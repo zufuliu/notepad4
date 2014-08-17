@@ -1,0 +1,11 @@
+/bin
+/build/Debug
+/build/Release
+/build/WDKRelease
+*.suo
+*.user
+*.aps
+*.obj
+*.exe
+*.pyc
+*.pyo

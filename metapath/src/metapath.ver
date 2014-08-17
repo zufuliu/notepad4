@@ -1,0 +1,57 @@
+/******************************************************************* mode:rc **
+*
+*
+* metapath - The universal Explorer-like Plugin
+*
+* metapath.ver
+*   metapath version information
+*
+* See Readme.txt for more information about this source code.
+* Please send me your comments to this work.
+*
+* See License.txt for details about distribution and modification.
+*
+*                                              (c) Florian Balmer 1996-2011
+*                                                  florian.balmer@gmail.com
+*                                               http://www.flos-freeware.ch
+*
+*
+******************************************************************************/
+
+
+#include "version.h"
+
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+#endif //_WIN32
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION    VERSION_FILEVERSION_NUM
+ PRODUCTVERSION VERSION_FILEVERSION_NUM
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+  BLOCK "StringFileInfo"
+  BEGIN
+    BLOCK "040904b0"
+    BEGIN
+      VALUE "FileDescription",  VERSION_FILEDESCRIPTION
+      VALUE "FileVersion",      VERSION_FILEVERSION_SHORT
+      VALUE "InternalName",     VERSION_INTERNALNAME
+      VALUE "LegalCopyright",   VERSION_LEGALCOPYRIGHT_LONG
+      VALUE "OriginalFilename", VERSION_ORIGINALFILENAME
+    END
+  END
+  BLOCK "VarFileInfo"
+  BEGIN
+    VALUE "Translation", 0x409, 1200
+  END
+END

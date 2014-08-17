@@ -1,0 +1,25 @@
+#include "EditLexer.h"
+
+static KEYWORDLIST Keywords_C = {
+""
+, // type keyword
+""
+, // #preprocessor
+""
+, // @directive
+""
+, // attribute
+""
+, // class
+""
+, // interface
+""
+, // enumeration
+""
+, // constant
+""
+
+#if NUMKEYWORD == 16
+,"","","","","","",""
+#endif
+};
