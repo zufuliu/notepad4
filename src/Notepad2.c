@@ -3526,25 +3526,16 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam)
 			// unset
 			SendMessage(hwndEdit , SCI_MARKERDELETE , iLine , 0);
 		} else {
-			// define (behöver bara göra detta en gång egentligen)
-			//SendMessage(hwndEdit , SCI_MARKERSETBACK , 0 , 74 | (203 << 8) | (0 << 16)); //behöver bara göra detta en gång egentligen
-			//SendMessage(hwndEdit , SCI_MARKERDEFINE , 0 , SC_MARK_ARROWS);		//behöver bara göra detta en gång egentligen
-
 			if (bShowSelectionMargin) {
 				SendMessage(hwndEdit , SCI_MARKERDEFINEPIXMAP , 0 , (LPARAM)bookmark_pixmap);
 			} else {
 				SendMessage(hwndEdit , SCI_MARKERSETBACK , 0 , 0xff << 8);
-				SendMessage(hwndEdit , SCI_MARKERSETALPHA , 0 , 20);
+				SendMessage(hwndEdit , SCI_MARKERSETALPHA , 0 , 40);
 				SendMessage(hwndEdit , SCI_MARKERDEFINE , 0 , SC_MARK_BACKGROUND);
 			}
 
-
-			//SendMessage(hwndEdit , SCI_MARKERSETBACK , 0 , 180 | (255 << 8) | (180 << 16)); //behöver bara göra detta en gång egentligen
-			//SendMessage(hwndEdit , SCI_MARKERDEFINE , 0 , SC_MARK_BACKGROUND);		//behöver bara göra detta en gång egentligen
-
 			// set
 			SendMessage(hwndEdit , SCI_MARKERADD , iLine , 0);
-			//SendMessage(hwndEdit , SCI_MARKERADD , iLine , 1);
 		}
 
 		break;
@@ -3840,7 +3831,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam)
 			SendMessage(hwndEdit , SCI_MARKERDEFINEPIXMAP , 0 , (LPARAM)bookmark_pixmap);
 		} else {
 			SendMessage(hwndEdit , SCI_MARKERSETBACK , 0 , 0xff << 8);
-			SendMessage(hwndEdit , SCI_MARKERSETALPHA , 0 , 20);
+			SendMessage(hwndEdit , SCI_MARKERSETALPHA , 0 , 40);
 			SendMessage(hwndEdit , SCI_MARKERDEFINE , 0 , SC_MARK_BACKGROUND);
 		}
 #endif
