@@ -404,7 +404,6 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	void SelectAll();
 	void Undo();
 	void Redo();
-	void DelChar();
 	void DelCharBack(bool allowLineStartDeletion);
 	virtual void ClaimSelection() = 0;
 
