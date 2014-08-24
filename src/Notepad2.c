@@ -288,7 +288,8 @@ UINT16		g_uWinVer;
 WCHAR		g_wchAppUserModelID[32] = L"";
 WCHAR		g_wchWorkingDirectory[MAX_PATH] = L"";
 
-
+#define	NP2_BookmarkLineForeColor	(0xff << 8)
+#define NP2_BookmarkLineColorAlpha	40
 
 #ifdef BOOKMARK_EDITION
 //Graphics for bookmark indicator
@@ -362,7 +363,7 @@ static char *bookmark_pixmap[] = {
 int		flagNoReuseWindow		= 0;
 int		flagReuseWindow			= 0;
 int		flagMultiFileArg		= 0;
-int		flagSingleFileInstance	= 0;
+int		flagSingleFileInstance	= 1;
 int		flagStartAsTrayIcon		= 0;
 int		flagAlwaysOnTop			= 0;
 int		flagRelativeFileMRU		= 0;
@@ -3529,8 +3530,8 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam)
 			if (bShowSelectionMargin) {
 				SendMessage(hwndEdit , SCI_MARKERDEFINEPIXMAP , 0 , (LPARAM)bookmark_pixmap);
 			} else {
-				SendMessage(hwndEdit , SCI_MARKERSETBACK , 0 , 0xff << 8);
-				SendMessage(hwndEdit , SCI_MARKERSETALPHA , 0 , 40);
+				SendMessage(hwndEdit , SCI_MARKERSETBACK , 0 , NP2_BookmarkLineForeColor);
+				SendMessage(hwndEdit , SCI_MARKERSETALPHA , 0 , NP2_BookmarkLineColorAlpha);
 				SendMessage(hwndEdit , SCI_MARKERDEFINE , 0 , SC_MARK_BACKGROUND);
 			}
 
@@ -3830,8 +3831,8 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam)
 		if (bShowSelectionMargin) {
 			SendMessage(hwndEdit , SCI_MARKERDEFINEPIXMAP , 0 , (LPARAM)bookmark_pixmap);
 		} else {
-			SendMessage(hwndEdit , SCI_MARKERSETBACK , 0 , 0xff << 8);
-			SendMessage(hwndEdit , SCI_MARKERSETALPHA , 0 , 40);
+			SendMessage(hwndEdit , SCI_MARKERSETBACK , 0 , NP2_BookmarkLineForeColor);
+			SendMessage(hwndEdit , SCI_MARKERSETALPHA , 0 , NP2_BookmarkLineColorAlpha);
 			SendMessage(hwndEdit , SCI_MARKERDEFINE , 0 , SC_MARK_BACKGROUND);
 		}
 #endif
@@ -3843,6 +3844,10 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam)
 		break;
 	case IDM_VIEW_AUTOCOMPLETEWORDS:
 		bAutoCompleteWords = !bAutoCompleteWords;
+		if (!bAutoCompleteWords) {
+			// close the autocompletion list
+			SendMessage(hwndEdit, SCI_AUTOCCANCEL, 0, 0);
+		}
 		break;
 	case IDM_VIEW_AUTOCWITHDOCWORDS:
 		bAutoCIncludeDocWord = !bAutoCIncludeDocWord;

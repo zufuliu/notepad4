@@ -973,6 +973,8 @@ PEDITLEXER __fastcall Style_SniffShebang(char *pchText)
 					return (&lexBash);
 				if (!(StrCmpNIA(pch - 3, "gawk.exe", 8) && StrCmpNIA(pch - 3, "nawk.exe", 8)))
 					return (&lexAwk);
+				if (StrCmpNIA(pch-8, "node.exe", 8) == 0)
+					return (&lexJS);
 				//if (StrCmpNIA(pch-8, "wlua.exe", 8) == 0)
 				//	return (&lexLua);
 				//if (StrCmpNIA(pch-8, "ipyw.exe", 8) == 0)
@@ -1023,8 +1025,8 @@ PEDITLEXER __fastcall Style_SniffShebang(char *pchText)
 				return (&lexPerl);
 			if (!StrCmpNIA(pch - 4, "ruby", 4))
 				return (&lexRuby);
-			//if (!StrCmpNA(pch - 4, "node", 4) == 0)
-			//	return(&lexJS);
+			if (!StrCmpNA(pch - 4, "node", 4) == 0)
+				return(&lexJS);
 			//if (!StrCmpNIA(pch-4, "wish", 4))
 			//	return (&lexTcl);
 			if (!(StrCmpNIA(pch - 3, "gawk", 4) && StrCmpNIA(pch - 3, "nawk", 4)))
@@ -1497,6 +1499,10 @@ void Style_SetLexerFromFile(HWND hwnd, LPCWSTR lpszFile)
 		}
 		if (!bFound && !lstrcmpi(lpszName, L"Rakefile")) {
 			pLexNew = &lexRuby;
+			bFound = TRUE;
+		}
+		if (!bFound && !lstrcmpi(lpszName, L"mozconfig")) {
+			pLexNew = &lexBash;
 			bFound = TRUE;
 		}
 		// Boost build

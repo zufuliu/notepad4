@@ -8,7 +8,7 @@ static KEYWORDLIST Keywords_Smail = {
 "true false null "
 "build runtime system "
 "public private protected static final synchronized bridge varargs native abstract "
-"strictfp synthetic constructor declared-synchronized interface enum annotation volatile transient "
+"strictfp synthetic constructor declared-synchronized class interface enum annotation volatile transient "
 "no-error generic-error no-such-class no-such-field no-such-method "
 "illegal-class-access illegal-field-access illegal-method-access "
 "class-change-error instantiation-error "

@@ -30,6 +30,10 @@ static inline bool IsSmaliWordChar(int ch) {
 	return iswordchar(ch) || ch == '-';
 }
 
+static inline bool IsOpcodeChar(int ch) {
+	return ch == '_'  || ch == '-' || IsAlpha(ch);
+}
+
 static inline bool IsJavaTypeChar(int ch) {
 	return ch == 'V'	// void
 		|| ch == 'Z'	// boolean
@@ -149,7 +153,7 @@ static void ColouriseSmaliDoc(unsigned int startPos, int length, int initStyle, 
 			}
 			break;
 		case SCE_SMALI_INSTRUCTION:
-			if (!(iswordchar(ch) || ch == '-' || ch == '/')) {
+			if (!(IsSmaliWordChar(ch) || ch == '/')) {
 				styler.ColourTo(i - 1, state);
 				state = SCE_SMALI_DEFAULT;
 			}
@@ -222,7 +226,17 @@ static void ColouriseSmaliDoc(unsigned int startPos, int length, int initStyle, 
 		}
 
 		if (state == SCE_SMALI_DEFAULT) {
-			if (ch == '#' || (ch == ';' && !iswordchar(chPrev))) { // jasmin
+			if (ch == '#') {
+				styler.ColourTo(i - 1, state);
+				if (IsADigit(chNext)) { // javap
+					state = SCE_SMALI_NUMBER;
+				} else {
+					state = SCE_SMALI_COMMENTLINE;
+				}
+			} else if (ch == '/' && chNext == '/') { // javap
+				styler.ColourTo(i - 1, state);
+				state = SCE_SMALI_COMMENTLINE;
+			} else if (ch == ';' && !(chPrev == '>' || iswordchar(chPrev))) { // jasmin
 				styler.ColourTo(i - 1, state);
 				state = SCE_SMALI_COMMENTLINE;
 			} else if (ch == '\"') {
@@ -272,10 +286,9 @@ static void ColouriseSmaliDoc(unsigned int startPos, int length, int initStyle, 
 			visibleChars = 0;
 			nextWordType = 0;
 		}
-		if (!isspacechar(ch)) {
+		if (ch == '.' || IsOpcodeChar(ch) || (IsADigit(ch) && IsOpcodeChar(chPrev))) {
 			visibleChars++;
 		}
-
 	}
 
 	// Colourise remaining document
@@ -290,6 +303,9 @@ static inline bool IsFoldWord(const char *word) {
 		|| strcmp(word, "packed-switch") == 0
 		|| strcmp(word, "sparse-switch") == 0
 		|| strcmp(word, "array-data") == 0
+		// not used in Smali and Jasmin or javap
+		|| strcmp(word, "tableswitch") == 0
+		|| strcmp(word, "lookupswitch") == 0
 		|| strcmp(word, "constant-pool") == 0
 		|| strcmp(word, "attribute") == 0;
 }
