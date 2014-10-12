@@ -243,6 +243,17 @@ val SC_CP_UTF8=65001
 # The SC_CP_UTF8 value can be used to enter Unicode mode.
 set void SetCodePage=2037(int codePage,)
 
+enu IMEInteraction=SC_IME_
+val SC_IME_WINDOWED=0
+val SC_IME_INLINE=1
+
+# Is the IME displayed in a winow or inline?
+get int GetIMEInteraction=2678(,)
+
+# Choose to display the the IME in a winow or inline.
+set void SetIMEInteraction=2679(int imeInteraction,)
+
+
 enu MarkerSymbol=SC_MARK_
 val MARKER_MAX=31
 val SC_MARK_CIRCLE=0
@@ -601,7 +612,9 @@ val INDIC_SQUIGGLELOW=11
 val INDIC_DOTBOX=12
 val INDIC_SQUIGGLEPIXMAP=13
 val INDIC_COMPOSITIONTHICK=14
-val INDIC_MAX=31
+val INDIC_IME=32
+val INDIC_IME_MAX=35
+val INDIC_MAX=35
 val INDIC_CONTAINER=8
 val INDIC0_MASK=0x20
 val INDIC1_MASK=0x40
@@ -882,6 +895,7 @@ val SCFIND_MATCHCASE=0x4
 val SCFIND_WORDSTART=0x00100000
 val SCFIND_REGEXP=0x00200000
 val SCFIND_POSIX=0x00400000
+val SCFIND_CXX11REGEX=0x00800000
 
 # Find some text in the document.
 fun position FindText=2150(int flags, findtext ft)
@@ -1659,6 +1673,8 @@ enu Status=SC_STATUS_
 val SC_STATUS_OK=0
 val SC_STATUS_FAILURE=1
 val SC_STATUS_BADALLOC=2
+val SC_STATUS_WARN_START=1000
+val SC_STATUS_WARN_REGEX=1001
 
 # Change error status - 0 = OK.
 set void SetStatus=2382(int statusCode,)
@@ -2357,6 +2373,7 @@ fun void ScrollToEnd=2629(,)
 
 val SC_TECHNOLOGY_DEFAULT=0
 val SC_TECHNOLOGY_DIRECTWRITE=1
+val SC_TECHNOLOGY_DIRECTWRITERETAIN=2
 
 # Set the technology used.
 set void SetTechnology=2630(int technology,)

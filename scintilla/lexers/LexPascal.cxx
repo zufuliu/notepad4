@@ -48,12 +48,6 @@ static void ClassifyPascalWord(WordList *keywordlists[], StyleContext &sc, int &
 	WordList& prcwords = *keywordlists[3];
 	char s[128];
 	sc.GetCurrentLowered(s, sizeof(s));
-	if (funwords.InList(s) || prcwords.InList(s)) {
-		while (!sc.atLineEnd && sc.ch == ' ')
-			sc.Forward();
-		if (sc.ch == '(')
-			sc.ChangeState(SCE_PAS_FUNCTION);
-	}
 	if (typewords.InList(s)) {
 		sc.ChangeState(SCE_PAS_TYPE);
 	}
@@ -94,6 +88,16 @@ static void ClassifyPascalWord(WordList *keywordlists[], StyleContext &sc, int &
 	} else if (curLineState & stateInAsm) {
 		sc.ChangeState(SCE_PAS_ASM);
 	}
+	while (!sc.atLineEnd && sc.ch == ' ')
+		sc.Forward();
+	if (sc.ch == '(') {
+		if (funwords.InList(s) || prcwords.InList(s)) {
+			sc.ChangeState(SCE_PAS_FUNCTION1);
+		} else {
+			sc.ChangeState(SCE_PAS_FUNCTION);
+		}
+	}
+
 	sc.SetState(SCE_PAS_DEFAULT);
 }
 

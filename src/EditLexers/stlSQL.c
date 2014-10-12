@@ -66,7 +66,7 @@ EDITLEXER lexSQL = { SCLEX_SQL, NP2LEX_SQL, L"SQL Query", L"sql; mysql", L"", &K
 	{ MULTI_STYLE(SCE_SQL_HEX,SCE_SQL_HEX2,0,0), NP2STYLE_BlobHex, L"Blob Hex", L"fore:#C08000", L""},
 	{ MULTI_STYLE(SCE_SQL_BIT,SCE_SQL_BIT2,0,0), NP2STYLE_BitField, L"Bit Field ", L"fore:#C08000", L""},
 	{ SCE_SQL_VARIABLE, NP2STYLE_Variable, L"Variable", L"fore:#CC3300", L"" },
-	{ SCE_SQL_OPERATOR, NP2STYLE_Operator, L"Operator", L"fore:#B000B0", L"" },
+	{ MULTI_STYLE(SCE_SQL_OPERATOR, SCE_SQL_QOPERATOR, 0, 0), NP2STYLE_Operator, L"Operator", L"fore:#B000B0", L"" },
 	{ -1, 00000, L"", L"", L"" }
 }
 };

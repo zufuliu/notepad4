@@ -90,6 +90,11 @@ _label_identifier:
 				sc.ChangeState(SCE_VHDL_STRINGEOL);
 				sc.ForwardSetState(SCE_VHDL_DEFAULT);
 			}
+		} else if (sc.state == SCE_VHDL_BLOCK_COMMENT) {
+			if (sc.ch == '*' && sc.chNext == '/') {
+				sc.Forward();
+				sc.ForwardSetState(SCE_VHDL_DEFAULT);
+			}
 		}
 
 		// Determine if a new state should be entered.
@@ -106,6 +111,8 @@ _label_identifier:
 					sc.SetState(SCE_VHDL_COMMENTLINEBANG);
 				else
 					sc.SetState(SCE_VHDL_COMMENT);
+			} else if (sc.Match('/', '*')) {
+				sc.SetState(SCE_VHDL_BLOCK_COMMENT);
 			} else if (sc.ch == '\"') {
 				sc.SetState(SCE_VHDL_STRING);
 			} else if (isoperator(static_cast<char>(sc.ch))) {
@@ -118,6 +125,14 @@ _label_identifier:
 		goto _label_identifier;
 
 	sc.Complete();
+}
+
+static inline bool IsCommentStyle(int style) {
+	return style == SCE_VHDL_BLOCK_COMMENT || style == SCE_VHDL_COMMENT || style == SCE_VHDL_COMMENTLINEBANG;
+}
+
+static inline bool IsStreamCommentStyle(int style) {
+	return style == SCE_VHDL_BLOCK_COMMENT;
 }
 
 #define IsCommentLine(line) IsLexCommentLine(line, styler, MultiStyle(SCE_VHDL_COMMENT, SCE_VHDL_COMMENTLINEBANG))
@@ -162,12 +177,12 @@ static void FoldVHDLDoc(unsigned int startPos, int length, int /*initStyle*/, Wo
 		char chPrev = styler.SafeGetCharAt(j-1);
 		int style = styler.StyleAt(j);
 		int stylePrev = styler.StyleAt(j-1);
-		if ((stylePrev != SCE_VHDL_COMMENT) && (stylePrev != SCE_VHDL_STRING)) {
+		if ((!IsCommentStyle(stylePrev)) && (stylePrev != SCE_VHDL_STRING)) {
 			if(iswordchar(chPrev) && !iswordchar(ch)) {
 				end = j - 1;
 			}
 		}
-		if ((style != SCE_VHDL_COMMENT) && (style != SCE_VHDL_STRING)) {
+		if ((!IsCommentStyle(style)) && (style != SCE_VHDL_STRING)) {
 			if(!iswordchar(chPrev) && iswordstart(ch) && (end != 0)) {
 				char s[32];
 				unsigned int k;
@@ -183,10 +198,10 @@ static void FoldVHDLDoc(unsigned int startPos, int length, int /*initStyle*/, Wo
 			}
 		}
 	}
-	for(j=j+strlen(prevWord); j<endPos; j++) {
+	for(j = j+strlen(prevWord); j<endPos; j++) {
 		char ch = styler.SafeGetCharAt(j);
 		int style = styler.StyleAt(j);
-		if ((style != SCE_VHDL_COMMENT) && (style != SCE_VHDL_STRING))
+		if ((!IsCommentStyle(style)) && (style != SCE_VHDL_STRING))
 		{
 			if((ch == ';') && (strcmp(prevWord, "end") == 0))
 			{
@@ -196,7 +211,7 @@ static void FoldVHDLDoc(unsigned int startPos, int length, int /*initStyle*/, Wo
 	}
 
 	char ch, chPrev, chNext;
-	int style, styleNext;
+	int stylePrev, style = SCE_VHDL_DEFAULT, styleNext;
 	chNext = styler[startPos];
 	chPrev = '\0';
 	styleNext = styler.StyleAt(startPos);
@@ -213,6 +228,7 @@ static void FoldVHDLDoc(unsigned int startPos, int length, int /*initStyle*/, Wo
 			j ++ ;
 			chNextNonBlank = styler.SafeGetCharAt(j);
 		}
+		stylePrev = style;
 		style = styleNext;
 		styleNext = styler.StyleAt(i + 1);
 		atEOL = (ch == '\r' && chNext != '\n') || (ch == '\n');
@@ -223,6 +239,13 @@ static void FoldVHDLDoc(unsigned int startPos, int length, int /*initStyle*/, Wo
 			else if(IsCommentLine(lineCurrent-1) && !IsCommentLine(lineCurrent+1))
 				levelNext--;
 		}
+		if (foldComment && IsStreamCommentStyle(style) && !IsCommentLine(lineCurrent)) {
+			if (!IsStreamCommentStyle(stylePrev)) {
+				levelNext++;
+			} else if (!IsStreamCommentStyle(styleNext) && !atEOL) {
+				levelNext--;
+			}
+		}
 
 		if ((style == SCE_VHDL_OPERATOR) && foldAtParenthese) {
 			if(ch == '(') {
@@ -232,7 +255,7 @@ static void FoldVHDLDoc(unsigned int startPos, int length, int /*initStyle*/, Wo
 			}
 		}
 
-		if ((style != SCE_VHDL_COMMENT) && (style != SCE_VHDL_STRING)) {
+		if ((!IsCommentStyle(style)) && (style != SCE_VHDL_STRING)) {
 			if((ch == ';') && (strcmp(prevWord, "end") == 0)) {
 				strcpy(prevWord, ";");
 			}
@@ -252,7 +275,6 @@ static void FoldVHDLDoc(unsigned int startPos, int length, int /*initStyle*/, Wo
 				if(kwFold.InList(s)) {
 					if (
 						strcmp(s, "architecture") == 0 || strcmp(s, "case") == 0 ||
-						strcmp(s, "component") == 0 || strcmp(s, "entity") == 0 ||
 						strcmp(s, "generate") == 0 || strcmp(s, "loop") == 0 ||
 						strcmp(s, "package") ==0 || strcmp(s, "process") == 0 ||
 						strcmp(s, "record") == 0 || strcmp(s, "then") == 0) {
@@ -262,21 +284,47 @@ static void FoldVHDLDoc(unsigned int startPos, int length, int /*initStyle*/, Wo
 							}
 							levelNext++;
 						}
-					} else if ( strcmp(s, "procedure") == 0 ||strcmp(s, "function") == 0) {
+					}
+					else if (
+						strcmp(s, "component") == 0 ||
+						strcmp(s, "entity") == 0 ||
+						strcmp(s, "configuration") == 0) {
+						if (strcmp(prevWord, "end") != 0) {
+							// check for instantiated unit by backward searching for the colon.
+							unsigned pos = lastStart - 1;
+							char chAtPos, styleAtPos;
+							do { // skip white spaces
+								styleAtPos = styler.StyleAt(pos);
+								chAtPos = styler.SafeGetCharAt(pos--);
+							} while (pos > 0 &&
+									(chAtPos == ' ' || chAtPos == '\t' ||
+									chAtPos == '\n' || chAtPos == '\r' ||
+									IsCommentStyle(styleAtPos)));
+
+							// check for a colon (':') before the instantiated units "entity", "component" or "configuration". Don't fold thereafter.
+							if (chAtPos != ':') {
+								if (levelMinCurrentElse > levelNext) {
+									levelMinCurrentElse = levelNext;
+								}
+								levelNext++;
+							}
+						}
+					}
+					else if ( strcmp(s, "procedure") == 0 ||strcmp(s, "function") == 0) {
 						if (strcmp(prevWord, "end") != 0) {
 						// check for "end procedure" etc.
 						// This code checks to see if the procedure / function is a definition within a "package"
 							// rather than the actual code in the body.
 							int BracketLevel = 0;
 							for(int j=i+1; j<styler.Length(); j++) {
-								int LocalStyle = styler.StyleAt(j);
-								char LocalCh = styler.SafeGetCharAt(j);
-								if(LocalCh == '(') BracketLevel++;
-								if(LocalCh == ')') BracketLevel--;
+								int styleAtPos = styler.StyleAt(j);
+								char chAtPos = styler.SafeGetCharAt(j);
+								if(chAtPos == '(') BracketLevel++;
+								if(chAtPos == ')') BracketLevel--;
 								if(
 									(BracketLevel == 0) &&
-									(LocalStyle != SCE_VHDL_COMMENT) &&
-									(LocalStyle != SCE_VHDL_STRING) &&
+									(!IsCommentLine(styleAtPos)) &&
+									(styleAtPos != SCE_VHDL_STRING) &&
 									!iswordchar(styler.SafeGetCharAt(j-1)) &&
 									styler.Match(j, "is") &&
 									!iswordchar(styler.SafeGetCharAt(j+2))) {
@@ -286,7 +334,7 @@ static void FoldVHDLDoc(unsigned int startPos, int length, int /*initStyle*/, Wo
 									levelNext++;
 									break;
 								}
-								if((BracketLevel == 0) && (LocalCh == ';')) {
+								if((BracketLevel == 0) && (chAtPos == ';')) {
 									break;
 								}
 							}
@@ -310,6 +358,7 @@ static void FoldVHDLDoc(unsigned int startPos, int length, int /*initStyle*/, Wo
 				}
 			}
 		}
+
 		if (!isspacechar(ch))
 			visibleChars++;
 		if (atEOL || (i == endPos-1)) {

@@ -43,7 +43,7 @@ EDITLEXER lexVHDL = { SCLEX_VHDL, NP2LEX_VHDL, L"VHDL Source", L"vhd; vhdl", L""
 	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
 	// { SCE_VHDL_DEFAULT, L"Default", L"", L"" },
 	{ SCE_VHDL_KEYWORD, NP2STYLE_Keyword, L"Keyword", L"fore:#0000FF", L"" },
-	{ MULTI_STYLE(SCE_VHDL_COMMENT,SCE_VHDL_COMMENTLINEBANG,0,0), NP2STYLE_Comment, L"Comment", L"fore:#008000", L"" },
+	{ MULTI_STYLE(SCE_VHDL_COMMENT,SCE_VHDL_COMMENTLINEBANG,SCE_VHDL_BLOCK_COMMENT,0), NP2STYLE_Comment, L"Comment", L"fore:#008000", L"" },
 	{ SCE_VHDL_STRING, NP2STYLE_String, L"String", L"fore:#008000", L"" },
 	{ SCE_VHDL_NUMBER, NP2STYLE_Number, L"Number", L"fore:#FF0000", L"" },
 	{ SCE_VHDL_OPERATOR, NP2STYLE_Operator, L"Operator", L"fore:#B000B0", L"" },

@@ -12,6 +12,7 @@
 #include <assert.h>
 #include <ctype.h>
 
+#include <stdexcept>
 #include <string>
 #include <vector>
 #include <map>
@@ -215,11 +216,11 @@ void EditView::ClearAllTabstops() {
 	ldTabstops = 0;
 }
 
-int EditView::NextTabstopPos(int line, int x, int tabWidth) const {
-	int next = GetNextTabstop(line, x);
+XYPOSITION EditView::NextTabstopPos(int line, XYPOSITION x, XYPOSITION tabWidth) const {
+	int next = GetNextTabstop(line, static_cast<int>(x + 2));
 	if (next > 0)
-		return next;
-	return ((((x + 2) / tabWidth) + 1) * tabWidth);
+		return static_cast<XYPOSITION>(next);
+	return (static_cast<int>((x + 2) / tabWidth) + 1) * tabWidth;
 }
 
 bool EditView::ClearTabstops(int line) {
@@ -452,9 +453,8 @@ void EditView::LayoutLine(const EditModel &model, int line, Surface *surface, co
 					XYPOSITION representationWidth = vstyle.controlCharWidth;
 					if (ll->chars[ts.start] == '\t') {
 						// Tab is a special case of representation, taking a variable amount of space
-						const int x = static_cast<int>(ll->positions[ts.start]);
-						const int tabWidth = static_cast<int>(vstyle.tabWidth);
-						representationWidth = static_cast<XYPOSITION>(NextTabstopPos(line, x, tabWidth) - ll->positions[ts.start]);
+						const XYPOSITION x = ll->positions[ts.start];
+						representationWidth = NextTabstopPos(line, x, vstyle.tabWidth) - ll->positions[ts.start];
 					} else {
 						if (representationWidth <= 0.0) {
 							XYPOSITION positionsRepr[256];	// Should expand when needed

@@ -30,6 +30,7 @@
 #include <set>
 #include <algorithm>
 #include <memory>
+#include <regex>
 
 // GTK+ headers
 #include <glib.h>

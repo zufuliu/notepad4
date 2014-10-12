@@ -63,6 +63,9 @@ static inline bool _sharpComment(int lex) {
 static inline bool _hasXML(int lex) {
 	return lex == LEX_JS || lex == LEX_AS || lex == LEX_SCALA;
 }
+static inline bool _squareBraceAfterType(int lex) {
+	return lex == LEX_JAVA || lex == LEX_CS || lex == LEX_JS || lex == LEX_AS || lex == LEX_HX || lex == LEX_GROOVY || lex == LEX_SCALA;
+}
 static inline bool IsDStrFix(int ch) {
 	return (ch < 0x80) && (ch == 'c' || ch == 'w' || ch == 'd');
 }
@@ -271,6 +274,7 @@ _label_identifier:
 				bool hasAttr = (lexType == LEX_CPP || lexType == LEX_OBJC || isObjCSource || lexType == LEX_CS);
 				bool mayAttr = lastWordWasAttr && (numRBrace > 0 || (lineState & LEX_BLOCK_MASK_DEFINE));
 				bool mayCSAttr = (lexType == LEX_CS) && numSBrace == 1 && numRBrace == 0;
+				const char nextChar = LexGetNextChar(sc.currentPos, styler);
 
 				if (lastPPDefineWord) {
 					if (lastPPDefineWord == 2 && strcmp(s, "defined") == 0)
@@ -353,8 +357,11 @@ _label_identifier:
 					sc.ChangeState(SCE_C_INTERFACE);
 				} else if (lexType != LEX_PHP && kwEnumeration.InList(s)) {
 					sc.ChangeState(SCE_C_ENUMERATION);
-				} else if (LexGetNextChar(sc.currentPos, styler) == '(' && kwConstant.InListAbbreviated(s, '(')) {
-					sc.ChangeState(SCE_C_MACRO2);
+				} else if (nextChar == '(') {
+					if (kwConstant.InListAbbreviated(s, '('))
+						sc.ChangeState(SCE_C_MACRO2);
+					else
+						sc.ChangeState(SCE_C_FUNCTION);
 				} else if (kwConstant.InList(s)) {
 					sc.ChangeState(SCE_C_CONSTANT);
 				} else if ((isObjCSource || _use2ndKeyword(lexType)) && kw2ndKeyword.InList(s)) {
@@ -368,6 +375,66 @@ _label_identifier:
 					&& (numCBrace > 0 && numSBrace == 0 && numRBrace == 0)
 					&& visibleChars == static_cast<int>(strlen(s))) {
 					sc.ChangeState(SCE_C_LABEL);
+				} else if (iswordchar(s[0]) && (IsASpace(sc.ch) || sc.ch == '[' || sc.ch == ')' || sc.ch == '>'
+					|| sc.ch == '*' || sc.ch == '&' || sc.ch == ':')) {
+					bool is_class = false;
+					int pos = sc.currentPos;
+					int next_char = IsASpace(sc.ch)? nextChar : sc.ch;
+
+					if (sc.ch == ':' && sc.chNext == ':') { // C++, Java, PHP
+						is_class = true;
+					} else if (IsASpace(sc.ch) && iswordstart(next_char)) {
+						is_class = true;
+						if (isObjCSource && numSBrace > 0) {
+							if (!IsUpperCase(s[0])) is_class = false;
+						}
+					} else if (next_char == ')' || next_char == '>'  || next_char == '[' || next_char == '*' || next_char == '&') {
+						while (IsASpace(styler.SafeGetCharAt(pos, '\0'))) pos++;
+						pos++;
+						while (IsASpace(styler.SafeGetCharAt(pos, '\0'))) pos++;
+						int ch = styler.SafeGetCharAt(pos, '\0');
+						const bool next_is_word = iswordstart(ch);
+						if (next_char == ')' || next_char == '>') {
+							if (next_is_word || (ch == '(')) {
+								pos = sc.currentPos - strlen(s) -1;
+								while (IsASpace(styler.SafeGetCharAt(pos, '\0'))) pos--;
+								ch = styler.SafeGetCharAt(pos, '\0');
+								if (next_char == '>' && (ch == '<' || ch == ',')) {
+									is_class = true;
+								} else if (next_char == ')' && ch == '(') {
+									pos--;
+									while (IsASpace(styler.SafeGetCharAt(pos, '\0'))) pos--;
+									ch = styler.SafeGetCharAt(pos, '\0');
+									if (ch == '=' || ch == '(') {
+										is_class = true;
+									}
+								}
+
+							}
+						} else if (next_is_word) {
+							pos++;
+							while (iswordchar(styler.SafeGetCharAt(pos, '\0'))) pos++;
+							while (IsASpace(styler.SafeGetCharAt(pos, '\0'))) pos++;
+							ch = styler.SafeGetCharAt(pos, '\0');
+							if (ch == '=') {
+								is_class = true;
+							} else if (ch == ',' || ch == ';') {
+								pos = sc.currentPos - strlen(s) -1;
+								while (IsASpace(styler.SafeGetCharAt(pos, '\0'))) pos--;
+								ch = styler.SafeGetCharAt(pos, '\0');
+								if (iswordchar(ch) || ch == ';' || ch == '{') {
+									is_class = true;
+								}
+							}
+						} else if (ch == ')' || ch == '>' || ch == '*') {
+							is_class = true;
+						} else if (ch == ']' && _squareBraceAfterType(lexType)) {
+							is_class = true;
+						}
+					}
+					if (is_class) {
+						sc.ChangeState(SCE_C_CLASS);
+					}
 				}
 
 				if ((isIncludePreprocessor && (sc.ch == '<' || sc.ch == '\"'))

@@ -237,7 +237,7 @@ EDITLEXER lexPHP = { SCLEX_CPP, NP2LEX_PHP, L"PHP Script", L"php;", L"", &Keywor
 	{ SCE_C_CLASS, NP2STYLE_Class, L"Class", L"bold; fore:#007F7F", L"" },
 	{ SCE_C_INTERFACE, NP2STYLE_Interface, L"Interface", L"bold; fore:#1E90FF", L""},
 	{ SCE_C_TRAIT, NP2STYLE_Trait, L"Trait", L"bold; fore:#007F7F", L"" },
-	{ SCE_C_FUNCTION, NP2STYLE_Function, L"Function", L"fore:#0080C0", L"" },
+	{ SCE_C_FUNCTION, NP2STYLE_Function, L"Function", L"fore:#A46000", L"" },
 	{ SCE_C_WORD2, 63361, L"Magic Method", L"fore:#0080C0", L"" },
 	{ SCE_C_ATTRIBUTE, 63362, L"Magic Constant", L"fore:#FF8000", L""},
 	{ SCE_C_ENUMERATION, NP2STYLE_PredefinedVariable, L"Predefined Variable", L"bold; italic; fore:#0080C0", L""},

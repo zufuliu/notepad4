@@ -51,6 +51,7 @@
 #define NP2STYLE_Annotation			63333
 #define NP2STYLE_Object				63334
 #define NP2STYLE_Type				63335
+#define NP2STYLE_FunctionDef		63336
 
 #define NP2STYLE_Label				63340
 #define NP2STYLE_Command			63341

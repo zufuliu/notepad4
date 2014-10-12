@@ -460,7 +460,8 @@ void ScintillaWin::EnsureRenderTarget() {
 		D2D1_HWND_RENDER_TARGET_PROPERTIES dhrtp;
 		dhrtp.hwnd = hw;
 		dhrtp.pixelSize = size;
-		dhrtp.presentOptions = D2D1_PRESENT_OPTIONS_NONE;
+		dhrtp.presentOptions = (technology == SC_TECHNOLOGY_DIRECTWRITERETAIN) ?
+			D2D1_PRESENT_OPTIONS_RETAIN_CONTENTS : D2D1_PRESENT_OPTIONS_NONE;
 
 		D2D1_RENDER_TARGET_PROPERTIES drtp;
 		drtp.type = D2D1_RENDER_TARGET_TYPE_DEFAULT;
@@ -1405,9 +1406,11 @@ sptr_t ScintillaWin::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam
 			return keysAlwaysUnicode;
 
 		case SCI_SETTECHNOLOGY:
-			if ((wParam == SC_TECHNOLOGY_DEFAULT) || (wParam == SC_TECHNOLOGY_DIRECTWRITE)) {
+			if ((wParam == SC_TECHNOLOGY_DEFAULT) ||
+				(wParam == SC_TECHNOLOGY_DIRECTWRITERETAIN) ||
+				(wParam == SC_TECHNOLOGY_DIRECTWRITE)) {
 				if (technology != static_cast<int>(wParam)) {
-					if (static_cast<int>(wParam) == SC_TECHNOLOGY_DIRECTWRITE) {
+					if (static_cast<int>(wParam) > SC_TECHNOLOGY_DEFAULT) {
 #if defined(USE_D2D)
 						if (!LoadD2D())
 							// Failed to load Direct2D or DirectWrite so no effect
@@ -2963,7 +2966,8 @@ sptr_t PASCAL ScintillaWin::CTWndProc(
 						D2D1_HWND_RENDER_TARGET_PROPERTIES dhrtp;
 						dhrtp.hwnd = hWnd;
 						dhrtp.pixelSize = D2D1::SizeU(rc.right - rc.left, rc.bottom - rc.top);
-						dhrtp.presentOptions = D2D1_PRESENT_OPTIONS_NONE;
+						dhrtp.presentOptions = (sciThis->technology == SC_TECHNOLOGY_DIRECTWRITERETAIN) ?
+							D2D1_PRESENT_OPTIONS_RETAIN_CONTENTS : D2D1_PRESENT_OPTIONS_NONE;
 
 						D2D1_RENDER_TARGET_PROPERTIES drtp;
 						drtp.type = D2D1_RENDER_TARGET_TYPE_DEFAULT;

@@ -193,7 +193,7 @@ static void ColouriseSmaliDoc(unsigned int startPos, int length, int initStyle, 
 						styler.ColourTo(i - 1, SCE_SMALI_OPERATOR);
 					state = (ch == '(' || ch == '>')? SCE_SMALI_DEFAULT : SCE_SMALI_METHOD;
 				} else if (/*kwInstruction.InList(buf)*/ wordLen == visibleChars && !curLineState) {
-					if (IsASpace(ch)) {
+					if (!(IsSmaliWordChar(ch) || ch == '/')) {
 						styler.ColourTo(i - 1, SCE_SMALI_INSTRUCTION);
 						state = SCE_SMALI_DEFAULT;
 					} else {
@@ -286,7 +286,7 @@ static void ColouriseSmaliDoc(unsigned int startPos, int length, int initStyle, 
 			visibleChars = 0;
 			nextWordType = 0;
 		}
-		if (ch == '.' || IsOpcodeChar(ch) || (IsADigit(ch) && IsOpcodeChar(chPrev))) {
+		if (ch == '.' || (ch == ':' && !IsASpace(chNext)) || IsOpcodeChar(ch) || (IsADigit(ch) && IsOpcodeChar(chPrev))) {
 			visibleChars++;
 		}
 	}

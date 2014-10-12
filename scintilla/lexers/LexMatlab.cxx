@@ -141,6 +141,8 @@ _label_identifier:
 					sc.ChangeState(SCE_MAT_FUNCTION1);
 				} else if (function2.InList(s)) {
 					sc.ChangeState(SCE_MAT_FUNCTION2);
+				} else if (LexGetNextChar(sc.currentPos, styler) == '(') {
+					sc.ChangeState(SCE_MAT_FUNCTION);
 				}
 				sc.SetState(SCE_MAT_DEFAULT);
 			}

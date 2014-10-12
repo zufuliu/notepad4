@@ -32,7 +32,7 @@ enum DrawPhase {
 	drawLineTranslucent = 0x40,
 	drawFoldLines = 0x80,
 	drawCarets = 0x100,
-	drawAll = 0x1FF,
+	drawAll = 0x1FF
 };
 
 bool ValidStyledText(const ViewStyle &vs, size_t styleOffset, const StyledText &st);
@@ -86,7 +86,7 @@ public:
 	bool LinesOverlap() const;
 
 	void ClearAllTabstops();
-	int NextTabstopPos(int line, int x, int tabWidth) const;
+	XYPOSITION NextTabstopPos(int line, XYPOSITION x, XYPOSITION tabWidth) const;
 	bool ClearTabstops(int line);
 	bool AddTabstop(int line, int x);
 	int GetNextTabstop(int line, int x) const;

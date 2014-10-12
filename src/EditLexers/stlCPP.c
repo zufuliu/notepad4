@@ -435,7 +435,7 @@ EDITLEXER lexCPP= { SCLEX_CPP, NP2LEX_CPP, L"C/C++ Source", L"c; cpp; cxx; cc; h
 	{ SCE_C_STRUCT, NP2STYLE_Struct, L"Struct", L"fore:#0080FF", L"" },
 	{ SCE_C_UNION, NP2STYLE_Union, L"Union", L"fore:#0080FF", L"" },
 	{ SCE_C_INTERFACE, NP2STYLE_Interface, L"Interface", L"bold; fore:#1E90FF", L""},
-	{ SCE_C_FUNCTION, NP2STYLE_Function, L"Function", L"fore:#0080C0", L"" },
+	{ SCE_C_FUNCTION, NP2STYLE_Function, L"Function", L"fore:#A46000", L"" },
 	{ SCE_C_ENUMERATION, NP2STYLE_Enumeration, L"Enumeration", L"fore:#FF8000", L""},
 	{ SCE_C_CONSTANT, NP2STYLE_Constant, L"Constant", L"bold; fore:#B000B0", L""},
 	{ MULTI_STYLE(SCE_C_MACRO2,SCE_C_MACRO,0,0), NP2STYLE_Macro, L"Macro", L"bold; fore:#B000B0", L""},

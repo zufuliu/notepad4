@@ -72,10 +72,10 @@ $(SCI_LEX_OBJDIR)\LexVim.obj: $(SCI_LEX)\LexVim.cxx $(LEX_HEADERS)
 ##  scintilla\lexlib  ##
 ########################
 $(SCI_LIB_OBJDIR)\Accessor.obj: \
+    $(SCI_LIB)\Accessor.cxx \
     $(SCI_INC)\ILexer.h \
     $(SCI_INC)\Scintilla.h \
     $(SCI_INC)\SciLexer.h \
-    $(SCI_LIB)\Accessor.cxx \
     $(SCI_LIB)\PropSetSimple.h \
     $(SCI_LIB)\WordList.h \
     $(SCI_LIB)\LexAccessor.h \

@@ -188,6 +188,10 @@ public:
 	}
 };
 
+struct RegexError : public std::runtime_error {
+	RegexError() : std::runtime_error("regex failure") {}
+};
+
 /**
  */
 class Document : PerLine, public IDocumentWithLineEnd, public ILoader {
@@ -270,7 +274,7 @@ public:
 	bool IsCrLf(int pos) const;
 	int LenChar(int pos);
 	bool InGoodUTF8(int pos, int &start, int &end) const;
-	int MovePositionOutsideChar(int pos, int moveDir, bool checkLineEnd=true);
+	int MovePositionOutsideChar(int pos, int moveDir, bool checkLineEnd=true) const;
 	int NextPosition(int pos, int moveDir) const;
 	bool NextCharacter(int &pos, int moveDir) const;	// Returns true if pos changed
 	int SCI_METHOD GetRelativePosition(int positionStart, int characterOffset) const;
@@ -316,7 +320,7 @@ public:
 	int SetLineIndentation(int line, int indent);
 	int GetLineIndentPosition(int line) const;
 	int GetColumn(int position);
-	int CountCharacters(int startPos, int endPos);
+	int CountCharacters(int startPos, int endPos) const;
 	int FindColumn(int line, int column);
 	void Indent(bool forwards, int lineBottom, int lineTop);
 	static std::string TransformLineEnds(const char *s, size_t len, int eolModeWanted);
@@ -344,6 +348,7 @@ public:
 	void DeleteAllMarks(int markerNum);
 	int LineFromHandle(int markerHandle);
 	int SCI_METHOD LineStart(int line) const;
+	bool IsLineStartPosition(int position) const;
 	int SCI_METHOD LineEnd(int line) const;
 	int LineEndPosition(int position) const;
 	bool IsLineEndPosition(int position) const;
@@ -363,6 +368,16 @@ public:
 	int NextWordEnd(int pos, int delta);
 	int SCI_METHOD Length() const { return cb.Length(); }
 	void Allocate(int newSize) { cb.Allocate(newSize); }
+
+	struct CharacterExtracted {
+		unsigned int character;
+		unsigned int widthBytes;
+		CharacterExtracted(unsigned int character_, unsigned int widthBytes_) :
+			character(character_), widthBytes(widthBytes_) {
+		}
+	};
+	CharacterExtracted ExtractCharacter(int position) const;
+
 	bool MatchesWordOptions(bool word, bool wordStart, int pos, int length) const;
 	bool HasCaseFolder(void) const;
 	void SetCaseFolder(CaseFolder *pcf_);

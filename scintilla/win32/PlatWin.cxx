@@ -1600,7 +1600,10 @@ void SurfaceD2D::Copy(const PRectangle &rc, const Point &from, const Surface &su
 		D2D1_RECT_F rcSource = {from.x, from.y, from.x + rc.Width(), from.y + rc.Height()};
 		pRenderTarget->DrawBitmap(pBitmap, rcDestination, 1.0f,
 			D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR, rcSource);
-		pRenderTarget->Flush();
+		hr = pRenderTarget->Flush();
+		if (FAILED(hr)) {
+			Platform::DebugPrintf("Failed Flush 0x%x\n", hr);
+		}
 		pBitmap->Release();
 	}
 }
@@ -3004,7 +3007,7 @@ void Menu::Destroy() {
 
 void Menu::Show(const Point &pt, const Window &w) {
 	::TrackPopupMenu(reinterpret_cast<HMENU>(mid),
-		0, static_cast<int>(pt.x - 4), static_cast<int>(pt.y), 0,
+		TPM_RIGHTBUTTON, static_cast<int>(pt.x - 4), static_cast<int>(pt.y), 0,
 		reinterpret_cast<HWND>(w.GetID()), NULL);
 	Destroy();
 }

@@ -33,6 +33,7 @@ class RESearch {
 public:
 	explicit RESearch(const CharClassify *charClassTable);
 	~RESearch();
+	void Clear();
 	void GrabMatches(const CharacterIndexer &ci);
 	const char *Compile(const char *pattern, int length, bool caseSensitive, bool posix);
 	int Execute(const CharacterIndexer &ci, int lp, int endp);
@@ -46,7 +47,6 @@ public:
 	std::string pat[MAXTAG];
 
 private:
-	void Clear();
 	void ChSet(unsigned char c);
 	void ChSetWithCase(unsigned char c, bool caseSensitive);
 	int GetBackslashExpression(const char *pattern, int &incr);

@@ -26,6 +26,7 @@ EDITLEXER lexPascal = { SCLEX_PASCAL, NP2LEX_PASCAL, L"Pascal Source", L"pas; in
 	{ SCE_PAS_WORD, NP2STYLE_Keyword, L"Keyword", L"bold; fore:#FF8000", L"" },
 	{ SCE_PAS_TYPE, NP2STYLE_TypeKeyword, L"Type Keyword", L"bold; fore:#1E90FF", L"" },
 	{ SCE_PAS_FUNCTION, NP2STYLE_BasicFunction, L"Basic Function", L"fore:#0080FF", L"" },
+	{ SCE_PAS_FUNCTION, NP2STYLE_Function, L"Function", L"fore:#A46000", L"" },
 	{ MULTI_STYLE(SCE_PAS_PREPROCESSOR,SCE_PAS_PREPROCESSOR2,0,0), NP2STYLE_Preprocessor, L"Preprocessor", L"fore:#FF00FF", L"" },
 	{ MULTI_STYLE(SCE_PAS_COMMENT,SCE_PAS_COMMENT2,SCE_PAS_COMMENTLINE,0), NP2STYLE_Comment, L"Comment", L"fore:#008000", L"" },
 	{ MULTI_STYLE(SCE_PAS_STRING,SCE_PAS_CHARACTER,SCE_PAS_STRINGEOL,0), NP2STYLE_String, L"String", L"fore:#008000", L"" },

@@ -39,7 +39,7 @@ EDITLEXER lexHaXe = { SCLEX_CPP, NP2LEX_HAXE, L"haXe Script", L"hx", L"", &Keywo
 	{ SCE_C_PREPROCESSOR, NP2STYLE_Preprocessor, L"Preprocessor", L"fore:#FF8000", L"" },
 	{ SCE_C_CLASS, NP2STYLE_Class, L"Class", L"fore:#0000FF", L"" },
 	{ SCE_C_INTERFACE, NP2STYLE_Interface, L"Interface", L"bold; fore:#1E90FF", L""},
-	{ SCE_C_FUNCTION, NP2STYLE_Function, L"Function", L"fore:#0080C0", L"" },
+	{ SCE_C_FUNCTION, NP2STYLE_Function, L"Function", L"fore:#A46000", L"" },
 	{ SCE_C_ENUMERATION, NP2STYLE_Enumeration, L"Enumeration", L"fore:#FF8000", L""},
 	{ SCE_C_CONSTANT, NP2STYLE_Constant, L"Constant", L"bold; fore:#B000B0", L""},
 	{ MULTI_STYLE(SCE_C_COMMENT,SCE_C_COMMENTLINE,0,0), NP2STYLE_Comment, L"Comment", L"fore:#008000", L"" },

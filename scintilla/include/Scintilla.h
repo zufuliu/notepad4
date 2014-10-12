@@ -97,6 +97,10 @@ typedef sptr_t (*SciFnDirect)(sptr_t ptr, unsigned int iMessage, uptr_t wParam, 
 #define SCI_GETNEXTTABSTOP 2677
 #define SC_CP_UTF8 65001
 #define SCI_SETCODEPAGE 2037
+#define SC_IME_WINDOWED 0
+#define SC_IME_INLINE 1
+#define SCI_GETIMEINTERACTION 2678
+#define SCI_SETIMEINTERACTION 2679
 #define MARKER_MAX 31
 #define SC_MARK_CIRCLE 0
 #define SC_MARK_ROUNDRECT 1
@@ -272,7 +276,9 @@ typedef sptr_t (*SciFnDirect)(sptr_t ptr, unsigned int iMessage, uptr_t wParam, 
 #define INDIC_DOTBOX 12
 #define INDIC_SQUIGGLEPIXMAP 13
 #define INDIC_COMPOSITIONTHICK 14
-#define INDIC_MAX 31
+#define INDIC_IME 32
+#define INDIC_IME_MAX 35
+#define INDIC_MAX 35
 #define INDIC_CONTAINER 8
 #define INDIC0_MASK 0x20
 #define INDIC1_MASK 0x40
@@ -370,6 +376,7 @@ typedef sptr_t (*SciFnDirect)(sptr_t ptr, unsigned int iMessage, uptr_t wParam, 
 #define SCFIND_WORDSTART 0x00100000
 #define SCFIND_REGEXP 0x00200000
 #define SCFIND_POSIX 0x00400000
+#define SCFIND_CXX11REGEX 0x00800000
 #define SCI_FINDTEXT 2150
 #define SCI_FORMATRANGE 2151
 #define SCI_GETFIRSTVISIBLELINE 2152
@@ -641,6 +648,8 @@ typedef sptr_t (*SciFnDirect)(sptr_t ptr, unsigned int iMessage, uptr_t wParam, 
 #define SC_STATUS_OK 0
 #define SC_STATUS_FAILURE 1
 #define SC_STATUS_BADALLOC 2
+#define SC_STATUS_WARN_START 1000
+#define SC_STATUS_WARN_REGEX 1001
 #define SCI_SETSTATUS 2382
 #define SCI_GETSTATUS 2383
 #define SCI_SETMOUSEDOWNCAPTURES 2384
@@ -890,6 +899,7 @@ typedef sptr_t (*SciFnDirect)(sptr_t ptr, unsigned int iMessage, uptr_t wParam, 
 #define SCI_SCROLLTOEND 2629
 #define SC_TECHNOLOGY_DEFAULT 0
 #define SC_TECHNOLOGY_DIRECTWRITE 1
+#define SC_TECHNOLOGY_DIRECTWRITERETAIN 2
 #define SCI_SETTECHNOLOGY 2630
 #define SCI_GETTECHNOLOGY 2631
 #define SCI_CREATELOADER 2632

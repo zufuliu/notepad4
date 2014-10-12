@@ -66,6 +66,8 @@ static void ColouriseSqlDoc(unsigned int startPos, int length, int initStyle, Wo
 	StyleContext sc(startPos, length, initStyle, styler);
 	//int styleBeforeDCKeyword = SCE_SQL_DEFAULT;
 	int offset = 0;
+	char qOperator = 0x00;
+
 	for (; sc.More(); sc.Forward(), offset++) {
 		// Determine if the current state should terminate.
 		switch (sc.state) {
@@ -179,11 +181,39 @@ _label_identifier:
 				}
 			}
 			break;
+		case SCE_SQL_QOPERATOR:
+			if (qOperator == 0x00) {
+				qOperator = (char)sc.ch;
+			} else {
+				char qComplement = 0x00;
+
+				if (qOperator == '<') {
+					qComplement = '>';
+				} else if (qOperator == '(') {
+					qComplement = ')';
+				} else if (qOperator == '{') {
+					qComplement = '}';
+				} else if (qOperator == '[') {
+					qComplement = ']';
+				} else {
+					qComplement = qOperator;
+				}
+
+				if (sc.Match(qComplement, '\'')) {
+					sc.Forward();
+					sc.ForwardSetState(SCE_SQL_DEFAULT);
+					qOperator = 0x00;
+				}
+			}
+			break;
 		}
 
 		// Determine if a new state should be entered.
 		if (sc.state == SCE_SQL_DEFAULT) {
-			if (sc.ch == '0' && (sc.chNext == 'x' || sc.chNext == 'X')) {
+			if (sc.Match('q', '\'') || sc.Match('Q', '\'')) {
+				sc.SetState(SCE_SQL_QOPERATOR);
+				sc.Forward();
+			} else if (sc.ch == '0' && (sc.chNext == 'x' || sc.chNext == 'X')) {
 				sc.SetState(SCE_SQL_HEX);
 				sc.Forward();
 			} else if ((sc.ch == 'x' || sc.ch == 'X') && (sc.chNext == '\"' || sc.chNext == '\'')) {

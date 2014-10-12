@@ -276,10 +276,9 @@ void RESearch::GrabMatches(const CharacterIndexer &ci) {
 	for (unsigned int i = 0; i < MAXTAG; i++) {
 		if ((bopat[i] != NOTFOUND) && (eopat[i] != NOTFOUND)) {
 			unsigned int len = eopat[i] - bopat[i];
-			pat[i] = std::string(len+1, '\0');
+			pat[i].resize(len);
 			for (unsigned int j = 0; j < len; j++)
 				pat[i][j] = ci.CharAt(bopat[i] + j);
-			pat[i][len] = '\0';
 		}
 	}
 }
