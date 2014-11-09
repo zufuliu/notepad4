@@ -1,4 +1,4 @@
-// Lexer for JSVM Jasmin, Android Dalvik Smali.
+// Lexer for javap, Jasmin, Android Dalvik Smali.
 
 #include <string.h>
 #include <assert.h>
@@ -21,12 +21,15 @@ using namespace Scintilla;
 static inline bool IsSmaliOp(int ch) {
 	return ch == ';' || ch == '{' || ch == '}' || ch == '(' || ch == ')' || ch == '='
 		|| ch == ',' || ch == '<' || ch == '>' || ch == '+' || ch == '-' || ch == ':' || ch == '.'
-		|| ch == '/';
+		|| ch == '/' || ch == '&' || ch == '|' || ch == '^' || ch == '!' || ch == '~' || ch == '*' || ch == '%';
 }
 static inline bool IsDelimiter(int ch) {
 	return ch != '/' && ch != '$' && (IsASpace(ch) || IsSmaliOp(ch));
 }
 static inline bool IsSmaliWordChar(int ch) {
+	return iswordstart(ch) || ch == '-';
+}
+static inline bool IsSmaliWordCharX(int ch) {
 	return iswordchar(ch) || ch == '-';
 }
 
@@ -48,7 +51,7 @@ static inline bool IsJavaTypeChar(int ch) {
 		|| ch == '[';	// array
 }
 static bool IsJavaType(int ch, int chPrev, int chNext) {
-	if (chPrev == 'L' || chPrev == '>' || chPrev == '/')
+	if (chPrev == 'L' || chPrev == '>' || chPrev == '/' || chPrev == '.')
 		return false;
 	if (ch == '[')
 		return IsJavaTypeChar(chNext);
@@ -192,7 +195,7 @@ static void ColouriseSmaliDoc(unsigned int startPos, int length, int initStyle, 
 					if (ch == '$')
 						styler.ColourTo(i - 1, SCE_SMALI_OPERATOR);
 					state = (ch == '(' || ch == '>')? SCE_SMALI_DEFAULT : SCE_SMALI_METHOD;
-				} else if (/*kwInstruction.InList(buf)*/ wordLen == visibleChars && !curLineState) {
+				} else if (/*kwInstruction.InList(buf)*/ wordLen == visibleChars && !curLineState && (IsASpace(ch) || ch == '/')) {
 					if (!(IsSmaliWordChar(ch) || ch == '/')) {
 						styler.ColourTo(i - 1, SCE_SMALI_INSTRUCTION);
 						state = SCE_SMALI_DEFAULT;
@@ -200,6 +203,11 @@ static void ColouriseSmaliDoc(unsigned int startPos, int length, int initStyle, 
 						state = SCE_SMALI_INSTRUCTION;
 					}
 				} else {
+					unsigned int pos = i;
+					while (pos < endPos && IsASpace(styler.SafeGetCharAt(pos, 0))) ++pos;
+					if (styler.SafeGetCharAt(pos, 0) == '(') {
+						styler.ColourTo(i - 1, SCE_SMALI_METHOD);
+					}
 					state = SCE_SMALI_DEFAULT;
 				}
 				wordLen = 0;
@@ -219,7 +227,7 @@ static void ColouriseSmaliDoc(unsigned int startPos, int length, int initStyle, 
 			if (ch == '$') {
 				styler.ColourTo(i - 1, state);
 				styler.ColourTo(i, SCE_SMALI_OPERATOR);
-			} else if (ch == ':' || ch == '(') {
+			} else if (ch == ':' || ch == '(' || IsASpace(ch)) {
 				styler.ColourTo(i - 1, (ch == ':' ? SCE_SMALI_FIELD : SCE_SMALI_METHOD));
 				state = SCE_SMALI_DEFAULT;
 			} break;
@@ -236,7 +244,7 @@ static void ColouriseSmaliDoc(unsigned int startPos, int length, int initStyle, 
 			} else if (ch == '/' && chNext == '/') { // javap
 				styler.ColourTo(i - 1, state);
 				state = SCE_SMALI_COMMENTLINE;
-			} else if (ch == ';' && !(chPrev == '>' || iswordchar(chPrev))) { // jasmin
+			} else if (ch == ';' && !(chPrev == '>' || iswordchar(chPrev)) && !(chNext == '\r' || chNext == '\n')) { // jasmin
 				styler.ColourTo(i - 1, state);
 				state = SCE_SMALI_COMMENTLINE;
 			} else if (ch == '\"') {
@@ -248,7 +256,7 @@ static void ColouriseSmaliDoc(unsigned int startPos, int length, int initStyle, 
 			} else if (IsADigit(ch) || (ch == '.' && IsADigit(chNext))) {
 				styler.ColourTo(i - 1, state);
 				state = SCE_SMALI_NUMBER;
-			} else if (ch == '.' && IsAlpha(chNext)) {
+			} else if (ch == '.' && visibleChars == 0 && IsAlpha(chNext)) {
 				styler.ColourTo(i - 1, state);
 				state = SCE_SMALI_DIRECTIVE;
 				buf[wordLen++] = (char)ch;
@@ -274,7 +282,7 @@ static void ColouriseSmaliDoc(unsigned int startPos, int length, int initStyle, 
 				}
 				state = SCE_SMALI_IDENTIFIER;
 				buf[wordLen++] = (char)ch;
-			} else if (IsSmaliOp(ch)) {
+			} else if (IsSmaliOp(ch) || (ch == '[' || ch == ']')) {
 				styler.ColourTo(i - 1, state);
 				state = SCE_SMALI_OPERATOR;
 			}
@@ -359,7 +367,7 @@ static void FoldSmaliDoc(unsigned int startPos, int length, int initStyle, WordL
 
 		if (iswordchar(ch) && style == SCE_SMALI_DIRECTIVE && stylePrev != SCE_SMALI_DIRECTIVE) {
 			char buf[MAX_WORD_LENGTH + 1];
-			LexGetRange(i, styler, IsSmaliWordChar, buf, sizeof(buf));
+			LexGetRange(i, styler, IsSmaliWordCharX, buf, sizeof(buf));
 			if (buf[0] == '.' && (IsFoldWord(&buf[1]) || (strcmp(&buf[1], "field") == 0 && IsAnnotationLine(lineCurrent + 1, styler)))) {
 				levelNext++;
 			} else if (buf[0] != '.' && (IsFoldWord(buf) || strcmp(buf, "field") == 0)) {

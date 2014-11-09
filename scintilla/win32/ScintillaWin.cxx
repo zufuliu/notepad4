@@ -12,6 +12,7 @@
 #include <ctype.h>
 #include <limits.h>
 
+#include <stdexcept>
 #include <new>
 #include <string>
 #include <vector>

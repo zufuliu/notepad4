@@ -13,6 +13,13 @@ static KEYWORDLIST Keywords_Smail = {
 "illegal-class-access illegal-field-access illegal-method-access "
 "class-change-error instantiation-error "
 "inline vtable field this "
+
+// java keyword
+"@interface assert break case catch continue default do else "
+"extends finally for if implements import instanceof "
+"package new return super switch throws try while "
+"boolean byte char double float int long short void "
+
 , // type keyword
 ""
 , // preprocessor

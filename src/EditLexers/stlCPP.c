@@ -11,13 +11,13 @@ static KEYWORDLIST Keywords_CPP = {
 "explicit export false friend mutable namespace new noexcept noreturn nullptr operator "
 "private protected public reinterpret_cast static_assert static_cast template "
 "this thread_local throw true try typeid typename using virtual "
-
+"override final "
 "_Pragma defined " "and and_eq bitand bitor compl not not_eq or or_eq xor xor_eq "
 
 // MSVC
 "__alignof __asm __assume __based __cdecl __declspec __event __except __fastcall __finally __forceinline __identifier __inline __interface __leave __raise __stdcall __clrcall __super __thiscall __try __unaligned __uuidof __hook __unhook __noop "
 "abstract array delegate event finally friend_as gcnew generic initonly interface interior_ptr literal property ref safecast sealed "
-"abstract delegate event finally for each in initonly internal literal override property sealed "
+"abstract delegate event finally for each in initonly internal literal property sealed "
 // GCC
 "typeof __typeof__ __alignof__ __label__ __asm__ __thread __attribute__ __volatile__ __restrict__ __restrict __inline__ __extension__ where "
 // Keil

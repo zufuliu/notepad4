@@ -275,7 +275,7 @@ static void FoldVHDLDoc(unsigned int startPos, int length, int /*initStyle*/, Wo
 				if(kwFold.InList(s)) {
 					if (
 						strcmp(s, "architecture") == 0 || strcmp(s, "case") == 0 ||
-						strcmp(s, "generate") == 0 || strcmp(s, "loop") == 0 ||
+						strcmp(s, "generate") == 0 || strcmp(s, "loop") == 0 || strcmp(s, "block") == 0 ||
 						strcmp(s, "package") ==0 || strcmp(s, "process") == 0 ||
 						strcmp(s, "record") == 0 || strcmp(s, "then") == 0) {
 						if (strcmp(prevWord, "end") != 0) {

@@ -90,7 +90,16 @@ static void ColouriseConfDoc(unsigned int startPos, int length, int initStyle, W
 			}
 			break;
 		case SCE_CONF_DIRECTIVE:
-			if (IsDelimiter(ch) || (insideTag && ch == '>')) {
+			if (insideTag && ch == ':') {
+				styler.ColourTo(i - 1, state);
+				if (chNext == ':') {
+					i++;
+					ch = chNext;
+					chNext = styler.SafeGetCharAt(i + 1);
+				}
+				styler.ColourTo(i, SCE_CONF_OPERATOR);
+				state = SCE_CONF_DIRECTIVE;
+			} else if (IsDelimiter(ch) || (insideTag && ch == '>')) {
 				styler.ColourTo(i - 1, state);
 				state = SCE_CONF_DEFAULT;
 			}
@@ -103,7 +112,7 @@ static void ColouriseConfDoc(unsigned int startPos, int length, int initStyle, W
 			}
 			break;
 		case SCE_CONF_IDENTIFIER:
-			if (IsDelimiter(ch) || (insideTag && ch == '>')) {
+			if (IsDelimiter(ch) || (insideTag && ch == '>') || (ch == '<' && chNext == '/')) {
 				styler.ColourTo(i - 1, state);
 				state = SCE_CONF_DEFAULT;
 			}
@@ -133,16 +142,26 @@ static void ColouriseConfDoc(unsigned int startPos, int length, int initStyle, W
 			} else if (IsConfOp(ch)) {
 				styler.ColourTo(i - 1, state);
 				state = SCE_CONF_OPERATOR;
-			} else if (visibleChars == 0 && !IsASpace(ch)) {
+			} else if ((visibleChars == 0 && !IsASpace(ch)) || (ch == '<' && chNext == '/')) {
 				styler.ColourTo(i - 1, state);
 				if (ch == '[') {
 					state = SCE_CONF_SECTION;
 				} else {
 					state = SCE_CONF_DIRECTIVE;
 					insideTag = ch == '<';
+					if (chNext == '/') {
+						i++;
+						ch = chNext;
+						chNext = styler.SafeGetCharAt(i + 1);
+					}
 				}
-			} else if (insideTag && ch == '>') {
+			} else if (insideTag && (ch == '>' || ((ch == '/' || ch  == '?') && chNext == '>'))) {
 				styler.ColourTo(i - 1, state);
+				if (ch == '/' || ch == '?') {
+					i++;
+					ch = chNext;
+					chNext = styler.SafeGetCharAt(i + 1);
+				}
 				styler.ColourTo(i, SCE_CONF_DIRECTIVE);
 				state = SCE_CONF_DEFAULT;
 				insideTag = false;

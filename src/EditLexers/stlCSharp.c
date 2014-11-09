@@ -6,7 +6,7 @@ static KEYWORDLIST Keywords_CSharp = {
 "abstract as base break case catch checked class const continue default delegate do else enum event explicit "
 "extern false finally fixed for foreach goto if implicit in interface internal is lock namespace new null "
 "operator out override params private protected public readonly ref return sealed sizeof stackalloc static "
-"struct switch this throw true try typeof unchecked unsafe using virtual void volatile while " "async await "
+"struct switch this throw true try typeof unchecked unsafe using virtual void volatile while " "async await nameof"
 // contextual keywords
 "global partial where add remove get set value yield alias "
 , // type keyword
@@ -54,7 +54,7 @@ static KEYWORDLIST Keywords_CSharp = {
 , "", "", "","","",""
 ,
 "for^() if^() switch^() while^() catch^() else^if^() foreach^() sizeof() typeof() using^() fixed^() lock^() "
-"base() this() checked() default() delegate() "
+"base() this() checked() default() delegate() nameof()"
 #endif
 };
 

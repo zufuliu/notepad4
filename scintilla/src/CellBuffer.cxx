@@ -378,7 +378,7 @@ char CellBuffer::CharAt(int position) const {
 }
 
 void CellBuffer::GetCharRange(char *buffer, int position, int lengthRetrieve) const {
-	if (lengthRetrieve < 0)
+	if (lengthRetrieve <= 0)
 		return;
 	if (position < 0)
 		return;
