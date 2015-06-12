@@ -39,7 +39,6 @@ static void ColouriseInnoDoc(unsigned int startPos, int length, int, WordList *k
 
 	int state = SCE_INNO_DEFAULT;
 	static bool sectionFound = false;
-	char chPrev;
 	char ch = 0;
 	char chNext = styler[startPos];
 	int lengthDoc = startPos + length;
@@ -57,7 +56,7 @@ static void ColouriseInnoDoc(unsigned int startPos, int length, int, WordList *k
 	styler.StartAt(startPos);
 	styler.StartSegment(startPos);
 	for (int i = startPos; i < lengthDoc; i++) {
-		chPrev = ch;
+		const char chPrev = ch;
 		ch = chNext;
 		chNext = styler.SafeGetCharAt(i + 1);
 

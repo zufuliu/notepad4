@@ -307,8 +307,6 @@ static void ColouriseBashDoc(unsigned int startPos, int length, int initStyle, W
 						sc.Forward();
 						HereDoc.Quoted = true;
 						HereDoc.State = 1;
-					} else if (!HereDoc.Indented && sc.chNext == '-') {	// <<- indent case
-						HereDoc.Indented = true;
 					} else if (setHereDoc.Contains(sc.chNext)) {
 						// an unquoted here-doc delimiter, no special handling
 						// TODO check what exactly bash considers part of the delim
@@ -357,7 +355,7 @@ static void ColouriseBashDoc(unsigned int startPos, int length, int initStyle, W
 				if (sc.atLineStart) {
 					sc.SetState(SCE_SH_HERE_Q);
 					int prefixws = 0;
-					while (IsASpace(sc.ch) && !sc.atLineEnd) {	// whitespace prefix
+					while (sc.ch == '\t' && !sc.atLineEnd) {	// tabulation prefix
 						sc.Forward();
 						prefixws++;
 					}
@@ -369,7 +367,8 @@ static void ColouriseBashDoc(unsigned int startPos, int length, int initStyle, W
 					char s[HERE_DELIM_MAX];
 					sc.GetCurrent(s, sizeof(s));
 					if (sc.LengthCurrent() == 0) {  // '' or "" delimiters
-						if (prefixws == 0 && HereDoc.Quoted && HereDoc.DelimiterLength == 0)
+						if ((prefixws == 0 || HereDoc.Indented) &&
+							HereDoc.Quoted && HereDoc.DelimiterLength == 0)
 							sc.SetState(SCE_SH_DEFAULT);
 						break;
 					}
@@ -562,7 +561,12 @@ static void ColouriseBashDoc(unsigned int startPos, int length, int initStyle, W
 			} else if (sc.Match('<', '<')) {
 				sc.SetState(SCE_SH_HERE_DELIM);
 				HereDoc.State = 0;
-				HereDoc.Indented = false;
+				if (sc.GetRelative(2) == '-') {	// <<- indent case
+					HereDoc.Indented = true;
+					sc.Forward();
+				} else {
+					HereDoc.Indented = false;
+				}
 			} else if (sc.ch == '-'	&&	// one-char file test operators
 						setSingleCharOp.Contains(sc.chNext) &&
 						!setWord.Contains(sc.GetRelative(2)) &&
@@ -570,8 +574,6 @@ static void ColouriseBashDoc(unsigned int startPos, int length, int initStyle, W
 				sc.SetState(SCE_SH_WORD);
 				sc.Forward();
 			} else if (setBashOperator.Contains(sc.ch)) {
-				char s[10];
-				bool isCmdDelim = false;
 				sc.SetState(SCE_SH_OPERATOR);
 				// handle opening delimiters for test/arithmetic expressions - ((,[[,[
 				if (cmdState == BASH_CMD_START || cmdState == BASH_CMD_BODY) {
@@ -596,6 +598,8 @@ static void ColouriseBashDoc(unsigned int startPos, int length, int initStyle, W
 				// handle command delimiters in command START|BODY|WORD state, also TEST if 'test'
 				if (cmdState == BASH_CMD_START || cmdState == BASH_CMD_BODY || cmdState == BASH_CMD_WORD
 				 || (cmdState == BASH_CMD_TEST && testExprType == 0)) {
+					char s[10];
+					bool isCmdDelim = false;
 					s[0] = static_cast<char>(sc.ch);
 					if (setBashOperator.Contains(sc.chNext)) {
 						s[1] = static_cast<char>(sc.chNext);

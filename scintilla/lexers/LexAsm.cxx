@@ -35,7 +35,7 @@ static inline bool IsAsmNumber(int ch, int chPrev) {
 		|| ((ch == 'x' || ch == 'X') && chPrev < 0x80 && chPrev == '0')
 		|| ((ch == 'H' || ch == 'h') && ch < 0x80 && isxdigit(chPrev))
 		|| ((ch == '+' || ch == '-') && chPrev < 0x80 && (chPrev == 'E' || chPrev == 'e'))
-		|| ((ch == 'Q' || ch == 'q') || chPrev < 0x80 && (chPrev >= '0' && chPrev <= '7'))
+		|| ((ch == 'Q' || ch == 'q') && chPrev < 0x80 && (chPrev >= '0' && chPrev <= '7'))
 		);
 }
 

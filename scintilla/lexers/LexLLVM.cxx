@@ -1,4 +1,4 @@
-// Lexer for Lisp.
+// Lexer for LLVM.
 
 #include <string.h>
 #include <assert.h>
@@ -15,17 +15,44 @@
 #include "StyleContext.h"
 #include "LexerModule.h"
 
-static inline bool IsLispOp(int ch) {
-	return ch == '(' || ch == ')' || ch == '[' || ch == ']'
-		|| ch == '\'' || ch == '*' || ch == '?' || ch == '.'
-		|| ch == '+' || ch == '-' || ch == '<' || ch == '>'
-		|| ch == ':' || ch == '=' || ch == ','
-		|| ch == '`' || ch == '#' || ch == '@' || ch == '&';
+#define MAX_WORD_LENGTH	31
+
+static void CheckLLVMVarType(unsigned pos, unsigned endPos, Accessor &styler, bool& is_func, bool& is_type) {
+	char c = 0;
+	while (pos < endPos) {
+		c = styler.SafeGetCharAt(pos, '\0');
+		if (!(IsASpaceOrTab(c) || c == '*')) break;
+		pos++;
+	}
+
+	if (c == '(') {
+		is_func = true;
+		return;
+	}
+	if (c == '%') {
+		is_type = true;
+		return;
+	}
+	if (c == '=') {
+		pos++;
+		while (pos < endPos) {
+			c = styler.SafeGetCharAt(pos, '\0');
+			if (!IsASpaceOrTab(c)) break;
+			pos++;
+		}
+		if (c == 't' && styler.SafeGetCharAt(pos + 1) == 'y'
+			&& styler.SafeGetCharAt(pos + 2) == 'p' && styler.SafeGetCharAt(pos + 3) == 'e'
+			&& isspacechar(styler.SafeGetCharAt(pos + 4, '\0'))) {
+			is_type = true;
+		}
+	}
 }
 
-#define MAX_WORD_LENGTH	15
-static void ColouriseLispDoc(unsigned int startPos, int length, int initStyle, WordList *keywordLists[], Accessor &styler) {
+static void ColouriseLLVMDoc(unsigned int startPos, int length, int initStyle, WordList *keywordLists[], Accessor &styler) {
 	WordList &keywords = *keywordLists[0];
+	WordList &keywords2 = *keywordLists[1];
+	WordList &kwAttr = *keywordLists[4];
+	WordList &kwInstruction = *keywordLists[10];
 
 	int state = initStyle;
 	int chNext = styler[startPos];
@@ -45,9 +72,6 @@ static void ColouriseLispDoc(unsigned int startPos, int length, int initStyle, W
 
 		const bool atEOL = (ch == '\r' && chNext != '\n') || (ch == '\n');
 		const bool atLineStart = i == (unsigned)styler.LineStart(lineCurrent);
-		if (atEOL || i == endPos-1) {
-			lineCurrent++;
-		}
 
 		switch (state) {
 		case SCE_C_OPERATOR:
@@ -61,10 +85,33 @@ static void ColouriseLispDoc(unsigned int startPos, int length, int initStyle, W
 			}
 			break;
 		case SCE_C_IDENTIFIER:
-			if (!(iswordchar(ch) || ch == '-')) {
+			if (!iswordchar(ch)) {
 				buf[wordLen] = 0;
-				if (keywords.InList(buf)) {
+				if (buf[0] == '@' || buf[0] == '%') {
+					if (strncmp(&buf[1], "llvm.", 5) == 0) {
+						styler.ColourTo(i - 1, SCE_C_DIRECTIVE);
+					} else {
+						bool is_func = false, is_type = false;
+						CheckLLVMVarType(i, endPos, styler, is_func, is_type);
+						if (is_func) {
+							state = SCE_C_PREPROCESSOR;
+						} else if (is_type) {
+							state = SCE_C_CLASS;
+						} else if (buf[0] == '@') {
+							state = SCE_C_STRUCT;
+						}
+						styler.ColourTo(i - 1, state);
+					}
+				} else if (keywords.InList(buf)) {
 					styler.ColourTo(i - 1, SCE_C_WORD);
+				} else if (keywords2.InList(buf)) {
+					styler.ColourTo(i - 1, SCE_C_WORD2);
+				} else if (kwInstruction.InList(buf)) {
+					styler.ColourTo(i - 1, SCE_C_ASM_INSTRUCTION);
+				} else if (kwAttr.InList(buf)) {
+					styler.ColourTo(i - 1, SCE_C_ATTRIBUTE);
+				} else if (ch == ':') {
+					styler.ColourTo(i - 1, SCE_C_LABEL);
 				}
 				state = SCE_C_DEFAULT;
 				wordLen = 0;
@@ -72,18 +119,22 @@ static void ColouriseLispDoc(unsigned int startPos, int length, int initStyle, W
 				buf[wordLen++] = (char)ch;
 			}
 			break;
-		case SCE_C_CHARACTER:
-			if (IsASpace(ch) || ch == ')') {
-				styler.ColourTo(i-1, state);
+		case SCE_C_WORD2:
+			if (!isdigit(ch)) {
+				styler.ColourTo(i - 1, state);
 				state = SCE_C_DEFAULT;
 			}
 			break;
 		case SCE_C_STRING:
-			if (ch == '\\' && (chNext == '\\' || chNext == '\"')) {
+		case SCE_C_CHARACTER:
+			if (atLineStart) {
+				styler.ColourTo(i - 1, state);
+				state = SCE_C_DEFAULT;
+			} else if (ch == '\\' && (chNext == '\\' || chNext == '\"')) {
 				i++;
 				ch = chNext;
 				chNext = styler.SafeGetCharAt(i + 1);
-			} else if (ch == '\"') {
+			} else if ((state == SCE_C_STRING && ch == '\"') || (state == SCE_C_CHARACTER && ch == '\'')) {
 				styler.ColourTo(i, state);
 				state = SCE_C_DEFAULT;
 				continue;
@@ -91,48 +142,47 @@ static void ColouriseLispDoc(unsigned int startPos, int length, int initStyle, W
 			break;
 		case SCE_C_COMMENTLINE:
 			if (atLineStart) {
-				styler.ColourTo(i-1, state);
+				styler.ColourTo(i - 1, state);
 				state = SCE_C_DEFAULT;
-			}
-			break;
-		case SCE_C_COMMENT:
-			if (ch == '|' && chNext == '#') {
-				i++;
-				ch = chNext;
-				chNext = styler.SafeGetCharAt(i + 1);
-				styler.ColourTo(i, state);
-				state = SCE_C_DEFAULT;
-				continue;
 			}
 			break;
 		}
 
 		if (state == SCE_C_DEFAULT) {
-			if (ch == '?' && chNext == '\\') {
-				styler.ColourTo(i - 1, state);
-				state = SCE_C_CHARACTER;
-			} else if (ch == ';') {
+			if (ch == ';') {
 				styler.ColourTo(i - 1, state);
 				state = SCE_C_COMMENTLINE;
-			} else if (ch == '\"') {
+			} else if (ch == '\"' || (ch == 'c' && chNext == '\"')) {
 				styler.ColourTo(i - 1, state);
 				state = SCE_C_STRING;
-			} else if (ch == '#' && chNext == '|') {
+				if (ch == 'c') {
+					++i;
+					chNext = styler.SafeGetCharAt(i + 1);
+				}
+			} else if (ch == '\'') {
 				styler.ColourTo(i - 1, state);
-				state = SCE_C_COMMENT;
-				i++;
-				chNext = styler.SafeGetCharAt(i + 1);
+				state = SCE_C_CHARACTER;
 			} else if (IsADigit(ch) || (ch == '.' && IsADigit(chNext))) {
 				styler.ColourTo(i - 1, state);
 				state = SCE_C_NUMBER;
-			} else if (iswordstart(ch)) {
+			} else if (ch == 'i' && isdigit(chNext)) { // iN
+				styler.ColourTo(i - 1, state);
+				state = SCE_C_WORD2;
+			} else if (ch == 'x' && isspacechar(chNext)) {
+				styler.ColourTo(i - 1, state);
+				state = SCE_C_OPERATOR;
+			} else if (iswordstart(ch) || ch == '@' || ch == '%') {
 				styler.ColourTo(i - 1, state);
 				state = SCE_C_IDENTIFIER;
 				buf[wordLen++] = (char)ch;
-			} else if (IsLispOp(ch)) {
+			} else if (isoperator(ch)) {
 				styler.ColourTo(i - 1, state);
 				state = SCE_C_OPERATOR;
 			}
+		}
+
+		if (atEOL || i == endPos-1) {
+			lineCurrent++;
 		}
 	}
 
@@ -141,9 +191,7 @@ static void ColouriseLispDoc(unsigned int startPos, int length, int initStyle, W
 }
 
 #define IsCommentLine(line)			IsLexCommentLine(line, styler, SCE_C_COMMENTLINE)
-#define IsStreamStyle(style)		(style == SCE_C_STRING)
-#define IsStreamCommantStyle(style)	(style == SCE_C_COMMENT)
-static void FoldListDoc(unsigned int startPos, int length, int initStyle, WordList *[], Accessor &styler) {
+static void FoldLLVMDoc(unsigned int startPos, int length, int initStyle, WordList *[], Accessor &styler) {
 	if (styler.GetPropertyInt("fold") == 0)
 		return;
 	const bool foldComment = styler.GetPropertyInt("fold.comment") != 0;
@@ -164,7 +212,6 @@ static void FoldListDoc(unsigned int startPos, int length, int initStyle, WordLi
 	for (unsigned int i = startPos; i < endPos; i++) {
 		char ch = chNext;
 		chNext = styler.SafeGetCharAt(i + 1);
-		int stylePrev = style;
 		style = styleNext;
 		styleNext = styler.StyleAt(i + 1);
 		bool atEOL = (ch == '\r' && chNext != '\n') || (ch == '\n');
@@ -175,26 +222,13 @@ static void FoldListDoc(unsigned int startPos, int length, int initStyle, WordLi
 			else if (IsCommentLine(lineCurrent - 1) && !IsCommentLine(lineCurrent + 1))
 				levelNext--;
 		}
-		if (foldComment && IsStreamCommantStyle(style)) {
-			if (!IsStreamCommantStyle(stylePrev)) {
-				levelNext++;
-			} else if (!IsStreamCommantStyle(styleNext) && !atEOL) {
-				levelNext--;
-			}
-		}
-		if (foldComment && IsStreamStyle(style)) {
-			if (!IsStreamStyle(stylePrev)) {
-				levelNext++;
-			} else if (!IsStreamStyle(styleNext) && !atEOL) {
-				levelNext--;
-			}
-		}
 
 		if (style == SCE_C_OPERATOR) {
-			if (ch == '(')
+			if (ch == '{' || ch == '[' || ch == '(') {
 				levelNext++;
-			else if (ch == ')')
+			} else if (ch == '}' || ch == ']' || ch == ')') {
 				levelNext--;
+			}
 		}
 
 		if (!isspacechar(ch))
@@ -217,4 +251,4 @@ static void FoldListDoc(unsigned int startPos, int length, int initStyle, WordLi
 	}
 }
 
-LexerModule lmLisp(SCLEX_LISP, ColouriseLispDoc, "lisp", FoldListDoc);
+LexerModule lmLLVM(SCLEX_LLVM, ColouriseLLVMDoc, "ll", FoldLLVMDoc);

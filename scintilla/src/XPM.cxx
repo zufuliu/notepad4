@@ -45,7 +45,7 @@ ColourDesired XPM::ColourFromCode(int ch) const {
 	return colourCodeTable[ch];
 }
 
-void XPM::FillRun(Surface *surface, int code, int startX, int y, int x) {
+void XPM::FillRun(Surface *surface, int code, int startX, int y, int x) const {
 	if ((code != codeTransparent) && (startX != x)) {
 		PRectangle rc = PRectangle::FromInts(startX, y, x, y + 1);
 		surface->FillRectangle(rc, ColourFromCode(code));

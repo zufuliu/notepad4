@@ -259,6 +259,7 @@ int RunStyles::Find(int value, int start) const {
 	return -1;
 }
 
+#if 0
 void RunStyles::Check() const {
 	if (Length() < 0) {
 		throw std::runtime_error("RunStyles: Length can not be negative.");
@@ -286,3 +287,5 @@ void RunStyles::Check() const {
 		}
 	}
 }
+#endif
+

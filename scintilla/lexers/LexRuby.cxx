@@ -378,7 +378,6 @@ static bool sureThisIsNotHeredoc(int lt2StartPos, Accessor &styler) {
 	}
 	// on second and next passes, only identifiers may appear since
 	// class and instance variable are private
-	prevStyle = SCE_RB_IDENTIFIER;
 	// Skip next batch of white-space
 	firstWordPosn = LexSkipSpaceTab(firstWordPosn, lt2StartPos, styler);
 	if (firstWordPosn != lt2StartPos) {
@@ -1414,14 +1413,13 @@ static bool keywordIsModifier(const char *word, int pos, Accessor &styler) {
 // on the current line
 
 static bool keywordDoStartsLoop(int pos, Accessor &styler) {
-	char ch;
-	int style;
 	int lineStart = styler.GetLine(pos);
 	int lineStartPosn = styler.LineStart(lineStart);
 	styler.Flush();
 	while (--pos >= lineStartPosn) {
-		style = actual_style(styler.StyleAt(pos));
+		const int style = actual_style(styler.StyleAt(pos));
 		if (style == SCE_RB_DEFAULT) {
+			char ch;
 			if ((ch = styler[pos]) == '\r' || ch == '\n') {
 				// Scintilla's LineStart() and GetLine() routines aren't
 				// platform-independent, so if we have text prepared with

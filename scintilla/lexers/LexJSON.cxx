@@ -24,7 +24,7 @@ static void ColouriseJSONDoc(unsigned int startPos, int length, int initStyle, W
 	const bool fold = styler.GetPropertyInt("fold", 1) != 0;
 
 	int state = initStyle;
-	int chPrev, ch = 0, chNext = styler[startPos];
+	int chNext = styler[startPos];
 	styler.StartAt(startPos);
 	styler.StartSegment(startPos);
 	unsigned int endPos = startPos + length;
@@ -40,8 +40,7 @@ static void ColouriseJSONDoc(unsigned int startPos, int length, int initStyle, W
 	int wordLen = 0;
 
 	for (unsigned int i = startPos; i < endPos; i++) {
-		chPrev = ch;
-		ch = chNext;
+		int ch = chNext;
 		chNext = styler.SafeGetCharAt(i + 1);
 
 		const bool atEOL = (ch == '\r' && chNext != '\n') || (ch == '\n');
@@ -113,7 +112,6 @@ static void ColouriseJSONDoc(unsigned int startPos, int length, int initStyle, W
 		case SCE_C_COMMENT:
 			if (ch == '*' && chNext == '/') {
 				i++;
-				ch = chNext;
 				chNext = styler.SafeGetCharAt(i + 1);
 				styler.ColourTo(i, state);
 				state = SCE_C_DEFAULT;
@@ -134,7 +132,6 @@ static void ColouriseJSONDoc(unsigned int startPos, int length, int initStyle, W
 				state = SCE_C_COMMENT;
 				levelNext++;
 				i++;
-				ch = chNext;
 				chNext = styler.SafeGetCharAt(i + 1);
 			} else
 #endif

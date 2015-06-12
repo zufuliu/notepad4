@@ -139,10 +139,10 @@ int IniSectionGetInt(LPCWSTR lpCachedIniSection, LPCWSTR lpName, int iDefault)
 
 BOOL IniSectionSetString(LPWSTR lpCachedIniSection, LPCWSTR lpName, LPCWSTR lpString)
 {
-	WCHAR tch[32 + 512 * 3 + 32];
 	WCHAR *p = lpCachedIniSection;
 
 	if (p) {
+		WCHAR tch[32 + 512 * 3 + 32];
 		while (*p) {
 			p = StrEnd(p) + 1;
 		}
@@ -407,10 +407,7 @@ BOOL SetWindowTitle(HWND hwnd, UINT uIDAppName, BOOL bIsElevated, UINT uIDUntitl
 {
 
 	WCHAR szUntitled[128];
-	WCHAR szExcrptQuot[256];
-	WCHAR szExcrptFmt[32];
 	WCHAR szAppName[128];
-	WCHAR szElevatedAppName[128];
 	WCHAR szReadOnly[32];
 	WCHAR szTitle[512];
 	static WCHAR szCachedFile[MAX_PATH];
@@ -428,6 +425,7 @@ BOOL SetWindowTitle(HWND hwnd, UINT uIDAppName, BOOL bIsElevated, UINT uIDUntitl
 	}
 
 	if (bIsElevated) {
+		WCHAR szElevatedAppName[128];
 		FormatString(szElevatedAppName, COUNTOF(szElevatedAppName), IDS_APPTITLE_ELEVATED, szAppName);
 		StrCpyN(szAppName, szElevatedAppName, COUNTOF(szAppName));
 	}
@@ -435,6 +433,8 @@ BOOL SetWindowTitle(HWND hwnd, UINT uIDAppName, BOOL bIsElevated, UINT uIDUntitl
 	lstrcpy(szTitle, (bModified? pszMod : L""));
 
 	if (lstrlen(lpszExcerpt)) {
+		WCHAR szExcrptQuot[256];
+		WCHAR szExcrptFmt[32];
 		GetString(IDS_TITLEEXCERPT, szExcrptFmt, COUNTOF(szExcrptFmt));
 		wsprintf(szExcrptQuot, szExcrptFmt, lpszExcerpt);
 		StrCat(szTitle, szExcrptQuot);
@@ -485,12 +485,11 @@ BOOL SetWindowTitle(HWND hwnd, UINT uIDAppName, BOOL bIsElevated, UINT uIDUntitl
 //
 void SetWindowTransparentMode(HWND hwnd, BOOL bTransparentMode)
 {
-	FARPROC fp;
-	int	 iAlphaPercent;
-	BYTE bAlpha;
-
 	if (bTransparentMode) {
-		if (fp = GetProcAddress(GetModuleHandle(L"User32"), "SetLayeredWindowAttributes")) {
+		FARPROC fp;
+		if ((fp = GetProcAddress(GetModuleHandle(L"User32"), "SetLayeredWindowAttributes"))) {
+			int	 iAlphaPercent;
+			BYTE bAlpha;
 			SetWindowLongPtr(hwnd, GWL_EXSTYLE, GetWindowLongPtr(hwnd, GWL_EXSTYLE) | WS_EX_LAYERED);
 
 			// get opacity level from registry
@@ -747,7 +746,7 @@ void MakeColorPickButton(HWND hwnd, int nCtlId, HINSTANCE hInstance, COLORREF cr
 		himlOld = bi.himl;
 	}
 
-	if (IsWindowEnabled(hwndCtl) && crColor != -1) {
+	if (IsWindowEnabled(hwndCtl) && crColor != (COLORREF)(-1)) {
 		colormap[0].from = RGB(0x00, 0x00, 0x00);
 		colormap[0].to	 = GetSysColor(COLOR_3DSHADOW);
 	} else {
@@ -755,7 +754,7 @@ void MakeColorPickButton(HWND hwnd, int nCtlId, HINSTANCE hInstance, COLORREF cr
 		colormap[0].to	 = RGB(0xFF, 0xFF, 0xFF);
 	}
 
-	if (IsWindowEnabled(hwndCtl) && crColor != -1) {
+	if (IsWindowEnabled(hwndCtl) && crColor != (COLORREF)(-1)) {
 		if (crColor == RGB(0xFF, 0xFF, 0xFF)) {
 			crColor = RGB(0xFF, 0xFF, 0xFE);
 		}
@@ -897,10 +896,10 @@ int Toolbar_SetButtons(HWND hwnd, int cmdBase, LPCWSTR lpszButtons, LPCTBBUTTON 
 	int i, c;
 	int iCmd;
 
-	ZeroMemory(tchButtons, COUNTOF(tchButtons)*sizeof(tchButtons[0]));
+	ZeroMemory(tchButtons, COUNTOF(tchButtons) * sizeof(WCHAR));
 	lstrcpyn(tchButtons, lpszButtons, COUNTOF(tchButtons) - 2);
 	TrimString(tchButtons);
-	while (p = StrStr(tchButtons, L"	 ")) {
+	while ((p = StrStr(tchButtons, L"	 "))) {
 		MoveMemory((WCHAR *)p, (WCHAR *)p + 1, (lstrlen(p) + 1) * sizeof(WCHAR));
 	}
 
@@ -1161,9 +1160,8 @@ BOOL PathGetLnkPath(LPCWSTR pszLnkFile, LPWSTR pszResPath, int cchResPath)
 //
 BOOL PathIsLnkToDirectory(LPCWSTR pszPath, LPWSTR pszResPath, int cchResPath)
 {
-	WCHAR tchResPath[MAX_PATH];
-
 	if (PathIsLnkFile(pszPath)) {
+		WCHAR tchResPath[MAX_PATH];
 		if (PathGetLnkPath(pszPath, tchResPath, sizeof(WCHAR)*COUNTOF(tchResPath))) {
 			if (PathIsDirectory(tchResPath)) {
 				lstrcpyn(pszResPath, tchResPath, cchResPath);
@@ -1416,7 +1414,7 @@ void PrepareFilterStr(LPWSTR lpFilter)
 void StrTab2Space(LPWSTR lpsz)
 {
 	WCHAR *c = lpsz;
-	while (c = StrChr(lpsz, L'\t')) {
+	while ((c = StrChr(lpsz, L'\t'))) {
 		*c = L' ';
 	}
 }
@@ -1429,7 +1427,7 @@ void StrTab2Space(LPWSTR lpsz)
 void PathFixBackslashes(LPWSTR lpsz)
 {
 	WCHAR *c = lpsz;
-	while (c = StrChr(c, L'/')) {
+	while ((c = StrChr(c, L'/'))) {
 		if (*CharPrev(lpsz, c) == L':' && *CharNext(c) == L'/') {
 			c += 2;
 		} else {
@@ -1870,7 +1868,7 @@ BOOL GetThemedDialogFont(LPWSTR lpFaceName, WORD *wSize)
 	iLogPixelsY = GetDeviceCaps(hDC, LOGPIXELSY);
 	ReleaseDC(NULL, hDC);
 
-	if (hModUxTheme = GetModuleHandle(L"uxtheme.dll")) {
+	if ((hModUxTheme = GetModuleHandle(L"uxtheme.dll"))) {
 		if ((BOOL)(GetProcAddress(hModUxTheme, "IsAppThemed"))()) {
 			hTheme = (HTHEME)(INT_PTR)(GetProcAddress(hModUxTheme, "OpenThemeData"))(NULL, L"WINDOWSTYLE;WINDOW");
 			if (hTheme) {
@@ -2059,12 +2057,12 @@ HWND CreateThemedDialogParam(HINSTANCE hInstance, LPCTSTR lpTemplate,
 * UnSlash functions
 * Mostly taken from SciTE, (c) Neil Hodgson, http://www.scintilla.org
 *
-/
+*/
 
 /**
  * Is the character an octal digit?
  */
-static BOOL IsOctalDigit(char ch)
+static __inline BOOL IsOctalDigit(char ch)
 {
 	return ch >= '0' && ch <= '7';
 }
@@ -2072,7 +2070,7 @@ static BOOL IsOctalDigit(char ch)
 /**
  * If the character is an hexa digit, get its value.
  */
-static int GetHexDigit(char ch)
+static __inline int GetHexDigit(char ch)
 {
 	if (ch >= '0' && ch <= '9') {
 		return ch - '0';

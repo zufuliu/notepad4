@@ -27,7 +27,7 @@ static void ColouriseGraphDoc(unsigned int startPos, int length, int initStyle, 
 	WordList &keywords = *keywordLists[0]; // command
 
 	int state = initStyle;
-	int chPrev, ch = 0, chNext = styler[startPos];
+	int ch = 0, chNext = styler[startPos];
 	styler.StartAt(startPos);
 	styler.StartSegment(startPos);
 	unsigned int endPos = startPos + length;
@@ -44,7 +44,7 @@ static void ColouriseGraphDoc(unsigned int startPos, int length, int initStyle, 
 	int chPrevNonWhite = 0;
 
 	for (unsigned int i = startPos; i < endPos; i++) {
-		chPrev = ch;
+		int chPrev = ch;
 		if (!IsASpace(ch) && state != SCE_C_COMMENTLINE && state != SCE_C_COMMENT && state != SCE_C_COMMENTDOC)
 			chPrevNonWhite = ch;
 		ch = chNext;

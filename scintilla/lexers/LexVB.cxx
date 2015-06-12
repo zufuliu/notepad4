@@ -458,7 +458,6 @@ static void FoldVBDoc(unsigned int startPos, int length, int initStyle, WordList
 			lineCurrent++;
 			levelCurrent = levelNext;
 			visibleChars = 0;
-			atLineBegin = false;
 		}
 	}
 }

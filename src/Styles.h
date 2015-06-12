@@ -23,7 +23,7 @@
 
 #include "EditLexer.h"
 // Number of Lexers in pLexArray
-#define NUMLEXERS 55
+#define NUMLEXERS 57
 
 extern PEDITLEXER pLexCurrent;
 extern int np2LexLangIndex;
@@ -76,6 +76,8 @@ __inline BOOL IsDocWordChar(int ch)
 		return (ch == '-' || ch == '$' || ch == '!');
 	case NP2LEX_XML:
 		return (ch == '-' || ch == ':');
+	case NP2LEX_LLVM:
+		return (ch == '@' || ch == '%');
 	case NP2LEX_CSS:
 	case NP2LEX_SMALI:
 	case NP2LEX_LISP:
@@ -195,7 +197,7 @@ void				Style_ConfigDlg(HWND hwnd);
 INT_PTR CALLBACK	Style_SelectLexerDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam);
 void				Style_SelectLexerDlg(HWND hwnd);
 
-#endif _NOTEPAD2_STYLES_H_
+#endif // _NOTEPAD2_STYLES_H_
 
 // End of Style.h
 

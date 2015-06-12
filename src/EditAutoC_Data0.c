@@ -540,6 +540,6 @@ void Style_UpdateLexKeywords(PEDITLEXER pLexNew)
 		np2_LexKeyword = &kwAndroidManifest;return;
 	case IDM_LANG_ANDROID_LAYOUT:			return;
 	//case IDM_LANG_SVG:
-		return;
+	//	return;
 	}
 }

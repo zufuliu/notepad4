@@ -25,7 +25,7 @@ static void ColouriseVimDoc(unsigned int startPos, int length, int initStyle, Wo
 	WordList &keywords = *keywordLists[0];
 
 	int state = initStyle;
-	int chPrev, ch = 0, chNext = styler[startPos];
+	int chNext = styler[startPos];
 	styler.StartAt(startPos);
 	styler.StartSegment(startPos);
 	unsigned int endPos = startPos + length;
@@ -38,8 +38,7 @@ static void ColouriseVimDoc(unsigned int startPos, int length, int initStyle, Wo
 	int wordLen = 0;
 
 	for (unsigned int i = startPos; i < endPos; i++) {
-		chPrev = ch;
-		ch = chNext;
+		int ch = chNext;
 		chNext = styler.SafeGetCharAt(i + 1);
 
 		const bool atEOL = (ch == '\r' && chNext != '\n') || (ch == '\n');

@@ -964,6 +964,7 @@ void EditToggleCommentLine(HWND hwnd)
 		EndWaitCursor();
 		break;
 	case SCLEX_LISP:
+	case SCLEX_LLVM:
 		BeginWaitCursor();
 		EditToggleLineComments(hwnd, L";", FALSE);
 		EndWaitCursor();

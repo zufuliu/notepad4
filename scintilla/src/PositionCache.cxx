@@ -439,7 +439,7 @@ void BreakFinder::Insert(int val) {
 }
 
 BreakFinder::BreakFinder(const LineLayout *ll_, const Selection *psel, const Range &rangeLine_, int posLineStart_,
-	int xStart, bool breakForSelection, const Document *pdoc_, const SpecialRepresentations *preprs_) :
+	int xStart, bool breakForSelection, const Document *pdoc_, const SpecialRepresentations *preprs_, const ViewStyle *pvsDraw) :
 	ll(ll_),
 	lineRange(rangeLine_),
 	posLineStart(posLineStart_),
@@ -474,7 +474,17 @@ BreakFinder::BreakFinder(const LineLayout *ll_, const Selection *psel, const Ran
 			}
 		}
 	}
-
+	if (pvsDraw && pvsDraw->indicatorsSetFore > 0) {
+		for (Decoration *deco = pdoc->decorations.root; deco; deco = deco->next) {
+			if (pvsDraw->indicators[deco->indicator].OverridesTextFore()) {
+				int startPos = deco->rs.EndRun(posLineStart);
+				while (startPos < (posLineStart + lineRange.end)) {
+					Insert(startPos - posLineStart);
+					startPos = deco->rs.EndRun(startPos);
+				}
+			}
+		}
+	}
 	Insert(ll->edgeColumn);
 	Insert(lineRange.end);
 	saeNext = (!selAndEdge.empty()) ? selAndEdge[0] : -1;

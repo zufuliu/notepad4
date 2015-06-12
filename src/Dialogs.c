@@ -230,10 +230,6 @@ INT_PTR CALLBACK AboutDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam
 		SetDlgItemText(hwnd, IDC_COPYRIGHT, VERSION_LEGALCOPYRIGHT_SHORT);
 		SetDlgItemText(hwnd, IDC_AUTHORNAME, VERSION_AUTHORNAME);
 
-		if (hFontTitle) {
-			DeleteObject(hFontTitle);
-		}
-
 		if (NULL == (hFontTitle = (HFONT)SendDlgItemMessage(hwnd, IDC_VERSION, WM_GETFONT, 0, 0))) {
 			hFontTitle = GetStockObject(DEFAULT_GUI_FONT);
 		}
@@ -296,6 +292,10 @@ INT_PTR CALLBACK AboutDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam
 			EndDialog(hwnd, IDOK);
 			break;
 		}
+		return TRUE;
+
+	case WM_DESTROY:
+		DeleteObject(hFontTitle);
 		return TRUE;
 	}
 	return FALSE;
@@ -390,8 +390,7 @@ INT_PTR CALLBACK RunDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 				ExpandEnvironmentStringsEx(arg1, COUNTOF(arg1));
 				ExtractFirstArgument(arg1, arg1, arg2);
 
-				if (lstrcmpi(arg1, L"notepad2") == 0 ||
-						lstrcmpi(arg1, L"notepad2.exe") == 0) {
+				if (lstrcmpi(arg1, L"notepad2") == 0 || lstrcmpi(arg1, L"notepad2.exe") == 0) {
 					GetModuleFileName(NULL, arg1, COUNTOF(arg1));
 					bQuickExit = TRUE;
 				}
@@ -637,8 +636,6 @@ extern int cyFavoritesDlg;
 
 INT_PTR CALLBACK FavoritesDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 {
-	static HWND hwndLV;
-
 	switch (umsg) {
 	case WM_INITDIALOG: {
 		LVCOLUMN lvc = { LVCF_FMT | LVCF_TEXT,  LVCFMT_LEFT,  0,  L"",  -1,  0,  0,  0 };
@@ -1302,12 +1299,12 @@ BOOL ChangeNotifyDlg(HWND hwnd)
 //
 INT_PTR CALLBACK ColumnWrapDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 {
-	static int *piNumber;
+	static int piNumber;
 	switch (umsg) {
 	case WM_INITDIALOG: {
-		piNumber = (int *)lParam;
+		piNumber = *((int *)lParam);
 
-		SetDlgItemInt(hwnd, 100, *piNumber, FALSE);
+		SetDlgItemInt(hwnd, 100, piNumber, FALSE);
 		SendDlgItemMessage(hwnd, 100, EM_LIMITTEXT, 15, 0);
 
 		CenterDlgInParent(hwnd);
@@ -1321,7 +1318,7 @@ INT_PTR CALLBACK ColumnWrapDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 			int iNewNumber = GetDlgItemInt(hwnd, 100, &fTranslated, FALSE);
 
 			if (fTranslated) {
-				*piNumber = iNewNumber;
+				piNumber = iNewNumber;
 
 				EndDialog(hwnd, IDOK);
 			} else {
@@ -1379,14 +1376,14 @@ INT_PTR CALLBACK WordWrapSettingsDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LP
 	switch (umsg) {
 	case WM_INITDIALOG: {
 		WCHAR tch[512];
-		WCHAR *p1,  *p2;
 		int i;
 
 		for (i = 0; i < 4; i++) {
+			WCHAR *p1,  *p2;
 			GetDlgItemText(hwnd, 200 + i, tch, COUNTOF(tch));
 			lstrcat(tch, L"|");
 			p1 = tch;
-			while (p2 = StrChr(p1, L'|')) {
+			while ((p2 = StrChr(p1, L'|'))) {
 				*p2++ = L'\0';
 				if (*p1) {
 					SendDlgItemMessage(hwnd, 100 + i, CB_ADDSTRING, 0, (LPARAM)p1);
@@ -1467,12 +1464,12 @@ extern int iLongLineMode;
 
 INT_PTR CALLBACK LongLineSettingsDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 {
-	static int *piNumber;
+	static int piNumber;
 	switch (umsg) {
 	case WM_INITDIALOG: {
-		piNumber = (int *)lParam;
+		piNumber = *((int *)lParam);
 
-		SetDlgItemInt(hwnd, 100, *piNumber, FALSE);
+		SetDlgItemInt(hwnd, 100, piNumber, FALSE);
 		SendDlgItemMessage(hwnd, 100, EM_LIMITTEXT, 15, 0);
 
 		if (iLongLineMode == EDGE_LINE) {
@@ -1493,7 +1490,7 @@ INT_PTR CALLBACK LongLineSettingsDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LP
 			int iNewNumber = GetDlgItemInt(hwnd, 100, &fTranslated, FALSE);
 
 			if (fTranslated) {
-				*piNumber = iNewNumber;
+				piNumber = iNewNumber;
 				iLongLineMode = (IsDlgButtonChecked(hwnd, 101)) ? EDGE_LINE : EDGE_BACKGROUND;
 				EndDialog(hwnd, IDOK);
 			} else {
@@ -1900,14 +1897,14 @@ BOOL RecodeDlg(HWND hwnd, int *pidREncoding)
 //
 INT_PTR CALLBACK SelectDefLineEndingDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 {
-	static int *piOption;
+	static int piOption;
 
 	switch (umsg) {
 	case WM_INITDIALOG: {
 		int i;
 		WCHAR wch[128];
 
-		piOption = (int *)lParam;
+		piOption = *((int *)lParam);
 
 		// Load options
 		for (i = 0; i < 3; i++) {
@@ -1915,7 +1912,7 @@ INT_PTR CALLBACK SelectDefLineEndingDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 			SendDlgItemMessage(hwnd, 100, CB_ADDSTRING, 0, (LPARAM)wch);
 		}
 
-		SendDlgItemMessage(hwnd, 100, CB_SETCURSEL, (WPARAM)*piOption, 0);
+		SendDlgItemMessage(hwnd, 100, CB_SETCURSEL, (WPARAM)(&piOption), 0);
 		SendDlgItemMessage(hwnd, 100, CB_SETEXTENDEDUI, TRUE, 0);
 
 		if (bFixLineEndings) {
@@ -1934,7 +1931,7 @@ INT_PTR CALLBACK SelectDefLineEndingDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 	case WM_COMMAND:
 		switch (LOWORD(wParam)) {
 		case IDOK: {
-			*piOption = (int)SendDlgItemMessage(hwnd, 100, CB_GETCURSEL, 0, 0);
+			piOption = (int)SendDlgItemMessage(hwnd, 100, CB_GETCURSEL, 0, 0);
 			bFixLineEndings = (IsDlgButtonChecked(hwnd, IDC_CONSISTENTEOLS) == BST_CHECKED) ? 1 : 0;
 			bAutoStripBlanks = (IsDlgButtonChecked(hwnd, IDC_AUTOSTRIPBLANKS) == BST_CHECKED) ? 1 : 0;
 			EndDialog(hwnd, IDOK);

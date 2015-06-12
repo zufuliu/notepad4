@@ -76,6 +76,7 @@ extern EDITLEXER lexPascal;
 
 extern EDITLEXER lexSmali;
 extern EDITLEXER lexCLI;
+extern EDITLEXER lexLLVM;
 extern EDITLEXER lexASM;
 extern EDITLEXER lexVHDL;
 extern EDITLEXER lexVerilog;
@@ -95,6 +96,7 @@ extern EDITLEXER lexRC;
 extern EDITLEXER lexMake;
 
 extern EDITLEXER lexCMake;
+extern EDITLEXER lexGradle;
 extern EDITLEXER lexJAM;
 extern EDITLEXER lexINNO;
 extern EDITLEXER lexNsis;
@@ -144,6 +146,7 @@ PEDITLEXER pLexArray[NUMLEXERS] = {
 
 	&lexSmali,
 	&lexCLI,
+	&lexLLVM,
 	&lexASM,
 	&lexVHDL,
 	&lexVerilog,
@@ -163,6 +166,7 @@ PEDITLEXER pLexArray[NUMLEXERS] = {
 	&lexMake,
 
 	&lexCMake,
+	&lexGradle,
 	&lexJAM,
 	&lexINNO,
 	&lexNsis,
@@ -211,8 +215,7 @@ extern BOOL	bHiliteCurrentLine;
 //
 void Style_Load()
 {
-	int i, iLexer;
-	WCHAR	tch[32];
+	unsigned int iLexer;
 	WCHAR	*pIniSection = LocalAlloc(LPTR, sizeof(WCHAR) * 32 * 1024);
 	int		cchIniSection = (int)LocalSize(pIniSection) / sizeof(WCHAR);
 
@@ -235,16 +238,19 @@ void Style_Load()
 	crCustom[15] = RGB(0xB2, 0x8B, 0x40);
 
 	LoadIniSection(L"Custom Colors", pIniSection, cchIniSection);
-	for (i = 0; i < 16; i++) {
-		int itok;
-		int irgb;
-		WCHAR wch[32];
-		wsprintf(tch, L"%02i", i + 1);
-		if (IniSectionGetString(pIniSection, tch, L"", wch, COUNTOF(wch))) {
-			if (wch[0] == L'#') {
-				itok = swscanf(CharNext(wch), L"%x", &irgb);
-				if (itok == 1) {
-					crCustom[i] = RGB((irgb & 0xFF0000) >> 16, (irgb & 0xFF00) >> 8, irgb & 0xFF);
+	{
+		unsigned int i;
+		for (i = 0; i < 16; i++) {
+			WCHAR tch[32];
+			WCHAR wch[32];
+			wsprintf(tch, L"%02i", i + 1);
+			if (IniSectionGetString(pIniSection, tch, L"", wch, COUNTOF(wch))) {
+				if (wch[0] == L'#') {
+					int irgb;
+					int itok = swscanf(CharNext(wch), L"%x", &irgb);
+					if (itok == 1) {
+						crCustom[i] = RGB((irgb & 0xFF0000) >> 16, (irgb & 0xFF00) >> 8, irgb & 0xFF);
+					}
 				}
 			}
 		}
@@ -269,6 +275,7 @@ void Style_Load()
 	cyStyleSelectDlg = max(cyStyleSelectDlg, 324);
 
 	for (iLexer = 0; iLexer < NUMLEXERS; iLexer++) {
+		unsigned int i = 0;
 		LoadIniSection(pLexArray[iLexer]->pszName, pIniSection, cchIniSection);
 		if (!IniSectionGetString(pIniSection, L"FileNameExtensions",
 								 pLexArray[iLexer]->pszDefExt,
@@ -277,7 +284,6 @@ void Style_Load()
 			lstrcpyn(pLexArray[iLexer]->szExtensions,
 					 pLexArray[iLexer]->pszDefExt,
 					 COUNTOF(pLexArray[iLexer]->szExtensions));
-		i = 0;
 		while (pLexArray[iLexer]->Styles[i].iStyle != -1) {
 			IniSectionGetString(pIniSection, pLexArray[iLexer]->Styles[i].pszName,
 								pLexArray[iLexer]->Styles[i].pszDefault,
@@ -296,20 +302,23 @@ void Style_Load()
 //
 void Style_Save()
 {
-	int i, iLexer;
-	WCHAR	tch[32];
+	unsigned iLexer;
 	WCHAR	*pIniSection = LocalAlloc(LPTR, sizeof(WCHAR) * 32 * 1024);
 	int		cchIniSection = (int)LocalSize(pIniSection) / sizeof(WCHAR);
 
 	// Custom colors
-	for (i = 0; i < 16; i++) {
-		WCHAR wch[32];
-		wsprintf(tch, L"%02i", i + 1);
-		wsprintf(wch, L"#%02X%02X%02X",
-				 (int)GetRValue(crCustom[i]),
-				 (int)GetGValue(crCustom[i]),
-				 (int)GetBValue(crCustom[i]));
-		IniSectionSetString(pIniSection, tch, wch);
+	{
+		unsigned int i;
+		for (i = 0; i < 16; i++) {
+			WCHAR tch[32];
+			WCHAR wch[32];
+			wsprintf(tch, L"%02i", i + 1);
+			wsprintf(wch, L"#%02X%02X%02X",
+					 (int)GetRValue(crCustom[i]),
+					 (int)GetGValue(crCustom[i]),
+					 (int)GetBValue(crCustom[i]));
+			IniSectionSetString(pIniSection, tch, wch);
+		}
 	}
 	SaveIniSection(L"Custom Colors", pIniSection);
 	ZeroMemory(pIniSection, cchIniSection);
@@ -336,9 +345,9 @@ void Style_Save()
 
 	ZeroMemory(pIniSection, cchIniSection);
 	for (iLexer = 0; iLexer < NUMLEXERS; iLexer++) {
+		unsigned int i = 0;
 		IniSectionSetString(pIniSection, L"FileNameExtensions",
 							pLexArray[iLexer]->szExtensions);
-		i = 0;
 		while (pLexArray[iLexer]->Styles[i].iStyle != -1) {
 			IniSectionSetString(pIniSection,
 								pLexArray[iLexer]->Styles[i].pszName,
@@ -376,12 +385,13 @@ BOOL Style_Import(HWND hwnd)
 					  | OFN_PATHMUSTEXIST | OFN_SHAREAWARE /*| OFN_NODEREFERENCELINKS*/;
 
 	if (GetOpenFileName(&ofn)) {
-		int i, iLexer;
+		unsigned int iLexer;
 		WCHAR	*pIniSection = LocalAlloc(LPTR, sizeof(WCHAR) * 32 * 1024);
 		int		cchIniSection = (int)LocalSize(pIniSection) / sizeof(WCHAR);
 
 		for (iLexer = 0; iLexer < NUMLEXERS; iLexer++) {
 			if (GetPrivateProfileSection(pLexArray[iLexer]->pszName, pIniSection, cchIniSection, szFile)) {
+				unsigned int i = 0;
 				if (!IniSectionGetString(pIniSection,
 										 L"FileNameExtensions",
 										 pLexArray[iLexer]->pszDefExt,
@@ -390,7 +400,6 @@ BOOL Style_Import(HWND hwnd)
 					lstrcpyn(pLexArray[iLexer]->szExtensions,
 							 pLexArray[iLexer]->pszDefExt,
 							 COUNTOF(pLexArray[iLexer]->szExtensions));
-				i = 0;
 				while (pLexArray[iLexer]->Styles[i].iStyle != -1) {
 					IniSectionGetString(pIniSection,
 										pLexArray[iLexer]->Styles[i].pszName,
@@ -432,13 +441,13 @@ BOOL Style_Export(HWND hwnd)
 			| OFN_PATHMUSTEXIST | OFN_SHAREAWARE /*| OFN_NODEREFERENCELINKS*/ | OFN_OVERWRITEPROMPT;
 
 	if (GetSaveFileName(&ofn)) {
-		int i, iLexer;
+		unsigned int iLexer;
 		WCHAR *pIniSection = LocalAlloc(LPTR, sizeof(WCHAR) * 32 * 1024);
 		int		cchIniSection = (int)LocalSize(pIniSection) / sizeof(WCHAR);
 
 		for (iLexer = 0; iLexer < NUMLEXERS; iLexer++) {
+			unsigned int i = 0;
 			IniSectionSetString(pIniSection, L"FileNameExtensions", pLexArray[iLexer]->szExtensions);
-			i = 0;
 			while (pLexArray[iLexer]->Styles[i].iStyle != -1) {
 				IniSectionSetString(pIniSection,
 									pLexArray[iLexer]->Styles[i].pszName,
@@ -479,7 +488,6 @@ static const int iMarkerIDs[] = {
 //
 void Style_SetLexer(HWND hwnd, PEDITLEXER pLexNew)
 {
-	int i;
 	//WCHAR *p;
 	int rgb;
 	int iValue;
@@ -511,11 +519,11 @@ void Style_SetLexer(HWND hwnd, PEDITLEXER pLexNew)
 	Style_UpdateLexKeywords(pLexNew);
 	// Add KeyWord Lists
 	if (IsDocLowerKeywords(pLexNew)) {
-		const char *pKeywords;
+		unsigned int i;
 		char *lowerKeywords;
 		char ch;
 		for (i = 0; i < NUMKEYWORD; i++) {
-			pKeywords = pLexNew->pKeyWords->pszKeyWords[i];
+			const char* pKeywords = pLexNew->pKeyWords->pszKeyWords[i];
 			if (*pKeywords) {
 				iIdx = lstrlenA(pKeywords);
 				lowerKeywords = LocalAlloc(LPTR, iIdx + 1);
@@ -534,6 +542,7 @@ void Style_SetLexer(HWND hwnd, PEDITLEXER pLexNew)
 			}
 		}
 	} else {
+		unsigned int i;
 		for (i = 0; i < NUMKEYWORD; i++) {
 			SendMessage(hwnd, SCI_SETKEYWORDS, i, (LPARAM)pLexNew->pKeyWords->pszKeyWords[i]);
 		}
@@ -544,10 +553,13 @@ void Style_SetLexer(HWND hwnd, PEDITLEXER pLexNew)
 
 	// Font quality setup, check availability of Consolas
 	Style_SetFontQuality(hwnd, lexDefault.Styles[0 + iIdx].szValue);
-	for (i = 0; i < NUM_MONO_FONT; i++) {
-		if (IsFontAvailable(SysMonoFontName[i])) {
-			np2MonoFontIndex = i;
-			break;
+	{
+		unsigned int i;
+		for (i = 0; i < NUM_MONO_FONT; i++) {
+			if (IsFontAvailable(SysMonoFontName[i])) {
+				np2MonoFontIndex = i;
+				break;
+			}
 		}
 	}
 
@@ -677,9 +689,9 @@ void Style_SetLexer(HWND hwnd, PEDITLEXER pLexNew)
 		SendMessage(hwnd, SCI_SETCARETSTYLE, CARETSTYLE_BLOCK, 0);
 		lstrcpy(wchCaretStyle, L"block");
 	} else {
-		WCHAR wch[32];
 		iValue = 1;
 		if (Style_StrGetSize(lexDefault.Styles[9 + iIdx].szValue, &iValue)) {
+			WCHAR wch[32];
 			iValue = max(min(iValue, 3), 1);
 			wsprintf(wch, L"size:%i", iValue);
 			lstrcat(wchCaretStyle, wch);
@@ -755,7 +767,7 @@ void Style_SetLexer(HWND hwnd, PEDITLEXER pLexNew)
 
 	// set folding style; braces are for scoping only
 	{
-		int i;
+		unsigned int i;
 		COLORREF clrFore;
 		COLORREF clrBack = SciCall_StyleGetBack(STYLE_DEFAULT);
 
@@ -787,9 +799,9 @@ void Style_SetLexer(HWND hwnd, PEDITLEXER pLexNew)
 	}
 
 	if (pLexNew->iLexer != SCLEX_NULL || pLexNew == &lexANSI) {
-		int j;
-		i = 1;
+		unsigned int i = 1;
 		while (pLexNew->Styles[i].iStyle != -1) {
+			unsigned int j;
 
 			for (j = 0; j < 4 && (pLexNew->Styles[i].iStyle8[j] != 0 || j == 0); ++j) {
 				Style_SetStyles(hwnd, pLexNew->Styles[i].iStyle8[j], pLexNew->Styles[i].szValue);
@@ -924,8 +936,8 @@ void Style_SetLexer(HWND hwnd, PEDITLEXER pLexNew)
 //
 PEDITLEXER __fastcall Style_SniffShebang(char *pchText)
 {
-	int len = 0;
 	if (StrCmpNA(pchText, "#!", 2) == 0) {
+		int len = 0;
 		char *pch = pchText + 2;
 		while (*pch == ' ' || *pch == '\t') {
 			pch++;
@@ -973,11 +985,11 @@ PEDITLEXER __fastcall Style_SniffShebang(char *pchText)
 					return (&lexBash);
 				if (!(StrCmpNIA(pch - 3, "gawk.exe", 8) && StrCmpNIA(pch - 3, "nawk.exe", 8)))
 					return (&lexAwk);
-				if (StrCmpNIA(pch-8, "node.exe", 8) == 0)
+				if (!StrCmpNIA(pch-8, "node.exe", 8))
 					return (&lexJS);
-				//if (StrCmpNIA(pch-8, "wlua.exe", 8) == 0)
+				//if (!StrCmpNIA(pch-8, "wlua.exe", 8))
 				//	return (&lexLua);
-				//if (StrCmpNIA(pch-8, "ipyw.exe", 8) == 0)
+				//if (!StrCmpNIA(pch-8, "ipyw.exe", 8))
 				//	return (&lexPython);
 			}
 			if (len >= 7) {
@@ -989,15 +1001,15 @@ PEDITLEXER __fastcall Style_SniffShebang(char *pchText)
 				}
 				if (!StrCmpNIA(pch - 3, "awk.exe", 7))
 					return (&lexAwk);
-				//if (StrCmpNIA(pch-7, "ipy.exe", 7) == 0)
+				//if (!StrCmpNIA(pch-7, "ipy.exe", 7))
 				//	return (&lexPython);
-				//if (StrCmpNIA(pch-7, "ksh.exe", 7) == 0 || StrCmpNIA(pch-7, "csh.exe", 7) == 0)
+				//if (!(StrCmpNIA(pch-7, "ksh.exe", 7) && StrCmpNIA(pch-7, "csh.exe", 7)))
 				//	return (&lexBash);
-				//if (StrCmpNIA(pch-7, "tcc.exe", 7) == 0)
+				//if (!StrCmpNIA(pch-7, "tcc.exe", 7))
 				//	return (&lexCPP);
-				//if (StrCmpNIA(pch-7, "pythonw", 7) == 0)
+				//if (!StrCmpNIA(pch-7, "pythonw", 7))
 				//	return (&lexPython);
-				//if (StrCmpNIA(pch-7, "groovyw", 7) == 0)
+				//if (!StrCmpNIA(pch-7, "groovyw", 7))
 				//	return (&lexGROOCY);
 			}
 			if (len >= 6) {
@@ -1025,7 +1037,7 @@ PEDITLEXER __fastcall Style_SniffShebang(char *pchText)
 				return (&lexPerl);
 			if (!StrCmpNIA(pch - 4, "ruby", 4))
 				return (&lexRuby);
-			if (!StrCmpNA(pch - 4, "node", 4) == 0)
+			if (!StrCmpNA(pch - 4, "node", 4))
 				return(&lexJS);
 			//if (!StrCmpNIA(pch-4, "wish", 4))
 			//	return (&lexTcl);
@@ -1120,7 +1132,7 @@ int Style_GetDocTypeLanguage()
 
 	// find root tag
 	p = tchText;
-	while (p - tchText < sizeof(tchText)) {
+	while (p - tchText < 2048) {
 		if (!(p = StrChrA(p, '<')))
 			return 0;
 		if (!StrCmpNA(p, "<!--", 4)) {
@@ -1344,7 +1356,7 @@ PEDITLEXER __fastcall Style_MatchLexer(LPCWSTR lpszMatch, BOOL bCheckNames)
 			lstrcpy(tch, pLexArray[i]->szExtensions);
 			p1 = tch;
 			while (*p1) {
-				if (p2 = StrChr(p1, L';')) {
+				if ((p2 = StrChr(p1, L';'))) {
 					*p2 = L'\0';
 				} else {
 					p2 = StrEnd(p1);
@@ -1397,7 +1409,7 @@ void Style_SetLexerFromFile(HWND hwnd, LPCWSTR lpszFile)
 			char tchText[256];
 			SendMessage(hwnd, SCI_GETTEXT, (WPARAM)COUNTOF(tchText) - 1, (LPARAM)tchText);
 			StrTrimA(tchText, " \t\n\r");
-			if (pLexSniffed = Style_SniffShebang(tchText)) {
+			if ((pLexSniffed = Style_SniffShebang(tchText))) {
 				pLexNew = pLexSniffed;
 				bFound = TRUE;
 			}
@@ -1481,7 +1493,7 @@ void Style_SetLexerFromFile(HWND hwnd, LPCWSTR lpszFile)
 
 		// check associated extensions
 		if (!bFound) {
-			if (pLexSniffed = Style_MatchLexer(lpszExt, FALSE)) {
+			if ((pLexSniffed = Style_MatchLexer(lpszExt, FALSE))) {
 				pLexNew = pLexSniffed;
 				bFound = TRUE;
 			}
@@ -1541,7 +1553,7 @@ void Style_SetLexerFromFile(HWND hwnd, LPCWSTR lpszFile)
 			char tchText[256];
 			SendMessage(hwnd, SCI_GETTEXT, (WPARAM)COUNTOF(tchText) - 1, (LPARAM)tchText);
 			StrTrimA(tchText, " \t\n\r");
-			if (pLexSniffed = Style_SniffShebang(tchText)) {
+			if ((pLexSniffed = Style_SniffShebang(tchText))) {
 				if (iEncoding != g_DOSEncoding || pLexSniffed != &lexDefault
 						|| (lstrcmpi(lpszExt, L"nfo") && lstrcmpi(lpszExt, L"diz"))) {
 					// Although .nfo and .diz were removed from the default lexer's
@@ -1553,10 +1565,10 @@ void Style_SetLexerFromFile(HWND hwnd, LPCWSTR lpszFile)
 		}
 		// file mode name/extension
 		if (!bFound) {
-			if (pLexMode = Style_MatchLexer(wchMode, FALSE)) {
+			if ((pLexMode = Style_MatchLexer(wchMode, FALSE))) {
 				pLexNew = pLexMode;
 				bFound = TRUE;
-			} else if (pLexMode = Style_MatchLexer(wchMode, TRUE)) {
+			} else if ((pLexMode = Style_MatchLexer(wchMode, TRUE))) {
 				pLexNew = pLexMode;
 				bFound = TRUE;
 			}
@@ -1580,9 +1592,9 @@ void Style_SetLexerFromFile(HWND hwnd, LPCWSTR lpszFile)
 void Style_SetLexerFromName(HWND hwnd, LPCWSTR lpszFile, LPCWSTR lpszName)
 {
 	PEDITLEXER pLexNew;
-	if (pLexNew = Style_MatchLexer(lpszName, FALSE)) {
+	if ((pLexNew = Style_MatchLexer(lpszName, FALSE))) {
 		Style_SetLexer(hwnd, pLexNew);
-	} else if (pLexNew = Style_MatchLexer(lpszName, TRUE)) {
+	} else if ((pLexNew = Style_MatchLexer(lpszName, TRUE))) {
 		Style_SetLexer(hwnd, pLexNew);
 	} else {
 		Style_SetLexerFromFile(hwnd, lpszFile);
@@ -1747,7 +1759,6 @@ void Style_SetIndentGuides(HWND hwnd, BOOL bShow)
 		} else {
 			iIndentView = SC_IV_REAL;
 		}
-		iIndentView = SC_IV_REAL;
 	}
 	SendMessage(hwnd, SCI_SETINDENTATIONGUIDES, iIndentView, 0);
 }
@@ -1778,12 +1789,12 @@ BOOL Style_GetOpenDlgFilterStr(LPWSTR lpszFilter, int cchFilter)
 //
 BOOL Style_StrGetFont(LPCWSTR lpszStyle, LPWSTR lpszFont, int cchFont)
 {
-	WCHAR tch[256];
 	WCHAR *p;
 
-	if (p = StrStrI(lpszStyle, L"font:")) {
+	if ((p = StrStrI(lpszStyle, L"font:"))) {
+		WCHAR tch[256];
 		lstrcpy(tch, p + CSTRLEN(L"font:"));
-		if (p = StrChr(tch, L';')) {
+		if ((p = StrChr(tch, L';'))) {
 			*p = L'\0';
 		}
 		TrimString(tch);
@@ -1809,12 +1820,12 @@ BOOL Style_StrGetFont(LPCWSTR lpszStyle, LPWSTR lpszFont, int cchFont)
 //
 BOOL Style_StrGetFontQuality(LPCWSTR lpszStyle, LPWSTR lpszQuality, int cchQuality)
 {
-	WCHAR tch[256];
 	WCHAR *p;
 
-	if (p = StrStrI(lpszStyle, L"smoothing:")) {
+	if ((p = StrStrI(lpszStyle, L"smoothing:"))) {
+		WCHAR tch[256];
 		lstrcpy(tch, p + CSTRLEN(L"smoothing:"));
-		if (p = StrChr(tch, L';')) {
+		if ((p = StrChr(tch, L';'))) {
 			*p = L'\0';
 		}
 		TrimString(tch);
@@ -1834,14 +1845,14 @@ BOOL Style_StrGetFontQuality(LPCWSTR lpszStyle, LPWSTR lpszQuality, int cchQuali
 //
 BOOL Style_StrGetCharSet(LPCWSTR lpszStyle, int *i)
 {
-	WCHAR tch[256];
 	WCHAR *p;
-	int	 iValue;
-	int	 itok;
 
-	if (p = StrStrI(lpszStyle, L"charset:")) {
+	if ((p = StrStrI(lpszStyle, L"charset:"))) {
+		WCHAR tch[256];
+		int	 iValue;
+		int	 itok;
 		lstrcpy(tch, p + CSTRLEN(L"charset:"));
-		if (p = StrChr(tch, L';')) {
+		if ((p = StrChr(tch, L';'))) {
 			*p = L'\0';
 		}
 		TrimString(tch);
@@ -1861,13 +1872,13 @@ BOOL Style_StrGetCharSet(LPCWSTR lpszStyle, int *i)
 //
 BOOL Style_StrGetSize(LPCWSTR lpszStyle, int *i)
 {
-	WCHAR tch[256];
 	WCHAR *p;
-	int	 iValue;
-	int	 iSign = 0;
-	int	 itok;
 
-	if (p = StrStrI(lpszStyle, L"size:")) {
+	if ((p = StrStrI(lpszStyle, L"size:"))) {
+		WCHAR tch[256];
+		int	 iValue;
+		int	 iSign = 0;
+		int	 itok;
 		lstrcpy(tch, p + CSTRLEN(L"size:"));
 		if (tch[0] == L'+') {
 			iSign = 1;
@@ -1876,7 +1887,7 @@ BOOL Style_StrGetSize(LPCWSTR lpszStyle, int *i)
 			iSign = -1;
 			tch[0] = L' ';
 		}
-		if (p = StrChr(tch, L';')) {
+		if ((p = StrChr(tch, L';'))) {
 			*p = L'\0';
 		}
 		TrimString(tch);
@@ -1900,12 +1911,12 @@ BOOL Style_StrGetSize(LPCWSTR lpszStyle, int *i)
 //
 BOOL Style_StrGetSizeStr(LPCWSTR lpszStyle, LPWSTR lpszSize, int cchSize)
 {
-	WCHAR tch[256];
 	WCHAR *p;
 
-	if (p = StrStrI(lpszStyle, L"size:")) {
+	if ((p = StrStrI(lpszStyle, L"size:"))) {
+		WCHAR tch[256];
 		lstrcpy(tch, p + CSTRLEN(L"size:"));
-		if (p = StrChr(tch, L';')) {
+		if ((p = StrChr(tch, L';'))) {
 			*p = L'\0';
 		}
 		TrimString(tch);
@@ -1922,18 +1933,18 @@ BOOL Style_StrGetSizeStr(LPCWSTR lpszStyle, LPWSTR lpszSize, int cchSize)
 //
 BOOL Style_StrGetColor(BOOL bFore, LPCWSTR lpszStyle, int *rgb)
 {
-	WCHAR tch[256];
 	WCHAR *p;
-	int	 iValue;
-	int	 itok;
-	WCHAR *pItem = (bFore) ? L"fore:" : L"back:";
+	const WCHAR *pItem = (bFore) ? L"fore:" : L"back:";
 
-	if (p = StrStrI(lpszStyle, pItem)) {
+	if ((p = StrStrI(lpszStyle, pItem))) {
+		WCHAR tch[256];
+		int	 iValue;
+		int	 itok;
 		lstrcpy(tch, p + lstrlen(pItem));
 		if (tch[0] == L'#') {
 			tch[0] = L' ';
 		}
-		if (p = StrChr(tch, L';')) {
+		if ((p = StrChr(tch, L';'))) {
 			*p = L'\0';
 		}
 		TrimString(tch);
@@ -1953,12 +1964,12 @@ BOOL Style_StrGetColor(BOOL bFore, LPCWSTR lpszStyle, int *rgb)
 //
 BOOL Style_StrGetCase(LPCWSTR lpszStyle, int *i)
 {
-	WCHAR tch[256];
 	WCHAR *p;
 
-	if (p = StrStrI(lpszStyle, L"case:")) {
+	if ((p = StrStrI(lpszStyle, L"case:"))) {
+		WCHAR tch[256];
 		lstrcpy(tch, p + CSTRLEN(L"case:"));
-		if (p = StrChr(tch, L';')) {
+		if ((p = StrChr(tch, L';'))) {
 			*p = L'\0';
 		}
 		TrimString(tch);
@@ -1980,14 +1991,14 @@ BOOL Style_StrGetCase(LPCWSTR lpszStyle, int *i)
 //
 BOOL Style_StrGetAlpha(LPCWSTR lpszStyle, int *i)
 {
-	WCHAR tch[256];
 	WCHAR *p;
-	int	 iValue;
-	int	 itok;
 
-	if (p = StrStrI(lpszStyle, L"alpha:")) {
+	if ((p = StrStrI(lpszStyle, L"alpha:"))) {
+		WCHAR tch[256];
+		int	 iValue;
+		int	 itok;
 		lstrcpy(tch, p + CSTRLEN(L"alpha:"));
-		if (p = StrChr(tch, L';')) {
+		if ((p = StrChr(tch, L';'))) {
 			*p = L'\0';
 		}
 		TrimString(tch);
@@ -2012,7 +2023,6 @@ BOOL Style_SelectFont(HWND hwnd, LPWSTR lpszStyle, int cchStyle, BOOL bDefaultSt
 	WCHAR szNewStyle[512];
 	int	 iValue;
 	WCHAR tch[32];
-	HDC hdc;
 
 	ZeroMemory(&cf, sizeof(CHOOSEFONT));
 	ZeroMemory(&lf, sizeof(LOGFONT));
@@ -2025,7 +2035,7 @@ BOOL Style_SelectFont(HWND hwnd, LPWSTR lpszStyle, int cchStyle, BOOL bDefaultSt
 		lf.lfCharSet = (BYTE)iValue;
 	}
 	if (Style_StrGetSize(lpszStyle, &iValue)) {
-		hdc = GetDC(hwnd);
+		HDC hdc = GetDC(hwnd);
 		lf.lfHeight = -MulDiv(iValue, GetDeviceCaps(hdc, LOGPIXELSY), 72);
 		ReleaseDC(hwnd, hdc);
 	}
@@ -2280,13 +2290,12 @@ BOOL Style_SelectColor(HWND hwnd, BOOL bFore, LPWSTR lpszStyle, int cchStyle)
 void Style_SetStyles(HWND hwnd, int iStyle, LPCWSTR lpszStyle)
 {
 	WCHAR tch[256];
-	WCHAR *p;
 	int	 iValue;
 
 	// Font
 	if (Style_StrGetFont(lpszStyle, tch, COUNTOF(tch))) {
 		char mch[256];
-		WideCharToMultiByte(CP_ACP, 0, tch, -1, mch, COUNTOF(mch), NULL, NULL);
+		WideCharToMultiByte(CP_UTF8, 0, tch, -1, mch, COUNTOF(mch), NULL, NULL);
 		SendMessage(hwnd, SCI_STYLESETFONT, iStyle, (LPARAM)mch);
 	}
 
@@ -2306,35 +2315,35 @@ void Style_SetStyles(HWND hwnd, int iStyle, LPCWSTR lpszStyle)
 	}
 
 	// Bold
-	if (p = StrStrI(lpszStyle, L"bold")) {
+	if (StrStrI(lpszStyle, L"bold")) {
 		SendMessage(hwnd, SCI_STYLESETBOLD, iStyle, (LPARAM)TRUE);
 	} else {
 		SendMessage(hwnd, SCI_STYLESETBOLD, iStyle, (LPARAM)FALSE);
 	}
 
 	// Italic
-	if (p = StrStrI(lpszStyle, L"italic")) {
+	if (StrStrI(lpszStyle, L"italic")) {
 		SendMessage(hwnd, SCI_STYLESETITALIC, iStyle, (LPARAM)TRUE);
 	} else {
 		SendMessage(hwnd, SCI_STYLESETITALIC, iStyle, (LPARAM)FALSE);
 	}
 
 	// Underline
-	if (p = StrStrI(lpszStyle, L"underline")) {
+	if (StrStrI(lpszStyle, L"underline")) {
 		SendMessage(hwnd, SCI_STYLESETUNDERLINE, iStyle, (LPARAM)TRUE);
 	} else {
 		SendMessage(hwnd, SCI_STYLESETUNDERLINE, iStyle, (LPARAM)FALSE);
 	}
 
 	// Strike
-	if (p = StrStrI(lpszStyle, L"strike")) {
+	if (StrStrI(lpszStyle, L"strike")) {
 		SendMessage(hwnd, SCI_STYLESETSTRIKE, iStyle, (LPARAM)TRUE);
 	} else {
 		SendMessage(hwnd, SCI_STYLESETSTRIKE, iStyle, (LPARAM)FALSE);
 	}
 
 	// EOL Filled
-	if (p = StrStrI(lpszStyle, L"eolfilled")) {
+	if (StrStrI(lpszStyle, L"eolfilled")) {
 		SendMessage(hwnd, SCI_STYLESETEOLFILLED, iStyle, (LPARAM)TRUE);
 	} else {
 		SendMessage(hwnd, SCI_STYLESETEOLFILLED, iStyle, (LPARAM)FALSE);
@@ -2419,7 +2428,7 @@ int Style_GetLexerIconId(PEDITLEXER pLex)
 	pszFile = GlobalAlloc(GPTR, sizeof(WCHAR) * (lstrlen(pszExtensions) + CSTRLEN(L"*.txt") + 16));
 	lstrcpy(pszFile, L"*.");
 	lstrcat(pszFile, pszExtensions);
-	if (p = StrChr(pszFile, L';')) {
+	if ((p = StrChr(pszFile, L';'))) {
 		*p = L'\0';
 	}
 
@@ -2521,8 +2530,8 @@ INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM
 	static PEDITLEXER pCurrentLexer;
 	static PEDITSTYLE pCurrentStyle;
 	static HFONT hFontTitle;
-	static HBRUSH hbrFore;
-	static HBRUSH hbrBack;
+	//static HBRUSH hbrFore;
+	//static HBRUSH hbrBack;
 
 	switch (umsg) {
 	case WM_INITDIALOG: {
@@ -2561,9 +2570,6 @@ INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM
 		MakeBitmapButton(hwnd, IDC_NEXTSTYLE, g_hInstance, IDB_NEXT);
 
 		// Setup title font
-		if (hFontTitle) {
-			DeleteObject(hFontTitle);
-		}
 		if (NULL == (hFontTitle = (HFONT)SendDlgItemMessage(hwnd, IDC_TITLE, WM_GETFONT, 0, 0))) {
 			hFontTitle = GetStockObject(DEFAULT_GUI_FONT);
 		}
@@ -2578,6 +2584,7 @@ INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM
 	return TRUE;
 
 	case WM_DESTROY:
+		DeleteObject(hFontTitle);
 		DeleteBitmapButton(hwnd, IDC_STYLEFORE);
 		DeleteBitmapButton(hwnd, IDC_STYLEBACK);
 		DeleteBitmapButton(hwnd, IDC_PREVSTYLE);
@@ -2607,7 +2614,7 @@ INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM
 					}
 
 					pCurrentStyle = 0;
-					if (pCurrentLexer = (PEDITLEXER)lpnmtv->itemNew.lParam) {
+					if ((pCurrentLexer = (PEDITLEXER)lpnmtv->itemNew.lParam)) {
 						SetDlgItemText(hwnd, IDC_STYLELABEL, wch);
 						EnableWindow(GetDlgItem(hwnd, IDC_STYLEEDIT), TRUE);
 						EnableWindow(GetDlgItem(hwnd, IDC_STYLEFONT), FALSE);
@@ -2653,7 +2660,7 @@ INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM
 
 
 					pCurrentLexer = 0;
-					if (pCurrentStyle = (PEDITSTYLE)lpnmtv->itemNew.lParam) {
+					if ((pCurrentStyle = (PEDITSTYLE)lpnmtv->itemNew.lParam)) {
 						SetDlgItemText(hwnd, IDC_STYLELABEL, StrEnd(wch) + 1);
 						EnableWindow(GetDlgItem(hwnd, IDC_STYLEEDIT), TRUE);
 						EnableWindow(GetDlgItem(hwnd, IDC_STYLEFONT), TRUE);
@@ -2751,7 +2758,7 @@ INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM
 
 			//ImageList_EndDrag();
 
-			if (htiTarget = TreeView_GetDropHilight(hwndTV)) {
+			if ((htiTarget = TreeView_GetDropHilight(hwndTV))) {
 				WCHAR tchCopy[256];
 				TreeView_SelectDropTarget(hwndTV, NULL);
 				GetDlgItemText(hwnd, IDC_STYLEEDIT, tchCopy, COUNTOF(tchCopy));

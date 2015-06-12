@@ -81,9 +81,6 @@ static inline bool IsSpaceEquiv(int state) {
 	// SCE_C_COMMENTDOC, SCE_C_COMMENTLINEDOC, SCE_C_COMMENTDOC_TAG, SCE_C_COMMENTDOC_TAG_XML
 	return (state < SCE_C_IDENTIFIER) || (state == SCE_C_DNESTEDCOMMENT);
 }
-static inline bool iswordstartH(int ch) {
-	return iswordstart(ch) || ch == '-';
-}
 static inline bool IsEscapeChar(int ch) {
 	return ch == '\\' || ch == '\'' || ch == '\"'
 		|| ch == '$'; // PHP
@@ -630,7 +627,7 @@ _label_identifier:
 			}
 			break;
 		case SCE_C_DSTRINGB: // D
-			if (sc.ch == '`') {
+			if (sc.ch == '`' && (lexType == LEX_D || lexType == LEX_GO)) {
 				if (lexType == LEX_D && IsDStrFix(sc.chNext))
 					sc.Forward();
 				sc.ForwardSetState(SCE_C_DEFAULT);
@@ -854,7 +851,7 @@ _label_identifier:
 				++numDTSBrace;
 				sc.SetState(SCE_C_DSTRINGT);
 				sc.Forward();
-			} else if (sc.ch == '`') {
+			} else if (sc.ch == '`' && (lexType == LEX_D || lexType == LEX_GO)) {
 				sc.SetState(SCE_C_DSTRINGB);
 			} else if (!_sharpComment(lexType) && sc.Match('/', '*')) {
 				if (visibleChars == 0 && (sc.Match("/**") || sc.Match("/*!"))) {
@@ -1129,10 +1126,10 @@ static bool IsCppFoldingLine(int line, LexAccessor &styler, int kind) {
 	//	return (ch == '/' || ch == '#') && (stl == SCE_C_COMMENTLINE || stl == SCE_C_COMMENTLINEDOC);
 	case 1:
 		return stl == SCE_C_WORD && (ch == 'i' || ch == 'u' || ch == 't') &&
-		styler.Match(pos, "using") || styler.Match(pos, "import") || styler.Match(pos, "typedef");
+		(styler.Match(pos, "using") || styler.Match(pos, "import") || styler.Match(pos, "typedef"));
 	case 2:
 		return stl == SCE_C_DIRECTIVE && (ch == '@') &&
-		styler.Match(pos, "@property") || styler.Match(pos, "@synthesize");
+		(styler.Match(pos, "@property") || styler.Match(pos, "@synthesize"));
 	default:
 		if (!(stl == SCE_C_PREPROCESSOR && (ch == '#' || ch == '!')))
 			return false;

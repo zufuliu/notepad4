@@ -60,6 +60,7 @@ typedef struct _editlexer {
 #define NP2LEX_GROOVY	63013	// SCLEX_CPP		Groovy
 #define NP2LEX_SCALA	63014	// SCLEX_CPP		Scala
 #define NP2LEX_GO		63015	// SCLEX_CPP		Go Source
+#define NP2LEX_GRADLE	63016	// SCLEX_CPP		Gradle
 
 #define NP2LEX_VB		63021	// SCLEX_VB			VB
 #define NP2LEX_FSHARP	63022	// SCLEX_FSHARP		F#
@@ -100,6 +101,7 @@ typedef struct _editlexer {
 #define NP2LEX_TEXINFO	63057	// SCLEX_TEXINFO	Texinfo
 #define NP2LEX_LISP		63058	// SCLEX_LISP		Lisp
 #define NP2LEX_VIM		63059	// SCLEX_VIM		Vim
+#define NP2LEX_LLVM		63060	// SCLEX_LLVM		LLVM
 #define NP2LEX_JULIA	63066	// SCLEX_MATLAB		Julia
 #define NP2LEX_ANSI		63099	// SCLEX_NULL		ANSI
 

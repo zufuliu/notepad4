@@ -154,7 +154,7 @@ struct WrapPending {
  */
 class Editor : public EditModel, public DocWatcher {
 	// Private so Editor objects can not be copied
-	Editor(const Editor &);
+	explicit Editor(const Editor &);
 	Editor &operator=(const Editor &);
 
 protected:	// ScintillaBase subclass needs access to much of Editor
@@ -204,6 +204,7 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 
 	Point lastClick;
 	unsigned int lastClickTime;
+	Point doubleClickCloseThreshold;
 	int dwellDelay;
 	int ticksToDwell;
 	bool dwelling;
@@ -300,7 +301,7 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	virtual void DiscardOverdraw();
 	virtual void Redraw();
 	void RedrawSelMargin(int line=-1, bool allAfter=false);
-	PRectangle RectangleFromRange(const Range &r, int overlap);
+	PRectangle RectangleFromRange(const Range &r, int overlap) const;
 	void InvalidateRange(int start, int end);
 
 	bool UserVirtualSpace() const {
@@ -388,6 +389,7 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	int InsertSpace(int position, unsigned int spaces);
 	void AddChar(char ch);
 	virtual void AddCharUTF(const char *s, unsigned int len, bool treatAsDBCS=false);
+	void FillVirtualSpace();
 	void InsertPaste(const char *text, int len);
 	enum PasteShape { pasteStream=0, pasteRectangular = 1, pasteLine = 2 };
 	void InsertPasteShape(const char *text, int len, PasteShape shape);
@@ -544,6 +546,8 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	bool PointIsHotspot(const Point &pt);
 	void SetHotSpotRange(const Point *pt);
 	Range GetHotSpotRange() const;
+	void SetHoverIndicatorPosition(int position);
+	void SetHoverIndicatorPoint(Point pt);
 
 	int CodePage() const;
 	virtual bool ValidCodePage(int /* codePage */) const { return true; }

@@ -31,7 +31,7 @@ static bool IsTclWordStart(int ch) {
 static bool IsTclNumberChar(int ch, int chPrev) {
 	return (ch < 0x80) && (isdigit(ch) || (ch == '.' && chPrev != '.')
 		|| ((ch == '+' || ch == '-') && (chPrev == 'e' || chPrev == 'E'))
-		|| (ch == 'e' || ch == 'E') && (chPrev < 0x80) && isdigit(chPrev));
+		|| ((ch == 'e' || ch == 'E') && (chPrev < 0x80) && isdigit(chPrev)));
 }
 
 /*static const char * const tclWordListDesc[] = {

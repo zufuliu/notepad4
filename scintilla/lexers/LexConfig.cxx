@@ -31,7 +31,7 @@ static inline bool IsDelimiter(int ch) {
 
 static void ColouriseConfDoc(unsigned int startPos, int length, int initStyle, WordList *[], Accessor &styler) {
 	int state = initStyle;
-	int chPrev, ch = 0, chNext = styler[startPos];
+	int chNext = styler[startPos];
 	styler.StartAt(startPos);
 	styler.StartSegment(startPos);
 	unsigned int endPos = startPos + length;
@@ -43,8 +43,7 @@ static void ColouriseConfDoc(unsigned int startPos, int length, int initStyle, W
 	int lineCurrent = styler.GetLine(startPos);
 
 	for (unsigned int i = startPos; i < endPos; i++) {
-		chPrev = ch;
-		ch = chNext;
+		int ch = chNext;
 		chNext = styler.SafeGetCharAt(i + 1);
 
 		const bool atEOL = (ch == '\r' && chNext != '\n') || (ch == '\n');
@@ -126,7 +125,6 @@ static void ColouriseConfDoc(unsigned int startPos, int length, int initStyle, W
 			chNext = styler.SafeGetCharAt(i + 1);
 			if (ch == '\r' && chNext == '\n') {
 				i++;
-				ch = chNext;
 				chNext = styler.SafeGetCharAt(i + 1);
 			}
 			continue;
@@ -234,10 +232,23 @@ static void FoldConfDoc(unsigned int startPos, int length, int initStyle, WordLi
 		}
 
 		if (style == SCE_CONF_DIRECTIVE) {
-			if ((ch == '<' && chNext != '/'))
+			if (visibleChars == 0 && ch == '<' && !(chNext == '/' || chNext == '?')) {
 				levelNext++;
-			else if ((ch == '<' && chNext == '/') || (ch == '/' && chNext == '>'))
+			} else if (ch == '<' && chNext == '/') {
 				levelNext--;
+			} else if (ch == '/' && chNext == '>') {
+				unsigned int pos = i;
+				while (pos > startPos) {
+					pos--;
+					char c = styler.SafeGetCharAt(pos);
+					if (!(c == ' ' || c == '\t')) {
+						break;
+					}
+				}
+				if (!(IsAlphaNumeric(styler.SafeGetCharAt(pos)) && styler.StyleAt(pos) == SCE_CONF_DIRECTIVE)) {
+					levelNext--;
+				}
+			}
 		}
 
 		if (style == SCE_CONF_OPERATOR) {

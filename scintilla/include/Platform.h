@@ -144,6 +144,11 @@ public:
 		return (pt.x >= left) && (pt.x <= right) &&
 			(pt.y >= top) && (pt.y <= bottom);
 	}
+	bool ContainsWholePixel(const Point& pt) const {
+		// Does the rectangle contain all of the pixel to left/below the point 
+		return (pt.x >= left) && ((pt.x+1) <= right) &&
+			(pt.y >= top) && ((pt.y+1) <= bottom);
+	}
 	bool Contains(const PRectangle &rc) const {
 		return (rc.left >= left) && (rc.right <= right) &&
 			(rc.top >= top) && (rc.bottom <= bottom);
@@ -266,9 +271,6 @@ struct FontParameters {
 class Font {
 protected:
 	FontID fid;
-#if PLAT_WX
-	int ascent;
-#endif
 	// Private so Font objects can not be copied
 	Font(const Font &);
 	Font &operator=(const Font &);
@@ -282,9 +284,6 @@ public:
 	FontID GetID() const { return fid; }
 	// Alias another font - caller guarantees not to Release
 	void SetID(FontID fid_) { fid = fid_; }
-#if PLAT_WX
-	void SetAscent(int ascent_) { ascent = ascent_; }
-#endif
 	friend class Surface;
 	friend class SurfaceImpl;
 };
@@ -357,9 +356,9 @@ class Window {
 protected:
 	WindowID wid;
 public:
-	Window() : wid(0), cursorLast(cursorInvalid) {
+	Window() : wid(0) {
 	}
-	Window(const Window &source) : wid(source.wid), cursorLast(cursorInvalid) {
+	Window(const Window &source) : wid(source.wid) {
 	}
 	virtual ~Window();
 	Window &operator=(WindowID wid_) {
@@ -382,8 +381,6 @@ public:
 	void SetCursor(Cursor curs);
 	void SetTitle(const char *s);
 	PRectangle GetMonitorRect(const Point &pt) const;
-private:
-	Cursor cursorLast;
 };
 
 /**

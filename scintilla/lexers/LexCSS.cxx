@@ -46,11 +46,10 @@ static inline bool IsCssOperator(const int ch) {
 
 // look behind (from start of document to our start position) to determine current nesting level
 static int NestingLevelLookBehind(unsigned int startPos, Accessor &styler) {
-	int ch;
 	int nestingLevel = 0;
 
 	for (unsigned int i = 0; i < startPos; i++) {
-		ch = styler.SafeGetCharAt(i);
+		int ch = styler.SafeGetCharAt(i);
 		if (ch == '{')
 			nestingLevel++;
 		else if (ch == '}')
@@ -380,10 +379,9 @@ static void ColouriseCssDoc(unsigned int startPos, int length, int initStyle, Wo
 			if (sc.state == SCE_CSS_IDENTIFIER && (IsAWordChar(sc.ch) || sc.ch == ':' || sc.ch == '.' || sc.ch == '#')) {
 				// look ahead to see whether { comes before next ; and }
 				unsigned int endPos = startPos + length;
-				int ch;
 
 				for (unsigned int i = sc.currentPos; i < endPos; i++) {
-					ch = styler.SafeGetCharAt(i);
+					int ch = styler.SafeGetCharAt(i);
 					if (ch == ';' || ch == '}')
 						break;
 					if (ch == '{') {

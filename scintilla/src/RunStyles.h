@@ -44,7 +44,7 @@ public:
 	bool AllSameAs(int value) const;
 	int Find(int value, int start) const;
 
-	void Check() const;
+	//void Check() const;
 };
 
 #ifdef SCI_NAMESPACE

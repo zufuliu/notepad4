@@ -62,7 +62,6 @@ BOOL DirList_Init(HWND hwnd, LPCWSTR pszHeader)
 {
 	HIMAGELIST hil;
 	SHFILEINFO shfi;
-	LV_COLUMN	 lvc;
 
 	// Allocate DirListData Property
 	LPDLDATA lpdl = (LPVOID)GlobalAlloc(GPTR, sizeof(DLDATA));
@@ -97,9 +96,6 @@ BOOL DirList_Init(HWND hwnd, LPCWSTR pszHeader)
 	// Icon thread control
 	lpdl->hExitThread = CreateEvent(NULL, TRUE, FALSE, NULL);
 	lpdl->hTerminatedThread = CreateEvent(NULL, TRUE, TRUE, NULL);
-
-	lvc;
-	pszHeader;
 
 	return TRUE;
 }
@@ -201,7 +197,6 @@ int DirList_Fill(HWND hwnd, LPCWSTR lpszDir, DWORD grfFlags, LPCWSTR lpszFileSpe
 	LPITEMIDLIST	pidlEntry = NULL;
 	LPENUMIDLIST	lpe = NULL;
 	LV_ITEM			lvi;
-	LPLV_ITEMDATA lplvid;
 	ULONG chParsed = 0;
 	ULONG dwAttributes = 0;
 	DL_FILTER dlf;
@@ -264,7 +259,7 @@ int DirList_Fill(HWND hwnd, LPCWSTR lpszDir, DWORD grfFlags, LPCWSTR lpszFileSpe
 						if (dwAttributes & SFGAO_FILESYSTEM) {
 							// Check if item matches specified filter
 							if (DirList_MatchFilter(lpsf, pidlEntry, &dlf)) {
-								lplvid = CoTaskMemAlloc(sizeof(LV_ITEMDATA));
+								LPLV_ITEMDATA lplvid = CoTaskMemAlloc(sizeof(LV_ITEMDATA));
 								lplvid->pidl = pidlEntry;
 								lplvid->lpsf = lpsf;
 								lpsf->lpVtbl->AddRef(lpsf);
@@ -770,7 +765,7 @@ void DirList_CreateFilter(PDL_FILTER pdlf, LPCWSTR lpszFileSpec, BOOL bExcludeFi
 	pdlf->nCount = 1;
 	pdlf->pFilter[0] = &pdlf->tFilterBuf[0];// Zeile zum Ausprobieren
 
-	while (p = StrChr(pdlf->pFilter[pdlf->nCount - 1], L';')) {
+	while ((p = StrChr(pdlf->pFilter[pdlf->nCount - 1], L';'))) {
 		*p = L'\0';			// Replace L';' by L'\0'
 		pdlf->pFilter[pdlf->nCount] = (p + 1);	// Next position after L';'
 		pdlf->nCount++;		// Increase number of filters
@@ -912,13 +907,11 @@ int DriveBox_Fill(HWND hwnd)
 								// Insert sorted ...
 								{
 									COMBOBOXEXITEM cbei2;
-									LPDC_ITEMDATA lpdcid2;
-									HRESULT hr;
 									cbei2.mask = CBEIF_LPARAM;
 									cbei2.iItem = 0;
 									while ((SendMessage(hwnd, CBEM_GETITEM, 0, (LPARAM)&cbei2))) {
-										lpdcid2 = (LPDC_ITEMDATA)cbei2.lParam;
-										hr = (lpdcid->lpsf->lpVtbl->CompareIDs(lpdcid->lpsf, 0, lpdcid->pidl, lpdcid2->pidl));
+										LPDC_ITEMDATA lpdcid2 = (LPDC_ITEMDATA)cbei2.lParam;
+										HRESULT hr = (lpdcid->lpsf->lpVtbl->CompareIDs(lpdcid->lpsf, 0, lpdcid->pidl, lpdcid2->pidl));
 										if ((short)(SCODE_CODE(GetScode(hr))) < 0) {
 											break;
 										} else {
@@ -987,7 +980,6 @@ BOOL DriveBox_GetSelDrive(HWND hwnd, LPWSTR lpszDrive, int nDrive, BOOL fNoSlash
 BOOL DriveBox_SelectDrive(HWND hwnd, LPCWSTR lpszPath)
 {
 	COMBOBOXEXITEM cbei;
-	LPDC_ITEMDATA lpdcid;
 	WCHAR szRoot[64];
 
 	int i;
@@ -1001,6 +993,7 @@ BOOL DriveBox_SelectDrive(HWND hwnd, LPCWSTR lpszPath)
 	cbei.mask = CBEIF_LPARAM;
 
 	for (i = 0; i < cbItems; i++) {
+		LPDC_ITEMDATA lpdcid;
 		// Get DC_ITEMDATA* of Item i
 		cbei.iItem = i;
 		SendMessage(hwnd, CBEM_GETITEM, 0, (LPARAM)&cbei);
@@ -1114,7 +1107,6 @@ LRESULT DriveBox_GetDispInfo(HWND hwnd, LPARAM lParam)
 	NMCOMBOBOXEX *lpnmcbe;
 	LPDC_ITEMDATA lpdcid;
 	SHFILEINFO shfi;
-	WCHAR szTemp[256];
 
 	lpnmcbe = (LPVOID)lParam;
 	lpdcid = (LPDC_ITEMDATA)lpnmcbe->ceItem.lParam;
@@ -1131,6 +1123,7 @@ LRESULT DriveBox_GetDispInfo(HWND hwnd, LPARAM lParam)
 
 	// Get Icon Index
 	if (lpnmcbe->ceItem.mask & (CBEIF_IMAGE | CBEIF_SELECTEDIMAGE)) {
+		WCHAR szTemp[256];
 		IL_GetDisplayName(lpdcid->lpsf, lpdcid->pidl, SHGDN_FORPARSING, szTemp, 256);
 		SHGetFileInfo(szTemp, 0, &shfi, sizeof(SHFILEINFO), SHGFI_SYSICONINDEX | SHGFI_SMALLICON);
 		lpnmcbe->ceItem.iImage = shfi.iIcon;

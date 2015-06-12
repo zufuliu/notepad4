@@ -1,9 +1,17 @@
 #include "EditLexer.h"
 #include "EditStyle.h"
 
-static KEYWORDLIST Keywords_Groovy = {
-"task apply include "
-"def if else "
+static KEYWORDLIST Keywords_Gradle = {
+"assert break case catch class continue const default do else enum extends "
+"finally for goto if implements import instanceof interface native new package "
+"return switch throw throws try while abstract final private protected "
+"public static strictfp synchronized transient "
+"volatile false null super this true "
+
+"def in task apply include "
+"println from into each "
+"plugin "
+"defaultTasks "
 , // type keyword
 "boolean byte char class double float int long short void "
 , // preprocessor
@@ -16,8 +24,7 @@ static KEYWORDLIST Keywords_Groovy = {
 , // attribute
 ""
 , // class
-"Void String Double Integer Class Object Byte Short Long Float Boolean Character Boolean BigDecimal BigInteger Number"
-"Map Exception Date File"
+"Copy File Zip Sync "
 , // interface
 ""
 , // enumeration
@@ -26,13 +33,25 @@ static KEYWORDLIST Keywords_Groovy = {
 ""
 
 #if NUMKEYWORD == 16
-,"","","","","","",
+,
+""
+,
+""
+,
+"each() onlyIf() "
+,
+""
+,
+""
+,
+""
+,
 "for^() if^() switch^() while^() catch^() else^if^()  "
 "def^() "
 #endif
 };
 
-EDITLEXER lexGradle = { SCLEX_CPP, NP2LEX_GRADLE, L"Gradle Script", L"groovy", L"", &Keywords_Groovy,
+EDITLEXER lexGradle = { SCLEX_CPP, NP2LEX_GRADLE, L"Gradle Build Script", L"gradle", L"", &Keywords_Gradle,
 {
 	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
 	//{ SCE_C_DEFAULT, L"Default", L"", L"" },

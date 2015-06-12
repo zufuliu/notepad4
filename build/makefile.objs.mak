@@ -67,6 +67,7 @@ SCI_LEX_OBJ = \
     $(SCI_LEX_OBJDIR)\LexJSON.obj \
     $(SCI_LEX_OBJDIR)\LexLaTeX.obj \
     $(SCI_LEX_OBJDIR)\LexLisp.obj \
+    $(SCI_LEX_OBJDIR)\LexLLVM.obj \
     $(SCI_LEX_OBJDIR)\LexLua.obj \
     $(SCI_LEX_OBJDIR)\LexMakefile.obj \
     $(SCI_LEX_OBJDIR)\LexMatlab.obj \
@@ -161,6 +162,7 @@ NP2_STL_OBJ = \
     $(NP2_STL_OBJDIR)\stlFortran.obj \
     $(NP2_STL_OBJDIR)\stlFSharp.obj \
     $(NP2_STL_OBJDIR)\stlGo.obj \
+    $(NP2_STL_OBJDIR)\stlGradle.obj \
     $(NP2_STL_OBJDIR)\stlGraphViz.obj \
     $(NP2_STL_OBJDIR)\stlGroovy.obj \
     $(NP2_STL_OBJDIR)\stlHaXe.obj \
@@ -173,6 +175,7 @@ NP2_STL_OBJ = \
     $(NP2_STL_OBJDIR)\stlJulia.obj \
     $(NP2_STL_OBJDIR)\stlLaTeX.obj \
     $(NP2_STL_OBJDIR)\stlLisp.obj \
+    $(NP2_STL_OBJDIR)\stlLLVM.obj \
     $(NP2_STL_OBJDIR)\stlLua.obj \
     $(NP2_STL_OBJDIR)\stlMake.obj \
     $(NP2_STL_OBJDIR)\stlMatlab.obj \

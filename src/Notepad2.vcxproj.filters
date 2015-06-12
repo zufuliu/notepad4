@@ -447,6 +447,12 @@
     <ClCompile Include="..\scintilla\src\MarginView.cxx">
       <Filter>Scintilla\src</Filter>
     </ClCompile>
+    <ClCompile Include="..\scintilla\lexers\LexLLVM.cxx">
+      <Filter>Scintilla\lexers</Filter>
+    </ClCompile>
+    <ClCompile Include="EditLexers\stlLLVM.c">
+      <Filter>Source Files\EditLexers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\scintilla\include\ILexer.h">

@@ -29,7 +29,7 @@ static void ColouriseTexiDoc(unsigned int startPos, int length, int initStyle, W
 	//WordList &keywords4 = *keywordLists[3];// command with arg
 
 	int state = initStyle;
-	int chPrev, ch = 0, chNext = styler[startPos];
+	int ch = 0, chNext = styler[startPos];
 	styler.StartAt(startPos);
 	styler.StartSegment(startPos);
 	unsigned int endPos = startPos + length;
@@ -46,7 +46,7 @@ static void ColouriseTexiDoc(unsigned int startPos, int length, int initStyle, W
 	bool isCommand = false;
 
 	for (unsigned int i = startPos; i < endPos; i++) {
-		chPrev = ch;
+		const int chPrev = ch;
 		ch = chNext;
 		chNext = styler.SafeGetCharAt(i + 1);
 

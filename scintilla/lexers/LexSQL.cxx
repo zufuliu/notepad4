@@ -33,7 +33,7 @@ static inline bool IsSqlWordChar(int ch, bool sqlAllowDottedWord) {
 static inline  bool IsANumberChar(int ch, int chPrev) {
 	return (ch < 0x80) && (IsADigit(ch) || (ch == '.' && chPrev != '.')
 		|| ((ch == '+' || ch == '-') && (chPrev == 'e' || chPrev == 'E'))
-		|| (ch == 'e' || ch == 'E') && (chPrev < 0x80) && IsADigit(chPrev));
+		|| ((ch == 'e' || ch == 'E') && (chPrev < 0x80) && IsADigit(chPrev)));
 }
 
 /*static const char * const sqlWordListDesc[] = {
@@ -66,7 +66,6 @@ static void ColouriseSqlDoc(unsigned int startPos, int length, int initStyle, Wo
 	StyleContext sc(startPos, length, initStyle, styler);
 	//int styleBeforeDCKeyword = SCE_SQL_DEFAULT;
 	int offset = 0;
-	char qOperator = 0x00;
 
 	for (; sc.More(); sc.Forward(), offset++) {
 		// Determine if the current state should terminate.
@@ -181,31 +180,36 @@ _label_identifier:
 				}
 			}
 			break;
-		case SCE_SQL_QOPERATOR:
-			if (qOperator == 0x00) {
-				qOperator = (char)sc.ch;
-			} else {
-				char qComplement = 0x00;
-
-				if (qOperator == '<') {
-					qComplement = '>';
-				} else if (qOperator == '(') {
-					qComplement = ')';
-				} else if (qOperator == '{') {
-					qComplement = '}';
-				} else if (qOperator == '[') {
-					qComplement = ']';
-				} else {
-					qComplement = qOperator;
-				}
-
-				if (sc.Match(qComplement, '\'')) {
-					sc.Forward();
-					sc.ForwardSetState(SCE_SQL_DEFAULT);
-					qOperator = 0x00;
+		case SCE_SQL_QOPERATOR: {
+			// Locate the unique Q operator character
+			sc.Complete();
+			char qOperator = 0x00;
+			for (int styleStartPos = sc.currentPos; styleStartPos > 0; --styleStartPos) {
+				if (styler.StyleAt(styleStartPos - 1) != SCE_SQL_QOPERATOR) {
+					qOperator = styler.SafeGetCharAt(styleStartPos + 2);
+					break;
 				}
 			}
-			break;
+
+			char qComplement = 0x00;
+
+			if (qOperator == '<') {
+				qComplement = '>';
+			} else if (qOperator == '(') {
+				qComplement = ')';
+			} else if (qOperator == '{') {
+				qComplement = '}';
+			} else if (qOperator == '[') {
+				qComplement = ']';
+			} else {
+				qComplement = qOperator;
+			}
+
+			if (sc.Match(qComplement, '\'')) {
+				sc.Forward();
+				sc.ForwardSetState(SCE_SQL_DEFAULT);
+			}
+		} break;
 		}
 
 		// Determine if a new state should be entered.
@@ -279,7 +283,7 @@ typedef unsigned int sql_state_t;
 class SQLStates {
 public :
 	void Set(int lineNumber, sql_state_t sqlStatesLine) {
-		if (!sqlStatement.size() == 0 || !sqlStatesLine == 0) {
+		if (sqlStatesLine) {
 			sqlStatement.resize(lineNumber + 1, 0);
 			sqlStatement[lineNumber] = sqlStatesLine;
 		}
@@ -321,7 +325,7 @@ public :
 		return sqlStatesLine;
 	}
 
-	sql_state_t IntoMergeStatement(sql_state_t sqlStatesLine, bool enable) {
+	static sql_state_t IntoMergeStatement(sql_state_t sqlStatesLine, bool enable) {
 		if (enable)
 			sqlStatesLine |= MASK_MERGE_STATEMENT;
 		else
@@ -330,7 +334,7 @@ public :
 		return sqlStatesLine;
 	}
 
-	sql_state_t CaseMergeWithoutWhenFound(sql_state_t sqlStatesLine, bool found) {
+	static sql_state_t CaseMergeWithoutWhenFound(sql_state_t sqlStatesLine, bool found) {
 		if (found)
 			sqlStatesLine |= MASK_CASE_MERGE_WITHOUT_WHEN_FOUND;
 		else
@@ -339,7 +343,7 @@ public :
 		return sqlStatesLine;
 	}
 
-	sql_state_t IntoSelectStatementOrAssignment(sql_state_t sqlStatesLine, bool found) {
+	static sql_state_t IntoSelectStatementOrAssignment(sql_state_t sqlStatesLine, bool found) {
 		if (found)
 			sqlStatesLine |= MASK_INTO_SELECT_STATEMENT_OR_ASSIGNEMENT;
 		else
@@ -362,7 +366,7 @@ public :
 		return sqlStatesLine;
 	}
 
-	sql_state_t IntoCreateStatement(sql_state_t sqlStatesLine, bool enable) {
+	static sql_state_t IntoCreateStatement(sql_state_t sqlStatesLine, bool enable) {
 		if (enable)
 			sqlStatesLine |= MASK_INTO_CREATE;
 		else
@@ -371,7 +375,7 @@ public :
 		return sqlStatesLine;
 	}
 
-	sql_state_t IntoCreateViewStatement(sql_state_t sqlStatesLine, bool enable) {
+	static sql_state_t IntoCreateViewStatement(sql_state_t sqlStatesLine, bool enable) {
 		if (enable)
 			sqlStatesLine |= MASK_INTO_CREATE_VIEW;
 		else
@@ -380,7 +384,7 @@ public :
 		return sqlStatesLine;
 	}
 
-	sql_state_t IntoCreateViewAsStatement(sql_state_t sqlStatesLine, bool enable) {
+	static sql_state_t IntoCreateViewAsStatement(sql_state_t sqlStatesLine, bool enable) {
 		if (enable)
 			sqlStatesLine |= MASK_INTO_CREATE_VIEW_AS_STATEMENT;
 		else
@@ -389,23 +393,23 @@ public :
 		return sqlStatesLine;
 	}
 
-	static inline bool IsIgnoreWhen(sql_state_t sqlStatesLine) {
+	static bool IsIgnoreWhen(sql_state_t sqlStatesLine) {
 		return (sqlStatesLine & MASK_IGNORE_WHEN) != 0;
 	}
 
-	static inline bool IsIntoCondition(sql_state_t sqlStatesLine) {
+	static bool IsIntoCondition(sql_state_t sqlStatesLine) {
 		return (sqlStatesLine & MASK_INTO_CONDITION) != 0;
 	}
 
-	static inline bool IsIntoCaseBlock(sql_state_t sqlStatesLine) {
+	static bool IsIntoCaseBlock(sql_state_t sqlStatesLine) {
 		return (sqlStatesLine & MASK_NESTED_CASES) != 0;
 	}
 
-	static inline bool IsIntoExceptionBlock(sql_state_t sqlStatesLine) {
+	static bool IsIntoExceptionBlock(sql_state_t sqlStatesLine) {
 		return (sqlStatesLine & MASK_INTO_EXCEPTION) != 0;
 	}
 
-	bool IsIntoSelectStatementOrAssignment(sql_state_t sqlStatesLine) {
+	static bool IsIntoSelectStatementOrAssignment(sql_state_t sqlStatesLine) {
 		return (sqlStatesLine & MASK_INTO_SELECT_STATEMENT_OR_ASSIGNEMENT) != 0;
 	}
 
@@ -413,7 +417,7 @@ public :
 		return (sqlStatesLine & MASK_CASE_MERGE_WITHOUT_WHEN_FOUND) != 0;
 	}
 
-	static inline bool IsIntoDeclareBlock(sql_state_t sqlStatesLine) {
+	static bool IsIntoDeclareBlock(sql_state_t sqlStatesLine) {
 		return (sqlStatesLine & MASK_INTO_DECLARE) != 0;
 	}
 
@@ -421,15 +425,15 @@ public :
 		return (sqlStatesLine & MASK_MERGE_STATEMENT) != 0;
 	}
 
-	bool IsIntoCreateStatement (sql_state_t sqlStatesLine) {
+	static bool IsIntoCreateStatement (sql_state_t sqlStatesLine) {
 		return (sqlStatesLine & MASK_INTO_CREATE) != 0;
 	}
 
-	bool IsIntoCreateViewStatement (sql_state_t sqlStatesLine) {
+	static bool IsIntoCreateViewStatement (sql_state_t sqlStatesLine) {
 		return (sqlStatesLine & MASK_INTO_CREATE_VIEW) != 0;
 	}
 
-	bool IsIntoCreateViewAsStatement (sql_state_t sqlStatesLine) {
+	static bool IsIntoCreateViewAsStatement (sql_state_t sqlStatesLine) {
 		return (sqlStatesLine & MASK_INTO_CREATE_VIEW_AS_STATEMENT) != 0;
 	}
 
@@ -479,8 +483,7 @@ static void FoldSqlDoc(unsigned int startPos, int length, int initStyle, WordLis
 			char ch = styler[startPos];
 			if (ch == '\n' || (ch == '\r' && styler[startPos + 1] != '\n')) {
 				lastNLPos = startPos;
-			} else if (ch == ';' &&
-				   styler.StyleAt(startPos) == SCE_SQL_OPERATOR) {
+			} else if (ch == ';' && styler.StyleAt(startPos) == SCE_SQL_OPERATOR) {
 				bool isAllClear = true;
 				for (int tempPos = startPos + 1;
 				     tempPos < lastNLPos;
@@ -513,13 +516,11 @@ static void FoldSqlDoc(unsigned int startPos, int length, int initStyle, WordLis
 	}
 
 	int levelNext = levelCurrent;
-	char ch, chNext;
-	int stylePrev, style, styleNext;
-	chNext = styler[startPos];
+	char chNext;
+	int style, styleNext;
 	chNext = styler[startPos];
 	style = initStyle;
 	styleNext = styler.StyleAt(startPos);
-	bool atEOL;
 	bool endFound = false;
 	bool isUnfoldingIgnored = false;
 	// this statementFound flag avoids to fold when the statement is on only one line by ignoring ELSE or ELSIF
@@ -531,12 +532,12 @@ static void FoldSqlDoc(unsigned int startPos, int length, int initStyle, WordLis
 	}
 
 	for (unsigned int i = startPos; i < endPos; i++) {
-		ch = chNext;
+		const char ch = chNext;
+		const int stylePrev = style;
 		chNext = styler.SafeGetCharAt(i + 1);
-		stylePrev = style;
 		style = styleNext;
 		styleNext = styler.StyleAt(i + 1);
-		atEOL = (ch == '\r' && chNext != '\n') || (ch == '\n');
+		const bool atEOL = (ch == '\r' && chNext != '\n') || (ch == '\n');
 
 		if (atEOL || (!IsCommentStyle(style) && ch == ';')) {
 			if (endFound) {

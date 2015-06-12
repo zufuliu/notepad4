@@ -14,6 +14,8 @@ namespace Scintilla {
 
 void DrawWrapMarker(Surface *surface, const PRectangle &rcPlace, bool isEndMarker, const ColourDesired &wrapColour);
 
+typedef void (*DrawWrapMarkerFn)(Surface *surface, const PRectangle &rcPlace, bool isEndMarker, const ColourDesired &wrapColour);
+
 /**
 * MarginView draws the margins.
 */
@@ -24,6 +26,13 @@ public:
 	Surface *pixmapSelPatternOffset1;
 	// Highlight current folding block
 	HighlightDelimiter highlightDelimiter;
+
+	int wrapMarkerPaddingRight; // right-most pixel padding of wrap markers
+	/** Some platforms, notably PLAT_CURSES, do not support Scintilla's native
+	 * DrawWrapMarker function for drawing wrap markers. Allow those platforms to
+	 * override it instead of creating a new method in the Surface class that
+	 * existing platforms must implement as empty. */
+	DrawWrapMarkerFn customDrawWrapMarker;
 
 	MarginView();
 

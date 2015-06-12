@@ -104,9 +104,6 @@ _label_identifier:
 			} else if (iswordstart(sc.ch)) {
 				sc.SetState(SCE_VHDL_IDENTIFIER);
 			} else if (sc.Match('-', '-')) {
-				sc.SetState(SCE_VHDL_COMMENT);
-				sc.Forward();
-			} else if (sc.Match('-', '-')) {
 				if (sc.Match("--!"))	// Nice to have a different comment style
 					sc.SetState(SCE_VHDL_COMMENTLINEBANG);
 				else
@@ -210,28 +207,25 @@ static void FoldVHDLDoc(unsigned int startPos, int length, int /*initStyle*/, Wo
 		}
 	}
 
-	char ch, chPrev, chNext;
-	int stylePrev, style = SCE_VHDL_DEFAULT, styleNext;
+	char ch = 0, chNext;
+	int style = SCE_VHDL_DEFAULT, styleNext;
 	chNext = styler[startPos];
-	chPrev = '\0';
 	styleNext = styler.StyleAt(startPos);
-	char chNextNonBlank;
-	bool atEOL;
 
 	for (unsigned int i = startPos; i < endPos; i++) {
+		char chPrev = ch;
 		ch = chNext;
 		chNext = styler.SafeGetCharAt(i + 1);
-		chPrev = styler.SafeGetCharAt(i - 1);
-		chNextNonBlank = chNext;
-		unsigned int j = i+1;
+		char chNextNonBlank = chNext;
+		unsigned int j = i + 1;
 		while(isspacechar(chNextNonBlank) && j<endPos) {
 			j ++ ;
 			chNextNonBlank = styler.SafeGetCharAt(j);
 		}
-		stylePrev = style;
+		int stylePrev = style;
 		style = styleNext;
 		styleNext = styler.StyleAt(i + 1);
-		atEOL = (ch == '\r' && chNext != '\n') || (ch == '\n');
+		bool atEOL = (ch == '\r' && chNext != '\n') || (ch == '\n');
 
 		if (foldComment && atEOL && IsCommentLine(lineCurrent)) {
 			if(!IsCommentLine(lineCurrent-1) && IsCommentLine(lineCurrent+1))
@@ -277,7 +271,8 @@ static void FoldVHDLDoc(unsigned int startPos, int length, int /*initStyle*/, Wo
 						strcmp(s, "architecture") == 0 || strcmp(s, "case") == 0 ||
 						strcmp(s, "generate") == 0 || strcmp(s, "loop") == 0 || strcmp(s, "block") == 0 ||
 						strcmp(s, "package") ==0 || strcmp(s, "process") == 0 ||
-						strcmp(s, "record") == 0 || strcmp(s, "then") == 0) {
+						strcmp(s, "record") == 0 || strcmp(s, "then") == 0 ||
+						strcmp(s, "units") == 0) {
 						if (strcmp(prevWord, "end") != 0) {
 							if (levelMinCurrentElse > levelNext) {
 								levelMinCurrentElse = levelNext;
@@ -289,13 +284,14 @@ static void FoldVHDLDoc(unsigned int startPos, int length, int /*initStyle*/, Wo
 						strcmp(s, "component") == 0 ||
 						strcmp(s, "entity") == 0 ||
 						strcmp(s, "configuration") == 0) {
-						if (strcmp(prevWord, "end") != 0) {
+						if (strcmp(prevWord, "end") != 0 && lastStart) {
 							// check for instantiated unit by backward searching for the colon.
-							unsigned pos = lastStart - 1;
+							unsigned pos = lastStart;
 							char chAtPos, styleAtPos;
 							do { // skip white spaces
+								pos--;
 								styleAtPos = styler.StyleAt(pos);
-								chAtPos = styler.SafeGetCharAt(pos--);
+								chAtPos = styler.SafeGetCharAt(pos);
 							} while (pos > 0 &&
 									(chAtPos == ' ' || chAtPos == '\t' ||
 									chAtPos == '\n' || chAtPos == '\r' ||
@@ -316,18 +312,18 @@ static void FoldVHDLDoc(unsigned int startPos, int length, int /*initStyle*/, Wo
 						// This code checks to see if the procedure / function is a definition within a "package"
 							// rather than the actual code in the body.
 							int BracketLevel = 0;
-							for(int j=i+1; j<styler.Length(); j++) {
-								int styleAtPos = styler.StyleAt(j);
-								char chAtPos = styler.SafeGetCharAt(j);
+							for(int pos=i+1; pos<styler.Length(); pos++) {
+								int styleAtPos = styler.StyleAt(pos);
+								char chAtPos = styler.SafeGetCharAt(pos);
 								if(chAtPos == '(') BracketLevel++;
 								if(chAtPos == ')') BracketLevel--;
 								if(
 									(BracketLevel == 0) &&
 									(!IsCommentLine(styleAtPos)) &&
 									(styleAtPos != SCE_VHDL_STRING) &&
-									!iswordchar(styler.SafeGetCharAt(j-1)) &&
-									styler.Match(j, "is") &&
-									!iswordchar(styler.SafeGetCharAt(j+2))) {
+									!iswordchar(styler.SafeGetCharAt(pos-1)) &&
+									(chAtPos|' ')=='i' && (styler.SafeGetCharAt(pos+1)|' ')=='s' &&
+									!iswordchar(styler.SafeGetCharAt(pos+2))) {
 									if (levelMinCurrentElse > levelNext) {
 										levelMinCurrentElse = levelNext;
 									}

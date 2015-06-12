@@ -24,14 +24,6 @@
 using namespace Scintilla;
 #endif
 
-static inline bool IsFSNumber(int ch, int chPrev) {
-	return (ch < 0x80) && (isxdigit(ch) || (ch == '.' && chPrev != '.')
-		|| (ch == '_' || ch == 'u' || ch == 'U' || ch == 'L' || ch == 'l')
-		|| ((ch == '+' || ch == '-') && (chPrev == 'e' || chPrev == 'E'))
-		|| (((chPrev < 0x80) && isdigit(chPrev)) || chPrev == 'u') && (ch == 'm' || ch == 'M' || ch == 'I'
-			||ch == 'n' || ch == 's' || ch == 'y'));
-}
-
 static inline bool IsFSOperator(int ch) {
 	return isoperator(ch) || (ch < 0x80 && (ch == '\'' || ch == '@' || ch == '$' || ch == '#' || ch == '`'));
 }
@@ -80,8 +72,14 @@ static void ColouriseFSharpDoc(unsigned int startPos, int length, int initStyle,
 			sc.SetState(SCE_FSHARP_DEFAULT);
 			break;
 		case SCE_FSHARP_NUMBER:
-			if (!IsFSNumber(sc.ch, sc.chPrev)) {
-				sc.SetState(SCE_FSHARP_DEFAULT);
+			if (!iswordstart(sc.ch)) { //
+				if ((sc.ch == '+' || sc.ch == '-') && (sc.chPrev == 'E' || sc.chPrev == 'e')) {
+					sc.Forward();
+				} else if (sc.ch == '.' && sc.chNext != '.') {
+					sc.ForwardSetState(SCE_FSHARP_DEFAULT);
+				} else {
+					sc.SetState(SCE_FSHARP_DEFAULT);
+				}
 			}
 			break;
 		case SCE_FSHARP_IDENTIFIER:

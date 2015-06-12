@@ -109,7 +109,6 @@ extern "C" BOOL EditPrint(HWND hwnd, LPCWSTR pszDocTitle, LPCWSTR pszPageFormat)
 	struct RangeToFormat frPrint;
 
 	int pageNum;
-	BOOL printPage;
 
 	WCHAR pageString[32];
 
@@ -339,7 +338,7 @@ extern "C" BOOL EditPrint(HWND hwnd, LPCWSTR pszDocTitle, LPCWSTR pszPageFormat)
 	pageNum = 1;
 
 	while (lengthPrinted < lengthDoc) {
-		printPage = (!(pdlg.Flags & PD_PAGENUMS) || (pageNum >= pdlg.nFromPage) && (pageNum <= pdlg.nToPage));
+		BOOL printPage = !(pdlg.Flags & PD_PAGENUMS) || (pageNum >= pdlg.nFromPage && pageNum <= pdlg.nToPage);
 
 		wsprintf(pageString, pszPageFormat, pageNum);
 
@@ -478,7 +477,7 @@ extern "C" UINT_PTR CALLBACK PageSetupHook(HWND hwnd, UINT uiMsg, WPARAM wParam,
 		GetString(IDS_PRINT_HEADER, tch, COUNTOF(tch));
 		lstrcat(tch, L"|");
 		p1 = tch;
-		while (p2 = StrChr(p1, L'|')) {
+		while ((p2 = StrChr(p1, L'|'))) {
 			*p2++ = L'\0';
 			if (*p1) {
 				SendDlgItemMessage(hwnd, 32, CB_ADDSTRING, 0, (LPARAM)p1);
@@ -491,7 +490,7 @@ extern "C" UINT_PTR CALLBACK PageSetupHook(HWND hwnd, UINT uiMsg, WPARAM wParam,
 		GetString(IDS_PRINT_FOOTER, tch, COUNTOF(tch));
 		lstrcat(tch, L"|");
 		p1 = tch;
-		while (p2 = StrChr(p1, L'|')) {
+		while ((p2 = StrChr(p1, L'|'))) {
 			*p2++ = L'\0';
 			if (*p1) {
 				SendDlgItemMessage(hwnd, 33, CB_ADDSTRING, 0, (LPARAM)p1);
@@ -504,7 +503,7 @@ extern "C" UINT_PTR CALLBACK PageSetupHook(HWND hwnd, UINT uiMsg, WPARAM wParam,
 		GetString(IDS_PRINT_COLOR, tch, COUNTOF(tch));
 		lstrcat(tch, L"|");
 		p1 = tch;
-		while (p2 = StrChr(p1, L'|')) {
+		while ((p2 = StrChr(p1, L'|'))) {
 			*p2++ = L'\0';
 			if (*p1) {
 				SendDlgItemMessage(hwnd, 34, CB_ADDSTRING, 0, (LPARAM)p1);

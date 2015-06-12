@@ -24,6 +24,9 @@ LexAccessor::LexAccessor(IDocument *pAccess_) :
 		validLen(0),
 		startSeg(0), startPosStyling(0),
 		documentVersion(pAccess->Version()) {
+		// Prevent warnings by static analyzers about uninitialized buf and styleBuf.
+		buf[0] = 0;
+		styleBuf[0] = 0;
 		switch (codePage) {
 		case 65001:
 			encodingType = encUnicode;
@@ -177,9 +180,8 @@ int LexSkipWhiteSpace(int startPos, int endPos, LexAccessor &styler, bool IsStre
 }
 int LexSkipWhiteSpace(int startPos, int endPos, LexAccessor &styler,
 					  bool IsStreamCommentStyle(int), const CharacterSet &charSet) {
-	char ch;
 	for (int i = startPos; i < endPos; i++) {
-		ch = styler[i];
+		char ch = styler[i];
 		if (!(isspacechar(styler.SafeGetCharAt(i, '\0')) || IsStreamCommentStyle(styler.StyleAt(i))
 			|| charSet.Contains(ch)))
 			return i;
