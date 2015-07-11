@@ -586,6 +586,7 @@ bool Document::InGoodUTF8(int pos, int &start, int &end) const {
 	while ((trail>0) && (pos-trail < UTF8MaxBytes) && UTF8IsTrailByte(static_cast<unsigned char>(cb.CharAt(trail-1))))
 		trail--;
 	start = (trail > 0) ? trail-1 : trail;
+
 	const unsigned char leadByte = static_cast<unsigned char>(cb.CharAt(start));
 	const int widthCharBytes = UTF8BytesOfLead[leadByte];
 	if (widthCharBytes == 1) {
@@ -1608,7 +1609,7 @@ bool Document::IsWordEndAt(int pos) const {
  * ends and where the characters on the inside are word or punctuation characters.
  */
 bool Document::IsWordAt(int start, int end) const {
-	return IsWordStartAt(start) && IsWordEndAt(end);
+	return (start < end) && IsWordStartAt(start) && IsWordEndAt(end);
 }
 
 bool Document::MatchesWordOptions(bool word, bool wordStart, int pos, int length) const {
@@ -1651,10 +1652,13 @@ Document::CharacterExtracted Document::ExtractCharacter(int position) const {
  * Has not been tested with backwards DBCS searches yet.
  */
 long Document::FindText(int minPos, int maxPos, const char *search,
-                        bool caseSensitive, bool word, bool wordStart, bool regExp, int flags,
-                        int *length) {
+                        int flags, int *length) {
 	if (*length <= 0)
 		return minPos;
+	const bool caseSensitive = (flags & SCFIND_MATCHCASE) != 0;
+	const bool word = (flags & SCFIND_WHOLEWORD) != 0;
+	const bool wordStart = (flags & SCFIND_WORDSTART) != 0;
+	const bool regExp = (flags & SCFIND_REGEXP) != 0;
 	if (regExp) {
 		if (!regex)
 			regex = CreateRegexSearch(&charClass);
@@ -2670,6 +2674,7 @@ long Cxx11RegexFindText(Document *doc, int minPos, int maxPos, const char *s,
 long BuiltinRegex::FindText(Document *doc, int minPos, int maxPos, const char *s,
                         bool caseSensitive, bool, bool, int flags,
                         int *length) {
+
 #ifdef CXX11_REGEX
 	if (flags & SCFIND_CXX11REGEX) {
 			return Cxx11RegexFindText(doc, minPos, maxPos, s,

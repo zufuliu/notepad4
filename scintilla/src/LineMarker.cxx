@@ -8,10 +8,12 @@
 #include <string.h>
 #include <math.h>
 
+#include <stdexcept>
 #include <vector>
 #include <map>
 
 #include "Platform.h"
+
 #include "Scintilla.h"
 
 #include "StringCopy.h"
@@ -140,7 +142,7 @@ void LineMarker::Draw(Surface *surface, const PRectangle &rcWhole, const Font &f
 			centreY - dimOn2,
 			centreX + dimOn2,
 			centreY + dimOn2);
- 		surface->Ellipse(rcCircle, fore, back);
+		surface->Ellipse(rcCircle, fore, back);
 	} else if (markType == SC_MARK_ARROW) {
 		Point pts[] = {
     		Point::FromInts(centreX - dimOn4, centreY - dimOn2),

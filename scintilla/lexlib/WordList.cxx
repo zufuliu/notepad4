@@ -105,7 +105,6 @@ void WordList::Clear() {
 	len = 0;
 }
 
-
 #ifdef _MSC_VER
 
 static bool cmpWords(const char *a, const char *b) {
@@ -240,3 +239,4 @@ bool WordList::InListAbbreviated(const char *s, const char marker) const {
 const char *WordList::WordAt(int n) const {
 	return words[n];
 }
+

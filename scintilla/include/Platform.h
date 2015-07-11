@@ -145,7 +145,7 @@ public:
 			(pt.y >= top) && (pt.y <= bottom);
 	}
 	bool ContainsWholePixel(const Point& pt) const {
-		// Does the rectangle contain all of the pixel to left/below the point 
+		// Does the rectangle contain all of the pixel to left/below the point
 		return (pt.x >= left) && ((pt.x+1) <= right) &&
 			(pt.y >= top) && ((pt.y+1) <= bottom);
 	}
@@ -356,9 +356,9 @@ class Window {
 protected:
 	WindowID wid;
 public:
-	Window() : wid(0) {
+	Window() : wid(0), cursorLast(cursorInvalid) {
 	}
-	Window(const Window &source) : wid(source.wid) {
+	Window(const Window &source) : wid(source.wid), cursorLast(cursorInvalid) {
 	}
 	virtual ~Window();
 	Window &operator=(WindowID wid_) {
@@ -380,7 +380,9 @@ public:
 	enum Cursor { cursorInvalid, cursorText, cursorArrow, cursorUp, cursorWait, cursorHoriz, cursorVert, cursorReverseArrow, cursorHand };
 	void SetCursor(Cursor curs);
 	void SetTitle(const char *s);
-	PRectangle GetMonitorRect(const Point &pt) const;
+	PRectangle GetMonitorRect(const Point& pt) const;
+private:
+	Cursor cursorLast;
 };
 
 /**

@@ -405,8 +405,8 @@ void MarginView::PaintMargin(Surface *surface, int topLine, const PRectangle &rc
 						}
 					}
 				} else if (vs.ms[margin].style == SC_MARGIN_TEXT || vs.ms[margin].style == SC_MARGIN_RTEXT) {
-						const StyledText stMargin = model.pdoc->MarginStyledText(lineDoc);
-						if (stMargin.text && ValidStyledText(vs, vs.marginStyleOffset, stMargin)) {
+					const StyledText stMargin = model.pdoc->MarginStyledText(lineDoc);
+					if (stMargin.text && ValidStyledText(vs, vs.marginStyleOffset, stMargin)) {
 						if (firstSubLine) {
 							surface->FillRectangle(rcMarker,
 								vs.styles[stMargin.StyleAt(0) + vs.marginStyleOffset].back);

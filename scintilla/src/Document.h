@@ -195,6 +195,7 @@ struct RegexError : public std::runtime_error {
 /**
  */
 class Document : PerLine, public IDocumentWithLineEnd, public ILoader {
+
 public:
 	/** Used to pair watcher pointer with user data. */
 	struct WatcherWithUserData {
@@ -380,11 +381,14 @@ public:
 	};
 	CharacterExtracted ExtractCharacter(int position) const;
 
+	bool IsWordStartAt(int pos) const;
+	bool IsWordEndAt(int pos) const;
+	bool IsWordAt(int start, int end) const;
+
 	bool MatchesWordOptions(bool word, bool wordStart, int pos, int length) const;
 	bool HasCaseFolder(void) const;
 	void SetCaseFolder(CaseFolder *pcf_);
-	long FindText(int minPos, int maxPos, const char *search, bool caseSensitive, bool word,
-		bool wordStart, bool regExp, int flags, int *length);
+	long FindText(int minPos, int maxPos, const char *search, int flags, int *length);
 	const char *SubstituteByPosition(const char *text, int *length);
 	int LinesTotal() const;
 
@@ -437,10 +441,6 @@ public:
 	int BraceMatch(int position, int maxReStyle);
 
 private:
-	bool IsWordStartAt(int pos) const;
-	bool IsWordEndAt(int pos) const;
-	bool IsWordAt(int start, int end) const;
-
 	void NotifyModifyAttempt();
 	void NotifySavePoint(bool atSavePoint);
 	void NotifyModified(DocModification mh);
@@ -474,12 +474,12 @@ public:
  */
 class DocModification {
 public:
-  	int modificationType;
+	int modificationType;
 	int position;
- 	int length;
- 	int linesAdded;	/**< Negative if lines deleted. */
- 	const char *text;	/**< Only valid for changes to text, not for changes to style. */
- 	int line;
+	int length;
+	int linesAdded;	/**< Negative if lines deleted. */
+	const char *text;	/**< Only valid for changes to text, not for changes to style. */
+	int line;
 	int foldLevelNow;
 	int foldLevelPrev;
 	int annotationLinesAdded;

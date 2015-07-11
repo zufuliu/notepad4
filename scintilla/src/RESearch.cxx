@@ -202,6 +202,7 @@
 
 #include <stdlib.h>
 
+#include <stdexcept>
 #include <string>
 #include <algorithm>
 
@@ -956,3 +957,5 @@ int RESearch::PMatch(const CharacterIndexer &ci, int lp, int endp, char *ap) {
 		}
 	return lp;
 }
+
+

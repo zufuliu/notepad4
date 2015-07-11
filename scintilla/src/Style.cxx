@@ -7,6 +7,8 @@
 
 #include <string.h>
 
+#include <stdexcept>
+
 #include "Platform.h"
 
 #include "Scintilla.h"
@@ -59,7 +61,7 @@ bool FontSpecification::operator<(const FontSpecification &other) const {
 	if (extraFontFlag != other.extraFontFlag)
 		return extraFontFlag < other.extraFontFlag;
 	return false;
- }
+}
 
 FontMeasurements::FontMeasurements() {
 	Clear();

@@ -29,9 +29,9 @@ public:
 class FontNames {
 private:
 	std::vector<char *> names;
+
 	// Private so FontNames objects can not be copied
 	FontNames(const FontNames &);
-
 public:
 	FontNames();
 	~FontNames();

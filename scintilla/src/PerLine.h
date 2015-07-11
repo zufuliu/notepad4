@@ -72,7 +72,7 @@ public:
 	void ExpandLevels(int sizeNew=-1);
 	void ClearLevels();
 	int SetLevel(int line, int level, int lines);
-	int GetLevel(int line) const ;
+	int GetLevel(int line) const;
 };
 
 class LineState : public PerLine {

@@ -192,15 +192,15 @@ static void FoldFortranDoc(unsigned int startPos, int length, int initStyle, Wor
 	int levelNext = levelCurrent;
 
 	char chNext = styler[startPos];
-	int styleNext = styler.StyleAt(startPos);
-	int style = initStyle;
+	//int styleNext = styler.StyleAt(startPos);
+	//int style = initStyle;
 
 	for (unsigned int i = startPos; i < endPos; i++) {
 		char ch = chNext;
 		chNext = styler.SafeGetCharAt(i + 1);
 		//int stylePrev = style;
-		style = styleNext;
-		styleNext = styler.StyleAt(i + 1);
+		//style = styleNext;
+		//styleNext = styler.StyleAt(i + 1);
 		bool atEOL = (ch == '\r' && chNext != '\n') || (ch == '\n');
 
 		if (foldComment && atEOL && IsCommentLine(lineCurrent)) {

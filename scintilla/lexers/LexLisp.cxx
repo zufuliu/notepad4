@@ -98,7 +98,6 @@ static void ColouriseLispDoc(unsigned int startPos, int length, int initStyle, W
 		case SCE_C_COMMENT:
 			if (ch == '|' && chNext == '#') {
 				i++;
-				ch = chNext;
 				chNext = styler.SafeGetCharAt(i + 1);
 				styler.ColourTo(i, state);
 				state = SCE_C_DEFAULT;

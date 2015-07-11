@@ -8,6 +8,7 @@
 #include <string.h>
 #include <assert.h>
 
+#include <stdexcept>
 #include <vector>
 #include <map>
 
@@ -49,6 +50,7 @@ void FontNames::Clear() {
 const char *FontNames::Save(const char *name) {
 	if (!name)
 		return 0;
+
 	for (std::vector<char *>::const_iterator it=names.begin(); it != names.end(); ++it) {
 		if (strcmp(*it, name) == 0) {
 			return *it;

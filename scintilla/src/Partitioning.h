@@ -190,6 +190,7 @@ public:
 	}
 };
 
+
 #ifdef SCI_NAMESPACE
 }
 #endif

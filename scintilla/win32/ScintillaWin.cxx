@@ -237,10 +237,10 @@ class ScintillaWin :
 
 	static sptr_t DirectFunction(
 		    sptr_t ptr, UINT iMessage, uptr_t wParam, sptr_t lParam);
-	static sptr_t PASCAL SWndProc(
-		    HWND hWnd, UINT iMessage, WPARAM wParam, sptr_t lParam);
-	static sptr_t PASCAL CTWndProc(
-		    HWND hWnd, UINT iMessage, WPARAM wParam, sptr_t lParam);
+	static LRESULT PASCAL SWndProc(
+		    HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam);
+	static LRESULT PASCAL CTWndProc(
+		    HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam);
 
 	enum { invalidTimerID, standardTimerID, idleTimerID, fineTimerStart };
 
@@ -310,7 +310,6 @@ class ScintillaWin :
 	virtual int SetScrollInfo(int nBar, LPCSCROLLINFO lpsi, BOOL bRedraw);
 	virtual bool GetScrollInfo(int nBar, LPSCROLLINFO lpsi);
 	void ChangeScrollPos(int barType, int pos);
-
 	sptr_t GetTextLength();
 	sptr_t GetText(uptr_t wParam, sptr_t lParam);
 
@@ -414,7 +413,7 @@ ScintillaWin::~ScintillaWin() {}
 
 void ScintillaWin::Initialise() {
 	// Initialize COM.  If the app has already done this it will have
-	// no effect.  If the app hasnt, we really shouldnt ask them to call
+	// no effect.  If the app hasn't, we really shouldn't ask them to call
 	// it just so this internal feature works.
 	hrOle = ::OleInitialize(NULL);
 
@@ -707,7 +706,7 @@ int ScintillaWin::EncodedFromUTF8(char *utf8, char *encoded) const {
 	}
 }
 
-LRESULT ScintillaWin::WndPaint(uptr_t wParam) {
+sptr_t ScintillaWin::WndPaint(uptr_t wParam) {
 	//ElapsedTime et;
 
 	// Redirect assertions to debug output and save current state
@@ -924,7 +923,6 @@ void ScintillaWin::EscapeHanja() {
 
 	std::wstring uniChar = StringDecode(oneChar, CodePageOfDocument());
 
-	// IME_ESC_HANJA_MODE appears to receive the first character only.
 	HIMC hIMC=ImmGetContext(MainHWND());
 	if (hIMC) {
 		// Set the candidate box position since IME may show it.
@@ -1071,7 +1069,6 @@ sptr_t ScintillaWin::HandleCompositionInline(uptr_t, sptr_t lParam) {
 			i += ucWidth;
 		}
 	}
-
 	SetCandidateWindowPos();
 	ShowCaretAtCurrentPosition();
 	::ImmReleaseContext(MainHWND(), hIMC);
@@ -1111,28 +1108,28 @@ UINT CodePageFromCharSet(DWORD characterSet, UINT documentCodePage) {
 		return SC_CP_UTF8;
 	}
 	switch (characterSet) {
-		case SC_CHARSET_ANSI: return 1252;
-		case SC_CHARSET_DEFAULT: return documentCodePage;
-		case SC_CHARSET_BALTIC: return 1257;
-		case SC_CHARSET_CHINESEBIG5: return 950;
-		case SC_CHARSET_EASTEUROPE: return 1250;
-		case SC_CHARSET_GB2312: return 936;
-		case SC_CHARSET_GREEK: return 1253;
-		case SC_CHARSET_HANGUL: return 949;
-		case SC_CHARSET_MAC: return 10000;
-		case SC_CHARSET_OEM: return 437;
-		case SC_CHARSET_RUSSIAN: return 1251;
-		case SC_CHARSET_SHIFTJIS: return 932;
-		case SC_CHARSET_TURKISH: return 1254;
-		case SC_CHARSET_JOHAB: return 1361;
-		case SC_CHARSET_HEBREW: return 1255;
-		case SC_CHARSET_ARABIC: return 1256;
-		case SC_CHARSET_VIETNAMESE: return 1258;
-		case SC_CHARSET_THAI: return 874;
-		case SC_CHARSET_8859_15: return 28605;
-		// Not supported
-		case SC_CHARSET_CYRILLIC: return documentCodePage;
-		case SC_CHARSET_SYMBOL: return documentCodePage;
+	case SC_CHARSET_ANSI: return 1252;
+	case SC_CHARSET_DEFAULT: return documentCodePage;
+	case SC_CHARSET_BALTIC: return 1257;
+	case SC_CHARSET_CHINESEBIG5: return 950;
+	case SC_CHARSET_EASTEUROPE: return 1250;
+	case SC_CHARSET_GB2312: return 936;
+	case SC_CHARSET_GREEK: return 1253;
+	case SC_CHARSET_HANGUL: return 949;
+	case SC_CHARSET_MAC: return 10000;
+	case SC_CHARSET_OEM: return 437;
+	case SC_CHARSET_RUSSIAN: return 1251;
+	case SC_CHARSET_SHIFTJIS: return 932;
+	case SC_CHARSET_TURKISH: return 1254;
+	case SC_CHARSET_JOHAB: return 1361;
+	case SC_CHARSET_HEBREW: return 1255;
+	case SC_CHARSET_ARABIC: return 1256;
+	case SC_CHARSET_VIETNAMESE: return 1258;
+	case SC_CHARSET_THAI: return 874;
+	case SC_CHARSET_8859_15: return 28605;
+	// Not supported
+	case SC_CHARSET_CYRILLIC: return documentCodePage;
+	case SC_CHARSET_SYMBOL: return documentCodePage;
 	}
 	return documentCodePage;
 }
@@ -2705,7 +2702,7 @@ void ScintillaWin::CopyToClipboard(const SelectionText &selectedText) {
 		if (borlandSelection) {
 			static_cast<BYTE *>(borlandSelection.ptr)[0] = 0x02;
 			borlandSelection.SetClip(cfBorlandIDEBlockType);
-	}
+		}
 	}
 
 	if (selectedText.lineCopy) {
@@ -3173,8 +3170,8 @@ BOOL ScintillaWin::DestroySystemCaret() {
 	return retval;
 }
 
-sptr_t PASCAL ScintillaWin::CTWndProc(
-    HWND hWnd, UINT iMessage, WPARAM wParam, sptr_t lParam) {
+LRESULT PASCAL ScintillaWin::CTWndProc(
+	HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam) {
 	// Find C++ object associated with window.
 	ScintillaWin *sciThis = reinterpret_cast<ScintillaWin *>(PointerFromWindow(hWnd));
 #if !defined(__clang__)
@@ -3295,8 +3292,8 @@ sptr_t __stdcall Scintilla_DirectFunction(
 	return sci->WndProc(iMessage, wParam, lParam);
 }
 
-sptr_t PASCAL ScintillaWin::SWndProc(
-    HWND hWnd, UINT iMessage, WPARAM wParam, sptr_t lParam) {
+LRESULT PASCAL ScintillaWin::SWndProc(
+	HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam) {
 	//Platform::DebugPrintf("S W:%x M:%x WP:%x L:%x\n", hWnd, iMessage, wParam, lParam);
 
 	// Find C++ object associated with window.

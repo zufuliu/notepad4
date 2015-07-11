@@ -7,6 +7,7 @@
 
 #include <string.h>
 
+#include <stdexcept>
 #include <algorithm>
 
 #include "Platform.h"

@@ -131,6 +131,7 @@ bool LoadD2D() {
 					reinterpret_cast<IUnknown**>(&pIDWriteFactory));
 			}
 		}
+
 		if (pIDWriteFactory) {
 			HRESULT hr = pIDWriteFactory->CreateRenderingParams(&defaultRenderingParams);
 			if (SUCCEEDED(hr)) {
@@ -188,7 +189,7 @@ struct FormatAndMetrics {
 		yAscent(yAscent_),
 		yDescent(yDescent_),
 		yInternalLeading(yInternalLeading_) {
-}
+	}
 #endif
 	~FormatAndMetrics() {
 		if (hfont)
@@ -745,7 +746,7 @@ void SurfaceGDI::RoundedRectangle(const PRectangle &rc, const ColourDesired &for
 		8, 8);
 }
 
-// Plot a point into a DWORD buffer symetrically to all 4 qudrants
+// Plot a point into a DWORD buffer symmetrically to all 4 quadrants
 static void AllFour(DWORD *pixels, int width, int height, int x, int y, DWORD val) {
 	pixels[y*width+x] = val;
 	pixels[y*width+width-1-x] = val;
@@ -894,46 +895,15 @@ typedef VarBuffer<int, stackBufferLength> TextPositionsI;
 
 void SurfaceGDI::DrawTextCommon(const PRectangle &rc, const Font &font_, XYPOSITION ybase, const char *s, int len, UINT fuOptions) {
 	SetFont(font_);
-	RECT rcw = RectFromPRectangle(rc);
-	SIZE sz={0,0};
-	int pos = 0;
-	int x = static_cast<int>(rc.left);
+	const RECT rcw = RectFromPRectangle(rc);
+	const int x = static_cast<int>(rc.left);
 	const int yBaseInt = static_cast<int>(ybase);
 
-	// Text drawing may fail if the text is too big.
-	// If it does fail, slice up into segments and draw each segment.
-	const int maxSegmentLength = 0x200;
-
-	if (!unicodeMode) {
-		// Use ANSI calls
-		int lenDraw = Platform::Minimum(len, maxLenText);
-		if (!::ExtTextOutA(hdc, x, yBaseInt, fuOptions, &rcw, s, lenDraw, NULL)) {
-			while (lenDraw > pos) {
-				int seglen = Platform::Minimum(maxSegmentLength, lenDraw - pos);
-				if (!::ExtTextOutA(hdc, x, yBaseInt, fuOptions, &rcw, s + pos, seglen, NULL)) {
-					PLATFORM_ASSERT(false);
-					return;
-				}
-				::GetTextExtentPoint32A(hdc, s+pos, seglen, &sz);
-				x += sz.cx;
-				pos += seglen;
-			}
-		}
-	} else {
-		// Use Unicode calls
+	if (unicodeMode) {
 		const TextWide tbuf(s, len, unicodeMode, codePage);
-		if (!::ExtTextOutW(hdc, x, yBaseInt, fuOptions, &rcw, tbuf.buffer, tbuf.tlen, NULL)) {
-			while (tbuf.tlen > pos) {
-				int seglen = Platform::Minimum(maxSegmentLength, tbuf.tlen - pos);
-				if (!::ExtTextOutW(hdc, x, yBaseInt, fuOptions, &rcw, tbuf.buffer + pos, seglen, NULL)) {
-					PLATFORM_ASSERT(false);
-					return;
-				}
-				::GetTextExtentPoint32W(hdc, tbuf.buffer+pos, seglen, &sz);
-				x += sz.cx;
-				pos += seglen;
-			}
-		}
+		::ExtTextOutW(hdc, x, yBaseInt, fuOptions, &rcw, tbuf.buffer, tbuf.tlen, NULL);
+	} else {
+		::ExtTextOutA(hdc, x, yBaseInt, fuOptions, &rcw, s, len, NULL);
 	}
 }
 
@@ -978,75 +948,43 @@ XYPOSITION SurfaceGDI::WidthText(const Font &font_, const char *s, int len) {
 }
 
 void SurfaceGDI::MeasureWidths(const Font &font_, const char *s, int len, XYPOSITION *positions) {
+	// Zero positions to avoid random behaviour on failure.
+	std::fill(positions, positions + len, 0.0f);
 	SetFont(font_);
 	SIZE sz={0,0};
 	int fit = 0;
+	int i = 0;
 	if (unicodeMode) {
 		const TextWide tbuf(s, len, unicodeMode, codePage);
 		TextPositionsI poses(tbuf.tlen);
-		fit = tbuf.tlen;
 		if (!::GetTextExtentExPointW(hdc, tbuf.buffer, tbuf.tlen, maxWidthMeasure, &fit, poses.buffer, &sz)) {
-			// Likely to have failed because on Windows 9x where function not available
-			// So measure the character widths by measuring each initial substring
-			// Turns a linear operation into a qudratic but seems fast enough on test files
-			for (int widthSS=0; widthSS < tbuf.tlen; widthSS++) {
-				::GetTextExtentPoint32W(hdc, tbuf.buffer, widthSS+1, &sz);
-				poses.buffer[widthSS] = sz.cx;
-			}
+			// Failure
+			return;
 		}
 		// Map the widths given for UTF-16 characters back onto the UTF-8 input string
-		int ui=0;
-		const unsigned char *us = reinterpret_cast<const unsigned char *>(s);
-		int i=0;
-		while (ui<fit) {
-			unsigned char uch = us[i];
-			unsigned int lenChar = 1;
-			if (uch >= (0x80 + 0x40 + 0x20 + 0x10)) {
-				lenChar = 4;
+		for (int ui = 0; ui < fit; ui++) {
+			unsigned int lenChar = UTF8BytesOfLead[static_cast<unsigned char>(s[i])];
+			if (lenChar == 4) {	// Non-BMP
 				ui++;
-			} else if (uch >= (0x80 + 0x40 + 0x20)) {
-				lenChar = 3;
-			} else if (uch >= (0x80)) {
-				lenChar = 2;
 			}
 			for (unsigned int bytePos=0; (bytePos<lenChar) && (i<len); bytePos++) {
 				positions[i++] = static_cast<XYPOSITION>(poses.buffer[ui]);
 			}
-			ui++;
-		}
-		XYPOSITION lastPos = 0.0f;
-		if (i > 0)
-			lastPos = positions[i-1];
-		while (i<len) {
-			positions[i++] = lastPos;
 		}
 	} else {
-		// Zero positions to avoid random behaviour on failure.
-		std::fill(positions, positions + len, 0.0f);
-		// len may be larger than platform supports so loop over segments small enough for platform
-		int startOffset = 0;
-		while (len > 0) {
-			int lenBlock = Platform::Minimum(len, maxLenText);
-			TextPositionsI poses(len);
-			if (!::GetTextExtentExPointA(hdc, s, lenBlock, maxWidthMeasure, &fit, poses.buffer, &sz)) {
-				// Eeek - a NULL DC or other foolishness could cause this.
-				return;
-			} else if (fit < lenBlock) {
-				// For some reason, such as an incomplete DBCS character
-				// Not all the positions are filled in so make them equal to end.
-				if (fit == 0)
-					poses.buffer[fit++] = 0;
-				for (int i = fit; i<lenBlock;i++)
-					poses.buffer[i] = poses.buffer[fit-1];
-			}
-			for (int i=0; i<lenBlock;i++)
-				positions[i] = static_cast<XYPOSITION>(poses.buffer[i] + startOffset);
-			startOffset = poses.buffer[lenBlock-1];
-			len -= lenBlock;
-			positions += lenBlock;
-			s += lenBlock;
+		TextPositionsI poses(len);
+		if (!::GetTextExtentExPointA(hdc, s, len, maxWidthMeasure, &fit, poses.buffer, &sz)) {
+			// Eeek - a NULL DC or other foolishness could cause this.
+			return;
+		}
+		while (i<fit) {
+			positions[i] = static_cast<XYPOSITION>(poses.buffer[i]);
+			i++;
 		}
 	}
+	// If any positions not filled in then use the last position for them
+	const XYPOSITION lastPos = (fit > 0) ? positions[fit - 1] : 0.0f;
+	std::fill(positions+i, positions + len, lastPos);
 }
 
 XYPOSITION SurfaceGDI::WidthChar(const Font &font_, char ch) {
@@ -2438,6 +2376,8 @@ void ListBoxX::Draw(DRAWITEMSTRUCT *pDrawItem) {
 					} else {
 						delete surfaceItem;
 					}
+#else
+					delete surfaceItem;
 #endif
 				}
 			}
@@ -3058,7 +2998,7 @@ public:
 	// Use GetProcAddress to get a pointer to the relevant function.
 	virtual Function FindFunction(const char *name) {
 		if (h != NULL) {
-			// C++ standard doesn't like casts betwen function pointers and void pointers so use a union
+			// C++ standard doesn't like casts between function pointers and void pointers so use a union
 			union {
 				FARPROC fp;
 				Function f;

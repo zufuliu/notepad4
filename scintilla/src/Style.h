@@ -62,7 +62,7 @@ public:
 	bool eolFilled;
 	bool underline;
 	bool strike;
-	enum ecaseForced {caseMixed, caseUpper, caseLower};
+	enum ecaseForced {caseMixed, caseUpper, caseLower, caseCamel};
 	ecaseForced caseForce;
 	bool visible;
 	bool changeable;

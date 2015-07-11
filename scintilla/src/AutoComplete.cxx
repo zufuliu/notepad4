@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include <assert.h>
 
+#include <stdexcept>
 #include <string>
 #include <vector>
 #include <algorithm>

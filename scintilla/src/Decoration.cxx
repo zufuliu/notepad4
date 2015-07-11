@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include <stdarg.h>
 
+#include <stdexcept>
 #include <algorithm>
 
 #include "Platform.h"

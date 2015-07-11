@@ -7,6 +7,7 @@
 
 #include <stdlib.h>
 
+#include <stdexcept>
 #include <vector>
 #include <algorithm>
 
@@ -292,7 +293,7 @@ void Selection::MovePositions(bool insertion, int startChange, int length) {
 	}
 	if (selType == selRectangle) {
 		rangeRectangular.MoveForInsertDelete(insertion, startChange, length);
-	} 
+	}
 }
 
 void Selection::TrimSelection(const SelectionRange &range) {
@@ -307,6 +308,14 @@ void Selection::TrimSelection(const SelectionRange &range) {
 			ranges.pop_back();
 		} else {
 			i++;
+		}
+	}
+}
+
+void Selection::TrimOtherSelections(size_t r, SelectionRange range) {
+	for (size_t i = 0; i<ranges.size(); ++i) {
+		if (i != r) {
+			ranges[i].Trim(range);
 		}
 	}
 }
@@ -341,6 +350,10 @@ void Selection::DropSelection(size_t r) {
 		ranges.erase(ranges.begin() + r);
 		mainRange = mainNew;
 	}
+}
+
+void Selection::DropAdditionalRanges() {
+	SetSelection(RangeMain());
 }
 
 void Selection::TentativeSelection(const SelectionRange &range) {

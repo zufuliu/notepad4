@@ -106,7 +106,6 @@ public:
 	bool Empty() const {
 		return s.empty();
 	}
-
 private:
 	void FixSelectionForClipboard() {
 		// To avoid truncating the contents of the clipboard when pasted where the
@@ -145,9 +144,9 @@ struct WrapPending {
 		if ((end < lineEnd) || !neededWrap) {
 			end = lineEnd;
 			changed = true;
- 		}
+		}
 		return changed;
- 	}
+	}
 };
 
 /**
@@ -314,18 +313,22 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	void SetRectangularRange();
 	void ThinRectangularRange();
 	void InvalidateSelection(const SelectionRange &newMain, bool invalidateWholeSelection=false);
+	void InvalidateWholeSelection();
 	void SetSelection(const SelectionPosition &currentPos, const SelectionPosition &anchor);
 	void SetSelection(int currentPos_, int anchor_);
 	void SetSelection(const SelectionPosition &currentPos);
 	void SetSelection(int currentPos_);
 	void SetEmptySelection(const SelectionPosition &currentPos);
 	void SetEmptySelection(int currentPos_);
+	enum AddNumber { addOne, addEach };
+	void MultipleSelectAdd(AddNumber addNumber);
 	bool RangeContainsProtected(int start, int end) const;
 	bool SelectionContainsProtected();
 	int MovePositionOutsideChar(int pos, int moveDir, bool checkLineEnd=true) const;
 	SelectionPosition MovePositionOutsideChar(const SelectionPosition &pos, int moveDir, bool checkLineEnd=true) const;
-	int MovePositionTo(const SelectionPosition &newPos, Selection::selTypes selt=Selection::noSel, bool ensureVisible=true);
-	int MovePositionTo(int newPos, Selection::selTypes selt=Selection::noSel, bool ensureVisible=true);
+	void MovedCaret(const SelectionPosition& newPos, SelectionPosition previousPos, bool ensureVisible);
+	void MovePositionTo(const SelectionPosition& newPos, Selection::selTypes selt=Selection::noSel, bool ensureVisible=true);
+	void MovePositionTo(int newPos, Selection::selTypes selt=Selection::noSel, bool ensureVisible=true);
 	SelectionPosition MovePositionSoVisible(const SelectionPosition &pos, int moveDir);
 	SelectionPosition MovePositionSoVisible(int pos, int moveDir);
 	Point PointMainCaret();
@@ -456,9 +459,15 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	void Duplicate(bool forLine);
 	virtual void CancelModes();
 	void NewLine();
-	void CursorUpOrDown(int direction, Selection::selTypes selt=Selection::noSel);
-	void ParaUpOrDown(int direction, Selection::selTypes selt=Selection::noSel);
+	SelectionPosition PositionUpOrDown(const SelectionPosition& spStart, int direction, int lastX);
+	void CursorUpOrDown(int direction, Selection::selTypes selt);
+	void ParaUpOrDown(int direction, Selection::selTypes selt);
 	int StartEndDisplayLine(int pos, bool start);
+	int VCHomeDisplayPosition(int position);
+	int VCHomeWrapPosition(int position);
+	int LineEndWrapPosition(int position);
+	int HorizontalMove(unsigned int iMessage);
+	int DelWordOrLine(unsigned int iMessage);
 	virtual int KeyCommand(unsigned int iMessage);
 	virtual int KeyDefault(int /* key */, int /*modifiers*/);
 	int KeyDownWithModifiers(int key, int modifiers, bool *consumed);

@@ -198,6 +198,7 @@ int LineLayout::FindBefore(XYPOSITION x, int lower, int upper) const {
 	return lower;
 }
 
+
 int LineLayout::FindPositionFromX(XYPOSITION x, const Range &range, bool charPosition) const {
 	int pos = FindBefore(x, range.start, range.end);
 	while (pos < range.end) {
@@ -438,12 +439,12 @@ void BreakFinder::Insert(int val) {
 	}
 }
 
-BreakFinder::BreakFinder(const LineLayout *ll_, const Selection *psel, const Range &rangeLine_, int posLineStart_,
+BreakFinder::BreakFinder(const LineLayout *ll_, const Selection *psel, const Range &lineRange_, int posLineStart_,
 	int xStart, bool breakForSelection, const Document *pdoc_, const SpecialRepresentations *preprs_, const ViewStyle *pvsDraw) :
 	ll(ll_),
-	lineRange(rangeLine_),
+	lineRange(lineRange_),
 	posLineStart(posLineStart_),
-	nextBreak(rangeLine_.start),
+	nextBreak(lineRange_.start),
 	saeCurrentPos(0),
 	saeNext(0),
 	subBreak(-1),

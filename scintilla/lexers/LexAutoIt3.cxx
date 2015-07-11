@@ -166,7 +166,7 @@ static void ColouriseAU3Doc(unsigned int startPos, int length, int initStyle, Wo
 	char si;	// string indicator "=1 '=2
 	char ni;	// Numeric indicator error=9 normal=0 normal+dec=1 hex=2 Enot=3
 	char ci;	// comment indicator 0=not linecomment(;)
-	char s_save[128];
+	char s_save[128] = "";
 	si = 0;
 	ni = 0;
 	ci = 0;

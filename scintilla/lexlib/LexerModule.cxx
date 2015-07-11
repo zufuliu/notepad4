@@ -75,7 +75,7 @@ const char *LexerModule::GetWordListDescription(int index) const {
 		return "";
 	} else {
 		return wordListDescriptions[index];
- 	}
+	}
 }
 
 ILexer *LexerModule::Create() const {

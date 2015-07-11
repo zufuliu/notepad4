@@ -389,9 +389,17 @@ void EditView::LayoutLine(const EditModel &model, int line, Surface *surface, co
 				else if (vstyle.styles[ll->styles[numCharsInLine]].caseForce == Style::caseLower)
 					allSame = allSame &&
 					(ll->chars[numCharsInLine] == static_cast<char>(tolower(chDoc)));
-				else	// Style::caseUpper
+				else if (vstyle.styles[ll->styles[numCharsInLine]].caseForce == Style::caseUpper)
 					allSame = allSame &&
 					(ll->chars[numCharsInLine] == static_cast<char>(toupper(chDoc)));
+				else	{ // Style::caseCamel
+					if ((model.pdoc->WordCharClass(ll->chars[numCharsInLine]) == CharClassify::ccWord) &&
+					  ((numCharsInLine == 0) || (model.pdoc->WordCharClass(ll->chars[numCharsInLine - 1]) != CharClassify::ccWord))) {
+						allSame = allSame && (ll->chars[numCharsInLine] == static_cast<char>(toupper(chDoc)));
+					} else {
+						allSame = allSame && (ll->chars[numCharsInLine] == static_cast<char>(tolower(chDoc)));
+					}
+				}
 				numCharsInLine++;
 			}
 			allSame = allSame && (ll->styles[numCharsInLine] == styleByte);	// For eolFilled
@@ -434,6 +442,14 @@ void EditView::LayoutLine(const EditModel &model, int line, Surface *surface, co
 					ll->chars[charInLine] = static_cast<char>(toupper(chDoc));
 				else if (vstyle.styles[ll->styles[charInLine]].caseForce == Style::caseLower)
 					ll->chars[charInLine] = static_cast<char>(tolower(chDoc));
+				else if (vstyle.styles[ll->styles[charInLine]].caseForce == Style::caseCamel) {
+					if ((model.pdoc->WordCharClass(ll->chars[charInLine]) == CharClassify::ccWord) &&
+					  ((charInLine == 0) || (model.pdoc->WordCharClass(ll->chars[charInLine - 1]) != CharClassify::ccWord))) {
+						ll->chars[charInLine] = static_cast<char>(toupper(chDoc));
+					} else {
+						ll->chars[charInLine] = static_cast<char>(tolower(chDoc));
+					}
+				}
 			}
 		}
 		ll->xHighlightGuide = 0;
@@ -1249,7 +1265,6 @@ void EditView::DrawBackground(Surface *surface, const EditModel &model, const Vi
 	const bool selBackDrawn = vsDraw.SelectionBackgroundDrawn();
 	bool inIndentation = subLine == 0;	// Do not handle indentation except on first subline.
 	const XYACCUMULATOR subLineStart = ll->positions[lineRange.start];
-
 	// Does not take margin into account but not significant
 	const int xStartVisible = static_cast<int>(subLineStart)-xStart;
 
@@ -1346,7 +1361,6 @@ static void DrawMarkUnderline(Surface *surface, const EditModel &model, const Vi
 		marks >>= 1;
 	}
 }
-
 static void DrawTranslucentSelection(Surface *surface, const EditModel &model, const ViewStyle &vsDraw, const LineLayout *ll,
 	int line, const PRectangle &rcLine, int subLine, const Range &lineRange, int xStart) {
 	if ((vsDraw.selAlpha != SC_ALPHA_NOALPHA) || (vsDraw.selAdditionalAlpha != SC_ALPHA_NOALPHA)) {
@@ -1421,7 +1435,6 @@ void EditView::DrawForeground(Surface *surface, const EditModel &model, const Vi
 
 	const bool selBackDrawn = vsDraw.SelectionBackgroundDrawn();
 	const bool drawWhitespaceBackground = vsDraw.WhitespaceBackgroundDrawn() && !background.isSet;
-
 	bool inIndentation = subLine == 0;	// Do not handle indentation except on first subline.
 
 	const XYACCUMULATOR subLineStart = ll->positions[lineRange.start];

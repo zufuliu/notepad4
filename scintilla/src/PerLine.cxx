@@ -7,6 +7,7 @@
 
 #include <string.h>
 
+#include <stdexcept>
 #include <vector>
 #include <algorithm>
 
@@ -108,11 +109,12 @@ bool MarkerHandleSet::RemoveNumber(int markerNum, bool all) {
 }
 
 void MarkerHandleSet::CombineWith(MarkerHandleSet *other) {
-	MarkerHandleNumber **pmhn = &root;
+	MarkerHandleNumber **pmhn = &other->root;
 	while (*pmhn) {
 		pmhn = &((*pmhn)->next);
 	}
-	*pmhn = other->root;
+	*pmhn = root;
+	root = other->root;
 	other->root = 0;
 }
 
