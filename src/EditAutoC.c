@@ -207,6 +207,7 @@ void AutoC_AddKeyword(struct WordList *pWList, int iCurrentStyle)
 	case NP2LEX_PHP:
 	case NP2LEX_JS:
 	case NP2LEX_PYTHON:
+	case NP2LEX_GRADLE:
 		count = NUMKEYWORD;
 		break;
 	case NP2LEX_ASM:

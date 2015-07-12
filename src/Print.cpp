@@ -18,7 +18,6 @@
 *
 *
 ******************************************************************************/
-
 #if !defined(_WIN32_WINNT)
 #define _WIN32_WINNT 0x501
 #endif
@@ -37,6 +36,7 @@ extern "C" {
 #pragma warning(disable: 4706)
 
 extern "C" HINSTANCE g_hInstance;
+
 
 // Global settings...
 extern "C" int iPrintHeader;
@@ -73,6 +73,7 @@ void StatusUpdatePrintPage(int iPageNum)
 
 extern "C" BOOL EditPrint(HWND hwnd, LPCWSTR pszDocTitle, LPCWSTR pszPageFormat)
 {
+
 	// Don't print empty documents
 	if (SendMessage(hwnd, SCI_GETLENGTH, 0, 0) == 0) {
 		MsgBox(MBWARN, IDS_PRINT_EMPTY);
@@ -81,6 +82,7 @@ extern "C" BOOL EditPrint(HWND hwnd, LPCWSTR pszDocTitle, LPCWSTR pszPageFormat)
 
 	int startPos;
 	int endPos;
+
 	HDC hdc;
 
 	RECT rectMargins;
@@ -90,6 +92,7 @@ extern "C" BOOL EditPrint(HWND hwnd, LPCWSTR pszDocTitle, LPCWSTR pszPageFormat)
 	POINT ptDpi;
 
 	//RECT rectSetup;
+
 	TEXTMETRIC tm;
 
 	int headerLineHeight;

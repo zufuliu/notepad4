@@ -453,6 +453,9 @@
     <ClCompile Include="EditLexers\stlLLVM.c">
       <Filter>Source Files\EditLexers</Filter>
     </ClCompile>
+    <ClCompile Include="EditLexers\stlGradle.c">
+      <Filter>Source Files\EditLexers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\scintilla\include\ILexer.h">

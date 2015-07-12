@@ -25,6 +25,8 @@
 extern "C" { // C-Declarations
 #endif //__cplusplus
 
+
+
 //==== DirList ================================================================
 
 //==== LV_ITEMDATA Structure ==================================================
@@ -63,16 +65,20 @@ BOOL DirList_GetDispInfo(HWND hwnd, LPARAM lParam, BOOL bNoFadeHidden);
 BOOL DirList_DeleteItem(HWND hwnd, LPARAM lParam);
 
 //==== DlSort() ===============================================================
+
 #define DS_NAME			0
 #define DS_SIZE			1
 #define DS_TYPE			2
 #define DS_LASTMOD		3
+
 BOOL DirList_Sort(HWND hwnd, int lFlags, BOOL fRev);
 
 //==== DlGetItem() ============================================================
+
 #define DLE_NONE		0
 #define DLE_DIR			1
 #define DLE_FILE		2
+
 #define DLI_FILENAME	1
 #define DLI_DISPNAME	2
 #define DLI_TYPE		4
@@ -100,6 +106,7 @@ BOOL DirList_GetLongPathName(HWND hwnd, LPWSTR lpszLongPath);
 BOOL DirList_SelectItem(HWND hwnd, LPCWSTR lpszDisplayName, LPCWSTR lpszFullPath);
 
 //==== DlCreateFilter() and DlMatchFilter() ===================================
+
 #define DL_FILTER_BUFSIZE 128
 
 typedef struct tagDL_FILTER { //dlf

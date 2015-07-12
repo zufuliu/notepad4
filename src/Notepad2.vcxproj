@@ -594,6 +594,7 @@
     <ClCompile Include="Edit.c" />
     <ClCompile Include="EditAutoC.c" />
     <ClCompile Include="EditEncoding.c" />
+    <ClCompile Include="EditLexers\stlGradle.c" />
     <ClCompile Include="EditLexers\stlLisp.c" />
     <ClCompile Include="EditLexers\stlLLVM.c" />
     <ClCompile Include="EditLexers\stlVim.c" />

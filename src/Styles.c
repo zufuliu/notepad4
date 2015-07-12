@@ -17,7 +17,6 @@
 *
 *
 ******************************************************************************/
-
 #if !defined(_WIN32_WINNT)
 #define _WIN32_WINNT 0x501
 #endif
@@ -751,7 +750,7 @@ void Style_SetLexer(HWND hwnd, PEDITLEXER pLexNew)
 		int iDescent = 0;
 		iValue = min(max(iValue, 0), 64);
 		wsprintf(lexDefault.Styles[11 + iIdx].szValue, L"size:%i", iValue);
-		if ((iValue & 2)) { // iValue % 2
+		if ((iValue & 1)) { // iValue % 2
 			iAscent++;
 			iValue--;
 		}
@@ -2525,6 +2524,7 @@ void Style_AddLexerToListView(HWND hwnd, PEDITLEXER pLex)
 //
 INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 {
+
 	static HWND hwndTV;
 	static BOOL fDragging;
 	static PEDITLEXER pCurrentLexer;
@@ -2534,6 +2534,7 @@ INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM
 	//static HBRUSH hbrBack;
 
 	switch (umsg) {
+
 	case WM_INITDIALOG: {
 		int i;
 		SHFILEINFO shfi;

@@ -212,8 +212,8 @@ BEGIN
         END
         POPUP "C&onvert"
         BEGIN
-            MENUITEM "&Uppercase\tCtrl+Shift+U",    IDM_EDIT_CONVERTUPPERCASE
-            MENUITEM "&Lowercase\tCtrl+U",          IDM_EDIT_CONVERTLOWERCASE
+            MENUITEM "&Upper Case\tCtrl+Shift+U",    IDM_EDIT_CONVERTUPPERCASE
+            MENUITEM "&Lower Case\tCtrl+U",          IDM_EDIT_CONVERTLOWERCASE
             MENUITEM SEPARATOR
             MENUITEM "&Invert Case\tCtrl+Alt+U",    IDM_EDIT_INVERTCASE
             MENUITEM "Title &Case\tCtrl+Alt+I",     IDM_EDIT_TITLECASE

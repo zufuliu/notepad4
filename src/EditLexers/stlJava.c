@@ -13,6 +13,7 @@ static KEYWORDLIST Keywords_Java = {
 ""
 , // annotation
 "interface Deprecated Override SuppressWarnings Documented Retention Target Inherited SafeVarargs "
+"Native Repeatable FunctionalInterface "
 // javax.annotation.*
 "Generated PostConstruct PreDestroy "
 // JSR 305 javax.annotation.*

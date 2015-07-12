@@ -6,7 +6,7 @@ static KEYWORDLIST Keywords_Groovy = {
 "finally for goto if in implements import instanceof interface native new package "
 "return switch threadsafe throw throws try while abstract final private protected "
 "public static strictfp synchronized transient "
-"volatile false null super this true it"
+"volatile false null super this true it trait println "
 , // type keyword
 "boolean byte char class double float int long short void "
 , // preprocessor
