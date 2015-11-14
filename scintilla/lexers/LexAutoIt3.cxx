@@ -19,18 +19,18 @@
 using namespace Scintilla;
 #endif
 
-static inline bool IsAu3TypeCharacter(const int ch) {
+static inline bool IsAu3TypeCharacter(int ch) {
 	return ch == '$';
 }
-static inline bool IsAu3WordChar(const int ch) {
+static inline bool IsAu3WordChar(int ch) {
 	return (ch < 0x80) && (isalnum(ch) || ch == '_');
 }
 
-static inline bool IsAu3WordStart(const int ch) {
+static inline bool IsAu3WordStart(int ch) {
 	return (ch < 0x80) && (isalnum(ch) || ch == '_' || ch == '@' || ch == '#' || ch == '$' || ch == '.');
 }
 
-static inline bool IsAu3Operator(char ch) {
+static inline bool IsAu3Operator(int ch) {
 	if (IsASCII(ch) && isalnum(ch)) {
 		return false;
 	}
@@ -106,9 +106,9 @@ static int GetSendKey(const char *szLine, char *szKey) {
 //
 // Routine to check the last "none comment" character on a line to see if its a continuation
 //
-static bool IsContinuationLine(unsigned int szLine, Accessor &styler) {
-	int nsPos = styler.LineStart(szLine);
-	int nePos = styler.LineStart(szLine + 1) - 2;
+static bool IsContinuationLine(Sci_PositionU szLine, Accessor &styler) {
+	Sci_Position nsPos = styler.LineStart(szLine);
+	Sci_Position nePos = styler.LineStart(szLine + 1) - 2;
 	//int stylech = styler.StyleAt(nsPos);
 	while (nsPos < nePos) {
 		//stylech = styler.StyleAt(nePos);
@@ -137,7 +137,7 @@ static bool IsContinuationLine(unsigned int szLine, Accessor &styler) {
 };*/
 
 // syntax highlighting logic
-static void ColouriseAU3Doc(unsigned int startPos, int length, int initStyle, WordList *keywordlists[], Accessor &styler) {
+static void ColouriseAU3Doc(Sci_PositionU startPos, Sci_Position length, int initStyle, WordList *keywordlists[], Accessor &styler) {
 	WordList &keywords = *keywordlists[0];
 	WordList &keywords2 = *keywordlists[1];
 	WordList &keywords3 = *keywordlists[2];
@@ -147,8 +147,8 @@ static void ColouriseAU3Doc(unsigned int startPos, int length, int initStyle, Wo
 	WordList &keywords7 = *keywordlists[6];
 	WordList &keywords8 = *keywordlists[7];
 	// find the first previous line without continuation character at the end
-	int lineCurrent = styler.GetLine(startPos);
-	int s_startPos = startPos;
+	Sci_Position lineCurrent = styler.GetLine(startPos);
+	Sci_Position s_startPos = startPos;
 	// When not inside a Block comment: find First line without _
 	if (!(initStyle == SCE_AU3_COMMENTBLOCK)) {
 		while ((lineCurrent > 0 && IsContinuationLine(lineCurrent, styler)) ||
@@ -358,7 +358,7 @@ static void ColouriseAU3Doc(unsigned int startPos, int length, int initStyle, Wo
 			if (sc.atLineEnd) {
 				si = 0;
 				// at line end and not found a continuation char then reset to default
-				int lineCurrent = styler.GetLine(sc.currentPos);
+				Sci_Position lineCurrent = styler.GetLine(sc.currentPos);
 				if (!IsContinuationLine(lineCurrent, styler)) {
 					sc.SetState(SCE_AU3_DEFAULT);
 					break;
@@ -374,7 +374,7 @@ static void ColouriseAU3Doc(unsigned int startPos, int length, int initStyle, Wo
 			// Send key string ended
 			if (sc.chPrev == '}' && sc.ch != '}') {
 				// set color to SENDKEY when valid sendkey .. else set back to regular string
-				char sk[128];
+				char sk[128] = "";
 				// split {111 222} and return {111} and check if 222 is valid.
 				// if return code = 1 then invalid 222 so must be string
 				if (GetSendKey(s, sk)) {
@@ -393,7 +393,7 @@ static void ColouriseAU3Doc(unsigned int startPos, int length, int initStyle, Wo
 				sc.SetState(SCE_AU3_STRING);
 			} else {
 				// check if the start is a valid SendKey start
-				int nPos = 0;
+				Sci_Position nPos = 0;
 				int nState = 1;
 				char cTemp;
 				while (!(nState == 2) && ((cTemp = s[nPos]) != '\0')) {
@@ -546,9 +546,9 @@ static inline  bool IsStreamCommentStyle(int style) {
 //
 // Routine to find first none space on the current line and return its Style
 // needed for comment lines not starting on pos 1
-static int GetStyleFirstWord(unsigned int szLine, Accessor &styler) {
-	int nsPos = styler.LineStart(szLine);
-	int nePos = styler.LineStart(szLine + 1) - 1;
+static int GetStyleFirstWord(Sci_PositionU szLine, Accessor &styler) {
+	Sci_Position nsPos = styler.LineStart(szLine);
+	Sci_Position nePos = styler.LineStart(szLine + 1) - 1;
 	while (isspacechar(styler.SafeGetCharAt(nsPos, '\0')) && nsPos < nePos) {
 		nsPos++; // skip to next char
 
@@ -559,18 +559,18 @@ static int GetStyleFirstWord(unsigned int szLine, Accessor &styler) {
 
 
 //
-static void FoldAU3Doc(unsigned int startPos, int length, int, WordList *[], Accessor &styler) {
+static void FoldAU3Doc(Sci_PositionU startPos, Sci_Position length, int, WordList *[], Accessor &styler) {
 	if (styler.GetPropertyInt("fold") == 0) {
 		return;
 	}
-	int endPos = startPos + length;
+	Sci_Position endPos = startPos + length;
 	// get settings from the config files for folding comments and preprocessor lines
 	const bool foldComment = styler.GetPropertyInt("fold.comment") != 0;
 	const bool foldInComment = styler.GetPropertyInt("fold.comment") == 2;
 	const bool foldCompact = styler.GetPropertyInt("fold.compact", 1) != 0;
 	const bool foldpreprocessor = styler.GetPropertyInt("fold.preprocessor") != 0;
 	// Backtrack to previous line in case need to fix its fold status
-	int lineCurrent = styler.GetLine(startPos);
+	Sci_Position lineCurrent = styler.GetLine(startPos);
 	if (startPos > 0) {
 		if (lineCurrent > 0) {
 			lineCurrent--;
@@ -608,7 +608,7 @@ static void FoldAU3Doc(unsigned int startPos, int length, int, WordList *[], Acc
 	char chNext = styler.SafeGetCharAt(startPos);
 	char chPrev = ' ';
 	//
-	for (int i = startPos; i < endPos; i++) {
+	for (Sci_Position i = startPos; i < endPos; i++) {
 		char ch = chNext;
 		chNext = styler.SafeGetCharAt(i + 1);
 		if (IsAu3WordChar(ch)) {

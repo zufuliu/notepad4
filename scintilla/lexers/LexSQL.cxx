@@ -48,7 +48,7 @@ static inline  bool IsANumberChar(int ch, int chPrev) {
 	0
 };*/
 
-static void ColouriseSqlDoc(unsigned int startPos, int length, int initStyle, WordList *keywordlists[], Accessor &styler) {
+static void ColouriseSqlDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, WordList *keywordlists[], Accessor &styler) {
 	WordList &keywords1 = *keywordlists[0];
 	WordList &keywords2 = *keywordlists[1];
 	WordList &kw_user1 = *keywordlists[2];
@@ -65,7 +65,7 @@ static void ColouriseSqlDoc(unsigned int startPos, int length, int initStyle, Wo
 
 	StyleContext sc(startPos, length, initStyle, styler);
 	//int styleBeforeDCKeyword = SCE_SQL_DEFAULT;
-	int offset = 0;
+	Sci_Position offset = 0;
 
 	for (; sc.More(); sc.Forward(), offset++) {
 		// Determine if the current state should terminate.
@@ -282,7 +282,7 @@ typedef unsigned int sql_state_t;
 
 class SQLStates {
 public :
-	void Set(int lineNumber, sql_state_t sqlStatesLine) {
+	void Set(Sci_Position lineNumber, sql_state_t sqlStatesLine) {
 		if (sqlStatesLine) {
 			sqlStatement.resize(lineNumber + 1, 0);
 			sqlStatement[lineNumber] = sqlStatesLine;
@@ -437,7 +437,7 @@ public :
 		return (sqlStatesLine & MASK_INTO_CREATE_VIEW_AS_STATEMENT) != 0;
 	}
 
-	sql_state_t ForLine(int lineNumber) {
+	sql_state_t ForLine(Sci_Position lineNumber) {
 		if ((lineNumber > 0) && (sqlStatement.size() > static_cast<size_t>(lineNumber))) {
 			return sqlStatement[lineNumber];
 		} else {
@@ -461,7 +461,7 @@ static inline bool IsCommentStyle (int style) {
 
 #define IsCommentLine(line)			IsLexCommentLine(line, styler, MultiStyle(SCE_SQL_COMMENTLINE, SCE_SQL_COMMENTLINEDOC))
 
-static void FoldSqlDoc(unsigned int startPos, int length, int initStyle, WordList *[], Accessor &styler) {
+static void FoldSqlDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, WordList *[], Accessor &styler) {
 	if (styler.GetPropertyInt("fold") == 0)
 		return;
 	const bool foldOnlyBegin = styler.GetPropertyInt("fold.sql.only.begin", 0) != 0;
@@ -470,13 +470,13 @@ static void FoldSqlDoc(unsigned int startPos, int length, int initStyle, WordLis
 	const bool foldCompact = styler.GetPropertyInt("fold.compact", 0) != 0;
 
 	SQLStates sqlStates;
-	unsigned int endPos = startPos + length;
+	Sci_PositionU endPos = startPos + length;
 	int visibleChars = 0;
-	int lineCurrent = styler.GetLine(startPos);
+	Sci_Position lineCurrent = styler.GetLine(startPos);
 	int levelCurrent = SC_FOLDLEVELBASE;
 	if (lineCurrent > 0) {
 		// Backtrack to previous line in case need to fix its fold status for folding block of single-line comments (i.e. '--').
-		int lastNLPos = -1;
+		Sci_Position lastNLPos = -1;
 		// And keep going back until we find an operator ';' followed
 		// by white-space and/or comments. This will improve folding.
 		while (--startPos > 0) {
@@ -485,7 +485,7 @@ static void FoldSqlDoc(unsigned int startPos, int length, int initStyle, WordLis
 				lastNLPos = startPos;
 			} else if (ch == ';' && styler.StyleAt(startPos) == SCE_SQL_OPERATOR) {
 				bool isAllClear = true;
-				for (int tempPos = startPos + 1;
+				for (Sci_Position tempPos = startPos + 1;
 				     tempPos < lastNLPos;
 				     ++tempPos) {
 					int tempStyle = styler.StyleAt(tempPos);
@@ -508,7 +508,7 @@ static void FoldSqlDoc(unsigned int startPos, int length, int initStyle, WordLis
 	// And because folding ends at ';', keep going until we find one
 	// Otherwise if create ... view ... as is split over multiple
 	// lines the folding won't always update immediately.
-	unsigned int docLength = styler.Length();
+	Sci_PositionU docLength = styler.Length();
 	for (; endPos < docLength; ++endPos) {
 		if (styler.SafeGetCharAt(endPos) == ';') {
 			break;
@@ -531,7 +531,7 @@ static void FoldSqlDoc(unsigned int startPos, int length, int initStyle, WordLis
 		sqlStatesCurrentLine = sqlStates.ForLine(lineCurrent);
 	}
 
-	for (unsigned int i = startPos; i < endPos; i++) {
+	for (Sci_PositionU i = startPos; i < endPos; i++) {
 		const char ch = chNext;
 		const int stylePrev = style;
 		chNext = styler.SafeGetCharAt(i + 1);

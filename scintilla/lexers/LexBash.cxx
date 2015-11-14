@@ -67,7 +67,7 @@ static int translateBashDigit(int ch) {
 	return BASH_BASE_ERROR;
 }
 
-static int getBashNumberBase(char *s) {
+static int getBashNumberBase(const char *s) {
 	int i = 0;
 	int base = 0;
 	while (*s) {
@@ -85,7 +85,7 @@ static int getBashNumberBase(char *s) {
 	0
 };*/
 
-static void ColouriseBashDoc(unsigned int startPos, int length, int initStyle, WordList *keywordlists[], Accessor &styler) {
+static void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, WordList *keywordlists[], Accessor &styler) {
 	WordList &keywords = *keywordlists[0];
 	WordList cmdDelimiter, bashStruct, bashStruct_in;
 	cmdDelimiter.Set("| || |& & && ; ;; ( ) { }");
@@ -110,14 +110,14 @@ static void ColouriseBashDoc(unsigned int startPos, int length, int initStyle, W
 
 	int numBase = 0;
 	int digit;
-	unsigned int endPos = startPos + length;
+	Sci_PositionU endPos = startPos + length;
 	int cmdState = BASH_CMD_START;
 	int testExprType = 0;
 
 	// Always backtracks to the start of a line that is not a continuation
 	// of the previous line (i.e. start of a bash command segment)
 	int ln = styler.GetLine(startPos);
-	if (ln > 0 && startPos == static_cast<unsigned int>(styler.LineStart(ln)))
+	if (ln > 0 && startPos == static_cast<Sci_PositionU>(styler.LineStart(ln)))
 		ln--;
 	for (;;) {
 		startPos = styler.LineStart(ln);
@@ -534,7 +534,7 @@ static void ColouriseBashDoc(unsigned int startPos, int length, int initStyle, W
 				sc.SetState(SCE_SH_BACKTICKS);
 				QuoteStack.Start(sc.ch, BASH_DELIM_BACKTICK);
 			} else if (sc.ch == '$') {
-				if (sc.Match("$((")) {
+				if (sc.Match("$((") || sc.Match("$[")) {
 					sc.SetState(SCE_SH_OPERATOR);	// handle '((' later
 					continue;
 				}
@@ -641,22 +641,22 @@ static void ColouriseBashDoc(unsigned int startPos, int length, int initStyle, W
 
 #define IsCommentLine(line)	IsLexCommentLine(line, styler, SCE_SH_COMMENTLINE)
 
-static void FoldBashDoc(unsigned int startPos, int length, int, WordList *[], Accessor &styler) {
+static void FoldBashDoc(Sci_PositionU startPos, Sci_Position length, int, WordList *[], Accessor &styler) {
 	if (styler.GetPropertyInt("fold") == 0)
 		return;
 	const bool foldComment = styler.GetPropertyInt("fold.comment") != 0;
 	const bool foldCompact = styler.GetPropertyInt("fold.compact", 1) != 0;
-	unsigned int endPos = startPos + length;
+	Sci_PositionU endPos = startPos + length;
 	int visibleChars = 0;
 	int skipHereCh = 0;
-	int lineCurrent = styler.GetLine(startPos);
+	Sci_Position lineCurrent = styler.GetLine(startPos);
 	int levelPrev = styler.LevelAt(lineCurrent) & SC_FOLDLEVELNUMBERMASK;
 	int levelCurrent = levelPrev;
 	char chNext = styler[startPos];
 	int styleNext = styler.StyleAt(startPos);
 	char word[128] = {0};
 	int wordlen = 0;
-	for (unsigned int i = startPos; i < endPos; i++) {
+	for (Sci_PositionU i = startPos; i < endPos; i++) {
 		char ch = chNext;
 		chNext = styler.SafeGetCharAt(i + 1);
 		int style = styleNext;

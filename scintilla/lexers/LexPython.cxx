@@ -51,7 +51,7 @@ static inline bool IsPyStringStyle(int style) {
 		|| style == SCE_PY_RAW_STRING1 || style == SCE_PY_RAW_STRING2
 		|| style == SCE_PY_RAW_BYTES1 || style == SCE_PY_RAW_BYTES2;
 }
-static void ColourisePyDoc(unsigned int startPos, int length, int initStyle, WordList *keywordLists[], Accessor &styler) {
+static void ColourisePyDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, WordList *keywordLists[], Accessor &styler) {
 	WordList &keywords = *keywordLists[0];
 	WordList &keywords2 = *keywordLists[1];
 	WordList &keywords_const = *keywordLists[2];
@@ -260,18 +260,18 @@ _label_identifier:
 
 #define IsCommentLine(line)		IsLexCommentLine(line, styler, MultiStyle(SCE_PY_COMMENTLINE, SCE_PY_COMMENTBLOCK))
 
-static inline bool IsQuoteLine(int line, Accessor &styler) {
+static inline bool IsQuoteLine(Sci_Position line, Accessor &styler) {
 	int style = styler.StyleAt(styler.LineStart(line));
 	return IsPyTripleStyle(style);
 }
 
 
-static void FoldPyDoc(unsigned int startPos, int length, int, WordList *[], Accessor &styler) {
+static void FoldPyDoc(Sci_PositionU startPos, Sci_Position length, int, WordList *[], Accessor &styler) {
 	if (styler.GetPropertyInt("fold") == 0)
 		return;
-	const int maxPos = startPos + length;
-	const int maxLines = (maxPos == styler.Length()) ? styler.GetLine(maxPos) : styler.GetLine(maxPos - 1);	// Requested last line
-	const int docLines = styler.GetLine(styler.Length());	// Available last line
+	const Sci_Position maxPos = startPos + length;
+	const Sci_Position maxLines = (maxPos == styler.Length()) ? styler.GetLine(maxPos) : styler.GetLine(maxPos - 1);	// Requested last line
+	const Sci_Position docLines = styler.GetLine(styler.Length());	// Available last line
 
 	// property fold.quotes.python
 	//	This option enables folding multi-line quoted strings when using the Python lexer.
@@ -284,11 +284,11 @@ static void FoldPyDoc(unsigned int startPos, int length, int, WordList *[], Acce
 	// and so we can fix any preceding fold level (which is why we go back
 	// at least one line in all cases)
 	int spaceFlags = 0;
-	int lineCurrent = styler.GetLine(startPos);
-	int indentCurrent = LexIndentAmount(styler, lineCurrent, &spaceFlags, NULL);
+	Sci_Position lineCurrent = styler.GetLine(startPos);
+	int indentCurrent = Accessor::LexIndentAmount(styler, lineCurrent, &spaceFlags, NULL);
 	while (lineCurrent > 0) {
 		lineCurrent--;
-		indentCurrent = LexIndentAmount(styler, lineCurrent, &spaceFlags, NULL);
+		indentCurrent = Accessor::LexIndentAmount(styler, lineCurrent, &spaceFlags, NULL);
 		if (!(indentCurrent & SC_FOLDLEVELWHITEFLAG) && (!IsCommentLine(lineCurrent)) &&
 			(!IsQuoteLine(lineCurrent, styler)))
 			break;
@@ -316,8 +316,8 @@ static void FoldPyDoc(unsigned int startPos, int length, int, WordList *[], Acce
 		int quote = false;
 		if (lineNext <= docLines) {
 			// Information about next line is only available if not at end of document
-			indentNext = LexIndentAmount(styler, lineNext, &spaceFlags, NULL);
-			int lookAtPos = (styler.LineStart(lineNext) == styler.Length()) ? styler.Length() - 1 : styler.LineStart(lineNext);
+			indentNext = Accessor::LexIndentAmount(styler, lineNext, &spaceFlags, NULL);
+			Sci_Position lookAtPos = (styler.LineStart(lineNext) == styler.Length()) ? styler.Length() - 1 : styler.LineStart(lineNext);
 			int style = styler.StyleAt(lookAtPos) & 31;
 			quote = foldQuotes && (
 				style == SCE_PY_TRIPLE_STRING1 || style == SCE_PY_TRIPLE_STRING2 ||
@@ -348,7 +348,7 @@ static void FoldPyDoc(unsigned int startPos, int length, int, WordList *[], Acce
 		while (!quote && (lineNext < docLines) && ((indentNext & SC_FOLDLEVELWHITEFLAG) ||
 			(lineNext <= docLines && IsCommentLine(lineNext)))) {
 			lineNext++;
-			indentNext = LexIndentAmount(styler, lineNext, &spaceFlags, NULL);
+			indentNext = Accessor::LexIndentAmount(styler, lineNext, &spaceFlags, NULL);
 		}
 
 		const int levelAfterComments = indentNext & SC_FOLDLEVELNUMBERMASK;
@@ -363,7 +363,7 @@ static void FoldPyDoc(unsigned int startPos, int length, int, WordList *[], Acce
 		int skipLevel = levelAfterComments;
 
 		while (--skipLine > lineCurrent) {
-			int skipLineIndent = LexIndentAmount(styler, skipLine, &spaceFlags, NULL);
+			int skipLineIndent = Accessor::LexIndentAmount(styler, skipLine, &spaceFlags, NULL);
 
 			if (foldCompact) {
 				if ((skipLineIndent & SC_FOLDLEVELNUMBERMASK) > levelAfterComments)

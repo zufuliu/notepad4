@@ -115,7 +115,7 @@ static inline bool IsEscapeChar(int ch) {
 #define DOC_TAG_OPEN_XML	3	/// <param name="path">file path
 #define DOC_TAG_CLOSE_XML	4	/// </param>
 
-static void ColouriseCppDoc(unsigned int startPos, int length, int initStyle, WordList *keywordLists[], Accessor &styler) {
+static void ColouriseCppDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, WordList *keywordLists[], Accessor &styler) {
 	WordList &keywords		= *keywordLists[0];
 	WordList &keywords2		= *keywordLists[1];
 	WordList &keywords3		= *keywordLists[2];
@@ -138,7 +138,7 @@ static void ColouriseCppDoc(unsigned int startPos, int length, int initStyle, Wo
 		initStyle = SCE_C_XML_DEFAULT;
 	}
 
-	int lineCurrent = styler.GetLine(startPos);
+	Sci_Position lineCurrent = styler.GetLine(startPos);
 	int curLineState =	(lineCurrent > 0) ? styler.GetLineState(lineCurrent-1) : 0;
 	int lineState =		(curLineState >> 24);
 	int numCBrace =		(curLineState >> 18) & 0x3F;
@@ -191,7 +191,7 @@ static void ColouriseCppDoc(unsigned int startPos, int length, int initStyle, Wo
 
 	// look back to set chPrevNonWhite properly for better regex colouring
 	if (startPos > 0) {
-		int back = startPos;
+		Sci_Position back = startPos;
 		while (--back && IsSpaceEquiv(styler.StyleAt(back)));
 
 		if (styler.StyleAt(back) == SCE_C_OPERATOR) {
@@ -375,7 +375,7 @@ _label_identifier:
 				} else if (iswordchar(s[0]) && (IsASpace(sc.ch) || sc.ch == '[' || sc.ch == ')' || sc.ch == '>'
 					|| sc.ch == '*' || sc.ch == '&' || sc.ch == ':')) {
 					bool is_class = false;
-					int pos = sc.currentPos;
+					Sci_Position pos = sc.currentPos;
 					int next_char = IsASpace(sc.ch)? nextChar : sc.ch;
 
 					if (sc.ch == ':' && sc.chNext == ':') { // C++, Java, PHP
@@ -1085,9 +1085,9 @@ _label_identifier:
 	sc.Complete();
 }
 
-static bool IsCppDefineLine(int line, LexAccessor &styler, int &DefinePos) {
-	int pos = styler.LineStart(line);
-	int endPos = styler.LineStart(line + 1) - 1;
+static bool IsCppDefineLine(Sci_Position line, LexAccessor &styler, int &DefinePos) {
+	Sci_Position pos = styler.LineStart(line);
+	Sci_Position endPos = styler.LineStart(line + 1) - 1;
 	pos = LexSkipSpaceTab(pos, endPos, styler);
 	if (styler[pos] == '#' && styler.StyleAt(pos) == SCE_C_PREPROCESSOR){
 		pos++;
@@ -1100,9 +1100,9 @@ static bool IsCppDefineLine(int line, LexAccessor &styler, int &DefinePos) {
 	return false;
 }
 // also used in LexAsm.cxx
-bool IsCppInDefine(int currentPos, LexAccessor &styler) {
-	int line = styler.GetLine(currentPos);
-	int pos;
+bool IsCppInDefine(Sci_Position currentPos, LexAccessor &styler) {
+	Sci_Position line = styler.GetLine(currentPos);
+	Sci_Position pos;
 	if (IsCppDefineLine(line, styler, pos)) {
 		if (pos < currentPos)
 			return true;
@@ -1115,10 +1115,10 @@ bool IsCppInDefine(int currentPos, LexAccessor &styler) {
 	}
 	return false;
 }
-static bool IsCppFoldingLine(int line, LexAccessor &styler, int kind) {
-	int startPos = styler.LineStart(line);
-	int endPos = styler.LineStart(line + 1) - 1;
-	int pos = LexSkipSpaceTab(startPos, endPos, styler);
+static bool IsCppFoldingLine(Sci_Position line, LexAccessor &styler, int kind) {
+	Sci_Position startPos = styler.LineStart(line);
+	Sci_Position endPos = styler.LineStart(line + 1) - 1;
+	Sci_Position pos = LexSkipSpaceTab(startPos, endPos, styler);
 	int stl = styler.StyleAt(pos);
 	char ch = styler[pos];
 	switch (kind) {
@@ -1161,11 +1161,11 @@ static inline bool IsStreamCommentStyle(int style) {
 static inline bool IsHear_NowDocStyle(int style) {
 	return style == SCE_C_HEREDOC || style == SCE_C_NOWDOC;
 }
-static bool IsOpenBraceLine(int line, LexAccessor &styler) {
+static bool IsOpenBraceLine(Sci_Position line, LexAccessor &styler) {
 	// above line
-	int startPos = styler.LineStart(line-1);
-	int endPos = styler.LineStart(line)-1;
-	int pos = LexSkipSpaceTab(startPos, endPos, styler);
+	Sci_Position startPos = styler.LineStart(line-1);
+	Sci_Position endPos = styler.LineStart(line)-1;
+	Sci_Position pos = LexSkipSpaceTab(startPos, endPos, styler);
 	char ch = styler[pos];
 	int stl = styler.StyleAt(pos);
 	if (ch == '\r' || ch == '\n' || IsSpaceEquiv(stl) || (stl == SCE_C_PREPROCESSOR || stl == SCE_C_XML_TAG))
@@ -1196,7 +1196,7 @@ static bool IsOpenBraceLine(int line, LexAccessor &styler) {
 	return false;
 }
 
-static void FoldCppDoc(unsigned int startPos, int length, int initStyle, WordList *[], Accessor &styler) {
+static void FoldCppDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, WordList *[], Accessor &styler) {
 	if (styler.GetPropertyInt("fold") == 0)
 		return;
 	const bool foldComment = styler.GetPropertyInt("fold.comment", 1) != 0;
@@ -1207,9 +1207,9 @@ static void FoldCppDoc(unsigned int startPos, int length, int initStyle, WordLis
 	const int lexType = styler.GetPropertyInt("lexer.lang.type", LEX_CPP);
 	const bool hasPreprocessor = _hasPreprocessor(lexType);
 
-	unsigned int endPos = startPos + length;
+	Sci_PositionU endPos = startPos + length;
 	int visibleChars = 0;
-	int lineCurrent = styler.GetLine(startPos);
+	Sci_Position lineCurrent = styler.GetLine(startPos);
 	int levelCurrent = SC_FOLDLEVELBASE;
 	if (lineCurrent > 0)
 		levelCurrent = styler.LevelAt(lineCurrent - 1) >> 16;
@@ -1221,7 +1221,7 @@ static void FoldCppDoc(unsigned int startPos, int length, int initStyle, WordLis
 	int styleNext = styler.StyleAt(startPos);
 	bool isObjCProtocol = false;
 
-	for (unsigned int i = startPos; i < endPos; i++) {
+	for (Sci_PositionU i = startPos; i < endPos; i++) {
 		int ch = chNext;
 		chNext = styler.SafeGetCharAt(i + 1);
 		int stylePrev = style;

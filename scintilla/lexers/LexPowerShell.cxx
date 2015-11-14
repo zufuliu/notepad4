@@ -33,7 +33,7 @@ static inline bool IsPSWordChar(int ch) {
 	0
 };*/
 
-static void ColourisePowerShellDoc(unsigned int startPos, int length, int initStyle, WordList *keywordlists[], Accessor &styler) {
+static void ColourisePowerShellDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, WordList *keywordlists[], Accessor &styler) {
 	WordList &keywords = *keywordlists[0];
 	WordList &keywords2 = *keywordlists[1];
 	WordList &keywords3 = *keywordlists[2];
@@ -134,15 +134,15 @@ _label_identifier:
 // Store both the current line's fold level and the next lines in the
 // level store to make it easy to pick up with each increment
 // and to make it possible to fiddle the current level for "} else {".
-static void FoldPowerShellDoc(unsigned int startPos, int length, int initStyle, WordList *[], Accessor &styler) {
+static void FoldPowerShellDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, WordList *[], Accessor &styler) {
 	if (styler.GetPropertyInt("fold") == 0)
 		return;
 	const bool foldComment = styler.GetPropertyInt("fold.comment") != 0;
 	const bool foldCompact = styler.GetPropertyInt("fold.compact", 1) != 0;
 	const bool foldAtElse = styler.GetPropertyInt("fold.at.else", 0) != 0;
-	unsigned int endPos = startPos + length;
+	Sci_PositionU endPos = startPos + length;
 	int visibleChars = 0;
-	int lineCurrent = styler.GetLine(startPos);
+	Sci_Position lineCurrent = styler.GetLine(startPos);
 	int levelCurrent = SC_FOLDLEVELBASE;
 	if (lineCurrent > 0)
 		levelCurrent = styler.LevelAt(lineCurrent-1) >> 16;
@@ -151,7 +151,7 @@ static void FoldPowerShellDoc(unsigned int startPos, int length, int initStyle, 
 	char chNext = styler[startPos];
 	int styleNext = styler.StyleAt(startPos);
 	int style = initStyle;
-	for (unsigned int i = startPos; i < endPos; i++) {
+	for (Sci_PositionU i = startPos; i < endPos; i++) {
 		char ch = chNext;
 		chNext = styler.SafeGetCharAt(i + 1);
 		int stylePrev = style;

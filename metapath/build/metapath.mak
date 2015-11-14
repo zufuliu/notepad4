@@ -5,13 +5,13 @@ CFG=i386
 !ENDIF
 
 !IF "$(CFG)" == "i386"
-OUTPUT=..\bin
+OUTPUT=..\..\bin
 CFLAGS=/D "WIN32" /D "_WIN32_WINNT=0x0501" /c /W4 /EHsc /MD /arch:SSE2 /O1 /Oy /Oi /Os /GT /GL /GF /Gm- /GR- /GS- /Gy /GA /Zc:wchar_t /Zc:forScope
 RCCFG=/d "_M_IX86"
 LDCFG=/VERSION:5.1 /SUBSYSTEM:WINDOWS,5.01 /OSVERSION:5.1 /MACHINE:X86
 LIBS2=msvcrt_winxp.obj
 !ELSE
-OUTPUT=..\bin\amd64
+OUTPUT=..\..\bin\amd64
 CFLAGS=/D "WIN64" /D "_WIN32_WINNT=0x0502" /c /W4 /EHsc /MD /arch:SSE2 /O1 /Oy /Oi /Os /GT /GL /GF /Gm- /GR- /GS- /Gy /GA /Zc:wchar_t /Zc:forScope
 RCCFG=/d "_M_AMD64"
 LDCFG=/VERSION:5.2 /SUBSYSTEM:WINDOWS,5.2 /OSVERSION:5.2 /MACHINE:AMD64

@@ -29,7 +29,7 @@ using namespace Scintilla;
 	0
 };*/
 
-static void ColouriseInnoDoc(unsigned int startPos, int length, int, WordList *keywordLists[], Accessor &styler) {
+static void ColouriseInnoDoc(Sci_PositionU startPos, Sci_Position length, int, WordList *keywordLists[], Accessor &styler) {
 	WordList &sectionKeywords = *keywordLists[0];
 	WordList &standardKeywords = *keywordLists[1];
 	WordList &parameterKeywords = *keywordLists[2];
@@ -42,20 +42,20 @@ static void ColouriseInnoDoc(unsigned int startPos, int length, int, WordList *k
 	char ch = 0;
 	char chNext = styler[startPos];
 	int lengthDoc = startPos + length;
-	char *buffer = new char[length];
-	int bufferCount = 0;
+	char *buffer = new char[length + 1];
+	Sci_Position bufferCount = 0;
 	bool isBOL, isEOL, isWS, isBOLWS = 0;
 	bool isCStyleComment = false;
 
-	int curLine = styler.GetLine(startPos);
-	int curLineState = curLine > 0 ? styler.GetLineState(curLine - 1) : 0;
+	Sci_Position curLine = styler.GetLine(startPos);
+	Sci_Position curLineState = curLine > 0 ? styler.GetLineState(curLine - 1) : 0;
 	bool isCode = (curLineState == 1);
 
 	// Go through all provided text segment
 	// using the hand-written state machine shown below
 	styler.StartAt(startPos);
 	styler.StartSegment(startPos);
-	for (int i = startPos; i < lengthDoc; i++) {
+	for (Sci_Position i = startPos; i < lengthDoc; i++) {
 		const char chPrev = ch;
 		ch = chNext;
 		chNext = styler.SafeGetCharAt(i + 1);
@@ -243,26 +243,26 @@ static void ColouriseInnoDoc(unsigned int startPos, int length, int, WordList *k
 static inline bool IsStreamCommentStyle(int style) {
 	return style == SCE_INNO_COMMENT_PASCAL;
 }
-static bool IsSectionEnd(int curPos, Accessor &styler) {
-	int curLine = styler.GetLine(curPos);
-	int pos = LexSkipSpaceTab(styler.LineStart(curLine+1), styler.LineStart(curLine+2)-1, styler);
+static bool IsSectionEnd(Sci_Position curPos, Accessor &styler) {
+	Sci_Position curLine = styler.GetLine(curPos);
+	Sci_Position pos = LexSkipSpaceTab(styler.LineStart(curLine+1), styler.LineStart(curLine+2)-1, styler);
 	char ch = styler.SafeGetCharAt(pos);
 	if (ch == '[' && styler.StyleAt(pos) == SCE_INNO_SECTION)
 		return true;
 	return false;
 }
 
-static void FoldInnoDoc(unsigned int startPos, int length, int initStyle, WordList *[], Accessor &styler) {
+static void FoldInnoDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, WordList *[], Accessor &styler) {
 	if (styler.GetPropertyInt("fold") == 0)
 		return;
 	const bool foldComment = styler.GetPropertyInt("fold.comment", 1) != 0;
 	const bool foldPreprocessor = styler.GetPropertyInt("fold.preprocessor", 1) != 0;
 	//const bool foldCompact = styler.GetPropertyInt("fold.compact", 0) != 0;
 
-	unsigned int endPos = startPos + length;
+	Sci_PositionU endPos = startPos + length;
 	static int sectionFound = -1;
 	//int visibleChars = 0;
-	int lineCurrent = styler.GetLine(startPos);
+	Sci_Position lineCurrent = styler.GetLine(startPos);
 	int levelCurrent = SC_FOLDLEVELBASE;
 	if (lineCurrent > 0)
 		levelCurrent = styler.LevelAt(lineCurrent-1) >> 16;
@@ -272,7 +272,7 @@ static void FoldInnoDoc(unsigned int startPos, int length, int initStyle, WordLi
 	int styleNext = styler.StyleAt(startPos);
 	int style = initStyle;
 
-	for (unsigned int i = startPos; i < endPos; i++) {
+	for (Sci_PositionU i = startPos; i < endPos; i++) {
 		char ch = chNext;
 		chNext = styler.SafeGetCharAt(i + 1);
 		int stylePrev = style;
@@ -295,7 +295,7 @@ static void FoldInnoDoc(unsigned int startPos, int length, int initStyle, WordLi
 		}
 
 		if (ch == '[' && style == SCE_INNO_SECTION) {
-			int curLine = styler.GetLine(i);
+			Sci_Position curLine = styler.GetLine(i);
 			if (sectionFound == -1 || sectionFound > curLine)
 				sectionFound = curLine;
 			levelNext++;
@@ -305,7 +305,7 @@ static void FoldInnoDoc(unsigned int startPos, int length, int initStyle, WordLi
 		}
 
 		if (foldPreprocessor && ch == '#' && style == SCE_INNO_PREPROC) {
-			int pos = LexSkipSpaceTab(i+1, endPos, styler);
+			Sci_Position pos = LexSkipSpaceTab(i+1, endPos, styler);
 			if (LexMatchIC(pos, "if")) {
 				levelNext++;
 			} else if (LexMatchIC(pos, "end")) {

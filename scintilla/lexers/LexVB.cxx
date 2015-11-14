@@ -58,7 +58,7 @@ static bool IsVBNumber(int ch, int chPrev) {
 	0
 };*/
 
-static void ColouriseVBDoc(unsigned int startPos, int length, int initStyle,
+static void ColouriseVBDoc(Sci_PositionU startPos, Sci_Position length, int initStyle,
 	WordList *keywordlists[], Accessor &styler, bool vbScriptSyntax) {
 
 	WordList &keywords = *keywordlists[0];
@@ -216,27 +216,27 @@ _label_identifier:
 	sc.Complete();
 }
 
-static bool VBLineStartsWith(int line, Accessor &styler, const char* word) {
-	int pos = LexLineSkipSpaceTab(line, styler);
+static bool VBLineStartsWith(Sci_Position line, Accessor &styler, const char* word) {
+	Sci_Position pos = LexLineSkipSpaceTab(line, styler);
 	return (styler.StyleAt(pos) == SCE_B_KEYWORD) && (LexMatchIgnoreCase(pos, styler, word));
 }
-static bool VBMatchNextWord(int startPos, int endPos, Accessor &styler, const char *word) {
-	int pos = LexSkipSpaceTab(startPos, endPos, styler);
+static bool VBMatchNextWord(Sci_Position startPos, Sci_Position endPos, Accessor &styler, const char *word) {
+	Sci_Position pos = LexSkipSpaceTab(startPos, endPos, styler);
 	return isspace(LexCharAt(pos + static_cast<int>(strlen(word))))
 		&& LexMatchIgnoreCase(pos, styler, word);
 }
-static bool IsVBProperty(int line, int startPos, Accessor &styler) {
-	int endPos = styler.LineStart(line+1) - 1;
-	for (int i = startPos; i < endPos; i++) {
+static bool IsVBProperty(Sci_Position line, Sci_Position startPos, Accessor &styler) {
+	Sci_Position endPos = styler.LineStart(line+1) - 1;
+	for (Sci_Position i = startPos; i < endPos; i++) {
 		if (styler.StyleAt(i) == SCE_B_OPERATOR && LexCharAt(i) == '(')
 			return true;
 	}
 	return false;
 }
-static bool IsVBSome(int line, int kind, Accessor &styler) {
-	int startPos = styler.LineStart(line);
-	int endPos = styler.LineStart(line+1) - 1;
-	int pos = LexSkipSpaceTab(startPos, endPos, styler);
+static bool IsVBSome(Sci_Position line, int kind, Accessor &styler) {
+	Sci_Position startPos = styler.LineStart(line);
+	Sci_Position endPos = styler.LineStart(line+1) - 1;
+	Sci_Position pos = LexSkipSpaceTab(startPos, endPos, styler);
 	int stl = styler.StyleAt(pos);
 	if (stl == SCE_B_KEYWORD) {
 		if (LexMatchIgnoreCase(pos, styler, "public")) {
@@ -265,16 +265,16 @@ static bool IsVBSome(int line, int kind, Accessor &styler) {
 #define IsConstLine(line)		IsVBSome(line, 2, styler)
 #define IsVB6Type(line)			IsVBSome(line, 1, styler)
 
-static void FoldVBDoc(unsigned int startPos, int length, int initStyle, WordList *[], Accessor &styler) {
+static void FoldVBDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, WordList *[], Accessor &styler) {
 	if (styler.GetPropertyInt("fold") == 0)
 		return;
 	const bool foldComment = styler.GetPropertyInt("fold.comment") != 0;
 	const bool foldPreprocessor = styler.GetPropertyInt("fold.preprocessor") != 0;
 	const bool foldCompact = styler.GetPropertyInt("fold.compact", 1) != 0;
 
-	unsigned int endPos = startPos + length;
+	Sci_PositionU endPos = startPos + length;
 	int visibleChars = 0;
-	int lineCurrent = styler.GetLine(startPos);
+	Sci_Position lineCurrent = styler.GetLine(startPos);
 	int levelCurrent = SC_FOLDLEVELBASE;
 	if (lineCurrent > 0)
 		levelCurrent = styler.LevelAt(lineCurrent-1) >> 16;
@@ -293,9 +293,9 @@ static void FoldVBDoc(unsigned int startPos, int length, int initStyle, WordList
 	bool isExit = false;	// Exit {Function Sub Property}
 	bool isDeclare = false;	// Declare, Delegate {Function Sub}
 	bool isIf = false;		// If ... Then \r\n ... \r\n End If
-	static int lineIf = 0, lineThen = 0;
+	static Sci_Position lineIf = 0, lineThen = 0;
 
-	for (unsigned int i = startPos; i < endPos; i++) {
+	for (Sci_PositionU i = startPos; i < endPos; i++) {
 		char chPrev = ch;
 		ch = chNext;
 		chNext = styler.SafeGetCharAt(i + 1);
@@ -380,7 +380,7 @@ static void FoldVBDoc(unsigned int startPos, int length, int initStyle, WordList
 			} else if (VBMatch("then")) {
 				if (isIf) {
 					isIf = false;
-					int pos = LexSkipSpaceTab(i+4, endPos, styler);
+					Sci_Position pos = LexSkipSpaceTab(i+4, endPos, styler);
 					char chEnd = LexCharAt(pos);
 					if (!(chEnd == '\r' || chEnd == '\n' || chEnd == '\''))
 						levelNext--;
@@ -462,10 +462,10 @@ static void FoldVBDoc(unsigned int startPos, int length, int initStyle, WordList
 	}
 }
 
-static void ColouriseVBNetDoc(unsigned int startPos, int length, int initStyle, WordList *keywordlists[], Accessor &styler) {
+static void ColouriseVBNetDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, WordList *keywordlists[], Accessor &styler) {
 	ColouriseVBDoc(startPos, length, initStyle, keywordlists, styler, false);
 }
-static void ColouriseVBScriptDoc(unsigned int startPos, int length, int initStyle, WordList *keywordlists[], Accessor &styler) {
+static void ColouriseVBScriptDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, WordList *keywordlists[], Accessor &styler) {
 	ColouriseVBDoc(startPos, length, initStyle, keywordlists, styler, true);
 }
 

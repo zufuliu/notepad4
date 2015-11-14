@@ -159,6 +159,7 @@ enu WhiteSpace=SCWS_
 val SCWS_INVISIBLE=0
 val SCWS_VISIBLEALWAYS=1
 val SCWS_VISIBLEAFTERINDENT=2
+val SCWS_VISIBLEONLYININDENT=3
 
 # Are white space characters currently visible?
 # Returns one of SCWS_* constants.
@@ -417,6 +418,7 @@ val SC_CHARSET_HANGUL=129
 val SC_CHARSET_MAC=77
 val SC_CHARSET_OEM=255
 val SC_CHARSET_RUSSIAN=204
+val SC_CHARSET_OEM866=866
 val SC_CHARSET_CYRILLIC=1251
 val SC_CHARSET_SHIFTJIS=128
 val SC_CHARSET_SYMBOL=2
@@ -1263,6 +1265,18 @@ fun int WordEndPosition=2267(position pos, bool onlyWordCharacters)
 
 # Is the range start..end considered a word?
 fun bool IsRangeWord=2691(position start, position end)
+
+enu IdleStyling=SC_IDLESTYLING_
+val SC_IDLESTYLING_NONE=0
+val SC_IDLESTYLING_TOVISIBLE=1
+val SC_IDLESTYLING_AFTERVISIBLE=2
+val SC_IDLESTYLING_ALL=3
+
+# Sets limits to idle styling.
+set void SetIdleStyling=2692(int idleStyling,)
+
+# Retrieve the limits to idle styling.
+get int GetIdleStyling=2693(,)
 
 enu Wrap=SC_WRAP_
 val SC_WRAP_NONE=0

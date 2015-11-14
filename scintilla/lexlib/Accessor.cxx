@@ -32,13 +32,8 @@ int Accessor::GetPropertyInt(const char *key, int defaultValue) const {
 	return pprops->GetInt(key, defaultValue);
 }
 
-////////////////////////////////////////////////////////////////////////////////
-#ifdef SCI_NAMESPACE
-namespace Scintilla {
-#endif
-
-int LexIndentAmount(Accessor &styler, int line, int *flags, PFNIsCommentLeader pfnIsCommentLeader) {
-	int end = styler.Length();
+int Accessor::LexIndentAmount(Accessor &styler, Sci_Position line, int *flags, PFNIsCommentLeader pfnIsCommentLeader) {
+	Sci_Position end = styler.Length();
 	int spaceFlags = 0;
 
 	// Determines the indentation level of the current line and also checks for consistent
@@ -46,11 +41,11 @@ int LexIndentAmount(Accessor &styler, int line, int *flags, PFNIsCommentLeader p
 	// Indentation is judged consistent when the indentation whitespace of each line lines
 	// the same or the indentation of one line is a prefix of the other.
 
-	int pos = styler.LineStart(line);
+	Sci_Position pos = styler.LineStart(line);
 	char ch = styler[pos];
 	int indent = 0;
 	bool inPrevPrefix = line > 0;
-	int posPrev = inPrevPrefix ? styler.LineStart(line-1) : 0;
+	Sci_Position posPrev = inPrevPrefix ? styler.LineStart(line-1) : 0;
 	while ((ch == ' ' || ch == '\t') && (pos < end)) {
 		if (inPrevPrefix) {
 			char chPrev = styler[posPrev++];
@@ -82,7 +77,3 @@ int LexIndentAmount(Accessor &styler, int line, int *flags, PFNIsCommentLeader p
 	else
 		return indent;
 }
-
-#ifdef SCI_NAMESPACE
-}
-#endif

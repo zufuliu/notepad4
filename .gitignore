@@ -1,8 +1,4 @@
 /bin
-/build/Debug
-/build/Release
-/build/WDKRelease
-/build/LLVMDebug
 *.suo
 *.sdf
 *.user

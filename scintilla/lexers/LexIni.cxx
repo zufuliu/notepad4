@@ -1,6 +1,14 @@
-// Lexer for my.cnf .ini .reg
+// Scintilla source code edit control
+/** @file LexOthers.cxx
+ ** Lexers for batch files, diff results, properties files, make files and error lists.
+ **/
+// Copyright 1998-2001 by Neil Hodgson <neilh@scintilla.org>
+// The License.txt file describes the conditions under which this software may be distributed.
 
 #include <stdlib.h>
+#include <string.h>
+#include <stdio.h>
+#include <stdarg.h>
 #include <assert.h>
 #include <ctype.h>
 
@@ -9,23 +17,24 @@
 #include "SciLexer.h"
 
 #include "WordList.h"
-#include "CharacterSet.h"
 #include "LexAccessor.h"
 #include "Accessor.h"
+#include "StyleContext.h"
+#include "CharacterSet.h"
 #include "LexerModule.h"
 
 #ifdef SCI_NAMESPACE
 using namespace Scintilla;
 #endif
 
-static inline bool isassignchar(unsigned char ch) {
+static inline bool isassignchar(int ch) {
 	return (ch == '=') || (ch == ':');
 }
 
-static void ColourisePropsLine(char *lineBuffer, unsigned int lengthLine, unsigned int startLine,
-	unsigned int endPos, Accessor &styler, bool allowInitialSpaces) {
+static void ColourisePropsLine(const char *lineBuffer, Sci_PositionU lengthLine, Sci_PositionU startLine,
+	Sci_PositionU endPos, Accessor &styler, bool allowInitialSpaces) {
 
-	unsigned int i = 0;
+	Sci_PositionU i = 0;
 	if (allowInitialSpaces) {
 		while ((i < lengthLine) && isspacechar(lineBuffer[i]))	// Skip initial spaces
 			i++;
@@ -35,7 +44,7 @@ static void ColourisePropsLine(char *lineBuffer, unsigned int lengthLine, unsign
 	}
 
 	if (i < lengthLine) {
-		if (lineBuffer[i] == '#' || lineBuffer[i] == ';' || lineBuffer[i] == '!') {
+		if (lineBuffer[i] == '#' || lineBuffer[i] == '!' || lineBuffer[i] == ';') {
 			styler.ColourTo(endPos, SCE_PROPS_COMMENT);
 		} else if (lineBuffer[i] == '[') {
 			styler.ColourTo(endPos, SCE_PROPS_SECTION);
@@ -61,13 +70,13 @@ static void ColourisePropsLine(char *lineBuffer, unsigned int lengthLine, unsign
 	}
 }
 
-static void ColourisePropsDoc(unsigned int startPos, int length, int, WordList *[], Accessor &styler) {
+static void ColourisePropsDoc(Sci_PositionU startPos, Sci_Position length, int, WordList *[], Accessor &styler) {
 	char lineBuffer[1024];
 	styler.StartAt(startPos);
 	styler.StartSegment(startPos);
-	unsigned int linePos = 0;
-	unsigned int startLine = startPos;
-	unsigned int endPos = startPos + length;
+	Sci_PositionU linePos = 0;
+	Sci_PositionU startLine = startPos;
+	Sci_PositionU endPos = startPos + length;
 
 	// property lexer.props.allow.initial.spaces
 	//	For properties files, set to 0 to style all lines that start with whitespace in the default style.
@@ -75,7 +84,7 @@ static void ColourisePropsDoc(unsigned int startPos, int length, int, WordList *
 	//	can be used for RFC2822 text where indentation is used for continuation lines.
 	const bool allowInitialSpaces = styler.GetPropertyInt("lexer.props.allow.initial.spaces", 1) != 0;
 
-	for (unsigned int i = startPos; i < endPos; i++) {
+	for (Sci_PositionU i = startPos; i < endPos; i++) {
 		lineBuffer[linePos++] = styler[i];
 		if (IsLexAtEOL(i, styler) || (linePos >= sizeof(lineBuffer) - 1)) {
 			// End of line (or of line buffer) met, colourise it
@@ -99,21 +108,20 @@ static void ColourisePropsDoc(unsigned int startPos, int length, int, WordList *
 
 // adaption by ksc, using the "} else {" trick of 1.53
 // 030721
-static void FoldPropsDoc(unsigned int startPos, int length, int, WordList *[], Accessor &styler) {
+static void FoldPropsDoc(Sci_PositionU startPos, Sci_Position length, int, WordList *[], Accessor &styler) {
 	if (styler.GetPropertyInt("fold") == 0)
 		return;
-	//const bool foldCompact = styler.GetPropertyInt("fold.compact", 1) != 0;
-	bool foldCompact = true;
-	unsigned int endPos = startPos + length;
+	const bool foldCompact = styler.GetPropertyInt("fold.compact", 1) != 0;
+	Sci_PositionU endPos = startPos + length;
 	int visibleChars = 0;
-	int lineCurrent = styler.GetLine(startPos);
+	Sci_Position lineCurrent = styler.GetLine(startPos);
 
 	char chNext = styler[startPos];
 	int styleNext = styler.StyleAt(startPos);
 	bool headerPoint = false;
 	int lev;
 
-	for (unsigned int i = startPos; i < endPos; i++) {
+	for (Sci_PositionU i = startPos; i < endPos; i++) {
 		char ch = chNext;
 		chNext = styler[i+1];
 
@@ -129,12 +137,12 @@ static void FoldPropsDoc(unsigned int startPos, int length, int, WordList *[], A
 			lev = SC_FOLDLEVELBASE;
 
 			if (lineCurrent > 0) {
-				int levelPrev = styler.LevelAt(lineCurrent - 1);
+				int levelPrevious = styler.LevelAt(lineCurrent - 1);
 
-				if (levelPrev & SC_FOLDLEVELHEADERFLAG) {
+				if (levelPrevious & SC_FOLDLEVELHEADERFLAG) {
 					lev = SC_FOLDLEVELBASE + 1;
 				} else {
-					lev = levelPrev & SC_FOLDLEVELNUMBERMASK;
+					lev = levelPrevious & SC_FOLDLEVELNUMBERMASK;
 				}
 			}
 
@@ -160,11 +168,11 @@ static void FoldPropsDoc(unsigned int startPos, int length, int, WordList *[], A
 	}
 
 	if (lineCurrent > 0) {
-		int levelPrev = styler.LevelAt(lineCurrent - 1);
-		if (levelPrev & SC_FOLDLEVELHEADERFLAG) {
+		int levelPrevious = styler.LevelAt(lineCurrent - 1);
+		if (levelPrevious & SC_FOLDLEVELHEADERFLAG) {
 			lev = SC_FOLDLEVELBASE + 1;
 		} else {
-			lev = levelPrev & SC_FOLDLEVELNUMBERMASK;
+			lev = levelPrevious & SC_FOLDLEVELNUMBERMASK;
 		}
 	} else {
 		lev = SC_FOLDLEVELBASE;

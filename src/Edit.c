@@ -109,6 +109,8 @@ HWND EditCreate(HWND hwndParent)
 	SendMessage(hwnd, SCI_SETVIRTUALSPACEOPTIONS, SCVS_NONE, 0);
 	SendMessage(hwnd, SCI_SETADDITIONALCARETSBLINK, FALSE, 0);
 	SendMessage(hwnd, SCI_SETADDITIONALCARETSVISIBLE, FALSE, 0);
+	// style both before and after the visible text in the background
+	SendMessage(hwnd, SCI_SETIDLESTYLING, SC_IDLESTYLING_ALL, 0);
 
 	SendMessage(hwnd, SCI_ASSIGNCMDKEY, (SCK_NEXT + (SCMOD_CTRL << 16)), SCI_PARADOWN);
 	SendMessage(hwnd, SCI_ASSIGNCMDKEY, (SCK_PRIOR + (SCMOD_CTRL << 16)), SCI_PARAUP);

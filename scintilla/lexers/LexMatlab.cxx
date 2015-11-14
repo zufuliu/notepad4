@@ -73,7 +73,7 @@ static bool IsInvalidFileName(int ch) {
 	0
 };*/
 
-static void ColouriseMatlabDoc(unsigned int startPos, int length, int initStyle, WordList *keywordLists[], Accessor &styler) {
+static void ColouriseMatlabDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, WordList *keywordLists[], Accessor &styler) {
 	WordList &keywords  = *keywordLists[0];
 	WordList &attributes = *keywordLists[1];
 	WordList &commands  = *keywordLists[2];
@@ -214,7 +214,7 @@ _label_identifier:
 					sc.SetState(SCE_MAT_COMMENT);
 					// Octave demo/test section, always placed in end of file
 					if ((lexType & LEX_OCTAVE) && sc.atLineStart && sc.ch == '%' && sc.chNext == '!') {
-						int pos = static_cast<int>(sc.currentPos) + 2;
+						Sci_Position pos = static_cast<Sci_Position>(sc.currentPos) + 2;
 						if (!hasTest && (styler.Match(pos, "test") || styler.Match(pos, "demo")
 							|| styler.Match(pos, "assert") || styler.Match(pos, "error") || styler.Match(pos, "warning")
 							|| styler.Match(pos, "fail") || styler.Match(pos, "shared") || styler.Match(pos, "function"))) {
@@ -293,17 +293,17 @@ static inline bool IsStreamCommentStyle(int style) {
 #define IsCommentLine(line)		IsLexCommentLine(line, styler, SCE_MAT_COMMENT)
 #define StrEqu(str1, str2)		(strcmp(str1, str2) == 0)
 
-static void FoldMatlabDoc(unsigned int startPos, int length, int initStyle, WordList *[], Accessor &styler) {
+static void FoldMatlabDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, WordList *[], Accessor &styler) {
 	if (styler.GetPropertyInt("fold") == 0)
 		return;
 	const int lexType = styler.GetPropertyInt("lexer.lang.type", LEX_MATLAB);
 	const bool foldComment = styler.GetPropertyInt("fold.comment") != 0;
 	const bool foldCompact = styler.GetPropertyInt("fold.compact", 1) != 0;
 
-	unsigned int endPos = startPos + length;
+	Sci_PositionU endPos = startPos + length;
 	int visibleChars = 0;
 	int numBrace = 0;
-	int lineCurrent = styler.GetLine(startPos);
+	Sci_Position lineCurrent = styler.GetLine(startPos);
 	int levelCurrent = SC_FOLDLEVELBASE;
 	if (lineCurrent > 0)
 		levelCurrent = styler.LevelAt(lineCurrent-1) >> 16;
@@ -314,7 +314,7 @@ static void FoldMatlabDoc(unsigned int startPos, int length, int initStyle, Word
 	int style = initStyle;
 	int styleNext = styler.StyleAt(startPos);
 
-	for (unsigned int i = startPos; i < endPos; i++) {
+	for (Sci_PositionU i = startPos; i < endPos; i++) {
 		char chPrev = ch;
 		ch = chNext;
 		chNext = styler.SafeGetCharAt(i + 1);
@@ -339,7 +339,7 @@ static void FoldMatlabDoc(unsigned int startPos, int length, int initStyle, Word
 
 		if (style == SCE_MAT_KEYWORD && stylePrev != SCE_MAT_KEYWORD && numBrace == 0 && chPrev != '.' && chPrev != ':') {
 			char word[32];
-			int len = LexGetRange(i, styler, iswordstart, word, sizeof(word));
+			Sci_Position len = LexGetRange(i, styler, iswordstart, word, sizeof(word));
 			if ((StrEqu(word, "function") && ((lexType & LEX_JULIA) || (!(lexType & LEX_JULIA) && LexGetNextChar(i+len, styler) != '(')))
 				|| StrEqu(word, "if")
 				|| StrEqu(word, "for")
@@ -368,7 +368,7 @@ static void FoldMatlabDoc(unsigned int startPos, int length, int initStyle, Word
 			} else if ((lexType & LEX_MATLAB) && (chPrev != '@') && (StrEqu(word, "methods")
 				|| StrEqu(word, "properties") || StrEqu(word, "events") || StrEqu(word, "enumeration"))) {
 				// Matlab classdef
-				int pos = LexSkipSpaceTab(i+len, endPos, styler);
+				Sci_Position pos = LexSkipSpaceTab(i+len, endPos, styler);
 				char chEnd = styler.SafeGetCharAt(pos);
 				if (IsMatEndChar(chEnd, styler.StyleAt(pos))) {
 					levelNext++;

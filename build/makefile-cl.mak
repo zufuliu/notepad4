@@ -28,7 +28,7 @@ BINDIR  = ..\bin
 !ELSE
 BINDIR  = ..\bin
 !ENDIF
-OBJDIR  = $(BINDIR)\obj-cl10
+OBJDIR  = $(BINDIR)\obj-cl
 EXE     = $(BINDIR)\Notepad2.exe
 
 SCI_OBJDIR      = $(OBJDIR)\scintilla
@@ -51,12 +51,12 @@ NP2_STL         = $(NP2_SRC)\EditLexers
 NP2_RES         = ..\res
 
 DEFINES       = /D "_WINDOWS" /D "NDEBUG" /D "_UNICODE" /D "UNICODE" \
-                /D "_CRT_SECURE_NO_WARNINGS" /D"_HAS_EXCEPTIONS=0" \
+                /D "_CRT_SECURE_NO_WARNINGS" \
                 /D "BOOKMARK_EDITION"
 INCLUDEDIRS   = /I "$(SCI_INC)" /I "$(SCI_LEX)" /I "$(SCI_LIB)" /I "$(SCI_SRC)" \
                 /I "$(SCI_WIN)" /I "$(NP2_SRC)"
 CXXFLAGS      = /nologo /c -Wall -Wextra -Wno-deprecated-declarations -Wno-missing-braces -Wno-unused-parameter -Wno-missing-field-initializers \
-				/MD /arch:SSE2 /O2 /GF /GR- /GS- /Gy /Zc:wchar_t /Zc:forScope $(DEFINES) $(INCLUDEDIRS)
+				/MD /EHsc /arch:SSE2 /O2 /GF /GR- /GS- /Gy /Zc:wchar_t /Zc:forScope $(DEFINES) $(INCLUDEDIRS)
 LDFLAGS       = /nologo /INCREMENTAL:NO /RELEASE /OPT:REF /OPT:ICF /DYNAMICBASE /NXCOMPAT /DEBUG
 LIBS          = kernel32.lib gdi32.lib user32.lib advapi32.lib comctl32.lib comdlg32.lib imm32.lib \
                 ole32.lib oleaut32.lib psapi.lib shell32.lib shlwapi.lib \

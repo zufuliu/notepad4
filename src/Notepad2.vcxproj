@@ -108,18 +108,18 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
     <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(SolutionDir)$(Configuration)\$(Platform)\</OutDir>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='LLVMDebug|x64'">$(SolutionDir)$(Configuration)\$(Platform)\</OutDir>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(SolutionDir)$(Configuration)\$(Platform)\</OutDir>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='WDKRelease|Win32'">$(SolutionDir)$(Configuration)\$(Platform)\</OutDir>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(SolutionDir)$(Configuration)\$(Platform)\</OutDir>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='WDKRelease|x64'">$(SolutionDir)$(Configuration)\$(Platform)\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(SolutionDir)$(Configuration)\$(Platform)\obj\$(ProjectName)\</IntDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='LLVMDebug|x64'">$(SolutionDir)$(Configuration)\$(Platform)\obj\$(ProjectName)\</IntDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(SolutionDir)$(Configuration)\$(Platform)\obj\$(ProjectName)\</IntDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='WDKRelease|Win32'">$(SolutionDir)$(Configuration)\$(Platform)\obj\$(ProjectName)\</IntDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(SolutionDir)$(Configuration)\$(Platform)\obj\$(ProjectName)\</IntDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='WDKRelease|x64'">$(SolutionDir)$(Configuration)\$(Platform)\obj\$(ProjectName)\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(SolutionDir)\..\bin\$(Configuration)\$(Platform)\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='LLVMDebug|x64'">$(SolutionDir)\..\bin\$(Configuration)\$(Platform)\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(SolutionDir)\..\bin\$(Configuration)\$(Platform)\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='WDKRelease|Win32'">$(SolutionDir)\..\bin\$(Configuration)\$(Platform)\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(SolutionDir)\..\bin\$(Configuration)\$(Platform)\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='WDKRelease|x64'">$(SolutionDir)\..\bin\$(Configuration)\$(Platform)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(SolutionDir)\..\bin\$(Configuration)\$(Platform)\obj\$(ProjectName)\</IntDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='LLVMDebug|x64'">$(SolutionDir)\..\bin\$(Configuration)\$(Platform)\obj\$(ProjectName)\</IntDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(SolutionDir)\..\bin\$(Configuration)\$(Platform)\obj\$(ProjectName)\</IntDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='WDKRelease|Win32'">$(SolutionDir)\..\bin\$(Configuration)\$(Platform)\obj\$(ProjectName)\</IntDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(SolutionDir)\..\bin\$(Configuration)\$(Platform)\obj\$(ProjectName)\</IntDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='WDKRelease|x64'">$(SolutionDir)\..\bin\$(Configuration)\$(Platform)\obj\$(ProjectName)\</IntDir>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</LinkIncremental>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='LLVMDebug|Win32'">true</LinkIncremental>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</LinkIncremental>
@@ -166,10 +166,10 @@
     <RunCodeAnalysis Condition="'$(Configuration)|$(Platform)'=='LLVMDebug|Win32'">false</RunCodeAnalysis>
     <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</GenerateManifest>
     <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='LLVMDebug|Win32'">false</GenerateManifest>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)$(Configuration)\$(Platform)\</OutDir>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='LLVMDebug|Win32'">$(SolutionDir)$(Configuration)\$(Platform)\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)$(Configuration)\$(Platform)\obj\$(ProjectName)\</IntDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='LLVMDebug|Win32'">$(SolutionDir)$(Configuration)\$(Platform)\obj\$(ProjectName)\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)\..\bin\$(Configuration)\$(Platform)\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='LLVMDebug|Win32'">$(SolutionDir)\..\bin\$(Configuration)\$(Platform)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)\..\bin\$(Configuration)\$(Platform)\obj\$(ProjectName)\</IntDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='LLVMDebug|Win32'">$(SolutionDir)\..\bin\$(Configuration)\$(Platform)\obj\$(ProjectName)\</IntDir>
     <IncludePath Condition="'$(Configuration)|$(Platform)'=='WDKRelease|Win32'">D:\Dev\WinDDK\inc\crt;D:\Dev\WinDDK\inc\stl70;D:\Dev\WinDDK\inc\api;D:\Dev\WinDDK\inc\ddk</IncludePath>
     <LibraryPath Condition="'$(Configuration)|$(Platform)'=='WDKRelease|Win32'">D:\Dev\WinDDK\lib\crt\i386;D:\Dev\WinDDK\lib\win7\i386</LibraryPath>
     <ReferencePath Condition="'$(Configuration)|$(Platform)'=='WDKRelease|Win32'" />

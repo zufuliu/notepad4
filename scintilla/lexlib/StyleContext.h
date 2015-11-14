@@ -19,32 +19,32 @@ namespace Scintilla {
 class StyleContext {
 	LexAccessor &styler;
 	IDocumentWithLineEnd *multiByteAccess;
-	unsigned int endPos;
-	unsigned int lengthDocument;
+	Sci_PositionU endPos;
+	Sci_PositionU lengthDocument;
 
 	// Used for optimizing GetRelativeCharacter
-	unsigned int posRelative;
-	unsigned int currentPosLastRelative;
-	int offsetRelative;
+	Sci_PositionU posRelative;
+	Sci_PositionU currentPosLastRelative;
+	Sci_Position offsetRelative;
 
 	StyleContext &operator=(const StyleContext &);
 	void GetNextChar();
 
 public:
-	unsigned int currentPos;
-	int currentLine;
-	int lineDocEnd;
-	int lineStartNext;
+	Sci_PositionU currentPos;
+	Sci_Position currentLine;
+	Sci_Position lineDocEnd;
+	Sci_Position lineStartNext;
 	bool atLineStart;
 	bool atLineEnd;
 	int state;
 	int chPrev;
 	int ch;
 	int chNext;
-	int width;
-	int widthNext;
+	Sci_Position width;
+	Sci_Position widthNext;
 
-	StyleContext(unsigned int startPos, unsigned int length,
+	StyleContext(Sci_PositionU startPos, Sci_PositionU length,
 				int initStyle, LexAccessor &styler_, unsigned char chMask='\377');
 	void Complete();
 	bool More() const {
@@ -56,13 +56,13 @@ public:
 	void ChangeState(int state_);
 	void SetState(int state_);
 	void ForwardSetState(int state_);
-	int LengthCurrent() const {
+	Sci_Position LengthCurrent() const {
 		return currentPos - styler.GetStartSegment();
 	}
-	int GetRelative(int n) const {
+	int GetRelative(Sci_Position n) const {
 		return static_cast<unsigned char>(styler.SafeGetCharAt(currentPos+n));
 	}
-	int GetRelativeCharacter(int n);
+	int GetRelativeCharacter(Sci_Position n);
 	bool Match(char ch0) const {
 		return ch == static_cast<unsigned char>(ch0);
 	}
@@ -76,10 +76,10 @@ public:
 		return LexMatchIgnoreCase(currentPos, styler, s);
 	}
 	// Non-inline
-	int GetCurrent(char *s, unsigned int len) const {
+	Sci_Position GetCurrent(char *s, Sci_PositionU len) const {
 		return LexGetRange(styler.GetStartSegment(), currentPos - 1, styler, s, len);
 	}
-	int GetCurrentLowered(char *s, unsigned int len) const {
+	Sci_Position GetCurrentLowered(char *s, Sci_PositionU len) const {
 		return LexGetRangeLowered(styler.GetStartSegment(), currentPos - 1, styler, s, len);
 	}
 };

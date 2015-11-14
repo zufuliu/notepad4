@@ -21,7 +21,7 @@ static inline bool IsTexiSpec(int ch) {
 }
 
 #define MAX_WORD_LENGTH	31
-static void ColouriseTexiDoc(unsigned int startPos, int length, int initStyle, WordList *keywordLists[], Accessor &styler) {
+static void ColouriseTexiDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, WordList *keywordLists[], Accessor &styler) {
 	const bool fold = styler.GetPropertyInt("fold", 1) != 0;
 	//WordList &keywords = *keywordLists[0]; // command
 	WordList &keywords2 = *keywordLists[1];// fold
@@ -32,11 +32,11 @@ static void ColouriseTexiDoc(unsigned int startPos, int length, int initStyle, W
 	int ch = 0, chNext = styler[startPos];
 	styler.StartAt(startPos);
 	styler.StartSegment(startPos);
-	unsigned int endPos = startPos + length;
-	if (endPos == (unsigned)styler.Length())
+	Sci_PositionU endPos = startPos + length;
+	if (endPos == (Sci_PositionU)styler.Length())
 		++endPos;
 
-	int lineCurrent = styler.GetLine(startPos);
+	Sci_Position lineCurrent = styler.GetLine(startPos);
 	int levelCurrent = SC_FOLDLEVELBASE;
 	if (lineCurrent > 0)
 		levelCurrent = styler.LevelAt(lineCurrent-1) >> 16;
@@ -45,13 +45,13 @@ static void ColouriseTexiDoc(unsigned int startPos, int length, int initStyle, W
 	int wordLen = 0;
 	bool isCommand = false;
 
-	for (unsigned int i = startPos; i < endPos; i++) {
+	for (Sci_PositionU i = startPos; i < endPos; i++) {
 		const int chPrev = ch;
 		ch = chNext;
 		chNext = styler.SafeGetCharAt(i + 1);
 
 		const bool atEOL = (ch == '\r' && chNext != '\n') || (ch == '\n');
-		const bool atLineStart = i == (unsigned)styler.LineStart(lineCurrent);
+		const bool atLineStart = i == (Sci_PositionU)styler.LineStart(lineCurrent);
 
 		switch (state) {
 		case SCE_L_OPERATOR:

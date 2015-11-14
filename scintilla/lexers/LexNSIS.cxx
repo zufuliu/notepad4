@@ -22,27 +22,27 @@ static inline bool IsNsisOp(int ch) {
 }
 
 #define MAX_WORD_LENGTH	15
-static void ColouriseNSISDoc(unsigned int startPos, int length, int initStyle, WordList *[], Accessor &styler) {
+static void ColouriseNSISDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, WordList *[], Accessor &styler) {
 	int state = initStyle;
 	int ch = 0, chNext = styler[startPos];
 	styler.StartAt(startPos);
 	styler.StartSegment(startPos);
-	unsigned int endPos = startPos + length;
-	if (endPos == (unsigned)styler.Length())
+	Sci_PositionU endPos = startPos + length;
+	if (endPos == (Sci_PositionU)styler.Length())
 		++endPos;
 
 	int visibleChars = 0;
-	int lineCurrent = styler.GetLine(startPos);
+	Sci_Position lineCurrent = styler.GetLine(startPos);
 	//char buf[MAX_WORD_LENGTH + 1] = {0};
 	//int wordLen = 0;
 
-	for (unsigned int i = startPos; i < endPos; i++) {
+	for (Sci_PositionU i = startPos; i < endPos; i++) {
 		const int chPrev = ch;
 		ch = chNext;
 		chNext = styler.SafeGetCharAt(i + 1);
 
 		const bool atEOL = (ch == '\r' && chNext != '\n') || (ch == '\n');
-		const bool atLineStart = i == (unsigned)styler.LineStart(lineCurrent);
+		const bool atLineStart = i == (Sci_PositionU)styler.LineStart(lineCurrent);
 
 		switch (state) {
 		case SCE_C_OPERATOR:
@@ -214,15 +214,15 @@ static inline bool IsNsisFoldPPStart(int ch) {
 		|| (ch == 'I' || ch == 'E' || ch == 'M');
 }
 
-static void FoldNSISDoc(unsigned int startPos, int length, int initStyle, WordList *[], Accessor &styler) {
+static void FoldNSISDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, WordList *[], Accessor &styler) {
 	if (styler.GetPropertyInt("fold") == 0)
 		return;
 	const bool foldComment = styler.GetPropertyInt("fold.comment") != 0;
 	const bool foldCompact = styler.GetPropertyInt("fold.compact", 1) != 0;
 
-	unsigned int endPos = startPos + length;
+	Sci_PositionU endPos = startPos + length;
 	int visibleChars = 0;
-	int lineCurrent = styler.GetLine(startPos);
+	Sci_Position lineCurrent = styler.GetLine(startPos);
 	int levelCurrent = SC_FOLDLEVELBASE;
 	if (lineCurrent > 0)
 		levelCurrent = styler.LevelAt(lineCurrent-1) >> 16;
@@ -232,7 +232,7 @@ static void FoldNSISDoc(unsigned int startPos, int length, int initStyle, WordLi
 	int styleNext = styler.StyleAt(startPos);
 	int style = initStyle;
 
-	for (unsigned int i = startPos; i < endPos; i++) {
+	for (Sci_PositionU i = startPos; i < endPos; i++) {
 		int ch = chNext;
 		chNext = styler.SafeGetCharAt(i + 1);
 		int stylePrev = style;

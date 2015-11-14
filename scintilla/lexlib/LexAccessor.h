@@ -19,30 +19,30 @@ class LexAccessor;
 	((stl1) | ((stl2) << 8))
 #define MultiStyle4(stl1, stl2, stl3, stl4) \
 	((stl1) | ((stl2) << 8) | ((stl3) << 16) | ((stl4) << 24))
-int IsLexCommentLine(int line, LexAccessor &styler, int style);
+bool IsLexCommentLine(Sci_Position line, LexAccessor &styler, int style);
 
-int IsBackslashLine(int line, LexAccessor &styler);
+bool IsBackslashLine(Sci_Position line, LexAccessor &styler);
 
-bool IsLexLineStartsWith(int line, LexAccessor &styler, const char* word, bool matchCase, int style);
+bool IsLexLineStartsWith(Sci_Position line, LexAccessor &styler, const char* word, bool matchCase, int style);
 
-int LexLineSkipSpaceTab(int line, LexAccessor &styler);
-int LexSkipSpaceTab  (int startPos, int endPos, LexAccessor &styler);
-int LexSkipWhiteSpace(int startPos, int endPos, LexAccessor &styler);
-int LexSkipWhiteSpace(int startPos, int endPos, LexAccessor &styler, bool IsStreamCommentStyle(int));
-int LexSkipWhiteSpace(int startPos, int endPos, LexAccessor &styler,
-											bool IsStreamCommentStyle(int), const CharacterSet &charSet);
-int LexGetRange			(int startPos, int endPos, LexAccessor &styler, char *s, int len);
-int LexGetRangeLowered	(int startPos, int endPos, LexAccessor &styler, char *s, int len);
-int LexGetRange			(int startPos, LexAccessor &styler, bool IsWordChar(int), char *s, int len);
-int LexGetRangeLowered	(int startPos, LexAccessor &styler, bool IsWordChar(int), char *s, int len);
-int LexGetRange			(int startPos, LexAccessor &styler, const CharacterSet &charSet, char *s, int len);
-int LexGetRangeLowered	(int startPos, LexAccessor &styler, const CharacterSet &charSet, char *s, int len);
+Sci_Position LexLineSkipSpaceTab(Sci_Position line, LexAccessor &styler);
+Sci_Position LexSkipSpaceTab  (Sci_Position startPos, Sci_Position endPos, LexAccessor &styler);
+Sci_Position LexSkipWhiteSpace(Sci_Position startPos, Sci_Position endPos, LexAccessor &styler);
+Sci_Position LexSkipWhiteSpace(Sci_Position startPos, Sci_Position endPos, LexAccessor &styler, bool IsStreamCommentStyle(Sci_Position));
+Sci_Position LexSkipWhiteSpace(Sci_Position startPos, Sci_Position endPos, LexAccessor &styler,
+											bool IsStreamCommentStyle(Sci_Position), const CharacterSet &charSet);
+int LexGetRange			(Sci_Position startPos, Sci_Position endPos, LexAccessor &styler, char *s, int len);
+int LexGetRangeLowered	(Sci_Position startPos, Sci_Position endPos, LexAccessor &styler, char *s, int len);
+int LexGetRange			(Sci_Position startPos, LexAccessor &styler, bool IsWordChar(int), char *s, int len);
+int LexGetRangeLowered	(Sci_Position startPos, LexAccessor &styler, bool IsWordChar(int), char *s, int len);
+int LexGetRange			(Sci_Position startPos, LexAccessor &styler, const CharacterSet &charSet, char *s, int len);
+int LexGetRangeLowered	(Sci_Position startPos, LexAccessor &styler, const CharacterSet &charSet, char *s, int len);
 
-char LexGetPrevChar     (int endPos, LexAccessor &styler);
-char LexGetNextChar		(int startPos, LexAccessor &styler);
-bool IsLexAtEOL			(int pos, LexAccessor &styler);
-bool LexMatch			(int pos, LexAccessor &styler, const char *s);
-bool LexMatchIgnoreCase (int pos, LexAccessor &styler, const char *s);
+char LexGetPrevChar     (Sci_Position endPos, LexAccessor &styler);
+char LexGetNextChar		(Sci_Position startPos, LexAccessor &styler);
+bool IsLexAtEOL			(Sci_Position pos, LexAccessor &styler);
+bool LexMatch			(Sci_Position pos, LexAccessor &styler, const char *s);
+bool LexMatchIgnoreCase (Sci_Position pos, LexAccessor &styler, const char *s);
 
 enum EncodingType { enc8bit, encUnicode, encDBCS };
 
@@ -57,22 +57,22 @@ private:
 	 * in case there is some backtracking. */
 	enum {bufferSize=4096, slopSize=bufferSize/8};
 	char buf[bufferSize+1];
-	int startPos;
-	int endPos;
+	Sci_Position startPos;
+	Sci_Position endPos;
 	int codePage;
 	enum EncodingType encodingType;
-	int lenDoc;
+	Sci_Position lenDoc;
 	unsigned char styleBuf[bufferSize];
-	int validLen;
-	unsigned int startSeg;
-	int startPosStyling;
+	Sci_Position validLen;
+	Sci_PositionU startSeg;
+	Sci_Position startPosStyling;
 	int documentVersion;
 
-	void Fill(int position);
+	void Fill(Sci_Position position);
 
 public:
 	explicit LexAccessor(IDocument *pAccess_);
-	char operator[](int position);
+	char operator[](Sci_Position position);
 	IDocumentWithLineEnd *MultiByteAccess() const {
 		if (documentVersion >= dvLineEnd) {
 			return static_cast<IDocumentWithLineEnd *>(pAccess);
@@ -80,7 +80,7 @@ public:
 		return 0;
 	}
 	/** Safe version of operator[], returning a defined value for invalid position. */
-	char SafeGetCharAt(int position, char chDefault='\0');
+	char SafeGetCharAt(Sci_Position position, char chDefault='\0');
 	bool IsLeadByte(char ch) const {
 		return pAccess->IsDBCSLeadByte(ch);
 	}
@@ -88,45 +88,45 @@ public:
 		return encodingType;
 	}
 
-	bool Match(int pos, const char *s);
-	unsigned char StyleAt(int position) const {
+	bool Match(Sci_Position pos, const char *s);
+	unsigned char StyleAt(Sci_Position position) const {
 		return static_cast<unsigned char>(pAccess->StyleAt(position));
 	}
-	int GetLine(int position) const {
+	Sci_Position GetLine(Sci_Position position) const {
 		return pAccess->LineFromPosition(position);
 	}
-	int LineStart(int line) const {
+	Sci_Position LineStart(Sci_Position line) const {
 		return pAccess->LineStart(line);
 	}
-	int LineEnd(int line);
-	int LevelAt(int line) const {
+	Sci_Position LineEnd(Sci_Position line);
+	Sci_Position LevelAt(Sci_Position line) const {
 		return pAccess->GetLevel(line);
 	}
-	int Length() const {
+	Sci_Position Length() const {
 		return lenDoc;
 	}
 	void Flush();
-	int GetLineState(int line) const {
+	int GetLineState(Sci_Position line) const {
 		return pAccess->GetLineState(line);
 	}
-	int SetLineState(int line, int state) {
+	int SetLineState(Sci_Position line, int state) {
 		return pAccess->SetLineState(line, state);
 	}
 	// Style setting
-	void StartAt(unsigned int start);
-	unsigned int GetStartSegment() const {
+	void StartAt(Sci_PositionU start);
+	Sci_PositionU GetStartSegment() const {
 		return startSeg;
 	}
-	void StartSegment(unsigned int pos) {
+	void StartSegment(Sci_PositionU pos) {
 		startSeg = pos;
 	}
-	void ColourTo(unsigned int pos, int chAttr);
-	void SetLevel(int line, int level) {
+	void ColourTo(Sci_PositionU pos, int chAttr);
+	void SetLevel(Sci_Position line, int level) {
 		pAccess->SetLevel(line, level);
 	}
-	void IndicatorFill(int start, int end, int indicator, int value);
+	void IndicatorFill(Sci_Position start, Sci_Position end, int indicator, int value);
 
-	void ChangeLexerState(int start, int end) {
+	void ChangeLexerState(Sci_Position start, Sci_Position end) {
 		pAccess->ChangeLexerState(start, end);
 	}
 };

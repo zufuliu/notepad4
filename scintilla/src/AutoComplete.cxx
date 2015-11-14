@@ -19,6 +19,7 @@
 
 #include "Scintilla.h"
 #include "CharacterSet.h"
+#include "Position.h"
 #include "AutoComplete.h"
 
 #ifdef SCI_NAMESPACE

@@ -17,6 +17,7 @@
 #include "Scintilla.h"
 
 #include "StringCopy.h"
+#include "Position.h"
 #include "CallTip.h"
 
 #ifdef SCI_NAMESPACE

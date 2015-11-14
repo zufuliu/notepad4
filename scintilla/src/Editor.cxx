@@ -25,6 +25,7 @@
 #include "Scintilla.h"
 
 #include "StringCopy.h"
+#include "Position.h"
 #include "SplitVector.h"
 #include "Partitioning.h"
 #include "RunStyles.h"
@@ -172,6 +173,8 @@ Editor::Editor() {
 	paintAbandonedByStyling = false;
 	paintingAllText = false;
 	willRedrawAll = false;
+	idleStyling = SC_IDLESTYLING_NONE;
+	needIdleStyling = false;
 
 	modEventMask = SC_MODEVENTMASKALL;
 
@@ -346,17 +349,17 @@ int Editor::MaxScrollPos() const {
 	}
 }
 
-SelectionPosition Editor::ClampPositionIntoDocument(const SelectionPosition &sp) const {
-	if (sp.Position() < 0) {
+SelectionPosition Editor::ClampPositionIntoDocument(const SelectionPosition &sp_) const {
+	if (sp_.Position() < 0) {
 		return SelectionPosition(0);
-	} else if (sp.Position() > pdoc->Length()) {
+	} else if (sp_.Position() > pdoc->Length()) {
 		return SelectionPosition(pdoc->Length());
 	} else {
 		// If not at end of line then set offset to 0
-		SelectionPosition sp_ = sp;
+		SelectionPosition sp = sp_;
 		if (!pdoc->IsLineEndPosition(sp.Position()))
-			sp_.SetVirtualSpace(0);
-		return sp_;
+			sp.SetVirtualSpace(0);
+		return sp;
 	}
 }
 
@@ -479,43 +482,47 @@ void Editor::Redraw() {
 }
 
 void Editor::RedrawSelMargin(int line, bool allAfter) {
-	bool abandonDraw = false;
-	if (!wMargin.GetID())	// Margin in main window so may need to abandon and retry
-		abandonDraw = AbandonPaint();
-	if (!abandonDraw) {
-		if (vs.maskInLine) {
-			Redraw();
-		} else {
-			PRectangle rcSelMargin = GetClientRectangle();
-			rcSelMargin.right = rcSelMargin.left + vs.fixedColumnWidth;
-			if (line != -1) {
-				PRectangle rcLine = RectangleFromRange(Range(pdoc->LineStart(line)), 0);
-
-				// Inflate line rectangle if there are image markers with height larger than line height
-				if (vs.largestMarkerHeight > vs.lineHeight) {
-					int delta = (vs.largestMarkerHeight - vs.lineHeight + 1) / 2;
-					rcLine.top -= delta;
-					rcLine.bottom += delta;
-					if (rcLine.top < rcSelMargin.top)
-						rcLine.top = rcSelMargin.top;
-					if (rcLine.bottom > rcSelMargin.bottom)
-						rcLine.bottom = rcSelMargin.bottom;
-				}
-
-				rcSelMargin.top = rcLine.top;
-				if (!allAfter)
-					rcSelMargin.bottom = rcLine.bottom;
-				if (rcSelMargin.Empty())
-					return;
-			}
-			if (wMargin.GetID()) {
-				Point ptOrigin = GetVisibleOriginInMain();
-				rcSelMargin.Move(-ptOrigin.x, -ptOrigin.y);
-				wMargin.InvalidateRectangle(rcSelMargin);
-			} else {
-				wMain.InvalidateRectangle(rcSelMargin);
-			}
+	const bool markersInText = vs.maskInLine || vs.maskDrawInText;
+	if (!wMargin.GetID() || markersInText) {	// May affect text area so may need to abandon and retry
+		if (AbandonPaint()) {
+			return;
 		}
+	}
+	if (wMargin.GetID() && markersInText) {
+		Redraw();
+		return;
+	}
+	PRectangle rcMarkers = GetClientRectangle();
+	if (!markersInText) {
+		// Normal case: just draw the margin
+		rcMarkers.right = rcMarkers.left + vs.fixedColumnWidth;
+	}
+	if (line != -1) {
+		PRectangle rcLine = RectangleFromRange(Range(pdoc->LineStart(line)), 0);
+
+		// Inflate line rectangle if there are image markers with height larger than line height
+		if (vs.largestMarkerHeight > vs.lineHeight) {
+			int delta = (vs.largestMarkerHeight - vs.lineHeight + 1) / 2;
+			rcLine.top -= delta;
+			rcLine.bottom += delta;
+			if (rcLine.top < rcMarkers.top)
+				rcLine.top = rcMarkers.top;
+			if (rcLine.bottom > rcMarkers.bottom)
+				rcLine.bottom = rcMarkers.bottom;
+		}
+
+		rcMarkers.top = rcLine.top;
+		if (!allAfter)
+			rcMarkers.bottom = rcLine.bottom;
+		if (rcMarkers.Empty())
+			return;
+	}
+	if (wMargin.GetID()) {
+		Point ptOrigin = GetVisibleOriginInMain();
+		rcMarkers.Move(-ptOrigin.x, -ptOrigin.y);
+		wMargin.InvalidateRectangle(rcMarkers);
+	} else {
+		wMain.InvalidateRectangle(rcMarkers);
 	}
 }
 
@@ -917,7 +924,7 @@ void Editor::ScrollTo(int line, bool moveThumb) {
 		SetTopLine(topLineNew);
 		// Optimize by styling the view as this will invalidate any needed area
 		// which could abort the initial paint if discovered later.
-		StyleToPositionInView(PositionAfterArea(GetClientRectangle()));
+		StyleAreaBounded(GetClientRectangle(), true);
 #ifndef UNDER_CE
 		// Perform redraw rather than scroll if many lines would be redrawn anyway.
 		if (performBlit) {
@@ -1690,7 +1697,7 @@ void Editor::Paint(Surface *surfaceWindow, const PRectangle &rcArea) {
 
 	paintAbandonedByStyling = false;
 
-	StyleToPositionInView(PositionAfterArea(rcArea));
+	StyleAreaBounded(rcArea, false);
 
 	PRectangle rcClient = GetClientRectangle();
 	//Platform::DebugPrintf("Client: (%3d,%3d) ... (%3d,%3d)   %d\n",
@@ -1950,11 +1957,25 @@ void Editor::AddCharUTF(const char *s, unsigned int len, bool treatAsDBCS) {
 	}
 }
 
-void Editor::FillVirtualSpace() {
-	const bool tmpOverstrike = inOverstrike;
-	inOverstrike = false;         // not allow to be deleted twice.
-	AddCharUTF("", 0);
-	inOverstrike = tmpOverstrike;
+void Editor::ClearBeforeTentativeStart() {
+	// Make positions for the first composition string.
+	for (size_t r = 0; r<sel.Count(); r++) {
+		if (!RangeContainsProtected(sel.Range(r).Start().Position(),
+			sel.Range(r).End().Position())) {
+			int positionInsert = sel.Range(r).Start().Position();
+			if (!sel.Range(r).Empty()) {
+				if (sel.Range(r).Length()) {
+					pdoc->DeleteChars(positionInsert, sel.Range(r).Length());
+					sel.Range(r).ClearVirtualSpace();
+				} else {
+					// Range is all virtual so collapse to start of virtual space
+					sel.Range(r).MinimizeVirtualSpace();
+				}
+			}
+			InsertSpace(positionInsert, sel.Range(r).caret.VirtualSpace());
+			sel.Range(r).ClearVirtualSpace();
+		}
+	}
 }
 
 void Editor::InsertPaste(const char *text, int len) {
@@ -3899,9 +3920,7 @@ long Editor::FindText(
 	int lengthFound = istrlen(ft->lpstrText);
 	if (!pdoc->HasCaseFolder())
 		pdoc->SetCaseFolder(CaseFolderForEncoding());
-#if !defined(__clang__)
 	try {
-#endif
 		long pos = pdoc->FindText(
 			static_cast<int>(ft->chrg.cpMin),
 			static_cast<int>(ft->chrg.cpMax),
@@ -3913,12 +3932,10 @@ long Editor::FindText(
 			ft->chrgText.cpMax = pos + lengthFound;
 		}
 		return static_cast<int>(pos);
-#if !defined(__clang__)
 	} catch (const RegexError &) {
 		errorStatus = SC_STATUS_WARN_REGEX;
 		return -1;
 	}
-#endif
 }
 
 /**
@@ -3952,9 +3969,7 @@ long Editor::SearchText(
 	int lengthFound = istrlen(txt);
 	if (!pdoc->HasCaseFolder())
 		pdoc->SetCaseFolder(CaseFolderForEncoding());
-#if !defined(__clang__)
 	try {
-#endif
 		if (iMessage == SCI_SEARCHNEXT) {
 			pos = pdoc->FindText(searchAnchor, pdoc->Length(), txt,
 					static_cast<int>(wParam),
@@ -3964,12 +3979,10 @@ long Editor::SearchText(
 					static_cast<int>(wParam),
 					&lengthFound);
 		}
-#if !defined(__clang__)
 	} catch (const RegexError &) {
 		errorStatus = SC_STATUS_WARN_REGEX;
 		return -1;
 	}
-#endif
 	if (pos != -1) {
 		SetSelection(static_cast<int>(pos), static_cast<int>(pos + lengthFound));
 	}
@@ -4003,9 +4016,7 @@ long Editor::SearchInTarget(const char *text, int length) {
 
 	if (!pdoc->HasCaseFolder())
 		pdoc->SetCaseFolder(CaseFolderForEncoding());
-#if !defined(__clang__)
 	try {
-#endif
 		long pos = pdoc->FindText(targetStart, targetEnd, text,
 				searchFlags,
 				&lengthFound);
@@ -4014,12 +4025,10 @@ long Editor::SearchInTarget(const char *text, int length) {
 			targetEnd = static_cast<int>(pos + lengthFound);
 		}
 		return pos;
-#if !defined(__clang__)
 	} catch (const RegexError &) {
 		errorStatus = SC_STATUS_WARN_REGEX;
 		return -1;
 	}
-#endif
 }
 
 void Editor::GoToLine(int lineNo) {
@@ -4890,6 +4899,8 @@ bool Editor::Idle() {
 		// No more wrapping
 		if (!wrapPending.NeedsWrap())
 			wrappingDone = true;
+	} else if (needIdleStyling) {
+		IdleStyling();
 	}
 
 	// Add more idle things to do here, but make sure idleDone is
@@ -4897,7 +4908,7 @@ bool Editor::Idle() {
 	// false will stop calling this idle function until SetIdle() is
 	// called again.
 
-	idleDone = wrappingDone; // && thatDone && theOtherThingDone...
+	idleDone = wrappingDone && !needIdleStyling; // && thatDone && theOtherThingDone...
 
 	return !idleDone;
 }
@@ -5000,12 +5011,71 @@ void Editor::StyleToPositionInView(Position pos) {
 	}
 }
 
+int Editor::PositionAfterMaxStyling(int posMax, bool scrolling) const {
+	if ((idleStyling == SC_IDLESTYLING_NONE) || (idleStyling == SC_IDLESTYLING_AFTERVISIBLE)) {
+		// Both states do not limit styling
+		return posMax;
+	}
+
+	// Try to keep time taken by styling reasonable so interaction remains smooth.
+	// When scrolling, allow less time to ensure responsive
+	const double secondsAllowed = scrolling ? 0.005 : 0.02;
+
+	const int linesToStyle = Platform::Clamp(static_cast<int>(secondsAllowed / pdoc->durationStyleOneLine),
+		10, 0x10000);
+	const int stylingMaxLine = std::min(
+		static_cast<int>(pdoc->LineFromPosition(pdoc->GetEndStyled()) + linesToStyle),
+		pdoc->LinesTotal());
+	return std::min(static_cast<int>(pdoc->LineStart(stylingMaxLine)), posMax);
+}
+
+void Editor::StartIdleStyling(bool truncatedLastStyling) {
+	if ((idleStyling == SC_IDLESTYLING_ALL) || (idleStyling == SC_IDLESTYLING_AFTERVISIBLE)) {
+		if (pdoc->GetEndStyled() < pdoc->Length()) {
+			// Style remainder of document in idle time
+			needIdleStyling = true;
+		}
+	} else if (truncatedLastStyling) {
+		needIdleStyling = true;
+	}
+
+	if (needIdleStyling) {
+		SetIdle(true);
+	}
+}
+
+// Style for an area but bound the amount of styling to remain responsive
+void Editor::StyleAreaBounded(PRectangle rcArea, bool scrolling) {
+	const int posAfterArea = PositionAfterArea(rcArea);
+	const int posAfterMax = PositionAfterMaxStyling(posAfterArea, scrolling);
+	if (posAfterMax < posAfterArea) {
+		// Idle styling may be performed before current visible area
+		// Style a bit now then style further in idle time
+		pdoc->StyleToAdjustingLineDuration(posAfterMax);
+	} else {
+		// Can style all wanted now.
+		StyleToPositionInView(posAfterArea);
+	}
+	StartIdleStyling(posAfterMax < posAfterArea);
+}
+
+void Editor::IdleStyling() {
+	const int posAfterArea = PositionAfterArea(GetClientRectangle());
+	const int endGoal = (idleStyling >= SC_IDLESTYLING_AFTERVISIBLE) ?
+		pdoc->Length() : posAfterArea;
+	const int posAfterMax = PositionAfterMaxStyling(endGoal, false);
+	pdoc->StyleToAdjustingLineDuration(posAfterMax);
+	if (pdoc->GetEndStyled() >= endGoal) {
+		needIdleStyling = false;
+	}
+}
+
 void Editor::IdleWork() {
 	// Style the line after the modification as this allows modifications that change just the
 	// line of the modification to heal instead of propagating to the rest of the window.
-	if (workNeeded.items & WorkNeeded::workStyle)
+	if (workNeeded.items & WorkNeeded::workStyle) {
 		StyleToPositionInView(pdoc->LineStart(pdoc->LineFromPosition(workNeeded.upTo) + 2));
-
+	}
 	NotifyUpdateUI();
 	workNeeded.Reset();
 }
@@ -6264,7 +6334,10 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 		break;
 
 	case SCI_SETSTYLING:
-		pdoc->SetStyleFor(static_cast<int>(wParam), static_cast<char>(lParam));
+		if (static_cast<int>(wParam) < 0)
+			errorStatus = SC_STATUS_FAILURE;
+		else
+			pdoc->SetStyleFor(static_cast<int>(wParam), static_cast<char>(lParam));
 		break;
 
 	case SCI_SETSTYLINGEX:             // Specify a complete styling buffer
@@ -6394,6 +6467,13 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 
 	case SCI_ISRANGEWORD:
 		return pdoc->IsWordAt(static_cast<int>(wParam), static_cast<int>(lParam));
+
+	case SCI_SETIDLESTYLING:
+		idleStyling = static_cast<int>(wParam);
+		break;
+
+	case SCI_GETIDLESTYLING:
+		return idleStyling;
 
 	case SCI_SETWRAPMODE:
 		if (vs.SetWrapState(static_cast<int>(wParam))) {
@@ -7915,7 +7995,7 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 
 	case SCI_SWAPMAINANCHORCARET:
 		InvalidateSelection(sel.RangeMain());
-		sel.RangeMain() = SelectionRange(sel.RangeMain().anchor, sel.RangeMain().caret);
+		sel.RangeMain().Swap();
 		break;
 
 	case SCI_MULTIPLESELECTADDNEXT:

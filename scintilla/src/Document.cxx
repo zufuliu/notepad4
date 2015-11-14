@@ -26,6 +26,7 @@
 #include "Scintilla.h"
 
 #include "CharacterSet.h"
+#include "Position.h"
 #include "SplitVector.h"
 #include "Partitioning.h"
 #include "RunStyles.h"
@@ -108,6 +109,7 @@ Document::Document() {
 	useTabs = true;
 	tabIndents = true;
 	backspaceUnindents = false;
+	durationStyleOneLine = 0.00001;
 
 	matchesValid = false;
 	regex = 0;
@@ -339,7 +341,7 @@ int Document::LineFromHandle(int markerHandle) {
 	return static_cast<LineMarkers *>(perLineData[ldMarkers])->LineFromHandle(markerHandle);
 }
 
-int SCI_METHOD Document::LineStart(int line) const {
+Sci_Position SCI_METHOD Document::LineStart(Sci_Position line) const {
 	return cb.LineStart(line);
 }
 
@@ -347,7 +349,7 @@ bool Document::IsLineStartPosition(int position) const {
 	return LineStart(LineFromPosition(position)) == position;
 }
 
-int SCI_METHOD Document::LineEnd(int line) const {
+Sci_Position SCI_METHOD Document::LineEnd(Sci_Position line) const {
 	if (line >= LinesTotal() - 1) {
 		return LineStart(line + 1);
 	} else {
@@ -381,7 +383,7 @@ void SCI_METHOD Document::SetErrorStatus(int status) {
 	}
 }
 
-int SCI_METHOD Document::LineFromPosition(int pos) const {
+Sci_Position SCI_METHOD Document::LineFromPosition(Sci_Position pos) const {
 	return cb.LineFromPosition(pos);
 }
 
@@ -410,7 +412,7 @@ int Document::VCHomePosition(int position) const {
 		return startText;
 }
 
-int SCI_METHOD Document::SetLevel(int line, int level) {
+int SCI_METHOD Document::SetLevel(Sci_Position line, int level) {
 	int prev = static_cast<LineLevels *>(perLineData[ldLevels])->SetLevel(line, level, LinesTotal());
 	if (prev != level) {
 		DocModification mh(SC_MOD_CHANGEFOLD | SC_MOD_CHANGEMARKER,
@@ -422,7 +424,7 @@ int SCI_METHOD Document::SetLevel(int line, int level) {
 	return prev;
 }
 
-int SCI_METHOD Document::GetLevel(int line) const {
+int SCI_METHOD Document::GetLevel(Sci_Position line) const {
 	return static_cast<LineLevels *>(perLineData[ldLevels])->GetLevel(line);
 }
 
@@ -770,7 +772,7 @@ bool Document::NextCharacter(int &pos, int moveDir) const {
 }
 
 // Return -1  on out-of-bounds
-int SCI_METHOD Document::GetRelativePosition(int positionStart, int characterOffset) const {
+Sci_Position SCI_METHOD Document::GetRelativePosition(Sci_Position positionStart, Sci_Position characterOffset) const {
 	int pos = positionStart;
 	if (dbcsCodePage) {
 		const int increment = (characterOffset > 0) ? 1 : -1;
@@ -810,7 +812,7 @@ int Document::GetRelativePositionUTF16(int positionStart, int characterOffset) c
 	return pos;
 }
 
-int SCI_METHOD Document::GetCharacterAndWidth(int position, int *pWidth) const {
+int SCI_METHOD Document::GetCharacterAndWidth(Sci_Position position, Sci_Position *pWidth) const {
 	int character;
 	int bytesInCharacter = 1;
 	if (dbcsCodePage) {
@@ -1050,19 +1052,15 @@ void Document::ChangeInsertion(const char *s, int length) {
 	insertion.assign(s, length);
 }
 
-int SCI_METHOD Document::AddData(char *data, int length) {
-#if !defined(__clang__)
+int SCI_METHOD Document::AddData(char *data, Sci_Position length) {
 	try {
-#endif
 		int position = Length();
 		InsertString(position, data, length);
-#if !defined(__clang__)
 	} catch (std::bad_alloc &) {
 		return SC_STATUS_BADALLOC;
 	} catch (...) {
 		return SC_STATUS_FAILURE;
 	}
-#endif
 	return 0;
 }
 
@@ -1251,7 +1249,7 @@ static std::string CreateIndentation(int indent, int tabSize, bool insertSpaces)
 	return indentation;
 }
 
-int SCI_METHOD Document::GetLineIndentation(int line) const {
+int SCI_METHOD Document::GetLineIndentation(Sci_Position line) const {
 	int indent = 0;
 	if ((line >= 0) && (line < LinesTotal())) {
 		int lineStart = LineStart(line);
@@ -1328,8 +1326,6 @@ int Document::CountCharacters(int startPos, int endPos) const {
 	int i = startPos;
 	while (i < endPos) {
 		count++;
-		if (IsCrLf(i))
-			i++;
 		i = NextPosition(i, 1);
 	}
 	return count;
@@ -1833,11 +1829,11 @@ int Document::GetCharsOfClass(CharClassify::cc characterClass, unsigned char *bu
     return charClass.GetCharsOfClass(characterClass, buffer);
 }
 
-void SCI_METHOD Document::StartStyling(int position, unsigned char) {
+void SCI_METHOD Document::StartStyling(Sci_Position position, unsigned char) {
 	endStyled = position;
 }
 
-bool SCI_METHOD Document::SetStyleFor(int length, unsigned char style) {
+bool SCI_METHOD Document::SetStyleFor(Sci_Position length, unsigned char style) {
 	if (enteredStyling != 0) {
 		return false;
 	} else {
@@ -1854,7 +1850,7 @@ bool SCI_METHOD Document::SetStyleFor(int length, unsigned char style) {
 	}
 }
 
-bool SCI_METHOD Document::SetStyles(int length, const unsigned char *styles) {
+bool SCI_METHOD Document::SetStyles(Sci_Position length, const unsigned char *styles) {
 	if (enteredStyling != 0) {
 		return false;
 	} else {
@@ -1899,6 +1895,33 @@ void Document::EnsureStyledTo(int pos) {
 	}
 }
 
+void Document::StyleToAdjustingLineDuration(int pos) {
+	// Place bounds on the duration used to avoid glitches spiking it
+	// and so causing slow styling or non-responsive scrolling
+	const double minDurationOneLine = 0.000001;
+	const double maxDurationOneLine = 0.0001;
+
+	// Alpha value for exponential smoothing.
+	// Most recent value contributes 25% to smoothed value.
+	const double alpha = 0.25;
+
+	const Sci_Position lineFirst = LineFromPosition(GetEndStyled());
+	ElapsedTime etStyling;
+	EnsureStyledTo(pos);
+	const double durationStyling = etStyling.Duration();
+	const Sci_Position lineLast = LineFromPosition(GetEndStyled());
+	if (lineLast >= lineFirst + 8) {
+		// Only adjust for styling multiple lines to avoid instability
+		const double durationOneLine = durationStyling / (lineLast - lineFirst);
+		durationStyleOneLine = alpha * durationOneLine + (1.0 - alpha) * durationStyleOneLine;
+		if (durationStyleOneLine < minDurationOneLine) {
+			durationStyleOneLine = minDurationOneLine;
+		} else if (durationStyleOneLine > maxDurationOneLine) {
+			durationStyleOneLine = maxDurationOneLine;
+		}
+	}
+}
+
 void Document::LexerChanged() {
 	// Tell the watchers the lexer has changed.
 	for (std::vector<WatcherWithUserData>::iterator it = watchers.begin(); it != watchers.end(); ++it) {
@@ -1906,7 +1929,7 @@ void Document::LexerChanged() {
 	}
 }
 
-int SCI_METHOD Document::SetLineState(int line, int state) {
+int SCI_METHOD Document::SetLineState(Sci_Position line, int state) {
 	int statePrevious = static_cast<LineState *>(perLineData[ldState])->SetLineState(line, state);
 	if (state != statePrevious) {
 		DocModification mh(SC_MOD_CHANGELINESTATE, LineStart(line), 0, 0, 0, line);
@@ -1915,7 +1938,7 @@ int SCI_METHOD Document::SetLineState(int line, int state) {
 	return statePrevious;
 }
 
-int SCI_METHOD Document::GetLineState(int line) const {
+int SCI_METHOD Document::GetLineState(Sci_Position line) const {
 	return static_cast<LineState *>(perLineData[ldState])->GetLineState(line);
 }
 
@@ -1923,7 +1946,7 @@ int Document::GetMaxLineState() {
 	return static_cast<LineState *>(perLineData[ldState])->GetMaxLineState();
 }
 
-void SCI_METHOD Document::ChangeLexerState(int start, int end) {
+void SCI_METHOD Document::ChangeLexerState(Sci_Position start, Sci_Position end) {
 	DocModification mh(SC_MOD_LEXERSTATE, start, end-start, 0, 0, 0);
 	NotifyModified(mh);
 }
@@ -2003,7 +2026,7 @@ void Document::IncrementStyleClock() {
 	styleClock = (styleClock + 1) % 0x100000;
 }
 
-void SCI_METHOD Document::DecorationFillRange(int position, int value, int fillLength) {
+void SCI_METHOD Document::DecorationFillRange(Sci_Position position, int value, Sci_Position fillLength) {
 	if (decorations.FillRange(position, value, fillLength)) {
 		DocModification mh(SC_MOD_CHANGEINDICATOR | SC_PERFORMED_USER,
 							position, fillLength);
@@ -2148,7 +2171,7 @@ int Document::WordPartRight(int pos) {
 	return pos;
 }
 
-bool IsLineEndChar(char c) {
+static inline bool IsLineEndChar(char c) {
 	return (c == '\n' || c == '\r');
 }
 

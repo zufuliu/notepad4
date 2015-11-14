@@ -17,7 +17,7 @@
 
 #define MAX_WORD_LENGTH	31
 
-static void CheckLLVMVarType(unsigned pos, unsigned endPos, Accessor &styler, bool& is_func, bool& is_type) {
+static void CheckLLVMVarType(Sci_PositionU pos, Sci_PositionU endPos, Accessor &styler, bool& is_func, bool& is_type) {
 	char c = 0;
 	while (pos < endPos) {
 		c = styler.SafeGetCharAt(pos, '\0');
@@ -48,7 +48,7 @@ static void CheckLLVMVarType(unsigned pos, unsigned endPos, Accessor &styler, bo
 	}
 }
 
-static void ColouriseLLVMDoc(unsigned int startPos, int length, int initStyle, WordList *keywordLists[], Accessor &styler) {
+static void ColouriseLLVMDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, WordList *keywordLists[], Accessor &styler) {
 	WordList &keywords = *keywordLists[0];
 	WordList &keywords2 = *keywordLists[1];
 	WordList &kwAttr = *keywordLists[4];
@@ -58,11 +58,11 @@ static void ColouriseLLVMDoc(unsigned int startPos, int length, int initStyle, W
 	int chNext = styler[startPos];
 	styler.StartAt(startPos);
 	styler.StartSegment(startPos);
-	unsigned int endPos = startPos + length;
-	if (endPos == (unsigned)styler.Length())
+	Sci_PositionU endPos = startPos + length;
+	if (endPos == (Sci_PositionU)styler.Length())
 		++endPos;
 
-	int lineCurrent = styler.GetLine(startPos);
+	Sci_Position lineCurrent = styler.GetLine(startPos);
 	char buf[MAX_WORD_LENGTH + 1] = {0};
 	int wordLen = 0;
 
@@ -71,7 +71,7 @@ static void ColouriseLLVMDoc(unsigned int startPos, int length, int initStyle, W
 		chNext = styler.SafeGetCharAt(i + 1);
 
 		const bool atEOL = (ch == '\r' && chNext != '\n') || (ch == '\n');
-		const bool atLineStart = i == (unsigned)styler.LineStart(lineCurrent);
+		const bool atLineStart = i == (Sci_PositionU)styler.LineStart(lineCurrent);
 
 		switch (state) {
 		case SCE_C_OPERATOR:
@@ -191,15 +191,15 @@ static void ColouriseLLVMDoc(unsigned int startPos, int length, int initStyle, W
 }
 
 #define IsCommentLine(line)			IsLexCommentLine(line, styler, SCE_C_COMMENTLINE)
-static void FoldLLVMDoc(unsigned int startPos, int length, int initStyle, WordList *[], Accessor &styler) {
+static void FoldLLVMDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, WordList *[], Accessor &styler) {
 	if (styler.GetPropertyInt("fold") == 0)
 		return;
 	const bool foldComment = styler.GetPropertyInt("fold.comment") != 0;
 	const bool foldCompact = styler.GetPropertyInt("fold.compact", 1) != 0;
 
-	unsigned int endPos = startPos + length;
+	Sci_PositionU endPos = startPos + length;
 	int visibleChars = 0;
-	int lineCurrent = styler.GetLine(startPos);
+	Sci_Position lineCurrent = styler.GetLine(startPos);
 	int levelCurrent = SC_FOLDLEVELBASE;
 	if (lineCurrent > 0)
 		levelCurrent = styler.LevelAt(lineCurrent-1) >> 16;
@@ -209,7 +209,7 @@ static void FoldLLVMDoc(unsigned int startPos, int length, int initStyle, WordLi
 	int styleNext = styler.StyleAt(startPos);
 	int style = initStyle;
 
-	for (unsigned int i = startPos; i < endPos; i++) {
+	for (Sci_PositionU i = startPos; i < endPos; i++) {
 		char ch = chNext;
 		chNext = styler.SafeGetCharAt(i + 1);
 		style = styleNext;

@@ -33,6 +33,7 @@
 #include "Catalogue.h"
 #endif
 
+#include "Position.h"
 #include "SplitVector.h"
 #include "Partitioning.h"
 #include "RunStyles.h"

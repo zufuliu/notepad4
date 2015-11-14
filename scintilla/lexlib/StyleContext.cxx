@@ -31,12 +31,12 @@ void StyleContext::GetNextChar() {
 	// End of line determined from line end position, allowing CR, LF,
 	// CRLF and Unicode line ends as set by document.
 	if (currentLine < lineDocEnd)
-		atLineEnd = static_cast<int>(currentPos) >= (lineStartNext-1);
+		atLineEnd = static_cast<Sci_Position>(currentPos) >= (lineStartNext-1);
 	else // Last line
-		atLineEnd = static_cast<int>(currentPos) >= lineStartNext;
+		atLineEnd = static_cast<Sci_Position>(currentPos) >= lineStartNext;
 }
 
-StyleContext::StyleContext(unsigned int startPos, unsigned int length,
+StyleContext::StyleContext(Sci_PositionU startPos, Sci_PositionU length,
 		int initStyle, LexAccessor &styler_, unsigned char chMask) :
 	styler(styler_),
 	multiByteAccess(0),
@@ -61,11 +61,11 @@ StyleContext::StyleContext(unsigned int startPos, unsigned int length,
 	styler.StartSegment(startPos);
 	currentLine = styler.GetLine(startPos);
 	lineStartNext = styler.LineStart(currentLine+1);
-	lengthDocument = static_cast<unsigned int>(styler.Length());
+	lengthDocument = static_cast<Sci_PositionU>(styler.Length());
 	if (endPos == lengthDocument)
 		endPos++;
 	lineDocEnd = styler.GetLine(lengthDocument);
-	atLineStart = static_cast<unsigned int>(styler.LineStart(currentLine)) == startPos;
+	atLineStart = static_cast<Sci_PositionU>(styler.LineStart(currentLine)) == startPos;
 
 	// Variable width is now 0 so GetNextChar gets the char at currentPos into chNext/widthNext
 	width = 0;
@@ -102,12 +102,12 @@ void StyleContext::Forward() {
 	}
 }
 
-void StyleContext::Forward(int nb) {
-	for (int i = 0; i < nb; i++) {
+void StyleContext::Forward(Sci_Position nb) {
+	for (Sci_Position i = 0; i < nb; i++) {
 		Forward();
 	}
 }
-void StyleContext::ForwardBytes(int nb) {
+void StyleContext::ForwardBytes(Sci_Position nb) {
 	size_t forwardPos = currentPos + nb;
 	while (forwardPos > currentPos) {
 		Forward();
@@ -126,7 +126,7 @@ void StyleContext::ForwardSetState(int state_) {
 	state = state_;
 }
 
-int StyleContext::GetRelativeCharacter(int n) {
+int StyleContext::GetRelativeCharacter(Sci_Position n) {
 	if (n == 0)
 		return ch;
 	if (multiByteAccess) {
@@ -136,8 +136,8 @@ int StyleContext::GetRelativeCharacter(int n) {
 			posRelative = currentPos;
 			offsetRelative = 0;
 		}
-		int diffRelative = n - offsetRelative;
-		int posNew = multiByteAccess->GetRelativePosition(posRelative, diffRelative);
+		Sci_Position diffRelative = n - offsetRelative;
+		Sci_Position posNew = multiByteAccess->GetRelativePosition(posRelative, diffRelative);
 		int chReturn = multiByteAccess->GetCharacterAndWidth(posNew, 0);
 		posRelative = posNew;
 		currentPosLastRelative = currentPos;

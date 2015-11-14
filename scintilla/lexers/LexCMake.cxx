@@ -32,7 +32,7 @@ static inline bool IsCmakeOperator(char ch) {
 	return ch == '(' || ch == ')' || ch == '=' || ch == ':';
 }
 
-static void ColouriseCmakeDoc(unsigned int startPos, int length, int initStyle, WordList *keywordLists[], Accessor &styler) {
+static void ColouriseCmakeDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, WordList *keywordLists[], Accessor &styler) {
 	WordList &keywords = *keywordLists[0];
 	WordList &keywords2 = *keywordLists[1];
 
@@ -146,15 +146,15 @@ _label_var_string:
 #define IsCommentLine(line)		IsLexCommentLine(line, styler, SCE_CMAKE_COMMENT)
 #define CMakeMatch(str)			LexMatchIgnoreCase(i, styler, str)
 
-static void FoldCmakeDoc(unsigned int startPos, int length, int initStyle, WordList *[], Accessor &styler) {
+static void FoldCmakeDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, WordList *[], Accessor &styler) {
 	if (styler.GetPropertyInt("fold") == 0)
 		return;
 	const bool foldComment = styler.GetPropertyInt("fold.comment", 1) != 0;
 	//const bool foldCompact = styler.GetPropertyInt("fold.compact") != 0;
 
-	unsigned int endPos = startPos + length;
+	Sci_PositionU endPos = startPos + length;
 	//int visibleChars = 0;
-	int lineCurrent = styler.GetLine(startPos);
+	Sci_Position lineCurrent = styler.GetLine(startPos);
 	int levelCurrent = SC_FOLDLEVELBASE;
 	if (lineCurrent > 0)
 		levelCurrent = styler.LevelAt(lineCurrent-1) >> 16;
@@ -164,7 +164,7 @@ static void FoldCmakeDoc(unsigned int startPos, int length, int initStyle, WordL
 	int styleNext = styler.StyleAt(startPos);
 	int style = initStyle;
 
-	for (unsigned int i = startPos; i < endPos; i++) {
+	for (Sci_PositionU i = startPos; i < endPos; i++) {
 		char ch = chNext;
 		chNext = styler.SafeGetCharAt(i + 1);
 		int stylePrev = style;

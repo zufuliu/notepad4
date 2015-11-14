@@ -11,6 +11,8 @@
 #ifndef SCINTILLA_H
 #define SCINTILLA_H
 
+#include "Sci_Position.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -71,6 +73,7 @@ typedef sptr_t (*SciFnDirect)(sptr_t ptr, unsigned int iMessage, uptr_t wParam, 
 #define SCWS_INVISIBLE 0
 #define SCWS_VISIBLEALWAYS 1
 #define SCWS_VISIBLEAFTERINDENT 2
+#define SCWS_VISIBLEONLYININDENT 3
 #define SCI_GETVIEWWS 2020
 #define SCI_SETVIEWWS 2021
 #define SCI_POSITIONFROMPOINT 2022
@@ -194,6 +197,7 @@ typedef sptr_t (*SciFnDirect)(sptr_t ptr, unsigned int iMessage, uptr_t wParam, 
 #define SC_CHARSET_MAC 77
 #define SC_CHARSET_OEM 255
 #define SC_CHARSET_RUSSIAN 204
+#define SC_CHARSET_OEM866 866
 #define SC_CHARSET_CYRILLIC 1251
 #define SC_CHARSET_SHIFTJIS 128
 #define SC_CHARSET_SYMBOL 2
@@ -504,6 +508,12 @@ typedef sptr_t (*SciFnDirect)(sptr_t ptr, unsigned int iMessage, uptr_t wParam, 
 #define SCI_WORDSTARTPOSITION 2266
 #define SCI_WORDENDPOSITION 2267
 #define SCI_ISRANGEWORD 2691
+#define SC_IDLESTYLING_NONE 0
+#define SC_IDLESTYLING_TOVISIBLE 1
+#define SC_IDLESTYLING_AFTERVISIBLE 2
+#define SC_IDLESTYLING_ALL 3
+#define SCI_SETIDLESTYLING 2692
+#define SCI_GETIDLESTYLING 2693
 #define SC_WRAP_NONE 0
 #define SC_WRAP_WORD 1
 #define SC_WRAP_CHAR 2
@@ -1072,8 +1082,8 @@ namespace Scintilla {
 #endif
 
 struct Sci_CharacterRange {
-	long cpMin;
-	long cpMax;
+	Sci_PositionCR cpMin;
+	Sci_PositionCR cpMax;
 };
 
 struct Sci_TextRange {
@@ -1126,7 +1136,7 @@ struct Sci_NotifyHeader {
 
 struct SCNotification {
 	struct Sci_NotifyHeader nmhdr;
-	int position;
+	Sci_Position position;
 	/* SCN_STYLENEEDED, SCN_DOUBLECLICK, SCN_MODIFIED, SCN_MARGINCLICK, */
 	/* SCN_NEEDSHOWN, SCN_DWELLSTART, SCN_DWELLEND, SCN_CALLTIPCLICK, */
 	/* SCN_HOTSPOTCLICK, SCN_HOTSPOTDOUBLECLICK, SCN_HOTSPOTRELEASECLICK, */
@@ -1144,12 +1154,12 @@ struct SCNotification {
 	const char *text;
 	/* SCN_MODIFIED, SCN_USERLISTSELECTION, SCN_AUTOCSELECTION, SCN_URIDROPPED */
 
-	int length;		/* SCN_MODIFIED */
-	int linesAdded;	/* SCN_MODIFIED */
+	Sci_Position length;		/* SCN_MODIFIED */
+	Sci_Position linesAdded;	/* SCN_MODIFIED */
 	int message;	/* SCN_MACRORECORD */
 	uptr_t wParam;	/* SCN_MACRORECORD */
 	sptr_t lParam;	/* SCN_MACRORECORD */
-	int line;		/* SCN_MODIFIED */
+	Sci_Position line;		/* SCN_MODIFIED */
 	int foldLevelNow;	/* SCN_MODIFIED */
 	int foldLevelPrev;	/* SCN_MODIFIED */
 	int margin;		/* SCN_MARGINCLICK */
@@ -1157,7 +1167,7 @@ struct SCNotification {
 	int x;			/* SCN_DWELLSTART, SCN_DWELLEND */
 	int y;		/* SCN_DWELLSTART, SCN_DWELLEND */
 	int token;		/* SCN_MODIFIED with SC_MOD_CONTAINER */
-	int annotationLinesAdded;	/* SCN_MODIFIED with SC_MOD_CHANGEANNOTATION */
+	Sci_Position annotationLinesAdded;	/* SCN_MODIFIED with SC_MOD_CHANGEANNOTATION */
 	int updated;	/* SCN_UPDATEUI */
 	int listCompletionMethod;
 	/* SCN_AUTOCSELECTION, SCN_AUTOCCOMPLETED, SCN_USERLISTSELECTION, */

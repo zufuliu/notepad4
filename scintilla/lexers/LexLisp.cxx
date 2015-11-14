@@ -24,27 +24,27 @@ static inline bool IsLispOp(int ch) {
 }
 
 #define MAX_WORD_LENGTH	15
-static void ColouriseLispDoc(unsigned int startPos, int length, int initStyle, WordList *keywordLists[], Accessor &styler) {
+static void ColouriseLispDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, WordList *keywordLists[], Accessor &styler) {
 	WordList &keywords = *keywordLists[0];
 
 	int state = initStyle;
 	int chNext = styler[startPos];
 	styler.StartAt(startPos);
 	styler.StartSegment(startPos);
-	unsigned int endPos = startPos + length;
-	if (endPos == (unsigned)styler.Length())
+	Sci_PositionU endPos = startPos + length;
+	if (endPos == (Sci_PositionU)styler.Length())
 		++endPos;
 
-	int lineCurrent = styler.GetLine(startPos);
+	Sci_Position lineCurrent = styler.GetLine(startPos);
 	char buf[MAX_WORD_LENGTH + 1] = {0};
 	int wordLen = 0;
 
-	for (unsigned int i = startPos; i < endPos; i++) {
+	for (Sci_PositionU i = startPos; i < endPos; i++) {
 		int ch = chNext;
 		chNext = styler.SafeGetCharAt(i + 1);
 
 		const bool atEOL = (ch == '\r' && chNext != '\n') || (ch == '\n');
-		const bool atLineStart = i == (unsigned)styler.LineStart(lineCurrent);
+		const bool atLineStart = i == (Sci_PositionU)styler.LineStart(lineCurrent);
 		if (atEOL || i == endPos-1) {
 			lineCurrent++;
 		}
@@ -142,15 +142,15 @@ static void ColouriseLispDoc(unsigned int startPos, int length, int initStyle, W
 #define IsCommentLine(line)			IsLexCommentLine(line, styler, SCE_C_COMMENTLINE)
 #define IsStreamStyle(style)		(style == SCE_C_STRING)
 #define IsStreamCommantStyle(style)	(style == SCE_C_COMMENT)
-static void FoldListDoc(unsigned int startPos, int length, int initStyle, WordList *[], Accessor &styler) {
+static void FoldListDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, WordList *[], Accessor &styler) {
 	if (styler.GetPropertyInt("fold") == 0)
 		return;
 	const bool foldComment = styler.GetPropertyInt("fold.comment") != 0;
 	const bool foldCompact = styler.GetPropertyInt("fold.compact", 1) != 0;
 
-	unsigned int endPos = startPos + length;
+	Sci_PositionU endPos = startPos + length;
 	int visibleChars = 0;
-	int lineCurrent = styler.GetLine(startPos);
+	Sci_Position lineCurrent = styler.GetLine(startPos);
 	int levelCurrent = SC_FOLDLEVELBASE;
 	if (lineCurrent > 0)
 		levelCurrent = styler.LevelAt(lineCurrent-1) >> 16;
@@ -160,7 +160,7 @@ static void FoldListDoc(unsigned int startPos, int length, int initStyle, WordLi
 	int styleNext = styler.StyleAt(startPos);
 	int style = initStyle;
 
-	for (unsigned int i = startPos; i < endPos; i++) {
+	for (Sci_PositionU i = startPos; i < endPos; i++) {
 		char ch = chNext;
 		chNext = styler.SafeGetCharAt(i + 1);
 		int stylePrev = style;

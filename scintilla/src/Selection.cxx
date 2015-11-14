@@ -15,6 +15,7 @@
 
 #include "Scintilla.h"
 
+#include "Position.h"
 #include "Selection.h"
 
 #ifdef SCI_NAMESPACE
@@ -123,6 +124,10 @@ SelectionSegment SelectionRange::Intersect(const SelectionSegment &check) const 
 	} else {
 		return SelectionSegment();
 	}
+}
+
+void SelectionRange::Swap() {
+	std::swap(caret, anchor);
 }
 
 bool SelectionRange::Trim(const SelectionRange &range) {

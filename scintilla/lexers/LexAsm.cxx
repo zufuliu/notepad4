@@ -52,9 +52,9 @@ static inline bool IsAsmNumber(int ch, int chPrev) {
 	0
 };*/
 
-extern bool IsCppInDefine(int currentPos, LexAccessor &styler);
+extern bool IsCppInDefine(Sci_Position currentPos, LexAccessor &styler);
 
-static void ColouriseAsmDoc(unsigned int startPos, int length, int initStyle, WordList *keywordLists[], Accessor &styler) {
+static void ColouriseAsmDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, WordList *keywordLists[], Accessor &styler) {
 	WordList &cpuInstruction	= *keywordLists[0];
 	WordList &mathInstruction	= *keywordLists[1];
 	WordList &registers			= *keywordLists[2];
@@ -69,12 +69,12 @@ static void ColouriseAsmDoc(unsigned int startPos, int length, int initStyle, Wo
 	// Do not leak onto next line
 	if (initStyle == SCE_ASM_STRINGEOL)
 		initStyle = SCE_ASM_DEFAULT;
-	unsigned endPos = startPos + length;
+	Sci_PositionU endPos = startPos + length;
 	StyleContext sc(startPos, length, initStyle, styler);
-	int lineCurrent = styler.GetLine(startPos);
+	Sci_Position lineCurrent = styler.GetLine(startPos);
 	bool isIncludePreprocessor = false;
 	static bool isGnuAsmSource = false;
-	int lastGnuAsmDefLine = -1;
+	Sci_Position lastGnuAsmDefLine = -1;
 
 	for (; sc.More(); sc.Forward())
 	{
@@ -137,7 +137,7 @@ _label_identifier:
 				} else if (s[0] == '.' && isdigit(s[1])) {
 					sc.ChangeState(SCE_ASM_NUMBER);
 				} else if (sc.ch == ':') {
-					int pos = sc.currentPos + 1;
+					Sci_Position pos = sc.currentPos + 1;
 					while (IsASpaceOrTab(styler.SafeGetCharAt(pos, '\0')))
 						pos++;
 					if (isspace(styler.SafeGetCharAt(pos, '\0'))) {
@@ -233,7 +233,7 @@ _label_identifier:
 			if (sc.ch == ';') {
 				// .def xx; .scl xx; .type xx; .endef
 				if (isGnuAsmSource && lastGnuAsmDefLine >= 0 && lastGnuAsmDefLine == lineCurrent) {
-					int i = sc.currentPos+1;
+					Sci_Position i = sc.currentPos+1;
 					while (styler[i] == ' ' || styler[i] == '\t')
 						i++;
 					if (styler[i] == '.')
@@ -270,8 +270,8 @@ _label_identifier:
 					sc.SetState(SCE_ASM_IDENTIFIER);
 				} else {
 					char pp[128];
-					int pos = LexSkipSpaceTab(sc.currentPos + 1, endPos, styler);
-					int len = LexGetRange(pos, styler, iswordstart, pp, sizeof(pp));
+					Sci_Position pos = LexSkipSpaceTab(sc.currentPos + 1, endPos, styler);
+					Sci_Position len = LexGetRange(pos, styler, iswordstart, pp, sizeof(pp));
 					if (kwProprocessor.InList(pp)) {
 						sc.SetState(SCE_ASM_PREPROCESSOR);
 						sc.Forward(pos - sc.currentPos + len);
@@ -330,10 +330,10 @@ static inline bool IsStreamCommentStyle(int style) {
 static inline bool IsAsmDefaultStyle(int style) {
 	return style == SCE_ASM_DEFAULT || style == SCE_ASM_IDENTIFIER;
 }
-static bool IsEquLine(int line, LexAccessor &styler) {
-	int startPos = styler.LineStart(line);
-	int endPos = styler.LineStart(line + 1) - 1;
-	int pos = LexSkipWhiteSpace(startPos, endPos, styler, IsAsmDefaultStyle);
+static bool IsEquLine(Sci_Position line, LexAccessor &styler) {
+	Sci_Position startPos = styler.LineStart(line);
+	Sci_Position endPos = styler.LineStart(line + 1) - 1;
+	Sci_Position pos = LexSkipWhiteSpace(startPos, endPos, styler, IsAsmDefaultStyle);
 	if (styler.StyleAt(pos) == SCE_ASM_DIRECTIVE) {
 		if (styler[pos] == '.')
 			pos++;
@@ -341,10 +341,10 @@ static bool IsEquLine(int line, LexAccessor &styler) {
 	}
 	return false;
 }
-static bool IsAsmDefineLine(int line, LexAccessor &styler) {
-	int startPos = styler.LineStart(line);
-	int endPos = styler.LineStart(line + 1) - 1;
-	int pos = LexSkipSpaceTab(startPos, endPos, styler);
+static bool IsAsmDefineLine(Sci_Position line, LexAccessor &styler) {
+	Sci_Position startPos = styler.LineStart(line);
+	Sci_Position endPos = styler.LineStart(line + 1) - 1;
+	Sci_Position pos = LexSkipSpaceTab(startPos, endPos, styler);
 	char ch = styler[pos];
 	int stl = styler.StyleAt(pos);
 	if (stl == SCE_ASM_DIRECTIVE) {
@@ -362,7 +362,7 @@ static bool IsAsmDefineLine(int line, LexAccessor &styler) {
 
 #define IsEndLine(line)			IsLexLineStartsWith(line, styler, "end", false, SCE_ASM_DIRECTIVE)
 
-static void FoldAsmDoc(unsigned int startPos, int length, int initStyle, WordList *keywordLists[], Accessor &styler) {
+static void FoldAsmDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, WordList *keywordLists[], Accessor &styler) {
 	if (styler.GetPropertyInt("fold") == 0)
 		return;
 	const bool foldSyntaxBased = styler.GetPropertyInt("fold.syntaxbased", 1) != 0;
@@ -373,9 +373,9 @@ static void FoldAsmDoc(unsigned int startPos, int length, int initStyle, WordLis
 	WordList &directives4foldstart	= *keywordLists[6];
 	WordList &directives4foldend	= *keywordLists[7];
 
-	unsigned int endPos = startPos + length;
+	Sci_PositionU endPos = startPos + length;
 	int visibleChars = 0;
-	int lineCurrent = styler.GetLine(startPos);
+	Sci_Position lineCurrent = styler.GetLine(startPos);
 	int levelCurrent = SC_FOLDLEVELBASE;
 	if (lineCurrent > 0)
 		levelCurrent = styler.LevelAt(lineCurrent-1) >> 16;
@@ -387,7 +387,7 @@ static void FoldAsmDoc(unsigned int startPos, int length, int initStyle, WordLis
 	char word[128];
 	int wordlen = 0;
 
-	for (unsigned int i = startPos; i < endPos; i++) {
+	for (Sci_PositionU i = startPos; i < endPos; i++) {
 		char ch = chNext;
 		chNext = styler.SafeGetCharAt(i + 1);
 		int stylePrev = style;

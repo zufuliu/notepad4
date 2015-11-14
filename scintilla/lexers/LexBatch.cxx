@@ -40,7 +40,7 @@ static inline bool IsWordChar(int ch) {
 	0
 };*/
 
-static void ColouriseBatchDoc(unsigned int startPos, int length, int initStyle, WordList *keywordLists[],Accessor &styler) {
+static void ColouriseBatchDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, WordList *keywordLists[],Accessor &styler) {
 	WordList &keywords = *keywordLists[0];
 	bool quatedVar = false;
 	bool numVar = false;

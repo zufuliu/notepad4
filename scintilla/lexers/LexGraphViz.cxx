@@ -22,7 +22,7 @@ static inline bool IsGraphOp(int ch) {
 }
 
 #define MAX_WORD_LENGTH	15
-static void ColouriseGraphDoc(unsigned int startPos, int length, int initStyle, WordList *keywordLists[], Accessor &styler) {
+static void ColouriseGraphDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, WordList *keywordLists[], Accessor &styler) {
 	const bool fold = styler.GetPropertyInt("fold", 1) != 0;
 	WordList &keywords = *keywordLists[0]; // command
 
@@ -30,11 +30,11 @@ static void ColouriseGraphDoc(unsigned int startPos, int length, int initStyle, 
 	int ch = 0, chNext = styler[startPos];
 	styler.StartAt(startPos);
 	styler.StartSegment(startPos);
-	unsigned int endPos = startPos + length;
-	if (endPos == (unsigned)styler.Length())
+	Sci_PositionU endPos = startPos + length;
+	if (endPos == (Sci_PositionU)styler.Length())
 		++endPos;
 
-	int lineCurrent = styler.GetLine(startPos);
+	Sci_Position lineCurrent = styler.GetLine(startPos);
 	int levelCurrent = SC_FOLDLEVELBASE;
 	if (lineCurrent > 0)
 		levelCurrent = styler.LevelAt(lineCurrent-1) >> 16;
@@ -43,7 +43,7 @@ static void ColouriseGraphDoc(unsigned int startPos, int length, int initStyle, 
 	int wordLen = 0;
 	int chPrevNonWhite = 0;
 
-	for (unsigned int i = startPos; i < endPos; i++) {
+	for (Sci_PositionU i = startPos; i < endPos; i++) {
 		int chPrev = ch;
 		if (!IsASpace(ch) && state != SCE_C_COMMENTLINE && state != SCE_C_COMMENT && state != SCE_C_COMMENTDOC)
 			chPrevNonWhite = ch;
@@ -51,7 +51,7 @@ static void ColouriseGraphDoc(unsigned int startPos, int length, int initStyle, 
 		chNext = styler.SafeGetCharAt(i + 1);
 
 		const bool atEOL = (ch == '\r' && chNext != '\n') || (ch == '\n');
-		const bool atLineStart = i == (unsigned)styler.LineStart(lineCurrent);
+		const bool atLineStart = i == (Sci_PositionU)styler.LineStart(lineCurrent);
 		if (atEOL || i == endPos-1) {
 			if (fold) {
 				int levelUse = levelCurrent;

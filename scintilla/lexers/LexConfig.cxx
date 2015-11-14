@@ -29,25 +29,25 @@ static inline bool IsDelimiter(int ch) {
 	return IsASpace(ch) || IsConfOp(ch);
 }
 
-static void ColouriseConfDoc(unsigned int startPos, int length, int initStyle, WordList *[], Accessor &styler) {
+static void ColouriseConfDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, WordList *[], Accessor &styler) {
 	int state = initStyle;
 	int chNext = styler[startPos];
 	styler.StartAt(startPos);
 	styler.StartSegment(startPos);
-	unsigned int endPos = startPos + length;
-	if (endPos == (unsigned)styler.Length())
+	Sci_PositionU endPos = startPos + length;
+	if (endPos == (Sci_PositionU)styler.Length())
 		++endPos;
 
 	int visibleChars = 0;
 	bool insideTag = false;
-	int lineCurrent = styler.GetLine(startPos);
+	Sci_Position lineCurrent = styler.GetLine(startPos);
 
-	for (unsigned int i = startPos; i < endPos; i++) {
+	for (Sci_PositionU i = startPos; i < endPos; i++) {
 		int ch = chNext;
 		chNext = styler.SafeGetCharAt(i + 1);
 
 		const bool atEOL = (ch == '\r' && chNext != '\n') || (ch == '\n');
-		const bool atLineStart = i == (unsigned)styler.LineStart(lineCurrent);
+		const bool atLineStart = i == (Sci_PositionU)styler.LineStart(lineCurrent);
 
 		switch (state) {
 		case SCE_CONF_OPERATOR:
@@ -198,15 +198,15 @@ static void ColouriseConfDoc(unsigned int startPos, int length, int initStyle, W
 
 #define IsCommentLine(line)		IsLexCommentLine(line, styler, SCE_CONF_COMMENT)
 
-static void FoldConfDoc(unsigned int startPos, int length, int initStyle, WordList *[], Accessor &styler) {
+static void FoldConfDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, WordList *[], Accessor &styler) {
 	if (styler.GetPropertyInt("fold") == 0)
 		return;
 	const bool foldComment = styler.GetPropertyInt("fold.comment") != 0;
 	const bool foldCompact = styler.GetPropertyInt("fold.compact", 1) != 0;
 
-	unsigned int endPos = startPos + length;
+	Sci_PositionU endPos = startPos + length;
 	int visibleChars = 0;
-	int lineCurrent = styler.GetLine(startPos);
+	Sci_Position lineCurrent = styler.GetLine(startPos);
 	int levelCurrent = SC_FOLDLEVELBASE;
 	if (lineCurrent > 0)
 		levelCurrent = styler.LevelAt(lineCurrent-1) >> 16;
@@ -216,7 +216,7 @@ static void FoldConfDoc(unsigned int startPos, int length, int initStyle, WordLi
 	int styleNext = styler.StyleAt(startPos);
 	int style = initStyle;
 
-	for (unsigned int i = startPos; i < endPos; i++) {
+	for (Sci_PositionU i = startPos; i < endPos; i++) {
 		char ch = chNext;
 		chNext = styler.SafeGetCharAt(i + 1);
 		//int stylePrev = style;
@@ -237,7 +237,7 @@ static void FoldConfDoc(unsigned int startPos, int length, int initStyle, WordLi
 			} else if (ch == '<' && chNext == '/') {
 				levelNext--;
 			} else if (ch == '/' && chNext == '>') {
-				unsigned int pos = i;
+				Sci_PositionU pos = i;
 				while (pos > startPos) {
 					pos--;
 					char c = styler.SafeGetCharAt(pos);

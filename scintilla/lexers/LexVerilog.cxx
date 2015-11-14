@@ -36,7 +36,7 @@ static bool IsVWordStart(const int ch) {
 	0,
 };*/
 
-static void ColouriseVerilogDoc(unsigned int startPos, int length, int initStyle, WordList *keywordlists[], Accessor &styler) {
+static void ColouriseVerilogDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, WordList *keywordlists[], Accessor &styler) {
 	WordList &keywords = *keywordlists[0];
 	WordList &keywords2 = *keywordlists[1];
 	WordList &keywords3 = *keywordlists[2];
@@ -154,7 +154,7 @@ static bool IsStreamCommentStyle(int style) {
 }
 #define IsCommentLine(line) IsLexCommentLine(line, styler, MultiStyle(SCE_V_COMMENTLINE, SCE_V_COMMENTLINEBANG))
 
-static void FoldVerilogDoc(unsigned int startPos, int length, int initStyle, WordList *[], Accessor &styler) {
+static void FoldVerilogDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, WordList *[], Accessor &styler) {
 	if (styler.GetPropertyInt("fold") == 0)
 		return;
 	const bool foldComment = styler.GetPropertyInt("fold.comment", 1) != 0;
@@ -162,9 +162,9 @@ static void FoldVerilogDoc(unsigned int startPos, int length, int initStyle, Wor
 	const bool foldCompact = styler.GetPropertyInt("fold.compact", 0) != 0;
 	const bool foldAtElse = styler.GetPropertyInt("fold.at.else", 0) != 0;
 
-	unsigned int endPos = startPos + length;
+	Sci_PositionU endPos = startPos + length;
 	int visibleChars = 0;
-	int lineCurrent = styler.GetLine(startPos);
+	Sci_Position lineCurrent = styler.GetLine(startPos);
 	int levelCurrent = SC_FOLDLEVELBASE;
 	if (lineCurrent > 0)
 		levelCurrent = styler.LevelAt(lineCurrent-1) >> 16;
@@ -175,7 +175,7 @@ static void FoldVerilogDoc(unsigned int startPos, int length, int initStyle, Wor
 	int style = initStyle;
 	int styleNext = styler.StyleAt(startPos);
 
-	for (unsigned int i = startPos; i < endPos; i++) {
+	for (Sci_PositionU i = startPos; i < endPos; i++) {
 		char ch = chNext;
 		chNext = styler.SafeGetCharAt(i + 1);
 		int stylePrev = style;
@@ -212,7 +212,7 @@ static void FoldVerilogDoc(unsigned int startPos, int length, int initStyle, Wor
 			}
 		}
 		if (style == SCE_V_WORD && stylePrev != SCE_V_WORD) {
-			unsigned int j = i;
+			Sci_PositionU j = i;
 			if (styler.Match(j, "case") ||
 				styler.Match(j, "class") || styler.Match(j, "function") || styler.Match(j, "generate") ||
 				styler.Match(j, "covergroup") || styler.Match(j, "package") ||styler.Match(j, "primitive") ||

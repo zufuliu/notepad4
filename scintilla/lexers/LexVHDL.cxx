@@ -32,7 +32,7 @@ using namespace Scintilla;
 	0,
 };*/
 
-static void ColouriseVHDLDoc(unsigned int startPos, int length, int initStyle, WordList *keywordlists[], Accessor &styler) {
+static void ColouriseVHDLDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, WordList *keywordlists[], Accessor &styler) {
 	WordList &Keywords = *keywordlists[0];
 	WordList &Operators = *keywordlists[1];
 	WordList &Attributes = *keywordlists[2];
@@ -135,7 +135,7 @@ static inline bool IsStreamCommentStyle(int style) {
 #define IsCommentLine(line) IsLexCommentLine(line, styler, MultiStyle(SCE_VHDL_COMMENT, SCE_VHDL_COMMENTLINEBANG))
 
 // Folding the code
-static void FoldVHDLDoc(unsigned int startPos, int length, int /*initStyle*/, WordList *keywordlists[], Accessor &styler) {
+static void FoldVHDLDoc(Sci_PositionU startPos, Sci_Position length, int /*initStyle*/, WordList *keywordlists[], Accessor &styler) {
 	if (styler.GetPropertyInt("fold") == 0)
 		return;
 	WordList &kwFold = *keywordlists[8];
@@ -148,9 +148,9 @@ static void FoldVHDLDoc(unsigned int startPos, int length, int /*initStyle*/, Wo
 	//const bool foldAtWhen = styler.GetPropertyInt("fold.at.When", 1) != 0; //< fold at when in case statements
 
 	int	 visibleChars = 0;
-	unsigned int endPos = startPos + length;
+	Sci_PositionU endPos = startPos + length;
 
-	int lineCurrent = styler.GetLine(startPos);
+	Sci_Position lineCurrent = styler.GetLine(startPos);
 	int levelCurrent = SC_FOLDLEVELBASE;
 	if(lineCurrent > 0)
 		levelCurrent = styler.LevelAt(lineCurrent-1) >> 16;
@@ -167,8 +167,8 @@ static void FoldVHDLDoc(unsigned int startPos, int length, int /*initStyle*/, Wo
 	// Find prev word
 	// The logic for going up or down a level depends on a the previous keyword
 	// This code could be cleaned up.
-	int end = 0;
-	unsigned int j;
+	Sci_Position end = 0;
+	Sci_PositionU j;
 	for(j = startPos; j>0; j--) {
 		char ch = styler.SafeGetCharAt(j);
 		char chPrev = styler.SafeGetCharAt(j-1);
@@ -212,12 +212,12 @@ static void FoldVHDLDoc(unsigned int startPos, int length, int /*initStyle*/, Wo
 	chNext = styler[startPos];
 	styleNext = styler.StyleAt(startPos);
 
-	for (unsigned int i = startPos; i < endPos; i++) {
+	for (Sci_PositionU i = startPos; i < endPos; i++) {
 		char chPrev = ch;
 		ch = chNext;
 		chNext = styler.SafeGetCharAt(i + 1);
 		char chNextNonBlank = chNext;
-		unsigned int j = i + 1;
+		Sci_PositionU j = i + 1;
 		while(isspacechar(chNextNonBlank) && j<endPos) {
 			j ++ ;
 			chNextNonBlank = styler.SafeGetCharAt(j);
@@ -312,7 +312,7 @@ static void FoldVHDLDoc(unsigned int startPos, int length, int /*initStyle*/, Wo
 						// This code checks to see if the procedure / function is a definition within a "package"
 							// rather than the actual code in the body.
 							int BracketLevel = 0;
-							for(int pos=i+1; pos<styler.Length(); pos++) {
+							for(Sci_Position pos=i+1; pos<styler.Length(); pos++) {
 								int styleAtPos = styler.StyleAt(pos);
 								char chAtPos = styler.SafeGetCharAt(pos);
 								if(chAtPos == '(') BracketLevel++;

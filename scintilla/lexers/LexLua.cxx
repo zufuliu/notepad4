@@ -46,7 +46,7 @@ static int LongDelimCheck(StyleContext &sc) {
 	0
 };*/
 
-static void ColouriseLuaDoc(unsigned int startPos, int length, int initStyle, WordList *keywordlists[], Accessor &styler) {
+static void ColouriseLuaDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, WordList *keywordlists[], Accessor &styler) {
 	WordList &keywords = *keywordlists[0];
 	WordList &keywords2 = *keywordlists[1];
 	WordList &keywords3 = *keywordlists[2];
@@ -66,7 +66,7 @@ static void ColouriseLuaDoc(unsigned int startPos, int length, int initStyle, Wo
 	CharacterSet setLuaOperator(CharacterSet::setNone, "*/-+()={}~[];<>,.^%:#");
 	CharacterSet setEscapeSkip(CharacterSet::setNone, "\"'\\");
 
-	int currentLine = styler.GetLine(startPos);
+	Sci_Position currentLine = styler.GetLine(startPos);
 	// Initialize long string [[ ... ]] or block comment --[[ ... ]] nesting level,
 	// if we are inside such a string. Block comment was introduced in Lua 5.0,
 	// blocks with separators [=[ ... ]=] in Lua 5.1.
@@ -332,12 +332,12 @@ _label_identifier:
 
 #define IsCommentLine(line)	IsLexCommentLine(line, styler, MultiStyle(SCE_LUA_COMMENTLINE, SCE_LUA_COMMENT))
 
-static void FoldLuaDoc(unsigned int startPos, int length, int /* initStyle */, WordList *[], Accessor &styler) {
+static void FoldLuaDoc(Sci_PositionU startPos, Sci_Position length, int /* initStyle */, WordList *[], Accessor &styler) {
 	if (styler.GetPropertyInt("fold") == 0)
 		return;
-	unsigned int lengthDoc = startPos + length;
+	Sci_PositionU lengthDoc = startPos + length;
 	int visibleChars = 0;
-	int lineCurrent = styler.GetLine(startPos);
+	Sci_Position lineCurrent = styler.GetLine(startPos);
 	int levelPrev = styler.LevelAt(lineCurrent) & SC_FOLDLEVELNUMBERMASK;
 	int levelCurrent = levelPrev;
 	char chNext = styler[startPos];
@@ -345,7 +345,7 @@ static void FoldLuaDoc(unsigned int startPos, int length, int /* initStyle */, W
 	const bool foldCompact = styler.GetPropertyInt("fold.compact", 1) != 0;
 	int styleNext = styler.StyleAt(startPos);
 
-	for (unsigned int i = startPos; i < lengthDoc; i++) {
+	for (Sci_PositionU i = startPos; i < lengthDoc; i++) {
 		char ch = chNext;
 		chNext = styler.SafeGetCharAt(i + 1);
 		int style = styleNext;
@@ -363,7 +363,7 @@ static void FoldLuaDoc(unsigned int startPos, int length, int /* initStyle */, W
 		if (style == SCE_LUA_WORD) {
 			if (ch == 'i' || ch == 'd' || ch == 'f' || ch == 'e' || ch == 'r' || ch == 'u') {
 				char s[10] = "";
-				for (unsigned int j = 0; j < 8; j++) {
+				for (Sci_PositionU j = 0; j < 8; j++) {
 					if (!iswordchar(styler[i + j])) {
 						break;
 					}

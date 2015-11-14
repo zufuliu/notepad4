@@ -1,7 +1,14 @@
-// Lexer for Diff, Patch.
+// Scintilla source code edit control
+/** @file LexOthers.cxx
+ ** Lexers for batch files, diff results, properties files, make files and error lists.
+ **/
+// Copyright 1998-2001 by Neil Hodgson <neilh@scintilla.org>
+// The License.txt file describes the conditions under which this software may be distributed.
 
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
+#include <stdarg.h>
 #include <assert.h>
 #include <ctype.h>
 
@@ -10,10 +17,10 @@
 #include "SciLexer.h"
 
 #include "WordList.h"
-#include "CharacterSet.h"
 #include "LexAccessor.h"
 #include "Accessor.h"
 #include "StyleContext.h"
+#include "CharacterSet.h"
 #include "LexerModule.h"
 
 #ifdef SCI_NAMESPACE
@@ -24,7 +31,7 @@ using namespace Scintilla;
 // Note that ColouriseDiffLine analyzes only the first DIFF_BUFFER_START_SIZE
 // characters of each line to classify the line.
 
-static void ColouriseDiffLine(char *lineBuffer, int endLine, Accessor &styler) {
+static void ColouriseDiffLine(char *lineBuffer, Sci_Position endLine, Accessor &styler) {
 	// It is needed to remember the current state to recognize starting
 	// comment lines before the first "diff " or "--- ". If a real
 	// difference starts then each line starting with ' ' is a whitespace
@@ -79,13 +86,13 @@ static void ColouriseDiffLine(char *lineBuffer, int endLine, Accessor &styler) {
 	}
 }
 
-static void ColouriseDiffDoc(unsigned int startPos, int length, int, WordList *[], Accessor &styler) {
+static void ColouriseDiffDoc(Sci_PositionU startPos, Sci_Position length, int, WordList *[], Accessor &styler) {
 	char lineBuffer[DIFF_BUFFER_START_SIZE] = "";
 	styler.StartAt(startPos);
 	styler.StartSegment(startPos);
-	unsigned int linePos = 0;
-	unsigned int endPos = startPos + length;
-	for (unsigned int i = startPos; i < endPos; i++) {
+	Sci_PositionU linePos = 0;
+	Sci_PositionU endPos = startPos + length;
+	for (Sci_PositionU i = startPos; i < endPos; i++) {
 		if (IsLexAtEOL(i, styler)) {
 			if (linePos < DIFF_BUFFER_START_SIZE) {
 				lineBuffer[linePos] = 0;
@@ -106,11 +113,11 @@ static void ColouriseDiffDoc(unsigned int startPos, int length, int, WordList *[
 	}
 }
 
-static void FoldDiffDoc(unsigned int startPos, int length, int, WordList *[], Accessor &styler) {
+static void FoldDiffDoc(Sci_PositionU startPos, Sci_Position length, int, WordList *[], Accessor &styler) {
 	if (styler.GetPropertyInt("fold") == 0)
 		return;
-	int curLine = styler.GetLine(startPos);
-	int curLineStart = styler.LineStart(curLine);
+	Sci_Position curLine = styler.GetLine(startPos);
+	Sci_Position curLineStart = styler.LineStart(curLine);
 	int prevLevel = curLine > 0 ? styler.LevelAt(curLine - 1) : SC_FOLDLEVELBASE;
 	int nextLevel;
 
@@ -134,7 +141,7 @@ static void FoldDiffDoc(unsigned int startPos, int length, int, WordList *[], Ac
 		prevLevel = nextLevel;
 
 		curLineStart = styler.LineStart(++curLine);
-	} while (static_cast<int>(startPos) + length > curLineStart);
+	} while (static_cast<Sci_Position>(startPos) + length > curLineStart);
 }
 
 LexerModule lmDiff(SCLEX_DIFF, ColouriseDiffDoc, "diff", FoldDiffDoc);

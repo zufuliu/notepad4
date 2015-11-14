@@ -16,6 +16,7 @@
 #include "Platform.h"
 
 #include "Scintilla.h"
+#include "Position.h"
 #include "SplitVector.h"
 #include "Partitioning.h"
 #include "CellBuffer.h"
@@ -788,10 +789,8 @@ void CellBuffer::PerformUndoStep() {
 	const Action &actionStep = uh.GetUndoStep();
 	if (actionStep.at == insertAction) {
 		if (substance.Length() < actionStep.lenData) {
-#if !defined(__clang__)
 			throw std::runtime_error(
 				"CellBuffer::PerformUndoStep: deletion must be less than document length.");
-#endif
 		}
 		BasicDeleteChars(actionStep.position, actionStep.lenData);
 	} else if (actionStep.at == removeAction) {

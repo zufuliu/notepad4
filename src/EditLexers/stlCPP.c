@@ -21,6 +21,7 @@ static KEYWORDLIST Keywords_CPP = {
 // GCC
 "typeof __typeof__ __alignof__ __label__ __asm__ __thread __attribute__ __volatile__ __restrict__ __restrict __inline__ __extension__ where "
 "__auto_type "
+"__nonnull __nullable __covariant __kindof "
 // Keil
 "sfr sfr16 interrupt "
 
@@ -58,7 +59,7 @@ static KEYWORDLIST Keywords_CPP = {
 "property() selector() "
 , // attribute
 // Objective C/C++ @property()
-"getter setter readwrite readonly strong weak copy assign retain nonatomic atomic "
+"getter setter readwrite readonly strong weak copy assign retain nonatomic atomic nonnull nullable "
 // MSVC __declspec()
 "deprecated dllexport dllimport naked noinline noreturn nothrow novtable property selectany thread uuid "
 // GCC __attribute__()

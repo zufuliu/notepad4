@@ -70,7 +70,7 @@ static bool IsJavaType(int ch, int chPrev, int chNext) {
 #define kWordType_Method	3
 
 #define MAX_WORD_LENGTH	31
-static void ColouriseSmaliDoc(unsigned int startPos, int length, int initStyle, WordList *keywordLists[], Accessor &styler) {
+static void ColouriseSmaliDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, WordList *keywordLists[], Accessor &styler) {
 	WordList &keywords = *keywordLists[0];
 	//WordList &kwInstruction = *keywordLists[10];
 
@@ -78,24 +78,24 @@ static void ColouriseSmaliDoc(unsigned int startPos, int length, int initStyle, 
 	int ch = 0, chNext = styler[startPos];
 	styler.StartAt(startPos);
 	styler.StartSegment(startPos);
-	unsigned int endPos = startPos + length;
-	if (endPos == (unsigned)styler.Length())
+	Sci_PositionU endPos = startPos + length;
+	if (endPos == (Sci_PositionU)styler.Length())
 		++endPos;
 
-	int lineCurrent = styler.GetLine(startPos);
+	Sci_Position lineCurrent = styler.GetLine(startPos);
 	int curLineState =	(lineCurrent > 0) ? styler.GetLineState(lineCurrent-1) : 0;
 	char buf[MAX_WORD_LENGTH + 1] = {0};
 	int wordLen = 0;
 	int visibleChars = 0;
 	int nextWordType = 0;
 
-	for (unsigned int i = startPos; i < endPos; i++) {
+	for (Sci_PositionU i = startPos; i < endPos; i++) {
 		const int chPrev = ch;
 		ch = chNext;
 		chNext = styler.SafeGetCharAt(i + 1);
 
 		const bool atEOL = (ch == '\r' && chNext != '\n') || (ch == '\n');
-		const bool atLineStart = i == (unsigned)styler.LineStart(lineCurrent);
+		const bool atLineStart = i == (Sci_PositionU)styler.LineStart(lineCurrent);
 
 		switch (state) {
 		case SCE_SMALI_OPERATOR:
@@ -203,7 +203,7 @@ static void ColouriseSmaliDoc(unsigned int startPos, int length, int initStyle, 
 						state = SCE_SMALI_INSTRUCTION;
 					}
 				} else {
-					unsigned int pos = i;
+					Sci_PositionU pos = i;
 					while (pos < endPos && IsASpace(styler.SafeGetCharAt(pos, 0))) ++pos;
 					if (styler.SafeGetCharAt(pos, 0) == '(') {
 						styler.ColourTo(i - 1, SCE_SMALI_METHOD);
@@ -318,12 +318,12 @@ static inline bool IsFoldWord(const char *word) {
 		|| strcmp(word, "attribute") == 0;
 }
 // field/parameter with annotation?
-static bool IsAnnotationLine(int line, Accessor &styler) {
-	int scan_line = 10;
+static bool IsAnnotationLine(Sci_Position line, Accessor &styler) {
+	Sci_Position scan_line = 10;
 	while (scan_line-- > 0) {
-		int startPos = styler.LineStart(line);
-		int endPos = styler.LineStart(line + 1) - 1;
-		int pos = LexSkipSpaceTab(startPos, endPos, styler);
+		Sci_Position startPos = styler.LineStart(line);
+		Sci_Position endPos = styler.LineStart(line + 1) - 1;
+		Sci_Position pos = LexSkipSpaceTab(startPos, endPos, styler);
 		if (styler[pos] == '.') {
 			return styler.StyleAt(pos) == SCE_SMALI_DIRECTIVE && styler[pos + 1] == 'a';
 		}
@@ -332,15 +332,15 @@ static bool IsAnnotationLine(int line, Accessor &styler) {
 	return false;
 }
 
-static void FoldSmaliDoc(unsigned int startPos, int length, int initStyle, WordList *[], Accessor &styler) {
+static void FoldSmaliDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, WordList *[], Accessor &styler) {
 	if (styler.GetPropertyInt("fold") == 0)
 		return;
 	const bool foldComment = styler.GetPropertyInt("fold.comment") != 0;
 	const bool foldCompact = styler.GetPropertyInt("fold.compact", 1) != 0;
 
-	unsigned int endPos = startPos + length;
+	Sci_PositionU endPos = startPos + length;
 	int visibleChars = 0;
-	int lineCurrent = styler.GetLine(startPos);
+	Sci_Position lineCurrent = styler.GetLine(startPos);
 	int levelCurrent = SC_FOLDLEVELBASE;
 	if (lineCurrent > 0)
 		levelCurrent = styler.LevelAt(lineCurrent-1) >> 16;
@@ -350,7 +350,7 @@ static void FoldSmaliDoc(unsigned int startPos, int length, int initStyle, WordL
 	int styleNext = styler.StyleAt(startPos);
 	int style = initStyle;
 
-	for (unsigned int i = startPos; i < endPos; i++) {
+	for (Sci_PositionU i = startPos; i < endPos; i++) {
 		int ch = chNext;
 		chNext = styler.SafeGetCharAt(i + 1);
 		int stylePrev = style;

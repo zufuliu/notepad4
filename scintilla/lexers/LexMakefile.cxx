@@ -31,31 +31,31 @@ static inline bool IsMakeOp(int ch, int chNext) {
 }
 
 #define MAX_WORD_LENGTH	15
-static void ColouriseMakeDoc(unsigned int startPos, int length, int initStyle, WordList *keywordLists[], Accessor &styler) {
+static void ColouriseMakeDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, WordList *keywordLists[], Accessor &styler) {
 	WordList &keywordsGP = *keywordLists[0]; // gnu make Preprocessor
 	WordList &keywordsDP2 = *keywordLists[6];
 	int state = initStyle;
 	int ch = 0, chNext = styler[startPos];
 	styler.StartAt(startPos);
 	styler.StartSegment(startPos);
-	unsigned int endPos = startPos + length;
-	if (endPos == (unsigned)styler.Length())
+	Sci_PositionU endPos = startPos + length;
+	if (endPos == (Sci_PositionU)styler.Length())
 		++endPos;
 
 	int visibleChars = 0;
-	int lineCurrent = styler.GetLine(startPos);
+	Sci_Position lineCurrent = styler.GetLine(startPos);
 	char buf[MAX_WORD_LENGTH + 1] = {0};
 	int wordLen = 0;
 	int varCount = 0;
 	static int makeType = MAKE_TYPE_GMAKE;
 
-	for (unsigned int i = startPos; i < endPos; i++) {
+	for (Sci_PositionU i = startPos; i < endPos; i++) {
 		const int chPrev = ch;
 		ch = chNext;
 		chNext = styler.SafeGetCharAt(i + 1);
 
 		const bool atEOL = (ch == '\r' && chNext != '\n') || (ch == '\n');
-		const bool atLineStart = i == (unsigned)styler.LineStart(lineCurrent);
+		const bool atLineStart = i == (Sci_PositionU)styler.LineStart(lineCurrent);
 
 		switch (state) {
 		case SCE_MAKE_OPERATOR:
@@ -83,7 +83,7 @@ static void ColouriseMakeDoc(unsigned int startPos, int length, int initStyle, W
 					styler.ColourTo(i - 1, SCE_MAKE_PREPROCESSOR);
 					makeType = MAKE_TYPE_GMAKE;
 				} else {
-					int pos = i;
+					Sci_Position pos = i;
 					while (IsASpace(styler.SafeGetCharAt(pos++)));
 					if (styler[pos-1] == '=' || styler[pos] == '=') {
 						styler.ColourTo(i - 1, SCE_MAKE_VARIABLE);
@@ -158,7 +158,7 @@ static void ColouriseMakeDoc(unsigned int startPos, int length, int initStyle, W
 				state = SCE_MAKE_COMMENT;
 			} else if ((ch == '$' && chNext == '(') || (ch == '$' && chNext == '$' && styler.SafeGetCharAt(i + 2) == '(')) {
 				styler.ColourTo(i - 1, state);
-				int pos = i + 1;
+				Sci_Position pos = i + 1;
 				if (chNext == '$') ++pos;
 				ch = chNext;
 				while (ch != ')') {
@@ -222,15 +222,15 @@ static void ColouriseMakeDoc(unsigned int startPos, int length, int initStyle, W
 
 #define IsCommentLine(line)	IsLexCommentLine(line, styler, SCE_MAKE_COMMENT)
 
-static void FoldMakeDoc(unsigned int startPos, int length, int initStyle, WordList *[], Accessor &styler) {
+static void FoldMakeDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, WordList *[], Accessor &styler) {
 	if (styler.GetPropertyInt("fold") == 0)
 		return;
 	const bool foldComment = styler.GetPropertyInt("fold.comment") != 0;
 	const bool foldCompact = styler.GetPropertyInt("fold.compact", 1) != 0;
 
-	unsigned int endPos = startPos + length;
+	Sci_PositionU endPos = startPos + length;
 	int visibleChars = 0;
-	int lineCurrent = styler.GetLine(startPos);
+	Sci_Position lineCurrent = styler.GetLine(startPos);
 	int levelCurrent = SC_FOLDLEVELBASE;
 	if (lineCurrent > 0)
 		levelCurrent = styler.LevelAt(lineCurrent-1) >> 16;
@@ -240,7 +240,7 @@ static void FoldMakeDoc(unsigned int startPos, int length, int initStyle, WordLi
 	int styleNext = styler.StyleAt(startPos);
 	int style = initStyle;
 
-	for (unsigned int i = startPos; i < endPos; i++) {
+	for (Sci_PositionU i = startPos; i < endPos; i++) {
 		char ch = chNext;
 		chNext = styler.SafeGetCharAt(i + 1);
 		int stylePrev = style;
@@ -265,7 +265,7 @@ static void FoldMakeDoc(unsigned int startPos, int length, int initStyle, WordLi
 		if (visibleChars == 0 && (ch == '!' || ch == 'i' || ch == 'e' || ch == 'd' || ch == '.')
 			&& style == SCE_MAKE_PREPROCESSOR && stylePrev != SCE_MAKE_PREPROCESSOR) {
 			char buf[MAX_WORD_LENGTH + 1];
-			unsigned j = i;
+			Sci_Position j = i;
 			if (ch == '!' || ch == '.')
 				j++;
 			LexGetRangeLowered(j, styler, iswordchar, buf, MAX_WORD_LENGTH);

@@ -234,6 +234,8 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	bool paintingAllText;
 	bool willRedrawAll;
 	WorkNeeded workNeeded;
+	int idleStyling;
+	bool needIdleStyling;
 
 	int modEventMask;
 
@@ -392,7 +394,7 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	int InsertSpace(int position, unsigned int spaces);
 	void AddChar(char ch);
 	virtual void AddCharUTF(const char *s, unsigned int len, bool treatAsDBCS=false);
-	void FillVirtualSpace();
+	void ClearBeforeTentativeStart();
 	void InsertPaste(const char *text, int len);
 	enum PasteShape { pasteStream=0, pasteRectangular = 1, pasteLine = 2 };
 	void InsertPasteShape(const char *text, int len, PasteShape shape);
@@ -525,6 +527,10 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 
 	int PositionAfterArea(const PRectangle &rcArea) const;
 	void StyleToPositionInView(Position pos);
+	int PositionAfterMaxStyling(int posMax, bool scrolling) const;
+	void StartIdleStyling(bool truncatedLastStyling);
+	void StyleAreaBounded(PRectangle rcArea, bool scrolling);
+	void IdleStyling();
 	virtual void IdleWork();
 	virtual void QueueIdleWork(WorkNeeded::workItems items, int upTo=0);
 

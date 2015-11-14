@@ -32,7 +32,7 @@ static inline bool IsLWordStart(int ch) {
 
 #define IsCmdEnd(pos)	(!IsLWordChar(sc.GetRelative(pos)))
 
-static void ColouriseLatexDoc(unsigned int startPos, int length, int initStyle, WordList *[], Accessor &styler) {
+static void ColouriseLatexDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, WordList *[], Accessor &styler) {
 	if (initStyle == SCE_L_COMMENT)
 		initStyle = SCE_L_DEFAULT;
 
@@ -239,17 +239,17 @@ static void ColouriseLatexDoc(unsigned int startPos, int length, int initStyle, 
 	sc.Complete();
 }
 
-static bool IsLBegin(int line, Accessor &styler, const char* word, int wlen) {
-	int pos = LexLineSkipSpaceTab(line, styler);
-	int chp = pos + 1 + wlen;
+static bool IsLBegin(Sci_Position line, Accessor &styler, const char* word, int wlen) {
+	Sci_Position pos = LexLineSkipSpaceTab(line, styler);
+	Sci_Position chp = pos + 1 + wlen;
 	if (styler[pos] == '\\' && styler.StyleAt(pos) == SCE_L_COMMAND
 		&& (styler[chp] == '{' || (styler[chp] == '*' && styler[chp+1] == '{'))
 		&& styler.Match(pos+1, word))
 		return true;
 	return false;
 }
-static bool IsLEnd(int line, Accessor &styler) {
-	int pos = LexLineSkipSpaceTab(line, styler);
+static bool IsLEnd(Sci_Position line, Accessor &styler) {
+	Sci_Position pos = LexLineSkipSpaceTab(line, styler);
 	if (styler[pos] == '\\' && styler.StyleAt(pos) == SCE_L_COMMAND && styler.Match(pos+1, "end")) {
 		if (styler.Match(pos+4, "{document}") || styler.Match(pos+4, "input"))
 			return true;
@@ -263,15 +263,15 @@ static bool IsLEnd(int line, Accessor &styler) {
 #define IsSubsubsection(line)	IsLBegin(line, styler, "subsubsection", 13)
 #define IsEndDoc(line)			IsLEnd(line, styler)
 
-static void FoldLatexDoc(unsigned int startPos, int length, int initStyle, WordList *[], Accessor &styler) {
+static void FoldLatexDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, WordList *[], Accessor &styler) {
 	if (styler.GetPropertyInt("fold") == 0)
 		return;
 	const bool foldComment = styler.GetPropertyInt("fold.comment") != 0;
 	const bool foldCompact = styler.GetPropertyInt("fold.compact", 1) != 0;
 
-	unsigned int endPos = startPos + length;
+	Sci_PositionU endPos = startPos + length;
 	int visibleChars = 0;
-	int lineCurrent = styler.GetLine(startPos);
+	Sci_Position lineCurrent = styler.GetLine(startPos);
 	int levelCurrent = SC_FOLDLEVELBASE;
 	if (lineCurrent > 0)
 		levelCurrent = styler.LevelAt(lineCurrent-1) >> 16;
@@ -285,7 +285,7 @@ static void FoldLatexDoc(unsigned int startPos, int length, int initStyle, WordL
 	bool isSection = false;
 	bool isSubsection = false;
 
-	for (unsigned int i = startPos; i < endPos; i++) {
+	for (Sci_PositionU i = startPos; i < endPos; i++) {
 		char ch = chNext;
 		chNext = styler.SafeGetCharAt(i + 1);
 		//int stylePrev = style;
