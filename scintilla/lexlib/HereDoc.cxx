@@ -21,7 +21,6 @@ HereDocCls::HereDocCls() {
 	Quoted = false;
 	Indented = false;
 	DelimiterLength = 0;
-	Delimiter = new char[HERE_DELIM_MAX];
 	Delimiter[0] = '\0';
 }
 void HereDocCls::Append(int ch) {
@@ -68,9 +67,6 @@ QuoteStackCls::QuoteStackCls() {
 	Down  = '\0';
 	Style = 0;
 	Depth = 0;
-	CountStack = new int[QUOTE_DELIM_STACK_MAX];
-	UpStack    = new int[QUOTE_DELIM_STACK_MAX];
-	StyleStack = new int[QUOTE_DELIM_STACK_MAX];
 }
 void QuoteStackCls::Start(int u, int s) {
 	Count = 1;

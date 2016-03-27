@@ -47,7 +47,7 @@ REBUILD:	CLEAN BUILD
 ##  Object files  ##
 ####################
 SCI_LEX_OBJ = \
-    $(SCI_LEX_OBJDIR)\LexAnsiArt.obj \
+    $(SCI_LEX_OBJDIR)\LexNull.obj \
     $(SCI_LEX_OBJDIR)\LexAsm.obj \
     $(SCI_LEX_OBJDIR)\LexAutoIt3.obj \
     $(SCI_LEX_OBJDIR)\LexBash.obj \

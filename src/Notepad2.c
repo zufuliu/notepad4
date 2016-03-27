@@ -5683,7 +5683,7 @@ void LoadSettings()
 		if (TranslateCharsetInfo((DWORD *)(UINT_PTR)iDefaultCodePage, &ci, TCI_SRCCODEPAGE)) {
 			iDefaultCharSet = ci.ciCharset;
 		} else {
-			iDefaultCharSet = ANSI_CHARSET;
+			iDefaultCharSet = OEM_CHARSET;
 		}
 	}
 

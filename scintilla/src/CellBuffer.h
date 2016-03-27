@@ -176,6 +176,7 @@ public:
 	int Length() const;
 	void Allocate(int newSize);
 	int GetLineEndTypes() const { return utf8LineEnds; }
+	bool ContainsLineEnd(const char *s, int length) const;
 	void SetLineEndTypes(int utf8LineEnds_);
 	void SetPerLine(PerLine *pl);
 	int Lines() const;

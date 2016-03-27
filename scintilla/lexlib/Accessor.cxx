@@ -63,7 +63,7 @@ int Accessor::LexIndentAmount(Accessor &styler, Sci_Position line, int *flags, P
 			spaceFlags |= wsTab;
 			if (spaceFlags & wsSpace)
 				spaceFlags |= wsSpaceTab;
-			indent = (indent / 8 + 1) * 8;
+			indent = (indent / 4 + 1) * 4;
 		}
 		ch = styler[++pos];
 	}

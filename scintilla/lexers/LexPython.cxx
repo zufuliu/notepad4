@@ -229,8 +229,11 @@ _label_identifier:
 				}
 			} else if (iswordstart(sc.ch)) {
 				sc.SetState(SCE_PY_IDENTIFIER);
-			} else if (sc.ch == '@' && iswordstart(sc.chNext)) {
-				sc.SetState(SCE_PY_DECORATOR);
+			} else if (sc.ch == '@') {
+				if (iswordstart(sc.chNext))
+					sc.SetState(SCE_PY_OPERATOR);
+				 else
+					sc.SetState(SCE_PY_DECORATOR);
 			} else if (isoperator(static_cast<char>(sc.ch)) || sc.ch == '`') {
 				sc.SetState(SCE_PY_OPERATOR);
 				if (defType > 0 && (sc.ch == '(' || sc.ch == ':'))

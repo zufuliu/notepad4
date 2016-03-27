@@ -85,6 +85,19 @@ static int getBashNumberBase(const char *s) {
 	0
 };*/
 
+static int GlobScan(StyleContext &sc) {
+	// forward scan for a glob-like (...), no whitespace allowed
+	int c, sLen = 0;
+	while ((c = sc.GetRelativeCharacter(++sLen)) != 0) {
+		if (IsASpace(c)) {
+			return 0;
+		} else if (c == ')') {
+			return sLen;
+		}
+	}
+	return 0;
+}
+
 static void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, WordList *keywordlists[], Accessor &styler) {
 	WordList &keywords = *keywordlists[0];
 	WordList cmdDelimiter, bashStruct, bashStruct_in;
@@ -100,9 +113,9 @@ static void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int in
 	const CharacterSet setBashOperator(CharacterSet::setNone, "^&%()-+=|{}[]:;>,*<?!.~@");
 	const CharacterSet setSingleCharOp(CharacterSet::setNone, "rwxoRWXOezsfdlpSbctugkTBMACahGLNn");
 	const CharacterSet setParam(CharacterSet::setAlphaNum, "$_");
-	const CharacterSet setHereDoc(CharacterSet::setAlpha, "_\\-+!");
-	const CharacterSet setHereDoc2(CharacterSet::setAlphaNum, "_-+!");
-	const CharacterSet setLeftShift(CharacterSet::setDigits, "=$");
+	CharacterSet setHereDoc(CharacterSet::setAlpha, "_\\-+!%*,./:?@[]^`{}~");
+	CharacterSet setHereDoc2(CharacterSet::setAlphaNum, "_-+!%*,./:=?@[]^`{}~");
+	CharacterSet setLeftShift(CharacterSet::setDigits, "$");
 
 	HereDocCls HereDoc;
 	QuoteCls Quote;
@@ -233,6 +246,8 @@ static void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int in
 					sc.ForwardSetState(SCE_SH_DEFAULT);
 				} else if (!setWord.Contains(sc.ch)) {
 					sc.SetState(SCE_SH_DEFAULT);
+				} else if (cmdState == BASH_CMD_ARITH && !setWordStart.Contains(sc.ch)) {
+					sc.SetState(SCE_SH_DEFAULT);
 				}
 				break;
 			case SCE_SH_NUMBER:
@@ -307,17 +322,18 @@ static void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int in
 						sc.Forward();
 						HereDoc.Quoted = true;
 						HereDoc.State = 1;
-					} else if (setHereDoc.Contains(sc.chNext)) {
+					} else if (setHereDoc.Contains(sc.chNext) ||
+					           (sc.chNext == '=' && cmdState != BASH_CMD_ARITH)) {
 						// an unquoted here-doc delimiter, no special handling
-						// TODO check what exactly bash considers part of the delim
 						HereDoc.State = 1;
 					} else if (sc.chNext == '<') {	// HERE string <<<
 						sc.Forward();
 						sc.ForwardSetState(SCE_SH_DEFAULT);
 					} else if (IsASpace(sc.chNext)) {
 						// eat whitespace
-					} else if (setLeftShift.Contains(sc.chNext)) {
-						// left shift << or <<= operator cases
+					} else if (setLeftShift.Contains(sc.chNext) ||
+					           (sc.chNext == '=' && cmdState == BASH_CMD_ARITH)) {
+						// left shift <<$var or <<= cases
 						sc.ChangeState(SCE_SH_OPERATOR);
 						sc.ForwardSetState(SCE_SH_DEFAULT);
 					} else {
@@ -472,12 +488,14 @@ static void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int in
 			HereDoc.State = 2;
 			if (HereDoc.Quoted) {
 				if (sc.state == SCE_SH_HERE_DELIM) {
-					// Missing quote at end of string! We are stricter than bash.
-					// Colour here-doc anyway while marking this bit as an error.
+					// Missing quote at end of string! Syntax error in bash 4.3
+					// Mark this bit as an error, do not colour any here-doc
 					sc.ChangeState(SCE_SH_ERROR);
+					sc.SetState(SCE_SH_DEFAULT);
+				} else {
+					// HereDoc.Quote always == '\''
+					sc.SetState(SCE_SH_HERE_Q);
 				}
-				// HereDoc.Quote always == '\''
-				sc.SetState(SCE_SH_HERE_Q);
 			} else if (HereDoc.DelimiterLength == 0) {
 				// no delimiter, illegal (but '' and "" are legal)
 				sc.ChangeState(SCE_SH_ERROR);
@@ -523,6 +541,23 @@ static void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int in
 					sc.SetState(SCE_SH_COMMENTLINE);
 				} else {
 					sc.SetState(SCE_SH_WORD);
+				}
+				// handle some zsh features within arithmetic expressions only
+				if (cmdState == BASH_CMD_ARITH) {
+					if (sc.chPrev == '[') {	// [#8] [##8] output digit setting
+						sc.SetState(SCE_SH_WORD);
+						if (sc.chNext == '#') {
+							sc.Forward();
+						}
+					} else if (sc.Match("##^") && IsUpperCase(sc.GetRelative(3))) {	// ##^A
+						sc.SetState(SCE_SH_IDENTIFIER);
+						sc.Forward(3);
+					} else if (sc.chNext == '#' && !IsASpace(sc.GetRelative(2))) {	// ##a
+						sc.SetState(SCE_SH_IDENTIFIER);
+						sc.Forward(2);
+					} else if (setWordStart.Contains(sc.chNext)) {	// #name
+						sc.SetState(SCE_SH_IDENTIFIER);
+					}
 				}
 			} else if (sc.ch == '\"') {
 				sc.SetState(SCE_SH_STRING);
@@ -575,6 +610,15 @@ static void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int in
 				sc.Forward();
 			} else if (setBashOperator.Contains(sc.ch)) {
 				sc.SetState(SCE_SH_OPERATOR);
+				// globs have no whitespace, do not appear in arithmetic expressions
+				if (cmdState != BASH_CMD_ARITH && sc.ch == '(' && sc.chNext != '(') {
+					int i = GlobScan(sc);
+					if (i > 1) {
+						sc.SetState(SCE_SH_IDENTIFIER);
+						sc.Forward(i);
+						continue;
+					}
+				}
 				// handle opening delimiters for test/arithmetic expressions - ((,[[,[
 				if (cmdState == BASH_CMD_START || cmdState == BASH_CMD_BODY) {
 					if (sc.Match('(', '(')) {

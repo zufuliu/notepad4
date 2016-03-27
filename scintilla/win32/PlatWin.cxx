@@ -5,6 +5,7 @@
 // Copyright 1998-2003 by Neil Hodgson <neilh@scintilla.org>
 // The License.txt file describes the conditions under which this software may be distributed.
 
+#include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -1616,17 +1617,16 @@ void SurfaceD2D::MeasureWidths(const Font &font_, const char *s, int len, XYPOSI
 		HRESULT hr = pIDWriteFactory->CreateTextLayout(tbuf.buffer, tbuf.tlen, pTextFormat, 10000.0, 1000.0, &pTextLayout);
 		if (!SUCCEEDED(hr))
 			return;
-		// For now, assuming WCHAR == cluster
 		if (!SUCCEEDED(pTextLayout->GetClusterMetrics(clusterMetrics, clusters, &count)))
 			return;
+		// A cluster may be more than one WCHAR, such as for "ffi" which is a ligature in the Candara font
 		FLOAT position = 0.0f;
 		size_t ti=0;
 		for (size_t ci=0; ci<count; ci++) {
-			position += clusterMetrics[ci].width;
 			for (size_t inCluster=0; inCluster<clusterMetrics[ci].length; inCluster++) {
-				//poses.buffer[ti++] = int(position + 0.5);
-				poses.buffer[ti++] = position;
+				poses.buffer[ti++] = position + clusterMetrics[ci].width * (inCluster + 1) / clusterMetrics[ci].length;
 			}
+			position += clusterMetrics[ci].width;
 		}
 		PLATFORM_ASSERT(ti == static_cast<size_t>(tbuf.tlen));
 		pTextLayout->Release();

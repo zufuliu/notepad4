@@ -249,7 +249,7 @@ enu IMEInteraction=SC_IME_
 val SC_IME_WINDOWED=0
 val SC_IME_INLINE=1
 
-# Is the IME displayed in a winow or inline?
+# Is the IME displayed in a window or inline?
 get int GetIMEInteraction=2678(,)
 
 # Choose to display the the IME in a winow or inline.
@@ -1426,7 +1426,7 @@ val SC_MULTIPASTE_EACH=1
 # Change the effect of pasting when there are multiple selections.
 set void SetMultiPaste=2614(int multiPaste,)
 
-# Retrieve the effect of pasting when there are multiple selections..
+# Retrieve the effect of pasting when there are multiple selections.
 get int GetMultiPaste=2615(,)
 
 # Retrieve the value of a tag from a regular expression search.
@@ -1995,7 +1995,7 @@ val SC_MULTIAUTOC_EACH=1
 # Change the effect of autocompleting when there are multiple selections.
 set void AutoCSetMulti=2636(int multi,)
 
-# Retrieve the effect of autocompleting when there are multiple selections..
+# Retrieve the effect of autocompleting when there are multiple selections.
 get int AutoCGetMulti=2637(,)
 
 enu Ordering=SC_ORDER_

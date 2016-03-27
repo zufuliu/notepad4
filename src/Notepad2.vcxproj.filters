@@ -150,7 +150,7 @@
     <ClCompile Include="..\scintilla\win32\ScintillaWin.cxx">
       <Filter>Scintilla\win32</Filter>
     </ClCompile>
-    <ClCompile Include="..\scintilla\lexers\LexAnsiArt.cxx">
+    <ClCompile Include="..\scintilla\lexers\LexNull.cxx">
       <Filter>Scintilla\lexers</Filter>
     </ClCompile>
     <ClCompile Include="..\scintilla\lexers\LexAsm.cxx">

@@ -24,12 +24,12 @@ LD = link.exe
 RC = rc.exe
 
 !IFDEF x64
-BINDIR  = ..\bin
+BINDIR = ..\bin\WDK\Release_x64
 !ELSE
-BINDIR  = ..\bin
+BINDIR = ..\bin\WDK\Release_x86
 !ENDIF
-OBJDIR  = $(BINDIR)\obj-7
-EXE     = $(BINDIR)\Notepad2-7.exe
+OBJDIR = $(BINDIR)\obj
+EXE    = $(BINDIR)\Notepad2.exe
 
 SCI_OBJDIR      = $(OBJDIR)\scintilla
 SCI_LEX_OBJDIR  = $(SCI_OBJDIR)\lexers
@@ -57,8 +57,8 @@ DEFINES       = /D "_WINDOWS" /D "NDEBUG" /D "_UNICODE" /D "UNICODE" /D "_STL70_
                 /D "WDK_BUILD"
 INCLUDEDIRS   = /I "$(SCI_INC)" /I "$(SCI_LEX)" /I "$(SCI_LIB)" /I "$(SCI_SRC)" \
                 /I "$(SCI_WIN)" /I "$(NP2_SRC)"
-CXXFLAGS      = /nologo /c /W4 /EHsc /MD /arch:SSE2 /O1 /Oy /Oi /Os /GT /GL /GF /Gm- /GR- /Gy /GA /Zc:wchar_t /Zc:forScope $(DEFINES) $(INCLUDEDIRS)
-LDFLAGS       = /nologo /INCREMENTAL:NO /RELEASE /OPT:REF /OPT:ICF /LTCG /MERGE:.rdata=.text /DEBUG
+CXXFLAGS      = /nologo /c /W4 /EHsc /MD /arch:SSE2 /O2 /Oy /Oi /Os /GT /GL /GF /Gm- /GR- /GS- /Gy /GA /Zc:wchar_t /Zc:forScope $(DEFINES) $(INCLUDEDIRS)
+LDFLAGS       = /nologo /INCREMENTAL:NO /RELEASE /OPT:REF /OPT:ICF /LTCG /DYNAMICBASE /NXCOMPAT /MERGE:.rdata=.text /DEBUG
 LIBS          = kernel32.lib gdi32.lib user32.lib advapi32.lib comctl32.lib comdlg32.lib imm32.lib \
                 ole32.lib oleaut32.lib psapi.lib shell32.lib shlwapi.lib \
                 winspool.lib ntstc_msvcrt.lib
@@ -78,6 +78,7 @@ LDFLAGS       = $(LDFLAGS) /LARGEADDRESSAWARE /SUBSYSTEM:WINDOWS,5.01 /MACHINE:$
 LIBS          = $(LIBS) msvcrt_winxp.obj
 RFLAGS        = $(RFLAGS) /d "WIN32"
 !ENDIF
+
 
 ###############
 ##  Targets  ##

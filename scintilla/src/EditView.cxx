@@ -376,14 +376,14 @@ void EditView::LayoutLine(const EditModel &model, int line, Surface *surface, co
 			// See if chars, styles, indicators, are all the same
 			bool allSame = true;
 			// Check base line layout
-			char styleByte = 0;
+			int styleByte = 0;
 			int numCharsInLine = 0;
 			while (numCharsInLine < lineLength) {
 				int charInDoc = numCharsInLine + posLineStart;
 				char chDoc = model.pdoc->CharAt(charInDoc);
-				styleByte = model.pdoc->StyleAt(charInDoc);
+				styleByte = model.pdoc->StyleIndexAt(charInDoc);
 				allSame = allSame &&
-					(ll->styles[numCharsInLine] == static_cast<unsigned char>(styleByte));
+					(ll->styles[numCharsInLine] == styleByte);
 				if (vstyle.styles[ll->styles[numCharsInLine]].caseForce == Style::caseMixed)
 					allSame = allSame &&
 					(ll->chars[numCharsInLine] == chDoc);
@@ -986,11 +986,10 @@ static void DrawIndicators(Surface *surface, const EditModel &model, const ViewS
 				startPos = deco->rs.EndRun(startPos);
 			}
 			while ((startPos < posLineEnd) && (deco->rs.ValueAt(startPos))) {
-				int endPos = deco->rs.EndRun(startPos);
-				if (endPos > posLineEnd)
-					endPos = posLineEnd;
+				const Range rangeRun(deco->rs.StartRun(startPos), deco->rs.EndRun(startPos));
+				const int endPos = std::min(rangeRun.end, posLineEnd);
 				const bool hover = vsDraw.indicators[deco->indicator].IsDynamic() &&
-					((hoverIndicatorPos >= startPos) && (hoverIndicatorPos <= endPos));
+					rangeRun.ContainsCharacter(hoverIndicatorPos);
 				const int value = deco->rs.ValueAt(startPos);
 				Indicator::DrawState drawState = hover ? Indicator::drawHover : Indicator::drawNormal;
 				DrawIndicator(deco->indicator, startPos - posLineStart, endPos - posLineStart,
@@ -1751,7 +1750,7 @@ static void DrawFoldLines(Surface *surface, const EditModel &model, const ViewSt
 	const int level = model.pdoc->GetLevel(line);
 	const int levelNext = model.pdoc->GetLevel(line + 1);
 	if ((level & SC_FOLDLEVELHEADERFLAG) &&
-		((level & SC_FOLDLEVELNUMBERMASK) < (levelNext & SC_FOLDLEVELNUMBERMASK))) {
+		(LevelNumber(level) < LevelNumber(levelNext))) {
 		// Paint the line above the fold
 		if ((expanded && (model.foldFlags & SC_FOLDFLAG_LINEBEFORE_EXPANDED))
 			||

@@ -22,11 +22,10 @@ public:
 	bool Quoted;	// true if Quote in ('\'','"','`')
 	bool Indented;	// indented delimiter (for <<-)
 	int DelimiterLength;	// strlen(Delimiter)
-	char *Delimiter;		// the Delimiter, 256: sizeof PL_tokenbuf
+	char Delimiter[HERE_DELIM_MAX];	// the Delimiter
 	HereDocCls();
 	void Append(int ch);
 	~HereDocCls() {
-		delete []Delimiter;
 	}
 };
 
@@ -53,17 +52,14 @@ public:
 	int Up, Down;
 	int Style;
 	int Depth;			// levels pushed
-	int *CountStack;
-	int *UpStack;
-	int *StyleStack;
+	int CountStack[QUOTE_DELIM_STACK_MAX];
+	int UpStack[QUOTE_DELIM_STACK_MAX];
+	int StyleStack[QUOTE_DELIM_STACK_MAX];
 	QuoteStackCls();
 	void Start(int u, int s);
 	void Push(int u, int s);
 	void Pop(void);
 	~QuoteStackCls() {
-		delete[] CountStack;
-		delete[] UpStack;
-		delete[] StyleStack;
 	}
 };
 

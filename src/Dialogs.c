@@ -292,7 +292,6 @@ INT_PTR CALLBACK AboutDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam
 
 
 	case WM_COMMAND:
-
 		switch (LOWORD(wParam)) {
 		case IDOK:
 		case IDCANCEL:

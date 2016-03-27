@@ -29,7 +29,7 @@ LEX_HEADERS = \
     $(SCI_LIB)\StyleContext.h \
     $(SCI_LIB)\LexerModule.h
 
-$(SCI_LEX_OBJDIR)\LexAnsiArt.obj: $(SCI_LEX)\LexAnsiArt.cxx $(LEX_HEADERS)
+$(SCI_LEX_OBJDIR)\LexNull.obj: $(SCI_LEX)\LexNull.cxx $(LEX_HEADERS)
 $(SCI_LEX_OBJDIR)\LexAsm.obj: $(SCI_LEX)\LexAsm.cxx $(LEX_HEADERS) $(SCI_LIB)
 $(SCI_LEX_OBJDIR)\LexAutoIt3.obj: $(SCI_LEX)\LexAutoIt3.cxx $(LEX_HEADERS)
 $(SCI_LEX_OBJDIR)\LexBash.obj: $(SCI_LEX)\LexBash.cxx $(LEX_HEADERS) $(SCI_LIB)\HereDoc.h
