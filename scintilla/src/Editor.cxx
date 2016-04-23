@@ -2268,12 +2268,13 @@ void Editor::DelCharBack(bool allowLineStartDeletion) {
 	ShowCaretAtCurrentPosition();
 }
 
-int Editor::ModifierFlags(bool shift, bool ctrl, bool alt, bool meta) {
+int Editor::ModifierFlags(bool shift, bool ctrl, bool alt, bool meta, bool super) {
 	return
 		(shift ? SCI_SHIFT : 0) |
 		(ctrl ? SCI_CTRL : 0) |
 		(alt ? SCI_ALT : 0) |
-		(meta ? SCI_META : 0);
+		(meta ? SCI_META : 0) |
+		(super ? SCI_SUPER : 0);
 }
 
 void Editor::NotifyFocus(bool focus) {

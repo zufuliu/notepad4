@@ -1095,10 +1095,10 @@ sptr_t ScintillaWin::HandleCompositionInline(uptr_t, sptr_t lParam) {
 		recordingMacro = tmpRecordingMacro;
 
 		// Move IME caret from current last position to imeCaretPos.
-		int toImeStart = static_cast<unsigned int>(StringEncode(wcs, codePage).size());
-		std::string imeCaret(StringEncode(wcs.substr(0, imc.GetImeCaretPos()), codePage));
-		int toImeCaret = static_cast<unsigned int>(imeCaret.size());
-		MoveImeCarets(- toImeStart + toImeCaret);
+		int imeEndToImeCaretU16 = imc.GetImeCaretPos() - static_cast<unsigned int>(wcs.size());
+		int imeCaretPosDoc = pdoc->GetRelativePositionUTF16(CurrentPosition(), imeEndToImeCaretU16);
+
+		MoveImeCarets(- CurrentPosition() + imeCaretPosDoc);
 
 		if (KoreanIME()) {
 			view.imeCaretBlockOverride = true;
