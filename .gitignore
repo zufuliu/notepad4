@@ -4,6 +4,7 @@
 *.suo
 *.sdf
 *.user
+*.VC.db
 *.aps
 *.obj
 *.exe

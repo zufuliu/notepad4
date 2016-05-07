@@ -63,7 +63,7 @@ LIBS          = kernel32.lib gdi32.lib user32.lib advapi32.lib comctl32.lib comd
                 ole32.lib oleaut32.lib psapi.lib shell32.lib shlwapi.lib \
                 winspool.lib ntstc_msvcrt.lib
 RFLAGS        = /l 0x0409 /d "_UNICODE" /d "UNICODE" /d "BOOKMARK_EDITION"
-SCI_CXXFLAGS  = $(CXXFLAGS) /D "STATIC_BUILD" /D "SCI_LEXER" /D "DISABLE_D2D" /D "SCI_DISABLE_PROVISIONAL"
+SCI_CXXFLAGS  = $(CXXFLAGS) /D "STATIC_BUILD" /D "SCI_LEXER" /D "DISABLE_D2D" /D "NO_CXX11_REGEX" /D "SCI_DISABLE_PROVISIONAL"
 
 !IFDEF x64
 DEFINES       = $(DEFINES) /D "_WIN64" /D "_WIN32_WINNT=0x0502"
