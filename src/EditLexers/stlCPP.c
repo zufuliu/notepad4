@@ -21,7 +21,7 @@ static KEYWORDLIST Keywords_CPP = {
 // GCC
 "typeof __typeof__ __alignof__ __label__ __asm__ __thread __attribute__ __volatile__ __restrict__ __restrict __inline__ __extension__ where "
 "__auto_type "
-"__nonnull __nullable __covariant __kindof "
+"__nonnull __nullable __covariant __kindof nullable nonnull "
 // Keil
 "sfr sfr16 interrupt "
 

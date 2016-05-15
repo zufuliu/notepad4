@@ -163,7 +163,7 @@ ECHO [%~1] %~2
 ECHO ______________________________ & ECHO.
 IF /I "%~1" == "ERROR" (
   PAUSE
-  EXIT
+  EXIT /B
 ) ELSE (
   EXIT /B
 )

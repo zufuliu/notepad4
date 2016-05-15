@@ -3938,6 +3938,7 @@ void EditSortLines(HWND hwnd, int iSortFlags)
 	int iCurPos;
 	int iAnchorPos;
 	int iSelStart;
+	int iSelEnd;
 	int iLineStart;
 	int iLineEnd;
 	int iLineCount;
@@ -3976,8 +3977,6 @@ void EditSortLines(HWND hwnd, int iSortFlags)
 		return;
 	}
 
-	iSelStart = (int)SendMessage(hwnd, SCI_GETSELECTIONSTART, 0, 0);
-
 	if (SC_SEL_RECTANGLE == SendMessage(hwnd, SCI_GETSELECTIONMODE, 0, 0)) {
 		iRcCurLine = (int)SendMessage(hwnd, SCI_LINEFROMPOSITION, (WPARAM)iCurPos, 0);
 		iRcAnchorLine = (int)SendMessage(hwnd, SCI_LINEFROMPOSITION, (WPARAM)iAnchorPos, 0);
@@ -3991,7 +3990,8 @@ void EditSortLines(HWND hwnd, int iSortFlags)
 		iSortColumn = min(iRcCurCol, iRcAnchorCol);
 	}
 	else {
-		int iSelEnd = (int)SendMessage(hwnd, SCI_GETSELECTIONEND, 0, 0);
+		iSelStart = (int)SendMessage(hwnd, SCI_GETSELECTIONSTART, 0, 0);
+		iSelEnd = (int)SendMessage(hwnd, SCI_GETSELECTIONEND, 0, 0);
 
 		iLine = (int)SendMessage(hwnd, SCI_LINEFROMPOSITION, (WPARAM)iSelStart, 0);
 		iSelStart = (int)SendMessage(hwnd, SCI_POSITIONFROMLINE, (WPARAM)iLine, 0);
@@ -4044,13 +4044,13 @@ void EditSortLines(HWND hwnd, int iSortFlags)
 
 		cchw = MultiByteToWideChar(uCodePage, 0, pmsz, -1, NULL, 0) - 1;
 		if (cchw > 0) {
+			UINT col = 0, tabs = iTabWidth;
 			pLines[i].pwszLine = LocalAlloc(LPTR, sizeof(WCHAR) * (cchw + 1));
 			MultiByteToWideChar(uCodePage, 0, pmsz, -1, pLines[i].pwszLine,
 								(int)LocalSize(pLines[i].pwszLine) / sizeof(WCHAR));
 			pLines[i].pwszSortEntry = pLines[i].pwszLine;
 
 			if (iSortFlags & SORT_COLUMN) {
-				UINT col = 0, tabs = iTabWidth;
 				while (*(pLines[i].pwszSortEntry)) {
 					if (*(pLines[i].pwszSortEntry) == L'\t') {
 						if (col + tabs <= iSortColumn) {
@@ -4080,7 +4080,7 @@ void EditSortLines(HWND hwnd, int iSortFlags)
 	}
 
 	if (iSortFlags & SORT_DESCENDING) {
-		if (iSortFlags & SORT_LOGICAL && pfnStrCmpLogicalW) {
+		if ((iSortFlags & SORT_LOGICAL) && pfnStrCmpLogicalW) {
 			qsort(pLines, iLineCount, sizeof(SORTLINE), CmpLogicalRev);
 		} else {
 			qsort(pLines, iLineCount, sizeof(SORTLINE), CmpStdRev);
@@ -4097,7 +4097,7 @@ void EditSortLines(HWND hwnd, int iSortFlags)
 			pLines[j].pwszSortEntry = sLine.pwszSortEntry;
 		}
 	} else {
-		if (iSortFlags & SORT_LOGICAL && pfnStrCmpLogicalW) {
+		if ((iSortFlags & SORT_LOGICAL) && pfnStrCmpLogicalW) {
 			qsort(pLines, iLineCount, sizeof(SORTLINE), CmpLogical);
 		} else {
 			qsort(pLines, iLineCount, sizeof(SORTLINE), CmpStd);
@@ -4105,17 +4105,17 @@ void EditSortLines(HWND hwnd, int iSortFlags)
 	}
 
 	pmszResult = LocalAlloc(LPTR, cchTotal + 2 * iLineCount + 1);
-	pmszBuf		 = LocalAlloc(LPTR, ichlMax + 1);
+	pmszBuf	   = LocalAlloc(LPTR, ichlMax + 1);
 
 	for (i = 0; i < iLineCount; i++) {
 		BOOL bDropLine = FALSE;
 		if (pLines[i].pwszLine && ((iSortFlags & SORT_SHUFFLE) || lstrlen(pLines[i].pwszLine))) {
 			if (!(iSortFlags & SORT_SHUFFLE)) {
-				if (iSortFlags & SORT_MERGEDUP || iSortFlags & SORT_UNIQDUP || iSortFlags & SORT_UNIQUNIQ) {
+				if ((iSortFlags & SORT_MERGEDUP) || (iSortFlags & SORT_UNIQDUP) || (iSortFlags & SORT_UNIQUNIQ)) {
 					if (i < iLineCount - 1) {
 						if (pfnStrCmp(pLines[i].pwszLine, pLines[i + 1].pwszLine) == 0) {
 							bLastDup = TRUE;
-							bDropLine = (iSortFlags & SORT_MERGEDUP || iSortFlags & SORT_UNIQDUP);
+							bDropLine = ((iSortFlags & SORT_MERGEDUP) || (iSortFlags & SORT_UNIQDUP));
 						} else {
 							bDropLine = (!bLastDup && (iSortFlags & SORT_UNIQUNIQ)) || (bLastDup && (iSortFlags & SORT_UNIQDUP));
 							bLastDup = FALSE;
@@ -5899,11 +5899,11 @@ BOOL EditModifyLinesDlg(HWND hwnd, LPWSTR pwsz1, LPWSTR pwsz2)
 //
 INT_PTR CALLBACK EditAlignDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 {
-	static int piAlignMode;
+	static int *piAlignMode;
 	switch (umsg) {
 	case WM_INITDIALOG: {
-		piAlignMode = *((int *)lParam);
-		CheckRadioButton(hwnd, 100, 104, piAlignMode + 100);
+		piAlignMode = (int *)lParam;
+		CheckRadioButton(hwnd, 100, 104, *piAlignMode + 100);
 		CenterDlgInParent(hwnd);
 	}
 	return TRUE;
@@ -5912,17 +5912,17 @@ INT_PTR CALLBACK EditAlignDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lP
 	case WM_COMMAND:
 		switch (LOWORD(wParam)) {
 		case IDOK: {
-			piAlignMode = 0;
+			*piAlignMode = 0;
 			if (IsDlgButtonChecked(hwnd, 100) == BST_CHECKED) {
-				piAlignMode = ALIGN_LEFT;
+				*piAlignMode = ALIGN_LEFT;
 			} else if (IsDlgButtonChecked(hwnd, 101) == BST_CHECKED) {
-				piAlignMode = ALIGN_RIGHT;
+				*piAlignMode = ALIGN_RIGHT;
 			} else if (IsDlgButtonChecked(hwnd, 102) == BST_CHECKED) {
-				piAlignMode = ALIGN_CENTER;
+				*piAlignMode = ALIGN_CENTER;
 			} else if (IsDlgButtonChecked(hwnd, 103) == BST_CHECKED) {
-				piAlignMode = ALIGN_JUSTIFY;
+				*piAlignMode = ALIGN_JUSTIFY;
 			} else if (IsDlgButtonChecked(hwnd, 104) == BST_CHECKED) {
-				piAlignMode = ALIGN_JUSTIFY_EX;
+				*piAlignMode = ALIGN_JUSTIFY_EX;
 			}
 			EndDialog(hwnd, IDOK);
 		}
@@ -6163,15 +6163,15 @@ BOOL EditInsertTagDlg(HWND hwnd, LPWSTR pwszOpen, LPWSTR pwszClose)
 //
 INT_PTR CALLBACK EditSortDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 {
-	static int piSortFlags;
+	static int *piSortFlags;
 	static BOOL bEnableLogicalSort;
 
 	switch (umsg) {
 	case WM_INITDIALOG: {
-		piSortFlags = *((int *)lParam);
-		if (piSortFlags & SORT_DESCENDING) {
+		piSortFlags = (int *)lParam;
+		if (*piSortFlags & SORT_DESCENDING) {
 			CheckRadioButton(hwnd, 100, 102, 101);
-		} else if (piSortFlags & SORT_SHUFFLE) {
+		} else if (*piSortFlags & SORT_SHUFFLE) {
 			CheckRadioButton(hwnd, 100, 102, 102);
 			EnableWindow(GetDlgItem(hwnd, 103), FALSE);
 			EnableWindow(GetDlgItem(hwnd, 104), FALSE);
@@ -6182,25 +6182,25 @@ INT_PTR CALLBACK EditSortDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPa
 			CheckRadioButton(hwnd, 100, 102, 100);
 		}
 
-		if (piSortFlags & SORT_MERGEDUP) {
+		if (*piSortFlags & SORT_MERGEDUP) {
 			CheckDlgButton(hwnd, 103, BST_CHECKED);
 		}
 
-		if (piSortFlags & SORT_UNIQDUP) {
+		if (*piSortFlags & SORT_UNIQDUP) {
 			CheckDlgButton(hwnd, 104, BST_CHECKED);
 			EnableWindow(GetDlgItem(hwnd, 103), FALSE);
 		}
 
-		if (piSortFlags & SORT_UNIQUNIQ) {
+		if (*piSortFlags & SORT_UNIQUNIQ) {
 			CheckDlgButton(hwnd, 105, BST_CHECKED);
 		}
 
-		if (piSortFlags & SORT_NOCASE) {
+		if (*piSortFlags & SORT_NOCASE) {
 			CheckDlgButton(hwnd, 106, BST_CHECKED);
 		}
 
 		if (GetProcAddress(GetModuleHandle(L"shlwapi"), "StrCmpLogicalW")) {
-			if (piSortFlags & SORT_LOGICAL) {
+			if (*piSortFlags & SORT_LOGICAL) {
 				CheckDlgButton(hwnd, 107, BST_CHECKED);
 			}
 			bEnableLogicalSort = TRUE;
@@ -6210,10 +6210,10 @@ INT_PTR CALLBACK EditSortDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPa
 		}
 
 		if (SC_SEL_RECTANGLE != SendMessage(hwndEdit, SCI_GETSELECTIONMODE, 0, 0)) {
-			piSortFlags &= ~SORT_COLUMN;
+			*piSortFlags &= ~SORT_COLUMN;
 			EnableWindow(GetDlgItem(hwnd, 108), FALSE);
 		} else {
-			piSortFlags |= SORT_COLUMN;
+			*piSortFlags |= SORT_COLUMN;
 			CheckDlgButton(hwnd, 108, BST_CHECKED);
 		}
 		CenterDlgInParent(hwnd);
@@ -6224,30 +6224,30 @@ INT_PTR CALLBACK EditSortDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPa
 	case WM_COMMAND:
 		switch (LOWORD(wParam)) {
 		case IDOK: {
-			piSortFlags = 0;
+			*piSortFlags = 0;
 			if (IsDlgButtonChecked(hwnd, 101) == BST_CHECKED) {
-				piSortFlags |= SORT_DESCENDING;
+				*piSortFlags |= SORT_DESCENDING;
 			}
 			if (IsDlgButtonChecked(hwnd, 102) == BST_CHECKED) {
-				piSortFlags |= SORT_SHUFFLE;
+				*piSortFlags |= SORT_SHUFFLE;
 			}
 			if (IsDlgButtonChecked(hwnd, 103) == BST_CHECKED) {
-				piSortFlags |= SORT_MERGEDUP;
+				*piSortFlags |= SORT_MERGEDUP;
 			}
 			if (IsDlgButtonChecked(hwnd, 104) == BST_CHECKED) {
-				piSortFlags |= SORT_UNIQDUP;
+				*piSortFlags |= SORT_UNIQDUP;
 			}
 			if (IsDlgButtonChecked(hwnd, 105) == BST_CHECKED) {
-				piSortFlags |= SORT_UNIQUNIQ;
+				*piSortFlags |= SORT_UNIQUNIQ;
 			}
 			if (IsDlgButtonChecked(hwnd, 106) == BST_CHECKED) {
-				piSortFlags |= SORT_NOCASE;
+				*piSortFlags |= SORT_NOCASE;
 			}
 			if (IsDlgButtonChecked(hwnd, 107) == BST_CHECKED) {
-				piSortFlags |= SORT_LOGICAL;
+				*piSortFlags |= SORT_LOGICAL;
 			}
 			if (IsDlgButtonChecked(hwnd, 108) == BST_CHECKED) {
-				piSortFlags |= SORT_COLUMN;
+				*piSortFlags |= SORT_COLUMN;
 			}
 			EndDialog(hwnd, IDOK);
 		}

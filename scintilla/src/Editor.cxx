@@ -831,6 +831,7 @@ void Editor::MovedCaret(const SelectionPosition& newPos, SelectionPosition previ
 	}
 
 	ShowCaretAtCurrentPosition();
+	NotifyCaretMove();
 
 	ClaimSelection();
 	SetHoverIndicatorPosition(sel.MainCaret());
@@ -1441,6 +1442,9 @@ void Editor::InvalidateCaret() {
 }
 
 void Editor::UpdateSystemCaret() {
+}
+
+void Editor::NotifyCaretMove() {
 }
 
 bool Editor::Wrapping() const {

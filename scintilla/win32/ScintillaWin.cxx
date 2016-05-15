@@ -327,6 +327,7 @@ class ScintillaWin :
 	virtual void SetTrackMouseLeaveEvent(bool on);
 	virtual bool PaintContains(const PRectangle &rc);
 	virtual void ScrollText(int linesToMove);
+	virtual void NotifyCaretMove();
 	virtual void UpdateSystemCaret();
 	virtual void SetVerticalScrollPos();
 	virtual void SetHorizontalScrollPos();
@@ -1838,6 +1839,10 @@ void ScintillaWin::ScrollText(int /* linesToMove */) {
 	//::UpdateWindow(MainHWND());
 	Redraw();
 	UpdateSystemCaret();
+}
+
+void ScintillaWin::NotifyCaretMove() {
+	NotifyWinEvent(EVENT_OBJECT_LOCATIONCHANGE, MainHWND(), OBJID_CARET, CHILDID_SELF);
 }
 
 void ScintillaWin::UpdateSystemCaret() {
