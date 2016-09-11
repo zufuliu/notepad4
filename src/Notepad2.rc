@@ -1445,11 +1445,9 @@ BEGIN
     IDS_TITLEEXCERPT        """%s"""
     IDS_READONLY            "(Read Only)"
 //#ifdef BOOKMARK_EDITION
-    IDS_DOCPOS              "Ln %s/%s  Col %s  Sel %s  SelLn %s  Fnd %s"
-    IDS_DOCPOS2             "Ln %s/%s  Col %s/%s  Sel %s  SelLn %s  Fnd %s"
+    IDS_DOCPOS             "Ln %s/%s Col %s/%s Ch %s/%s Sel %s/%s SelLn %s Fnd %s"
 //#else
-//    IDS_DOCPOS              "Ln %s/%s  Col %s  Sel %s"
-//    IDS_DOCPOS2             "Ln %s/%s  Col %s/%s  Sel %s"
+//    IDS_DOCPOS             "Ln %s/%s Col %s/%s Ch %s/%s Sel %s/%s"
 //#endif
     IDS_DOCSIZE             "%s"
     IDS_LOADFILE            "Loading ""%s""..."

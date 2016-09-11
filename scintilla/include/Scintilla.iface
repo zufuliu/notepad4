@@ -1191,7 +1191,7 @@ get bool GetFoldExpanded=2230(int line,)
 # Switch a header line between expanded and contracted.
 fun void ToggleFold=2231(int line,)
 
-enu FoldAction=SC_FOLDACTION
+enu FoldAction=SC_FOLDACTION_
 val SC_FOLDACTION_CONTRACT=0
 val SC_FOLDACTION_EXPAND=1
 val SC_FOLDACTION_TOGGLE=2
@@ -1387,7 +1387,7 @@ get bool GetTwoPhaseDraw=2283(,)
 # and then the foreground. This avoids chopping off characters that overlap the next run.
 set void SetTwoPhaseDraw=2284(bool twoPhase,)
 
-enu FontQuality=SC_PHASES_
+enu PhasesDraw=SC_PHASES_
 val SC_PHASES_ONE=0
 val SC_PHASES_TWO=1
 val SC_PHASES_MULTIPLE=2
@@ -2337,6 +2337,7 @@ enu VirtualSpace=SCVS_
 val SCVS_NONE=0
 val SCVS_RECTANGULARSELECTION=1
 val SCVS_USERACCESSIBLE=2
+val SCVS_NOWRAPLINESTART=4
 
 set void SetVirtualSpaceOptions=2596(int virtualSpaceOptions,)
 get int GetVirtualSpaceOptions=2597(,)

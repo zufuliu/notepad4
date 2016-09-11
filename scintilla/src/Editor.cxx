@@ -1840,13 +1840,24 @@ void Editor::ChangeSize() {
 	}
 }
 
-int Editor::InsertSpace(int position, unsigned int spaces) {
-	if (spaces > 0) {
-		std::string spaceText(spaces, ' ');
-		const int lengthInserted = pdoc->InsertString(position, spaceText.c_str(), spaces);
-		position += lengthInserted;
+int Editor::RealizeVirtualSpace(int position, unsigned int virtualSpace) {
+	if (virtualSpace > 0) {
+		const int line = pdoc->LineFromPosition(position);
+		const int indent = pdoc->GetLineIndentPosition(line);
+		if (indent == position) {
+			return pdoc->SetLineIndentation(line, pdoc->GetLineIndentation(line) + virtualSpace);
+		} else {
+			std::string spaceText(virtualSpace, ' ');
+			const int lengthInserted = pdoc->InsertString(position, spaceText.c_str(), virtualSpace);
+			position += lengthInserted;
+		}
 	}
 	return position;
+}
+
+SelectionPosition Editor::RealizeVirtualSpace(const SelectionPosition &position) {
+	// Return the new position with no virtual space
+	return SelectionPosition(RealizeVirtualSpace(position.Position(), position.VirtualSpace()));
 }
 
 void Editor::AddChar(char ch) {
@@ -1904,7 +1915,7 @@ void Editor::AddCharUTF(const char *s, unsigned int len, bool treatAsDBCS) {
 						}
 					}
 				}
-				positionInsert = InsertSpace(positionInsert, currentSel->caret.VirtualSpace());
+				positionInsert = RealizeVirtualSpace(positionInsert, currentSel->caret.VirtualSpace());
 				const int lengthInserted = pdoc->InsertString(positionInsert, s, len);
 				if (lengthInserted > 0) {
 					currentSel->caret.SetPosition(positionInsert + lengthInserted);
@@ -1978,7 +1989,7 @@ void Editor::ClearBeforeTentativeStart() {
 					sel.Range(r).MinimizeVirtualSpace();
 				}
 			}
-			InsertSpace(positionInsert, sel.Range(r).caret.VirtualSpace());
+			RealizeVirtualSpace(positionInsert, sel.Range(r).caret.VirtualSpace());
 			sel.Range(r).ClearVirtualSpace();
 		}
 	}
@@ -1987,7 +1998,7 @@ void Editor::ClearBeforeTentativeStart() {
 void Editor::InsertPaste(const char *text, int len) {
 	if (multiPasteMode == SC_MULTIPASTE_ONCE) {
 		SelectionPosition selStart = sel.Start();
-		selStart = SelectionPosition(InsertSpace(selStart.Position(), selStart.VirtualSpace()));
+		selStart = SelectionPosition(RealizeVirtualSpace(selStart.Position(), selStart.VirtualSpace()));
 		const int lengthInserted = pdoc->InsertString(selStart.Position(), text, len);
 		if (lengthInserted > 0) {
 			SetEmptySelection(selStart.Position() + lengthInserted);
@@ -2007,7 +2018,7 @@ void Editor::InsertPaste(const char *text, int len) {
 						sel.Range(r).MinimizeVirtualSpace();
 					}
 				}
-				positionInsert = InsertSpace(positionInsert, sel.Range(r).caret.VirtualSpace());
+				positionInsert = RealizeVirtualSpace(positionInsert, sel.Range(r).caret.VirtualSpace());
 				const int lengthInserted = pdoc->InsertString(positionInsert, text, len);
 				if (lengthInserted > 0) {
 					sel.Range(r).caret.SetPosition(positionInsert + lengthInserted);
@@ -2129,8 +2140,7 @@ void Editor::PasteRectangular(const SelectionPosition &pos, const char *ptr, int
 	sel.RangeMain() = SelectionRange(pos);
 	int line = pdoc->LineFromPosition(sel.MainCaret());
 	UndoGroup ug(pdoc);
-	sel.RangeMain().caret = SelectionPosition(
-		InsertSpace(sel.RangeMain().caret.Position(), sel.RangeMain().caret.VirtualSpace()));
+	sel.RangeMain().caret = RealizeVirtualSpace(sel.RangeMain().caret);
 	int xInsert = XFromPosition(sel.RangeMain().caret);
 	bool prevCr = false;
 	while ((len > 0) && IsEOLChar(ptr[len-1]))
@@ -2182,9 +2192,9 @@ void Editor::Clear() {
 			if (!RangeContainsProtected(sel.Range(r).caret.Position(), sel.Range(r).caret.Position() + 1)) {
 				if (sel.Range(r).Start().VirtualSpace()) {
 					if (sel.Range(r).anchor < sel.Range(r).caret)
-						sel.Range(r) = SelectionRange(InsertSpace(sel.Range(r).anchor.Position(), sel.Range(r).anchor.VirtualSpace()));
+						sel.Range(r) = SelectionRange(RealizeVirtualSpace(sel.Range(r).anchor.Position(), sel.Range(r).anchor.VirtualSpace()));
 					else
-						sel.Range(r) = SelectionRange(InsertSpace(sel.Range(r).caret.Position(), sel.Range(r).caret.VirtualSpace()));
+						sel.Range(r) = SelectionRange(RealizeVirtualSpace(sel.Range(r).caret.Position(), sel.Range(r).caret.VirtualSpace()));
 				}
 				if ((sel.Count() == 1) || !pdoc->IsPositionInLineEnd(sel.Range(r).caret.Position())) {
 					pdoc->DelChar(sel.Range(r).caret.Position());
@@ -3286,7 +3296,7 @@ int Editor::HorizontalMove(unsigned int iMessage) {
 		case SCI_CHARLEFTRECTEXTEND:
 			if (pdoc->IsLineEndPosition(spCaret.Position()) && spCaret.VirtualSpace()) {
 				spCaret.SetVirtualSpace(spCaret.VirtualSpace() - 1);
-			} else {
+			} else if ((virtualSpaceOptions & SCVS_NOWRAPLINESTART) == 0 || pdoc->GetColumn(spCaret.Position()) > 0) {
 				spCaret = SelectionPosition(spCaret.Position() - 1);
 			}
 			break;
@@ -3331,7 +3341,7 @@ int Editor::HorizontalMove(unsigned int iMessage) {
 			case SCI_CHARLEFTEXTEND:
 				if (spCaret.VirtualSpace()) {
 					spCaret.SetVirtualSpace(spCaret.VirtualSpace() - 1);
-				} else {
+				} else if ((virtualSpaceOptions & SCVS_NOWRAPLINESTART) == 0 || pdoc->GetColumn(spCaret.Position()) > 0) {
 					spCaret = SelectionPosition(spCaret.Position() - 1);
 				}
 				break;
@@ -3507,7 +3517,7 @@ int Editor::DelWordOrLine(unsigned int iMessage) {
 		} else {
 			// Delete to the right so first realise the virtual space.
 			sel.Range(r) = SelectionRange(
-				InsertSpace(sel.Range(r).caret.Position(), sel.Range(r).caret.VirtualSpace()));
+				RealizeVirtualSpace(sel.Range(r).caret.Position(), sel.Range(r).caret.VirtualSpace()));
 		}
 
 		Range rangeDelete;
@@ -4212,7 +4222,7 @@ void Editor::DropAt(const SelectionPosition &position_, const char *value, size_
 			SetEmptySelection(position);
 		} else {
 			position = MovePositionOutsideChar(position, sel.MainCaret() - position.Position());
-			position = SelectionPosition(InsertSpace(position.Position(), position.VirtualSpace()));
+			position = RealizeVirtualSpace(position);
 			const int lengthInserted = pdoc->InsertString(
 				position.Position(), convertedText.c_str(), static_cast<int>(convertedText.length()));
 			if (lengthInserted > 0) {
@@ -5297,6 +5307,9 @@ void Editor::FoldExpand(int line, int action, int level) {
 	if (action == SC_FOLDACTION_TOGGLE) {
 		expanding = !cs.GetExpanded(line);
 	}
+	// Ensure child lines lexed and fold information extracted before
+	// flipping the state.
+	pdoc->GetLastChild(line, LevelNumber(level));
 	SetFoldExpanded(line, expanding);
 	if (expanding && (cs.HiddenLines() == 0))
 		// Nothing to do

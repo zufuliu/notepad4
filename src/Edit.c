@@ -3392,8 +3392,8 @@ void EditCompressSpaces(HWND hwnd)
 
 		if (iSelStart != iSelEnd) {
 			int cch = (int)SendMessage(hwnd, SCI_GETSELTEXT, 0, 0);
-			pszIn = LocalAlloc(LPTR, cch);
-			pszOut = LocalAlloc(LPTR, cch);
+			pszIn = LocalAlloc(LPTR, cch + 1);
+			pszOut = LocalAlloc(LPTR, cch + 1);
 			SendMessage(hwnd, SCI_GETSELTEXT, 0, (LPARAM)pszIn);
 			bIsLineStart =
 				(iSelStart == SendMessage(hwnd, SCI_POSITIONFROMLINE, (WPARAM)iLineStart, 0));

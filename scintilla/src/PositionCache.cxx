@@ -636,6 +636,7 @@ void PositionCache::Clear() {
 		for (size_t i=0; i<pces.size(); i++) {
 			pces[i].Clear();
 		}
+		pces.clear();
 	}
 	clock = 1;
 	allClear = true;
