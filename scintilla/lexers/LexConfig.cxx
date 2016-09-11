@@ -20,7 +20,7 @@ using namespace Scintilla;
 
 static inline bool IsConfOp(int ch) {
 	return ch == '=' || ch == ':' || ch == ';' || ch == '{' || ch == '}' || ch == '(' || ch == ')' ||
-		ch == '!' || ch == ',' || ch == '|' || ch == '*';
+		ch == '!' || ch == ',' || ch == '|' || ch == '*' || ch == '$' || ch == '.';
 }
 static inline bool IsUnit(int ch) {
 	return ch == 'K' || ch == 'M' || ch == 'G' || ch == 'k' || ch == 'm' || ch == 'g';
@@ -100,7 +100,11 @@ static void ColouriseConfDoc(Sci_PositionU startPos, Sci_Position length, int in
 				state = SCE_CONF_DIRECTIVE;
 			} else if (IsDelimiter(ch) || (insideTag && ch == '>')) {
 				styler.ColourTo(i - 1, state);
-				state = SCE_CONF_DEFAULT;
+				if (ch == '.') {
+					styler.ColourTo(i, SCE_CONF_OPERATOR);
+				} else {
+					state = SCE_CONF_DEFAULT;
+				}
 			}
 			break;
 		case SCE_CONF_SECTION:
@@ -113,7 +117,11 @@ static void ColouriseConfDoc(Sci_PositionU startPos, Sci_Position length, int in
 		case SCE_CONF_IDENTIFIER:
 			if (IsDelimiter(ch) || (insideTag && ch == '>') || (ch == '<' && chNext == '/')) {
 				styler.ColourTo(i - 1, state);
-				state = SCE_CONF_DEFAULT;
+				if (ch == '.') {
+					styler.ColourTo(i, SCE_CONF_OPERATOR);
+				} else {
+					state = SCE_CONF_DEFAULT;
+				}
 			}
 			break;
 		}

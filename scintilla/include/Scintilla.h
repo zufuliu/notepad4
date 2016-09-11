@@ -1123,6 +1123,13 @@ struct Sci_RangeToFormat {
 
 #define RangeToFormat Sci_RangeToFormat
 
+#ifndef __cplusplus
+/* For the GTK+ platform, g-ir-scanner needs to have these typedefs. This
+ * is not required in C++ code and actually seems to break ScintillaEditPy */
+typedef struct Sci_NotifyHeader Sci_NotifyHeader;
+typedef struct SCNotification SCNotification;
+#endif
+
 struct Sci_NotifyHeader {
 	/* Compatible with Windows NMHDR.
 	 * hwndFrom is really an environment specific window handle or pointer
@@ -1135,7 +1142,7 @@ struct Sci_NotifyHeader {
 #define NotifyHeader Sci_NotifyHeader
 
 struct SCNotification {
-	struct Sci_NotifyHeader nmhdr;
+	Sci_NotifyHeader nmhdr;
 	Sci_Position position;
 	/* SCN_STYLENEEDED, SCN_DOUBLECLICK, SCN_MODIFIED, SCN_MARGINCLICK, */
 	/* SCN_NEEDSHOWN, SCN_DWELLSTART, SCN_DWELLEND, SCN_CALLTIPCLICK, */

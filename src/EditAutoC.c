@@ -157,10 +157,28 @@ void AutoC_AddDocWord(HWND hwnd, struct WordList *pWList, BOOL bIgnore)
 					pWord[wordLength] = '\0';
 				}
 				if (wordLength > 0 && IsWordStart(*pWord) && !(*pWord == ':' && *(pWord + 1) != ':')) {
+					int count = 0;
 					if (!(pLexCurrent->iLexer == SCLEX_CPP && style == SCE_C_MACRO)) {
-						while (IsASpace(SciCall_GetCharAt(wordEnd))) wordEnd++;
+						while (IsASpace(SciCall_GetCharAt(wordEnd))) {
+							++count;
+							wordEnd++;
+						}
 					}
 					if (SciCall_GetCharAt(wordEnd) == '(') {
+						if (count && !(
+							   lstrcmpA(pWord, "for")
+							&& lstrcmpA(pWord, "if")
+							&& lstrcmpA(pWord, "while")
+							&& lstrcmpA(pWord, "switch")
+							&& lstrcmpA(pWord, "catch")
+							&& lstrcmpA(pWord, "foreach")
+							&& lstrcmpA(pWord, "elseif")
+							&& lstrcmpA(pWord, "synchronized")
+							&& lstrcmpA(pWord, "try")
+							&& lstrcmpA(pWord, "using")
+							))
+						pWord[wordLength++] = ' ';
+
 						pWord[wordLength++] = '(';
 						pWord[wordLength++] = ')';
 					//} else if (SciCall_GetCharAt(wordEnd) == '[') {
@@ -740,7 +758,6 @@ extern int	iIndentWidth;
 void EditAutoIndent(HWND hwnd)
 {
 	char *pLineBuf;
-	char *pPos;
 
 	int iCurPos = (int)SendMessage(hwnd, SCI_GETCURRENTPOS, 0, 0);
 	//int iAnchorPos = (int)SendMessage(hwnd, SCI_GETANCHOR, 0, 0);
@@ -770,6 +787,7 @@ void EditAutoIndent(HWND hwnd)
 		}
 		pLineBuf = GlobalAlloc(GPTR, 2*iPrevLineLength + 1 + iIndentWidth*2 + 2 + 64);
 		if (pLineBuf) {
+			char *pPos;
 			int indent = 0;
 			int	iIndentLen = 0;
 			int iIndentPos = iCurPos;
@@ -903,6 +921,7 @@ void EditToggleCommentLine(HWND hwnd)
 	case SCLEX_VERILOG:
 	case SCLEX_FSHARP:
 	case SCLEX_GRAPHVIZ:
+	case SCLEX_JSON:
 		BeginWaitCursor();
 		EditToggleLineComments(hwnd, L"//", FALSE);
 		EndWaitCursor();
@@ -1009,6 +1028,7 @@ void EditToggleCommentBlock(HWND hwnd)
 	case SCLEX_ASM:
 	case SCLEX_VERILOG:
 	case SCLEX_GRAPHVIZ:
+	case SCLEX_JSON:
 		EditEncloseSelection(hwnd, L"/*", L"*/");
 		break;
 	case SCLEX_PASCAL:

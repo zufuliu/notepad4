@@ -245,7 +245,7 @@ void Style_Load()
 			wsprintf(tch, L"%02i", i + 1);
 			if (IniSectionGetString(pIniSection, tch, L"", wch, COUNTOF(wch))) {
 				if (wch[0] == L'#') {
-					int irgb;
+					unsigned int irgb;
 					int itok = swscanf(CharNext(wch), L"%x", &irgb);
 					if (itok == 1) {
 						crCustom[i] = RGB((irgb & 0xFF0000) >> 16, (irgb & 0xFF00) >> 8, irgb & 0xFF);
@@ -519,11 +519,11 @@ void Style_SetLexer(HWND hwnd, PEDITLEXER pLexNew)
 	// Add KeyWord Lists
 	if (IsDocLowerKeywords(pLexNew)) {
 		unsigned int i;
-		char *lowerKeywords;
-		char ch;
 		for (i = 0; i < NUMKEYWORD; i++) {
 			const char* pKeywords = pLexNew->pKeyWords->pszKeyWords[i];
-			if (*pKeywords) {
+			if (pKeywords && *pKeywords) {
+				char *lowerKeywords;
+				char ch;
 				iIdx = lstrlenA(pKeywords);
 				lowerKeywords = LocalAlloc(LPTR, iIdx + 1);
 				lstrcpyA(lowerKeywords, pKeywords);
@@ -543,7 +543,12 @@ void Style_SetLexer(HWND hwnd, PEDITLEXER pLexNew)
 	} else {
 		unsigned int i;
 		for (i = 0; i < NUMKEYWORD; i++) {
-			SendMessage(hwnd, SCI_SETKEYWORDS, i, (LPARAM)pLexNew->pKeyWords->pszKeyWords[i]);
+			const char* pKeywords = pLexNew->pKeyWords->pszKeyWords[i];
+			if (pKeywords && *pKeywords) {
+				SendMessage(hwnd, SCI_SETKEYWORDS, i, (LPARAM)pKeywords);
+			} else {
+				SendMessage(hwnd, SCI_SETKEYWORDS, i, (LPARAM)"");
+			}
 		}
 	}
 
@@ -935,137 +940,92 @@ void Style_SetLexer(HWND hwnd, PEDITLEXER pLexNew)
 //
 PEDITLEXER __fastcall Style_SniffShebang(char *pchText)
 {
-	if (StrCmpNA(pchText, "#!", 2) == 0) {
+	if (pchText[0] == '#' && pchText[1] == '!') {
 		int len = 0;
 		char *pch = pchText + 2;
+		char *name = pch;
 		while (*pch == ' ' || *pch == '\t') {
 			pch++;
 		}
+		name = pch;
 		while (*pch && *pch != ' ' && *pch != '\t' && *pch != '\r' && *pch != '\n') {
+			len = *pch == '\\' || *pch == '/';
 			pch++;
+			name = len? pch : name;
 		}
-		if ((pch - pchText) >= 3 && StrCmpNIA(pch - 3, "env", 3) == 0) {
-			while (*pch == ' ') {
+		if ((pch - name) >= 3 && StrCmpNIA(name, "env", 3) == 0) {
+			while (*pch == ' ' || *pch == '\t') {
 				pch++;
 			}
+			name = pch;
 			while (*pch && *pch != ' ' && *pch != '\t' && *pch != '\r' && *pch != '\n') {
+				len = *pch == '\\' || *pch == '/';
 				pch++;
+				name = len? pch : name;
 			}
 		}
 
-		len = pch - pchText;
-		if (len >= 5) {
-			//if (len >= 11) {
-			//	if (!StrCmpNIA(pch-7, "pythonw.exe", 7))
-			//		return (&lexPython);
-			//	if (!StrCmpNIA(pch-7, "groovyw.exe", 7))
-			//		return (&lexGroovy);
-			//}
-			if (len >= 10) {
-				if (!StrCmpNIA(pch - 10, "python.exe", 10))
-					return (&lexPython);
-				//if (StrCmpNIA(pch-10, "groovy.exe", 10))
-				//	return (&lexGroovy);
+		*pch = 0;
+		len = pch - name;
+		pch = name;
+		while (*pch) {
+			*pch |= 32;
+			if (*pch < 'a' || *pch > 'z') {
+				*pch = 0;
+				len = pch - name;
+				break;
 			}
-			// if (len >= 9) {
-			//	if (!StrCmpNIA(pch-9, "tclsh.exe", 9))
-			//		return (&lexTcl);
-			//	if (!StrCmpNIA(pch-9, "rubyw.exe", 9))
-			//		return (&lexRuby);
-			//}
-			if (len >= 8) {
-				if (!StrCmpNIA(pch - 8, "perl.exe", 8))
-					return (&lexPerl);
-				if (!StrCmpNIA(pch - 8, "ruby.exe", 8))
-					return (&lexRuby);
-				if (!StrCmpNIA(pch - 8, "wish.exe", 8))
-					return (&lexTcl);
-				if (!StrCmpNIA(pch - 8, "bash.exe", 8) && StrCmpNIA(pch-8, "tcsh.exe", 8))
-					return (&lexBash);
-				if (!(StrCmpNIA(pch - 3, "gawk.exe", 8) && StrCmpNIA(pch - 3, "nawk.exe", 8)))
-					return (&lexAwk);
-				if (!StrCmpNIA(pch-8, "node.exe", 8))
-					return (&lexJS);
-				//if (!StrCmpNIA(pch-8, "wlua.exe", 8))
-				//	return (&lexLua);
-				//if (!StrCmpNIA(pch-8, "ipyw.exe", 8))
-				//	return (&lexPython);
-			}
-			if (len >= 7) {
-				if (!StrCmpNIA(pch - 7, "lua.exe", 7))
-					return (&lexLua);
-				if (!StrCmpNIA(pch-7, "php.exe", 7)) {
-					//np2LexLangIndex = IDM_LANG_PHP;
-					return (&lexPHP);
-				}
-				if (!StrCmpNIA(pch - 3, "awk.exe", 7))
-					return (&lexAwk);
-				//if (!StrCmpNIA(pch-7, "ipy.exe", 7))
-				//	return (&lexPython);
-				//if (!(StrCmpNIA(pch-7, "ksh.exe", 7) && StrCmpNIA(pch-7, "csh.exe", 7)))
-				//	return (&lexBash);
-				//if (!StrCmpNIA(pch-7, "tcc.exe", 7))
-				//	return (&lexCPP);
-				//if (!StrCmpNIA(pch-7, "pythonw", 7))
-				//	return (&lexPython);
-				//if (!StrCmpNIA(pch-7, "groovyw", 7))
-				//	return (&lexGROOCY);
-			}
-			if (len >= 6) {
-				if (!StrCmpNIA(pch - 6, "python", 6))
-					return (&lexPython);
-				if (!StrCmpNIA(pch - 6, "groovy", 6))
-					return (&lexGroovy);
-				if (!StrCmpNIA(pch - 6, "sh.exe", 6))
-					return (&lexBash);
-				if (!StrCmpNIA(pch - 6, "ir.exe", 6))
-					return (&lexRuby);
-			}
-			if (!StrCmpNIA(pch - 5, "scala", 5))
-				return (&lexScala);
-			//if (!StrCmpNIA(pch-5, "tclsh", 5))
-			//	return (&lexTcl);
-			//if (!StrCmpNIA(pch-5, "rubyw", 5))
-			//	return (&lexRuby);
+			pch++;
 		}
 
 		if (len >= 4) {
-			if (!(StrCmpNIA(pch - 4, "bash", 4) && StrCmpNIA(pch-4, "tcsh", 4)))
-				return (&lexBash);
-			if (!StrCmpNIA(pch - 4, "perl", 4))
-				return (&lexPerl);
-			if (!StrCmpNIA(pch - 4, "ruby", 4))
-				return (&lexRuby);
-			if (!StrCmpNA(pch - 4, "node", 4))
-				return(&lexJS);
-			//if (!StrCmpNIA(pch-4, "wish", 4))
-			//	return (&lexTcl);
-			if (!(StrCmpNIA(pch - 3, "gawk", 4) && StrCmpNIA(pch - 3, "nawk", 4)))
-				return (&lexAwk);
-			//if (!StrCmpNIA(pch-4, "wlua", 4))
-			//	return (&lexLua);
-			//if (!StrCmpNIA(pch-4, "ipyw", 4))
-			//	return (&lexPython);
+			if (len >= 5) {
+				if (!StrCmpNA(name, "python", 5))
+					return &lexPython;
+				if (!StrCmpNA(name, "groovy", 5))
+					return &lexGroovy;
+				if (!StrCmpNA(name, "scala", 5))
+					return (&lexScala);
+			}
+
+			if (!StrCmpNA(name, "bash", 4) || !StrCmpNA(name, "dash", 4) || !StrCmpNA(name, "tcsh", 4))
+				return &lexBash;
+			if (!StrCmpNA(name, "perl", 4))
+				return &lexPerl;
+			if (!StrCmpNA(name, "ruby", 4))
+				return &lexRuby;
+			if (!StrCmpNA(name, "gawk", 4) || !StrCmpNA(name, "nawk", 4))
+				return &lexAwk;
+			if (!StrCmpNA(name, "node", 4))
+				return &lexJS;
+			if (!StrCmpNA(name, "wish", 4))
+				return &lexTcl;
+			if (!StrCmpNA(name, "wlua", 4))
+				return &lexLua;
 		}
 		if (len >= 3) {
-			if (!StrCmpNIA(pch - 3, "lua", 3))
-				return (&lexLua);
-			if (!StrCmpNIA(pch-3, "php", 3))
-				return (&lexPHP);
-			if (!StrCmpNIA(pch - 3, "awk", 3))
-				return (&lexAwk);
-			if (!StrCmpNIA(pch - 3, "ipy", 3))
-				return (&lexPython);
-			//if (!(StrCmpNIA(pch-3, "ksh", 3) && StrCmpNIA(pch-3, "csh", 3)))
-			//	return (&lexBash);
-			//if (!StrCmpNIA(pch-3, "tcc", 3))
-			//	return (&lexCPP);
+			if (!StrCmpNA(name, "awk", 3))
+				return &lexAwk;
+			if (!StrCmpNA(name, "lua", 3))
+				return &lexLua;
+			if (!StrCmpNA(name, "php", 3)) {
+				//np2LexLangIndex = IDM_LANG_PHP;
+				return &lexPHP;
+			}
+			if (!StrCmpNA(name, "tcl", 3))
+				return &lexTcl;
+			if (!StrCmpNA(name, "ash", 3) || !StrCmpNA(name, "zsh", 3) || !StrCmpNA(name, "ksh", 3) || !StrCmpNA(name, "csh", 3))
+				return &lexBash;
+			if (!StrCmpNA(name, "ipy", 3))
+				return &lexPython;
 		}
 		if (len >= 2) {
-			if (!StrCmpNIA(pch - 2, "sh", 2))
-				return (&lexBash);
-			if (!StrCmpNIA(pch - 2, "ir", 2))
-				return (&lexRuby);
+			if (!StrCmpNA(name, "sh", 2))
+				return &lexBash;
+			if (!StrCmpNA(name, "py", 2))
+				return &lexPython;
+			if (!StrCmpNA(name, "go", 2))
+				return &lexGo;
 		}
 	}
 	return NULL;
@@ -1937,8 +1897,8 @@ BOOL Style_StrGetColor(BOOL bFore, LPCWSTR lpszStyle, int *rgb)
 
 	if ((p = StrStrI(lpszStyle, pItem))) {
 		WCHAR tch[256];
-		int	 iValue;
-		int	 itok;
+		unsigned int iValue;
+		int	itok;
 		lstrcpy(tch, p + lstrlen(pItem));
 		if (tch[0] == L'#') {
 			tch[0] = L' ';
@@ -2382,7 +2342,6 @@ void Style_SetFontQuality(HWND hwnd, LPCWSTR lpszStyle)
 			wQuality = SC_EFF_QUALITY_DEFAULT;
 		}
 	} else {
-		WCHAR tch[32];
 		if (Style_StrGetFont(lpszStyle, tch, COUNTOF(tch))) {
 			if (lstrcmpi(tch, L"DejaVu Sans Mono") == 0 ||
 					lstrcmpi(tch, L"Consolas") == 0 ||
@@ -2926,7 +2885,7 @@ INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM
 			break;
 
 			case IDC_IMPORT: {
-				HWND hwndTV = GetDlgItem(hwnd, IDC_STYLELIST);
+				hwndTV = GetDlgItem(hwnd, IDC_STYLELIST);
 
 				if (pCurrentStyle) {
 					GetDlgItemText(hwnd, IDC_STYLEEDIT, pCurrentStyle->szValue, COUNTOF(pCurrentStyle->szValue));

@@ -3938,7 +3938,6 @@ void EditSortLines(HWND hwnd, int iSortFlags)
 	int iCurPos;
 	int iAnchorPos;
 	int iSelStart;
-	int iSelEnd;
 	int iLineStart;
 	int iLineEnd;
 	int iLineCount;
@@ -3990,6 +3989,7 @@ void EditSortLines(HWND hwnd, int iSortFlags)
 		iSortColumn = min(iRcCurCol, iRcAnchorCol);
 	}
 	else {
+		int iSelEnd;
 		iSelStart = (int)SendMessage(hwnd, SCI_GETSELECTIONSTART, 0, 0);
 		iSelEnd = (int)SendMessage(hwnd, SCI_GETSELECTIONEND, 0, 0);
 

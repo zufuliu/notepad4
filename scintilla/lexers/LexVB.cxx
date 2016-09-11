@@ -58,6 +58,11 @@ static bool IsVBNumber(int ch, int chPrev) {
 	0
 };*/
 
+static inline bool IsSpaceEquiv(int state) {
+	// including SCE_B_DEFAULT, SCE_B_COMMENT
+	return (state <= SCE_B_COMMENT);
+}
+
 static void ColouriseVBDoc(Sci_PositionU startPos, Sci_Position length, int initStyle,
 	WordList *keywordlists[], Accessor &styler, bool vbScriptSyntax) {
 
@@ -69,6 +74,7 @@ static void ColouriseVBDoc(Sci_PositionU startPos, Sci_Position length, int init
 	WordList &keywords6 = *keywordlists[5];
 
 	int fileNbDigits = 0;
+	int visibleChars = 0;
 	bool isIfThenPreprocessor = false;
 	bool isEndPreprocessor = false;
 
@@ -79,6 +85,7 @@ static void ColouriseVBDoc(Sci_PositionU startPos, Sci_Position length, int init
 		if (sc.atLineStart) {
 			isIfThenPreprocessor = false;
 			isEndPreprocessor = false;
+			visibleChars = 0;
 		}
 
 		if (sc.state == SCE_B_OPERATOR) {
@@ -98,10 +105,14 @@ _label_identifier:
 					sc.Forward();
 				}
 				char s[128];
-				sc.GetCurrentLowered(s, sizeof(s));
+				int len = sc.GetCurrentLowered(s, sizeof(s));
 				if (skipType) {
-					s[strlen(s) - 1] = '\0';
+					s[len - 1] = '\0';
 				}
+				if (visibleChars == len && LexGetNextChar(sc.currentPos, styler) == ':') {
+					sc.ChangeState(SCE_B_LABEL);
+					sc.SetState(SCE_B_DEFAULT);
+				} else
 				if (strcmp(s, "rem") == 0) {
 					sc.ChangeState(SCE_B_COMMENT);
 				} else {
@@ -207,6 +218,10 @@ _label_identifier:
 			} else if (isoperator(static_cast<char>(sc.ch)) || (sc.ch == '\\')) { // Integer division
 				sc.SetState(SCE_B_OPERATOR);
 			}
+		}
+
+		if (!(isspacechar(sc.ch) || IsSpaceEquiv(sc.state))) {
+			visibleChars++;
 		}
 	}
 

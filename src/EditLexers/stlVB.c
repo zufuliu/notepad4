@@ -76,6 +76,7 @@ EDITLEXER lexVB = { SCLEX_VB, NP2LEX_VB, L"Visual Basic", L"vb; bas; frm; cls; c
 	{ SCE_B_CONSTANT, NP2STYLE_Constant, L"Constant", L"bold; fore:#B000B0", L""},
 	{ SCE_B_COMMENT, NP2STYLE_Comment, L"Comment", L"fore:#008000", L"" },
 	{ MULTI_STYLE(SCE_B_STRING,SCE_B_STRINGEOL,0,0), NP2STYLE_String, L"String", L"fore:#008000", L"" },
+	{ SCE_B_LABEL, NP2STYLE_Label, L"Label", L"fore:#000000; back:#FFC040", L""},
 	{ MULTI_STYLE(SCE_B_NUMBER,SCE_B_DATE,0,0), NP2STYLE_Number, L"Number", L"fore:#FF0000", L"" },
 	{ SCE_B_OPERATOR, NP2STYLE_Operator, L"Operator", L"fore:#B000B0", L"" },
 	{ -1, 00000, L"", L"", L"" }

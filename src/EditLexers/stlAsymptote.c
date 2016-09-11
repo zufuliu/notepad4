@@ -5,26 +5,26 @@ static KEYWORDLIST Keywords_ASY = {
 "private public import include from access as if else false true default restricted struct "
 "return for new explicit do while break operator this static typedef var continue unravel "
 "controls and cycle tension void null object"
-, // type keywor
+, // type keyword
 "bool int real string "
 "pair triple pen path frame guide transform file "
 
 "bool3 picture projection surface path3 guide3 transform3 "
 "revolution animation "
 
-, // preprocesso
+, // preprocessor
 ""
-, // directiv
+, // directive
 ""
 , // attribute
 ""
-, // clas
+, // class
 ""
-, // interfac
+, // interface
 ""
-, // enumeratio
+, // enumeration
 ""
-, // constan
+, // constant
 ""
 
 #if NUMKEYWORD == 1

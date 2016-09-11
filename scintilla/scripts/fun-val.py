@@ -1,4 +1,5 @@
 #-*- coding: UTF-8 -*-
+from __future__ import print_function
 import re
 
 def findHoles(asc):
@@ -20,11 +21,12 @@ for item in result:
 	name = item[2]
 	val = int(item[3])
 	if val in valList:
-		print 'duplicate value: %d %s %s' % (val, name, str(valList[val]))
+		print('duplicate value: %d %s %s' % (val, name, str(valList[val])))
 		valList[val].append(name)
 	else:
 		valList[val] = [name]
+
 allVals = sorted(valList.keys())
-print allVals
+print('all values:', allVals)
 allVals = [item for item in allVals if item < 3000]
-print allVals[0], allVals[-1], findHoles(allVals)
+print('min, max and holes:', allVals[0], allVals[-1], findHoles(allVals))

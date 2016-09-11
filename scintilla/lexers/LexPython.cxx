@@ -51,6 +51,11 @@ static inline bool IsPyStringStyle(int style) {
 		|| style == SCE_PY_RAW_STRING1 || style == SCE_PY_RAW_STRING2
 		|| style == SCE_PY_RAW_BYTES1 || style == SCE_PY_RAW_BYTES2;
 }
+static inline bool IsSpaceEquiv(int state) {
+	// including SCE_PY_DEFAULT, SCE_PY_COMMENTLINE, SCE_PY_COMMENTBLOCK
+	return (state <= SCE_PY_COMMENTLINE) || (state == SCE_PY_COMMENTBLOCK);
+}
+
 static void ColourisePyDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, WordList *keywordLists[], Accessor &styler) {
 	WordList &keywords = *keywordLists[0];
 	WordList &keywords2 = *keywordLists[1];
@@ -62,6 +67,7 @@ static void ColourisePyDoc(Sci_PositionU startPos, Sci_Position length, int init
 	WordList &keywords_class = *keywordLists[7];
 
 	int defType = 0;
+	int visibleChars = 0;
 	bool continuationLine = false;
 
 	//const int lexType = styler.GetPropertyInt("lexer.lang.type", LEX_PY);
@@ -73,6 +79,7 @@ static void ColourisePyDoc(Sci_PositionU startPos, Sci_Position length, int init
 				sc.SetState(sc.state);
 			}
 			defType = 0;
+			visibleChars = 0;
 		}
 
 		// Determine if the current state should terminate.
@@ -230,7 +237,7 @@ _label_identifier:
 			} else if (iswordstart(sc.ch)) {
 				sc.SetState(SCE_PY_IDENTIFIER);
 			} else if (sc.ch == '@') {
-				if (iswordstart(sc.chNext))
+				if (visibleChars == 1 && iswordstart(sc.chNext))
 					sc.SetState(SCE_PY_OPERATOR);
 				 else
 					sc.SetState(SCE_PY_DECORATOR);
@@ -251,6 +258,9 @@ _label_identifier:
 				continuationLine = true;
 				continue;
 			}
+		}
+		if (!(isspacechar(sc.ch) || IsSpaceEquiv(sc.state))) {
+			visibleChars++;
 		}
 		continuationLine = false;
 	}
@@ -355,7 +365,7 @@ static void FoldPyDoc(Sci_PositionU startPos, Sci_Position length, int, WordList
 		}
 
 		const int levelAfterComments = indentNext & SC_FOLDLEVELNUMBERMASK;
-		const int levelBeforeComments = Maximum(indentCurrentLevel,levelAfterComments);
+		const int levelBeforeComments = Maximum(indentCurrentLevel, levelAfterComments);
 
 		// Now set all the indent levels on the lines we skipped
 		// Do this from end to start.  Once we encounter one line
