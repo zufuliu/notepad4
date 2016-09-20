@@ -59,7 +59,7 @@ static KEYWORDLIST Keywords_HTML = {
 "double else enum export extends false final finally float for function goto if implements "
 "import in instanceof int interface long native new null package private protected public "
 "return short static super switch synchronized this throw throws transient true try typeof var "
-"void volatile while with"
+"void volatile while with yield undefined"
 , // VBScript
 "Alias And As Attribute Begin Boolean ByRef Byte ByVal Call Case Class Compare Const Continue "
 "Currency Date Declare Dim Do Double Each Else ElseIf Empty End Enum Eqv Erase Error Event Exit "
