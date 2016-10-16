@@ -1274,6 +1274,18 @@ sptr_t ScintillaWin::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam
 			break;
 
 		case WM_MOUSEWHEEL:
+			if (!mouseWheelCaptures) {
+				// if the mouse wheel is not captured, test if the mouse
+				// pointer is over the editor window and if not, don't
+				// handle the message but pass it on.
+				RECT rc;
+				GetWindowRect(MainHWND(), &rc);
+				POINT pt;
+				pt.x = GET_X_LPARAM(lParam);
+				pt.y = GET_Y_LPARAM(lParam);
+				if (!PtInRect(&rc, pt))
+					return ::DefWindowProc(MainHWND(), iMessage, wParam, lParam);
+			}
 			// if autocomplete list active then send mousewheel message to it
 			if (ac.Active()) {
 				HWND hWnd = static_cast<HWND>(ac.lb->GetID());

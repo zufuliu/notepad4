@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # Script to generate CaseConvert.cxx from Python's Unicode data
 # Should be run rarely when a Python with a new version of Unicode data is available.
 # Requires Python 3.3 or later
@@ -18,7 +19,7 @@
 
 import codecs, itertools, os, string, sys, unicodedata
 
-from FileGenerator import Regenerate
+from .FileGenerator import Regenerate
 
 def contiguousRanges(l, diff):
     # l is s list of lists

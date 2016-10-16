@@ -165,6 +165,7 @@ static void ColouriseSmaliDoc(Sci_PositionU startPos, Sci_Position length, int i
 			if (!iswordchar(ch)) {
 				styler.ColourTo(i - 1, state);
 				state = SCE_SMALI_DEFAULT;
+				visibleChars = 0;
 			}
 			break;
 		case SCE_SMALI_TYPE:
