@@ -9,8 +9,8 @@
 #include <ctype.h>
 
 #include "ILexer.h"
-#include "CharacterSet.h"
 #include "LexAccessor.h"
+#include "CharacterSet.h"
 
 #ifdef SCI_NAMESPACE
 using namespace Scintilla;

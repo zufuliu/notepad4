@@ -14,10 +14,10 @@
 #include "SciLexer.h"
 
 #include "WordList.h"
-#include "CharacterSet.h"
 #include "LexAccessor.h"
 #include "Accessor.h"
 #include "StyleContext.h"
+#include "CharacterSet.h"
 #include "LexerModule.h"
 
 static void ColouriseNullDoc(Sci_PositionU startPos, Sci_Position length, int, WordList *[], Accessor &styler) {

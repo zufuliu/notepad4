@@ -4,22 +4,22 @@
 # Requires Python 3.3 or later
 # Should not be run with old versions of Python.
 
-# Current best approach divides case conversions into two cases: 
+# Current best approach divides case conversions into two cases:
 # simple symmetric and complex.
 # Simple symmetric is where a lower and upper case pair convert to each
-# other and the folded form is the same as the lower case. 
+# other and the folded form is the same as the lower case.
 # There are 1006 symmetric pairs.
 # These are further divided into ranges (stored as lower, upper, range length,
-# range pitch and singletons (stored as lower, upper). 
+# range pitch and singletons (stored as lower, upper).
 # Complex is for cases that don't fit the above: where there are multiple
-# characters in one of the forms or fold is different to lower or 
+# characters in one of the forms or fold is different to lower or
 # lower(upper(x)) or upper(lower(x)) are not x. These are represented as UTF-8
 # strings with original, folded, upper, and lower separated by '|'.
 # There are 126 complex cases.
 
 import codecs, itertools, os, string, sys, unicodedata
 
-from .FileGenerator import Regenerate
+from FileGenerator import Regenerate
 
 def contiguousRanges(l, diff):
     # l is s list of lists
@@ -34,7 +34,7 @@ def contiguousRanges(l, diff):
 def flatten(listOfLists):
     "Flatten one level of nesting"
     return itertools.chain.from_iterable(listOfLists)
-    
+
 def conversionSets():
     # For all Unicode characters, see whether they have case conversions
     # Return 2 sets: one of simple symmetric conversion cases and another
@@ -90,7 +90,7 @@ def groupRanges(symmetrics):
 
     contiguousGroups = flatten([contiguousRanges(g, 1) for g in groups])
     longGroups = [(x[0][0], x[0][1], len(x), 1) for x in contiguousGroups if len(x) > 4]
-    
+
     oneDiffs = [s for s in symmetrics if s[2] == 1]
     contiguousOnes = flatten([contiguousRanges(g, 2) for g in [oneDiffs]])
     longOneGroups = [(x[0][0], x[0][1], len(x), 2) for x in contiguousOnes if len(x) > 4]
@@ -98,7 +98,7 @@ def groupRanges(symmetrics):
     rangeGroups = sorted(longGroups+longOneGroups, key=lambda s: s[0])
 
     rangeCoverage = list(flatten([range(r[0], r[0]+r[2]*r[3], r[3]) for r in rangeGroups]))
-    
+
     nonRanges = [(l, u) for l, u, d in symmetrics if l not in rangeCoverage]
 
     return rangeGroups, nonRanges
@@ -108,7 +108,7 @@ def escape(s):
 
 def updateCaseConvert():
     symmetrics, complexes = conversionSets()
-    
+
     rangeGroups, nonRanges = groupRanges(symmetrics)
 
     print(len(rangeGroups), "ranges")
@@ -116,9 +116,9 @@ def updateCaseConvert():
 
     print(len(nonRanges), "non ranges")
     nonRangeLines = ["%d,%d," % x for x in nonRanges]
-    
+
     print(len(symmetrics), "symmetric")
-    
+
     complexLines = ['"%s|%s|%s|%s|"' % tuple(escape(t) for t in x) for x in complexes]
     print(len(complexLines), "complex")
 

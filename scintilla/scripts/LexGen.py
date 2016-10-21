@@ -44,14 +44,14 @@ def UpdateVersionNumbers(sci, root):
         "CFBundleShortVersionString", sci.versionDotted)
 
 def RegenerateAll(root):
-    
+
     sci = ScintillaData.ScintillaData(root)
 
     Regenerate(root + "src/Catalogue.cxx", "//", sci.lexerModules)
     Regenerate(root + "win32/scintilla.mak", "#", sci.lexFiles)
 
     UpdateVersionNumbers(sci, root)
-    
+
     HFacer.RegenerateAll(root, False)
 
 if __name__=="__main__":

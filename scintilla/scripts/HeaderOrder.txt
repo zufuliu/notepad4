@@ -3,10 +3,10 @@
 // and each of these groups are then divided into directory groups.
 
 // C standard library
+#include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-#include <stddef.h>
 #include <stdarg.h>
 #include <time.h>
 #include <math.h>
@@ -21,6 +21,7 @@
 #include <cstring>
 #include <cctype>
 #include <cstdio>
+#include <cstdarg>
 #include <cmath>
 
 // C++ standard library
@@ -98,6 +99,7 @@
 #include "SplitVector.h"
 #include "Partitioning.h"
 #include "RunStyles.h"
+#include "SparseVector.h"
 #include "ContractionState.h"
 #include "CellBuffer.h"
 #include "PerLine.h"
@@ -148,3 +150,7 @@
 #import "ScintillaView.h"
 #import "ScintillaCocoa.h"
 #import "PlatCocoa.h"
+
+// Catch testing framework
+#include "catch.hpp"
+
