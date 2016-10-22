@@ -131,6 +131,9 @@ val SCLEX_LLVM=109
 # When a lexer specifies its language as SCLEX_AUTOMATIC it receives a
 # value assigned in sequence from SCLEX_AUTOMATIC+1.
 val SCLEX_AUTOMATIC=1000
+
+# style number must < 32 or > 40
+
 # Lexical states for SCLEX_PYTHON
 lex Python=SCLEX_PYTHON SCE_PY_
 lex Nimrod=SCLEX_NIMROD SCE_PY_
@@ -163,6 +166,10 @@ val SCE_PY_OBJ_FUNC=25
 val SCE_PY_CLASS=26
 val SCE_PY_ATTR=27
 val SCE_PY_FUNCTION=28
+val SCE_PY_FMT_STRING1=29
+val SCE_PY_FMT_STRING2=30
+val SCE_PY_TRIPLE_FMT_STRING1=40
+val SCE_PY_TRIPLE_FMT_STRING2=41
 # Lexical states for SCLEX_CPP
 lex Cpp=SCLEX_CPP SCE_C_
 lex BullAnt=SCLEX_BULLANT SCE_C_

@@ -39,21 +39,84 @@ using namespace Scintilla;
 #define PY_DEF_ENUM	3	// Boo
 
 static inline bool IsPyStringPrefix(int ch) {
-    return ch == 'r' || ch == 'u' || ch == 'b' || ch == 'R' || ch == 'U' || ch == 'B';
+	ch |= 32;
+	return ch == 'r' || ch == 'u' || ch == 'b' || ch == 'f';
 }
 static inline bool IsPyTripleStyle(int style) {
 	return style == SCE_PY_TRIPLE_STRING1 || style == SCE_PY_TRIPLE_STRING2
-		|| style == SCE_PY_TRIPLE_BYTES1 || style == SCE_PY_TRIPLE_BYTES2;
+		|| style == SCE_PY_TRIPLE_BYTES1 || style == SCE_PY_TRIPLE_BYTES2
+		|| style == SCE_PY_TRIPLE_FMT_STRING1 || style == SCE_PY_TRIPLE_FMT_STRING2;
 }
 static inline bool IsPyStringStyle(int style) {
 	return style == SCE_PY_STRING1 || style == SCE_PY_STRING2
 		|| style == SCE_PY_BYTES1 || style == SCE_PY_BYTES2
 		|| style == SCE_PY_RAW_STRING1 || style == SCE_PY_RAW_STRING2
-		|| style == SCE_PY_RAW_BYTES1 || style == SCE_PY_RAW_BYTES2;
+		|| style == SCE_PY_RAW_BYTES1 || style == SCE_PY_RAW_BYTES2
+		|| style == SCE_PY_FMT_STRING1 || style == SCE_PY_FMT_STRING2;
 }
 static inline bool IsSpaceEquiv(int state) {
 	// including SCE_PY_DEFAULT, SCE_PY_COMMENTLINE, SCE_PY_COMMENTBLOCK
 	return (state <= SCE_PY_COMMENTLINE) || (state == SCE_PY_COMMENTBLOCK);
+}
+
+#define PyStringPrefix_Empty	0
+#define PyStringPrefix_Raw		1		// 'r'
+#define PyStringPrefix_Unicode	2		// 'u'
+#define PyStringPrefix_Bytes	4		// 'b'
+#define PyStringPrefix_Formatted	8	// 'f'
+
+// r, u, b, f
+// ru, rb, rf
+// ur, br, fr
+
+static inline int GetPyStringPrefix(int ch) {
+	switch ((ch | 32)) {
+	case 'r':
+		return PyStringPrefix_Raw;
+	case 'u':
+		return PyStringPrefix_Unicode;
+	case 'b':
+		return PyStringPrefix_Bytes;
+	case 'f':
+		return PyStringPrefix_Formatted;
+	default:
+		return PyStringPrefix_Empty;
+	}
+}
+
+static inline int GetPyStringStyle(int quote, bool is_raw, bool is_bytes, bool is_fmt) {
+	switch (quote) {
+	case 1:
+		if (is_bytes)
+			return is_raw? SCE_PY_RAW_BYTES1 : SCE_PY_BYTES1;
+		if (is_fmt)
+			return SCE_PY_FMT_STRING1;
+		return is_raw? SCE_PY_RAW_STRING1 : SCE_PY_STRING1;
+
+	case 2:
+		if (is_bytes)
+			return is_raw? SCE_PY_RAW_BYTES2 : SCE_PY_BYTES2;
+		if (is_fmt)
+			return SCE_PY_FMT_STRING2;
+		return is_raw? SCE_PY_RAW_STRING2 : SCE_PY_STRING2;
+
+	case 3:
+		if (is_bytes)
+			return SCE_PY_TRIPLE_BYTES1;
+		if (is_fmt)
+			return SCE_PY_TRIPLE_FMT_STRING1;
+		return SCE_PY_TRIPLE_STRING1;
+
+	case 6:
+		if (is_bytes)
+			return SCE_PY_TRIPLE_BYTES2;
+		if (is_fmt)
+			return SCE_PY_TRIPLE_FMT_STRING2;
+		return SCE_PY_TRIPLE_STRING2;
+
+	default:
+		return SCE_PY_DEFAULT;
+	}
 }
 
 static void ColourisePyDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, WordList *keywordLists[], Accessor &styler) {
@@ -151,6 +214,7 @@ _label_identifier:
 		case SCE_PY_BYTES1:
 		case SCE_PY_RAW_STRING1:
 		case SCE_PY_RAW_BYTES1:
+		case SCE_PY_FMT_STRING1:
 			if (sc.atLineStart&& !continuationLine) {
 				sc.SetState(SCE_PY_DEFAULT);
 			} else if (sc.ch == '\\' && (sc.chNext == '\\' || sc.chNext == '\"' || sc.chNext == '\'')) {
@@ -163,6 +227,7 @@ _label_identifier:
 		case SCE_PY_BYTES2:
 		case SCE_PY_RAW_STRING2:
 		case SCE_PY_RAW_BYTES2:
+		case SCE_PY_FMT_STRING2:
 			if (sc.atLineStart && !continuationLine) {
 				sc.SetState(SCE_PY_DEFAULT);
 			} else if (sc.ch == '\\' && (sc.chNext == '\\' || sc.chNext == '\"' || sc.chNext == '\'')) {
@@ -173,6 +238,7 @@ _label_identifier:
 			break;
 		case SCE_PY_TRIPLE_STRING1:
 		case SCE_PY_TRIPLE_BYTES1:
+		case SCE_PY_TRIPLE_FMT_STRING1:
 			if (sc.ch == '\\') {
 				sc.Forward();
 			} else if (sc.Match("\'\'\'")) {
@@ -182,6 +248,7 @@ _label_identifier:
 			break;
 		case SCE_PY_TRIPLE_STRING2:
 		case SCE_PY_TRIPLE_BYTES2:
+		case SCE_PY_TRIPLE_FMT_STRING2:
 			if (sc.ch == '\\') {
 				sc.Forward();
 			} else if (sc.Match("\"\"\"")) {
@@ -209,29 +276,38 @@ _label_identifier:
 				sc.SetState(SCE_PY_NUMBER);
 			} else if (IsPyStringPrefix(sc.ch)) {
 				int offset = 0;
-				bool is_raw = (sc.ch == 'r' || sc.ch == 'R');
-				bool is_bytes = (sc.ch == 'b' || sc.ch == 'B');
+				int prefix = GetPyStringPrefix(sc.ch);
+				bool is_bytes = prefix == PyStringPrefix_Bytes;
+				bool is_fmt = prefix == PyStringPrefix_Formatted;
+				bool is_raw = prefix == PyStringPrefix_Raw;
+
 				if (sc.chNext == '\"' || sc.chNext == '\'') {
 					offset = 1;
 				} else if (IsPyStringPrefix(sc.chNext) && (sc.GetRelative(2) == '\"' || sc.GetRelative(2) == '\'')) {
+					prefix = GetPyStringPrefix(sc.chNext);
 					offset = 2;
-					is_bytes = !is_bytes && (sc.chNext == 'b' || sc.chNext == 'B');
-					is_raw = !is_raw && (sc.chNext == 'r' || sc.chNext == 'R');
+					is_bytes = (is_bytes && prefix == PyStringPrefix_Raw) || (is_raw && prefix == PyStringPrefix_Bytes);
+					is_fmt = (is_fmt && prefix == PyStringPrefix_Raw) || (is_raw && prefix == PyStringPrefix_Formatted);
+					is_raw = (is_raw && prefix != PyStringPrefix_Raw) || (!is_raw && prefix == PyStringPrefix_Raw);
+					if (!(is_bytes || is_fmt || is_raw)) {
+						--offset;
+						sc.ForwardSetState(SCE_PY_IDENTIFIER);
+					}
 				}
 				if (!offset) {
 					sc.SetState(SCE_PY_IDENTIFIER);
 				} else {
 					sc.Forward(offset);
 					if (sc.Match("\'\'\'")) {
-						sc.ChangeState(is_bytes ? SCE_PY_TRIPLE_BYTES1 : SCE_PY_TRIPLE_STRING1);
+						sc.ChangeState(GetPyStringStyle(3, is_raw, is_bytes, is_fmt));
 						sc.Forward(2);
 					} else if (sc.Match("\"\"\"")) {
-						sc.ChangeState(is_bytes ? SCE_PY_TRIPLE_BYTES2 : SCE_PY_TRIPLE_STRING2);
+						sc.ChangeState(GetPyStringStyle(6, is_raw, is_bytes, is_fmt));
 						sc.Forward(2);
 					} else if (sc.ch == '\'') {
-						sc.ChangeState(is_raw ? (is_bytes ? SCE_PY_RAW_BYTES1 : SCE_PY_RAW_STRING1) : (is_bytes ? SCE_PY_BYTES1 : SCE_PY_STRING1));
+						sc.ChangeState(GetPyStringStyle(1, is_raw, is_bytes, is_fmt));
 					} else if (sc.ch == '\"') {
-						sc.ChangeState(is_raw ? (is_bytes ? SCE_PY_RAW_BYTES2 : SCE_PY_RAW_STRING2) : (is_bytes ? SCE_PY_BYTES2 : SCE_PY_STRING2));
+						sc.ChangeState(GetPyStringStyle(2, is_raw, is_bytes, is_fmt));
 					}
 				}
 			} else if (iswordstart(sc.ch)) {
@@ -313,9 +389,7 @@ static void FoldPyDoc(Sci_PositionU startPos, Sci_Position length, int, WordList
 	int prev_state = SCE_PY_DEFAULT & 31;
 	if (lineCurrent >= 1)
 		prev_state = styler.StyleAt(startPos - 1) & 31;
-	int prevQuote = foldQuotes && (
-		prev_state == SCE_PY_TRIPLE_STRING1 || prev_state == SCE_PY_TRIPLE_STRING2 ||
-		prev_state == SCE_PY_TRIPLE_BYTES1 || prev_state == SCE_PY_TRIPLE_BYTES2);
+	int prevQuote = foldQuotes && IsPyTripleStyle(prev_state);
 
 	// Process all characters to end of requested range or end of any triple quote
 	//that hangs over the end of the range.  Cap processing in all cases
@@ -332,9 +406,7 @@ static void FoldPyDoc(Sci_PositionU startPos, Sci_Position length, int, WordList
 			indentNext = Accessor::LexIndentAmount(styler, lineNext, &spaceFlags, NULL);
 			Sci_Position lookAtPos = (styler.LineStart(lineNext) == styler.Length()) ? styler.Length() - 1 : styler.LineStart(lineNext);
 			int style = styler.StyleAt(lookAtPos) & 31;
-			quote = foldQuotes && (
-				style == SCE_PY_TRIPLE_STRING1 || style == SCE_PY_TRIPLE_STRING2 ||
-				style == SCE_PY_TRIPLE_BYTES1 || style == SCE_PY_TRIPLE_BYTES2);
+			quote = foldQuotes && IsPyTripleStyle(style);
 		}
 		const int quote_start = (quote && !prevQuote);
 		const int quote_continue = (quote && prevQuote);

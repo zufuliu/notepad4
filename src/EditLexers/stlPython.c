@@ -301,6 +301,8 @@ EDITLEXER lexPython  = { SCLEX_PYTHON, NP2LEX_PYTHON, L"Python Script", L"py; py
 	{ MULTI_STYLE(SCE_PY_BYTES1,SCE_PY_BYTES2,0,0), 63461, L"Bytes", L"fore:#C08000", L"" },
 	{ MULTI_STYLE(SCE_PY_RAW_BYTES1,SCE_PY_RAW_BYTES2,0,0), 63462, L"Raw Bytes", L"fore:#648000", L"" },
 	{ MULTI_STYLE(SCE_PY_TRIPLE_BYTES1,SCE_PY_TRIPLE_BYTES2,0,0), 63463, L"Triple Quoted Bytes", L"fore:#A46000", L"" },
+	{ MULTI_STYLE(SCE_PY_FMT_STRING1,SCE_PY_FMT_STRING2,0,0), 63469, L"Formatted String", L"fore:#008080", L"" },
+	{ MULTI_STYLE(SCE_PY_TRIPLE_FMT_STRING1,SCE_PY_TRIPLE_FMT_STRING2,0,0), 63470, L"Triple Quoted Formatted String", L"fore:#F08000", L"" },
 	{ SCE_PY_NUMBER, NP2STYLE_Number, L"Number", L"fore:#FF0000", L"" },
 	{ SCE_PY_OPERATOR, NP2STYLE_Operator, L"Operator", L"fore:#B000B0", L"" },
 	{ -1, 00000, L"", L"", L"" }

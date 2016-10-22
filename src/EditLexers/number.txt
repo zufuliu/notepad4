@@ -48,6 +48,9 @@ style number must < 32 or > 40
 		63465, L"Decorator"
 		63466, L"Build-in Functions"
 		63467, L"object Method"
+		63468, L"Build-in Constants"
+		63469, L"Formatted String"
+		63470, L"Triple Quoted Formatted String"
 63033	Ruby Script			63471-63480		yes
 		63471, L"Module"
 		63472, L"POD"
