@@ -111,7 +111,9 @@ public:
 	void LayoutLine(const EditModel &model, int line, Surface *surface, const ViewStyle &vstyle,
 		LineLayout *ll, int width = LineLayout::wrapWidthInfinite);
 
-	Point LocationFromPosition(Surface *surface, const EditModel &model, const SelectionPosition &pos, int topLine, const ViewStyle &vs);
+	Point LocationFromPosition(Surface *surface, const EditModel &model, const SelectionPosition &pos, int topLine,
+				   const ViewStyle &vs, PointEnd pe);
+	Range RangeDisplayLine(Surface *surface, const EditModel &model, int lineVisible, const ViewStyle &vs);
 	SelectionPosition SPositionFromLocation(Surface *surface, const EditModel &model, const Point &pt, bool canReturnInvalid,
 		bool charPosition, bool virtualSpace, const ViewStyle &vs);
 	SelectionPosition SPositionFromLineX(Surface *surface, const EditModel &model, int lineDoc, int x, const ViewStyle &vs);

@@ -289,6 +289,8 @@ typedef sptr_t (*SciFnDirect)(sptr_t ptr, unsigned int iMessage, uptr_t wParam, 
 #define INDIC_COMPOSITIONTHIN 15
 #define INDIC_FULLBOX 16
 #define INDIC_TEXTFORE 17
+#define INDIC_POINT 18
+#define INDIC_POINTCHARACTER 19
 #define INDIC_IME 32
 #define INDIC_IME_MAX 35
 #define INDIC_MAX 35

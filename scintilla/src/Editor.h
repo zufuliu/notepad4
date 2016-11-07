@@ -285,8 +285,8 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	int LinesToScroll() const;
 	int MaxScrollPos() const;
 	SelectionPosition ClampPositionIntoDocument(const SelectionPosition &sp) const;
-	Point LocationFromPosition(const SelectionPosition &pos);
-	Point LocationFromPosition(int pos);
+	Point LocationFromPosition(const SelectionPosition &pos, PointEnd pe=peDefault);
+	Point LocationFromPosition(int pos, PointEnd pe=peDefault);
 	int XFromPosition(int pos);
 	int XFromPosition(const SelectionPosition &sp);
 	SelectionPosition SPositionFromLocation(const Point &pt, bool canReturnInvalid=false, bool charPosition=false, bool virtualSpace=true);
@@ -465,6 +465,7 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	SelectionPosition PositionUpOrDown(const SelectionPosition& spStart, int direction, int lastX);
 	void CursorUpOrDown(int direction, Selection::selTypes selt);
 	void ParaUpOrDown(int direction, Selection::selTypes selt);
+	Range RangeDisplayLine(int lineVisible);
 	int StartEndDisplayLine(int pos, bool start);
 	int VCHomeDisplayPosition(int position);
 	int VCHomeWrapPosition(int position);
@@ -571,7 +572,7 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	void AddStyledText(const char *buffer, int appendLength);
 
 	virtual sptr_t DefWndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) = 0;
-	bool ValidMargin(uptr_t wParam);
+	bool ValidMargin(uptr_t wParam) const;
 	void StyleSetMessage(unsigned int iMessage, uptr_t wParam, sptr_t lParam);
 	sptr_t StyleGetMessage(unsigned int iMessage, uptr_t wParam, sptr_t lParam);
 

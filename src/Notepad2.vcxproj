@@ -287,8 +287,9 @@
       <PreprocessorDefinitions>_WIN64;STATIC_BUILD;SCI_LEXER;BOOKMARK_EDITION;DISABLE_D2D;NO_CXX11_REGEX;SCI_DISABLE_PROVISIONAL;UNICODE;_UNICODE;_CRT_SECURE_NO_WARNINGS;_WIN32_WINNT=0x0502;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <WarningLevel>Level4</WarningLevel>
+      <WarningLevel>EnableAllWarnings</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <AdditionalOptions>-Wextra %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <AdditionalDependencies>comctl32.lib;shlwapi.lib;imm32.lib;%(AdditionalDependencies)</AdditionalDependencies>

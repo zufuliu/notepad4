@@ -180,6 +180,8 @@ _label_variable:
 				} else {
 					quatedVar = true;
 				}
+			} else if (sc.ch == '@' && sc.MatchIgnoreCase("@rem")) {
+				sc.SetState(SCE_BAT_COMMENT);				
 			} else if (IsWordStart(sc.ch)) { // all file name
 				sc.SetState(SCE_BAT_IDENTIFIER);
 			} else if (IsBatOp(sc.ch)) {

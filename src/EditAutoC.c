@@ -971,7 +971,7 @@ void EditToggleCommentLine(HWND hwnd)
 		break;
 	case SCLEX_BATCH:
 		BeginWaitCursor();
-		EditToggleLineComments(hwnd, L"rem ", TRUE);
+		EditToggleLineComments(hwnd, L"@rem ", TRUE);
 		EndWaitCursor();
 		break;
 	case SCLEX_LATEX:

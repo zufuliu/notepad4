@@ -8,7 +8,7 @@
 #include "Scintilla.h"
 #include "SciLexer.h"
 
-#define	MULTI_STYLE(a, b, c, d)	((a) | (b << 8) | (c << 16) | (d << 24))
+#define	MULTI_STYLE(a, b, c, d)	((a) | ((b) << 8) | ((c) << 16) | ((d) << 24))
 #define	NUMKEYWORD				(KEYWORDSET_MAX + 1)
 
 #pragma warning(push)

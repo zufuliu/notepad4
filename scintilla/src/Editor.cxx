@@ -364,14 +364,14 @@ SelectionPosition Editor::ClampPositionIntoDocument(const SelectionPosition &sp_
 	}
 }
 
-Point Editor::LocationFromPosition(const SelectionPosition &pos) {
+Point Editor::LocationFromPosition(const SelectionPosition &pos, PointEnd pe) {
 	RefreshStyleData();
 	AutoSurface surface(this);
-	return view.LocationFromPosition(surface, *this, pos, topLine, vs);
+	return view.LocationFromPosition(surface, *this, pos, topLine, vs, pe);
 }
 
-Point Editor::LocationFromPosition(int pos) {
-	return LocationFromPosition(SelectionPosition(pos));
+Point Editor::LocationFromPosition(int pos, PointEnd pe) {
+	return LocationFromPosition(SelectionPosition(pos), pe);
 }
 
 int Editor::XFromPosition(int pos) {
@@ -2427,13 +2427,7 @@ void Editor::NotifyIndicatorClick(bool click, int position, bool shift, bool ctr
 }
 
 bool Editor::NotifyMarginClick(const Point &pt, int modifiers) {
-	int marginClicked = -1;
-	int x = vs.textStart - vs.fixedColumnWidth;
-	for (size_t margin = 0; margin < vs.ms.size(); margin++) {
-		if ((pt.x >= x) && (pt.x < x + vs.ms[margin].width))
-			marginClicked = static_cast<int>(margin);
-		x += vs.ms[margin].width;
-	}
+	const int marginClicked = vs.MarginFromLocation(pt);
 	if ((marginClicked >= 0) && vs.ms[marginClicked].sensitive) {
 		int position = pdoc->LineStart(LineFromLocation(pt));
 		if ((vs.ms[marginClicked].mask & SC_MASK_FOLDERS) && (foldAutomatic & SC_AUTOMATICFOLD_CLICK)) {
@@ -3157,6 +3151,12 @@ void Editor::ParaUpOrDown(int direction, Selection::selTypes selt) {
 			}
 		}
 	} while (!cs.GetVisible(lineDoc));
+}
+
+Range Editor::RangeDisplayLine(int lineVisible) {
+	RefreshStyleData();
+	AutoSurface surface(this);
+	return view.RangeDisplayLine(surface, *this, lineVisible, vs);
 }
 
 int Editor::StartEndDisplayLine(int pos, bool start) {
@@ -4503,6 +4503,7 @@ void Editor::ButtonDownWithModifiers(const Point &pt, unsigned int curTime, int 
 	} else {	// Single click
 		if (inSelMargin) {
 			if (sel.IsRectangular() || (sel.Count() > 1)) {
+				InvalidateWholeSelection();
 				sel.Clear();
 			}
 			sel.selType = Selection::selStream;
@@ -5576,7 +5577,7 @@ void Editor::AddStyledText(const char *buffer, int appendLength) {
 	SetEmptySelection(sel.MainCaret() + lengthInserted);
 }
 
-bool Editor::ValidMargin(uptr_t wParam) {
+bool Editor::ValidMargin(uptr_t wParam) const {
 	return wParam < vs.ms.size();
 }
 

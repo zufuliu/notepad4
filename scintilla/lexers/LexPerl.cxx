@@ -569,7 +569,7 @@ static void ColourisePerlDoc(unsigned int startPos, int length, int initStyle, W
 		backPos++;
 	}
 
-	StyleContext sc(startPos, endPos - startPos, initStyle, styler, 127);
+	StyleContext sc(startPos, endPos - startPos, initStyle, styler);
 
 	for (; sc.More(); sc.Forward()) {
 

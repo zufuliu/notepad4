@@ -712,6 +712,35 @@ static bool BoundsContains(PRectangle rcBounds, HRGN hRgnBounds, PRectangle rcCh
 	return contains;
 }
 
+static std::string StringEncode(const std::wstring &s, int codePage) {
+	const int cchMulti = s.length() ? ::WideCharToMultiByte(codePage, 0, s.c_str(), static_cast<int>(s.length()), NULL, 0, NULL, NULL) : 0;
+	std::string sMulti(cchMulti, 0);
+	if (cchMulti) {
+		::WideCharToMultiByte(codePage, 0, s.c_str(), static_cast<int>(s.size()), &sMulti[0], cchMulti, NULL, NULL);
+	}
+	return sMulti;
+}
+
+static std::wstring StringDecode(const std::string &s, int codePage) {
+	const int cchWide = s.length() ? ::MultiByteToWideChar(codePage, 0, s.c_str(), static_cast<int>(s.length()), NULL, 0) : 0;
+	std::wstring sWide(cchWide, 0);
+	if (cchWide) {
+		::MultiByteToWideChar(codePage, 0, s.c_str(), static_cast<int>(s.length()), &sWide[0], cchWide);
+	}
+	return sWide;
+}
+
+static std::wstring StringMapCase(const std::wstring &ws, DWORD mapFlags) {
+	const int charsConverted = ::LCMapStringW(LOCALE_SYSTEM_DEFAULT, mapFlags,
+		ws.c_str(), static_cast<int>(ws.length()), NULL, 0);
+	std::wstring wsConverted(charsConverted, 0);
+	if (charsConverted) {
+		::LCMapStringW(LOCALE_SYSTEM_DEFAULT, mapFlags,
+			ws.c_str(), static_cast<int>(ws.length()), &wsConverted[0], charsConverted);
+	}
+	return wsConverted;
+}
+
 // Returns the target converted to UTF8.
 // Return the length in bytes.
 int ScintillaWin::TargetAsUTF8(char *text) {
@@ -722,14 +751,11 @@ int ScintillaWin::TargetAsUTF8(char *text) {
 		}
 	} else {
 		// Need to convert
-		std::string s = RangeText(targetStart, targetEnd);
-		int charsLen = ::MultiByteToWideChar(CodePageOfDocument(), 0, &s[0], targetLength, NULL, 0);
-		std::wstring characters(charsLen, '\0');
-		::MultiByteToWideChar(CodePageOfDocument(), 0, &s[0], targetLength, &characters[0], charsLen);
-
-		int utf8Len = ::WideCharToMultiByte(CP_UTF8, 0, &characters[0], charsLen, NULL, 0, 0, 0);
+		const std::string s = RangeText(targetStart, targetEnd);
+		const std::wstring characters = StringDecode(s, CodePageOfDocument());
+		const int utf8Len = ::WideCharToMultiByte(CP_UTF8, 0, characters.c_str(), static_cast<int>(characters.length()), NULL, 0, 0, 0);
 		if (text) {
-			::WideCharToMultiByte(CP_UTF8, 0, &characters[0], charsLen, text, utf8Len, 0, 0);
+			::WideCharToMultiByte(CP_UTF8, 0, characters.c_str(), static_cast<int>(characters.length()), text, utf8Len, 0, 0);
 			text[utf8Len] = '\0';
 		}
 		return utf8Len;
@@ -910,28 +936,6 @@ void ScintillaWin::SetCandidateWindowPos() {
 		CandForm.ptCurrentPos.x = static_cast<int>(pos.x);
 		CandForm.ptCurrentPos.y = static_cast<int>(pos.y + vs.lineHeight);
 		::ImmSetCandidateWindow(imc.hIMC, &CandForm);
-	}
-}
-
-static std::string StringEncode(const std::wstring& s, int codePage) {
-	if (s.length()) {
-		int cchMulti = ::WideCharToMultiByte(codePage, 0, s.c_str(), static_cast<int>(s.length()), NULL, 0, NULL, NULL);
-		std::string sMulti(cchMulti, 0);
-		::WideCharToMultiByte(codePage, 0, s.c_str(), static_cast<int>(s.size()), &sMulti[0], cchMulti, NULL, NULL);
-		return sMulti;
-	} else {
-		return std::string();
-	}
-}
-
-static std::wstring StringDecode(const std::string& s, int codePage) {
-	if (s.length()) {
-		int cchWide = ::MultiByteToWideChar(codePage, 0, s.c_str(), static_cast<int>(s.length()), NULL, 0);
-		std::wstring sWide(cchWide, 0);
-		::MultiByteToWideChar(codePage, 0, s.c_str(), static_cast<int>(s.length()), &sWide[0], cchWide);
-		return sWide;
-	} else {
-		return std::wstring();
 	}
 }
 
@@ -1350,6 +1354,10 @@ sptr_t ScintillaWin::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam
 						// However, some things like WM_PAINT are a lower priority, and will not fire
 						// when there's a message posted.  So, several times a second, we stop and let
 						// the low priority events have a turn (after which the timer will fire again).
+
+						// Suppress a warning from Code Analysis that the GetTickCount function
+						// wraps after 49 days. The WM_TIMER will kick off another SC_WIN_IDLE
+						// after the wrap.
 
 						DWORD dwCurrent = GetTickCount();
 						DWORD dwStart = wParam ? static_cast<DWORD>(wParam) : dwCurrent;
@@ -2097,44 +2105,24 @@ std::string ScintillaWin::CaseMapString(const std::string &s, int caseMapping) {
 	if ((s.size() == 0) || (caseMapping == cmSame))
 		return s;
 
-	UINT cpDoc = CodePageOfDocument();
+	const UINT cpDoc = CodePageOfDocument();
 	if (cpDoc == SC_CP_UTF8) {
-		std::string retMapped(s.length() * maxExpansionCaseConversion, 0);
-		size_t lenMapped = CaseConvertString(&retMapped[0], retMapped.length(), s.c_str(), s.length(),
-			(caseMapping == cmUpper) ? CaseConversionUpper : CaseConversionLower);
-		retMapped.resize(lenMapped);
-		return retMapped;
+		return CaseConvertString(s, (caseMapping == cmUpper) ? CaseConversionUpper : CaseConversionLower);
 	}
 
-	unsigned int lengthUTF16 = ::MultiByteToWideChar(cpDoc, 0, s.c_str(),
-		static_cast<int>(s.size()), NULL, 0);
-	if (lengthUTF16 == 0)	// Failed to convert
-		return s;
+	// Change text to UTF-16
+	const std::wstring wsText = StringDecode(s, cpDoc);
 
-	DWORD mapFlags = LCMAP_LINGUISTIC_CASING |
+	const DWORD mapFlags = LCMAP_LINGUISTIC_CASING |
 		((caseMapping == cmUpper) ? LCMAP_UPPERCASE : LCMAP_LOWERCASE);
 
-	// Change text to UTF-16
-	std::vector<wchar_t> vwcText(lengthUTF16);
-	::MultiByteToWideChar(cpDoc, 0, s.c_str(), static_cast<int>(s.size()), &vwcText[0], lengthUTF16);
-
 	// Change case
-	int charsConverted = ::LCMapStringW(LOCALE_SYSTEM_DEFAULT, mapFlags,
-		&vwcText[0], lengthUTF16, NULL, 0);
-	std::vector<wchar_t> vwcConverted(charsConverted);
-	::LCMapStringW(LOCALE_SYSTEM_DEFAULT, mapFlags,
-		&vwcText[0], lengthUTF16, &vwcConverted[0], charsConverted);
+	const std::wstring wsConverted = StringMapCase(wsText, mapFlags);
 
 	// Change back to document encoding
-	unsigned int lengthConverted = ::WideCharToMultiByte(cpDoc, 0,
-		&vwcConverted[0], static_cast<int>(vwcConverted.size()),
-		NULL, 0, NULL, 0);
-	std::vector<char> vcConverted(lengthConverted);
-	::WideCharToMultiByte(cpDoc, 0,
-		&vwcConverted[0], static_cast<int>(vwcConverted.size()),
-		&vcConverted[0], static_cast<int>(vcConverted.size()), NULL, 0);
+	std::string sConverted = StringEncode(wsConverted, cpDoc);
 
-	return std::string(&vcConverted[0], vcConverted.size());
+	return sConverted;
 }
 
 void ScintillaWin::Copy() {

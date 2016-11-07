@@ -445,6 +445,17 @@ int ViewStyle::ExternalMarginWidth() const {
 	return marginInside ? 0 : fixedColumnWidth;
 }
 
+int ViewStyle::MarginFromLocation(Point pt) const {
+	int margin = -1;
+	int x = textStart - fixedColumnWidth;
+	for (size_t i = 0; i < ms.size(); i++) {
+		if ((pt.x >= x) && (pt.x < x + ms[i].width))
+			margin = static_cast<int>(i);
+		x += ms[i].width;
+	}
+	return margin;
+}
+
 bool ViewStyle::ValidStyle(size_t styleIndex) const {
 	return styleIndex < styles.size();
 }
