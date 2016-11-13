@@ -450,22 +450,9 @@ void EditCompleteWord(HWND hwnd, BOOL autoInsert)
 	}
 
 	bIgnore = (iStartWordPos >= 0 && pLine[iStartWordPos] >= '0' && pLine[iStartWordPos] <= '9');
-	pWList = (struct WordList *)NP2HeapAlloc(sizeof(struct WordList));
-	pWList->nWordCount = 0;
-	pWList->pWordStart = pRoot;
-	pWList->iStartLen = iRootLen;
-	pWList->iMaxLength = iRootLen;
-#if NP2_AUTOC_USE_BUF
-	pWList->capacity = NP2_AUTOC_INIT_BUF_SIZE;
-	pWList->buffer = NP2HeapAlloc(NP2_AUTOC_INIT_BUF_SIZE);
-#endif
+	pWList = WordList_Alloc(pRoot, iRootLen, bIgnore);
 	if (bIgnore) {
-		pWList->WL_StrCmpA = StrCmpIA;
-		pWList->WL_StrCmpNA = StrCmpNIA;
 		goto label_add_doc_word;
-	} else {
-		pWList->WL_StrCmpA = StrCmpA;
-		pWList->WL_StrCmpNA = StrCmpNA;
 	}
 //#ifndef NDEBUG
 //goto label_add_doc_word;

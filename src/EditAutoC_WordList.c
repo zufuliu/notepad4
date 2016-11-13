@@ -53,7 +53,8 @@ void WordList_AddWord(struct WordList *pWList, LPCSTR pWord, int len)
 	}
 
 	if (diff) {
-		struct WordNode *node = (struct WordNode *)NP2HeapAlloc(sizeof(struct WordNode));
+		struct WordNode *node;
+		node = (struct WordNode *)NP2HeapAlloc(sizeof(struct WordNode));
 		node->len = len;
 #if NP2_AUTOC_USE_BUF
 		if (pWList->capacity < pWList->nTotalLen + len + 1) {
@@ -73,6 +74,7 @@ void WordList_AddWord(struct WordList *pWList, LPCSTR pWord, int len)
 		} else {
 			*pListHead = node;
 		}
+
 		pWList->nWordCount++;
 		pWList->nTotalLen += len + 1;
 		if (len > pWList->iMaxLength) {
@@ -87,7 +89,7 @@ void WordList_Free(struct WordList *pWList)
 	struct WordNode *prev;
 
 	while (head) {
-#if !(NP2_AUTOC_USE_BUF)
+#if !NP2_AUTOC_USE_BUF
 		NP2HeapFree(head->word);
 #endif
 		prev = head;
@@ -115,7 +117,7 @@ void WordList_GetList(struct WordList *pWList, char* *pList)
 #endif
 		buf += head->len;
 		*buf++ = '\n'; // the separator char
-#if !(NP2_AUTOC_USE_BUF)
+#if !NP2_AUTOC_USE_BUF
 		NP2HeapFree(head->word);
 #endif
 		prev = head;
@@ -177,7 +179,8 @@ void WordList_AddWord(struct WordList *pWList, LPCSTR pWord, int len)
 {
 	struct WordNode *root = pWList->pListHead;
 	if (root == NULL) {
-		struct WordNode *node = (struct WordNode *)NP2HeapAlloc(sizeof(struct WordNode));
+		struct WordNode *node;
+		node = (struct WordNode *)NP2HeapAlloc(sizeof(struct WordNode));
 		node->len = len;
 #if NP2_AUTOC_USE_BUF
 		node->offset = 0;
@@ -242,6 +245,7 @@ void WordList_AddWord(struct WordList *pWList, LPCSTR pWord, int len)
 				root = path[top];
 		}
 	}
+
 	pWList->pListHead = root;
 	pWList->nWordCount++;
 	pWList->nTotalLen += len + 1;
@@ -259,7 +263,7 @@ void WordList_Free(struct WordList *pWList)
 	while (iter) {
 		if (iter->left == NULL) {
 			save = iter->right;
-#if !(NP2_AUTOC_USE_BUF)
+#if !NP2_AUTOC_USE_BUF
 			NP2HeapFree(iter->word);
 #endif
 			NP2HeapFree(iter);
@@ -310,6 +314,29 @@ void WordList_GetList(struct WordList *pWList, char* *pList)
 
 #pragma warning(pop) // C4201
 #endif
+
+struct WordList *WordList_Alloc(LPCSTR pRoot, int iRootLen, BOOL bIgnoreCase) {
+	struct WordList *pWList = (struct WordList *)NP2HeapAlloc(sizeof(struct WordList));
+	pWList->pListHead =  NULL;
+	pWList->pWordStart = pRoot;
+	pWList->nWordCount = 0;
+	pWList->nTotalLen = 0;
+	pWList->iStartLen = iRootLen;
+	pWList->iMaxLength = iRootLen;
+#if NP2_AUTOC_USE_BUF
+	pWList->capacity = NP2_AUTOC_INIT_BUF_SIZE;
+	pWList->buffer = (char *)NP2HeapAlloc(NP2_AUTOC_INIT_BUF_SIZE);
+#endif
+	if (bIgnoreCase) {
+		pWList->WL_StrCmpA = StrCmpIA;
+		pWList->WL_StrCmpNA = StrCmpNIA;
+	} else {
+		pWList->WL_StrCmpA = StrCmpA;
+		pWList->WL_StrCmpNA = StrCmpNA;
+	}
+
+	return pWList;
+}
 
 #define NP2_MAX_KEYWORD_LENGTH		(255)
 void WordList_AddList(struct WordList *pWList, LPCSTR pList)
