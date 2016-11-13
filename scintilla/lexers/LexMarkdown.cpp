@@ -15,6 +15,10 @@
 #include "CharacterSet.h"
 #include "LexerModule.h"
 
+#ifdef SCI_NAMESPACE
+using namespace Scintilla;
+#endif
+
 static void ColouriseMarkdownDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, WordList *keywordLists[], Accessor &styler) {
 	int state = initStyle;
 	int chPrev, ch = 0, chNext = styler[startPos];

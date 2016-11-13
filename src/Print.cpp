@@ -50,6 +50,11 @@ extern "C" RECT pagesetupMargin;
 HGLOBAL hDevMode = NULL;
 HGLOBAL hDevNames = NULL;
 
+#ifdef SCI_NAMESPACE
+#undef RangeToFormat
+#define RangeToFormat Scintilla::Sci_RangeToFormat
+#endif
+
 
 //=============================================================================
 //

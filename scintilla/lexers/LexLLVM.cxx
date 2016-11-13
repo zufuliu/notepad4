@@ -15,6 +15,10 @@
 #include "CharacterSet.h"
 #include "LexerModule.h"
 
+#ifdef SCI_NAMESPACE
+using namespace Scintilla;
+#endif
+
 #define MAX_WORD_LENGTH	31
 
 static void CheckLLVMVarType(Sci_PositionU pos, Sci_PositionU endPos, Accessor &styler, bool& is_func, bool& is_type) {
