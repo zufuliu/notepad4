@@ -1,8 +1,11 @@
 #define NP2_AUTOC_USE_LIST	0
 #define NP2_AUTOC_USE_BUF	1
+#define NP2_AUTOC_USE_NODE_CACHE	1
 // scintilla/src/AutoComplete.h AutoComplete::maxItemLen
 #define NP2_AUTOC_MAX_WORD_LENGTH	(1024 - 3 - 1)	// SP + '(' + ')' + '\0'
 #define NP2_AUTOC_INIT_BUF_SIZE		(4096)
+#define NP2_AUTOC_INIT_CACHE_SIZE	128
+#define NP2_AUTOC_MAX_CACHE_COUNT	12
 
 struct WordNode;
 struct WordList {
@@ -18,7 +21,19 @@ struct WordList {
 	int nTotalLen;
 	int iStartLen;
 	int iMaxLength;
+#if NP2_AUTOC_USE_NODE_CACHE
+	struct WordNode* nodeCacheList[NP2_AUTOC_MAX_CACHE_COUNT];
+	int cacheIndexList[NP2_AUTOC_MAX_CACHE_COUNT];
+	struct WordNode* nodeCache;
+	int cacheCount;
+	int cacheIndex;
+	int cacheCapacity;
+#endif
 };
+
+#if NP2_AUTOC_USE_NODE_CACHE
+static void WordList_AllocMoreNodeCache(struct WordList *pWList);
+#endif
 
 #if NP2_AUTOC_USE_LIST
 // Linked List
@@ -54,7 +69,14 @@ void WordList_AddWord(struct WordList *pWList, LPCSTR pWord, int len)
 
 	if (diff) {
 		struct WordNode *node;
+#if NP2_AUTOC_USE_NODE_CACHE
+		if (pWList->cacheIndex + 1 > pWList->cacheCapacity) {
+			WordList_AllocMoreNodeCache(pWList);
+		}
+		node = &(pWList->nodeCache[pWList->cacheIndex++]);
+#else
 		node = (struct WordNode *)NP2HeapAlloc(sizeof(struct WordNode));
+#endif
 		node->len = len;
 #if NP2_AUTOC_USE_BUF
 		if (pWList->capacity < pWList->nTotalLen + len + 1) {
@@ -85,6 +107,21 @@ void WordList_AddWord(struct WordList *pWList, LPCSTR pWord, int len)
 
 void WordList_Free(struct WordList *pWList)
 {
+#if NP2_AUTOC_USE_NODE_CACHE
+	int i;
+	pWList->cacheIndexList[pWList->cacheCount - 1] = pWList->cacheIndex;
+	for (i = 0; i < pWList->cacheCount; i++) {
+#if !NP2_AUTOC_USE_BUF
+		int j, cacheIndex = pWList->cacheIndexList[i];
+		struct WordNode *nodeCache = pWList->nodeCacheList[i];
+		for (j = 0; j < cacheIndex; j++) {
+			struct WordNode *iter = &(nodeCache[j]);
+			NP2HeapFree(iter->word);
+		}
+#endif
+		NP2HeapFree(pWList->nodeCacheList[i]);
+	}
+#else
 	struct WordNode *head = pWList->pListHead;
 	struct WordNode *prev;
 
@@ -96,6 +133,7 @@ void WordList_Free(struct WordList *pWList)
 		head = head->next;
 		NP2HeapFree(prev);
 	}
+#endif
 #if NP2_AUTOC_USE_BUF
 	NP2HeapFree(pWList->buffer);
 #endif
@@ -106,6 +144,10 @@ void WordList_GetList(struct WordList *pWList, char* *pList)
 	struct WordNode *head = pWList->pListHead;
 	struct WordNode *prev;
 	char* buf;
+#if NP2_AUTOC_USE_NODE_CACHE
+	int i;
+	pWList->cacheIndexList[pWList->cacheCount - 1] = pWList->cacheIndex;
+#endif
 	*pList = NP2HeapAlloc(pWList->nTotalLen + 1);// additional separator
 	buf = *pList;
 
@@ -122,8 +164,15 @@ void WordList_GetList(struct WordList *pWList, char* *pList)
 #endif
 		prev = head;
 		head = head->next;
+#if !NP2_AUTOC_USE_NODE_CACHE
 		NP2HeapFree(prev);
+#endif
 	}
+#if NP2_AUTOC_USE_NODE_CACHE
+	for (i = 0; i < pWList->cacheCount; i++) {
+		NP2HeapFree(pWList->nodeCacheList[i]);
+	}
+#endif
 #if NP2_AUTOC_USE_BUF
 	NP2HeapFree(pWList->buffer);
 #endif
@@ -180,7 +229,11 @@ void WordList_AddWord(struct WordList *pWList, LPCSTR pWord, int len)
 	struct WordNode *root = pWList->pListHead;
 	if (root == NULL) {
 		struct WordNode *node;
+#if NP2_AUTOC_USE_NODE_CACHE
+		node = &(pWList->nodeCache[pWList->cacheIndex++]);
+#else
 		node = (struct WordNode *)NP2HeapAlloc(sizeof(struct WordNode));
+#endif
 		node->len = len;
 #if NP2_AUTOC_USE_BUF
 		node->offset = 0;
@@ -214,7 +267,14 @@ void WordList_AddWord(struct WordList *pWList, LPCSTR pWord, int len)
 			iter = iter->link[dir];
 		}
 
+#if NP2_AUTOC_USE_NODE_CACHE
+		if (pWList->cacheIndex + 1 > pWList->cacheCapacity) {
+			WordList_AllocMoreNodeCache(pWList);
+		}
+		node = &(pWList->nodeCache[pWList->cacheIndex++]);
+#else
 		node = (struct WordNode *)NP2HeapAlloc(sizeof(struct WordNode));
+#endif
 		node->len = len;
 #if NP2_AUTOC_USE_BUF
 		if (pWList->capacity < pWList->nTotalLen + len + 1) {
@@ -256,6 +316,21 @@ void WordList_AddWord(struct WordList *pWList, LPCSTR pWord, int len)
 
 void WordList_Free(struct WordList *pWList)
 {
+#if NP2_AUTOC_USE_NODE_CACHE
+	int i;
+	pWList->cacheIndexList[pWList->cacheCount - 1] = pWList->cacheIndex;
+	for (i = 0; i < pWList->cacheCount; i++) {
+#if !NP2_AUTOC_USE_BUF
+		int j, cacheIndex = pWList->cacheIndexList[i];
+		struct WordNode *nodeCache = pWList->nodeCacheList[i];
+		for (j = 0; j < cacheIndex; j++) {
+			struct WordNode *iter = &(nodeCache[j]);
+			NP2HeapFree(iter->word);
+		}
+#endif
+		NP2HeapFree(pWList->nodeCacheList[i]);
+	}
+#else
 	struct WordNode *iter = pWList->pListHead;
 	struct WordNode *save;
 
@@ -275,6 +350,7 @@ void WordList_Free(struct WordList *pWList)
 		}
 		iter = save;
 	}
+#endif
 #if NP2_AUTOC_USE_BUF
 	NP2HeapFree(pWList->buffer);
 #endif
@@ -315,6 +391,16 @@ void WordList_GetList(struct WordList *pWList, char* *pList)
 #pragma warning(pop) // C4201
 #endif
 
+#if NP2_AUTOC_USE_NODE_CACHE
+static void WordList_AllocMoreNodeCache(struct WordList *pWList) {
+	pWList->cacheIndexList[pWList->cacheCount - 1] = pWList->cacheIndex;
+	pWList->cacheCapacity <<= 1;
+	pWList->cacheIndex = 0;
+	pWList->nodeCache = (struct WordNode *)NP2HeapAlloc(pWList->cacheCapacity * sizeof(struct WordNode));
+	pWList->nodeCacheList[pWList->cacheCount++] = pWList->nodeCache;
+}
+#endif
+
 struct WordList *WordList_Alloc(LPCSTR pRoot, int iRootLen, BOOL bIgnoreCase) {
 	struct WordList *pWList = (struct WordList *)NP2HeapAlloc(sizeof(struct WordList));
 	pWList->pListHead =  NULL;
@@ -334,7 +420,12 @@ struct WordList *WordList_Alloc(LPCSTR pRoot, int iRootLen, BOOL bIgnoreCase) {
 		pWList->WL_StrCmpA = StrCmpA;
 		pWList->WL_StrCmpNA = StrCmpNA;
 	}
-
+#if NP2_AUTOC_USE_NODE_CACHE
+	pWList->cacheCapacity = NP2_AUTOC_INIT_CACHE_SIZE;
+	pWList->cacheCount = 1;
+	pWList->nodeCache = (struct WordNode *)NP2HeapAlloc(pWList->cacheCapacity * sizeof(struct WordNode));
+	pWList->nodeCacheList[0] = pWList->nodeCache;
+#endif
 	return pWList;
 }
 
