@@ -6292,6 +6292,14 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 		Redraw();
 		break;
 
+	case SCI_GETTABDRAWMODE:
+		return vs.tabDrawMode;
+
+	case SCI_SETTABDRAWMODE:
+		vs.tabDrawMode = static_cast<TabDrawMode>(wParam);
+		Redraw();
+		break;
+
 	case SCI_GETWHITESPACESIZE:
 		return vs.whitespaceSize;
 

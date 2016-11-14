@@ -5,6 +5,7 @@
 *.sdf
 *.user
 *.VC.db
+*.opendb
 *.aps
 *.obj
 *.exe

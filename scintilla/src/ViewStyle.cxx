@@ -153,6 +153,7 @@ ViewStyle::ViewStyle(const ViewStyle &source) {
 	textStart = source.textStart;
 	zoomLevel = source.zoomLevel;
 	viewWhitespace = source.viewWhitespace;
+	tabDrawMode = source.tabDrawMode;
 	whitespaceSize = source.whitespaceSize;
 	viewIndentationGuides = source.viewIndentationGuides;
 	viewEOL = source.viewEOL;
@@ -293,6 +294,7 @@ void ViewStyle::Init(size_t stylesSize_) {
 	textStart = marginInside ? fixedColumnWidth : leftMarginWidth;
 	zoomLevel = 0;
 	viewWhitespace = wsInvisible;
+	tabDrawMode = tdLongArrow;
 	whitespaceSize = 1;
 	viewIndentationGuides = ivNone;
 	viewEOL = false;

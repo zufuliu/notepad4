@@ -168,6 +168,17 @@ get int GetViewWS=2020(,)
 # Make white space characters invisible, always visible or visible outside indentation.
 set void SetViewWS=2021(int viewWS,)
 
+enu TabDrawMode=SCTD_
+val SCTD_LONGARROW=0
+val SCTD_STRIKEOUT=1
+
+# Retrieve the current tab draw mode.
+# Returns one of SCTD_* constants.
+get int GetTabDrawMode=2698(,)
+
+# Set how tabs are drawn when visible.
+set void SetTabDrawMode=2699(int tabDrawMode,)
+
 # Find the position from a point within the window.
 fun position PositionFromPoint=2022(int x, int y)
 

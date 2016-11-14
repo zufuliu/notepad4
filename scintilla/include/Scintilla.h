@@ -76,6 +76,10 @@ typedef sptr_t (*SciFnDirect)(sptr_t ptr, unsigned int iMessage, uptr_t wParam, 
 #define SCWS_VISIBLEONLYININDENT 3
 #define SCI_GETVIEWWS 2020
 #define SCI_SETVIEWWS 2021
+#define SCTD_LONGARROW 0
+#define SCTD_STRIKEOUT 1
+#define SCI_GETTABDRAWMODE 2698
+#define SCI_SETTABDRAWMODE 2699
 #define SCI_POSITIONFROMPOINT 2022
 #define SCI_POSITIONFROMPOINTCLOSE 2023
 #define SCI_GOTOLINE 2024

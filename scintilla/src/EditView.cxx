@@ -306,21 +306,25 @@ static const char *ControlCharacterString(unsigned char ch) {
 	}
 }
 
-static void DrawTabArrow(Surface *surface, const PRectangle &rcTab, int ymid) {
-	int ydiff = static_cast<int>(rcTab.bottom - rcTab.top) / 2;
-	int xhead = static_cast<int>(rcTab.right) - 1 - ydiff;
-	if (xhead <= rcTab.left) {
-		ydiff -= static_cast<int>(rcTab.left) - xhead - 1;
-		xhead = static_cast<int>(rcTab.left) - 1;
-	}
+static void DrawTabArrow(Surface *surface, const PRectangle &rcTab, int ymid, const ViewStyle &vsDraw) {
 	if ((rcTab.left + 2) < (rcTab.right - 1))
 		surface->MoveTo(static_cast<int>(rcTab.left) + 2, ymid);
 	else
 		surface->MoveTo(static_cast<int>(rcTab.right) - 1, ymid);
 	surface->LineTo(static_cast<int>(rcTab.right) - 1, ymid);
-	surface->LineTo(xhead, ymid - ydiff);
-	surface->MoveTo(static_cast<int>(rcTab.right) - 1, ymid);
-	surface->LineTo(xhead, ymid + ydiff);
+
+	// Draw the arrow head if needed
+	if (vsDraw.tabDrawMode == tdLongArrow) {
+		int ydiff = static_cast<int>(rcTab.bottom - rcTab.top) / 2;
+		int xhead = static_cast<int>(rcTab.right) - 1 - ydiff;
+		if (xhead <= rcTab.left) {
+			ydiff -= static_cast<int>(rcTab.left) - xhead - 1;
+			xhead = static_cast<int>(rcTab.left) - 1;
+		}
+		surface->LineTo(xhead, ymid - ydiff);
+		surface->MoveTo(static_cast<int>(rcTab.right) - 1, ymid);
+		surface->LineTo(xhead, ymid + ydiff);
+	}
 }
 
 void EditView::RefreshPixMaps(Surface *surfaceWindow, WindowID wid, const ViewStyle &vsDraw) {
@@ -1579,7 +1583,7 @@ void EditView::DrawForeground(Surface *surface, const EditModel &model, const Vi
 							PRectangle rcTab(rcSegment.left + 1, rcSegment.top + tabArrowHeight,
 								rcSegment.right - 1, rcSegment.bottom - vsDraw.maxDescent);
 							if (customDrawTabArrow == NULL)
-								DrawTabArrow(surface, rcTab, static_cast<int>(rcSegment.top + vsDraw.lineHeight / 2));
+								DrawTabArrow(surface, rcTab, static_cast<int>(rcSegment.top + vsDraw.lineHeight / 2), vsDraw);
 							else
 								customDrawTabArrow(surface, rcTab, static_cast<int>(rcSegment.top + vsDraw.lineHeight / 2));
 						}

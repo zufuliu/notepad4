@@ -7,6 +7,13 @@
 #define NP2_AUTOC_INIT_CACHE_SIZE	128
 #define NP2_AUTOC_MAX_CACHE_COUNT	12
 
+#if NP2_AUTOC_USE_BUF
+#define DefaultAlignment		16
+__forceinline unsigned int align_up(unsigned int value) {
+	return (value + DefaultAlignment - 1) & (~(DefaultAlignment - 1));
+}
+#endif
+
 struct WordNode;
 struct WordList {
 	int (WINAPI *WL_StrCmpA)(LPCSTR, LPCSTR);
@@ -16,6 +23,7 @@ struct WordList {
 #if NP2_AUTOC_USE_BUF
 	char* buffer;
 	int capacity;
+	int offset;
 #endif
 	int nWordCount;
 	int nTotalLen;
@@ -56,7 +64,7 @@ void WordList_AddWord(struct WordList *pWList, LPCSTR pWord, int len)
 
 	while (head) {
 #if NP2_AUTOC_USE_BUF
-		diff = pWList->WL_StrCmpA(pWord, &pWList->buffer[head->offset]);
+		diff = pWList->WL_StrCmpA(pWord, pWList->buffer + head->offset);
 #else
 		diff = pWList->WL_StrCmpA(pWord, head->word);
 #endif
@@ -79,12 +87,12 @@ void WordList_AddWord(struct WordList *pWList, LPCSTR pWord, int len)
 #endif
 		node->len = len;
 #if NP2_AUTOC_USE_BUF
-		if (pWList->capacity < pWList->nTotalLen + len + 1) {
+		if (pWList->capacity < pWList->offset + len + 1) {
 			pWList->capacity <<= 1;
 			pWList->buffer = NP2HeapReAlloc(pWList->buffer, pWList->capacity);
 		}
-		node->offset = pWList->nTotalLen;
-		CopyMemory(&pWList->buffer[node->offset], pWord, len);
+		node->offset = pWList->offset;
+		CopyMemory(pWList->buffer + node->offset, pWord, len);
 		pWList->buffer[node->offset + len] = '\0';
 #else
 		node->word = NP2HeapAlloc(len + 1);
@@ -99,6 +107,9 @@ void WordList_AddWord(struct WordList *pWList, LPCSTR pWord, int len)
 
 		pWList->nWordCount++;
 		pWList->nTotalLen += len + 1;
+#if NP2_AUTOC_USE_BUF
+		pWList->offset += align_up(len + 1);
+#endif
 		if (len > pWList->iMaxLength) {
 			pWList->iMaxLength = len;
 		}
@@ -153,7 +164,7 @@ void WordList_GetList(struct WordList *pWList, char* *pList)
 
 	while (head) {
 #if NP2_AUTOC_USE_BUF
-		CopyMemory(buf, &pWList->buffer[head->offset], head->len);
+		CopyMemory(buf, pWList->buffer + head->offset, head->len);
 #else
 		CopyMemory(buf, head->word, head->len);
 #endif
@@ -255,7 +266,7 @@ void WordList_AddWord(struct WordList *pWList, LPCSTR pWord, int len)
 		for (;;) {
 			path[top++] = iter;
 #if NP2_AUTOC_USE_BUF
-			dir = pWList->WL_StrCmpA(&pWList->buffer[iter->offset], pWord);
+			dir = pWList->WL_StrCmpA(pWList->buffer + iter->offset, pWord);
 #else
 			dir = pWList->WL_StrCmpA(iter->word, pWord);
 #endif
@@ -277,12 +288,12 @@ void WordList_AddWord(struct WordList *pWList, LPCSTR pWord, int len)
 #endif
 		node->len = len;
 #if NP2_AUTOC_USE_BUF
-		if (pWList->capacity < pWList->nTotalLen + len + 1) {
+		if (pWList->capacity < pWList->offset + len + 1) {
 			pWList->capacity <<= 1;
 			pWList->buffer = NP2HeapReAlloc(pWList->buffer, pWList->capacity);
 		}
-		node->offset = pWList->nTotalLen;
-		CopyMemory(&pWList->buffer[node->offset], pWord, len);
+		node->offset = pWList->offset;
+		CopyMemory(pWList->buffer + node->offset, pWord, len);
 		pWList->buffer[node->offset + len] = '\0';
 #else
 		node->word = NP2HeapAlloc(len + 1);
@@ -309,6 +320,9 @@ void WordList_AddWord(struct WordList *pWList, LPCSTR pWord, int len)
 	pWList->pListHead = root;
 	pWList->nWordCount++;
 	pWList->nTotalLen += len + 1;
+#if NP2_AUTOC_USE_BUF
+	pWList->offset += align_up(len + 1);
+#endif
 	if (len > pWList->iMaxLength) {
 		pWList->iMaxLength = len;
 	}
@@ -372,7 +386,7 @@ void WordList_GetList(struct WordList *pWList, char* *pList)
 		} else {
 			root = path[--top];
 #if NP2_AUTOC_USE_BUF
-			CopyMemory(buf, &pWList->buffer[root->offset], root->len);
+			CopyMemory(buf, pWList->buffer + root->offset, root->len);
 #else
 			CopyMemory(buf, root->word, root->len);
 #endif
