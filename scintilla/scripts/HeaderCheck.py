@@ -32,7 +32,8 @@ def ExtractHeaders(filename):
 
 def CheckFiles(root):
     # Find all the lexer source code files
-    filePaths = glob.glob(root + "/src/*.cxx")
+    filePaths = glob.glob(root + "/include/*.h")
+    filePaths += glob.glob(root + "/src/*.cxx")
     SortListInsensitive(filePaths)
     filePaths += glob.glob(root + "/lexlib/*.cxx")
     filePaths += glob.glob(root + "/lexers/*.cxx")

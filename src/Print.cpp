@@ -50,11 +50,6 @@ extern "C" RECT pagesetupMargin;
 HGLOBAL hDevMode = NULL;
 HGLOBAL hDevNames = NULL;
 
-#ifdef SCI_NAMESPACE
-#undef RangeToFormat
-#define RangeToFormat Scintilla::Sci_RangeToFormat
-#endif
-
 
 //=============================================================================
 //
@@ -114,7 +109,7 @@ extern "C" BOOL EditPrint(HWND hwnd, LPCWSTR pszDocTitle, LPCWSTR pszPageFormat)
 	LONG lengthDocMax;
 	LONG lengthPrinted;
 
-	struct RangeToFormat frPrint;
+	struct Sci_RangeToFormat frPrint;
 
 	int pageNum;
 

@@ -11,8 +11,6 @@
 #ifndef SCINTILLA_H
 #define SCINTILLA_H
 
-#include "Sci_Position.h"
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -28,19 +26,20 @@ int Scintilla_LinkLexers(void);
 }
 #endif
 
-/* Here should be placed typedefs for uptr_t, an unsigned integer type large enough to
- * hold a pointer and sptr_t, a signed integer large enough to hold a pointer.
- * May need to be changed for 64 bit platforms. */
-#if defined(_WIN32)
-#include <basetsd.h>
-#endif
-#ifdef MAXULONG_PTR
-typedef ULONG_PTR uptr_t;
-typedef LONG_PTR sptr_t;
+// Include header that defines basic numeric types.
+#if defined(_MSC_VER)
+// Older releases of MSVC did not have stdint.h.
+#include <stddef.h>
 #else
-typedef unsigned long uptr_t;
-typedef long sptr_t;
+#include <stdint.h>
 #endif
+
+// Define uptr_t, an unsigned integer type large enough to hold a pointer.
+typedef uintptr_t uptr_t;
+// Define sptr_t, a signed integer large enough to hold a pointer.
+typedef intptr_t sptr_t;
+
+#include "Sci_Position.h"
 
 typedef sptr_t (*SciFnDirect)(sptr_t ptr, unsigned int iMessage, uptr_t wParam, sptr_t lParam);
 
@@ -1094,10 +1093,6 @@ typedef sptr_t (*SciFnDirect)(sptr_t ptr, unsigned int iMessage, uptr_t wParam, 
  * CHARRANGE, TEXTRANGE, FINDTEXTEX, FORMATRANGE, and NMHDR structs.
  * So older code that treats Scintilla as a RichEdit will work. */
 
-#if defined(__cplusplus) && defined(SCI_NAMESPACE)
-namespace Scintilla {
-#endif
-
 struct Sci_CharacterRange {
 	Sci_PositionCR cpMin;
 	Sci_PositionCR cpMax;
@@ -1113,10 +1108,6 @@ struct Sci_TextToFind {
 	const char *lpstrText;
 	struct Sci_CharacterRange chrgText;
 };
-
-#define CharacterRange Sci_CharacterRange
-#define TextRange Sci_TextRange
-#define TextToFind Sci_TextToFind
 
 typedef void *Sci_SurfaceID;
 
@@ -1138,8 +1129,6 @@ struct Sci_RangeToFormat {
 	struct Sci_CharacterRange chrg;
 };
 
-#define RangeToFormat Sci_RangeToFormat
-
 #ifndef __cplusplus
 /* For the GTK+ platform, g-ir-scanner needs to have these typedefs. This
  * is not required in C++ code and actually seems to break ScintillaEditPy */
@@ -1155,8 +1144,6 @@ struct Sci_NotifyHeader {
 	uptr_t idFrom;
 	unsigned int code;
 };
-
-#define NotifyHeader Sci_NotifyHeader
 
 struct SCNotification {
 	Sci_NotifyHeader nmhdr;
@@ -1197,17 +1184,16 @@ struct SCNotification {
 	/* SCN_AUTOCSELECTION, SCN_AUTOCCOMPLETED, SCN_USERLISTSELECTION, */
 };
 
-#if defined(__cplusplus) && defined(SCI_NAMESPACE)
-}
-#endif
-
 #ifdef INCLUDE_DEPRECATED_FEATURES
 
-#define SC_CP_DBCS 1
-#define SCI_SETUSEPALETTE 2039
-#define SCI_GETUSEPALETTE 2139
 #define SCI_SETKEYSUNICODE 2521
 #define SCI_GETKEYSUNICODE 2522
+
+#define CharacterRange Sci_CharacterRange
+#define TextRange Sci_TextRange
+#define TextToFind Sci_TextToFind
+#define RangeToFormat Sci_RangeToFormat
+#define NotifyHeader Sci_NotifyHeader
 
 #endif
 

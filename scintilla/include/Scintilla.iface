@@ -2818,19 +2818,6 @@ cat Provisional
 
 cat Deprecated
 
-# Deprecated in 2.21
-# The SC_CP_DBCS value can be used to indicate a DBCS mode for GTK+.
-val SC_CP_DBCS=1
-
-# Deprecated in 2.30
-
-# In palette mode?
-get bool GetUsePalette=2139(,)
-
-# In palette mode, Scintilla uses the environment's palette calls to display
-# more colours. This may lead to ugly displays.
-set void SetUsePalette=2039(bool usePalette,)
-
 # Deprecated in 3.5.5
 
 # Always interpret keyboard input as Unicode

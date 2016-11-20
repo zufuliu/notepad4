@@ -199,7 +199,7 @@ BOOL EditConvertText(HWND hwnd, UINT cpSource, UINT cpDest, BOOL bSetSavePoint)
 			SendMessage(hwnd, SCI_SETSAVEPOINT, 0, 0);
 		}
 	} else {
-		struct TextRange tr = { { 0, -1 }, NULL };
+		struct Sci_TextRange tr = { { 0, -1 }, NULL };
 		int cbText, cbwText;
 		char *pchText;
 		WCHAR *pwchText;
@@ -1834,7 +1834,7 @@ void EditTabsToSpaces(HWND hwnd, int nTabWidth, BOOL bOnlyIndentingWS)
 	int iSelEnd;
 	int iSelCount;
 	UINT cpEdit;
-	struct TextRange tr;
+	struct Sci_TextRange tr;
 	BOOL bIsLineStart = TRUE;
 	BOOL bModified = FALSE;
 
@@ -1966,7 +1966,7 @@ void EditSpacesToTabs(HWND hwnd, int nTabWidth, BOOL bOnlyIndentingWS)
 	int iSelEnd;
 	int iSelCount;
 	UINT cpEdit;
-	struct TextRange tr;
+	struct Sci_TextRange tr;
 	WCHAR space[256];
 	BOOL bIsLineStart = TRUE;
 	BOOL bModified = FALSE;
@@ -2963,7 +2963,7 @@ void EditToggleLineComments(HWND hwnd, LPCWSTR pwszComment, BOOL bInsertAtStart)
 			int iCommentPos;
 			int iIndentPos = (int)SendMessage(hwnd, SCI_GETLINEINDENTPOSITION, (WPARAM)iLine, 0);
 			char tchBuf[32];
-			struct TextRange tr;
+			struct Sci_TextRange tr;
 			BOOL bWhitespaceLine = FALSE;
 			int ch;
 
@@ -3564,7 +3564,7 @@ void EditWrapToColumn(HWND hwnd, int nColumn/*, int nTabWidth*/)
 	int iSelCount;
 
 	UINT cpEdit;
-	struct TextRange tr;
+	struct Sci_TextRange tr;
 	int		cEOLMode;
 	WCHAR wszEOL[] = L"\r\n";
 	int		cchEOL = 2;
@@ -3773,7 +3773,7 @@ void EditJoinLinesEx(HWND hwnd)
 	int iSelEnd;
 	int iSelCount;
 
-	struct TextRange tr;
+	struct Sci_TextRange tr;
 	int	 cEOLMode;
 	char szEOL[] = "\r\n";
 	int	 cchEOL = 2;
@@ -4313,7 +4313,7 @@ void EditGetExcerpt(HWND hwnd, LPWSTR lpszExcerpt, DWORD cchExcerpt)
 {
 	WCHAR tch[256] = L"";
 	DWORD cch = 0;
-	struct TextRange tr;
+	struct Sci_TextRange tr;
 	char	 *pszText;
 	LPWSTR pszTextW;
 
@@ -4942,7 +4942,7 @@ void EscapeWildcards(char *szFind2 , LPCEDITFINDREPLACE lpefr)
 BOOL EditFindNext(HWND hwnd, LPCEDITFINDREPLACE lpefr, BOOL fExtendSelection)
 {
 
-	struct TextToFind ttf;
+	struct Sci_TextToFind ttf;
 	int iPos;
 	int iSelPos, iSelAnchor;
 	char szFind2[NP2_FIND_REPLACE_LIMIT];
@@ -5014,7 +5014,7 @@ BOOL EditFindNext(HWND hwnd, LPCEDITFINDREPLACE lpefr, BOOL fExtendSelection)
 BOOL EditFindPrev(HWND hwnd, LPCEDITFINDREPLACE lpefr, BOOL fExtendSelection)
 {
 
-	struct TextToFind ttf;
+	struct Sci_TextToFind ttf;
 	int iPos;
 	int iSelPos, iSelAnchor;
 	int iLength;
@@ -5089,7 +5089,7 @@ BOOL EditFindPrev(HWND hwnd, LPCEDITFINDREPLACE lpefr, BOOL fExtendSelection)
 BOOL EditReplace(HWND hwnd, LPCEDITFINDREPLACE lpefr)
 {
 
-	struct TextToFind ttf;
+	struct Sci_TextToFind ttf;
 	int iPos;
 	int iSelStart;
 	int iSelEnd;
@@ -5216,7 +5216,7 @@ extern 	int iMatchesCount;
 
 void EditMarkAll(HWND hwnd, int iMarkOccurrences, BOOL bMarkOccurrencesMatchCase, BOOL bMarkOccurrencesMatchWords)
 {
-	struct TextToFind ttf;
+	struct Sci_TextToFind ttf;
 	int iPos;
 	char *pszText;
 	int iTextLen;
@@ -5258,7 +5258,7 @@ void EditMarkAll(HWND hwnd, int iMarkOccurrences, BOOL bMarkOccurrencesMatchCase
 	// exit if selection is not a word and Match whole words only is enabled
 	if (bMarkOccurrencesMatchWords) {
 		iSelStart = 0;
-		while (pszText[iSelStart]) {
+		while (iSelStart < iSelCount && pszText[iSelStart]) {
 			if (IsDocWordChar(pszText[iSelStart]) || pszText[iSelStart] == '-') {
 				iSelStart++;
 			} else {
@@ -5301,7 +5301,7 @@ void EditMarkAll(HWND hwnd, int iMarkOccurrences, BOOL bMarkOccurrencesMatchCase
 BOOL EditReplaceAll(HWND hwnd, LPCEDITFINDREPLACE lpefr, BOOL bShowInfo)
 {
 
-	struct TextToFind ttf;
+	struct Sci_TextToFind ttf;
 	int iCount = 0;
 	int iReplaceMsg = (lpefr->fuFlags & SCFIND_REGEXP) ? SCI_REPLACETARGETRE : SCI_REPLACETARGET;
 	char szFind2[NP2_FIND_REPLACE_LIMIT];
@@ -5434,7 +5434,7 @@ BOOL EditReplaceAll(HWND hwnd, LPCEDITFINDREPLACE lpefr, BOOL bShowInfo)
 BOOL EditReplaceAllInSelection(HWND hwnd, LPCEDITFINDREPLACE lpefr, BOOL bShowInfo)
 {
 
-	struct TextToFind ttf;
+	struct Sci_TextToFind ttf;
 	int iCount = 0;
 	int iReplaceMsg = (lpefr->fuFlags & SCFIND_REGEXP) ? SCI_REPLACETARGETRE : SCI_REPLACETARGET;
 	BOOL fCancel = FALSE;
