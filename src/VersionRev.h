@@ -1,3 +1,3 @@
-#define VERSION_HASH _T("5e7c586")
-#define VERSION_REV 977
-#define VERSION_REV_FULL _T("977 (5e7c586)")
+#define VERSION_HASH _T("b27830c")
+#define VERSION_REV 990
+#define VERSION_REV_FULL _T("990 (b27830c)")

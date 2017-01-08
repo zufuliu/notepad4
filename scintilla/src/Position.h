@@ -19,7 +19,6 @@ typedef int Position;
 
 // A later version (4.x) of this file may:
 //#if defined(SCI_LARGE_FILE_SUPPORT)
-//typedef ptrdiff_t Position;
 //typedef std::ptrdiff_t Position;
 // or may allow runtime choice between different position sizes.
 

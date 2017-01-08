@@ -15,11 +15,8 @@ namespace Scintilla {
 class CharClassify {
 public:
 	CharClassify();
-#if 0	// for Latin
-	enum cc { ccSpace, ccNewLine, ccWord, ccPunctuation, ccUniWord=ccWord, ccUniPunct=ccPunctuation};
-#else	// for CJK
-	enum cc { ccSpace, ccNewLine, ccWord, ccPunctuation, ccUniWord, ccUniPunct};
-#endif
+
+	enum cc { ccSpace, ccNewLine, ccWord, ccPunctuation };
 	void SetDefaultCharClasses(bool includeWordClass);
 	void SetCharClasses(const unsigned char *chars, cc newCharClass);
 	int GetCharsOfClass(cc charClass, unsigned char *buffer) const;

@@ -104,11 +104,7 @@ void AutoC_AddDocWord(HWND hwnd, struct WordList *pWList, BOOL bIgnore)
 		int wordEnd = iPosFind + iRootLen;
 		int style = SciCall_GetStyleAt(wordEnd - 1);
 		if (iPosFind != iCurrentPos && !IsWordStyleToIgnore(style)) {
-#ifdef NDEBUG
 			int chPrev, ch = *pRoot, chNext = SciCall_GetCharAt(wordEnd);
-#else
-			char chPrev, ch = *pRoot, chNext = SciCall_GetCharAt(wordEnd);
-#endif
 			int wordLength = -iPosFind;
 			BOOL bSubWord = FALSE;
 			while (wordEnd < iDocLen) {
@@ -680,7 +676,7 @@ void EditAutoCloseXMLTag(HWND hwnd)
 		}
 	}
 	if (!autoClosed && bAutoCompleteWords) {
-		int iCurPos = SciCall_GetCurrentPos();
+		iCurPos = SciCall_GetCurrentPos();
 		if (SciCall_GetCharAt(iCurPos - 2) == '-') {
 			EditCompleteWord(hwnd, FALSE); // obj->field, obj->method
 		}
@@ -778,7 +774,7 @@ void EditAutoIndent(HWND hwnd)
 			int indent = 0;
 			int	iIndentLen = 0;
 			int iIndentPos = iCurPos;
-			char ch;
+			int ch;
 			char *endPart = NULL;
 			SciCall_GetLine(iCurLine - 1, pLineBuf);
 			*(pLineBuf + iPrevLineLength) = '\0';
@@ -828,7 +824,7 @@ void EditAutoIndent(HWND hwnd)
 				}
 				iIndentPos += pad;
 				while (pad-- > 0) {
-					*pPos++ = ch;
+					*pPos++ = (char)ch;
 				}
 				if (iEOLMode == SC_EOL_CRLF || iEOLMode == SC_EOL_CR) {
 					*pPos++ = '\r';

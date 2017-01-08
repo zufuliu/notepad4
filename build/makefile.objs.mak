@@ -129,6 +129,7 @@ SCI_SRC_OBJ = \
     $(SCI_SRC_OBJDIR)\XPM.obj
 
 SCI_WIN_OBJ = \
+    $(SCI_WIN_OBJDIR)\HanjaDic.obj \
     $(SCI_WIN_OBJDIR)\PlatWin.obj \
     $(SCI_WIN_OBJDIR)\ScintillaWin.obj
 

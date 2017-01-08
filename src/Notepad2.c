@@ -1646,7 +1646,7 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance)
 	DWORD dwStatusbarStyle = WS_CHILD | WS_CLIPSIBLINGS;
 	DWORD dwReBarStyle = WS_REBAR;
 
-	BOOL bIsAppThemed = PrivateIsAppThemed();
+	bIsAppThemed = PrivateIsAppThemed();
 
 	unsigned int i, n;
 	WCHAR tchDesc[256];
@@ -3733,11 +3733,11 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam)
 	case IDM_EDIT_SELTOBEGIN: {
 			int selStart, selEnd;
 			if (LOWORD(wParam) == IDM_EDIT_SELTOEND) {
-				selStart = SendMessage(hwndEdit, SCI_GETSELECTIONSTART, 0, 0);
-				selEnd = SendMessage(hwndEdit, SCI_GETLENGTH, 0, 0);
+				selStart = (int)SendMessage(hwndEdit, SCI_GETSELECTIONSTART, 0, 0);
+				selEnd = (int)SendMessage(hwndEdit, SCI_GETLENGTH, 0, 0);
 			} else {
 				selStart = 0;
-				selEnd = SendMessage(hwndEdit, SCI_GETSELECTIONEND, 0, 0);
+				selEnd = (int)SendMessage(hwndEdit, SCI_GETSELECTIONEND, 0, 0);
 			}
 			SendMessage(hwndEdit, SCI_SETSELECTIONSTART, selStart, 0);
 			SendMessage(hwndEdit, SCI_SETSELECTIONEND, selEnd, 0);
@@ -5179,7 +5179,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam)
 					int iEndStyled = (int)SendMessage(hwndEdit, SCI_GETENDSTYLED, 0, 0);
 					if (iEndStyled < (int)SendMessage(hwndEdit, SCI_GETLENGTH, 0, 0)) {
 						int iLine = (int)SendMessage(hwndEdit, SCI_LINEFROMPOSITION, iEndStyled, 0);
-						int iEndStyled = (int)SendMessage(hwndEdit, SCI_POSITIONFROMLINE, iLine, 0);
+						iEndStyled = (int)SendMessage(hwndEdit, SCI_POSITIONFROMLINE, iLine, 0);
 						SendMessage(hwndEdit, SCI_COLOURISE, iEndStyled, -1);
 					}
 
@@ -5522,7 +5522,7 @@ void LoadSettings()
 	iDefaultEncoding = IniSectionGetInt(pIniSection, L"DefaultEncoding", 0);
 	iDefaultEncoding = Encoding_MapIniSetting(TRUE, iDefaultEncoding);
 	if (!Encoding_IsValid(iDefaultEncoding)) {
-		iDefaultEncoding = CPI_DEFAULT;
+		iDefaultEncoding = CPI_UTF8;
 	}
 
 	bSkipUnicodeDetection = IniSectionGetBool(pIniSection, L"SkipUnicodeDetection", 0);

@@ -15,9 +15,7 @@ namespace Scintilla {
 
 namespace HanjaDict {
 
-int GetHangulOfHanja(wchar_t *inout) {
-	return 0;
-}
+int GetHangulOfHanja(wchar_t *inout);
 
 }
 

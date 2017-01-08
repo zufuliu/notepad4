@@ -1862,7 +1862,6 @@ BOOL GetThemedDialogFont(LPWSTR lpFaceName, WORD *wSize)
 {
 	HDC hDC;
 	int iLogPixelsY;
-	HMODULE hModUxTheme;
 	HTHEME hTheme;
 	LOGFONT lf;
 	BOOL bSucceed = FALSE;
@@ -1871,7 +1870,7 @@ BOOL GetThemedDialogFont(LPWSTR lpFaceName, WORD *wSize)
 	iLogPixelsY = GetDeviceCaps(hDC, LOGPIXELSY);
 	ReleaseDC(NULL, hDC);
 
-	if ((hModUxTheme = GetModuleHandle(L"uxtheme.dll"))) {
+	if (hModUxTheme) {
 		if ((BOOL)(GetProcAddress(hModUxTheme, "IsAppThemed"))()) {
 			hTheme = (HTHEME)(INT_PTR)(GetProcAddress(hModUxTheme, "OpenThemeData"))(NULL, L"WINDOWSTYLE;WINDOW");
 			if (hTheme) {

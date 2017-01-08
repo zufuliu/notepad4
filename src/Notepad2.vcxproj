@@ -188,7 +188,7 @@
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>..\scintilla\include;..\scintilla\lexlib;..\scintilla\src;.;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;STATIC_BUILD;SCI_NAMESPACE;SCI_LEXER;BOOKMARK_EDITION;DISABLE_D2D;NO_CXX11_REGEX;SCI_DISABLE_PROVISIONAL;UNICODE;_UNICODE;_CRT_SECURE_NO_WARNINGS;_WIN32_WINNT=0x0501;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;STATIC_BUILD;SCI_NAMESPACE;SCI_LEXER;BOOKMARK_EDITION;DISABLE_D2D;NO_CXX11_REGEX;SCI_DISABLE_PROVISIONAL;UNICODE;_UNICODE;_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;_WIN32_WINNT=0x0501;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <WarningLevel>Level4</WarningLevel>
@@ -222,7 +222,7 @@
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>..\scintilla\include;..\scintilla\lexlib;..\scintilla\src;.;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;STATIC_BUILD;SCI_NAMESPACE;SCI_LEXER;BOOKMARK_EDITION;DISABLE_D2D;NO_CXX11_REGEX;SCI_DISABLE_PROVISIONAL;UNICODE;_UNICODE;_CRT_SECURE_NO_WARNINGS;_WIN32_WINNT=0x0501;_HAS_EXCEPTIONS=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;STATIC_BUILD;SCI_NAMESPACE;SCI_LEXER;BOOKMARK_EDITION;DISABLE_D2D;NO_CXX11_REGEX;SCI_DISABLE_PROVISIONAL;UNICODE;_UNICODE;_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;_WIN32_WINNT=0x0501;_HAS_EXCEPTIONS=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <WarningLevel>Level4</WarningLevel>
@@ -256,7 +256,7 @@
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>..\scintilla\include;..\scintilla\lexlib;..\scintilla\src;.;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_WIN64;STATIC_BUILD;SCI_NAMESPACE;SCI_LEXER;BOOKMARK_EDITION;DISABLE_D2D;NO_CXX11_REGEX;SCI_DISABLE_PROVISIONAL;UNICODE;_UNICODE;_CRT_SECURE_NO_WARNINGS;_WIN32_WINNT=0x0502;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_WIN64;STATIC_BUILD;SCI_NAMESPACE;SCI_LEXER;BOOKMARK_EDITION;DISABLE_D2D;NO_CXX11_REGEX;SCI_DISABLE_PROVISIONAL;UNICODE;_UNICODE;_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;_WIN32_WINNT=0x0502;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <WarningLevel>Level4</WarningLevel>
@@ -284,7 +284,7 @@
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>..\scintilla\include;..\scintilla\lexlib;..\scintilla\src;.;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_WIN64;STATIC_BUILD;SCI_NAMESPACE;SCI_LEXER;BOOKMARK_EDITION;DISABLE_D2D;NO_CXX11_REGEX;SCI_DISABLE_PROVISIONAL;UNICODE;_UNICODE;_CRT_SECURE_NO_WARNINGS;_WIN32_WINNT=0x0502;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_WIN64;STATIC_BUILD;SCI_NAMESPACE;SCI_LEXER;BOOKMARK_EDITION;DISABLE_D2D;NO_CXX11_REGEX;SCI_DISABLE_PROVISIONAL;UNICODE;_UNICODE;_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;_WIN32_WINNT=0x0502;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <WarningLevel>EnableAllWarnings</WarningLevel>
@@ -312,7 +312,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
       <AdditionalIncludeDirectories>..\scintilla\include;..\scintilla\lexlib;..\scintilla\src;.;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;STATIC_BUILD;SCI_NAMESPACE;SCI_LEXER;BOOKMARK_EDITION;DISABLE_D2D;NO_CXX11_REGEX;SCI_DISABLE_PROVISIONAL;NDEBUG;UNICODE;_UNICODE;_CRT_SECURE_NO_WARNINGS;_WIN32_WINNT=0x0501;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;STATIC_BUILD;SCI_NAMESPACE;SCI_LEXER;BOOKMARK_EDITION;DISABLE_D2D;NO_CXX11_REGEX;SCI_DISABLE_PROVISIONAL;NDEBUG;UNICODE;_UNICODE;_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;_WIN32_WINNT=0x0501;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <WarningLevel>Level4</WarningLevel>
       <DebugInformationFormat>
@@ -376,7 +376,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='WDKRelease|Win32'">
     <ClCompile>
       <AdditionalIncludeDirectories>..\scintilla\include;..\scintilla\lexlib;..\scintilla\src;.;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_WINDOWS;WIN32;_STL70_;_STATIC_CPPLIB;STATIC_BUILD;SCI_NAMESPACE;SCI_LEXER;BOOKMARK_EDITION;DISABLE_D2D;NO_CXX11_REGEX;SCI_DISABLE_PROVISIONAL;WDK_BUILD;NDEBUG;UNICODE;_UNICODE;_M_IX86;_CRT_SECURE_NO_WARNINGS;_WIN32_WINNT=0x0501;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_WINDOWS;WIN32;_STL70_;_STATIC_CPPLIB;STATIC_BUILD;SCI_NAMESPACE;SCI_LEXER;BOOKMARK_EDITION;DISABLE_D2D;NO_CXX11_REGEX;SCI_DISABLE_PROVISIONAL;WDK_BUILD;NDEBUG;UNICODE;_UNICODE;_M_IX86;_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;_WIN32_WINNT=0x0501;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <WarningLevel>Level4</WarningLevel>
       <DebugInformationFormat>
@@ -440,7 +440,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
       <AdditionalIncludeDirectories>..\scintilla\include;..\scintilla\lexlib;..\scintilla\src;.;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_WIN64;STATIC_BUILD;SCI_NAMESPACE;SCI_LEXER;BOOKMARK_EDITION;DISABLE_D2D;NO_CXX11_REGEX;SCI_DISABLE_PROVISIONAL;NDEBUG;UNICODE;_UNICODE;_CRT_SECURE_NO_WARNINGS;_WIN32_WINNT=0x0502;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_WIN64;STATIC_BUILD;SCI_NAMESPACE;SCI_LEXER;BOOKMARK_EDITION;DISABLE_D2D;NO_CXX11_REGEX;SCI_DISABLE_PROVISIONAL;NDEBUG;UNICODE;_UNICODE;_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;_WIN32_WINNT=0x0502;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <WarningLevel>Level4</WarningLevel>
       <MultiProcessorCompilation>
@@ -480,7 +480,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='WDKRelease|x64'">
     <ClCompile>
       <AdditionalIncludeDirectories>..\scintilla\include;..\scintilla\lexlib;..\scintilla\src;.;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_WINDOWS;WIN64;_STL70_;_STATIC_CPPLIB;STATIC_BUILD;SCI_NAMESPACE;SCI_LEXER;BOOKMARK_EDITION;DISABLE_D2D;NO_CXX11_REGEX;SCI_DISABLE_PROVISIONAL;WDK_BUILD;NDEBUG;UNICODE;_UNICODE;_CRT_SECURE_NO_WARNINGS;_WIN32_WINNT=0x0502;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_WINDOWS;WIN64;_STL70_;_STATIC_CPPLIB;STATIC_BUILD;SCI_NAMESPACE;SCI_LEXER;BOOKMARK_EDITION;DISABLE_D2D;NO_CXX11_REGEX;SCI_DISABLE_PROVISIONAL;WDK_BUILD;NDEBUG;UNICODE;_UNICODE;_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;_WIN32_WINNT=0x0502;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <WarningLevel>Level4</WarningLevel>
       <MultiProcessorCompilation>
@@ -564,6 +564,7 @@
     <ClCompile Include="..\scintilla\src\UniConversion.cxx" />
     <ClCompile Include="..\scintilla\src\ViewStyle.cxx" />
     <ClCompile Include="..\scintilla\src\XPM.cxx" />
+    <ClCompile Include="..\scintilla\win32\HanjaDic.cxx" />
     <ClCompile Include="..\scintilla\win32\PlatWin.cxx" />
     <ClCompile Include="..\scintilla\win32\ScintillaWin.cxx" />
     <ClCompile Include="..\scintilla\lexers\LexNull.cxx" />

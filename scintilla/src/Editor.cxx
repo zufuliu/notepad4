@@ -283,8 +283,8 @@ Point Editor::GetVisibleOriginInMain() const {
 	return Point(0,0);
 }
 
-Point Editor::DocumentPointFromView(const Point &ptView) const {
-	Point ptDocument = ptView;
+PointDocument Editor::DocumentPointFromView(const Point &ptView) const {
+	PointDocument ptDocument(ptView);
 	if (wMargin.GetID()) {
 		Point ptOrigin = GetVisibleOriginInMain();
 		ptDocument.x += ptOrigin.x;
@@ -351,13 +351,13 @@ int Editor::MaxScrollPos() const {
 }
 
 SelectionPosition Editor::ClampPositionIntoDocument(const SelectionPosition &sp_) const {
-	if (sp_.Position() < 0) {
+	SelectionPosition sp = sp_;
+	if (sp.Position() < 0) {
 		return SelectionPosition(0);
-	} else if (sp_.Position() > pdoc->Length()) {
+	} else if (sp.Position() > pdoc->Length()) {
 		return SelectionPosition(pdoc->Length());
 	} else {
 		// If not at end of line then set offset to 0
-		SelectionPosition sp = sp_;
 		if (!pdoc->IsLineEndPosition(sp.Position()))
 			sp.SetVirtualSpace(0);
 		return sp;
@@ -400,8 +400,8 @@ SelectionPosition Editor::SPositionFromLocation(const Point &pt_, bool canReturn
 		if (pt.y < 0)
 			return SelectionPosition(INVALID_POSITION);
 	}
-	pt = DocumentPointFromView(pt);
-	return view.SPositionFromLocation(surface, *this, pt, canReturnInvalid, charPosition, virtualSpace, vs);
+	PointDocument ptdoc = DocumentPointFromView(pt);
+	return view.SPositionFromLocation(surface, *this, ptdoc, canReturnInvalid, charPosition, virtualSpace, vs);
 }
 
 int Editor::PositionFromLocation(const Point &pt, bool canReturnInvalid, bool charPosition) {
@@ -742,8 +742,8 @@ void Editor::MultipleSelectAdd(AddNumber addNumber) {
 			const int searchEnd = it->end;
 			for (;;) {
 				int lengthFound = static_cast<int>(selectedText.length());
-				int pos = static_cast<int>(pdoc->FindText(searchStart, searchEnd, selectedText.c_str(),
-					searchFlags, &lengthFound));
+				int pos = static_cast<int>(pdoc->FindText(searchStart, searchEnd,
+					selectedText.c_str(), searchFlags, &lengthFound));
 				if (pos >= 0) {
 					sel.AddSelection(SelectionRange(pos + lengthFound, pos));
 					ScrollRange(sel.RangeMain());
@@ -1442,10 +1442,10 @@ void Editor::InvalidateCaret() {
 	UpdateSystemCaret();
 }
 
-void Editor::UpdateSystemCaret() {
+void Editor::NotifyCaretMove() {
 }
 
-void Editor::NotifyCaretMove() {
+void Editor::UpdateSystemCaret() {
 }
 
 bool Editor::Wrapping() const {
@@ -1999,7 +1999,7 @@ void Editor::ClearBeforeTentativeStart() {
 void Editor::InsertPaste(const char *text, int len) {
 	if (multiPasteMode == SC_MULTIPASTE_ONCE) {
 		SelectionPosition selStart = sel.Start();
-		selStart = SelectionPosition(RealizeVirtualSpace(selStart.Position(), selStart.VirtualSpace()));
+		selStart = RealizeVirtualSpace(selStart);
 		const int lengthInserted = pdoc->InsertString(selStart.Position(), text, len);
 		if (lengthInserted > 0) {
 			SetEmptySelection(selStart.Position() + lengthInserted);
@@ -2466,6 +2466,22 @@ bool Editor::NotifyMarginClick(const Point &pt, int modifiers) {
 
 bool Editor::NotifyMarginClick(const Point &pt, bool shift, bool ctrl, bool alt) {
 	return NotifyMarginClick(pt, ModifierFlags(shift, ctrl, alt));
+}
+
+bool Editor::NotifyMarginRightClick(const Point &pt, int modifiers) {
+	int marginRightClicked = vs.MarginFromLocation(pt);
+	if ((marginRightClicked >= 0) && vs.ms[marginRightClicked].sensitive) {
+		int position = pdoc->LineStart(LineFromLocation(pt));
+		SCNotification scn = {};
+		scn.nmhdr.code = SCN_MARGINRIGHTCLICK;
+		scn.modifiers = modifiers;
+		scn.position = position;
+		scn.margin = marginRightClicked;
+		NotifyParent(scn);
+		return true;
+	} else {
+		return false;
+	}
 }
 
 void Editor::NotifyNeedShown(int pos, int len) {
@@ -3425,7 +3441,7 @@ int Editor::HorizontalMove(unsigned int iMessage) {
 			const int directionMove = (spCaret < spCaretNow) ? -1 : 1;
 			spCaret = MovePositionSoVisible(spCaret, directionMove);
 
-			// Handle move versus extend, and special behaviour for non-emoty left/right
+			// Handle move versus extend, and special behaviour for non-empty left/right
 			switch (iMessage) {
 			case SCI_CHARLEFT:
 			case SCI_CHARRIGHT:
@@ -3518,7 +3534,7 @@ int Editor::DelWordOrLine(unsigned int iMessage) {
 		} else {
 			// Delete to the right so first realise the virtual space.
 			sel.Range(r) = SelectionRange(
-				RealizeVirtualSpace(sel.Range(r).caret.Position(), sel.Range(r).caret.VirtualSpace()));
+				RealizeVirtualSpace(sel.Range(r).caret));
 		}
 
 		Range rangeDelete;
@@ -4580,6 +4596,11 @@ void Editor::ButtonDownWithModifiers(const Point &pt, unsigned int curTime, int 
 	lastClick = pt;
 	lastXChosen = static_cast<int>(pt.x) + xOffset;
 	ShowCaretAtCurrentPosition();
+}
+
+void Editor::RightButtonDownWithModifiers(const Point &pt, unsigned int, int modifiers) {
+	if (NotifyMarginRightClick(pt, modifiers))
+		return;
 }
 
 void Editor::ButtonDown(const Point &pt, unsigned int curTime, bool shift, bool ctrl, bool alt) {
@@ -5675,6 +5696,39 @@ sptr_t Editor::StyleGetMessage(unsigned int iMessage, uptr_t wParam, sptr_t lPar
 		return vs.styles[wParam].hotspot ? 1 : 0;
 	}
 	return 0;
+}
+
+void Editor::SetSelectionNMessage(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
+	InvalidateRange(sel.Range(wParam).Start().Position(), sel.Range(wParam).End().Position());
+
+	switch (iMessage) {
+	case SCI_SETSELECTIONNCARET:
+		sel.Range(wParam).caret.SetPosition(static_cast<int>(lParam));
+		break;
+
+	case SCI_SETSELECTIONNANCHOR:
+		sel.Range(wParam).anchor.SetPosition(static_cast<int>(lParam));
+		break;
+
+	case SCI_SETSELECTIONNCARETVIRTUALSPACE:
+		sel.Range(wParam).caret.SetVirtualSpace(static_cast<int>(lParam));
+		break;
+
+	case SCI_SETSELECTIONNANCHORVIRTUALSPACE:
+		sel.Range(wParam).anchor.SetVirtualSpace(static_cast<int>(lParam));
+		break;
+
+	case SCI_SETSELECTIONNSTART:
+		sel.Range(wParam).anchor.SetPosition(static_cast<int>(lParam));
+		break;
+
+	case SCI_SETSELECTIONNEND:
+		sel.Range(wParam).caret.SetPosition(static_cast<int>(lParam));
+		break;
+	}
+
+	InvalidateRange(sel.Range(wParam).Start().Position(), sel.Range(wParam).End().Position());
+	ContainerNeedsUpdate(SC_UPDATE_SELECTION);
 }
 
 sptr_t Editor::StringResult(sptr_t lParam, const char *val) {
@@ -7063,6 +7117,16 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 		Redraw();
 		break;
 
+	case SCI_TOGGLEFOLDSHOWTEXT:
+		cs.SetFoldDisplayText(static_cast<int>(wParam), CharPtrFromSPtr(lParam));
+		FoldLine(static_cast<int>(wParam), SC_FOLDACTION_TOGGLE);
+		break;
+
+	case SCI_FOLDDISPLAYTEXTSETSTYLE:
+		foldDisplayTextStyle = static_cast<int>(wParam);
+		Redraw();
+		break;
+
 	case SCI_TOGGLEFOLD:
 		FoldLine(static_cast<int>(wParam), SC_FOLDACTION_TOGGLE);
 		break;
@@ -7940,54 +8004,28 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 		return sel.Main();
 
 	case SCI_SETSELECTIONNCARET:
-		sel.Range(wParam).caret.SetPosition(static_cast<int>(lParam));
-		ContainerNeedsUpdate(SC_UPDATE_SELECTION);
-		Redraw();
+	case SCI_SETSELECTIONNANCHOR:
+	case SCI_SETSELECTIONNCARETVIRTUALSPACE:
+	case SCI_SETSELECTIONNANCHORVIRTUALSPACE:
+	case SCI_SETSELECTIONNSTART:
+	case SCI_SETSELECTIONNEND:
+		SetSelectionNMessage(iMessage, wParam, lParam);
 		break;
 
 	case SCI_GETSELECTIONNCARET:
 		return sel.Range(wParam).caret.Position();
 
-	case SCI_SETSELECTIONNANCHOR:
-		sel.Range(wParam).anchor.SetPosition(static_cast<int>(lParam));
-		ContainerNeedsUpdate(SC_UPDATE_SELECTION);
-		Redraw();
-		break;
 	case SCI_GETSELECTIONNANCHOR:
 		return sel.Range(wParam).anchor.Position();
-
-	case SCI_SETSELECTIONNCARETVIRTUALSPACE:
-		sel.Range(wParam).caret.SetVirtualSpace(static_cast<int>(lParam));
-		ContainerNeedsUpdate(SC_UPDATE_SELECTION);
-		Redraw();
-		break;
 
 	case SCI_GETSELECTIONNCARETVIRTUALSPACE:
 		return sel.Range(wParam).caret.VirtualSpace();
 
-	case SCI_SETSELECTIONNANCHORVIRTUALSPACE:
-		sel.Range(wParam).anchor.SetVirtualSpace(static_cast<int>(lParam));
-		ContainerNeedsUpdate(SC_UPDATE_SELECTION);
-		Redraw();
-		break;
-
 	case SCI_GETSELECTIONNANCHORVIRTUALSPACE:
 		return sel.Range(wParam).anchor.VirtualSpace();
 
-	case SCI_SETSELECTIONNSTART:
-		sel.Range(wParam).anchor.SetPosition(static_cast<int>(lParam));
-		ContainerNeedsUpdate(SC_UPDATE_SELECTION);
-		Redraw();
-		break;
-
 	case SCI_GETSELECTIONNSTART:
 		return sel.Range(wParam).Start().Position();
-
-	case SCI_SETSELECTIONNEND:
-		sel.Range(wParam).caret.SetPosition(static_cast<int>(lParam));
-		ContainerNeedsUpdate(SC_UPDATE_SELECTION);
-		Redraw();
-		break;
 
 	case SCI_GETSELECTIONNEND:
 		return sel.Range(wParam).End().Position();

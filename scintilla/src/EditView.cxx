@@ -394,16 +394,16 @@ void EditView::LayoutLine(const EditModel &model, int line, Surface *surface, co
 					(ll->chars[numCharsInLine] == chDoc);
 				else if (vstyle.styles[ll->styles[numCharsInLine]].caseForce == Style::caseLower)
 					allSame = allSame &&
-					(ll->chars[numCharsInLine] == static_cast<char>(MakeLowerCase(chDoc)));
+					(ll->chars[numCharsInLine] == MakeLowerCase(chDoc));
 				else if (vstyle.styles[ll->styles[numCharsInLine]].caseForce == Style::caseUpper)
 					allSame = allSame &&
-					(ll->chars[numCharsInLine] == static_cast<char>(MakeUpperCase(chDoc)));
+					(ll->chars[numCharsInLine] == MakeUpperCase(chDoc));
 				else	{ // Style::caseCamel
 					if ((model.pdoc->IsASCIIWordByte(ll->chars[numCharsInLine])) &&
 					  ((numCharsInLine == 0) || (!model.pdoc->IsASCIIWordByte(ll->chars[numCharsInLine - 1])))) {
-						allSame = allSame && (ll->chars[numCharsInLine] == static_cast<char>(MakeUpperCase(chDoc)));
+						allSame = allSame && (ll->chars[numCharsInLine] == MakeUpperCase(chDoc));
 					} else {
-						allSame = allSame && (ll->chars[numCharsInLine] == static_cast<char>(MakeLowerCase(chDoc)));
+						allSame = allSame && (ll->chars[numCharsInLine] == MakeLowerCase(chDoc));
 					}
 				}
 				numCharsInLine++;
@@ -447,13 +447,13 @@ void EditView::LayoutLine(const EditModel &model, int line, Surface *surface, co
 				if (vstyle.styles[ll->styles[charInLine]].caseForce == Style::caseUpper)
 					ll->chars[charInLine] = static_cast<char>(MakeUpperCase(chDoc));
 				else if (vstyle.styles[ll->styles[charInLine]].caseForce == Style::caseLower)
-					ll->chars[charInLine] = static_cast<char>(MakeUpperCase(chDoc));
+					ll->chars[charInLine] = static_cast<char>(MakeLowerCase(chDoc));
 				else if (vstyle.styles[ll->styles[charInLine]].caseForce == Style::caseCamel) {
 					if ((model.pdoc->IsASCIIWordByte(ll->chars[charInLine])) &&
 					  ((charInLine == 0) || (!model.pdoc->IsASCIIWordByte(ll->chars[charInLine - 1])))) {
 						ll->chars[charInLine] = static_cast<char>(MakeUpperCase(chDoc));
 					} else {
-						ll->chars[charInLine] = static_cast<char>(MakeUpperCase(chDoc));
+						ll->chars[charInLine] = static_cast<char>(MakeLowerCase(chDoc));
 					}
 				}
 			}
@@ -650,8 +650,9 @@ Range EditView::RangeDisplayLine(Surface *surface, const EditModel &model, int l
 	return rangeSubLine;
 }
 
-SelectionPosition EditView::SPositionFromLocation(Surface *surface, const EditModel &model, const Point &pt, bool canReturnInvalid, bool charPosition, bool virtualSpace, const ViewStyle &vs) {
-	XYPOSITION pt_x = pt.x - vs.textStart;
+SelectionPosition EditView::SPositionFromLocation(Surface *surface, const EditModel &model, const PointDocument &pt_, bool canReturnInvalid, bool charPosition, bool virtualSpace, const ViewStyle &vs) {
+	PointDocument pt = pt_;
+	pt.x = pt.x - vs.textStart;
 	int visibleLine = static_cast<int>(floor(pt.y / vs.lineHeight));
 	if (!canReturnInvalid && (visibleLine < 0))
 		visibleLine = 0;
@@ -670,18 +671,19 @@ SelectionPosition EditView::SPositionFromLocation(Surface *surface, const EditMo
 			const Range rangeSubLine = ll->SubLineRange(subLine);
 			const XYPOSITION subLineStart = ll->positions[rangeSubLine.start];
 			if (subLine > 0)	// Wrapped
-				pt_x -= ll->wrapIndent;
-			const int positionInLine = ll->FindPositionFromX(pt_x + subLineStart, rangeSubLine, charPosition);
+				pt.x -= ll->wrapIndent;
+			const int positionInLine = ll->FindPositionFromX(static_cast<XYPOSITION>(pt.x + subLineStart),
+				rangeSubLine, charPosition);
 			if (positionInLine < rangeSubLine.end) {
 				return SelectionPosition(model.pdoc->MovePositionOutsideChar(positionInLine + posLineStart, 1));
 			}
 			if (virtualSpace) {
 				const XYPOSITION spaceWidth = vs.styles[ll->EndLineStyle()].spaceWidth;
 				const int spaceOffset = static_cast<int>(
-					(pt_x + subLineStart - ll->positions[rangeSubLine.end] + spaceWidth / 2) / spaceWidth);
+					(pt.x + subLineStart - ll->positions[rangeSubLine.end] + spaceWidth / 2) / spaceWidth);
 				return SelectionPosition(rangeSubLine.end + posLineStart, spaceOffset);
 			} else if (canReturnInvalid) {
-				if (pt_x < (ll->positions[rangeSubLine.end] - subLineStart)) {
+				if (pt.x < (ll->positions[rangeSubLine.end] - subLineStart)) {
 					return SelectionPosition(model.pdoc->MovePositionOutsideChar(rangeSubLine.end + posLineStart, 1));
 				}
 			} else {
@@ -879,7 +881,7 @@ void EditView::DrawEOL(Surface *surface, const EditModel &model, const ViewStyle
 	int alpha = SC_ALPHA_NOALPHA;
 	if (!hideSelection) {
 		int posAfterLineEnd = model.pdoc->LineStart(line + 1);
-		eolInSelection = (subLine == (ll->lines - 1)) ? model.sel.InSelectionForEOL(posAfterLineEnd) : 0;
+		eolInSelection = (lastSubLine == true) ? model.sel.InSelectionForEOL(posAfterLineEnd) : 0;
 		alpha = (eolInSelection == 1) ? vsDraw.selAlpha : vsDraw.selAdditionalAlpha;
 	}
 
@@ -948,25 +950,15 @@ void EditView::DrawEOL(Surface *surface, const EditModel &model, const ViewStyle
 		}
 	}
 
-	// Fill the remainder of the line
 	rcSegment.left = rcSegment.right;
 	if (rcSegment.left < rcLine.left)
 		rcSegment.left = rcLine.left;
 	rcSegment.right = rcLine.right;
 
-	if (eolInSelection && vsDraw.selEOLFilled && vsDraw.selColours.back.isSet && (line < model.pdoc->LinesTotal() - 1) && (alpha == SC_ALPHA_NOALPHA)) {
-		surface->FillRectangle(rcSegment, SelectionBackground(vsDraw, eolInSelection == 1, model.primarySelection));
-	} else {
-		if (background.isSet) {
-			surface->FillRectangle(rcSegment, background);
-		} else if (vsDraw.styles[ll->styles[ll->numCharsInLine]].eolFilled) {
-			surface->FillRectangle(rcSegment, vsDraw.styles[ll->styles[ll->numCharsInLine]].back);
-		} else {
-			surface->FillRectangle(rcSegment, vsDraw.styles[STYLE_DEFAULT].back);
-		}
-		if (eolInSelection && vsDraw.selEOLFilled && vsDraw.selColours.back.isSet && (line < model.pdoc->LinesTotal() - 1) && (alpha != SC_ALPHA_NOALPHA)) {
-			SimpleAlphaRectangle(surface, rcSegment, SelectionBackground(vsDraw, eolInSelection == 1, model.primarySelection), alpha);
-		}
+	bool fillRemainder = !lastSubLine || model.foldDisplayTextStyle == SC_FOLDDISPLAYTEXT_HIDDEN || !model.cs.GetFoldDisplayTextShown(line);
+	if (fillRemainder) {
+		// Fill the remainder of the line
+		FillLineRemainder(surface, model, vsDraw, ll, line, rcSegment, subLine);
 	}
 
 	bool drawWrapMarkEnd = false;
@@ -1038,7 +1030,7 @@ static void DrawIndicators(Surface *surface, const EditModel &model, const ViewS
 				Indicator::DrawState drawState = hover ? Indicator::drawHover : Indicator::drawNormal;
 				const int posSecond = model.pdoc->MovePositionOutsideChar(rangeRun.First() + 1, 1);
 				DrawIndicator(deco->indicator, startPos - posLineStart, endPos - posLineStart,
-					surface, vsDraw, ll, xStart, rcLine, posSecond - posLineStart,subLine, drawState, value);
+					surface, vsDraw, ll, xStart, rcLine, posSecond - posLineStart, subLine, drawState, value);
 				startPos = endPos;
 				if (!deco->rs.ValueAt(startPos)) {
 					startPos = deco->rs.EndRun(startPos);
@@ -1067,6 +1059,95 @@ static void DrawIndicators(Surface *surface, const EditModel &model, const ViewS
 					DrawIndicator(braceIndicator, braceOffset, braceOffset + 1, surface, vsDraw, ll, xStart, rcLine, secondOffset, subLine, Indicator::drawNormal, 1);
 				}
 			}
+		}
+	}
+}
+
+void EditView::DrawFoldDisplayText(Surface *surface, const EditModel &model, const ViewStyle &vsDraw, const LineLayout *ll,
+							  int line, int xStart, const PRectangle &rcLine, int subLine, XYACCUMULATOR subLineStart, DrawPhase phase) {
+	const bool lastSubLine = subLine == (ll->lines - 1);
+	if (!lastSubLine)
+		return;
+
+	if ((model.foldDisplayTextStyle == SC_FOLDDISPLAYTEXT_HIDDEN) || !model.cs.GetFoldDisplayTextShown(line))
+		return;
+
+	PRectangle rcSegment = rcLine;
+	const char *foldDisplayText = model.cs.GetFoldDisplayText(line);
+	const int lengthFoldDisplayText = static_cast<int>(strlen(foldDisplayText));
+	FontAlias fontText = vsDraw.styles[STYLE_FOLDDISPLAYTEXT].font;
+	const int widthFoldDisplayText = static_cast<int>(surface->WidthText(fontText, foldDisplayText, lengthFoldDisplayText));
+
+	int eolInSelection = 0;
+	int alpha = SC_ALPHA_NOALPHA;
+	if (!hideSelection) {
+		int posAfterLineEnd = model.pdoc->LineStart(line + 1);
+		eolInSelection = (subLine == (ll->lines - 1)) ? model.sel.InSelectionForEOL(posAfterLineEnd) : 0;
+		alpha = (eolInSelection == 1) ? vsDraw.selAlpha : vsDraw.selAdditionalAlpha;
+	}
+
+	const XYPOSITION spaceWidth = vsDraw.styles[ll->EndLineStyle()].spaceWidth;
+	XYPOSITION virtualSpace = model.sel.VirtualSpaceFor(model.pdoc->LineEnd(line)) * spaceWidth;
+	rcSegment.left = xStart + static_cast<XYPOSITION>(ll->positions[ll->numCharsInLine] - subLineStart) + spaceWidth + virtualSpace;
+	rcSegment.right = rcSegment.left + static_cast<XYPOSITION>(widthFoldDisplayText);
+
+	ColourOptional background = vsDraw.Background(model.pdoc->GetMark(line), model.caret.active, ll->containsCaret);
+	FontAlias textFont = vsDraw.styles[STYLE_FOLDDISPLAYTEXT].font;
+	ColourDesired textFore = vsDraw.styles[STYLE_FOLDDISPLAYTEXT].fore;
+	if (eolInSelection && (vsDraw.selColours.fore.isSet)) {
+		textFore = (eolInSelection == 1) ? vsDraw.selColours.fore : vsDraw.selAdditionalForeground;
+	}
+	ColourDesired textBack = TextBackground(model, vsDraw, ll, background, eolInSelection,
+											false, STYLE_FOLDDISPLAYTEXT, -1);
+
+	if (model.trackLineWidth) {
+		if (rcSegment.right + 1> lineWidthMaxSeen) {
+			// Fold display text border drawn on rcSegment.right with width 1 is the last visble object of the line
+			lineWidthMaxSeen = static_cast<int>(rcSegment.right + 1);
+		}
+	}
+
+	if ((phasesDraw != phasesOne) && (phase & drawBack)) {
+		surface->FillRectangle(rcSegment, textBack);
+
+		// Fill Remainder of the line
+		PRectangle rcRemainder = rcSegment;
+		rcRemainder.left = rcRemainder.right + 1;
+		if (rcRemainder.left < rcLine.left)
+			rcRemainder.left = rcLine.left;
+		rcRemainder.right = rcLine.right;
+		FillLineRemainder(surface, model, vsDraw, ll, line, rcRemainder, subLine);
+	}
+
+	if (phase & drawText) {
+		if (phasesDraw != phasesOne) {
+			surface->DrawTextTransparent(rcSegment, textFont,
+				rcSegment.top + vsDraw.maxAscent, foldDisplayText,
+				lengthFoldDisplayText, textFore);
+		} else {
+			surface->DrawTextNoClip(rcSegment, textFont,
+				rcSegment.top + vsDraw.maxAscent, foldDisplayText,
+				lengthFoldDisplayText, textFore, textBack);
+		}
+	}
+
+	if (phase & drawIndicatorsFore) {
+		if (model.foldDisplayTextStyle == SC_FOLDDISPLAYTEXT_BOXED) {
+			surface->PenColour(textFore);
+			surface->MoveTo(static_cast<int>(rcSegment.left), static_cast<int>(rcSegment.top));
+			surface->LineTo(static_cast<int>(rcSegment.left), static_cast<int>(rcSegment.bottom));
+			surface->MoveTo(static_cast<int>(rcSegment.right), static_cast<int>(rcSegment.top));
+			surface->LineTo(static_cast<int>(rcSegment.right), static_cast<int>(rcSegment.bottom));
+			surface->MoveTo(static_cast<int>(rcSegment.left), static_cast<int>(rcSegment.top));
+			surface->LineTo(static_cast<int>(rcSegment.right), static_cast<int>(rcSegment.top));
+			surface->MoveTo(static_cast<int>(rcSegment.left), static_cast<int>(rcSegment.bottom - 1));
+			surface->LineTo(static_cast<int>(rcSegment.right), static_cast<int>(rcSegment.bottom - 1));
+		}
+	}
+
+	if (phase & drawSelectionTranslucent) {
+		if (eolInSelection && vsDraw.selColours.back.isSet && (line < model.pdoc->LinesTotal() - 1) && alpha != SC_ALPHA_NOALPHA) {
+			SimpleAlphaRectangle(surface, rcSegment, SelectionBackground(vsDraw, eolInSelection == 1, model.primarySelection), alpha);
 		}
 	}
 }
@@ -1795,6 +1876,8 @@ void EditView::DrawLine(Surface *surface, const EditModel &model, const ViewStyl
 			xStart, subLine, subLineStart, background);
 	}
 
+	DrawFoldDisplayText(surface, model, vsDraw, ll, line, xStart, rcLine, subLine, subLineStart, phase);
+
 	if (!hideSelection && (phase & drawSelectionTranslucent)) {
 		DrawTranslucentSelection(surface, model, vsDraw, ll, line, rcLine, subLine, lineRange, xStart);
 	}
@@ -2008,6 +2091,34 @@ void EditView::PaintText(Surface *surfaceWindow, const EditModel &model, const P
 		//"Layout:%9.6g    Paint:%9.6g    Ratio:%9.6g   Copy:%9.6g   Total:%9.6g\n",
 		//durLayout, durPaint, durLayout / durPaint, durCopy, etWhole.Duration());
 	}
+}
+
+void EditView::FillLineRemainder(Surface *surface, const EditModel &model, const ViewStyle &vsDraw, const LineLayout *ll,
+	int line, const PRectangle &rcArea, int subLine) const {
+		int eolInSelection = 0;
+		int alpha = SC_ALPHA_NOALPHA;
+		if (!hideSelection) {
+			int posAfterLineEnd = model.pdoc->LineStart(line + 1);
+			eolInSelection = (subLine == (ll->lines - 1)) ? model.sel.InSelectionForEOL(posAfterLineEnd) : 0;
+			alpha = (eolInSelection == 1) ? vsDraw.selAlpha : vsDraw.selAdditionalAlpha;
+		}
+
+		ColourOptional background = vsDraw.Background(model.pdoc->GetMark(line), model.caret.active, ll->containsCaret);
+
+		if (eolInSelection && vsDraw.selEOLFilled && vsDraw.selColours.back.isSet && (line < model.pdoc->LinesTotal() - 1) && (alpha == SC_ALPHA_NOALPHA)) {
+			surface->FillRectangle(rcArea, SelectionBackground(vsDraw, eolInSelection == 1, model.primarySelection));
+		} else {
+			if (background.isSet) {
+				surface->FillRectangle(rcArea, background);
+			} else if (vsDraw.styles[ll->styles[ll->numCharsInLine]].eolFilled) {
+				surface->FillRectangle(rcArea, vsDraw.styles[ll->styles[ll->numCharsInLine]].back);
+			} else {
+				surface->FillRectangle(rcArea, vsDraw.styles[STYLE_DEFAULT].back);
+			}
+			if (eolInSelection && vsDraw.selEOLFilled && vsDraw.selColours.back.isSet && (line < model.pdoc->LinesTotal() - 1) && (alpha != SC_ALPHA_NOALPHA)) {
+				SimpleAlphaRectangle(surface, rcArea, SelectionBackground(vsDraw, eolInSelection == 1, model.primarySelection), alpha);
+			}
+		}
 }
 
 // Space (3 space characters) between line numbers and text when printing.

@@ -239,7 +239,7 @@ void ViewStyle::Init(size_t stylesSize_) {
 	maxDescent = 1;
 	aveCharWidth = 8;
 	spaceWidth = 8;
-	tabWidth = spaceWidth * 4;
+	tabWidth = spaceWidth * 8;
 
 	selColours.fore = ColourOptional(ColourDesired(0xff, 0, 0));
 	selColours.back = ColourOptional(ColourDesired(0xc0, 0xc0, 0xc0), true);
@@ -386,7 +386,7 @@ void ViewStyle::Refresh(Surface &surface, int tabInChars) {
 
 	controlCharWidth = 0.0;
 	if (controlCharSymbol >= 32) {
-		controlCharWidth = surface.WidthChar(styles[STYLE_CONTROLCHAR].font, static_cast<char>(controlCharSymbol));
+		controlCharWidth = surface.WidthChar(styles[STYLE_CONTROLCHAR].font, controlCharSymbol);
 	}
 
 	CalculateMarginWidthAndMask();

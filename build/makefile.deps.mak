@@ -492,6 +492,11 @@ $(SCI_SRC_OBJDIR)\XPM.obj: \
 #######################
 ##  scintilla\win32  ##
 #######################
+$(SCI_WIN_OBJDIR)\HanjaDic.obj: \
+    $(SCI_WIN)\HanjaDic.cxx \
+    $(SCI_WIN)\HanjaDic.h \
+    $(SCI_SRC)\UniConversion.h
+
 $(SCI_WIN_OBJDIR)\PlatWin.obj: \
     $(SCI_WIN)\PlatWin.cxx \
     $(SCI_INC)\Platform.h \

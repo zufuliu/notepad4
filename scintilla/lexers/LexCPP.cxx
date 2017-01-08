@@ -375,7 +375,7 @@ _label_identifier:
 				} else if (iswordchar(s[0]) && (IsASpace(sc.ch) || sc.ch == '[' || sc.ch == ')' || sc.ch == '>'
 					|| sc.ch == '*' || sc.ch == '&' || sc.ch == ':')) {
 					bool is_class = false;
-					Sci_Position pos = sc.currentPos;
+					Sci_PositionU pos = sc.currentPos;
 					int next_char = IsASpace(sc.ch)? nextChar : sc.ch;
 
 					if (sc.ch == ':' && sc.chNext == ':') { // C++, Java, PHP
@@ -393,7 +393,7 @@ _label_identifier:
 						const bool next_is_word = iswordstart(ch);
 						if (next_char == ')' || next_char == '>') {
 							if (next_is_word || (ch == '(')) {
-								pos = sc.currentPos - strlen(s) -1;
+								pos = sc.currentPos - (uint32_t)strlen(s) -1;
 								while (IsASpace(styler.SafeGetCharAt(pos, '\0'))) pos--;
 								ch = styler.SafeGetCharAt(pos, '\0');
 								if (next_char == '>' && (ch == '<' || ch == ',')) {
@@ -416,7 +416,7 @@ _label_identifier:
 							if (ch == '=') {
 								is_class = true;
 							} else if (ch == ',' || ch == ';') {
-								pos = sc.currentPos - strlen(s) -1;
+								pos = sc.currentPos - (uint32_t)strlen(s) -1;
 								while (IsASpace(styler.SafeGetCharAt(pos, '\0'))) pos--;
 								ch = styler.SafeGetCharAt(pos, '\0');
 								if (iswordchar(ch) || ch == ';' || ch == '{') {

@@ -64,7 +64,7 @@ using namespace Scintilla;
 #endif
 
 ScintillaBase::ScintillaBase() {
-	displayPopupMenu = true;
+	displayPopupMenu = SC_POPUP_ALL;
 	listType = 0;
 	maxListWidth = 0;
 	multiAutoCMode = SC_MULTIAUTOC_ONCE;
@@ -478,6 +478,11 @@ void ScintillaBase::CallTipClick() {
 	NotifyParent(scn);
 }
 
+bool ScintillaBase::ShouldDisplayPopup(const Point &ptInWindowCoordinates) const {
+	return (displayPopupMenu == SC_POPUP_ALL ||
+		(displayPopupMenu == SC_POPUP_TEXT && !PointInSelMargin(ptInWindowCoordinates)));
+}
+
 void ScintillaBase::ContextMenu(const Point &pt) {
 	if (displayPopupMenu) {
 		bool writable = !WndProc(SCI_GETREADONLY, 0, 0);
@@ -508,6 +513,11 @@ void ScintillaBase::ButtonDownWithModifiers(const Point &pt, unsigned int curTim
 
 void ScintillaBase::ButtonDown(const Point &pt, unsigned int curTime, bool shift, bool ctrl, bool alt) {
 	ButtonDownWithModifiers(pt, curTime, ModifierFlags(shift, ctrl, alt));
+}
+
+void ScintillaBase::RightButtonDownWithModifiers(const Point &pt, unsigned int curTime, int modifiers) {
+	CancelModes();
+	Editor::RightButtonDownWithModifiers(pt, curTime, modifiers);
 }
 
 #ifdef SCI_LEXER
@@ -970,7 +980,7 @@ sptr_t ScintillaBase::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lPara
 		break;
 
 	case SCI_USEPOPUP:
-		displayPopupMenu = wParam != 0;
+		displayPopupMenu = static_cast<int>(wParam);
 		break;
 
 #ifdef SCI_LEXER

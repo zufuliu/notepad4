@@ -1,6 +1,6 @@
-/bin
-/build/.vs
-/build/bin
+bin
+build/.vs
+build/bin
 *.suo
 *.sdf
 *.user

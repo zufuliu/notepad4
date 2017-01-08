@@ -1561,8 +1561,6 @@ int Document::ParaDown(int pos) const {
 		return LineEnd(line-1);
 }
 
-// http://www.unicode.org/charts/PDF/U3000.pdf
-// CJK Symbols and Punctuation: 3000-303F
 bool Document::IsASCIIWordByte(unsigned char ch) const {
 	if (IsASCII(ch)) {
 		return charClass.GetClass(ch) == CharClassify::ccWord;
@@ -1627,7 +1625,7 @@ CharClassify::cc Document::WordCharacterClass(unsigned int ch) const {
 			}
 		} else {
 			// Asian DBCS
-			return CharClassify::ccUniWord;
+			return CharClassify::ccWord;
 		}
 	}
 	return charClass.GetClass(static_cast<unsigned char>(ch));
@@ -2584,7 +2582,7 @@ public:
 		doc = other.doc;
 		position = other.position;
 	}
-	ByteIterator &operator=(const ByteIterator &other) NOEXCEPT {
+	ByteIterator &operator=(const ByteIterator &other) {
 		if (this != &other) {
 			doc = other.doc;
 			position = other.position;
@@ -2755,7 +2753,7 @@ class UTF8Iterator : public std::iterator<std::bidirectional_iterator_tag, wchar
 public:
 	UTF8Iterator(const Document *doc_=0, Position position_=0) : doc(doc_), position(position_) {
 	}
-	UTF8Iterator(const UTF8Iterator &other) {
+	UTF8Iterator(const UTF8Iterator &other) NOEXCEPT {
 		doc = other.doc;
 		position = other.position;
 	}

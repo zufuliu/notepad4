@@ -425,6 +425,7 @@ val STYLE_BRACEBAD=35
 val STYLE_CONTROLCHAR=36
 val STYLE_INDENTGUIDE=37
 val STYLE_CALLTIP=38
+val STYLE_FOLDDISPLAYTEXT=39
 val STYLE_LASTPREDEFINED=39
 val STYLE_MAX=255
 
@@ -1217,6 +1218,17 @@ get bool GetFoldExpanded=2230(int line,)
 # Switch a header line between expanded and contracted.
 fun void ToggleFold=2231(int line,)
 
+# Switch a header line between expanded and contracted and show some text after the line.
+fun void ToggleFoldShowText=2700(int line, string text)
+
+enu foldDisplayTextStyle=SC_FOLDDISPLAYTEXTSTYLE_
+val SC_FOLDDISPLAYTEXT_HIDDEN=0
+val SC_FOLDDISPLAYTEXT_STANDARD=1
+val SC_FOLDDISPLAYTEXT_BOXED=2
+
+# Set the style of fold display text
+set void FoldDisplayTextSetStyle=2701(int style,)
+
 enu FoldAction=SC_FOLDACTION_
 val SC_FOLDACTION_CONTRACT=0
 val SC_FOLDACTION_EXPAND=1
@@ -1741,9 +1753,14 @@ fun int SearchPrev=2368(int searchFlags, string text)
 # Retrieves the number of lines completely visible.
 get int LinesOnScreen=2370(,)
 
+enu PopUp=SC_POPUP_
+val SC_POPUP_NEVER=0
+val SC_POPUP_ALL=1
+val SC_POPUP_TEXT=2
+
 # Set whether a pop up menu is displayed automatically when the user presses
-# the wrong mouse button.
-fun void UsePopUp=2371(bool allowPopUp,)
+# the wrong mouse button on certain areas.
+fun void UsePopUp=2371(int popUpMode,)
 
 # Is the selection rectangular? The alternative is the more common stream selection.
 get bool SelectionIsRectangle=2372(,)
@@ -2811,6 +2828,7 @@ evt void HotSpotReleaseClick=2027(int modifiers, int position)
 evt void FocusIn=2028(void)
 evt void FocusOut=2029(void)
 evt void AutoCCompleted=2030(string text, int position, int ch, CompletionMethods listCompletionMethod)
+evt void MarginRightClick=2031(int modifiers, int position, int margin)
 
 # There are no provisional features currently
 

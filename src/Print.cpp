@@ -131,8 +131,8 @@ extern "C" BOOL EditPrint(HWND hwnd, LPCWSTR pszDocTitle, LPCWSTR pszPageFormat)
 	pdlg.hDevMode = hDevMode;
 	pdlg.hDevNames = hDevNames;
 
-	startPos = SendMessage(hwnd, SCI_GETSELECTIONSTART, 0, 0);;
-	endPos = SendMessage(hwnd, SCI_GETSELECTIONEND, 0, 0);
+	startPos = (int)SendMessage(hwnd, SCI_GETSELECTIONSTART, 0, 0);;
+	endPos = (int)SendMessage(hwnd, SCI_GETSELECTIONEND, 0, 0);
 
 	if (startPos == endPos) {
 		pdlg.Flags |= PD_NOSELECTION;
@@ -302,7 +302,7 @@ extern "C" BOOL EditPrint(HWND hwnd, LPCWSTR pszDocTitle, LPCWSTR pszPageFormat)
 	// Set print zoom...
 	SendMessage(hwnd, SCI_SETPRINTMAGNIFICATION, (WPARAM)iPrintZoom, 0);
 
-	lengthDoc = SendMessage(hwnd, SCI_GETLENGTH, 0, 0);
+	lengthDoc = (long)SendMessage(hwnd, SCI_GETLENGTH, 0, 0);
 	lengthDocMax = lengthDoc;
 	lengthPrinted = 0;
 
@@ -395,7 +395,7 @@ extern "C" BOOL EditPrint(HWND hwnd, LPCWSTR pszDocTitle, LPCWSTR pszPageFormat)
 		frPrint.chrg.cpMin = lengthPrinted;
 		frPrint.chrg.cpMax = lengthDoc;
 
-		lengthPrinted = SendMessage(hwnd, SCI_FORMATRANGE, printPage, (LPARAM)&frPrint);
+		lengthPrinted = (long)SendMessage(hwnd, SCI_FORMATRANGE, printPage, (LPARAM)&frPrint);
 
 		if (printPage) {
 			SetTextColor(hdc, RGB(0, 0, 0));

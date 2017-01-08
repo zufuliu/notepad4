@@ -29,7 +29,7 @@ using namespace Scintilla;
 }*/
 
 static inline bool IsCmakeOperator(char ch) {
-	return ch == '(' || ch == ')' || ch == '=' || ch == ':';
+	return ch == '(' || ch == ')' || ch == '=' || ch == ':' || ch == ';';
 }
 
 static void ColouriseCmakeDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, WordList *keywordLists[], Accessor &styler) {
@@ -116,6 +116,8 @@ _label_var_string:
 		if (sc.state == SCE_CMAKE_DEFAULT) {
 			varStyle = SCE_CMAKE_DEFAULT;
 			if (sc.ch == '#') {
+				sc.SetState(SCE_CMAKE_COMMENT);
+			} else if (sc.ch == '/' && sc.chNext == '/') { // CMakeCache.txt
 				sc.SetState(SCE_CMAKE_COMMENT);
 			} else if (sc.ch == '\"') {
 				sc.SetState(SCE_CMAKE_STRINGDQ);

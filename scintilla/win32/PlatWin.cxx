@@ -553,7 +553,7 @@ public:
 	void DrawTextTransparent(const PRectangle &rc, const Font &font_, XYPOSITION ybase, const char *s, int len, const ColourDesired &fore);
 	void MeasureWidths(const Font &font_, const char *s, int len, XYPOSITION *positions);
 	XYPOSITION WidthText(const Font &font_, const char *s, int len);
-	XYPOSITION WidthChar(const Font &font_, char ch);
+	XYPOSITION WidthChar(const Font &font_, int ch);
 	XYPOSITION Ascent(const Font &font_);
 	XYPOSITION Descent(const Font &font_);
 	XYPOSITION InternalLeading(const Font &font_);
@@ -756,10 +756,10 @@ static void AllFour(DWORD *pixels, int width, int height, int x, int y, DWORD va
 }
 
 #ifndef AC_SRC_OVER
-#define AC_SRC_OVER		0x00
+#define AC_SRC_OVER			0x00
 #endif
 #ifndef AC_SRC_ALPHA
-#define AC_SRC_ALPHA	0x01
+#define AC_SRC_ALPHA		0x01
 #endif
 
 static DWORD dwordFromBGRA(byte b, byte g, byte r, byte a) {
@@ -988,10 +988,11 @@ void SurfaceGDI::MeasureWidths(const Font &font_, const char *s, int len, XYPOSI
 	std::fill(positions+i, positions + len, lastPos);
 }
 
-XYPOSITION SurfaceGDI::WidthChar(const Font &font_, char ch) {
+XYPOSITION SurfaceGDI::WidthChar(const Font &font_, int ch) {
 	SetFont(font_);
 	SIZE sz;
-	::GetTextExtentPoint32A(hdc, &ch, 1, &sz);
+	const WCHAR wch = static_cast<WCHAR>(ch);
+	::GetTextExtentPoint32W(hdc, &wch, 1, &sz);
 	return static_cast<XYPOSITION>(sz.cx);
 }
 
@@ -1123,7 +1124,7 @@ public:
 	void DrawTextTransparent(const PRectangle &rc, const Font &font_, XYPOSITION ybase, const char *s, int len, const ColourDesired &fore);
 	void MeasureWidths(const Font &font_, const char *s, int len, XYPOSITION *positions);
 	XYPOSITION WidthText(const Font &font_, const char *s, int len);
-	XYPOSITION WidthChar(const Font &font_, char ch);
+	XYPOSITION WidthChar(const Font &font_, int ch);
 	XYPOSITION Ascent(const Font &font_);
 	XYPOSITION Descent(const Font &font_);
 	XYPOSITION InternalLeading(const Font &font_);
@@ -1688,7 +1689,7 @@ void SurfaceD2D::MeasureWidths(const Font &font_, const char *s, int len, XYPOSI
 	}
 }
 
-XYPOSITION SurfaceD2D::WidthChar(const Font &font_, char ch) {
+XYPOSITION SurfaceD2D::WidthChar(const Font &font_, int ch) {
 	FLOAT width = 1.0;
 	SetFont(font_);
 	if (pIDWriteFactory && pTextFormat) {

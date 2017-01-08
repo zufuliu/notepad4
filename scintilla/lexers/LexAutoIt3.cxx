@@ -178,7 +178,7 @@ static void ColouriseAU3Doc(Sci_PositionU startPos, Sci_Position length, int ini
 		// save the total current word for eof processing
 		if (IsAu3WordChar(sc.ch) || sc.ch == '}') {
 			strcpy(s_save, s);
-			int tp = strlen(s_save);
+			size_t tp = strlen(s_save);
 			if (tp < 127) {
 				s_save[tp] = static_cast<char>(tolower(sc.ch));
 				s_save[tp + 1] = '\0';
@@ -358,7 +358,7 @@ static void ColouriseAU3Doc(Sci_PositionU startPos, Sci_Position length, int ini
 			if (sc.atLineEnd) {
 				si = 0;
 				// at line end and not found a continuation char then reset to default
-				Sci_Position lineCurrent = styler.GetLine(sc.currentPos);
+				lineCurrent = styler.GetLine(sc.currentPos);
 				if (!IsContinuationLine(lineCurrent, styler)) {
 					sc.SetState(SCE_AU3_DEFAULT);
 					break;

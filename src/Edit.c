@@ -342,9 +342,7 @@ BOOL EditCopyAppend(HWND hwnd)
 			MsgBox(MBWARN, IDS_SELRECT);
 			return FALSE;
 		} else {
-			int iSelCount =
-				(int)SendMessage(hwnd, SCI_GETSELECTIONEND, 0, 0)
-				- (int)SendMessage(hwnd, SCI_GETSELECTIONSTART, 0, 0);
+			int iSelCount = (int)SendMessage(hwnd, SCI_GETSELTEXT, 0, 0);
 			pszText = LocalAlloc(LPTR, iSelCount + 1);
 			SendMessage(hwnd, SCI_GETSELTEXT, 0, (LPARAM)pszText);
 		}
@@ -870,9 +868,8 @@ void EditInvertCase(HWND hwnd)
 			int cchTextW;
 			UINT cpEdit;
 			int i;
-			int iSelCount = (int)SendMessage(hwnd, SCI_GETSELECTIONEND, 0, 0)
-							- (int)SendMessage(hwnd, SCI_GETSELECTIONSTART, 0, 0);
-			char	 *pszText	= GlobalAlloc(GPTR, (iSelCount) + 2);
+			int iSelCount = (int)SendMessage(hwnd, SCI_GETSELTEXT, 0, 0);
+			char *pszText = GlobalAlloc(GPTR, iSelCount + 1);
 			LPWSTR pszTextW = GlobalAlloc(GPTR, (iSelCount * 2) + 2);
 
 			if (pszText == NULL || pszTextW == NULL) {
@@ -939,9 +936,8 @@ void EditTitleCase(HWND hwnd)
 		if (SC_SEL_RECTANGLE != SendMessage(hwnd, SCI_GETSELECTIONMODE, 0, 0)) {
 			int cchTextW;
 			UINT cpEdit;
-			int iSelCount = (int)SendMessage(hwnd, SCI_GETSELECTIONEND, 0, 0)
-							- (int)SendMessage(hwnd, SCI_GETSELECTIONSTART, 0, 0);
-			char	 *pszText	= GlobalAlloc(GPTR, (iSelCount) + 2);
+			int iSelCount = (int)SendMessage(hwnd, SCI_GETSELTEXT, 0, 0);
+			char *pszText = GlobalAlloc(GPTR, iSelCount + 1);
 			LPWSTR pszTextW = GlobalAlloc(GPTR, (iSelCount * 2) + 2);
 
 			if (pszText == NULL || pszTextW == NULL) {
@@ -980,12 +976,12 @@ void EditTitleCase(HWND hwnd)
 					} else {
 						if (bNewWord) {
 							if (IsCharLowerW(pszTextW[i])) {
-								pszTextW[i] = LOWORD(CharUpperW((LPWSTR)MAKELONG(pszTextW[i], 0)));
+								pszTextW[i] = LOWORD(CharUpperW((LPWSTR)(LONG_PTR)MAKELONG(pszTextW[i], 0)));
 								bChanged = TRUE;
 							}
 						} else {
 							if (IsCharUpperW(pszTextW[i])) {
-								pszTextW[i] = LOWORD(CharLowerW((LPWSTR)MAKELONG(pszTextW[i], 0)));
+								pszTextW[i] = LOWORD(CharLowerW((LPWSTR)(LONG_PTR)MAKELONG(pszTextW[i], 0)));
 								bChanged = TRUE;
 							}
 						}
@@ -1060,9 +1056,8 @@ void EditSentenceCase(HWND hwnd)
 			int cchTextW;
 			UINT cpEdit;
 			int i;
-			int iSelCount = (int)SendMessage(hwnd, SCI_GETSELECTIONEND, 0, 0)
-							- (int)SendMessage(hwnd, SCI_GETSELECTIONSTART, 0, 0);
-			char	 *pszText	= GlobalAlloc(GPTR, (iSelCount) + 2);
+			int iSelCount = (int)SendMessage(hwnd, SCI_GETSELTEXT, 0, 0);
+			char *pszText = GlobalAlloc(GPTR, iSelCount + 1);
 			LPWSTR pszTextW = GlobalAlloc(GPTR, (iSelCount * 2) + 2);
 
 			if (pszText == NULL || pszTextW == NULL) {
@@ -1132,8 +1127,7 @@ void EditURLEncode(HWND hwnd)
 		if (SC_SEL_RECTANGLE != SendMessage(hwnd, SCI_GETSELECTIONMODE, 0, 0)) {
 			//int cchTextW;
 			UINT cpEdit;
-			int iSelCount = (int)SendMessage(hwnd, SCI_GETSELECTIONEND, 0, 0)
-							- (int)SendMessage(hwnd, SCI_GETSELECTIONSTART, 0, 0);
+			int iSelCount = (int)SendMessage(hwnd, SCI_GETSELTEXT, 0, 0);
 			char	 *pszText;
 			LPWSTR pszTextW;
 
@@ -1216,8 +1210,7 @@ void EditURLDecode(HWND hwnd)
 		if (SC_SEL_RECTANGLE != SendMessage(hwnd, SCI_GETSELECTIONMODE, 0, 0)) {
 			//int cchTextW;
 			UINT cpEdit;
-			int iSelCount = (int)SendMessage(hwnd, SCI_GETSELECTIONEND, 0, 0)
-							- (int)SendMessage(hwnd, SCI_GETSELECTIONSTART, 0, 0);
+			int iSelCount = (int)SendMessage(hwnd, SCI_GETSELTEXT, 0, 0);
 			char	 *pszText;
 			LPWSTR pszTextW;
 
@@ -1586,9 +1579,9 @@ void EditShowHex(HWND hwnd)
 				int c = *p++, v;
 				if (c < 0) c += 256;
 				v = c >> 4;
-				*t++ = (v >= 10)? v -10 + 'a' : v + '0';
+				*t++ = (char)((v >= 10)? v -10 + 'a' : v + '0');
 				v = c & 0x0f;
-				*t++ = (v >= 10)? v -10 + 'a' : v + '0';
+				*t++ = (char)((v >= 10)? v -10 + 'a' : v + '0');
 				*t++ = ' ';
 			}
 			*--t = ']';
@@ -3960,7 +3953,6 @@ void EditSortLines(HWND hwnd, int iSortFlags)
 	DWORD cEOLMode;
 	char mszEOL[] = "\r\n";
 
-	UINT iTabWidth;
 	UINT iSortColumn;
 
 	BOOL bLastDup = FALSE;
@@ -5252,6 +5244,7 @@ void EditMarkAll(HWND hwnd, int iMarkOccurrences, BOOL bMarkOccurrencesMatchCase
 	}
 
 
+	iSelCount = (int)SendMessage(hwnd, SCI_GETSELTEXT, 0, 0);
 	pszText = LocalAlloc(LPTR, iSelCount + 1);
 	SendMessage(hwnd, SCI_GETSELTEXT, 0, (LPARAM)pszText);
 
@@ -5283,7 +5276,7 @@ void EditMarkAll(HWND hwnd, int iMarkOccurrences, BOOL bMarkOccurrencesMatchCase
 	while ((iPos = (int)SendMessage(hwnd, SCI_FINDTEXT, findFlag, (LPARAM)&ttf)) != -1) {
 		// mark this match
 		++iMatchesCount;
-		SendMessage(hwnd, SCI_INDICATORFILLRANGE, iPos, iSelCount);
+		SendMessage(hwnd, SCI_INDICATORFILLRANGE, iPos, iSelCount - 1);
 		ttf.chrg.cpMin = ttf.chrgText.cpMin + iSelCount;
 		if (ttf.chrg.cpMin == ttf.chrg.cpMax) {
 			break;

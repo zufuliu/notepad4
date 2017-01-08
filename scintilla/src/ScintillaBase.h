@@ -40,7 +40,7 @@ protected:
 
 	enum { maxLenInputIME = 200 };
 
-	bool displayPopupMenu;
+	int displayPopupMenu;
 	Menu popup;
 	AutoComplete ac;
 
@@ -84,10 +84,12 @@ protected:
 	virtual void CreateCallTipWindow(const PRectangle &rc) = 0;
 
 	virtual void AddToPopUp(const char *label, int cmd=0, bool enabled=true) = 0;
+	bool ShouldDisplayPopup(const Point &ptInWindowCoordinates) const;
 	void ContextMenu(const Point &pt);
 
 	virtual void ButtonDownWithModifiers(const Point &pt, unsigned int curTime, int modifiers);
 	virtual void ButtonDown(const Point &pt, unsigned int curTime, bool shift, bool ctrl, bool alt);
+	virtual void RightButtonDownWithModifiers(const Point &pt, unsigned int curTime, int modifiers);
 
 	void NotifyStyleToNeeded(int endStyleNeeded);
 	void NotifyLexerChanged(Document *doc, void *userData);

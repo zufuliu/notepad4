@@ -456,6 +456,9 @@
     <ClCompile Include="EditLexers\stlGradle.c">
       <Filter>Source Files\EditLexers</Filter>
     </ClCompile>
+    <ClCompile Include="..\scintilla\win32\HanjaDic.cxx">
+      <Filter>Scintilla\win32</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\scintilla\include\ILexer.h">

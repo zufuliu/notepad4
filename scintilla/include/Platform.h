@@ -328,7 +328,7 @@ public:
 	virtual void DrawTextTransparent(const PRectangle &rc, const Font &font_, XYPOSITION ybase, const char *s, int len, const ColourDesired &fore)=0;
 	virtual void MeasureWidths(const Font &font_, const char *s, int len, XYPOSITION *positions)=0;
 	virtual XYPOSITION WidthText(const Font &font_, const char *s, int len)=0;
-	virtual XYPOSITION WidthChar(const Font &font_, char ch)=0;
+	virtual XYPOSITION WidthChar(const Font &font_, int ch)=0;
 	virtual XYPOSITION Ascent(const Font &font_)=0;
 	virtual XYPOSITION Descent(const Font &font_)=0;
 	virtual XYPOSITION InternalLeading(const Font &font_)=0;

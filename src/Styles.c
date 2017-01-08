@@ -941,7 +941,7 @@ void Style_SetLexer(HWND hwnd, PEDITLEXER pLexNew)
 PEDITLEXER __fastcall Style_SniffShebang(char *pchText)
 {
 	if (pchText[0] == '#' && pchText[1] == '!') {
-		int len = 0;
+		size_t len = 0;
 		char *pch = pchText + 2;
 		char *name = pch;
 		while (*pch == ' ' || *pch == '\t') {
@@ -1445,7 +1445,7 @@ void Style_SetLexerFromFile(HWND hwnd, LPCWSTR lpszFile)
 			np2LexLangIndex = IDM_LANG_PMD_RULESET;
 		}
 
-		if (!bFound && (!lstrcmpi(lpszName, L"cmakelists.txt") || StrRStrI(lpszFile, NULL, L".cmake.in"))) {
+		if (!bFound && (!lstrcmpi(lpszName, L"CMakeLists.txt") || !lstrcmpi(lpszName, L"CMakeCache.txt") || StrRStrI(lpszFile, NULL, L".cmake.in"))) {
 			pLexNew = &lexCMake;
 			bFound = TRUE;
 		}

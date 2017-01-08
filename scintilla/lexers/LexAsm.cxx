@@ -32,10 +32,10 @@ static inline bool IsAsmOperator(int ch) {
 }
 static inline bool IsAsmNumber(int ch, int chPrev) {
 	return (ch < 0x80) && (isxdigit(ch) //|| (isdigit(ch) && chPrev == '.')
-		|| ((ch == 'x' || ch == 'X') && chPrev < 0x80 && chPrev == '0')
+		|| ((ch == 'x' || ch == 'X') && chPrev == '0')
 		|| ((ch == 'H' || ch == 'h') && ch < 0x80 && isxdigit(chPrev))
-		|| ((ch == '+' || ch == '-') && chPrev < 0x80 && (chPrev == 'E' || chPrev == 'e'))
-		|| ((ch == 'Q' || ch == 'q') && chPrev < 0x80 && (chPrev >= '0' && chPrev <= '7'))
+		|| ((ch == '+' || ch == '-') && (chPrev == 'E' || chPrev == 'e'))
+		|| ((ch == 'Q' || ch == 'q') && (chPrev >= '0' && chPrev <= '7'))
 		);
 }
 
@@ -251,7 +251,7 @@ _label_identifier:
 				sc.SetState(SCE_ASM_COMMENT);
 				sc.Forward();
 			} else if (sc.ch == '@') {
-				if (sc.chNext < 0x80 && sc.chNext >= '0' && sc.chNext <= '7'
+				if (sc.chNext >= '0' && sc.chNext <= '7'
 					&& (IsAsmOperator(sc.chPrev) || isspace(sc.chPrev))) {	// Freescale Octal
 					sc.SetState(SCE_ASM_NUMBER);
 				} else if (isspace(sc.chNext)) {

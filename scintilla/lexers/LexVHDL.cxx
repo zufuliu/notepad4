@@ -195,7 +195,7 @@ static void FoldVHDLDoc(Sci_PositionU startPos, Sci_Position length, int /*initS
 			}
 		}
 	}
-	for(j = j+strlen(prevWord); j<endPos; j++) {
+	for(j = j + (Sci_PositionU)strlen(prevWord); j < endPos; j++) {
 		char ch = styler.SafeGetCharAt(j);
 		int style = styler.StyleAt(j);
 		if ((!IsCommentStyle(style)) && (style != SCE_VHDL_STRING))
@@ -217,7 +217,7 @@ static void FoldVHDLDoc(Sci_PositionU startPos, Sci_Position length, int /*initS
 		ch = chNext;
 		chNext = styler.SafeGetCharAt(i + 1);
 		char chNextNonBlank = chNext;
-		Sci_PositionU j = i + 1;
+		j = i + 1;
 		while(isspacechar(chNextNonBlank) && j<endPos) {
 			j ++ ;
 			chNextNonBlank = styler.SafeGetCharAt(j);

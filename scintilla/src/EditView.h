@@ -114,7 +114,7 @@ public:
 	Point LocationFromPosition(Surface *surface, const EditModel &model, const SelectionPosition &pos, int topLine,
 				   const ViewStyle &vs, PointEnd pe);
 	Range RangeDisplayLine(Surface *surface, const EditModel &model, int lineVisible, const ViewStyle &vs);
-	SelectionPosition SPositionFromLocation(Surface *surface, const EditModel &model, const Point &pt, bool canReturnInvalid,
+	SelectionPosition SPositionFromLocation(Surface *surface, const EditModel &model, const PointDocument &pt, bool canReturnInvalid,
 		bool charPosition, bool virtualSpace, const ViewStyle &vs);
 	SelectionPosition SPositionFromLineX(Surface *surface, const EditModel &model, int lineDoc, int x, const ViewStyle &vs);
 	int DisplayFromPosition(Surface *surface, const EditModel &model, int pos, const ViewStyle &vs);
@@ -124,6 +124,8 @@ public:
 	void DrawEOL(Surface *surface, const EditModel &model, const ViewStyle &vsDraw, const LineLayout *ll, const PRectangle &rcLine,
 		int line, int lineEnd, int xStart, int subLine, XYACCUMULATOR subLineStart,
 		const ColourOptional &background);
+	void DrawFoldDisplayText(Surface *surface, const EditModel &model, const ViewStyle &vsDraw, const LineLayout *ll,
+		int line, int xStart, const PRectangle &rcLine, int subLine, XYACCUMULATOR subLineStart, DrawPhase phase);
 	void DrawAnnotation(Surface *surface, const EditModel &model, const ViewStyle &vsDraw, const LineLayout *ll,
 		int line, int xStart, const PRectangle &rcLine, int subLine, DrawPhase phase);
 	void DrawCarets(Surface *surface, const EditModel &model, const ViewStyle &vsDraw, const LineLayout *ll, int line,
@@ -140,6 +142,8 @@ public:
 		int lineVisible, int xStart, const PRectangle &rcLine, int subLine, DrawPhase phase);
 	void PaintText(Surface *surfaceWindow, const EditModel &model, const PRectangle &rcArea, const PRectangle &rcClient,
 		const ViewStyle &vsDraw);
+	void FillLineRemainder(Surface *surface, const EditModel &model, const ViewStyle &vsDraw, const LineLayout *ll,
+		int line, const PRectangle &rcArea, int subLine) const;
 	long FormatRange(bool draw, const Sci_RangeToFormat *pfr, Surface *surface, Surface *surfaceMeasure,
 		const EditModel &model, const ViewStyle &vs);
 };

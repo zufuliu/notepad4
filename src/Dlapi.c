@@ -985,7 +985,7 @@ int DriveBox_Fill(HWND hwnd)
 
 									while ((SendMessage(hwnd, CBEM_GETITEM, 0, (LPARAM)&cbei2))) {
 										LPDC_ITEMDATA lpdcid2 = (LPDC_ITEMDATA)cbei2.lParam;
-										HRESULT hr = (lpdcid->lpsf->lpVtbl->CompareIDs(lpdcid->lpsf, 0, lpdcid->pidl, lpdcid2->pidl));
+										hr = (lpdcid->lpsf->lpVtbl->CompareIDs(lpdcid->lpsf, 0, lpdcid->pidl, lpdcid2->pidl));
 										if ((short)(SCODE_CODE(GetScode(hr))) < 0) {
 											break;
 										} else {
