@@ -2362,10 +2362,10 @@ get bool GetSelectionEmpty=2650(,)
 fun void ClearSelections=2571(,)
 
 # Set a simple selection
-fun int SetSelection=2572(position caret, position anchor)
+fun void SetSelection=2572(position caret, position anchor)
 
 # Add a selection
-fun int AddSelection=2573(position caret, position anchor)
+fun void AddSelection=2573(position caret, position anchor)
 
 # Drop one selection
 fun void DropSelectionN=2671(int selection,)

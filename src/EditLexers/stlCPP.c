@@ -11,15 +11,13 @@ static KEYWORDLIST Keywords_CPP = {
 "explicit export false friend mutable namespace new noexcept noreturn nullptr operator "
 "private protected public reinterpret_cast static_assert static_cast template "
 "this thread_local throw true try typeid typename using virtual "
-"override final "
+"override "
 "_Pragma defined " "and and_eq bitand bitor compl not not_eq or or_eq xor xor_eq "
 
 // MSVC
 "__alignof __asm __assume __based __cdecl __declspec __event __except __fastcall __finally __forceinline __identifier __inline __interface __leave __raise __stdcall __clrcall __super __thiscall __try __unaligned __uuidof __hook __unhook __noop __vectorcall "
-"abstract array delegate event finally friend_as gcnew generic initonly interface interior_ptr literal property ref safecast sealed "
-"abstract delegate event finally for each in initonly internal literal property sealed "
 // GCC
-"typeof __typeof__ __alignof__ __label__ __asm__ __thread __attribute__ __volatile__ __restrict__ __restrict __inline__ __extension__ where "
+"typeof __typeof__ __alignof__ __label__ __asm__ __thread __attribute__ __volatile__ __restrict__ __restrict __inline__ __extension__ "
 "__auto_type "
 "__nonnull __nullable __covariant __kindof nullable nonnull "
 // Keil
@@ -71,7 +69,7 @@ static KEYWORDLIST Keywords_CPP = {
 // STL class
 "basic_string string wstring u16string u32string "
 "vector deque list map multimap multiset queue priority_queue set stack initializer_list forward_list gslice gslice_array "
-"unordered_map unordered_set array valarray tuple tuple_element tuple_size bitset hash pair indirect_array mask_array slice slice_array unordered_multimap unordered_multiset array rb_tree bool_set dynamic_bitset "
+"unordered_map unordered_set array valarray tuple tuple_element tuple_size bitset hash pair indirect_array mask_array slice slice_array unordered_multimap unordered_multiset rb_tree bool_set dynamic_bitset "
 
 "char_traits ios_base basic_ios "
 "basic_streambuf basic_istream basic_ostream basic_iostream "
@@ -141,7 +139,7 @@ static KEYWORDLIST Keywords_CPP = {
 "__STDC__ __STDC_HOSTED__ __STDC_VERSION__ __STDC_IEC_559__ __STDC_IEC_559_COMPLEX__ __STDC_ISO_10646__ "
 "__i386__ __x86_64__ __LP64__ __amd64 __ia64 _MSC_VER __MSVCRT__ __MINGW32__ __CYGWIN__ "
 "__GNUC__ __GNUG__ __GNUC_MINOR__ __GNU_MINOR__ __OBJC__ __ASSEMBLER__ __GFORTRAN__ __COUNTER__ __STRICT_ANSI__  __PRETTY_FUNCTION__ __STDC_DEC_FP__ "
-"__APPLE__ __clang__ __llvm__ "
+"__APPLE__ __clang__ __llvm__ __GLIBC__ __linux__ "
 
 // assert.h
 "_DEBUG NDEBUG assert() "
@@ -197,7 +195,7 @@ static KEYWORDLIST Keywords_CPP = {
 "Py_INCREF() Py_DECREF() Py_None Py_RETURN_NONE Py_True Py_False Py_RETURN_TRUE Py_RETURN_FALSE "
 "PyMODINIT_FUNC METH_VARARGS METH_KEYWORDS METH_NOARGS PyModuleDef_HEAD_INIT "
 // Mac/iOS
-"IBOutlet IBAction __has_feature() objc_arc objc_instancetype "
+"IBOutlet IBAction __has_feature() "
 
 #if NUMKEYWORD == 16
 ,// 2nd keyword: Objective C/C++

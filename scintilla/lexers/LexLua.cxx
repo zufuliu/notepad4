@@ -88,8 +88,8 @@ static void ColouriseLuaDoc(Sci_PositionU startPos, Sci_Position length, int ini
 	}
 
 	StyleContext sc(startPos, length, initStyle, styler);
-	if (startPos == 0 && sc.ch == '#') {
-		// shbang line: # is a comment only if first char of the script
+	if (startPos == 0 && sc.ch == '#' && sc.chNext == '!') {
+		// shbang line: "#!" is a comment only if located at the start of the script
 		sc.SetState(SCE_LUA_COMMENTLINE);
 	}
 	for (; sc.More(); sc.Forward()) {
