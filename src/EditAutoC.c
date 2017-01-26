@@ -776,17 +776,26 @@ void EditAutoIndent(HWND hwnd)
 			int iIndentPos = iCurPos;
 			int ch;
 			char *endPart = NULL;
+			int commentStyle = 0;
 			SciCall_GetLine(iCurLine - 1, pLineBuf);
-			*(pLineBuf + iPrevLineLength) = '\0';
+			pLineBuf[iPrevLineLength] = '\0';
 			ch = pLineBuf[iPrevLineLength - 2];
 			if (ch == '\r') {
 				ch = pLineBuf[iPrevLineLength - 3];
+				iIndentLen = 1;
 			}
 			if (ch == '{' || ch == '[' || ch == '(') {
 				indent = 2;
 			} else if (ch == ':') { // case label/Python
 				indent = 1;
+			} else if (ch == '*' || ch == '!') { // indent block comment
+				iIndentLen = iPrevLineLength - (2 + iIndentLen);
+				if (iIndentLen >= 2 && pLineBuf[iIndentLen - 2] == '/' && pLineBuf[iIndentLen - 1] == '*') {
+					indent = 1;
+					commentStyle = 1;
+				}
 			}
+			iIndentLen = 0;
 			ch = SciCall_GetCharAt(SciCall_PositionFromLine(iCurLine));
 			if (indent == 2 && !(ch == '}' || ch == ']' || ch == ')')) {
 				indent = 1;
@@ -822,9 +831,15 @@ void EditAutoIndent(HWND hwnd)
 						ch = '\t';
 					}
 				}
-				iIndentPos += pad;
-				while (pad-- > 0) {
-					*pPos++ = (char)ch;
+				if (commentStyle) {
+					iIndentPos += 2;
+					*pPos++ = ' ';
+					*pPos++ = '*';
+				} else {
+					iIndentPos += pad;
+					while (pad-- > 0) {
+						*pPos++ = (char)ch;
+					}
 				}
 				if (iEOLMode == SC_EOL_CRLF || iEOLMode == SC_EOL_CR) {
 					*pPos++ = '\r';
