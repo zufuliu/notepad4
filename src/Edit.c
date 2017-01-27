@@ -5243,8 +5243,8 @@ void EditMarkAll(HWND hwnd, int iMarkOccurrences, BOOL bMarkOccurrencesMatchCase
 		return;
 	}
 
-
-	iSelCount = (int)SendMessage(hwnd, SCI_GETSELTEXT, 0, 0);
+	// scintilla/src/Editor.h SelectionText.LengthWithTerminator()
+	iSelCount = (int)SendMessage(hwnd, SCI_GETSELTEXT, 0, 0) - 1;
 	pszText = LocalAlloc(LPTR, iSelCount + 1);
 	SendMessage(hwnd, SCI_GETSELTEXT, 0, (LPARAM)pszText);
 
@@ -5276,7 +5276,7 @@ void EditMarkAll(HWND hwnd, int iMarkOccurrences, BOOL bMarkOccurrencesMatchCase
 	while ((iPos = (int)SendMessage(hwnd, SCI_FINDTEXT, findFlag, (LPARAM)&ttf)) != -1) {
 		// mark this match
 		++iMatchesCount;
-		SendMessage(hwnd, SCI_INDICATORFILLRANGE, iPos, iSelCount - 1);
+		SendMessage(hwnd, SCI_INDICATORFILLRANGE, iPos, iSelCount);
 		ttf.chrg.cpMin = ttf.chrgText.cpMin + iSelCount;
 		if (ttf.chrg.cpMin == ttf.chrg.cpMax) {
 			break;
