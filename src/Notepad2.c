@@ -1923,7 +1923,7 @@ void MsgSize(HWND hwnd, WPARAM wParam, LPARAM lParam)
 	// Statusbar width
 #if BOOKMARK_EDITION
 	aWidth[0] = (int)max(120, min(cx * 0.4f, StatusCalcPaneWidth(hwndStatus,
-									L"Ln 9,999,999/9,999,999  Col 9,999/,999  Sel 9,999,999  Sel Ln 9,999,999  Fnd 9,999")));
+									L"Ln 9,999,999/9,999,999  Col 9,999/,999  Ch 9,999/,999  Sel 9,999/,999  SelLn 9,999,999  Fnd 9,999")));
 #else
 	aWidth[0] = (int)max(120, min(cx * 0.4f, StatusCalcPaneWidth(hwndStatus,
 									L"Ln 9,999,999/9,999,999  Col 9,999/9,999  Sel 9,999,999")));
@@ -6591,7 +6591,7 @@ void UpdateStatusbar()
 	iSelStart = (int)SendMessage(hwndEdit, SCI_GETSELECTIONSTART, 0, 0);
 	iSelEnd = (int)SendMessage(hwndEdit, SCI_GETSELECTIONEND, 0, 0);
 	if (SC_SEL_RECTANGLE != SendMessage(hwndEdit, SCI_GETSELECTIONMODE, 0, 0)) {
-		int iSel = iSelEnd - iSelStart;
+		int iSel = SendMessage(hwndEdit, SCI_GETSELTEXT, 0, 0);
 		wsprintf(tchSel, L"%i", iSel);
 		FormatNumberStr(tchSel);
 		iSel = (int)SendMessage(hwndEdit, SCI_COUNTCHARACTERS, iSelStart, iSelEnd);

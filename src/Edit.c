@@ -204,14 +204,14 @@ BOOL EditConvertText(HWND hwnd, UINT cpSource, UINT cpDest, BOOL bSetSavePoint)
 		char *pchText;
 		WCHAR *pwchText;
 
-		pchText = GlobalAlloc(GPTR, length * 5 + 2);
+		pchText = GlobalAlloc(GPTR, length * 2 + 1);
 
 		tr.lpstrText = pchText;
 		SendMessage(hwnd, SCI_GETTEXTRANGE, 0, (LPARAM)&tr);
 
-		pwchText = GlobalAlloc(GPTR, length * 3 + 2);
-		cbwText	 = MultiByteToWideChar(cpSource, 0, pchText, length, pwchText, length * 3 + 2);
-		cbText	 = WideCharToMultiByte(cpDest, 0, pwchText, cbwText, pchText, length * 5 + 2, NULL, NULL);
+		pwchText = GlobalAlloc(GPTR, (length + 1) * sizeof(WCHAR));
+		cbwText	 = MultiByteToWideChar(cpSource, 0, pchText, length, pwchText, length);
+		cbText	 = WideCharToMultiByte(cpDest, 0, pwchText, cbwText, pchText, length * 2, NULL, NULL);
 
 		SendMessage(hwnd, SCI_CANCEL, 0, 0);
 		SendMessage(hwnd, SCI_SETUNDOCOLLECTION, 0, 0);
@@ -343,7 +343,7 @@ BOOL EditCopyAppend(HWND hwnd)
 			return FALSE;
 		} else {
 			int iSelCount = (int)SendMessage(hwnd, SCI_GETSELTEXT, 0, 0);
-			pszText = LocalAlloc(LPTR, iSelCount + 1);
+			pszText = LocalAlloc(LPTR, iSelCount);
 			SendMessage(hwnd, SCI_GETSELTEXT, 0, (LPARAM)pszText);
 		}
 	} else {
@@ -868,9 +868,9 @@ void EditInvertCase(HWND hwnd)
 			int cchTextW;
 			UINT cpEdit;
 			int i;
-			int iSelCount = (int)SendMessage(hwnd, SCI_GETSELTEXT, 0, 0);
+			int iSelCount = (int)SendMessage(hwnd, SCI_GETSELTEXT, 0, 0) - 1;
 			char *pszText = GlobalAlloc(GPTR, iSelCount + 1);
-			LPWSTR pszTextW = GlobalAlloc(GPTR, (iSelCount * 2) + 2);
+			LPWSTR pszTextW = GlobalAlloc(GPTR, (iSelCount + 1) * sizeof(WCHAR));
 
 			if (pszText == NULL || pszTextW == NULL) {
 				GlobalFree(pszText);
@@ -936,9 +936,9 @@ void EditTitleCase(HWND hwnd)
 		if (SC_SEL_RECTANGLE != SendMessage(hwnd, SCI_GETSELECTIONMODE, 0, 0)) {
 			int cchTextW;
 			UINT cpEdit;
-			int iSelCount = (int)SendMessage(hwnd, SCI_GETSELTEXT, 0, 0);
+			int iSelCount = (int)SendMessage(hwnd, SCI_GETSELTEXT, 0, 0) - 1;
 			char *pszText = GlobalAlloc(GPTR, iSelCount + 1);
-			LPWSTR pszTextW = GlobalAlloc(GPTR, (iSelCount * 2) + 2);
+			LPWSTR pszTextW = GlobalAlloc(GPTR, (iSelCount + 1) * sizeof(WCHAR));
 
 			if (pszText == NULL || pszTextW == NULL) {
 				GlobalFree(pszText);
@@ -1056,9 +1056,9 @@ void EditSentenceCase(HWND hwnd)
 			int cchTextW;
 			UINT cpEdit;
 			int i;
-			int iSelCount = (int)SendMessage(hwnd, SCI_GETSELTEXT, 0, 0);
+			int iSelCount = (int)SendMessage(hwnd, SCI_GETSELTEXT, 0, 0) - 1;
 			char *pszText = GlobalAlloc(GPTR, iSelCount + 1);
-			LPWSTR pszTextW = GlobalAlloc(GPTR, (iSelCount * 2) + 2);
+			LPWSTR pszTextW = GlobalAlloc(GPTR, (iSelCount + 1) * sizeof(WCHAR));
 
 			if (pszText == NULL || pszTextW == NULL) {
 				GlobalFree(pszText);
@@ -1136,12 +1136,12 @@ void EditURLEncode(HWND hwnd)
 			DWORD	 cchEscapedW;
 			LPWSTR pszEscapedW;
 
-			pszText = LocalAlloc(LPTR, (iSelCount) + 2);
+			pszText = LocalAlloc(LPTR, iSelCount);
 			if (pszText == NULL) {
 				return;
 			}
 
-			pszTextW = LocalAlloc(LPTR, (iSelCount * 2) + 2);
+			pszTextW = LocalAlloc(LPTR, iSelCount * sizeof(WCHAR));
 			if (pszTextW == NULL) {
 				LocalFree(pszText);
 				return;
@@ -1152,7 +1152,8 @@ void EditURLEncode(HWND hwnd)
 			//cchTextW = MultiByteToWideChar(cpEdit, 0, pszText, iSelCount, pszTextW,
 			//								(int)LocalSize(pszTextW) / sizeof(WCHAR));
 
-			pszEscaped = LocalAlloc(LPTR, LocalSize(pszText) * 3);
+			// https://msdn.microsoft.com/en-us/library/windows/desktop/bb773774(v=vs.85).aspx
+			pszEscaped = LocalAlloc(LPTR, LocalSize(pszText) * 3); // '&', H1, H0
 			if (pszEscaped == NULL) {
 				LocalFree(pszText);
 				LocalFree(pszTextW);
@@ -1219,12 +1220,12 @@ void EditURLDecode(HWND hwnd)
 			DWORD	 cchUnescapedW;
 			LPWSTR pszUnescapedW;
 
-			pszText = LocalAlloc(LPTR, (iSelCount) + 2);
+			pszText = LocalAlloc(LPTR, iSelCount);
 			if (pszText == NULL) {
 				return;
 			}
 
-			pszTextW = LocalAlloc(LPTR, (iSelCount * 2) + 2);
+			pszTextW = LocalAlloc(LPTR, iSelCount * sizeof(WCHAR));
 			if (pszTextW == NULL) {
 				LocalFree(pszText);
 				return;
@@ -1350,6 +1351,7 @@ void EditUnescapeCChars(HWND hwnd)
 // &lt;		[<]
 // &gt;		[>]
 // &nbsp;	[ ]
+// &emsp;	[\t]
 //=============================================================================
 //
 // EditEscapeXHTMLChars()
@@ -1385,6 +1387,10 @@ void EditEscapeXHTMLChars(HWND hwnd)
 			if (pLexCurrent->iLexer != SCLEX_XML) {
 				lstrcpyA(efr.szFind, " ");
 				lstrcpyA(efr.szReplace, "&nbsp;");
+				EditReplaceAllInSelection(hwnd, &efr, FALSE);
+
+				lstrcpyA(efr.szFind, "\t");
+				lstrcpyA(efr.szReplace, "&emsp;");
 				EditReplaceAllInSelection(hwnd, &efr, FALSE);
 			}
 
@@ -1432,6 +1438,9 @@ void EditUnescapeXHTMLChars(HWND hwnd)
 			lstrcpyA(efr.szReplace, "&");
 			EditReplaceAllInSelection(hwnd, &efr, FALSE);
 
+			lstrcpyA(efr.szFind, "&emsp;");
+			lstrcpyA(efr.szReplace, "\t");
+			EditReplaceAllInSelection(hwnd, &efr, FALSE);
 			SendMessage(hwnd, SCI_ENDUNDOACTION, 0, 0);
 		} else {
 			MsgBox(MBWARN, IDS_SELRECT);
@@ -1459,11 +1468,11 @@ void EditChar2Hex(HWND hwnd)
 {
 	if (SC_SEL_RECTANGLE != SendMessage(hwnd, SCI_GETSELECTIONMODE, 0, 0)) {
 		int iSelStart = (int)SendMessage(hwnd, SCI_GETSELECTIONSTART, 0, 0);
-		int iSelEnd = (int)SendMessage(hwnd, SCI_GETSELECTIONEND, 0, 0);
-		int count = (iSelEnd - iSelStart) * 4;
+		int count = (int)SendMessage(hwnd, SCI_GETSELTEXT, 0, 0) - 1;
 
 		if (count) {
-			char *ch = LocalAlloc(LPTR, count*2 + 1);
+			count *= 2 + MAX_ESCAPE_HEX_DIGIT;
+			char *ch = LocalAlloc(LPTR, count + 1);
 			WCHAR *wch = (WCHAR*)LocalAlloc(LPTR, (count + 1)*sizeof(WCHAR));
 			UINT cp = (UINT)SendMessage(hwnd, SCI_GETCODEPAGE, 0, 0);
 			SendMessage(hwnd, SCI_GETSELTEXT, 0, (LPARAM)ch);
@@ -1509,9 +1518,10 @@ void EditHex2Char(HWND hwnd)
 	if (SC_SEL_RECTANGLE != SendMessage(hwnd, SCI_GETSELECTIONMODE, 0, 0)) {
 		int iSelStart = (int)SendMessage(hwnd, SCI_GETSELECTIONSTART, 0, 0);
 		int iSelEnd		= (int)SendMessage(hwnd, SCI_GETSELECTIONEND, 0, 0);
-		int count = (iSelEnd - iSelStart) * 4;
+		int count = (int)SendMessage(hwnd, SCI_GETSELTEXT, 0, 0) - 1;
 
 		if (count) {
+			count *= 2 + MAX_ESCAPE_HEX_DIGIT;
 			char *ch = LocalAlloc(LPTR, count + 1);
 			WCHAR *wch = (WCHAR*)LocalAlloc(LPTR, (count + 1)*sizeof(WCHAR));
 			UINT cp = (UINT)SendMessage(hwnd, SCI_GETCODEPAGE, 0, 0);
@@ -1565,13 +1575,12 @@ void EditHex2Char(HWND hwnd)
 void EditShowHex(HWND hwnd)
 {
 	if (SC_SEL_RECTANGLE != SendMessage(hwnd, SCI_GETSELECTIONMODE, 0, 0)) {
-		int iSelStart = (int)SendMessage(hwnd, SCI_GETSELECTIONSTART, 0, 0);
 		int iSelEnd = (int)SendMessage(hwnd, SCI_GETSELECTIONEND, 0, 0);
-		int count = (iSelEnd - iSelStart);
+		int count = (int)SendMessage(hwnd, SCI_GETSELTEXT, 0, 0) - 1;
 
 		if (count) {
-			char *ch = LocalAlloc(LPTR, count*2 + 1);
-			char *cch = LocalAlloc(LPTR, count*3 + 5);
+			char *ch = LocalAlloc(LPTR, count + 1);
+			char *cch = LocalAlloc(LPTR, count*3 + 3);
 			char *p = ch, *t = cch;
 			SendMessage(hwnd, SCI_GETSELTEXT, 0, (LPARAM)ch);
 			*t++ = '[';
@@ -1612,11 +1621,11 @@ void EditHex2Dec(HWND hwnd, BOOL toHex)
 	if (SC_SEL_RECTANGLE != SendMessage(hwnd, SCI_GETSELECTIONMODE, 0, 0)) {
 		int iSelStart = (int)SendMessage(hwnd, SCI_GETSELECTIONSTART, 0, 0);
 		int iSelEnd		= (int)SendMessage(hwnd, SCI_GETSELECTIONEND, 0, 0);
-		int count = (iSelEnd - iSelStart) * 4;
+		int count = (int)SendMessage(hwnd, SCI_GETSELTEXT, 0, 0) - 1;
 
 		if (count) {
 			char *ch = LocalAlloc(LPTR, count + 1);
-			char *tch = LocalAlloc(LPTR, count + 1);
+			char *tch = LocalAlloc(LPTR, count*2 + 1);
 			int cch = 0;
 			char *p = ch;
 			unsigned __int64 ci = 0;
@@ -1851,14 +1860,14 @@ void EditTabsToSpaces(HWND hwnd, int nTabWidth, BOOL bOnlyIndentingWS)
 	iLine = (int)SendMessage(hwnd, SCI_LINEFROMPOSITION, (WPARAM)iSelStart, 0);
 	iSelStart = (int)SendMessage(hwnd, SCI_POSITIONFROMLINE, (WPARAM)iLine, 0);
 
-	iSelCount = iSelEnd - iSelStart;
+	iSelCount = (int)SendMessage(hwnd, SCI_GETSELTEXT, 0, 0);
 
-	pszText = GlobalAlloc(GPTR, (iSelCount) + 2);
+	pszText = GlobalAlloc(GPTR, iSelCount);
 	if (pszText == NULL) {
 		return;
 	}
 
-	pszTextW = GlobalAlloc(GPTR, (iSelCount * 2) + 2);
+	pszTextW = GlobalAlloc(GPTR, iSelCount * sizeof(WCHAR));
 	if (pszTextW == NULL) {
 		GlobalFree(pszText);
 		return;
@@ -1984,14 +1993,14 @@ void EditSpacesToTabs(HWND hwnd, int nTabWidth, BOOL bOnlyIndentingWS)
 	iLine = (int)SendMessage(hwnd, SCI_LINEFROMPOSITION, (WPARAM)iSelStart, 0);
 	iSelStart = (int)SendMessage(hwnd, SCI_POSITIONFROMLINE, (WPARAM)iLine, 0);
 
-	iSelCount = iSelEnd - iSelStart;
+	iSelCount = SendMessage(hwnd, SCI_GETSELTEXT, 0, 0);
 
-	pszText = GlobalAlloc(GPTR, (iSelCount) + 2);
+	pszText = GlobalAlloc(GPTR, iSelCount);
 	if (pszText == NULL) {
 		return;
 	}
 
-	pszTextW = GlobalAlloc(GPTR, (iSelCount * 2) + 2);
+	pszTextW = GlobalAlloc(GPTR, iSelCount * sizeof(WCHAR));
 	if (pszTextW == NULL) {
 		GlobalFree(pszText);
 		return;
@@ -2061,7 +2070,7 @@ void EditSpacesToTabs(HWND hwnd, int nTabWidth, BOOL bOnlyIndentingWS)
 
 	if (bModified || cchConvW != cchTextW) {
 		int cchConvM;
-		pszText = GlobalAlloc(GPTR, cchConvW * 3);
+		pszText = GlobalAlloc(GPTR, cchConvW * 4 + 1);
 		cchConvM = WideCharToMultiByte(cpEdit, 0, pszConvW, cchConvW, pszText,
 										(int)GlobalSize(pszText), NULL, NULL);
 		GlobalFree(pszConvW);
@@ -3385,8 +3394,8 @@ void EditCompressSpaces(HWND hwnd)
 
 		if (iSelStart != iSelEnd) {
 			int cch = (int)SendMessage(hwnd, SCI_GETSELTEXT, 0, 0);
-			pszIn = LocalAlloc(LPTR, cch + 1);
-			pszOut = LocalAlloc(LPTR, cch + 1);
+			pszIn = LocalAlloc(LPTR, cch);
+			pszOut = LocalAlloc(LPTR, cch);
 			SendMessage(hwnd, SCI_GETSELTEXT, 0, (LPARAM)pszIn);
 			bIsLineStart =
 				(iSelStart == SendMessage(hwnd, SCI_POSITIONFROMLINE, (WPARAM)iLineStart, 0));
@@ -4330,7 +4339,7 @@ void EditGetExcerpt(HWND hwnd, LPWSTR lpszExcerpt, DWORD cchExcerpt)
 	tr.chrg.cpMax = min((int)SendMessage(hwnd, SCI_GETLENGTH, 0, 0), tr.chrg.cpMax);
 
 	pszText	 = LocalAlloc(LPTR, (tr.chrg.cpMax - tr.chrg.cpMin) + 2);
-	pszTextW = LocalAlloc(LPTR, ((tr.chrg.cpMax - tr.chrg.cpMin) * 2) + 2);
+	pszTextW = LocalAlloc(LPTR, ((tr.chrg.cpMax - tr.chrg.cpMin) + 1) * sizeof(WCHAR));
 
 	if (pszText && pszTextW) {
 		UINT cpEdit;
@@ -4425,7 +4434,7 @@ INT_PTR CALLBACK EditFindReplaceDlgProcW(HWND hwnd, UINT umsg, WPARAM wParam, LP
 				char *lpszEscSel;
 				char *lpszSelection;
 				cchSelection = (int)SendMessage(lpefr->hwnd, SCI_GETSELTEXT, 0, 0);
-				lpszSelection = GlobalAlloc(GPTR, cchSelection + 2);
+				lpszSelection = GlobalAlloc(GPTR, cchSelection);
 				SendMessage(lpefr->hwnd, SCI_GETSELTEXT, 0, (LPARAM)lpszSelection);
 
 #ifdef BOOKMARK_EDITION
