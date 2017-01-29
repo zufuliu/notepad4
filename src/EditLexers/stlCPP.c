@@ -13,7 +13,7 @@ static KEYWORDLIST Keywords_CPP = {
 "this thread_local throw true try typeid typename using virtual "
 "override "
 "_Pragma defined " "and and_eq bitand bitor compl not not_eq or or_eq xor xor_eq "
-
+"concept "
 // MSVC
 "__alignof __asm __assume __based __cdecl __declspec __event __except __fastcall __finally __forceinline __identifier __inline __interface __leave __raise __stdcall __clrcall __super __thiscall __try __unaligned __uuidof __hook __unhook __noop __vectorcall "
 // GCC

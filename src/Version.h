@@ -37,14 +37,15 @@
 #define VERSION_FILEVERSION_NUM      VERSION_MAJOR,VERSION_MINOR,VERSION_BUILD,VERSION_REV
 #define VERSION_FILEVERSION          STRINGIFY(VERSION_MAJOR) "." STRINGIFY(VERSION_MINOR) "." \
                                      STRINGIFY(VERSION_BUILD) "." STRINGIFY(VERSION_REV)
-#define VERSION_LEGALCOPYRIGHT_SHORT L"Copyright © 2004-2014"
-#define VERSION_LEGALCOPYRIGHT_LONG  L"© Florian Balmer 2004-2014"
+#define VERSION_LEGALCOPYRIGHT_SHORT L"Copyright © 2004-2017"
+#define VERSION_LEGALCOPYRIGHT_LONG  L"© Florian Balmer 2004-2017"
 #define VERSION_AUTHORNAME           L"Florian Balmer"
 #define VERSION_WEBPAGEDISPLAY       L"flo's freeware - http://www.flos-freeware.ch"
-//#define VERSION_EMAILDISPLAY       L"florian.balmer@gmail.com"
-#define VERSION_EMAILDISPLAY		L"http://www.scintilla.org/"
+#define VERSION_EMAILDISPLAY         L"florian.balmer@gmail.com"
 #define VERSION_COMPANYNAME          L"Florian Balmer et al."
 #define VERSION_MODPAGEDISPLAY       L"https://xhmikosr.github.io/notepad2-mod/"
+#define VERSION_NEWPAGE_DISPLAY      L"https://github.com/zufuliu/notepad2"
+#define VERSION_SCIPAGE_DISPLAY      L"http://www.scintilla.org/"
 
 #if defined(_WIN64)
    #define VERSION_FILEVERSION_LONG  L"Notepad2 (64-bit) " STRINGIFY(VERSION_MAJOR) L"." \

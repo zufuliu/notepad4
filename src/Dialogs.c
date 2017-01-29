@@ -241,28 +241,44 @@ INT_PTR CALLBACK AboutDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam
 		hFontTitle = CreateFontIndirect(&lf);
 		SendDlgItemMessage(hwnd, IDC_VERSION, WM_SETFONT, (WPARAM)hFontTitle, TRUE);
 
-		if (GetDlgItem(hwnd, IDC_WEBPAGE) == NULL) {
-			SetDlgItemText(hwnd, IDC_WEBPAGE2, VERSION_WEBPAGEDISPLAY);
-			ShowWindow(GetDlgItem(hwnd, IDC_WEBPAGE2), SW_SHOWNORMAL);
+		if (GetDlgItem(hwnd, IDC_WEBPAGE_LINK) == NULL) {
+			SetDlgItemText(hwnd, IDC_WEBPAGE_TEXT, VERSION_WEBPAGEDISPLAY);
+			ShowWindow(GetDlgItem(hwnd, IDC_WEBPAGE_TEXT), SW_SHOWNORMAL);
 		} else {
 			wsprintf(wch, L"<A>%s</A>", VERSION_WEBPAGEDISPLAY);
-			SetDlgItemText(hwnd, IDC_WEBPAGE, wch);
+			SetDlgItemText(hwnd, IDC_WEBPAGE_LINK, wch);
 		}
 
-		if (GetDlgItem(hwnd, IDC_EMAIL) == NULL) {
-			SetDlgItemText(hwnd, IDC_EMAIL2, VERSION_EMAILDISPLAY);
-			ShowWindow(GetDlgItem(hwnd, IDC_EMAIL2), SW_SHOWNORMAL);
+		if (GetDlgItem(hwnd, IDC_EMAIL_LINK) == NULL) {
+			SetDlgItemText(hwnd, IDC_EMAIL_TEXT, VERSION_EMAILDISPLAY);
+			ShowWindow(GetDlgItem(hwnd, IDC_EMAIL_TEXT), SW_SHOWNORMAL);
 		} else {
 			wsprintf(wch, L"<A>%s</A>", VERSION_EMAILDISPLAY);
-			SetDlgItemText(hwnd, IDC_EMAIL, wch);
+			SetDlgItemText(hwnd, IDC_EMAIL_LINK, wch);
 		}
 
-		if (GetDlgItem(hwnd, IDC_MOD_PAGE) == NULL) {
-			SetDlgItemText(hwnd, IDC_MOD_PAGE, VERSION_MODPAGEDISPLAY);
-			ShowWindow(GetDlgItem(hwnd, IDC_MOD_PAGE2), SW_SHOWNORMAL);
+		if (GetDlgItem(hwnd, IDC_MOD_PAGE_LINK) == NULL) {
+			SetDlgItemText(hwnd, IDC_MOD_PAGE_LINK, VERSION_MODPAGEDISPLAY);
+			ShowWindow(GetDlgItem(hwnd, IDC_MOD_PAGE_TEXT), SW_SHOWNORMAL);
 		} else {
 			wsprintf(wch, L"<A>%s</A>", VERSION_MODPAGEDISPLAY);
-			SetDlgItemText(hwnd, IDC_MOD_PAGE, wch);
+			SetDlgItemText(hwnd, IDC_MOD_PAGE_LINK, wch);
+		}
+
+		if (GetDlgItem(hwnd, IDC_NEW_PAGE_LINK) == NULL) {
+			SetDlgItemText(hwnd, IDC_NEW_PAGE_TEXT, VERSION_NEWPAGE_DISPLAY);
+			ShowWindow(GetDlgItem(hwnd, IDC_NEW_PAGE_TEXT), SW_SHOWNORMAL);
+		} else {
+			wsprintf(wch, L"<A>%s</A>", VERSION_NEWPAGE_DISPLAY);
+			SetDlgItemText(hwnd, IDC_NEW_PAGE_LINK, wch);
+		}
+
+		if (GetDlgItem(hwnd, IDC_SCI_PAGE_LINK) == NULL) {
+			SetDlgItemText(hwnd, IDC_SCI_PAGE_TEXT, VERSION_SCIPAGE_DISPLAY);
+			ShowWindow(GetDlgItem(hwnd, IDC_SCI_PAGE_TEXT), SW_SHOWNORMAL);
+		} else {
+			wsprintf(wch, L"<A>%s</A>", VERSION_SCIPAGE_DISPLAY);
+			SetDlgItemText(hwnd, IDC_SCI_PAGE_LINK, wch);
 		}
 
 		CenterDlgInParent(hwnd);
@@ -276,13 +292,16 @@ INT_PTR CALLBACK AboutDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam
 
 		case NM_CLICK:
 		case NM_RETURN: {
-			if (pnmhdr->idFrom == IDC_WEBPAGE) {
+			if (pnmhdr->idFrom == IDC_WEBPAGE_LINK) {
 				ShellExecute(hwnd, L"open", L"http://www.flos-freeware.ch", NULL, NULL, SW_SHOWNORMAL);
-			} else if (pnmhdr->idFrom == IDC_EMAIL) {
-				//ShellExecute(hwnd, L"open", L"mailto:florian.balmer@gmail.com", NULL, NULL, SW_SHOWNORMAL);
-				ShellExecute(hwnd, L"open", L"http://www.scintilla.org/", NULL, NULL, SW_SHOWNORMAL);
-			} else if (pnmhdr->idFrom == IDC_MOD_PAGE) {
+			} else if (pnmhdr->idFrom == IDC_EMAIL_LINK) {
+				ShellExecute(hwnd, L"open", L"mailto:florian.balmer@gmail.com", NULL, NULL, SW_SHOWNORMAL);			
+			} else if (pnmhdr->idFrom == IDC_MOD_PAGE_LINK) {
 				ShellExecute(hwnd, L"open", L"https://xhmikosr.github.io/notepad2-mod/", NULL, NULL, SW_SHOWNORMAL);
+			} else if (pnmhdr->idFrom == IDC_NEW_PAGE_LINK) {
+				ShellExecute(hwnd, L"open", L"https://github.com/zufuliu/notepad2", NULL, NULL, SW_SHOWNORMAL);
+			} else if (pnmhdr->idFrom == IDC_SCI_PAGE_LINK) {
+				ShellExecute(hwnd, L"open", L"http://www.scintilla.org/", NULL, NULL, SW_SHOWNORMAL);
 			}
 		}
 		break;
