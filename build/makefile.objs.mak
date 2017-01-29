@@ -52,7 +52,7 @@ SCI_LEX_OBJ = \
     $(SCI_LEX_OBJDIR)\LexAutoIt3.obj \
     $(SCI_LEX_OBJDIR)\LexBash.obj \
     $(SCI_LEX_OBJDIR)\LexBatch.obj \
-    $(SCI_LEX_OBJDIR)\LexCLI.obj \
+    $(SCI_LEX_OBJDIR)\LexCIL.obj \
     $(SCI_LEX_OBJDIR)\LexCMake.obj \
     $(SCI_LEX_OBJDIR)\LexConfig.obj \
     $(SCI_LEX_OBJDIR)\LexCPP.obj \
@@ -153,7 +153,7 @@ NP2_STL_OBJ = \
     $(NP2_STL_OBJDIR)\stlAwk.obj \
     $(NP2_STL_OBJDIR)\stlBash.obj \
     $(NP2_STL_OBJDIR)\stlBatch.obj \
-    $(NP2_STL_OBJDIR)\stlCLI.obj \
+    $(NP2_STL_OBJDIR)\stlCIL.obj \
     $(NP2_STL_OBJDIR)\stlCMake.obj \
     $(NP2_STL_OBJDIR)\stlCPP.obj \
     $(NP2_STL_OBJDIR)\stlCSharp.obj \

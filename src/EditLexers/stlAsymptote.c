@@ -1,6 +1,8 @@
 #include "EditLexer.h"
 #include "EditStyle.h"
 
+// http://asymptote.sourceforge.net/
+
 static KEYWORDLIST Keywords_ASY = {
 "private public import include from access as if else false true default restricted struct "
 "return for new explicit do while break operator this static typedef var continue unravel "

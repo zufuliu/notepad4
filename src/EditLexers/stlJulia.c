@@ -1,6 +1,9 @@
 #include "EditLexer.h"
 #include "EditStyle.h"
 
+// https://en.wikipedia.org/wiki/Julia_%28programming_language%29
+// http://julialang.org/
+
 static KEYWORDLIST Keywords_Julia = {
 "abstract begin bitstype break catch continue const do else elseif end export for function global if in import "
 "let local macro module quote return try type typealias using while "

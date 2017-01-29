@@ -1,6 +1,8 @@
 #include "EditLexer.h"
 #include "EditStyle.h"
 
+// http://www.scala-lang.org/index.html
+
 static KEYWORDLIST Keywords_Scala = {
 "abstract case catch class def do else extends false final finally for forSome if "
 "implicit import lazy match new null object override package private protected "

@@ -1,6 +1,8 @@
 #include "EditLexer.h"
 #include "EditStyle.h"
 
+// http://php.net/
+
 static KEYWORDLIST Keywords_PHP = {
 "abstract and as break callable case catch class clone const continue declare "
 "default do else elseif enddeclare endfor endforeach endif endswitch endwhile "

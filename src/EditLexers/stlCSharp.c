@@ -1,6 +1,9 @@
 #include "EditLexer.h"
 #include "EditStyle.h"
-//http://msdn.microsoft.com/en-us/library/x53a06bb.aspx
+
+// https://en.wikipedia.org/wiki/C_Sharp_%28programming_language%29
+// https://msdn.microsoft.com/en-us/library/ms228593.aspx
+// https://wiki.gnome.org/Projects/Vala
 
 static KEYWORDLIST Keywords_CSharp = {
 "abstract as base break case catch checked class const continue default delegate do else enum event explicit "

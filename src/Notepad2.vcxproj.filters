@@ -288,7 +288,7 @@
     <ClCompile Include="EditLexers\stlBatch.c">
       <Filter>Source Files\EditLexers</Filter>
     </ClCompile>
-    <ClCompile Include="EditLexers\stlCLI.c">
+    <ClCompile Include="EditLexers\stlCIL.c">
       <Filter>Source Files\EditLexers</Filter>
     </ClCompile>
     <ClCompile Include="EditLexers\stlCMake.c">
@@ -432,7 +432,7 @@
     <ClCompile Include="..\scintilla\lexers\LexVim.cxx">
       <Filter>Scintilla\lexers</Filter>
     </ClCompile>
-    <ClCompile Include="..\scintilla\lexers\LexCLI.cxx">
+    <ClCompile Include="..\scintilla\lexers\LexCIL.cxx">
       <Filter>Scintilla\lexers</Filter>
     </ClCompile>
     <ClCompile Include="EditLexers\stlVim.c">

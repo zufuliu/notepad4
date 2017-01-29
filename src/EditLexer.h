@@ -53,7 +53,7 @@ typedef struct _editlexer {
 //#define NP2LEX_IDL		63006	// SCLEX_CPP		Interface Definition Language
 #define NP2LEX_D		63007	// SCLEX_CPP		D
 #define NP2LEX_ASY		63008	// SCLEX_CPP		Asymptote
-#define NP2LEX_CLI		63009	// SCLEX_CPP		CLI
+#define NP2LEX_CIL		63009	// SCLEX_CIL		CIL
 //#define NP2LEX_OBJC		63010	// SCLEX_CPP		Objective C/C++
 #define NP2LEX_AS		63011	// SCLEX_CPP		ActionScript
 #define NP2LEX_HAXE		63012	// SCLEX_CPP		haXe

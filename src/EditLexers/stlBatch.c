@@ -1,11 +1,14 @@
 #include "EditLexer.h"
 #include "EditStyle.h"
 
+// https://en.wikibooks.org/wiki/Windows_Batch_Scripting
+
 static KEYWORDLIST Keywords_Batch = {
 "defined do not else for goto if in "
 "assoc break call cd chdir cls color copy date del dir echo echo. endlocal erase exist exit ftype md mkdir move path pause popd prompt pushd rd rem ren rename rmdir set setlocal shift sort start time title tree type ver verify vol "
 "errorlevel nul disableextensions enableextensions enabledelayedexpansion "
 //"change com con country ctty equ forfiles geq gtr icacls kill leq loadhigh lpt lss mklink msiexe neq robocopy sclist timeout "
+"mdlink "
 , ""// system cmd
 /* // com
 "chcp diskcomp diskcopy format graftabl help loadfix mode more tree "

@@ -1,6 +1,8 @@
 #include "EditLexer.h"
 #include "EditStyle.h"
 
+// https://www.gnu.org/software/bash/manual/
+
 static KEYWORDLIST Keywords_Bash = {
 // build-in
 "alias true false yes no if then fi elif else end endif for foreach function functions in return "

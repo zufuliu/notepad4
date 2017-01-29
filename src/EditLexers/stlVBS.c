@@ -1,7 +1,8 @@
 #include "EditLexer.h"
 #include "EditStyle.h"
-//http://msdn.microsoft.com/library/d1wf56tt.aspx
-//http://msdn.microsoft.com/en-us/library/ydz4cfk3.aspx
+
+// http://msdn.microsoft.com/library/d1wf56tt.aspx
+// http://msdn.microsoft.com/en-us/library/ydz4cfk3.aspx
 
 static KEYWORDLIST Keywords_VBS = {
 "Alias And As Attribute Array Begin ByRef ByVal Call Case Class Compare Const Continue "

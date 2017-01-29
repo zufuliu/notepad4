@@ -517,7 +517,7 @@
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\scintilla\lexers\LexCLI.cxx" />
+    <ClCompile Include="..\scintilla\lexers\LexCIL.cxx" />
     <ClCompile Include="..\scintilla\lexers\LexGraphViz.cxx" />
     <ClCompile Include="..\scintilla\lexers\LexLisp.cxx" />
     <ClCompile Include="..\scintilla\lexers\LexLLVM.cxx" />
@@ -617,7 +617,7 @@
     <ClCompile Include="EditLexers\stlAwk.c" />
     <ClCompile Include="EditLexers\stlBash.c" />
     <ClCompile Include="EditLexers\stlBatch.c" />
-    <ClCompile Include="EditLexers\stlCLI.c" />
+    <ClCompile Include="EditLexers\stlCIL.c" />
     <ClCompile Include="EditLexers\stlCMake.c" />
     <ClCompile Include="EditLexers\stlCPP.c" />
     <ClCompile Include="EditLexers\stlCSharp.c" />

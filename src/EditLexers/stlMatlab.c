@@ -1,6 +1,11 @@
 #include "EditLexer.h"
 #include "EditStyle.h"
 
+// http://www.mathworks.com/
+// https://www.gnu.org/software/octave/
+// http://www.scilab.org/
+// http://gnuplot.info/
+
 static KEYWORDLIST Keywords_Matlab = {
 "break case catch classdef continue else elseif end for function global if otherwise parfor persistent return spmd switch try while "
 "double single char logical int8 uint8 int16 uin16 int32 uint32 int64 uint64 cell struct function_handle "

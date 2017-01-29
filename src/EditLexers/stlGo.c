@@ -1,6 +1,9 @@
 #include "EditLexer.h"
 #include "EditStyle.h"
 
+// https://en.wikipedia.org/wiki/Go_(programming_language)
+// https://golang.org/
+
 static KEYWORDLIST Keywords_Go = {
 "break case chan const continue default defer else fallthrough for func go goto "
 "if import interface map package range return select struct switch type var "

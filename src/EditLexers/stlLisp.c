@@ -1,6 +1,9 @@
 #include "EditLexer.h"
 #include "EditStyle.h"
 
+// https://en.wikipedia.org/wiki/Common_Lisp
+// https://common-lisp.net/
+
 static KEYWORDLIST Keywords_LISP= {
 "nil car cdr list "
 "cond defun defvar defmacro let setq setf and or not equal if while lambda loop when "

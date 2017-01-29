@@ -1,7 +1,10 @@
 #include "EditLexer.h"
 #include "EditStyle.h"
 
-static KEYWORDLIST Keywords_CLI = {
+// https://en.wikipedia.org/wiki/Common_Intermediate_Language
+// http://www.ecma-international.org/publications/standards/Ecma-335.htm
+
+static KEYWORDLIST Keywords_CIL = {
 "THE_END abstract algorithm alignment as assembly assert at beforefieldinit catch cdecl "
 "cil class const default demand deny endfault "
 "endfinally endmac enum explicit extends extern false famandassem family famorassem "
@@ -72,7 +75,7 @@ static KEYWORDLIST Keywords_CLI = {
 #endif
 };
 
-EDITLEXER lexCLI = { SCLEX_CLI, NP2LEX_CLI, L".NET IL", L"il", L"", &Keywords_CLI,
+EDITLEXER lexCIL = { SCLEX_CIL, NP2LEX_CIL, L".NET IL", L"il", L"", &Keywords_CIL,
 {
 	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
 	//{ SCE_C_DEFAULT, L"Default", L"", L"" },

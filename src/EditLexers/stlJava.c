@@ -1,6 +1,8 @@
 #include "EditLexer.h"
 #include "EditStyle.h"
 
+// https://docs.oracle.com/javase/specs/
+
 static KEYWORDLIST Keywords_Java = {
 "@interface abstract assert break case catch class const continue default do else "
 "enum extends final finally for goto if implements import instanceof interface "

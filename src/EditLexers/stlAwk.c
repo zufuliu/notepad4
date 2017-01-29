@@ -1,6 +1,9 @@
 #include "EditLexer.h"
 #include "EditStyle.h"
 
+// https://en.wikipedia.org/wiki/AWK
+// https://www.gnu.org/software/gawk/manual/gawk.html
+
 static KEYWORDLIST Keywords_Awk = {
 "break case continue do else exit function for if in next return switch while "
 "@include delete nextfile BEGIN END"

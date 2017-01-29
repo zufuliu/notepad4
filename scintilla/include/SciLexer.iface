@@ -125,7 +125,7 @@ val SCLEX_JSON=104
 val SCLEX_SMALI=105
 val SCLEX_GRAPHVIZ=106
 val SCLEX_VIM=107
-val SCLEX_CLI=108
+val SCLEX_CIL=108
 val SCLEX_LLVM=109
 
 # When a lexer specifies its language as SCLEX_AUTOMATIC it receives a

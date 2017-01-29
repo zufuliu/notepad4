@@ -215,7 +215,7 @@ void AutoC_AddKeyword(struct WordList *pWList, int iCurrentStyle)
 
 	switch (pLexCurrent->rid) {
 	case NP2LEX_CPP:
-	case NP2LEX_CLI:
+	case NP2LEX_CIL:
 		count = 11;
 		break;	// CPP
 	case NP2LEX_PHP:

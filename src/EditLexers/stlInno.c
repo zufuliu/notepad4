@@ -1,6 +1,8 @@
 #include "EditLexer.h"
 #include "EditStyle.h"
 
+// http://www.jrsoftware.org/isinfo.php
+
 static KEYWORDLIST Keywords_INNO = {
 "code components custommessages dirs files icons ini installdelete langoptions languages messages "
 "registry run setup types tasks uninstalldelete uninstallrun _istool",

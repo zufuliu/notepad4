@@ -1,6 +1,8 @@
 #include "EditLexer.h"
 #include "EditStyle.h"
 
+// http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/index.html
+
 static KEYWORDLIST Keywords_AS = {
 "as break case catch class const continue default delete do dynamic each else extends "
 "final finally for function get if implements import include interface internal "

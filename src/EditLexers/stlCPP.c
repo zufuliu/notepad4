@@ -1,6 +1,8 @@
 #include "EditLexer.h"
 #include "EditStyle.h"
 
+// https://developer.apple.com/library/content/documentation/Cocoa/Conceptual/ProgrammingWithObjectiveC/Introduction/Introduction.html
+
 static KEYWORDLIST Keywords_CPP = {
 "break case const continue default do else enum extern for "
 "goto if inline register restrict return sizeof static struct "

@@ -1,6 +1,8 @@
 #include "EditLexer.h"
 #include "EditStyle.h"
 
+// http://www.latex-project.org/
+
 static KEYWORDLIST Keywords_TEX = {
 "", "", "", "", "", "", "", "", ""
 
@@ -30,6 +32,8 @@ EDITLEXER lexLaTeX = { SCLEX_LATEX, NP2LEX_LATEX, L"LaTeX File", L"tex; latex; s
 }
 };
 
+
+// https://www.gnu.org/software/texinfo/
 
 static KEYWORDLIST Keywords_TEXI = {
 // cmd

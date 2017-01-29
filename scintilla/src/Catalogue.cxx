@@ -182,7 +182,7 @@ int Scintilla_LinkLexers() {
 	LINK_LEXER(lmSmali);
 	LINK_LEXER(lmGraphViz);
 	LINK_LEXER(lmVim);
-	LINK_LEXER(lmCLI);
+	LINK_LEXER(lmCIL);
 	LINK_LEXER(lmLLVM);
 	//LINK_LEXER(lmYAML);
 

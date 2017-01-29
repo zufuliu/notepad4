@@ -1,6 +1,9 @@
 #include "EditLexer.h"
 #include "EditStyle.h"
 
+// https://en.wikipedia.org/wiki/PowerShell
+// https://msdn.microsoft.com/en-us/powershell/mt173057.aspx
+
 static KEYWORDLIST Keywords_PS1 = {
 "begin break catch continue data do dynamicparam else elseif end exit filter finally for foreach "
 "from function if in local param private process return switch throw trap try until where while",

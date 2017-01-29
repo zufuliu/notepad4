@@ -1,6 +1,8 @@
 #include "EditLexer.h"
 #include "EditStyle.h"
 
+// http://dlang.org/
+
 static KEYWORDLIST Keywords_D = {
 "alias align asm assert body break case cast catch continue debug default delete "
 "do else export false finally for foreach foreach_reverse goto if import invariant "

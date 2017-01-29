@@ -1,6 +1,8 @@
 #include "EditLexer.h"
 #include "EditStyle.h"
 
+// https://www.perl.org/
+
 static KEYWORDLIST Keywords_Perl = {
 "__DATA__ __END__ __FILE__ __LINE__ __PACKAGE__ abs accept alarm and atan2 AUTOLOAD BEGIN "
 "bind binmode bless break caller chdir CHECK chmod chomp chop chown chr chroot close closedir cmp "

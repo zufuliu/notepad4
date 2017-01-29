@@ -1,8 +1,9 @@
 #include "EditLexer.h"
 #include "EditStyle.h"
-//http://msdn.microsoft.com/en-us/library/sh9ywfdk.aspx
-//http://msdn.microsoft.com/en-us/library/dd409611.aspx
-//http://msdn.microsoft.com/en-us/library/c157t28f.aspx
+
+// http://msdn.microsoft.com/en-us/library/sh9ywfdk.aspx
+// http://msdn.microsoft.com/en-us/library/dd409611.aspx
+// http://msdn.microsoft.com/en-us/library/c157t28f.aspx
 
 static KEYWORDLIST Keywords_VB = {
 "AddHandler AddressOf Alias And AndAlso As ByRef ByVal Call Case Catch Class Const Continue "

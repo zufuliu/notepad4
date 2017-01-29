@@ -1,6 +1,8 @@
 #include "EditLexer.h"
 #include "EditStyle.h"
 
+// http://www.tcl.tk/about/language.html
+
 static KEYWORDLIST Keywords_Tcl = {
 // TCL Keywords
 "after append array auto_execok auto_import auto_load auto_load_index auto_qualify beep "

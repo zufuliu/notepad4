@@ -1,6 +1,8 @@
 #include "EditLexer.h"
 #include "EditStyle.h"
 
+// https://www.autoitscript.com/site/autoit/
+
 static KEYWORDLIST Keywords_AU3 = {
 "and byref case const continuecase continueloop default dim do else elseif endfunc endif "
 "endselect endswitch endwith enum exit exitloop false for func global if in local next not "

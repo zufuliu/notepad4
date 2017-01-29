@@ -1,6 +1,9 @@
 #include "EditLexer.h"
 #include "EditStyle.h"
 
+// https://en.wikipedia.org/wiki/Cascading_Style_Sheets
+// https://www.w3.org/Style/CSS/
+
 static KEYWORDLIST Keywords_CSS = {
 "^-moz- ^-ms- ^-o- ^-webkit- alignment-adjust alignment-baseline animation animation-delay "
 "animation-direction animation-duration animation-iteration-count animation-name "

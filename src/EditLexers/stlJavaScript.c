@@ -93,7 +93,7 @@ static KEYWORDLIST Keywords_JS = {
 #endif
 };
 
-EDITLEXER lexJS = { SCLEX_CPP, NP2LEX_JS, L"JavaScript", L"js; jse; jsm; json", L"", &Keywords_JS,
+EDITLEXER lexJS = { SCLEX_CPP, NP2LEX_JS, L"JavaScript", L"js; jse; jsm", L"", &Keywords_JS,
 {
 	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
 	//{ SCE_C_DEFAULT, L"Default", L"", L"" },

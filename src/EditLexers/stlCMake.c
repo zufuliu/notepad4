@@ -1,6 +1,8 @@
 #include "EditLexer.h"
 #include "EditStyle.h"
 
+// https://cmake.org/documentation/
+
 static KEYWORDLIST Keywords_CMake = {
 "break else elseif return "
 "foreach function if macro while endforeach endfunction endif endmacro endwhile"

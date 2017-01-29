@@ -1,6 +1,8 @@
 #include "EditLexer.h"
 #include "EditStyle.h"
 
+// https://gradle.org/
+
 static KEYWORDLIST Keywords_Gradle = {
 "as assert break case catch class continue const def default do else enum extends "
 "finally for goto if in implements import instanceof interface native new package "

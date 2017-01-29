@@ -1,6 +1,8 @@
 #include "EditLexer.h"
 #include "EditStyle.h"
 
+// http://haxe.org/
+
 static KEYWORDLIST Keywords_HaXe = {
 "break callback case cast catch class continue default do dynamic else enum "
 "extends extern false for function here if implements import in inline interface "

@@ -1,6 +1,9 @@
 #include "EditLexer.h"
 #include "EditStyle.h"
 
+// https://msdn.microsoft.com/en-us/library/afzk3475.aspx
+// https://sourceware.org/binutils/docs/as/
+
 static KEYWORDLIST Keywords_ASM = {
 /**************** Instruction *********************/
 "aaa aad aam aas adc add and arpl bound bsf bsr bswap bt btc btr bts call cbw cwde "

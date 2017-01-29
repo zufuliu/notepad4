@@ -1,6 +1,8 @@
 #include "EditLexer.h"
 #include "EditStyle.h"
 
+// http://www.ruby-lang.org/en/
+
 static KEYWORDLIST Keywords_Ruby = {
 "__FILE__ __LINE__ __END__ BEGIN END "
 "alias and begin break case class def defined? do else elsif end ensure false for if in module next nil "

@@ -1,6 +1,8 @@
 #include "EditLexer.h"
 #include "EditStyle.h"
 
+// https://en.wikibooks.org/wiki/Windows_Programming/Resource_Script_Reference
+
 static KEYWORDLIST Keywords_RC = {
 "defined "
 // Resources:

@@ -74,7 +74,7 @@ extern EDITLEXER lexFSharp;
 extern EDITLEXER lexPascal;
 
 extern EDITLEXER lexSmali;
-extern EDITLEXER lexCLI;
+extern EDITLEXER lexCIL;
 extern EDITLEXER lexLLVM;
 extern EDITLEXER lexASM;
 extern EDITLEXER lexVHDL;
@@ -144,7 +144,7 @@ PEDITLEXER pLexArray[NUMLEXERS] = {
 	&lexPascal,
 
 	&lexSmali,
-	&lexCLI,
+	&lexCIL,
 	&lexLLVM,
 	&lexASM,
 	&lexVHDL,

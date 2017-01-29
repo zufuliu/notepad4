@@ -1,6 +1,10 @@
 #include "EditLexer.h"
 #include "EditStyle.h"
 
+// https://msdn.microsoft.com/en-us/library/dd9y37ha.aspx
+// https://www.gnu.org/software/make/
+// http://doc.qt.io/qt-5/qmake-manual.html
+
 static KEYWORDLIST Keywords_MAK = {
 // gmake
 "define endef undefine ifdef ifndef ifeq ifneq else endif include -include sinclude override export unexport private vpath load "

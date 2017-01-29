@@ -1,4 +1,4 @@
-// Lexer for MSIL, CLI
+// Lexer for MSIL, CIL
 
 #include <string.h>
 #include <assert.h>
@@ -18,16 +18,16 @@
 using namespace Scintilla;
 #endif
 
-static inline bool IsCLIOp(int ch) {
+static inline bool IsCILOp(int ch) {
 	return ch == '{' || ch == '}' || ch == '[' || ch == ']' || ch == '(' || ch == ')' || ch == '=' || ch == '&'
 		|| ch == ':' || ch == ',' || ch == '+' || ch == '-' || ch == '.';
 }
-static inline bool IsCLIWordChar(int ch) {
+static inline bool IsCILWordChar(int ch) {
 	return iswordchar(ch) || ch == '-' || ch == '/' || ch == '$';
 }
 
 #define MAX_WORD_LENGTH	31
-static void ColouriseCLIDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, WordList *keywordLists[], Accessor &styler) {
+static void ColouriseCILDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, WordList *keywordLists[], Accessor &styler) {
 	WordList &keywords = *keywordLists[0];
 	WordList &keywords2	= *keywordLists[1];
 	WordList &kwInstruction = *keywordLists[10];
@@ -68,7 +68,7 @@ static void ColouriseCLIDoc(Sci_PositionU startPos, Sci_Position length, int ini
 			break;
 		case SCE_C_DIRECTIVE:
 		case SCE_C_ASM_INSTRUCTION:
-			if (!IsCLIWordChar(ch)) {
+			if (!IsCILWordChar(ch)) {
 				styler.ColourTo(i - 1, state);
 				state = SCE_L_DEFAULT;
 			}
@@ -143,14 +143,14 @@ static void ColouriseCLIDoc(Sci_PositionU startPos, Sci_Position length, int ini
 			} else if (IsADigit(ch) || (ch == '.' && IsADigit(chNext))) {
 				styler.ColourTo(i - 1, state);
 				state = SCE_C_NUMBER;
-			} else if (ch == '.' && IsAlpha(chNext) && (IsCLIOp(chPrev) || IsASpace(chPrev))) {
+			} else if (ch == '.' && IsAlpha(chNext) && (IsCILOp(chPrev) || IsASpace(chPrev))) {
 				styler.ColourTo(i - 1, state);
 				state = SCE_C_DIRECTIVE;
 			} else if (iswordstart(ch)) {
 				styler.ColourTo(i - 1, state);
 				state = SCE_C_IDENTIFIER;
 				buf[wordLen++] = (char)ch;
-			} else if (IsCLIOp(ch)) {
+			} else if (IsCILOp(ch)) {
 				styler.ColourTo(i - 1, state);
 				state = SCE_C_OPERATOR;
 			}
@@ -163,7 +163,7 @@ static void ColouriseCLIDoc(Sci_PositionU startPos, Sci_Position length, int ini
 
 #define IsCommentLine(line)			IsLexCommentLine(line, styler, SCE_C_COMMENTLINE)
 #define IsStreamCommentStyle(style)	(style == SCE_C_COMMENT)
-static void FoldCLIDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, WordList *[], Accessor &styler) {
+static void FoldCILDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, WordList *[], Accessor &styler) {
 	if (styler.GetPropertyInt("fold") == 0)
 		return;
 	const bool foldComment = styler.GetPropertyInt("fold.comment") != 0;
@@ -231,4 +231,4 @@ static void FoldCLIDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 	}
 }
 
-LexerModule lmCLI(SCLEX_CLI, ColouriseCLIDoc, "cli", FoldCLIDoc);
+LexerModule lmCIL(SCLEX_CIL, ColouriseCILDoc, "cli", FoldCILDoc);

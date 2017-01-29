@@ -1,6 +1,12 @@
 #include "EditLexer.h"
 #include "EditStyle.h"
 
+// https://www.python.org/
+// http://ironpython.net/
+// http://cobra-language.com/
+// http://boo-lang.org/
+// http://www.jython.org/
+
 static KEYWORDLIST Keywords_Python = {
 "async await " // python 3.7
 "and as assert break class continue def del elif else except finally for from "
