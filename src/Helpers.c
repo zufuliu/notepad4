@@ -31,7 +31,7 @@
 #include <stdio.h>
 #include "Scintilla.h"
 #include "Helpers.h"
-#include "Resource.h"
+#include "resource.h"
 
 #pragma warning(push)
 #pragma warning(disable: 4100 4244 4706)

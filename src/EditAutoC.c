@@ -11,7 +11,7 @@
 #include "Styles.h"
 #include "Helpers.h"
 #include "SciCall.h"
-#include "Resource.h"
+#include "resource.h"
 
 __forceinline BOOL IsASpace(int ch) {
     return (ch == ' ') || ((ch >= 0x09) && (ch <= 0x0d));

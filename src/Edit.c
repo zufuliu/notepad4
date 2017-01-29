@@ -31,7 +31,7 @@
 #include "Dialogs.h"
 #include "Helpers.h"
 #include "SciCall.h"
-#include "Resource.h"
+#include "resource.h"
 
 #pragma warning(push)
 #pragma warning(disable: 4100 4204 4305 4701 4706)

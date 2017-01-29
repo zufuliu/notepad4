@@ -30,7 +30,7 @@ extern "C" {
 #include "Dialogs.h"
 #include "Helpers.h"
 }
-#include "Resource.h"
+#include "resource.h"
 
 #pragma warning(push)
 #pragma warning(disable: 4706)

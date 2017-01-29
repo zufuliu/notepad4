@@ -32,7 +32,7 @@
 #include "Dlapi.h"
 #include "Dialogs.h"
 #include "Helpers.h"
-#include "Resource.h"
+#include "resource.h"
 #include "Version.h"
 
 #pragma warning(push)
