@@ -690,6 +690,7 @@ BOOL IsIndentKeywordStyle(int style) {
 	//	return style == SCE_C_PREPROCESSOR;
 	//case SCLEX_VB:
 	//case SCLEX_VBSCRIPT:
+	//	return SCE_B_KEYWORD;
 	case SCLEX_RUBY:
 		return style == SCE_RB_WORD;
 	case SCLEX_MATLAB:
@@ -703,9 +704,12 @@ BOOL IsIndentKeywordStyle(int style) {
 	case SCLEX_CMAKE:
 		return style == SCE_CMAKE_WORD;
 	//case SCLEX_VHDL:
+	//	return SCE_VHDL_KEYWORD;
 	//case SCLEX_VERILOG:
+	//	return SCE_V_WORD;
 	//case SCLEX_PASCAL:
 	//case SCLEX_INNOSETUP:
+	//	return SCE_INNO_KEYWORD_PASCAL;
 	//case SCLEX_NSIS:
 	//case SCLEX_AU3:
 	//case SCLEX_SQL:
@@ -764,7 +768,7 @@ const char* EditKeywordIndent(const char* head, int *indent) {
 			endPart = "endif";
 		} else if (!strcmp(word, "define")) {
 			*indent = 2;
-			endPart = "endef"
+			endPart = "endef";
 		} else if (!strcmp(word, "for")) {
 			*indent = 2;
 			endPart = "endfor";
