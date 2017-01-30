@@ -51,13 +51,17 @@ static void ColouriseCmakeDoc(Sci_PositionU startPos, Sci_Position length, int i
 _label_identifier:
 			if (!iswordstart(sc.ch)) {
 				char s[128];
-				sc.GetCurrentLowered(s, sizeof(s));
+				sc.GetCurrentLowered(s, sizeof(s) - 3);
 				if (LexGetNextChar(sc.currentPos, styler) == '(') {
+					size_t len = strlen(s);
+					s[len++] = '(';
+					s[len++] = ')';
+					s[len++] = '\0';
 					if (keywords.InList(s)) {
 						sc.ChangeState(SCE_CMAKE_WORD);
-						if (strcmp(s, "function") == 0 || strcmp(s, "endfunction") == 0)
+						if (strcmp(s, "function()") == 0 || strcmp(s, "endfunction()") == 0)
 							userDefType = 1;
-						else if (strcmp(s, "macro") == 0 || strcmp(s, "endmacro") == 0)
+						else if (strcmp(s, "macro()") == 0 || strcmp(s, "endmacro()") == 0)
 							userDefType = 2;
 					} else if (keywords2.InList(s)) {
 						sc.ChangeState(SCE_CMAKE_COMMANDS);
@@ -119,6 +123,8 @@ _label_var_string:
 				sc.SetState(SCE_CMAKE_COMMENT);
 			} else if (sc.ch == '/' && sc.chNext == '/') { // CMakeCache.txt
 				sc.SetState(SCE_CMAKE_COMMENT);
+			} else if (sc.ch == '\\' && (sc.chNext == '\"' || sc.chNext == '\'')) {
+				sc.Forward();
 			} else if (sc.ch == '\"') {
 				sc.SetState(SCE_CMAKE_STRINGDQ);
 			} else if (sc.ch == '\'') {

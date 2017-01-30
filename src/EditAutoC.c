@@ -690,20 +690,23 @@ BOOL IsIndentKeywordStyle(int style) {
 		return style == SCE_MAT_KEYWORD;
 	case SCLEX_LUA:
 		return style == SCE_LUA_WORD;
+	case SCLEX_CMAKE:
+		return style == SCE_CMAKE_WORD;
 	}
 	return FALSE;
 }
-char* EditKeywordIndent(const char* head, int *indent) {
+
+const char* EditKeywordIndent(const char* head, int *indent) {
 	char word[64] = "";
 	int length = 0;
-	char *endPart = NULL;
+	const char *endPart = NULL;
 	*indent = 0;
 	word[length++] = *head++;
 	while (*head && length < 63 && IsAAlpha(*head)) {
 		word[length++] = *head++;
 	}
 	switch (pLexCurrent->iLexer) {
-	case SCLEX_CPP:
+	//case SCLEX_CPP:
 	//case SCLEX_VB:
 	//case SCLEX_VBSCRIPT:
 	case SCLEX_RUBY:
@@ -723,7 +726,24 @@ char* EditKeywordIndent(const char* head, int *indent) {
 		}
 		break;
 	//case SCLEX_BASH:
-	//case SCLEX_CMAKE:
+	case SCLEX_CMAKE:
+		if (!strcmp(word, "function")) {
+			*indent = 2;
+			endPart = "endfunction()";
+		} else if (!strcmp(word, "macro")) {
+			*indent = 2;
+			endPart = "endmacro()";
+		} else if (!strcmp(word, "if")) {
+			*indent = 2;
+			endPart = "endif()";
+		} else if (!strcmp(word, "foreach")) {
+			*indent = 2;
+			endPart = "endforeach()";
+		} else if (!strcmp(word, "while")) {
+			*indent = 2;
+			endPart = "endwhile()";
+		}
+		break;
 	//case SCLEX_VHDL:
 	//case SCLEX_VERILOG:
 	//case SCLEX_PASCAL:
@@ -775,7 +795,7 @@ void EditAutoIndent(HWND hwnd)
 			int	iIndentLen = 0;
 			int iIndentPos = iCurPos;
 			int ch;
-			char *endPart = NULL;
+			const char *endPart = NULL;
 			int commentStyle = 0;
 			SciCall_GetLine(iCurLine - 1, pLineBuf);
 			pLineBuf[iPrevLineLength] = '\0';
