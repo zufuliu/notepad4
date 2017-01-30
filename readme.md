@@ -8,7 +8,7 @@
 * Support for bookmarks
 * Option to mark all occurrences of a word
 * Word auto-completion (include keywords and preprocessor)
-* Auto indent
+* Auto indentation
 * Auto completion for braces, brackets, quotes
 * Syntax highlighting and auto-completion support for:
 	* Plain Text

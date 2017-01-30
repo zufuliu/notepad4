@@ -686,12 +686,29 @@ void EditAutoCloseXMLTag(HWND hwnd)
 
 BOOL IsIndentKeywordStyle(int style) {
 	switch (pLexCurrent->iLexer) {
+	//case SCLEX_CPP:
+	//	return style == SCE_C_PREPROCESSOR;
+	//case SCLEX_VB:
+	//case SCLEX_VBSCRIPT:
+	case SCLEX_RUBY:
+		return style == SCE_RB_WORD;
 	case SCLEX_MATLAB:
 		return style == SCE_MAT_KEYWORD;
 	case SCLEX_LUA:
 		return style == SCE_LUA_WORD;
+	case SCLEX_MAKEFILE:
+		return style == SCE_MAKE_PREPROCESSOR;
+	case SCLEX_BASH:
+		return style == SCE_BAT_WORD;
 	case SCLEX_CMAKE:
 		return style == SCE_CMAKE_WORD;
+	//case SCLEX_VHDL:
+	//case SCLEX_VERILOG:
+	//case SCLEX_PASCAL:
+	//case SCLEX_INNOSETUP:
+	//case SCLEX_NSIS:
+	//case SCLEX_AU3:
+	//case SCLEX_SQL:
 	}
 	return FALSE;
 }
@@ -710,6 +727,10 @@ const char* EditKeywordIndent(const char* head, int *indent) {
 	//case SCLEX_VB:
 	//case SCLEX_VBSCRIPT:
 	case SCLEX_RUBY:
+		if (!strcmp(word, "if") || !strcmp(word, "do") || !strcmp(word, "while") || !strcmp(word, "for")) {
+			*indent = 2;
+			endPart = "end";
+		}
 		break;
 	case SCLEX_MATLAB:
 		if (!strcmp(word, "function")) {
@@ -725,7 +746,30 @@ const char* EditKeywordIndent(const char* head, int *indent) {
 			endPart = "end";
 		}
 		break;
-	//case SCLEX_BASH:
+	case SCLEX_BASH:
+		if (!strcmp(word, "if")) {
+			*indent = 2;
+			endPart = "fi";
+		} else if (!strcmp(word, "case")) {
+			*indent = 2;
+			endPart = "esac";
+		} else if (!strcmp(word, "do")) {
+			*indent = 2;
+			endPart = "done";
+		}
+		break;
+	case SCLEX_MAKEFILE:
+		if (!strcmp(word, "if")) {
+			*indent = 2;
+			endPart = "endif";
+		} else if (!strcmp(word, "define")) {
+			*indent = 2;
+			endPart = "endef"
+		} else if (!strcmp(word, "for")) {
+			*indent = 2;
+			endPart = "endfor";
+		}
+		break;
 	case SCLEX_CMAKE:
 		if (!strcmp(word, "function")) {
 			*indent = 2;
@@ -749,6 +793,8 @@ const char* EditKeywordIndent(const char* head, int *indent) {
 	//case SCLEX_PASCAL:
 	//case SCLEX_INNOSETUP:
 	//case SCLEX_NSIS:
+	//case SCLEX_AU3:
+	//case SCLEX_SQL:
 	}
 	return endPart;
 }
