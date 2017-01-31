@@ -137,9 +137,9 @@ _label_identifier:
 					sc.ChangeState(SCE_MAT_ATTRIBUTE);
 				} else if (commands.InList(s)) {
 					sc.ChangeState(SCE_MAT_INTERNALCOMMAND);
-				} else if (function1.InList(s)) {
+				} else if (function1.InListAbbreviated(s, '(')) {
 					sc.ChangeState(SCE_MAT_FUNCTION1);
-				} else if (function2.InList(s)) {
+				} else if (function2.InListAbbreviated(s, '(')) {
 					sc.ChangeState(SCE_MAT_FUNCTION2);
 				} else if (LexGetNextChar(sc.currentPos, styler) == '(') {
 					sc.ChangeState(SCE_MAT_FUNCTION);

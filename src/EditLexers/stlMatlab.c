@@ -20,8 +20,8 @@ static KEYWORDLIST Keywords_Matlab = {
 "clc clear delete demo exit load open pause quit save test testif tic toc which who whos "
 "axis box cla clf close grid hold pan shg zoom "
 ,/********************* Basic Function ********************/
-"assert deal disp display error eval evalc evalin fail feval find get input length warning message set size find full sparse "
-"isa iscell iscellstr ischar iscolumn iscom isdir isempty isequal isfield isfloat isfinite isglobal ishandle ishold isindex isinf isinterface isinteger isjava islogical ismatrix ismethod ismember isnan isnumeric isobject isprop isreal isrow isscalar issparse issquare isstr isstruct isvalid isvector ",
+"assert() deal() disp() display() error() eval() evalc() evalin() fail() feval() find() get() input() length() warning() message() set() size() find() full() sparse() "
+"isa() iscell() iscellstr() ischar() iscolumn() iscom() isdir() isempty() isequal() isfield() isfloat() isfinite() isglobal() ishandle() ishold() isindex() isinf() isinterface() isinteger() isjava() islogical() ismatrix() ismethod() ismember() isnan() isnumeric() isobject() isprop() isreal() isrow() isscalar() issparse() issquare() isstr() isstruct() isvalid() isvector() ",
 "axes figure uicontrol uimenu ",
  "", "", "", ""
 

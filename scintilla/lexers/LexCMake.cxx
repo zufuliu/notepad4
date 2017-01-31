@@ -52,22 +52,16 @@ _label_identifier:
 			if (!iswordstart(sc.ch)) {
 				char s[128];
 				sc.GetCurrentLowered(s, sizeof(s) - 3);
-				if (LexGetNextChar(sc.currentPos, styler) == '(') {
-					size_t len = strlen(s);
-					s[len++] = '(';
-					s[len++] = ')';
-					s[len++] = '\0';
-					if (keywords.InList(s)) {
-						sc.ChangeState(SCE_CMAKE_WORD);
-						if (strcmp(s, "function()") == 0 || strcmp(s, "endfunction()") == 0)
-							userDefType = 1;
-						else if (strcmp(s, "macro()") == 0 || strcmp(s, "endmacro()") == 0)
-							userDefType = 2;
-					} else if (keywords2.InList(s)) {
-						sc.ChangeState(SCE_CMAKE_COMMANDS);
-					} else {
-						sc.ChangeState(SCE_CMAKE_FUNCATION);
-					}
+				if (keywords.InListAbbreviated(s, '(')) {
+					sc.ChangeState(SCE_CMAKE_WORD);
+					if (strcmp(s, "function()") == 0 || strcmp(s, "endfunction()") == 0)
+						userDefType = 1;
+					else if (strcmp(s, "macro()") == 0 || strcmp(s, "endmacro()") == 0)
+						userDefType = 2;
+				} else if (keywords2.InListAbbreviated(s, '(')) {
+					sc.ChangeState(SCE_CMAKE_COMMANDS);
+				} else if (LexGetNextChar(sc.currentPos, styler) == '(') {
+					sc.ChangeState(SCE_CMAKE_FUNCATION);
 				} else if (userDefType) {
 					userDefType = 0;
 					sc.ChangeState(userDefType == 1 ? SCE_CMAKE_FUNCATION : SCE_CMAKE_MACRO);
