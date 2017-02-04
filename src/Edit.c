@@ -1879,7 +1879,7 @@ void EditTabsToSpaces(HWND hwnd, int nTabWidth, BOOL bOnlyIndentingWS)
 	SendMessage(hwnd, SCI_GETTEXTRANGE, 0, (LPARAM)&tr);
 
 	cpEdit = (UINT)SendMessage(hwnd, SCI_GETCODEPAGE, 0, 0);
-	cchTextW = MultiByteToWideChar(cpEdit, 0, pszText, iSelCount, pszTextW,
+	cchTextW = MultiByteToWideChar(cpEdit, 0, pszText, iSelCount - 1, pszTextW,
 									(int)GlobalSize(pszTextW) / sizeof(WCHAR));
 	GlobalFree(pszText);
 
@@ -2013,7 +2013,7 @@ void EditSpacesToTabs(HWND hwnd, int nTabWidth, BOOL bOnlyIndentingWS)
 
 	cpEdit = (UINT)SendMessage(hwnd, SCI_GETCODEPAGE, 0, 0);
 
-	cchTextW = MultiByteToWideChar(cpEdit, 0, pszText, iSelCount, pszTextW,
+	cchTextW = MultiByteToWideChar(cpEdit, 0, pszText, iSelCount - 1, pszTextW,
 									(int)GlobalSize(pszTextW) / sizeof(WCHAR));
 	GlobalFree(pszText);
 

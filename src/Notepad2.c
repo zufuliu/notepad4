@@ -6591,7 +6591,7 @@ void UpdateStatusbar()
 	iSelStart = (int)SendMessage(hwndEdit, SCI_GETSELECTIONSTART, 0, 0);
 	iSelEnd = (int)SendMessage(hwndEdit, SCI_GETSELECTIONEND, 0, 0);
 	if (SC_SEL_RECTANGLE != SendMessage(hwndEdit, SCI_GETSELECTIONMODE, 0, 0)) {
-		int iSel = SendMessage(hwndEdit, SCI_GETSELTEXT, 0, 0);
+		int iSel = SendMessage(hwndEdit, SCI_GETSELTEXT, 0, 0) - 1;
 		wsprintf(tchSel, L"%i", iSel);
 		FormatNumberStr(tchSel);
 		iSel = (int)SendMessage(hwndEdit, SCI_COUNTCHARACTERS, iSelStart, iSelEnd);
