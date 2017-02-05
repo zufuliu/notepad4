@@ -1,7 +1,7 @@
 @ECHO OFF
 rem ******************************************************************************
 rem *
-rem * Notepad2-mod
+rem * Notepad2
 rem *
 rem * build_vs2015.bat
 rem *   Batch file used to build Notepad2 with MSVC2015
@@ -9,7 +9,7 @@ rem *
 rem * See License.txt for details about distribution and modification.
 rem *
 rem *                                     (c) XhmikosR 2010-2015
-rem *                                     https://github.com/XhmikosR/notepad2-mod
+rem *                                     https://github.com/XhmikosR/Notepad2
 rem *
 rem ******************************************************************************
 
@@ -122,15 +122,15 @@ IF /I "%CONFIG%" == "all" (CALL :SUBMSVC %BUILDTYPE% Debug x64 && CALL :SUBMSVC 
 
 
 :END
-TITLE Building Notepad2-mod with MSVC2015 - Finished!
+TITLE Building Notepad2 with MSVC2015 - Finished!
 ENDLOCAL
 EXIT /B
 
 
 :SUBMSVC
 ECHO.
-TITLE Building Notepad2-mod with MSVC2015 - %~1 "%~2|%~3"...
-"MSBuild.exe" /nologo Notepad2.sln /t:%~1 /p:Configuration=%~2;Platform=%~3^
+TITLE Building Notepad2 with MSVC2015 - %~1 "%~2|%~3"...
+"MSBuild.exe" /nologo Notepad2.sln /target:Notepad2;%~1 /property:Configuration=%~2;Platform=%~3^
  /consoleloggerparameters:Verbosity=minimal /maxcpucount /nodeReuse:true
 IF %ERRORLEVEL% NEQ 0 CALL :SUBMSG "ERROR" "Compilation failed!"
 EXIT /B

@@ -84,6 +84,58 @@ __inline BOOL IsWordStyleToIgnore(int style) {
 	return FALSE;
 }
 
+// https://en.wikipedia.org/wiki/Printf_format_string
+__inline BOOL IsStringFormatChar(int ch, int style) {
+	if (!IsAAlpha(ch)) {
+		return FALSE;
+	}
+	switch (pLexCurrent->iLexer) {
+	case SCLEX_CPP:
+		return style != SCE_C_OPERATOR;
+	case SCLEX_FSHARP:
+		return style != SCE_FSHARP_OPERATOR;
+	case SCLEX_LUA:
+		return style != SCE_LUA_OPERATOR;
+	case SCLEX_MATLAB:
+		return style != SCE_MAT_OPERATOR;
+	case SCLEX_PERL:
+		return style != SCE_PL_OPERATOR;
+	case SCLEX_PYTHON:
+		return style != SCE_PY_OPERATOR;
+	case SCLEX_RUBY:
+		return style != SCE_RB_OPERATOR;
+	case SCLEX_TCL:
+		return style != SCE_TCL_OPERATOR;
+	}
+	return FALSE;
+}
+
+#define make_switch_key(length, ch)	(((length) << 8) | (ch))
+
+__forceinline BOOL NeedSpaceAfterKeyword(const char *word, int length) {
+	switch (make_switch_key(length, word[0])) {
+	case make_switch_key(2, 'i'):
+		return word[1] == 'f';
+	case make_switch_key(3, 'f'):
+		return (word[1] == 'o' && word[2] == 'r');
+	case make_switch_key(3, 't'):
+		return (word[1] == 'r' && word[2] == 'y');
+	case make_switch_key(5, 'u'):
+		return memcmp(word, "using", 5) == 0;
+	case make_switch_key(5, 'w'):
+		return memcmp(word, "while", 5) == 0;
+	case make_switch_key(6, 'e'):
+		return memcmp(word, "elseif", 6) == 0;
+	case make_switch_key(6, 's'):
+		return memcmp(word, "switch", 6) == 0;
+	case make_switch_key(7, 'f'):
+		return memcmp(word, "foreach", 7) == 0;
+	case make_switch_key(12, 's'):
+		return memcmp(word, "synchronized", 12) == 0;
+	}
+	return FALSE;
+}
+
 void AutoC_AddDocWord(HWND hwnd, struct WordList *pWList, BOOL bIgnore)
 {
 	LPCSTR pRoot = pWList->pWordStart;
@@ -94,9 +146,9 @@ void AutoC_AddDocWord(HWND hwnd, struct WordList *pWList, BOOL bIgnore)
 	int iDocLen = (int)SendMessage(hwnd, SCI_GETLENGTH, 0, 0);
 	int findFlag = bIgnore? SCFIND_WORDSTART : (SCFIND_WORDSTART | SCFIND_MATCHCASE);
 	int iPosFind;
-	char wordBuf[NP2_AUTOC_MAX_WORD_LENGTH + 3 + 1];
 
 	ft.lpstrText = pRoot;
+	ft.chrg.cpMin = iRootLen;
 	ft.chrg.cpMax = iDocLen;
 	iPosFind = (int)SendMessage(hwnd, SCI_FINDTEXT, findFlag, (LPARAM)&ft);
 
@@ -128,7 +180,8 @@ void AutoC_AddDocWord(HWND hwnd, struct WordList *pWList, BOOL bIgnore)
 			wordLength += wordEnd;
 
 			if (wordLength >= iRootLen) {
-				char* pWord = wordBuf;
+				char* pWord = pWList->wordBuf;
+				bIgnore = TRUE;
 				tr.lpstrText = pWord;
 				tr.chrg.cpMin = iPosFind;
 				tr.chrg.cpMax = wordEnd;
@@ -138,21 +191,32 @@ void AutoC_AddDocWord(HWND hwnd, struct WordList *pWList, BOOL bIgnore)
 				SendMessage(hwnd, SCI_GETTEXTRANGE, 0, (LPARAM)&tr);
 
 				ch = SciCall_GetCharAt(iPosFind - 1);
-				// word after escape char
+				// word after escape char or format char
 				chPrev = SciCall_GetCharAt(iPosFind - 2);
 				if (chPrev != '\\' && ch == '\\' && IsEscapeChar(*pWord)) {
 					pWord++;
 					--wordLength;
+					bIgnore = FALSE;
+				} else if (ch == '%' && IsStringFormatChar(*pWord, SciCall_GetStyleAt(iPosFind - 1))) {
+					pWord++;
+					--wordLength;
+					bIgnore = FALSE;
 				}
 				//if (pLexCurrent->rid == NP2LEX_PHP && wordLength >= 2 && *pWord == '$' && *(pWord+1) == '$') {
 				//	pWord++;
 				//	--wordLength;
+				//	bIgnore = FALSE;
 				//}
 				while (wordLength > 0 && (pWord[wordLength - 1] == '-' || pWord[wordLength - 1] == ':' || pWord[wordLength - 1] == '.')) {
 					--wordLength;
 					pWord[wordLength] = '\0';
+					bIgnore = FALSE;
 				}
-				if (wordLength > 0 && IsWordStart(*pWord) && !(*pWord == ':' && *(pWord + 1) != ':')) {
+				if (!bIgnore) {
+					bIgnore = wordLength >= iRootLen && WordList_StartsWith(pWList, pWord);
+				}
+				ch = *pWord;
+				if (bIgnore && !(ch == ':' && *(pWord + 1) != ':')) {
 					int count = 0;
 					if (!(pLexCurrent->iLexer == SCLEX_CPP && style == SCE_C_MACRO)) {
 						while (IsASpace(SciCall_GetCharAt(wordEnd))) {
@@ -161,19 +225,9 @@ void AutoC_AddDocWord(HWND hwnd, struct WordList *pWList, BOOL bIgnore)
 						}
 					}
 					if (SciCall_GetCharAt(wordEnd) == '(') {
-						if (count && !(
-							   lstrcmpA(pWord, "for")
-							&& lstrcmpA(pWord, "if")
-							&& lstrcmpA(pWord, "while")
-							&& lstrcmpA(pWord, "switch")
-							&& lstrcmpA(pWord, "catch")
-							&& lstrcmpA(pWord, "foreach")
-							&& lstrcmpA(pWord, "elseif")
-							&& lstrcmpA(pWord, "synchronized")
-							&& lstrcmpA(pWord, "try")
-							&& lstrcmpA(pWord, "using")
-							))
-						pWord[wordLength++] = ' ';
+						if (count && NeedSpaceAfterKeyword(pWord, wordLength)) {
+							pWord[wordLength++] = ' ';
+						}
 
 						pWord[wordLength++] = '(';
 						pWord[wordLength++] = ')';
@@ -182,9 +236,9 @@ void AutoC_AddDocWord(HWND hwnd, struct WordList *pWList, BOOL bIgnore)
 					//	pWord[wordLength++] = ']';
 					}
 					if (wordLength >= iRootLen) {
-						if (bSubWord && !(*pWord >= '0' && *pWord <= '9')) {
+						if (bSubWord && !(ch >= '0' && ch <= '9')) {
 							int i;
-							ch = 0,  chNext = *pWord;
+							ch = 0, chNext = *pWord;
 							for (i = 0; i < wordLength-1; i++) {
 								chPrev = ch;
 								ch = chNext;
@@ -599,6 +653,27 @@ void EditAutoCloseBraceQuote(HWND hwnd, int ch)
 	}
 }
 
+__forceinline BOOL IsHtmlVoidTag(const char *word, int length) {
+	switch (make_switch_key(length, word[0])) {
+	case make_switch_key(2, 'b'):
+		return word[1] == 'r';
+	case make_switch_key(2, 'h'):
+		return word[1] == 'r';
+	case make_switch_key(3, 'i'):
+		return (word[1] == 'm' && word[2] == 'g');
+	case make_switch_key(4, 'b'):
+		return (word[1] == 'a' && word[2] == 's' && word[3] == 'e');
+	case make_switch_key(4, 'l'):
+		return (word[1] == 'i' && word[2] == 'n' && word[3] == 'k');
+	case make_switch_key(4, 'm'):
+		return (word[1] == 'e' && word[2] == 't' && word[3] == 'a');
+	case make_switch_key(5, 'e'):
+		return memcmp(word, "embed", 5) == 0;
+	case make_switch_key(5, 'i'):
+		return memcmp(word, "input", 5) == 0;
+	}
+	return FALSE;
+}
 
 void EditAutoCloseXMLTag(HWND hwnd)
 {
@@ -655,16 +730,7 @@ void EditAutoCloseXMLTag(HWND hwnd)
 
 			iHelper = cchIns > 3;
 			if (iHelper && pLexCurrent->iLexer == SCLEX_HTML) {
-				iHelper =  lstrcmpiA(tchIns, "</base>")
-						&& lstrcmpiA(tchIns, "</bgsound>")
-						&& lstrcmpiA(tchIns, "</br>")
-						&& lstrcmpiA(tchIns, "</embed>")
-						&& lstrcmpiA(tchIns, "</hr>")
-						&& lstrcmpiA(tchIns, "</img>")
-						&& lstrcmpiA(tchIns, "</input>")
-						&& lstrcmpiA(tchIns, "</link>")
-						&& lstrcmpiA(tchIns, "</meta>")
-						;
+				iHelper = !IsHtmlVoidTag(tchIns + 2, cchIns - 3);
 			}
 			if (iHelper) {
 				autoClosed = TRUE;

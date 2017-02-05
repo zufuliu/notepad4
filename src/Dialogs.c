@@ -291,20 +291,25 @@ INT_PTR CALLBACK AboutDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam
 		switch (pnmhdr->code) {
 
 		case NM_CLICK:
-		case NM_RETURN: {
-			if (pnmhdr->idFrom == IDC_WEBPAGE_LINK) {
+		case NM_RETURN:
+			switch (pnmhdr->idFrom) {
+			case IDC_WEBPAGE_LINK:
 				ShellExecute(hwnd, L"open", L"http://www.flos-freeware.ch", NULL, NULL, SW_SHOWNORMAL);
-			} else if (pnmhdr->idFrom == IDC_EMAIL_LINK) {
-				ShellExecute(hwnd, L"open", L"mailto:florian.balmer@gmail.com", NULL, NULL, SW_SHOWNORMAL);			
-			} else if (pnmhdr->idFrom == IDC_MOD_PAGE_LINK) {
+				break;
+			case IDC_EMAIL_LINK:
+				ShellExecute(hwnd, L"open", L"mailto:florian.balmer@gmail.com", NULL, NULL, SW_SHOWNORMAL);
+				break;
+			case IDC_MOD_PAGE_LINK:
 				ShellExecute(hwnd, L"open", L"https://xhmikosr.github.io/notepad2-mod/", NULL, NULL, SW_SHOWNORMAL);
-			} else if (pnmhdr->idFrom == IDC_NEW_PAGE_LINK) {
+				break;
+			case IDC_NEW_PAGE_LINK:
 				ShellExecute(hwnd, L"open", L"https://github.com/zufuliu/notepad2", NULL, NULL, SW_SHOWNORMAL);
-			} else if (pnmhdr->idFrom == IDC_SCI_PAGE_LINK) {
+				break;
+			case IDC_SCI_PAGE_LINK:
 				ShellExecute(hwnd, L"open", L"http://www.scintilla.org/", NULL, NULL, SW_SHOWNORMAL);
+				break;
 			}
-		}
-		break;
+			break;
 		}
 	}
 	break;

@@ -614,7 +614,7 @@ BOOL IsUnicode(const char *pBuffer, int cb, LPBOOL lpbBOM, LPBOOL lpbReverse)
 
 BOOL IsUTF8(const char *pTest, int nLength)
 {
-	static int byte_class_table[256] = {
+	static const int byte_class_table[256] = {
 		/* 00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F */
 		/* 00 */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 		/* 10 */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -640,7 +640,7 @@ BOOL IsUTF8(const char *pTest, int nLength)
 		kSTART = 0, kA, kB, kC, kD, kE, kF, kG, kERROR, kNumOfStates
 	} utf8_state;
 
-	static utf8_state state_table[] = {
+	static const utf8_state state_table[] = {
 		/*							   kSTART, kA,     kB,     kC,     kD,     kE,     kF,     kG,     kERROR */
 		/* 0x00-0x7F: 0				*/ kSTART, kERROR, kERROR, kERROR, kERROR, kERROR, kERROR, kERROR, kERROR,
 		/* 0x80-0x8F: 1				*/ kERROR, kSTART, kA,     kERROR, kA,     kB,     kERROR, kB,     kERROR,

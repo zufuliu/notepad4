@@ -146,7 +146,7 @@ _label_identifier:
 					}
 				}
 				sc.SetState(SCE_ASM_DEFAULT);
-				if (IsDirective && (strcmp(s, "#error") == 0 || strcmp(s, "%error") == 0 ||
+				if (IsDirective && s[0] == '#' && (strcmp(s, "#error") == 0 || strcmp(s, "%error") == 0 ||
 					strcmp(s, "#warning") == 0 || strcmp(s, "#message") == 0)) {
 					while (!(sc.ch == ' ' || sc.ch == '\t') && !(sc.chNext == '\r' || sc.chNext == '\n'))
 						sc.Forward();
