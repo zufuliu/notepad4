@@ -107,7 +107,13 @@ def _get_switch_func_tail(switch_type, option_set):
 		ret = option_set['default']
 	if ret:
 		ret = IndentLevel1 + 'return %s;\n' % (ret)
-	return ret + '}\n\n'
+	return ret
+
+def _get_switch_default_return(switch_type, option_set):
+	ret = _get_switch_func_tail(switch_type, option_set)
+	if not ret:
+		ret = IndentLevel1 + 'return;\n'
+	return ret
 
 def build_switch_stmt(switch_type, func_name, var_name, word_list, int_arg=0, switch_option=0):
 	option_set = None
@@ -141,6 +147,12 @@ def build_switch_stmt(switch_type, func_name, var_name, word_list, int_arg=0, sw
 	stmt_list = []
 	stmt = _get_switch_func_header(switch_type, func_name, var_name, option_set)
 	stmt_list.append(stmt)
+
+	if switch_option != SwitchOption_OnlyLength:
+		stmt = IndentLevel1 + _get_switch_default_return(switch_type, option_set)
+		stmt = "if (length < %d || length > %d) {\n%s%s}\n" % \
+			(sorted_list[0][0], sorted_list[-1][0], stmt, IndentLevel1)
+		stmt_list.append(IndentLevel1 + stmt)
 
 	if switch_option == SwitchOption_HeadAndLength:
 		stmt = 'switch (make_switch_key(length, %s[%d])) {\n' % (var_name, int_arg)
@@ -211,7 +223,7 @@ def build_switch_stmt(switch_type, func_name, var_name, word_list, int_arg=0, sw
 
 	stmt_list.append(IndentLevel1 + '}\n')
 	stmt = _get_switch_func_tail(switch_type, option_set)
-	stmt_list.append(stmt)
+	stmt_list.append(stmt + '}\n\n')
 	return ''.join(stmt_list)
 
 def build_switch_stmt_head(switch_type, func_name, var_name, word_list, ch_index=0, switch_option=SwitchOption_HeadAndLength):

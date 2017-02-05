@@ -113,6 +113,9 @@ __inline BOOL IsStringFormatChar(int ch, int style) {
 #define make_switch_key(length, ch)	(((length) << 8) | (ch))
 
 __forceinline BOOL NeedSpaceAfterKeyword(const char *word, int length) {
+	if (length < 2 || length > 12) {
+		return FALSE;
+	}
 	switch (make_switch_key(length, word[0])) {
 	case make_switch_key(2, 'i'):
 		return word[1] == 'f';
@@ -148,7 +151,6 @@ void AutoC_AddDocWord(HWND hwnd, struct WordList *pWList, BOOL bIgnore)
 	int iPosFind;
 
 	ft.lpstrText = pRoot;
-	ft.chrg.cpMin = iRootLen;
 	ft.chrg.cpMax = iDocLen;
 	iPosFind = (int)SendMessage(hwnd, SCI_FINDTEXT, findFlag, (LPARAM)&ft);
 
@@ -654,6 +656,9 @@ void EditAutoCloseBraceQuote(HWND hwnd, int ch)
 }
 
 __forceinline BOOL IsHtmlVoidTag(const char *word, int length) {
+	if (length < 2 || length > 5) {
+		return FALSE;
+	}
 	switch (make_switch_key(length, word[0])) {
 	case make_switch_key(2, 'b'):
 		return word[1] == 'r';

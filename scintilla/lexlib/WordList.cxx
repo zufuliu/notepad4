@@ -115,7 +115,7 @@ static int cmpWords(const void *a, const void *b) {
 }
 
 static void SortWordList(char **words, unsigned int len) {
-	qsort(reinterpret_cast<void *>(words), len, sizeof(*words), cmpWords);
+	qsort(static_cast<void *>(words), len, sizeof(*words), cmpWords);
 }
 
 #endif
