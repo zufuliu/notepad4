@@ -578,17 +578,21 @@ BOOL EditLoadFile(HWND hwnd, LPCWSTR pszFile, BOOL bSkipEncodingDetection,
 	}
 	else {
 		FileVars_Init(lpData, cbData, &fvCurFile);
-		if (!bSkipEncodingDetection && (iSrcEncoding == -1 || iSrcEncoding == CPI_UTF8 || iSrcEncoding == CPI_UTF8SIGN) &&
-				((IsUTF8Signature(lpData) ||
-				  FileVars_IsUTF8(&fvCurFile) ||
-				  (iSrcEncoding == CPI_UTF8 || iSrcEncoding == CPI_UTF8SIGN) ||
-				  (IsUTF8(lpData, cbData) &&
-				   (((UTF8_mbslen_bytes(UTF8StringStart(lpData)) - 1 !=
-					  UTF8_mbslen(UTF8StringStart(lpData), IsUTF8Signature(lpData) ? cbData - 3 : cbData)) ||
-					 (!bPreferOEM && (
-						  mEncoding[_iDefaultEncoding].uFlags & NCP_UTF8 ||
-						  bLoadASCIIasUTF8))))))) && !(FileVars_IsNonUTF8(&fvCurFile) &&
-								  (iSrcEncoding != CPI_UTF8 && iSrcEncoding != CPI_UTF8SIGN))) {
+		if (!bSkipEncodingDetection
+			&& (iSrcEncoding == -1 || iSrcEncoding == CPI_UTF8 || iSrcEncoding == CPI_UTF8SIGN)
+			&& ((IsUTF8Signature(lpData)
+				|| FileVars_IsUTF8(&fvCurFile)
+				|| (iSrcEncoding == CPI_UTF8 || iSrcEncoding == CPI_UTF8SIGN)
+				|| (!bPreferOEM && bLoadASCIIasUTF8) // from menu "Reload As... UTF-8"
+				|| (IsUTF8(lpData, cbData) && (
+						(!bPreferOEM && (mEncoding[_iDefaultEncoding].uFlags & NCP_UTF8))
+						|| UTF8_mbslen_bytes(UTF8StringStart(lpData)) - 1 !=
+							UTF8_mbslen(UTF8StringStart(lpData), IsUTF8Signature(lpData) ? cbData - 3 : cbData)
+						)
+					)
+				)
+			)
+			&& !(FileVars_IsNonUTF8(&fvCurFile) && (iSrcEncoding != CPI_UTF8 && iSrcEncoding != CPI_UTF8SIGN))) {
 			SendMessage(hwnd, SCI_SETCODEPAGE, SC_CP_UTF8, 0);
 			//EditSetNewText(hwnd, "", 0);
 			if (IsUTF8Signature(lpData)) {
