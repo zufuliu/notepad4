@@ -7,6 +7,7 @@
 #include <shlwapi.h>
 #include <commctrl.h>
 #include <commdlg.h>
+#include <limits.h>
 #include "Edit.h"
 #include "Styles.h"
 #include "Helpers.h"
@@ -182,7 +183,7 @@ void AutoC_AddDocWord(HWND hwnd, struct WordList *pWList, BOOL bIgnore)
 			wordLength += wordEnd;
 
 			if (wordLength >= iRootLen) {
-				char* pWord = pWList->wordBuf;
+				char* pWord = pWList->wordBuf + DefaultAlignment;
 				bIgnore = TRUE;
 				tr.lpstrText = pWord;
 				tr.chrg.cpMin = iPosFind;
@@ -212,9 +213,10 @@ void AutoC_AddDocWord(HWND hwnd, struct WordList *pWList, BOOL bIgnore)
 				while (wordLength > 0 && (pWord[wordLength - 1] == '-' || pWord[wordLength - 1] == ':' || pWord[wordLength - 1] == '.')) {
 					--wordLength;
 					pWord[wordLength] = '\0';
-					bIgnore = FALSE;
 				}
 				if (!bIgnore) {
+					CopyMemory(pWList->wordBuf, pWord, wordLength + 1);
+					pWord = pWList->wordBuf;
 					bIgnore = wordLength >= iRootLen && WordList_StartsWith(pWList, pWord);
 				}
 				ch = *pWord;

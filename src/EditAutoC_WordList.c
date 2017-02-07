@@ -3,30 +3,28 @@
 #define NP2_AUTOC_USE_NODE_CACHE	1
 #define NP2_AUTOC_USE_STRING_ORDER	1
 // scintilla/src/AutoComplete.h AutoComplete::maxItemLen
-#define NP2_AUTOC_MAX_WORD_LENGTH	(1024 - 3 - 1)	// SP + '(' + ')' + '\0'
+#define NP2_AUTOC_MAX_WORD_LENGTH	(1024 - 3 - 1 - 16)	// SP + '(' + ')' + '\0'
 #define NP2_AUTOC_INIT_BUF_SIZE		(4096)
 #define NP2_AUTOC_MAX_BUF_COUNT		12
 #define NP2_AUTOC_INIT_CACHE_SIZE	128
 #define NP2_AUTOC_MAX_CACHE_COUNT	12
 
-#ifndef MIN
-#define MIN(a, b) ((a) < (b)? (a) : (b))
-#endif
-
-#if NP2_AUTOC_USE_BUF
 #define DefaultAlignment		16
 __forceinline unsigned int align_up(unsigned int value) {
 	return (value + DefaultAlignment - 1) & (~(DefaultAlignment - 1));
 }
-#endif
+
+__forceinline unsigned int bswap32(unsigned int x) {
+	return (x << 24) | ((x << 8) & 0xff0000) | ((x >> 8) & 0xff00) | (x >> 24);
+}
 
 struct WordNode;
 struct WordList {
-	char wordBuf[NP2_AUTOC_MAX_WORD_LENGTH + 3 + 1];
+	char wordBuf[1024];
 	int (WINAPI *WL_StrCmpA)(LPCSTR, LPCSTR);
 	int (WINAPI *WL_StrCmpNA)(LPCSTR, LPCSTR, int);
 #if NP2_AUTOC_USE_STRING_ORDER
-	int (*WL_OrderFunc)(const void*, int);
+	int (*WL_OrderFunc)(const void*, unsigned int);
 #endif
 	struct WordNode *pListHead;
 	LPCSTR pWordStart;
@@ -56,37 +54,19 @@ struct WordList {
 
 #if NP2_AUTOC_USE_STRING_ORDER
 #define NP2_AUTOC_ORDER_LENGTH	4
-int WordList_Order(const void *pWord, int len) {
-	unsigned int high = 0;
-	const unsigned char *buf = pWord;
-	len = MIN(len, NP2_AUTOC_ORDER_LENGTH);
-	switch (len) {
-	case 4:
-		high |= buf[3];
-	case 3:
-		high |= buf[2] << 8;
-	case 2:
-		high |= buf[1] << 16;
-	case 1:
-		high |= buf[0] << 24;
-	}
+
+int WordList_Order(const void *pWord, unsigned int len) {
+	unsigned int high = *(const unsigned int *)pWord;
+	high &= (len < NP2_AUTOC_ORDER_LENGTH) ? ((1U << len * 8) - 1) : UINT_MAX;
+	high = bswap32(high);
 	return high;
 }
 
-int WordList_OrderCase(const void *pWord, int len) {
-	unsigned int high = 0;
-	const unsigned char *buf = pWord;
-	len = MIN(len, NP2_AUTOC_ORDER_LENGTH);
-	switch (len) {
-	case 4:
-		high |= (buf[3] | 0x20);
-	case 3:
-		high |= (buf[2] | 0x20) << 8;
-	case 2:
-		high |= (buf[1] | 0x20) << 16;
-	case 1:
-		high |= (buf[0] | 0x20) << 24;
-	}
+int WordList_OrderCase(const void *pWord, unsigned int len) {
+	unsigned int high = *(const unsigned int *)pWord;
+	high |= 0x20202020;
+	high &= (len < NP2_AUTOC_ORDER_LENGTH) ? ((1U << len * 8) - 1) : UINT_MAX;
+	high = bswap32(high);
 	return high;
 }
 #endif
@@ -109,7 +89,7 @@ void WordList_AddWord(struct WordList *pWList, LPCSTR pWord, int len)
 	struct WordNode *prev = NULL;
 	int diff = 1;
 #if NP2_AUTOC_USE_STRING_ORDER
-	int order = pWList->WL_OrderFunc(pWord, len);
+	int order = (pWList->iStartLen > NP2_AUTOC_ORDER_LENGTH)? 0 : pWList->WL_OrderFunc(pWord, len);
 #endif
 
 	while (head) {
@@ -305,7 +285,7 @@ void WordList_AddWord(struct WordList *pWList, LPCSTR pWord, int len)
 {
 	struct WordNode *root = pWList->pListHead;
 #if NP2_AUTOC_USE_STRING_ORDER
-	int order = pWList->WL_OrderFunc(pWord, len);
+	int order = (pWList->iStartLen > NP2_AUTOC_ORDER_LENGTH)? 0 : pWList->WL_OrderFunc(pWord, len);
 #endif
 	if (root == NULL) {
 		struct WordNode *node;
@@ -534,10 +514,10 @@ struct WordList *WordList_Alloc(LPCSTR pRoot, int iRootLen, BOOL bIgnoreCase) {
 
 __forceinline BOOL WordList_StartsWith(struct WordList *pWList, LPCSTR pWord) {
 #if NP2_AUTOC_USE_STRING_ORDER
-	if (pWList->orderStart != pWList->WL_OrderFunc(pWord, pWList->iStartLen))
-		return FALSE;
 	if (pWList->iStartLen > NP2_AUTOC_ORDER_LENGTH)
 		return pWList->WL_StrCmpNA(pWList->pWordStart, pWord, pWList->iStartLen) == 0;
+	if (pWList->orderStart != pWList->WL_OrderFunc(pWord, pWList->iStartLen))
+		return FALSE;
 	return TRUE;
 #else
 	return pWList->WL_StrCmpNA(pWList->pWordStart, pWord, pWList->iStartLen) == 0;
@@ -554,7 +534,7 @@ void WordList_AddList(struct WordList *pWList, LPCSTR pList)
 		char *sub = StrPBrkA(pList, " \t.,();^\n\r");
 		if (sub) {
 			int lenSub = (int)(sub - pList);
-			lenSub = MIN(NP2_AUTOC_MAX_WORD_LENGTH - len, lenSub);
+			lenSub = min(NP2_AUTOC_MAX_WORD_LENGTH - len, lenSub);
 			memcpy(word + len, pList, lenSub);
 			len += lenSub;
 			if (len >= iStartLen) {
@@ -578,7 +558,7 @@ void WordList_AddList(struct WordList *pWList, LPCSTR pList)
 			pList = ++sub;
 		} else {
 			int lenSub = lstrlenA(pList);
-			lenSub = MIN(NP2_AUTOC_MAX_WORD_LENGTH - len, lenSub);
+			lenSub = min(NP2_AUTOC_MAX_WORD_LENGTH - len, lenSub);
 			if (len) {
 				memcpy(word + len, pList, lenSub);
 				len += lenSub;
