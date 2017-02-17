@@ -27,10 +27,10 @@ static KEYWORDLIST Keywords_ASM = {
 // AMD
 "clgi invlpga iretq scasq stgi "
 /************** GNU Assembler Instruction ********************/
-"adcl adcb adcq addl addq addw andb andl andq andw bsrl btl btsl cbtw cltd cmpb cmpl "
-"cmpq cmpw decl decq decw divl fldl fstpl idivl imull incl incq incw insl jmpl jmpq "
-"leal leaq lgdtl lidtl ljmp ljmpl lret lretq lretw movabs movb movl movsbl movsl "
-"movswl movw movzb movzbl movzwl mull mulq negl negw notl notq outsl orb orl orw popal popaw "
+"adcl adcb adcq addl addq addw andb andl andq andw bsrl btl btsl cbtw cltd cltq cwtl cmpb cmpl "
+"cmpq cmpw decl decq decw divl divq fldl fstpl idivl imull incl incq incw insl jmpl jmpq "
+"leal leaq lgdtl lidtl ljmp ljmpl lret lretq lretw movabs movabsw movabsq movb movl movsbl movsl movq movslq "
+"movswl movw movzb movzbl movzwl mull mulq negl negw negq notl notq outsl orb orl orw orq popal popaw imulq "
 "popfl popl popq popw pushal pushfl pushfq pushl pushq rclb rcll rcrl retl retq roll "
 "sall salq sarl sarb sbbb sbbl setaeb shldl shll shrb shrdl shrl shrq shrw stosl subb "
 "subl subq subw testb testl testq testw xorb xorl xorq xorw "
@@ -109,7 +109,7 @@ static KEYWORDLIST Keywords_ASM = {
 "cvtss2sd cvtss2si cvttpd2dq cvttpd2pi cvttps2dq cvttps2pi cvttsd2si cvttss2si "
 "divpd divps divsd divss dppd dpps extractps haddpd haddps hsubpd hsubps insertps "
 "lddqu ldmxcsr lfence maskmovdqu maskmovq maxpd maxps maxsd maxss mfence minpd minps "
-"minsd minss monitor movapd movaps movd movq movddup movdqa movdqu movdq2q movhlps "
+"minsd minss monitor movapd movaps movd movddup movdqa movdqu movdq2q movhlps "
 "movhpd movhps movlhps movlpd movlps movmskpd movmskps movntdqa movntdq movnti "
 "movntpd movntps movntq movq2dq movsd movshdup movsldup movss movupd movups mpsadbw "
 "mulpd mulps mulsd mulss mwait "
@@ -138,13 +138,14 @@ static KEYWORDLIST Keywords_ASM = {
 "pfrcpit2 pfrsqit1 pfrsqrt pfsub pfsubr pi2fd pi2fw pmulhrw pswapd "
 //AMD XOP/FMA4
 , // fold begin
-"do .while .repeat switch if .if if1 if2 ife ifb ifnb ifdef .ifdef ifndef .ifndef ifidn ifidni macro istruc struc struct union dialog proc .def .func .macro .irp .irpc .rept $if %ifnnum %ifidn %ifidni %ifstr %ifctx %imacro %macro %rep .cfi_startproc "
+"do .while .repeat switch if .if if1 if2 ife ifb ifnb ifdef .ifdef ifndef .ifndef ifidn ifidni macro istruc struc struct union dialog proc .def .func .macro .irp .irpc .rept $if %ifnnum %ifidn %ifidni %ifstr %ifctx %imacro %macro %rep .cfi_startproc .seh_proc "
 , // fold end
-"while .endw .until endswitch endsw endif endm iend ends enddialog endproc endp .endef .endfunc .endif .endm .endr $endif %endmacro %endrep .cfi_endproc"
+"while .endw .until endswitch endsw endif endm iend ends enddialog endproc endp .endef .endfunc .endif .endm .endr $endif %endmacro %endrep .cfi_endproc .seh_endproc "
 
 ,/************ GNU Assembler directives  *****************/
-"abort align altmacro ascii asciz balign balignl balignw byte code16 code16gcc code32 code64 comm def desc dim double eject else elseif end endef endfunc endif endm endr equ equiv eqv err error even exitm extern fail file fill float func global globl gnu_attribute hidden hword ident if ifdef ifndef incbin include int internal irp irpc lcomm lflags line linkonce list ln loc loc_mark_labels local long macro endm mri noaltmacro nolist octa org p2align p2alignl p2alignw popsection previous print protected psize purgem pushsection quad reloc rept sbttl scl section set short single size skip sleb128 space stabd stabn stabs string string8 string16 string32 string64 struct subsection symver tag text title type uleb128 val version vtable_entry vtable_inherit warning weak weakref word "
-" cfi_startproc cfi_endproc cfi_personality cfi_lsda encoding cfi_def_cfa cfi_def_cfa_register cfi_def_cfa_offset cfi_adjust_cfa_offset cfi_offset cfi_rel_offset cfi_register cfi_restore cfi_undefined cfi_same_value cfi_remember_state cfi_return_column cfi_signal_frame cfi_window_save cfi_escape cfi_val_encoded_addr "
+"abort align altmacro ascii asciz balign balignl balignw byte code16 code16gcc code32 code64 comm def desc dim double eject else elseif end endef endfunc endif endm endr equ equiv eqv err error even exitm extern fail file fill float func global globl gnu_attribute hidden hword ident if ifdef ifndef incbin include int internal irp irpc lcomm lflags line linkonce list ln loc loc_mark_labels local long macro endm mri noaltmacro nolist octa org p2align p2alignl p2alignw popsection previous print protected psize purgem pushsection quad reloc rept sbttl scl section set short single size skip sleb128 space stabd stabn stabs string string8 string16 string32 string64 struct subsection symver tag text title type uleb128 val version vtable_entry vtable_inherit warning weak weakref word secrel32 "
+" cfi_startproc cfi_endproc cfi_personality cfi_lsda encoding cfi_def_cfa cfi_def_cfa_register cfi_def_cfa_offset cfi_adjust_cfa_offset cfi_offset cfi_rel_offset cfi_register cfi_restore cfi_undefined cfi_same_value cfi_remember_state cfi_return_column cfi_signal_frame cfi_window_save cfi_escape cfi_val_encoded_addr cfi_sections "
+"seh_proc seh_endproc seh_pushreg seh_endprologue seh_stackalloc seh_setframe seh_handler seh_handlerdata "
 
 #if NUMKEYWORD == 16
 , // Proprocessor
