@@ -444,10 +444,8 @@ static void FoldAsmDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 				levelNext--;
  		}
 		if (foldSyntaxBased && (style == SCE_ASM_DIRECTIVE)) {
-			word[wordlen++] = static_cast<char>(tolower(ch));
-			if (wordlen == 128) {                   // prevent overflow
-				word[0] = '\0';
-				wordlen = 1;
+			if (wordlen < 128) { // prevent overflow
+				word[wordlen++] = static_cast<char>(tolower(ch));
 			}
 			if (styleNext != SCE_ASM_DIRECTIVE) {   // reading directive ready
 				word[wordlen] = '\0';
