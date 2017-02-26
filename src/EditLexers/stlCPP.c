@@ -52,10 +52,10 @@ static KEYWORDLIST Keywords_CPP = {
 // wchar.h				wctype.h
 "wint_t mbstate_t "		"wctrans_t wctype_t "
 , // preprocessor
-"if elif else endif ifdef ifndef define undef include include_next import using pragma line error warning warn message "
+" if elif else endif ifdef ifndef define undef include include_next import using pragma line error warning warn message "
 "region endregion sccs ident assert unassert "
 , // directive: Objective C/C++
-"interface private protected public package property end protocol optional required implementation synthesize try throw catch finally autoreleasepool synchronized dynamic class selector encode compatibility_alias import"
+" interface private protected public package property end protocol optional required implementation synthesize try throw catch finally autoreleasepool synchronized dynamic class selector encode compatibility_alias import "
 "property() selector() "
 , // attribute
 // Objective C/C++ @property()

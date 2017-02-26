@@ -1040,8 +1040,8 @@ int Style_GetDocTypeLanguage()
 {
 	extern HWND hwndEdit;
 	char *p = NULL, *pb = NULL;
-	char tchText[2048] = ""; // maybe contains header comments
-	SendMessage(hwndEdit, SCI_GETTEXT, (WPARAM)COUNTOF(tchText) - 1, (LPARAM)tchText);
+	char tchText[4096] = ""; // maybe contains header comments
+	SendMessage(hwndEdit, SCI_GETTEXT, (WPARAM)(COUNTOF(tchText) - 1), (LPARAM)tchText);
 
 	// check DOCTYPE
 	if ((p = StrStrA(tchText, "!DOCTYPE"))) {
@@ -1091,7 +1091,7 @@ int Style_GetDocTypeLanguage()
 
 	// find root tag
 	p = tchText;
-	while (p - tchText < 2048) {
+	while (p - tchText < COUNTOF(tchText)) {
 		if (!(p = StrChrA(p, '<')))
 			return 0;
 		if (!StrCmpNA(p, "<!--", 4)) {
@@ -1179,6 +1179,84 @@ int Style_GetDocTypeLanguage()
 		return IDM_LANG_ANDROID_LAYOUT;
 
 	return 0;
+}
+
+__forceinline BOOL IsASpace(int ch) {
+    return (ch == ' ') || ((ch >= 0x09) && (ch <= 0x0d));
+}
+
+BOOL MatchCPPKeyword(char *p, int index) {
+	char word[32];
+	int len = 0;
+
+	if (*p < 'a' || *p > 'z') {
+		return FALSE;
+	}
+	word[0] = ' ';
+	word[1] = *p++;
+	len = 2;
+	while (len < 30 && (*p == '_' || (*p >= 'a' && *p <= 'z'))) {
+		word[len++] = *p++;
+	}
+	if (len == 30 || isalnum(*p)) {
+		return FALSE;
+	}
+	word[len++] = ' ';
+	word[len++] = 0;
+	p = StrStrA(lexCPP.pKeyWords->pszKeyWords[index], word);
+	return p != NULL;
+}
+
+PEDITLEXER Style_DetectObjCAndMatlab(void) {
+	extern HWND hwndEdit;
+	char *p = NULL;
+	char tchText[4096] = ""; // maybe contains header comments
+	SendMessage(hwndEdit, SCI_GETTEXT, (WPARAM)(COUNTOF(tchText) - 2), (LPARAM)tchText);
+
+	p = tchText;
+	while (*p) {
+		while (IsASpace(*p)) {
+			++p;
+		}
+		switch (*p) {
+		case '#':	// ObjC preprocessor or octave comment
+			if (!(p == tchText && p[1] == '!')) {
+				++p;
+				while (*p == ' ' || *p == '\t') {
+					++p;
+				}
+				if (MatchCPPKeyword(p, 2)) {
+					return &lexCPP;
+				}
+			}
+			return &lexMatlab;
+		case '@':	// ObjC keyword or Matlab command
+			++p;
+			if (MatchCPPKeyword(p, 3)) {
+				return &lexCPP;
+			}
+			return &lexMatlab;
+		case '/':	// C/C++ style comment
+			++p;
+			if (*p == '/' || *p == '*') {
+				return &lexCPP;
+			}
+			break;
+		case '.':	// Matlab matrix multiple
+			++p;
+			if (*p == '*') {
+				return &lexMatlab;
+			}
+			break;
+		case '%':	// ObjC modular or Matlab comment
+			return &lexMatlab;
+		}
+		while (*p && !(*p == '\r' || *p == '\n')) {
+			++p;
+		}
+	}
+
+	return NULL;
 }
 
 //=============================================================================
@@ -1308,6 +1386,12 @@ PEDITLEXER __fastcall Style_MatchLexer(LPCWSTR lpszMatch, BOOL bCheckNames)
 		if (!lstrcmpi(L"xml", lpszMatch)) {
 			np2LexLangIndex = Style_GetDocTypeLanguage();
 			return (&lexXML);
+		}
+		if (bAutoSelect && !lstrcmpi(L"m", lpszMatch)) {
+			PEDITLEXER lex = Style_DetectObjCAndMatlab();
+			if (lex != NULL) {
+				return lex;
+			}
 		}
 
 		for (i = 0; i < NUMLEXERS; i++) {
