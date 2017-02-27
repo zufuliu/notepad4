@@ -1242,9 +1242,8 @@ PEDITLEXER Style_DetectObjCAndMatlab(void) {
 				return &lexCPP;
 			}
 			break;
-		case '.':	// Matlab matrix multiple
-			++p;
-			if (*p == '*') {
+		case 'f':	// Matlab function
+			if (StrCmpNA(p, "function", 8) && (IsASpace(p + 8) || p[8] == '[')) {
 				return &lexMatlab;
 			}
 			break;
