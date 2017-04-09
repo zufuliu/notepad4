@@ -17,8 +17,8 @@ class PerLine {
 public:
 	virtual ~PerLine() {}
 	virtual void Init()=0;
-	virtual void InsertLine(int line)=0;
-	virtual void RemoveLine(int line)=0;
+	virtual void InsertLine(Sci::Line line)=0;
+	virtual void RemoveLine(Sci::Line line)=0;
 };
 
 /**
@@ -36,15 +36,15 @@ public:
 	void Init();
 	void SetPerLine(PerLine *pl);
 
-	void InsertText(int line, int delta);
-	void InsertLine(int line, int position, bool lineStart);
-	void SetLineStart(int line, int position);
-	void RemoveLine(int line);
-	int Lines() const {
+	void InsertText(Sci::Line line, Sci::Position delta);
+	void InsertLine(Sci::Line line, Sci::Position position, bool lineStart);
+	void SetLineStart(Sci::Line line, Sci::Position position);
+	void RemoveLine(Sci::Line line);
+	Sci::Line Lines() const {
 		return starts.Partitions();
 	}
-	int LineFromPosition(int pos) const;
-	int LineStart(int line) const {
+	Sci::Line LineFromPosition(Sci::Position pos) const;
+	Sci::Position LineStart(Sci::Line line) const {
 		return starts.PositionFromPartition(line);
 	}
 };
@@ -57,14 +57,14 @@ enum actionType { insertAction, removeAction, startAction, containerAction };
 class Action {
 public:
 	actionType at;
-	int position;
+	Sci::Position position;
 	char *data;
-	int lenData;
+	Sci::Position lenData;
 	bool mayCoalesce;
 
 	Action();
 	~Action();
-	void Create(actionType at_, int position_=0, const char *data_=0, int lenData_=0, bool mayCoalesce_=true);
+	void Create(actionType at_, Sci::Position position_=0, const char *data_=0, Sci::Position lenData_=0, bool mayCoalesce_=true);
 	void Destroy();
 	void Grab(Action *source);
 };
@@ -90,7 +90,7 @@ public:
 	UndoHistory();
 	~UndoHistory();
 
-	const char *AppendAction(actionType at, int position, const char *data, int length, bool &startSequence, bool mayCoalesce=true);
+	const char *AppendAction(actionType at, Sci::Position position, const char *data, Sci::Position lengthData, bool &startSequence, bool mayCoalesce=true);
 
 	void BeginUndoAction();
 	void EndUndoAction();
@@ -137,11 +137,11 @@ private:
 
 	LineVector lv;
 
-	bool UTF8LineEndOverlaps(int position) const;
+	bool UTF8LineEndOverlaps(Sci::Position position) const;
 	void ResetLineEnds();
 	/// Actions without undo
-	void BasicInsertString(int position, const char *s, int insertLength);
-	void BasicDeleteChars(int position, int deleteLength);
+	void BasicInsertString(Sci::Position position, const char *s, Sci::Position insertLength);
+	void BasicDeleteChars(Sci::Position position, Sci::Position deleteLength);
 
 public:
 
@@ -149,33 +149,33 @@ public:
 	~CellBuffer();
 
 	/// Retrieving positions outside the range of the buffer works and returns 0
-	char CharAt(int position) const;
-	void GetCharRange(char *buffer, int position, int lengthRetrieve) const;
-	char StyleAt(int position) const;
-	void GetStyleRange(unsigned char *buffer, int position, int lengthRetrieve) const;
+	char CharAt(Sci::Position position) const;
+	void GetCharRange(char *buffer, Sci::Position position, Sci::Position lengthRetrieve) const;
+	char StyleAt(Sci::Position position) const;
+	void GetStyleRange(unsigned char *buffer, Sci::Position position, Sci::Position lengthRetrieve) const;
 	const char *BufferPointer();
-	const char *RangePointer(int position, int rangeLength);
-	int GapPosition() const;
+	const char *RangePointer(Sci::Position position, Sci::Position rangeLength);
+	Sci::Position GapPosition() const;
 
-	int Length() const;
-	void Allocate(int newSize);
+	Sci::Position Length() const;
+	void Allocate(Sci::Position newSize);
 	int GetLineEndTypes() const { return utf8LineEnds; }
 	void SetLineEndTypes(int utf8LineEnds_);
-	bool ContainsLineEnd(const char *s, int length) const;
+	bool ContainsLineEnd(const char *s, Sci::Position length) const;
 	void SetPerLine(PerLine *pl);
-	int Lines() const;
-	int LineStart(int line) const;
-	int LineFromPosition(int pos) const { return lv.LineFromPosition(pos); }
-	void InsertLine(int line, int position, bool lineStart);
-	void RemoveLine(int line);
-	const char *InsertString(int position, const char *s, int insertLength, bool &startSequence);
+	Sci::Line Lines() const;
+	Sci::Position LineStart(Sci::Line line) const;
+	Sci::Line LineFromPosition(Sci::Position pos) const { return lv.LineFromPosition(pos); }
+	void InsertLine(Sci::Line line, Sci::Position position, bool lineStart);
+	void RemoveLine(Sci::Line line);
+	const char *InsertString(Sci::Position position, const char *s, Sci::Position insertLength, bool &startSequence);
 
 	/// Setting styles for positions outside the range of the buffer is safe and has no effect.
 	/// @return true if the style of a character is changed.
-	bool SetStyleAt(int position, char styleValue);
-	bool SetStyleFor(int position, int length, char styleValue);
+	bool SetStyleAt(Sci::Position position, char styleValue);
+	bool SetStyleFor(Sci::Position position, Sci::Position lengthStyle, char styleValue);
 
-	const char *DeleteChars(int position, int deleteLength, bool &startSequence);
+	const char *DeleteChars(Sci::Position position, Sci::Position deleteLength, bool &startSequence);
 
 	bool IsReadOnly() const;
 	void SetReadOnly(bool set);
@@ -194,7 +194,7 @@ public:
 	bool IsCollectingUndo() const;
 	void BeginUndoAction();
 	void EndUndoAction();
-	void AddUndoAction(int token, bool mayCoalesce);
+	void AddUndoAction(Sci::Position token, bool mayCoalesce);
 	void DeleteUndoHistory();
 
 	/// To perform an undo, StartUndo is called to retrieve the number of steps, then UndoStep is

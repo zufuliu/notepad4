@@ -1230,6 +1230,12 @@ PEDITLEXER Style_DetectObjCAndMatlab(void) {
 				}
 			}
 			return &lexMatlab;
+		case '(':
+			++p;
+			if (*p == '*') { // Mathematica comment
+				return &lexFSharp;
+			}
+			break;
 		case '@':	// ObjC keyword or Matlab command
 			++p;
 			if (MatchCPPKeyword(p, 3)) {
@@ -1243,7 +1249,7 @@ PEDITLEXER Style_DetectObjCAndMatlab(void) {
 			}
 			break;
 		case 'f':	// Matlab function
-			if (StrCmpNA(p, "function", 8) && (IsASpace(p + 8) || p[8] == '[')) {
+			if (StrCmpNA(p, "function", 8) == 0 && (IsASpace(p + 8) || p[8] == '[')) {
 				return &lexMatlab;
 			}
 			break;

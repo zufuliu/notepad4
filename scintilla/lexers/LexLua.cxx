@@ -47,24 +47,24 @@ static int LongDelimCheck(StyleContext &sc) {
 };*/
 
 static void ColouriseLuaDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, WordList *keywordlists[], Accessor &styler) {
-	WordList &keywords = *keywordlists[0];
-	WordList &keywords2 = *keywordlists[1];
-	WordList &keywords3 = *keywordlists[2];
-	WordList &keywords4 = *keywordlists[3];
-	WordList &keywords5 = *keywordlists[4];
-	WordList &keywords6 = *keywordlists[5];
-	WordList &keywords7 = *keywordlists[6];
-	WordList &keywords8 = *keywordlists[7];
+	const WordList &keywords = *keywordlists[0];
+	const WordList &keywords2 = *keywordlists[1];
+	const WordList &keywords3 = *keywordlists[2];
+	const WordList &keywords4 = *keywordlists[3];
+	const WordList &keywords5 = *keywordlists[4];
+	const WordList &keywords6 = *keywordlists[5];
+	const WordList &keywords7 = *keywordlists[6];
+	const WordList &keywords8 = *keywordlists[7];
 
 	// Accepts accented characters
-	CharacterSet setWordStart(CharacterSet::setAlpha, "_", 0x80, true);
-	CharacterSet setWord(CharacterSet::setAlphaNum, "_", 0x80, true);
+	const CharacterSet setWordStart(CharacterSet::setAlpha, "_", 0x80, true);
+	const CharacterSet setWord(CharacterSet::setAlphaNum, "_", 0x80, true);
 	// Not exactly following number definition (several dots are seen as OK, etc.)
 	// but probably enough in most cases. [pP] is for hex floats.
-	CharacterSet setNumber(CharacterSet::setDigits, ".-+abcdefpABCDEFP");
-	CharacterSet setExponent(CharacterSet::setNone, "eEpP");
-	CharacterSet setLuaOperator(CharacterSet::setNone, "*/-+()={}~[];<>,.^%:#&|");
-	CharacterSet setEscapeSkip(CharacterSet::setNone, "\"'\\");
+	const CharacterSet setNumber(CharacterSet::setDigits, ".-+abcdefpABCDEFP");
+	const CharacterSet setExponent(CharacterSet::setNone, "eEpP");
+	const CharacterSet setLuaOperator(CharacterSet::setNone, "*/-+()={}~[];<>,.^%:#&|");
+	const CharacterSet setEscapeSkip(CharacterSet::setNone, "\"'\\");
 
 	Sci_Position currentLine = styler.GetLine(startPos);
 	// Initialize long string [[ ... ]] or block comment --[[ ... ]] nesting level,
@@ -76,7 +76,7 @@ static void ColouriseLuaDoc(Sci_PositionU startPos, Sci_Position length, int ini
 	int stringWs = 0;
 	if (initStyle == SCE_LUA_LITERALSTRING || initStyle == SCE_LUA_COMMENT ||
 		initStyle == SCE_LUA_STRING || initStyle == SCE_LUA_CHARACTER) {
-		int lineState = styler.GetLineState(currentLine - 1);
+		const int lineState = styler.GetLineState(currentLine - 1);
 		nestLevel = lineState >> 9;
 		sepCount = lineState & 0xFF;
 		stringWs = lineState & 0x100;
@@ -131,10 +131,10 @@ static void ColouriseLuaDoc(Sci_PositionU startPos, Sci_Position length, int ini
 		if (sc.state == SCE_LUA_OPERATOR) {
 			if (sc.ch == ':' && sc.chPrev == ':') {	// :: <label> :: forward scan
 				sc.Forward();
-				int ln = 0;
+				Sci_Position ln = 0;
 				while (IsASpaceOrTab(sc.GetRelative(ln)))	// skip over spaces/tabs
 					ln++;
-				int ws1 = ln;
+				Sci_Position ws1 = ln;
 				if (setWordStart.Contains(sc.GetRelative(ln))) {
 					int c, i = 0;
 					char s[128];
@@ -143,11 +143,11 @@ static void ColouriseLuaDoc(Sci_PositionU startPos, Sci_Position length, int ini
 							s[i++] = static_cast<char>(c);
 						ln++;
 					}
-					s[i] = '\0'; int lbl = ln;
+					s[i] = '\0'; Sci_Position lbl = ln;
 					if (!keywords.InList(s)) {
 						while (IsASpaceOrTab(sc.GetRelative(ln)))	// skip over spaces/tabs
 							ln++;
-						int ws2 = ln - lbl;
+						Sci_Position ws2 = ln - lbl;
 						if (sc.GetRelative(ln) == ':' && sc.GetRelative(ln + 1) == ':') {
 							// final :: found, complete valid label construct
 							sc.ChangeState(SCE_LUA_LABEL);
@@ -259,7 +259,7 @@ _label_identifier:
 			}
 		} else if (sc.state == SCE_LUA_LITERALSTRING || sc.state == SCE_LUA_COMMENT) {
 			if (sc.ch == '[') {
-				int sep = LongDelimCheck(sc);
+				const int sep = LongDelimCheck(sc);
 				if (sep == 1 && sepCount == 1) {    // [[-only allowed to nest
 					nestLevel++;
 					sc.Forward();
@@ -335,7 +335,7 @@ _label_identifier:
 static void FoldLuaDoc(Sci_PositionU startPos, Sci_Position length, int /* initStyle */, WordList *[], Accessor &styler) {
 	if (styler.GetPropertyInt("fold") == 0)
 		return;
-	Sci_PositionU lengthDoc = startPos + length;
+	const Sci_PositionU lengthDoc = startPos + length;
 	int visibleChars = 0;
 	Sci_Position lineCurrent = styler.GetLine(startPos);
 	int levelPrev = styler.LevelAt(lineCurrent) & SC_FOLDLEVELNUMBERMASK;
@@ -346,11 +346,11 @@ static void FoldLuaDoc(Sci_PositionU startPos, Sci_Position length, int /* initS
 	int styleNext = styler.StyleAt(startPos);
 
 	for (Sci_PositionU i = startPos; i < lengthDoc; i++) {
-		char ch = chNext;
+		const char ch = chNext;
 		chNext = styler.SafeGetCharAt(i + 1);
-		int style = styleNext;
+		const int style = styleNext;
 		styleNext = styler.StyleAt(i + 1);
-		bool atEOL = (ch == '\r' && chNext != '\n') || (ch == '\n');
+		const bool atEOL = (ch == '\r' && chNext != '\n') || (ch == '\n');
 
 		if (foldComment && atEOL && IsCommentLine(lineCurrent))
 		{

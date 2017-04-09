@@ -333,7 +333,7 @@ void AutoC_AddKeyword(struct WordList *pWList, int iCurrentStyle)
 	// keywords with paranthesis
 	{
 		const char *pKeywords = pLexCurrent->pKeyWords->pszKeyWords[NUMKEYWORD - 1];
-		if (*pKeywords) {
+		if (pKeywords != NULL && *pKeywords != '\0') {
 			WordList_AddList(pWList, pKeywords);
 		}
 	}

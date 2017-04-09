@@ -27,9 +27,9 @@ public:
 	void RangeAddDelta(int start, int end, int delta) {
 		// end is 1 past end, so end-start is number of elements to change
 		int i = 0;
-		int rangeLength = end - start;
+		const int rangeLength = end - start;
 		int range1Length = rangeLength;
-		int part1Left = part1Length - start;
+		const int part1Left = part1Length - start;
 		if (range1Length > part1Left)
 			range1Length = part1Left;
 		while (i < range1Length) {
@@ -170,7 +170,7 @@ public:
 		int lower = 0;
 		int upper = body->Length()-1;
 		do {
-			int middle = (upper + lower + 1) / 2; 	// Round high
+			const int middle = (upper + lower + 1) / 2; 	// Round high
 			int posMiddle = body->ValueAt(middle);
 			if (middle > stepPartition)
 				posMiddle += stepLength;

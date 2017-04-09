@@ -33,8 +33,8 @@ struct FontSpecification {
 
 // Just like Font but only has a copy of the FontID so should not delete it
 class FontAlias : public Font {
-	// Private so FontAlias objects can not be assigned except for intiialization
-	FontAlias &operator=(const FontAlias &);
+	// FontAlias objects can not be assigned except for initialization
+	FontAlias &operator=(const FontAlias &) = delete;
 public:
 	FontAlias();
 	FontAlias(const FontAlias &);
@@ -75,11 +75,11 @@ public:
 	~Style();
 	Style &operator=(const Style &source);
 	void Clear(ColourDesired fore_, ColourDesired back_,
-			   int size_,
-			   const char *fontName_, int characterSet_,
-			   int weight_, bool italic_, bool eolFilled_,
-			   bool underline_, bool strike_, ecaseForced caseForce_,
-			   bool visible_, bool changeable_, bool hotspot_);
+	           int size_,
+	           const char *fontName_, int characterSet_,
+	           int weight_, bool italic_, bool eolFilled_,
+	           bool underline_, bool strike_, ecaseForced caseForce_,
+	           bool visible_, bool changeable_, bool hotspot_);
 	void ClearTo(const Style &source);
 	void Copy(Font &font_, const FontMeasurements &fm_);
 	bool IsProtected() const { return !(changeable && visible);}

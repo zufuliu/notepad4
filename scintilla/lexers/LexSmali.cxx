@@ -71,8 +71,8 @@ static bool IsJavaType(int ch, int chPrev, int chNext) {
 
 #define MAX_WORD_LENGTH	31
 static void ColouriseSmaliDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, WordList *keywordLists[], Accessor &styler) {
-	WordList &keywords = *keywordLists[0];
-	//WordList &kwInstruction = *keywordLists[10];
+	const WordList &keywords = *keywordLists[0];
+	//const WordList &kwInstruction = *keywordLists[10];
 
 	int state = initStyle;
 	int ch = 0, chNext = styler[startPos];

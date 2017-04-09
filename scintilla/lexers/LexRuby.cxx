@@ -1,4 +1,9 @@
-// Lexer for Ruby.
+// Scintilla source code edit control
+/** @file LexRuby.cxx
+ ** Lexer for Ruby.
+ **/
+// Copyright 2001- by Clemens Wyss <wys@helbling.ch>
+// The License.txt file describes the conditions under which this software may be distributed.
 
 #include <stdlib.h>
 #include <string.h>
@@ -24,7 +29,7 @@ using namespace Scintilla;
 #endif
 
 //XXX Identical to Perl, put in common area
-static bool isEOLChar(char ch) {
+static inline bool isEOLChar(char ch) {
 	return (ch == '\r') || (ch == '\n');
 }
 
@@ -32,23 +37,23 @@ static bool isEOLChar(char ch) {
 // This one's redundant, but makes for more readable code
 #define isHighBitChar(ch) ((unsigned int)(ch) > 127)
 
-static bool isSafeAlpha(char ch) {
+static inline bool isSafeAlpha(char ch) {
 	return (isSafeASCII(ch) && isalpha(ch)) || ch == '_';
 }
 
-static bool isSafeAlnum(char ch) {
+static inline bool isSafeAlnum(char ch) {
 	return (isSafeASCII(ch) && isalnum(ch)) || ch == '_';
 }
 
-static bool isSafeAlnumOrHigh(char ch) {
+static inline bool isSafeAlnumOrHigh(char ch) {
 	return isHighBitChar(ch) || isalnum(ch) || ch == '_';
 }
 
-static bool isSafeDigit(char ch) {
+static inline bool isSafeDigit(char ch) {
 	return isSafeASCII(ch) && isdigit(ch);
 }
 
-static bool isSafeWordcharOrHigh(char ch) {
+static inline bool isSafeWordcharOrHigh(char ch) {
 	// Error: scintilla's KeyWords.h includes '.' as a word-char
 	// we want to separate things that can take methods from the
 	// methods.
@@ -90,7 +95,7 @@ static bool keywordIsAmbiguous(const char *prevWord);
 static bool keywordDoStartsLoop(Sci_Position pos, Accessor &styler);
 static bool keywordIsModifier(const char *word, Sci_Position pos, Accessor &styler);
 
-static int ClassifyWordRb(Sci_PositionU start, Sci_PositionU end, WordList &keywords, Accessor &styler, char *prevWord) {
+static int ClassifyWordRb(Sci_PositionU start, Sci_PositionU end, const WordList &keywords, Accessor &styler, char *prevWord) {
 	char s[MAX_KEYWORD_LENGTH];
 	Sci_PositionU i, j;
 	Sci_PositionU lim = end - start + 1; // num chars to copy
@@ -578,8 +583,8 @@ static void ColouriseRbDoc(Sci_PositionU startPos, Sci_Position length, int init
 	// which characters are being used as quotes, how deeply nested is the
 	// start position and what the termination string is for here documents
 
-	WordList &keywords = *keywordlists[0];
-	WordList &kwFold = *keywordlists[8];
+	const WordList &keywords = *keywordlists[0];
+	const WordList &kwFold = *keywordlists[8];
 
 	HereDocCls HereDoc;
 	QuoteCls Quote;

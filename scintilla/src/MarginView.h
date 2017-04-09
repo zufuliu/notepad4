@@ -39,7 +39,7 @@ public:
 	void DropGraphics(bool freeObjects);
 	void AllocateGraphics(const ViewStyle &vsDraw);
 	void RefreshPixMaps(Surface *surfaceWindow, WindowID wid, const ViewStyle &vsDraw);
-	void PaintMargin(Surface *surface, int topLine, const PRectangle &rc, const PRectangle &rcMargin,
+	void PaintMargin(Surface *surface, Sci::Line topLine, const PRectangle &rc, const PRectangle &rcMargin,
 		const EditModel &model, const ViewStyle &vs);
 };
 

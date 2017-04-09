@@ -50,7 +50,7 @@ private:
 	int *lineStarts;
 	int lenLineStarts;
 	/// Drawing is only performed for @a maxLineLength characters on each line.
-	int lineNumber;
+	Sci::Line lineNumber;
 	bool inCache;
 public:
 	enum { wrapWidthInfinite = 0x7ffffff };
@@ -83,12 +83,12 @@ public:
 	void Invalidate(validLevel validity_);
 	int LineStart(int line) const;
 	int LineLastVisible(int line) const;
-	Range SubLineRange(int line) const;
+	Range SubLineRange(int subLine) const;
 	bool InLine(int offset, int line) const;
 	void SetLineStart(int line, int start);
-	void SetBracesHighlight(const Range &rangeLine, const Position braces[],
+	void SetBracesHighlight(const Range &rangeLine, const Sci::Position braces[],
 		char bracesMatchStyle, int xHighlight, bool ignoreStyle);
-	void RestoreBracesHighlight(const Range &rangeLine, const Position braces[], bool ignoreStyle);
+	void RestoreBracesHighlight(const Range &rangeLine, const Sci::Position braces[], bool ignoreStyle);
 	int FindBefore(XYPOSITION x, int lower, int upper) const;
 	int FindPositionFromX(XYPOSITION x, const Range &range, bool charPosition) const;
 	Point PointFromPosition(int posInLine, int lineHeight, PointEnd pe) const;
@@ -104,7 +104,7 @@ class LineLayoutCache {
 	int styleClock;
 	int useCount;
 	void Allocate(size_t length_);
-	void AllocateForLevel(int linesOnScreen, int linesInDoc);
+	void AllocateForLevel(Sci::Line linesOnScreen, Sci::Line linesInDoc);
 public:
 	LineLayoutCache();
 	virtual ~LineLayoutCache();
@@ -118,8 +118,8 @@ public:
 	void Invalidate(LineLayout::validLevel validity_);
 	void SetLevel(int level_);
 	int GetLevel() const { return level; }
-	LineLayout *Retrieve(int lineNumber, int lineCaret, int maxChars, int styleClock_,
-		int linesOnScreen, int linesInDoc);
+	LineLayout *Retrieve(Sci::Line lineNumber, Sci::Line lineCaret, int maxChars, int styleClock_,
+		Sci::Line linesOnScreen, Sci::Line linesInDoc);
 	void Dispose(LineLayout *ll);
 };
 
@@ -134,7 +134,7 @@ public:
 	void Set(unsigned int styleNumber_, const char *s_, unsigned int len_, XYPOSITION *positions_, unsigned int clock_);
 	void Clear();
 	bool Retrieve(unsigned int styleNumber_, const char *s_, unsigned int len_, XYPOSITION *positions_) const;
-	static unsigned int Hash(unsigned int styleNumber_, const char *s, unsigned int len);
+	static unsigned int Hash(unsigned int styleNumber_, const char *s, unsigned int len_);
 	bool NewerThan(const PositionCacheEntry &other) const;
 	void ResetClock();
 };
@@ -176,7 +176,7 @@ struct TextSegment {
 class BreakFinder {
 	const LineLayout *ll;
 	Range lineRange;
-	int posLineStart;
+	Sci::Position posLineStart;
 	int nextBreak;
 	std::vector<int> selAndEdge;
 	unsigned int saeCurrentPos;
@@ -194,7 +194,7 @@ public:
 	enum { lengthStartSubdivision = 300 };
 	// Try to make each subdivided run lengthEachSubdivision or shorter.
 	enum { lengthEachSubdivision = 100 };
-	BreakFinder(const LineLayout *ll_, const Selection *psel, const Range &rangeLine_, int posLineStart_,
+	BreakFinder(const LineLayout *ll_, const Selection *psel, const Range &lineRange_, Sci::Position posLineStart_,
 		int xStart, bool breakForSelection, const Document *pdoc_, const SpecialRepresentations *preprs_, const ViewStyle *pvsDraw);
 	~BreakFinder();
 	TextSegment Next();
@@ -214,7 +214,7 @@ public:
 	void SetSize(size_t size_);
 	size_t GetSize() const { return pces.size(); }
 	void MeasureWidths(Surface *surface, const ViewStyle &vstyle, unsigned int styleNumber,
-		const char *s, unsigned int len, XYPOSITION *positions, Document *pdoc);
+		const char *s, unsigned int len, XYPOSITION *positions, const Document *pdoc);
 };
 
 inline bool IsSpaceOrTab(int ch) {

@@ -53,17 +53,13 @@ public:
 
 	ILexer *Create() const;
 
-	virtual void Lex(Sci_PositionU startPos, Sci_Position length, int initStyle,
+	virtual void Lex(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle,
                   WordList *keywordlists[], Accessor &styler) const;
-	virtual void Fold(Sci_PositionU startPos, Sci_Position length, int initStyle,
+	virtual void Fold(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle,
                   WordList *keywordlists[], Accessor &styler) const;
 
 	friend class Catalogue;
 };
-
-inline int Maximum(int a, int b) {
-	return (a > b) ? a : b;
-}
 
 #ifdef SCI_NAMESPACE
 }

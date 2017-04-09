@@ -45,9 +45,9 @@ static inline bool IsFNumber(int ch, int) {
 };*/
 
 static void ColouriseFortranDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, WordList *keywordLists[], Accessor &styler) {
-	WordList &keywords = *keywordLists[0];
-	WordList &keywords2 = *keywordLists[1];
-	WordList &keywords3 = *keywordLists[2];
+	const WordList &keywords = *keywordLists[0];
+	const WordList &keywords2 = *keywordLists[1];
+	const WordList &keywords3 = *keywordLists[2];
 
 	int visibleChars = 0;
 	styler.StartAt(startPos);

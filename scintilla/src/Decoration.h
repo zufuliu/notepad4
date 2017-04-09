@@ -12,15 +12,21 @@ namespace Scintilla {
 #endif
 
 class Decoration {
+	int indicator;
 public:
 	Decoration *next;
 	RunStyles rs;
-	int indicator;
 
 	explicit Decoration(int indicator_);
 	~Decoration();
 
 	bool Empty() const;
+	Decoration *Next() const {
+		return next;
+	}
+	int Indicator() const {
+		return indicator;
+	}
 };
 
 class DecorationList {
@@ -32,12 +38,16 @@ class DecorationList {
 	Decoration *Create(int indicator, int length);
 	void Delete(int indicator);
 	void DeleteAnyEmpty();
-public:
 	Decoration *root;
 	bool clickNotified;
+public:
 
 	DecorationList();
 	~DecorationList();
+
+	Decoration *Root() const {
+		return root;
+	}
 
 	void SetCurrentIndicator(int indicator);
 	int GetCurrentIndicator() const { return currentIndicator; }
@@ -55,6 +65,13 @@ public:
 	int ValueAt(int indicator, int position);
 	int Start(int indicator, int position);
 	int End(int indicator, int position);
+
+	bool ClickNotified() const {
+		return clickNotified;
+	}
+	void SetClickNotified(bool notified) {
+		clickNotified = notified;
+	}
 };
 
 #ifdef SCI_NAMESPACE

@@ -5,16 +5,16 @@
 // Copyright 1998-2007 by Neil Hodgson <neilh@scintilla.org>
 // The License.txt file describes the conditions under which this software may be distributed.
 
-#include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
-#include <ctype.h>
+#include <cstddef>
+#include <cstdlib>
+#include <cstring>
 
 #include <stdexcept>
 #include <string>
 #include <vector>
 #include <map>
 #include <algorithm>
+#include <memory>
 
 #include "Platform.h"
 
@@ -148,7 +148,7 @@ void LineLayout::SetLineStart(int line, int start) {
 	lineStarts[line] = start;
 }
 
-void LineLayout::SetBracesHighlight(const Range &rangeLine, const Position braces[],
+void LineLayout::SetBracesHighlight(const Range &rangeLine, const Sci::Position braces[],
                                     char bracesMatchStyle, int xHighlight, bool ignoreStyle) {
 	if (!ignoreStyle && rangeLine.ContainsCharacter(braces[0])) {
 		int braceOffset = braces[0] - rangeLine.start;
@@ -170,7 +170,7 @@ void LineLayout::SetBracesHighlight(const Range &rangeLine, const Position brace
 	}
 }
 
-void LineLayout::RestoreBracesHighlight(const Range &rangeLine, const Position braces[], bool ignoreStyle) {
+void LineLayout::RestoreBracesHighlight(const Range &rangeLine, const Sci::Position braces[], bool ignoreStyle) {
 	if (!ignoreStyle && rangeLine.ContainsCharacter(braces[0])) {
 		int braceOffset = braces[0] - rangeLine.start;
 		if (braceOffset < numCharsInLine) {
@@ -189,7 +189,7 @@ void LineLayout::RestoreBracesHighlight(const Range &rangeLine, const Position b
 int LineLayout::FindBefore(XYPOSITION x, int lower, int upper) const {
 	do {
 		int middle = (upper + lower + 1) / 2; 	// Round high
-		XYPOSITION posMiddle = positions[middle];
+		const XYPOSITION posMiddle = positions[middle];
 		if (x < posMiddle) {
 			upper = middle - 1;
 		} else {
@@ -266,7 +266,7 @@ void LineLayoutCache::Allocate(size_t length_) {
 	cache.resize(length_);
 }
 
-void LineLayoutCache::AllocateForLevel(int linesOnScreen, int linesInDoc) {
+void LineLayoutCache::AllocateForLevel(Sci::Line linesOnScreen, Sci::Line linesInDoc) {
 	PLATFORM_ASSERT(useCount == 0);
 	size_t lengthForLevel = 0;
 	if (level == llcCaret) {
@@ -293,16 +293,16 @@ void LineLayoutCache::AllocateForLevel(int linesOnScreen, int linesInDoc) {
 
 void LineLayoutCache::Deallocate() {
 	PLATFORM_ASSERT(useCount == 0);
-	for (size_t i = 0; i < cache.size(); i++)
-		delete cache[i];
+	for (LineLayout *ll : cache)
+		delete ll;
 	cache.clear();
 }
 
 void LineLayoutCache::Invalidate(LineLayout::validLevel validity_) {
 	if (!cache.empty() && !allInvalidated) {
-		for (size_t i = 0; i < cache.size(); i++) {
-			if (cache[i]) {
-				cache[i]->Invalidate(validity_);
+		for (LineLayout *ll : cache) {
+			if (ll) {
+				ll->Invalidate(validity_);
 			}
 		}
 		if (validity_ == LineLayout::llInvalid) {
@@ -319,15 +319,15 @@ void LineLayoutCache::SetLevel(int level_) {
 	}
 }
 
-LineLayout *LineLayoutCache::Retrieve(int lineNumber, int lineCaret, int maxChars, int styleClock_,
-                                      int linesOnScreen, int linesInDoc) {
+LineLayout *LineLayoutCache::Retrieve(Sci::Line lineNumber, Sci::Line lineCaret, int maxChars, int styleClock_,
+                                      Sci::Line linesOnScreen, Sci::Line linesInDoc) {
 	AllocateForLevel(linesOnScreen, linesInDoc);
 	if (styleClock != styleClock_) {
 		Invalidate(LineLayout::llCheckTextAndStyle);
 		styleClock = styleClock_;
 	}
 	allInvalidated = false;
-	int pos = -1;
+	Sci::Position pos = -1;
 	LineLayout *ret = 0;
 	if (level == llcCaret) {
 		pos = 0;
@@ -391,7 +391,7 @@ static inline int KeyFromString(const char *charBytes, size_t len) {
 }
 
 SpecialRepresentations::SpecialRepresentations() {
-	std::fill(startByteHasReprs, startByteHasReprs+0x100, 0);
+	std::fill(startByteHasReprs, startByteHasReprs+0x100, static_cast<short>(0));
 }
 
 void SpecialRepresentations::SetRepresentation(const char *charBytes, const char *value) {
@@ -432,7 +432,7 @@ bool SpecialRepresentations::Contains(const char *charBytes, size_t len) const {
 
 void SpecialRepresentations::Clear() {
 	mapReprs.clear();
-	std::fill(startByteHasReprs, startByteHasReprs+0x100, 0);
+	std::fill(startByteHasReprs, startByteHasReprs+0x100, static_cast<short>(0));
 }
 
 void BreakFinder::Insert(int val) {
@@ -446,7 +446,7 @@ void BreakFinder::Insert(int val) {
 	}
 }
 
-BreakFinder::BreakFinder(const LineLayout *ll_, const Selection *psel, const Range &lineRange_, int posLineStart_,
+BreakFinder::BreakFinder(const LineLayout *ll_, const Selection *psel, const Range &lineRange_, Sci::Position posLineStart_,
 	int xStart, bool breakForSelection, const Document *pdoc_, const SpecialRepresentations *preprs_, const ViewStyle *pvsDraw) :
 	ll(ll_),
 	lineRange(lineRange_),
@@ -469,11 +469,11 @@ BreakFinder::BreakFinder(const LineLayout *ll_, const Selection *psel, const Ran
 	}
 
 	if (breakForSelection) {
-		SelectionPosition posStart(posLineStart);
-		SelectionPosition posEnd(posLineStart + lineRange.end);
-		SelectionSegment segmentLine(posStart, posEnd);
+		const SelectionPosition posStart(posLineStart);
+		const SelectionPosition posEnd(posLineStart + lineRange.end);
+		const SelectionSegment segmentLine(posStart, posEnd);
 		for (size_t r=0; r<psel->Count(); r++) {
-			SelectionSegment portion = psel->Range(r).Intersect(segmentLine);
+			const SelectionSegment portion = psel->Range(r).Intersect(segmentLine);
 			if (!(portion.start == portion.end)) {
 				if (portion.start.IsValid())
 					Insert(portion.start.Position() - posLineStart);
@@ -482,10 +482,10 @@ BreakFinder::BreakFinder(const LineLayout *ll_, const Selection *psel, const Ran
 			}
 		}
 	}
-	if (pvsDraw && pvsDraw->indicatorsSetFore > 0) {
-		for (Decoration *deco = pdoc->decorations.root; deco; deco = deco->next) {
-			if (pvsDraw->indicators[deco->indicator].OverridesTextFore()) {
-				int startPos = deco->rs.EndRun(posLineStart);
+	if (pvsDraw && pvsDraw->indicatorsSetFore) {
+		for (Decoration *deco = pdoc->decorations.Root(); deco; deco = deco->Next()) {
+			if (pvsDraw->indicators[deco->Indicator()].OverridesTextFore()) {
+				Sci::Position startPos = deco->rs.EndRun(posLineStart);
 				while (startPos < (posLineStart + lineRange.end)) {
 					Insert(startPos - posLineStart);
 					startPos = deco->rs.EndRun(startPos);
@@ -575,7 +575,7 @@ void PositionCacheEntry::Set(unsigned int styleNumber_, const char *s_,
 		for (unsigned int i=0; i<len; i++) {
 			positions[i] = positions_[i];
 		}
-		memcpy(reinterpret_cast<char *>(reinterpret_cast<void *>(positions + len)), s_, len);
+		memcpy(reinterpret_cast<void *>(positions + len), s_, len);
 	}
 }
 
@@ -594,7 +594,7 @@ void PositionCacheEntry::Clear() {
 bool PositionCacheEntry::Retrieve(unsigned int styleNumber_, const char *s_,
 	unsigned int len_, XYPOSITION *positions_) const {
 	if ((styleNumber == styleNumber_) && (len == len_) &&
-		(memcmp(reinterpret_cast<char *>(reinterpret_cast<void *>(positions + len)), s_, len)== 0)) {
+		(memcmp(reinterpret_cast<void *>(positions + len), s_, len)== 0)) {
 		for (unsigned int i=0; i<len; i++) {
 			positions_[i] = positions[i];
 		}
@@ -639,8 +639,8 @@ PositionCache::~PositionCache() {
 
 void PositionCache::Clear() {
 	if (!allClear) {
-		for (size_t i=0; i<pces.size(); i++) {
-			pces[i].Clear();
+		for (PositionCacheEntry &pce : pces) {
+			pce.Clear();
 		}
 		pces.clear();
 	}
@@ -654,7 +654,7 @@ void PositionCache::SetSize(size_t size_) {
 }
 
 void PositionCache::MeasureWidths(Surface *surface, const ViewStyle &vstyle, unsigned int styleNumber,
-	const char *s, unsigned int len, XYPOSITION *positions, Document *pdoc) {
+	const char *s, unsigned int len, XYPOSITION *positions, const Document *pdoc) {
 
 	allClear = false;
 	size_t probe = pces.size();	// Out of bounds
@@ -701,8 +701,8 @@ void PositionCache::MeasureWidths(Surface *surface, const ViewStyle &vstyle, uns
 		if (clock > 60000) {
 			// Since there are only 16 bits for the clock, wrap it round and
 			// reset all cache entries so none get stuck with a high clock.
-			for (size_t i=0; i<pces.size(); i++) {
-				pces[i].ResetClock();
+			for (PositionCacheEntry &pce : pces) {
+				pce.ResetClock();
 			}
 			clock = 2;
 		}

@@ -33,14 +33,14 @@ using namespace Scintilla;
 };*/
 
 static void ColouriseVHDLDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, WordList *keywordlists[], Accessor &styler) {
-	WordList &Keywords = *keywordlists[0];
-	WordList &Operators = *keywordlists[1];
-	WordList &Attributes = *keywordlists[2];
-	WordList &Functions = *keywordlists[3];
-	WordList &Packages = *keywordlists[4];
-	WordList &Types = *keywordlists[5];
-	WordList &User = *keywordlists[6];
-	//WordList &User2 = *keywordlists[7];
+	const WordList &Keywords = *keywordlists[0];
+	const WordList &Operators = *keywordlists[1];
+	const WordList &Attributes = *keywordlists[2];
+	const WordList &Functions = *keywordlists[3];
+	const WordList &Packages = *keywordlists[4];
+	const WordList &Types = *keywordlists[5];
+	const WordList &User = *keywordlists[6];
+	//const WordList &User2 = *keywordlists[7];
 
 	StyleContext sc(startPos, length, initStyle, styler);
 
@@ -138,7 +138,7 @@ static inline bool IsStreamCommentStyle(int style) {
 static void FoldVHDLDoc(Sci_PositionU startPos, Sci_Position length, int /*initStyle*/, WordList *keywordlists[], Accessor &styler) {
 	if (styler.GetPropertyInt("fold") == 0)
 		return;
-	WordList &kwFold = *keywordlists[8];
+	const WordList &kwFold = *keywordlists[8];
 
 	const bool foldComment = styler.GetPropertyInt("fold.comment") != 0;
 	const bool foldCompact = styler.GetPropertyInt("fold.compact", 1) != 0;
@@ -284,15 +284,17 @@ static void FoldVHDLDoc(Sci_PositionU startPos, Sci_Position length, int /*initS
 						strcmp(s, "component") == 0 ||
 						strcmp(s, "entity") == 0 ||
 						strcmp(s, "configuration") == 0) {
-						if (strcmp(prevWord, "end") != 0 && lastStart) {
+						if (strcmp(prevWord, "end") != 0) {
 							// check for instantiated unit by backward searching for the colon.
-							unsigned pos = lastStart;
-							char chAtPos, styleAtPos;
+							Sci_PositionU pos = lastStart;
+							char chAtPos = 0, styleAtPos;
 							do { // skip white spaces
+								if (!pos)
+									break;
 								pos--;
 								styleAtPos = styler.StyleAt(pos);
 								chAtPos = styler.SafeGetCharAt(pos);
-							} while (pos > 0 &&
+							} while (pos &&
 									(chAtPos == ' ' || chAtPos == '\t' ||
 									chAtPos == '\n' || chAtPos == '\r' ||
 									IsCommentStyle(styleAtPos)));

@@ -24,7 +24,7 @@ class ContractionState {
 	RunStyles *heights;
 	SparseVector<const char *> *foldDisplayTexts;
 	Partitioning *displayLines;
-	int linesInDocument;
+	Sci::Line linesInDocument;
 
 	void EnsureData();
 
@@ -40,31 +40,31 @@ public:
 
 	void Clear();
 
-	int LinesInDoc() const;
-	int LinesDisplayed() const;
-	int DisplayFromDoc(int lineDoc) const;
-	int DisplayLastFromDoc(int lineDoc) const;
-	int DocFromDisplay(int lineDisplay) const;
+	Sci::Line LinesInDoc() const;
+	Sci::Line LinesDisplayed() const;
+	Sci::Line DisplayFromDoc(Sci::Line lineDoc) const;
+	Sci::Line DisplayLastFromDoc(Sci::Line lineDoc) const;
+	Sci::Line DocFromDisplay(Sci::Line lineDisplay) const;
 
-	void InsertLine(int lineDoc);
-	void InsertLines(int lineDoc, int lineCount);
-	void DeleteLine(int lineDoc);
-	void DeleteLines(int lineDoc, int lineCount);
+	void InsertLine(Sci::Line lineDoc);
+	void InsertLines(Sci::Line lineDoc, Sci::Line lineCount);
+	void DeleteLine(Sci::Line lineDoc);
+	void DeleteLines(Sci::Line lineDoc, Sci::Line lineCount);
 
-	bool GetVisible(int lineDoc) const;
-	bool SetVisible(int lineDocStart, int lineDocEnd, bool isVisible);
+	bool GetVisible(Sci::Line lineDoc) const;
+	bool SetVisible(Sci::Line lineDocStart, Sci::Line lineDocEnd, bool isVisible);
 	bool HiddenLines() const;
 
-	const char *GetFoldDisplayText(int lineDoc) const;
-	bool SetFoldDisplayText(int lineDoc, const char *text);
+	const char *GetFoldDisplayText(Sci::Line lineDoc) const;
+	bool SetFoldDisplayText(Sci::Line lineDoc, const char *text);
 
-	bool GetExpanded(int lineDoc) const;
-	bool SetExpanded(int lineDoc, bool isExpanded);
-	bool GetFoldDisplayTextShown(int lineDoc) const;
-	int ContractedNext(int lineDocStart) const;
+	bool GetExpanded(Sci::Line lineDoc) const;
+	bool SetExpanded(Sci::Line lineDoc, bool isExpanded);
+	bool GetFoldDisplayTextShown(Sci::Line lineDoc) const;
+	Sci::Line ContractedNext(Sci::Line lineDocStart) const;
 
-	int GetHeight(int lineDoc) const;
-	bool SetHeight(int lineDoc, int height);
+	int GetHeight(Sci::Line lineDoc) const;
+	bool SetHeight(Sci::Line lineDoc, int height);
 
 	void ShowAll();
 	void Check() const;

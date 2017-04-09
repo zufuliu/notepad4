@@ -1,6 +1,6 @@
 // Scintilla source code edit control
-/** @file LexOthers.cxx
- ** Lexers for batch files, diff results, properties files, make files and error lists.
+/** @file LexDiff.cxx
+ ** Lexer for diff results.
  **/
 // Copyright 1998-2001 by Neil Hodgson <neilh@scintilla.org>
 // The License.txt file describes the conditions under which this software may be distributed.
@@ -124,7 +124,7 @@ static void FoldDiffDoc(Sci_PositionU startPos, Sci_Position length, int, WordLi
 	int nextLevel;
 
 	do {
-		int lineType = styler.StyleAt(curLineStart);
+		const int lineType = styler.StyleAt(curLineStart);
 		if (lineType == SCE_DIFF_COMMAND)
 			nextLevel = SC_FOLDLEVELBASE | SC_FOLDLEVELHEADERFLAG;
 		else if (lineType == SCE_DIFF_HEADER)

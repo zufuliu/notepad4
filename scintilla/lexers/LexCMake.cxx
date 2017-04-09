@@ -33,8 +33,8 @@ static inline bool IsCmakeOperator(char ch) {
 }
 
 static void ColouriseCmakeDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, WordList *keywordLists[], Accessor &styler) {
-	WordList &keywords = *keywordLists[0];
-	WordList &keywords2 = *keywordLists[1];
+	const WordList &keywords = *keywordLists[0];
+	const WordList &keywords2 = *keywordLists[1];
 
 	int varStyle = SCE_CMAKE_DEFAULT;
 	static int nvarLevel = 0; // nested variable ${${}}

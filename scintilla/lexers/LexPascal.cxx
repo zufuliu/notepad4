@@ -42,10 +42,10 @@ enum {
 };*/
 
 static void ClassifyPascalWord(WordList *keywordlists[], StyleContext &sc, int &curLineState, bool bSmartHighlighting) {
-	WordList& keywords = *keywordlists[0];
-	WordList& typewords = *keywordlists[1];
-	WordList& funwords = *keywordlists[2];
-	WordList& prcwords = *keywordlists[3];
+	const WordList& keywords = *keywordlists[0];
+	const WordList& typewords = *keywordlists[1];
+	const WordList& funwords = *keywordlists[2];
+	const WordList& prcwords = *keywordlists[3];
 	char s[128];
 	sc.GetCurrentLowered(s, sizeof(s));
 	if (typewords.InList(s)) {
@@ -104,11 +104,11 @@ static void ClassifyPascalWord(WordList *keywordlists[], StyleContext &sc, int &
 static void ColourisePascalDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, WordList *keywordlists[], Accessor &styler) {
 	const bool bSmartHighlighting = styler.GetPropertyInt("lexer.pascal.smart.highlighting", 1) != 0;
 
-	CharacterSet setWordStart(CharacterSet::setAlpha, "_", 0x80, true);
-	CharacterSet setWord(CharacterSet::setAlphaNum, "_", 0x80, true);
-	CharacterSet setNumber(CharacterSet::setDigits, ".-+eE");
-	CharacterSet setHexNumber(CharacterSet::setDigits, "abcdefABCDEF");
-	CharacterSet setOperator(CharacterSet::setNone, "#$&'()*+,-./:;<=>@[]^{}");
+	const CharacterSet setWordStart(CharacterSet::setAlpha, "_", 0x80, true);
+	const CharacterSet setWord(CharacterSet::setAlphaNum, "_", 0x80, true);
+	const CharacterSet setNumber(CharacterSet::setDigits, ".-+eE");
+	const CharacterSet setHexNumber(CharacterSet::setDigits, "abcdefABCDEF");
+	const CharacterSet setOperator(CharacterSet::setNone, "#$&'()*+,-./:;<=>@[]^{}");
 
 	Sci_Position curLine = styler.GetLine(startPos);
 	int curLineState = curLine > 0 ? styler.GetLineState(curLine - 1) : 0;
@@ -262,7 +262,7 @@ static void SetFoldInPreprocessorLevelFlag(int &lineFoldStateCurrent, unsigned i
 
 static void ClassifyPascalPreprocessorFoldPoint(int &levelCurrent, int &lineFoldStateCurrent,
 	Sci_PositionU startPos, Accessor &styler) {
-	CharacterSet setWord(CharacterSet::setAlpha);
+	const CharacterSet setWord(CharacterSet::setAlpha);
 
 	char s[16];	// Size of the longest possible keyword + one additional character + null
 	LexGetRangeLowered(startPos, styler, setWord, s, sizeof(s));
@@ -297,8 +297,8 @@ static void ClassifyPascalWordFoldPoint(int &levelCurrent, int &lineFoldStateCur
 		Sci_Position startPos, Sci_PositionU endPos,
 		Sci_PositionU lastStart, Sci_PositionU currentPos, Accessor &styler) {
 	char s[128];
-	CharacterSet setWordStart(CharacterSet::setAlpha, "_");
-	CharacterSet setWord(CharacterSet::setAlphaNum, "_");
+	const CharacterSet setWordStart(CharacterSet::setAlpha, "_");
+	const CharacterSet setWord(CharacterSet::setAlphaNum, "_");
 
 	LexGetRangeLowered(lastStart, currentPos, styler, s, sizeof(s));
 
@@ -411,7 +411,7 @@ static void FoldPascalDoc(Sci_PositionU startPos, Sci_Position length, int initS
 	int style = initStyle;
 
 	int lastStart = 0;
-	CharacterSet setWord(CharacterSet::setAlphaNum, "_", 0x80, true);
+	const CharacterSet setWord(CharacterSet::setAlphaNum, "_", 0x80, true);
 
 	for (Sci_PositionU i = startPos; i < endPos; i++) {
 		char ch = chNext;

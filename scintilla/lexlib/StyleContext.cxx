@@ -5,17 +5,16 @@
 // Copyright 1998-2004 by Neil Hodgson <neilh@scintilla.org>
 // This file is in the public domain.
 
-#include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
-#include <assert.h>
-#include <ctype.h>
+#include <cstdlib>
+#include <cassert>
+#include <cctype>
 
 #include "ILexer.h"
 
 #include "LexAccessor.h"
 #include "Accessor.h"
 #include "StyleContext.h"
+#include "CharacterSet.h"
 
 #ifdef SCI_NAMESPACE
 using namespace Scintilla;
@@ -51,8 +50,8 @@ StyleContext::StyleContext(Sci_PositionU startPos, Sci_PositionU length,
 	state(initStyle & chMask), // Mask off all bits which aren't in the chMask.
 	chPrev(0),
 	ch(0),
-	chNext(0),
 	width(0),
+	chNext(0),
 	widthNext(1) {
 	if (styler.Encoding() != enc8bit) {
 		multiByteAccess = styler.MultiByteAccess();
@@ -108,13 +107,10 @@ void StyleContext::Forward(Sci_Position nb) {
 	}
 }
 void StyleContext::ForwardBytes(Sci_Position nb) {
-	size_t forwardPos = currentPos + nb;
+	const Sci_PositionU forwardPos = currentPos + nb;
 	while (forwardPos > currentPos) {
 		Forward();
 	}
-}
-void StyleContext::ChangeState(int state_) {
-	state = state_;
 }
 void StyleContext::SetState(int state_) {
 	styler.ColourTo(currentPos - ((currentPos > lengthDocument) ? 2 : 1), state);
@@ -138,7 +134,7 @@ int StyleContext::GetRelativeCharacter(Sci_Position n) {
 		}
 		Sci_Position diffRelative = n - offsetRelative;
 		Sci_Position posNew = multiByteAccess->GetRelativePosition(posRelative, diffRelative);
-		int chReturn = multiByteAccess->GetCharacterAndWidth(posNew, 0);
+		const int chReturn = multiByteAccess->GetCharacterAndWidth(posNew, 0);
 		posRelative = posNew;
 		currentPosLastRelative = currentPos;
 		offsetRelative = n;

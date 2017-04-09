@@ -36,7 +36,7 @@ public:
 	SpecialRepresentations reprs;
 	Caret caret;
 	SelectionPosition posDrag;
-	Position braces[2];
+	Sci::Position braces[2];
 	int bracesMatchStyle;
 	int highlightGuideColumn;
 	Selection sel;
@@ -49,7 +49,7 @@ public:
 	ContractionState cs;
 	// Hotspot support
 	Range hotspot;
-	int hoverIndicatorPos;
+	Sci::Position hoverIndicatorPos;
 
 	// Wrapping support
 	int wrapWidth;
@@ -58,9 +58,9 @@ public:
 
 	EditModel();
 	virtual ~EditModel();
-	virtual int TopLineOfMain() const = 0;
+	virtual Sci::Line TopLineOfMain() const = 0;
 	virtual Point GetVisibleOriginInMain() const = 0;
-	virtual int LinesOnScreen() const = 0;
+	virtual Sci::Line LinesOnScreen() const = 0;
 	virtual Range GetHotSpotRange() const = 0;
 };
 

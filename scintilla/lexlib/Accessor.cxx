@@ -5,12 +5,8 @@
 // Copyright 1998-2002 by Neil Hodgson <neilh@scintilla.org>
 // The License.txt file describes the conditions under which this software may be distributed.
 
-#include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
-#include <stdarg.h>
-#include <assert.h>
-#include <ctype.h>
+#include <cstdlib>
+#include <cassert>
 
 #include "ILexer.h"
 #include "Scintilla.h"
@@ -33,7 +29,7 @@ int Accessor::GetPropertyInt(const char *key, int defaultValue) const {
 }
 
 int Accessor::LexIndentAmount(Accessor &styler, Sci_Position line, int *flags, PFNIsCommentLeader pfnIsCommentLeader) {
-	Sci_Position end = styler.Length();
+	const Sci_Position end = styler.Length();
 	int spaceFlags = 0;
 
 	// Determines the indentation level of the current line and also checks for consistent
@@ -48,7 +44,7 @@ int Accessor::LexIndentAmount(Accessor &styler, Sci_Position line, int *flags, P
 	Sci_Position posPrev = inPrevPrefix ? styler.LineStart(line-1) : 0;
 	while ((ch == ' ' || ch == '\t') && (pos < end)) {
 		if (inPrevPrefix) {
-			char chPrev = styler[posPrev++];
+			const char chPrev = styler[posPrev++];
 			if (chPrev == ' ' || chPrev == '\t') {
 				if (chPrev != ch)
 					spaceFlags |= wsInconsistent;

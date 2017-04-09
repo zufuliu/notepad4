@@ -69,8 +69,6 @@ static KEYWORDLIST Keywords_HTML = {
 "Static Stop String Sub Then To True Type Unload Until Variant WEnd While With WithEvents Xor"
 , // Python
 ""
-, // SCGL
-""
 , // PHP
 "abstract and as break callable case catch class clone const continue declare default "
 "do else elseif enddeclare endfor endforeach endif endswitch endwhile extends final "
@@ -89,8 +87,9 @@ static KEYWORDLIST Keywords_HTML = {
 "stdClass Exception ErrorException Directory php_user_filter DateTime "
 //
 "__CLASS__ __DIR__ __FILE__ __FUNCTION__ __LINE__ __METHOD__ __NAMESPACE__ __TRAIT__ "
+, // SGML DTD
+""
 ,
-
 "", "", ""
 
 #if NUMKEYWORD == 16

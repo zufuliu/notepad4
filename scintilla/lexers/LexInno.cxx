@@ -30,12 +30,12 @@ using namespace Scintilla;
 };*/
 
 static void ColouriseInnoDoc(Sci_PositionU startPos, Sci_Position length, int, WordList *keywordLists[], Accessor &styler) {
-	WordList &sectionKeywords = *keywordLists[0];
-	WordList &standardKeywords = *keywordLists[1];
-	WordList &parameterKeywords = *keywordLists[2];
-	WordList &preprocessorKeywords = *keywordLists[3];
-	WordList &pascalKeywords = *keywordLists[4];
-	WordList &typeKeywords = *keywordLists[5];
+	const WordList &sectionKeywords = *keywordLists[0];
+	const WordList &standardKeywords = *keywordLists[1];
+	const WordList &parameterKeywords = *keywordLists[2];
+	const WordList &preprocessorKeywords = *keywordLists[3];
+	const WordList &pascalKeywords = *keywordLists[4];
+	const WordList &typeKeywords = *keywordLists[5];
 
 	int state = SCE_INNO_DEFAULT;
 	static bool sectionFound = false;

@@ -41,10 +41,10 @@ static inline bool IsFSOperator(int ch) {
 };*/
 
 static void ColouriseFSharpDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, WordList *keywordLists[], Accessor &styler) {
-	WordList &keywords = *keywordLists[0];
-	WordList &keywords2 = *keywordLists[1];
-	WordList &keywords3 = *keywordLists[2];
-	WordList &keywords4 = *keywordLists[3];
+	const WordList &keywords = *keywordLists[0];
+	const WordList &keywords2 = *keywordLists[1];
+	const WordList &keywords3 = *keywordLists[2];
+	const WordList &keywords4 = *keywordLists[3];
 
 	//const int lexType = styler.GetPropertyInt("lexer.lang.type", LEX_FSHARP);
 	int visibleChars = 0;

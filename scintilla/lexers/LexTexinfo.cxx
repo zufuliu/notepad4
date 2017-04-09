@@ -27,10 +27,10 @@ static inline bool IsTexiSpec(int ch) {
 #define MAX_WORD_LENGTH	31
 static void ColouriseTexiDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, WordList *keywordLists[], Accessor &styler) {
 	const bool fold = styler.GetPropertyInt("fold", 1) != 0;
-	//WordList &keywords = *keywordLists[0]; // command
-	WordList &keywords2 = *keywordLists[1];// fold
-	//WordList &keywords3 = *keywordLists[2];// condition
-	//WordList &keywords4 = *keywordLists[3];// command with arg
+	//const WordList &keywords = *keywordLists[0]; // command
+	const WordList &keywords2 = *keywordLists[1];// fold
+	//const WordList &keywords3 = *keywordLists[2];// condition
+	//const WordList &keywords4 = *keywordLists[3];// command with arg
 
 	int state = initStyle;
 	int ch = 0, chNext = styler[startPos];

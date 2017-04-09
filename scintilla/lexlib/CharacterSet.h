@@ -27,6 +27,7 @@ public:
 	};
 	CharacterSet(setBase base=setNone, const char *initialSet="", int size_=0x80, bool valueAfter_=false);
 	CharacterSet(const CharacterSet &other);
+	CharacterSet &operator=(CharacterSet &&other);
 	~CharacterSet() {
 		delete []bset;
 		bset = 0;
@@ -142,7 +143,7 @@ inline int MakeLowerCase(int ch) {
 	if (ch < 'A' || ch > 'Z')
 		return ch;
 	else
-		return (ch - 'A' + 'a');
+		return ch - 'A' + 'a';
 }
 
 int CompareCaseInsensitive(const char *a, const char *b);

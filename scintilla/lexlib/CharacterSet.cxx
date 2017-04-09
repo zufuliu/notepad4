@@ -6,11 +6,8 @@
 // Copyright 1998-2010 by Neil Hodgson <neilh@scintilla.org>
 // The License.txt file describes the conditions under which this software may be distributed.
 
-#include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
-#include <assert.h>
-#include <ctype.h>
+#include <cstdlib>
+#include <cassert>
 
 #include "CharacterSet.h"
 
@@ -45,16 +42,14 @@ CharacterSet::CharacterSet(const CharacterSet &other) {
 		bset[i] = other.bset[i];
 	}
 }
-CharacterSet& CharacterSet::operator=(const CharacterSet &other) {
+CharacterSet& CharacterSet::operator=(CharacterSet &&other) {
 	if (this != &other) {
-		bool *bsetNew = new bool[other.size];
-		for (int i=0; i < other.size; i++) {
-			bsetNew[i] = other.bset[i];
-		}
 		delete []bset;
 		size = other.size;
 		valueAfter = other.valueAfter;
-		bset = bsetNew;
+		bset = other.bset;
+		other.size = 0;
+		other.bset = nullptr;
 	}
 	return *this;
 }
@@ -73,8 +68,8 @@ void CharacterSet::AddString(const char *setToAdd) {
 int CompareCaseInsensitive(const char *a, const char *b) {
 	while (*a && *b) {
 		if (*a != *b) {
-			int upperA = MakeUpperCase(*a);
-			int upperB = MakeUpperCase(*b);
+			const int upperA = MakeUpperCase(*a);
+			const int upperB = MakeUpperCase(*b);
 			if (upperA != upperB)
 				return upperA - upperB;
 		}
@@ -88,8 +83,8 @@ int CompareCaseInsensitive(const char *a, const char *b) {
 int CompareNCaseInsensitive(const char *a, const char *b, size_t len) {
 	while (*a && *b && len) {
 		if (*a != *b) {
-			int upperA = MakeUpperCase(*a);
-			int upperB = MakeUpperCase(*b);
+			const int upperA = MakeUpperCase(*a);
+			const int upperB = MakeUpperCase(*b);
 			if (upperA != upperB)
 				return upperA - upperB;
 		}

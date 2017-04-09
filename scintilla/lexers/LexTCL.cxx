@@ -71,15 +71,15 @@ static void ColouriseTCLDoc(Sci_PositionU startPos, Sci_Position length, int , W
 	// make sure lines overlap
 	startPos = styler.LineStart(currentLine);
 
-	WordList &keywords = *keywordlists[0];
-	WordList &keywords2 = *keywordlists[1];
-	WordList &keywords3 = *keywordlists[2];
-	WordList &keywords4 = *keywordlists[3];
-	WordList &keywords5 = *keywordlists[4];
-	WordList &keywords6 = *keywordlists[5];
-	WordList &keywords7 = *keywordlists[6];
-	WordList &keywords8 = *keywordlists[7];
-	WordList &keywords9 = *keywordlists[8];
+	const WordList &keywords = *keywordlists[0];
+	const WordList &keywords2 = *keywordlists[1];
+	const WordList &keywords3 = *keywordlists[2];
+	const WordList &keywords4 = *keywordlists[3];
+	const WordList &keywords5 = *keywordlists[4];
+	const WordList &keywords6 = *keywordlists[5];
+	const WordList &keywords7 = *keywordlists[6];
+	const WordList &keywords8 = *keywordlists[7];
+	const WordList &keywords9 = *keywordlists[8];
 
 	if (currentLine > 0) {
 		Sci_Position ls = styler.GetLineState(currentLine - 1);

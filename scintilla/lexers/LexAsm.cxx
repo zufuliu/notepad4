@@ -55,16 +55,16 @@ static inline bool IsAsmNumber(int ch, int chPrev) {
 extern bool IsCppInDefine(Sci_Position currentPos, LexAccessor &styler);
 
 static void ColouriseAsmDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, WordList *keywordLists[], Accessor &styler) {
-	WordList &cpuInstruction	= *keywordLists[0];
-	WordList &mathInstruction	= *keywordLists[1];
-	WordList &registers			= *keywordLists[2];
-	WordList &directive			= *keywordLists[3];
-	WordList &directiveOperand	= *keywordLists[4];
-	WordList &extInstruction		= *keywordLists[5];
-	//WordList &directives4foldstart= *keywordLists[6];
-	//WordList &directives4foldend	= *keywordLists[7];
-	WordList &GNUdirective			= *keywordLists[8];
-	WordList &kwProprocessor		= *keywordLists[9];
+	const WordList &cpuInstruction	= *keywordLists[0];
+	const WordList &mathInstruction	= *keywordLists[1];
+	const WordList &registers		= *keywordLists[2];
+	const WordList &directive		= *keywordLists[3];
+	const WordList &directiveOperand= *keywordLists[4];
+	const WordList &extInstruction	= *keywordLists[5];
+	//const WordList &directives4foldstart= *keywordLists[6];
+	//const WordList &directives4foldend= *keywordLists[7];
+	const WordList &GNUdirective		= *keywordLists[8];
+	const WordList &kwProprocessor	= *keywordLists[9];
 	std::string delimiters = "";
 	// Do not leak onto next line
 	if (initStyle == SCE_ASM_STRINGEOL)
@@ -370,8 +370,8 @@ static void FoldAsmDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 	const bool foldPreprocessor = styler.GetPropertyInt("fold.preprocessor", 1) != 0;
 	const bool foldCompact = styler.GetPropertyInt("fold.compact", 0) != 0;
 
-	WordList &directives4foldstart	= *keywordLists[6];
-	WordList &directives4foldend	= *keywordLists[7];
+	const WordList &directives4foldstart	= *keywordLists[6];
+	const WordList &directives4foldend	= *keywordLists[7];
 
 	Sci_PositionU endPos = startPos + length;
 	int visibleChars = 0;

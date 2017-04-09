@@ -4,6 +4,8 @@
 #include <assert.h>
 #include <ctype.h>
 
+#include <algorithm>
+
 #include "ILexer.h"
 #include "Scintilla.h"
 #include "SciLexer.h"
@@ -120,14 +122,14 @@ static inline int GetPyStringStyle(int quote, bool is_raw, bool is_bytes, bool i
 }
 
 static void ColourisePyDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, WordList *keywordLists[], Accessor &styler) {
-	WordList &keywords = *keywordLists[0];
-	WordList &keywords2 = *keywordLists[1];
-	WordList &keywords_const = *keywordLists[2];
-	//WordList &keywords4 = *keywordLists[3];
-	WordList &keywords_func = *keywordLists[4];
-	WordList &keywords_attr = *keywordLists[5];
-	WordList &keywords_objm = *keywordLists[6];
-	WordList &keywords_class = *keywordLists[7];
+	const WordList &keywords = *keywordLists[0];
+	const WordList &keywords2 = *keywordLists[1];
+	const WordList &keywords_const = *keywordLists[2];
+	//const WordList &keywords4 = *keywordLists[3];
+	const WordList &keywords_func = *keywordLists[4];
+	const WordList &keywords_attr = *keywordLists[5];
+	const WordList &keywords_objm = *keywordLists[6];
+	const WordList &keywords_class = *keywordLists[7];
 
 	int defType = 0;
 	int visibleChars = 0;
@@ -437,7 +439,7 @@ static void FoldPyDoc(Sci_PositionU startPos, Sci_Position length, int, WordList
 		}
 
 		const int levelAfterComments = indentNext & SC_FOLDLEVELNUMBERMASK;
-		const int levelBeforeComments = Maximum(indentCurrentLevel, levelAfterComments);
+		const int levelBeforeComments = std::max(indentCurrentLevel, levelAfterComments);
 
 		// Now set all the indent levels on the lines we skipped
 		// Do this from end to start.  Once we encounter one line

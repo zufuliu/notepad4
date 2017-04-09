@@ -95,7 +95,6 @@ class Face:
 							raise Exception("Duplicate event " + value + " " + name)
 						self.events[value] = 1
 						self.order.append(name)
-						currentComment = []
 					elif featureType == "cat":
 						currentCategory = featureVal
 					elif featureType == "val":
@@ -107,14 +106,15 @@ class Face:
 						self.features[name] = {
 							"FeatureType": featureType,
 							"Category": currentCategory,
-							"Value": value,
-							"Comment": currentComment }
+							"Value": value }
 						self.order.append(name)
 					elif featureType == "enu" or featureType == "lex":
 						name, value = featureVal.split("=", 1)
 						self.features[name] = {
 							"FeatureType": featureType,
 							"Category": currentCategory,
-							"Value": value }
+							"Value": value,
+							"Comment": currentComment }
 						self.order.append(name)
+						currentComment = []
 

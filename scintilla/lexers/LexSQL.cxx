@@ -49,14 +49,14 @@ static inline  bool IsANumberChar(int ch, int chPrev) {
 };*/
 
 static void ColouriseSqlDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, WordList *keywordlists[], Accessor &styler) {
-	WordList &keywords1 = *keywordlists[0];
-	WordList &keywords2 = *keywordlists[1];
-	WordList &kw_user1 = *keywordlists[2];
-	//WordList &kw_pldoc = *keywordlists[2];
-	//WordList &kw_sqlplus = *keywordlists[3];
-	//WordList &kw_user2 = *keywordlists[5];
-	//WordList &kw_user3 = *keywordlists[6];
-	//WordList &kw_user4 = *keywordlists[7];
+	const WordList &keywords1 = *keywordlists[0];
+	const WordList &keywords2 = *keywordlists[1];
+	const WordList &kw_user1 = *keywordlists[2];
+	//const WordList &kw_pldoc = *keywordlists[2];
+	//const WordList &kw_sqlplus = *keywordlists[3];
+	//const WordList &kw_user2 = *keywordlists[5];
+	//const WordList &kw_user3 = *keywordlists[6];
+	//const WordList &kw_user4 = *keywordlists[7];
 
 	const bool sqlBackticksIdentifier = styler.GetPropertyInt("lexer.sql.backticks.identifier", 1) != 0;
 	const bool sqlNumbersignComment = styler.GetPropertyInt("lexer.sql.numbersign.comment", 1) != 0;

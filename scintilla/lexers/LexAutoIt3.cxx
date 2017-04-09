@@ -138,14 +138,14 @@ static bool IsContinuationLine(Sci_PositionU szLine, Accessor &styler) {
 
 // syntax highlighting logic
 static void ColouriseAU3Doc(Sci_PositionU startPos, Sci_Position length, int initStyle, WordList *keywordlists[], Accessor &styler) {
-	WordList &keywords = *keywordlists[0];
-	WordList &keywords2 = *keywordlists[1];
-	WordList &keywords3 = *keywordlists[2];
-	WordList &keywords4 = *keywordlists[3];
-	WordList &keywords5 = *keywordlists[4];
-	WordList &keywords6 = *keywordlists[5];
-	WordList &keywords7 = *keywordlists[6];
-	WordList &keywords8 = *keywordlists[7];
+	const WordList &keywords = *keywordlists[0];
+	const WordList &keywords2 = *keywordlists[1];
+	const WordList &keywords3 = *keywordlists[2];
+	const WordList &keywords4 = *keywordlists[3];
+	const WordList &keywords5 = *keywordlists[4];
+	const WordList &keywords6 = *keywordlists[5];
+	const WordList &keywords7 = *keywordlists[6];
+	const WordList &keywords8 = *keywordlists[7];
 	// find the first previous line without continuation character at the end
 	Sci_Position lineCurrent = styler.GetLine(startPos);
 	Sci_Position s_startPos = startPos;

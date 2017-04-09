@@ -606,7 +606,7 @@ public:
 		else
 			return 0;
 	}
-	size_t CaseConvertString(char *converted, size_t sizeConverted, const char *mixed, size_t lenMixed) {
+	size_t CaseConvertString(char *converted, size_t sizeConverted, const char *mixed, size_t lenMixed) override {
 		size_t lenConverted = 0;
 		size_t mixedPos = 0;
 		unsigned char bytes[UTF8MaxBytes + 1];
@@ -653,9 +653,9 @@ public:
 		std::sort(characterToConversion.begin(), characterToConversion.end());
 		characters.reserve(characterToConversion.size());
 		conversions.reserve(characterToConversion.size());
-		for (CharacterToConversion::iterator it = characterToConversion.begin(); it != characterToConversion.end(); ++it) {
-			characters.push_back(it->character);
-			conversions.push_back(it->conversion);
+		for (const CharacterConversion &chConv : characterToConversion) {
+			characters.push_back(chConv.character);
+			conversions.push_back(chConv.conversion);
 		}
 		// Empty the original calculated data completely
 		CharacterToConversion().swap(characterToConversion);
@@ -708,21 +708,20 @@ void AddSymmetric(enum CaseConversion conversion, int lower,int upper) {
 void SetupConversions(enum CaseConversion conversion) {
 	// First initialize for the symmetric ranges
 	for (size_t i=0; i<ELEMENTS(symmetricCaseConversionRanges);) {
-		int lower = symmetricCaseConversionRanges[i++];
-		int upper = symmetricCaseConversionRanges[i++];
-		int length = symmetricCaseConversionRanges[i++];
-		int pitch = symmetricCaseConversionRanges[i++];
+		const int lower = symmetricCaseConversionRanges[i++];
+		const int upper = symmetricCaseConversionRanges[i++];
+		const int length = symmetricCaseConversionRanges[i++];
+		const int pitch = symmetricCaseConversionRanges[i++];
 		for (int j=0; j<length*pitch; j+=pitch) {
 			AddSymmetric(conversion, lower+j, upper+j);
 		}
 	}
 	// Add the symmetric singletons
 	for (size_t i=0; i<ELEMENTS(symmetricCaseConversions);) {
-		int lower = symmetricCaseConversions[i++];
-		int upper = symmetricCaseConversions[i++];
+		const int lower = symmetricCaseConversions[i++];
+		const int upper = symmetricCaseConversions[i++];
 		AddSymmetric(conversion, lower, upper);
 	}
-
 	// Add the complex cases
 	const char *sComplex = complexCaseConversions;
 	while (*sComplex) {

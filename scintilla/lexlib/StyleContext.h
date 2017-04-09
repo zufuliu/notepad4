@@ -40,8 +40,8 @@ public:
 	int state;
 	int chPrev;
 	int ch;
-	int chNext;
 	Sci_Position width;
+	int chNext;
 	Sci_Position widthNext;
 
 	StyleContext(Sci_PositionU startPos, Sci_PositionU length,
@@ -53,7 +53,9 @@ public:
 	void Forward();
 	void Forward(int nb);
 	void ForwardBytes(int nb);
-	void ChangeState(int state_);
+	void ChangeState(int state_) {
+		state = state_;
+	}
 	void SetState(int state_);
 	void ForwardSetState(int state_);
 	Sci_Position LengthCurrent() const {

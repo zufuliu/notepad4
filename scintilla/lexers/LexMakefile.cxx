@@ -32,8 +32,8 @@ static inline bool IsMakeOp(int ch, int chNext) {
 
 #define MAX_WORD_LENGTH	15
 static void ColouriseMakeDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, WordList *keywordLists[], Accessor &styler) {
-	WordList &keywordsGP = *keywordLists[0]; // gnu make Preprocessor
-	WordList &keywordsDP2 = *keywordLists[6];
+	const WordList &keywordsGP = *keywordLists[0]; // gnu make Preprocessor
+	const WordList &keywordsDP2 = *keywordLists[6];
 	int state = initStyle;
 	int ch = 0, chNext = styler[startPos];
 	styler.StartAt(startPos);

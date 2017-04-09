@@ -116,21 +116,21 @@ static inline bool IsEscapeChar(int ch) {
 #define DOC_TAG_CLOSE_XML	4	/// </param>
 
 static void ColouriseCppDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, WordList *keywordLists[], Accessor &styler) {
-	WordList &keywords		= *keywordLists[0];
-	WordList &keywords2		= *keywordLists[1];
-	WordList &keywords3		= *keywordLists[2];
-	WordList &keywords4		= *keywordLists[3];
+	const WordList &keywords		= *keywordLists[0];
+	const WordList &keywords2		= *keywordLists[1];
+	const WordList &keywords3		= *keywordLists[2];
+	const WordList &keywords4		= *keywordLists[3];
 	// global
-	WordList &kwAttribute	= *keywordLists[4];
-	WordList &kwClass		= *keywordLists[5];
-	WordList &kwInterface	= *keywordLists[6];
-	WordList &kwEnumeration	= *keywordLists[7];
-	WordList &kwConstant	= *keywordLists[8];
+	const WordList &kwAttribute	= *keywordLists[4];
+	const WordList &kwClass		= *keywordLists[5];
+	const WordList &kwInterface	= *keywordLists[6];
+	const WordList &kwEnumeration	= *keywordLists[7];
+	const WordList &kwConstant	= *keywordLists[8];
 	// 2nd
-	WordList &kw2ndKeyword	= *keywordLists[9];
-	WordList &kw2ndKeyword2	= *keywordLists[10];
-	WordList &kwAsmInstruction	 = *keywordLists[11];
-	WordList &kwAsmRegister		 = *keywordLists[12];
+	const WordList &kw2ndKeyword	= *keywordLists[9];
+	const WordList &kw2ndKeyword2	= *keywordLists[10];
+	const WordList &kwAsmInstruction = *keywordLists[11];
+	const WordList &kwAsmRegister	= *keywordLists[12];
 
 	static bool isObjCSource = false;
 	const int lexType = styler.GetPropertyInt("lexer.lang.type", LEX_CPP);
@@ -883,7 +883,6 @@ _label_identifier:
 				bool isJsRegex = (isAssignStmt && (chPrevNonWhite == '=' || chPrevNonWhite == ':')) 	// assignment
 					|| (numRBrace > 0 && strchr("(,!&|", chPrevNonWhite))	// argument
 					|| (strchr("};", chPrevNonWhite))
-					|| (numCBrace == 0 || numRBrace == 0)
 					|| followsReturn;
 				if (_hasRegex(lexType) && isJsRegex
 					&& !(chPrevNonWhite == '+' || chPrevNonWhite == '-' || followsPostfixOperator)) {

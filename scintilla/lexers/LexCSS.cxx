@@ -72,14 +72,14 @@ static int NestingLevelLookBehind(Sci_PositionU startPos, Accessor &styler) {
 };*/
 
 static void ColouriseCssDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, WordList *keywordlists[], Accessor &styler) {
-	WordList &css1Props = *keywordlists[0];
-	WordList &pseudoClasses = *keywordlists[1];
-	WordList &css2Props = *keywordlists[2];
-	WordList &css3Props = *keywordlists[3];
-	WordList &pseudoElements = *keywordlists[4];
-	WordList &exProps = *keywordlists[5];
-	WordList &exPseudoClasses = *keywordlists[6];
-	WordList &exPseudoElements = *keywordlists[7];
+	const WordList &css1Props = *keywordlists[0];
+	const WordList &pseudoClasses = *keywordlists[1];
+	const WordList &css2Props = *keywordlists[2];
+	const WordList &css3Props = *keywordlists[3];
+	const WordList &pseudoElements = *keywordlists[4];
+	const WordList &exProps = *keywordlists[5];
+	const WordList &exPseudoClasses = *keywordlists[6];
+	const WordList &exPseudoElements = *keywordlists[7];
 
 	StyleContext sc(startPos, length, initStyle, styler);
 

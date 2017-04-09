@@ -251,7 +251,7 @@ public:
 		// Split into up to 2 ranges, before and after the split then use memcpy on each.
 		int range1Length = 0;
 		if (position < part1Length) {
-			int part1AfterPosition = part1Length - position;
+			const int part1AfterPosition = part1Length - position;
 			range1Length = retrieveLength;
 			if (range1Length > part1AfterPosition)
 				range1Length = part1AfterPosition;

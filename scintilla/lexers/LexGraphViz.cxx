@@ -28,7 +28,7 @@ static inline bool IsGraphOp(int ch) {
 #define MAX_WORD_LENGTH	15
 static void ColouriseGraphDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, WordList *keywordLists[], Accessor &styler) {
 	const bool fold = styler.GetPropertyInt("fold", 1) != 0;
-	WordList &keywords = *keywordLists[0]; // command
+	const WordList &keywords = *keywordLists[0]; // command
 
 	int state = initStyle;
 	int ch = 0, chNext = styler[startPos];

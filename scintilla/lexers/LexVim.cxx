@@ -26,7 +26,7 @@ static inline bool IsVimOp(int ch) {
 
 #define MAX_WORD_LENGTH	15
 static void ColouriseVimDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, WordList *keywordLists[], Accessor &styler) {
-	WordList &keywords = *keywordLists[0];
+	const WordList &keywords = *keywordLists[0];
 
 	int state = initStyle;
 	int chNext = styler[startPos];

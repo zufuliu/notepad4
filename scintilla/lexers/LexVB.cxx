@@ -63,15 +63,13 @@ static inline bool IsSpaceEquiv(int state) {
 	return (state <= SCE_B_COMMENT);
 }
 
-static void ColouriseVBDoc(Sci_PositionU startPos, Sci_Position length, int initStyle,
-	WordList *keywordlists[], Accessor &styler, bool vbScriptSyntax) {
-
-	WordList &keywords = *keywordlists[0];
-	WordList &keywords2 = *keywordlists[1];
-	WordList &keywords3 = *keywordlists[2];
-	WordList &keywords4 = *keywordlists[3];
-	WordList &keywords5 = *keywordlists[4];
-	WordList &keywords6 = *keywordlists[5];
+static void ColouriseVBDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, WordList *keywordlists[], Accessor &styler, bool vbScriptSyntax) {
+	const WordList &keywords = *keywordlists[0];
+	const WordList &keywords2 = *keywordlists[1];
+	const WordList &keywords3 = *keywordlists[2];
+	const WordList &keywords4 = *keywordlists[3];
+	const WordList &keywords5 = *keywordlists[4];
+	const WordList &keywords6 = *keywordlists[5];
 
 	int fileNbDigits = 0;
 	int visibleChars = 0;

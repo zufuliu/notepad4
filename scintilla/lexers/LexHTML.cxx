@@ -222,7 +222,7 @@ static bool isCommentASPState(int state) {
 	return bResult;
 }
 
-static void classifyAttribHTML(Sci_PositionU start, Sci_PositionU end, WordList &keywords, Accessor &styler) {
+static void classifyAttribHTML(Sci_PositionU start, Sci_PositionU end, const WordList &keywords, Accessor &styler) {
 	bool wordIsNumber = IsNumber(start, styler);
 	char chAttr = SCE_H_ATTRIBUTEUNKNOWN;
 	if (wordIsNumber) {
@@ -240,7 +240,7 @@ static void classifyAttribHTML(Sci_PositionU start, Sci_PositionU end, WordList 
 }
 
 static int classifyTagHTML(Sci_PositionU start, Sci_PositionU end,
-                           WordList &keywords, Accessor &styler, bool &tagDontFold,
+                           const WordList &keywords, Accessor &styler, bool &tagDontFold,
 			   bool caseSensitive, bool isXml, bool allowScripts) {
 	char withSpace[30 + 2] = " ";
 	const char *s = withSpace + 1;
@@ -313,7 +313,7 @@ static int classifyTagHTML(Sci_PositionU start, Sci_PositionU end,
 }
 
 static void classifyWordHTJS(Sci_PositionU start, Sci_PositionU end,
-                             WordList &keywords, Accessor &styler, script_mode inScriptType) {
+                             const WordList &keywords, Accessor &styler, script_mode inScriptType) {
 	char s[30 + 1];
 	Sci_PositionU i = 0;
 	for (; i < end - start + 1 && i < 30; i++) {
@@ -331,7 +331,7 @@ static void classifyWordHTJS(Sci_PositionU start, Sci_PositionU end,
 	styler.ColourTo(end, statePrintForState(chAttr, inScriptType));
 }
 
-static int classifyWordHTVB(Sci_PositionU start, Sci_PositionU end, WordList &keywords, Accessor &styler, script_mode inScriptType) {
+static int classifyWordHTVB(Sci_PositionU start, Sci_PositionU end, const WordList &keywords, Accessor &styler, script_mode inScriptType) {
 	char chAttr = SCE_HB_IDENTIFIER;
 	bool wordIsNumber = IsADigit(styler[start]) || (styler[start] == '.');
 	if (wordIsNumber) {
@@ -352,7 +352,7 @@ static int classifyWordHTVB(Sci_PositionU start, Sci_PositionU end, WordList &ke
 		return SCE_HB_DEFAULT;
 }
 
-static void classifyWordHTPy(Sci_PositionU start, Sci_PositionU end, WordList &keywords, Accessor &styler, char *prevWord, script_mode inScriptType, bool isMako) {
+static void classifyWordHTPy(Sci_PositionU start, Sci_PositionU end, const WordList &keywords, Accessor &styler, char *prevWord, script_mode inScriptType, bool isMako) {
 	bool wordIsNumber = IsADigit(styler[start]);
 	char s[30 + 1];
 	Sci_PositionU i = 0;
@@ -377,7 +377,7 @@ static void classifyWordHTPy(Sci_PositionU start, Sci_PositionU end, WordList &k
 
 // Update the word colour to default or keyword
 // Called when in a PHP word
-static void classifyWordHTPHP(Sci_PositionU start, Sci_PositionU end, WordList &keywords, Accessor &styler) {
+static void classifyWordHTPHP(Sci_PositionU start, Sci_PositionU end, const WordList &keywords, Accessor &styler) {
 	char chAttr = SCE_HPHP_DEFAULT;
 	bool wordIsNumber = IsADigit(styler[start]) || (styler[start] == '.' && start+1 <= end && IsADigit(styler[start+1]));
 	if (wordIsNumber) {
@@ -391,7 +391,7 @@ static void classifyWordHTPHP(Sci_PositionU start, Sci_PositionU end, WordList &
 	styler.ColourTo(end, chAttr);
 }
 
-static bool isWordHSGML(Sci_PositionU start, Sci_PositionU end, WordList &keywords, Accessor &styler) {
+static bool isWordHSGML(Sci_PositionU start, Sci_PositionU end, const WordList &keywords, Accessor &styler) {
 	char s[30 + 1];
 	Sci_PositionU i = 0;
 	for (; i < end - start + 1 && i < 30; i++) {
@@ -508,9 +508,11 @@ static bool isDjangoBlockEnd(const int ch, const int chNext, const char *blockTy
 
 static bool isPHPStringState(int state) {
 	return
-	    (state == SCE_HPHP_HSTRING) || (state == SCE_HPHP_HEREDOC) ||
-	    (state == SCE_HPHP_SIMPLESTRING) || (state == SCE_HPHP_NOWDOC) ||
+	    (state == SCE_HPHP_HSTRING) ||
+	    (state == SCE_HPHP_SIMPLESTRING) ||
 	    (state == SCE_HPHP_HSTRING_VARIABLE) ||
+	    (state == SCE_HPHP_HEREDOC) ||
+	    (state == SCE_HPHP_NOWDOC) ||
 	    (state == SCE_HPHP_COMPLEX_VARIABLE);
 }
 
@@ -573,12 +575,12 @@ static Sci_Position FindPhpStringDelimiter(char *phpStringDelimiter, const int p
 
 static void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, WordList *keywordlists[],
                                   Accessor &styler, bool isXml) {
-	WordList &keywords = *keywordlists[0];
-	WordList &keywords_JS = *keywordlists[1];
-	WordList &keywords_VBS = *keywordlists[2];
-	WordList &keywords_PY = *keywordlists[3];
-	WordList &keywords_SGML = *keywordlists[4]; // SGML (DTD)
-	WordList &keywords_PHP = *keywordlists[5];
+	const WordList &keywords = *keywordlists[0];
+	const WordList &keywords_JS = *keywordlists[1];
+	const WordList &keywords_VBS = *keywordlists[2];
+	const WordList &keywords_PY = *keywordlists[3];
+	const WordList &keywords_PHP = *keywordlists[4];
+	const WordList &keywords_SGML = *keywordlists[5]; // SGML (DTD)
 
 	styler.StartAt(startPos);
 	char prevWord[256];
@@ -726,7 +728,7 @@ static void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, i
 
 	styler.StartSegment(startPos);
 	const Sci_Position lengthDoc = startPos + length;
-	for (int i = startPos; i < lengthDoc; i++) {
+	for (Sci_Position i = startPos; i < lengthDoc; i++) {
 		const int chPrev2 = chPrev;
 		chPrev = ch;
 		if (!isspacechar(ch) && state != SCE_HJ_COMMENT &&
@@ -785,7 +787,7 @@ static void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, i
 					} else if ((ch == '\n') && !((chNext == '\r') && (chNext2 == '\n')) && (chNext != '\n')) {
 						// check if the number of tabs is lower than the level
 						int Findlevel = (levelCurrent & ~SC_FOLDLEVELBASE) * 8;
-						for (int j = 0; Findlevel > 0; j++) {
+						for (Sci_Position j = 0; Findlevel > 0; j++) {
 							char chTmp = styler.SafeGetCharAt(i + j + 1);
 							if (chTmp == '\t') {
 								Findlevel -= 8;
@@ -893,7 +895,7 @@ static void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, i
 				if (const char *tag =
 						state == SCE_HJ_COMMENTLINE || isXml ? "script" :
 						state == SCE_H_COMMENT ? "comment" : 0) {
-					int j = i + 2;
+					Sci_Position j = i + 2;
 					int chr;
 					do {
 						chr = static_cast<int>(*tag++);
@@ -1260,7 +1262,7 @@ static void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, i
 				styler.ColourTo(i - 1, StateToPrint);
 				state = SCE_H_SGML_SIMPLESTRING;
 			} else if ((ch == '-') && (chPrev == '-')) {
-				if (static_cast<int>(styler.GetStartSegment()) <= (i - 2)) {
+				if (static_cast<Sci_Position>(styler.GetStartSegment()) <= (i - 2)) {
 					styler.ColourTo(i - 2, StateToPrint);
 				}
 				state = SCE_H_SGML_COMMENT;
@@ -1652,7 +1654,7 @@ static void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, i
 			}
 			break;
 		case SCE_HJ_WORD:
-			if (!iswordchar(ch)) {
+			if (!iswordchar(ch) || ch == '.') {
 				classifyWordHTJS(styler.GetStartSegment(), i - 1, keywords_JS, styler, inScriptType);
 				//styler.ColourTo(i - 1, eHTJSKeyword);
 				state = SCE_HJ_DEFAULT;
@@ -1673,7 +1675,7 @@ static void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, i
 					i += 2;
 				} else if (isoperator(ch)) {
 					styler.ColourTo(i, statePrintForState(SCE_HJ_SYMBOLS, inScriptType));
-					state = SCE_HJ_DEFAULT;
+					state = (ch == '.')? SCE_HJ_WORD : SCE_HJ_DEFAULT;
 				}
 			}
 			break;
@@ -1784,7 +1786,7 @@ static void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, i
 			}
 			break;
 		case SCE_HB_WORD:
-			if (!iswordchar(ch)) {
+			if (!iswordchar(ch) || ch == '.') {
 				state = classifyWordHTVB(styler.GetStartSegment(), i - 1, keywords_VBS, styler, inScriptType);
 				if (state == SCE_HB_DEFAULT) {
 					if (ch == '\"') {
@@ -1793,7 +1795,7 @@ static void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, i
 						state = SCE_HB_COMMENTLINE;
 					} else if (isoperator(ch)) {
 						styler.ColourTo(i, statePrintForState(SCE_HB_DEFAULT, inScriptType));
-						state = SCE_HB_DEFAULT;
+						state = (ch == '.')? SCE_HB_WORD : SCE_HB_DEFAULT;
 					}
 				}
 			}
@@ -1868,7 +1870,7 @@ static void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, i
 			}
 			break;
 		case SCE_HP_WORD:
-			if (!iswordchar(ch)) {
+			if (!iswordchar(ch) || ch == '.') {
 				classifyWordHTPy(styler.GetStartSegment(), i - 1, keywords_PY, styler, prevWord, inScriptType, isMako);
 				state = SCE_HP_DEFAULT;
 				if (ch == '#') {
@@ -1895,6 +1897,7 @@ static void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, i
 					}
 				} else if (isoperator(ch)) {
 					styler.ColourTo(i, statePrintForState(SCE_HP_OPERATOR, inScriptType));
+					state = (ch == '.')? SCE_HP_WORD : SCE_HP_DEFAULT;
 				}
 			}
 			break;
@@ -1942,7 +1945,7 @@ static void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, i
 			break;
 			///////////// start - PHP state handling
 		case SCE_HPHP_WORD:
-			if (!iswordchar(ch)) {
+			if (!iswordchar(ch) || ch == '.') {
 				classifyWordHTPHP(styler.GetStartSegment(), i - 1, keywords_PHP, styler);
 				if (ch == '/' && chNext == '*') {
 					i++;
@@ -1968,7 +1971,8 @@ static void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, i
 				} else if (ch == '$' && IsPhpWordStart(chNext)) {
 					state = SCE_HPHP_VARIABLE;
 				} else if (isoperator(ch)) {
-					state = SCE_HPHP_OPERATOR;
+					styler.ColourTo(i, SCE_HPHP_OPERATOR);
+					state = (ch == '.')? SCE_HPHP_WORD : SCE_HPHP_OPERATOR;
 				} else {
 					state = SCE_HPHP_DEFAULT;
 				}
@@ -2113,7 +2117,7 @@ static void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, i
 		// Some of the above terminated their lexeme but since the same character starts
 		// the same class again, only reenter if non empty segment.
 
-		bool nonEmptySegment = i >= static_cast<int>(styler.GetStartSegment());
+		bool nonEmptySegment = i >= static_cast<Sci_Position>(styler.GetStartSegment());
 		if (state == SCE_HB_DEFAULT) {    // One of the above succeeded
 			if ((ch == '\"') && (nonEmptySegment)) {
 				state = SCE_HB_STRING;
@@ -2169,7 +2173,7 @@ static void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, i
 		break;
 	default:
 		StateToPrint = statePrintForState(state, inScriptType);
-		if (static_cast<int>(styler.GetStartSegment()) < lengthDoc)
+		if (static_cast<Sci_Position>(styler.GetStartSegment()) < lengthDoc)
 			styler.ColourTo(lengthDoc - 1, StateToPrint);
 		break;
 	}
@@ -2208,8 +2212,8 @@ static void ColouriseHTMLDoc(Sci_PositionU startPos, Sci_Position length, int in
 	"JavaScript keywords",
 	"VBScript keywords",
 	"Python keywords",
-	"SGML and DTD keywords",
 	"PHP keywords",
+	"SGML and DTD keywords",
 	0,
 };*/
 
@@ -2218,8 +2222,8 @@ static void ColouriseHTMLDoc(Sci_PositionU startPos, Sci_Position length, int in
 	"", //Unused
 	"", //Unused
 	"", //Unused
-	"", //Unused
 	"PHP keywords",
+	"", //Unused
 	0,
 };*/
 

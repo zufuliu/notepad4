@@ -53,10 +53,10 @@ static void CheckLLVMVarType(Sci_PositionU pos, Sci_PositionU endPos, Accessor &
 }
 
 static void ColouriseLLVMDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, WordList *keywordLists[], Accessor &styler) {
-	WordList &keywords = *keywordLists[0];
-	WordList &keywords2 = *keywordLists[1];
-	WordList &kwAttr = *keywordLists[4];
-	WordList &kwInstruction = *keywordLists[10];
+	const WordList &keywords = *keywordLists[0];
+	const WordList &keywords2 = *keywordLists[1];
+	const WordList &kwAttr = *keywordLists[4];
+	const WordList &kwInstruction = *keywordLists[10];
 
 	int state = initStyle;
 	int chNext = styler[startPos];

@@ -8,6 +8,7 @@
 #include <stdexcept>
 #include <vector>
 #include <map>
+#include <algorithm>
 
 #include "Platform.h"
 
@@ -21,7 +22,8 @@ using namespace Scintilla;
 
 static PRectangle PixelGridAlign(const PRectangle &rc) {
 	// Move left and right side to nearest pixel to avoid blurry visuals
-	return PRectangle::FromInts(int(rc.left + 0.5), int(rc.top), int(rc.right + 0.5), int(rc.bottom));
+	return PRectangle::FromInts(static_cast<int>(rc.left + 0.5), static_cast<int>(rc.top),
+		static_cast<int>(rc.right + 0.5), static_cast<int>(rc.bottom));
 }
 
 void Indicator::Draw(Surface *surface, const PRectangle &rc, const PRectangle &rcLine, const PRectangle &rcCharacter, DrawState drawState, int value) const {
@@ -35,8 +37,8 @@ void Indicator::Draw(Surface *surface, const PRectangle &rc, const PRectangle &r
 	surface->PenColour(sacDraw.fore);
 	int ymid = static_cast<int>(rc.bottom + rc.top) / 2;
 	if (sacDraw.style == INDIC_SQUIGGLE) {
-		int x = int(rc.left+0.5);
-		int xLast = int(rc.right+0.5);
+		int x = static_cast<int>(rc.left+0.5);
+		const int xLast = static_cast<int>(rc.right+0.5);
 		int y = 0;
 		surface->MoveTo(x, static_cast<int>(rc.top) + y);
 		while (x < xLast) {
@@ -53,7 +55,7 @@ void Indicator::Draw(Surface *surface, const PRectangle &rc, const PRectangle &r
 	} else if (sacDraw.style == INDIC_SQUIGGLEPIXMAP) {
 		PRectangle rcSquiggle = PixelGridAlign(rc);
 
-		int width = Platform::Minimum(4000, static_cast<int>(rcSquiggle.Width()));
+		int width = std::min(4000, static_cast<int>(rcSquiggle.Width()));
 		RGBAImage image(width, 3, 1.0, 0);
 		enum { alphaFull = 0xff, alphaSide = 0x2f, alphaSide2=0x5f };
 		for (int x = 0; x < width; x++) {
@@ -135,7 +137,7 @@ void Indicator::Draw(Surface *surface, const PRectangle &rc, const PRectangle &r
 		rcBox.top = rcLine.top + 1;
 		rcBox.bottom = rcLine.bottom;
 		// Cap width at 4000 to avoid large allocations when mistakes made
-		int width = Platform::Minimum(static_cast<int>(rcBox.Width()), 4000);
+		int width = std::min(static_cast<int>(rcBox.Width()), 4000);
 		RGBAImage image(width, static_cast<int>(rcBox.Height()), 1.0, 0);
 		// Draw horizontal lines top and bottom
 		for (int x=0; x<width; x++) {
@@ -154,7 +156,7 @@ void Indicator::Draw(Surface *surface, const PRectangle &rc, const PRectangle &r
 		int x = static_cast<int>(rc.left);
 		while (x < rc.right) {
 			surface->MoveTo(x, ymid);
-			surface->LineTo(Platform::Minimum(x + 4, static_cast<int>(rc.right)), ymid);
+			surface->LineTo(std::min(x + 4, static_cast<int>(rc.right)), ymid);
 			x += 7;
 		}
 	} else if (sacDraw.style == INDIC_DOTS) {

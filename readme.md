@@ -161,6 +161,7 @@ TBD.
 * I'm not interested in any **localization** of Notepad2.
 
 ## Contributors:
+* [XhmikosR](https://xhmikosr.github.io/notepad2-mod/)
 * [Kai Liu](http://code.kliu.org/misc/notepad2/)
 * [RL Vision](http://www.rlvision.com/notepad2/about.asp)
 * Aleksandar Lekov

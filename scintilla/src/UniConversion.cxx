@@ -5,9 +5,10 @@
 // Copyright 1998-2001 by Neil Hodgson <neilh@scintilla.org>
 // The License.txt file describes the conditions under which this software may be distributed.
 
-#include <stdlib.h>
+#include <cstdlib>
 
 #include <stdexcept>
+#include <string>
 
 #include "UniConversion.h"
 
@@ -22,7 +23,7 @@ namespace Scintilla {
 unsigned int UTF8Length(const wchar_t *uptr, unsigned int tlen) {
 	unsigned int len = 0;
 	for (unsigned int i = 0; i < tlen && uptr[i];) {
-		unsigned int uch = uptr[i];
+		const unsigned int uch = uptr[i];
 		if (uch < 0x80) {
 			len++;
 		} else if (uch < 0x800) {
@@ -42,7 +43,7 @@ unsigned int UTF8Length(const wchar_t *uptr, unsigned int tlen) {
 void UTF8FromUTF16(const wchar_t *uptr, unsigned int tlen, char *putf, unsigned int len) {
 	unsigned int k = 0;
 	for (unsigned int i = 0; i < tlen && uptr[i];) {
-		unsigned int uch = uptr[i];
+		const unsigned int uch = uptr[i];
 		if (uch < 0x80) {
 			putf[k++] = static_cast<char>(uch);
 		} else if (uch < 0x800) {
@@ -52,7 +53,7 @@ void UTF8FromUTF16(const wchar_t *uptr, unsigned int tlen, char *putf, unsigned 
 			(uch <= SURROGATE_TRAIL_LAST)) {
 			// Half a surrogate pair
 			i++;
-			unsigned int xch = 0x10000 + ((uch & 0x3ff) << 10) + (uptr[i] & 0x3ff);
+			const unsigned int xch = 0x10000 + ((uch & 0x3ff) << 10) + (uptr[i] & 0x3ff);
 			putf[k++] = static_cast<char>(0xF0 | (xch >> 18));
 			putf[k++] = static_cast<char>(0x80 | ((xch >> 12) & 0x3f));
 			putf[k++] = static_cast<char>(0x80 | ((xch >> 6) & 0x3f));
@@ -84,7 +85,7 @@ size_t UTF16Length(const char *s, size_t len) {
 	size_t ulen = 0;
 	size_t charLen;
 	for (size_t i = 0; i<len;) {
-		unsigned char ch = static_cast<unsigned char>(s[i]);
+		const unsigned char ch = static_cast<unsigned char>(s[i]);
 		if (ch < 0x80) {
 			charLen = 1;
 		} else if (ch < 0x80 + 0x40 + 0x20) {
@@ -300,8 +301,30 @@ int UTF8Classify(const unsigned char *us, int len) {
 }
 
 int UTF8DrawBytes(const unsigned char *us, int len) {
-	int utf8StatusNext = UTF8Classify(us, len);
+	const int utf8StatusNext = UTF8Classify(us, len);
 	return (utf8StatusNext & UTF8MaskInvalid) ? 1 : (utf8StatusNext & UTF8MaskWidth);
+}
+
+// Replace invalid bytes in UTF-8 with the replacement character
+std::string FixInvalidUTF8(const std::string &text) {
+	std::string result;
+	const unsigned char *us = reinterpret_cast<const unsigned char *>(text.c_str());
+	size_t remaining = text.size();
+	while (remaining > 0) {
+		const int utf8Status = UTF8Classify(us, static_cast<int>(remaining));
+		if (utf8Status & UTF8MaskInvalid) {
+			// Replacement character 0xFFFD = UTF8:"efbfbd".
+			result.append("\xef\xbf\xbd");
+			us++;
+			remaining--;
+		} else {
+			const int len = utf8Status&UTF8MaskWidth;
+			result.append(reinterpret_cast<const char *>(us), len);
+			us += len;
+			remaining -= len;
+		}
+	}
+	return result;
 }
 
 #ifdef SCI_NAMESPACE

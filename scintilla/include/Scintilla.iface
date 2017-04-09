@@ -415,8 +415,7 @@ set void SetMargins=2252(int margins,)
 # How many margins are there?.
 get int GetMargins=2253(,)
 
-# Styles in range 32..38 are predefined for parts of the UI and are not used as normal styles.
-# Style 39 is for future use.
+# Styles in range 32..39 are predefined for parts of the UI and are not used as normal styles.
 enu StylesCommon=STYLE_
 val STYLE_DEFAULT=32
 val STYLE_LINENUMBER=33
@@ -737,6 +736,14 @@ get colour GetCaretLineBack=2097(,)
 
 # Set the colour of the background of the line containing the caret.
 set void SetCaretLineBack=2098(colour back,)
+
+# Retrieve the caret line frame width.
+# Width = 0 means this option is disabled.
+get int GetCaretLineFrame=2704(,)
+
+# Display the caret line framed.
+# Set width != 0 to enable this option and width = 0 to disable it.
+set void SetCaretLineFrame=2705(int width,)
 
 # Set a style to be changeable or not (read only).
 # Experimental feature, currently buggy.
@@ -1221,7 +1228,7 @@ fun void ToggleFold=2231(int line,)
 # Switch a header line between expanded and contracted and show some text after the line.
 fun void ToggleFoldShowText=2700(int line, string text)
 
-enu foldDisplayTextStyle=SC_FOLDDISPLAYTEXTSTYLE_
+enu FoldDisplayTextStyle=SC_FOLDDISPLAYTEXT_
 val SC_FOLDDISPLAYTEXT_HIDDEN=0
 val SC_FOLDDISPLAYTEXT_STANDARD=1
 val SC_FOLDDISPLAYTEXT_BOXED=2
@@ -1483,6 +1490,16 @@ fun void SetFoldMarginColour=2290(bool useSetting, colour back)
 # Set the other colour used as a chequerboard pattern in the fold margin
 fun void SetFoldMarginHiColour=2291(bool useSetting, colour fore)
 
+enu Accessibility=SC_ACCESSIBILITY_
+val SC_ACCESSIBILITY_DISABLED=0
+val SC_ACCESSIBILITY_ENABLED=1
+
+# Enable or disable accessibility.
+set void SetAccessibility=2702(int accessibility,)
+
+# Report accessibility status.
+get int GetAccessibility=2703(,)
+
 ## New messages go here
 
 ## Start of key messages
@@ -1611,6 +1628,9 @@ fun void LineDelete=2338(,)
 # Switch the current line with the previous.
 fun void LineTranspose=2339(,)
 
+# Reverse order of selected lines.
+fun void LineReverse=2354(,)
+
 # Duplicate the current line.
 fun void LineDuplicate=2404(,)
 
@@ -1689,6 +1709,7 @@ fun void BraceBadLight=2352(position pos,)
 # Use specified indicator to highlight non matching brace instead of changing its style.
 fun void BraceBadLightIndicator=2499(bool useSetting, int indicator)
 
+# Find the position of a matching brace or INVALID_POSITION if no match.
 # The maxReStyle must be 0 for now. It may be defined in a future release.
 fun position BraceMatch=2353(position pos, int maxReStyle)
 
@@ -1837,6 +1858,7 @@ fun void WordPartRight=2392(,)
 fun void WordPartRightExtend=2393(,)
 
 # Constants for use with SetVisiblePolicy, similar to SetCaretPolicy.
+enu VisiblePolicy=VISIBLE_
 val VISIBLE_SLOP=0x01
 val VISIBLE_STRICT=0x04
 # Set the way the display area is determined when a particular line
@@ -1849,8 +1871,10 @@ fun void DelLineLeft=2395(,)
 # Delete forwards from the current position to the end of the line.
 fun void DelLineRight=2396(,)
 
-# Get and Set the xOffset (ie, horizontal scroll position).
+# Set the xOffset (ie, horizontal scroll position).
 set void SetXOffset=2397(int xOffset,)
+
+# Get the xOffset (ie, horizontal scroll position).
 get int GetXOffset=2398(,)
 
 # Set the last x chosen value to be the caret x position.
@@ -2125,6 +2149,7 @@ get bool GetPasteConvertEndings=2468(,)
 # Duplicate the selection. If selection empty duplicate the line containing the caret.
 fun void SelectionDuplicate=2469(,)
 
+enu Alpha=SC_ALPHA_
 val SC_ALPHA_TRANSPARENT=0
 val SC_ALPHA_OPAQUE=255
 val SC_ALPHA_NOALPHA=256
@@ -2538,6 +2563,7 @@ fun void ScrollToStart=2628(,)
 # Scroll to end of document.
 fun void ScrollToEnd=2629(,)
 
+enu Technology=SC_TECHNOLOGY_
 val SC_TECHNOLOGY_DEFAULT=0
 val SC_TECHNOLOGY_DIRECTWRITE=1
 val SC_TECHNOLOGY_DIRECTWRITERETAIN=2
@@ -2811,7 +2837,7 @@ evt void MacroRecord=2009(int message, int wParam, int lParam)
 evt void MarginClick=2010(int modifiers, int position, int margin)
 evt void NeedShown=2011(int position, int length)
 evt void Painted=2013(void)
-evt void UserListSelection=2014(int listType, string text, int positionint, int ch, CompletionMethods listCompletionMethod)
+evt void UserListSelection=2014(int listType, string text, int position, int ch, CompletionMethods listCompletionMethod)
 evt void URIDropped=2015(string text)
 evt void DwellStart=2016(int position, int x, int y)
 evt void DwellEnd=2017(int position, int x, int y)
@@ -2830,7 +2856,7 @@ evt void FocusOut=2029(void)
 evt void AutoCCompleted=2030(string text, int position, int ch, CompletionMethods listCompletionMethod)
 evt void MarginRightClick=2031(int modifiers, int position, int margin)
 
-# There are no provisional features currently
+# There are no provisional APIs currently, but some arguments to SCI_SETTECHNOLOGY are provisional.
 
 cat Provisional
 

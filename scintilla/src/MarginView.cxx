@@ -5,12 +5,13 @@
 // Copyright 1998-2014 by Neil Hodgson <neilh@scintilla.org>
 // The License.txt file describes the conditions under which this software may be distributed.
 
-#include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
-#include <math.h>
-#include <assert.h>
-#include <ctype.h>
+#include <cstddef>
+#include <cstdlib>
+#include <cassert>
+#include <cstring>
+#include <cctype>
+#include <cstdio>
+#include <cmath>
 
 #include <stdexcept>
 #include <string>
@@ -63,10 +64,10 @@ void DrawWrapMarker(Surface *surface, const PRectangle& rcPlace,
 	enum { xa = 1 }; // gap before start
 	int w = static_cast<int>(rcPlace.right - rcPlace.left) - xa - 1;
 
-	bool xStraight = isEndMarker;  // x-mirrored symbol for start marker
+	const bool xStraight = isEndMarker;  // x-mirrored symbol for start marker
 
-	int x0 = static_cast<int>(xStraight ? rcPlace.left : rcPlace.right - 1);
-	int y0 = static_cast<int>(rcPlace.top);
+	const int x0 = static_cast<int>(xStraight ? rcPlace.left : rcPlace.right - 1);
+	const int y0 = static_cast<int>(rcPlace.top);
 
 	int dy = static_cast<int>(rcPlace.bottom - rcPlace.top) / 5;
 	int y = static_cast<int>(rcPlace.bottom - rcPlace.top) / 2 + dy;
@@ -183,7 +184,7 @@ static int SubstituteMarkerIfEmpty(int markerCheck, int markerDefault, const Vie
 	return markerCheck;
 }
 
-void MarginView::PaintMargin(Surface *surface, int topLine, const PRectangle &rc, const PRectangle &rcMargin,
+void MarginView::PaintMargin(Surface *surface, Sci::Line topLine, const PRectangle &rc, const PRectangle &rcMargin,
 	const EditModel &model, const ViewStyle &vs) {
 
 	PRectangle rcSelMargin = rcMargin;
@@ -204,7 +205,7 @@ void MarginView::PaintMargin(Surface *surface, int topLine, const PRectangle &rc
 					// Required because of special way brush is created for selection margin
 					// Ensure patterns line up when scrolling with separate margin view
 					// by choosing correctly aligned variant.
-					bool invertPhase = static_cast<int>(ptOrigin.y) & 1;
+					const bool invertPhase = static_cast<int>(ptOrigin.y) & 1;
 					surface->FillRectangle(rcSelMargin,
 						invertPhase ? *pixmapSelPattern : *pixmapSelPatternOffset1);
 				} else {
@@ -230,16 +231,16 @@ void MarginView::PaintMargin(Surface *surface, int topLine, const PRectangle &rc
 			}
 
 			const int lineStartPaint = static_cast<int>(rcMargin.top + ptOrigin.y) / vs.lineHeight;
-			int visibleLine = model.TopLineOfMain() + lineStartPaint;
-			int yposScreen = lineStartPaint * vs.lineHeight - static_cast<int>(ptOrigin.y);
+			Sci::Line visibleLine = model.TopLineOfMain() + lineStartPaint;
+			Sci::Position yposScreen = lineStartPaint * vs.lineHeight - static_cast<Sci::Position>(ptOrigin.y);
 			// Work out whether the top line is whitespace located after a
 			// lessening of fold level which implies a 'fold tail' but which should not
 			// be displayed until the last of a sequence of whitespace.
 			bool needWhiteClosure = false;
 			if (vs.ms[margin].mask & SC_MASK_FOLDERS) {
-				int level = model.pdoc->GetLevel(model.cs.DocFromDisplay(visibleLine));
+				const int level = model.pdoc->GetLevel(model.cs.DocFromDisplay(visibleLine));
 				if (level & SC_FOLDLEVELWHITEFLAG) {
-					int lineBack = model.cs.DocFromDisplay(visibleLine);
+					Sci::Line lineBack = model.cs.DocFromDisplay(visibleLine);
 					int levelPrev = level;
 					while ((lineBack > 0) && (levelPrev & SC_FOLDLEVELWHITEFLAG)) {
 						lineBack--;
@@ -251,7 +252,7 @@ void MarginView::PaintMargin(Surface *surface, int topLine, const PRectangle &rc
 					}
 				}
 				if (highlightDelimiter.isEnabled) {
-					int lastLine = model.cs.DocFromDisplay(topLine + model.LinesOnScreen()) + 1;
+					Sci::Line lastLine = model.cs.DocFromDisplay(topLine + model.LinesOnScreen()) + 1;
 					model.pdoc->GetHighlightDelimiters(highlightDelimiter, model.pdoc->LineFromPosition(model.sel.MainCaret()), lastLine);
 				}
 			}
@@ -265,10 +266,10 @@ void MarginView::PaintMargin(Surface *surface, int topLine, const PRectangle &rc
 			while ((visibleLine < model.cs.LinesDisplayed()) && yposScreen < rc.bottom) {
 
 				PLATFORM_ASSERT(visibleLine < model.cs.LinesDisplayed());
-				const int lineDoc = model.cs.DocFromDisplay(visibleLine);
+				const Sci::Line lineDoc = model.cs.DocFromDisplay(visibleLine);
 				PLATFORM_ASSERT(model.cs.GetVisible(lineDoc));
-				const int firstVisibleLine = model.cs.DisplayFromDoc(lineDoc);
-				const int lastVisibleLine = model.cs.DisplayLastFromDoc(lineDoc);
+				const Sci::Line firstVisibleLine = model.cs.DisplayFromDoc(lineDoc);
+				const Sci::Line lastVisibleLine = model.cs.DisplayLastFromDoc(lineDoc);
 				const bool firstSubLine = visibleLine == firstVisibleLine;
 				const bool lastSubLine = visibleLine == lastVisibleLine;
 
@@ -313,7 +314,7 @@ void MarginView::PaintMargin(Surface *surface, int topLine, const PRectangle &rc
 							}
 						}
 						needWhiteClosure = false;
-						const int firstFollowupLine = model.cs.DocFromDisplay(model.cs.DisplayFromDoc(lineDoc + 1));
+						const Sci::Line firstFollowupLine = model.cs.DocFromDisplay(model.cs.DisplayFromDoc(lineDoc + 1));
 						const int firstFollowupLineLevel = model.pdoc->GetLevel(firstFollowupLine);
 						const int secondFollowupLineLevelNum = LevelNumber(model.pdoc->GetLevel(firstFollowupLine + 1));
 						if (!model.cs.GetExpanded(lineDoc)) {
@@ -379,7 +380,7 @@ void MarginView::PaintMargin(Surface *surface, int topLine, const PRectangle &rc
 							sprintf(number, "%d", lineDoc + 1);
 						if (model.foldFlags & (SC_FOLDFLAG_LEVELNUMBERS | SC_FOLDFLAG_LINESTATE)) {
 							if (model.foldFlags & SC_FOLDFLAG_LEVELNUMBERS) {
-								int lev = model.pdoc->GetLevel(lineDoc);
+								const int lev = model.pdoc->GetLevel(lineDoc);
 								sprintf(number, "%c%c %03X %03X",
 									(lev & SC_FOLDLEVELHEADERFLAG) ? 'H' : '_',
 									(lev & SC_FOLDLEVELWHITEFLAG) ? 'W' : '_',
@@ -387,7 +388,7 @@ void MarginView::PaintMargin(Surface *surface, int topLine, const PRectangle &rc
 									lev >> 16
 									);
 							} else {
-								int state = model.pdoc->GetLineState(lineDoc);
+								const int state = model.pdoc->GetLineState(lineDoc);
 								sprintf(number, "%0X", state);
 							}
 						}

@@ -99,7 +99,7 @@ static int GlobScan(StyleContext &sc) {
 }
 
 static void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, WordList *keywordlists[], Accessor &styler) {
-	WordList &keywords = *keywordlists[0];
+	const WordList &keywords = *keywordlists[0];
 	WordList cmdDelimiter, bashStruct, bashStruct_in;
 	cmdDelimiter.Set("| || |& & && ; ;; ( ) { }");
 	bashStruct.Set("if elif fi while until else then do done esac eval");
@@ -113,9 +113,9 @@ static void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int in
 	const CharacterSet setBashOperator(CharacterSet::setNone, "^&%()-+=|{}[]:;>,*<?!.~@");
 	const CharacterSet setSingleCharOp(CharacterSet::setNone, "rwxoRWXOezsfdlpSbctugkTBMACahGLNn");
 	const CharacterSet setParam(CharacterSet::setAlphaNum, "$_");
-	CharacterSet setHereDoc(CharacterSet::setAlpha, "_\\-+!%*,./:?@[]^`{}~");
-	CharacterSet setHereDoc2(CharacterSet::setAlphaNum, "_-+!%*,./:=?@[]^`{}~");
-	CharacterSet setLeftShift(CharacterSet::setDigits, "$");
+	const CharacterSet setHereDoc(CharacterSet::setAlpha, "_\\-+!%*,./:?@[]^`{}~");
+	const CharacterSet setHereDoc2(CharacterSet::setAlphaNum, "_-+!%*,./:=?@[]^`{}~");
+	const CharacterSet setLeftShift(CharacterSet::setDigits, "$");
 
 	HereDocCls HereDoc;
 	QuoteCls Quote;

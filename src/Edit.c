@@ -1129,7 +1129,6 @@ void EditURLEncode(HWND hwnd)
 
 	if (iCurPos != iAnchorPos) {
 		if (SC_SEL_RECTANGLE != SendMessage(hwnd, SCI_GETSELECTIONMODE, 0, 0)) {
-			//int cchTextW;
 			UINT cpEdit;
 			int iSelCount = (int)SendMessage(hwnd, SCI_GETSELTEXT, 0, 0);
 			char	 *pszText;
@@ -1153,8 +1152,8 @@ void EditURLEncode(HWND hwnd)
 
 			SendMessage(hwnd, SCI_GETSELTEXT, 0, (LPARAM)pszText);
 			cpEdit = (UINT)SendMessage(hwnd, SCI_GETCODEPAGE, 0, 0);
-			//cchTextW = MultiByteToWideChar(cpEdit, 0, pszText, iSelCount, pszTextW,
-			//								(int)LocalSize(pszTextW) / sizeof(WCHAR));
+			MultiByteToWideChar(cpEdit, 0, pszText, iSelCount, pszTextW,
+											(int)LocalSize(pszTextW) / sizeof(WCHAR));
 
 			// https://msdn.microsoft.com/en-us/library/windows/desktop/bb773774(v=vs.85).aspx
 			pszEscaped = LocalAlloc(LPTR, LocalSize(pszText) * 3); // '&', H1, H0
@@ -1213,7 +1212,6 @@ void EditURLDecode(HWND hwnd)
 
 	if (iCurPos != iAnchorPos) {
 		if (SC_SEL_RECTANGLE != SendMessage(hwnd, SCI_GETSELECTIONMODE, 0, 0)) {
-			//int cchTextW;
 			UINT cpEdit;
 			int iSelCount = (int)SendMessage(hwnd, SCI_GETSELTEXT, 0, 0);
 			char	 *pszText;
@@ -1237,8 +1235,8 @@ void EditURLDecode(HWND hwnd)
 
 			SendMessage(hwnd, SCI_GETSELTEXT, 0, (LPARAM)pszText);
 			cpEdit = (UINT)SendMessage(hwnd, SCI_GETCODEPAGE, 0, 0);
-			//cchTextW = MultiByteToWideChar(cpEdit, 0, pszText, iSelCount, pszTextW,
-			//								(int)LocalSize(pszTextW) / sizeof(WCHAR));
+			MultiByteToWideChar(cpEdit, 0, pszText, iSelCount, pszTextW,
+											(int)LocalSize(pszTextW) / sizeof(WCHAR));
 
 			pszUnescaped = LocalAlloc(LPTR, LocalSize(pszText) * 3);
 			if (pszUnescaped == NULL) {

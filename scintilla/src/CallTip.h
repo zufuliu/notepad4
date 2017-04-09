@@ -34,14 +34,14 @@ class CallTip {
 		int posStart, int posEnd, int ytext, const PRectangle &rcClient,
 		bool highlight, bool draw);
 	int PaintContents(Surface *surfaceWindow, bool draw);
-	bool IsTabCharacter(char c) const;
+	bool IsTabCharacter(char ch) const;
 	int NextTabPos(int x) const;
 
 public:
 	Window wCallTip;
 	Window wDraw;
 	bool inCallTipMode;
-	int posStartCallTip;
+	Sci::Position posStartCallTip;
 	ColourDesired colourBG;
 	ColourDesired colourUnSel;
 	ColourDesired colourSel;
@@ -63,7 +63,7 @@ public:
 	void MouseClick(const Point &pt);
 
 	/// Setup the calltip and return a rectangle of the area required.
-	PRectangle CallTipStart(int pos, const Point &pt, int textHeight, const char *defn,
+	PRectangle CallTipStart(Sci::Position pos, const Point &pt, int textHeight, const char *defn,
 		const char *faceName, int size, int codePage_,
 		int characterSet, int technology, Window &wParent);
 
