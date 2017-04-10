@@ -9,6 +9,8 @@
 #include <assert.h>
 #include <ctype.h>
 
+#include <algorithm>
+
 #include "ILexer.h"
 #include "Scintilla.h"
 #include "SciLexer.h"
@@ -34,37 +36,98 @@ static void ColouriseNullDoc(Sci_PositionU startPos, Sci_Position length, int, W
 }
 
 static void FoldNullDoc(Sci_PositionU startPos, Sci_Position length, int /* initStyle */, WordList *[], Accessor &styler) {
-	int visibleCharsCurrent, visibleCharsNext;
-	int levelCurrent, levelNext;
-	Sci_PositionU i, lineEnd;
-	Sci_PositionU lengthDoc   = startPos + length;
-	Sci_Position  lineCurrent = styler.GetLine(startPos);
+	if (styler.GetPropertyInt("fold") == 0)
+		return;
+	const Sci_Position maxPos = startPos + length;
+	const Sci_Position maxLines = (maxPos == styler.Length()) ? styler.GetLine(maxPos) : styler.GetLine(maxPos - 1);	// Requested last line
+	const Sci_Position docLines = styler.GetLine(styler.Length());	// Available last line
 
-	i       = styler.LineStart(lineCurrent  );
-	lineEnd = styler.LineStart(lineCurrent+1)-1;
-	if(lineEnd>=lengthDoc) lineEnd = lengthDoc-1;
-	while(styler[lineEnd]=='\n' || styler[lineEnd]=='\r') lineEnd--;
-	for(visibleCharsCurrent=0, levelCurrent=SC_FOLDLEVELBASE; !visibleCharsCurrent && i<=lineEnd; i++){
-		if(isspacechar(styler[i])) levelCurrent++;
-		else                       visibleCharsCurrent=1;
+	const bool foldCompact = styler.GetPropertyInt("fold.compact") != 0;
+
+	// Backtrack to previous non-blank line so we can determine indent level
+	// for any white space lines
+	// and so we can fix any preceding fold level (which is why we go back
+	// at least one line in all cases)
+	int spaceFlags = 0;
+	Sci_Position lineCurrent = styler.GetLine(startPos);
+	int indentCurrent = Accessor::LexIndentAmount(styler, lineCurrent, &spaceFlags, NULL);
+	while (lineCurrent > 0) {
+		lineCurrent--;
+		indentCurrent = Accessor::LexIndentAmount(styler, lineCurrent, &spaceFlags, NULL);
+		if (!(indentCurrent & SC_FOLDLEVELWHITEFLAG))
+			break;
 	}
+	int indentCurrentLevel = indentCurrent & SC_FOLDLEVELNUMBERMASK;
 
-	for(; i<lengthDoc; lineCurrent++) {
-		i       = styler.LineStart(lineCurrent+1);
-		lineEnd = styler.LineStart(lineCurrent+2)-1;
-		if(lineEnd>=lengthDoc) lineEnd = lengthDoc-1;
-		while(styler[lineEnd]=='\n' || styler[lineEnd]=='\r') lineEnd--;
-		for(visibleCharsNext=0, levelNext=SC_FOLDLEVELBASE; !visibleCharsNext && i<=lineEnd; i++){
-			if(isspacechar(styler[i])) levelNext++;
-			else                       visibleCharsNext=1;
+	// Set up initial loop state
+	startPos = styler.LineStart(lineCurrent);
+
+	// Process all characters to end of requested range
+	// Cap processing in all cases
+	// to end of document (in case of unclosed quote at end).
+	while ((lineCurrent <= docLines) && ((lineCurrent <= maxLines))) {
+		// Gather info
+		int lev = indentCurrent;
+		int lineNext = lineCurrent + 1;
+		int indentNext = indentCurrent;
+		if (lineNext <= docLines) {
+			// Information about next line is only available if not at end of document
+			indentNext = Accessor::LexIndentAmount(styler, lineNext, &spaceFlags, NULL);
 		}
-		int lev = levelCurrent;
-		if(!visibleCharsCurrent) lev |= SC_FOLDLEVELWHITEFLAG;
-		else if(levelNext > levelCurrent) lev |= SC_FOLDLEVELHEADERFLAG;
-		styler.SetLevel(lineCurrent, lev);
-		levelCurrent = levelNext;
-		visibleCharsCurrent = visibleCharsNext;
+		indentCurrentLevel = indentCurrent & SC_FOLDLEVELNUMBERMASK;
+		if (indentNext & SC_FOLDLEVELWHITEFLAG)
+			indentNext = SC_FOLDLEVELWHITEFLAG | indentCurrentLevel;
+
+		// Skip past any blank lines for next indent level info
+		while ((lineNext < docLines) && (indentNext & SC_FOLDLEVELWHITEFLAG)) {
+			lineNext++;
+			indentNext = Accessor::LexIndentAmount(styler, lineNext, &spaceFlags, NULL);
+		}
+
+		const int levelAfterBlank = indentNext & SC_FOLDLEVELNUMBERMASK;
+		const int levelBeforeBlank = std::max(indentCurrentLevel, levelAfterBlank);
+
+		// Now set all the indent levels on the lines we skipped
+		// Do this from end to start. Once we encounter one line
+		// which is indented more than the line after the end of
+		// the blank-block, use the level of the block before
+
+		int skipLine = lineNext;
+		int skipLevel = levelAfterBlank;
+
+		while (--skipLine > lineCurrent) {
+			int skipLineIndent = Accessor::LexIndentAmount(styler, skipLine, &spaceFlags, NULL);
+
+			if (foldCompact) {
+				if ((skipLineIndent & SC_FOLDLEVELNUMBERMASK) > levelAfterBlank)
+					skipLevel = levelBeforeBlank;
+
+				int whiteFlag = skipLineIndent & SC_FOLDLEVELWHITEFLAG;
+				styler.SetLevel(skipLine, skipLevel | whiteFlag);
+			} else {
+				if ((skipLineIndent & SC_FOLDLEVELNUMBERMASK) > levelAfterBlank &&
+					!(skipLineIndent & SC_FOLDLEVELWHITEFLAG))
+					skipLevel = levelBeforeBlank;
+
+				styler.SetLevel(skipLine, skipLevel);
+			}
+		}
+
+		// Set fold header
+		if (!(indentCurrent & SC_FOLDLEVELWHITEFLAG)) {
+			if ((indentCurrent & SC_FOLDLEVELNUMBERMASK) < (indentNext & SC_FOLDLEVELNUMBERMASK))
+				lev |= SC_FOLDLEVELHEADERFLAG;
+		}
+
+		// Set fold level for this line and move to next line
+		styler.SetLevel(lineCurrent, foldCompact ? lev : lev & ~SC_FOLDLEVELWHITEFLAG);
+		indentCurrent = indentNext;
+		lineCurrent = lineNext;
 	}
+
+	// NOTE: Cannot set level of last line here because indentCurrent doesn't have
+	// header flag set; the loop above is crafted to take care of this case!
+	//styler.SetLevel(lineCurrent, indentCurrent);
 }
 
 LexerModule lmNull(SCLEX_NULL, ColouriseNullDoc, "null", FoldNullDoc);
