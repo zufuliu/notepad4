@@ -68,6 +68,7 @@ FontMeasurements::FontMeasurements() {
 void FontMeasurements::Clear() {
 	ascent = 1;
 	descent = 1;
+	capitalHeight = 1;
 	aveCharWidth = 1;
 	spaceWidth = 1;
 	sizeZoomed = 2;

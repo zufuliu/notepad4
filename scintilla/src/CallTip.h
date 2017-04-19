@@ -27,9 +27,6 @@ class CallTip {
 	bool useStyleCallTip;   // if true, STYLE_CALLTIP should be used
 	bool above;		// if true, display calltip above text
 
-	// Private so CallTip objects can not be copied
-	CallTip(const CallTip &);
-	CallTip &operator=(const CallTip &);
 	void DrawChunk(Surface *surface, int &x, const char *s,
 		int posStart, int posEnd, int ytext, const PRectangle &rcClient,
 		bool highlight, bool draw);
@@ -56,6 +53,9 @@ public:
 	int verticalOffset; // pixel offset up or down of the calltip with respect to the line
 
 	CallTip();
+	// Deleted so CallTip objects can not be copied
+	CallTip(const CallTip &) = delete;
+	CallTip &operator=(const CallTip &) = delete;
 	~CallTip();
 
 	void PaintCT(Surface *surfaceWindow);

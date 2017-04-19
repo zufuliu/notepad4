@@ -48,9 +48,9 @@ public:
 	LineMarkers() : handleCurrent(0) {
 	}
 	virtual ~LineMarkers();
-	virtual void Init();
-	virtual void InsertLine(Sci::Line line);
-	virtual void RemoveLine(Sci::Line line);
+	void Init() override;
+	void InsertLine(Sci::Line line) override;
+	void RemoveLine(Sci::Line line) override;
 
 	int MarkValue(Sci::Line line);
 	Sci::Line MarkerNext(Sci::Line lineStart, int mask) const;
@@ -65,9 +65,9 @@ class LineLevels : public PerLine {
 	SplitVector<int> levels;
 public:
 	virtual ~LineLevels();
-	virtual void Init();
-	virtual void InsertLine(Sci::Line line);
-	virtual void RemoveLine(Sci::Line line);
+	void Init() override;
+	void InsertLine(Sci::Line line) override;
+	void RemoveLine(Sci::Line line) override;
 
 	void ExpandLevels(Sci::Line sizeNew=-1);
 	void ClearLevels();
@@ -81,9 +81,9 @@ public:
 	LineState() {
 	}
 	virtual ~LineState();
-	virtual void Init();
-	virtual void InsertLine(Sci::Line line);
-	virtual void RemoveLine(Sci::Line line);
+	void Init() override;
+	void InsertLine(Sci::Line line) override;
+	void RemoveLine(Sci::Line line) override;
 
 	int SetLineState(Sci::Line line, int state);
 	int GetLineState(Sci::Line line);
@@ -96,9 +96,9 @@ public:
 	LineAnnotation() {
 	}
 	virtual ~LineAnnotation();
-	virtual void Init();
-	virtual void InsertLine(Sci::Line line);
-	virtual void RemoveLine(Sci::Line line);
+	void Init() override;
+	void InsertLine(Sci::Line line) override;
+	void RemoveLine(Sci::Line line) override;
 
 	bool MultipleStyles(Sci::Line line) const;
 	int Style(Sci::Line line) const;
@@ -120,9 +120,9 @@ public:
 	LineTabstops() {
 	}
 	virtual ~LineTabstops();
-	virtual void Init();
-	virtual void InsertLine(Sci::Line line);
-	virtual void RemoveLine(Sci::Line line);
+	void Init() override;
+	void InsertLine(Sci::Line line) override;
+	void RemoveLine(Sci::Line line) override;
 
 	bool ClearTabstops(Sci::Line line);
 	bool AddTabstop(Sci::Line line, int x);

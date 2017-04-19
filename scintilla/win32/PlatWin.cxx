@@ -462,9 +462,6 @@ void Font::Release() {
 template<typename T, int lengthStandard>
 class VarBuffer {
 	T bufferStandard[lengthStandard];
-	// Private so VarBuffer objects can not be copied
-	VarBuffer(const VarBuffer &);
-	VarBuffer &operator=(const VarBuffer &);
 public:
 	T *buffer;
 	explicit VarBuffer(size_t length) : buffer(0) {
@@ -474,6 +471,9 @@ public:
 			buffer = bufferStandard;
 		}
 	}
+	// Deleted so VarBuffer objects can not be copied
+	VarBuffer(const VarBuffer &) = delete;
+	VarBuffer &operator=(const VarBuffer &) = delete;
 	~VarBuffer() {
 		if (buffer != bufferStandard) {
 			delete []buffer;
@@ -518,11 +518,11 @@ class SurfaceGDI : public Surface {
 	void BrushColor(const ColourDesired &back);
 	void SetFont(const Font &font_);
 
-	// Private so SurfaceGDI objects can not be copied
-	SurfaceGDI(const SurfaceGDI &);
-	SurfaceGDI &operator=(const SurfaceGDI &);
 public:
 	SurfaceGDI();
+	// Deleted so SurfaceGDI objects can not be copied
+	SurfaceGDI(const SurfaceGDI &) = delete;
+	SurfaceGDI &operator=(const SurfaceGDI &) = delete;
 	~SurfaceGDI() override;
 
 	void Init(WindowID wid) override;
@@ -1077,11 +1077,11 @@ class SurfaceD2D : public Surface {
 
 	void SetFont(const Font &font_);
 
-	// Private so SurfaceD2D objects can not be copied
-	SurfaceD2D(const SurfaceD2D &);
-	SurfaceD2D &operator=(const SurfaceD2D &);
 public:
 	SurfaceD2D();
+	// Deleted so SurfaceD2D objects can not be copied
+	SurfaceD2D(const SurfaceD2D &) = delete;
+	SurfaceD2D &operator=(const SurfaceD2D &) = delete;
 	virtual ~SurfaceD2D() override;
 
 	void SetScale();
@@ -1297,8 +1297,9 @@ static int Delta(int difference) {
 		return 0;
 }
 
+// Round to integer, with halfway cases rounding down.
 static inline float RoundFloat(float f) {
-	return static_cast<float>(static_cast<int>(f+0.5f));
+	return std::floor(f+0.5f);
 }
 
 void SurfaceD2D::LineTo(int x_, int y_) {
@@ -2085,28 +2086,28 @@ public:
 			fontCopy = 0;
 		}
 	}
-	virtual void SetFont(const Font &font) override;
-	virtual void Create(const Window &parent_, int ctrlID_, const Point &location_, int lineHeight_, bool unicodeMode_, int technology_) override;
-	virtual void SetAverageCharWidth(int width) override;
-	virtual void SetVisibleRows(int rows) override;
-	virtual int GetVisibleRows() const override;
-	virtual PRectangle GetDesiredRect() override;
-	virtual int CaretFromEdge() const override;
-	virtual void Clear() override;
-	virtual void Append(char *s, int type = -1) override;
-	virtual int Length() const override;
-	virtual void Select(int n) override;
-	virtual int GetSelection() override;
-	virtual int Find(const char *prefix) override;
-	virtual void GetValue(int n, char *value, int len) const override;
-	virtual void RegisterImage(int type, const char *xpm_data) override;
-	virtual void RegisterRGBAImage(int type, int width, int height, const unsigned char *pixelsImage) override;
-	virtual void ClearRegisteredImages() override;
-	virtual void SetDoubleClickAction(CallBackAction action, void *data) override {
+	void SetFont(const Font &font) override;
+	void Create(const Window &parent_, int ctrlID_, const Point &location_, int lineHeight_, bool unicodeMode_, int technology_) override;
+	void SetAverageCharWidth(int width) override;
+	void SetVisibleRows(int rows) override;
+	int GetVisibleRows() const override;
+	PRectangle GetDesiredRect() override;
+	int CaretFromEdge() const override;
+	void Clear() override;
+	void Append(char *s, int type = -1) override;
+	int Length() const override;
+	void Select(int n) override;
+	int GetSelection() override;
+	int Find(const char *prefix) override;
+	void GetValue(int n, char *value, int len) const override;
+	void RegisterImage(int type, const char *xpm_data) override;
+	void RegisterRGBAImage(int type, int width, int height, const unsigned char *pixelsImage) override;
+	void ClearRegisteredImages() override;
+	void SetDoubleClickAction(CallBackAction action, void *data) override {
 		doubleClickAction = action;
 		doubleClickActionData = data;
 	}
-	virtual void SetList(const char *list, char separator, char typesep) override;
+	void SetList(const char *list, char separator, char typesep) override;
 	void Draw(DRAWITEMSTRUCT *pDrawItem);
 	LRESULT WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam);
 	static LRESULT PASCAL StaticWndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam);

@@ -186,8 +186,6 @@ class BreakFinder {
 	EncodingFamily encodingFamily;
 	const SpecialRepresentations *preprs;
 	void Insert(int val);
-	// Private so BreakFinder objects can not be copied
-	BreakFinder(const BreakFinder &);
 public:
 	// If a whole run is longer than lengthStartSubdivision then subdivide
 	// into smaller runs at spaces or punctuation.
@@ -196,6 +194,8 @@ public:
 	enum { lengthEachSubdivision = 100 };
 	BreakFinder(const LineLayout *ll_, const Selection *psel, const Range &lineRange_, Sci::Position posLineStart_,
 		int xStart, bool breakForSelection, const Document *pdoc_, const SpecialRepresentations *preprs_, const ViewStyle *pvsDraw);
+	// Deleted so BreakFinder objects can not be copied
+	BreakFinder(const BreakFinder &) = delete;
 	~BreakFinder();
 	TextSegment Next();
 	bool More() const;
@@ -205,10 +205,10 @@ class PositionCache {
 	std::vector<PositionCacheEntry> pces;
 	unsigned int clock;
 	bool allClear;
-	// Private so PositionCache objects can not be copied
-	PositionCache(const PositionCache &);
 public:
 	PositionCache();
+	// Deleted so PositionCache objects can not be copied
+	PositionCache(const PositionCache &) = delete;
 	~PositionCache();
 	void Clear();
 	void SetSize(size_t size_);

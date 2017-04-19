@@ -24,10 +24,6 @@ public:
 };
 
 class EditModel {
-	// Private so EditModel objects can not be copied
-	explicit EditModel(const EditModel &);
-	EditModel &operator=(const EditModel &);
-
 public:
 	bool inOverstrike;
 	int xOffset;		///< Horizontal scrolled amount in pixels
@@ -57,6 +53,9 @@ public:
 	Document *pdoc;
 
 	EditModel();
+	// Deleted so EditModel objects can not be copied
+	explicit EditModel(const EditModel &) = delete;
+	EditModel &operator=(const EditModel &) = delete;
 	virtual ~EditModel();
 	virtual Sci::Line TopLineOfMain() const = 0;
 	virtual Point GetVisibleOriginInMain() const = 0;

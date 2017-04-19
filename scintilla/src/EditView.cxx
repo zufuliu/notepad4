@@ -819,8 +819,7 @@ static void DrawTextBlob(Surface *surface, const ViewStyle &vsDraw, const PRecta
 		surface->FillRectangle(rcSegment, textBack);
 	}
 	FontAlias ctrlCharsFont = vsDraw.styles[STYLE_CONTROLCHAR].font;
-	int normalCharHeight = static_cast<int>(surface->Ascent(ctrlCharsFont) -
-		surface->InternalLeading(ctrlCharsFont));
+	const int normalCharHeight = static_cast<int>(ceil(vsDraw.styles[STYLE_CONTROLCHAR].capitalHeight));
 	PRectangle rcCChar = rcSegment;
 	rcCChar.left = rcCChar.left + 1;
 	rcCChar.top = rcSegment.top + vsDraw.maxAscent - normalCharHeight;

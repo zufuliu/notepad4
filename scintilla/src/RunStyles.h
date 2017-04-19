@@ -23,10 +23,10 @@ private:
 	void RemoveRun(int run);
 	void RemoveRunIfEmpty(int run);
 	void RemoveRunIfSameAsPrevious(int run);
-	// Private so RunStyles objects can not be copied
-	RunStyles(const RunStyles &);
 public:
 	RunStyles();
+	// Deleted so RunStyles objects can not be copied
+	RunStyles(const RunStyles &) = delete;
 	~RunStyles();
 	int Length() const;
 	int ValueAt(int position) const;

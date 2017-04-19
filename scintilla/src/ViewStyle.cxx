@@ -86,6 +86,7 @@ void FontRealised::Realise(Surface &surface, int zoomLevel, int technology, cons
 
 	ascent = static_cast<unsigned int>(surface.Ascent(font));
 	descent = static_cast<unsigned int>(surface.Descent(font));
+	capitalHeight = surface.Ascent(font) - surface.InternalLeading(font);
 	aveCharWidth = surface.AverageCharWidth(font);
 	spaceWidth = surface.WidthChar(font, ' ');
 }

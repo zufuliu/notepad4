@@ -278,7 +278,7 @@ class ScintillaWin :
 	~ScintillaWin() override;
 	ScintillaWin &operator=(const ScintillaWin &);
 
-	void Initialise() override;
+	void Init();
 	void Finalise() override;
 #if defined(USE_D2D)
 	void EnsureRenderTarget(HDC hdc);
@@ -461,12 +461,12 @@ ScintillaWin::ScintillaWin(HWND hwnd) {
 	if (caret.period < 0)
 		caret.period = 0;
 
-	Initialise();
+	Init();
 }
 
 ScintillaWin::~ScintillaWin() {}
 
-void ScintillaWin::Initialise() {
+void ScintillaWin::Init() {
 	// Initialize COM.  If the app has already done this it will have
 	// no effect.  If the app hasn't, we really shouldn't ask them to call
 	// it just so this internal feature works.

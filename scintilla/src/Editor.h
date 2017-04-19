@@ -150,10 +150,6 @@ struct WrapPending {
 /**
  */
 class Editor : public EditModel, public DocWatcher {
-	// Private so Editor objects can not be copied
-	explicit Editor(const Editor &);
-	Editor &operator=(const Editor &);
-
 protected:	// ScintillaBase subclass needs access to much of Editor
 
 	/** On GTK+, Scintilla is a container widget holding two scroll bars
@@ -261,6 +257,9 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	bool convertPastes;
 
 	Editor();
+	// Deleted so Editor objects can not be copied
+	explicit Editor(const Editor &) = delete;
+	Editor &operator=(const Editor &) = delete;
 	~Editor() override;
 	virtual void Initialise() = 0;
 	virtual void Finalise();

@@ -5335,7 +5335,7 @@ void Editor::FoldLine(Sci::Line line, int action) {
 		if (action == SC_FOLDACTION_CONTRACT) {
 			const Sci::Line lineMaxSubord = pdoc->GetLastChild(line);
 			if (lineMaxSubord > line) {
-				cs.SetExpanded(line, 0);
+				cs.SetExpanded(line, false);
 				cs.SetVisible(line + 1, lineMaxSubord, false);
 
 				const Sci::Line lineCurrent = pdoc->LineFromPosition(sel.MainCaret());
@@ -5350,7 +5350,7 @@ void Editor::FoldLine(Sci::Line line, int action) {
 				EnsureLineVisible(line, false);
 				GoToLine(line);
 			}
-			cs.SetExpanded(line, 1);
+			cs.SetExpanded(line, true);
 			ExpandLine(line);
 		}
 
@@ -5423,7 +5423,7 @@ void Editor::EnsureLineVisible(Sci::Line lineDoc, bool enforcePolicy) {
 			if (lineDoc != lineParent)
 				EnsureLineVisible(lineParent, enforcePolicy);
 			if (!cs.GetExpanded(lineParent)) {
-				cs.SetExpanded(lineParent, 1);
+				cs.SetExpanded(lineParent, true);
 				ExpandLine(lineParent);
 			}
 		}

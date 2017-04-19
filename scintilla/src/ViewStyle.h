@@ -30,24 +30,23 @@ public:
 class FontNames {
 private:
 	std::vector<const char *> names;
-
+public:
+	FontNames();
 	// FontNames objects can not be copied
 	FontNames(const FontNames &) = delete;
 	FontNames &operator=(const FontNames &) = delete;
-public:
-	FontNames();
 	~FontNames();
 	void Clear();
 	const char *Save(const char *name);
 };
 
 class FontRealised : public FontMeasurements {
-	// FontRealised objects can not be copied
-	FontRealised(const FontRealised &) = delete;
-	FontRealised &operator=(const FontRealised &) = delete;
 public:
 	Font font;
 	FontRealised();
+	// FontRealised objects can not be copied
+	FontRealised(const FontRealised &) = delete;
+	FontRealised &operator=(const FontRealised &) = delete;
 	virtual ~FontRealised();
 	void Realise(Surface &surface, int zoomLevel, int technology, const FontSpecification &fs);
 };
@@ -177,6 +176,8 @@ public:
 
 	ViewStyle();
 	ViewStyle(const ViewStyle &source);
+	// Can only be copied through copy constructor which ensures font names initialised correctly
+	ViewStyle &operator=(const ViewStyle &) = delete;
 	~ViewStyle();
 	void CalculateMarginWidthAndMask();
 	void Init(size_t stylesSize_=256);
@@ -212,8 +213,6 @@ private:
 	void CreateAndAddFont(const FontSpecification &fs);
 	FontRealised *Find(const FontSpecification &fs);
 	void FindMaxAscentDescent();
-	// Can only be copied through copy constructor which ensures font names initialised correctly
-	ViewStyle &operator=(const ViewStyle &) = delete;
 };
 
 #ifdef SCI_NAMESPACE

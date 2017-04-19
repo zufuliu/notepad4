@@ -55,7 +55,7 @@ LineLayout::LineLayout(int maxLineLength_) :
 	numCharsBeforeEOL(0),
 	validity(llInvalid),
 	xHighlightGuide(0),
-	highlightColumn(0),
+	highlightColumn(false),
 	containsCaret(false),
 	edgeColumn(0),
 	chars(0),
@@ -575,7 +575,7 @@ void PositionCacheEntry::Set(unsigned int styleNumber_, const char *s_,
 		for (unsigned int i=0; i<len; i++) {
 			positions[i] = positions_[i];
 		}
-		memcpy(reinterpret_cast<void *>(positions + len), s_, len);
+		memcpy(positions + len, s_, len);
 	}
 }
 
@@ -594,7 +594,7 @@ void PositionCacheEntry::Clear() {
 bool PositionCacheEntry::Retrieve(unsigned int styleNumber_, const char *s_,
 	unsigned int len_, XYPOSITION *positions_) const {
 	if ((styleNumber == styleNumber_) && (len == len_) &&
-		(memcmp(reinterpret_cast<void *>(positions + len), s_, len)== 0)) {
+		(memcmp(positions + len, s_, len)== 0)) {
 		for (unsigned int i=0; i<len; i++) {
 			positions_[i] = positions[i];
 		}
