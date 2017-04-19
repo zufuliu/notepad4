@@ -1617,8 +1617,68 @@ __forceinline BOOL iswordchar(int ch) {
 	return iswordstart(ch) || (ch >= '0' && ch <= '9') || ch == '$';
 }
 
+typedef unsigned __int64 uint64_t;
 
-void EditHex2Dec(HWND hwnd, BOOL toHex)
+static int ConvertNumRadix(char *tch, uint64_t num, int radix) {
+	switch (radix) {
+	case 16:
+		return sprintf(tch, "0x%I64x", num);
+
+	case 10:
+		return sprintf(tch, "%I64u", num);
+
+	case 8: {
+		char buf[2 + 22 + 1] = "";
+		int index = 2 + 22;
+		int length = 0;
+		while (num) {
+			int bit = num & 7;
+			num >>= 3;
+			buf[index--] = '0' + bit;
+			++length;
+		}
+		if (length == 0) {
+			buf[index--] = '0';
+			++length;
+		}
+		buf[index--] = 'O';
+		buf[index] = '0';
+		length += 2;
+		lstrcatA(tch, buf + index);
+		return length;
+	} break;
+
+	case 2: {
+		char buf[2 + 64 + 8 + 1] = "";
+		int index = 2 + 64 + 8;
+		int length = 0, bit_count = 0;
+		while (num) {
+			int bit = num & 1;
+			num >>= 1;
+			buf[index--] = '0' + bit;
+			++bit_count;
+			++length;
+			if (num && (bit_count & 7) == 0) {
+				buf[index--] = '_';
+				++length;
+			}
+		}
+		if (length == 0) {
+			buf[index--] = '0';
+			++length;
+		}
+		buf[index--] = 'b';
+		buf[index] = '0';
+		length += 2;
+		lstrcatA(tch, buf + index);
+		return length;
+	} break;
+
+	}
+	return 0;
+}
+
+void EditConvertNumRadix(HWND hwnd, int radix)
 {
 	if (SC_SEL_RECTANGLE != SendMessage(hwnd, SCI_GETSELECTIONMODE, 0, 0)) {
 		int iSelStart = (int)SendMessage(hwnd, SCI_GETSELECTIONSTART, 0, 0);
@@ -1627,10 +1687,10 @@ void EditHex2Dec(HWND hwnd, BOOL toHex)
 
 		if (count) {
 			char *ch = LocalAlloc(LPTR, count + 1);
-			char *tch = LocalAlloc(LPTR, count*2 + 1);
+			char *tch = LocalAlloc(LPTR, 2 + count*4 + 8 + 1);
 			int cch = 0;
 			char *p = ch;
-			unsigned __int64 ci = 0;
+			uint64_t ci = 0;
 
 			SendMessage(hwnd, SCI_GETSELTEXT, 0, (LPARAM)ch);
 
@@ -1638,7 +1698,7 @@ void EditHex2Dec(HWND hwnd, BOOL toHex)
 				if (*p == '0') {
 					ci = 0;
 					p++;
-					if ((*p == 'x' || *p == 'X') && !toHex) {
+					if ((*p == 'x' || *p == 'X') && radix != 16) {
 						p++;
 						while (*p) {
 							if (*p >= '0' && *p <= '9') {
@@ -1655,8 +1715,8 @@ void EditHex2Dec(HWND hwnd, BOOL toHex)
 							else
 								break;
 						}
-						cch += sprintf(tch + cch, "%I64u", ci);
-					} else if ((*p == 'o' || *p == 'O')) {
+						cch += ConvertNumRadix(tch + cch, ci, radix);
+					} else if ((*p == 'o' || *p == 'O') && radix != 8) {
 						p++;
 						while (*p) {
 							if (*p >= '0' && *p <= '7') {
@@ -1667,8 +1727,8 @@ void EditHex2Dec(HWND hwnd, BOOL toHex)
 							else
 								break;
 						}
-						cch += sprintf(tch + cch, (toHex ? "0x%I64x" : "%I64u"), ci);
-					} else if ((*p == 'b' || *p == 'B')) {
+						cch += ConvertNumRadix(tch + cch, ci, radix);
+					} else if ((*p == 'b' || *p == 'B') && radix != 2) {
 						p++;
 						while (*p) {
 							if (*p == '0') {
@@ -1683,8 +1743,8 @@ void EditHex2Dec(HWND hwnd, BOOL toHex)
 							else
 								break;
 						}
-						cch += sprintf(tch + cch, (toHex ? "0x%I64x" : "%I64u"), ci);
-					} else if ((*p >= '0' && *p <= '9') && toHex) {
+						cch += ConvertNumRadix(tch + cch, ci, radix);
+					} else if ((*p >= '0' && *p <= '9') && radix != 10) {
 						ci = *p++ - '0';
 						while (*p) {
 							if (*p >= '0' && *p <= '9') {
@@ -1695,11 +1755,11 @@ void EditHex2Dec(HWND hwnd, BOOL toHex)
 							else
 								break;
 						}
-						cch += sprintf(tch + cch, "0x%I64x", ci);
+						cch += ConvertNumRadix(tch + cch, ci, radix);
 					} else {
 						tch[cch++] = '0';
 					}
-				} else if ((*p >= '1' && *p <= '9') && toHex) {
+				} else if ((*p >= '1' && *p <= '9') && radix != 10) {
 					ci = *p++ - '0';
 					while (*p) {
 						if (*p >= '0' && *p <= '9') {
@@ -1710,7 +1770,7 @@ void EditHex2Dec(HWND hwnd, BOOL toHex)
 						else
 							break;
 					}
-					cch += sprintf(tch + cch, "0x%I64x", ci);
+					cch += ConvertNumRadix(tch + cch, ci, radix);
 				} else if (iswordstart(*p)) {
 					tch[cch++] = *p++;
 					while (iswordchar(*p))

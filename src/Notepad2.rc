@@ -254,8 +254,10 @@ BEGIN
         END
         POPUP "Spec&ial"
         BEGIN
-            MENUITEM "Dec to &Hex\tCtrl+Alt+H",     IDM_EDIT_DEC2HEX
-            MENUITEM "Hex to &Dec\tCtrl+Alt+D",     IDM_EDIT_HEX2DEC
+            MENUITEM "Convert to &Hex\tCtrl+Alt+H",     IDM_EDIT_NUM2HEX
+            MENUITEM "Convert to &Dec\tCtrl+Alt+D",     IDM_EDIT_NUM2DEC
+            MENUITEM "Convert to &Bin\tCtrl+Alt+B",     IDM_EDIT_NUM2BIN
+            MENUITEM "Convert to &Oct",                 IDM_EDIT_NUM2OCT
             MENUITEM SEPARATOR
             MENUITEM "C&har to Hex\tCtrl+Alt+X",    IDM_EDIT_CHAR2HEX
             MENUITEM "Hex to Cha&r\tCtrl+Alt+C",    IDM_EDIT_HEX2CHAR
@@ -528,6 +530,7 @@ BEGIN
     "A",            CMD_RELOADANSI,         VIRTKEY, SHIFT, CONTROL, NOINVERT
     "B",            IDM_EDIT_FINDMATCHINGBRACE, VIRTKEY, CONTROL, NOINVERT
     "B",            IDM_EDIT_MERGEBLANKLINES, VIRTKEY, ALT, NOINVERT
+    "B",            IDM_EDIT_NUM2BIN,       VIRTKEY, CONTROL, ALT, NOINVERT
     "B",            IDM_EDIT_SELTOMATCHINGBRACE, VIRTKEY, SHIFT, CONTROL, NOINVERT
     "C",            IDM_EDIT_COPY,          VIRTKEY, CONTROL, NOINVERT
     "C",            IDM_EDIT_COPYALL,       VIRTKEY, ALT, NOINVERT
@@ -536,7 +539,7 @@ BEGIN
     "D",            IDM_EDIT_DUPLICATELINE, VIRTKEY, CONTROL, NOINVERT
     "D",            IDM_EDIT_SELECTIONDUPLICATE, VIRTKEY, ALT, NOINVERT
     "D",            IDM_EDIT_DELETELINE,    VIRTKEY, SHIFT, CONTROL, NOINVERT
-    "D",            IDM_EDIT_HEX2DEC,       VIRTKEY, CONTROL, ALT, NOINVERT
+    "D",            IDM_EDIT_NUM2DEC,       VIRTKEY, CONTROL, ALT, NOINVERT
     "E",            IDM_EDIT_COPYADD,       VIRTKEY, CONTROL, NOINVERT
     "E",            IDM_EDIT_ESCAPECCHARS,  VIRTKEY, CONTROL, ALT, NOINVERT
     "E",            IDM_EDIT_URLENCODE,     VIRTKEY, SHIFT, CONTROL, NOINVERT
@@ -549,7 +552,7 @@ BEGIN
     "H",            IDM_EDIT_REPLACE,       VIRTKEY, CONTROL, NOINVERT
     "H",            IDM_FILE_RECENT,        VIRTKEY, ALT, NOINVERT
     "H",            IDM_EDIT_XHTML_UNESCAPE_CHAR, VIRTKEY, SHIFT, ALT, NOINVERT
-    "H",            IDM_EDIT_DEC2HEX,       VIRTKEY, CONTROL, ALT, NOINVERT
+    "H",            IDM_EDIT_NUM2HEX,       VIRTKEY, CONTROL, ALT, NOINVERT
     "I",            IDM_EDIT_SPLITLINES,    VIRTKEY, CONTROL, NOINVERT
     "I",            IDM_FILE_OPENFAV,       VIRTKEY, ALT, NOINVERT
     "I",            IDM_EDIT_TITLECASE,     VIRTKEY, CONTROL, ALT, NOINVERT

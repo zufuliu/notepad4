@@ -93,7 +93,7 @@ void	EditUnescapeXHTMLChars(HWND hwnd);
 void	EditChar2Hex(HWND hwnd);
 void	EditHex2Char(HWND hwnd);
 void	EditShowHex(HWND hwnd);
-void	EditHex2Dec(HWND hwnd, BOOL toHex);
+void	EditConvertNumRadix(HWND hwnd, int radix);
 void	EditModifyNumber(HWND hwnd, BOOL bIncrease);
 
 void	EditTabsToSpaces(HWND hwnd, int nTabWidth, BOOL bOnlyIndentingWS);

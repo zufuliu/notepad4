@@ -1249,7 +1249,7 @@ PEDITLEXER Style_DetectObjCAndMatlab(void) {
 			}
 			break;
 		case 'f':	// Matlab function
-			if (StrCmpNA(p, "function", 8) == 0 && (IsASpace(p + 8) || p[8] == '[')) {
+			if (StrCmpNA(p, "function", 8) == 0 && (IsASpace(p[8]) || p[8] == '[')) {
 				return &lexMatlab;
 			}
 			break;

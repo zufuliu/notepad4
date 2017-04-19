@@ -2070,8 +2070,10 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam)
 	EnableCmd(hmenu, IDM_EDIT_HEX2CHAR, i /*&& !bReadOnly*/);
 	EnableCmd(hmenu, IDM_EDIT_SHOW_HEX, i /*&& !bReadOnly*/);
 
-	EnableCmd(hmenu, IDM_EDIT_DEC2HEX, i /*&& !bReadOnly*/);
-	EnableCmd(hmenu, IDM_EDIT_HEX2DEC, i /*&& !bReadOnly*/);
+	EnableCmd(hmenu, IDM_EDIT_NUM2HEX, i /*&& !bReadOnly*/);
+	EnableCmd(hmenu, IDM_EDIT_NUM2DEC, i /*&& !bReadOnly*/);
+	EnableCmd(hmenu, IDM_EDIT_NUM2BIN, i /*&& !bReadOnly*/);
+	EnableCmd(hmenu, IDM_EDIT_NUM2OCT, i /*&& !bReadOnly*/);
 
 	//EnableCmd(hmenu, IDM_EDIT_INCREASENUM, i /*&& !bReadOnly*/);
 	//EnableCmd(hmenu, IDM_EDIT_DECREASENUM, i /*&& !bReadOnly*/);
@@ -3513,15 +3515,27 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam)
 		EndWaitCursor();
 		break;
 
-	case IDM_EDIT_DEC2HEX:
+	case IDM_EDIT_NUM2HEX:
 		BeginWaitCursor();
-		EditHex2Dec(hwndEdit, TRUE);
+		EditConvertNumRadix(hwndEdit, 16);
 		EndWaitCursor();
 		break;
 
-	case IDM_EDIT_HEX2DEC:
+	case IDM_EDIT_NUM2DEC:
 		BeginWaitCursor();
-		EditHex2Dec(hwndEdit, FALSE);
+		EditConvertNumRadix(hwndEdit, 10);
+		EndWaitCursor();
+		break;
+
+	case IDM_EDIT_NUM2BIN:
+		BeginWaitCursor();
+		EditConvertNumRadix(hwndEdit, 2);
+		EndWaitCursor();
+		break;
+
+	case IDM_EDIT_NUM2OCT:
+		BeginWaitCursor();
+		EditConvertNumRadix(hwndEdit, 8);
 		EndWaitCursor();
 		break;
 
