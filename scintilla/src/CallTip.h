@@ -53,7 +53,7 @@ public:
 	int verticalOffset; // pixel offset up or down of the calltip with respect to the line
 
 	CallTip();
-	// Deleted so CallTip objects can not be copied
+	// Deleted so CallTip objects can not be copied.
 	CallTip(const CallTip &) = delete;
 	CallTip &operator=(const CallTip &) = delete;
 	~CallTip();

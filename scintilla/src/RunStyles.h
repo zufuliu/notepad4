@@ -25,8 +25,9 @@ private:
 	void RemoveRunIfSameAsPrevious(int run);
 public:
 	RunStyles();
-	// Deleted so RunStyles objects can not be copied
+	// Deleted so RunStyles objects can not be copied.
 	RunStyles(const RunStyles &) = delete;
+	void operator=(const RunStyles &) = delete;
 	~RunStyles();
 	int Length() const;
 	int ValueAt(int position) const;

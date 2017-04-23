@@ -12,6 +12,7 @@
 #include <vector>
 #include <map>
 #include <algorithm>
+#include <memory>
 
 #include "Platform.h"
 
@@ -26,20 +27,17 @@ using namespace Scintilla;
 #endif
 
 void LineMarker::SetXPM(const char *textForm) {
-	delete pxpm;
-	pxpm = new XPM(textForm);
+	pxpm.reset(new XPM(textForm));
 	markType = SC_MARK_PIXMAP;
 }
 
 void LineMarker::SetXPM(const char *const *linesForm) {
-	delete pxpm;
-	pxpm = new XPM(linesForm);
+	pxpm.reset(new XPM(linesForm));
 	markType = SC_MARK_PIXMAP;
 }
 
 void LineMarker::SetRGBAImage(const Point &sizeRGBAImage, float scale, const unsigned char *pixelsRGBAImage) {
-	delete image;
-	image = new RGBAImage(static_cast<int>(sizeRGBAImage.x), static_cast<int>(sizeRGBAImage.y), scale, pixelsRGBAImage);
+	image.reset(new RGBAImage(static_cast<int>(sizeRGBAImage.x), static_cast<int>(sizeRGBAImage.y), scale, pixelsRGBAImage));
 	markType = SC_MARK_RGBAIMAGE;
 }
 
@@ -74,7 +72,7 @@ static void DrawMinus(Surface *surface, int centreX, int centreY, int armSize, c
 }
 
 void LineMarker::Draw(Surface *surface, const PRectangle &rcWhole, const Font &fontForCharacter, typeOfFold tFold, int marginStyle) const {
-	if (customDraw != NULL) {
+	if (customDraw) {
 		customDraw(surface, rcWhole, fontForCharacter, tFold, marginStyle, this);
 		return;
 	}

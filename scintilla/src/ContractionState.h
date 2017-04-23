@@ -36,6 +36,9 @@ class ContractionState {
 
 public:
 	ContractionState();
+	// Deleted so ContractionState objects can not be copied.
+	ContractionState(const ContractionState &) = delete;
+	void operator=(const ContractionState &) = delete;
 	virtual ~ContractionState();
 
 	void Clear();

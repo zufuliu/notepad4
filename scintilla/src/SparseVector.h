@@ -19,8 +19,9 @@ class SparseVector {
 private:
 	Partitioning *starts;
 	SplitVector<T> *values;
-	// Deleted so SparseVector objects can not be copied
+	// Deleted so SparseVector objects can not be copied.
 	SparseVector(const SparseVector &) = delete;
+	void operator=(const SparseVector &) = delete;
 	void ClearValue(int partition) {
 		values->SetValueAt(partition, T());
 	}

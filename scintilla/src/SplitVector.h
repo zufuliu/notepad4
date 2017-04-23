@@ -70,6 +70,10 @@ public:
 		Init();
 	}
 
+	// Deleted so SplitVector objects can not be copied.
+	SplitVector(const SplitVector &) = delete;
+	void operator=(const SplitVector &) = delete;
+
 	~SplitVector() {
 		delete []body;
 		body = 0;

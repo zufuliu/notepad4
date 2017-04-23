@@ -22,6 +22,9 @@ public:
 		SetGrowSize(growSize_);
 		ReAllocate(growSize_);
 	}
+	// Deleted so SplitVectorWithRangeAdd objects can not be copied.
+	SplitVectorWithRangeAdd(const SplitVectorWithRangeAdd &) = delete;
+	void operator=(const SplitVectorWithRangeAdd &) = delete;
 	~SplitVectorWithRangeAdd() {
 	}
 	void RangeAddDelta(int start, int end, int delta) {
@@ -91,6 +94,10 @@ public:
 	explicit Partitioning(int growSize) {
 		Allocate(growSize);
 	}
+
+	// Deleted so Partitioning objects can not be copied.
+	Partitioning(const Partitioning &) = delete;
+	void operator=(const Partitioning &) = delete;
 
 	~Partitioning() {
 		delete body;

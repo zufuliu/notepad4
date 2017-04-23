@@ -53,7 +53,7 @@ public:
 	Document *pdoc;
 
 	EditModel();
-	// Deleted so EditModel objects can not be copied
+	// Deleted so EditModel objects can not be copied.
 	explicit EditModel(const EditModel &) = delete;
 	EditModel &operator=(const EditModel &) = delete;
 	virtual ~EditModel();

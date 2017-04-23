@@ -90,6 +90,9 @@ public:
 	DrawWrapMarkerFn customDrawWrapMarker;
 
 	EditView();
+	// Deleted so EditView objects can not be copied.
+	EditView(const EditView &) = delete;
+	void operator=(const EditView &) = delete;
 	virtual ~EditView();
 
 	bool SetTwoPhaseDraw(bool twoPhaseDraw);
@@ -154,9 +157,11 @@ public:
 class AutoLineLayout {
 	LineLayoutCache &llc;
 	LineLayout *ll;
-	AutoLineLayout &operator=(const AutoLineLayout &);
 public:
 	AutoLineLayout(LineLayoutCache &llc_, LineLayout *ll_) : llc(llc_), ll(ll_) {}
+	// Deleted so AutoLineLayout objects can not be copied.
+	explicit AutoLineLayout(const AutoLineLayout &) = delete;
+	AutoLineLayout &operator=(const AutoLineLayout &) = delete;
 	~AutoLineLayout() {
 		llc.Dispose(ll);
 		ll = 0;

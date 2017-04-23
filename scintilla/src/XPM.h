@@ -50,7 +50,7 @@ class RGBAImage {
 public:
 	RGBAImage(int width_, int height_, float scale_, const unsigned char *pixels_);
 	explicit RGBAImage(const XPM &xpm);
-	// Deleted so RGBAImage objects can not be copied
+	// Deleted so RGBAImage objects can not be copied.
 	RGBAImage(const RGBAImage &) = delete;
 	RGBAImage &operator=(const RGBAImage &) = delete;
 	virtual ~RGBAImage();
@@ -68,7 +68,7 @@ public:
  * A collection of RGBAImage pixmaps indexed by integer id.
  */
 class RGBAImageSet {
-	typedef std::map<int, RGBAImage*> ImageMap;
+	typedef std::map<int, std::unique_ptr<RGBAImage>> ImageMap;
 	ImageMap images;
 	mutable int height;	///< Memorize largest height of the set.
 	mutable int width;	///< Memorize largest width of the set.

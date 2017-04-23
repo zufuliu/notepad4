@@ -77,6 +77,9 @@ public:
 	XYPOSITION wrapIndent; // In pixels
 
 	explicit LineLayout(int maxLineLength_);
+	// Deleted so LineLayout objects can not be copied.
+	LineLayout(const LineLayout &) = delete;
+	void operator=(const LineLayout &) = delete;
 	virtual ~LineLayout();
 	void Resize(int maxLineLength_);
 	void Free();
@@ -107,6 +110,9 @@ class LineLayoutCache {
 	void AllocateForLevel(Sci::Line linesOnScreen, Sci::Line linesInDoc);
 public:
 	LineLayoutCache();
+	// Deleted so LineLayoutCache objects can not be copied.
+	LineLayoutCache(const LineLayoutCache &) = delete;
+	void operator=(const LineLayoutCache &) = delete;
 	virtual ~LineLayoutCache();
 	void Deallocate();
 	enum {
@@ -130,6 +136,10 @@ class PositionCacheEntry {
 	XYPOSITION *positions;
 public:
 	PositionCacheEntry();
+	// Copy constructor not currently used, but needed for being element in std::vector.
+	PositionCacheEntry(const PositionCacheEntry &);
+	// Deleted so PositionCacheEntry objects can not be assigned.
+	void operator=(const PositionCacheEntry &) = delete;
 	~PositionCacheEntry();
 	void Set(unsigned int styleNumber_, const char *s_, unsigned int len_, XYPOSITION *positions_, unsigned int clock_);
 	void Clear();
@@ -194,8 +204,9 @@ public:
 	enum { lengthEachSubdivision = 100 };
 	BreakFinder(const LineLayout *ll_, const Selection *psel, const Range &lineRange_, Sci::Position posLineStart_,
 		int xStart, bool breakForSelection, const Document *pdoc_, const SpecialRepresentations *preprs_, const ViewStyle *pvsDraw);
-	// Deleted so BreakFinder objects can not be copied
+	// Deleted so BreakFinder objects can not be copied.
 	BreakFinder(const BreakFinder &) = delete;
+	void operator=(const BreakFinder &) = delete;
 	~BreakFinder();
 	TextSegment Next();
 	bool More() const;
@@ -207,8 +218,9 @@ class PositionCache {
 	bool allClear;
 public:
 	PositionCache();
-	// Deleted so PositionCache objects can not be copied
+	// Deleted so PositionCache objects can not be copied.
 	PositionCache(const PositionCache &) = delete;
+	void operator=(const PositionCache &) = delete;
 	~PositionCache();
 	void Clear();
 	void SetSize(size_t size_);

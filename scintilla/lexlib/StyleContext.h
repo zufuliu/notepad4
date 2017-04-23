@@ -27,7 +27,6 @@ class StyleContext {
 	Sci_PositionU currentPosLastRelative;
 	Sci_Position offsetRelative;
 
-	StyleContext &operator=(const StyleContext &);
 	void GetNextChar();
 
 public:
@@ -46,6 +45,9 @@ public:
 
 	StyleContext(Sci_PositionU startPos, Sci_PositionU length,
 				int initStyle, LexAccessor &styler_, unsigned char chMask='\377');
+	// Deleted so StyleContext objects can not be copied.
+	StyleContext(const StyleContext &) = delete;
+	StyleContext &operator=(const StyleContext &) = delete;
 	void Complete();
 	bool More() const {
 		return currentPos < endPos;

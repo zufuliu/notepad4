@@ -257,7 +257,7 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	bool convertPastes;
 
 	Editor();
-	// Deleted so Editor objects can not be copied
+	// Deleted so Editor objects can not be copied.
 	explicit Editor(const Editor &) = delete;
 	Editor &operator=(const Editor &) = delete;
 	~Editor() override;
@@ -624,6 +624,9 @@ public:
 			}
 		}
 	}
+	// Deleted so AutoSurface objects can not be copied.
+	AutoSurface(const AutoSurface &) = delete;
+	void operator=(const AutoSurface &) = delete;
 	~AutoSurface() {
 		delete surf;
 	}

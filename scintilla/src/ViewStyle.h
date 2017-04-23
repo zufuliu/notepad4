@@ -32,7 +32,7 @@ private:
 	std::vector<const char *> names;
 public:
 	FontNames();
-	// FontNames objects can not be copied
+	// FontNames objects can not be copied.
 	FontNames(const FontNames &) = delete;
 	FontNames &operator=(const FontNames &) = delete;
 	~FontNames();
@@ -44,7 +44,7 @@ class FontRealised : public FontMeasurements {
 public:
 	Font font;
 	FontRealised();
-	// FontRealised objects can not be copied
+	// FontRealised objects can not be copied.
 	FontRealised(const FontRealised &) = delete;
 	FontRealised &operator=(const FontRealised &) = delete;
 	virtual ~FontRealised();

@@ -11,6 +11,7 @@
 #include <stdexcept>
 #include <vector>
 #include <map>
+#include <memory>
 
 #include "Platform.h"
 
@@ -248,10 +249,6 @@ RGBAImageSet::~RGBAImageSet() {
 
 /// Remove all images.
 void RGBAImageSet::Clear() {
-	for (ImageMap::iterator it=images.begin(); it != images.end(); ++it) {
-		delete it->second;
-		it->second = 0;
-	}
 	images.clear();
 	height = -1;
 	width = -1;
@@ -261,10 +258,9 @@ void RGBAImageSet::Clear() {
 void RGBAImageSet::Add(int ident, RGBAImage *image) {
 	ImageMap::iterator it=images.find(ident);
 	if (it == images.end()) {
-		images[ident] = image;
+		images[ident] = std::unique_ptr<RGBAImage>(image);
 	} else {
-		delete it->second;
-		it->second = image;
+		it->second.reset(image);
 	}
 	height = -1;
 	width = -1;
@@ -274,17 +270,17 @@ void RGBAImageSet::Add(int ident, RGBAImage *image) {
 RGBAImage *RGBAImageSet::Get(int ident) {
 	ImageMap::iterator it = images.find(ident);
 	if (it != images.end()) {
-		return it->second;
+		return it->second.get();
 	}
-	return NULL;
+	return nullptr;
 }
 
 /// Give the largest height of the set.
 int RGBAImageSet::GetHeight() const {
 	if (height < 0) {
-		for (ImageMap::const_iterator it=images.begin(); it != images.end(); ++it) {
-			if (height < it->second->GetHeight()) {
-				height = it->second->GetHeight();
+		for (const std::pair<const int, std::unique_ptr<RGBAImage>> &image : images) {
+ 			if (height < image.second->GetHeight()) {
+ 				height = image.second->GetHeight();
 			}
 		}
 	}
@@ -294,9 +290,9 @@ int RGBAImageSet::GetHeight() const {
 /// Give the largest width of the set.
 int RGBAImageSet::GetWidth() const {
 	if (width < 0) {
-		for (ImageMap::const_iterator it=images.begin(); it != images.end(); ++it) {
-			if (width < it->second->GetWidth()) {
-				width = it->second->GetWidth();
+		for (const std::pair<const int, std::unique_ptr<RGBAImage>> &image : images) {
+ 			if (width < image.second->GetWidth()) {
+ 				width = image.second->GetWidth();
 			}
 		}
 	}

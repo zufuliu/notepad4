@@ -27,7 +27,7 @@ public:
 
 	bool ignoreCase;
 	bool chooseSingle;
-	ListBox *lb;
+	std::unique_ptr<ListBox> lb;
 	Sci::Position posStart;
 	int startLen;
 	/// Should autocompletion be canceled if editor's currentPos <= startPos?

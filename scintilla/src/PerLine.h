@@ -30,6 +30,9 @@ class MarkerHandleSet {
 
 public:
 	MarkerHandleSet();
+	// Deleted so MarkerHandleSet objects can not be copied.
+	MarkerHandleSet(const MarkerHandleSet &) = delete;
+	void operator=(const MarkerHandleSet &) = delete;
 	~MarkerHandleSet();
 	int Length() const;
 	int MarkValue() const;	///< Bit set of marker numbers.
@@ -47,6 +50,9 @@ class LineMarkers : public PerLine {
 public:
 	LineMarkers() : handleCurrent(0) {
 	}
+	// Deleted so Worker objects can not be copied.
+	LineMarkers(const LineMarkers &) = delete;
+	void operator=(const LineMarkers &) = delete;
 	virtual ~LineMarkers();
 	void Init() override;
 	void InsertLine(Sci::Line line) override;
@@ -64,6 +70,11 @@ public:
 class LineLevels : public PerLine {
 	SplitVector<int> levels;
 public:
+	LineLevels() {
+	}
+	// Deleted so Worker objects can not be copied.
+	LineLevels(const LineLevels &) = delete;
+	void operator=(const LineLevels &) = delete;
 	virtual ~LineLevels();
 	void Init() override;
 	void InsertLine(Sci::Line line) override;
@@ -78,6 +89,9 @@ public:
 class LineState : public PerLine {
 	SplitVector<int> lineStates;
 public:
+	// Deleted so Worker objects can not be copied.
+	LineState(const LineState &) = delete;
+	void operator=(const LineState &) = delete;
 	LineState() {
 	}
 	virtual ~LineState();
@@ -93,6 +107,9 @@ public:
 class LineAnnotation : public PerLine {
 	SplitVector<char *> annotations;
 public:
+	// Deleted so Worker objects can not be copied.
+	LineAnnotation(const LineAnnotation &) = delete;
+	void operator=(const LineAnnotation &) = delete;
 	LineAnnotation() {
 	}
 	virtual ~LineAnnotation();
@@ -119,6 +136,9 @@ class LineTabstops : public PerLine {
 public:
 	LineTabstops() {
 	}
+	// Deleted so Worker objects can not be copied.
+	LineTabstops(const LineTabstops &) = delete;
+	void operator=(const LineTabstops &) = delete;
 	virtual ~LineTabstops();
 	void Init() override;
 	void InsertLine(Sci::Line line) override;

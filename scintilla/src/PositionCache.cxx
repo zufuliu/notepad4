@@ -561,7 +561,17 @@ bool BreakFinder::More() const {
 }
 
 PositionCacheEntry::PositionCacheEntry() :
-	styleNumber(0), len(0), clock(0), positions(0) {
+	styleNumber(0), len(0), clock(0), positions(nullptr) {
+}
+
+// Copy constructor not currently used, but needed for being element in std::vector.
+PositionCacheEntry::PositionCacheEntry(const PositionCacheEntry &other) :
+	styleNumber(other.styleNumber), len(other.styleNumber), clock(other.styleNumber), positions(nullptr) {
+	if (other.positions) {
+		const size_t lenData = len + (len / sizeof(XYPOSITION)) + 1;
+		positions = new XYPOSITION[lenData];
+		memcpy(positions, other.positions, lenData * sizeof(XYPOSITION));
+	}
 }
 
 void PositionCacheEntry::Set(unsigned int styleNumber_, const char *s_,
@@ -571,7 +581,7 @@ void PositionCacheEntry::Set(unsigned int styleNumber_, const char *s_,
 	len = len_;
 	clock = clock_;
 	if (s_ && positions_) {
-		positions = new XYPOSITION[len + (len / 4) + 1];
+		positions = new XYPOSITION[len + (len / sizeof(XYPOSITION)) + 1];
 		for (unsigned int i=0; i<len; i++) {
 			positions[i] = positions_[i];
 		}
@@ -585,7 +595,7 @@ PositionCacheEntry::~PositionCacheEntry() {
 
 void PositionCacheEntry::Clear() {
 	delete []positions;
-	positions = 0;
+	positions = nullptr;
 	styleNumber = 0;
 	len = 0;
 	clock = 0;

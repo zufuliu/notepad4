@@ -95,7 +95,6 @@ int LexInterface::LineEndTypesSupported() {
 
 Document::Document() {
 	refCount = 0;
-	pcf = NULL;
 #ifdef _WIN32
 	eolMode = SC_EOL_CRLF;
 #else
@@ -118,7 +117,6 @@ Document::Document() {
 	durationStyleOneLine = 0.00001;
 
 	matchesValid = false;
-	regex = 0;
 
 	UTF8BytesOfLeadInitialise();
 
@@ -129,8 +127,6 @@ Document::Document() {
 	perLineData[ldAnnotation] = new LineAnnotation();
 
 	cb.SetPerLine(this);
-
-	pli = 0;
 }
 
 Document::~Document() {
@@ -141,12 +137,6 @@ Document::~Document() {
 		delete pl;
 		pl = nullptr;
 	}
-	regex.release();
-	regex = 0;
-	delete pli;
-	pli = 0;
-	delete pcf;
-	pcf = 0;
 }
 
 void Document::Init() {
@@ -166,7 +156,7 @@ int Document::LineEndTypesSupported() const {
 bool Document::SetDBCSCodePage(int dbcsCodePage_) {
 	if (dbcsCodePage != dbcsCodePage_) {
 		dbcsCodePage = dbcsCodePage_;
-		SetCaseFolder(NULL);
+		SetCaseFolder(nullptr);
 		cb.SetLineEndTypes(lineEndBitSet & LineEndTypesSupported());
 		return true;
 	} else {
@@ -1807,12 +1797,11 @@ bool Document::MatchesWordOptions(bool word, bool wordStart, Sci::Position pos, 
 }
 
 bool Document::HasCaseFolder() const {
-	return pcf != 0;
+	return pcf != nullptr;
 }
 
 void Document::SetCaseFolder(CaseFolder *pcf_) {
-	delete pcf;
-	pcf = pcf_;
+	pcf.reset(pcf_);
 }
 
 Document::CharacterExtracted Document::ExtractCharacter(Sci::Position position) const {
@@ -2123,6 +2112,14 @@ void Document::LexerChanged() {
 	for (const WatcherWithUserData &watcher : watchers) {
 		watcher.watcher->NotifyLexerChanged(this, watcher.userData);
 	}
+}
+
+LexInterface *Document::GetLexInterface() const {
+	return pli.get();
+}
+
+void Document::SetLexInterface(LexInterface *pLexInterface) {
+	pli.reset(pLexInterface);
 }
 
 int SCI_METHOD Document::SetLineState(Sci_Position line, int state) {

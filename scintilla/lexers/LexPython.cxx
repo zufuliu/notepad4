@@ -430,15 +430,23 @@ static void FoldPyDoc(Sci_PositionU startPos, Sci_Position length, int, WordList
 		// Skip past any blank lines for next indent level info; we skip also
 		// comments (all comments, not just those starting in column 0)
 		// which effectively folds them into surrounding code rather
-		// than screwing up folding.
+		// than screwing up folding.  If comments end file, use the min
+		// comment indent as the level after
 
-		while (!quote && (lineNext < docLines) && ((indentNext & SC_FOLDLEVELWHITEFLAG) ||
-			(lineNext <= docLines && IsCommentLine(lineNext)))) {
+		int minCommentLevel = indentCurrentLevel;
+		while (!quote
+			&& (lineNext < docLines)
+			&& ((indentNext & SC_FOLDLEVELWHITEFLAG) || (lineNext <= docLines && IsCommentLine(lineNext)))) {
+
+			if (IsCommentLine(lineNext) && indentNext < minCommentLevel) {
+				minCommentLevel = indentNext;
+			}
+
 			lineNext++;
 			indentNext = Accessor::LexIndentAmount(styler, lineNext, &spaceFlags, NULL);
 		}
 
-		const int levelAfterComments = indentNext & SC_FOLDLEVELNUMBERMASK;
+		const int levelAfterComments = ((lineNext < docLines) ? indentNext & SC_FOLDLEVELNUMBERMASK : minCommentLevel);
 		const int levelBeforeComments = std::max(indentCurrentLevel, levelAfterComments);
 
 		// Now set all the indent levels on the lines we skipped
