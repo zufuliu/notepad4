@@ -163,6 +163,10 @@ public:
 };
 
 class Document;
+class LineMarkers;
+class LineLevels;
+class LineState;
+class LineAnnotation;
 
 static inline int LevelNumber(int level) {
 	return level & SC_FOLDLEVELNUMBERMASK;
@@ -224,7 +228,12 @@ private:
 
 	// ldSize is not real data - it is for dimensions and loops
 	enum lineData { ldMarkers, ldLevels, ldState, ldMargin, ldAnnotation, ldSize };
-	PerLine *perLineData[ldSize];
+	std::unique_ptr<PerLine> perLineData[ldSize];
+	LineMarkers *Markers() const;
+	LineLevels *Levels() const;
+	LineState *States() const;
+	LineAnnotation *Margins() const;
+	LineAnnotation *Annotations() const;
 
 	bool matchesValid;
 	std::unique_ptr<RegexSearchBase> regex;
@@ -358,14 +367,14 @@ public:
 	void GetStyleRange(unsigned char *buffer, Sci::Position position, Sci::Position lengthRetrieve) const {
 		cb.GetStyleRange(buffer, position, lengthRetrieve);
 	}
-	int GetMark(Sci::Line line);
+	int GetMark(Sci::Line line) const;
 	Sci::Line MarkerNext(Sci::Line lineStart, int mask) const;
 	int AddMark(Sci::Line line, int markerNum);
 	void AddMarkSet(Sci::Line line, int valueSet);
 	void DeleteMark(Sci::Line line, int markerNum);
 	void DeleteMarkFromHandle(int markerHandle);
 	void DeleteAllMarks(int markerNum);
-	Sci::Line LineFromHandle(int markerHandle);
+	Sci::Line LineFromHandle(int markerHandle) const;
 	Sci_Position SCI_METHOD LineStart(Sci_Position line) const;
 	bool IsLineStartPosition(Sci::Position position) const;
 	Sci_Position SCI_METHOD LineEnd(Sci_Position line) const;
@@ -419,7 +428,7 @@ public:
 
 	int SCI_METHOD SetLineState(Sci_Position line, int state);
 	int SCI_METHOD GetLineState(Sci_Position line) const;
-	Sci::Line GetMaxLineState();
+	Sci::Line GetMaxLineState() const;
 	void SCI_METHOD ChangeLexerState(Sci_Position start, Sci_Position end);
 
 	StyledText MarginStyledText(Sci::Line line) const;
@@ -513,7 +522,7 @@ public:
 		position(act.position),
 		length(act.lenData),
 		linesAdded(linesAdded_),
-		text(act.data),
+		text(act.data.get()),
 		line(0),
 		foldLevelNow(0),
 		foldLevelPrev(0),

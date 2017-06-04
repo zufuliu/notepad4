@@ -486,7 +486,7 @@ public:
 const int stackBufferLength = 1000;
 class TextWide : public VarBuffer<wchar_t, stackBufferLength> {
 public:
-	int tlen;
+	int tlen;	// Using int instead of size_t as most Win32 APIs take int.
 	TextWide(const char *s, int len, bool unicodeMode, int codePage=0) :
 		VarBuffer<wchar_t, stackBufferLength>(len) {
 		if (unicodeMode) {
@@ -1599,40 +1599,43 @@ XYPOSITION SurfaceD2D::WidthText(const Font &font_, const char *s, int len) {
 
 void SurfaceD2D::MeasureWidths(const Font &font_, const char *s, int len, XYPOSITION *positions) {
 	SetFont(font_);
-	int fit = 0;
+	if (!pIDWriteFactory || !pTextFormat) {
+		// SetFont failed or no access to DirectWrite so give up.
+		return;
+	}
 	const TextWide tbuf(s, len, unicodeMode, codePageText);
 	TextPositions poses(tbuf.tlen);
-	fit = tbuf.tlen;
+	// Initialize poses for safety.
+	std::fill(poses.buffer, poses.buffer + tbuf.tlen, 0.0f);
+	// Create a layout
+	IDWriteTextLayout *pTextLayout = 0;
+	const HRESULT hrCreate = pIDWriteFactory->CreateTextLayout(tbuf.buffer, tbuf.tlen, pTextFormat, 10000.0, 1000.0, &pTextLayout);
+	if (!SUCCEEDED(hrCreate)) {
+		return;
+	}
 	const int clusters = 1000;
 	DWRITE_CLUSTER_METRICS clusterMetrics[clusters];
 	UINT32 count = 0;
-	if (pIDWriteFactory && pTextFormat) {
-		SetFont(font_);
-		// Create a layout
-		IDWriteTextLayout *pTextLayout = 0;
-		const HRESULT hr = pIDWriteFactory->CreateTextLayout(tbuf.buffer, tbuf.tlen, pTextFormat, 10000.0, 1000.0, &pTextLayout);
-		if (!SUCCEEDED(hr))
-			return;
-		if (!SUCCEEDED(pTextLayout->GetClusterMetrics(clusterMetrics, clusters, &count)))
-			return;
-		// A cluster may be more than one WCHAR, such as for "ffi" which is a ligature in the Candara font
-		FLOAT position = 0.0f;
-		size_t ti=0;
-		for (size_t ci=0; ci<count; ci++) {
-			for (size_t inCluster=0; inCluster<clusterMetrics[ci].length; inCluster++) {
-				poses.buffer[ti++] = position + clusterMetrics[ci].width * (inCluster + 1) / clusterMetrics[ci].length;
-			}
-			position += clusterMetrics[ci].width;
+	const HRESULT hrGetCluster = pTextLayout->GetClusterMetrics(clusterMetrics, clusters, &count);
+	pTextLayout->Release();
+	if (!SUCCEEDED(hrGetCluster)) {
+		return;
+	}
+	// A cluster may be more than one WCHAR, such as for "ffi" which is a ligature in the Candara font
+	FLOAT position = 0.0f;
+	size_t ti=0;
+	for (size_t ci=0; ci<count; ci++) {
+		for (size_t inCluster=0; inCluster<clusterMetrics[ci].length; inCluster++) {
+			poses.buffer[ti++] = position + clusterMetrics[ci].width * (inCluster + 1) / clusterMetrics[ci].length;
 		}
-		PLATFORM_ASSERT(ti == static_cast<size_t>(tbuf.tlen));
-		pTextLayout->Release();
+		position += clusterMetrics[ci].width;
 	}
 	if (unicodeMode) {
 		// Map the widths given for UTF-16 characters back onto the UTF-8 input string
 		int ui=0;
 		const unsigned char *us = reinterpret_cast<const unsigned char *>(s);
 		int i=0;
-		while (ui<fit) {
+		while (ui<tbuf.tlen) {
 			const unsigned char uch = us[i];
 			unsigned int lenChar = 1;
 			if (uch >= (0x80 + 0x40 + 0x20 + 0x10)) {
@@ -1656,26 +1659,22 @@ void SurfaceD2D::MeasureWidths(const Font &font_, const char *s, int len, XYPOSI
 		}
 	} else if (codePageText == 0) {
 
-		// One character per position
+		// One char per position
 		PLATFORM_ASSERT(len == tbuf.tlen);
-		for (size_t kk=0; kk<static_cast<size_t>(len); kk++) {
+		for (int kk=0; kk<tbuf.tlen; kk++) {
 			positions[kk] = poses.buffer[kk];
 		}
 
 	} else {
 
-		// May be more than one byte per position
-		unsigned int ui = 0;
-		FLOAT position = 0.0f;
-		for (int i=0; i<len;) {
-			if (ui < count)
-				position = poses.buffer[ui];
+		// May be one or two bytes per position
+		int ui = 0;
+		for (int i=0; i<len && ui<tbuf.tlen;) {
+			positions[i] = poses.buffer[ui];
 			if (Platform::IsDBCSLeadByte(codePageText, s[i])) {
-				positions[i] = position;
-				positions[i+1] = position;
+				positions[i+1] = poses.buffer[ui];
 				i += 2;
 			} else {
-				positions[i] = position;
 				i++;
 			}
 
@@ -2315,56 +2314,46 @@ void ListBoxX::Draw(DRAWITEMSTRUCT *pDrawItem) {
 		// Draw the image, if any
 		const RGBAImage *pimage = images.Get(pixId);
 		if (pimage) {
-			Surface *surfaceItem = Surface::Allocate(technology);
-			if (surfaceItem) {
-				if (technology == SCWIN_TECH_GDI) {
-					surfaceItem->Init(pDrawItem->hDC, pDrawItem->hwndItem);
-					const long left = pDrawItem->rcItem.left + static_cast<int>(ItemInset.x + ImageInset.x);
-					PRectangle rcImage = PRectangle::FromInts(left, pDrawItem->rcItem.top,
-						left + images.GetWidth(), pDrawItem->rcItem.bottom);
-					surfaceItem->DrawRGBAImage(rcImage,
-						pimage->GetWidth(), pimage->GetHeight(), pimage->Pixels());
-					delete surfaceItem;
-					::SetTextAlign(pDrawItem->hDC, TA_TOP);
-				} else {
+			std::unique_ptr<Surface> surfaceItem(Surface::Allocate(technology));
+			if (technology == SCWIN_TECH_GDI) {
+				surfaceItem->Init(pDrawItem->hDC, pDrawItem->hwndItem);
+				const long left = pDrawItem->rcItem.left + static_cast<int>(ItemInset.x + ImageInset.x);
+				PRectangle rcImage = PRectangle::FromInts(left, pDrawItem->rcItem.top,
+					left + images.GetWidth(), pDrawItem->rcItem.bottom);
+				surfaceItem->DrawRGBAImage(rcImage,
+					pimage->GetWidth(), pimage->GetHeight(), pimage->Pixels());
+				::SetTextAlign(pDrawItem->hDC, TA_TOP);
+			} else {
 #if defined(USE_D2D)
-					D2D1_RENDER_TARGET_PROPERTIES props = D2D1::RenderTargetProperties(
-						D2D1_RENDER_TARGET_TYPE_DEFAULT,
-						D2D1::PixelFormat(
-							DXGI_FORMAT_B8G8R8A8_UNORM,
-							D2D1_ALPHA_MODE_IGNORE),
-						0,
-						0,
-						D2D1_RENDER_TARGET_USAGE_NONE,
-						D2D1_FEATURE_LEVEL_DEFAULT
-						);
-					ID2D1DCRenderTarget *pDCRT = 0;
-					HRESULT hr = pD2DFactory->CreateDCRenderTarget(&props, &pDCRT);
+				D2D1_RENDER_TARGET_PROPERTIES props = D2D1::RenderTargetProperties(
+					D2D1_RENDER_TARGET_TYPE_DEFAULT,
+					D2D1::PixelFormat(
+						DXGI_FORMAT_B8G8R8A8_UNORM,
+						D2D1_ALPHA_MODE_IGNORE),
+					0,
+					0,
+					D2D1_RENDER_TARGET_USAGE_NONE,
+					D2D1_FEATURE_LEVEL_DEFAULT
+					);
+				ID2D1DCRenderTarget *pDCRT = 0;
+				HRESULT hr = pD2DFactory->CreateDCRenderTarget(&props, &pDCRT);
+				if (SUCCEEDED(hr)) {
+					RECT rcWindow;
+					GetClientRect(pDrawItem->hwndItem, &rcWindow);
+					hr = pDCRT->BindDC(pDrawItem->hDC, &rcWindow);
 					if (SUCCEEDED(hr)) {
-						RECT rcWindow;
-						GetClientRect(pDrawItem->hwndItem, &rcWindow);
-						hr = pDCRT->BindDC(pDrawItem->hDC, &rcWindow);
-						if (SUCCEEDED(hr)) {
-							surfaceItem->Init(pDCRT, pDrawItem->hwndItem);
-							pDCRT->BeginDraw();
-							const long left = pDrawItem->rcItem.left + static_cast<long>(ItemInset.x + ImageInset.x);
-							PRectangle rcImage = PRectangle::FromInts(left, pDrawItem->rcItem.top,
-								left + images.GetWidth(), pDrawItem->rcItem.bottom);
-							surfaceItem->DrawRGBAImage(rcImage,
-								pimage->GetWidth(), pimage->GetHeight(), pimage->Pixels());
-							delete surfaceItem;
-							pDCRT->EndDraw();
-							pDCRT->Release();
-						} else {
-							delete surfaceItem;
-						}
-					} else {
-						delete surfaceItem;
+						surfaceItem->Init(pDCRT, pDrawItem->hwndItem);
+						pDCRT->BeginDraw();
+						const long left = pDrawItem->rcItem.left + static_cast<long>(ItemInset.x + ImageInset.x);
+						PRectangle rcImage = PRectangle::FromInts(left, pDrawItem->rcItem.top,
+							left + images.GetWidth(), pDrawItem->rcItem.bottom);
+						surfaceItem->DrawRGBAImage(rcImage,
+							pimage->GetWidth(), pimage->GetHeight(), pimage->Pixels());
+						pDCRT->EndDraw();
+						pDCRT->Release();
 					}
-#else
-					delete surfaceItem;
-#endif
 				}
+#endif
 			}
 		}
 	}

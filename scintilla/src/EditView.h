@@ -50,7 +50,7 @@ typedef void (*DrawTabArrowFn)(Surface *surface, const PRectangle& rcTab, int ym
 class EditView {
 public:
 	PrintParameters printParameters;
-	PerLine *ldTabstops;
+	std::unique_ptr<PerLine> ldTabstops;
 	int tabWidthMinimumPixels;
 
 	bool hideSelection;
@@ -74,9 +74,9 @@ public:
 
 	bool imeCaretBlockOverride;
 
-	Surface *pixmapLine;
-	Surface *pixmapIndentGuide;
-	Surface *pixmapIndentGuideHighlight;
+	std::unique_ptr<Surface> pixmapLine;
+	std::unique_ptr<Surface> pixmapIndentGuide;
+	std::unique_ptr<Surface> pixmapIndentGuideHighlight;
 
 	LineLayoutCache llc;
 	PositionCache posCache;

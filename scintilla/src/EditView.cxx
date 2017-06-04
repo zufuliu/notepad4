@@ -17,6 +17,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <forward_list>
 #include <algorithm>
 #include <memory>
 
@@ -28,6 +29,7 @@
 #include "StringCopy.h"
 #include "CharacterSet.h"
 #include "Position.h"
+#include "UniqueString.h"
 #include "SplitVector.h"
 #include "Partitioning.h"
 #include "RunStyles.h"
@@ -175,7 +177,6 @@ void DrawStyledText(Surface *surface, const ViewStyle &vs, int styleOffset, cons
 const XYPOSITION epsilon = 0.0001f;	// A small nudge to avoid floating point precision issues
 
 EditView::EditView() {
-	ldTabstops = NULL;
 	tabWidthMinimumPixels = 2; // needed for calculating tab stops for fractional proportional fonts
 	hideSelection = false;
 	drawOverstrikeCaret = true;
@@ -185,9 +186,6 @@ EditView::EditView() {
 	additionalCaretsBlink = true;
 	additionalCaretsVisible = true;
 	imeCaretBlockOverride = false;
-	pixmapLine = 0;
-	pixmapIndentGuide = 0;
-	pixmapIndentGuideHighlight = 0;
 	llc.SetLevel(LineLayoutCache::llcCaret);
 	posCache.SetSize(0x400);
 	tabArrowHeight = 4;
@@ -196,8 +194,6 @@ EditView::EditView() {
 }
 
 EditView::~EditView() {
-	delete ldTabstops;
-	ldTabstops = NULL;
 }
 
 bool EditView::SetTwoPhaseDraw(bool twoPhaseDraw) {
@@ -219,8 +215,7 @@ bool EditView::LinesOverlap() const {
 }
 
 void EditView::ClearAllTabstops() {
-	delete ldTabstops;
-	ldTabstops = 0;
+	ldTabstops.reset();
 }
 
 XYPOSITION EditView::NextTabstopPos(Sci::Line line, XYPOSITION x, XYPOSITION tabWidth) const {
@@ -231,20 +226,20 @@ XYPOSITION EditView::NextTabstopPos(Sci::Line line, XYPOSITION x, XYPOSITION tab
 }
 
 bool EditView::ClearTabstops(Sci::Line line) {
-	LineTabstops *lt = static_cast<LineTabstops *>(ldTabstops);
+	LineTabstops *lt = static_cast<LineTabstops *>(ldTabstops.get());
 	return lt && lt->ClearTabstops(line);
 }
 
 bool EditView::AddTabstop(Sci::Line line, int x) {
 	if (!ldTabstops) {
-		ldTabstops = new LineTabstops();
+		ldTabstops.reset(new LineTabstops());
 	}
-	LineTabstops *lt = static_cast<LineTabstops *>(ldTabstops);
+	LineTabstops *lt = static_cast<LineTabstops *>(ldTabstops.get());
 	return lt && lt->AddTabstop(line, x);
 }
 
 int EditView::GetNextTabstop(Sci::Line line, int x) const {
-	const LineTabstops *lt = static_cast<LineTabstops *>(ldTabstops);
+	const LineTabstops *lt = static_cast<LineTabstops *>(ldTabstops.get());
 	if (lt) {
 		return lt->GetNextTabstop(line, x);
 	} else {
@@ -268,12 +263,9 @@ void EditView::LinesAddedOrRemoved(Sci::Line lineOfPos, Sci::Line linesAdded) {
 
 void EditView::DropGraphics(bool freeObjects) {
 	if (freeObjects) {
-		delete pixmapLine;
-		pixmapLine = 0;
-		delete pixmapIndentGuide;
-		pixmapIndentGuide = 0;
-		delete pixmapIndentGuideHighlight;
-		pixmapIndentGuideHighlight = 0;
+		pixmapLine.reset();
+		pixmapIndentGuide.reset();
+		pixmapIndentGuideHighlight.reset();
 	} else {
 		if (pixmapLine)
 			pixmapLine->Release();
@@ -286,11 +278,11 @@ void EditView::DropGraphics(bool freeObjects) {
 
 void EditView::AllocateGraphics(const ViewStyle &vsDraw) {
 	if (!pixmapLine)
-		pixmapLine = Surface::Allocate(vsDraw.technology);
+		pixmapLine.reset(Surface::Allocate(vsDraw.technology));
 	if (!pixmapIndentGuide)
-		pixmapIndentGuide = Surface::Allocate(vsDraw.technology);
+		pixmapIndentGuide.reset(Surface::Allocate(vsDraw.technology));
 	if (!pixmapIndentGuideHighlight)
-		pixmapIndentGuideHighlight = Surface::Allocate(vsDraw.technology);
+		pixmapIndentGuideHighlight.reset(Surface::Allocate(vsDraw.technology));
 }
 
 static const char *ControlCharacterString(unsigned char ch) {
@@ -433,8 +425,8 @@ void EditView::LayoutLine(const EditModel &model, Sci::Line line, Surface *surfa
 
 		// Fill base line layout
 		const int lineLength = posLineEnd - posLineStart;
-		model.pdoc->GetCharRange(ll->chars, posLineStart, lineLength);
-		model.pdoc->GetStyleRange(ll->styles, posLineStart, lineLength);
+		model.pdoc->GetCharRange(ll->chars.get(), posLineStart, lineLength);
+		model.pdoc->GetStyleRange(ll->styles.get(), posLineStart, lineLength);
 		const int numCharsBeforeEOL = model.pdoc->LineEnd(line) - posLineStart;
 		const int numCharsInLine = (vstyle.viewEOL) ? lineLength : numCharsBeforeEOL;
 		for (Sci::Position styleInLine = 0; styleInLine < numCharsInLine; styleInLine++) {
@@ -497,8 +489,8 @@ void EditView::LayoutLine(const EditModel &model, Sci::Line line, Surface *surfa
 						// Over half the segments are single characters and of these about half are space characters.
 						ll->positions[ts.start + 1] = vstyle.styles[ll->styles[ts.start]].spaceWidth;
 					} else {
-						posCache.MeasureWidths(surface, vstyle, ll->styles[ts.start], ll->chars + ts.start,
-							ts.length, ll->positions + ts.start + 1, model.pdoc);
+						posCache.MeasureWidths(surface, vstyle, ll->styles[ts.start], &ll->chars[ts.start],
+							ts.length, &ll->positions[ts.start + 1], model.pdoc);
 					}
 				}
 				lastSegItalics = (!ts.representation) && ((ll->chars[ts.end() - 1] != ' ') && vstyle.styles[ll->styles[ts.start]].italic);
@@ -931,7 +923,7 @@ void EditView::DrawEOL(Surface *surface, const EditModel &model, const ViewStyle
 			if (UTF8IsAscii(chEOL)) {
 				ctrlChar = ControlCharacterString(chEOL);
 			} else {
-				const Representation *repr = model.reprs.RepresentationFromCharacter(ll->chars + eolPos, ll->numCharsInLine - eolPos);
+				const Representation *repr = model.reprs.RepresentationFromCharacter(&ll->chars[eolPos], ll->numCharsInLine - eolPos);
 				if (repr) {
 					ctrlChar = repr->stringRep.c_str();
 					eolPos = ll->numCharsInLine;
@@ -1052,7 +1044,7 @@ static void DrawIndicators(Surface *surface, const EditModel &model, const ViewS
 	const Sci::Position lineStart = ll->LineStart(subLine);
 	const Sci::Position posLineEnd = posLineStart + lineEnd;
 
-	for (Decoration *deco = model.pdoc->decorations.Root(); deco; deco = deco->Next()) {
+	for (const Decoration *deco : model.pdoc->decorations.View()) {
 		if (under == vsDraw.indicators[deco->Indicator()].under) {
 			Sci::Position startPos = posLineStart + lineStart;
 			if (!deco->rs.ValueAt(startPos)) {
@@ -1314,7 +1306,7 @@ static void DrawBlockCaret(Surface *surface, const EditModel &model, const ViewS
 	int styleMain = ll->styles[offsetFirstChar];
 	FontAlias fontText = vsDraw.styles[styleMain].font;
 	surface->DrawTextClipped(rcCaret, fontText,
-		rcCaret.top + vsDraw.maxAscent, ll->chars + offsetFirstChar,
+		rcCaret.top + vsDraw.maxAscent, &ll->chars[offsetFirstChar],
 		numCharsToDraw, vsDraw.styles[styleMain].back,
 		caretColour);
 }
@@ -1669,7 +1661,7 @@ void EditView::DrawForeground(Surface *surface, const EditModel &model, const Vi
 			}
 			if (vsDraw.indicatorsSetFore) {
 				// At least one indicator sets the text colour so see if it applies to this segment
-				for (Decoration *deco = model.pdoc->decorations.Root(); deco; deco = deco->Next()) {
+				for (const Decoration *deco : model.pdoc->decorations.View()) {
 					const int indicatorValue = deco->rs.ValueAt(ts.start + posLineStart);
 					if (indicatorValue) {
 						const Indicator &indicator = vsDraw.indicators[deco->Indicator()];
@@ -1749,11 +1741,11 @@ void EditView::DrawForeground(Surface *surface, const EditModel &model, const Vi
 				if (vsDraw.styles[styleMain].visible) {
 					if (phasesDraw != phasesOne) {
 						surface->DrawTextTransparent(rcSegment, textFont,
-							rcSegment.top + vsDraw.maxAscent, ll->chars + ts.start,
+							rcSegment.top + vsDraw.maxAscent, &ll->chars[ts.start],
 							i - ts.start + 1, textFore);
 					} else {
 						surface->DrawTextNoClip(rcSegment, textFont,
-							rcSegment.top + vsDraw.maxAscent, ll->chars + ts.start,
+							rcSegment.top + vsDraw.maxAscent, &ll->chars[ts.start],
 							i - ts.start + 1, textFore, textBack);
 					}
 				}
@@ -1993,7 +1985,7 @@ void EditView::PaintText(Surface *surfaceWindow, const EditModel &model, const P
 
 		Surface *surface = surfaceWindow;
 		if (bufferedDraw) {
-			surface = pixmapLine;
+			surface = pixmapLine.get();
 			PLATFORM_ASSERT(pixmapLine->Initialised());
 		}
 		surface->SetUnicodeMode(SC_CP_UTF8 == model.pdoc->dbcsCodePage);

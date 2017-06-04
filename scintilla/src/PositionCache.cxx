@@ -22,6 +22,7 @@
 #include "Scintilla.h"
 
 #include "Position.h"
+#include "UniqueString.h"
 #include "SplitVector.h"
 #include "Partitioning.h"
 #include "RunStyles.h"
@@ -46,7 +47,6 @@ using namespace Scintilla;
 #endif
 
 LineLayout::LineLayout(int maxLineLength_) :
-	lineStarts(0),
 	lenLineStarts(0),
 	lineNumber(-1),
 	inCache(false),
@@ -58,9 +58,6 @@ LineLayout::LineLayout(int maxLineLength_) :
 	highlightColumn(false),
 	containsCaret(false),
 	edgeColumn(0),
-	chars(0),
-	styles(0),
-	positions(0),
 	hotspot(0,0),
 	widthLine(wrapWidthInfinite),
 	lines(1),
@@ -77,24 +74,20 @@ LineLayout::~LineLayout() {
 void LineLayout::Resize(int maxLineLength_) {
 	if (maxLineLength_ > maxLineLength) {
 		Free();
-		chars = new char[maxLineLength_ + 1];
-		styles = new unsigned char[maxLineLength_ + 1];
+		chars.reset(new char[maxLineLength_ + 1]);
+		styles.reset(new unsigned char[maxLineLength_ + 1]);
 		// Extra position allocated as sometimes the Windows
 		// GetTextExtentExPoint API writes an extra element.
-		positions = new XYPOSITION[maxLineLength_ + 1 + 1];
+		positions.reset(new XYPOSITION[maxLineLength_ + 1 + 1]);
 		maxLineLength = maxLineLength_;
 	}
 }
 
 void LineLayout::Free() {
-	delete []chars;
-	chars = 0;
-	delete []styles;
-	styles = 0;
-	delete []positions;
-	positions = 0;
-	delete []lineStarts;
-	lineStarts = 0;
+	chars.reset();
+	styles.reset();
+	positions.reset();
+	lineStarts.reset();
 }
 
 void LineLayout::Invalidate(validLevel validity_) {
@@ -141,8 +134,7 @@ void LineLayout::SetLineStart(int line, int start) {
 			else
 				newLineStarts[i] = 0;
 		}
-		delete []lineStarts;
-		lineStarts = newLineStarts;
+		lineStarts.reset(newLineStarts);
 		lenLineStarts = newMaxLines;
 	}
 	lineStarts[line] = start;
@@ -282,8 +274,7 @@ void LineLayoutCache::AllocateForLevel(Sci::Line linesOnScreen, Sci::Line linesI
 	} else {
 		if (lengthForLevel < cache.size()) {
 			for (size_t i = lengthForLevel; i < cache.size(); i++) {
-				delete cache[i];
-				cache[i] = 0;
+				cache[i].reset();
 			}
 		}
 		cache.resize(lengthForLevel);
@@ -293,14 +284,12 @@ void LineLayoutCache::AllocateForLevel(Sci::Line linesOnScreen, Sci::Line linesI
 
 void LineLayoutCache::Deallocate() {
 	PLATFORM_ASSERT(useCount == 0);
-	for (LineLayout *ll : cache)
-		delete ll;
 	cache.clear();
 }
 
 void LineLayoutCache::Invalidate(LineLayout::validLevel validity_) {
 	if (!cache.empty() && !allInvalidated) {
-		for (LineLayout *ll : cache) {
+		for (const std::unique_ptr<LineLayout> &ll : cache) {
 			if (ll) {
 				ll->Invalidate(validity_);
 			}
@@ -346,16 +335,15 @@ LineLayout *LineLayoutCache::Retrieve(Sci::Line lineNumber, Sci::Line lineCaret,
 			if (cache[pos]) {
 				if ((cache[pos]->lineNumber != lineNumber) ||
 				        (cache[pos]->maxLineLength < maxChars)) {
-					delete cache[pos];
-					cache[pos] = 0;
+					cache[pos].reset();
 				}
 			}
 			if (!cache[pos]) {
-				cache[pos] = new LineLayout(maxChars);
+				cache[pos].reset(new LineLayout(maxChars));
 			}
 			cache[pos]->lineNumber = lineNumber;
 			cache[pos]->inCache = true;
-			ret = cache[pos];
+			ret = cache[pos].get();
 			useCount++;
 		}
 	}
@@ -483,7 +471,7 @@ BreakFinder::BreakFinder(const LineLayout *ll_, const Selection *psel, const Ran
 		}
 	}
 	if (pvsDraw && pvsDraw->indicatorsSetFore) {
-		for (Decoration *deco = pdoc->decorations.Root(); deco; deco = deco->Next()) {
+		for (const Decoration *deco : pdoc->decorations.View()) {
 			if (pvsDraw->indicators[deco->Indicator()].OverridesTextFore()) {
 				Sci::Position startPos = deco->rs.EndRun(posLineStart);
 				while (startPos < (posLineStart + lineRange.end)) {
@@ -507,10 +495,10 @@ TextSegment BreakFinder::Next() {
 		while (nextBreak < lineRange.end) {
 			int charWidth = 1;
 			if (encodingFamily == efUnicode)
-				charWidth = UTF8DrawBytes(reinterpret_cast<unsigned char *>(ll->chars) + nextBreak, lineRange.end - nextBreak);
+				charWidth = UTF8DrawBytes(reinterpret_cast<unsigned char *>(&ll->chars[nextBreak]), lineRange.end - nextBreak);
 			else if (encodingFamily == efDBCS)
 				charWidth = pdoc->IsDBCSLeadByte(ll->chars[nextBreak]) ? 2 : 1;
-			const Representation *repr = preprs->RepresentationFromCharacter(ll->chars + nextBreak, charWidth);
+			const Representation *repr = preprs->RepresentationFromCharacter(&ll->chars[nextBreak], charWidth);
 			if (((nextBreak > 0) && (ll->styles[nextBreak] != ll->styles[nextBreak - 1])) ||
 					repr ||
 					(nextBreak == saeNext)) {
@@ -546,7 +534,7 @@ TextSegment BreakFinder::Next() {
 		subBreak = -1;
 		return TextSegment(startSegment, nextBreak - startSegment);
 	} else {
-		subBreak += pdoc->SafeSegment(ll->chars + subBreak, nextBreak-subBreak, lengthEachSubdivision);
+		subBreak += pdoc->SafeSegment(&ll->chars[subBreak], nextBreak-subBreak, lengthEachSubdivision);
 		if (subBreak >= nextBreak) {
 			subBreak = -1;
 			return TextSegment(startSegment, nextBreak - startSegment);
@@ -569,8 +557,8 @@ PositionCacheEntry::PositionCacheEntry(const PositionCacheEntry &other) :
 	styleNumber(other.styleNumber), len(other.styleNumber), clock(other.styleNumber), positions(nullptr) {
 	if (other.positions) {
 		const size_t lenData = len + (len / sizeof(XYPOSITION)) + 1;
-		positions = new XYPOSITION[lenData];
-		memcpy(positions, other.positions, lenData * sizeof(XYPOSITION));
+		positions.reset(new XYPOSITION[lenData]);
+		memcpy(positions.get(), other.positions.get(), lenData * sizeof(XYPOSITION));
 	}
 }
 
@@ -581,11 +569,11 @@ void PositionCacheEntry::Set(unsigned int styleNumber_, const char *s_,
 	len = len_;
 	clock = clock_;
 	if (s_ && positions_) {
-		positions = new XYPOSITION[len + (len / sizeof(XYPOSITION)) + 1];
+		positions.reset(new XYPOSITION[len + (len / sizeof(XYPOSITION)) + 1]);
 		for (unsigned int i=0; i<len; i++) {
 			positions[i] = positions_[i];
 		}
-		memcpy(positions + len, s_, len);
+		memcpy(&positions[len], s_, len);
 	}
 }
 
@@ -594,8 +582,7 @@ PositionCacheEntry::~PositionCacheEntry() {
 }
 
 void PositionCacheEntry::Clear() {
-	delete []positions;
-	positions = nullptr;
+	positions.reset();
 	styleNumber = 0;
 	len = 0;
 	clock = 0;
@@ -604,7 +591,7 @@ void PositionCacheEntry::Clear() {
 bool PositionCacheEntry::Retrieve(unsigned int styleNumber_, const char *s_,
 	unsigned int len_, XYPOSITION *positions_) const {
 	if ((styleNumber == styleNumber_) && (len == len_) &&
-		(memcmp(positions + len, s_, len)== 0)) {
+		(memcmp(&positions[len], s_, len)== 0)) {
 		for (unsigned int i=0; i<len; i++) {
 			positions_[i] = positions[i];
 		}

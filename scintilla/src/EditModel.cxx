@@ -8,6 +8,7 @@
 #include <cstddef>
 #include <cstdlib>
 #include <cassert>
+#include <cstring>
 #include <cmath>
 
 #include <stdexcept>
@@ -24,6 +25,7 @@
 
 #include "StringCopy.h"
 #include "Position.h"
+#include "UniqueString.h"
 #include "SplitVector.h"
 #include "Partitioning.h"
 #include "RunStyles.h"

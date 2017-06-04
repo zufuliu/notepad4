@@ -16,8 +16,8 @@ namespace Scintilla {
 
 class RunStyles {
 private:
-	Partitioning *starts;
-	SplitVector<int> *styles;
+	std::unique_ptr<Partitioning> starts;
+	std::unique_ptr<SplitVector<int>> styles;
 	int RunFromPosition(int position) const;
 	int SplitRun(int position);
 	void RemoveRun(int run);

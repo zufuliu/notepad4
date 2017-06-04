@@ -19,11 +19,11 @@ class SparseVector;
  */
 class ContractionState {
 	// These contain 1 element for every document line.
-	RunStyles *visible;
-	RunStyles *expanded;
-	RunStyles *heights;
-	SparseVector<const char *> *foldDisplayTexts;
-	Partitioning *displayLines;
+	std::unique_ptr<RunStyles> visible;
+	std::unique_ptr<RunStyles> expanded;
+	std::unique_ptr<RunStyles> heights;
+	std::unique_ptr<SparseVector<UniqueString>> foldDisplayTexts;
+	std::unique_ptr<Partitioning> displayLines;
 	Sci::Line linesInDocument;
 
 	void EnsureData();
@@ -31,7 +31,7 @@ class ContractionState {
 	bool OneToOne() const {
 		// True when each document line is exactly one display line so need for
 		// complex data structures.
-		return visible == 0;
+		return visible == nullptr;
 	}
 
 public:

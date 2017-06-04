@@ -29,7 +29,7 @@ public:
  */
 class FontNames {
 private:
-	std::vector<const char *> names;
+	std::vector<UniqueString> names;
 public:
 	FontNames();
 	// FontNames objects can not be copied.

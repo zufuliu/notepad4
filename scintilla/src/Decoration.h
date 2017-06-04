@@ -14,16 +14,12 @@ namespace Scintilla {
 class Decoration {
 	int indicator;
 public:
-	Decoration *next;
 	RunStyles rs;
 
 	explicit Decoration(int indicator_);
 	~Decoration();
 
 	bool Empty() const;
-	Decoration *Next() const {
-		return next;
-	}
 	int Indicator() const {
 		return indicator;
 	}
@@ -32,22 +28,24 @@ public:
 class DecorationList {
 	int currentIndicator;
 	int currentValue;
-	Decoration *current;
+	Decoration *current;	// Cached so FillRange doesn't have to search for each call.
 	int lengthDocument;
+	// Ordered by indicator
+	std::vector<std::unique_ptr<Decoration>> decorationList;
+	std::vector<const Decoration*> decorationView;	// Read-only view of decorationList
+	bool clickNotified;
+
 	Decoration *DecorationFromIndicator(int indicator);
 	Decoration *Create(int indicator, int length);
 	void Delete(int indicator);
 	void DeleteAnyEmpty();
-	Decoration *root;
-	bool clickNotified;
+	void SetView();
 public:
 
 	DecorationList();
 	~DecorationList();
 
-	Decoration *Root() const {
-		return root;
-	}
+	const std::vector<const Decoration*> &View() const { return decorationView; }
 
 	void SetCurrentIndicator(int indicator);
 	int GetCurrentIndicator() const { return currentIndicator; }
@@ -60,6 +58,8 @@ public:
 
 	void InsertSpace(int position, int insertLength);
 	void DeleteRange(int position, int deleteLength);
+
+	void DeleteLexerDecorations();
 
 	int AllOnFor(int position) const;
 	int ValueAt(int indicator, int position);

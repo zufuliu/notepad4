@@ -113,7 +113,6 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
-    <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(SolutionDir)\..\bin\$(Configuration)\$(Platform)\</OutDir>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='LLVMDebug|x64'">$(SolutionDir)\..\bin\$(Configuration)\$(Platform)\</OutDir>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(SolutionDir)\..\bin\$(Configuration)\$(Platform)\</OutDir>
@@ -664,7 +663,7 @@
     <ClInclude Include="..\scintilla\include\Platform.h" />
     <ClInclude Include="..\scintilla\include\SciLexer.h" />
     <ClInclude Include="..\scintilla\include\Scintilla.h" />
-    <ClInclude Include="..\scintilla\include\ScintillaWidget.h" />
+    <ClInclude Include="..\scintilla\include\Sci_Position.h" />
     <ClInclude Include="..\scintilla\lexlib\Accessor.h" />
     <ClInclude Include="..\scintilla\lexlib\CharacterCategory.h" />
     <ClInclude Include="..\scintilla\lexlib\CharacterSet.h" />
@@ -698,17 +697,21 @@
     <ClInclude Include="..\scintilla\src\MarginView.h" />
     <ClInclude Include="..\scintilla\src\Partitioning.h" />
     <ClInclude Include="..\scintilla\src\PerLine.h" />
+    <ClInclude Include="..\scintilla\src\Position.h" />
     <ClInclude Include="..\scintilla\src\PositionCache.h" />
     <ClInclude Include="..\scintilla\src\RESearch.h" />
     <ClInclude Include="..\scintilla\src\RunStyles.h" />
     <ClInclude Include="..\scintilla\src\ScintillaBase.h" />
     <ClInclude Include="..\scintilla\src\Selection.h" />
+    <ClInclude Include="..\scintilla\src\SparseVector.h" />
     <ClInclude Include="..\scintilla\src\SplitVector.h" />
     <ClInclude Include="..\scintilla\src\Style.h" />
     <ClInclude Include="..\scintilla\src\UnicodeFromUTF8.h" />
     <ClInclude Include="..\scintilla\src\UniConversion.h" />
+    <ClInclude Include="..\scintilla\src\UniqueString.h" />
     <ClInclude Include="..\scintilla\src\ViewStyle.h" />
     <ClInclude Include="..\scintilla\src\XPM.h" />
+    <ClInclude Include="..\scintilla\win32\HanjaDic.h" />
     <ClInclude Include="..\scintilla\win32\PlatWin.h" />
     <ClInclude Include="Dialogs.h" />
     <ClInclude Include="Dlapi.h" />

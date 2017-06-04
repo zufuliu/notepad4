@@ -47,7 +47,7 @@ enum PointEnd {
 class LineLayout {
 private:
 	friend class LineLayoutCache;
-	int *lineStarts;
+	std::unique_ptr<int []>lineStarts;
 	int lenLineStarts;
 	/// Drawing is only performed for @a maxLineLength characters on each line.
 	Sci::Line lineNumber;
@@ -63,9 +63,9 @@ public:
 	bool highlightColumn;
 	bool containsCaret;
 	int edgeColumn;
-	char *chars;
-	unsigned char *styles;
-	XYPOSITION *positions;
+	std::unique_ptr<char[]> chars;
+	std::unique_ptr<unsigned char[]> styles;
+	std::unique_ptr<XYPOSITION[]> positions;
 	char bracePreviousStyles[2];
 
 	// Hotspot support
@@ -102,7 +102,7 @@ public:
  */
 class LineLayoutCache {
 	int level;
-	std::vector<LineLayout *>cache;
+	std::vector<std::unique_ptr<LineLayout>>cache;
 	bool allInvalidated;
 	int styleClock;
 	int useCount;
@@ -133,7 +133,7 @@ class PositionCacheEntry {
 	unsigned int styleNumber:8;
 	unsigned int len:8;
 	unsigned int clock:16;
-	XYPOSITION *positions;
+	std::unique_ptr<XYPOSITION []> positions;
 public:
 	PositionCacheEntry();
 	// Copy constructor not currently used, but needed for being element in std::vector.

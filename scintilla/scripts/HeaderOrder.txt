@@ -37,6 +37,7 @@
 #include <deque>
 #include <map>
 #include <set>
+#include <forward_list>
 #include <algorithm>
 #include <functional>
 #include <memory>
@@ -105,6 +106,7 @@
 #include "Catalogue.h"
 
 #include "Position.h"
+#include "UniqueString.h"
 #include "SplitVector.h"
 #include "Partitioning.h"
 #include "RunStyles.h"

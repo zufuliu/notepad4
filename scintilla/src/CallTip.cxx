@@ -12,6 +12,7 @@
 #include <stdexcept>
 #include <string>
 #include <algorithm>
+#include <memory>
 
 #include "Platform.h"
 
@@ -258,9 +259,7 @@ PRectangle CallTip::CallTipStart(Sci::Position pos, const Point &pt, int textHei
 	clickPlace = 0;
 	val = defn;
 	codePage = codePage_;
-	Surface *surfaceMeasure = Surface::Allocate(technology);
-	if (!surfaceMeasure)
-		return PRectangle();
+	std::unique_ptr<Surface> surfaceMeasure(Surface::Allocate(technology));
 	surfaceMeasure->Init(wParent.GetID());
 	surfaceMeasure->SetUnicodeMode(SC_CP_UTF8 == codePage);
 	surfaceMeasure->SetDBCSMode(codePage);
@@ -279,7 +278,7 @@ PRectangle CallTip::CallTipStart(Sci::Position pos, const Point &pt, int textHei
 	rectUp = PRectangle(0,0,0,0);
 	rectDown = PRectangle(0,0,0,0);
 	offsetMain = insetX;            // changed to right edge of any arrows
-	int width = PaintContents(surfaceMeasure, false) + insetX;
+	const int width = PaintContents(surfaceMeasure.get(), false) + insetX;
 	while ((newline = strchr(look, '\n')) != NULL) {
 		look = newline + 1;
 		numLines++;
@@ -290,7 +289,6 @@ PRectangle CallTip::CallTipStart(Sci::Position pos, const Point &pt, int textHei
 	// rectangle is aligned to the right edge of the last arrow encountered in
 	// the tip text, else to the tip text left edge.
 	int height = lineHeight * numLines - static_cast<int>(surfaceMeasure->InternalLeading(font)) + borderHeight * 2;
-	delete surfaceMeasure;
 	if (above) {
 		return PRectangle(pt.x - offsetMain, pt.y - verticalOffset - height, pt.x + width - offsetMain, pt.y - verticalOffset);
 	} else {

@@ -60,7 +60,7 @@ private:
 	// there may be a step somewhere in the list.
 	int stepPartition;
 	int stepLength;
-	SplitVectorWithRangeAdd *body;
+	std::unique_ptr<SplitVectorWithRangeAdd> body;
 
 	// Move step forward
 	void ApplyStep(int partitionUpTo) {
@@ -83,7 +83,7 @@ private:
 	}
 
 	void Allocate(int growSize) {
-		body = new SplitVectorWithRangeAdd(growSize);
+		body.reset(new SplitVectorWithRangeAdd(growSize));
 		stepPartition = 0;
 		stepLength = 0;
 		body->Insert(0, 0);	// This value stays 0 for ever
@@ -100,8 +100,6 @@ public:
 	void operator=(const Partitioning &) = delete;
 
 	~Partitioning() {
-		delete body;
-		body = 0;
 	}
 
 	int Partitions() const {
@@ -191,9 +189,7 @@ public:
 	}
 
 	void DeleteAll() {
-		int growSize = body->GetGrowSize();
-		delete body;
-		Allocate(growSize);
+		Allocate(body->GetGrowSize());
 	}
 };
 

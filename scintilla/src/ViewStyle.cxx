@@ -19,9 +19,7 @@
 
 #include "Scintilla.h"
 #include "Position.h"
-#include "SplitVector.h"
-#include "Partitioning.h"
-#include "RunStyles.h"
+#include "UniqueString.h"
 #include "Indicator.h"
 #include "XPM.h"
 #include "LineMarker.h"
@@ -45,26 +43,21 @@ FontNames::~FontNames() {
 }
 
 void FontNames::Clear() {
-	for (const char *name : names) {
-		delete []name;
-	}
 	names.clear();
 }
 
 const char *FontNames::Save(const char *name) {
 	if (!name)
-		return 0;
+		return nullptr;
 
-	for (const char *nm : names) {
-		if (strcmp(nm, name) == 0) {
-			return nm;
+	for (const UniqueString &nm : names) {
+		if (strcmp(nm.get(), name) == 0) {
+			return nm.get();
 		}
 	}
-	const size_t lenName = strlen(name) + 1;
-	char *nameSave(new char[lenName]);
-	memcpy(nameSave, name, lenName);
-	names.push_back(nameSave);
-	return nameSave;
+
+	names.push_back(UniqueStringCopy(name));
+	return names.back().get();
 }
 
 FontRealised::FontRealised() {

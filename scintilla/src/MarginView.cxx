@@ -27,6 +27,7 @@
 
 #include "StringCopy.h"
 #include "Position.h"
+#include "UniqueString.h"
 #include "SplitVector.h"
 #include "Partitioning.h"
 #include "RunStyles.h"
@@ -102,21 +103,15 @@ void DrawWrapMarker(Surface *surface, const PRectangle& rcPlace,
 }
 
 MarginView::MarginView() {
-	pixmapSelMargin = 0;
-	pixmapSelPattern = 0;
-	pixmapSelPatternOffset1 = 0;
 	wrapMarkerPaddingRight = 3;
 	customDrawWrapMarker = NULL;
 }
 
 void MarginView::DropGraphics(bool freeObjects) {
 	if (freeObjects) {
-		delete pixmapSelMargin;
-		pixmapSelMargin = 0;
-		delete pixmapSelPattern;
-		pixmapSelPattern = 0;
-		delete pixmapSelPatternOffset1;
-		pixmapSelPatternOffset1 = 0;
+		pixmapSelMargin.reset();
+		pixmapSelPattern.reset();
+		pixmapSelPatternOffset1.reset();
 	} else {
 		if (pixmapSelMargin)
 			pixmapSelMargin->Release();
@@ -129,11 +124,11 @@ void MarginView::DropGraphics(bool freeObjects) {
 
 void MarginView::AllocateGraphics(const ViewStyle &vsDraw) {
 	if (!pixmapSelMargin)
-		pixmapSelMargin = Surface::Allocate(vsDraw.technology);
+		pixmapSelMargin.reset(Surface::Allocate(vsDraw.technology));
 	if (!pixmapSelPattern)
-		pixmapSelPattern = Surface::Allocate(vsDraw.technology);
+		pixmapSelPattern.reset(Surface::Allocate(vsDraw.technology));
 	if (!pixmapSelPatternOffset1)
-		pixmapSelPatternOffset1 = Surface::Allocate(vsDraw.technology);
+		pixmapSelPatternOffset1.reset(Surface::Allocate(vsDraw.technology));
 }
 
 void MarginView::RefreshPixMaps(Surface *surfaceWindow, WindowID wid, const ViewStyle &vsDraw) {

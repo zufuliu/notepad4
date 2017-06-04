@@ -19,14 +19,14 @@ namespace Scintilla {
 struct MarkerHandleNumber {
 	int handle;
 	int number;
-	MarkerHandleNumber *next;
+	MarkerHandleNumber(int handle_, int number_) : handle(handle_), number(number_) {}
 };
 
 /**
  * A marker handle set contains any number of MarkerHandleNumbers.
  */
 class MarkerHandleSet {
-	MarkerHandleNumber *root;
+	std::forward_list<MarkerHandleNumber> mhList;
 
 public:
 	MarkerHandleSet();
@@ -34,7 +34,7 @@ public:
 	MarkerHandleSet(const MarkerHandleSet &) = delete;
 	void operator=(const MarkerHandleSet &) = delete;
 	~MarkerHandleSet();
-	int Length() const;
+	bool Empty() const;
 	int MarkValue() const;	///< Bit set of marker numbers.
 	bool Contains(int handle) const;
 	bool InsertHandle(int handle, int markerNum);
@@ -44,7 +44,7 @@ public:
 };
 
 class LineMarkers : public PerLine {
-	SplitVector<MarkerHandleSet *> markers;
+	SplitVector<std::unique_ptr<MarkerHandleSet>> markers;
 	/// Handles are allocated sequentially and should never have to be reused as 32 bit ints are very big.
 	int handleCurrent;
 public:
@@ -105,7 +105,7 @@ public:
 };
 
 class LineAnnotation : public PerLine {
-	SplitVector<char *> annotations;
+	SplitVector<std::unique_ptr<char []>> annotations;
 public:
 	// Deleted so Worker objects can not be copied.
 	LineAnnotation(const LineAnnotation &) = delete;
@@ -132,7 +132,7 @@ public:
 typedef std::vector<int> TabstopList;
 
 class LineTabstops : public PerLine {
-	SplitVector<TabstopList *> tabstops;
+	SplitVector<std::unique_ptr<TabstopList>> tabstops;
 public:
 	LineTabstops() {
 	}

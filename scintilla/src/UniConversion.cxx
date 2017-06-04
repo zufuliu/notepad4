@@ -20,9 +20,9 @@ using namespace Scintilla;
 namespace Scintilla {
 #endif
 
-unsigned int UTF8Length(const wchar_t *uptr, unsigned int tlen) {
-	unsigned int len = 0;
-	for (unsigned int i = 0; i < tlen && uptr[i];) {
+size_t UTF8Length(const wchar_t *uptr, size_t tlen) {
+	size_t len = 0;
+	for (size_t i = 0; i < tlen && uptr[i];) {
 		const unsigned int uch = uptr[i];
 		if (uch < 0x80) {
 			len++;
@@ -40,9 +40,9 @@ unsigned int UTF8Length(const wchar_t *uptr, unsigned int tlen) {
 	return len;
 }
 
-void UTF8FromUTF16(const wchar_t *uptr, unsigned int tlen, char *putf, unsigned int len) {
-	unsigned int k = 0;
-	for (unsigned int i = 0; i < tlen && uptr[i];) {
+void UTF8FromUTF16(const wchar_t *uptr, size_t tlen, char *putf, size_t len) {
+	size_t k = 0;
+	for (size_t i = 0; i < tlen && uptr[i];) {
 		const unsigned int uch = uptr[i];
 		if (uch < 0x80) {
 			putf[k++] = static_cast<char>(uch);
@@ -138,10 +138,10 @@ size_t UTF16FromUTF8(const char *s, size_t len, wchar_t *tbuf, size_t tlen) {
 	return ui;
 }
 
-unsigned int UTF32FromUTF8(const char *s, unsigned int len, unsigned int *tbuf, unsigned int tlen) {
-	unsigned int ui=0;
+size_t UTF32FromUTF8(const char *s, size_t len, unsigned int *tbuf, size_t tlen) {
+	size_t ui=0;
 	const unsigned char *us = reinterpret_cast<const unsigned char *>(s);
-	unsigned int i=0;
+	size_t i=0;
 	while ((i<len) && (ui<tlen)) {
 		unsigned char ch = us[i++];
 		unsigned int value = 0;

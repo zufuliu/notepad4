@@ -473,9 +473,6 @@
     <ClInclude Include="..\scintilla\include\Scintilla.h">
       <Filter>Scintilla\include</Filter>
     </ClInclude>
-    <ClInclude Include="..\scintilla\include\ScintillaWidget.h">
-      <Filter>Scintilla\include</Filter>
-    </ClInclude>
     <ClInclude Include="..\scintilla\lexlib\Accessor.h">
       <Filter>Scintilla\lexlib</Filter>
     </ClInclude>
@@ -596,9 +593,6 @@
     <ClInclude Include="..\scintilla\src\XPM.h">
       <Filter>Scintilla\src</Filter>
     </ClInclude>
-    <ClInclude Include="..\scintilla\win32\PlatWin.h">
-      <Filter>Scintilla\include</Filter>
-    </ClInclude>
     <ClInclude Include="Dialogs.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -645,6 +639,24 @@
       <Filter>Scintilla\src</Filter>
     </ClInclude>
     <ClInclude Include="..\scintilla\src\EditView.h">
+      <Filter>Scintilla\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\scintilla\win32\PlatWin.h">
+      <Filter>Scintilla\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\scintilla\include\Sci_Position.h">
+      <Filter>Scintilla\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\scintilla\win32\HanjaDic.h">
+      <Filter>Scintilla\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\scintilla\src\Position.h">
+      <Filter>Scintilla\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\scintilla\src\SparseVector.h">
+      <Filter>Scintilla\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\scintilla\src\UniqueString.h">
       <Filter>Scintilla\src</Filter>
     </ClInclude>
   </ItemGroup>

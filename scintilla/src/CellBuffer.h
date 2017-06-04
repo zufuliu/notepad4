@@ -61,26 +61,28 @@ class Action {
 public:
 	actionType at;
 	Sci::Position position;
-	char *data;
+	std::unique_ptr<char[]> data;
 	Sci::Position lenData;
 	bool mayCoalesce;
 
 	Action();
 	// Deleted so Action objects can not be copied.
-	Action(const Action &) = delete;
-	void operator=(const Action &) = delete;
+	Action(const Action &other) = delete;
+	Action &operator=(const Action &other) = delete;
+	Action &operator=(const Action &&other) = delete;
+	// Move constructor allows vector to be resized without reallocating.
+	// Could use =default but MSVC 2013 warns.
+	Action(Action &&other);
 	~Action();
 	void Create(actionType at_, Sci::Position position_=0, const char *data_=0, Sci::Position lenData_=0, bool mayCoalesce_=true);
-	void Destroy();
-	void Grab(Action *source);
+	void Clear();
 };
 
 /**
  *
  */
 class UndoHistory {
-	Action *actions;
-	int lenActions;
+	std::vector<Action> actions;
 	int maxAction;
 	int currentAction;
 	int undoSequenceDepth;

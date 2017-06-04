@@ -12,6 +12,7 @@
 #include <cstdarg>
 
 #include <stdexcept>
+#include <vector>
 #include <algorithm>
 #include <memory>
 
@@ -78,48 +79,36 @@ Sci::Line LineVector::LineFromPosition(Sci::Position pos) const {
 Action::Action() {
 	at = startAction;
 	position = 0;
-	data = 0;
 	lenData = 0;
 	mayCoalesce = false;
 }
 
+Action::Action(Action &&other) {
+	at = other.at;
+	position = other.position;
+	data = std::move(other.data);
+	lenData = other.lenData;
+	mayCoalesce = other.mayCoalesce;
+}
+
 Action::~Action() {
-	Destroy();
 }
 
 void Action::Create(actionType at_, Sci::Position position_, const char *data_, Sci::Position lenData_, bool mayCoalesce_) {
-	delete []data;
-	data = NULL;
+	data = nullptr;
 	position = position_;
 	at = at_;
 	if (lenData_) {
-		data = new char[lenData_];
-		memcpy(data, data_, lenData_);
+		data = std::unique_ptr<char []>(new char[lenData_]);
+		memcpy(&data[0], data_, lenData_);
 	}
 	lenData = lenData_;
 	mayCoalesce = mayCoalesce_;
 }
 
-void Action::Destroy() {
-	delete []data;
-	data = 0;
-}
-
-void Action::Grab(Action *source) {
-	delete []data;
-
-	position = source->position;
-	at = source->at;
-	data = source->data;
-	lenData = source->lenData;
-	mayCoalesce = source->mayCoalesce;
-
-	// Ownership of source data transferred to this
-	source->position = 0;
-	source->at = startAction;
-	source->data = 0;
-	source->lenData = 0;
-	source->mayCoalesce = true;
+void Action::Clear() {
+	data = nullptr;
+	lenData = 0;
 }
 
 // The undo history stores a sequence of user operations that represent the user's view of the
@@ -142,8 +131,7 @@ void Action::Grab(Action *source) {
 
 UndoHistory::UndoHistory() {
 
-	lenActions = 100;
-	actions = new Action[lenActions];
+	actions.resize(3);
 	maxAction = 0;
 	currentAction = 0;
 	undoSequenceDepth = 0;
@@ -154,22 +142,14 @@ UndoHistory::UndoHistory() {
 }
 
 UndoHistory::~UndoHistory() {
-	delete []actions;
-	actions = 0;
 }
 
 void UndoHistory::EnsureUndoRoom() {
 	// Have to test that there is room for 2 more actions in the array
 	// as two actions may be created by the calling function
-	if (currentAction >= (lenActions - 2)) {
+	if (static_cast<size_t>(currentAction) >= (actions.size() - 2)) {
 		// Run out of undo nodes so extend the array
-		const int lenActionsNew = lenActions * 2;
-		Action *actionsNew = new Action[lenActionsNew];
-		for (int act = 0; act <= currentAction; act++)
-			actionsNew[act].Grab(&actions[act]);
-		delete []actions;
-		lenActions = lenActionsNew;
-		actions = actionsNew;
+		actions.resize(actions.size() * 2);
 	}
 }
 
@@ -195,10 +175,6 @@ const char *UndoHistory::AppendAction(actionType at, Sci::Position position, con
 			}
 			// See if current action can be coalesced into previous action
 			// Will work if both are inserts or deletes and position is same
-#if defined(_MSC_VER) && defined(_PREFAST_)
-			// Visual Studio 2013 Code Analysis wrongly believes actions can be NULL at its next reference
-			__analysis_assume(actions);
-#endif
 			if ((currentAction == savePoint) || (currentAction == tentativePoint)) {
 				currentAction++;
 			} else if (!actions[currentAction].mayCoalesce) {
@@ -246,7 +222,7 @@ const char *UndoHistory::AppendAction(actionType at, Sci::Position position, con
 	currentAction++;
 	actions[currentAction].Create(startAction);
 	maxAction = currentAction;
-	return actions[actionWithData].data;
+	return actions[actionWithData].data.get();
 }
 
 void UndoHistory::BeginUndoAction() {
@@ -282,7 +258,7 @@ void UndoHistory::DropUndoSequence() {
 
 void UndoHistory::DeleteUndoHistory() {
 	for (int i = 1; i < maxAction; i++)
-		actions[i].Destroy();
+		actions[i].Clear();
 	maxAction = 0;
 	currentAction = 0;
 	actions[currentAction].Create(startAction);
@@ -815,7 +791,7 @@ void CellBuffer::PerformUndoStep() {
 		}
 		BasicDeleteChars(actionStep.position, actionStep.lenData);
 	} else if (actionStep.at == removeAction) {
-		BasicInsertString(actionStep.position, actionStep.data, actionStep.lenData);
+		BasicInsertString(actionStep.position, actionStep.data.get(), actionStep.lenData);
 	}
 	uh.CompletedUndoStep();
 }
@@ -835,7 +811,7 @@ const Action &CellBuffer::GetRedoStep() const {
 void CellBuffer::PerformRedoStep() {
 	const Action &actionStep = uh.GetRedoStep();
 	if (actionStep.at == insertAction) {
-		BasicInsertString(actionStep.position, actionStep.data, actionStep.lenData);
+		BasicInsertString(actionStep.position, actionStep.data.get(), actionStep.lenData);
 	} else if (actionStep.at == removeAction) {
 		BasicDeleteChars(actionStep.position, actionStep.lenData);
 	}

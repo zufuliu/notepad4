@@ -17,6 +17,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <forward_list>
 #include <algorithm>
 #include <memory>
 
@@ -27,6 +28,7 @@
 
 #include "StringCopy.h"
 #include "Position.h"
+#include "UniqueString.h"
 #include "SplitVector.h"
 #include "Partitioning.h"
 #include "RunStyles.h"
@@ -1656,7 +1658,7 @@ void Editor::PaintSelMargin(Surface *surfaceWindow, const PRectangle &rc) {
 
 	Surface *surface;
 	if (view.bufferedDraw) {
-		surface = marginView.pixmapSelMargin;
+		surface = marginView.pixmapSelMargin.get();
 	} else {
 		surface = surfaceWindow;
 	}
@@ -2100,16 +2102,7 @@ void Editor::ClearAll() {
 }
 
 void Editor::ClearDocumentStyle() {
-	Decoration *deco = pdoc->decorations.Root();
-	while (deco) {
-		// Save next in case deco deleted
-		Decoration *decoNext = deco->Next();
-		if (deco->Indicator() < INDIC_CONTAINER) {
-			pdoc->DecorationSetCurrentIndicator(deco->Indicator());
-			pdoc->DecorationFillRange(0, 0, pdoc->Length());
-		}
-		deco = decoNext;
-	}
+	pdoc->decorations.DeleteLexerDecorations();
 	pdoc->StartStyling(0, static_cast<unsigned char>('\377'));
 	pdoc->SetStyleFor(pdoc->Length(), 0);
 	cs.ShowAll();
@@ -2641,7 +2634,9 @@ void Editor::NotifyModified(Document *, const DocModification &mh, void *) {
 		if (mh.modificationType & SC_MOD_CHANGEANNOTATION) {
 			Sci::Line lineDoc = pdoc->LineFromPosition(mh.position);
 			if (vs.annotationVisible) {
-				cs.SetHeight(lineDoc, cs.GetHeight(lineDoc) + mh.annotationLinesAdded);
+				if (cs.SetHeight(lineDoc, cs.GetHeight(lineDoc) + mh.annotationLinesAdded)) {
+					SetScrollBars();
+				}
 				Redraw();
 			}
 		}
@@ -3748,7 +3743,7 @@ int Editor::KeyCommand(unsigned int iMessage) {
 	case SCI_CANCEL:            	// Cancel any modes - handled in subclass
 		// Also unselect text
 		CancelModes();
-		if (sel.Count() > 1) {
+		if ((sel.Count() > 1) && !sel.IsRectangular()) {
 			// Drop additional selections
 			InvalidateWholeSelection();
 			sel.DropAdditionalRanges();
@@ -4655,7 +4650,7 @@ void Editor::SetHoverIndicatorPosition(Sci::Position position) {
 	if (!vs.indicatorsDynamic)
 		return;
 	if (position != INVALID_POSITION) {
-		for (Decoration *deco = pdoc->decorations.Root(); deco; deco = deco->Next()) {
+		for (const Decoration *deco : pdoc->decorations.View()) {
 			if (vs.indicators[deco->Indicator()].IsDynamic()) {
 				if (pdoc->decorations.ValueAt(deco->Indicator(), position)) {
 					hoverIndicatorPos = position;
@@ -5289,6 +5284,7 @@ void Editor::SetAnnotationVisible(int visible) {
 					cs.SetHeight(line, cs.GetHeight(line) + annotationLines * dir);
 				}
 			}
+			SetScrollBars();
 		}
 		Redraw();
 	}

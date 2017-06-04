@@ -602,39 +602,34 @@ public:
  */
 class AutoSurface {
 private:
-	Surface *surf;
+	std::unique_ptr<Surface> surf;
 public:
-	AutoSurface(Editor *ed, int technology = -1) : surf(0) {
+	AutoSurface(Editor *ed, int technology = -1) {
 		if (ed->wMain.GetID()) {
-			surf = Surface::Allocate(technology != -1 ? technology : ed->technology);
-			if (surf) {
-				surf->Init(ed->wMain.GetID());
-				surf->SetUnicodeMode(SC_CP_UTF8 == ed->CodePage());
-				surf->SetDBCSMode(ed->CodePage());
-			}
+			surf.reset(Surface::Allocate(technology != -1 ? technology : ed->technology));
+			surf->Init(ed->wMain.GetID());
+			surf->SetUnicodeMode(SC_CP_UTF8 == ed->CodePage());
+			surf->SetDBCSMode(ed->CodePage());
 		}
 	}
-	AutoSurface(SurfaceID sid, Editor *ed, int technology = -1) : surf(0) {
+	AutoSurface(SurfaceID sid, Editor *ed, int technology = -1) {
 		if (ed->wMain.GetID()) {
-			surf = Surface::Allocate(technology != -1 ? technology : ed->technology);
-			if (surf) {
-				surf->Init(sid, ed->wMain.GetID());
-				surf->SetUnicodeMode(SC_CP_UTF8 == ed->CodePage());
-				surf->SetDBCSMode(ed->CodePage());
-			}
+			surf.reset(Surface::Allocate(technology != -1 ? technology : ed->technology));
+			surf->Init(sid, ed->wMain.GetID());
+			surf->SetUnicodeMode(SC_CP_UTF8 == ed->CodePage());
+			surf->SetDBCSMode(ed->CodePage());
 		}
 	}
 	// Deleted so AutoSurface objects can not be copied.
 	AutoSurface(const AutoSurface &) = delete;
 	void operator=(const AutoSurface &) = delete;
 	~AutoSurface() {
-		delete surf;
 	}
 	Surface *operator->() const {
-		return surf;
+		return surf.get();
 	}
 	operator Surface *() const {
-		return surf;
+		return surf.get();
 	}
 };
 
