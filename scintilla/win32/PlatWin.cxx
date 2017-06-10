@@ -21,13 +21,16 @@
 #include <algorithm>
 #include <memory>
 
+// Want to use std::min and std::max so don't want Windows.h version of min and max
+#if !defined(NOMINMAX)
+#define NOMINMAX
+#endif
 #ifndef _WIN32_WINNT
 #define _WIN32_WINNT 0x0501
 #endif
 #ifndef WINVER
 #define WINVER 0x0501
 #endif
-#define NOMINMAX // disable min() and max() macro
 #include <windows.h>
 #include <commctrl.h>
 #include <richedit.h>

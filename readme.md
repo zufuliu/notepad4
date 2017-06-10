@@ -175,4 +175,4 @@ TBD.
 ## Changed keyboard shortcuts compared to Notepad2 or Notepad2-mod:
 TBD.
 
-You can use MSVC 2015 or WDK to build Notepad2.
+You can use MSVC 2015 or later to build Notepad2.

@@ -1,10 +1,10 @@
 Notepad2-Mod
 git clone https://github.com/XhmikosR/notepad2-mod.git
-2017-04-20 2d2416db52cead8442fd68c00cbde374672431aa
+2017-06-06 bd913241c56bd0077ee825232689e38b9e544aa9
 
 Scintilla
 hg clone http://hg.code.sf.net/p/scintilla/code scintilla
-6288:cff4f0002eef
+6305:f2f32d58bcd8
 
 SciTE
 hg clone http://hg.code.sf.net/p/scintilla/scite
