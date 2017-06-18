@@ -564,7 +564,7 @@ void Document::GetHighlightDelimiters(HighlightDelimiter &highlightDelimiter, Sc
 }
 
 Sci::Position Document::ClampPositionIntoDocument(Sci::Position pos) const {
-	return Platform::Clamp(pos, 0, Length());
+	return Sci::clamp(pos, 0, Length());
 }
 
 bool Document::IsCrLf(Sci::Position pos) const {

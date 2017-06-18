@@ -202,9 +202,15 @@ int ScintillaBase::KeyCommand(unsigned int iMessage) {
 	return Editor::KeyCommand(iMessage);
 }
 
-void ScintillaBase::AutoCompleteDoubleClick(void *p) {
-	ScintillaBase *sci = static_cast<ScintillaBase *>(p);
-	sci->AutoCompleteCompleted(0, SC_AC_DOUBLECLICK);
+void ScintillaBase::ListNotify(ListBoxEvent *plbe) {
+	switch (plbe->event) {
+	case ListBoxEvent::EventType::selectionChange:
+		AutoCompleteSelection();
+		break;
+	case ListBoxEvent::EventType::doubleClick:
+		AutoCompleteCompleted(0, SC_AC_DOUBLECLICK);
+		break;
+	}
 }
 
 void ScintillaBase::AutoCompleteInsert(Sci::Position startPos, int removeLen, const char *text, int textLen) {
@@ -293,7 +299,7 @@ void ScintillaBase::AutoCompleteStart(int lenEntered, const char *list) {
 	ac.lb->SetFont(vs.styles[STYLE_DEFAULT].font);
 	unsigned int aveCharWidth = static_cast<unsigned int>(vs.styles[STYLE_DEFAULT].aveCharWidth);
 	ac.lb->SetAverageCharWidth(aveCharWidth);
-	ac.lb->SetDoubleClickAction(AutoCompleteDoubleClick, this);
+	ac.lb->SetDelegate(this);
 
 	ac.SetList(list ? list : "");
 
@@ -338,6 +344,25 @@ void ScintillaBase::AutoCompleteMove(int delta) {
 void ScintillaBase::AutoCompleteMoveToCurrentWord() {
 	std::string wordCurrent = RangeText(ac.posStart - ac.startLen, sel.MainCaret());
 	ac.Select(wordCurrent.c_str());
+}
+
+void ScintillaBase::AutoCompleteSelection() {
+	int item = ac.GetSelection();
+	std::string selected;
+	if (item != -1) {
+		selected = ac.GetValue(item);
+	}
+
+	SCNotification scn = {};
+	scn.nmhdr.code = SCN_AUTOCSELECTIONCHANGE;
+	scn.message = 0;
+	scn.wParam = listType;
+	scn.listType = listType;
+	Sci::Position firstPos = ac.posStart - ac.startLen;
+	scn.position = firstPos;
+	scn.lParam = firstPos;
+	scn.text = selected.c_str();
+	NotifyParent(scn);
 }
 
 void ScintillaBase::AutoCompleteCharacterAdded(char ch) {
@@ -510,10 +535,6 @@ void ScintillaBase::CancelModes() {
 void ScintillaBase::ButtonDownWithModifiers(const Point &pt, unsigned int curTime, int modifiers) {
 	CancelModes();
 	Editor::ButtonDownWithModifiers(pt, curTime, modifiers);
-}
-
-void ScintillaBase::ButtonDown(const Point &pt, unsigned int curTime, bool shift, bool ctrl, bool alt) {
-	ButtonDownWithModifiers(pt, curTime, ModifierFlags(shift, ctrl, alt));
 }
 
 void ScintillaBase::RightButtonDownWithModifiers(const Point &pt, unsigned int curTime, int modifiers) {

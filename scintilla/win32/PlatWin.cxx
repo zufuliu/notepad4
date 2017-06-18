@@ -49,6 +49,7 @@
 #include "StringCopy.h"
 #include "XPM.h"
 #include "UniConversion.h"
+#include "DBCS.h"
 #include "FontQuality.h"
 
 #ifndef SPI_GETFONTSMOOTHINGCONTRAST
@@ -77,10 +78,6 @@ static HCURSOR reverseArrowCursor = NULL;
 #ifdef SCI_NAMESPACE
 namespace Scintilla {
 #endif
-
-Point Point::FromLong(long lpoint) {
-	return Point(static_cast<short>(LOWORD(lpoint)), static_cast<short>(HIWORD(lpoint)));
-}
 
 static RECT RectFromPRectangle(const PRectangle& prc) {
 	RECT rc = {static_cast<LONG>(prc.left), static_cast<LONG>(prc.top),
@@ -561,7 +558,6 @@ public:
 	XYPOSITION Ascent(const Font &font_) override;
 	XYPOSITION Descent(const Font &font_) override;
 	XYPOSITION InternalLeading(const Font &font_) override;
-	XYPOSITION ExternalLeading(const Font &font_) override;
 	XYPOSITION Height(const Font &font_) override;
 	XYPOSITION AverageCharWidth(const Font &font_) override;
 
@@ -1014,13 +1010,6 @@ XYPOSITION SurfaceGDI::InternalLeading(const Font &font_) {
 	return static_cast<XYPOSITION>(tm.tmInternalLeading);
 }
 
-XYPOSITION SurfaceGDI::ExternalLeading(const Font &font_) {
-	SetFont(font_);
-	TEXTMETRIC tm;
-	::GetTextMetrics(hdc, &tm);
-	return static_cast<XYPOSITION>(tm.tmExternalLeading);
-}
-
 XYPOSITION SurfaceGDI::Height(const Font &font_) {
 	SetFont(font_);
 	TEXTMETRIC tm;
@@ -1125,7 +1114,6 @@ public:
 	XYPOSITION Ascent(const Font &font_) override;
 	XYPOSITION Descent(const Font &font_) override;
 	XYPOSITION InternalLeading(const Font &font_) override;
-	XYPOSITION ExternalLeading(const Font &font_) override;
 	XYPOSITION Height(const Font &font_) override;
 	XYPOSITION AverageCharWidth(const Font &font_) override;
 
@@ -1674,7 +1662,7 @@ void SurfaceD2D::MeasureWidths(const Font &font_, const char *s, int len, XYPOSI
 		int ui = 0;
 		for (int i=0; i<len && ui<tbuf.tlen;) {
 			positions[i] = poses.buffer[ui];
-			if (Platform::IsDBCSLeadByte(codePageText, s[i])) {
+			if (DBCSIsLeadByte(codePageText, s[i])) {
 				positions[i+1] = poses.buffer[ui];
 				i += 2;
 			} else {
@@ -1717,11 +1705,6 @@ XYPOSITION SurfaceD2D::Descent(const Font &font_) {
 XYPOSITION SurfaceD2D::InternalLeading(const Font &font_) {
 	SetFont(font_);
 	return floor(yInternalLeading);
-}
-
-XYPOSITION SurfaceD2D::ExternalLeading(Font &) {
-	// Not implemented, always return one
-	return 1;
 }
 
 XYPOSITION SurfaceD2D::Height(const Font &font_) {
@@ -1787,10 +1770,6 @@ void Window::Destroy() {
 	if (wid)
 		::DestroyWindow(static_cast<HWND>(wid));
 	wid = 0;
-}
-
-bool Window::HasFocus() const {
-	return ::GetFocus() == wid;
 }
 
 PRectangle Window::GetPosition() const {
@@ -1955,10 +1934,6 @@ void Window::SetCursor(Cursor curs) {
 	}
 }
 
-void Window::SetTitle(const char *s) {
-	::SetWindowTextA(static_cast<HWND>(wid), s);
-}
-
 /* Returns rectangle of monitor pt is on, both rect and pt are in Window's
    coordinates */
 PRectangle Window::GetMonitorRect(const Point &pt) const {
@@ -2045,8 +2020,7 @@ class ListBoxX : public ListBox {
 	unsigned int aveCharWidth;
 	const Window *parent;
 	int ctrlID;
-	CallBackAction doubleClickAction;
-	void *doubleClickActionData;
+	IListBoxDelegate *delegate;
 	const char *widestItem;
 	unsigned int maxCharWidth;
 	int resizeHit;
@@ -2066,6 +2040,7 @@ class ListBoxX : public ListBox {
 	POINT MaxTrackSize() const;
 	void SetRedraw(bool on);
 	void OnDoubleClick();
+	void OnSelChange();
 	void ResizeToCursor();
 	void StartResize(WPARAM);
 	LRESULT NcHitTest(WPARAM, LPARAM) const;
@@ -2080,7 +2055,8 @@ class ListBoxX : public ListBox {
 public:
 	ListBoxX() : lineHeight(10), fontCopy(0), technology(0), lb(0), unicodeMode(false),
 		desiredVisibleRows(9), maxItemCharacters(0), aveCharWidth(8),
-		parent(NULL), ctrlID(0), doubleClickAction(NULL), doubleClickActionData(NULL),
+		parent(NULL), ctrlID(0),
+		delegate(nullptr),
 		widestItem(NULL), maxCharWidth(1), resizeHit(0), wheelDelta(0) {
 	}
 	~ListBoxX() override {
@@ -2106,10 +2082,7 @@ public:
 	void RegisterImage(int type, const char *xpm_data) override;
 	void RegisterRGBAImage(int type, int width, int height, const unsigned char *pixelsImage) override;
 	void ClearRegisteredImages() override;
-	void SetDoubleClickAction(CallBackAction action, void *data) override {
-		doubleClickAction = action;
-		doubleClickActionData = data;
-	}
+	virtual void SetDelegate(IListBoxDelegate *lbDelegate) override;
 	void SetList(const char *list, char separator, char typesep) override;
 	void Draw(DRAWITEMSTRUCT *pDrawItem);
 	LRESULT WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam);
@@ -2250,6 +2223,7 @@ void ListBoxX::Select(int n) {
 	SetRedraw(false);
 	CentreItem(n);
 	::SendMessage(lb, LB_SETCURSEL, n, 0);
+	OnSelChange();
 	SetRedraw(true);
 }
 
@@ -2378,6 +2352,10 @@ void ListBoxX::AppendListItem(const char *text, const char *numword) {
 		maxItemCharacters = len;
 		widestItem = text;
 	}
+}
+
+void ListBoxX::SetDelegate(IListBoxDelegate *lbDelegate) {
+	delegate = lbDelegate;
 }
 
 void ListBoxX::SetList(const char *list, char separator, char typesep) {
@@ -2609,9 +2587,16 @@ LRESULT ListBoxX::NcHitTest(WPARAM wParam, LPARAM lParam) const {
 }
 
 void ListBoxX::OnDoubleClick() {
+	if (delegate) {
+		ListBoxEvent event(ListBoxEvent::EventType::doubleClick);
+		delegate->ListNotify(&event);
+	}
+}
 
-	if (doubleClickAction != NULL) {
-		doubleClickAction(doubleClickActionData);
+void ListBoxX::OnSelChange() {
+	if (delegate) {
+		ListBoxEvent event(ListBoxEvent::EventType::selectionChange);
+		delegate->ListNotify(&event);
 	}
 }
 
@@ -2686,6 +2671,10 @@ LRESULT PASCAL ListBoxX::ControlWndProc(HWND hWnd, UINT iMessage, WPARAM wParam,
 				int item = LOWORD(lResult);
 				if (HIWORD(lResult) == 0 && item >= 0) {
 					::SendMessage(hWnd, LB_SETCURSEL, item, 0);
+					ListBoxX *lbx = static_cast<ListBoxX *>(PointerFromWindow(::GetParent(hWnd)));
+					if (lbx) {
+						lbx->OnSelChange();
+					}
 				}
 			}
 			return 0;
@@ -3013,70 +3002,9 @@ unsigned int Platform::DoubleClickTime() {
 	return ::GetDoubleClickTime();
 }
 
-bool Platform::MouseButtonBounce() {
-	return false;
-}
-
 void Platform::DebugDisplay(const char *s) {
 	::OutputDebugStringA(s);
 }
-
-bool Platform::IsKeyDown(int key) {
-	return (::GetKeyState(key) & 0x80000000) != 0;
-}
-
-long Platform::SendScintilla(WindowID w, unsigned int msg, unsigned long wParam, long lParam) {
-	// This should never be called - its here to satisfy an old interface
-	return static_cast<long>(::SendMessage(static_cast<HWND>(w), msg, wParam, lParam));
-}
-
-long Platform::SendScintillaPointer(WindowID w, unsigned int msg, unsigned long wParam, void *lParam) {
-	// This should never be called - its here to satisfy an old interface
-	return static_cast<long>(::SendMessage(static_cast<HWND>(w), msg, wParam,
-		reinterpret_cast<LPARAM>(lParam)));
-}
-
-bool Platform::IsDBCSLeadByte(int codePage, char ch) {
-	// Byte ranges found in Wikipedia articles with relevant search strings in each case
-	const unsigned char uch = static_cast<unsigned char>(ch);
-	switch (codePage) {
-	case 932:
-		// Shift_jis
-		return ((uch >= 0x81) && (uch <= 0x9F)) ||
-		       ((uch >= 0xE0) && (uch <= 0xEF));
-	case 936:
-		// GBK
-		return (uch >= 0x81) && (uch <= 0xFE);
-	case 949:
-		// Korean Wansung KS C-5601-1987
-		return (uch >= 0x81) && (uch <= 0xFE);
-	case 950:
-		// Big5
-		return (uch >= 0x81) && (uch <= 0xFE);
-	case 1361:
-		// Korean Johab KS C-5601-1992
-		return
-		    ((uch >= 0x84) && (uch <= 0xD3)) ||
-		    ((uch >= 0xD8) && (uch <= 0xDE)) ||
-		    ((uch >= 0xE0) && (uch <= 0xF9));
-	}
-	return false;
-}
-
-int Platform::DBCSCharLength(int codePage, const char *s) {
-	if (codePage == 932 || codePage == 936 || codePage == 949 ||
-	        codePage == 950 || codePage == 1361) {
-		return Platform::IsDBCSLeadByte(codePage, s[0]) ? 2 : 1;
-	} else {
-		return 1;
-	}
-}
-
-int Platform::DBCSCharMaxLength() {
-	return 2;
-}
-
-// These are utility functions not really tied to a platform
 
 //#define TRACE
 
@@ -3120,14 +3048,6 @@ void Platform::Assert(const char *c, const char *file, int line) {
 		::DebugBreak();
 		abort();
 	}
-}
-
-int Platform::Clamp(int val, int minVal, int maxVal) {
-	if (val > maxVal)
-		val = maxVal;
-	if (val < minVal)
-		val = minVal;
-	return val;
 }
 
 void Platform_Initialise(void *hInstance) {

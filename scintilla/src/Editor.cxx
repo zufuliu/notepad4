@@ -821,8 +821,11 @@ void Editor::MovedCaret(const SelectionPosition& newPos, SelectionPosition previ
 	const Sci::Line currentLine = pdoc->LineFromPosition(newPos.Position());
 	if (ensureVisible) {
 		// In case in need of wrapping to ensure DisplayFromDoc works.
-		if (currentLine >= wrapPending.start)
-			WrapLines(WrapScope::wsAll);
+		if (currentLine >= wrapPending.start) {
+			if (WrapLines(WrapScope::wsAll)) {
+				Redraw();
+			}
+		}
 		XYScrollPosition newXY = XYScrollToMakeVisible(
 			SelectionRange(posDrag.IsValid() ? posDrag : newPos), xysDefault);
 		if (previousPos.IsValid() && (newXY.xOffset == xOffset)) {
@@ -891,10 +894,10 @@ SelectionPosition Editor::MovePositionSoVisible(const SelectionPosition &pos_, i
 		Sci::Line lineDisplay = cs.DisplayFromDoc(lineDoc);
 		if (moveDir > 0) {
 			// lineDisplay is already line before fold as lines in fold use display line of line after fold
-			lineDisplay = Platform::Clamp(lineDisplay, 0, cs.LinesDisplayed());
+			lineDisplay = Sci::clamp(lineDisplay, 0, cs.LinesDisplayed());
 			return SelectionPosition(pdoc->LineStart(cs.DocFromDisplay(lineDisplay)));
 		} else {
-			lineDisplay = Platform::Clamp(lineDisplay - 1, 0, cs.LinesDisplayed());
+			lineDisplay = Sci::clamp(lineDisplay - 1, 0, cs.LinesDisplayed());
 			return SelectionPosition(pdoc->LineEnd(cs.DocFromDisplay(lineDisplay)));
 		}
 	}
@@ -918,7 +921,7 @@ void Editor::SetLastXChosen() {
 }
 
 void Editor::ScrollTo(Sci::Line line, bool moveThumb) {
-	const Sci::Line topLineNew = Platform::Clamp(line, 0, MaxScrollPos());
+	const Sci::Line topLineNew = Sci::clamp(line, 0, MaxScrollPos());
 	if (topLineNew != topLine) {
 		// Try to optimise small scrolls
 #ifndef UNDER_CE
@@ -1157,7 +1160,7 @@ Editor::XYScrollPosition Editor::XYScrollToMakeVisible(const SelectionRange &ran
 				} else {
 					// yMarginT must equal to caretYSlop, with a minimum of 1 and
 					// a maximum of slightly less than half the heigth of the text area.
-					yMarginT = Platform::Clamp(caretYSlop, 1, halfScreen);
+					yMarginT = Sci::clamp(caretYSlop, 1, halfScreen);
 					if (bEven) {
 						yMarginB = yMarginT;
 					} else {
@@ -1167,7 +1170,7 @@ Editor::XYScrollPosition Editor::XYScrollToMakeVisible(const SelectionRange &ran
 				yMoveT = yMarginT;
 				if (bEven) {
 					if (bJump) {
-						yMoveT = Platform::Clamp(caretYSlop * 3, 1, halfScreen);
+						yMoveT = Sci::clamp(caretYSlop * 3, 1, halfScreen);
 					}
 					yMoveB = yMoveT;
 				} else {
@@ -1182,7 +1185,7 @@ Editor::XYScrollPosition Editor::XYScrollToMakeVisible(const SelectionRange &ran
 				}
 			} else {	// Not strict
 				yMoveT = bJump ? caretYSlop * 3 : caretYSlop;
-				yMoveT = Platform::Clamp(yMoveT, 1, halfScreen);
+				yMoveT = Sci::clamp(yMoveT, 1, halfScreen);
 				if (bEven) {
 					yMoveB = yMoveT;
 				} else {
@@ -1232,7 +1235,7 @@ Editor::XYScrollPosition Editor::XYScrollToMakeVisible(const SelectionRange &ran
 				newXY.topLine = std::min(newXY.topLine, lineCaret);
 			}
 		}
-		newXY.topLine = Platform::Clamp(newXY.topLine, 0, MaxScrollPos());
+		newXY.topLine = Sci::clamp(newXY.topLine, 0, MaxScrollPos());
 	}
 
 	// Horizontal positioning
@@ -1254,7 +1257,7 @@ Editor::XYScrollPosition Editor::XYScrollToMakeVisible(const SelectionRange &ran
 				} else {
 					// xMargin must equal to caretXSlop, with a minimum of 2 and
 					// a maximum of slightly less than half the width of the text area.
-					xMarginR = Platform::Clamp(caretXSlop, 2, halfScreen);
+					xMarginR = Sci::clamp(caretXSlop, 2, halfScreen);
 					if (bEven) {
 						xMarginL = xMarginR;
 					} else {
@@ -1263,7 +1266,7 @@ Editor::XYScrollPosition Editor::XYScrollToMakeVisible(const SelectionRange &ran
 				}
 				if (bJump && bEven) {
 					// Jump is used only in even mode
-					xMoveL = xMoveR = Platform::Clamp(caretXSlop * 3, 1, halfScreen);
+					xMoveL = xMoveR = Sci::clamp(caretXSlop * 3, 1, halfScreen);
 				} else {
 					xMoveL = xMoveR = 0;	// Not used, avoid a warning
 				}
@@ -1286,7 +1289,7 @@ Editor::XYScrollPosition Editor::XYScrollToMakeVisible(const SelectionRange &ran
 				}
 			} else {	// Not strict
 				xMoveR = bJump ? caretXSlop * 3 : caretXSlop;
-				xMoveR = Platform::Clamp(xMoveR, 1, halfScreen);
+				xMoveR = Sci::clamp(xMoveR, 1, halfScreen);
 				if (bEven) {
 					xMoveL = xMoveR;
 				} else {
@@ -1396,28 +1399,20 @@ void Editor::ShowCaretAtCurrentPosition() {
 	if (hasFocus) {
 		caret.active = true;
 		caret.on = true;
-		if (FineTickerAvailable()) {
-			FineTickerCancel(tickCaret);
-			if (caret.period > 0)
-				FineTickerStart(tickCaret, caret.period, caret.period/10);
-		} else {
-			SetTicking(true);
-		}
+		FineTickerCancel(tickCaret);
+		if (caret.period > 0)
+			FineTickerStart(tickCaret, caret.period, caret.period/10);
 	} else {
 		caret.active = false;
 		caret.on = false;
-		if (FineTickerAvailable()) {
-			FineTickerCancel(tickCaret);
-		}
+		FineTickerCancel(tickCaret);
 	}
 	InvalidateCaret();
 }
 
 void Editor::DropCaret() {
 	caret.active = false;
-	if (FineTickerAvailable()) {
-		FineTickerCancel(tickCaret);
-	}
+	FineTickerCancel(tickCaret);
 	InvalidateCaret();
 }
 
@@ -1425,11 +1420,9 @@ void Editor::CaretSetPeriod(int period) {
 	if (caret.period != period) {
 		caret.period = period;
 		caret.on = true;
-		if (FineTickerAvailable()) {
-			FineTickerCancel(tickCaret);
-			if ((caret.active) && (caret.period > 0))
-				FineTickerStart(tickCaret, caret.period, caret.period/10);
-		}
+		FineTickerCancel(tickCaret);
+		if ((caret.active) && (caret.period > 0))
+			FineTickerStart(tickCaret, caret.period, caret.period/10);
 		InvalidateCaret();
 	}
 }
@@ -1508,7 +1501,7 @@ bool Editor::WrapLines(WrapScope ws) {
 		const Sci::Line lineDocTop = cs.DocFromDisplay(topLine);
 		const int subLineTop = topLine - cs.DisplayFromDoc(lineDocTop);
 		if (ws == WrapScope::wsVisible) {
-			lineToWrap = Platform::Clamp(lineDocTop-5, wrapPending.start, pdoc->LinesTotal());
+			lineToWrap = Sci::clamp(lineDocTop-5, wrapPending.start, pdoc->LinesTotal());
 			// Priority wrap to just after visible area.
 			// Since wrapping could reduce display lines, treat each
 			// as taking only one display line.
@@ -1564,7 +1557,7 @@ bool Editor::WrapLines(WrapScope ws) {
 
 	if (wrapOccurred) {
 		SetScrollBars();
-		SetTopLine(Platform::Clamp(goodTopLine, 0, MaxScrollPos()));
+		SetTopLine(Sci::clamp(goodTopLine, 0, MaxScrollPos()));
 		SetVerticalScrollPos();
 	}
 
@@ -1765,11 +1758,9 @@ void Editor::Paint(Surface *surfaceWindow, const PRectangle &rcArea) {
 	view.PaintText(surfaceWindow, *this, rcArea, rcClient, vs);
 
 	if (horizontalScrollBarVisible && trackLineWidth && (view.lineWidthMaxSeen > scrollWidth)) {
-		if (FineTickerAvailable()) {
-			scrollWidth = view.lineWidthMaxSeen;
-			if (!FineTickerRunning(tickWiden)) {
-				FineTickerStart(tickWiden, 50, 5);
-			}
+		scrollWidth = view.lineWidthMaxSeen;
+		if (!FineTickerRunning(tickWiden)) {
+			FineTickerStart(tickWiden, 50, 5);
 		}
 	}
 
@@ -1819,7 +1810,7 @@ void Editor::SetScrollBars() {
 	// TODO: ensure always showing as many lines as possible
 	// May not be, if, for example, window made larger
 	if (topLine > MaxScrollPos()) {
-		SetTopLine(Platform::Clamp(topLine, 0, MaxScrollPos()));
+		SetTopLine(Sci::clamp(topLine, 0, MaxScrollPos()));
 		SetVerticalScrollPos();
 		Redraw();
 	}
@@ -2343,20 +2334,12 @@ void Editor::NotifyDoubleClick(const Point &pt, int modifiers) {
 	NotifyParent(scn);
 }
 
-void Editor::NotifyDoubleClick(const Point &pt, bool shift, bool ctrl, bool alt) {
-	NotifyDoubleClick(pt, ModifierFlags(shift, ctrl, alt));
-}
-
 void Editor::NotifyHotSpotDoubleClicked(Sci::Position position, int modifiers) {
 	SCNotification scn = {};
 	scn.nmhdr.code = SCN_HOTSPOTDOUBLECLICK;
 	scn.position = position;
 	scn.modifiers = modifiers;
 	NotifyParent(scn);
-}
-
-void Editor::NotifyHotSpotDoubleClicked(Sci::Position position, bool shift, bool ctrl, bool alt) {
-	NotifyHotSpotDoubleClicked(position, ModifierFlags(shift, ctrl, alt));
 }
 
 void Editor::NotifyHotSpotClicked(Sci::Position position, int modifiers) {
@@ -2367,20 +2350,12 @@ void Editor::NotifyHotSpotClicked(Sci::Position position, int modifiers) {
 	NotifyParent(scn);
 }
 
-void Editor::NotifyHotSpotClicked(Sci::Position position, bool shift, bool ctrl, bool alt) {
-	NotifyHotSpotClicked(position, ModifierFlags(shift, ctrl, alt));
-}
-
 void Editor::NotifyHotSpotReleaseClick(Sci::Position position, int modifiers) {
 	SCNotification scn = {};
 	scn.nmhdr.code = SCN_HOTSPOTRELEASECLICK;
 	scn.position = position;
 	scn.modifiers = modifiers;
 	NotifyParent(scn);
-}
-
-void Editor::NotifyHotSpotReleaseClick(Sci::Position position, bool shift, bool ctrl, bool alt) {
-	NotifyHotSpotReleaseClick(position, ModifierFlags(shift, ctrl, alt));
 }
 
 bool Editor::NotifyUpdateUI() {
@@ -2411,10 +2386,6 @@ void Editor::NotifyIndicatorClick(bool click, Sci::Position position, int modifi
 		scn.position = position;
 		NotifyParent(scn);
 	}
-}
-
-void Editor::NotifyIndicatorClick(bool click, Sci::Position position, bool shift, bool ctrl, bool alt) {
-	NotifyIndicatorClick(click, position, ModifierFlags(shift, ctrl, alt));
 }
 
 bool Editor::NotifyMarginClick(const Point &pt, int modifiers) {
@@ -2453,10 +2424,6 @@ bool Editor::NotifyMarginClick(const Point &pt, int modifiers) {
 	} else {
 		return false;
 	}
-}
-
-bool Editor::NotifyMarginClick(const Point &pt, bool shift, bool ctrl, bool alt) {
-	return NotifyMarginClick(pt, ModifierFlags(shift, ctrl, alt));
 }
 
 bool Editor::NotifyMarginRightClick(const Point &pt, int modifiers) {
@@ -2644,7 +2611,7 @@ void Editor::NotifyModified(Document *, const DocModification &mh, void *) {
 		if (mh.linesAdded != 0) {
 			// Avoid scrolling of display if change before current display
 			if (mh.position < posTopLine && !CanDeferToLastStep(mh)) {
-				Sci::Line newTop = Platform::Clamp(topLine + mh.linesAdded, 0, MaxScrollPos());
+				Sci::Line newTop = Sci::clamp(topLine + mh.linesAdded, 0, MaxScrollPos());
 				if (newTop != topLine) {
 					SetTopLine(newTop);
 					SetVerticalScrollPos();
@@ -2880,7 +2847,7 @@ void Editor::PageMove(int direction, Selection::selTypes selt, bool stuttered) {
 	} else {
 		Point pt = LocationFromPosition(sel.MainCaret());
 
-		topLineNew = Platform::Clamp(
+		topLineNew = Sci::clamp(
 		            topLine + direction * LinesToScroll(), 0, MaxScrollPos());
 		newPos = SPositionFromLocation(
 			Point::FromInts(lastXChosen - xOffset, static_cast<int>(pt.y) + direction * (vs.lineHeight * LinesToScroll())),
@@ -3211,6 +3178,14 @@ Sci::Position Editor::StartEndDisplayLine(Sci::Position pos, bool start) {
 }
 
 namespace {
+
+inline short HighShortFromLong(long x) {
+	return static_cast<short>(x >> 16);
+}
+
+inline short LowShortFromLong(long x) {
+	return static_cast<short>(x & 0xffff);
+}
 
 unsigned int WithExtends(unsigned int iMessage) {
 	switch (iMessage) {
@@ -3877,10 +3852,6 @@ int Editor::KeyDownWithModifiers(int key, int modifiers, bool *consumed) {
 	}
 }
 
-int Editor::KeyDown(int key, bool shift, bool ctrl, bool alt, bool *consumed) {
-	return KeyDownWithModifiers(key, ModifierFlags(shift, ctrl, alt), consumed);
-}
-
 void Editor::Indent(bool forwards) {
 	UndoGroup ug(pdoc);
 	for (size_t r=0; r<sel.Count(); r++) {
@@ -4184,13 +4155,9 @@ void Editor::SetDragPosition(const SelectionPosition &newPos_) {
 	}
 	if (!(posDrag == newPos)) {
 		caret.on = true;
-		if (FineTickerAvailable()) {
-			FineTickerCancel(tickCaret);
-			if ((caret.active) && (caret.period > 0) && (newPos.Position() < 0))
-				FineTickerStart(tickCaret, caret.period, caret.period/10);
-		} else {
-			SetTicking(true);
-		}
+		FineTickerCancel(tickCaret);
+		if ((caret.active) && (caret.period > 0) && (newPos.Position() < 0))
+			FineTickerStart(tickCaret, caret.period, caret.period/10);
 		InvalidateCaret();
 		posDrag = newPos;
 		InvalidateCaret();
@@ -4414,12 +4381,7 @@ void Editor::DwellEnd(bool mouseMoved) {
 		dwelling = false;
 		NotifyDwelling(ptMouseLast, dwelling);
 	}
-	if (FineTickerAvailable()) {
-		FineTickerCancel(tickDwell);
-		if (mouseMoved && (dwellDelay < SC_TIME_FOREVER)) {
-			//FineTickerStart(tickDwell, dwellDelay, dwellDelay/10);
-		}
-	}
+	FineTickerCancel(tickDwell);
 }
 
 void Editor::MouseLeave() {
@@ -4468,36 +4430,31 @@ void Editor::ButtonDownWithModifiers(const Point &pt, unsigned int curTime, int 
 	if (((curTime - lastClickTime) < Platform::DoubleClickTime()) && Close(pt, lastClick, doubleClickCloseThreshold)) {
 		//Platform::DebugPrintf("Double click %d %d = %d\n", curTime, lastClickTime, curTime - lastClickTime);
 		SetMouseCapture(true);
-		if (FineTickerAvailable()) {
-			FineTickerStart(tickScroll, 100, 10);
-		}
+		FineTickerStart(tickScroll, 100, 10);
 		if (!ctrl || !multipleSelection || (selectionType != selChar && selectionType != selWord))
 			SetEmptySelection(newPos.Position());
 		bool doubleClick = false;
-		// Stop mouse button bounce changing selection type
-		if (!Platform::MouseButtonBounce() || curTime != lastClickTime) {
-			if (inSelMargin) {
-				// Inside margin selection type should be either selSubLine or selWholeLine.
-				if (selectionType == selSubLine) {
-					// If it is selSubLine, we're inside a *double* click and word wrap is enabled,
-					// so we switch to selWholeLine in order to select whole line.
-					selectionType = selWholeLine;
-				} else if (selectionType != selSubLine && selectionType != selWholeLine) {
-					// If it is neither, reset selection type to line selection.
-					selectionType = (Wrapping() && (marginOptions & SC_MARGINOPTION_SUBLINESELECT)) ? selSubLine : selWholeLine;
-				}
+		if (inSelMargin) {
+			// Inside margin selection type should be either selSubLine or selWholeLine.
+			if (selectionType == selSubLine) {
+				// If it is selSubLine, we're inside a *double* click and word wrap is enabled,
+				// so we switch to selWholeLine in order to select whole line.
+				selectionType = selWholeLine;
+			} else if (selectionType != selSubLine && selectionType != selWholeLine) {
+				// If it is neither, reset selection type to line selection.
+				selectionType = (Wrapping() && (marginOptions & SC_MARGINOPTION_SUBLINESELECT)) ? selSubLine : selWholeLine;
+			}
+		} else {
+			if (selectionType == selChar) {
+				selectionType = selWord;
+				doubleClick = true;
+			} else if (selectionType == selWord) {
+				// Since we ended up here, we're inside a *triple* click, which should always select
+				// whole line regardless of word wrap being enabled or not.
+				selectionType = selWholeLine;
 			} else {
-				if (selectionType == selChar) {
-					selectionType = selWord;
-					doubleClick = true;
-				} else if (selectionType == selWord) {
-					// Since we ended up here, we're inside a *triple* click, which should always select
-					// whole line regardless of word wrap being enabled or not.
-					selectionType = selWholeLine;
-				} else {
-					selectionType = selChar;
-					originalAnchorPos = sel.MainCaret();
-				}
+				selectionType = selChar;
+				originalAnchorPos = sel.MainCaret();
 			}
 		}
 
@@ -4571,9 +4528,7 @@ void Editor::ButtonDownWithModifiers(const Point &pt, unsigned int curTime, int 
 
 			SetDragPosition(SelectionPosition(Sci::invalidPosition));
 			SetMouseCapture(true);
-			if (FineTickerAvailable()) {
-				FineTickerStart(tickScroll, 100, 10);
-			}
+			FineTickerStart(tickScroll, 100, 10);
 		} else {
 			if (PointIsHotspot(pt)) {
 				NotifyHotSpotClicked(newCharPos.Position(), modifiers);
@@ -4586,9 +4541,7 @@ void Editor::ButtonDownWithModifiers(const Point &pt, unsigned int curTime, int 
 					inDragDrop = ddNone;
 			}
 			SetMouseCapture(true);
-			if (FineTickerAvailable()) {
-				FineTickerStart(tickScroll, 100, 10);
-			}
+			FineTickerStart(tickScroll, 100, 10);
 			if (inDragDrop != ddInitial) {
 				SetDragPosition(SelectionPosition(Sci::invalidPosition));
 				if (!shift) {
@@ -4627,10 +4580,6 @@ void Editor::ButtonDownWithModifiers(const Point &pt, unsigned int curTime, int 
 void Editor::RightButtonDownWithModifiers(const Point &pt, unsigned int, int modifiers) {
 	if (NotifyMarginRightClick(pt, modifiers))
 		return;
-}
-
-void Editor::ButtonDown(const Point &pt, unsigned int curTime, bool shift, bool ctrl, bool alt) {
-	return ButtonDownWithModifiers(pt, curTime, ModifierFlags(shift, ctrl, alt));
 }
 
 bool Editor::PositionIsHotspot(Sci::Position position) const {
@@ -4702,7 +4651,7 @@ Range Editor::GetHotSpotRange() const {
 	return hotspot;
 }
 
-void Editor::ButtonMoveWithModifiers(const Point &pt, int modifiers) {
+void Editor::ButtonMoveWithModifiers(Point pt, unsigned int, int modifiers) {
 	if ((ptMouseLast.x != pt.x) || (ptMouseLast.y != pt.y)) {
 		DwellEnd(true);
 	}
@@ -4714,9 +4663,7 @@ void Editor::ButtonMoveWithModifiers(const Point &pt, int modifiers) {
 	if (inDragDrop == ddInitial) {
 		if (DragThreshold(ptMouseLast, pt)) {
 			SetMouseCapture(false);
-			if (FineTickerAvailable()) {
-				FineTickerCancel(tickScroll);
-			}
+			FineTickerCancel(tickScroll);
 			SetDragPosition(movePos);
 			CopySelectionRange(&drag);
 			StartDrag();
@@ -4728,7 +4675,7 @@ void Editor::ButtonMoveWithModifiers(const Point &pt, int modifiers) {
 	PRectangle rcClient = GetClientRectangle();
 	Point ptOrigin = GetVisibleOriginInMain();
 	rcClient.Move(0, -ptOrigin.y);
-	if (FineTickerAvailable() && (dwellDelay < SC_TIME_FOREVER) && rcClient.Contains(pt)) {
+	if ((dwellDelay < SC_TIME_FOREVER) && rcClient.Contains(pt)) {
 		FineTickerStart(tickDwell, dwellDelay, dwellDelay/10);
 	}
 	//Platform::DebugPrintf("Move %d %d\n", pt.x, pt.y);
@@ -4768,7 +4715,7 @@ void Editor::ButtonMoveWithModifiers(const Point &pt, int modifiers) {
 					// the selection for a fancier definition of "word" (for
 					// example, in Perl it is useful to include the leading
 					// '$', '%' or '@' on variables for word selection). In this
-					// the ButtonMove() called via Tick() for auto-scrolling
+					// the ButtonMove() called via TickFor() for auto-scrolling
 					// could result in the fancier word selection adjustment
 					// being unmade.
 				} else {
@@ -4829,11 +4776,7 @@ void Editor::ButtonMoveWithModifiers(const Point &pt, int modifiers) {
 	}
 }
 
-void Editor::ButtonMove(const Point &pt) {
-	ButtonMoveWithModifiers(pt, 0);
-}
-
-void Editor::ButtonUp(const Point &pt, unsigned int curTime, bool ctrl) {
+void Editor::ButtonUpWithModifiers(Point pt, unsigned int curTime, int modifiers) {
 	//Platform::DebugPrintf("ButtonUp %d %d\n", HaveMouseCapture(), inDragDrop);
 	SelectionPosition newPos = SPositionFromLocation(pt, false, false,
 		AllowVirtualSpace(virtualSpaceOptions, sel.IsRectangular()));
@@ -4850,7 +4793,7 @@ void Editor::ButtonUp(const Point &pt, unsigned int curTime, bool ctrl) {
 		hotSpotClickPos = INVALID_POSITION;
 		SelectionPosition newCharPos = SPositionFromLocation(pt, false, true, false);
 		newCharPos = MovePositionOutsideChar(newCharPos, -1);
-		NotifyHotSpotReleaseClick(newCharPos.Position(), ctrl ? SCI_CTRL : 0);
+		NotifyHotSpotReleaseClick(newCharPos.Position(), modifiers & SCI_CTRL);
 	}
 	if (HaveMouseCapture()) {
 		if (PointInSelMargin(pt)) {
@@ -4861,9 +4804,7 @@ void Editor::ButtonUp(const Point &pt, unsigned int curTime, bool ctrl) {
 		}
 		ptMouseLast = pt;
 		SetMouseCapture(false);
-		if (FineTickerAvailable()) {
-			FineTickerCancel(tickScroll);
-		}
+		FineTickerCancel(tickScroll);
 		NotifyIndicatorClick(false, newPos.Position(), 0);
 		if (inDragDrop == ddDragging) {
 			SelectionPosition selStart = SelectionStart();
@@ -4871,7 +4812,7 @@ void Editor::ButtonUp(const Point &pt, unsigned int curTime, bool ctrl) {
 			if (selStart < selEnd) {
 				if (drag.Length()) {
 					const int length = static_cast<int>(drag.Length());
-					if (ctrl) {
+					if (modifiers & SCI_CTRL) {
 						const Sci::Position lengthInserted = pdoc->InsertString(
 							newPos.Position(), drag.Data(), length);
 						if (lengthInserted > 0) {
@@ -4923,39 +4864,6 @@ void Editor::ButtonUp(const Point &pt, unsigned int curTime, bool ctrl) {
 	}
 }
 
-// Called frequently to perform background UI including
-// caret blinking and automatic scrolling.
-void Editor::Tick() {
-	if (HaveMouseCapture()) {
-		// Auto scroll
-		ButtonMove(ptMouseLast);
-	}
-	if (caret.period > 0) {
-		timer.ticksToWait -= timer.tickSize;
-		if (timer.ticksToWait <= 0) {
-			caret.on = !caret.on;
-			timer.ticksToWait = caret.period;
-			if (caret.active) {
-				InvalidateCaret();
-			}
-		}
-	}
-	if (horizontalScrollBarVisible && trackLineWidth && (view.lineWidthMaxSeen > scrollWidth)) {
-		scrollWidth = view.lineWidthMaxSeen;
-		SetScrollBars();
-	}
-	if ((dwellDelay < SC_TIME_FOREVER) &&
-	        (ticksToDwell > 0) &&
-	        (!HaveMouseCapture()) &&
-	        (ptMouseLast.y >= 0)) {
-		ticksToDwell -= timer.tickSize;
-		if (ticksToDwell <= 0) {
-			dwelling = true;
-			NotifyDwelling(ptMouseLast, dwelling);
-		}
-	}
-}
-
 bool Editor::Idle() {
 	bool needWrap = Wrapping() && wrapPending.NeedsWrap();
 
@@ -4978,13 +4886,6 @@ bool Editor::Idle() {
 	return !idleDone;
 }
 
-void Editor::SetTicking(bool) {
-	// SetTicking is deprecated. In the past it was pure virtual and was overridden in each
-	// derived platform class but fine grained timers should now be implemented.
-	// Either way, execution should not arrive here so assert failure.
-	assert(false);
-}
-
 void Editor::TickFor(TickReason reason) {
 	switch (reason) {
 		case tickCaret:
@@ -4995,7 +4896,7 @@ void Editor::TickFor(TickReason reason) {
 			break;
 		case tickScroll:
 			// Auto scroll
-			ButtonMove(ptMouseLast);
+			ButtonMoveWithModifiers(ptMouseLast, 0, 0);
 			break;
 		case tickWiden:
 			SetScrollBars();
@@ -5013,10 +4914,6 @@ void Editor::TickFor(TickReason reason) {
 			// tickPlatform handled by subclass
 			break;
 	}
-}
-
-bool Editor::FineTickerAvailable() {
-	return false;
 }
 
 // FineTickerStart is be overridden by subclasses that support fine ticking so
@@ -5086,7 +4983,7 @@ Sci::Position Editor::PositionAfterMaxStyling(Sci::Position posMax, bool scrolli
 	// When scrolling, allow less time to ensure responsive
 	const double secondsAllowed = scrolling ? 0.005 : 0.02;
 
-	const Sci::Line linesToStyle = Platform::Clamp(static_cast<int>(secondsAllowed / pdoc->durationStyleOneLine),
+	const Sci::Line linesToStyle = Sci::clamp(static_cast<int>(secondsAllowed / pdoc->durationStyleOneLine),
 		10, 0x10000);
 	const Sci::Line stylingMaxLine = std::min(
 		static_cast<Sci::Line>(pdoc->LineFromPosition(pdoc->GetEndStyled()) + linesToStyle),
@@ -5400,8 +5297,11 @@ Sci::Line Editor::ContractedFoldNext(Sci::Line lineStart) const {
 void Editor::EnsureLineVisible(Sci::Line lineDoc, bool enforcePolicy) {
 
 	// In case in need of wrapping to ensure DisplayFromDoc works.
-	if (lineDoc >= wrapPending.start)
-		WrapLines(WrapScope::wsAll);
+	if (lineDoc >= wrapPending.start) {
+		if (WrapLines(WrapScope::wsAll)) {
+			Redraw();
+		}
+	}
 
 	if (!cs.GetVisible(lineDoc)) {
 		// Back up to find a non-blank line
@@ -5430,18 +5330,18 @@ void Editor::EnsureLineVisible(Sci::Line lineDoc, bool enforcePolicy) {
 		const Sci::Line lineDisplay = cs.DisplayFromDoc(lineDoc);
 		if (visiblePolicy & VISIBLE_SLOP) {
 			if ((topLine > lineDisplay) || ((visiblePolicy & VISIBLE_STRICT) && (topLine + visibleSlop > lineDisplay))) {
-				SetTopLine(Platform::Clamp(lineDisplay - visibleSlop, 0, MaxScrollPos()));
+				SetTopLine(Sci::clamp(lineDisplay - visibleSlop, 0, MaxScrollPos()));
 				SetVerticalScrollPos();
 				Redraw();
 			} else if ((lineDisplay > topLine + LinesOnScreen() - 1) ||
 			        ((visiblePolicy & VISIBLE_STRICT) && (lineDisplay > topLine + LinesOnScreen() - 1 - visibleSlop))) {
-				SetTopLine(Platform::Clamp(lineDisplay - LinesOnScreen() + 1 + visibleSlop, 0, MaxScrollPos()));
+				SetTopLine(Sci::clamp(lineDisplay - LinesOnScreen() + 1 + visibleSlop, 0, MaxScrollPos()));
 				SetVerticalScrollPos();
 				Redraw();
 			}
 		} else {
 			if ((topLine > lineDisplay) || (lineDisplay > topLine + LinesOnScreen() - 1) || (visiblePolicy & VISIBLE_STRICT)) {
-				SetTopLine(Platform::Clamp(lineDisplay - LinesOnScreen() / 2 + 1, 0, MaxScrollPos()));
+				SetTopLine(Sci::clamp(lineDisplay - LinesOnScreen() / 2 + 1, 0, MaxScrollPos()));
 				SetVerticalScrollPos();
 				Redraw();
 			}
@@ -6044,7 +5944,7 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 		return pdoc->MovePositionOutsideChar(static_cast<int>(wParam) + 1, 1, true);
 
 	case SCI_POSITIONRELATIVE:
-		return Platform::Clamp(pdoc->GetRelativePosition(static_cast<int>(wParam), static_cast<int>(lParam)), 0, pdoc->Length());
+		return Sci::clamp(pdoc->GetRelativePosition(static_cast<int>(wParam), static_cast<int>(lParam)), 0, pdoc->Length());
 
 	case SCI_LINESCROLL:
 		ScrollTo(topLine + static_cast<Sci::Line>(lParam));
@@ -7294,13 +7194,13 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 		return vs.caretWidth;
 
 	case SCI_ASSIGNCMDKEY:
-		kmap.AssignCmdKey(Platform::LowShortFromLong(static_cast<long>(wParam)),
-			Platform::HighShortFromLong(static_cast<long>(wParam)), static_cast<unsigned int>(lParam));
+		kmap.AssignCmdKey(LowShortFromLong(static_cast<long>(wParam)),
+			HighShortFromLong(static_cast<long>(wParam)), static_cast<unsigned int>(lParam));
 		break;
 
 	case SCI_CLEARCMDKEY:
-		kmap.AssignCmdKey(Platform::LowShortFromLong(static_cast<long>(wParam)),
-			Platform::HighShortFromLong(static_cast<long>(wParam)), SCI_NULL);
+		kmap.AssignCmdKey(LowShortFromLong(static_cast<long>(wParam)),
+			HighShortFromLong(static_cast<long>(wParam)), SCI_NULL);
 		break;
 
 	case SCI_CLEARALLCMDKEYS:
