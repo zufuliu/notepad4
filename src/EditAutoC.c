@@ -763,7 +763,7 @@ BOOL IsIndentKeywordStyle(int style) {
 	//	return style == SCE_C_PREPROCESSOR;
 	//case SCLEX_VB:
 	//case SCLEX_VBSCRIPT:
-	//	return SCE_B_KEYWORD;
+	//	return style == SCE_B_KEYWORD;
 	case SCLEX_RUBY:
 		return style == SCE_RB_WORD;
 	case SCLEX_MATLAB:
@@ -777,27 +777,33 @@ BOOL IsIndentKeywordStyle(int style) {
 	case SCLEX_CMAKE:
 		return style == SCE_CMAKE_WORD;
 	//case SCLEX_VHDL:
-	//	return SCE_VHDL_KEYWORD;
+	//	return style == SCE_VHDL_KEYWORD;
 	//case SCLEX_VERILOG:
-	//	return SCE_V_WORD;
+	//	return style == SCE_V_WORD;
 	//case SCLEX_PASCAL:
 	//case SCLEX_INNOSETUP:
-	//	return SCE_INNO_KEYWORD_PASCAL;
+	//	return style == SCE_INNO_KEYWORD_PASCAL;
 	//case SCLEX_NSIS:
+	//	return style == SCE_C_WORD || style == SCE_C_PREPROCESSOR;
 	//case SCLEX_AU3:
-	//case SCLEX_SQL:
+	//	return style == SCE_AU3_KEYWORD;
+	case SCLEX_SQL:
+		return style == SCE_SQL_WORD;
 	}
 	return FALSE;
 }
 
 const char* EditKeywordIndent(const char* head, int *indent) {
 	char word[64] = "";
+	char word_low[64] = "";
 	int length = 0;
 	const char *endPart = NULL;
 	*indent = 0;
-	word[length++] = *head++;
 	while (*head && length < 63 && IsAAlpha(*head)) {
-		word[length++] = *head++;
+		word[length] = *head;
+		word_low[length] = (*head) | 0x20;
+		++length;
+		++head;
 	}
 	switch (pLexCurrent->iLexer) {
 	//case SCLEX_CPP:
@@ -871,7 +877,36 @@ const char* EditKeywordIndent(const char* head, int *indent) {
 	//case SCLEX_INNOSETUP:
 	//case SCLEX_NSIS:
 	//case SCLEX_AU3:
-	//case SCLEX_SQL:
+	case SCLEX_SQL:
+		if (!strcmp(word_low, "if")) {
+			*indent = 2;
+			endPart = "END IF;";
+		} else if (!strcmp(word_low, "while")) {
+			*indent = 2;
+			endPart = "END WHILE;";
+		} else if (!strcmp(word_low, "repeat")) {
+			*indent = 2;
+			endPart = "END REPEAT;";
+		} else if (!strcmp(word_low, "loop") || !strcmp(word_low, "for")) {
+			*indent = 2;
+			endPart = "END LOOP;";
+		} else if (!strcmp(word_low, "case")) {
+			*indent = 2;
+			endPart = "END CASE;";
+		} else if (!strcmp(word_low, "begin")) {
+			*indent = 2;
+			if (StrStrIA(head, "transaction") != NULL) {
+				endPart = "COMMIT;";
+			} else {
+				endPart = "END";
+			}
+		} else if (!strcmp(word_low, "start")) {
+			if (StrStrIA(head, "transaction") != NULL) {
+				*indent = 2;
+				endPart = "COMMIT;";
+			}
+		}
+		break;
 	}
 	return endPart;
 }
