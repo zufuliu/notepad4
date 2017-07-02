@@ -17,9 +17,6 @@
 *
 *
 ******************************************************************************/
-#if !defined(_WIN32_WINNT)
-#define _WIN32_WINNT 0x501
-#endif
 #include <windows.h>
 #include <shlwapi.h>
 #include <shlobj.h>
@@ -35,8 +32,6 @@
 #include "resource.h"
 #include "Version.h"
 
-#pragma warning(push)
-#pragma warning(disable: 4100 4702 4706)
 
 extern HWND		hwndMain;
 extern HWND		hwndEdit;
@@ -117,7 +112,7 @@ int MsgBox(int iType, UINT uIdMsg, ...)
 		break;
 	}
 
-	if (!(hwnd = GetFocus())) {
+	if ((hwnd = GetFocus()) == NULL) {
 		hwnd = hwndMain;
 	}
 
@@ -1020,7 +1015,6 @@ DWORD WINAPI FileMRUIconThread(LPVOID lpParam)
 
 	SetEvent(lpit->hTerminatedThread);
 	ExitThread(0);
-	return 0;
 }
 
 INT_PTR CALLBACK FileMRUDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
@@ -1495,7 +1489,7 @@ INT_PTR CALLBACK WordWrapSettingsDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LP
 			GetDlgItemText(hwnd, 200 + i, tch, COUNTOF(tch));
 			lstrcat(tch, L"|");
 			p1 = tch;
-			while ((p2 = StrChr(p1, L'|'))) {
+			while ((p2 = StrChr(p1, L'|')) != NULL) {
 				*p2++ = L'\0';
 				if (*p1) {
 					SendDlgItemMessage(hwnd, 100 + i, CB_ADDSTRING, 0, (LPARAM)p1);
@@ -2199,7 +2193,7 @@ INT_PTR InfoBox(int iType, LPCWSTR lpstrSetting, int uidMessage, ...)
 		idDlg = IDD_INFOBOX3;
 	}
 
-	if (!(hwnd = GetFocus())) {
+	if ((hwnd = GetFocus()) == NULL) {
 		hwnd = hwndMain;
 	}
 
@@ -2209,6 +2203,5 @@ INT_PTR InfoBox(int iType, LPCWSTR lpstrSetting, int uidMessage, ...)
 								hwnd, InfoBoxDlgProc, (LPARAM)&ib);
 }
 
-#pragma warning(pop)
 
 // End of Dialogs.c

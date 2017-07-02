@@ -17,9 +17,6 @@
 *
 *
 ******************************************************************************/
-#if !defined(_WIN32_WINNT)
-#define _WIN32_WINNT 0x501
-#endif
 #include <windows.h>
 #include <shlwapi.h>
 #include <shlobj.h>
@@ -36,8 +33,6 @@
 #include "SciCall.h"
 #include "resource.h"
 
-#pragma warning(push)
-#pragma warning(disable: 4100 4204 4706)
 
 // show fold level
 #define NP2_DEBUG_FOLD_LEVEL	0
@@ -254,7 +249,7 @@ UINT	msgTaskbarCreated = 0;
 HMODULE		hModUxTheme = NULL;
 
 WIN32_FIND_DATA		fdCurFile;
-EDITFINDREPLACE		efrData = { "", "", "", "", 0, 0, 0, 0, 0, 0, NULL };
+static EDITFINDREPLACE efrData;
 UINT	cpLastFind = 0;
 BOOL	bReplaceInitialized = FALSE;
 
@@ -519,7 +514,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInst, LPSTR lpCmdLine, in
 		return FALSE;
 	}
 
-	if (!(hwnd = InitInstance(hInstance, lpCmdLine, nCmdShow))) {
+	if ((hwnd = InitInstance(hInstance, lpCmdLine, nCmdShow)) == NULL) {
 		OleUninitialize();
 		return FALSE;
 	}
@@ -734,7 +729,7 @@ HWND InitInstance(HINSTANCE hInstance, LPSTR pszCmdLine, int nCmdShow)
 				bFileLoadCalled = TRUE;
 			}
 		} else {
-			if ((bOpened = FileLoad(FALSE, FALSE, FALSE, FALSE, lpFileArg))) {
+			if ((bOpened = FileLoad(FALSE, FALSE, FALSE, FALSE, lpFileArg)) != FALSE) {
 				bFileLoadCalled = TRUE;
 				if (flagJumpTo) { // Jump to position
 					EditJumpTo(hwndEdit, iInitialLine, iInitialColumn);
@@ -1693,7 +1688,7 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance)
 		if (!SearchPath(NULL, tchToolbarBitmapHot, NULL, COUNTOF(szTmp), szTmp, NULL)) {
 			lstrcpy(szTmp, tchToolbarBitmapHot);
 		}
-		if ((hbmp = LoadImage(NULL, szTmp, IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION | LR_LOADFROMFILE))) {
+		if ((hbmp = LoadImage(NULL, szTmp, IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION | LR_LOADFROMFILE)) != NULL) {
 			GetObject(hbmp, sizeof(BITMAP), &bmp);
 			himl = ImageList_Create(bmp.bmWidth / NUMTOOLBITMAPS, bmp.bmHeight, ILC_COLOR32 | ILC_MASK, 0, 0);
 			ImageList_AddMasked(himl, hbmp, CLR_DEFAULT);
@@ -1708,7 +1703,7 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance)
 		if (!SearchPath(NULL, tchToolbarBitmapDisabled, NULL, COUNTOF(szTmp), szTmp, NULL)) {
 			lstrcpy(szTmp, tchToolbarBitmapDisabled);
 		}
-		if ((hbmp = LoadImage(NULL, szTmp, IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION | LR_LOADFROMFILE))) {
+		if ((hbmp = LoadImage(NULL, szTmp, IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION | LR_LOADFROMFILE)) != NULL) {
 			GetObject(hbmp, sizeof(BITMAP), &bmp);
 			himl = ImageList_Create(bmp.bmWidth / NUMTOOLBITMAPS, bmp.bmHeight, ILC_COLOR32 | ILC_MASK, 0, 0);
 			ImageList_AddMasked(himl, hbmp, CLR_DEFAULT);
@@ -3270,7 +3265,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam)
 			char *p;
 			BOOL done = FALSE;
 			lstrcpynA(msz, mEncoding[iEncoding].pszParseNames, COUNTOF(msz));
-			if ((p = StrChrA(msz, ','))) {
+			if ((p = StrChrA(msz, ',')) != NULL) {
 				*p = 0;
 			}
 			if (pLexCurrent->iLexer == SCLEX_PYTHON) {
@@ -4630,11 +4625,14 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam)
 		struct tm sst;
 
 		UINT cp;
-		EDITFINDREPLACE efrTS = { "", "", "", "", SCFIND_REGEXP, 0, 0, 0, 0, 0, hwndEdit };
+		EDITFINDREPLACE efrTS = {
+			.fuFlags = SCFIND_REGEXP,
+			.hwnd = hwndEdit,
+		};
 
 		IniGetString(L"Settings2", L"TimeStamp", L"\\$Date:[^\\$]+\\$ | $Date: %Y/%m/%d %H:%M:%S $", wchFind, COUNTOF(wchFind));
 
-		if ((pwchSep = StrChr(wchFind, L'|'))) {
+		if ((pwchSep = StrChr(wchFind, L'|')) != NULL) {
 			lstrcpy(wchTemplate, pwchSep + 1);
 			*pwchSep = 0;
 		}
@@ -5264,7 +5262,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam)
 			SendMessage(hwndEdit, SCI_SETSEL, scn->position, iCurPos);
 			SendMessage(hwndEdit, SCI_REPLACESEL, 0, (LPARAM)scn->text);
 			// function/array/template/generic
-			if ((iCurPos = lstrlenA(StrPBrkA(scn->text, "([{<")))) {
+			if ((iCurPos = lstrlenA(StrPBrkA(scn->text, "([{<"))) != 0) {
 			//if ((iCurPos = lstrlenA(StrChrA(scn->text, '(')))) {
 				iCurPos = 1 - iCurPos;
 			}
@@ -6465,7 +6463,7 @@ int CreateIniFileEx(LPCWSTR lpszIniFile)
 		HANDLE hFile;
 		WCHAR *pwchTail;
 
-		if ((pwchTail = StrRChrW(lpszIniFile, NULL, L'\\'))) {
+		if ((pwchTail = StrRChrW(lpszIniFile, NULL, L'\\')) != NULL) {
 			*pwchTail = 0;
 			SHCreateDirectoryEx(NULL, lpszIniFile, NULL);
 			*pwchTail = L'\\';
@@ -6605,7 +6603,7 @@ void UpdateStatusbar()
 	iSelStart = (int)SendMessage(hwndEdit, SCI_GETSELECTIONSTART, 0, 0);
 	iSelEnd = (int)SendMessage(hwndEdit, SCI_GETSELECTIONEND, 0, 0);
 	if (SC_SEL_RECTANGLE != SendMessage(hwndEdit, SCI_GETSELECTIONMODE, 0, 0)) {
-		int iSel = SendMessage(hwndEdit, SCI_GETSELTEXT, 0, 0) - 1;
+		int iSel = (int)SendMessage(hwndEdit, SCI_GETSELTEXT, 0, 0) - 1;
 		wsprintf(tchSel, L"%i", iSel);
 		FormatNumberStr(tchSel);
 		iSel = (int)SendMessage(hwndEdit, SCI_COUNTCHARACTERS, iSelStart, iSelEnd);
@@ -7798,6 +7796,5 @@ void CALLBACK PasteBoardTimer(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTi
 	}
 }
 
-#pragma warning(pop)
 
 // End of Notepad2.c

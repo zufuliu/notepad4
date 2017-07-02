@@ -17,9 +17,6 @@
 *
 *
 ******************************************************************************/
-#if !defined(_WIN32_WINNT)
-#define _WIN32_WINNT 0x0501
-#endif
 #include <windows.h>
 #include <commctrl.h>
 #include <shlobj.h>
@@ -27,8 +24,6 @@
 #include <string.h>
 #include "dlapi.h"
 
-#pragma warning(push)
-#pragma warning(disable: 4100 4702 4706)
 
 typedef struct tagDLDATA { // dl
 	HWND hwnd;					// HWND of ListView Control
@@ -339,7 +334,6 @@ DWORD WINAPI DirList_IconThread(LPVOID lpParam)
 	if (!lpdl->lpsf) {
 		SetEvent(lpdl->hTerminatedThread);
 		ExitThread(0);
-		return 0;
 	}
 
 	hwnd = lpdl->hwnd;
@@ -415,7 +409,6 @@ DWORD WINAPI DirList_IconThread(LPVOID lpParam)
 
 	SetEvent(lpdl->hTerminatedThread);
 	ExitThread(0);
-	return 0;
 }
 
 
@@ -846,7 +839,7 @@ void DirList_CreateFilter(PDL_FILTER pdlf, LPCWSTR lpszFileSpec, BOOL bExcludeFi
 	pdlf->nCount = 1;
 	pdlf->pFilter[0] = &pdlf->tFilterBuf[0];    // Zeile zum Ausprobieren
 
-	while (p = StrChr(pdlf->pFilter[pdlf->nCount - 1], L';')) {
+	while ((p = StrChr(pdlf->pFilter[pdlf->nCount - 1], L';')) != NULL) {
 		*p = L'\0';                              // Replace L';' by L'\0'
 		pdlf->pFilter[pdlf->nCount] = (p + 1);  // Next position after L';'
 		pdlf->nCount++;                         // Increase number of filters
@@ -999,7 +992,6 @@ int DriveBox_Fill(HWND hwnd)
 								{
 									COMBOBOXEXITEM cbei2;
 									LPDC_ITEMDATA lpdcid2;
-									HRESULT hr;
 									cbei2.mask = CBEIF_LPARAM;
 									cbei2.iItem = 0;
 
@@ -1340,6 +1332,5 @@ BOOL IL_GetDisplayName(LPSHELLFOLDER lpsf, LPCITEMIDLIST pidl, DWORD dwFlags, LP
 	return FALSE;
 }
 
-#pragma warning(pop)
 
 ///   End of Dlapi.c   \\\

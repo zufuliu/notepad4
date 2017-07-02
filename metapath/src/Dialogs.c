@@ -17,9 +17,6 @@
 *
 *
 ******************************************************************************/
-#if !defined(_WIN32_WINNT)
-#define _WIN32_WINNT 0x0501
-#endif
 #define _WIN32_IE 0x0600
 #define OEMRESOURCE  // use OBM_ resource constants
 #include <windows.h>
@@ -35,8 +32,6 @@
 #include "resource.h"
 #include "version.h"
 
-#pragma warning(push)
-#pragma warning(disable: 4100 4706)
 
 //=============================================================================
 //
@@ -71,7 +66,7 @@ int ErrorMessage(int iLevel, UINT uIdMsg, ...)
 
 	iIcon = (iLevel > 1) ? MB_ICONEXCLAMATION : MB_ICONINFORMATION;
 
-	if (!(hwnd = GetFocus())) {
+	if ((hwnd = GetFocus()) == NULL) {
 		hwnd = hwndMain;
 	}
 
@@ -384,7 +379,7 @@ INT_PTR CALLBACK GotoDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 			}
 		}
 
-		if (fp = GetProcAddress(GetModuleHandle(L"User32"), "GetComboBoxInfo")) {
+		if ((fp = GetProcAddress(GetModuleHandle(L"User32"), "GetComboBoxInfo")) != NULL) {
 			COMBOBOXINFO cbi;
 			cbi.cbSize = sizeof(COMBOBOXINFO);
 			if (fp(GetDlgItem(hwnd, IDC_GOTO), &cbi)) {
@@ -2439,7 +2434,6 @@ INT_PTR CALLBACK FindTargetDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 				ErrorMessage(1, IDS_ERR_INVALIDTARGET);
 			} else {
 				WCHAR *pIniSection = LocalAlloc(LPTR, sizeof(WCHAR) * 32 * 1024);
-				int cbIniSection = (int)LocalSize(pIniSection) / sizeof(WCHAR);
 
 				i = IsDlgButtonChecked(hwnd, IDC_LAUNCH);
 				iUseTargetApplication = i ? 0 : 1;
@@ -2520,6 +2514,5 @@ INT_PTR CALLBACK FindTargetDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 	return FALSE;
 }
 
-#pragma warning(pop)
 
 // End of Dialogs.c

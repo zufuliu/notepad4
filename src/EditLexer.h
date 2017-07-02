@@ -1,9 +1,6 @@
 #ifndef _NOTEPAD2_EDITLEXER_H_
 #define _NOTEPAD2_EDITLEXER_H_
 
-#if !defined(_WIN32_WINNT)
-#define _WIN32_WINNT 0x501
-#endif
 #include <windows.h>
 #include "Scintilla.h"
 #include "SciLexer.h"
@@ -11,6 +8,7 @@
 #define	MULTI_STYLE(a, b, c, d)	((a) | ((b) << 8) | ((c) << 16) | ((d) << 24))
 #define	NUMKEYWORD				(KEYWORDSET_MAX + 1)
 
+// C4200: zero-sized array in struct/union; C4201: nameless struct/union;
 #pragma warning(push)
 #pragma warning(disable: 4200 4201)
 
@@ -40,7 +38,7 @@ typedef struct _editlexer {
 } EDITLEXER, *PEDITLEXER;
 
 
-#pragma warning(pop)
+#pragma warning(pop) // C4200, C4201
 
 
 // NP2LEX_, rid for EDITLEXERs

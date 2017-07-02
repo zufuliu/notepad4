@@ -19,10 +19,6 @@
 *
 *
 ******************************************************************************/
-
-#if !defined(_WIN32_WINNT)
-#define _WIN32_WINNT 0x501
-#endif
 #include <windows.h>
 #include <shlwapi.h>
 #include <shlobj.h>
@@ -33,8 +29,6 @@
 #include "Helpers.h"
 #include "resource.h"
 
-#pragma warning(push)
-#pragma warning(disable: 4100 4244 4706)
 
 #ifndef NDEBUG
 void DLog(const char* fmt, ...)
@@ -487,7 +481,7 @@ void SetWindowTransparentMode(HWND hwnd, BOOL bTransparentMode)
 {
 	if (bTransparentMode) {
 		FARPROC fp;
-		if ((fp = GetProcAddress(GetModuleHandle(L"User32"), "SetLayeredWindowAttributes"))) {
+		if ((fp = GetProcAddress(GetModuleHandle(L"User32"), "SetLayeredWindowAttributes")) != NULL) {
 			int	 iAlphaPercent;
 			BYTE bAlpha;
 			SetWindowLongPtr(hwnd, GWL_EXSTYLE, GetWindowLongPtr(hwnd, GWL_EXSTYLE) | WS_EX_LAYERED);
@@ -497,7 +491,7 @@ void SetWindowTransparentMode(HWND hwnd, BOOL bTransparentMode)
 			if (iAlphaPercent < 0 || iAlphaPercent > 100) {
 				iAlphaPercent = 75;
 			}
-			bAlpha = iAlphaPercent * 255 / 100;
+			bAlpha = (BYTE)(iAlphaPercent * 255 / 100);
 
 			fp(hwnd, 0, bAlpha, LWA_ALPHA);
 		}
@@ -899,7 +893,7 @@ int Toolbar_SetButtons(HWND hwnd, int cmdBase, LPCWSTR lpszButtons, LPCTBBUTTON 
 	ZeroMemory(tchButtons, COUNTOF(tchButtons) * sizeof(WCHAR));
 	lstrcpyn(tchButtons, lpszButtons, COUNTOF(tchButtons) - 2);
 	TrimString(tchButtons);
-	while ((p = StrStr(tchButtons, L"	 "))) {
+	while ((p = StrStr(tchButtons, L"	 ")) != NULL) {
 		MoveMemory((WCHAR *)p, (WCHAR *)p + 1, (lstrlen(p) + 1) * sizeof(WCHAR));
 	}
 
@@ -1414,7 +1408,7 @@ void PrepareFilterStr(LPWSTR lpFilter)
 void StrTab2Space(LPWSTR lpsz)
 {
 	WCHAR *c = lpsz;
-	while ((c = StrChr(lpsz, L'\t'))) {
+	while ((c = StrChr(lpsz, L'\t')) != NULL) {
 		*c = L' ';
 	}
 }
@@ -1427,7 +1421,7 @@ void StrTab2Space(LPWSTR lpsz)
 void PathFixBackslashes(LPWSTR lpsz)
 {
 	WCHAR *c = lpsz;
-	while ((c = StrChr(c, L'/'))) {
+	while ((c = StrChr(c, L'/')) != NULL) {
 		if (*CharPrev(lpsz, c) == L':' && *CharNext(c) == L'/') {
 			c += 2;
 		} else {
@@ -2453,6 +2447,5 @@ VOID RestoreWndFromTray(HWND hWnd)
 	// properly until DAR finished
 }
 
-#pragma warning(pop)
 
 // End of Helpers.c

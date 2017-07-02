@@ -17,9 +17,6 @@
 *
 *
 ******************************************************************************/
-#if !defined(_WIN32_WINNT)
-#define _WIN32_WINNT 0x0501
-#endif
 #include <windows.h>
 #include <commctrl.h>
 #include <shlobj.h>
@@ -34,8 +31,6 @@
 #include "metapath.h"
 #include "resource.h"
 
-#pragma warning(push)
-#pragma warning(disable: 4100 4204 4706 4996)
 
 /******************************************************************************
 *
@@ -215,7 +210,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInst, LPSTR lpCmdLine, in
 		return FALSE;
 	}
 
-	if (!(hwnd = InitInstance(hInstance, lpCmdLine, nCmdShow))) {
+	if ((hwnd = InitInstance(hInstance, lpCmdLine, nCmdShow)) == NULL) {
 		return FALSE;
 	}
 
@@ -879,7 +874,7 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance)
 		if (!SearchPath(NULL, tchToolbarBitmapHot, NULL, COUNTOF(szTmp), szTmp, NULL)) {
 			lstrcpy(szTmp, tchToolbarBitmapHot);
 		}
-		if (hbmp = LoadImage(NULL, szTmp, IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION | LR_LOADFROMFILE)) {
+		if ((hbmp = LoadImage(NULL, szTmp, IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION | LR_LOADFROMFILE)) != NULL) {
 			GetObject(hbmp, sizeof(BITMAP), &bmp);
 			himl = ImageList_Create(bmp.bmWidth / NUMTOOLBITMAPS, bmp.bmHeight, ILC_COLOR32 | ILC_MASK, 0, 0);
 			ImageList_AddMasked(himl, hbmp, CLR_DEFAULT);
@@ -894,7 +889,7 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance)
 		if (!SearchPath(NULL, tchToolbarBitmapDisabled, NULL, COUNTOF(szTmp), szTmp, NULL)) {
 			lstrcpy(szTmp, tchToolbarBitmapDisabled);
 		}
-		if (hbmp = LoadImage(NULL, szTmp, IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION | LR_LOADFROMFILE)) {
+		if ((hbmp = LoadImage(NULL, szTmp, IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION | LR_LOADFROMFILE)) == NULL) {
 			GetObject(hbmp, sizeof(BITMAP), &bmp);
 			himl = ImageList_Create(bmp.bmWidth / NUMTOOLBITMAPS, bmp.bmHeight, ILC_COLOR32 | ILC_MASK, 0, 0);
 			ImageList_AddMasked(himl, hbmp, CLR_DEFAULT);
@@ -1961,7 +1956,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam)
 				if (PathGetLnkPath(dli.szFileName, szFullPath, COUNTOF(szFullPath))) {
 					if (PathFileExists(szFullPath)) {
 						lstrcpy(szDir, szFullPath);
-						if (p = StrRChr(szDir, NULL, L'\\')) {
+						if ((p = StrRChr(szDir, NULL, L'\\')) != NULL) {
 							*(p + 1) = 0;
 							if (!PathIsRoot(szDir)) {
 								*p = 0;
@@ -3022,7 +3017,7 @@ int CreateIniFileEx(LPCWSTR lpszIniFile)
 		HANDLE hFile;
 		WCHAR *pwchTail;
 
-		if (pwchTail = StrRChrW(lpszIniFile, NULL, L'\\')) {
+		if ((pwchTail = StrRChrW(lpszIniFile, NULL, L'\\')) != NULL) {
 			*pwchTail = 0;
 			SHCreateDirectoryEx(NULL, lpszIniFile, NULL);
 			*pwchTail = L'\\';
@@ -3094,7 +3089,7 @@ BOOL DisplayPath(LPCWSTR lpPath, UINT uIdError)
 
 			SHGetFileInfo(szPath, 0, &shfi, sizeof(SHFILEINFO), SHGFI_DISPLAYNAME);
 
-			if (p = StrRChr(szPath, NULL, L'\\')) {
+			if ((p = StrRChr(szPath, NULL, L'\\')) != NULL) {
 				*(p + 1) = 0;
 				if (!PathIsRoot(szPath)) {
 					*p = 0;
@@ -3178,7 +3173,7 @@ BOOL DisplayLnkFile(LPCWSTR pszLnkFile)
 
 			SHGetFileInfo(szPath, 0, &shfi, sizeof(SHFILEINFO), SHGFI_DISPLAYNAME);
 
-			if (p = StrRChr(szPath, NULL, L'\\')) {
+			if ((p = StrRChr(szPath, NULL, L'\\')) != NULL) {
 				*(p + 1) = 0;
 				if (!PathIsRoot(szPath)) {
 					*p = 0;
@@ -3714,6 +3709,5 @@ void SnapToDefaultPos(HWND hwnd)
 	SetWindowPlacement(hwnd, &wndpl);
 }
 
-#pragma warning(pop)
 
 ///  End of metapath.c  \\\

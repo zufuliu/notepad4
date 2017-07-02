@@ -18,9 +18,6 @@
 *
 *
 ******************************************************************************/
-#if !defined(_WIN32_WINNT)
-#define _WIN32_WINNT 0x501
-#endif
 #include <windows.h>
 #include <shlwapi.h>
 #include <commctrl.h>
@@ -32,8 +29,6 @@ extern "C" {
 }
 #include "resource.h"
 
-#pragma warning(push)
-#pragma warning(disable: 4706)
 
 extern "C" HINSTANCE g_hInstance;
 
@@ -480,7 +475,7 @@ extern "C" UINT_PTR CALLBACK PageSetupHook(HWND hwnd, UINT uiMsg, WPARAM wParam,
 		GetString(IDS_PRINT_HEADER, tch, COUNTOF(tch));
 		lstrcat(tch, L"|");
 		p1 = tch;
-		while ((p2 = StrChr(p1, L'|'))) {
+		while ((p2 = StrChr(p1, L'|')) != NULL) {
 			*p2++ = L'\0';
 			if (*p1) {
 				SendDlgItemMessage(hwnd, 32, CB_ADDSTRING, 0, (LPARAM)p1);
@@ -493,7 +488,7 @@ extern "C" UINT_PTR CALLBACK PageSetupHook(HWND hwnd, UINT uiMsg, WPARAM wParam,
 		GetString(IDS_PRINT_FOOTER, tch, COUNTOF(tch));
 		lstrcat(tch, L"|");
 		p1 = tch;
-		while ((p2 = StrChr(p1, L'|'))) {
+		while ((p2 = StrChr(p1, L'|')) != NULL) {
 			*p2++ = L'\0';
 			if (*p1) {
 				SendDlgItemMessage(hwnd, 33, CB_ADDSTRING, 0, (LPARAM)p1);
@@ -506,7 +501,7 @@ extern "C" UINT_PTR CALLBACK PageSetupHook(HWND hwnd, UINT uiMsg, WPARAM wParam,
 		GetString(IDS_PRINT_COLOR, tch, COUNTOF(tch));
 		lstrcat(tch, L"|");
 		p1 = tch;
-		while ((p2 = StrChr(p1, L'|'))) {
+		while ((p2 = StrChr(p1, L'|')) != NULL) {
 			*p2++ = L'\0';
 			if (*p1) {
 				SendDlgItemMessage(hwnd, 34, CB_ADDSTRING, 0, (LPARAM)p1);
@@ -526,16 +521,16 @@ extern "C" UINT_PTR CALLBACK PageSetupHook(HWND hwnd, UINT uiMsg, WPARAM wParam,
 
 	case WM_COMMAND:
 		if (LOWORD(wParam) == IDOK) {
-			LONG lPos = SendDlgItemMessage(hwnd, 31, UDM_GETPOS, 0, 0);
+			LONG lPos = (LONG)SendDlgItemMessage(hwnd, 31, UDM_GETPOS, 0, 0);
 			if (HIWORD(lPos) == 0) {
 				iPrintZoom = (int)(short)LOWORD(lPos);
 			} else {
 				iPrintZoom = 0;
 			}
 
-			iPrintHeader = SendDlgItemMessage(hwnd, 32, CB_GETCURSEL, 0, 0);
-			iPrintFooter = SendDlgItemMessage(hwnd, 33, CB_GETCURSEL, 0, 0);
-			iPrintColor	 = SendDlgItemMessage(hwnd, 34, CB_GETCURSEL, 0, 0);
+			iPrintHeader = (int)SendDlgItemMessage(hwnd, 32, CB_GETCURSEL, 0, 0);
+			iPrintFooter = (int)SendDlgItemMessage(hwnd, 33, CB_GETCURSEL, 0, 0);
+			iPrintColor	 = (int)SendDlgItemMessage(hwnd, 34, CB_GETCURSEL, 0, 0);
 		}
 		break;
 
@@ -613,6 +608,5 @@ extern "C" void EditPrintInit()
 	}
 }
 
-#pragma warning(pop)
 
 // End of Print.cpp

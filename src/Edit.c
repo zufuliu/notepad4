@@ -17,9 +17,6 @@
 *
 *
 ******************************************************************************/
-#if !defined(_WIN32_WINNT)
-#define _WIN32_WINNT 0x501
-#endif
 #include <windows.h>
 #include <shlwapi.h>
 #include <commctrl.h>
@@ -33,8 +30,6 @@
 #include "SciCall.h"
 #include "resource.h"
 
-#pragma warning(push)
-#pragma warning(disable: 4100 4204 4305 4701 4706)
 
 extern HWND hwndMain;
 extern HWND hwndEdit;
@@ -442,7 +437,7 @@ BOOL EditLoadFile(HWND hwnd, LPCWSTR pszFile, BOOL bSkipEncodingDetection,
 	//char	*cp;
 	int _iDefaultEncoding;
 
-	BOOL bBOM;
+	BOOL bBOM = FALSE;
 	BOOL bReverse = FALSE;
 
 	BOOL bPreferOEM = FALSE;
@@ -1289,7 +1284,9 @@ void EditEscapeCChars(HWND hwnd)
 
 	if (SendMessage(hwnd, SCI_GETSELECTIONEND, 0, 0) - SendMessage(hwnd, SCI_GETSELECTIONSTART, 0, 0)) {
 		if (SC_SEL_RECTANGLE != SendMessage(hwnd, SCI_GETSELECTIONMODE, 0, 0)) {
-			EDITFINDREPLACE efr = { "", "", "", "", 0, 0, 0, 0, 0, 0, hwnd };
+			EDITFINDREPLACE efr = {
+				.hwnd = hwnd,
+			};
 
 			SendMessage(hwnd, SCI_BEGINUNDOACTION, 0, 0);
 
@@ -1322,7 +1319,9 @@ void EditUnescapeCChars(HWND hwnd)
 
 	if (SendMessage(hwnd, SCI_GETSELECTIONEND, 0, 0) - SendMessage(hwnd, SCI_GETSELECTIONSTART, 0, 0)) {
 		if (SC_SEL_RECTANGLE != SendMessage(hwnd, SCI_GETSELECTIONMODE, 0, 0)) {
-			EDITFINDREPLACE efr = { "", "", "", "", 0, 0, 0, 0, 0, 0, hwnd };
+			EDITFINDREPLACE efr = {
+				.hwnd = hwnd,
+			};
 
 			SendMessage(hwnd, SCI_BEGINUNDOACTION, 0, 0);
 
@@ -1362,7 +1361,9 @@ void EditEscapeXHTMLChars(HWND hwnd)
 {
 	if (SendMessage(hwnd, SCI_GETSELECTIONEND, 0, 0) - SendMessage(hwnd, SCI_GETSELECTIONSTART, 0, 0)) {
 		if (SC_SEL_RECTANGLE != SendMessage(hwnd, SCI_GETSELECTIONMODE, 0, 0)) {
-			EDITFINDREPLACE efr = { "", "", "", "", 0, 0, 0, 0, 0, 0, hwnd };
+			EDITFINDREPLACE efr = {
+				.hwnd = hwnd,
+			};
 
 			SendMessage(hwnd, SCI_BEGINUNDOACTION, 0, 0);
 
@@ -1412,7 +1413,9 @@ void EditUnescapeXHTMLChars(HWND hwnd)
 {
 	if (SendMessage(hwnd, SCI_GETSELECTIONEND, 0, 0) - SendMessage(hwnd, SCI_GETSELECTIONSTART, 0, 0)) {
 		if (SC_SEL_RECTANGLE != SendMessage(hwnd, SCI_GETSELECTIONMODE, 0, 0)) {
-			EDITFINDREPLACE efr = { "", "", "", "", 0, 0, 0, 0, 0, 0, hwnd };
+			EDITFINDREPLACE efr = {
+				.hwnd = hwnd,
+			};
 
 			SendMessage(hwnd, SCI_BEGINUNDOACTION, 0, 0);
 
@@ -2055,7 +2058,7 @@ void EditSpacesToTabs(HWND hwnd, int nTabWidth, BOOL bOnlyIndentingWS)
 	iLine = (int)SendMessage(hwnd, SCI_LINEFROMPOSITION, (WPARAM)iSelStart, 0);
 	iSelStart = (int)SendMessage(hwnd, SCI_POSITIONFROMLINE, (WPARAM)iLine, 0);
 
-	iSelCount = SendMessage(hwnd, SCI_GETSELTEXT, 0, 0);
+	iSelCount = (int)SendMessage(hwnd, SCI_GETSELTEXT, 0, 0);
 
 	pszText = GlobalAlloc(GPTR, iSelCount);
 	if (pszText == NULL) {
@@ -2444,7 +2447,7 @@ void EditModifyLines(HWND hwnd, LPCWSTR pwszPrefix, LPCWSTR pwszAppend)
 
 		if (lstrlenA(mszPrefix1)) {
 			p = mszPrefix1;
-			while (!bPrefixNum && (p = StrStrA(p, "$("))) {
+			while (!bPrefixNum && (p = StrStrA(p, "$(")) != NULL) {
 				if (StrCmpNA(p, "$(I)", CSTRLEN("$(I)")) == 0) {
 					*p = 0;
 					StrCpyA(mszPrefix2, p + CSTRLEN("$(I)"));
@@ -2506,7 +2509,7 @@ void EditModifyLines(HWND hwnd, LPCWSTR pwszPrefix, LPCWSTR pwszAppend)
 
 		if (lstrlenA(mszAppend1)) {
 			p = mszAppend1;
-			while (!bAppendNum && (p = StrStrA(p, "$("))) {
+			while (!bAppendNum && (p = StrStrA(p, "$(")) != NULL) {
 				if (StrCmpNA(p, "$(I)", CSTRLEN("$(I)")) == 0) {
 					*p = 0;
 					StrCpyA(mszAppend2, p + CSTRLEN("$(I)"));
@@ -3049,7 +3052,7 @@ void EditToggleLineComments(HWND hwnd, LPCWSTR pwszComment, BOOL bInsertAtStart)
 				case 2:
 					iCommentPos = iIndentPos;
 					// a line with [space/tab] comment only
-					if ((ch = (int)SendMessage(hwnd, SCI_GETCHARAT, (WPARAM)(iIndentPos + cchComment), 0)) && (ch == '\n' || ch == '\r'))
+					if ((ch = (int)SendMessage(hwnd, SCI_GETCHARAT, (WPARAM)(iIndentPos + cchComment), 0)) != '\0' && (ch == '\n' || ch == '\r'))
 						iCommentPos = (int)SendMessage(hwnd, SCI_POSITIONFROMLINE, (WPARAM)iLine, 0);
 					SendMessage(hwnd, SCI_SETTARGETSTART, (WPARAM)iCommentPos, 0);
 					SendMessage(hwnd, SCI_SETTARGETEND, (WPARAM)(iIndentPos + cchComment), 0);
@@ -3057,7 +3060,7 @@ void EditToggleLineComments(HWND hwnd, LPCWSTR pwszComment, BOOL bInsertAtStart)
 					break;
 				case 1:
 					iCommentPos = (int)SendMessage(hwnd, SCI_FINDCOLUMN, (WPARAM)iLine, (LPARAM)iCommentCol);
-					if ((ch = (int)SendMessage(hwnd, SCI_GETCHARAT, (WPARAM)(iCommentPos), 0)) && (ch == '\t' || ch == ' ')) {
+					if ((ch = (int)SendMessage(hwnd, SCI_GETCHARAT, (WPARAM)(iCommentPos), 0)) != '\0' && (ch == '\t' || ch == ' ')) {
 						SendMessage(hwnd, SCI_INSERTTEXT, (WPARAM)iCommentPos, (LPARAM)mszComment);
 					}
 					break;
@@ -3121,16 +3124,16 @@ void EditPadWithSpaces(HWND hwnd, BOOL bSkipEmpty, BOOL bNoUndoGroup)
 	BOOL bIsRectangular = FALSE;
 	BOOL bReducedSelection = FALSE;
 
-	int iSelStart;
-	int iSelEnd;
+	int iSelStart = 0;
+	int iSelEnd = 0;
 
-	int iLineStart;
-	int iLineEnd;
+	int iLineStart = 0;
+	int iLineEnd = 0;
 
-	int iRcCurLine;
-	int iRcAnchorLine;
-	int iRcCurCol;
-	int iRcAnchorCol;
+	int iRcCurLine = 0;
+	int iRcAnchorLine = 0;
+	int iRcCurCol = 0;
+	int iRcAnchorCol = 0;
 
 	if (SC_SEL_RECTANGLE != SendMessage(hwnd, SCI_GETSELECTIONMODE, 0, 0)) {
 		iSelStart = (int)SendMessage(hwnd, SCI_GETSELECTIONSTART, 0, 0);
@@ -3359,7 +3362,11 @@ void EditStripTrailingBlanks(HWND hwnd, BOOL bIgnoreSelection)
 	if (!bIgnoreSelection &&
 			(SendMessage(hwnd, SCI_GETSELECTIONEND, 0, 0) - SendMessage(hwnd, SCI_GETSELECTIONSTART, 0, 0) != 0)) {
 		if (SC_SEL_RECTANGLE != SendMessage(hwnd, SCI_GETSELECTIONMODE, 0, 0)) {
-			EDITFINDREPLACE efrTrim = { "[ \t]+$", "", "", "", SCFIND_REGEXP, 0, 0, 0, 0, 0, hwnd };
+			EDITFINDREPLACE efrTrim = {
+				.szFind = "[ \t]+$",
+				.fuFlags = SCFIND_REGEXP,
+				.hwnd = hwnd,
+			};
 			EditReplaceAllInSelection(hwnd, &efrTrim, FALSE);
 		} else {
 			MsgBox(MBWARN, IDS_SELRECT);
@@ -3401,7 +3408,11 @@ void EditStripLeadingBlanks(HWND hwnd, BOOL bIgnoreSelection)
 	if (!bIgnoreSelection &&
 			(SendMessage(hwnd, SCI_GETSELECTIONEND, 0, 0) - SendMessage(hwnd, SCI_GETSELECTIONSTART, 0, 0) != 0)) {
 		if (SC_SEL_RECTANGLE != SendMessage(hwnd, SCI_GETSELECTIONMODE, 0, 0)) {
-			EDITFINDREPLACE efrTrim = { "^[ \t]+", "", "", "", SCFIND_REGEXP, 0, 0, 0, 0, 0, hwnd };
+			EDITFINDREPLACE efrTrim = {
+				.szFind = "^[ \t]+",
+				.fuFlags = SCFIND_REGEXP,
+				.hwnd = hwnd,
+			};
 			EditReplaceAllInSelection(hwnd, &efrTrim, FALSE);
 		} else {
 			MsgBox(MBWARN, IDS_SELRECT);
@@ -4001,16 +4012,16 @@ void EditSortLines(HWND hwnd, int iSortFlags)
 {
 	int iCurPos;
 	int iAnchorPos;
-	int iSelStart;
+	int iSelStart = 0;
 	int iLineStart;
 	int iLineEnd;
 	int iLineCount;
 
 	BOOL bIsRectangular = FALSE;
-	int iRcCurLine;
-	int iRcAnchorLine;
-	int iRcCurCol;
-	int iRcAnchorCol;
+	int iRcCurLine = 0;
+	int iRcAnchorLine = 0;
+	int iRcCurCol = 0;
+	int iRcAnchorCol = 0;
 
 	int	 i, iLine;
 	int	 cchTotal = 0;
@@ -5792,7 +5803,7 @@ INT_PTR CALLBACK EditModifyLinesDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPA
 		hFontHover = CreateFontIndirect(&lf);
 
 		hCursorNormal = LoadCursor(NULL, MAKEINTRESOURCE(IDC_ARROW));
-		if (!(hCursorHover = LoadCursor(NULL, MAKEINTRESOURCE(IDC_HAND)))) {
+		if ((hCursorHover = LoadCursor(NULL, MAKEINTRESOURCE(IDC_HAND))) == NULL) {
 			hCursorHover = LoadCursor(g_hInstance, MAKEINTRESOURCE(IDC_ARROW));
 		}
 
@@ -6588,7 +6599,7 @@ BOOL FileVars_ParseInt(char *pszData, char *pszName, int *piValue)
 	char tch[32];
 	char *pvStart = pszData;
 
-	while ((pvStart = StrStrIA(pvStart, pszName))) {
+	while ((pvStart = StrStrIA(pvStart, pszName)) != NULL) {
 		char chPrev = (pvStart > pszData) ? *(pvStart - 1) : 0;
 		if (!IsCharAlphaNumericA(chPrev) && chPrev != '-' && chPrev != '_') {
 			pvStart += lstrlenA(pszName);
@@ -6651,7 +6662,7 @@ BOOL FileVars_ParseStr(char *pszData, char *pszName, char *pszValue, int cchValu
 	char *pvStart = pszData;
 	BOOL bQuoted = FALSE;
 
-	while ((pvStart = StrStrIA(pvStart, pszName))) {
+	while ((pvStart = StrStrIA(pvStart, pszName)) != NULL) {
 		char chPrev = (pvStart > pszData) ? *(pvStart - 1) : 0;
 		if (!IsCharAlphaNumericA(chPrev) && chPrev != '-' && chPrev != '_') {
 			pvStart += lstrlenA(pszName);
@@ -6827,7 +6838,5 @@ BOOL FileVars_ParseStr(char *pszData, char *pszName, char *pszValue, int cchValu
 //	return CallWindowProcW(pfnSciWndProc, hwnd, umsg, wParam, lParam);
 //}
 
-
-#pragma warning(pop)
 
 // End of Edit.c

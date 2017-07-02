@@ -242,8 +242,9 @@ void WordList_GetList(struct WordList *pWList, char* *pList)
 
 #else
 
+// C4201: nameless struct/union
 #pragma warning(push)
-#pragma warning(disable: 4201) // C4201: nonstandard extension used : nameless struct/union
+#pragma warning(disable: 4201)
 
 // Tree
 struct WordNode {
@@ -261,6 +262,8 @@ struct WordNode {
 	int len;
 	int level;
 };
+
+#pragma warning(pop) // C4201
 
 #define NP2_TREE_HEIGHT_LIMIT	16
 
@@ -470,7 +473,6 @@ void WordList_GetList(struct WordList *pWList, char* *pList)
 	WordList_Free(pWList);
 }
 
-#pragma warning(pop) // C4201
 #endif
 
 struct WordList *WordList_Alloc(LPCSTR pRoot, int iRootLen, BOOL bIgnoreCase) {

@@ -25,12 +25,6 @@
 #if !defined(NOMINMAX)
 #define NOMINMAX
 #endif
-#ifndef _WIN32_WINNT
-#define _WIN32_WINNT 0x0501
-#endif
-#ifndef WINVER
-#define WINVER 0x0501
-#endif
 #include <windows.h>
 #include <commctrl.h>
 #include <richedit.h>

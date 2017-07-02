@@ -17,17 +17,12 @@
 *
 *
 ******************************************************************************/
-#if !defined(_WIN32_WINNT)
-#define _WIN32_WINNT 0x501
-#endif
 #include <windows.h>
 #include <shlwapi.h>
 #include <shlobj.h>
 #include <commctrl.h>
 #include "Dlapi.h"
 
-#pragma warning(push)
-#pragma warning(disable: 4100 4702 4706)
 
 //==== DirList ================================================================
 
@@ -360,7 +355,6 @@ DWORD WINAPI DirList_IconThread(LPVOID lpParam)
 	if (!lpdl->lpsf) {
 		SetEvent(lpdl->hTerminatedThread);
 		ExitThread(0);
-		return 0;
 	}
 
 	hwnd = lpdl->hwnd;
@@ -434,7 +428,6 @@ DWORD WINAPI DirList_IconThread(LPVOID lpParam)
 
 	SetEvent(lpdl->hTerminatedThread);
 	ExitThread(0);
-	return 0;
 }
 
 
@@ -823,7 +816,7 @@ void DirList_CreateFilter(PDL_FILTER pdlf, LPCWSTR lpszFileSpec, BOOL bExcludeFi
 	pdlf->nCount = 1;
 	pdlf->pFilter[0] = &pdlf->tFilterBuf[0];// Zeile zum Ausprobieren
 
-	while ((p = StrChr(pdlf->pFilter[pdlf->nCount - 1], L';'))) {
+	while ((p = StrChr(pdlf->pFilter[pdlf->nCount - 1], L';')) != NULL) {
 		*p = L'\0';			// Replace L';' by L'\0'
 		pdlf->pFilter[pdlf->nCount] = (p + 1);	// Next position after L';'
 		pdlf->nCount++;		// Increase number of filters
@@ -1337,6 +1330,5 @@ BOOL IL_GetDisplayName(LPSHELLFOLDER lpsf, LPCITEMIDLIST pidl,
 	return FALSE;
 }
 
-#pragma warning(pop)
 
 // End of Dlapi.c

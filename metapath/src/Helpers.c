@@ -17,9 +17,6 @@
 *
 *
 ******************************************************************************/
-#if !defined(_WIN32_WINNT)
-#define _WIN32_WINNT 0x0501
-#endif
 #include <windows.h>
 #include <shlobj.h>
 #include <shlwapi.h>
@@ -31,8 +28,6 @@
 #include "helpers.h"
 #include "resource.h"
 
-#pragma warning(push)
-#pragma warning(disable: 4100 4706 4996)
 
 //=============================================================================
 //
@@ -296,7 +291,7 @@ BOOL SetTheme(HWND hwnd, LPCWSTR lpszTheme)
 	HMODULE hModUxTheme;
 	FARPROC pfnSetWindowTheme;
 
-	if (hModUxTheme = GetModuleHandle(L"uxtheme")) {
+	if ((hModUxTheme = GetModuleHandle(L"uxtheme")) != NULL) {
 		pfnSetWindowTheme = GetProcAddress(hModUxTheme, "SetWindowTheme");
 
 		if (pfnSetWindowTheme) {
@@ -503,7 +498,7 @@ void SetWindowTransparentMode(HWND hwnd, BOOL bTransparentMode)
 	BYTE bAlpha;
 
 	if (bTransparentMode) {
-		if (fp = GetProcAddress(GetModuleHandle(L"User32"), "SetLayeredWindowAttributes")) {
+		if ((fp = GetProcAddress(GetModuleHandle(L"User32"), "SetLayeredWindowAttributes")) != NULL) {
 			SetWindowLongPtr(hwnd, GWL_EXSTYLE, GetWindowLongPtr(hwnd, GWL_EXSTYLE) | WS_EX_LAYERED);
 
 			// get opacity level from registry
@@ -511,7 +506,7 @@ void SetWindowTransparentMode(HWND hwnd, BOOL bTransparentMode)
 			if (iAlphaPercent < 0 || iAlphaPercent > 100) {
 				iAlphaPercent = 75;
 			}
-			bAlpha = iAlphaPercent * 255 / 100;
+			bAlpha = (BYTE)(iAlphaPercent * 255 / 100);
 
 			fp(hwnd, 0, bAlpha, LWA_ALPHA);
 		}
@@ -566,7 +561,7 @@ int Toolbar_SetButtons(HWND hwnd, int cmdBase, LPCWSTR lpszButtons, LPCTBBUTTON 
 	ZeroMemory(tchButtons, COUNTOF(tchButtons)*sizeof(tchButtons[0]));
 	lstrcpyn(tchButtons, lpszButtons, COUNTOF(tchButtons) - 2);
 	TrimString(tchButtons);
-	while (p = StrStr(tchButtons, L"  ")) {
+	while ((p = StrStr(tchButtons, L"  ")) != NULL) {
 		MoveMemory((WCHAR *)p, (WCHAR *)p + 1, (lstrlen(p) + 1) * sizeof(WCHAR));
 	}
 
@@ -1031,7 +1026,7 @@ void PrepareFilterStr(LPWSTR lpFilter)
 void StrTab2Space(LPWSTR lpsz)
 {
 	WCHAR *c = lpsz;
-	while (c = StrChr(lpsz, L'\t')) {
+	while ((c = StrChr(lpsz, L'\t')) != NULL) {
 		*c = L' ';
 	}
 }
@@ -1229,7 +1224,7 @@ BOOL ExecDDECommand(LPCWSTR lpszCmdLine, LPCWSTR lpszDDEMsg, LPCWSTR lpszDDEApp,
 	}
 
 	lstrcpyn(lpszDDEMsgBuf, lpszDDEMsg, COUNTOF(lpszDDEMsgBuf));
-	if (pSubst = StrStr(lpszDDEMsgBuf, L"%1")) {
+	if ((pSubst = StrStr(lpszDDEMsgBuf, L"%1")) != NULL) {
 		*(pSubst + 1) = L's';
 	}
 
@@ -1611,7 +1606,7 @@ BOOL GetThemedDialogFont(LPWSTR lpFaceName, WORD *wSize)
 	iLogPixelsY = GetDeviceCaps(hDC, LOGPIXELSY);
 	ReleaseDC(NULL, hDC);
 
-	if (hModUxTheme = GetModuleHandle(L"uxtheme.dll")) {
+	if ((hModUxTheme = GetModuleHandle(L"uxtheme.dll")) != NULL) {
 		if ((BOOL)(GetProcAddress(hModUxTheme, "IsAppThemed"))()) {
 			hTheme = (HTHEME)(INT_PTR)(GetProcAddress(hModUxTheme, "OpenThemeData"))(NULL, L"WINDOWSTYLE;WINDOW");
 			if (hTheme) {
@@ -1964,6 +1959,5 @@ VOID RestoreWndFromTray(HWND hwnd)
 	// properly until DAR finished
 }
 
-#pragma warning(pop)
 
 ///   End of Helpers.c   \\\

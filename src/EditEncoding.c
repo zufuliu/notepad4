@@ -1,8 +1,5 @@
 // Edit Encoding
 
-#if !defined(_WIN32_WINNT)
-#define _WIN32_WINNT 0x501
-#endif
 #include <windows.h>
 #include <shlwapi.h>
 #include <commctrl.h>
@@ -16,8 +13,6 @@
 #include "SciCall.h"
 #include "resource.h"
 
-#pragma warning(push)
-#pragma warning(disable: 4706)
 
 
 extern BOOL bSkipUnicodeDetection;
@@ -307,8 +302,8 @@ void Encoding_GetLabel(int iEncoding)
 		WCHAR *pwsz;
 		WCHAR wch[256] = L"";
 		GetString(mEncoding[iEncoding].idsName, wch, COUNTOF(wch));
-		if ((pwsz = StrChr(wch, L';'))) {
-			if ((pwsz = StrChr(CharNext(pwsz), L';'))) {
+		if ((pwsz = StrChr(wch, L';')) != NULL) {
+			if ((pwsz = StrChr(CharNext(pwsz), L';')) != NULL) {
 				pwsz = CharNext(pwsz);
 			}
 		}
@@ -412,9 +407,9 @@ void Encoding_AddToListView(HWND hwnd, int idSel, BOOL bRecodeOnly)
 			WCHAR *pwsz;
 
 			lvi.iItem = ListView_GetItemCount(hwnd);
-			if ((pwsz = StrChr(pEE[i].wch, L';'))) {
+			if ((pwsz = StrChr(pEE[i].wch, L';')) != NULL) {
 				StrCpyN(wchBuf, CharNext(pwsz), COUNTOF(wchBuf));
-				if ((pwsz = StrChr(wchBuf, L';'))) {
+				if ((pwsz = StrChr(wchBuf, L';')) != NULL) {
 					*pwsz = 0;
 				}
 			} else {
@@ -506,9 +501,9 @@ void Encoding_AddToComboboxEx(HWND hwnd, int idSel, BOOL bRecodeOnly)
 			WCHAR *pwsz;
 
 			cbei.iItem = SendMessage(hwnd, CB_GETCOUNT, 0, 0);
-			if ((pwsz = StrChr(pEE[i].wch, L';'))) {
+			if ((pwsz = StrChr(pEE[i].wch, L';')) != NULL) {
 				StrCpyN(wchBuf, CharNext(pwsz), COUNTOF(wchBuf));
-				if ((pwsz = StrChr(wchBuf, L';'))) {
+				if ((pwsz = StrChr(wchBuf, L';')) != NULL) {
 					*pwsz = 0;
 				}
 			} else {
@@ -853,6 +848,5 @@ int FileVars_GetEncoding(LPFILEVARS lpfv)
 }
 
 
-#pragma warning(pop)
 
 // End of EditEncoding.c
