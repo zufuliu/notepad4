@@ -68,6 +68,9 @@ extern	NP2ENCODING mEncoding[];
 extern LPMRULIST mruFind;
 extern LPMRULIST mruReplace;
 
+__forceinline BOOL IsEmptySelection(HWND hwnd) {
+	return SendMessage(hwnd, SCI_GETSELECTIONEND, 0, 0) == SendMessage(hwnd, SCI_GETSELECTIONSTART, 0, 0);
+}
 
 //=============================================================================
 //
@@ -1282,7 +1285,7 @@ void EditURLDecode(HWND hwnd)
 void EditEscapeCChars(HWND hwnd)
 {
 
-	if (SendMessage(hwnd, SCI_GETSELECTIONEND, 0, 0) - SendMessage(hwnd, SCI_GETSELECTIONSTART, 0, 0)) {
+	if (!IsEmptySelection(hwnd)) {
 		if (SC_SEL_RECTANGLE != SendMessage(hwnd, SCI_GETSELECTIONMODE, 0, 0)) {
 			EDITFINDREPLACE efr = {
 				.hwnd = hwnd,
@@ -1317,7 +1320,7 @@ void EditEscapeCChars(HWND hwnd)
 void EditUnescapeCChars(HWND hwnd)
 {
 
-	if (SendMessage(hwnd, SCI_GETSELECTIONEND, 0, 0) - SendMessage(hwnd, SCI_GETSELECTIONSTART, 0, 0)) {
+	if (!IsEmptySelection(hwnd)) {
 		if (SC_SEL_RECTANGLE != SendMessage(hwnd, SCI_GETSELECTIONMODE, 0, 0)) {
 			EDITFINDREPLACE efr = {
 				.hwnd = hwnd,
@@ -1359,7 +1362,7 @@ void EditUnescapeCChars(HWND hwnd)
 //
 void EditEscapeXHTMLChars(HWND hwnd)
 {
-	if (SendMessage(hwnd, SCI_GETSELECTIONEND, 0, 0) - SendMessage(hwnd, SCI_GETSELECTIONSTART, 0, 0)) {
+	if (!IsEmptySelection(hwnd)) {
 		if (SC_SEL_RECTANGLE != SendMessage(hwnd, SCI_GETSELECTIONMODE, 0, 0)) {
 			EDITFINDREPLACE efr = {
 				.hwnd = hwnd,
@@ -1411,7 +1414,7 @@ void EditEscapeXHTMLChars(HWND hwnd)
 //
 void EditUnescapeXHTMLChars(HWND hwnd)
 {
-	if (SendMessage(hwnd, SCI_GETSELECTIONEND, 0, 0) - SendMessage(hwnd, SCI_GETSELECTIONSTART, 0, 0)) {
+	if (!IsEmptySelection(hwnd)) {
 		if (SC_SEL_RECTANGLE != SendMessage(hwnd, SCI_GETSELECTIONMODE, 0, 0)) {
 			EDITFINDREPLACE efr = {
 				.hwnd = hwnd,
@@ -3359,21 +3362,20 @@ void EditStripLastCharacter(HWND hwnd)
 void EditStripTrailingBlanks(HWND hwnd, BOOL bIgnoreSelection)
 {
 	// Check if there is any selection... simply use a regular expression replace!
-	if (!bIgnoreSelection &&
-			(SendMessage(hwnd, SCI_GETSELECTIONEND, 0, 0) - SendMessage(hwnd, SCI_GETSELECTIONSTART, 0, 0) != 0)) {
+	if (!bIgnoreSelection && !IsEmptySelection(hwnd)) {
 		if (SC_SEL_RECTANGLE != SendMessage(hwnd, SCI_GETSELECTIONMODE, 0, 0)) {
 			EDITFINDREPLACE efrTrim = {
 				.szFind = "[ \t]+$",
 				.fuFlags = SCFIND_REGEXP,
 				.hwnd = hwnd,
 			};
-			EditReplaceAllInSelection(hwnd, &efrTrim, FALSE);
-		} else {
-			MsgBox(MBWARN, IDS_SELRECT);
+			if (EditReplaceAllInSelection(hwnd, &efrTrim, FALSE)) {
+				return;
+			}
 		}
 	}
 	// Code from SciTE...
-	else {
+	{
 		int line;
 		int maxLines;
 
@@ -3405,21 +3407,20 @@ void EditStripTrailingBlanks(HWND hwnd, BOOL bIgnoreSelection)
 void EditStripLeadingBlanks(HWND hwnd, BOOL bIgnoreSelection)
 {
 	// Check if there is any selection... simply use a regular expression replace!
-	if (!bIgnoreSelection &&
-			(SendMessage(hwnd, SCI_GETSELECTIONEND, 0, 0) - SendMessage(hwnd, SCI_GETSELECTIONSTART, 0, 0) != 0)) {
+	if (!bIgnoreSelection && !IsEmptySelection(hwnd)) {
 		if (SC_SEL_RECTANGLE != SendMessage(hwnd, SCI_GETSELECTIONMODE, 0, 0)) {
 			EDITFINDREPLACE efrTrim = {
 				.szFind = "^[ \t]+",
 				.fuFlags = SCFIND_REGEXP,
 				.hwnd = hwnd,
 			};
-			EditReplaceAllInSelection(hwnd, &efrTrim, FALSE);
-		} else {
-			MsgBox(MBWARN, IDS_SELRECT);
+			if (EditReplaceAllInSelection(hwnd, &efrTrim, FALSE)) {
+				return;
+			}
 		}
 	}
 	// Code from SciTE...
-	else {
+	{
 		int line;
 		int maxLines;
 
@@ -3434,9 +3435,9 @@ void EditStripLeadingBlanks(HWND hwnd, BOOL bIgnoreSelection)
 				i++;
 				ch = (char)SendMessage(hwnd, SCI_GETCHARAT, i, 0);
 			}
-			if (i < (lineEnd - 1)) {
-				SendMessage(hwnd, SCI_SETTARGETSTART, i + 1, 0);
-				SendMessage(hwnd, SCI_SETTARGETEND, lineEnd, 0);
+			if (i > lineStart) {
+				SendMessage(hwnd, SCI_SETTARGETSTART, lineStart, 0);
+				SendMessage(hwnd, SCI_SETTARGETEND, i, 0);
 				SendMessage(hwnd, SCI_REPLACETARGET, 0, (LPARAM)"");
 			}
 		}
