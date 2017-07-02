@@ -279,8 +279,8 @@ RGBAImage *RGBAImageSet::Get(int ident) {
 int RGBAImageSet::GetHeight() const {
 	if (height < 0) {
 		for (const std::pair<const int, std::unique_ptr<RGBAImage>> &image : images) {
- 			if (height < image.second->GetHeight()) {
- 				height = image.second->GetHeight();
+			if (height < image.second->GetHeight()) {
+				height = image.second->GetHeight();
 			}
 		}
 	}
@@ -291,8 +291,8 @@ int RGBAImageSet::GetHeight() const {
 int RGBAImageSet::GetWidth() const {
 	if (width < 0) {
 		for (const std::pair<const int, std::unique_ptr<RGBAImage>> &image : images) {
- 			if (width < image.second->GetWidth()) {
- 				width = image.second->GetWidth();
+			if (width < image.second->GetWidth()) {
+				width = image.second->GetWidth();
 			}
 		}
 	}

@@ -89,11 +89,11 @@ public:
 class LineState : public PerLine {
 	SplitVector<int> lineStates;
 public:
+	LineState() {
+	}
 	// Deleted so Worker objects can not be copied.
 	LineState(const LineState &) = delete;
 	void operator=(const LineState &) = delete;
-	LineState() {
-	}
 	virtual ~LineState();
 	void Init() override;
 	void InsertLine(Sci::Line line) override;
@@ -107,11 +107,11 @@ public:
 class LineAnnotation : public PerLine {
 	SplitVector<std::unique_ptr<char []>> annotations;
 public:
+	LineAnnotation() {
+	}
 	// Deleted so Worker objects can not be copied.
 	LineAnnotation(const LineAnnotation &) = delete;
 	void operator=(const LineAnnotation &) = delete;
-	LineAnnotation() {
-	}
 	virtual ~LineAnnotation();
 	void Init() override;
 	void InsertLine(Sci::Line line) override;

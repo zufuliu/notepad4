@@ -775,7 +775,7 @@ void SurfaceGDI::AlphaRectangle(const PRectangle &rc, int cornerSize, const Colo
 		int width = static_cast<int>(rc.Width());
 		int height = static_cast<int>(rc.Height());
 		// Ensure not distorted too much by corners when small
-		cornerSize = std::min(cornerSize, std::min(width, height) / 2 - 2);
+		cornerSize = std::min(cornerSize, (std::min(width, height) / 2) - 2);
 		BITMAPINFO bpih = {{sizeof(BITMAPINFOHEADER), width, height, 1, 32, BI_RGB, 0, 0, 0, 0, 0}};
 		void *image = 0;
 		HBITMAP hbmMem = CreateDIBSection(hMemDC, &bpih,
@@ -1621,6 +1621,7 @@ void SurfaceD2D::MeasureWidths(const Font &font_, const char *s, int len, XYPOSI
 		}
 		position += clusterMetrics[ci].width;
 	}
+	PLATFORM_ASSERT(ti == static_cast<size_t>(tbuf.tlen));
 	if (unicodeMode) {
 		// Map the widths given for UTF-16 characters back onto the UTF-8 input string
 		int ui=0;

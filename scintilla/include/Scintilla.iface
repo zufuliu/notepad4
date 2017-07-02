@@ -1425,13 +1425,6 @@ get bool GetVScrollBar=2281(,)
 # Append a string to the end of the document without changing the selection.
 fun void AppendText=2282(int length, string text)
 
-# Is drawing done in two phases with backgrounds drawn before foregrounds?
-get bool GetTwoPhaseDraw=2283(,)
-
-# In twoPhaseDraw mode, drawing is performed in two phases, first the background
-# and then the foreground. This avoids chopping off characters that overlap the next run.
-set void SetTwoPhaseDraw=2284(bool twoPhase,)
-
 enu PhasesDraw=SC_PHASES_
 val SC_PHASES_ONE=0
 val SC_PHASES_TWO=1
@@ -2870,3 +2863,12 @@ set void SetKeysUnicode=2521(bool keysUnicode,)
 
 # Are keys always interpreted as Unicode?
 get bool GetKeysUnicode=2522(,)
+
+# Deprecated in 3.7.6
+
+# Is drawing done in two phases with backgrounds drawn before foregrounds?
+get bool GetTwoPhaseDraw=2283(,)
+
+# In twoPhaseDraw mode, drawing is performed in two phases, first the background
+# and then the foreground. This avoids chopping off characters that overlap the next run.
+set void SetTwoPhaseDraw=2284(bool twoPhase,)

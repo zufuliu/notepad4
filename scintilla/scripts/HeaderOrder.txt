@@ -98,6 +98,7 @@
 #include "OptionSet.h"
 #include "SparseState.h"
 #include "SubStyles.h"
+#include "DefaultLexer.h"
 #include "LexerBase.h"
 #include "LexerSimple.h"
 #include "LexerNoExceptions.h"

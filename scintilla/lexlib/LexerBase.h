@@ -21,17 +21,17 @@ protected:
 public:
 	LexerBase();
 	virtual ~LexerBase();
-	void SCI_METHOD Release();
-	int SCI_METHOD Version() const;
-	const char * SCI_METHOD PropertyNames() const;
-	int SCI_METHOD PropertyType(const char *name) const ;
-	const char * SCI_METHOD DescribeProperty(const char *name) const;
-	Sci_Position SCI_METHOD PropertySet(const char *key, const char *val);
-	const char * SCI_METHOD DescribeWordListSets() const;
-	Sci_Position SCI_METHOD WordListSet(int n, const char *wl);
-	void SCI_METHOD Lex(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, IDocument *pAccess) = 0;
-	void SCI_METHOD Fold(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, IDocument *pAccess) = 0;
-	void * SCI_METHOD PrivateCall(int operation, void *pointer);
+	void SCI_METHOD Release() override;
+	int SCI_METHOD Version() const override;
+	const char * SCI_METHOD PropertyNames() const override;
+	int SCI_METHOD PropertyType(const char *name) const override;
+	const char * SCI_METHOD DescribeProperty(const char *name) const override;
+	Sci_Position SCI_METHOD PropertySet(const char *key, const char *val) override;
+	const char * SCI_METHOD DescribeWordListSets() const override;
+	Sci_Position SCI_METHOD WordListSet(int n, const char *wl) override;
+	void SCI_METHOD Lex(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, IDocument *pAccess) override = 0;
+	void SCI_METHOD Fold(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, IDocument *pAccess) override = 0;
+	void * SCI_METHOD PrivateCall(int operation, void *pointer) override;
 };
 
 #ifdef SCI_NAMESPACE

@@ -20,7 +20,7 @@ namespace Scintilla {
 	#define SCI_METHOD
 #endif
 
-enum { dvOriginal=0, dvLineEnd=1 };
+enum { dvRelease4=2 };
 
 class IDocument {
 public:
@@ -35,7 +35,7 @@ public:
 	virtual int SCI_METHOD SetLevel(Sci_Position line, int level) = 0;
 	virtual int SCI_METHOD GetLineState(Sci_Position line) const = 0;
 	virtual int SCI_METHOD SetLineState(Sci_Position line, int state) = 0;
-	virtual void SCI_METHOD StartStyling(Sci_Position position, unsigned char mask) = 0;
+	virtual void SCI_METHOD StartStyling(Sci_Position position) = 0;
 	virtual bool SCI_METHOD SetStyleFor(Sci_Position length, unsigned char style) = 0;
 	virtual bool SCI_METHOD SetStyles(Sci_Position length, const unsigned char *styles) = 0;
 	virtual void SCI_METHOD DecorationSetCurrentIndicator(int indicator) = 0;
@@ -45,10 +45,6 @@ public:
 	virtual bool SCI_METHOD IsDBCSLeadByte(char ch) const = 0;
 	virtual const char * SCI_METHOD BufferPointer() = 0;
 	virtual int SCI_METHOD GetLineIndentation(Sci_Position line) const = 0;
-};
-
-class IDocumentWithLineEnd : public IDocument {
-public:
 	virtual Sci_Position SCI_METHOD LineEnd(Sci_Position line) const = 0;
 	virtual Sci_Position SCI_METHOD GetRelativePosition(Sci_Position positionStart, Sci_Position characterOffset) const = 0;
 	virtual int SCI_METHOD GetCharacterAndWidth(Sci_Position position, Sci_Position *pWidth) const = 0;

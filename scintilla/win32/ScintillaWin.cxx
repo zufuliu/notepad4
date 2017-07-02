@@ -1676,7 +1676,7 @@ sptr_t ScintillaWin::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam
 				Sci::Position nStart = static_cast<Sci::Position>(wParam);
 				Sci::Position nEnd = static_cast<Sci::Position>(lParam);
 				if (nStart == 0 && nEnd == -1) {
-					nEnd = pdoc->Length();
+					nEnd = static_cast<Sci::Position>(pdoc->Length());
 				}
 				if (nStart == -1) {
 					nStart = nEnd;	// Remove selection
@@ -1693,7 +1693,7 @@ sptr_t ScintillaWin::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam
 				Sci_CharacterRange *pCR = reinterpret_cast<Sci_CharacterRange *>(lParam);
 				sel.selType = Selection::selStream;
 				if (pCR->cpMin == 0 && pCR->cpMax == -1) {
-					SetSelection(pCR->cpMin, pdoc->Length());
+					SetSelection(pCR->cpMin, static_cast<Sci::Position>(pdoc->Length()));
 				} else {
 					SetSelection(pCR->cpMin, pCR->cpMax);
 				}
@@ -2679,11 +2679,11 @@ LRESULT ScintillaWin::ImeOnReconvert(LPARAM lParam) {
 	// Look around:   baseStart  <--  (|mainStart|  -- mainEnd)  --> baseEnd.
 	const Sci::Position mainStart = sel.RangeMain().Start().Position();
 	const Sci::Position mainEnd = sel.RangeMain().End().Position();
-	const Sci::Line curLine = pdoc->LineFromPosition(mainStart);
+	const Sci::Line curLine = static_cast<Sci::Line>(pdoc->LineFromPosition(mainStart));
 	if (curLine != pdoc->LineFromPosition(mainEnd))
 		return 0;
-	const Sci::Position baseStart = pdoc->LineStart(curLine);
-	const Sci::Position baseEnd = pdoc->LineEnd(curLine);
+	const Sci::Position baseStart = static_cast<Sci::Position>(pdoc->LineStart(curLine));
+	const Sci::Position baseEnd = static_cast<Sci::Position>(pdoc->LineEnd(curLine));
 	if ((baseStart == baseEnd) || (mainEnd > baseEnd))
 		return 0;
 
@@ -2743,7 +2743,7 @@ LRESULT ScintillaWin::ImeOnReconvert(LPARAM lParam) {
 		} else {
 			// Ensure docCompStart+docCompLen be not beyond lineEnd.
 			// since docCompLen by byte might break eol.
-			Sci::Position lineEnd = pdoc->LineEnd(pdoc->LineFromPosition(rBase));
+			Sci::Position lineEnd = static_cast<Sci::Position>(pdoc->LineEnd(pdoc->LineFromPosition(rBase)));
 			Sci::Position overflow = (docCompStart + docCompLen) - lineEnd;
 			if (overflow > 0) {
 				pdoc->DeleteChars(docCompStart, docCompLen - overflow);

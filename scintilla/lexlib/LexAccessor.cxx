@@ -72,17 +72,7 @@ bool LexAccessor::Match(Sci_Position pos, const char *s) {
 	return LexMatch(pos, *this, s);
 }
 Sci_Position LexAccessor::LineEnd(Sci_Position line) {
-	if (documentVersion >= dvLineEnd) {
-		return (static_cast<IDocumentWithLineEnd *>(pAccess))->LineEnd(line);
-	} else {
-		// Old interface means only '\r', '\n' and '\r\n' line ends.
-		Sci_Position startNext = pAccess->LineStart(line+1);
-		const char chLineEnd = SafeGetCharAt(startNext-1);
-		if (chLineEnd == '\n' && (SafeGetCharAt(startNext-2)  == '\r'))
-			return startNext - 2;
-		else
-			return startNext - 1;
-	}
+	return pAccess->LineEnd(line);
 }
 void LexAccessor::Flush() {
 	if (validLen > 0) {
@@ -92,7 +82,7 @@ void LexAccessor::Flush() {
 	}
 }
 void LexAccessor::StartAt(Sci_PositionU start) {
-	pAccess->StartStyling(start, static_cast<unsigned char>('\377'));
+	pAccess->StartStyling(start);
 	startPosStyling = start;
 }
 void LexAccessor::ColourTo(Sci_PositionU pos, int chAttr) {

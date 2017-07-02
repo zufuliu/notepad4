@@ -73,11 +73,8 @@ private:
 public:
 	explicit LexAccessor(IDocument *pAccess_);
 	char operator[](Sci_Position position);
-	IDocumentWithLineEnd *MultiByteAccess() const {
-		if (documentVersion >= dvLineEnd) {
-			return static_cast<IDocumentWithLineEnd *>(pAccess);
-		}
-		return 0;
+	IDocument *MultiByteAccess() const {
+		return pAccess;
 	}
 	/** Safe version of operator[], returning a defined value for invalid position. */
 	char SafeGetCharAt(Sci_Position position, char chDefault='\0');

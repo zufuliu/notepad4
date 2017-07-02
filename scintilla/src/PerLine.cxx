@@ -40,7 +40,7 @@ bool MarkerHandleSet::Empty() const {
 }
 
 int MarkerHandleSet::MarkValue() const {
- 	unsigned int m = 0;
+	unsigned int m = 0;
 	for (const MarkerHandleNumber &mhn : mhList) {
 		m |= (1 << mhn.number);
 	}
@@ -66,7 +66,7 @@ void MarkerHandleSet::RemoveHandle(int handle) {
 }
 
 bool MarkerHandleSet::RemoveNumber(int markerNum, bool all) {
- 	bool performedDeletion = false;
+	bool performedDeletion = false;
 	mhList.remove_if([&](const MarkerHandleNumber &mhn) {
 		if ((all || !performedDeletion) && (mhn.number == markerNum)) {
 			performedDeletion = true;

@@ -993,7 +993,7 @@ _label_identifier:
 				} else {
 					sc.SetState(SCE_C_OPERATOR);
 				}
-			} else if (isoperator(static_cast<char>(sc.ch)) || ((lexType == LEX_D || lexType == LEX_JS) && sc.ch == '$') ||	 sc.ch == '@'
+			} else if (isoperator(static_cast<char>(sc.ch)) || ((lexType == LEX_CS || lexType == LEX_D || lexType == LEX_JS) && sc.ch == '$') ||	 sc.ch == '@'
 				|| (lexType == LEX_PHP && sc.ch == '\\')) {
 				sc.SetState(SCE_C_OPERATOR);
 				isPragmaPreprocessor = false;

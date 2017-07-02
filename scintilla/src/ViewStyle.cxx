@@ -100,6 +100,7 @@ ViewStyle::ViewStyle(const ViewStyle &source) : markers(MARKER_MAX + 1), indicat
 	nextExtendedStyle = source.nextExtendedStyle;
 	markers = source.markers;
 	CalcLargestMarkerHeight();
+
 	indicators = source.indicators;
 
 	indicatorsDynamic = source.indicatorsDynamic;

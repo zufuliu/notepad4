@@ -45,6 +45,7 @@ class LexerLibrary {
 public:
 	explicit LexerLibrary(const char *moduleName_);
 	~LexerLibrary();
+
 	std::string moduleName;
 };
 

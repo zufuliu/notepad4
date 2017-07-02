@@ -195,7 +195,7 @@ struct RegexError : public std::runtime_error {
 
 /**
  */
-class Document : PerLine, public IDocumentWithLineEnd, public ILoader {
+class Document : PerLine, public IDocument, public ILoader {
 
 public:
 	/** Used to pair watcher pointer with user data. */
@@ -286,7 +286,7 @@ public:
 	virtual void RemoveLine(Sci::Line line);
 
 	int SCI_METHOD Version() const {
-		return dvLineEnd;
+		return dvRelease4;
 	}
 
 	void SCI_METHOD SetErrorStatus(int status);
@@ -360,10 +360,10 @@ public:
 
 	char CharAt(Sci::Position position) const { return cb.CharAt(position); }
 	void SCI_METHOD GetCharRange(char *buffer, Sci_Position position, Sci_Position lengthRetrieve) const {
-		cb.GetCharRange(buffer, position, lengthRetrieve);
+		cb.GetCharRange(buffer, static_cast<Sci::Position>(position), static_cast<Sci::Position>(lengthRetrieve));
 	}
-	unsigned char SCI_METHOD StyleAt(Sci_Position position) const { return cb.StyleAt(position); }
-	int StyleIndexAt(Sci_Position position) const { return static_cast<unsigned char>(cb.StyleAt(position)); }
+	unsigned char SCI_METHOD StyleAt(Sci_Position position) const { return cb.StyleAt(static_cast<Sci::Position>(position)); }
+	int StyleIndexAt(Sci_Position position) const { return static_cast<unsigned char>(cb.StyleAt(static_cast<Sci::Position>(position))); }
 	void GetStyleRange(unsigned char *buffer, Sci::Position position, Sci::Position lengthRetrieve) const {
 		cb.GetStyleRange(buffer, position, lengthRetrieve);
 	}
@@ -412,7 +412,7 @@ public:
 	void SetDefaultCharClasses(bool includeWordClass);
 	void SetCharClasses(const unsigned char *chars, CharClassify::cc newCharClass);
 	int GetCharsOfClass(CharClassify::cc characterClass, unsigned char *buffer) const;
-	void SCI_METHOD StartStyling(Sci_Position position, unsigned char mask);
+	void SCI_METHOD StartStyling(Sci_Position position);
 	bool SCI_METHOD SetStyleFor(Sci_Position length, unsigned char style);
 	bool SCI_METHOD SetStyles(Sci_Position length, const unsigned char *styles);
 	Sci::Position GetEndStyled() const { return endStyled; }
