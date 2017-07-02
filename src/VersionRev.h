@@ -1,3 +1,3 @@
-#define VERSION_HASH _T("af6d5cd")
-#define VERSION_REV 1024
-#define VERSION_REV_FULL _T("1024 (af6d5cd)")
+#define VERSION_HASH _T("3925067")
+#define VERSION_REV 1025
+#define VERSION_REV_FULL _T("1025 (3925067)")

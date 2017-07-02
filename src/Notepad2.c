@@ -2000,7 +2000,7 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam)
 	EnableCmd(hmenu, IDM_EDIT_UNDO, SendMessage(hwndEdit, SCI_CANUNDO, 0, 0) /*&& !bReadOnly*/);
 	EnableCmd(hmenu, IDM_EDIT_REDO, SendMessage(hwndEdit, SCI_CANREDO, 0, 0) /*&& !bReadOnly*/);
 
-	i  = IsEmptySelection(hwndEdit);
+	i  = !IsEmptySelection(hwndEdit);
 	i2 = (int)SendMessage(hwndEdit, SCI_CANPASTE, 0, 0);
 
 	EnableCmd(hmenu, IDM_EDIT_CUT, i /*&& !bReadOnly*/);

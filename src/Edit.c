@@ -5410,10 +5410,10 @@ BOOL EditReplaceAll(HWND hwnd, LPCEDITFINDREPLACE lpefr, BOOL bShowInfo)
 	}
 #endif
 
-	bRegexStartOfLine = (szFind2[0] == '^');
+	bRegexStartOfLine = (lpefr->fuFlags & SCFIND_REGEXP) && (szFind2[0] == '^');
 	bRegexStartOrEndOfLine =
-		(lpefr->fuFlags & SCFIND_REGEXP &&
-		 (!lstrcmpA(szFind2, "$") || !lstrcmpA(szFind2, "^") || !lstrcmpA(szFind2, "^$")));
+		(lpefr->fuFlags & SCFIND_REGEXP) &&
+		 ((!lstrcmpA(szFind2, "$") || !lstrcmpA(szFind2, "^") || !lstrcmpA(szFind2, "^$")));
 
 	if (lstrcmpA(lpefr->szReplace, "^c") == 0) {
 		iReplaceMsg = SCI_REPLACETARGET;
@@ -5548,10 +5548,10 @@ BOOL EditReplaceAllInSelection(HWND hwnd, LPCEDITFINDREPLACE lpefr, BOOL bShowIn
 	}
 #endif
 
-	bRegexStartOfLine = (szFind2[0] == '^');
+	bRegexStartOfLine = (lpefr->fuFlags & SCFIND_REGEXP) && (szFind2[0] == '^');
 	bRegexStartOrEndOfLine =
-		(lpefr->fuFlags & SCFIND_REGEXP &&
-		 (!lstrcmpA(szFind2, "$") || !lstrcmpA(szFind2, "^") || !lstrcmpA(szFind2, "^$")));
+		(lpefr->fuFlags & SCFIND_REGEXP) &&
+		 ((!lstrcmpA(szFind2, "$") || !lstrcmpA(szFind2, "^") || !lstrcmpA(szFind2, "^$")));
 
 	if (lstrcmpA(lpefr->szReplace, "^c") == 0) {
 		iReplaceMsg = SCI_REPLACETARGET;
