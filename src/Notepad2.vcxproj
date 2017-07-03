@@ -94,7 +94,6 @@
       <AdditionalDependencies>comctl32.lib;shlwapi.lib;imm32.lib;msimg32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
-      <TargetMachine>MachineX86</TargetMachine>
       <MinimumRequiredVersion>5.01</MinimumRequiredVersion>
     </Link>
     <ResourceCompile>
@@ -128,7 +127,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
       <AdditionalIncludeDirectories>..\scintilla\include;..\scintilla\lexlib;..\scintilla\src;.;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;STATIC_BUILD;SCI_NAMESPACE;SCI_LEXER;BOOKMARK_EDITION;DISABLE_D2D;NO_CXX11_REGEX;SCI_DISABLE_PROVISIONAL;NDEBUG;UNICODE;_UNICODE;_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;_WIN32_WINNT=0x0501;WINVER=0x0501%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;STATIC_BUILD;SCI_NAMESPACE;SCI_LEXER;BOOKMARK_EDITION;DISABLE_D2D;NO_CXX11_REGEX;SCI_DISABLE_PROVISIONAL;NDEBUG;UNICODE;_UNICODE;_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;_WIN32_WINNT=0x0501;WINVER=0x0501;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <WarningLevel>Level4</WarningLevel>
       <Optimization>MinSpace</Optimization>
@@ -150,7 +149,6 @@
       <SubSystem>Windows</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <TargetMachine>MachineX86</TargetMachine>
       <LargeAddressAware>true</LargeAddressAware>
       <MinimumRequiredVersion>5.01</MinimumRequiredVersion>
       <MergeSections>.rdata=.text</MergeSections>

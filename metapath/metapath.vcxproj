@@ -90,7 +90,6 @@
       <EnablePREfast>false</EnablePREfast>
     </ClCompile>
     <Link>
-      <TargetMachine>MachineX86</TargetMachine>
       <AdditionalDependencies>comctl32.lib;shlwapi.lib;psapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
@@ -143,7 +142,6 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <MinimumRequiredVersion>5.01</MinimumRequiredVersion>
-      <TargetMachine>MachineX86</TargetMachine>
       <LargeAddressAware>true</LargeAddressAware>
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
