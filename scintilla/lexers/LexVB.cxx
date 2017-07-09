@@ -63,13 +63,13 @@ static inline bool IsSpaceEquiv(int state) {
 	return (state <= SCE_B_COMMENT);
 }
 
-static void ColouriseVBDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, WordList *keywordlists[], Accessor &styler, bool vbScriptSyntax) {
-	const WordList &keywords = *keywordlists[0];
-	const WordList &keywords2 = *keywordlists[1];
-	const WordList &keywords3 = *keywordlists[2];
-	const WordList &keywords4 = *keywordlists[3];
-	const WordList &keywords5 = *keywordlists[4];
-	const WordList &keywords6 = *keywordlists[5];
+static void ColouriseVBDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler, bool vbScriptSyntax) {
+	const WordList &keywords = *keywordLists[0];
+	const WordList &keywords2 = *keywordLists[1];
+	const WordList &keywords3 = *keywordLists[2];
+	const WordList &keywords4 = *keywordLists[3];
+	const WordList &keywords5 = *keywordLists[4];
+	const WordList &keywords6 = *keywordLists[5];
 
 	int fileNbDigits = 0;
 	int visibleChars = 0;
@@ -278,7 +278,7 @@ static bool IsVBSome(Sci_Position line, int kind, Accessor &styler) {
 #define IsConstLine(line)		IsVBSome(line, 2, styler)
 #define IsVB6Type(line)			IsVBSome(line, 1, styler)
 
-static void FoldVBDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, WordList *[], Accessor &styler) {
+static void FoldVBDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList, Accessor &styler) {
 	if (styler.GetPropertyInt("fold") == 0)
 		return;
 	const bool foldComment = styler.GetPropertyInt("fold.comment") != 0;
@@ -475,11 +475,11 @@ static void FoldVBDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 	}
 }
 
-static void ColouriseVBNetDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, WordList *keywordlists[], Accessor &styler) {
-	ColouriseVBDoc(startPos, length, initStyle, keywordlists, styler, false);
+static void ColouriseVBNetDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
+	ColouriseVBDoc(startPos, length, initStyle, keywordLists, styler, false);
 }
-static void ColouriseVBScriptDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, WordList *keywordlists[], Accessor &styler) {
-	ColouriseVBDoc(startPos, length, initStyle, keywordlists, styler, true);
+static void ColouriseVBScriptDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
+	ColouriseVBDoc(startPos, length, initStyle, keywordLists, styler, true);
 }
 
 LexerModule lmVB(SCLEX_VB, ColouriseVBNetDoc, "vb", FoldVBDoc);

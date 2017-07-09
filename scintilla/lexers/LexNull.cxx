@@ -26,7 +26,7 @@
 using namespace Scintilla;
 #endif
 
-static void ColouriseNullDoc(Sci_PositionU startPos, Sci_Position length, int, WordList *[], Accessor &styler) {
+static void ColouriseNullDoc(Sci_PositionU startPos, Sci_Position length, int, LexerWordList, Accessor &styler) {
 	// Null language means all style bytes are 0 so just mark the end - no need to fill in.
 	if (length > 0) {
 		styler.StartAt(startPos + length - 1);
@@ -35,7 +35,7 @@ static void ColouriseNullDoc(Sci_PositionU startPos, Sci_Position length, int, W
 	}
 }
 
-static void FoldNullDoc(Sci_PositionU startPos, Sci_Position length, int /* initStyle */, WordList *[], Accessor &styler) {
+static void FoldNullDoc(Sci_PositionU startPos, Sci_Position length, int /* initStyle */, LexerWordList, Accessor &styler) {
 	if (styler.GetPropertyInt("fold") == 0)
 		return;
 	const Sci_Position maxPos = startPos + length;

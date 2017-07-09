@@ -225,9 +225,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInst, LPSTR lpCmdLine, in
 
 	OleUninitialize();
 
-	return(int)(msg.wParam);
-	hPrevInst;
-	lpCmdLine;
+	return (int)(msg.wParam);
 }
 
 
@@ -1219,10 +1217,10 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam)
 			if (!PathIsLnkFile(dli.szFileName)) {
 				LaunchTarget(dli.szFileName, 0);
 			} else { // PathIsLinkFile()
-				DWORD dwAttr;
 				WCHAR  tch[MAX_PATH];
 
 				if (PathGetLnkPath(dli.szFileName, tch, COUNTOF(tch))) {
+					DWORD dwAttr;
 					ExpandEnvironmentStringsEx(tch, COUNTOF(tch));
 					dwAttr = GetFileAttributes(tch);
 					if ((dwAttr == (DWORD)(-1)) || (dwAttr & FILE_ATTRIBUTE_DIRECTORY)) {
@@ -1255,10 +1253,10 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam)
 			if (!PathIsLnkFile(dli.szFileName)) {
 				LaunchTarget(dli.szFileName, 1);
 			} else { // PathIsLinkFile()
-				DWORD dwAttr;
 				WCHAR  tch[MAX_PATH];
 
 				if (PathGetLnkPath(dli.szFileName, tch, COUNTOF(tch))) {
+					DWORD dwAttr;
 					ExpandEnvironmentStringsEx(tch, COUNTOF(tch));
 					dwAttr = GetFileAttributes(tch);
 					if ((dwAttr == (DWORD)(-1)) || (dwAttr & FILE_ATTRIBUTE_DIRECTORY)) {
@@ -1384,7 +1382,6 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam)
 		WCHAR szNewFile[MAX_PATH];
 		WCHAR szFilter[128];
 		WCHAR szTitle[32];
-		WCHAR szPath[MAX_PATH];
 
 		lstrcpy(szNewFile, L"");
 		GetString(IDS_FILTER_ALL, szFilter, COUNTOF(szFilter));
@@ -1417,6 +1414,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam)
 						   NULL);
 
 		if (hFile != INVALID_HANDLE_VALUE) {
+			WCHAR szPath[MAX_PATH];
 			SHFILEINFO shfi;
 
 			CloseHandle(hFile);
@@ -1554,7 +1552,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam)
 		}
 
 		ZeroMemory(&shfos, sizeof(SHFILEOPSTRUCT));
-		ZeroMemory(tch, sizeof(WCHAR) * 512);
+		ZeroMemory(tch, sizeof(tch));
 		lstrcpy(tch, dli.szFileName);
 
 		shfos.hwnd = hwnd;
@@ -1893,6 +1891,8 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam)
 			EmptyClipboard();
 			SetClipboardData(CF_UNICODETEXT, hData);
 			CloseClipboard();
+		} else {
+			GlobalFree(hData);
 		}
 	}
 	break;
@@ -1949,12 +1949,12 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam)
 		if (dli.ntype == DLE_FILE) {
 			if (PathIsLnkFile(dli.szFileName)) {
 				WCHAR szFullPath[MAX_PATH];
-				WCHAR szDir[MAX_PATH];
-				WCHAR *p;
 
 				//SetFocus(hwndDirList);
 				if (PathGetLnkPath(dli.szFileName, szFullPath, COUNTOF(szFullPath))) {
 					if (PathFileExists(szFullPath)) {
+						WCHAR szDir[MAX_PATH];
+						WCHAR *p;
 						lstrcpy(szDir, szFullPath);
 						if ((p = StrRChr(szDir, NULL, L'\\')) != NULL) {
 							*(p + 1) = 0;
@@ -2215,12 +2215,8 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam)
 			break;
 
 		case LVN_ITEMCHANGED: {
-			WCHAR tch[64], tchnum[64];
-			WCHAR tchsize[64], tchdate[64], tchtime[64], tchattr[64];
-			HANDLE hFile;
 			WIN32_FIND_DATA fd;
 			DLITEM dli;
-			LONGLONG isize;
 			FILETIME   ft;
 			SYSTEMTIME st;
 
@@ -2229,13 +2225,17 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam)
 			if ((pnmlv->uNewState & LVIS_SELECTED | LVIS_FOCUSED) !=
 					(pnmlv->uOldState & LVIS_SELECTED | LVIS_FOCUSED)) {
 
+				WCHAR tch[64];
 				if ((pnmlv->uNewState & LVIS_SELECTED)) {
+					WCHAR tchsize[64], tchdate[64], tchtime[64], tchattr[64];
+					LONGLONG isize;
 					dli.mask  = DLI_FILENAME;
 					dli.ntype = DLE_NONE;
 					DirList_GetItem(hwndDirList, -1, &dli);
 					DirList_GetItemEx(hwndDirList, -1, &fd);
 
 					if (fd.nFileSizeLow >= MAXDWORD) {
+						HANDLE hFile;
 						if ((hFile = FindFirstFile(dli.szFileName, &fd)) != INVALID_HANDLE_VALUE) {
 							FindClose(hFile);
 						}
@@ -2256,6 +2256,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam)
 
 					wsprintf(tch, L"%s | %s %s | %s", tchsize, tchdate, tchtime, tchattr);
 				} else {
+					WCHAR tchnum[64];
 					wsprintf(tchnum, L"%u", ListView_GetItemCount(hwndDirList));
 					FormatNumberStr(tchnum);
 					FormatString(tch, COUNTOF(tch),
@@ -2349,12 +2350,12 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam)
 	default:
 		switch (pnmh->code) {
 		case TTN_NEEDTEXT: {
-			WCHAR tch[256];
 
 			if (((LPTOOLTIPTEXT)lParam)->uFlags & TTF_IDISHWND) {
 				PathCompactPathEx(((LPTOOLTIPTEXT)lParam)->szText, szCurDir,
 								  COUNTOF(((LPTOOLTIPTEXT)lParam)->szText), 0);
 			} else {
+				WCHAR tch[256];
 				GetString((UINT)pnmh->idFrom, tch, COUNTOF(tch));
 				lstrcpyn(((LPTOOLTIPTEXT)lParam)->szText, tch, 80);
 			}
@@ -2382,10 +2383,10 @@ BOOL ChangeDirectory(HWND hwnd, LPCWSTR lpszNewDir, BOOL bUpdateHistory)
 
 	if (!lpszNewDir) { // Update call
 		WCHAR szTest[MAX_PATH];
-		WCHAR szWinDir[MAX_PATH];
 
 		GetCurrentDirectory(COUNTOF(szTest), szTest);
 		if (!PathFileExists(szTest)) {
+			WCHAR szWinDir[MAX_PATH];
 			GetWindowsDirectory(szWinDir, COUNTOF(szWinDir));
 			SetCurrentDirectory(szWinDir);
 			ErrorMessage(2, IDS_ERR_CD);
@@ -2445,7 +2446,7 @@ BOOL ChangeDirectory(HWND hwnd, LPCWSTR lpszNewDir, BOOL bUpdateHistory)
 		DriveBox_Fill(hwndDriveBox);
 		DriveBox_SelectDrive(hwndDriveBox, szCurDir);
 
-		wsprintf(tchnum, L"%u", cItems);
+		wsprintf(tchnum, L"%d", cItems);
 		FormatNumberStr(tchnum);
 		FormatString(tch, COUNTOF(tch),
 					 (lstrcmp(tchFilter, L"*.*") || bNegFilter) ? IDS_NUMFILES2 : IDS_NUMFILES, tchnum);
@@ -2630,8 +2631,8 @@ void LoadSettings()
 //
 void SaveSettings(BOOL bSaveSettingsNow)
 {
-	WCHAR *pIniSection = NULL;
-	int   cbIniSection = 0;
+	WCHAR *pIniSection;
+	//int   cbIniSection;
 
 	WCHAR wchTmp[MAX_PATH];
 
@@ -2650,7 +2651,7 @@ void SaveSettings(BOOL bSaveSettingsNow)
 	}
 
 	pIniSection = LocalAlloc(LPTR, sizeof(WCHAR) * 32 * 1024);
-	cbIniSection = (int)LocalSize(pIniSection) / sizeof(WCHAR);
+	//cbIniSection = (int)LocalSize(pIniSection) / sizeof(WCHAR);
 
 	IniSectionSetBool(pIniSection, L"SaveSettings", bSaveSettings);
 	IniSectionSetBool(pIniSection, L"SingleClick", bSingleClick);
@@ -2870,10 +2871,10 @@ void LoadFlags()
 int CheckIniFile(LPWSTR lpszFile, LPCWSTR lpszModule)
 {
 	WCHAR tchFileExpanded[MAX_PATH];
-	WCHAR tchBuild[MAX_PATH];
 	ExpandEnvironmentStrings(lpszFile, tchFileExpanded, COUNTOF(tchFileExpanded));
 
 	if (PathIsRelative(tchFileExpanded)) {
+		WCHAR tchBuild[MAX_PATH];
 		// program directory
 		lstrcpy(tchBuild, lpszModule);
 		lstrcpy(PathFindFileName(tchBuild), tchFileExpanded);
@@ -3604,7 +3605,6 @@ void LaunchTarget(LPCWSTR lpFileName, BOOL bOpenNew)
 void SnapToTarget(HWND hwnd)
 {
 	RECT rcOld, rcNew, rc2;
-	int  cxScreen;
 	HWND hwnd2;
 
 	if (IniGetInt(L"Target Application", L"UseTargetApplication", 0xFB) != 0xFB) {
@@ -3626,6 +3626,7 @@ void SnapToTarget(HWND hwnd)
 
 	// Found a window
 	if (hwnd2 != NULL) {
+		int  cxScreen;
 		if (IsIconic(hwnd2) || IsZoomed(hwnd2)) {
 			SendMessage(hwnd2, WM_SYSCOMMAND, SC_RESTORE, 0);
 		}

@@ -115,7 +115,7 @@ static inline bool IsEscapeChar(int ch) {
 #define DOC_TAG_OPEN_XML	3	/// <param name="path">file path
 #define DOC_TAG_CLOSE_XML	4	/// </param>
 
-static void ColouriseCppDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, WordList *keywordLists[], Accessor &styler) {
+static void ColouriseCppDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
 	const WordList &keywords		= *keywordLists[0];
 	const WordList &keywords2		= *keywordLists[1];
 	const WordList &keywords3		= *keywordLists[2];
@@ -317,8 +317,7 @@ _label_identifier:
 					isPragmaPreprocessor = false;
 					sc.ChangeState(SCE_C_PREPROCESSOR);
 					isMessagePreprocessor = strequ(s, "region") || strequ(s, "endregion") || strequ(s, "mark");
-				} else if ((!hasAttr || (hasAttr && (mayAttr || mayCSAttr)))
-					&& (kwAttribute.InList(s))) {
+				} else if ((!hasAttr || mayAttr || mayCSAttr) && kwAttribute.InList(s)) {
 					sc.ChangeState(SCE_C_ATTRIBUTE);
 				} else if (keywords.InList(s)) {
 					sc.ChangeState(SCE_C_WORD);
@@ -1195,7 +1194,7 @@ static bool IsOpenBraceLine(Sci_Position line, LexAccessor &styler) {
 	return false;
 }
 
-static void FoldCppDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, WordList *[], Accessor &styler) {
+static void FoldCppDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList, Accessor &styler) {
 	if (styler.GetPropertyInt("fold") == 0)
 		return;
 	const bool foldComment = styler.GetPropertyInt("fold.comment", 1) != 0;

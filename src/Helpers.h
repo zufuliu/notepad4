@@ -182,8 +182,6 @@ int		FormatNumberStr(LPWSTR lpNumberStr);
 BOOL	SetDlgItemIntEx(HWND hwnd, int nIdItem, UINT uValue);
 
 
-#define MBCSToWChar(c, a, w, i) MultiByteToWideChar(c, 0, a, -1, w, i)
-#define WCharToMBCS(c, w, a, i) WideCharToMultiByte(c, 0, w, -1, a, i, NULL, NULL)
 
 UINT	GetDlgItemTextA2W(UINT uCP, HWND hDlg, int nIDDlgItem, LPSTR lpString, int nMaxCount);
 UINT	SetDlgItemTextA2W(UINT uCP, HWND hDlg, int nIDDlgItem, LPSTR lpString);

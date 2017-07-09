@@ -3299,7 +3299,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam)
 		WCHAR tchDateTime[256];
 		WCHAR tchTemplate[256];
 		SYSTEMTIME st;
-		char	mszBuf[MAX_PATH * 3];
+		char	mszBuf[256 * kMaxMultiByteCount];
 		UINT	uCP;
 		//int		iSelStart;
 
@@ -3432,7 +3432,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam)
 		} else {
 			UINT uCP;
 			//int iSelStart;
-			char mszBuf[MAX_PATH * 3];
+			char mszBuf[MAX_PATH * kMaxMultiByteCount];
 			uCP = (SendMessage(hwndEdit, SCI_GETCODEPAGE, 0, 0) == SC_CP_UTF8) ? CP_UTF8 : CP_ACP;
 			WideCharToMultiByte(uCP, 0, pszInsert, -1, mszBuf, COUNTOF(mszBuf), NULL, NULL);
 			//iSelStart = SendMessage(hwndEdit, SCI_GETSELECTIONSTART, 0, 0);
@@ -5535,7 +5535,8 @@ void LoadSettings()
 	bViewWhiteSpace = IniSectionGetBool(pIniSection, L"ViewWhiteSpace", 0);
 	bViewEOLs = IniSectionGetBool(pIniSection, L"ViewEOLs", 0);
 
-	iDefaultEncoding = IniSectionGetInt(pIniSection, L"DefaultEncoding", 0);
+	iDefaultEncoding = Encoding_MapIniSetting(FALSE, CPI_UTF8);
+	iDefaultEncoding = IniSectionGetInt(pIniSection, L"DefaultEncoding", iDefaultEncoding);
 	iDefaultEncoding = Encoding_MapIniSetting(TRUE, iDefaultEncoding);
 	if (!Encoding_IsValid(iDefaultEncoding)) {
 		iDefaultEncoding = CPI_UTF8;
@@ -5648,7 +5649,7 @@ void LoadSettings()
 
 	IniSectionGetString(pIniSection, L"DefaultDirectory", L"", tchDefaultDir, COUNTOF(tchDefaultDir));
 
-	ZeroMemory(tchFileDlgFilters, sizeof(WCHAR) * COUNTOF(tchFileDlgFilters));
+	ZeroMemory(tchFileDlgFilters, sizeof(tchFileDlgFilters));
 	IniSectionGetString(pIniSection, L"FileDlgFilters", L"", tchFileDlgFilters, COUNTOF(tchFileDlgFilters) - 2);
 
 	dwFileCheckInverval = IniSectionGetInt(pIniSection, L"FileCheckInverval", 1000);
@@ -6566,8 +6567,8 @@ void UpdateStatusbar()
 	int iSelEnd;
 	int iLineStart;
 	int iLineEnd;
-	int iStartOfLinePos;
 #ifdef BOOKMARK_EDITION
+	int iStartOfLinePos;
 	int iLinesSelected;
 	WCHAR tchLinesSelected[32];
 	WCHAR tchMatchesCount[32];
@@ -6753,7 +6754,7 @@ BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect, LPCWST
 {
 	WCHAR tch[MAX_PATH] = L"";
 	WCHAR szFileName[MAX_PATH] = L"";
-	BOOL fSuccess;
+	BOOL fSuccess = FALSE;
 	BOOL bUnicodeErr = FALSE;
 	BOOL bFileTooBig = FALSE;
 
@@ -6833,8 +6834,8 @@ BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect, LPCWST
 									GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE,
 									NULL, CREATE_NEW, FILE_ATTRIBUTE_NORMAL, NULL);
 			dwLastIOError = GetLastError();
-			fSuccess = hFile != INVALID_HANDLE_VALUE;
-			if (fSuccess) {
+			if (hFile != INVALID_HANDLE_VALUE) {
+				fSuccess = TRUE;
 				CloseHandle(hFile);
 				FileVars_Init(NULL, 0, &fvCurFile);
 				EditSetNewText(hwndEdit, "", 0);

@@ -206,6 +206,9 @@ INT		UTF8_mbslen(LPCSTR source, INT byte_length);
 INT		UTF8_mbslen_bytes(LPCSTR utf8_string);
 
 
+// WideCharToMultiByte, UTF8 encoding of U+0800 to U+FFFF 	
+#define kMaxMultiByteCount	3
+
 #define IsUTF8Signature(p) \
 	((*(p+0) == '\xEF' && *(p+1) == '\xBB' && *(p+2) == '\xBF'))
 

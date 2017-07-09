@@ -220,7 +220,7 @@ void Encoding_InitDefaults()
 {
 	wsprintf(wchANSI, L" (%i)", GetACP());
 	mEncoding[CPI_OEM].uCodePage = GetOEMCP();
-	wsprintf(wchOEM, L" (%i)", mEncoding[CPI_OEM].uCodePage);
+	wsprintf(wchOEM, L" (%u)", mEncoding[CPI_OEM].uCodePage);
 
 	g_DOSEncoding = CPI_OEM;
 

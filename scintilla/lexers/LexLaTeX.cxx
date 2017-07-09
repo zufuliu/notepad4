@@ -32,7 +32,7 @@ static inline bool IsLWordStart(int ch) {
 
 #define IsCmdEnd(pos)	(!IsLWordChar(sc.GetRelative(pos)))
 
-static void ColouriseLatexDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, WordList *[], Accessor &styler) {
+static void ColouriseLatexDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList, Accessor &styler) {
 	if (initStyle == SCE_L_COMMENT)
 		initStyle = SCE_L_DEFAULT;
 
@@ -263,7 +263,7 @@ static bool IsLEnd(Sci_Position line, Accessor &styler) {
 #define IsSubsubsection(line)	IsLBegin(line, styler, "subsubsection", 13)
 #define IsEndDoc(line)			IsLEnd(line, styler)
 
-static void FoldLatexDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, WordList *[], Accessor &styler) {
+static void FoldLatexDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList, Accessor &styler) {
 	if (styler.GetPropertyInt("fold") == 0)
 		return;
 	const bool foldComment = styler.GetPropertyInt("fold.comment") != 0;

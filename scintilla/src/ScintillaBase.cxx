@@ -454,8 +454,9 @@ int ScintillaBase::AutoCompleteGetCurrentText(char *buffer) const {
 	return 0;
 }
 
-void ScintillaBase::CallTipShow(Point pt, const char *defn) {
+void ScintillaBase::CallTipShow(const Point &pt_, const char *defn) {
 	ac.Cancel();
+	Point pt = pt_;
 	// If container knows about STYLE_CALLTIP then use it in place of the
 	// STYLE_DEFAULT for the face name, size and character set. Also use it
 	// for the foreground and background colour.
@@ -572,7 +573,7 @@ public:
 	int PropGetInt(const char *key, int defaultValue=0) const;
 	int PropGetExpanded(const char *key, char *result) const;
 
-	int LineEndTypesSupported();
+	int LineEndTypesSupported() const;
 	int AllocateSubStyles(int styleBase, int numberStyles);
 	int SubStylesStart(int styleBase);
 	int SubStylesLength(int styleBase);
@@ -721,7 +722,7 @@ int LexState::PropGetExpanded(const char *key, char *result) const {
 	return props.GetExpanded(key, result);
 }
 
-int LexState::LineEndTypesSupported() {
+int LexState::LineEndTypesSupported() const {
 	if (instance && (interfaceVersion >= lvSubStyles)) {
 		return static_cast<ILexerWithSubStyles *>(instance)->LineEndTypesSupported();
 	}

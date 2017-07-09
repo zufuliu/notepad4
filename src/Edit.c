@@ -202,14 +202,14 @@ BOOL EditConvertText(HWND hwnd, UINT cpSource, UINT cpDest, BOOL bSetSavePoint)
 		char *pchText;
 		WCHAR *pwchText;
 
-		pchText = GlobalAlloc(GPTR, length * 2 + 1);
+		pchText = GlobalAlloc(GPTR, length * sizeof(WCHAR) + 1);
 
 		tr.lpstrText = pchText;
 		SendMessage(hwnd, SCI_GETTEXTRANGE, 0, (LPARAM)&tr);
 
 		pwchText = GlobalAlloc(GPTR, (length + 1) * sizeof(WCHAR));
 		cbwText	 = MultiByteToWideChar(cpSource, 0, pchText, length, pwchText, length);
-		cbText	 = WideCharToMultiByte(cpDest, 0, pwchText, cbwText, pchText, length * 2, NULL, NULL);
+		cbText	 = WideCharToMultiByte(cpDest, 0, pwchText, cbwText, pchText, length * sizeof(WCHAR), NULL, NULL);
 
 		SendMessage(hwnd, SCI_CANCEL, 0, 0);
 		SendMessage(hwnd, SCI_SETUNDOCOLLECTION, 0, 0);
@@ -311,12 +311,6 @@ char *EditGetClipboardText(HWND hwnd)
 //
 BOOL EditCopyAppend(HWND hwnd)
 {
-	HANDLE hOld;
-	WCHAR	 *pszOld;
-
-	HANDLE hNew;
-	WCHAR	 *pszNew;
-
 	char	*pszText;
 	int		cchTextW;
 	WCHAR *pszTextW;
@@ -325,6 +319,7 @@ BOOL EditCopyAppend(HWND hwnd)
 
 	int iCurPos;
 	int iAnchorPos;
+	BOOL succ = FALSE;
 
 	if (!IsClipboardFormatAvailable(CF_UNICODETEXT)) {
 		SendMessage(hwnd, SCI_COPY, 0, 0);
@@ -364,29 +359,37 @@ BOOL EditCopyAppend(HWND hwnd)
 
 	LocalFree(pszText);
 
-	if (!OpenClipboard(GetParent(hwnd))) {
-		LocalFree(pszTextW);
-		return FALSE;
+	if (OpenClipboard(GetParent(hwnd))) {
+		HANDLE hOld;
+		WCHAR *pszOld;
+
+		HANDLE hNew;
+		WCHAR *pszNew;
+
+		hOld = GetClipboardData(CF_UNICODETEXT);
+		pszOld = GlobalLock(hOld);
+
+		hNew = GlobalAlloc(GMEM_MOVEABLE | GMEM_ZEROINIT,
+							sizeof(WCHAR) * (lstrlen(pszOld) + lstrlen(pszTextW) + 1));
+		pszNew = GlobalLock(hNew);
+
+		lstrcpy(pszNew, pszOld);
+		lstrcat(pszNew, pszTextW);
+
+		GlobalUnlock(hNew);
+		GlobalUnlock(hOld);
+
+		EmptyClipboard();
+		SetClipboardData(CF_UNICODETEXT, hNew);
+		CloseClipboard();
+
+		succ = TRUE;
 	}
 
-	hOld = GetClipboardData(CF_UNICODETEXT);
-	pszOld = GlobalLock(hOld);
-
-	hNew = GlobalAlloc(GMEM_MOVEABLE | GMEM_ZEROINIT,
-						sizeof(WCHAR) * (lstrlen(pszOld) + lstrlen(pszTextW) + 1));
-	pszNew = GlobalLock(hNew);
-
-	lstrcpy(pszNew, pszOld);
-	lstrcat(pszNew, pszTextW);
-
-	GlobalUnlock(hNew);
-	GlobalUnlock(hOld);
-
-	EmptyClipboard();
-	SetClipboardData(CF_UNICODETEXT, hNew);
-	CloseClipboard();
-
-	return TRUE;
+	if (cchTextW > 0) {
+		LocalFree(pszTextW);
+	}
+	return succ;
 }
 
 
@@ -498,7 +501,7 @@ BOOL EditLoadFile(HWND hwnd, LPCWSTR pszFile, BOOL bSkipEncodingDetection,
 	}
 
 	if (!Encoding_IsValid(iDefaultEncoding)) {
-		iDefaultEncoding = CPI_DEFAULT;
+		iDefaultEncoding = CPI_UTF8;
 	}
 
 	_iDefaultEncoding = (bPreferOEM) ? g_DOSEncoding : iDefaultEncoding;
@@ -525,7 +528,6 @@ BOOL EditLoadFile(HWND hwnd, LPCWSTR pszFile, BOOL bSkipEncodingDetection,
 		SendMessage(hwnd, SCI_SETCODEPAGE, (mEncoding[*iEncoding].uFlags & NCP_DEFAULT) ? iDefaultCodePage : SC_CP_UTF8, 0);
 		EditSetNewText(hwnd, "", 0);
 		SendMessage(hwnd, SCI_SETEOLMODE, iLineEndings[iDefaultEOLMode], 0);
-		GlobalFree(lpData);
 	}
 	else if (!bSkipEncodingDetection &&
 		(iSrcEncoding == -1 || iSrcEncoding == CPI_UNICODE || iSrcEncoding == CPI_UNICODEBE) &&
@@ -556,7 +558,7 @@ BOOL EditLoadFile(HWND hwnd, LPCWSTR pszFile, BOOL bSkipEncodingDetection,
 			}
 		}
 
-		lpDataUTF8 = GlobalAlloc(GPTR, (cbData * 3) + 2);
+		lpDataUTF8 = GlobalAlloc(GPTR, cbData * kMaxMultiByteCount + 2);
 		cbData = WideCharToMultiByte(CP_UTF8, 0, (bBOM) ? (LPWSTR)lpData + 1 : (LPWSTR)lpData,
 									 (bBOM) ? (cbData) / sizeof(WCHAR) : cbData / sizeof(WCHAR) + 1,
 									 lpDataUTF8, (int)GlobalSize(lpDataUTF8), NULL, NULL);
@@ -566,9 +568,7 @@ BOOL EditLoadFile(HWND hwnd, LPCWSTR pszFile, BOOL bSkipEncodingDetection,
 			*pbUnicodeErr = TRUE;
 		}
 
-		GlobalFree(lpData);
 		SendMessage(hwnd, SCI_SETCODEPAGE, SC_CP_UTF8, 0);
-		//EditSetNewText(hwnd, "", 0);
 		FileVars_Init(lpDataUTF8, cbData - 1, &fvCurFile);
 		EditSetNewText(hwnd, lpDataUTF8, cbData - 1);
 		*iEOLMode = EditDetectEOLMode(hwnd, lpDataUTF8, cbData - 1);
@@ -592,7 +592,6 @@ BOOL EditLoadFile(HWND hwnd, LPCWSTR pszFile, BOOL bSkipEncodingDetection,
 			)
 			&& !(FileVars_IsNonUTF8(&fvCurFile) && (iSrcEncoding != CPI_UTF8 && iSrcEncoding != CPI_UTF8SIGN))) {
 			SendMessage(hwnd, SCI_SETCODEPAGE, SC_CP_UTF8, 0);
-			//EditSetNewText(hwnd, "", 0);
 			if (IsUTF8Signature(lpData)) {
 				EditSetNewText(hwnd, UTF8StringStart(lpData), cbData - 3);
 				*iEncoding = CPI_UTF8SIGN;
@@ -602,7 +601,6 @@ BOOL EditLoadFile(HWND hwnd, LPCWSTR pszFile, BOOL bSkipEncodingDetection,
 				*iEncoding = CPI_UTF8;
 				*iEOLMode = EditDetectEOLMode(hwnd, lpData, cbData);
 			}
-			GlobalFree(lpData);
 		}
 		else {
 			UINT uCodePage = CP_UTF8;
@@ -631,32 +629,28 @@ BOOL EditLoadFile(HWND hwnd, LPCWSTR pszFile, BOOL bSkipEncodingDetection,
 				LPWSTR lpDataWide;
 				int cbDataWide;
 				uCodePage	 = mEncoding[*iEncoding].uCodePage;
-				lpDataWide = GlobalAlloc(GPTR, cbData * 2 + 16);
+				lpDataWide = GlobalAlloc(GPTR, cbData * sizeof(WCHAR) + 16);
 				cbDataWide = MultiByteToWideChar(uCodePage, 0, lpData, cbData, lpDataWide,
 												(int)GlobalSize(lpDataWide) / sizeof(WCHAR));
 				GlobalFree(lpData);
-				lpData = GlobalAlloc(GPTR, cbDataWide * 3 + 16);
+				lpData = GlobalAlloc(GPTR, cbDataWide * kMaxMultiByteCount + 16);
 				cbData = WideCharToMultiByte(CP_UTF8, 0, lpDataWide, cbDataWide, lpData,
 											(int)GlobalSize(lpData), NULL, NULL);
 				GlobalFree(lpDataWide);
 
 				SendMessage(hwnd, SCI_SETCODEPAGE, SC_CP_UTF8, 0);
-				//EditSetNewText(hwnd, "", 0);
 				EditSetNewText(hwnd, lpData, cbData);
 				*iEOLMode = EditDetectEOLMode(hwnd, lpData, cbData);
-
-				GlobalFree(lpData);
 			} else {
 				SendMessage(hwnd, SCI_SETCODEPAGE, iDefaultCodePage, 0);
-				//EditSetNewText(hwnd, "", 0);
 				EditSetNewText(hwnd, lpData, cbData);
 				*iEncoding = CPI_DEFAULT;
 				*iEOLMode = EditDetectEOLMode(hwnd, lpData, cbData);
-				GlobalFree(lpData);
 			}
 		}
 	}
 
+	GlobalFree(lpData);
 	iSrcEncoding = -1;
 	iWeakSrcEncoding = -1;
 
@@ -758,7 +752,7 @@ BOOL EditSaveFile(HWND hwnd, LPCWSTR pszFile, int iEncoding, BOOL *pbCancelDataL
 
 			SetEndOfFile(hFile);
 
-			lpDataWide = GlobalAlloc(GPTR, cbData * 2 + 16);
+			lpDataWide = GlobalAlloc(GPTR, cbData * sizeof(WCHAR) + 16);
 			cbDataWide = MultiByteToWideChar(CP_UTF8, 0, lpData, cbData, lpDataWide,
 											(int)GlobalSize(lpDataWide) / sizeof(WCHAR));
 
@@ -778,7 +772,6 @@ BOOL EditSaveFile(HWND hwnd, LPCWSTR pszFile, int iEncoding, BOOL *pbCancelDataL
 			dwLastIOError = GetLastError();
 
 			GlobalFree(lpDataWide);
-			GlobalFree(lpData);
 		}
 		else if (mEncoding[iEncoding].uFlags & NCP_UTF8) {
 			SetEndOfFile(hFile);
@@ -789,8 +782,6 @@ BOOL EditSaveFile(HWND hwnd, LPCWSTR pszFile, int iEncoding, BOOL *pbCancelDataL
 
 			bWriteSuccess = WriteFile(hFile, lpData, cbData, &dwBytesWritten, NULL);
 			dwLastIOError = GetLastError();
-
-			GlobalFree(lpData);
 		}
 		else if (mEncoding[iEncoding].uFlags & NCP_8BIT) {
 			BOOL bCancelDataLoss = FALSE;
@@ -829,16 +820,14 @@ BOOL EditSaveFile(HWND hwnd, LPCWSTR pszFile, int iEncoding, BOOL *pbCancelDataL
 				bWriteSuccess = FALSE;
 				*pbCancelDataLoss = TRUE;
 			}
-
-			GlobalFree(lpData);
 		} else {
 			SetEndOfFile(hFile);
 			bWriteSuccess = WriteFile(hFile, lpData, cbData, &dwBytesWritten, NULL);
 			dwLastIOError = GetLastError();
-			GlobalFree(lpData);
 		}
 	}
 
+	GlobalFree(lpData);
 	CloseHandle(hFile);
 
 	if (bWriteSuccess) {
@@ -1816,6 +1805,7 @@ void EditModifyNumber(HWND hwnd, BOOL bIncrease)
 				char chNumber[32];
 				char chFormat[32] = "";
 				int	 iNumber;
+				unsigned uNumber;
 				int	 iWidth;
 				SendMessage(hwnd, SCI_GETSELTEXT, 0, (LPARAM)chNumber);
 
@@ -1837,8 +1827,9 @@ void EditModifyNumber(HWND hwnd, BOOL bIncrease)
 						SendMessage(hwnd, SCI_REPLACESEL, 0, (LPARAM)chNumber);
 						SendMessage(hwnd, SCI_SETSEL, iSelStart, iSelStart + lstrlenA(chNumber));
 					}
-				} else if (sscanf(chNumber, "%x", &iNumber) == 1) {
+				} else if (sscanf(chNumber, "%x", &uNumber) == 1) {
 					BOOL bUppercase = FALSE;
+					iNumber = uNumber;
 					iWidth = lstrlenA(chNumber) - 2;
 					if (iNumber >= 0) {
 						int i;
@@ -1964,7 +1955,7 @@ void EditTabsToSpaces(HWND hwnd, int nTabWidth, BOOL bOnlyIndentingWS)
 	i = 0;
 	for (iTextW = 0; iTextW < cchTextW; iTextW++) {
 		WCHAR w = pszTextW[iTextW];
-		if (w == L'\t' && (!bOnlyIndentingWS || (bOnlyIndentingWS && bIsLineStart))) {
+		if (w == L'\t' && (!bOnlyIndentingWS || bIsLineStart)) {
 			for (j = 0; j < nTabWidth - i % nTabWidth; j++) {
 				pszConvW[cchConvW++] = L' ';
 			}
@@ -1986,7 +1977,7 @@ void EditTabsToSpaces(HWND hwnd, int nTabWidth, BOOL bOnlyIndentingWS)
 
 	if (bModified) {
 		int cchConvM;
-		pszText = GlobalAlloc(GPTR, cchConvW * 3);
+		pszText = GlobalAlloc(GPTR, cchConvW * kMaxMultiByteCount);
 
 		cchConvM = WideCharToMultiByte(cpEdit, 0, pszConvW, cchConvW, pszText,
 										(int)GlobalSize(pszText), NULL, NULL);
@@ -2098,7 +2089,7 @@ void EditSpacesToTabs(HWND hwnd, int nTabWidth, BOOL bOnlyIndentingWS)
 	i = j = 0;
 	for (iTextW = 0; iTextW < cchTextW; iTextW++) {
 		WCHAR w = pszTextW[iTextW];
-		if ((w == L' ' || w == L'\t') && (!bOnlyIndentingWS || (bOnlyIndentingWS && bIsLineStart))) {
+		if ((w == L' ' || w == L'\t') && (!bOnlyIndentingWS ||  bIsLineStart)) {
 			space[j++] = w;
 			if (j == nTabWidth - i % nTabWidth || w == L'\t') {
 				if (j > 1 || pszTextW[iTextW + 1] == L' ' || pszTextW[iTextW + 1] == L'\t') {
@@ -2138,7 +2129,7 @@ void EditSpacesToTabs(HWND hwnd, int nTabWidth, BOOL bOnlyIndentingWS)
 
 	if (bModified || cchConvW != cchTextW) {
 		int cchConvM;
-		pszText = GlobalAlloc(GPTR, cchConvW * 4 + 1);
+		pszText = GlobalAlloc(GPTR, cchConvW * kMaxMultiByteCount + 1);
 		cchConvM = WideCharToMultiByte(cpEdit, 0, pszConvW, cchConvW, pszText,
 										(int)GlobalSize(pszText), NULL, NULL);
 		GlobalFree(pszConvW);
@@ -2724,9 +2715,9 @@ void EditAlignText(HWND hwnd, int nMode)
 					SendMessage(hwnd, SCI_REPLACETARGET, 0, (LPARAM)"");
 				}
 				else {
-					char	tchLineBuf[BUFSIZE_ALIGN * 3] = "";
-					WCHAR wchLineBuf[BUFSIZE_ALIGN * 3] = L"";
-					WCHAR *pWords[BUFSIZE_ALIGN * 3 / 2];
+					char tchLineBuf[BUFSIZE_ALIGN * kMaxMultiByteCount] = "";
+					WCHAR wchLineBuf[BUFSIZE_ALIGN] = L"";
+					WCHAR *pWords[BUFSIZE_ALIGN];
 					WCHAR *p = wchLineBuf;
 
 					int iWords = 0;
@@ -3798,7 +3789,7 @@ void EditWrapToColumn(HWND hwnd, int nColumn/*, int nTabWidth*/)
 
 	if (bModified) {
 		int cchConvM;
-		pszText = GlobalAlloc(GPTR, cchConvW * 3);
+		pszText = GlobalAlloc(GPTR, cchConvW * kMaxMultiByteCount);
 
 		cchConvM = WideCharToMultiByte(cpEdit, 0, pszConvW, cchConvW, pszText,
 										(int)GlobalSize(pszText), NULL, NULL);
@@ -4119,13 +4110,13 @@ void EditSortLines(HWND hwnd, int iSortFlags)
 
 		cchw = MultiByteToWideChar(uCodePage, 0, pmsz, -1, NULL, 0) - 1;
 		if (cchw > 0) {
-			UINT col = 0, tabs = iTabWidth;
 			pLines[i].pwszLine = LocalAlloc(LPTR, sizeof(WCHAR) * (cchw + 1));
 			MultiByteToWideChar(uCodePage, 0, pmsz, -1, pLines[i].pwszLine,
 								(int)LocalSize(pLines[i].pwszLine) / sizeof(WCHAR));
 			pLines[i].pwszSortEntry = pLines[i].pwszLine;
 
 			if (iSortFlags & SORT_COLUMN) {
+				UINT col = 0, tabs = iTabWidth;
 				while (*(pLines[i].pwszSortEntry)) {
 					if (*(pLines[i].pwszSortEntry) == L'\t') {
 						if (col + tabs <= iSortColumn) {

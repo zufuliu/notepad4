@@ -137,15 +137,15 @@ static bool IsContinuationLine(Sci_PositionU szLine, Accessor &styler) {
 };*/
 
 // syntax highlighting logic
-static void ColouriseAU3Doc(Sci_PositionU startPos, Sci_Position length, int initStyle, WordList *keywordlists[], Accessor &styler) {
-	const WordList &keywords = *keywordlists[0];
-	const WordList &keywords2 = *keywordlists[1];
-	const WordList &keywords3 = *keywordlists[2];
-	const WordList &keywords4 = *keywordlists[3];
-	const WordList &keywords5 = *keywordlists[4];
-	const WordList &keywords6 = *keywordlists[5];
-	const WordList &keywords7 = *keywordlists[6];
-	const WordList &keywords8 = *keywordlists[7];
+static void ColouriseAU3Doc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
+	const WordList &keywords = *keywordLists[0];
+	const WordList &keywords2 = *keywordLists[1];
+	const WordList &keywords3 = *keywordLists[2];
+	const WordList &keywords4 = *keywordLists[3];
+	const WordList &keywords5 = *keywordLists[4];
+	const WordList &keywords6 = *keywordLists[5];
+	const WordList &keywords7 = *keywordLists[6];
+	const WordList &keywords8 = *keywordLists[7];
 	// find the first previous line without continuation character at the end
 	Sci_Position lineCurrent = styler.GetLine(startPos);
 	Sci_Position s_startPos = startPos;
@@ -559,7 +559,7 @@ static int GetStyleFirstWord(Sci_PositionU szLine, Accessor &styler) {
 
 
 //
-static void FoldAU3Doc(Sci_PositionU startPos, Sci_Position length, int, WordList *[], Accessor &styler) {
+static void FoldAU3Doc(Sci_PositionU startPos, Sci_Position length, int, LexerWordList, Accessor &styler) {
 	if (styler.GetPropertyInt("fold") == 0) {
 		return;
 	}

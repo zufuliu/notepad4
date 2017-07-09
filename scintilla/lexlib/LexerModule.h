@@ -15,8 +15,10 @@ namespace Scintilla {
 class Accessor;
 class WordList;
 
+typedef const WordList * const LexerWordList[];
+
 typedef void (*LexerFunction)(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle,
-                  WordList *keywordlists[], Accessor &styler);
+                  LexerWordList keywordLists, Accessor &styler);
 typedef ILexer *(*LexerFactoryFunction)();
 
 /**
@@ -54,9 +56,9 @@ public:
 	ILexer *Create() const;
 
 	virtual void Lex(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle,
-                  WordList *keywordlists[], Accessor &styler) const;
+                  LexerWordList keywordLists, Accessor &styler) const;
 	virtual void Fold(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle,
-                  WordList *keywordlists[], Accessor &styler) const;
+                  LexerWordList keywordLists, Accessor &styler) const;
 
 	friend class Catalogue;
 };

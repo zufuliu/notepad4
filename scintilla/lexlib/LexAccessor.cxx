@@ -71,7 +71,7 @@ char LexAccessor::SafeGetCharAt(Sci_Position position, char chDefault) {
 bool LexAccessor::Match(Sci_Position pos, const char *s) {
 	return LexMatch(pos, *this, s);
 }
-Sci_Position LexAccessor::LineEnd(Sci_Position line) {
+Sci_Position LexAccessor::LineEnd(Sci_Position line) const {
 	return pAccess->LineEnd(line);
 }
 void LexAccessor::Flush() {

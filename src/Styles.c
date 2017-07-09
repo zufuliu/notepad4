@@ -237,7 +237,7 @@ void Style_Load()
 		for (i = 0; i < 16; i++) {
 			WCHAR tch[32];
 			WCHAR wch[32];
-			wsprintf(tch, L"%02i", i + 1);
+			wsprintf(tch, L"%02u", i + 1);
 			if (IniSectionGetString(pIniSection, tch, L"", wch, COUNTOF(wch))) {
 				if (wch[0] == L'#') {
 					unsigned int irgb;
@@ -306,7 +306,7 @@ void Style_Save()
 		for (i = 0; i < 16; i++) {
 			WCHAR tch[32];
 			WCHAR wch[32];
-			wsprintf(tch, L"%02i", i + 1);
+			wsprintf(tch, L"%02u", i + 1);
 			wsprintf(wch, L"#%02X%02X%02X",
 					 (int)GetRValue(crCustom[i]),
 					 (int)GetGValue(crCustom[i]),
@@ -1210,7 +1210,7 @@ BOOL MatchCPPKeyword(char *p, int index) {
 
 PEDITLEXER Style_DetectObjCAndMatlab(void) {
 	extern HWND hwndEdit;
-	char *p = NULL;
+	char *p;
 	char tchText[4096] = ""; // maybe contains header comments
 	SendMessage(hwndEdit, SCI_GETTEXT, (WPARAM)(COUNTOF(tchText) - 2), (LPARAM)tchText);
 
@@ -1401,7 +1401,7 @@ PEDITLEXER __fastcall Style_MatchLexer(LPCWSTR lpszMatch, BOOL bCheckNames)
 		}
 
 		for (i = 0; i < NUMLEXERS; i++) {
-			ZeroMemory(tch, sizeof(WCHAR) * COUNTOF(tch));
+			ZeroMemory(tch, sizeof(tch));
 			lstrcpy(tch, pLexArray[i]->szExtensions);
 			p1 = tch;
 			while (*p1) {
@@ -2343,7 +2343,7 @@ void Style_SetStyles(HWND hwnd, int iStyle, LPCWSTR lpszStyle)
 
 	// Font
 	if (Style_StrGetFont(lpszStyle, tch, COUNTOF(tch))) {
-		char mch[256];
+		char mch[256 * kMaxMultiByteCount];
 		WideCharToMultiByte(CP_UTF8, 0, tch, -1, mch, COUNTOF(mch), NULL, NULL);
 		SendMessage(hwnd, SCI_STYLESETFONT, iStyle, (LPARAM)mch);
 	}

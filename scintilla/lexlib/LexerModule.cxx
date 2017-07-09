@@ -82,13 +82,13 @@ ILexer *LexerModule::Create() const {
 }
 
 void LexerModule::Lex(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle,
-	  WordList *keywordlists[], Accessor &styler) const {
+	  LexerWordList keywordLists, Accessor &styler) const {
 	if (fnLexer)
-		fnLexer(startPos, lengthDoc, initStyle, keywordlists, styler);
+		fnLexer(startPos, lengthDoc, initStyle, keywordLists, styler);
 }
 
 void LexerModule::Fold(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle,
-	  WordList *keywordlists[], Accessor &styler) const {
+	  LexerWordList keywordLists, Accessor &styler) const {
 	if (fnFolder) {
 		Sci_Position lineCurrent = styler.GetLine(startPos);
 		// Move back one line in case deletion wrecked current line fold state
@@ -102,6 +102,6 @@ void LexerModule::Fold(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 				initStyle = styler.StyleAt(startPos - 1);
 			}
 		}
-		fnFolder(startPos, lengthDoc, initStyle, keywordlists, styler);
+		fnFolder(startPos, lengthDoc, initStyle, keywordLists, styler);
 	}
 }

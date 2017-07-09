@@ -134,6 +134,7 @@ public:
 		}
 		starts->InsertText(partition, -1);
 	}
+#if 0
 	void Check() const {
 		if (Length() < 0) {
 			throw std::runtime_error("SparseVector: Length can not be negative.");
@@ -149,6 +150,7 @@ public:
 			throw std::runtime_error("SparseVector: Unused style at end changed.");
 		}
 	}
+#endif
 };
 
 #ifdef SCI_NAMESPACE

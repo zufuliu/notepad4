@@ -48,15 +48,15 @@ static inline  bool IsANumberChar(int ch, int chPrev) {
 	0
 };*/
 
-static void ColouriseSqlDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, WordList *keywordlists[], Accessor &styler) {
-	const WordList &keywords1 = *keywordlists[0];
-	const WordList &keywords2 = *keywordlists[1];
-	const WordList &kw_user1 = *keywordlists[2];
-	//const WordList &kw_pldoc = *keywordlists[2];
-	//const WordList &kw_sqlplus = *keywordlists[3];
-	//const WordList &kw_user2 = *keywordlists[5];
-	//const WordList &kw_user3 = *keywordlists[6];
-	//const WordList &kw_user4 = *keywordlists[7];
+static void ColouriseSqlDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
+	const WordList &keywords1 = *keywordLists[0];
+	const WordList &keywords2 = *keywordLists[1];
+	const WordList &kw_user1 = *keywordLists[2];
+	//const WordList &kw_pldoc = *keywordLists[2];
+	//const WordList &kw_sqlplus = *keywordLists[3];
+	//const WordList &kw_user2 = *keywordLists[5];
+	//const WordList &kw_user3 = *keywordLists[6];
+	//const WordList &kw_user4 = *keywordLists[7];
 
 	const bool sqlBackticksIdentifier = styler.GetPropertyInt("lexer.sql.backticks.identifier", 1) != 0;
 	const bool sqlNumbersignComment = styler.GetPropertyInt("lexer.sql.numbersign.comment", 1) != 0;
@@ -461,7 +461,7 @@ static inline bool IsCommentStyle (int style) {
 
 #define IsCommentLine(line)			IsLexCommentLine(line, styler, MultiStyle(SCE_SQL_COMMENTLINE, SCE_SQL_COMMENTLINEDOC))
 
-static void FoldSqlDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, WordList *[], Accessor &styler) {
+static void FoldSqlDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList, Accessor &styler) {
 	if (styler.GetPropertyInt("fold") == 0)
 		return;
 	const bool foldOnlyBegin = styler.GetPropertyInt("fold.sql.only.begin", 0) != 0;

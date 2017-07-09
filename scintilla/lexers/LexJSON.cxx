@@ -24,7 +24,7 @@ static inline bool IsJsonOp(int ch) {
 }
 
 #define MAX_WORD_LENGTH	7
-static void ColouriseJSONDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, WordList *[], Accessor &styler) {
+static void ColouriseJSONDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList, Accessor &styler) {
 	const bool fold = styler.GetPropertyInt("fold", 1) != 0;
 
 	int state = initStyle;

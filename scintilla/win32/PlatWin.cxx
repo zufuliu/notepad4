@@ -538,7 +538,7 @@ public:
 	void RoundedRectangle(const PRectangle &rc, const ColourDesired &fore, const ColourDesired &back) override;
 	void AlphaRectangle(const PRectangle &rc, int cornerSize, const ColourDesired &fill, int alphaFill,
 		const ColourDesired &outline, int alphaOutline, int flags) override;
-	void DrawRGBAImage(PRectangle &rc, int width, int height, const unsigned char *pixelsImage) override;
+	void DrawRGBAImage(const PRectangle &rc, int width, int height, const unsigned char *pixelsImage) override;
 	void Ellipse(const PRectangle &rc, const ColourDesired &fore, const ColourDesired &back) override;
 	void Copy(const PRectangle &rc, const Point &from, const Surface &surfaceSource) override;
 
@@ -822,8 +822,9 @@ void SurfaceGDI::AlphaRectangle(const PRectangle &rc, int cornerSize, const Colo
 	}
 }
 
-void SurfaceGDI::DrawRGBAImage(PRectangle &rc, int width, int height, const unsigned char *pixelsImage) {
-	if (rc.Width() > 0) {
+void SurfaceGDI::DrawRGBAImage(const PRectangle &rc_, int width, int height, const unsigned char *pixelsImage) {
+	if (rc_.Width() > 0) {
+		PRectangle rc = rc_;
 		HDC hMemDC = ::CreateCompatibleDC(hdc);
 		if (rc.Width() > width)
 			rc.left += static_cast<int>((rc.Width() - width) / 2);
@@ -1087,7 +1088,7 @@ public:
 	int DeviceHeightFont(int points) const override;
 	void MoveTo(int x_, int y_) override;
 	void LineTo(int x_, int y_) override;
-	void Polygon(Point *pts, int npts, const ColourDesired &fore, const ColourDesired &back) override;
+	void Polygon(const Point *pts, int npts, const ColourDesired &fore, const ColourDesired &back) override;
 	void RectangleDraw(const PRectangle &rc, const ColourDesired &fore, const ColourDesired &back) override;
 	void FillRectangle(const PRectangle &rc, const ColourDesired &back) override;
 	void FillRectangle(const PRectangle &rc, Surface &surfacePattern) override;
@@ -1319,7 +1320,7 @@ void SurfaceD2D::LineTo(int x_, int y_) {
 	}
 }
 
-void SurfaceD2D::Polygon(Point *pts, int npts, const ColourDesired &fore, const ColourDesired &back) {
+void SurfaceD2D::Polygon(const Point *pts, int npts, const ColourDesired &fore, const ColourDesired &back) {
 	if (pRenderTarget) {
 		ID2D1Factory *pFactory = 0;
 		pRenderTarget->GetFactory(&pFactory);
@@ -2068,7 +2069,7 @@ public:
 	PRectangle GetDesiredRect() override;
 	int CaretFromEdge() const override;
 	void Clear() override;
-	void Append(char *s, int type = -1) override;
+	void Append(const char *s, int type = -1) override;
 	int Length() const override;
 	void Select(int n) override;
 	int GetSelection() override;
@@ -2079,7 +2080,7 @@ public:
 	void ClearRegisteredImages() override;
 	virtual void SetDelegate(IListBoxDelegate *lbDelegate) override;
 	void SetList(const char *list, char separator, char typesep) override;
-	void Draw(DRAWITEMSTRUCT *pDrawItem);
+	void Draw(const DRAWITEMSTRUCT *pDrawItem);
 	LRESULT WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam);
 	static LRESULT PASCAL StaticWndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam);
 };
@@ -2202,7 +2203,7 @@ void ListBoxX::Clear() {
 	lti.Clear();
 }
 
-void ListBoxX::Append(char *, int) {
+void ListBoxX::Append(const char *, int) {
 	// This method is no longer called in Scintilla
 	PLATFORM_ASSERT(false);
 }
@@ -2250,7 +2251,7 @@ void ListBoxX::ClearRegisteredImages() {
 	images.Clear();
 }
 
-void ListBoxX::Draw(DRAWITEMSTRUCT *pDrawItem) {
+void ListBoxX::Draw(const DRAWITEMSTRUCT *pDrawItem) {
 	if ((pDrawItem->itemAction == ODA_SELECT) || (pDrawItem->itemAction == ODA_DRAWENTIRE)) {
 		RECT rcBox = pDrawItem->rcItem;
 		rcBox.left += TextOffset();

@@ -1592,7 +1592,7 @@ static void DrawTranslucentSelection(Surface *surface, const EditModel &model, c
 
 // Draw any translucent whole line states
 static void DrawTranslucentLineState(Surface *surface, const EditModel &model, const ViewStyle &vsDraw, const LineLayout *ll,
-	Sci::Line line, PRectangle rcLine, int subLine) {
+	Sci::Line line, const PRectangle &rcLine, int subLine) {
 	if ((model.caret.active || vsDraw.alwaysShowCaretLineBackground) && vsDraw.showCaretLineBackground && ll->containsCaret &&
 		vsDraw.caretLineAlpha != SC_ALPHA_NOALPHA) {
 		if (vsDraw.caretLineFrame) {

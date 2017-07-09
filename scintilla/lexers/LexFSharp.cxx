@@ -40,7 +40,7 @@ static inline bool IsFSOperator(int ch) {
 	0
 };*/
 
-static void ColouriseFSharpDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, WordList *keywordLists[], Accessor &styler) {
+static void ColouriseFSharpDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
 	const WordList &keywords = *keywordLists[0];
 	const WordList &keywords2 = *keywordLists[1];
 	const WordList &keywords3 = *keywordLists[2];
@@ -206,7 +206,7 @@ static inline bool IsStreamCommentStyle(int style) {
 }
 #define IsOpenLine(line)		IsFSLine(line, "open")
 
-static void FoldFSharpDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, WordList *[], Accessor &styler) {
+static void FoldFSharpDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList, Accessor &styler) {
 	if (styler.GetPropertyInt("fold") == 0)
 		return;
 	//const int lexType = styler.GetPropertyInt("lexer.lang.type", LEX_FSHARP);

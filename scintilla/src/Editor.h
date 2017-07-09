@@ -503,8 +503,8 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	void MouseLeave();
 	virtual void ButtonDownWithModifiers(const Point &pt, unsigned int curTime, int modifiers);
 	virtual void RightButtonDownWithModifiers(const Point &pt, unsigned int curTime, int modifiers);
-	void ButtonMoveWithModifiers(Point pt, unsigned int curTime, int modifiers);
-	void ButtonUpWithModifiers(Point pt, unsigned int curTime, int modifiers);
+	void ButtonMoveWithModifiers(const Point &pt, unsigned int curTime, int modifiers);
+	void ButtonUpWithModifiers(const Point &pt, unsigned int curTime, int modifiers);
 
 	bool Idle();
 	enum TickReason { tickCaret, tickScroll, tickWiden, tickDwell, tickPlatform };
@@ -521,7 +521,7 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	void StyleToPositionInView(Sci::Position pos);
 	Sci::Position PositionAfterMaxStyling(Sci::Position posMax, bool scrolling) const;
 	void StartIdleStyling(bool truncatedLastStyling);
-	void StyleAreaBounded(PRectangle rcArea, bool scrolling);
+	void StyleAreaBounded(const PRectangle &rcArea, bool scrolling);
 	void IdleStyling();
 	virtual void IdleWork();
 	virtual void QueueIdleWork(WorkNeeded::workItems items, Sci::Position upTo=0);
@@ -554,7 +554,7 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	void SetHotSpotRange(const Point *pt);
 	Range GetHotSpotRange() const override;
 	void SetHoverIndicatorPosition(Sci::Position position);
-	void SetHoverIndicatorPoint(Point pt);
+	void SetHoverIndicatorPoint(const Point &pt);
 
 	int CodePage() const;
 	virtual bool ValidCodePage(int /* codePage */) const { return true; }

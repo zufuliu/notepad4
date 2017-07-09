@@ -223,7 +223,7 @@ static bool currLineContainsHereDelims(Sci_Position& startPos, Accessor &styler)
 
 static void enterInnerExpression(int *p_inner_string_types,
 	int *p_inner_expn_brace_counts, QuoteCls *p_inner_quotes, int& inner_string_count,
-	int& state, int& brace_counts, QuoteCls curr_quote) {
+	int& state, int& brace_counts, QuoteCls& curr_quote) {
 	p_inner_string_types[inner_string_count] = state;
 	state = SCE_RB_DEFAULT;
 	p_inner_expn_brace_counts[inner_string_count] = brace_counts;
@@ -578,13 +578,13 @@ static void synchronizeDocStart(Sci_PositionU & startPos, Sci_Position &length, 
 	0
 };*/
 
-static void ColouriseRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, WordList *keywordlists[], Accessor &styler) {
+static void ColouriseRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
 	// Lexer for Ruby often has to backtrack to start of current style to determine
 	// which characters are being used as quotes, how deeply nested is the
 	// start position and what the termination string is for here documents
 
-	const WordList &keywords = *keywordlists[0];
-	const WordList &kwFold = *keywordlists[8];
+	const WordList &keywords = *keywordLists[0];
+	const WordList &kwFold = *keywordLists[8];
 
 	HereDocCls HereDoc;
 	QuoteCls Quote;
@@ -1566,7 +1566,7 @@ static bool keywordDoStartsLoop(Sci_Position pos, Accessor &styler) {
 
 #define IsCommentLine(line)	IsLexCommentLine(line, styler, SCE_RB_COMMENTLINE)
 
-static void FoldRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, WordList *[], Accessor &styler) {
+static void FoldRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList, Accessor &styler) {
 	if (styler.GetPropertyInt("fold") == 0)
 		return;
 	const bool foldCompact = styler.GetPropertyInt("fold.compact", 1) != 0;

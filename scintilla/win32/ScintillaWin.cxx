@@ -305,7 +305,7 @@ class ScintillaWin :
 
 	Sci::Position TargetAsUTF8(char *text);
 	void AddCharUTF16(wchar_t const *wcs, unsigned int wclen);
-	Sci::Position EncodedFromUTF8(char *utf8, char *encoded) const;
+	Sci::Position EncodedFromUTF8(const char *utf8, char *encoded) const;
 	sptr_t WndPaint(uptr_t wParam);
 
 	sptr_t HandleCompositionWindowed(uptr_t wParam, sptr_t lParam);
@@ -317,7 +317,7 @@ class ScintillaWin :
 	void SelectionToHangul();
 	void EscapeHanja();
 	void ToggleHanja();
-	void AddWString(std::wstring wcs);
+	void AddWString(const std::wstring &wcs);
 
 	UINT CodePageOfDocument() const;
 	bool ValidCodePage(int codePage) const override;
@@ -688,7 +688,7 @@ static int KeyTranslate(int keyIn) {
 	}
 }
 
-static bool BoundsContains(PRectangle rcBounds, HRGN hRgnBounds, PRectangle rcCheck) {
+static bool BoundsContains(const PRectangle &rcBounds, HRGN hRgnBounds, const PRectangle &rcCheck) {
 	bool contains = true;
 	if (!rcCheck.Empty()) {
 		if (!rcBounds.Contains(rcCheck)) {
@@ -766,7 +766,7 @@ Sci::Position ScintillaWin::TargetAsUTF8(char *text) {
 
 // Translates a nul terminated UTF8 string into the document encoding.
 // Return the length of the result in bytes.
-Sci::Position ScintillaWin::EncodedFromUTF8(char *utf8, char *encoded) const {
+Sci::Position ScintillaWin::EncodedFromUTF8(const char *utf8, char *encoded) const {
 	Sci::Position inputLength = (lengthForEncode >= 0) ? lengthForEncode : static_cast<Sci::Position>(strlen(utf8));
 	if (IsUnicodeMode()) {
 		if (encoded) {
@@ -1013,7 +1013,7 @@ void ScintillaWin::ToggleHanja() {
 
 namespace {
 
-std::vector<int> MapImeIndicators(std::vector<BYTE> inputStyle) {
+std::vector<int> MapImeIndicators(const std::vector<BYTE> &inputStyle) {
 	std::vector<int> imeIndicator(inputStyle.size(), SC_INDICATOR_UNKNOWN);
 	for (size_t i = 0; i < inputStyle.size(); i++) {
 		switch (static_cast<int>(inputStyle.at(i))) {
@@ -1037,7 +1037,7 @@ std::vector<int> MapImeIndicators(std::vector<BYTE> inputStyle) {
 
 }
 
-void ScintillaWin::AddWString(std::wstring wcs) {
+void ScintillaWin::AddWString(const std::wstring &wcs) {
 	if (wcs.empty())
 		return;
 

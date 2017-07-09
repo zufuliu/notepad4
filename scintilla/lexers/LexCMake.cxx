@@ -32,7 +32,7 @@ static inline bool IsCmakeOperator(char ch) {
 	return ch == '(' || ch == ')' || ch == '=' || ch == ':' || ch == ';';
 }
 
-static void ColouriseCmakeDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, WordList *keywordLists[], Accessor &styler) {
+static void ColouriseCmakeDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
 	const WordList &keywords = *keywordLists[0];
 	const WordList &keywords2 = *keywordLists[1];
 
@@ -63,8 +63,8 @@ _label_identifier:
 				} else if (LexGetNextChar(sc.currentPos, styler) == '(') {
 					sc.ChangeState(SCE_CMAKE_FUNCATION);
 				} else if (userDefType) {
-					userDefType = 0;
 					sc.ChangeState(userDefType == 1 ? SCE_CMAKE_FUNCATION : SCE_CMAKE_MACRO);
+					userDefType = 0;
 				}
 				sc.SetState(SCE_CMAKE_DEFAULT);
 			}
@@ -148,7 +148,7 @@ _label_var_string:
 #define IsCommentLine(line)		IsLexCommentLine(line, styler, SCE_CMAKE_COMMENT)
 #define CMakeMatch(str)			LexMatchIgnoreCase(i, styler, str)
 
-static void FoldCmakeDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, WordList *[], Accessor &styler) {
+static void FoldCmakeDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList, Accessor &styler) {
 	if (styler.GetPropertyInt("fold") == 0)
 		return;
 	const bool foldComment = styler.GetPropertyInt("fold.comment", 1) != 0;

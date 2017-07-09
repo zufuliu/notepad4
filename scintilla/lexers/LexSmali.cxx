@@ -70,7 +70,7 @@ static bool IsJavaType(int ch, int chPrev, int chNext) {
 #define kWordType_Method	3
 
 #define MAX_WORD_LENGTH	31
-static void ColouriseSmaliDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, WordList *keywordLists[], Accessor &styler) {
+static void ColouriseSmaliDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
 	const WordList &keywords = *keywordLists[0];
 	//const WordList &kwInstruction = *keywordLists[10];
 
@@ -333,7 +333,7 @@ static bool IsAnnotationLine(Sci_Position line, Accessor &styler) {
 	return false;
 }
 
-static void FoldSmaliDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, WordList *[], Accessor &styler) {
+static void FoldSmaliDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList, Accessor &styler) {
 	if (styler.GetPropertyInt("fold") == 0)
 		return;
 	const bool foldComment = styler.GetPropertyInt("fold.comment") != 0;

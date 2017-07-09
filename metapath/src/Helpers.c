@@ -36,10 +36,10 @@
 int IniSectionGetString(LPCWSTR lpCachedIniSection, LPCWSTR lpName, LPCWSTR lpDefault, LPWSTR lpReturnedString, int cchReturnedString)
 {
 	WCHAR *p = (WCHAR *)lpCachedIniSection;
-	WCHAR tch[256];
-	int  ich;
 
 	if (p) {
+		int  ich;
+		WCHAR tch[256];
 		lstrcpy(tch, lpName);
 		lstrcat(tch, L"=");
 		ich = lstrlen(tch);
@@ -94,11 +94,11 @@ BOOL IniSectionGetBool(LPCWSTR lpCachedIniSection, LPCWSTR lpName, BOOL bDefault
 int IniSectionGetInt(LPCWSTR lpCachedIniSection, LPCWSTR lpName, int iDefault)
 {
 	WCHAR *p = (WCHAR *)lpCachedIniSection;
-	WCHAR tch[256];
-	int  ich;
-	int  i;
 
 	if (p) {
+		WCHAR tch[256];
+		int  ich;
+		int  i;
 		lstrcpy(tch, lpName);
 		lstrcat(tch, L"=");
 		ich = lstrlen(tch);
@@ -120,10 +120,10 @@ int IniSectionGetInt(LPCWSTR lpCachedIniSection, LPCWSTR lpName, int iDefault)
 
 BOOL IniSectionSetString(LPWSTR lpCachedIniSection, LPCWSTR lpName, LPCWSTR lpString)
 {
-	WCHAR tch[256];
 	WCHAR *p = lpCachedIniSection;
 
 	if (p) {
+		WCHAR tch[256];
 		while (*p) {
 			p = StrEnd(p) + 1;
 		}
@@ -393,7 +393,7 @@ BOOL BitmapGrayScale(HBITMAP hbmp)
 //
 BOOL SetWindowPathTitle(HWND hwnd, LPCWSTR lpszFile)
 {
-	WCHAR szTitle[256];
+	WCHAR szTitle[256] = L"";
 	if (lstrlen(lpszFile)) {
 		if (!PathIsRoot(lpszFile)) {
 			SHFILEINFO shfi;
@@ -494,11 +494,11 @@ void DeleteBitmapButton(HWND hwnd, int nCtlId)
 void SetWindowTransparentMode(HWND hwnd, BOOL bTransparentMode)
 {
 	FARPROC fp;
-	int  iAlphaPercent;
-	BYTE bAlpha;
 
 	if (bTransparentMode) {
 		if ((fp = GetProcAddress(GetModuleHandle(L"User32"), "SetLayeredWindowAttributes")) != NULL) {
+			int  iAlphaPercent;
+			BYTE bAlpha;
 			SetWindowLongPtr(hwnd, GWL_EXSTYLE, GetWindowLongPtr(hwnd, GWL_EXSTYLE) | WS_EX_LAYERED);
 
 			// get opacity level from registry
@@ -558,7 +558,7 @@ int Toolbar_SetButtons(HWND hwnd, int cmdBase, LPCWSTR lpszButtons, LPCTBBUTTON 
 	int i, c;
 	int iCmd;
 
-	ZeroMemory(tchButtons, COUNTOF(tchButtons)*sizeof(tchButtons[0]));
+	ZeroMemory(tchButtons, sizeof(tchButtons));
 	lstrcpyn(tchButtons, lpszButtons, COUNTOF(tchButtons) - 2);
 	TrimString(tchButtons);
 	while ((p = StrStr(tchButtons, L"  ")) != NULL) {
@@ -742,7 +742,6 @@ void PathAbsoluteFromApp(LPWSTR lpszSrc, LPWSTR lpszDest, int cchDest, BOOL bExp
 BOOL PathIsLnkFile(LPCWSTR pszPath)
 {
 	//WCHAR *pszExt;
-	WCHAR tchResPath[256];
 
 	if (!pszPath || !*pszPath) {
 		return FALSE;
@@ -767,6 +766,7 @@ BOOL PathIsLnkFile(LPCWSTR pszPath)
 	if (lstrcmpi(PathFindExtension(pszPath), L".lnk")) {
 		return FALSE;
 	} else {
+		WCHAR tchResPath[256];
 		return PathGetLnkPath(pszPath, tchResPath, COUNTOF(tchResPath));
 	}
 }
@@ -832,9 +832,9 @@ BOOL PathGetLnkPath(LPCWSTR pszLnkFile, LPWSTR pszResPath, int cchResPath)
 //
 BOOL PathIsLnkToDirectory(LPCWSTR pszPath, LPWSTR pszResPath, int cchResPath)
 {
-	WCHAR tchResPath[MAX_PATH];
 
 	if (PathIsLnkFile(pszPath)) {
+		WCHAR tchResPath[MAX_PATH];
 		if (PathGetLnkPath(pszPath, tchResPath, sizeof(WCHAR)*COUNTOF(tchResPath))) {
 			if (PathIsDirectory(tchResPath)) {
 				lstrcpyn(pszResPath, tchResPath, cchResPath);
@@ -1215,8 +1215,6 @@ BOOL ExecDDECommand(LPCWSTR lpszCmdLine, LPCWSTR lpszDDEMsg, LPCWSTR lpszDDEApp,
 	WCHAR  lpszDDEMsgBuf[256];
 	WCHAR  *pSubst;
 	DWORD idInst = 0;
-	HSZ hszService, hszTopic;
-	HCONV hConv;
 	BOOL bSuccess = TRUE;
 
 	if (lstrlen(lpszCmdLine) == 0 || lstrlen(lpszDDEMsg) == 0 || lstrlen(lpszDDEApp) == 0 || lstrlen(lpszDDETopic) == 0) {
@@ -1231,9 +1229,11 @@ BOOL ExecDDECommand(LPCWSTR lpszCmdLine, LPCWSTR lpszDDEMsg, LPCWSTR lpszDDEApp,
 	wsprintf(lpszURLExec, lpszDDEMsgBuf, lpszCmdLine);
 
 	if (DdeInitialize(&idInst, DdeCallback, APPCLASS_STANDARD | APPCMD_CLIENTONLY, 0L) == DMLERR_NO_ERROR) {
+		HSZ hszService, hszTopic;
 		hszService = DdeCreateStringHandle(idInst, lpszDDEApp, CP_WINUNICODE);
 		hszTopic = DdeCreateStringHandle(idInst, lpszDDETopic, CP_WINUNICODE);
 		if (hszService && hszTopic) {
+			HCONV hConv;
 			hConv = DdeConnect(idInst, hszService, hszTopic, NULL);
 			if (hConv) {
 				DdeClientTransaction((LPBYTE)lpszURLExec, sizeof(WCHAR) * (lstrlen(lpszURLExec) + 1), hConv, 0, 0, XTYP_EXECUTE, TIMEOUT_ASYNC, NULL);
@@ -1293,7 +1293,6 @@ BOOL History_Uninit(PHISTORY ph)
 
 BOOL History_Add(PHISTORY ph, LPCWSTR pszNew)
 {
-	int i;
 
 	if (!ph) {
 		return FALSE;
@@ -1313,6 +1312,7 @@ BOOL History_Add(PHISTORY ph, LPCWSTR pszNew)
 
 		MoveMemory(ph->psz, ph->psz + 1, (HISTORY_ITEMS - 1)*sizeof(WCHAR *));
 	} else {
+		int i;
 		ph->iCurItem++;
 		for (i = ph->iCurItem; i < HISTORY_ITEMS; i++) {
 			if (ph->psz[i]) {
@@ -1492,7 +1492,7 @@ int MRU_Enum(LPMRULIST pmru, int iIndex, LPWSTR pszItem, int cchItem)
 {
 	if (pszItem == NULL || cchItem == 0) {
 		int i = 0;
-		while (pmru->pszItems[i] && i < pmru->iSize) {
+		while (i < pmru->iSize && pmru->pszItems[i]) {
 			i++;
 		}
 		return i;

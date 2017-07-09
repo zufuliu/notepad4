@@ -1223,8 +1223,8 @@ void EditToggleCommentBlock(HWND hwnd)
 }
 
 void EditShowCallTips(HWND hwnd, int position) {
-	char *text = NULL;
-	char *pLine = NULL;
+	char *text;
+	char *pLine;
 	int iLine = (int)SendMessage(hwnd, SCI_LINEFROMPOSITION, (WPARAM)position, 0);
 	int iDocLen = SciCall_GetLine(iLine, NULL); // get length
 	pLine = NP2HeapAlloc(iDocLen + 1);

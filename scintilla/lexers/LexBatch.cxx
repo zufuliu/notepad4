@@ -44,7 +44,7 @@ static inline bool IsWordChar(int ch) {
 	0
 };*/
 
-static void ColouriseBatchDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, WordList *keywordLists[],Accessor &styler) {
+static void ColouriseBatchDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
 	const WordList &keywords = *keywordLists[0];
 	bool quatedVar = false;
 	bool numVar = false;

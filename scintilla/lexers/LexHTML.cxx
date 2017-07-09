@@ -573,14 +573,14 @@ static Sci_Position FindPhpStringDelimiter(char *phpStringDelimiter, const int p
 //#define		LEX_ASPNET_CS	7
 //#define		LEX_ASPNET_VB	8
 
-static void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, WordList *keywordlists[],
+static void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists,
                                   Accessor &styler, bool isXml) {
-	const WordList &keywords = *keywordlists[0];
-	const WordList &keywords_JS = *keywordlists[1];
-	const WordList &keywords_VBS = *keywordlists[2];
-	const WordList &keywords_PY = *keywordlists[3];
-	const WordList &keywords_PHP = *keywordlists[4];
-	const WordList &keywords_SGML = *keywordlists[5]; // SGML (DTD)
+	const WordList &keywords = *keywordLists[0];
+	const WordList &keywords_JS = *keywordLists[1];
+	const WordList &keywords_VBS = *keywordLists[2];
+	const WordList &keywords_PY = *keywordLists[3];
+	const WordList &keywords_PHP = *keywordLists[4];
+	const WordList &keywords_SGML = *keywordLists[5]; // SGML (DTD)
 
 	styler.StartAt(startPos);
 	char prevWord[256];
@@ -2185,26 +2185,26 @@ static void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, i
 	}
 }
 
-static void ColouriseXMLDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, WordList *keywordlists[],
+static void ColouriseXMLDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists,
                                   Accessor &styler) {
 	// Passing in true because we're lexing XML
-	ColouriseHyperTextDoc(startPos, length, initStyle, keywordlists, styler, true);
+	ColouriseHyperTextDoc(startPos, length, initStyle, keywordLists, styler, true);
 }
 
-static void ColouriseHTMLDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, WordList *keywordlists[],
+static void ColouriseHTMLDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists,
                                   Accessor &styler) {
 	// Passing in false because we're notlexing XML
 	const int lexType = styler.GetPropertyInt("lexer.lang.type", LEX_HTML);
 	if (lexType == LEX_PHP && startPos == 0)
 		initStyle = SCE_HPHP_DEFAULT;
-	ColouriseHyperTextDoc(startPos, length, initStyle, keywordlists, styler, false);
+	ColouriseHyperTextDoc(startPos, length, initStyle, keywordLists, styler, false);
 }
 
-/*static void ColourisePHPScriptDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, WordList *keywordlists[],
+/*static void ColourisePHPScriptDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists,
         Accessor &styler) {
 	if (startPos == 0)
 		initStyle = SCE_HPHP_DEFAULT;
-	ColouriseHTMLDoc(startPos, length, initStyle, keywordlists, styler);
+	ColouriseHTMLDoc(startPos, length, initStyle, keywordLists, styler);
 }*/
 
 /*static const char * const htmlWordListDesc[] = {

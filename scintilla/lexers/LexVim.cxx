@@ -25,7 +25,7 @@ static inline bool IsVimOp(int ch) {
 }
 
 #define MAX_WORD_LENGTH	15
-static void ColouriseVimDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, WordList *keywordLists[], Accessor &styler) {
+static void ColouriseVimDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
 	const WordList &keywords = *keywordLists[0];
 
 	int state = initStyle;
@@ -131,7 +131,7 @@ static void ColouriseVimDoc(Sci_PositionU startPos, Sci_Position length, int ini
 }
 
 #define IsCommentLine(line)			IsLexCommentLine(line, styler, SCE_C_COMMENTLINE)
-static void FoldVimDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, WordList *[], Accessor &styler) {
+static void FoldVimDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList, Accessor &styler) {
 	if (styler.GetPropertyInt("fold") == 0)
 		return;
 	const bool foldComment = styler.GetPropertyInt("fold.comment") != 0;

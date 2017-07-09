@@ -36,6 +36,7 @@ typedef struct tagDLDATA { // dl
 	BOOL bNoFadeHidden;			// Flag passed from GetDispInfo()
 	HANDLE hExitThread;			// Flag is set when Icon Thread should terminate
 	HANDLE hTerminatedThread;	// Flag is set when Icon Thread has terminated
+	HANDLE hIconThread;
 } DLDATA, *LPDLDATA;
 
 //==== Property Name ==========================================================
@@ -52,7 +53,6 @@ BOOL DirList_Init(HWND hwnd, LPCWSTR pszHeader)
 {
 	HIMAGELIST hil;
 	SHFILEINFO shfi;
-	LV_COLUMN  lvc;
 
 	// Allocate DirListData Property
 	LPDLDATA lpdl = (LPVOID)GlobalAlloc(GPTR, sizeof(DLDATA));
@@ -86,9 +86,6 @@ BOOL DirList_Init(HWND hwnd, LPCWSTR pszHeader)
 	lpdl->hExitThread = CreateEvent(NULL, TRUE, FALSE, NULL);
 	lpdl->hTerminatedThread = CreateEvent(NULL, TRUE, TRUE, NULL);
 
-	lvc;
-	pszHeader;
-
 	return TRUE;
 }
 
@@ -107,6 +104,7 @@ BOOL DirList_Destroy(HWND hwnd)
 	DirList_TerminateIconThread(hwnd);
 	CloseHandle(lpdl->hExitThread);
 	CloseHandle(lpdl->hTerminatedThread);
+	CloseHandle(lpdl->hIconThread);
 
 	if (lpdl->pidl) {
 		CoTaskMemFree(lpdl->pidl);
@@ -140,7 +138,7 @@ BOOL DirList_StartIconThread(HWND hwnd)
 	ResetEvent(lpdl->hExitThread);
 	//ResetEvent(lpdl->hTerminatedThread);
 
-	CreateThread(NULL, 0, DirList_IconThread, (LPVOID)lpdl, 0, &dwtid);
+	lpdl->hIconThread = CreateThread(NULL, 0, DirList_IconThread, (LPVOID)lpdl, 0, &dwtid);
 
 	return TRUE;
 }
@@ -192,7 +190,6 @@ int DirList_Fill(HWND hwnd, LPCWSTR lpszDir, DWORD grfFlags, LPCWSTR lpszFileSpe
 	LPENUMIDLIST  lpe = NULL;
 
 	LV_ITEM       lvi;
-	LPLV_ITEMDATA lplvid;
 
 	ULONG chParsed = 0;
 	ULONG dwAttributes = 0;
@@ -256,7 +253,7 @@ int DirList_Fill(HWND hwnd, LPCWSTR lpszDir, DWORD grfFlags, LPCWSTR lpszFileSpe
 						if (dwAttributes & SFGAO_FILESYSTEM) {
 							// Check if item matches specified filter
 							if (DirList_MatchFilter(lpsf, pidlEntry, &dlf)) {
-								lplvid = CoTaskMemAlloc(sizeof(LV_ITEMDATA));
+								LPLV_ITEMDATA lplvid = CoTaskMemAlloc(sizeof(LV_ITEMDATA));
 								lplvid->pidl = pidlEntry;
 								lplvid->lpsf = lpsf;
 								lpsf->lpVtbl->AddRef(lpsf);
@@ -548,7 +545,7 @@ int DirList_GetItem(HWND hwnd, int iItem, LPDLITEM lpdli)
 {
 	LV_ITEM lvi;
 	LPLV_ITEMDATA lplvid;
-	ULONG dwAttributes = SFGAO_FILESYSTEM;
+	//ULONG dwAttributes = SFGAO_FILESYSTEM;
 
 	if (iItem == -1) {
 		if (ListView_GetSelectedCount(hwnd)) {
@@ -991,12 +988,11 @@ int DriveBox_Fill(HWND hwnd)
 								// Insert sorted ...
 								{
 									COMBOBOXEXITEM cbei2;
-									LPDC_ITEMDATA lpdcid2;
 									cbei2.mask = CBEIF_LPARAM;
 									cbei2.iItem = 0;
 
 									while ((SendMessage(hwnd, CBEM_GETITEM, 0, (LPARAM)&cbei2))) {
-										lpdcid2 = (LPDC_ITEMDATA)cbei2.lParam;
+										LPDC_ITEMDATA lpdcid2 = (LPDC_ITEMDATA)cbei2.lParam;
 										hr = (lpdcid->lpsf->lpVtbl->CompareIDs(lpdcid->lpsf, 0, lpdcid->pidl, lpdcid2->pidl));
 
 										if ((short)(SCODE_CODE(GetScode(hr))) < 0) {
@@ -1073,7 +1069,6 @@ BOOL DriveBox_GetSelDrive(HWND hwnd, LPWSTR lpszDrive, int nDrive, BOOL fNoSlash
 BOOL DriveBox_SelectDrive(HWND hwnd, LPCWSTR lpszPath)
 {
 	COMBOBOXEXITEM cbei;
-	LPDC_ITEMDATA lpdcid;
 	WCHAR szRoot[64];
 
 	int i;
@@ -1087,6 +1082,7 @@ BOOL DriveBox_SelectDrive(HWND hwnd, LPCWSTR lpszPath)
 	cbei.mask = CBEIF_LPARAM;
 
 	for (i = 0; i < cbItems; i++) {
+		LPDC_ITEMDATA lpdcid;
 		// Get DC_ITEMDATA* of Item i
 		cbei.iItem = i;
 		SendMessage(hwnd, CBEM_GETITEM, 0, (LPARAM)&cbei);
@@ -1199,7 +1195,6 @@ LRESULT DriveBox_GetDispInfo(HWND hwnd, LPARAM lParam)
 	NMCOMBOBOXEX *lpnmcbe;
 	LPDC_ITEMDATA lpdcid;
 	SHFILEINFO shfi;
-	WCHAR szTemp[256];
 
 	lpnmcbe = (LPVOID)lParam;
 	lpdcid = (LPDC_ITEMDATA)lpnmcbe->ceItem.lParam;
@@ -1215,6 +1210,7 @@ LRESULT DriveBox_GetDispInfo(HWND hwnd, LPARAM lParam)
 
 	// Get Icon Index
 	if (lpnmcbe->ceItem.mask & (CBEIF_IMAGE | CBEIF_SELECTEDIMAGE)) {
+		WCHAR szTemp[256];
 		IL_GetDisplayName(lpdcid->lpsf, lpdcid->pidl, SHGDN_FORPARSING, szTemp, 256);
 		SHGetFileInfo(szTemp, 0, &shfi, sizeof(SHFILEINFO), SHGFI_SYSICONINDEX | SHGFI_SMALLICON);
 		lpnmcbe->ceItem.iImage = shfi.iIcon;

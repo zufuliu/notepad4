@@ -23,6 +23,7 @@ public:
 	bool Indented;	// indented delimiter (for <<-)
 	int DelimiterLength;	// strlen(Delimiter)
 	char Delimiter[HERE_DELIM_MAX];	// the Delimiter
+
 	HereDocCls();
 	void Append(int ch);
 	~HereDocCls() {
@@ -35,6 +36,7 @@ public:
 	int Rep;
 	int	Count;
 	int Up, Down;
+
 	QuoteCls() {
 		this->New();
 	}
@@ -55,6 +57,7 @@ public:
 	int CountStack[QUOTE_DELIM_STACK_MAX];
 	int UpStack[QUOTE_DELIM_STACK_MAX];
 	int StyleStack[QUOTE_DELIM_STACK_MAX];
+
 	QuoteStackCls();
 	void Start(int u, int s);
 	void Push(int u, int s);

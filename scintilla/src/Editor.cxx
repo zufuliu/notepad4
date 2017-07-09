@@ -3736,9 +3736,8 @@ int Editor::KeyCommand(unsigned int iMessage) {
 		break;
 	case SCI_EDITTOGGLEOVERTYPE:
 		inOverstrike = !inOverstrike;
+		ContainerNeedsUpdate(SC_UPDATE_SELECTION);
 		ShowCaretAtCurrentPosition();
-		ContainerNeedsUpdate(SC_UPDATE_CONTENT);
-		NotifyUpdateUI();
 		break;
 	case SCI_CANCEL:            	// Cancel any modes - handled in subclass
 		// Also unselect text
@@ -4644,7 +4643,7 @@ void Editor::SetHoverIndicatorPosition(Sci::Position position) {
 	}
 }
 
-void Editor::SetHoverIndicatorPoint(Point pt) {
+void Editor::SetHoverIndicatorPoint(const Point &pt) {
 	if (!vs.indicatorsDynamic) {
 		SetHoverIndicatorPosition(INVALID_POSITION);
 	} else {
@@ -4683,7 +4682,7 @@ Range Editor::GetHotSpotRange() const {
 	return hotspot;
 }
 
-void Editor::ButtonMoveWithModifiers(Point pt, unsigned int, int modifiers) {
+void Editor::ButtonMoveWithModifiers(const Point &pt, unsigned int, int modifiers) {
 	if ((ptMouseLast.x != pt.x) || (ptMouseLast.y != pt.y)) {
 		DwellEnd(true);
 	}
@@ -4808,7 +4807,7 @@ void Editor::ButtonMoveWithModifiers(Point pt, unsigned int, int modifiers) {
 	}
 }
 
-void Editor::ButtonUpWithModifiers(Point pt, unsigned int curTime, int modifiers) {
+void Editor::ButtonUpWithModifiers(const Point &pt, unsigned int curTime, int modifiers) {
 	//Platform::DebugPrintf("ButtonUp %d %d\n", HaveMouseCapture(), inDragDrop);
 	SelectionPosition newPos = SPositionFromLocation(pt, false, false,
 		AllowVirtualSpace(virtualSpaceOptions, sel.IsRectangular()));
@@ -5039,7 +5038,7 @@ void Editor::StartIdleStyling(bool truncatedLastStyling) {
 }
 
 // Style for an area but bound the amount of styling to remain responsive
-void Editor::StyleAreaBounded(PRectangle rcArea, bool scrolling) {
+void Editor::StyleAreaBounded(const PRectangle &rcArea, bool scrolling) {
 	const Sci::Position posAfterArea = PositionAfterArea(rcArea);
 	const Sci::Position posAfterMax = PositionAfterMaxStyling(posAfterArea, scrolling);
 	if (posAfterMax < posAfterArea) {
@@ -7641,7 +7640,11 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 		}
 
 	case SCI_SETOVERTYPE:
-		inOverstrike = wParam != 0;
+		if (inOverstrike != (wParam != 0)) {
+			inOverstrike = wParam != 0;
+			ContainerNeedsUpdate(SC_UPDATE_SELECTION);
+			ShowCaretAtCurrentPosition();
+		}
 		break;
 
 	case SCI_GETOVERTYPE:

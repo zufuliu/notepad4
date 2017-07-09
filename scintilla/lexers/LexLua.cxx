@@ -46,15 +46,15 @@ static int LongDelimCheck(StyleContext &sc) {
 	0
 };*/
 
-static void ColouriseLuaDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, WordList *keywordlists[], Accessor &styler) {
-	const WordList &keywords = *keywordlists[0];
-	const WordList &keywords2 = *keywordlists[1];
-	const WordList &keywords3 = *keywordlists[2];
-	const WordList &keywords4 = *keywordlists[3];
-	const WordList &keywords5 = *keywordlists[4];
-	const WordList &keywords6 = *keywordlists[5];
-	const WordList &keywords7 = *keywordlists[6];
-	const WordList &keywords8 = *keywordlists[7];
+static void ColouriseLuaDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
+	const WordList &keywords = *keywordLists[0];
+	const WordList &keywords2 = *keywordLists[1];
+	const WordList &keywords3 = *keywordLists[2];
+	const WordList &keywords4 = *keywordLists[3];
+	const WordList &keywords5 = *keywordLists[4];
+	const WordList &keywords6 = *keywordLists[5];
+	const WordList &keywords7 = *keywordLists[6];
+	const WordList &keywords8 = *keywordLists[7];
 
 	// Accepts accented characters
 	const CharacterSet setWordStart(CharacterSet::setAlpha, "_", 0x80, true);
@@ -332,7 +332,7 @@ _label_identifier:
 
 #define IsCommentLine(line)	IsLexCommentLine(line, styler, MultiStyle(SCE_LUA_COMMENTLINE, SCE_LUA_COMMENT))
 
-static void FoldLuaDoc(Sci_PositionU startPos, Sci_Position length, int /* initStyle */, WordList *[], Accessor &styler) {
+static void FoldLuaDoc(Sci_PositionU startPos, Sci_Position length, int /* initStyle */, LexerWordList, Accessor &styler) {
 	if (styler.GetPropertyInt("fold") == 0)
 		return;
 	const Sci_PositionU lengthDoc = startPos + length;

@@ -317,7 +317,7 @@ public:
 	virtual void RoundedRectangle(const PRectangle &rc, const ColourDesired &fore, const ColourDesired &back)=0;
 	virtual void AlphaRectangle(const PRectangle &rc, int cornerSize, const ColourDesired &fill, int alphaFill,
 		const ColourDesired &outline, int alphaOutline, int flags)=0;
-	virtual void DrawRGBAImage(PRectangle &rc, int width, int height, const unsigned char *pixelsImage) = 0;
+	virtual void DrawRGBAImage(const PRectangle &rc, int width, int height, const unsigned char *pixelsImage) = 0;
 	virtual void Ellipse(const PRectangle &rc, const ColourDesired &fore, const ColourDesired &back)=0;
 	virtual void Copy(const PRectangle &rc, const Point &from, const Surface &surfaceSource)=0;
 
@@ -396,7 +396,7 @@ private:
 
 struct ListBoxEvent {
 	enum class EventType { selectionChange, doubleClick } event;
-	ListBoxEvent(EventType event_) : event(event_) {
+	explicit ListBoxEvent(EventType event_) : event(event_) {
 	}
 };
 
@@ -419,7 +419,7 @@ public:
 	virtual PRectangle GetDesiredRect()=0;
 	virtual int CaretFromEdge() const=0;
 	virtual void Clear()=0;
-	virtual void Append(char *s, int type = -1)=0;
+	virtual void Append(const char *s, int type = -1)=0;
 	virtual int Length() const=0;
 	virtual void Select(int n)=0;
 	virtual int GetSelection()=0;

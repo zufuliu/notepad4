@@ -27,7 +27,7 @@ static inline bool IsCILWordChar(int ch) {
 }
 
 #define MAX_WORD_LENGTH	31
-static void ColouriseCILDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, WordList *keywordLists[], Accessor &styler) {
+static void ColouriseCILDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
 	const WordList &keywords = *keywordLists[0];
 	const WordList &keywords2	= *keywordLists[1];
 	const WordList &kwInstruction = *keywordLists[10];
@@ -163,7 +163,7 @@ static void ColouriseCILDoc(Sci_PositionU startPos, Sci_Position length, int ini
 
 #define IsCommentLine(line)			IsLexCommentLine(line, styler, SCE_C_COMMENTLINE)
 #define IsStreamCommentStyle(style)	(style == SCE_C_COMMENT)
-static void FoldCILDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, WordList *[], Accessor &styler) {
+static void FoldCILDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList, Accessor &styler) {
 	if (styler.GetPropertyInt("fold") == 0)
 		return;
 	const bool foldComment = styler.GetPropertyInt("fold.comment") != 0;

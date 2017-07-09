@@ -45,7 +45,7 @@ static inline bool IsANumberChar(int ch) {
 	        ch == '.' || ch == '-' || ch == '+');
 }
 
-static void ColouriseTCLDoc(Sci_PositionU startPos, Sci_Position length, int , WordList *keywordlists[], Accessor &styler) {
+static void ColouriseTCLDoc(Sci_PositionU startPos, Sci_Position length, int , LexerWordList keywordLists, Accessor &styler) {
 #define  isComment(s) (s==SCE_TCL_COMMENT || s==SCE_TCL_COMMENTLINE || s==SCE_TCL_COMMENT_BOX || s==SCE_TCL_BLOCK_COMMENT)
 	const bool foldComment = styler.GetPropertyInt("fold.comment") != 0;
 	bool commentLevel = false;
@@ -71,15 +71,15 @@ static void ColouriseTCLDoc(Sci_PositionU startPos, Sci_Position length, int , W
 	// make sure lines overlap
 	startPos = styler.LineStart(currentLine);
 
-	const WordList &keywords = *keywordlists[0];
-	const WordList &keywords2 = *keywordlists[1];
-	const WordList &keywords3 = *keywordlists[2];
-	const WordList &keywords4 = *keywordlists[3];
-	const WordList &keywords5 = *keywordlists[4];
-	const WordList &keywords6 = *keywordlists[5];
-	const WordList &keywords7 = *keywordlists[6];
-	const WordList &keywords8 = *keywordlists[7];
-	const WordList &keywords9 = *keywordlists[8];
+	const WordList &keywords = *keywordLists[0];
+	const WordList &keywords2 = *keywordLists[1];
+	const WordList &keywords3 = *keywordLists[2];
+	const WordList &keywords4 = *keywordLists[3];
+	const WordList &keywords5 = *keywordLists[4];
+	const WordList &keywords6 = *keywordLists[5];
+	const WordList &keywords7 = *keywordLists[6];
+	const WordList &keywords8 = *keywordLists[7];
+	const WordList &keywords9 = *keywordLists[8];
 
 	if (currentLine > 0) {
 		Sci_Position ls = styler.GetLineState(currentLine - 1);

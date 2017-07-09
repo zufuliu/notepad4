@@ -183,7 +183,7 @@ public:
 	virtual ~LexInterface() {
 	}
 	void Colourise(Sci::Position start, Sci::Position end);
-	int LineEndTypesSupported();
+	int LineEndTypesSupported() const;
 	bool UseContainerLexing() const {
 		return instance == 0;
 	}
@@ -316,7 +316,7 @@ public:
 	bool DeleteChars(Sci::Position pos, Sci::Position len);
 	Sci::Position InsertString(Sci::Position position, const char *s, Sci::Position insertLength);
 	void ChangeInsertion(const char *s, Sci::Position length);
-	int SCI_METHOD AddData(char *data, Sci_Position length);
+	int SCI_METHOD AddData(const char *data, Sci_Position length);
 	void * SCI_METHOD ConvertToDocument();
 	Sci::Position Undo();
 	Sci::Position Redo();

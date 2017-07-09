@@ -54,7 +54,7 @@ static inline bool IsAsmNumber(int ch, int chPrev) {
 
 extern bool IsCppInDefine(Sci_Position currentPos, LexAccessor &styler);
 
-static void ColouriseAsmDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, WordList *keywordLists[], Accessor &styler) {
+static void ColouriseAsmDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
 	const WordList &cpuInstruction	= *keywordLists[0];
 	const WordList &mathInstruction	= *keywordLists[1];
 	const WordList &registers		= *keywordLists[2];
@@ -362,7 +362,7 @@ static bool IsAsmDefineLine(Sci_Position line, LexAccessor &styler) {
 
 #define IsEndLine(line)			IsLexLineStartsWith(line, styler, "end", false, SCE_ASM_DIRECTIVE)
 
-static void FoldAsmDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, WordList *keywordLists[], Accessor &styler) {
+static void FoldAsmDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
 	if (styler.GetPropertyInt("fold") == 0)
 		return;
 	const bool foldSyntaxBased = styler.GetPropertyInt("fold.syntaxbased", 1) != 0;

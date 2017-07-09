@@ -121,7 +121,7 @@ static inline int GetPyStringStyle(int quote, bool is_raw, bool is_bytes, bool i
 	}
 }
 
-static void ColourisePyDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, WordList *keywordLists[], Accessor &styler) {
+static void ColourisePyDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
 	const WordList &keywords = *keywordLists[0];
 	const WordList &keywords2 = *keywordLists[1];
 	const WordList &keywords_const = *keywordLists[2];
@@ -357,7 +357,7 @@ static inline bool IsQuoteLine(Sci_Position line, Accessor &styler) {
 }
 
 
-static void FoldPyDoc(Sci_PositionU startPos, Sci_Position length, int, WordList *[], Accessor &styler) {
+static void FoldPyDoc(Sci_PositionU startPos, Sci_Position length, int, LexerWordList, Accessor &styler) {
 	if (styler.GetPropertyInt("fold") == 0)
 		return;
 	const Sci_Position maxPos = startPos + length;

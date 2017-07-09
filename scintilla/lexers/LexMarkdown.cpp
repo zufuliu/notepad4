@@ -19,7 +19,7 @@
 using namespace Scintilla;
 #endif
 
-static void ColouriseMarkdownDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, WordList *keywordLists[], Accessor &styler) {
+static void ColouriseMarkdownDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
 	int state = initStyle;
 	int chPrev, ch = 0, chNext = styler[startPos];
 	styler.StartAt(startPos);

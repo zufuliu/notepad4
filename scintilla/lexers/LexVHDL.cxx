@@ -32,15 +32,15 @@ using namespace Scintilla;
 	0,
 };*/
 
-static void ColouriseVHDLDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, WordList *keywordlists[], Accessor &styler) {
-	const WordList &Keywords = *keywordlists[0];
-	const WordList &Operators = *keywordlists[1];
-	const WordList &Attributes = *keywordlists[2];
-	const WordList &Functions = *keywordlists[3];
-	const WordList &Packages = *keywordlists[4];
-	const WordList &Types = *keywordlists[5];
-	const WordList &User = *keywordlists[6];
-	//const WordList &User2 = *keywordlists[7];
+static void ColouriseVHDLDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
+	const WordList &Keywords = *keywordLists[0];
+	const WordList &Operators = *keywordLists[1];
+	const WordList &Attributes = *keywordLists[2];
+	const WordList &Functions = *keywordLists[3];
+	const WordList &Packages = *keywordLists[4];
+	const WordList &Types = *keywordLists[5];
+	const WordList &User = *keywordLists[6];
+	//const WordList &User2 = *keywordLists[7];
 
 	StyleContext sc(startPos, length, initStyle, styler);
 
@@ -135,10 +135,10 @@ static inline bool IsStreamCommentStyle(int style) {
 #define IsCommentLine(line) IsLexCommentLine(line, styler, MultiStyle(SCE_VHDL_COMMENT, SCE_VHDL_COMMENTLINEBANG))
 
 // Folding the code
-static void FoldVHDLDoc(Sci_PositionU startPos, Sci_Position length, int /*initStyle*/, WordList *keywordlists[], Accessor &styler) {
+static void FoldVHDLDoc(Sci_PositionU startPos, Sci_Position length, int /*initStyle*/, LexerWordList keywordLists, Accessor &styler) {
 	if (styler.GetPropertyInt("fold") == 0)
 		return;
-	const WordList &kwFold = *keywordlists[8];
+	const WordList &kwFold = *keywordLists[8];
 
 	const bool foldComment = styler.GetPropertyInt("fold.comment") != 0;
 	const bool foldCompact = styler.GetPropertyInt("fold.compact", 1) != 0;

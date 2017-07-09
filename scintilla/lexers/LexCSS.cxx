@@ -71,15 +71,15 @@ static int NestingLevelLookBehind(Sci_PositionU startPos, Accessor &styler) {
 	0
 };*/
 
-static void ColouriseCssDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, WordList *keywordlists[], Accessor &styler) {
-	const WordList &css1Props = *keywordlists[0];
-	const WordList &pseudoClasses = *keywordlists[1];
-	const WordList &css2Props = *keywordlists[2];
-	const WordList &css3Props = *keywordlists[3];
-	const WordList &pseudoElements = *keywordlists[4];
-	const WordList &exProps = *keywordlists[5];
-	const WordList &exPseudoClasses = *keywordlists[6];
-	const WordList &exPseudoElements = *keywordlists[7];
+static void ColouriseCssDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
+	const WordList &css1Props = *keywordLists[0];
+	const WordList &pseudoClasses = *keywordLists[1];
+	const WordList &css2Props = *keywordLists[2];
+	const WordList &css3Props = *keywordLists[3];
+	const WordList &pseudoElements = *keywordLists[4];
+	const WordList &exProps = *keywordLists[5];
+	const WordList &exPseudoClasses = *keywordLists[6];
+	const WordList &exPseudoElements = *keywordLists[7];
 
 	StyleContext sc(startPos, length, initStyle, styler);
 
@@ -499,7 +499,7 @@ static void ColouriseCssDoc(Sci_PositionU startPos, Sci_Position length, int ini
 	sc.Complete();
 }
 
-static void FoldCSSDoc(Sci_PositionU startPos, Sci_Position length, int, WordList *[], Accessor &styler) {
+static void FoldCSSDoc(Sci_PositionU startPos, Sci_Position length, int, LexerWordList, Accessor &styler) {
 	bool foldComment = styler.GetPropertyInt("fold.comment") != 0;
 	bool foldCompact = styler.GetPropertyInt("fold.compact", 1) != 0;
 	Sci_PositionU endPos = startPos + length;

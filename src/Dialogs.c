@@ -934,6 +934,7 @@ typedef struct tagIconThreadInfo {
 	HWND hwnd;					// HWND of ListView Control
 	HANDLE hExitThread;			// Flag is set when Icon Thread should terminate
 	HANDLE hTerminatedThread;	// Flag is set when Icon Thread has terminated
+	HANDLE hFileMRUIconThread;
 
 } ICONTHREADINFO,  *LPICONTHREADINFO;
 
@@ -1072,6 +1073,7 @@ INT_PTR CALLBACK FileMRUDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPar
 		}
 		CloseHandle(lpit->hExitThread);
 		CloseHandle(lpit->hTerminatedThread);
+		CloseHandle(lpit->hFileMRUIconThread);
 		RemoveProp(hwnd, L"it");
 		GlobalFree(lpit);
 
@@ -1237,7 +1239,7 @@ INT_PTR CALLBACK FileMRUDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPar
 			ListView_SetItemState(GetDlgItem(hwnd, IDC_FILEMRU), 0, LVIS_FOCUSED, LVIS_FOCUSED);
 			ListView_SetColumnWidth(GetDlgItem(hwnd, IDC_FILEMRU), 0, LVSCW_AUTOSIZE_USEHEADER);
 
-			CreateThread(NULL, 0, FileMRUIconThread, (LPVOID)lpit, 0, &dwtid);
+			lpit->hFileMRUIconThread = CreateThread(NULL, 0, FileMRUIconThread, (LPVOID)lpit, 0, &dwtid);
 		}
 		break;
 

@@ -41,11 +41,11 @@ enum {
 	0
 };*/
 
-static void ClassifyPascalWord(WordList *keywordlists[], StyleContext &sc, int &curLineState, bool bSmartHighlighting) {
-	const WordList& keywords = *keywordlists[0];
-	const WordList& typewords = *keywordlists[1];
-	const WordList& funwords = *keywordlists[2];
-	const WordList& prcwords = *keywordlists[3];
+static void ClassifyPascalWord(LexerWordList keywordLists, StyleContext &sc, int &curLineState, bool bSmartHighlighting) {
+	const WordList& keywords = *keywordLists[0];
+	const WordList& typewords = *keywordLists[1];
+	const WordList& funwords = *keywordLists[2];
+	const WordList& prcwords = *keywordLists[3];
 	char s[128];
 	sc.GetCurrentLowered(s, sizeof(s));
 	if (typewords.InList(s)) {
@@ -101,7 +101,7 @@ static void ClassifyPascalWord(WordList *keywordlists[], StyleContext &sc, int &
 	sc.SetState(SCE_PAS_DEFAULT);
 }
 
-static void ColourisePascalDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, WordList *keywordlists[], Accessor &styler) {
+static void ColourisePascalDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
 	const bool bSmartHighlighting = styler.GetPropertyInt("lexer.pascal.smart.highlighting", 1) != 0;
 
 	const CharacterSet setWordStart(CharacterSet::setAlpha, "_", 0x80, true);
@@ -135,7 +135,7 @@ static void ColourisePascalDoc(Sci_PositionU startPos, Sci_Position length, int 
 				break;
 			case SCE_PAS_IDENTIFIER:
 				if (!setWord.Contains(sc.ch)) {
-					ClassifyPascalWord(keywordlists, sc, curLineState, bSmartHighlighting);
+					ClassifyPascalWord(keywordLists, sc, curLineState, bSmartHighlighting);
 				}
 				break;
 			case SCE_PAS_HEXNUMBER:
@@ -241,7 +241,7 @@ static void ColourisePascalDoc(Sci_PositionU startPos, Sci_Position length, int 
 	}
 
 	if (sc.state == SCE_PAS_IDENTIFIER && setWord.Contains(sc.chPrev)) {
-		ClassifyPascalWord(keywordlists, sc, curLineState, bSmartHighlighting);
+		ClassifyPascalWord(keywordLists, sc, curLineState, bSmartHighlighting);
 	}
 
 	sc.Complete();
@@ -394,7 +394,7 @@ static void ClassifyPascalWordFoldPoint(int &levelCurrent, int &lineFoldStateCur
 
 #define IsCommentLine(line)		IsLexCommentLine(line, styler, SCE_PAS_COMMENTLINE)
 
-static void FoldPascalDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, WordList *[], Accessor &styler) {
+static void FoldPascalDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList, Accessor &styler) {
 	if (styler.GetPropertyInt("fold") == 0)
 		return;
 	const bool foldComment = styler.GetPropertyInt("fold.comment") != 0;

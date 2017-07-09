@@ -26,7 +26,7 @@ static inline bool IsNsisOp(int ch) {
 }
 
 #define MAX_WORD_LENGTH	15
-static void ColouriseNSISDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, WordList *[], Accessor &styler) {
+static void ColouriseNSISDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList, Accessor &styler) {
 	int state = initStyle;
 	int ch = 0, chNext = styler[startPos];
 	styler.StartAt(startPos);
@@ -218,7 +218,7 @@ static inline bool IsNsisFoldPPStart(int ch) {
 		|| (ch == 'I' || ch == 'E' || ch == 'M');
 }
 
-static void FoldNSISDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, WordList *[], Accessor &styler) {
+static void FoldNSISDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList, Accessor &styler) {
 	if (styler.GetPropertyInt("fold") == 0)
 		return;
 	const bool foldComment = styler.GetPropertyInt("fold.comment") != 0;

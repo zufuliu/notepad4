@@ -39,6 +39,7 @@ typedef struct tagDLDATA { // dl
 	BOOL bNoFadeHidden;			// Flag passed from GetDispInfo()
 	HANDLE hExitThread;			// Flag is set when Icon Thread should terminate
 	HANDLE hTerminatedThread;	// Flag is set when Icon Thread has terminated
+	HANDLE hIconThread;
 } DLDATA, *LPDLDATA;
 
 
@@ -112,6 +113,7 @@ BOOL DirList_Destroy(HWND hwnd)
 	DirList_TerminateIconThread(hwnd);
 	CloseHandle(lpdl->hExitThread);
 	CloseHandle(lpdl->hTerminatedThread);
+	CloseHandle(lpdl->hIconThread);
 
 	if (lpdl->pidl) {
 		CoTaskMemFree(lpdl->pidl);
@@ -146,7 +148,7 @@ BOOL DirList_StartIconThread(HWND hwnd)
 	ResetEvent(lpdl->hExitThread);
 	//ResetEvent(lpdl->hTerminatedThread);
 
-	CreateThread(NULL, 0, DirList_IconThread, (LPVOID)lpdl, 0, &dwtid);
+	lpdl->hIconThread = CreateThread(NULL, 0, DirList_IconThread, (LPVOID)lpdl, 0, &dwtid);
 
 	return TRUE;
 }

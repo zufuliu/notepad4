@@ -29,7 +29,7 @@ static inline bool IsDelimiter(int ch) {
 	return IsASpace(ch) || IsConfOp(ch);
 }
 
-static void ColouriseConfDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, WordList *[], Accessor &styler) {
+static void ColouriseConfDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList, Accessor &styler) {
 	int state = initStyle;
 	int chNext = styler[startPos];
 	styler.StartAt(startPos);
@@ -206,7 +206,7 @@ static void ColouriseConfDoc(Sci_PositionU startPos, Sci_Position length, int in
 
 #define IsCommentLine(line)		IsLexCommentLine(line, styler, SCE_CONF_COMMENT)
 
-static void FoldConfDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, WordList *[], Accessor &styler) {
+static void FoldConfDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList, Accessor &styler) {
 	if (styler.GetPropertyInt("fold") == 0)
 		return;
 	const bool foldComment = styler.GetPropertyInt("fold.comment") != 0;

@@ -31,7 +31,7 @@ using namespace Scintilla;
 // Note that ColouriseDiffLine analyzes only the first DIFF_BUFFER_START_SIZE
 // characters of each line to classify the line.
 
-static void ColouriseDiffLine(char *lineBuffer, Sci_Position endLine, Accessor &styler) {
+static void ColouriseDiffLine(const char *lineBuffer, Sci_Position endLine, Accessor &styler) {
 	// It is needed to remember the current state to recognize starting
 	// comment lines before the first "diff " or "--- ". If a real
 	// difference starts then each line starting with ' ' is a whitespace
@@ -88,7 +88,7 @@ static void ColouriseDiffLine(char *lineBuffer, Sci_Position endLine, Accessor &
 	}
 }
 
-static void ColouriseDiffDoc(Sci_PositionU startPos, Sci_Position length, int, WordList *[], Accessor &styler) {
+static void ColouriseDiffDoc(Sci_PositionU startPos, Sci_Position length, int, LexerWordList, Accessor &styler) {
 	char lineBuffer[DIFF_BUFFER_START_SIZE] = "";
 	styler.StartAt(startPos);
 	styler.StartSegment(startPos);
@@ -115,7 +115,7 @@ static void ColouriseDiffDoc(Sci_PositionU startPos, Sci_Position length, int, W
 	}
 }
 
-static void FoldDiffDoc(Sci_PositionU startPos, Sci_Position length, int, WordList *[], Accessor &styler) {
+static void FoldDiffDoc(Sci_PositionU startPos, Sci_Position length, int, LexerWordList, Accessor &styler) {
 	if (styler.GetPropertyInt("fold") == 0)
 		return;
 	Sci_Position curLine = styler.GetLine(startPos);

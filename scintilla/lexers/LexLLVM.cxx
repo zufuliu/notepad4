@@ -52,7 +52,7 @@ static void CheckLLVMVarType(Sci_PositionU pos, Sci_PositionU endPos, Accessor &
 	}
 }
 
-static void ColouriseLLVMDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, WordList *keywordLists[], Accessor &styler) {
+static void ColouriseLLVMDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
 	const WordList &keywords = *keywordLists[0];
 	const WordList &keywords2 = *keywordLists[1];
 	const WordList &kwAttr = *keywordLists[4];
@@ -195,7 +195,7 @@ static void ColouriseLLVMDoc(Sci_PositionU startPos, Sci_Position length, int in
 }
 
 #define IsCommentLine(line)			IsLexCommentLine(line, styler, SCE_C_COMMENTLINE)
-static void FoldLLVMDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, WordList *[], Accessor &styler) {
+static void FoldLLVMDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList, Accessor &styler) {
 	if (styler.GetPropertyInt("fold") == 0)
 		return;
 	const bool foldComment = styler.GetPropertyInt("fold.comment") != 0;

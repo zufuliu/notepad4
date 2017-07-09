@@ -111,8 +111,8 @@ static int GlobScan(StyleContext &sc) {
 	return 0;
 }
 
-static void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, WordList *keywordlists[], Accessor &styler) {
-	const WordList &keywords = *keywordlists[0];
+static void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
+	const WordList &keywords = *keywordLists[0];
 	WordList cmdDelimiter, bashStruct, bashStruct_in;
 	cmdDelimiter.Set("| || |& & && ; ;; ( ) { }");
 	bashStruct.Set("if elif fi while until else then do done esac eval");
@@ -698,7 +698,7 @@ static void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int in
 
 #define IsCommentLine(line)	IsLexCommentLine(line, styler, SCE_SH_COMMENTLINE)
 
-static void FoldBashDoc(Sci_PositionU startPos, Sci_Position length, int, WordList *[], Accessor &styler) {
+static void FoldBashDoc(Sci_PositionU startPos, Sci_Position length, int, LexerWordList, Accessor &styler) {
 	if (styler.GetPropertyInt("fold") == 0)
 		return;
 	const bool foldComment = styler.GetPropertyInt("fold.comment") != 0;

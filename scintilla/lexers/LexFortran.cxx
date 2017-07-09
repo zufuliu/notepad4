@@ -44,7 +44,7 @@ static inline bool IsFNumber(int ch, int) {
 	0
 };*/
 
-static void ColouriseFortranDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, WordList *keywordLists[], Accessor &styler) {
+static void ColouriseFortranDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
 	const WordList &keywords = *keywordLists[0];
 	const WordList &keywords2 = *keywordLists[1];
 	const WordList &keywords3 = *keywordLists[2];
@@ -177,7 +177,7 @@ _label_identifier:
 #define IsCommentLine(line)		IsLexCommentLine(line, styler, SCE_F_COMMENT)
 #define StrEqu(str1, str2)		(strcmp(str1, str2) == 0)
 
-static void FoldFortranDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, WordList *[], Accessor &styler) {
+static void FoldFortranDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList, Accessor &styler) {
 	if (styler.GetPropertyInt("fold") == 0)
 		return;
 	const bool foldComment = styler.GetPropertyInt("fold.comment") != 0;

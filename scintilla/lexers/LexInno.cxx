@@ -29,7 +29,7 @@ using namespace Scintilla;
 	0
 };*/
 
-static void ColouriseInnoDoc(Sci_PositionU startPos, Sci_Position length, int, WordList *keywordLists[], Accessor &styler) {
+static void ColouriseInnoDoc(Sci_PositionU startPos, Sci_Position length, int, LexerWordList keywordLists, Accessor &styler) {
 	const WordList &sectionKeywords = *keywordLists[0];
 	const WordList &standardKeywords = *keywordLists[1];
 	const WordList &parameterKeywords = *keywordLists[2];
@@ -252,7 +252,7 @@ static bool IsSectionEnd(Sci_Position curPos, Accessor &styler) {
 	return false;
 }
 
-static void FoldInnoDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, WordList *[], Accessor &styler) {
+static void FoldInnoDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList, Accessor &styler) {
 	if (styler.GetPropertyInt("fold") == 0)
 		return;
 	const bool foldComment = styler.GetPropertyInt("fold.comment", 1) != 0;
