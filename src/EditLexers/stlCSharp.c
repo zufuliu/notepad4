@@ -2,16 +2,16 @@
 #include "EditStyle.h"
 
 // https://en.wikipedia.org/wiki/C_Sharp_%28programming_language%29
-// https://msdn.microsoft.com/en-us/library/ms228593.aspx
+// https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/
 // https://wiki.gnome.org/Projects/Vala
 
 static KEYWORDLIST Keywords_CSharp = {
 "abstract as base break case catch checked class const continue default delegate do else enum event explicit "
 "extern false finally fixed for foreach goto if implicit in interface internal is lock namespace new null "
 "operator out override params private protected public readonly ref return sealed sizeof stackalloc static "
-"struct switch this throw true try typeof unchecked unsafe using virtual void volatile while " "async await nameof"
+"struct switch this throw true try typeof unchecked unsafe using virtual void volatile while "
 // contextual keywords
-"global partial where add remove get set value yield alias "
+"add alias async await get global nameof partial remove set value when where yield "
 , // type keyword
 "dynamic var bool byte char decimal double float int long object sbyte short string uint ulong ushort"
 , // preprocessor
