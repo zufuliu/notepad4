@@ -68,7 +68,7 @@ static void FoldNullDoc(Sci_PositionU startPos, Sci_Position length, int /* init
 	while ((lineCurrent <= docLines) && ((lineCurrent <= maxLines))) {
 		// Gather info
 		int lev = indentCurrent;
-		int lineNext = lineCurrent + 1;
+		Sci_Position lineNext = lineCurrent + 1;
 		int indentNext = indentCurrent;
 		if (lineNext <= docLines) {
 			// Information about next line is only available if not at end of document
@@ -92,7 +92,7 @@ static void FoldNullDoc(Sci_PositionU startPos, Sci_Position length, int /* init
 		// which is indented more than the line after the end of
 		// the blank-block, use the level of the block before
 
-		int skipLine = lineNext;
+		Sci_Position skipLine = lineNext;
 		int skipLevel = levelAfterBlank;
 
 		while (--skipLine > lineCurrent) {

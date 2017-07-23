@@ -143,7 +143,7 @@ void AutoC_AddDocWord(HWND hwnd, struct WordList *pWList, BOOL bIgnore)
 	int iRootLen = pWList->iStartLen;
 	struct Sci_TextToFind ft = {{0, 0}, 0, {0, 0}};
 	struct Sci_TextRange tr = { { 0, -1 }, NULL };
-	int iCurrentPos = SciCall_GetCurrentPos() - iRootLen;
+	Sci_Position iCurrentPos = SciCall_GetCurrentPos() - iRootLen;
 	int iDocLen = (int)SendMessage(hwnd, SCI_GETLENGTH, 0, 0);
 	int findFlag = bIgnore? SCFIND_WORDSTART : (SCFIND_WORDSTART | SCFIND_MATCHCASE);
 	int iPosFind;
@@ -403,11 +403,11 @@ INT AutoC_AddSpecWord(struct WordList *pWList, int iCurrentStyle, int ch, int ch
 
 void EditCompleteWord(HWND hwnd, BOOL autoInsert)
 {
-	const int iCurrentPos = SciCall_GetCurrentPos();
+	const Sci_Position iCurrentPos = SciCall_GetCurrentPos();
 	const int iCurrentStyle = SciCall_GetStyleAt(iCurrentPos);
 	int iLine = SciCall_LineFromPosition(iCurrentPos);
-	int iCurrentLinePos = iCurrentPos - SciCall_PositionFromLine(iLine);
-	int iStartWordPos = iCurrentLinePos;
+	Sci_Position iCurrentLinePos = iCurrentPos - SciCall_PositionFromLine(iLine);
+	Sci_Position iStartWordPos = iCurrentLinePos;
 
 	char *pLine;
 	char *pRoot = NULL;
@@ -574,7 +574,7 @@ end:
 
 void EditAutoCloseBraceQuote(HWND hwnd, int ch)
 {
-	int iCurPos = SciCall_GetCurrentPos();
+	Sci_Position iCurPos = SciCall_GetCurrentPos();
 	int chPrev = SciCall_GetCharAt(iCurPos - 2);
 	int chNext = SciCall_GetCharAt(iCurPos);
 	int iCurrentStyle = SciCall_GetStyleAt(iCurPos - 2);
@@ -682,7 +682,7 @@ __forceinline BOOL IsHtmlVoidTag(const char *word, int length) {
 void EditAutoCloseXMLTag(HWND hwnd)
 {
 	char tchBuf[512];
-	int	 iCurPos = SciCall_GetCurrentPos();
+	Sci_Position iCurPos = SciCall_GetCurrentPos();
 	int	 iHelper = iCurPos - (COUNTOF(tchBuf) - 1);
 	int	 iStartPos = max(0, iHelper);
 	int	 iSize = iCurPos - iStartPos;
@@ -694,7 +694,7 @@ void EditAutoCloseXMLTag(HWND hwnd)
 			iHelper = FALSE;
 		} else {
 			int iLine = SciCall_LineFromPosition(iCurPos);
-			int iCurrentLinePos = SciCall_PositionFromLine(iLine);
+			Sci_Position iCurrentLinePos = SciCall_PositionFromLine(iLine);
 			while (iCurrentLinePos < iCurPos && IsASpace(SciCall_GetCharAt(iCurrentLinePos)))
 				iCurrentLinePos++;
 			iCurrentStyle = SciCall_GetStyleAt(iCurrentLinePos);
@@ -1222,7 +1222,7 @@ void EditToggleCommentBlock(HWND hwnd)
 	}
 }
 
-void EditShowCallTips(HWND hwnd, int position) {
+void EditShowCallTips(HWND hwnd, Sci_Position position) {
 	char *text;
 	char *pLine;
 	int iLine = (int)SendMessage(hwnd, SCI_LINEFROMPOSITION, (WPARAM)position, 0);

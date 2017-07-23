@@ -400,7 +400,7 @@ static void FoldPyDoc(Sci_PositionU startPos, Sci_Position length, int, LexerWor
 
 		// Gather info
 		int lev = indentCurrent;
-		int lineNext = lineCurrent + 1;
+		Sci_Position lineNext = lineCurrent + 1;
 		int indentNext = indentCurrent;
 		int quote = false;
 		if (lineNext <= docLines) {
@@ -454,7 +454,7 @@ static void FoldPyDoc(Sci_PositionU startPos, Sci_Position length, int, LexerWor
 		// which is indented more than the line after the end of
 		// the comment-block, use the level of the block before
 
-		int skipLine = lineNext;
+		Sci_Position skipLine = lineNext;
 		int skipLevel = levelAfterComments;
 
 		while (--skipLine > lineCurrent) {

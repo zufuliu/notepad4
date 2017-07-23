@@ -184,7 +184,7 @@ _label_identifier:
 			// Locate the unique Q operator character
 			sc.Complete();
 			char qOperator = 0x00;
-			for (int styleStartPos = sc.currentPos; styleStartPos > 0; --styleStartPos) {
+			for (Sci_PositionU styleStartPos = sc.currentPos; styleStartPos > 0; --styleStartPos) {
 				if (styler.StyleAt(styleStartPos - 1) != SCE_SQL_QOPERATOR) {
 					qOperator = styler.SafeGetCharAt(styleStartPos + 2);
 					break;

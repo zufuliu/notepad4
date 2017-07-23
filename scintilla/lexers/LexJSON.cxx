@@ -95,7 +95,7 @@ static void ColouriseJSONDoc(Sci_PositionU startPos, Sci_Position length, int in
 				ch = chNext;
 				chNext = styler.SafeGetCharAt(i + 1);
 			} else if (ch == '\"') {
-				int pos = i + 1;
+				Sci_PositionU pos = i + 1;
 				while (IsASpace(styler.SafeGetCharAt(pos++)));
 				if (styler[pos-1] == ':') {
 					styler.ColourTo(i, SCE_C_LABEL);

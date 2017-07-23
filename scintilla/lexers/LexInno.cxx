@@ -41,7 +41,7 @@ static void ColouriseInnoDoc(Sci_PositionU startPos, Sci_Position length, int, L
 	static bool sectionFound = false;
 	char ch = 0;
 	char chNext = styler[startPos];
-	int lengthDoc = startPos + length;
+	Sci_PositionU lengthDoc = startPos + length;
 	char *buffer = new char[length + 1];
 	Sci_Position bufferCount = 0;
 	bool isBOL, isEOL, isWS, isBOLWS = 0;
@@ -55,7 +55,7 @@ static void ColouriseInnoDoc(Sci_PositionU startPos, Sci_Position length, int, L
 	// using the hand-written state machine shown below
 	styler.StartAt(startPos);
 	styler.StartSegment(startPos);
-	for (Sci_Position i = startPos; i < lengthDoc; i++) {
+	for (Sci_PositionU i = startPos; i < lengthDoc; i++) {
 		const char chPrev = ch;
 		ch = chNext;
 		chNext = styler.SafeGetCharAt(i + 1);
@@ -260,7 +260,7 @@ static void FoldInnoDoc(Sci_PositionU startPos, Sci_Position length, int initSty
 	//const bool foldCompact = styler.GetPropertyInt("fold.compact", 0) != 0;
 
 	Sci_PositionU endPos = startPos + length;
-	static int sectionFound = -1;
+	static Sci_Position sectionFound = -1;
 	//int visibleChars = 0;
 	Sci_Position lineCurrent = styler.GetLine(startPos);
 	int levelCurrent = SC_FOLDLEVELBASE;

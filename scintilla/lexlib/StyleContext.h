@@ -53,8 +53,8 @@ public:
 		return currentPos < endPos;
 	}
 	void Forward();
-	void Forward(int nb);
-	void ForwardBytes(int nb);
+	void Forward(Sci_Position nb);
+	void ForwardBytes(Sci_Position nb);
 	void ChangeState(int state_) {
 		state = state_;
 	}

@@ -3273,9 +3273,9 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam)
 				*p = 0;
 			}
 			if (pLexCurrent->iLexer == SCLEX_PYTHON) {
-				int iCurrentPos = SciCall_GetCurrentPos();
+				Sci_Position iCurrentPos = SciCall_GetCurrentPos();
 				int iCurLine = SciCall_LineFromPosition(iCurrentPos);
-				int iCurrentLinePos = iCurrentPos - SciCall_PositionFromLine(iCurLine);
+				Sci_Position iCurrentLinePos = iCurrentPos - SciCall_PositionFromLine(iCurLine);
 				if (iCurLine < 2 && iCurrentLinePos == 0) {
 					char cmsz[128];
 					wnsprintfA(cmsz, COUNTOF(cmsz), "#-*- coding: %s -*-", msz);
@@ -5261,7 +5261,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam)
 
 		case SCN_AUTOCSELECTION:
 		case SCN_USERLISTSELECTION: {
-			int iCurPos = SciCall_GetCurrentPos();
+			Sci_Position iCurPos = SciCall_GetCurrentPos();
 			SendMessage(hwndEdit, SCI_BEGINUNDOACTION, 0, 0);
 			SendMessage(hwndEdit, SCI_SETSEL, scn->position, iCurPos);
 			SendMessage(hwndEdit, SCI_REPLACESEL, 0, (LPARAM)scn->text);

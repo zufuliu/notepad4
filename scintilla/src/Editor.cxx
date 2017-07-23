@@ -11,8 +11,8 @@
 #include <cstring>
 #include <cctype>
 #include <cstdio>
-#include <cmath>
 
+#include <cmath>
 #include <stdexcept>
 #include <string>
 #include <vector>
@@ -238,7 +238,7 @@ void Editor::SetRepresentations() {
 	if (IsUnicodeMode()) {
 		for (int k=0x80; k < 0x100; k++) {
 			char hiByte[2] = {  static_cast<char>(k), 0 };
-			char hexits[4];
+			char hexits[5];	// Really only needs 4 but that causes warning from gcc 7.1
 			sprintf(hexits, "x%2X", k);
 			reprs.SetRepresentation(hiByte, hexits);
 		}

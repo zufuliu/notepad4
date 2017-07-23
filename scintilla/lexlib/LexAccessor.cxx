@@ -161,7 +161,7 @@ Sci_Position LexSkipWhiteSpace(Sci_Position startPos, Sci_Position endPos, LexAc
 	}
 	return endPos;
 }
-Sci_Position LexSkipWhiteSpace(Sci_Position startPos, Sci_Position endPos, LexAccessor &styler, bool IsStreamCommentStyle(Sci_Position)) {
+Sci_Position LexSkipWhiteSpace(Sci_Position startPos, Sci_Position endPos, LexAccessor &styler, bool IsStreamCommentStyle(int)) {
 	for (Sci_Position i = startPos; i < endPos; i++) {
 		if (!(isspacechar(styler.SafeGetCharAt(i, '\0')) || IsStreamCommentStyle(styler.StyleAt(i))))
 			return i;
@@ -169,7 +169,7 @@ Sci_Position LexSkipWhiteSpace(Sci_Position startPos, Sci_Position endPos, LexAc
 	return endPos;
 }
 Sci_Position LexSkipWhiteSpace(Sci_Position startPos, Sci_Position endPos, LexAccessor &styler,
-					  bool IsStreamCommentStyle(Sci_Position), const CharacterSet &charSet) {
+					  bool IsStreamCommentStyle(int), const CharacterSet &charSet) {
 	for (Sci_Position i = startPos; i < endPos; i++) {
 		char ch = styler[i];
 		if (!(isspacechar(styler.SafeGetCharAt(i, '\0')) || IsStreamCommentStyle(styler.StyleAt(i))
@@ -198,10 +198,10 @@ bool LexMatchIgnoreCase(Sci_Position pos, LexAccessor &styler, const char *s) {
 	return true;
 }
 
-int LexGetRange(Sci_Position startPos, Sci_Position endPos, LexAccessor &styler, char *s, int len) {
-	int i = 0;
+Sci_PositionU LexGetRange(Sci_Position startPos, Sci_Position endPos, LexAccessor &styler, char *s, Sci_PositionU len) {
+	Sci_PositionU i = 0;
 	char ch = styler.SafeGetCharAt(startPos + i);
-	Sci_Position _endPos = endPos - startPos + 1;
+	Sci_PositionU _endPos = endPos - startPos + 1;
 	if (_endPos > len - 1)
         _endPos = len - 1;
 	while (i < _endPos) {
@@ -212,10 +212,10 @@ int LexGetRange(Sci_Position startPos, Sci_Position endPos, LexAccessor &styler,
 	s[i] = '\0';
 	return i;
 }
-int LexGetRangeLowered(Sci_Position startPos, Sci_Position endPos, LexAccessor &styler, char *s, int len) {
-	int i = 0;
+Sci_PositionU LexGetRangeLowered(Sci_Position startPos, Sci_Position endPos, LexAccessor &styler, char *s, Sci_PositionU len) {
+	Sci_PositionU i = 0;
 	char ch = static_cast<char>(tolower(styler.SafeGetCharAt(startPos + i)));
-	Sci_Position _endPos = endPos - startPos + 1;
+	Sci_PositionU _endPos = endPos - startPos + 1;
 	if (_endPos > len - 1)
         _endPos = len - 1;
 	while (i < _endPos) {
@@ -227,8 +227,8 @@ int LexGetRangeLowered(Sci_Position startPos, Sci_Position endPos, LexAccessor &
 	return i;
 }
 
-int LexGetRange(Sci_Position startPos, LexAccessor &styler, bool IsWordChar(int), char *s, int len) {
-	int i = 0;
+Sci_PositionU LexGetRange(Sci_Position startPos, LexAccessor &styler, bool IsWordChar(int), char *s, Sci_PositionU len) {
+	Sci_PositionU i = 0;
 	char ch = styler.SafeGetCharAt(startPos + i);
 	while ((i < len - 1) && IsWordChar(ch)) {
 		s[i] = ch;
@@ -238,8 +238,8 @@ int LexGetRange(Sci_Position startPos, LexAccessor &styler, bool IsWordChar(int)
 	s[i] = '\0';
 	return i;
 }
-int LexGetRangeLowered(Sci_Position startPos, LexAccessor &styler, bool IsWordChar(int), char *s, int len) {
-	int i = 0;
+Sci_PositionU LexGetRangeLowered(Sci_Position startPos, LexAccessor &styler, bool IsWordChar(int), char *s, Sci_PositionU len) {
+	Sci_PositionU i = 0;
 	char ch = static_cast<char>(tolower(styler.SafeGetCharAt(startPos + i)));
 	while ((i < len - 1) && IsWordChar(ch)) {
 		s[i] = ch;
@@ -249,8 +249,8 @@ int LexGetRangeLowered(Sci_Position startPos, LexAccessor &styler, bool IsWordCh
 	s[i] = '\0';
 	return i;
 }
-int LexGetRange(Sci_Position startPos, LexAccessor &styler, const CharacterSet &charSet, char *s, int len) {
-	int i = 0;
+Sci_PositionU LexGetRange(Sci_Position startPos, LexAccessor &styler, const CharacterSet &charSet, char *s, Sci_PositionU len) {
+	Sci_PositionU i = 0;
 	char ch = styler.SafeGetCharAt(startPos + i);
 	while ((i < len - 1) && charSet.Contains(ch)) {
 		s[i] = ch;
@@ -260,8 +260,8 @@ int LexGetRange(Sci_Position startPos, LexAccessor &styler, const CharacterSet &
 	s[i] = '\0';
 	return i;
 }
-int LexGetRangeLowered(Sci_Position startPos, LexAccessor &styler, const CharacterSet &charSet, char *s, int len) {
-	int i = 0;
+Sci_PositionU LexGetRangeLowered(Sci_Position startPos, LexAccessor &styler, const CharacterSet &charSet, char *s, Sci_PositionU len) {
+	Sci_PositionU i = 0;
 	char ch = static_cast<char>(tolower(styler.SafeGetCharAt(startPos + i)));
 	while ((i < len - 1) && charSet.Contains(ch)) {
 		s[i] = ch;

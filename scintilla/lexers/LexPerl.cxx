@@ -436,7 +436,7 @@ static void InterpolateSegment(StyleContext &sc, int maxSeg, bool isPattern = fa
 }
 
 
-static void ColourisePerlDoc(unsigned int startPos, int length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
+static void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
 	const WordList &keywords = *keywordLists[0];
 	// keywords that forces /PATTERN/ at all times; should track vim's behaviour
 	const WordList &reWords = *keywordLists[1];
@@ -1453,7 +1453,7 @@ static void ColourisePerlDoc(unsigned int startPos, int length, int initStyle, L
 
 #define IsCommentLine(line)		IsLexCommentLine(line, styler, SCE_PL_COMMENTLINE)
 
-static void FoldPerlDoc(unsigned int startPos, int length, int /*initStyle*/, LexerWordList, Accessor &styler) {
+static void FoldPerlDoc(Sci_PositionU startPos, Sci_Position length, int /*initStyle*/, LexerWordList, Accessor &styler) {
 	if (styler.GetPropertyInt("fold") == 0)
 		return;
 	const bool foldComment = styler.GetPropertyInt("fold.comment", 1) != 0;

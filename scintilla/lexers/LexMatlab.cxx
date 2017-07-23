@@ -339,7 +339,7 @@ static void FoldMatlabDoc(Sci_PositionU startPos, Sci_Position length, int initS
 
 		if (style == SCE_MAT_KEYWORD && stylePrev != SCE_MAT_KEYWORD && numBrace == 0 && chPrev != '.' && chPrev != ':') {
 			char word[32];
-			Sci_Position len = LexGetRange(i, styler, iswordstart, word, sizeof(word));
+			Sci_PositionU len = LexGetRange(i, styler, iswordstart, word, sizeof(word));
 			if ((StrEqu(word, "function") && ((lexType & LEX_JULIA) || (!(lexType & LEX_JULIA) && LexGetNextChar(i+len, styler) != '(')))
 				|| StrEqu(word, "if")
 				|| StrEqu(word, "for")

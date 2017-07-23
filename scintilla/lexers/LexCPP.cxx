@@ -151,7 +151,7 @@ static void ColouriseCppDoc(Sci_PositionU startPos, Sci_Position length, int ini
 #define _UpdateCurLineState() lineCurrent = styler.GetLine(sc.currentPos); \
 								styler.SetLineState(lineCurrent, _MakeState())
 	static char heredoc[256];
-	static int heredoc_len;
+	static Sci_PositionU heredoc_len;
 	int outerStyle = SCE_C_DEFAULT;
 	int varType = 0;
 	int docTagType = 0;
@@ -1083,7 +1083,7 @@ _label_identifier:
 	sc.Complete();
 }
 
-static bool IsCppDefineLine(Sci_Position line, LexAccessor &styler, int &DefinePos) {
+static bool IsCppDefineLine(Sci_Position line, LexAccessor &styler, Sci_Position &DefinePos) {
 	Sci_Position pos = styler.LineStart(line);
 	Sci_Position endPos = styler.LineStart(line + 1) - 1;
 	pos = LexSkipSpaceTab(pos, endPos, styler);
@@ -1303,7 +1303,7 @@ static void FoldCppDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 		}
 
 		if ((hasPreprocessor || lexType == LEX_HX) && foldPreprocessor && (ch == '#') && style == SCE_C_PREPROCESSOR) {
-			int pos = LexSkipSpaceTab(i+1, endPos, styler);
+			Sci_Position pos = LexSkipSpaceTab(i+1, endPos, styler);
 			if (styler.Match(pos, "if") || styler.Match(pos, "region")) {
 				levelNext++;
 			} else if (styler.Match(pos, "end")) {

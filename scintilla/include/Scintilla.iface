@@ -2726,6 +2726,21 @@ get int DistanceToSecondaryStyles=4025(,)
 # Result is NUL-terminated.
 get int GetSubStyleBases=4026(, stringresult styles)
 
+# Retrieve the number of named styles for the lexer.
+get int GetNamedStyles=4029(,)
+
+# Retrieve the name of a style.
+# Result is NUL-terminated.
+fun int NameOfStyle=4030(int style, stringresult names)
+
+# Retrieve a ' ' separated list of style tags like "literal quoted string".
+# Result is NUL-terminated.
+fun int TagsOfStyle=4031(int style, stringresult names)
+
+# Retrieve a description of a style.
+# Result is NUL-terminated.
+fun int DescriptionOfStyle=4032(int style, stringresult names)
+
 # Notifications
 # Type of modification and the action which caused the modification.
 # These are defined as a bit mask to make it easy to specify which notifications are wanted.

@@ -410,7 +410,7 @@ static void FoldPascalDoc(Sci_PositionU startPos, Sci_Position length, int initS
 	int styleNext = styler.StyleAt(startPos);
 	int style = initStyle;
 
-	int lastStart = 0;
+	Sci_PositionU lastStart = 0;
 	const CharacterSet setWord(CharacterSet::setAlphaNum, "_", 0x80, true);
 
 	for (Sci_PositionU i = startPos; i < endPos; i++) {

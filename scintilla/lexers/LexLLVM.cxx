@@ -70,7 +70,7 @@ static void ColouriseLLVMDoc(Sci_PositionU startPos, Sci_Position length, int in
 	char buf[MAX_WORD_LENGTH + 1] = {0};
 	int wordLen = 0;
 
-	for (unsigned int i = startPos; i < endPos; i++) {
+	for (Sci_PositionU i = startPos; i < endPos; i++) {
 		int ch = chNext;
 		chNext = styler.SafeGetCharAt(i + 1);
 

@@ -142,7 +142,7 @@ static void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int in
 
 	// Always backtracks to the start of a line that is not a continuation
 	// of the previous line (i.e. start of a bash command segment)
-	int ln = styler.GetLine(startPos);
+	Sci_Position ln = styler.GetLine(startPos);
 	if (ln > 0 && startPos == static_cast<Sci_PositionU>(styler.LineStart(ln)))
 		ln--;
 	for (;;) {

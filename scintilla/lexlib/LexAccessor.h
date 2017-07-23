@@ -28,15 +28,15 @@ bool IsLexLineStartsWith(Sci_Position line, LexAccessor &styler, const char* wor
 Sci_Position LexLineSkipSpaceTab(Sci_Position line, LexAccessor &styler);
 Sci_Position LexSkipSpaceTab  (Sci_Position startPos, Sci_Position endPos, LexAccessor &styler);
 Sci_Position LexSkipWhiteSpace(Sci_Position startPos, Sci_Position endPos, LexAccessor &styler);
-Sci_Position LexSkipWhiteSpace(Sci_Position startPos, Sci_Position endPos, LexAccessor &styler, bool IsStreamCommentStyle(Sci_Position));
+Sci_Position LexSkipWhiteSpace(Sci_Position startPos, Sci_Position endPos, LexAccessor &styler, bool IsStreamCommentStyle(int));
 Sci_Position LexSkipWhiteSpace(Sci_Position startPos, Sci_Position endPos, LexAccessor &styler,
-											bool IsStreamCommentStyle(Sci_Position), const CharacterSet &charSet);
-int LexGetRange			(Sci_Position startPos, Sci_Position endPos, LexAccessor &styler, char *s, int len);
-int LexGetRangeLowered	(Sci_Position startPos, Sci_Position endPos, LexAccessor &styler, char *s, int len);
-int LexGetRange			(Sci_Position startPos, LexAccessor &styler, bool IsWordChar(int), char *s, int len);
-int LexGetRangeLowered	(Sci_Position startPos, LexAccessor &styler, bool IsWordChar(int), char *s, int len);
-int LexGetRange			(Sci_Position startPos, LexAccessor &styler, const CharacterSet &charSet, char *s, int len);
-int LexGetRangeLowered	(Sci_Position startPos, LexAccessor &styler, const CharacterSet &charSet, char *s, int len);
+											bool IsStreamCommentStyle(int), const CharacterSet &charSet);
+Sci_PositionU LexGetRange			(Sci_Position startPos, Sci_Position endPos, LexAccessor &styler, char *s, Sci_PositionU len);
+Sci_PositionU LexGetRangeLowered	(Sci_Position startPos, Sci_Position endPos, LexAccessor &styler, char *s, Sci_PositionU len);
+Sci_PositionU LexGetRange			(Sci_Position startPos, LexAccessor &styler, bool IsWordChar(int), char *s, Sci_PositionU len);
+Sci_PositionU LexGetRangeLowered	(Sci_Position startPos, LexAccessor &styler, bool IsWordChar(int), char *s, Sci_PositionU len);
+Sci_PositionU LexGetRange			(Sci_Position startPos, LexAccessor &styler, const CharacterSet &charSet, char *s, Sci_PositionU len);
+Sci_PositionU LexGetRangeLowered	(Sci_Position startPos, LexAccessor &styler, const CharacterSet &charSet, char *s, Sci_PositionU len);
 
 char LexGetPrevChar     (Sci_Position endPos, LexAccessor &styler);
 char LexGetNextChar		(Sci_Position startPos, LexAccessor &styler);
@@ -96,7 +96,7 @@ public:
 		return pAccess->LineStart(line);
 	}
 	Sci_Position LineEnd(Sci_Position line) const;
-	Sci_Position LevelAt(Sci_Position line) const {
+	int LevelAt(Sci_Position line) const {
 		return pAccess->GetLevel(line);
 	}
 	Sci_Position Length() const {
@@ -126,6 +126,13 @@ public:
 	void ChangeLexerState(Sci_Position start, Sci_Position end) {
 		pAccess->ChangeLexerState(start, end);
 	}
+};
+
+struct LexicalClass {
+	int value;
+	const char *name;
+	const char *tags;
+	const char *description;
 };
 
 #ifdef SCI_NAMESPACE

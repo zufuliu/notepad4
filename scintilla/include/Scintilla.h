@@ -573,8 +573,6 @@ typedef sptr_t (*SciFnDirect)(sptr_t ptr, unsigned int iMessage, uptr_t wParam, 
 #define SCI_SETVSCROLLBAR 2280
 #define SCI_GETVSCROLLBAR 2281
 #define SCI_APPENDTEXT 2282
-#define SCI_GETTWOPHASEDRAW 2283
-#define SCI_SETTWOPHASEDRAW 2284
 #define SC_PHASES_ONE 0
 #define SC_PHASES_TWO 1
 #define SC_PHASES_MULTIPLE 2
@@ -1012,6 +1010,10 @@ typedef sptr_t (*SciFnDirect)(sptr_t ptr, unsigned int iMessage, uptr_t wParam, 
 #define SCI_SETIDENTIFIERS 4024
 #define SCI_DISTANCETOSECONDARYSTYLES 4025
 #define SCI_GETSUBSTYLEBASES 4026
+#define SCI_GETNAMEDSTYLES 4029
+#define SCI_NAMEOFSTYLE 4030
+#define SCI_TAGSOFSTYLE 4031
+#define SCI_DESCRIPTIONOFSTYLE 4032
 #define SC_MOD_INSERTTEXT 0x1
 #define SC_MOD_DELETETEXT 0x2
 #define SC_MOD_CHANGESTYLE 0x4

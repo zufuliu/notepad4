@@ -197,7 +197,7 @@ static void FoldVerilogDoc(Sci_PositionU startPos, Sci_Position length, int init
 				levelNext--;
 		}
 		if (foldPreprocessor && ch == '`' && (style == SCE_V_PREPROCESSOR)) {
-			int pos = LexSkipSpaceTab(i+1, endPos, styler);
+			Sci_Position pos = LexSkipSpaceTab(i+1, endPos, styler);
 			if (styler.Match(pos, "if")) {
 				levelNext++;
 			} else if (styler.Match(pos, "end")) {

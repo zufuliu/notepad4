@@ -50,9 +50,9 @@ public:
 	virtual int SCI_METHOD GetCharacterAndWidth(Sci_Position position, Sci_Position *pWidth) const = 0;
 };
 
-enum { lvOriginal=0, lvSubStyles=1 };
+enum { lvRelease4=2 };
 
-class ILexer {
+class ILexer4 {
 public:
 	virtual int SCI_METHOD Version() const = 0;
 	virtual void SCI_METHOD Release() = 0;
@@ -65,20 +65,20 @@ public:
 	virtual void SCI_METHOD Lex(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, IDocument *pAccess) = 0;
 	virtual void SCI_METHOD Fold(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, IDocument *pAccess) = 0;
 	virtual void * SCI_METHOD PrivateCall(int operation, void *pointer) = 0;
-};
-
-class ILexerWithSubStyles : public ILexer {
-public:
 	virtual int SCI_METHOD LineEndTypesSupported() const = 0;
 	virtual int SCI_METHOD AllocateSubStyles(int styleBase, int numberStyles) = 0;
-	virtual int SCI_METHOD SubStylesStart(int styleBase) = 0;
-	virtual int SCI_METHOD SubStylesLength(int styleBase) = 0;
+	virtual int SCI_METHOD SubStylesStart(int styleBase) const = 0;
+	virtual int SCI_METHOD SubStylesLength(int styleBase) const = 0;
 	virtual int SCI_METHOD StyleFromSubStyle(int subStyle) const = 0;
 	virtual int SCI_METHOD PrimaryStyleFromStyle(int style) const = 0;
 	virtual void SCI_METHOD FreeSubStyles() = 0;
 	virtual void SCI_METHOD SetIdentifiers(int style, const char *identifiers) = 0;
-	virtual int SCI_METHOD DistanceToSecondaryStyles() = 0;
-	virtual const char * SCI_METHOD GetSubStyleBases() = 0;
+	virtual int SCI_METHOD DistanceToSecondaryStyles() const = 0;
+	virtual const char * SCI_METHOD GetSubStyleBases() const = 0;
+	virtual int SCI_METHOD NamedStyles() const = 0;
+	virtual const char * SCI_METHOD NameOfStyle(int style) const = 0;
+	virtual const char * SCI_METHOD TagsOfStyle(int style) const = 0;
+	virtual const char * SCI_METHOD DescriptionOfStyle(int style) const = 0;
 };
 
 class ILoader {

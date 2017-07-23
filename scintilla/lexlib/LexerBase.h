@@ -13,13 +13,15 @@ namespace Scintilla {
 #endif
 
 // A simple lexer with no state
-class LexerBase : public ILexer {
+class LexerBase : public ILexer4 {
 protected:
+	const LexicalClass *lexClasses;
+	size_t nClasses;
 	PropSetSimple props;
 	enum {numWordLists=KEYWORDSET_MAX+1};
 	WordList *keyWordLists[numWordLists+1];
 public:
-	LexerBase();
+	LexerBase(const LexicalClass *lexClasses_=nullptr, size_t nClasses_=0);
 	virtual ~LexerBase();
 	void SCI_METHOD Release() override;
 	int SCI_METHOD Version() const override;
@@ -32,6 +34,20 @@ public:
 	void SCI_METHOD Lex(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, IDocument *pAccess) override = 0;
 	void SCI_METHOD Fold(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, IDocument *pAccess) override = 0;
 	void * SCI_METHOD PrivateCall(int operation, void *pointer) override;
+	int SCI_METHOD LineEndTypesSupported() const override;
+	int SCI_METHOD AllocateSubStyles(int styleBase, int numberStyles) override;
+	int SCI_METHOD SubStylesStart(int styleBase) const override;
+	int SCI_METHOD SubStylesLength(int styleBase) const override;
+	int SCI_METHOD StyleFromSubStyle(int subStyle) const override;
+	int SCI_METHOD PrimaryStyleFromStyle(int style) const override;
+	void SCI_METHOD FreeSubStyles() override;
+	void SCI_METHOD SetIdentifiers(int style, const char *identifiers) override;
+	int SCI_METHOD DistanceToSecondaryStyles() const override;
+	const char * SCI_METHOD GetSubStyleBases() const override;
+	int SCI_METHOD NamedStyles() const override;
+	const char * SCI_METHOD NameOfStyle(int style) const override;
+	const char * SCI_METHOD TagsOfStyle(int style) const override;
+	const char * SCI_METHOD DescriptionOfStyle(int style) const override;
 };
 
 #ifdef SCI_NAMESPACE

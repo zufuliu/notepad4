@@ -160,7 +160,7 @@ static void FoldVHDLDoc(Sci_PositionU startPos, Sci_Position length, int /*initS
 	int levelNext = levelCurrent;
 
 	/***************************************/
-	int lastStart = 0;
+	Sci_PositionU lastStart = 0;
 	char prevWord[32] = "";
 
 	/***************************************/

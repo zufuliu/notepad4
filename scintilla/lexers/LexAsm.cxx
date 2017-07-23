@@ -271,7 +271,7 @@ _label_identifier:
 				} else {
 					char pp[128];
 					Sci_Position pos = LexSkipSpaceTab(sc.currentPos + 1, endPos, styler);
-					Sci_Position len = LexGetRange(pos, styler, iswordstart, pp, sizeof(pp));
+					Sci_PositionU len = LexGetRange(pos, styler, iswordstart, pp, sizeof(pp));
 					if (kwProprocessor.InList(pp)) {
 						sc.SetState(SCE_ASM_PREPROCESSOR);
 						sc.Forward(pos - sc.currentPos + len);
@@ -453,7 +453,7 @@ static void FoldAsmDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 				if (directives4foldstart.InList(word)) {
 					levelNext++;
 					if (strcmp(word, "dialog") == 0) {
-						int pos = LexSkipSpaceTab(i+1, endPos, styler);
+						Sci_Position pos = LexSkipSpaceTab(i+1, endPos, styler);
 						if (styler[pos] == '\"')
 							levelNext--;
 					}
@@ -463,13 +463,13 @@ static void FoldAsmDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 				} else if (directives4foldend.InList(word)) {
 					levelNext--;
 					if (strcmp(word, "enddialog") == 0) {
-						int pos = LexSkipSpaceTab(i+1, endPos, styler);
+						Sci_Position pos = LexSkipSpaceTab(i+1, endPos, styler);
 						if (styler[pos] == ',')
 							levelNext++;
 					}
 					if (strcmp(word, "endproc") == 0)
 					{
-						int pos = LexSkipSpaceTab(i+1, endPos, styler);
+						Sci_Position pos = LexSkipSpaceTab(i+1, endPos, styler);
 						if (styler[pos] == '(')
 							levelNext++;
 					}

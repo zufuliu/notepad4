@@ -85,11 +85,7 @@ void LexInterface::Colourise(Sci::Position start, Sci::Position end) {
 
 int LexInterface::LineEndTypesSupported() const {
 	if (instance) {
-		const int interfaceVersion = instance->Version();
-		if (interfaceVersion >= lvSubStyles) {
-			ILexerWithSubStyles *ssinstance = static_cast<ILexerWithSubStyles *>(instance);
-			return ssinstance->LineEndTypesSupported();
-		}
+		return instance->LineEndTypesSupported();
 	}
 	return 0;
 }

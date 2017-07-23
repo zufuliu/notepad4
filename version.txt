@@ -4,11 +4,11 @@ git clone https://github.com/XhmikosR/notepad2-mod.git
 
 Scintilla
 hg clone http://hg.code.sf.net/p/scintilla/code scintilla
-6341:a9e074386d18
+6360:ff0e3efc436c
 
 SciTE
 hg clone http://hg.code.sf.net/p/scintilla/scite
-4876:3f65bc25e1b1
+4880:8f1da41909b6
 
 Notepad++
 https://github.com/notepad-plus-plus/notepad-plus-plus.git

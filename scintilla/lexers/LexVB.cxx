@@ -103,7 +103,7 @@ _label_identifier:
 					sc.Forward();
 				}
 				char s[128];
-				int len = sc.GetCurrentLowered(s, sizeof(s));
+				Sci_Position len = sc.GetCurrentLowered(s, sizeof(s));
 				if (skipType) {
 					s[len - 1] = '\0';
 				}
@@ -363,7 +363,7 @@ static void FoldVBDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 				levelNext--;
 				char chEnd = LexCharAt(i+3);
 				if (chEnd == ' ' || chEnd == '\t') {
-					int pos = LexSkipSpaceTab(i+3, endPos, styler);
+					Sci_Position pos = LexSkipSpaceTab(i+3, endPos, styler);
 					chEnd = LexCharAt(pos);
 					// check if End is used to terminate statement
 					if (isalpha(chEnd) && (VBMatchNext(pos, "function") || VBMatchNext(pos, "sub")

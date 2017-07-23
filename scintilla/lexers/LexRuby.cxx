@@ -259,7 +259,7 @@ static bool sureThisIsHeredoc(Sci_Position iPrev, Accessor &styler, char *prevWo
 	// to make sure we're OK.
 	int prevStyle;
 	Sci_Position lineStart = styler.GetLine(iPrev);
-	int lineStartPosn = styler.LineStart(lineStart);
+	Sci_Position lineStartPosn = styler.LineStart(lineStart);
 	styler.Flush();
 
 	// Find the first word after some whitespace
@@ -644,7 +644,7 @@ static void ColouriseRbDoc(Sci_PositionU startPos, Sci_Position length, int init
 	int inner_string_count = 0;
 	int brace_counts = 0;	// Number of #{ ... } things within an expression
 
-	int i;
+	Sci_Position i;
 	for (i = 0; i < INNER_STRINGS_MAX_COUNT; i++) {
 		inner_string_types[i] = 0;
 		inner_expn_brace_counts[i] = 0;
@@ -1480,7 +1480,7 @@ static bool keywordDoStartsLoop(Sci_Position pos, Accessor &styler) {
 			char prevWord[MAX_KEYWORD_LENGTH + 1]; // 1 byte for zero
 			char *dst = prevWord;
 			int wordLen = 0;
-			int start_word;
+			Sci_Position start_word;
 			for (start_word = pos;
 				 start_word >= lineStartPosn && actual_style(styler.StyleAt(start_word)) == SCE_RB_WORD;
 				 start_word--) {

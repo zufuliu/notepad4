@@ -79,13 +79,13 @@ LRESULT WINAPI Scintilla_DirectFunction(HANDLE, UINT, WPARAM, LPARAM);
 //
 //
 DeclareSciCallR0(int, GetLineCount, GETLINECOUNT);
-DeclareSciCallV2(SetSel, SETSEL, int, anchorPos, int, currentPos);
-DeclareSciCallV1(GotoPos, GOTOPOS, int, position);
+DeclareSciCallV2(SetSel, SETSEL, Sci_Position, anchorPos, Sci_Position, currentPos);
+DeclareSciCallV1(GotoPos, GOTOPOS, Sci_Position, position);
 DeclareSciCallV1(GotoLine, GOTOLINE, int, line);
-DeclareSciCallR0(int, GetCurrentPos, GETCURRENTPOS);
-DeclareSciCallR1(int, LineFromPosition, LINEFROMPOSITION, int, position);
-DeclareSciCallR1(int, PositionFromLine, POSITIONFROMLINE, int, position);
-DeclareSciCallR1(int, GetCharAt, GETCHARAT, int, position);
+DeclareSciCallR0(Sci_Position, GetCurrentPos, GETCURRENTPOS);
+DeclareSciCallR1(int, LineFromPosition, LINEFROMPOSITION, Sci_Position, position);
+DeclareSciCallR1(Sci_Position, PositionFromLine, POSITIONFROMLINE, int, position);
+DeclareSciCallR1(int, GetCharAt, GETCHARAT, Sci_Position, position);
 DeclareSciCallR2(int, GetLine, GETLINE, int, line, char *, buffer);
 
 
@@ -104,7 +104,7 @@ DeclareSciCallV2(SetYCaretPolicy, SETYCARETPOLICY, int, caretPolicy, int, caretS
 //  Style definition
 //
 //
-DeclareSciCallR1(int, GetStyleAt, GETSTYLEAT, int, position);
+DeclareSciCallR1(int, GetStyleAt, GETSTYLEAT, Sci_Position, position);
 DeclareSciCallR1(COLORREF, StyleGetFore, STYLEGETFORE, int, styleNumber);
 DeclareSciCallR1(COLORREF, StyleGetBack, STYLEGETBACK, int, styleNumber);
 

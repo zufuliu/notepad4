@@ -21,6 +21,8 @@
 #ifndef _NOTEPAD2_EDIT_H_
 #define _NOTEPAD2_EDIT_H_
 
+#include "Sci_Position.h"
+
 // extern "C" declarations of Scintilla functions
 BOOL Scintilla_RegisterClasses(void *);
 BOOL Scintilla_ReleaseResources();
@@ -153,7 +155,7 @@ void	EditAutoCloseXMLTag(HWND hwnd);
 void	EditAutoIndent(HWND hwnd);
 void	EditToggleCommentLine(HWND hwnd);
 void	EditToggleCommentBlock(HWND hwnd);
-void	EditShowCallTips(HWND hwnd, int position);
+void	EditShowCallTips(HWND hwnd, Sci_Position position);
 
 #define NCP_DEFAULT					1
 #define NCP_UTF8					2

@@ -175,7 +175,7 @@ static inline int LevelNumber(int level) {
 class LexInterface {
 protected:
 	Document *pdoc;
-	ILexer *instance;
+	ILexer4 *instance;
 	bool performingStyle;	///< Prevent reentrance
 public:
 	explicit LexInterface(Document *pdoc_) : pdoc(pdoc_), instance(0), performingStyle(false) {
