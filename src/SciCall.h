@@ -87,6 +87,8 @@ DeclareSciCallR1(int, LineFromPosition, LINEFROMPOSITION, Sci_Position, position
 DeclareSciCallR1(Sci_Position, PositionFromLine, POSITIONFROMLINE, int, position);
 DeclareSciCallR1(int, GetCharAt, GETCHARAT, Sci_Position, position);
 DeclareSciCallR2(int, GetLine, GETLINE, int, line, char *, buffer);
+DeclareSciCallR0(Sci_Position, GetSelectionStart, GETSELECTIONSTART)
+DeclareSciCallR0(Sci_Position, GetSelectionEnd, GETSELECTIONEND)
 
 
 //=============================================================================

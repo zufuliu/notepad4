@@ -913,6 +913,20 @@ extern BOOL	bTabsAsSpaces;
 extern BOOL	bTabIndents;
 extern int	iTabWidth;
 extern int	iIndentWidth;
+
+__inline LPCWSTR EditGetLineEndString(void) {
+	switch (iEOLMode) {
+	case SC_EOL_CRLF:
+		return L"\r\n";
+	case SC_EOL_LF:
+		return L"\n";
+	case SC_EOL_CR:
+		return L"\r";
+	default:
+		return L"\n";
+	}
+}
+
 void EditAutoIndent(HWND hwnd)
 {
 	char *pLineBuf;
@@ -1177,6 +1191,30 @@ void EditToggleCommentLine(HWND hwnd)
 	}
 }
 
+void EditEncloseSelectionNewLine(HWND hwnd, LPCWSTR pwszOpen, LPCWSTR pwszClose) {
+	WCHAR start[64] = L"";
+	WCHAR end[64] = L"";
+	Sci_Position pos;
+	int line;
+	LPCWSTR lineEnd = EditGetLineEndString();
+
+	pos = SciCall_GetSelectionStart();
+	line = SciCall_LineFromPosition(pos);
+	if (pos != SciCall_PositionFromLine(line)) {
+		lstrcat(start, lineEnd);
+	}
+	lstrcat(start, pwszOpen);
+	lstrcat(start, lineEnd);
+
+	pos = SciCall_GetSelectionEnd();
+	line = SciCall_LineFromPosition(pos);
+	if (pos != SciCall_PositionFromLine(line)) {
+		lstrcat(end, lineEnd);
+	}
+	lstrcat(end, pwszClose);
+	lstrcat(end, lineEnd);
+	EditEncloseSelection(hwnd, start, end);
+}
 
 void EditToggleCommentBlock(HWND hwnd)
 {
@@ -1215,7 +1253,10 @@ void EditToggleCommentBlock(HWND hwnd)
 		EditEncloseSelection(hwnd, L"(*", L"*)");
 		break;
 	case SCLEX_LATEX:
-		EditEncloseSelection(hwnd, L"\\begin{comment}", L"\\end{comment}");
+		EditEncloseSelectionNewLine(hwnd, L"\\begin{comment}", L"\\end{comment}");
+		break;
+	case SCLEX_MATLAB:
+		EditEncloseSelectionNewLine(hwnd, L"%{", L"%}");
 		break;
 	default:
 		break;

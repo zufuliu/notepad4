@@ -1003,7 +1003,7 @@ fun int GetSelText=2161(, stringresult text)
 # Return the length of the text.
 fun int GetTextRange=2162(, textrange tr)
 
-# Draw the selection in normal style or with selection highlighted.
+# Draw the selection either highlighted or in normal (non-highlighted) style.
 fun void HideSelection=2163(bool hide,)
 
 # Retrieve the x value of the point in the window where a position is displayed.
