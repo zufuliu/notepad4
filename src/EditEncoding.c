@@ -361,7 +361,7 @@ BOOL Encoding_IsValid(int iTestEncoding)
 {
 	CPINFO cpi;
 	if (iTestEncoding >= 0 &&
-			iTestEncoding < COUNTOF(mEncoding)) {
+			iTestEncoding < (int)COUNTOF(mEncoding)) {
 		if	((mEncoding[iTestEncoding].uFlags & NCP_INTERNAL) ||
 			(IsValidCodePage(mEncoding[iTestEncoding].uCodePage) && GetCPInfo(mEncoding[iTestEncoding].uCodePage, &cpi))) {
 			return TRUE;
@@ -823,7 +823,7 @@ BOOL FileVars_IsValidEncoding(LPFILEVARS lpfv)
 	CPINFO cpi;
 	if (lpfv->mask & FV_ENCODING &&
 			lpfv->iEncoding >= 0 &&
-			lpfv->iEncoding < COUNTOF(mEncoding)) {
+			lpfv->iEncoding < (int)COUNTOF(mEncoding)) {
 		if ((mEncoding[lpfv->iEncoding].uFlags & NCP_INTERNAL) ||
 			(IsValidCodePage(mEncoding[lpfv->iEncoding].uCodePage) && GetCPInfo(mEncoding[lpfv->iEncoding].uCodePage, &cpi))) {
 			return TRUE;

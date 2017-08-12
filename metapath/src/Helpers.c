@@ -555,7 +555,7 @@ int Toolbar_SetButtons(HWND hwnd, int cmdBase, LPCWSTR lpszButtons, LPCTBBUTTON 
 {
 	WCHAR tchButtons[512];
 	WCHAR *p;
-	int i, c;
+	int c;
 	int iCmd;
 
 	ZeroMemory(tchButtons, sizeof(tchButtons));
@@ -566,11 +566,11 @@ int Toolbar_SetButtons(HWND hwnd, int cmdBase, LPCWSTR lpszButtons, LPCTBBUTTON 
 	}
 
 	c = (int)SendMessage(hwnd, TB_BUTTONCOUNT, 0, 0);
-	for (i = 0; i < c; i++) {
+	for (int i = 0; i < c; i++) {
 		SendMessage(hwnd, TB_DELETEBUTTON, 0, 0);
 	}
 
-	for (i = 0; i < COUNTOF(tchButtons); i++) {
+	for (unsigned int i = 0; i < COUNTOF(tchButtons); i++) {
 		if (tchButtons[i] == L' ') {
 			tchButtons[i] = 0;
 		}
@@ -580,7 +580,7 @@ int Toolbar_SetButtons(HWND hwnd, int cmdBase, LPCWSTR lpszButtons, LPCTBBUTTON 
 	while (*p) {
 		if (swscanf(p, L"%i", &iCmd) == 1) {
 			iCmd = (iCmd == 0) ? 0 : iCmd + cmdBase - 1;
-			for (i = 0; i < ctbb; i++) {
+			for (int i = 0; i < ctbb; i++) {
 				if (ptbb[i].idCommand == iCmd) {
 					SendMessage(hwnd, TB_ADDBUTTONS, (WPARAM)1, (LPARAM)&ptbb[i]);
 					break;
@@ -1642,22 +1642,22 @@ BOOL GetThemedDialogFont(LPWSTR lpFaceName, WORD *wSize)
 	return bSucceed;
 }
 
-__inline BOOL DialogTemplate_IsDialogEx(const DLGTEMPLATE *pTemplate)
+static __inline BOOL DialogTemplate_IsDialogEx(const DLGTEMPLATE *pTemplate)
 {
 	return ((DLGTEMPLATEEX *)pTemplate)->signature == 0xFFFF;
 }
 
-__inline BOOL DialogTemplate_HasFont(const DLGTEMPLATE *pTemplate)
+static __inline BOOL DialogTemplate_HasFont(const DLGTEMPLATE *pTemplate)
 {
 	return (DS_SETFONT & (DialogTemplate_IsDialogEx(pTemplate) ? ((DLGTEMPLATEEX *)pTemplate)->style : pTemplate->style));
 }
 
-__inline int DialogTemplate_FontAttrSize(BOOL bDialogEx)
+static __inline int DialogTemplate_FontAttrSize(BOOL bDialogEx)
 {
 	return (int)sizeof(WORD) * (bDialogEx ? 3 : 1);
 }
 
-__inline BYTE *DialogTemplate_GetFontSizeField(const DLGTEMPLATE *pTemplate)
+static __inline BYTE *DialogTemplate_GetFontSizeField(const DLGTEMPLATE *pTemplate)
 {
 	BOOL bDialogEx = DialogTemplate_IsDialogEx(pTemplate);
 	WORD *pw;
@@ -1960,4 +1960,4 @@ VOID RestoreWndFromTray(HWND hwnd)
 }
 
 
-///   End of Helpers.c   \\\
+///   End of Helpers.c

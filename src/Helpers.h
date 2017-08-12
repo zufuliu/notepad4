@@ -56,7 +56,7 @@ extern WCHAR szIniFile[MAX_PATH];
 	WritePrivateProfileString(lpSection, lpName, lpString, szIniFile)
 #define IniDeleteSection(lpSection) \
 	WritePrivateProfileSection(lpSection, NULL, szIniFile)
-__inline BOOL IniSetInt(LPCWSTR lpSection, LPCWSTR lpName, int i)
+static __inline BOOL IniSetInt(LPCWSTR lpSection, LPCWSTR lpName, int i)
 {
 	WCHAR tch[32];
 	wsprintf(tch, L"%i", i);
@@ -71,23 +71,23 @@ int		IniSectionGetString(LPCWSTR lpCachedIniSection, LPCWSTR lpName, LPCWSTR lpD
 int		IniSectionGetInt(LPCWSTR lpCachedIniSection, LPCWSTR lpName, int iDefault);
 BOOL	IniSectionGetBool(LPCWSTR lpCachedIniSection, LPCWSTR lpName, BOOL bDefault);
 BOOL	IniSectionSetString(LPWSTR lpCachedIniSection, LPCWSTR lpName, LPCWSTR lpString);
-__inline BOOL IniSectionSetInt(LPWSTR lpCachedIniSection, LPCWSTR lpName, int i)
+static __inline BOOL IniSectionSetInt(LPWSTR lpCachedIniSection, LPCWSTR lpName, int i)
 {
 	WCHAR tch[32];
 	wsprintf(tch, L"%i", i);
 	return IniSectionSetString(lpCachedIniSection, lpName, tch);
 }
-__inline BOOL IniSectionSetBool(LPWSTR lpCachedIniSection, LPCWSTR lpName, BOOL b)
+static __inline BOOL IniSectionSetBool(LPWSTR lpCachedIniSection, LPCWSTR lpName, BOOL b)
 {
 	return IniSectionSetString(lpCachedIniSection, lpName, (b? L"1" : L"0"));
 }
 
 extern HWND hwndEdit;
-__inline void BeginWaitCursor()
+static __inline void BeginWaitCursor()
 {
 	SendMessage(hwndEdit, SCI_SETCURSOR, (WPARAM)SC_CURSORWAIT, 0);
 }
-__inline void EndWaitCursor()
+static __inline void EndWaitCursor()
 {
 	POINT pt;
 	SendMessage(hwndEdit, SCI_SETCURSOR, (WPARAM)SC_CURSORNORMAL, 0);

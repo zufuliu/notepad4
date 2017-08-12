@@ -22,6 +22,7 @@ class FAR CDropSource : public IDropSource
 {
 public:
 	CDropSource();
+	virtual ~CDropSource() {}
 
 	/* IUnknown methods */
 	STDMETHOD(QueryInterface)(REFIID riid, void FAR *FAR *ppvObj);

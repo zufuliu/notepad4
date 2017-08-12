@@ -8,9 +8,11 @@
 #define	MULTI_STYLE(a, b, c, d)	((a) | ((b) << 8) | ((c) << 16) | ((d) << 24))
 #define	NUMKEYWORD				(KEYWORDSET_MAX + 1)
 
+#if defined(_MSC_VER)
 // C4200: zero-sized array in struct/union; C4201: nameless struct/union;
 #pragma warning(push)
 #pragma warning(disable: 4200 4201)
+#endif
 
 typedef struct _editstyle {
 	union {
@@ -37,8 +39,9 @@ typedef struct _editlexer {
 	EDITSTYLE		Styles[];
 } EDITLEXER, *PEDITLEXER;
 
-
+#if defined(_MSC_VER)
 #pragma warning(pop) // C4200, C4201
+#endif
 
 
 // NP2LEX_, rid for EDITLEXERs

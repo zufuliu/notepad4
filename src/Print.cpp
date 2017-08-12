@@ -29,6 +29,9 @@ extern "C" {
 }
 #include "resource.h"
 
+#ifndef max
+#define max(a,b)	(((a) > (b)) ? (a) : (b))
+#endif
 
 extern "C" HINSTANCE g_hInstance;
 

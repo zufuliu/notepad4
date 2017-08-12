@@ -1,7 +1,10 @@
 .codelite
 bin
-build/.vs
+build/VS*/.vs
 build/bin
+build/CodeLite/*.mk
+build/CodeLite/*.txt
+build/CodeLite/Makefile
 *.suo
 *.sdf
 *.user
@@ -13,3 +16,4 @@ build/bin
 *.pyc
 *.pyo
 *.plist
+*.orig

@@ -3043,6 +3043,7 @@ void EditToggleLineComments(HWND hwnd, LPCWSTR pwszComment, BOOL bInsertAtStart)
 				switch (iAction) {
 				case 0:
 					iAction = 2;
+				// fall through
 				case 2:
 					iCommentPos = iIndentPos;
 					// a line with [space/tab] comment only
@@ -3063,6 +3064,7 @@ void EditToggleLineComments(HWND hwnd, LPCWSTR pwszComment, BOOL bInsertAtStart)
 				switch (iAction) {
 				case 0:
 					iAction = 1;
+				// fall through
 				case 1:
 					iCommentPos = (int)SendMessage(hwnd, SCI_FINDCOLUMN, (WPARAM)iLine, (LPARAM)iCommentCol);
 					if (!bWhitespaceLine || (iLineStart == iLineEnd)) {

@@ -987,6 +987,7 @@ static void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int in
 							InterpolateSegment(sc, sLen);
 							break;
 						}
+						// fall through
 						// (continued for ' delim)
 					default:	// non-interpolated path
 						sc.Forward(sLen);

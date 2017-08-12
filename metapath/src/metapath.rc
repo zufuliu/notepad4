@@ -7,7 +7,16 @@
 //
 // Generated from the TEXTINCLUDE 2 resource.
 //
+#if defined(__MINGW64__) || defined(__MINGW32__)
+#if defined(__has_include) && __has_include(<winres.h>)
 #include <winres.h>
+#else
+#include <afxres.h>
+#include <winresrc.h>
+#endif
+#else
+#include <winres.h>
+#endif
 /////////////////////////////////////////////////////////////////////////////
 #undef APSTUDIO_READONLY_SYMBOLS
 
@@ -718,18 +727,6 @@ BEGIN
     IDS_SAVESETTINGS        "Save Settings\nThe current program settings have been saved."
 END
 
-#endif    // English (U.S.) resources
-/////////////////////////////////////////////////////////////////////////////
-
-
-/////////////////////////////////////////////////////////////////////////////
-// German (Switzerland) resources
-
-#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_DES)
-#ifdef _WIN32
-LANGUAGE LANG_GERMAN, SUBLANG_GERMAN_SWISS
-#pragma code_page(1252)
-#endif //_WIN32
 
 #ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
@@ -754,7 +751,7 @@ END
 
 #endif    // APSTUDIO_INVOKED
 
-#endif    // German (Switzerland) resources
+#endif    // English (U.S.) resources
 /////////////////////////////////////////////////////////////////////////////
 
 

@@ -46,7 +46,8 @@ HWND      hwndReBar;
 
 #define TBFILTERBMP 13
 
-TBBUTTON  tbbMainWnd[] = { {0, IDT_HISTORY_BACK, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0, 0},
+TBBUTTON  tbbMainWnd[] = {
+	{0, IDT_HISTORY_BACK, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0, 0},
 	{1, IDT_HISTORY_FORWARD, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0, 0},
 	{2, IDT_UPDIR, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0, 0},
 	{3, IDT_ROOT, TBSTATE_ENABLED, TBSTYLE_BUTTON, 0, 0},
@@ -827,7 +828,6 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance)
 
 	BOOL bIsAppThemed = PrivateIsAppThemed();
 
-	int i, n;
 	WCHAR tchDesc[256];
 	WCHAR tchIndex[256];
 
@@ -921,16 +921,13 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance)
 	pIniSection = LocalAlloc(LPTR, sizeof(WCHAR) * 32 * 1024);
 	cbIniSection = (int)LocalSize(pIniSection) / sizeof(WCHAR);
 	LoadIniSection(L"Toolbar Labels", pIniSection, cbIniSection);
-	n = 0;
-	for (i = 0; i < COUNTOF(tbbMainWnd); i++) {
 
+	for (unsigned i = 0, n = 0; i < COUNTOF(tbbMainWnd); i++) {
 		if (tbbMainWnd[i].fsStyle == TBSTYLE_SEP) {
 			continue;
-		} else {
-			n++;
 		}
 
-		wsprintf(tchIndex, L"%02i", n);
+		wsprintf(tchIndex, L"%02u", n++);
 
 		if (IniSectionGetString(pIniSection, tchIndex, L"", tchDesc, COUNTOF(tchDesc)) &&
 				lstrcmpi(tchDesc, L"(none)") != 0) {
@@ -2222,8 +2219,8 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam)
 
 			NM_LISTVIEW *pnmlv = (NM_LISTVIEW *)lParam;
 
-			if ((pnmlv->uNewState & LVIS_SELECTED | LVIS_FOCUSED) !=
-					(pnmlv->uOldState & LVIS_SELECTED | LVIS_FOCUSED)) {
+			if ((pnmlv->uNewState & (LVIS_SELECTED | LVIS_FOCUSED)) !=
+					(pnmlv->uOldState & (LVIS_SELECTED | LVIS_FOCUSED))) {
 
 				WCHAR tch[64];
 				if ((pnmlv->uNewState & LVIS_SELECTED)) {
@@ -3711,4 +3708,4 @@ void SnapToDefaultPos(HWND hwnd)
 }
 
 
-///  End of metapath.c  \\\
+///  End of metapath.c

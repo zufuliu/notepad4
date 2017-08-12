@@ -112,4 +112,4 @@ void    MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam);
 LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam);
 LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam);
 
-///   End of metapath.h   \\\
+///   End of metapath.h

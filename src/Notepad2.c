@@ -3341,7 +3341,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam)
 	case IDM_EDIT_INSERT_LOC_DATE:
 	case IDM_EDIT_INSERT_LOC_DATETIME: {
 		SYSTEMTIME lt;
-		char	mszBuf[32];
+		char	mszBuf[38];
 		// Local
 		GetLocalTime(&lt);
 		if (LOWORD(wParam) == IDM_EDIT_INSERT_LOC_DATE) {
@@ -3354,7 +3354,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam)
 	break;
 	case IDM_EDIT_INSERT_UTC_DATETIME: {
 		SYSTEMTIME lt;
-		char	mszBuf[32];
+		char	mszBuf[38];
 		// UTC
 		GetSystemTime(&lt);
 		sprintf(mszBuf, "%04d-%02d-%02dT%02d:%02d:%02dZ", lt.wYear, lt.wMonth, lt.wDay, lt.wHour, lt.wMinute, lt.wSecond);

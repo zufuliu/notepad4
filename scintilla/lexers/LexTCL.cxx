@@ -320,6 +320,7 @@ next:
 					break;
 				case '[':
 					expected = true;
+					// fall through
 				case ']':
 				case '(':
 				case ')':

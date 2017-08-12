@@ -1086,7 +1086,7 @@ int Style_GetDocTypeLanguage()
 
 	// find root tag
 	p = tchText;
-	while (p - tchText < COUNTOF(tchText)) {
+	while (p - tchText < (ptrdiff_t)COUNTOF(tchText)) {
 		if ((p = StrChrA(p, '<')) == NULL)
 			return 0;
 		if (!StrCmpNA(p, "<!--", 4)) {

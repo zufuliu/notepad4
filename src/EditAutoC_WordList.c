@@ -242,9 +242,11 @@ void WordList_GetList(struct WordList *pWList, char* *pList)
 
 #else
 
+#if defined(_MSC_VER)
 // C4201: nameless struct/union
 #pragma warning(push)
 #pragma warning(disable: 4201)
+#endif
 
 // Tree
 struct WordNode {
@@ -263,7 +265,9 @@ struct WordNode {
 	int level;
 };
 
+#if defined(_MSC_VER)
 #pragma warning(pop) // C4201
+#endif
 
 #define NP2_TREE_HEIGHT_LIMIT	16
 

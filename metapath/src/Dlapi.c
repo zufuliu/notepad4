@@ -1329,4 +1329,4 @@ BOOL IL_GetDisplayName(LPSHELLFOLDER lpsf, LPCITEMIDLIST pidl, DWORD dwFlags, LP
 }
 
 
-///   End of Dlapi.c   \\\
+///   End of Dlapi.c

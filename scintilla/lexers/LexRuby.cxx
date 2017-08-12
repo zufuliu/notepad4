@@ -1664,9 +1664,9 @@ static void FoldRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 		int new_lev = levelCurrent;
 		if (visibleChars == 0 && foldCompact)
 			new_lev |= SC_FOLDLEVELWHITEFLAG;
-			if ((levelCurrent > levelPrev) && (visibleChars > 0))
-				new_lev |= SC_FOLDLEVELHEADERFLAG;
-			levelCurrent = new_lev;
+		if ((levelCurrent > levelPrev) && (visibleChars > 0))
+			new_lev |= SC_FOLDLEVELHEADERFLAG;
+		levelCurrent = new_lev;
 	}
 	styler.SetLevel(lineCurrent, levelCurrent|SC_FOLDLEVELBASE);
 }
