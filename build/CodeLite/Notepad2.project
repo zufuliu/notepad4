@@ -1,0 +1,449 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CodeLite_Project Name="Notepad2" Version="10.0.0">
+  <Description/>
+  <Dependencies/>
+  <VirtualDirectory Name="Scintilla">
+    <VirtualDirectory Name="include">
+      <File Name="../../scintilla/include/ILexer.h"/>
+      <File Name="../../scintilla/include/Platform.h"/>
+      <File Name="../../scintilla/include/Sci_Position.h"/>
+      <File Name="../../scintilla/include/SciLexer.h"/>
+      <File Name="../../scintilla/include/Scintilla.h"/>
+    </VirtualDirectory>
+    <VirtualDirectory Name="lexers">
+      <File Name="../../scintilla/lexers/LexAsm.cxx"/>
+      <File Name="../../scintilla/lexers/LexAutoIt3.cxx"/>
+      <File Name="../../scintilla/lexers/LexBash.cxx"/>
+      <File Name="../../scintilla/lexers/LexBatch.cxx"/>
+      <File Name="../../scintilla/lexers/LexCIL.cxx"/>
+      <File Name="../../scintilla/lexers/LexCMake.cxx"/>
+      <File Name="../../scintilla/lexers/LexConfig.cxx"/>
+      <File Name="../../scintilla/lexers/LexCPP.cxx"/>
+      <File Name="../../scintilla/lexers/LexCSS.cxx"/>
+      <File Name="../../scintilla/lexers/LexDiff.cxx"/>
+      <File Name="../../scintilla/lexers/LexFortran.cxx"/>
+      <File Name="../../scintilla/lexers/LexFSharp.cxx"/>
+      <File Name="../../scintilla/lexers/LexGraphViz.cxx"/>
+      <File Name="../../scintilla/lexers/LexHTML.cxx"/>
+      <File Name="../../scintilla/lexers/LexIni.cxx"/>
+      <File Name="../../scintilla/lexers/LexInno.cxx"/>
+      <File Name="../../scintilla/lexers/LexJSON.cxx"/>
+      <File Name="../../scintilla/lexers/LexLaTeX.cxx"/>
+      <File Name="../../scintilla/lexers/LexLisp.cxx"/>
+      <File Name="../../scintilla/lexers/LexLLVM.cxx"/>
+      <File Name="../../scintilla/lexers/LexLua.cxx"/>
+      <File Name="../../scintilla/lexers/LexMakefile.cxx"/>
+      <File Name="../../scintilla/lexers/LexMatlab.cxx"/>
+      <File Name="../../scintilla/lexers/LexNSIS.cxx"/>
+      <File Name="../../scintilla/lexers/LexNull.cxx"/>
+      <File Name="../../scintilla/lexers/LexPascal.cxx"/>
+      <File Name="../../scintilla/lexers/LexPerl.cxx"/>
+      <File Name="../../scintilla/lexers/LexPowerShell.cxx"/>
+      <File Name="../../scintilla/lexers/LexPython.cxx"/>
+      <File Name="../../scintilla/lexers/LexRuby.cxx"/>
+      <File Name="../../scintilla/lexers/LexSmali.cxx"/>
+      <File Name="../../scintilla/lexers/LexSQL.cxx"/>
+      <File Name="../../scintilla/lexers/LexTCL.cxx"/>
+      <File Name="../../scintilla/lexers/LexTexinfo.cxx"/>
+      <File Name="../../scintilla/lexers/LexVB.cxx"/>
+      <File Name="../../scintilla/lexers/LexVerilog.cxx"/>
+      <File Name="../../scintilla/lexers/LexVHDL.cxx"/>
+      <File Name="../../scintilla/lexers/LexVim.cxx"/>
+    </VirtualDirectory>
+    <VirtualDirectory Name="lexlib">
+      <File Name="../../scintilla/lexlib/Accessor.cxx"/>
+      <File Name="../../scintilla/lexlib/Accessor.h"/>
+      <File Name="../../scintilla/lexlib/CharacterCategory.cxx"/>
+      <File Name="../../scintilla/lexlib/CharacterCategory.h"/>
+      <File Name="../../scintilla/lexlib/CharacterSet.cxx"/>
+      <File Name="../../scintilla/lexlib/CharacterSet.h"/>
+      <File Name="../../scintilla/lexlib/HereDoc.cxx"/>
+      <File Name="../../scintilla/lexlib/HereDoc.h"/>
+      <File Name="../../scintilla/lexlib/LexAccessor.cxx"/>
+      <File Name="../../scintilla/lexlib/LexAccessor.h"/>
+      <File Name="../../scintilla/lexlib/LexerBase.cxx"/>
+      <File Name="../../scintilla/lexlib/LexerBase.h"/>
+      <File Name="../../scintilla/lexlib/LexerModule.cxx"/>
+      <File Name="../../scintilla/lexlib/LexerModule.h"/>
+      <File Name="../../scintilla/lexlib/LexerSimple.cxx"/>
+      <File Name="../../scintilla/lexlib/LexerSimple.h"/>
+      <File Name="../../scintilla/lexlib/PropSetSimple.cxx"/>
+      <File Name="../../scintilla/lexlib/PropSetSimple.h"/>
+      <File Name="../../scintilla/lexlib/StringCopy.h"/>
+      <File Name="../../scintilla/lexlib/StyleContext.cxx"/>
+      <File Name="../../scintilla/lexlib/StyleContext.h"/>
+      <File Name="../../scintilla/lexlib/WordList.cxx"/>
+      <File Name="../../scintilla/lexlib/WordList.h"/>
+    </VirtualDirectory>
+    <VirtualDirectory Name="src">
+      <File Name="../../scintilla/src/AutoComplete.cxx"/>
+      <File Name="../../scintilla/src/AutoComplete.h"/>
+      <File Name="../../scintilla/src/CallTip.cxx"/>
+      <File Name="../../scintilla/src/CallTip.h"/>
+      <File Name="../../scintilla/src/CaseConvert.cxx"/>
+      <File Name="../../scintilla/src/CaseConvert.h"/>
+      <File Name="../../scintilla/src/CaseFolder.cxx"/>
+      <File Name="../../scintilla/src/CaseFolder.h"/>
+      <File Name="../../scintilla/src/Catalogue.cxx"/>
+      <File Name="../../scintilla/src/Catalogue.h"/>
+      <File Name="../../scintilla/src/CellBuffer.cxx"/>
+      <File Name="../../scintilla/src/CellBuffer.h"/>
+      <File Name="../../scintilla/src/CharClassify.cxx"/>
+      <File Name="../../scintilla/src/CharClassify.h"/>
+      <File Name="../../scintilla/src/ContractionState.cxx"/>
+      <File Name="../../scintilla/src/ContractionState.h"/>
+      <File Name="../../scintilla/src/DBCS.cxx"/>
+      <File Name="../../scintilla/src/DBCS.h"/>
+      <File Name="../../scintilla/src/Decoration.cxx"/>
+      <File Name="../../scintilla/src/Decoration.h"/>
+      <File Name="../../scintilla/src/Document.cxx"/>
+      <File Name="../../scintilla/src/Document.h"/>
+      <File Name="../../scintilla/src/EditModel.cxx"/>
+      <File Name="../../scintilla/src/EditModel.h"/>
+      <File Name="../../scintilla/src/Editor.cxx"/>
+      <File Name="../../scintilla/src/Editor.h"/>
+      <File Name="../../scintilla/src/EditView.cxx"/>
+      <File Name="../../scintilla/src/EditView.h"/>
+      <File Name="../../scintilla/src/ExternalLexer.cxx"/>
+      <File Name="../../scintilla/src/ExternalLexer.h"/>
+      <File Name="../../scintilla/src/FontQuality.h"/>
+      <File Name="../../scintilla/src/Indicator.cxx"/>
+      <File Name="../../scintilla/src/Indicator.h"/>
+      <File Name="../../scintilla/src/KeyMap.cxx"/>
+      <File Name="../../scintilla/src/KeyMap.h"/>
+      <File Name="../../scintilla/src/LineMarker.cxx"/>
+      <File Name="../../scintilla/src/LineMarker.h"/>
+      <File Name="../../scintilla/src/MarginView.cxx"/>
+      <File Name="../../scintilla/src/MarginView.h"/>
+      <File Name="../../scintilla/src/Partitioning.h"/>
+      <File Name="../../scintilla/src/PerLine.cxx"/>
+      <File Name="../../scintilla/src/PerLine.h"/>
+      <File Name="../../scintilla/src/Position.h"/>
+      <File Name="../../scintilla/src/PositionCache.cxx"/>
+      <File Name="../../scintilla/src/PositionCache.h"/>
+      <File Name="../../scintilla/src/RESearch.cxx"/>
+      <File Name="../../scintilla/src/RESearch.h"/>
+      <File Name="../../scintilla/src/RunStyles.cxx"/>
+      <File Name="../../scintilla/src/RunStyles.h"/>
+      <File Name="../../scintilla/src/ScintillaBase.cxx"/>
+      <File Name="../../scintilla/src/ScintillaBase.h"/>
+      <File Name="../../scintilla/src/Selection.cxx"/>
+      <File Name="../../scintilla/src/Selection.h"/>
+      <File Name="../../scintilla/src/SparseVector.h"/>
+      <File Name="../../scintilla/src/SplitVector.h"/>
+      <File Name="../../scintilla/src/Style.cxx"/>
+      <File Name="../../scintilla/src/Style.h"/>
+      <File Name="../../scintilla/src/UnicodeFromUTF8.h"/>
+      <File Name="../../scintilla/src/UniConversion.cxx"/>
+      <File Name="../../scintilla/src/UniConversion.h"/>
+      <File Name="../../scintilla/src/UniqueString.h"/>
+      <File Name="../../scintilla/src/ViewStyle.cxx"/>
+      <File Name="../../scintilla/src/ViewStyle.h"/>
+      <File Name="../../scintilla/src/XPM.cxx"/>
+      <File Name="../../scintilla/src/XPM.h"/>
+    </VirtualDirectory>
+    <VirtualDirectory Name="win32">
+      <File Name="../../scintilla/win32/HanjaDic.cxx"/>
+      <File Name="../../scintilla/win32/HanjaDic.h"/>
+      <File Name="../../scintilla/win32/PlatWin.cxx"/>
+      <File Name="../../scintilla/win32/PlatWin.h"/>
+      <File Name="../../scintilla/win32/ScintillaWin.cxx"/>
+    </VirtualDirectory>
+  </VirtualDirectory>
+  <VirtualDirectory Name="Source Files">
+    <VirtualDirectory Name="EditLexers">
+      <File Name="../../src/EditLexers/stlActionScript.c"/>
+      <File Name="../../src/EditLexers/stlAsm.c"/>
+      <File Name="../../src/EditLexers/stlAsymptote.c"/>
+      <File Name="../../src/EditLexers/stlAutoIt3.c"/>
+      <File Name="../../src/EditLexers/stlAwk.c"/>
+      <File Name="../../src/EditLexers/stlBash.c"/>
+      <File Name="../../src/EditLexers/stlBatch.c"/>
+      <File Name="../../src/EditLexers/stlCIL.c"/>
+      <File Name="../../src/EditLexers/stlCMake.c"/>
+      <File Name="../../src/EditLexers/stlCPP.c"/>
+      <File Name="../../src/EditLexers/stlCSharp.c"/>
+      <File Name="../../src/EditLexers/stlCSS.c"/>
+      <File Name="../../src/EditLexers/stlD.c"/>
+      <File Name="../../src/EditLexers/stlDefault.c"/>
+      <File Name="../../src/EditLexers/stlFortran.c"/>
+      <File Name="../../src/EditLexers/stlFSharp.c"/>
+      <File Name="../../src/EditLexers/stlGo.c"/>
+      <File Name="../../src/EditLexers/stlGradle.c"/>
+      <File Name="../../src/EditLexers/stlGraphViz.c"/>
+      <File Name="../../src/EditLexers/stlGroovy.c"/>
+      <File Name="../../src/EditLexers/stlHaXe.c"/>
+      <File Name="../../src/EditLexers/stlHTML.c"/>
+      <File Name="../../src/EditLexers/stlInno.c"/>
+      <File Name="../../src/EditLexers/stlJamfile.c"/>
+      <File Name="../../src/EditLexers/stlJava.c"/>
+      <File Name="../../src/EditLexers/stlJavaScript.c"/>
+      <File Name="../../src/EditLexers/stlJSON.c"/>
+      <File Name="../../src/EditLexers/stlJulia.c"/>
+      <File Name="../../src/EditLexers/stlLaTeX.c"/>
+      <File Name="../../src/EditLexers/stlLisp.c"/>
+      <File Name="../../src/EditLexers/stlLLVM.c"/>
+      <File Name="../../src/EditLexers/stlLua.c"/>
+      <File Name="../../src/EditLexers/stlMake.c"/>
+      <File Name="../../src/EditLexers/stlMATLAB.c"/>
+      <File Name="../../src/EditLexers/stlNsis.c"/>
+      <File Name="../../src/EditLexers/stlPascal.c"/>
+      <File Name="../../src/EditLexers/stlPerl.c"/>
+      <File Name="../../src/EditLexers/stlPHP.c"/>
+      <File Name="../../src/EditLexers/stlPowerShell.c"/>
+      <File Name="../../src/EditLexers/stlPython.c"/>
+      <File Name="../../src/EditLexers/stlResource.c"/>
+      <File Name="../../src/EditLexers/stlRuby.c"/>
+      <File Name="../../src/EditLexers/stlScala.c"/>
+      <File Name="../../src/EditLexers/stlSmali.c"/>
+      <File Name="../../src/EditLexers/stlSQL.c"/>
+      <File Name="../../src/EditLexers/stlTcl.c"/>
+      <File Name="../../src/EditLexers/stlVB.c"/>
+      <File Name="../../src/EditLexers/stlVBS.c"/>
+      <File Name="../../src/EditLexers/stlVerilog.c"/>
+      <File Name="../../src/EditLexers/stlVHDL.c"/>
+      <File Name="../../src/EditLexers/stlVim.c"/>
+      <File Name="../../src/EditLexers/stlXML.c"/>
+    </VirtualDirectory>
+    <File Name="../../src/Dialogs.c"/>
+    <File Name="../../src/Dlapi.c"/>
+    <File Name="../../src/Edit.c"/>
+    <File Name="../../src/EditAutoC.c"/>
+    <File Name="../../src/EditEncoding.c"/>
+    <File Name="../../src/Helpers.c"/>
+    <File Name="../../src/Notepad2.c"/>
+    <File Name="../../src/Print.cpp"/>
+    <File Name="../../src/Styles.c"/>
+  </VirtualDirectory>
+  <VirtualDirectory Name="Header Files">
+    <File Name="../../src/Dialogs.h"/>
+    <File Name="../../src/Dlapi.h"/>
+    <File Name="../../src/Edit.h"/>
+    <File Name="../../src/EditLexer.h"/>
+    <File Name="../../src/EditLexers/EditStyle.h"/>
+    <File Name="../../src/Helpers.h"/>
+    <File Name="../../src/Notepad2.h"/>
+    <File Name="../../src/resource.h"/>
+    <File Name="../../src/SciCall.h"/>
+    <File Name="../../src/Styles.h"/>
+    <File Name="../../src/Version.h"/>
+    <File Name="../../src/VersionRev.h"/>
+  </VirtualDirectory>
+  <VirtualDirectory Name="Resource Files">
+    <File Name="../../res/Copy.cur"/>
+    <File Name="../../res/Encoding.bmp"/>
+    <File Name="../../res/Next.bmp"/>
+    <File Name="../../res/Notepad2.ico"/>
+    <File Name="../../res/Open.bmp"/>
+    <File Name="../../res/Pick.bmp"/>
+    <File Name="../../res/Prev.bmp"/>
+    <File Name="../../res/Run.ico"/>
+    <File Name="../../res/Styles.ico"/>
+    <File Name="../../res/Toolbar.bmp"/>
+    <File Name="../../src/Notepad2.rc"/>
+    <File Name="../../src/Notepad2.ver"/>
+  </VirtualDirectory>
+  <Settings Type="Executable">
+    <GlobalSettings>
+      <Compiler Options="-Wall;-mthreads;-Wextra;-Wshadow" C_Options="-Wall;-mthreads;-Wextra;-Wshadow;-Wno-missing-braces" Assembler="">
+        <IncludePath Value="../../src"/>
+        <IncludePath Value="../../scintilla/include"/>
+        <IncludePath Value="../../scintilla/lexlib"/>
+        <IncludePath Value="../../scintilla/src"/>
+        <Preprocessor Value="UNICODE"/>
+        <Preprocessor Value="_UNICODE"/>
+        <Preprocessor Value="STATIC_BUILD"/>
+        <Preprocessor Value="SCI_NAMESPACE"/>
+        <Preprocessor Value="SCI_LEXER"/>
+        <Preprocessor Value="BOOKMARK_EDITION"/>
+        <Preprocessor Value="DISABLE_D2D"/>
+        <Preprocessor Value="NO_CXX11_REGEX"/>
+        <Preprocessor Value="SCI_DISABLE_PROVISIONAL"/>
+      </Compiler>
+      <Linker Options="-mwindows;-mthreads">
+        <Library Value="kernel32.a"/>
+        <Library Value="user32.a"/>
+        <Library Value="gdi32.a"/>
+        <Library Value="comctl32.a"/>
+        <Library Value="comdlg32.a"/>
+        <Library Value="advapi32.a"/>
+        <Library Value="shlwapi.a"/>
+        <Library Value="shell32.a"/>
+        <Library Value="ole32.a"/>
+        <Library Value="oleaut32.a"/>
+        <Library Value="uuid.a"/>
+        <Library Value="imm32.a"/>
+        <Library Value="msimg32.a"/>
+      </Linker>
+      <ResourceCompiler Options="-DRC_INVOKED;-DUNICODE;-D_UNICODE;-DBOOKMARK_EDITION;"/>
+    </GlobalSettings>
+    <Configuration Name="Debug_Win32" CompilerType="MinGW ( gcc )" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
+      <Compiler Options="-g;-O0" C_Options="-g;-O0" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
+        <Preprocessor Value="_DEBUG"/>
+        <Preprocessor Value="WIN32"/>
+        <Preprocessor Value="_WIN32_WINNT=0x0501"/>
+        <Preprocessor Value="WINVER=0x0501"/>
+      </Compiler>
+      <Linker Options="-O0" Required="yes"/>
+      <ResourceCompiler Options="-D_DEBUG;-DWIN32" Required="no"/>
+      <General OutputFile="$(WorkspacePath)/../bin/$(ConfigurationName)/$(ProjectName).exe" IntermediateDirectory="$(WorkspacePath)/../bin/$(ConfigurationName)/obj/$(ProjectName)" Command="./$(ProjectName)" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(WorkspacePath)/../bin/$(ConfigurationName)" PauseExecWhenProcTerminates="no" IsGUIProgram="yes" IsEnabled="yes"/>
+      <BuildSystem Name="Default"/>
+      <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
+        <![CDATA[]]>
+      </Environment>
+      <Debugger IsRemote="no" RemoteHostName="" RemoteHostPort="" DebuggerPath="" IsExtended="no">
+        <DebuggerSearchPaths/>
+        <PostConnectCommands/>
+        <StartupCommands/>
+      </Debugger>
+      <PreBuild/>
+      <PostBuild/>
+      <CustomBuild Enabled="no">
+        <RebuildCommand/>
+        <CleanCommand/>
+        <BuildCommand/>
+        <PreprocessFileCommand/>
+        <SingleFileCommand/>
+        <MakefileGenerationCommand/>
+        <ThirdPartyToolName/>
+        <WorkingDirectory/>
+      </CustomBuild>
+      <AdditionalRules>
+        <CustomPostBuild/>
+        <CustomPreBuild/>
+      </AdditionalRules>
+      <Completion EnableCpp11="no" EnableCpp14="yes">
+        <ClangCmpFlagsC/>
+        <ClangCmpFlags/>
+        <ClangPP/>
+        <SearchPaths/>
+      </Completion>
+    </Configuration>
+    <Configuration Name="Debug_x64" CompilerType="MinGW ( gcc )" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
+      <Compiler Options="-g;-O0" C_Options="-g;-O0" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
+        <Preprocessor Value="_DEBUG"/>
+        <Preprocessor Value="_WIN64"/>
+        <Preprocessor Value="_WIN32_WINNT=0x0502"/>
+        <Preprocessor Value="WINVER=0x0502"/>
+      </Compiler>
+      <Linker Options="-O0" Required="yes"/>
+      <ResourceCompiler Options="-D_DEBUG;-D_WIN64;" Required="no"/>
+      <General OutputFile="$(WorkspacePath)/../bin/$(ConfigurationName)/$(ProjectName).exe" IntermediateDirectory="$(WorkspacePath)/../bin/$(ConfigurationName)/obj/$(ProjectName)" Command="./$(ProjectName)" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(WorkspacePath)/../bin/$(ConfigurationName)" PauseExecWhenProcTerminates="no" IsGUIProgram="yes" IsEnabled="yes"/>
+      <BuildSystem Name="Default"/>
+      <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
+        <![CDATA[]]>
+      </Environment>
+      <Debugger IsRemote="no" RemoteHostName="" RemoteHostPort="" DebuggerPath="" IsExtended="no">
+        <DebuggerSearchPaths/>
+        <PostConnectCommands/>
+        <StartupCommands/>
+      </Debugger>
+      <PreBuild/>
+      <PostBuild/>
+      <CustomBuild Enabled="no">
+        <RebuildCommand/>
+        <CleanCommand/>
+        <BuildCommand/>
+        <PreprocessFileCommand/>
+        <SingleFileCommand/>
+        <MakefileGenerationCommand/>
+        <ThirdPartyToolName/>
+        <WorkingDirectory/>
+      </CustomBuild>
+      <AdditionalRules>
+        <CustomPostBuild/>
+        <CustomPreBuild/>
+      </AdditionalRules>
+      <Completion EnableCpp11="no" EnableCpp14="yes">
+        <ClangCmpFlagsC/>
+        <ClangCmpFlags/>
+        <ClangPP/>
+        <SearchPaths/>
+      </Completion>
+    </Configuration>
+    <Configuration Name="Release_Win32" CompilerType="MinGW ( gcc )" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
+      <Compiler Options="-O2;-fno-rtti" C_Options="-O2" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
+        <Preprocessor Value="NDEBUG"/>
+        <Preprocessor Value="WIN32"/>
+        <Preprocessor Value="_WIN32_WINNT=0x0501"/>
+        <Preprocessor Value="WINVER=0x0501"/>
+      </Compiler>
+      <Linker Options="-s;-O2;-static" Required="yes"/>
+      <ResourceCompiler Options="-DWIN32" Required="no"/>
+      <General OutputFile="$(WorkspacePath)/../bin/$(ConfigurationName)/$(ProjectName).exe" IntermediateDirectory="$(WorkspacePath)/../bin/$(ConfigurationName)/obj/$(ProjectName)" Command="./$(ProjectName)" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(WorkspacePath)/../bin/$(ConfigurationName)" PauseExecWhenProcTerminates="no" IsGUIProgram="yes" IsEnabled="yes"/>
+      <BuildSystem Name="Default"/>
+      <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
+        <![CDATA[]]>
+      </Environment>
+      <Debugger IsRemote="no" RemoteHostName="" RemoteHostPort="" DebuggerPath="" IsExtended="no">
+        <DebuggerSearchPaths/>
+        <PostConnectCommands/>
+        <StartupCommands/>
+      </Debugger>
+      <PreBuild/>
+      <PostBuild/>
+      <CustomBuild Enabled="no">
+        <RebuildCommand/>
+        <CleanCommand/>
+        <BuildCommand/>
+        <PreprocessFileCommand/>
+        <SingleFileCommand/>
+        <MakefileGenerationCommand/>
+        <ThirdPartyToolName/>
+        <WorkingDirectory/>
+      </CustomBuild>
+      <AdditionalRules>
+        <CustomPostBuild/>
+        <CustomPreBuild/>
+      </AdditionalRules>
+      <Completion EnableCpp11="no" EnableCpp14="yes">
+        <ClangCmpFlagsC/>
+        <ClangCmpFlags/>
+        <ClangPP/>
+        <SearchPaths/>
+      </Completion>
+    </Configuration>
+    <Configuration Name="Release_x64" CompilerType="MinGW ( gcc )" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
+      <Compiler Options="-O2;-fno-rtti" C_Options="-O2" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
+        <Preprocessor Value="NDEBUG"/>
+        <Preprocessor Value="_WIN64"/>
+        <Preprocessor Value="_WIN32_WINNT=0x0502"/>
+        <Preprocessor Value="WINVER=0x0502"/>
+      </Compiler>
+      <Linker Options="-s;-O2;-static" Required="yes"/>
+      <ResourceCompiler Options="-D_WIN64" Required="no"/>
+      <General OutputFile="$(WorkspacePath)/../bin/$(ConfigurationName)/$(ProjectName).exe" IntermediateDirectory="$(WorkspacePath)/../bin/$(ConfigurationName)/obj/$(ProjectName)" Command="./$(ProjectName)" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(WorkspacePath)/../bin/$(ConfigurationName)" PauseExecWhenProcTerminates="no" IsGUIProgram="yes" IsEnabled="yes"/>
+      <BuildSystem Name="Default"/>
+      <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
+        <![CDATA[]]>
+      </Environment>
+      <Debugger IsRemote="no" RemoteHostName="" RemoteHostPort="" DebuggerPath="" IsExtended="no">
+        <DebuggerSearchPaths/>
+        <PostConnectCommands/>
+        <StartupCommands/>
+      </Debugger>
+      <PreBuild/>
+      <PostBuild/>
+      <CustomBuild Enabled="no">
+        <RebuildCommand/>
+        <CleanCommand/>
+        <BuildCommand/>
+        <PreprocessFileCommand/>
+        <SingleFileCommand/>
+        <MakefileGenerationCommand/>
+        <ThirdPartyToolName/>
+        <WorkingDirectory/>
+      </CustomBuild>
+      <AdditionalRules>
+        <CustomPostBuild/>
+        <CustomPreBuild/>
+      </AdditionalRules>
+      <Completion EnableCpp11="no" EnableCpp14="yes">
+        <ClangCmpFlagsC/>
+        <ClangCmpFlags/>
+        <ClangPP/>
+        <SearchPaths/>
+      </Completion>
+    </Configuration>
+  </Settings>
+</CodeLite_Project>
