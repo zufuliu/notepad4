@@ -1905,8 +1905,13 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	int i, i2;
 	HMENU hmenu = (HMENU)wParam;
 
-	i = lstrlen(szCurFile);
+	i = lstrlen(szCurFile) > 0;
 	EnableCmd(hmenu, IDM_FILE_REVERT, i);
+	EnableCmd(hmenu, CMD_RELOADASCIIASUTF8, i);
+	EnableCmd(hmenu, CMD_RELOADANSI, i);
+	EnableCmd(hmenu, CMD_RELOADOEM, i);
+	EnableCmd(hmenu, CMD_RELOADNOFILEVARS, i);
+	EnableCmd(hmenu, CMD_RECODEDEFAULT, i);
 	EnableCmd(hmenu, IDM_FILE_LAUNCH, i);
 	EnableCmd(hmenu, IDM_FILE_PROPERTIES, i);
 	EnableCmd(hmenu, IDM_FILE_CREATELINK, i);
@@ -2050,7 +2055,7 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	//EnableCmd(hmenu, IDM_EDIT_INSERT_FILENAME, !bReadOnly);
 	//EnableCmd(hmenu, IDM_EDIT_INSERT_PATHNAME, !bReadOnly);
 
-	i = (int)SendMessage(hwndEdit, SCI_GETLENGTH, 0, 0);
+	i = (int)SendMessage(hwndEdit, SCI_GETLENGTH, 0, 0) > 0;
 	EnableCmd(hmenu, IDM_EDIT_FIND, i);
 	EnableCmd(hmenu, IDM_EDIT_SAVEFIND, i);
 	EnableCmd(hmenu, IDM_EDIT_FINDNEXT, i);
@@ -2063,12 +2068,19 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	EnableCmd(hmenu, IDM_EDIT_SELTOPREV, i && lstrlenA(efrData.szFind));
 	EnableCmd(hmenu, IDM_EDIT_FINDMATCHINGBRACE, i);
 	EnableCmd(hmenu, IDM_EDIT_SELTOMATCHINGBRACE, i);
+	EnableCmd(hmenu, CMD_JUMP2SELSTART, i);
+	EnableCmd(hmenu, CMD_JUMP2SELEND, i);
 #ifdef BOOKMARK_EDITION
 	EnableCmd(hmenu, BME_EDIT_BOOKMARKPREV, i);
 	EnableCmd(hmenu, BME_EDIT_BOOKMARKNEXT, i);
 	EnableCmd(hmenu, BME_EDIT_BOOKMARKTOGGLE, i);
 	EnableCmd(hmenu, BME_EDIT_BOOKMARKCLEAR, i);
 #endif
+	EnableCmd(hmenu, IDM_EDIT_DELETELINELEFT, i);
+	EnableCmd(hmenu, IDM_EDIT_DELETELINERIGHT, i);
+	EnableCmd(hmenu, CMD_CTRLBACK, i);
+	EnableCmd(hmenu, CMD_CTRLDEL, i);
+	EnableCmd(hmenu, CMD_TIMESTAMPS, i);
 	//EnableCmd(hmenu, IDM_VIEW_TOGGLEFOLDS, i && bShowCodeFolding);
 	//EnableCmd(hmenu, IDM_VIEW_FOLD_ALL, i && bShowCodeFolding);
 	//EnableCmd(hmenu, IDM_VIEW_FOLD_LEVEL1, i && bShowCodeFolding);
@@ -2171,7 +2183,7 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	}
 	CheckMenuRadioItem(hmenu, IDM_VIEW_NOESCFUNC, IDM_VIEW_ESCEXIT, i, MF_BYCOMMAND);
 
-	i = lstrlen(szIniFile);
+	i = lstrlen(szIniFile) > 0;
 	CheckCmd(hmenu, IDM_VIEW_SAVESETTINGS, bSaveSettings && i);
 
 	EnableCmd(hmenu, IDM_VIEW_REUSEWINDOW, i);
@@ -2181,7 +2193,7 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	EnableCmd(hmenu, IDM_VIEW_NOSAVEFINDREPL, i);
 	EnableCmd(hmenu, IDM_VIEW_SAVESETTINGS, i);
 
-	i = (lstrlen(szIniFile) > 0 || lstrlen(szIniFile2) > 0);
+	i = i || lstrlen(szIniFile2) > 0;
 	EnableCmd(hmenu, IDM_VIEW_SAVESETTINGSNOW, i);
 
 	i = np2LexLangIndex;

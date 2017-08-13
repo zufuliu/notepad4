@@ -2474,7 +2474,6 @@ void Style_SetStyles(HWND hwnd, int iStyle, LPCWSTR lpszStyle) {
 // Style_SetFontQuality()
 //
 void Style_SetFontQuality(HWND hwnd, LPCWSTR lpszStyle) {
-
 	WPARAM wQuality = SC_EFF_QUALITY_DEFAULT;
 	WCHAR tch[32];
 

@@ -1540,19 +1540,19 @@ BOOL GetThemedDialogFont(LPWSTR lpFaceName, WORD *wSize) {
 	return bSucceed;
 }
 
-__inline BOOL DialogTemplate_IsDialogEx(const DLGTEMPLATE *pTemplate) {
+static __inline BOOL DialogTemplate_IsDialogEx(const DLGTEMPLATE *pTemplate) {
 	return ((DLGTEMPLATEEX *)pTemplate)->signature == 0xFFFF;
 }
 
-__inline BOOL DialogTemplate_HasFont(const DLGTEMPLATE *pTemplate) {
+static __inline BOOL DialogTemplate_HasFont(const DLGTEMPLATE *pTemplate) {
 	return (DS_SETFONT & (DialogTemplate_IsDialogEx(pTemplate) ? ((DLGTEMPLATEEX *)pTemplate)->style : pTemplate->style));
 }
 
-__inline int DialogTemplate_FontAttrSize(BOOL bDialogEx) {
+static __inline int DialogTemplate_FontAttrSize(BOOL bDialogEx) {
 	return (int)sizeof(WORD) * (bDialogEx ? 3 : 1);
 }
 
-__inline BYTE *DialogTemplate_GetFontSizeField(const DLGTEMPLATE *pTemplate) {
+static __inline BYTE *DialogTemplate_GetFontSizeField(const DLGTEMPLATE *pTemplate) {
 	BOOL bDialogEx = DialogTemplate_IsDialogEx(pTemplate);
 	WORD *pw;
 

@@ -86,9 +86,9 @@ BEGIN
         POPUP "&Reload"
         BEGIN
             MENUITEM "As UFT-&8\tShift+F8",         CMD_RELOADASCIIASUTF8
-            MENUITEM "As &ANSI\tShift+A",           CMD_RELOADANSI
-            MENUITEM "As &OEM\tShift+Ctrl+O",       CMD_RELOADOEM
-            MENUITEM "&No FileVars\tShift+Alt+F8",  CMD_RELOADNOFILEVARS
+            MENUITEM "As &ANSI\tCtrl+Shift+A",      CMD_RELOADANSI
+            MENUITEM "As &OEM\tCtrl+Shift+O",       CMD_RELOADOEM
+            MENUITEM "&No FileVars\tAlt+F8",        CMD_RELOADNOFILEVARS
             MENUITEM "&Default\tCtrl+Alt+F",        CMD_RECODEDEFAULT
         END
         POPUP "&Launch"
@@ -99,6 +99,9 @@ BEGIN
             MENUITEM "Execute &Document",           IDM_FILE_LAUNCH
             MENUITEM "&Open with...",               IDM_FILE_OPENWITH
             MENUITEM "&Command...",                 IDM_FILE_RUN
+            MENUITEM SEPARATOR
+            MENUITEM "Web Template &1\tCtrl+Shift+1",   CMD_WEBACTION1
+            MENUITEM "Web Template &2\tCtrl+Shift+2",   CMD_WEBACTION2
         END
         MENUITEM SEPARATOR
         POPUP "&Encoding"
@@ -129,6 +132,7 @@ BEGIN
         MENUITEM "Propert&ies...",              IDM_FILE_PROPERTIES
         MENUITEM "Create &Desktop Link",        IDM_FILE_CREATELINK
         MENUITEM SEPARATOR
+        MENUITEM "Browse...\tCtrl+M",           IDM_FILE_BROWSE
         POPUP "&Favorites"
         BEGIN
             MENUITEM "&Open Favorites...\tAlt+I",   IDM_FILE_OPENFAV
@@ -154,9 +158,9 @@ BEGIN
         MENUITEM "Clear Clipboar&d",            IDM_EDIT_CLEARCLIPBOARD
         POPUP "Copy to Clipboard"
         BEGIN
-            MENUITEM "&FileName",      CMD_COPYFILENAME_NOEXT
+            MENUITEM "&FileName",                       CMD_COPYFILENAME_NOEXT
             MENUITEM "FileName and &Ext\tShift+F9",     CMD_COPYFILENAME
-            MENUITEM "Full &PathName\tShift+Alt+F9",    CMD_COPYPATHNAME
+            MENUITEM "Full &PathName\tAlt+Shift+F9",    CMD_COPYPATHNAME
             MENUITEM SEPARATOR
             MENUITEM "&Window Position\tCtrl+Shift+K",  CMD_COPYWINPOS
         END
@@ -279,6 +283,13 @@ BEGIN
             MENUITEM "URL &Decode\tCtrl+Shift+R",   IDM_EDIT_URLDECODE
             MENUITEM "Escape HTML/XML Chars\tAlt+Shift+X", IDM_EDIT_XHTML_ESCAPE_CHAR
             MENUITEM "Unescape HTML/XML Chars\tAlt+Shift+H", IDM_EDIT_XHTML_UNESCAPE_CHAR
+            MENUITEM SEPARATOR
+            MENUITEM "Delete Line Left\tCtrl+Shift+Back",   IDM_EDIT_DELETELINELEFT
+            MENUITEM "Delete Line Right\tCtrl+Shift+Del",   IDM_EDIT_DELETELINERIGHT
+            MENUITEM "Delete Word Left\tCtrl+Back",         CMD_CTRLBACK
+            MENUITEM "Delete Word Right\tCtrl+Del",         CMD_CTRLDEL
+            MENUITEM SEPARATOR
+            MENUITEM "Update Timestamps\tShift+F5", CMD_TIMESTAMPS
         END
         MENUITEM SEPARATOR
         POPUP "&Find and Replace"
@@ -291,12 +302,14 @@ BEGIN
             MENUITEM "Replace Ne&xt\tF4",           IDM_EDIT_REPLACENEXT
             MENUITEM SEPARATOR
             MENUITEM "&Find Matching Brace\tCtrl+B", IDM_EDIT_FINDMATCHINGBRACE
-            MENUITEM "&Select To Matching Brace\tCtrl+Shift+B", IDM_EDIT_SELTOMATCHINGBRACE
+            MENUITEM "&Select to Matching Brace\tCtrl+Shift+B", IDM_EDIT_SELTOMATCHINGBRACE
             MENUITEM SEPARATOR
             MENUITEM "Select to End", IDM_EDIT_SELTOEND
             MENUITEM "Select to Begin", IDM_EDIT_SELTOBEGIN
             MENUITEM "Select to Ne&xt\tCtrl+Alt+F2", IDM_EDIT_SELTONEXT
             MENUITEM "Select to Pre&vious\tCtrl+Alt+Shift+F2", IDM_EDIT_SELTOPREV
+            MENUITEM "Junp to Selection Start\tCtrl+,", CMD_JUMP2SELSTART
+            MENUITEM "Jump to Selection End\tCtrl+.",   CMD_JUMP2SELEND
         END
 //#ifdef BOOKMARK_EDITION
         POPUP "Bookmarks"
@@ -642,7 +655,6 @@ BEGIN
     VK_F3,          IDM_EDIT_FINDPREV,      VIRTKEY, SHIFT, NOINVERT
     VK_F3,          CMD_FINDPREVSEL,        VIRTKEY, SHIFT, CONTROL, NOINVERT
     VK_F4,          IDM_EDIT_REPLACENEXT,   VIRTKEY, NOINVERT
-    VK_F4,          IDM_FILE_NEW,           VIRTKEY, CONTROL, NOINVERT
     VK_F4,          IDM_FILE_NEW,           VIRTKEY, CONTROL, NOINVERT
     VK_F5,          IDM_FILE_REVERT,        VIRTKEY, NOINVERT
     VK_F5,          IDM_EDIT_INSERT_SHORTDATE, VIRTKEY, CONTROL, NOINVERT

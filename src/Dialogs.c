@@ -1523,7 +1523,6 @@ extern BOOL bBackspaceUnindents;
 
 INT_PTR CALLBACK TabSettingsDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
 	switch (umsg) {
-
 	case WM_INITDIALOG: {
 		SetDlgItemInt(hwnd, 100, iTabWidth, FALSE);
 		SendDlgItemMessage(hwnd, 100, EM_LIMITTEXT, 15, 0);

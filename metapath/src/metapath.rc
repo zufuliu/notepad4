@@ -166,8 +166,7 @@ BEGIN
     "G",            ACC_GOTOTARGET,         VIRTKEY, ALT, NOINVERT
     "H",            IDM_VIEW_SAVESETTINGS,  VIRTKEY, CONTROL, NOINVERT
     "K",            IDM_FILE_CREATELINK,    VIRTKEY, CONTROL, NOINVERT
-    "P",            ACC_DEFAULTWINPOS,      VIRTKEY, SHIFT, CONTROL,
-                                                    NOINVERT
+    "P",            ACC_DEFAULTWINPOS,      VIRTKEY, SHIFT, CONTROL, NOINVERT
     "L",            IDM_FILE_LAUNCH,        VIRTKEY, CONTROL, NOINVERT
     "L",            IDM_FILE_OPENWITH,      VIRTKEY, ALT, NOINVERT
     "M",            IDM_VIEW_FILTER,        VIRTKEY, CONTROL, NOINVERT
@@ -186,8 +185,7 @@ BEGIN
     VK_BACK,        IDT_ROOT,               VIRTKEY, CONTROL, NOINVERT
     VK_DELETE,      IDM_FILE_DELETE,        VIRTKEY, NOINVERT
     VK_DELETE,      IDM_FILE_DELETE2,       VIRTKEY, SHIFT, NOINVERT
-    VK_DELETE,      IDM_FILE_DELETE3,       VIRTKEY, SHIFT, CONTROL,
-                                                    NOINVERT
+    VK_DELETE,      IDM_FILE_DELETE3,       VIRTKEY, SHIFT, CONTROL, NOINVERT
     VK_DOWN,        IDT_FILE_NEXT,          VIRTKEY, ALT, NOINVERT
     VK_ESCAPE,      ACC_ESCAPE,             VIRTKEY, NOINVERT
     VK_F1,          SC_ABOUT,               VIRTKEY, NOINVERT
