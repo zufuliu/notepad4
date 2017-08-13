@@ -4508,17 +4508,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 				mszSelection[cchSelection] = 0; // zero terminate
 
 				// Check lpszSelection and truncate bad WCHARs
-				lpsz = StrChrA(mszSelection, 13);
-				if (lpsz) {
-					*lpsz = '\0';
-				}
-
-				lpsz = StrChrA(mszSelection, 10);
-				if (lpsz) {
-					*lpsz = '\0';
-				}
-
-				lpsz = StrChrA(mszSelection, 9);
+				lpsz = StrPBrkA(mszSelection, "\r\n\t");
 				if (lpsz) {
 					*lpsz = '\0';
 				}
@@ -4581,12 +4571,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			mszSelection[cchSelection] = 0; // zero terminate
 
 			// Check lpszSelection and truncate newlines
-			lpsz = StrChrA(mszSelection, '\n');
-			if (lpsz) {
-				*lpsz = '\0';
-			}
-
-			lpsz = StrChrA(mszSelection, '\r');
+			lpsz = StrPBrkA(mszSelection, "\r\n");
 			if (lpsz) {
 				*lpsz = '\0';
 			}

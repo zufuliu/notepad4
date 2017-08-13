@@ -173,7 +173,7 @@ TBD.
 * [Scintilla Documentation](http://www.scintilla.org/ScintillaDoc.html)
 
 ## Changed keyboard shortcuts compared to Notepad2 and/or Notepad2-mod:
-TBD.
+Almost every shortcut is available in the menu.
 
 ## You can use following system to build Notepad2 and metapath:
 * Visual C++ 2015 or later.
