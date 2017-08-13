@@ -1080,7 +1080,7 @@ public:
 	void Release() override;
 	bool Initialised() const override;
 
-	HRESULT FlushDrawing();
+	HRESULT FlushDrawing() const;
 
 	void PenColour(const ColourDesired &fore) override;
 	void D2DPenColour(const ColourDesired &fore, int alpha=255);
@@ -1091,7 +1091,7 @@ public:
 	void Polygon(const Point *pts, int npts, const ColourDesired &fore, const ColourDesired &back) override;
 	void RectangleDraw(const PRectangle &rc, const ColourDesired &fore, const ColourDesired &back) override;
 	void FillRectangle(const PRectangle &rc, const ColourDesired &back) override;
-	void FillRectangle(const PRectangle &rc, Surface &surfacePattern) override;
+	void FillRectangle(const PRectangle &rc, const Surface &surfacePattern) override;
 	void RoundedRectangle(const PRectangle &rc, const ColourDesired &fore, const ColourDesired &back) override;
 	void AlphaRectangle(const PRectangle &rc, int cornerSize, const ColourDesired &fill, int alphaFill,
 		const ColourDesired &outline, int alphaOutline, int flags) override;
@@ -1099,7 +1099,7 @@ public:
 	void Ellipse(const PRectangle &rc, const ColourDesired &fore, const ColourDesired &back) override;
 	void Copy(const PRectangle &rc, const Point &from, const Surface &surfaceSource) override;
 
-	void DrawTextCommon(const PRectangle &rc, const Font &font_, XYPOSITION ybase, const char *s, int len, UINT fuOptions) override;
+	void DrawTextCommon(const PRectangle &rc, const Font &font_, XYPOSITION ybase, const char *s, int len, UINT fuOptions);
 	void DrawTextNoClip(const PRectangle &rc, const Font &font_, XYPOSITION ybase, const char *s, int len, const ColourDesired &fore, const ColourDesired &back) override;
 	void DrawTextClipped(const PRectangle &rc, const Font &font_, XYPOSITION ybase, const char *s, int len, const ColourDesired &fore, const ColourDesired &back) override;
 	void DrawTextTransparent(const PRectangle &rc, const Font &font_, XYPOSITION ybase, const char *s, int len, const ColourDesired &fore) override;
@@ -1176,7 +1176,7 @@ bool SurfaceD2D::Initialised() const {
 	return pRenderTarget != 0;
 }
 
-HRESULT SurfaceD2D::FlushDrawing() {
+HRESULT SurfaceD2D::FlushDrawing() const {
 	return pRenderTarget->Flush();
 }
 
@@ -1367,8 +1367,8 @@ void SurfaceD2D::FillRectangle(const PRectangle &rc, const ColourDesired &back) 
 	}
 }
 
-void SurfaceD2D::FillRectangle(const PRectangle &rc, Surface &surfacePattern) {
-	SurfaceD2D &surfOther = static_cast<SurfaceD2D &>(surfacePattern);
+void SurfaceD2D::FillRectangle(const PRectangle &rc, const Surface &surfacePattern) {
+	const SurfaceD2D &surfOther = static_cast<const SurfaceD2D &>(surfacePattern);
 	surfOther.FlushDrawing();
 	ID2D1Bitmap *pBitmap = NULL;
 	ID2D1BitmapRenderTarget *pCompatibleRenderTarget = reinterpret_cast<ID2D1BitmapRenderTarget *>(
@@ -1436,8 +1436,9 @@ void SurfaceD2D::AlphaRectangle(const PRectangle &rc, int cornerSize, const Colo
 	}
 }
 
-void SurfaceD2D::DrawRGBAImage(const PRectangle &rc, int width, int height, const unsigned char *pixelsImage) {
+void SurfaceD2D::DrawRGBAImage(const PRectangle &rc_, int width, int height, const unsigned char *pixelsImage) {
 	if (pRenderTarget) {
+		PRectangle rc = rc_;
 		if (rc.Width() > width)
 			rc.left += static_cast<int>((rc.Width() - width) / 2);
 		rc.right = rc.left + width;
@@ -1487,7 +1488,7 @@ void SurfaceD2D::Ellipse(const PRectangle &rc, const ColourDesired &fore, const 
 }
 
 void SurfaceD2D::Copy(const PRectangle &rc, const Point &from, const Surface &surfaceSource) {
-	SurfaceD2D &surfOther = static_cast<SurfaceD2D &>(surfaceSource);
+	const SurfaceD2D &surfOther = static_cast<const SurfaceD2D &>(surfaceSource);
 	surfOther.FlushDrawing();
 	ID2D1BitmapRenderTarget *pCompatibleRenderTarget = reinterpret_cast<ID2D1BitmapRenderTarget *>(
 		surfOther.pRenderTarget);
@@ -1676,7 +1677,7 @@ XYPOSITION SurfaceD2D::WidthChar(const Font &font_, int ch) {
 	if (pIDWriteFactory && pTextFormat) {
 		// Create a layout
 		IDWriteTextLayout *pTextLayout = 0;
-		const WCHAR wch = ch;
+		const WCHAR wch = static_cast<WCHAR>(ch);
 		const HRESULT hr = pIDWriteFactory->CreateTextLayout(&wch, 1, pTextFormat, 1000.0, 1000.0, &pTextLayout);
 		if (SUCCEEDED(hr)) {
 			DWRITE_TEXT_METRICS textMetrics;
