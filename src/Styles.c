@@ -1236,6 +1236,7 @@ PEDITLEXER Style_DetectObjCAndMatlab(void) {
 	SendMessage(hwndEdit, SCI_GETTEXT, (WPARAM)(COUNTOF(tchText) - 2), (LPARAM)tchText);
 
 	p = tchText;
+	lexMatlab.rid = NP2LEX_MATLAB;
 	while (*p) {
 		while (IsASpace(*p)) {
 			++p;
@@ -1250,8 +1251,10 @@ PEDITLEXER Style_DetectObjCAndMatlab(void) {
 				if (MatchCPPKeyword(p, 2)) {
 					return &lexCPP;
 				}
+				lexMatlab.rid = NP2LEX_OCTAVE;
+				return &lexMatlab;
 			}
-			return &lexMatlab;
+			break;
 		case '(':
 			++p;
 			if (*p == '*') { // Mathematica comment
@@ -1275,9 +1278,15 @@ PEDITLEXER Style_DetectObjCAndMatlab(void) {
 				return &lexMatlab;
 			}
 			break;
+		case 'c':	// Matlab classdef
+			if (StrCmpNA(p, "classdef", 8) == 0 && IsASpace(p[8])) {
+				return &lexMatlab;
+			}
+			break;
 		case '%':	// ObjC modular or Matlab comment
 			return &lexMatlab;
 		}
+		// skip to next line
 		while (*p && !(*p == '\r' || *p == '\n')) {
 			++p;
 		}
@@ -1481,6 +1490,14 @@ PEDITLEXER __fastcall Style_MatchLexer(LPCWSTR lpszMatch, BOOL bCheckNames) {
 		if (!lstrcmpi(L"xml", lpszMatch)) {
 			np2LexLangIndex = Style_GetDocTypeLanguage();
 			return (&lexXML);
+		}
+		if (!lstrcmpi(L"sce", lpszMatch)) {
+			lexMatlab.rid = NP2LEX_SCILAB;
+			return (&lexMatlab);
+		}
+		if (!lstrcmpi(L"sci", lpszMatch)) {
+			lexMatlab.rid = NP2LEX_SCILAB;
+			return (&lexMatlab);
 		}
 		if (bAutoSelect && !lstrcmpi(L"m", lpszMatch)) {
 			PEDITLEXER lex = Style_DetectObjCAndMatlab();

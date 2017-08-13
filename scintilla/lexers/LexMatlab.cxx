@@ -25,21 +25,49 @@ using namespace Scintilla;
 #define LEX_GNUPLOT		65
 #define LEX_JULIA		66
 
-static bool IsLineCommentStart(int lexType, int ch, int chNext) {
-	return ((lexType & LEX_MATLAB) && (ch == '%'))
-		|| ((lexType & LEX_JULIA) && (ch == '#'))
-		|| ((lexType & LEX_OCTAVE) && (ch == '#' || ch == '%'))
-		|| ((lexType & LEX_SCILAB) && (ch == '/' && chNext == '/'));
+static inline bool IsMatlabOctave(int lexType) {
+	return lexType == LEX_MATLAB || lexType == LEX_OCTAVE;
 }
-static bool IsBlockCommentStart(int lexType, int ch, int chNext) {
-	return ((lexType & LEX_MATLAB) && (ch == '%' && chNext == '{'))
-		|| ((lexType & LEX_OCTAVE) && (ch == '#' || ch == '%') && chNext == '{')
-		|| ((lexType & LEX_SCILAB) && (ch == '/' && chNext == '*'));
+
+static bool IsLineCommentStart(int lexType, StyleContext &sc, int visibleChars) {
+	int ch = sc.ch, chNext = sc.chNext;
+	return ch == '#'	// Octave, Julia, Gnuplot, Shebang or invalid character
+		|| (IsMatlabOctave(lexType) && (ch == '%' || (visibleChars == 0 && ch == '.' && chNext == '.' && sc.GetRelative(2) == '.')))
+		|| (lexType != LEX_JULIA && ch == '/' && chNext == '/'); // Scilab
 }
-static bool IsBlockCommentEnd(int lexType, int ch, int chNext) {
-	return ((lexType & LEX_MATLAB) && (ch == '%' && chNext == '}'))
-		|| ((lexType & LEX_OCTAVE) && (ch == '#' || ch == '%') && chNext == '}')
-		|| ((lexType & LEX_SCILAB) && (ch == '*' && chNext == '/'));
+
+static bool IsNestedCommentStart(int lexType, int ch, int chNext, int visibleChars, LexAccessor &styler, Sci_PositionU currentPos) {
+	return visibleChars == 0 && chNext == '{'
+		&& ((lexType == LEX_MATLAB && ch == '%') || (lexType == LEX_OCTAVE && (ch == '%' || ch == '#')))
+		&& IsLexSpaceToEOL(styler, currentPos + 2);
+}
+
+static bool IsNestedCommentEnd(int lexType, int ch, int chNext, int visibleChars, LexAccessor &styler, Sci_PositionU currentPos) {
+	return visibleChars == 0 && chNext == '}'
+		&& ((lexType == LEX_MATLAB && ch == '%') || (lexType == LEX_OCTAVE && (ch == '%' || ch == '#')))
+		&& IsLexSpaceToEOL(styler, currentPos + 2);
+}
+
+static bool IsBlockCommentStart(int lexType, int ch, int chNext, int visibleChars, LexAccessor &styler, Sci_PositionU currentPos) {
+	return IsNestedCommentStart(lexType, ch, chNext, visibleChars, styler, currentPos)
+		|| (ch == '/' && chNext == '*'); // Scilab
+}
+
+static bool IsBlockCommentEnd(int lexType, int ch, int chNext, int visibleChars, LexAccessor &styler, Sci_PositionU currentPos) {
+	return IsNestedCommentEnd(lexType, ch, chNext, visibleChars, styler, currentPos)
+		|| (ch == '*' && chNext == '/'); // Scilab
+}
+
+static bool IsBlockCommentStart(int lexType, StyleContext &sc, int visibleChars) {
+	return IsBlockCommentStart(lexType, sc.ch, sc.chNext, visibleChars, sc.styler, sc.currentPos);
+}
+
+static bool IsBlockCommentEnd(int lexType, StyleContext &sc, int visibleChars) {
+	return IsBlockCommentEnd(lexType, sc.ch, sc.chNext, visibleChars, sc.styler, sc.currentPos);
+}
+
+static bool IsNestedCommentStart(int lexType, StyleContext &sc, int visibleChars) {
+	return IsNestedCommentStart(lexType, sc.ch, sc.chNext, visibleChars, sc.styler, sc.currentPos);
 }
 
 static bool IsMatOperator(int ch) {
@@ -81,6 +109,11 @@ static void ColouriseMatlabDoc(Sci_PositionU startPos, Sci_Position length, int 
 	const WordList &function2 = *keywordLists[4];
 
 	const int lexType = styler.GetPropertyInt("lexer.lang.type", LEX_MATLAB);
+
+	Sci_Position lineCurrent = styler.GetLine(startPos);
+	int commentLevel = (lineCurrent > 0)? styler.GetLineState(lineCurrent - 1) : 0;
+#define _UpdateLineState()	styler.SetLineState(lineCurrent, commentLevel)
+
 	int visibleChars = 0;
 	StyleContext sc(startPos, length, initStyle, styler);
 	bool isTransposeOperator = false;
@@ -90,19 +123,6 @@ static void ColouriseMatlabDoc(Sci_PositionU startPos, Sci_Position length, int 
 	for (; sc.More(); sc.Forward()) {
 
 		if (sc.state == SCE_MAT_OPERATOR) {
-			//if (sc.chPrev == '.') {
-			//	if (sc.ch == '*' || sc.ch == '/' || sc.ch == '\\' || sc.ch == '^') {
-			//		isTransposeOperator = false;
-			//		sc.ForwardSetState(SCE_MAT_DEFAULT);
-			//	} else if (sc.ch == '\'') {
-			//		isTransposeOperator = true;
-			//		sc.ForwardSetState(SCE_MAT_DEFAULT);
-			//	} else {
-			//		sc.SetState(SCE_MAT_DEFAULT);
-			//	}
-			//} else {
-			//	sc.SetState(SCE_MAT_DEFAULT);
-			//}
 			sc.SetState(SCE_MAT_DEFAULT);
 			if (sc.chPrev == '.') {
 				if (sc.ch == '*' || sc.ch == '/' || sc.ch == '\\' || sc.ch == '^') {
@@ -113,7 +133,7 @@ static void ColouriseMatlabDoc(Sci_PositionU startPos, Sci_Position length, int 
 			}
 		} else if (sc.state == SCE_MAT_NUMBER) {
 			if (!IsMatNumber(sc.ch, sc.chPrev)) {
-				if ((lexType & LEX_JULIA) && sc.ch == 'm' && sc.chPrev == 'i')
+				if ((lexType == LEX_JULIA) && sc.ch == 'm' && sc.chPrev == 'i')
 					sc.Forward();
 				sc.SetState(SCE_MAT_DEFAULT);
 				isTransposeOperator = true;
@@ -144,18 +164,27 @@ _label_identifier:
 				} else if (LexGetNextChar(sc.currentPos, styler) == '(') {
 					sc.ChangeState(SCE_MAT_FUNCTION);
 				}
+				if (sc.ch == '@') {
+					sc.SetState(SCE_MAT_OPERATOR);
+					sc.Forward();
+				}
 				sc.SetState(SCE_MAT_DEFAULT);
 			}
 		} else if (sc.state == SCE_MAT_CALLBACK || sc.state == SCE_MAT_VARIABLE) {
-			if (!iswordstart(sc.ch))
+			if (!iswordstart(sc.ch)) {
+				if (sc.ch == '@') {
+					sc.SetState(SCE_MAT_OPERATOR);
+					sc.Forward();
+				}
 				sc.SetState(SCE_MAT_DEFAULT);
+			}
 		} else if (sc.state == SCE_MAT_COMMAND) {
 			if (IsInvalidFileName(sc.ch)) {
 				sc.SetState(SCE_MAT_DEFAULT);
 				isTransposeOperator = false;
 			}
 		} else if (sc.state == SCE_MAT_STRING) {
-			if ((lexType & LEX_JULIA) && sc.ch == '\\') {
+			if ((lexType == LEX_JULIA) && sc.ch == '\\') {
 				if (sc.chNext == '\"' || sc.chNext == '\'' || sc.chNext == '\\') {
 					sc.Forward();
 				}
@@ -183,9 +212,20 @@ _label_identifier:
 			if (sc.ch == '`')
 				sc.ForwardSetState(SCE_MAT_DEFAULT);
 		} else if (sc.state == SCE_MAT_COMMENTBLOCK) {
-			if(IsBlockCommentEnd(lexType, sc.ch, sc.chNext)) {
+			if (IsBlockCommentEnd(lexType, sc, visibleChars)) {
+				if (IsMatlabOctave(lexType)) {
+					--commentLevel;
+					if (commentLevel < 0) {
+						commentLevel = 0;
+					}
+				}
+				if (commentLevel == 0) {
+					sc.Forward();
+					sc.ForwardSetState(SCE_MAT_DEFAULT);
+				}
+			} else if (IsNestedCommentStart(lexType, sc, visibleChars)) {
+				++commentLevel;
 				sc.Forward();
-				sc.ForwardSetState(SCE_MAT_DEFAULT);
 			}
 		} else if (sc.state == SCE_MAT_COMMENT) {
 			if (sc.atLineStart) {
@@ -196,24 +236,23 @@ _label_identifier:
 		}
 
 		if (sc.state == SCE_MAT_DEFAULT) {
-			if ((lexType & LEX_JULIA) && sc.Match('r', '\"')) { // regex
+			if ((lexType == LEX_JULIA) && sc.Match('r', '\"')) { // regex
 				sc.SetState(SCE_MAT_REGEX);
 				sc.Forward();
-			} else if ((lexType & LEX_JULIA) && (sc.ch == 'b' || sc.ch == 'L' || sc.ch == 'I' || sc.ch == 'E') && sc.chNext == '\"') {
+			} else if ((lexType == LEX_JULIA) && (sc.ch == 'b' || sc.ch == 'L' || sc.ch == 'I' || sc.ch == 'E') && sc.chNext == '\"') {
 				sc.SetState(SCE_MAT_DOUBLEQUOTESTRING);
 				sc.Forward();
-			} else if (IsBlockCommentStart(lexType, sc.ch, sc.chNext)) {
+			} else if (IsBlockCommentStart(lexType, sc, visibleChars)) {
+				if (IsMatlabOctave(lexType)) {
+					++commentLevel;
+				}
 				sc.SetState(SCE_MAT_COMMENTBLOCK);
 				sc.Forward();
-			} else if (IsLineCommentStart(lexType, sc.ch, sc.chNext)){
-				if ((lexType & LEX_JULIA) && sc.ch == '/' && sc.chNext == '/') {
-					sc.SetState(SCE_MAT_OPERATOR);
-					sc.Forward();
-					isTransposeOperator = false;
-				} else {
+			} else if (IsLineCommentStart(lexType, sc, visibleChars)) {
+				{
 					sc.SetState(SCE_MAT_COMMENT);
 					// Octave demo/test section, always placed in end of file
-					if ((lexType & LEX_OCTAVE) && sc.atLineStart && sc.ch == '%' && sc.chNext == '!') {
+					if ((lexType == LEX_OCTAVE) && sc.atLineStart && sc.ch == '%' && sc.chNext == '!') {
 						Sci_Position pos = static_cast<Sci_Position>(sc.currentPos) + 2;
 						if (!hasTest && (styler.Match(pos, "test") || styler.Match(pos, "demo")
 							|| styler.Match(pos, "assert") || styler.Match(pos, "error") || styler.Match(pos, "warning")
@@ -227,9 +266,11 @@ _label_identifier:
 							else
 								sc.SetState(SCE_MAT_DEFAULT);
 						}
+					} else if (sc.ch == '.') {
+						sc.Forward(2);
 					}
 				}
-			} else if ((lexType & LEX_MATLAB) && visibleChars == 0 && sc.ch == '!') {
+			} else if (IsMatlabOctave(lexType) && visibleChars == 0 && sc.ch == '!') {
 				sc.SetState(SCE_MAT_COMMAND);
 			} else if (sc.ch == '\'') { // Octave allows whitespace before transpose operator
 				if (isTransposeOperator) {
@@ -266,6 +307,8 @@ _label_identifier:
 		}
 
 		if (sc.atLineEnd) {
+			_UpdateLineState();
+			++lineCurrent;
 			visibleChars = 0;
 		}
 		if (!isspacechar(sc.ch)) {
@@ -324,10 +367,18 @@ static void FoldMatlabDoc(Sci_PositionU startPos, Sci_Position length, int initS
 		bool atEOL = (ch == '\r' && chNext != '\n') || (ch == '\n');
 
 		if (foldComment && IsStreamCommentStyle(style)) {
-			if (!IsStreamCommentStyle(stylePrev)) {
-				levelNext++;
-			} else if (!IsStreamCommentStyle(styleNext) && !atEOL) {
-				levelNext--;
+			if (IsMatlabOctave(lexType)) {
+				if (IsNestedCommentStart(lexType, ch, chNext, visibleChars, styler, i)) {
+					levelNext++;
+				} else if (IsNestedCommentEnd(lexType, ch, chNext, visibleChars, styler, i)) {
+					levelNext--;
+				}
+			} else {
+				if (!IsStreamCommentStyle(stylePrev)) {
+					levelNext++;
+				} else if (!IsStreamCommentStyle(styleNext) && !atEOL) {
+					levelNext--;
+				}
 			}
 		}
 		if (foldComment && atEOL && IsCommentLine(lineCurrent)) {
@@ -340,32 +391,32 @@ static void FoldMatlabDoc(Sci_PositionU startPos, Sci_Position length, int initS
 		if (style == SCE_MAT_KEYWORD && stylePrev != SCE_MAT_KEYWORD && numBrace == 0 && chPrev != '.' && chPrev != ':') {
 			char word[32];
 			Sci_PositionU len = LexGetRange(i, styler, iswordstart, word, sizeof(word));
-			if ((StrEqu(word, "function") && ((lexType & LEX_JULIA) || (!(lexType & LEX_JULIA) && LexGetNextChar(i+len, styler) != '(')))
+			if ((StrEqu(word, "function") && ((lexType == LEX_JULIA) || (!(lexType == LEX_JULIA) && LexGetNextChar(i+len, styler) != '(')))
 				|| StrEqu(word, "if")
 				|| StrEqu(word, "for")
 				|| StrEqu(word, "while")
 				|| StrEqu(word, "try")
-				|| ((lexType & (LEX_MATLAB | LEX_OCTAVE)) && StrEqu(word, "switch"))
-				|| ((lexType & LEX_MATLAB) && (StrEqu(word, "classdef") || StrEqu(word, "parfor")))
-				|| ((lexType & LEX_OCTAVE) && (StrEqu(word, "do") || StrEqu(word, "unwind_protect")))
-				|| ((lexType & LEX_SCILAB) && StrEqu(word, "select"))
-				|| ((lexType & LEX_JULIA) && (StrEqu(word, "type") || StrEqu(word, "quote")
+				|| (IsMatlabOctave(lexType) && (StrEqu(word, "switch") || StrEqu(word, "classdef") || StrEqu(word, "parfor")))
+				|| ((lexType == LEX_OCTAVE) && (StrEqu(word, "do") || StrEqu(word, "unwind_protect")))
+				|| ((lexType == LEX_SCILAB) && StrEqu(word, "select"))
+				|| ((lexType == LEX_JULIA) && (StrEqu(word, "type") || StrEqu(word, "quote")
 							|| StrEqu(word, "let") || StrEqu(word, "macro") || StrEqu(word, "do")
 							|| StrEqu(word, "begin") || StrEqu(word, "module"))
 							)
 			) {
 				levelNext++;
-			} else if ((lexType & LEX_OCTAVE) && StrEqu(word, "until")) {
+			} else if ((lexType == LEX_OCTAVE) && StrEqu(word, "until")) {
 				levelNext--;
 			} else if (styler.Match(i, "end")) {
 				levelNext--;
 				//if (len == 3) {	// just "end"
-				//	int pos = LexSkipSpaceTab(i+3, endPos, styler);
+				//	Sci_Position pos = LexSkipSpaceTab(i+3, endPos, styler);
 				//	char chEnd = styler.SafeGetCharAt(pos);
-				//	if (!(IsMatEndChar(chEnd, styler.StyleAt(pos))))
+				//	if (!(IsMatEndChar(chEnd, styler.StyleAt(pos)))) {
 				//		levelNext++;
+				//	}
 				//}
-			} else if ((lexType & LEX_MATLAB) && (chPrev != '@') && (StrEqu(word, "methods")
+			} else if (IsMatlabOctave(lexType) && chPrev != '@' && (StrEqu(word, "methods")
 				|| StrEqu(word, "properties") || StrEqu(word, "events") || StrEqu(word, "enumeration"))) {
 				// Matlab classdef
 				Sci_Position pos = LexSkipSpaceTab(i+len, endPos, styler);

@@ -17,7 +17,9 @@ namespace Scintilla {
 // DBCS treated specially as the second character can be < 0x80 and hence
 // syntactically significant. UTF-8 avoids this as all trail bytes are >= 0x80
 class StyleContext {
+public:
 	LexAccessor &styler;
+private:
 	IDocument *multiByteAccess;
 	Sci_PositionU endPos;
 	Sci_PositionU lengthDocument;

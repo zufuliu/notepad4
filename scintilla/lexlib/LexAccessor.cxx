@@ -132,6 +132,18 @@ Sci_Position LexLineSkipSpaceTab(Sci_Position line, LexAccessor &styler) {
 	Sci_Position endPos = styler.LineStart(line + 1) - 1;
 	return LexSkipSpaceTab(startPos, endPos, styler);
 }
+bool IsLexSpaceToEOL(LexAccessor &styler, Sci_Position startPos) {
+	Sci_Position line = styler.GetLine(startPos);
+	Sci_Position endPos = styler.LineStart(line + 1) - 1;
+	startPos = LexSkipSpaceTab(startPos, endPos, styler);
+	return startPos == endPos;
+}
+bool IsLexEmptyLine(LexAccessor &styler, Sci_Position line) {
+	Sci_Position startPos = styler.LineStart(line);
+	Sci_Position endPos = styler.LineStart(line + 1) - 1;
+	startPos = LexSkipSpaceTab(startPos, endPos, styler);
+	return startPos == endPos;
+}
 bool IsLexLineStartsWith(Sci_Position line, LexAccessor &styler, const char* word, bool matchCase, int style) {
 	Sci_Position pos = LexLineSkipSpaceTab(line, styler);
 	return styler.StyleAt(pos) == style &&

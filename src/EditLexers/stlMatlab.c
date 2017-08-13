@@ -1,7 +1,9 @@
 #include "EditLexer.h"
 #include "EditStyle.h"
 
-// http://www.mathworks.com/
+// https://www.mathworks.com/help/pdf_doc/matlab/matlab_prog.pdf
+// https://www.mathworks.com/help/matlab/matlab_oop/specifying-attributes.html
+// https://www.mathworks.com/help/matlab/ref/matlab.system-class.html
 // https://www.gnu.org/software/octave/
 // http://www.scilab.org/
 // http://gnuplot.info/
@@ -15,7 +17,8 @@ static KEYWORDLIST Keywords_Matlab = {{
 "typeinfo shared inline do until endfor endfunction endif endswitch end_try_catch end_unwind_protect endwhile unwind_protect unwind_protect_cleanup select then "
 "off on eps pi ans Inf inf NaN nan null nargin nargout varargin varargout gca gcf gco gcbf gcbo intmax intmin realmax realmin "
 ,/********             Attribte            *********************/
-"HandleCompatibile Hidden InferiorClasses ConstructOnLoad Sealed AbortSet Access Constant Dependent GetAccess GetObservable SetAccess SetObservable Transient Abstract Static ListenAccess NotifyAccess "
+"AbortSet Abstract Access AllowedSubclasses Constant ConstructOnLoad Dependent GetAccess GetObservable HandleCompatible Hidden InferiorClasses ListenAccess NonCopyable NotifyAccess Sealed SetAccess SetObservable Static Transient "
+"DiscreteState Logical Nontunable PositiveInteger "
 ,/****************  Command   *************************/
 "clc clear delete demo exit load open pause quit save test testif tic toc which who whos "
 "axis box cla clf close grid hold pan shg zoom "
