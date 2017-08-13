@@ -88,7 +88,8 @@ BEGIN
             MENUITEM "As UFT-&8\tShift+F8",         CMD_RELOADASCIIASUTF8
             MENUITEM "As &ANSI\tShift+A",           CMD_RELOADANSI
             MENUITEM "As &OEM\tShift+Ctrl+O",       CMD_RELOADOEM
-            MENUITEM "No FileVars\tShift+Alt+F8",   CMD_RELOADNOFILEVARS
+            MENUITEM "&No FileVars\tShift+Alt+F8",  CMD_RELOADNOFILEVARS
+            MENUITEM "&Default\tCtrl+Alt+F",        CMD_RECODEDEFAULT
         END
         POPUP "&Launch"
         BEGIN
@@ -117,7 +118,7 @@ BEGIN
         BEGIN
             MENUITEM "&Windows (CR+LF)",            IDM_LINEENDINGS_CRLF
             MENUITEM "&Unix/Mac (LF)",              IDM_LINEENDINGS_LF
-            MENUITEM "Old &Mac (CR)",              IDM_LINEENDINGS_CR
+            MENUITEM "Old &Mac (CR)",               IDM_LINEENDINGS_CR
             MENUITEM SEPARATOR
             MENUITEM "&Default...",                 IDM_LINEENDINGS_SETDEFAULT
         END
@@ -154,10 +155,10 @@ BEGIN
         POPUP "Copy to Clipboard"
         BEGIN
             MENUITEM "&FileName",      CMD_COPYFILENAME_NOEXT
-            MENUITEM "FileName and &Ext\tShift+F9",      CMD_COPYFILENAME
-            MENUITEM "Full &PathName\tShift+Alt+F9", CMD_COPYPATHNAME
+            MENUITEM "FileName and &Ext\tShift+F9",     CMD_COPYFILENAME
+            MENUITEM "Full &PathName\tShift+Alt+F9",    CMD_COPYPATHNAME
             MENUITEM SEPARATOR
-            MENUITEM "&Window Position\tCtrl+Shift+K", CMD_COPYWINPOS
+            MENUITEM "&Window Position\tCtrl+Shift+K",  CMD_COPYWINPOS
         END
         POPUP "&More Copy"
         BEGIN
@@ -236,24 +237,24 @@ BEGIN
         END
         POPUP "I&nsert"
         BEGIN
-            MENUITEM "&Complete Words\tAlt+/",			IDM_EDIT_COMPLETEWORD
+            MENUITEM "&Complete Words\tAlt+/",          IDM_EDIT_COMPLETEWORD
             MENUITEM SEPARATOR
-            MENUITEM "&HTML/XML Tags...\tAlt+X",			IDM_EDIT_INSERT_XMLTAG
-            MENUITEM "New &GUID",						IDM_EDIT_INSERT_GUID
+            MENUITEM "&HTML/XML Tags...\tAlt+X",        IDM_EDIT_INSERT_XMLTAG
+            MENUITEM "New &GUID",                       IDM_EDIT_INSERT_GUID
             MENUITEM SEPARATOR
-            MENUITEM "&FileName",						CMD_INSERTFILENAME_NOEXT
-            MENUITEM "FileName and &Ext\tCtrl+F9",		IDM_EDIT_INSERT_FILENAME
-            MENUITEM "Full &PathName\tCtrl+Shift+F9",	IDM_EDIT_INSERT_PATHNAME
+            MENUITEM "&FileName",                       CMD_INSERTFILENAME_NOEXT
+            MENUITEM "FileName and &Ext\tCtrl+F9",      IDM_EDIT_INSERT_FILENAME
+            MENUITEM "Full &PathName\tCtrl+Shift+F9",   IDM_EDIT_INSERT_PATHNAME
             MENUITEM SEPARATOR
             MENUITEM "Current Date",                IDM_EDIT_INSERT_LOC_DATE
             MENUITEM "Current Date Time",           IDM_EDIT_INSERT_LOC_DATETIME
-            MENUITEM "UTC Date Time",           	IDM_EDIT_INSERT_UTC_DATETIME
-			MENUITEM "&Unix Timestamp",				IDM_EDIT_INSERT_TIMESTAMP
+            MENUITEM "UTC Date Time",               IDM_EDIT_INSERT_UTC_DATETIME
+            MENUITEM "&Unix Timestamp",             IDM_EDIT_INSERT_TIMESTAMP
             POPUP "Other Timestamps"
             BEGIN
-				MENUITEM "Millisecond (ms)",		IDM_EDIT_INSERT_TIMESTAMP_MS
-				MENUITEM "Microsecond (us)",		IDM_EDIT_INSERT_TIMESTAMP_US
-				MENUITEM "Nanosecond (ns)",			IDM_EDIT_INSERT_TIMESTAMP_NS
+                MENUITEM "Millisecond (ms)",        IDM_EDIT_INSERT_TIMESTAMP_MS
+                MENUITEM "Microsecond (us)",        IDM_EDIT_INSERT_TIMESTAMP_US
+                MENUITEM "Nanosecond (ns)",         IDM_EDIT_INSERT_TIMESTAMP_NS
             END
             MENUITEM "Time/Date (&Short Form)\tCtrl+F5", IDM_EDIT_INSERT_SHORTDATE
             MENUITEM "Time/Date (&Long Form)\tCtrl+Shift+F5", IDM_EDIT_INSERT_LONGDATE
@@ -326,10 +327,10 @@ BEGIN
         MENUITEM "Show Wrap S&ymbols\tCtrl+Shift+0", IDM_VIEW_WORDWRAPSYMBOLS
         MENUITEM "Show Call Tips", IDM_VIEW_SHOWCALLTIPS
         MENUITEM SEPARATOR
-        MENUITEM "Visual &Brace Matching\tCtrl+Shift+V", IDM_VIEW_MATCHBRACES
-        MENUITEM "Highlight C&urrent Line\tCtrl+Shift+I", IDM_VIEW_HILITECURRENTLINE
+        MENUITEM "Visual &Brace Matching\tCtrl+Shift+V",    IDM_VIEW_MATCHBRACES
+        MENUITEM "Highlight C&urrent Line\tCtrl+Shift+I",   IDM_VIEW_HILITECURRENTLINE
         MENUITEM SEPARATOR
-        MENUITEM "Line &Numbers\tCtrl+Shift+N", IDM_VIEW_LINENUMBERS
+        MENUITEM "Line &Numbers\tCtrl+Shift+N",     IDM_VIEW_LINENUMBERS
         MENUITEM "Selection &Margin\tCtrl+Shift+M", IDM_VIEW_MARGIN
         POPUP "Mar&k Occurrences"
         BEGIN
@@ -345,18 +346,18 @@ BEGIN
         MENUITEM "Code &Folding\tCtrl+Shift+Alt+F", IDM_VIEW_FOLDING
         POPUP "&Toggle Folds"
         BEGIN
-			MENUITEM "&Default\tCtrl+Shift+F",IDM_VIEW_TOGGLEFOLDS
-			MENUITEM "&All",				IDM_VIEW_FOLD_ALL
-			MENUITEM "Level &1\tAlt+1",		IDM_VIEW_FOLD_LEVEL1
-			MENUITEM "Level &2\tAlt+2",		IDM_VIEW_FOLD_LEVEL2
-			MENUITEM "Level &3\tAlt+3",		IDM_VIEW_FOLD_LEVEL3
-			MENUITEM "Level &4\tAlt+4",		IDM_VIEW_FOLD_LEVEL4
-			MENUITEM "Level &5\tAlt+5",		IDM_VIEW_FOLD_LEVEL5
-			MENUITEM "Level &6\tAlt+6",		IDM_VIEW_FOLD_LEVEL6
-			MENUITEM "Level &7\tAlt+7",		IDM_VIEW_FOLD_LEVEL7
-			MENUITEM "Level &8\tAlt+8",		IDM_VIEW_FOLD_LEVEL8
-			MENUITEM "Level &9\tAlt+9",		IDM_VIEW_FOLD_LEVEL9
-			MENUITEM "Level 1&0",	IDM_VIEW_FOLD_LEVEL10
+            MENUITEM "&Default\tCtrl+Shift+F",  IDM_VIEW_TOGGLEFOLDS
+            MENUITEM "&All",                    IDM_VIEW_FOLD_ALL
+            MENUITEM "Level &1\tAlt+1",         IDM_VIEW_FOLD_LEVEL1
+            MENUITEM "Level &2\tAlt+2",         IDM_VIEW_FOLD_LEVEL2
+            MENUITEM "Level &3\tAlt+3",         IDM_VIEW_FOLD_LEVEL3
+            MENUITEM "Level &4\tAlt+4",         IDM_VIEW_FOLD_LEVEL4
+            MENUITEM "Level &5\tAlt+5",         IDM_VIEW_FOLD_LEVEL5
+            MENUITEM "Level &6\tAlt+6",         IDM_VIEW_FOLD_LEVEL6
+            MENUITEM "Level &7\tAlt+7",         IDM_VIEW_FOLD_LEVEL7
+            MENUITEM "Level &8\tAlt+8",         IDM_VIEW_FOLD_LEVEL8
+            MENUITEM "Level &9\tAlt+9",         IDM_VIEW_FOLD_LEVEL9
+            MENUITEM "Level 1&0",               IDM_VIEW_FOLD_LEVEL10
         END
         MENUITEM SEPARATOR
         MENUITEM "Zoom &In\tCtrl++",            IDM_VIEW_ZOOMIN
@@ -422,16 +423,16 @@ BEGIN
     POPUP "&Settings"
     BEGIN
         MENUITEM "Insert Tabs as &Spaces",      IDM_VIEW_TABSASSPACES
-        MENUITEM "&Tab Settings...\tCtrl+T",    		IDM_VIEW_TABSETTINGS
+        MENUITEM "&Tab Settings...\tCtrl+T",    IDM_VIEW_TABSETTINGS
         MENUITEM "&Word Wrap Settings...",      IDM_VIEW_WORDWRAPSETTINGS
         MENUITEM "&Long Line Settings...",      IDM_VIEW_LONGLINESETTINGS
         POPUP "&Auto Complete"
         BEGIN
-			MENUITEM "&Indent Text",				IDM_VIEW_AUTOINDENTTEXT
-			MENUITEM "Close HTML/XML &Tags",		IDM_VIEW_AUTOCLOSETAGS
-			MENUITEM "Close &Braces/Quotes",		IDM_VIEW_AUTOCOMPLETEQUOTE
-			MENUITEM "Complete &Words",				IDM_VIEW_AUTOCOMPLETEWORDS
-			MENUITEM "&Include Document Words",		IDM_VIEW_AUTOCWITHDOCWORDS
+            MENUITEM "&Indent Text",                IDM_VIEW_AUTOINDENTTEXT
+            MENUITEM "Close HTML/XML &Tags",        IDM_VIEW_AUTOCLOSETAGS
+            MENUITEM "Close &Braces/Quotes",        IDM_VIEW_AUTOCOMPLETEQUOTE
+            MENUITEM "Complete &Words",             IDM_VIEW_AUTOCOMPLETEWORDS
+            MENUITEM "&Include Document Words",     IDM_VIEW_AUTOCWITHDOCWORDS
         END
         MENUITEM SEPARATOR
         MENUITEM "&Reuse Window",               IDM_VIEW_REUSEWINDOW
@@ -447,7 +448,7 @@ BEGIN
             MENUITEM "FileName &Only",              IDM_VIEW_SHOWFILENAMEONLY
             MENUITEM "FileName and &Directory",     IDM_VIEW_SHOWFILENAMEFIRST
             MENUITEM "Full &PathName",              IDM_VIEW_SHOWFULLPATH
-            MENUITEM "&Text Excerpt",       		IDM_VIEW_SHOWEXCERPT
+            MENUITEM "&Text Excerpt",               IDM_VIEW_SHOWEXCERPT
         END
         POPUP "Esc &Key Function"
         BEGIN
