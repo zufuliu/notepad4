@@ -4,7 +4,7 @@
 // https://en.wikipedia.org/wiki/Julia_%28programming_language%29
 // http://julialang.org/
 
-static KEYWORDLIST Keywords_Julia = {
+static KEYWORDLIST Keywords_Julia = {{
 "abstract begin bitstype break catch continue const do else elseif end export for function global if in import "
 "let local macro module quote return try type typealias using while "
 "true false nothing ans Inf NaN Inf32 NaN32 Inf16 NaN16"
@@ -22,25 +22,25 @@ static KEYWORDLIST Keywords_Julia = {
 "include is isa() throw() typeof() new error() show() print() "
 "ccall() box() unbox() "
 "sizeof() convert() length() size() numel() ndims() isequal() isempty() assign() "
- , "", "", "", "", ""
+, "", "", "", "", ""
 
 #if NUMKEYWORD == 16
-,"","","","","","",""
+, "", "", "", "", "", "", ""
 #endif
-};
+}};
 
 EDITLEXER lexJulia = { SCLEX_MATLAB, NP2LEX_JULIA, L"Julia Script", L"jl", L"", &Keywords_Julia,
 {
 	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
-//	{ SCE_MAT_DEFAULT, L"Default", L"", L"" },
+	//	{ SCE_MAT_DEFAULT, L"Default", L"", L"" },
 	{ SCE_MAT_KEYWORD, NP2STYLE_Keyword, L"Keyword", L"fore:#0000FF", L"" },
 	{ SCE_MAT_ATTRIBUTE, NP2STYLE_TypeKeyword, L"Type Keyword", L"fore:#0080FF", L"" },
 	{ SCE_MAT_CALLBACK, NP2STYLE_Macro, L"Macro", L"fore:#FF8000", L"" },
-	{ MULTI_STYLE(SCE_MAT_FUNCTION1,SCE_MAT_FUNCTION2,0,0), NP2STYLE_BasicFunction, L"Basic Function", L"fore:#FF0080", L"" },
+	{ MULTI_STYLE(SCE_MAT_FUNCTION1, SCE_MAT_FUNCTION2, 0, 0), NP2STYLE_BasicFunction, L"Basic Function", L"fore:#FF0080", L"" },
 	{ SCE_MAT_FUNCTION, NP2STYLE_Function, L"Function", L"fore:#A46000", L"" },
-	{ MULTI_STYLE(SCE_MAT_COMMENT,SCE_MAT_COMMENTBLOCK,0,0), NP2STYLE_Comment, L"Comment", L"fore:#008000", L"" },
-	{ MULTI_STYLE(SCE_MAT_STRING,SCE_MAT_DOUBLEQUOTESTRING,0,0), NP2STYLE_String, L"String", L"fore:#008000", L"" },
-	{ MULTI_STYLE(SCE_MAT_NUMBER,SCE_MAT_HEXNUM,0,0), NP2STYLE_Number, L"Number", L"fore:#FF0000", L"" },
+	{ MULTI_STYLE(SCE_MAT_COMMENT, SCE_MAT_COMMENTBLOCK, 0, 0), NP2STYLE_Comment, L"Comment", L"fore:#008000", L"" },
+	{ MULTI_STYLE(SCE_MAT_STRING, SCE_MAT_DOUBLEQUOTESTRING, 0, 0), NP2STYLE_String, L"String", L"fore:#008000", L"" },
+	{ MULTI_STYLE(SCE_MAT_NUMBER, SCE_MAT_HEXNUM, 0, 0), NP2STYLE_Number, L"Number", L"fore:#FF0000", L"" },
 	{ SCE_MAT_BACKTICK, NP2STYLE_BackTicks, L"Back Ticks", L"fore:#FF0080", L"" },
 	{ SCE_MAT_REGEX, NP2STYLE_Regex, L"Regex", L"fore:#006633; back:#FFF1A8", L"" },
 	{ SCE_MAT_VARIABLE, NP2STYLE_Variable, L"Variable", L"fore:#CC3300", L"" },

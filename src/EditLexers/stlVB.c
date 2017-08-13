@@ -5,7 +5,7 @@
 // http://msdn.microsoft.com/en-us/library/dd409611.aspx
 // http://msdn.microsoft.com/en-us/library/c157t28f.aspx
 
-static KEYWORDLIST Keywords_VB = {
+static KEYWORDLIST Keywords_VB = {{
 "AddHandler AddressOf Alias And AndAlso As ByRef ByVal Call Case Catch Class Const Continue "
 "Declare Default Delegate Dim DirectCast Do Each Else ElseIf End Enum Erase Error Event Exit "
 "False Finally For Friend Function Get GetType GetXMLNamespace Global Goto Handles If Implements "
@@ -62,23 +62,23 @@ static KEYWORDLIST Keywords_VB = {
 , "", "", ""
 
 #if NUMKEYWORD == 16
-,"","","","","","",""
+, "", "", "", "", "", "", ""
 #endif
-};
+}};
 
 EDITLEXER lexVB = { SCLEX_VB, NP2LEX_VB, L"Visual Basic", L"vb; bas; frm; cls; ctl; pag; dsr; dob", L"", &Keywords_VB,
 {
 	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
 	//{ SCE_B_DEFAULT, L"Default", L"", L"" },
-	{ MULTI_STYLE(SCE_B_KEYWORD,SCE_B_KEYWORD3,0,0), NP2STYLE_Keyword, L"Keyword", L"fore:#0000FF", L"" },
+	{ MULTI_STYLE(SCE_B_KEYWORD, SCE_B_KEYWORD3, 0, 0), NP2STYLE_Keyword, L"Keyword", L"fore:#0000FF", L"" },
 	{ SCE_B_KEYWORD2, NP2STYLE_TypeKeyword, L"Type Keyword", L"fore:#0000FF", L"" },
 	{ SCE_B_PREPROCESSOR, NP2STYLE_Preprocessor, L"Preprocessor", L"fore:#FF9C00", L"" },
 	{ SCE_B_KEYWORD4, NP2STYLE_Attribute, L"Attribute", L"fore:#FF8000", L""},
 	{ SCE_B_CONSTANT, NP2STYLE_Constant, L"Constant", L"bold; fore:#B000B0", L""},
 	{ SCE_B_COMMENT, NP2STYLE_Comment, L"Comment", L"fore:#008000", L"" },
-	{ MULTI_STYLE(SCE_B_STRING,SCE_B_STRINGEOL,0,0), NP2STYLE_String, L"String", L"fore:#008000", L"" },
+	{ MULTI_STYLE(SCE_B_STRING, SCE_B_STRINGEOL, 0, 0), NP2STYLE_String, L"String", L"fore:#008000", L"" },
 	{ SCE_B_LABEL, NP2STYLE_Label, L"Label", L"fore:#000000; back:#FFC040", L""},
-	{ MULTI_STYLE(SCE_B_NUMBER,SCE_B_DATE,0,0), NP2STYLE_Number, L"Number", L"fore:#FF0000", L"" },
+	{ MULTI_STYLE(SCE_B_NUMBER, SCE_B_DATE, 0, 0), NP2STYLE_Number, L"Number", L"fore:#FF0000", L"" },
 	{ SCE_B_OPERATOR, NP2STYLE_Operator, L"Operator", L"fore:#B000B0", L"" },
 	{ -1, 00000, L"", L"", L"" }
 }

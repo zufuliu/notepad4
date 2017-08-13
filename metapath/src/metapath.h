@@ -18,12 +18,15 @@
 *
 ******************************************************************************/
 
+#ifndef METAPATH_H_
+#define METAPATH_H_
+
 //==== Main Window ============================================================
 #define WC_METAPATH L"metapath"
 
-#define WS_METAPATH (WS_OVERLAPPEDWINDOW ^ \
-					 (WS_MINIMIZEBOX | WS_MAXIMIZEBOX)) | \
-(WS_CLIPCHILDREN | WS_POPUP)
+#define WS_METAPATH ((WS_OVERLAPPEDWINDOW ^ \
+					  (WS_MINIMIZEBOX | WS_MAXIMIZEBOX)) | \
+					 (WS_CLIPCHILDREN | WS_POPUP))
 
 //==== Data Type for WM_COPYDATA ==============================================
 #define DATA_METAPATH_PATHARG 0xFB30
@@ -75,25 +78,24 @@
 //==== Callback Message from System Tray ======================================
 #define WM_TRAYMESSAGE WM_USER
 
-
 //==== Function Declarations ==================================================
 BOOL InitApplication(HINSTANCE hInstance);
 HWND InitInstance(HINSTANCE hInstance, LPSTR pszCmdLine, int nCmdShow);
-BOOL ActivatePrevInst();
+BOOL ActivatePrevInst(void);
 void ShowNotifyIcon(HWND hwnd, BOOL bAdd);
 
 BOOL ChangeDirectory(HWND hwnd, LPCWSTR lpszNewDir, BOOL bUpdateHistory);
-void LoadSettings();
+void LoadSettings(void);
 void SaveSettings(BOOL bSaveSettingsNow);
 
-void ParseCommandLine();
-void LoadFlags();
-int  CheckIniFile(LPWSTR lpszFile, LPCWSTR lpszModule);
-int  CheckIniFileRedirect(LPWSTR lpszFile, LPCWSTR lpszModule);
-int  FindIniFile();
-int  TestIniFile();
-int  CreateIniFile();
-int  CreateIniFileEx(LPCWSTR lpszIniFile);
+void ParseCommandLine(void);
+void LoadFlags(void);
+int CheckIniFile(LPWSTR lpszFile, LPCWSTR lpszModule);
+int CheckIniFileRedirect(LPWSTR lpszFile, LPCWSTR lpszModule);
+int FindIniFile(void);
+int TestIniFile(void);
+int CreateIniFile(void);
+int CreateIniFileEx(LPCWSTR lpszIniFile);
 
 BOOL DisplayPath(LPCWSTR lpPath, UINT uIdError);
 BOOL DisplayLnkFile(LPCWSTR pszLnkFile);
@@ -105,11 +107,13 @@ void SnapToDefaultPos(HWND hwnd);
 LRESULT CALLBACK HiddenWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam);
 LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam);
 LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam);
-void    CreateBars(HWND hwnd, HINSTANCE hInstance);
-void    MsgThemeChanged(HWND hwnd, WPARAM wParam, LPARAM lParam);
-void    MsgSize(HWND hwnd, WPARAM wParam, LPARAM lParam);
-void    MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam);
+void CreateBars(HWND hwnd, HINSTANCE hInstance);
+void MsgThemeChanged(HWND hwnd, WPARAM wParam, LPARAM lParam);
+void MsgSize(HWND hwnd, WPARAM wParam, LPARAM lParam);
+void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam);
 LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam);
 LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam);
+
+#endif // METAPATH_H_
 
 ///   End of metapath.h

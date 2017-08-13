@@ -3,8 +3,8 @@
 
 // https://en.wikibooks.org/wiki/Windows_Programming/Resource_Script_Reference
 
-static KEYWORDLIST Keywords_RC = {
-"defined "
+static KEYWORDLIST Keywords_RC = {{
+"defined __has_include "
 // Resources:
 "ACCELERATORS BITMAP CURSOR DIALOG DIALOGEX FONT HTML ICON MENU MENUEX MESSAGETABLE POPUP PNG RCDATA REGISTRY RT_MANIFEST STRINGTABLE STYLE_XML TEXTINCLUDE TYPELIB VERSIONINFO "
 // Controls:
@@ -18,8 +18,9 @@ static KEYWORDLIST Keywords_RC = {
 ""
 , // preprocessor
 "define undef ifdef ifndef if elif else endif include pragma error code_page "
+"warning "
 , // directive
-"" 
+""
 , // attribute
 ""
 , // class
@@ -32,11 +33,11 @@ static KEYWORDLIST Keywords_RC = {
 "RC_INVOKED __DATE__ __FILE__ __LINE__ __STDC__ __TIME__ __TIMESTAMP__ "
 
 #if NUMKEYWORD == 16
-,"","","","","",""
+, "", "", "", "", "", ""
 ,
-"defined() code_page() "
+"defined() code_page() __has_include() "
 #endif
-};
+}};
 
 EDITLEXER lexRC = { SCLEX_CPP, NP2LEX_RC, L"Resource Script", L"rc; rc2; rct; rh; dlg", L"", &Keywords_RC,
 {
@@ -44,8 +45,8 @@ EDITLEXER lexRC = { SCLEX_CPP, NP2LEX_RC, L"Resource Script", L"rc; rc2; rct; rh
 	//{ SCE_C_DEFAULT, L"Default", L"", L"" },
 	{ SCE_C_WORD, NP2STYLE_Keyword, L"Keyword", L"fore:#0000FF", L"" },
 	{ SCE_C_PREPROCESSOR, NP2STYLE_Preprocessor, L"Preprocessor", L"fore:#FF8000", L"" },
-	{ MULTI_STYLE(SCE_C_COMMENT,SCE_C_COMMENTLINE,SCE_C_COMMENTDOC,SCE_C_COMMENTLINEDOC), NP2STYLE_Comment, L"Comment", L"fore:#008000", L"" },
-	{ MULTI_STYLE(SCE_C_STRING,SCE_C_CHARACTER,SCE_C_STRINGEOL,0), NP2STYLE_String, L"String", L"fore:#008000", L"" },
+	{ MULTI_STYLE(SCE_C_COMMENT, SCE_C_COMMENTLINE, SCE_C_COMMENTDOC, SCE_C_COMMENTLINEDOC), NP2STYLE_Comment, L"Comment", L"fore:#008000", L"" },
+	{ MULTI_STYLE(SCE_C_STRING, SCE_C_CHARACTER, SCE_C_STRINGEOL, 0), NP2STYLE_String, L"String", L"fore:#008000", L"" },
 	{ SCE_C_NUMBER, NP2STYLE_Number, L"Number", L"fore:#FF0000", L"" },
 	{ SCE_C_OPERATOR, NP2STYLE_Operator, L"Operator", L"fore:#B000B0", L"" },
 	{ -1, 00000, L"", L"", L"" }

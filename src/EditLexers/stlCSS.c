@@ -4,7 +4,7 @@
 // https://en.wikipedia.org/wiki/Cascading_Style_Sheets
 // https://www.w3.org/Style/CSS/
 
-static KEYWORDLIST Keywords_CSS = {
+static KEYWORDLIST Keywords_CSS = {{
 "^-moz- ^-ms- ^-o- ^-webkit- alignment-adjust alignment-baseline animation animation-delay "
 "animation-direction animation-duration animation-iteration-count animation-name "
 "animation-play-state animation-timing-function appearance ascent azimuth backface-visibility "
@@ -58,9 +58,9 @@ static KEYWORDLIST Keywords_CSS = {
 "", "", "", "", "", "", ""
 
 #if NUMKEYWORD == 16
-,"","","","","","",""
+, "", "", "", "", "", "", ""
 #endif
-};
+}};
 
 EDITLEXER lexCSS = { SCLEX_CSS, NP2LEX_CSS, L"CSS Style Sheet", L"css", L"", &Keywords_CSS,
 {
@@ -71,9 +71,9 @@ EDITLEXER lexCSS = { SCLEX_CSS, NP2LEX_CSS, L"CSS Style Sheet", L"css", L"", &Ke
 	{ SCE_CSS_CLASS, 63301, L"Tag-Class", L"fore:#648000", L"" },
 	{ SCE_CSS_ID, 63302, L"Tag-Id", L"fore:#648000", L"" },
 	{ SCE_CSS_ATTRIBUTE, 63303, L"Tag-Attribute", L"italic; fore:#648000", L"" },
-	{ MULTI_STYLE(SCE_CSS_PSEUDOCLASS,SCE_CSS_EXTENDED_PSEUDOCLASS,SCE_CSS_PSEUDOELEMENT,SCE_CSS_EXTENDED_PSEUDOELEMENT), 63304, L"Pseudo-class/element", L"fore:#B000B0", L"" },
-	{ MULTI_STYLE(SCE_CSS_IDENTIFIER,SCE_CSS_IDENTIFIER2,SCE_CSS_IDENTIFIER3,SCE_CSS_EXTENDED_IDENTIFIER), 63306, L"CSS Property", L"fore:#FF4000", L"" },
-	{ MULTI_STYLE(SCE_CSS_DOUBLESTRING,SCE_CSS_SINGLESTRING,0,0), NP2STYLE_String, L"String", L"fore:#008000", L"" },
+	{ MULTI_STYLE(SCE_CSS_PSEUDOCLASS, SCE_CSS_EXTENDED_PSEUDOCLASS, SCE_CSS_PSEUDOELEMENT, SCE_CSS_EXTENDED_PSEUDOELEMENT), 63304, L"Pseudo-class/element", L"fore:#B000B0", L"" },
+	{ MULTI_STYLE(SCE_CSS_IDENTIFIER, SCE_CSS_IDENTIFIER2, SCE_CSS_IDENTIFIER3, SCE_CSS_EXTENDED_IDENTIFIER), 63306, L"CSS Property", L"fore:#FF4000", L"" },
+	{ MULTI_STYLE(SCE_CSS_DOUBLESTRING, SCE_CSS_SINGLESTRING, 0, 0), NP2STYLE_String, L"String", L"fore:#008000", L"" },
 	{ SCE_CSS_VALUE, 63309, L"Value", L"fore:#3A6EA5", L"" },
 	{ SCE_CSS_OPERATOR, NP2STYLE_Operator, L"Operator", L"fore:#B000B0", L"" },
 	{ SCE_CSS_IMPORTANT, 63310, L"Important", L"bold; fore:#C80000", L"" },

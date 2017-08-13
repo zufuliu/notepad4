@@ -4,7 +4,7 @@
 // https://en.wikipedia.org/wiki/Common_Intermediate_Language
 // http://www.ecma-international.org/publications/standards/Ecma-335.htm
 
-static KEYWORDLIST Keywords_CIL = {
+static KEYWORDLIST Keywords_CIL = {{
 "THE_END abstract algorithm alignment as assembly assert at beforefieldinit catch cdecl "
 "cil class const default demand deny endfault "
 "endfinally endmac enum explicit extends extern false famandassem family famorassem "
@@ -70,10 +70,10 @@ static KEYWORDLIST Keywords_CIL = {
 "ldloca         modopt modreq "
 "       reqmin reqopt reqrefuse reqsecobj     "
 "       tls   "
-,"","","","",
+, "", "", "", "",
 "ctor() "
 #endif
-};
+}};
 
 EDITLEXER lexCIL = { SCLEX_CIL, NP2LEX_CIL, L".NET IL", L"il", L"", &Keywords_CIL,
 {
@@ -86,8 +86,8 @@ EDITLEXER lexCIL = { SCLEX_CIL, NP2LEX_CIL, L".NET IL", L"il", L"", &Keywords_CI
 	//{ SCE_C_PREPROCESSOR, NP2STYLE_Preprocessor, L"Preprocessor", L"fore:#FF8000", L"" },
 	//{ MULTI_STYLE(SCE_C_COMMENT,SCE_C_COMMENTLINE,SCE_C_COMMENTDOC,SCE_C_COMMENTLINEDOC), NP2STYLE_Comment, L"Comment", L"fore:#008000", L"" },
 	//{ MULTI_STYLE(SCE_C_STRING,SCE_C_CHARACTER,SCE_C_STRINGEOL,0), NP2STYLE_String, L"String", L"fore:#008000", L"" },
-	{ MULTI_STYLE(SCE_C_COMMENT,SCE_C_COMMENTLINE,0,0), NP2STYLE_Comment, L"Comment", L"fore:#008000", L"" },
-	{ MULTI_STYLE(SCE_C_STRING,SCE_C_CHARACTER,0,0), NP2STYLE_String, L"String", L"fore:#008000", L"" },
+	{ MULTI_STYLE(SCE_C_COMMENT, SCE_C_COMMENTLINE, 0, 0), NP2STYLE_Comment, L"Comment", L"fore:#008000", L"" },
+	{ MULTI_STYLE(SCE_C_STRING, SCE_C_CHARACTER, 0, 0), NP2STYLE_String, L"String", L"fore:#008000", L"" },
 	{ SCE_C_LABEL, NP2STYLE_Label, L"Label", L"fore:#000000; back:#FFC040", L""},
 	{ SCE_C_NUMBER, NP2STYLE_Number, L"Number", L"fore:#FF0000", L"" },
 	{ SCE_C_OPERATOR, NP2STYLE_Operator, L"Operator", L"fore:#B000B0", L"" },

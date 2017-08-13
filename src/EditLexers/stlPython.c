@@ -7,7 +7,7 @@
 // http://boo-lang.org/
 // http://www.jython.org/
 
-static KEYWORDLIST Keywords_Python = {
+static KEYWORDLIST Keywords_Python = {{
 "async await " // python 3.7
 "and as assert break class continue def del elif else except finally for from "
 "global if import in is lambda nonlocal not or pass raise return try while with yield "
@@ -283,9 +283,9 @@ static KEYWORDLIST Keywords_Python = {
 // gzip
 "filename mode compresslevel fileobj "
 ,
-"","",""
+"", "", ""
 #endif
-};
+}};
 
 EDITLEXER lexPython  = { SCLEX_PYTHON, NP2LEX_PYTHON, L"Python Script", L"py; pyw", L"", &Keywords_Python,
 {
@@ -301,15 +301,15 @@ EDITLEXER lexPython  = { SCLEX_PYTHON, NP2LEX_PYTHON, L"Python Script", L"py; py
 	{ SCE_PY_BUILDIN_CONST, 63468, L"Build-in Constants", L"bold; fore:#008080", L"" },
 	{ SCE_PY_BUILDIN_FUNC, 63466, L"Build-in Functions", L"fore:#0080C0", L"" },
 	{ SCE_PY_OBJ_FUNC, 63467, L"object Method", L"fore:#FF8000", L"" },
-	{ MULTI_STYLE(SCE_PY_COMMENTLINE,SCE_PY_COMMENTBLOCK,0,0), NP2STYLE_Comment, L"Comment", L"fore:#008000", L"" },
-	{ MULTI_STYLE(SCE_PY_STRING1,SCE_PY_STRING2,0,0), NP2STYLE_String, L"String", L"fore:#008000", L"" },
-	{ MULTI_STYLE(SCE_PY_RAW_STRING1,SCE_PY_RAW_STRING2,0,0), NP2STYLE_RawString, L"Raw String", L"fore:#008080", L"" },
-	{ MULTI_STYLE(SCE_PY_TRIPLE_STRING1,SCE_PY_TRIPLE_STRING2,0,0), NP2STYLE_TripleString, L"Triple Quoted String", L"fore:#F08000", L"" },
-	{ MULTI_STYLE(SCE_PY_BYTES1,SCE_PY_BYTES2,0,0), 63461, L"Bytes", L"fore:#C08000", L"" },
-	{ MULTI_STYLE(SCE_PY_RAW_BYTES1,SCE_PY_RAW_BYTES2,0,0), 63462, L"Raw Bytes", L"fore:#648000", L"" },
-	{ MULTI_STYLE(SCE_PY_TRIPLE_BYTES1,SCE_PY_TRIPLE_BYTES2,0,0), 63463, L"Triple Quoted Bytes", L"fore:#A46000", L"" },
-	{ MULTI_STYLE(SCE_PY_FMT_STRING1,SCE_PY_FMT_STRING2,0,0), 63469, L"Formatted String", L"fore:#008080", L"" },
-	{ MULTI_STYLE(SCE_PY_TRIPLE_FMT_STRING1,SCE_PY_TRIPLE_FMT_STRING2,0,0), 63470, L"Triple Quoted Formatted String", L"fore:#F08000", L"" },
+	{ MULTI_STYLE(SCE_PY_COMMENTLINE, SCE_PY_COMMENTBLOCK, 0, 0), NP2STYLE_Comment, L"Comment", L"fore:#008000", L"" },
+	{ MULTI_STYLE(SCE_PY_STRING1, SCE_PY_STRING2, 0, 0), NP2STYLE_String, L"String", L"fore:#008000", L"" },
+	{ MULTI_STYLE(SCE_PY_RAW_STRING1, SCE_PY_RAW_STRING2, 0, 0), NP2STYLE_RawString, L"Raw String", L"fore:#008080", L"" },
+	{ MULTI_STYLE(SCE_PY_TRIPLE_STRING1, SCE_PY_TRIPLE_STRING2, 0, 0), NP2STYLE_TripleString, L"Triple Quoted String", L"fore:#F08000", L"" },
+	{ MULTI_STYLE(SCE_PY_BYTES1, SCE_PY_BYTES2, 0, 0), 63461, L"Bytes", L"fore:#C08000", L"" },
+	{ MULTI_STYLE(SCE_PY_RAW_BYTES1, SCE_PY_RAW_BYTES2, 0, 0), 63462, L"Raw Bytes", L"fore:#648000", L"" },
+	{ MULTI_STYLE(SCE_PY_TRIPLE_BYTES1, SCE_PY_TRIPLE_BYTES2, 0, 0), 63463, L"Triple Quoted Bytes", L"fore:#A46000", L"" },
+	{ MULTI_STYLE(SCE_PY_FMT_STRING1, SCE_PY_FMT_STRING2, 0, 0), 63469, L"Formatted String", L"fore:#008080", L"" },
+	{ MULTI_STYLE(SCE_PY_TRIPLE_FMT_STRING1, SCE_PY_TRIPLE_FMT_STRING2, 0, 0), 63470, L"Triple Quoted Formatted String", L"fore:#F08000", L"" },
 	{ SCE_PY_NUMBER, NP2STYLE_Number, L"Number", L"fore:#FF0000", L"" },
 	{ SCE_PY_OPERATOR, NP2STYLE_Operator, L"Operator", L"fore:#B000B0", L"" },
 	{ -1, 00000, L"", L"", L"" }

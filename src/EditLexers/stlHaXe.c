@@ -3,7 +3,7 @@
 
 // http://haxe.org/
 
-static KEYWORDLIST Keywords_HaXe = {
+static KEYWORDLIST Keywords_HaXe = {{
 "break callback case cast catch class continue default do dynamic else enum "
 "extends extern false for function here if implements import in inline interface "
 "never new null override package private public return static super switch this "
@@ -27,10 +27,10 @@ static KEYWORDLIST Keywords_HaXe = {
 ""
 
 #if NUMKEYWORD == 16
-,"","","","","","",
+, "", "", "", "", "", "",
 "for^() if^() switch^() while^() else^if^() "
 #endif
-};
+}};
 
 EDITLEXER lexHaXe = { SCLEX_CPP, NP2LEX_HAXE, L"haXe Script", L"hx", L"", &Keywords_HaXe,
 {
@@ -44,10 +44,10 @@ EDITLEXER lexHaXe = { SCLEX_CPP, NP2LEX_HAXE, L"haXe Script", L"hx", L"", &Keywo
 	{ SCE_C_FUNCTION, NP2STYLE_Function, L"Function", L"fore:#A46000", L"" },
 	{ SCE_C_ENUMERATION, NP2STYLE_Enumeration, L"Enumeration", L"fore:#FF8000", L""},
 	{ SCE_C_CONSTANT, NP2STYLE_Constant, L"Constant", L"bold; fore:#B000B0", L""},
-	{ MULTI_STYLE(SCE_C_COMMENT,SCE_C_COMMENTLINE,0,0), NP2STYLE_Comment, L"Comment", L"fore:#008000", L"" },
+	{ MULTI_STYLE(SCE_C_COMMENT, SCE_C_COMMENTLINE, 0, 0), NP2STYLE_Comment, L"Comment", L"fore:#008000", L"" },
 	{ SCE_C_COMMENTDOC_TAG, NP2STYLE_DocCommentTag, L"Doc Comment Tag", L"bold; fore:#008000F", L"" },
-	{ MULTI_STYLE(SCE_C_COMMENTDOC,SCE_C_COMMENTLINEDOC,SCE_C_COMMENTDOC_TAG_XML,0), NP2STYLE_DocComment, L"Doc Comment", L"fore:#008000", L"" },
-	{ MULTI_STYLE(SCE_C_STRING,SCE_C_CHARACTER,SCE_C_STRINGEOL,0), NP2STYLE_String, L"String", L"fore:#008000", L"" },
+	{ MULTI_STYLE(SCE_C_COMMENTDOC, SCE_C_COMMENTLINEDOC, SCE_C_COMMENTDOC_TAG_XML, 0), NP2STYLE_DocComment, L"Doc Comment", L"fore:#008000", L"" },
+	{ MULTI_STYLE(SCE_C_STRING, SCE_C_CHARACTER, SCE_C_STRINGEOL, 0), NP2STYLE_String, L"String", L"fore:#008000", L"" },
 	{ SCE_C_REGEX, NP2STYLE_Regex, L"Regex", L"fore:#006633; back:#FFF1A8", L"" },
 	{ SCE_C_NUMBER, NP2STYLE_Number, L"Number", L"fore:#FF0000", L"" },
 	{ SCE_C_VARIABLE, NP2STYLE_Variable, L"Variable", L"fore:#CC3300", L"" },

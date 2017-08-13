@@ -18,6 +18,9 @@
 *
 ******************************************************************************/
 
+#ifndef METAPATH_DIALOGS_H_
+#define METAPATH_DIALOGS_H_
+
 int  ErrorMessage(int iLevel, UINT uIdMsg, ...);
 BOOL GetDirectory(HWND hwndParent, int iTitle, LPWSTR pszFolder, LPCWSTR pszBase, BOOL bNewDialogStyle);
 BOOL GetDirectory2(HWND hwndParent, int iTitle, LPWSTR pszFolder, int iBase);
@@ -49,5 +52,6 @@ BOOL NewDirDlg(HWND hwnd, LPWSTR pszNewDir);
 INT_PTR CALLBACK FindWinDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam);
 INT_PTR CALLBACK FindTargetDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam);
 
+#endif // METAPATH_DIALOGS_H_
 
 // End of Dialogs.h

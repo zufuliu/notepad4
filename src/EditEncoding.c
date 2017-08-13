@@ -13,8 +13,6 @@
 #include "SciCall.h"
 #include "resource.h"
 
-
-
 extern BOOL bSkipUnicodeDetection;
 extern int iDefaultCodePage;
 
@@ -23,7 +21,6 @@ int g_DOSEncoding;
 // Supported Encodings
 WCHAR wchANSI[8] = L"";
 WCHAR wchOEM [8] = L"";
-
 
 // Encoding
 NP2ENCODING mEncoding[] = {
@@ -167,13 +164,11 @@ NP2ENCODING mEncoding[] = {
 	//{ NCP_8BIT | NCP_RECODE, 57011, "x-iscii-pa,xisciipa,", 00000, L"" },// ISCII Panjabi
 };
 
-
 //=============================================================================
 //
 // EditSetNewEncoding()
 //
-BOOL EditSetNewEncoding(HWND hwnd, int iCurrentEncoding, int iNewEncoding, BOOL bNoUI, BOOL bSetSavePoint)
-{
+BOOL EditSetNewEncoding(HWND hwnd, int iCurrentEncoding, int iNewEncoding, BOOL bNoUI, BOOL bSetSavePoint) {
 	if (iCurrentEncoding != iNewEncoding) {
 		if ((iCurrentEncoding == CPI_DEFAULT && iNewEncoding == CPI_DEFAULT) ||
 				(iCurrentEncoding != CPI_DEFAULT && iNewEncoding != CPI_DEFAULT)) {
@@ -187,9 +182,9 @@ BOOL EditSetNewEncoding(HWND hwnd, int iCurrentEncoding, int iNewEncoding, BOOL 
 			if ((iCurrentEncoding == CPI_DEFAULT || iNewEncoding == CPI_DEFAULT) &&
 					(bNoUI || bIsEmptyUndoHistory || InfoBox(MBYESNO, L"MsgConv2", IDS_ASK_ENCODING2) == IDYES)) {
 				EditConvertText(hwnd,
-							(mEncoding[iCurrentEncoding].uFlags & NCP_DEFAULT) ? iDefaultCodePage : SC_CP_UTF8,
-							(mEncoding[iNewEncoding].uFlags & NCP_DEFAULT) ? iDefaultCodePage : SC_CP_UTF8,
-							bSetSavePoint);
+								(mEncoding[iCurrentEncoding].uFlags & NCP_DEFAULT) ? iDefaultCodePage : SC_CP_UTF8,
+								(mEncoding[iNewEncoding].uFlags & NCP_DEFAULT) ? iDefaultCodePage : SC_CP_UTF8,
+								bSetSavePoint);
 				return TRUE;
 			} else {
 				return FALSE;
@@ -198,9 +193,9 @@ BOOL EditSetNewEncoding(HWND hwnd, int iCurrentEncoding, int iNewEncoding, BOOL 
 				   (bNoUI || InfoBox(MBYESNO, L"MsgConv1", IDS_ASK_ENCODING) == IDYES)) {
 			BeginWaitCursor();
 			EditConvertText(hwnd,
-						(mEncoding[iCurrentEncoding].uFlags & NCP_DEFAULT) ? iDefaultCodePage : SC_CP_UTF8,
-						(mEncoding[iNewEncoding].uFlags & NCP_DEFAULT) ? iDefaultCodePage : SC_CP_UTF8,
-						FALSE);
+							(mEncoding[iCurrentEncoding].uFlags & NCP_DEFAULT) ? iDefaultCodePage : SC_CP_UTF8,
+							(mEncoding[iNewEncoding].uFlags & NCP_DEFAULT) ? iDefaultCodePage : SC_CP_UTF8,
+							FALSE);
 			EndWaitCursor();
 			return TRUE;
 		} else {
@@ -211,13 +206,11 @@ BOOL EditSetNewEncoding(HWND hwnd, int iCurrentEncoding, int iNewEncoding, BOOL 
 	return FALSE;
 }
 
-
 //=============================================================================
 //
 // Encoding Helper Functions
 //
-void Encoding_InitDefaults()
-{
+void Encoding_InitDefaults(void) {
 	wsprintf(wchANSI, L" (%i)", GetACP());
 	mEncoding[CPI_OEM].uCodePage = GetOEMCP();
 	wsprintf(wchOEM, L" (%u)", mEncoding[CPI_OEM].uCodePage);
@@ -226,8 +219,7 @@ void Encoding_InitDefaults()
 
 	// Try to set the DOS encoding to DOS-437 if the default OEMCP is not DOS-437
 	if (mEncoding[g_DOSEncoding].uCodePage != 437) {
-		unsigned int i;
-		for (i = CPI_UTF7 + 1; i < COUNTOF(mEncoding); ++i) {
+		for (unsigned int i = CPI_UTF7 + 1; i < COUNTOF(mEncoding); ++i) {
 			if (mEncoding[i].uCodePage == 437 && Encoding_IsValid(i)) {
 				g_DOSEncoding = i;
 				break;
@@ -236,9 +228,7 @@ void Encoding_InitDefaults()
 	}
 }
 
-
-int Encoding_MapIniSetting(BOOL bLoad, int iSetting)
-{
+int Encoding_MapIniSetting(BOOL bLoad, int iSetting) {
 	if (bLoad) {
 		switch (iSetting) {
 		case 0:
@@ -260,8 +250,7 @@ int Encoding_MapIniSetting(BOOL bLoad, int iSetting)
 		case 8:
 			return CPI_UTF7;
 		default: {
-			unsigned int i;
-			for (i = CPI_UTF7 + 1; i < COUNTOF(mEncoding); i++) {
+			for (unsigned int i = CPI_UTF7 + 1; i < COUNTOF(mEncoding); i++) {
 				if (mEncoding[i].uCodePage == (UINT)iSetting && Encoding_IsValid(i)) {
 					return i;
 				}
@@ -295,9 +284,7 @@ int Encoding_MapIniSetting(BOOL bLoad, int iSetting)
 	}
 }
 
-
-void Encoding_GetLabel(int iEncoding)
-{
+void Encoding_GetLabel(int iEncoding) {
 	if (mEncoding[iEncoding].wchLabel[0] == 0) {
 		WCHAR *pwsz;
 		WCHAR wch[256] = L"";
@@ -314,18 +301,13 @@ void Encoding_GetLabel(int iEncoding)
 	}
 }
 
-
-int Encoding_MatchW(LPCWSTR pwszTest)
-{
+int Encoding_MatchW(LPCWSTR pwszTest) {
 	char tchTest[256];
 	WideCharToMultiByte(CP_ACP, 0, pwszTest, -1, tchTest, COUNTOF(tchTest), NULL, NULL);
 	return Encoding_MatchA(tchTest);
 }
 
-
-int Encoding_MatchA(char *pchTest)
-{
-	unsigned int i;
+int Encoding_MatchA(char *pchTest) {
 	char chTest[256];
 	char *pchSrc = pchTest;
 	char *pchDst = chTest;
@@ -341,11 +323,11 @@ int Encoding_MatchA(char *pchTest)
 	*pchDst++ = ',';
 	*pchDst = 0;
 
-	for (i = 0; i < COUNTOF(mEncoding); i++) {
+	for (unsigned int i = 0; i < COUNTOF(mEncoding); i++) {
 		if (StrStrIA(mEncoding[i].pszParseNames, chTest)) {
 			CPINFO cpi;
 			if ((mEncoding[i].uFlags & NCP_INTERNAL) ||
-				(IsValidCodePage(mEncoding[i].uCodePage) && GetCPInfo(mEncoding[i].uCodePage, &cpi))) {
+					(IsValidCodePage(mEncoding[i].uCodePage) && GetCPInfo(mEncoding[i].uCodePage, &cpi))) {
 				return i;
 			} else {
 				return -1;
@@ -356,14 +338,12 @@ int Encoding_MatchA(char *pchTest)
 	return -1;
 }
 
-
-BOOL Encoding_IsValid(int iTestEncoding)
-{
+BOOL Encoding_IsValid(int iTestEncoding) {
 	CPINFO cpi;
 	if (iTestEncoding >= 0 &&
 			iTestEncoding < (int)COUNTOF(mEncoding)) {
 		if	((mEncoding[iTestEncoding].uFlags & NCP_INTERNAL) ||
-			(IsValidCodePage(mEncoding[iTestEncoding].uCodePage) && GetCPInfo(mEncoding[iTestEncoding].uCodePage, &cpi))) {
+				(IsValidCodePage(mEncoding[iTestEncoding].uCodePage) && GetCPInfo(mEncoding[iTestEncoding].uCodePage, &cpi))) {
 			return TRUE;
 		}
 	}
@@ -371,26 +351,22 @@ BOOL Encoding_IsValid(int iTestEncoding)
 	return FALSE;
 }
 
-
 typedef struct _ee {
 	int		 id;
 	WCHAR	 wch[256];
 } ENCODINGENTRY, *PENCODINGENTRY;
 
-int CmpEncoding(const void *s1, const void *s2)
-{
+int CmpEncoding(const void *s1, const void *s2) {
 	return StrCmp(((PENCODINGENTRY)s1)->wch, ((PENCODINGENTRY)s2)->wch);
 }
 
-void Encoding_AddToListView(HWND hwnd, int idSel, BOOL bRecodeOnly)
-{
-	unsigned int i;
+void Encoding_AddToListView(HWND hwnd, int idSel, BOOL bRecodeOnly) {
 	int iSelItem = -1;
 	LVITEM lvi;
 	WCHAR wchBuf[256];
 
 	PENCODINGENTRY pEE = LocalAlloc(LPTR, COUNTOF(mEncoding) * sizeof(ENCODINGENTRY));
-	for (i = 0; i < COUNTOF(mEncoding); i++) {
+	for (unsigned int i = 0; i < COUNTOF(mEncoding); i++) {
 		pEE[i].id = i;
 		GetString(mEncoding[i].idsName, pEE[i].wch, COUNTOF(pEE[i].wch));
 	}
@@ -400,7 +376,7 @@ void Encoding_AddToListView(HWND hwnd, int idSel, BOOL bRecodeOnly)
 	lvi.mask = LVIF_PARAM | LVIF_TEXT | LVIF_IMAGE;
 	lvi.pszText = wchBuf;
 
-	for (i = 0; i < COUNTOF(mEncoding); i++) {
+	for (unsigned int i = 0; i < COUNTOF(mEncoding); i++) {
 		int id = pEE[i].id;
 		if (!bRecodeOnly || (mEncoding[id].uFlags & NCP_RECODE)) {
 			CPINFO cpi;
@@ -450,9 +426,7 @@ void Encoding_AddToListView(HWND hwnd, int idSel, BOOL bRecodeOnly)
 	}
 }
 
-
-BOOL Encoding_GetFromListView(HWND hwnd, int *pidEncoding)
-{
+BOOL Encoding_GetFromListView(HWND hwnd, int *pidEncoding) {
 	LVITEM lvi;
 
 	lvi.iItem = ListView_GetNextItem(hwnd, -1, LVNI_ALL | LVNI_SELECTED);
@@ -471,16 +445,13 @@ BOOL Encoding_GetFromListView(HWND hwnd, int *pidEncoding)
 	return FALSE;
 }
 
-
-void Encoding_AddToComboboxEx(HWND hwnd, int idSel, BOOL bRecodeOnly)
-{
-	unsigned int i;
+void Encoding_AddToComboboxEx(HWND hwnd, int idSel, BOOL bRecodeOnly) {
 	int iSelItem = -1;
 	COMBOBOXEXITEM cbei;
 	WCHAR wchBuf[256];
 
 	PENCODINGENTRY pEE = LocalAlloc(LPTR, COUNTOF(mEncoding) * sizeof(ENCODINGENTRY));
-	for (i = 0; i < COUNTOF(mEncoding); i++) {
+	for (unsigned int i = 0; i < COUNTOF(mEncoding); i++) {
 		pEE[i].id = i;
 		GetString(mEncoding[i].idsName, pEE[i].wch, COUNTOF(pEE[i].wch));
 	}
@@ -494,7 +465,7 @@ void Encoding_AddToComboboxEx(HWND hwnd, int idSel, BOOL bRecodeOnly)
 	cbei.iImage = 0;
 	cbei.iSelectedImage = 0;
 
-	for (i = 0; i < COUNTOF(mEncoding); i++) {
+	for (unsigned int i = 0; i < COUNTOF(mEncoding); i++) {
 		int id = pEE[i].id;
 		if (!bRecodeOnly || (mEncoding[id].uFlags & NCP_RECODE)) {
 			CPINFO cpi;
@@ -540,9 +511,7 @@ void Encoding_AddToComboboxEx(HWND hwnd, int idSel, BOOL bRecodeOnly)
 	}
 }
 
-
-BOOL Encoding_GetFromComboboxEx(HWND hwnd, int *pidEncoding)
-{
+BOOL Encoding_GetFromComboboxEx(HWND hwnd, int *pidEncoding) {
 	COMBOBOXEXITEM cbei;
 
 	cbei.iItem = SendMessage(hwnd, CB_GETCURSEL, 0, 0);
@@ -560,9 +529,7 @@ BOOL Encoding_GetFromComboboxEx(HWND hwnd, int *pidEncoding)
 	return FALSE;
 }
 
-
-BOOL IsUnicode(const char *pBuffer, int cb, LPBOOL lpbBOM, LPBOOL lpbReverse)
-{
+BOOL IsUnicode(const char *pBuffer, int cb, LPBOOL lpbBOM, LPBOOL lpbReverse) {
 	int i = 0xFFFF;
 
 	BOOL bIsTextUnicode;
@@ -606,9 +573,7 @@ BOOL IsUnicode(const char *pBuffer, int cb, LPBOOL lpbBOM, LPBOOL lpbReverse)
 	return FALSE;
 }
 
-
-BOOL IsUTF8(const char *pTest, int nLength)
-{
+BOOL IsUTF8(const char *pTest, int nLength) {
 	static const int byte_class_table[256] = {
 		/* 00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F */
 		/* 00 */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -655,12 +620,11 @@ BOOL IsUTF8(const char *pTest, int nLength)
 #define NEXT_STATE(b, cur) (state_table[(BYTE_CLASS(b) * kNumOfStates) + (cur)])
 
 	utf8_state current = kSTART;
-	int i;
 
 	const char *pt = pTest;
 	int len = nLength;
 
-	for (i = 0; i < len ; i++, pt++) {
+	for (int i = 0; i < len ; i++, pt++) {
 		current = NEXT_STATE(*pt, current);
 		if (kERROR == current) {
 			break;
@@ -670,13 +634,10 @@ BOOL IsUTF8(const char *pTest, int nLength)
 	return (current == kSTART) ? TRUE : FALSE;
 }
 
-
-BOOL IsUTF7(const char *pTest, int nLength)
-{
-	int i;
+BOOL IsUTF7(const char *pTest, int nLength) {
 	const char *pt = pTest;
 
-	for (i = 0; i < nLength; i++) {
+	for (int i = 0; i < nLength; i++) {
 		if (*pt & 0x80 || !*pt) {
 			return FALSE;
 		}
@@ -685,7 +646,6 @@ BOOL IsUTF7(const char *pTest, int nLength)
 
 	return TRUE;
 }
-
 
 /* byte length of UTF-8 sequence based on value of first byte.
 	 for UTF-16 (21-bit space), max. code length is 4, so we only need to look
@@ -709,8 +669,7 @@ Return value :
 	size (in bytes) of a NULL-terminated UTF-8 string.
 	1 if invalid NULL-terminated UTF-8 string
 --*/
-INT UTF8_mbslen_bytes(LPCSTR utf8_string)
-{
+INT UTF8_mbslen_bytes(LPCSTR utf8_string) {
 	INT length = 0;
 
 	while (*utf8_string) {
@@ -744,8 +703,7 @@ Return value :
 	size (in characters) of a UTF-8 string.
 	-1 if invalid UTF-8 string
 --*/
-INT UTF8_mbslen(LPCSTR source, INT byte_length)
-{
+INT UTF8_mbslen(LPCSTR source, INT byte_length) {
 	INT wchar_length = 0;
 
 	while (byte_length > 0) {
@@ -780,13 +738,11 @@ INT UTF8_mbslen(LPCSTR source, INT byte_length)
 	return wchar_length;
 }
 
-
 //=============================================================================
 //
 // FileVars_IsUTF8()
 //
-BOOL FileVars_IsUTF8(LPFILEVARS lpfv)
-{
+BOOL FileVars_IsUTF8(LPFILEVARS lpfv) {
 	if (lpfv->mask & FV_ENCODING) {
 		if (lstrcmpiA(lpfv->tchEncoding, "utf-8") == 0 || lstrcmpiA(lpfv->tchEncoding, "utf8") == 0) {
 			return TRUE;
@@ -796,36 +752,32 @@ BOOL FileVars_IsUTF8(LPFILEVARS lpfv)
 	return FALSE;
 }
 
-
 //=============================================================================
 //
 // FileVars_IsNonUTF8()
 //
-BOOL FileVars_IsNonUTF8(LPFILEVARS lpfv)
-{
+BOOL FileVars_IsNonUTF8(LPFILEVARS lpfv) {
 	if (lpfv->mask & FV_ENCODING) {
 		if (lstrlenA(lpfv->tchEncoding) &&
-			lstrcmpiA(lpfv->tchEncoding, "utf-8") != 0 && lstrcmpiA(lpfv->tchEncoding, "utf8") != 0) {
+				lstrcmpiA(lpfv->tchEncoding, "utf-8") != 0 && lstrcmpiA(lpfv->tchEncoding, "utf8") != 0) {
 			return TRUE;
 		}
 	}
 
 	return FALSE;
 }
-
 
 //=============================================================================
 //
 // FileVars_IsValidEncoding()
 //
-BOOL FileVars_IsValidEncoding(LPFILEVARS lpfv)
-{
+BOOL FileVars_IsValidEncoding(LPFILEVARS lpfv) {
 	CPINFO cpi;
 	if (lpfv->mask & FV_ENCODING &&
 			lpfv->iEncoding >= 0 &&
 			lpfv->iEncoding < (int)COUNTOF(mEncoding)) {
 		if ((mEncoding[lpfv->iEncoding].uFlags & NCP_INTERNAL) ||
-			(IsValidCodePage(mEncoding[lpfv->iEncoding].uCodePage) && GetCPInfo(mEncoding[lpfv->iEncoding].uCodePage, &cpi))) {
+				(IsValidCodePage(mEncoding[lpfv->iEncoding].uCodePage) && GetCPInfo(mEncoding[lpfv->iEncoding].uCodePage, &cpi))) {
 			return TRUE;
 		}
 	}
@@ -833,20 +785,16 @@ BOOL FileVars_IsValidEncoding(LPFILEVARS lpfv)
 	return FALSE;
 }
 
-
 //=============================================================================
 //
 // FileVars_GetEncoding()
 //
-int FileVars_GetEncoding(LPFILEVARS lpfv)
-{
+int FileVars_GetEncoding(LPFILEVARS lpfv) {
 	if (lpfv->mask & FV_ENCODING) {
 		return lpfv->iEncoding;
 	} else {
 		return -1;
 	}
 }
-
-
 
 // End of EditEncoding.c

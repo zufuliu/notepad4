@@ -3,7 +3,7 @@
 
 // https://developer.apple.com/library/content/documentation/Cocoa/Conceptual/ProgrammingWithObjectiveC/Introduction/Introduction.html
 
-static KEYWORDLIST Keywords_CPP = {
+static KEYWORDLIST Keywords_CPP = {{
 "break case const continue default do else enum extern for "
 "goto if inline register restrict return sizeof static struct "
 "switch typedef union volatile while "
@@ -14,7 +14,8 @@ static KEYWORDLIST Keywords_CPP = {
 "private protected public reinterpret_cast static_assert static_cast template "
 "this thread_local throw true try typeid typename using virtual "
 "override "
-"_Pragma defined " "and and_eq bitand bitor compl not not_eq or or_eq xor xor_eq "
+"_Pragma defined __has_include __has_include_next __has_attribute "
+"and and_eq bitand bitor compl not not_eq or or_eq xor xor_eq "
 "concept "
 // MSVC
 "__alignof __asm __assume __based __cdecl __declspec __event __except __fastcall __finally __forceinline __identifier __inline __interface __leave __raise __stdcall __clrcall __super __thiscall __try __unaligned __uuidof __hook __unhook __noop __vectorcall "
@@ -413,7 +414,7 @@ static KEYWORDLIST Keywords_CPP = {
 // Mac/iOS
 "NSLog() "
 ,
-"_Pragma() defined() comment() "
+"_Pragma() defined() comment() __has_include() __has_include_next() __has_attribute() "
 "sizeof() for^() if^() switch^() while^() catch^() else^if^() "
 "alignas() alignof() delete[] decltype() noexcept() typeid() typeof() static_assert() "
 "static_cast<> const_cast<> dynamic_cast<> reinterpret_cast<> "
@@ -421,13 +422,13 @@ static KEYWORDLIST Keywords_CPP = {
 "__attribute__() __typeof__() __alignof__() "
 "__except^() __alignof() __declspec() __uuidof() "
 #endif
-};
+}};
 
-EDITLEXER lexCPP= { SCLEX_CPP, NP2LEX_CPP, L"C/C++ Source", L"c; cpp; cxx; cc; h; hpp; hxx; hh; inl; pch; mm", L"", &Keywords_CPP,
+EDITLEXER lexCPP = { SCLEX_CPP, NP2LEX_CPP, L"C/C++ Source", L"c; cpp; cxx; cc; h; hpp; hxx; hh; inl; pch; mm", L"", &Keywords_CPP,
 {
 	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
 	//{ SCE_C_DEFAULT, L"Default", L"", L"" },
-	{ MULTI_STYLE(SCE_C_WORD,SCE_C_2NDWORD,0,0), NP2STYLE_Keyword, L"Keyword", L"fore:#0000FF", L"" },
+	{ MULTI_STYLE(SCE_C_WORD, SCE_C_2NDWORD, 0, 0), NP2STYLE_Keyword, L"Keyword", L"fore:#0000FF", L"" },
 	{ SCE_C_WORD2, NP2STYLE_TypeKeyword, L"Type Keyword", L"fore:#0000FF", L"" },
 	{ SCE_C_PREPROCESSOR, NP2STYLE_Preprocessor, L"Preprocessor", L"fore:#FF8000", L"" },
 	{ SCE_C_ATTRIBUTE, NP2STYLE_Attribute, L"Attribute", L"fore:#FF8000", L""},
@@ -440,11 +441,11 @@ EDITLEXER lexCPP= { SCLEX_CPP, NP2LEX_CPP, L"C/C++ Source", L"c; cpp; cxx; cc; h
 	{ SCE_C_FUNCTION, NP2STYLE_Function, L"Function", L"fore:#A46000", L"" },
 	{ SCE_C_ENUMERATION, NP2STYLE_Enumeration, L"Enumeration", L"fore:#FF8000", L""},
 	{ SCE_C_CONSTANT, NP2STYLE_Constant, L"Constant", L"bold; fore:#B000B0", L""},
-	{ MULTI_STYLE(SCE_C_MACRO2,SCE_C_MACRO,0,0), NP2STYLE_Macro, L"Macro", L"bold; fore:#B000B0", L""},
-	{ MULTI_STYLE(SCE_C_COMMENT,SCE_C_COMMENTLINE,0,0), NP2STYLE_Comment, L"Comment", L"fore:#008000", L"" },
+	{ MULTI_STYLE(SCE_C_MACRO2, SCE_C_MACRO, 0, 0), NP2STYLE_Macro, L"Macro", L"bold; fore:#B000B0", L""},
+	{ MULTI_STYLE(SCE_C_COMMENT, SCE_C_COMMENTLINE, 0, 0), NP2STYLE_Comment, L"Comment", L"fore:#008000", L"" },
 	{ SCE_C_COMMENTDOC_TAG, NP2STYLE_DocCommentTag, L"Doc Comment Tag", L"bold; fore:#008000F", L"" },
-	{ MULTI_STYLE(SCE_C_COMMENTDOC,SCE_C_COMMENTLINEDOC,SCE_C_COMMENTDOC_TAG_XML,0), NP2STYLE_DocComment, L"Doc Comment", L"fore:#008000", L"" },
-	{ MULTI_STYLE(SCE_C_STRING,SCE_C_CHARACTER,SCE_C_STRINGEOL,0), NP2STYLE_String, L"String", L"fore:#008000", L"" },
+	{ MULTI_STYLE(SCE_C_COMMENTDOC, SCE_C_COMMENTLINEDOC, SCE_C_COMMENTDOC_TAG_XML, 0), NP2STYLE_DocComment, L"Doc Comment", L"fore:#008000", L"" },
+	{ MULTI_STYLE(SCE_C_STRING, SCE_C_CHARACTER, SCE_C_STRINGEOL, 0), NP2STYLE_String, L"String", L"fore:#008000", L"" },
 	{ SCE_C_STRINGRAW, NP2STYLE_RawString, L"Raw String", L"fore:#008080", L"" },
 	{ SCE_C_LABEL, NP2STYLE_Label, L"Label", L"fore:#000000; back:#FFC040", L""},
 	{ SCE_C_NUMBER, NP2STYLE_Number, L"Number", L"fore:#FF0000", L"" },

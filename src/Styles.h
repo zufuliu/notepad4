@@ -18,8 +18,8 @@
 *
 ******************************************************************************/
 
-#ifndef _NOTEPAD2_STYLES_H_
-#define _NOTEPAD2_STYLES_H_
+#ifndef NOTEPAD2_STYLES_H_
+#define NOTEPAD2_STYLES_H_
 
 #include "EditLexer.h"
 // Number of Lexers in pLexArray
@@ -44,8 +44,8 @@ static __inline BOOL IsDocLowerKeywords(PEDITLEXER pLex) {
 
 BOOL IsDocWordChar(int ch);
 
-void	Style_Load();
-void	Style_Save();
+void	Style_Load(void);
+void	Style_Save(void);
 BOOL	Style_Import(HWND hwnd);
 BOOL	Style_Export(HWND hwnd);
 
@@ -89,7 +89,6 @@ void				Style_ConfigDlg(HWND hwnd);
 INT_PTR CALLBACK	Style_SelectLexerDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam);
 void				Style_SelectLexerDlg(HWND hwnd);
 
-#endif // _NOTEPAD2_STYLES_H_
+#endif // NOTEPAD2_STYLES_H_
 
 // End of Style.h
-

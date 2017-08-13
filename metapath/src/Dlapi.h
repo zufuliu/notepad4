@@ -18,8 +18,8 @@
 *
 ******************************************************************************/
 
-#ifndef _DLAPI_H_
-#define _DLAPI_H_
+#ifndef METAPATH_DLAPI_H_
+#define METAPATH_DLAPI_H_
 
 #ifdef __cplusplus
 extern "C" { // C-Declarations
@@ -28,7 +28,6 @@ extern "C" { // C-Declarations
 typedef struct tagLV_ITEMDATA { // lvid
 	LPITEMIDLIST  pidl; // Item Id
 	LPSHELLFOLDER lpsf; // Parent IShellFolder Interface
-
 } LV_ITEMDATA, *LPLV_ITEMDATA;
 
 BOOL DirList_Init(HWND hwnd, LPCWSTR pszHeader);
@@ -51,15 +50,17 @@ BOOL DirList_DeleteItem(HWND hwnd, LPARAM lParam);
 #define DS_SIZE     1
 #define DS_TYPE     2
 #define DS_LASTMOD  3
+
 BOOL DirList_Sort(HWND hwnd, int lFlags, BOOL fRev);
 
 #define DLE_NONE 0
 #define DLE_DIR  1
 #define DLE_FILE 2
+
 #define DLI_FILENAME 1
 #define DLI_DISPNAME 2
 #define DLI_TYPE     4
-#define DLI_ALL (1|2|4)
+#define DLI_ALL (1 | 2 | 4)
 
 typedef struct tagDLITEM { // dli
 	UINT mask;
@@ -80,7 +81,7 @@ BOOL DirList_IsFileSelected(HWND hwnd);
 typedef struct tagDL_FILTER { //dlf
 	int   nCount;
 	WCHAR  tFilterBuf[DL_FILTER_BUFSIZE];
-	WCHAR  *pFilter  [DL_FILTER_BUFSIZE];
+	WCHAR  *pFilter[DL_FILTER_BUFSIZE];
 	BOOL  bExcludeFilter;
 } DL_FILTER, *PDL_FILTER;
 
@@ -96,18 +97,14 @@ LRESULT DriveBox_DeleteItem(HWND hwnd, LPARAM lParam);
 LRESULT DriveBox_GetDispInfo(HWND hwnd, LPARAM lParam);
 
 #define _IL_Next(pidl) ((LPITEMIDLIST)(((LPBYTE)(pidl)) + pidl->mkid.cb))
-LPITEMIDLIST IL_Create(LPCITEMIDLIST, UINT,
-						   LPCITEMIDLIST, UINT);
+LPITEMIDLIST IL_Create(LPCITEMIDLIST, UINT, LPCITEMIDLIST, UINT);
 UINT IL_GetSize(LPCITEMIDLIST pidl);
-BOOL IL_GetDisplayName(LPSHELLFOLDER lpsf,
-					   LPCITEMIDLIST pidl,
-					   DWORD dwFlags,
-					   LPWSTR lpszDisplayName,
-					   int nDisplayName);
+BOOL IL_GetDisplayName(LPSHELLFOLDER lpsf, LPCITEMIDLIST pidl, DWORD dwFlags, LPWSTR lpszDisplayName, int nDisplayName);
+
 #ifdef __cplusplus
 }
 #endif //__cplusplus
 
-#endif // _DLAPI_H_
+#endif // METAPATH_DLAPI_H_
 
 ///   End of Dlapi.h

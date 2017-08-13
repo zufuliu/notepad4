@@ -24,13 +24,13 @@ struct WordList {
 	int (WINAPI *WL_StrCmpA)(LPCSTR, LPCSTR);
 	int (WINAPI *WL_StrCmpNA)(LPCSTR, LPCSTR, int);
 #if NP2_AUTOC_USE_STRING_ORDER
-	int (*WL_OrderFunc)(const void*, unsigned int);
+	int (*WL_OrderFunc)(const void *, unsigned int);
 #endif
 	struct WordNode *pListHead;
 	LPCSTR pWordStart;
 #if NP2_AUTOC_USE_BUF
-	char* bufferList[NP2_AUTOC_MAX_BUF_COUNT];
-	char* buffer;
+	char *bufferList[NP2_AUTOC_MAX_BUF_COUNT];
+	char *buffer;
 	int bufferCount;
 	int offset;
 	int capacity;
@@ -41,11 +41,11 @@ struct WordList {
 	int iStartLen;
 	int iMaxLength;
 #if NP2_AUTOC_USE_NODE_CACHE
-	struct WordNode* nodeCacheList[NP2_AUTOC_MAX_CACHE_COUNT];
+	struct WordNode *nodeCacheList[NP2_AUTOC_MAX_CACHE_COUNT];
 #if !NP2_AUTOC_USE_BUF
 	int cacheIndexList[NP2_AUTOC_MAX_CACHE_COUNT];
 #endif
-	struct WordNode* nodeCache;
+	struct WordNode *nodeCache;
 	int cacheCount;
 	int cacheIndex;
 	int cacheCapacity;
@@ -82,14 +82,13 @@ struct WordNode {
 	int len;
 };
 
-void WordList_AddWord(struct WordList *pWList, LPCSTR pWord, int len)
-{
-	struct WordNode* *pListHead = &(pWList->pListHead);
+void WordList_AddWord(struct WordList *pWList, LPCSTR pWord, int len) {
+	struct WordNode * *pListHead = &(pWList->pListHead);
 	struct WordNode *head = *pListHead;
 	struct WordNode *prev = NULL;
 	int diff = 1;
 #if NP2_AUTOC_USE_STRING_ORDER
-	int order = (pWList->iStartLen > NP2_AUTOC_ORDER_LENGTH)? 0 : pWList->WL_OrderFunc(pWord, len);
+	int order = (pWList->iStartLen > NP2_AUTOC_ORDER_LENGTH) ? 0 : pWList->WL_OrderFunc(pWord, len);
 #endif
 
 	while (head) {
@@ -160,8 +159,7 @@ void WordList_AddWord(struct WordList *pWList, LPCSTR pWord, int len)
 	}
 }
 
-void WordList_Free(struct WordList *pWList)
-{
+void WordList_Free(struct WordList *pWList) {
 #if NP2_AUTOC_USE_NODE_CACHE || NP2_AUTOC_USE_BUF
 	int i;
 #endif
@@ -200,11 +198,10 @@ void WordList_Free(struct WordList *pWList)
 #endif
 }
 
-void WordList_GetList(struct WordList *pWList, char* *pList)
-{
+void WordList_GetList(struct WordList *pWList, char * *pList) {
 	struct WordNode *head = pWList->pListHead;
 	struct WordNode *prev;
-	char* buf;
+	char *buf;
 #if NP2_AUTOC_USE_NODE_CACHE || NP2_AUTOC_USE_BUF
 	int i;
 #endif
@@ -251,7 +248,7 @@ void WordList_GetList(struct WordList *pWList, char* *pList)
 // Tree
 struct WordNode {
 	union {
-		struct WordNode* link[2];
+		struct WordNode *link[2];
 		struct {
 			struct WordNode *left;
 			struct WordNode *right;
@@ -273,26 +270,25 @@ struct WordNode {
 
 // Andersson Tree, source from http://www.eternallyconfuzzled.com/tuts/datastructures/jsw_tut_andersson.aspx
 #define aa_tree_skew(t) \
-if (t->level && t->left && t->level == t->left->level) {\
-	struct WordNode *save = t->left;					\
-	t->left = save->right;								\
-	save->right = t;									\
-	t = save;											\
-}
+	if (t->level && t->left && t->level == t->left->level) {\
+		struct WordNode *save = t->left;					\
+		t->left = save->right;								\
+		save->right = t;									\
+		t = save;											\
+	}
 #define aa_tree_split(t) \
-if (t->level && t->right && t->right->right && t->level == t->right->right->level) {\
-	struct WordNode *save = t->right;					\
-	t->right = save->left;								\
-	save->left = t;										\
-	t = save;											\
-	++t->level;											\
-}
+	if (t->level && t->right && t->right->right && t->level == t->right->right->level) {\
+		struct WordNode *save = t->right;					\
+		t->right = save->left;								\
+		save->left = t;										\
+		t = save;											\
+		++t->level;											\
+	}
 
-void WordList_AddWord(struct WordList *pWList, LPCSTR pWord, int len)
-{
+void WordList_AddWord(struct WordList *pWList, LPCSTR pWord, int len) {
 	struct WordNode *root = pWList->pListHead;
 #if NP2_AUTOC_USE_STRING_ORDER
-	int order = (pWList->iStartLen > NP2_AUTOC_ORDER_LENGTH)? 0 : pWList->WL_OrderFunc(pWord, len);
+	int order = (pWList->iStartLen > NP2_AUTOC_ORDER_LENGTH) ? 0 : pWList->WL_OrderFunc(pWord, len);
 #endif
 	if (root == NULL) {
 		struct WordNode *node;
@@ -317,7 +313,7 @@ void WordList_AddWord(struct WordList *pWList, LPCSTR pWord, int len)
 		root = node;
 	} else {
 		struct WordNode *iter = root;
-		struct WordNode* path[NP2_TREE_HEIGHT_LIMIT] = {NULL};
+		struct WordNode *path[NP2_TREE_HEIGHT_LIMIT] = {NULL};
 		struct WordNode *node = NULL;
 		int top = 0, dir;
 
@@ -332,11 +328,13 @@ void WordList_AddWord(struct WordList *pWList, LPCSTR pWord, int len)
 #else
 			dir = pWList->WL_StrCmpA(iter->word, pWord);
 #endif
-			if (dir == 0)
+			if (dir == 0) {
 				return;
+			}
 			dir = dir < 0;
-			if (iter->link[dir] == NULL)
+			if (iter->link[dir] == NULL) {
 				break;
+			}
 			iter = iter->link[dir];
 		}
 
@@ -378,15 +376,17 @@ void WordList_AddWord(struct WordList *pWList, LPCSTR pWord, int len)
 		// walk back and rebalance
 		while (--top >= 0) {
 			// which child?
-			if (top != 0)
+			if (top != 0) {
 				dir = path[top - 1]->right == path[top];
+			}
 			aa_tree_skew(path[top]);
 			aa_tree_split(path[top]);
 			// fix the parent
-			if (top != 0)
+			if (top != 0) {
 				path[top - 1]->link[dir] = path[top];
-			else
+			} else {
 				root = path[top];
+			}
 		}
 	}
 
@@ -401,8 +401,7 @@ void WordList_AddWord(struct WordList *pWList, LPCSTR pWord, int len)
 	}
 }
 
-void WordList_Free(struct WordList *pWList)
-{
+void WordList_Free(struct WordList *pWList) {
 #if NP2_AUTOC_USE_NODE_CACHE || NP2_AUTOC_USE_BUF
 	int i;
 #endif
@@ -449,12 +448,11 @@ void WordList_Free(struct WordList *pWList)
 #endif
 }
 
-void WordList_GetList(struct WordList *pWList, char* *pList)
-{
+void WordList_GetList(struct WordList *pWList, char * *pList) {
 	struct WordNode *root = pWList->pListHead;
-	struct WordNode* path[NP2_TREE_HEIGHT_LIMIT] = {NULL};
+	struct WordNode *path[NP2_TREE_HEIGHT_LIMIT] = {NULL};
 	int top = 0;
-	char* buf;
+	char *buf;
 	*pList = NP2HeapAlloc(pWList->nTotalLen + 1);// additional separator
 	buf = *pList;
 
@@ -520,18 +518,19 @@ struct WordList *WordList_Alloc(LPCSTR pRoot, int iRootLen, BOOL bIgnoreCase) {
 
 __forceinline BOOL WordList_StartsWith(struct WordList *pWList, LPCSTR pWord) {
 #if NP2_AUTOC_USE_STRING_ORDER
-	if (pWList->iStartLen > NP2_AUTOC_ORDER_LENGTH)
+	if (pWList->iStartLen > NP2_AUTOC_ORDER_LENGTH) {
 		return pWList->WL_StrCmpNA(pWList->pWordStart, pWord, pWList->iStartLen) == 0;
-	if (pWList->orderStart != pWList->WL_OrderFunc(pWord, pWList->iStartLen))
+	}
+	if (pWList->orderStart != pWList->WL_OrderFunc(pWord, pWList->iStartLen)) {
 		return FALSE;
+	}
 	return TRUE;
 #else
 	return pWList->WL_StrCmpNA(pWList->pWordStart, pWord, pWList->iStartLen) == 0;
 #endif
 }
 
-void WordList_AddList(struct WordList *pWList, LPCSTR pList)
-{
+void WordList_AddList(struct WordList *pWList, LPCSTR pList) {
 	char *word = pWList->wordBuf;
 	int iStartLen = pWList->iStartLen;
 	int len = 0;

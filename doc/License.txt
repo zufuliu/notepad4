@@ -1,5 +1,5 @@
-Notepad2 Copyright © 2004-2011 Florian Balmer
-Notepad2-mod Copyright © 2010-2014 All contributors, see Readme-mod.txt
+Notepad2 Copyright Â© 2004-2011 Florian Balmer
+Notepad2-mod Copyright Â© 2010-2014 All contributors, see Readme-mod.txt
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without

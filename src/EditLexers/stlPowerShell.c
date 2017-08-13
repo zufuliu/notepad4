@@ -4,7 +4,7 @@
 // https://en.wikipedia.org/wiki/PowerShell
 // https://msdn.microsoft.com/en-us/powershell/mt173057.aspx
 
-static KEYWORDLIST Keywords_PS1 = {
+static KEYWORDLIST Keywords_PS1 = {{
 "begin break catch continue data do dynamicparam else elseif end exit filter finally for foreach "
 "from function if in local param private process return switch throw trap try until where while",
 "add-computer add-content add-history add-member add-pssnapin add-type checkpoint-computer "
@@ -59,21 +59,21 @@ static KEYWORDLIST Keywords_PS1 = {
 "", "", "", "", ""
 
 #if NUMKEYWORD == 16
-,"","","","","","",""
+, "", "", "", "", "", "", ""
 #endif
-};
+}};
 
 EDITLEXER lexPS1 = { SCLEX_POWERSHELL, NP2LEX_PS1, L"PowerShell Script", L"ps1; psc1; psd1; psm1", L"", &Keywords_PS1,
 {
 	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
 	//{ SCE_POWERSHELL_DEFAULT, L"Default", L"", L"" },
-	{ MULTI_STYLE(SCE_POWERSHELL_COMMENT,SCE_POWERSHELL_COMMENTSTREAM,0,0), NP2STYLE_Comment, L"Comment", L"fore:#008000", L"" },
+	{ MULTI_STYLE(SCE_POWERSHELL_COMMENT, SCE_POWERSHELL_COMMENTSTREAM, 0, 0), NP2STYLE_Comment, L"Comment", L"fore:#008000", L"" },
 	{ SCE_POWERSHELL_KEYWORD, NP2STYLE_Keyword, L"Keyword", L"bold; fore:#FF8000", L"" },
-	{ MULTI_STYLE(SCE_POWERSHELL_STRING,SCE_POWERSHELL_CHARACTER,0,0), NP2STYLE_String, L"String", L"fore:#008000", L"" },
+	{ MULTI_STYLE(SCE_POWERSHELL_STRING, SCE_POWERSHELL_CHARACTER, 0, 0), NP2STYLE_String, L"String", L"fore:#008000", L"" },
 	{ SCE_POWERSHELL_NUMBER, NP2STYLE_Number, L"Number", L"fore:#FF0000", L"" },
 	{ SCE_POWERSHELL_OPERATOR, NP2STYLE_Operator, L"Operator", L"fore:#B000B0", L"" },
 	{ SCE_POWERSHELL_VARIABLE, NP2STYLE_Variable, L"Variable", L"fore:#003CE6", L"" },
-	{ MULTI_STYLE(SCE_POWERSHELL_CMDLET,SCE_POWERSHELL_FUNCTION,0,0), 63481, L"Cmdlet", L"fore:#804000; back:#FFF1A8", L"" },
+	{ MULTI_STYLE(SCE_POWERSHELL_CMDLET, SCE_POWERSHELL_FUNCTION, 0, 0), 63481, L"Cmdlet", L"fore:#804000; back:#FFF1A8", L"" },
 	{ SCE_POWERSHELL_ALIAS, 63482, L"Alias", L"bold; fore:#0080C0", L"" },
 	{ -1, 00000, L"", L"", L"" }
 }

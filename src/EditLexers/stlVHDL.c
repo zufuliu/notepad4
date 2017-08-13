@@ -1,7 +1,7 @@
 #include "EditLexer.h"
 #include "EditStyle.h"
 
-static KEYWORDLIST Keywords_VHDL = {
+static KEYWORDLIST Keywords_VHDL = {{
 "access after alias all architecture array assert attribute begin block body buffer bus case component "
 "configuration constant disconnect downto else elsif end entity exit file for function generate generic "
 "group guarded if impure in inertial inout is label library linkage literal loop map new next null of "
@@ -34,16 +34,16 @@ static KEYWORDLIST Keywords_VHDL = {
 "architecture begin case component else elsif end entity generate loop package process record then procedure function when"
 
 #if NUMKEYWORD == 16
-,"","","","","","",""
+, "", "", "", "", "", "", ""
 #endif
-};
+}};
 
 EDITLEXER lexVHDL = { SCLEX_VHDL, NP2LEX_VHDL, L"VHDL Source", L"vhd; vhdl", L"", &Keywords_VHDL,
 {
 	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
 	// { SCE_VHDL_DEFAULT, L"Default", L"", L"" },
 	{ SCE_VHDL_KEYWORD, NP2STYLE_Keyword, L"Keyword", L"fore:#0000FF", L"" },
-	{ MULTI_STYLE(SCE_VHDL_COMMENT,SCE_VHDL_COMMENTLINEBANG,SCE_VHDL_BLOCK_COMMENT,0), NP2STYLE_Comment, L"Comment", L"fore:#008000", L"" },
+	{ MULTI_STYLE(SCE_VHDL_COMMENT, SCE_VHDL_COMMENTLINEBANG, SCE_VHDL_BLOCK_COMMENT, 0), NP2STYLE_Comment, L"Comment", L"fore:#008000", L"" },
 	{ SCE_VHDL_STRING, NP2STYLE_String, L"String", L"fore:#008000", L"" },
 	{ SCE_VHDL_NUMBER, NP2STYLE_Number, L"Number", L"fore:#FF0000", L"" },
 	{ SCE_VHDL_OPERATOR, NP2STYLE_Operator, L"Operator", L"fore:#B000B0", L"" },

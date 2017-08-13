@@ -3,7 +3,7 @@
 
 // http://llvm.org/docs/LangRef.html
 
-static KEYWORDLIST Keywords_LLVM = {
+static KEYWORDLIST Keywords_LLVM = {{
 "define declare type alias comdat "
 "global constant "
 "prefix prologue attributes module asm target datalayout triple uselistorder uselistorder_bb section "
@@ -77,7 +77,7 @@ static KEYWORDLIST Keywords_LLVM = {
 , // auto complete
 ""
 #endif
-};
+}};
 
 EDITLEXER lexLLVM = { SCLEX_LLVM, NP2LEX_LLVM, L"LLVM IR", L"ll", L"", &Keywords_LLVM,
 {
@@ -92,8 +92,8 @@ EDITLEXER lexLLVM = { SCLEX_LLVM, NP2LEX_LLVM, L"LLVM IR", L"ll", L"", &Keywords
 	{ SCE_C_IDENTIFIER, NP2STYLE_Variable, L"Variable", L"fore:#808000", L"" },
 	{ SCE_C_PREPROCESSOR, NP2STYLE_Function, L"Function", L"fore:#A46000", L"" },
 	{ SCE_C_CLASS, NP2STYLE_Type, L"Type", L"fore:#B000B0", L"" },
-	{ MULTI_STYLE(SCE_C_COMMENT,SCE_C_COMMENTLINE,0,0), NP2STYLE_Comment, L"Comment", L"fore:#008000", L"" },
-	{ MULTI_STYLE(SCE_C_STRING,SCE_C_CHARACTER,0,0), NP2STYLE_String, L"String", L"fore:#008000", L"" },
+	{ MULTI_STYLE(SCE_C_COMMENT, SCE_C_COMMENTLINE, 0, 0), NP2STYLE_Comment, L"Comment", L"fore:#008000", L"" },
+	{ MULTI_STYLE(SCE_C_STRING, SCE_C_CHARACTER, 0, 0), NP2STYLE_String, L"String", L"fore:#008000", L"" },
 	{ SCE_C_LABEL, NP2STYLE_Label, L"Label", L"fore:#000000; back:#FFC040", L""},
 	{ SCE_C_NUMBER, NP2STYLE_Number, L"Number", L"fore:#FF0000", L"" },
 	{ SCE_C_OPERATOR, NP2STYLE_Operator, L"Operator", L"fore:#B000B0", L"" },

@@ -18,8 +18,10 @@
 *
 ******************************************************************************/
 
-class FAR CDropSource : public IDropSource
-{
+#ifndef METAPATH_DROPSOURCE_H_
+#define METAPATH_DROPSOURCE_H_
+
+class FAR CDropSource : public IDropSource {
 public:
 	CDropSource();
 	virtual ~CDropSource() {}
@@ -32,9 +34,11 @@ public:
 	/* IDropSource methods */
 	STDMETHOD(QueryContinueDrag)(BOOL fEscapePressed, DWORD grfKeyState);
 	STDMETHOD(GiveFeedback)(DWORD dwEffect);
+
 private:
 	ULONG m_refs;
 };
 
+#endif // METAPATH_DROPSOURCE_H_
 
 // End of Dropsource.h

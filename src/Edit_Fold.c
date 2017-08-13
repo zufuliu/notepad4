@@ -14,8 +14,7 @@ typedef enum {
 
 UINT stateToggleFoldLevel = 0;
 
-UINT Style_GetDefaultFoldState()
-{
+UINT Style_GetDefaultFoldState(void) {
 	switch (pLexCurrent->rid) {
 	case NP2LEX_DEFAULT:
 	case NP2LEX_ANSI:
@@ -40,8 +39,7 @@ UINT Style_GetDefaultFoldState()
 	return (1 << 1) | (1 << 2);
 }
 
-BOOL FoldToggleNode(int line, FOLD_ACTION action)
-{
+BOOL FoldToggleNode(int line, FOLD_ACTION action) {
 	BOOL fExpanded = SciCall_GetFoldExpanded(line);
 
 	if ((action == FOLD_ACTION_FOLD && fExpanded) || (action == FOLD_ACTION_EXPAND && !fExpanded)) {
@@ -52,8 +50,7 @@ BOOL FoldToggleNode(int line, FOLD_ACTION action)
 	return FALSE;
 }
 
-void FoldToggleAll(FOLD_ACTION action)
-{
+void FoldToggleAll(FOLD_ACTION action) {
 	BOOL fToggled = FALSE;
 	int lineCount = SciCall_GetLineCount();
 	int line;
@@ -90,8 +87,7 @@ void FoldToggleAll(FOLD_ACTION action)
 	}
 }
 
-void FoldToggleLevel(int lev, FOLD_ACTION action)
-{
+void FoldToggleLevel(int lev, FOLD_ACTION action) {
 	BOOL fToggled = FALSE;
 	int lineCount = SciCall_GetLineCount();
 	int line;
@@ -126,8 +122,7 @@ void FoldToggleLevel(int lev, FOLD_ACTION action)
 	}
 }
 
-void FoldToggleDefault(FOLD_ACTION action)
-{
+void FoldToggleDefault(FOLD_ACTION action) {
 	UINT state;
 	BOOL fToggled = FALSE;
 	int lineCount;
@@ -135,9 +130,13 @@ void FoldToggleDefault(FOLD_ACTION action)
 	stateToggleFoldLevel = 0;
 
 	state = Style_GetDefaultFoldState();
-	if (state == 0)		return;
+	if (state == 0) {
+		return;
+	}
 	lineCount = SciCall_GetLineCount();
-	if (lineCount < 2)	return;
+	if (lineCount < 2)	{
+		return;
+	}
 
 	for (line = 0; line < lineCount; ++line) {
 		int level = SciCall_GetFoldLevel(line);
@@ -170,8 +169,7 @@ void FoldToggleDefault(FOLD_ACTION action)
 	}
 }
 
-void FoldPerformAction(int ln, int mode, FOLD_ACTION action)
-{
+void FoldPerformAction(int ln, int mode, FOLD_ACTION action) {
 	if (action == FOLD_ACTION_SNIFF) {
 		action = SciCall_GetFoldExpanded(ln) ? FOLD_ACTION_FOLD : FOLD_ACTION_EXPAND;
 	}
@@ -206,8 +204,7 @@ void FoldPerformAction(int ln, int mode, FOLD_ACTION action)
 	}
 }
 
-void FoldClick(int ln, int mode)
-{
+void FoldClick(int ln, int mode) {
 	static struct {
 		int ln;
 		int mode;
@@ -242,8 +239,7 @@ void FoldClick(int ln, int mode)
 	}
 }
 
-void FoldAltArrow(int key, int mode)
-{
+void FoldAltArrow(int key, int mode) {
 	// Because Alt-Shift is already in use (and because the sibling fold feature
 	// is not as useful from the keyboard), only the Ctrl modifier is supported
 

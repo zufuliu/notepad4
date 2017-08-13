@@ -3,7 +3,7 @@
 
 // https://en.wikibooks.org/wiki/Windows_Batch_Scripting
 
-static KEYWORDLIST Keywords_Batch = {
+static KEYWORDLIST Keywords_Batch = {{
 "defined do not else for goto if in "
 "assoc break call cd chdir cls color copy date del dir echo echo. endlocal erase exist exit ftype md mkdir move path pause popd prompt pushd rd rem ren rename rmdir set setlocal shift sort start time title tree type ver verify vol "
 "errorlevel nul disableextensions enableextensions enabledelayedexpansion "
@@ -22,9 +22,9 @@ static KEYWORDLIST Keywords_Batch = {
 , "dp0", "", "", "", "", "", ""
 
 #if NUMKEYWORD == 16
-,"","","","","","",""
+, "", "", "", "", "", "", ""
 #endif
-};
+}};
 
 EDITLEXER lexBatch = { SCLEX_BATCH, NP2LEX_BATCH, L"Batch File", L"bat; cmd", L"", &Keywords_Batch,
 {
@@ -33,7 +33,7 @@ EDITLEXER lexBatch = { SCLEX_BATCH, NP2LEX_BATCH, L"Batch File", L"bat; cmd", L"
 	{ SCE_BAT_COMMENT, NP2STYLE_Comment, L"Comment", L"fore:#008000", L"" },
 	{ SCE_BAT_WORD, NP2STYLE_Keyword, L"Keyword", L"bold; fore:#FF8000", L"" },
 	{ SCE_BAT_COMMAND, NP2STYLE_Command, L"Command", L"bold", L"" },
-	{ MULTI_STYLE(SCE_BAT_STRINGDQ,SCE_BAT_STRINGSQ,SCE_BAT_STRINGBT,0), NP2STYLE_String, L"String", L"fore:#008080", L"" },
+	{ MULTI_STYLE(SCE_BAT_STRINGDQ, SCE_BAT_STRINGSQ, SCE_BAT_STRINGBT, 0), NP2STYLE_String, L"String", L"fore:#008080", L"" },
 	{ SCE_BAT_VARIABLE, NP2STYLE_Variable, L"Variable", L"fore:#003CE6; back:#FFF1A8", L"" },
 	{ SCE_BAT_OPERATOR, NP2STYLE_Operator, L"Operator", L"fore:#B000B0", L"" },
 	{ SCE_BAT_LABEL, NP2STYLE_Label, L"Label", L"fore:#C80000; back:#F4F4F4", L"" },

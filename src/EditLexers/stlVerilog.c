@@ -1,7 +1,7 @@
 #include "EditLexer.h"
 #include "EditStyle.h"
 
-static KEYWORDLIST Keywords_Verilog = {
+static KEYWORDLIST Keywords_Verilog = {{
 "always and assign attribute begin buf bufif0 bufif1 case casex casez cmos deassign default defparam disable edge "
 " else end endattribute endcase endfunction endmodule endprimitive endspecify endtable endtask event for force "
 " forever fork function highz0 highz1 if ifnone initial inout input integer join medium module large localparam "
@@ -17,9 +17,9 @@ static KEYWORDLIST Keywords_Verilog = {
 "", "", "", "", "", "", ""
 
 #if NUMKEYWORD == 16
-,"","","","","","",""
+, "", "", "", "", "", "", ""
 #endif
-};
+}};
 
 EDITLEXER lexVerilog = { SCLEX_VERILOG, NP2LEX_VERILOG, L"Verilog HDL Source", L"v; vl", L"", &Keywords_Verilog,
 {
@@ -27,7 +27,7 @@ EDITLEXER lexVerilog = { SCLEX_VERILOG, NP2LEX_VERILOG, L"Verilog HDL Source", L
 	// { SCE_V_DEFAULT, L"Default", L"", L"" },
 	{ SCE_V_WORD, NP2STYLE_Keyword, L"Keyword", L"fore:#0000FF", L"" },
 	{ SCE_V_WORD2, 63586, L"System Tasks and Functions", L"fore:#0080FF", L"" },
-	{ MULTI_STYLE(SCE_V_COMMENT,SCE_V_COMMENTLINE,SCE_V_COMMENTLINEBANG,0), NP2STYLE_Comment, L"Comment", L"fore:#008000", L"" },
+	{ MULTI_STYLE(SCE_V_COMMENT, SCE_V_COMMENTLINE, SCE_V_COMMENTLINEBANG, 0), NP2STYLE_Comment, L"Comment", L"fore:#008000", L"" },
 	//{ SCE_V_COMMENTLINE, 64302, L"Comment Line", L"fore:#008000", L"" },
 	//{ SCE_V_COMMENTLINEBANG, 64303, L"Comment Line Bang", L"fore:#008000", L"" },
 	{ SCE_V_STRING, NP2STYLE_String, L"String", L"fore:#008000", L"" },

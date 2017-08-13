@@ -1,5 +1,5 @@
-#ifndef _NOTEPAD2_EditStyle_H_
-#define _NOTEPAD2_EditStyle_H_
+#ifndef NOTEPAD2_EDITSTYLE_H_
+#define NOTEPAD2_EDITSTYLE_H_
 
 //#include "EditStyle.h"
 // MULTI_STYLE
@@ -32,7 +32,7 @@
 #define NP2STYLE_XMLIdentifier		63149
 #define NP2STYLE_XMLSGML			63150
 #define NP2STYLE_XMLCDATA			63151
-#define NP2STYLE_JSONKey			63152		
+#define NP2STYLE_JSONKey			63152
 //63161-63300 Web
 //63301-63320 CSS
 #define NP2STYLE_Class				63320

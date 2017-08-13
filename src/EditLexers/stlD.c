@@ -3,7 +3,7 @@
 
 // http://dlang.org/
 
-static KEYWORDLIST Keywords_D = {
+static KEYWORDLIST Keywords_D = {{
 "alias align asm assert body break case cast catch continue debug default delete "
 "do else export false finally for foreach foreach_reverse goto if import invariant "
 "is macro mixin new null package pragma private protected public ref return super "
@@ -54,13 +54,13 @@ static KEYWORDLIST Keywords_D = {
 "AL AH AX EAX BL BH BX EBX CL CH CX ECX DL DH DX EDX BP EBP SP ESP DI EDI SI ESI ES CS SS DS GS FS "
 "CR0 CR2 CR3 CR4 DR0 DR1 DR2 DR3 DR6 DR7 TR3 TR4 TR5 TR6 TR7 ST ST0 ST1 ST2 ST3 ST4 ST5 ST6 ST7 "
 "MM0 MM1 MM2 MM3 MM4 MM5 MM6 MM7 XMM0 XMM1 XMM2 XMM3 XMM4 XMM5 XMM6 XMM7 "
-,"","",
+, "", "",
 "for^() if^() switch^() while^() else^if^() foreach^() foreach_reverse^() with^() "
 " synchronized^() catch^() scope^() version^() mixin^() "
 #endif
-};
+}};
 
-EDITLEXER lexD= { SCLEX_CPP, NP2LEX_D, L"D Source", L"d; di", L"", &Keywords_D,
+EDITLEXER lexD = { SCLEX_CPP, NP2LEX_D, L"D Source", L"d; di", L"", &Keywords_D,
 {
 	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
 	//{ SCE_C_DEFAULT, L"Default", L"", L"" },
@@ -76,11 +76,11 @@ EDITLEXER lexD= { SCLEX_CPP, NP2LEX_D, L"D Source", L"d; di", L"", &Keywords_D,
 	{ SCE_C_FUNCTION, NP2STYLE_Function, L"Function", L"fore:#A46000", L"" },
 	{ SCE_C_ENUMERATION, NP2STYLE_Enumeration, L"Enumeration", L"fore:#FF8000", L""},
 	{ SCE_C_CONSTANT, NP2STYLE_Constant, L"Constant", L"bold; fore:#B000B0", L""},
-	{ MULTI_STYLE(SCE_C_COMMENT,SCE_C_COMMENTLINE,0,0), NP2STYLE_Comment, L"Comment", L"fore:#008000", L"" },
+	{ MULTI_STYLE(SCE_C_COMMENT, SCE_C_COMMENTLINE, 0, 0), NP2STYLE_Comment, L"Comment", L"fore:#008000", L"" },
 	{ SCE_C_COMMENTDOC_TAG, NP2STYLE_DocCommentTag, L"Doc Comment Tag", L"bold; fore:#008000F", L"" },
-	{ MULTI_STYLE(SCE_C_COMMENTDOC,SCE_C_COMMENTLINEDOC,SCE_C_COMMENTDOC_TAG_XML,0), NP2STYLE_DocComment, L"Doc Comment", L"fore:#008000", L"" },
-	{ MULTI_STYLE(SCE_C_STRING,SCE_C_CHARACTER,SCE_C_STRINGEOL,0), NP2STYLE_String, L"String", L"fore:#008000", L"" },
-	{ MULTI_STYLE(SCE_C_VERBATIM,SCE_C_DSTRINGB,0,0), NP2STYLE_VerbatimString, L"Verbatim String", L"fore:#008080", L"" },
+	{ MULTI_STYLE(SCE_C_COMMENTDOC, SCE_C_COMMENTLINEDOC, SCE_C_COMMENTDOC_TAG_XML, 0), NP2STYLE_DocComment, L"Doc Comment", L"fore:#008000", L"" },
+	{ MULTI_STYLE(SCE_C_STRING, SCE_C_CHARACTER, SCE_C_STRINGEOL, 0), NP2STYLE_String, L"String", L"fore:#008000", L"" },
+	{ MULTI_STYLE(SCE_C_VERBATIM, SCE_C_DSTRINGB, 0, 0), NP2STYLE_VerbatimString, L"Verbatim String", L"fore:#008080", L"" },
 	{ SCE_C_DSTRINGX, NP2STYLE_HexString, L"Hex String", L"fore:#FF0080", L""},
 	{ SCE_C_DSTRINGQ, NP2STYLE_DelimitedString, L"Delimited String", L"fore:#E24000", L""},
 	{ SCE_C_DSTRINGT, NP2STYLE_TokenString, L"Token String", L"fore:#A46000", L""},

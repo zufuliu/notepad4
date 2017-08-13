@@ -3,7 +3,7 @@
 
 // https://www.gnu.org/software/bash/manual/
 
-static KEYWORDLIST Keywords_Bash = {
+static KEYWORDLIST Keywords_Bash = {{
 // build-in
 "alias true false yes no if then fi elif else end endif for foreach function functions in return "
 " case esac eval ex exec do done du echo EOF "
@@ -27,15 +27,15 @@ static KEYWORDLIST Keywords_Bash = {
 , "", "", "", "", "", "", ""
 
 #if NUMKEYWORD == 16
-,"","","","","","",""
+, "", "", "", "", "", "", ""
 #endif
-};
+}};
 
 EDITLEXER lexBash = { SCLEX_BASH, NP2LEX_BASH, L"Shell Script", L"sh; m4; in; po", L"", &Keywords_Bash,
 {
 	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
 	//{ SCE_SH_ERROR, 63531, L"Error", L"", L"" },
-	{ MULTI_STYLE(SCE_SH_COMMENTLINE,0,0,0), NP2STYLE_Comment, L"Comment", L"fore:#008000", L"" },
+	{ MULTI_STYLE(SCE_SH_COMMENTLINE, 0, 0, 0), NP2STYLE_Comment, L"Comment", L"fore:#008000", L"" },
 	{ SCE_SH_WORD, NP2STYLE_Keyword, L"Keyword", L"fore:#0000FF", L"" },
 	{ SCE_SH_STRING, 63532, L"String double quoted", L"fore:#008080", L"" },
 	{ SCE_SH_CHARACTER, 63533, L"String single quoted", L"fore:#800080", L"" },

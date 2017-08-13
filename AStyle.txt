@@ -1,0 +1,21 @@
+http://astyle.sourceforge.net/
+
+A2		--style=java
+A3		--style=kr
+T		--indent=force-tab
+w		--indent-preproc-define
+p		--pad-oper
+H		--pad-header
+U		--unpad-paren
+j		--add-brackets
+k3		--align-pointer=name
+M		--max-continuation-indent=40
+-xn		--attach-namespaces
+-xk		--attach-extern-c
+-xV		--attach-closing-while
+R		--recursive
+
+astyle -A2 -TwpHUj -k3 -M -xn -xc -xV -R *.c *.h *.cpp *.cxx *.hpp
+
+astyle -A3 -TwpHUj -k3 -M -xn -xc -xV -R *.c *.h *.cpp *.cxx *.hpp
+

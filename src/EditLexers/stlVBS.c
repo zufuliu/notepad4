@@ -4,7 +4,7 @@
 // http://msdn.microsoft.com/library/d1wf56tt.aspx
 // http://msdn.microsoft.com/en-us/library/ydz4cfk3.aspx
 
-static KEYWORDLIST Keywords_VBS = {
+static KEYWORDLIST Keywords_VBS = {{
 "Alias And As Attribute Array Begin ByRef ByVal Call Case Class Compare Const Continue "
 "Declare Dim Do Each Else ElseIf Empty End Enum Eqv Erase Error Event Exit "
 "Explicit False For Friend Function Get Global GoSub Goto If Imp Implement In Is Let Lib "
@@ -50,9 +50,9 @@ static KEYWORDLIST Keywords_VBS = {
 "WScript "
 
 #if NUMKEYWORD == 16
-,"","","","","","",""
+, "", "", "", "", "", "", ""
 #endif
-};
+}};
 
 
 EDITLEXER lexVBS = { SCLEX_VBSCRIPT, NP2LEX_VBS, L"VBScript", L"vbs; dsm", L"", &Keywords_VBS,
@@ -63,7 +63,7 @@ EDITLEXER lexVBS = { SCLEX_VBSCRIPT, NP2LEX_VBS, L"VBScript", L"vbs; dsm", L"", 
 	{ SCE_B_KEYWORD2, NP2STYLE_TypeKeyword, L"Type Keyword", L"fore:#0000FF", L"" },
 	{ SCE_B_CONSTANT, NP2STYLE_Constant, L"Constant", L"bold; fore:#B000B0", L""},
 	{ SCE_B_COMMENT, NP2STYLE_Comment, L"Comment", L"fore:#008000", L"" },
-	{ MULTI_STYLE(SCE_B_STRING,SCE_B_STRINGEOL,0,0), NP2STYLE_String, L"String", L"fore:#008000", L"" },
+	{ MULTI_STYLE(SCE_B_STRING, SCE_B_STRINGEOL, 0, 0), NP2STYLE_String, L"String", L"fore:#008000", L"" },
 	{ SCE_B_LABEL, NP2STYLE_Label, L"Label", L"fore:#000000; back:#FFC040", L""},
 	{ SCE_B_NUMBER, NP2STYLE_Number, L"Number", L"fore:#FF0000", L"" },
 	{ SCE_B_OPERATOR, NP2STYLE_Operator, L"Operator", L"fore:#B000B0", L"" },

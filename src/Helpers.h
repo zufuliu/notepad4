@@ -18,20 +18,22 @@
 *
 ******************************************************************************/
 
-#ifndef _NOTEPAD2_HELPERS_H_
-#define _NOTEPAD2_HELPERS_H_
+#ifndef NOTEPAD2_HELPERS_H_
+#define NOTEPAD2_HELPERS_H_
 
 #define COUNTOF(ar)		(sizeof(ar)/sizeof(ar[0]))
 #define CSTRLEN(s)		(COUNTOF(s)-1)
 
 #ifdef NDEBUG
 #if defined(_MSC_VER) && _MSC_VER < 1600
-static __inline void DLog(const char* fmt, ...) {fmt;}
+static __inline void DLog(const char *fmt, ...) {
+	fmt;
+}
 #else
 #define DLog(fmt, ...)
 #endif
 #else
-void DLog(const char* fmt, ...);
+void DLog(const char *fmt, ...);
 #endif
 
 extern HINSTANCE g_hInstance;
@@ -56,8 +58,7 @@ extern WCHAR szIniFile[MAX_PATH];
 	WritePrivateProfileString(lpSection, lpName, lpString, szIniFile)
 #define IniDeleteSection(lpSection) \
 	WritePrivateProfileSection(lpSection, NULL, szIniFile)
-static __inline BOOL IniSetInt(LPCWSTR lpSection, LPCWSTR lpName, int i)
-{
+static __inline BOOL IniSetInt(LPCWSTR lpSection, LPCWSTR lpName, int i) {
 	WCHAR tch[32];
 	wsprintf(tch, L"%i", i);
 	return IniSetString(lpSection, lpName, tch);
@@ -71,35 +72,30 @@ int		IniSectionGetString(LPCWSTR lpCachedIniSection, LPCWSTR lpName, LPCWSTR lpD
 int		IniSectionGetInt(LPCWSTR lpCachedIniSection, LPCWSTR lpName, int iDefault);
 BOOL	IniSectionGetBool(LPCWSTR lpCachedIniSection, LPCWSTR lpName, BOOL bDefault);
 BOOL	IniSectionSetString(LPWSTR lpCachedIniSection, LPCWSTR lpName, LPCWSTR lpString);
-static __inline BOOL IniSectionSetInt(LPWSTR lpCachedIniSection, LPCWSTR lpName, int i)
-{
+static __inline BOOL IniSectionSetInt(LPWSTR lpCachedIniSection, LPCWSTR lpName, int i) {
 	WCHAR tch[32];
 	wsprintf(tch, L"%i", i);
 	return IniSectionSetString(lpCachedIniSection, lpName, tch);
 }
-static __inline BOOL IniSectionSetBool(LPWSTR lpCachedIniSection, LPCWSTR lpName, BOOL b)
-{
-	return IniSectionSetString(lpCachedIniSection, lpName, (b? L"1" : L"0"));
+static __inline BOOL IniSectionSetBool(LPWSTR lpCachedIniSection, LPCWSTR lpName, BOOL b) {
+	return IniSectionSetString(lpCachedIniSection, lpName, (b ? L"1" : L"0"));
 }
 
 extern HWND hwndEdit;
-static __inline void BeginWaitCursor()
-{
+static __inline void BeginWaitCursor(void) {
 	SendMessage(hwndEdit, SCI_SETCURSOR, (WPARAM)SC_CURSORWAIT, 0);
 }
-static __inline void EndWaitCursor()
-{
+static __inline void EndWaitCursor(void) {
 	POINT pt;
 	SendMessage(hwndEdit, SCI_SETCURSOR, (WPARAM)SC_CURSORNORMAL, 0);
 	GetCursorPos(&pt);
 	SetCursorPos(pt.x, pt.y);
 }
 
-BOOL PrivateIsAppThemed();
+BOOL PrivateIsAppThemed(void);
 HRESULT PrivateSetCurrentProcessExplicitAppUserModelID(PCWSTR AppID);
-BOOL IsElevated();
-//BOOL SetExplorerTheme(HWND);
-
+BOOL IsElevated(void);
+//BOOL SetExplorerTheme(HWND hwnd);
 
 BOOL BitmapMergeAlpha(HBITMAP hbmp, COLORREF crDest);
 BOOL BitmapAlphaBlend(HBITMAP hbmp, COLORREF crDest, BYTE alpha);
@@ -125,7 +121,6 @@ void MakeBitmapButton(HWND hwnd, int nCtlId, HINSTANCE hInstance, UINT uBmpId);
 void MakeColorPickButton(HWND hwnd, int nCtlId, HINSTANCE hInstance, COLORREF crColor);
 void DeleteBitmapButton(HWND hwnd, int nCtlId);
 
-
 #define StatusSetSimple(hwnd, b) SendMessage(hwnd, SB_SIMPLE, (WPARAM)b, 0)
 BOOL StatusSetText(HWND hwnd, UINT nPart, LPCWSTR lpszText);
 BOOL StatusSetTextID(HWND hwnd, UINT nPart, UINT uID);
@@ -141,25 +136,21 @@ LRESULT SendWMSize(HWND hwnd);
 
 BOOL IsCmdEnabled(HWND hwnd, UINT uId);
 
-
 #define GetString(id, pb, cb) LoadString(g_hInstance, id, pb, cb)
 
 #define StrEnd(pStart) (pStart + lstrlen(pStart))
 
 int FormatString(LPWSTR lpOutput, int nOutput, UINT uIdFormat, ...);
 
-
 void PathRelativeToApp(LPWSTR lpszSrc, LPWSTR lpszDest, int cchDest,
 					   BOOL bSrcIsFile, BOOL bUnexpandEnv, BOOL bUnexpandMyDocs);
 void PathAbsoluteFromApp(LPWSTR lpszSrc, LPWSTR lpszDest, int cchDest, BOOL bExpandEnv);
-
 
 BOOL PathIsLnkFile(LPCWSTR pszPath);
 BOOL PathGetLnkPath(LPCWSTR pszLnkFile, LPWSTR pszResPath, int cchResPath);
 BOOL PathIsLnkToDirectory(LPCWSTR pszPath, LPWSTR pszResPath, int cchResPath);
 BOOL PathCreateDeskLnk(LPCWSTR pszDocument);
 BOOL PathCreateFavLnk(LPCWSTR pszName, LPCWSTR pszTarget, LPCWSTR pszDir);
-
 
 BOOL StrLTrim(LPWSTR pszSource, LPCWSTR pszTrimChars);
 BOOL TrimString(LPWSTR lpString);
@@ -170,26 +161,20 @@ void PrepareFilterStr(LPWSTR lpFilter);
 void	StrTab2Space(LPWSTR lpsz);
 void	PathFixBackslashes(LPWSTR lpsz);
 
-
 void	ExpandEnvironmentStringsEx(LPWSTR lpSrc, DWORD dwSrc);
 void	PathCanonicalizeEx(LPWSTR lpSrc);
 DWORD	GetLongPathNameEx(LPWSTR lpszPath, DWORD cchBuffer);
 DWORD_PTR SHGetFileInfo2(LPCWSTR pszPath, DWORD dwFileAttributes,
-						SHFILEINFO *psfi, UINT cbFileInfo, UINT uFlags);
-
+						 SHFILEINFO *psfi, UINT cbFileInfo, UINT uFlags);
 
 int		FormatNumberStr(LPWSTR lpNumberStr);
 BOOL	SetDlgItemIntEx(HWND hwnd, int nIdItem, UINT uValue);
-
-
 
 UINT	GetDlgItemTextA2W(UINT uCP, HWND hDlg, int nIDDlgItem, LPSTR lpString, int nMaxCount);
 UINT	SetDlgItemTextA2W(UINT uCP, HWND hDlg, int nIDDlgItem, LPSTR lpString);
 LRESULT ComboBox_AddStringA2W(UINT uCP, HWND hwnd, LPCSTR lpString);
 
-
 UINT CodePageFromCharSet(UINT uCharSet);
-
 
 //==== MRU Functions ==========================================================
 #define MRU_MAXITEMS	24
@@ -248,9 +233,9 @@ BOOL AddBackslash(char *pszOut, const char *pszInput);
 
 //==== MinimizeToTray Functions - see comments in Helpers.c ===================
 BOOL GetDoAnimateMinimize(VOID);
-VOID MinimizeWndToTray(HWND hWnd);
-VOID RestoreWndFromTray(HWND hWnd);
+VOID MinimizeWndToTray(HWND hwnd);
+VOID RestoreWndFromTray(HWND hwnd);
 
-#endif // _NOTEPAD2_HELPERS_H_
+#endif // NOTEPAD2_HELPERS_H_
 
 // End of Helpers.h

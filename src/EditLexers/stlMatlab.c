@@ -6,7 +6,7 @@
 // http://www.scilab.org/
 // http://gnuplot.info/
 
-static KEYWORDLIST Keywords_Matlab = {
+static KEYWORDLIST Keywords_Matlab = {{
 "break case catch classdef continue else elseif end for function global if otherwise parfor persistent return spmd switch try while "
 "double single char logical int8 uint8 int16 uin16 int32 uint32 int64 uint64 cell struct function_handle "
 "methods properties events enumeration public protected private mutable immutable internal import "
@@ -23,26 +23,26 @@ static KEYWORDLIST Keywords_Matlab = {
 "assert() deal() disp() display() error() eval() evalc() evalin() fail() feval() find() get() input() length() warning() message() set() size() find() full() sparse() "
 "isa() iscell() iscellstr() ischar() iscolumn() iscom() isdir() isempty() isequal() isfield() isfloat() isfinite() isglobal() ishandle() ishold() isindex() isinf() isinterface() isinteger() isjava() islogical() ismatrix() ismethod() ismember() isnan() isnumeric() isobject() isprop() isreal() isrow() isscalar() issparse() issquare() isstr() isstruct() isvalid() isvector() ",
 "axes figure uicontrol uimenu ",
- "", "", "", ""
+"", "", "", ""
 
 #if NUMKEYWORD == 16
-,"","","","","","",""
+, "", "", "", "", "", "", ""
 #endif
-};
+}};
 
 EDITLEXER lexMatlab = { SCLEX_MATLAB, NP2LEX_MATLAB, L"MATLAB Code", L"m", L"", &Keywords_Matlab,
 {
 	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
-//	{ SCE_MAT_DEFAULT, L"Default", L"", L"" },
+	//	{ SCE_MAT_DEFAULT, L"Default", L"", L"" },
 	{ SCE_MAT_KEYWORD, NP2STYLE_Keyword, L"Keyword", L"fore:#0000FF", L"" },
 	{ SCE_MAT_ATTRIBUTE, NP2STYLE_Attribute, L"Attribte", L"fore:#FF8000", L"" },
-	{ MULTI_STYLE(SCE_MAT_INTERNALCOMMAND,SCE_MAT_COMMAND,0,0), NP2STYLE_Command, L"Command", L"bold; fore:#FF8000", L"" },
-	{ MULTI_STYLE(SCE_MAT_FUNCTION1,SCE_MAT_FUNCTION2,0,0), NP2STYLE_BasicFunction, L"Basic Function", L"fore:#FF0080", L"" },
+	{ MULTI_STYLE(SCE_MAT_INTERNALCOMMAND, SCE_MAT_COMMAND, 0, 0), NP2STYLE_Command, L"Command", L"bold; fore:#FF8000", L"" },
+	{ MULTI_STYLE(SCE_MAT_FUNCTION1, SCE_MAT_FUNCTION2, 0, 0), NP2STYLE_BasicFunction, L"Basic Function", L"fore:#FF0080", L"" },
 	{ SCE_MAT_FUNCTION, NP2STYLE_Function, L"Function", L"fore:#A46000", L"" },
 	{ SCE_MAT_CALLBACK, NP2STYLE_Callback, L"Callback", L"fore:#FF0080", L"" },
-	{ MULTI_STYLE(SCE_MAT_COMMENT,SCE_MAT_COMMENTBLOCK,0,0), NP2STYLE_Comment, L"Comment", L"fore:#008000", L"" },
-	{ MULTI_STYLE(SCE_MAT_STRING,SCE_MAT_DOUBLEQUOTESTRING,0,0), NP2STYLE_String, L"String", L"fore:#008000", L"" },
-	{ MULTI_STYLE(SCE_MAT_NUMBER,SCE_MAT_HEXNUM,0,0), NP2STYLE_Number, L"Number", L"fore:#FF0000", L"" },
+	{ MULTI_STYLE(SCE_MAT_COMMENT, SCE_MAT_COMMENTBLOCK, 0, 0), NP2STYLE_Comment, L"Comment", L"fore:#008000", L"" },
+	{ MULTI_STYLE(SCE_MAT_STRING, SCE_MAT_DOUBLEQUOTESTRING, 0, 0), NP2STYLE_String, L"String", L"fore:#008000", L"" },
+	{ MULTI_STYLE(SCE_MAT_NUMBER, SCE_MAT_HEXNUM, 0, 0), NP2STYLE_Number, L"Number", L"fore:#FF0000", L"" },
 	{ SCE_MAT_OPERATOR, NP2STYLE_Operator, L"Operator", L"fore:#B000B0", L"" },
 	{ -1, 00000, L"", L"", L"" }
 }

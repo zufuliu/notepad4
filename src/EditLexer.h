@@ -1,5 +1,5 @@
-#ifndef _NOTEPAD2_EDITLEXER_H_
-#define _NOTEPAD2_EDITLEXER_H_
+#ifndef NOTEPAD2_EDITLEXER_H_
+#define NOTEPAD2_EDITLEXER_H_
 
 #include <windows.h>
 #include "Scintilla.h"
@@ -42,7 +42,6 @@ typedef struct _editlexer {
 #if defined(_MSC_VER)
 #pragma warning(pop) // C4200, C4201
 #endif
-
 
 // NP2LEX_, rid for EDITLEXERs
 #define NP2LEX_DEFAULT	63000	// SCLEX_NULL		Default Text
@@ -106,7 +105,6 @@ typedef struct _editlexer {
 #define NP2LEX_JULIA	63066	// SCLEX_MATLAB		Julia
 #define NP2LEX_ANSI		63099	// SCLEX_NULL		ANSI
 
-
-#endif // _NOTEPAD2_EDITLEXER_H_
+#endif // NOTEPAD2_EDITLEXER_H_
 
 // end of EditLexer.h

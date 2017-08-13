@@ -17,20 +17,19 @@
 *
 *
 ******************************************************************************/
+
 #include <windows.h>
+#include <shlwapi.h>
 #include <commctrl.h>
 #include <shlobj.h>
 #include <shellapi.h>
-#include <shlwapi.h>
 #include <commdlg.h>
 #include <stdio.h>
-#include <string.h>
-#include "helpers.h"
-#include "dlapi.h"
-#include "dialogs.h"
+#include "Helpers.h"
+#include "Dlapi.h"
+#include "Dialogs.h"
 #include "metapath.h"
 #include "resource.h"
-
 
 /******************************************************************************
 *
@@ -169,8 +168,7 @@ int flagPosParam        = 0;
 //  WinMain()
 //
 //
-int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nCmdShow)
-{
+int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nCmdShow) {
 	MSG    msg;
 	HWND   hwnd;
 	HACCEL hAcc;
@@ -229,14 +227,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInst, LPSTR lpCmdLine, in
 	return (int)(msg.wParam);
 }
 
-
 //=============================================================================
 //
 //  InitApplication()
 //
 //
-BOOL InitApplication(HINSTANCE hInstance)
-{
+BOOL InitApplication(HINSTANCE hInstance) {
 	WNDCLASS wc;
 
 	wc.style         = CS_BYTEALIGNWINDOW;
@@ -253,14 +249,12 @@ BOOL InitApplication(HINSTANCE hInstance)
 	return RegisterClass(&wc);
 }
 
-
 //=============================================================================
 //
 //  InitInstance()
 //
 //
-HWND InitInstance(HINSTANCE hInstance, LPSTR pszCmdLine, int nCmdShow)
-{
+HWND InitInstance(HINSTANCE hInstance, LPSTR pszCmdLine, int nCmdShow) {
 	RECT rc = { wi.x, wi.y, wi.x + wi.cx, wi.y + wi.cy };
 	RECT rc2;
 	MONITORINFO mi;
@@ -347,10 +341,8 @@ HWND InitInstance(HINSTANCE hInstance, LPSTR pszCmdLine, int nCmdShow)
 	if (lpPathArg) {
 		DisplayPath(lpPathArg, IDS_ERR_CMDLINE);
 		GlobalFree(lpPathArg);
-	}
-
-	// Use a startup directory
-	else if (iStartupDir) {
+	} else if (iStartupDir) {
+		// Use a startup directory
 		if (iStartupDir == 1) {
 			WCHAR tch[MAX_PATH];
 			if (IniGetString(L"Settings", L"MRUDirectory", L"", tch, COUNTOF(tch))) {
@@ -361,10 +353,8 @@ HWND InitInstance(HINSTANCE hInstance, LPSTR pszCmdLine, int nCmdShow)
 		} else {
 			DisplayPath(tchFavoritesDir, IDS_ERR_STARTUPDIR);
 		}
-	}
-
-	// Favorites
-	else if (flagGotoFavorites) {
+	} else if (flagGotoFavorites) {
+		// Favorites
 		DisplayPath(tchFavoritesDir, IDS_ERR_FAVORITES);
 	}
 
@@ -376,7 +366,6 @@ HWND InitInstance(HINSTANCE hInstance, LPSTR pszCmdLine, int nCmdShow)
 	return hwndMain;
 }
 
-
 //=============================================================================
 //
 //  MainWndProc()
@@ -384,9 +373,7 @@ HWND InitInstance(HINSTANCE hInstance, LPSTR pszCmdLine, int nCmdShow)
 //  Messages are distributed to the MsgXXX-handlers
 //
 //
-LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
-{
-
+LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
 	static BOOL bShutdownOK;
 
 	switch (umsg) {
@@ -610,7 +597,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 		case SC_RESTORE: {
 			LRESULT lrv = DefWindowProc(hwnd, umsg, wParam, lParam);
 			ShowOwnedPopups(hwnd, TRUE);
-			return(lrv);
+			return (lrv);
 		}
 
 		case SC_ALWAYSONTOP:
@@ -659,9 +646,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 				ShowNotifyIcon(hwnd, FALSE);
 				RestoreWndFromTray(hwnd);
 				ShowOwnedPopups(hwnd, TRUE);
-			}
-
-			else if (iCmd == IDM_TRAY_EXIT) {
+			} else if (iCmd == IDM_TRAY_EXIT) {
 				ShowNotifyIcon(hwnd, FALSE);
 				SendMessage(hwnd, WM_CLOSE, 0, 0);
 			}
@@ -688,14 +673,12 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 	return 0;
 }
 
-
 //=============================================================================
 //
 //  MsgCreate() - Handles WM_CREATE
 //
 //
-LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam)
-{
+LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	HWND hwndTT;
 	TOOLINFO ti;
 
@@ -767,8 +750,7 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam)
 	DragAcceptFiles(hwnd, TRUE);
 	// History
 	History_Init(&mHistory);
-	History_UpdateToolbar(&mHistory, hwndToolbar,
-						  IDT_HISTORY_BACK, IDT_HISTORY_FORWARD);
+	History_UpdateToolbar(&mHistory, hwndToolbar, IDT_HISTORY_BACK, IDT_HISTORY_FORWARD);
 	// ToolTip with Current Directory
 	ZeroMemory(&ti, sizeof(TOOLINFO));
 	ti.cbSize = sizeof(TOOLINFO);
@@ -804,14 +786,12 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam)
 	return 0;
 }
 
-
 //=============================================================================
 //
 //  CreateBars() - Create Toolbar and Statusbar
 //
 //
-void CreateBars(HWND hwnd, HINSTANCE hInstance)
-{
+void CreateBars(HWND hwnd, HINSTANCE hInstance) {
 	REBARINFO rbi;
 	REBARBANDINFO rbBand;
 	RECT rc;
@@ -887,7 +867,7 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance)
 		if (!SearchPath(NULL, tchToolbarBitmapDisabled, NULL, COUNTOF(szTmp), szTmp, NULL)) {
 			lstrcpy(szTmp, tchToolbarBitmapDisabled);
 		}
-		if ((hbmp = LoadImage(NULL, szTmp, IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION | LR_LOADFROMFILE)) == NULL) {
+		if ((hbmp = LoadImage(NULL, szTmp, IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION | LR_LOADFROMFILE)) != NULL) {
 			GetObject(hbmp, sizeof(BITMAP), &bmp);
 			himl = ImageList_Create(bmp.bmWidth / NUMTOOLBITMAPS, bmp.bmHeight, ILC_COLOR32 | ILC_MASK, 0, 0);
 			ImageList_AddMasked(himl, hbmp, CLR_DEFAULT);
@@ -922,20 +902,17 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance)
 	cbIniSection = (int)LocalSize(pIniSection) / sizeof(WCHAR);
 	LoadIniSection(L"Toolbar Labels", pIniSection, cbIniSection);
 
-	for (unsigned i = 0, n = 0; i < COUNTOF(tbbMainWnd); i++) {
+	for (unsigned i = 0, n = 1; i < COUNTOF(tbbMainWnd); i++) {
 		if (tbbMainWnd[i].fsStyle == TBSTYLE_SEP) {
 			continue;
 		}
 
 		wsprintf(tchIndex, L"%02u", n++);
 
-		if (IniSectionGetString(pIniSection, tchIndex, L"", tchDesc, COUNTOF(tchDesc)) &&
-				lstrcmpi(tchDesc, L"(none)") != 0) {
-
+		if (IniSectionGetString(pIniSection, tchIndex, L"", tchDesc, COUNTOF(tchDesc)) && lstrcmpi(tchDesc, L"(none)") != 0) {
 			tbbMainWnd[i].iString = SendMessage(hwndToolbar, TB_ADDSTRING, 0, (LPARAM)tchDesc);
 			tbbMainWnd[i].fsStyle |= BTNS_AUTOSIZE | BTNS_SHOWTEXT;
 		} else if ((n == 5 || n == 8) && lstrcmpi(tchDesc, L"(none)") != 0) {
-
 			GetString(42000 + n, tchDesc, COUNTOF(tchDesc));
 			tbbMainWnd[i].iString = SendMessage(hwndToolbar, TB_ADDSTRING, 0, (LPARAM)tchDesc);
 			tbbMainWnd[i].fsStyle |= BTNS_AUTOSIZE | BTNS_SHOWTEXT;
@@ -949,12 +926,12 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance)
 				SendMessage(hwndToolbar, TB_GETEXTENDEDSTYLE, 0, 0) | TBSTYLE_EX_MIXEDBUTTONS);
 
 	SendMessage(hwndToolbar, TB_ADDBUTTONS, NUMINITIALTOOLS, (LPARAM)tbbMainWnd);
-	//SendMessage(hwndToolbar,TB_SAVERESTORE,FALSE,(LPARAM)lptbsp);
+	//SendMessage(hwndToolbar, TB_SAVERESTORE, FALSE, (LPARAM)lptbsp);
 	if (Toolbar_SetButtons(hwndToolbar, IDT_HISTORY_BACK, tchToolbarButtons, tbbMainWnd, COUNTOF(tbbMainWnd)) == 0) {
 		SendMessage(hwndToolbar, TB_ADDBUTTONS, NUMINITIALTOOLS, (LPARAM)tbbMainWnd);
 	}
 	SendMessage(hwndToolbar, TB_GETITEMRECT, 0, (LPARAM)&rc);
-	//SendMessage(hwndToolbar,TB_SETINDENT,2,0);
+	//SendMessage(hwndToolbar, TB_SETINDENT, 2, 0);
 
 	if (bShowStatusbar) {
 		dwStatusbarStyle |= WS_VISIBLE;
@@ -994,14 +971,12 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance)
 	cyDriveBoxFrame = (bIsAppThemed && IsVista()) ? 0 : 2;
 }
 
-
 //=============================================================================
 //
 //  MsgThemeChanged() - Handles WM_THEMECHANGED
 //
 //
-void MsgThemeChanged(HWND hwnd, WPARAM wParam, LPARAM lParam)
-{
+void MsgThemeChanged(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	RECT rc;
 	WCHAR chStatus[255];
 	HINSTANCE hInstance = (HINSTANCE)(INT_PTR)GetWindowLongPtr(hwnd, GWLP_HINSTANCE);
@@ -1041,14 +1016,12 @@ void MsgThemeChanged(HWND hwnd, WPARAM wParam, LPARAM lParam)
 	StatusSetText(hwndStatus, ID_FILEINFO, chStatus);
 }
 
-
 //=============================================================================
 //
 //  MsgSize() - Handles WM_SIZE
 //
 //
-void MsgSize(HWND hwnd, WPARAM wParam, LPARAM lParam)
-{
+void MsgSize(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	RECT rc;
 	int  x, y, cx, cy;
 	HDWP hdwp;
@@ -1065,12 +1038,12 @@ void MsgSize(HWND hwnd, WPARAM wParam, LPARAM lParam)
 	cy = HIWORD(lParam);
 
 	if (bShowToolbar) {
-		/*  SendMessage(hwndToolbar,WM_SIZE,0,0);
-		    GetWindowRect(hwndToolbar,&rc);
-		    y = (rc.bottom - rc.top);
-		    cy -= (rc.bottom - rc.top);*/
+		//SendMessage(hwndToolbar, WM_SIZE, 0, 0);
+		//GetWindowRect(hwndToolbar, &rc);
+		//y = (rc.bottom - rc.top);
+		//cy -= (rc.bottom - rc.top);
 
-		//SendMessage(hwndToolbar,TB_GETITEMRECT,0,(LPARAM)&rc);
+		//SendMessage(hwndToolbar, TB_GETITEMRECT, 0, (LPARAM)&rc);
 		SetWindowPos(hwndReBar, NULL, 0, 0, LOWORD(lParam), cyReBar, SWP_NOZORDER);
 		// the ReBar automatically sets the correct height
 		// calling SetWindowPos() with the height of one toolbar button
@@ -1089,9 +1062,7 @@ void MsgSize(HWND hwnd, WPARAM wParam, LPARAM lParam)
 	}
 
 	hdwp = BeginDeferWindowPos(2);
-
-	DeferWindowPos(hdwp, hwndDriveBox, NULL, x, y, cx, max(cy, 100),
-				   SWP_NOZORDER | SWP_NOACTIVATE);
+	DeferWindowPos(hdwp, hwndDriveBox, NULL, x, y, cx, max(cy, 100), SWP_NOZORDER | SWP_NOACTIVATE);
 
 	if (bShowDriveBox) {
 		GetWindowRect(hwndDriveBox, &rc);
@@ -1099,9 +1070,7 @@ void MsgSize(HWND hwnd, WPARAM wParam, LPARAM lParam)
 		cy -= (rc.bottom - rc.top) + cyDriveBoxFrame;
 	}
 
-	DeferWindowPos(hdwp, hwndDirList, NULL, x, y, cx, cy,
-				   SWP_NOZORDER | SWP_NOACTIVATE);
-
+	DeferWindowPos(hdwp, hwndDirList, NULL, x, y, cx, cy, SWP_NOZORDER | SWP_NOACTIVATE);
 	EndDeferWindowPos(hdwp);
 
 	// Rebuild DirList Columns
@@ -1113,19 +1082,17 @@ void MsgSize(HWND hwnd, WPARAM wParam, LPARAM lParam)
 	InvalidateRect(hwndStatus, NULL, TRUE);
 }
 
-
 //=============================================================================
 //
 //  MsgInitMenu() - Handles WM_INITMENU
 //
 //
-void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam)
-{
+void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	int i; // Helper
 	DLITEM dli;
 	HMENU hmenu = (HMENU)wParam;
 
-	i = (ListView_GetSelectedCount(hwndDirList));
+	i = ListView_GetSelectedCount(hwndDirList);
 	dli.mask = DLI_TYPE;
 	dli.ntype = DLE_NONE;
 	DirList_GetItem(hwndDirList, -1, &dli);
@@ -1153,26 +1120,21 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam)
 	CheckCmd(hmenu, IDM_VIEW_STATUSBAR, bShowStatusbar);
 	CheckCmd(hmenu, IDM_VIEW_DRIVEBOX, bShowDriveBox);
 
-	CheckMenuRadioItem(hmenu, IDM_SORT_NAME, IDM_SORT_DATE,
-					   IDM_SORT_NAME + nSortFlags, MF_BYCOMMAND);
+	CheckMenuRadioItem(hmenu, IDM_SORT_NAME, IDM_SORT_DATE, IDM_SORT_NAME + nSortFlags, MF_BYCOMMAND);
 
 	CheckCmd(hmenu, IDM_SORT_REVERSE, fSortRev);
-
 	CheckCmd(hmenu, SC_ALWAYSONTOP, bAlwaysOnTop);
 
 	i = (lstrlen(szIniFile) > 0 || lstrlen(szIniFile2) > 0);
 	EnableCmd(hmenu, IDM_VIEW_SAVESETTINGS, i);
 }
 
-
 //=============================================================================
 //
 //  MsgCommand() - Handles WM_COMMAND
 //
 //
-LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam)
-{
-
+LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	switch (LOWORD(wParam)) {
 	case IDC_DRIVEBOX:
 		switch (HIWORD(wParam)) {
@@ -1213,7 +1175,8 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam)
 
 			if (!PathIsLnkFile(dli.szFileName)) {
 				LaunchTarget(dli.szFileName, 0);
-			} else { // PathIsLinkFile()
+			} else {
+				// PathIsLinkFile()
 				WCHAR  tch[MAX_PATH];
 
 				if (PathGetLnkPath(dli.szFileName, tch, COUNTOF(tch))) {
@@ -1222,9 +1185,8 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam)
 					dwAttr = GetFileAttributes(tch);
 					if ((dwAttr == (DWORD)(-1)) || (dwAttr & FILE_ATTRIBUTE_DIRECTORY)) {
 						DisplayLnkFile(dli.szFileName);
-					} else
+					} else {
 						// Made sure link points to a file
-					{
 						LaunchTarget(tch, 0);
 					}
 				} else {
@@ -1249,7 +1211,8 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam)
 
 			if (!PathIsLnkFile(dli.szFileName)) {
 				LaunchTarget(dli.szFileName, 1);
-			} else { // PathIsLinkFile()
+			} else {
+				// PathIsLinkFile()
 				WCHAR  tch[MAX_PATH];
 
 				if (PathGetLnkPath(dli.szFileName, tch, COUNTOF(tch))) {
@@ -1258,9 +1221,8 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam)
 					dwAttr = GetFileAttributes(tch);
 					if ((dwAttr == (DWORD)(-1)) || (dwAttr & FILE_ATTRIBUTE_DIRECTORY)) {
 						DisplayLnkFile(dli.szFileName);
-					} else
+					} else {
 						// Made sure link points to a file
-					{
 						LaunchTarget(tch, 1);
 					}
 				} else {
@@ -1821,7 +1783,6 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam)
 		}
 
 		if (!bCreateFailure) {
-
 			if (WritePrivateProfileString(L"Settings", L"WriteTest", L"ok", szIniFile)) {
 				BeginWaitCursor();
 				SaveSettings(TRUE);
@@ -1958,6 +1919,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam)
 							if (!PathIsRoot(szDir)) {
 								*p = 0;
 							}
+
 							SetCurrentDirectory(szDir);
 							SendMessage(hwndMain, WM_COMMAND, MAKELONG(IDM_VIEW_UPDATE, 1), 0);
 							if (!DirList_SelectItem(hwndDirList, NULL, szFullPath)) {
@@ -2005,8 +1967,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam)
 		} else {
 			MessageBeep(0);
 		}
-		History_UpdateToolbar(&mHistory, hwndToolbar,
-							  IDT_HISTORY_BACK, IDT_HISTORY_FORWARD);
+		History_UpdateToolbar(&mHistory, hwndToolbar, IDT_HISTORY_BACK, IDT_HISTORY_FORWARD);
 		break;
 
 	case IDT_HISTORY_FORWARD:
@@ -2019,8 +1980,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam)
 		} else {
 			MessageBeep(0);
 		}
-		History_UpdateToolbar(&mHistory, hwndToolbar,
-							  IDT_HISTORY_BACK, IDT_HISTORY_FORWARD);
+		History_UpdateToolbar(&mHistory, hwndToolbar, IDT_HISTORY_BACK, IDT_HISTORY_FORWARD);
 		break;
 
 	case IDT_UPDIR: {
@@ -2181,16 +2141,14 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam)
 	return 0;
 }
 
-
 //=============================================================================
 //
 //  MsgNotify() - Handles WM_NOTIFY
 //
 //
-LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam)
-{
-
+LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	LPNMHDR pnmh = (LPNMHDR)lParam;
+
 	switch (pnmh->idFrom) {
 	case IDC_DIRLIST:
 		switch (pnmh->code) {
@@ -2212,11 +2170,6 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam)
 			break;
 
 		case LVN_ITEMCHANGED: {
-			WIN32_FIND_DATA fd;
-			DLITEM dli;
-			FILETIME   ft;
-			SYSTEMTIME st;
-
 			NM_LISTVIEW *pnmlv = (NM_LISTVIEW *)lParam;
 
 			if ((pnmlv->uNewState & (LVIS_SELECTED | LVIS_FOCUSED)) !=
@@ -2224,6 +2177,10 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam)
 
 				WCHAR tch[64];
 				if ((pnmlv->uNewState & LVIS_SELECTED)) {
+					WIN32_FIND_DATA fd;
+					DLITEM dli;
+					FILETIME ft;
+					SYSTEMTIME st;
 					WCHAR tchsize[64], tchdate[64], tchtime[64], tchattr[64];
 					LONGLONG isize;
 					dli.mask  = DLI_FILENAME;
@@ -2261,7 +2218,6 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam)
 				}
 
 				StatusSetText(hwndStatus, ID_FILEINFO, tch);
-
 			}
 		}
 		break;
@@ -2288,23 +2244,20 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam)
 				SendMessage(hwnd, WM_COMMAND, MAKELONG(IDM_FILE_OPEN, 1), 0);
 			}
 			break;
-
 		}
 		break;
 
-
 	case IDC_DRIVEBOX:
-	switch (pnmh->code) {
-	case CBEN_GETDISPINFO:
-		DriveBox_GetDispInfo(hwndDriveBox, lParam);
-		break;
+		switch (pnmh->code) {
+		case CBEN_GETDISPINFO:
+			DriveBox_GetDispInfo(hwndDriveBox, lParam);
+			break;
 
-	case CBEN_DELETEITEM:
-		DriveBox_DeleteItem(hwndDriveBox, lParam);
+		case CBEN_DELETEITEM:
+			DriveBox_DeleteItem(hwndDriveBox, lParam);
+			break;
+		}
 		break;
-	}
-	break;
-
 
 	case IDC_TOOLBAR:
 		switch (pnmh->code) {
@@ -2320,7 +2273,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam)
 			return TRUE;
 
 		case TBN_GETBUTTONINFO: {
-			if (((LPTBNOTIFY)lParam)->iItem < COUNTOF(tbbMainWnd)) {
+			if (((LPTBNOTIFY)lParam)->iItem < (int)COUNTOF(tbbMainWnd)) {
 				WCHAR tch[256];
 				GetString(tbbMainWnd[((LPTBNOTIFY)lParam)->iItem].idCommand, tch, COUNTOF(tch));
 				lstrcpyn(((LPTBNOTIFY)lParam)->pszText, tch, ((LPTBNOTIFY)lParam)->cchText);
@@ -2331,9 +2284,8 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam)
 		return FALSE;
 
 		case TBN_RESET: {
-			int i;
 			int c = (int)SendMessage(hwndToolbar, TB_BUTTONCOUNT, 0, 0);
-			for (i = 0; i < c; i++) {
+			for (int i = 0; i < c; i++) {
 				SendMessage(hwndToolbar, TB_DELETEBUTTON, 0, 0);
 			}
 			if (Toolbar_SetButtons(hwndToolbar, IDT_HISTORY_BACK, L"1 2 3 4 5 0 8", tbbMainWnd, COUNTOF(tbbMainWnd)) == 0) {
@@ -2347,7 +2299,6 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam)
 	default:
 		switch (pnmh->code) {
 		case TTN_NEEDTEXT: {
-
 			if (((LPTOOLTIPTEXT)lParam)->uFlags & TTF_IDISHWND) {
 				PathCompactPathEx(((LPTOOLTIPTEXT)lParam)->szText, szCurDir,
 								  COUNTOF(((LPTOOLTIPTEXT)lParam)->szText), 0);
@@ -2364,21 +2315,20 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam)
 	return 0;
 }
 
-
 //=============================================================================
 //
 //  ChangeDirectory()
 //
 //
-BOOL ChangeDirectory(HWND hwnd, LPCWSTR lpszNewDir, BOOL bUpdateHistory)
-{
+BOOL ChangeDirectory(HWND hwnd, LPCWSTR lpszNewDir, BOOL bUpdateHistory) {
 	BOOL fUpdate = FALSE;
 
 	if (lpszNewDir && !SetCurrentDirectory(lpszNewDir)) {
 		return FALSE;
 	}
 
-	if (!lpszNewDir) { // Update call
+	if (!lpszNewDir) {
+		// Update call
 		WCHAR szTest[MAX_PATH];
 
 		GetCurrentDirectory(COUNTOF(szTest), szTest);
@@ -2455,21 +2405,18 @@ BOOL ChangeDirectory(HWND hwnd, LPCWSTR lpszNewDir, BOOL bUpdateHistory)
 			History_UpdateToolbar(&mHistory, hwndToolbar,
 								  IDT_HISTORY_BACK, IDT_HISTORY_FORWARD);
 		}
-
 	}
 	EndWaitCursor();
 
 	return TRUE;
 }
 
-
 //=============================================================================
 //
 //  LoadSettings()
 //
 //
-void LoadSettings()
-{
+void LoadSettings(void) {
 	WCHAR *pIniSection = LocalAlloc(LPTR, sizeof(WCHAR) * 32 * 1024);
 	int   cbIniSection = (int)LocalSize(pIniSection) / sizeof(WCHAR);
 
@@ -2573,7 +2520,8 @@ void LoadSettings()
 	cxCopyMoveDlg = IniSectionGetInt(pIniSection, L"CopyMoveDlgSizeX", 0);
 	cxCopyMoveDlg = max(cxCopyMoveDlg, 0);
 
-	if (!flagPosParam) { // ignore window position if /p was specified
+	if (!flagPosParam) {
+		// ignore window position if /p was specified
 		WCHAR tchPosX[32], tchPosY[32], tchSizeX[32], tchSizeY[32];
 		int ResX = GetSystemMetrics(SM_CXSCREEN);
 		int ResY = GetSystemMetrics(SM_CYSCREEN);
@@ -2620,14 +2568,12 @@ void LoadSettings()
 	crCustom[15] = GetSysColor(COLOR_3DFACE);
 }
 
-
 //=============================================================================
 //
 //  SaveSettings()
 //
 //
-void SaveSettings(BOOL bSaveSettingsNow)
-{
+void SaveSettings(BOOL bSaveSettingsNow) {
 	WCHAR *pIniSection;
 	//int   cbIniSection;
 
@@ -2732,14 +2678,12 @@ void SaveSettings(BOOL bSaveSettingsNow)
 	}
 }
 
-
 //=============================================================================
 //
 //  ParseCommandLine()
 //
 //
-void ParseCommandLine()
-{
+void ParseCommandLine(void) {
 	LPWSTR lpCmdLine = GetCommandLine();
 	LPWSTR lp1, lp2;
 
@@ -2833,14 +2777,12 @@ void ParseCommandLine()
 	LocalFree(lp2);
 }
 
-
 //=============================================================================
 //
 //  LoadFlags()
 //
 //
-void LoadFlags()
-{
+void LoadFlags(void) {
 	WCHAR *pIniSection = LocalAlloc(LPTR, sizeof(WCHAR) * 32 * 1024);
 	int   cchIniSection = (int)LocalSize(pIniSection) / sizeof(WCHAR);
 
@@ -2859,14 +2801,12 @@ void LoadFlags()
 	LocalFree(pIniSection);
 }
 
-
 //=============================================================================
 //
 //  FindIniFile()
 //
 //
-int CheckIniFile(LPWSTR lpszFile, LPCWSTR lpszModule)
-{
+int CheckIniFile(LPWSTR lpszFile, LPCWSTR lpszModule) {
 	WCHAR tchFileExpanded[MAX_PATH];
 	ExpandEnvironmentStrings(lpszFile, tchFileExpanded, COUNTOF(tchFileExpanded));
 
@@ -2900,8 +2840,7 @@ int CheckIniFile(LPWSTR lpszFile, LPCWSTR lpszModule)
 	return 0;
 }
 
-int CheckIniFileRedirect(LPWSTR lpszFile, LPCWSTR lpszModule)
-{
+int CheckIniFileRedirect(LPWSTR lpszFile, LPCWSTR lpszModule) {
 	WCHAR tch[MAX_PATH];
 	if (GetPrivateProfileString(L"metapath", L"metapath.ini", L"", tch, COUNTOF(tch), lpszFile)) {
 		if (CheckIniFile(tch, lpszModule)) {
@@ -2923,8 +2862,7 @@ int CheckIniFileRedirect(LPWSTR lpszFile, LPCWSTR lpszModule)
 	return 0;
 }
 
-int FindIniFile()
-{
+int FindIniFile(void) {
 	int bFound = 0;
 	WCHAR tchTest[MAX_PATH];
 	WCHAR tchModule[MAX_PATH];
@@ -2970,9 +2908,7 @@ int FindIniFile()
 	return 1;
 }
 
-
-int TestIniFile()
-{
+int TestIniFile(void) {
 	if (lstrcmpi(szIniFile, L"*?") == 0) {
 		lstrcpy(szIniFile2, L"");
 		lstrcpy(szIniFile, L"");
@@ -3002,15 +2938,11 @@ int TestIniFile()
 	}
 }
 
-
-int CreateIniFile()
-{
+int CreateIniFile(void) {
 	return CreateIniFileEx(szIniFile);
 }
 
-
-int CreateIniFileEx(LPCWSTR lpszIniFile)
-{
+int CreateIniFileEx(LPCWSTR lpszIniFile) {
 	if (*lpszIniFile) {
 		HANDLE hFile;
 		WCHAR *pwchTail;
@@ -3039,14 +2971,12 @@ int CreateIniFileEx(LPCWSTR lpszIniFile)
 	return 0;
 }
 
-
 //=============================================================================
 //
 //  DisplayPath()
 //
 //
-BOOL DisplayPath(LPCWSTR lpPath, UINT uIdError)
-{
+BOOL DisplayPath(LPCWSTR lpPath, UINT uIdError) {
 	DWORD dwAttr;
 	WCHAR  szPath[MAX_PATH];
 	WCHAR  szTmp[MAX_PATH];
@@ -3109,14 +3039,12 @@ BOOL DisplayPath(LPCWSTR lpPath, UINT uIdError)
 	}
 }
 
-
 //=============================================================================
 //
 //  DisplayLnkFile()
 //
 //
-BOOL DisplayLnkFile(LPCWSTR pszLnkFile)
-{
+BOOL DisplayLnkFile(LPCWSTR pszLnkFile) {
 	DWORD dwAttr;
 	WCHAR  szPath[MAX_PATH];
 	WCHAR  szTmp[MAX_PATH];
@@ -3221,7 +3149,6 @@ BOOL DisplayLnkFile(LPCWSTR pszLnkFile)
 	}
 }
 
-
 /******************************************************************************
 *
 * ActivatePrevInst()
@@ -3230,8 +3157,7 @@ BOOL DisplayLnkFile(LPCWSTR pszLnkFile)
 *
 *
 ******************************************************************************/
-BOOL CALLBACK EnumWndProc(HWND hwnd, LPARAM lParam)
-{
+BOOL CALLBACK EnumWndProc(HWND hwnd, LPARAM lParam) {
 	BOOL bContinue = TRUE;
 	WCHAR szClassName[64];
 
@@ -3247,8 +3173,7 @@ BOOL CALLBACK EnumWndProc(HWND hwnd, LPARAM lParam)
 	return bContinue;
 }
 
-BOOL ActivatePrevInst()
-{
+BOOL ActivatePrevInst(void) {
 	HWND hwnd = NULL;
 	COPYDATASTRUCT cds;
 
@@ -3290,9 +3215,7 @@ BOOL ActivatePrevInst()
 							lstrcpy(lpPathArg, tchTmp);
 						}
 					}
-				}
-
-				else if (SearchPath(NULL, lpPathArg, NULL, COUNTOF(tchTmp), tchTmp, NULL)) {
+				} else if (SearchPath(NULL, lpPathArg, NULL, COUNTOF(tchTmp), tchTmp, NULL)) {
 					lstrcpy(lpPathArg, tchTmp);
 				}
 
@@ -3333,14 +3256,12 @@ BOOL ActivatePrevInst()
 	return FALSE;
 }
 
-
 //=============================================================================
 //
 //  ShowNotifyIcon()
 //
 //
-void ShowNotifyIcon(HWND hwnd, BOOL bAdd)
-{
+void ShowNotifyIcon(HWND hwnd, BOOL bAdd) {
 	static HICON hIcon;
 	NOTIFYICONDATA nid;
 
@@ -3364,7 +3285,6 @@ void ShowNotifyIcon(HWND hwnd, BOOL bAdd)
 	}
 }
 
-
 //=============================================================================
 //
 //  LaunchTarget()
@@ -3375,8 +3295,7 @@ void ShowNotifyIcon(HWND hwnd, BOOL bAdd)
 //
 WCHAR szGlobalWndClass[256] = L"";
 
-BOOL CALLBACK EnumWndProc2(HWND hwnd, LPARAM lParam)
-{
+BOOL CALLBACK EnumWndProc2(HWND hwnd, LPARAM lParam) {
 	BOOL bContinue = TRUE;
 	WCHAR szClassName[64];
 
@@ -3392,9 +3311,7 @@ BOOL CALLBACK EnumWndProc2(HWND hwnd, LPARAM lParam)
 	return bContinue;
 }
 
-
-void LaunchTarget(LPCWSTR lpFileName, BOOL bOpenNew)
-{
+void LaunchTarget(LPCWSTR lpFileName, BOOL bOpenNew) {
 	HWND  hwnd  = NULL;
 	HDROP hDrop = NULL;
 
@@ -3480,8 +3397,7 @@ void LaunchTarget(LPCWSTR lpFileName, BOOL bOpenNew)
 
 			ZeroMemory(&sei, sizeof(SHELLEXECUTEINFO));
 
-			if (PathIsLnkFile(lpFileName) &&
-					PathGetLnkPath(lpFileName, szTmp, COUNTOF(szTmp))) {
+			if (PathIsLnkFile(lpFileName) && PathGetLnkPath(lpFileName, szTmp, COUNTOF(szTmp))) {
 				lpParam = szTmp;
 			} else {
 				lpParam = (LPWSTR)lpFileName;
@@ -3591,7 +3507,6 @@ void LaunchTarget(LPCWSTR lpFileName, BOOL bOpenNew)
 	}
 }
 
-
 //=============================================================================
 //
 //  SnapToTarget()
@@ -3599,13 +3514,11 @@ void LaunchTarget(LPCWSTR lpFileName, BOOL bOpenNew)
 //  Aligns metapath to either side of target window
 //
 //
-void SnapToTarget(HWND hwnd)
-{
+void SnapToTarget(HWND hwnd) {
 	RECT rcOld, rcNew, rc2;
 	HWND hwnd2;
 
 	if (IniGetInt(L"Target Application", L"UseTargetApplication", 0xFB) != 0xFB) {
-
 		IniGetString(L"Target Application", L"TargetApplicationWndClass",
 					 szTargetApplicationWndClass, szTargetApplicationWndClass, COUNTOF(szTargetApplicationWndClass));
 
@@ -3657,7 +3570,6 @@ void SnapToTarget(HWND hwnd)
 	}
 }
 
-
 //=============================================================================
 //
 //  SnapToDefaultPos()
@@ -3665,8 +3577,7 @@ void SnapToTarget(HWND hwnd)
 //  Aligns metapath to the default window position on the current screen
 //
 //
-void SnapToDefaultPos(HWND hwnd)
-{
+void SnapToDefaultPos(HWND hwnd) {
 	WINDOWPLACEMENT wndpl;
 	HMONITOR hMonitor;
 	MONITORINFO mi;
@@ -3706,6 +3617,5 @@ void SnapToDefaultPos(HWND hwnd)
 
 	SetWindowPlacement(hwnd, &wndpl);
 }
-
 
 ///  End of metapath.c

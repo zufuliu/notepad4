@@ -18,8 +18,8 @@
 *
 ******************************************************************************/
 
-#ifndef _NOTEPAD2_DIALOGS_H_
-#define _NOTEPAD2_DIALOGS_H_
+#ifndef NOTEPAD2_DIALOGS_H_
+#define NOTEPAD2_DIALOGS_H_
 
 #define MBINFO			0
 #define MBWARN			1
@@ -48,6 +48,6 @@ BOOL	RecodeDlg(HWND hwnd, int *pidREncoding);
 BOOL	SelectDefLineEndingDlg(HWND hwnd, int *iOption);
 INT_PTR InfoBox(int iType, LPCWSTR lpstrSetting, int uidMessage, ...);
 
-#endif // _NOTEPAD2_DIALOGS_H_
+#endif // NOTEPAD2_DIALOGS_H_
 
 // End of Dialogs.h

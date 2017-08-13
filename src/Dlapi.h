@@ -18,14 +18,12 @@
 *
 ******************************************************************************/
 
-#ifndef _NOTEPAD2_DLAPI_H_
-#define _NOTEPAD2_DLAPI_H_
+#ifndef NOTEPAD2_DLAPI_H_
+#define NOTEPAD2_DLAPI_H_
 
 #ifdef __cplusplus
 extern "C" { // C-Declarations
 #endif //__cplusplus
-
-
 
 //==== DirList ================================================================
 
@@ -131,7 +129,6 @@ BOOL DriveBox_PropertyDlg(HWND hwnd);
 LRESULT DriveBox_DeleteItem(HWND hwnd, LPARAM lParam);
 LRESULT DriveBox_GetDispInfo(HWND hwnd, LPARAM lParam);
 
-
 //==== ItemID =================================================================
 
 //==== IL_Next() ==============================================================
@@ -145,13 +142,12 @@ UINT IL_GetSize(LPCITEMIDLIST pidl);
 
 //==== IL_GetDisplayName() ====================================================
 BOOL IL_GetDisplayName(LPSHELLFOLDER lpsf, LPCITEMIDLIST pidl, DWORD dwFlags,
-						LPWSTR lpszDisplayName, int nDisplayName);
+					   LPWSTR lpszDisplayName, int nDisplayName);
 
 #ifdef __cplusplus
 }
 #endif //__cplusplus
 
-#endif // _NOTEPAD2_DLAPI_H_
-
+#endif // NOTEPAD2_DLAPI_H_
 
 // End of Dlapi.h

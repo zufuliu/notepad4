@@ -4,7 +4,7 @@
 // smali smaliLexer.flex
 // android src/dalvik/opcode-gen/bytecode.txt
 
-static KEYWORDLIST Keywords_Smail = {
+static KEYWORDLIST Keywords_Smail = {{
 "true false null "
 "build runtime system "
 "public private protected static final synchronized bridge varargs native abstract "
@@ -113,9 +113,9 @@ static KEYWORDLIST Keywords_Smail = {
 "invoke-object-init invoke-direct-empty "
 , // instruction
 "from16 high16 jumbo range 2addr lit16 lit8 "
-,"","","",""
+, "", "", "", ""
 #endif
-};
+}};
 
 EDITLEXER lexSmali = { SCLEX_SMALI, NP2LEX_SMALI, L"Android Smali", L"smali", L"", &Keywords_Smail,
 {
@@ -129,8 +129,8 @@ EDITLEXER lexSmali = { SCLEX_SMALI, NP2LEX_SMALI, L"Android Smali", L"smali", L"
 	{ SCE_SMALI_FIELD, NP2STYLE_Field, L"Field", L"fore:#648000", L"" },
 	{ SCE_SMALI_METHOD, NP2STYLE_Method, L"Method", L"fore:#A46000", L"" },
 	{ SCE_SMALI_COMMENTLINE, NP2STYLE_Comment, L"Comment", L"fore:#008000", L"" },
-	{ MULTI_STYLE(SCE_SMALI_STRING,SCE_SMALI_CHARACTER,0,0), NP2STYLE_String, L"String", L"fore:#008000", L"" },
-	{ MULTI_STYLE(SCE_SMALI_LABEL,SCE_SMALI_LABEL_EOL,0,0), NP2STYLE_Label, L"Label", L"fore:#000000; back:#FFC040", L""},
+	{ MULTI_STYLE(SCE_SMALI_STRING, SCE_SMALI_CHARACTER, 0, 0), NP2STYLE_String, L"String", L"fore:#008000", L"" },
+	{ MULTI_STYLE(SCE_SMALI_LABEL, SCE_SMALI_LABEL_EOL, 0, 0), NP2STYLE_Label, L"Label", L"fore:#000000; back:#FFC040", L""},
 	{ SCE_SMALI_NUMBER, NP2STYLE_Number, L"Number", L"fore:#FF0000", L"" },
 	{ SCE_SMALI_OPERATOR, NP2STYLE_Operator, L"Operator", L"fore:#B000B0", L"" },
 	{ -1, 00000, L"", L"", L"" }

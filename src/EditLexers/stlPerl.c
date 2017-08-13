@@ -3,7 +3,7 @@
 
 // https://www.perl.org/
 
-static KEYWORDLIST Keywords_Perl = {
+static KEYWORDLIST Keywords_Perl = {{
 "__DATA__ __END__ __FILE__ __LINE__ __PACKAGE__ abs accept alarm and atan2 AUTOLOAD BEGIN "
 "bind binmode bless break caller chdir CHECK chmod chomp chop chown chr chroot close closedir cmp "
 "connect continue CORE cos crypt dbmclose dbmopen default defined delete DESTROY die do "
@@ -29,9 +29,9 @@ static KEYWORDLIST Keywords_Perl = {
 , "", "", "", "", "", "", ""
 
 #if NUMKEYWORD == 16
-,"","","","","","",""
+, "", "", "", "", "", "", ""
 #endif
-};
+}};
 
 EDITLEXER lexPerl = { SCLEX_PERL, NP2LEX_PERL, L"Perl Script", L"pl; pm; cgi; pod; plx; stp", L"", &Keywords_Perl,
 {
@@ -39,7 +39,7 @@ EDITLEXER lexPerl = { SCLEX_PERL, NP2LEX_PERL, L"Perl Script", L"pl; pm; cgi; po
 	//{ SCE_PL_DEFAULT, L"Default", L"", L"" },
 	{ SCE_PL_COMMENTLINE, NP2STYLE_Comment, L"Comment", L"fore:#008000", L"" },
 	{ SCE_PL_WORD, NP2STYLE_Keyword, L"Keyword", L"bold; fore:#FF8000", L"" },
-	{ MULTI_STYLE(SCE_PL_STRING,SCE_PL_CHARACTER,0,0), NP2STYLE_String, L"String", L"fore:#008000", L"" },
+	{ MULTI_STYLE(SCE_PL_STRING, SCE_PL_CHARACTER, 0, 0), NP2STYLE_String, L"String", L"fore:#008000", L"" },
 	{ SCE_PL_NUMBER, NP2STYLE_Number, L"Number", L"fore:#FF0000", L"" },
 	{ SCE_PL_OPERATOR, NP2STYLE_Operator, L"Operator", L"fore:#B000B0", L"" },
 	{ SCE_PL_SCALAR, 63401, L"Scalar $var", L"fore:#0000FF", L"" },

@@ -1,13 +1,13 @@
 #include "EditLexer.h"
 #include "EditStyle.h"
 
-static KEYWORDLIST Keywords_NULL = {
+static KEYWORDLIST Keywords_NULL = {{
 "", "", "", "", "", "", "", "", ""
 
 #if NUMKEYWORD == 16
-,"","","","","","",""
+, "", "", "", "", "", "", ""
 #endif
-};
+}};
 
 EDITLEXER lexDefault = { SCLEX_NULL, NP2LEX_DEFAULT, L"Default Text", L"txt; text; wtx; log; asc; doc", L"", &Keywords_NULL,
 {
@@ -19,12 +19,12 @@ EDITLEXER lexDefault = { SCLEX_NULL, NP2LEX_DEFAULT, L"Default Text", L"txt; tex
 	{ STYLE_BRACEBAD, 63103, L"Matching Braces Error", L"size:+1; bold; fore:#000080", L"" },
 	{ STYLE_CONTROLCHAR, 63104, L"Control Characters (Font)", L"size:-1", L"" },
 	{ STYLE_INDENTGUIDE, 63105, L"Indentation Guide (Color)", L"fore:#FF8000", L"" },
-	{ SCI_SETSELFORE+SCI_SETSELBACK, 63106, L"Selected Text (Colors)", L"back:#0A246A; eolfilled; alpha:95", L"" },
-	{ SCI_SETWHITESPACEFORE+SCI_SETWHITESPACEBACK+SCI_SETWHITESPACESIZE, 63107, L"Whitespace (Colors, Size 0-5)", L"fore:#FF4000", L"" },
+	{ SCI_SETSELFORE + SCI_SETSELBACK, 63106, L"Selected Text (Colors)", L"back:#0A246A; eolfilled; alpha:95", L"" },
+	{ SCI_SETWHITESPACEFORE + SCI_SETWHITESPACEBACK + SCI_SETWHITESPACESIZE, 63107, L"Whitespace (Colors, Size 0-5)", L"fore:#FF4000", L"" },
 	{ SCI_SETCARETLINEBACK, 63108, L"Current Line Background (Color)", L"back:#FFFF00; alpha:50", L"" },
-	{ SCI_SETCARETFORE+SCI_SETCARETWIDTH, 63109, L"Caret (Color, Size 1-3)", L"", L"" },
+	{ SCI_SETCARETFORE + SCI_SETCARETWIDTH, 63109, L"Caret (Color, Size 1-3)", L"", L"" },
 	{ SCI_SETEDGECOLOUR, 63110, L"Long Line Marker (Colors)", L"fore:#FFC000", L"" },
-	{ SCI_SETEXTRAASCENT+SCI_SETEXTRADESCENT, 63111, L"Extra Line Spacing (Size)", L"size:2", L"" },
+	{ SCI_SETEXTRAASCENT + SCI_SETEXTRADESCENT, 63111, L"Extra Line Spacing (Size)", L"size:2", L"" },
 
 	{ STYLE_DEFAULT, 63112, L"2nd Default Style", L"font:Default; size:11", L"" },
 	//{ STYLE_DEFAULT, 63112, L"2nd Default Style", L"font:Courier New; size:11", L"" },
@@ -33,12 +33,12 @@ EDITLEXER lexDefault = { SCLEX_NULL, NP2LEX_DEFAULT, L"Default Text", L"txt; tex
 	{ STYLE_BRACEBAD, 63115, L"2nd Matching Braces Error", L"bold; fore:#000080", L"" },
 	{ STYLE_CONTROLCHAR, 63116, L"2nd Control Characters (Font)", L"size:-1", L"" },
 	{ STYLE_INDENTGUIDE, 63117, L"2nd Indentation Guide (Color)", L"fore:#FF8000", L"" },
-	{ SCI_SETSELFORE+SCI_SETSELBACK, 63118, L"2nd Selected Text (Colors)", L"eolfilled", L"" },
-	{ SCI_SETWHITESPACEFORE+SCI_SETWHITESPACEBACK+SCI_SETWHITESPACESIZE, 63119, L"2nd Whitespace (Colors, Size 0-5)", L"fore:#FF4000", L"" },
+	{ SCI_SETSELFORE + SCI_SETSELBACK, 63118, L"2nd Selected Text (Colors)", L"eolfilled", L"" },
+	{ SCI_SETWHITESPACEFORE + SCI_SETWHITESPACEBACK + SCI_SETWHITESPACESIZE, 63119, L"2nd Whitespace (Colors, Size 0-5)", L"fore:#FF4000", L"" },
 	{ SCI_SETCARETLINEBACK, 63120, L"2nd Current Line Background (Color)", L"back:#FFFF00; alpha:50", L"" },
-	{ SCI_SETCARETFORE+SCI_SETCARETWIDTH, 63121, L"2nd Caret (Color, Size 1-3)", L"", L"" },
+	{ SCI_SETCARETFORE + SCI_SETCARETWIDTH, 63121, L"2nd Caret (Color, Size 1-3)", L"", L"" },
 	{ SCI_SETEDGECOLOUR, 63122, L"2nd Long Line Marker (Colors)", L"fore:#FFC000", L"" },
-	{ SCI_SETEXTRAASCENT+SCI_SETEXTRADESCENT, 63123, L"2nd Extra Line Spacing (Size)", L"", L"" },
+	{ SCI_SETEXTRAASCENT + SCI_SETEXTRADESCENT, 63123, L"2nd Extra Line Spacing (Size)", L"", L"" },
 	{ -1, 00000, L"", L"", L"" }
 }
 };
@@ -59,7 +59,7 @@ EDITLEXER lexCONF = { SCLEX_CONF, NP2LEX_CONF, L"Config File", L"conf; cfg; cnf;
 	{ SCE_CONF_DIRECTIVE, NP2STYLE_Directive, L"Directive", L"fore:#003CE6", L"" },
 	{ SCE_CONF_COMMENT, NP2STYLE_Comment, L"Comment", L"fore:#008000", L"" },
 	{ SCE_CONF_STRING, NP2STYLE_String, L"String", L"fore:#B000B0", L"" },
-	{ MULTI_STYLE(SCE_CONF_NUMBER, SCE_CONF_HEXNUM,0,0), NP2STYLE_Number, L"Number", L"fore:#FF4000", L"" },
+	{ MULTI_STYLE(SCE_CONF_NUMBER, SCE_CONF_HEXNUM, 0, 0), NP2STYLE_Number, L"Number", L"fore:#FF4000", L"" },
 	{ SCE_CONF_SECTION, 63511, L"Section", L"bold; fore:#000000; back:#FFC040; eolfilled", L"" },
 	//{ SCE_CONF_IP, 63521, L"IP Address", L"bold; fore:#FF4000", L"" },
 	//{ SCE_CONF_IDENTIFIER, L"Identifier", L"", L"" },

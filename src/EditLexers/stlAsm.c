@@ -4,7 +4,7 @@
 // https://msdn.microsoft.com/en-us/library/afzk3475.aspx
 // https://sourceware.org/binutils/docs/as/
 
-static KEYWORDLIST Keywords_ASM = {
+static KEYWORDLIST Keywords_ASM = {{
 /**************** Instruction *********************/
 "aaa aad aam aas adc add and arpl bound bsf bsr bswap bt btc btr bts call cbw cwde "
 "cdqe clc cld cli clts cmc cmova cmovae cmovb cmovbe cmovc cmove cmovg cmovge cmovl "
@@ -151,16 +151,16 @@ static KEYWORDLIST Keywords_ASM = {
 , // Proprocessor
 "define elif else endif error if ifdef ifndef import include line pragma undef using "
 "warning message assert unassert include_next ident sccs "
-,"","","","","",""
+, "", "", "", "", "", ""
 #endif
-};
+}};
 
 EDITLEXER lexASM = { SCLEX_ASM, NP2LEX_ASM, L"Assembler Source", L"asm; s", L"", &Keywords_ASM,
 {
 	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
 	//{ SCE_ASM_DEFAULT, L"Default", L"", L"" },
-	{ MULTI_STYLE(SCE_ASM_COMMENT,SCE_ASM_COMMENTLINE,SCE_ASM_COMMENT2,SCE_ASM_COMMENTDIRECTIVE), NP2STYLE_Comment, L"Comment", L"fore:#008000", L"" },
-	{ MULTI_STYLE(SCE_ASM_STRING,SCE_ASM_CHARACTER,SCE_ASM_STRINGEOL,0), NP2STYLE_String, L"String", L"fore:#008000", L"" },
+	{ MULTI_STYLE(SCE_ASM_COMMENT, SCE_ASM_COMMENTLINE, SCE_ASM_COMMENT2, SCE_ASM_COMMENTDIRECTIVE), NP2STYLE_Comment, L"Comment", L"fore:#008000", L"" },
+	{ MULTI_STYLE(SCE_ASM_STRING, SCE_ASM_CHARACTER, SCE_ASM_STRINGEOL, 0), NP2STYLE_String, L"String", L"fore:#008000", L"" },
 	{ SCE_ASM_PREPROCESSOR, NP2STYLE_Preprocessor, L"Preprocessor", L"fore:#FF8000", L"" },
 	{ SCE_ASM_NUMBER, NP2STYLE_Number, L"Number", L"fore:#FF0000", L"" },
 	{ SCE_ASM_OPERATOR, NP2STYLE_Operator, L"Operator", L"fore:#B000B0", L"" },

@@ -18,6 +18,7 @@
 *
 *
 ******************************************************************************/
+
 #include <windows.h>
 #include <shlwapi.h>
 #include <commctrl.h>
@@ -35,7 +36,6 @@ extern "C" {
 
 extern "C" HINSTANCE g_hInstance;
 
-
 // Global settings...
 extern "C" int iPrintHeader;
 extern "C" int iPrintFooter;
@@ -43,11 +43,9 @@ extern "C" int iPrintColor;
 extern "C" int iPrintZoom;
 extern "C" RECT pagesetupMargin;
 
-
 // Stored objects...
 HGLOBAL hDevMode = NULL;
 HGLOBAL hDevNames = NULL;
-
 
 //=============================================================================
 //
@@ -55,8 +53,7 @@ HGLOBAL hDevNames = NULL;
 //
 extern "C" HWND hwndStatus;
 
-void StatusUpdatePrintPage(int iPageNum)
-{
+void StatusUpdatePrintPage(int iPageNum) {
 	WCHAR tch[32];
 
 	FormatString(tch, COUNTOF(tch), IDS_PRINTFILE, iPageNum);
@@ -68,10 +65,7 @@ void StatusUpdatePrintPage(int iPageNum)
 	UpdateWindow(hwndStatus);
 }
 
-
-extern "C" BOOL EditPrint(HWND hwnd, LPCWSTR pszDocTitle, LPCWSTR pszPageFormat)
-{
-
+extern "C" BOOL EditPrint(HWND hwnd, LPCWSTR pszDocTitle, LPCWSTR pszPageFormat) {
 	// Don't print empty documents
 	if (SendMessage(hwnd, SCI_GETLENGTH, 0, 0) == 0) {
 		MsgBox(MBWARN, IDS_PRINT_EMPTY);
@@ -451,7 +445,6 @@ extern "C" BOOL EditPrint(HWND hwnd, LPCWSTR pszDocTitle, LPCWSTR pszPageFormat)
 	return TRUE;
 }
 
-
 //=============================================================================
 //
 // EditPrintSetup() - Code from SciTE
@@ -462,8 +455,7 @@ extern "C" BOOL EditPrint(HWND hwnd, LPCWSTR pszDocTitle, LPCWSTR pszPageFormat)
 // 33 Footer
 // 34 Colors
 //
-extern "C" UINT_PTR CALLBACK PageSetupHook(HWND hwnd, UINT uiMsg, WPARAM wParam, LPARAM lParam)
-{
+extern "C" UINT_PTR CALLBACK PageSetupHook(HWND hwnd, UINT uiMsg, WPARAM wParam, LPARAM lParam) {
 	switch (uiMsg) {
 	case WM_INITDIALOG: {
 		WCHAR tch[512];
@@ -541,12 +533,10 @@ extern "C" UINT_PTR CALLBACK PageSetupHook(HWND hwnd, UINT uiMsg, WPARAM wParam,
 		break;
 	}
 
-	return (0);
+	return 0;
 }
 
-
-extern "C" void EditPrintSetup(HWND hwnd)
-{
+extern "C" void EditPrintSetup(HWND hwnd) {
 	DLGTEMPLATE *pDlgTemplate = LoadThemedDialogTemplate(MAKEINTRESOURCE(IDD_PAGESETUP), g_hInstance);
 
 	PAGESETUPDLG pdlg;
@@ -585,13 +575,11 @@ extern "C" void EditPrintSetup(HWND hwnd)
 	LocalFree(pDlgTemplate);
 }
 
-
 //=============================================================================
 //
 // EditPrintInit() - Setup default page margin if no values from registry
 //
-extern "C" void EditPrintInit()
-{
+extern "C" void EditPrintInit(void) {
 	if (pagesetupMargin.left == -1 || pagesetupMargin.top == -1 ||
 			pagesetupMargin.right == -1 || pagesetupMargin.bottom == -1) {
 		WCHAR localeInfo[3];
@@ -610,6 +598,5 @@ extern "C" void EditPrintInit()
 		}
 	}
 }
-
 
 // End of Print.cpp

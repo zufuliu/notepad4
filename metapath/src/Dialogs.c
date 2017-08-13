@@ -17,21 +17,19 @@
 *
 *
 ******************************************************************************/
-#define _WIN32_IE 0x0600
+
 #define OEMRESOURCE  // use OBM_ resource constants
 #include <windows.h>
+#include <shlwapi.h>
 #include <shlobj.h>
 #include <shellapi.h>
-#include <shlwapi.h>
 #include <commdlg.h>
-#include <string.h>
 #include "metapath.h"
-#include "dlapi.h"
-#include "helpers.h"
-#include "dialogs.h"
+#include "Dlapi.h"
+#include "Helpers.h"
+#include "Dialogs.h"
 #include "resource.h"
 #include "version.h"
-
 
 //=============================================================================
 //
@@ -41,8 +39,7 @@
 //
 extern HWND hwndMain;
 
-int ErrorMessage(int iLevel, UINT uIdMsg, ...)
-{
+int ErrorMessage(int iLevel, UINT uIdMsg, ...) {
 	WCHAR szText [256 * 2];
 	WCHAR szTitle[256 * 2];
 	WCHAR *c;
@@ -73,13 +70,11 @@ int ErrorMessage(int iLevel, UINT uIdMsg, ...)
 	return MessageBoxEx(hwnd, szText, szTitle, MB_SETFOREGROUND | iIcon, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT));
 }
 
-
 //=============================================================================
 //
 // BFFCallBack()
 //
-int CALLBACK BFFCallBack(HWND hwnd, UINT umsg, LPARAM lParam, LPARAM lpData)
-{
+int CALLBACK BFFCallBack(HWND hwnd, UINT umsg, LPARAM lParam, LPARAM lpData) {
 	if (umsg == BFFM_INITIALIZED) {
 		SendMessage(hwnd, BFFM_SETSELECTION, TRUE, lpData);
 	}
@@ -87,13 +82,11 @@ int CALLBACK BFFCallBack(HWND hwnd, UINT umsg, LPARAM lParam, LPARAM lpData)
 	return 0;
 }
 
-
 //=============================================================================
 //
 // GetDirectory()
 //
-BOOL GetDirectory(HWND hwndParent, int iTitle, LPWSTR pszFolder, LPCWSTR pszBase, BOOL bNewDialogStyle)
-{
+BOOL GetDirectory(HWND hwndParent, int iTitle, LPWSTR pszFolder, LPCWSTR pszBase, BOOL bNewDialogStyle) {
 	BROWSEINFO bi;
 	LPITEMIDLIST pidl;
 	WCHAR szTitle[256];
@@ -128,13 +121,11 @@ BOOL GetDirectory(HWND hwndParent, int iTitle, LPWSTR pszFolder, LPCWSTR pszBase
 	return fOk;
 }
 
-
 //=============================================================================
 //
 // GetDirectory2()
 //
-BOOL GetDirectory2(HWND hwndParent, int iTitle, LPWSTR pszFolder, int iBase)
-{
+BOOL GetDirectory2(HWND hwndParent, int iTitle, LPWSTR pszFolder, int iBase) {
 	BROWSEINFO bi;
 	LPITEMIDLIST pidl, pidlRoot;
 	WCHAR szTitle[256];
@@ -168,7 +159,6 @@ BOOL GetDirectory2(HWND hwndParent, int iTitle, LPWSTR pszFolder, int iBase)
 	return fOk;
 }
 
-
 extern WCHAR szCurDir[MAX_PATH + 40];
 
 //=============================================================================
@@ -178,8 +168,7 @@ extern WCHAR szCurDir[MAX_PATH + 40];
 //
 extern HWND hwndDirList;
 
-INT_PTR CALLBACK RunDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
-{
+INT_PTR CALLBACK RunDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
 	switch (umsg) {
 	case WM_INITDIALOG: {
 		DLITEM dli;
@@ -250,10 +239,11 @@ INT_PTR CALLBACK RunDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 			WCHAR args[MAX_PATH];
 
 			if (GetDlgItemText(hwnd, IDC_COMMANDLINE, args, MAX_PATH)) {
-				if (ExtractFirstArgument(args, args, NULL))
+				if (ExtractFirstArgument(args, args, NULL)) {
 					if (lstrlen(args)) {
 						bEnableOK = TRUE;
 					}
+				}
 			}
 			EnableWindow(GetDlgItem(hwnd, IDOK), bEnableOK);
 		}
@@ -304,17 +294,14 @@ INT_PTR CALLBACK RunDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 	return FALSE;
 }
 
-
 //=============================================================================
 //
 //  RunDlg()
 //
 //
-void RunDlg(HWND hwnd)
-{
+void RunDlg(HWND hwnd) {
 	ThemedDialogBox(g_hInstance, MAKEINTRESOURCE(IDD_RUN), hwnd, RunDlgProc);
 }
-
 
 //=============================================================================
 //
@@ -324,8 +311,7 @@ void RunDlg(HWND hwnd)
 extern HISTORY mHistory;
 extern int cxGotoDlg;
 
-INT_PTR CALLBACK GotoDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
-{
+INT_PTR CALLBACK GotoDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
 	static int cxClient;
 	static int cyClient;
 	static int mmiPtMaxY;
@@ -333,7 +319,6 @@ INT_PTR CALLBACK GotoDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 
 	switch (umsg) {
 	case WM_INITDIALOG: {
-		int i;
 		RECT rc;
 		WCHAR tch[64];
 		int cGrip;
@@ -368,7 +353,7 @@ INT_PTR CALLBACK GotoDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 		SendDlgItemMessage(hwnd, IDC_GOTO, CB_LIMITTEXT, MAX_PATH - 1, 0);
 		SendDlgItemMessage(hwnd, IDC_GOTO, CB_SETEXTENDEDUI, TRUE, 0);
 
-		for (i = 0; i < HISTORY_ITEMS; i++) {
+		for (int i = 0; i < HISTORY_ITEMS; i++) {
 			if (mHistory.psz[i]) {
 				int iItem = (int)SendDlgItemMessage(hwnd, IDC_GOTO, CB_FINDSTRINGEXACT, (WPARAM) - 1, (LPARAM)mHistory.psz[i]);
 				if (iItem != LB_ERR) {
@@ -473,25 +458,22 @@ INT_PTR CALLBACK GotoDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 	return FALSE;
 }
 
-
 //=============================================================================
 //
 //  GotoDlg()
 //
 //
-void GotoDlg(HWND hwnd)
-{
+void GotoDlg(HWND hwnd) {
 	ThemedDialogBox(g_hInstance, MAKEINTRESOURCE(IDD_GOTO), hwnd, GotoDlgProc);
 }
-
 
 //=============================================================================
 //
 //  AboutDlgProc()
 //
-INT_PTR CALLBACK AboutDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
-{
+INT_PTR CALLBACK AboutDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
 	static HFONT hFontTitle;
+
 	switch (umsg) {
 	case WM_INITDIALOG: {
 		WCHAR wch[256];
@@ -560,7 +542,6 @@ INT_PTR CALLBACK AboutDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam
 	return FALSE;
 }
 
-
 //=============================================================================
 //
 //  GeneralPageProc
@@ -584,8 +565,7 @@ extern BOOL fNoConfirmDelete;
 extern int  iStartupDir;
 extern int  iEscFunction;
 
-INT_PTR CALLBACK GeneralPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
-{
+INT_PTR CALLBACK GeneralPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
 	switch (umsg) {
 	case WM_INITDIALOG:
 		if (lstrlen(szIniFile)) {
@@ -686,14 +666,12 @@ INT_PTR CALLBACK GeneralPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPa
 	return FALSE;
 }
 
-
 //=============================================================================
 //
 //  AdvancedPageProc
 //
 //
-INT_PTR CALLBACK AdvancedPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
-{
+INT_PTR CALLBACK AdvancedPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
 	switch (umsg) {
 	case WM_INITDIALOG:
 		if (bClearReadOnly) {
@@ -814,7 +792,6 @@ INT_PTR CALLBACK AdvancedPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lP
 	return FALSE;
 }
 
-
 //=============================================================================
 //
 //  ItemsPageProc
@@ -826,8 +803,7 @@ extern COLORREF crNoFilt;
 extern COLORREF crFilter;
 extern COLORREF crCustom[16];
 
-INT_PTR CALLBACK ItemsPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
-{
+INT_PTR CALLBACK ItemsPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
 	static BOOL m_bDefCrNoFilt;
 	static BOOL m_bDefCrFilter;
 
@@ -838,6 +814,7 @@ INT_PTR CALLBACK ItemsPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPara
 	static HBRUSH m_hbrFilter;
 
 	CHOOSECOLOR cc;
+
 	switch (umsg) {
 	case WM_INITDIALOG:
 		m_bDefCrNoFilt = bDefCrNoFilt;
@@ -950,9 +927,9 @@ INT_PTR CALLBACK ItemsPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPara
 
 	case WM_CTLCOLORSTATIC:
 		if (!m_bDefCrNoFilt && GetDlgCtrlID((HWND)lParam) == IDC_COLOR_SAMP1) {
-			return(LRESULT)m_hbrNoFilt;
+			return (LRESULT)m_hbrNoFilt;
 		} else if (!m_bDefCrFilter && GetDlgCtrlID((HWND)lParam) == IDC_COLOR_SAMP2) {
-			return(LRESULT)m_hbrFilter;
+			return (LRESULT)m_hbrFilter;
 		} else {
 			return FALSE;
 		}
@@ -961,14 +938,12 @@ INT_PTR CALLBACK ItemsPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPara
 	return FALSE;
 }
 
-
 //=============================================================================
 //
 //  ProgPageProc
 //
 //
-INT_PTR CALLBACK ProgPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
-{
+INT_PTR CALLBACK ProgPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
 	switch (umsg) {
 	case WM_INITDIALOG: {
 		WCHAR tch[MAX_PATH];
@@ -1052,8 +1027,8 @@ INT_PTR CALLBACK ProgPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam
 			PostMessage(hwnd, WM_NEXTDLGCTL, 1, 0);
 		}
 		break;
-	}
-	return TRUE;
+		}
+		return TRUE;
 
 	case WM_NOTIFY:
 		switch (((LPNMHDR)lParam)->code) {
@@ -1086,7 +1061,6 @@ INT_PTR CALLBACK ProgPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam
 	return FALSE;
 }
 
-
 //=============================================================================
 //
 //  OptionsPropSheet
@@ -1098,8 +1072,7 @@ extern int nIdFocus;
 extern WCHAR tchFilter[128];
 extern BOOL bNegFilter;
 
-INT_PTR OptionsPropSheet(HWND hwnd, HINSTANCE hInstance)
-{
+INT_PTR OptionsPropSheet(HWND hwnd, HINSTANCE hInstance) {
 	PROPSHEETHEADER psh;
 	PROPSHEETPAGE   psp[4];
 	INT_PTR nResult;
@@ -1132,8 +1105,7 @@ INT_PTR OptionsPropSheet(HWND hwnd, HINSTANCE hInstance)
 	psp[3].pfnDlgProc  = ProgPageProc;
 
 	psh.dwSize      = sizeof(PROPSHEETHEADER);
-	psh.dwFlags     = PSH_PROPSHEETPAGE | PSH_NOAPPLYNOW | \
-					  PSH_PROPTITLE;
+	psh.dwFlags     = PSH_PROPSHEETPAGE | PSH_NOAPPLYNOW | PSH_PROPTITLE;
 	psh.hwndParent  = hwnd;
 	psh.hInstance   = hInstance;
 	psh.pszCaption  = L"metapath";
@@ -1194,7 +1166,6 @@ INT_PTR OptionsPropSheet(HWND hwnd, HINSTANCE hInstance)
 	return nResult;
 }
 
-
 //=============================================================================
 //
 //  GetFilterDlgProc()
@@ -1204,8 +1175,7 @@ INT_PTR OptionsPropSheet(HWND hwnd, HINSTANCE hInstance)
 extern WCHAR tchFilter[DL_FILTER_BUFSIZE];
 extern BOOL bNegFilter;
 
-INT_PTR CALLBACK GetFilterDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
-{
+INT_PTR CALLBACK GetFilterDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
 	switch (umsg) {
 	case WM_INITDIALOG: {
 		MakeBitmapButton(hwnd, IDC_BROWSEFILTER, NULL, OBM_COMBO);
@@ -1241,8 +1211,8 @@ INT_PTR CALLBACK GetFilterDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lP
 			pIniSection = LocalAlloc(LPTR, sizeof(WCHAR) * 32 * 1024);
 			cbIniSection = (int)LocalSize(pIniSection) / sizeof(WCHAR);
 			LoadIniSection(L"Filters", pIniSection, cbIniSection);
-			pszFilterName = pIniSection;
 
+			pszFilterName = pIniSection;
 			while (*pszFilterName) {
 				WCHAR *pszFilterValue = CharNext(StrChr(pszFilterName, L'='));
 				if (*pszFilterValue) {
@@ -1325,14 +1295,12 @@ INT_PTR CALLBACK GetFilterDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lP
 	return FALSE;
 }
 
-
 //=============================================================================
 //
 //  GetFilterDlg()
 //
 //
-BOOL GetFilterDlg(HWND hwnd)
-{
+BOOL GetFilterDlg(HWND hwnd) {
 	WCHAR tchOldFilter[DL_FILTER_BUFSIZE];
 	BOOL bOldNegFilter;
 
@@ -1350,7 +1318,6 @@ BOOL GetFilterDlg(HWND hwnd)
 	return FALSE;
 }
 
-
 // Data structure used in file operation dialogs
 typedef struct tagFILEOPDLGDATA {
 	WCHAR szSource[MAX_PATH];
@@ -1358,15 +1325,14 @@ typedef struct tagFILEOPDLGDATA {
 	UINT wFunc;
 } FILEOPDLGDATA, *LPFILEOPDLGDATA;
 
-
 //=============================================================================
 //
 //  RenameFileDlgProc()
 //
 //
-INT_PTR CALLBACK RenameFileDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
-{
+INT_PTR CALLBACK RenameFileDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
 	LPFILEOPDLGDATA lpfod;
+
 	switch (umsg) {
 	case WM_INITDIALOG:
 		lpfod = (LPFILEOPDLGDATA)lParam;
@@ -1406,14 +1372,12 @@ INT_PTR CALLBACK RenameFileDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 	return FALSE;
 }
 
-
 //=============================================================================
 //
 //  RenameFileDlg()
 //
 //
-BOOL RenameFileDlg(HWND hwnd)
-{
+BOOL RenameFileDlg(HWND hwnd) {
 	DLITEM dli;
 	FILEOPDLGDATA fod;
 	SHFILEOPSTRUCT shfos;
@@ -1461,7 +1425,6 @@ BOOL RenameFileDlg(HWND hwnd)
 	return FALSE;
 }
 
-
 //=============================================================================
 //
 //  CopyMoveDlgProc()
@@ -1469,15 +1432,14 @@ BOOL RenameFileDlg(HWND hwnd)
 //
 extern int cxCopyMoveDlg;
 
-INT_PTR CALLBACK CopyMoveDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
-{
+INT_PTR CALLBACK CopyMoveDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
 	static int cxClient;
 	static int cyClient;
 	static int mmiPtMaxY;
 	static int mmiPtMinX;
+	LPFILEOPDLGDATA lpfod;
 
 	switch (umsg) {
-	LPFILEOPDLGDATA lpfod;
 	case WM_INITDIALOG: {
 		RECT rc;
 		WCHAR tch[64];
@@ -1619,10 +1581,9 @@ INT_PTR CALLBACK CopyMoveDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPa
 		case IDOK:
 			/*text*/
 			lpfod = (LPFILEOPDLGDATA)GetWindowLongPtr(hwnd, DWLP_USER);
-			if (GetDlgItemText(hwnd, IDC_DESTINATION, lpfod->szDestination,
-							   COUNTOF(lpfod->szDestination) - 1)) {
-
-				/*wfunc*/ if (IsDlgButtonChecked(hwnd, IDC_FUNCCOPY)) {
+			if (GetDlgItemText(hwnd, IDC_DESTINATION, lpfod->szDestination, COUNTOF(lpfod->szDestination) - 1)) {
+				/*wfunc*/
+				if (IsDlgButtonChecked(hwnd, IDC_FUNCCOPY)) {
 					lpfod->wFunc = FO_COPY;
 				} else {
 					lpfod->wFunc = FO_MOVE;
@@ -1646,14 +1607,12 @@ INT_PTR CALLBACK CopyMoveDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPa
 	return FALSE;
 }
 
-
 //=============================================================================
 //
 //  CopyMoveDlg()
 //
 //
-BOOL CopyMoveDlg(HWND hwnd, UINT *wFunc)
-{
+BOOL CopyMoveDlg(HWND hwnd, UINT *wFunc) {
 	DLITEM dli;
 	FILEOPDLGDATA fod;
 	SHFILEOPSTRUCT shfos;
@@ -1721,15 +1680,13 @@ BOOL CopyMoveDlg(HWND hwnd, UINT *wFunc)
 	return FALSE;
 }
 
-
 extern WCHAR tchOpenWithDir[MAX_PATH];
 extern int  flagNoFadeHidden;
 
 extern int cxOpenWithDlg;
 extern int cyOpenWithDlg;
 
-INT_PTR CALLBACK OpenWithDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
-{
+INT_PTR CALLBACK OpenWithDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
 	static int cxClient;
 	static int cyClient;
 	static int mmiPtMaxY;
@@ -1773,8 +1730,8 @@ INT_PTR CALLBACK OpenWithDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPa
 
 		SetWindowLongPtr(hwnd, DWLP_USER, (LONG_PTR)lParam);
 
-		//SetExplorerTheme(GetDlgItem(hwnd,IDC_OPENWITHDIR));
-		ListView_SetExtendedListViewStyle(GetDlgItem(hwnd, IDC_OPENWITHDIR),/*LVS_EX_FULLROWSELECT|*/LVS_EX_DOUBLEBUFFER | LVS_EX_LABELTIP);
+		//SetExplorerTheme(GetDlgItem(hwnd, IDC_OPENWITHDIR));
+		ListView_SetExtendedListViewStyle(GetDlgItem(hwnd, IDC_OPENWITHDIR), /*LVS_EX_FULLROWSELECT | */LVS_EX_DOUBLEBUFFER | LVS_EX_LABELTIP);
 		ListView_InsertColumn(GetDlgItem(hwnd, IDC_OPENWITHDIR), 0, &lvc);
 		DirList_Init(GetDlgItem(hwnd, IDC_OPENWITHDIR), NULL);
 		DirList_Fill(GetDlgItem(hwnd, IDC_OPENWITHDIR), tchOpenWithDir, DL_ALLOBJECTS, NULL, FALSE, flagNoFadeHidden, DS_NAME, FALSE);
@@ -1914,14 +1871,12 @@ INT_PTR CALLBACK OpenWithDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPa
 	return FALSE;
 }
 
-
 //=============================================================================
 //
 //  OpenWithDlg()
 //
 //
-BOOL OpenWithDlg(HWND hwnd, LPDLITEM lpdliParam)
-{
+BOOL OpenWithDlg(HWND hwnd, LPDLITEM lpdliParam) {
 	DLITEM dliOpenWith;
 	dliOpenWith.mask = DLI_FILENAME;
 
@@ -1984,16 +1939,15 @@ BOOL OpenWithDlg(HWND hwnd, LPDLITEM lpdliParam)
 	return FALSE;
 }
 
-
 //=============================================================================
 //
 //  NewDirDlgProc()
 //
 //
-INT_PTR CALLBACK NewDirDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
-{
-	switch (umsg) {
+INT_PTR CALLBACK NewDirDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
 	LPFILEOPDLGDATA lpfod;
+
+	switch (umsg) {
 	case WM_INITDIALOG:
 		lpfod = (LPFILEOPDLGDATA)lParam;
 		SetWindowLongPtr(hwnd, DWLP_USER, (LONG_PTR)lpfod);
@@ -2024,14 +1978,12 @@ INT_PTR CALLBACK NewDirDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPara
 	return FALSE;
 }
 
-
 //=============================================================================
 //
 //  NewDirDlg()
 //
 //
-BOOL NewDirDlg(HWND hwnd, LPWSTR pszNewDir)
-{
+BOOL NewDirDlg(HWND hwnd, LPWSTR pszNewDir) {
 	FILEOPDLGDATA fod;
 
 	if (IDOK == ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_NEWDIR),  hwnd, NewDirDlgProc, (LPARAM)&fod)) {
@@ -2042,7 +1994,6 @@ BOOL NewDirDlg(HWND hwnd, LPWSTR pszNewDir)
 	}
 }
 
-
 //=============================================================================
 //
 //  FindWinDlgProc()
@@ -2051,8 +2002,7 @@ BOOL NewDirDlg(HWND hwnd, LPWSTR pszNewDir)
 //
 extern int flagPortableMyDocs;
 
-INT_PTR CALLBACK FindWinDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
-{
+INT_PTR CALLBACK FindWinDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
 	static WCHAR *pTargetWndClassBuf;
 	static HICON hIconCross1, hIconCross2;
 	static HCURSOR hCursorCross;
@@ -2099,12 +2049,13 @@ INT_PTR CALLBACK FindWinDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPar
 			PostMessage(hwnd, WM_NEXTDLGCTL, (WPARAM)(GetDlgItem(hwnd, IDOK)), 1);
 		}
 
-		//if (GetDlgItemText(hwnd,IDC_WINMODULE,tch,COUNTOF(tch)))
-		//	SetDlgItemText(GetParent(hwnd),IDC_TARGETPATH,tch);
+		//if (GetDlgItemText(hwnd, IDC_WINMODULE, tch, COUNTOF(tch))) {
+		//	SetDlgItemText(GetParent(hwnd), IDC_TARGETPATH, tch);
+		//}
 		//
-		//if (GetDlgItemText(hwnd,IDC_WINCLASS,tch,COUNTOF(tch))) {
-		//	lstrcpyn(pTargetWndClassBuf,tch,256);
-		//	PostMessage(hwnd,WM_CLOSE,0,0);
+		//if (GetDlgItemText(hwnd, IDC_WINCLASS, tch, COUNTOF(tch))) {
+		//	lstrcpyn(pTargetWndClassBuf, tch, 256);
+		//	PostMessage(hwnd, WM_CLOSE, 0, 0);
 		//}
 	}
 	break;
@@ -2176,7 +2127,6 @@ INT_PTR CALLBACK FindWinDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPar
 	return FALSE;
 }
 
-
 //=============================================================================
 //
 //  FindTargetDlgProc()
@@ -2192,8 +2142,7 @@ extern WCHAR szDDEMsg[256];
 extern WCHAR szDDEApp[256];
 extern WCHAR szDDETopic[256];
 
-INT_PTR CALLBACK FindTargetDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
-{
+INT_PTR CALLBACK FindTargetDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
 	static WCHAR szTargetWndClass[256];
 
 	switch (umsg) {
@@ -2221,22 +2170,23 @@ INT_PTR CALLBACK FindTargetDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 			DestroyWindow(hwndToolTip);
 		}
 
-		//// ToolTip for find window button
-		//hwndToolTip = CreateWindowEx(0,TOOLTIPS_CLASS,NULL,0,0,0,0,0,hwnd, NULL,g_hInstance,NULL);
-		//ZeroMemory(&ti,sizeof(TOOLINFO));
+		// ToolTip for find window button
+		//hwndToolTip = CreateWindowEx(0, TOOLTIPS_CLASS, NULL, 0, 0, 0, 0, 0, hwnd, NULL, g_hInstance, NULL);
+		//ZeroMemory(&ti, sizeof(TOOLINFO));
 		//ti.cbSize   = sizeof(TOOLINFO);
 		//ti.uFlags   = TTF_IDISHWND | TTF_SUBCLASS;
 		//ti.hwnd     = hwnd;
-		//ti.uId      = (UINT)GetDlgItem(hwnd,IDC_FINDWIN);
+		//ti.uId      = (UINT)GetDlgItem(hwnd, IDC_FINDWIN);
 		//ti.hinst    = g_hInstance;
 		//ti.lpszText = (LPWSTR)IDS_FINDWINTITLE;
-
-		//if (!SendMessage(hwndToolTip,TTM_ADDTOOL,0,(LPARAM)&ti))
+		//
+		//if (!SendMessage(hwndToolTip, TTM_ADDTOOL, 0, (LPARAM)&ti)) {
 		//	DestroyWindow(hwndToolTip);
+		//}
 
-		// Bitmap f黵 den Browse-Button
+		// Bitmap f \x00FC r den Browse-Button
 		MakeBitmapButton(hwnd, IDC_BROWSE, g_hInstance, IDB_OPEN);
-		//MakeBitmapButton(hwnd,IDC_FINDWIN,g_hInstance,IDB_BROWSE);
+		//MakeBitmapButton(hwnd, IDC_FINDWIN, g_hInstance, IDB_BROWSE);
 
 		// initialize edit controls
 		SendDlgItemMessage(hwnd, IDC_TARGETPATH, EM_LIMITTEXT, MAX_PATH - 1, 0);
@@ -2305,7 +2255,7 @@ INT_PTR CALLBACK FindTargetDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 
 	case WM_DESTROY:
 		DeleteBitmapButton(hwnd, IDC_BROWSE);
-		//DeleteBitmapButton(hwnd,IDC_FINDWIN);
+		//DeleteBitmapButton(hwnd, IDC_FINDWIN);
 		return FALSE;
 
 	case WM_COMMAND:
@@ -2329,7 +2279,7 @@ INT_PTR CALLBACK FindTargetDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 			GetString(IDS_FILTER_EXE, szFilter, COUNTOF(szFilter));
 			PrepareFilterStr(szFilter);
 
-			// ofn ausf黮len
+			// ofn ausf \x00FC llen
 			ofn.lStructSize = sizeof(OPENFILENAME);
 			ofn.hwndOwner   = hwnd;
 			ofn.lpstrFilter = szFilter;
@@ -2362,17 +2312,18 @@ INT_PTR CALLBACK FindTargetDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 		//	BOOL bEnableOK = FALSE;
 		//	WCHAR tchArgs[MAX_PATH * 2];
 		//
-		//	if (GetDlgItemText(hwnd,IDC_COMMANDLINE,tchArgs,COUNTOF(tchArgs))) {
-		//		if (ExtractFirstArgument(tchArgs,tchArgs,NULL)) {
-		//			if (lstrlen(tchArgs))
+		//	if (GetDlgItemText(hwnd, IDC_COMMANDLINE, tchArgs, COUNTOF(tchArgs))) {
+		//		if (ExtractFirstArgument(tchArgs, tchArgs, NULL)) {
+		//			if (lstrlen(tchArgs)) {
 		//				bEnableOK = TRUE;
+		//			}
 		//		}
 		//	}
 		//
-			// OK Button enablen und disablen
-		//	EnableWindow(GetDlgItem(hwnd,IDOK),bEnableOK);
-		//	}
-		//	break;
+		//	// OK Button enablen und disablen
+		//	EnableWindow(GetDlgItem(hwnd, IDOK), bEnableOK);
+		//}
+		//break;
 
 		case IDC_LAUNCH:
 			CheckRadioButton(hwnd, IDC_ALWAYSRUN, IDC_USEDDE, 0);
@@ -2510,6 +2461,5 @@ INT_PTR CALLBACK FindTargetDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 
 	return FALSE;
 }
-
 
 // End of Dialogs.c

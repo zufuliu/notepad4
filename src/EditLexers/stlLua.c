@@ -4,7 +4,7 @@
 // https://en.wikipedia.org/wiki/Lua_(programming_language)
 // http://www.lua.org/
 
-static KEYWORDLIST Keywords_Lua = {
+static KEYWORDLIST Keywords_Lua = {{
 "and break do else elseif end false for function goto if "
 "in local nil not or repeat return then true until while",
 // Basic Functions
@@ -33,9 +33,9 @@ static KEYWORDLIST Keywords_Lua = {
 "", "", "", "", ""
 
 #if NUMKEYWORD == 16
-,"","","","","","",""
+, "", "", "", "", "", "", ""
 #endif
-};
+}};
 
 EDITLEXER lexLua = { SCLEX_LUA, NP2LEX_LUA, L"Lua Script", L"lua; wlua", L"", &Keywords_Lua,
 {
@@ -46,8 +46,8 @@ EDITLEXER lexLua = { SCLEX_LUA, NP2LEX_LUA, L"Lua Script", L"lua; wlua", L"", &K
 	{ SCE_LUA_WORD3, 63452, L"String, Table & Math Functions", L"fore:#FF0080", L"" },
 	{ SCE_LUA_WORD4, 63453, L"Input, Output & System Facilities", L"fore:#0080FF", L"" },
 	{ SCE_LUA_FUNCTION, NP2STYLE_Function, L"Function", L"fore:#A46000", L"" },
-	{ MULTI_STYLE(SCE_LUA_COMMENT,SCE_LUA_COMMENTLINE,SCE_LUA_COMMENTDOC,0), NP2STYLE_Comment, L"Comment", L"fore:#008000", L"" },
-	{ MULTI_STYLE(SCE_LUA_STRING,SCE_LUA_STRINGEOL,SCE_LUA_LITERALSTRING,SCE_LUA_CHARACTER), NP2STYLE_String, L"String", L"fore:#008000", L"" },
+	{ MULTI_STYLE(SCE_LUA_COMMENT, SCE_LUA_COMMENTLINE, SCE_LUA_COMMENTDOC, 0), NP2STYLE_Comment, L"Comment", L"fore:#008000", L"" },
+	{ MULTI_STYLE(SCE_LUA_STRING, SCE_LUA_STRINGEOL, SCE_LUA_LITERALSTRING, SCE_LUA_CHARACTER), NP2STYLE_String, L"String", L"fore:#008000", L"" },
 	{ SCE_LUA_NUMBER, NP2STYLE_Number, L"Number", L"fore:#FF0000", L"" },
 	{ SCE_LUA_OPERATOR, NP2STYLE_Operator, L"Operator", L"fore:#B000B0", L"fore:#B000B0" },
 	{ SCE_LUA_PREPROCESSOR, NP2STYLE_Preprocessor, L"Preprocessor", L"fore:#FF8000", L"" },

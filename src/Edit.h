@@ -18,15 +18,14 @@
 *
 ******************************************************************************/
 
-#ifndef _NOTEPAD2_EDIT_H_
-#define _NOTEPAD2_EDIT_H_
+#ifndef NOTEPAD2_EDIT_H_
+#define NOTEPAD2_EDIT_H_
 
 #include "Sci_Position.h"
 
 // extern "C" declarations of Scintilla functions
 BOOL Scintilla_RegisterClasses(void *);
-BOOL Scintilla_ReleaseResources();
-
+BOOL Scintilla_ReleaseResources(void);
 
 typedef struct _editfindreplace {
 	char	szFind[512];
@@ -45,9 +44,7 @@ typedef struct _editfindreplace {
 #endif
 	//HANDLE hMRUFind;
 	//HANDLE hMRUReplace;
-
 } EDITFINDREPLACE, *LPEDITFINDREPLACE, *LPCEDITFINDREPLACE;
-
 
 #define IDMSG_SWITCHTOFIND		300
 #define IDMSG_SWITCHTOREPLACE	301
@@ -68,18 +65,17 @@ typedef struct _editfindreplace {
 #define SORT_LOGICAL		64
 #define SORT_COLUMN			128
 
-
 HWND	EditCreate(HWND hwndParent);
 void	EditSetNewText(HWND hwnd, char *lpstrText, DWORD cbText);
 BOOL	EditConvertText(HWND hwnd, UINT cpSource, UINT cpDest, BOOL bSetSavePoint);
 BOOL	EditSetNewEncoding(HWND hwnd, int iCurrentEncoding,
-							int iNewEncoding, BOOL bNoUI, BOOL bSetSavePoint);
+						   int iNewEncoding, BOOL bNoUI, BOOL bSetSavePoint);
 
-char*	EditGetClipboardText(HWND hwnd);
+char	*EditGetClipboardText(HWND hwnd);
 BOOL	EditCopyAppend(HWND hwnd);
 int 	EditDetectEOLMode(HWND hwnd, char *lpData, DWORD cbData);
 BOOL	EditLoadFile(HWND hwnd, LPCWSTR pszFile, BOOL bSkipEncodingDetection,
-				  int *iEncoding, int *iEOLMode, BOOL *pbUnicodeErr, BOOL *pbFileTooBig);
+					 int *iEncoding, int *iEOLMode, BOOL *pbUnicodeErr, BOOL *pbFileTooBig);
 BOOL	EditSaveFile(HWND hwnd, LPCWSTR pszFile, int iEncoding, BOOL *pbCancelDataLoss, BOOL bSaveCopy);
 
 void	EditInvertCase(HWND hwnd);
@@ -143,10 +139,10 @@ BOOL	EditAlignDlg(HWND hwnd, int *piAlignMode);
 // in Print.cpp
 BOOL	EditPrint(HWND hwnd, LPCWSTR pszDocTitle, LPCWSTR pszPageFormat);
 void	EditPrintSetup(HWND hwnd);
-void	EditPrintInit();
+void	EditPrintInit(void);
 
 void	EditMarkAll(HWND hwnd, int iMarkOccurrences,
-				BOOL bMarkOccurrencesMatchCase, BOOL bMarkOccurrencesMatchWords);
+					BOOL bMarkOccurrencesMatchCase, BOOL bMarkOccurrencesMatchWords);
 
 // in EditAutoC.c
 void	EditCompleteWord(HWND hwnd, BOOL autoInsert);
@@ -188,9 +184,8 @@ typedef struct _np2encoding {
 	WCHAR	wchLabel[32];
 } NP2ENCODING;
 
-
 // in EditEncoding.c
-void	Encoding_InitDefaults();
+void	Encoding_InitDefaults(void);
 int 	Encoding_MapIniSetting(BOOL bLoad, int iSetting);
 void	Encoding_GetLabel(int iEncoding);
 int 	Encoding_MatchW(LPCWSTR pwszTest);
@@ -207,8 +202,7 @@ BOOL	IsUTF7(const char *pTest, int nLength);
 INT		UTF8_mbslen(LPCSTR source, INT byte_length);
 INT		UTF8_mbslen_bytes(LPCSTR utf8_string);
 
-
-// WideCharToMultiByte, UTF8 encoding of U+0800 to U+FFFF 	
+// WideCharToMultiByte, UTF8 encoding of U+0800 to U+FFFF
 #define kMaxMultiByteCount	3
 
 #define IsUTF8Signature(p) \
@@ -217,10 +211,8 @@ INT		UTF8_mbslen_bytes(LPCSTR utf8_string);
 #define UTF8StringStart(p) \
 	(IsUTF8Signature(p)) ? (p+3) : (p)
 
-
-//void SciInitThemes(HWND);
-//LRESULT CALLBACK SciThemedWndProc(HWND, UINT, WPARAM, LPARAM);
-
+//void SciInitThemes(HWND hwnd);
+//LRESULT CALLBACK SciThemedWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam);
 
 #define FV_TABWIDTH				1
 #define FV_INDENTWIDTH			2
@@ -254,7 +246,6 @@ BOOL	FileVars_IsNonUTF8(LPFILEVARS lpfv);
 BOOL	FileVars_IsValidEncoding(LPFILEVARS lpfv);
 int 	FileVars_GetEncoding(LPFILEVARS lpfv);
 
-
-#endif //_NOTEPAD2_EDIT_H_
+#endif //NOTEPAD2_EDIT_H_
 
 // End of Edit.h

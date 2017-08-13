@@ -1,7 +1,7 @@
 #include "EditLexer.h"
 #include "EditStyle.h"
 
-static KEYWORDLIST Keywords_SQL = {
+static KEYWORDLIST Keywords_SQL = {{
 "abort action add after all allocate alter analyze and any as asc asensitive at attach audit authorization auto_increment autoincrement before begin between both break by call cascade cascaded case cast change check close cluster coalesce collate collation column comment commit condition conflict connect connection "
 "constraint continue convert create cross current current_date current_path current_time current_timestamp current_user "
 "cursor database deallocate dec declare default deferrable deferred delete desc describe descriptor detach deterministic disconnect distinct do drop dynamic each else elseif end escape except exception exclusive exec execute exists "
@@ -25,7 +25,7 @@ static KEYWORDLIST Keywords_SQL = {
 "changes() instr() last_insert_rowid() load_extension() quote() soundex() sqlite_compileoption_get() sqlite_compileoption_used() sqlite_source_id() sqlite_version() total_changes() unicode() julianday() rtree() fts3() fts4() "
 , "", "", "",
 // upper case
- "ABORT ACTION ADD AFTER ALL ALLOCATE ALTER ANALYZE AND ANY AS ASC ASENSITIVE AT ATTACH AUDIT AUTHORIZATION AUTO_INCREMENT AUTOINCREMENT BEFORE BEGIN BETWEEN BOTH BREAK BY CALL CASCADE CASCADED CASE CAST CHANGE CHECK CLOSE CLUSTER COALESCE COLLATE COLLATION COLUMN COMMENT COMMIT CONDITION CONFLICT CONNECT CONNECTION "
+"ABORT ACTION ADD AFTER ALL ALLOCATE ALTER ANALYZE AND ANY AS ASC ASENSITIVE AT ATTACH AUDIT AUTHORIZATION AUTO_INCREMENT AUTOINCREMENT BEFORE BEGIN BETWEEN BOTH BREAK BY CALL CASCADE CASCADED CASE CAST CHANGE CHECK CLOSE CLUSTER COALESCE COLLATE COLLATION COLUMN COMMENT COMMIT CONDITION CONFLICT CONNECT CONNECTION "
 "CONSTRAINT CONTINUE CONVERT CREATE CROSS CURRENT CURRENT_DATE CURRENT_PATH CURRENT_TIME CURRENT_TIMESTAMP CURRENT_USER "
 "CURSOR DATABASE DEALLOCATE DEC DECLARE DEFAULT DEFERRABLE DEFERRED DELETE DESC DESCRIBE DESCRIPTOR DETACH DETERMINISTIC DISCONNECT DISTINCT DO DROP DYNAMIC EACH ELSE ELSEIF END ESCAPE EXCEPT EXCEPTION EXCLUSIVE EXEC EXECUTE EXISTS "
 "EXIT EXPLAIN EXTERNAL FAIL FALSE FETCH FILE FIRST FOR FOREIGN FREE FROM FULL FUNCTION GET GLOB GLOBAL GO GOTO GRANT GROUP HANDLER HAVING HOLD IDENTITY IF "
@@ -47,9 +47,9 @@ static KEYWORDLIST Keywords_SQL = {
 "CHANGES() INSTR() LAST_INSERT_ROWID() LOAD_EXTENSION() QUOTE() SOUNDEX() SQLITE_COMPILEOPTION_GET() SQLITE_COMPILEOPTION_USED() SQLITE_SOURCE_ID() SQLITE_VERSION() TOTAL_CHANGES() UNICODE() JULIANDAY() RTREE() FTS3() FTS4() "
 
 #if NUMKEYWORD == 16
-,"","","","","","",""
+, "", "", "", "", "", "", ""
 #endif
-};
+}};
 
 EDITLEXER lexSQL = { SCLEX_SQL, NP2LEX_SQL, L"SQL Query", L"sql; mysql", L"", &Keywords_SQL,
 {
@@ -58,13 +58,13 @@ EDITLEXER lexSQL = { SCLEX_SQL, NP2LEX_SQL, L"SQL Query", L"sql; mysql", L"", &K
 	{ SCE_SQL_WORD, NP2STYLE_Keyword, L"Keyword", L"bold; fore:#FF8040", L"" },
 	{ SCE_SQL_WORD2, NP2STYLE_TypeKeyword, L"Type Keyword", L"bold; fore:#1E90FF", L"" },
 	{ SCE_SQL_USER1, NP2STYLE_BasicFunction, L"Basic Function", L"fore:#FF0080", L"" },
-	{ MULTI_STYLE(SCE_SQL_COMMENT,SCE_SQL_COMMENTLINE,SCE_SQL_COMMENTLINEDOC,0), NP2STYLE_Comment, L"Comment", L"fore:#008000", L"" },
-	{ MULTI_STYLE(SCE_SQL_STRING,SCE_SQL_CHARACTER,0,0), NP2STYLE_String, L"String", L"fore:#008000; back:#FFF1A8", L"" },
+	{ MULTI_STYLE(SCE_SQL_COMMENT, SCE_SQL_COMMENTLINE, SCE_SQL_COMMENTLINEDOC, 0), NP2STYLE_Comment, L"Comment", L"fore:#008000", L"" },
+	{ MULTI_STYLE(SCE_SQL_STRING, SCE_SQL_CHARACTER, 0, 0), NP2STYLE_String, L"String", L"fore:#008000; back:#FFF1A8", L"" },
 	//{ SCE_SQL_IDENTIFIER, NP2STYLE_Identifier, L"Identifier", L"fore:#800080", L"" },
 	//{ SCE_SQL_QUOTEDIDENTIFIER, 63551, L"Quoted Identifier", L"fore:#800080; back:#FFCCFF", L"" },
 	{ SCE_SQL_NUMBER, NP2STYLE_Number, L"Number", L"fore:#FF0000", L"" },
-	{ MULTI_STYLE(SCE_SQL_HEX,SCE_SQL_HEX2,0,0), NP2STYLE_BlobHex, L"Blob Hex", L"fore:#C08000", L""},
-	{ MULTI_STYLE(SCE_SQL_BIT,SCE_SQL_BIT2,0,0), NP2STYLE_BitField, L"Bit Field ", L"fore:#C08000", L""},
+	{ MULTI_STYLE(SCE_SQL_HEX, SCE_SQL_HEX2, 0, 0), NP2STYLE_BlobHex, L"Blob Hex", L"fore:#C08000", L""},
+	{ MULTI_STYLE(SCE_SQL_BIT, SCE_SQL_BIT2, 0, 0), NP2STYLE_BitField, L"Bit Field ", L"fore:#C08000", L""},
 	{ SCE_SQL_VARIABLE, NP2STYLE_Variable, L"Variable", L"fore:#CC3300", L"" },
 	{ MULTI_STYLE(SCE_SQL_OPERATOR, SCE_SQL_QOPERATOR, 0, 0), NP2STYLE_Operator, L"Operator", L"fore:#B000B0", L"" },
 	{ -1, 00000, L"", L"", L"" }

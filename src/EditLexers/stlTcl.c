@@ -3,7 +3,7 @@
 
 // http://www.tcl.tk/about/language.html
 
-static KEYWORDLIST Keywords_Tcl = {
+static KEYWORDLIST Keywords_Tcl = {{
 // TCL Keywords
 "after append array auto_execok auto_import auto_load auto_load_index auto_qualify beep "
 "bgerror binary break case catch cd clock close concat continue dde default echo else "
@@ -28,13 +28,13 @@ static KEYWORDLIST Keywords_Tcl = {
 "", "", "", "", "", ""
 
 #if NUMKEYWORD == 16
-,"","","","","","",""
+, "", "", "", "", "", "", ""
 #endif
-};
+}};
 
-#define SCE_TCL__MULTI_COMMENT      MULTI_STYLE(SCE_TCL_COMMENT,SCE_TCL_COMMENTLINE,SCE_TCL_COMMENT_BOX,SCE_TCL_BLOCK_COMMENT)
-#define SCE_TCL__MULTI_KEYWORD      MULTI_STYLE(SCE_TCL_WORD,SCE_TCL_WORD2,SCE_TCL_WORD3,SCE_TCL_WORD_IN_QUOTE)
-#define SCE_TCL__MULTI_SUBSTITUTION MULTI_STYLE(SCE_TCL_SUBSTITUTION,SCE_TCL_SUB_BRACE,0,0)
+#define SCE_TCL__MULTI_COMMENT      MULTI_STYLE(SCE_TCL_COMMENT, SCE_TCL_COMMENTLINE, SCE_TCL_COMMENT_BOX, SCE_TCL_BLOCK_COMMENT)
+#define SCE_TCL__MULTI_KEYWORD      MULTI_STYLE(SCE_TCL_WORD, SCE_TCL_WORD2, SCE_TCL_WORD3, SCE_TCL_WORD_IN_QUOTE)
+#define SCE_TCL__MULTI_SUBSTITUTION MULTI_STYLE(SCE_TCL_SUBSTITUTION, SCE_TCL_SUB_BRACE, 0, 0)
 
 EDITLEXER lexTcl = { SCLEX_TCL, NP2LEX_TCL, L"Tcl Script", L"tcl; itcl; tm", L"", &Keywords_Tcl,
 {

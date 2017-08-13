@@ -18,6 +18,9 @@
 *
 ******************************************************************************/
 
+#ifndef METAPATH_HELPERS_H_
+#define METAPATH_HELPERS_H_
+
 extern HINSTANCE g_hInstance;
 extern UINT16 g_uWinVer;
 
@@ -32,8 +35,7 @@ extern WCHAR szIniFile[MAX_PATH];
 	WritePrivateProfileString(lpSection, lpName, lpString, szIniFile)
 #define IniDeleteSection(lpSection) \
 	WritePrivateProfileSection(lpSection, NULL, szIniFile)
-static __inline BOOL IniSetInt(LPCWSTR lpSection, LPCWSTR lpName, int i)
-{
+static __inline BOOL IniSetInt(LPCWSTR lpSection, LPCWSTR lpName, int i) {
 	WCHAR tch[32];
 	wsprintf(tch, L"%i", i);
 	return WritePrivateProfileString(lpSection, lpName, tch, szIniFile);
@@ -46,19 +48,17 @@ int IniSectionGetString(LPCWSTR lpCachedIniSection, LPCWSTR lpName, LPCWSTR lpDe
 int IniSectionGetInt(LPCWSTR lpCachedIniSection, LPCWSTR lpName, int iDefault);
 BOOL IniSectionGetBool(LPCWSTR lpCachedIniSection, LPCWSTR lpName, BOOL bDefault);
 BOOL IniSectionSetString(LPWSTR lpCachedIniSection, LPCWSTR lpName, LPCWSTR lpString);
-static __inline BOOL IniSectionSetInt(LPWSTR lpCachedIniSection, LPCWSTR lpName, int i)
-{
+static __inline BOOL IniSectionSetInt(LPWSTR lpCachedIniSection, LPCWSTR lpName, int i) {
 	WCHAR tch[32];
 	wsprintf(tch, L"%i", i);
 	return IniSectionSetString(lpCachedIniSection, lpName, tch);
 }
-static __inline BOOL IniSectionSetBool(LPWSTR lpCachedIniSection, LPCWSTR lpName, BOOL b)
-{
-	return IniSectionSetString(lpCachedIniSection, lpName, (b? L"1" : L"0"));
+static __inline BOOL IniSectionSetBool(LPWSTR lpCachedIniSection, LPCWSTR lpName, BOOL b) {
+	return IniSectionSetString(lpCachedIniSection, lpName, (b ? L"1" : L"0"));
 }
 
-void BeginWaitCursor();
-void EndWaitCursor();
+void BeginWaitCursor(void);
+void EndWaitCursor(void);
 
 #define Is2k()    (g_uWinVer >= 0x0500)
 #define IsXP()    (g_uWinVer >= 0x0501)
@@ -66,9 +66,9 @@ void EndWaitCursor();
 #define IsW7()    (g_uWinVer >= 0x0601)
 
 BOOL ExeNameFromWnd(HWND hwnd, LPWSTR szExeName, int cchExeName);
-//BOOL Is32bitExe(LPCWSTR);
-BOOL PrivateIsAppThemed();
-//BOOL SetExplorerTheme(HWND);
+//BOOL Is32bitExe(LPCWSTR lpszExeName);
+BOOL PrivateIsAppThemed(void);
+//BOOL SetExplorerTheme(HWND hwnd);
 BOOL SetTheme(HWND hwnd, LPCWSTR lpszTheme);
 BOOL BitmapMergeAlpha(HBITMAP hbmp, COLORREF crDest);
 BOOL BitmapAlphaBlend(HBITMAP hbmp, COLORREF crDest, BYTE alpha);
@@ -102,7 +102,7 @@ LRESULT SendWMSize(HWND hwnd);
 int FormatString(LPWSTR lpOutput, int nOutput, UINT uIdFormat, ...);
 
 void PathRelativeToApp(LPWSTR lpszSrc, LPWSTR lpszDest, int cchDest, BOOL bSrcIsFile,
-	BOOL bUnexpandEnv, BOOL bUnexpandMyDocs);
+					   BOOL bUnexpandEnv, BOOL bUnexpandMyDocs);
 void PathAbsoluteFromApp(LPWSTR lpszSrc, LPWSTR lpszDest, int cchDest, BOOL bExpandEnv);
 
 BOOL PathIsLnkFile(LPCWSTR pszPath);
@@ -137,7 +137,6 @@ BOOL ExecDDECommand(LPCWSTR lpszCmdLine, LPCWSTR lpszDDEMsg, LPCWSTR lpszDDEApp,
 typedef struct tagHISTORY {
 	WCHAR *psz[HISTORY_ITEMS]; // Strings
 	int  iCurItem;            // Current Item
-
 } HISTORY, *PHISTORY;
 
 BOOL History_Init(PHISTORY ph);
@@ -155,24 +154,22 @@ void History_UpdateToolbar(PHISTORY ph, HWND hwnd, int cmdBack, int cmdForward);
 #define MRU_UTF8      2
 
 typedef struct _mrulist {
-
 	WCHAR  szRegKey[256];
 	int   iFlags;
 	int   iSize;
 	LPWSTR pszItems[MRU_MAXITEMS];
-
 } MRULIST, *PMRULIST, *LPMRULIST;
 
 LPMRULIST MRU_Create(LPCWSTR pszRegKey, int iFlags, int iSize);
-BOOL	MRU_Destroy(LPMRULIST pmru);
-BOOL	MRU_Add(LPMRULIST pmru, LPCWSTR pszNew);
-BOOL	MRU_Delete(LPMRULIST pmru, int iIndex);
-BOOL	MRU_Empty(LPMRULIST pmru);
-int		MRU_Enum(LPMRULIST pmru, int iIndex, LPWSTR pszItem, int cchItem);
-BOOL	MRU_Load(LPMRULIST pmru);
-BOOL	MRU_Save(LPMRULIST pmru);
-void	MRU_LoadToCombobox(HWND hwnd, LPCWSTR pszKey);
-void	MRU_AddOneItem(LPCWSTR pszKey, LPCWSTR pszNewItem);
+BOOL MRU_Destroy(LPMRULIST pmru);
+BOOL MRU_Add(LPMRULIST pmru, LPCWSTR pszNew);
+BOOL MRU_Delete(LPMRULIST pmru, int iIndex);
+BOOL MRU_Empty(LPMRULIST pmru);
+int MRU_Enum(LPMRULIST pmru, int iIndex, LPWSTR pszItem, int cchItem);
+BOOL MRU_Load(LPMRULIST pmru);
+BOOL MRU_Save(LPMRULIST pmru);
+void MRU_LoadToCombobox(HWND hwnd, LPCWSTR pszKey);
+void MRU_AddOneItem(LPCWSTR pszKey, LPCWSTR pszNewItem);
 
 //==== Themed Dialogs =========================================================
 #ifndef DLGTEMPLATEEX
@@ -197,14 +194,16 @@ DLGTEMPLATE *LoadThemedDialogTemplate(LPCTSTR lpDialogTemplateID, HINSTANCE hIns
 #define ThemedDialogBox(hInstance, lpTemplate, hWndParent, lpDialogFunc) \
 	ThemedDialogBoxParam(hInstance, lpTemplate, hWndParent, lpDialogFunc, 0)
 INT_PTR ThemedDialogBoxParam(HINSTANCE hInstance,
-	LPCTSTR lpTemplate,
-	HWND hWndParent,
-	DLGPROC lpDialogFunc,
-	LPARAM dwInitParam);
+							 LPCTSTR lpTemplate,
+							 HWND hWndParent,
+							 DLGPROC lpDialogFunc,
+							 LPARAM dwInitParam);
 
 //==== MinimizeToTray Functions - see comments in Helpers.c ===================
 BOOL GetDoAnimateMinimize(VOID);
 VOID MinimizeWndToTray(HWND hwnd);
 VOID RestoreWndFromTray(HWND hwnd);
+
+#endif // METAPATH_HELPERS_H_
 
 ///   End of Helpers.h
