@@ -83,12 +83,12 @@ BEGIN
         MENUITEM SEPARATOR
         MENUITEM "&Read Only",                  IDM_FILE_READONLY
         MENUITEM "Re&fresh\tF5",                IDM_FILE_REVERT
-        POPUP "&Reload As..."
+        POPUP "&Reload"
         BEGIN
-            MENUITEM "&ANSI\tShift+A",              CMD_RELOADANSI
-            MENUITEM "UFT-&8\tShift+F8",            CMD_RELOADASCIIASUTF8
-            MENUITEM "&OEM\tShift+Ctrl+O",          CMD_RELOADOEM
-            MENUITEM "Auto\tShift+Alt+F8",          CMD_RELOADNOFILEVARS
+            MENUITEM "As UFT-&8\tShift+F8",         CMD_RELOADASCIIASUTF8
+            MENUITEM "As &ANSI\tShift+A",           CMD_RELOADANSI
+            MENUITEM "As &OEM\tShift+Ctrl+O",       CMD_RELOADOEM
+            MENUITEM "No FileVars\tShift+Alt+F8",   CMD_RELOADNOFILEVARS
         END
         POPUP "&Launch"
         BEGIN
