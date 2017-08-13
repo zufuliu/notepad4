@@ -56,7 +56,7 @@
 		* JavaDoc
 	* JavaScript
 	* JSON Document
-	* Julia Script
+	* [Julia Script](https://julialang.org/)
 	* LaTeX
 	* Lisp Script
 	* Lisp
@@ -130,7 +130,7 @@
 	* C# (class list only)
 	* Java (class list only)
 	* Inno Setup
-	* Julia Script
+	* [Julia Script](https://julialang.org/)
 	* Lua Script
 	* Python Script
 	* PHP Script
@@ -172,7 +172,12 @@ TBD.
 * [Official Notepad2-mod website](https://xhmikosr.github.io/notepad2-mod/)
 * [Scintilla Documentation](http://www.scintilla.org/ScintillaDoc.html)
 
-## Changed keyboard shortcuts compared to Notepad2 or Notepad2-mod:
+## Changed keyboard shortcuts compared to Notepad2 and/or Notepad2-mod:
 TBD.
 
-You can use MSVC 2015 or later to build Notepad2.
+## You can use the following system to build Notepad2 and metapath:
+* Visual C++ 2015 or later.
+* [CodeLite](https://www.codelite.org/) and GCC, recommended using the latest [MinGW-w64](http://mingw-w64.org/) GCC
+	* [x86\_64-7.1.0-release-posix-seh](https://sourceforge.net/projects/mingw-w64/files/Toolchains%20targetting%20Win64/Personal%20Builds/mingw-builds/7.1.0/threads-posix/seh/) for 64 bit build.
+	* [i686-7.1.0-release-posix-dwarf](https://sourceforge.net/projects/mingw-w64/files/Toolchains%20targetting%20Win32/Personal%20Builds/mingw-builds/7.1.0/threads-posix/dwarf/) for 32 bit build.
+* Other system which support C99 and C++11.
