@@ -175,9 +175,9 @@ TBD.
 ## Changed keyboard shortcuts compared to Notepad2 and/or Notepad2-mod:
 TBD.
 
-## You can use the following system to build Notepad2 and metapath:
+## You can use following system to build Notepad2 and metapath:
 * Visual C++ 2015 or later.
-* [CodeLite](https://www.codelite.org/) and GCC, recommended using the latest [MinGW-w64](http://mingw-w64.org/) GCC
+* [CodeLite](https://www.codelite.org/) and GCC, recommended using latest [MinGW-w64](http://mingw-w64.org/) GCC
 	* [x86\_64-7.1.0-release-posix-seh](https://sourceforge.net/projects/mingw-w64/files/Toolchains%20targetting%20Win64/Personal%20Builds/mingw-builds/7.1.0/threads-posix/seh/) for 64 bit build.
 	* [i686-7.1.0-release-posix-dwarf](https://sourceforge.net/projects/mingw-w64/files/Toolchains%20targetting%20Win32/Personal%20Builds/mingw-builds/7.1.0/threads-posix/dwarf/) for 32 bit build.
 * Other system which support C99 and C++11.
