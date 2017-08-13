@@ -84,7 +84,7 @@
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>..\..\scintilla\include;..\..\scintilla\lexlib;..\..\scintilla\src;..\..\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;STATIC_BUILD;SCI_NAMESPACE;SCI_LEXER;BOOKMARK_EDITION;DISABLE_D2D;NO_CXX11_REGEX;SCI_DISABLE_PROVISIONAL;UNICODE;_UNICODE;_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;_WIN32_WINNT=0x0501;WINVER=0x0501;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;WIN32;STATIC_BUILD;SCI_NAMESPACE;SCI_LEXER;BOOKMARK_EDITION;DISABLE_D2D;NO_CXX11_REGEX;SCI_DISABLE_PROVISIONAL;UNICODE;_UNICODE;_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;_WIN32_WINNT=0x0501;WINVER=0x0501;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <WarningLevel>Level4</WarningLevel>
@@ -105,7 +105,7 @@
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>..\..\scintilla\include;..\..\scintilla\lexlib;..\..\scintilla\src;..\..\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_WIN64;STATIC_BUILD;SCI_NAMESPACE;SCI_LEXER;BOOKMARK_EDITION;DISABLE_D2D;NO_CXX11_REGEX;SCI_DISABLE_PROVISIONAL;UNICODE;_UNICODE;_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;_WIN32_WINNT=0x0502;WINVER=0x0502;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_WIN64;STATIC_BUILD;SCI_NAMESPACE;SCI_LEXER;BOOKMARK_EDITION;DISABLE_D2D;NO_CXX11_REGEX;SCI_DISABLE_PROVISIONAL;UNICODE;_UNICODE;_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;_WIN32_WINNT=0x0502;WINVER=0x0502;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <WarningLevel>Level4</WarningLevel>
