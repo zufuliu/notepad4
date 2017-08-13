@@ -3428,7 +3428,7 @@ static int ResourcesRelease(bool fromDllMain) {
 }
 
 // This function is externally visible so it can be called from container when building statically.
-int Scintilla_ReleaseResources() {
+int Scintilla_ReleaseResources(void) {
 	return ResourcesRelease(false);
 }
 

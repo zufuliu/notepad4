@@ -701,7 +701,7 @@ _label_identifier:
 			break;
 
 		case SCE_C_REGEX:
-			if (sc.atLineStart) {
+			if (sc.atLineStart && !(lexType & LEX_AWK)) {
 				sc.SetState(SCE_C_DEFAULT);
 			} else if (sc.ch == '/') {
 				sc.Forward();
