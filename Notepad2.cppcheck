@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="1">
-    <importproject>build/VS2015/Notepad2.sln</importproject>
+    <importproject>build/VS2017/Notepad2.sln</importproject>
 </project>
