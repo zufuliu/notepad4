@@ -28,6 +28,12 @@
 #define MBYESNOCANCEL	4
 #define MBOKCANCEL		8
 
+/**
+ * App message used to center MessageBox to the window of the program.
+ * https://stackoverflow.com/questions/6299797/c-how-to-center-messagebox
+ */
+#define APPM_CENTER_MESSAGE_BOX		(WM_APP + 1)
+
 int 	MsgBox(int iType, UINT uIdMsg, ...);
 void	DisplayCmdLineHelp(HWND hwnd);
 BOOL	GetDirectory(HWND hwndParent, int iTitle, LPWSTR pszFolder, LPCWSTR pszBase, BOOL bNewDialogStyle);

@@ -109,6 +109,7 @@ BOOL SetWindowTitle(HWND hwnd, UINT uIDAppName, BOOL bIsElevated, UINT uIDUntitl
 					UINT uIDReadOnly, BOOL bReadOnly, LPCWSTR lpszExcerpt);
 void SetWindowTransparentMode(HWND hwnd, BOOL bTransparentMode);
 
+void CenterDlgInParentEx(HWND hDlg, HWND hParent);
 void CenterDlgInParent(HWND hDlg);
 void GetDlgPos(HWND hDlg, LPINT xDlg, LPINT yDlg);
 void SetDlgPos(HWND hDlg, int xDlg, int yDlg);

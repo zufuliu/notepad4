@@ -510,7 +510,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 
 		DragFinish(hDrop);
 	}
-	break;
+		break;
 
 	case WM_COPYDATA: {
 		PCOPYDATASTRUCT pcds = (PCOPYDATASTRUCT)lParam;
@@ -524,7 +524,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 			LocalFree(lpsz);
 		}
 	}
-	return TRUE;
+		return TRUE;
 
 	case WM_CONTEXTMENU: {
 		HMENU hmenu;
@@ -569,7 +569,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 
 		DestroyMenu(hmenu);
 	}
-	break;
+		break;
 
 	case WM_INITMENU:
 		MsgInitMenu(hwnd, wParam, lParam);
@@ -659,6 +659,16 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 			ShowOwnedPopups(hwnd, TRUE);
 			return TRUE;
 		}
+		break;
+
+	case APPM_CENTER_MESSAGE_BOX: {
+		HWND box = FindWindow(L"#32770", NULL);
+		HWND parent = (HWND)lParam;
+		// MessageBox belongs to us.
+		if (GetParent(box) == parent || GetWindow(box, GW_OWNER) == parent) {
+			CenterDlgInParentEx(box, parent);
+		}
+	}
 		break;
 
 	default:

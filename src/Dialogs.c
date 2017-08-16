@@ -113,6 +113,7 @@ int MsgBox(int iType, UINT uIdMsg, ...) {
 		hwnd = hwndMain;
 	}
 
+	PostMessage(hwndMain, APPM_CENTER_MESSAGE_BOX, 0, (LPARAM)hwnd);
 	return MessageBoxEx(hwnd, szText, szTitle,
 						MB_SETFOREGROUND | iIcon,
 						MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT));
@@ -142,6 +143,9 @@ void DisplayCmdLineHelp(HWND hwnd) {
 	mbp.lpfnMsgBoxCallback = NULL;
 	mbp.dwLanguageId = MAKELANGID(LANG_NEUTRAL, SUBLANG_NEUTRAL);
 
+	if (hwnd != NULL) {
+		PostMessage(hwndMain, APPM_CENTER_MESSAGE_BOX, 0, (LPARAM)hwnd);
+	}
 	MessageBoxIndirect(&mbp);
 }
 

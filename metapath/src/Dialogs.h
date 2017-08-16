@@ -21,6 +21,12 @@
 #ifndef METAPATH_DIALOGS_H_
 #define METAPATH_DIALOGS_H_
 
+/**
+ * App message used to center MessageBox to the window of the program.
+ * https://stackoverflow.com/questions/6299797/c-how-to-center-messagebox
+ */
+#define APPM_CENTER_MESSAGE_BOX		(WM_APP + 1)
+
 int  ErrorMessage(int iLevel, UINT uIdMsg, ...);
 BOOL GetDirectory(HWND hwndParent, int iTitle, LPWSTR pszFolder, LPCWSTR pszBase, BOOL bNewDialogStyle);
 BOOL GetDirectory2(HWND hwndParent, int iTitle, LPWSTR pszFolder, int iBase);
