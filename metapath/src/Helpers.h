@@ -77,6 +77,7 @@ BOOL BitmapGrayScale(HBITMAP hbmp);
 BOOL SetWindowPathTitle(HWND hwnd, LPCWSTR lpszFile);
 void CenterDlgInParentEx(HWND hDlg, HWND hParent);
 void CenterDlgInParent(HWND hDlg);
+void SnapToDefaultButton(HWND hwndBox);
 void MakeBitmapButton(HWND hwnd, int nCtlId, HINSTANCE hInstance, UINT uBmpId);
 void DeleteBitmapButton(HWND hwnd, int nCtlId);
 void SetWindowTransparentMode(HWND hwnd, BOOL bTransparentMode);

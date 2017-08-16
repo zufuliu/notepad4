@@ -111,6 +111,7 @@ void SetWindowTransparentMode(HWND hwnd, BOOL bTransparentMode);
 
 void CenterDlgInParentEx(HWND hDlg, HWND hParent);
 void CenterDlgInParent(HWND hDlg);
+void SnapToDefaultButton(HWND hwndBox);
 void GetDlgPos(HWND hDlg, LPINT xDlg, LPINT yDlg);
 void SetDlgPos(HWND hDlg, int xDlg, int yDlg);
 void ResizeDlg_Init(HWND hwnd, int cxFrame, int cyFrame, int nIdGrip);

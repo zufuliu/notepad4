@@ -667,6 +667,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 		// MessageBox belongs to us.
 		if (parent == (HWND)wParam || parent == hwndMain) {
 			CenterDlgInParentEx(box, parent);
+			SnapToDefaultButton(box);
 		}
 	}
 		break;
