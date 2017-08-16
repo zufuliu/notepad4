@@ -63,11 +63,11 @@ int ErrorMessage(int iLevel, UINT uIdMsg, ...) {
 
 	iIcon = (iLevel > 1) ? MB_ICONEXCLAMATION : MB_ICONINFORMATION;
 
-	if ((hwnd = GetFocus()) == NULL) {
+	if ((hwnd = GetActiveWindow()) == NULL) {
 		hwnd = hwndMain;
 	}
 
-	PostMessage(hwndMain, APPM_CENTER_MESSAGE_BOX, 0, (LPARAM)hwnd);
+	PostMessage(hwndMain, APPM_CENTER_MESSAGE_BOX, (WPARAM)hwnd, 0);
 	return MessageBoxEx(hwnd, szText, szTitle, MB_SETFOREGROUND | iIcon, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT));
 }
 

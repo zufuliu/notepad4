@@ -109,11 +109,11 @@ int MsgBox(int iType, UINT uIdMsg, ...) {
 		break;
 	}
 
-	if ((hwnd = GetFocus()) == NULL) {
+	if ((hwnd = GetActiveWindow()) == NULL) {
 		hwnd = hwndMain;
 	}
 
-	PostMessage(hwndMain, APPM_CENTER_MESSAGE_BOX, 0, (LPARAM)hwnd);
+	PostMessage(hwndMain, APPM_CENTER_MESSAGE_BOX, (WPARAM)hwnd, 0);
 	return MessageBoxEx(hwnd, szText, szTitle,
 						MB_SETFOREGROUND | iIcon,
 						MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT));
@@ -144,7 +144,7 @@ void DisplayCmdLineHelp(HWND hwnd) {
 	mbp.dwLanguageId = MAKELANGID(LANG_NEUTRAL, SUBLANG_NEUTRAL);
 
 	if (hwnd != NULL) {
-		PostMessage(hwndMain, APPM_CENTER_MESSAGE_BOX, 0, (LPARAM)hwnd);
+		PostMessage(hwndMain, APPM_CENTER_MESSAGE_BOX, (WPARAM)hwnd, 0);
 	}
 	MessageBoxIndirect(&mbp);
 }

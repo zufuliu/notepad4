@@ -663,9 +663,9 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 
 	case APPM_CENTER_MESSAGE_BOX: {
 		HWND box = FindWindow(L"#32770", NULL);
-		HWND parent = (HWND)lParam;
+		HWND parent = GetParent(box);
 		// MessageBox belongs to us.
-		if (GetParent(box) == parent || GetWindow(box, GW_OWNER) == parent) {
+		if (parent == (HWND)wParam || parent == hwndMain) {
 			CenterDlgInParentEx(box, parent);
 		}
 	}
