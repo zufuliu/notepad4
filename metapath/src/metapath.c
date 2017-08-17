@@ -298,6 +298,7 @@ HWND InitInstance(HINSTANCE hInstance, LPSTR pszCmdLine, int nCmdShow) {
 				wi.cy = mi.rcWork.bottom - wi.y;
 			}
 		}
+
 		SetRect(&rc, wi.x, wi.y, wi.x + wi.cx, wi.y + wi.cy);
 		if (!IntersectRect(&rc2, &rc, &mi.rcWork)) {
 			wi.y = mi.rcWork.top + 16;
@@ -345,11 +346,11 @@ HWND InitInstance(HINSTANCE hInstance, LPSTR pszCmdLine, int nCmdShow) {
 		// Use a startup directory
 		if (iStartupDir == 1) {
 			WCHAR tch[MAX_PATH];
-			if (IniGetString(L"Settings", L"MRUDirectory", L"", tch, COUNTOF(tch))) {
-				DisplayPath(tch, IDS_ERR_STARTUPDIR);
-			} else {
-				ErrorMessage(2, IDS_ERR_STARTUPDIR);
+			if (!IniGetString(L"Settings", L"MRUDirectory", L"", tch, COUNTOF(tch))) {
+				GetModuleFileName(NULL, tch, COUNTOF(tch));
+				PathRemoveFileSpec(tch);
 			}
+			DisplayPath(tch, IDS_ERR_STARTUPDIR);
 		} else {
 			DisplayPath(tchFavoritesDir, IDS_ERR_STARTUPDIR);
 		}
@@ -510,7 +511,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 
 		DragFinish(hDrop);
 	}
-		break;
+	break;
 
 	case WM_COPYDATA: {
 		PCOPYDATASTRUCT pcds = (PCOPYDATASTRUCT)lParam;
@@ -524,7 +525,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 			LocalFree(lpsz);
 		}
 	}
-		return TRUE;
+	return TRUE;
 
 	case WM_CONTEXTMENU: {
 		HMENU hmenu;
@@ -569,7 +570,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 
 		DestroyMenu(hmenu);
 	}
-		break;
+	break;
 
 	case WM_INITMENU:
 		MsgInitMenu(hwnd, wParam, lParam);
@@ -670,7 +671,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 			SnapToDefaultButton(box);
 		}
 	}
-		break;
+	break;
 
 	default:
 		if (umsg == msgTaskbarCreated) {
@@ -744,10 +745,11 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	ListView_SetExtendedListViewStyle(hwndDirList, LVS_EX_DOUBLEBUFFER | LVS_EX_LABELTIP);
 	ListView_InsertColumn(hwndDirList, 0, &lvc);
 	DirList_Init(hwndDirList, NULL);
-	if (bTrackSelect)
+	if (bTrackSelect) {
 		ListView_SetExtendedListViewStyleEx(hwndDirList,
 											LVS_EX_TRACKSELECT | LVS_EX_ONECLICKACTIVATE,
 											LVS_EX_TRACKSELECT | LVS_EX_ONECLICKACTIVATE);
+	}
 	if (bFullRowSelect) {
 		ListView_SetExtendedListViewStyleEx(hwndDirList,
 											LVS_EX_FULLROWSELECT,
@@ -756,6 +758,7 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			SetTheme(hwndDirList, L"Explorer");
 		}
 	}
+
 	ListView_SetHoverTime(hwndDirList, 10);
 	// Drag & Drop
 	DragAcceptFiles(hwnd, TRUE);
@@ -848,10 +851,12 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) {
 		hbmp = LoadImage(hInstance, MAKEINTRESOURCE(IDR_MAINWND), IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION);
 		hbmpCopy = CopyImage(hbmp, IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION);
 	}
+
 	GetObject(hbmp, sizeof(BITMAP), &bmp);
 	if (!IsWinXPAndAbove()) {
 		BitmapMergeAlpha(hbmp, GetSysColor(COLOR_3DFACE));
 	}
+
 	himl = ImageList_Create(bmp.bmWidth / NUMTOOLBITMAPS, bmp.bmHeight, ILC_COLOR32 | ILC_MASK, 0, 0);
 	ImageList_AddMasked(himl, hbmp, CLR_DEFAULT);
 	DeleteObject(hbmp);
@@ -2449,7 +2454,7 @@ void LoadSettings(void) {
 	iEscFunction = IniSectionGetInt(pIniSection, L"EscFunction", 2);
 	iEscFunction = max(min(iEscFunction, 2), 0);
 
-	iStartupDir = IniSectionGetInt(pIniSection, L"StartupDirectory", 2);
+	iStartupDir = IniSectionGetInt(pIniSection, L"StartupDirectory", 1);
 	iStartupDir = max(min(iStartupDir, 2), 0);
 
 	if (!IniSectionGetString(pIniSection, L"Favorites", L"",

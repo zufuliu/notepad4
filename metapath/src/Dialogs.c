@@ -155,8 +155,8 @@ BOOL GetDirectory2(HWND hwndParent, int iTitle, LPWSTR pszFolder, int iBase) {
 		CoTaskMemFree(pidl);
 		fOk = TRUE;
 	}
-	CoTaskMemFree(pidlRoot);
 
+	CoTaskMemFree(pidlRoot);
 	return fOk;
 }
 

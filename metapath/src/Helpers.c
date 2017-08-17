@@ -51,6 +51,7 @@ int IniSectionGetString(LPCWSTR lpCachedIniSection, LPCWSTR lpName, LPCWSTR lpDe
 			}
 		}
 	}
+
 	lstrcpyn(lpReturnedString, lpDefault, cchReturnedString);
 	return lstrlen(lpReturnedString);
 }
@@ -542,6 +543,7 @@ int Toolbar_GetButtons(HWND hwnd, int cmdBase, LPWSTR lpszButtons, int cchButton
 		wsprintf(tchItem, L"%i ", (tbb.idCommand == 0) ? 0 : tbb.idCommand - cmdBase + 1);
 		lstrcat(tchButtons, tchItem);
 	}
+
 	TrimString(tchButtons);
 	lstrcpyn(lpszButtons, tchButtons, cchButtons);
 	return c;
@@ -815,22 +817,17 @@ BOOL PathGetLnkPath(LPCWSTR pszLnkFile, LPWSTR pszResPath, int cchResPath) {
 //  Manipulates: pszResPath
 //
 BOOL PathIsLnkToDirectory(LPCWSTR pszPath, LPWSTR pszResPath, int cchResPath) {
-
 	if (PathIsLnkFile(pszPath)) {
 		WCHAR tchResPath[MAX_PATH];
 		if (PathGetLnkPath(pszPath, tchResPath, sizeof(WCHAR)*COUNTOF(tchResPath))) {
 			if (PathIsDirectory(tchResPath)) {
 				lstrcpyn(pszResPath, tchResPath, cchResPath);
 				return TRUE;
-			} else {
-				return FALSE;
 			}
-		} else {
-			return FALSE;
 		}
-	} else {
-		return FALSE;
 	}
+
+	return FALSE;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1076,7 +1073,6 @@ int FormatNumberStr(LPWSTR lpNumberStr) {
 	}
 
 	c = StrEnd(lpNumberStr);
-
 	while ((c = CharPrev(lpNumberStr, c)) != lpNumberStr) {
 		if (++i == 3) {
 			i = 0;
@@ -1130,7 +1126,6 @@ HDROP CreateDropHandle(LPCWSTR lpFileName) {
 	HGLOBAL      hDrop;
 
 	hDrop = GlobalAlloc(GMEM_ZEROINIT | GMEM_MOVEABLE | GMEM_DDESHARE, sizeof(DROPFILES) + sizeof(WCHAR) * (lstrlen(lpFileName) + 2));
-
 	lpdf = GlobalLock(hDrop);
 
 	lpdf->pFiles = sizeof(DROPFILES);
@@ -1140,7 +1135,6 @@ HDROP CreateDropHandle(LPCWSTR lpFileName) {
 	lpdf->fWide  = TRUE;
 
 	lstrcpy((WCHAR *)&lpdf[1], lpFileName);
-
 	GlobalUnlock(hDrop);
 
 	return hDrop;
@@ -1366,6 +1360,7 @@ BOOL MRU_Destroy(LPMRULIST pmru) {
 			LocalFree(pmru->pszItems[i]);
 		}
 	}
+
 	ZeroMemory(pmru, sizeof(MRULIST));
 	LocalFree(pmru);
 	return 1;
@@ -1392,7 +1387,7 @@ BOOL MRU_Add(LPMRULIST pmru, LPCWSTR pszNew) {
 		pmru->pszItems[i] = pmru->pszItems[i - 1];
 	}
 	pmru->pszItems[0] = StrDup(pszNew);
-	return 1;
+	return TRUE;
 }
 
 BOOL MRU_Delete(LPMRULIST pmru, int iIndex) {
@@ -1406,7 +1401,7 @@ BOOL MRU_Delete(LPMRULIST pmru, int iIndex) {
 		pmru->pszItems[i] = pmru->pszItems[i + 1];
 		pmru->pszItems[i + 1] = NULL;
 	}
-	return 1;
+	return TRUE;
 }
 
 BOOL MRU_Empty(LPMRULIST pmru) {
@@ -1416,7 +1411,7 @@ BOOL MRU_Empty(LPMRULIST pmru) {
 			pmru->pszItems[i] = NULL;
 		}
 	}
-	return 1;
+	return TRUE;
 }
 
 int MRU_Enum(LPMRULIST pmru, int iIndex, LPWSTR pszItem, int cchItem) {
@@ -1457,8 +1452,9 @@ BOOL MRU_Load(LPMRULIST pmru) {
 			pmru->pszItems[n++] = StrDup(tchItem);
 		}
 	}
+
 	LocalFree(pIniSection);
-	return 1;
+	return TRUE;
 }
 
 BOOL MRU_Save(LPMRULIST pmru) {
@@ -1481,9 +1477,10 @@ BOOL MRU_Save(LPMRULIST pmru) {
 			IniSectionSetString(pIniSection, tchName, pmru->pszItems[i]);
 		}
 	}
+
 	SaveIniSection(pmru->szRegKey, pIniSection);
 	LocalFree(pIniSection);
-	return 1;
+	return TRUE;
 }
 
 void MRU_LoadToCombobox(HWND hwnd, LPCWSTR pszKey) {

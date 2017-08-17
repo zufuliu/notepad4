@@ -703,9 +703,8 @@ BOOL DirList_GetLongPathName(HWND hwnd, LPWSTR lpszLongPath) {
 	if (SHGetPathFromIDList(lpdl->pidl, tch)) {
 		lstrcpy(lpszLongPath, tch);
 		return TRUE;
-	} else {
-		return FALSE;
 	}
+	return FALSE;
 }
 
 //=============================================================================

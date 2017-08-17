@@ -69,6 +69,7 @@ void EndWaitCursor(void);
 #endif
 #define IsVistaAndAbove()	(g_uWinVer >= 0x0600)
 #define IsWin7AndAbove()	(g_uWinVer >= 0x0601)
+#define IsWin8AndAbove()	(g_uWinVer >= 0x0602)
 
 BOOL ExeNameFromWnd(HWND hwnd, LPWSTR szExeName, int cchExeName);
 //BOOL Is32bitExe(LPCWSTR lpszExeName);
@@ -96,14 +97,10 @@ void Toolbar_SetButtonImage(HWND hwnd, int idCommand, int iImage);
 
 LRESULT SendWMSize(HWND hwnd);
 
-#define EnableCmd(hmenu, id, b) EnableMenuItem(hmenu, id, (b)\
-		?MF_BYCOMMAND | MF_ENABLED : MF_BYCOMMAND | MF_GRAYED)
-
-#define CheckCmd(hmenu, id, b)  CheckMenuItem(hmenu, id, (b)\
-		?MF_BYCOMMAND | MF_CHECKED : MF_BYCOMMAND | MF_UNCHECKED)
+#define EnableCmd(hmenu, id, b) EnableMenuItem(hmenu, id, (b)? (MF_BYCOMMAND | MF_ENABLED) : (MF_BYCOMMAND | MF_GRAYED))
+#define CheckCmd(hmenu, id, b)  CheckMenuItem(hmenu, id, (b)? (MF_BYCOMMAND | MF_CHECKED) : (MF_BYCOMMAND | MF_UNCHECKED))
 
 #define GetString(id,pb,cb) LoadString(g_hInstance, id, pb, cb)
-
 #define StrEnd(pStart) (pStart + lstrlen(pStart))
 
 int FormatString(LPWSTR lpOutput, int nOutput, UINT uIdFormat, ...);
