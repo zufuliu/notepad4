@@ -1925,6 +1925,7 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	EnableCmd(hmenu, IDM_FILE_CREATELINK, i);
 	EnableCmd(hmenu, IDM_FILE_ADDTOFAV, i);
 
+	EnableCmd(hmenu, IDM_FILE_RELAUNCH_ELEVATED, IsVistaAndAbove() && !fIsElevated);
 	EnableCmd(hmenu, IDM_FILE_READONLY, i);
 	CheckCmd(hmenu, IDM_FILE_READONLY, bReadOnly);
 
@@ -2457,6 +2458,13 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		ShellExecuteEx(&sei);
 	}
 	break;
+
+	case IDM_FILE_RELAUNCH_ELEVATED:
+		flagRelaunchElevated = 2;
+		if (RelaunchElevated()) {
+			DestroyWindow(hwnd);
+		}
+		break;
 
 	case IDM_FILE_LAUNCH: {
 		SHELLEXECUTEINFO sei;
@@ -3504,11 +3512,9 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	break;
 
 	//case IDM_EDIT_BOOKMARKCLEAR:
-	case BME_EDIT_BOOKMARKCLEAR: {
+	case BME_EDIT_BOOKMARKCLEAR:
 		SendMessage(hwndEdit, SCI_MARKERDELETEALL, (WPARAM) - 1, 0);
-
 		break;
-	}
 #endif
 
 	case IDM_EDIT_FINDNEXT:
@@ -7138,7 +7144,8 @@ BOOL RelaunchMultiInst(void) {
 BOOL RelaunchElevated(void) {
 	if (!IsVistaAndAbove() || fIsElevated || !flagRelaunchElevated || flagDisplayHelp) {
 		return FALSE;
-	} else {
+	}
+	if (flagRelaunchElevated == 1 || FileSave(FALSE, TRUE, FALSE, FALSE)) {
 		LPWSTR lpCmdLine;
 		LPWSTR lpArg1, lpArg2;
 		STARTUPINFO si;
@@ -7147,10 +7154,16 @@ BOOL RelaunchElevated(void) {
 		si.cb = sizeof(STARTUPINFO);
 		GetStartupInfo(&si);
 
-		lpCmdLine = GetCommandLine();
-		lpArg1 = LocalAlloc(LPTR, sizeof(WCHAR) * (lstrlen(lpCmdLine) + 1));
-		lpArg2 = LocalAlloc(LPTR, sizeof(WCHAR) * (lstrlen(lpCmdLine) + 1));
-		ExtractFirstArgument(lpCmdLine, lpArg1, lpArg2);
+		if (flagRelaunchElevated == 2) {
+			lpArg1 = LocalAlloc(LPTR, sizeof(WCHAR) * MAX_PATH);
+			GetModuleFileName(NULL, lpArg1, MAX_PATH);
+			lpArg2 = szCurFile;
+		} else {
+			lpCmdLine = GetCommandLine();
+			lpArg1 = LocalAlloc(LPTR, sizeof(WCHAR) * (lstrlen(lpCmdLine) + 1));
+			lpArg2 = LocalAlloc(LPTR, sizeof(WCHAR) * (lstrlen(lpCmdLine) + 1));
+			ExtractFirstArgument(lpCmdLine, lpArg1, lpArg2);
+		}
 
 		if (lstrlen(lpArg1)) {
 			ZeroMemory(&sei, sizeof(SHELLEXECUTEINFO));
@@ -7161,16 +7174,19 @@ BOOL RelaunchElevated(void) {
 			sei.lpFile = lpArg1;
 			sei.lpParameters = lpArg2;
 			sei.lpDirectory = g_wchWorkingDirectory;
-			sei.nShow = si.wShowWindow;
+			sei.nShow = si.wShowWindow ? si.wShowWindow : SW_SHOWNORMAL;
 
 			ShellExecuteEx(&sei);
 		}
 
 		LocalFree(lpArg1);
-		LocalFree(lpArg2);
+		if (flagRelaunchElevated != 2) {
+			LocalFree(lpArg2);
+		}
 
 		return TRUE;
 	}
+	return FALSE;
 }
 
 //=============================================================================

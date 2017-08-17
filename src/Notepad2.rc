@@ -96,6 +96,7 @@ BEGIN
             MENUITEM "&New Window\tAlt+N",          IDM_FILE_NEWWINDOW
             MENUITEM "&Empty Window\tAlt+0",        IDM_FILE_NEWWINDOW2
             MENUITEM SEPARATOR
+            MENUITEM "&Relaunch Elevated",          IDM_FILE_RELAUNCH_ELEVATED
             MENUITEM "Execute &Document",           IDM_FILE_LAUNCH
             MENUITEM "&Open with...",               IDM_FILE_OPENWITH
             MENUITEM "&Command...",                 IDM_FILE_RUN
