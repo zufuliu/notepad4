@@ -1592,52 +1592,10 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	case IDM_VIEW_NEWWINDOW: {
 		WCHAR szModuleName[MAX_PATH];
-		WCHAR szParameters[MAX_PATH + 64];
-
-		MONITORINFO mi;
-		HMONITOR hMonitor;
-		WINDOWPLACEMENT wndpl;
-		int x, y, cx, cy;
-		WCHAR tch[64];
+		WCHAR szParameters[2 * MAX_PATH + 128];
 
 		GetModuleFileName(NULL, szModuleName, COUNTOF(szModuleName));
-
-		lstrcpy(szParameters, szCurDir);
-		PathQuoteSpaces(szParameters);
-
-		lstrcat(szParameters, L" -f");
-		if (lstrlen(szIniFile)) {
-			lstrcat(szParameters, L" \"");
-			lstrcat(szParameters, szIniFile);
-			lstrcat(szParameters, L"\"");
-		} else {
-			lstrcat(szParameters, L"0");
-		}
-
-		lstrcat(szParameters, L" -n");
-
-		wndpl.length = sizeof(WINDOWPLACEMENT);
-		GetWindowPlacement(hwnd, &wndpl);
-
-		hMonitor = MonitorFromRect(&wndpl.rcNormalPosition, MONITOR_DEFAULTTONEAREST);
-		mi.cbSize = sizeof(mi);
-		GetMonitorInfo(hMonitor, &mi);
-
-		// offset new window position +10/+10
-		x = wndpl.rcNormalPosition.left + 10;
-		y = wndpl.rcNormalPosition.top  + 10;
-		cx = wndpl.rcNormalPosition.right - wndpl.rcNormalPosition.left;
-		cy = wndpl.rcNormalPosition.bottom - wndpl.rcNormalPosition.top;
-
-		// check if window fits monitor
-		if ((x + cx) > mi.rcWork.right || (y + cy) > mi.rcWork.bottom) {
-			x = mi.rcMonitor.left;
-			y = mi.rcMonitor.top;
-		}
-
-		wsprintf(tch, L" -p %i,%i,%i,%i", x, y, cx, cy);
-		lstrcat(szParameters, tch);
-
+		GetRelaunchParameters(szParameters);
 		ShellExecute(hwnd, NULL, szModuleName, szParameters, NULL, SW_SHOWNORMAL);
 	}
 	break;
@@ -3270,6 +3228,50 @@ BOOL ActivatePrevInst(void) {
 	}
 
 	return FALSE;
+}
+
+void GetRelaunchParameters(LPWSTR szParameters) {
+	MONITORINFO mi;
+	HMONITOR hMonitor;
+	WINDOWPLACEMENT wndpl;
+	int x, y, cx, cy;
+	WCHAR tch[64];
+
+	lstrcpy(szParameters, szCurDir);
+	PathQuoteSpaces(szParameters);
+
+	lstrcat(szParameters, L" -f");
+	if (lstrlen(szIniFile)) {
+		lstrcat(szParameters, L" \"");
+		lstrcat(szParameters, szIniFile);
+		lstrcat(szParameters, L"\"");
+	} else {
+		lstrcat(szParameters, L"0");
+	}
+
+	lstrcat(szParameters, L" -n");
+
+	wndpl.length = sizeof(WINDOWPLACEMENT);
+	GetWindowPlacement(hwndMain, &wndpl);
+
+	hMonitor = MonitorFromRect(&wndpl.rcNormalPosition, MONITOR_DEFAULTTONEAREST);
+	mi.cbSize = sizeof(mi);
+	GetMonitorInfo(hMonitor, &mi);
+
+	// offset new window position +10/+10
+	x = wndpl.rcNormalPosition.left + 10;
+	y = wndpl.rcNormalPosition.top  + 10;
+	cx = wndpl.rcNormalPosition.right - wndpl.rcNormalPosition.left;
+	cy = wndpl.rcNormalPosition.bottom - wndpl.rcNormalPosition.top;
+
+	// check if window fits monitor
+	if ((x + cx) > mi.rcWork.right || (y + cy) > mi.rcWork.bottom) {
+		x = mi.rcMonitor.left;
+		y = mi.rcMonitor.top;
+	}
+
+	wsprintf(tch, L" -p %i,%i,%i,%i", x, y, cx, cy);
+	lstrcat(szParameters, tch);
 }
 
 //=============================================================================

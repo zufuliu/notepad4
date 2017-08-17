@@ -2381,71 +2381,17 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case IDM_FILE_NEWWINDOW2: {
 		SHELLEXECUTEINFO sei;
 		WCHAR szModuleName[MAX_PATH];
-		WCHAR szParameters[2 * MAX_PATH + 64];
+		WCHAR szParameters[2 * MAX_PATH + 128];
+		BOOL emptyWind = LOWORD(wParam) == IDM_FILE_NEWWINDOW2;
 
-		MONITORINFO mi;
-		HMONITOR hMonitor;
-		WINDOWPLACEMENT wndpl;
-		int x, y, cx, cy, imax;
-		WCHAR tch[64];
-
-		if (bSaveBeforeRunningTools && !FileSave(FALSE, TRUE, FALSE, FALSE)) {
+		if (!emptyWind && bSaveBeforeRunningTools && !FileSave(FALSE, TRUE, FALSE, FALSE)) {
 			break;
 		}
 
 		GetModuleFileName(NULL, szModuleName, COUNTOF(szModuleName));
-
-		wsprintf(tch, L"\"-appid=%s\"", g_wchAppUserModelID);
-		lstrcpy(szParameters, tch);
-
-		wsprintf(tch, L" \"-sysmru=%i\"", (flagUseSystemMRU == 2) ? 1 : 0);
-		lstrcat(szParameters, tch);
-
-		lstrcat(szParameters, L" -f");
-		if (lstrlen(szIniFile)) {
-			lstrcat(szParameters, L" \"");
-			lstrcat(szParameters, szIniFile);
-			lstrcat(szParameters, L"\"");
-		} else {
-			lstrcat(szParameters, L"0");
-		}
-
-		lstrcat(szParameters, L" -n");
-
-		wndpl.length = sizeof(WINDOWPLACEMENT);
-		GetWindowPlacement(hwnd, &wndpl);
-
-		hMonitor = MonitorFromRect(&wndpl.rcNormalPosition, MONITOR_DEFAULTTONEAREST);
-		mi.cbSize = sizeof(mi);
-		GetMonitorInfo(hMonitor, &mi);
-
-		// offset new window position +10/+10
-		x  = wndpl.rcNormalPosition.left + 10;
-		y  = wndpl.rcNormalPosition.top	+ 10;
-		cx = wndpl.rcNormalPosition.right - wndpl.rcNormalPosition.left;
-		cy = wndpl.rcNormalPosition.bottom - wndpl.rcNormalPosition.top;
-
-		// check if window fits monitor
-		if ((x + cx) > mi.rcWork.right || (y + cy) > mi.rcWork.bottom) {
-			x = mi.rcMonitor.left;
-			y = mi.rcMonitor.top;
-		}
-
-		imax = IsZoomed(hwnd);
-
-		wsprintf(tch, L" -pos %i,%i,%i,%i,%i", x, y, cx, cy, imax);
-		lstrcat(szParameters, tch);
-
-		if (LOWORD(wParam) != IDM_FILE_NEWWINDOW2 && lstrlen(szCurFile)) {
-			WCHAR szFileName[MAX_PATH];
-			lstrcpy(szFileName, szCurFile);
-			PathQuoteSpaces(szFileName);
-			lstrcat(szParameters, L" ");
-			lstrcat(szParameters, szFileName);
-		}
+		GetRelaunchParameters(szParameters, TRUE, emptyWind);
 
 		ZeroMemory(&sei, sizeof(SHELLEXECUTEINFO));
-
 		sei.cbSize = sizeof(SHELLEXECUTEINFO);
 		sei.fMask = /*SEE_MASK_NOZONECHECKS*/0x00800000;
 		sei.hwnd = hwnd;
@@ -7136,6 +7082,73 @@ BOOL RelaunchMultiInst(void) {
 	}
 }
 
+void GetRelaunchParameters(LPWSTR szParameters, BOOL newWind, BOOL emptyWind) {
+	MONITORINFO mi;
+	HMONITOR hMonitor;
+	WINDOWPLACEMENT wndpl;
+	int x, y, cx, cy, imax;
+	WCHAR tch[64];
+
+	wsprintf(tch, L"\"-appid=%s\"", g_wchAppUserModelID);
+	lstrcpy(szParameters, tch);
+
+	wsprintf(tch, L" \"-sysmru=%i\"", (flagUseSystemMRU == 2) ? 1 : 0);
+	lstrcat(szParameters, tch);
+
+	lstrcat(szParameters, L" -f");
+	if (lstrlen(szIniFile)) {
+		lstrcat(szParameters, L" \"");
+		lstrcat(szParameters, szIniFile);
+		lstrcat(szParameters, L"\"");
+	} else {
+		lstrcat(szParameters, L"0");
+	}
+
+	if (newWind) {
+		lstrcat(szParameters, L" -n");
+	}
+
+	wndpl.length = sizeof(WINDOWPLACEMENT);
+	GetWindowPlacement(hwndMain, &wndpl);
+
+	hMonitor = MonitorFromRect(&wndpl.rcNormalPosition, MONITOR_DEFAULTTONEAREST);
+	mi.cbSize = sizeof(mi);
+	GetMonitorInfo(hMonitor, &mi);
+
+	// offset new window position +10/+10
+	x  = wndpl.rcNormalPosition.left + (newWind? 10 : 0);
+	y  = wndpl.rcNormalPosition.top	+ (newWind? 10 : 0);
+	cx = wndpl.rcNormalPosition.right - wndpl.rcNormalPosition.left;
+	cy = wndpl.rcNormalPosition.bottom - wndpl.rcNormalPosition.top;
+
+	// check if window fits monitor
+	if ((x + cx) > mi.rcWork.right || (y + cy) > mi.rcWork.bottom) {
+		x = mi.rcMonitor.left;
+		y = mi.rcMonitor.top;
+	}
+
+	imax = IsZoomed(hwndMain);
+
+	wsprintf(tch, L" -pos %i,%i,%i,%i,%i", x, y, cx, cy, imax);
+	lstrcat(szParameters, tch);
+
+	if (!emptyWind && lstrlen(szCurFile)) {
+		WCHAR szFileName[COUNTOF(szCurFile) + 4];
+		Sci_Position pos = SciCall_GetCurrentPos();
+		if (pos > 0) {
+			x = SciCall_LineFromPosition(pos) + 1;
+			y = SciCall_GetColumn(pos) + 1;
+			wsprintf(tch, L" -g %i,%i", x, y);
+			lstrcat(szParameters, tch);
+		}
+
+		lstrcpy(szFileName, szCurFile);
+		PathQuoteSpaces(szFileName);
+		lstrcat(szParameters, L" ");
+		lstrcat(szParameters, szFileName);
+	}
+}
+
 //=============================================================================
 //
 // RelaunchElevated()
@@ -7146,26 +7159,22 @@ BOOL RelaunchElevated(void) {
 		return FALSE;
 	}
 	if (flagRelaunchElevated == 1 || FileSave(FALSE, TRUE, FALSE, FALSE)) {
-		LPWSTR lpCmdLine;
 		LPWSTR lpArg1, lpArg2;
-		STARTUPINFO si;
-		SHELLEXECUTEINFO sei;
-
-		si.cb = sizeof(STARTUPINFO);
-		GetStartupInfo(&si);
 
 		if (flagRelaunchElevated == 2) {
 			lpArg1 = LocalAlloc(LPTR, sizeof(WCHAR) * MAX_PATH);
 			GetModuleFileName(NULL, lpArg1, MAX_PATH);
-			lpArg2 = szCurFile;
+			lpArg2 = LocalAlloc(LPTR, sizeof(WCHAR) * (2 * MAX_PATH + 128));
+			GetRelaunchParameters(lpArg2, FALSE, FALSE);
 		} else {
-			lpCmdLine = GetCommandLine();
+			LPWSTR lpCmdLine = GetCommandLine();
 			lpArg1 = LocalAlloc(LPTR, sizeof(WCHAR) * (lstrlen(lpCmdLine) + 1));
 			lpArg2 = LocalAlloc(LPTR, sizeof(WCHAR) * (lstrlen(lpCmdLine) + 1));
 			ExtractFirstArgument(lpCmdLine, lpArg1, lpArg2);
 		}
 
 		if (lstrlen(lpArg1)) {
+			SHELLEXECUTEINFO sei;
 			ZeroMemory(&sei, sizeof(SHELLEXECUTEINFO));
 			sei.cbSize = sizeof(SHELLEXECUTEINFO);
 			sei.fMask = SEE_MASK_FLAG_NO_UI | /*SEE_MASK_NOASYNC*/0x00000100 | /*SEE_MASK_NOZONECHECKS*/0x00800000;
@@ -7174,16 +7183,13 @@ BOOL RelaunchElevated(void) {
 			sei.lpFile = lpArg1;
 			sei.lpParameters = lpArg2;
 			sei.lpDirectory = g_wchWorkingDirectory;
-			sei.nShow = si.wShowWindow ? si.wShowWindow : SW_SHOWNORMAL;
+			sei.nShow = SW_SHOWNORMAL;
 
 			ShellExecuteEx(&sei);
 		}
 
 		LocalFree(lpArg1);
-		if (flagRelaunchElevated != 2) {
-			LocalFree(lpArg2);
-		}
-
+		LocalFree(lpArg2);
 		return TRUE;
 	}
 	return FALSE;

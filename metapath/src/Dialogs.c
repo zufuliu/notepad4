@@ -1037,7 +1037,6 @@ INT_PTR CALLBACK ProgPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam
 			WCHAR tch[MAX_PATH];
 
 			if (!GetDlgItemText(hwnd, IDC_QUICKVIEW, tch, MAX_PATH)) {
-
 				GetSystemDirectory(szQuickview, MAX_PATH);
 				PathAddBackslash(szQuickview);
 				lstrcat(szQuickview, L"Viewers\\Quikview.exe");

@@ -82,6 +82,7 @@
 BOOL InitApplication(HINSTANCE hInstance);
 HWND InitInstance(HINSTANCE hInstance, LPSTR pszCmdLine, int nCmdShow);
 BOOL ActivatePrevInst(void);
+void GetRelaunchParameters(LPWSTR szParameters);
 void ShowNotifyIcon(HWND hwnd, BOOL bAdd);
 
 BOOL ChangeDirectory(HWND hwnd, LPCWSTR lpszNewDir, BOOL bUpdateHistory);
