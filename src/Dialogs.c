@@ -991,6 +991,7 @@ INT_PTR CALLBACK FileMRUDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPar
 				DispatchMessage(&msg);
 			}
 		}
+
 		CloseHandle(lpit->hExitThread);
 		CloseHandle(lpit->hTerminatedThread);
 		CloseHandle(lpit->hFileMRUIconThread);
@@ -1102,7 +1103,6 @@ INT_PTR CALLBACK FileMRUDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPar
 			}
 		}
 	}
-
 	return TRUE;
 
 	case WM_COMMAND:
@@ -1322,7 +1322,6 @@ INT_PTR CALLBACK ColumnWrapDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 		case IDCANCEL:
 			EndDialog(hwnd, IDCANCEL);
 			break;
-
 		}
 
 		return TRUE;

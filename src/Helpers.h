@@ -41,6 +41,8 @@ extern HANDLE g_hDefaultHeap;
 extern UINT16 g_uWinVer;
 extern WCHAR szIniFile[MAX_PATH];
 
+// MSDN: Operating System Version
+
 #if 0
 #define IsWin2KAndAbove()	(g_uWinVer >= 0x0500)
 #define IsWinXPAndAbove()	(g_uWinVer >= 0x0501)
@@ -50,6 +52,7 @@ extern WCHAR szIniFile[MAX_PATH];
 #endif
 #define IsVistaAndAbove()	(g_uWinVer >= 0x0600)
 #define IsWin7AndAbove()	(g_uWinVer >= 0x0601)
+#define IsWin8AndAbove()	(g_uWinVer >= 0x0602)
 
 #define NP2HeapAlloc(size)			HeapAlloc(g_hDefaultHeap, HEAP_ZERO_MEMORY, size)
 #define NP2HeapFree(hMem)			HeapFree(g_hDefaultHeap, 0, hMem)
@@ -144,7 +147,6 @@ LRESULT SendWMSize(HWND hwnd);
 BOOL IsCmdEnabled(HWND hwnd, UINT uId);
 
 #define GetString(id, pb, cb) LoadString(g_hInstance, id, pb, cb)
-
 #define StrEnd(pStart) (pStart + lstrlen(pStart))
 
 int FormatString(LPWSTR lpOutput, int nOutput, UINT uIdFormat, ...);

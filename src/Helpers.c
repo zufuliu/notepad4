@@ -1538,9 +1538,10 @@ BOOL MRU_Destroy(LPMRULIST pmru) {
 			LocalFree(pmru->pszItems[i]);
 		}
 	}
+
 	ZeroMemory(pmru, sizeof(MRULIST));
 	LocalFree(pmru);
-	return 1;
+	return TRUE;
 }
 
 int MRU_Compare(LPMRULIST pmru, LPCWSTR psz1, LPCWSTR psz2) {
@@ -1563,7 +1564,7 @@ BOOL MRU_Add(LPMRULIST pmru, LPCWSTR pszNew) {
 		pmru->pszItems[i] = pmru->pszItems[i - 1];
 	}
 	pmru->pszItems[0] = StrDup(pszNew);
-	return 1;
+	return TRUE;
 }
 
 BOOL MRU_AddFile(LPMRULIST pmru, LPCWSTR pszFile, BOOL bRelativePath, BOOL bUnexpandMyDocs) {
@@ -1604,7 +1605,7 @@ BOOL MRU_AddFile(LPMRULIST pmru, LPCWSTR pszFile, BOOL bRelativePath, BOOL bUnex
 	}
 	/* notepad2-mod custom code end */
 
-	return 1;
+	return TRUE;
 }
 
 BOOL MRU_Delete(LPMRULIST pmru, int iIndex) {
@@ -1618,7 +1619,7 @@ BOOL MRU_Delete(LPMRULIST pmru, int iIndex) {
 		pmru->pszItems[i] = pmru->pszItems[i + 1];
 		pmru->pszItems[i + 1] = NULL;
 	}
-	return 1;
+	return TRUE;
 }
 
 BOOL MRU_DeleteFileFromStore(LPMRULIST pmru, LPCWSTR pszFile) {
@@ -1650,7 +1651,7 @@ BOOL MRU_Empty(LPMRULIST pmru) {
 			pmru->pszItems[i] = NULL;
 		}
 	}
-	return 1;
+	return TRUE;
 }
 
 int MRU_Enum(LPMRULIST pmru, int iIndex, LPWSTR pszItem, int cchItem) {
@@ -1691,8 +1692,9 @@ BOOL MRU_Load(LPMRULIST pmru) {
 			pmru->pszItems[n++] = StrDup(tchItem);
 		}
 	}
+
 	LocalFree(pIniSection);
-	return 1;
+	return TRUE;
 }
 
 BOOL MRU_Save(LPMRULIST pmru) {
@@ -1715,9 +1717,10 @@ BOOL MRU_Save(LPMRULIST pmru) {
 			IniSectionSetString(pIniSection, tchName, pmru->pszItems[i]);
 		}
 	}
+
 	SaveIniSection(pmru->szRegKey, pIniSection);
 	LocalFree(pIniSection);
-	return 1;
+	return TRUE;
 }
 
 BOOL MRU_MergeSave(LPMRULIST pmru, BOOL bAddFiles, BOOL bRelativePath, BOOL bUnexpandMyDocs) {
@@ -1744,7 +1747,7 @@ BOOL MRU_MergeSave(LPMRULIST pmru, BOOL bAddFiles, BOOL bRelativePath, BOOL bUne
 
 	MRU_Save(pmruBase);
 	MRU_Destroy(pmruBase);
-	return 1;
+	return TRUE;
 }
 
 /*

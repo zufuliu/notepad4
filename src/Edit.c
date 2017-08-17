@@ -2521,6 +2521,7 @@ void EditModifyLines(HWND hwnd, LPCWSTR pwszPrefix, LPCWSTR pwszAppend) {
 					lstrcatA(mszInsert, mszPrefix2);
 					iPrefixNum++;
 				}
+
 				iPos = (int)SendMessage(hwnd, SCI_POSITIONFROMLINE, (WPARAM)iLine, 0);
 				SendMessage(hwnd, SCI_SETTARGETSTART, (WPARAM)iPos, 0);
 				SendMessage(hwnd, SCI_SETTARGETEND, (WPARAM)iPos, 0);
@@ -2540,6 +2541,7 @@ void EditModifyLines(HWND hwnd, LPCWSTR pwszPrefix, LPCWSTR pwszAppend) {
 					lstrcatA(mszInsert, mszAppend2);
 					iAppendNum++;
 				}
+
 				iPos = (int)SendMessage(hwnd, SCI_GETLINEENDPOSITION, (WPARAM)iLine, 0);
 				SendMessage(hwnd, SCI_SETTARGETSTART, (WPARAM)iPos, 0);
 				SendMessage(hwnd, SCI_SETTARGETEND, (WPARAM)iPos, 0);
@@ -4348,6 +4350,62 @@ void EditGetExcerpt(HWND hwnd, LPWSTR lpszExcerpt, DWORD cchExcerpt) {
 	}
 }
 
+void EditSelectWord(HWND hwnd) {
+	int iSel = (int)SendMessage(hwnd, SCI_GETSELECTIONEND, 0, 0) -
+			   (int)SendMessage(hwnd, SCI_GETSELECTIONSTART, 0, 0);
+
+	int iPos = (int)SendMessage(hwnd, SCI_GETCURRENTPOS, 0, 0);
+
+	if (iSel == 0) {
+		int iWordStart  = (int)SendMessage(hwnd, SCI_WORDSTARTPOSITION, iPos, TRUE);
+		int iWordEnd	= (int)SendMessage(hwnd, SCI_WORDENDPOSITION, iPos, TRUE);
+
+		if (iWordStart == iWordEnd) {// we are in whitespace salad...
+			iWordStart	= (int)SendMessage(hwnd, SCI_WORDENDPOSITION, iPos, FALSE);
+			iWordEnd	= (int)SendMessage(hwnd, SCI_WORDENDPOSITION, iWordStart, TRUE);
+			if (iWordStart != iWordEnd) {
+				//if (SCLEX_HTML == SendMessage(hwnd, SCI_GETLEXER, 0, 0) &&
+				//		SCE_HPHP_VARIABLE == SendMessage(hwnd, SCI_GETSTYLEAT, (WPARAM)iWordStart, 0) &&
+				//		'$' == (char)SendMessage(hwnd, SCI_GETCHARAT, (WPARAM)iWordStart-1, 0))
+				//	iWordStart--;
+				SendMessage(hwnd, SCI_SETSEL, iWordStart, iWordEnd);
+			}
+		} else {
+			//if (SCLEX_HTML == SendMessage(hwnd, SCI_GETLEXER, 0, 0) &&
+			//		SCE_HPHP_VARIABLE == SendMessage(hwnd, SCI_GETSTYLEAT, (WPARAM)iWordStart, 0) &&
+			//		'$' == (char)SendMessage(hwnd, SCI_GETCHARAT, (WPARAM)iWordStart-1, 0))
+			//	iWordStart--;
+			SendMessage(hwnd, SCI_SETSEL, iWordStart, iWordEnd);
+		}
+
+		iSel =	(int)SendMessage(hwnd, SCI_GETSELECTIONEND, 0, 0) -
+				(int)SendMessage(hwnd, SCI_GETSELECTIONSTART, 0, 0);
+
+		if (iSel == 0) {
+			int iLine		= (int)SendMessage(hwnd, SCI_LINEFROMPOSITION, iPos, 0);
+			int iLineStart	= (int)SendMessage(hwnd, SCI_GETLINEINDENTPOSITION, iLine, 0);
+			int iLineEnd	= (int)SendMessage(hwnd, SCI_GETLINEENDPOSITION, iLine, 0);
+			SendMessage(hwnd, SCI_SETSEL, iLineStart, iLineEnd);
+		}
+	} else {
+		int iLine		= (int)SendMessage(hwnd, SCI_LINEFROMPOSITION, iPos, 0);
+		int iLineStart	= (int)SendMessage(hwnd, SCI_GETLINEINDENTPOSITION, iLine, 0);
+		int iLineEnd	= (int)SendMessage(hwnd, SCI_GETLINEENDPOSITION, iLine, 0);
+		SendMessage(hwnd, SCI_SETSEL, iLineStart, iLineEnd);
+	}
+}
+
+void EditSelectLine(HWND hwnd) {
+	int iSelStart	= (int)SendMessage(hwnd, SCI_GETSELECTIONSTART, 0, 0);
+	int iSelEnd		= (int)SendMessage(hwnd, SCI_GETSELECTIONEND, 0, 0);
+	int iLineStart	= (int)SendMessage(hwnd, SCI_LINEFROMPOSITION, iSelStart, 0);
+	int iLineEnd	= (int)SendMessage(hwnd, SCI_LINEFROMPOSITION, iSelEnd, 0);
+	iSelStart		= (int)SendMessage(hwnd, SCI_POSITIONFROMLINE, iLineStart, 0);
+	iSelEnd			= (int)SendMessage(hwnd, SCI_POSITIONFROMLINE, iLineEnd + 1, 0);
+	SendMessage(hwnd, SCI_SETSEL, iSelStart, iSelEnd);
+	SendMessage(hwnd, SCI_CHOOSECARETX, 0, 0);
+}
+
 //=============================================================================
 //
 // EditFindReplaceDlgProcW()
@@ -4361,7 +4419,6 @@ INT_PTR CALLBACK EditFindReplaceDlgProcW(HWND hwnd, UINT umsg, WPARAM wParam, LP
 	static UINT uCPEdit;
 
 	switch (umsg) {
-
 	case WM_INITDIALOG: {
 #ifdef BOOKMARK_EDITION
 		static BOOL bFirstTime = TRUE;
@@ -4778,7 +4835,6 @@ INT_PTR CALLBACK EditFindReplaceDlgProcW(HWND hwnd, UINT umsg, WPARAM wParam, LP
 			PostMessage(hwnd, WM_NEXTDLGCTL, (WPARAM)(GetDlgItem(hwnd, IDC_FINDTEXT)), 1);
 			break;
 		}
-
 		return TRUE;
 
 	case WM_SYSCOMMAND:
@@ -4788,9 +4844,8 @@ INT_PTR CALLBACK EditFindReplaceDlgProcW(HWND hwnd, UINT umsg, WPARAM wParam, LP
 		} else if (wParam == SC_RESETPOS) {
 			PostMessage(hwnd, WM_COMMAND, MAKELONG(IDACC_RESETPOS, 0), 0);
 			return TRUE;
-		} else {
-			return FALSE;
 		}
+		return FALSE;
 
 	case WM_NOTIFY: {
 		LPNMHDR pnmhdr = (LPNMHDR)lParam;
@@ -4840,7 +4895,6 @@ HWND EditFindReplaceDlg(HWND hwnd, LPCEDITFINDREPLACE lpefr, BOOL bReplace) {
 								   (LPARAM) lpefr);
 
 	ShowWindow(hDlg, SW_SHOW);
-
 	return hDlg;
 }
 

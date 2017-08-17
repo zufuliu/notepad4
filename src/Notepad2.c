@@ -542,8 +542,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInst, LPSTR lpCmdLine, in
 	OleUninitialize();
 
 	return (int)(msg.wParam);
-
-	//hPrevInst;
 }
 
 //=============================================================================
@@ -895,7 +893,6 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 	static BOOL bShutdownOK;
 
 	switch (umsg) {
-
 	// Quickly handle painting and sizing messages, found in ScintillaWin.cxx
 	// Cool idea, don't know if this has any effect... ;-)
 	case WM_MOVE:
@@ -1054,7 +1051,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 
 		DragFinish(hDrop);
 	}
-		break;
+	break;
 
 	case WM_COPYDATA: {
 		PCOPYDATASTRUCT pcds = (PCOPYDATASTRUCT)lParam;
@@ -1157,7 +1154,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 			UpdateStatusbar();
 		}
 	}
-		return TRUE;
+	return TRUE;
 
 	case WM_CONTEXTMENU: {
 		HMENU hmenu;
@@ -1214,7 +1211,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 
 		DestroyMenu(hmenu);
 	}
-		break;
+	break;
 
 	case WM_INITMENU:
 		MsgInitMenu(hwnd, wParam, lParam);
@@ -1319,7 +1316,6 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 	case WM_TRAYMESSAGE:
 		switch (lParam) {
 		case WM_RBUTTONUP: {
-
 			HMENU hMenu = LoadMenu(g_hInstance, MAKEINTRESOURCE(IDR_POPUPMENU));
 			HMENU hMenuPopup = GetSubMenu(hMenu, 2);
 
@@ -1361,7 +1357,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 			SnapToDefaultButton(box);
 		}
 	}
-		break;
+	break;
 
 	default:
 		if (umsg == msgTaskbarCreated) {
@@ -1440,6 +1436,7 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		SendMessage(hwndEdit, SCI_SETWRAPSTARTINDENT, i, 0);
 		SendMessage(hwndEdit, SCI_SETWRAPINDENTMODE, SC_WRAPINDENT_FIXED, 0);
 	}
+
 	if (bShowWordWrapSymbols) {
 		int wrapVisualFlags = 0;
 		int wrapVisualFlagsLocation = 0;
@@ -2073,6 +2070,8 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	EnableCmd(hmenu, IDM_EDIT_FINDPREV, i && lstrlenA(efrData.szFind));
 	EnableCmd(hmenu, IDM_EDIT_REPLACE, i /*&& !bReadOnly*/);
 	EnableCmd(hmenu, IDM_EDIT_REPLACENEXT, i);
+	//EnableCmd(hmenu, IDM_EDIT_SELECTWORD, i);
+	//EnableCmd(hmenu, IDM_EDIT_SELECTLINE, i);
 	EnableCmd(hmenu, IDM_EDIT_SELTOEND, i);
 	EnableCmd(hmenu, IDM_EDIT_SELTOBEGIN, i);
 	EnableCmd(hmenu, IDM_EDIT_SELTONEXT, i && lstrlenA(efrData.szFind));
@@ -2828,63 +2827,13 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		//SendMessage(hwndEdit, SCI_SETSEL, 0, (LPARAM)-1);
 		break;
 
-	case IDM_EDIT_SELECTWORD: {
-		int iSel = (int)SendMessage(hwndEdit, SCI_GETSELECTIONEND, 0, 0) -
-				   (int)SendMessage(hwndEdit, SCI_GETSELECTIONSTART, 0, 0);
+	case IDM_EDIT_SELECTWORD:
+		EditSelectWord(hwndEdit);
+		break;
 
-		int iPos = (int)SendMessage(hwndEdit, SCI_GETCURRENTPOS, 0, 0);
-
-		if (iSel == 0) {
-			int iWordStart  = (int)SendMessage(hwndEdit, SCI_WORDSTARTPOSITION, iPos, TRUE);
-			int iWordEnd	= (int)SendMessage(hwndEdit, SCI_WORDENDPOSITION, iPos, TRUE);
-
-			if (iWordStart	== iWordEnd) {// we are in whitespace salad...
-				iWordStart	= (int)SendMessage(hwndEdit, SCI_WORDENDPOSITION, iPos, FALSE);
-				iWordEnd	= (int)SendMessage(hwndEdit, SCI_WORDENDPOSITION, iWordStart, TRUE);
-				if (iWordStart != iWordEnd) {
-					//if (SCLEX_HTML == SendMessage(hwndEdit, SCI_GETLEXER, 0, 0) &&
-					//		SCE_HPHP_VARIABLE == SendMessage(hwndEdit, SCI_GETSTYLEAT, (WPARAM)iWordStart, 0) &&
-					//		'$' == (char)SendMessage(hwndEdit, SCI_GETCHARAT, (WPARAM)iWordStart-1, 0))
-					//	iWordStart--;
-					SendMessage(hwndEdit, SCI_SETSEL, iWordStart, iWordEnd);
-				}
-			} else {
-				//if (SCLEX_HTML == SendMessage(hwndEdit, SCI_GETLEXER, 0, 0) &&
-				//		SCE_HPHP_VARIABLE == SendMessage(hwndEdit, SCI_GETSTYLEAT, (WPARAM)iWordStart, 0) &&
-				//		'$' == (char)SendMessage(hwndEdit, SCI_GETCHARAT, (WPARAM)iWordStart-1, 0))
-				//	iWordStart--;
-				SendMessage(hwndEdit, SCI_SETSEL, iWordStart, iWordEnd);
-			}
-
-			iSel =	(int)SendMessage(hwndEdit, SCI_GETSELECTIONEND, 0, 0) -
-					(int)SendMessage(hwndEdit, SCI_GETSELECTIONSTART, 0, 0);
-
-			if (iSel == 0) {
-				int iLine		= (int)SendMessage(hwndEdit, SCI_LINEFROMPOSITION, iPos, 0);
-				int iLineStart	= (int)SendMessage(hwndEdit, SCI_GETLINEINDENTPOSITION, iLine, 0);
-				int iLineEnd	= (int)SendMessage(hwndEdit, SCI_GETLINEENDPOSITION, iLine, 0);
-				SendMessage(hwndEdit, SCI_SETSEL, iLineStart, iLineEnd);
-			}
-		} else {
-			int iLine		= (int)SendMessage(hwndEdit, SCI_LINEFROMPOSITION, iPos, 0);
-			int iLineStart	= (int)SendMessage(hwndEdit, SCI_GETLINEINDENTPOSITION, iLine, 0);
-			int iLineEnd	= (int)SendMessage(hwndEdit, SCI_GETLINEENDPOSITION, iLine, 0);
-			SendMessage(hwndEdit, SCI_SETSEL, iLineStart, iLineEnd);
-		}
-	}
-	break;
-
-	case IDM_EDIT_SELECTLINE: {
-		int iSelStart	= (int)SendMessage(hwndEdit, SCI_GETSELECTIONSTART, 0, 0);
-		int iSelEnd		= (int)SendMessage(hwndEdit, SCI_GETSELECTIONEND, 0, 0);
-		int iLineStart	= (int)SendMessage(hwndEdit, SCI_LINEFROMPOSITION, iSelStart, 0);
-		int iLineEnd	= (int)SendMessage(hwndEdit, SCI_LINEFROMPOSITION, iSelEnd, 0);
-		iSelStart		= (int)SendMessage(hwndEdit, SCI_POSITIONFROMLINE, iLineStart, 0);
-		iSelEnd			= (int)SendMessage(hwndEdit, SCI_POSITIONFROMLINE, iLineEnd + 1, 0);
-		SendMessage(hwndEdit, SCI_SETSEL, iSelStart, iSelEnd);
-		SendMessage(hwndEdit, SCI_CHOOSECARETX, 0, 0);
-	}
-	break;
+	case IDM_EDIT_SELECTLINE:
+		EditSelectLine(hwndEdit);
+		break;
 
 	case IDM_EDIT_MOVELINEUP:
 		EditMoveUp(hwndEdit);
@@ -3251,6 +3200,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		SendMessage(hwndEdit, SCI_REPLACESEL, 0, (LPARAM)mszBuf);
 	}
 	break;
+
 	case IDM_EDIT_INSERT_UTC_DATETIME: {
 		SYSTEMTIME lt;
 		char	mszBuf[38];
@@ -3504,8 +3454,8 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			SciCall_ScrollCaret();
 			SciCall_SetYCaretPolicy(CARET_EVEN, 0);
 		}
-		break;
 	}
+	break;
 
 	//case IMD_EDIT_BOOKMARKPREV:
 	case BME_EDIT_BOOKMARKPREV: {
@@ -3526,9 +3476,8 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			SciCall_ScrollCaret();
 			SciCall_SetYCaretPolicy(CARET_EVEN, 0);
 		}
-
-		break;
 	}
+	break;
 
 	//case IDM_EDIT_BOOKMARKTOGGLE:
 	case BME_EDIT_BOOKMARKTOGGLE: {
@@ -3551,9 +3500,8 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			// set
 			SendMessage(hwndEdit, SCI_MARKERADD, iLine, 0);
 		}
-
-		break;
 	}
+	break;
 
 	//case IDM_EDIT_BOOKMARKCLEAR:
 	case BME_EDIT_BOOKMARKCLEAR: {
@@ -3594,9 +3542,9 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 					lstrcpyA(efrData.szReplace, efrData.szReplaceUTF8);
 				}
 			}
+
 			cpLastFind = cp;
 			switch (LOWORD(wParam)) {
-
 			case IDM_EDIT_FINDNEXT:
 				EditFindNext(hwndEdit, &efrData, FALSE);
 				break;
@@ -6883,19 +6831,17 @@ BOOL CALLBACK EnumWndProc(HWND hwnd, LPARAM lParam) {
 	BOOL bContinue = TRUE;
 	WCHAR szClassName[64];
 
-	if (GetClassName(hwnd, szClassName, COUNTOF(szClassName)))
+	if (GetClassName(hwnd, szClassName, COUNTOF(szClassName))) {
 		if (lstrcmpi(szClassName, wchWndClass) == 0) {
-
 			DWORD dwReuseLock = GetDlgItemInt(hwnd, IDC_REUSELOCK, NULL, FALSE);
 			if (GetTickCount() - dwReuseLock >= REUSEWINDOWLOCKTIMEOUT) {
-
 				*(HWND *)lParam = hwnd;
-
 				if (IsWindowEnabled(hwnd)) {
 					bContinue = FALSE;
 				}
 			}
 		}
+	}
 	return bContinue;
 }
 
@@ -6903,7 +6849,7 @@ BOOL CALLBACK EnumWndProc2(HWND hwnd, LPARAM lParam) {
 	BOOL bContinue = TRUE;
 	WCHAR szClassName[64];
 
-	if (GetClassName(hwnd, szClassName, COUNTOF(szClassName)))
+	if (GetClassName(hwnd, szClassName, COUNTOF(szClassName))) {
 		if (lstrcmpi(szClassName, wchWndClass) == 0) {
 			DWORD dwReuseLock = GetDlgItemInt(hwnd, IDC_REUSELOCK, NULL, FALSE);
 			if (GetTickCount() - dwReuseLock >= REUSEWINDOWLOCKTIMEOUT) {
@@ -6921,6 +6867,7 @@ BOOL CALLBACK EnumWndProc2(HWND hwnd, LPARAM lParam) {
 				}
 			}
 		}
+	}
 	return bContinue;
 }
 

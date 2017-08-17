@@ -303,6 +303,8 @@ BEGIN
             MENUITEM SEPARATOR
             MENUITEM "&Find Matching Brace\tCtrl+B", IDM_EDIT_FINDMATCHINGBRACE
             MENUITEM "&Select to Matching Brace\tCtrl+Shift+B", IDM_EDIT_SELTOMATCHINGBRACE
+            //MENUITEM "Select &Word\tCtrl+SP", IDM_EDIT_SELECTWORD
+            //MENUITEM "Select &Line\tCtrl+Shift+SP", IDM_EDIT_SELECTLINE
             MENUITEM SEPARATOR
             MENUITEM "Select to End", IDM_EDIT_SELTOEND
             MENUITEM "Select to Begin", IDM_EDIT_SELTOBEGIN

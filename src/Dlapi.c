@@ -458,7 +458,6 @@ BOOL DirList_DeleteItem(HWND hwnd, LPARAM lParam) {
 		lplvid->lpsf->lpVtbl->Release(lplvid->lpsf);
 
 		CoTaskMemFree(lplvid);
-
 		return TRUE;
 	}
 
