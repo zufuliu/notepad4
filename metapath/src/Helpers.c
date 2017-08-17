@@ -262,7 +262,7 @@ BOOL SetExplorerTheme(HWND hwnd) {
 	HMODULE hModUxTheme;
 	FARPROC pfnSetWindowTheme;
 
-	if (IsVista()) {
+	if (IsVistaAndAbove()) {
 		if (hModUxTheme = GetModuleHandle(L"uxtheme.dll")) {
 			pfnSetWindowTheme = GetProcAddress(hModUxTheme, "SetWindowTheme");
 

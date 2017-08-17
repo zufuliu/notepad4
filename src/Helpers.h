@@ -41,8 +41,13 @@ extern HANDLE g_hDefaultHeap;
 extern UINT16 g_uWinVer;
 extern WCHAR szIniFile[MAX_PATH];
 
+#if 0
 #define IsWin2KAndAbove()	(g_uWinVer >= 0x0500)
 #define IsWinXPAndAbove()	(g_uWinVer >= 0x0501)
+#else
+#define IsWin2KAndAbove()	TRUE
+#define IsWinXPAndAbove()	TRUE
+#endif
 #define IsVistaAndAbove()	(g_uWinVer >= 0x0600)
 #define IsWin7AndAbove()	(g_uWinVer >= 0x0601)
 

@@ -1145,12 +1145,12 @@ INT_PTR OptionsPropSheet(HWND hwnd, HINSTANCE hInstance) {
 
 		if (bFullRowSelect) {
 			ListView_SetExtendedListViewStyleEx(hwndDirList, LVS_EX_FULLROWSELECT, LVS_EX_FULLROWSELECT);
-			if (IsVista()) {
+			if (IsVistaAndAbove()) {
 				SetTheme(hwndDirList, L"Explorer");
 			}
 		} else {
 			ListView_SetExtendedListViewStyleEx(hwndDirList, LVS_EX_FULLROWSELECT, 0);
-			if (IsVista()) {
+			if (IsVistaAndAbove()) {
 				SetTheme(hwndDirList, L"Listview");
 			}
 		}

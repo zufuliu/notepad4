@@ -60,10 +60,15 @@ static __inline BOOL IniSectionSetBool(LPWSTR lpCachedIniSection, LPCWSTR lpName
 void BeginWaitCursor(void);
 void EndWaitCursor(void);
 
-#define Is2k()    (g_uWinVer >= 0x0500)
-#define IsXP()    (g_uWinVer >= 0x0501)
-#define IsVista() (g_uWinVer >= 0x0600)
-#define IsW7()    (g_uWinVer >= 0x0601)
+#if 0
+#define IsWin2KAndAbove()	(g_uWinVer >= 0x0500)
+#define IsWinXPAndAbove()	(g_uWinVer >= 0x0501)
+#else
+#define IsWin2KAndAbove()	TRUE
+#define IsWinXPAndAbove()	TRUE
+#endif
+#define IsVistaAndAbove()	(g_uWinVer >= 0x0600)
+#define IsWin7AndAbove()	(g_uWinVer >= 0x0601)
 
 BOOL ExeNameFromWnd(HWND hwnd, LPWSTR szExeName, int cchExeName);
 //BOOL Is32bitExe(LPCWSTR lpszExeName);

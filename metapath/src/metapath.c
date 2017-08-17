@@ -713,7 +713,7 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 					  hInstance,
 					  NULL);
 
-	if (IsVista() && PrivateIsAppThemed()) {
+	if (IsVistaAndAbove() && PrivateIsAppThemed()) {
 		SetWindowLongPtr(hwndDirList, GWL_EXSTYLE, GetWindowLongPtr(hwndDirList, GWL_EXSTYLE) & ~WS_EX_CLIENTEDGE);
 		SetWindowPos(hwndDirList, NULL, 0, 0, 0, 0, SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE | SWP_FRAMECHANGED);
 	}
@@ -752,7 +752,7 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		ListView_SetExtendedListViewStyleEx(hwndDirList,
 											LVS_EX_FULLROWSELECT,
 											LVS_EX_FULLROWSELECT);
-		if (IsVista()) {
+		if (IsVistaAndAbove()) {
 			SetTheme(hwndDirList, L"Explorer");
 		}
 	}
@@ -849,7 +849,7 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) {
 		hbmpCopy = CopyImage(hbmp, IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION);
 	}
 	GetObject(hbmp, sizeof(BITMAP), &bmp);
-	if (!IsXP()) {
+	if (!IsWinXPAndAbove()) {
 		BitmapMergeAlpha(hbmp, GetSysColor(COLOR_3DFACE));
 	}
 	himl = ImageList_Create(bmp.bmWidth / NUMTOOLBITMAPS, bmp.bmHeight, ILC_COLOR32 | ILC_MASK, 0, 0);
@@ -892,10 +892,10 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) {
 		BOOL fProcessed = FALSE;
 		if (flagToolbarLook == 1) {
 			fProcessed = BitmapAlphaBlend(hbmpCopy, GetSysColor(COLOR_3DFACE), 0x60);
-		} else if (flagToolbarLook == 2 || (!IsXP() && flagToolbarLook == 0)) {
+		} else if (flagToolbarLook == 2 || (!IsWinXPAndAbove() && flagToolbarLook == 0)) {
 			fProcessed = BitmapGrayScale(hbmpCopy);
 		}
-		if (fProcessed && !IsXP()) {
+		if (fProcessed && !IsWinXPAndAbove()) {
 			BitmapMergeAlpha(hbmpCopy, GetSysColor(COLOR_3DFACE));
 		}
 		if (fProcessed) {
@@ -979,7 +979,7 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) {
 	cyReBar = rc.bottom - rc.top;
 
 	cyReBarFrame = bIsAppThemed ? 0 : 2;
-	cyDriveBoxFrame = (bIsAppThemed && IsVista()) ? 0 : 2;
+	cyDriveBoxFrame = (bIsAppThemed && IsVistaAndAbove()) ? 0 : 2;
 }
 
 //=============================================================================
@@ -994,7 +994,7 @@ void MsgThemeChanged(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	BOOL bIsAppThemed = PrivateIsAppThemed();
 
-	if (IsVista() && bIsAppThemed) {
+	if (IsVistaAndAbove() && bIsAppThemed) {
 		SetWindowLongPtr(hwndDirList, GWL_EXSTYLE, GetWindowLongPtr(hwndDirList, GWL_EXSTYLE) & ~WS_EX_CLIENTEDGE);
 		SetWindowPos(hwndDirList, NULL, 0, 0, 0, 0, SWP_NOZORDER | SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE);
 		if (bFullRowSelect) {
