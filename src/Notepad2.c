@@ -6541,9 +6541,10 @@ BOOL FileSave(BOOL bSaveAlways, BOOL bAsk, BOOL bSaveAs, BOOL bSaveCopy) {
 	WCHAR tchFile[MAX_PATH];
 	BOOL fSuccess = FALSE;
 	BOOL bCancelDataLoss = FALSE;
-
+	BOOL Untitled = lstrlen(szCurFile) == 0;
 	BOOL bIsEmptyNewFile = FALSE;
-	if (lstrlen(szCurFile) == 0) {
+
+	if (Untitled) {
 		int cchText = (int)SendMessage(hwndEdit, SCI_GETLENGTH, 0, 0);
 		if (cchText == 0) {
 			bIsEmptyNewFile = TRUE;
@@ -6564,7 +6565,7 @@ BOOL FileSave(BOOL bSaveAlways, BOOL bAsk, BOOL bSaveAs, BOOL bSaveCopy) {
 	if (bAsk) {
 		// File or "Untitled" ...
 		WCHAR tch[MAX_PATH];
-		if (lstrlen(szCurFile)) {
+		if (!Untitled) {
 			lstrcpy(tch, szCurFile);
 		} else {
 			GetString(IDS_UNTITLED, tch, COUNTOF(tch));
@@ -6579,7 +6580,7 @@ BOOL FileSave(BOOL bSaveAlways, BOOL bAsk, BOOL bSaveAs, BOOL bSaveCopy) {
 	}
 
 	// Read only...
-	if (!bSaveAs && !bSaveCopy && lstrlen(szCurFile)) {
+	if (!bSaveAs && !bSaveCopy && !Untitled) {
 		DWORD dwFileAttributes = GetFileAttributes(szCurFile);
 		if (dwFileAttributes != INVALID_FILE_ATTRIBUTES) {
 			bReadOnly = (dwFileAttributes & FILE_ATTRIBUTE_READONLY);
@@ -6594,10 +6595,16 @@ BOOL FileSave(BOOL bSaveAlways, BOOL bAsk, BOOL bSaveAs, BOOL bSaveCopy) {
 				return FALSE;
 			}
 		}
+		if (!bSaveAs) {
+			fSuccess = FileIO(FALSE, szCurFile, FALSE, &iEncoding, &iEOLMode, NULL, NULL, &bCancelDataLoss, FALSE);
+			if (!fSuccess) {
+				bSaveAs = TRUE;
+			}
+		}
 	}
 
 	// Save As...
-	if (bSaveAs || bSaveCopy || lstrlen(szCurFile) == 0) {
+	if (bSaveAs || bSaveCopy || Untitled) {
 		WCHAR tchInitialDir[MAX_PATH] = L"";
 		if (bSaveCopy && lstrlen(tchLastSaveCopyDir)) {
 			lstrcpy(tchInitialDir, tchLastSaveCopyDir);
@@ -6628,7 +6635,7 @@ BOOL FileSave(BOOL bSaveAlways, BOOL bAsk, BOOL bSaveAs, BOOL bSaveCopy) {
 		} else {
 			return FALSE;
 		}
-	} else {
+	} else if (!fSuccess) {
 		fSuccess = FileIO(FALSE, szCurFile, FALSE, &iEncoding, &iEOLMode, NULL, NULL, &bCancelDataLoss, FALSE);
 	}
 
