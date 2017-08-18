@@ -88,7 +88,7 @@ typedef struct np2params {
 BOOL InitApplication(HINSTANCE hInstance);
 HWND InitInstance(HINSTANCE hInstance, LPSTR pszCmdLine, int nCmdShow);
 BOOL ActivatePrevInst(void);
-void GetRelaunchParameters(LPWSTR szParameters, BOOL newWind, BOOL emptyWind);
+void GetRelaunchParameters(LPWSTR szParameters, LPCWSTR lpszFile, BOOL newWind, BOOL emptyWind);
 BOOL RelaunchMultiInst(void);
 BOOL RelaunchElevated(void);
 void SnapToDefaultPos(HWND hwnd);

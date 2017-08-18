@@ -2385,7 +2385,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		}
 
 		GetModuleFileName(NULL, szModuleName, COUNTOF(szModuleName));
-		GetRelaunchParameters(szParameters, TRUE, emptyWind);
+		GetRelaunchParameters(szParameters, szCurFile, TRUE, emptyWind);
 
 		ZeroMemory(&sei, sizeof(SHELLEXECUTEINFO));
 		sei.cbSize = sizeof(SHELLEXECUTEINFO);
@@ -6647,6 +6647,9 @@ BOOL FileSave(BOOL bSaveAlways, BOOL bAsk, BOOL bSaveAs, BOOL bSaveCopy) {
 			if (flagUseSystemMRU == 2) {
 				SHAddToRecentDocs(SHARD_PATHW, szCurFile);
 			}
+			if (flagRelaunchElevated == 2 && bSaveAs && iPathNameFormat == 0) {
+				iPathNameFormat = 1;
+			}
 			SetWindowTitle(hwndMain, uidsAppTitle, fIsElevated, IDS_UNTITLED, szCurFile,
 						   iPathNameFormat, bModified || iEncoding != iOriginalEncoding,
 						   IDS_READONLY, bReadOnly, szTitleExcerpt);
@@ -7087,7 +7090,7 @@ BOOL RelaunchMultiInst(void) {
 	}
 }
 
-void GetRelaunchParameters(LPWSTR szParameters, BOOL newWind, BOOL emptyWind) {
+void GetRelaunchParameters(LPWSTR szParameters, LPCWSTR lpszFile, BOOL newWind, BOOL emptyWind) {
 	MONITORINFO mi;
 	HMONITOR hMonitor;
 	WINDOWPLACEMENT wndpl;
@@ -7137,7 +7140,7 @@ void GetRelaunchParameters(LPWSTR szParameters, BOOL newWind, BOOL emptyWind) {
 	wsprintf(tch, L" -pos %i,%i,%i,%i,%i", x, y, cx, cy, imax);
 	lstrcat(szParameters, tch);
 
-	if (!emptyWind && lstrlen(szCurFile)) {
+	if (!emptyWind && lstrlen(lpszFile)) {
 		WCHAR szFileName[MAX_PATH + 4];
 		Sci_Position pos = SciCall_GetCurrentPos();
 		if (pos > 0) {
@@ -7147,7 +7150,7 @@ void GetRelaunchParameters(LPWSTR szParameters, BOOL newWind, BOOL emptyWind) {
 			lstrcat(szParameters, tch);
 		}
 
-		lstrcpy(szFileName, szCurFile);
+		lstrcpy(szFileName, lpszFile);
 		PathQuoteSpaces(szFileName);
 		lstrcat(szParameters, L" ");
 		lstrcat(szParameters, szFileName);
@@ -7162,15 +7165,22 @@ void GetRelaunchParameters(LPWSTR szParameters, BOOL newWind, BOOL emptyWind) {
 BOOL RelaunchElevated(void) {
 	if (!IsVistaAndAbove() || fIsElevated || !flagRelaunchElevated || flagDisplayHelp) {
 		return FALSE;
-	}
-	if (flagRelaunchElevated == 1 || FileSave(FALSE, TRUE, FALSE, FALSE)) {
+	} else {
 		LPWSTR lpArg1, lpArg2;
+		BOOL exit = TRUE;
 
 		if (flagRelaunchElevated == 2) {
+			WCHAR tchFile[MAX_PATH];
+			lstrcpy(tchFile, szCurFile);
+			if (!FileSave(FALSE, TRUE, FALSE, FALSE)) {
+				return FALSE;
+			}
+
+			exit = lstrcmpi(tchFile, szCurFile) == 0;
 			lpArg1 = LocalAlloc(LPTR, sizeof(WCHAR) * MAX_PATH);
 			GetModuleFileName(NULL, lpArg1, MAX_PATH);
 			lpArg2 = LocalAlloc(LPTR, sizeof(WCHAR) * (2 * MAX_PATH + 128));
-			GetRelaunchParameters(lpArg2, FALSE, FALSE);
+			GetRelaunchParameters(lpArg2, tchFile, !exit, FALSE);
 		} else {
 			LPWSTR lpCmdLine = GetCommandLine();
 			lpArg1 = LocalAlloc(LPTR, sizeof(WCHAR) * (lstrlen(lpCmdLine) + 1));
@@ -7191,13 +7201,14 @@ BOOL RelaunchElevated(void) {
 			sei.nShow = SW_SHOWNORMAL;
 
 			ShellExecuteEx(&sei);
+		} else {
+			exit = FALSE;
 		}
 
 		LocalFree(lpArg1);
 		LocalFree(lpArg2);
-		return TRUE;
+		return exit;
 	}
-	return FALSE;
 }
 
 //=============================================================================
