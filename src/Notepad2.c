@@ -5538,16 +5538,34 @@ void ParseCommandLine(void) {
 			// Encoding
 			if (lstrcmpi(lp1, L"ANSI") == 0 || lstrcmpi(lp1, L"A") == 0 || lstrcmpi(lp1, L"MBCS") == 0) {
 				flagSetEncoding = IDM_ENCODING_ANSI - IDM_ENCODING_ANSI + 1;
-			} else if (lstrcmpi(lp1, L"UNICODE") == 0 || lstrcmpi(lp1, L"W") == 0) {
+			} else if (lstrcmpi(lp1, L"W") == 0) {
 				flagSetEncoding = IDM_ENCODING_UNICODE - IDM_ENCODING_ANSI + 1;
-			} else if (lstrcmpi(lp1, L"UNICODEBE") == 0 || lstrcmpi(lp1, L"UNICODE-BE") == 0) {
-				flagSetEncoding = IDM_ENCODING_UNICODEREV - IDM_ENCODING_ANSI + 1;
-			} else if (lstrcmpi(lp1, L"UTF8") == 0 || lstrcmpi(lp1, L"UTF-8") == 0) {
-				flagSetEncoding = IDM_ENCODING_UTF8 - IDM_ENCODING_ANSI + 1;
-			} else if (lstrcmpi(lp1, L"UTF8SIG") == 0 || lstrcmpi(lp1, L"UTF-8SIG") == 0 ||
-					   lstrcmpi(lp1, L"UTF8SIGNATURE") == 0 || lstrcmpi(lp1, L"UTF-8SIGNATURE") == 0 ||
-					   lstrcmpi(lp1, L"UTF8-SIGNATURE") == 0 || lstrcmpi(lp1, L"UTF-8-SIGNATURE") == 0) {
-				flagSetEncoding = IDM_ENCODING_UTF8SIGN - IDM_ENCODING_ANSI + 1;
+			} else if (StrCmpNI(lp1, L"UNICODE", 7) == 0) {
+				if (StrStrI(lp1 + 7, L"BE") != NULL) {
+					flagSetEncoding = IDM_ENCODING_UNICODEREV - IDM_ENCODING_ANSI + 1;
+				} else {
+					flagSetEncoding = IDM_ENCODING_UNICODE - IDM_ENCODING_ANSI + 1;
+				}
+			} else if (StrCmpNI(lp1, L"UTF", 3) == 0) {
+				WCHAR *p = lp1 + 3;
+				if (*p == L'-') {
+					++p;
+				}
+				if (*p == L'8') {
+					++p;
+					if (StrStrI(p, L"SIG") != NULL || StrStrI(p, L"BOM") != NULL) {
+						flagSetEncoding = IDM_ENCODING_UTF8SIGN - IDM_ENCODING_ANSI + 1;
+					} else {
+						flagSetEncoding = IDM_ENCODING_UTF8 - IDM_ENCODING_ANSI + 1;
+					}
+				} else if (*p == L'1' && p[1] == L'6') {
+					p += 2;
+					if (StrStrI(p, L"BE") != NULL) {
+						flagSetEncoding = IDM_ENCODING_UNICODEREV - IDM_ENCODING_ANSI + 1;
+					} else {
+						flagSetEncoding = IDM_ENCODING_UNICODE - IDM_ENCODING_ANSI + 1;
+					}
+				}
 			}
 
 			// EOL Mode
