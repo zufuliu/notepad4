@@ -2248,8 +2248,6 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	case IDM_FILE_REVERT: {
 		if (lstrlen(szCurFile)) {
-			WCHAR tchCurFile2[MAX_PATH];
-
 			int iCurPos		= (int)SendMessage(hwndEdit, SCI_GETCURRENTPOS, 0, 0);
 			int iAnchorPos	= (int)SendMessage(hwndEdit, SCI_GETANCHOR, 0, 0);
 			int iVisTopLine	= (int)SendMessage(hwndEdit, SCI_GETFIRSTVISIBLELINE, 0, 0);
@@ -2260,10 +2258,8 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 				return 0;
 			}
 
-			lstrcpy(tchCurFile2, szCurFile);
-
 			iWeakSrcEncoding = iEncoding;
-			if (FileLoad(TRUE, FALSE, TRUE, FALSE, tchCurFile2)) {
+			if (FileLoad(TRUE, FALSE, TRUE, FALSE, szCurFile)) {
 				if (SendMessage(hwndEdit, SCI_GETLENGTH, 0, 0) >= 4) {
 					char tch[5] = "";
 					SendMessage(hwndEdit, SCI_GETTEXT, 5, (LPARAM)tch);
@@ -2656,10 +2652,8 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			}
 
 			if (RecodeDlg(hwnd, &iNewEncoding)) {
-				WCHAR tchCurFile2[MAX_PATH];
-				lstrcpy(tchCurFile2, szCurFile);
 				iSrcEncoding = iNewEncoding;
-				FileLoad(TRUE, FALSE, TRUE, FALSE, tchCurFile2);
+				FileLoad(TRUE, FALSE, TRUE, FALSE, szCurFile);
 			}
 		}
 	}
@@ -4213,7 +4207,6 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	case CMD_RECODEDEFAULT: {
 		if (lstrlen(szCurFile)) {
-			WCHAR tchCurFile2[MAX_PATH];
 			if (iDefaultEncoding == CPI_UNICODEBOM) {
 				iSrcEncoding = CPI_UNICODE;
 			} else if (iDefaultEncoding == CPI_UNICODEBEBOM) {
@@ -4223,39 +4216,32 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			} else {
 				iSrcEncoding = iDefaultEncoding;
 			}
-			lstrcpy(tchCurFile2, szCurFile);
-			FileLoad(FALSE, FALSE, TRUE, FALSE, tchCurFile2);
+			FileLoad(FALSE, FALSE, TRUE, FALSE, szCurFile);
 		}
 	}
 	break;
 
 	case CMD_RELOADANSI: {
 		if (lstrlen(szCurFile)) {
-			WCHAR tchCurFile2[MAX_PATH];
 			iSrcEncoding = CPI_DEFAULT;
-			lstrcpy(tchCurFile2, szCurFile);
-			FileLoad(FALSE, FALSE, TRUE, FALSE, tchCurFile2);
+			FileLoad(FALSE, FALSE, TRUE, FALSE, szCurFile);
 		}
 	}
 	break;
 
 	case CMD_RELOADOEM: {
 		if (lstrlen(szCurFile)) {
-			WCHAR tchCurFile2[MAX_PATH];
 			iSrcEncoding = CPI_OEM;
-			lstrcpy(tchCurFile2, szCurFile);
-			FileLoad(FALSE, FALSE, TRUE, FALSE, tchCurFile2);
+			FileLoad(FALSE, FALSE, TRUE, FALSE, szCurFile);
 		}
 	}
 	break;
 
 	case CMD_RELOADASCIIASUTF8: {
 		if (lstrlen(szCurFile)) {
-			WCHAR tchCurFile2[MAX_PATH];
 			BOOL _bLoadASCIIasUTF8 = bLoadASCIIasUTF8;
 			bLoadASCIIasUTF8 = 1;
-			lstrcpy(tchCurFile2, szCurFile);
-			FileLoad(FALSE, FALSE, TRUE, FALSE, tchCurFile2);
+			FileLoad(FALSE, FALSE, TRUE, FALSE, szCurFile);
 			bLoadASCIIasUTF8 = _bLoadASCIIasUTF8;
 		}
 	}
@@ -4263,13 +4249,11 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	case CMD_RELOADNOFILEVARS: {
 		if (lstrlen(szCurFile)) {
-			WCHAR tchCurFile2[MAX_PATH];
 			int _fNoFileVariables = fNoFileVariables;
 			BOOL _bNoEncodingTags = bNoEncodingTags;
 			fNoFileVariables = 1;
 			bNoEncodingTags = 1;
-			lstrcpy(tchCurFile2, szCurFile);
-			FileLoad(FALSE, FALSE, TRUE, FALSE, tchCurFile2);
+			FileLoad(FALSE, FALSE, TRUE, FALSE, szCurFile);
 			fNoFileVariables = _fNoFileVariables;
 			bNoEncodingTags = _bNoEncodingTags;
 		}
@@ -6375,7 +6359,17 @@ BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect, LPCWST
 	BOOL fSuccess = FALSE;
 	BOOL bUnicodeErr = FALSE;
 	BOOL bFileTooBig = FALSE;
+	int line = 0, col = 0;
 
+	if (!bNew && lpszFile != NULL && lstrlen(lpszFile) > 0) {
+		lstrcpy(tch, lpszFile);
+		if (lpszFile == szCurFile || lstrcmpi(lpszFile, szCurFile) == 0) {
+			Sci_Position pos = SciCall_GetCurrentPos();
+			line = SciCall_LineFromPosition(pos) + 1;
+			col = SciCall_GetColumn(pos) + 1;
+		}
+		fSuccess = TRUE;
+	}
 	if (!bDontSave) {
 		if (!FileSave(FALSE, TRUE, FALSE, FALSE)) {
 			return FALSE;
@@ -6415,13 +6409,12 @@ BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect, LPCWST
 		return TRUE;
 	}
 
-	if (!lpszFile || lstrlen(lpszFile) == 0) {
+	if (!fSuccess) {
 		if (!OpenFileDlg(hwndMain, tch, COUNTOF(tch), NULL)) {
 			return FALSE;
 		}
-	} else {
-		lstrcpy(tch, lpszFile);
 	}
+	fSuccess = FALSE;
 
 	ExpandEnvironmentStringsEx(tch, COUNTOF(tch));
 
@@ -6507,6 +6500,10 @@ BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect, LPCWST
 		}
 		InstallFileWatching(szCurFile);
 
+		if (line > 1 || col > 1) {
+			EditJumpTo(hwndEdit, line, col);
+			EditEnsureSelectionVisible(hwndEdit);
+		}
 		// the .LOG feature ...
 		if (SendMessage(hwndEdit, SCI_GETLENGTH, 0, 0) >= 4) {
 			char tchLog[5] = "";
@@ -7068,6 +7065,7 @@ BOOL RelaunchMultiInst(void) {
 
 			CreateProcess(NULL, lpCmdLineNew, NULL, NULL, FALSE, 0, NULL, g_wchWorkingDirectory, &si, &pi);
 		}
+
 		LocalFree(lpCmdLineNew);
 		LocalFree(lp1);
 		LocalFree(lp2);
@@ -7133,7 +7131,7 @@ void GetRelaunchParameters(LPWSTR szParameters, BOOL newWind, BOOL emptyWind) {
 	lstrcat(szParameters, tch);
 
 	if (!emptyWind && lstrlen(szCurFile)) {
-		WCHAR szFileName[COUNTOF(szCurFile) + 4];
+		WCHAR szFileName[MAX_PATH + 4];
 		Sci_Position pos = SciCall_GetCurrentPos();
 		if (pos > 0) {
 			x = SciCall_LineFromPosition(pos) + 1;
