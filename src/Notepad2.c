@@ -5113,7 +5113,7 @@ void LoadSettings(void) {
 		PathAbsoluteFromApp(tchFavoritesDir, NULL, COUNTOF(tchFavoritesDir), TRUE);
 	}
 
-	iPathNameFormat = IniSectionGetInt(pIniSection, L"PathNameFormat", 0);
+	iPathNameFormat = IniSectionGetInt(pIniSection, L"PathNameFormat", 1);
 	iPathNameFormat = max(min(iPathNameFormat, 2), 0);
 
 	fWordWrap = IniSectionGetBool(pIniSection, L"WordWrap", 1);
