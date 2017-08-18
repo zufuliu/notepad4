@@ -1805,6 +1805,34 @@ void Style_SetLexerFromID(HWND hwnd, int id) {
 	}
 }
 
+int Style_GetEditLexerId(int lexer) {
+	PEDITLEXER lex = NULL;
+
+	switch (lexer) {
+	case EditLexer_Default:
+		lex = &lexDefault;
+		break;
+
+	case EditLexer_HTML:
+		lex = &lexHTML;
+		break;
+
+	case EditLexer_XML:
+		lex = &lexXML;
+		break;
+
+	default:
+		return -1;
+	}
+
+	for (int i = 0; i < NUMLEXERS; i++) {
+		if (pLexArray[i] == lex) {
+			return i;
+		}
+	}
+	return -1;
+}
+
 //=============================================================================
 //
 // Style_ToggleUse2ndDefault()

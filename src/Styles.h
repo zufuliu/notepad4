@@ -25,6 +25,13 @@
 // Number of Lexers in pLexArray
 #define NUMLEXERS 57
 
+/**
+ * used in ParseCommandLine() for option /d, /h and /x.
+ */
+#define EditLexer_Default	0
+#define EditLexer_HTML		1
+#define EditLexer_XML		2
+
 extern PEDITLEXER pLexCurrent;
 extern int np2LexLangIndex;
 
@@ -53,6 +60,7 @@ void	Style_SetLexer(HWND hwnd, PEDITLEXER pLexNew);
 void	Style_SetLexerFromFile(HWND hwnd, LPCWSTR lpszFile);
 void	Style_SetLexerFromName(HWND hwnd, LPCWSTR lpszFile, LPCWSTR lpszName);
 void	Style_SetLexerFromID(HWND hwnd, int id);
+int		Style_GetEditLexerId(int lexer);
 
 int		Style_GetDocTypeLanguage();
 void	Style_UpdateLexKeywords(PEDITLEXER pLexNew);

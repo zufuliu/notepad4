@@ -5799,7 +5799,7 @@ void ParseCommandLine(void) {
 						LocalFree(lpSchemeArg);
 						lpSchemeArg = NULL;
 					}
-					iInitialLexer = 0;
+					iInitialLexer = Style_GetEditLexerId(EditLexer_Default);
 					flagLexerSpecified = 1;
 					break;
 
@@ -5808,7 +5808,7 @@ void ParseCommandLine(void) {
 						LocalFree(lpSchemeArg);
 						lpSchemeArg = NULL;
 					}
-					iInitialLexer = 21; // HTML
+					iInitialLexer = Style_GetEditLexerId(EditLexer_HTML);
 					flagLexerSpecified = 1;
 					break;
 
@@ -5817,7 +5817,7 @@ void ParseCommandLine(void) {
 						LocalFree(lpSchemeArg);
 						lpSchemeArg = NULL;
 					}
-					iInitialLexer = 22; // XML
+					iInitialLexer = Style_GetEditLexerId(EditLexer_XML);
 					flagLexerSpecified = 1;
 					break;
 
