@@ -7161,6 +7161,42 @@ void GetRelaunchParameters(LPWSTR szParameters, LPCWSTR lpszFile, BOOL newWind, 
 	if (!emptyWind && lstrlen(lpszFile)) {
 		WCHAR szFileName[MAX_PATH + 4];
 		Sci_Position pos = SciCall_GetCurrentPos();
+
+		// file encoding
+		switch (iEncoding) {
+		case CPI_DEFAULT:
+			lstrcat(szParameters, L" -ansi");
+			break;
+
+		case CPI_UNICODE:
+		case CPI_UNICODEBOM:
+			lstrcat(szParameters, L" -utf16le");
+			break;
+
+		case CPI_UNICODEBE:
+		case CPI_UNICODEBEBOM:
+			lstrcat(szParameters, L" -utf16be");
+			break;
+
+		case CPI_UTF8:
+			lstrcat(szParameters, L" -utf8");
+			break;
+
+		case CPI_UTF8SIGN:
+			lstrcat(szParameters, L" -utf8sig");
+			break;
+
+		default: {
+			const char *enc = mEncoding[iEncoding].pszParseNames;
+			char *sep = StrChrA(enc, ',');
+			ZeroMemory(tch, sizeof(tch));
+			MultiByteToWideChar(CP_UTF8, 0, enc, sep - enc, tch, COUNTOF(tch));
+			lstrcat(szParameters, L" -e \"");
+			lstrcat(szParameters, tch);
+			lstrcat(szParameters, L"\"");
+		}
+		}
+
 		if (pos > 0) {
 			x = SciCall_LineFromPosition(pos) + 1;
 			y = SciCall_GetColumn(pos) + 1;

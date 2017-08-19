@@ -181,7 +181,7 @@ void	EditShowCallTips(HWND hwnd, Sci_Position position);
 typedef struct _np2encoding {
 	UINT	uFlags;
 	UINT	uCodePage;
-	char	*pszParseNames;
+	const char *pszParseNames;
 	int		idsName;
 	WCHAR	wchLabel[32];
 } NP2ENCODING;
