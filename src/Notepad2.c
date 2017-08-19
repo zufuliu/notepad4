@@ -7197,6 +7197,32 @@ void GetRelaunchParameters(LPWSTR szParameters, LPCWSTR lpszFile, BOOL newWind, 
 		}
 		}
 
+		// scheme
+		switch (pLexCurrent->rid) {
+		case NP2LEX_DEFAULT:
+			lstrcat(szParameters, L" -d");
+			break;
+
+		case NP2LEX_HTML:
+			lstrcat(szParameters, L" -h");
+			break;
+
+		case NP2LEX_XML:
+			lstrcat(szParameters, L" -x");
+			break;
+
+		default:
+			ZeroMemory(tch, sizeof(tch));
+			x = np2LexLangIndex;
+			np2LexLangIndex = 0;
+			Style_GetCurrentLexerName(tch, COUNTOF(tch));
+			np2LexLangIndex = x;
+			lstrcat(szParameters, L" -s \"");
+			lstrcat(szParameters, tch);
+			lstrcat(szParameters, L"\"");
+		}
+
+		// position
 		if (pos > 0) {
 			x = SciCall_LineFromPosition(pos) + 1;
 			y = SciCall_GetColumn(pos) + 1;
