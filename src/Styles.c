@@ -492,9 +492,15 @@ void Style_SetLexer(HWND hwnd, PEDITLEXER pLexNew) {
 	SciCall_SetProperty("fold.comment", "1");
 	SciCall_SetProperty("fold.preprocessor", "1");
 	SciCall_SetProperty("fold.compact", "0");
-	SciCall_SetProperty("fold.html", "1");
-	SciCall_SetProperty("fold.hypertext.comment", "1");
-	SciCall_SetProperty("fold.hypertext.heredoc", "1");
+
+	switch (pLexNew->rid) {
+	case NP2LEX_HTML:
+	case NP2LEX_XML:
+		SciCall_SetProperty("fold.html", "1");
+		SciCall_SetProperty("fold.hypertext.comment", "1");
+		SciCall_SetProperty("fold.hypertext.heredoc", "1");
+		break;
+	}
 
 	Style_UpdateLexKeywords(pLexNew);
 	// Add KeyWord Lists

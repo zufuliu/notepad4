@@ -169,7 +169,7 @@ _label_identifier:
 			}
 			break;
 		case SCE_SQL_STRING:
-			if (sc.ch == '\\') {
+			if (sqlBackslashEscapes && sc.ch == '\\') {
 				// Escape sequence
 				sc.Forward();
 			} else if (sc.ch == '\"') {

@@ -511,7 +511,7 @@ void CenterDlgInParentEx(HWND hDlg, HWND hParent) {
 	}
 
 	if ((rcParent.bottom - rcParent.top) - (rcDlg.bottom - rcDlg.top) > 20) {
-		y = rcParent.top	+ (((rcParent.bottom - rcParent.top) - (rcDlg.bottom - rcDlg.top)) / 2);
+		y = rcParent.top + (((rcParent.bottom - rcParent.top) - (rcDlg.bottom - rcDlg.top)) / 2);
 	} else {
 		y = rcParent.top + 60;
 	}
