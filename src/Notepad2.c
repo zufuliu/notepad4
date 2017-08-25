@@ -6378,6 +6378,8 @@ BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect, LPCWST
 	BOOL bUnicodeErr = FALSE;
 	BOOL bFileTooBig = FALSE;
 	int line = 0, col = 0;
+	int keepTitleExcerpt = fKeepTitleExcerpt;
+	int lexerSpecified = flagLexerSpecified;
 
 	if (!bNew && lpszFile != NULL && lstrlen(lpszFile) > 0) {
 		lstrcpy(tch, lpszFile);
@@ -6385,6 +6387,8 @@ BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect, LPCWST
 			Sci_Position pos = SciCall_GetCurrentPos();
 			line = SciCall_LineFromPosition(pos) + 1;
 			col = SciCall_GetColumn(pos) + 1;
+			keepTitleExcerpt = 1;
+			lexerSpecified = 1;
 		}
 		fSuccess = TRUE;
 	}
@@ -6399,7 +6403,7 @@ BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect, LPCWST
 		lstrcpy(szCurFile, L"");
 		SetDlgItemText(hwndMain, IDC_FILENAME, szCurFile);
 		SetDlgItemInt(hwndMain, IDC_REUSELOCK, GetTickCount(), FALSE);
-		if (!fKeepTitleExcerpt) {
+		if (!keepTitleExcerpt) {
 			lstrcpy(szTitleExcerpt, L"");
 		}
 		FileVars_Init(NULL, 0, &fvCurFile);
@@ -6493,10 +6497,10 @@ BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect, LPCWST
 		lstrcpy(szCurFile, szFileName);
 		SetDlgItemText(hwndMain, IDC_FILENAME, szCurFile);
 		SetDlgItemInt(hwndMain, IDC_REUSELOCK, GetTickCount(), FALSE);
-		if (!fKeepTitleExcerpt) {
+		if (!keepTitleExcerpt) {
 			lstrcpy(szTitleExcerpt, L"");
 		}
-		if (!flagLexerSpecified) { // flag will be cleared
+		if (!lexerSpecified) { // flagLexerSpecified will be cleared
 			Style_SetLexerFromFile(hwndEdit, szCurFile);
 		}
 		UpdateLineNumberWidth();
