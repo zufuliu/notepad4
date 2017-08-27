@@ -1592,7 +1592,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	case IDM_VIEW_NEWWINDOW: {
 		WCHAR szModuleName[MAX_PATH];
-		WCHAR szParameters[2 * MAX_PATH + 128];
+		WCHAR szParameters[1024];
 
 		GetModuleFileName(NULL, szModuleName, COUNTOF(szModuleName));
 		GetRelaunchParameters(szParameters);
@@ -2657,98 +2657,161 @@ void SaveSettings(BOOL bSaveSettingsNow) {
 //  ParseCommandLine()
 //
 //
+int ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2) {
+	int state = 0;
+	LPWSTR opt = lp1 + 1;
+	// only accept /opt, -opt, --opt
+	if (*opt == L'-') {
+		++opt;
+	}
+	if (*opt == 0) {
+		return 0;
+	}
+
+	if (opt[1] == 0) {
+		switch (*CharUpper(opt)) {
+		case L'F':
+			state = 2;
+			if (ExtractFirstArgument(lp2, lp1, lp2)) {
+				StrCpyN(szIniFile, lp1, COUNTOF(szIniFile));
+				TrimString(szIniFile);
+				PathUnquoteSpaces(szIniFile);
+				state = 1;
+			}
+			break;
+
+		case L'G':
+			flagGotoFavorites = 1;
+			state = 1;
+			break;
+
+		case L'I':
+			flagStartAsTrayIcon = 1;
+			state = 1;
+			break;
+
+		case L'M':
+			state = 2;
+			if (ExtractFirstArgument(lp2, lp1, lp2)) {
+				if (lpFilterArg) {
+					GlobalFree(lpFilterArg);
+				}
+
+				lpFilterArg = GlobalAlloc(GPTR, sizeof(WCHAR) * (lstrlen(lp1) + 1));
+				lstrcpy(lpFilterArg, lp1);
+				state = 1;
+			}
+			break;
+
+		case L'N':
+			flagNoReuseWindow = 1;
+			state = 1;
+			break;
+
+		case L'P':
+			state = 2;
+			if (ExtractFirstArgument(lp2, lp1, lp2)) {
+				int x = 0, y = 0, cx = 0, cy = 0;
+				int itok = swscanf(lp1, L"%i,%i,%i,%i", &x, &y, &cx, &cy);
+				if (itok == 4) { // scan successful
+					flagPosParam = 1;
+					state = 1;
+					wi.x = x;
+					wi.y = y;
+					wi.cx = cx;
+					wi.cy = cy;
+					if (wi.cx < 1) {
+						wi.cx = CW_USEDEFAULT;
+					}
+					if (wi.cy < 1) {
+						wi.cy = CW_USEDEFAULT;
+					}
+				}
+			}
+			break;
+
+		default:
+			break;
+		}
+	} else if (opt[2] == 0) {
+		switch (*CharUpper(opt)) {
+		case L'F':
+			if (opt[1] == L'0' || *CharUpper(opt + 1) == L'O') {
+				lstrcpy(szIniFile, L"*?");
+				state = 1;
+			}
+			break;
+
+		case L'P':
+			switch (*CharUpper(opt + 1)) {
+			case L'D':
+			case L'S':
+				flagPosParam = 1;
+				state = 1;
+				wi.x = wi.y = wi.cx = wi.cy = CW_USEDEFAULT;
+				break;
+			}
+			break;
+
+		default:
+			break;
+		}
+	}
+
+	return state;
+}
+
 void ParseCommandLine(void) {
 	LPWSTR lpCmdLine = GetCommandLine();
-	LPWSTR lp1, lp2;
+	LPWSTR lp1, lp2, lp3;
+	size_t cmdSize = sizeof(WCHAR) * (lstrlen(lpCmdLine) + 1);
 
-	if (lstrlen(lpCmdLine) == 0) {
+	if (cmdSize == sizeof(WCHAR)) {
 		return;
 	}
 
 	// Good old console can also send args separated by Tabs
 	StrTab2Space(lpCmdLine);
 
-	lp1 = LocalAlloc(LPTR, sizeof(WCHAR) * (lstrlen(lpCmdLine) + 1));
-	lp2 = LocalAlloc(LPTR, sizeof(WCHAR) * (lstrlen(lpCmdLine) + 1));
+	lp1 = LocalAlloc(LPTR, cmdSize);
+	lp3 = LocalAlloc(LPTR, cmdSize);
 
 	// Start with 2nd argument
-	ExtractFirstArgument(lpCmdLine, lp1, lp2);
+	if (!(ExtractFirstArgument(lpCmdLine, lp1, lp3) && *lp3)) {
+		LocalFree(lp1);
+		LocalFree(lp3);
+		return;
+	}
 
-	while (ExtractFirstArgument(lp2, lp1, lp2)) {
+	lp2 = LocalAlloc(LPTR, cmdSize);
+	while (ExtractFirstArgument(lp3, lp1, lp2)) {
 		// options
-		if ((*lp1 == L'/') || (*lp1 == L'-')) {
-			StrTrim(lp1, L"-/");
-			switch (*CharUpper((lp1))) {
-			case L'N':
-				flagNoReuseWindow = 1;
-				break;
-
-			case L'I':
-				flagStartAsTrayIcon = 1;
-				break;
-
-			case L'G':
-				flagGotoFavorites = 1;
-				break;
-
-			case L'F':
-				if (*(lp1 + 1) == L'0' || *CharUpper(lp1 + 1) == L'O') {
-					lstrcpy(szIniFile, L"*?");
-				} else if (ExtractFirstArgument(lp2, lp1, lp2)) {
-					StrCpyN(szIniFile, lp1, COUNTOF(szIniFile));
-					TrimString(szIniFile);
-					PathUnquoteSpaces(szIniFile);
-				}
-				break;
-
-			case L'P':
-				if (*CharUpper(lp1 + 1) == L'D' || *CharUpper(lp1 + 1) == L'S') {
-					flagPosParam = 1;
-					wi.x = wi.y = wi.cx = wi.cy = CW_USEDEFAULT;
-				} else if (ExtractFirstArgument(lp2, lp1, lp2)) {
-					int itok =
-						swscanf(lp1, L"%i,%i,%i,%i", &wi.x, &wi.y, &wi.cx, &wi.cy);
-					if (itok == 4) { // scan successful
-						flagPosParam = 1;
-						if (wi.cx < 1) {
-							wi.cx = CW_USEDEFAULT;
-						}
-						if (wi.cy < 1) {
-							wi.cy = CW_USEDEFAULT;
-						}
-					}
-				}
-				break;
-
-			case L'M':
-				if (ExtractFirstArgument(lp2, lp1, lp2)) {
-					if (lpFilterArg) {
-						GlobalFree(lpFilterArg);
-					}
-
-					lpFilterArg = GlobalAlloc(GPTR, sizeof(WCHAR) * (lstrlen(lp1) + 1));
-					lstrcpy(lpFilterArg, lp1);
-				}
-				break;
-
-			default:
-				break;
+		if ((*lp1 == L'/' || *lp1 == L'-') && lp1[1] != 0) {
+			int state = ParseCommandLineOption(lp1, lp2);
+			if (state == 1) {
+				lstrcpy(lp3, lp2);
+				continue;
+			}
+			if (state == 2) {
+				ExtractFirstArgument(lp3, lp1, lp2);
 			}
 		}
 
 		// pathname
-		else {
+		{
 			if (lpPathArg) {
 				GlobalFree(lpPathArg);
 			}
 
 			lpPathArg = GlobalAlloc(GPTR, sizeof(WCHAR) * (MAX_PATH + 2));
-			lstrcpy(lpPathArg, lp1);
+			StrCpyN(lpPathArg, lp1, MAX_PATH);
+			break;
 		}
 	}
 
-	LocalFree(lp1);
 	LocalFree(lp2);
+	LocalFree(lp1);
+	LocalFree(lp3);
 }
 
 //=============================================================================
@@ -3174,7 +3237,7 @@ BOOL ActivatePrevInst(void) {
 
 			if (lpPathArg) {
 				// Search working directory from second instance, first!
-				// lpFileArg is at least MAX_PATH+2 bytes
+				// lpPathArg is at least MAX_PATH+2 bytes
 				WCHAR tchTmp[MAX_PATH];
 
 				ExpandEnvironmentStringsEx(lpPathArg, (DWORD)GlobalSize(lpPathArg) / sizeof(WCHAR));
@@ -3236,11 +3299,9 @@ void GetRelaunchParameters(LPWSTR szParameters) {
 	WINDOWPLACEMENT wndpl;
 	int x, y, cx, cy;
 	WCHAR tch[64];
+	WCHAR szDirName[MAX_PATH + 4];
 
-	lstrcpy(szParameters, szCurDir);
-	PathQuoteSpaces(szParameters);
-
-	lstrcat(szParameters, L" -f");
+	lstrcpy(szParameters, L" -f");
 	if (lstrlen(szIniFile)) {
 		lstrcat(szParameters, L" \"");
 		lstrcat(szParameters, szIniFile);
@@ -3272,6 +3333,11 @@ void GetRelaunchParameters(LPWSTR szParameters) {
 
 	wsprintf(tch, L" -p %i,%i,%i,%i", x, y, cx, cy);
 	lstrcat(szParameters, tch);
+
+	lstrcpy(szDirName, szCurDir);
+	PathQuoteSpaces(szDirName);
+	lstrcat(szParameters, L" ");
+	lstrcat(szParameters, szDirName);
 }
 
 //=============================================================================

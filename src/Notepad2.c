@@ -279,7 +279,7 @@ HINSTANCE	g_hInstance;
 HANDLE		g_hDefaultHeap;
 HANDLE		g_hScintilla;
 UINT16		g_uWinVer;
-WCHAR		g_wchAppUserModelID[32] = L"";
+WCHAR		g_wchAppUserModelID[38] = L"";
 WCHAR		g_wchWorkingDirectory[MAX_PATH] = L"";
 
 #define	NP2_BookmarkLineForeColor	(0xff << 8)
@@ -2377,7 +2377,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case IDM_FILE_NEWWINDOW2: {
 		SHELLEXECUTEINFO sei;
 		WCHAR szModuleName[MAX_PATH];
-		WCHAR szParameters[2 * MAX_PATH + 128];
+		WCHAR *szParameters;
 		BOOL emptyWind = LOWORD(wParam) == IDM_FILE_NEWWINDOW2;
 
 		if (!emptyWind && bSaveBeforeRunningTools && !FileSave(FALSE, TRUE, FALSE, FALSE)) {
@@ -2385,6 +2385,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		}
 
 		GetModuleFileName(NULL, szModuleName, COUNTOF(szModuleName));
+		szParameters = LocalAlloc(LPTR, sizeof(WCHAR) * 1024);
 		GetRelaunchParameters(szParameters, szCurFile, TRUE, emptyWind);
 
 		ZeroMemory(&sei, sizeof(SHELLEXECUTEINFO));
@@ -2398,6 +2399,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		sei.nShow = SW_SHOWNORMAL;
 
 		ShellExecuteEx(&sei);
+		LocalFree(szParameters);
 	}
 	break;
 
@@ -5501,378 +5503,604 @@ void SaveSettings(BOOL bSaveSettingsNow) {
 // ParseCommandLine()
 //
 //
+int ParseCommandLineEncoding(LPCWSTR opt, int idmLE, int idmBE) {
+	int flag = idmLE;
+	if (*opt == '-') {
+		++opt;
+	}
+	if (StrCmpNI(opt, L"LE", CSTRLEN(L"LE")) == 0){
+		flag = idmLE;
+		opt += CSTRLEN(L"LE");
+		if (*opt == '-') {
+			++opt;
+		}
+	} else if (StrCmpNI(opt, L"BE", CSTRLEN(L"BE")) == 0) {
+		flag = idmBE;
+		opt += CSTRLEN(L"BE");
+		if (*opt == '-') {
+			++opt;
+		}
+	}
+	if (*opt == 0 || lstrcmpi(opt, L"BOM") == 0 || lstrcmpi(opt, L"SIG") == 0 || lstrcmpi(opt, L"SIGNATURE") == 0) {
+		flagSetEncoding = flag - IDM_ENCODING_ANSI + 1;
+		return 1;
+	}
+	return 0;
+}
+
+int ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2, BOOL *bIsNotepadReplacement) {
+	int state = 0;
+	LPWSTR opt = lp1 + 1;
+	// only accept /opt, -opt, --opt
+	if (*opt == L'-') {
+		++opt;
+	}
+	if (*opt == 0) {
+		return 0;
+	}
+
+	if (opt[1] == 0) {
+		switch (*CharUpper(opt)) {
+		case L'A':
+			flagSetEncoding = IDM_ENCODING_ANSI - IDM_ENCODING_ANSI + 1;
+			state = 1;
+			break;
+
+		case L'B':
+			flagPasteBoard = 1;
+			state = 1;
+			break;
+
+		case L'C':
+			flagNewFromClipboard = 1;
+			state = 1;
+			break;
+
+		case L'D':
+			if (lpSchemeArg) {
+				LocalFree(lpSchemeArg);
+				lpSchemeArg = NULL;
+			}
+			iInitialLexer = Style_GetEditLexerId(EditLexer_Default);
+			flagLexerSpecified = 1;
+			state = 1;
+			break;
+
+		case L'E':
+			state = 2;
+			if (ExtractFirstArgument(lp2, lp1, lp2)) {
+				if (lpEncodingArg) {
+					LocalFree(lpEncodingArg);
+				}
+				lpEncodingArg = StrDup(lp1);
+				state = 1;
+			}
+			break;
+
+		case L'F':
+			state = 2;
+			if (ExtractFirstArgument(lp2, lp1, lp2)) {
+				StrCpyN(szIniFile, lp1, COUNTOF(szIniFile));
+				TrimString(szIniFile);
+				PathUnquoteSpaces(szIniFile);
+				state = 1;
+			}
+			break;
+
+		case L'G':
+			state = 2;
+			if (ExtractFirstArgument(lp2, lp1, lp2)) {
+				int x = 0, y = 0;
+				int itok = swscanf(lp1, L"%i,%i", &x, &y);
+				if (itok == 1 || itok == 2) { // scan successful
+					flagJumpTo = 1;
+					state = 1;
+					iInitialLine = x;
+					iInitialColumn = y;
+				}
+			}
+			break;
+
+		case L'H':
+			if (lpSchemeArg) {
+				LocalFree(lpSchemeArg);
+				lpSchemeArg = NULL;
+			}
+			iInitialLexer = Style_GetEditLexerId(EditLexer_HTML);
+			flagLexerSpecified = 1;
+			state = 1;
+			break;
+
+		case L'I':
+			flagStartAsTrayIcon = 1;
+			state = 1;
+			break;
+
+		case L'L':
+			flagChangeNotify = 2;
+			state = 1;
+			break;
+
+		case L'N':
+			flagReuseWindow = 0;
+			flagNoReuseWindow = 1;
+			flagSingleFileInstance = 0;
+			state = 1;
+			break;
+
+		case L'O':
+			flagAlwaysOnTop = 2;
+			state = 1;
+			break;
+
+		case L'Q':
+			flagQuietCreate = 1;
+			state = 1;
+			break;
+
+		case L'R':
+			flagReuseWindow = 1;
+			flagNoReuseWindow = 0;
+			flagSingleFileInstance = 0;
+			state = 1;
+			break;
+
+		case L'S':
+			state = 2;
+			if (ExtractFirstArgument(lp2, lp1, lp2)) {
+				if (lpSchemeArg) {
+					LocalFree(lpSchemeArg);
+				}
+				lpSchemeArg = StrDup(lp1);
+				flagLexerSpecified = 1;
+				state = 1;
+			}
+			break;
+
+		case L'T':
+			state = 2;
+			if (ExtractFirstArgument(lp2, lp1, lp2)) {
+				StrCpyN(szTitleExcerpt, lp1, COUNTOF(szTitleExcerpt));
+				fKeepTitleExcerpt = 1;
+				state = 1;
+			}
+			break;
+
+		case L'U':
+			flagRelaunchElevated = 1;
+			state = 1;
+			break;
+
+		case L'W':
+			flagSetEncoding = IDM_ENCODING_UNICODE - IDM_ENCODING_ANSI + 1;
+			state = 1;
+			break;
+
+		case L'X':
+			if (lpSchemeArg) {
+				LocalFree(lpSchemeArg);
+				lpSchemeArg = NULL;
+			}
+			iInitialLexer = Style_GetEditLexerId(EditLexer_XML);
+			flagLexerSpecified = 1;
+			state = 1;
+			break;
+
+		case L'Z':
+			ExtractFirstArgument(lp2, lp1, lp2);
+			flagMultiFileArg = 1;
+			*bIsNotepadReplacement = TRUE;
+			state = 1;
+			break;
+
+		case L'?':
+			flagDisplayHelp = 1;
+			state = 1;
+			break;
+
+		default:
+			state = 3;
+			break;
+		}
+	} else if (opt[2] == 0) {
+		switch (*CharUpper(opt)) {
+		case L'C':
+			if (opt[1] == L'R') {
+				flagSetEOLMode = IDM_LINEENDINGS_CR - IDM_LINEENDINGS_CRLF + 1;
+				state = 1;
+			}
+			break;
+
+		case L'F':
+			if (opt[1] == L'0' || *CharUpper(opt + 1) == L'O') {
+				lstrcpy(szIniFile, L"*?");
+				state = 1;
+			}
+			break;
+
+		case L'L':
+			if (opt[1] == L'F') {
+				flagSetEOLMode = IDM_LINEENDINGS_LF - IDM_LINEENDINGS_CRLF + 1;
+				state = 1;
+			} else if (opt[1] == L'0' || opt[1] == L'-' || *CharUpper(opt + 1) == L'O') {
+				flagChangeNotify = 1;
+				state = 1;
+			}
+			break;
+
+		case L'N':
+			if (*CharUpper(opt + 1) == L'S') {
+				flagReuseWindow = 0;
+				flagNoReuseWindow = 1;
+				flagSingleFileInstance = 1;
+				state = 1;
+			}
+			break;
+
+		case L'O':
+			if (opt[1] == L'0' || opt[1] == L'-' || *CharUpper(opt + 1) == L'O') {
+				flagAlwaysOnTop = 1;
+				state = 1;
+			}
+			break;
+
+		case L'R':
+			if (*CharUpper(opt + 1) == L'S') {
+				flagReuseWindow = 1;
+				flagNoReuseWindow = 0;
+				flagSingleFileInstance = 1;
+				state = 1;
+			}
+			break;
+
+		default:
+			state = 3;
+			break;
+		}
+	} else {
+		state = 3;
+	}
+
+	if (state != 3) {
+		return state;
+	}
+
+	state = 0;
+	switch (*CharUpper(opt)) {
+	case L'A':
+		if (lstrcmpi(opt, L"ANSI") == 0) {
+			flagSetEncoding = IDM_ENCODING_ANSI - IDM_ENCODING_ANSI + 1;
+			state = 1;
+		} else if (StrCmpNI(opt, L"appid=", CSTRLEN(L"appid=")) == 0) {
+			// Shell integration
+			opt += CSTRLEN(L"appid=");
+			StrCpyN(g_wchAppUserModelID, opt, COUNTOF(g_wchAppUserModelID));
+			StrTrim(g_wchAppUserModelID, L"\" ");
+			if (lstrlen(g_wchAppUserModelID) == 0) {
+				lstrcpy(g_wchAppUserModelID, L"(default)");
+			}
+			state = 1;
+		}
+		break;
+
+	case L'C':
+		if (opt[1] == L'R') {
+			opt += 2;
+			if (*opt == L'-') {
+				++opt;
+			}
+			if (*opt == L'L' && opt[1] == L'F' && opt[2] == 0) {
+				flagSetEOLMode = IDM_LINEENDINGS_CRLF - IDM_LINEENDINGS_CRLF + 1;
+				state = 1;
+			}
+		}
+		break;
+
+	case L'M':
+		if (lstrcmpi(opt, L"MBCS") == 0) {
+			flagSetEncoding = IDM_ENCODING_ANSI - IDM_ENCODING_ANSI + 1;
+			state = 1;
+		} else {
+			BOOL bFindUp = FALSE;
+			BOOL bRegex = FALSE;
+			BOOL bTransBS = FALSE;
+
+			++opt;
+			switch (*CharUpper(opt)) {
+			case L'R':
+				bRegex = TRUE;
+				++opt;
+				break;
+
+			case L'B':
+				bTransBS = TRUE;
+				++opt;
+				break;
+			}
+
+			if (*opt == L'-') {
+				bFindUp = TRUE;
+				++opt;
+			}
+			if (*opt != 0) {
+				break;
+			}
+
+			state = 2;
+			if (ExtractFirstArgument(lp2, lp1, lp2)) {
+				if (lpMatchArg) {
+					GlobalFree(lpMatchArg);
+				}
+
+				lpMatchArg = StrDup(lp1);
+				flagMatchText = 1;
+				state = 1;
+
+				if (bFindUp) {
+					flagMatchText |= 2;
+				}
+				if (bRegex) {
+					flagMatchText &= ~8;
+					flagMatchText |= 4;
+				}
+				if (bTransBS) {
+					flagMatchText &= ~4;
+					flagMatchText |= 8;
+				}
+			}
+		}
+		break;
+
+	case L'P': {
+		if (*bIsNotepadReplacement) {
+			if (*CharUpper(opt + 1) == L'T') {
+				ExtractFirstArgument(lp2, lp1, lp2);
+			}
+			state = 1;
+			break;
+		}
+
+		if (StrCmpNI(opt, L"POS", CSTRLEN(L"POS")) == 0) {
+			opt += CSTRLEN(L"POS");
+		} else {
+			++opt;
+		}
+		if (*opt == L':') {
+			++opt;
+		}
+
+		switch (*CharUpper(opt)) {
+		case L'0':
+		case L'O':
+			if (opt[1] == 0) {
+				flagPosParam = 1;
+				flagDefaultPos = 1;
+				state = 1;
+			}
+			break;
+
+		case L'D':
+		case L'S':
+			if (opt[1] == 0 || (opt[2] == 0 && *CharUpper(opt + 1) == L'L')) {
+				flagPosParam = 1;
+				flagDefaultPos = (opt[1] == 0)? 2 : 3;;
+				state = 1;
+			}
+			break;
+
+		case L'F':
+		case L'L':
+		case L'R':
+		case L'T':
+		case L'B':
+		case L'M': {
+			WCHAR *p = opt;
+			flagPosParam = 1;
+			flagDefaultPos = 0;
+			state = 1;
+			while (*p && state == 1) {
+				switch (*CharUpper(p)) {
+				case L'F':
+					flagDefaultPos &= ~(4 | 8 | 16 | 32);
+					flagDefaultPos |= 64;
+					break;
+
+				case L'L':
+					flagDefaultPos &= ~(8 | 64);
+					flagDefaultPos |= 4;
+					break;
+
+				case L'R':
+					flagDefaultPos &= ~(4 | 64);
+					flagDefaultPos |= 8;
+					break;
+
+				case L'T':
+					flagDefaultPos &= ~(32 | 64);
+					flagDefaultPos |= 16;
+					break;
+
+				case L'B':
+					flagDefaultPos &= ~(16 | 64);
+					flagDefaultPos |= 32;
+					break;
+
+				case L'M':
+					if (flagDefaultPos == 0) {
+						flagDefaultPos |= 64;
+					}
+					flagDefaultPos |= 128;
+					break;
+
+				default:
+					state = 0;
+					break;
+				}
+				p = CharNext(p);
+			}
+		}
+		break;
+
+		default:
+			state = 2;
+			if (ExtractFirstArgument(lp2, lp1, lp2)) {
+				int x = 0, y = 0, cx = 0, cy = 0, cm = 0;
+				int itok = swscanf(lp1, L"%i,%i,%i,%i,%i", &x, &y, &cx, &cy, &cm);
+				if (itok == 4 || itok == 5) { // scan successful
+					flagPosParam = 1;
+					flagDefaultPos = 0;
+					state = 1;
+					wi.x = x;
+					wi.y = y;
+					wi.cx = cx;
+					wi.cy = cy;
+					wi.max = cm;
+					if (wi.cx < 1) {
+						wi.cx = CW_USEDEFAULT;
+					}
+					if (wi.cy < 1) {
+						wi.cy = CW_USEDEFAULT;
+					}
+					if (wi.max) {
+						wi.max = 1;
+					}
+					if (itok == 4) {
+						wi.max = 0;
+					}
+				}
+			}
+			break;
+		}
+	}
+	break;
+
+	case L'S':
+		// Shell integration
+		if (StrCmpNI(opt, L"sysmru=", CSTRLEN(L"sysmru=")) == 0) {
+			opt += CSTRLEN(L"sysmru=");
+			if (opt[1] == 0) {
+				switch (*opt) {
+				case L'0':
+					flagUseSystemMRU = 1;
+					state = 1;
+					break;
+
+				case L'1':
+					flagUseSystemMRU = 2;
+					state = 1;
+					break;
+				}
+			}
+		}
+		break;
+
+	case L'U':
+		if (StrCmpNI(opt, L"UTF", CSTRLEN(L"UTF")) == 0) {
+			opt += CSTRLEN(L"UTF");
+			if (*opt == '-') {
+				++opt;
+			}
+			if (*opt == L'8') {
+				++opt;
+				if (*opt == '-') {
+					++opt;
+				}
+				if (*opt == 0) {
+					flagSetEncoding = IDM_ENCODING_UTF8 - IDM_ENCODING_ANSI + 1;
+					state = 1;
+				} else if (lstrcmpi(opt, L"BOM") == 0 || lstrcmpi(opt, L"SIG") == 0 || lstrcmpi(opt, L"SIGNATURE") == 0) {
+					flagSetEncoding = IDM_ENCODING_UTF8SIGN - IDM_ENCODING_ANSI + 1;
+					state = 1;
+				}
+			} else if (*opt == L'1' && opt[1] == L'6') {
+				opt += 2;
+				state = ParseCommandLineEncoding(opt, IDM_ENCODING_UNICODE, IDM_ENCODING_UNICODEREV);
+			}
+		} else if (StrCmpNI(opt, L"UNICODE", CSTRLEN(L"UNICODE")) == 0) {
+			opt += CSTRLEN(L"UNICODE");
+			state = ParseCommandLineEncoding(opt, IDM_ENCODING_UNICODE, IDM_ENCODING_UNICODEREV);
+		}
+		break;
+	}
+
+	return state;
+}
+
 void ParseCommandLine(void) {
 	LPWSTR lp1, lp2, lp3;
-	BOOL bContinue = TRUE;
 	BOOL bIsFileArg = FALSE;
 	BOOL bIsNotepadReplacement = FALSE;
 
 	LPWSTR lpCmdLine = GetCommandLine();
+	size_t cmdSize = sizeof(WCHAR) * (lstrlen(lpCmdLine) + 1);
 
-	if (lstrlen(lpCmdLine) == 0) {
+	if (cmdSize == sizeof(WCHAR)) {
 		return;
 	}
 
 	// Good old console can also send args separated by Tabs
 	StrTab2Space(lpCmdLine);
 
-	lp1 = LocalAlloc(LPTR, sizeof(WCHAR) * (lstrlen(lpCmdLine) + 1));
-	lp2 = LocalAlloc(LPTR, sizeof(WCHAR) * (lstrlen(lpCmdLine) + 1));
-	lp3 = LocalAlloc(LPTR, sizeof(WCHAR) * (lstrlen(lpCmdLine) + 1));
+	lp1 = LocalAlloc(LPTR, cmdSize);
+	lp3 = LocalAlloc(LPTR, cmdSize);
 
 	// Start with 2nd argument
-	ExtractFirstArgument(lpCmdLine, lp1, lp3);
+	if (!(ExtractFirstArgument(lpCmdLine, lp1, lp3) && *lp3)) {
+		LocalFree(lp1);
+		LocalFree(lp3);
+		return;
+	}
 
-	while (bContinue && ExtractFirstArgument(lp3, lp1, lp2)) {
+	lp2 = LocalAlloc(LPTR, cmdSize);
+	while (ExtractFirstArgument(lp3, lp1, lp2)) {
 		// options
-		if (!bIsFileArg && lstrcmp(lp1, L"+") == 0) {
-			flagMultiFileArg = 2;
-			bIsFileArg = TRUE;
-		} else if (!bIsFileArg && lstrcmp(lp1, L"-") == 0) {
-			flagMultiFileArg = 1;
-			bIsFileArg = TRUE;
-		} else if (!bIsFileArg && ((*lp1 == L'/') || (*lp1 == L'-'))) {
-			// LTrim
-			StrLTrim(lp1, L"-/");
-
-			// Encoding
-			if (lstrcmpi(lp1, L"ANSI") == 0 || lstrcmpi(lp1, L"A") == 0 || lstrcmpi(lp1, L"MBCS") == 0) {
-				flagSetEncoding = IDM_ENCODING_ANSI - IDM_ENCODING_ANSI + 1;
-			} else if (lstrcmpi(lp1, L"W") == 0) {
-				flagSetEncoding = IDM_ENCODING_UNICODE - IDM_ENCODING_ANSI + 1;
-			} else if (StrCmpNI(lp1, L"UNICODE", 7) == 0) {
-				if (StrStrI(lp1 + 7, L"BE") != NULL) {
-					flagSetEncoding = IDM_ENCODING_UNICODEREV - IDM_ENCODING_ANSI + 1;
-				} else {
-					flagSetEncoding = IDM_ENCODING_UNICODE - IDM_ENCODING_ANSI + 1;
-				}
-			} else if (StrCmpNI(lp1, L"UTF", 3) == 0) {
-				WCHAR *p = lp1 + 3;
-				if (*p == L'-') {
-					++p;
-				}
-				if (*p == L'8') {
-					++p;
-					if (StrStrI(p, L"SIG") != NULL || StrStrI(p, L"BOM") != NULL) {
-						flagSetEncoding = IDM_ENCODING_UTF8SIGN - IDM_ENCODING_ANSI + 1;
-					} else {
-						flagSetEncoding = IDM_ENCODING_UTF8 - IDM_ENCODING_ANSI + 1;
-					}
-				} else if (*p == L'1' && p[1] == L'6') {
-					p += 2;
-					if (StrStrI(p, L"BE") != NULL) {
-						flagSetEncoding = IDM_ENCODING_UNICODEREV - IDM_ENCODING_ANSI + 1;
-					} else {
-						flagSetEncoding = IDM_ENCODING_UNICODE - IDM_ENCODING_ANSI + 1;
-					}
-				}
-			}
-
-			// EOL Mode
-			else if (lstrcmpi(lp1, L"CRLF") == 0 || lstrcmpi(lp1, L"CR+LF") == 0) {
-				flagSetEOLMode = IDM_LINEENDINGS_CRLF - IDM_LINEENDINGS_CRLF + 1;
-			} else if (lstrcmpi(lp1, L"LF") == 0) {
-				flagSetEOLMode = IDM_LINEENDINGS_LF - IDM_LINEENDINGS_CRLF + 1;
-			} else if (lstrcmpi(lp1, L"CR") == 0) {
-				flagSetEOLMode = IDM_LINEENDINGS_CR - IDM_LINEENDINGS_CRLF + 1;
-			}
-
-			// Shell integration
-			else if (StrCmpNI(lp1, L"appid=", CSTRLEN(L"appid=")) == 0) {
-				StrCpyN(g_wchAppUserModelID, lp1 + CSTRLEN(L"appid="), COUNTOF(g_wchAppUserModelID));
-				StrTrim(g_wchAppUserModelID, L" ");
-				if (lstrlen(g_wchAppUserModelID) == 0) {
-					lstrcpy(g_wchAppUserModelID, L"(default)");
-				}
-			} else if (StrCmpNI(lp1, L"sysmru=", CSTRLEN(L"sysmru=")) == 0) {
-				WCHAR wch[8];
-				StrCpyN(wch, lp1 + CSTRLEN(L"sysmru="), COUNTOF(wch));
-				StrTrim(wch, L" ");
-				if (*wch == L'1') {
-					flagUseSystemMRU = 2;
-				} else {
-					flagUseSystemMRU = 1;
-				}
-			}
-
-			else
-				switch (*CharUpper(lp1)) {
-				case L'N':
-					flagReuseWindow = 0;
-					flagNoReuseWindow = 1;
-					if (*CharUpper(lp1 + 1) == L'S') {
-						flagSingleFileInstance = 1;
-					} else {
-						flagSingleFileInstance = 0;
-					}
+		if (!bIsFileArg) {
+			int state = 0;
+			if (lp1[1] == 0) {
+				switch (*lp1) {
+				case L'+':
+					flagMultiFileArg = 2;
+					bIsFileArg = TRUE;
+					state = 1;
 					break;
 
-				case L'R':
-					flagReuseWindow = 1;
-					flagNoReuseWindow = 0;
-					if (*CharUpper(lp1 + 1) == L'S') {
-						flagSingleFileInstance = 1;
-					} else {
-						flagSingleFileInstance = 0;
-					}
-					break;
-
-				case L'F':
-					if (*(lp1 + 1) == L'0' || *CharUpper(lp1 + 1) == L'O') {
-						lstrcpy(szIniFile, L"*?");
-					} else if (ExtractFirstArgument(lp2, lp1, lp2)) {
-						StrCpyN(szIniFile, lp1, COUNTOF(szIniFile));
-						TrimString(szIniFile);
-						PathUnquoteSpaces(szIniFile);
-					}
-					break;
-
-				case L'I':
-					flagStartAsTrayIcon = 1;
-					break;
-
-				case L'O':
-					if (*(lp1 + 1) == L'0' || *(lp1 + 1) == L'-' || *CharUpper(lp1 + 1) == L'O') {
-						flagAlwaysOnTop = 1;
-					} else {
-						flagAlwaysOnTop = 2;
-					}
-					break;
-
-				case L'P': {
-					WCHAR *lp = lp1;
-					if (StrCmpNI(lp1, L"POS:", CSTRLEN(L"POS:")) == 0) {
-						lp += CSTRLEN(L"POS:") - 1;
-					} else if (StrCmpNI(lp1, L"POS", CSTRLEN(L"POS")) == 0) {
-						lp += CSTRLEN(L"POS") - 1;
-					} else if (*(lp1 + 1) == L':') {
-						lp += 1;
-					} else if (bIsNotepadReplacement) {
-						if (*(lp1 + 1) == L'T') {
-							ExtractFirstArgument(lp2, lp1, lp2);
-						}
-						break;
-					}
-					if (*(lp + 1) == L'0' || *CharUpper(lp + 1) == L'O') {
-						flagPosParam = 1;
-						flagDefaultPos = 1;
-					} else if (*CharUpper(lp + 1) == L'D' || *CharUpper(lp + 1) == L'S') {
-						flagPosParam = 1;
-						flagDefaultPos = (StrChrI((lp + 1), L'L')) ? 3 : 2;
-					} else if (StrChrI(L"FLTRBM", *(lp + 1))) {
-						WCHAR *p = (lp + 1);
-						flagPosParam = 1;
-						flagDefaultPos = 0;
-						while (*p) {
-							switch (*CharUpper(p)) {
-							case L'F':
-								flagDefaultPos &= ~(4 | 8 | 16 | 32);
-								flagDefaultPos |= 64;
-								break;
-							case L'L':
-								flagDefaultPos &= ~(8 | 64);
-								flagDefaultPos |= 4;
-								break;
-							case L'R':
-								flagDefaultPos &= ~(4 | 64);
-								flagDefaultPos |= 8;
-								break;
-							case L'T':
-								flagDefaultPos &= ~(32 | 64);
-								flagDefaultPos |= 16;
-								break;
-							case L'B':
-								flagDefaultPos &= ~(16 | 64);
-								flagDefaultPos |= 32;
-								break;
-							case L'M':
-								if (flagDefaultPos == 0) {
-									flagDefaultPos |= 64;
-								}
-								flagDefaultPos |= 128;
-								break;
-							}
-							p = CharNext(p);
-						}
-					} else if (ExtractFirstArgument(lp2, lp1, lp2)) {
-						int itok =
-							swscanf(lp1, L"%i,%i,%i,%i,%i", &wi.x, &wi.y, &wi.cx, &wi.cy, &wi.max);
-						if (itok == 4 || itok == 5) { // scan successful
-							flagPosParam = 1;
-							flagDefaultPos = 0;
-							if (wi.cx < 1) {
-								wi.cx = CW_USEDEFAULT;
-							}
-							if (wi.cy < 1) {
-								wi.cy = CW_USEDEFAULT;
-							}
-							if (wi.max) {
-								wi.max = 1;
-							}
-							if (itok == 4) {
-								wi.max = 0;
-							}
-						}
-					}
-				}
-				break;
-
-				case L'T':
-					if (ExtractFirstArgument(lp2, lp1, lp2)) {
-						StrCpyN(szTitleExcerpt, lp1, COUNTOF(szTitleExcerpt));
-						fKeepTitleExcerpt = 1;
-					}
-					break;
-
-				case L'C':
-					flagNewFromClipboard = 1;
-					break;
-
-				case L'B':
-					flagPasteBoard = 1;
-					break;
-
-				case L'E':
-					if (ExtractFirstArgument(lp2, lp1, lp2)) {
-						if (lpEncodingArg) {
-							LocalFree(lpEncodingArg);
-						}
-						lpEncodingArg = StrDup(lp1);
-					}
-					break;
-
-				case L'G':
-					if (ExtractFirstArgument(lp2, lp1, lp2)) {
-						int itok =
-							swscanf(lp1, L"%i,%i", &iInitialLine, &iInitialColumn);
-						if (itok == 1 || itok == 2) { // scan successful
-							flagJumpTo = 1;
-						}
-					}
-					break;
-
-				case L'M': {
-					BOOL bFindUp	= FALSE;
-					BOOL bRegex		= FALSE;
-					BOOL bTransBS = FALSE;
-
-					if (StrChr(lp1, L'-')) {
-						bFindUp = TRUE;
-					}
-					if (StrChr(lp1, L'R')) {
-						bRegex = TRUE;
-					}
-					if (StrChr(lp1, L'B')) {
-						bTransBS = TRUE;
-					}
-
-					if (ExtractFirstArgument(lp2, lp1, lp2)) {
-						if (lpMatchArg) {
-							GlobalFree(lpMatchArg);
-						}
-						lpMatchArg = StrDup(lp1);
-						flagMatchText = 1;
-
-						if (bFindUp) {
-							flagMatchText |= 2;
-						}
-
-						if (bRegex) {
-							flagMatchText &= ~8;
-							flagMatchText |= 4;
-						}
-
-						if (bTransBS) {
-							flagMatchText &= ~4;
-							flagMatchText |= 8;
-						}
-					}
-				}
-				break;
-
-				case L'L':
-					if (*(lp1 + 1) == L'0' || *(lp1 + 1) == L'-' || *CharUpper(lp1 + 1) == L'O') {
-						flagChangeNotify = 1;
-					} else {
-						flagChangeNotify = 2;
-					}
-					break;
-
-				case L'Q':
-					flagQuietCreate = 1;
-					break;
-
-				case L'S':
-					if (ExtractFirstArgument(lp2, lp1, lp2)) {
-						if (lpSchemeArg) {
-							LocalFree(lpSchemeArg);
-						}
-						lpSchemeArg = StrDup(lp1);
-						flagLexerSpecified = 1;
-					}
-					break;
-
-				case L'D':
-					if (lpSchemeArg) {
-						LocalFree(lpSchemeArg);
-						lpSchemeArg = NULL;
-					}
-					iInitialLexer = Style_GetEditLexerId(EditLexer_Default);
-					flagLexerSpecified = 1;
-					break;
-
-				case L'H':
-					if (lpSchemeArg) {
-						LocalFree(lpSchemeArg);
-						lpSchemeArg = NULL;
-					}
-					iInitialLexer = Style_GetEditLexerId(EditLexer_HTML);
-					flagLexerSpecified = 1;
-					break;
-
-				case L'X':
-					if (lpSchemeArg) {
-						LocalFree(lpSchemeArg);
-						lpSchemeArg = NULL;
-					}
-					iInitialLexer = Style_GetEditLexerId(EditLexer_XML);
-					flagLexerSpecified = 1;
-					break;
-
-				case L'U':
-					flagRelaunchElevated = 1;
-					break;
-
-				case L'Z':
-					ExtractFirstArgument(lp2, lp1, lp2);
+				case L'-':
 					flagMultiFileArg = 1;
-					bIsNotepadReplacement = TRUE;
+					bIsFileArg = TRUE;
+					state = 1;
 					break;
-
-				case L'?':
-					flagDisplayHelp = 1;
-					break;
-
-				default:
-					break;
-
 				}
+			} else if (*lp1 == L'/' || *lp1 == L'-') {
+				state = ParseCommandLineOption(lp1, lp2, &bIsNotepadReplacement);
+			}
+
+			if (state == 1) {
+				lstrcpy(lp3, lp2);
+				continue;
+			}
+			if (state == 2) {
+				ExtractFirstArgument(lp3, lp1, lp2);
+			}
 		}
 
 		// pathname
-		else {
-			LPWSTR lpFileBuf = LocalAlloc(LPTR, sizeof(WCHAR) * (lstrlen(lpCmdLine) + 1));
-
-			cchiFileList = lstrlen(lpCmdLine) - lstrlen(lp3);
+		{
+			LPWSTR lpFileBuf = LocalAlloc(LPTR, cmdSize);
 
 			if (lpFileArg) {
 				GlobalFree(lpFileArg);
 			}
 
 			lpFileArg = GlobalAlloc(GPTR, sizeof(WCHAR) * (MAX_PATH + 2)); // changed for ActivatePrevInst() needs
-			StrCpyN(lpFileArg, lp3, MAX_PATH);
+			if (flagMultiFileArg == 1) {
+				// single file argument without quoted spaces
+				StrCpyN(lpFileArg, lp3, MAX_PATH);
+			} else {
+				StrCpyN(lpFileArg, lp1, MAX_PATH);
+			}
 
 			PathFixBackslashes(lpFileArg);
+			StrTrim(lpFileArg, L" \"");
 
 			if (!PathIsRelative(lpFileArg) && !PathIsUNC(lpFileArg) &&
 					PathGetDriveNumber(lpFileArg) == -1 /*&& PathGetDriveNumber(g_wchWorkingDirectory) != -1*/) {
@@ -5884,26 +6112,22 @@ void ParseCommandLine(void) {
 				lstrcpy(lpFileArg, wchPath);
 			}
 
-			StrTrim(lpFileArg, L" \"");
+			if (flagMultiFileArg == 2) {
+				cchiFileList = lstrlen(lpCmdLine) - lstrlen(lp3);
 
-			while (cFileList < 32 && ExtractFirstArgument(lp3, lpFileBuf, lp3)) {
-				PathQuoteSpaces(lpFileBuf);
-				lpFileList[cFileList++] = StrDup(lpFileBuf);
+				while (cFileList < 32 && ExtractFirstArgument(lp3, lpFileBuf, lp3)) {
+					PathQuoteSpaces(lpFileBuf);
+					lpFileList[cFileList++] = StrDup(lpFileBuf);
+				}
 			}
 
-			bContinue = FALSE;
 			LocalFree(lpFileBuf);
+			break;
 		}
-
-		// Continue with next argument
-		if (bContinue) {
-			lstrcpy(lp3, lp2);
-		}
-
 	}
 
-	LocalFree(lp1);
 	LocalFree(lp2);
+	LocalFree(lp1);
 	LocalFree(lp3);
 }
 
@@ -7071,8 +7295,9 @@ BOOL RelaunchMultiInst(void) {
 		PROCESS_INFORMATION pi;
 
 		LPWSTR lpCmdLineNew = StrDup(GetCommandLine());
-		LPWSTR lp1 = LocalAlloc(LPTR, sizeof(WCHAR) * (lstrlen(lpCmdLineNew) + 1));
-		LPWSTR lp2 = LocalAlloc(LPTR, sizeof(WCHAR) * (lstrlen(lpCmdLineNew) + 1));
+		size_t cmdSize = sizeof(WCHAR) * (lstrlen(lpCmdLineNew) + 1);
+		LPWSTR lp1 = LocalAlloc(LPTR, cmdSize);
+		LPWSTR lp2 = LocalAlloc(LPTR, cmdSize);
 
 		StrTab2Space(lpCmdLineNew);
 		lstrcpy(lpCmdLineNew + cchiFileList, L"");
@@ -7119,10 +7344,10 @@ void GetRelaunchParameters(LPWSTR szParameters, LPCWSTR lpszFile, BOOL newWind, 
 	int x, y, cx, cy, imax;
 	WCHAR tch[64];
 
-	wsprintf(tch, L"\"-appid=%s\"", g_wchAppUserModelID);
+	wsprintf(tch, L"-appid=\"%s\"", g_wchAppUserModelID);
 	lstrcpy(szParameters, tch);
 
-	wsprintf(tch, L" \"-sysmru=%i\"", (flagUseSystemMRU == 2) ? 1 : 0);
+	wsprintf(tch, L" -sysmru=%i", (flagUseSystemMRU == 2) ? 1 : 0);
 	lstrcat(szParameters, tch);
 
 	lstrcat(szParameters, L" -f");
@@ -7263,12 +7488,13 @@ BOOL RelaunchElevated(void) {
 			exit = lstrcmpi(tchFile, szCurFile) == 0;
 			lpArg1 = LocalAlloc(LPTR, sizeof(WCHAR) * MAX_PATH);
 			GetModuleFileName(NULL, lpArg1, MAX_PATH);
-			lpArg2 = LocalAlloc(LPTR, sizeof(WCHAR) * (2 * MAX_PATH + 128));
+			lpArg2 = LocalAlloc(LPTR, sizeof(WCHAR) * 1024);
 			GetRelaunchParameters(lpArg2, tchFile, !exit, FALSE);
 		} else {
 			LPWSTR lpCmdLine = GetCommandLine();
-			lpArg1 = LocalAlloc(LPTR, sizeof(WCHAR) * (lstrlen(lpCmdLine) + 1));
-			lpArg2 = LocalAlloc(LPTR, sizeof(WCHAR) * (lstrlen(lpCmdLine) + 1));
+			size_t cmdSize = sizeof(WCHAR) * (lstrlen(lpCmdLine) + 1);
+			lpArg1 = LocalAlloc(LPTR, cmdSize);
+			lpArg2 = LocalAlloc(LPTR, cmdSize);
 			ExtractFirstArgument(lpCmdLine, lpArg1, lpArg2);
 		}
 
