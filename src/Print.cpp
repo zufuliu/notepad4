@@ -30,10 +30,6 @@ extern "C" {
 }
 #include "resource.h"
 
-#ifndef max
-#define max(a,b)	(((a) > (b)) ? (a) : (b))
-#endif
-
 extern "C" HINSTANCE g_hInstance;
 
 // Global settings...
@@ -198,10 +194,10 @@ extern "C" BOOL EditPrint(HWND hwnd, LPCWSTR pszDocTitle, LPCWSTR pszPageFormat)
 		}
 
 		// Dont reduce margins below the minimum printable area
-		rectMargins.left	= max(rectPhysMargins.left, rectSetup.left);
-		rectMargins.top		= max(rectPhysMargins.top, rectSetup.top);
-		rectMargins.right	= max(rectPhysMargins.right, rectSetup.right);
-		rectMargins.bottom	= max(rectPhysMargins.bottom, rectSetup.bottom);
+		rectMargins.left	= max_l(rectPhysMargins.left, rectSetup.left);
+		rectMargins.top		= max_l(rectPhysMargins.top, rectSetup.top);
+		rectMargins.right	= max_l(rectPhysMargins.right, rectSetup.right);
+		rectMargins.bottom	= max_l(rectPhysMargins.bottom, rectSetup.bottom);
 	} else {
 		rectMargins.left	= rectPhysMargins.left;
 		rectMargins.top		= rectPhysMargins.top;

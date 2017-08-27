@@ -2133,7 +2133,7 @@ void EditMoveUp(HWND hwnd) {
 			SendMessage(hwnd, SCI_ENDUNDOACTION, 0, 0);
 		}
 	} else if (SC_SEL_RECTANGLE != SendMessage(hwnd, SCI_GETSELECTIONMODE, 0, 0)) {
-		int iLineSrc = min(iCurLine, iAnchorLine) - 1;
+		int iLineSrc = min_i(iCurLine, iAnchorLine) - 1;
 		//int iLineCur = (int)SendMessage(hwnd, SCI_DOCLINEFROMVISIBLE, (WPARAM)iCurLine, 0);
 		//int iLineAnchor = (int)SendMessage(hwnd, SCI_DOCLINEFROMVISIBLE, (WPARAM)iAnchorLine, 0);
 		//if (iLineCur == iLineAnchor) {
@@ -2154,8 +2154,8 @@ void EditMoveUp(HWND hwnd) {
 			iLineSrcStart = (int)SendMessage(hwnd, SCI_POSITIONFROMLINE, (WPARAM)iLineSrc, 0);
 			iLineSrcEnd = (int)SendMessage(hwnd, SCI_POSITIONFROMLINE, (WPARAM)iLineSrc + 1, 0);
 
-			iLineDest = max(iCurLine, iAnchorLine);
-			if (max(iCurPos, iAnchorPos) <= SendMessage(hwnd, SCI_POSITIONFROMLINE, (WPARAM)iLineDest, 0)) {
+			iLineDest = max_i(iCurLine, iAnchorLine);
+			if (max_i(iCurPos, iAnchorPos) <= SendMessage(hwnd, SCI_POSITIONFROMLINE, (WPARAM)iLineDest, 0)) {
 				if (iLineDest >= 1) {
 					iLineDest--;
 				}
@@ -2237,13 +2237,13 @@ void EditMoveDown(HWND hwnd) {
 			SendMessage(hwnd, SCI_ENDUNDOACTION, 0, 0);
 		}
 	} else if (SC_SEL_RECTANGLE != SendMessage(hwnd, SCI_GETSELECTIONMODE, 0, 0)) {
-		int iLineSrc = max(iCurLine, iAnchorLine) + 1;
+		int iLineSrc = max_i(iCurLine, iAnchorLine) + 1;
 		//int iLineCur = (int)SendMessage(hwnd, SCI_DOCLINEFROMVISIBLE, (WPARAM)iCurLine, 0);
 		//int iLineAnchor = (int)SendMessage(hwnd, SCI_DOCLINEFROMVISIBLE, (WPARAM)iAnchorLine, 0);
 		//if (iLineCur == iLineAnchor) {
 		//}
 
-		if (max(iCurPos, iAnchorPos) <= SendMessage(hwnd, SCI_POSITIONFROMLINE, (WPARAM)iLineSrc - 1, 0)) {
+		if (max_i(iCurPos, iAnchorPos) <= SendMessage(hwnd, SCI_POSITIONFROMLINE, (WPARAM)iLineSrc - 1, 0)) {
 			if (iLineSrc >= 1) {
 				iLineSrc--;
 			}
@@ -2286,7 +2286,7 @@ void EditMoveDown(HWND hwnd) {
 			iLineSrcStart = (int)SendMessage(hwnd, SCI_POSITIONFROMLINE, (WPARAM)iLineSrc, 0);
 			iLineSrcEnd = (int)SendMessage(hwnd, SCI_POSITIONFROMLINE, (WPARAM)iLineSrc + 1, 0);
 
-			iLineDest = min(iCurLine, iAnchorLine);
+			iLineDest = min_i(iCurLine, iAnchorLine);
 
 			SendMessage(hwnd, SCI_BEGINUNDOACTION, 0, 0);
 
@@ -2634,8 +2634,8 @@ void EditAlignText(HWND hwnd, int nMode) {
 				}
 				iEndCol = (int)SendMessage(hwnd, SCI_GETCOLUMN, (WPARAM)iLineEndPos, 0);
 
-				iMinIndent = min(iMinIndent, iIndentCol);
-				iMaxLength = max(iMaxLength, iEndCol);
+				iMinIndent = min_i(iMinIndent, iIndentCol);
+				iMaxLength = max_i(iMaxLength, iEndCol);
 			}
 		}
 
@@ -2947,7 +2947,7 @@ void EditToggleLineComments(HWND hwnd, LPCWSTR pwszComment, BOOL bInsertAtStart)
 
 				if (iLineIndentPos != iLineEndPos) {
 					int iIndentColumn = (int)SendMessage(hwnd, SCI_GETCOLUMN, (WPARAM)iLineIndentPos, 0);
-					iCommentCol = min(iCommentCol, iIndentColumn);
+					iCommentCol = min_i(iCommentCol, iIndentColumn);
 				}
 			}
 		}
@@ -2969,7 +2969,7 @@ void EditToggleLineComments(HWND hwnd, LPCWSTR pwszComment, BOOL bInsertAtStart)
 			}
 
 			tr.chrg.cpMin = iIndentPos;
-			tr.chrg.cpMax = tr.chrg.cpMin + min(31, cchComment);
+			tr.chrg.cpMax = tr.chrg.cpMin + min_i(31, cchComment);
 			tr.lpstrText = tchBuf;
 			SendMessage(hwnd, SCI_GETTEXTRANGE, 0, (LPARAM)&tr);
 
@@ -3085,7 +3085,7 @@ void EditPadWithSpaces(HWND hwnd, BOOL bSkipEmpty, BOOL bNoUndoGroup) {
 
 		for (iLine = iLineStart; iLine <= iLineEnd; iLine++) {
 			int iPos = (int)SendMessage(hwnd, SCI_GETLINEENDPOSITION, (WPARAM)iLine, 0);
-			iMaxColumn = max(iMaxColumn, (int)SendMessage(hwnd, SCI_GETCOLUMN, (WPARAM)iPos, 0));
+			iMaxColumn = max_i(iMaxColumn, (int)SendMessage(hwnd, SCI_GETCOLUMN, (WPARAM)iPos, 0));
 		}
 	} else {
 		int iCurPos = (int)SendMessage(hwnd, SCI_GETCURRENTPOS, 0, 0);
@@ -3105,7 +3105,7 @@ void EditPadWithSpaces(HWND hwnd, BOOL bSkipEmpty, BOOL bNoUndoGroup) {
 		for (iLine = iLineStart; iLine <= iLineEnd; iLine++) {
 			int iPos = (int)SendMessage(hwnd, SCI_GETLINESELENDPOSITION, (WPARAM)iLine, 0);
 			if (iPos != INVALID_POSITION) {
-				iMaxColumn = max(iMaxColumn, (int)SendMessage(hwnd, SCI_GETCOLUMN, (WPARAM)iPos, 0));
+				iMaxColumn = max_i(iMaxColumn, (int)SendMessage(hwnd, SCI_GETCOLUMN, (WPARAM)iPos, 0));
 			}
 		}
 	}
@@ -3963,9 +3963,9 @@ void EditSortLines(HWND hwnd, int iSortFlags) {
 		iRcAnchorCol = (int)SendMessage(hwnd, SCI_GETCOLUMN, (WPARAM)iAnchorPos, 0);
 
 		bIsRectangular = TRUE;
-		iLineStart = min(iRcCurLine, iRcAnchorLine);
-		iLineEnd	 = max(iRcCurLine, iRcAnchorLine);
-		iSortColumn = min(iRcCurCol, iRcAnchorCol);
+		iLineStart = min_i(iRcCurLine, iRcAnchorLine);
+		iLineEnd	 = max_i(iRcCurLine, iRcAnchorLine);
+		iSortColumn = min_i(iRcCurCol, iRcAnchorCol);
 	} else {
 		int iSelEnd;
 		iSelStart = (int)SendMessage(hwnd, SCI_GETSELECTIONSTART, 0, 0);
@@ -4018,7 +4018,7 @@ void EditSortLines(HWND hwnd, int iSortFlags) {
 		SendMessage(hwnd, SCI_GETLINE, (WPARAM)iLine, (LPARAM)pmsz);
 		StrTrimA(pmsz, "\r\n");
 		cchTotal += cchm;
-		ichlMax = max(ichlMax, cchm);
+		ichlMax = max_i(ichlMax, cchm);
 
 		cchw = MultiByteToWideChar(uCodePage, 0, pmsz, -1, NULL, 0) - 1;
 		if (cchw > 0) {
@@ -4185,10 +4185,10 @@ void EditJumpTo(HWND hwnd, int iNewLine, int iNewCol) {
 	}
 
 	// Line maximum is iMaxLine
-	iNewLine = min(iNewLine, iMaxLine);
+	iNewLine = min_i(iNewLine, iMaxLine);
 
 	// Column minimum is 1
-	iNewCol = max(iNewCol, 1);
+	iNewCol = max_i(iNewCol, 1);
 
 	if (iNewLine > 0 && iNewLine <= iMaxLine && iNewCol > 0) {
 		int iNewPos	 = (int)SendMessage(hwnd, SCI_POSITIONFROMLINE, (WPARAM)iNewLine - 1, 0);
@@ -4202,7 +4202,7 @@ void EditJumpTo(HWND hwnd, int iNewLine, int iNewCol) {
 			iNewPos = (int)SendMessage(hwnd, SCI_POSITIONAFTER, (WPARAM)iNewPos, 0);
 		}
 
-		iNewPos = min(iNewPos, iLineEndPos);
+		iNewPos = min_i(iNewPos, iLineEndPos);
 		EditSelectEx(hwnd, -1, iNewPos); // SCI_GOTOPOS(pos) is equivalent to SCI_SETSEL(-1, pos)
 		SendMessage(hwnd, SCI_CHOOSECARETX, 0, 0);
 	}
@@ -4295,15 +4295,15 @@ void EditGetExcerpt(HWND hwnd, LPWSTR lpszExcerpt, DWORD cchExcerpt) {
 
 	/*if (iCurPos != iAnchorPos && SC_SEL_RECTANGLE != SendMessage(hwnd, SCI_GETSELECTIONMODE, 0, 0)) {*/
 	tr.chrg.cpMin = (int)SendMessage(hwnd, SCI_GETSELECTIONSTART, 0, 0);
-	tr.chrg.cpMax = min((int)SendMessage(hwnd, SCI_GETSELECTIONEND, 0, 0), (LONG)(tr.chrg.cpMin + COUNTOF(tch)));
+	tr.chrg.cpMax = min_i((int)SendMessage(hwnd, SCI_GETSELECTIONEND, 0, 0), (LONG)(tr.chrg.cpMin + COUNTOF(tch)));
 	/*}
 	else {
 		int iLine = SendMessage(hwnd, SCI_LINEFROMPOSITION, (WPARAM)iCurPos, 0);
 		tr.chrg.cpMin = SendMessage(hwnd, SCI_POSITIONFROMLINE, (WPARAM)iLine, 0);
-		tr.chrg.cpMax = min(SendMessage(hwnd, SCI_GETLINEENDPOSITION, (WPARAM)iLine, 0), (LONG)(tr.chrg.cpMin + COUNTOF(tch)));
+		tr.chrg.cpMax = min_i(SendMessage(hwnd, SCI_GETLINEENDPOSITION, (WPARAM)iLine, 0), (LONG)(tr.chrg.cpMin + COUNTOF(tch)));
 	}*/
 
-	tr.chrg.cpMax = min((int)SendMessage(hwnd, SCI_GETLENGTH, 0, 0), tr.chrg.cpMax);
+	tr.chrg.cpMax = min_i((int)SendMessage(hwnd, SCI_GETLENGTH, 0, 0), tr.chrg.cpMax);
 
 	pszText	 = LocalAlloc(LPTR, (tr.chrg.cpMax - tr.chrg.cpMin) + 2);
 	pszTextW = LocalAlloc(LPTR, ((tr.chrg.cpMax - tr.chrg.cpMin) + 1) * sizeof(WCHAR));
@@ -4991,7 +4991,7 @@ BOOL EditFindNext(HWND hwnd, LPCEDITFINDREPLACE lpefr, BOOL fExtendSelection) {
 	if (!fExtendSelection) {
 		EditSelectEx(hwnd, ttf.chrgText.cpMin, ttf.chrgText.cpMax);
 	} else {
-		EditSelectEx(hwnd, min(iSelAnchor, iSelPos), ttf.chrgText.cpMax);
+		EditSelectEx(hwnd, min_i(iSelAnchor, iSelPos), ttf.chrgText.cpMax);
 	}
 
 	return TRUE;
@@ -5035,7 +5035,7 @@ BOOL EditFindPrev(HWND hwnd, LPCEDITFINDREPLACE lpefr, BOOL fExtendSelection) {
 
 	ZeroMemory(&ttf, sizeof(ttf));
 
-	ttf.chrg.cpMin = max(0, (int)SendMessage(hwnd, SCI_GETSELECTIONSTART, 0, 0));
+	ttf.chrg.cpMin = max_i(0, (int)SendMessage(hwnd, SCI_GETSELECTIONSTART, 0, 0));
 	ttf.chrg.cpMax = 0;
 	ttf.lpstrText = szFind2;
 
@@ -5062,7 +5062,7 @@ BOOL EditFindPrev(HWND hwnd, LPCEDITFINDREPLACE lpefr, BOOL fExtendSelection) {
 	if (!fExtendSelection) {
 		EditSelectEx(hwnd, ttf.chrgText.cpMin, ttf.chrgText.cpMax);
 	} else {
-		EditSelectEx(hwnd, max(iSelPos, iSelAnchor), ttf.chrgText.cpMin);
+		EditSelectEx(hwnd, max_i(iSelPos, iSelAnchor), ttf.chrgText.cpMin);
 	}
 
 	return TRUE;
@@ -5611,7 +5611,7 @@ INT_PTR CALLBACK EditLineNumDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM 
 				//		break;
 				//	iNewPos = SendMessage(hwndEdit, SCI_POSITIONAFTER, (WPARAM)iNewPos, 0);
 				//}
-				//iNewPos = min(iNewPos, iLineEndPos);
+				//iNewPos = min_i(iNewPos, iLineEndPos);
 				//SendMessage(hwndEdit, SCI_GOTOPOS, (WPARAM)iNewPos, 0);
 				//SendMessage(hwndEdit, SCI_CHOOSECARETX, 0, 0);
 				EditJumpTo(hwndEdit, iNewLine, iNewCol);
@@ -6256,7 +6256,7 @@ BOOL FileVars_Init(char *lpData, DWORD cbData, LPFILEVARS lpfv) {
 		return TRUE;
 	}
 
-	lstrcpynA(tch, lpData, min(cbData + 1, COUNTOF(tch)));
+	lstrcpynA(tch, lpData, min_i(cbData + 1, COUNTOF(tch)));
 
 	if (!fNoFileVariables) {
 		if (FileVars_ParseInt(tch, "enable-local-variables", &i) && (!i)) {
@@ -6265,12 +6265,12 @@ BOOL FileVars_Init(char *lpData, DWORD cbData, LPFILEVARS lpfv) {
 
 		if (!bDisableFileVariables) {
 			if (FileVars_ParseInt(tch, "tab-width", &i)) {
-				lpfv->iTabWidth = max(min(i, 256), 1);
+				lpfv->iTabWidth = maxmin_i(i, 256, 1);
 				lpfv->mask |= FV_TABWIDTH;
 			}
 
 			if (FileVars_ParseInt(tch, "c-basic-indent", &i)) {
-				lpfv->iIndentWidth = max(min(i, 256), 0);
+				lpfv->iIndentWidth = maxmin_i(i, 256, 0);
 				lpfv->mask |= FV_INDENTWIDTH;
 			}
 
@@ -6290,7 +6290,7 @@ BOOL FileVars_Init(char *lpData, DWORD cbData, LPFILEVARS lpfv) {
 			}
 
 			if (FileVars_ParseInt(tch, "fill-column", &i)) {
-				lpfv->iLongLinesLimit = max(min(i, NP2_LONG_LINE_LIMIT), 0);
+				lpfv->iLongLinesLimit = maxmin_i(i, NP2_LONG_LINE_LIMIT, 0);
 				lpfv->mask |= FV_LONGLINESLIMIT;
 			}
 		}
@@ -6321,12 +6321,12 @@ BOOL FileVars_Init(char *lpData, DWORD cbData, LPFILEVARS lpfv) {
 
 			if (!bDisableFileVariables) {
 				if (FileVars_ParseInt(tch, "tab-width", &i)) {
-					lpfv->iTabWidth = max(min(i, 256), 1);
+					lpfv->iTabWidth = maxmin_i(i, 256, 1);
 					lpfv->mask |= FV_TABWIDTH;
 				}
 
 				if (FileVars_ParseInt(tch, "c-basic-indent", &i)) {
-					lpfv->iIndentWidth = max(min(i, 256), 0);
+					lpfv->iIndentWidth = maxmin_i(i, 256, 0);
 					lpfv->mask |= FV_INDENTWIDTH;
 				}
 
@@ -6346,7 +6346,7 @@ BOOL FileVars_Init(char *lpData, DWORD cbData, LPFILEVARS lpfv) {
 				}
 
 				if (FileVars_ParseInt(tch, "fill-column", &i)) {
-					lpfv->iLongLinesLimit = max(min(i, NP2_LONG_LINE_LIMIT), 0);
+					lpfv->iLongLinesLimit = maxmin_i(i, NP2_LONG_LINE_LIMIT, 0);
 					lpfv->mask |= FV_LONGLINESLIMIT;
 				}
 			}

@@ -303,7 +303,7 @@ HWND InitInstance(HINSTANCE hInstance, LPSTR pszCmdLine, int nCmdShow) {
 		if (!IntersectRect(&rc2, &rc, &mi.rcWork)) {
 			wi.y = mi.rcWork.top + 16;
 			wi.cy = mi.rcWork.bottom - mi.rcWork.top - 32;
-			wi.cx = min(mi.rcWork.right - mi.rcWork.left - 32, wi.cy);
+			wi.cx = min_i(mi.rcWork.right - mi.rcWork.left - 32, wi.cy);
 			wi.x = mi.rcWork.right - wi.cx - 16;
 		}
 	}
@@ -1078,7 +1078,7 @@ void MsgSize(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	}
 
 	hdwp = BeginDeferWindowPos(2);
-	DeferWindowPos(hdwp, hwndDriveBox, NULL, x, y, cx, max(cy, 100), SWP_NOZORDER | SWP_NOACTIVATE);
+	DeferWindowPos(hdwp, hwndDriveBox, NULL, x, y, cx, max_i(cy, 100), SWP_NOZORDER | SWP_NOACTIVATE);
 
 	if (bShowDriveBox) {
 		GetWindowRect(hwndDriveBox, &rc);
@@ -1550,7 +1550,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			if (iItem > 0) {
 				iItem--;
 			}
-			iItem = min(iItem, ListView_GetItemCount(hwndDirList) - 1);
+			iItem = min_i(iItem, ListView_GetItemCount(hwndDirList) - 1);
 			ListView_SetItemState(hwndDirList, iItem, LVIS_FOCUSED, LVIS_FOCUSED);
 			ListView_EnsureVisible(hwndDirList, iItem, FALSE);
 
@@ -2350,7 +2350,7 @@ BOOL ChangeDirectory(HWND hwnd, LPCWSTR lpszNewDir, BOOL bUpdateHistory) {
 		if (!fUpdate) {
 			ListView_EnsureVisible(hwndDirList, 0, FALSE);
 		} else {
-			int iJump = min(iTopItem + ListView_GetCountPerPage(hwndDirList), cItems - 1);
+			int iJump = min_i(iTopItem + ListView_GetCountPerPage(hwndDirList), cItems - 1);
 			ListView_EnsureVisible(hwndDirList, iJump, TRUE);
 			ListView_EnsureVisible(hwndDirList, iTopItem, TRUE);
 		}
@@ -2410,10 +2410,10 @@ void LoadSettings(void) {
 	bTransparentMode = IniSectionGetBool(pIniSection, L"TransparentMode", 0);
 
 	iEscFunction = IniSectionGetInt(pIniSection, L"EscFunction", 2);
-	iEscFunction = max(min(iEscFunction, 2), 0);
+	iEscFunction = maxmin_i(iEscFunction, 2, 0);
 
 	iStartupDir = IniSectionGetInt(pIniSection, L"StartupDirectory", 1);
-	iStartupDir = max(min(iStartupDir, 2), 0);
+	iStartupDir = maxmin_i(iStartupDir, 2, 0);
 
 	if (!IniSectionGetString(pIniSection, L"Favorites", L"",
 							 tchFavoritesDir, COUNTOF(tchFavoritesDir))) {
@@ -2447,7 +2447,7 @@ void LoadSettings(void) {
 	}
 
 	nSortFlags = IniSectionGetInt(pIniSection, L"SortOptions", DS_TYPE);
-	nSortFlags = min(3, max(nSortFlags, 0));
+	nSortFlags = minmax_i(nSortFlags, 0, 3);
 
 	fSortRev = IniSectionGetBool(pIniSection, L"SortReverse", 0);
 
@@ -2483,16 +2483,16 @@ void LoadSettings(void) {
 	bShowDriveBox = IniSectionGetBool(pIniSection, L"ShowDriveBox", 1);
 
 	cxGotoDlg = IniSectionGetInt(pIniSection, L"GotoDlgSizeX", 0);
-	cxGotoDlg = max(cxGotoDlg, 0);
+	cxGotoDlg = max_i(cxGotoDlg, 0);
 
 	cxOpenWithDlg = IniSectionGetInt(pIniSection, L"OpenWithDlgSizeX", 0);
-	cxOpenWithDlg = max(cxOpenWithDlg, 0);
+	cxOpenWithDlg = max_i(cxOpenWithDlg, 0);
 
 	cyOpenWithDlg = IniSectionGetInt(pIniSection, L"OpenWithDlgSizeY", 0);
-	cyOpenWithDlg = max(cyOpenWithDlg, 0);
+	cyOpenWithDlg = max_i(cyOpenWithDlg, 0);
 
 	cxCopyMoveDlg = IniSectionGetInt(pIniSection, L"CopyMoveDlgSizeX", 0);
-	cxCopyMoveDlg = max(cxCopyMoveDlg, 0);
+	cxCopyMoveDlg = max_i(cxCopyMoveDlg, 0);
 
 	if (!flagPosParam) {
 		// ignore window position if /p was specified
@@ -2833,7 +2833,7 @@ void LoadFlags(void) {
 	flagNoFadeHidden = IniSectionGetBool(pIniSection, L"NoFadeHidden", 0);
 
 	flagToolbarLook = IniSectionGetInt(pIniSection, L"ToolbarLook", 0);
-	flagToolbarLook = max(min(flagToolbarLook, 2), 0);
+	flagToolbarLook = maxmin_i(flagToolbarLook, 2, 0);
 
 	LocalFree(pIniSection);
 }

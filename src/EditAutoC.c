@@ -801,7 +801,7 @@ void EditAutoCloseXMLTag(HWND hwnd) {
 	char tchBuf[512];
 	Sci_Position iCurPos = SciCall_GetCurrentPos();
 	int	 iHelper = iCurPos - (COUNTOF(tchBuf) - 1);
-	int	 iStartPos = max(0, iHelper);
+	int	 iStartPos = max_i(0, iHelper);
 	int	 iSize = iCurPos - iStartPos;
 	BOOL autoClosed = FALSE;
 

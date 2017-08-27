@@ -624,7 +624,7 @@ HWND InitInstance(HINSTANCE hInstance, LPSTR pszCmdLine, int nCmdShow) {
 		SystemParametersInfo(SPI_GETWORKAREA, 0, &rc, 0);
 		wi.y = rc.top + 16;
 		wi.cy = rc.bottom - rc.top - 32;
-		wi.cx = min(rc.right - rc.left - 32, wi.cy);
+		wi.cx = min_i(rc.right - rc.left - 32, wi.cy);
 		wi.x = (flagDefaultPos == 3) ? rc.left + 16 : rc.right - wi.cx - 16;
 	} else {
 
@@ -659,7 +659,7 @@ HWND InitInstance(HINSTANCE hInstance, LPSTR pszCmdLine, int nCmdShow) {
 		if (!IntersectRect(&rc2, &rc, &mi.rcWork)) {
 			wi.y = mi.rcWork.top + 16;
 			wi.cy = mi.rcWork.bottom - mi.rcWork.top - 32;
-			wi.cx = min(mi.rcWork.right - mi.rcWork.left - 32, wi.cy);
+			wi.cx = min_i(mi.rcWork.right - mi.rcWork.left - 32, wi.cy);
 			wi.x = mi.rcWork.right - wi.cx - 16;
 		}
 	}
@@ -2964,7 +2964,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		}
 
 		if (ColumnWrapDlg(hwnd, IDD_COLUMNWRAP, &iWrapCol)) {
-			iWrapCol = max(min(iWrapCol, 512), 1);
+			iWrapCol = maxmin_i(iWrapCol, 512, 1);
 			BeginWaitCursor();
 			EditWrapToColumn(hwndEdit, iWrapCol);
 			EndWaitCursor();
@@ -3678,7 +3678,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			bMarkLongLines = TRUE;
 			SendMessage(hwndEdit, SCI_SETEDGEMODE, (iLongLineMode == EDGE_LINE) ? EDGE_LINE : EDGE_BACKGROUND, 0);
 			Style_SetLongLineColors(hwndEdit);
-			iLongLinesLimit = max(min(iLongLinesLimit, NP2_LONG_LINE_LIMIT), 0);
+			iLongLinesLimit = maxmin_i(iLongLinesLimit, NP2_LONG_LINE_LIMIT, 0);
 			SendMessage(hwndEdit, SCI_SETEDGECOLUMN, iLongLinesLimit, 0);
 			UpdateStatusbar();
 			iLongLinesLimitG = iLongLinesLimit;
@@ -3696,8 +3696,8 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			SendMessage(hwndEdit, SCI_SETUSETABS, !bTabsAsSpaces, 0);
 			SendMessage(hwndEdit, SCI_SETTABINDENTS, bTabIndents, 0);
 			SendMessage(hwndEdit, SCI_SETBACKSPACEUNINDENTS, bBackspaceUnindents, 0);
-			iTabWidth = max(min(iTabWidth, 256), 1);
-			iIndentWidth = max(min(iIndentWidth, 256), 0);
+			iTabWidth = maxmin_i(iTabWidth, 256, 1);
+			iIndentWidth = maxmin_i(iIndentWidth, 256, 0);
 			SendMessage(hwndEdit, SCI_SETTABWIDTH, iTabWidth, 0);
 			SendMessage(hwndEdit, SCI_SETINDENT, iIndentWidth, 0);
 			bTabsAsSpacesG = bTabsAsSpaces;
@@ -4528,7 +4528,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			} else {
 				iLongLinesLimit--;
 			}
-			iLongLinesLimit = max(min(iLongLinesLimit, NP2_LONG_LINE_LIMIT), 0);
+			iLongLinesLimit = maxmin_i(iLongLinesLimit, NP2_LONG_LINE_LIMIT, 0);
 			SendMessage(hwndEdit, SCI_SETEDGECOLUMN, iLongLinesLimit, 0);
 			UpdateStatusbar();
 			iLongLinesLimitG = iLongLinesLimit;
@@ -4877,7 +4877,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 							int col1 = (int)SendMessage(hwndEdit, SCI_GETCOLUMN, iPos, 0);
 							int col2 = (int)SendMessage(hwndEdit, SCI_GETCOLUMN, iBrace2, 0);
 							SendMessage(hwndEdit, SCI_BRACEHIGHLIGHT, iPos, iBrace2);
-							SendMessage(hwndEdit, SCI_SETHIGHLIGHTGUIDE, min(col1, col2), 0);
+							SendMessage(hwndEdit, SCI_SETHIGHLIGHTGUIDE, min_i(col1, col2), 0);
 						} else {
 							SendMessage(hwndEdit, SCI_BRACEBADLIGHT, iPos, 0);
 							SendMessage(hwndEdit, SCI_SETHIGHLIGHTGUIDE, 0, 0);
@@ -4891,7 +4891,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 								int col1 = (int)SendMessage(hwndEdit, SCI_GETCOLUMN, iPos, 0);
 								int col2 = (int)SendMessage(hwndEdit, SCI_GETCOLUMN, iBrace2, 0);
 								SendMessage(hwndEdit, SCI_BRACEHIGHLIGHT, iPos, iBrace2);
-								SendMessage(hwndEdit, SCI_SETHIGHLIGHTGUIDE, min(col1, col2), 0);
+								SendMessage(hwndEdit, SCI_SETHIGHLIGHTGUIDE, min_i(col1, col2), 0);
 							} else {
 								SendMessage(hwndEdit, SCI_BRACEBADLIGHT, iPos, 0);
 								SendMessage(hwndEdit, SCI_SETHIGHLIGHTGUIDE, 0, 0);
@@ -5131,19 +5131,19 @@ void LoadSettings(void) {
 	}
 
 	iPathNameFormat = IniSectionGetInt(pIniSection, L"PathNameFormat", 1);
-	iPathNameFormat = max(min(iPathNameFormat, 2), 0);
+	iPathNameFormat = maxmin_i(iPathNameFormat, 2, 0);
 
 	fWordWrap = IniSectionGetBool(pIniSection, L"WordWrap", 1);
 	fWordWrapG = fWordWrap;
 
 	iWordWrapMode = IniSectionGetInt(pIniSection, L"WordWrapMode", 0);
-	iWordWrapMode = max(min(iWordWrapMode, 1), 0);
+	iWordWrapMode = maxmin_i(iWordWrapMode, 1, 0);
 
 	iWordWrapIndent = IniSectionGetInt(pIniSection, L"WordWrapIndent", 0);
-	iWordWrapIndent = max(min(iWordWrapIndent, 6), 0);
+	iWordWrapIndent = maxmin_i(iWordWrapIndent, 6, 0);
 
 	iWordWrapSymbols = IniSectionGetInt(pIniSection, L"WordWrapSymbols", 22);
-	iWordWrapSymbols = max(min(iWordWrapSymbols % 10, 2), 0) + max(min((iWordWrapSymbols % 100 - iWordWrapSymbols % 10) / 10, 2), 0) * 10;
+	iWordWrapSymbols = maxmin_i(iWordWrapSymbols % 10, 2, 0) + maxmin_i((iWordWrapSymbols % 100 - iWordWrapSymbols % 10) / 10, 2, 0) * 10;
 
 	bShowWordWrapSymbols = IniSectionGetBool(pIniSection, L"ShowWordWrapSymbols", 0);
 	bMatchBraces = IniSectionGetBool(pIniSection, L"MatchBraces", 1);
@@ -5165,21 +5165,21 @@ void LoadSettings(void) {
 	bBackspaceUnindents = IniSectionGetBool(pIniSection, L"BackspaceUnindents", 0);
 
 	iTabWidth = IniSectionGetInt(pIniSection, L"TabWidth", 4);
-	iTabWidth = max(min(iTabWidth, 256), 1);
+	iTabWidth = maxmin_i(iTabWidth, 256, 1);
 	iTabWidthG = iTabWidth;
 
 	iIndentWidth = IniSectionGetInt(pIniSection, L"IndentWidth", 4);
-	iIndentWidth = max(min(iIndentWidth, 256), 0);
+	iIndentWidth = maxmin_i(iIndentWidth, 256, 0);
 	iIndentWidthG = iIndentWidth;
 
 	bMarkLongLines = IniSectionGetBool(pIniSection, L"MarkLongLines", 1);
 
 	iLongLinesLimit = IniSectionGetInt(pIniSection, L"LongLinesLimit", 80);
-	iLongLinesLimit = max(min(iLongLinesLimit, NP2_LONG_LINE_LIMIT), 0);
+	iLongLinesLimit = maxmin_i(iLongLinesLimit, NP2_LONG_LINE_LIMIT, 0);
 	iLongLinesLimitG = iLongLinesLimit;
 
 	iLongLineMode = IniSectionGetInt(pIniSection, L"LongLineMode", EDGE_LINE);
-	iLongLineMode = max(min(iLongLineMode, EDGE_BACKGROUND), EDGE_LINE);
+	iLongLineMode = maxmin_i(iLongLineMode, EDGE_BACKGROUND, EDGE_LINE);
 
 	bShowSelectionMargin = IniSectionGetBool(pIniSection, L"ShowSelectionMargin", 0);
 	bShowLineNumbers = IniSectionGetBool(pIniSection, L"ShowLineNumbers", 1);
@@ -5205,44 +5205,44 @@ void LoadSettings(void) {
 	bNoEncodingTags = IniSectionGetBool(pIniSection, L"NoEncodingTags", 0);
 
 	iDefaultEOLMode = IniSectionGetInt(pIniSection, L"DefaultEOLMode", 0);
-	iDefaultEOLMode = max(min(iDefaultEOLMode, 2), 0);
+	iDefaultEOLMode = maxmin_i(iDefaultEOLMode, 2, 0);
 
 	bFixLineEndings = IniSectionGetBool(pIniSection, L"FixLineEndings", 1);
 	bAutoStripBlanks = IniSectionGetBool(pIniSection, L"FixTrailingBlanks", 0);
 
 	iPrintHeader = IniSectionGetInt(pIniSection, L"PrintHeader", 1);
-	iPrintHeader = max(min(iPrintHeader, 3), 0);
+	iPrintHeader = maxmin_i(iPrintHeader, 3, 0);
 
 	iPrintFooter = IniSectionGetInt(pIniSection, L"PrintFooter", 0);
-	iPrintFooter = max(min(iPrintFooter, 1), 0);
+	iPrintFooter = maxmin_i(iPrintFooter, 1, 0);
 
 	iPrintColor = IniSectionGetInt(pIniSection, L"PrintColorMode", 3);
-	iPrintColor = max(min(iPrintColor, 4), 0);
+	iPrintColor = maxmin_i(iPrintColor, 4, 0);
 
 	iPrintZoom = IniSectionGetInt(pIniSection, L"PrintZoom", 10) - 10;
-	iPrintZoom = max(min(iPrintZoom, 20), -10);
+	iPrintZoom = maxmin_i(iPrintZoom, 20, -10);
 
 	pagesetupMargin.left = IniSectionGetInt(pIniSection, L"PrintMarginLeft", -1);
-	pagesetupMargin.left = max(pagesetupMargin.left, -1);
+	pagesetupMargin.left = max_i(pagesetupMargin.left, -1);
 
 	pagesetupMargin.top = IniSectionGetInt(pIniSection, L"PrintMarginTop", -1);
-	pagesetupMargin.top = max(pagesetupMargin.top, -1);
+	pagesetupMargin.top = max_i(pagesetupMargin.top, -1);
 
 	pagesetupMargin.right = IniSectionGetInt(pIniSection, L"PrintMarginRight", -1);
-	pagesetupMargin.right = max(pagesetupMargin.right, -1);
+	pagesetupMargin.right = max_i(pagesetupMargin.right, -1);
 
 	pagesetupMargin.bottom = IniSectionGetInt(pIniSection, L"PrintMarginBottom", -1);
-	pagesetupMargin.bottom = max(pagesetupMargin.bottom, -1);
+	pagesetupMargin.bottom = max_i(pagesetupMargin.bottom, -1);
 
 	bSaveBeforeRunningTools = IniSectionGetBool(pIniSection, L"SaveBeforeRunningTools", 0);
 
 	iFileWatchingMode = IniSectionGetInt(pIniSection, L"FileWatchingMode", 0);
-	iFileWatchingMode = max(min(iFileWatchingMode, 2), 0);
+	iFileWatchingMode = maxmin_i(iFileWatchingMode, 2, 0);
 
 	bResetFileWatching = IniSectionGetBool(pIniSection, L"ResetFileWatching", 0);
 
 	iEscFunction = IniSectionGetInt(pIniSection, L"EscFunction", 0);
-	iEscFunction = max(min(iEscFunction, 2), 0);
+	iEscFunction = maxmin_i(iEscFunction, 2, 0);
 
 	bAlwaysOnTop = IniSectionGetBool(pIniSection, L"AlwaysOnTop", 0);
 	bMinimizeToTray = IniSectionGetBool(pIniSection, L"MinimizeToTray", 0);
@@ -5258,34 +5258,34 @@ void LoadSettings(void) {
 	bShowStatusbar = IniSectionGetBool(pIniSection, L"ShowStatusbar", 1);
 
 	cxEncodingDlg = IniSectionGetInt(pIniSection, L"EncodingDlgSizeX", 256);
-	cxEncodingDlg = max(cxEncodingDlg, 0);
+	cxEncodingDlg = max_i(cxEncodingDlg, 0);
 
 	cyEncodingDlg = IniSectionGetInt(pIniSection, L"EncodingDlgSizeY", 262);
-	cyEncodingDlg = max(cyEncodingDlg, 0);
+	cyEncodingDlg = max_i(cyEncodingDlg, 0);
 
 	cxRecodeDlg = IniSectionGetInt(pIniSection, L"RecodeDlgSizeX", 256);
-	cxRecodeDlg = max(cxRecodeDlg, 0);
+	cxRecodeDlg = max_i(cxRecodeDlg, 0);
 
 	cyRecodeDlg = IniSectionGetInt(pIniSection, L"RecodeDlgSizeY", 262);
-	cyRecodeDlg = max(cyRecodeDlg, 0);
+	cyRecodeDlg = max_i(cyRecodeDlg, 0);
 
 	cxFileMRUDlg = IniSectionGetInt(pIniSection, L"FileMRUDlgSizeX", 412);
-	cxFileMRUDlg = max(cxFileMRUDlg, 0);
+	cxFileMRUDlg = max_i(cxFileMRUDlg, 0);
 
 	cyFileMRUDlg = IniSectionGetInt(pIniSection, L"FileMRUDlgSizeY", 376);
-	cyFileMRUDlg = max(cyFileMRUDlg, 0);
+	cyFileMRUDlg = max_i(cyFileMRUDlg, 0);
 
 	cxOpenWithDlg = IniSectionGetInt(pIniSection, L"OpenWithDlgSizeX", 384);
-	cxOpenWithDlg = max(cxOpenWithDlg, 0);
+	cxOpenWithDlg = max_i(cxOpenWithDlg, 0);
 
 	cyOpenWithDlg = IniSectionGetInt(pIniSection, L"OpenWithDlgSizeY", 386);
-	cyOpenWithDlg = max(cyOpenWithDlg, 0);
+	cyOpenWithDlg = max_i(cyOpenWithDlg, 0);
 
 	cxFavoritesDlg = IniSectionGetInt(pIniSection, L"FavoritesDlgSizeX", 334);
-	cxFavoritesDlg = max(cxFavoritesDlg, 0);
+	cxFavoritesDlg = max_i(cxFavoritesDlg, 0);
 
 	cyFavoritesDlg = IniSectionGetInt(pIniSection, L"FavoritesDlgSizeY", 316);
-	cyFavoritesDlg = max(cyFavoritesDlg, 0);
+	cyFavoritesDlg = max_i(cyFavoritesDlg, 0);
 
 	xFindReplaceDlg = IniSectionGetInt(pIniSection, L"FindReplaceDlgPosX", 0);
 	yFindReplaceDlg = IniSectionGetInt(pIniSection, L"FindReplaceDlgPosY", 0);
@@ -6173,7 +6173,7 @@ void LoadFlags(void) {
 
 	flagNoFadeHidden = IniSectionGetBool(pIniSection, L"NoFadeHidden", 0);
 	flagToolbarLook = IniSectionGetInt(pIniSection, L"ToolbarLook", IsWinXPAndAbove() ? 1 : 2);
-	flagToolbarLook = max(min(flagToolbarLook, 2), 0);
+	flagToolbarLook = maxmin_i(flagToolbarLook, 2, 0);
 
 	flagSimpleIndentGuides = IniSectionGetBool(pIniSection, L"SimpleIndentGuides", 0);
 	fNoHTMLGuess = IniSectionGetBool(pIniSection, L"NoHTMLGuess", 0);
@@ -7559,7 +7559,7 @@ void SnapToDefaultPos(HWND hwnd) {
 
 	y = mi.rcWork.top + 16;
 	cy = mi.rcWork.bottom - mi.rcWork.top - 32;
-	cx = min(mi.rcWork.right - mi.rcWork.left - 32, cy);
+	cx = min_i(mi.rcWork.right - mi.rcWork.left - 32, cy);
 	x = mi.rcWork.right - cx - 16;
 
 	wndpl.length = sizeof(WINDOWPLACEMENT);

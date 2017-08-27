@@ -539,7 +539,7 @@ void WordList_AddList(struct WordList *pWList, LPCSTR pList) {
 		char *sub = StrPBrkA(pList, " \t.,();^\n\r");
 		if (sub) {
 			int lenSub = (int)(sub - pList);
-			lenSub = min(NP2_AUTOC_MAX_WORD_LENGTH - len, lenSub);
+			lenSub = min_i(NP2_AUTOC_MAX_WORD_LENGTH - len, lenSub);
 			memcpy(word + len, pList, lenSub);
 			len += lenSub;
 			if (len >= iStartLen) {
@@ -563,7 +563,7 @@ void WordList_AddList(struct WordList *pWList, LPCSTR pList) {
 			pList = ++sub;
 		} else {
 			int lenSub = lstrlenA(pList);
-			lenSub = min(NP2_AUTOC_MAX_WORD_LENGTH - len, lenSub);
+			lenSub = min_i(NP2_AUTOC_MAX_WORD_LENGTH - len, lenSub);
 			if (len) {
 				memcpy(word + len, pList, lenSub);
 				len += lenSub;

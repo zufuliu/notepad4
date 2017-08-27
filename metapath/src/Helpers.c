@@ -432,7 +432,7 @@ void CenterDlgInParentEx(HWND hDlg, HWND hParent) {
 		y = rcParent.top + 60;
 	}
 
-	SetWindowPos(hDlg, NULL, max(xMin, min(xMax, x)), max(yMin, min(yMax, y)), 0, 0, SWP_NOZORDER | SWP_NOSIZE);
+	SetWindowPos(hDlg, NULL, maxmin_i(xMax, x, xMin), maxmin_i(yMax, y, yMin), 0, 0, SWP_NOZORDER | SWP_NOSIZE);
 }
 
 // Why doesn’t the "Automatically move pointer to the default button in a dialog box"
@@ -536,7 +536,7 @@ int Toolbar_GetButtons(HWND hwnd, int cmdBase, LPWSTR lpszButtons, int cchButton
 	TBBUTTON tbb;
 
 	lstrcpy(tchButtons, L"");
-	c = min(50, (int)SendMessage(hwnd, TB_BUTTONCOUNT, 0, 0));
+	c = min_i(50, (int)SendMessage(hwnd, TB_BUTTONCOUNT, 0, 0));
 
 	for (int i = 0; i < c; i++) {
 		SendMessage(hwnd, TB_GETBUTTON, (WPARAM)i, (LPARAM)&tbb);
@@ -1350,7 +1350,7 @@ LPMRULIST MRU_Create(LPCWSTR pszRegKey, int iFlags, int iSize) {
 	ZeroMemory(pmru, sizeof(MRULIST));
 	lstrcpyn(pmru->szRegKey, pszRegKey, COUNTOF(pmru->szRegKey));
 	pmru->iFlags = iFlags;
-	pmru->iSize = min(iSize, MRU_MAXITEMS);
+	pmru->iSize = min_i(iSize, MRU_MAXITEMS);
 	return pmru;
 }
 
@@ -1382,7 +1382,7 @@ BOOL MRU_Add(LPMRULIST pmru, LPCWSTR pszNew) {
 			break;
 		}
 	}
-	i = min(i, pmru->iSize - 1);
+	i = min_i(i, pmru->iSize - 1);
 	for (; i > 0; i--) {
 		pmru->pszItems[i] = pmru->pszItems[i - 1];
 	}

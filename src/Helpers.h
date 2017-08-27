@@ -32,6 +32,10 @@ __forceinline int max_i(int x, int y) {
 	return (x > y) ? x : y;
 }
 
+__forceinline long max_l(long x, long y) {
+	return (x > y) ? x : y;
+}
+
 __forceinline int maxmin_i(int x, int y, int z) {
 	return max_i(min_i(x, y), z);
 }
