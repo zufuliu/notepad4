@@ -322,8 +322,6 @@ typedef sptr_t (*SciFnDirect)(sptr_t ptr, unsigned int iMessage, uptr_t wParam, 
 #define SCI_SETWHITESPACEBACK 2085
 #define SCI_SETWHITESPACESIZE 2086
 #define SCI_GETWHITESPACESIZE 2087
-#define SCI_SETSTYLEBITS 2090
-#define SCI_GETSTYLEBITS 2091
 #define SCI_SETLINESTATE 2092
 #define SCI_GETLINESTATE 2093
 #define SCI_GETMAXLINESTATE 2094
@@ -990,7 +988,6 @@ typedef sptr_t (*SciFnDirect)(sptr_t ptr, unsigned int iMessage, uptr_t wParam, 
 #define SCI_GETPROPERTY 4008
 #define SCI_GETPROPERTYEXPANDED 4009
 #define SCI_GETPROPERTYINT 4010
-#define SCI_GETSTYLEBITSNEEDED 4011
 #define SCI_GETLEXERLANGUAGE 4012
 #define SCI_PRIVATELEXERCALL 4013
 #define SCI_PROPERTYNAMES 4014

@@ -6975,12 +6975,15 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 		vs.ResetDefaultStyle();
 		InvalidateStyleRedraw();
 		break;
+
+#ifdef INCLUDE_DEPRECATED_FEATURES
 	case SCI_SETSTYLEBITS:
 		vs.EnsureStyle(0xff);
 		break;
 
 	case SCI_GETSTYLEBITS:
 		return 8;
+#endif
 
 	case SCI_SETLINESTATE:
 		return pdoc->SetLineState(static_cast<int>(wParam), static_cast<int>(lParam));
