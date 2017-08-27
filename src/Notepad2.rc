@@ -364,6 +364,7 @@ BEGIN
         BEGIN
             MENUITEM "&Default\tCtrl+Shift+F",  IDM_VIEW_TOGGLEFOLDS
             MENUITEM "&All",                    IDM_VIEW_FOLD_ALL
+            MENUITEM "&Current",                IDM_VIEW_FOLD_CURRENT
             MENUITEM "Level &1\tAlt+1",         IDM_VIEW_FOLD_LEVEL1
             MENUITEM "Level &2\tAlt+2",         IDM_VIEW_FOLD_LEVEL2
             MENUITEM "Level &3\tAlt+3",         IDM_VIEW_FOLD_LEVEL3

@@ -96,7 +96,8 @@ void FoldToggleLevel(int lev, FOLD_ACTION action) {
 		int level = SciCall_GetFoldLevel(line);
 		if (level & SC_FOLDLEVELHEADERFLAG) {
 			level -= SC_FOLDLEVELBASE;
-			if (lev == ((level & SC_FOLDLEVELNUMBERMASK))) {
+			level &= SC_FOLDLEVELNUMBERMASK;
+			if (lev == level) {
 				if (action == FOLD_ACTION_SNIFF) {
 					action = SciCall_GetFoldExpanded(line) ? FOLD_ACTION_FOLD : FOLD_ACTION_EXPAND;
 				}
@@ -113,6 +114,42 @@ void FoldToggleLevel(int lev, FOLD_ACTION action) {
 	} else {
 		stateToggleFoldLevel &= ~(1 << lev);
 	}
+	if (fToggled) {
+		SciCall_SetXCaretPolicy(CARET_SLOP | CARET_STRICT | CARET_EVEN, 50);
+		SciCall_SetYCaretPolicy(CARET_SLOP | CARET_STRICT | CARET_EVEN, 5);
+		SciCall_ScrollCaret();
+		SciCall_SetXCaretPolicy(CARET_SLOP | CARET_EVEN, 50);
+		SciCall_SetYCaretPolicy(CARET_EVEN, 0);
+	}
+}
+
+void FoldToggleCurrent(FOLD_ACTION action) {
+	BOOL fToggled = FALSE;
+	int line = SciCall_LineFromPosition(SciCall_GetCurrentPos());
+	int level = SciCall_GetFoldLevel(line);
+	int lev = level - SC_FOLDLEVELBASE;
+	lev &= SC_FOLDLEVELNUMBERMASK;
+	if (!(level & SC_FOLDLEVELHEADERFLAG)) {
+		lev -= 1;
+	}
+
+	for (; line >= 0; --line) {
+		level = SciCall_GetFoldLevel(line);
+		if (level & SC_FOLDLEVELHEADERFLAG) {
+			level -= SC_FOLDLEVELBASE;
+			level &= SC_FOLDLEVELNUMBERMASK;
+			if (lev == level) {
+				if (action == FOLD_ACTION_SNIFF) {
+					action = SciCall_GetFoldExpanded(line) ? FOLD_ACTION_FOLD : FOLD_ACTION_EXPAND;
+				}
+				if (FoldToggleNode(line, action)) {
+					fToggled = TRUE;
+				}
+				break;
+			}
+		}
+	}
+
 	if (fToggled) {
 		SciCall_SetXCaretPolicy(CARET_SLOP | CARET_STRICT | CARET_EVEN, 50);
 		SciCall_SetYCaretPolicy(CARET_SLOP | CARET_STRICT | CARET_EVEN, 5);
@@ -190,12 +227,12 @@ void FoldPerformAction(int ln, int mode, FOLD_ACTION action) {
 
 		for (; ln < lnTotal; ++ln) {
 			int lv = SciCall_GetFoldLevel(ln);
-			BOOL fHeader = lv & SC_FOLDLEVELHEADERFLAG;
+			BOOL fHeader = (lv & SC_FOLDLEVELHEADERFLAG) != 0;
 			lv &= SC_FOLDLEVELNUMBERMASK;
 
 			if (lv < lvStop || (lv == lvStop && fHeader && ln != lnNode)) {
 				return;
-			} else if (fHeader && (lv == lvNode || (lv > lvNode && mode & FOLD_CHILDREN))) {
+			} else if (fHeader && (lv == lvNode || (lv > lvNode && (mode & FOLD_CHILDREN)))) {
 				FoldToggleNode(ln, action);
 			}
 		}
@@ -250,14 +287,14 @@ void FoldAltArrow(int key, int mode) {
 		if (key == SCK_DOWN && !(mode & SCMOD_CTRL)) {
 			int lnTotal = SciCall_GetLineCount();
 			for (ln = ln + 1; ln < lnTotal; ++ln) {
-				if (SciCall_GetFoldLevel(ln) & SC_FOLDLEVELHEADERFLAG && SciCall_GetLineVisible(ln)) {
+				if ((SciCall_GetFoldLevel(ln) & SC_FOLDLEVELHEADERFLAG) && SciCall_GetLineVisible(ln)) {
 					EditJumpTo(hwndEdit, ln + 1, 0);
 					return;
 				}
 			}
 		} else if (key == SCK_UP && !(mode & SCMOD_CTRL)) {// Jump to the previous visible fold point
 			for (ln = ln - 1; ln >= 0; --ln) {
-				if (SciCall_GetFoldLevel(ln) & SC_FOLDLEVELHEADERFLAG && SciCall_GetLineVisible(ln)) {
+				if ((SciCall_GetFoldLevel(ln) & SC_FOLDLEVELHEADERFLAG) && SciCall_GetLineVisible(ln)) {
 					EditJumpTo(hwndEdit, ln + 1, 0);
 					return;
 				}

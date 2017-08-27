@@ -3820,6 +3820,12 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		}
 		break;
 
+	case IDM_VIEW_FOLD_CURRENT:
+		if (bShowCodeFolding) {
+			FoldToggleCurrent(FOLD_ACTION_SNIFF);
+		}
+		break;
+
 	case IDM_VIEW_FOLD_LEVEL1:
 	case IDM_VIEW_FOLD_LEVEL2:
 	case IDM_VIEW_FOLD_LEVEL3:
@@ -3831,7 +3837,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case IDM_VIEW_FOLD_LEVEL9:
 	case IDM_VIEW_FOLD_LEVEL10:
 		if (bShowCodeFolding) {
-			FoldToggleLevel(LOWORD(wParam) - IDM_VIEW_FOLD_ALL - 1, FOLD_ACTION_SNIFF);
+			FoldToggleLevel(LOWORD(wParam) - IDM_VIEW_FOLD_LEVEL1, FOLD_ACTION_SNIFF);
 		}
 		break;
 
