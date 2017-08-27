@@ -6731,6 +6731,7 @@ BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect, LPCWST
 			lstrcpy(szTitleExcerpt, L"");
 		}
 		if (!lexerSpecified) { // flagLexerSpecified will be cleared
+			np2LexLangIndex = 0;
 			Style_SetLexerFromFile(hwndEdit, szCurFile);
 		}
 		UpdateLineNumberWidth();

@@ -477,6 +477,7 @@ void Style_SetLexer(HWND hwnd, PEDITLEXER pLexNew) {
 
 	// Select default if NULL is specified
 	if (!pLexNew) {
+		np2LexLangIndex = 0;
 		pLexNew = pLexArray[iDefaultLexer];
 	}
 
