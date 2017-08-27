@@ -912,6 +912,7 @@ void Style_SetLexer(HWND hwnd, PEDITLEXER pLexNew) {
 
 	// Save current lexer
 	pLexCurrent = pLexNew;
+	UpdateStatusBarWidth();
 }
 
 //=============================================================================
@@ -3380,6 +3381,7 @@ INT_PTR CALLBACK Style_SelectLexerDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, L
 				np2LexLangIndex = 0;
 				iDefaultLexer = iInternalDefault;
 				bAutoSelect = (IsDlgButtonChecked(hwnd, IDC_AUTOSELECT) == BST_CHECKED) ? 1 : 0;
+				UpdateStatusBarWidth();
 				EndDialog(hwnd, IDOK);
 			}
 		}

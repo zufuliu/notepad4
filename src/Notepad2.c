@@ -1837,9 +1837,6 @@ void MsgSize(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	int x, y, cx, cy;
 	HDWP hdwp;
 
-	// Statusbar
-	int aWidth[6];
-
 	if (wParam == SIZE_MINIMIZED) {
 		return;
 	}
@@ -1886,22 +1883,34 @@ void MsgSize(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	EndDeferWindowPos(hdwp);
 
 	// Statusbar width
-#if BOOKMARK_EDITION
-	aWidth[0] = (int)max(120, min(cx * 0.4f, StatusCalcPaneWidth(hwndStatus,
-								  L"Ln 9,999,999/9,999,999  Col 9,999/,999  Ch 9,999/,999  Sel 9,999/,999  SelLn 9,999,999  Fnd 9,999")));
-#else
-	aWidth[0] = (int)max(120, min(cx * 0.4f, StatusCalcPaneWidth(hwndStatus,
-								  L"Ln 9,999,999/9,999,999  Col 9,999/9,999  Sel 9,999,999")));
-#endif
-	aWidth[1] = aWidth[0] + StatusCalcPaneWidth(hwndStatus, L"9,999,999 Bytes");
-	aWidth[2] = aWidth[1] + StatusCalcPaneWidth(hwndStatus, L"UTF-16 LE BOM");
-	aWidth[3] = aWidth[2] + StatusCalcPaneWidth(hwndStatus, L"CR+LF");
-	aWidth[4] = aWidth[3] + StatusCalcPaneWidth(hwndStatus, L"OVR");
+	UpdateStatusBarWidth();
+}
+
+void UpdateStatusBarWidth(void) {
+	WCHAR tchLexerName[128];
+	int cx;
+	RECT rc;
+	int aWidth[6];
+
+	GetClientRect(hwndMain, &rc);
+	cx = rc.right - rc.left;
+
+	Style_GetCurrentLexerName(tchLexerName, COUNTOF(tchLexerName));
+
+	aWidth[1] = StatusCalcPaneWidth(hwndStatus, L"9,999,999 Bytes");
+	aWidth[2] = StatusCalcPaneWidth(hwndStatus, L"UTF-16 LE BOM");
+	aWidth[3] = StatusCalcPaneWidth(hwndStatus, L"CR+LF");
+	aWidth[4] = StatusCalcPaneWidth(hwndStatus, L"OVR");
+	aWidth[5] = StatusCalcPaneWidth(hwndStatus, tchLexerName) + 32;
+
+	aWidth[0] = max_i(120, cx - (aWidth[1] + aWidth[2] + aWidth[3] + aWidth[4] + aWidth[5]));
+	aWidth[1] += aWidth[0];
+	aWidth[2] += aWidth[1];
+	aWidth[3] += aWidth[2];
+	aWidth[4] += aWidth[3];
 	aWidth[5] = -1;
 
 	SendMessage(hwndStatus, SB_SETPARTS, COUNTOF(aWidth), (LPARAM)aWidth);
-
-	//UpdateStatusbar();
 }
 
 //=============================================================================

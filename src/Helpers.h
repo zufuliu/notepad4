@@ -24,6 +24,22 @@
 #define COUNTOF(ar)		(sizeof(ar)/sizeof(ar[0]))
 #define CSTRLEN(s)		(COUNTOF(s)-1)
 
+__forceinline int min_i(int x, int y) {
+	return (x < y) ? x : y;
+}
+
+__forceinline int max_i(int x, int y) {
+	return (x > y) ? x : y;
+}
+
+__forceinline int maxmin_i(int x, int y, int z) {
+	return max_i(min_i(x, y), z);
+}
+
+__forceinline int minmax_i(int x, int y, int z) {
+	return min_i(max_i(x, y), z);
+}
+
 #ifdef NDEBUG
 #if defined(_MSC_VER) && _MSC_VER < 1600
 static __inline void DLog(const char *fmt, ...) {
