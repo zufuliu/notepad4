@@ -63,11 +63,11 @@ typedef struct np2params {
 
 //==== Statusbar ==============================================================
 #define STATUS_DOCPOS		0
-#define STATUS_DOCSIZE		1
+#define STATUS_LEXER		1
 #define STATUS_CODEPAGE		2
 #define STATUS_EOLMODE		3
 #define STATUS_OVRMODE		4
-#define STATUS_LEXER		5
+#define STATUS_DOCSIZE		5
 #define STATUS_HELP			255
 
 //==== Change Notifications ===================================================

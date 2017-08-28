@@ -1895,13 +1895,14 @@ void UpdateStatusBarWidth(void) {
 	GetClientRect(hwndMain, &rc);
 	cx = rc.right - rc.left;
 
+	Encoding_GetLabel(iEncoding);
 	Style_GetCurrentLexerName(tchLexerName, COUNTOF(tchLexerName));
 
-	aWidth[1] = StatusCalcPaneWidth(hwndStatus, L"9,999,999 Bytes");
-	aWidth[2] = StatusCalcPaneWidth(hwndStatus, L"UTF-16 LE BOM");
+	aWidth[1] = StatusCalcPaneWidth(hwndStatus, tchLexerName) + 4;
+	aWidth[2] = StatusCalcPaneWidth(hwndStatus, mEncoding[iEncoding].wchLabel) + 4;
 	aWidth[3] = StatusCalcPaneWidth(hwndStatus, L"CR+LF");
 	aWidth[4] = StatusCalcPaneWidth(hwndStatus, L"OVR");
-	aWidth[5] = StatusCalcPaneWidth(hwndStatus, tchLexerName) + 32;
+	aWidth[5] = StatusCalcPaneWidth(hwndStatus, L"9,999,999 Bytes");
 
 	aWidth[0] = max_i(120, cx - (aWidth[1] + aWidth[2] + aWidth[3] + aWidth[4] + aWidth[5]));
 	aWidth[1] += aWidth[0];
@@ -2633,6 +2634,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			}
 
 			UpdateToolbar();
+			UpdateStatusBarWidth();
 			UpdateStatusbar();
 
 			SetWindowTitle(hwnd, uidsAppTitle, fIsElevated, IDS_UNTITLED, szCurFile,
@@ -6530,11 +6532,11 @@ void UpdateStatusbar(void) {
 	Style_GetCurrentLexerName(tchLexerName, COUNTOF(tchLexerName));
 
 	StatusSetText(hwndStatus, STATUS_DOCPOS, tchDocPos);
-	StatusSetText(hwndStatus, STATUS_DOCSIZE, tchDocSize);
+	StatusSetText(hwndStatus, STATUS_LEXER, tchLexerName);
 	StatusSetText(hwndStatus, STATUS_CODEPAGE, mEncoding[iEncoding].wchLabel);
 	StatusSetText(hwndStatus, STATUS_EOLMODE, tchEOLMode);
 	StatusSetText(hwndStatus, STATUS_OVRMODE, tchOvrMode);
-	StatusSetText(hwndStatus, STATUS_LEXER, tchLexerName);
+	StatusSetText(hwndStatus, STATUS_DOCSIZE, tchDocSize);
 
 	//InvalidateRect(hwndStatus, NULL, TRUE);
 }

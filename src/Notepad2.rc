@@ -748,7 +748,7 @@ BEGIN
     CONTROL         "",IDC_NEW_PAGE_LINK,"SysLink",WS_TABSTOP,45,48,200,10
     LTEXT           "Visit Notepad2-mod's website:",IDC_STATIC,45,60,140,8
     LTEXT           "",IDC_MOD_PAGE_TEXT,45,68,140,8,NOT WS_VISIBLE | WS_DISABLED
-    CONTROL         "",IDC_MOD_PAGE_LINK,"SysLink",WS_TABSTOP,45,68,140,10
+    CONTROL         "",IDC_MOD_PAGE_LINK,"SysLink",WS_TABSTOP,45,68,144,10
     LTEXT           "Visit Scintilla's website:",IDC_STATIC,45,80,140,8
     LTEXT           "",IDC_SCI_PAGE_TEXT,45,88,140,8,NOT WS_VISIBLE | WS_DISABLED
     CONTROL         "",IDC_SCI_PAGE_LINK,"SysLink",WS_TABSTOP,45,88,140,10
@@ -1480,9 +1480,9 @@ BEGIN
     IDS_TITLEEXCERPT        """%s"""
     IDS_READONLY            "(Read Only)"
 //#ifdef BOOKMARK_EDITION
-    IDS_DOCPOS             "Ln %s/%s Col %s/%s Ch %s/%s Sel %s/%s SelLn %s Fnd %s"
+    IDS_DOCPOS              "Ln %s / %s  Col %s / %s  Ch %s / %s  Sel %s / %s  SelLn %s  Fnd %s"
 //#else
-//    IDS_DOCPOS             "Ln %s/%s Col %s/%s Ch %s/%s Sel %s/%s"
+//    IDS_DOCPOS            "Ln %s / %s  Col %s / %s  Ch %s / %s  Sel %s / %s"
 //#endif
     IDS_DOCSIZE             "%s"
     IDS_LOADFILE            "Loading ""%s""..."
