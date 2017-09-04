@@ -2792,9 +2792,6 @@ void ParseCommandLine(void) {
 				lstrcpy(lp3, lp2);
 				continue;
 			}
-			if (state == 2) {
-				ExtractFirstArgument(lp3, lp1, lp2);
-			}
 		}
 
 		// pathname
@@ -2804,7 +2801,7 @@ void ParseCommandLine(void) {
 			}
 
 			lpPathArg = GlobalAlloc(GPTR, sizeof(WCHAR) * (MAX_PATH + 2));
-			StrCpyN(lpPathArg, lp1, MAX_PATH);
+			StrCpyN(lpPathArg, lp3, MAX_PATH);
 			break;
 		}
 	}

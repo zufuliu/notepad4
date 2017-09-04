@@ -6095,7 +6095,7 @@ void ParseCommandLine(void) {
 				lstrcpy(lp3, lp2);
 				continue;
 			}
-			if (state == 2) {
+			if (state == 2 && flagMultiFileArg == 2) {
 				ExtractFirstArgument(lp3, lp1, lp2);
 			}
 		}
@@ -6109,11 +6109,11 @@ void ParseCommandLine(void) {
 			}
 
 			lpFileArg = GlobalAlloc(GPTR, sizeof(WCHAR) * (MAX_PATH + 2)); // changed for ActivatePrevInst() needs
-			if (flagMultiFileArg == 1) {
-				// single file argument without quoted spaces
-				StrCpyN(lpFileArg, lp3, MAX_PATH);
-			} else {
+			if (flagMultiFileArg == 2) {
+				// multiple file arguments with quoted spaces
 				StrCpyN(lpFileArg, lp1, MAX_PATH);
+			} else {
+				StrCpyN(lpFileArg, lp3, MAX_PATH);
 			}
 
 			PathFixBackslashes(lpFileArg);
