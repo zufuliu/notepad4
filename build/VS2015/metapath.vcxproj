@@ -216,7 +216,6 @@
     <None Include="..\..\metapath\src\metapath.ver" />
     <None Include="..\..\metapath\res\Folder.ico" />
     <None Include="..\..\metapath\res\Goto.ico" />
-    <None Include="..\..\metapath\res\Hover.cur" />
     <None Include="..\..\metapath\res\Items.ico" />
     <None Include="..\..\metapath\res\Open.bmp" />
     <None Include="..\..\metapath\res\Options.ico" />

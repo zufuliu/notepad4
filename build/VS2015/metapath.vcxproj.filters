@@ -74,9 +74,6 @@
     <None Include="..\..\metapath\res\Goto.ico">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="..\..\metapath\res\Hover.cur">
-      <Filter>Resource Files</Filter>
-    </None>
     <None Include="..\..\metapath\res\Items.ico">
       <Filter>Resource Files</Filter>
     </None>
