@@ -1386,10 +1386,6 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 #define SetCallTipsWaitTime() \
 	SendMessage(hwndEdit, SCI_SETMOUSEDWELLTIME, bShowCallTips? iCallTipsWaitTime : SC_TIME_FOREVER, 0);
 
-__forceinline BOOL IsEmptySelection(HWND hwnd) {
-	return SendMessage(hwnd, SCI_GETSELECTIONEND, 0, 0) == SendMessage(hwnd, SCI_GETSELECTIONSTART, 0, 0);
-}
-
 LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	HINSTANCE hInstance = ((LPCREATESTRUCT)lParam)->hInstance;
 
@@ -1979,7 +1975,7 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	EnableCmd(hmenu, IDM_EDIT_UNDO, SendMessage(hwndEdit, SCI_CANUNDO, 0, 0) /*&& !bReadOnly*/);
 	EnableCmd(hmenu, IDM_EDIT_REDO, SendMessage(hwndEdit, SCI_CANREDO, 0, 0) /*&& !bReadOnly*/);
 
-	i  = !IsEmptySelection(hwndEdit);
+	i  = !EditIsEmptySelection();
 	i2 = (int)SendMessage(hwndEdit, SCI_CANPASTE, 0, 0);
 
 	EnableCmd(hmenu, IDM_EDIT_CUT, i /*&& !bReadOnly*/);
@@ -4389,7 +4385,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		WideCharToMultiByte(cp, 0, wchFind, -1, efrTS.szFind, COUNTOF(efrTS.szFind), NULL, NULL);
 		WideCharToMultiByte(cp, 0, wchReplace, -1, efrTS.szReplace, COUNTOF(efrTS.szReplace), NULL, NULL);
 
-		if (!IsEmptySelection(hwndEdit)) {
+		if (!EditIsEmptySelection()) {
 			EditReplaceAllInSelection(hwndEdit, &efrTS, TRUE);
 		} else {
 			EditReplaceAll(hwndEdit, &efrTS, TRUE);

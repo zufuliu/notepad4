@@ -67,10 +67,6 @@ extern	NP2ENCODING mEncoding[];
 extern LPMRULIST mruFind;
 extern LPMRULIST mruReplace;
 
-__forceinline BOOL IsEmptySelection(HWND hwnd) {
-	return SendMessage(hwnd, SCI_GETSELECTIONEND, 0, 0) == SendMessage(hwnd, SCI_GETSELECTIONSTART, 0, 0);
-}
-
 //=============================================================================
 //
 // EditCreate()
@@ -1232,7 +1228,7 @@ void EditURLDecode(HWND hwnd) {
 // EditEscapeCChars()
 //
 void EditEscapeCChars(HWND hwnd) {
-	if (!IsEmptySelection(hwnd)) {
+	if (!EditIsEmptySelection()) {
 		if (SC_SEL_RECTANGLE != SendMessage(hwnd, SCI_GETSELECTIONMODE, 0, 0)) {
 			EDITFINDREPLACE efr = {
 				.hwnd = hwnd,
@@ -1264,7 +1260,7 @@ void EditEscapeCChars(HWND hwnd) {
 // EditUnescapeCChars()
 //
 void EditUnescapeCChars(HWND hwnd) {
-	if (!IsEmptySelection(hwnd)) {
+	if (!EditIsEmptySelection()) {
 		if (SC_SEL_RECTANGLE != SendMessage(hwnd, SCI_GETSELECTIONMODE, 0, 0)) {
 			EDITFINDREPLACE efr = {
 				.hwnd = hwnd,
@@ -1305,7 +1301,7 @@ void EditUnescapeCChars(HWND hwnd) {
 // EditEscapeXHTMLChars()
 //
 void EditEscapeXHTMLChars(HWND hwnd) {
-	if (!IsEmptySelection(hwnd)) {
+	if (!EditIsEmptySelection()) {
 		if (SC_SEL_RECTANGLE != SendMessage(hwnd, SCI_GETSELECTIONMODE, 0, 0)) {
 			EDITFINDREPLACE efr = {
 				.hwnd = hwnd,
@@ -1355,7 +1351,7 @@ void EditEscapeXHTMLChars(HWND hwnd) {
 // EditUnescapeXHTMLChars()
 //
 void EditUnescapeXHTMLChars(HWND hwnd) {
-	if (!IsEmptySelection(hwnd)) {
+	if (!EditIsEmptySelection()) {
 		if (SC_SEL_RECTANGLE != SendMessage(hwnd, SCI_GETSELECTIONMODE, 0, 0)) {
 			EDITFINDREPLACE efr = {
 				.hwnd = hwnd,
@@ -3282,7 +3278,7 @@ void EditStripLastCharacter(HWND hwnd) {
 //
 void EditStripTrailingBlanks(HWND hwnd, BOOL bIgnoreSelection) {
 	// Check if there is any selection... simply use a regular expression replace!
-	if (!bIgnoreSelection && !IsEmptySelection(hwnd)) {
+	if (!bIgnoreSelection && !EditIsEmptySelection()) {
 		if (SC_SEL_RECTANGLE != SendMessage(hwnd, SCI_GETSELECTIONMODE, 0, 0)) {
 			EDITFINDREPLACE efrTrim = {
 				.szFind = "[ \t]+$",
@@ -3326,7 +3322,7 @@ void EditStripTrailingBlanks(HWND hwnd, BOOL bIgnoreSelection) {
 //
 void EditStripLeadingBlanks(HWND hwnd, BOOL bIgnoreSelection) {
 	// Check if there is any selection... simply use a regular expression replace!
-	if (!bIgnoreSelection && !IsEmptySelection(hwnd)) {
+	if (!bIgnoreSelection && !EditIsEmptySelection()) {
 		if (SC_SEL_RECTANGLE != SendMessage(hwnd, SCI_GETSELECTIONMODE, 0, 0)) {
 			EDITFINDREPLACE efrTrim = {
 				.szFind = "^[ \t]+",

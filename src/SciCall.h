@@ -33,119 +33,216 @@ __forceinline void InitScintillaHandle(HWND hwnd) {
 //
 //
 LRESULT WINAPI Scintilla_DirectFunction(HANDLE, UINT, WPARAM, LPARAM);
-#define SciCall(m, w, l) Scintilla_DirectFunction(g_hScintilla, m, w, l)
-
-//=============================================================================
-//
-// DeclareSciCall[RV][0-2] Macros
-//
-// R: With an explicit return type
-// V: No return type defined ("void"); defaults to SendMessage's LRESULT
-// 0-2: Number of parameters to define
-//
-//
-#define DeclareSciCallR0(ret, fn, msg)				\
-	__forceinline ret SciCall_##fn() {				\
-		return((ret)SciCall(SCI_##msg, 0, 0));		\
-	}
-#define DeclareSciCallR1(ret, fn, msg, type1, var1)				\
-	__forceinline ret SciCall_##fn(type1 var1) {				\
-		return((ret)SciCall(SCI_##msg, (WPARAM)(var1), 0));		\
-	}
-#define DeclareSciCallR2(ret, fn, msg, type1, var1, type2, var2)			\
-	__forceinline ret SciCall_##fn(type1 var1, type2 var2) {				\
-		return((ret)SciCall(SCI_##msg, (WPARAM)(var1), (LPARAM)(var2)));	\
-	}
-#define DeclareSciCallV0(fn, msg)				\
-	__forceinline LRESULT SciCall_##fn() {		\
-		return(SciCall(SCI_##msg, 0, 0));		\
-	}
-#define DeclareSciCallV1(fn, msg, type1, var1)				\
-	__forceinline LRESULT SciCall_##fn(type1 var1) {		\
-		return(SciCall(SCI_##msg, (WPARAM)(var1), 0));		\
-	}
-#define DeclareSciCallV2(fn, msg, type1, var1, type2, var2)				\
-	__forceinline LRESULT SciCall_##fn(type1 var1, type2 var2) {		\
-		return(SciCall(SCI_##msg, (WPARAM)(var1), (LPARAM)(var2)));		\
-	}
+#define SciCall0(m)			Scintilla_DirectFunction(g_hScintilla, m, 0, 0)
+#define SciCall1(m, w)		Scintilla_DirectFunction(g_hScintilla, m, (WPARAM)w, 0)
+#define SciCall2(m, w, l)	Scintilla_DirectFunction(g_hScintilla, m, (WPARAM)w, (LPARAM)l)
 
 //=============================================================================
 //
 //  Selection and information
 //
 //
-DeclareSciCallR0(int, GetLineCount, GETLINECOUNT)
-DeclareSciCallV2(SetSel, SETSEL, Sci_Position, anchorPos, Sci_Position, currentPos)
-DeclareSciCallV1(GotoPos, GOTOPOS, Sci_Position, position)
-DeclareSciCallV1(GotoLine, GOTOLINE, int, line)
-DeclareSciCallR0(Sci_Position, GetCurrentPos, GETCURRENTPOS)
-DeclareSciCallR1(int, GetColumn, GETCOLUMN, Sci_Position, position)
-DeclareSciCallR1(int, LineFromPosition, LINEFROMPOSITION, Sci_Position, position)
-DeclareSciCallR1(Sci_Position, PositionFromLine, POSITIONFROMLINE, int, position)
-DeclareSciCallR1(int, GetCharAt, GETCHARAT, Sci_Position, position)
-DeclareSciCallR2(int, GetLine, GETLINE, int, line, char *, buffer)
-DeclareSciCallR0(Sci_Position, GetSelectionStart, GETSELECTIONSTART)
-DeclareSciCallR0(Sci_Position, GetSelectionEnd, GETSELECTIONEND)
+__forceinline int SciCall_GetLength(void) {
+	return (int)SciCall0(SCI_GETLENGTH);
+}
+
+__forceinline int SciCall_GetLineCount(void) {
+	return (int)SciCall0(SCI_GETLINECOUNT);
+}
+
+__forceinline void SciCall_SetSel(Sci_Position anchor, Sci_Position caret) {
+	SciCall2(SCI_SETSEL, anchor, caret);
+}
+
+__forceinline void SciCall_GotoPos(Sci_Position caret) {
+	SciCall1(SCI_GOTOPOS, caret);
+}
+
+__forceinline void SciCall_GotoLine(int line) {
+	SciCall1(SCI_GOTOLINE, line);
+}
+
+__forceinline Sci_Position SciCall_GetCurrentPos(void) {
+	return (Sci_Position)SciCall0(SCI_GETCURRENTPOS);
+}
+
+__forceinline int SciCall_GetColumn(Sci_Position position) {
+	return (int)SciCall1(SCI_GETCOLUMN, position);
+}
+
+__forceinline int SciCall_LineFromPosition(Sci_Position position) {
+	return (int)SciCall1(SCI_LINEFROMPOSITION, position);
+}
+
+__forceinline Sci_Position SciCall_PositionFromLine(int line) {
+	return (Sci_Position)SciCall1(SCI_POSITIONFROMLINE, line);
+}
+
+__forceinline int SciCall_GetCharAt(Sci_Position position) {
+	return (int)SciCall1(SCI_GETCHARAT, position);
+}
+
+__forceinline int SciCall_GetLineLength(int line) {
+	return (int)SciCall1(SCI_GETLINE, line);
+}
+
+__forceinline int SciCall_GetLine(int line, char *buffer) {
+	return (int)SciCall2(SCI_GETLINE, line, buffer);
+}
+
+__forceinline int SciCall_GetSelTextLength(void) {
+	return (int)SciCall0(SCI_GETSELTEXT);
+}
+
+__forceinline int SciCall_GetSelText(char *buffer) {
+	return (int)SciCall2(SCI_GETSELTEXT, 0, buffer);
+}
+
+__forceinline int SciCall_CountCharacters(Sci_Position start, Sci_Position end) {
+	return (int)SciCall2(SCI_COUNTCHARACTERS, start, end);
+}
+
+__forceinline Sci_Position SciCall_GetSelectionStart(void) {
+	return (Sci_Position)SciCall0(SCI_GETSELECTIONSTART);
+}
+
+__forceinline Sci_Position SciCall_GetSelectionEnd(void) {
+	return (Sci_Position)SciCall0(SCI_GETSELECTIONEND);
+}
+
+__forceinline int SciCall_GetSelectionMode(void) {
+	return (int)SciCall0(SCI_GETSELECTIONMODE);
+}
+
+__forceinline BOOL EditIsEmptySelection(void) {
+	return SciCall_GetSelectionStart() == SciCall_GetSelectionEnd();
+}
 
 //=============================================================================
 //
 //  Scrolling and automatic scrolling
 //
 //
-DeclareSciCallV0(ScrollCaret, SCROLLCARET)
-DeclareSciCallV2(SetXCaretPolicy, SETXCARETPOLICY, int, caretPolicy, int, caretSlop)
-DeclareSciCallV2(SetYCaretPolicy, SETYCARETPOLICY, int, caretPolicy, int, caretSlop)
+__forceinline void SciCall_ScrollCaret(void) {
+	SciCall0(SCI_SCROLLCARET);
+}
+
+__forceinline void SciCall_SetXCaretPolicy(int caretPolicy, int caretSlop) {
+	SciCall2(SCI_SETXCARETPOLICY, caretPolicy, caretSlop);
+}
+
+__forceinline void SciCall_SetYCaretPolicy(int caretPolicy, int caretSlop) {
+	SciCall2(SCI_SETYCARETPOLICY, caretPolicy, caretSlop);
+}
 
 //=============================================================================
 //
 //  Style definition
 //
 //
-DeclareSciCallR1(int, GetStyleAt, GETSTYLEAT, Sci_Position, position)
-DeclareSciCallR1(COLORREF, StyleGetFore, STYLEGETFORE, int, styleNumber)
-DeclareSciCallR1(COLORREF, StyleGetBack, STYLEGETBACK, int, styleNumber)
+__forceinline int SciCall_GetStyleAt(Sci_Position position) {
+	return (int)SciCall1(SCI_GETSTYLEAT, position);
+}
+
+__forceinline COLORREF SciCall_StyleGetFore(int style) {
+	return (COLORREF)SciCall1(SCI_STYLEGETFORE, style);
+}
+
+__forceinline COLORREF SciCall_StyleGetBack(int style) {
+	return (COLORREF)SciCall1(SCI_STYLEGETBACK, style);
+}
 
 //=============================================================================
 //
 //  Margins
 //
 //
-DeclareSciCallV2(SetMarginType, SETMARGINTYPEN, int, margin, int, type)
-DeclareSciCallV2(SetMarginWidth, SETMARGINWIDTHN, int, margin, int, pixelWidth)
-DeclareSciCallV2(SetMarginMask, SETMARGINMASKN, int, margin, int, mask)
-DeclareSciCallV2(SetMarginSensitive, SETMARGINSENSITIVEN, int, margin, BOOL, sensitive)
-DeclareSciCallV2(SetFoldMarginColour, SETFOLDMARGINCOLOUR, BOOL, useSetting, COLORREF, colour)
-DeclareSciCallV2(SetFoldMarginHiColour, SETFOLDMARGINHICOLOUR, BOOL, useSetting, COLORREF, colour)
+__forceinline void SciCall_SetMarginType(int margin, int marginType) {
+	SciCall2(SCI_SETMARGINTYPEN, margin, marginType);
+}
+
+__forceinline void SciCall_SetMarginWidth(int margin, int pixelWidth) {
+	SciCall2(SCI_SETMARGINWIDTHN, margin, pixelWidth);
+}
+
+__forceinline void SciCall_SetMarginMask(int margin, int mask) {
+	SciCall2(SCI_SETMARGINMASKN, margin, mask);
+}
+
+__forceinline void SciCall_SetMarginSensitive(int margin, BOOL sensitive) {
+	SciCall2(SCI_SETMARGINSENSITIVEN, margin, sensitive);
+}
+
+__forceinline void SciCall_SetFoldMarginColour(BOOL useSetting, COLORREF back) {
+	SciCall2(SCI_SETFOLDMARGINCOLOUR, useSetting, back);
+}
+
+__forceinline void SciCall_SetFoldMarginHiColour(BOOL useSetting, COLORREF fore) {
+	SciCall2(SCI_SETFOLDMARGINHICOLOUR, useSetting, fore);
+}
 
 //=============================================================================
 //
 //  Markers
 //
 //
-DeclareSciCallV2(MarkerDefine, MARKERDEFINE, int, markerNumber, int, markerSymbols)
-DeclareSciCallV2(MarkerSetFore, MARKERSETFORE, int, markerNumber, COLORREF, colour)
-DeclareSciCallV2(MarkerSetBack, MARKERSETBACK, int, markerNumber, COLORREF, colour)
-DeclareSciCallV1(MarkerEnableHighlight, MARKERENABLEHIGHLIGHT, BOOL, enabled)
+__forceinline void SciCall_MarkerDefine(int markerNumber, int markerSymbol) {
+	SciCall2(SCI_MARKERDEFINE, markerNumber, markerSymbol);
+}
+
+__forceinline void SciCall_MarkerSetFore(int markerNumber, COLORREF fore) {
+	SciCall2(SCI_MARKERSETFORE, markerNumber, fore);
+}
+
+__forceinline void SciCall_MarkerSetBack(int markerNumber, COLORREF back) {
+	SciCall2(SCI_MARKERSETBACK, markerNumber, back);
+}
+
+__forceinline void SciCall_MarkerEnableHighlight(BOOL enabled) {
+	SciCall1(SCI_MARKERENABLEHIGHLIGHT, enabled);
+}
 
 //=============================================================================
 //
 //  Folding
 //
 //
-DeclareSciCallR1(BOOL, GetLineVisible, GETLINEVISIBLE, int, line)
-DeclareSciCallR1(int, GetFoldLevel, GETFOLDLEVEL, int, line)
-DeclareSciCallV1(SetFoldFlags, SETFOLDFLAGS, int, flags)
-DeclareSciCallR1(int, GetFoldParent, GETFOLDPARENT, int, line)
-DeclareSciCallR1(int, GetFoldExpanded, GETFOLDEXPANDED, int, line)
-DeclareSciCallV1(ToggleFold, TOGGLEFOLD, int, line)
-DeclareSciCallV1(EnsureVisible, ENSUREVISIBLE, int, line)
+__forceinline BOOL SciCall_GetLineVisible(int line) {
+	return (BOOL)SciCall1(SCI_GETLINEVISIBLE, line);
+}
+
+__forceinline int SciCall_GetFoldLevel(int line) {
+	return (int)SciCall1(SCI_GETFOLDLEVEL, line);
+}
+
+__forceinline void SciCall_SetFoldFlags(int flags) {
+	SciCall1(SCI_SETFOLDFLAGS, flags);
+}
+
+__forceinline int SciCall_GetFoldParent(int line) {
+	return (int)SciCall1(SCI_GETFOLDPARENT, line);
+}
+
+__forceinline BOOL SciCall_GetFoldExpanded(int line) {
+	return (BOOL)SciCall1(SCI_GETFOLDEXPANDED, line);
+}
+
+__forceinline void SciCall_ToggleFold(int line) {
+	SciCall1(SCI_TOGGLEFOLD, line);
+}
+
+__forceinline void SciCall_EnsureVisible(int line) {
+	SciCall1(SCI_ENSUREVISIBLE, line);
+}
 
 //=============================================================================
 //
 //  Lexer
 //
 //
-DeclareSciCallV2(SetProperty, SETPROPERTY, const char *, key, const char *, value)
+__forceinline void SciCall_SetProperty(const char *key, const char *value) {
+	SciCall2(SCI_SETPROPERTY, key, value);
+}
 
 #endif // NOTEPAD2_SCICALL_H_
 
