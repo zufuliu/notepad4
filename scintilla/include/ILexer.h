@@ -14,12 +14,6 @@
 namespace Scintilla {
 #endif
 
-#ifdef _WIN32
-	#define SCI_METHOD __stdcall
-#else
-	#define SCI_METHOD
-#endif
-
 enum { dvRelease4=2 };
 
 class IDocument {
@@ -79,14 +73,6 @@ public:
 	virtual const char * SCI_METHOD NameOfStyle(int style) const = 0;
 	virtual const char * SCI_METHOD TagsOfStyle(int style) const = 0;
 	virtual const char * SCI_METHOD DescriptionOfStyle(int style) const = 0;
-};
-
-class ILoader {
-public:
-	virtual int SCI_METHOD Release() = 0;
-	// Returns a status code from SC_STATUS_*
-	virtual int SCI_METHOD AddData(const char *data, Sci_Position length) = 0;
-	virtual void * SCI_METHOD ConvertToDocument() = 0;
 };
 
 #ifdef SCI_NAMESPACE
