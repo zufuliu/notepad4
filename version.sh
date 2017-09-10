@@ -83,9 +83,10 @@ if [[ ! -f "$versionfile" ]] || [[ "$version_info" != "$(<"$versionfile")" ]]; t
   echo "$version_info" > "$versionfile"
 fi
 
-# Update manifest file if it does not exist or if source manifest.conf was changed.
-newmanifest="$(sed -e "s/\\\$WCREV\\\$/${ver}/" "$manifestfile.conf")"
-if [[ ! -f "$manifestfile" ]] || [[ "$newmanifest" != "$(<"$manifestfile")" ]]; then
+# Update manifest file if version information was changed.
+base_ver="4.2.25"
+newmanifest="$(sed -Ee "s/(${base_ver}.)([0-9]+)/\1${ver}/g" "$manifestfile")"
+if [[ "$newmanifest" != "$(<"$manifestfile")" ]]; then
   # Update the revision number in the manifest file
   echo "$newmanifest" > "$manifestfile"
 fi
