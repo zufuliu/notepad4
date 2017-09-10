@@ -5245,10 +5245,7 @@ void LoadSettings(void) {
 	bAlwaysOnTop = IniSectionGetBool(pIniSection, L"AlwaysOnTop", 0);
 	bMinimizeToTray = IniSectionGetBool(pIniSection, L"MinimizeToTray", 0);
 	bTransparentMode = IniSectionGetBool(pIniSection, L"TransparentMode", 0);
-
-	// Check if SetLayeredWindowAttributes() is available
-	bTransparentModeAvailable =
-		(GetProcAddress(GetModuleHandle(L"User32"), "SetLayeredWindowAttributes") != NULL);
+	bTransparentModeAvailable = IsWin2KAndAbove();
 
 	IniSectionGetString(pIniSection, L"ToolbarButtons", L"", tchToolbarButtons, COUNTOF(tchToolbarButtons));
 

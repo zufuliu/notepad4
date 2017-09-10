@@ -161,60 +161,17 @@ DWORD WINAPI GetModuleFileNameExW(HANDLE, HMODULE, LPTSTR, DWORD);
 BOOL WINAPI EnumProcessModules(HANDLE, HMODULE *, DWORD, LPDWORD);
 
 BOOL ExeNameFromWnd(HWND hwnd, LPWSTR szExeName, int cchExeName) {
-	//HMODULE hPSAPI;
 	DWORD dwProcessId;
 	HANDLE hProcess;
 	HMODULE hModule;
 	DWORD cbNeeded = 0;
-	//FARPROC fpCreateToolhelp32Snapshot;
-	//FARPROC fpProcess32First;
-	//FARPROC fpProcess32Next;
-	//HANDLE hProcessList;
-	//PROCESSENTRY32 pe;
-	//BOOL bMoreEntries;
-	//BOOL bFoundMatching = FALSE;
 
-	/*if (IsWindowsNT()) {
-		if (hPSAPI = LoadLibrary(L"PSAPI")) {*/
 	GetWindowThreadProcessId(hwnd, &dwProcessId);
 	hProcess = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, dwProcessId);
-	/*GetProcAddress(hPSAPI, "EnumProcessModules")*/
 	EnumProcessModules(hProcess, &hModule, sizeof(HMODULE), &cbNeeded);
-	/*GetProcAddress(hPSAPI, "GetModuleFileNameExW")*/
 	GetModuleFileNameExW(hProcess, hModule, szExeName, cchExeName);
 	CloseHandle(hProcess);
-	//FreeLibrary(hPSAPI);
 	return TRUE;
-	/*} else {
-		return FALSE;
-	}
-	} else {
-		fpCreateToolhelp32Snapshot = GetProcAddress(GetModuleHandle(L"Kernel32"), "CreateToolhelp32Snapshot");
-		fpProcess32First = GetProcAddress(GetModuleHandle(L"Kernel32"), "Process32First");
-		fpProcess32Next = GetProcAddress(GetModuleHandle(L"Kernel32"), "Process32Next");
-
-		if (fpCreateToolhelp32Snapshot) {
-			GetWindowThreadProcessId(hwnd, &dwProcessId);
-			hProcessList = (HANDLE)fpCreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
-			pe.dwSize = sizeof(PROCESSENTRY32);
-			bMoreEntries = fpProcess32First(hProcessList, &pe);
-
-			while (bMoreEntries) {
-				if (pe.th32ProcessID == dwProcessId) {
-					bMoreEntries = FALSE;
-					bFoundMatching = TRUE;
-					lstrcpyn(szExeName, pe.szExeFile, cchExeName);
-				} else {
-					bMoreEntries = fpProcess32Next(hProcessList, &pe);
-				}
-			}
-			CloseHandle(hProcessList);
-			return (bFoundMatching);
-		} else {
-			return FALSE;
-		}
-	}
-	*/
 }
 
 ////=============================================================================
@@ -494,10 +451,8 @@ void DeleteBitmapButton(HWND hwnd, int nCtlId) {
 //  SetWindowTransparentMode()
 //
 void SetWindowTransparentMode(HWND hwnd, BOOL bTransparentMode) {
-	FARPROC fp;
-
 	if (bTransparentMode) {
-		if ((fp = GetProcAddress(GetModuleHandle(L"User32"), "SetLayeredWindowAttributes")) != NULL) {
+		if (IsWin2KAndAbove()) {
 			int  iAlphaPercent;
 			BYTE bAlpha;
 			SetWindowLongPtr(hwnd, GWL_EXSTYLE, GetWindowLongPtr(hwnd, GWL_EXSTYLE) | WS_EX_LAYERED);
@@ -509,7 +464,7 @@ void SetWindowTransparentMode(HWND hwnd, BOOL bTransparentMode) {
 			}
 			bAlpha = (BYTE)(iAlphaPercent * 255 / 100);
 
-			fp(hwnd, 0, bAlpha, LWA_ALPHA);
+			SetLayeredWindowAttributes(hwnd, 0, bAlpha, LWA_ALPHA);
 		}
 	} else {
 		SetWindowLongPtr(hwnd, GWL_EXSTYLE, GetWindowLongPtr(hwnd, GWL_EXSTYLE) & ~WS_EX_LAYERED);

@@ -364,7 +364,8 @@ INT_PTR CALLBACK GotoDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 			}
 		}
 
-		if ((fp = GetProcAddress(GetModuleHandle(L"User32"), "GetComboBoxInfo")) != NULL) {
+		// since Windows Vista
+		if ((fp = GetProcAddress(GetModuleHandle(L"user32.dll"), "GetComboBoxInfo")) != NULL) {
 			COMBOBOXINFO cbi;
 			cbi.cbSize = sizeof(COMBOBOXINFO);
 			if (fp(GetDlgItem(hwnd, IDC_GOTO), &cbi)) {

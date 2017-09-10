@@ -183,8 +183,9 @@ HRESULT PrivateSetCurrentProcessExplicitAppUserModelID(PCWSTR AppID) {
 		return S_OK;
 	}
 
+	// since Windows 7
 	pfnSetCurrentProcessExplicitAppUserModelID =
-		GetProcAddress(GetModuleHandleA("shell32.dll"), "SetCurrentProcessExplicitAppUserModelID");
+		GetProcAddress(GetModuleHandle(L"shell32.dll"), "SetCurrentProcessExplicitAppUserModelID");
 
 	if (pfnSetCurrentProcessExplicitAppUserModelID) {
 		return (HRESULT)pfnSetCurrentProcessExplicitAppUserModelID(AppID);
@@ -455,8 +456,7 @@ BOOL SetWindowTitle(HWND hwnd, UINT uIDAppName, BOOL bIsElevated, UINT uIDUntitl
 //
 void SetWindowTransparentMode(HWND hwnd, BOOL bTransparentMode) {
 	if (bTransparentMode) {
-		FARPROC fp;
-		if ((fp = GetProcAddress(GetModuleHandle(L"User32"), "SetLayeredWindowAttributes")) != NULL) {
+		if (IsWin2KAndAbove()) {
 			int	 iAlphaPercent;
 			BYTE bAlpha;
 			SetWindowLongPtr(hwnd, GWL_EXSTYLE, GetWindowLongPtr(hwnd, GWL_EXSTYLE) | WS_EX_LAYERED);
@@ -468,7 +468,7 @@ void SetWindowTransparentMode(HWND hwnd, BOOL bTransparentMode) {
 			}
 			bAlpha = (BYTE)(iAlphaPercent * 255 / 100);
 
-			fp(hwnd, 0, bAlpha, LWA_ALPHA);
+			SetLayeredWindowAttributes(hwnd, 0, bAlpha, LWA_ALPHA);
 		}
 	} else {
 		SetWindowLongPtr(hwnd, GWL_EXSTYLE, GetWindowLongPtr(hwnd, GWL_EXSTYLE) & ~WS_EX_LAYERED);

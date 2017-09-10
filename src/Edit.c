@@ -3871,7 +3871,6 @@ typedef struct _SORTLINE {
 	WCHAR *pwszSortEntry;
 } SORTLINE;
 
-static FARPROC pfnStrCmpLogicalW;
 typedef int (__stdcall *FNSTRCMP)(LPCWSTR, LPCWSTR);
 
 int CmpStd(const void *s1, const void *s2) {
@@ -3885,9 +3884,9 @@ int CmpStdRev(const void *s1, const void *s2) {
 }
 
 int CmpLogical(const void *s1, const void *s2) {
-	int cmp = (int)pfnStrCmpLogicalW(((SORTLINE *)s1)->pwszSortEntry, ((SORTLINE *)s2)->pwszSortEntry);
+	int cmp = (int)StrCmpLogicalW(((SORTLINE *)s1)->pwszSortEntry, ((SORTLINE *)s2)->pwszSortEntry);
 	if (cmp == 0) {
-		cmp = (int)pfnStrCmpLogicalW(((SORTLINE *)s1)->pwszLine, ((SORTLINE *)s2)->pwszLine);
+		cmp = (int)StrCmpLogicalW(((SORTLINE *)s1)->pwszLine, ((SORTLINE *)s2)->pwszLine);
 	}
 	if (cmp) {
 		return cmp;
@@ -3898,9 +3897,9 @@ int CmpLogical(const void *s1, const void *s2) {
 }
 
 int CmpLogicalRev(const void *s1, const void *s2) {
-	int cmp = -1 * (int)pfnStrCmpLogicalW(((SORTLINE *)s1)->pwszSortEntry, ((SORTLINE *)s2)->pwszSortEntry);
+	int cmp = -1 * (int)StrCmpLogicalW(((SORTLINE *)s1)->pwszSortEntry, ((SORTLINE *)s2)->pwszSortEntry);
 	if (cmp == 0) {
-		cmp = -1 * (int)pfnStrCmpLogicalW(((SORTLINE *)s1)->pwszLine, ((SORTLINE *)s2)->pwszLine);
+		cmp = -1 * (int)StrCmpLogicalW(((SORTLINE *)s1)->pwszLine, ((SORTLINE *)s2)->pwszLine);
 	}
 	if (cmp) {
 		return cmp;
@@ -3941,7 +3940,6 @@ void EditSortLines(HWND hwnd, int iSortFlags) {
 	BOOL bLastDup = FALSE;
 	FNSTRCMP pfnStrCmp;
 
-	pfnStrCmpLogicalW = GetProcAddress(GetModuleHandle(L"shlwapi"), "StrCmpLogicalW");
 	pfnStrCmp = (iSortFlags & SORT_NOCASE) ? StrCmpIW : StrCmpW;
 
 	iCurPos = (int)SendMessage(hwnd, SCI_GETCURRENTPOS, 0, 0);
@@ -4054,7 +4052,7 @@ void EditSortLines(HWND hwnd, int iSortFlags) {
 	}
 
 	if (iSortFlags & SORT_DESCENDING) {
-		if ((iSortFlags & SORT_LOGICAL) && pfnStrCmpLogicalW) {
+		if ((iSortFlags & SORT_LOGICAL) && IsWinXPAndAbove()) {
 			qsort(pLines, iLineCount, sizeof(SORTLINE), CmpLogicalRev);
 		} else {
 			qsort(pLines, iLineCount, sizeof(SORTLINE), CmpStdRev);
@@ -4071,7 +4069,7 @@ void EditSortLines(HWND hwnd, int iSortFlags) {
 			pLines[j].pwszSortEntry = sLine.pwszSortEntry;
 		}
 	} else {
-		if ((iSortFlags & SORT_LOGICAL) && pfnStrCmpLogicalW) {
+		if ((iSortFlags & SORT_LOGICAL) && IsWinXPAndAbove()) {
 			qsort(pLines, iLineCount, sizeof(SORTLINE), CmpLogical);
 		} else {
 			qsort(pLines, iLineCount, sizeof(SORTLINE), CmpStd);
@@ -6135,7 +6133,7 @@ INT_PTR CALLBACK EditSortDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPa
 			CheckDlgButton(hwnd, 106, BST_CHECKED);
 		}
 
-		if (GetProcAddress(GetModuleHandle(L"shlwapi"), "StrCmpLogicalW")) {
+		if (IsWinXPAndAbove()) {
 			if (*piSortFlags & SORT_LOGICAL) {
 				CheckDlgButton(hwnd, 107, BST_CHECKED);
 			}
