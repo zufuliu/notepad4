@@ -6379,13 +6379,12 @@ void UpdateToolbar(void) {
 	EnableTool(IDT_EDIT_UNDO, SendMessage(hwndEdit, SCI_CANUNDO, 0, 0) /*&& !bReadOnly*/);
 	EnableTool(IDT_EDIT_REDO, SendMessage(hwndEdit, SCI_CANREDO, 0, 0) /*&& !bReadOnly*/);
 
-	i = (int)SendMessage(hwndEdit, SCI_GETSELECTIONEND, 0, 0) -
-		(int)SendMessage(hwndEdit, SCI_GETSELECTIONSTART, 0, 0);
+	i = !EditIsEmptySelection();
 	EnableTool(IDT_EDIT_CUT, i /*&& !bReadOnly*/);
-	EnableTool(IDT_EDIT_COPY, SendMessage(hwndEdit, SCI_GETLENGTH, 0, 0));
+	i = (int)SendMessage(hwndEdit, SCI_GETLENGTH, 0, 0);
+	EnableTool(IDT_EDIT_COPY, i);
 	EnableTool(IDT_EDIT_PASTE, SendMessage(hwndEdit, SCI_CANPASTE, 0, 0) /*&& !bReadOnly*/);
 
-	i = (int)SendMessage(hwndEdit, SCI_GETLENGTH, 0, 0);
 	EnableTool(IDT_EDIT_FIND, i);
 	//EnableTool(IDT_EDIT_FINDNEXT, i);
 	//EnableTool(IDT_EDIT_FINDPREV, i && lstrlen(efrData.szFind));

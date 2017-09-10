@@ -2039,7 +2039,7 @@ INT_PTR CALLBACK FindWinDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPar
 	case WM_LBUTTONUP: {
 		WCHAR tch[256];
 
-		SetCursor(LoadCursor(NULL, MAKEINTRESOURCE(IDC_ARROW)));
+		SetCursor(LoadCursor(NULL, IDC_ARROW));
 		SendDlgItemMessage(hwnd, IDC_CROSSCURSOR, STM_SETICON, (WPARAM)hIconCross1, 0);
 		ReleaseCapture();
 		bHasCapture = FALSE;

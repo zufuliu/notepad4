@@ -612,8 +612,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 			break;
 
 		case SC_ABOUT:
-			ThemedDialogBox(g_hInstance, MAKEINTRESOURCE(IDD_ABOUT),
-							hwnd, AboutDlgProc);
+			ThemedDialogBox(g_hInstance, MAKEINTRESOURCE(IDD_ABOUT), hwnd, AboutDlgProc);
 			break;
 
 		default:

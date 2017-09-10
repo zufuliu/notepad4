@@ -2297,7 +2297,7 @@ void EditMoveDown(HWND hwnd) {
 			if (bLastLine) {
 				SendMessage(hwnd, SCI_SETTARGETSTART, (WPARAM)
 							SendMessage(hwnd, SCI_GETLINEENDPOSITION, (WPARAM)
-										SendMessage(hwnd, SCI_GETLINECOUNT, 0, 0) - 2, 0), 0);
+										(SendMessage(hwnd, SCI_GETLINECOUNT, 0, 0) - 2), 0), 0);
 				SendMessage(hwnd, SCI_SETTARGETEND, (WPARAM)
 							SendMessage(hwnd, SCI_GETLENGTH, 0, 0), 0);
 				SendMessage(hwnd, SCI_REPLACETARGET, 0, (LPARAM)"");
@@ -5686,9 +5686,9 @@ INT_PTR CALLBACK EditModifyLinesDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPA
 		lf.lfUnderline = TRUE;
 		hFontHover = CreateFontIndirect(&lf);
 
-		hCursorNormal = LoadCursor(NULL, MAKEINTRESOURCE(IDC_ARROW));
-		if ((hCursorHover = LoadCursor(NULL, MAKEINTRESOURCE(IDC_HAND))) == NULL) {
-			hCursorHover = LoadCursor(g_hInstance, MAKEINTRESOURCE(IDC_ARROW));
+		hCursorNormal = LoadCursor(NULL, IDC_ARROW);
+		if ((hCursorHover = LoadCursor(NULL, IDC_HAND)) == NULL) {
+			hCursorHover = LoadCursor(g_hInstance, IDC_ARROW);
 		}
 
 		pdata = (PMODLINESDATA)lParam;
