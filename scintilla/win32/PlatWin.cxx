@@ -810,7 +810,7 @@ void SurfaceGDI::AlphaRectangle(const PRectangle &rc, int cornerSize, const Colo
 
 			BLENDFUNCTION merge = { AC_SRC_OVER, 0, 255, AC_SRC_ALPHA };
 
-			AlphaBlend(hdc, rcw.left, rcw.top, width, height, hMemDC, 0, 0, width, height, merge);
+			GdiAlphaBlend(hdc, rcw.left, rcw.top, width, height, hMemDC, 0, 0, width, height, merge);
 
 			SelectBitmap(hMemDC, hbmOld);
 			::DeleteObject(hbmMem);
@@ -854,7 +854,7 @@ void SurfaceGDI::DrawRGBAImage(const PRectangle &rc_, int width, int height, con
 
 			BLENDFUNCTION merge = { AC_SRC_OVER, 0, 255, AC_SRC_ALPHA };
 
-			AlphaBlend(hdc, static_cast<int>(rc.left), static_cast<int>(rc.top),
+			GdiAlphaBlend(hdc, static_cast<int>(rc.left), static_cast<int>(rc.top),
 				static_cast<int>(rc.Width()), static_cast<int>(rc.Height()), hMemDC, 0, 0, width, height, merge);
 
 			SelectBitmap(hMemDC, hbmOld);

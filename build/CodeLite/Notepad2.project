@@ -273,7 +273,6 @@
         <Library Value="oleaut32.a"/>
         <Library Value="uuid.a"/>
         <Library Value="imm32.a"/>
-        <Library Value="msimg32.a"/>
       </Linker>
       <ResourceCompiler Options="-DRC_INVOKED;-DUNICODE;-D_UNICODE;-DBOOKMARK_EDITION;"/>
     </GlobalSettings>
