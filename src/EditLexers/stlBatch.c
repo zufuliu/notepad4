@@ -7,8 +7,9 @@ static KEYWORDLIST Keywords_Batch = {{
 "defined do not else for goto if in "
 "assoc break call cd chdir cls color copy date del dir echo echo. endlocal erase exist exit ftype md mkdir move path pause popd prompt pushd rd rem ren rename rmdir set setlocal shift sort start time title tree type ver verify vol "
 "errorlevel nul disableextensions enableextensions enabledelayedexpansion "
-//"change com con country ctty equ forfiles geq gtr icacls kill leq loadhigh lpt lss mklink msiexe neq robocopy sclist timeout "
-"mdlink "
+"and or equ neq lss leq gtr geq "
+//"change com con country ctty forfiles icacls kill loadhigh lpt msiexe robocopy sclist timeout "
+"mklink "
 , ""// system cmd
 /* // com
 "chcp diskcomp diskcopy format graftabl help loadfix mode more tree "
@@ -19,7 +20,18 @@ static KEYWORDLIST Keywords_Batch = {{
 /* // unknown
 "bcdedit choice cmdkey "
 */
-, "dp0", "", "", "", "", "", ""
+,
+"dp0"
+, "", "", "",
+// upper case
+"DEFINED DO NOT ELSE FOR GOTO IF IN "
+"ASSOC BREAK CALL CD CHDIR CLS COLOR COPY DATE DEL DIR ECHO ECHO. ENDLOCAL ERASE EXIST EXIT FTYPE MD MKDIR MOVE PATH PAUSE POPD PROMPT PUSHD RD REM REN RENAME RMDIR SET SETLOCAL SHIFT SORT START TIME TITLE TREE TYPE VER VERIFY VOL "
+"ERRORLEVEL NUL DISABLEEXTENSIONS ENABLEEXTENSIONS ENABLEDELAYEDEXPANSION "
+"AND OR EQU NEQ LSS LEQ GTR GEQ "
+//"CHANGE COM CON COUNTRY CTTY FORFILES ICACLS KILL LOADHIGH LPT MSIEXE ROBOCOPY SCLIST TIMEOUT "
+"MKLINK "
+, ""
+, ""
 
 #if NUMKEYWORD == 16
 , "", "", "", "", "", "", ""
