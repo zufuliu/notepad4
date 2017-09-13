@@ -993,7 +993,7 @@ void Editor::VerticalCentreCaret() {
 
 // Avoid 64 bit compiler warnings.
 // Scintilla does not support text buffers larger than 2**31
-static int istrlen(const char *s) {
+static inline int istrlen(const char *s) {
 	return static_cast<int>(s ? strlen(s) : 0);
 }
 

@@ -1348,6 +1348,19 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 		}
 		break;
 
+	case WM_DPICHANGED: {
+		int dpi = HIWORD(wParam);
+		RECT* const rc = (RECT *)lParam;
+#if 0
+		char buf[64];
+		sprintf(buf, "WM_DPICHANGED: dpi=%d\n", dpi);
+		SendMessage(hwndEdit, SCI_INSERTTEXT, 0, (LPARAM)buf);
+#endif
+		SetWindowPos(hwnd, NULL, rc->left, rc->top,  rc->right - rc->left, rc->bottom - rc->top, SWP_NOZORDER | SWP_NOACTIVATE);
+		Style_OnDPIChanged(hwndEdit, dpi);
+	}
+	break;
+
 	case APPM_CENTER_MESSAGE_BOX: {
 		HWND box = FindWindow(L"#32770", NULL);
 		HWND parent = GetParent(box);

@@ -56,6 +56,7 @@ void	Style_Save(void);
 BOOL	Style_Import(HWND hwnd);
 BOOL	Style_Export(HWND hwnd);
 
+void	Style_OnDPIChanged(HWND hwnd, int dpi);
 void	Style_SetLexer(HWND hwnd, PEDITLEXER pLexNew);
 void	Style_SetLexerFromFile(HWND hwnd, LPCWSTR lpszFile);
 void	Style_SetLexerFromName(HWND hwnd, LPCWSTR lpszFile, LPCWSTR lpszName);
