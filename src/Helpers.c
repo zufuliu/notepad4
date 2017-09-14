@@ -150,6 +150,55 @@ BOOL IniSectionSetString(LPWSTR lpCachedIniSection, LPCWSTR lpName, LPCWSTR lpSt
 	return FALSE;
 }
 
+UINT GetCurrentDPI(HWND hwnd) {
+	UINT dpi = 0;
+	if (IsWin10AndAbove()) {
+		FARPROC pfnGetDpiForWindow = GetProcAddress(GetModuleHandle(L"user32.dll"), "GetDpiForWindow");
+		if (pfnGetDpiForWindow) {
+			dpi = (UINT)pfnGetDpiForWindow(hwnd);
+		}
+	}
+
+	if (dpi == 0 && IsWin8p1AndAbove()) {
+		HMODULE hShcore = LoadLibrary(L"shcore.dll");
+		if (hShcore) {
+			FARPROC pfnGetDpiForMonitor = GetProcAddress(hShcore, "GetDpiForMonitor");
+			if (pfnGetDpiForMonitor) {
+				HMONITOR hMonitor = MonitorFromWindow(hwnd, MONITOR_DEFAULTTONEAREST);
+				UINT dpiX = 0, dpiY = 0;
+				if (pfnGetDpiForMonitor(hMonitor, 0 /* MDT_EFFECTIVE_DPI */, &dpiX, &dpiY) == S_OK) {
+					dpi = dpiX;
+				}
+			}
+			FreeLibrary(hShcore);
+		}
+	}
+
+	if (dpi == 0) {
+		// FIXME: seems always get 96
+		HDC hDC = GetDC(hwnd);
+		dpi = GetDeviceCaps(hDC, LOGPIXELSX);
+		ReleaseDC(hwnd, hDC);
+	}
+
+	dpi = max_u(dpi, USER_DEFAULT_SCREEN_DPI);
+	return dpi;
+}
+
+HBITMAP ResizeImageForCurrentDPI(HBITMAP hBmp) {
+	BITMAP bmp;
+	if (g_uCurrentDPI > USER_DEFAULT_SCREEN_DPI && GetObject(hBmp, sizeof(BITMAP), &bmp)) {
+		int width = MulDiv(bmp.bmWidth, g_uCurrentDPI, USER_DEFAULT_SCREEN_DPI);
+		int height = MulDiv(bmp.bmHeight, g_uCurrentDPI, USER_DEFAULT_SCREEN_DPI);
+		HBITMAP hCopy = CopyImage(hBmp, IMAGE_BITMAP, width, height, LR_COPYRETURNORG | LR_COPYDELETEORG);
+		if (hCopy != NULL) {
+			hBmp = hCopy;
+		}
+	}
+
+	return hBmp;
+}
+
 //=============================================================================
 //
 // PrivateIsAppThemed()
@@ -699,6 +748,7 @@ void MakeBitmapButton(HWND hwnd, int nCtlId, HINSTANCE hInstance, UINT uBmpId) {
 	BITMAP bmp;
 	BUTTON_IMAGELIST bi;
 	HBITMAP hBmp = LoadImage(hInstance, MAKEINTRESOURCE(uBmpId), IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION);
+	hBmp = ResizeImageForCurrentDPI(hBmp);
 	GetObject(hBmp, sizeof(BITMAP), &bmp);
 	bi.himl = ImageList_Create(bmp.bmWidth, bmp.bmHeight, ILC_COLOR32 | ILC_MASK, 1, 0);
 	ImageList_AddMasked(bi.himl, hBmp, CLR_DEFAULT);

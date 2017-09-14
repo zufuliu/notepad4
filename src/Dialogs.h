@@ -34,14 +34,6 @@
  */
 #define APPM_CENTER_MESSAGE_BOX		(WM_APP + 1)
 
-// https://msdn.microsoft.com/en-us/library/windows/desktop/dn312083(v=vs.85).aspx
-#ifndef WM_DPICHANGED
-#define WM_DPICHANGED	0x02E0
-#endif
-#ifndef USER_DEFAULT_SCREEN_DPI
-#define USER_DEFAULT_SCREEN_DPI		96
-#endif
-
 int 	MsgBox(int iType, UINT uIdMsg, ...);
 void	DisplayCmdLineHelp(HWND hwnd);
 BOOL	GetDirectory(HWND hwndParent, int iTitle, LPWSTR pszFolder, LPCWSTR pszBase, BOOL bNewDialogStyle);

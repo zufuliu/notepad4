@@ -125,6 +125,7 @@ BOOL SaveFileDlg(HWND hwnd, LPWSTR lpstrFile, int cchFile, LPCWSTR lpstrInitialD
 LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam);
 LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam);
 void	CreateBars(HWND hwnd, HINSTANCE hInstance);
+void	MsgDPIChanged(HWND hwnd, WPARAM wParam, LPARAM lParam);
 void	MsgThemeChanged(HWND hwnd, WPARAM wParam, LPARAM lParam);
 void	MsgSize(HWND hwnd, WPARAM wParam, LPARAM lParam);
 void	MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam);

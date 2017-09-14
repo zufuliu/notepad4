@@ -190,7 +190,6 @@ BOOL	bUse2ndDefaultStyle;
 BOOL	fStylesModified = FALSE;
 BOOL	fWarnedNoIniFile = FALSE;
 int		iBaseFontSize = 11;
-int		iCurrentDPI = USER_DEFAULT_SCREEN_DPI;
 int		iDefaultLexer;
 BOOL	bAutoSelect;
 int		cxStyleSelectDlg;
@@ -453,11 +452,8 @@ BOOL Style_Export(HWND hwnd) {
 	return FALSE;
 }
 
-void Style_OnDPIChanged(HWND hwnd, int dpi) {
-	if (iCurrentDPI != dpi) {
-		iCurrentDPI = dpi;
-		Style_SetLexer(hwnd, pLexCurrent);
-	}
+void Style_OnDPIChanged(HWND hwnd) {
+	Style_SetLexer(hwnd, pLexCurrent);
 }
 
 // set folding style; braces are for scoping only
@@ -2453,7 +2449,7 @@ void Style_SetStyles(HWND hwnd, int iStyle, LPCWSTR lpszStyle) {
 
 	// Size
 	if (Style_StrGetSize(lpszStyle, &iValue)) {
-		iValue = MulDiv(iValue, iCurrentDPI, USER_DEFAULT_SCREEN_DPI);
+		iValue = MulDiv(iValue, g_uCurrentDPI, USER_DEFAULT_SCREEN_DPI);
 		SendMessage(hwnd, SCI_STYLESETSIZE, iStyle, (LPARAM)iValue);
 	}
 

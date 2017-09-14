@@ -279,6 +279,7 @@ HINSTANCE	g_hInstance;
 HANDLE		g_hDefaultHeap;
 HANDLE		g_hScintilla;
 UINT16		g_uWinVer;
+UINT		g_uCurrentDPI = USER_DEFAULT_SCREEN_DPI;
 WCHAR		g_wchAppUserModelID[38] = L"";
 WCHAR		g_wchWorkingDirectory[MAX_PATH] = L"";
 
@@ -998,6 +999,10 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 		MsgThemeChanged(hwnd, wParam, lParam);
 		break;
 
+	case WM_DPICHANGED:
+		MsgDPIChanged(hwnd, wParam, lParam);
+		break;
+
 	// update Scintilla colors
 	case WM_SYSCOLORCHANGE: {
 		Style_SetLexer(hwndEdit, pLexCurrent);
@@ -1348,19 +1353,6 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 		}
 		break;
 
-	case WM_DPICHANGED: {
-		int dpi = HIWORD(wParam);
-		RECT* const rc = (RECT *)lParam;
-#if 0
-		char buf[64];
-		sprintf(buf, "WM_DPICHANGED: dpi=%d\n", dpi);
-		SendMessage(hwndEdit, SCI_INSERTTEXT, 0, (LPARAM)buf);
-#endif
-		SetWindowPos(hwnd, NULL, rc->left, rc->top,  rc->right - rc->left, rc->bottom - rc->top, SWP_NOZORDER | SWP_NOACTIVATE);
-		Style_OnDPIChanged(hwndEdit, dpi);
-	}
-	break;
-
 	case APPM_CENTER_MESSAGE_BOX: {
 		HWND box = FindWindow(L"#32770", NULL);
 		HWND parent = GetParent(box);
@@ -1392,15 +1384,22 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 // MsgCreate() - Handles WM_CREATE
 //
 //
-#define UpdateSelectionMarginWidth() \
-	SendMessage(hwndEdit, SCI_SETMARGINWIDTHN, 1, (bShowSelectionMargin) ? 16 : 0)
-#define UpdateFoldMarginWidth() \
-	SciCall_SetMarginWidth(MARGIN_FOLD_INDEX, (bShowCodeFolding) ? 13 : 0)
+static __inline void UpdateSelectionMarginWidth() {
+	int width = bShowSelectionMargin ? MulDiv(16, g_uCurrentDPI, USER_DEFAULT_SCREEN_DPI) : 0;
+	SendMessage(hwndEdit, SCI_SETMARGINWIDTHN, 1, width);
+}
+
+static __inline void UpdateFoldMarginWidth() {
+	int width = bShowCodeFolding ? MulDiv(13, g_uCurrentDPI, USER_DEFAULT_SCREEN_DPI) : 0;
+	SciCall_SetMarginWidth(MARGIN_FOLD_INDEX, width);
+}
+
 #define SetCallTipsWaitTime() \
 	SendMessage(hwndEdit, SCI_SETMOUSEDWELLTIME, bShowCallTips? iCallTipsWaitTime : SC_TIME_FOREVER, 0);
 
 LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	HINSTANCE hInstance = ((LPCREATESTRUCT)lParam)->hInstance;
+	g_uCurrentDPI = GetCurrentDPI(hwnd);
 
 	// Setup edit control
 	hwndEdit = EditCreate(hwnd);
@@ -1655,6 +1654,9 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) {
 		bExternalBitmap = TRUE;
 	} else {
 		hbmp = LoadImage(hInstance, MAKEINTRESOURCE(IDR_MAINWND), IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION);
+	}
+	hbmp = ResizeImageForCurrentDPI(hbmp);
+	if (!bExternalBitmap) {
 		hbmpCopy = CopyImage(hbmp, IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION);
 	}
 	GetObject(hbmp, sizeof(BITMAP), &bmp);
@@ -1673,6 +1675,7 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) {
 			lstrcpy(szTmp, tchToolbarBitmapHot);
 		}
 		if ((hbmp = LoadImage(NULL, szTmp, IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION | LR_LOADFROMFILE)) != NULL) {
+			hbmp = ResizeImageForCurrentDPI(hbmp);
 			GetObject(hbmp, sizeof(BITMAP), &bmp);
 			himl = ImageList_Create(bmp.bmWidth / NUMTOOLBITMAPS, bmp.bmHeight, ILC_COLOR32 | ILC_MASK, 0, 0);
 			ImageList_AddMasked(himl, hbmp, CLR_DEFAULT);
@@ -1688,6 +1691,7 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) {
 			lstrcpy(szTmp, tchToolbarBitmapDisabled);
 		}
 		if ((hbmp = LoadImage(NULL, szTmp, IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION | LR_LOADFROMFILE)) != NULL) {
+			hbmp = ResizeImageForCurrentDPI(hbmp);
 			GetObject(hbmp, sizeof(BITMAP), &bmp);
 			himl = ImageList_Create(bmp.bmWidth / NUMTOOLBITMAPS, bmp.bmHeight, ILC_COLOR32 | ILC_MASK, 0, 0);
 			ImageList_AddMasked(himl, hbmp, CLR_DEFAULT);
@@ -1782,6 +1786,39 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) {
 	cyReBar = rc.bottom - rc.top;
 
 	cyReBarFrame = bIsAppThemed ? 0 : 2;
+}
+
+//=============================================================================
+//
+// MsgDPIChanged() - Handle WM_DPICHANGED
+//
+//
+void MsgDPIChanged(HWND hwnd, WPARAM wParam, LPARAM lParam) {
+	g_uCurrentDPI = HIWORD(wParam);
+	RECT* const rc = (RECT *)lParam;
+	Sci_Position pos = SciCall_GetCurrentPos();
+#if 0
+	char buf[64];
+	sprintf(buf, "WM_DPICHANGED: dpi=%u\n", g_uCurrentDPI);
+	SendMessage(hwndEdit, SCI_INSERTTEXT, 0, (LPARAM)buf);
+#endif
+
+	Style_OnDPIChanged(hwndEdit);
+	UpdateSelectionMarginWidth();
+	UpdateLineNumberWidth();
+	UpdateFoldMarginWidth();
+	SciCall_GotoPos(pos);
+
+	// recreate toolbar and statusbar
+	Toolbar_GetButtons(hwndToolbar, IDT_FILE_NEW, tchToolbarButtons, COUNTOF(tchToolbarButtons));
+
+	DestroyWindow(hwndToolbar);
+	DestroyWindow(hwndReBar);
+	DestroyWindow(hwndStatus);
+	CreateBars(hwnd, g_hInstance);
+	UpdateToolbar();
+	SetWindowPos(hwnd, NULL, rc->left, rc->top, rc->right - rc->left, rc->bottom - rc->top, SWP_NOZORDER | SWP_NOACTIVATE);
+	UpdateStatusbar();
 }
 
 //=============================================================================

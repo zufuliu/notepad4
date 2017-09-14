@@ -32,6 +32,10 @@ __forceinline int max_i(int x, int y) {
 	return (x > y) ? x : y;
 }
 
+__forceinline UINT max_u(UINT x, UINT y) {
+	return (x > y) ? x : y;
+}
+
 __forceinline long max_l(long x, long y) {
 	return (x > y) ? x : y;
 }
@@ -59,6 +63,7 @@ void DLog(const char *fmt, ...);
 extern HINSTANCE g_hInstance;
 extern HANDLE g_hDefaultHeap;
 extern UINT16 g_uWinVer;
+extern UINT g_uCurrentDPI;
 extern WCHAR szIniFile[MAX_PATH];
 
 // MSDN: Operating System Version
@@ -73,6 +78,17 @@ extern WCHAR szIniFile[MAX_PATH];
 #define IsVistaAndAbove()	(g_uWinVer >= 0x0600)
 #define IsWin7AndAbove()	(g_uWinVer >= 0x0601)
 #define IsWin8AndAbove()	(g_uWinVer >= 0x0602)
+#define IsWin8p1AndAbove()	(g_uWinVer >= 0x0603)
+#define IsWin10AndAbove()	(g_uWinVer >= 0x0A00)
+
+// High DPI Reference
+// https://msdn.microsoft.com/en-us/library/windows/desktop/hh447398(v=vs.85).aspx
+#ifndef WM_DPICHANGED
+#define WM_DPICHANGED	0x02E0
+#endif
+#ifndef USER_DEFAULT_SCREEN_DPI
+#define USER_DEFAULT_SCREEN_DPI		96
+#endif
 
 #define NP2HeapAlloc(size)			HeapAlloc(g_hDefaultHeap, HEAP_ZERO_MEMORY, size)
 #define NP2HeapFree(hMem)			HeapFree(g_hDefaultHeap, 0, hMem)
@@ -120,11 +136,13 @@ static __inline void EndWaitCursor(void) {
 	SetCursorPos(pt.x, pt.y);
 }
 
+UINT GetCurrentDPI(HWND hwnd);
 BOOL PrivateIsAppThemed(void);
 HRESULT PrivateSetCurrentProcessExplicitAppUserModelID(PCWSTR AppID);
 BOOL IsElevated(void);
 //BOOL SetExplorerTheme(HWND hwnd);
 
+HBITMAP ResizeImageForCurrentDPI(HBITMAP hbmp);
 BOOL BitmapMergeAlpha(HBITMAP hbmp, COLORREF crDest);
 BOOL BitmapAlphaBlend(HBITMAP hbmp, COLORREF crDest, BYTE alpha);
 BOOL BitmapGrayScale(HBITMAP hbmp);
