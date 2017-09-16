@@ -12,10 +12,10 @@
 #include <stddef.h>
 
 // Basic signed type used throughout interface
-typedef ptrdiff_t Sci_Position;
+typedef int Sci_Position;
 
 // Unsigned variant used for ILexer::Lex and ILexer::Fold
-typedef size_t Sci_PositionU;
+typedef unsigned int Sci_PositionU;
 
 // For Sci_CharacterRange  which is defined as long to be compatible with Win32 CHARRANGE
 typedef long Sci_PositionCR;
