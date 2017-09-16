@@ -20,9 +20,7 @@
 #include "UniConversion.h"
 #include "UnicodeFromUTF8.h"
 
-#ifdef SCI_NAMESPACE
 using namespace Scintilla;
-#endif
 
 namespace {
 	// Use an unnamed namespace to protect the declarations from name conflicts
@@ -802,9 +800,7 @@ CaseConverter *ConverterForConversion(enum CaseConversion conversion) {
 
 }
 
-#ifdef SCI_NAMESPACE
 namespace Scintilla {
-#endif
 
 ICaseConverter *ConverterFor(enum CaseConversion conversion) {
 	CaseConverter *pCaseConv = ConverterForConversion(conversion);
@@ -835,6 +831,4 @@ std::string CaseConvertString(const std::string &s, enum CaseConversion conversi
 	return retMapped;
 }
 
-#ifdef SCI_NAMESPACE
 }
-#endif

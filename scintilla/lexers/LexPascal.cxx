@@ -1,4 +1,11 @@
-// Lexer for Pascal, Delphi.
+// Scintilla source code edit control
+/** @file LexPascal.cxx
+ ** Lexer for Pascal.
+ ** Written by Laurent le Tynevez
+ ** Updated by Simon Steele <s.steele@pnotepad.org> September 2002
+ ** Updated by Mathias Rauen <scite@madshi.net> May 2003 (Delphi adjustments)
+ ** Completely rewritten by Marko Njezic <sf@maxempire.com> October 2008
+ **/
 
 #include <string.h>
 #include <assert.h>
@@ -19,9 +26,7 @@
 #include "CharacterSet.h"
 #include "LexerModule.h"
 
-#ifdef SCI_NAMESPACE
 using namespace Scintilla;
-#endif
 
 enum {
 	stateInAsm = 0x1000,

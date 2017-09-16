@@ -1,4 +1,11 @@
-// Lexer for SQL, including PL/SQL and SQL*Plus.
+//-*- coding: utf-8 -*-
+// Scintilla source code edit control
+/** @file LexSQL.cxx
+ ** Lexer for SQL, including PL/SQL and SQL*Plus.
+ ** Improved by Jérôme LAFORGE <jerome.laforge_AT_gmail_DOT_com> from 2010 to 2012.
+ **/
+// Copyright 1998-2012 by Neil Hodgson <neilh@scintilla.org>
+// The License.txt file describes the conditions under which this software may be distributed.
 
 #include <string.h>
 #include <assert.h>
@@ -19,9 +26,7 @@
 #include "CharacterSet.h"
 #include "LexerModule.h"
 
-#ifdef SCI_NAMESPACE
 using namespace Scintilla;
-#endif
 
 static inline bool IsSqlWordChar(int ch, bool sqlAllowDottedWord) {
 	if (!sqlAllowDottedWord)

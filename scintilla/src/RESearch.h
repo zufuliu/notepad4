@@ -9,9 +9,7 @@
 #ifndef RESEARCH_H
 #define RESEARCH_H
 
-#ifdef SCI_NAMESPACE
 namespace Scintilla {
-#endif
 
 /*
  * The following defines are not meant to be changeable.
@@ -66,9 +64,7 @@ private:
 	}
 };
 
-#ifdef SCI_NAMESPACE
 }
-#endif
 
 #endif
 

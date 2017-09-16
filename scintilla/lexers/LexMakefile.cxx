@@ -15,9 +15,7 @@
 #include "CharacterSet.h"
 #include "LexerModule.h"
 
-#ifdef SCI_NAMESPACE
 using namespace Scintilla;
-#endif
 
 #define MAKE_TYPE_GMAKE 0
 #define MAKE_TYPE_NMAKE 1

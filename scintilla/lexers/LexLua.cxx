@@ -1,4 +1,11 @@
-// Lexer for Lua language.
+// Scintilla source code edit control
+/** @file LexLua.cxx
+ ** Lexer for Lua language.
+ **
+ ** Written by Paul Winwood.
+ ** Folder by Alexey Yutkin.
+ ** Modified by Marcos E. Wurzius & Philippe Lhoste
+ **/
 
 #include <stdlib.h>
 #include <string.h>
@@ -18,9 +25,7 @@
 #include "CharacterSet.h"
 #include "LexerModule.h"
 
-#ifdef SCI_NAMESPACE
 using namespace Scintilla;
-#endif
 
 // Test for [=[ ... ]=] delimiters, returns 0 if it's only a [ or ],
 // return 1 for [[ or ]], returns >=2 for [=[ or ]=] and so on.

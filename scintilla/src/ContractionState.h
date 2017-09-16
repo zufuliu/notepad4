@@ -8,9 +8,7 @@
 #ifndef CONTRACTIONSTATE_H
 #define CONTRACTIONSTATE_H
 
-#ifdef SCI_NAMESPACE
 namespace Scintilla {
-#endif
 
 template<class T>
 class SparseVector;
@@ -73,8 +71,6 @@ public:
 	void Check() const;
 };
 
-#ifdef SCI_NAMESPACE
 }
-#endif
 
 #endif

@@ -210,9 +210,7 @@
 #include "CharClassify.h"
 #include "RESearch.h"
 
-#ifdef SCI_NAMESPACE
 using namespace Scintilla;
-#endif
 
 #define OKP     1
 #define NOP     0

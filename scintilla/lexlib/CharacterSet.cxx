@@ -11,13 +11,9 @@
 
 #include "CharacterSet.h"
 
-#ifdef SCI_NAMESPACE
 using namespace Scintilla;
-#endif
 
-#ifdef SCI_NAMESPACE
 namespace Scintilla {
-#endif
 
 CharacterSet::CharacterSet(setBase base, const char *initialSet, int size_, bool valueAfter_) {
 	size = size_;
@@ -34,6 +30,7 @@ CharacterSet::CharacterSet(setBase base, const char *initialSet, int size_, bool
 	if (base & setDigits)
 		AddString("0123456789");
 }
+
 CharacterSet::CharacterSet(const CharacterSet &other) {
 	size = other.size;
 	valueAfter = other.valueAfter;
@@ -42,6 +39,7 @@ CharacterSet::CharacterSet(const CharacterSet &other) {
 		bset[i] = other.bset[i];
 	}
 }
+
 CharacterSet& CharacterSet::operator=(CharacterSet &&other) {
 	if (this != &other) {
 		delete []bset;
@@ -53,6 +51,7 @@ CharacterSet& CharacterSet::operator=(CharacterSet &&other) {
 	}
 	return *this;
 }
+
 void CharacterSet::AddString(const char *setToAdd) {
 	for (const char *cp=setToAdd; *cp; cp++) {
 		int val = static_cast<unsigned char>(*cp);
@@ -61,9 +60,6 @@ void CharacterSet::AddString(const char *setToAdd) {
 		bset[val] = true;
 	}
 }
-
-
-
 
 int CompareCaseInsensitive(const char *a, const char *b) {
 	while (*a && *b) {
@@ -99,6 +95,4 @@ int CompareNCaseInsensitive(const char *a, const char *b, size_t len) {
 		return *a - *b;
 }
 
-#ifdef SCI_NAMESPACE
 }
-#endif

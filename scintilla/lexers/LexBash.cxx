@@ -1,4 +1,10 @@
-// Lexer for Bash.
+// Scintilla source code edit control
+/** @file LexBash.cxx
+ ** Lexer for Bash.
+ **/
+// Copyright 2004-2012 by Neil Hodgson <neilh@scintilla.org>
+// Adapted from LexPerl by Kein-Hong Man 2004
+// The License.txt file describes the conditions under which this software may be distributed.
 
 #include <stdlib.h>
 #include <string.h>
@@ -19,9 +25,7 @@
 #include "LexerModule.h"
 #include "HereDoc.h"
 
-#ifdef SCI_NAMESPACE
 using namespace Scintilla;
-#endif
 
 // define this if you want 'invalid octals' to be marked as errors
 // usually, this is not a good idea, permissive lexing is better

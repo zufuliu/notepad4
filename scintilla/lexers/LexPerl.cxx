@@ -29,9 +29,7 @@
 #include "LexerModule.h"
 #include "HereDoc.h"
 
-#ifdef SCI_NAMESPACE
 using namespace Scintilla;
-#endif
 
 // Info for HERE document handling from perldata.pod (reformatted):
 // ----------------------------------------------------------------

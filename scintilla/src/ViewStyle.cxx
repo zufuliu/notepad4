@@ -26,9 +26,7 @@
 #include "Style.h"
 #include "ViewStyle.h"
 
-#ifdef SCI_NAMESPACE
 using namespace Scintilla;
-#endif
 
 MarginStyle::MarginStyle(int style_, int width_, int mask_) :
 	style(style_), width(width_), mask(mask_), sensitive(false), cursor(SC_CURSORREVERSEARROW) {

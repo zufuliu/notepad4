@@ -1,4 +1,9 @@
-// Lexer for Inno Setup.
+// Scintilla source code edit control
+/** @file LexInno.cxx
+ ** Lexer for Inno Setup scripts.
+ **/
+// Written by Friedrich Vedder <fvedd@t-online.de>, using code from LexOthers.cxx.
+// The License.txt file describes the conditions under which this software may be distributed.
 
 #include <string.h>
 #include <assert.h>
@@ -15,9 +20,7 @@
 #include "CharacterSet.h"
 #include "LexerModule.h"
 
-#ifdef SCI_NAMESPACE
 using namespace Scintilla;
-#endif
 
 /*static const char * const innoWordListDesc[] = {
 	"Sections",

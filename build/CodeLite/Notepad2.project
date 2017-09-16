@@ -253,7 +253,6 @@
         <Preprocessor Value="UNICODE"/>
         <Preprocessor Value="_UNICODE"/>
         <Preprocessor Value="STATIC_BUILD"/>
-        <Preprocessor Value="SCI_NAMESPACE"/>
         <Preprocessor Value="SCI_LEXER"/>
         <Preprocessor Value="BOOKMARK_EDITION"/>
         <Preprocessor Value="DISABLE_D2D"/>

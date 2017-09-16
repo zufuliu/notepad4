@@ -54,9 +54,7 @@
 #include "EditView.h"
 #include "Editor.h"
 
-#ifdef SCI_NAMESPACE
 using namespace Scintilla;
-#endif
 
 /*
 	return whether this modification represents an operation that
@@ -4326,6 +4324,8 @@ bool Editor::PointInSelMargin(const Point &pt) const {
 		PRectangle rcSelMargin = GetClientRectangle();
 		rcSelMargin.right = static_cast<XYPOSITION>(vs.textStart - vs.leftMarginWidth);
 		rcSelMargin.left = static_cast<XYPOSITION>(vs.textStart - vs.fixedColumnWidth);
+		const Point ptOrigin = GetVisibleOriginInMain();
+		rcSelMargin.Move(0, -ptOrigin.y);
 		return rcSelMargin.ContainsWholePixel(pt);
 	} else {
 		return false;

@@ -8,9 +8,7 @@
 #ifndef DOCUMENT_H
 #define DOCUMENT_H
 
-#ifdef SCI_NAMESPACE
 namespace Scintilla {
-#endif
 
 enum EncodingFamily { efEightBit, efUnicode, efDBCS };
 
@@ -547,8 +545,6 @@ public:
 	virtual void NotifyErrorOccurred(Document *doc, void *userData, int status) = 0;
 };
 
-#ifdef SCI_NAMESPACE
 }
-#endif
 
 #endif

@@ -43,9 +43,7 @@
 #include "Selection.h"
 #include "PositionCache.h"
 
-#ifdef SCI_NAMESPACE
 using namespace Scintilla;
-#endif
 
 LineLayout::LineLayout(int maxLineLength_) :
 	lenLineStarts(0),

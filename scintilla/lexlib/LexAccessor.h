@@ -8,9 +8,7 @@
 #ifndef LEXACCESSOR_H
 #define LEXACCESSOR_H
 
-#ifdef SCI_NAMESPACE
 namespace Scintilla {
-#endif
 
 class CharacterSet;
 class LexAccessor;
@@ -138,8 +136,6 @@ struct LexicalClass {
 	const char *description;
 };
 
-#ifdef SCI_NAMESPACE
 }
-#endif
 
 #endif

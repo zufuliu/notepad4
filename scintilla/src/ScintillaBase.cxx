@@ -61,9 +61,7 @@
 #include "AutoComplete.h"
 #include "ScintillaBase.h"
 
-#ifdef SCI_NAMESPACE
 using namespace Scintilla;
-#endif
 
 ScintillaBase::ScintillaBase() {
 	displayPopupMenu = SC_POPUP_ALL;
@@ -546,9 +544,7 @@ void ScintillaBase::RightButtonDownWithModifiers(const Point &pt, unsigned int c
 
 #ifdef SCI_LEXER
 
-#ifdef SCI_NAMESPACE
 namespace Scintilla {
-#endif
 
 class LexState : public LexInterface {
 	const LexerModule *lexCurrent;
@@ -590,9 +586,7 @@ public:
 	const char *DescriptionOfStyle(int style);
 };
 
-#ifdef SCI_NAMESPACE
 }
-#endif
 
 LexState::LexState(Document *pdoc_) : LexInterface(pdoc_) {
 	lexCurrent = 0;

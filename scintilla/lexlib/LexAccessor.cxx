@@ -12,9 +12,7 @@
 #include "LexAccessor.h"
 #include "CharacterSet.h"
 
-#ifdef SCI_NAMESPACE
 using namespace Scintilla;
-#endif
 
 LexAccessor::LexAccessor(IDocument *pAccess_) :
 		pAccess(pAccess_), startPos(extremePosition), endPos(0),
@@ -113,9 +111,7 @@ void LexAccessor::IndicatorFill(Sci_Position start, Sci_Position end, int indica
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-#ifdef SCI_NAMESPACE
 namespace Scintilla {
-#endif
 
 bool IsLexAtEOL(Sci_Position pos, LexAccessor &styler) {
 	return (styler[pos] == '\n') || ((styler[pos] == '\r') && styler.SafeGetCharAt(pos + 1) != '\n');
@@ -293,6 +289,4 @@ char LexGetNextChar(Sci_Position startPos, LexAccessor &styler) {
 	return styler.SafeGetCharAt(startPos - 1);
 }
 
-#ifdef SCI_NAMESPACE
 }
-#endif

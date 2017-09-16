@@ -54,9 +54,7 @@
 #include "MarginView.h"
 #include "EditView.h"
 
-#ifdef SCI_NAMESPACE
 using namespace Scintilla;
-#endif
 
 static inline bool IsControlCharacter(int ch) {
 	// iscntrl returns true for lots of chars > 127 which are displayable
@@ -69,9 +67,7 @@ PrintParameters::PrintParameters() {
 	wrapState = eWrapWord;
 }
 
-#ifdef SCI_NAMESPACE
 namespace Scintilla {
-#endif
 
 bool ValidStyledText(const ViewStyle &vs, size_t styleOffset, const StyledText &st) {
 	if (st.multipleStyles) {
@@ -171,9 +167,7 @@ void DrawStyledText(Surface *surface, const ViewStyle &vs, int styleOffset, cons
 	}
 }
 
-#ifdef SCI_NAMESPACE
 }
-#endif
 
 const XYPOSITION epsilon = 0.0001f;	// A small nudge to avoid floating point precision issues
 
@@ -287,7 +281,7 @@ void EditView::AllocateGraphics(const ViewStyle &vsDraw) {
 }
 
 static const char *ControlCharacterString(unsigned char ch) {
-	const char *reps[] = {
+	static const char *reps[] = {
 		"NUL", "SOH", "STX", "ETX", "EOT", "ENQ", "ACK", "BEL",
 		"BS", "HT", "LF", "VT", "FF", "CR", "SO", "SI",
 		"DLE", "DC1", "DC2", "DC3", "DC4", "NAK", "SYN", "ETB",

@@ -28,7 +28,7 @@ def UpdateFile(filename, updated):
             # Same as before so don't write
             return
         os.unlink(filename)
-    except IOError:	# File is not there yet
+    except IOError: # File is not there yet
         newOrChanged = "New"
     with codecs.open(filename, "w", "utf-8") as outfile:
         outfile.write(updated)

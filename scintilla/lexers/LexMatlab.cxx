@@ -15,9 +15,7 @@
 #include "CharacterSet.h"
 #include "LexerModule.h"
 
-#ifdef SCI_NAMESPACE
 using namespace Scintilla;
-#endif
 
 #define	LEX_MATLAB		40
 #define	LEX_OCTAVE		61

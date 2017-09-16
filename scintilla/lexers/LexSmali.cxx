@@ -14,9 +14,7 @@
 #include "CharacterSet.h"
 #include "LexerModule.h"
 
-#ifdef SCI_NAMESPACE
 using namespace Scintilla;
-#endif
 
 static inline bool IsSmaliOp(int ch) {
 	return ch == ';' || ch == '{' || ch == '}' || ch == '(' || ch == ')' || ch == '='

@@ -15,9 +15,7 @@
 #include "CharacterSet.h"
 #include "LexerModule.h"
 
-#ifdef SCI_NAMESPACE
 using namespace Scintilla;
-#endif
 
 static bool IsLSpecial(int ch) {
 	return (ch < 0x80) && (ch == '#' || ch == '$' || ch == '%' || ch == '&'

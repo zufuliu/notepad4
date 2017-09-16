@@ -57,4 +57,4 @@ def RegenerateAll(root, showMaxID):
 			#~ print(v)
 
 if __name__ == "__main__":
-    RegenerateAll("../", True)
+	RegenerateAll("../", True)

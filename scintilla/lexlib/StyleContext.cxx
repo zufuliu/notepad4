@@ -16,9 +16,7 @@
 #include "StyleContext.h"
 #include "CharacterSet.h"
 
-#ifdef SCI_NAMESPACE
 using namespace Scintilla;
-#endif
 
 void StyleContext::GetNextChar() {
 	if (multiByteAccess) {

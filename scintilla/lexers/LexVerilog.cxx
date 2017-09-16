@@ -1,4 +1,10 @@
-// Lexer for Verilog.
+// Scintilla source code edit control
+/** @file LexVerilog.cxx
+ ** Lexer for Verilog.
+ ** Written by Avi Yegudin, based on C++ lexer by Neil Hodgson
+ **/
+// Copyright 1998-2002 by Neil Hodgson <neilh@scintilla.org>
+// The License.txt file describes the conditions under which this software may be distributed.
 
 #include <stdlib.h>
 #include <assert.h>
@@ -15,9 +21,7 @@
 #include "CharacterSet.h"
 #include "LexerModule.h"
 
-#ifdef SCI_NAMESPACE
 using namespace Scintilla;
-#endif
 
 static bool IsVWordChar(const int ch) {
 	return (ch < 0x80) && (isalnum(ch) || ch == '.' || ch == '_' || ch == '\''|| ch == '$');

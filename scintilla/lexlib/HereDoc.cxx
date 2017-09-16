@@ -2,9 +2,7 @@
 
 #include "HereDoc.h"
 
-#ifdef SCI_NAMESPACE
 using namespace Scintilla;
-#endif
 
 static int opposite(int ch) {
 	if (ch == '(') return ')';

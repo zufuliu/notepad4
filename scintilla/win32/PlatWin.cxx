@@ -69,9 +69,7 @@ static HINSTANCE hinstPlatformRes = 0;
 
 static HCURSOR reverseArrowCursor = NULL;
 
-#ifdef SCI_NAMESPACE
 namespace Scintilla {
-#endif
 
 static RECT RectFromPRectangle(const PRectangle& prc) {
 	RECT rc = {static_cast<LONG>(prc.left), static_cast<LONG>(prc.top),
@@ -3088,6 +3086,4 @@ void Platform_Finalise(bool fromDllMain) {
 	::DeleteCriticalSection(&crPlatformLock);
 }
 
-#ifdef SCI_NAMESPACE
 }
-#endif

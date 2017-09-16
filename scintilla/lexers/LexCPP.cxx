@@ -22,9 +22,7 @@
 #include "LexerModule.h"
 //#include "SparseState.h"
 
-#ifdef SCI_NAMESPACE
 using namespace Scintilla;
-#endif
 
 #define		LEX_CPP		1	// C/C++
 #define		LEX_JAVA	2	// Java

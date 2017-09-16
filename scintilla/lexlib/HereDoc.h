@@ -3,9 +3,7 @@
 #ifndef HEREDOC_H
 #define HEREDOC_H
 
-#ifdef SCI_NAMESPACE
 namespace Scintilla {
-#endif
 
 #define HERE_DELIM_MAX 256		// maximum length of HERE doc delimiter
 #define QUOTE_DELIM_STACK_MAX	7
@@ -67,8 +65,6 @@ public:
 };
 
 
-#ifdef SCI_NAMESPACE
 }
-#endif
 
 #endif

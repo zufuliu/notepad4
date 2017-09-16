@@ -23,9 +23,7 @@
 #include "CharacterSet.h"
 #include "LexerModule.h"
 
-#ifdef SCI_NAMESPACE
 using namespace Scintilla;
-#endif
 
 #define DIFF_BUFFER_START_SIZE 16
 // Note that ColouriseDiffLine analyzes only the first DIFF_BUFFER_START_SIZE

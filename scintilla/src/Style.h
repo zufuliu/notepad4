@@ -8,9 +8,7 @@
 #ifndef STYLE_H
 #define STYLE_H
 
-#ifdef SCI_NAMESPACE
 namespace Scintilla {
-#endif
 
 struct FontSpecification {
 	const char *fontName;
@@ -86,8 +84,6 @@ public:
 	bool IsProtected() const { return !(changeable && visible);}
 };
 
-#ifdef SCI_NAMESPACE
 }
-#endif
 
 #endif

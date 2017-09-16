@@ -52,9 +52,7 @@
 #include "UniConversion.h"
 #include "UnicodeFromUTF8.h"
 
-#ifdef SCI_NAMESPACE
 using namespace Scintilla;
-#endif
 
 void LexInterface::Colourise(Sci::Position start, Sci::Position end) {
 	if (pdoc && instance && !performingStyle) {
@@ -3094,18 +3092,8 @@ const char *BuiltinRegex::SubstituteByPosition(Document *doc, const char *text, 
 
 #ifndef SCI_OWNREGEX
 
-#ifdef SCI_NAMESPACE
-
 RegexSearchBase *Scintilla::CreateRegexSearch(CharClassify *charClassTable) {
 	return new BuiltinRegex(charClassTable);
 }
-
-#else
-
-RegexSearchBase *CreateRegexSearch(CharClassify *charClassTable) {
-	return new BuiltinRegex(charClassTable);
-}
-
-#endif
 
 #endif

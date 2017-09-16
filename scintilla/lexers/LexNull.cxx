@@ -22,9 +22,7 @@
 #include "CharacterSet.h"
 #include "LexerModule.h"
 
-#ifdef SCI_NAMESPACE
 using namespace Scintilla;
-#endif
 
 static void ColouriseNullDoc(Sci_PositionU startPos, Sci_Position length, int, LexerWordList, Accessor &styler) {
 	// Null language means all style bytes are 0 so just mark the end - no need to fill in.

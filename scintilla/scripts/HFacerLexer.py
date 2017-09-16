@@ -35,4 +35,4 @@ def RegenerateAll(root):
 	Regenerate(root + "include/SciLexer.h", "/* ", printLexHFile(f))
 
 if __name__ == "__main__":
-    RegenerateAll("../")
+	RegenerateAll("../")

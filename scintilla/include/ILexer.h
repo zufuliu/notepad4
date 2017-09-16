@@ -10,9 +10,7 @@
 
 #include "Sci_Position.h"
 
-#ifdef SCI_NAMESPACE
 namespace Scintilla {
-#endif
 
 enum { dvRelease4=2 };
 
@@ -75,8 +73,6 @@ public:
 	virtual const char * SCI_METHOD DescriptionOfStyle(int style) const = 0;
 };
 
-#ifdef SCI_NAMESPACE
 }
-#endif
 
 #endif

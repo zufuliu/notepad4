@@ -20,9 +20,7 @@
 #include "CharacterSet.h"
 #include "LexerModule.h"
 
-#ifdef SCI_NAMESPACE
 using namespace Scintilla;
-#endif
 
 static inline bool IsFSOperator(int ch) {
 	return isoperator(ch) || (ch < 0x80 && (ch == '\'' || ch == '@' || ch == '$' || ch == '#' || ch == '`'));

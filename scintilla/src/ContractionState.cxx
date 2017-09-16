@@ -24,9 +24,7 @@
 #include "SparseVector.h"
 #include "ContractionState.h"
 
-#ifdef SCI_NAMESPACE
 using namespace Scintilla;
-#endif
 
 ContractionState::ContractionState() : linesInDocument(1) {
 }

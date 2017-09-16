@@ -133,9 +133,7 @@ typedef UINT_PTR (WINAPI *SetCoalescableTimerSig)(HWND hwnd, UINT_PTR nIDEvent,
 
 const TCHAR callClassName[] = TEXT("CallTip");
 
-#ifdef SCI_NAMESPACE
 using namespace Scintilla;
-#endif
 
 static inline void *PointerFromWindow(HWND hWnd) {
 	return reinterpret_cast<void *>(::GetWindowLongPtr(hWnd, 0));

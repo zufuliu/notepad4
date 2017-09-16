@@ -8,9 +8,7 @@
 #ifndef LEXERMODULE_H
 #define LEXERMODULE_H
 
-#ifdef SCI_NAMESPACE
 namespace Scintilla {
-#endif
 
 class Accessor;
 class WordList;
@@ -70,8 +68,6 @@ public:
 	friend class Catalogue;
 };
 
-#ifdef SCI_NAMESPACE
 }
-#endif
 
 #endif

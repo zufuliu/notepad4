@@ -17,9 +17,7 @@
 #include "CharacterSet.h"
 #include "LexerModule.h"
 
-#ifdef SCI_NAMESPACE
 using namespace Scintilla;
-#endif
 
 #define		LEX_PY		32	// Python
 #define		LEX_BOO		55	// Boo

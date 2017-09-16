@@ -1,4 +1,13 @@
-// Lexer for Cascading Style Sheets
+// Scintilla source code edit control
+// Encoding: UTF-8
+/** @file LexCSS.cxx
+ ** Lexer for Cascading Style Sheets
+ ** Written by Jakub Vrána
+ ** Improved by Philippe Lhoste (CSS2)
+ ** Improved by Ross McKay (SCSS mode; see http://sass-lang.com/ )
+ **/
+// Copyright 1998-2002 by Neil Hodgson <neilh@scintilla.org>
+// The License.txt file describes the conditions under which this software may be distributed.
 
 #include <stdlib.h>
 #include <string.h>
@@ -18,9 +27,7 @@
 #include "CharacterSet.h"
 #include "LexerModule.h"
 
-#ifdef SCI_NAMESPACE
 using namespace Scintilla;
-#endif
 
 
 static inline bool IsAWordChar(int ch) {
