@@ -24,19 +24,19 @@
 #define COUNTOF(ar)		(sizeof(ar)/sizeof(ar[0]))
 #define CSTRLEN(s)		(COUNTOF(s)-1)
 
-__forceinline int min_i(int x, int y) {
+static inline int min_i(int x, int y) {
 	return (x < y) ? x : y;
 }
 
-__forceinline int max_i(int x, int y) {
+static inline int max_i(int x, int y) {
 	return (x > y) ? x : y;
 }
 
-__forceinline int maxmin_i(int x, int y, int z) {
+static inline int maxmin_i(int x, int y, int z) {
 	return max_i(min_i(x, y), z);
 }
 
-__forceinline int minmax_i(int x, int y, int z) {
+static inline int minmax_i(int x, int y, int z) {
 	return min_i(max_i(x, y), z);
 }
 
@@ -52,7 +52,7 @@ extern WCHAR szIniFile[MAX_PATH];
 	WritePrivateProfileString(lpSection, lpName, lpString, szIniFile)
 #define IniDeleteSection(lpSection) \
 	WritePrivateProfileSection(lpSection, NULL, szIniFile)
-static __inline BOOL IniSetInt(LPCWSTR lpSection, LPCWSTR lpName, int i) {
+static inline BOOL IniSetInt(LPCWSTR lpSection, LPCWSTR lpName, int i) {
 	WCHAR tch[32];
 	wsprintf(tch, L"%i", i);
 	return WritePrivateProfileString(lpSection, lpName, tch, szIniFile);
@@ -65,12 +65,14 @@ int IniSectionGetString(LPCWSTR lpCachedIniSection, LPCWSTR lpName, LPCWSTR lpDe
 int IniSectionGetInt(LPCWSTR lpCachedIniSection, LPCWSTR lpName, int iDefault);
 BOOL IniSectionGetBool(LPCWSTR lpCachedIniSection, LPCWSTR lpName, BOOL bDefault);
 BOOL IniSectionSetString(LPWSTR lpCachedIniSection, LPCWSTR lpName, LPCWSTR lpString);
-static __inline BOOL IniSectionSetInt(LPWSTR lpCachedIniSection, LPCWSTR lpName, int i) {
+
+static inline BOOL IniSectionSetInt(LPWSTR lpCachedIniSection, LPCWSTR lpName, int i) {
 	WCHAR tch[32];
 	wsprintf(tch, L"%i", i);
 	return IniSectionSetString(lpCachedIniSection, lpName, tch);
 }
-static __inline BOOL IniSectionSetBool(LPWSTR lpCachedIniSection, LPCWSTR lpName, BOOL b) {
+
+static inline BOOL IniSectionSetBool(LPWSTR lpCachedIniSection, LPCWSTR lpName, BOOL b) {
 	return IniSectionSetString(lpCachedIniSection, lpName, (b ? L"1" : L"0"));
 }
 
@@ -105,7 +107,7 @@ void MakeBitmapButton(HWND hwnd, int nCtlId, HINSTANCE hInstance, UINT uBmpId);
 void DeleteBitmapButton(HWND hwnd, int nCtlId);
 void SetWindowTransparentMode(HWND hwnd, BOOL bTransparentMode);
 
-#define StatusSetSimple(hwnd,b) SendMessage(hwnd, SB_SIMPLE, (WPARAM)b, 0)
+#define StatusSetSimple(hwnd,b) SendMessage(hwnd, SB_SIMPLE, (WPARAM)(b), 0)
 BOOL StatusSetText(HWND hwnd, UINT nPart, LPCWSTR lpszText);
 
 int Toolbar_GetButtons(HWND hwnd, int cmdBase, LPWSTR lpszButtons, int cchButtons);

@@ -3200,11 +3200,11 @@ Sci::Position Editor::StartEndDisplayLine(Sci::Position pos, bool start) {
 
 namespace {
 
-inline short HighShortFromLong(long x) {
+static inline short HighShortFromLong(long x) {
 	return static_cast<short>(x >> 16);
 }
 
-inline short LowShortFromLong(long x) {
+static inline short LowShortFromLong(long x) {
 	return static_cast<short>(x & 0xffff);
 }
 

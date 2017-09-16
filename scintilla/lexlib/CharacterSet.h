@@ -47,25 +47,25 @@ public:
 
 // Functions for classifying characters
 
-inline bool IsASpace(int ch) {
+static inline bool IsASpace(int ch) {
     return (ch == ' ') || ((ch >= 0x09) && (ch <= 0x0d));
 }
 
-inline bool IsASpaceOrTab(int ch) {
+static inline bool IsASpaceOrTab(int ch) {
 	return (ch == ' ') || (ch == '\t');
 }
 
-inline bool IsADigit(int ch) {
+static inline bool IsADigit(int ch) {
 	return (ch >= '0') && (ch <= '9');
 }
 
-inline bool IsHexDigit(int ch) {
+static inline bool IsHexDigit(int ch) {
 	return (ch >= '0' && ch <= '9')
 		|| (ch >= 'A' && ch <= 'F')
 		|| (ch >= 'a' && ch <= 'f');
 }
 
-inline bool IsADigit(int ch, int base) {
+static inline bool IsADigit(int ch, int base) {
 	if (base <= 10) {
 		return (ch >= '0') && (ch < '0' + base);
 	} else {
@@ -75,24 +75,24 @@ inline bool IsADigit(int ch, int base) {
 	}
 }
 
-inline bool IsASCII(int ch) {
+static inline bool IsASCII(int ch) {
 	return (ch >= 0) && (ch < 0x80);
 }
 
-inline bool IsLowerCase(int ch) {
+static inline bool IsLowerCase(int ch) {
 	return (ch >= 'a') && (ch <= 'z');
 }
 
-inline bool IsUpperCase(int ch) {
+static inline bool IsUpperCase(int ch) {
 	return (ch >= 'A') && (ch <= 'Z');
 }
 
-inline bool IsAlpha(int ch) {
+static inline bool IsAlpha(int ch) {
 	return 	((ch >= 'a') && (ch <= 'z')) ||
 			((ch >= 'A') && (ch <= 'Z'));
 }
 
-inline bool IsAlphaNumeric(int ch) {
+static inline bool IsAlphaNumeric(int ch) {
 	return
 		((ch >= '0') && (ch <= '9')) ||
 		((ch >= 'a') && (ch <= 'z')) ||
@@ -103,19 +103,19 @@ inline bool IsAlphaNumeric(int ch) {
  * Check if a character is a space.
  * This is ASCII specific but is safe with chars >= 0x80.
  */
-inline bool isspacechar(int ch) {
+static inline bool isspacechar(int ch) {
     return (ch == ' ') || ((ch >= 0x09) && (ch <= 0x0d));
 }
 
-inline bool iswordchar(int ch) {
+static inline bool iswordchar(int ch) {
 	return IsAlphaNumeric(ch) || ch == '.' || ch == '_';
 }
 
-inline bool iswordstart(int ch) {
+static inline bool iswordstart(int ch) {
 	return IsAlphaNumeric(ch) || ch == '_';
 }
 
-inline bool isoperator(int ch) {
+static inline bool isoperator(int ch) {
 	if (IsAlphaNumeric(ch))
 		return false;
 	if (ch == '%' || ch == '^' || ch == '&' || ch == '*' ||
@@ -130,14 +130,14 @@ inline bool isoperator(int ch) {
 
 // Simple case functions for ASCII.
 
-inline int MakeUpperCase(int ch) {
+static inline int MakeUpperCase(int ch) {
 	if (ch < 'a' || ch > 'z')
 		return ch;
 	else
 		return (ch - 'a' + 'A');
 }
 
-inline int MakeLowerCase(int ch) {
+static inline int MakeLowerCase(int ch) {
 	if (ch < 'A' || ch > 'Z')
 		return ch;
 	else

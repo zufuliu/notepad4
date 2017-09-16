@@ -1216,7 +1216,7 @@ int Style_GetDocTypeLanguage() {
 	return 0;
 }
 
-__forceinline BOOL IsASpace(int ch) {
+static inline BOOL IsASpace(int ch) {
 	return (ch == ' ') || ((ch >= 0x09) && (ch <= 0x0d));
 }
 

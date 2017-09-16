@@ -1854,19 +1854,19 @@ BOOL GetThemedDialogFont(LPWSTR lpFaceName, WORD *wSize) {
 	return bSucceed;
 }
 
-static __inline BOOL DialogTemplate_IsDialogEx(const DLGTEMPLATE *pTemplate) {
+static inline BOOL DialogTemplate_IsDialogEx(const DLGTEMPLATE *pTemplate) {
 	return ((DLGTEMPLATEEX *)pTemplate)->signature == 0xFFFF;
 }
 
-static __inline BOOL DialogTemplate_HasFont(const DLGTEMPLATE *pTemplate) {
+static inline BOOL DialogTemplate_HasFont(const DLGTEMPLATE *pTemplate) {
 	return (DS_SETFONT & (DialogTemplate_IsDialogEx(pTemplate) ? ((DLGTEMPLATEEX *)pTemplate)->style : pTemplate->style));
 }
 
-static __inline int DialogTemplate_FontAttrSize(BOOL bDialogEx) {
+static inline int DialogTemplate_FontAttrSize(BOOL bDialogEx) {
 	return (int)sizeof(WORD) * (bDialogEx ? 3 : 1);
 }
 
-static __inline BYTE *DialogTemplate_GetFontSizeField(const DLGTEMPLATE *pTemplate) {
+static inline BYTE *DialogTemplate_GetFontSizeField(const DLGTEMPLATE *pTemplate) {
 	BOOL bDialogEx = DialogTemplate_IsDialogEx(pTemplate);
 	WORD *pw;
 
@@ -2004,14 +2004,14 @@ HWND CreateThemedDialogParam(HINSTANCE hInstance, LPCTSTR lpTemplate,
 /**
  * Is the character an octal digit?
  */
-static __inline BOOL IsOctalDigit(char ch) {
+static inline BOOL IsOctalDigit(char ch) {
 	return ch >= '0' && ch <= '7';
 }
 
 /**
  * If the character is an hexa digit, get its value.
  */
-static __inline int GetHexDigit(char ch) {
+static inline int GetHexDigit(char ch) {
 	if (ch >= '0' && ch <= '9') {
 		return ch - '0';
 	}

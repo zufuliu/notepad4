@@ -1551,10 +1551,11 @@ void EditShowHex(HWND hwnd) {
 //
 // EditHex2Dec()
 //
-__forceinline BOOL iswordstart(int ch) {
+static inline BOOL iswordstart(int ch) {
 	return (ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z') || ch == '.' || ch == '_';
 }
-__forceinline BOOL iswordchar(int ch) {
+
+static inline BOOL iswordchar(int ch) {
 	return iswordstart(ch) || (ch >= '0' && ch <= '9') || ch == '$';
 }
 

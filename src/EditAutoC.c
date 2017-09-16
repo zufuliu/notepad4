@@ -11,36 +11,36 @@
 #include "SciCall.h"
 #include "resource.h"
 
-__forceinline BOOL IsASpace(int ch) {
+static inline BOOL IsASpace(int ch) {
 	return (ch == ' ') || ((ch >= 0x09) && (ch <= 0x0d));
 }
 
-__forceinline BOOL IsAAlpha(int ch) {
+static inline BOOL IsAAlpha(int ch) {
 	return (ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z');
 }
 
-__forceinline BOOL IsWordStart(int ch) {
+static inline BOOL IsWordStart(int ch) {
 	return ch != '.' && IsDocWordChar(ch);
 }
 
-__forceinline BOOL IsEscapeChar(int ch) {
+static inline BOOL IsEscapeChar(int ch) {
 	return ch == 't' || ch == 'n' || ch == 'r' || ch == 'a' || ch == 'b' || ch == 'v' || ch == 'f'
 		   || ch == '$'; // PHP
 	// x u U
 }
 
-__forceinline BOOL IsCppCommentStyle(int style) {
+static inline BOOL IsCppCommentStyle(int style) {
 	return style == SCE_C_COMMENT || style == SCE_C_COMMENTLINE
 		   || style == SCE_C_COMMENTDOC || style == SCE_C_COMMENTLINEDOC
 		   || style == SCE_C_COMMENTDOC_TAG || style == SCE_C_COMMENTDOC_TAG_XML;
 }
 
-__forceinline BOOL IsCppStringStyle(int style) {
+static inline BOOL IsCppStringStyle(int style) {
 	return style == SCE_C_STRING || style == SCE_C_CHARACTER || style == SCE_C_STRINGEOL || style == SCE_C_STRINGRAW
 		   || style == SCE_C_VERBATIM || style == SCE_C_DSTRINGX || style == SCE_C_DSTRINGQ || style == SCE_C_DSTRINGT;
 }
 
-__forceinline BOOL IsSpecialStartChar(int ch, int chPrev) {
+static inline BOOL IsSpecialStartChar(int ch, int chPrev) {
 	return (ch == '.')	// member
 		   || (ch == '#')	// preprocessor
 		   || (ch == '@') // Java/PHP/Doxygen Doc Tag
@@ -115,7 +115,7 @@ BOOL IsDocWordChar(int ch) {
 	return FALSE;
 }
 
-static __inline BOOL IsOperatorStyle(int style) {
+static inline BOOL IsOperatorStyle(int style) {
 	switch (pLexCurrent->iLexer) {
 	case SCLEX_CPP:
 	case SCLEX_JSON:
@@ -179,7 +179,7 @@ static __inline BOOL IsOperatorStyle(int style) {
 	return FALSE;
 }
 
-static __inline BOOL IsWordStyleToIgnore(int style) {
+static inline BOOL IsWordStyleToIgnore(int style) {
 	switch (pLexCurrent->iLexer) {
 	case SCLEX_CPP:
 		return style == SCE_C_WORD || style == SCE_C_WORD2 || style == SCE_C_PREPROCESSOR;
@@ -196,7 +196,7 @@ static __inline BOOL IsWordStyleToIgnore(int style) {
 }
 
 // https://en.wikipedia.org/wiki/Printf_format_string
-static __inline BOOL IsStringFormatChar(int ch, int style) {
+static inline BOOL IsStringFormatChar(int ch, int style) {
 	if (!IsAAlpha(ch)) {
 		return FALSE;
 	}
@@ -223,7 +223,7 @@ static __inline BOOL IsStringFormatChar(int ch, int style) {
 
 #define make_switch_key(length, ch)	(((length) << 8) | (ch))
 
-__forceinline BOOL NeedSpaceAfterKeyword(const char *word, int length) {
+static inline BOOL NeedSpaceAfterKeyword(const char *word, int length) {
 	if (length < 2 || length > 12) {
 		return FALSE;
 	}
@@ -772,7 +772,7 @@ void EditAutoCloseBraceQuote(HWND hwnd, int ch) {
 	}
 }
 
-static __inline BOOL IsHtmlVoidTag(const char *word, int length) {
+static inline BOOL IsHtmlVoidTag(const char *word, int length) {
 	if (length < 2 || length > 5) {
 		return FALSE;
 	}
@@ -1032,7 +1032,7 @@ extern BOOL	bTabIndents;
 extern int	iTabWidth;
 extern int	iIndentWidth;
 
-static __inline LPCWSTR EditGetLineEndString(void) {
+static inline LPCWSTR EditGetLineEndString(void) {
 	switch (iEOLMode) {
 	case SC_EOL_CRLF:
 		return L"\r\n";

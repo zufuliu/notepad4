@@ -75,7 +75,7 @@ namespace Scintilla {
 
 typedef float XYPOSITION;
 typedef double XYACCUMULATOR;
-inline int RoundXYPosition(XYPOSITION xyPos) {
+static inline int RoundXYPosition(XYPOSITION xyPos) {
 	return static_cast<int>(xyPos + 0.5);
 }
 

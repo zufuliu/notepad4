@@ -10,11 +10,11 @@
 #define NP2_AUTOC_MAX_CACHE_COUNT	12
 
 #define DefaultAlignment		16
-__forceinline unsigned int align_up(unsigned int value) {
+static inline unsigned int align_up(unsigned int value) {
 	return (value + DefaultAlignment - 1) & (~(DefaultAlignment - 1));
 }
 
-__forceinline unsigned int bswap32(unsigned int x) {
+static inline unsigned int bswap32(unsigned int x) {
 	return (x << 24) | ((x << 8) & 0xff0000) | ((x >> 8) & 0xff00) | (x >> 24);
 }
 
@@ -516,7 +516,7 @@ struct WordList *WordList_Alloc(LPCSTR pRoot, int iRootLen, BOOL bIgnoreCase) {
 	return pWList;
 }
 
-__forceinline BOOL WordList_StartsWith(struct WordList *pWList, LPCSTR pWord) {
+static inline BOOL WordList_StartsWith(struct WordList *pWList, LPCSTR pWord) {
 #if NP2_AUTOC_USE_STRING_ORDER
 	if (pWList->iStartLen > NP2_AUTOC_ORDER_LENGTH) {
 		return pWList->WL_StrCmpNA(pWList->pWordStart, pWord, pWList->iStartLen) == 0;

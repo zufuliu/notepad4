@@ -227,7 +227,7 @@ public:
 		const char *s, unsigned int len, XYPOSITION *positions, const Document *pdoc);
 };
 
-inline bool IsSpaceOrTab(int ch) {
+static inline bool IsSpaceOrTab(int ch) {
 	return ch == ' ' || ch == '\t';
 }
 

@@ -35,7 +35,7 @@
 extern PEDITLEXER pLexCurrent;
 extern int np2LexLangIndex;
 
-static __inline BOOL IsDocLowerKeywords(PEDITLEXER pLex) {
+static inline BOOL IsDocLowerKeywords(PEDITLEXER pLex) {
 	switch (pLex->rid) {
 	case NP2LEX_HTML:		// HTML
 	case NP2LEX_PHP:		// PHP

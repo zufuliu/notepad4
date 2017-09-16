@@ -15,7 +15,7 @@ using UniqueString = std::unique_ptr<const char[]>;
 
 /// Equivalent to strdup but produces a std::unique_ptr<const char[]> allocation to go
 /// into collections.
-inline UniqueString UniqueStringCopy(const char *text) {
+static inline UniqueString UniqueStringCopy(const char *text) {
 	if (!text) {
 		return UniqueString();
 	}

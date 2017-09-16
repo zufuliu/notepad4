@@ -874,17 +874,19 @@ HWND InitInstance(HINSTANCE hInstance, LPSTR pszCmdLine, int nCmdShow) {
 // Messages are distributed to the MsgXXX-handlers
 //
 //
-__forceinline void NP2MinimizeWind(HWND hwnd) {
+static inline void NP2MinimizeWind(HWND hwnd) {
 	MinimizeWndToTray(hwnd);
 	ShowNotifyIcon(hwnd, TRUE);
 	SetNotifyIconTitle(hwnd);
 }
-__forceinline void NP2RestoreWind(HWND hwnd) {
+
+static inline void NP2RestoreWind(HWND hwnd) {
 	ShowNotifyIcon(hwnd, FALSE);
 	RestoreWndFromTray(hwnd);
 	ShowOwnedPopups(hwnd, TRUE);
 }
-__forceinline void NP2ExitWind(HWND hwnd) {
+
+static inline void NP2ExitWind(HWND hwnd) {
 	if (FileSave(FALSE, TRUE, FALSE, FALSE)) {
 		DestroyWindow(hwnd);
 	}
@@ -1384,12 +1386,12 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 // MsgCreate() - Handles WM_CREATE
 //
 //
-static __inline void UpdateSelectionMarginWidth() {
+static inline void UpdateSelectionMarginWidth() {
 	int width = bShowSelectionMargin ? MulDiv(16, g_uCurrentDPI, USER_DEFAULT_SCREEN_DPI) : 0;
 	SendMessage(hwndEdit, SCI_SETMARGINWIDTHN, 1, width);
 }
 
-static __inline void UpdateFoldMarginWidth() {
+static inline void UpdateFoldMarginWidth() {
 	int width = bShowCodeFolding ? MulDiv(13, g_uCurrentDPI, USER_DEFAULT_SCREEN_DPI) : 0;
 	SciCall_SetMarginWidth(MARGIN_FOLD_INDEX, width);
 }
@@ -7479,7 +7481,7 @@ void GetRelaunchParameters(LPWSTR szParameters, LPCWSTR lpszFile, BOOL newWind, 
 			const char *enc = mEncoding[iEncoding].pszParseNames;
 			char *sep = StrChrA(enc, ',');
 			ZeroMemory(tch, sizeof(tch));
-			MultiByteToWideChar(CP_UTF8, 0, enc, sep - enc, tch, COUNTOF(tch));
+			MultiByteToWideChar(CP_UTF8, 0, enc, (int)(sep - enc), tch, COUNTOF(tch));
 			lstrcat(szParameters, L" -e \"");
 			lstrcat(szParameters, tch);
 			lstrcat(szParameters, L"\"");

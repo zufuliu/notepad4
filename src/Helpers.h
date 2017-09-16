@@ -24,38 +24,32 @@
 #define COUNTOF(ar)		(sizeof(ar)/sizeof(ar[0]))
 #define CSTRLEN(s)		(COUNTOF(s)-1)
 
-__forceinline int min_i(int x, int y) {
+static inline int min_i(int x, int y) {
 	return (x < y) ? x : y;
 }
 
-__forceinline int max_i(int x, int y) {
+static inline int max_i(int x, int y) {
 	return (x > y) ? x : y;
 }
 
-__forceinline UINT max_u(UINT x, UINT y) {
+static inline UINT max_u(UINT x, UINT y) {
 	return (x > y) ? x : y;
 }
 
-__forceinline long max_l(long x, long y) {
+static inline long max_l(long x, long y) {
 	return (x > y) ? x : y;
 }
 
-__forceinline int maxmin_i(int x, int y, int z) {
+static inline int maxmin_i(int x, int y, int z) {
 	return max_i(min_i(x, y), z);
 }
 
-__forceinline int minmax_i(int x, int y, int z) {
+static inline int minmax_i(int x, int y, int z) {
 	return min_i(max_i(x, y), z);
 }
 
 #ifdef NDEBUG
-#if defined(_MSC_VER) && _MSC_VER < 1600
-static __inline void DLog(const char *fmt, ...) {
-	fmt;
-}
-#else
 #define DLog(fmt, ...)
-#endif
 #else
 void DLog(const char *fmt, ...);
 #endif
@@ -90,9 +84,9 @@ extern WCHAR szIniFile[MAX_PATH];
 #define USER_DEFAULT_SCREEN_DPI		96
 #endif
 
-#define NP2HeapAlloc(size)			HeapAlloc(g_hDefaultHeap, HEAP_ZERO_MEMORY, size)
+#define NP2HeapAlloc(size)			HeapAlloc(g_hDefaultHeap, HEAP_ZERO_MEMORY, (size))
 #define NP2HeapFree(hMem)			HeapFree(g_hDefaultHeap, 0, hMem)
-#define NP2HeapReAlloc(hMem, size)	HeapReAlloc(g_hDefaultHeap, HEAP_ZERO_MEMORY, hMem, size)
+#define NP2HeapReAlloc(hMem, size)	HeapReAlloc(g_hDefaultHeap, HEAP_ZERO_MEMORY, hMem, (size))
 
 #define IniGetString(lpSection, lpName, lpDefault, lpReturnedStr, nSize) \
 	GetPrivateProfileString(lpSection, lpName, lpDefault, lpReturnedStr, nSize, szIniFile)
@@ -102,34 +96,40 @@ extern WCHAR szIniFile[MAX_PATH];
 	WritePrivateProfileString(lpSection, lpName, lpString, szIniFile)
 #define IniDeleteSection(lpSection) \
 	WritePrivateProfileSection(lpSection, NULL, szIniFile)
-static __inline BOOL IniSetInt(LPCWSTR lpSection, LPCWSTR lpName, int i) {
+
+static inline BOOL IniSetInt(LPCWSTR lpSection, LPCWSTR lpName, int i) {
 	WCHAR tch[32];
 	wsprintf(tch, L"%i", i);
 	return IniSetString(lpSection, lpName, tch);
 }
+
 #define LoadIniSection(lpSection, lpBuf, cchBuf) \
 	GetPrivateProfileSection(lpSection, lpBuf, cchBuf, szIniFile);
 #define SaveIniSection(lpSection, lpBuf) \
 	WritePrivateProfileSection(lpSection, lpBuf, szIniFile)
+
 int		IniSectionGetString(LPCWSTR lpCachedIniSection, LPCWSTR lpName, LPCWSTR lpDefault,
 							LPWSTR lpReturnedString, int cchReturnedString);
 int		IniSectionGetInt(LPCWSTR lpCachedIniSection, LPCWSTR lpName, int iDefault);
 BOOL	IniSectionGetBool(LPCWSTR lpCachedIniSection, LPCWSTR lpName, BOOL bDefault);
 BOOL	IniSectionSetString(LPWSTR lpCachedIniSection, LPCWSTR lpName, LPCWSTR lpString);
-static __inline BOOL IniSectionSetInt(LPWSTR lpCachedIniSection, LPCWSTR lpName, int i) {
+
+static inline BOOL IniSectionSetInt(LPWSTR lpCachedIniSection, LPCWSTR lpName, int i) {
 	WCHAR tch[32];
 	wsprintf(tch, L"%i", i);
 	return IniSectionSetString(lpCachedIniSection, lpName, tch);
 }
-static __inline BOOL IniSectionSetBool(LPWSTR lpCachedIniSection, LPCWSTR lpName, BOOL b) {
+
+static inline BOOL IniSectionSetBool(LPWSTR lpCachedIniSection, LPCWSTR lpName, BOOL b) {
 	return IniSectionSetString(lpCachedIniSection, lpName, (b ? L"1" : L"0"));
 }
 
 extern HWND hwndEdit;
-static __inline void BeginWaitCursor(void) {
+static inline void BeginWaitCursor(void) {
 	SendMessage(hwndEdit, SCI_SETCURSOR, (WPARAM)SC_CURSORWAIT, 0);
 }
-static __inline void EndWaitCursor(void) {
+
+static inline void EndWaitCursor(void) {
 	POINT pt;
 	SendMessage(hwndEdit, SCI_SETCURSOR, (WPARAM)SC_CURSORNORMAL, 0);
 	GetCursorPos(&pt);
@@ -169,7 +169,7 @@ void MakeBitmapButton(HWND hwnd, int nCtlId, HINSTANCE hInstance, UINT uBmpId);
 void MakeColorPickButton(HWND hwnd, int nCtlId, HINSTANCE hInstance, COLORREF crColor);
 void DeleteBitmapButton(HWND hwnd, int nCtlId);
 
-#define StatusSetSimple(hwnd, b) SendMessage(hwnd, SB_SIMPLE, (WPARAM)b, 0)
+#define StatusSetSimple(hwnd, b) SendMessage(hwnd, SB_SIMPLE, (WPARAM)(b), 0)
 BOOL StatusSetText(HWND hwnd, UINT nPart, LPCWSTR lpszText);
 BOOL StatusSetTextID(HWND hwnd, UINT nPart, UINT uID);
 int  StatusCalcPaneWidth(HWND hwnd, LPCWSTR lpsz);
