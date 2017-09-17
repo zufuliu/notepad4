@@ -1025,7 +1025,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 		UpdateStatusbar();
 
 		//if (bPendingChangeNotify)
-		//	PostMessage(hwnd, WM_CHANGENOTIFY, 0, 0);
+		//	PostMessage(hwnd, APPM_CHANGENOTIFY, 0, 0);
 		break;
 
 	case WM_DROPFILES: {
@@ -1248,7 +1248,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 		}
 		return DefWindowProc(hwnd, umsg, wParam, lParam);
 
-	case WM_CHANGENOTIFY:
+	case APPM_CHANGENOTIFY:
 		if (iFileWatchingMode == 1 || bModified || iEncoding != iOriginalEncoding) {
 			SetForegroundWindow(hwnd);
 		}
@@ -1296,7 +1296,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 		break;
 
 	//// This message is posted before Notepad2 reactivates itself
-	//case WM_CHANGENOTIFYCLEAR:
+	//case APPM_CHANGENOTIFYCLEAR:
 	//	bPendingChangeNotify = FALSE;
 	//	break;
 
@@ -1320,7 +1320,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 		}
 		break;
 
-	case WM_TRAYMESSAGE:
+	case APPM_TRAYMESSAGE:
 		switch (lParam) {
 		case WM_RBUTTONUP: {
 			HMENU hMenu = LoadMenu(g_hInstance, MAKEINTRESOURCE(IDR_POPUPMENU));
@@ -7182,15 +7182,15 @@ BOOL ActivatePrevInst(void) {
 				DWORD cb = sizeof(NP2PARAMS);
 
 				// Make sure the previous window won't pop up a change notification message
-				//SendMessage(hwnd, WM_CHANGENOTIFYCLEAR, 0, 0);
+				//SendMessage(hwnd, APPM_CHANGENOTIFYCLEAR, 0, 0);
 
 				if (IsIconic(hwnd)) {
 					ShowWindowAsync(hwnd, SW_RESTORE);
 				}
 
 				if (!IsWindowVisible(hwnd)) {
-					SendMessage(hwnd, WM_TRAYMESSAGE, 0, WM_LBUTTONDBLCLK);
-					SendMessage(hwnd, WM_TRAYMESSAGE, 0, WM_LBUTTONUP);
+					SendMessage(hwnd, APPM_TRAYMESSAGE, 0, WM_LBUTTONDBLCLK);
+					SendMessage(hwnd, APPM_TRAYMESSAGE, 0, WM_LBUTTONUP);
 				}
 
 				SetForegroundWindow(hwnd);
@@ -7249,15 +7249,15 @@ BOOL ActivatePrevInst(void) {
 		// Enabled
 		if (IsWindowEnabled(hwnd)) {
 			// Make sure the previous window won't pop up a change notification message
-			//SendMessage(hwnd, WM_CHANGENOTIFYCLEAR, 0, 0);
+			//SendMessage(hwnd, APPM_CHANGENOTIFYCLEAR, 0, 0);
 
 			if (IsIconic(hwnd)) {
 				ShowWindowAsync(hwnd, SW_RESTORE);
 			}
 
 			if (!IsWindowVisible(hwnd)) {
-				SendMessage(hwnd, WM_TRAYMESSAGE, 0, WM_LBUTTONDBLCLK);
-				SendMessage(hwnd, WM_TRAYMESSAGE, 0, WM_LBUTTONUP);
+				SendMessage(hwnd, APPM_TRAYMESSAGE, 0, WM_LBUTTONDBLCLK);
+				SendMessage(hwnd, APPM_TRAYMESSAGE, 0, WM_LBUTTONUP);
 			}
 
 			SetForegroundWindow(hwnd);
@@ -7649,7 +7649,7 @@ void ShowNotifyIcon(HWND hwnd, BOOL bAdd) {
 	nid.hWnd = hwnd;
 	nid.uID = 0;
 	nid.uFlags = NIF_ICON | NIF_MESSAGE | NIF_TIP;
-	nid.uCallbackMessage = WM_TRAYMESSAGE;
+	nid.uCallbackMessage = APPM_TRAYMESSAGE;
 	nid.hIcon = hIcon;
 	lstrcpy(nid.szTip, L"Notepad2");
 
@@ -7773,7 +7773,7 @@ void CALLBACK WatchTimerProc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTim
 			KillTimer(NULL, ID_WATCHTIMER);
 			bRunningWatch = FALSE;
 			dwChangeNotifyTime = 0;
-			SendMessage(hwndMain, WM_CHANGENOTIFY, 0, 0);
+			SendMessage(hwndMain, APPM_CHANGENOTIFY, 0, 0);
 		}
 
 		// Check Change Notification Handle
@@ -7803,7 +7803,7 @@ void CALLBACK WatchTimerProc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTim
 					KillTimer(NULL, ID_WATCHTIMER);
 					bRunningWatch = FALSE;
 					dwChangeNotifyTime = 0;
-					SendMessage(hwndMain, WM_CHANGENOTIFY, 0, 0);
+					SendMessage(hwndMain, APPM_CHANGENOTIFY, 0, 0);
 				}
 			} else {
 				FindNextChangeNotification(hChangeHandle);

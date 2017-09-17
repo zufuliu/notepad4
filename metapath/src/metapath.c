@@ -620,7 +620,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 		}
 		break;
 
-	case WM_TRAYMESSAGE:
+	case APPM_TRAYMESSAGE:
 		switch (lParam) {
 		case WM_RBUTTONUP: {
 
@@ -3225,8 +3225,8 @@ BOOL ActivatePrevInst(void) {
 			}
 
 			if (!IsWindowVisible(hwnd)) {
-				SendMessage(hwnd, WM_TRAYMESSAGE, 0, WM_LBUTTONDBLCLK);
-				SendMessage(hwnd, WM_TRAYMESSAGE, 0, WM_LBUTTONUP);
+				SendMessage(hwnd, APPM_TRAYMESSAGE, 0, WM_LBUTTONDBLCLK);
+				SendMessage(hwnd, APPM_TRAYMESSAGE, 0, WM_LBUTTONUP);
 			}
 
 			SetForegroundWindow(hwnd);
@@ -3354,7 +3354,7 @@ void ShowNotifyIcon(HWND hwnd, BOOL bAdd) {
 	nid.hWnd = hwnd;
 	nid.uID = 0;
 	nid.uFlags = NIF_ICON | NIF_MESSAGE | NIF_TIP;
-	nid.uCallbackMessage = WM_TRAYMESSAGE;
+	nid.uCallbackMessage = APPM_TRAYMESSAGE;
 	nid.hIcon = hIcon;
 	lstrcpy(nid.szTip, L"metapath");
 

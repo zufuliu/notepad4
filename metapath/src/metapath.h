@@ -76,7 +76,7 @@
 #define ID_TIMER 0xA000
 
 //==== Callback Message from System Tray ======================================
-#define WM_TRAYMESSAGE WM_USER
+#define APPM_TRAYMESSAGE	(WM_APP + 4)
 
 //==== Function Declarations ==================================================
 BOOL InitApplication(HINSTANCE hInstance);
