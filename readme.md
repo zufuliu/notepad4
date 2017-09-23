@@ -146,8 +146,8 @@
 * Display caret location and length of selected text in count of characters
 * Improved auto-completion
 * Improved support for NFO ANSI art
-* Support for replacing Windows Notepad using a clean, unintrusive registry-based method
-* Support adding Notepad2 to Windows explorer context menu
+* Support replacing Windows Notepad using a clean, unintrusive registry-based method
+* Support [adding Notepad2 to Windows explorer context menu](https://github.com/zufuliu/notepad2/wiki/Open-with-Notepad2)
 * Other various minor changes and tweaks
 
 ## Supported Operating Systems:
@@ -171,8 +171,7 @@ TBD.
 * [Official Notepad2 website](http://www.flos-freeware.ch/notepad2.html)
 * [Official Notepad2-mod website](https://xhmikosr.github.io/notepad2-mod/)
 * [Scintilla Documentation](http://www.scintilla.org/ScintillaDoc.html)
+* [Build Notepad2 and metapath](https://github.com/zufuliu/notepad2/wiki/Build-Notepad2)
 
 ## Changed keyboard shortcuts compared to Notepad2 and/or Notepad2-mod:
 Almost every shortcut is available in the menu.
-
-## [Build Notepad2 and metapath](https://github.com/zufuliu/notepad2/wiki/Build-Notepad2)

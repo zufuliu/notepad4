@@ -1,3 +1,3 @@
-#define VERSION_HASH _T("32e15e8")
-#define VERSION_REV 1071
-#define VERSION_REV_FULL _T("1071 (32e15e8)")
+#define VERSION_HASH _T("cffabe8")
+#define VERSION_REV 1096
+#define VERSION_REV_FULL _T("1096 (cffabe8)")
