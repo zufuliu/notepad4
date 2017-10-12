@@ -169,7 +169,7 @@ BEGIN
         BEGIN
             MENUITEM "Copy A&ll\tAlt+C",            IDM_EDIT_COPYALL
             MENUITEM "Copy &Add\tCtrl+E",           IDM_EDIT_COPYADD
-            MENUITEM "Copy as &RTF",                IDM_EDIT_COPYRTF
+            MENUITEM "Copy As &RTF",                IDM_EDIT_COPYRTF
         END
         MENUITEM SEPARATOR
         POPUP "&Block"
@@ -311,7 +311,7 @@ BEGIN
             MENUITEM "Select to Begin", IDM_EDIT_SELTOBEGIN
             MENUITEM "Select to Ne&xt\tCtrl+Alt+F2", IDM_EDIT_SELTONEXT
             MENUITEM "Select to Pre&vious\tCtrl+Alt+Shift+F2", IDM_EDIT_SELTOPREV
-            MENUITEM "Junp to Selection Start\tCtrl+,", CMD_JUMP2SELSTART
+            MENUITEM "Jump to Selection Start\tCtrl+,", CMD_JUMP2SELSTART
             MENUITEM "Jump to Selection End\tCtrl+.",   CMD_JUMP2SELEND
         END
 //#ifdef BOOKMARK_EDITION
