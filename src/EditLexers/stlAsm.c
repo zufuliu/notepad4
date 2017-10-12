@@ -16,7 +16,7 @@ static KEYWORDLIST Keywords_ASM = {{
 "jnc jne jng jnge jnl jnle jno jnp jns jnz jo jp jpe jpo js jz jmp lahf lar lds les "
 "lfs lgs lss lea leave lgdt lidt lldt lmsw lock lods lodsb lodsw lodsd lodsq loop "
 "loope loopne loopnz loopz lsl ltr mov movbe movs movsb movsw movsd movsq movsx "
-"movsxd movzx mul neg nop not or out outs outsb outsw outsd  pause pop popa popad "
+"movsxd movzx mul neg nop not npad or out outs outsb outsw outsd  pause pop popa popad "
 "popf popfd popfq push pusha pushad pushf pushfd rcl rcr rol ror rdmsr rdpmc rdtsc "
 "rdtscp rep repe repz repne repnz ret retf rsm sahf sal sar shl shr sbb scas scasb "
 "scasw scasd seta setae setb setbe setc sete setg setge setl setle setna setnae "
@@ -96,7 +96,7 @@ static KEYWORDLIST Keywords_ASM = {{
 "prologue qword radix readonly real10 real4 real8 req sbyte scoped sdword seq setif2 sign? small "
 "smallstack sword tbyte tiny use16 use32 uses vararg word wrt zero? "
 "ptrdiff_t size_t int_t uint_t int32_t uint32_t int64_t uint64_t null true false "
-
+"const _text pdata xdata imagerel "
 ,/* ext Instruction */
 //XMM SSE SSE2 SSE4
 "addpd addps addsd addss addsubpd addsubps andpd andps andnpd andnps blendpd blendps "
@@ -139,6 +139,7 @@ static KEYWORDLIST Keywords_ASM = {{
 //AMD XOP/FMA4
 , // fold begin
 "do .while .repeat switch if .if if1 if2 ife ifb ifnb ifdef .ifdef ifndef .ifndef ifidn ifidni macro istruc struc struct union dialog proc .def .func .macro .irp .irpc .rept $if %ifnnum %ifidn %ifidni %ifstr %ifctx %imacro %macro %rep .cfi_startproc .seh_proc "
+"segment "
 , // fold end
 "while .endw .until endswitch endsw endif endm iend ends enddialog endproc endp .endef .endfunc .endif .endm .endr $endif %endmacro %endrep .cfi_endproc .seh_endproc "
 

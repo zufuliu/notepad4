@@ -19,7 +19,7 @@
 using namespace Scintilla;
 
 static inline bool IsAsmWordChar(int ch) {
-	return (ch < 0x80) && (isalnum(ch) || ch == '.' || ch == '_' || ch == '?');
+	return (ch < 0x80) && (isalnum(ch) || ch == '.' || ch == '_' || ch == '?' || ch == '@' || ch == '$');
 }
 static inline bool IsAsmWordStart(int ch) {
 	return (ch < 0x80) && (isalnum(ch) || ch == '_' || ch == '.' ||
