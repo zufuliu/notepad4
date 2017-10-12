@@ -386,9 +386,9 @@ static void FoldPyDoc(Sci_PositionU startPos, Sci_Position length, int, LexerWor
 
 	// Set up initial loop state
 	startPos = styler.LineStart(lineCurrent);
-	int prev_state = SCE_PY_DEFAULT & 31;
+	int prev_state = SCE_PY_DEFAULT;
 	if (lineCurrent >= 1)
-		prev_state = styler.StyleAt(startPos - 1) & 31;
+		prev_state = styler.StyleAt(startPos - 1);
 	int prevQuote = foldQuotes && IsPyTripleStyle(prev_state);
 
 	// Process all characters to end of requested range or end of any triple quote
@@ -405,7 +405,7 @@ static void FoldPyDoc(Sci_PositionU startPos, Sci_Position length, int, LexerWor
 			// Information about next line is only available if not at end of document
 			indentNext = Accessor::LexIndentAmount(styler, lineNext, &spaceFlags, NULL);
 			Sci_Position lookAtPos = (styler.LineStart(lineNext) == styler.Length()) ? styler.Length() - 1 : styler.LineStart(lineNext);
-			int style = styler.StyleAt(lookAtPos) & 31;
+			int style = styler.StyleAt(lookAtPos);
 			quote = foldQuotes && IsPyTripleStyle(style);
 		}
 		const int quote_start = (quote && !prevQuote);
