@@ -33,141 +33,161 @@
 #include "resource.h"
 
 extern EDITLEXER lexDefault;
+
 extern EDITLEXER lexCPP;
-extern EDITLEXER lexJava;
 extern EDITLEXER lexCSharp;
+extern EDITLEXER lexCSS;
+extern EDITLEXER lexJava;
+extern EDITLEXER lexJS;
+extern EDITLEXER lexJSON;
+extern EDITLEXER lexPHP;
 extern EDITLEXER lexPython;
 extern EDITLEXER lexRuby;
-
-extern EDITLEXER lexPHP;
 extern EDITLEXER lexSQL;
-extern EDITLEXER lexXML;
-extern EDITLEXER lexJSON;
 extern EDITLEXER lexHTML;
-extern EDITLEXER lexCSS;
-extern EDITLEXER lexJS;
-
-extern EDITLEXER lexMatlab;
-extern EDITLEXER lexVB;
-extern EDITLEXER lexVBS;
-extern EDITLEXER lexGroovy;
-extern EDITLEXER lexScala;
-extern EDITLEXER lexGo;
-extern EDITLEXER lexLua;
-
-extern EDITLEXER lexJulia;
-extern EDITLEXER lexFortran;
-extern EDITLEXER lexTexinfo;
-extern EDITLEXER lexLaTeX;
-extern EDITLEXER lexASY;
-extern EDITLEXER lexDOT;
+extern EDITLEXER lexXML;
 
 extern EDITLEXER lexAS;
-extern EDITLEXER lexHaXe;
-extern EDITLEXER lexD;
-extern EDITLEXER lexFSharp;
-extern EDITLEXER lexPascal;
-
 extern EDITLEXER lexSmali;
-extern EDITLEXER lexCIL;
-extern EDITLEXER lexLLVM;
 extern EDITLEXER lexASM;
-extern EDITLEXER lexVHDL;
-extern EDITLEXER lexVerilog;
+extern EDITLEXER lexASY;
+extern EDITLEXER lexAU3;
+extern EDITLEXER lexAwk;
 
 extern EDITLEXER lexBatch;
-extern EDITLEXER lexBash;
-extern EDITLEXER lexPerl;
-extern EDITLEXER lexTcl;
-extern EDITLEXER lexAwk;
-extern EDITLEXER lexLisp;
-extern EDITLEXER lexVim;
-extern EDITLEXER lexPS1;
-extern EDITLEXER lexAU3;
-
-extern EDITLEXER lexRC;
-//extern EDITLEXER lexIDL;
-extern EDITLEXER lexMake;
 
 extern EDITLEXER lexCMake;
+extern EDITLEXER lexCONF;
+
+extern EDITLEXER lexD;
+extern EDITLEXER lexDIFF;
+
+extern EDITLEXER lexFSharp;
+extern EDITLEXER lexFortran;
+
 extern EDITLEXER lexGradle;
-extern EDITLEXER lexJAM;
+extern EDITLEXER lexDOT;
+extern EDITLEXER lexGo;
+extern EDITLEXER lexGroovy;
+
+extern EDITLEXER lexHaXe;
+
+//extern EDITLEXER lexIDL;
+extern EDITLEXER lexINI;
 extern EDITLEXER lexINNO;
+
+extern EDITLEXER lexJAM;
+extern EDITLEXER lexJulia;
+
+extern EDITLEXER lexLaTeX;
+extern EDITLEXER lexLisp;
+extern EDITLEXER lexLLVM;
+extern EDITLEXER lexLua;
+
+extern EDITLEXER lexMake;
+extern EDITLEXER lexMatlab;
+
+extern EDITLEXER lexCIL;
 extern EDITLEXER lexNsis;
 
-extern EDITLEXER lexCONF;
-extern EDITLEXER lexINI;
-extern EDITLEXER lexDIFF;
+extern EDITLEXER lexPascal;
+extern EDITLEXER lexPerl;
+extern EDITLEXER lexPS1;
+
+extern EDITLEXER lexRC;
+
+extern EDITLEXER lexScala;
+extern EDITLEXER lexBash;
+
+extern EDITLEXER lexTcl;
+extern EDITLEXER lexTexinfo;
+
+extern EDITLEXER lexVBS;
+extern EDITLEXER lexVerilog;
+extern EDITLEXER lexVHDL;
+extern EDITLEXER lexVim;
+extern EDITLEXER lexVB;
+
 extern EDITLEXER lexANSI;
 
 // This array holds all the lexers...
 PEDITLEXER pLexArray[NUMLEXERS] = {
 	&lexDefault,
+
 	&lexCPP,
-	&lexJava,
 	&lexCSharp,
+	&lexCSS,
+	&lexJava,
+	&lexJS,
+	&lexJSON,
+	&lexPHP,
 	&lexPython,
 	&lexRuby,
-
-	&lexPHP,
 	&lexSQL,
-	&lexXML,
-	&lexJSON,
 	&lexHTML,
-	&lexCSS,
-	&lexJS,
-
-	&lexMatlab,
-	&lexVB,
-	&lexVBS,
-	&lexGroovy,
-	&lexScala,
-	&lexGo,
-	&lexLua,
-
-	&lexJulia,
-	&lexFortran,
-	&lexTexinfo,
-	&lexLaTeX,
-	&lexASY,
-	&lexDOT,
+	&lexXML,
 
 	&lexAS,
-	&lexHaXe,
-	&lexD,
-	&lexFSharp,
-	&lexPascal,
-
 	&lexSmali,
-	&lexCIL,
-	&lexLLVM,
 	&lexASM,
-	&lexVHDL,
-	&lexVerilog,
+	&lexASY,
+	&lexAU3,
+	&lexAwk,
 
 	&lexBatch,
-	&lexBash,
-	&lexPerl,
-	&lexTcl,
-	&lexAwk,
-	&lexLisp,
-	&lexVim,
-	&lexPS1,
-	&lexAU3,
-
-	&lexRC,
-	//&lexIDL,
-	&lexMake,
 
 	&lexCMake,
+	&lexCONF,
+
+	&lexD,
+	&lexDIFF,
+
+	&lexFSharp,
+	&lexFortran,
+
 	&lexGradle,
-	&lexJAM,
+	&lexDOT,
+	&lexGo,
+	&lexGroovy,
+
+	&lexHaXe,
+
+	//&lexIDL,
+	&lexINI,
 	&lexINNO,
+
+	&lexJAM,
+	&lexJulia,
+
+	&lexLaTeX,
+	&lexLisp,
+	&lexLLVM,
+	&lexLua,
+
+	&lexMake,
+	&lexMatlab,
+
+	&lexCIL,
 	&lexNsis,
 
-	&lexCONF,
-	&lexINI,
-	&lexDIFF,
+	&lexPascal,
+	&lexPerl,
+	&lexPS1,
+
+	&lexRC,
+
+	&lexScala,
+	&lexBash,
+
+	&lexTcl,
+	&lexTexinfo,
+
+	&lexVBS,
+	&lexVerilog,
+	&lexVHDL,
+	&lexVim,
+	&lexVB,
+
 	&lexANSI
 };
 

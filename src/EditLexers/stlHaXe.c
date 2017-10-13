@@ -32,7 +32,7 @@ static KEYWORDLIST Keywords_HaXe = {{
 #endif
 }};
 
-EDITLEXER lexHaXe = { SCLEX_CPP, NP2LEX_HAXE, L"haXe Script", L"hx", L"", &Keywords_HaXe,
+EDITLEXER lexHaXe = { SCLEX_CPP, NP2LEX_HAXE, L"HaXe Script", L"hx", L"", &Keywords_HaXe,
 {
 	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
 	//{ SCE_C_DEFAULT, L"Default", L"", L"" },
