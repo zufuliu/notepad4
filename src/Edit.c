@@ -925,7 +925,7 @@ void EditTitleCase(HWND hwnd) {
 				//Added some '-characters and bPrevWasSpace makes it better (for example "'Don't'" will now work)
 				bPrevWasSpace = TRUE;
 				for (i = 0; i < cchTextW; i++) {
-					if (!IsCharAlphaNumericW(pszTextW[i]) && (!StrChr(L"\x0027\x0060\x00B4\x0092", pszTextW[i]) ||	bPrevWasSpace)) {
+					if (!IsCharAlphaNumericW(pszTextW[i]) && (!StrChr(L"\x0027\x0060\x0384\x2019", pszTextW[i]) ||	bPrevWasSpace)) {
 						bNewWord = TRUE;
 					} else {
 						if (bNewWord) {
@@ -3618,7 +3618,7 @@ void EditWrapToColumn(HWND hwnd, int nColumn/*, int nTabWidth*/) {
 	cchConvW = 0;
 	iLineLength = 0;
 
-#define ISDELIMITER(wc) StrChr(L",;.:-+%&\x00A6|/*?!\"\'~\x00B4#=", wc)
+#define ISDELIMITER(wc) StrChr(L",;.:-+%&\x00A6|/*?!\"\'~\x0384#=", wc)
 #define ISWHITE(wc) StrChr(L" \t", wc)
 #define ISWORDEND(wc) (/*ISDELIMITER(wc) ||*/ StrChr(L" \t\r\n", wc))
 
