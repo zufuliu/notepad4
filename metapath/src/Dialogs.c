@@ -115,7 +115,7 @@ BOOL GetDirectory(HWND hwndParent, int iTitle, LPWSTR pszFolder, LPCWSTR pszBase
 	pidl = SHBrowseForFolder(&bi);
 	if (pidl) {
 		SHGetPathFromIDList(pidl, pszFolder);
-		CoTaskMemFree(pidl);
+		CoTaskMemFree((LPVOID)pidl);
 		fOk = TRUE;
 	}
 
@@ -136,7 +136,7 @@ BOOL GetDirectory2(HWND hwndParent, int iTitle, LPWSTR pszFolder, int iBase) {
 	GetString(iTitle, szTitle, COUNTOF(szTitle));
 
 	if (NOERROR != SHGetSpecialFolderLocation(hwndParent, iBase, &pidlRoot)) {
-		CoTaskMemFree(pidlRoot);
+		CoTaskMemFree((LPVOID)pidlRoot);
 		return FALSE;
 	}
 
@@ -152,11 +152,11 @@ BOOL GetDirectory2(HWND hwndParent, int iTitle, LPWSTR pszFolder, int iBase) {
 	pidl = SHBrowseForFolder(&bi);
 	if (pidl) {
 		SHGetPathFromIDList(pidl, pszFolder);
-		CoTaskMemFree(pidl);
+		CoTaskMemFree((LPVOID)pidl);
 		fOk = TRUE;
 	}
 
-	CoTaskMemFree(pidlRoot);
+	CoTaskMemFree((LPVOID)pidlRoot);
 	return fOk;
 }
 

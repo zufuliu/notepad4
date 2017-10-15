@@ -2936,7 +2936,7 @@ void ScintillaWin::FullPaintDC(HDC hdc) {
 	paintState = notPainting;
 }
 
-static bool CompareDevCap(HDC hdc, HDC hOtherDC, int nIndex) {
+static inline bool CompareDevCap(HDC hdc, HDC hOtherDC, int nIndex) {
 	return ::GetDeviceCaps(hdc, nIndex) == ::GetDeviceCaps(hOtherDC, nIndex);
 }
 

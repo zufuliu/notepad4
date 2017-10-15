@@ -108,7 +108,7 @@ BOOL DirList_Destroy(HWND hwnd) {
 	CloseHandle(lpdl->hIconThread);
 
 	if (lpdl->pidl) {
-		CoTaskMemFree(lpdl->pidl);
+		CoTaskMemFree((LPVOID)(lpdl->pidl));
 	}
 
 	if (lpdl->lpsf) {
@@ -239,7 +239,7 @@ int DirList_Fill(HWND hwnd, LPCWSTR lpszDir, DWORD grfFlags, LPCWSTR lpszFileSpe
 		// Convert wszDir into a pidl
 		if (NOERROR == lpsfDesktop->lpVtbl->ParseDisplayName(lpsfDesktop, hwnd, NULL, wszDir, &chParsed, &pidl, &dwAttributes)) {
 			// Bind pidl to IShellFolder
-			if (NOERROR == lpsfDesktop->lpVtbl->BindToObject(lpsfDesktop, pidl, NULL, &IID_IShellFolder, &lpsf)) {
+			if (NOERROR == lpsfDesktop->lpVtbl->BindToObject(lpsfDesktop, pidl, NULL, &IID_IShellFolder, (void **)(&lpsf))) {
 				// Create an Enumeration object for lpsf
 				if (NOERROR == lpsf->lpVtbl->EnumObjects(lpsf, hwnd, grfFlags, &lpe)) {
 					// Enumerate the contents of lpsf
@@ -247,7 +247,7 @@ int DirList_Fill(HWND hwnd, LPCWSTR lpszDir, DWORD grfFlags, LPCWSTR lpszFileSpe
 						// Add found item to the List
 						// Check if it's part of the Filesystem
 						dwAttributes = SFGAO_FILESYSTEM | SFGAO_FOLDER;
-						lpsf->lpVtbl->GetAttributesOf(lpsf, 1, &pidlEntry, &dwAttributes);
+						lpsf->lpVtbl->GetAttributesOf(lpsf, 1, (LPCITEMIDLIST *)(&pidlEntry), &dwAttributes);
 
 						if (dwAttributes & SFGAO_FILESYSTEM) {
 
@@ -284,7 +284,7 @@ int DirList_Fill(HWND hwnd, LPCWSTR lpszDir, DWORD grfFlags, LPCWSTR lpszFileSpe
 	} // SHGetDesktopFolder()
 
 	if (lpdl->pidl) {
-		CoTaskMemFree(lpdl->pidl);
+		CoTaskMemFree((LPVOID)(lpdl->pidl));
 	}
 
 	if (lpdl->lpsf && lpdl->lpsf->lpVtbl) {
@@ -341,7 +341,7 @@ DWORD WINAPI DirList_IconThread(LPVOID lpParam) {
 	iMaxItem = ListView_GetItemCount(hwnd);
 
 	// Get IShellIcon
-	lpdl->lpsf->lpVtbl->QueryInterface(lpdl->lpsf, &IID_IShellIcon, &lpshi);
+	lpdl->lpsf->lpVtbl->QueryInterface(lpdl->lpsf, &IID_IShellIcon, (void **)(&lpshi));
 
 	while (iItem < iMaxItem && WaitForSingleObject(lpdl->hExitThread, 0) != WAIT_OBJECT_0) {
 		lvi.iItem = iItem;
@@ -358,7 +358,7 @@ DWORD WINAPI DirList_IconThread(LPVOID lpParam) {
 			if (!lpshi || NOERROR != lpshi->lpVtbl->GetIconOf(lpshi, lplvid->pidl, GIL_FORSHELL, &lvi.iImage)) {
 				pidl = IL_Create(lpdl->pidl, lpdl->cbidl, lplvid->pidl, 0);
 				SHGetFileInfo((LPCWSTR)pidl, 0, &shfi, sizeof(SHFILEINFO), SHGFI_PIDL | SHGFI_SYSICONINDEX | SHGFI_SMALLICON);
-				CoTaskMemFree(pidl);
+				CoTaskMemFree((LPVOID)pidl);
 				lvi.iImage = shfi.iIcon;
 			}
 
@@ -367,7 +367,7 @@ DWORD WINAPI DirList_IconThread(LPVOID lpParam) {
 			lvi.state = 0;
 
 			// Link and Share Overlay
-			lplvid->lpsf->lpVtbl->GetAttributesOf(lplvid->lpsf, 1, &lplvid->pidl, &dwAttributes);
+			lplvid->lpsf->lpVtbl->GetAttributesOf(lplvid->lpsf, 1, (LPCITEMIDLIST *)(&lplvid->pidl), &dwAttributes);
 
 			if (dwAttributes & SFGAO_LINK) {
 				lvi.mask |= LVIF_STATE;
@@ -454,7 +454,7 @@ BOOL DirList_DeleteItem(HWND hwnd, LPARAM lParam) {
 	if (ListView_GetItem(hwnd, &lvi)) {
 		// Free mem
 		LPLV_ITEMDATA lplvid = (LPLV_ITEMDATA)lvi.lParam;
-		CoTaskMemFree(lplvid->pidl);
+		CoTaskMemFree((LPVOID)(lplvid->pidl));
 		lplvid->lpsf->lpVtbl->Release(lplvid->lpsf);
 
 		CoTaskMemFree(lplvid);
@@ -650,7 +650,7 @@ BOOL DirList_PropertyDlg(HWND hwnd, int iItem) {
 	lplvid = (LPLV_ITEMDATA)lvi.lParam;
 
 	if (NOERROR == lplvid->lpsf->lpVtbl->GetUIObjectOf(lplvid->lpsf,
-			GetParent(hwnd), 1, &lplvid->pidl, &IID_IContextMenu, NULL, &lpcm)) {
+			GetParent(hwnd), 1, (LPCITEMIDLIST *)(&lplvid->pidl), &IID_IContextMenu, NULL, (void **)(&lpcm))) {
 		cmi.cbSize = sizeof(CMINVOKECOMMANDINFO);
 		cmi.fMask = 0;
 		cmi.hwnd = GetParent(hwnd);
@@ -866,7 +866,7 @@ int DriveBox_Fill(HWND hwnd) {
 		// Get Desktop Folder
 		if (NOERROR == SHGetDesktopFolder(&lpsfDesktop)) {
 			// Bind pidl to IShellFolder
-			if (NOERROR == lpsfDesktop->lpVtbl->BindToObject(lpsfDesktop, pidl, NULL, &IID_IShellFolder, &lpsf)) {
+			if (NOERROR == lpsfDesktop->lpVtbl->BindToObject(lpsfDesktop, pidl, NULL, &IID_IShellFolder, (void **)(&lpsf))) {
 				// Create an Enumeration object for lpsf
 				if (NOERROR == lpsf->lpVtbl->EnumObjects(lpsf, hwnd, grfFlags, &lpe)) {
 					// Enumerate the contents of [My Computer]
@@ -874,7 +874,7 @@ int DriveBox_Fill(HWND hwnd) {
 						// Add item to the List if it is part of the
 						// Filesystem
 						dwAttributes = SFGAO_FILESYSTEM;
-						lpsf->lpVtbl->GetAttributesOf(lpsf, 1, &pidlEntry, &dwAttributes);
+						lpsf->lpVtbl->GetAttributesOf(lpsf, 1, (LPCITEMIDLIST *)(&pidlEntry), &dwAttributes);
 
 						if (dwAttributes & SFGAO_FILESYSTEM) {
 
@@ -928,7 +928,7 @@ int DriveBox_Fill(HWND hwnd) {
 
 			} // IShellFolder::BindToObject()
 
-			CoTaskMemFree(pidl);
+			CoTaskMemFree((LPVOID)pidl);
 
 		} // SHGetSpecialFolderLocation()
 
@@ -1040,7 +1040,7 @@ BOOL DriveBox_PropertyDlg(HWND hwnd) {
 	lpdcid = (LPDC_ITEMDATA)cbei.lParam;
 
 	if (NOERROR == lpdcid->lpsf->lpVtbl->GetUIObjectOf(lpdcid->lpsf,
-			GetParent(hwnd), 1, &lpdcid->pidl, &IID_IContextMenu, NULL, &lpcm)) {
+			GetParent(hwnd), 1, (LPCITEMIDLIST *)(&lpdcid->pidl), &IID_IContextMenu, NULL, (void **)(&lpcm))) {
 		cmi.cbSize = sizeof(CMINVOKECOMMANDINFO);
 		cmi.fMask = 0;
 		cmi.hwnd = GetParent(hwnd);
@@ -1080,7 +1080,7 @@ LRESULT DriveBox_DeleteItem(HWND hwnd, LPARAM lParam) {
 	lpdcid = (LPDC_ITEMDATA)cbei.lParam;
 
 	// Free pidl
-	CoTaskMemFree(lpdcid->pidl);
+	CoTaskMemFree((LPVOID)(lpdcid->pidl));
 	// Release lpsf
 	lpdcid->lpsf->lpVtbl->Release(lpdcid->lpsf);
 
@@ -1160,11 +1160,11 @@ LPITEMIDLIST IL_Create(LPCITEMIDLIST pidl1, UINT cb1, LPCITEMIDLIST pidl2, UINT 
 
 	// Init new ITEMIDLIST
 	if (pidl1) {
-		CopyMemory(pidl, pidl1, cb1);
+		CopyMemory((LPBYTE)pidl, (LPCBYTE)pidl1, cb1);
 	}
 
 	// pidl2 can't be NULL here
-	CopyMemory((LPBYTE)pidl + cb1, pidl2, cb2);
+	CopyMemory((LPBYTE)pidl + cb1, (LPCBYTE)pidl2, cb2);
 
 	return pidl;
 }
@@ -1184,7 +1184,7 @@ UINT IL_GetSize(LPCITEMIDLIST pidl) {
 		return 0;
 	}
 
-	for (pidlTmp = (LPITEMIDLIST)pidl; pidlTmp->mkid.cb; pidlTmp = _IL_Next(pidlTmp)) {
+	for (pidlTmp = (LPITEMIDLIST)pidl; pidlTmp->mkid.cb; pidlTmp = IL_Next(pidlTmp)) {
 		cb += pidlTmp->mkid.cb;
 	}
 

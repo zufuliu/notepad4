@@ -118,6 +118,14 @@ static inline BOOL EditIsEmptySelection(void) {
 	return SciCall_GetSelectionStart() == SciCall_GetSelectionEnd();
 }
 
+static inline Sci_Position SciCall_FindText(int searchFlags, struct Sci_TextToFind *ft) {
+	return (Sci_Position)SciCall2(SCI_FINDTEXT, searchFlags, ft);
+}
+
+static inline int SciCall_GetTextRange(struct Sci_TextRange *tr) {
+	return (int)SciCall2(SCI_GETTEXTRANGE, 0, tr);
+}
+
 //=============================================================================
 //
 //  Scrolling and automatic scrolling

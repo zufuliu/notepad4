@@ -729,10 +729,10 @@ BOOL PathGetLnkPath(LPCWSTR pszLnkFile, LPWSTR pszResPath, int cchResPath) {
 	WIN32_FIND_DATA  fd;
 	BOOL bSucceeded = FALSE;
 
-	if (SUCCEEDED(CoCreateInstance(&CLSID_ShellLink, NULL, CLSCTX_INPROC_SERVER, &IID_IShellLink, &psl))) {
+	if (SUCCEEDED(CoCreateInstance(&CLSID_ShellLink, NULL, CLSCTX_INPROC_SERVER, &IID_IShellLink, (LPVOID *)(&psl)))) {
 		IPersistFile *ppf;
 
-		if (SUCCEEDED(psl->lpVtbl->QueryInterface(psl, &IID_IPersistFile, &ppf))) {
+		if (SUCCEEDED(psl->lpVtbl->QueryInterface(psl, &IID_IPersistFile, (void **)(&ppf)))) {
 			WORD wsz[MAX_PATH];
 
 			/*MultiByteToWideChar(CP_ACP,MB_PRECOMPOSED, pszLnkFile, -1, wsz, MAX_PATH);*/
@@ -807,10 +807,10 @@ BOOL PathCreateLnk(LPCWSTR pszLnkDir, LPCWSTR pszPath) {
 		return FALSE;
 	}
 
-	if (SUCCEEDED(CoCreateInstance(&CLSID_ShellLink, NULL, CLSCTX_INPROC_SERVER, &IID_IShellLink, &psl))) {
+	if (SUCCEEDED(CoCreateInstance(&CLSID_ShellLink, NULL, CLSCTX_INPROC_SERVER, &IID_IShellLink, (LPVOID *)(&psl)))) {
 		IPersistFile *ppf;
 
-		if (SUCCEEDED(psl->lpVtbl->QueryInterface(psl, &IID_IPersistFile, &ppf))) {
+		if (SUCCEEDED(psl->lpVtbl->QueryInterface(psl, &IID_IPersistFile, (void **)(&ppf)))) {
 			WORD wsz[MAX_PATH];
 			/*MultiByteToWideChar(CP_ACP,MB_PRECOMPOSED, tchLnkFileName,-1,wsz,MAX_PATH);*/
 			lstrcpy(wsz, tchLnkFileName);
@@ -1048,7 +1048,7 @@ void GetDefaultFavoritesDir(LPWSTR lpFavDir, int cchFavDir) {
 
 	if (NOERROR == SHGetSpecialFolderLocation(NULL, CSIDL_PERSONAL, &pidl)) {
 		SHGetPathFromIDList(pidl, lpFavDir);
-		CoTaskMemFree(pidl);
+		CoTaskMemFree((LPVOID)pidl);
 	} else {
 		GetWindowsDirectory(lpFavDir, cchFavDir);
 	}
@@ -1063,7 +1063,7 @@ void GetDefaultOpenWithDir(LPWSTR lpOpenWithDir, int cchOpenWithDir) {
 
 	if (NOERROR == SHGetSpecialFolderLocation(NULL, CSIDL_DESKTOPDIRECTORY, &pidl)) {
 		SHGetPathFromIDList(pidl, lpOpenWithDir);
-		CoTaskMemFree(pidl);
+		CoTaskMemFree((LPVOID)pidl);
 	} else {
 		GetWindowsDirectory(lpOpenWithDir, cchOpenWithDir);
 	}

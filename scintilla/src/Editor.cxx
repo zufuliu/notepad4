@@ -70,7 +70,7 @@ static bool CanDeferToLastStep(const DocModification &mh) {
 	return false;		// PRESUMABLY must do
 }
 
-static bool CanEliminate(const DocModification &mh) {
+static inline bool CanEliminate(const DocModification &mh) {
 	return
 	    (mh.modificationType & (SC_MOD_BEFOREINSERT | SC_MOD_BEFOREDELETE)) != 0;
 }
@@ -205,7 +205,7 @@ void Editor::SetRepresentations() {
 	reprs.Clear();
 
 	// C0 control set
-	const char *reps[] = {
+	static const char *reps[] = {
 		"NUL", "SOH", "STX", "ETX", "EOT", "ENQ", "ACK", "BEL",
 		"BS", "HT", "LF", "VT", "FF", "CR", "SO", "SI",
 		"DLE", "DC1", "DC2", "DC3", "DC4", "NAK", "SYN", "ETB",
@@ -219,7 +219,7 @@ void Editor::SetRepresentations() {
 	// C1 control set
 	// As well as Unicode mode, ISO-8859-1 should use these
 	if (IsUnicodeMode()) {
-		const char *repsC1[] = {
+		static const char *repsC1[] = {
 			"PAD", "HOP", "BPH", "NBH", "IND", "NEL", "SSA", "ESA",
 			"HTS", "HTJ", "VTS", "PLD", "PLU", "RI", "SS2", "SS3",
 			"DCS", "PU1", "PU2", "STS", "CCH", "MW", "SPA", "EPA",

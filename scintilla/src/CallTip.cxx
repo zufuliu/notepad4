@@ -64,7 +64,7 @@ CallTip::~CallTip() {
 }
 
 // Although this test includes 0, we should never see a \0 character.
-static bool IsArrowCharacter(char ch) {
+static inline bool IsArrowCharacter(char ch) {
 	return (ch == 0) || (ch == '\001') || (ch == '\002');
 }
 

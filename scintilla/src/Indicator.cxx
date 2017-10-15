@@ -19,7 +19,7 @@
 
 using namespace Scintilla;
 
-static PRectangle PixelGridAlign(const PRectangle &rc) {
+static inline PRectangle PixelGridAlign(const PRectangle &rc) {
 	// Move left and right side to nearest pixel to avoid blurry visuals
 	return PRectangle::FromInts(static_cast<int>(rc.left + 0.5), static_cast<int>(rc.top),
 		static_cast<int>(rc.right + 0.5), static_cast<int>(rc.bottom));

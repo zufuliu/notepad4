@@ -55,10 +55,6 @@ static void FoldNullDoc(Sci_PositionU startPos, Sci_Position length, int /* init
 		if (!(indentCurrent & SC_FOLDLEVELWHITEFLAG))
 			break;
 	}
-	int indentCurrentLevel = indentCurrent & SC_FOLDLEVELNUMBERMASK;
-
-	// Set up initial loop state
-	startPos = styler.LineStart(lineCurrent);
 
 	// Process all characters to end of requested range
 	// Cap processing in all cases
@@ -72,7 +68,7 @@ static void FoldNullDoc(Sci_PositionU startPos, Sci_Position length, int /* init
 			// Information about next line is only available if not at end of document
 			indentNext = Accessor::LexIndentAmount(styler, lineNext, &spaceFlags, NULL);
 		}
-		indentCurrentLevel = indentCurrent & SC_FOLDLEVELNUMBERMASK;
+		int indentCurrentLevel = indentCurrent & SC_FOLDLEVELNUMBERMASK;
 		if (indentNext & SC_FOLDLEVELWHITEFLAG)
 			indentNext = SC_FOLDLEVELWHITEFLAG | indentCurrentLevel;
 

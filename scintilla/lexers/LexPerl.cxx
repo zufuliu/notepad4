@@ -121,8 +121,8 @@ static int disambiguateBareword(LexAccessor &styler, Sci_PositionU bk, Sci_Posit
 	// if ch isn't one of '[{(,' we can skip the test
 	if ((ch == '{' || ch == '(' || ch == '['|| ch == ',')
 	        && fw < endPos) {
-		while (ch = static_cast<unsigned char>(styler.SafeGetCharAt(fw)),
-		        IsASpaceOrTab(ch) && fw < endPos) {
+		while (IsASpaceOrTab(ch = static_cast<unsigned char>(styler.SafeGetCharAt(fw)))
+		        && fw < endPos) {
 			fw++;
 		}
 		if ((ch == '}' && brace)
@@ -137,10 +137,12 @@ static int disambiguateBareword(LexAccessor &styler, Sci_PositionU bk, Sci_Posit
 
 static void skipWhitespaceComment(LexAccessor &styler, Sci_PositionU &p) {
 	// when backtracking, we need to skip whitespace and comments
-	int style;
-	while ((p > 0) && (style = styler.StyleAt(p),
-	        style == SCE_PL_DEFAULT || style == SCE_PL_COMMENTLINE))
+	while (p > 0) {
+		const int style = styler.StyleAt(p);
+		if (style != SCE_PL_DEFAULT && style != SCE_PL_COMMENTLINE)
+			break;
 		p--;
+	}
 }
 
 static int findPrevLexeme(LexAccessor &styler, Sci_PositionU &bk, int &style) {
@@ -985,6 +987,7 @@ static void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int in
 							InterpolateSegment(sc, sLen);
 							break;
 						}
+						[[fallthrough]];
 						// fall through
 						// (continued for ' delim)
 					default:	// non-interpolated path

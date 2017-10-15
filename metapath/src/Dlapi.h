@@ -38,7 +38,7 @@ BOOL DirList_TerminateIconThread(HWND hwnd);
 #define DL_FOLDERS      32
 #define DL_NONFOLDERS   64
 #define DL_INCLHIDDEN  128
-#define DL_ALLOBJECTS  (32|64|128)
+#define DL_ALLOBJECTS  (DL_FOLDERS | DL_NONFOLDERS | DL_INCLHIDDEN)
 int DirList_Fill(HWND hwnd, LPCWSTR lpszDir, DWORD grfFlags, LPCWSTR lpszFileSpec,
 				 BOOL bExcludeFilter, BOOL bNoFadeHidden,
 				 int iSortFlags, BOOL fSortRev);
@@ -57,10 +57,10 @@ BOOL DirList_Sort(HWND hwnd, int lFlags, BOOL fRev);
 #define DLE_DIR  1
 #define DLE_FILE 2
 
-#define DLI_FILENAME 1
-#define DLI_DISPNAME 2
-#define DLI_TYPE     4
-#define DLI_ALL (1 | 2 | 4)
+#define DLI_FILENAME	1
+#define DLI_DISPNAME	2
+#define DLI_TYPE		4
+#define DLI_ALL			(DLI_FILENAME | DLI_DISPNAME | DLI_TYPE)
 
 typedef struct tagDLITEM { // dli
 	UINT mask;
@@ -96,7 +96,10 @@ BOOL DriveBox_PropertyDlg(HWND hwnd);
 LRESULT DriveBox_DeleteItem(HWND hwnd, LPARAM lParam);
 LRESULT DriveBox_GetDispInfo(HWND hwnd, LPARAM lParam);
 
-#define _IL_Next(pidl) ((LPITEMIDLIST)(((LPBYTE)(pidl)) + pidl->mkid.cb))
+static inline LPITEMIDLIST IL_Next(LPITEMIDLIST pidl) {
+	return (LPITEMIDLIST)((LPBYTE)(pidl) + pidl->mkid.cb);
+}
+
 LPITEMIDLIST IL_Create(LPCITEMIDLIST, UINT, LPCITEMIDLIST, UINT);
 UINT IL_GetSize(LPCITEMIDLIST pidl);
 BOOL IL_GetDisplayName(LPSHELLFOLDER lpsf, LPCITEMIDLIST pidl, DWORD dwFlags, LPWSTR lpszDisplayName, int nDisplayName);

@@ -1,4 +1,4 @@
-typedef char *NP2_KEYWORDS[4];
+typedef const char * const NP2_KEYWORDS[4];
 
 // JavaDoc
 static NP2_KEYWORDS kwJavaDoc = {

@@ -54,11 +54,11 @@
 #define LOAD_LIBRARY_SEARCH_SYSTEM32 0x00000800
 #endif
 
-static void *PointerFromWindow(HWND hWnd) {
+static inline void *PointerFromWindow(HWND hWnd) {
 	return reinterpret_cast<void *>(::GetWindowLongPtr(hWnd, 0));
 }
 
-static void SetWindowPointer(HWND hWnd, void *ptr) {
+static inline void SetWindowPointer(HWND hWnd, void *ptr) {
 	::SetWindowLongPtr(hWnd, 0, reinterpret_cast<LONG_PTR>(ptr));
 }
 
@@ -71,7 +71,7 @@ static HCURSOR reverseArrowCursor = NULL;
 
 namespace Scintilla {
 
-static RECT RectFromPRectangle(const PRectangle& prc) {
+static inline RECT RectFromPRectangle(const PRectangle& prc) {
 	RECT rc = {static_cast<LONG>(prc.left), static_cast<LONG>(prc.top),
 		static_cast<LONG>(prc.right), static_cast<LONG>(prc.bottom)};
 	return rc;

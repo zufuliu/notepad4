@@ -105,7 +105,6 @@ void LaunchTarget(LPCWSTR lpFileName, BOOL bOpenNew);
 void SnapToTarget(HWND hwnd);
 void SnapToDefaultPos(HWND hwnd);
 
-LRESULT CALLBACK HiddenWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam);
 LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam);
 LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam);
 void CreateBars(HWND hwnd, HINSTANCE hInstance);

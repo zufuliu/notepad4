@@ -192,7 +192,7 @@ void ViewStyle::CalculateMarginWidthAndMask() {
 	}
 	maskDrawInText = 0;
 	for (int markBit = 0; markBit < 32; markBit++) {
-		const int maskBit = 1 << markBit;
+		const int maskBit = 1U << markBit;
 		switch (markers[markBit].markType) {
 		case SC_MARK_EMPTY:
 			maskInLine &= ~maskBit;

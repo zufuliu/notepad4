@@ -318,6 +318,7 @@ next:
 					break;
 				case '[':
 					expected = true;
+					[[fallthrough]];
 					// fall through
 				case ']':
 				case '(':

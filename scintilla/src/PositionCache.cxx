@@ -367,7 +367,7 @@ void LineLayoutCache::Dispose(LineLayout *ll) {
 }
 
 // Simply pack the (maximum 4) character bytes into an int
-static inline int KeyFromString(const char *charBytes, size_t len) {
+static int KeyFromString(const char *charBytes, size_t len) {
 	PLATFORM_ASSERT(len <= 4);
 	int k=0;
 	for (size_t i=0; i<len && charBytes[i]; i++) {

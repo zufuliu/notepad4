@@ -142,7 +142,7 @@
       </Completion>
     </Configuration>
     <Configuration Name="Release_Win32" CompilerType="MinGW ( gcc )" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
-      <Compiler Options="-O2;-fno-rtti" C_Options="-O2" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
+      <Compiler Options="-O2;-fno-rtti;-fomit-frame-pointer" C_Options="-O2;-fomit-frame-pointer" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
         <Preprocessor Value="NDEBUG"/>
         <Preprocessor Value="WIN32"/>
         <Preprocessor Value="_WIN32_WINNT=0x0501"/>
@@ -184,7 +184,7 @@
       </Completion>
     </Configuration>
     <Configuration Name="Release_x64" CompilerType="MinGW ( gcc )" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
-      <Compiler Options="-O2;-fno-rtti" C_Options="-O2" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
+      <Compiler Options="-O2;-fno-rtti;-fomit-frame-pointer" C_Options="-O2;-fomit-frame-pointer" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
         <Preprocessor Value="NDEBUG"/>
         <Preprocessor Value="_WIN64"/>
         <Preprocessor Value="_WIN32_WINNT=0x0502"/>

@@ -238,7 +238,7 @@ using namespace Scintilla;
 #define BLKIND  0370
 #define BITIND  07
 
-const char bitarr[] = { 1, 2, 4, 8, 16, 32, 64, '\200' };
+static const char bitarr[] = { 1, 2, 4, 8, 16, 32, 64, '\200' };
 
 #define badpat(x)	(*nfa = END, x)
 
@@ -303,7 +303,7 @@ void RESearch::ChSetWithCase(unsigned char c, bool caseSensitive) {
 	}
 }
 
-static unsigned char escapeValue(unsigned char ch) {
+static inline unsigned char escapeValue(unsigned char ch) {
 	switch (ch) {
 	case 'a':	return '\a';
 	case 'b':	return '\b';
@@ -782,6 +782,7 @@ int RESearch::Execute(const CharacterIndexer &ci, Sci::Position lp, Sci::Positio
 			lp++;
 		if (lp >= endp)	/* if EOS, fail, else fall through. */
 			return 0;
+		[[fallthrough]];
 		// fall through
 	default:			/* regular matching all the way. */
 		while (lp < endp) {
@@ -833,7 +834,9 @@ int RESearch::Execute(const CharacterIndexer &ci, Sci::Position lp, Sci::Positio
 
 extern void re_fail(char *,char);
 
-#define isinset(x,y)	((x)[((y)&BLKIND)>>3] & bitarr[(y)&BITIND])
+static inline int isinset(const char *ap, unsigned char c) {
+	return ap[(c & BLKIND) >> 3] & bitarr[c & BITIND];
+}
 
 /*
  * skip values for CLO XXX to skip past the closure
@@ -865,8 +868,7 @@ Sci::Position RESearch::PMatch(const CharacterIndexer &ci, Sci::Position lp, Sci
 		case CCL:
 			if (lp >= endp)
 				return NOTFOUND;
-			c = ci.CharAt(lp++);
-			if (!isinset(ap,c))
+			if (!isinset(ap, ci.CharAt(lp++)))
 				return NOTFOUND;
 			ap += BITBLK;
 			break;
@@ -925,7 +927,7 @@ Sci::Position RESearch::PMatch(const CharacterIndexer &ci, Sci::Position lp, Sci
 				n = CHRSKIP;
 				break;
 			case CCL:
-				while ((lp < endp) && isinset(ap+1,ci.CharAt(lp)))
+				while ((lp < endp) && isinset(ap+1, ci.CharAt(lp)))
 					lp++;
 				n = CCLSKIP;
 				break;

@@ -13,7 +13,7 @@ static KEYWORDLIST Keywords_CPP = {{
 "explicit export false friend mutable namespace new noexcept noreturn nullptr operator "
 "private protected public reinterpret_cast static_assert static_cast template "
 "this thread_local throw true try typeid typename using virtual "
-"override "
+"override final "
 "_Pragma defined __has_include __has_include_next __has_attribute "
 "and and_eq bitand bitor compl not not_eq or or_eq xor xor_eq "
 "concept "
@@ -52,15 +52,16 @@ static KEYWORDLIST Keywords_CPP = {{
 "clock_t time_t "
 // wchar.h				wctype.h
 "wint_t mbstate_t "		"wctrans_t wctype_t "
+"byte "
 , // preprocessor
 " if elif else endif ifdef ifndef define undef include include_next import using pragma line error warning warn message "
 "region endregion sccs ident assert unassert "
 , // directive: Objective C/C++
-" interface private protected public package property end protocol optional required implementation synthesize try throw catch finally autoreleasepool synchronized dynamic class selector encode compatibility_alias import "
-"property() selector() "
+" interface private protected public package property end protocol optional required implementation synthesize try throw catch finally autoreleasepool synchronized dynamic class selector encode compatibility_alias import available "
+"property() selector() available() "
 , // attribute
 // Objective C/C++ @property()
-"getter setter readwrite readonly strong weak copy assign retain nonatomic atomic nonnull nullable "
+"getter setter readwrite readonly strong weak copy assign retain nonatomic atomic nonnull nullable null_resettable "
 // MSVC __declspec()
 "deprecated dllexport dllimport naked noinline noreturn nothrow novtable property selectany thread uuid "
 // GCC __attribute__()
@@ -68,6 +69,8 @@ static KEYWORDLIST Keywords_CPP = {{
 "__aligned__ __alloc_size__ __noreturn__ __returns_twice__ __noinline__ __noclone__ __always_inline__ __flatten__ __pure__ __nothrow__ __sentinel__ __format__ __format_arg__ __no_instrument_function__ __no_split_stack__ __section__ __constructor__ __destructor__ __used__ __unused__ __deprecated__ __weak__ __malloc__ __alias__ __ifunc__ __warn_unused_result__ __nonnull__ __gnu_inline__ __externally_visible__ __hot__ __cold__ __artificial__ __error__ __warning__ __cleanup__ __common__ __nocommon__ __mode__ __packed__ __shared__ __tls_model__ __vector_size__ __const__ "
 "cdecl stdcall __cdecl__ __stdcall__ __deprecated__ __dllexport__ __dllimport__ __naked__ __noinline__ __noreturn__ __nothrow__ __selectany__ "
 "may_alias __may_alias__ visibility __visibility__"
+// C++11, 14, 17
+"carries_dependency fallthrough "
 , // class
 // STL class
 "basic_string string wstring u16string u32string "

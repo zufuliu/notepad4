@@ -256,13 +256,13 @@ void AutoC_AddDocWord(HWND hwnd, struct WordList *pWList, BOOL bIgnore) {
 	struct Sci_TextToFind ft = {{0, 0}, 0, {0, 0}};
 	struct Sci_TextRange tr = { { 0, -1 }, NULL };
 	Sci_Position iCurrentPos = SciCall_GetCurrentPos() - iRootLen;
-	int iDocLen = (int)SendMessage(hwnd, SCI_GETLENGTH, 0, 0);
+	int iDocLen = SciCall_GetLength();
 	int findFlag = bIgnore ? SCFIND_WORDSTART : (SCFIND_WORDSTART | SCFIND_MATCHCASE);
 	int iPosFind;
 
 	ft.lpstrText = pRoot;
 	ft.chrg.cpMax = iDocLen;
-	iPosFind = (int)SendMessage(hwnd, SCI_FINDTEXT, findFlag, (LPARAM)&ft);
+	iPosFind = SciCall_FindText(findFlag, &ft);
 
 	while (iPosFind >= 0 && iPosFind < iDocLen) {
 		int wordEnd = iPosFind + iRootLen;
@@ -303,8 +303,8 @@ void AutoC_AddDocWord(HWND hwnd, struct WordList *pWList, BOOL bIgnore) {
 				if (wordLength > NP2_AUTOC_MAX_WORD_LENGTH) {
 					tr.chrg.cpMax = iPosFind + NP2_AUTOC_MAX_WORD_LENGTH;
 				}
-				SendMessage(hwnd, SCI_GETTEXTRANGE, 0, (LPARAM)&tr);
 
+				SciCall_GetTextRange(&tr);
 				ch = SciCall_GetCharAt(iPosFind - 1);
 				// word after escape char or format char
 				chPrev = SciCall_GetCharAt(iPosFind - 2);
@@ -354,7 +354,7 @@ void AutoC_AddDocWord(HWND hwnd, struct WordList *pWList, BOOL bIgnore) {
 					if (wordLength >= iRootLen) {
 						if (bSubWord && !(ch >= '0' && ch <= '9')) {
 							int i;
-							ch = 0, chNext = *pWord;
+							ch = 0; chNext = *pWord;
 							for (i = 0; i < wordLength - 1; i++) {
 								chPrev = ch;
 								ch = chNext;
@@ -374,8 +374,9 @@ void AutoC_AddDocWord(HWND hwnd, struct WordList *pWList, BOOL bIgnore) {
 				}
 			}
 		}
+
 		ft.chrg.cpMin = wordEnd;
-		iPosFind = (int)SendMessage(hwnd, SCI_FINDTEXT, findFlag, (LPARAM)&ft);
+		iPosFind = SciCall_FindText(findFlag, &ft);
 	}
 }
 
@@ -535,7 +536,7 @@ void EditCompleteWord(HWND hwnd, BOOL autoInsert) {
 
 	iAutoCItemCount = 0; // recreate list
 
-	iDocLen = SciCall_GetLine(iLine, NULL);  // get length
+	iDocLen = SciCall_GetLineLength(iLine);
 	pLine = NP2HeapAlloc(iDocLen + 1);
 	SciCall_GetLine(iLine, pLine);
 	iRootLen = iAutoCMinWordLength;

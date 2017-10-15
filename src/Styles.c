@@ -947,7 +947,7 @@ PEDITLEXER __fastcall Style_SniffShebang(char *pchText) {
 	if (pchText[0] == '#' && pchText[1] == '!') {
 		size_t len = 0;
 		char *pch = pchText + 2;
-		char *name = pch;
+		char *name;
 		while (*pch == ' ' || *pch == '\t') {
 			pch++;
 		}
