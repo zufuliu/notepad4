@@ -21,7 +21,7 @@ static KEYWORDLIST Keywords_Python = {{
 , // @Decorator
 "classmethod staticmethod cached_method abstractmethod property contextmanager "
 , // Built-in Functions
-"__import__() abs() all() any() ascii() bin() bool() bytearray() bytes() callable() chr() classmethod() "
+"__import__() abs() all() any() ascii() bin() bool() breakpoint() bytearray() bytes() callable() chr() classmethod() "
 "compile() complex() delattr() dict() dir() divmod() enumerate() eval() exec() filter() float() format() "
 "frozenset() getattr() globals() hasattr() hash() help() hex() id() input() int() isinstance() issubclass() "
 "iter() len() list() locals() map() max() memoryview() min() next() object() oct() open() ord() pow() print() "
