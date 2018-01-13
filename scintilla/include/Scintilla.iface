@@ -1973,6 +1973,9 @@ set void SetSelectionMode=2422(int selectionMode,)
 # Get the mode of the current selection.
 get int GetSelectionMode=2423(,)
 
+# Get whether or not regular caret moves will extend or reduce the selection.
+get bool GetMoveExtendsSelection=2706(,)
+
 # Retrieve the position of the start of the selection at the given line (INVALID_POSITION if no selection on this line).
 fun position GetLineSelStartPosition=2424(int line,)
 
@@ -2720,15 +2723,15 @@ get int GetNamedStyles=4029(,)
 
 # Retrieve the name of a style.
 # Result is NUL-terminated.
-fun int NameOfStyle=4030(int style, stringresult names)
+fun int NameOfStyle=4030(int style, stringresult name)
 
 # Retrieve a ' ' separated list of style tags like "literal quoted string".
 # Result is NUL-terminated.
-fun int TagsOfStyle=4031(int style, stringresult names)
+fun int TagsOfStyle=4031(int style, stringresult tags)
 
 # Retrieve a description of a style.
 # Result is NUL-terminated.
-fun int DescriptionOfStyle=4032(int style, stringresult names)
+fun int DescriptionOfStyle=4032(int style, stringresult description)
 
 # Notifications
 # Type of modification and the action which caused the modification.
@@ -2854,9 +2857,18 @@ evt void AutoCCompleted=2030(string text, int position, int ch, CompletionMethod
 evt void MarginRightClick=2031(int modifiers, int position, int margin)
 evt void AutoCSelectionChange=2032(int listType, string text, int position)
 
-# There are no provisional APIs currently, but some arguments to SCI_SETTECHNOLOGY are provisional.
-
 cat Provisional
+
+enu Bidirectional=SC_BIDIRECTIONAL_
+val SC_BIDIRECTIONAL_DISABLED=0
+val SC_BIDIRECTIONAL_L2R=1
+val SC_BIDIRECTIONAL_R2L=2
+
+# Retrieve bidirectional text display state.
+get int GetBidirectional=2708(,)
+
+# Set bidirectional text display state.
+set void SetBidirectional=2709(int bidirectional,)
 
 cat Deprecated
 

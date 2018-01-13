@@ -63,6 +63,9 @@ EditModel::EditModel() {
 	highlightGuideColumn = 0;
 	primarySelection = true;
 	imeInteraction = imeWindowed;
+#ifndef SCI_DISABLE_PROVISIONAL
+	bidirectional = Bidirectional::bidiDisabled;
+#endif
 	foldFlags = 0;
 	foldDisplayTextStyle = SC_FOLDDISPLAYTEXT_HIDDEN;
 	hotspot = Range(Sci::invalidPosition);

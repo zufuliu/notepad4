@@ -38,6 +38,10 @@ public:
 
 	enum IMEInteraction { imeWindowed, imeInline } imeInteraction;
 
+#ifndef SCI_DISABLE_PROVISIONAL
+	enum class Bidirectional { bidiDisabled, bidiL2R, bidiR2L  } bidirectional;
+#endif
+
 	int foldFlags;
 	int foldDisplayTextStyle;
 	ContractionState cs;

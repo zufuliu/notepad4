@@ -6740,6 +6740,15 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 	case SCI_GETIMEINTERACTION:
 		return imeInteraction;
 
+#ifndef SCI_DISABLE_PROVISIONAL
+	case SCI_SETBIDIRECTIONAL:
+		// SCI_SETBIDIRECTIONAL is implemented on platform subclasses if they support bidirectional text.
+		break;
+
+	case SCI_GETBIDIRECTIONAL:
+		return static_cast<sptr_t>(bidirectional);
+#endif
+
 		// Marker definition and setting
 	case SCI_MARKERDEFINE:
 		if (wParam <= MARKER_MAX) {
@@ -7629,6 +7638,8 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 		default:	// ?!
 			return SC_SEL_STREAM;
 		}
+	case SCI_GETMOVEEXTENDSSELECTION:
+		return sel.MoveExtends();
 	case SCI_GETLINESELSTARTPOSITION:
 	case SCI_GETLINESELENDPOSITION: {
 			SelectionSegment segmentLine(
