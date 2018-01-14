@@ -176,7 +176,6 @@ max(X)
 min(X)
 sum(X)
 total(X)
-
 -- date and time functions
 -- https://sqlite.org/lang_datefunc.html
 date(timestring, modifier, modifier, ...)
@@ -184,7 +183,6 @@ datetime(timestring, modifier, modifier, ...)
 julianday(timestring, modifier, modifier, ...)
 strftime(format, timestring, modifier, modifier, ...)
 time(timestring, modifier, modifier, ...)
-
 -- core functions
 -- https://sqlite.org/lang_corefunc.html
 abs(X)
@@ -233,6 +231,26 @@ unicode(X)
 unlikely(X)
 upper(X)
 zeroblob(N)
-
 -- JSON1
 -- https://www.sqlite.org/json1.html
+json(json)
+json_array(value1,value2,...)
+json_array_length(json)
+json_array_length(json,path)
+json_extract(json,path,...)
+json_insert(json,path,value,...)
+json_object(label1,value1,...)
+json_patch(json1,json2)
+json_remove(json,path,...)
+json_replace(json,path,value,...)
+json_set(json,path,value,...)
+json_type(json)
+json_type(json,path)
+json_valid(json)
+json_quote(value)
+json_group_array(value)
+json_group_object(name,value)
+json_each(json)
+json_each(json,path)
+json_tree(json)
+json_tree(json,path)
