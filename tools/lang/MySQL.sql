@@ -828,7 +828,34 @@ ExtractValue()
 UpdateXML()
 -- 12.12 Bit Functions and Operators
 BIT_COUNT()
---12.14 Information Functions
+-- 12.13 Encryption and Compression Functions
+AES_DECRYPT()
+AES_ENCRYPT()
+ASYMMETRIC_DECRYPT()
+ASYMMETRIC_DERIVE()
+ASYMMETRIC_ENCRYPT()
+ASYMMETRIC_SIGN()
+ASYMMETRIC_VERIFY()
+COMPRESS()
+CREATE_ASYMMETRIC_PRIV_KEY()
+CREATE_ASYMMETRIC_PUB_KEY()
+CREATE_DH_PARAMETERS()
+CREATE_DIGEST()
+DECODE() -- deprecated 5.7.2
+DES_DECRYPT() -- deprecated 5.7.6
+DES_ENCRYPT() -- deprecated 5.7.6
+ENCODE() -- deprecated 5.7.2
+ENCRYPT() -- deprecated 5.7.6
+MD5()
+OLD_PASSWORD()
+PASSWORD() -- deprecated 5.7.6
+RANDOM_BYTES()
+SHA1(), SHA()
+SHA2()
+UNCOMPRESS()
+UNCOMPRESSED_LENGTH()
+VALIDATE_PASSWORD_STRENGTH()
+-- 12.14 Information Functions
 CHARSET()
 COERCIBILITY()
 COLLATION()
@@ -843,6 +870,140 @@ SESSION_USER()
 SYSTEM_USER()
 USER()
 VERSION()
+-- 12.15.1 Spatial Function Reference
+Area() -- deprecated 5.7.6
+AsBinary(), AsWKB() -- deprecated 5.7.6
+AsText(), AsWKT() -- deprecated 5.7.6
+Buffer() -- deprecated 5.7.6
+Centroid() -- deprecated 5.7.6
+Contains() -- deprecated 5.7.6
+ConvexHull() -- deprecated 5.7.6
+Crosses() -- deprecated 5.7.6
+Dimension() -- deprecated 5.7.6
+Disjoint() -- deprecated 5.7.6
+Distance() -- deprecated 5.7.6
+EndPoint() -- deprecated 5.7.6
+Envelope() -- deprecated 5.7.6
+Equals() -- deprecated 5.7.6
+ExteriorRing() -- deprecated 5.7.6
+GeomCollFromText(), GeometryCollectionFromText() -- deprecated 5.7.6
+GeomCollFromWKB(), GeometryCollectionFromWKB() -- deprecated 5.7.6
+GeometryCollection()
+GeometryN() -- deprecated 5.7.6
+GeometryType() -- deprecated 5.7.6
+GeomFromText(), GeometryFromText() -- deprecated 5.7.6
+GeomFromWKB(), GeometryFromWKB() -- deprecated 5.7.6
+GLength() -- deprecated 5.7.6
+InteriorRingN() -- deprecated 5.7.6
+Intersects() -- deprecated 5.7.6
+IsClosed() -- deprecated 5.7.6
+IsEmpty() -- deprecated 5.7.6
+IsSimple() -- deprecated 5.7.6
+LineFromText(), LineStringFromText() -- deprecated 5.7.6
+LineFromWKB(), LineStringFromWKB() -- deprecated 5.7.6
+LineString()
+MBRContains()
+MBRCoveredBy()
+MBRCovers()
+MBRDisjoint()
+MBREqual() -- deprecated 5.7.6
+MBREquals()
+MBRIntersects()
+MBROverlaps()
+MBRTouches()
+MBRWithin()
+MLineFromText(), MultiLineStringFromText() -- deprecated 5.7.6
+MLineFromWKB(), MultiLineStringFromWKB() -- deprecated 5.7.6
+MPointFromText(), MultiPointFromText() -- deprecated 5.7.6
+MPointFromWKB(), MultiPointFromWKB() -- deprecated 5.7.6
+MPolyFromText(), MultiPolygonFromText() -- deprecated 5.7.6
+MPolyFromWKB(), MultiPolygonFromWKB() -- deprecated 5.7.6
+MultiLineString()
+MultiPoint()
+MultiPolygon()
+NumGeometries() -- deprecated 5.7.6
+NumInteriorRings() -- deprecated 5.7.6
+NumPoints() -- deprecated 5.7.6
+Overlaps() -- deprecated 5.7.6
+Point()
+PointFromText() -- deprecated 5.7.6
+PointFromWKB() -- deprecated 5.7.6
+PointN() -- deprecated 5.7.6
+PolyFromText(), PolygonFromText() -- deprecated 5.7.6
+PolyFromWKB(), PolygonFromWKB() -- deprecated 5.7.6
+Polygon()
+SRID() -- deprecated 5.7.6
+ST_Area()
+ST_AsBinary(), ST_AsWKB()
+ST_AsGeoJSON()
+ST_AsText(), ST_AsWKT()
+ST_Buffer()
+ST_Buffer_Strategy()
+ST_Centroid()
+ST_Contains()
+ST_ConvexHull()
+ST_Crosses()
+ST_Difference()
+ST_Dimension()
+ST_Disjoint()
+ST_Distance()
+ST_Distance_Sphere()
+ST_EndPoint()
+ST_Envelope()
+ST_Equals()
+ST_ExteriorRing()
+ST_GeoHash()
+ST_GeomCollFromText(), ST_GeometryCollectionFromText(), ST_GeomCollFromTxt()
+ST_GeomCollFromWKB(), ST_GeometryCollectionFromWKB()
+ST_GeometryN()
+ST_GeometryType()
+ST_GeomFromGeoJSON()
+ST_GeomFromText(), ST_GeometryFromText()
+ST_GeomFromWKB(),
+ST_InteriorRingN()
+ST_Intersection()
+ST_Intersects()
+ST_IsClosed()
+ST_IsEmpty()
+ST_IsSimple()
+ST_IsValid()
+ST_LatFromGeoHash()
+ST_Length()
+ST_LineFromText(), ST_LineStringFromText()
+ST_LineFromWKB(), ST_LineStringFromWKB()
+ST_LongFromGeoHash()
+ST_MakeEnvelope()
+ST_MLineFromText(), ST_MultiLineStringFromText()
+ST_MLineFromWKB(), ST_MultiLineStringFromWKB()
+ST_MPointFromText(), ST_MultiPointFromText()
+ST_MPointFromWKB(), ST_MultiPointFromWKB()
+ST_MPolyFromText(), ST_MultiPolygonFromText()
+ST_MPolyFromWKB(), ST_MultiPolygonFromWKB()
+ST_NumGeometries()
+ST_NumInteriorRing(), ST_NumInteriorRings()
+ST_NumPoints()
+ST_Overlaps()
+ST_PointFromGeoHash()
+ST_PointFromText()
+ST_PointFromWKB()
+ST_PointN()
+ST_PolyFromText(), ST_PolygonFromText()
+ST_PolyFromWKB(), ST_PolygonFromWKB()
+ST_Simplify()
+ST_SRID()
+ST_StartPoint()
+ST_SymDifference()
+ST_Touches()
+ST_Union()
+ST_Validate()
+ST_Within()
+ST_X()
+ST_Y()
+StartPoint() -- deprecated 5.7.6
+Touches() -- deprecated 5.7.6
+Within() -- deprecated 5.7.6
+X() -- deprecated 5.7.6
+Y() -- deprecated 5.7.6
 -- 12.16.1 JSON Function Reference
 JSON_APPEND() -- deprecated 5.7.9
 JSON_ARRAY()
