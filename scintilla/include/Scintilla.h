@@ -691,6 +691,8 @@ typedef sptr_t (*SciFnDirect)(sptr_t ptr, unsigned int iMessage, uptr_t wParam, 
 #define SCI_SELECTIONISRECTANGLE 2372
 #define SCI_SETZOOM 2373
 #define SCI_GETZOOM 2374
+#define SC_DOCUMENTOPTION_DEFAULT 0
+#define SC_DOCUMENTOPTION_STYLES_NONE 1
 #define SCI_CREATEDOCUMENT 2375
 #define SCI_ADDREFDOCUMENT 2376
 #define SCI_RELEASEDOCUMENT 2377

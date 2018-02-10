@@ -71,7 +71,7 @@ EditModel::EditModel() {
 	hotspot = Range(Sci::invalidPosition);
 	hoverIndicatorPos = Sci::invalidPosition;
 	wrapWidth = LineLayout::wrapWidthInfinite;
-	pdoc = new Document();
+	pdoc = new Document(SC_DOCUMENTOPTION_DEFAULT);
 	pdoc->AddRef();
 }
 

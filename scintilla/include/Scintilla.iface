@@ -1777,9 +1777,13 @@ set void SetZoom=2373(int zoomInPoints,)
 # Retrieve the zoom level.
 get int GetZoom=2374(,)
 
+enu DocumentOption=SC_DOCUMENTOPTION_
+val SC_DOCUMENTOPTION_DEFAULT=0
+val SC_DOCUMENTOPTION_STYLES_NONE=1
+
 # Create a new document object.
 # Starts with reference count of 1 and not selected into editor.
-fun int CreateDocument=2375(,)
+fun int CreateDocument=2375(int bytes, int documentOption)
 # Extend life of document.
 fun void AddRefDocument=2376(, int doc)
 # Release a reference to the document, deleting document if it fades to black.
@@ -2564,7 +2568,7 @@ set void SetTechnology=2630(int technology,)
 get int GetTechnology=2631(,)
 
 # Create an ILoader*.
-fun int CreateLoader=2632(int bytes,)
+fun int CreateLoader=2632(int bytes, int documentOption)
 
 # On OS X, show a find indicator.
 fun void FindIndicatorShow=2640(position start, position end)

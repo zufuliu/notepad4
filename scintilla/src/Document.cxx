@@ -10,6 +10,7 @@
 #include <cassert>
 #include <cstring>
 #include <cstdio>
+#include <cmath>
 
 #include <stdexcept>
 #include <string>
@@ -90,7 +91,8 @@ int LexInterface::LineEndTypesSupported() const {
 	return 0;
 }
 
-Document::Document() {
+Document::Document(int options) :
+	cb((options & SC_DOCUMENTOPTION_STYLES_NONE) == 0) {
 	refCount = 0;
 #ifdef _WIN32
 	eolMode = SC_EOL_CRLF;
@@ -560,7 +562,7 @@ void Document::GetHighlightDelimiters(HighlightDelimiter &highlightDelimiter, Sc
 }
 
 Sci::Position Document::ClampPositionIntoDocument(Sci::Position pos) const {
-	return Sci::clamp(pos, 0, static_cast<Sci::Position>(Length()));
+	return std::clamp(pos, static_cast<Sci::Position>(0), static_cast<Sci::Position>(Length()));
 }
 
 bool Document::IsCrLf(Sci::Position pos) const {
@@ -878,7 +880,7 @@ Sci::Position Document::GetRelativePositionUTF16(Sci::Position positionStart, Sc
 			const Sci::Position posNext = NextPosition(pos, increment);
 			if (posNext == pos)
 				return INVALID_POSITION;
-			if (abs(pos-posNext) > 3)	// 4 byte character = 2*UTF16.
+			if (std::abs(pos-posNext) > 3)	// 4 byte character = 2*UTF16.
 				characterOffset -= increment;
 			pos = posNext;
 			characterOffset -= increment;
