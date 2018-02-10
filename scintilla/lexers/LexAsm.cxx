@@ -279,7 +279,7 @@ _label_identifier:
 								sc.SetState(SCE_ASM_STRING);
 						}
 						else if (strcmp(pp, "error") == 0 || strcmp(pp, "warning") == 0
-							|| strcmp(pp, "message")) {
+							|| strcmp(pp, "message") == 0) {
 							if (!sc.atLineEnd)
 								sc.SetState(SCE_ASM_STRING);
 						} else {

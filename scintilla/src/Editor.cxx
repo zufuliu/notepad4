@@ -7563,6 +7563,7 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 			Document *doc = new Document(static_cast<int>(lParam));
 			doc->AddRef();
 			doc->Allocate(static_cast<int>(wParam));
+			return reinterpret_cast<sptr_t>(doc);
 		}
 
 	case SCI_ADDREFDOCUMENT:
