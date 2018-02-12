@@ -1216,11 +1216,18 @@ struct SCNotification {
 #define SCI_SETKEYSUNICODE 2521
 #define SCI_GETKEYSUNICODE 2522
 
+#define SCI_GETTWOPHASEDRAW 2283
+#define SCI_SETTWOPHASEDRAW 2284
+
 #define CharacterRange Sci_CharacterRange
 #define TextRange Sci_TextRange
 #define TextToFind Sci_TextToFind
 #define RangeToFormat Sci_RangeToFormat
 #define NotifyHeader Sci_NotifyHeader
+
+#define SCI_SETSTYLEBITS 2090
+#define SCI_GETSTYLEBITS 2091
+#define SCI_GETSTYLEBITSNEEDED 4011
 
 #endif
 
