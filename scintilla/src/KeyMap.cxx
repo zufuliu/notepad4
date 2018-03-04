@@ -12,7 +12,9 @@
 #include <map>
 
 #include "Platform.h"
+
 #include "Scintilla.h"
+
 #include "KeyMap.h"
 
 using namespace Scintilla;

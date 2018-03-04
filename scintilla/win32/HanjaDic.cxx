@@ -124,5 +124,4 @@ int GetHangulOfHanja(wchar_t *inout) {
 }
 
 }
-
 }

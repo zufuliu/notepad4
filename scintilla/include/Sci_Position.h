@@ -24,6 +24,6 @@ typedef long Sci_PositionCR;
 	#define SCI_METHOD __stdcall
 #else
 	#define SCI_METHOD
- #endif
+#endif
 
 #endif

@@ -312,6 +312,7 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	void ThinRectangularRange();
 	void InvalidateSelection(const SelectionRange &newMain, bool invalidateWholeSelection=false);
 	void InvalidateWholeSelection();
+	SelectionRange LineSelectionRange(const SelectionPosition &currentPos_, const SelectionPosition &anchor_) const;
 	void SetSelection(const SelectionPosition &currentPos, const SelectionPosition &anchor);
 	void SetSelection(Sci::Position currentPos_, Sci::Position anchor_);
 	void SetSelection(const SelectionPosition &currentPos);

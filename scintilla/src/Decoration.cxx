@@ -55,7 +55,7 @@ Decoration *DecorationList::DecorationFromIndicator(int indicator) {
 
 Decoration *DecorationList::Create(int indicator, int length) {
 	currentIndicator = indicator;
-	std::unique_ptr<Decoration> decoNew(new Decoration(indicator));
+	std::unique_ptr<Decoration> decoNew = std::make_unique<Decoration>(indicator);
 	decoNew->rs.InsertSpace(0, length);
 
 	std::vector<std::unique_ptr<Decoration>>::iterator it = std::lower_bound(

@@ -23,7 +23,7 @@ using namespace Scintilla;
 void SelectionPosition::MoveForInsertDelete(bool insertion, Sci::Position startChange, Sci::Position length) {
 	if (insertion) {
 		if (position == startChange) {
-			Sci::Position virtualLengthRemove = std::min(length, virtualSpace);
+			const Sci::Position virtualLengthRemove = std::min(length, virtualSpace);
 			virtualSpace -= virtualLengthRemove;
 			position += virtualLengthRemove;
 		} else if (position > startChange) {
@@ -108,7 +108,7 @@ bool SelectionRange::ContainsCharacter(Sci::Position posCharacter) const {
 }
 
 SelectionSegment SelectionRange::Intersect(const SelectionSegment &check) const {
-	SelectionSegment inOrder(caret, anchor);
+	const SelectionSegment inOrder(caret, anchor);
 	if ((inOrder.start <= check.end) || (inOrder.end >= check.start)) {
 		SelectionSegment portion = check;
 		if (portion.start < inOrder.start)

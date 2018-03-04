@@ -97,7 +97,7 @@ void Action::Create(actionType at_, Sci::Position position_, const char *data_, 
 	position = position_;
 	at = at_;
 	if (lenData_) {
-		data = std::unique_ptr<char []>(new char[lenData_]);
+		data = std::make_unique<char[]>(lenData_);
 		memcpy(&data[0], data_, lenData_);
 	}
 	lenData = lenData_;
@@ -577,10 +577,10 @@ void CellBuffer::ResetLineEnds() {
 	// Reinitialize line data -- too much work to preserve
 	lv.Init();
 
-	Sci::Position position = 0;
-	Sci::Position length = Length();
+	const Sci::Position position = 0;
+	const Sci::Position length = Length();
 	Sci::Line lineInsert = 1;
-	bool atLineStart = true;
+	const bool atLineStart = true;
 	lv.InsertText(lineInsert-1, length);
 	unsigned char chBeforePrev = 0;
 	unsigned char chPrev = 0;
@@ -626,7 +626,7 @@ void CellBuffer::BasicInsertString(Sci::Position position, const char *s, Sci::P
 	}
 
 	Sci::Line lineInsert = lv.LineFromPosition(position) + 1;
-	bool atLineStart = lv.LineStart(lineInsert-1) == position;
+	const bool atLineStart = lv.LineStart(lineInsert-1) == position;
 	// Point all the lines after the insertion point further along in the buffer
 	lv.InsertText(lineInsert-1, insertLength);
 	unsigned char chBeforePrev = substance.ValueAt(position - 2);

@@ -7,6 +7,8 @@
 
 #include "DBCS.h"
 
+using namespace Scintilla;
+
 namespace Scintilla {
 
 bool DBCSIsLeadByte(int codePage, char ch) {
