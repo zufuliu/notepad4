@@ -23,6 +23,7 @@
 #include <shlobj.h>
 #include <commctrl.h>
 #include <uxtheme.h>
+#include <psapi.h>
 #include <stdio.h>
 #include "Dlapi.h"
 #include "Helpers.h"
@@ -157,9 +158,6 @@ void EndWaitCursor(void) {
 //
 //  ExeNameFromWnd()
 //
-DWORD WINAPI GetModuleFileNameExW(HANDLE, HMODULE, LPTSTR, DWORD);
-BOOL WINAPI EnumProcessModules(HANDLE, HMODULE *, DWORD, LPDWORD);
-
 BOOL ExeNameFromWnd(HWND hwnd, LPWSTR szExeName, int cchExeName) {
 	DWORD dwProcessId;
 	HANDLE hProcess;
@@ -733,7 +731,7 @@ BOOL PathGetLnkPath(LPCWSTR pszLnkFile, LPWSTR pszResPath, int cchResPath) {
 		IPersistFile *ppf;
 
 		if (SUCCEEDED(psl->lpVtbl->QueryInterface(psl, &IID_IPersistFile, (void **)(&ppf)))) {
-			WORD wsz[MAX_PATH];
+			WCHAR wsz[MAX_PATH];
 
 			/*MultiByteToWideChar(CP_ACP,MB_PRECOMPOSED, pszLnkFile, -1, wsz, MAX_PATH);*/
 			lstrcpy(wsz, pszLnkFile);
@@ -811,7 +809,7 @@ BOOL PathCreateLnk(LPCWSTR pszLnkDir, LPCWSTR pszPath) {
 		IPersistFile *ppf;
 
 		if (SUCCEEDED(psl->lpVtbl->QueryInterface(psl, &IID_IPersistFile, (void **)(&ppf)))) {
-			WORD wsz[MAX_PATH];
+			WCHAR wsz[MAX_PATH];
 			/*MultiByteToWideChar(CP_ACP,MB_PRECOMPOSED, tchLnkFileName,-1,wsz,MAX_PATH);*/
 			lstrcpy(wsz, tchLnkFileName);
 
