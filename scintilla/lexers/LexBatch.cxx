@@ -105,7 +105,7 @@ _label_identifier:
 			case SCE_BAT_LABEL:
 				if (sc.ch == ':')
 					sc.ForwardSetState(SCE_BAT_DEFAULT);
-				else if (!iswordstart(sc.ch))
+				else if (!(iswordstart(sc.ch) || sc.ch == '-'))
 					sc.SetState(SCE_BAT_DEFAULT);
 				break;
 			case SCE_BAT_VARIABLE: {
@@ -124,7 +124,7 @@ _label_identifier:
 							end_var = true;
 							sc.SetState(varStyle);
 						}
-					} else if (!iswordstart(sc.ch)) {
+					} else if (!(iswordstart(sc.ch) || sc.ch == '-')) {
 						end_var = true;
 						sc.SetState(varStyle);
 					}
