@@ -16,6 +16,9 @@ using namespace Scintilla;
 
 namespace Scintilla {
 
+const unsigned char utf8Start3 = 0b11100000;
+const unsigned char utf8Start4 = 0b11110000;
+
 size_t UTF8Length(const wchar_t *uptr, size_t tlen) {
 	size_t len = 0;
 	for (size_t i = 0; i < tlen && uptr[i];) {
@@ -68,9 +71,9 @@ void UTF8FromUTF16(const wchar_t *uptr, size_t tlen, char *putf, size_t len) {
 unsigned int UTF8CharLength(unsigned char ch) {
 	if (ch < 0x80) {
 		return 1;
-	} else if (ch < 0x80 + 0x40 + 0x20) {
+	} else if (ch < utf8Start3) {
 		return 2;
-	} else if (ch < 0x80 + 0x40 + 0x20 + 0x10) {
+	} else if (ch < utf8Start4) {
 		return 3;
 	} else {
 		return 4;
@@ -84,9 +87,9 @@ size_t UTF16Length(const char *s, size_t len) {
 		const unsigned char ch = static_cast<unsigned char>(s[i]);
 		if (ch < 0x80) {
 			charLen = 1;
-		} else if (ch < 0x80 + 0x40 + 0x20) {
+		} else if (ch < utf8Start3) {
 			charLen = 2;
-		} else if (ch < 0x80 + 0x40 + 0x20 + 0x10) {
+		} else if (ch < utf8Start4) {
 			charLen = 3;
 		} else {
 			charLen = 4;
@@ -106,16 +109,16 @@ size_t UTF16FromUTF8(const char *s, size_t len, wchar_t *tbuf, size_t tlen) {
 		unsigned char ch = us[i++];
 		if (ch < 0x80) {
 			tbuf[ui] = ch;
-		} else if (ch < 0x80 + 0x40 + 0x20) {
+		} else if (ch < utf8Start3) {
 			tbuf[ui] = static_cast<wchar_t>((ch & 0x1F) << 6);
 			ch = us[i++];
-			tbuf[ui] = static_cast<wchar_t>(tbuf[ui] + (ch & 0x7F));
-		} else if (ch < 0x80 + 0x40 + 0x20 + 0x10) {
+			tbuf[ui] = static_cast<wchar_t>(tbuf[ui] + (ch & 0x3F));
+		} else if (ch < utf8Start4) {
 			tbuf[ui] = static_cast<wchar_t>((ch & 0xF) << 12);
 			ch = us[i++];
-			tbuf[ui] = static_cast<wchar_t>(tbuf[ui] + ((ch & 0x7F) << 6));
+			tbuf[ui] = static_cast<wchar_t>(tbuf[ui] + ((ch & 0x3F) << 6));
 			ch = us[i++];
-			tbuf[ui] = static_cast<wchar_t>(tbuf[ui] + (ch & 0x7F));
+			tbuf[ui] = static_cast<wchar_t>(tbuf[ui] + (ch & 0x3F));
 		} else {
 			// Outside the BMP so need two surrogates
 			int val = (ch & 0x7) << 18;
@@ -143,16 +146,16 @@ size_t UTF32FromUTF8(const char *s, size_t len, unsigned int *tbuf, size_t tlen)
 		unsigned int value = 0;
 		if (ch < 0x80) {
 			value = ch;
-		} else if (((len-i) >= 1) && (ch < 0x80 + 0x40 + 0x20)) {
+		} else if (((len-i) >= 1) && (ch < utf8Start3)) {
 			value = (ch & 0x1F) << 6;
 			ch = us[i++];
-			value += ch & 0x7F;
-		} else if (((len-i) >= 2) && (ch < 0x80 + 0x40 + 0x20 + 0x10)) {
+			value += ch & 0x3F;
+		} else if (((len-i) >= 2) && (ch < utf8Start4)) {
 			value = (ch & 0xF) << 12;
 			ch = us[i++];
-			value += (ch & 0x7F) << 6;
+			value += (ch & 0x3F) << 6;
 			ch = us[i++];
-			value += ch & 0x7F;
+			value += ch & 0x3F;
 		} else if ((len-i) >= 3) {
 			value = (ch & 0x7) << 18;
 			ch = us[i++];
@@ -314,7 +317,7 @@ std::string FixInvalidUTF8(const std::string &text) {
 			us++;
 			remaining--;
 		} else {
-			const int len = utf8Status&UTF8MaskWidth;
+			const int len = utf8Status & UTF8MaskWidth;
 			result.append(reinterpret_cast<const char *>(us), len);
 			us += len;
 			remaining -= len;

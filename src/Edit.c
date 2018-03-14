@@ -557,12 +557,16 @@ BOOL EditLoadFile(HWND hwnd, LPCWSTR pszFile, BOOL bSkipEncodingDetection,
 					 || FileVars_IsUTF8(&fvCurFile)
 					 || (iSrcEncoding == CPI_UTF8 || iSrcEncoding == CPI_UTF8SIGN)
 					 || (!bPreferOEM && bLoadASCIIasUTF8) // from menu "Reload As... UTF-8"
+#if 0
 					 || (IsUTF8(lpData, cbData) && (
 							 (!bPreferOEM && (mEncoding[_iDefaultEncoding].uFlags & NCP_UTF8))
 							 || UTF8_mbslen_bytes(UTF8StringStart(lpData)) - 1 !=
 							 UTF8_mbslen(UTF8StringStart(lpData), IsUTF8Signature(lpData) ? cbData - 3 : cbData)
 						 )
 						)
+#else
+					|| IsUTF8(lpData, cbData)
+#endif
 					)
 				   )
 				&& !(FileVars_IsNonUTF8(&fvCurFile) && (iSrcEncoding != CPI_UTF8 && iSrcEncoding != CPI_UTF8SIGN))) {

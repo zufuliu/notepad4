@@ -573,6 +573,8 @@ BOOL IsUnicode(const char *pBuffer, int cb, LPBOOL lpbBOM, LPBOOL lpbReverse) {
 	return FALSE;
 }
 
+#if 0
+
 BOOL IsUTF8(const char *pTest, int nLength) {
 	static const int byte_class_table[256] = {
 		/* 00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F */
@@ -634,18 +636,65 @@ BOOL IsUTF8(const char *pTest, int nLength) {
 	return (current == kSTART) ? TRUE : FALSE;
 }
 
-BOOL IsUTF7(const char *pTest, int nLength) {
-	const char *pt = pTest;
+#else
 
-	for (int i = 0; i < nLength; i++) {
-		if (*pt & 0x80 || !*pt) {
+// http://bjoern.hoehrmann.de/utf-8/decoder/dfa/
+
+BOOL IsUTF8(const char *pTest, int nLength) {
+	enum {
+		UTF8_ACCEPT = 0,
+		UTF8_REJECT = 12,
+	};
+
+	static const unsigned char utf8_dfa[] = {
+		// The first part of the table maps bytes to character classes that
+		// to reduce the size of the transition table and create bitmasks.
+		 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+		 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+		 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+		 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+		 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,  9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,
+		 7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,  7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,
+		 8,8,2,2,2,2,2,2,2,2,2,2,2,2,2,2,  2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,
+		10,3,3,3,3,3,3,3,3,3,3,3,3,4,3,3, 11,6,6,6,5,8,8,8,8,8,8,8,8,8,8,8,
+
+		// The second part is a transition table that maps a combination
+		// of a state of the automaton and a character class to a state.
+		 0,12,24,36,60,96,84,12,12,12,48,72, 12,12,12,12,12,12,12,12,12,12,12,12,
+		12, 0,12,12,12,12,12, 0,12, 0,12,12, 12,24,12,12,12,12,12,24,12,24,12,12,
+		12,12,12,12,12,12,12,24,12,12,12,12, 12,24,12,12,12,12,12,12,12,24,12,12,
+		12,12,12,12,12,12,12,36,12,36,12,12, 12,36,12,12,12,12,12,36,12,36,12,12,
+		12,36,12,12,12,12,12,12,12,12,12,12,
+	};
+
+	const unsigned char *pt = (const unsigned char *)pTest;
+	const unsigned char *end = pt + nLength;
+
+	UINT state = UTF8_ACCEPT;
+	while (pt < end && *pt) {
+		state = utf8_dfa[256 + state + utf8_dfa[*pt++]];
+		if (state == UTF8_REJECT) {
 			return FALSE;
 		}
+	}
+
+	return state == UTF8_ACCEPT;
+}
+
+#endif
+
+BOOL IsUTF7(const char *pTest, int nLength) {
+	const unsigned char *pt = (const unsigned char *)pTest;
+	const unsigned char *end = pt + nLength;
+
+	while (pt < end && *pt && (*pt & 0x80) == 0) {
 		pt++;
 	}
 
-	return TRUE;
+	return pt == end;
 }
+
+#if 0
 
 /* byte length of UTF-8 sequence based on value of first byte.
 	 for UTF-16 (21-bit space), max. code length is 4, so we only need to look
@@ -737,6 +786,8 @@ INT UTF8_mbslen(LPCSTR source, INT byte_length) {
 
 	return wchar_length;
 }
+
+#endif
 
 //=============================================================================
 //
