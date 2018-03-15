@@ -3220,40 +3220,37 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	}
 	break;
 
-//http://www.frenk.com/2009/12/convert-filetime-to-unix-timestamp/
+	// http://www.frenk.com/2009/12/convert-filetime-to-unix-timestamp/
 	case IDM_EDIT_INSERT_TIMESTAMP:		// second	1000 milli
 	case IDM_EDIT_INSERT_TIMESTAMP_MS:	// milli	1000 micro
 	case IDM_EDIT_INSERT_TIMESTAMP_US:	// micro 	1000 nano
 	case IDM_EDIT_INSERT_TIMESTAMP_NS: {// nano
-		char	mszBuf[32];
+		char mszBuf[32];
 		FILETIME ft;
-		LONGLONG t;
-		LARGE_INTEGER date, adjust;
+		ULARGE_INTEGER date, adjust;
 		// Windows timestamp in 100-nanosecond
 		GetSystemTimeAsFileTime(&ft);
+		//GetSystemTimePreciseAsFileTime(&ft);
 		date.HighPart = ft.dwHighDateTime;
 		date.LowPart = ft.dwLowDateTime;
 		// Between Jan 1, 1601 and Jan 1, 1970 there are 11644473600 seconds
-		adjust.QuadPart = 11644473600 * 1000 * 1000 * 10;
+		adjust.QuadPart = 11644473600U * 1000 * 1000 * 10;
 		date.QuadPart -= adjust.QuadPart;
 		switch (LOWORD(wParam)) {
 		case IDM_EDIT_INSERT_TIMESTAMP:		// second	1000 milli
-			date.QuadPart /= 1000 * 1000 * 10;
+			date.QuadPart /= 1000U * 1000 * 10;
 			break;
 		case IDM_EDIT_INSERT_TIMESTAMP_MS:	// milli	1000 micro
-			date.QuadPart /= 1000 * 10;
+			date.QuadPart /= 1000U * 10;
 			break;
 		case IDM_EDIT_INSERT_TIMESTAMP_US:	// micro 	1000 nano
-			date.QuadPart /= 10;
+			date.QuadPart /= 10U;
 			break;
 		case IDM_EDIT_INSERT_TIMESTAMP_NS:	// nano
-			date.QuadPart *= 100;
+			date.QuadPart *= 100U;
 			break;
 		}
-		t = date.QuadPart;
-		// second
-		//t = time(NULL);
-		sprintf(mszBuf, "%I64d", t);
+		sprintf(mszBuf, "%I64u", date.QuadPart);
 		SendMessage(hwndEdit, SCI_REPLACESEL, 0, (LPARAM)mszBuf);
 	}
 	break;
