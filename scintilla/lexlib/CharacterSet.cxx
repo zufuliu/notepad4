@@ -8,6 +8,7 @@
 
 #include <cstdlib>
 #include <cassert>
+#include <cstring>
 
 #include "CharacterSet.h"
 
@@ -18,10 +19,7 @@ namespace Scintilla {
 CharacterSet::CharacterSet(setBase base, const char *initialSet, int size_, bool valueAfter_) {
 	size = size_;
 	valueAfter = valueAfter_;
-	bset = new bool[size];
-	for (int i=0; i < size; i++) {
-		bset[i] = false;
-	}
+	bset = new bool[size]();
 	AddString(initialSet);
 	if (base & setLower)
 		AddString("abcdefghijklmnopqrstuvwxyz");
@@ -35,9 +33,7 @@ CharacterSet::CharacterSet(const CharacterSet &other) {
 	size = other.size;
 	valueAfter = other.valueAfter;
 	bset = new bool[size];
-	for (int i=0; i < size; i++) {
-		bset[i] = other.bset[i];
-	}
+	memcpy(bset, other.bset, size * sizeof(bool));
 }
 
 CharacterSet& CharacterSet::operator=(CharacterSet &&other) {
@@ -62,6 +58,9 @@ void CharacterSet::AddString(const char *setToAdd) {
 }
 
 int CompareCaseInsensitive(const char *a, const char *b) {
+#if 1
+	return _stricmp(a, b);
+#else
 	while (*a && *b) {
 		if (*a != *b) {
 			const int upperA = MakeUpperCase(*a);
@@ -74,9 +73,13 @@ int CompareCaseInsensitive(const char *a, const char *b) {
 	}
 	// Either *a or *b is nul
 	return *a - *b;
+#endif
 }
 
 int CompareNCaseInsensitive(const char *a, const char *b, size_t len) {
+#if 1
+	return _strnicmp(a, b, len);
+#else
 	while (*a && *b && len) {
 		if (*a != *b) {
 			const int upperA = MakeUpperCase(*a);
@@ -93,6 +96,6 @@ int CompareNCaseInsensitive(const char *a, const char *b, size_t len) {
 	else
 		// Either *a or *b is nul
 		return *a - *b;
+#endif
 }
-
 }
