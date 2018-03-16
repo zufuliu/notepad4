@@ -6810,6 +6810,7 @@ BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect, LPCWST
 			EditEnsureSelectionVisible(hwndEdit);
 		}
 		// the .LOG feature ...
+#if 0
 		if (SendMessage(hwndEdit, SCI_GETLENGTH, 0, 0) >= 4) {
 			char tchLog[5] = "";
 			SendMessage(hwndEdit, SCI_GETTEXT, 5, (LPARAM)tchLog);
@@ -6825,7 +6826,7 @@ BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect, LPCWST
 				EditEnsureSelectionVisible(hwndEdit);
 			}
 		}
-
+#endif
 		// Show warning: Unicode file loaded as ANSI
 		if (bUnicodeErr) {
 			MsgBox(MBWARN, IDS_ERR_UNICODE);
