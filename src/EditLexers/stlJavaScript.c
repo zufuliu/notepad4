@@ -1,15 +1,18 @@
 #include "EditLexer.h"
 #include "EditStyle.h"
 
+// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Lexical_grammar
+// http://www.ecma-international.org/publications/standards/Ecma-262.htm
 static KEYWORDLIST Keywords_JS = {{
 // ECMA-262
-"break case catch continue debugger default delete do else finally for function if in "
-"instanceof new return switch this throw try typeof var void while with "
+"await break case catch class const continue debugger default delete do else export extends finally for function if import in "
+"instanceof let new return static super switch this throw try typeof var void while with yield "
 "null true false undefined NaN Infinity "
-,// Reserved Word
+,// Reserved Words
 // ECMA-262
-"class const enum export extends import super "
-"implements interface let package private protected public static yield "
+"enum implements interface package private protected public "
+// ECMAScript 1 till 3
+//"abstract boolean byte char double final float goto int long native short synchronized throws transient volatile "
 // Firefox
 "each of get set "
 , // preprocessor
@@ -20,12 +23,13 @@ static KEYWORDLIST Keywords_JS = {{
 ""
 , // class
 // ECMA-262
-"Global Function Array String Boolean Number Date RegExp Error Math JSON Undefined Null "
-"EvalError RangeError ReferenceError SyntaxError TypeError URIError ConversionError "
-"Object ActiveXObject ArrayBuffer arguments DataView Debug Enumerator Float32Array Float64Array Int8Array Int16Array Int32Array Uint8Array Uint16Array Uint32Array VBArray WinRTError "
+"Global Object Function Boolean Symbol Array String Number Date RegExp Math JSON Null Atomics "
+"Error EvalError RangeError ReferenceError SyntaxError TypeError URIError NativeError "
+"Float32Array Float64Array Int8Array Int16Array Int32Array Uint8Array Uint8ClampedArray Uint16Array Uint32Array "
+"Map Set WeakMap WeakSet ArrayBuffer SharedArrayBuffer DataView Promise Reflect Proxy "
 // JScript
-"WScript "
-// DOM
+"arguments ActiveXObject ConversionError Debug Enumerator VBArray WScript WinRTError "
+// HTML DOM
 //
 "jQuery "
 , // interface
@@ -36,42 +40,55 @@ static KEYWORDLIST Keywords_JS = {{
 // Math
 "E LN2 LN10 LOG2E LOG10E PI SQRT1_2 SQRT2 "
 // Number
-"MAX_VALUE MIN_VALUE NaN NEGATIVE_INFINITY POSITIVE_INFINITY "
+"EPSILON MAX_SAFE_INTEGER MIN_SAFE_INTEGER MAX_VALUE MIN_VALUE NaN NEGATIVE_INFINITY POSITIVE_INFINITY "
+// TypedArray
+"BYTES_PER_ELEMENT "
 
 #if NUMKEYWORD == 16
 , // Functions
 // Global
 "decodeURI() decodeURIComponent() encodeURI() encodeURIComponent() escape() eval() GetObject() isFinite() isNaN() parseFloat() parseInt() ScriptEngine() ScriptEngineBuildVersion() ScriptEngineMajorVersion() ScriptEngineMinorVersion() nescape() "
 // Math
-"abs() acos() asin() atan() atan2() ceil() cos() exp() floor() log() max() min() pow() random() round() sin() sqrt() tan() "
+"abs() acos() acosh() asin() asinh() atan() atanh() atan2() cbrt() ceil() clz32() cos() cosh() exp() expm1() floor() fround() hypot() imul() log() log1p() log10() log2() max() min() pow() random() round() sin() sinh() sqrt() tan() tanh() trunc() "
 // Object
-"create() defineProperties() defineProperty() freeze() getOwnPropertyDescriptor() getOwnPropertyNames() getPrototypeOf() isExtensible() isFrozen() isSealed() keys() preventExtensions() seal() "
-// Array, String, JSON
-"isArray() " "fromCharCode() " "parse() stringify() "
+"assign() create() defineProperties() defineProperty() entries() freeze() getOwnPropertyDescriptor() getOwnPropertyDescriptors() getOwnPropertyNames() getOwnPropertySymbols() getPrototypeOf() is() isExtensible() isFrozen() isSealed() keys() preventExtensions() seal() setPrototypeOf() values() "
+// Number
+"isInteger() isSafeInteger() "
+// Symbol
+"keyFor() "
+// Array, ArrayBuffer, String, JSON
+"of() from() isArray() " "isView() " "fromCharCode() " "parse() stringify() "
 // Debug, WScript
 "write() writeln() echo() quit() "
 // Date
 "now() parse() UTC() "
 , // Properties
+"use strict "
 // All
-"constructor prototype "
-// arguments, Function
-"callee length "
-// Array, ArrayBuffer
-"length " "byteLength buffer byteOffset "
+"constructor prototype __proto__ "
+// arguments, Function, Error
+"callee length name message "
+// Symbol
+"hasInstance isConcatSpreadable iterator match replace search species split toPrimitive toStringTag unscopables prototype "
+// Array, ArrayBuffer, DataView, Map
+"length " "byteLength buffer byteOffset " "size "
 // RegExp
 "index input lastIndex lastMatch lastParen leftContext rightContext " "global ignoreCase multiline source "
 // Debug
 "debuggerEnabled setNonUserCodeExceptions "
+
+// HTML DOM
+"document window body "
 , // Methods
 // All
 "hasOwnProperty() isPrototypeOf() propertyIsEnumerable() toLocaleString() toString() valueOf() "
+"__defineGetter__() __defineSetter__() __lookupGetter__() __lookupSetter__() "
 // Number
 "toExponential() toFixed() toPrecision() "
 // Function
 "apply() bind() call() "
 // Array
-"concat() every() filter() forEach() indexOf() join() lastIndexOf() map() pop() push() reduce() reduceRight() reverse() shift() slice() some() sort() splice() unshift() "
+"copyWithin() every() filter() find() findIndex() forEach() join() map() pop() push() reduce() reduceRight() reverse() shift() some() sort() splice() unshift() "
 // Enumerator
 "atEnd() item() moveFirst() moveNext() "
 "get() set() subarray() "
@@ -82,11 +99,21 @@ static KEYWORDLIST Keywords_JS = {{
 // RegExp
 "compile() exec() test() "
 // String
-"anchor() big() blink() bold() charAt() charCodeAt() concat() fixed() fontcolor() fontsize() indexOf() italics() lastIndexOf() link() localeCompare() match() replace() search() slice() small() split() strike() sub() substr() substring() sup() toLocaleLowerCase() toLocaleUpperCase() toLowerCase() toUpperCase() trim() "
+"charAt() charCodeAt() codePointAt() concat() endsWith() includes() indexOf() lastIndexOf() localeCompare() match() normalize() padEnd() padStart() repeat() replace() search() slice() split() startsWith() strike() substring() toLocaleLowerCase() toLocaleUpperCase() toLowerCase() toUpperCase() trim() "
+"substr() anchor() big() blink() bold() fixed() fontcolor() fontsize() italics() link() small() sub() sup() "
 // Date
 "getDate() getDay() getFullYear() getHours() getMilliseconds() getMinutes() getMonth() getSeconds() getTime() getTimezoneOffset() getUTCDate() getUTCDay() getUTCFullYear() getUTCHours() getUTCMilliseconds() getUTCMinutes() getUTCMonth() getUTCSeconds() getVarDate() getYear() "
 "setDate() setFullYear() setHours() setMilliseconds() setMinutes() setMonth() setSeconds() setTime() setUTCDate() setUTCFullYear() setUTCHours() setUTCMilliseconds() setUTCMinutes() setUTCMonth() setUTCSeconds() setYear() "
 "toDateString() toGMTString() toISOString() toJSON() toLocaleDateString() toLocaleTimeString() toTimeString() toUTCString() "
+// Map, Set
+"clear() delete() get() has() set() add() "
+// Generator, Promise
+"next() all() race() reject() resolve() "
+// Reflect, Proxy
+"construct() defineProperty() deleteProperty() ownKeys() " "revocable() "
+
+// HTML DOM
+"getElementById() getElementsByClassName() getElementsByName() getElementsByTagName() "
 , "", "", ""
 ,
 "for^() if^() switch^() while^() else^if^() function() "
