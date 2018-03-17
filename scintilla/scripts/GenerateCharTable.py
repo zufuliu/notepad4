@@ -35,8 +35,10 @@ def GenerateUTF8Table():
         UTF8BytesOfLead.append(line)
 
     print('UTF8CharLength:', len(UTF8CharLengthTable))
+    print('\n'.join(UTF8CharLengthTable))
+
     print('UTF8BytesOfLead:', len(UTF8BytesOfLead))
-    Regenerate("../src/UniConversion.cxx", "//", UTF8CharLengthTable, UTF8BytesOfLead)
+    print('\n'.join(UTF8BytesOfLead))
 
 if __name__ == '__main__':
     GenerateUTF8Table()
