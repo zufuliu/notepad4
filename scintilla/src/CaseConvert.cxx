@@ -617,7 +617,7 @@ public:
 				caseConverted = Find(leadByte);
 			} else {
 				bytes[0] = leadByte;
-				const int widthCharBytes = UTF8BytesOfLead[leadByte];
+				const int widthCharBytes = UTF8BytesOfLead(leadByte);
 				for (int b=1; b<widthCharBytes; b++) {
 					bytes[b] = (mixedPos+b < lenMixed) ? mixed[mixedPos+b] : 0;
 				}

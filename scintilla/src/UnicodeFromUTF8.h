@@ -11,7 +11,7 @@
 namespace Scintilla {
 
 static inline int UnicodeFromUTF8(const unsigned char *us) {
-	switch (UTF8BytesOfLead[us[0]]) {
+	switch (UTF8BytesOfLead(us[0])) {
 	case 1:
 		return us[0];
 	case 2:

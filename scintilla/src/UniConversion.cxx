@@ -70,7 +70,7 @@ size_t UTF16Length(const char *s, size_t len) {
 	const unsigned char *us = reinterpret_cast<const unsigned char *>(s);
 	for (size_t i = 0; i < len;) {
 		const unsigned char ch = us[i];
-		size_t charLen = UTF8BytesOfLead[ch];
+		const size_t charLen = UTF8BytesOfLead(ch);
 		ulen += (charLen < 4) ? 1 : 2;
 		i += charLen;
 	}
@@ -83,14 +83,20 @@ size_t UTF16FromUTF8(const char *s, size_t len, wchar_t *tbuf, size_t tlen) {
 	size_t i = 0;
 	while (i < len) {
 		unsigned char ch = us[i];
-		const unsigned int charLen = UTF8BytesOfLead[ch];
+		const unsigned int charLen = UTF8BytesOfLead(ch);
 		unsigned int value;
 
 		if (i + charLen > len) {
-			throw std::runtime_error("UTF16FromUTF8: attempted read beyond end");
+			// Trying to read past end but still have space to write
+			if (ui < tlen) {
+				tbuf[ui] = ch;
+				ui++;
+			}
+			break;
 		}
-		value = (charLen < 4) ? 1 : 2;
-		if (ui + value > tlen) {
+
+		const size_t outLen = (charLen < 4) ? 1 : 2;
+		if (ui + outLen > tlen) {
 			throw std::runtime_error("UTF16FromUTF8: attempted write beyond end");
 		}
 
@@ -137,13 +143,19 @@ size_t UTF32FromUTF8(const char *s, size_t len, unsigned int *tbuf, size_t tlen)
 	const unsigned char *us = reinterpret_cast<const unsigned char *>(s);
 	size_t i = 0;
 	while (i < len) {
-		unsigned char ch = us[i++];
-		const unsigned int charLen = UTF8BytesOfLead[ch];
+		unsigned char ch = us[i];
+		const unsigned int charLen = UTF8BytesOfLead(ch);
 		unsigned int value;
 
 		if (i + charLen > len) {
-			throw std::runtime_error("UTF32FromUTF8: attempted read beyond end");
+			// Trying to read past end but still have space to write
+			if (ui < tlen) {
+				tbuf[ui] = ch;
+				ui++;
+			}
+			break;
 		}
+
 		if (ui == tlen) {
 			throw std::runtime_error("UTF32FromUTF8: attempted write beyond end");
 		}
@@ -192,23 +204,72 @@ unsigned int UTF16FromUTF32Character(unsigned int val, wchar_t *tbuf) {
 	}
 }
 
-const unsigned char UTF8BytesOfLead[256] = {
-1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
-2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
-3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-4, 4, 4, 4, 4, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+// https://en.wikipedia.org/wiki/UTF-8
+// https://tools.ietf.org/html/rfc3629
+// UTF-8, a transformation format of ISO 10646
+//  4. Syntax of UTF-8 Byte Sequences
+// https://www.unicode.org/versions/Unicode10.0.0/
+//  3.9 Unicode Encoding Forms
+//      Table 3-7. Well-Formed UTF-8 Byte Sequences
+/*
+UTF8-octets = *(UTF8-char)
+UTF8-char   = UTF8-1 / UTF8-2 / UTF8-3 / UTF8-4
+UTF8-1      = 00-7F
+UTF8-2      = C2-DF         UTF8-tail   4
+UTF8-3      = E0        5   A0-BF       11  UTF8-tail
+              E1-EC     6   UTF8-tail   4   UTF8-tail
+              ED        7   80-9F       12  UTF8-tail
+              EE-EF     6   UTF8-tail   4   UTF8-tail
+UTF8-4      = F0        8   90-BF       13  UTF8-tail   UTF8-tail
+              F1-F3     9   UTF8-tail   4   UTF8-tail   UTF8-tail
+              F4        10  80-8F       14  UTF8-tail   UTF8-tail
+UTF8-tail   = 80-BF     4
+
+bit 0-2: octet count, invalid bytes is treated as isolated single byte.
+bit 3: leading byte
+bit 4: tailing byte
+
+UTF8-2:
+    (1 << 3)  | (1 << 4)
+UTF8-3:
+    (1 << 5)  | (1 << 11)
+    (1 << 6)  | (1 << 4)
+    (1 << 7)  | (1 << 12)
+UTF8-4:
+    (1 << 8)  | (1 << 13)
+    (1 << 9)  | (1 << 4)
+    (1 << 10) | (1 << 14)
+*/
+
+enum {
+	UTF8_3ByteMask1 = (1 << 5)  | (1 << 11) | ((1 << 4) << 11),
+	UTF8_3ByteMask2 = (1 << 6)  | (1 << 4)  | ((1 << 4) << 11),
+	UTF8_3ByteMask3 = (1 << 7)  | (1 << 12) | ((1 << 4) << 11),
+
+	UTF8_4ByteMask1 = (1 << 8)  | (1 << 13) | ((1 << 4) << 11) | ((1 << 4) << 12),
+	UTF8_4ByteMask2 = (1 << 9)  | (1 << 4)  | ((1 << 4) << 11) | ((1 << 4) << 12),
+	UTF8_4ByteMask3 = (1 << 10) | (1 << 14) | ((1 << 4) << 11) | ((1 << 4) << 12),
+};
+
+#define mask_match(mask, test)	((mask & test) == test)
+
+const unsigned short UTF8ClassifyTable[256] = {
+0x0009, 0x0009, 0x0009, 0x0009, 0x0009, 0x0009, 0x0009, 0x0009, 0x0009, 0x0009, 0x0009, 0x0009, 0x0009, 0x0009, 0x0009, 0x0009, // 00 - 0F
+0x0009, 0x0009, 0x0009, 0x0009, 0x0009, 0x0009, 0x0009, 0x0009, 0x0009, 0x0009, 0x0009, 0x0009, 0x0009, 0x0009, 0x0009, 0x0009, // 10 - 1F
+0x0009, 0x0009, 0x0009, 0x0009, 0x0009, 0x0009, 0x0009, 0x0009, 0x0009, 0x0009, 0x0009, 0x0009, 0x0009, 0x0009, 0x0009, 0x0009, // 20 - 2F
+0x0009, 0x0009, 0x0009, 0x0009, 0x0009, 0x0009, 0x0009, 0x0009, 0x0009, 0x0009, 0x0009, 0x0009, 0x0009, 0x0009, 0x0009, 0x0009, // 30 - 3F
+0x0009, 0x0009, 0x0009, 0x0009, 0x0009, 0x0009, 0x0009, 0x0009, 0x0009, 0x0009, 0x0009, 0x0009, 0x0009, 0x0009, 0x0009, 0x0009, // 40 - 4F
+0x0009, 0x0009, 0x0009, 0x0009, 0x0009, 0x0009, 0x0009, 0x0009, 0x0009, 0x0009, 0x0009, 0x0009, 0x0009, 0x0009, 0x0009, 0x0009, // 50 - 5F
+0x0009, 0x0009, 0x0009, 0x0009, 0x0009, 0x0009, 0x0009, 0x0009, 0x0009, 0x0009, 0x0009, 0x0009, 0x0009, 0x0009, 0x0009, 0x0009, // 60 - 6F
+0x0009, 0x0009, 0x0009, 0x0009, 0x0009, 0x0009, 0x0009, 0x0009, 0x0009, 0x0009, 0x0009, 0x0009, 0x0009, 0x0009, 0x0009, 0x0009, // 70 - 7F
+0x5011, 0x5011, 0x5011, 0x5011, 0x5011, 0x5011, 0x5011, 0x5011, 0x5011, 0x5011, 0x5011, 0x5011, 0x5011, 0x5011, 0x5011, 0x5011, // 80 - 8F
+0x3011, 0x3011, 0x3011, 0x3011, 0x3011, 0x3011, 0x3011, 0x3011, 0x3011, 0x3011, 0x3011, 0x3011, 0x3011, 0x3011, 0x3011, 0x3011, // 90 - 9F
+0x2811, 0x2811, 0x2811, 0x2811, 0x2811, 0x2811, 0x2811, 0x2811, 0x2811, 0x2811, 0x2811, 0x2811, 0x2811, 0x2811, 0x2811, 0x2811, // A0 - AF
+0x2811, 0x2811, 0x2811, 0x2811, 0x2811, 0x2811, 0x2811, 0x2811, 0x2811, 0x2811, 0x2811, 0x2811, 0x2811, 0x2811, 0x2811, 0x2811, // B0 - BF
+0x0001, 0x0001, 0x000A, 0x000A, 0x000A, 0x000A, 0x000A, 0x000A, 0x000A, 0x000A, 0x000A, 0x000A, 0x000A, 0x000A, 0x000A, 0x000A, // C0 - CF
+0x000A, 0x000A, 0x000A, 0x000A, 0x000A, 0x000A, 0x000A, 0x000A, 0x000A, 0x000A, 0x000A, 0x000A, 0x000A, 0x000A, 0x000A, 0x000A, // D0 - DF
+0x002B, 0x004B, 0x004B, 0x004B, 0x004B, 0x004B, 0x004B, 0x004B, 0x004B, 0x004B, 0x004B, 0x004B, 0x004B, 0x008B, 0x004B, 0x004B, // E0 - EF
+0x010C, 0x020C, 0x020C, 0x020C, 0x040C, 0x0001, 0x0001, 0x0001, 0x0001, 0x0001, 0x0001, 0x0001, 0x0001, 0x0001, 0x0001, 0x0001, // F0 - FF
 };
 
 // Return both the width of the first character in the string and a status
@@ -222,82 +283,50 @@ int UTF8Classify(const unsigned char *us, int len) {
 	if (*us < 0x80) {
 		// Single bytes easy
 		return 1;
-	} else if (*us > 0xf4) {
-		// Characters longer than 4 bytes not possible in current UTF-8
+	}
+
+	unsigned int mask = UTF8ClassifyTable[*us];
+	const int charLen = mask & UTF8ClassifyMaskOctetCount;
+	if (charLen == 1 || charLen > len) {
 		return UTF8MaskInvalid | 1;
-	} else if (*us >= 0xf0) {
-		// 4 bytes
-		if (len < 4)
-			return UTF8MaskInvalid | 1;
-		if (UTF8IsTrailByte(us[1]) && UTF8IsTrailByte(us[2]) && UTF8IsTrailByte(us[3])) {
-			if (((us[1] & 0xf) == 0xf) && (us[2] == 0xbf) && ((us[3] == 0xbe) || (us[3] == 0xbf))) {
-				// *FFFE or *FFFF non-character
-				return UTF8MaskInvalid | 4;
-			}
-			if (*us == 0xf4) {
-				// Check if encoding a value beyond the last Unicode character 10FFFF
-				if (us[1] > 0x8f) {
-					return UTF8MaskInvalid | 1;
-				} else if (us[1] == 0x8f) {
-					if (us[2] > 0xbf) {
-						return UTF8MaskInvalid | 1;
-					} else if (us[2] == 0xbf) {
-						if (us[3] > 0xbf) {
-							return UTF8MaskInvalid | 1;
-						}
-					}
-				}
-			} else if ((*us == 0xf0) && ((us[1] & 0xf0) == 0x80)) {
-				// Overlong
-				return UTF8MaskInvalid | 1;
-			}
-			return 4;
-		} else {
-			return UTF8MaskInvalid | 1;
+	}
+
+	mask |= UTF8ClassifyTable[us[1]];
+	switch (charLen) {
+	case 2:
+		if (mask & UTF8ClassifyMaskTrailByte) {
+			return 2;
 		}
-	} else if (*us >= 0xe0) {
-		// 3 bytes
-		if (len < 3)
-			return UTF8MaskInvalid | 1;
-		if (UTF8IsTrailByte(us[1]) && UTF8IsTrailByte(us[2])) {
-			if ((*us == 0xe0) && ((us[1] & 0xe0) == 0x80)) {
-				// Overlong
-				return UTF8MaskInvalid | 1;
-			}
-			if ((*us == 0xed) && ((us[1] & 0xe0) == 0xa0)) {
-				// Surrogate
-				return UTF8MaskInvalid | 1;
-			}
-			if ((*us == 0xef) && (us[1] == 0xbf) && (us[2] == 0xbe)) {
-				// U+FFFE non-character - 3 bytes long
-				return UTF8MaskInvalid | 3;
-			}
-			if ((*us == 0xef) && (us[1] == 0xbf) && (us[2] == 0xbf)) {
-				// U+FFFF non-character - 3 bytes long
-				return UTF8MaskInvalid | 3;
-			}
-			if ((*us == 0xef) && (us[1] == 0xb7) && (((us[2] & 0xf0) == 0x90) || ((us[2] & 0xf0) == 0xa0))) {
-				// U+FDD0 .. U+FDEF
+		break;
+
+	case 3:
+		mask |= ((UTF8ClassifyTable[us[2]]) & UTF8ClassifyMaskTrailByte) << 11;
+		if (mask_match(mask, UTF8_3ByteMask1) || mask_match(mask, UTF8_3ByteMask2) || mask_match(mask, UTF8_3ByteMask3)) {
+			mask = ((us[0] & 0xF) << 12) | ((us[1] & 0x3F) << 6) | (us[2] & 0x3F);
+			if (mask == 0xFFFE || mask == 0xFFFF || (mask >= 0xFDD0 && mask <= 0xFDEF)) {
+				// U+FFFE or U+FFFF, FDD0 .. FDEF non-character
 				return UTF8MaskInvalid | 3;
 			}
 			return 3;
-		} else {
-			return UTF8MaskInvalid | 1;
 		}
-	} else if (*us >= 0xc2) {
-		// 2 bytes
-		if (len < 2)
-			return UTF8MaskInvalid | 1;
-		if (UTF8IsTrailByte(us[1])) {
-			return 2;
-		} else {
-			return UTF8MaskInvalid | 1;
+		break;
+
+	default:
+		mask |= ((UTF8ClassifyTable[us[2]]) & UTF8ClassifyMaskTrailByte) << 11;
+		mask |= ((UTF8ClassifyTable[us[3]]) & UTF8ClassifyMaskTrailByte) << 12;
+		if (mask_match(mask, UTF8_4ByteMask1) || mask_match(mask, UTF8_4ByteMask2) || mask_match(mask, UTF8_4ByteMask3)) {
+			mask = ((us[1] & 0x3F) << 12) | ((us[2] & 0x3F) << 6) | (us[3] & 0x3F);
+			mask &= 0xFFFF;
+			if (mask == 0xFFFE || mask == 0xFFFF) {
+				// *FFFE or *FFFF non-character
+				return UTF8MaskInvalid | 4;
+			}
+			return 4;
 		}
-	} else {
-		// 0xc0 .. 0xc1 is overlong encoding
-		// 0x80 .. 0xbf is trail byte
-		return UTF8MaskInvalid | 1;
+		break;
 	}
+
+	return UTF8MaskInvalid | 1;
 }
 
 int UTF8DrawBytes(const unsigned char *us, int len) {

@@ -578,7 +578,7 @@ int Document::LenChar(Sci::Position pos) {
 		return 2;
 	} else if (SC_CP_UTF8 == dbcsCodePage) {
 		const unsigned char leadByte = static_cast<unsigned char>(cb.CharAt(pos));
-		const int widthCharBytes = UTF8BytesOfLead[leadByte];
+		const int widthCharBytes = UTF8BytesOfLead(leadByte);
 		const Sci::Position lengthDoc = static_cast<Sci::Position>(Length());
 		if ((pos + widthCharBytes) > lengthDoc)
 			return lengthDoc - pos;
@@ -598,7 +598,7 @@ bool Document::InGoodUTF8(Sci::Position pos, Sci::Position &start, Sci::Position
 	start = (trail > 0) ? trail-1 : trail;
 
 	const unsigned char leadByte = static_cast<unsigned char>(cb.CharAt(start));
-	const int widthCharBytes = UTF8BytesOfLead[leadByte];
+	const int widthCharBytes = UTF8BytesOfLead(leadByte);
 	if (widthCharBytes == 1) {
 		return false;
 	} else {
@@ -707,7 +707,7 @@ Sci::Position Document::NextPosition(Sci::Position pos, int moveDir) const {
 					// Single byte character or invalid
 					pos++;
 				} else {
-					const int widthCharBytes = UTF8BytesOfLead[leadByte];
+					const int widthCharBytes = UTF8BytesOfLead(leadByte);
 					char charBytes[UTF8MaxBytes] = {static_cast<char>(leadByte),0,0,0};
 					for (int b=1; b<widthCharBytes; b++)
 						charBytes[b] = cb.CharAt(static_cast<int>(pos+b));
@@ -789,7 +789,7 @@ Document::CharacterExtracted Document::CharacterAfter(Sci::Position position) co
 		return CharacterExtracted(leadByte, 1);
 	}
 	if (SC_CP_UTF8 == dbcsCodePage) {
-		const int widthCharBytes = UTF8BytesOfLead[leadByte];
+		const int widthCharBytes = UTF8BytesOfLead(leadByte);
 		unsigned char charBytes[UTF8MaxBytes] = { leadByte, 0, 0, 0 };
 		for (int b = 1; b<widthCharBytes; b++)
 			charBytes[b] = static_cast<unsigned char>(cb.CharAt(position + b));
@@ -902,7 +902,7 @@ int SCI_METHOD Document::GetCharacterAndWidth(Sci_Position position, Sci_Positio
 				// Single byte character or invalid
 				character =  leadByte;
 			} else {
-				const int widthCharBytes = UTF8BytesOfLead[leadByte];
+				const int widthCharBytes = UTF8BytesOfLead(leadByte);
 				unsigned char charBytes[UTF8MaxBytes] = {leadByte,0,0,0};
 				for (int b=1; b<widthCharBytes; b++)
 					charBytes[b] = static_cast<unsigned char>(
@@ -976,7 +976,7 @@ int Document::SafeSegment(const char *text, int length, int lengthSegment) const
 		lastEncodingAllowedBreak = j;
 
 		if (dbcsCodePage == SC_CP_UTF8) {
-			j += UTF8BytesOfLead[ch];
+			j += UTF8BytesOfLead(ch);
 		} else if (dbcsCodePage) {
 			j += IsDBCSLeadByte(ch) ? 2 : 1;
 		} else {
@@ -1801,7 +1801,7 @@ Document::CharacterExtracted Document::ExtractCharacter(Sci::Position position) 
 		// Common case: ASCII character
 		return CharacterExtracted(leadByte, 1);
 	}
-	const int widthCharBytes = UTF8BytesOfLead[leadByte];
+	const int widthCharBytes = UTF8BytesOfLead(leadByte);
 	unsigned char charBytes[UTF8MaxBytes] = { leadByte, 0, 0, 0 };
 	for (int b=1; b<widthCharBytes; b++)
 		charBytes[b] = static_cast<unsigned char>(cb.CharAt(position + b));
@@ -1883,7 +1883,7 @@ long Document::FindText(Sci::Position minPos, Sci::Position maxPos, const char *
 					bytes[0] = leadByte;
 					int widthChar = 1;
 					if (!UTF8IsAscii(leadByte)) {
-						const int widthCharBytes = UTF8BytesOfLead[leadByte];
+						const int widthCharBytes = UTF8BytesOfLead(leadByte);
 						for (int b=1; b<widthCharBytes; b++) {
 							bytes[b] = cb.CharAt(posIndexDocument+b);
 						}
