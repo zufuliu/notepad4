@@ -949,8 +949,10 @@ void SurfaceGDI::MeasureWidths(const Font &font_, const char *s, int len, XYPOSI
 			return;
 		}
 		// Map the widths given for UTF-16 characters back onto the UTF-8 input string
+		const unsigned char *us = reinterpret_cast<const unsigned char *>(s);
 		for (int ui = 0; ui < fit; ui++) {
-			const unsigned int lenChar = UTF8CharLength[static_cast<unsigned char>(s[i])];
+			const unsigned char uch = us[i];
+			const unsigned int lenChar = UTF8BytesOfLead[uch];
 			if (lenChar == 4) {	// Non-BMP
 				ui++;
 			}
@@ -1623,7 +1625,7 @@ void SurfaceD2D::MeasureWidths(const Font &font_, const char *s, int len, XYPOSI
 		int i=0;
 		while (ui<tbuf.tlen) {
 			const unsigned char uch = us[i];
-			unsigned int lenChar = UTF8CharLength[uch];
+			unsigned int lenChar = UTF8BytesOfLead[uch];
 			if (lenChar == 4) {	// Non-BMP
 				ui++;
 			}

@@ -22,7 +22,6 @@ size_t UTF32FromUTF8(const char *s, size_t len, unsigned int *tbuf, size_t tlen)
 unsigned int UTF16FromUTF32Character(unsigned int val, wchar_t *tbuf);
 std::string FixInvalidUTF8(const std::string &text);
 
-extern const unsigned char UTF8CharLength[256];
 extern const unsigned char UTF8BytesOfLead[256];
 
 static inline bool UTF8IsTrailByte(int ch) {

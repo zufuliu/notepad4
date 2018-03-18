@@ -65,30 +65,12 @@ void UTF8FromUTF16(const wchar_t *uptr, size_t tlen, char *putf, size_t len) {
 		putf[k] = '\0';
 }
 
-const unsigned char UTF8CharLength[256] = {
-1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
-2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
-2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
-2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
-2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
-2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
-3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
-};
-
 size_t UTF16Length(const char *s, size_t len) {
 	size_t ulen = 0;
-	for (size_t i = 0; i<len;) {
-		const unsigned char ch = static_cast<unsigned char>(s[i]);
-		size_t charLen = UTF8CharLength[ch];
+	const unsigned char *us = reinterpret_cast<const unsigned char *>(s);
+	for (size_t i = 0; i < len;) {
+		const unsigned char ch = us[i];
+		size_t charLen = UTF8BytesOfLead[ch];
 		ulen += (charLen < 4) ? 1 : 2;
 		i += charLen;
 	}
@@ -99,28 +81,31 @@ size_t UTF16FromUTF8(const char *s, size_t len, wchar_t *tbuf, size_t tlen) {
 	size_t ui = 0;
 	const unsigned char *us = reinterpret_cast<const unsigned char *>(s);
 	size_t i = 0;
-	while ((i<len) && (ui<tlen)) {
-		unsigned char ch = us[i++];
-		const unsigned int charLen = UTF8CharLength[ch];
+	while (i < len) {
+		unsigned char ch = us[i];
+		const unsigned int charLen = UTF8BytesOfLead[ch];
 		unsigned int value;
 
+		if (i + charLen > len) {
+			throw std::runtime_error("UTF16FromUTF8: attempted read beyond end");
+		}
+		value = (charLen < 4) ? 1 : 2;
+		if (ui + value > tlen) {
+			throw std::runtime_error("UTF16FromUTF8: attempted write beyond end");
+		}
+
+		i++;
 		switch (charLen) {
 		case 1:
 			tbuf[ui] = ch;
 			break;
 		case 2:
-			if (i + 1 > len) {
-				return ui;
-			}
 			value = (ch & 0x1F) << 6;
 			ch = us[i++];
 			value += ch & 0x3F;
 			tbuf[ui] = static_cast<wchar_t>(value);
 			break;
 		case 3:
-			if (i + 2 > len) {
-				return ui;
-			}
 			value = (ch & 0xF) << 12;
 			ch = us[i++];
 			value += (ch & 0x3F) << 6;
@@ -129,9 +114,6 @@ size_t UTF16FromUTF8(const char *s, size_t len, wchar_t *tbuf, size_t tlen) {
 			tbuf[ui] = static_cast<wchar_t>(value);
 			break;
 		default:
-			if (i + 3 > len || ui + 1 == tlen) {
-				return ui;
-			}
 			// Outside the BMP so need two surrogates
 			value = (ch & 0x7) << 18;
 			ch = us[i++];
@@ -151,30 +133,32 @@ size_t UTF16FromUTF8(const char *s, size_t len, wchar_t *tbuf, size_t tlen) {
 }
 
 size_t UTF32FromUTF8(const char *s, size_t len, unsigned int *tbuf, size_t tlen) {
-	size_t ui=0;
+	size_t ui = 0;
 	const unsigned char *us = reinterpret_cast<const unsigned char *>(s);
-	size_t i=0;
-	while ((i<len) && (ui<tlen)) {
+	size_t i = 0;
+	while (i < len) {
 		unsigned char ch = us[i++];
-		const unsigned int charLen = UTF8CharLength[ch];
+		const unsigned int charLen = UTF8BytesOfLead[ch];
 		unsigned int value;
 
+		if (i + charLen > len) {
+			throw std::runtime_error("UTF32FromUTF8: attempted read beyond end");
+		}
+		if (ui == tlen) {
+			throw std::runtime_error("UTF32FromUTF8: attempted write beyond end");
+		}
+
+		i++;
 		switch (charLen) {
 		case 1:
 			value = ch;
 			break;
 		case 2:
-			if (i + 1 > len) {
-				return ui;
-			}
 			value = (ch & 0x1F) << 6;
 			ch = us[i++];
 			value += ch & 0x3F;
 			break;
 		case 3:
-			if (i + 2 > len) {
-				return ui;
-			}
 			value = (ch & 0xF) << 12;
 			ch = us[i++];
 			value += (ch & 0x3F) << 6;
@@ -182,9 +166,6 @@ size_t UTF32FromUTF8(const char *s, size_t len, unsigned int *tbuf, size_t tlen)
 			value += ch & 0x3F;
 			break;
 		default:
-			if (i + 3 > len) {
-				return ui;
-			}
 			value = (ch & 0x7) << 18;
 			ch = us[i++];
 			value += (ch & 0x3F) << 12;
