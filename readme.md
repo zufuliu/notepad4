@@ -91,6 +91,8 @@
 		* javap
 		* Jasmin
 	* SQL Query
+		* MySQL
+		* SQLite3
 	* TCL
 	* Texinfo
 	* Visual Basic
@@ -99,7 +101,7 @@
 	* VBScript
 	* VHDL
 	* Verilog HDL
-	* VIM
+	* Vim
 	* XML Document
 		* XML Schema
 		* XML Stylesheet
@@ -129,12 +131,15 @@
 	* CMake
 	* C# (class list only)
 	* Java (class list only)
+	* JavaScript
 	* Inno Setup
 	* [Julia Script](https://julialang.org/)
 	* Lua Script
 	* Python Script
 	* PHP Script
 	* SQL Query
+		* MySQL
+		* SQLite3
 * Syntax highlighting for function and type for C/C++ family language
 * Syntax highlighting for anotation for Java like JVM based language
 * Syntax highlighting for attribute for C# like language
@@ -170,7 +175,7 @@ TBD.
 ## More information:
 * [Official Notepad2 website](http://www.flos-freeware.ch/notepad2.html)
 * [Official Notepad2-mod website](https://xhmikosr.github.io/notepad2-mod/)
-* [Scintilla Documentation](http://www.scintilla.org/ScintillaDoc.html)
+* [Scintilla's website](http://www.scintilla.org/)
 * [Build Notepad2 and metapath](https://github.com/zufuliu/notepad2/wiki/Build-Notepad2)
 
 ## Changed keyboard shortcuts compared to Notepad2 and/or Notepad2-mod:
