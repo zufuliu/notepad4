@@ -952,11 +952,11 @@ void SurfaceGDI::MeasureWidths(const Font &font_, const char *s, int len, XYPOSI
 		const unsigned char *us = reinterpret_cast<const unsigned char *>(s);
 		for (int ui = 0; ui < fit; ui++) {
 			const unsigned char uch = us[i];
-			const unsigned int lenChar = UTF8BytesOfLead(uch);
-			if (lenChar == 4) {	// Non-BMP
+			const unsigned int byteCount = UTF8BytesOfLead(uch);
+			if (byteCount == 4) {	// Non-BMP
 				ui++;
 			}
-			for (unsigned int bytePos=0; (bytePos<lenChar) && (i<len); bytePos++) {
+			for (unsigned int bytePos=0; (bytePos<byteCount) && (i<len); bytePos++) {
 				positions[i++] = static_cast<XYPOSITION>(poses.buffer[ui]);
 			}
 		}
@@ -1625,11 +1625,11 @@ void SurfaceD2D::MeasureWidths(const Font &font_, const char *s, int len, XYPOSI
 		int i=0;
 		while (ui<tbuf.tlen) {
 			const unsigned char uch = us[i];
-			unsigned int lenChar = UTF8BytesOfLead(uch);
-			if (lenChar == 4) {	// Non-BMP
+			unsigned int byteCount = UTF8BytesOfLead(uch);
+			if (byteCount == 4) {	// Non-BMP
 				ui++;
 			}
-			for (unsigned int bytePos=0; (bytePos<lenChar) && (i<len); bytePos++) {
+			for (unsigned int bytePos=0; (bytePos<byteCount) && (i<len); bytePos++) {
 				positions[i++] = poses.buffer[ui];
 			}
 			ui++;

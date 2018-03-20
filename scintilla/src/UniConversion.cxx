@@ -68,11 +68,29 @@ void UTF8FromUTF16(const wchar_t *uptr, size_t tlen, char *putf, size_t len) {
 size_t UTF16Length(const char *s, size_t len) {
 	size_t ulen = 0;
 	const unsigned char *us = reinterpret_cast<const unsigned char *>(s);
-	for (size_t i = 0; i < len;) {
+	size_t i = 0;
+	unsigned int byteCount = 0;
+	while (i < len) {
 		const unsigned char ch = us[i];
-		const size_t charLen = UTF8BytesOfLead(ch);
-		ulen += (charLen < 4) ? 1 : 2;
-		i += charLen;
+		byteCount = UTF8BytesOfLead(ch);
+		i += byteCount;
+		ulen += UTF16LengthFromUTF8ByteCount(byteCount < 4);
+	}
+
+	// Invalid 4-bytes UTF-8 lead byte at string end.
+	//if ((byteCount == 4) && (i != len)) {
+	//	ulen--;
+	//}
+
+	/*
+	Branchless version of above two tests:
+	For 4-bytes UTF-8 lead byte, when the loop is finished, i must
+	in [len, len + 1, len + 2, len + 3], thus (i ^ len) is in [0, 1, 2, 3],
+	where 0 (i.e. i == len) is the only valid case.
+	*/
+	const unsigned mask = (1 << (byteCount & 4)) - 1;
+	if (mask & (i ^ len)) {
+		ulen--;
 	}
 	return ulen;
 }
@@ -80,13 +98,12 @@ size_t UTF16Length(const char *s, size_t len) {
 size_t UTF16FromUTF8(const char *s, size_t len, wchar_t *tbuf, size_t tlen) {
 	size_t ui = 0;
 	const unsigned char *us = reinterpret_cast<const unsigned char *>(s);
-	size_t i = 0;
-	while (i < len) {
+	for (size_t i = 0; i < len;) {
 		unsigned char ch = us[i];
-		const unsigned int charLen = UTF8BytesOfLead(ch);
+		const unsigned int byteCount = UTF8BytesOfLead(ch);
 		unsigned int value;
 
-		if (i + charLen > len) {
+		if (i + byteCount > len) {
 			// Trying to read past end but still have space to write
 			if (ui < tlen) {
 				tbuf[ui] = ch;
@@ -95,13 +112,13 @@ size_t UTF16FromUTF8(const char *s, size_t len, wchar_t *tbuf, size_t tlen) {
 			break;
 		}
 
-		const size_t outLen = (charLen < 4) ? 1 : 2;
+		const size_t outLen = (byteCount < 4) ? 1 : 2;
 		if (ui + outLen > tlen) {
 			throw std::runtime_error("UTF16FromUTF8: attempted write beyond end");
 		}
 
 		i++;
-		switch (charLen) {
+		switch (byteCount) {
 		case 1:
 			tbuf[ui] = ch;
 			break;
@@ -141,13 +158,12 @@ size_t UTF16FromUTF8(const char *s, size_t len, wchar_t *tbuf, size_t tlen) {
 size_t UTF32FromUTF8(const char *s, size_t len, unsigned int *tbuf, size_t tlen) {
 	size_t ui = 0;
 	const unsigned char *us = reinterpret_cast<const unsigned char *>(s);
-	size_t i = 0;
-	while (i < len) {
+	for (size_t i = 0; i < len;) {
 		unsigned char ch = us[i];
-		const unsigned int charLen = UTF8BytesOfLead(ch);
+		const unsigned int byteCount = UTF8BytesOfLead(ch);
 		unsigned int value;
 
-		if (i + charLen > len) {
+		if (i + byteCount > len) {
 			// Trying to read past end but still have space to write
 			if (ui < tlen) {
 				tbuf[ui] = ch;
@@ -161,7 +177,7 @@ size_t UTF32FromUTF8(const char *s, size_t len, unsigned int *tbuf, size_t tlen)
 		}
 
 		i++;
-		switch (charLen) {
+		switch (byteCount) {
 		case 1:
 			value = ch;
 			break;
@@ -286,13 +302,13 @@ int UTF8Classify(const unsigned char *us, int len) {
 	}
 
 	unsigned int mask = UTF8ClassifyTable[*us];
-	const int charLen = mask & UTF8ClassifyMaskOctetCount;
-	if (charLen == 1 || charLen > len) {
+	const int byteCount = mask & UTF8ClassifyMaskOctetCount;
+	if (byteCount == 1 || byteCount > len) {
 		return UTF8MaskInvalid | 1;
 	}
 
 	mask |= UTF8ClassifyTable[us[1]];
-	switch (charLen) {
+	switch (byteCount) {
 	case 2:
 		if (mask & UTF8ClassifyMaskTrailByte) {
 			return 2;
@@ -300,7 +316,7 @@ int UTF8Classify(const unsigned char *us, int len) {
 		break;
 
 	case 3:
-		mask |= ((UTF8ClassifyTable[us[2]]) & UTF8ClassifyMaskTrailByte) << 11;
+		mask |= (UTF8ClassifyTable[us[2]] & UTF8ClassifyMaskTrailByte) << 11;
 		if (mask_match(mask, UTF8_3ByteMask1) || mask_match(mask, UTF8_3ByteMask2) || mask_match(mask, UTF8_3ByteMask3)) {
 			mask = ((us[0] & 0xF) << 12) | ((us[1] & 0x3F) << 6) | (us[2] & 0x3F);
 			if (mask == 0xFFFE || mask == 0xFFFF || (mask >= 0xFDD0 && mask <= 0xFDEF)) {
@@ -312,8 +328,8 @@ int UTF8Classify(const unsigned char *us, int len) {
 		break;
 
 	default:
-		mask |= ((UTF8ClassifyTable[us[2]]) & UTF8ClassifyMaskTrailByte) << 11;
-		mask |= ((UTF8ClassifyTable[us[3]]) & UTF8ClassifyMaskTrailByte) << 12;
+		mask |= (UTF8ClassifyTable[us[2]] & UTF8ClassifyMaskTrailByte) << 11;
+		mask |= (UTF8ClassifyTable[us[3]] & UTF8ClassifyMaskTrailByte) << 12;
 		if (mask_match(mask, UTF8_4ByteMask1) || mask_match(mask, UTF8_4ByteMask2) || mask_match(mask, UTF8_4ByteMask3)) {
 			mask = ((us[1] & 0x3F) << 12) | ((us[2] & 0x3F) << 6) | (us[3] & 0x3F);
 			mask &= 0xFFFF;

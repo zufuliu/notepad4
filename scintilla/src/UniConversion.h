@@ -78,6 +78,10 @@ static inline unsigned int UTF16CharLength(wchar_t uch) {
 	return ((uch >= SURROGATE_LEAD_FIRST) && (uch <= SURROGATE_LEAD_LAST)) ? 2 : 1;
 }
 
+inline unsigned int UTF16LengthFromUTF8ByteCount(unsigned int byteCount) {
+    return (byteCount < 4) ? 1 : 2;
+}
+
 }
 
 #endif
