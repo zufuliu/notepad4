@@ -73,12 +73,8 @@ BOOL IniSectionGetBool(LPCWSTR lpCachedIniSection, LPCWSTR lpName, BOOL bDefault
 				while (*t) {
 					switch (*t) {
 					case '1':
-					case 't':
-					case 'y': // 1/true/yes
 						return TRUE;
 					case '0':
-					case 'f':
-					case 'n': // 0/false/no
 						return FALSE;
 					case ' ':
 					case '\t':
