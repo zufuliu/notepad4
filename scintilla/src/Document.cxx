@@ -51,7 +51,6 @@
 #include "Document.h"
 #include "RESearch.h"
 #include "UniConversion.h"
-#include "UnicodeFromUTF8.h"
 #include "DBCS.h"
 
 using namespace Scintilla;

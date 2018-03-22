@@ -584,9 +584,6 @@
     <ClInclude Include="..\..\scintilla\src\Style.h">
       <Filter>Scintilla\src</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\scintilla\src\UnicodeFromUTF8.h">
-      <Filter>Scintilla\src</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\scintilla\src\UniConversion.h">
       <Filter>Scintilla\src</Filter>
     </ClInclude>

@@ -136,7 +136,6 @@
 #include "RESearch.h"
 #include "CaseConvert.h"
 #include "UniConversion.h"
-#include "UnicodeFromUTF8.h"
 #include "DBCS.h"
 #include "Selection.h"
 #include "PositionCache.h"

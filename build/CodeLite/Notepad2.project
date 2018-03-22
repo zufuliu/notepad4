@@ -133,7 +133,6 @@
       <File Name="../../scintilla/src/SplitVector.h"/>
       <File Name="../../scintilla/src/Style.cxx"/>
       <File Name="../../scintilla/src/Style.h"/>
-      <File Name="../../scintilla/src/UnicodeFromUTF8.h"/>
       <File Name="../../scintilla/src/UniConversion.cxx"/>
       <File Name="../../scintilla/src/UniConversion.h"/>
       <File Name="../../scintilla/src/UniqueString.h"/>

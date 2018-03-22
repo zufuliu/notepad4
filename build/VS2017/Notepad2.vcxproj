@@ -397,7 +397,6 @@
     <ClInclude Include="..\..\scintilla\src\SparseVector.h" />
     <ClInclude Include="..\..\scintilla\src\SplitVector.h" />
     <ClInclude Include="..\..\scintilla\src\Style.h" />
-    <ClInclude Include="..\..\scintilla\src\UnicodeFromUTF8.h" />
     <ClInclude Include="..\..\scintilla\src\UniConversion.h" />
     <ClInclude Include="..\..\scintilla\src\UniqueString.h" />
     <ClInclude Include="..\..\scintilla\src\ViewStyle.h" />
