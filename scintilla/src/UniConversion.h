@@ -79,7 +79,7 @@ static inline unsigned int UTF16CharLength(wchar_t uch) {
 }
 
 inline unsigned int UTF16LengthFromUTF8ByteCount(unsigned int byteCount) {
-    return (byteCount < 4) ? 1 : 2;
+	return (byteCount < 4) ? 1 : 2;
 }
 
 }

@@ -74,7 +74,7 @@ size_t UTF16Length(const char *s, size_t len) {
 		const unsigned char ch = us[i];
 		byteCount = UTF8BytesOfLead(ch);
 		i += byteCount;
-		ulen += UTF16LengthFromUTF8ByteCount(byteCount < 4);
+		ulen += UTF16LengthFromUTF8ByteCount(byteCount);
 	}
 
 	// Invalid 4-bytes UTF-8 lead byte at string end.
@@ -112,7 +112,7 @@ size_t UTF16FromUTF8(const char *s, size_t len, wchar_t *tbuf, size_t tlen) {
 			break;
 		}
 
-		const size_t outLen = (byteCount < 4) ? 1 : 2;
+		const size_t outLen = UTF16LengthFromUTF8ByteCount(byteCount);
 		if (ui + outLen > tlen) {
 			throw std::runtime_error("UTF16FromUTF8: attempted write beyond end");
 		}
