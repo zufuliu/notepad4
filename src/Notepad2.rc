@@ -1620,7 +1620,7 @@ BEGIN
     61004                   "A4;Unicode (UTF-16 LE);UTF-16 LE"
     61005                   "A5;Unicode (UTF-16 BE);UTF-16 BE"
     61006                   "A6;UTF-8;UTF-8"
-    61007                   "A7;UTF-8 Signature;UTF-8 BOM"
+    61007                   "A7;UTF-8 BOM;UTF-8 BOM"
 END
 
 STRINGTABLE
