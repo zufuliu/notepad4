@@ -22,12 +22,12 @@ size_t UTF32FromUTF8(const char *s, size_t len, unsigned int *tbuf, size_t tlen)
 unsigned int UTF16FromUTF32Character(unsigned int val, wchar_t *tbuf);
 std::string FixInvalidUTF8(const std::string &text);
 
-extern const unsigned short UTF8ClassifyTable[256];
+extern const unsigned char UTF8ClassifyTable[256];
 
 enum {
-	UTF8ClassifyMaskOctetCount = 0b111,
-	UTF8ClassifyMaskLeadByte = 1 << 3,
-	UTF8ClassifyMaskTrailByte = 1 << 4,
+	UTF8ClassifyMaskOctetCount = 7,
+	UTF8ClassifyMaskLeadByte = 8,
+	UTF8ClassifyMaskTrailByte = 0x30,
 };
 
 static inline int UTF8BytesOfLead(unsigned char ch) {
