@@ -1,7 +1,7 @@
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Lexical_grammar
 // http://www.ecma-international.org/publications/standards/Ecma-262.htm
 
-await
+async await
 break
 case catch class const continue
 debugger default delete do
@@ -491,4 +491,45 @@ Reflect {
 
 Proxy(target, handler) {
 	revocable(target, handler)
+}
+
+// https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest
+XMLHttpRequest() {
+	UNSENT
+	OPENED
+	HEADERS_RECEIVED
+	LOADING
+	DONE
+
+	onreadystatechange
+	readyState
+	response
+	responseText
+	responseType
+	responseURL
+	responseXML
+	status
+	statusText
+	timeout
+	upload
+	withCredentials
+	abort()
+	getAllResponseHeaders()
+	getResponseHeader(headerName)
+	open(method, url [, async [, user[, password]]])
+	overrideMimeType(mimeType)
+	send(body)
+	setRequestHeader(header, value)
+}
+
+// https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope
+WindowOrWorkerGlobalScope {
+	atob(encodedData)
+	btoa(stringToEncode)
+	clearInterval(intervalID)
+	clearTimeout(timeoutID)
+	createImageBitmap(image[, sx, sy, sw, sh[, options]]).then(function(response) { ... })
+	Promise<Response> fetch(input[, init])
+	setInterval(func, delay[, param1, param2, ...])
+	setTimeout(function[, delay, param1, param2, ...])
 }

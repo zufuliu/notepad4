@@ -5,7 +5,7 @@
 // http://www.ecma-international.org/publications/standards/Ecma-262.htm
 static KEYWORDLIST Keywords_JS = {{
 // ECMA-262
-"await break case catch class const continue debugger default delete do else export extends finally for function if import in "
+"async await break case catch class const continue debugger default delete do else export extends finally for function if import in "
 "instanceof let new return static super switch this throw try typeof var void while with yield "
 "null true false undefined NaN Infinity "
 ,// Reserved Words
@@ -31,7 +31,7 @@ static KEYWORDLIST Keywords_JS = {{
 "arguments ActiveXObject ConversionError Debug Enumerator VBArray WScript WinRTError "
 // HTML DOM
 //
-"jQuery "
+"XMLHttpRequest jQuery "
 , // interface
 ""
 , // enumeration
@@ -43,6 +43,8 @@ static KEYWORDLIST Keywords_JS = {{
 "EPSILON MAX_SAFE_INTEGER MIN_SAFE_INTEGER MAX_VALUE MIN_VALUE NaN NEGATIVE_INFINITY POSITIVE_INFINITY "
 // TypedArray
 "BYTES_PER_ELEMENT "
+// XMLHttpRequest
+"UNSENT OPENED HEADERS_RECEIVED LOADING DONE "
 
 #if NUMKEYWORD == 16
 , // Functions
@@ -62,6 +64,10 @@ static KEYWORDLIST Keywords_JS = {{
 "write() writeln() echo() quit() "
 // Date
 "now() parse() UTC() "
+
+// HTML DOM
+// WindowOrWorkerGlobalScope
+"atob() btoa() clearInterval() clearTimeout() createImageBitmap() fetch() setInterval() setTimeout() "
 , // Properties
 "use strict "
 // All
@@ -79,6 +85,8 @@ static KEYWORDLIST Keywords_JS = {{
 
 // HTML DOM
 "document window body "
+// XMLHttpRequest
+"onreadystatechange readyState response responseText responseType responseURL responseXML status statusText timeout upload withCredentials "
 , // Methods
 // All
 "hasOwnProperty() isPrototypeOf() propertyIsEnumerable() toLocaleString() toString() valueOf() "
@@ -114,6 +122,8 @@ static KEYWORDLIST Keywords_JS = {{
 
 // HTML DOM
 "getElementById() getElementsByClassName() getElementsByName() getElementsByTagName() "
+// XMLHttpRequest
+"abort() getAllResponseHeaders() getResponseHeader() open() overrideMimeType() send() setRequestHeader() "
 , "", "", ""
 ,
 "for^() if^() switch^() while^() else^if^() function() "
