@@ -163,13 +163,11 @@ BEGIN
             MENUITEM "FileName and &Ext\tShift+F9",     CMD_COPYFILENAME
             MENUITEM "Full &PathName\tAlt+Shift+F9",    CMD_COPYPATHNAME
             MENUITEM SEPARATOR
-            MENUITEM "&Window Position\tCtrl+Shift+K",  CMD_COPYWINPOS
-        END
-        POPUP "&More Copy"
-        BEGIN
             MENUITEM "Copy A&ll\tAlt+C",            IDM_EDIT_COPYALL
             MENUITEM "Copy &Add\tCtrl+E",           IDM_EDIT_COPYADD
             MENUITEM "Copy As &RTF",                IDM_EDIT_COPYRTF
+            MENUITEM SEPARATOR
+            MENUITEM "&Window Position\tCtrl+Shift+K",  CMD_COPYWINPOS
         END
         MENUITEM SEPARATOR
         POPUP "&Block"
