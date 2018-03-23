@@ -27,8 +27,7 @@ extern const unsigned char UTF8ClassifyTable[256];
 
 enum {
 	UTF8ClassifyMaskOctetCount = 7,
-	UTF8ClassifyMaskLeadByte = 8,
-	UTF8ClassifyMaskTrailByte = 0x30,
+	UTF8ClassifyMaskTrailByte = 8,
 };
 
 static inline int UTF8BytesOfLead(unsigned char ch) {
@@ -48,15 +47,15 @@ static inline int UnicodeFromUTF8(const unsigned char *us) {
 	}
 }
 
-static inline bool UTF8IsLeadByte(unsigned char ch) {
-	return (UTF8ClassifyTable[ch] & UTF8ClassifyMaskLeadByte) !=0;
-}
-
 static inline bool UTF8IsTrailByte(unsigned char ch) {
 	return (UTF8ClassifyTable[ch] & UTF8ClassifyMaskTrailByte) !=0;
 }
 
-static inline bool UTF8IsAscii(int ch) {
+static inline bool UTF8IsAscii(unsigned char ch) {
+	return (ch & 0x80) == 0;
+}
+
+static inline bool UTF8IsAscii(unsigned int ch) {
 	return ch < 0x80;
 }
 
