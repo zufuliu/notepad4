@@ -72,7 +72,7 @@ typedef struct np2params {
 
 //==== Change Notifications ===================================================
 #define ID_WATCHTIMER		0xA000
-#define APPM_CHANGENOTIFY		(WM_APP + 2)
+#define APPM_CHANGENOTIFY	(WM_APP + 2)
 //#define APPM_CHANGENOTIFYCLEAR	(WM_APP + 3)
 
 //==== Callback Message from System Tray ======================================

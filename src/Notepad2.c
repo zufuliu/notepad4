@@ -36,6 +36,8 @@
 
 // show fold level
 #define NP2_DEBUG_FOLD_LEVEL	0
+// enable the .LOG feature
+#define NP2_ENABLE_DOT_LOG_FEATURE	0
 
 /******************************************************************************
 *
@@ -1270,7 +1272,9 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 					if (bIsTail && iFileWatchingMode == 2) {
 						EditJumpTo(hwndEdit, -1, 0);
 						EditEnsureSelectionVisible(hwndEdit);
-					} else if (SendMessage(hwndEdit, SCI_GETLENGTH, 0, 0) >= 4) {
+					}
+#if NP2_ENABLE_DOT_LOG_FEATURE
+					 else if (SendMessage(hwndEdit, SCI_GETLENGTH, 0, 0) >= 4) {
 						char tch[5] = "";
 						SendMessage(hwndEdit, SCI_GETTEXT, 5, (LPARAM)tch);
 						if (lstrcmpiA(tch, ".LOG") != 0) {
@@ -1282,6 +1286,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 							SendMessage(hwndEdit, SCI_SETXOFFSET, (WPARAM)iXOffset, 0);
 						}
 					}
+#endif
 				}
 			}
 		} else {
@@ -2318,6 +2323,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 			iWeakSrcEncoding = iEncoding;
 			if (FileLoad(TRUE, FALSE, TRUE, FALSE, szCurFile)) {
+#if NP2_ENABLE_DOT_LOG_FEATURE
 				if (SendMessage(hwndEdit, SCI_GETLENGTH, 0, 0) >= 4) {
 					char tch[5] = "";
 					SendMessage(hwndEdit, SCI_GETTEXT, 5, (LPARAM)tch);
@@ -2330,6 +2336,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 						SendMessage(hwndEdit, SCI_SETXOFFSET, (WPARAM)iXOffset, 0);
 					}
 				}
+#endif
 			}
 		}
 	}
@@ -6813,8 +6820,8 @@ BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect, LPCWST
 			EditJumpTo(hwndEdit, line, col);
 			EditEnsureSelectionVisible(hwndEdit);
 		}
+#if NP2_ENABLE_DOT_LOG_FEATURE
 		// the .LOG feature ...
-#if 0
 		if (SendMessage(hwndEdit, SCI_GETLENGTH, 0, 0) >= 4) {
 			char tchLog[5] = "";
 			SendMessage(hwndEdit, SCI_GETTEXT, 5, (LPARAM)tchLog);
