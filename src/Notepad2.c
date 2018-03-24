@@ -6789,6 +6789,10 @@ BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect, LPCWST
 		UpdateLineNumberWidth();
 		iOriginalEncoding = iEncoding;
 		bModified = FALSE;
+		if (bReload) {
+			UpdateStatusBarWidth();
+			UpdateStatusbar();
+		}
 		//bReadOnly = FALSE;
 		SendMessage(hwndEdit, SCI_SETEOLMODE, iEOLMode, 0);
 		MRU_AddFile(pFileMRU, szFileName, flagRelativeFileMRU, flagPortableMyDocs);
