@@ -161,6 +161,9 @@
 ## [Screenshots]
 TBD.
 
+## Download
+Prebuild binaries for each release can be download from [release list](https://github.com/zufuliu/notepad2/releases).
+
 ## Notes:
 * If you find any bugs or have any suggestions feel free to **provide patches/pull requests**.
 * I'm not interested in any **localization** of Notepad2.
