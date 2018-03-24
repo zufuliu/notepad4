@@ -738,6 +738,7 @@ void EditAutoCloseBraceQuote(HWND hwnd, int ch) {
 								|| pLexCurrent->iLexer == SCLEX_VBSCRIPT	// line comment
 								|| pLexCurrent->iLexer == SCLEX_VERILOG		// inside number
 								|| pLexCurrent->iLexer == SCLEX_LISP 		// operator
+								|| (pLexCurrent->iLexer == SCLEX_CPP && iCurrentStyle == SCE_C_NUMBER)
 							   )) {
 			tchIns[0] = '\'';
 		}

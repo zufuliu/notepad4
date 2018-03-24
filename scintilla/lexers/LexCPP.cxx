@@ -244,6 +244,8 @@ static void ColouriseCppDoc(Sci_PositionU startPos, Sci_Position length, int ini
 					sc.Forward();
 				} else if (sc.ch == '.' && sc.chNext != '.') {
 					sc.ForwardSetState(SCE_C_DEFAULT);
+				} else if (sc.ch == '\'' && lexType == LEX_CPP) {
+					sc.Forward();
 				} else {
 					sc.SetState(SCE_C_DEFAULT);
 				}
