@@ -7,7 +7,7 @@ static KEYWORDLIST Keywords_Java = {{
 "@interface abstract assert break case catch class const continue default do else "
 "enum extends final finally for goto if implements import instanceof interface "
 "native new package private protected public return static strictfp super switch "
-"synchronized this throw throws transient try volatile while "
+"synchronized this throw throws transient try var volatile while "
 "false true null parcelable "
 , // type keyword
 "boolean byte char double float int long short void "
@@ -23,7 +23,8 @@ static KEYWORDLIST Keywords_Java = {{
 // Java Persistence javax.persistence.*
 "Entity Table Id Column Basic OrderBy Version Transient "
 , // attribute
-""
+// module directive
+"exports module open opens provides requires to transitive uses with "
 , // class
 "Void Class Enum Package Object Boolean Number Byte Short Integer Long Float Double Character String "
 "BigDecimal BigInteger "
@@ -110,6 +111,7 @@ EDITLEXER lexJava = { SCLEX_CPP, NP2LEX_JAVA, L"Java Source", L"java", L"", &Key
 	//{ SCE_C_DEFAULT, L"Default", L"", L"" },
 	{ SCE_C_WORD, NP2STYLE_Keyword, L"Keyword", L"fore:#0000FF", L"" },
 	{ SCE_C_WORD2, NP2STYLE_TypeKeyword, L"Type Keyword", L"fore:#0000FF", L"" },
+	{ SCE_C_ATTRIBUTE, NP2STYLE_Directive, L"Module Directive", L"fore:#FF8000", L"" },
 	{ SCE_C_DIRECTIVE, NP2STYLE_Annotation, L"Annotation", L"fore:#FF8000", L""},
 	{ SCE_C_CLASS, NP2STYLE_Class, L"Class", L"fore:#0080FF", L"" },
 	{ SCE_C_INTERFACE, NP2STYLE_Interface, L"Interface", L"bold; fore:#1E90FF", L""},

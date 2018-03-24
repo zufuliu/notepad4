@@ -55,7 +55,7 @@ static KEYWORDLIST Keywords_HTML = {{
 "command checkbox radio context toolbar soft hard "
 
 , // JavaScript
-"await break case catch class const continue debugger default delete do else export extends finally for function if import in "
+"async await break case catch class const continue debugger default delete do else export extends finally for function if import in "
 "instanceof let new return static super switch this throw try typeof var void while with yield "
 "null true false undefined "
 "enum implements interface package private protected public "
