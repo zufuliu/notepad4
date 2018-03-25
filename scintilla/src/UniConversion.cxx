@@ -331,7 +331,7 @@ const unsigned char UTF8ClassifyTable[256] = {
 int UTF8Classify(const unsigned char *us, int len) {
 	// For the rules: http://www.cl.cam.ac.uk/~mgk25/unicode.html#utf-8
 	if (us[0] < 0x80) {
-		// Single bytes easy
+		// ASCII
 		return 1;
 	}
 

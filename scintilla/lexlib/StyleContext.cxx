@@ -104,16 +104,24 @@ void StyleContext::Forward(Sci_Position nb) {
 		Forward();
 	}
 }
+
 void StyleContext::ForwardBytes(Sci_Position nb) {
 	const Sci_PositionU forwardPos = currentPos + nb;
+	const Sci_PositionU currentPosStart = currentPos;
 	while (forwardPos > currentPos) {
 		Forward();
+		if (currentPos == currentPosStart) {
+			// Reached end
+			return;
+		}
 	}
 }
+
 void StyleContext::SetState(int state_) {
 	styler.ColourTo(currentPos - ((currentPos > lengthDocument) ? 2 : 1), state);
 	state = state_;
 }
+
 void StyleContext::ForwardSetState(int state_) {
 	Forward();
 	styler.ColourTo(currentPos - ((currentPos > lengthDocument) ? 2 : 1), state);

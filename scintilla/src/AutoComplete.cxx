@@ -54,7 +54,7 @@ bool AutoComplete::Active() const {
 }
 
 void AutoComplete::Start(const Window &parent, int ctrlID,
-	Sci::Position position, const Point &location, int startLen_,
+	Sci::Position position, const Point &location, Sci::Position startLen_,
 	int lineHeight, bool unicodeMode, int technology) {
 	if (active) {
 		Cancel();

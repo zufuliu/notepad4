@@ -88,7 +88,7 @@ class RegexSearchBase {
 public:
 	virtual ~RegexSearchBase() {}
 
-	virtual long FindText(Document *doc, Sci::Position minPos, Sci::Position maxPos, const char *s,
+	virtual Sci::Position FindText(Document *doc, Sci::Position minPos, Sci::Position maxPos, const char *s,
                         bool caseSensitive, bool word, bool wordStart, int flags, Sci::Position *length) = 0;
 
 	///@return String with the substitutions, must remain valid until the next call or destruction
@@ -403,7 +403,7 @@ public:
 	bool MatchesWordOptions(bool word, bool wordStart, Sci::Position pos, Sci::Position length) const;
 	bool HasCaseFolder() const;
 	void SetCaseFolder(CaseFolder *pcf_);
-	long FindText(Sci::Position minPos, Sci::Position maxPos, const char *search, int flags, Sci::Position *length);
+	Sci::Position FindText(Sci::Position minPos, Sci::Position maxPos, const char *search, int flags, Sci::Position *length);
 	const char *SubstituteByPosition(const char *text, Sci::Position *length);
 	Sci::Line LinesTotal() const;
 

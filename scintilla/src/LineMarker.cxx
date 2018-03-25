@@ -24,6 +24,45 @@
 
 using namespace Scintilla;
 
+LineMarker::~LineMarker() {
+}
+
+LineMarker::LineMarker() {
+	markType = SC_MARK_CIRCLE;
+	fore = ColourDesired(0, 0, 0);
+	back = ColourDesired(0xff, 0xff, 0xff);
+	backSelected = ColourDesired(0xff, 0x00, 0x00);
+	alpha = SC_ALPHA_NOALPHA;
+	customDraw = nullptr;
+}
+
+LineMarker::LineMarker(const LineMarker &) {
+	// Defined to avoid pxpm and image being blindly copied, not as a complete copy constructor.
+	markType = SC_MARK_CIRCLE;
+	fore = ColourDesired(0, 0, 0);
+	back = ColourDesired(0xff, 0xff, 0xff);
+	backSelected = ColourDesired(0xff, 0x00, 0x00);
+	alpha = SC_ALPHA_NOALPHA;
+	pxpm.reset();
+	image.reset();
+	customDraw = nullptr;
+}
+
+LineMarker &LineMarker::operator=(const LineMarker &other) {
+	// Defined to avoid pxpm and image being blindly copied, not as a complete assignment operator.
+	if (this != &other) {
+		markType = SC_MARK_CIRCLE;
+		fore = ColourDesired(0, 0, 0);
+		back = ColourDesired(0xff, 0xff, 0xff);
+		backSelected = ColourDesired(0xff, 0x00, 0x00);
+		alpha = SC_ALPHA_NOALPHA;
+		pxpm.reset();
+		image.reset();
+		customDraw = nullptr;
+	}
+	return *this;
+}
+
 void LineMarker::SetXPM(const char *textForm) {
 	pxpm = std::make_unique<XPM>(textForm);
 	markType = SC_MARK_PIXMAP;

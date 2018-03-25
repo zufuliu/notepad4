@@ -64,8 +64,8 @@ protected:
 	void CancelModes() override;
 	int KeyCommand(unsigned int iMessage) override;
 
-	void AutoCompleteInsert(Sci::Position startPos, int removeLen, const char *text, int textLen);
-	void AutoCompleteStart(int lenEntered, const char *list);
+	void AutoCompleteInsert(Sci::Position startPos, Sci::Position removeLen, const char *text, Sci::Position textLen);
+	void AutoCompleteStart(Sci::Position lenEntered, const char *list);
 	void AutoCompleteCancel();
 	void AutoCompleteMove(int delta);
 	int AutoCompleteGetCurrent() const;

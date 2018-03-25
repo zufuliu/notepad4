@@ -580,7 +580,7 @@ int Document::LenChar(Sci::Position pos) {
 		const int widthCharBytes = UTF8BytesOfLead(leadByte);
 		const Sci::Position lengthDoc = static_cast<Sci::Position>(Length());
 		if ((pos + widthCharBytes) > lengthDoc)
-			return lengthDoc - pos;
+			return static_cast<int>(lengthDoc - pos);
 		else
 			return widthCharBytes;
 	} else if (dbcsCodePage) {
@@ -827,7 +827,7 @@ Document::CharacterExtracted Document::CharacterBefore(Sci::Position position) c
 			Sci::Position startUTF = position;
 			Sci::Position endUTF = position;
 			if (InGoodUTF8(position, startUTF, endUTF)) {
-				const int widthCharBytes = endUTF - startUTF;
+				const int widthCharBytes = static_cast<int>(endUTF - startUTF);
 				unsigned char charBytes[UTF8MaxBytes] = { 0, 0, 0, 0 };
 				for (int b = 0; b<widthCharBytes; b++)
 					charBytes[b] = static_cast<unsigned char>(cb.CharAt(startUTF + b));
@@ -1316,7 +1316,7 @@ int SCI_METHOD Document::GetLineIndentation(Sci_Position line) const {
 			if (ch == ' ')
 				indent++;
 			else if (ch == '\t')
-				indent = NextTab(indent, tabInChars);
+				indent = static_cast<int>(NextTab(indent, tabInChars));
 			else
 				return indent;
 		}
@@ -1818,7 +1818,7 @@ Document::CharacterExtracted Document::ExtractCharacter(Sci::Position position) 
  * searches (just pass minPos > maxPos to do a backward search)
  * Has not been tested with backwards DBCS searches yet.
  */
-long Document::FindText(Sci::Position minPos, Sci::Position maxPos, const char *search,
+Sci::Position Document::FindText(Sci::Position minPos, Sci::Position maxPos, const char *search,
                         int flags, Sci::Position *length) {
 	if (*length <= 0)
 		return minPos;
@@ -2488,7 +2488,7 @@ public:
 	~BuiltinRegex() override {
 	}
 
-	long FindText(Document *doc, Sci::Position minPos, Sci::Position maxPos, const char *s,
+	Sci::Position FindText(Document *doc, Sci::Position minPos, Sci::Position maxPos, const char *s,
                         bool caseSensitive, bool word, bool wordStart, int flags,
                         Sci::Position *length) override;
 
@@ -2948,7 +2948,7 @@ Sci::Position Cxx11RegexFindText(Document *doc, Sci::Position minPos, Sci::Posit
 
 }
 
-long BuiltinRegex::FindText(Document *doc, Sci::Position minPos, Sci::Position maxPos, const char *s,
+Sci::Position BuiltinRegex::FindText(Document *doc, Sci::Position minPos, Sci::Position maxPos, const char *s,
                         bool caseSensitive, bool, bool, int flags,
                         Sci::Position *length) {
 

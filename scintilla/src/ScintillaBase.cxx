@@ -44,7 +44,6 @@
 #include "CallTip.h"
 #include "KeyMap.h"
 #include "Indicator.h"
-#include "XPM.h"
 #include "LineMarker.h"
 #include "Style.h"
 #include "ViewStyle.h"
@@ -212,7 +211,7 @@ void ScintillaBase::ListNotify(ListBoxEvent *plbe) {
 	}
 }
 
-void ScintillaBase::AutoCompleteInsert(Sci::Position startPos, int removeLen, const char *text, int textLen) {
+void ScintillaBase::AutoCompleteInsert(Sci::Position startPos, Sci::Position removeLen, const char *text, Sci::Position textLen) {
 	UndoGroup ug(pdoc);
 	if (multiAutoCMode == SC_MULTIAUTOC_ONCE) {
 		pdoc->DeleteChars(startPos, removeLen);
@@ -240,15 +239,15 @@ void ScintillaBase::AutoCompleteInsert(Sci::Position startPos, int removeLen, co
 	}
 }
 
-void ScintillaBase::AutoCompleteStart(int lenEntered, const char *list) {
+void ScintillaBase::AutoCompleteStart(Sci::Position lenEntered, const char *list) {
 	//Platform::DebugPrintf("AutoComplete %s\n", list);
 	ct.CallTipCancel();
 
 	if (ac.chooseSingle && (listType == 0)) {
 		if (list && !strchr(list, ac.GetSeparator())) {
 			const char *typeSep = strchr(list, ac.GetTypesep());
-			const int lenInsert = typeSep ?
-				static_cast<int>(typeSep-list) : static_cast<int>(strlen(list));
+			const Sci::Position lenInsert = typeSep ?
+				static_cast<Sci::Position>(typeSep-list) : static_cast<Sci::Position>(strlen(list));
 			if (ac.ignoreCase) {
 				// May need to convert the case before invocation, so remove lenEntered characters
 				AutoCompleteInsert(sel.MainCaret() - lenEntered, lenEntered, list, lenInsert);
@@ -424,7 +423,7 @@ void ScintillaBase::AutoCompleteCompleted(char ch, unsigned int completionMethod
 		endPos = pdoc->ExtendWordSelect(endPos, 1, true);
 	if (endPos < firstPos)
 		return;
-	AutoCompleteInsert(firstPos, endPos - firstPos, selected.c_str(), static_cast<int>(selected.length()));
+	AutoCompleteInsert(firstPos, endPos - firstPos, selected.c_str(), static_cast<Sci::Position>(selected.length()));
 	SetLastXChosen();
 
 	scn.nmhdr.code = SCN_AUTOCCOMPLETED;
@@ -848,7 +847,7 @@ sptr_t ScintillaBase::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lPara
 	switch (iMessage) {
 	case SCI_AUTOCSHOW:
 		listType = 0;
-		AutoCompleteStart(static_cast<int>(wParam), reinterpret_cast<const char *>(lParam));
+		AutoCompleteStart(static_cast<Sci::Position>(wParam), reinterpret_cast<const char *>(lParam));
 		break;
 
 	case SCI_AUTOCCANCEL:

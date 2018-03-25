@@ -38,7 +38,6 @@
 #include "PerLine.h"
 #include "KeyMap.h"
 #include "Indicator.h"
-#include "XPM.h"
 #include "LineMarker.h"
 #include "Style.h"
 #include "ViewStyle.h"
@@ -936,7 +935,7 @@ Point Editor::PointMainCaret() {
  */
 void Editor::SetLastXChosen() {
 	const Point pt = PointMainCaret();
-	lastXChosen = static_cast<Sci::Position>(pt.x) + xOffset;
+	lastXChosen = static_cast<int>(pt.x) + xOffset;
 }
 
 void Editor::ScrollTo(Sci::Line line, bool moveThumb) {
@@ -1084,7 +1083,7 @@ void Editor::MoveCaretInsideView(bool ensureVisible) {
 	} else if ((pt.y + vs.lineHeight - 1) > rcClient.bottom) {
 		const Sci::Position yOfLastLineFullyDisplayed = static_cast<Sci::Position>(rcClient.top) + (LinesOnScreen() - 1) * vs.lineHeight;
 		MovePositionTo(SPositionFromLocation(
-		            Point::FromInts(lastXChosen - xOffset, static_cast<int>(rcClient.top) + yOfLastLineFullyDisplayed),
+		            Point::FromInts(lastXChosen - xOffset, static_cast<int>(rcClient.top + yOfLastLineFullyDisplayed)),
 					false, false, UserVirtualSpace()),
 		        Selection::noSel, ensureVisible);
 	}
@@ -1161,7 +1160,7 @@ Editor::XYScrollPosition Editor::XYScrollToMakeVisible(const SelectionRange &ran
 	if ((options & xysVertical) && (pt.y < rcClient.top || ptBottomCaret.y >= rcClient.bottom || (caretYPolicy & CARET_STRICT) != 0)) {
 		const Sci::Line lineCaret = DisplayFromPosition(range.caret.Position());
 		const Sci::Line linesOnScreen = LinesOnScreen();
-		const Sci::Line halfScreen = std::max(linesOnScreen - 1, 2) / 2;
+		const Sci::Line halfScreen = std::max(linesOnScreen - 1, static_cast<Sci::Line>(2)) / 2;
 		const bool bSlop = (caretYPolicy & CARET_SLOP) != 0;
 		const bool bStrict = (caretYPolicy & CARET_STRICT) != 0;
 		const bool bJump = (caretYPolicy & CARET_JUMPS) != 0;
@@ -1368,8 +1367,8 @@ Editor::XYScrollPosition Editor::XYScrollToMakeVisible(const SelectionRange &ran
 				newXY.xOffset = std::max(newXY.xOffset, minOffset);
 			} else {
 				// Shift to right to show anchor or as much of range as possible
-				const int minOffset = static_cast<Sci::Position>(ptAnchor.x + xOffset - rcClient.right) + 1;
-				const int maxOffset = static_cast<Sci::Position>(pt.x + xOffset - rcClient.left) - 1;
+				const int minOffset = static_cast<int>(ptAnchor.x + xOffset - rcClient.right) + 1;
+				const int maxOffset = static_cast<int>(pt.x + xOffset - rcClient.left) - 1;
 				newXY.xOffset = std::max(newXY.xOffset, minOffset);
 				newXY.xOffset = std::min(newXY.xOffset, maxOffset);
 			}
@@ -1395,7 +1394,7 @@ void Editor::SetXYScroll(const XYScrollPosition &newXY) {
 				const PRectangle rcText = GetTextRectangle();
 				if (horizontalScrollBarVisible &&
 					rcText.Width() + xOffset > scrollWidth) {
-					scrollWidth = xOffset + static_cast<Sci::Position>(rcText.Width());
+					scrollWidth = xOffset + static_cast<int>(rcText.Width());
 					SetScrollBars();
 				}
 			}
@@ -1519,7 +1518,7 @@ bool Editor::WrapLines(WrapScope ws) {
 		Sci::Line lineToWrap = wrapPending.start;
 		Sci::Line lineToWrapEnd = std::min(wrapPending.end, pdoc->LinesTotal());
 		const Sci::Line lineDocTop = cs.DocFromDisplay(topLine);
-		const int subLineTop = topLine - cs.DisplayFromDoc(lineDocTop);
+		const int subLineTop = static_cast<int>(topLine - cs.DisplayFromDoc(lineDocTop));
 		if (ws == WrapScope::wsVisible) {
 			lineToWrap = std::clamp(lineDocTop-5, wrapPending.start, pdoc->LinesTotal());
 			// Priority wrap to just after visible area.
@@ -1790,7 +1789,7 @@ void Editor::Paint(Surface *surfaceWindow, const PRectangle &rcArea) {
 // This is mostly copied from the Paint method but with some things omitted
 // such as the margin markers, line numbers, selection and caret
 // Should be merged back into a combined Draw method.
-long Editor::FormatRange(bool draw, Sci_RangeToFormat *pfr) {
+Sci::Position Editor::FormatRange(bool draw, Sci_RangeToFormat *pfr) {
 	if (!pfr)
 		return 0;
 
@@ -2624,7 +2623,7 @@ void Editor::NotifyModified(Document *, const DocModification &mh, void *) {
 		if (mh.modificationType & SC_MOD_CHANGEANNOTATION) {
 			const Sci::Line lineDoc = static_cast<Sci::Line>(pdoc->LineFromPosition(mh.position));
 			if (vs.annotationVisible) {
-				if (cs.SetHeight(lineDoc, cs.GetHeight(lineDoc) + mh.annotationLinesAdded)) {
+				if (cs.SetHeight(lineDoc, static_cast<int>(cs.GetHeight(lineDoc) + mh.annotationLinesAdded))) {
 					SetScrollBars();
 				}
 				Redraw();
@@ -2694,7 +2693,7 @@ void Editor::NotifyModified(Document *, const DocModification &mh, void *) {
 		scn.line = mh.line;
 		scn.foldLevelNow = mh.foldLevelNow;
 		scn.foldLevelPrev = mh.foldLevelPrev;
-		scn.token = mh.token;
+		scn.token = static_cast<int>(mh.token);
 		scn.annotationLinesAdded = mh.annotationLinesAdded;
 		NotifyParent(scn);
 	}
@@ -2854,7 +2853,7 @@ void Editor::PageMove(int direction, Selection::selTypes selt, bool stuttered) {
 	const Sci::Line topStutterLine = topLine + caretYSlop;
 	const Sci::Line bottomStutterLine = static_cast<Sci::Line>(
 	    pdoc->LineFromPosition(PositionFromLocation(
-	                Point::FromInts(lastXChosen - xOffset, direction * vs.lineHeight * LinesToScroll())))
+	                Point::FromInts(lastXChosen - xOffset, direction * vs.lineHeight * static_cast<int>(LinesToScroll()))))
 	    - caretYSlop - 1);
 
 	if (stuttered && (direction < 0 && currentLine > topStutterLine)) {
@@ -2864,7 +2863,7 @@ void Editor::PageMove(int direction, Selection::selTypes selt, bool stuttered) {
 
 	} else if (stuttered && (direction > 0 && currentLine < bottomStutterLine)) {
 		topLineNew = topLine;
-		newPos = SPositionFromLocation(Point::FromInts(lastXChosen - xOffset, vs.lineHeight * (LinesToScroll() - caretYSlop)),
+		newPos = SPositionFromLocation(Point::FromInts(lastXChosen - xOffset, vs.lineHeight * static_cast<int>(LinesToScroll() - caretYSlop)),
 			false, false, UserVirtualSpace());
 
 	} else {
@@ -2873,7 +2872,8 @@ void Editor::PageMove(int direction, Selection::selTypes selt, bool stuttered) {
 		topLineNew = std::clamp(
 		            topLine + direction * LinesToScroll(), static_cast<Sci::Line>(0), MaxScrollPos());
 		newPos = SPositionFromLocation(
-			Point::FromInts(lastXChosen - xOffset, static_cast<int>(pt.y) + direction * (vs.lineHeight * LinesToScroll())),
+			Point::FromInts(lastXChosen - xOffset, static_cast<int>(pt.y) +
+				direction * (vs.lineHeight * static_cast<int>(LinesToScroll()))),
 			false, false, UserVirtualSpace());
 	}
 
@@ -3102,10 +3102,10 @@ SelectionPosition Editor::PositionUpOrDown(const SelectionPosition& spStart, int
 
 	const Sci::Line newY = static_cast<Sci::Line>(pt.y) + (1 + skipLines) * direction * vs.lineHeight;
 	if (lastX < 0) {
-		lastX = static_cast<Sci::Position>(pt.x) + xOffset;
+		lastX = static_cast<int>(pt.x) + xOffset;
 	}
 	SelectionPosition posNew = SPositionFromLocation(
-		Point::FromInts(lastX - xOffset, newY), false, false, UserVirtualSpace());
+		Point::FromInts(lastX - xOffset, static_cast<int>(newY)), false, false, UserVirtualSpace());
 
 	if (direction < 0) {
 		// Line wrapping may lead to a location on the same line, so
@@ -4021,7 +4021,7 @@ CaseFolder *Editor::CaseFolderForEncoding() {
  * Search of a text in the document, in the given range.
  * @return The position of the found text, -1 if not found.
  */
-long Editor::FindText(
+Sci::Position Editor::FindText(
     uptr_t wParam,		///< Search modes : @c SCFIND_MATCHCASE, @c SCFIND_WHOLEWORD,
     ///< @c SCFIND_WORDSTART, @c SCFIND_REGEXP or @c SCFIND_POSIX.
     sptr_t lParam) {	///< @c Sci_TextToFind structure: The text to search for in the given range.
@@ -4031,15 +4031,15 @@ long Editor::FindText(
 	if (!pdoc->HasCaseFolder())
 		pdoc->SetCaseFolder(CaseFolderForEncoding());
 	try {
-		const long pos = pdoc->FindText(
+		const Sci::Position pos = pdoc->FindText(
 			static_cast<Sci::Position>(ft->chrg.cpMin),
 			static_cast<Sci::Position>(ft->chrg.cpMax),
 			ft->lpstrText,
 			static_cast<int>(wParam),
 			&lengthFound);
 		if (pos != -1) {
-			ft->chrgText.cpMin = pos;
-			ft->chrgText.cpMax = pos + lengthFound;
+			ft->chrgText.cpMin = static_cast<Sci_PositionCR>(pos);
+			ft->chrgText.cpMax = static_cast<Sci_PositionCR>(pos + lengthFound);
 		}
 		return static_cast<int>(pos);
 	} catch (const RegexError &) {
@@ -4068,14 +4068,14 @@ void Editor::SearchAnchor() {
  * Used for next text and previous text requests.
  * @return The position of the found text, -1 if not found.
  */
-long Editor::SearchText(
+Sci::Position Editor::SearchText(
     unsigned int iMessage,		///< Accepts both @c SCI_SEARCHNEXT and @c SCI_SEARCHPREV.
     uptr_t wParam,				///< Search modes : @c SCFIND_MATCHCASE, @c SCFIND_WHOLEWORD,
     ///< @c SCFIND_WORDSTART, @c SCFIND_REGEXP or @c SCFIND_POSIX.
     sptr_t lParam) {			///< The text to search for.
 
 	const char *txt = reinterpret_cast<char *>(lParam);
-	long pos;
+	Sci::Position pos;
 	Sci::Position lengthFound = istrlen(txt);
 	if (!pdoc->HasCaseFolder())
 		pdoc->SetCaseFolder(CaseFolderForEncoding());
@@ -4094,7 +4094,7 @@ long Editor::SearchText(
 		return -1;
 	}
 	if (pos != -1) {
-		SetSelection(static_cast<int>(pos), static_cast<int>(pos + lengthFound));
+		SetSelection(pos, pos + lengthFound);
 	}
 
 	return pos;
@@ -4121,18 +4121,18 @@ std::string Editor::CaseMapString(const std::string &s, int caseMapping) {
  * Search for text in the target range of the document.
  * @return The position of the found text, -1 if not found.
  */
-long Editor::SearchInTarget(const char *text, Sci::Position length) {
+Sci::Position Editor::SearchInTarget(const char *text, Sci::Position length) {
 	Sci::Position lengthFound = length;
 
 	if (!pdoc->HasCaseFolder())
 		pdoc->SetCaseFolder(CaseFolderForEncoding());
 	try {
-		const long pos = pdoc->FindText(targetStart, targetEnd, text,
+		const Sci::Position pos = pdoc->FindText(targetStart, targetEnd, text,
 				searchFlags,
 				&lengthFound);
 		if (pos != -1) {
-			targetStart = static_cast<int>(pos);
-			targetEnd = static_cast<int>(pos + lengthFound);
+			targetStart = pos;
+			targetEnd = pos + lengthFound;
 		}
 		return pos;
 	} catch (const RegexError &) {

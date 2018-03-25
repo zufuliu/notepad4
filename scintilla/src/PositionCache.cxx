@@ -32,7 +32,6 @@
 #include "CellBuffer.h"
 #include "KeyMap.h"
 #include "Indicator.h"
-#include "XPM.h"
 #include "LineMarker.h"
 #include "Style.h"
 #include "ViewStyle.h"
@@ -143,14 +142,14 @@ void LineLayout::SetLineStart(int line, int start) {
 void LineLayout::SetBracesHighlight(const Range &rangeLine, const Sci::Position braces[],
                                     char bracesMatchStyle, int xHighlight, bool ignoreStyle) {
 	if (!ignoreStyle && rangeLine.ContainsCharacter(braces[0])) {
-		const int braceOffset = braces[0] - rangeLine.start;
+		const Sci::Position braceOffset = braces[0] - rangeLine.start;
 		if (braceOffset < numCharsInLine) {
 			bracePreviousStyles[0] = styles[braceOffset];
 			styles[braceOffset] = bracesMatchStyle;
 		}
 	}
 	if (!ignoreStyle && rangeLine.ContainsCharacter(braces[1])) {
-		const int braceOffset = braces[1] - rangeLine.start;
+		const Sci::Position braceOffset = braces[1] - rangeLine.start;
 		if (braceOffset < numCharsInLine) {
 			bracePreviousStyles[1] = styles[braceOffset];
 			styles[braceOffset] = bracesMatchStyle;
@@ -164,13 +163,13 @@ void LineLayout::SetBracesHighlight(const Range &rangeLine, const Sci::Position 
 
 void LineLayout::RestoreBracesHighlight(const Range &rangeLine, const Sci::Position braces[], bool ignoreStyle) {
 	if (!ignoreStyle && rangeLine.ContainsCharacter(braces[0])) {
-		const int braceOffset = braces[0] - rangeLine.start;
+		const Sci::Position braceOffset = braces[0] - rangeLine.start;
 		if (braceOffset < numCharsInLine) {
 			styles[braceOffset] = bracePreviousStyles[0];
 		}
 	}
 	if (!ignoreStyle && rangeLine.ContainsCharacter(braces[1])) {
-		const int braceOffset = braces[1] - rangeLine.start;
+		const Sci::Position braceOffset = braces[1] - rangeLine.start;
 		if (braceOffset < numCharsInLine) {
 			styles[braceOffset] = bracePreviousStyles[1];
 		}
@@ -193,7 +192,7 @@ int LineLayout::FindBefore(XYPOSITION x, int lower, int upper) const {
 
 
 int LineLayout::FindPositionFromX(XYPOSITION x, const Range &range, bool charPosition) const {
-	int pos = FindBefore(x, range.start, range.end);
+	int pos = FindBefore(x, static_cast<int>(range.start), static_cast<int>(range.end));
 	while (pos < range.end) {
 		if (charPosition) {
 			if (x < (positions[pos + 1])) {
@@ -206,7 +205,7 @@ int LineLayout::FindPositionFromX(XYPOSITION x, const Range &range, bool charPos
 		}
 		pos++;
 	}
-	return range.end;
+	return static_cast<int>(range.end);
 }
 
 Point LineLayout::PointFromPosition(int posInLine, int lineHeight, PointEnd pe) const {
@@ -439,7 +438,7 @@ BreakFinder::BreakFinder(const LineLayout *ll_, const Selection *psel, const Ran
 	ll(ll_),
 	lineRange(lineRange_),
 	posLineStart(posLineStart_),
-	nextBreak(lineRange_.start),
+	nextBreak(static_cast<int>(lineRange_.start)),
 	saeCurrentPos(0),
 	saeNext(0),
 	subBreak(-1),
@@ -450,7 +449,7 @@ BreakFinder::BreakFinder(const LineLayout *ll_, const Selection *psel, const Ran
 	// Search for first visible break
 	// First find the first visible character
 	if (xStart > 0.0f)
-		nextBreak = ll->FindBefore(static_cast<XYPOSITION>(xStart), lineRange.start, lineRange.end);
+		nextBreak = ll->FindBefore(static_cast<XYPOSITION>(xStart), static_cast<int>(lineRange.start), static_cast<int>(lineRange.end));
 	// Now back to a style break
 	while ((nextBreak > lineRange.start) && (ll->styles[nextBreak] == ll->styles[nextBreak - 1])) {
 		nextBreak--;
@@ -464,9 +463,9 @@ BreakFinder::BreakFinder(const LineLayout *ll_, const Selection *psel, const Ran
 			const SelectionSegment portion = psel->Range(r).Intersect(segmentLine);
 			if (!(portion.start == portion.end)) {
 				if (portion.start.IsValid())
-					Insert(portion.start.Position() - posLineStart);
+					Insert(static_cast<int>(portion.start.Position() - posLineStart));
 				if (portion.end.IsValid())
-					Insert(portion.end.Position() - posLineStart);
+					Insert(static_cast<int>(portion.end.Position() - posLineStart));
 			}
 		}
 	}
@@ -475,14 +474,14 @@ BreakFinder::BreakFinder(const LineLayout *ll_, const Selection *psel, const Ran
 			if (pvsDraw->indicators[deco->Indicator()].OverridesTextFore()) {
 				Sci::Position startPos = deco->rs.EndRun(posLineStart);
 				while (startPos < (posLineStart + lineRange.end)) {
-					Insert(startPos - posLineStart);
+					Insert(static_cast<int>(startPos - posLineStart));
 					startPos = deco->rs.EndRun(startPos);
 				}
 			}
 		}
 	}
 	Insert(ll->edgeColumn);
-	Insert(lineRange.end);
+	Insert(static_cast<int>(lineRange.end));
 	saeNext = (!selAndEdge.empty()) ? selAndEdge[0] : -1;
 }
 
@@ -495,7 +494,8 @@ TextSegment BreakFinder::Next() {
 		while (nextBreak < lineRange.end) {
 			int charWidth = 1;
 			if (encodingFamily == efUnicode)
-				charWidth = UTF8DrawBytes(reinterpret_cast<unsigned char *>(&ll->chars[nextBreak]), lineRange.end - nextBreak);
+				charWidth = UTF8DrawBytes(reinterpret_cast<unsigned char *>(&ll->chars[nextBreak]),
+					static_cast<int>(lineRange.end - nextBreak));
 			else if (encodingFamily == efDBCS)
 				charWidth = pdoc->IsDBCSLeadByte(ll->chars[nextBreak]) ? 2 : 1;
 			const Representation *repr = preprs->RepresentationFromCharacter(&ll->chars[nextBreak], charWidth);
@@ -504,7 +504,7 @@ TextSegment BreakFinder::Next() {
 					(nextBreak == saeNext)) {
 				while ((nextBreak >= saeNext) && (saeNext < lineRange.end)) {
 					saeCurrentPos++;
-					saeNext = (saeCurrentPos < selAndEdge.size()) ? selAndEdge[saeCurrentPos] : lineRange.end;
+					saeNext = static_cast<int>((saeCurrentPos < selAndEdge.size()) ? selAndEdge[saeCurrentPos] : lineRange.end);
 				}
 				if ((nextBreak > prev) || repr) {
 					// Have a segment to report

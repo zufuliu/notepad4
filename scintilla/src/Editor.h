@@ -378,7 +378,7 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	void PaintSelMargin(Surface *surfaceWindow, const PRectangle &rc);
 	void RefreshPixMaps(Surface *surfaceWindow);
 	void Paint(Surface *surfaceWindow, const PRectangle &frcArea);
-	long FormatRange(bool draw, Sci_RangeToFormat *pfr);
+	Sci::Position FormatRange(bool draw, Sci_RangeToFormat *pfr);
 	int TextWidth(int style, const char *text);
 
 	virtual void SetVerticalScrollPos() = 0;
@@ -473,10 +473,10 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	void Indent(bool forwards);
 
 	virtual CaseFolder *CaseFolderForEncoding();
-	long FindText(uptr_t wParam, sptr_t lParam);
+	Sci::Position FindText(uptr_t wParam, sptr_t lParam);
 	void SearchAnchor();
-	long SearchText(unsigned int iMessage, uptr_t wParam, sptr_t lParam);
-	long SearchInTarget(const char *text, Sci::Position length);
+	Sci::Position SearchText(unsigned int iMessage, uptr_t wParam, sptr_t lParam);
+	Sci::Position SearchInTarget(const char *text, Sci::Position length);
 	void GoToLine(Sci::Line lineNo);
 
 	virtual void CopyToClipboard(const SelectionText &selectedText) = 0;
