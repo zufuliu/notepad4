@@ -7,9 +7,7 @@ static KEYWORDLIST Keywords_JSON = {{
 "true false null"
 , "", "", "", "", "", "", "",
 
-#if NUMKEYWORD == 16
 "", "", "", "", "", "", "", ""
-#endif
 }};
 
 EDITLEXER lexJSON = { SCLEX_JSON, NP2LEX_JSON, L"JSON Document", L"json", L"", &Keywords_JSON,

@@ -3,39 +3,37 @@
 
 static KEYWORDLIST Keywords_CPP = {
 ""
-, // type keyword
+, // 1 Type Keyword
 ""
-, // #preprocessor
+, // 2 #Preprocessor
 ""
-, // @directive
+, // 3 @Directive
 ""
-, // attribute
+, // 4 Attribute
 ""
-, // class
+, // 5 Class
 ""
-, // interface
+, // 6 Interface
 ""
-, // enumeration
+, // 7 Enumeration
 ""
-, // constant
+, // 8 Constant
 ""
 
-#if NUMKEYWORD == 16
-, // 2nd keyword
+, // 9 2nd Keyword
 ""
-, // 2nd type keyword
+, // 10 2nd Type Keyword
 ""
-, // asm intruction
+, // 11 Assembler Intruction
 ""
-, // asm register
+, // 12 Assembler Register
 ""
-, // C functions
+, // 13 C Function
 ""
-, // C++ functions
+, // 14 C++ Function
 ""
-, // auto complete
+, // 15 Code Snippet
 ""
-#endif
 };
 
 EDITLEXER lexCPP= { SCLEX_CPP, NP2LEX_CPP, L"C/C++ Source", L"c; cpp; cxx; cc; h; hpp; hxx; hh; inl; pch; mm; m", L"", &Keywords_CPP,

@@ -21,7 +21,7 @@
 	* AutoIt Script
 	* AWK
 		* GNU AWK
-	* Bash Shell Script
+	* Bash Script
 	* Windows Batch Script
 	* .NET IL
 	* CMake

@@ -54,13 +54,14 @@ static KEYWORDLIST Keywords_PS1 = {{
 "ipmo ipsn ise iwmi kill lp ls man md measure mi mkdir more mount move mp mv nal ndr ni nmo nsn "
 "nv ogv oh popd ps pushd pwd r rbp rcjb rd rdr ren ri rjb rm rmdir rmo rni rnp rp rsn rsnp rv "
 "rvpa rwmi sajb sal saps sasv sbp sc select set si sl sleep sort sp spjb spps spsv start sv swmi "
-"tee type where wjb write",
-"importsystemmodules prompt psedit tabexpansion",
-"", "", "", "", ""
+"tee type where wjb write"
 
-#if NUMKEYWORD == 16
+, // 1
+"importsystemmodules prompt psedit tabexpansion"
+
+, "", "", "", "", ""
+
 , "", "", "", "", "", "", ""
-#endif
 }};
 
 EDITLEXER lexPS1 = { SCLEX_POWERSHELL, NP2LEX_PS1, L"PowerShell Script", L"ps1; psc1; psd1; psm1", L"", &Keywords_PS1,

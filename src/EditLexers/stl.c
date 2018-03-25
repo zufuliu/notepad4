@@ -3,8 +3,9 @@
 static KEYWORDLIST Keywords_NULL = {
 "", "", "", "", "", "", "", "", ""
 
-#if NUMKEYWORD == 16
-, "", "", "", "", "", "", ""
-#endif
+, "", "", "", "", "", ""
+
+, // 15 Code Snippet
+""
 };
 

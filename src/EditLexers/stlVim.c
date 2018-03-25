@@ -5,16 +5,17 @@ static KEYWORDLIST Keywords_VIM = {{
 "if endif end else elseif while endwhile endw fun endfun func endfunc function endfunction for in endfor try catch endtry "
 "break continue return next let unlet set setf setlocal call map cmap unmap "
 "finish quit exe silent echo "
-,
+
+, // 1
 ""
-,
+
+, // 2
 "exists() has() "
 "strlen() stridx() strpart() "
+
 , "", "", "", "", "",
 
-#if NUMKEYWORD == 16
 "", "", "", "", "", "", "", ""
-#endif
 }};
 
 EDITLEXER lexVim = { SCLEX_VIM, NP2LEX_VIM, L"Vim Script", L"vim", L"", &Keywords_VIM,

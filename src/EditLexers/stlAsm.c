@@ -5,7 +5,7 @@
 // https://sourceware.org/binutils/docs/as/
 
 static KEYWORDLIST Keywords_ASM = {{
-/**************** Instruction *********************/
+// 0 Instruction
 "aaa aad aam aas adc add and arpl bound bsf bsr bswap bt btc btr bts call cbw cwde "
 "cdqe clc cld cli clts cmc cmova cmovae cmovb cmovbe cmovc cmove cmovg cmovge cmovl "
 "cmovle cmovna cmovnae cmovnb cmovnbe cmovnc cmovne cmovng cmovnge cmovnl cmovnle "
@@ -26,7 +26,7 @@ static KEYWORDLIST Keywords_ASM = {{
 "verw wait wbinvd wrmsr xadd xchg xgetbv xlat xlatb xor xrstor xsave xsetbv "
 // AMD
 "clgi invlpga iretq scasq stgi "
-/************** GNU Assembler Instruction ********************/
+// GNU Assembler Instruction
 "adcl adcb adcq addl addq addw andb andl andq andw bsrl btl btsl cbtw cltd cltq cwtl cmpb cmpl "
 "cmpq cmpw decl decq decw divl divq fldl fstpl idivl imull incl incq incw insl jmpl jmpq "
 "leal leaq lgdtl lidtl ljmp ljmpl lret lretq lretw movabs movabsw movabsq movb movl movsbl movsl movq movslq "
@@ -35,7 +35,7 @@ static KEYWORDLIST Keywords_ASM = {{
 "sall salq sarl sarb sbbb sbbl setaeb shldl shll shrb shrdl shrl shrq shrw stosl subb "
 "subl subq subw testb testl testq testw xorb xorl xorq xorw "
 
-,/*************** FPU Instruction *********************/
+, // 1 FPU Instruction
 "f2xm1 fabs fadd faddp fiadd fbld fbstp fchs fclex fnclex fcmovb fcmove fcmovbe "
 "fcmovu fcmovnb fcmovne fcmovnbe fcmovnu fcom fcomp fcompp fcomi fcomip fucomi "
 "fucomip fcos fdecstp fdiv fdivp fidiv fdivr fdivrp fidivr ffree ficom ficomp fild "
@@ -46,7 +46,7 @@ static KEYWORDLIST Keywords_ASM = {{
 "fxrstor fxsave fxtract fyl2x fyl2xp1 fwait "
 "faddl fstpt flds "
 
-,/************** Register ***********************/
+, // 2 Register
 "eax ebx ecx edx esi edi esp ebp  "
 "ax ah al bx bh bl cx ch cl dx dh dl "
 "si di sp bp cs ds ss es fs gs eflags eip "
@@ -65,7 +65,7 @@ static KEYWORDLIST Keywords_ASM = {{
 "ymm8 ymm9 ymm10 ymm11 ymm12 ymm13 ymm14 ymm15 "
 "rip st tr3 tr4 tr5 tr6 tr7 eiz "
 
-,/* directive */
+, // 3 Directive
 ".186 .286 .286c .286p .287 .386 .386c .386p .387 .486 .486p .8086 .8087 .alpha .break .code .const .continue .cref .data .data? .dosseg .else .elseif .endif .endw .err .err1 .err2 .errb .errdef .errdif .errdifi .erre .erridn .erridni .errnb .errndef .errnz .exit .fardata .fardata? .if .lall .lfcond .list .listall .listif .listmacro .listmacroall .model .msfloat .no87 .nocref .nolist .nolistif .nolistmacro .radix .repeat .sall .seq .sfcond .stack .startup .tfcond .type .until .untilcxz .while .xall .xcref .xlist "
 "absolute alias align alignb assume at begin bits catstr comm comment common cpu db rb dd df dosseg dq dt dup dw "
 "echo else elseif elseif1 elseif2 elseifb elseifdef elseifdif elseifdifi elseife elseifidn "
@@ -86,7 +86,7 @@ static KEYWORDLIST Keywords_ASM = {{
 "comcall interface ccall calll heap stack syscall stdcall locals endlocals "
 "$eject $if $else $elseif $endif rseg cseg $restore $save $set data code bit "
 
-,/**************** directive Operand ***************************/
+, // 4 Directive Operand
 "$ $$ %0 %1 %2 %3 %4 %5 %6 %7 %8 %9 .bss .data .rdata .text ? @b @f a16 a32 abs addr all assumes at "
 "basic byte c carry? casemap common compact cpu dotname dword emulator epilogue error export "
 "expr16 expr32 far far16 far32 farstack flat forceframe fortran fword huge language large listing "
@@ -97,8 +97,9 @@ static KEYWORDLIST Keywords_ASM = {{
 "smallstack sword tbyte tiny use16 use32 uses vararg word wrt zero? "
 "ptrdiff_t size_t int_t uint_t int32_t uint32_t int64_t uint64_t null true false "
 "const _text pdata xdata imagerel "
-,/* ext Instruction */
-//XMM SSE SSE2 SSE4
+
+, // 5 Extended Instruction
+// XMM SSE SSE2 SSE4
 "addpd addps addsd addss addsubpd addsubps andpd andps andnpd andnps blendpd blendps "
 "blendvpd blendvps clflush cmppd cmpeqpd cmpltpd cmpltpd cmplepd cmpunordpd cmpneqpd "
 "cmpnltpd cmpnlepd cmpordpd cmpps cmpeqps cmpltps cmpleps cmpunordps cmpneqps "
@@ -127,33 +128,33 @@ static KEYWORDLIST Keywords_ASM = {{
 "punpcklqdq pxor rcpps rcpss roundpd roundps roundsd roundss rsqrtps rsqrtss sfence "
 "shufpd shufps sqrtpd sqrtps sqrtsd sqrtss stmxcsr subpd subps subsd subss ucomisd "
 "ucomiss unpckhpd unpckhps unpcklpd unpcklps xorpd xorps "
-//VMX
+// VMX
 "invept invvpid vmcall vmclear vmlaunch vmresume vmptrld vmptrst vmread vmwrite vmxoff vmxon "
-//AMD
+// AMD
 "lzcnt prefetch prefetchw skinit vmload vmmcall vmrun vmsave "
 "extrq insertq movntsd movntss "
-//AMD 3DNow!
+// AMD 3DNow!
 "femms pavgusb pf2id pf2iw pfacc pfadd pfcmpeq pfcmpge pfcmpgt "
 "pfmax pfmin pfmul pfnacc pfpnacc pfrcp pfrcpit1 "
 "pfrcpit2 pfrsqit1 pfrsqrt pfsub pfsubr pi2fd pi2fw pmulhrw pswapd "
 //AMD XOP/FMA4
-, // fold begin
+
+, // 6 Fold Begin
 "do .while .repeat switch if .if if1 if2 ife ifb ifnb ifdef .ifdef ifndef .ifndef ifidn ifidni macro istruc struc struct union dialog proc .def .func .macro .irp .irpc .rept $if %ifnnum %ifidn %ifidni %ifstr %ifctx %imacro %macro %rep .cfi_startproc .seh_proc "
 "segment "
-, // fold end
+, // 7 Fold End
 "while .endw .until endswitch endsw endif endm iend ends enddialog endproc endp .endef .endfunc .endif .endm .endr $endif %endmacro %endrep .cfi_endproc .seh_endproc "
 
-,/************ GNU Assembler directives  *****************/
+, // 8 GNU Assembler Directive
 "abort align altmacro ascii asciz balign balignl balignw byte code16 code16gcc code32 code64 comm def desc dim double eject else elseif end endef endfunc endif endm endr equ equiv eqv err error even exitm extern fail file fill float func global globl gnu_attribute hidden hword ident if ifdef ifndef incbin include int internal irp irpc lcomm lflags line linkonce list ln loc loc_mark_labels local long macro endm mri noaltmacro nolist octa org p2align p2alignl p2alignw popsection previous print protected psize purgem pushsection quad reloc rept sbttl scl section set short single size skip sleb128 space stabd stabn stabs string string8 string16 string32 string64 struct subsection symver tag text title type uleb128 val version vtable_entry vtable_inherit warning weak weakref word secrel32 "
 " cfi_startproc cfi_endproc cfi_personality cfi_lsda encoding cfi_def_cfa cfi_def_cfa_register cfi_def_cfa_offset cfi_adjust_cfa_offset cfi_offset cfi_rel_offset cfi_register cfi_restore cfi_undefined cfi_same_value cfi_remember_state cfi_return_column cfi_signal_frame cfi_window_save cfi_escape cfi_val_encoded_addr cfi_sections "
 "seh_proc seh_endproc seh_pushreg seh_endprologue seh_stackalloc seh_setframe seh_handler seh_handlerdata "
 
-#if NUMKEYWORD == 16
-, // Proprocessor
+, // 9 Proprocessor
 "define elif else endif error if ifdef ifndef import include line pragma undef using "
 "warning message assert unassert include_next ident sccs "
+
 , "", "", "", "", "", ""
-#endif
 }};
 
 EDITLEXER lexASM = { SCLEX_ASM, NP2LEX_ASM, L"Assembler Source", L"asm; s", L"", &Keywords_ASM,

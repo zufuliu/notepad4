@@ -20,29 +20,29 @@ static KEYWORDLIST Keywords_Smail = {{
 "package new return super switch throws try while "
 "boolean byte char double float int long short void "
 
-, // type keyword
+, // 1 Type Keyword
 ""
-, // preprocessor
+, // 2 Preprocessor
 ""
-, // directive
+, // 3 Directive
 ""
-, // attribute
+, // 4 Attribute
 ""
-, // class
+, // 5 Class
 ""
-, // interface
+, // 6 Interface
 ""
-, // enumeration
+, // 7 Enumeration
 ""
-, // constant
+, // 8 Constant
 "init clinit value "
 
-#if NUMKEYWORD == 16
-, // directive
+, // 9 Directive
 "end class super implements source field subannotation annotation enum method "
 "registers locals array-data packed-switch sparse-switch catch catchall line param local restart prologue epilogue "
 "parameter "
-, // instruction
+
+, // 10 Instruction
 // Regular opcodes
 "nop "
 "move move/from16 move/16 move-wide move-wide/from16 move-wide/16 "
@@ -111,10 +111,11 @@ static KEYWORDLIST Keywords_Smail = {{
 
 // Invalid: used for highlight
 "invoke-object-init invoke-direct-empty "
-, // instruction
+
+, // 11 Instruction
 "from16 high16 jumbo range 2addr lit16 lit8 "
+
 , "", "", "", ""
-#endif
 }};
 
 EDITLEXER lexSmali = { SCLEX_SMALI, NP2LEX_SMALI, L"Android Smali", L"smali", L"", &Keywords_Smail,

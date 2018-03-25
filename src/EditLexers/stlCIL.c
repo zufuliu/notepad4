@@ -25,54 +25,57 @@ static KEYWORDLIST Keywords_CIL = {{
 "break switch throw rethrow ref sizeof endfilter    "
 "constrained no readonly tail  volatile " // "unsigned"
 
-, // type keyword
+, // 1 Type Keyword
 "ansi any array auto autochar blob blob_object bool bstr bytearray byvalstr "
 "carray cf char clsid currency custom date decimal error filetime fixed float float32 "
 "float64 handler hresult idispatch int int16 int32 int64 int8 iunknown lcid lpstr "
 "lptstr lpstruct lpvoid lpwstr native object objectref record refany "
 "safearray storage stored_object stream streamed_object string syschar "
 "sysstring tbstr typedref unicode unsigned valuetype vararg variant vector wchar "
-, // preprocessor
+
+, // 2 Preprocessor
 "line"
-, // directive
+
+, // 3 directive
 ""
-, // attribute
+, // 4 Attribute
 ""
-, // class
+, // 5 Class
 ""
-, // interface
+, // 6 Interface
 ""
-, // enumeration
+, // 7 Enumeration
 ""
-, // constant
+, // 8 Constant
 ""
 
-#if NUMKEYWORD == 16
-, // directive
+, // 9 Directive
 "addon assembly cctor class corflags ctor custom data emitbyte entrypoint "
 "event export field file fire get hash imagebase import language line "
 "locale localized locals manifestres maxstack method module mresource "
 "namespace other override pack param pdirect permission permissionset "
 "property publickey publickeytoken removeon set size stackreserve subsystem "
 "try ver vtable vtentry vtfixup zeroinit "
-, // instructions
+
+, // 10 Instruction
 "add ovf and arglist beq bge bgt ble blt bne br brfalse brtrue call calli "
 "ceq cgt ckfinite clt conv cpblk div dup initblk jmp "
 "ldarg ldarga ldc ldftn ldind ldloc ldnull leave localloc mul neg nop not or pop "
 "rem ret shl shr starg stind stloc sub xor "
-// object model instructions
+// Object Model Instruction
 "box callvirt castclass cpobj initobj isinst ldelem ldelema ldfld ldflda ldlen ldobj "
 "ldsfld ldsflda ldstr ldtoken ldvirtftn mkrefany newobj refanytype refanyval "
 "stelem stfld stobj stsfld unbox "
-" newarr           brinst brnull  brzero "
-"  callmostderived          "
-"             "
-"ldloca         modopt modreq "
-"       reqmin reqopt reqrefuse reqsecobj     "
-"       tls   "
-, "", "", "", "",
+"newarr brinst brnull brzero "
+"callmostderived "
+"ldloca modopt modreq "
+"reqmin reqopt reqrefuse reqsecobj "
+"tls "
+
+, "", "", "", ""
+
+, // 15 Code Snippet
 "ctor() "
-#endif
 }};
 
 EDITLEXER lexCIL = { SCLEX_CIL, NP2LEX_CIL, L".NET IL", L"il", L"", &Keywords_CIL,

@@ -9,35 +9,39 @@ static KEYWORDLIST Keywords_AS = {{
 "instanceof in is namespace native new override package private protected public "
 "rest return set static super switch this throw try typeof use var void while with intrinsic "
 "false null true undefined Infinity NaN"
-, // type keyword
+
+, // 1 Type Keyword
 "int uint "
-, // preprocessor
+
+, // 2 Preprocessor
 ""
-, // directive
+, // 3 Directive
 ""
-, // attribute
-""
-, // class
-"Array Boolean Class Date Error Function Namespace Number Null Object Void "
-"QName RegExp String Vector XML XMLList"
-, // interface
-""
-, // enumeration
-""
-, // constant
+, // 4 Attribute
 ""
 
-#if NUMKEYWORD == 16
-, "", "", "", "", "", "",
+, // 5 Class
+"Array Boolean Class Date Error Function Namespace Number Null Object Void "
+"QName RegExp String Vector XML XMLList"
+
+, // 6 Interface
+""
+, // 7 Enumeration
+""
+, // 8 Constant
+""
+
+, "", "", "", "", "", ""
+
+, // 15 Code Snippet
 "for^() if^() switch^() while^() else^if^() "
-#endif
 }};
 
 EDITLEXER lexAS = { SCLEX_CPP, NP2LEX_AS, L"ActionScript", L"as", L"", &Keywords_AS,
 {
 	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
 	//{ SCE_C_DEFAULT, L"Default", L"", L"" },
-	{ SCE_C_WORD, NP2STYLE_Keyword, L"Keyword", L"fore:#0000FF", L"" },
+{ SCE_C_WORD, NP2STYLE_Keyword, L"Keyword", L"fore:#0000FF", L"" },
 	{ SCE_C_WORD2, NP2STYLE_TypeKeyword, L"Type Keyword", L"fore:#1E90FF", L"" },
 	{ SCE_C_CLASS, NP2STYLE_Class, L"Class", L"fore:#0000FF", L"" },
 	{ SCE_C_INTERFACE, NP2STYLE_Interface, L"Interface", L"bold; fore:#1E90FF", L""},

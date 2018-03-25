@@ -13,16 +13,20 @@ static KEYWORDLIST Keywords_PHP = {{
 "define defined die echo empty eval exit isset list print unset "
 "include include_once require require_once __halt_compiler "
 "array bool boolean real double float int integer object string "
-, // type keyword, magic method
+
+, // 1 Type Keyword, Magic Method
 "__autoload __call __callStatic __clone __construct __destruct __get __invoke "
 "__isset __set __set_state __sleep __toString __unset __wakeup "
-, // #preprocessor
+
+, // 2 #preprocessor
 ""
-, // @directive, Predefined Variable
+, // 3 @Directive, Predefined Variable
 ""
-, // attribute, magic constant
+
+, // 4 Attribute, Magic Constant
 "__CLASS__ __DIR__ __FILE__ __FUNCTION__ __LINE__ __METHOD__ __NAMESPACE__ __TRAIT__ "
-, // class
+
+, // 5 Class
 "stdClass __PHP_Incomplete_Class Exception ErrorException Directory php_user_filter "
 "DateTime DateTimeZone DateInterval DatePeriod DateTimeInterface DateTimeImmutable "
 // Reflection
@@ -39,32 +43,34 @@ static KEYWORDLIST Keywords_PHP = {{
 "PDO PDOStatement PDOException "
 "mysqli mysqli_stmt mysqli_result mysqli_driver mysqli_warning mysqli_sql_exception "
 "SQLite3 SQLite3Stmt SQLite3Result "
-, // interface
+
+, // 6 Interface
 "Traversable Iterator IteratorAggregate ArrayAccess Serializable Closure Generator "
 "Reflector JsonSerializable SessionHandlerInterface "
 // SPL
 "Countable OuterIterator RecursiveIterator SeekableIterator SplObserver SplSubject"
-, // enumeration
+
+, // 7 Enumeration
 "$this $GLOBALS $_SERVER $_GET $_POST $_FILES $_COOKIE $_SESSION $_REQUEST $_ENV "
 "$php_errormsg $HTTP_RAW_POST_DATA $http_response_header $argc $argv "
 
-, // constant
-//Core Predefined Constants
+, // 8 Constant
+// Core Predefined Constants
 "PHP_VERSION PHP_MAJOR_VERSION  PHP_MINOR_VERSION  PHP_RELEASE_VERSION  PHP_VERSION_ID  PHP_EXTRA_VERSION PHP_ZTS  PHP_DEBUG  PHP_MAXPATHLEN  PHP_OS PHP_SAPI PHP_EOL PHP_INT_MAX  PHP_INT_SIZE  DEFAULT_INCLUDE_PATH PEAR_INSTALL_DIR PEAR_EXTENSION_DIR PHP_EXTENSION_DIR PHP_PREFIX PHP_BINDIR PHP_BINARY PHP_MANDIR PHP_LIBDIR PHP_DATADIR PHP_SYSCONFDIR PHP_LOCALSTATEDIR PHP_CONFIG_FILE_PATH PHP_CONFIG_FILE_SCAN_DIR PHP_SHLIB_SUFFIX "
 // Error Handling
 "E_ERROR E_WARNING E_PARSE E_NOTICE E_CORE_ERROR E_CORE_WARNING E_COMPILE_ERROR E_COMPILE_WARNING E_USER_ERROR E_USER_WARNING E_USER_NOTICE E_STRICT E_RECOVERABLE_ERROR E_DEPRECATED E_USER_DEPRECATED E_ALL "
 // Output Control
 "PHP_OUTPUT_HANDLER_START PHP_OUTPUT_HANDLER_WRITE PHP_OUTPUT_HANDLER_FLUSH PHP_OUTPUT_HANDLER_CLEAN PHP_OUTPUT_HANDLER_FINAL PHP_OUTPUT_HANDLER_CONT PHP_OUTPUT_HANDLER_END "
 // PHP Options/Info
-//Pre-defined phpcredits constants
+// Pre-defined phpcredits constants
 "CREDITS_GROUP CREDITS_GENERAL CREDITS_SAPI CREDITS_MODULES CREDITS_DOCS CREDITS_FULLPAGE CREDITS_QA CREDITS_ALL "
-//phpinfo constants
+// phpinfo constants
 "INFO_GENERAL INFO_CREDITS INFO_CONFIGURATION INFO_MODULES INFO_ENVIRONMENT INFO_VARIABLES INFO_LICENSE INFO_ALL "
-//INI constants
+// INI constants
 "INI_USER INI_PERDIR INI_SYSTEM INI_ALL "
-//assert constants
+// assert constants
 "ASSERT_ACTIVE ASSERT_CALLBACK ASSERT_BAIL ASSERT_WARNING ASSERT_QUIET_EVAL "
-//Windows specific constants
+// Windows specific constants
 "PHP_WINDOWS_VERSION_MAJOR PHP_WINDOWS_VERSION_MINOR PHP_WINDOWS_VERSION_BUILD PHP_WINDOWS_VERSION_PLATFORM PHP_WINDOWS_VERSION_SP_MAJOR PHP_WINDOWS_VERSION_SP_MINOR PHP_WINDOWS_VERSION_SUITEMASK PHP_WINDOWS_VERSION_PRODUCTTYPE PHP_WINDOWS_NT_DOMAIN_CONTROLLER PHP_WINDOWS_NT_SERVER PHP_WINDOWS_NT_WORKSTATION "
 // Date and Time, Hash, Password Hashing
 "SUNFUNCS_RET_TIMESTAMP SUNFUNCS_RET_STRING SUNFUNCS_RET_DOUBLE " "HASH_HMAC " "PASSWORD_BCRYPT PASSWORD_DEFAULT "
@@ -113,8 +119,7 @@ static KEYWORDLIST Keywords_PHP = {{
 // cURL
 ""
 
-#if NUMKEYWORD == 16
-, // Function
+, // 9 Function
 // Error Handling
 "debug_backtrace() debug_print_backtrace() error_get_last() error_log() error_reporting() restore_error_handler() restore_exception_handler() set_error_handler() set_exception_handler() trigger_error() user_error() "
 // Output Control
@@ -175,7 +180,8 @@ static KEYWORDLIST Keywords_PHP = {{
 "simplexml_import_dom() simplexml_load_file() simplexml_load_string() "
 // cURL
 "curl_close() curl_copy_handle() curl_errno() curl_error() curl_escape() curl_exec() curl_file_create() curl_getinfo() curl_init() curl_multi_add_handle() curl_multi_close() curl_multi_exec() curl_multi_getcontent() curl_multi_info_read() curl_multi_init() curl_multi_remove_handle() curl_multi_select() curl_multi_setopt() curl_multi_strerror() curl_pause() curl_reset() curl_setopt_array() curl_setopt() curl_share_close() curl_share_init() curl_share_setopt() curl_strerror() curl_unescape() curl_version() "
-, // Field
+
+, // 10 Field
 // Exception/ErrorException
 "message code file line ""severity "
 // Directory
@@ -186,7 +192,7 @@ static KEYWORDLIST Keywords_PHP = {{
 "affected_rows client_info client_version connect_errno connect_error errno error_list field_count client_version host_info protocol_version server_info info insert_id warning_count  "
 "num_rows param_count sqlstate " "current_field lengths " "embedded reconnect report_mode "
 
-, // Method
+, // 11 Method
 // Iterator/Generator/IteratorAggregate/ArrayAccess
 "current() key() next() rewind() valid() " " send() throw() valid() " " getIterator() " "offsetExists() offsetGet() offsetSet() offsetUnset() "
 // Serializable/Closure
@@ -216,18 +222,21 @@ static KEYWORDLIST Keywords_PHP = {{
 "bindColumn() bindParam() bindValue() closeCursor() columnCount() debugDumpParams() errorCode() errorInfo() execute() fetch() fetchAll() fetchColumn() fetchObject() getAttribute() getColumnMeta() nextRowset() rowCount() setAttribute() setFetchMode() "
 // SimpleXML
 "addAttribute() addChild() asXML() attributes() children() count() getDocNamespaces() getName() getNamespaces() registerXPathNamespace() xpath() " "getChildren() hasChildren() "
-,
+
+, // 12 Tag
 "php"
-,
+
+, // 13 String Constant
 // $_SERVER
 "PHP_SELF argv argc GATEWAY_INTERFACE SERVER_ADDR SERVER_NAME SERVER_SOFTWARE SERVER_PROTOCOL REQUEST_METHOD REQUEST_TIME REQUEST_TIME_FLOAT QUERY_STRING DOCUMENT_ROOT HTTP_ACCEPT HTTP_ACCEPT_CHARSET HTTP_ACCEPT_ENCODING HTTP_ACCEPT_LANGUAGE HTTP_CONNECTION HTTP_HOST HTTP_REFERER HTTP_USER_AGENT HTTPS REMOTE_ADDR REMOTE_HOST REMOTE_PORT REMOTE_USER REDIRECT_REMOTE_USER SCRIPT_FILENAME SERVER_ADMIN SERVER_PORT SERVER_SIGNATURE PATH_TRANSLATED SCRIPT_NAME REQUEST_URI PHP_AUTH_DIGEST PHP_AUTH_USER PHP_AUTH_PW AUTH_TYPE PATH_INFO ORIG_PATH_INFO "
-,
+
+, // 14
 ""
-,
+
+, // 15 Code Snippet
 "for^() if^() switch^() while^() elseif^() foreach^() catch^() "
 "declare() define() defined() die() echo() empty() eval() exit() isset() list() unset() require() require_once() __halt_compiler() "
 "__autoload() __call() __callStatic() __clone() __construct() __destruct() __get() __invoke()  __isset() __set() __set_state() __sleep() __toString() __unset() __wakeup() "
-#endif
 }};
 
 EDITLEXER lexPHP = { SCLEX_CPP, NP2LEX_PHP, L"PHP Script", L"php;", L"", &Keywords_PHP,

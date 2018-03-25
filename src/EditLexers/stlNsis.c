@@ -6,9 +6,11 @@
 static KEYWORDLIST Keywords_NSIS = {{
 "Function FunctionEnd Section SectionEnd SectionGroup SectionGroupEnd PageEx PageExEnd Goto Var "
 "Page UninstPage"
-, //
+
+, // 1
 ""
-, //
+
+, // 2 Preprocessor
 "define undef ifdef ifndef if ifmacrodef ifmacrondef else endif insertmacro macro macroend searchparse searchreplace "
 "include addincludedir addplugindir appendfile cd delfile echo error execute packhdr system tempfile warning verbose"
 
@@ -18,9 +20,7 @@ static KEYWORDLIST Keywords_NSIS = {{
 ""
 , "", "", "", ""
 
-#if NUMKEYWORD == 16
 , "", "", "", "", "", "", ""
-#endif
 }};
 
 EDITLEXER lexNsis = { SCLEX_NSIS, NP2LEX_NSIS, L"Nsis Setup Script", L"nsi; nsh", L"", &Keywords_NSIS,

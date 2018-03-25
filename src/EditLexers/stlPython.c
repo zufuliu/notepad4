@@ -13,14 +13,18 @@ static KEYWORDLIST Keywords_Python = {{
 "global if import in is lambda nonlocal not or pass raise return try while with yield "
 // python 2
 "exec print "
-, // type
+
+, // 1 Type
 "int long float bool complex list tuple range str bytes bytearray memoryview set frozenset dict contextmanager "
 "type object unicode buffer file xrange slice "
-, // Built-in Constants
+
+, // 2 Built-in Constant
 "self None True False NotImplemented Ellipsis __debug__ __main__ __builtin__ __future__  "
-, // @Decorator
+
+, // 3 @Decorator
 "classmethod staticmethod cached_method abstractmethod property contextmanager "
-, // Built-in Functions
+
+, // 4 Built-in Function
 "__import__() abs() all() any() ascii() bin() bool() breakpoint() bytearray() bytes() callable() chr() classmethod() "
 "compile() complex() delattr() dict() dir() divmod() enumerate() eval() exec() filter() float() format() "
 "frozenset() getattr() globals() hasattr() hash() help() hex() id() input() int() isinstance() issubclass() "
@@ -32,14 +36,15 @@ static KEYWORDLIST Keywords_Python = {{
 "basestring() cmp() execfile() file() long() raw_input() reduce() reload() unichr() unicode() xrange() "
 "apply() buffer() coerce() intern() "
 
-, // attribute
+, // 5 Attribute
 "__doc__ __name__ __qualname__ __module__ __defaults__ __code__ __globals__  "
 "__dict__ __closure__ __annotations__ __kwdefaults__ __self__ __func__  "
 "__class__ __bases__ __metaclass__ __subclasses__ __loader__ __package__ "
 "__path__ __file__ __all__ __version__ __slots__ "
 // other
 "__docformat__ __about__ __author__ __date__ __traceback__ __cause__ __context__ __suppress_context__ __weakref__ "
-, // object method
+
+, // 6 Object Method
 "__new__ __init__ __del__ __repr__ __str__ __bytes__ __format__ __lt__ __le__ "
 "__eq__ __ne__ __gt__ __ge__ __hash__ __bool__ __getattr__ __getattribute__ "
 "__setattr__ __delattr__ __dir__ __get__ __set__ __delete__ __prepare__ "
@@ -58,7 +63,7 @@ static KEYWORDLIST Keywords_Python = {{
 // other
 "__trunc__ __getstate__ __setstate__ __copy__ __deepcopy__ __getinitargs__ "
 
-, // class
+, // 7 Class
 "Complex Real Rational Integral " "Fraction " "Decimal BasicContext ExtendedContext DefaultContext Context Clamped DecimalException DivisionByZero Inexact InvalidOperation Overflow Rounded Subnormal Underflow FloatOperation " "SystemRandom "
 // exception
 "BaseException SystemExit KeyboardInterrupt GeneratorExit Exception StopIteration ArithmeticError FloatingPointError OverflowError ZeroDivisionError AssertionError AttributeError BufferError EOFError ImportError LookupError IndexError KeyError MemoryError NameError UnboundLocalError OSError BlockingIOError ChildProcessError ConnectionError BrokenPipeError ConnectionAbortedError ConnectionRefusedError ConnectionResetError FileExistsError FileNotFoundError InterruptedError IsADirectoryError NotADirectoryError PermissionError ProcessLookupError TimeoutError ReferenceError RuntimeError NotImplementedError SyntaxError IndentationError TabError SystemError TypeError ValueError UnicodeError UnicodeDecodeError UnicodeEncodeError UnicodeTranslateError Warning DeprecationWarning PendingDeprecationWarning RuntimeWarning SyntaxWarning UserWarning FutureWarning ImportWarning UnicodeWarning BytesWarning ResourceWarning "
@@ -87,11 +92,11 @@ static KEYWORDLIST Keywords_Python = {{
 "MySQLConnection CursorBase MySQLCursor MySQLCursorRaw MySQLCursorBuffered MySQLCursorBufferedRaw "
 // gzip
 "GzipFile "
-, // site
+
+, // 8 Site
 "copyright license credits __copyright__ __license__ __credits__ "
 
-#if NUMKEYWORD == 16
-, // module
+, // 9 Module
 "__builtin__ builtins __future__ "
 // future
 "nested_scopes generators division absolute_import with_statement print_function unicode_literals generator_stop "
@@ -103,7 +108,8 @@ static KEYWORDLIST Keywords_Python = {{
 "json base64 email.utils "
 "urllib urllib2 urlparse uuid httplib.client cookielib "
 "wave sqlite3 mysql.connector gzip "
-, // method
+
+, // 10 Method
 // int/float
 "bit_length() to_bytes() from_bytes() " "as_integer_ratio() is_integer() hex() fromhex() "
 // list
@@ -206,7 +212,7 @@ static KEYWORDLIST Keywords_Python = {{
 "config() disconnect() get_rows() get_row() is_connected() reconnect() ping() set_converter_class() get_server_version() get_server_info() set_login() set_unicode() set_charset_collation() set_client_flags() isset_client_flag() set_database() get_database() set_time_zone() get_time_zone() set_sql_mode() get_sql_mode() set_autocommit() get_autocommit() "
 "callproc() nextset() setinputsizes() setoutputsize() reset() stored_results() getlastrowid() fetchwarnings() "
 
-, // constant
+, // 11 Constant
 // math/decimal
 "pi " "inf nan NaN Infinity " "MAX_PREC MAX_EMAX MIN_EMIN MIN_ETINY HAVE_THREADS ROUND_CEILING ROUND_DOWN ROUND_FLOOR ROUND_HALF_DOWN ROUND_HALF_EVEN ROUND_HALF_UP ROUND_UP ROUND_05UP "
 // os
@@ -228,7 +234,7 @@ static KEYWORDLIST Keywords_Python = {{
 // sqlite3
 "PARSE_DECLTYPES PARSE_COLNAMES "
 
-, // attribute
+, // 12 Attribute
 // builtins
 ""
 // numbers
@@ -282,9 +288,8 @@ static KEYWORDLIST Keywords_Python = {{
 "password port use_unicode connection_timeout client_flags buffered "
 // gzip
 "filename mode compresslevel fileobj "
-,
-"", "", ""
-#endif
+
+, "", "", ""
 }};
 
 EDITLEXER lexPython  = { SCLEX_PYTHON, NP2LEX_PYTHON, L"Python Script", L"py; pyw", L"", &Keywords_Python,

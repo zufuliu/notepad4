@@ -11,16 +11,20 @@ static KEYWORDLIST Keywords_VBS = {{
 "Load Loop LSet Me Mid Mod Module New Next Not Nothing Null On Option Optional Or "
 "Preserve Private Property Public RaiseEvent ReDim Rem Resume Return RSet Select Set "
 "Static Stop Sub Then To True Type Unload Until Wend While With WithEvents Xor"
-, // type keyword
+
+, // 1 Type Keyword
 "Boolean Byte Currency Date Double Integer Long Object Single String Variant "
 "RegExp "
-, // not used keyword
+
+, // 2 not used keyword
 "Err WScript"
-, // preprocessor
+
+, // 3 Preprocessor
 ""
-, // attribute/property
+, // 4 Attribute/Property
 ""
-, // VB Const
+
+, // 5 VB Const
 // String
 "vbCr vbCrLf vbFormFeed vbLf vbNewLine vbNullChar vbNullString vbTab vbVerticalTab "
 // MsgBox
@@ -44,14 +48,10 @@ static KEYWORDLIST Keywords_VBS = {{
 "vbObject vbError vbBoolean vbVariant vbDataObject vbDecimal vbByte vbArray "
 // Miscellaneous
 "vbObjectError"
-, "",
-""
-,
-"WScript "
 
-#if NUMKEYWORD == 16
+, "", "", ""
+
 , "", "", "", "", "", "", ""
-#endif
 }};
 
 

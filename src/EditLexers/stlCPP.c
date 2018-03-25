@@ -29,7 +29,8 @@ static KEYWORDLIST Keywords_CPP = {{
 "NULL TRUE FALSE EOF WEOF "
 "errno " "stdin stdout stderr " "signgam "
 "CONST ENUM "
-, // type keyword
+
+, // 1 Type Keyword
 "auto char double float int long short signed unsigned void "
 "bool char16_t char32_t wchar_t nullptr_t nothrow_t "
 "_Bool complex _Complex _Imaginary "
@@ -53,13 +54,16 @@ static KEYWORDLIST Keywords_CPP = {{
 // wchar.h				wctype.h
 "wint_t mbstate_t "		"wctrans_t wctype_t "
 "byte "
-, // preprocessor
+
+, // 2 Preprocessor
 " if elif else endif ifdef ifndef define undef include include_next import using pragma line error warning warn message "
 "region endregion sccs ident assert unassert "
-, // directive: Objective C/C++
+
+, // 3 Directive: Objective C/C++
 " interface private protected public package property end protocol optional required implementation synthesize try throw catch finally autoreleasepool synchronized dynamic class selector encode compatibility_alias import available "
 "property() selector() available() "
-, // attribute
+
+, // 4 Attribute
 // Objective C/C++ @property()
 "getter setter readwrite readonly strong weak copy assign retain nonatomic atomic nonnull nullable null_resettable "
 // MSVC __declspec()
@@ -71,7 +75,8 @@ static KEYWORDLIST Keywords_CPP = {{
 "may_alias __may_alias__ visibility __visibility__"
 // C++11, 14, 17
 "carries_dependency fallthrough "
-, // class
+
+, // 5 Class
 // STL class
 "basic_string string wstring u16string u32string "
 "vector deque list map multimap multiset queue priority_queue set stack initializer_list forward_list gslice gslice_array "
@@ -129,17 +134,18 @@ static KEYWORDLIST Keywords_CPP = {{
 // third lib
 "ASIHTTPRequest "
 
-, // interface
+, // 6 Interface
 // Win32/MFC
 "IUnknown IStream "
 
 // Mac/iOS
 "NSCopying "
 
-, // enumeration
+, // 7 Enumeration
 // ios_base
 "fmtflags iostate openmode seekdir "
-, // constant
+
+, // 8 Constant
 "__cplusplus __cplusplus_cli __assembler __midl "
 "__FILE__ __FUNCTION__ __LINE__ __DATE__ __TIME__ __TIMESTAMP__ __func__ __VA_ARGS__ "
 "__STDC__ __STDC_HOSTED__ __STDC_VERSION__ __STDC_IEC_559__ __STDC_IEC_559_COMPLEX__ __STDC_ISO_10646__ "
@@ -203,12 +209,12 @@ static KEYWORDLIST Keywords_CPP = {{
 // Mac/iOS
 "IBOutlet IBAction __has_feature() "
 
-#if NUMKEYWORD == 16
-,// 2nd keyword: Objective C/C++
+, // 9 2nd Keyword: Objective C/C++
 "id instancetype Class Protocol SEL IMP self super "
 "nil Nil BOOL YES NO oneway in out inout bycopy byref "
 "__unsafe_unretained __strong __weak __bridge __bridge_transfer __bridge_retained __block __autoreleasing "
-,// 2nd type keyword
+
+, // 10 2nd Type Keyword
 // Win32
 "VOID PVOID LPVOID LPCVOID BOOL PBOOL LPBOOL BOOLEAN PBOOLEAN BYTE PBYTE LPBYTE WORD PWORD LPWORD ATOM DWORD PDWORD LPDWORD "
 "UCHAR PUCHAR SHORT PSHORT USHORT PUSHORT INT PINT LPINT UINT PUINT LONG PLONG LPLONG ULONG PULONG FLOAT PFLOAT "
@@ -245,7 +251,7 @@ static KEYWORDLIST Keywords_CPP = {{
 "NSInteger NSUInteger NSTimeInterval NSZone NSRange "
 "CGFloat CGRect CGSize CGPoint dispatch_queue_t unichar "
 
-,// asm intruction
+, // 11 Assembler Intruction
 "aaa aad aam aas adc add and arpl bound bsf bsr bswap bt btc btr bts call cbw cwde "
 "cdqe clc cld cli clts cmc cmova cmovae cmovb cmovbe cmovc cmove cmovg cmovge cmovl "
 "cmovle cmovna cmovnae cmovnb cmovnbe cmovnc cmovne cmovng cmovnge cmovnl cmovnle "
@@ -266,7 +272,7 @@ static KEYWORDLIST Keywords_CPP = {{
 "verw wait wbinvd wrmsr xadd xchg xgetbv xlat xlatb xor xrstor xsave xsetbv "
 // AMD
 "clgi invlpga iretq scasq stgi "
-/************** GNU Assembler Instruction ********************/
+// GNU Assembler Instruction
 "adcl adcb adcq addl addq addw andb andl andq andw bsrl btl btsl cbtw cltd cmpb cmpl "
 "cmpq cmpw decl decq decw divl fldl fstpl idivl imull incl incq incw insl jmpl jmpq "
 "leal leaq lgdtl lidtl ljmp ljmpl lret lretq lretw movabs movb movl movsbl movsl "
@@ -274,7 +280,7 @@ static KEYWORDLIST Keywords_CPP = {{
 "popfl popl popq popw pushal pushfl pushfq pushl pushq rclb rcll rcrl retl retq roll "
 "sall salq sarl sarb sbbb sbbl setaeb shldl shll shrb shrdl shrl shrq shrw stosl subb "
 "subl subq subw testb testl testq testw xorb xorl xorq xorw "
-/*************** FPU Instruction *********************/
+// FPU Instruction
 "f2xm1 fabs fadd faddp fiadd fbld fbstp fchs fclex fnclex fcmovb fcmove fcmovbe "
 "fcmovu fcmovnb fcmovne fcmovnbe fcmovnu fcom fcomp fcompp fcomi fcomip fucomi "
 "fucomip fcos fdecstp fdiv fdivp fidiv fdivr fdivrp fidivr ffree ficom ficomp fild "
@@ -284,7 +290,7 @@ static KEYWORDLIST Keywords_CPP = {{
 "fnstsw fsub fsubp fisub fsubr fsubrp fisubr ftst fucom fucomp fucompp fxam fxch "
 "fxrstor fxsave fxtract fyl2x fyl2xp1 fwait "
 "faddl fstpt flds "
-//XMM SSE SSE2 SSE4
+// XMM SSE SSE2 SSE4
 "addpd addps addsd addss addsubpd addsubps andpd andps andnpd andnps blendpd blendps "
 "blendvpd blendvps clflush cmppd cmpeqpd cmpltpd cmpltpd cmplepd cmpunordpd cmpneqpd "
 "cmpnltpd cmpnlepd cmpordpd cmpps cmpeqps cmpltps cmpleps cmpunordps cmpneqps "
@@ -313,17 +319,18 @@ static KEYWORDLIST Keywords_CPP = {{
 "punpcklqdq pxor rcpps rcpss roundpd roundps roundsd roundss rsqrtps rsqrtss sfence "
 "shufpd shufps sqrtpd sqrtps sqrtsd sqrtss stmxcsr subpd subps subsd subss ucomisd "
 "ucomiss unpckhpd unpckhps unpcklpd unpcklps xorpd xorps "
-//VMX
+// VMX
 "invept invvpid vmcall vmclear vmlaunch vmresume vmptrld vmptrst vmread vmwrite vmxoff vmxon "
-//AMD
+// AMD
 "lzcnt prefetch prefetchw skinit vmload vmmcall vmrun vmsave "
 "extrq insertq movntsd movntss "
-//AMD 3DNow!
+// AMD 3DNow!
 "femms pavgusb pf2id pf2iw pfacc pfadd pfcmpeq pfcmpge pfcmpgt "
 "pfmax pfmin pfmul pfnacc pfpnacc pfrcp pfrcpit1 "
 "pfrcpit2 pfrsqit1 pfrsqrt pfsub pfsubr pi2fd pi2fw pmulhrw pswapd "
-//AMD XOP/FMA4
-,// asm register
+// AMD XOP/FMA4
+
+, // 12 Assembler Register
 "eax ebx ecx edx esi edi esp ebp  "
 "ax ah al bx bh bl cx ch cl dx dh dl "
 "si di sp bp cs ds ss es fs gs eflags eip "
@@ -341,7 +348,8 @@ static KEYWORDLIST Keywords_CPP = {{
 "ymm0 ymm1 ymm2 ymm3 ymm4 ymm5 ymm6 ymm7 "
 "ymm8 ymm9 ymm10 ymm11 ymm12 ymm13 ymm14 ymm15 "
 "rip st tr3 tr4 tr5 tr6 tr7 eiz "
-, // C functions
+
+, // 13 C Function
 // locale.h
 "setlocale() localeconv() "
 // setjmp.h
@@ -391,7 +399,8 @@ static KEYWORDLIST Keywords_CPP = {{
 // fenv.h
 "feclearexcept() fegetexceptflag() feraiseexcept() fesetexceptflag() fetestexcept() fegetround() fesetround() "
 "fegetenv() feholdexcept() fesetenv() feupdateenv() "
-, // C++ functions
+
+, // 14 C++ Function
 // algorithm
 "forward() move() move_if_noexcept() move_backward() addressof() swap() get() " // move
 "distance() advance() next() prev() base() back_inserter() front_inserter() inserter() "
@@ -416,7 +425,8 @@ static KEYWORDLIST Keywords_CPP = {{
 
 // Mac/iOS
 "NSLog() "
-,
+
+, // 15 Code Snippet
 "_Pragma() defined() comment() __has_include() __has_include_next() __has_attribute() "
 "sizeof() for^() if^() switch^() while^() catch^() else^if^() "
 "alignas() alignof() delete[] decltype() noexcept() typeid() typeof() static_assert() "
@@ -424,7 +434,6 @@ static KEYWORDLIST Keywords_CPP = {{
 "_Alignas() _Alignof() _Static_assert() "
 "__attribute__() __typeof__() __alignof__() "
 "__except^() __alignof() __declspec() __uuidof() "
-#endif
 }};
 
 EDITLEXER lexCPP = { SCLEX_CPP, NP2LEX_CPP, L"C/C++ Source", L"c; cpp; cxx; cc; h; hpp; hxx; hh; inl; pch; mm", L"", &Keywords_CPP,

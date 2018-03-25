@@ -6,9 +6,7 @@
 static KEYWORDLIST Keywords_TEX = {{
 "", "", "", "", "", "", "", "", ""
 
-#if NUMKEYWORD == 16
 , "", "", "", "", "", "", ""
-#endif
 }};
 
 EDITLEXER lexLaTeX = { SCLEX_LATEX, NP2LEX_LATEX, L"LaTeX File", L"tex; latex; sty; cls; tpx; bbl; bib; ltx; dtx; ins; toc; info", L"", &Keywords_TEX,
@@ -41,25 +39,27 @@ static KEYWORDLIST Keywords_TEXI = {{
 "shorttitlepage center titlefont title subtitle author "
 "shortcontents summarycontents contents setcontentsaftertitlepage setshortcontentsaftertitlepage "
 "node top novalidate lowersections raisesections part charpter centerchap section subsection subsubsection unnumbered "
-, // fold
+
+, // 1 Fold
 "copying frenchspacing direntry documentdescription titlepage menu detailmenu cartouche quotation smallquotation indentedblock smallindentedblock raggedright format smallformat display smalldisplay flushleft flushright example smallexample lisp smalllist verbatim itemize enumerate table ftable vtable multitable float group "
 "deffn defun defmac deftypefn deftypefun defcv defivar deftypecv deftypevar deftypevr deftp defvr defvar deftypeivar "
 "ignore ifdocbook ifhtml ifinfo ifplaintext iftex ifxml ifnotdocbook ifnothtml ifnotplaintext ifnottex ifnotxml ifnotinfo "
 "docbook html tex xml ifset ifclear ifcommanddefined ifcommandnotdefined macro "
-, // Tex cmd
+
+, // 2 Tex Command
 "input"
-,
+
+, // 3 input
 // \input
 "texinfo "
 // @documentencoding
 "US-ASCII UTF-8 ISO-8859-1 "
 // @frenchspacing @allowcodebreaks
 "on off true false "
+
 , "", "", "", "", ""
 
-#if NUMKEYWORD == 16
 , "", "", "", "", "", "", ""
-#endif
 }};
 
 EDITLEXER lexTexinfo = { SCLEX_TEXINFO, NP2LEX_TEXINFO, L"Texinfo File", L"texi; texinfo; txi", L"", &Keywords_TEXI,

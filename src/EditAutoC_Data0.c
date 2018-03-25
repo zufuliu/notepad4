@@ -467,7 +467,7 @@ static NP2_KEYWORDS kwAndroidManifest = {
 
 NP2_KEYWORDS *np2_LexKeyword;
 
-void Style_UpdateLexKeywords(PEDITLEXER pLexNew) {
+void Style_UpdateLexerKeywords(PEDITLEXER pLexNew) {
 	np2_LexKeyword = NULL;
 	// additional keywords
 	switch (pLexNew->rid) {

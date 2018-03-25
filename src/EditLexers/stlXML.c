@@ -2,19 +2,22 @@
 #include "EditStyle.h"
 
 static KEYWORDLIST Keywords_XML = {{
-"", "", "",
+"", "", ""
+
+, // 4 Tag
 "xml xmlns xsi DOCTYPE doctype PUBLIC "
-, // Attribute
+
+, // 5 Attribute
 "version encoding standalone noNamespaceSchemaLocation schemaLocation CDATA "
 "lang id name type value "
-, // Value
+
+, // 6 Value
 "utf-8 UTF-8 ISO-8859-1 "
 "true false yes no on off "
+
 , "", "", ""
 
-#if NUMKEYWORD == 16
 , "", "", "", "", "", "", ""
-#endif
 }};
 
 EDITLEXER lexXML = { SCLEX_XML, NP2LEX_XML, L"XML Document", L"xml; xsl; xslt; xsd; dtd; rss; svg; xul; axl; rdf; xaml; resx; plist; ", L"", &Keywords_XML,

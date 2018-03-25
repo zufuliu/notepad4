@@ -5,32 +5,35 @@
 
 static KEYWORDLIST Keywords_DOT = {{
 "node edge graph digraph subgraph strict true false"
-, // type keyword
-// Node Shapes
+
+, // 1 Type Keyword
+// Node Shape
 "box polygon ellipse circle point egg triangle plaintext diamond trapezium parallelogram house pentagon hexagon septagon octagon doublecircle doubleoctagon tripleoctagon invtriangle invtrapezium invhouse Mdiamond Msquare Mcircle rect rectangle none note tab folder box3d component "
-, // preprocessor
+
+, // 2 Preprocessor
 ""
-, // directive
-// HTML-Like Labels
+, // 3 Directive
+// HTML Like Label
 "TABLE TR TD FONT IMG BR "
-, // attribute
+
+, // 4 Attribute
 "Damping K URL arrowhead arrowsize arrowtail aspect bb bgcolor center charset clusterrank color colorList colorscheme comment compound concentrate constraint decorate defaultdist dim dimen dir diredgeconstraints distortion dpi edgeURL edgehref edgetarget edgetooltip epsilon esep fillcolor fixedsize fontcolor fontname fontnames fontpath fontsize group headURL headclip headhref headlabel headport headtarget headtooltip height href id image imagescale label labelURL labelangle labeldistance labelfloat labelfontcolor labelfontname labelfontsize labelhref labeljust labelloc labelloc labeltarget labeltooltip landscape layer layers layersep layout len levels levelsgap lhead lp ltail margin maxiter mclimit mindist minlen mode model mosek nodesep nojustify normalize nslimit nslimit1 ordering orientation orientation outputorder overlap overlap_scaling pack packmode pad page pagedir pencolor penwidth peripheries pin pos quadtree quantum rank rankdir ranksep ratio rects regular remincross repulsiveforce resolution root rotate samehead sametail samplepoints searchsize sep shape shapefile showboxes sides size skew smoothing sortv splines start style stylesheet tailURL tailclip tailhref taillabel tailport tailtarget tailtooltip target tooltip truecolor vertices viewport voro_margin weight width "
 //
 "ALIGN BALIGN BGCOLOR BORDER CELLBORDER CELLPADDING CELLSPACING COLOR COLSPAN FACE FIXEDSIZE HEIGHT HREF POINT-SIZE PORT ROWSPAN SCALE SRC TARGET TITLE TOOLTIP VALIGN WIDTH "
-, // class
+
+, // 5 Class
 ""
-, // interface
+, // 6 Interface
 ""
-, // enumeration
-// Styles for Nodes
+, // 7 Enumeration
+// Style for Node
 "filled invisible diagonals rounded dashed dotted solid bold "
-, // constant
-// Color Names
+
+, // 8 Constant
+// Color Name
 "aliceblue antiquewhite aquamarine azure beige bisque black blanchedalmond blue blueviolet brown burlywood cadetblue chartreuse chocolate coral cornflowerblue cornsilk crimson cyan darkgoldenrod darkgreen darkkhaki darkolivegreen darkorange darkorchid darksalmon darkseagreen darkslateblue darkslategray darkslategrey darkturquoise darkviolet deeppink deepskyblue dimgray dimgrey dodgerblue firebrick floralwhite forestgreen gainsboro ghostwhite gold goldenrod gray green greenyellow grey honeydew hotpink indianred indigo ivory khaki lavender lavenderblush lawngreen lemonchiffon lightblue lightcoral lightcyan lightgoldenrod lightgoldenrodyellow lightgray lightgrey lightpink lightsalmon lightseagreen lightskyblue lightslateblue lightslategray lightslategrey lightsteelblue lightyellow limegreen linen magenta maroon mediumaquamarine mediumblue mediumorchid mediumpurple mediumseagreen mediumslateblue mediumspringgreen mediumturquoise mediumvioletred midnightblue mintcream mistyrose moccasin navajowhite navy navyblue oldlace olivedrab orange orangered orchid palegoldenrod palegreen paleturquoise palevioletred papayawhip peachpuff peru pink plum powderblue purple red rosybrown royalblue saddlebrown salmon sandybrown seagreen seashell sienna skyblue slateblue slategray slategrey snow springgreen steelblue tan thistle tomato transparent turquoise violet violetred wheat white whitesmoke yellow yellowgreen "
 
-#if NUMKEYWORD == 16
 , "", "", "", "", "", "", ""
-#endif
 }};
 
 EDITLEXER lexDOT = { SCLEX_GRAPHVIZ, NP2LEX_DOT, L"GraphViz Dot", L"dot; gv", L"", &Keywords_DOT,

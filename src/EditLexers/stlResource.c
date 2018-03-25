@@ -5,38 +5,40 @@
 
 static KEYWORDLIST Keywords_RC = {{
 "defined __has_include "
-// Resources:
+// Resource
 "ACCELERATORS BITMAP CURSOR DIALOG DIALOGEX FONT HTML ICON MENU MENUEX MESSAGETABLE POPUP PNG RCDATA REGISTRY RT_MANIFEST STRINGTABLE STYLE_XML TEXTINCLUDE TYPELIB VERSIONINFO "
-// Controls:
+// Control
 "AUTO3STATE AUTOCHECKBOX AUTORADIOBUTTON CHECKBOX COMBOBOX CONTROL CTEXT DEFPUSHBUTTON EDITTEXT GROUPBOX LISTBOX LTEXT PUSHBOX PUSHBUTTON RADIOBUTTON RTEXT SCROLLBAR STATE3 "
-// Statements
+// Statement
 "CAPTION CHARACTERISTICS CLASS EXSTYLE LANGUAGE MENUITEM STYLE VERSION "
 "BEGIN END BLOCK BUTTON SEPARATOR VALUE "
 "VIRTKEY ALT SHIFT NOINVERT "
 "PRELOAD LOADONCALL FIXED DISCARDABLE PURE IMPURE SHARED NONSHARED "
-, // type keyword
+
+, // 1 Type keyword
 ""
-, // preprocessor
+, // 2 Preprocessor
 "define undef ifdef ifndef if elif else endif include pragma error code_page "
 "warning "
-, // directive
+
+, // 3 Directive
 ""
-, // attribute
+, // 4 Attribute
 ""
-, // class
+, // 5 Class
 ""
-, // interface
+, // 6 Interface
 ""
-, // enumeration
+, // 7 Enumeration
 ""
-, // constant
+
+, // 8 Constant
 "RC_INVOKED __DATE__ __FILE__ __LINE__ __STDC__ __TIME__ __TIMESTAMP__ "
 
-#if NUMKEYWORD == 16
 , "", "", "", "", "", ""
-,
+
+, // 15 Code Snippet
 "defined() code_page() __has_include() "
-#endif
 }};
 
 EDITLEXER lexRC = { SCLEX_CPP, NP2LEX_RC, L"Resource Script", L"rc; rc2; rct; rh; dlg", L"", &Keywords_RC,

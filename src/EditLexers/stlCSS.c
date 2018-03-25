@@ -50,16 +50,17 @@ static KEYWORDLIST Keywords_CSS = {{
 "transition-timing-function unicode-bidi unicode-range units-per-em vertical-align visibility "
 "voice-balance voice-duration voice-family voice-pitch voice-pitch-range voice-rate voice-stress "
 "voice-volume volume white-space white-space-collapse widows width widths word-break word-spacing "
-"word-wrap x-height z-index",
+"word-wrap x-height z-index"
+
+, // 1 Pseudo-Class
 "active after before checked default disabled empty enabled first first-child first-letter "
 "first-line first-of-type focus hover indeterminate invalid lang last-child last-of-type left "
 "link not nth-child nth-last-child nth-last-of-type nth-of-type only-child only-of-type optional "
-"required right root target valid visited",
-"", "", "", "", "", "", ""
+"required right root target valid visited"
 
-#if NUMKEYWORD == 16
+,"", "", "", "", "", "", ""
+
 , "", "", "", "", "", "", ""
-#endif
 }};
 
 EDITLEXER lexCSS = { SCLEX_CSS, NP2LEX_CSS, L"CSS Style Sheet", L"css", L"", &Keywords_CSS,

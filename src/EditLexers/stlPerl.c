@@ -24,13 +24,13 @@ static KEYWORDLIST Keywords_Perl = {{
 "system syswrite tell telldir tie tied time times truncate uc ucfirst umask undef UNITCHECK "
 "unless unlink unpack unshift untie until use utime values vec wait waitpid wantarray warn "
 "when while write xor"
-,
+
+, // 1
 "elsif if split while"
+
 , "", "", "", "", "", "", ""
 
-#if NUMKEYWORD == 16
 , "", "", "", "", "", "", ""
-#endif
 }};
 
 EDITLEXER lexPerl = { SCLEX_PERL, NP2LEX_PERL, L"Perl Script", L"pl; pm; cgi; pod; plx; stp", L"", &Keywords_Perl,

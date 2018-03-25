@@ -7,28 +7,30 @@
 static KEYWORDLIST Keywords_Awk = {{
 "break case continue do else exit function for if in next return switch while "
 "@include delete nextfile BEGIN END"
-, // type keyword
+
+, // 1 Type Keyword
 "ARGC ARGIND ARGV FILENAME FNR FS NF NR OFMT OFS ORS RLENGTH RS RSTART SUBSEP "
 "BINMODE CONVFMT FIELDWIDTHS FPAT IGNORECASE LINT TEXTDOMAiN ENVIRON ERRNO PROCINFO RT"
-, // preprocessor
+
+, // 2 Preprocessor
 ""
-, // directive
+, // 3 Directive
 ""
-, // attribute
+, // 4 Attribute
 ""
-, // class
+, // 5 Class
 ""
-, // interface
+, // 6 Interface
 ""
-, // enumeration
+, // 7 Enumeration
 ""
-, // constant
+, // 8 Constant
 ""
 
-#if NUMKEYWORD == 16
-, "", "", "", "", "", "",
+, "", "", "", "", "", ""
+
+, // 15 Code Snippet
 "for^() if^() switch^() while^() else^if^() "
-#endif
 }};
 
 EDITLEXER lexAwk = { SCLEX_CPP, NP2LEX_AWK, L"Awk Script", L"awk", L"", &Keywords_Awk,

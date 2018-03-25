@@ -7,32 +7,33 @@ static KEYWORDLIST Keywords_ASY = {{
 "private public import include from access as if else false true default restricted struct "
 "return for new explicit do while break operator this static typedef var continue unravel "
 "controls and cycle tension void null object"
-, // type keyword
+
+, // 1 Type Keyword
 "bool int real string "
 "pair triple pen path frame guide transform file "
 
 "bool3 picture projection surface path3 guide3 transform3 "
 "revolution animation "
 
-, // preprocessor
+, // 2 Preprocessor
 ""
-, // directive
+, // 3 Directive
 ""
-, // attribute
+, // 4 Attribute
 ""
-, // class
+, // 5 Class
 ""
-, // interface
+, // 6 Interface
 ""
-, // enumeration
+, // 7 Enumeration
 ""
-, // constant
+, // 8 Constant
 ""
 
-#if NUMKEYWORD == 1
-, "", "", "", "", "", "",
+, "", "", "", "", "", ""
+
+, // 15 Code Snippet
 "for^() if^() while^() else^if^() "
-#endif
 }};
 
 EDITLEXER lexASY = { SCLEX_CPP, NP2LEX_ASY, L"Asymptote Code", L"asy", L"", &Keywords_ASY,

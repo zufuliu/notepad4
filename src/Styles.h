@@ -34,20 +34,7 @@
 
 extern PEDITLEXER pLexCurrent;
 extern int np2LexLangIndex;
-
-static inline BOOL IsDocLowerKeywords(PEDITLEXER pLex) {
-	switch (pLex->rid) {
-	case NP2LEX_HTML:		// HTML
-	case NP2LEX_PHP:		// PHP
-	case NP2LEX_VB:			// VB
-	case NP2LEX_VBS:		// VBS
-	case NP2LEX_CONF:		// Apache Config
-	case NP2LEX_NSIS:
-		return TRUE;
-	default:
-		return FALSE;
-	}
-}
+extern UINT currentLexKeywordAttr[NUMKEYWORD];
 
 BOOL IsDocWordChar(int ch);
 
@@ -64,7 +51,8 @@ void	Style_SetLexerFromID(HWND hwnd, int id);
 int		Style_GetEditLexerId(int lexer);
 
 int		Style_GetDocTypeLanguage();
-void	Style_UpdateLexKeywords(PEDITLEXER pLexNew);
+void	Style_UpdateLexerKeywords(PEDITLEXER pLexNew);
+void	Style_UpdateLexerKeywordAttr(PEDITLEXER pLexNew);
 void	Style_GetCurrentLexerName(LPWSTR lpszName, int cchName);
 void	Style_SetDefaultLexer(HWND hwnd);
 void	Style_SetConfLexer(HWND hwnd);

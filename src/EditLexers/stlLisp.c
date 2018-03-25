@@ -10,9 +10,7 @@ static KEYWORDLIST Keywords_LISP = {{
 ,
 "", "", "", "", "", "", "",
 
-#if NUMKEYWORD == 16
 "", "", "", "", "", "", "", ""
-#endif
 }};
 
 EDITLEXER lexLisp = { SCLEX_LISP, NP2LEX_LISP, L"Lisp Script", L"lisp; el; lsp", L"", &Keywords_LISP,

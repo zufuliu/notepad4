@@ -8,28 +8,29 @@ static KEYWORDLIST Keywords_Go = {{
 "break case chan const continue default defer else fallthrough for func go goto "
 "if import interface map package range return select struct switch type var "
 "false iota nil true "
-, // type keyword
+
+, // 1 Type Keyword
 "bool byte complex64 complex128 error float32 float64 int int8 int16 int32 int64 "
 "rune string uint uintptr uint8 uint16 uint32 uint64 "
-, // preprocessor
+
+, // 2 Preprocessor
 ""
-, // directive
-""
-, // attribute
-"append cap close complex copy imag len make new panic print println real recover "
-, // class
-""
-, // interface
-""
-, // enumeration
-""
-, // constant
+, // 3 Directive
 ""
 
-#if NUMKEYWORD == 16
-, "", "", "", "", "", "",
+, // 4 Attribute
+"append cap close complex copy imag len make new panic print println real recover "
+
+, // 5 Class
 ""
-#endif
+, // 6 Interface
+""
+, // 7 Enumeration
+""
+, // 8 Constant
+""
+
+, "", "", "", "", "", "", ""
 }};
 
 EDITLEXER lexGo = { SCLEX_CPP, NP2LEX_GO, L"Go Source", L"go", L"", &Keywords_Go,

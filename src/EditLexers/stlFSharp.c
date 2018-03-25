@@ -7,27 +7,26 @@
 static KEYWORDLIST Keywords_FSharp = {{
 "abstract and as assert async base begin class default delegate do done downcast downto elif else end exception extern false finally for fun function global if in inherit inline interface internal lazy let match member module mutable namespace new not null of open or override private public rec return static struct then to true try type upcast use val void when while with yield "
 
-/* OCaml */
+// OCaml
 "constraint external functor include initializer method object sig virtual parser "
 "asr land lor lxor lsl lsr mod " " lnot div "
-
 "atomic break ckecked component const constructor continue eager event fixed mixin parallel process protected pure sealed tailcall trait volatile "
-
 "byref enum ref " "assembly field property param"
-, // type keyword
 
+, // 1 Type Keyword
 "bool byte sbyte int8 uint8 int16 uint16 int uint int32 uint32 int64 uint64 nativeint unativeint char string decimal uint void float32 single float double "
 "bigint unit "
 "array list big_int "
-, // preprocessor
+
+, // 2 Preprocessor
 "if else endif line light nowarn indent load r I"
-, // attribute
+
+, // 3 Attribute
 "DllImport Interface Sealed "
+
 , "", "", "", "", ""
 
-#if NUMKEYWORD == 16
 , "", "", "", "", "", "", ""
-#endif
 }};
 
 EDITLEXER lexFSharp = { SCLEX_FSHARP, NP2LEX_FSHARP, L"F# Source", L"fs; fsi; fsx; fsscript; fsl; fsy", L"", &Keywords_FSharp,

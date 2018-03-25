@@ -21,14 +21,14 @@ static KEYWORDLIST Keywords_Bash = {{
 "unset until uudecode uuencode vi vim vpax wait wc whence which while who wpaste wstart xargs "
 "zcat chgrp chown chroot dir dircolors factor groups hostid install link md5sum mkfifo mknod "
 "nice pinky printenv ptx readlink seq sha1sum shred stat su tac unlink users vdir whoami yes dnl"
-, //
+
+, // 1
 "$PATH $MANPATH $INFOPATH $USER $TMP $TEMP $PRINTER $HOSTNAME $PS1 $SHELL "
 "$JAVA_HOME $JAVA_OPTS $CATALINA_HOME $CATALINA_BASE $CATALINA_OPTS "
+
 , "", "", "", "", "", "", ""
 
-#if NUMKEYWORD == 16
 , "", "", "", "", "", "", ""
-#endif
 }};
 
 EDITLEXER lexBash = { SCLEX_BASH, NP2LEX_BASH, L"Shell Script", L"sh; m4; in; po", L"", &Keywords_Bash,

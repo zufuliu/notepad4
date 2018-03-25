@@ -6,13 +6,14 @@
 static KEYWORDLIST Keywords_Fortran = {{
 "access action advance allocatable allocate apostrophe assign assignment associate asynchronous backspace bind blank blockdata call case character class common complex contains continue cycle data deallocate decimal delim default dimension direct do dowhile double doubleprecision else elseif elsewhere encoding end endassociate endblockdata enddo endfile endforall endfunction endif endinterface endmodule endprogram endselect endsubroutine endtype endwhere entry eor equivalence err errmsg exist exit external file flush fmt forall form formatted function go goto id if implicit in include inout integer inquire intent interface intrinsic iomsg iolength iostat kind len logical module name named namelist nextrec nml none nullify number only opened operator optional out pad parameter pass pause pending pointer pos position precision private program protected public quote readwrite real rec recl recursive result return rewind save select selectcase selecttype sequential sign size stat status stop stream subroutine target then to type unformatted unit use value volatile wait where while "
 
-"mwpointer mwsize ",
-"close format open print read write",
-"", "", "", "", "", "", ""
+"mwpointer mwsize "
 
-#if NUMKEYWORD == 16
+, // 1 Basic Function
+"close format open print read write"
+
 , "", "", "", "", "", "", ""
-#endif
+
+, "", "", "", "", "", "", ""
 }};
 
 EDITLEXER lexFortran = { SCLEX_FORTRAN, NP2LEX_FORTRAN, L"Fortran Source", L"f; for; f90; f95; f03; f08; hf", L"", &Keywords_Fortran,

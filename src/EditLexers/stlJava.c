@@ -9,11 +9,14 @@ static KEYWORDLIST Keywords_Java = {{
 "native new package private protected public return static strictfp super switch "
 "synchronized this throw throws transient try var volatile while "
 "false true null parcelable "
-, // type keyword
+
+, // 1 Type Keyword
 "boolean byte char double float int long short void "
-, // preprocessor
+
+, // 2 Preprocessor
 ""
-, // annotation
+
+, // 3 Annotation
 "interface Deprecated Override SuppressWarnings Documented Retention Target Inherited SafeVarargs "
 "Native Repeatable FunctionalInterface "
 // javax.annotation.*
@@ -22,10 +25,12 @@ static KEYWORDLIST Keywords_Java = {{
 "Nonnull "
 // Java Persistence javax.persistence.*
 "Entity Table Id Column Basic OrderBy Version Transient "
-, // attribute
+
+, // 4 Attribute
 // module directive
 "exports module open opens provides requires to transitive uses with "
-, // class
+
+, // 5 Class
 "Void Class Enum Package Object Boolean Number Byte Short Integer Long Float Double Character String "
 "BigDecimal BigInteger "
 // java.lang
@@ -67,7 +72,7 @@ static KEYWORDLIST Keywords_Java = {{
 // android.media
 "AudioFormat AudioManager AudioRecord AudioTrack "
 
-, // interface
+, // 6 Interface
 // java.lang
 "Annotation Appendable CharSequence Cloneable Comparable Iterable Readable Runnable "
 // java.util
@@ -85,24 +90,27 @@ static KEYWORDLIST Keywords_Java = {{
 "Adapter "
 // android.graphics
 " "
-, // enumeration
+
+, // 7 Enumeration
 ""
 /*
 "ElementType RetentionPolicy "
 */
-, // constant
+
+, // 8 Constant
 ""
 /*
 "TRUE FALSE MIN_VALUE MAX_VALUE MIN_RADIX MAX_RADIX POSITIVE_INFINITY NEGATIVE_INFINITY NaN MIN_NORMAL MAX_EXPONENT MIN_EXPONENT MAXIMUM_CAPACITY"
 */
 
-#if NUMKEYWORD == 16
-,
+, // 9 Package
 "java.util "
 "android.widget "
-, "", "", "", "", "",
+
+, "", "", "", "", ""
+
+, // 15 Code Snippet
 "for^() if^() switch^() while^() catch^() else^if^() synchronized^() try^() "
-#endif
 }};
 
 EDITLEXER lexJava = { SCLEX_CPP, NP2LEX_JAVA, L"Java Source", L"java", L"", &Keywords_Java,

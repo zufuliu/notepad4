@@ -15,23 +15,28 @@ static KEYWORDLIST Keywords_VB = {{
 "Property Protected Public RaiseEvent Readonly ReDim Rem RemoveHandler Resume Return Select Set "
 "Shadows Shared Static Step Stop Structure Sub SyncLock Then Throw To True Try TryCast TypeOf Using "
 "When While Widening With WithEvents WriteOnly Xor "
-//Unreserved Keywords
+// Unreserved Keyword
 "Aggregate Ansi Assembly Async Attribute Auto Await Binary By Compare Custom Distinct Equals Explicit "
 "From Group Into IsFalse IsTrue Join Key Mid Off Order Preserve Skip Strict Take Text Unicode Until Where Yield "
 
 "Array Any Count GroupBy OrderBy "
 // VB6
 "Begin BeginProperty EndProperty Type"
-, // type keyword
+
+, // 1 Type Keyword
 "Boolean Byte CBool CByte CChar CDate CDbl CDec Char CInt CLng CObj CSByte CShort CSng CStr CType CUInt "
 "CULng CUShort Date Decimal Double Integer Long Object SByte Short Single String UInteger ULong UShort"
-,// not used keyword, used in VBScript
+
+, // 2 not used keyword, used in VBScript
 "EndIf GoSub Variant Wend "
-, // preprocessor
+
+, // 3 Preprocessor
 "If Else ElseIf End Const Region ExternalChecksum ExternalSource "
-, // attribute
+
+, // 4 Attribute
 "ComClass HideModuleName WebMethod Serializable MarshalAs AttributeUsage DllImport StructLayout VBFixedString VBFixedArray"
-, // VB Const
+
+, // 5 VB Const
 // String
 "vbCr VbCrLf vbFormFeed vbLf vbNewLine vbNullChar vbNullString vbTab vbVerticalTab "
 // MsgBox
@@ -61,9 +66,7 @@ static KEYWORDLIST Keywords_VB = {{
 
 , "", "", ""
 
-#if NUMKEYWORD == 16
 , "", "", "", "", "", "", ""
-#endif
 }};
 
 EDITLEXER lexVB = { SCLEX_VB, NP2LEX_VB, L"Visual Basic", L"vb; bas; frm; cls; ctl; pag; dsr; dob", L"", &Keywords_VB,

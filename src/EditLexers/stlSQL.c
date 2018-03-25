@@ -28,12 +28,13 @@ static KEYWORDLIST Keywords_SQL = {{
 "x509 xa xid xml xor "
 "year_month "
 "zerofill "
-, // type
+
+, // 1 Type
 "bigint binary bit blob bool boolean byte char character clob date datetime day dec decimal double enum fixed float float4 float8 hour int int1 int2 int3 int4 int8 integer long mediumint minute month nchar native nvarchar numeric real second serial signed smallint text time timestamp tinyint unsigned varbinary varchar varcharacter varying year "
 // MySQL
 "tinyblob mediumblob longblob tinytext mediumtext longtext "
 
-, // function
+, // 2 Function
 "abs() acos() adddate() addtime() aes_decrypt() aes_encrypt() any_value() ascii() asin() asymmetric_decrypt() asymmetric_derive() asymmetric_encrypt() asymmetric_sign() asymmetric_verify() atan() atan2() avg() "
 "bin() bit_and() bit_count() bit_length() bit_or() bit_xor() "
 "char_length() character_length() charset() ceil() ceiling() coercibility() compress() concat() concat_ws() connection_id() count() conv() convert_tz() cos() cot() crc32() create_asymmetric_priv_key() create_asymmetric_pub_key() create_dh_parameters() create_digest() curdate() curtime() "
@@ -61,8 +62,10 @@ static KEYWORDLIST Keywords_SQL = {{
 "zeroblob() "
 // SQLite
 "changes() fts3() fts4() instr() json_array_length() json_patch() json_group_array() json_group_object() json_each() json_tree() julianday() last_insert_rowid() likelihood() likely() load_extension() printf() quote() rtree() soundex() sqlite_compileoption_get() sqlite_compileoption_used() sqlite_source_id() sqlite_version() total_changes() unicode() unlikely() "
-, "", "", "",
-// upper case
+
+, "", "", ""
+
+, // 6 Upper Case Keyword
 "ABORT ACCESSIBLE ACCOUNT ACTION ADD AFTER AGAINST AGGREGATE ALGORITHM ALL ALLOCATE ALTER ALWAYS ANALYSE ANALYZE AND ANY AS ASC ASCII ASENSITIVE AT ATTACH AUDIT AUTHORIZATION AUTO_INCREMENT AUTOEXTEND_SIZE AUTOINCREMENT AVG AVG_ROW_LENGTH "
 "BACKUP BEFORE BEGIN BETWEEN BINLOG BLOCK BOTH BREAK BTREE BY "
 "CACHE CALL CASCADE CASCADED CASE CAST CATALOG_NAME CHAIN CHANGE CHANGED CHANNEL CHARSET CHECK CHECKSUM CIPHER CLASS_ORIGIN CLIENT CLOSE CLUSTER COALESCE CODE COLLATE COLLATION COLUMN COLUMNS COLUMN_FORMAT COLUMN_NAME COMMENT COMMIT COMMITTED COMPACT COMPLETION COMPRESSED COMPRESSION CONCURRENT CONDITION CONFLICT CONNECT CONNECTION CONSISTENT CONSTRAINT CONSTRAINT_CATALOG CONSTRAINT_NAME CONSTRAINT_SCHEMA CONTAINS CONTEXT CONTINUE CONVERT CPU CREATE CROSS CUBE CURRENT CURRENT_DATE CURRENT_PATH CURRENT_TIME CURRENT_TIMESTAMP CURRENT_USER CURSOR CURSOR_NAME "
@@ -89,11 +92,13 @@ static KEYWORDLIST Keywords_SQL = {{
 "X509 XA XID XML XOR "
 "YEAR_MONTH "
 "ZEROFILL "
-,
+
+, // 7 Upper Case Type
 "BIGINT BINARY BIT BLOB BOOL BOOLEAN BYTE CHAR CHARACTER CLOB DATE DATETIME DAY DEC DECIMAL DOUBLE ENUM FIXED FLOAT FLOAT4 FLOAT8 HOUR INT INT1 INT2 INT3 INT4 INT8 INTEGER LONG MEDIUMINT MINUTE MONTH NCHAR NATIVE NVARCHAR NUMERIC REAL SECOND SERIAL SIGNED SMALLINT TEXT TIME TIMESTAMP TINYINT UNSIGNED VARBINARY VARCHAR VARCHARACTER VARYING YEAR "
 // MySQL
 "TINYBLOB MEDIUMBLOB LONGBLOB TINYTEXT MEDIUMTEXT LONGTEXT "
-,
+
+, // 8 Upper Case Keyword
 "ABS() ACOS() ADDDATE() ADDTIME() AES_DECRYPT() AES_ENCRYPT() ANY_VALUE() ASCII() ASIN() ASYMMETRIC_DECRYPT() ASYMMETRIC_DERIVE() ASYMMETRIC_ENCRYPT() ASYMMETRIC_SIGN() ASYMMETRIC_VERIFY() ATAN() ATAN2() AVG() "
 "BIN() BIT_AND() BIT_COUNT() BIT_LENGTH() BIT_OR() BIT_XOR() "
 "CHAR_LENGTH() CHARACTER_LENGTH() CHARSET() CEIL() CEILING() COERCIBILITY() COMPRESS() CONCAT() CONCAT_WS() CONNECTION_ID() COUNT() CONV() CONVERT_TZ() COS() COT() CRC32() CREATE_ASYMMETRIC_PRIV_KEY() CREATE_ASYMMETRIC_PUB_KEY() CREATE_DH_PARAMETERS() CREATE_DIGEST() CURDATE() CURTIME() "
@@ -122,9 +127,7 @@ static KEYWORDLIST Keywords_SQL = {{
 // SQLite
 "CHANGES() FTS3() FTS4() INSTR() JSON_ARRAY_LENGTH() JSON_PATCH() JSON_GROUP_ARRAY() JSON_GROUP_OBJECT() JSON_EACH() JSON_TREE() JULIANDAY() LAST_INSERT_ROWID() LIKELIHOOD() LIKELY() LOAD_EXTENSION() PRINTF() QUOTE() RTREE() SOUNDEX() SQLITE_COMPILEOPTION_GET() SQLITE_COMPILEOPTION_USED() SQLITE_SOURCE_ID() SQLITE_VERSION() TOTAL_CHANGES() UNICODE() UNLIKELY() "
 
-#if NUMKEYWORD == 16
 , "", "", "", "", "", "", ""
-#endif
 }};
 
 EDITLEXER lexSQL = { SCLEX_SQL, NP2LEX_SQL, L"SQL Query", L"sql; mysql", L"", &Keywords_SQL,

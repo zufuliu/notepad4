@@ -8,36 +8,41 @@
 static KEYWORDLIST Keywords_MAK = {{
 // gmake
 "define endef undefine ifdef ifndef ifeq ifneq else endif include -include sinclude override export unexport private vpath load "
-, // nmake preprocessor
+
+, // 1 nmake Preprocessor
 "!CMDSWITCHES !ERROR !MESSAGE !INCLUDE !IF !ELSE !ELSEIF !IFDEF !IFNDEF !ELSEIFDEF !ELSEIFNDEF !ENDIF !UNDEF "
 "!cmdswitches !error !message !include !if !else !elseif !ifdef !ifndef !elseifdef !elseifndef !endif !undef "
 // Borland
 "!LOADDLL !WARNING "
 "!loaddll warning "
-, // gmake Function
+
+, // 2 gmake Function
 "subst patsubst strip findstring filter filter-out sort word wordlist words firstword lastword "
 "dir notdir suffix basename addsuffix addprefix join wildcard realpath abspath "
 "errno warning info shell origin flavor "
 "foreach if or and "
 "call eval file value "
 "guile "
-, // Special Built-in Target
+
+, // 3 Special Built-in Target
 "all clean "
 ".IGNORE .PHONY .SUFFIXES .PRECIOUS .SILENT "
 ".DEFAULT .INTERMEDIATE .SECONDARY .SECONDEXPANSION .DELETE_ON_ERROR .LOW_RESOLUTION_TIME .EXPORT_ALL_VARIABLES .NOTPARALLEL .ONESHELL .POSIX "
-,
+
+, // 4
 "VPATH SHELL "
 "CC CXX "
 "CFLAGS CXXFLAGS LDFLAGS LDLIBS "
-, // bmake
+
+, // 5 bmake
 "include if endif error for endfor else "
-, // bmake
+
+, // 6 bmake
 "in defined empty exists "
+
 , "", ""
 
-#if NUMKEYWORD == 16
 , "", "", "", "", "", "", ""
-#endif
 }};
 
 

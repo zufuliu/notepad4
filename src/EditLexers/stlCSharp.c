@@ -12,18 +12,23 @@ static KEYWORDLIST Keywords_CSharp = {{
 "struct switch this throw true try typeof unchecked unsafe using virtual void volatile while "
 // contextual keywords
 "add alias async await get global nameof partial remove set value when where yield "
-, // type keyword
+
+, // 1 Type Keyword
 "dynamic var bool byte char decimal double float int long object sbyte short string uint ulong ushort"
-, // preprocessor
+
+, // 2 Preprocessor
 "if else elif endif define undef warning error line region endregion pragma "
-, // directive
+
+, // 3 Directive
 // LINQ
 "from where select group into orderby join let in on equals by ascending descending "
-, // attribute
+
+, // 4 Attribute
 // attribute target
 "assembly module field event method param property return type "
 "AttributeUsage Flags Serializable STAThread MTAThread ThreadStatic CLSCompliant ComVisible DllImport Guid MarshalAs StructLayout ComImport DefaultCharSet NonSerialized Obsolete ParamArray "
-, // class
+
+, // 5 Class
 "Delegate Enum Void Assembly Guid Clsid Type ValueType Array Marshal "
 "Object String Boolean Byte SByte Char Decimal Double Single Int16 UInt16 Int32 UInt32 Int64 UInt64 Complex BigInteger "
 "IntPtr UIntPtr HandleRef GCHandle "
@@ -42,23 +47,25 @@ static KEYWORDLIST Keywords_CSharp = {{
 "Button CheckBox CheckedListBox ComboBox ContextMenu ContextMenuStrip DataGridView DataGridViewCell DataGridViewColumn DataGridViewRow GroupBox HtmlDocument HtmlWindow ImageList Label LinkLabel ListBox ListControl ListView ListViewGroup ListViewItem MainMenu MaskedTextBox Menu MenuItem MenuStrip NotifyIcon NumericUpDown Panel PictureBox ProgressBar RadioButton RichTextBox ScrollBar SplitContainer Splitter StatusBar StatusBarPanel StatusStrip TabControl TableLayoutPanel TabPage TextBox ToolBar ToolStrip ToolStripItem ToolTip TrackBar TreeNode TreeView VScrollBar WebBrowser "
 "MessageBox CommonDialog FileDialog ColorDialog FolderBrowserDialog FontDialog OpenFileDialog PageSetupDialog PrintDialog PrintPreviewDialog SaveFileDialog "
 "ResourceManager ResourceReader ResourceSet ResourceWriter ResXDataNode ResXFileRef ResXResourceReader ResXResourceSet ResXResourceWriter "
-, // interface
+
+, // 6 Interface
 "IAsyncResult ICloneable IComparable IConvertible IDisposable IEquatable IFormattable IComparer IEnumerable IEnumerator ISerializable ICollection IDictionary IList ISet IFormatProvider IObservable IObserver IServiceProvider IFormatter IFormatterConverter "
 "IResourceReader IResourceWriter "
-, // enumeration
+
+, // 7 Enumeration
 "ConsoleColor ConsoleKey StringComparison StringSplitOptions TypeCode LayoutKind AttributeTargets DialogResult Keys CharSet "
 "DriveType FileAccess FileAttributes FileMode FileOptions FileShare SearchOption SeekOrigin "
 "SocketError SocketFlags SocketType FtpStatusCode HttpRequestHeader HttpResponseHeader HttpStatusCode Parity "
 "FontStyle GraphicsUnit KnownColor "
-, // constant
+
+, // 8 Constant
 ""
 
-#if NUMKEYWORD == 16
 , "", "", "", "", "", ""
-,
+
+, // 15 Code Snippet
 "for^() if^() switch^() while^() catch^() else^if^() foreach^() sizeof() typeof() using^() fixed^() lock^() "
 "base() this() checked() default() delegate() nameof()"
-#endif
 }};
 
 EDITLEXER lexCSharp = { SCLEX_CPP, NP2LEX_CSHARP, L"C# Source", L"cs", L"", &Keywords_CSharp,

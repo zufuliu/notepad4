@@ -4,9 +4,7 @@
 static KEYWORDLIST Keywords_NULL = {{
 "", "", "", "", "", "", "", "", ""
 
-#if NUMKEYWORD == 16
 , "", "", "", "", "", "", ""
-#endif
 }};
 
 EDITLEXER lexDefault = { SCLEX_NULL, NP2LEX_DEFAULT, L"Default Text", L"txt; text; wtx; log; asc; doc", L"", &Keywords_NULL,

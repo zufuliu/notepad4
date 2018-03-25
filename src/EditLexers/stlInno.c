@@ -5,7 +5,9 @@
 
 static KEYWORDLIST Keywords_INNO = {{
 "code components custommessages dirs files icons ini installdelete langoptions languages messages "
-"registry run setup types tasks uninstalldelete uninstallrun _istool",
+"registry run setup types tasks uninstalldelete uninstallrun _istool"
+
+, // 1
 "allowcancelduringinstall allownetworkdrive allownoicons allowrootdirectory allowuncpath alwaysrestart alwaysshowcomponentslist "
 "alwaysshowdironreadypage alwaysshowgrouponreadypage alwaysusepersonalgroup appcomments appcontact appcopyright "
 "appenddefaultdirname appenddefaultgroupname appid appmodifypath appmutex appname apppublisher apppublisherurl "
@@ -27,20 +29,25 @@ static KEYWORDLIST Keywords_INNO = {{
 "verb versioninfoproductname useprevioususerinfo userinfopage usesetupldr versioninfocompany versioninfocopyright "
 "versioninfodescription versioninfoproductversion versioninfotextversion versioninfoversion versioninfoproducttextversion "
 "welcomefontname welcomefontsize windowshowcaption windowstartmaximized windowresizable windowvisible wizardimagebackcolor "
-"wizardimagefile wizardimagestretch wizardsmallimagefile",
+"wizardimagefile wizardimagestretch wizardsmallimagefile"
+
+, // 2
 "appusermodelid afterinstall attribs beforeinstall check comment components copymode description destdir destname excludes "
 "extradiskspacerequired filename flags fontinstall groupdescription hotkey infoafterfile infobeforefile iconfilename "
 "iconindex key languages licensefile messagesfile minversion name onlybelowversion parameters permissions root runonceid "
-"section source statusmsg string subkey tasks terminalservicesaware type types valuedata valuename valuetype workingdir",
-"append define dim else emit elif endif endsub error expr file for if "
-"ifdef ifexist ifndef ifnexist include insert pragma sub undef",
-"and begin break case const continue do downto else end except finally for function "
-"if not of or procedure repeat then to try type until uses var while with interface record",
-"", "", "", ""
+"section source statusmsg string subkey tasks terminalservicesaware type types valuedata valuename valuetype workingdir"
 
-#if NUMKEYWORD == 16
+, // 3 Preprocessor
+"append define dim else emit elif endif endsub error expr file for if "
+"ifdef ifexist ifndef ifnexist include insert pragma sub undef"
+
+, // 4 Pascal Keyword
+"and begin break case const continue do downto else end except finally for function "
+"if not of or procedure repeat then to try type until uses var while with interface record"
+
+, "", "", "", ""
+
 , "", "", "", "", "", "", ""
-#endif
 }};
 
 EDITLEXER lexINNO = { SCLEX_INNOSETUP, NP2LEX_INNO, L"Inno Setup Script", L"iss; isl; islu", L"", &Keywords_INNO,

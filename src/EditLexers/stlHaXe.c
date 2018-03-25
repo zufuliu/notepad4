@@ -8,28 +8,31 @@ static KEYWORDLIST Keywords_HaXe = {{
 "extends extern false for function here if implements import in inline interface "
 "never new null override package private public return static super switch this "
 "throw trace true try typedef untyped using var while"
-, // type keyword
+
+, // 1 Type Keyword
 "Class Enum Void Float Int UInt Null Bool Dynamic Iterator Iterable "
 "Array Date Hash EReg IntHash IntIter List String StringBuf Xml "
-, // preprocessor
+
+, // 2 Preprocessor
 "if elseif else end error"
-, // directive
+
+, // 3 Directive
 ""
-, // attribute
+, // 4 Attribute
 ""
-, // class
+, // 5 Class
 ""
-, // interface
+, // 6 Interface
 ""
-, // enumeration
+, // 7 Enumeration
 ""
-, // constant
+, // 8 Constant
 ""
 
-#if NUMKEYWORD == 16
-, "", "", "", "", "", "",
+, "", "", "", "", "", ""
+
+, // 15 Code Snippet
 "for^() if^() switch^() while^() else^if^() "
-#endif
 }};
 
 EDITLEXER lexHaXe = { SCLEX_CPP, NP2LEX_HAXE, L"HaXe Script", L"hx", L"", &Keywords_HaXe,

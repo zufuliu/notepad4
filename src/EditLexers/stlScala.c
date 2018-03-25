@@ -7,32 +7,35 @@ static KEYWORDLIST Keywords_Scala = {{
 "abstract case catch class def do else extends false final finally for forSome if "
 "implicit import lazy match new null object override package private protected "
 "return sealed super this throw trait try true type val var while with yield Nil None"
-, // type keyword
+
+, // 1 Type Keyword
 "Any AnyVal AnyRef ScalaObject Null Nothing Unit Boolean Char Byte Double Float Long Int Short "
 "String Object Class Integer Character Void List"
-, // preprocessor
+
+, // 2 Preprocessor
 ""
-, // annotation
-""
+, // 3 Annotation
 "beanGetter beanSetter field getter param setter "
 "bridge elidable implicitNotFound migration serializable strictfp switch tailrec varargs "
 "cloneable deprecated deprecatedName inline native noinline remote "
 "SerialVersionUID specialized throws transient unchecked volatile "
-, // attribute
+
+, // 4 Attribute
 ""
-, // class
+, // 5 Class
 "Annotation Array Error Exception CharSequence Iterator Option Symbol"
-, // interface
+
+, // 6 Interface
 ""
-, // enumeration
+, // 7 Enumeration
 ""
-, // constant
+, // 8 Constant
 ""
 
-#if NUMKEYWORD == 16
-, "", "", "", "", "", "",
+, "", "", "", "", "", ""
+
+, // 15 Code Snippet
 "for^() if^() switch^() while^() catch^() else^if^() "
-#endif
 }};
 
 EDITLEXER lexScala = { SCLEX_CPP, NP2LEX_SCALA, L"Scala Script", L"scala", L"", &Keywords_Scala,

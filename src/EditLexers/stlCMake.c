@@ -6,7 +6,7 @@
 static KEYWORDLIST Keywords_CMake = {{
 "break() else() elseif() return() continue() "
 "foreach() function() if() macro() while() endforeach() endfunction() endif() endmacro() endwhile() "
-, // command
+, // 1 Command
 "add_compile_options() "
 "add_custom_command() add_custom_target() add_definitions() add_dependencies() add_executable() "
 "add_library() add_subdirectory() add_test() aux_source_directory() build_command() "
@@ -27,17 +27,16 @@ static KEYWORDLIST Keywords_CMake = {{
 "ctest_build() ctest_configure() ctest_coverage() ctest_empty_binary_directory() ctest_memcheck() "
 "ctest_read_custom_files() ctest_run_script() ctest_sleep() ctest_start() ctest_submit() "
 "ctest_test() ctest_update() ctest_upload() "
-, // Variables that Provide Information
+
+, // 1 Variables that Provide Information
 ""
-, // Variables That Change Behavior
+, // 2 Variables That Change Behavior
 ""
-, // Variables That Describe the System
+, // 3 Variables That Describe the System
 ""
 , "", "", "", ""
 
-#if NUMKEYWORD == 16
 , "", "", "", "", "", "", ""
-#endif
 }};
 
 EDITLEXER lexCMake = { SCLEX_CMAKE, NP2LEX_CMAKE, L"CMake Script", L"cmake; ctest", L"", &Keywords_CMake,

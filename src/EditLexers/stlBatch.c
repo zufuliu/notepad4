@@ -10,7 +10,9 @@ static KEYWORDLIST Keywords_Batch = {{
 "and or equ neq lss leq gtr geq "
 //"change com con country ctty forfiles icacls kill loadhigh lpt msiexe robocopy sclist timeout "
 "mklink "
-, ""// system cmd
+
+, // 1 system cmd
+""
 /* // com
 "chcp diskcomp diskcopy format graftabl help loadfix mode more tree "
 */
@@ -20,22 +22,22 @@ static KEYWORDLIST Keywords_Batch = {{
 /* // unknown
 "bcdedit choice cmdkey "
 */
-,
+, // 2
 "dp0"
-, "", "", "",
-// upper case
+
+, "", "", ""
+
+, // 6 Upper Case
 "DEFINED DO NOT ELSE FOR GOTO IF IN "
 "ASSOC BREAK CALL CD CHDIR CLS COLOR COPY DATE DEL DIR ECHO ECHO. ENDLOCAL ERASE EXIST EXIT FTYPE MD MKDIR MOVE PATH PAUSE POPD PROMPT PUSHD RD REM REN RENAME RMDIR SET SETLOCAL SHIFT SORT START TIME TITLE TREE TYPE VER VERIFY VOL "
 "ERRORLEVEL NUL DISABLEEXTENSIONS ENABLEEXTENSIONS ENABLEDELAYEDEXPANSION "
 "AND OR EQU NEQ LSS LEQ GTR GEQ "
 //"CHANGE COM CON COUNTRY CTTY FORFILES ICACLS KILL LOADHIGH LPT MSIEXE ROBOCOPY SCLIST TIMEOUT "
 "MKLINK "
-, ""
-, ""
 
-#if NUMKEYWORD == 16
+, "" , ""
+
 , "", "", "", "", "", "", ""
-#endif
 }};
 
 EDITLEXER lexBatch = { SCLEX_BATCH, NP2LEX_BATCH, L"Batch File", L"bat; cmd", L"", &Keywords_Batch,

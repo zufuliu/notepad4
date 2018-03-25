@@ -8,34 +8,39 @@ static KEYWORDLIST Keywords_VHDL = {{
 "on open others out package port postponed procedure process pure range record register reject report "
 "return select severity shared signal subtype then to transport type unaffected units until use variable "
 "wait when while with"
-,//operator
+
+, // 1 Operator
 "abs and mod nand nor not or rem rol ror sla sll sra srl xnor xor"
-,//attribute
+
+, // 2 Attribute
 "active ascending base delayed driving driving_value event high image instance_name last_active last_event "
 "last_value left leftof length low path_name pred pos quiet range reverse_range right rightof simple_name "
 "stable transaction value val succ"
-,//function
+
+, // 3 Function
 "endfile falling_edge is_x now read readline resize resolved rising_edge rotate_left rotate_right "
 "shift_left shift_right std_match to_bit to_bitvector to_integer to_signed to_stdlogicvector "
 "to_stdulogic to_stdulogicvector to_UX01 to_unsigned to_x01 to_x01z to_01 writeline write "
-,//package
+
+, // 4 Package
 "ieee numeric_bit numeric_std math_complex math_real std std_logic_arith std_logic_misc "
 "std_logic_signed std_logic_textio std_logic_unsigned std_logic_1164 "
 "standard textio vital_primitives vital_timing work"
-,//type
+
+, // 5 Type
 "bit bit_vector boolean character delay_length file_open_kind file_open_status integer line natural positive "
 "real severity_level side signed std_logic std_logic_vector std_ulogic std_ulogic_vector string text time "
 "unsigned UX01 UX01Z width X01 X01Z"
-,//user
+
+, // 6 User
 ""
-,//user2
+, // 7 User2
 ""
-,// fold
+
+, // 8 Fold
 "architecture begin case component else elsif end entity generate loop package process record then procedure function when"
 
-#if NUMKEYWORD == 16
 , "", "", "", "", "", "", ""
-#endif
 }};
 
 EDITLEXER lexVHDL = { SCLEX_VHDL, NP2LEX_VHDL, L"VHDL Source", L"vhd; vhdl", L"", &Keywords_VHDL,

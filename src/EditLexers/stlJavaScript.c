@@ -8,20 +8,23 @@ static KEYWORDLIST Keywords_JS = {{
 "async await break case catch class const continue debugger default delete do else export extends finally for function if import in "
 "instanceof let new return static super switch this throw try typeof var void while with yield "
 "null true false undefined NaN Infinity "
-,// Reserved Words
+
+, // 1 Reserved Word
 // ECMA-262
 "enum implements interface package private protected public "
 // ECMAScript 1 till 3
 //"abstract boolean byte char double final float goto int long native short synchronized throws transient volatile "
 // Firefox
 "each of get set "
-, // preprocessor
+
+, // 2 Preprocessor
 ""
-, // directive
+, // 3 Directive
 ""
-, // attribute
+, // 4 Attribute
 ""
-, // class
+
+, // 5 Class
 // ECMA-262
 "Global Object Function Boolean Symbol Array String Number Date RegExp Math JSON Null Atomics "
 "Error EvalError RangeError ReferenceError SyntaxError TypeError URIError NativeError "
@@ -32,11 +35,13 @@ static KEYWORDLIST Keywords_JS = {{
 // HTML DOM
 //
 "XMLHttpRequest jQuery "
-, // interface
+
+, // 6 Interface
 ""
-, // enumeration
+, // 7 Enumeration
 ""
-, // constant
+
+, // 8 Constant
 // Math
 "E LN2 LN10 LOG2E LOG10E PI SQRT1_2 SQRT2 "
 // Number
@@ -46,8 +51,7 @@ static KEYWORDLIST Keywords_JS = {{
 // XMLHttpRequest
 "UNSENT OPENED HEADERS_RECEIVED LOADING DONE "
 
-#if NUMKEYWORD == 16
-, // Functions
+, // 9 Function
 // Global
 "decodeURI() decodeURIComponent() encodeURI() encodeURIComponent() escape() eval() GetObject() isFinite() isNaN() parseFloat() parseInt() ScriptEngine() ScriptEngineBuildVersion() ScriptEngineMajorVersion() ScriptEngineMinorVersion() nescape() "
 // Math
@@ -68,7 +72,8 @@ static KEYWORDLIST Keywords_JS = {{
 // HTML DOM
 // WindowOrWorkerGlobalScope
 "atob() btoa() clearInterval() clearTimeout() createImageBitmap() fetch() setInterval() setTimeout() "
-, // Properties
+
+, // 10 Property
 "use strict "
 // All
 "constructor prototype __proto__ "
@@ -87,7 +92,8 @@ static KEYWORDLIST Keywords_JS = {{
 "document window body "
 // XMLHttpRequest
 "onreadystatechange readyState response responseText responseType responseURL responseXML status statusText timeout upload withCredentials "
-, // Methods
+
+, // 11 Method
 // All
 "hasOwnProperty() isPrototypeOf() propertyIsEnumerable() toLocaleString() toString() valueOf() "
 "__defineGetter__() __defineSetter__() __lookupGetter__() __lookupSetter__() "
@@ -124,10 +130,11 @@ static KEYWORDLIST Keywords_JS = {{
 "getElementById() getElementsByClassName() getElementsByName() getElementsByTagName() "
 // XMLHttpRequest
 "abort() getAllResponseHeaders() getResponseHeader() open() overrideMimeType() send() setRequestHeader() "
+
 , "", "", ""
-,
+
+, // 15 Code Snippet
 "for^() if^() switch^() while^() else^if^() function() "
-#endif
 }};
 
 EDITLEXER lexJS = { SCLEX_CPP, NP2LEX_JS, L"JavaScript", L"js; jse; jsm", L"", &Keywords_JS,

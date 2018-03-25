@@ -10,25 +10,32 @@ static KEYWORDLIST Keywords_Gradle = {{
 "public static strictfp synchronized transient "
 "volatile false null super this true it"
 
-, // type keyword
+, // 1 Type Keyword
 "boolean byte char class double float int long short void "
-, // preprocessor
+
+, // 2 Preprocessor
 ""
-, // annotation
+
+, // 3 Annotation
 "Managed Model  "
-, // attribute
+
+, // 4 Attribute
 // Task types
 ""
-, // class
+
+, // 5 Class
 "String Object "
 "Project Task Gradle Settings Script SourceSet "
 "Copy "
-, // interface
+
+, // 6 Interface
 "List Map Set "
-, // Action
+
+, // 7 Action
 "apply task "
-, // Properties
-/// Project
+
+, // 8 Property
+// Project
 "allprojects ant artifacts buildDir buildFile buildscript childProjects configurations convention defaultTasks dependencies description extensions gradle group logger logging name parent path pluginManager plugins project projectDir properties repositories resources rootDir rootProject state status subprojects tasks version "
 // java
 "archivesBaseName distsDir distsDirName docsDir docsDirName libsDir libsDirName reporting sourceCompatibility sourceSets targetCompatibility testReportDir testReportDirName testResultsDir testResultsDirName "
@@ -48,12 +55,11 @@ static KEYWORDLIST Keywords_Gradle = {{
 // JavaCompile
 "classpath options "
 
-#if NUMKEYWORD == 16
-,
+, // 9
 ""
-,
+, // 10
 ""
-, // Methods
+, // 11 Method
 // Project
 "absoluteProjectPath afterEvaluate allprojects beforeEvaluate configure container copy copySpec delete evaluationDependsOn exec file fileTree files findProject getAllTasks getTasksByName hasProperty javaexec mkdir project property relativePath relativeProjectPath setProperty subprojects tarTree task uri zipTree "
 // java
@@ -69,18 +75,18 @@ static KEYWORDLIST Keywords_Gradle = {{
 // JavaCompile
 "source "
 
-,
-//
+, // 12
 ""
-,
+, // 13
 ""
-,
+, // 14
 ""
-, // auto complete
+
+, // 15 Code Snippet
 "for^() if^() switch^() while^() catch^() else^if^()  "
 "def^() "
 
-// Script blocks
+// Script block
 "allprojects^{} ant^{} artifacts^{} buildscript^{} configurations^{} dependencies^{} repositories^{} subprojects^{} "
 // java
 "reporting^{} sourceSets^{} "
@@ -91,8 +97,6 @@ static KEYWORDLIST Keywords_Gradle = {{
 
 // SourceSet
 "java&{} resources^{}"
-
-#endif
 }};
 
 EDITLEXER lexGradle = { SCLEX_CPP, NP2LEX_GRADLE, L"Gradle Build Script", L"gradle", L"", &Keywords_Gradle,

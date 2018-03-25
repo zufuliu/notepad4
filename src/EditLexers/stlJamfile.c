@@ -6,26 +6,25 @@
 static KEYWORDLIST Keywords_JAM = {{
 "class else for if import in local module return rule while "
 "switch case actions true false try catch include alias using "
-, // type keyword
+, // 1 Type Keyword
 ""
-, // preprocessor
+, // 2 Preprocessor
 ""
-, // directive
+, // 3 Directive
 ""
-, // attribute
+, // 4 Attribute
 ""
-, // class
+, // 5 Class
 ""
-, // interface
+, // 6 Interface
 ""
-, // enumeration
+, // 7 Enumeration
 ""
-, // constant
+
+, // 8 Constant
 "ECHO EXIT GLOB MATCH "
 
-#if NUMKEYWORD == 16
 , "", "", "", "", "", "", ""
-#endif
 }};
 
 EDITLEXER lexJAM = { SCLEX_CPP, NP2LEX_JAM, L"Jamfile", L"jam", L"", &Keywords_JAM,

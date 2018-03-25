@@ -25,6 +25,13 @@ typedef struct _editstyle {
 	WCHAR	szValue[128];
 } EDITSTYLE, *PEDITSTYLE;
 
+// Not used by Scintilla lexer, listed for auto completion.
+#define KeywordAttr_NoLexer		1
+// Convert to lower case before pass to Scintilla.
+#define KeywordAttr_MakeLower	2
+// Don't add to default auto completion list.
+#define KeywordAttr_NoAutoComp	4
+
 typedef struct _keywordlist {
 	char *pszKeyWords[NUMKEYWORD];
 } KEYWORDLIST, *PKEYWORDLIST;
@@ -43,7 +50,7 @@ typedef struct _editlexer {
 #pragma warning(pop) // C4200, C4201
 #endif
 
-// NP2LEX_, rid for EDITLEXERs
+// NP2LEX_, rid for EDITLEXER
 #define NP2LEX_DEFAULT	63000	// SCLEX_NULL		Default Text
 #define NP2LEX_CPP		63001	// SCLEX_CPP		C/C++
 #define NP2LEX_JAVA		63002	// SCLEX_CPP		Java

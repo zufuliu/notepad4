@@ -205,6 +205,8 @@ int	np2MonoFontIndex = NUM_MONO_FONT; // Courier New
 // Currently used lexer
 PEDITLEXER pLexCurrent = &lexDefault;
 int np2LexLangIndex = 0;
+UINT currentLexKeywordAttr[NUMKEYWORD] = {0};
+
 COLORREF	crCustom[16];
 BOOL	bUse2ndDefaultStyle;
 BOOL	fStylesModified = FALSE;
@@ -487,6 +489,92 @@ static const int iMarkerIDs[] = {
 	SC_MARKNUM_FOLDERMIDTAIL
 };
 
+void Style_UpdateLexerKeywordAttr(PEDITLEXER pLexNew) {
+	UINT *attr = currentLexKeywordAttr;
+	memset(currentLexKeywordAttr, 0, sizeof(currentLexKeywordAttr));
+
+	// Code Snippet
+	attr[NUMKEYWORD - 1] = KeywordAttr_NoLexer;
+
+	switch (pLexNew->rid) {
+	case NP2LEX_CPP:
+		attr[2] = KeywordAttr_NoAutoComp;	// Preprocessor
+		attr[3] = KeywordAttr_NoAutoComp;	// Directive
+		attr[11] = KeywordAttr_NoAutoComp;	// Assembler Intruction
+		attr[12] = KeywordAttr_NoAutoComp;	// Assembler Register
+		attr[13] = KeywordAttr_NoLexer;		// C Function
+		attr[14] = KeywordAttr_NoLexer;		// C++ Function
+		break;
+	case NP2LEX_JAVA:
+		attr[10] = KeywordAttr_NoLexer;		// Package
+		break;
+	case NP2LEX_CSHARP:
+		attr[2] = KeywordAttr_NoAutoComp;	// Preprocessor
+		break;
+	case NP2LEX_JS:
+		//attr[1] = KeywordAttr_NoAutoComp;	// Reserved Word
+		attr[9] = KeywordAttr_NoLexer;		// Function
+		attr[10] = KeywordAttr_NoLexer;		// Property
+		attr[11] = KeywordAttr_NoLexer;		// Method
+		break;
+	case NP2LEX_RC:
+		attr[2] = KeywordAttr_NoAutoComp;	// Preprocessor
+		break;
+	case NP2LEX_D:
+		attr[2] = KeywordAttr_NoAutoComp;	// Preprocessor
+		attr[11] = KeywordAttr_NoAutoComp;	// Assembler Intruction
+		attr[12] = KeywordAttr_NoAutoComp;	// Assembler Register
+		break;
+	case NP2LEX_HAXE:
+		attr[2] = KeywordAttr_NoAutoComp;	// Preprocessor
+		break;
+	case NP2LEX_VB:
+	case NP2LEX_VBS:
+		attr[0] = KeywordAttr_MakeLower;
+		attr[1] = KeywordAttr_MakeLower;
+		attr[2] = KeywordAttr_MakeLower;
+		attr[3] = KeywordAttr_MakeLower | KeywordAttr_NoAutoComp; // Preprocessor
+		attr[4] = KeywordAttr_MakeLower;
+		attr[5] = KeywordAttr_MakeLower;
+		attr[6] = KeywordAttr_MakeLower;
+		break;
+	case NP2LEX_HTML:
+		attr[2] = KeywordAttr_MakeLower;	// VBScript
+		break;
+	case NP2LEX_SQL:
+		attr[6] = KeywordAttr_NoLexer;		// Upper Case Keyword
+		attr[7] = KeywordAttr_NoLexer;		// Upper Case Type
+		attr[8] = KeywordAttr_NoLexer;		// Upper Case Function
+		break;
+	case NP2LEX_PHP:
+		attr[9] = KeywordAttr_NoLexer;		// Function
+		attr[10] = KeywordAttr_NoLexer;		// Field
+		attr[11] = KeywordAttr_NoLexer;		// Method
+		attr[12] = KeywordAttr_NoLexer;		// Tag
+		attr[13] = KeywordAttr_NoLexer;		// String Constant
+		break;
+	case NP2LEX_PYTHON:
+		attr[3] = KeywordAttr_NoAutoComp;	// Decorator
+		attr[9] = KeywordAttr_NoLexer;		// Module
+		attr[10] = KeywordAttr_NoLexer;		// Method
+		attr[11] = KeywordAttr_NoLexer;		// Constant
+		attr[12] = KeywordAttr_NoLexer;		// Attribute
+		break;
+	case NP2LEX_BATCH:
+		attr[6] = KeywordAttr_NoLexer;		// Upper Case Keyword
+		break;
+	case NP2LEX_AU3:
+		break;
+	case NP2LEX_INNO:
+		break;
+	case NP2LEX_NSIS:
+		attr[0] = KeywordAttr_MakeLower;
+		break;
+	default:
+		break;
+	}
+}
+
 //=============================================================================
 // set current lexer
 // Style_SetLexer()
@@ -527,16 +615,17 @@ void Style_SetLexer(HWND hwnd, PEDITLEXER pLexNew) {
 		break;
 	}
 
-	Style_UpdateLexKeywords(pLexNew);
-	// Add KeyWord Lists
-	if (IsDocLowerKeywords(pLexNew)) {
-		for (int i = 0; i < NUMKEYWORD; i++) {
-			const char *pKeywords = pLexNew->pKeyWords->pszKeyWords[i];
-			if (pKeywords && *pKeywords) {
+	Style_UpdateLexerKeywords(pLexNew);
+	Style_UpdateLexerKeywordAttr(pLexNew);
+	// Add keyword lists
+	for (int i = 0; i < NUMKEYWORD; i++) {
+		const char *pKeywords = pLexNew->pKeyWords->pszKeyWords[i];
+		if (pKeywords && *pKeywords && !(currentLexKeywordAttr[i] & KeywordAttr_NoLexer)) {
+			if (currentLexKeywordAttr[i] & KeywordAttr_MakeLower) {
 				char *lowerKeywords;
 				char ch;
-				iIdx = lstrlenA(pKeywords);
-				lowerKeywords = LocalAlloc(LPTR, iIdx + 1);
+				int len = lstrlenA(pKeywords);
+				lowerKeywords = LocalAlloc(LPTR, len + 1);
 				lstrcpyA(lowerKeywords, pKeywords);
 				while ((ch = *lowerKeywords) != '\0') {
 					if (ch >= 'A' && ch <= 'Z') {
@@ -544,21 +633,14 @@ void Style_SetLexer(HWND hwnd, PEDITLEXER pLexNew) {
 					}
 					lowerKeywords++;
 				}
-				lowerKeywords -= iIdx;
+				lowerKeywords -= len;
 				SendMessage(hwnd, SCI_SETKEYWORDS, i, (LPARAM)lowerKeywords);
 				LocalFree(lowerKeywords);
 			} else {
-				SendMessage(hwnd, SCI_SETKEYWORDS, i, (LPARAM)"");
-			}
-		}
-	} else {
-		for (int i = 0; i < NUMKEYWORD; i++) {
-			const char *pKeywords = pLexNew->pKeyWords->pszKeyWords[i];
-			if (pKeywords && *pKeywords) {
 				SendMessage(hwnd, SCI_SETKEYWORDS, i, (LPARAM)pKeywords);
-			} else {
-				SendMessage(hwnd, SCI_SETKEYWORDS, i, (LPARAM)"");
 			}
+		} else {
+			SendMessage(hwnd, SCI_SETKEYWORDS, i, (LPARAM)"");
 		}
 	}
 

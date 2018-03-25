@@ -10,32 +10,36 @@ static KEYWORDLIST Keywords_Groovy = {{
 "return switch threadsafe throw throws try while abstract final private protected "
 "public static strictfp synchronized transient "
 "volatile false null super this true it trait println "
-, // type keyword
+
+, // 1 Type Keyword
 "boolean byte char class double float int long short void "
-, // preprocessor
+
+, // 2 Preprocessor
 ""
-, // annotation
+, // 3 Annotation
 ""
 /*
 "interface Retention Target Override"
 */
-, // attribute
-""
-, // class
-"Void String Double Integer Class Object Byte Short Long Float Boolean Character Boolean BigDecimal BigInteger Number"
-"Map Exception Date File"
-, // interface
-""
-, // enumeration
-""
-, // constant
+, // 4 Attribute
 ""
 
-#if NUMKEYWORD == 16
-, "", "", "", "", "", "",
+, // 5 Class
+"Void String Double Integer Class Object Byte Short Long Float Boolean Character Boolean BigDecimal BigInteger Number"
+"Map Exception Date File"
+
+, // 6 Interface
+""
+, // 7 Enumeration
+""
+, // 8 Constant
+""
+
+, "", "", "", "", "", ""
+
+, // 15 Code Snippet
 "for^() if^() switch^() while^() catch^() else^if^() "
 "def^() "
-#endif
 }};
 
 EDITLEXER lexGroovy = { SCLEX_CPP, NP2LEX_GROOVY, L"Groovy Script", L"groovy", L"", &Keywords_Groovy,

@@ -9,13 +9,13 @@ static KEYWORDLIST Keywords_Ruby = {{
 "not or redo rescue retry return self super then true undef unless until when while yield "
 "ARGF ARGV ENV DATA FALSE NIL TRUE STDERR STDIN STDOUT "
 "require raise public private protected include extend "
+
 , "", "", "", "", "", "", ""
-,//fold
+
+, // 8 Fold
 "and begin break case do else elsif if next return when unless until not or"
 
-#if NUMKEYWORD == 16
 , "", "", "", "", "", "", ""
-#endif
 }};
 
 EDITLEXER lexRuby = { SCLEX_RUBY, NP2LEX_RUBY, L"Ruby Script", L"rb; ruby; rbw; rake; rjs", L"", &Keywords_Ruby,

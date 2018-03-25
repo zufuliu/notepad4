@@ -16,21 +16,25 @@ static KEYWORDLIST Keywords_Matlab = {{
 "sym syms complex real vpa scalar class typecast cast handle throw rethrow "
 "typeinfo shared inline do until endfor endfunction endif endswitch end_try_catch end_unwind_protect endwhile unwind_protect unwind_protect_cleanup select then "
 "off on eps pi ans Inf inf NaN nan null nargin nargout varargin varargout gca gcf gco gcbf gcbo intmax intmin realmax realmin "
-,/********             Attribte            *********************/
+
+, // 1 Attribte
 "AbortSet Abstract Access AllowedSubclasses Constant ConstructOnLoad Dependent GetAccess GetObservable HandleCompatible Hidden InferiorClasses ListenAccess NonCopyable NotifyAccess Sealed SetAccess SetObservable Static Transient "
 "DiscreteState Logical Nontunable PositiveInteger "
-,/****************  Command   *************************/
+
+, // 2 Command
 "clc clear delete demo exit load open pause quit save test testif tic toc which who whos "
 "axis box cla clf close grid hold pan shg zoom "
-,/********************* Basic Function ********************/
-"assert() deal() disp() display() error() eval() evalc() evalin() fail() feval() find() get() input() length() warning() message() set() size() find() full() sparse() "
-"isa() iscell() iscellstr() ischar() iscolumn() iscom() isdir() isempty() isequal() isfield() isfloat() isfinite() isglobal() ishandle() ishold() isindex() isinf() isinterface() isinteger() isjava() islogical() ismatrix() ismethod() ismember() isnan() isnumeric() isobject() isprop() isreal() isrow() isscalar() issparse() issquare() isstr() isstruct() isvalid() isvector() ",
-"axes figure uicontrol uimenu ",
-"", "", "", ""
 
-#if NUMKEYWORD == 16
+, // 3 Basic Function
+"assert() deal() disp() display() error() eval() evalc() evalin() fail() feval() find() get() input() length() warning() message() set() size() find() full() sparse() "
+"isa() iscell() iscellstr() ischar() iscolumn() iscom() isdir() isempty() isequal() isfield() isfloat() isfinite() isglobal() ishandle() ishold() isindex() isinf() isinterface() isinteger() isjava() islogical() ismatrix() ismethod() ismember() isnan() isnumeric() isobject() isprop() isreal() isrow() isscalar() issparse() issquare() isstr() isstruct() isvalid() isvector() "
+
+, // 4 UI
+"axes figure uicontrol uimenu "
+
+, "", "", "", ""
+
 , "", "", "", "", "", "", ""
-#endif
 }};
 
 EDITLEXER lexMatlab = { SCLEX_MATLAB, NP2LEX_MATLAB, L"MATLAB Code", L"m", L"", &Keywords_Matlab,

@@ -54,21 +54,24 @@ static KEYWORDLIST Keywords_HTML = {{
 "row col rowgroup colgroup circle default poly rect any yes no submit reset button "
 "command checkbox radio context toolbar soft hard "
 
-, // JavaScript
+, // 1 JavaScript
 "async await break case catch class const continue debugger default delete do else export extends finally for function if import in "
 "instanceof let new return static super switch this throw try typeof var void while with yield "
 "null true false undefined "
 "enum implements interface package private protected public "
-, // VBScript
+
+, // 2 VBScript
 "Alias And As Attribute Begin Boolean ByRef Byte ByVal Call Case Class Compare Const Continue "
 "Currency Date Declare Dim Do Double Each Else ElseIf Empty End Enum Eqv Erase Error Event Exit "
 "Explicit False For Friend Function Get Global GoSub Goto If Imp Implement In Integer Is Let Lib "
 "Load Long Loop LSet Me Mid Mod Module New Next Not Nothing Null Object On Option Optional Or "
 "Preserve Private Property Public RaiseEvent ReDim Rem Resume Return RSet Select Set Single "
 "Static Stop String Sub Then To True Type Unload Until Variant WEnd While With WithEvents Xor"
-, // Python
+
+, // 3 Python
 ""
-, // PHP
+
+, // 4 PHP
 "abstract and as break callable case catch class clone const continue declare default "
 "do else elseif enddeclare endfor endforeach endif endswitch endwhile extends final "
 "finally for foreach function global goto if implements instanceof insteadof interface "
@@ -86,14 +89,12 @@ static KEYWORDLIST Keywords_HTML = {{
 "stdClass Exception ErrorException Directory php_user_filter DateTime "
 //
 "__CLASS__ __DIR__ __FILE__ __FUNCTION__ __LINE__ __METHOD__ __NAMESPACE__ __TRAIT__ "
-, // SGML DTD
-""
-,
-"", "", ""
 
-#if NUMKEYWORD == 16
+, // 5 SGML DTD
+""
+, "", "", ""
+
 , "", "", "", "", "", "", ""
-#endif
 }};
 
 EDITLEXER lexHTML = { SCLEX_HTML, NP2LEX_HTML, L"Web Source Code", L"html; htm; xhtml; shtml; asp; aspx; jsp; htd; htt; hta; htc", L"", &Keywords_HTML,

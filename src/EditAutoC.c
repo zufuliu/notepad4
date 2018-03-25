@@ -381,58 +381,10 @@ void AutoC_AddDocWord(HWND hwnd, struct WordList *pWList, BOOL bIgnore) {
 }
 
 void AutoC_AddKeyword(struct WordList *pWList, int iCurrentStyle) {
-	int i, count;
-
-	switch (pLexCurrent->rid) {
-	case NP2LEX_CPP:
-	case NP2LEX_CIL:
-		count = 11;
-		break;	// CPP
-	case NP2LEX_PHP:
-	case NP2LEX_JS:
-	case NP2LEX_PYTHON:
-	case NP2LEX_GRADLE:
-		count = NUMKEYWORD;
-		break;
-	case NP2LEX_ASM:
-		count = 10;
-		break;	// ASM
-	case NP2LEX_CSHARP:
-	case NP2LEX_JAVA:
-	case NP2LEX_SMALI:
-		count = 12;
-		break;
-	default:
-		count = 9;
-	}
-
-	WordList_AddList(pWList, pLexCurrent->pKeyWords->pszKeyWords[0]);
-	if (pLexCurrent->rid != NP2LEX_JS) { // Reserved Word
-		WordList_AddList(pWList, pLexCurrent->pKeyWords->pszKeyWords[1]);
-	}
-	i = 2;
-	if (pLexCurrent->iLexer == SCLEX_CPP || pLexCurrent->iLexer == SCLEX_PYTHON) {
-		i = 4;
-		if (pLexCurrent->rid == NP2LEX_CSHARP || pLexCurrent->rid == NP2LEX_PHP) {
-			i = 3;
-		}
-	}
-	if (pLexCurrent->iLexer == SCLEX_PYTHON) {
-		WordList_AddList(pWList, pLexCurrent->pKeyWords->pszKeyWords[2]);
-	}
-	for (; i < count; i++) {
+	for (int i = 0; i < NUMKEYWORD; i++) {
 		const char *pKeywords = pLexCurrent->pKeyWords->pszKeyWords[i];
-		if (*pKeywords) {
+		if (pKeywords && *pKeywords && !(currentLexKeywordAttr[i] & KeywordAttr_NoAutoComp)) {
 			WordList_AddList(pWList, pKeywords);
-		}
-	}
-	if (pLexCurrent->rid == NP2LEX_CPP) {
-		i = 13;
-		for (; i < NUMKEYWORD; i++) {
-			const char *pKeywords = pLexCurrent->pKeyWords->pszKeyWords[i];
-			if (*pKeywords) {
-				WordList_AddList(pWList, pKeywords);
-			}
 		}
 	}
 
@@ -442,13 +394,6 @@ void AutoC_AddKeyword(struct WordList *pWList, int iCurrentStyle) {
 		WordList_AddList(pWList, (*np2_LexKeyword)[1]);
 		WordList_AddList(pWList, (*np2_LexKeyword)[2]);
 		WordList_AddList(pWList, (*np2_LexKeyword)[3]);
-	}
-	// keywords with paranthesis
-	{
-		const char *pKeywords = pLexCurrent->pKeyWords->pszKeyWords[NUMKEYWORD - 1];
-		if (pKeywords != NULL && *pKeywords != '\0') {
-			WordList_AddList(pWList, pKeywords);
-		}
 	}
 }
 
@@ -478,9 +423,16 @@ INT AutoC_AddSpecWord(struct WordList *pWList, int iCurrentStyle, int ch, int ch
 		return 0;
 	} else if ((pLexCurrent->iLexer == SCLEX_CPP && iCurrentStyle == SCE_C_DEFAULT)
 			   || (pLexCurrent->iLexer == SCLEX_PYTHON && iCurrentStyle == SCE_PY_DEFAULT)
+			   || (pLexCurrent->rid == NP2LEX_VB && iCurrentStyle == SCE_B_DEFAULT)
 			   || (pLexCurrent->iLexer == SCLEX_SMALI && iCurrentStyle == SCE_C_DEFAULT)) {
 		if (ch == '#' && pLexCurrent->iLexer == SCLEX_CPP) { // #preprocessor
 			const char *pKeywords = pLexCurrent->pKeyWords->pszKeyWords[2];
+			if (pKeywords && *pKeywords) {
+				WordList_AddList(pWList, pKeywords);
+				return 0;
+			}
+		} else if (ch == '#' && pLexCurrent->rid == NP2LEX_VB) { // #preprocessor
+			const char *pKeywords = pLexCurrent->pKeyWords->pszKeyWords[3];
 			if (pKeywords && *pKeywords) {
 				WordList_AddList(pWList, pKeywords);
 				return 0;

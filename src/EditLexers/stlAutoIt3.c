@@ -60,7 +60,9 @@ static KEYWORDLIST Keywords_AU3 = {{
 "wingetclasslist wingetclientsize wingethandle wingetpos wingetprocess wingetstate "
 "wingettext wingettitle winkill winlist winmenuselectitem winminimizeall winminimizeallundo "
 "winmove winsetontop winsetstate winsettitle winsettrans winwait winwaitactive winwaitclose "
-"winwaitnotactive",
+"winwaitnotactive"
+
+, // 1
 "@appdatacommondir @appdatadir @autoitexe @autoitpid @autoitunicode @autoitversion @autoitx64 "
 "@com_eventobj @commonfilesdir @compiled @computername @comspec @cr @crlf @desktopcommondir "
 "@desktopdepth @desktopdir @desktopheight @desktoprefresh @desktopwidth @documentscommondir "
@@ -74,7 +76,9 @@ static KEYWORDLIST Keywords_AU3 = {{
 "@sw_maximize @sw_minimize @sw_restore @sw_show @sw_showdefault @sw_showmaximized "
 "@sw_showminimized @sw_showminnoactive @sw_showna @sw_shownoactivate @sw_shownormal "
 "@sw_unlock @systemdir @tab @tempdir @tray_id @trayiconflashing @trayiconvisible @username "
-"@userprofiledir @wday @windowsdir @workingdir @yday @year",
+"@userprofiledir @wday @windowsdir @workingdir @yday @year"
+
+, // 2
 "{!} {#} {^} {{} {}} {+} {alt} {altdown} {altup} {appskey} "
 "{asc} {backspace} {break} {browser_back} {browser_favorites} {browser_forward} {browser_home} "
 "{browser_refresh} {browser_search} {browser_stop} {bs} {capslock} {ctrldown} {ctrlup} "
@@ -85,8 +89,12 @@ static KEYWORDLIST Keywords_AU3 = {{
 "{numpad3} {numpad4} {numpad5} {numpad6} {numpad7} {numpad8} {numpad9} {numpadadd} "
 "{numpaddiv} {numpaddot} {numpadenter} {numpadmult} {numpadsub} {pause} {pgdn} {pgup} "
 "{printscreen} {ralt} {rctrl} {right} {rshift} {rwin} {rwindown} {rwinup} {scrolllock} "
-"{shiftdown} {shiftup} {sleep} {space} {tab} {up} {volume_down} {volume_mute} {volume_up}",
-"#ce #comments-end #comments-start #cs #include #include-once #notrayicon #requireadmin",
+"{shiftdown} {shiftup} {sleep} {space} {tab} {up} {volume_down} {volume_mute} {volume_up}"
+
+, // 3
+"#ce #comments-end #comments-start #cs #include #include-once #notrayicon #requireadmin"
+
+, // 4
 "#autoit3wrapper_au3check_parameters #autoit3wrapper_au3check_stop_onwarning "
 "#autoit3wrapper_change2cui #autoit3wrapper_compression #autoit3wrapper_cvswrapper_parameters "
 "#autoit3wrapper_icon #autoit3wrapper_outfile #autoit3wrapper_outfile_type #autoit3wrapper_plugin_funcs "
@@ -98,12 +106,11 @@ static KEYWORDLIST Keywords_AU3 = {{
 "#autoit3wrapper_run_debug_mode #autoit3wrapper_run_obfuscator #autoit3wrapper_run_tidy "
 "#autoit3wrapper_tidy_stop_onerror #autoit3wrapper_useansi #autoit3wrapper_useupx "
 "#autoit3wrapper_usex64 #autoit3wrapper_version #endregion #forceref #obfuscator_ignore_funcs "
-"#obfuscator_ignore_variables #obfuscator_parameters #region #tidy_parameters",
-"", "", ""
+"#obfuscator_ignore_variables #obfuscator_parameters #region #tidy_parameters"
 
-#if NUMKEYWORD == 16
+, "", "", ""
+
 , "", "", "", "", "", "", ""
-#endif
 }};
 
 EDITLEXER lexAU3 = { SCLEX_AU3, NP2LEX_AU3, L"AutoIt3 Script", L"au3", L"", &Keywords_AU3,

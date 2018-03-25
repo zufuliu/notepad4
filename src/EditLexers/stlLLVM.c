@@ -10,14 +10,18 @@ static KEYWORDLIST Keywords_LLVM = {{
 // linkage
 "private internal available_externally linkonce weak common appending extern_weak linkonce_odr weak_odr external "
 "true false null undef "
-, // type keyword
+
+, // 1 Type Keyword
 "void i1 i8 i16 i32 i64 i128 "
 "half float double fp128 x86_fp80 ppc_fp128 x86_mmx label metadata "
-, // #preprocessor
+
+, // 2 #Preprocessor
 ""
-, // @directive
+
+, // 3 @Directive
 ""
-, // attribute
+
+, // 4 Attribute
 "unnamed_addr "
 
 // DLL storage class
@@ -45,19 +49,19 @@ static KEYWORDLIST Keywords_LLVM = {{
 "eq ne ugt uge ult ule sgt sgt sge slt sle "	// icmp
 "oeq ogt oge oge ole one ord une uno "			// fcmp
 
-, // class
+, // 5 Class
 ""
-, // interface
+, // 6 Interface
 ""
-, // enumeration
+, // 7 Enumeration
 ""
-, // constant
+, // 8 Constant
 ""
 
-#if NUMKEYWORD == 16
-, // 2nd keyword
+, // 9 2nd Keyword
 ""
-, // asm intruction
+
+, // 10 Intruction
 "ret br switch indirectbr invoke resume unreachable "			// terminator
 "add fadd sub fsub mul fmul udiv sdiv fdiv urem srem frem "		// binary
 "shl lshr ashr and or xor "										// bitwise binary
@@ -65,18 +69,9 @@ static KEYWORDLIST Keywords_LLVM = {{
 "extractvalue insertvalue "										// aggregate
 "alloca load store fence cmpxchg atomicrww getelementptr "		// memory access
 "to trunc zext sext fptrunc fpext fptoui fptosi uitofp sitofp ptrtoint inttoptr bitcast addrspacecast "	// conversion
-"icmp fcmp phi select call va_arg landingpad "			// other
-, // asm register
-""
-, // C functions
-""
-, // C++ functions
-""
-, //
-""
-, // auto complete
-""
-#endif
+"icmp fcmp phi select call va_arg landingpad "
+
+, "", "", "",  "", ""
 }};
 
 EDITLEXER lexLLVM = { SCLEX_LLVM, NP2LEX_LLVM, L"LLVM IR", L"ll", L"", &Keywords_LLVM,
