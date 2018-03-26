@@ -626,7 +626,7 @@ _label_identifier:
 			}
 			break;
 		case SCE_C_DSTRINGB: // D
-			if (sc.ch == '`' && (lexType == LEX_D || lexType == LEX_GO)) {
+			if (sc.ch == '`' && (lexType == LEX_JS || lexType == LEX_D || lexType == LEX_GO)) {
 				if (lexType == LEX_D && IsDStrFix(sc.chNext))
 					sc.Forward();
 				sc.ForwardSetState(SCE_C_DEFAULT);
@@ -850,7 +850,7 @@ _label_identifier:
 				++numDTSBrace;
 				sc.SetState(SCE_C_DSTRINGT);
 				sc.Forward();
-			} else if (sc.ch == '`' && (lexType == LEX_D || lexType == LEX_GO)) {
+			} else if (sc.ch == '`' && (lexType == LEX_JS || lexType == LEX_D || lexType == LEX_GO)) {
 				sc.SetState(SCE_C_DSTRINGB);
 			} else if (!_sharpComment(lexType) && sc.Match('/', '*')) {
 				if (visibleChars == 0 && (sc.Match("/**") || sc.Match("/*!"))) {
@@ -1357,7 +1357,7 @@ static void FoldCppDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 		}
 
 		// Go
-		if (lexType == LEX_GO && style == SCE_C_DSTRINGB) {
+		if ((lexType == LEX_JS || lexType == LEX_GO) && style == SCE_C_DSTRINGB) {
 			if (ch == '`') {
 				if (styleNext == SCE_C_DSTRINGB)
 					levelNext++;
