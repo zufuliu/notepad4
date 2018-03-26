@@ -205,7 +205,7 @@ int	np2MonoFontIndex = NUM_MONO_FONT; // Courier New
 // Currently used lexer
 PEDITLEXER pLexCurrent = &lexDefault;
 int np2LexLangIndex = 0;
-UINT currentLexKeywordAttr[NUMKEYWORD] = {0};
+UINT8 currentLexKeywordAttr[NUMKEYWORD] = {0};
 
 COLORREF	crCustom[16];
 BOOL	bUse2ndDefaultStyle;
@@ -490,7 +490,7 @@ static const int iMarkerIDs[] = {
 };
 
 void Style_UpdateLexerKeywordAttr(PEDITLEXER pLexNew) {
-	UINT *attr = currentLexKeywordAttr;
+	UINT8 *attr = currentLexKeywordAttr;
 	memset(currentLexKeywordAttr, 0, sizeof(currentLexKeywordAttr));
 
 	// Code Snippet

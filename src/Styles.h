@@ -34,7 +34,7 @@
 
 extern PEDITLEXER pLexCurrent;
 extern int np2LexLangIndex;
-extern UINT currentLexKeywordAttr[NUMKEYWORD];
+extern UINT8 currentLexKeywordAttr[NUMKEYWORD];
 
 BOOL IsDocWordChar(int ch);
 
