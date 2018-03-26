@@ -54,7 +54,7 @@
 	* Boost Jam
 	* Java
 		* JavaDoc
-	* JavaScript
+	* [JavaScript](../master/tools/lang/JavaScript.js), up to ECMAScript 2017, 8ed.
 	* JSON Document
 	* [Julia Script](https://julialang.org/)
 	* LaTeX
@@ -91,8 +91,8 @@
 		* javap
 		* Jasmin
 	* SQL Query
-		* MySQL
-		* SQLite3
+		* [MySQL](../master/tools/lang/MySQL.sql), up to 5.7.
+		* [SQLite3](../master/tools/lang/SQLite3.sql)
 	* TCL
 	* Texinfo
 	* Visual Basic
@@ -131,21 +131,21 @@
 	* CMake
 	* C# (class list only)
 	* Java (class list only)
-	* JavaScript
+	* [JavaScript](../master/tools/lang/JavaScript.js), up to ECMAScript 2017, 8ed.
 	* Inno Setup
 	* [Julia Script](https://julialang.org/)
 	* Lua Script
 	* Python Script
 	* PHP Script
 	* SQL Query
-		* MySQL
-		* SQLite3
+		* [MySQL](../master/tools/lang/MySQL.sql), up to 5.7.
+		* [SQLite3](../master/tools/lang/SQLite3.sql)
 * Syntax highlighting for function and type for C/C++ family language
 * Syntax highlighting for anotation for Java like JVM based language
 * Syntax highlighting for attribute for C# like language
 * Syntax highlighting for decorator for Python like language
 * Folding for plain text
-* Toggle folding for specific level
+* Toggle folding for specific level or current block.
 * Insert new GUID and current timestamp
 * Number conversion between decimal, hexadecimal, octal and binary
 * Display caret location and length of selected text in count of characters
@@ -153,7 +153,7 @@
 * Improved support for NFO ANSI art
 * Support replacing Windows Notepad using a clean, unintrusive registry-based method
 * Support [adding Notepad2 to Windows explorer context menu](https://github.com/zufuliu/notepad2/wiki/Open-with-Notepad2)
-* Other various minor changes and tweaks
+* Other various major or minor changes and tweaks
 
 ## Supported Operating Systems:
 * XP (SP3, SP2 might or might not work), Vista, 7, 8, 8.1 and 10 both 32-bit and 64-bit
@@ -162,7 +162,7 @@
 TBD.
 
 ## Download
-Prebuild binaries for each release can be download from [release list](https://github.com/zufuliu/notepad2/releases).
+Prebuild binaries for each release can be downloaded from [release list](https://github.com/zufuliu/notepad2/releases).
 
 ## Notes:
 * If you find any bugs or have any suggestions feel free to **provide patches/pull requests**.
