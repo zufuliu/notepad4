@@ -45,12 +45,15 @@ int ErrorMessage(int iLevel, UINT uIdMsg, ...) {
 	WCHAR *c;
 	int iIcon;
 	HWND hwnd;
+	va_list va;
 
 	if (!GetString(uIdMsg, szText, COUNTOF(szText))) {
 		return 0;
 	}
 
-	wvsprintf(szTitle, szText, (LPVOID)(&uIdMsg + 1));
+	va_start(va, uIdMsg);
+	wvsprintf(szTitle, szText, va);
+	va_end(va);
 
 	c = StrChr(szTitle, L'\n');
 	if (c) {

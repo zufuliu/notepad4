@@ -56,12 +56,15 @@ int MsgBox(int iType, UINT uIdMsg, ...) {
 	WCHAR szTitle[64];
 	int iIcon = 0;
 	HWND hwnd;
+	va_list va;
 
 	if (!GetString(uIdMsg, szBuf, COUNTOF(szBuf))) {
 		return 0;
 	}
 
-	wvsprintf(szText, szBuf, (LPVOID)((PUINT_PTR)&uIdMsg + 1));
+	va_start(va, uIdMsg);
+	wvsprintf(szText, szBuf, va);
+	va_end(va);
 
 	if (uIdMsg == IDS_ERR_LOADFILE || uIdMsg == IDS_ERR_SAVEFILE ||
 			uIdMsg == IDS_CREATEINI_FAIL || uIdMsg == IDS_WRITEINI_FAIL ||
@@ -1984,6 +1987,7 @@ INT_PTR InfoBox(int iType, LPCWSTR lpstrSetting, int uidMessage, ...) {
 	INFOBOX ib;
 	WCHAR wchFormat[512];
 	int iMode;
+	va_list va;
 
 	iMode = IniGetInt(L"Suppressed Messages", lpstrSetting, 0);
 
@@ -1996,7 +2000,9 @@ INT_PTR InfoBox(int iType, LPCWSTR lpstrSetting, int uidMessage, ...) {
 	}
 
 	ib.lpstrMessage = LocalAlloc(LPTR, 1024 * sizeof(WCHAR));
-	wvsprintf(ib.lpstrMessage, wchFormat, (LPVOID)((PUINT_PTR)&uidMessage + 1));
+	va_start(va, uidMessage);
+	wvsprintf(ib.lpstrMessage, wchFormat, va);
+	va_end(va);
 	ib.lpstrSetting = (LPWSTR)lpstrSetting;
 	ib.bDisableCheckBox = (lstrlen(szIniFile) == 0 || lstrlen(lpstrSetting) == 0 || iMode == 2) ? TRUE : FALSE;
 

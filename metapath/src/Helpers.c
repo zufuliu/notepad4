@@ -570,7 +570,10 @@ int FormatString(LPWSTR lpOutput, int nOutput, UINT uIdFormat, ...) {
 	WCHAR *p = LocalAlloc(LPTR, sizeof(WCHAR) * nOutput);
 
 	if (GetString(uIdFormat, p, nOutput)) {
-		wvsprintf(lpOutput, p, (LPVOID)((PUINT_PTR)&uIdFormat + 1));
+		va_list va;
+		va_start(va, uIdFormat);
+		wvsprintf(lpOutput, p, va);
+		va_end(va);
 	}
 
 	LocalFree(p);
