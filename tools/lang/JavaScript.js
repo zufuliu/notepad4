@@ -533,3 +533,15 @@ WindowOrWorkerGlobalScope {
 	setInterval(func, delay[, param1, param2, ...])
 	setTimeout(function[, delay, param1, param2, ...])
 }
+
+// https://developer.mozilla.org/en-US/docs/Web/API/Storage
+Storage {
+	length
+	clear()
+	getItem()
+	key()
+	removeItem()
+	setItem()
+	localStorage
+	sessionStorage
+}

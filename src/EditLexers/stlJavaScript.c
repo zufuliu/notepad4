@@ -92,6 +92,8 @@ static KEYWORDLIST Keywords_JS = {{
 "document window body "
 // XMLHttpRequest
 "onreadystatechange readyState response responseText responseType responseURL responseXML status statusText timeout upload withCredentials "
+// Storage
+"localStorage sessionStorage "
 
 , // 11 Method
 // All
@@ -130,7 +132,8 @@ static KEYWORDLIST Keywords_JS = {{
 "getElementById() getElementsByClassName() getElementsByName() getElementsByTagName() "
 // XMLHttpRequest
 "abort() getAllResponseHeaders() getResponseHeader() open() overrideMimeType() send() setRequestHeader() "
-
+// Storage
+"getItem() key() removeItem() setItem() "
 , "", "", ""
 
 , // 15 Code Snippet
