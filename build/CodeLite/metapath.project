@@ -37,11 +37,11 @@
   </VirtualDirectory>
   <Settings Type="Executable">
     <GlobalSettings>
-      <Compiler Options="-std=gnu++17;-Wall;-mthreads;-Wextra;-Wshadow;-Wno-missing-braces" C_Options="-std=gnu11;-Wall;-mthreads;-Wextra;-Wshadow;-Wno-missing-braces" Assembler="">
+      <Compiler Options="-std=gnu++17;-mthreads;-municode;-Wall;-Wextra;-Wshadow;-Wno-missing-braces;-Wimplicit-fallthrough" C_Options="-std=gnu11;-mthreads;-municode;-Wall;-Wextra;-Wshadow;-Wno-missing-braces;-Wimplicit-fallthrough" Assembler="">
         <Preprocessor Value="UNICODE"/>
         <Preprocessor Value="_UNICODE"/>
       </Compiler>
-      <Linker Options="-mwindows;-mthreads">
+      <Linker Options="-mwindows;-mthreads;-municode">
         <Library Value="kernel32.a"/>
         <Library Value="user32.a"/>
         <Library Value="gdi32.a"/>

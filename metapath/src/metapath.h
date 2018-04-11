@@ -80,7 +80,7 @@
 
 //==== Function Declarations ==================================================
 BOOL InitApplication(HINSTANCE hInstance);
-HWND InitInstance(HINSTANCE hInstance, LPSTR pszCmdLine, int nCmdShow);
+HWND InitInstance(HINSTANCE hInstance, LPWSTR pszCmdLine, int nCmdShow);
 BOOL ActivatePrevInst(void);
 void GetRelaunchParameters(LPWSTR szParameters);
 void ShowNotifyIcon(HWND hwnd, BOOL bAdd);
