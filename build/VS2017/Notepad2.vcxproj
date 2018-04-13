@@ -237,7 +237,6 @@
     <ClCompile Include="..\..\scintilla\src\EditModel.cxx" />
     <ClCompile Include="..\..\scintilla\src\Editor.cxx" />
     <ClCompile Include="..\..\scintilla\src\EditView.cxx" />
-    <ClCompile Include="..\..\scintilla\src\ExternalLexer.cxx" />
     <ClCompile Include="..\..\scintilla\src\Indicator.cxx" />
     <ClCompile Include="..\..\scintilla\src\KeyMap.cxx" />
     <ClCompile Include="..\..\scintilla\src\LineMarker.cxx" />
@@ -379,7 +378,6 @@
     <ClInclude Include="..\..\scintilla\src\EditModel.h" />
     <ClInclude Include="..\..\scintilla\src\Editor.h" />
     <ClInclude Include="..\..\scintilla\src\EditView.h" />
-    <ClInclude Include="..\..\scintilla\src\ExternalLexer.h" />
     <ClInclude Include="..\..\scintilla\src\FontQuality.h" />
     <ClInclude Include="..\..\scintilla\src\Indicator.h" />
     <ClInclude Include="..\..\scintilla\src\KeyMap.h" />

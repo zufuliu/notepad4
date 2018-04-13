@@ -104,8 +104,6 @@
       <File Name="../../scintilla/src/Editor.h"/>
       <File Name="../../scintilla/src/EditView.cxx"/>
       <File Name="../../scintilla/src/EditView.h"/>
-      <File Name="../../scintilla/src/ExternalLexer.cxx"/>
-      <File Name="../../scintilla/src/ExternalLexer.h"/>
       <File Name="../../scintilla/src/FontQuality.h"/>
       <File Name="../../scintilla/src/Indicator.cxx"/>
       <File Name="../../scintilla/src/Indicator.h"/>

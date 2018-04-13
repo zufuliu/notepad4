@@ -102,9 +102,6 @@
     <ClCompile Include="..\..\scintilla\src\Editor.cxx">
       <Filter>Scintilla\src</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\scintilla\src\ExternalLexer.cxx">
-      <Filter>Scintilla\src</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\scintilla\src\Indicator.cxx">
       <Filter>Scintilla\src</Filter>
     </ClCompile>
@@ -540,9 +537,6 @@
       <Filter>Scintilla\src</Filter>
     </ClInclude>
     <ClInclude Include="..\..\scintilla\src\Editor.h">
-      <Filter>Scintilla\src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\scintilla\src\ExternalLexer.h">
       <Filter>Scintilla\src</Filter>
     </ClInclude>
     <ClInclude Include="..\..\scintilla\src\FontQuality.h">

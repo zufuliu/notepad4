@@ -80,10 +80,6 @@
 #include "AutoComplete.h"
 #include "ScintillaBase.h"
 
-#ifdef SCI_LEXER
-#include "ExternalLexer.h"
-#endif
-
 #include "PlatWin.h"
 #include "HanjaDic.h"
 
@@ -1747,12 +1743,6 @@ sptr_t ScintillaWin::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam
 			// Invalidate all cached information including layout.
 			DropGraphics(true);
 			InvalidateStyleRedraw();
-			break;
-#endif
-
-#ifdef SCI_LEXER
-		case SCI_LOADLEXERLIBRARY:
-			LexerManager::GetInstance()->Load(reinterpret_cast<const char *>(lParam));
 			break;
 #endif
 
