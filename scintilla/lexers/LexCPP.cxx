@@ -614,7 +614,24 @@ _label_identifier:
 			break;
 		case SCE_C_STRINGRAW:
 			if (sc.ch == '\"') {
-				sc.ForwardSetState(SCE_C_DEFAULT);
+				Sci_PositionU pos = sc.currentPos;
+				Sci_PositionU len = 0;
+				bool rawEnd = false;
+				while (pos > startPos && len < 16) {
+					char ch = styler.SafeGetCharAt(pos, '\0');
+					if (ch == ')') {
+						rawEnd = true;
+						break;
+					}
+					if (IsASpace(ch) || ch == '\\' || ch == '(' || ch == ')') {
+						break;
+					}
+					pos--;
+					len++;
+				}
+				if (rawEnd) {
+					sc.ForwardSetState(SCE_C_DEFAULT);
+				}
 			}
 			break;
 
