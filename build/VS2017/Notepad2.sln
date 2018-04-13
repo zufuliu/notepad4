@@ -10,6 +10,10 @@ Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
 		Debug|x64 = Debug|x64
+		LLVMDebug|Win32 = LLVMDebug|Win32
+		LLVMDebug|x64 = LLVMDebug|x64
+		LLVMRelease|Win32 = LLVMRelease|Win32
+		LLVMRelease|x64 = LLVMRelease|x64
 		Release|Win32 = Release|Win32
 		Release|x64 = Release|x64
 	EndGlobalSection
@@ -18,6 +22,14 @@ Global
 		{B69A8C7E-A22D-45DA-9997-2D1403C7AEE8}.Debug|Win32.Build.0 = Debug|Win32
 		{B69A8C7E-A22D-45DA-9997-2D1403C7AEE8}.Debug|x64.ActiveCfg = Debug|x64
 		{B69A8C7E-A22D-45DA-9997-2D1403C7AEE8}.Debug|x64.Build.0 = Debug|x64
+		{B69A8C7E-A22D-45DA-9997-2D1403C7AEE8}.LLVMDebug|Win32.ActiveCfg = LLVMDebug|Win32
+		{B69A8C7E-A22D-45DA-9997-2D1403C7AEE8}.LLVMDebug|Win32.Build.0 = LLVMDebug|Win32
+		{B69A8C7E-A22D-45DA-9997-2D1403C7AEE8}.LLVMDebug|x64.ActiveCfg = LLVMDebug|x64
+		{B69A8C7E-A22D-45DA-9997-2D1403C7AEE8}.LLVMDebug|x64.Build.0 = LLVMDebug|x64
+		{B69A8C7E-A22D-45DA-9997-2D1403C7AEE8}.LLVMRelease|Win32.ActiveCfg = LLVMRelease|Win32
+		{B69A8C7E-A22D-45DA-9997-2D1403C7AEE8}.LLVMRelease|Win32.Build.0 = LLVMRelease|Win32
+		{B69A8C7E-A22D-45DA-9997-2D1403C7AEE8}.LLVMRelease|x64.ActiveCfg = LLVMRelease|x64
+		{B69A8C7E-A22D-45DA-9997-2D1403C7AEE8}.LLVMRelease|x64.Build.0 = LLVMRelease|x64
 		{B69A8C7E-A22D-45DA-9997-2D1403C7AEE8}.Release|Win32.ActiveCfg = Release|Win32
 		{B69A8C7E-A22D-45DA-9997-2D1403C7AEE8}.Release|Win32.Build.0 = Release|Win32
 		{B69A8C7E-A22D-45DA-9997-2D1403C7AEE8}.Release|x64.ActiveCfg = Release|x64
@@ -26,6 +38,14 @@ Global
 		{D4FC99E4-DA51-B5E0-B47A-B846746940E4}.Debug|Win32.Build.0 = Debug|Win32
 		{D4FC99E4-DA51-B5E0-B47A-B846746940E4}.Debug|x64.ActiveCfg = Debug|x64
 		{D4FC99E4-DA51-B5E0-B47A-B846746940E4}.Debug|x64.Build.0 = Debug|x64
+		{D4FC99E4-DA51-B5E0-B47A-B846746940E4}.LLVMDebug|Win32.ActiveCfg = LLVMDebug|Win32
+		{D4FC99E4-DA51-B5E0-B47A-B846746940E4}.LLVMDebug|Win32.Build.0 = LLVMDebug|Win32
+		{D4FC99E4-DA51-B5E0-B47A-B846746940E4}.LLVMDebug|x64.ActiveCfg = LLVMDebug|x64
+		{D4FC99E4-DA51-B5E0-B47A-B846746940E4}.LLVMDebug|x64.Build.0 = LLVMDebug|x64
+		{D4FC99E4-DA51-B5E0-B47A-B846746940E4}.LLVMRelease|Win32.ActiveCfg = LLVMRelease|Win32
+		{D4FC99E4-DA51-B5E0-B47A-B846746940E4}.LLVMRelease|Win32.Build.0 = LLVMRelease|Win32
+		{D4FC99E4-DA51-B5E0-B47A-B846746940E4}.LLVMRelease|x64.ActiveCfg = LLVMRelease|x64
+		{D4FC99E4-DA51-B5E0-B47A-B846746940E4}.LLVMRelease|x64.Build.0 = LLVMRelease|x64
 		{D4FC99E4-DA51-B5E0-B47A-B846746940E4}.Release|Win32.ActiveCfg = Release|Win32
 		{D4FC99E4-DA51-B5E0-B47A-B846746940E4}.Release|Win32.Build.0 = Release|Win32
 		{D4FC99E4-DA51-B5E0-B47A-B846746940E4}.Release|x64.ActiveCfg = Release|x64
@@ -33,5 +53,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {D2995E93-301E-4A65-AEFA-23A071553145}
 	EndGlobalSection
 EndGlobal
