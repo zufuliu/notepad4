@@ -17,3 +17,4 @@ build/CodeLite/Makefile
 *.pyo
 *.plist
 *.orig
+*.log
