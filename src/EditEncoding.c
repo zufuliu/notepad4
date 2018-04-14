@@ -186,8 +186,6 @@ BOOL EditSetNewEncoding(HWND hwnd, int iCurrentEncoding, int iNewEncoding, BOOL 
 								(mEncoding[iNewEncoding].uFlags & NCP_DEFAULT) ? iDefaultCodePage : SC_CP_UTF8,
 								bSetSavePoint);
 				return TRUE;
-			} else {
-				return FALSE;
 			}
 		} else if ((iCurrentEncoding == CPI_DEFAULT || iNewEncoding == CPI_DEFAULT) &&
 				   (bNoUI || InfoBox(MBYESNO, L"MsgConv1", IDS_ASK_ENCODING) == IDYES)) {
@@ -198,8 +196,6 @@ BOOL EditSetNewEncoding(HWND hwnd, int iCurrentEncoding, int iNewEncoding, BOOL 
 							FALSE);
 			EndWaitCursor();
 			return TRUE;
-		} else {
-			return FALSE;
 		}
 	}
 
@@ -329,9 +325,8 @@ int Encoding_MatchA(char *pchTest) {
 			if ((mEncoding[i].uFlags & NCP_INTERNAL) ||
 					(IsValidCodePage(mEncoding[i].uCodePage) && GetCPInfo(mEncoding[i].uCodePage, &cpi))) {
 				return i;
-			} else {
-				return -1;
 			}
+			break;
 		}
 	}
 
@@ -437,9 +432,8 @@ BOOL Encoding_GetFromListView(HWND hwnd, int *pidEncoding) {
 		if (Encoding_IsValid((int)lvi.lParam)) {
 			*pidEncoding = (int)lvi.lParam;
 			return TRUE;
-		} else {
-			MsgBox(MBWARN, IDS_ERR_ENCODINGNA);
 		}
+		MsgBox(MBWARN, IDS_ERR_ENCODINGNA);
 	}
 
 	return FALSE;
@@ -521,9 +515,8 @@ BOOL Encoding_GetFromComboboxEx(HWND hwnd, int *pidEncoding) {
 		if (Encoding_IsValid((int)cbei.lParam)) {
 			*pidEncoding = (int)cbei.lParam;
 			return TRUE;
-		} else {
-			MsgBox(MBWARN, IDS_ERR_ENCODINGNA);
 		}
+		MsgBox(MBWARN, IDS_ERR_ENCODINGNA);
 	}
 
 	return FALSE;
@@ -560,10 +553,11 @@ BOOL IsUnicode(const char *pBuffer, int cb, LPBOOL lpbBOM, LPBOOL lpbReverse) {
 			 !(i & IS_TEXT_UNICODE_ODD_LENGTH) &&
 			 !(i & IS_TEXT_UNICODE_ILLEGAL_CHARS && !(i & IS_TEXT_UNICODE_REVERSE_SIGNATURE)) &&
 			 !((i & IS_TEXT_UNICODE_REVERSE_MASK) == IS_TEXT_UNICODE_REVERSE_STATISTICS))) {
-		if (lpbBOM)
+		if (lpbBOM) {
 			*lpbBOM = (bHasBOM || bHasRBOM ||
 					   (i & (IS_TEXT_UNICODE_SIGNATURE | IS_TEXT_UNICODE_REVERSE_SIGNATURE)))
 					  ? TRUE : FALSE;
+		}
 		if (lpbReverse) {
 			*lpbReverse = (bHasRBOM || (i & IS_TEXT_UNICODE_REVERSE_MASK)) ? TRUE : FALSE;
 		}
@@ -844,9 +838,8 @@ BOOL FileVars_IsValidEncoding(LPFILEVARS lpfv) {
 int FileVars_GetEncoding(LPFILEVARS lpfv) {
 	if (lpfv->mask & FV_ENCODING) {
 		return lpfv->iEncoding;
-	} else {
-		return -1;
 	}
+	return -1;
 }
 
 // End of EditEncoding.c

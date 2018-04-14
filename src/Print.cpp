@@ -30,8 +30,6 @@ extern "C" {
 }
 #include "resource.h"
 
-extern "C" HINSTANCE g_hInstance;
-
 // Global settings...
 extern "C" int iPrintHeader;
 extern "C" int iPrintFooter;
@@ -91,7 +89,7 @@ extern "C" BOOL EditPrint(HWND hwnd, LPCWSTR pszDocTitle, LPCWSTR pszPageFormat)
 
 	WCHAR dateString[256];
 
-	DOCINFO di = {sizeof(DOCINFO), 0, 0, 0, 0};
+	DOCINFO di = {sizeof(DOCINFO)};
 
 	LONG lengthDoc;
 	LONG lengthDocMax;
@@ -106,7 +104,7 @@ extern "C" BOOL EditPrint(HWND hwnd, LPCWSTR pszDocTitle, LPCWSTR pszPageFormat)
 	HPEN pen;
 	HPEN penOld;
 
-	PRINTDLG pdlg = { sizeof(PRINTDLG), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+	PRINTDLG pdlg = { sizeof(PRINTDLG) };
 	pdlg.hwndOwner = GetParent(hwnd);
 	pdlg.hInstance = g_hInstance;
 	pdlg.Flags = PD_USEDEVMODECOPIES | PD_ALLPAGES | PD_RETURNDC;

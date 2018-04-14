@@ -32,9 +32,6 @@
 #include "resource.h"
 
 extern HWND hwndMain;
-extern HWND hwndEdit;
-extern HINSTANCE g_hInstance;
-//extern LPMALLOC g_lpMalloc;
 extern DWORD dwLastIOError;
 extern HWND hDlgFindReplace;
 extern UINT cpLastFind;
@@ -127,7 +124,7 @@ HWND EditCreate(HWND hwndParent) {
 extern BOOL bFreezeAppTitle;
 extern FILEVARS fvCurFile;
 
-void EditSetNewText(HWND hwnd, char *lpstrText, DWORD cbText) {
+void EditSetNewText(HWND hwnd, LPCSTR lpstrText, DWORD cbText) {
 	bFreezeAppTitle = TRUE;
 
 	if (SendMessage(hwnd, SCI_GETREADONLY, 0, 0)) {
@@ -317,7 +314,8 @@ BOOL EditCopyAppend(HWND hwnd) {
 		if (SC_SEL_RECTANGLE == SendMessage(hwnd, SCI_GETSELECTIONMODE, 0, 0)) {
 			MsgBox(MBWARN, IDS_SELRECT);
 			return FALSE;
-		} else {
+		}
+		{
 			int iSelCount = (int)SendMessage(hwnd, SCI_GETSELTEXT, 0, 0);
 			pszText = LocalAlloc(LPTR, iSelCount);
 			SendMessage(hwnd, SCI_GETSELTEXT, 0, (LPARAM)pszText);
@@ -379,23 +377,23 @@ BOOL EditCopyAppend(HWND hwnd) {
 //
 // EditDetectEOLMode() - moved here to handle Unicode files correctly
 //
-int EditDetectEOLMode(HWND hwnd, char *lpData, DWORD cbData) {
+int EditDetectEOLMode(HWND hwnd, LPCSTR lpData, DWORD cbData) {
 	int iEOLMode = iLineEndings[iDefaultEOLMode];
-	char *cp = (char *)lpData;
+	LPCSTR cp = lpData;
 
 	if (!cp) {
 		return iEOLMode;
 	}
 
-	while (*cp && (*cp != '\x0D' && *cp != '\x0A')) {
+	while (*cp && (*cp != '\r' && *cp != '\n')) {
 		cp++;
 	}
 
-	if (*cp == '\x0D' && *(cp + 1) == '\x0A') {
+	if (*cp == '\r' && *(cp + 1) == '\n') {
 		iEOLMode = SC_EOL_CRLF;
-	} else if (*cp == '\x0D' && *(cp + 1) != '\x0A') {
+	} else if (*cp == '\r' && *(cp + 1) != '\n') {
 		iEOLMode = SC_EOL_CR;
-	} else if (*cp == '\x0A') {
+	} else if (*cp == '\n') {
 		iEOLMode = SC_EOL_LF;
 	}
 
@@ -422,7 +420,7 @@ BOOL EditLoadFile(HWND hwnd, LPCWSTR pszFile, BOOL bSkipEncodingDetection,
 
 	BOOL bBOM = FALSE;
 	BOOL bReverse = FALSE;
-
+	BOOL utf8Sig;
 	BOOL bPreferOEM = FALSE;
 
 	*pbUnicodeErr = FALSE;
@@ -487,6 +485,7 @@ BOOL EditLoadFile(HWND hwnd, LPCWSTR pszFile, BOOL bSkipEncodingDetection,
 	}
 
 	*iEncoding = CPI_DEFAULT;
+	utf8Sig = cbData? IsUTF8Signature(lpData) : FALSE;
 
 	if (cbData == 0) {
 		FileVars_Init(NULL, 0, &fvCurFile);
@@ -508,7 +507,7 @@ BOOL EditLoadFile(HWND hwnd, LPCWSTR pszFile, BOOL bSkipEncodingDetection,
 	} else if (!bSkipEncodingDetection &&
 			   (iSrcEncoding == -1 || iSrcEncoding == CPI_UNICODE || iSrcEncoding == CPI_UNICODEBE) &&
 			   (iSrcEncoding == CPI_UNICODE || iSrcEncoding == CPI_UNICODEBE || IsUnicode(lpData, cbData, &bBOM, &bReverse)) &&
-			   (iSrcEncoding == CPI_UNICODE || iSrcEncoding == CPI_UNICODEBE || !IsUTF8Signature(lpData))) { // check for UTF-8 signature
+			   (iSrcEncoding == CPI_UNICODE || iSrcEncoding == CPI_UNICODEBE || !utf8Sig)) {
 
 		char *lpDataUTF8;
 
@@ -553,28 +552,19 @@ BOOL EditLoadFile(HWND hwnd, LPCWSTR pszFile, BOOL bSkipEncodingDetection,
 		FileVars_Init(lpData, cbData, &fvCurFile);
 		if (!bSkipEncodingDetection
 				&& (iSrcEncoding == -1 || iSrcEncoding == CPI_UTF8 || iSrcEncoding == CPI_UTF8SIGN)
-				&& ((IsUTF8Signature(lpData)
+				&& ((utf8Sig
 					 || FileVars_IsUTF8(&fvCurFile)
 					 || (iSrcEncoding == CPI_UTF8 || iSrcEncoding == CPI_UTF8SIGN)
 					 || (!bPreferOEM && bLoadASCIIasUTF8) // from menu "Reload As... UTF-8"
-#if 0
-					 || (IsUTF8(lpData, cbData) && (
-							 (!bPreferOEM && (mEncoding[_iDefaultEncoding].uFlags & NCP_UTF8))
-							 || UTF8_mbslen_bytes(UTF8StringStart(lpData)) - 1 !=
-							 UTF8_mbslen(UTF8StringStart(lpData), IsUTF8Signature(lpData) ? cbData - 3 : cbData)
-						 )
-						)
-#else
-					|| IsUTF8(lpData, cbData)
-#endif
+					 || IsUTF8(lpData, cbData)
 					)
 				   )
 				&& !(FileVars_IsNonUTF8(&fvCurFile) && (iSrcEncoding != CPI_UTF8 && iSrcEncoding != CPI_UTF8SIGN))) {
 			SendMessage(hwnd, SCI_SETCODEPAGE, SC_CP_UTF8, 0);
-			if (IsUTF8Signature(lpData)) {
-				EditSetNewText(hwnd, UTF8StringStart(lpData), cbData - 3);
+			if (utf8Sig) {
+				EditSetNewText(hwnd, lpData + 3, cbData - 3);
 				*iEncoding = CPI_UTF8SIGN;
-				*iEOLMode = EditDetectEOLMode(hwnd, UTF8StringStart(lpData), cbData - 3);
+				*iEOLMode = EditDetectEOLMode(hwnd, lpData + 3, cbData - 3);
 			} else {
 				EditSetNewText(hwnd, lpData, cbData);
 				*iEncoding = CPI_UTF8;
@@ -1796,7 +1786,8 @@ void EditModifyNumber(HWND hwnd, BOOL bIncrease) {
 						for (int i = lstrlenA(chNumber) - 1 ; i >= 0; i--) {
 							if (IsCharLowerA(chNumber[i])) {
 								break;
-							} else if (IsCharUpper(chNumber[i])) {
+							}
+							if (IsCharUpperA(chNumber[i])) {
 								bUppercase = TRUE;
 								break;
 							}
@@ -2982,11 +2973,11 @@ void EditToggleLineComments(HWND hwnd, LPCWSTR pwszComment, BOOL bInsertAtStart)
 				case 2:
 					iCommentPos = iIndentPos;
 					// a line with [space/tab] comment only
-					if ((ch = (int)SendMessage(hwnd, SCI_GETCHARAT, (WPARAM)(iIndentPos + cchComment), 0)) != '\0' && (ch == '\n' || ch == '\r')) {
+					if ((ch = (int)SendMessage(hwnd, SCI_GETCHARAT, (iIndentPos + cchComment), 0)) != '\0' && (ch == '\n' || ch == '\r')) {
 						iCommentPos = (int)SendMessage(hwnd, SCI_POSITIONFROMLINE, (WPARAM)iLine, 0);
 					}
 					SendMessage(hwnd, SCI_SETTARGETSTART, (WPARAM)iCommentPos, 0);
-					SendMessage(hwnd, SCI_SETTARGETEND, (WPARAM)(iIndentPos + cchComment), 0);
+					SendMessage(hwnd, SCI_SETTARGETEND, (iIndentPos + cchComment), 0);
 					SendMessage(hwnd, SCI_REPLACETARGET, 0, (LPARAM)"");
 					break;
 				case 1:
@@ -3884,8 +3875,7 @@ int CmpStd(const void *s1, const void *s2) {
 }
 
 int CmpStdRev(const void *s1, const void *s2) {
-	int cmp = -1 * StrCmp(((SORTLINE *)s1)->pwszSortEntry, ((SORTLINE *)s2)->pwszSortEntry);
-	return (cmp) ? cmp :	-1 * StrCmp(((SORTLINE *)s1)->pwszLine, ((SORTLINE *)s2)->pwszLine);
+	return CmpStd(s2, s1);
 }
 
 int CmpLogical(const void *s1, const void *s2) {
@@ -3893,25 +3883,14 @@ int CmpLogical(const void *s1, const void *s2) {
 	if (cmp == 0) {
 		cmp = (int)StrCmpLogicalW(((SORTLINE *)s1)->pwszLine, ((SORTLINE *)s2)->pwszLine);
 	}
-	if (cmp) {
-		return cmp;
-	} else {
+	if (cmp == 0) {
 		cmp = StrCmp(((SORTLINE *)s1)->pwszSortEntry, ((SORTLINE *)s2)->pwszSortEntry);
-		return (cmp) ? cmp : StrCmp(((SORTLINE *)s1)->pwszLine, ((SORTLINE *)s2)->pwszLine);
 	}
+	return (cmp) ? cmp : StrCmp(((SORTLINE *)s1)->pwszLine, ((SORTLINE *)s2)->pwszLine);
 }
 
 int CmpLogicalRev(const void *s1, const void *s2) {
-	int cmp = -1 * (int)StrCmpLogicalW(((SORTLINE *)s1)->pwszSortEntry, ((SORTLINE *)s2)->pwszSortEntry);
-	if (cmp == 0) {
-		cmp = -1 * (int)StrCmpLogicalW(((SORTLINE *)s1)->pwszLine, ((SORTLINE *)s2)->pwszLine);
-	}
-	if (cmp) {
-		return cmp;
-	} else {
-		cmp = -1 * StrCmp(((SORTLINE *)s1)->pwszSortEntry, ((SORTLINE *)s2)->pwszSortEntry);
-		return (cmp) ? cmp : -1 * StrCmp(((SORTLINE *)s1)->pwszLine, ((SORTLINE *)s2)->pwszLine);
-	}
+	return CmpLogical(s2, s1);
 }
 
 void EditSortLines(HWND hwnd, int iSortFlags) {
@@ -5108,9 +5087,10 @@ BOOL EditReplace(HWND hwnd, LPCEDITFINDREPLACE lpefr) {
 	} else {
 		//lstrcpyA(szReplace2, lpefr->szReplace);
 		pszReplace2 = StrDupA(lpefr->szReplace);
-		if (lpefr->bTransformBS)
+		if (lpefr->bTransformBS) {
 			TransformBackslashes(pszReplace2, (lpefr->fuFlags & SCFIND_REGEXP),
 								 (UINT)SendMessage(hwnd, SCI_GETCODEPAGE, 0, 0));
+		}
 	}
 
 	if (!pszReplace2) {
@@ -5323,9 +5303,10 @@ BOOL EditReplaceAll(HWND hwnd, LPCEDITFINDREPLACE lpefr, BOOL bShowInfo) {
 	} else {
 		//lstrcpyA(szReplace2, lpefr->szReplace);
 		pszReplace2 = StrDupA(lpefr->szReplace);
-		if (lpefr->bTransformBS)
+		if (lpefr->bTransformBS) {
 			TransformBackslashes(pszReplace2, (lpefr->fuFlags & SCFIND_REGEXP),
 								 (UINT)SendMessage(hwnd, SCI_GETCODEPAGE, 0, 0));
+		}
 	}
 
 	if (!pszReplace2) {
@@ -5458,9 +5439,10 @@ BOOL EditReplaceAllInSelection(HWND hwnd, LPCEDITFINDREPLACE lpefr, BOOL bShowIn
 	} else {
 		//lstrcpyA(szReplace2, lpefr->szReplace);
 		pszReplace2 = StrDupA(lpefr->szReplace);
-		if (lpefr->bTransformBS)
+		if (lpefr->bTransformBS) {
 			TransformBackslashes(pszReplace2, (lpefr->fuFlags & SCFIND_REGEXP),
 								 (UINT)SendMessage(hwnd, SCI_GETCODEPAGE, 0, 0));
+		}
 	}
 
 	if (!pszReplace2) {
@@ -6245,10 +6227,11 @@ BOOL EditSortDlg(HWND hwnd, int *piSortFlags) {
 extern BOOL bNoEncodingTags;
 extern int fNoFileVariables;
 
-BOOL FileVars_Init(char *lpData, DWORD cbData, LPFILEVARS lpfv) {
+BOOL FileVars_Init(LPCSTR lpData, DWORD cbData, LPFILEVARS lpfv) {
 	int i;
 	char tch[512];
 	BOOL bDisableFileVariables = FALSE;
+	BOOL utf8Sig;
 
 	ZeroMemory(lpfv, sizeof(FILEVARS));
 	if ((fNoFileVariables && bNoEncodingTags) || !lpData || !cbData) {
@@ -6256,6 +6239,7 @@ BOOL FileVars_Init(char *lpData, DWORD cbData, LPFILEVARS lpfv) {
 	}
 
 	lstrcpynA(tch, lpData, min_i(cbData + 1, COUNTOF(tch)));
+	utf8Sig = IsUTF8Signature(lpData);
 
 	if (!fNoFileVariables) {
 		if (FileVars_ParseInt(tch, "enable-local-variables", &i) && (!i)) {
@@ -6295,7 +6279,7 @@ BOOL FileVars_Init(char *lpData, DWORD cbData, LPFILEVARS lpfv) {
 		}
 	}
 
-	if (!IsUTF8Signature(lpData) && !bNoEncodingTags && !bDisableFileVariables) {
+	if (!utf8Sig && !bNoEncodingTags && !bDisableFileVariables) {
 		if (FileVars_ParseStr(tch, "encoding", lpfv->tchEncoding, COUNTOF(lpfv->tchEncoding))) {
 			lpfv->mask |= FV_ENCODING;
 		} else if (FileVars_ParseStr(tch, "charset", lpfv->tchEncoding, COUNTOF(lpfv->tchEncoding))) {
@@ -6351,7 +6335,7 @@ BOOL FileVars_Init(char *lpData, DWORD cbData, LPFILEVARS lpfv) {
 			}
 		}
 
-		if (!IsUTF8Signature(lpData) && !bNoEncodingTags && !bDisableFileVariables) {
+		if (!utf8Sig && !bNoEncodingTags && !bDisableFileVariables) {
 			if (FileVars_ParseStr(tch, "encoding", lpfv->tchEncoding, COUNTOF(lpfv->tchEncoding))) {
 				lpfv->mask |= FV_ENCODING;
 			} else if (FileVars_ParseStr(tch, "charset", lpfv->tchEncoding, COUNTOF(lpfv->tchEncoding))) {
@@ -6446,9 +6430,9 @@ BOOL FileVars_Apply(HWND hwnd, LPFILEVARS lpfv) {
 //
 // FileVars_ParseInt()
 //
-BOOL FileVars_ParseInt(char *pszData, char *pszName, int *piValue) {
+BOOL FileVars_ParseInt(LPCSTR pszData, LPCSTR pszName, int *piValue) {
 	char tch[32];
-	char *pvStart = pszData;
+	LPCSTR pvStart = pszData;
 
 	while ((pvStart = StrStrIA(pvStart, pszName)) != NULL) {
 		char chPrev = (pvStart > pszData) ? *(pvStart - 1) : 0;
@@ -6505,9 +6489,9 @@ BOOL FileVars_ParseInt(char *pszData, char *pszName, int *piValue) {
 //
 // FileVars_ParseStr()
 //
-BOOL FileVars_ParseStr(char *pszData, char *pszName, char *pszValue, int cchValue) {
+BOOL FileVars_ParseStr(LPCSTR pszData, LPCSTR pszName, char *pszValue, int cchValue) {
 	char tch[32];
-	char *pvStart = pszData;
+	LPCSTR pvStart = pszData;
 	BOOL bQuoted = FALSE;
 
 	while ((pvStart = StrStrIA(pvStart, pszName)) != NULL) {

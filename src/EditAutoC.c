@@ -407,7 +407,8 @@ INT AutoC_AddSpecWord(struct WordList *pWList, int iCurrentStyle, int ch, int ch
 			WordList_AddList(pWList, (*np2_LexKeyword)[2]);
 			WordList_AddList(pWList, (*np2_LexKeyword)[3]);
 			return 0;
-		} else if (ch == '#' && (*np2_LexKeyword == kwJavaDoc) && IsWordStart(*(pWList->pWordStart))) { // package.Class#member
+		}
+		if (ch == '#' && (*np2_LexKeyword == kwJavaDoc) && IsWordStart(*(pWList->pWordStart))) { // package.Class#member
 			return 1;
 		}
 	} else if ((pLexCurrent->rid == NP2LEX_HTML || pLexCurrent->rid == NP2LEX_XML || pLexCurrent->rid == NP2LEX_CONF)
@@ -532,7 +533,7 @@ void EditCompleteWord(HWND hwnd, BOOL autoInsert) {
 			while (iLine >= 0 && IsASpace(ch)) {
 				ch = pLine[iLine--];
 			}
-			while (iLine >= 0 && IsASpace(pLine[iLine--]));
+			while (iLine >= 0 && IsASpace(pLine[iLine--])){}
 			if (iLine > 0) {
 				ch = '\0';
 				chPrev = '\0';

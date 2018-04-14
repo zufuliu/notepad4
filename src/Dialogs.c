@@ -34,8 +34,6 @@
 #include "Version.h"
 
 extern HWND		hwndMain;
-extern HWND		hwndEdit;
-extern HINSTANCE	g_hInstance;
 extern DWORD	dwLastIOError;
 extern BOOL		bSkipUnicodeDetection;
 extern BOOL		bLoadASCIIasUTF8;
@@ -839,13 +837,11 @@ BOOL AddToFavDlg(HWND hwnd, LPCWSTR lpszName, LPCWSTR lpszTarget) {
 								   hwnd, AddToFavDlgProc, (LPARAM)pszName);
 
 	if (iResult == IDOK) {
-		if (!PathCreateFavLnk(pszName, lpszTarget, tchFavoritesDir)) {
-			MsgBox(MBWARN, IDS_FAV_FAILURE);
-			return FALSE;
-		} else {
+		if (PathCreateFavLnk(pszName, lpszTarget, tchFavoritesDir)) {
 			MsgBox(MBINFO, IDS_FAV_SUCCESS);
 			return TRUE;
 		}
+		MsgBox(MBWARN, IDS_FAV_FAILURE);
 	}
 
 	return FALSE;
@@ -860,7 +856,6 @@ extern LPMRULIST pFileMRU;
 extern BOOL bSaveRecentFiles;
 extern int cxFileMRUDlg;
 extern int cyFileMRUDlg;
-extern int flagNoFadeHidden;
 
 typedef struct tagIconThreadInfo {
 	HWND hwnd;					// HWND of ListView Control
@@ -1979,8 +1974,6 @@ INT_PTR CALLBACK InfoBoxDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPar
 // InfoBox()
 //
 //
-extern WCHAR szIniFile[MAX_PATH];
-
 INT_PTR InfoBox(int iType, LPCWSTR lpstrSetting, int uidMessage, ...) {
 	HWND hwnd;
 	int idDlg = IDD_INFOBOX;

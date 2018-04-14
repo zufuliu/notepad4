@@ -47,9 +47,8 @@ int IniSectionGetString(LPCWSTR lpCachedIniSection, LPCWSTR lpName, LPCWSTR lpDe
 			if (StrCmpNI(p, tch, ich) == 0) {
 				lstrcpyn(lpReturnedString, p + ich, cchReturnedString);
 				return lstrlen(lpReturnedString);
-			} else {
-				p = StrEnd(p) + 1;
 			}
+			p = StrEnd(p) + 1;
 		}
 	}
 
@@ -83,9 +82,8 @@ BOOL IniSectionGetBool(LPCWSTR lpCachedIniSection, LPCWSTR lpName, BOOL bDefault
 					}
 				}
 				return bDefault;
-			} else {
-				p = StrEnd(p) + 1;
 			}
+			p = StrEnd(p) + 1;
 		}
 	}
 	return bDefault;
@@ -106,12 +104,10 @@ int IniSectionGetInt(LPCWSTR lpCachedIniSection, LPCWSTR lpName, int iDefault) {
 			if (StrCmpNI(p, tch, ich) == 0) {
 				if (swscanf(p + ich, L"%i", &i) == 1) {
 					return i;
-				} else {
-					return iDefault;
 				}
-			} else {
-				p = StrEnd(p) + 1;
+				return iDefault;
 			}
+			p = StrEnd(p) + 1;
 		}
 	}
 	return iDefault;
@@ -705,8 +701,9 @@ BOOL PathIsLnkFile(LPCWSTR pszPath) {
 
 	if (lstrcmpi(PathFindExtension(pszPath), L".lnk")) {
 		return FALSE;
-	} else {
-		WCHAR tchResPath[256];
+	}
+	{
+		WCHAR tchResPath[MAX_PATH];
 		return PathGetLnkPath(pszPath, tchResPath, COUNTOF(tchResPath));
 	}
 }
@@ -1192,10 +1189,11 @@ BOOL History_Add(PHISTORY ph, LPCWSTR pszNew) {
 	}
 
 	// Item to be added is equal to current item
-	if (ph->iCurItem >= 0 && ph->iCurItem <= (HISTORY_ITEMS - 1))
+	if (ph->iCurItem >= 0 && ph->iCurItem <= (HISTORY_ITEMS - 1)) {
 		if (!lstrcmpi(pszNew, ph->psz[ph->iCurItem])) {
 			return FALSE;
 		}
+	}
 
 	if (ph->iCurItem == (HISTORY_ITEMS - 1)) {
 		// Shift
@@ -1319,11 +1317,7 @@ BOOL MRU_Destroy(LPMRULIST pmru) {
 }
 
 int MRU_Compare(LPMRULIST pmru, LPCWSTR psz1, LPCWSTR psz2) {
-	if (pmru->iFlags & MRU_NOCASE) {
-		return lstrcmpi(psz1, psz2);
-	} else {
-		return lstrcmp(psz1, psz2);
-	}
+	return (pmru->iFlags & MRU_NOCASE) ? lstrcmpi(psz1, psz2) : lstrcmp(psz1, psz2);
 }
 
 BOOL MRU_Add(LPMRULIST pmru, LPCWSTR pszNew) {
@@ -1373,14 +1367,13 @@ int MRU_Enum(LPMRULIST pmru, int iIndex, LPWSTR pszItem, int cchItem) {
 			i++;
 		}
 		return i;
-	} else {
-		if (iIndex < 0 || iIndex > pmru->iSize - 1 || !pmru->pszItems[iIndex]) {
-			return -1;
-		} else {
-			lstrcpyn(pszItem, pmru->pszItems[iIndex], cchItem);
-			return lstrlen(pszItem);
-		}
 	}
+
+	if (iIndex < 0 || iIndex > pmru->iSize - 1 || !pmru->pszItems[iIndex]) {
+		return -1;
+	}
+	lstrcpyn(pszItem, pmru->pszItems[iIndex], cchItem);
+	return lstrlen(pszItem);
 }
 
 BOOL MRU_Load(LPMRULIST pmru) {
@@ -1538,15 +1531,17 @@ static inline BYTE *DialogTemplate_GetFontSizeField(const DLGTEMPLATE *pTemplate
 
 	if (*pw == (WORD) - 1) {
 		pw += 2;
-	} else
-		while (*pw++);
+	} else {
+		while (*pw++){}
+	}
 
 	if (*pw == (WORD) - 1) {
 		pw += 2;
-	} else
-		while (*pw++);
+	} else {
+		while (*pw++){}
+	}
 
-	while (*pw++);
+	while (*pw++){}
 
 	return (BYTE *)pw;
 }

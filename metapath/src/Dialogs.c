@@ -552,7 +552,6 @@ INT_PTR CALLBACK AboutDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam
 //  GeneralPageProc
 //
 //
-extern WCHAR szIniFile[MAX_PATH];
 extern BOOL bSaveSettings;
 extern WCHAR szQuickview[MAX_PATH];
 extern WCHAR szQuickviewParams[MAX_PATH];
@@ -1175,10 +1174,6 @@ INT_PTR OptionsPropSheet(HWND hwnd, HINSTANCE hInstance) {
 //  GetFilterDlgProc()
 //
 //
-
-extern WCHAR tchFilter[DL_FILTER_BUFSIZE];
-extern BOOL bNegFilter;
-
 INT_PTR CALLBACK GetFilterDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
 	switch (umsg) {
 	case WM_INITDIALOG: {
@@ -1314,9 +1309,8 @@ BOOL GetFilterDlg(HWND hwnd) {
 	if (IDOK == ThemedDialogBox(g_hInstance, MAKEINTRESOURCE(IDD_FILTER), hwnd, GetFilterDlgProc)) {
 		if (!lstrcmpi(tchFilter, tchOldFilter) && (bOldNegFilter == bNegFilter)) {
 			return FALSE;    // Old and new filters are identical
-		} else {
-			return TRUE;
 		}
+		return TRUE;
 	}
 
 	return FALSE;
@@ -1915,7 +1909,8 @@ BOOL OpenWithDlg(HWND hwnd, LPDLITEM lpdliParam) {
 				}
 			}
 			return TRUE;
-		} else {
+		}
+		{
 			SHELLEXECUTEINFO sei;
 			WCHAR szParam[MAX_PATH];
 
@@ -1993,9 +1988,8 @@ BOOL NewDirDlg(HWND hwnd, LPWSTR pszNewDir) {
 	if (IDOK == ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_NEWDIR),  hwnd, NewDirDlgProc, (LPARAM)&fod)) {
 		lstrcpy(pszNewDir, fod.szDestination);
 		return TRUE;
-	} else {
-		return FALSE;
 	}
+	return FALSE;
 }
 
 //=============================================================================

@@ -168,7 +168,7 @@ int flagPosParam        = 0;
 //  WinMain()
 //
 //
-int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInst, LPWSTR lpCmdLine, int nCmdShow) {
+int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nShowCmd) {
 	MSG    msg;
 	HWND   hwnd;
 	HACCEL hAcc;
@@ -209,7 +209,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInst, LPWSTR lpCmdLine, 
 		return FALSE;
 	}
 
-	if ((hwnd = InitInstance(hInstance, lpCmdLine, nCmdShow)) == NULL) {
+	if ((hwnd = InitInstance(hInstance, lpCmdLine, nShowCmd)) == NULL) {
 		return FALSE;
 	}
 
@@ -254,7 +254,7 @@ BOOL InitApplication(HINSTANCE hInstance) {
 //  InitInstance()
 //
 //
-HWND InitInstance(HINSTANCE hInstance, LPWSTR pszCmdLine, int nCmdShow) {
+HWND InitInstance(HINSTANCE hInstance, LPWSTR pszCmdLine, int nShowCmd) {
 	RECT rc = { wi.x, wi.y, wi.x + wi.cx, wi.y + wi.cy };
 	RECT rc2;
 	MONITORINFO mi;
@@ -331,7 +331,7 @@ HWND InitInstance(HINSTANCE hInstance, LPWSTR pszCmdLine, int nCmdShow) {
 	}
 
 	if (!flagStartAsTrayIcon) {
-		ShowWindow(hwndMain, nCmdShow);
+		ShowWindow(hwndMain, nShowCmd);
 		UpdateWindow(hwndMain);
 	} else {
 		ShowWindow(hwndMain, SW_HIDE);   // trick ShowWindow()
@@ -589,10 +589,9 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 			ShowOwnedPopups(hwnd, FALSE);
 			if (!bMinimizeToTray) {
 				return DefWindowProc(hwnd, umsg, wParam, lParam);
-			} else {
-				MinimizeWndToTray(hwnd);
-				ShowNotifyIcon(hwnd, TRUE);
 			}
+			MinimizeWndToTray(hwnd);
+			ShowNotifyIcon(hwnd, TRUE);
 			break;
 
 		case SC_RESTORE: {
@@ -2878,19 +2877,17 @@ int CheckIniFileRedirect(LPWSTR lpszFile, LPCWSTR lpszModule) {
 	if (GetPrivateProfileString(L"metapath", L"metapath.ini", L"", tch, COUNTOF(tch), lpszFile)) {
 		if (CheckIniFile(tch, lpszModule)) {
 			lstrcpy(lpszFile, tch);
-			return 1;
 		} else {
 			WCHAR tchFileExpanded[MAX_PATH];
 			ExpandEnvironmentStrings(tch, tchFileExpanded, COUNTOF(tchFileExpanded));
 			if (PathIsRelative(tchFileExpanded)) {
 				lstrcpy(lpszFile, lpszModule);
 				lstrcpy(PathFindFileName(lpszFile), tchFileExpanded);
-				return 1;
 			} else {
 				lstrcpy(lpszFile, tchFileExpanded);
-				return 1;
 			}
 		}
+		return 1;
 	}
 	return 0;
 }
@@ -2904,15 +2901,14 @@ int FindIniFile(void) {
 	if (lstrlen(szIniFile)) {
 		if (lstrcmpi(szIniFile, L"*?") == 0) {
 			return 0;
-		} else {
-			if (!CheckIniFile(szIniFile, tchModule)) {
-				ExpandEnvironmentStringsEx(szIniFile, COUNTOF(szIniFile));
-				if (PathIsRelative(szIniFile)) {
-					lstrcpy(tchTest, tchModule);
-					PathRemoveFileSpec(tchTest);
-					PathAppend(tchTest, szIniFile);
-					lstrcpy(szIniFile, tchTest);
-				}
+		}
+		if (!CheckIniFile(szIniFile, tchModule)) {
+			ExpandEnvironmentStringsEx(szIniFile, COUNTOF(szIniFile));
+			if (PathIsRelative(szIniFile)) {
+				lstrcpy(tchTest, tchModule);
+				PathRemoveFileSpec(tchTest);
+				PathAppend(tchTest, szIniFile);
+				lstrcpy(szIniFile, tchTest);
 			}
 		}
 		return 1;
@@ -2966,9 +2962,8 @@ int TestIniFile(void) {
 		lstrcpy(szIniFile2, szIniFile);
 		lstrcpy(szIniFile, L"");
 		return 0;
-	} else {
-		return 1;
 	}
+	return 1;
 }
 
 int CreateIniFile(void) {
@@ -2996,8 +2991,6 @@ int CreateIniFileEx(LPCWSTR lpszIniFile) {
 			}
 			CloseHandle(hFile);
 			return 1;
-		} else {
-			return 0;
 		}
 	}
 
@@ -3036,12 +3029,12 @@ BOOL DisplayPath(LPCWSTR lpPath, UINT uIdError) {
 			if (!SetCurrentDirectory(szPath)) {
 				ErrorMessage(2, uIdError);
 				return FALSE;
-			} else {
-				PostMessage(hwndMain, WM_COMMAND, MAKELONG(IDM_VIEW_UPDATE, 1), 0);
-				ListView_EnsureVisible(hwndDirList, 0, FALSE);
-				return TRUE;
 			}
-		} else { // dwAttr & FILE_ATTRIBUTE_DIRECTORY
+			PostMessage(hwndMain, WM_COMMAND, MAKELONG(IDM_VIEW_UPDATE, 1), 0);
+			ListView_EnsureVisible(hwndDirList, 0, FALSE);
+			return TRUE;
+		}
+		{ // !(dwAttr & FILE_ATTRIBUTE_DIRECTORY)
 			WCHAR *p;
 			SHFILEINFO shfi;
 
@@ -3066,10 +3059,11 @@ BOOL DisplayPath(LPCWSTR lpPath, UINT uIdError) {
 
 			return TRUE;
 		}
-	} else { // dwAttr != (DWORD)(-1)
-		ErrorMessage(2, uIdError);
-		return FALSE;
 	}
+
+	// dwAttr != (DWORD)(-1)
+	ErrorMessage(2, uIdError);
+	return FALSE;
 }
 
 //=============================================================================
@@ -3116,12 +3110,12 @@ BOOL DisplayLnkFile(LPCWSTR pszLnkFile) {
 			if (!SetCurrentDirectory(szPath)) {
 				ErrorMessage(2, IDS_ERR_LNK_NOACCESS);
 				return FALSE;
-			} else {
-				PostMessage(hwndMain, WM_COMMAND, MAKELONG(IDM_VIEW_UPDATE, 1), 0);
-				ListView_EnsureVisible(hwndDirList, 0, FALSE);
-				return TRUE;
 			}
-		} else { // dwAttr & FILE_ATTRIBUTE_DIRECTORY
+			PostMessage(hwndMain, WM_COMMAND, MAKELONG(IDM_VIEW_UPDATE, 1), 0);
+			ListView_EnsureVisible(hwndDirList, 0, FALSE);
+			return TRUE;
+		}
+		{ // !(dwAttr & FILE_ATTRIBUTE_DIRECTORY)
 			WCHAR *p;
 			int  i;
 			SHFILEINFO  shfi;
@@ -3160,7 +3154,7 @@ BOOL DisplayLnkFile(LPCWSTR pszLnkFile) {
 	}
 
 	// GetFileAttributes() failed
-	else {
+	{
 		// Select lnk-file if target is not available
 		if (PathFileExists(pszLnkFile)) {
 			SHFILEINFO shfi;
@@ -3264,7 +3258,7 @@ BOOL ActivatePrevInst(void) {
 			return TRUE;
 		}
 
-		else { // IsWindowEnabled()
+		{ // !IsWindowEnabled()
 			WCHAR szBuf[256];
 			WCHAR *c;
 
@@ -3279,9 +3273,8 @@ BOOL ActivatePrevInst(void) {
 			// Ask...
 			if (MessageBox(NULL, c, szBuf, MB_YESNO | MB_ICONQUESTION | MB_SETFOREGROUND) == IDYES) {
 				return FALSE;
-			} else {
-				return TRUE;
 			}
+			return TRUE;
 
 		}
 	}
@@ -3345,9 +3338,10 @@ void ShowNotifyIcon(HWND hwnd, BOOL bAdd) {
 	static HICON hIcon;
 	NOTIFYICONDATA nid;
 
-	if (!hIcon)
+	if (!hIcon) {
 		hIcon = LoadImage(g_hInstance, MAKEINTRESOURCE(IDR_MAINWND),
 						  IMAGE_ICON, 16, 16, LR_DEFAULTCOLOR);
+	}
 
 	ZeroMemory(&nid, sizeof(NOTIFYICONDATA));
 	nid.cbSize = sizeof(NOTIFYICONDATA);
@@ -3530,7 +3524,8 @@ void LaunchTarget(LPCWSTR lpFileName, BOOL bOpenNew) {
 
 		if (!iUseTargetApplication && lstrlen(lpFileName) == 0) {
 			return;
-		} else {
+		}
+		{
 
 			ZeroMemory(&sei, sizeof(SHELLEXECUTEINFO));
 
@@ -3604,9 +3599,8 @@ void SnapToTarget(HWND hwnd) {
 
 		if (!lstrlen(szTargetApplicationWndClass)) {
 			return;
-		} else {
-			lstrcpy(szGlobalWndClass, szTargetApplicationWndClass);
 		}
+		lstrcpy(szGlobalWndClass, szTargetApplicationWndClass);
 	} else {
 		lstrcpy(szGlobalWndClass, L"Notepad2");
 	}

@@ -141,17 +141,17 @@
 		* [MySQL](../master/tools/lang/MySQL.sql), up to 5.7.
 		* [SQLite3](../master/tools/lang/SQLite3.sql)
 * Syntax highlighting for function and type for C/C++ family language
-* Syntax highlighting for anotation for Java like JVM based language
+* Syntax highlighting for annotation for Java like JVM based language
 * Syntax highlighting for attribute for C# like language
 * Syntax highlighting for decorator for Python like language
 * Folding for plain text
 * Toggle folding for specific level or current block.
-* Insert new GUID and current timestamp
+* Insert new GUID and current timestamps
 * Number conversion between decimal, hexadecimal, octal and binary
 * Display caret location and length of selected text in count of characters
 * Improved auto-completion
 * Improved support for NFO ANSI art
-* Support replacing Windows Notepad using a clean, unintrusive registry-based method
+* Support replacing Windows Notepad using a clean, unintuitive registry-based method
 * Support [adding Notepad2 to Windows explorer context menu](https://github.com/zufuliu/notepad2/wiki/Open-with-Notepad2)
 * Other various major or minor changes and tweaks
 

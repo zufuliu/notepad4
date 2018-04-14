@@ -396,7 +396,7 @@ int		flagDisplayHelp			= 0;
 // WinMain()
 //
 //
-int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInst, LPWSTR lpCmdLine, int nCmdShow) {
+int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nShowCmd) {
 	MSG msg;
 	HWND hwnd;
 	HACCEL hAccMain;
@@ -513,7 +513,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInst, LPWSTR lpCmdLine, 
 		return FALSE;
 	}
 
-	if ((hwnd = InitInstance(hInstance, lpCmdLine, nCmdShow)) == NULL) {
+	if ((hwnd = InitInstance(hInstance, lpCmdLine, nShowCmd)) == NULL) {
 		OleUninitialize();
 		return FALSE;
 	}
@@ -522,10 +522,11 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInst, LPWSTR lpCmdLine, 
 	hAccFindReplace = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDR_ACCFINDREPLACE));
 
 	while (GetMessage(&msg, NULL, 0, 0)) {
-		if (IsWindow(hDlgFindReplace) && (msg.hwnd == hDlgFindReplace || IsChild(hDlgFindReplace, msg.hwnd)))
+		if (IsWindow(hDlgFindReplace) && (msg.hwnd == hDlgFindReplace || IsChild(hDlgFindReplace, msg.hwnd))) {
 			if (TranslateAccelerator(hDlgFindReplace, hAccFindReplace, &msg) || IsDialogMessage(hDlgFindReplace, &msg)) {
 				continue;
 			}
+		}
 
 		if (!TranslateAccelerator(hwnd, hAccMain, &msg)) {
 			TranslateMessage(&msg);
@@ -574,7 +575,7 @@ BOOL InitApplication(HINSTANCE hInstance) {
 // InitInstance()
 //
 //
-HWND InitInstance(HINSTANCE hInstance, LPWSTR pszCmdLine, int nCmdShow) {
+HWND InitInstance(HINSTANCE hInstance, LPWSTR pszCmdLine, int nShowCmd) {
 	RECT rc = { wi.x, wi.y, wi.x + wi.cx, wi.y + wi.cy };
 	RECT rc2;
 	MONITORINFO mi;
@@ -682,7 +683,7 @@ HWND InitInstance(HINSTANCE hInstance, LPWSTR pszCmdLine, int nCmdShow) {
 				   NULL);
 
 	if (wi.max) {
-		nCmdShow = SW_SHOWMAXIMIZED;
+		nShowCmd = SW_SHOWMAXIMIZED;
 	}
 
 	if ((bAlwaysOnTop || flagAlwaysOnTop == 2) && flagAlwaysOnTop != 1) {
@@ -697,7 +698,7 @@ HWND InitInstance(HINSTANCE hInstance, LPWSTR pszCmdLine, int nCmdShow) {
 	//FileLoad(TRUE, TRUE, FALSE, FALSE, L"");
 	//
 	if (!flagStartAsTrayIcon) {
-		ShowWindow(hwndMain, nCmdShow);
+		ShowWindow(hwndMain, nShowCmd);
 		UpdateWindow(hwndMain);
 	} else {
 		ShowWindow(hwndMain, SW_HIDE); // trick ShowWindow()
@@ -1261,9 +1262,11 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 
 				int iCurPos		= (int)SendMessage(hwndEdit, SCI_GETCURRENTPOS, 0, 0);
 				int iAnchorPos	= (int)SendMessage(hwndEdit, SCI_GETANCHOR, 0, 0);
+#if NP2_ENABLE_DOT_LOG_FEATURE
 				int iVisTopLine = (int)SendMessage(hwndEdit, SCI_GETFIRSTVISIBLELINE, 0, 0);
 				int iDocTopLine = (int)SendMessage(hwndEdit, SCI_DOCLINEFROMVISIBLE, (WPARAM)iVisTopLine, 0);
 				int iXOffset	= (int)SendMessage(hwndEdit, SCI_GETXOFFSET, 0, 0);
+#endif
 				BOOL bIsTail	= (iCurPos == iAnchorPos) && (iCurPos == SendMessage(hwndEdit, SCI_GETLENGTH, 0, 0));
 
 				iWeakSrcEncoding = iEncoding;
@@ -2311,12 +2314,13 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	case IDM_FILE_REVERT: {
 		if (lstrlen(szCurFile)) {
+#if NP2_ENABLE_DOT_LOG_FEATURE
 			int iCurPos		= (int)SendMessage(hwndEdit, SCI_GETCURRENTPOS, 0, 0);
 			int iAnchorPos	= (int)SendMessage(hwndEdit, SCI_GETANCHOR, 0, 0);
 			int iVisTopLine	= (int)SendMessage(hwndEdit, SCI_GETFIRSTVISIBLELINE, 0, 0);
 			int iDocTopLine	= (int)SendMessage(hwndEdit, SCI_DOCLINEFROMVISIBLE, (WPARAM)iVisTopLine, 0);
 			int iXOffset	= (int)SendMessage(hwndEdit, SCI_GETXOFFSET, 0, 0);
-
+#endif
 			if ((bModified || iEncoding != iOriginalEncoding) && MsgBox(MBOKCANCEL, IDS_ASK_REVERT) != IDOK) {
 				return 0;
 			}
@@ -2657,24 +2661,24 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		int iNewEncoding = iEncoding;
 		if (LOWORD(wParam) == IDM_ENCODING_SELECT && !SelectEncodingDlg(hwnd, &iNewEncoding)) {
 			break;
-		} else {
-			switch (LOWORD(wParam)) {
-			case IDM_ENCODING_UNICODE:
-				iNewEncoding = CPI_UNICODEBOM;
-				break;
-			case IDM_ENCODING_UNICODEREV:
-				iNewEncoding = CPI_UNICODEBEBOM;
-				break;
-			case IDM_ENCODING_UTF8:
-				iNewEncoding = CPI_UTF8;
-				break;
-			case IDM_ENCODING_UTF8SIGN:
-				iNewEncoding = CPI_UTF8SIGN;
-				break;
-			case IDM_ENCODING_ANSI:
-				iNewEncoding = CPI_DEFAULT;
-				break;
-			}
+		}
+
+		switch (LOWORD(wParam)) {
+		case IDM_ENCODING_UNICODE:
+			iNewEncoding = CPI_UNICODEBOM;
+			break;
+		case IDM_ENCODING_UNICODEREV:
+			iNewEncoding = CPI_UNICODEBEBOM;
+			break;
+		case IDM_ENCODING_UTF8:
+			iNewEncoding = CPI_UTF8;
+			break;
+		case IDM_ENCODING_UTF8SIGN:
+			iNewEncoding = CPI_UTF8SIGN;
+			break;
+		case IDM_ENCODING_ANSI:
+			iNewEncoding = CPI_DEFAULT;
+			break;
 		}
 
 		if (EditSetNewEncoding(hwndEdit, iEncoding, iNewEncoding, (flagSetEncoding), lstrlen(szCurFile) == 0)) {
@@ -6288,19 +6292,17 @@ int CheckIniFileRedirect(LPWSTR lpszFile, LPCWSTR lpszModule) {
 	if (GetPrivateProfileString(L"Notepad2", L"Notepad2.ini", L"", tch, COUNTOF(tch), lpszFile)) {
 		if (CheckIniFile(tch, lpszModule)) {
 			lstrcpy(lpszFile, tch);
-			return 1;
 		} else {
 			WCHAR tchFileExpanded[MAX_PATH];
 			ExpandEnvironmentStrings(tch, tchFileExpanded, COUNTOF(tchFileExpanded));
 			if (PathIsRelative(tchFileExpanded)) {
 				lstrcpy(lpszFile, lpszModule);
 				lstrcpy(PathFindFileName(lpszFile), tchFileExpanded);
-				return 1;
 			} else {
 				lstrcpy(lpszFile, tchFileExpanded);
-				return 1;
 			}
 		}
+		return 1;
 	}
 	return 0;
 }
@@ -6314,15 +6316,14 @@ int FindIniFile(void) {
 	if (lstrlen(szIniFile)) {
 		if (lstrcmpi(szIniFile, L"*?") == 0) {
 			return 0;
-		} else {
-			if (!CheckIniFile(szIniFile, tchModule)) {
-				ExpandEnvironmentStringsEx(szIniFile, COUNTOF(szIniFile));
-				if (PathIsRelative(szIniFile)) {
-					lstrcpy(tchTest, tchModule);
-					PathRemoveFileSpec(tchTest);
-					PathAppend(tchTest, szIniFile);
-					lstrcpy(szIniFile, tchTest);
-				}
+		}
+		if (!CheckIniFile(szIniFile, tchModule)) {
+			ExpandEnvironmentStringsEx(szIniFile, COUNTOF(szIniFile));
+			if (PathIsRelative(szIniFile)) {
+				lstrcpy(tchTest, tchModule);
+				PathRemoveFileSpec(tchTest);
+				PathAppend(tchTest, szIniFile);
+				lstrcpy(szIniFile, tchTest);
 			}
 		}
 		return 1;
@@ -7236,13 +7237,13 @@ BOOL ActivatePrevInst(void) {
 				GlobalFree(params);
 
 				return TRUE;
-			} else  { // IsWindowEnabled()
-				// Ask...
-				if (IDYES == MsgBox(MBYESNO, IDS_ERR_PREVWINDISABLED)) {
-					return FALSE;
-				}
-				return TRUE;
 			}
+
+			// Ask...
+			if (IDYES == MsgBox(MBYESNO, IDS_ERR_PREVWINDISABLED)) {
+				return FALSE;
+			}
+			return TRUE;
 		}
 	}
 
@@ -7342,13 +7343,13 @@ BOOL ActivatePrevInst(void) {
 				GlobalFree(lpFileArg);
 			}
 			return TRUE;
-		} else { // IsWindowEnabled()
-			// Ask...
-			if (IDYES == MsgBox(MBYESNO, IDS_ERR_PREVWINDISABLED)) {
-				return FALSE;
-			}
-			return TRUE;
 		}
+
+		// Ask...
+		if (IDYES == MsgBox(MBYESNO, IDS_ERR_PREVWINDISABLED)) {
+			return FALSE;
+		}
+		return TRUE;
 	}
 	return FALSE;
 }
@@ -7400,12 +7401,12 @@ BOOL RelaunchMultiInst(void) {
 		GlobalFree(lpFileArg);
 
 		return TRUE;
-	} else {
-		for (int i = 0; i < cFileList; i++) {
-			LocalFree(lpFileList[i]);
-		}
-		return FALSE;
 	}
+
+	for (int i = 0; i < cFileList; i++) {
+		LocalFree(lpFileList[i]);
+	}
+	return FALSE;
 }
 
 void GetRelaunchParameters(LPWSTR szParameters, LPCWSTR lpszFile, BOOL newWind, BOOL emptyWind) {
@@ -7545,7 +7546,8 @@ void GetRelaunchParameters(LPWSTR szParameters, LPCWSTR lpszFile, BOOL newWind, 
 BOOL RelaunchElevated(void) {
 	if (!IsVistaAndAbove() || fIsElevated || !flagRelaunchElevated || flagDisplayHelp) {
 		return FALSE;
-	} else {
+	}
+	{
 		LPWSTR lpArg1, lpArg2;
 		BOOL exit = TRUE;
 
@@ -7727,7 +7729,7 @@ void InstallFileWatching(LPCWSTR lpszFile) {
 	}
 
 	// Install
-	else {
+	{
 		WCHAR tchDirectory[MAX_PATH];
 		HANDLE hFind;
 		// Terminate previous watching

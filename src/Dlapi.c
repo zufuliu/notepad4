@@ -517,11 +517,7 @@ int CALLBACK DirList_CompareProcRw(LPARAM lp1, LPARAM lp2, LPARAM lFlags) {
 // Sorts the listview control by the specified order
 //
 BOOL DirList_Sort(HWND hwnd, int lFlags, BOOL fRev) {
-	if (fRev) {
-		return ListView_SortItems(hwnd, DirList_CompareProcRw, lFlags);
-	} else {
-		return ListView_SortItems(hwnd, DirList_CompareProcFw, lFlags);
-	}
+	return ListView_SortItems(hwnd, (fRev? DirList_CompareProcRw : DirList_CompareProcFw), lFlags);
 }
 
 //=============================================================================
@@ -707,10 +703,9 @@ BOOL DirList_SelectItem(HWND hwnd, LPCWSTR lpszDisplayName, LPCWSTR lpszFullPath
 
 	if (!lpszFullPath || !lstrlen(lpszFullPath)) {
 		return FALSE;
-	} else {
-		GetShortPathName(lpszFullPath, szShortPath, MAX_PATH);
 	}
 
+	GetShortPathName(lpszFullPath, szShortPath, MAX_PATH);
 	if (!lpszDisplayName || !lstrlen(lpszDisplayName)) {
 		SHGetFileInfo(lpszFullPath, 0, &shfi, sizeof(SHFILEINFO), SHGFI_DISPLAYNAME);
 	} else {
@@ -904,9 +899,8 @@ int DriveBox_Fill(HWND hwnd) {
 										hr = (lpdcid->lpsf->lpVtbl->CompareIDs(lpdcid->lpsf, 0, lpdcid->pidl, lpdcid2->pidl));
 										if ((short)(SCODE_CODE(GetScode(hr))) < 0) {
 											break;
-										} else {
-											cbei2.iItem++;
 										}
+										cbei2.iItem++;
 									}
 
 									cbei.iItem = cbei2.iItem;

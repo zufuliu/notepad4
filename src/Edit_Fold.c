@@ -232,7 +232,8 @@ void FoldPerformAction(int ln, int mode, FOLD_ACTION action) {
 
 			if (lv < lvStop || (lv == lvStop && fHeader && ln != lnNode)) {
 				return;
-			} else if (fHeader && (lv == lvNode || (lv > lvNode && (mode & FOLD_CHILDREN)))) {
+			}
+			if (fHeader && (lv == lvNode || (lv > lvNode && (mode & FOLD_CHILDREN)))) {
 				FoldToggleNode(ln, action);
 			}
 		}

@@ -100,7 +100,7 @@ static inline LPITEMIDLIST IL_Next(LPITEMIDLIST pidl) {
 	return (LPITEMIDLIST)((LPBYTE)(pidl) + pidl->mkid.cb);
 }
 
-LPITEMIDLIST IL_Create(LPCITEMIDLIST, UINT, LPCITEMIDLIST, UINT);
+LPITEMIDLIST IL_Create(LPCITEMIDLIST pidl1, UINT cb1, LPCITEMIDLIST pidl2, UINT cb2);
 UINT IL_GetSize(LPCITEMIDLIST pidl);
 BOOL IL_GetDisplayName(LPSHELLFOLDER lpsf, LPCITEMIDLIST pidl, DWORD dwFlags, LPWSTR lpszDisplayName, int nDisplayName);
 

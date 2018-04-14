@@ -32,7 +32,7 @@ STDMETHODIMP CDropSource::QueryInterface(REFIID iid, void FAR *FAR *ppv) {
 		++m_refs;
 		return NOERROR;
 	}
-	*ppv = NULL;
+	*ppv = nullptr;
 	return E_NOINTERFACE;
 }
 
@@ -65,11 +65,11 @@ CDropSource::CDropSource() {
 STDMETHODIMP CDropSource::QueryContinueDrag(BOOL fEscapePressed, DWORD grfKeyState) {
 	if (fEscapePressed) {
 		return DRAGDROP_S_CANCEL;
-	} else if (!(grfKeyState & MK_LBUTTON) && !(grfKeyState & MK_RBUTTON)) {
-		return DRAGDROP_S_DROP;
-	} else {
-		return NOERROR;
 	}
+	if (!(grfKeyState & MK_LBUTTON) && !(grfKeyState & MK_RBUTTON)) {
+		return DRAGDROP_S_DROP;
+	}
+	return NOERROR;
 }
 
 STDMETHODIMP CDropSource::GiveFeedback(DWORD dwEffect) {

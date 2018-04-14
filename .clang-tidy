@@ -1,5 +1,6 @@
 ---
-Checks: 'clang-diagnostic-*,clang-analyzer-*,modernize-*,-modernize-use-auto,-modernize-use-using,-modernize-use-default-member-init,bugprone-*,performance-*'
+# http://clang.llvm.org/extra/clang-tidy/checks/list.html
+Checks: 'clang-diagnostic-*,clang-analyzer-*,modernize-*,-modernize-use-nullptr;-modernize-use-auto,-modernize-use-using,-modernize-use-default-member-init,bugprone-*,performance-*,readability-*,misc-*'
 WarningsAsErrors: ''
 HeaderFilterRegex: '.*'
 AnalyzeTemporaryDtors: false

@@ -218,7 +218,6 @@ int		cxStyleSelectDlg;
 int		cyStyleSelectDlg;
 
 // Notepad2.c
-extern HWND hwndEdit;
 extern int	iEncoding;
 extern int	g_DOSEncoding;
 extern int	iDefaultCodePage;
@@ -292,10 +291,11 @@ void Style_Load(void) {
 		if (!IniSectionGetString(pIniSection, L"FileNameExtensions",
 								 pLexArray[iLexer]->pszDefExt,
 								 pLexArray[iLexer]->szExtensions,
-								 COUNTOF(pLexArray[iLexer]->szExtensions)))
+								 COUNTOF(pLexArray[iLexer]->szExtensions))) {
 			lstrcpyn(pLexArray[iLexer]->szExtensions,
 					 pLexArray[iLexer]->pszDefExt,
 					 COUNTOF(pLexArray[iLexer]->szExtensions));
+		}
 		while (pLexArray[iLexer]->Styles[i].iStyle != -1) {
 			IniSectionGetString(pIniSection, pLexArray[iLexer]->Styles[i].pszName,
 								pLexArray[iLexer]->Styles[i].pszDefault,
@@ -402,10 +402,11 @@ BOOL Style_Import(HWND hwnd) {
 										 L"FileNameExtensions",
 										 pLexArray[iLexer]->pszDefExt,
 										 pLexArray[iLexer]->szExtensions,
-										 COUNTOF(pLexArray[iLexer]->szExtensions)))
+										 COUNTOF(pLexArray[iLexer]->szExtensions))) {
 					lstrcpyn(pLexArray[iLexer]->szExtensions,
 							 pLexArray[iLexer]->pszDefExt,
 							 COUNTOF(pLexArray[iLexer]->szExtensions));
+				}
 				while (pLexArray[iLexer]->Styles[i].iStyle != -1) {
 					IniSectionGetString(pIniSection,
 										pLexArray[iLexer]->Styles[i].pszName,
@@ -2236,7 +2237,8 @@ BOOL Style_StrGetCase(LPCWSTR lpszStyle, int *i) {
 		if (tch[0] == L'u' || tch[0] == L'U') {
 			*i = SC_CASE_UPPER;
 			return TRUE;
-		} else if (tch[0] == L'l' || tch[0] == L'L') {
+		}
+		if (tch[0] == L'l' || tch[0] == L'L') {
 			*i = SC_CASE_LOWER;
 			return TRUE;
 		}
@@ -3032,16 +3034,18 @@ INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM
 	case WM_COMMAND:
 		switch (LOWORD(wParam)) {
 		case IDC_PREVSTYLE:
-			if (TreeView_GetSelection(hwndTV))
+			if (TreeView_GetSelection(hwndTV)) {
 				TreeView_Select(hwndTV, TreeView_GetPrevVisible(hwndTV,
 								TreeView_GetSelection(hwndTV)), TVGN_CARET);
+			}
 			PostMessage(hwnd, WM_NEXTDLGCTL, (WPARAM)(GetDlgItem(hwnd, IDC_STYLEEDIT)), 1);
 			break;
 
 		case IDC_NEXTSTYLE:
-			if (TreeView_GetSelection(hwndTV))
+			if (TreeView_GetSelection(hwndTV)) {
 				TreeView_Select(hwndTV, TreeView_GetNextVisible(hwndTV,
 								TreeView_GetSelection(hwndTV)), TVGN_CARET);
+			}
 			PostMessage(hwnd, WM_NEXTDLGCTL, (WPARAM)(GetDlgItem(hwnd, IDC_STYLEEDIT)), 1);
 			break;
 

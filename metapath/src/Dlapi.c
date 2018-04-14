@@ -446,9 +446,8 @@ BOOL DirList_DeleteItem(HWND hwnd, LPARAM lParam) {
 
 		CoTaskMemFree(lplvid);
 		return TRUE;
-	} else {
-		return FALSE;
 	}
+	return FALSE;
 }
 
 //=============================================================================
@@ -504,11 +503,7 @@ int CALLBACK DirList_CompareProcRw(LPARAM lp1, LPARAM lp2, LPARAM lFlags) {
 //  Sorts the listview control by the specified order
 //
 BOOL DirList_Sort(HWND hwnd, int lFlags, BOOL fRev) {
-	if (fRev) {
-		return ListView_SortItems(hwnd, DirList_CompareProcRw, lFlags);
-	} else {
-		return ListView_SortItems(hwnd, DirList_CompareProcFw, lFlags);
-	}
+	return ListView_SortItems(hwnd, (fRev? DirList_CompareProcRw : DirList_CompareProcFw), lFlags);
 }
 
 //=============================================================================
@@ -597,9 +592,8 @@ int DirList_GetItemEx(HWND hwnd, int iItem, LPWIN32_FIND_DATA pfd) {
 
 	if (NOERROR == SHGetDataFromIDList(lplvid->lpsf, lplvid->pidl, SHGDFIL_FINDDATA, pfd, sizeof(WIN32_FIND_DATA))) {
 		return iItem;
-	} else {
-		return -1;
 	}
+	return -1;
 }
 
 //=============================================================================
@@ -726,10 +720,9 @@ BOOL DirList_SelectItem(HWND hwnd, LPCWSTR lpszDisplayName, LPCWSTR lpszFullPath
 
 	if (!lpszFullPath || !lstrlen(lpszFullPath)) {
 		return FALSE;
-	} else {
-		GetShortPathName(lpszFullPath, szShortPath, MAX_PATH);
 	}
 
+	GetShortPathName(lpszFullPath, szShortPath, MAX_PATH);
 	if (!lpszDisplayName || !lstrlen(lpszDisplayName)) {
 		SHGetFileInfo(lpszFullPath, 0, &shfi, sizeof(SHFILEINFO), SHGFI_DISPLAYNAME);
 	} else {
@@ -833,9 +826,8 @@ BOOL DirList_MatchFilter(LPSHELLFOLDER lpsf, LPCITEMIDLIST pidl, PDL_FILTER pdlf
 			if (bMatchSpec) {
 				if (!pdlf->bExcludeFilter) {
 					return TRUE;
-				} else {
-					return FALSE;
 				}
+				return FALSE;
 			}
 		}
 	}
@@ -942,9 +934,8 @@ int DriveBox_Fill(HWND hwnd) {
 
 										if ((short)(SCODE_CODE(GetScode(hr))) < 0) {
 											break;
-										} else {
-											cbei2.iItem++;
 										}
+										cbei2.iItem++;
 									}
 
 									cbei.iItem = cbei2.iItem;

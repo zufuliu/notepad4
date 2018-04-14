@@ -60,9 +60,8 @@ int IniSectionGetString(LPCWSTR lpCachedIniSection, LPCWSTR lpName, LPCWSTR lpDe
 			if (StrCmpNI(p, tch, ich) == 0) {
 				lstrcpyn(lpReturnedString, p + ich, cchReturnedString);
 				return lstrlen(lpReturnedString);
-			} else {
-				p = StrEnd(p) + 1;
 			}
+			p = StrEnd(p) + 1;
 		}
 	}
 	lstrcpyn(lpReturnedString, lpDefault, cchReturnedString);
@@ -95,9 +94,8 @@ BOOL IniSectionGetBool(LPCWSTR lpCachedIniSection, LPCWSTR lpName, BOOL bDefault
 					}
 				}
 				return bDefault;
-			} else {
-				p = StrEnd(p) + 1;
 			}
+			p = StrEnd(p) + 1;
 		}
 	}
 	return bDefault;
@@ -118,12 +116,10 @@ int IniSectionGetInt(LPCWSTR lpCachedIniSection, LPCWSTR lpName, int iDefault) {
 			if (StrCmpNI(p, tch, ich) == 0) {
 				if (swscanf(p + ich, L"%i", &i) == 1) {
 					return i;
-				} else {
-					return iDefault;
 				}
-			} else {
-				p = StrEnd(p) + 1;
+				return iDefault;
 			}
+			p = StrEnd(p) + 1;
 		}
 	}
 	return iDefault;
@@ -181,18 +177,18 @@ UINT GetCurrentDPI(HWND hwnd) {
 	return dpi;
 }
 
-HBITMAP ResizeImageForCurrentDPI(HBITMAP hBmp) {
+HBITMAP ResizeImageForCurrentDPI(HBITMAP hbmp) {
 	BITMAP bmp;
-	if (g_uCurrentDPI > USER_DEFAULT_SCREEN_DPI && GetObject(hBmp, sizeof(BITMAP), &bmp)) {
+	if (g_uCurrentDPI > USER_DEFAULT_SCREEN_DPI && GetObject(hbmp, sizeof(BITMAP), &bmp)) {
 		int width = MulDiv(bmp.bmWidth, g_uCurrentDPI, USER_DEFAULT_SCREEN_DPI);
 		int height = MulDiv(bmp.bmHeight, g_uCurrentDPI, USER_DEFAULT_SCREEN_DPI);
-		HBITMAP hCopy = CopyImage(hBmp, IMAGE_BITMAP, width, height, LR_COPYRETURNORG | LR_COPYDELETEORG);
+		HBITMAP hCopy = CopyImage(hbmp, IMAGE_BITMAP, width, height, LR_COPYRETURNORG | LR_COPYDELETEORG);
 		if (hCopy != NULL) {
-			hBmp = hCopy;
+			hbmp = hCopy;
 		}
 	}
 
-	return hBmp;
+	return hbmp;
 }
 
 //=============================================================================
@@ -730,9 +726,8 @@ HDWP DeferCtlPos(HDWP hdwp, HWND hwndDlg, int nCtlId, int dx, int dy, UINT uFlag
 	MapWindowPoints(NULL, hwndDlg, (LPPOINT)&rc, 2);
 	if (uFlags & SWP_NOSIZE) {
 		return DeferWindowPos(hdwp, hwndCtl, NULL, rc.left + dx, rc.top + dy, 0, 0, SWP_NOZORDER | SWP_NOSIZE);
-	} else {
-		return DeferWindowPos(hdwp, hwndCtl, NULL, 0, 0, rc.right - rc.left + dx, rc.bottom - rc.top + dy, SWP_NOZORDER | SWP_NOMOVE);
 	}
+	return DeferWindowPos(hdwp, hwndCtl, NULL, 0, 0, rc.right - rc.left + dx, rc.bottom - rc.top + dy, SWP_NOZORDER | SWP_NOMOVE);
 }
 
 //=============================================================================
@@ -1480,7 +1475,8 @@ DWORD_PTR SHGetFileInfo2(LPCWSTR pszPath, DWORD dwFileAttributes, SHFILEINFO *ps
 			StrCatBuff(psfi->szDisplayName, PathFindExtension(pszPath), COUNTOF(psfi->szDisplayName));
 		}
 		return dw;
-	} else {
+	}
+	{
 		DWORD_PTR dw = SHGetFileInfo(pszPath, FILE_ATTRIBUTE_NORMAL, psfi, cbFileInfo, uFlags | SHGFI_USEFILEATTRIBUTES);
 		if (lstrlen(psfi->szDisplayName) < lstrlen(PathFindFileName(pszPath))) {
 			StrCatBuff(psfi->szDisplayName, PathFindExtension(pszPath), COUNTOF(psfi->szDisplayName));
@@ -1625,7 +1621,8 @@ BOOL MRU_AddFile(LPMRULIST pmru, LPCWSTR pszFile, BOOL bRelativePath, BOOL bUnex
 		if (lstrcmpi(pmru->pszItems[i], pszFile) == 0) {
 			LocalFree(pmru->pszItems[i]);
 			break;
-		} else {
+		}
+		{
 			WCHAR wchItem[MAX_PATH];
 			PathAbsoluteFromApp(pmru->pszItems[i], wchItem, COUNTOF(wchItem), TRUE);
 			if (lstrcmpi(wchItem, pszFile) == 0) {
@@ -1710,14 +1707,13 @@ int MRU_Enum(LPMRULIST pmru, int iIndex, LPWSTR pszItem, int cchItem) {
 			i++;
 		}
 		return i;
-	} else {
-		if (iIndex < 0 || iIndex > pmru->iSize - 1 || !pmru->pszItems[iIndex]) {
-			return -1;
-		} else {
-			lstrcpyn(pszItem, pmru->pszItems[iIndex], cchItem);
-			return lstrlen(pszItem);
-		}
 	}
+
+	if (iIndex < 0 || iIndex > pmru->iSize - 1 || !pmru->pszItems[iIndex]) {
+		return -1;
+	}
+	lstrcpyn(pszItem, pmru->pszItems[iIndex], cchItem);
+	return lstrlen(pszItem);
 }
 
 BOOL MRU_Load(LPMRULIST pmru) {
@@ -1878,16 +1874,16 @@ static inline BYTE *DialogTemplate_GetFontSizeField(const DLGTEMPLATE *pTemplate
 	if (*pw == (WORD) - 1) {
 		pw += 2;
 	} else {
-		while (*pw++);
+		while (*pw++){}
 	}
 
 	if (*pw == (WORD) - 1) {
 		pw += 2;
 	} else {
-		while (*pw++);
+		while (*pw++){}
 	}
 
-	while (*pw++);
+	while (*pw++){}
 
 	return (BYTE *)pw;
 }

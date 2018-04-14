@@ -37,7 +37,7 @@ INT_PTR CALLBACK GotoDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 void GotoDlg(HWND hwnd);
 
 INT_PTR CALLBACK AboutDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam);
-INT_PTR OptionsPropSheet(HWND, HINSTANCE);
+INT_PTR OptionsPropSheet(HWND hwnd, HINSTANCE hInstance);
 
 INT_PTR CALLBACK GetFilterDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam);
 BOOL GetFilterDlg(HWND hwnd);

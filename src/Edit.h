@@ -23,10 +23,6 @@
 
 #include "Sci_Position.h"
 
-// extern "C" declarations of Scintilla functions
-BOOL Scintilla_RegisterClasses(void *);
-BOOL Scintilla_ReleaseResources(void);
-
 typedef struct _editfindreplace {
 	char	szFind[512];
 	char	szReplace[512];
@@ -66,14 +62,14 @@ typedef struct _editfindreplace {
 #define SORT_COLUMN			128
 
 HWND	EditCreate(HWND hwndParent);
-void	EditSetNewText(HWND hwnd, char *lpstrText, DWORD cbText);
+void	EditSetNewText(HWND hwnd, LPCSTR lpstrText, DWORD cbText);
 BOOL	EditConvertText(HWND hwnd, UINT cpSource, UINT cpDest, BOOL bSetSavePoint);
 BOOL	EditSetNewEncoding(HWND hwnd, int iCurrentEncoding,
 						   int iNewEncoding, BOOL bNoUI, BOOL bSetSavePoint);
 
 char	*EditGetClipboardText(HWND hwnd);
 BOOL	EditCopyAppend(HWND hwnd);
-int 	EditDetectEOLMode(HWND hwnd, char *lpData, DWORD cbData);
+int 	EditDetectEOLMode(HWND hwnd, LPCSTR lpData, DWORD cbData);
 BOOL	EditLoadFile(HWND hwnd, LPCWSTR pszFile, BOOL bSkipEncodingDetection,
 					 int *iEncoding, int *iEOLMode, BOOL *pbUnicodeErr, BOOL *pbFileTooBig);
 BOOL	EditSaveFile(HWND hwnd, LPCWSTR pszFile, int iEncoding, BOOL *pbCancelDataLoss, BOOL bSaveCopy);
@@ -207,11 +203,10 @@ INT		UTF8_mbslen_bytes(LPCSTR utf8_string);
 // WideCharToMultiByte, UTF8 encoding of U+0800 to U+FFFF
 #define kMaxMultiByteCount	3
 
-#define IsUTF8Signature(p) \
-	((*(p+0) == '\xEF' && *(p+1) == '\xBB' && *(p+2) == '\xBF'))
-
-#define UTF8StringStart(p) \
-	(IsUTF8Signature(p)) ? (p+3) : (p)
+static inline BOOL IsUTF8Signature(const char *p) {
+	UINT value = (p[0] << 16) | (p[1] << 8) | p[2];
+	return value == 0xEFBBBF;
+}
 
 //void SciInitThemes(HWND hwnd);
 //LRESULT CALLBACK SciThemedWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam);
@@ -238,10 +233,10 @@ typedef struct _filevars {
 	char	tchMode[32];
 } FILEVARS, *LPFILEVARS;
 
-BOOL	FileVars_Init(char *lpData, DWORD cbData, LPFILEVARS lpfv);
+BOOL	FileVars_Init(LPCSTR lpData, DWORD cbData, LPFILEVARS lpfv);
 BOOL	FileVars_Apply(HWND hwnd, LPFILEVARS lpfv);
-BOOL	FileVars_ParseInt(char *pszData, char *pszName, int *piValue);
-BOOL	FileVars_ParseStr(char *pszData, char *pszName, char *pszValue, int cchValue);
+BOOL	FileVars_ParseInt(LPCSTR pszData, LPCSTR pszName, int *piValue);
+BOOL	FileVars_ParseStr(LPCSTR pszData, LPCSTR pszName, char *pszValue, int cchValue);
 // in EditEncoding.c
 BOOL	FileVars_IsUTF8(LPFILEVARS lpfv);
 BOOL	FileVars_IsNonUTF8(LPFILEVARS lpfv);

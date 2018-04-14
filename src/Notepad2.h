@@ -86,7 +86,7 @@ typedef struct np2params {
 
 //==== Function Declarations ==================================================
 BOOL InitApplication(HINSTANCE hInstance);
-HWND InitInstance(HINSTANCE hInstance, LPWSTR pszCmdLine, int nCmdShow);
+HWND InitInstance(HINSTANCE hInstance, LPWSTR pszCmdLine, int nShowCmd);
 BOOL ActivatePrevInst(void);
 void GetRelaunchParameters(LPWSTR szParameters, LPCWSTR lpszFile, BOOL newWind, BOOL emptyWind);
 BOOL RelaunchMultiInst(void);
@@ -99,7 +99,7 @@ void CALLBACK WatchTimerProc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTim
 void CALLBACK PasteBoardTimer(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime);
 
 void LoadSettings(void);
-void SaveSettings(BOOL);
+void SaveSettings(BOOL bSaveSettingsNow);
 void ParseCommandLine(void);
 void LoadFlags(void);
 int  CheckIniFile(LPWSTR lpszFile, LPCWSTR lpszModule);
