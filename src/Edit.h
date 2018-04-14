@@ -204,8 +204,9 @@ INT		UTF8_mbslen_bytes(LPCSTR utf8_string);
 #define kMaxMultiByteCount	3
 
 static inline BOOL IsUTF8Signature(const char *p) {
-	UINT value = (p[0] << 16) | (p[1] << 8) | p[2];
-	return value == 0xEFBBBF;
+	UINT value = (*((UNALIGNED UINT*)p)) & 0xFFFFFF;
+	// 0xEF, 0xBB, 0xBF in little endian
+	return value == 0xBFBBEF;
 }
 
 //void SciInitThemes(HWND hwnd);

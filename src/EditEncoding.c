@@ -617,7 +617,7 @@ BOOL IsUTF8(const char *pTest, int nLength) {
 
 	utf8_state current = kSTART;
 
-	const char *pt = pTest;
+	const unsigned char *pt = (const unsigned char *)pTest;
 	int len = nLength;
 
 	for (int i = 0; i < len ; i++, pt++) {
@@ -715,20 +715,21 @@ Return value :
 --*/
 INT UTF8_mbslen_bytes(LPCSTR utf8_string) {
 	INT length = 0;
+	const unsigned char *pt = (const unsigned char *)utf8_string;
 
-	while (*utf8_string) {
+	while (*pt) {
 		INT code_size;
-		BYTE byte = (BYTE)(*utf8_string);
+		BYTE ch = *pt;
 
-		if ((byte <= 0xF7) && (0 != (code_size = utf8_lengths[ byte >> 4 ]))) {
+		if ((ch <= 0xF7) && (0 != (code_size = utf8_lengths[ ch >> 4 ]))) {
 			length += code_size;
-			utf8_string += code_size;
+			pt += code_size;
 		} else {
 			/* we got an invalid byte value but need to count it,
 				 it will be later ignored during the string conversion */
 			//WARN("invalid first byte value 0x%02X in UTF-8 sequence!\n", byte);
 			length++;
-			utf8_string++;
+			pt++;
 		}
 	}
 	length++; /* include NULL terminator */
@@ -749,14 +750,15 @@ Return value :
 --*/
 INT UTF8_mbslen(LPCSTR source, INT byte_length) {
 	INT wchar_length = 0;
+	const unsigned char *pt = (const unsigned char *)utf8_string;
 
 	while (byte_length > 0) {
 		INT code_size;
-		BYTE byte = (BYTE)(*source);
+		BYTE ch = *pt;
 		/* UTF-16 can't encode 5-byte and 6-byte sequences, so maximum value
 			 for first byte is 11110111. Use lookup table to determine sequence
 			 length based on upper 4 bits of first byte */
-		if ((byte <= 0xF7) && (0 != (code_size = utf8_lengths[ byte >> 4]))) {
+		if ((ch <= 0xF7) && (0 != (code_size = utf8_lengths[ ch >> 4]))) {
 			/* 1 sequence == 1 character */
 			wchar_length++;
 
@@ -764,7 +766,7 @@ INT UTF8_mbslen(LPCSTR source, INT byte_length) {
 				wchar_length++;
 			}
 
-			source += code_size;				/* increment pointer */
+			pt += code_size;				/* increment pointer */
 			byte_length -= code_size;		/* decrement counter*/
 		} else {
 			/*
@@ -774,7 +776,7 @@ INT UTF8_mbslen(LPCSTR source, INT byte_length) {
 			*/
 			//WARN("invalid byte 0x%02X in UTF-8 sequence, skipping it!\n",
 			//		 byte);
-			source++;
+			pt++;
 			byte_length--;
 		}
 	}
