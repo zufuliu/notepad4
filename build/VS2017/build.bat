@@ -1,22 +1,22 @@
 @ECHO OFF
-rem ******************************************************************************
-rem *
-rem * Notepad2-mod
-rem *
-rem * build_vs2017.bat
-rem *   Batch file used to build Notepad2 with MSVC2017
-rem *
-rem * See License.txt for details about distribution and modification.
-rem *
-rem *                                     (c) XhmikosR 2010-2015, 2017
-rem *                                     https://github.com/XhmikosR/Notepad2-mod
-rem *
-rem ******************************************************************************
+@rem ******************************************************************************
+@rem *
+@rem * Notepad2-mod
+@rem *
+@rem * build_vs2017.bat
+@rem *   Batch file used to build Notepad2 with MSVC2017
+@rem *
+@rem * See License.txt for details about distribution and modification.
+@rem *
+@rem *                                     (c) XhmikosR 2010-2015, 2017
+@rem *                                     https://github.com/XhmikosR/Notepad2-mod
+@rem *
+@rem ******************************************************************************
 
 SETLOCAL ENABLEEXTENSIONS
 CD /D %~dp0
 
-rem Check for the help switches
+@rem Check for the help switches
 IF /I "%~1" == "help"   GOTO SHOWHELP
 IF /I "%~1" == "/help"  GOTO SHOWHELP
 IF /I "%~1" == "-help"  GOTO SHOWHELP
@@ -24,7 +24,7 @@ IF /I "%~1" == "--help" GOTO SHOWHELP
 IF /I "%~1" == "/?"     GOTO SHOWHELP
 
 
-rem Check for the first switch
+@rem Check for the first switch
 IF "%~1" == "" (
   SET "BUILDTYPE=Build"
 ) ELSE (
@@ -49,7 +49,7 @@ IF "%~1" == "" (
 
 
 :CHECKSECONDARG
-rem Check for the second switch
+@rem Check for the second switch
 IF "%~2" == "" (
   SET "ARCH=all"
 ) ELSE (
@@ -74,7 +74,7 @@ IF "%~2" == "" (
 
 
 :CHECKTHIRDARG
-rem Check for the third switch
+@rem Check for the third switch
 IF "%~3" == "" (
   SET "CONFIG=Release"
 ) ELSE (
@@ -127,7 +127,7 @@ EXIT /B
 
 
 :SubVSPath
-rem Check the building environment
+@rem Check the building environment
 FOR /f "delims=" %%A IN ('"%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe" -property installationPath -latest -requires Microsoft.Component.MSBuild Microsoft.VisualStudio.Component.VC.ATLMFC Microsoft.VisualStudio.Component.VC.Tools.x86.x64') DO SET "VS_PATH=%%A"
 EXIT /B
 
@@ -136,8 +136,7 @@ EXIT /B
 ECHO.
 TITLE Building Notepad2 with MSVC2017 - %~1 "%~2|%~3"...
 CD /D %~dp0
-"MSBuild.exe" /nologo Notepad2.sln /target:Notepad2;%~1 /property:Configuration=%~2;Platform=%~3^
- /consoleloggerparameters:Verbosity=minimal /maxcpucount /nodeReuse:true
+"MSBuild.exe" /nologo Notepad2.sln /target:Notepad2;%~1 /property:Configuration=%~2;Platform=%~3^ /consoleloggerparameters:Verbosity=minimal /maxcpucount /nodeReuse:true
 IF %ERRORLEVEL% NEQ 0 CALL :SUBMSG "ERROR" "Compilation failed!"
 EXIT /B
 
