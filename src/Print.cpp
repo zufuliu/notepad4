@@ -89,7 +89,7 @@ extern "C" BOOL EditPrint(HWND hwnd, LPCWSTR pszDocTitle, LPCWSTR pszPageFormat)
 
 	WCHAR dateString[256];
 
-	DOCINFO di = {sizeof(DOCINFO)};
+	DOCINFO di = {sizeof(DOCINFO), 0, 0, 0, 0};
 
 	LONG lengthDoc;
 	LONG lengthDocMax;
@@ -104,7 +104,9 @@ extern "C" BOOL EditPrint(HWND hwnd, LPCWSTR pszDocTitle, LPCWSTR pszPageFormat)
 	HPEN pen;
 	HPEN penOld;
 
-	PRINTDLG pdlg = { sizeof(PRINTDLG) };
+	PRINTDLG pdlg;
+	ZeroMemory(&pdlg, sizeof(PRINTDLG));
+	pdlg.lStructSize = sizeof(PRINTDLG);
 	pdlg.hwndOwner = GetParent(hwnd);
 	pdlg.hInstance = g_hInstance;
 	pdlg.Flags = PD_USEDEVMODECOPIES | PD_ALLPAGES | PD_RETURNDC;
