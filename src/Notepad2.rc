@@ -358,9 +358,9 @@ BEGIN
         MENUITEM "Code &Folding\tCtrl+Shift+Alt+F", IDM_VIEW_FOLDING
         POPUP "&Toggle Folds"
         BEGIN
-            MENUITEM "&Default\tCtrl+Shift+F",  IDM_VIEW_TOGGLEFOLDS
-            MENUITEM "&All",                    IDM_VIEW_FOLD_ALL
-            MENUITEM "&Current",                IDM_VIEW_FOLD_CURRENT
+            MENUITEM "&Default\tShift+Alt+D",   IDM_VIEW_TOGGLEFOLDS
+            MENUITEM "&All\tShift+Alt+A",       IDM_VIEW_FOLD_ALL
+            MENUITEM "&Current\tShift+Alt+C",   IDM_VIEW_FOLD_CURRENT
             MENUITEM "Level &1\tAlt+1",         IDM_VIEW_FOLD_LEVEL1
             MENUITEM "Level &2\tAlt+2",         IDM_VIEW_FOLD_LEVEL2
             MENUITEM "Level &3\tAlt+3",         IDM_VIEW_FOLD_LEVEL3
@@ -377,7 +377,7 @@ BEGIN
         MENUITEM "Zoom &Out\tCtrl+-",           IDM_VIEW_ZOOMOUT
         MENUITEM "Reset &Zoom\tCtrl+\\",        IDM_VIEW_RESETZOOM
     END
-    POPUP "S&cheme"
+    POPUP "Sche&me"
     BEGIN
         MENUITEM "Default &Text",          IDM_LANG_DEFAULT
         POPUP "&Web Source Code"
@@ -550,6 +550,7 @@ BEGIN
     "9",            IDM_VIEW_FOLD_LEVEL9,        VIRTKEY, ALT, NOINVERT
     "9",            IDM_VIEW_SHOWEOLS,      VIRTKEY, SHIFT, CONTROL, NOINVERT
     "A",            IDM_EDIT_SELECTALL,     VIRTKEY, CONTROL, NOINVERT
+    "A",            IDM_VIEW_FOLD_ALL,      VIRTKEY, SHIFT, ALT, NOINVERT
     "A",            CMD_RELOADANSI,         VIRTKEY, SHIFT, CONTROL, NOINVERT
     "B",            IDM_EDIT_FINDMATCHINGBRACE, VIRTKEY, CONTROL, NOINVERT
     "B",            IDM_EDIT_MERGEBLANKLINES, VIRTKEY, ALT, NOINVERT
@@ -558,9 +559,11 @@ BEGIN
     "C",            IDM_EDIT_COPY,          VIRTKEY, CONTROL, NOINVERT
     "C",            IDM_EDIT_COPYALL,       VIRTKEY, ALT, NOINVERT
     "C",            IDM_EDIT_HEX2CHAR,      VIRTKEY, CONTROL, ALT, NOINVERT
+    "C",            IDM_VIEW_FOLD_CURRENT,  VIRTKEY, SHIFT, ALT, NOINVERT
     "C",            IDM_EDIT_COPYLINE,      VIRTKEY, SHIFT, CONTROL, NOINVERT
     "D",            IDM_EDIT_DUPLICATELINE, VIRTKEY, CONTROL, NOINVERT
     "D",            IDM_EDIT_SELECTIONDUPLICATE, VIRTKEY, ALT, NOINVERT
+    "D",            IDM_VIEW_TOGGLEFOLDS,   VIRTKEY, SHIFT, ALT, NOINVERT
     "D",            IDM_EDIT_DELETELINE,    VIRTKEY, SHIFT, CONTROL, NOINVERT
     "D",            IDM_EDIT_NUM2DEC,       VIRTKEY, CONTROL, ALT, NOINVERT
     "E",            IDM_EDIT_COPYADD,       VIRTKEY, CONTROL, NOINVERT
@@ -569,7 +572,6 @@ BEGIN
     "F",            IDM_EDIT_FIND,          VIRTKEY, CONTROL, NOINVERT
     "F",            CMD_RECODEDEFAULT,      VIRTKEY, CONTROL, ALT, NOINVERT
     "F",            IDM_VIEW_FOLDING,       VIRTKEY, SHIFT, CONTROL, ALT, NOINVERT
-    "F",            IDM_VIEW_TOGGLEFOLDS,   VIRTKEY, SHIFT, CONTROL, NOINVERT
     "G",            IDM_EDIT_GOTOLINE,      VIRTKEY, CONTROL, NOINVERT
     "G",            IDM_VIEW_SHOWINDENTGUIDES, VIRTKEY, SHIFT, CONTROL, NOINVERT
     "H",            IDM_EDIT_REPLACE,       VIRTKEY, CONTROL, NOINVERT
