@@ -166,7 +166,7 @@ int CALLBACK BFFCallBack(HWND hwnd, UINT umsg, LPARAM lParam, LPARAM lpData) {
 //
 // GetDirectory()
 //
-BOOL GetDirectory(HWND hwndParent, int iTitle, LPWSTR pszFolder, LPCWSTR pszBase, BOOL bNewDialogStyle) {
+BOOL GetDirectory(HWND hwndParent, int iTitle, LPWSTR pszFolder, LPCWSTR pszBase) {
 	BROWSEINFO bi;
 	LPITEMIDLIST pidl;
 	WCHAR szTitle[256];
@@ -186,10 +186,7 @@ BOOL GetDirectory(HWND hwndParent, int iTitle, LPWSTR pszFolder, LPCWSTR pszBase
 	bi.pidlRoot = NULL;
 	bi.pszDisplayName = pszFolder;
 	bi.lpszTitle = szTitle;
-	bi.ulFlags = BIF_RETURNONLYFSDIRS;
-	if (bNewDialogStyle) {
-		bi.ulFlags |= BIF_NEWDIALOGSTYLE;
-	}
+	bi.ulFlags = BIF_RETURNONLYFSDIRS | BIF_NEWDIALOGSTYLE;
 	bi.lpfn = &BFFCallBack;
 	bi.lParam = (LPARAM)szBase;
 	bi.iImage = 0;
@@ -556,7 +553,7 @@ INT_PTR CALLBACK OpenWithDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPa
 	case WM_COMMAND:
 		switch (LOWORD(wParam)) {
 		case IDC_GETOPENWITHDIR: {
-			if (GetDirectory(hwnd, IDS_OPENWITH, tchOpenWithDir, tchOpenWithDir, TRUE)) {
+			if (GetDirectory(hwnd, IDS_OPENWITH, tchOpenWithDir, tchOpenWithDir)) {
 				DirList_Fill(GetDlgItem(hwnd, IDC_OPENWITHDIR), tchOpenWithDir, DL_ALLOBJECTS, NULL, FALSE, flagNoFadeHidden, DS_NAME, FALSE);
 				DirList_StartIconThread(GetDlgItem(hwnd, IDC_OPENWITHDIR));
 				ListView_EnsureVisible(GetDlgItem(hwnd, IDC_OPENWITHDIR), 0, FALSE);
@@ -729,7 +726,7 @@ INT_PTR CALLBACK FavoritesDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lP
 	case WM_COMMAND:
 		switch (LOWORD(wParam)) {
 		case IDC_GETFAVORITESDIR: {
-			if (GetDirectory(hwnd, IDS_FAVORITES, tchFavoritesDir, tchFavoritesDir, TRUE)) {
+			if (GetDirectory(hwnd, IDS_FAVORITES, tchFavoritesDir, tchFavoritesDir)) {
 				DirList_Fill(GetDlgItem(hwnd, IDC_FAVORITESDIR), tchFavoritesDir, DL_ALLOBJECTS, NULL, FALSE, flagNoFadeHidden, DS_NAME, FALSE);
 				DirList_StartIconThread(GetDlgItem(hwnd, IDC_FAVORITESDIR));
 				ListView_EnsureVisible(GetDlgItem(hwnd, IDC_FAVORITESDIR), 0, FALSE);

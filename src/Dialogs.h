@@ -35,7 +35,7 @@
 
 int 	MsgBox(int iType, UINT uIdMsg, ...);
 void	DisplayCmdLineHelp(HWND hwnd);
-BOOL	GetDirectory(HWND hwndParent, int iTitle, LPWSTR pszFolder, LPCWSTR pszBase, BOOL bNewDialogStyle);
+BOOL	GetDirectory(HWND hwndParent, int iTitle, LPWSTR pszFolder, LPCWSTR pszBase);
 INT_PTR CALLBACK AboutDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam);
 void	RunDlg(HWND hwnd, LPCWSTR lpstrDefault);
 BOOL	OpenWithDlg(HWND hwnd, LPCWSTR lpstrFile);

@@ -168,7 +168,7 @@ int flagPosParam        = 0;
 //  WinMain()
 //
 //
-int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nShowCmd) {
+int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nCmdShow) {
 	MSG    msg;
 	HWND   hwnd;
 	HACCEL hAcc;
@@ -209,7 +209,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 		return FALSE;
 	}
 
-	if ((hwnd = InitInstance(hInstance, lpCmdLine, nShowCmd)) == NULL) {
+	if ((hwnd = InitInstance(hInstance, nCmdShow)) == NULL) {
 		return FALSE;
 	}
 
@@ -254,7 +254,7 @@ BOOL InitApplication(HINSTANCE hInstance) {
 //  InitInstance()
 //
 //
-HWND InitInstance(HINSTANCE hInstance, LPWSTR pszCmdLine, int nShowCmd) {
+HWND InitInstance(HINSTANCE hInstance, int nCmdShow) {
 	RECT rc = { wi.x, wi.y, wi.x + wi.cx, wi.y + wi.cy };
 	RECT rc2;
 	MONITORINFO mi;
@@ -331,7 +331,7 @@ HWND InitInstance(HINSTANCE hInstance, LPWSTR pszCmdLine, int nShowCmd) {
 	}
 
 	if (!flagStartAsTrayIcon) {
-		ShowWindow(hwndMain, nShowCmd);
+		ShowWindow(hwndMain, nCmdShow);
 		UpdateWindow(hwndMain);
 	} else {
 		ShowWindow(hwndMain, SW_HIDE);   // trick ShowWindow()
@@ -1429,7 +1429,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			break;
 		}
 
-		if (GetDirectory(hwnd, IDS_CREATELINK, tchLinkDestination, NULL, FALSE)) {
+		if (GetDirectory(hwnd, IDS_CREATELINK, tchLinkDestination, NULL)) {
 			if (!PathCreateLnk(tchLinkDestination, dli.szFileName)) {
 				ErrorMessage(2, IDS_ERR_CREATELINK);
 			}
@@ -1576,7 +1576,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case IDM_FILE_CHANGEDIR: {
 		WCHAR tch[MAX_PATH];
 
-		if (GetDirectory(hwnd, IDS_GETDIRECTORY, tch, NULL, FALSE)) {
+		if (GetDirectory(hwnd, IDS_GETDIRECTORY, tch, NULL)) {
 			if (!ChangeDirectory(hwnd, tch, 1)) {
 				ErrorMessage(2, IDS_ERR_CD);
 			}

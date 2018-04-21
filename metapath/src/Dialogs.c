@@ -90,7 +90,7 @@ int CALLBACK BFFCallBack(HWND hwnd, UINT umsg, LPARAM lParam, LPARAM lpData) {
 //
 // GetDirectory()
 //
-BOOL GetDirectory(HWND hwndParent, int iTitle, LPWSTR pszFolder, LPCWSTR pszBase, BOOL bNewDialogStyle) {
+BOOL GetDirectory(HWND hwndParent, int iTitle, LPWSTR pszFolder, LPCWSTR pszBase) {
 	BROWSEINFO bi;
 	LPITEMIDLIST pidl;
 	WCHAR szTitle[256];
@@ -1024,7 +1024,7 @@ INT_PTR CALLBACK ProgPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam
 			GetDlgItemText(hwnd, IDC_FAVORITES, tch, COUNTOF(tch));
 			StrTrim(tch, L" \"");
 
-			if (GetDirectory(hwnd, IDS_FAVORITES, tch, tch, FALSE)) {
+			if (GetDirectory(hwnd, IDS_FAVORITES, tch, tch)) {
 				SetDlgItemText(hwnd, IDC_FAVORITES, tch);
 			}
 
@@ -1569,7 +1569,7 @@ INT_PTR CALLBACK CopyMoveDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPa
 			WCHAR tch[MAX_PATH];
 			GetDlgItemText(hwnd, IDC_DESTINATION, tch, COUNTOF(tch));
 			ExpandEnvironmentStringsEx(tch, COUNTOF(tch));
-			if (GetDirectory(hwnd, IDS_COPYMOVE, tch, tch, TRUE)) {
+			if (GetDirectory(hwnd, IDS_COPYMOVE, tch, tch)) {
 				SetDlgItemText(hwnd, IDC_DESTINATION, tch);
 			}
 			PostMessage(hwnd, WM_NEXTDLGCTL, 1, 0);
@@ -1835,7 +1835,7 @@ INT_PTR CALLBACK OpenWithDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPa
 	case WM_COMMAND:
 		switch (LOWORD(wParam)) {
 		case IDC_GETOPENWITHDIR: {
-			if (GetDirectory(hwnd, IDS_OPENWITH, tchOpenWithDir, tchOpenWithDir, TRUE)) {
+			if (GetDirectory(hwnd, IDS_OPENWITH, tchOpenWithDir, tchOpenWithDir)) {
 				DirList_Fill(GetDlgItem(hwnd, IDC_OPENWITHDIR), tchOpenWithDir, DL_ALLOBJECTS, NULL, FALSE, flagNoFadeHidden, DS_NAME, FALSE);
 				DirList_StartIconThread(GetDlgItem(hwnd, IDC_OPENWITHDIR));
 				ListView_EnsureVisible(GetDlgItem(hwnd, IDC_OPENWITHDIR), 0, FALSE);

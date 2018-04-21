@@ -27,7 +27,7 @@
 #define APPM_CENTER_MESSAGE_BOX		(WM_APP + 1)
 
 int  ErrorMessage(int iLevel, UINT uIdMsg, ...);
-BOOL GetDirectory(HWND hwndParent, int iTitle, LPWSTR pszFolder, LPCWSTR pszBase, BOOL bNewDialogStyle);
+BOOL GetDirectory(HWND hwndParent, int iTitle, LPWSTR pszFolder, LPCWSTR pszBase);
 BOOL GetDirectory2(HWND hwndParent, int iTitle, LPWSTR pszFolder, int iBase);
 
 INT_PTR CALLBACK RunDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam);
