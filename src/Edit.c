@@ -377,23 +377,21 @@ BOOL EditCopyAppend(HWND hwnd) {
 //
 // EditDetectEOLMode() - moved here to handle Unicode files correctly
 //
-int EditDetectEOLMode(HWND hwnd, LPCSTR lpData, DWORD cbData) {
+int EditDetectEOLMode(HWND hwnd, LPCSTR lpData) {
 	int iEOLMode = iLineEndings[iDefaultEOLMode];
-	LPCSTR cp = lpData;
+	LPCSTR cp = lpData ? StrPBrkA(lpData, "\r\n") : NULL;
 
 	if (!cp) {
 		return iEOLMode;
 	}
 
-	while (*cp && (*cp != '\r' && *cp != '\n')) {
-		cp++;
-	}
-
-	if (*cp == '\r' && *(cp + 1) == '\n') {
-		iEOLMode = SC_EOL_CRLF;
-	} else if (*cp == '\r' && *(cp + 1) != '\n') {
-		iEOLMode = SC_EOL_CR;
-	} else if (*cp == '\n') {
+	if (*cp == '\r') {
+		if (*(cp + 1) == '\n') {
+			iEOLMode = SC_EOL_CRLF;
+		} else {
+			iEOLMode = SC_EOL_CR;
+		}
+	} else {
 		iEOLMode = SC_EOL_LF;
 	}
 
@@ -546,7 +544,7 @@ BOOL EditLoadFile(HWND hwnd, LPCWSTR pszFile, BOOL bSkipEncodingDetection,
 		SendMessage(hwnd, SCI_SETCODEPAGE, SC_CP_UTF8, 0);
 		FileVars_Init(lpDataUTF8, cbData - 1, &fvCurFile);
 		EditSetNewText(hwnd, lpDataUTF8, cbData - 1);
-		*iEOLMode = EditDetectEOLMode(hwnd, lpDataUTF8, cbData - 1);
+		*iEOLMode = EditDetectEOLMode(hwnd, lpDataUTF8);
 		GlobalFree(lpDataUTF8);
 	} else {
 		FileVars_Init(lpData, cbData, &fvCurFile);
@@ -564,11 +562,11 @@ BOOL EditLoadFile(HWND hwnd, LPCWSTR pszFile, BOOL bSkipEncodingDetection,
 			if (utf8Sig) {
 				EditSetNewText(hwnd, lpData + 3, cbData - 3);
 				*iEncoding = CPI_UTF8SIGN;
-				*iEOLMode = EditDetectEOLMode(hwnd, lpData + 3, cbData - 3);
+				*iEOLMode = EditDetectEOLMode(hwnd, lpData + 3);
 			} else {
 				EditSetNewText(hwnd, lpData, cbData);
 				*iEncoding = CPI_UTF8;
-				*iEOLMode = EditDetectEOLMode(hwnd, lpData, cbData);
+				*iEOLMode = EditDetectEOLMode(hwnd, lpData);
 			}
 		} else {
 			UINT uCodePage = CP_UTF8;
@@ -608,12 +606,12 @@ BOOL EditLoadFile(HWND hwnd, LPCWSTR pszFile, BOOL bSkipEncodingDetection,
 
 				SendMessage(hwnd, SCI_SETCODEPAGE, SC_CP_UTF8, 0);
 				EditSetNewText(hwnd, lpData, cbData);
-				*iEOLMode = EditDetectEOLMode(hwnd, lpData, cbData);
+				*iEOLMode = EditDetectEOLMode(hwnd, lpData);
 			} else {
 				SendMessage(hwnd, SCI_SETCODEPAGE, iDefaultCodePage, 0);
 				EditSetNewText(hwnd, lpData, cbData);
 				*iEncoding = CPI_DEFAULT;
-				*iEOLMode = EditDetectEOLMode(hwnd, lpData, cbData);
+				*iEOLMode = EditDetectEOLMode(hwnd, lpData);
 			}
 		}
 	}

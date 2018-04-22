@@ -69,7 +69,7 @@ BOOL	EditSetNewEncoding(HWND hwnd, int iCurrentEncoding,
 
 char	*EditGetClipboardText(HWND hwnd);
 BOOL	EditCopyAppend(HWND hwnd);
-int 	EditDetectEOLMode(HWND hwnd, LPCSTR lpData, DWORD cbData);
+int 	EditDetectEOLMode(HWND hwnd, LPCSTR lpData);
 BOOL	EditLoadFile(HWND hwnd, LPCWSTR pszFile, BOOL bSkipEncodingDetection,
 					 int *iEncoding, int *iEOLMode, BOOL *pbUnicodeErr, BOOL *pbFileTooBig);
 BOOL	EditSaveFile(HWND hwnd, LPCWSTR pszFile, int iEncoding, BOOL *pbCancelDataLoss, BOOL bSaveCopy);
