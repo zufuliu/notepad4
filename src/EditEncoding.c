@@ -4,7 +4,6 @@
 #include <shlwapi.h>
 #include <commctrl.h>
 #include <commdlg.h>
-#include <stdio.h>
 #include "Notepad2.h"
 #include "Edit.h"
 #include "Styles.h"
