@@ -32,12 +32,8 @@ static inline int max_i(int x, int y) {
 	return (x > y) ? x : y;
 }
 
-static inline int maxmin_i(int x, int y, int z) {
-	return max_i(min_i(x, y), z);
-}
-
-static inline int minmax_i(int x, int y, int z) {
-	return min_i(max_i(x, y), z);
+static inline int clamp_i(int x, int lower, int upper) {
+	return (x < lower) ? lower : (x > upper) ? upper : x;
 }
 
 extern HINSTANCE g_hInstance;

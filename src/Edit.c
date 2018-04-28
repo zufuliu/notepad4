@@ -6245,12 +6245,12 @@ BOOL FileVars_Init(LPCSTR lpData, DWORD cbData, LPFILEVARS lpfv) {
 
 		if (!bDisableFileVariables) {
 			if (FileVars_ParseInt(tch, "tab-width", &i)) {
-				lpfv->iTabWidth = maxmin_i(i, 256, 1);
+				lpfv->iTabWidth = clamp_i(i, 1, 256);
 				lpfv->mask |= FV_TABWIDTH;
 			}
 
 			if (FileVars_ParseInt(tch, "c-basic-indent", &i)) {
-				lpfv->iIndentWidth = maxmin_i(i, 256, 0);
+				lpfv->iIndentWidth = clamp_i(i, 0, 256);
 				lpfv->mask |= FV_INDENTWIDTH;
 			}
 
@@ -6270,7 +6270,7 @@ BOOL FileVars_Init(LPCSTR lpData, DWORD cbData, LPFILEVARS lpfv) {
 			}
 
 			if (FileVars_ParseInt(tch, "fill-column", &i)) {
-				lpfv->iLongLinesLimit = maxmin_i(i, NP2_LONG_LINE_LIMIT, 0);
+				lpfv->iLongLinesLimit = clamp_i(i, 0, NP2_LONG_LINE_LIMIT);
 				lpfv->mask |= FV_LONGLINESLIMIT;
 			}
 		}
@@ -6301,12 +6301,12 @@ BOOL FileVars_Init(LPCSTR lpData, DWORD cbData, LPFILEVARS lpfv) {
 
 			if (!bDisableFileVariables) {
 				if (FileVars_ParseInt(tch, "tab-width", &i)) {
-					lpfv->iTabWidth = maxmin_i(i, 256, 1);
+					lpfv->iTabWidth = clamp_i(i, 1, 256);
 					lpfv->mask |= FV_TABWIDTH;
 				}
 
 				if (FileVars_ParseInt(tch, "c-basic-indent", &i)) {
-					lpfv->iIndentWidth = maxmin_i(i, 256, 0);
+					lpfv->iIndentWidth = clamp_i(i, 0, 256);
 					lpfv->mask |= FV_INDENTWIDTH;
 				}
 
@@ -6326,7 +6326,7 @@ BOOL FileVars_Init(LPCSTR lpData, DWORD cbData, LPFILEVARS lpfv) {
 				}
 
 				if (FileVars_ParseInt(tch, "fill-column", &i)) {
-					lpfv->iLongLinesLimit = maxmin_i(i, NP2_LONG_LINE_LIMIT, 0);
+					lpfv->iLongLinesLimit = clamp_i(i, 0, NP2_LONG_LINE_LIMIT);
 					lpfv->mask |= FV_LONGLINESLIMIT;
 				}
 			}

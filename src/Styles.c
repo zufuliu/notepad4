@@ -273,7 +273,7 @@ void Style_Load(void) {
 
 	// default scheme
 	iDefaultLexer = IniSectionGetInt(pIniSection, L"DefaultScheme", 0);
-	iDefaultLexer = minmax_i(iDefaultLexer, 0, NUMLEXERS - 1);
+	iDefaultLexer = clamp_i(iDefaultLexer, 0, NUMLEXERS - 1);
 
 	// auto select
 	bAutoSelect = IniSectionGetBool(pIniSection, L"AutoSelect", 1);
@@ -740,7 +740,7 @@ void Style_SetLexer(HWND hwnd, PEDITLEXER pLexNew) {
 		WCHAR wchStyle[COUNTOF(lexDefault.Styles[0].szValue)];
 		lstrcpyn(wchStyle, lexDefault.Styles[7 + iIdx].szValue, COUNTOF(lexDefault.Styles[0].szValue));
 
-		iValue = maxmin_i(iValue, 5, 0);
+		iValue = clamp_i(iValue, 0, 5);
 		wsprintf(lexDefault.Styles[7 + iIdx].szValue, L"size:%i", iValue);
 
 		if (Style_StrGetColor(TRUE, wchStyle, &rgb)) {
@@ -786,7 +786,7 @@ void Style_SetLexer(HWND hwnd, PEDITLEXER pLexNew) {
 		iValue = 1;
 		if (Style_StrGetSize(lexDefault.Styles[9 + iIdx].szValue, &iValue)) {
 			WCHAR wch[32];
-			iValue = maxmin_i(iValue, 3, 1);
+			iValue = clamp_i(iValue, 1, 3);
 			wsprintf(wch, L"size:%i", iValue);
 			lstrcat(wchCaretStyle, wch);
 		}
@@ -843,7 +843,7 @@ void Style_SetLexer(HWND hwnd, PEDITLEXER pLexNew) {
 	if (Style_StrGetSize(lexDefault.Styles[11 + iIdx].szValue, &iValue) && pLexNew != &lexANSI) {
 		int iAscent = 0;
 		int iDescent = 0;
-		iValue = minmax_i(iValue, 0, 64);
+		iValue = clamp_i(iValue, 0, 64);
 		wsprintf(lexDefault.Styles[11 + iIdx].szValue, L"size:%i", iValue);
 		if ((iValue & 1)) { // iValue % 2
 			iAscent++;
@@ -2264,7 +2264,7 @@ BOOL Style_StrGetAlpha(LPCWSTR lpszStyle, int *i) {
 		TrimString(tch);
 		itok = swscanf(tch, L"%i", &iValue);
 		if (itok == 1) {
-			*i = minmax_i(SC_ALPHA_TRANSPARENT, iValue, SC_ALPHA_OPAQUE);
+			*i = clamp_i(iValue, SC_ALPHA_TRANSPARENT, SC_ALPHA_OPAQUE);
 			return TRUE;
 		}
 	}

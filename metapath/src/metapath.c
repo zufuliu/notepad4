@@ -2408,10 +2408,10 @@ void LoadSettings(void) {
 	bTransparentMode = IniSectionGetBool(pIniSection, L"TransparentMode", 0);
 
 	iEscFunction = IniSectionGetInt(pIniSection, L"EscFunction", 2);
-	iEscFunction = maxmin_i(iEscFunction, 2, 0);
+	iEscFunction = clamp_i(iEscFunction, 0, 2);
 
 	iStartupDir = IniSectionGetInt(pIniSection, L"StartupDirectory", 1);
-	iStartupDir = maxmin_i(iStartupDir, 2, 0);
+	iStartupDir = clamp_i(iStartupDir, 0, 2);
 
 	if (!IniSectionGetString(pIniSection, L"Favorites", L"",
 							 tchFavoritesDir, COUNTOF(tchFavoritesDir))) {
@@ -2445,7 +2445,7 @@ void LoadSettings(void) {
 	}
 
 	nSortFlags = IniSectionGetInt(pIniSection, L"SortOptions", DS_TYPE);
-	nSortFlags = minmax_i(nSortFlags, 0, 3);
+	nSortFlags = clamp_i(nSortFlags, 0, 3);
 
 	fSortRev = IniSectionGetBool(pIniSection, L"SortReverse", 0);
 
@@ -2828,7 +2828,7 @@ void LoadFlags(void) {
 	flagNoFadeHidden = IniSectionGetBool(pIniSection, L"NoFadeHidden", 0);
 
 	flagToolbarLook = IniSectionGetInt(pIniSection, L"ToolbarLook", 0);
-	flagToolbarLook = maxmin_i(flagToolbarLook, 2, 0);
+	flagToolbarLook = clamp_i(flagToolbarLook, 0, 2);
 
 	LocalFree(pIniSection);
 }
