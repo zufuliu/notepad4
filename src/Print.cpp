@@ -38,8 +38,8 @@ extern "C" int iPrintZoom;
 extern "C" RECT pagesetupMargin;
 
 // Stored objects...
-HGLOBAL hDevMode = NULL;
-HGLOBAL hDevNames = NULL;
+HGLOBAL hDevMode = nullptr;
+HGLOBAL hDevNames = nullptr;
 
 //=============================================================================
 //
@@ -55,7 +55,7 @@ void StatusUpdatePrintPage(int iPageNum) {
 	StatusSetText(hwndStatus, 255, tch);
 	StatusSetSimple(hwndStatus, TRUE);
 
-	InvalidateRect(hwndStatus, NULL, TRUE);
+	InvalidateRect(hwndStatus, nullptr, TRUE);
 	UpdateWindow(hwndStatus);
 }
 
@@ -89,7 +89,7 @@ extern "C" BOOL EditPrint(HWND hwnd, LPCWSTR pszDocTitle, LPCWSTR pszPageFormat)
 
 	WCHAR dateString[256];
 
-	DOCINFO di = {sizeof(DOCINFO), 0, 0, 0, 0};
+	DOCINFO di = {sizeof(DOCINFO), nullptr, nullptr, nullptr, 0};
 
 	LONG lengthDoc;
 	LONG lengthDocMax;
@@ -115,7 +115,7 @@ extern "C" BOOL EditPrint(HWND hwnd, LPCWSTR pszDocTitle, LPCWSTR pszPageFormat)
 	pdlg.nMinPage = 1;
 	pdlg.nMaxPage = 0xffffU;
 	pdlg.nCopies = 1;
-	pdlg.hDC = 0;
+	pdlg.hDC = nullptr;
 	pdlg.hDevMode = hDevMode;
 	pdlg.hDevNames = hDevNames;
 
@@ -250,8 +250,8 @@ extern "C" BOOL EditPrint(HWND hwnd, LPCWSTR pszDocTitle, LPCWSTR pszPageFormat)
 	}
 
 	di.lpszDocName = pszDocTitle;
-	di.lpszOutput = 0;
-	di.lpszDatatype = 0;
+	di.lpszOutput = nullptr;
+	di.lpszDatatype = nullptr;
 	di.fwType = 0;
 	if (StartDoc(hdc, &di) < 0) {
 		DeleteDC(hdc);
@@ -267,12 +267,12 @@ extern "C" BOOL EditPrint(HWND hwnd, LPCWSTR pszDocTitle, LPCWSTR pszPageFormat)
 	// Get current date...
 	SYSTEMTIME st;
 	GetLocalTime(&st);
-	GetDateFormat(LOCALE_USER_DEFAULT, DATE_SHORTDATE, &st, NULL, dateString, 256);
+	GetDateFormat(LOCALE_USER_DEFAULT, DATE_SHORTDATE, &st, nullptr, dateString, 256);
 
 	// Get current time...
 	if (iPrintHeader == 0) {
 		WCHAR timeString[128];
-		GetTimeFormat(LOCALE_USER_DEFAULT, TIME_NOSECONDS, &st, NULL, timeString, 128);
+		GetTimeFormat(LOCALE_USER_DEFAULT, TIME_NOSECONDS, &st, nullptr, timeString, 128);
 		lstrcat(dateString, L" ");
 		lstrcat(dateString, timeString);
 	}
@@ -356,7 +356,7 @@ extern "C" BOOL EditPrint(HWND hwnd, LPCWSTR pszDocTitle, LPCWSTR pszPageFormat)
 			if (iPrintHeader < 3) {
 				ExtTextOut(hdc, frPrint.rc.left + 5, frPrint.rc.top - headerLineHeight / 2,
 						   /*ETO_OPAQUE*/0, &rcw, pszDocTitle,
-						   lstrlen(pszDocTitle), NULL);
+						   lstrlen(pszDocTitle), nullptr);
 			}
 
 			// Print date in header
@@ -366,14 +366,14 @@ extern "C" BOOL EditPrint(HWND hwnd, LPCWSTR pszDocTitle, LPCWSTR pszPageFormat)
 				GetTextExtentPoint32(hdc, dateString, lstrlen(dateString), &sizeInfo);
 				ExtTextOut(hdc, frPrint.rc.right - 5 - sizeInfo.cx, frPrint.rc.top - headerLineHeight / 2,
 						   /*ETO_OPAQUE*/0, &rcw, dateString,
-						   lstrlen(dateString), NULL);
+						   lstrlen(dateString), nullptr);
 			}
 
 			if (iPrintHeader < 3) {
 				SetTextAlign(hdc, ta);
 				pen = CreatePen(0, 1, RGB(0, 0, 0));
 				penOld = (HPEN)SelectObject(hdc, pen);
-				MoveToEx(hdc, frPrint.rc.left, frPrint.rc.top - headerLineHeight / 4, NULL);
+				MoveToEx(hdc, frPrint.rc.left, frPrint.rc.top - headerLineHeight / 4, nullptr);
 				LineTo(hdc, frPrint.rc.right, frPrint.rc.top - headerLineHeight / 4);
 				SelectObject(hdc, penOld);
 				DeleteObject(pen);
@@ -400,13 +400,13 @@ extern "C" BOOL EditPrint(HWND hwnd, LPCWSTR pszDocTitle, LPCWSTR pszPageFormat)
 				GetTextExtentPoint32(hdc, pageString, lstrlen(pageString), &sizeFooter);
 				ExtTextOut(hdc, frPrint.rc.right - 5 - sizeFooter.cx, frPrint.rc.bottom + footerLineHeight / 2,
 						   /*ETO_OPAQUE*/0, &rcw, pageString,
-						   lstrlen(pageString), NULL);
+						   lstrlen(pageString), nullptr);
 
 				SetTextAlign(hdc, ta);
 				pen = ::CreatePen(0, 1, RGB(0, 0, 0));
 				penOld = (HPEN)SelectObject(hdc, pen);
 				SetBkColor(hdc, RGB(0, 0, 0));
-				MoveToEx(hdc, frPrint.rc.left, frPrint.rc.bottom + footerLineHeight / 4, NULL);
+				MoveToEx(hdc, frPrint.rc.left, frPrint.rc.bottom + footerLineHeight / 4, nullptr);
 				LineTo(hdc, frPrint.rc.right, frPrint.rc.bottom + footerLineHeight / 4);
 				SelectObject(hdc, penOld);
 				DeleteObject(pen);
@@ -466,7 +466,7 @@ extern "C" UINT_PTR CALLBACK PageSetupHook(HWND hwnd, UINT uiMsg, WPARAM wParam,
 		GetString(IDS_PRINT_HEADER, tch, COUNTOF(tch));
 		lstrcat(tch, L"|");
 		p1 = tch;
-		while ((p2 = StrChr(p1, L'|')) != NULL) {
+		while ((p2 = StrChr(p1, L'|')) != nullptr) {
 			*p2++ = L'\0';
 			if (*p1) {
 				SendDlgItemMessage(hwnd, 32, CB_ADDSTRING, 0, (LPARAM)p1);
@@ -479,7 +479,7 @@ extern "C" UINT_PTR CALLBACK PageSetupHook(HWND hwnd, UINT uiMsg, WPARAM wParam,
 		GetString(IDS_PRINT_FOOTER, tch, COUNTOF(tch));
 		lstrcat(tch, L"|");
 		p1 = tch;
-		while ((p2 = StrChr(p1, L'|')) != NULL) {
+		while ((p2 = StrChr(p1, L'|')) != nullptr) {
 			*p2++ = L'\0';
 			if (*p1) {
 				SendDlgItemMessage(hwnd, 33, CB_ADDSTRING, 0, (LPARAM)p1);
@@ -492,7 +492,7 @@ extern "C" UINT_PTR CALLBACK PageSetupHook(HWND hwnd, UINT uiMsg, WPARAM wParam,
 		GetString(IDS_PRINT_COLOR, tch, COUNTOF(tch));
 		lstrcat(tch, L"|");
 		p1 = tch;
-		while ((p2 = StrChr(p1, L'|')) != NULL) {
+		while ((p2 = StrChr(p1, L'|')) != nullptr) {
 			*p2++ = L'\0';
 			if (*p1) {
 				SendDlgItemMessage(hwnd, 34, CB_ADDSTRING, 0, (LPARAM)p1);

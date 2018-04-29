@@ -27,9 +27,8 @@ int Scintilla_LinkLexers(void);
 #endif
 
 // Include header that defines basic numeric types.
-#if defined(_MSC_VER)
-// Older releases of MSVC did not have stdint.h.
-#include <stddef.h>
+#if defined(__cplusplus)
+#include <cstdint>
 #else
 #include <stdint.h>
 #endif
