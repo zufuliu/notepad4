@@ -99,7 +99,7 @@ BEGIN
             MENUITEM SEPARATOR
             MENUITEM "Execute &Document",           IDM_FILE_LAUNCH
             MENUITEM "&Open with...",               IDM_FILE_OPENWITH
-            MENUITEM "&Command...",                 IDM_FILE_RUN
+            MENUITEM "&Command...\tCtrl+R",         IDM_FILE_RUN
             MENUITEM SEPARATOR
             MENUITEM "Web Template &1\tCtrl+Shift+1",   CMD_WEBACTION1
             MENUITEM "Web Template &2\tCtrl+Shift+2",   CMD_WEBACTION2
@@ -208,6 +208,7 @@ BEGIN
         BEGIN
             MENUITEM "Move &Up\tAlt+Up",            IDM_EDIT_MOVELINEUP
             MENUITEM "&Move Down\tAlt+Down",        IDM_EDIT_MOVELINEDOWN
+            MENUITEM "&Transpose\tAlt+S",           IDM_EDIT_LINETRANSPOSE
             MENUITEM SEPARATOR
             MENUITEM "S&ort Lines...\tAlt+O",       IDM_EDIT_SORTLINES
             MENUITEM "&Modify Lines...\tAlt+M",     IDM_EDIT_MODIFYLINES
@@ -605,10 +606,12 @@ BEGIN
     "P",            CMD_DEFAULTWINPOS,      VIRTKEY, SHIFT, CONTROL, NOINVERT
     "Q",            IDM_EDIT_ENCLOSESELECTION, VIRTKEY, ALT, NOINVERT
     "Q",            IDM_EDIT_STREAMCOMMENT, VIRTKEY, CONTROL, NOINVERT
+    "R",            IDM_FILE_RUN,           VIRTKEY, CONTROL, NOINVERT
     "R",            IDM_EDIT_REMOVEBLANKLINES, VIRTKEY, ALT, NOINVERT
     "R",            IDM_EDIT_UNESCAPECCHARS, VIRTKEY, CONTROL, ALT, NOINVERT
     "R",            IDM_EDIT_URLDECODE,     VIRTKEY, SHIFT, CONTROL, NOINVERT
     "S",            IDM_FILE_SAVE,          VIRTKEY, CONTROL, NOINVERT
+    "S",            IDM_EDIT_LINETRANSPOSE, VIRTKEY, ALT, NOINVERT
     "S",            IDM_EDIT_CONVERTTABS2,  VIRTKEY, CONTROL, ALT, NOINVERT
     "S",            IDM_EDIT_CONVERTTABS,   VIRTKEY, SHIFT, CONTROL, NOINVERT
     "T",            IDM_VIEW_TABSETTINGS,   VIRTKEY, CONTROL, NOINVERT

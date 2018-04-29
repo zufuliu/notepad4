@@ -2053,6 +2053,7 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	//EnableCmd(hmenu, IDM_EDIT_MOVELINEUP, !bReadOnly);
 	//EnableCmd(hmenu, IDM_EDIT_MOVELINEDOWN, !bReadOnly);
+	//EnableCmd(hmenu, IDM_EDIT_LINETRANSPOSE, !bReadOnly);
 	//EnableCmd(hmenu, IDM_EDIT_DUPLICATELINE, !bReadOnly);
 	//EnableCmd(hmenu, IDM_EDIT_CUTLINE, !bReadOnly);
 	//EnableCmd(hmenu, IDM_EDIT_COPYLINE, !bReadOnly);
@@ -2863,6 +2864,10 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		EditMoveDown(hwndEdit);
 		break;
 
+	case IDM_EDIT_LINETRANSPOSE:
+		SendMessage(hwndEdit, SCI_LINETRANSPOSE, 0, 0);
+		break;
+
 	case IDM_EDIT_DUPLICATELINE:
 		SendMessage(hwndEdit, SCI_LINEDUPLICATE, 0, 0);
 		break;
@@ -3453,7 +3458,6 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 #ifdef BOOKMARK_EDITION
 	// Main Bookmark Functions
-	//case IDM_EDIT_BOOKMARKNEXT:
 	case BME_EDIT_BOOKMARKNEXT: {
 		int iPos = (int)SendMessage(hwndEdit, SCI_GETCURRENTPOS, 0, 0);
 		int iLine = (int)SendMessage(hwndEdit, SCI_LINEFROMPOSITION, iPos, 0);
@@ -3474,7 +3478,6 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	}
 	break;
 
-	//case IMD_EDIT_BOOKMARKPREV:
 	case BME_EDIT_BOOKMARKPREV: {
 		int iPos = (int)SendMessage(hwndEdit, SCI_GETCURRENTPOS, 0, 0);
 		int iLine = (int)SendMessage(hwndEdit, SCI_LINEFROMPOSITION, iPos, 0);
@@ -3496,7 +3499,6 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	}
 	break;
 
-	//case IDM_EDIT_BOOKMARKTOGGLE:
 	case BME_EDIT_BOOKMARKTOGGLE: {
 		int iPos = (int)SendMessage(hwndEdit, SCI_GETCURRENTPOS, 0, 0);
 		int iLine = (int)SendMessage(hwndEdit, SCI_LINEFROMPOSITION, iPos, 0);
@@ -3520,7 +3522,6 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	}
 	break;
 
-	//case IDM_EDIT_BOOKMARKCLEAR:
 	case BME_EDIT_BOOKMARKCLEAR:
 		SendMessage(hwndEdit, SCI_MARKERDELETEALL, (WPARAM) - 1, 0);
 		break;

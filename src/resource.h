@@ -155,8 +155,8 @@
 #define CMD_ESCAPE						20000	// Esc					None/Min To Tray/Exit
 #define CMD_SHIFTESC					20001	// Shift+Esc			Exit
 #define CMD_CTRLENTER					20002	// Ctrl+Shift+Enter		Newline with toggled auto indent setting
-#define CMD_CTRLBACK					20003	// Ctrl+Back			Left Delete
-#define CMD_CTRLDEL						20004	// Ctrl+Del				Right Delete
+#define CMD_CTRLBACK					20003	// Ctrl+Back			Delete Word Left
+#define CMD_CTRLDEL						20004	// Ctrl+Del				Delete Word Right
 #define CMD_CTRLTAB						20005	// Ctrl+Tab
 #define CMD_RECODEDEFAULT				20006	// Ctrl+Alt+F
 #define CMD_RELOADANSI					20007	// Ctrl+Shift+A
@@ -171,8 +171,8 @@
 #define CMD_WEBACTION2					20016	// Ctrl+Shift+2
 #define CMD_FINDNEXTSEL					20017	// Ctrl+F3
 #define CMD_FINDPREVSEL					20018	// Ctrl+Shift+F3
-#define CMD_INCLINELIMIT				20019	// Alt+
-#define CMD_DECLINELIMIT				20020	// Alt-
+#define CMD_INCLINELIMIT				20019	// Alt++
+#define CMD_DECLINELIMIT				20020	// Alt+-
 
 #define CMD_STRINGIFYS					20021	// Ctrl+1
 #define CMD_STRINGIFYD					20022	// Ctrl+2
@@ -204,8 +204,8 @@
 #define IDM_FILE_SAVEAS					40005	// F6
 #define IDM_FILE_SAVECOPY				40006	// Ctrl+F6
 #define IDM_FILE_READONLY				40007
-#define IDM_FILE_LAUNCH					40008	// Ctrl+L
-#define IDM_FILE_OPENWITH				40009	// Alt+L
+#define IDM_FILE_LAUNCH					40008
+#define IDM_FILE_OPENWITH				40009
 #define IDM_FILE_RUN					40010	// Ctrl+R
 #define IDM_FILE_NEWWINDOW				40011	// Alt+N
 #define IDM_FILE_NEWWINDOW2				40012	// Alt+0
@@ -217,7 +217,7 @@
 #define IDM_FILE_ADDTOFAV				40018	// Alt+K
 #define IDM_FILE_MANAGEFAV				40019	// Alt+F9
 #define IDM_FILE_RECENT					40020	// Alt+H
-#define IDM_FILE_EXIT					40021
+#define IDM_FILE_EXIT					40021	// Alt+F4
 #define IDM_FILE_RELAUNCH_ELEVATED		40022
 #define IDM_ENCODING_ANSI				40100
 #define IDM_ENCODING_UNICODE			40101
@@ -232,10 +232,7 @@
 #define IDM_LINEENDINGS_CR				40202
 #define IDM_LINEENDINGS_SETDEFAULT		40203
 
-#define IDM_EDIT_BOOKMARKTOGGLE			40250
-#define IDM_EDIT_BOOKMARKNEXT			40251
-#define IDM_EDIT_BOOKMARKCLEAR			40252
-#define IDM_EDIT_BOOKMARKPREV			40253
+#define IDM_EDIT_LINETRANSPOSE			40253	// Alt+S
 #define BME_EDIT_BOOKMARKTOGGLE			40254	// Ctrl+F2
 #define BME_EDIT_BOOKMARKNEXT			40255	// F2
 #define BME_EDIT_BOOKMARKCLEAR			40256	// Alt+F2
@@ -244,11 +241,11 @@
 #define IDM_EDIT_REDO					40301	// Ctrl+Y Ctrl+Shift+Z
 #define IDM_EDIT_CUT					40302	// Ctrl+X Shift+Del
 #define IDM_EDIT_COPY					40303	// Ctrl+C
-#define IDM_EDIT_COPYALL				40304	// Alt+C
+#define IDM_EDIT_COPYALL				40304	// Alt+A
 #define IDM_EDIT_COPYADD				40305	// Ctrl+E
 #define IDM_EDIT_PASTE					40306	// Ctrl+V
 #define IDM_EDIT_SWAP					40307	// Ctrl+K
-#define IDM_EDIT_CLEAR					40308
+#define IDM_EDIT_CLEAR					40308	// Del
 #define IDM_EDIT_CLEARCLIPBOARD			40309
 #define IDM_EDIT_SELECTALL				40310	// Ctrl+A
 #define IDM_EDIT_SELECTWORD				40311	// Ctrl+Space
@@ -265,16 +262,16 @@
 #define IDM_EDIT_SPLITLINES				40322	// Ctrl+I
 #define IDM_EDIT_JOINLINES				40323	// Ctrl+J
 #define IDM_EDIT_JOINLINESEX			40324	// Ctrl+Shift+J
-#define IDM_EDIT_INDENT					40325
-#define IDM_EDIT_UNINDENT				40326
+#define IDM_EDIT_INDENT					40325	// Tab
+#define IDM_EDIT_UNINDENT				40326	// Shift+Tab
 #define IDM_EDIT_ENCLOSESELECTION		40327	// Alt+Q
 #define IDM_EDIT_SELECTIONDUPLICATE		40328	// Alt+D
-#define IDM_EDIT_PADWITHSPACES			40329	// Alt+B
+#define IDM_EDIT_PADWITHSPACES			40329	// Alt+P
 #define IDM_EDIT_STRIP1STCHAR			40330	// Alt+Z
-#define IDM_EDIT_STRIPLASTCHAR			40331	// Alt+U
-#define IDM_EDIT_TRIMLINES				40332	// Alt+W
-#define IDM_EDIT_COMPRESSWS				40333	// Alt+P
-#define IDM_EDIT_MERGEBLANKLINES		40334	// Alt+Y
+#define IDM_EDIT_STRIPLASTCHAR			40331	// Alt+L
+#define IDM_EDIT_TRIMLINES				40332	// Alt+T
+#define IDM_EDIT_COMPRESSWS				40333	// Alt+W
+#define IDM_EDIT_MERGEBLANKLINES		40334	// Alt+B
 #define IDM_EDIT_REMOVEBLANKLINES		40335	// Alt+R
 #define IDM_EDIT_MODIFYLINES			40336	// Alt+M
 #define IDM_EDIT_SORTLINES				40337	// Alt+O
@@ -317,8 +314,8 @@
 
 #define IDM_EDIT_COPYRTF				40374	// copy as RTF
 #define IDM_EDIT_TRIMLEAD				40375	// trim leading whitespace
-#define IDM_EDIT_XHTML_ESCAPE_CHAR		40376	//
-#define IDM_EDIT_XHTML_UNESCAPE_CHAR	40377	//
+#define IDM_EDIT_XHTML_ESCAPE_CHAR		40376	// Alt+Shift+X
+#define IDM_EDIT_XHTML_UNESCAPE_CHAR	40377	// Alt+Shift+H
 #define IDM_EDIT_NUM2HEX				40378	// Ctrl+Alt+H
 #define IDM_EDIT_NUM2DEC				40379	// Ctrl+Alt+D
 
@@ -391,8 +388,8 @@
 #define IDM_VIEW_AUTOCOMPLETEWORDS		40451
 #define IDM_VIEW_AUTOCOMPLETEQUOTE		40452
 #define IDM_VIEW_FOLDING				40453	// Ctrl+Shift+Alt+F
-#define IDM_VIEW_TOGGLEFOLDS			40454	// Ctrl+Shift+F
-#define IDM_VIEW_FOLD_ALL				40455
+#define IDM_VIEW_TOGGLEFOLDS			40454	// Shift+Alt+D
+#define IDM_VIEW_FOLD_ALL				40455	// Shift+Alt+A
 #define IDM_VIEW_FOLD_LEVEL1			40456	// Alt+1
 #define IDM_VIEW_FOLD_LEVEL2			40457	// Alt+2
 #define IDM_VIEW_FOLD_LEVEL3			40458	// Alt+3
@@ -404,7 +401,7 @@
 #define IDM_VIEW_FOLD_LEVEL9			40464	// Alt+9
 #define IDM_VIEW_FOLD_LEVEL10			40465
 #define IDM_VIEW_AUTOCWITHDOCWORDS		40466
-#define IDM_VIEW_FOLD_CURRENT			40467
+#define IDM_VIEW_FOLD_CURRENT			40467	// Alt+C
 #define IDM_VIEW_SHOWCALLTIPS			40047
 #define IDM_LANG_DEFAULT				41000
 #define IDM_LANG_NULL					41060
