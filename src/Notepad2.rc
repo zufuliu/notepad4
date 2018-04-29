@@ -163,7 +163,7 @@ BEGIN
             MENUITEM "FileName and &Ext\tShift+F9",     CMD_COPYFILENAME
             MENUITEM "Full &PathName\tAlt+Shift+F9",    CMD_COPYPATHNAME
             MENUITEM SEPARATOR
-            MENUITEM "Copy A&ll\tAlt+C",            IDM_EDIT_COPYALL
+            MENUITEM "Copy A&ll\tAlt+A",            IDM_EDIT_COPYALL
             MENUITEM "Copy &Add\tCtrl+E",           IDM_EDIT_COPYADD
             MENUITEM "Copy As &RTF",                IDM_EDIT_COPYRTF
             MENUITEM SEPARATOR
@@ -360,7 +360,7 @@ BEGIN
         BEGIN
             MENUITEM "&Default\tShift+Alt+D",   IDM_VIEW_TOGGLEFOLDS
             MENUITEM "&All\tShift+Alt+A",       IDM_VIEW_FOLD_ALL
-            MENUITEM "&Current\tShift+Alt+C",   IDM_VIEW_FOLD_CURRENT
+            MENUITEM "&Current\tAlt+C",         IDM_VIEW_FOLD_CURRENT
             MENUITEM "Level &1\tAlt+1",         IDM_VIEW_FOLD_LEVEL1
             MENUITEM "Level &2\tAlt+2",         IDM_VIEW_FOLD_LEVEL2
             MENUITEM "Level &3\tAlt+3",         IDM_VIEW_FOLD_LEVEL3
@@ -550,6 +550,7 @@ BEGIN
     "9",            IDM_VIEW_FOLD_LEVEL9,        VIRTKEY, ALT, NOINVERT
     "9",            IDM_VIEW_SHOWEOLS,      VIRTKEY, SHIFT, CONTROL, NOINVERT
     "A",            IDM_EDIT_SELECTALL,     VIRTKEY, CONTROL, NOINVERT
+    "A",            IDM_EDIT_COPYALL,       VIRTKEY, ALT, NOINVERT
     "A",            IDM_VIEW_FOLD_ALL,      VIRTKEY, SHIFT, ALT, NOINVERT
     "A",            CMD_RELOADANSI,         VIRTKEY, SHIFT, CONTROL, NOINVERT
     "B",            IDM_EDIT_FINDMATCHINGBRACE, VIRTKEY, CONTROL, NOINVERT
@@ -557,9 +558,8 @@ BEGIN
     "B",            IDM_EDIT_NUM2BIN,       VIRTKEY, CONTROL, ALT, NOINVERT
     "B",            IDM_EDIT_SELTOMATCHINGBRACE, VIRTKEY, SHIFT, CONTROL, NOINVERT
     "C",            IDM_EDIT_COPY,          VIRTKEY, CONTROL, NOINVERT
-    "C",            IDM_EDIT_COPYALL,       VIRTKEY, ALT, NOINVERT
+    "C",            IDM_VIEW_FOLD_CURRENT,  VIRTKEY, ALT, NOINVERT
     "C",            IDM_EDIT_HEX2CHAR,      VIRTKEY, CONTROL, ALT, NOINVERT
-    "C",            IDM_VIEW_FOLD_CURRENT,  VIRTKEY, SHIFT, ALT, NOINVERT
     "C",            IDM_EDIT_COPYLINE,      VIRTKEY, SHIFT, CONTROL, NOINVERT
     "D",            IDM_EDIT_DUPLICATELINE, VIRTKEY, CONTROL, NOINVERT
     "D",            IDM_EDIT_SELECTIONDUPLICATE, VIRTKEY, ALT, NOINVERT
