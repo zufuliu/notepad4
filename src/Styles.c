@@ -1040,7 +1040,7 @@ PEDITLEXER __fastcall Style_SniffShebang(char *pchText) {
 			pch++;
 			name = len ? pch : name;
 		}
-		if ((pch - name) >= 3 && StrCmpNIA(name, "env", 3) == 0) {
+		if ((pch - name) >= 3 && StrCmpNIA(name, "env", 3) == 0 || StrCmpNIA(name, "winpty", 6) == 0) {
 			while (*pch == ' ' || *pch == '\t') {
 				pch++;
 			}
@@ -1056,6 +1056,7 @@ PEDITLEXER __fastcall Style_SniffShebang(char *pchText) {
 		len = pch - name;
 		pch = name;
 		while (*pch) {
+			// to lower
 			*pch |= 32;
 			if (*pch < 'a' || *pch > 'z') {
 				*pch = 0;
