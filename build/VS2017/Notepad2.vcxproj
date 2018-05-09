@@ -536,6 +536,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\scintilla\include\ILexer.h" />
+    <ClInclude Include="..\..\scintilla\include\ILoader.h" />
     <ClInclude Include="..\..\scintilla\include\Platform.h" />
     <ClInclude Include="..\..\scintilla\include\SciLexer.h" />
     <ClInclude Include="..\..\scintilla\include\Scintilla.h" />

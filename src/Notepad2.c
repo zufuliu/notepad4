@@ -2053,6 +2053,7 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	//EnableCmd(hmenu, IDM_EDIT_MOVELINEUP, !bReadOnly);
 	//EnableCmd(hmenu, IDM_EDIT_MOVELINEDOWN, !bReadOnly);
+	//EnableCmd(hmenu, IDM_EDIT_LINETRANSPOSE, !bReadOnly);
 	//EnableCmd(hmenu, IDM_EDIT_DUPLICATELINE, !bReadOnly);
 	//EnableCmd(hmenu, IDM_EDIT_CUTLINE, !bReadOnly);
 	//EnableCmd(hmenu, IDM_EDIT_COPYLINE, !bReadOnly);
@@ -2863,6 +2864,10 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		EditMoveDown(hwndEdit);
 		break;
 
+	case IDM_EDIT_LINETRANSPOSE:
+		SendMessage(hwndEdit, SCI_LINETRANSPOSE, 0, 0);
+		break;
+
 	case IDM_EDIT_DUPLICATELINE:
 		SendMessage(hwndEdit, SCI_LINEDUPLICATE, 0, 0);
 		break;
@@ -3025,7 +3030,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		}
 
 		if (ColumnWrapDlg(hwnd, IDD_COLUMNWRAP, &iWrapCol)) {
-			iWrapCol = maxmin_i(iWrapCol, 512, 1);
+			iWrapCol = clamp_i(iWrapCol, 1, 512);
 			BeginWaitCursor();
 			EditWrapToColumn(hwndEdit, iWrapCol);
 			EndWaitCursor();
@@ -3453,7 +3458,6 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 #ifdef BOOKMARK_EDITION
 	// Main Bookmark Functions
-	//case IDM_EDIT_BOOKMARKNEXT:
 	case BME_EDIT_BOOKMARKNEXT: {
 		int iPos = (int)SendMessage(hwndEdit, SCI_GETCURRENTPOS, 0, 0);
 		int iLine = (int)SendMessage(hwndEdit, SCI_LINEFROMPOSITION, iPos, 0);
@@ -3474,7 +3478,6 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	}
 	break;
 
-	//case IMD_EDIT_BOOKMARKPREV:
 	case BME_EDIT_BOOKMARKPREV: {
 		int iPos = (int)SendMessage(hwndEdit, SCI_GETCURRENTPOS, 0, 0);
 		int iLine = (int)SendMessage(hwndEdit, SCI_LINEFROMPOSITION, iPos, 0);
@@ -3496,7 +3499,6 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	}
 	break;
 
-	//case IDM_EDIT_BOOKMARKTOGGLE:
 	case BME_EDIT_BOOKMARKTOGGLE: {
 		int iPos = (int)SendMessage(hwndEdit, SCI_GETCURRENTPOS, 0, 0);
 		int iLine = (int)SendMessage(hwndEdit, SCI_LINEFROMPOSITION, iPos, 0);
@@ -3520,7 +3522,6 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	}
 	break;
 
-	//case IDM_EDIT_BOOKMARKCLEAR:
 	case BME_EDIT_BOOKMARKCLEAR:
 		SendMessage(hwndEdit, SCI_MARKERDELETEALL, (WPARAM) - 1, 0);
 		break;
@@ -3736,7 +3737,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			bMarkLongLines = TRUE;
 			SendMessage(hwndEdit, SCI_SETEDGEMODE, (iLongLineMode == EDGE_LINE) ? EDGE_LINE : EDGE_BACKGROUND, 0);
 			Style_SetLongLineColors(hwndEdit);
-			iLongLinesLimit = maxmin_i(iLongLinesLimit, NP2_LONG_LINE_LIMIT, 0);
+			iLongLinesLimit = clamp_i(iLongLinesLimit, 0, NP2_LONG_LINE_LIMIT);
 			SendMessage(hwndEdit, SCI_SETEDGECOLUMN, iLongLinesLimit, 0);
 			UpdateStatusbar();
 			iLongLinesLimitG = iLongLinesLimit;
@@ -3754,8 +3755,8 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			SendMessage(hwndEdit, SCI_SETUSETABS, !bTabsAsSpaces, 0);
 			SendMessage(hwndEdit, SCI_SETTABINDENTS, bTabIndents, 0);
 			SendMessage(hwndEdit, SCI_SETBACKSPACEUNINDENTS, bBackspaceUnindents, 0);
-			iTabWidth = maxmin_i(iTabWidth, 256, 1);
-			iIndentWidth = maxmin_i(iIndentWidth, 256, 0);
+			iTabWidth = clamp_i(iTabWidth, 1, 256);
+			iIndentWidth = clamp_i(iIndentWidth, 0, 256);
 			SendMessage(hwndEdit, SCI_SETTABWIDTH, iTabWidth, 0);
 			SendMessage(hwndEdit, SCI_SETINDENT, iIndentWidth, 0);
 			bTabsAsSpacesG = bTabsAsSpaces;
@@ -4586,7 +4587,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			} else {
 				iLongLinesLimit--;
 			}
-			iLongLinesLimit = maxmin_i(iLongLinesLimit, NP2_LONG_LINE_LIMIT, 0);
+			iLongLinesLimit = clamp_i(iLongLinesLimit, 0, NP2_LONG_LINE_LIMIT);
 			SendMessage(hwndEdit, SCI_SETEDGECOLUMN, iLongLinesLimit, 0);
 			UpdateStatusbar();
 			iLongLinesLimitG = iLongLinesLimit;
@@ -5189,19 +5190,19 @@ void LoadSettings(void) {
 	}
 
 	iPathNameFormat = IniSectionGetInt(pIniSection, L"PathNameFormat", 1);
-	iPathNameFormat = maxmin_i(iPathNameFormat, 2, 0);
+	iPathNameFormat = clamp_i(iPathNameFormat, 0, 2);
 
 	fWordWrap = IniSectionGetBool(pIniSection, L"WordWrap", 1);
 	fWordWrapG = fWordWrap;
 
 	iWordWrapMode = IniSectionGetInt(pIniSection, L"WordWrapMode", 0);
-	iWordWrapMode = maxmin_i(iWordWrapMode, 1, 0);
+	iWordWrapMode = clamp_i(iWordWrapMode, 0, 1);
 
 	iWordWrapIndent = IniSectionGetInt(pIniSection, L"WordWrapIndent", 0);
-	iWordWrapIndent = maxmin_i(iWordWrapIndent, 6, 0);
+	iWordWrapIndent = clamp_i(iWordWrapIndent, 0, 6);
 
 	iWordWrapSymbols = IniSectionGetInt(pIniSection, L"WordWrapSymbols", 22);
-	iWordWrapSymbols = maxmin_i(iWordWrapSymbols % 10, 2, 0) + maxmin_i((iWordWrapSymbols % 100 - iWordWrapSymbols % 10) / 10, 2, 0) * 10;
+	iWordWrapSymbols = clamp_i(iWordWrapSymbols % 10, 0, 2) + clamp_i((iWordWrapSymbols % 100 - iWordWrapSymbols % 10) / 10, 0, 2) * 10;
 
 	bShowWordWrapSymbols = IniSectionGetBool(pIniSection, L"ShowWordWrapSymbols", 0);
 	bMatchBraces = IniSectionGetBool(pIniSection, L"MatchBraces", 1);
@@ -5223,21 +5224,21 @@ void LoadSettings(void) {
 	bBackspaceUnindents = IniSectionGetBool(pIniSection, L"BackspaceUnindents", 0);
 
 	iTabWidth = IniSectionGetInt(pIniSection, L"TabWidth", 4);
-	iTabWidth = maxmin_i(iTabWidth, 256, 1);
+	iTabWidth = clamp_i(iTabWidth, 1, 256);
 	iTabWidthG = iTabWidth;
 
 	iIndentWidth = IniSectionGetInt(pIniSection, L"IndentWidth", 4);
-	iIndentWidth = maxmin_i(iIndentWidth, 256, 0);
+	iIndentWidth = clamp_i(iIndentWidth, 0, 256);
 	iIndentWidthG = iIndentWidth;
 
 	bMarkLongLines = IniSectionGetBool(pIniSection, L"MarkLongLines", 1);
 
 	iLongLinesLimit = IniSectionGetInt(pIniSection, L"LongLinesLimit", 80);
-	iLongLinesLimit = maxmin_i(iLongLinesLimit, NP2_LONG_LINE_LIMIT, 0);
+	iLongLinesLimit = clamp_i(iLongLinesLimit, 0, NP2_LONG_LINE_LIMIT);
 	iLongLinesLimitG = iLongLinesLimit;
 
 	iLongLineMode = IniSectionGetInt(pIniSection, L"LongLineMode", EDGE_LINE);
-	iLongLineMode = maxmin_i(iLongLineMode, EDGE_BACKGROUND, EDGE_LINE);
+	iLongLineMode = clamp_i(iLongLineMode, EDGE_LINE, EDGE_BACKGROUND);
 
 	bShowSelectionMargin = IniSectionGetBool(pIniSection, L"ShowSelectionMargin", 0);
 	bShowLineNumbers = IniSectionGetBool(pIniSection, L"ShowLineNumbers", 1);
@@ -5263,22 +5264,22 @@ void LoadSettings(void) {
 	bNoEncodingTags = IniSectionGetBool(pIniSection, L"NoEncodingTags", 0);
 
 	iDefaultEOLMode = IniSectionGetInt(pIniSection, L"DefaultEOLMode", 0);
-	iDefaultEOLMode = maxmin_i(iDefaultEOLMode, 2, 0);
+	iDefaultEOLMode = clamp_i(iDefaultEOLMode, 0, 2);
 
 	bFixLineEndings = IniSectionGetBool(pIniSection, L"FixLineEndings", 1);
 	bAutoStripBlanks = IniSectionGetBool(pIniSection, L"FixTrailingBlanks", 0);
 
 	iPrintHeader = IniSectionGetInt(pIniSection, L"PrintHeader", 1);
-	iPrintHeader = maxmin_i(iPrintHeader, 3, 0);
+	iPrintHeader = clamp_i(iPrintHeader, 0, 3);
 
 	iPrintFooter = IniSectionGetInt(pIniSection, L"PrintFooter", 0);
-	iPrintFooter = maxmin_i(iPrintFooter, 1, 0);
+	iPrintFooter = clamp_i(iPrintFooter, 0, 1);
 
 	iPrintColor = IniSectionGetInt(pIniSection, L"PrintColorMode", 3);
-	iPrintColor = maxmin_i(iPrintColor, 4, 0);
+	iPrintColor = clamp_i(iPrintColor, 0, 4);
 
 	iPrintZoom = IniSectionGetInt(pIniSection, L"PrintZoom", 10) - 10;
-	iPrintZoom = maxmin_i(iPrintZoom, 20, -10);
+	iPrintZoom = clamp_i(iPrintZoom, -10, 20);
 
 	pagesetupMargin.left = IniSectionGetInt(pIniSection, L"PrintMarginLeft", -1);
 	pagesetupMargin.left = max_i(pagesetupMargin.left, -1);
@@ -5295,12 +5296,12 @@ void LoadSettings(void) {
 	bSaveBeforeRunningTools = IniSectionGetBool(pIniSection, L"SaveBeforeRunningTools", 0);
 
 	iFileWatchingMode = IniSectionGetInt(pIniSection, L"FileWatchingMode", 0);
-	iFileWatchingMode = maxmin_i(iFileWatchingMode, 2, 0);
+	iFileWatchingMode = clamp_i(iFileWatchingMode, 0, 2);
 
 	bResetFileWatching = IniSectionGetBool(pIniSection, L"ResetFileWatching", 0);
 
 	iEscFunction = IniSectionGetInt(pIniSection, L"EscFunction", 0);
-	iEscFunction = maxmin_i(iEscFunction, 2, 0);
+	iEscFunction = clamp_i(iEscFunction, 0, 2);
 
 	bAlwaysOnTop = IniSectionGetBool(pIniSection, L"AlwaysOnTop", 0);
 	bMinimizeToTray = IniSectionGetBool(pIniSection, L"MinimizeToTray", 0);
@@ -6228,7 +6229,7 @@ void LoadFlags(void) {
 
 	flagNoFadeHidden = IniSectionGetBool(pIniSection, L"NoFadeHidden", 0);
 	flagToolbarLook = IniSectionGetInt(pIniSection, L"ToolbarLook", IsWinXPAndAbove() ? 1 : 2);
-	flagToolbarLook = maxmin_i(flagToolbarLook, 2, 0);
+	flagToolbarLook = clamp_i(flagToolbarLook, 0, 2);
 
 	flagSimpleIndentGuides = IniSectionGetBool(pIniSection, L"SimpleIndentGuides", 0);
 	fNoHTMLGuess = IniSectionGetBool(pIniSection, L"NoHTMLGuess", 0);

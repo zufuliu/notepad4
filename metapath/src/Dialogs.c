@@ -2237,7 +2237,7 @@ INT_PTR CALLBACK FindTargetDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 
 		if (iUseTargetApplication) {
 			int i = iTargetApplicationMode;
-			i = maxmin_i(2, i, 0);
+			i = clamp_i(i, 0, 2);
 			CheckRadioButton(hwnd, IDC_ALWAYSRUN, IDC_USEDDE, IDC_ALWAYSRUN + i);
 		}
 

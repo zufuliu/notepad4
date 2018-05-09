@@ -557,7 +557,7 @@ void CenterDlgInParentEx(HWND hDlg, HWND hParent) {
 		y = rcParent.top + 60;
 	}
 
-	SetWindowPos(hDlg, NULL, maxmin_i(xMax, x, xMin), maxmin_i(yMax, y, yMin), 0, 0, SWP_NOZORDER | SWP_NOSIZE);
+	SetWindowPos(hDlg, NULL, clamp_i(x, xMin, xMax), clamp_i(y, yMin, yMax), 0, 0, SWP_NOZORDER | SWP_NOSIZE);
 }
 
 // Why doesn’t the "Automatically move pointer to the default button in a dialog box"
@@ -634,7 +634,7 @@ void SetDlgPos(HWND hDlg, int xDlg, int yDlg) {
 	x = rcParent.left + xDlg;
 	y = rcParent.top + yDlg;
 
-	SetWindowPos(hDlg, NULL, maxmin_i(xMax, x, xMin), maxmin_i(yMax, y, yMin), 0, 0, SWP_NOZORDER | SWP_NOSIZE);
+	SetWindowPos(hDlg, NULL, clamp_i(x, xMin, xMax), clamp_i(y, yMin, yMax), 0, 0, SWP_NOZORDER | SWP_NOSIZE);
 }
 
 //=============================================================================

@@ -5,6 +5,7 @@
   <VirtualDirectory Name="Scintilla">
     <VirtualDirectory Name="include">
       <File Name="../../scintilla/include/ILexer.h"/>
+      <File Name="../../scintilla/include/ILoader.h"/>
       <File Name="../../scintilla/include/Platform.h"/>
       <File Name="../../scintilla/include/Sci_Position.h"/>
       <File Name="../../scintilla/include/SciLexer.h"/>

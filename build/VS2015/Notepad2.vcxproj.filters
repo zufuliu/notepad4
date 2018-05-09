@@ -464,6 +464,9 @@
     <ClInclude Include="..\..\scintilla\include\ILexer.h">
       <Filter>Scintilla\include</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\scintilla\include\ILoader.h">
+      <Filter>Scintilla\include</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\scintilla\include\Platform.h">
       <Filter>Scintilla\include</Filter>
     </ClInclude>
