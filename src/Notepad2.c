@@ -124,6 +124,7 @@ BOOL	bTabsAsSpacesG;
 BOOL	bTabIndents;
 BOOL	bTabIndentsG;
 BOOL	bBackspaceUnindents;
+int		iZoomLevel;
 int		iTabWidth;
 int		iTabWidthG;
 int		iIndentWidth;
@@ -1415,6 +1416,7 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	hwndEdit = EditCreate(hwnd);
 	InitScintillaHandle(hwndEdit);
 
+	SendMessage(hwndEdit, SCI_SETZOOM, iZoomLevel, 0);
 	// Tabs
 	SendMessage(hwndEdit, SCI_SETUSETABS, !bTabsAsSpaces, 0);
 	SendMessage(hwndEdit, SCI_SETTABINDENTS, bTabIndents, 0);
@@ -3982,16 +3984,19 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	case IDM_VIEW_ZOOMIN:
 		SendMessage(hwndEdit, SCI_ZOOMIN, 0, 0);
+		iZoomLevel = (int)SendMessage(hwndEdit, SCI_GETZOOM, 0, 0);
 		//UpdateLineNumberWidth();
 		break;
 
 	case IDM_VIEW_ZOOMOUT:
 		SendMessage(hwndEdit, SCI_ZOOMOUT, 0, 0);
+		iZoomLevel = (int)SendMessage(hwndEdit, SCI_GETZOOM, 0, 0);
 		//UpdateLineNumberWidth();
 		break;
 
 	case IDM_VIEW_RESETZOOM:
 		SendMessage(hwndEdit, SCI_SETZOOM, 0, 0);
+		iZoomLevel = 0;
 		//UpdateLineNumberWidth();
 		break;
 
@@ -5222,6 +5227,7 @@ void LoadSettings(void) {
 	bTabIndentsG = bTabIndents;
 
 	bBackspaceUnindents = IniSectionGetBool(pIniSection, L"BackspaceUnindents", 0);
+	iZoomLevel = IniSectionGetInt(pIniSection, L"ZoomLevel", 0);
 
 	iTabWidth = IniSectionGetInt(pIniSection, L"TabWidth", 4);
 	iTabWidth = clamp_i(iTabWidth, 1, 256);
@@ -5472,6 +5478,7 @@ void SaveSettings(BOOL bSaveSettingsNow) {
 	IniSectionSetBool(pIniSection, L"TabsAsSpaces", bTabsAsSpacesG);
 	IniSectionSetBool(pIniSection, L"TabIndents", bTabIndentsG);
 	IniSectionSetBool(pIniSection, L"BackspaceUnindents", bBackspaceUnindents);
+	IniSectionSetInt(pIniSection, L"ZoomLevel", iZoomLevel);
 	IniSectionSetInt(pIniSection, L"TabWidth", iTabWidthG);
 	IniSectionSetInt(pIniSection, L"IndentWidth", iIndentWidthG);
 	IniSectionSetBool(pIniSection, L"MarkLongLines", bMarkLongLines);
