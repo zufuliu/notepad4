@@ -221,33 +221,11 @@ static inline BOOL IsStringFormatChar(int ch, int style) {
 	return FALSE;
 }
 
-#define make_switch_key(length, ch)	(((length) << 8) | (ch))
-
 static inline BOOL NeedSpaceAfterKeyword(const char *word, int length) {
-	if (length < 2 || length > 12) {
-		return FALSE;
-	}
-	switch (make_switch_key(length, word[0])) {
-	case make_switch_key(2, 'i'):
-		return word[1] == 'f';
-	case make_switch_key(3, 'f'):
-		return (word[1] == 'o' && word[2] == 'r');
-	case make_switch_key(3, 't'):
-		return (word[1] == 'r' && word[2] == 'y');
-	case make_switch_key(5, 'u'):
-		return memcmp(word, "using", 5) == 0;
-	case make_switch_key(5, 'w'):
-		return memcmp(word, "while", 5) == 0;
-	case make_switch_key(6, 'e'):
-		return memcmp(word, "elseif", 6) == 0;
-	case make_switch_key(6, 's'):
-		return memcmp(word, "switch", 6) == 0;
-	case make_switch_key(7, 'f'):
-		return memcmp(word, "foreach", 7) == 0;
-	case make_switch_key(12, 's'):
-		return memcmp(word, "synchronized", 12) == 0;
-	}
-	return FALSE;
+	const char *p = StrStrA(
+		" if for try using while elseif switch foreach synchronized "
+		, word);
+	return p != NULL && p[-1] == ' ' && p[length] == ' ';
 }
 
 void AutoC_AddDocWord(HWND hwnd, struct WordList *pWList, BOOL bIgnore) {
@@ -728,28 +706,12 @@ void EditAutoCloseBraceQuote(HWND hwnd, int ch) {
 }
 
 static inline BOOL IsHtmlVoidTag(const char *word, int length) {
-	if (length < 2 || length > 5) {
-		return FALSE;
-	}
-	switch (make_switch_key(length, word[0])) {
-	case make_switch_key(2, 'b'):
-		return word[1] == 'r';
-	case make_switch_key(2, 'h'):
-		return word[1] == 'r';
-	case make_switch_key(3, 'i'):
-		return (word[1] == 'm' && word[2] == 'g');
-	case make_switch_key(4, 'b'):
-		return (word[1] == 'a' && word[2] == 's' && word[3] == 'e');
-	case make_switch_key(4, 'l'):
-		return (word[1] == 'i' && word[2] == 'n' && word[3] == 'k');
-	case make_switch_key(4, 'm'):
-		return (word[1] == 'e' && word[2] == 't' && word[3] == 'a');
-	case make_switch_key(5, 'e'):
-		return memcmp(word, "embed", 5) == 0;
-	case make_switch_key(5, 'i'):
-		return memcmp(word, "input", 5) == 0;
-	}
-	return FALSE;
+	// see classifyTagHTML() in LexHTML.cxx
+	const char *p = StrStrIA(
+		// void elements
+		" area base basefont br col command embed frame hr img input isindex keygen link meta param source track wbr "
+		, word);
+	return p != NULL && p[-1] == ' ' && p[length] == ' ';
 }
 
 void EditAutoCloseXMLTag(HWND hwnd) {
@@ -807,9 +769,11 @@ void EditAutoCloseXMLTag(HWND hwnd) {
 
 			iHelper = cchIns > 3;
 			if (iHelper && pLexCurrent->iLexer == SCLEX_HTML) {
+				tchIns[cchIns - 1] = '\0';
 				iHelper = !IsHtmlVoidTag(tchIns + 2, cchIns - 3);
 			}
 			if (iHelper) {
+				tchIns[cchIns - 1] = '>';
 				autoClosed = TRUE;
 				SendMessage(hwnd, SCI_BEGINUNDOACTION, 0, 0);
 				SendMessage(hwnd, SCI_REPLACESEL, 0, (LPARAM)tchIns);

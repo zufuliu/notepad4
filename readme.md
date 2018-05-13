@@ -44,7 +44,7 @@
 	* GraphViz Dot
 	* Groovy
 	* Haxe
-	* HTML
+	* [HTML](../master/tools/lang/html.html), up to 5.2.
 		* ASP
 		* ASP.NET
 		* JSP

@@ -67,7 +67,7 @@ static script_type segIsScriptingIndicator(Accessor &styler, Sci_PositionU start
 		return eScriptVBS;
 	if (strstr(s, "pyth"))
 		return eScriptPython;
-	if (strstr(s, "javas"))
+	if (strstr(s, "javas") || strstr(s, "ecmas") || strstr(s, "module"))
 		return eScriptJS;
 	if (strstr(s, "jscr"))
 		return eScriptJS;
@@ -573,12 +573,13 @@ static Sci_Position FindPhpStringDelimiter(char *phpStringDelimiter, const int p
 
 static void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists,
                                   Accessor &styler, bool isXml) {
-	const WordList &keywords = *keywordLists[0];
+	const WordList &keywords_Tag = *keywordLists[0];
 	const WordList &keywords_JS = *keywordLists[1];
 	const WordList &keywords_VBS = *keywordLists[2];
 	const WordList &keywords_PY = *keywordLists[3];
 	const WordList &keywords_PHP = *keywordLists[4];
 	const WordList &keywords_SGML = *keywordLists[5]; // SGML (DTD)
+	const WordList &keywords_Attr = *keywordLists[6];
 
 	styler.StartAt(startPos);
 	char prevWord[256];
@@ -1418,7 +1419,7 @@ static void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, i
 		case SCE_H_TAGUNKNOWN:
 			if (!setTagContinue.Contains(ch) && !((ch == '/') && (chPrev == '<'))) {
 				int eClass = classifyTagHTML(styler.GetStartSegment(),
-					i - 1, keywords, styler, tagDontFold, caseSensitive, isXml, allowScripts);
+					i - 1, keywords_Tag, styler, tagDontFold, caseSensitive, isXml, allowScripts);
 				if (eClass == SCE_H_SCRIPT || eClass == SCE_H_COMMENT) {
 					if (!tagClosing) {
 						inScriptType = eNonHtmlScript;
@@ -1478,7 +1479,7 @@ static void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, i
 					if ((scriptLanguagePrev != scriptLanguage) && (scriptLanguage == eScriptNone))
 						inScriptType = eHtml;
 				}
-				classifyAttribHTML(styler.GetStartSegment(), i - 1, keywords, styler);
+				classifyAttribHTML(styler.GetStartSegment(), i - 1, keywords_Attr, styler);
 				if (ch == '>') {
 					styler.ColourTo(i, SCE_H_TAG);
 					if (inScriptType == eNonHtmlScript) {

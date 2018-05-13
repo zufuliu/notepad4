@@ -5,54 +5,20 @@ static KEYWORDLIST Keywords_HTML = {{
 // Tag
 "!doctype !DOCTYPE a abbr address area article aside audio b base bdi bdo "
 "blockquote body br button canvas caption cite code col colgroup command datalist "
-"dd del details dfn dialog div dl dt em embed fieldset figcaption figure footer "
+"data dd del details dfn dialog div dl dt em embed fieldset figcaption figure footer "
 "form h1 h2 h3 h4 h5 h6 head header hgroup hr html i iframe img input ins kbd "
-"keygen label legend li link map mark menu meta meter nav noscript object ol "
-"optgroup option output p param pre progress q rp rt ruby s samp script section "
-"select small source span strong style sub summary sup table tbody td textarea "
+"keygen label legend li link main map mark meta meter nav noscript object ol "
+"optgroup option output p param picture pre progress q rb rp rt rtc ruby s samp script section "
+"select small source span strong style sub summary sup table tbody td template textarea "
 "tfoot th thead time title tr track u ul var video wbr "
 "math svg "
+
 // Other Tag
-"acronym applet basefont big center font frame frameset isindex noframes strike tt "
-"datagrid datatemplate dir eventsource "
-// Attribute
-"abbr accept accept-charset accesskey action alt async autocomplete autofocus autoplay "
-"border challenge charset checked cite class cols colspan command content "
-"contenteditable contextmenu controls coords crossorigin data datetime default "
-"defer dir dirname disabled draggable dropzone enctype for form formaction "
-"formenctype formmethod formnovalidate formtarget headers height hidden high href hreflang "
-"http-equiv icon id ismap keytype kind label lang list loop low manifest max "
-"maxlength media mediagroup method min multiple muted name novalidate open "
-"optimum pattern placeholder poster preload radiogroup readonly rel required "
-"reversed rows rowspan sandbox spellcheck scope scoped seamless selected shape size span "
-"src srcdoc srclang start step style tabindex target title translate type "
-"typemustmatch usemap value width wrap "
-// Event Handle
-"onabort onafterprint onbeforeprint onbeforeunload onblur oncancel oncanplay oncanplaythrough onchange onclick onclose "
-"oncontextmenu oncuechange ondblclick ondrag ondragend ondragenter ondragleave "
-"ondragover ondragstart ondrop ondurationchange onemptied onended onerror "
-"onfocus onhashchange oninput oninvalid onkeydown onkeypress onkeyup onload onloadeddata "
-"onloadedmetadata onloadstart onmousedown onmousemove onmouseout onmouseover "
-"onmouseup onmousewheel onoffline ononline onpagehide onpageshow onpause onplay onplaying onprogress onratechange onreset "
-"onscroll onseeked onseeking onselect onshow onstalled onstorage onsubmit onsuspend "
-"ontimeupdate onvolumechange onunload onvolumechange onwaiting "
-// Other Attribute
-"align alink and archive axis background bb bgcolor bordercolor cellpadding "
-"cellspacing char charoff classid clear codebase codetype color "
-"compact datafld dataformatas datapagesize datasrc declare event face file "
-"frameborder hspace image isindex language leftmargin longdesc "
-"marginheight marginwidth noframes nohref noresize noshade nowrap "
-"onformchange onforminput onmessage onpopstate onreadystatechange onredo onresize onundo "
-"password ping profile prompt pubdate public  rev rules scheme "
-"scrolling sizes standby strike text topmargin tt "
-"valign valuetype version vlink vspace xml xmlns "
-// Value
-"on off true false anonymous use-credentials ltr rtl auto "
-"application/x-www-form-urlencoded multipart/form-data text/plain GET POST "
-"subtitles captions descriptions chapters metadata none "
-"allow-forms allow-popups allow-same-origin allow-scripts allow-top-navigation "
-"row col rowgroup colgroup circle default poly rect any yes no submit reset button "
-"command checkbox radio context toolbar soft hard "
+"datagrid datatemplate eventsource "
+
+// Obsolete Elements
+"applet acronym bgsound basefont big blink center dir font frame frameset isindex listing "
+"marquee menu menuitem multicol nobr noembed noframes plaintext spacer strike tt xmp "
 
 , // 1 JavaScript
 "async await break case catch class const continue debugger default delete do else export extends finally for function if import in "
@@ -92,7 +58,72 @@ static KEYWORDLIST Keywords_HTML = {{
 
 , // 5 SGML DTD
 ""
-, "", "", ""
+
+, // 6 Attribute
+// Attribute
+"abbr accept accept-charset accesskey action allowfullscreen allowpaymentrequest alt async autocomplete autofocus autoplay "
+"border challenge charset checked cite class cols colspan command content "
+"contenteditable contextmenu controls coords crossorigin data datetime default "
+"defer dir dirname disabled download draggable dropzone enctype for form formaction "
+"formenctype formmethod formnovalidate formtarget headers height hidden high href hreflang "
+"http-equiv icon id ismap keytype kind label lang list longdesc loop low nonce minlength manifest max "
+"maxlength media mediagroup method min multiple muted name novalidate open "
+"optimum pattern placeholder poster preload radiogroup readonly referrerpolicy rel required "
+"rev reversed rows rowspan sandbox sizes spellcheck scope scoped seamless selected shape size span "
+"src srcdoc srclang srcset start step style tabindex target title translate type "
+"typemustmatch usemap value width wrap "
+
+// Other Attribute
+"and bb face file password ping prompt pubdate public strike tt "
+"xml xmlns "
+
+// Obsolete Attributes
+"align alink allowtransparency archive axis background bgcolor border bottommargin bordercolor cellpadding cellspacing "
+"char charoff classid clear code codebase codetype color "
+"compact datafld dataformatas datapagesize datasrc declare event "
+"frame frameborder framespacing hspace image isindex language leftmargin link lowsrc "
+"marginheight marginwidth methods noframes nohref noresize noshade nowrap "
+"profile rightmargin rules scheme summary "
+"scrolling standby text topmargin "
+"urn valign valuetype version vlink vspace "
+
+// Event Handle
+"onaddtrack onabort onafterprint onauxclick onbeforeprint onbeforeunload onblur oncancel oncanplay oncanplaythrough onchange onclick onclose "
+"oncontextmenu oncopy oncuechange oncut ondblclick ondrag ondragend ondragenter ondragexit ondragleave "
+"ondragover ondragstart ondrop ondurationchange onemptied onended onerror onenter onexit "
+"onformchange onforminput onmessage onpopstate onreadystatechange onredo onresize onundo "
+"onfocus onhashchange oninput oninvalid onkeydown onkeypress onkeyup onlanguagechange onload onloadeddata "
+"onloadedmetadata onloadend onloadstart onmousedown onmouseenter onmouseleave onmousemove onmouseout onmouseover "
+"onmouseup onmousewheel onwheel onoffline ononline onpagehide onpageshow onpause onplay onplaying onprogress onpaste onratechange onrejectionhandled onremovetrack onreset "
+"onscroll onseeked onseeking onselect onshow onstalled onstorage onsubmit onsuspend "
+"ontimeupdate ontoggle onvolumechange onunhandledrejection onunload onwaiting "
+
+, // 7 Value
+// Link types
+"alternate author bookmark external help icon license next nofollow noopener noreferrer prev search stylesheet tag "
+"about blob data http https mailto sms urn tel "
+"_blank _self _parent _top "
+// referrerpolicy, crossorigin
+"no-referrer no-referrer-when-downgrade unsafe-url origin-when-cross-origin " "anonymous use-credentials "
+// http-equiv
+"content-language content-type default-style refresh set-cookie content-security-policy "
+// ol
+"decimal lower-alpha upper-alpha lower-roman upper-roman "
+// media preload, kind
+"none metadata auto " "subtitles captions descriptions chapters metadata "
+// area shape
+"circle circ default poly polygon rect rectangle "
+// input type
+"hidden text search tel url email password date month week time datetime-local number range color checkbox radio file submit image reset button "
+
+// Other Value, dir
+"on off true false yes no " "ltr rtl auto "
+"application/x-www-form-urlencoded multipart/form-data text/plain GET POST "
+"text/javascript module text/xml text/css application/octet-stream application/xml audio video image "
+"allow-forms allow-popups allow-same-origin allow-scripts allow-top-navigation "
+"row col rowgroup colgroup any "
+"command context toolbar soft hard "
+, ""
 
 , "", "", "", "", "", "", ""
 }};
