@@ -808,7 +808,7 @@ static void DrawTextBlob(Surface *surface, const ViewStyle &vsDraw, const PRecta
 		surface->FillRectangle(rcSegment, textBack);
 	}
 	FontAlias ctrlCharsFont = vsDraw.styles[STYLE_CONTROLCHAR].font;
-	const int normalCharHeight = static_cast<int>(ceil(vsDraw.styles[STYLE_CONTROLCHAR].capitalHeight));
+	const int normalCharHeight = static_cast<int>(std::ceil(vsDraw.styles[STYLE_CONTROLCHAR].capitalHeight));
 	PRectangle rcCChar = rcSegment;
 	rcCChar.left = rcCChar.left + 1;
 	rcCChar.top = rcSegment.top + vsDraw.maxAscent - normalCharHeight;
@@ -1805,10 +1805,10 @@ void EditView::DrawForeground(Surface *surface, const EditModel &model, const Vi
 				rcUL.top = rcUL.top + vsDraw.maxAscent + 1;
 				rcUL.bottom = rcUL.top + 1;
 				surface->FillRectangle(rcUL, textFore);
-// added 2011-12-20 <strike></strike>
+			// Added strike style, 2011-12-20
 			} else if (vsDraw.styles[styleMain].strike) {
 				PRectangle rcUL = rcSegment;
-				rcUL.top = (rcUL.top + rcUL.bottom)/2;
+				rcUL.top = rcUL.top + std::ceil((rcUL.bottom - rcUL.top)/2) + 1;
 				rcUL.bottom = rcUL.top + 1;
 				surface->FillRectangle(rcUL, textFore);
 			}

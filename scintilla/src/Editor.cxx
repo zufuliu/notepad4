@@ -5646,6 +5646,10 @@ void Editor::StyleSetMessage(unsigned int iMessage, uptr_t wParam, sptr_t lParam
 	case SCI_STYLESETUNDERLINE:
 		vs.styles[wParam].underline = lParam != 0;
 		break;
+	// Added strike style, 2011-12-20
+	case SCI_STYLESETSTRIKE:
+		vs.styles[wParam].strike = lParam != 0;
+		break;
 	case SCI_STYLESETCASE:
 		vs.styles[wParam].caseForce = static_cast<Style::ecaseForced>(lParam);
 		break;
@@ -5689,6 +5693,9 @@ sptr_t Editor::StyleGetMessage(unsigned int iMessage, uptr_t wParam, sptr_t lPar
 		return StringResult(lParam, vs.styles[wParam].fontName);
 	case SCI_STYLEGETUNDERLINE:
 		return vs.styles[wParam].underline ? 1 : 0;
+	// Added strike style, 2011-12-20
+	case SCI_STYLEGETSTRIKE:
+		return vs.styles[wParam].strike ? 1 : 0;
 	case SCI_STYLEGETCASE:
 		return static_cast<int>(vs.styles[wParam].caseForce);
 	case SCI_STYLEGETCHARACTERSET:
@@ -7001,6 +7008,7 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 	case SCI_STYLESETSIZEFRACTIONAL:
 	case SCI_STYLESETFONT:
 	case SCI_STYLESETUNDERLINE:
+	case SCI_STYLESETSTRIKE:
 	case SCI_STYLESETCASE:
 	case SCI_STYLESETCHARACTERSET:
 	case SCI_STYLESETVISIBLE:
@@ -7019,6 +7027,7 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 	case SCI_STYLEGETSIZEFRACTIONAL:
 	case SCI_STYLEGETFONT:
 	case SCI_STYLEGETUNDERLINE:
+	case SCI_STYLEGETSTRIKE:
 	case SCI_STYLEGETCASE:
 	case SCI_STYLEGETCHARACTERSET:
 	case SCI_STYLEGETVISIBLE:
