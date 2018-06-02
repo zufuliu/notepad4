@@ -1040,7 +1040,7 @@ PEDITLEXER __fastcall Style_SniffShebang(char *pchText) {
 			pch++;
 			name = len ? pch : name;
 		}
-		if ((pch - name) >= 3 && StrCmpNIA(name, "env", 3) == 0 || StrCmpNIA(name, "winpty", 6) == 0) {
+		if ((pch - name) >= 3 && (StrCmpNIA(name, "env", 3) == 0 || StrCmpNIA(name, "winpty", 6) == 0)) {
 			while (*pch == ' ' || *pch == '\t') {
 				pch++;
 			}
