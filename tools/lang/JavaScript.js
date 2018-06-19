@@ -494,6 +494,7 @@ Proxy(target, handler) {
 }
 
 // https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest
+// https://xhr.spec.whatwg.org/
 XMLHttpRequest() {
 	UNSENT
 	OPENED
@@ -520,6 +521,20 @@ XMLHttpRequest() {
 	overrideMimeType(mimeType)
 	send(body)
 	setRequestHeader(header, value)
+}
+
+// https://developer.mozilla.org/en-US/docs/Web/API/FormData
+// https://xhr.spec.whatwg.org/#formdata
+FormData([form]) {
+	append(name, value [, filename])
+	delete(name)
+	delete(name)
+	get(name)
+	getAll(name)
+	has(name)
+	keys()
+	set(name, value [, filename])
+	values()
 }
 
 // https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope

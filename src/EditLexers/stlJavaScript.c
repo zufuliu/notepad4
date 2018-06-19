@@ -34,7 +34,7 @@ static KEYWORDLIST Keywords_JS = {{
 "arguments ActiveXObject ConversionError Debug Enumerator VBArray WScript WinRTError "
 // HTML DOM
 //
-"XMLHttpRequest jQuery "
+"XMLHttpRequest FormData jQuery "
 
 , // 6 Interface
 ""
@@ -132,6 +132,8 @@ static KEYWORDLIST Keywords_JS = {{
 "getElementById() getElementsByClassName() getElementsByName() getElementsByTagName() "
 // XMLHttpRequest
 "abort() getAllResponseHeaders() getResponseHeader() open() overrideMimeType() send() setRequestHeader() "
+// FormData
+"append() getAll() "
 // Storage
 "getItem() key() removeItem() setItem() "
 , "", "", ""
