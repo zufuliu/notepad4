@@ -5352,6 +5352,39 @@ void LoadSettings(void) {
 	xFindReplaceDlg = IniSectionGetInt(pIniSection, L"FindReplaceDlgPosX", 0);
 	yFindReplaceDlg = IniSectionGetInt(pIniSection, L"FindReplaceDlgPosY", 0);
 
+	if (bSaveFindReplace) {
+		efrData.fuFlags = 0;
+		if (IniSectionGetInt(pIniSection,L"FindReplaceMatchCase",0)) {
+			efrData.fuFlags |= SCFIND_MATCHCASE;
+		}
+		if (IniSectionGetInt(pIniSection,L"FindReplaceMatchWholeWorldOnly",0)) {
+			efrData.fuFlags |= SCFIND_WHOLEWORD;
+		}
+		if (IniSectionGetInt(pIniSection,L"FindReplaceMatchBeginingWordOnly",0)) {
+			efrData.fuFlags |= SCFIND_WORDSTART;
+		}
+		if (IniSectionGetInt(pIniSection,L"FindReplaceRegExpSearch",0)) {
+			efrData.fuFlags |= SCFIND_REGEXP | SCFIND_POSIX;
+		}
+		if (IniSectionGetInt(pIniSection,L"FindReplaceTransformBackslash",0)) {
+			efrData.bTransformBS = 1;
+		}
+		if (IniSectionGetInt(pIniSection,L"FindReplaceDontWrapRound",0)) {
+			efrData.bNoFindWrap = 1;
+		}
+		if (IniSectionGetInt(pIniSection,L"FindReplaceCloseAfterFind",0)) {
+			efrData.bFindClose = 1;
+		}
+		if (IniSectionGetInt(pIniSection,L"FindReplaceCloseAfterReplace",0)) {
+			efrData.bReplaceClose = 1;
+		}
+#ifdef BOOKMARK_EDITION
+		if (IniSectionGetInt(pIniSection,L"FindReplaceWildcardSearch",0)) {
+			efrData.bWildcardSearch = 1;
+		}
+#endif
+	}
+
 //////////////////////////////// Settings2 ///////////////////////////////////////////
 
 	LoadIniSection(L"Settings2", pIniSection, cchIniSection);
@@ -5532,6 +5565,38 @@ void SaveSettings(BOOL bSaveSettingsNow) {
 	IniSectionSetInt(pIniSection, L"FavoritesDlgSizeY", cyFavoritesDlg);
 	IniSectionSetInt(pIniSection, L"FindReplaceDlgPosX", xFindReplaceDlg);
 	IniSectionSetInt(pIniSection, L"FindReplaceDlgPosY", yFindReplaceDlg);
+
+	if (bSaveFindReplace) {
+		IniSectionSetInt(pIniSection,
+						 L"FindReplaceMatchCase",
+						 (efrData.fuFlags & SCFIND_MATCHCASE) ? 1 : 0 );
+		IniSectionSetInt(pIniSection,
+						 L"FindReplaceMatchWholeWorldOnly",
+						 (efrData.fuFlags & SCFIND_WHOLEWORD) ? 1 : 0 );
+		IniSectionSetInt(pIniSection,
+						 L"FindReplaceMatchBeginingWordOnly",
+						 (efrData.fuFlags & SCFIND_WORDSTART) ? 1 : 0 );
+		IniSectionSetInt(pIniSection,
+						 L"FindReplaceRegExpSearch",
+						 (efrData.fuFlags & (SCFIND_REGEXP | SCFIND_POSIX)) ? 1 : 0 );
+		IniSectionSetInt(pIniSection,
+						 L"FindReplaceTransformBackslash",
+						 efrData.bTransformBS);
+		IniSectionSetInt(pIniSection,
+						 L"FindReplaceDontWrapRound",
+						 efrData.bNoFindWrap);
+		IniSectionSetInt(pIniSection,
+						 L"FindReplaceCloseAfterFind",
+						 efrData.bFindClose);
+		IniSectionSetInt(pIniSection,
+						 L"FindReplaceCloseAfterReplace",
+						 efrData.bReplaceClose);
+#ifdef BOOKMARK_EDITION
+		IniSectionSetInt(pIniSection,
+						 L"FindReplaceWildcardSearch",
+						 efrData.bWildcardSearch);
+#endif
+	}
 
 	SaveIniSection(L"Settings", pIniSection);
 	LocalFree(pIniSection);
