@@ -54,12 +54,11 @@
 	* Boost Jam
 	* Java
 		* JavaDoc
-	* [JavaScript](../master/tools/lang/JavaScript.js), up to ECMAScript 2017, 8ed.
+	* [JavaScript](../master/tools/lang/JavaScript.js), up to ECMAScript 2018, 9ed.
 	* JSON Document
 	* [Julia Script](https://julialang.org/)
 	* LaTeX
 	* Lisp Script
-	* Lisp
 		* Common Lisp
 	* LLVM IR
 	* Lua Script
@@ -131,7 +130,7 @@
 	* CMake
 	* C# (class list only)
 	* Java (class list only)
-	* [JavaScript](../master/tools/lang/JavaScript.js), up to ECMAScript 2017, 8ed.
+	* [JavaScript](../master/tools/lang/JavaScript.js), up to ECMAScript 2018, 9ed.
 	* Inno Setup
 	* [Julia Script](https://julialang.org/)
 	* Lua Script

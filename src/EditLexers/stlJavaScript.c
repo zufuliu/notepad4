@@ -80,11 +80,11 @@ static KEYWORDLIST Keywords_JS = {{
 // arguments, Function, Error
 "callee length name message "
 // Symbol
-"hasInstance isConcatSpreadable iterator match replace search species split toPrimitive toStringTag unscopables prototype "
+"asyncIterator hasInstance isConcatSpreadable iterator match replace search species split toPrimitive toStringTag unscopables prototype "
 // Array, ArrayBuffer, DataView, Map
 "length " "byteLength buffer byteOffset " "size "
 // RegExp
-"index input lastIndex lastMatch lastParen leftContext rightContext " "global ignoreCase multiline source "
+"index input lastIndex lastMatch lastParen leftContext rightContext " "dotAll global ignoreCase multiline source unicode "
 // Debug
 "debuggerEnabled setNonUserCodeExceptions "
 

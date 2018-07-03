@@ -86,6 +86,7 @@ Function(p1, p2, … , pn, body) {
 Boolean(value)
 
 Symbol([description]) {
+	asyncIterator
 	hasInstance
 	isConcatSpreadable
 	iterator
@@ -294,11 +295,13 @@ RegExp(pattern, flags) {
 	prototype
 		exec(string)
 		test(S)
+		dotAll
 		flags
 		global
 		ignoreCase
 		multiline
 		sticky
+		source
 		unicode
 }
 
