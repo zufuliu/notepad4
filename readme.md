@@ -7,9 +7,9 @@
 * Code folding
 * Support for bookmarks
 * Option to mark all occurrences of a word
-* Word auto-completion (include keywords and preprocessor)
-* Auto indentation
-* Auto completion for braces, brackets, quotes
+* [Word auto-completion](https://github.com/zufuliu/notepad2/wiki/Auto-Completion-in-Notepad2#auto-complete-words)
+* [Auto indentation](https://github.com/zufuliu/notepad2/wiki/Auto-Completion-in-Notepad2#auto-indent-text)
+* [Auto completion for braces, brackets, quotes](https://github.com/zufuliu/notepad2/wiki/Auto-Completion-in-Notepad2#auto-close-bracesquotes)
 * Syntax highlighting and auto-completion support for:
 	* Plain Text
 	* ActionScript
@@ -148,7 +148,7 @@
 * Insert new GUID and current timestamps
 * Number conversion between decimal, hexadecimal, octal and binary
 * Display caret location and length of selected text in count of characters
-* Improved auto-completion
+* [Improved auto-completion](https://github.com/zufuliu/notepad2/wiki/Auto-Completion-in-Notepad2)
 * Improved support for NFO ANSI art
 * Support replacing Windows Notepad using a clean, unintuitive registry-based method
 * Support [adding Notepad2 to Windows explorer context menu](https://github.com/zufuliu/notepad2/wiki/Open-with-Notepad2)
