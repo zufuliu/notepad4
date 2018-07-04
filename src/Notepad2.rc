@@ -472,7 +472,7 @@ BEGIN
         END
         MENUITEM "Sa&ve Before Running Tools",  IDM_VIEW_SAVEBEFORERUNNINGTOOLS
         MENUITEM "Remember Recent F&iles",      IDM_VIEW_NOSAVERECENT
-        MENUITEM "Remember S&earch Strings",    IDM_VIEW_NOSAVEFINDREPL
+        MENUITEM "Remember S&earch Options",    IDM_VIEW_NOSAVEFINDREPL
         MENUITEM SEPARATOR
         MENUITEM "Sh&ow Toolbar",               IDM_VIEW_TOOLBAR
         MENUITEM "C&ustomize Toolbar...",       IDM_VIEW_CUSTOMIZETB
