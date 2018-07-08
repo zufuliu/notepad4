@@ -84,7 +84,7 @@ void QuoteStackCls::Push(int u, int s) {
 	Down  = opposite(Up);
 	Style = s;
 }
-void QuoteStackCls::Pop(void) {
+void QuoteStackCls::Pop() {
 	if (Depth <= 0)
 		return;
 	Depth--;

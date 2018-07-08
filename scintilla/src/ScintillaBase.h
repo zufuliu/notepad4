@@ -20,19 +20,21 @@ class ScintillaBase : public Editor, IListBoxDelegate {
 protected:
 	/** Enumeration of commands and child windows. */
 	enum {
-		idCallTip=1,
-		idAutoComplete=2,
+		idCallTip = 1,
+		idAutoComplete = 2,
 
-		idcmdUndo=10,
-		idcmdRedo=11,
-		idcmdCut=12,
-		idcmdCopy=13,
-		idcmdPaste=14,
-		idcmdDelete=15,
-		idcmdSelectAll=16
+		idcmdUndo = 10,
+		idcmdRedo = 11,
+		idcmdCut = 12,
+		idcmdCopy = 13,
+		idcmdPaste = 14,
+		idcmdDelete = 15,
+		idcmdSelectAll = 16
 	};
 
-	enum { maxLenInputIME = 200 };
+	enum {
+		maxLenInputIME = 200
+	};
 
 	int displayPopupMenu;
 	Menu popup;
@@ -46,20 +48,14 @@ protected:
 
 #ifdef SCI_LEXER
 	LexState *DocumentLexState();
-	void SetLexer(uptr_t wParam);
-	void SetLexerLanguage(const char *languageName);
-	void Colourise(int start, int end);
 #endif
 
 	ScintillaBase();
-	// Deleted so ScintillaBase objects can not be copied.
-	explicit ScintillaBase(const ScintillaBase &) = delete;
-	ScintillaBase &operator=(const ScintillaBase &) = delete;
-	virtual ~ScintillaBase();
+	~ScintillaBase() override;
 	void Initialise() override {}
 	void Finalise() override;
 
-	void AddCharUTF(const char *s, unsigned int len, bool treatAsDBCS=false) override;
+	void AddCharUTF(const char *s, unsigned int len, bool treatAsDBCS = false) override;
 	void Command(int cmdId);
 	void CancelModes() override;
 	int KeyCommand(unsigned int iMessage) override;
@@ -81,7 +77,7 @@ protected:
 	void CallTipShow(const Point &pt, const char *defn);
 	virtual void CreateCallTipWindow(const PRectangle &rc) = 0;
 
-	virtual void AddToPopUp(const char *label, int cmd=0, bool enabled=true) = 0;
+	virtual void AddToPopUp(const char *label, int cmd = 0, bool enabled = true) = 0;
 	bool ShouldDisplayPopup(const Point &ptInWindowCoordinates) const;
 	void ContextMenu(const Point &pt);
 
@@ -92,6 +88,11 @@ protected:
 	void NotifyLexerChanged(Document *doc, void *userData) override;
 
 public:
+	// Deleted so ScintillaBase objects can not be copied.
+	ScintillaBase(const ScintillaBase &) = delete;
+	ScintillaBase(ScintillaBase &&) = delete;
+	ScintillaBase &operator=(const ScintillaBase &) = delete;
+	ScintillaBase &operator=(ScintillaBase &&) = delete;
 	// Public so scintilla_send_message can use it
 	sptr_t WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) override;
 };

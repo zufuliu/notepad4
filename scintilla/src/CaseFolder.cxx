@@ -14,23 +14,21 @@
 
 using namespace Scintilla;
 
-CaseFolder::~CaseFolder() {
-}
+CaseFolder::~CaseFolder() = default;
 
-CaseFolderTable::CaseFolderTable() {
-	for (size_t iChar=0; iChar<sizeof(mapping); iChar++) {
+CaseFolderTable::CaseFolderTable() : mapping{} {
+	for (size_t iChar = 0; iChar < sizeof(mapping); iChar++) {
 		mapping[iChar] = static_cast<char>(iChar);
 	}
 }
 
-CaseFolderTable::~CaseFolderTable() {
-}
+CaseFolderTable::~CaseFolderTable() = default;
 
 size_t CaseFolderTable::Fold(char *folded, size_t sizeFolded, const char *mixed, size_t lenMixed) {
 	if (lenMixed > sizeFolded) {
 		return 0;
 	} else {
-		for (size_t i=0; i<lenMixed; i++) {
+		for (size_t i = 0; i < lenMixed; i++) {
 			folded[i] = mapping[static_cast<unsigned char>(mixed[i])];
 		}
 		return lenMixed;
@@ -42,7 +40,7 @@ void CaseFolderTable::SetTranslation(char ch, char chTranslation) {
 }
 
 void CaseFolderTable::StandardASCII() {
-	for (size_t iChar=0; iChar<sizeof(mapping); iChar++) {
+	for (size_t iChar = 0; iChar < sizeof(mapping); iChar++) {
 		if (iChar >= 'A' && iChar <= 'Z') {
 			mapping[iChar] = static_cast<char>(iChar - 'A' + 'a');
 		} else {

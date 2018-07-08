@@ -18,7 +18,9 @@ class AutoComplete {
 	std::string fillUpChars;
 	char separator;
 	char typesep; // Type seperator
-	enum { maxItemLen=1000 };
+	enum {
+		maxItemLen = 1000
+	};
 	std::vector<int> sortMatrix;
 
 public:
@@ -45,7 +47,7 @@ public:
 	~AutoComplete();
 
 	/// Is the auto completion list displayed?
-	bool Active() const;
+	bool Active() const noexcept;
 
 	/// Display the auto completion list positioned to be near a character position
 	void Start(const Window &parent, int ctrlID, Sci::Position position, const Point &location,
@@ -53,19 +55,19 @@ public:
 
 	/// The stop chars are characters which, when typed, cause the auto completion list to disappear
 	void SetStopChars(const char *stopChars_);
-	bool IsStopChar(char ch);
+	bool IsStopChar(char ch) const noexcept;
 
 	/// The fillup chars are characters which, when typed, fill up the selected word
 	void SetFillUpChars(const char *fillUpChars_);
-	bool IsFillUpChar(char ch);
+	bool IsFillUpChar(char ch) const noexcept;
 
 	/// The separator character is used when interpreting the list in SetList
 	void SetSeparator(char separator_);
-	char GetSeparator() const;
+	char GetSeparator() const noexcept;
 
 	/// The typesep character is used for separating the word from the type
 	void SetTypesep(char separator_);
-	char GetTypesep() const;
+	char GetTypesep() const noexcept;
 
 	/// The list string contains a sequence of words separated by the separator character
 	void SetList(const char *list);

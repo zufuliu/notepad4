@@ -25,8 +25,7 @@ class KeyModifiers {
 public:
 	int key;
 	int modifiers;
-	KeyModifiers(int key_, int modifiers_) : key(key_), modifiers(modifiers_) {
-	}
+	KeyModifiers(int key_, int modifiers_) : key(key_), modifiers(modifiers_) {}
 	bool operator<(const KeyModifiers &other) const {
 		if (key == other.key)
 			return modifiers < other.modifiers;

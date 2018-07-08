@@ -1,8 +1,8 @@
 // Lexer for NSIS.
 
-#include <string.h>
-#include <assert.h>
-#include <ctype.h>
+#include <cstring>
+#include <cassert>
+#include <cctype>
 
 #include "ILexer.h"
 #include "Scintilla.h"
@@ -17,7 +17,7 @@
 
 using namespace Scintilla;
 
-static inline bool IsNsisOp(int ch) {
+static inline bool IsNsisOp(int ch) noexcept {
 	return ch == '(' || ch == ')' || ch == '+' || ch == '-' || ch == '&' || ch == '|'
 		|| ch == '=' || ch == ':' || ch == ',' || ch == '<' || ch == '>'
 		|| ch == '!' || ch == '.';
@@ -133,7 +133,7 @@ static void ColouriseNSISDoc(Sci_PositionU startPos, Sci_Position length, int in
 			break;
 		}
 
-		if (state != SCE_C_COMMENTLINE &&  ch == '\\' && (chNext == '\n' || chNext == '\r')) {
+		if (state != SCE_C_COMMENTLINE && ch == '\\' && (chNext == '\n' || chNext == '\r')) {
 			i++;
 			lineCurrent++;
 			ch = chNext;
@@ -192,7 +192,7 @@ static void ColouriseNSISDoc(Sci_PositionU startPos, Sci_Position length, int in
 			}
 		}
 
-		if (atEOL || i == endPos-1) {
+		if (atEOL || i == endPos - 1) {
 			lineCurrent++;
 			visibleChars = 0;
 		}
@@ -207,11 +207,11 @@ static void ColouriseNSISDoc(Sci_PositionU startPos, Sci_Position length, int in
 
 #define IsCommentLine(line)			IsLexCommentLine(line, styler, SCE_C_COMMENTLINE)
 #define IsStreamCommantStyle(style)	(style == SCE_C_COMMENT)
-static inline bool IsNsisFoldWordStart(int ch) {
+static inline bool IsNsisFoldWordStart(int ch) noexcept {
 	return (ch == 'S' || ch == 'F' || ch == 'P')
 		|| (ch == 's' || ch == 'f' || ch == 'p');
 }
-static inline bool IsNsisFoldPPStart(int ch) {
+static inline bool IsNsisFoldPPStart(int ch) noexcept {
 	return (ch == 'i' || ch == 'e' || ch == 'm')
 		|| (ch == 'I' || ch == 'E' || ch == 'M');
 }
@@ -227,7 +227,7 @@ static void FoldNSISDoc(Sci_PositionU startPos, Sci_Position length, int initSty
 	Sci_Position lineCurrent = styler.GetLine(startPos);
 	int levelCurrent = SC_FOLDLEVELBASE;
 	if (lineCurrent > 0)
-		levelCurrent = styler.LevelAt(lineCurrent-1) >> 16;
+		levelCurrent = styler.LevelAt(lineCurrent - 1) >> 16;
 	int levelNext = levelCurrent;
 
 	int chNext = styler[startPos];
@@ -276,7 +276,7 @@ static void FoldNSISDoc(Sci_PositionU startPos, Sci_Position length, int initSty
 		if (!isspacechar(ch))
 			visibleChars++;
 
-		if (atEOL || (i == endPos-1)) {
+		if (atEOL || (i == endPos - 1)) {
 			int levelUse = levelCurrent;
 			int lev = levelUse | levelNext << 16;
 			if (visibleChars == 0 && foldCompact)
@@ -293,4 +293,4 @@ static void FoldNSISDoc(Sci_PositionU startPos, Sci_Position length, int initSty
 	}
 }
 
-LexerModule lmNsis(SCLEX_NSIS, ColouriseNSISDoc, "nsi", FoldNSISDoc);
+LexerModule lmNsis(SCLEX_NSIS, ColouriseNSISDoc, "nsis", FoldNSISDoc);

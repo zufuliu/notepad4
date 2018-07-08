@@ -12,7 +12,6 @@
 #include <algorithm>
 #include <iterator>
 
-#include "StringCopy.h"
 #include "WordList.h"
 
 using namespace Scintilla;
@@ -63,7 +62,7 @@ static char **ArrayFromWordList(char *wordlist, int *len, bool onlyLineEnds = fa
 }
 
 WordList::WordList(bool onlyLineEnds_) :
-	words(0), list(0), len(0), onlyLineEnds(onlyLineEnds_) {
+	words(nullptr), list(nullptr), len(0), onlyLineEnds(onlyLineEnds_) {
 	// Prevent warnings by static analyzers about uninitialized starts.
 	starts[0] = -1;
 }
@@ -73,13 +72,13 @@ WordList::~WordList() {
 }
 
 WordList::operator bool() const {
-	return len ? true : false;
+	return len != 0;
 }
 
 bool WordList::operator!=(const WordList &other) const {
 	if (len != other.len)
 		return true;
-	for (int i=0; i<len; i++) {
+	for (int i = 0; i < len; i++) {
 		if (strcmp(words[i], other.words[i]) != 0)
 			return true;
 	}
@@ -92,11 +91,11 @@ int WordList::Length() const {
 
 void WordList::Clear() {
 	if (words) {
-		delete []list;
-		delete []words;
+		delete[]list;
+		delete[]words;
 	}
-	words = 0;
-	list = 0;
+	words = nullptr;
+	list = nullptr;
 	len = 0;
 }
 
@@ -113,7 +112,7 @@ static int cmpWords(const void *a, const void *b) {
 }
 
 static void SortWordList(char **words, unsigned int len) {
-	qsort(static_cast<void *>(words), len, sizeof(*words), cmpWords);
+	qsort(words, len, sizeof(*words), cmpWords);
 }
 
 #endif
@@ -142,12 +141,12 @@ void WordList::Set(const char *s) {
  * so '^GTK_' matches 'GTK_X', 'GTK_MAJOR_VERSION', and 'GTK_'.
  */
 bool WordList::InList(const char *s) const {
-	if (0 == words)
+	if (nullptr == words)
 		return false;
 	const unsigned char firstChar = s[0];
 	int j = starts[firstChar];
 	if (j >= 0) {
-		while (static_cast<unsigned char>(words[j][0]) == firstChar) {
+		while (words[j][0] == firstChar) {
 			if (s[1] == words[j][1]) {
 				const char *a = words[j] + 1;
 				const char *b = s + 1;
@@ -184,12 +183,12 @@ bool WordList::InList(const char *s) const {
  * The marker is ~ in this case.
  */
 bool WordList::InListAbbreviated(const char *s, const char marker) const {
-	if (0 == words)
+	if (nullptr == words)
 		return false;
 	const unsigned char firstChar = s[0];
 	int j = starts[firstChar];
 	if (j >= 0) {
-		while (static_cast<unsigned char>(words[j][0]) == firstChar) {
+		while (words[j][0] == firstChar) {
 			bool isSubword = false;
 			int start = 1;
 			if (words[j][1] == marker) {
@@ -238,12 +237,12 @@ bool WordList::InListAbbreviated(const char *s, const char marker) const {
 * No multiple markers check is done and wont work.
 */
 bool WordList::InListAbridged(const char *s, const char marker) const {
-	if (0 == words)
+	if (nullptr == words)
 		return false;
 	const unsigned char firstChar = s[0];
 	int j = starts[firstChar];
 	if (j >= 0) {
-		while (static_cast<unsigned char>(words[j][0]) == firstChar) {
+		while (words[j][0] == firstChar) {
 			const char *a = words[j];
 			const char *b = s;
 			while (*a && *a == *b) {
@@ -258,7 +257,7 @@ bool WordList::InListAbridged(const char *s, const char marker) const {
 				}
 				b++;
 			}
-			if (!*a  && !*b)
+			if (!*a && !*b)
 				return true;
 			j++;
 		}

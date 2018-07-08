@@ -1,8 +1,8 @@
 // Lexer for javap, Jasmin, Android Dalvik Smali.
 
-#include <string.h>
-#include <assert.h>
-#include <ctype.h>
+#include <cstring>
+#include <cassert>
+#include <cctype>
 
 #include "ILexer.h"
 #include "Scintilla.h"
@@ -16,26 +16,26 @@
 
 using namespace Scintilla;
 
-static inline bool IsSmaliOp(int ch) {
+static inline bool IsSmaliOp(int ch) noexcept {
 	return ch == ';' || ch == '{' || ch == '}' || ch == '(' || ch == ')' || ch == '='
 		|| ch == ',' || ch == '<' || ch == '>' || ch == '+' || ch == '-' || ch == ':' || ch == '.'
 		|| ch == '/' || ch == '&' || ch == '|' || ch == '^' || ch == '!' || ch == '~' || ch == '*' || ch == '%';
 }
-static inline bool IsDelimiter(int ch) {
+static inline bool IsDelimiter(int ch) noexcept {
 	return ch != '/' && ch != '$' && (IsASpace(ch) || IsSmaliOp(ch));
 }
-static inline bool IsSmaliWordChar(int ch) {
+static inline bool IsSmaliWordChar(int ch) noexcept {
 	return iswordstart(ch) || ch == '-';
 }
-static inline bool IsSmaliWordCharX(int ch) {
+static inline bool IsSmaliWordCharX(int ch) noexcept {
 	return iswordchar(ch) || ch == '-';
 }
 
-static inline bool IsOpcodeChar(int ch) {
-	return ch == '_'  || ch == '-' || IsAlpha(ch);
+static inline bool IsOpcodeChar(int ch) noexcept {
+	return ch == '_' || ch == '-' || IsAlpha(ch);
 }
 
-static inline bool IsJavaTypeChar(int ch) {
+static inline bool IsJavaTypeChar(int ch) noexcept {
 	return ch == 'V'	// void
 		|| ch == 'Z'	// boolean
 		|| ch == 'B'	// byte
@@ -48,7 +48,7 @@ static inline bool IsJavaTypeChar(int ch) {
 		|| ch == 'L'	// object
 		|| ch == '[';	// array
 }
-static bool IsJavaType(int ch, int chPrev, int chNext) {
+static bool IsJavaType(int ch, int chPrev, int chNext) noexcept {
 	if (chPrev == 'L' || chPrev == '>' || chPrev == '/' || chPrev == '.')
 		return false;
 	if (ch == '[')
@@ -81,8 +81,8 @@ static void ColouriseSmaliDoc(Sci_PositionU startPos, Sci_Position length, int i
 		++endPos;
 
 	Sci_Position lineCurrent = styler.GetLine(startPos);
-	int curLineState =	(lineCurrent > 0) ? styler.GetLineState(lineCurrent-1) : 0;
-	char buf[MAX_WORD_LENGTH + 1] = {0};
+	int curLineState = (lineCurrent > 0) ? styler.GetLineState(lineCurrent - 1) : 0;
+	char buf[MAX_WORD_LENGTH + 1] = { 0 };
 	int wordLen = 0;
 	int visibleChars = 0;
 	int nextWordType = 0;
@@ -187,13 +187,13 @@ static void ColouriseSmaliDoc(Sci_PositionU startPos, Sci_Position length, int i
 					styler.ColourTo(i - 1, SCE_SMALI_FIELD);
 					if (ch == '$')
 						styler.ColourTo(i - 1, SCE_SMALI_OPERATOR);
-					state = (ch == ':')? SCE_SMALI_DEFAULT : SCE_SMALI_FIELD;
+					state = (ch == ':') ? SCE_SMALI_DEFAULT : SCE_SMALI_FIELD;
 				} else if (nextWordType == kWordType_Method) {
 					nextWordType = 0;
 					styler.ColourTo(i - 1, SCE_SMALI_METHOD);
 					if (ch == '$')
 						styler.ColourTo(i - 1, SCE_SMALI_OPERATOR);
-					state = (ch == '(' || ch == '>')? SCE_SMALI_DEFAULT : SCE_SMALI_METHOD;
+					state = (ch == '(' || ch == '>') ? SCE_SMALI_DEFAULT : SCE_SMALI_METHOD;
 				} else if (/*kwInstruction.InList(buf)*/ wordLen == visibleChars && !curLineState && (IsASpace(ch) || ch == '/')) {
 					if (!(IsSmaliWordChar(ch) || ch == '/')) {
 						styler.ColourTo(i - 1, SCE_SMALI_INSTRUCTION);
@@ -203,8 +203,8 @@ static void ColouriseSmaliDoc(Sci_PositionU startPos, Sci_Position length, int i
 					}
 				} else {
 					Sci_PositionU pos = i;
-					while (pos < endPos && IsASpace(styler.SafeGetCharAt(pos, 0))) ++pos;
-					if (styler.SafeGetCharAt(pos, 0) == '(') {
+					while (pos < endPos && IsASpace(styler.SafeGetCharAt(pos))) ++pos;
+					if (styler.SafeGetCharAt(pos) == '(') {
 						styler.ColourTo(i - 1, SCE_SMALI_METHOD);
 					}
 					state = SCE_SMALI_DEFAULT;
@@ -287,7 +287,7 @@ static void ColouriseSmaliDoc(Sci_PositionU startPos, Sci_Position length, int i
 			}
 		}
 
-		if (atEOL || i == endPos-1) {
+		if (atEOL || i == endPos - 1) {
 			styler.SetLineState(lineCurrent, curLineState);
 			lineCurrent++;
 			visibleChars = 0;
@@ -303,7 +303,7 @@ static void ColouriseSmaliDoc(Sci_PositionU startPos, Sci_Position length, int i
 }
 
 #define IsCommentLine(line)		IsLexCommentLine(line, styler, SCE_SMALI_COMMENTLINE)
-static inline bool IsFoldWord(const char *word) {
+static inline bool IsFoldWord(const char *word) noexcept {
 	return strcmp(word, "method") == 0
 		|| strcmp(word, "annotation") == 0
 		|| strcmp(word, "subannotation") == 0
@@ -342,7 +342,7 @@ static void FoldSmaliDoc(Sci_PositionU startPos, Sci_Position length, int initSt
 	Sci_Position lineCurrent = styler.GetLine(startPos);
 	int levelCurrent = SC_FOLDLEVELBASE;
 	if (lineCurrent > 0)
-		levelCurrent = styler.LevelAt(lineCurrent-1) >> 16;
+		levelCurrent = styler.LevelAt(lineCurrent - 1) >> 16;
 	int levelNext = levelCurrent;
 
 	int chNext = styler[startPos];
@@ -377,7 +377,7 @@ static void FoldSmaliDoc(Sci_PositionU startPos, Sci_Position length, int initSt
 		if (!isspacechar(ch))
 			visibleChars++;
 
-		if (atEOL || (i == endPos-1)) {
+		if (atEOL || (i == endPos - 1)) {
 			int levelUse = levelCurrent;
 			int lev = levelUse | levelNext << 16;
 			if (visibleChars == 0 && foldCompact)

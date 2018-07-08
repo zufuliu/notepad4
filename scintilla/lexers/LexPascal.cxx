@@ -7,9 +7,9 @@
  ** Completely rewritten by Marko Njezic <sf@maxempire.com> October 2008
  **/
 
-#include <string.h>
-#include <assert.h>
-#include <ctype.h>
+#include <cstring>
+#include <cassert>
+#include <cctype>
 
 #include <string>
 #include <vector>
@@ -79,10 +79,10 @@ static void ClassifyPascalWord(LexerWordList keywordLists, StyleContext &sc, int
 					ignoreKeyword = true;
 				} else if (!(curLineState & stateInProperty) &&
 					(strcmp(s, "read") == 0 || strcmp(s, "write") == 0 ||
-//					 strcmp(s, "default") == 0 || strcmp(s, "nodefault") == 0 ||
-					 strcmp(s, "stored") == 0 || strcmp(s, "implements") == 0 ||
-					 strcmp(s, "readonly") == 0 || strcmp(s, "writeonly") == 0 ||
-					 strcmp(s, "add") == 0 || strcmp(s, "remove") == 0)) {
+						//					 strcmp(s, "default") == 0 || strcmp(s, "nodefault") == 0 ||
+						strcmp(s, "stored") == 0 || strcmp(s, "implements") == 0 ||
+						strcmp(s, "readonly") == 0 || strcmp(s, "writeonly") == 0 ||
+						strcmp(s, "add") == 0 || strcmp(s, "remove") == 0)) {
 					ignoreKeyword = true;
 				}
 			}
@@ -129,76 +129,76 @@ static void ColourisePascalDoc(Sci_PositionU startPos, Sci_Position length, int 
 
 		// Determine if the current state should terminate.
 		switch (sc.state) {
-			case SCE_PAS_NUMBER:
-				if (!setNumber.Contains(sc.ch) || (sc.ch == '.' && sc.chNext == '.')) {
-					sc.SetState(SCE_PAS_DEFAULT);
-				} else if (sc.ch == '-' || sc.ch == '+') {
-					if (sc.chPrev != 'E' && sc.chPrev != 'e') {
-						sc.SetState(SCE_PAS_DEFAULT);
-					}
-				}
-				break;
-			case SCE_PAS_IDENTIFIER:
-				if (!setWord.Contains(sc.ch)) {
-					ClassifyPascalWord(keywordLists, sc, curLineState, bSmartHighlighting);
-				}
-				break;
-			case SCE_PAS_HEXNUMBER:
-				if (!setHexNumber.Contains(sc.ch)) {
-					sc.SetState(SCE_PAS_DEFAULT);
-				}
-				break;
-			case SCE_PAS_COMMENT:
-			case SCE_PAS_PREPROCESSOR:
-				if (sc.ch == '}') {
-					sc.ForwardSetState(SCE_PAS_DEFAULT);
-				}
-				break;
-			case SCE_PAS_COMMENT2:
-			case SCE_PAS_PREPROCESSOR2:
-				if (sc.Match('*', ')')) {
-					sc.Forward();
-					sc.ForwardSetState(SCE_PAS_DEFAULT);
-				}
-				break;
-			case SCE_PAS_COMMENTLINE:
-				if (sc.atLineStart) {
-					sc.SetState(SCE_PAS_DEFAULT);
-				}
-				break;
-			case SCE_PAS_STRING:
-				if (sc.atLineEnd) {
-					sc.ChangeState(SCE_PAS_STRINGEOL);
-				} else if (sc.ch == '\'' && sc.chNext == '\'') {
-					sc.Forward();
-				} else if (sc.ch == '\'') {
-					sc.ForwardSetState(SCE_PAS_DEFAULT);
-				}
-				break;
-			case SCE_PAS_STRINGEOL:
-				if (sc.atLineStart) {
-					sc.SetState(SCE_PAS_DEFAULT);
-				}
-				break;
-			case SCE_PAS_CHARACTER:
-				if (!setHexNumber.Contains(sc.ch) && sc.ch != '$') {
-					sc.SetState(SCE_PAS_DEFAULT);
-				}
-				break;
-			case SCE_PAS_OPERATOR:
-				if (bSmartHighlighting && sc.chPrev == ';') {
-					curLineState &= ~(stateInProperty | stateInExport);
-				}
+		case SCE_PAS_NUMBER:
+			if (!setNumber.Contains(sc.ch) || (sc.ch == '.' && sc.chNext == '.')) {
 				sc.SetState(SCE_PAS_DEFAULT);
-				break;
-			case SCE_PAS_ASM:
+			} else if (sc.ch == '-' || sc.ch == '+') {
+				if (sc.chPrev != 'E' && sc.chPrev != 'e') {
+					sc.SetState(SCE_PAS_DEFAULT);
+				}
+			}
+			break;
+		case SCE_PAS_IDENTIFIER:
+			if (!setWord.Contains(sc.ch)) {
+				ClassifyPascalWord(keywordLists, sc, curLineState, bSmartHighlighting);
+			}
+			break;
+		case SCE_PAS_HEXNUMBER:
+			if (!setHexNumber.Contains(sc.ch)) {
 				sc.SetState(SCE_PAS_DEFAULT);
-				break;
+			}
+			break;
+		case SCE_PAS_COMMENT:
+		case SCE_PAS_PREPROCESSOR:
+			if (sc.ch == '}') {
+				sc.ForwardSetState(SCE_PAS_DEFAULT);
+			}
+			break;
+		case SCE_PAS_COMMENT2:
+		case SCE_PAS_PREPROCESSOR2:
+			if (sc.Match('*', ')')) {
+				sc.Forward();
+				sc.ForwardSetState(SCE_PAS_DEFAULT);
+			}
+			break;
+		case SCE_PAS_COMMENTLINE:
+			if (sc.atLineStart) {
+				sc.SetState(SCE_PAS_DEFAULT);
+			}
+			break;
+		case SCE_PAS_STRING:
+			if (sc.atLineEnd) {
+				sc.ChangeState(SCE_PAS_STRINGEOL);
+			} else if (sc.ch == '\'' && sc.chNext == '\'') {
+				sc.Forward();
+			} else if (sc.ch == '\'') {
+				sc.ForwardSetState(SCE_PAS_DEFAULT);
+			}
+			break;
+		case SCE_PAS_STRINGEOL:
+			if (sc.atLineStart) {
+				sc.SetState(SCE_PAS_DEFAULT);
+			}
+			break;
+		case SCE_PAS_CHARACTER:
+			if (!setHexNumber.Contains(sc.ch) && sc.ch != '$') {
+				sc.SetState(SCE_PAS_DEFAULT);
+			}
+			break;
+		case SCE_PAS_OPERATOR:
+			if (bSmartHighlighting && sc.chPrev == ';') {
+				curLineState &= ~(stateInProperty | stateInExport);
+			}
+			sc.SetState(SCE_PAS_DEFAULT);
+			break;
+		case SCE_PAS_ASM:
+			sc.SetState(SCE_PAS_DEFAULT);
+			break;
 		}
 
 		// Determine if a new state should be entered.
 		if (sc.state == SCE_PAS_DEFAULT) {
-//			if (IsADigit(sc.ch) && !(curLineState & stateInAsm)) {
+			//			if (IsADigit(sc.ch) && !(curLineState & stateInAsm)) {
 			if (IsADigit(sc.ch)) {
 				sc.SetState(SCE_PAS_NUMBER);
 				if (sc.MatchIgnoreCase("0x")) {
@@ -209,7 +209,7 @@ static void ColourisePascalDoc(Sci_PositionU startPos, Sci_Position length, int 
 				}
 			} else if (setWordStart.Contains(sc.ch)) {
 				sc.SetState(SCE_PAS_IDENTIFIER);
-//			} else if (sc.ch == '$' && !(curLineState & stateInAsm)) {
+				//			} else if (sc.ch == '$' && !(curLineState & stateInAsm)) {
 			} else if (sc.ch == '$') {
 				sc.SetState(SCE_PAS_HEXNUMBER);
 				if (curLineState & stateInAsm) {
@@ -234,8 +234,7 @@ static void ColourisePascalDoc(Sci_PositionU startPos, Sci_Position length, int 
 					sc.SetState(SCE_PAS_HEXNUMBER);
 					if (sc.MatchIgnoreCase("#0x"))
 						sc.Forward(2);
-				}
-				else
+				} else
 					sc.SetState(SCE_PAS_CHARACTER);
 			} else if (setOperator.Contains(sc.ch) && !(curLineState & stateInAsm)) {
 				sc.SetState(SCE_PAS_OPERATOR);
@@ -252,15 +251,15 @@ static void ColourisePascalDoc(Sci_PositionU startPos, Sci_Position length, int 
 	sc.Complete();
 }
 
-static inline bool IsStreamCommentStyle(int style) {
+static inline bool IsStreamCommentStyle(int style) noexcept {
 	return style == SCE_PAS_COMMENT || style == SCE_PAS_COMMENT2;
 }
 
-static unsigned int GetFoldInPreprocessorLevelFlag(int lineFoldStateCurrent) {
+static unsigned int GetFoldInPreprocessorLevelFlag(int lineFoldStateCurrent) noexcept {
 	return lineFoldStateCurrent & stateFoldInPreprocessorLevelMask;
 }
 
-static void SetFoldInPreprocessorLevelFlag(int &lineFoldStateCurrent, unsigned int nestLevel) {
+static void SetFoldInPreprocessorLevelFlag(int &lineFoldStateCurrent, unsigned int nestLevel) noexcept {
 	lineFoldStateCurrent &= ~stateFoldInPreprocessorLevelMask;
 	lineFoldStateCurrent |= nestLevel & stateFoldInPreprocessorLevelMask;
 }
@@ -299,8 +298,8 @@ static void ClassifyPascalPreprocessorFoldPoint(int &levelCurrent, int &lineFold
 }
 
 static void ClassifyPascalWordFoldPoint(int &levelCurrent, int &lineFoldStateCurrent,
-		Sci_Position startPos, Sci_PositionU endPos,
-		Sci_PositionU lastStart, Sci_PositionU currentPos, Accessor &styler) {
+	Sci_Position startPos, Sci_PositionU endPos,
+	Sci_PositionU lastStart, Sci_PositionU currentPos, Accessor &styler) {
 	char s[128];
 	const CharacterSet setWordStart(CharacterSet::setAlpha, "_");
 	const CharacterSet setWord(CharacterSet::setAlphaNum, "_");
@@ -434,29 +433,27 @@ static void FoldPascalDoc(Sci_PositionU startPos, Sci_Position length, int initS
 				levelCurrent--;
 			}
 		}
-		if (foldComment && atEOL && IsCommentLine(lineCurrent))
-		{
-			if (!IsCommentLine(lineCurrent-1) && IsCommentLine(lineCurrent+1))
+		if (foldComment && atEOL && IsCommentLine(lineCurrent)) {
+			if (!IsCommentLine(lineCurrent - 1) && IsCommentLine(lineCurrent + 1))
 				levelCurrent++;
-			else if (IsCommentLine(lineCurrent-1) && !IsCommentLine(lineCurrent+1))
+			else if (IsCommentLine(lineCurrent - 1) && !IsCommentLine(lineCurrent + 1))
 				levelCurrent--;
 		}
 		if (foldPreprocessor) {
 			if (style == SCE_PAS_PREPROCESSOR && ch == '{' && chNext == '$') {
 				ClassifyPascalPreprocessorFoldPoint(levelCurrent, lineFoldStateCurrent, i + 2, styler);
 			} else if (style == SCE_PAS_PREPROCESSOR2 && ch == '(' && chNext == '*'
-			           && styler.SafeGetCharAt(i + 2) == '$') {
+				&& styler.SafeGetCharAt(i + 2) == '$') {
 				ClassifyPascalPreprocessorFoldPoint(levelCurrent, lineFoldStateCurrent, i + 3, styler);
 			}
 		}
 
-		if (stylePrev != SCE_PAS_WORD && style == SCE_PAS_WORD)
-		{
+		if (stylePrev != SCE_PAS_WORD && style == SCE_PAS_WORD) {
 			// Store last word start point.
 			lastStart = i;
 		}
 		if (stylePrev == SCE_PAS_WORD && !(lineFoldStateCurrent & stateFoldInPreprocessor)) {
-			if(setWord.Contains(ch) && !setWord.Contains(chNext)) {
+			if (setWord.Contains(ch) && !setWord.Contains(chNext)) {
 				ClassifyPascalWordFoldPoint(levelCurrent, lineFoldStateCurrent, startPos, endPos, lastStart, i, styler);
 			}
 		}

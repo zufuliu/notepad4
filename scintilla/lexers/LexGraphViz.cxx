@@ -1,8 +1,8 @@
 // Lexer for GraphViz/Dot.
 
-#include <string.h>
-#include <assert.h>
-#include <ctype.h>
+#include <cstring>
+#include <cassert>
+#include <cctype>
 
 #include "ILexer.h"
 #include "Scintilla.h"
@@ -17,10 +17,10 @@
 
 using namespace Scintilla;
 
-static inline bool IsGraphOp(int ch) {
+static inline bool IsGraphOp(int ch) noexcept {
 	return ch == '{' || ch == '}' || ch == '[' || ch == ']' || ch == '='
 		|| ch == ';' || ch == ',' || ch == '>' || ch == '+' || ch == '-'
-		|| ch == ':' || ch == '<' || ch == '/' ;
+		|| ch == ':' || ch == '<' || ch == '/';
 }
 
 #define MAX_WORD_LENGTH	15
@@ -39,9 +39,9 @@ static void ColouriseGraphDoc(Sci_PositionU startPos, Sci_Position length, int i
 	Sci_Position lineCurrent = styler.GetLine(startPos);
 	int levelCurrent = SC_FOLDLEVELBASE;
 	if (lineCurrent > 0)
-		levelCurrent = styler.LevelAt(lineCurrent-1) >> 16;
+		levelCurrent = styler.LevelAt(lineCurrent - 1) >> 16;
 	int levelNext = levelCurrent;
-	char buf[MAX_WORD_LENGTH + 1] = {0};
+	char buf[MAX_WORD_LENGTH + 1] = { 0 };
 	int wordLen = 0;
 	int chPrevNonWhite = 0;
 
@@ -54,7 +54,7 @@ static void ColouriseGraphDoc(Sci_PositionU startPos, Sci_Position length, int i
 
 		const bool atEOL = (ch == '\r' && chNext != '\n') || (ch == '\n');
 		const bool atLineStart = i == (Sci_PositionU)styler.LineStart(lineCurrent);
-		if (atEOL || i == endPos-1) {
+		if (atEOL || i == endPos - 1) {
 			if (fold) {
 				int levelUse = levelCurrent;
 				int lev = levelUse | levelNext << 16;
@@ -84,7 +84,7 @@ static void ColouriseGraphDoc(Sci_PositionU startPos, Sci_Position length, int i
 				buf[wordLen] = 0;
 				Sci_PositionU pos = i;
 				while (IsASpace(styler.SafeGetCharAt(pos++)));
-				if (styler[pos-1] == '=') {
+				if (styler[pos - 1] == '=') {
 					styler.ColourTo(i - 1, SCE_C_WORD2);
 				} else if (keywords.InList(buf)) {
 					styler.ColourTo(i - 1, SCE_C_WORD);

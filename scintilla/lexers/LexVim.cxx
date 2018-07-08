@@ -1,8 +1,8 @@
 // Lexer for Vim.
 
-#include <string.h>
-#include <assert.h>
-#include <ctype.h>
+#include <cstring>
+#include <cassert>
+#include <cctype>
 
 #include "ILexer.h"
 #include "Scintilla.h"
@@ -17,7 +17,7 @@
 
 using namespace Scintilla;
 
-static inline bool IsVimOp(int ch) {
+static inline bool IsVimOp(int ch) noexcept {
 	//return ch == '{' || ch == '}' || ch == '[' || ch == ']' || ch == ':' || ch == ',' || ch == '+' || ch == '-';
 	return isoperator(ch);
 }
@@ -36,7 +36,7 @@ static void ColouriseVimDoc(Sci_PositionU startPos, Sci_Position length, int ini
 
 	Sci_Position lineCurrent = styler.GetLine(startPos);
 	int visibleChars = 0;
-	char buf[MAX_WORD_LENGTH + 1] = {0};
+	char buf[MAX_WORD_LENGTH + 1] = { 0 };
 	int wordLen = 0;
 
 	for (Sci_PositionU i = startPos; i < endPos; i++) {
@@ -115,7 +115,7 @@ static void ColouriseVimDoc(Sci_PositionU startPos, Sci_Position length, int ini
 			}
 		}
 
-		if (atEOL || i == endPos-1) {
+		if (atEOL || i == endPos - 1) {
 			lineCurrent++;
 			visibleChars = 0;
 		}
@@ -140,7 +140,7 @@ static void FoldVimDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 	Sci_Position lineCurrent = styler.GetLine(startPos);
 	int levelCurrent = SC_FOLDLEVELBASE;
 	if (lineCurrent > 0)
-		levelCurrent = styler.LevelAt(lineCurrent-1) >> 16;
+		levelCurrent = styler.LevelAt(lineCurrent - 1) >> 16;
 	int levelNext = levelCurrent;
 
 	char chNext = styler[startPos];
@@ -165,7 +165,7 @@ static void FoldVimDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 		if (visibleChars == 0 && iswordchar(ch) && style == SCE_C_WORD && stylePrev != SCE_C_WORD) {
 			char buf[MAX_WORD_LENGTH + 1];
 			LexGetRange(i, styler, iswordstart, buf, sizeof(buf));
-			if (strcmp(buf, "if")  == 0 || strcmp(buf, "while") == 0 || strncmp(buf, "fun", 3) == 0 || strcmp(buf, "for") == 0 || strcmp(buf,  "try") == 0) {
+			if (strcmp(buf, "if") == 0 || strcmp(buf, "while") == 0 || strncmp(buf, "fun", 3) == 0 || strcmp(buf, "for") == 0 || strcmp(buf, "try") == 0) {
 				levelNext++;
 			} else if (buf[0] == 'e' && buf[1] == 'n' && buf[2] == 'd') {
 				levelNext--;
@@ -175,7 +175,7 @@ static void FoldVimDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 		if (!isspacechar(ch))
 			visibleChars++;
 
-		if (atEOL || (i == endPos-1)) {
+		if (atEOL || (i == endPos - 1)) {
 			int levelUse = levelCurrent;
 			int lev = levelUse | levelNext << 16;
 			if (visibleChars == 0 && foldCompact)

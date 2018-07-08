@@ -10,7 +10,9 @@
 
 namespace Scintilla {
 
-enum { wsSpace=1, wsTab=2, wsSpaceTab=4, wsInconsistent=8 };
+enum {
+	wsSpace = 1, wsTab = 2, wsSpaceTab = 4, wsInconsistent = 8
+};
 
 class Accessor;
 class WordList;
@@ -22,8 +24,8 @@ class Accessor : public LexAccessor {
 public:
 	PropSetSimple *pprops;
 	Accessor(IDocument *pAccess_, PropSetSimple *pprops_);
-	int GetPropertyInt(const char *, int defaultValue=0) const;
-	static int LexIndentAmount(Accessor &styler, Sci_Position line, int *flags, PFNIsCommentLeader pfnIsCommentLeader = 0);
+	int GetPropertyInt(const char *, int defaultValue = 0) const;
+	static int LexIndentAmount(Accessor &styler, Sci_Position line, int *flags, PFNIsCommentLeader pfnIsCommentLeader = nullptr);
 };
 
 }

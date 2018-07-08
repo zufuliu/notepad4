@@ -1,8 +1,8 @@
 // Lexer for LLVM.
 
-#include <string.h>
-#include <assert.h>
-#include <ctype.h>
+#include <cstring>
+#include <cassert>
+#include <cctype>
 
 #include "ILexer.h"
 #include "Scintilla.h"
@@ -22,7 +22,7 @@ using namespace Scintilla;
 static void CheckLLVMVarType(Sci_PositionU pos, Sci_PositionU endPos, Accessor &styler, bool& is_func, bool& is_type) {
 	char c = 0;
 	while (pos < endPos) {
-		c = styler.SafeGetCharAt(pos, '\0');
+		c = styler.SafeGetCharAt(pos);
 		if (!(IsASpaceOrTab(c) || c == '*')) break;
 		pos++;
 	}
@@ -38,13 +38,13 @@ static void CheckLLVMVarType(Sci_PositionU pos, Sci_PositionU endPos, Accessor &
 	if (c == '=') {
 		pos++;
 		while (pos < endPos) {
-			c = styler.SafeGetCharAt(pos, '\0');
+			c = styler.SafeGetCharAt(pos);
 			if (!IsASpaceOrTab(c)) break;
 			pos++;
 		}
 		if (c == 't' && styler.SafeGetCharAt(pos + 1) == 'y'
 			&& styler.SafeGetCharAt(pos + 2) == 'p' && styler.SafeGetCharAt(pos + 3) == 'e'
-			&& isspacechar(styler.SafeGetCharAt(pos + 4, '\0'))) {
+			&& isspacechar(styler.SafeGetCharAt(pos + 4))) {
 			is_type = true;
 		}
 	}
@@ -65,7 +65,7 @@ static void ColouriseLLVMDoc(Sci_PositionU startPos, Sci_Position length, int in
 		++endPos;
 
 	Sci_Position lineCurrent = styler.GetLine(startPos);
-	char buf[MAX_WORD_LENGTH + 1] = {0};
+	char buf[MAX_WORD_LENGTH + 1] = { 0 };
 	int wordLen = 0;
 
 	for (Sci_PositionU i = startPos; i < endPos; i++) {
@@ -183,7 +183,7 @@ static void ColouriseLLVMDoc(Sci_PositionU startPos, Sci_Position length, int in
 			}
 		}
 
-		if (atEOL || i == endPos-1) {
+		if (atEOL || i == endPos - 1) {
 			lineCurrent++;
 		}
 	}
@@ -204,7 +204,7 @@ static void FoldLLVMDoc(Sci_PositionU startPos, Sci_Position length, int initSty
 	Sci_Position lineCurrent = styler.GetLine(startPos);
 	int levelCurrent = SC_FOLDLEVELBASE;
 	if (lineCurrent > 0)
-		levelCurrent = styler.LevelAt(lineCurrent-1) >> 16;
+		levelCurrent = styler.LevelAt(lineCurrent - 1) >> 16;
 	int levelNext = levelCurrent;
 
 	char chNext = styler[startPos];
@@ -236,7 +236,7 @@ static void FoldLLVMDoc(Sci_PositionU startPos, Sci_Position length, int initSty
 		if (!isspacechar(ch))
 			visibleChars++;
 
-		if (atEOL || (i == endPos-1)) {
+		if (atEOL || (i == endPos - 1)) {
 			int levelUse = levelCurrent;
 			int lev = levelUse | levelNext << 16;
 			if (visibleChars == 0 && foldCompact)
@@ -253,4 +253,4 @@ static void FoldLLVMDoc(Sci_PositionU startPos, Sci_Position length, int initSty
 	}
 }
 
-LexerModule lmLLVM(SCLEX_LLVM, ColouriseLLVMDoc, "ll", FoldLLVMDoc);
+LexerModule lmLLVM(SCLEX_LLVM, ColouriseLLVMDoc, "llvm", FoldLLVMDoc);

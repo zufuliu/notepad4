@@ -13,12 +13,10 @@ namespace Scintilla {
 // A simple lexer with no state
 class LexerSimple : public LexerBase {
 	const LexerModule *module;
-	std::string wordLists;
 public:
 	explicit LexerSimple(const LexerModule *module_);
-	const char * SCI_METHOD DescribeWordListSets() const;
-	void SCI_METHOD Lex(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, IDocument *pAccess);
-	void SCI_METHOD Fold(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, IDocument *pAccess);
+	void SCI_METHOD Lex(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, IDocument *pAccess) override;
+	void SCI_METHOD Fold(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, IDocument *pAccess) override;
 };
 
 }

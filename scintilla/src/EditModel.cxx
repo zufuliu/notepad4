@@ -12,6 +12,7 @@
 #include <cmath>
 
 #include <stdexcept>
+#include <string_view>
 #include <string>
 #include <vector>
 #include <map>
@@ -24,7 +25,6 @@
 #include "ILexer.h"
 #include "Scintilla.h"
 
-#include "StringCopy.h"
 #include "Position.h"
 #include "UniqueString.h"
 #include "SplitVector.h"
@@ -51,7 +51,7 @@ using namespace Scintilla;
 Caret::Caret() :
 	active(false), on(false), period(500) {}
 
-EditModel::EditModel() {
+EditModel::EditModel() : braces{} {
 	inOverstrike = false;
 	xOffset = 0;
 	trackLineWidth = false;
@@ -62,9 +62,7 @@ EditModel::EditModel() {
 	highlightGuideColumn = 0;
 	primarySelection = true;
 	imeInteraction = imeWindowed;
-#ifndef SCI_DISABLE_PROVISIONAL
 	bidirectional = Bidirectional::bidiDisabled;
-#endif
 	foldFlags = 0;
 	foldDisplayTextStyle = SC_FOLDDISPLAYTEXT_HIDDEN;
 	hotspot = Range(Sci::invalidPosition);
@@ -72,9 +70,19 @@ EditModel::EditModel() {
 	wrapWidth = LineLayout::wrapWidthInfinite;
 	pdoc = new Document(SC_DOCUMENTOPTION_DEFAULT);
 	pdoc->AddRef();
+	pcs = ContractionStateCreate(pdoc->IsLarge());
 }
 
 EditModel::~EditModel() {
 	pdoc->Release();
-	pdoc = 0;
+	pdoc = nullptr;
+}
+
+bool EditModel::BidirectionalEnabled() const noexcept {
+	return (bidirectional != Bidirectional::bidiDisabled) &&
+		(SC_CP_UTF8 == pdoc->dbcsCodePage);
+}
+
+bool EditModel::BidirectionalR2L() const noexcept {
+	return bidirectional == Bidirectional::bidiR2L;
 }

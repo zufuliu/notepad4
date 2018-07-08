@@ -173,6 +173,7 @@ Prebuild binaries for each release can be downloaded from [release list](https:/
 * [RL Vision](http://www.rlvision.com/notepad2/about.asp)
 * Aleksandar Lekov
 * Bruno Barbieri
+* Everyone else on [GitHub](https://github.com/zufuliu/notepad2/graphs/contributors)
 
 ## More information:
 * [Official Notepad2 website](http://www.flos-freeware.ch/notepad2.html)

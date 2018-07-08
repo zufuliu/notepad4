@@ -9,12 +9,9 @@
 // Copyright 1998-2002 by Neil Hodgson <neilh@scintilla.org>
 // The License.txt file describes the conditions under which this software may be distributed.
 
-#include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
-#include <stdarg.h>
-#include <assert.h>
-#include <ctype.h>
+#include <cstring>
+#include <cassert>
+#include <cctype>
 
 #include "ILexer.h"
 #include "Scintilla.h"
@@ -30,7 +27,7 @@
 using namespace Scintilla;
 
 
-static inline bool IsAWordChar(int ch) {
+static inline bool IsAWordChar(int ch) noexcept {
 	/* FIXME:
 	 * The CSS spec allows "ISO 10646 characters U+00A1 and higher" to be treated as word chars.
 	 * Unfortunately, we are only getting string bytes here, and not full unicode characters. We cannot guarantee
@@ -39,13 +36,13 @@ static inline bool IsAWordChar(int ch) {
 	return ch >= 0x80 || isalnum(ch) || ch == '-' || ch == '_';
 }
 
-static inline bool IsCssOperator(int ch) {
+static inline bool IsCssOperator(int ch) noexcept {
 	if (!((ch < 0x80) && isalnum(ch)) &&
 		(ch == '{' || ch == '}' || ch == ':' || ch == ',' || ch == ';' ||
-		 ch == '.' || ch == '#' || ch == '!' || ch == '@' ||
-		 /* CSS2 */
-		 ch == '*' || ch == '>' || ch == '+' || ch == '=' || ch == '~' || ch == '|' ||
-		 ch == '[' || ch == ']' || ch == '(' || ch == ')')) {
+			ch == '.' || ch == '#' || ch == '!' || ch == '@' ||
+			/* CSS2 */
+			ch == '*' || ch == '>' || ch == '+' || ch == '=' || ch == '~' || ch == '|' ||
+			ch == '[' || ch == ']' || ch == '(' || ch == ')')) {
 		return true;
 	}
 	return false;
@@ -118,7 +115,9 @@ static void ColouriseCssDoc(Sci_PositionU startPos, Sci_Position length, int ini
 		varPrefix = isLessDocument ? '@' : '$';
 
 	// SCSS/LESS/HSS support single-line comments
-	typedef enum _CommentModes { eCommentBlock = 0, eCommentLine = 1} CommentMode;
+	typedef enum _CommentModes {
+		eCommentBlock = 0, eCommentLine = 1
+	} CommentMode;
 	CommentMode comment_mode = eCommentBlock;
 	bool hasSingleLineComments = isScssDocument || isLessDocument || isHssDocument;
 
@@ -138,12 +137,12 @@ static void ColouriseCssDoc(Sci_PositionU startPos, Sci_Position length, int ini
 				// comments are like whitespace, so we must return to the previous state
 				Sci_PositionU i = startPos;
 				for (; i > 0; i--) {
-					if ((lastStateC = styler.StyleAt(i-1)) != SCE_CSS_COMMENT) {
+					if ((lastStateC = styler.StyleAt(i - 1)) != SCE_CSS_COMMENT) {
 						if (lastStateC == SCE_CSS_OPERATOR) {
-							op = styler.SafeGetCharAt(i-1);
-							opPrev = styler.SafeGetCharAt(i-2);
+							op = styler.SafeGetCharAt(i - 1);
+							opPrev = styler.SafeGetCharAt(i - 2);
 							while (--i) {
-								lastState = styler.StyleAt(i-1);
+								lastState = styler.StyleAt(i - 1);
 								if (lastState != SCE_CSS_OPERATOR && lastState != SCE_CSS_COMMENT)
 									break;
 							}
@@ -171,7 +170,7 @@ static void ColouriseCssDoc(Sci_PositionU startPos, Sci_Position length, int ini
 			if (sc.ch != (sc.state == SCE_CSS_DOUBLESTRING ? '\"' : '\''))
 				continue;
 			Sci_PositionU i = sc.currentPos;
-			while (i && styler[i-1] == '\\')
+			while (i && styler[i - 1] == '\\')
 				i--;
 			if ((sc.currentPos - i) % 2 == 1)
 				continue;
@@ -181,10 +180,10 @@ static void ColouriseCssDoc(Sci_PositionU startPos, Sci_Position length, int ini
 		if (sc.state == SCE_CSS_OPERATOR) {
 			if (op == ' ') {
 				Sci_PositionU i = startPos;
-				op = styler.SafeGetCharAt(i-1);
-				opPrev = styler.SafeGetCharAt(i-2);
+				op = styler.SafeGetCharAt(i - 1);
+				opPrev = styler.SafeGetCharAt(i - 2);
 				while (--i) {
-					lastState = styler.StyleAt(i-1);
+					lastState = styler.StyleAt(i - 1);
 					if (lastState != SCE_CSS_OPERATOR && lastState != SCE_CSS_COMMENT)
 						break;
 				}
@@ -417,7 +416,7 @@ static void ColouriseCssDoc(Sci_PositionU startPos, Sci_Position length, int ini
 			sc.state == SCE_CSS_UNKNOWN_PSEUDOCLASS ||
 			sc.state == SCE_CSS_IMPORTANT ||
 			sc.state == SCE_CSS_DIRECTIVE
-		)) {
+			)) {
 			char s[100];
 			sc.GetCurrentLowered(s, sizeof(s));
 			char *s2 = s;
@@ -473,8 +472,8 @@ static void ColouriseCssDoc(Sci_PositionU startPos, Sci_Position length, int ini
 				sc.state == SCE_CSS_PSEUDOCLASS || sc.state == SCE_CSS_PSEUDOELEMENT ||
 				sc.state == SCE_CSS_EXTENDED_PSEUDOCLASS || sc.state == SCE_CSS_EXTENDED_PSEUDOELEMENT ||
 				sc.state == SCE_CSS_UNKNOWN_PSEUDOCLASS
+				))
 			))
-		))
 			sc.SetState(SCE_CSS_TAG);
 
 		if (sc.Match('/', '*')) {
@@ -496,7 +495,7 @@ static void ColouriseCssDoc(Sci_PositionU startPos, Sci_Position length, int ini
 			&& (sc.state != SCE_CSS_ATTRIBUTE || sc.ch == ']')
 			&& (sc.state != SCE_CSS_VALUE || sc.ch == ';' || sc.ch == '}' || sc.ch == '!')
 			&& ((sc.state != SCE_CSS_DIRECTIVE && sc.state != SCE_CSS_MEDIA) || sc.ch == ';' || sc.ch == '{')
-		) {
+			) {
 			if (sc.state != SCE_CSS_OPERATOR)
 				lastState = sc.state;
 			sc.SetState(SCE_CSS_OPERATOR);
@@ -517,7 +516,7 @@ static void FoldCSSDoc(Sci_PositionU startPos, Sci_Position length, int, LexerWo
 	int levelPrev = styler.LevelAt(lineCurrent) & SC_FOLDLEVELNUMBERMASK;
 	int levelCurrent = levelPrev;
 	char chNext = styler[startPos];
-	bool inComment = (styler.StyleAt(startPos-1) == SCE_CSS_COMMENT);
+	bool inComment = (styler.StyleAt(startPos - 1) == SCE_CSS_COMMENT);
 	for (Sci_PositionU i = startPos; i < endPos; i++) {
 		char ch = chNext;
 		chNext = styler.SafeGetCharAt(i + 1);

@@ -7,9 +7,9 @@
 // Copyright 1998-2012 by Neil Hodgson <neilh@scintilla.org>
 // The License.txt file describes the conditions under which this software may be distributed.
 
-#include <string.h>
-#include <assert.h>
-#include <ctype.h>
+#include <cstring>
+#include <cassert>
+#include <cctype>
 
 #include <string>
 #include <vector>
@@ -28,14 +28,14 @@
 
 using namespace Scintilla;
 
-static inline bool IsSqlWordChar(int ch, bool sqlAllowDottedWord) {
+static inline bool IsSqlWordChar(int ch, bool sqlAllowDottedWord) noexcept {
 	if (!sqlAllowDottedWord)
 		return (ch < 0x80) && (IsAlphaNumeric(ch) || ch == '_');
 	else
 		return (ch < 0x80) && (IsAlphaNumeric(ch) || ch == '_' || ch == '.');
 }
 
-static inline  bool IsANumberChar(int ch, int chPrev) {
+static inline  bool IsANumberChar(int ch, int chPrev) noexcept {
 	return (ch < 0x80) && (IsADigit(ch) || (ch == '.' && chPrev != '.')
 		|| ((ch == '+' || ch == '-') && (chPrev == 'e' || chPrev == 'E'))
 		|| ((ch == 'e' || ch == 'E') && (chPrev < 0x80) && IsADigit(chPrev)));
@@ -156,8 +156,8 @@ _label_identifier:
 			break;
 		case SCE_SQL_COMMENTLINE:
 		case SCE_SQL_COMMENTLINEDOC:
-		//case SCE_SQL_SQLPLUS_COMMENT:
-		//case SCE_SQL_SQLPLUS_PROMPT:
+			//case SCE_SQL_SQLPLUS_COMMENT:
+			//case SCE_SQL_SQLPLUS_PROMPT:
 			if (sc.atLineStart) {
 				sc.SetState(SCE_SQL_DEFAULT);
 			}
@@ -185,7 +185,8 @@ _label_identifier:
 				}
 			}
 			break;
-		case SCE_SQL_QOPERATOR: {
+		case SCE_SQL_QOPERATOR:
+		{
 			// Locate the unique Q operator character
 			sc.Complete();
 			char qOperator = 0x00;
@@ -286,7 +287,9 @@ enum {
 typedef unsigned int sql_state_t;
 
 class SQLStates {
-public :
+public:
+	SQLStates() = default;
+
 	void Set(Sci_Position lineNumber, sql_state_t sqlStatesLine) {
 		if (sqlStatesLine) {
 			sqlStatement.resize(lineNumber + 1, 0);
@@ -294,7 +297,7 @@ public :
 		}
 	}
 
-	static sql_state_t IgnoreWhen(sql_state_t sqlStatesLine, bool enable) {
+	static sql_state_t IgnoreWhen(sql_state_t sqlStatesLine, bool enable) noexcept {
 		if (enable)
 			sqlStatesLine |= MASK_IGNORE_WHEN;
 		else
@@ -303,7 +306,7 @@ public :
 		return sqlStatesLine;
 	}
 
-	static sql_state_t IntoCondition(sql_state_t sqlStatesLine, bool enable) {
+	static sql_state_t IntoCondition(sql_state_t sqlStatesLine, bool enable) noexcept {
 		if (enable)
 			sqlStatesLine |= MASK_INTO_CONDITION;
 		else
@@ -312,7 +315,7 @@ public :
 		return sqlStatesLine;
 	}
 
-	static sql_state_t IntoExceptionBlock(sql_state_t sqlStatesLine, bool enable) {
+	static sql_state_t IntoExceptionBlock(sql_state_t sqlStatesLine, bool enable) noexcept {
 		if (enable)
 			sqlStatesLine |= MASK_INTO_EXCEPTION;
 		else
@@ -321,7 +324,7 @@ public :
 		return sqlStatesLine;
 	}
 
-	static sql_state_t IntoDeclareBlock(sql_state_t sqlStatesLine, bool enable) {
+	static sql_state_t IntoDeclareBlock(sql_state_t sqlStatesLine, bool enable) noexcept {
 		if (enable)
 			sqlStatesLine |= MASK_INTO_DECLARE;
 		else
@@ -330,7 +333,7 @@ public :
 		return sqlStatesLine;
 	}
 
-	static sql_state_t IntoMergeStatement(sql_state_t sqlStatesLine, bool enable) {
+	static sql_state_t IntoMergeStatement(sql_state_t sqlStatesLine, bool enable) noexcept {
 		if (enable)
 			sqlStatesLine |= MASK_MERGE_STATEMENT;
 		else
@@ -339,7 +342,7 @@ public :
 		return sqlStatesLine;
 	}
 
-	static sql_state_t CaseMergeWithoutWhenFound(sql_state_t sqlStatesLine, bool found) {
+	static sql_state_t CaseMergeWithoutWhenFound(sql_state_t sqlStatesLine, bool found) noexcept {
 		if (found)
 			sqlStatesLine |= MASK_CASE_MERGE_WITHOUT_WHEN_FOUND;
 		else
@@ -348,7 +351,7 @@ public :
 		return sqlStatesLine;
 	}
 
-	static sql_state_t IntoSelectStatementOrAssignment(sql_state_t sqlStatesLine, bool found) {
+	static sql_state_t IntoSelectStatementOrAssignment(sql_state_t sqlStatesLine, bool found) noexcept {
 		if (found)
 			sqlStatesLine |= MASK_INTO_SELECT_STATEMENT_OR_ASSIGNEMENT;
 		else
@@ -357,21 +360,21 @@ public :
 		return sqlStatesLine;
 	}
 
-	static sql_state_t BeginCaseBlock(sql_state_t sqlStatesLine) {
+	static sql_state_t BeginCaseBlock(sql_state_t sqlStatesLine) noexcept {
 		if ((sqlStatesLine & MASK_NESTED_CASES) < MASK_NESTED_CASES) {
 			sqlStatesLine++;
 		}
 		return sqlStatesLine;
 	}
 
-	static sql_state_t EndCaseBlock(sql_state_t sqlStatesLine) {
+	static sql_state_t EndCaseBlock(sql_state_t sqlStatesLine) noexcept {
 		if ((sqlStatesLine & MASK_NESTED_CASES) > 0) {
 			sqlStatesLine--;
 		}
 		return sqlStatesLine;
 	}
 
-	static sql_state_t IntoCreateStatement(sql_state_t sqlStatesLine, bool enable) {
+	static sql_state_t IntoCreateStatement(sql_state_t sqlStatesLine, bool enable) noexcept {
 		if (enable)
 			sqlStatesLine |= MASK_INTO_CREATE;
 		else
@@ -380,7 +383,7 @@ public :
 		return sqlStatesLine;
 	}
 
-	static sql_state_t IntoCreateViewStatement(sql_state_t sqlStatesLine, bool enable) {
+	static sql_state_t IntoCreateViewStatement(sql_state_t sqlStatesLine, bool enable) noexcept {
 		if (enable)
 			sqlStatesLine |= MASK_INTO_CREATE_VIEW;
 		else
@@ -389,7 +392,7 @@ public :
 		return sqlStatesLine;
 	}
 
-	static sql_state_t IntoCreateViewAsStatement(sql_state_t sqlStatesLine, bool enable) {
+	static sql_state_t IntoCreateViewAsStatement(sql_state_t sqlStatesLine, bool enable) noexcept {
 		if (enable)
 			sqlStatesLine |= MASK_INTO_CREATE_VIEW_AS_STATEMENT;
 		else
@@ -398,51 +401,51 @@ public :
 		return sqlStatesLine;
 	}
 
-	static bool IsIgnoreWhen(sql_state_t sqlStatesLine) {
+	static bool IsIgnoreWhen(sql_state_t sqlStatesLine) noexcept {
 		return (sqlStatesLine & MASK_IGNORE_WHEN) != 0;
 	}
 
-	static bool IsIntoCondition(sql_state_t sqlStatesLine) {
+	static bool IsIntoCondition(sql_state_t sqlStatesLine) noexcept {
 		return (sqlStatesLine & MASK_INTO_CONDITION) != 0;
 	}
 
-	static bool IsIntoCaseBlock(sql_state_t sqlStatesLine) {
+	static bool IsIntoCaseBlock(sql_state_t sqlStatesLine) noexcept {
 		return (sqlStatesLine & MASK_NESTED_CASES) != 0;
 	}
 
-	static bool IsIntoExceptionBlock(sql_state_t sqlStatesLine) {
+	static bool IsIntoExceptionBlock(sql_state_t sqlStatesLine) noexcept {
 		return (sqlStatesLine & MASK_INTO_EXCEPTION) != 0;
 	}
 
-	static bool IsIntoSelectStatementOrAssignment(sql_state_t sqlStatesLine) {
+	static bool IsIntoSelectStatementOrAssignment(sql_state_t sqlStatesLine) noexcept {
 		return (sqlStatesLine & MASK_INTO_SELECT_STATEMENT_OR_ASSIGNEMENT) != 0;
 	}
 
-	static bool IsCaseMergeWithoutWhenFound(sql_state_t sqlStatesLine) {
+	static bool IsCaseMergeWithoutWhenFound(sql_state_t sqlStatesLine) noexcept {
 		return (sqlStatesLine & MASK_CASE_MERGE_WITHOUT_WHEN_FOUND) != 0;
 	}
 
-	static bool IsIntoDeclareBlock(sql_state_t sqlStatesLine) {
+	static bool IsIntoDeclareBlock(sql_state_t sqlStatesLine) noexcept {
 		return (sqlStatesLine & MASK_INTO_DECLARE) != 0;
 	}
 
-	static bool IsIntoMergeStatement(sql_state_t sqlStatesLine) {
+	static bool IsIntoMergeStatement(sql_state_t sqlStatesLine) noexcept {
 		return (sqlStatesLine & MASK_MERGE_STATEMENT) != 0;
 	}
 
-	static bool IsIntoCreateStatement (sql_state_t sqlStatesLine) {
+	static bool IsIntoCreateStatement(sql_state_t sqlStatesLine) noexcept {
 		return (sqlStatesLine & MASK_INTO_CREATE) != 0;
 	}
 
-	static bool IsIntoCreateViewStatement (sql_state_t sqlStatesLine) {
+	static bool IsIntoCreateViewStatement(sql_state_t sqlStatesLine) noexcept {
 		return (sqlStatesLine & MASK_INTO_CREATE_VIEW) != 0;
 	}
 
-	static bool IsIntoCreateViewAsStatement (sql_state_t sqlStatesLine) {
+	static bool IsIntoCreateViewAsStatement(sql_state_t sqlStatesLine) noexcept {
 		return (sqlStatesLine & MASK_INTO_CREATE_VIEW_AS_STATEMENT) != 0;
 	}
 
-	sql_state_t ForLine(Sci_Position lineNumber) {
+	sql_state_t ForLine(Sci_Position lineNumber) const noexcept {
 		if ((lineNumber > 0) && (sqlStatement.size() > static_cast<size_t>(lineNumber))) {
 			return sqlStatement[lineNumber];
 		} else {
@@ -450,17 +453,15 @@ public :
 		}
 	}
 
-	SQLStates() {}
-
-private :
+private:
 	std::vector<sql_state_t> sqlStatement;
 };
 
-static inline bool IsStreamCommentStyle(int style) {
+static inline bool IsStreamCommentStyle(int style) noexcept {
 	return style == SCE_SQL_COMMENT;
 }
 
-static inline bool IsCommentStyle (int style) {
+static inline bool IsCommentStyle (int style) noexcept {
 	return style == SCE_SQL_COMMENT || style == SCE_SQL_COMMENTLINE || style == SCE_SQL_COMMENTLINEDOC;
 }
 
@@ -491,11 +492,11 @@ static void FoldSqlDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 			} else if (ch == ';' && styler.StyleAt(startPos) == SCE_SQL_OPERATOR) {
 				bool isAllClear = true;
 				for (Sci_Position tempPos = startPos + 1;
-				     tempPos < lastNLPos;
-				     ++tempPos) {
+					tempPos < lastNLPos;
+					++tempPos) {
 					int tempStyle = styler.StyleAt(tempPos);
 					if (!IsCommentStyle(tempStyle)
-					    && tempStyle != SCE_SQL_DEFAULT) {
+						&& tempStyle != SCE_SQL_DEFAULT) {
 						isAllClear = false;
 						break;
 					}
@@ -554,29 +555,29 @@ static void FoldSqlDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 			isUnfoldingIgnored = false;
 		}
 		if ((!IsCommentStyle(style) && ch == ';')) {
-			if (sqlStates.IsIntoMergeStatement(sqlStatesCurrentLine)) {
+			if (SQLStates::IsIntoMergeStatement(sqlStatesCurrentLine)) {
 				// This is the end of "MERGE" statement.
-				if (!sqlStates.IsCaseMergeWithoutWhenFound(sqlStatesCurrentLine))
+				if (!SQLStates::IsCaseMergeWithoutWhenFound(sqlStatesCurrentLine))
 					levelNext--;
-				sqlStatesCurrentLine = sqlStates.IntoMergeStatement(sqlStatesCurrentLine, false);
-				//sqlStatesCurrentLine = sqlStates.WhenThenFound(sqlStatesCurrentLine, false);
+				sqlStatesCurrentLine = SQLStates::IntoMergeStatement(sqlStatesCurrentLine, false);
+				//sqlStatesCurrentLine = SQLStates::WhenThenFound(sqlStatesCurrentLine, false);
 				levelNext--;
 			}
-			if (sqlStates.IsIntoSelectStatementOrAssignment(sqlStatesCurrentLine))
-				sqlStatesCurrentLine = sqlStates.IntoSelectStatementOrAssignment(sqlStatesCurrentLine, false);
-			if (sqlStates.IsIntoCreateStatement(sqlStatesCurrentLine)) {
-				if (sqlStates.IsIntoCreateViewStatement(sqlStatesCurrentLine)) {
-					if (sqlStates.IsIntoCreateViewAsStatement(sqlStatesCurrentLine)) {
+			if (SQLStates::IsIntoSelectStatementOrAssignment(sqlStatesCurrentLine))
+				sqlStatesCurrentLine = SQLStates::IntoSelectStatementOrAssignment(sqlStatesCurrentLine, false);
+			if (SQLStates::IsIntoCreateStatement(sqlStatesCurrentLine)) {
+				if (SQLStates::IsIntoCreateViewStatement(sqlStatesCurrentLine)) {
+					if (SQLStates::IsIntoCreateViewAsStatement(sqlStatesCurrentLine)) {
 						levelNext--;
-						sqlStatesCurrentLine = sqlStates.IntoCreateViewAsStatement(sqlStatesCurrentLine, false);
+						sqlStatesCurrentLine = SQLStates::IntoCreateViewAsStatement(sqlStatesCurrentLine, false);
 					}
-					sqlStatesCurrentLine = sqlStates.IntoCreateViewStatement(sqlStatesCurrentLine, false);
+					sqlStatesCurrentLine = SQLStates::IntoCreateViewStatement(sqlStatesCurrentLine, false);
 				}
-				sqlStatesCurrentLine = sqlStates.IntoCreateStatement(sqlStatesCurrentLine, false);
+				sqlStatesCurrentLine = SQLStates::IntoCreateStatement(sqlStatesCurrentLine, false);
 			}
 		}
 		if (ch == ':' && chNext == '=' && !IsCommentStyle(style))
-			sqlStatesCurrentLine = sqlStates.IntoSelectStatementOrAssignment(sqlStatesCurrentLine, true);
+			sqlStatesCurrentLine = SQLStates::IntoSelectStatementOrAssignment(sqlStatesCurrentLine, true);
 
 		if (foldComment && IsStreamCommentStyle(style)) {
 			if (!IsStreamCommentStyle(stylePrev)) {
@@ -591,7 +592,7 @@ static void FoldSqlDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 		if (foldComment && atEOL && IsCommentLine(lineCurrent)) {
 			if (!IsCommentLine(lineCurrent - 1) && IsCommentLine(lineCurrent + 1))
 				levelNext++;
-			else if (IsCommentLine(lineCurrent - 1) && !IsCommentLine(lineCurrent+1))
+			else if (IsCommentLine(lineCurrent - 1) && !IsCommentLine(lineCurrent + 1))
 				levelNext--;
 		}
 		if (style == SCE_SQL_OPERATOR) {
@@ -624,7 +625,7 @@ static void FoldSqlDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 			}
 
 			if (!foldOnlyBegin && strcmp(s, "select") == 0) {
-				sqlStatesCurrentLine = sqlStates.IntoSelectStatementOrAssignment(sqlStatesCurrentLine, true);
+				sqlStatesCurrentLine = SQLStates::IntoSelectStatementOrAssignment(sqlStatesCurrentLine, true);
 			} else if (strcmp(s, "if") == 0) {
 				if (endFound) {
 					endFound = false;
@@ -667,13 +668,13 @@ static void FoldSqlDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 					}
 					if ((!foldOnlyBegin) && strcmp(s, "case") == 0) {
 						sqlStatesCurrentLine = SQLStates::EndCaseBlock(sqlStatesCurrentLine);
-						if (!sqlStates.IsCaseMergeWithoutWhenFound(sqlStatesCurrentLine))
+						if (!SQLStates::IsCaseMergeWithoutWhenFound(sqlStatesCurrentLine))
 							levelNext--; //again for the "end case;" and block when
 					}
 				} else if (!foldOnlyBegin) {
 					if (strcmp(s, "case") == 0) {
 						sqlStatesCurrentLine = SQLStates::BeginCaseBlock(sqlStatesCurrentLine);
-						sqlStatesCurrentLine = sqlStates.CaseMergeWithoutWhenFound(sqlStatesCurrentLine, true);
+						sqlStatesCurrentLine = SQLStates::CaseMergeWithoutWhenFound(sqlStatesCurrentLine, true);
 					}
 
 					if (levelCurrent > levelNext)
@@ -699,8 +700,8 @@ static void FoldSqlDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 				// and IF or CASE aren't on only one line with ELSE or ELSIF (with flag statementFound)
 				// prevent also ELSE is on the same line (eg. "ELSE ... END IF;")
 				statementFound = true;
-				if (sqlStates.IsIntoCaseBlock(sqlStatesCurrentLine) && sqlStates.IsCaseMergeWithoutWhenFound(sqlStatesCurrentLine)) {
-					sqlStatesCurrentLine = sqlStates.CaseMergeWithoutWhenFound(sqlStatesCurrentLine, false);
+				if (SQLStates::IsIntoCaseBlock(sqlStatesCurrentLine) && SQLStates::IsCaseMergeWithoutWhenFound(sqlStatesCurrentLine)) {
+					sqlStatesCurrentLine = SQLStates::CaseMergeWithoutWhenFound(sqlStatesCurrentLine, false);
 					levelNext++;
 				} else {
 					// we are in same case "} ELSE {" in C language
@@ -715,7 +716,7 @@ static void FoldSqlDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 				// keyword list.
 				endFound = true;
 				levelNext--;
-				if (sqlStates.IsIntoSelectStatementOrAssignment(sqlStatesCurrentLine) && !sqlStates.IsCaseMergeWithoutWhenFound(sqlStatesCurrentLine))
+				if (SQLStates::IsIntoSelectStatementOrAssignment(sqlStatesCurrentLine) && !SQLStates::IsCaseMergeWithoutWhenFound(sqlStatesCurrentLine))
 					levelNext--;
 				if (levelNext < SC_FOLDLEVELBASE) {
 					levelNext = SC_FOLDLEVELBASE;
@@ -723,20 +724,20 @@ static void FoldSqlDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 				}
 			} else if ((!foldOnlyBegin) && strcmp(s, "when") == 0 &&
 				!SQLStates::IsIgnoreWhen(sqlStatesCurrentLine) &&
-						!sqlStates.IsIntoExceptionBlock(sqlStatesCurrentLine) && (
-							sqlStates.IsIntoCaseBlock(sqlStatesCurrentLine) ||
-							sqlStates.IsIntoMergeStatement(sqlStatesCurrentLine)
-							)
-						) {
+				!SQLStates::IsIntoExceptionBlock(sqlStatesCurrentLine) && (
+					SQLStates::IsIntoCaseBlock(sqlStatesCurrentLine) ||
+					SQLStates::IsIntoMergeStatement(sqlStatesCurrentLine)
+					)
+				) {
 				sqlStatesCurrentLine = SQLStates::IntoCondition(sqlStatesCurrentLine, true);
 				// Don't foldind when CASE and WHEN are on the same line (with flag statementFound) (eg. "CASE selector WHEN expression1 THEN sequence_of_statements1;\n")
 				// and same way for MERGE statement.
 				if (!statementFound) {
-					if (!sqlStates.IsCaseMergeWithoutWhenFound(sqlStatesCurrentLine)) {
+					if (!SQLStates::IsCaseMergeWithoutWhenFound(sqlStatesCurrentLine)) {
 						levelCurrent--;
 						levelNext--;
 					}
-					sqlStatesCurrentLine = sqlStates.CaseMergeWithoutWhenFound(sqlStatesCurrentLine, false);
+					sqlStatesCurrentLine = SQLStates::CaseMergeWithoutWhenFound(sqlStatesCurrentLine, false);
 				}
 			} else if ((!foldOnlyBegin) && strcmp(s, "exit") == 0) {
 				sqlStatesCurrentLine = SQLStates::IgnoreWhen(sqlStatesCurrentLine, true);
@@ -744,32 +745,32 @@ static void FoldSqlDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 				sqlStatesCurrentLine = SQLStates::IntoExceptionBlock(sqlStatesCurrentLine, true);
 			} else if ((!foldOnlyBegin) &&
 				(strcmp(s, "declare") == 0 || strcmp(s, "function") == 0 ||
-				strcmp(s, "procedure") == 0 || strcmp(s, "package") == 0)) {
+					strcmp(s, "procedure") == 0 || strcmp(s, "package") == 0)) {
 				sqlStatesCurrentLine = SQLStates::IntoDeclareBlock(sqlStatesCurrentLine, true);
 			} else if ((!foldOnlyBegin) && strcmp(s, "merge") == 0) {
-				sqlStatesCurrentLine = sqlStates.IntoMergeStatement(sqlStatesCurrentLine, true);
-				sqlStatesCurrentLine = sqlStates.CaseMergeWithoutWhenFound(sqlStatesCurrentLine, true);
+				sqlStatesCurrentLine = SQLStates::IntoMergeStatement(sqlStatesCurrentLine, true);
+				sqlStatesCurrentLine = SQLStates::CaseMergeWithoutWhenFound(sqlStatesCurrentLine, true);
 				levelNext++;
 				statementFound = true;
 			} else if ((!foldOnlyBegin) &&
-				   strcmp(s, "create") == 0) {
-				sqlStatesCurrentLine = sqlStates.IntoCreateStatement(sqlStatesCurrentLine, true);
+				strcmp(s, "create") == 0) {
+				sqlStatesCurrentLine = SQLStates::IntoCreateStatement(sqlStatesCurrentLine, true);
 			} else if ((!foldOnlyBegin) &&
-				   strcmp(s, "view") == 0 &&
-				   sqlStates.IsIntoCreateStatement(sqlStatesCurrentLine)) {
-				sqlStatesCurrentLine = sqlStates.IntoCreateViewStatement(sqlStatesCurrentLine, true);
+				strcmp(s, "view") == 0 &&
+				SQLStates::IsIntoCreateStatement(sqlStatesCurrentLine)) {
+				sqlStatesCurrentLine = SQLStates::IntoCreateViewStatement(sqlStatesCurrentLine, true);
 			} else if ((!foldOnlyBegin) &&
-				   strcmp(s, "as") == 0 &&
-				   sqlStates.IsIntoCreateViewStatement(sqlStatesCurrentLine) &&
-				   ! sqlStates.IsIntoCreateViewAsStatement(sqlStatesCurrentLine)) {
-				sqlStatesCurrentLine = sqlStates.IntoCreateViewAsStatement(sqlStatesCurrentLine, true);
+				strcmp(s, "as") == 0 &&
+				SQLStates::IsIntoCreateViewStatement(sqlStatesCurrentLine) &&
+				!SQLStates::IsIntoCreateViewAsStatement(sqlStatesCurrentLine)) {
+				sqlStatesCurrentLine = SQLStates::IntoCreateViewAsStatement(sqlStatesCurrentLine, true);
 				levelNext++;
 			}
 		}
 		if (!isspacechar(ch)) {
 			visibleChars++;
 		}
-		if (atEOL || (i == endPos-1)) {
+		if (atEOL || (i == endPos - 1)) {
 			int levelUse = levelCurrent;
 			int lev = levelUse | levelNext << 16;
 			if (visibleChars == 0 && foldCompact)

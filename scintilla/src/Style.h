@@ -18,13 +18,12 @@ struct FontSpecification {
 	int characterSet;
 	int extraFontFlag;
 	FontSpecification() :
-		fontName(0),
+		fontName(nullptr),
 		weight(SC_WEIGHT_NORMAL),
 		italic(false),
 		size(10 * SC_FONT_SIZE_MULTIPLIER),
 		characterSet(0),
-		extraFontFlag(0) {
-	}
+		extraFontFlag(0) {}
 	bool operator==(const FontSpecification &other) const;
 	bool operator<(const FontSpecification &other) const;
 };
@@ -34,9 +33,11 @@ class FontAlias : public Font {
 public:
 	FontAlias();
 	// FontAlias objects can not be assigned except for initialization
-	FontAlias &operator=(const FontAlias &) = delete;
 	FontAlias(const FontAlias &);
-	virtual ~FontAlias();
+	FontAlias(FontAlias &&) = delete;
+	FontAlias &operator=(const FontAlias &) = delete;
+	FontAlias &operator=(FontAlias &&) = delete;
+	~FontAlias() override;
 	void MakeAlias(const Font &fontOrigin);
 	void ClearFont();
 };
@@ -49,7 +50,7 @@ struct FontMeasurements {
 	XYPOSITION spaceWidth;
 	int sizeZoomed;
 	FontMeasurements();
-	void Clear();
+	void ClearMeasurements();
 };
 
 /**
@@ -61,7 +62,9 @@ public:
 	bool eolFilled;
 	bool underline;
 	bool strike;
-	enum ecaseForced {caseMixed, caseUpper, caseLower, caseCamel};
+	enum ecaseForced {
+		caseMixed, caseUpper, caseLower, caseCamel
+	};
 	ecaseForced caseForce;
 	bool visible;
 	bool changeable;
@@ -71,17 +74,21 @@ public:
 
 	Style();
 	Style(const Style &source);
+	Style(Style &&) = delete;
 	~Style();
 	Style &operator=(const Style &source);
+	Style &operator=(Style &&) = delete;
 	void Clear(ColourDesired fore_, ColourDesired back_,
-	           int size_,
-	           const char *fontName_, int characterSet_,
-	           int weight_, bool italic_, bool eolFilled_,
-	           bool underline_, bool strike_, ecaseForced caseForce_,
-	           bool visible_, bool changeable_, bool hotspot_);
+		int size_,
+		const char *fontName_, int characterSet_,
+		int weight_, bool italic_, bool eolFilled_,
+		bool underline_, bool strike_, ecaseForced caseForce_,
+		bool visible_, bool changeable_, bool hotspot_);
 	void ClearTo(const Style &source);
 	void Copy(Font &font_, const FontMeasurements &fm_);
-	bool IsProtected() const { return !(changeable && visible);}
+	bool IsProtected() const {
+		return !(changeable && visible);
+	}
 };
 
 }

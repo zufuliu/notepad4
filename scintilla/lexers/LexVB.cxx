@@ -9,9 +9,9 @@
 // Copyright 1998-2005 by Neil Hodgson <neilh@scintilla.org>
 // The License.txt file describes the conditions under which this software may be distributed.
 
-#include <string.h>
-#include <assert.h>
-#include <ctype.h>
+#include <cstring>
+#include <cassert>
+#include <cctype>
 
 #include "ILexer.h"
 #include "Scintilla.h"
@@ -29,13 +29,13 @@ using namespace Scintilla;
 // Internal state, highlighted as number
 #define SCE_B_FILENUMBER SCE_B_DEFAULT+100
 
-#define LexCharAt(pos)	styler.SafeGetCharAt(pos, '\0')
+#define LexCharAt(pos)	styler.SafeGetCharAt(pos)
 
-static inline bool IsTypeCharacter(int ch) {
+static inline bool IsTypeCharacter(int ch) noexcept {
 	return ch == '%' || ch == '&' || ch == '@' || ch == '!' || ch == '#' || ch == '$';
 }
 
-static bool IsVBNumber(int ch, int chPrev) {
+static bool IsVBNumber(int ch, int chPrev) noexcept {
 	return (ch < 0x80) && (isxdigit(ch)
 		|| (ch == '.' && chPrev != '.')
 		|| ((ch == '+' || ch == '_') && (chPrev == 'E' || chPrev == 'e'))
@@ -56,7 +56,7 @@ static bool IsVBNumber(int ch, int chPrev) {
 	0
 };*/
 
-static inline bool IsSpaceEquiv(int state) {
+static inline bool IsSpaceEquiv(int state) noexcept {
 	// including SCE_B_DEFAULT, SCE_B_COMMENT
 	return (state <= SCE_B_COMMENT);
 }
@@ -109,30 +109,30 @@ _label_identifier:
 					sc.ChangeState(SCE_B_LABEL);
 					sc.SetState(SCE_B_DEFAULT);
 				} else
-				if (strcmp(s, "rem") == 0) {
-					sc.ChangeState(SCE_B_COMMENT);
-				} else {
-					if ((isIfThenPreprocessor && strcmp(s, "then") == 0) || (isEndPreprocessor
-						&& (strcmp(s, "if") == 0 || strcmp(s, "region") == 0 || strcmp(s, "externalsource") == 0))) {
-						sc.ChangeState(SCE_B_PREPROCESSOR);
-					} else if (keywords.InList(s)) {
-						sc.ChangeState(SCE_B_KEYWORD);
-					} else if (keywords2.InList(s)) {
-						sc.ChangeState(SCE_B_KEYWORD2);
-					} else if (keywords3.InList(s)) {
-						sc.ChangeState(SCE_B_KEYWORD3);
-					} else if (!vbScriptSyntax && s[0] == '#' && keywords4.InList(&s[1])) {
-						sc.ChangeState(SCE_B_PREPROCESSOR);
-						isIfThenPreprocessor = strcmp(s, "#if") == 0 || strcmp(s, "#elseif") == 0;
-						isEndPreprocessor = strcmp(s, "#end") == 0;
-					} else if (keywords5.InList(s)) {
-						sc.ChangeState(SCE_B_KEYWORD4);
-					} else if (keywords6.InList(s)) {
-						sc.ChangeState(SCE_B_CONSTANT);
-					}
+					if (strcmp(s, "rem") == 0) {
+						sc.ChangeState(SCE_B_COMMENT);
+					} else {
+						if ((isIfThenPreprocessor && strcmp(s, "then") == 0) || (isEndPreprocessor
+							&& (strcmp(s, "if") == 0 || strcmp(s, "region") == 0 || strcmp(s, "externalsource") == 0))) {
+							sc.ChangeState(SCE_B_PREPROCESSOR);
+						} else if (keywords.InList(s)) {
+							sc.ChangeState(SCE_B_KEYWORD);
+						} else if (keywords2.InList(s)) {
+							sc.ChangeState(SCE_B_KEYWORD2);
+						} else if (keywords3.InList(s)) {
+							sc.ChangeState(SCE_B_KEYWORD3);
+						} else if (!vbScriptSyntax && s[0] == '#' && keywords4.InList(&s[1])) {
+							sc.ChangeState(SCE_B_PREPROCESSOR);
+							isIfThenPreprocessor = strcmp(s, "#if") == 0 || strcmp(s, "#elseif") == 0;
+							isEndPreprocessor = strcmp(s, "#end") == 0;
+						} else if (keywords5.InList(s)) {
+							sc.ChangeState(SCE_B_KEYWORD4);
+						} else if (keywords6.InList(s)) {
+							sc.ChangeState(SCE_B_CONSTANT);
+						}
 
-					sc.SetState(SCE_B_DEFAULT);
-				}
+						sc.SetState(SCE_B_DEFAULT);
+					}
 			}
 		} else if (sc.state == SCE_B_NUMBER) {
 			if (!IsVBNumber(sc.ch, sc.chPrev)) {
@@ -237,7 +237,7 @@ static bool VBMatchNextWord(Sci_Position startPos, Sci_Position endPos, Accessor
 		&& LexMatchIgnoreCase(pos, styler, word);
 }
 static bool IsVBProperty(Sci_Position line, Sci_Position startPos, Accessor &styler) {
-	Sci_Position endPos = styler.LineStart(line+1) - 1;
+	Sci_Position endPos = styler.LineStart(line + 1) - 1;
 	for (Sci_Position i = startPos; i < endPos; i++) {
 		if (styler.StyleAt(i) == SCE_B_OPERATOR && LexCharAt(i) == '(')
 			return true;
@@ -246,7 +246,7 @@ static bool IsVBProperty(Sci_Position line, Sci_Position startPos, Accessor &sty
 }
 static bool IsVBSome(Sci_Position line, int kind, Accessor &styler) {
 	Sci_Position startPos = styler.LineStart(line);
-	Sci_Position endPos = styler.LineStart(line+1) - 1;
+	Sci_Position endPos = styler.LineStart(line + 1) - 1;
 	Sci_Position pos = LexSkipSpaceTab(startPos, endPos, styler);
 	int stl = styler.StyleAt(pos);
 	if (stl == SCE_B_KEYWORD) {
@@ -263,8 +263,8 @@ static bool IsVBSome(Sci_Position line, int kind, Accessor &styler) {
 		pos = LexSkipSpaceTab(pos, endPos, styler);
 		stl = styler.StyleAt(pos);
 		if (stl == SCE_B_KEYWORD) {
-			return (kind == 1 && isspace(LexCharAt(pos+4)) && LexMatchIgnoreCase(pos, styler, "type"))
-				|| (kind == 2 && isspace(LexCharAt(pos+5)) && LexMatchIgnoreCase(pos, styler, "const"));
+			return (kind == 1 && isspace(LexCharAt(pos + 4)) && LexMatchIgnoreCase(pos, styler, "type"))
+				|| (kind == 2 && isspace(LexCharAt(pos + 5)) && LexMatchIgnoreCase(pos, styler, "const"));
 		}
 	}
 	return false;
@@ -288,7 +288,7 @@ static void FoldVBDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 	Sci_Position lineCurrent = styler.GetLine(startPos);
 	int levelCurrent = SC_FOLDLEVELBASE;
 	if (lineCurrent > 0)
-		levelCurrent = styler.LevelAt(lineCurrent-1) >> 16;
+		levelCurrent = styler.LevelAt(lineCurrent - 1) >> 16;
 	int levelNext = levelCurrent;
 
 	char ch = '\0';
@@ -338,37 +338,37 @@ static void FoldVBDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 
 		if (style == SCE_B_KEYWORD && stylePrev != SCE_B_KEYWORD
 			&& !(chPrev == '.' || chPrev == '[')) { // not a member, not bracketed [keyword] identifier
-			if (atLineBegin && (VBMatch("for") || (VBMatch("do") && isspace(LexCharAt(i+2))) // not Double
-				|| VBMatch("while") || (VBMatch("try") && isspace(LexCharAt(i+3))) // not TryCast
-				|| (VBMatch("select") && VBMatchNext(i+6, "case")) // Select Case
-				|| (VBMatch("with") && isspace(LexCharAt(i+4))) // not WithEvents, not With {...}
+			if (atLineBegin && (VBMatch("for") || (VBMatch("do") && isspace(LexCharAt(i + 2))) // not Double
+				|| VBMatch("while") || (VBMatch("try") && isspace(LexCharAt(i + 3))) // not TryCast
+				|| (VBMatch("select") && VBMatchNext(i + 6, "case")) // Select Case
+				|| (VBMatch("with") && isspace(LexCharAt(i + 4))) // not WithEvents, not With {...}
 				|| VBMatch("namespace") || VBMatch("synclock") || VBMatch("using")
-				|| (isProperty && (VBMatch("set") || (VBMatch("get") && isspace(LexCharAt(i+3))))) // not GetType
+				|| (isProperty && (VBMatch("set") || (VBMatch("get") && isspace(LexCharAt(i + 3))))) // not GetType
 				|| (isCustom && (VBMatch("raiseevent") || VBMatch("addhandler") || VBMatch("removehandler")))
 				)) {
 				levelNext++;
 			} else if (atLineBegin && (VBMatch("next") || VBMatch("loop") || VBMatch("wend"))) {
 				levelNext--;
-			} else if (VBMatch("exit") && (VBMatchNext(i+4, "function") || VBMatchNext(i+4, "sub")
-				|| VBMatchNext(i+4, "property")
+			} else if (VBMatch("exit") && (VBMatchNext(i + 4, "function") || VBMatchNext(i + 4, "sub")
+				|| VBMatchNext(i + 4, "property")
 				)) {
 				isExit = true;
 			} else if (VBMatch("begin")) {
 				levelNext++;
-				if (isspace(LexCharAt(i+5)))
+				if (isspace(LexCharAt(i + 5)))
 					numBegin++;
 			} else if (VBMatch("end")) {
 				levelNext--;
-				char chEnd = LexCharAt(i+3);
+				char chEnd = LexCharAt(i + 3);
 				if (chEnd == ' ' || chEnd == '\t') {
-					Sci_Position pos = LexSkipSpaceTab(i+3, endPos, styler);
+					Sci_Position pos = LexSkipSpaceTab(i + 3, endPos, styler);
 					chEnd = LexCharAt(pos);
 					// check if End is used to terminate statement
 					if (isalpha(chEnd) && (VBMatchNext(pos, "function") || VBMatchNext(pos, "sub")
 						|| VBMatchNext(pos, "if") || VBMatchNext(pos, "class") || VBMatchNext(pos, "structure")
 						|| VBMatchNext(pos, "module") || VBMatchNext(pos, "enum") || VBMatchNext(pos, "interface")
 						|| VBMatchNext(pos, "operator") || VBMatchNext(pos, "property") || VBMatchNext(pos, "event")
-						|| VBMatchNext(pos,"type") // VB6
+						|| VBMatchNext(pos, "type") // VB6
 						)) {
 						isEnd = true;
 					}
@@ -386,12 +386,13 @@ static void FoldVBDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 			} else if (VBMatch("if")) {
 				isIf = true;
 				lineIf = lineCurrent;
-				if (isEnd)			{isEnd = false; isIf = false;}
-				else				levelNext++;
+				if (isEnd) {
+					isEnd = false; isIf = false;
+				} else				levelNext++;
 			} else if (VBMatch("then")) {
 				if (isIf) {
 					isIf = false;
-					Sci_Position pos = LexSkipSpaceTab(i+4, endPos, styler);
+					Sci_Position pos = LexSkipSpaceTab(i + 4, endPos, styler);
 					char chEnd = LexCharAt(pos);
 					if (!(chEnd == '\r' || chEnd == '\n' || chEnd == '\''))
 						levelNext--;
@@ -404,11 +405,13 @@ static void FoldVBDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 				else				levelNext++;
 			} else if (VBMatch("interface")) {
 				if (!(isEnd || isInterface))
-									levelNext++;
+					levelNext++;
 				isInterface = true;
-				if (isEnd)			{isEnd = false; isInterface = false;}
+				if (isEnd) {
+					isEnd = false; isInterface = false;
+				}
 			} else if (VBMatch("declare") || VBMatch("delegate")) {
-									isDeclare = true;
+				isDeclare = true;
 			} else if (!isInterface && (VBMatch("sub") || VBMatch("function"))) {
 				if (!(isEnd || isExit || isDeclare))
 					levelNext++;
@@ -419,19 +422,22 @@ static void FoldVBDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 				isProperty = true;
 				if (!(isEnd || isExit)) {
 					levelNext++;
-					if (!IsVBProperty(lineCurrent, i+8, styler)) {
+					if (!IsVBProperty(lineCurrent, i + 8, styler)) {
 						isProperty = false;
 						levelNext--;
 					}
 				}
-				if (isEnd)			{isEnd = false; isProperty = false;}
+				if (isEnd) {
+					isEnd = false; isProperty = false;
+				}
 				if (isExit)			isExit = false;
 			} else if (VBMatch("custom")) {
-									isCustom = true;
+				isCustom = true;
 			} else if (!isInterface && isCustom && VBMatch("event")) {
-				if (isEnd) 			{isEnd = false; isCustom = false;}
-				else 				levelNext++;
-			} else if (VBMatch("type") && isspace(LexCharAt(i+4)))	{ // not TypeOf, VB6: [...] Type ... End Type
+				if (isEnd) {
+					isEnd = false; isCustom = false;
+				} else 				levelNext++;
+			} else if (VBMatch("type") && isspace(LexCharAt(i + 4))) { // not TypeOf, VB6: [...] Type ... End Type
 				if (!isEnd && IsVB6Type(lineCurrent))
 					levelNext++;
 				if (isEnd)	isEnd = false;
@@ -456,7 +462,7 @@ static void FoldVBDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 		if (!isspacechar(ch))
 			visibleChars++;
 
-		if (atEOL || (i == endPos-1)) {
+		if (atEOL || (i == endPos - 1)) {
 			int levelUse = levelCurrent;
 			int lev = levelUse | levelNext << 16;
 			if (visibleChars == 0 && foldCompact)

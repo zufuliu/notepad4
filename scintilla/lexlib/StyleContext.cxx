@@ -20,23 +20,23 @@ using namespace Scintilla;
 
 void StyleContext::GetNextChar() {
 	if (multiByteAccess) {
-		chNext = multiByteAccess->GetCharacterAndWidth(currentPos+width, &widthNext);
+		chNext = multiByteAccess->GetCharacterAndWidth(currentPos + width, &widthNext);
 	} else {
-		chNext = static_cast<unsigned char>(styler.SafeGetCharAt(currentPos+width, 0));
+		chNext = static_cast<unsigned char>(styler.SafeGetCharAt(currentPos + width));
 		widthNext = 1;
 	}
 	// End of line determined from line end position, allowing CR, LF,
 	// CRLF and Unicode line ends as set by document.
 	if (currentLine < lineDocEnd)
-		atLineEnd = static_cast<Sci_Position>(currentPos) >= (lineStartNext-1);
+		atLineEnd = static_cast<Sci_Position>(currentPos) >= (lineStartNext - 1);
 	else // Last line
 		atLineEnd = static_cast<Sci_Position>(currentPos) >= lineStartNext;
 }
 
 StyleContext::StyleContext(Sci_PositionU startPos, Sci_PositionU length,
-		int initStyle, LexAccessor &styler_, unsigned char chMask) :
+	int initStyle, LexAccessor &styler_, unsigned char chMask) :
 	styler(styler_),
-	multiByteAccess(0),
+	multiByteAccess(nullptr),
 	endPos(startPos + length),
 	posRelative(0),
 	currentPosLastRelative(LexAccessor::extremePosition),
@@ -57,7 +57,7 @@ StyleContext::StyleContext(Sci_PositionU startPos, Sci_PositionU length,
 	styler.StartAt(startPos/*, chMask*/);
 	styler.StartSegment(startPos);
 	currentLine = styler.GetLine(startPos);
-	lineStartNext = styler.LineStart(currentLine+1);
+	lineStartNext = styler.LineStart(currentLine + 1);
 	lengthDocument = static_cast<Sci_PositionU>(styler.Length());
 	if (endPos == lengthDocument)
 		endPos++;
@@ -83,7 +83,7 @@ void StyleContext::Forward() {
 		atLineStart = atLineEnd;
 		if (atLineStart) {
 			currentLine++;
-			lineStartNext = styler.LineStart(currentLine+1);
+			lineStartNext = styler.LineStart(currentLine + 1);
 		}
 		chPrev = ch;
 		currentPos += width;
@@ -138,15 +138,15 @@ int StyleContext::GetRelativeCharacter(Sci_Position n) {
 			posRelative = currentPos;
 			offsetRelative = 0;
 		}
-		Sci_Position diffRelative = n - offsetRelative;
-		Sci_Position posNew = multiByteAccess->GetRelativePosition(posRelative, diffRelative);
-		const int chReturn = multiByteAccess->GetCharacterAndWidth(posNew, 0);
+		const Sci_Position diffRelative = n - offsetRelative;
+		const Sci_Position posNew = multiByteAccess->GetRelativePosition(posRelative, diffRelative);
+		const int chReturn = multiByteAccess->GetCharacterAndWidth(posNew, nullptr);
 		posRelative = posNew;
 		currentPosLastRelative = currentPos;
 		offsetRelative = n;
 		return chReturn;
 	} else {
 		// fast version for single byte encodings
-		return static_cast<unsigned char>(styler.SafeGetCharAt(currentPos + n, 0));
+		return static_cast<unsigned char>(styler.SafeGetCharAt(currentPos + n));
 	}
 }

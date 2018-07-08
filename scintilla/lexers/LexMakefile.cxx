@@ -1,8 +1,8 @@
 // Lexer for Makefile of gmake, nmake, bmake, qmake
 
-#include <string.h>
-#include <assert.h>
-#include <ctype.h>
+#include <cstring>
+#include <cassert>
+#include <cctype>
 
 #include "ILexer.h"
 #include "Scintilla.h"
@@ -21,7 +21,7 @@ using namespace Scintilla;
 #define MAKE_TYPE_NMAKE 1
 #define MAKE_TYPE_BMAKE 2
 #define MAKE_TYPE_QMAKE 3
-static inline bool IsMakeOp(int ch, int chNext) {
+static inline bool IsMakeOp(int ch, int chNext) noexcept {
 	return ch == '=' || ch == ':' || ch == '{' || ch == '}' || ch == '(' || ch == ')' || ch == ','
 		|| ch == '$' || ch == '@' || ch == '%' || ch == '<' || ch == '?' || ch == '^'
 		|| ch == '|' || ch == '*' || ch == '>' || ch == ';' || ch == '&' || ch == '!'
@@ -42,7 +42,7 @@ static void ColouriseMakeDoc(Sci_PositionU startPos, Sci_Position length, int in
 
 	int visibleChars = 0;
 	Sci_Position lineCurrent = styler.GetLine(startPos);
-	char buf[MAX_WORD_LENGTH + 1] = {0};
+	char buf[MAX_WORD_LENGTH + 1] = { 0 };
 	int wordLen = 0;
 	int varCount = 0;
 	static int makeType = MAKE_TYPE_GMAKE;
@@ -83,9 +83,9 @@ static void ColouriseMakeDoc(Sci_PositionU startPos, Sci_Position length, int in
 				} else {
 					Sci_Position pos = i;
 					while (IsASpace(styler.SafeGetCharAt(pos++)));
-					if (styler[pos-1] == '=' || styler[pos] == '=') {
+					if (styler[pos - 1] == '=' || styler[pos] == '=') {
 						styler.ColourTo(i - 1, SCE_MAKE_VARIABLE);
-					} else if (styler[pos-1] == ':') {
+					} else if (styler[pos - 1] == ':') {
 						styler.ColourTo(i - 1, SCE_MAKE_TARGET);
 					} else if (buf[0] == '.' && IsASpace(ch)) { // bmake
 						styler.ColourTo(i - 1, SCE_MAKE_PREPROCESSOR);
@@ -120,7 +120,7 @@ static void ColouriseMakeDoc(Sci_PositionU startPos, Sci_Position length, int in
 			break;
 		case SCE_MAKE_VARIABLE3:
 			if (chPrev == '}') {
-				styler.ColourTo( i - 1, state);
+				styler.ColourTo(i - 1, state);
 				state = SCE_MAKE_DEFAULT;
 			} break;
 		case SCE_MAKE_PREPROCESSOR:
@@ -186,7 +186,7 @@ static void ColouriseMakeDoc(Sci_PositionU startPos, Sci_Position length, int in
 				ch = chNext;
 				chNext = styler.SafeGetCharAt(i + 1);
 			} else if (ch == '$' && chNext == '{') { // bmake
-				styler.ColourTo(i - 1,  state);
+				styler.ColourTo(i - 1, state);
 				state = SCE_MAKE_VARIABLE3;
 			} else if (ch == '$' && (chNext == '$' || iswordstart(chNext))) {
 				styler.ColourTo(i - 1, state);
@@ -201,11 +201,11 @@ static void ColouriseMakeDoc(Sci_PositionU startPos, Sci_Position length, int in
 			} else if (isgraph(ch)) {
 				styler.ColourTo(i - 1, state);
 				buf[wordLen++] = (char)ch;
-				state = (visibleChars == 0)? SCE_MAKE_TARGET : SCE_MAKE_IDENTIFIER;
+				state = (visibleChars == 0) ? SCE_MAKE_TARGET : SCE_MAKE_IDENTIFIER;
 			}
 		}
 
-		if (atEOL || i == endPos-1) {
+		if (atEOL || i == endPos - 1) {
 			lineCurrent++;
 			visibleChars = 0;
 		}
@@ -231,7 +231,7 @@ static void FoldMakeDoc(Sci_PositionU startPos, Sci_Position length, int initSty
 	Sci_Position lineCurrent = styler.GetLine(startPos);
 	int levelCurrent = SC_FOLDLEVELBASE;
 	if (lineCurrent > 0)
-		levelCurrent = styler.LevelAt(lineCurrent-1) >> 16;
+		levelCurrent = styler.LevelAt(lineCurrent - 1) >> 16;
 	int levelNext = levelCurrent;
 
 	char chNext = styler[startPos];
@@ -249,14 +249,14 @@ static void FoldMakeDoc(Sci_PositionU startPos, Sci_Position length, int initSty
 		if (foldComment && atEOL && IsCommentLine(lineCurrent)) {
 			if (!IsCommentLine(lineCurrent - 1) && IsCommentLine(lineCurrent + 1))
 				levelNext++;
-			else if (IsCommentLine(lineCurrent - 1) && !IsCommentLine(lineCurrent+1))
+			else if (IsCommentLine(lineCurrent - 1) && !IsCommentLine(lineCurrent + 1))
 				levelNext--;
 		}
 
-		if (atEOL && IsBackslashLine(lineCurrent, styler) && !IsBackslashLine(lineCurrent-1, styler)) {
+		if (atEOL && IsBackslashLine(lineCurrent, styler) && !IsBackslashLine(lineCurrent - 1, styler)) {
 			levelNext++;
 		}
-		if (atEOL && !IsBackslashLine(lineCurrent, styler) && IsBackslashLine(lineCurrent-1, styler)) {
+		if (atEOL && !IsBackslashLine(lineCurrent, styler) && IsBackslashLine(lineCurrent - 1, styler)) {
 			levelNext--;
 		}
 
@@ -283,7 +283,7 @@ static void FoldMakeDoc(Sci_PositionU startPos, Sci_Position length, int initSty
 		if (!isspacechar(ch))
 			visibleChars++;
 
-		if (atEOL || (i == endPos-1)) {
+		if (atEOL || (i == endPos - 1)) {
 			int levelUse = levelCurrent;
 			int lev = levelUse | levelNext << 16;
 			if (visibleChars == 0 && foldCompact)

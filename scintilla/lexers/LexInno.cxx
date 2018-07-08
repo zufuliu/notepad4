@@ -5,9 +5,9 @@
 // Written by Friedrich Vedder <fvedd@t-online.de>, using code from LexOthers.cxx.
 // The License.txt file describes the conditions under which this software may be distributed.
 
-#include <string.h>
-#include <assert.h>
-#include <ctype.h>
+#include <cstring>
+#include <cassert>
+#include <cctype>
 
 #include "ILexer.h"
 #include "Scintilla.h"
@@ -47,7 +47,7 @@ static void ColouriseInnoDoc(Sci_PositionU startPos, Sci_Position length, int, L
 	Sci_PositionU lengthDoc = startPos + length;
 	char *buffer = new char[length + 1];
 	Sci_Position bufferCount = 0;
-	bool isBOL, isEOL, isWS, isBOLWS = 0;
+	bool isBOL, isEOL, isWS, isBOLWS = false;
 	bool isCStyleComment = false;
 
 	Sci_Position curLine = styler.GetLine(startPos);
@@ -70,7 +70,7 @@ static void ColouriseInnoDoc(Sci_PositionU startPos, Sci_Position length, int, L
 		}
 
 		isBOL = (chPrev == 0) || (chPrev == '\n') || (chPrev == '\r' && ch != '\n');
-		isBOLWS = (isBOL) ? 1 : (isBOLWS && (chPrev == ' ' || chPrev == '\t'));
+		isBOLWS = (isBOL) ? true : (isBOLWS && (chPrev == ' ' || chPrev == '\t'));
 		isEOL = (ch == '\n' || ch == '\r');
 		isWS = (ch == ' ' || ch == '\t');
 
@@ -80,175 +80,175 @@ static void ColouriseInnoDoc(Sci_PositionU startPos, Sci_Position length, int, L
 			styler.SetLineState(curLine, (isCode ? 1 : 0));
 		}
 
-		switch(state) {
-			case SCE_INNO_DEFAULT:
-				if (!isCode && ch == ';' && isBOLWS) {
-					// Start of a comment
-					state = SCE_INNO_COMMENT;
-				} else if (ch == '[' && isBOLWS) {
-					// Start of a section name
-					bufferCount = 0;
-					state = SCE_INNO_SECTION;
-					sectionFound = true;
-				} else if (ch == '#' && isBOLWS) {
-					// Start of a preprocessor directive
-					state = SCE_INNO_PREPROC;
-				} else if (!isCode && ch == '{' && chNext != '{' && chPrev != '{') {
-					// Start of an inline expansion
-					state = SCE_INNO_INLINE_EXPANSION;
-				} else if (isCode && (ch == '{' || (ch == '(' && chNext == '*'))) {
-					// Start of a Pascal comment
-					state = SCE_INNO_COMMENT_PASCAL;
-					isCStyleComment = ch == '(';
-				} else if ((isCode || !sectionFound) && ch == '/' && chNext == '/') {
-					// Apparently, C-style comments are legal, too
-					state = SCE_INNO_COMMENT;
-					//isCStyleComment = true;
-				} else if (ch == '"') {
-					// Start of a double-quote string
-					state = SCE_INNO_STRING_DOUBLE;
-				} else if (ch == '\'') {
-					// Start of a single-quote string
-					state = SCE_INNO_STRING_SINGLE;
-				} else if (IsASCII(ch) && (isalpha(ch) || (ch == '_'))) {
-					// Start of an identifier
-					bufferCount = 0;
-					buffer[bufferCount++] = static_cast<char>(tolower(ch));
-					state = SCE_INNO_IDENTIFIER;
+		switch (state) {
+		case SCE_INNO_DEFAULT:
+			if (!isCode && ch == ';' && isBOLWS) {
+				// Start of a comment
+				state = SCE_INNO_COMMENT;
+			} else if (ch == '[' && isBOLWS) {
+				// Start of a section name
+				bufferCount = 0;
+				state = SCE_INNO_SECTION;
+				sectionFound = true;
+			} else if (ch == '#' && isBOLWS) {
+				// Start of a preprocessor directive
+				state = SCE_INNO_PREPROC;
+			} else if (!isCode && ch == '{' && chNext != '{' && chPrev != '{') {
+				// Start of an inline expansion
+				state = SCE_INNO_INLINE_EXPANSION;
+			} else if (isCode && (ch == '{' || (ch == '(' && chNext == '*'))) {
+				// Start of a Pascal comment
+				state = SCE_INNO_COMMENT_PASCAL;
+				isCStyleComment = ch == '(';
+			} else if ((isCode || !sectionFound) && ch == '/' && chNext == '/') {
+				// Apparently, C-style comments are legal, too
+				state = SCE_INNO_COMMENT;
+				//isCStyleComment = true;
+			} else if (ch == '"') {
+				// Start of a double-quote string
+				state = SCE_INNO_STRING_DOUBLE;
+			} else if (ch == '\'') {
+				// Start of a single-quote string
+				state = SCE_INNO_STRING_SINGLE;
+			} else if (IsASCII(ch) && (isalpha(ch) || (ch == '_'))) {
+				// Start of an identifier
+				bufferCount = 0;
+				buffer[bufferCount++] = static_cast<char>(tolower(ch));
+				state = SCE_INNO_IDENTIFIER;
+			} else {
+				// Style it the default style
+				styler.ColourTo(i, SCE_INNO_DEFAULT);
+			}
+			break;
+
+		case SCE_INNO_COMMENT:
+			if (isEOL) {
+				state = SCE_INNO_DEFAULT;
+				styler.ColourTo(i, SCE_INNO_COMMENT);
+			}
+			break;
+
+		case SCE_INNO_IDENTIFIER:
+			if (IsASCII(ch) && (isalnum(ch) || (ch == '_'))) {
+				buffer[bufferCount++] = static_cast<char>(tolower(ch));
+			} else {
+				state = SCE_INNO_DEFAULT;
+				buffer[bufferCount] = '\0';
+
+				// Check if the buffer contains a keyword
+				if (!isCode && standardKeywords.InList(buffer)) {
+					styler.ColourTo(i - 1, SCE_INNO_KEYWORD);
+				} else if (!isCode && parameterKeywords.InList(buffer)) {
+					styler.ColourTo(i - 1, SCE_INNO_PARAMETER);
+				} else if (isCode && pascalKeywords.InList(buffer)) {
+					styler.ColourTo(i - 1, SCE_INNO_KEYWORD_PASCAL);
+				} else if (isCode && typeKeywords.InList(buffer)) {
+					styler.ColourTo(i - 1, SCE_INNO_PAS_TYPE);
 				} else {
-					// Style it the default style
+					styler.ColourTo(i - 1, SCE_INNO_DEFAULT);
+				}
+
+				// Push back the faulty character
+				chNext = styler[i--];
+				ch = chPrev;
+			}
+			break;
+
+		case SCE_INNO_SECTION:
+			if (ch == ']') {
+				state = SCE_INNO_DEFAULT;
+				buffer[bufferCount] = '\0';
+
+				//Check if the buffer contains a section name
+				if (sectionKeywords.InList(buffer)) {
+					styler.ColourTo(styler.LineStart(styler.GetLine(i) + 1) - 1, SCE_INNO_SECTION);
+					isCode = !CompareCaseInsensitive(buffer, "code");
+				} else {
 					styler.ColourTo(i, SCE_INNO_DEFAULT);
 				}
-				break;
+			} else if (IsASCII(ch) && (isalnum(ch) || (ch == '_'))) {
+				buffer[bufferCount++] = static_cast<char>(tolower(ch));
+			} else {
+				state = SCE_INNO_DEFAULT;
+				styler.ColourTo(i, SCE_INNO_DEFAULT);
+			}
+			break;
 
-			case SCE_INNO_COMMENT:
-				if (isEOL) {
-					state = SCE_INNO_DEFAULT;
-					styler.ColourTo(i, SCE_INNO_COMMENT);
-				}
-				break;
-
-			case SCE_INNO_IDENTIFIER:
-				if (IsASCII(ch) && (isalnum(ch) || (ch == '_'))) {
-					buffer[bufferCount++] = static_cast<char>(tolower(ch));
-				} else {
+		case SCE_INNO_PREPROC:
+			if (isWS || isEOL) {
+				if (IsASCII(chPrev) && isalpha(chPrev)) {
 					state = SCE_INNO_DEFAULT;
 					buffer[bufferCount] = '\0';
 
-					// Check if the buffer contains a keyword
-					if (!isCode && standardKeywords.InList(buffer)) {
-						styler.ColourTo(i-1, SCE_INNO_KEYWORD);
-					} else if (!isCode && parameterKeywords.InList(buffer)) {
-						styler.ColourTo(i-1, SCE_INNO_PARAMETER);
-					} else if (isCode && pascalKeywords.InList(buffer)) {
-						styler.ColourTo(i-1, SCE_INNO_KEYWORD_PASCAL);
-					} else if (isCode && typeKeywords.InList(buffer)) {
-						styler.ColourTo(i-1, SCE_INNO_PAS_TYPE);
+					// Check if the buffer contains a preprocessor directive
+					if (preprocessorKeywords.InList(buffer)) {
+						styler.ColourTo(i - 1, SCE_INNO_PREPROC);
 					} else {
-						styler.ColourTo(i-1, SCE_INNO_DEFAULT);
+						styler.ColourTo(i - 1, SCE_INNO_DEFAULT);
 					}
 
 					// Push back the faulty character
 					chNext = styler[i--];
 					ch = chPrev;
 				}
-				break;
+			} else if (IsASCII(ch) && isalpha(ch)) {
+				if (chPrev == '#' || chPrev == ' ' || chPrev == '\t')
+					bufferCount = 0;
+				buffer[bufferCount++] = static_cast<char>(tolower(ch));
+			}
+			break;
 
-			case SCE_INNO_SECTION:
-				if (ch == ']') {
+		case SCE_INNO_STRING_DOUBLE:
+			if (ch == '"' || isEOL) {
+				state = SCE_INNO_DEFAULT;
+				styler.ColourTo(i, SCE_INNO_STRING_DOUBLE);
+			}
+			break;
+
+		case SCE_INNO_STRING_SINGLE:
+			if (ch == '\'' || isEOL) {
+				state = SCE_INNO_DEFAULT;
+				styler.ColourTo(i, SCE_INNO_STRING_SINGLE);
+			}
+			break;
+
+		case SCE_INNO_INLINE_EXPANSION:
+			if (ch == '}') {
+				state = SCE_INNO_DEFAULT;
+				styler.ColourTo(i, SCE_INNO_INLINE_EXPANSION);
+			} else if (isEOL) {
+				state = SCE_INNO_DEFAULT;
+				styler.ColourTo(i, SCE_INNO_DEFAULT);
+			}
+			break;
+
+		case SCE_INNO_COMMENT_PASCAL:
+			if (isCStyleComment) {
+				if (ch == ')' && chPrev == '*') {
 					state = SCE_INNO_DEFAULT;
-					buffer[bufferCount] = '\0';
-
-					 //Check if the buffer contains a section name
-					if (sectionKeywords.InList(buffer)) {
-						styler.ColourTo(styler.LineStart(styler.GetLine(i)+1)-1, SCE_INNO_SECTION);
-						isCode = !CompareCaseInsensitive(buffer, "code");
-					} else {
-						styler.ColourTo(i, SCE_INNO_DEFAULT);
-					}
-				} else if (IsASCII(ch) && (isalnum(ch) || (ch == '_'))) {
-					buffer[bufferCount++] = static_cast<char>(tolower(ch));
-				} else {
-					state = SCE_INNO_DEFAULT;
-					styler.ColourTo(i, SCE_INNO_DEFAULT);
+					styler.ColourTo(i, SCE_INNO_COMMENT_PASCAL);
 				}
-				break;
-
-			case SCE_INNO_PREPROC:
-				if (isWS || isEOL) {
-					if (IsASCII(chPrev) && isalpha(chPrev)) {
-						state = SCE_INNO_DEFAULT;
-						buffer[bufferCount] = '\0';
-
-						// Check if the buffer contains a preprocessor directive
-						if (preprocessorKeywords.InList(buffer)) {
-							styler.ColourTo(i-1, SCE_INNO_PREPROC);
-						} else {
-							styler.ColourTo(i-1, SCE_INNO_DEFAULT);
-						}
-
-						// Push back the faulty character
-						chNext = styler[i--];
-						ch = chPrev;
-					}
-				} else if (IsASCII(ch) && isalpha(ch)) {
-					if (chPrev == '#' || chPrev == ' ' || chPrev == '\t')
-						bufferCount = 0;
-					buffer[bufferCount++] = static_cast<char>(tolower(ch));
-				}
-				break;
-
-			case SCE_INNO_STRING_DOUBLE:
-				if (ch == '"' || isEOL) {
-					state = SCE_INNO_DEFAULT;
-					styler.ColourTo(i, SCE_INNO_STRING_DOUBLE);
-				}
-				break;
-
-			case SCE_INNO_STRING_SINGLE:
-				if (ch == '\'' || isEOL) {
-					state = SCE_INNO_DEFAULT;
-					styler.ColourTo(i, SCE_INNO_STRING_SINGLE);
-				}
-				break;
-
-			case SCE_INNO_INLINE_EXPANSION:
+			} else {
 				if (ch == '}') {
 					state = SCE_INNO_DEFAULT;
-					styler.ColourTo(i, SCE_INNO_INLINE_EXPANSION);
-				} else if (isEOL) {
-					state = SCE_INNO_DEFAULT;
-					styler.ColourTo(i, SCE_INNO_DEFAULT);
+					styler.ColourTo(i, SCE_INNO_COMMENT_PASCAL);
 				}
-				break;
-
-			case SCE_INNO_COMMENT_PASCAL:
-				if (isCStyleComment) {
-					if (ch == ')' && chPrev == '*') {
-						state = SCE_INNO_DEFAULT;
-						styler.ColourTo(i, SCE_INNO_COMMENT_PASCAL);
-					}
-				} else {
-					if (ch == '}') {
-						state = SCE_INNO_DEFAULT;
-						styler.ColourTo(i, SCE_INNO_COMMENT_PASCAL);
-					}
-				}
-				break;
+			}
+			break;
 
 		}
 	}
-	delete []buffer;
+	delete[]buffer;
 }
 
 #define LexMatchIC(pos, str)	LexMatchIgnoreCase(pos, styler, str)
 #define IsCommentLine(line)		IsLexCommentLine(line, styler, SCE_INNO_COMMENT)
-static inline bool IsStreamCommentStyle(int style) {
+static inline bool IsStreamCommentStyle(int style) noexcept {
 	return style == SCE_INNO_COMMENT_PASCAL;
 }
 static bool IsSectionEnd(Sci_Position curPos, Accessor &styler) {
 	Sci_Position curLine = styler.GetLine(curPos);
-	Sci_Position pos = LexSkipSpaceTab(styler.LineStart(curLine+1), styler.LineStart(curLine+2)-1, styler);
+	Sci_Position pos = LexSkipSpaceTab(styler.LineStart(curLine + 1), styler.LineStart(curLine + 2) - 1, styler);
 	char ch = styler.SafeGetCharAt(pos);
 	if (ch == '[' && styler.StyleAt(pos) == SCE_INNO_SECTION)
 		return true;
@@ -268,7 +268,7 @@ static void FoldInnoDoc(Sci_PositionU startPos, Sci_Position length, int initSty
 	Sci_Position lineCurrent = styler.GetLine(startPos);
 	int levelCurrent = SC_FOLDLEVELBASE;
 	if (lineCurrent > 0)
-		levelCurrent = styler.LevelAt(lineCurrent-1) >> 16;
+		levelCurrent = styler.LevelAt(lineCurrent - 1) >> 16;
 	int levelNext = levelCurrent;
 
 	char chNext = styler[startPos];
@@ -291,9 +291,9 @@ static void FoldInnoDoc(Sci_PositionU startPos, Sci_Position length, int initSty
 			}
 		}
 		if (foldComment && atEOL && IsCommentLine(lineCurrent)) {
-			if(!IsCommentLine(lineCurrent - 1) && IsCommentLine(lineCurrent + 1))
+			if (!IsCommentLine(lineCurrent - 1) && IsCommentLine(lineCurrent + 1))
 				levelNext++;
-			else if(IsCommentLine(lineCurrent - 1) && !IsCommentLine(lineCurrent + 1))
+			else if (IsCommentLine(lineCurrent - 1) && !IsCommentLine(lineCurrent + 1))
 				levelNext--;
 		}
 
@@ -308,7 +308,7 @@ static void FoldInnoDoc(Sci_PositionU startPos, Sci_Position length, int initSty
 		}
 
 		if (foldPreprocessor && ch == '#' && style == SCE_INNO_PREPROC) {
-			Sci_Position pos = LexSkipSpaceTab(i+1, endPos, styler);
+			Sci_Position pos = LexSkipSpaceTab(i + 1, endPos, styler);
 			if (LexMatchIC(pos, "if")) {
 				levelNext++;
 			} else if (LexMatchIC(pos, "end")) {
@@ -327,7 +327,7 @@ static void FoldInnoDoc(Sci_PositionU startPos, Sci_Position length, int initSty
 
 		//if (!isspacechar(ch))
 		//	visibleChars++;
-		if (atEOL || (i == endPos-1)) {
+		if (atEOL || (i == endPos - 1)) {
 			int levelUse = levelCurrent;
 			int lev = levelUse | levelNext << 16;
 			//if (visibleChars == 0 && foldCompact)

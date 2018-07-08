@@ -5,12 +5,10 @@
 // Copyright 1998-2001 by Neil Hodgson <neilh@scintilla.org>
 // The License.txt file describes the conditions under which this software may be distributed.
 
-#include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
-#include <stdarg.h>
-#include <assert.h>
-#include <ctype.h>
+#include <cstdlib>
+#include <cstring>
+#include <cassert>
+#include <cctype>
 
 #include "ILexer.h"
 #include "Scintilla.h"
@@ -51,7 +49,7 @@ static void ColouriseDiffLine(const char *lineBuffer, Sci_Position endLine, Acce
 	} else if (0 == strncmp(lineBuffer, "+++ ", 4)) {
 		// I don't know of any diff where "+++ " is a position marker, but for
 		// consistency, do the same as with "--- " and "*** ".
-		if (atoi(lineBuffer+4) && !strchr(lineBuffer, '/'))
+		if (atoi(lineBuffer + 4) && !strchr(lineBuffer, '/'))
 			styler.ColourTo(endLine, SCE_DIFF_POSITION);
 		else
 			styler.ColourTo(endLine, SCE_DIFF_HEADER);
@@ -61,7 +59,7 @@ static void ColouriseDiffLine(const char *lineBuffer, Sci_Position endLine, Acce
 		// In a context diff, *** appears in both the header and the position markers.
 		// Also ******** is a chunk header, but here it's treated as part of the
 		// position marker since there is no separate style for a chunk header.
-		if (lineBuffer[3] == ' ' && atoi(lineBuffer+4) && !strchr(lineBuffer, '/'))
+		if (lineBuffer[3] == ' ' && atoi(lineBuffer + 4) && !strchr(lineBuffer, '/'))
 			styler.ColourTo(endLine, SCE_DIFF_POSITION);
 		else if (lineBuffer[3] == '*')
 			styler.ColourTo(endLine, SCE_DIFF_POSITION);
@@ -73,6 +71,14 @@ static void ColouriseDiffLine(const char *lineBuffer, Sci_Position endLine, Acce
 		styler.ColourTo(endLine, SCE_DIFF_POSITION);
 	} else if (lineBuffer[0] >= '0' && lineBuffer[0] <= '9') {
 		styler.ColourTo(endLine, SCE_DIFF_POSITION);
+	} else if (0 == strncmp(lineBuffer, "++", 2)) {
+		styler.ColourTo(endLine, SCE_DIFF_PATCH_ADD);
+	} else if (0 == strncmp(lineBuffer, "+-", 2)) {
+		styler.ColourTo(endLine, SCE_DIFF_PATCH_DELETE);
+	} else if (0 == strncmp(lineBuffer, "-+", 2)) {
+		styler.ColourTo(endLine, SCE_DIFF_REMOVED_PATCH_ADD);
+	} else if (0 == strncmp(lineBuffer, "--", 2)) {
+		styler.ColourTo(endLine, SCE_DIFF_REMOVED_PATCH_DELETE);
 	} else if (lineBuffer[0] == '-' || lineBuffer[0] == '<') {
 		styler.ColourTo(endLine, SCE_DIFF_DELETED);
 	} else if (lineBuffer[0] == '+' || lineBuffer[0] == '>') {
@@ -135,7 +141,7 @@ static void FoldDiffDoc(Sci_PositionU startPos, Sci_Position length, int, LexerW
 			nextLevel = prevLevel;
 
 		if ((nextLevel & SC_FOLDLEVELHEADERFLAG) && (nextLevel == prevLevel))
-			styler.SetLevel(curLine-1, prevLevel & ~SC_FOLDLEVELHEADERFLAG);
+			styler.SetLevel(curLine - 1, prevLevel & ~SC_FOLDLEVELHEADERFLAG);
 
 		styler.SetLevel(curLine, nextLevel);
 		prevLevel = nextLevel;

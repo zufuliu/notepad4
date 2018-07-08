@@ -7,12 +7,9 @@
  ** Modified by Marcos E. Wurzius & Philippe Lhoste
  **/
 
-#include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
-#include <stdarg.h>
-#include <assert.h>
-#include <ctype.h>
+#include <cstring>
+#include <cassert>
+#include <cctype>
 
 #include "ILexer.h"
 #include "Scintilla.h"
@@ -122,7 +119,7 @@ static void ColouriseLuaDoc(Sci_PositionU startPos, Sci_Position length, int ini
 
 		// Handle string line continuation
 		if ((sc.state == SCE_LUA_STRING || sc.state == SCE_LUA_CHARACTER) &&
-				sc.ch == '\\') {
+			sc.ch == '\\') {
 			if (sc.chNext == '\n' || sc.chNext == '\r') {
 				sc.Forward();
 				if (sc.ch == '\r' && sc.chNext == '\n') {
@@ -357,11 +354,10 @@ static void FoldLuaDoc(Sci_PositionU startPos, Sci_Position length, int /* initS
 		styleNext = styler.StyleAt(i + 1);
 		const bool atEOL = (ch == '\r' && chNext != '\n') || (ch == '\n');
 
-		if (foldComment && atEOL && IsCommentLine(lineCurrent))
-		{
-			if(!IsCommentLine(lineCurrent-1) && IsCommentLine(lineCurrent+1))
+		if (foldComment && atEOL && IsCommentLine(lineCurrent)) {
+			if (!IsCommentLine(lineCurrent - 1) && IsCommentLine(lineCurrent + 1))
 				levelCurrent++;
-			else if(IsCommentLine(lineCurrent-1) && !IsCommentLine(lineCurrent+1))
+			else if (IsCommentLine(lineCurrent - 1) && !IsCommentLine(lineCurrent + 1))
 				levelCurrent--;
 		}
 

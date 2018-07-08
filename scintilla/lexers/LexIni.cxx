@@ -1,16 +1,13 @@
 // Scintilla source code edit control
 /** @file LexOthers.cxx
- ** Lexers for batch files, diff results, properties files, make files and error lists.
+ ** Lexers for properties files.
  **/
 // Copyright 1998-2001 by Neil Hodgson <neilh@scintilla.org>
 // The License.txt file describes the conditions under which this software may be distributed.
 
-#include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
-#include <stdarg.h>
-#include <assert.h>
-#include <ctype.h>
+#include <cstring>
+#include <cassert>
+#include <cctype>
 
 #include "ILexer.h"
 #include "Scintilla.h"
@@ -25,7 +22,7 @@
 
 using namespace Scintilla;
 
-static inline bool isassignchar(int ch) {
+static inline bool isassignchar(int ch) noexcept {
 	return (ch == '=') || (ch == ':');
 }
 
@@ -121,7 +118,7 @@ static void FoldPropsDoc(Sci_PositionU startPos, Sci_Position length, int, Lexer
 
 	for (Sci_PositionU i = startPos; i < endPos; i++) {
 		char ch = chNext;
-		chNext = styler[i+1];
+		chNext = styler[i + 1];
 
 		int style = styleNext;
 		styleNext = styler.StyleAt(i + 1);

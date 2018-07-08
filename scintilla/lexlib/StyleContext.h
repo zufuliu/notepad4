@@ -16,9 +16,9 @@ namespace Scintilla {
 // syntactically significant. UTF-8 avoids this as all trail bytes are >= 0x80
 class StyleContext {
 public:
-	LexAccessor &styler;
+	LexAccessor & styler;
 private:
-	IDocument *multiByteAccess;
+	IDocument * multiByteAccess;
 	Sci_PositionU endPos;
 	Sci_PositionU lengthDocument;
 
@@ -44,7 +44,7 @@ public:
 	Sci_Position widthNext;
 
 	StyleContext(Sci_PositionU startPos, Sci_PositionU length,
-				int initStyle, LexAccessor &styler_, unsigned char chMask='\377');
+		int initStyle, LexAccessor &styler_, unsigned char chMask = '\377');
 	// Deleted so StyleContext objects can not be copied.
 	StyleContext(const StyleContext &) = delete;
 	StyleContext &operator=(const StyleContext &) = delete;
@@ -64,7 +64,7 @@ public:
 		return currentPos - styler.GetStartSegment();
 	}
 	int GetRelative(Sci_Position n) const {
-		return static_cast<unsigned char>(styler.SafeGetCharAt(currentPos+n));
+		return static_cast<unsigned char>(styler.SafeGetCharAt(currentPos + n));
 	}
 	int GetRelativeCharacter(Sci_Position n);
 	bool Match(char ch0) const {
@@ -74,7 +74,7 @@ public:
 		return (ch == static_cast<unsigned char>(ch0)) && (chNext == static_cast<unsigned char>(ch1));
 	}
 	bool Match(const char *s) const {
-        return LexMatch(currentPos, styler, s);
+		return LexMatch(currentPos, styler, s);
 	}
 	bool MatchIgnoreCase(const char *s) const {
 		return LexMatchIgnoreCase(currentPos, styler, s);

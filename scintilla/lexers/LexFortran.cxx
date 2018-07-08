@@ -5,9 +5,9 @@
  **/
 // The License.txt file describes the conditions under which this software may be distributed.
 
-#include <stdlib.h>
-#include <assert.h>
-#include <ctype.h>
+#include <cstdlib>
+#include <cassert>
+#include <cctype>
 
 #include "ILexer.h"
 #include "Scintilla.h"
@@ -22,16 +22,16 @@
 
 using namespace Scintilla;
 
-static inline bool IsFWordChar(int ch) {
+static inline bool IsFWordChar(int ch) noexcept {
 	return (ch < 0x80) && (isalnum(ch) || ch == '_' || ch == '%');
 }
-static inline bool IsFWordStart(int ch) {
+static inline bool IsFWordStart(int ch) noexcept {
 	return (ch < 0x80) && isalnum(ch);
 }
-static inline bool IsFOperator(int ch) {
+static inline bool IsFOperator(int ch) noexcept {
 	return (ch < 0x80) && isoperator(ch);
 }
-static inline bool IsFNumber(int ch, int) {
+static inline bool IsFNumber(int ch, int) noexcept {
 	return (ch < 0x80) && isxdigit(ch);
 }
 
@@ -59,12 +59,12 @@ static void ColouriseFortranDoc(Sci_PositionU startPos, Sci_Position length, int
 
 	for (; sc.More(); sc.Forward()) {
 
-		 if (sc.atLineStart) {
+		if (sc.atLineStart) {
 			if (sc.state == SCE_F_STRING2) {
 				sc.SetState(sc.state);
 			}
 			visibleChars = 0;
-		 }
+		}
 
 		if (sc.state == SCE_F_COMMENT) {
 			if (sc.atLineStart) {
@@ -127,11 +127,11 @@ _label_identifier:
 		// Determine if a new state should be entered.
 		if (sc.state == SCE_F_DEFAULT) {
 			if (visibleChars == 0 && (sc.ch == 'C' || sc.ch == 'c' || sc.ch == '*' || sc.ch == '!')) {
-				if ((LexMatchIgnoreCase(sc.currentPos+1, styler, "dec") && sc.GetRelative(4) == '$')
-					|| (LexMatchIgnoreCase(sc.currentPos+1, styler, "dir") && sc.GetRelative(4) == '$')
-					|| (LexMatchIgnoreCase(sc.currentPos+1, styler, "gcc") && sc.GetRelative(4) == '$')
-					|| (LexMatchIgnoreCase(sc.currentPos+1, styler, "$omp") && sc.GetRelative(5) == '$')
-					|| (LexMatchIgnoreCase(sc.currentPos+1, styler, "ms") && sc.GetRelative(3) == '$')
+				if ((LexMatchIgnoreCase(sc.currentPos + 1, styler, "dec") && sc.GetRelative(4) == '$')
+					|| (LexMatchIgnoreCase(sc.currentPos + 1, styler, "dir") && sc.GetRelative(4) == '$')
+					|| (LexMatchIgnoreCase(sc.currentPos + 1, styler, "gcc") && sc.GetRelative(4) == '$')
+					|| (LexMatchIgnoreCase(sc.currentPos + 1, styler, "$omp") && sc.GetRelative(5) == '$')
+					|| (LexMatchIgnoreCase(sc.currentPos + 1, styler, "ms") && sc.GetRelative(3) == '$')
 					) {
 					sc.SetState(SCE_F_PREPROCESSOR);
 				} else if ((sc.ch == 'C' || sc.ch == 'c') && sc.chNext < 0x80 && isalpha(sc.chNext)) {
@@ -186,7 +186,7 @@ static void FoldFortranDoc(Sci_PositionU startPos, Sci_Position length, int /*in
 	Sci_Position lineCurrent = styler.GetLine(startPos);
 	int levelCurrent = SC_FOLDLEVELBASE;
 	if (lineCurrent > 0)
-		levelCurrent = styler.LevelAt(lineCurrent-1) >> 16;
+		levelCurrent = styler.LevelAt(lineCurrent - 1) >> 16;
 	int levelNext = levelCurrent;
 
 	char chNext = styler[startPos];
@@ -216,7 +216,7 @@ static void FoldFortranDoc(Sci_PositionU startPos, Sci_Position length, int /*in
 		if (!isspacechar(ch))
 			visibleChars++;
 
-		if (atEOL || (i == endPos-1)) {
+		if (atEOL || (i == endPos - 1)) {
 			int levelUse = levelCurrent;
 			int lev = levelUse | levelNext << 16;
 			if (visibleChars == 0 && foldCompact)

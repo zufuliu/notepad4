@@ -20,7 +20,7 @@ public:
 	int mask;
 	bool sensitive;
 	int cursor;
-	MarginStyle(int style_= SC_MARGIN_SYMBOL, int width_=0, int mask_=0);
+	MarginStyle(int style_ = SC_MARGIN_SYMBOL, int width_ = 0, int mask_ = 0);
 };
 
 /**
@@ -32,7 +32,9 @@ public:
 	FontNames();
 	// FontNames objects can not be copied.
 	FontNames(const FontNames &) = delete;
+	FontNames(FontNames &&) = delete;
 	FontNames &operator=(const FontNames &) = delete;
+	FontNames &operator=(FontNames &&) = delete;
 	~FontNames();
 	void Clear();
 	const char *Save(const char *name);
@@ -44,7 +46,9 @@ public:
 	FontRealised();
 	// FontRealised objects can not be copied.
 	FontRealised(const FontRealised &) = delete;
+	FontRealised(FontRealised &&) = delete;
 	FontRealised &operator=(const FontRealised &) = delete;
+	FontRealised &operator=(FontRealised &&) = delete;
 	virtual ~FontRealised();
 	void Realise(Surface &surface, int zoomLevel, int technology, const FontSpecification &fs);
 };
@@ -62,10 +66,8 @@ enum WrapMode { eWrapNone, eWrapWord, eWrapChar, eWrapWhitespace };
 class ColourOptional : public ColourDesired {
 public:
 	bool isSet;
-	ColourOptional(const ColourDesired& colour_=ColourDesired(0,0,0), bool isSet_=false) : ColourDesired(colour_), isSet(isSet_) {
-	}
-	ColourOptional(uptr_t wParam, sptr_t lParam) : ColourDesired(static_cast<long>(lParam)), isSet(wParam != 0) {
-	}
+	ColourOptional(const ColourDesired& colour_ = ColourDesired(0, 0, 0), bool isSet_ = false) : ColourDesired(colour_), isSet(isSet_) {}
+	ColourOptional(uptr_t wParam, sptr_t lParam) : ColourDesired(static_cast<int>(lParam)), isSet(wParam != 0) {}
 };
 
 struct ForeBackColours {
@@ -77,11 +79,9 @@ struct EdgeProperties {
 	int column;
 	ColourDesired colour;
 	EdgeProperties(int column_ = 0, ColourDesired colour_ = ColourDesired(0)) :
-		column(column_), colour(colour_) {
-	}
+		column(column_), colour(colour_) {}
 	EdgeProperties(uptr_t wParam, sptr_t lParam) :
-		column(static_cast<int>(wParam)), colour(static_cast<long>(lParam)) {
-	}
+		column(static_cast<int>(wParam)), colour(static_cast<int>(lParam)) {}
 };
 
 /**
@@ -91,7 +91,7 @@ class ViewStyle {
 	FontMap fonts;
 public:
 	std::vector<Style> styles;
-	size_t nextExtendedStyle;
+	int nextExtendedStyle;
 	std::vector<LineMarker> markers;
 	int largestMarkerHeight;
 	std::vector<Indicator> indicators;
@@ -174,11 +174,13 @@ public:
 
 	ViewStyle();
 	ViewStyle(const ViewStyle &source);
+	ViewStyle(ViewStyle &&) = delete;
 	// Can only be copied through copy constructor which ensures font names initialised correctly
 	ViewStyle &operator=(const ViewStyle &) = delete;
+	ViewStyle &operator=(ViewStyle &&) = delete;
 	~ViewStyle();
 	void CalculateMarginWidthAndMask();
-	void Init(size_t stylesSize_=256);
+	void Init(size_t stylesSize_ = 256);
 	void Refresh(Surface &surface, int tabInChars);
 	void ReleaseAllExtendedStyles();
 	int AllocateExtendedStyles(int numberStyles);
@@ -209,7 +211,7 @@ public:
 private:
 	void AllocStyles(size_t sizeNew);
 	void CreateAndAddFont(const FontSpecification &fs);
-	FontRealised *Find(const FontSpecification &fs);
+	FontRealised *Find(const FontSpecification &fs) const;
 	void FindMaxAscentDescent();
 };
 

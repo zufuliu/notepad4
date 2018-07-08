@@ -1,8 +1,8 @@
 // Lexer for JSON.
 
-#include <string.h>
-#include <assert.h>
-#include <ctype.h>
+#include <cstring>
+#include <cassert>
+#include <cctype>
 
 #include "ILexer.h"
 #include "Scintilla.h"
@@ -17,7 +17,7 @@
 
 using namespace Scintilla;
 
-static inline bool IsJsonOp(int ch) {
+static inline bool IsJsonOp(int ch) noexcept {
 	return ch == '{' || ch == '}' || ch == '[' || ch == ']' || ch == ':' || ch == ',' || ch == '+' || ch == '-';
 }
 
@@ -36,9 +36,9 @@ static void ColouriseJSONDoc(Sci_PositionU startPos, Sci_Position length, int in
 	Sci_Position lineCurrent = styler.GetLine(startPos);
 	int levelCurrent = SC_FOLDLEVELBASE;
 	if (lineCurrent > 0)
-		levelCurrent = styler.LevelAt(lineCurrent-1) >> 16;
+		levelCurrent = styler.LevelAt(lineCurrent - 1) >> 16;
 	int levelNext = levelCurrent;
-	char buf[MAX_WORD_LENGTH + 1] = {0};
+	char buf[MAX_WORD_LENGTH + 1] = { 0 };
 	int wordLen = 0;
 
 	for (Sci_PositionU i = startPos; i < endPos; i++) {
@@ -47,7 +47,7 @@ static void ColouriseJSONDoc(Sci_PositionU startPos, Sci_Position length, int in
 
 		const bool atEOL = (ch == '\r' && chNext != '\n') || (ch == '\n');
 		const bool atLineStart = i == (Sci_PositionU)styler.LineStart(lineCurrent);
-		if (atEOL || i == endPos-1) {
+		if (atEOL || i == endPos - 1) {
 			if (fold) {
 				int levelUse = levelCurrent;
 				int lev = levelUse | levelNext << 16;
@@ -95,7 +95,7 @@ static void ColouriseJSONDoc(Sci_PositionU startPos, Sci_Position length, int in
 			} else if (ch == '\"') {
 				Sci_PositionU pos = i + 1;
 				while (IsASpace(styler.SafeGetCharAt(pos++)));
-				if (styler[pos-1] == ':') {
+				if (styler[pos - 1] == ':') {
 					styler.ColourTo(i, SCE_C_LABEL);
 				} else {
 					styler.ColourTo(i, SCE_C_STRING);
@@ -104,7 +104,6 @@ static void ColouriseJSONDoc(Sci_PositionU startPos, Sci_Position length, int in
 				continue;
 			}
 			break;
-#if 1
 		case SCE_C_COMMENTLINE:
 			if (atLineStart) {
 				styler.ColourTo(i - 1, state);
@@ -121,11 +120,9 @@ static void ColouriseJSONDoc(Sci_PositionU startPos, Sci_Position length, int in
 				continue;
 			}
 			break;
-#endif
 		}
 
 		if (state == SCE_C_DEFAULT) {
-#if 1
 			if (ch == '/' && chNext == '/') {
 				styler.ColourTo(i - 1, state);
 				state = SCE_C_COMMENTLINE;
@@ -135,9 +132,7 @@ static void ColouriseJSONDoc(Sci_PositionU startPos, Sci_Position length, int in
 				levelNext++;
 				i++;
 				chNext = styler.SafeGetCharAt(i + 1);
-			} else
-#endif
-			if (ch == '\"') {
+			} else if (ch == '\"') {
 				styler.ColourTo(i - 1, state);
 				state = SCE_C_STRING;
 			} else if (IsADigit(ch) || (ch == '.' && IsADigit(chNext))) {

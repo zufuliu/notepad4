@@ -10,6 +10,7 @@
 #include <cstring>
 
 #include <stdexcept>
+#include <string_view>
 #include <vector>
 #include <map>
 #include <algorithm>
@@ -33,8 +34,7 @@ MarginStyle::MarginStyle(int style_, int width_, int mask_) :
 }
 
 // A list of the fontnames - avoids wasting space in each style
-FontNames::FontNames() {
-}
+FontNames::FontNames() = default;
 
 FontNames::~FontNames() {
 	Clear();
@@ -48,7 +48,7 @@ const char *FontNames::Save(const char *name) {
 	if (!name)
 		return nullptr;
 
-	for (const UniqueString &nm : names) {
+	for (const auto &nm : names) {
 		if (strcmp(nm.get(), name) == 0) {
 			return nm.get();
 		}
@@ -58,8 +58,7 @@ const char *FontNames::Save(const char *name) {
 	return names.back().get();
 }
 
-FontRealised::FontRealised() {
-}
+FontRealised::FontRealised() = default;
 
 FontRealised::~FontRealised() {
 	font.Release();
@@ -79,7 +78,7 @@ void FontRealised::Realise(Surface &surface, int zoomLevel, int technology, cons
 	descent = static_cast<unsigned int>(surface.Descent(font));
 	capitalHeight = surface.Ascent(font) - surface.InternalLeading(font);
 	aveCharWidth = surface.AverageCharWidth(font);
-	spaceWidth = surface.WidthChar(font, ' ');
+	spaceWidth = surface.WidthText(font, " ");
 }
 
 ViewStyle::ViewStyle() : markers(MARKER_MAX + 1), indicators(INDIC_MAX + 1) {
@@ -91,7 +90,7 @@ ViewStyle::ViewStyle() : markers(MARKER_MAX + 1), indicators(INDIC_MAX + 1) {
 ViewStyle::ViewStyle(const ViewStyle &source) : markers(MARKER_MAX + 1), indicators(INDIC_MAX + 1) {
 	Init(source.styles.size());
 	styles = source.styles;
-	for (size_t sty=0; sty<source.styles.size(); sty++) {
+	for (size_t sty = 0; sty < source.styles.size(); sty++) {
 		// Can't just copy fontName as its lifetime is relative to its owning ViewStyle
 		styles[sty].fontName = fontNames.Save(source.styles[sty].fontName);
 	}
@@ -314,23 +313,23 @@ void ViewStyle::Refresh(Surface &surface, int tabInChars) {
 	selbarlight = Platform::ChromeHighlight();
 
 	// Apply the extra font flag which controls text drawing quality to each style.
-	for (Style &style : styles) {
+	for (auto &style : styles) {
 		style.extraFontFlag = extraFontFlag;
 	}
 
 	// Create a FontRealised object for each unique font in the styles.
 	CreateAndAddFont(styles[STYLE_DEFAULT]);
-	for (const Style &style : styles) {
+	for (const auto &style : styles) {
 		CreateAndAddFont(style);
 	}
 
 	// Ask platform to allocate each unique font.
-	for (std::pair<const FontSpecification, std::unique_ptr<FontRealised>> &font : fonts) {
+	for (auto &font : fonts) {
 		font.second->Realise(surface, zoomLevel, technology, font.first);
 	}
 
 	// Set the platform font handle and measurements for each style.
-	for (Style &style : styles) {
+	for (auto &style : styles) {
 		FontRealised *fr = Find(style);
 		style.Copy(fr->font, *fr);
 	}
@@ -365,7 +364,8 @@ void ViewStyle::Refresh(Surface &surface, int tabInChars) {
 
 	controlCharWidth = 0.0;
 	if (controlCharSymbol >= 32) {
-		controlCharWidth = surface.WidthChar(styles[STYLE_CONTROLCHAR].font, controlCharSymbol);
+		const char cc[2] = { static_cast<char>(controlCharSymbol), '\0' };
+		controlCharWidth = surface.WidthText(styles[STYLE_CONTROLCHAR].font, cc);
 	}
 
 	CalculateMarginWidthAndMask();
@@ -377,10 +377,10 @@ void ViewStyle::ReleaseAllExtendedStyles() {
 }
 
 int ViewStyle::AllocateExtendedStyles(int numberStyles) {
-	const int startRange = static_cast<int>(nextExtendedStyle);
+	const int startRange = nextExtendedStyle;
 	nextExtendedStyle += numberStyles;
 	EnsureStyle(nextExtendedStyle);
-	for (size_t i=startRange; i<nextExtendedStyle; i++) {
+	for (int i = startRange; i < nextExtendedStyle; i++) {
 		styles[i].ClearTo(styles[STYLE_DEFAULT]);
 	}
 	return startRange;
@@ -388,21 +388,21 @@ int ViewStyle::AllocateExtendedStyles(int numberStyles) {
 
 void ViewStyle::EnsureStyle(size_t index) {
 	if (index >= styles.size()) {
-		AllocStyles(index+1);
+		AllocStyles(index + 1);
 	}
 }
 
 void ViewStyle::ResetDefaultStyle() {
-	styles[STYLE_DEFAULT].Clear(ColourDesired(0,0,0),
-	        ColourDesired(0xff,0xff,0xff),
-	        Platform::DefaultFontSize() * SC_FONT_SIZE_MULTIPLIER, fontNames.Save(Platform::DefaultFont()),
-	        SC_CHARSET_DEFAULT,
-	        SC_WEIGHT_NORMAL, false, false, false, false, Style::caseMixed, true, true, false);
+	styles[STYLE_DEFAULT].Clear(ColourDesired(0, 0, 0),
+		ColourDesired(0xff, 0xff, 0xff),
+		Platform::DefaultFontSize() * SC_FONT_SIZE_MULTIPLIER, fontNames.Save(Platform::DefaultFont()),
+		SC_CHARSET_DEFAULT,
+		SC_WEIGHT_NORMAL, false, false, false, false, Style::caseMixed, true, true, false);
 }
 
 void ViewStyle::ClearStyles() {
 	// Reset all styles to be like the default style
-	for (size_t i=0; i<styles.size(); i++) {
+	for (size_t i = 0; i < styles.size(); i++) {
 		if (i != STYLE_DEFAULT) {
 			styles[i].ClearTo(styles[STYLE_DEFAULT]);
 		}
@@ -443,7 +443,7 @@ bool ViewStyle::ValidStyle(size_t styleIndex) const {
 
 void ViewStyle::CalcLargestMarkerHeight() {
 	largestMarkerHeight = 0;
-	for (const LineMarker &marker : markers) {
+	for (const auto &marker : markers) {
 		switch (marker.markType) {
 		case SC_MARK_PIXMAP:
 			if (marker.pxpm && marker.pxpm->GetHeight() > largestMarkerHeight)
@@ -458,7 +458,7 @@ void ViewStyle::CalcLargestMarkerHeight() {
 }
 
 int ViewStyle::GetFrameWidth() const {
-	return static_cast<int>(std::clamp(caretLineFrame, 1, lineHeight / 3));
+	return std::clamp(caretLineFrame, 1, lineHeight / 3);
 }
 
 bool ViewStyle::IsLineFrameOpaque(bool caretActive, bool lineContainsCaret) const {
@@ -571,10 +571,10 @@ bool ViewStyle::SetWrapIndentMode(int wrapIndentMode_) {
 }
 
 void ViewStyle::AllocStyles(size_t sizeNew) {
-	size_t i=styles.size();
+	size_t i = styles.size();
 	styles.resize(sizeNew);
 	if (styles.size() > STYLE_DEFAULT) {
-		for (; i<sizeNew; i++) {
+		for (; i < sizeNew; i++) {
 			if (i != STYLE_DEFAULT) {
 				styles[i].ClearTo(styles[STYLE_DEFAULT]);
 			}
@@ -584,29 +584,29 @@ void ViewStyle::AllocStyles(size_t sizeNew) {
 
 void ViewStyle::CreateAndAddFont(const FontSpecification &fs) {
 	if (fs.fontName) {
-		FontMap::iterator it = fonts.find(fs);
+		const auto it = fonts.find(fs);
 		if (it == fonts.end()) {
 			fonts[fs] = std::make_unique<FontRealised>();
 		}
 	}
 }
 
-FontRealised *ViewStyle::Find(const FontSpecification &fs) {
+FontRealised *ViewStyle::Find(const FontSpecification &fs) const {
 	if (!fs.fontName)	// Invalid specification so return arbitrary object
 		return fonts.begin()->second.get();
-	FontMap::iterator it = fonts.find(fs);
+	const auto it = fonts.find(fs);
 	if (it != fonts.end()) {
 		// Should always reach here since map was just set for all styles
 		return it->second.get();
 	}
-	return 0;
+	return nullptr;
 }
 
 void ViewStyle::FindMaxAscentDescent() {
-	for (FontMap::const_iterator it = fonts.cbegin(); it != fonts.cend(); ++it) {
-		if (maxAscent < it->second->ascent)
-			maxAscent = it->second->ascent;
-		if (maxDescent < it->second->descent)
-			maxDescent = it->second->descent;
+	for (const auto &it : fonts) {
+		if (maxAscent < it.second->ascent)
+			maxAscent = it.second->ascent;
+		if (maxDescent < it.second->descent)
+			maxDescent = it.second->descent;
 	}
 }

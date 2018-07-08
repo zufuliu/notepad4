@@ -1,9 +1,9 @@
 // Lexer for C, C++, C#, Java, Rescouce Script, Asymptote, D, Objective C/C++, PHP
 // JavaScript, JScript, ActionScript, haXe, Groovy, Scala, Jamfile, AWK, IDL/ODL/AIDL
 
-#include <string.h>
-#include <assert.h>
-#include <ctype.h>
+#include <cstring>
+#include <cassert>
+#include <cctype>
 
 #include <string>
 #include <vector>
@@ -43,43 +43,43 @@ using namespace Scintilla;
 #define		LEX_AWK		51	// Awk
 #define		LEX_JAM		52	// Jamfile
 
-static inline bool _hasPreprocessor(int lex) { // #[space]preprocessor
+static inline bool _hasPreprocessor(int lex) noexcept { // #[space]preprocessor
 	return lex == LEX_CPP || lex == LEX_CS || lex == LEX_RC || lex == LEX_OBJC;
 }
-static inline bool _hasAnotation(int lex) { // @anotation
+static inline bool _hasAnotation(int lex) noexcept { // @anotation
 	return lex == LEX_JAVA || lex == LEX_GROOVY || lex == LEX_SCALA;
 }
-static inline bool _hasRegex(int lex) { // Javascript /regex/
+static inline bool _hasRegex(int lex) noexcept { // Javascript /regex/
 	return lex == LEX_JS || lex == LEX_GROOVY || lex == LEX_AS || lex == LEX_HX || lex == LEX_AWK;
 }
-static inline bool _hasTripleVerbatim(int lex) {
+static inline bool _hasTripleVerbatim(int lex) noexcept {
 	return lex == LEX_GROOVY || lex == LEX_SCALA;
 }
-static inline bool _sharpComment(int lex) {
+static inline bool _sharpComment(int lex) noexcept {
 	return lex == LEX_AWK || lex == LEX_JAM;
 }
-static inline bool _hasXML(int lex) {
+static inline bool _hasXML(int lex) noexcept {
 	return lex == LEX_JS || lex == LEX_AS || lex == LEX_SCALA;
 }
-static inline bool _squareBraceAfterType(int lex) {
+static inline bool _squareBraceAfterType(int lex) noexcept {
 	return lex == LEX_JAVA || lex == LEX_CS || lex == LEX_JS || lex == LEX_AS || lex == LEX_HX || lex == LEX_GROOVY || lex == LEX_SCALA;
 }
-static inline bool IsDStrFix(int ch) {
+static inline bool IsDStrFix(int ch) noexcept {
 	return (ch < 0x80) && (ch == 'c' || ch == 'w' || ch == 'd');
 }
-static inline bool _use2ndKeyword(int lex) {
+static inline bool _use2ndKeyword(int lex) noexcept {
 	return lex == LEX_OBJC;
 }
-static inline bool _use2ndKeyword2(int lex) {
+static inline bool _use2ndKeyword2(int lex) noexcept {
 	return lex == LEX_CPP || lex == LEX_OBJC;
 }
 #define	strequ(str1, str2)	(!strcmp(str1, str2))
-static inline bool IsSpaceEquiv(int state) {
+static inline bool IsSpaceEquiv(int state) noexcept {
 	// including SCE_C_DEFAULT, SCE_C_COMMENT, SCE_C_COMMENTLINE
 	// SCE_C_COMMENTDOC, SCE_C_COMMENTLINEDOC, SCE_C_COMMENTDOC_TAG, SCE_C_COMMENTDOC_TAG_XML
 	return (state < SCE_C_IDENTIFIER) || (state == SCE_C_DNESTEDCOMMENT);
 }
-static inline bool IsEscapeChar(int ch) {
+static inline bool IsEscapeChar(int ch) noexcept {
 	return ch == '\\' || ch == '\'' || ch == '\"'
 		|| ch == '$'; // PHP
 }
@@ -114,21 +114,21 @@ static inline bool IsEscapeChar(int ch) {
 #define DOC_TAG_CLOSE_XML	4	/// </param>
 
 static void ColouriseCppDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
-	const WordList &keywords		= *keywordLists[0];
-	const WordList &keywords2		= *keywordLists[1];
-	const WordList &keywords3		= *keywordLists[2];
-	const WordList &keywords4		= *keywordLists[3];
+	const WordList &keywords = *keywordLists[0];
+	const WordList &keywords2 = *keywordLists[1];
+	const WordList &keywords3 = *keywordLists[2];
+	const WordList &keywords4 = *keywordLists[3];
 	// global
-	const WordList &kwAttribute	= *keywordLists[4];
-	const WordList &kwClass		= *keywordLists[5];
-	const WordList &kwInterface	= *keywordLists[6];
-	const WordList &kwEnumeration	= *keywordLists[7];
-	const WordList &kwConstant	= *keywordLists[8];
+	const WordList &kwAttribute = *keywordLists[4];
+	const WordList &kwClass = *keywordLists[5];
+	const WordList &kwInterface = *keywordLists[6];
+	const WordList &kwEnumeration = *keywordLists[7];
+	const WordList &kwConstant = *keywordLists[8];
 	// 2nd
-	const WordList &kw2ndKeyword	= *keywordLists[9];
-	const WordList &kw2ndKeyword2	= *keywordLists[10];
+	const WordList &kw2ndKeyword = *keywordLists[9];
+	const WordList &kw2ndKeyword2 = *keywordLists[10];
 	const WordList &kwAsmInstruction = *keywordLists[11];
-	const WordList &kwAsmRegister	= *keywordLists[12];
+	const WordList &kwAsmRegister = *keywordLists[12];
 
 	static bool isObjCSource = false;
 	const int lexType = styler.GetPropertyInt("lexer.lang.type", LEX_CPP);
@@ -137,13 +137,13 @@ static void ColouriseCppDoc(Sci_PositionU startPos, Sci_Position length, int ini
 	}
 
 	Sci_Position lineCurrent = styler.GetLine(startPos);
-	int curLineState =	(lineCurrent > 0) ? styler.GetLineState(lineCurrent-1) : 0;
-	int lineState =		(curLineState >> 24);
-	int numCBrace =		(curLineState >> 18) & 0x3F;
-	int numSBrace =		(curLineState >> 13) & 0x1F;
-	int numRBrace =		(curLineState >>  8) & 0x1F;
-	int curNcLevel =	(curLineState >>  4) & 0x0F;
-	int numDTSBrace =	(curLineState	   ) & 0x0F;
+	int curLineState = (lineCurrent > 0) ? styler.GetLineState(lineCurrent - 1) : 0;
+	int lineState = (curLineState >> 24);
+	int numCBrace = (curLineState >> 18) & 0x3F;
+	int numSBrace = (curLineState >> 13) & 0x1F;
+	int numRBrace = (curLineState >> 8) & 0x1F;
+	int curNcLevel = (curLineState >> 4) & 0x0F;
+	int numDTSBrace = (curLineState) & 0x0F;
 #define _MakeState() ((lineState << 24)|(numCBrace << 18)|(numSBrace << 13)|(numRBrace << 8)|(curNcLevel << 4)|numDTSBrace)
 #define _UpdateLineState()	styler.SetLineState(lineCurrent, _MakeState())
 #define _UpdateCurLineState() lineCurrent = styler.GetLine(sc.currentPos); \
@@ -175,11 +175,11 @@ static void ColouriseCppDoc(Sci_PositionU startPos, Sci_Position length, int ini
 	if (initStyle == SCE_C_COMMENTLINE || initStyle == SCE_C_COMMENTLINEDOC || initStyle == SCE_C_PREPROCESSOR) {
 		// Set continuationLine if last character of previous line is '\'
 		if (lineCurrent > 0) {
-			int chBack = styler.SafeGetCharAt(startPos-1, '\0');
-			int chBack2 = styler.SafeGetCharAt(startPos-2, '\0');
+			int chBack = styler.SafeGetCharAt(startPos - 1);
+			int chBack2 = styler.SafeGetCharAt(startPos - 2);
 			int lineEndChar = '!';
 			if (chBack2 == '\r' && chBack == '\n') {
-				lineEndChar = styler.SafeGetCharAt(startPos-3, '\0');
+				lineEndChar = styler.SafeGetCharAt(startPos - 3);
 			} else if (chBack == '\n' || chBack == '\r') {
 				lineEndChar = chBack2;
 			}
@@ -255,7 +255,7 @@ static void ColouriseCppDoc(Sci_PositionU startPos, Sci_Position length, int ini
 		case SCE_C_IDENTIFIER:
 _label_identifier:
 			if (!(iswordstart(sc.ch) || (sc.ch == '-' && (lexType == LEX_JAM)))) {
-				char s[256] = {0};
+				char s[256] = { 0 };
 				if (lexType == LEX_PHP)
 					sc.GetCurrentLowered(s, sizeof(s));
 				else
@@ -300,10 +300,10 @@ _label_identifier:
 						char *ppw = s;
 						if (s[0] == '#')
 							ppw = &s[1];
-						isPragmaPreprocessor  = strequ(ppw, "pragma") || strequ(ppw, "line");
+						isPragmaPreprocessor = strequ(ppw, "pragma") || strequ(ppw, "line");
 						isIncludePreprocessor = strcmp(ppw, "include") >= 0 || strequ(ppw, "import") || strequ(ppw, "using");
 						isMessagePreprocessor = strequ(ppw, "error") || strequ(ppw, "warning") || strequ(ppw, "message") ||
-												strequ(ppw, "region") || strequ(ppw, "endregion");
+							strequ(ppw, "region") || strequ(ppw, "endregion");
 						if (strequ(ppw, "define")) {
 							lineState |= LEX_BLOCK_MASK_DEFINE;
 							lastPPDefineWord = 1;
@@ -325,7 +325,7 @@ _label_identifier:
 						isAssignStmt = false;
 					}
 					// asm __asm _asm
-					lastWordWasAsm	= strequ(s, "asm") || strequ(s, "__asm");
+					lastWordWasAsm = strequ(s, "asm") || strequ(s, "__asm");
 					lastWordWasUUID = strequ(s, "uuid");
 					lastWordWasGoto = strequ(s, "goto") || strequ(s, "__label__") || strequ(s, "break") || strequ(s, "continue");
 					followsReturn = strequ(s, "return");
@@ -375,7 +375,7 @@ _label_identifier:
 					|| sc.ch == '*' || sc.ch == '&' || sc.ch == ':')) {
 					bool is_class = false;
 					Sci_PositionU pos = sc.currentPos;
-					int next_char = IsASpace(sc.ch)? nextChar : sc.ch;
+					int next_char = IsASpace(sc.ch) ? nextChar : sc.ch;
 
 					if (sc.ch == ':' && sc.chNext == ':') { // C++, Java, PHP
 						is_class = true;
@@ -384,23 +384,23 @@ _label_identifier:
 						if (isObjCSource && numSBrace > 0) {
 							if (!IsUpperCase(s[0])) is_class = false;
 						}
-					} else if (next_char == ')' || next_char == '>'  || next_char == '[' || next_char == '*' || next_char == '&') {
-						while (IsASpace(styler.SafeGetCharAt(pos, '\0'))) pos++;
+					} else if (next_char == ')' || next_char == '>' || next_char == '[' || next_char == '*' || next_char == '&') {
+						while (IsASpace(styler.SafeGetCharAt(pos))) pos++;
 						pos++;
-						while (IsASpace(styler.SafeGetCharAt(pos, '\0'))) pos++;
-						int ch = styler.SafeGetCharAt(pos, '\0');
+						while (IsASpace(styler.SafeGetCharAt(pos))) pos++;
+						int ch = styler.SafeGetCharAt(pos);
 						const bool next_is_word = iswordstart(ch);
 						if (next_char == ')' || next_char == '>') {
 							if (next_is_word || (ch == '(')) {
-								pos = sc.currentPos - (uint32_t)strlen(s) -1;
-								while (IsASpace(styler.SafeGetCharAt(pos, '\0'))) pos--;
-								ch = styler.SafeGetCharAt(pos, '\0');
+								pos = sc.currentPos - (uint32_t)strlen(s) - 1;
+								while (IsASpace(styler.SafeGetCharAt(pos))) pos--;
+								ch = styler.SafeGetCharAt(pos);
 								if (next_char == '>' && (ch == '<' || ch == ',')) {
 									is_class = true;
 								} else if (next_char == ')' && ch == '(') {
 									pos--;
-									while (IsASpace(styler.SafeGetCharAt(pos, '\0'))) pos--;
-									ch = styler.SafeGetCharAt(pos, '\0');
+									while (IsASpace(styler.SafeGetCharAt(pos))) pos--;
+									ch = styler.SafeGetCharAt(pos);
 									if (ch == '=' || ch == '(') {
 										is_class = true;
 									}
@@ -409,15 +409,15 @@ _label_identifier:
 							}
 						} else if (next_is_word) {
 							pos++;
-							while (iswordchar(styler.SafeGetCharAt(pos, '\0'))) pos++;
-							while (IsASpace(styler.SafeGetCharAt(pos, '\0'))) pos++;
-							ch = styler.SafeGetCharAt(pos, '\0');
+							while (iswordchar(styler.SafeGetCharAt(pos))) pos++;
+							while (IsASpace(styler.SafeGetCharAt(pos))) pos++;
+							ch = styler.SafeGetCharAt(pos);
 							if (ch == '=') {
 								is_class = true;
 							} else if (ch == ',' || ch == ';') {
-								pos = sc.currentPos - (uint32_t)strlen(s) -1;
-								while (IsASpace(styler.SafeGetCharAt(pos, '\0'))) pos--;
-								ch = styler.SafeGetCharAt(pos, '\0');
+								pos = sc.currentPos - (uint32_t)strlen(s) - 1;
+								while (IsASpace(styler.SafeGetCharAt(pos))) pos--;
+								ch = styler.SafeGetCharAt(pos);
 								if (iswordchar(ch) || ch == ';' || ch == '{') {
 									is_class = true;
 								}
@@ -526,8 +526,8 @@ _label_identifier:
 			if (!iswordstart(sc.ch) && sc.ch != '-') {
 				bool ignore = false;
 				if (sc.ch == '>' || sc.ch == '}') {
-					 docTagType = 0;
-					 sc.Forward();
+					docTagType = 0;
+					sc.Forward();
 					if (sc.ch == '<' && (IsAlpha(sc.chNext) || (sc.chNext == '/' && IsAlpha(sc.GetRelative(2))))) {
 						ignore = true;
 						sc.Forward();
@@ -556,7 +556,7 @@ _label_identifier:
 				if (curNcLevel == 0) {
 					sc.ForwardSetState(SCE_C_DEFAULT);
 				}
-			} else if (sc.Match('/','+')) {
+			} else if (sc.Match('/', '+')) {
 				++curNcLevel;
 				sc.Forward();
 			}
@@ -593,9 +593,9 @@ _label_identifier:
 			} else if (sc.ch == '\\' && IsEscapeChar(sc.chNext)) {
 				sc.Forward();
 			} else if (lexType == LEX_PHP && sc.chPrev != '\\' && (
-				  (sc.ch == '$' && iswordstart(sc.chNext)) ||
-				  (sc.ch == '$' && sc.chNext == '{') ||
-				  (sc.ch == '{' && sc.chNext == '$'))) {
+				(sc.ch == '$' && iswordstart(sc.chNext)) ||
+				(sc.ch == '$' && sc.chNext == '{') ||
+				(sc.ch == '{' && sc.chNext == '$'))) {
 				outerStyle = SCE_C_STRING;
 				if (sc.ch == '{' || sc.chNext == '{') {
 					varType = 2;
@@ -618,7 +618,7 @@ _label_identifier:
 				Sci_PositionU len = 0;
 				bool rawEnd = false;
 				while (pos > startPos && len < 16) {
-					char ch = styler.SafeGetCharAt(pos, '\0');
+					char ch = styler.SafeGetCharAt(pos);
 					if (ch == ')') {
 						rawEnd = true;
 						break;
@@ -668,7 +668,7 @@ _label_identifier:
 		case SCE_C_VARIABLE:
 			if (!(iswordstart(sc.ch) || (sc.ch == '-' && lexType == LEX_JAM))) {
 				if (lexType == LEX_PHP) {
-					char s[256] = {0};
+					char s[256] = { 0 };
 					sc.GetCurrentLowered(s, sizeof(s));
 					if (kwEnumeration.InList(s)) {
 						sc.ChangeState(SCE_C_ENUMERATION);
@@ -686,9 +686,8 @@ _label_identifier:
 					}
 					sc.SetState(outerStyle);
 					if (outerStyle == SCE_C_STRING && sc.ch == '\\' && IsEscapeChar(sc.chNext)) {
-						  sc.Forward();
-					}
-					else if (outerStyle == SCE_C_STRING && sc.ch == '\"') {
+						sc.Forward();
+					} else if (outerStyle == SCE_C_STRING && sc.ch == '\"') {
 						outerStyle = SCE_C_DEFAULT;
 						sc.ForwardSetState(SCE_C_DEFAULT);
 					}
@@ -703,7 +702,7 @@ _label_identifier:
 				if (numDTSBrace == 0) {
 					sc.Forward();
 					if (varType == 2 && sc.ch == '}')
-					sc.Forward();
+						sc.Forward();
 					varType = 0;
 					sc.SetState(outerStyle);
 					if (outerStyle == SCE_C_STRING && sc.ch == '\"') {
@@ -768,7 +767,7 @@ _label_identifier:
 			}
 			break;
 
-		// for Smali
+			// for Smali
 		case SCE_C_2NDWORD2: // instruction
 		case SCE_C_DIRECTIVE:
 		case SCE_C_LABEL:
@@ -781,7 +780,7 @@ _label_identifier:
 				sc.SetState(SCE_C_DEFAULT);
 			}
 			break;
-		//
+			//
 		case SCE_C_XML_TAG:	// PHP, Scala, ActionScript, Javascript
 			if (lexType == LEX_PHP) {
 			} else {
@@ -805,9 +804,9 @@ _label_identifier:
 
 		case SCE_C_HEREDOC:	// PHP
 			if (sc.chPrev != '\\' && (
-				  (sc.ch == '$' && iswordstart(sc.chNext)) ||
-				  (sc.ch == '$' && sc.chNext == '{') ||
-				  (sc.ch == '{' && sc.chNext == '$'))) {
+				(sc.ch == '$' && iswordstart(sc.chNext)) ||
+				(sc.ch == '$' && sc.chNext == '{') ||
+				(sc.ch == '{' && sc.chNext == '$'))) {
 				outerStyle = SCE_C_HEREDOC;
 				if (sc.ch == '{' || sc.chNext == '{') {
 					varType = 2;
@@ -818,14 +817,14 @@ _label_identifier:
 					sc.SetState(SCE_C_VARIABLE);
 				}
 			} else
-			if ((visibleChars == 0) && LexMatch(sc.currentPos+1, styler, heredoc)) {
-				sc.Forward(heredoc_len);
-				outerStyle = SCE_C_DEFAULT;
-				sc.ForwardSetState(SCE_C_DEFAULT);
-			}
+				if ((visibleChars == 0) && LexMatch(sc.currentPos + 1, styler, heredoc)) {
+					sc.Forward(heredoc_len);
+					outerStyle = SCE_C_DEFAULT;
+					sc.ForwardSetState(SCE_C_DEFAULT);
+				}
 			break;
 		case SCE_C_NOWDOC:	// PHP
-			if ((visibleChars == 0) && LexMatch(sc.currentPos+1, styler, heredoc)) {
+			if ((visibleChars == 0) && LexMatch(sc.currentPos + 1, styler, heredoc)) {
 				sc.Forward(heredoc_len);
 				sc.ForwardSetState(SCE_C_DEFAULT);
 			}
@@ -840,239 +839,239 @@ _label_identifier:
 				sc.SetState(SCE_C_DEFAULT);
 			}
 		} else
-		if (sc.state == SCE_C_DEFAULT) {
-			if (lexType == LEX_PHP && sc.Match("<?php")) {
-				sc.SetState(SCE_C_XML_TAG);
-				sc.Forward(5);
-				sc.SetState(SCE_C_DEFAULT);
-			} else
-			if (((lexType == LEX_CS) && sc.Match('@', '\"'))
-				|| ((lexType == LEX_D) && sc.Match('r', '\"'))) {
-				sc.SetState(SCE_C_VERBATIM);
-				sc.Forward();
-			} else if (_hasTripleVerbatim(lexType) && sc.Match("\"\"\"")) {
-				sc.SetState(SCE_C_TRIPLEVERBATIM);
-				sc.Forward(2);
-			} else if (lexType == LEX_GROOVY && sc.Match("\'\'\'")) {
-				sc.SetState(SCE_C_TRIPLEVERBATIM);
-				sc.Forward(2);
-				isTripleSingle = true;
-			} else if ((lexType == LEX_D) && sc.Match('x', '\"')) {
-				sc.SetState(SCE_C_DSTRINGX);
-				sc.Forward();
-			} else if ((lexType == LEX_D) && sc.Match('q', '\"')) {
-				sc.SetState(SCE_C_DSTRINGQ);
-				sc.Forward();
-			} else if ((lexType == LEX_D) && sc.Match('q', '{')) {
-				++numDTSBrace;
-				sc.SetState(SCE_C_DSTRINGT);
-				sc.Forward();
-			} else if (sc.ch == '`' && (lexType == LEX_JS || lexType == LEX_D || lexType == LEX_GO)) {
-				sc.SetState(SCE_C_DSTRINGB);
-			} else if (!_sharpComment(lexType) && sc.Match('/', '*')) {
-				if (visibleChars == 0 && (sc.Match("/**") || sc.Match("/*!"))) {
-					sc.SetState(SCE_C_COMMENTDOC);
-				} else {
-					sc.SetState(SCE_C_COMMENT);
-				}
-				sc.Forward();
-			} else if ((!(_sharpComment(lexType)) && sc.Match('/', '/'))
-				|| (lineCurrent == 0 && sc.Match('#', '!'))
-				|| ((_sharpComment(lexType) || lexType == LEX_PHP) && sc.ch == '#')) {
-				if (visibleChars == 0 && ((sc.Match("///") && !sc.Match("////")) || sc.Match("//!")))
-					sc.SetState(SCE_C_COMMENTLINEDOC);
-				else
-					sc.SetState(SCE_C_COMMENTLINE);
-			} else if (sc.ch == '$' && (lexType == LEX_JAM && sc.chNext == '(')) {
-				++numDTSBrace;
-				if (sc.chNext == '(')
-					varType = 1;
-				else
-					varType = 2;
-				sc.SetState(SCE_C_VARIABLE2);
-				sc.Forward();
-			} else if (IsADigit(sc.ch) || (sc.ch == '.' && IsADigit(sc.chNext))) {
-				sc.SetState(SCE_C_NUMBER);
-			} else if (sc.ch == '/') { // bug
-				// RegExp only appears in assignment or function argument
-				//if (_hasRegex(lexType) && (isAssignStmt || numRBrace > 0) && (strchr("([{=,:;!%^&*|?~+-", chPrevNonWhite) || followsReturn)
-				bool isJsRegex = (isAssignStmt && (chPrevNonWhite == '=' || chPrevNonWhite == ':')) 	// assignment
-					|| (numRBrace > 0 && strchr("(,!&|", chPrevNonWhite))	// argument
-					|| (strchr("};", chPrevNonWhite))
-					|| followsReturn;
-				if (_hasRegex(lexType) && isJsRegex
-					&& !(chPrevNonWhite == '+' || chPrevNonWhite == '-' || followsPostfixOperator)) {
-					sc.SetState(SCE_C_REGEX);	// JavaScript's RegEx
-					followsReturn = false;
-				} else if ((lexType == LEX_D) && sc.chNext == '+'){
-					++curNcLevel;
-					sc.SetState(SCE_C_DNESTEDCOMMENT);
-					sc.Forward();
-				} else {
-					sc.SetState(SCE_C_OPERATOR);
-				}
-			} else if ((lexType == LEX_CPP || lexType == LEX_RC) && (sc.ch == 'u' || sc.ch == 'U' || sc.ch == 'L')) {
-				int offset = 0;
-				bool is_raw = false;
-				bool isuchar = false;
-				if (sc.chNext == '\"' || sc.chNext == '\'') {
-					offset = 1;
-					isuchar = sc.chNext == '\'';
-				} else if (sc.chNext == 'R' && sc.GetRelative(2) == '\"') {
-					offset = 2;
-					is_raw = true;
-				} else if (sc.chNext == '8' && sc.GetRelative(2) == 'R' && sc.GetRelative(3) == '\"') {
-					offset = 3;
-					is_raw = true;
-				}
-				if (!offset) {
-					sc.SetState(SCE_C_IDENTIFIER);
-				} else {
-					if (is_raw)
-						sc.SetState(SCE_C_STRINGRAW);
-					else if (isuchar)
-						sc.SetState(SCE_C_CHARACTER);
-					else
-						sc.SetState(SCE_C_STRING);
-					sc.Forward(offset);
-				}
-			} else if (lexType == LEX_CPP && sc.ch == 'R' && sc.chNext == '\"') {
-				sc.SetState(SCE_C_STRINGRAW);
-				sc.Forward();
-			} else if (lexType == LEX_JAM && sc.ch == '\\' && IsEscapeChar(sc.chNext)) {
-				sc.Forward();
-			} else if (sc.ch == '\"') {
-				isIncludePreprocessor = false;
-				//isMessagePreprocessor = false;
-				sc.SetState(SCE_C_STRING);
-			} else if (sc.ch == '\'') {
-				if (lexType == LEX_SCALA && !(sc.chNext == '\\' || (sc.chNext != '\'' && sc.GetRelative(2) == '\'')))
-					sc.SetState(SCE_C_OPERATOR);
-				else
-					sc.SetState(SCE_C_CHARACTER);
-			} else if (_hasPreprocessor(lexType) && sc.ch == '#') {
-				if (lineState & LEX_BLOCK_MASK_DEFINE) {
-					sc.SetState(SCE_C_OPERATOR);
-					if (sc.chNext == '#' || sc.chNext == '@') {
-						sc.Forward(2);
-						if (iswordstart(sc.ch))
-							sc.SetState(SCE_C_IDENTIFIER);
-						else
-							sc.SetState(SCE_C_DEFAULT);
-					}
-				} else if (visibleChars == 0) {
-					isPreprocessorWord = true;
-					if (isspacechar(sc.chNext)) {
-						sc.SetState(SCE_C_PREPROCESSOR);
-						sc.ForwardSetState(SCE_C_DEFAULT);
-					} else if (iswordstart(sc.chNext)) {
-						sc.SetState(SCE_C_IDENTIFIER);
-					}
-				}
-			} else if (sc.ch == '$' && (lexType == LEX_HX || lexType == LEX_AWK || lexType == LEX_PHP)) {
-				if (lexType == LEX_PHP && !iswordstart(sc.chNext))
-					sc.SetState(SCE_C_OPERATOR);
-				else
-					sc.SetState(SCE_C_VARIABLE);
-			} else if (iswordstart(sc.ch) || (iswordstart(sc.chNext) && (lexType != LEX_PHP) && (sc.ch == '@' ||
-					(sc.ch == '#' && (lexType == LEX_D || lexType == LEX_HX || lexType == LEX_JAM))))) {
-				sc.SetState(SCE_C_IDENTIFIER);
-			} else if (sc.ch == '.') {
-				sc.SetState(SCE_C_OPERATOR);
-				if (sc.chNext == '.')
-					sc.Forward();
-			} else if (lexType == LEX_PHP && sc.Match('?', '>')) {
-				sc.SetState(SCE_C_XML_TAG);
-				sc.Forward();
-				sc.ForwardSetState(SCE_C_XML_DEFAULT);
-			} else if (sc.ch == '<') {
-				if (_hasXML(lexType) && chPrevNonWhite == '=') {
+			if (sc.state == SCE_C_DEFAULT) {
+				if (lexType == LEX_PHP && sc.Match("<?php")) {
 					sc.SetState(SCE_C_XML_TAG);
-					if (sc.chNext != '/') {
-						++curNcLevel;
-					}
-					sc.Forward();
-				} else if (isIncludePreprocessor) {
-					sc.SetState(SCE_C_STRING);
-				} else if (lexType == LEX_PHP && sc.chNext == '<' && sc.GetRelative(2) == '<') { // <<<EOT, <<<"EOT", <<<'EOT'
-					if (sc.GetRelative(3) == '\'')
-						sc.SetState(SCE_C_NOWDOC);
-					else
-						sc.SetState(SCE_C_HEREDOC);
-					sc.Forward(3);
-					if (sc.ch == '\'' || sc.ch == '\"')
+					sc.Forward(5);
+					sc.SetState(SCE_C_DEFAULT);
+				} else
+					if (((lexType == LEX_CS) && sc.Match('@', '\"'))
+						|| ((lexType == LEX_D) && sc.Match('r', '\"'))) {
+						sc.SetState(SCE_C_VERBATIM);
 						sc.Forward();
-					heredoc_len = LexGetRange(sc.currentPos + 1, styler, iswordstart, heredoc, sizeof(heredoc));
-					sc.Forward(heredoc_len);
-					if (sc.ch == '\'' || sc.ch == '\"')
+					} else if (_hasTripleVerbatim(lexType) && sc.Match("\"\"\"")) {
+						sc.SetState(SCE_C_TRIPLEVERBATIM);
+						sc.Forward(2);
+					} else if (lexType == LEX_GROOVY && sc.Match("\'\'\'")) {
+						sc.SetState(SCE_C_TRIPLEVERBATIM);
+						sc.Forward(2);
+						isTripleSingle = true;
+					} else if ((lexType == LEX_D) && sc.Match('x', '\"')) {
+						sc.SetState(SCE_C_DSTRINGX);
 						sc.Forward();
-				} else {
-					sc.SetState(SCE_C_OPERATOR);
-				}
-			} else if (isoperator(static_cast<char>(sc.ch)) || ((lexType == LEX_CS || lexType == LEX_D || lexType == LEX_JS) && sc.ch == '$') ||	 sc.ch == '@'
-				|| (lexType == LEX_PHP && sc.ch == '\\')) {
-				sc.SetState(SCE_C_OPERATOR);
-				isPragmaPreprocessor = false;
-				if ((sc.ch == '+' && sc.chPrev == '+') || (sc.ch == '-' && sc.chPrev == '-'))
-					followsPostfixOperator = true;
-				else
-					followsPostfixOperator = false;
+					} else if ((lexType == LEX_D) && sc.Match('q', '\"')) {
+						sc.SetState(SCE_C_DSTRINGQ);
+						sc.Forward();
+					} else if ((lexType == LEX_D) && sc.Match('q', '{')) {
+						++numDTSBrace;
+						sc.SetState(SCE_C_DSTRINGT);
+						sc.Forward();
+					} else if (sc.ch == '`' && (lexType == LEX_JS || lexType == LEX_D || lexType == LEX_GO)) {
+						sc.SetState(SCE_C_DSTRINGB);
+					} else if (!_sharpComment(lexType) && sc.Match('/', '*')) {
+						if (visibleChars == 0 && (sc.Match("/**") || sc.Match("/*!"))) {
+							sc.SetState(SCE_C_COMMENTDOC);
+						} else {
+							sc.SetState(SCE_C_COMMENT);
+						}
+						sc.Forward();
+					} else if ((!(_sharpComment(lexType)) && sc.Match('/', '/'))
+						|| (lineCurrent == 0 && sc.Match('#', '!'))
+						|| ((_sharpComment(lexType) || lexType == LEX_PHP) && sc.ch == '#')) {
+						if (visibleChars == 0 && ((sc.Match("///") && !sc.Match("////")) || sc.Match("//!")))
+							sc.SetState(SCE_C_COMMENTLINEDOC);
+						else
+							sc.SetState(SCE_C_COMMENTLINE);
+					} else if (sc.ch == '$' && (lexType == LEX_JAM && sc.chNext == '(')) {
+						++numDTSBrace;
+						if (sc.chNext == '(')
+							varType = 1;
+						else
+							varType = 2;
+						sc.SetState(SCE_C_VARIABLE2);
+						sc.Forward();
+					} else if (IsADigit(sc.ch) || (sc.ch == '.' && IsADigit(sc.chNext))) {
+						sc.SetState(SCE_C_NUMBER);
+					} else if (sc.ch == '/') { // bug
+						// RegExp only appears in assignment or function argument
+						//if (_hasRegex(lexType) && (isAssignStmt || numRBrace > 0) && (strchr("([{=,:;!%^&*|?~+-", chPrevNonWhite) || followsReturn)
+						bool isJsRegex = (isAssignStmt && (chPrevNonWhite == '=' || chPrevNonWhite == ':')) 	// assignment
+							|| (numRBrace > 0 && strchr("(,!&|", chPrevNonWhite))	// argument
+							|| (strchr("};", chPrevNonWhite))
+							|| followsReturn;
+						if (_hasRegex(lexType) && isJsRegex
+							&& !(chPrevNonWhite == '+' || chPrevNonWhite == '-' || followsPostfixOperator)) {
+							sc.SetState(SCE_C_REGEX);	// JavaScript's RegEx
+							followsReturn = false;
+						} else if ((lexType == LEX_D) && sc.chNext == '+') {
+							++curNcLevel;
+							sc.SetState(SCE_C_DNESTEDCOMMENT);
+							sc.Forward();
+						} else {
+							sc.SetState(SCE_C_OPERATOR);
+						}
+					} else if ((lexType == LEX_CPP || lexType == LEX_RC) && (sc.ch == 'u' || sc.ch == 'U' || sc.ch == 'L')) {
+						int offset = 0;
+						bool is_raw = false;
+						bool isuchar = false;
+						if (sc.chNext == '\"' || sc.chNext == '\'') {
+							offset = 1;
+							isuchar = sc.chNext == '\'';
+						} else if (sc.chNext == 'R' && sc.GetRelative(2) == '\"') {
+							offset = 2;
+							is_raw = true;
+						} else if (sc.chNext == '8' && sc.GetRelative(2) == 'R' && sc.GetRelative(3) == '\"') {
+							offset = 3;
+							is_raw = true;
+						}
+						if (!offset) {
+							sc.SetState(SCE_C_IDENTIFIER);
+						} else {
+							if (is_raw)
+								sc.SetState(SCE_C_STRINGRAW);
+							else if (isuchar)
+								sc.SetState(SCE_C_CHARACTER);
+							else
+								sc.SetState(SCE_C_STRING);
+							sc.Forward(offset);
+						}
+					} else if (lexType == LEX_CPP && sc.ch == 'R' && sc.chNext == '\"') {
+						sc.SetState(SCE_C_STRINGRAW);
+						sc.Forward();
+					} else if (lexType == LEX_JAM && sc.ch == '\\' && IsEscapeChar(sc.chNext)) {
+						sc.Forward();
+					} else if (sc.ch == '\"') {
+						isIncludePreprocessor = false;
+						//isMessagePreprocessor = false;
+						sc.SetState(SCE_C_STRING);
+					} else if (sc.ch == '\'') {
+						if (lexType == LEX_SCALA && !(sc.chNext == '\\' || (sc.chNext != '\'' && sc.GetRelative(2) == '\'')))
+							sc.SetState(SCE_C_OPERATOR);
+						else
+							sc.SetState(SCE_C_CHARACTER);
+					} else if (_hasPreprocessor(lexType) && sc.ch == '#') {
+						if (lineState & LEX_BLOCK_MASK_DEFINE) {
+							sc.SetState(SCE_C_OPERATOR);
+							if (sc.chNext == '#' || sc.chNext == '@') {
+								sc.Forward(2);
+								if (iswordstart(sc.ch))
+									sc.SetState(SCE_C_IDENTIFIER);
+								else
+									sc.SetState(SCE_C_DEFAULT);
+							}
+						} else if (visibleChars == 0) {
+							isPreprocessorWord = true;
+							if (isspacechar(sc.chNext)) {
+								sc.SetState(SCE_C_PREPROCESSOR);
+								sc.ForwardSetState(SCE_C_DEFAULT);
+							} else if (iswordstart(sc.chNext)) {
+								sc.SetState(SCE_C_IDENTIFIER);
+							}
+						}
+					} else if (sc.ch == '$' && (lexType == LEX_HX || lexType == LEX_AWK || lexType == LEX_PHP)) {
+						if (lexType == LEX_PHP && !iswordstart(sc.chNext))
+							sc.SetState(SCE_C_OPERATOR);
+						else
+							sc.SetState(SCE_C_VARIABLE);
+					} else if (iswordstart(sc.ch) || (iswordstart(sc.chNext) && (lexType != LEX_PHP) && (sc.ch == '@' ||
+						(sc.ch == '#' && (lexType == LEX_D || lexType == LEX_HX || lexType == LEX_JAM))))) {
+						sc.SetState(SCE_C_IDENTIFIER);
+					} else if (sc.ch == '.') {
+						sc.SetState(SCE_C_OPERATOR);
+						if (sc.chNext == '.')
+							sc.Forward();
+					} else if (lexType == LEX_PHP && sc.Match('?', '>')) {
+						sc.SetState(SCE_C_XML_TAG);
+						sc.Forward();
+						sc.ForwardSetState(SCE_C_XML_DEFAULT);
+					} else if (sc.ch == '<') {
+						if (_hasXML(lexType) && chPrevNonWhite == '=') {
+							sc.SetState(SCE_C_XML_TAG);
+							if (sc.chNext != '/') {
+								++curNcLevel;
+							}
+							sc.Forward();
+						} else if (isIncludePreprocessor) {
+							sc.SetState(SCE_C_STRING);
+						} else if (lexType == LEX_PHP && sc.chNext == '<' && sc.GetRelative(2) == '<') { // <<<EOT, <<<"EOT", <<<'EOT'
+							if (sc.GetRelative(3) == '\'')
+								sc.SetState(SCE_C_NOWDOC);
+							else
+								sc.SetState(SCE_C_HEREDOC);
+							sc.Forward(3);
+							if (sc.ch == '\'' || sc.ch == '\"')
+								sc.Forward();
+							heredoc_len = LexGetRange(sc.currentPos + 1, styler, iswordstart, heredoc, sizeof(heredoc));
+							sc.Forward(heredoc_len);
+							if (sc.ch == '\'' || sc.ch == '\"')
+								sc.Forward();
+						} else {
+							sc.SetState(SCE_C_OPERATOR);
+						}
+					} else if (isoperator(static_cast<char>(sc.ch)) || ((lexType == LEX_CS || lexType == LEX_D || lexType == LEX_JS) && sc.ch == '$') || sc.ch == '@'
+						|| (lexType == LEX_PHP && sc.ch == '\\')) {
+						sc.SetState(SCE_C_OPERATOR);
+						isPragmaPreprocessor = false;
+						if ((sc.ch == '+' && sc.chPrev == '+') || (sc.ch == '-' && sc.chPrev == '-'))
+							followsPostfixOperator = true;
+						else
+							followsPostfixOperator = false;
 
-				if (lastWordWasUUID && sc.ch == '(') {
-					sc.ForwardSetState(SCE_C_UUID);
-					lastWordWasUUID = false;
-					isAssignStmt = false;
-				}
-				if (sc.ch == '=' && !(sc.chPrev == '=' || sc.chNext == '=')) {
-					isAssignStmt = true;
-				}
-				if (sc.ch == ';') {
-					isAssignStmt = false;
-					lastWordWasGoto = false;
-					followsReturn = false;
-					//if (numCBrace == 0)
-						isTypeDefine = false;
-				}
-				if (sc.ch == '{') {
-					if (lastWordWasAsm) {
-						lineState |= LEX_BLOCK_MASK_ASM;
-						lastWordWasAsm = false;
-					}
-					//if (isTypeDefine) {
-					//	lineState |= LEX_BLOCK_MASK_TYPEDEF;
-					//	isTypeDefine = false;
-					//}
-				} else if (sc.ch == '}') {
-					lastWordWasGoto = false;
-					followsReturn = false;
-					lastWordWasAsm = false;
-					if (lineState & LEX_BLOCK_MASK_ASM) {
-						lineState &= LEX_BLOCK_UMASK_ASM;
-					}
-				}
+						if (lastWordWasUUID && sc.ch == '(') {
+							sc.ForwardSetState(SCE_C_UUID);
+							lastWordWasUUID = false;
+							isAssignStmt = false;
+						}
+						if (sc.ch == '=' && !(sc.chPrev == '=' || sc.chNext == '=')) {
+							isAssignStmt = true;
+						}
+						if (sc.ch == ';') {
+							isAssignStmt = false;
+							lastWordWasGoto = false;
+							followsReturn = false;
+							//if (numCBrace == 0)
+							isTypeDefine = false;
+						}
+						if (sc.ch == '{') {
+							if (lastWordWasAsm) {
+								lineState |= LEX_BLOCK_MASK_ASM;
+								lastWordWasAsm = false;
+							}
+							//if (isTypeDefine) {
+							//	lineState |= LEX_BLOCK_MASK_TYPEDEF;
+							//	isTypeDefine = false;
+							//}
+						} else if (sc.ch == '}') {
+							lastWordWasGoto = false;
+							followsReturn = false;
+							lastWordWasAsm = false;
+							if (lineState & LEX_BLOCK_MASK_ASM) {
+								lineState &= LEX_BLOCK_UMASK_ASM;
+							}
+						}
 
-				if(!(lineState & LEX_BLOCK_MASK_DEFINE)) {
-					if (sc.ch == '{') {
-						++numCBrace;
-					} else if (sc.ch == '}') {
-						if (numCBrace > 0)
-							--numCBrace;
-					} else if (sc.ch == '(') {
-						++numRBrace;
-					} else if (sc.ch == ')') {
-						if (numRBrace > 0)
-							--numRBrace;
-						if (lastWordWasAttr && numRBrace == 0)
-							lastWordWasAttr = false;
-					} else if (sc.ch == '[') {
-						++numSBrace;
-					} else if (sc.ch == ']') {
-						if (numSBrace > 0)
-							--numSBrace;
+						if (!(lineState & LEX_BLOCK_MASK_DEFINE)) {
+							if (sc.ch == '{') {
+								++numCBrace;
+							} else if (sc.ch == '}') {
+								if (numCBrace > 0)
+									--numCBrace;
+							} else if (sc.ch == '(') {
+								++numRBrace;
+							} else if (sc.ch == ')') {
+								if (numRBrace > 0)
+									--numRBrace;
+								if (lastWordWasAttr && numRBrace == 0)
+									lastWordWasAttr = false;
+							} else if (sc.ch == '[') {
+								++numSBrace;
+							} else if (sc.ch == ']') {
+								if (numSBrace > 0)
+									--numSBrace;
+							}
+						}
 					}
-				}
 			}
-		}
 
 		// Handle line continuation generically.
 		if (sc.ch == '\\') {
@@ -1104,7 +1103,7 @@ static bool IsCppDefineLine(Sci_Position line, LexAccessor &styler, Sci_Position
 	Sci_Position pos = styler.LineStart(line);
 	Sci_Position endPos = styler.LineStart(line + 1) - 1;
 	pos = LexSkipSpaceTab(pos, endPos, styler);
-	if (styler[pos] == '#' && styler.StyleAt(pos) == SCE_C_PREPROCESSOR){
+	if (styler[pos] == '#' && styler.StyleAt(pos) == SCE_C_PREPROCESSOR) {
 		pos++;
 		pos = LexSkipSpaceTab(pos, endPos, styler);
 		if (styler.Match(pos, "define") && IsASpaceOrTab(styler[pos + 6])) {
@@ -1137,14 +1136,14 @@ static bool IsCppFoldingLine(Sci_Position line, LexAccessor &styler, int kind) {
 	int stl = styler.StyleAt(pos);
 	char ch = styler[pos];
 	switch (kind) {
-	//case 0:
-	//	return (ch == '/' || ch == '#') && (stl == SCE_C_COMMENTLINE || stl == SCE_C_COMMENTLINEDOC);
+		//case 0:
+		//	return (ch == '/' || ch == '#') && (stl == SCE_C_COMMENTLINE || stl == SCE_C_COMMENTLINEDOC);
 	case 1:
 		return stl == SCE_C_WORD && (ch == 'i' || ch == 'u' || ch == 't') &&
-		(styler.Match(pos, "using") || styler.Match(pos, "import") || styler.Match(pos, "typedef"));
+			(styler.Match(pos, "using") || styler.Match(pos, "import") || styler.Match(pos, "typedef"));
 	case 2:
 		return stl == SCE_C_DIRECTIVE && (ch == '@') &&
-		(styler.Match(pos, "@property") || styler.Match(pos, "@synthesize"));
+			(styler.Match(pos, "@property") || styler.Match(pos, "@synthesize"));
 	default:
 		if (!(stl == SCE_C_PREPROCESSOR && (ch == '#' || ch == '!')))
 			return false;
@@ -1169,17 +1168,17 @@ static bool IsCppFoldingLine(Sci_Position line, LexAccessor &styler, int kind) {
 #define IsDefineLine(line)		IsCppFoldingLine(line, styler, 4)
 #define IsUnDefLine(line)		IsCppFoldingLine(line, styler, 5)
 
-static inline bool IsStreamCommentStyle(int style) {
+static inline bool IsStreamCommentStyle(int style) noexcept {
 	return style == SCE_C_COMMENT || style == SCE_C_COMMENTDOC
-		  || style == SCE_C_COMMENTDOC_TAG || style == SCE_C_COMMENTDOC_TAG_XML;
+		|| style == SCE_C_COMMENTDOC_TAG || style == SCE_C_COMMENTDOC_TAG_XML;
 }
-static inline bool IsHear_NowDocStyle(int style) {
+static inline bool IsHear_NowDocStyle(int style) noexcept {
 	return style == SCE_C_HEREDOC || style == SCE_C_NOWDOC;
 }
 static bool IsOpenBraceLine(Sci_Position line, LexAccessor &styler) {
 	// above line
-	Sci_Position startPos = styler.LineStart(line-1);
-	Sci_Position endPos = styler.LineStart(line)-1;
+	Sci_Position startPos = styler.LineStart(line - 1);
+	Sci_Position endPos = styler.LineStart(line) - 1;
 	Sci_Position pos = LexSkipSpaceTab(startPos, endPos, styler);
 	char ch = styler[pos];
 	int stl = styler.StyleAt(pos);
@@ -1245,9 +1244,9 @@ static void FoldCppDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 		bool atEOL = (ch == '\r' && chNext != '\n') || (ch == '\n');
 
 		if (foldComment && atEOL && IsCommentLine(lineCurrent)) {
-			if(!IsCommentLine(lineCurrent - 1) && IsCommentLine(lineCurrent + 1))
+			if (!IsCommentLine(lineCurrent - 1) && IsCommentLine(lineCurrent + 1))
 				levelNext++;
-			else if(IsCommentLine(lineCurrent - 1) && !IsCommentLine(lineCurrent + 1))
+			else if (IsCommentLine(lineCurrent - 1) && !IsCommentLine(lineCurrent + 1))
 				levelNext--;
 		}
 		if (foldComment && IsStreamCommentStyle(style) && !IsCommentLine(lineCurrent)) {
@@ -1279,9 +1278,9 @@ static void FoldCppDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 		}
 
 		if (atEOL && IsUsingLine(lineCurrent)) {
-			if(!IsUsingLine(lineCurrent-1) && IsUsingLine(lineCurrent+1))
+			if (!IsUsingLine(lineCurrent - 1) && IsUsingLine(lineCurrent + 1))
 				levelNext++;
-			else if(IsUsingLine(lineCurrent-1) && !IsUsingLine(lineCurrent+1))
+			else if (IsUsingLine(lineCurrent - 1) && !IsUsingLine(lineCurrent + 1))
 				levelNext--;
 		}
 		//if (hasPreprocessor && atEOL && IsPropertyLine(lineCurrent)) {
@@ -1291,42 +1290,42 @@ static void FoldCppDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 		//		levelNext--;
 		//}
 		if (hasPreprocessor && atEOL && IsIncludeLine(lineCurrent)) {
-			if(!IsIncludeLine(lineCurrent-1) && IsIncludeLine(lineCurrent+1))
+			if (!IsIncludeLine(lineCurrent - 1) && IsIncludeLine(lineCurrent + 1))
 				levelNext++;
-			else if(IsIncludeLine(lineCurrent-1) && !IsIncludeLine(lineCurrent+1))
+			else if (IsIncludeLine(lineCurrent - 1) && !IsIncludeLine(lineCurrent + 1))
 				levelNext--;
 		}
 		if (hasPreprocessor && atEOL && IsDefineLine(lineCurrent)) {
-			if(!IsDefineLine(lineCurrent-1) && IsDefineLine(lineCurrent+1))
+			if (!IsDefineLine(lineCurrent - 1) && IsDefineLine(lineCurrent + 1))
 				levelNext++;
-			else if(IsDefineLine(lineCurrent-1) && !IsDefineLine(lineCurrent+1))
+			else if (IsDefineLine(lineCurrent - 1) && !IsDefineLine(lineCurrent + 1))
 				levelNext--;
 		}
 		if (hasPreprocessor && atEOL && IsUnDefLine(lineCurrent)) {
-			if(!IsUnDefLine(lineCurrent-1) && IsUnDefLine(lineCurrent+1))
+			if (!IsUnDefLine(lineCurrent - 1) && IsUnDefLine(lineCurrent + 1))
 				levelNext++;
-			else if(IsUnDefLine(lineCurrent-1) && !IsUnDefLine(lineCurrent+1))
+			else if (IsUnDefLine(lineCurrent - 1) && !IsUnDefLine(lineCurrent + 1))
 				levelNext--;
 		}
 
-		if (atEOL && !IsStreamCommentStyle(style) && IsBackslashLine(lineCurrent, styler) && !IsBackslashLine(lineCurrent-1, styler)) {
+		if (atEOL && !IsStreamCommentStyle(style) && IsBackslashLine(lineCurrent, styler) && !IsBackslashLine(lineCurrent - 1, styler)) {
 			levelNext++;
 		}
-		if (atEOL && !IsStreamCommentStyle(style) && !IsBackslashLine(lineCurrent, styler) && IsBackslashLine(lineCurrent-1, styler)) {
+		if (atEOL && !IsStreamCommentStyle(style) && !IsBackslashLine(lineCurrent, styler) && IsBackslashLine(lineCurrent - 1, styler)) {
 			levelNext--;
 		}
-		if (atEOL && !(hasPreprocessor && IsCppInDefine(i, styler)) && IsOpenBraceLine(lineCurrent+1, styler)) {
+		if (atEOL && !(hasPreprocessor && IsCppInDefine(i, styler)) && IsOpenBraceLine(lineCurrent + 1, styler)) {
 			levelNext++;
 		}
 
 		if ((hasPreprocessor || lexType == LEX_HX) && foldPreprocessor && (ch == '#') && style == SCE_C_PREPROCESSOR) {
-			Sci_Position pos = LexSkipSpaceTab(i+1, endPos, styler);
+			Sci_Position pos = LexSkipSpaceTab(i + 1, endPos, styler);
 			if (styler.Match(pos, "if") || styler.Match(pos, "region")) {
 				levelNext++;
 			} else if (styler.Match(pos, "end")) {
 				levelNext--;
 			} else if (styler.Match(pos, "pragma")) { // #pragma region, #pragma endregion
-				pos = LexSkipSpaceTab(pos+7, endPos, styler);
+				pos = LexSkipSpaceTab(pos + 7, endPos, styler);
 				if (styler.StyleAt(pos) == SCE_C_PREPROCESSOR) {
 					if (styler.Match(pos, "region")) {
 						levelNext++;
@@ -1339,14 +1338,14 @@ static void FoldCppDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 
 		// Objctive C/C++
 		if ((lexType == LEX_CPP || lexType == LEX_OBJC) && ch == '@' && style == SCE_C_DIRECTIVE) {
-			if (styler.Match(i+1, "interface") || styler.Match(i+1, "implementation")) {
+			if (styler.Match(i + 1, "interface") || styler.Match(i + 1, "implementation")) {
 				levelNext++;
-			} else if (styler.Match(i+1, "end")) {
+			} else if (styler.Match(i + 1, "end")) {
 				levelNext--;
 				isObjCProtocol = false;
-			} else if (styler.Match(i+1, "protocol")) {
+			} else if (styler.Match(i + 1, "protocol")) {
 				//char ch = LexGetNextChar(i+9, styler);
-				if (LexGetNextChar(i+9, styler) != '(') { // @protocol()
+				if (LexGetNextChar(i + 9, styler) != '(') { // @protocol()
 					isObjCProtocol = true;
 					levelNext++;
 				}
@@ -1403,7 +1402,7 @@ static void FoldCppDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 
 		if (!isspacechar(ch))
 			visibleChars++;
-		if (atEOL || (i == endPos-1)) {
+		if (atEOL || (i == endPos - 1)) {
 			int levelUse = levelCurrent;
 			//if (foldAtElse) {
 			//	levelUse = levelMinCurrent;

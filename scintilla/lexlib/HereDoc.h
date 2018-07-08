@@ -24,8 +24,7 @@ public:
 
 	HereDocCls();
 	void Append(int ch);
-	~HereDocCls() {
-	}
+	~HereDocCls() = default;
 };
 
 // Class to manage quote pairs
@@ -59,9 +58,8 @@ public:
 	QuoteStackCls();
 	void Start(int u, int s);
 	void Push(int u, int s);
-	void Pop(void);
-	~QuoteStackCls() {
-	}
+	void Pop();
+	~QuoteStackCls() = default;
 };
 
 

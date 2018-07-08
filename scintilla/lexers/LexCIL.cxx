@@ -1,8 +1,8 @@
 // Lexer for MSIL, CIL
 
-#include <string.h>
-#include <assert.h>
-#include <ctype.h>
+#include <cstring>
+#include <cassert>
+#include <cctype>
 
 #include "ILexer.h"
 #include "Scintilla.h"
@@ -16,18 +16,18 @@
 
 using namespace Scintilla;
 
-static inline bool IsCILOp(int ch) {
+static inline bool IsCILOp(int ch) noexcept {
 	return ch == '{' || ch == '}' || ch == '[' || ch == ']' || ch == '(' || ch == ')' || ch == '=' || ch == '&'
 		|| ch == ':' || ch == ',' || ch == '+' || ch == '-' || ch == '.';
 }
-static inline bool IsCILWordChar(int ch) {
+static inline bool IsCILWordChar(int ch) noexcept {
 	return iswordchar(ch) || ch == '-' || ch == '/' || ch == '$';
 }
 
 #define MAX_WORD_LENGTH	31
 static void ColouriseCILDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
 	const WordList &keywords = *keywordLists[0];
-	const WordList &keywords2	= *keywordLists[1];
+	const WordList &keywords2 = *keywordLists[1];
 	const WordList &kwInstruction = *keywordLists[10];
 
 	int state = initStyle;
@@ -39,7 +39,7 @@ static void ColouriseCILDoc(Sci_PositionU startPos, Sci_Position length, int ini
 		++endPos;
 
 	Sci_Position lineCurrent = styler.GetLine(startPos);
-	char buf[MAX_WORD_LENGTH + 1] = {0};
+	char buf[MAX_WORD_LENGTH + 1] = { 0 };
 	int wordLen = 0;
 
 	for (Sci_PositionU i = startPos; i < endPos; i++) {
@@ -49,7 +49,7 @@ static void ColouriseCILDoc(Sci_PositionU startPos, Sci_Position length, int ini
 
 		const bool atEOL = (ch == '\r' && chNext != '\n') || (ch == '\n');
 		const bool atLineStart = i == (Sci_PositionU)styler.LineStart(lineCurrent);
-		if (atEOL || i == endPos-1) {
+		if (atEOL || i == endPos - 1) {
 			lineCurrent++;
 		}
 
@@ -172,7 +172,7 @@ static void FoldCILDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 	Sci_Position lineCurrent = styler.GetLine(startPos);
 	int levelCurrent = SC_FOLDLEVELBASE;
 	if (lineCurrent > 0)
-		levelCurrent = styler.LevelAt(lineCurrent-1) >> 16;
+		levelCurrent = styler.LevelAt(lineCurrent - 1) >> 16;
 	int levelNext = levelCurrent;
 
 	int chNext = styler[startPos];
@@ -212,7 +212,7 @@ static void FoldCILDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 		if (!isspacechar(ch))
 			visibleChars++;
 
-		if (atEOL || (i == endPos-1)) {
+		if (atEOL || (i == endPos - 1)) {
 			int levelUse = levelCurrent;
 			int lev = levelUse | levelNext << 16;
 			if (visibleChars == 0 && foldCompact)
@@ -229,4 +229,4 @@ static void FoldCILDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 	}
 }
 
-LexerModule lmCIL(SCLEX_CIL, ColouriseCILDoc, "cli", FoldCILDoc);
+LexerModule lmCIL(SCLEX_CIL, ColouriseCILDoc, "cil", FoldCILDoc);
