@@ -278,12 +278,13 @@ extern "C" BOOL EditPrint(HWND hwnd, LPCWSTR pszDocTitle, LPCWSTR pszPageFormat)
 	}
 
 	// Set print color mode
-	int printColorModes[5] = {
+	const int printColorModes[] = {
 		SC_PRINT_NORMAL,
 		SC_PRINT_INVERTLIGHT,
 		SC_PRINT_BLACKONWHITE,
 		SC_PRINT_COLOURONWHITE,
-		SC_PRINT_COLOURONWHITEDEFAULTBG
+		SC_PRINT_COLOURONWHITEDEFAULTBG,
+		SC_PRINT_SCREENCOLOURS,
 	};
 	SendMessage(hwnd, SCI_SETPRINTCOLOURMODE, printColorModes[iPrintColor], 0);
 
