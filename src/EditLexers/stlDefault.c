@@ -88,8 +88,8 @@ EDITLEXER lexDIFF = { SCLEX_DIFF, NP2LEX_DIFF, L"Diff File", L"diff; patch", L""
 	{ SCE_DIFF_COMMAND, NP2STYLE_Command, L"Command", L"bold; fore:#0A246A", L"" },
 	{ SCE_DIFF_HEADER, 63541, L"Source and Destination", L"fore:#C80000; back:#FFF1A8; eolfilled", L"" },
 	{ SCE_DIFF_POSITION, 63542, L"Position Setting", L"fore:#0000FF", L"" },
-	{ SCE_DIFF_ADDED, 63543, L"Line Addition", L"fore:#002000; back:#80FF80; eolfilled", L"" },
-	{ SCE_DIFF_DELETED, 63544, L"Line Removal", L"fore:#200000; back:#FF8080; eolfilled", L"" },
+	{ MULTI_STYLE(SCE_DIFF_ADDED, SCE_DIFF_PATCH_ADD, SCE_DIFF_REMOVED_PATCH_ADD, 0), 63543, L"Line Addition", L"fore:#002000; back:#80FF80; eolfilled", L"" },
+	{ MULTI_STYLE(SCE_DIFF_DELETED, SCE_DIFF_PATCH_DELETE, SCE_DIFF_REMOVED_PATCH_DELETE, 0), 63544, L"Line Removal", L"fore:#200000; back:#FF8080; eolfilled", L"" },
 	{ SCE_DIFF_CHANGED, 63545, L"Line Change", L"fore:#000020; back:#8080FF; eolfilled", L"" },
 	{ -1, 00000, L"", L"", L"" }
 }
