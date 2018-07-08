@@ -6,9 +6,9 @@
 // Copyright 1998-2002 by Neil Hodgson <neilh@scintilla.org>
 // The License.txt file describes the conditions under which this software may be distributed.
 
-#include <stdlib.h>
-#include <assert.h>
-#include <ctype.h>
+#include <cstdlib>
+#include <cassert>
+#include <cctype>
 
 #include "ILexer.h"
 #include "Scintilla.h"
@@ -23,11 +23,11 @@
 
 using namespace Scintilla;
 
-static bool IsVWordChar(const int ch) {
+static bool IsVWordChar(const int ch) noexcept {
 	return (ch < 0x80) && (isalnum(ch) || ch == '.' || ch == '_' || ch == '\''|| ch == '$');
 }
 
-static bool IsVWordStart(const int ch) {
+static bool IsVWordStart(const int ch) noexcept {
 	return (ch < 0x80) && (isalnum(ch) || ch == '_' || ch == '$');
 }
 
@@ -153,7 +153,7 @@ _label_identifier:
 	sc.Complete();
 }
 
-static bool IsStreamCommentStyle(int style) {
+static bool IsStreamCommentStyle(int style) noexcept {
 	return style == SCE_V_COMMENT;
 }
 #define IsCommentLine(line) IsLexCommentLine(line, styler, MultiStyle(SCE_V_COMMENTLINE, SCE_V_COMMENTLINEBANG))
@@ -171,7 +171,7 @@ static void FoldVerilogDoc(Sci_PositionU startPos, Sci_Position length, int init
 	Sci_Position lineCurrent = styler.GetLine(startPos);
 	int levelCurrent = SC_FOLDLEVELBASE;
 	if (lineCurrent > 0)
-		levelCurrent = styler.LevelAt(lineCurrent-1) >> 16;
+		levelCurrent = styler.LevelAt(lineCurrent - 1) >> 16;
 	int levelMinCurrent = levelCurrent;
 	int levelNext = levelCurrent;
 
@@ -201,7 +201,7 @@ static void FoldVerilogDoc(Sci_PositionU startPos, Sci_Position length, int init
 				levelNext--;
 		}
 		if (foldPreprocessor && ch == '`' && (style == SCE_V_PREPROCESSOR)) {
-			Sci_Position pos = LexSkipSpaceTab(i+1, endPos, styler);
+			Sci_Position pos = LexSkipSpaceTab(i + 1, endPos, styler);
 			if (styler.Match(pos, "if")) {
 				levelNext++;
 			} else if (styler.Match(pos, "end")) {
@@ -219,7 +219,7 @@ static void FoldVerilogDoc(Sci_PositionU startPos, Sci_Position length, int init
 			Sci_PositionU j = i;
 			if (styler.Match(j, "case") ||
 				styler.Match(j, "class") || styler.Match(j, "function") || styler.Match(j, "generate") ||
-				styler.Match(j, "covergroup") || styler.Match(j, "package") ||styler.Match(j, "primitive") ||
+				styler.Match(j, "covergroup") || styler.Match(j, "package") || styler.Match(j, "primitive") ||
 				styler.Match(j, "program") || styler.Match(j, "sequence") || styler.Match(j, "specify") ||
 				styler.Match(j, "table") || styler.Match(j, "task") || styler.Match(j, "fork") ||
 				styler.Match(j, "module") || styler.Match(j, "begin")) {
@@ -230,7 +230,7 @@ static void FoldVerilogDoc(Sci_PositionU startPos, Sci_Position length, int init
 		}
 		if (!isspacechar(ch))
 			visibleChars++;
-		if (atEOL || (i == endPos-1)) {
+		if (atEOL || (i == endPos - 1)) {
 			int levelUse = levelCurrent;
 			if (foldAtElse) {
 				levelUse = levelMinCurrent;

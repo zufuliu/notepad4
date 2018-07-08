@@ -1,8 +1,8 @@
 // Lexer for Configuration Files.
 
-#include <string.h>
-#include <assert.h>
-#include <ctype.h>
+#include <cstring>
+#include <cassert>
+#include <cctype>
 
 #include "ILexer.h"
 #include "Scintilla.h"
@@ -16,14 +16,14 @@
 
 using namespace Scintilla;
 
-static inline bool IsConfOp(int ch) {
+static inline bool IsConfOp(int ch) noexcept {
 	return ch == '=' || ch == ':' || ch == ';' || ch == '{' || ch == '}' || ch == '(' || ch == ')' ||
 		ch == '!' || ch == ',' || ch == '|' || ch == '*' || ch == '$' || ch == '.';
 }
-static inline bool IsUnit(int ch) {
+static inline bool IsUnit(int ch) noexcept {
 	return ch == 'K' || ch == 'M' || ch == 'G' || ch == 'k' || ch == 'm' || ch == 'g';
 }
-static inline bool IsDelimiter(int ch) {
+static inline bool IsDelimiter(int ch) noexcept {
 	return IsASpace(ch) || IsConfOp(ch);
 }
 
@@ -124,7 +124,7 @@ static void ColouriseConfDoc(Sci_PositionU startPos, Sci_Position length, int in
 			break;
 		}
 
-		if (state != SCE_CONF_COMMENT &&  ch == '\\' && (chNext == '\n' || chNext == '\r')) {
+		if (state != SCE_CONF_COMMENT && ch == '\\' && (chNext == '\n' || chNext == '\r')) {
 			i++;
 			lineCurrent++;
 			ch = chNext;
@@ -159,7 +159,7 @@ static void ColouriseConfDoc(Sci_PositionU startPos, Sci_Position length, int in
 						chNext = styler.SafeGetCharAt(i + 1);
 					}
 				}
-			} else if (insideTag && (ch == '>' || ((ch == '/' || ch  == '?') && chNext == '>'))) {
+			} else if (insideTag && (ch == '>' || ((ch == '/' || ch == '?') && chNext == '>'))) {
 				styler.ColourTo(i - 1, state);
 				if (ch == '/' || ch == '?') {
 					i++;
@@ -188,7 +188,7 @@ static void ColouriseConfDoc(Sci_PositionU startPos, Sci_Position length, int in
 			}
 		}
 
-		if (atEOL || i == endPos-1) {
+		if (atEOL || i == endPos - 1) {
 			lineCurrent++;
 			visibleChars = 0;
 		}
@@ -199,7 +199,6 @@ static void ColouriseConfDoc(Sci_PositionU startPos, Sci_Position length, int in
 
 	// Colourise remaining document
 	styler.ColourTo(endPos - 1, state);
-
 }
 
 #define IsCommentLine(line)		IsLexCommentLine(line, styler, SCE_CONF_COMMENT)
@@ -215,7 +214,7 @@ static void FoldConfDoc(Sci_PositionU startPos, Sci_Position length, int initSty
 	Sci_Position lineCurrent = styler.GetLine(startPos);
 	int levelCurrent = SC_FOLDLEVELBASE;
 	if (lineCurrent > 0)
-		levelCurrent = styler.LevelAt(lineCurrent-1) >> 16;
+		levelCurrent = styler.LevelAt(lineCurrent - 1) >> 16;
 	int levelNext = levelCurrent;
 
 	char chNext = styler[startPos];
@@ -267,7 +266,7 @@ static void FoldConfDoc(Sci_PositionU startPos, Sci_Position length, int initSty
 		if (!isspacechar(ch))
 			visibleChars++;
 
-		if (atEOL || (i == endPos-1)) {
+		if (atEOL || (i == endPos - 1)) {
 			int levelUse = levelCurrent;
 			int lev = levelUse | levelNext << 16;
 			if (visibleChars == 0 && foldCompact)

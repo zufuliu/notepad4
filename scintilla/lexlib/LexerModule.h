@@ -22,48 +22,38 @@ typedef ILexer4 *(*LexerFactoryFunction)();
 
 /**
  * A LexerModule is responsible for lexing and folding a particular language.
- * The class maintains a list of LexerModules which can be searched to find a
+ * The Catalogue class maintains a list of LexerModules which can be searched to find a
  * module appropriate to a particular language.
- */
+ * The ExternalLexerModule subclass holds lexers loaded from DLLs or shared libraries.
+*/
 class LexerModule {
 protected:
 	int language;
 	LexerFunction fnLexer;
 	LexerFunction fnFolder;
 	LexerFactoryFunction fnFactory;
-	const char * const * wordListDescriptions;
-	const LexicalClass *lexClasses;
-	size_t nClasses;
 
 public:
 	const char *languageName;
-	LexerModule(int language_,
+	LexerModule(
+		int language_,
 		LexerFunction fnLexer_,
-		const char *languageName_=0,
-		LexerFunction fnFolder_=0,
-		const char * const wordListDescriptions_[] = NULL,
-		const LexicalClass *lexClasses_=nullptr,
-		size_t nClasses_=0);
-	LexerModule(int language_,
+		const char *languageName_ = nullptr,
+		LexerFunction fnFolder_ = nullptr);
+	LexerModule(
+		int language_,
 		LexerFactoryFunction fnFactory_,
-		const char *languageName_,
-		const char * const wordListDescriptions_[] = NULL);
-	virtual ~LexerModule() {
-	}
-	int GetLanguage() const { return language; }
+		const char *languageName_ = nullptr);
+	virtual ~LexerModule();
 
-	// -1 is returned if no WordList information is available
-	int GetNumWordLists() const;
-	const char *GetWordListDescription(int index) const;
-	const LexicalClass *LexClasses() const;
-	size_t NamedStyles() const;
+	int GetLanguage() const;
 
 	ILexer4 *Create() const;
 
 	virtual void Lex(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle,
-                  LexerWordList keywordLists, Accessor &styler) const;
+		LexerWordList keywordLists, Accessor &styler) const;
 	virtual void Fold(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle,
-                  LexerWordList keywordLists, Accessor &styler) const;
+		LexerWordList keywordLists, Accessor &styler) const;
 
 	friend class Catalogue;
 };

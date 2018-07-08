@@ -1,8 +1,8 @@
 // Lexer for Matlab, Octave, Scilab and Gnuplot (treated as same as Octave).
 
-#include <string.h>
-#include <assert.h>
-#include <ctype.h>
+#include <cstring>
+#include <cassert>
+#include <cctype>
 
 #include "ILexer.h"
 #include "Scintilla.h"
@@ -23,7 +23,7 @@ using namespace Scintilla;
 #define LEX_GNUPLOT		65
 #define LEX_JULIA		66
 
-static inline bool IsMatlabOctave(int lexType) {
+static inline bool IsMatlabOctave(int lexType) noexcept {
 	return lexType == LEX_MATLAB || lexType == LEX_OCTAVE;
 }
 
@@ -68,22 +68,22 @@ static bool IsNestedCommentStart(int lexType, StyleContext &sc, int visibleChars
 	return IsNestedCommentStart(lexType, sc.ch, sc.chNext, visibleChars, sc.styler, sc.currentPos);
 }
 
-static bool IsMatOperator(int ch) {
+static bool IsMatOperator(int ch) noexcept {
 	return isoperator(ch) || ch == '@' || ch == '\\' || ch == '$';
 }
 
 // format: [.] digit [.] [e | E] [+ | -] [i | j]
-static bool IsMatNumber(int ch, int chPrev) {
+static bool IsMatNumber(int ch, int chPrev) noexcept {
 	return (ch < 0x80) && (isdigit(ch) || (ch == '.' && chPrev != '.') // only one dot
 		|| ((ch == '+' || ch == '-') && (chPrev == 'e' || chPrev == 'E')) // exponent
 		|| ((chPrev < 0x80) && isdigit(chPrev) && (ch == 'e' || ch == 'E'
-			||ch == 'i' || ch == 'j' || ch == 'I' || ch == 'J')));// complex, 'I','J' in Octave
+			|| ch == 'i' || ch == 'j' || ch == 'I' || ch == 'J')));// complex, 'I','J' in Octave
 }
-static bool IsHexNum(int ch) {
+static bool IsHexNum(int ch) noexcept {
 	return (ch < 0x80) && isxdigit(ch);
 }
 
-static bool IsInvalidFileName(int ch) {
+static bool IsInvalidFileName(int ch) noexcept {
 	return isspace(ch) || ch == '<' || ch == '>' || ch == '/' || ch == '\\' || ch == '\'' || ch == '\"'
 		|| ch == '|' || ch == '*' || ch == '?';
 }
@@ -100,16 +100,16 @@ static bool IsInvalidFileName(int ch) {
 };*/
 
 static void ColouriseMatlabDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
-	const WordList &keywords  = *keywordLists[0];
+	const WordList &keywords = *keywordLists[0];
 	const WordList &attributes = *keywordLists[1];
-	const WordList &commands  = *keywordLists[2];
+	const WordList &commands = *keywordLists[2];
 	const WordList &function1 = *keywordLists[3];
 	const WordList &function2 = *keywordLists[4];
 
 	const int lexType = styler.GetPropertyInt("lexer.lang.type", LEX_MATLAB);
 
 	Sci_Position lineCurrent = styler.GetLine(startPos);
-	int commentLevel = (lineCurrent > 0)? styler.GetLineState(lineCurrent - 1) : 0;
+	int commentLevel = (lineCurrent > 0) ? styler.GetLineState(lineCurrent - 1) : 0;
 #define _UpdateLineState()	styler.SetLineState(lineCurrent, commentLevel)
 
 	int visibleChars = 0;
@@ -188,10 +188,10 @@ _label_identifier:
 				}
 			} else if (sc.ch == '\'') {
 				if (sc.chNext == '\'') {
- 					sc.Forward();
+					sc.Forward();
 				} else {
 					sc.ForwardSetState(SCE_MAT_DEFAULT);
- 				}
+				}
 			}
 		} else if (sc.state == SCE_MAT_DOUBLEQUOTESTRING || sc.state == SCE_MAT_REGEX) {
 			if (sc.ch == '\\') {
@@ -322,12 +322,12 @@ _label_identifier:
 }
 
 // character after the "end" statement (skiped space and tabs)
-static bool IsMatEndChar(char chEnd, int style) {
+static bool IsMatEndChar(char chEnd, int style) noexcept {
 	return (chEnd == '\r' || chEnd == '\n' || chEnd == ';')
 		|| (style == SCE_MAT_COMMENT || style == SCE_MAT_COMMENTBLOCK);
 }
 
-static inline bool IsStreamCommentStyle(int style) {
+static inline bool IsStreamCommentStyle(int style) noexcept {
 	return style == SCE_MAT_COMMENTBLOCK;
 }
 
@@ -347,7 +347,7 @@ static void FoldMatlabDoc(Sci_PositionU startPos, Sci_Position length, int initS
 	Sci_Position lineCurrent = styler.GetLine(startPos);
 	int levelCurrent = SC_FOLDLEVELBASE;
 	if (lineCurrent > 0)
-		levelCurrent = styler.LevelAt(lineCurrent-1) >> 16;
+		levelCurrent = styler.LevelAt(lineCurrent - 1) >> 16;
 	int levelNext = levelCurrent;
 
 	char ch = '\0';
@@ -389,7 +389,7 @@ static void FoldMatlabDoc(Sci_PositionU startPos, Sci_Position length, int initS
 		if (style == SCE_MAT_KEYWORD && stylePrev != SCE_MAT_KEYWORD && numBrace == 0 && chPrev != '.' && chPrev != ':') {
 			char word[32];
 			Sci_PositionU len = LexGetRange(i, styler, iswordstart, word, sizeof(word));
-			if ((StrEqu(word, "function") && ((lexType == LEX_JULIA) || (!(lexType == LEX_JULIA) && LexGetNextChar(i+len, styler) != '(')))
+			if ((StrEqu(word, "function") && ((lexType == LEX_JULIA) || (!(lexType == LEX_JULIA) && LexGetNextChar(i + len, styler) != '(')))
 				|| StrEqu(word, "if")
 				|| StrEqu(word, "for")
 				|| StrEqu(word, "while")
@@ -398,10 +398,10 @@ static void FoldMatlabDoc(Sci_PositionU startPos, Sci_Position length, int initS
 				|| ((lexType == LEX_OCTAVE) && (StrEqu(word, "do") || StrEqu(word, "unwind_protect")))
 				|| ((lexType == LEX_SCILAB) && StrEqu(word, "select"))
 				|| ((lexType == LEX_JULIA) && (StrEqu(word, "type") || StrEqu(word, "quote")
-							|| StrEqu(word, "let") || StrEqu(word, "macro") || StrEqu(word, "do")
-							|| StrEqu(word, "begin") || StrEqu(word, "module"))
-							)
-			) {
+					|| StrEqu(word, "let") || StrEqu(word, "macro") || StrEqu(word, "do")
+					|| StrEqu(word, "begin") || StrEqu(word, "module"))
+					)
+				) {
 				levelNext++;
 			} else if ((lexType == LEX_OCTAVE) && StrEqu(word, "until")) {
 				levelNext--;
@@ -417,7 +417,7 @@ static void FoldMatlabDoc(Sci_PositionU startPos, Sci_Position length, int initS
 			} else if (IsMatlabOctave(lexType) && chPrev != '@' && (StrEqu(word, "methods")
 				|| StrEqu(word, "properties") || StrEqu(word, "events") || StrEqu(word, "enumeration"))) {
 				// Matlab classdef
-				Sci_Position pos = LexSkipSpaceTab(i+len, endPos, styler);
+				Sci_Position pos = LexSkipSpaceTab(i + len, endPos, styler);
 				char chEnd = styler.SafeGetCharAt(pos);
 				if (IsMatEndChar(chEnd, styler.StyleAt(pos))) {
 					levelNext++;

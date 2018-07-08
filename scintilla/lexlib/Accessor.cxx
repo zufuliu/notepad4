@@ -39,7 +39,7 @@ int Accessor::LexIndentAmount(Accessor &styler, Sci_Position line, int *flags, P
 	char ch = styler[pos];
 	int indent = 0;
 	bool inPrevPrefix = line > 0;
-	Sci_Position posPrev = inPrevPrefix ? styler.LineStart(line-1) : 0;
+	Sci_Position posPrev = inPrevPrefix ? styler.LineStart(line - 1) : 0;
 	while ((ch == ' ' || ch == '\t') && (pos < end)) {
 		if (inPrevPrefix) {
 			const char chPrev = styler[posPrev++];
@@ -66,7 +66,7 @@ int Accessor::LexIndentAmount(Accessor &styler, Sci_Position line, int *flags, P
 	indent += SC_FOLDLEVELBASE;
 	// if completely empty line or the start of a comment...
 	if ((styler.LineStart(line) == styler.Length()) || (ch == ' ' || ch == '\t' || ch == '\n' || ch == '\r') ||
-			(pfnIsCommentLeader && (*pfnIsCommentLeader)(styler, pos, end-pos)))
+		(pfnIsCommentLeader && (*pfnIsCommentLeader)(styler, pos, end - pos)))
 		return indent | SC_FOLDLEVELWHITEFLAG;
 	else
 		return indent;

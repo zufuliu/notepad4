@@ -29,8 +29,8 @@ class CallTip {
 		int posStart, int posEnd, int ytext, const PRectangle &rcClient,
 		bool highlight, bool draw);
 	int PaintContents(Surface *surfaceWindow, bool draw);
-	bool IsTabCharacter(char ch) const;
-	int NextTabPos(int x) const;
+	bool IsTabCharacter(char ch) const noexcept;
+	int NextTabPos(int x) const noexcept;
 
 public:
 	Window wCallTip;
@@ -53,7 +53,9 @@ public:
 	CallTip();
 	// Deleted so CallTip objects can not be copied.
 	CallTip(const CallTip &) = delete;
+	CallTip(CallTip &&) = delete;
 	CallTip &operator=(const CallTip &) = delete;
+	CallTip &operator=(CallTip &&) = delete;
 	~CallTip();
 
 	void PaintCT(Surface *surfaceWindow);
@@ -63,7 +65,7 @@ public:
 	/// Setup the calltip and return a rectangle of the area required.
 	PRectangle CallTipStart(Sci::Position pos, const Point &pt, int textHeight, const char *defn,
 		const char *faceName, int size, int codePage_,
-		int characterSet, int technology, Window &wParent);
+		int characterSet, int technology, const Window &wParent);
 
 	void CallTipCancel();
 
@@ -72,16 +74,18 @@ public:
 	void SetHighlight(int start, int end);
 
 	/// Set the tab size in pixels for the call tip. 0 or -ve means no tab expand.
-	void SetTabSize(int tabSz);
+	void SetTabSize(int tabSz) noexcept;
 
 	/// Set calltip position.
-	void SetPosition(bool aboveText);
+	void SetPosition(bool aboveText) noexcept;
 
 	/// Used to determine which STYLE_xxxx to use for call tip information
-	bool UseStyleCallTip() const { return useStyleCallTip;}
+	bool UseStyleCallTip() const noexcept {
+		return useStyleCallTip;
+	}
 
 	// Modify foreground and background colours
-	void SetForeBack(const ColourDesired &fore, const ColourDesired &back);
+	void SetForeBack(const ColourDesired &fore, const ColourDesired &back) noexcept;
 };
 
 }

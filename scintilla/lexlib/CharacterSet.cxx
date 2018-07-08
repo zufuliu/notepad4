@@ -29,27 +29,8 @@ CharacterSet::CharacterSet(setBase base, const char *initialSet, int size_, bool
 		AddString("0123456789");
 }
 
-CharacterSet::CharacterSet(const CharacterSet &other) {
-	size = other.size;
-	valueAfter = other.valueAfter;
-	bset = new bool[size];
-	memcpy(bset, other.bset, size * sizeof(bool));
-}
-
-CharacterSet& CharacterSet::operator=(CharacterSet &&other) {
-	if (this != &other) {
-		delete []bset;
-		size = other.size;
-		valueAfter = other.valueAfter;
-		bset = other.bset;
-		other.size = 0;
-		other.bset = nullptr;
-	}
-	return *this;
-}
-
 void CharacterSet::AddString(const char *setToAdd) {
-	for (const char *cp=setToAdd; *cp; cp++) {
+	for (const char *cp = setToAdd; *cp; cp++) {
 		int val = static_cast<unsigned char>(*cp);
 		assert(val >= 0);
 		assert(val < size);
@@ -57,14 +38,14 @@ void CharacterSet::AddString(const char *setToAdd) {
 	}
 }
 
-int CompareCaseInsensitive(const char *a, const char *b) {
+int CompareCaseInsensitive(const char *a, const char *b) noexcept {
 #if 1
 	return _stricmp(a, b);
 #else
 	while (*a && *b) {
 		if (*a != *b) {
-			const int upperA = MakeUpperCase(*a);
-			const int upperB = MakeUpperCase(*b);
+			const char upperA = MakeUpperCase(*a);
+			const char upperB = MakeUpperCase(*b);
 			if (upperA != upperB)
 				return upperA - upperB;
 		}
@@ -76,14 +57,14 @@ int CompareCaseInsensitive(const char *a, const char *b) {
 #endif
 }
 
-int CompareNCaseInsensitive(const char *a, const char *b, size_t len) {
+int CompareNCaseInsensitive(const char *a, const char *b, size_t len) noexcept {
 #if 1
 	return _strnicmp(a, b, len);
 #else
 	while (*a && *b && len) {
 		if (*a != *b) {
-			const int upperA = MakeUpperCase(*a);
-			const int upperB = MakeUpperCase(*b);
+			const char upperA = MakeUpperCase(*a);
+			const char upperB = MakeUpperCase(*b);
 			if (upperA != upperB)
 				return upperA - upperB;
 		}

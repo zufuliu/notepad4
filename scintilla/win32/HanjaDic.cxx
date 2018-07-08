@@ -7,6 +7,7 @@
 // The License.txt file describes the conditions under which this software may be distributed.
 
 #include <string>
+#include <string_view>
 
 #include <windows.h>
 
@@ -62,14 +63,14 @@ private:
 	CLSID CLSID_HanjaDic;
 
 public:
-	IHanjaDic *HJinterface;
+	IHanjaDic * HJinterface;
 
-	HanjaDic() : HJinterface(NULL) {
+	HanjaDic() : HJinterface(nullptr) {
 		hr = CLSIDFromProgID(OLESTR("mshjdic.hanjadic"), &CLSID_HanjaDic);
 		if (SUCCEEDED(hr)) {
-			hr = CoCreateInstance(CLSID_HanjaDic, NULL,
-					CLSCTX_INPROC_SERVER, IID_IHanjaDic,
-					(LPVOID *)& HJinterface);
+			hr = CoCreateInstance(CLSID_HanjaDic, nullptr,
+				CLSCTX_INPROC_SERVER, IID_IHanjaDic,
+				(LPVOID *)& HJinterface);
 			if (SUCCEEDED(hr)) {
 				hr = HJinterface->OpenMainDic();
 			}
@@ -104,9 +105,9 @@ int GetHangulOfHanja(wchar_t *inout) {
 	HanjaDic dict;
 	if (dict.HJdictAvailable()) {
 		const size_t len = wcslen(inout);
-		wchar_t conv[UTF8MaxBytes] = {0};
+		wchar_t conv[UTF8MaxBytes] = { 0 };
 		BSTR bstrHangul = SysAllocString(conv);
-		for (size_t i=0; i<len; i++) {
+		for (size_t i = 0; i < len; i++) {
 			if (dict.IsHanja(static_cast<int>(inout[i]))) { // Pass hanja only!
 				conv[0] = inout[i];
 				BSTR bstrHanja = SysAllocString(conv);

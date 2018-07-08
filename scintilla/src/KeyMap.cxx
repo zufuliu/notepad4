@@ -8,8 +8,10 @@
 #include <cstdlib>
 
 #include <stdexcept>
+#include <string_view>
 #include <vector>
 #include <map>
+#include <memory>
 
 #include "Platform.h"
 
@@ -40,7 +42,7 @@ void KeyMap::AssignCmdKey(int key, int modifiers, unsigned int msg) {
 }
 
 unsigned int KeyMap::Find(int key, int modifiers) const {
-	std::map<KeyModifiers, unsigned int>::const_iterator it = kmap.find(KeyModifiers(key, modifiers));
+	const auto it = kmap.find(KeyModifiers(key, modifiers));
 	return (it == kmap.end()) ? 0 : it->second;
 }
 

@@ -7,12 +7,9 @@
 // Lexical analysis fixes by Kein-Hong Man <mkh@pl.jaring.my>
 // The License.txt file describes the conditions under which this software may be distributed.
 
-#include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
-#include <stdarg.h>
-#include <assert.h>
-#include <ctype.h>
+#include <cstring>
+#include <cassert>
+#include <cctype>
 
 #include <string>
 #include <map>
@@ -79,14 +76,16 @@ static bool isPerlKeyword(Sci_PositionU start, Sci_PositionU end, const WordList
 	// current segment to be committed, but we may abandon early...
 	char s[100];
 	Sci_PositionU i, len = end - start;
-	if (len > 30) { len = 30; }
+	if (len > 30) {
+		len = 30;
+	}
 	for (i = 0; i < len; i++, start++) s[i] = styler[start];
 	s[i] = '\0';
 	return keywords.InList(s);
 }
 
 static int disambiguateBareword(LexAccessor &styler, Sci_PositionU bk, Sci_PositionU fw,
-        int backFlag, Sci_PositionU backPos, Sci_PositionU endPos) {
+	int backFlag, Sci_PositionU backPos, Sci_PositionU endPos) {
 	// identifiers are recognized by Perl as barewords under some
 	// conditions, the following attempts to do the disambiguation
 	// by looking backward and forward; result in 2 LSB
@@ -107,28 +106,28 @@ static int disambiguateBareword(LexAccessor &styler, Sci_PositionU bk, Sci_Posit
 		// {bareword: possible variable spec
 		brace = true;
 	} else if ((ch == '&' && styler.SafeGetCharAt(bk - 1) != '&')
-	        // &bareword: subroutine call
-	        || styler.Match(bk - 1, "->")
-	        // ->bareword: part of variable spec
-	        || styler.Match(bk - 1, "::")
-	        // ::bareword: part of module spec
-	        || styler.Match(bk - 2, "sub")) {
-	        // sub bareword: subroutine declaration
-	        // (implied BACK_KEYWORD, no keywords end in 'sub'!)
+		// &bareword: subroutine call
+		|| styler.Match(bk - 1, "->")
+		// ->bareword: part of variable spec
+		|| styler.Match(bk - 1, "::")
+		// ::bareword: part of module spec
+		|| styler.Match(bk - 2, "sub")) {
+		// sub bareword: subroutine declaration
+		// (implied BACK_KEYWORD, no keywords end in 'sub'!)
 		result |= 1;
 	}
 	// next, scan forward after word past tab/spaces only;
 	// if ch isn't one of '[{(,' we can skip the test
-	if ((ch == '{' || ch == '(' || ch == '['|| ch == ',')
-	        && fw < endPos) {
+	if ((ch == '{' || ch == '(' || ch == '[' || ch == ',')
+		&& fw < endPos) {
 		while (IsASpaceOrTab(ch = static_cast<unsigned char>(styler.SafeGetCharAt(fw)))
-		        && fw < endPos) {
+			&& fw < endPos) {
 			fw++;
 		}
 		if ((ch == '}' && brace)
-		        // {bareword}: variable spec
-		        || styler.Match(fw, "=>")) {
-		        // [{(, bareword=>: hash literal
+			// {bareword}: variable spec
+			|| styler.Match(fw, "=>")) {
+			// [{(, bareword=>: hash literal
 			result |= 2;
 		}
 	}
@@ -200,7 +199,7 @@ static int styleCheckIdentifier(LexAccessor &styler, Sci_PositionU bk) {
 	while (bk > 0) {
 		int bkstyle = styler.StyleAt(bk);
 		if (bkstyle == SCE_PL_DEFAULT
-		        || bkstyle == SCE_PL_COMMENTLINE) {
+			|| bkstyle == SCE_PL_COMMENTLINE) {
 			// skip whitespace, comments
 		} else if (bkstyle == SCE_PL_OPERATOR) {
 			// test for "->" and "::"
@@ -259,7 +258,7 @@ static bool styleCheckSubPrototype(LexAccessor &styler, Sci_PositionU bk) {
 
 		// match parts of syntax, if invalid subroutine syntax, break off
 		if (style1 == SCE_PL_OPERATOR && len1 == 1 &&
-		    styler.SafeGetCharAt(pos1) == ':') {	// ':'
+			styler.SafeGetCharAt(pos1) == ':') {	// ':'
 			if (style2 == SCE_PL_IDENTIFIER || style2 == SCE_PL_WORD) {
 				if (len2 == 9 && styler.Match(pos2, "prototype")) {	// ':' 'prototype'
 					if (state == SUB_BEGIN) {
@@ -275,13 +274,13 @@ static bool styleCheckSubPrototype(LexAccessor &styler, Sci_PositionU bk) {
 			} else
 				break;
 		} else if (style1 == SCE_PL_OPERATOR && len1 == 2 &&
-		           styler.Match(pos1, "::")) {	// '::'
+			styler.Match(pos1, "::")) {	// '::'
 			if (style2 == SCE_PL_IDENTIFIER) {	// '::' <identifier>
 				state = SUB_HAS_MODULE;
 			} else
 				break;
 		} else if (style1 == SCE_PL_WORD && len1 == 3 &&
-		           styler.Match(pos1, "sub")) {	// 'sub'
+			styler.Match(pos1, "sub")) {	// 'sub'
 			if (style2 == SCE_PL_IDENTIFIER) {	// 'sub' <identifier>
 				state = SUB_HAS_SUB;
 			} else
@@ -294,7 +293,7 @@ static bool styleCheckSubPrototype(LexAccessor &styler, Sci_PositionU bk) {
 	return (state == SUB_HAS_SUB);
 }
 
-static int actualNumStyle(int numberStyle) {
+static int actualNumStyle(int numberStyle) noexcept {
 	if (numberStyle == PERLNUM_VECTOR || numberStyle == PERLNUM_V_VECTOR) {
 		return SCE_PL_STRING;
 	} else if (numberStyle == PERLNUM_BAD) {
@@ -483,14 +482,14 @@ static void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int in
 	// Includes strings (may be multi-line), numbers (additional state), format
 	// bodies, as well as POD sections.
 	if (initStyle == SCE_PL_HERE_Q
-	    || initStyle == SCE_PL_HERE_QQ
-	    || initStyle == SCE_PL_HERE_QX
-	    || initStyle == SCE_PL_FORMAT
-	    || initStyle == SCE_PL_HERE_QQ_VAR
-	    || initStyle == SCE_PL_HERE_QX_VAR
-	   ) {
+		|| initStyle == SCE_PL_HERE_QQ
+		|| initStyle == SCE_PL_HERE_QX
+		|| initStyle == SCE_PL_FORMAT
+		|| initStyle == SCE_PL_HERE_QQ_VAR
+		|| initStyle == SCE_PL_HERE_QX_VAR
+		) {
 		// backtrack through multiple styles to reach the delimiter start
-		int delim = (initStyle == SCE_PL_FORMAT) ? SCE_PL_FORMAT_IDENT:SCE_PL_HERE_DELIM;
+		int delim = (initStyle == SCE_PL_FORMAT) ? SCE_PL_FORMAT_IDENT : SCE_PL_HERE_DELIM;
 		while ((startPos > 1) && (styler.StyleAt(startPos) != delim)) {
 			startPos--;
 		}
@@ -498,20 +497,20 @@ static void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int in
 		initStyle = styler.StyleAt(startPos - 1);
 	}
 	if (initStyle == SCE_PL_STRING
-	    || initStyle == SCE_PL_STRING_QQ
-	    || initStyle == SCE_PL_BACKTICKS
-	    || initStyle == SCE_PL_STRING_QX
-	    || initStyle == SCE_PL_REGEX
-	    || initStyle == SCE_PL_STRING_QR
-	    || initStyle == SCE_PL_REGSUBST
-	    || initStyle == SCE_PL_STRING_VAR
-	    || initStyle == SCE_PL_STRING_QQ_VAR
-	    || initStyle == SCE_PL_BACKTICKS_VAR
-	    || initStyle == SCE_PL_STRING_QX_VAR
-	    || initStyle == SCE_PL_REGEX_VAR
-	    || initStyle == SCE_PL_STRING_QR_VAR
-	    || initStyle == SCE_PL_REGSUBST_VAR
-	   ) {
+		|| initStyle == SCE_PL_STRING_QQ
+		|| initStyle == SCE_PL_BACKTICKS
+		|| initStyle == SCE_PL_STRING_QX
+		|| initStyle == SCE_PL_REGEX
+		|| initStyle == SCE_PL_STRING_QR
+		|| initStyle == SCE_PL_REGSUBST
+		|| initStyle == SCE_PL_STRING_VAR
+		|| initStyle == SCE_PL_STRING_QQ_VAR
+		|| initStyle == SCE_PL_BACKTICKS_VAR
+		|| initStyle == SCE_PL_STRING_QX_VAR
+		|| initStyle == SCE_PL_REGEX_VAR
+		|| initStyle == SCE_PL_STRING_QR_VAR
+		|| initStyle == SCE_PL_REGSUBST_VAR
+		) {
 		// for interpolation, must backtrack through a mix of two different styles
 		int otherStyle = (initStyle >= SCE_PL_STRING_VAR) ?
 			initStyle - INTERPOLATE_SHIFT : initStyle + INTERPOLATE_SHIFT;
@@ -523,21 +522,21 @@ static void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int in
 		}
 		initStyle = SCE_PL_DEFAULT;
 	} else if (initStyle == SCE_PL_STRING_Q
-	        || initStyle == SCE_PL_STRING_QW
-	        || initStyle == SCE_PL_XLAT
-	        || initStyle == SCE_PL_CHARACTER
-	        || initStyle == SCE_PL_NUMBER
-	        || initStyle == SCE_PL_IDENTIFIER
-	        || initStyle == SCE_PL_ERROR
-	        || initStyle == SCE_PL_SUB_PROTOTYPE
-	   ) {
+		|| initStyle == SCE_PL_STRING_QW
+		|| initStyle == SCE_PL_XLAT
+		|| initStyle == SCE_PL_CHARACTER
+		|| initStyle == SCE_PL_NUMBER
+		|| initStyle == SCE_PL_IDENTIFIER
+		|| initStyle == SCE_PL_ERROR
+		|| initStyle == SCE_PL_SUB_PROTOTYPE
+		) {
 		while ((startPos > 1) && (styler.StyleAt(startPos - 1) == initStyle)) {
 			startPos--;
 		}
 		initStyle = SCE_PL_DEFAULT;
 	} else if (initStyle == SCE_PL_POD
-	        || initStyle == SCE_PL_POD_VERB
-	          ) {
+		|| initStyle == SCE_PL_POD_VERB
+		) {
 		// POD backtracking finds preceding blank lines and goes back past them
 		Sci_Position ln = styler.GetLine(startPos);
 		if (ln > 0) {
@@ -582,8 +581,8 @@ static void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int in
 			break;
 		case SCE_PL_IDENTIFIER:		// identifier, bareword, inputsymbol
 			if ((!setWord.Contains(sc.ch) && sc.ch != '\'')
-			        || sc.Match('.', '.')
-			        || sc.chPrev == '>') {	// end of inputsymbol
+				|| sc.Match('.', '.')
+				|| sc.chPrev == '>') {	// end of inputsymbol
 				sc.SetState(SCE_PL_DEFAULT);
 			}
 			break;
@@ -726,7 +725,7 @@ static void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int in
 					HereDoc.Quote = delim_ch;
 					HereDoc.Quoted = true;
 				} else if ((ws_skip == 0 && setNonHereDoc.Contains(sc.chNext))
-				        || ws_skip > 0) {
+					|| ws_skip > 0) {
 					// left shift << or <<= operator cases
 					// restore position if operator
 					sc.ChangeState(SCE_PL_OPERATOR);
@@ -819,46 +818,47 @@ static void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int in
 			}
 			break;
 		case SCE_PL_POD:
-		case SCE_PL_POD_VERB: {
-				Sci_PositionU fw = sc.currentPos;
-				Sci_Position ln = styler.GetLine(fw);
-				if (sc.atLineStart && sc.Match("=cut")) {	// end of POD
-					sc.SetState(SCE_PL_POD);
-					sc.Forward(4);
-					sc.SetState(SCE_PL_DEFAULT);
-					styler.SetLineState(ln, SCE_PL_POD);
-					break;
-				}
-				int pod = podLineScan(styler, fw, endPos);	// classify POD line
-				styler.SetLineState(ln, pod);
-				if (pod == SCE_PL_DEFAULT) {
-					if (sc.state == SCE_PL_POD_VERB) {
-						Sci_PositionU fw2 = fw;
-						while (fw2 < (endPos - 1) && pod == SCE_PL_DEFAULT) {
-							fw = fw2++;	// penultimate line (last blank line)
-							pod = podLineScan(styler, fw2, endPos);
-							styler.SetLineState(styler.GetLine(fw2), pod);
-						}
-						if (pod == SCE_PL_POD) {	// truncate verbatim POD early
-							sc.SetState(SCE_PL_POD);
-						} else
-							fw = fw2;
-					}
-				} else {
-					if (pod == SCE_PL_POD_VERB	// still part of current paragraph
-					        && (styler.GetLineState(ln - 1) == SCE_PL_POD)) {
-						pod = SCE_PL_POD;
-						styler.SetLineState(ln, pod);
-					} else if (pod == SCE_PL_POD
-					        && (styler.GetLineState(ln - 1) == SCE_PL_POD_VERB)) {
-						pod = SCE_PL_POD_VERB;
-						styler.SetLineState(ln, pod);
-					}
-					sc.SetState(pod);
-				}
-				sc.ForwardBytes(fw - sc.currentPos);	// commit style
+		case SCE_PL_POD_VERB:
+		{
+			Sci_PositionU fw = sc.currentPos;
+			Sci_Position ln = styler.GetLine(fw);
+			if (sc.atLineStart && sc.Match("=cut")) {	// end of POD
+				sc.SetState(SCE_PL_POD);
+				sc.Forward(4);
+				sc.SetState(SCE_PL_DEFAULT);
+				styler.SetLineState(ln, SCE_PL_POD);
+				break;
 			}
-			break;
+			int pod = podLineScan(styler, fw, endPos);	// classify POD line
+			styler.SetLineState(ln, pod);
+			if (pod == SCE_PL_DEFAULT) {
+				if (sc.state == SCE_PL_POD_VERB) {
+					Sci_PositionU fw2 = fw;
+					while (fw2 < (endPos - 1) && pod == SCE_PL_DEFAULT) {
+						fw = fw2++;	// penultimate line (last blank line)
+						pod = podLineScan(styler, fw2, endPos);
+						styler.SetLineState(styler.GetLine(fw2), pod);
+					}
+					if (pod == SCE_PL_POD) {	// truncate verbatim POD early
+						sc.SetState(SCE_PL_POD);
+					} else
+						fw = fw2;
+				}
+			} else {
+				if (pod == SCE_PL_POD_VERB	// still part of current paragraph
+					&& (styler.GetLineState(ln - 1) == SCE_PL_POD)) {
+					pod = SCE_PL_POD;
+					styler.SetLineState(ln, pod);
+				} else if (pod == SCE_PL_POD
+					&& (styler.GetLineState(ln - 1) == SCE_PL_POD_VERB)) {
+					pod = SCE_PL_POD_VERB;
+					styler.SetLineState(ln, pod);
+				}
+				sc.SetState(pod);
+			}
+			sc.ForwardBytes(fw - sc.currentPos);	// commit style
+		}
+		break;
 		case SCE_PL_REGEX:
 		case SCE_PL_STRING_QR:
 			if (Quote.Rep <= 0) {
@@ -1000,32 +1000,34 @@ static void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int in
 					sc.ForwardSetState(SCE_PL_DEFAULT);
 			}
 			break;
-		case SCE_PL_SUB_PROTOTYPE: {
-				int i = 0;
-				// forward scan; must all be valid proto characters
-				while (setSubPrototype.Contains(sc.GetRelative(i)))
-					i++;
-				if (sc.GetRelative(i) == ')') {	// valid sub prototype
-					sc.ForwardBytes(i);
-					sc.ForwardSetState(SCE_PL_DEFAULT);
-				} else {
-					// abandon prototype, restart from '('
-					sc.ChangeState(SCE_PL_OPERATOR);
+		case SCE_PL_SUB_PROTOTYPE:
+		{
+			int i = 0;
+			// forward scan; must all be valid proto characters
+			while (setSubPrototype.Contains(sc.GetRelative(i)))
+				i++;
+			if (sc.GetRelative(i) == ')') {	// valid sub prototype
+				sc.ForwardBytes(i);
+				sc.ForwardSetState(SCE_PL_DEFAULT);
+			} else {
+				// abandon prototype, restart from '('
+				sc.ChangeState(SCE_PL_OPERATOR);
+				sc.SetState(SCE_PL_DEFAULT);
+			}
+		}
+		break;
+		case SCE_PL_FORMAT:
+		{
+			sc.Complete();
+			if (sc.Match('.')) {
+				sc.Forward();
+				if (sc.atLineEnd || ((sc.ch == '\r' && sc.chNext == '\n')))
 					sc.SetState(SCE_PL_DEFAULT);
-				}
 			}
-			break;
-		case SCE_PL_FORMAT: {
-				sc.Complete();
-				if (sc.Match('.')) {
-					sc.Forward();
-					if (sc.atLineEnd || ((sc.ch == '\r' && sc.chNext == '\n')))
-						sc.SetState(SCE_PL_DEFAULT);
-				}
-				while (!sc.atLineEnd)
-					sc.Forward();
-			}
-			break;
+			while (!sc.atLineEnd)
+				sc.Forward();
+		}
+		break;
 		case SCE_PL_ERROR:
 			break;
 		}
@@ -1080,10 +1082,10 @@ static void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int in
 				case '\'':
 					st_new = SCE_PL_HERE_Q;
 					break;
-				case '"' :
+				case '"':
 					st_new = SCE_PL_HERE_QQ;
 					break;
-				case '`' :
+				case '`':
 					st_new = SCE_PL_HERE_QX;
 					break;
 				}
@@ -1102,7 +1104,7 @@ static void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int in
 		// Determine if a new state should be entered.
 		if (sc.state == SCE_PL_DEFAULT) {
 			if (IsADigit(sc.ch) ||
-			        (IsADigit(sc.chNext) && (sc.ch == '.' || sc.ch == 'v'))) {
+				(IsADigit(sc.chNext) && (sc.ch == '.' || sc.ch == 'v'))) {
 				sc.SetState(SCE_PL_NUMBER);
 				backFlag = BACK_NONE;
 				numState = PERLNUM_DECIMAL;
@@ -1148,7 +1150,7 @@ static void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int in
 					sc.Forward();
 					fw++;
 				} else if (sc.ch == 'q' && setQDelim.Contains(sc.chNext)
-				        && !setWord.Contains(sc.GetRelative(2))) {
+					&& !setWord.Contains(sc.GetRelative(2))) {
 					if (sc.chNext == 'q') sc.ChangeState(SCE_PL_STRING_QQ);
 					else if (sc.chNext == 'x') sc.ChangeState(SCE_PL_STRING_QX);
 					else if (sc.chNext == 'r') sc.ChangeState(SCE_PL_STRING_QR);
@@ -1157,8 +1159,8 @@ static void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int in
 					sc.Forward();
 					fw++;
 				} else if (sc.ch == 'x' && (sc.chNext == '=' ||	// repetition
-				        !setWord.Contains(sc.chNext) ||
-				        (setRepetition.Contains(sc.chPrev) && IsADigit(sc.chNext)))) {
+					!setWord.Contains(sc.chNext) ||
+					(setRepetition.Contains(sc.chPrev) && IsADigit(sc.chNext)))) {
 					sc.ChangeState(SCE_PL_OPERATOR);
 				}
 				// if potentially a keyword, scan forward and grab word, then check
@@ -1234,7 +1236,7 @@ static void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int in
 				bool preferRE = false;
 				bool isHereDoc = sc.Match('<', '<');
 				bool hereDocSpace = false;		// for: SCALAR [whitespace] '<<'
-				Sci_PositionU bk = (sc.currentPos > 0) ? sc.currentPos - 1: 0;
+				Sci_PositionU bk = (sc.currentPos > 0) ? sc.currentPos - 1 : 0;
 				sc.Complete();
 				styler.Flush();
 				if (styler.StyleAt(bk) == SCE_PL_DEFAULT)
@@ -1256,15 +1258,15 @@ static void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int in
 							// needed to test for variables like ${}, @{} etc.
 							bkstyle = styleBeforeBracePair(styler, bk);
 							if (bkstyle == SCE_PL_SCALAR
-							        || bkstyle == SCE_PL_ARRAY
-							        || bkstyle == SCE_PL_HASH
-							        || bkstyle == SCE_PL_SYMBOLTABLE
-							        || bkstyle == SCE_PL_OPERATOR) {
+								|| bkstyle == SCE_PL_ARRAY
+								|| bkstyle == SCE_PL_HASH
+								|| bkstyle == SCE_PL_SYMBOLTABLE
+								|| bkstyle == SCE_PL_OPERATOR) {
 								preferRE = false;
 							}
 						} else if (bkch == '+' || bkch == '-') {
 							if (bkch == static_cast<unsigned char>(styler.SafeGetCharAt(bk - 1))
-							        && bkch != static_cast<unsigned char>(styler.SafeGetCharAt(bk - 2)))
+								&& bkch != static_cast<unsigned char>(styler.SafeGetCharAt(bk - 2)))
 								// exceptions for operators: unary suffixes ++, --
 								preferRE = false;
 						}
@@ -1397,15 +1399,15 @@ static void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int in
 					}
 				}
 			} else if (sc.ch == '='		// POD
-			        && setPOD.Contains(sc.chNext)
-			        && sc.atLineStart) {
+				&& setPOD.Contains(sc.chNext)
+				&& sc.atLineStart) {
 				sc.SetState(SCE_PL_POD);
 				backFlag = BACK_NONE;
 			} else if (sc.ch == '-' && setWordStart.Contains(sc.chNext)) {	// extended '-' cases
 				Sci_PositionU bk = sc.currentPos;
 				Sci_PositionU fw = 2;
 				if (setSingleCharOp.Contains(sc.chNext) &&	// file test operators
-				        !setWord.Contains(sc.GetRelative(2))) {
+					!setWord.Contains(sc.GetRelative(2))) {
 					sc.SetState(SCE_PL_WORD);
 				} else {
 					// nominally a minus and bareword; find extent of bareword
@@ -1442,9 +1444,9 @@ static void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int in
 	}
 	sc.Complete();
 	if (sc.state == SCE_PL_HERE_Q
-	        || sc.state == SCE_PL_HERE_QQ
-	        || sc.state == SCE_PL_HERE_QX
-	        || sc.state == SCE_PL_FORMAT) {
+		|| sc.state == SCE_PL_HERE_QQ
+		|| sc.state == SCE_PL_HERE_QX
+		|| sc.state == SCE_PL_FORMAT) {
 		styler.ChangeLexerState(sc.currentPos, styler.Length());
 	}
 	sc.Complete();
@@ -1492,7 +1494,7 @@ static void FoldPerlDoc(Sci_PositionU startPos, Sci_Position length, int /*initS
 		chNext = styler.SafeGetCharAt(i + 1);
 		int style = styleNext;
 		styleNext = styler.StyleAt(i + 1);
-		int stylePrevCh = (i) ? styler.StyleAt(i - 1):SCE_PL_DEFAULT;
+		int stylePrevCh = (i) ? styler.StyleAt(i - 1) : SCE_PL_DEFAULT;
 		bool atEOL = (ch == '\r' && chNext != '\n') || (ch == '\n');
 		bool atLineStart = ((chPrev == '\r') || (chPrev == '\n')) || i == 0;
 		// Comment folding
@@ -1551,34 +1553,34 @@ static void FoldPerlDoc(Sci_PositionU startPos, Sci_Position length, int /*initS
 		// package folding
 		if (foldPackage && atLineStart) {
 			if (IsPackageLine(lineCurrent, styler)
-			        && !IsPackageLine(lineCurrent + 1, styler))
+				&& !IsPackageLine(lineCurrent + 1, styler))
 				isPackageLine = true;
 		}
 
 		//heredoc folding
 		switch (style) {
-		case SCE_PL_HERE_QQ :
-		case SCE_PL_HERE_Q :
-		case SCE_PL_HERE_QX :
+		case SCE_PL_HERE_QQ:
+		case SCE_PL_HERE_Q:
+		case SCE_PL_HERE_QX:
 			switch (stylePrevCh) {
-			case SCE_PL_HERE_QQ :
-			case SCE_PL_HERE_Q :
-			case SCE_PL_HERE_QX :
+			case SCE_PL_HERE_QQ:
+			case SCE_PL_HERE_Q:
+			case SCE_PL_HERE_QX:
 				//do nothing;
 				break;
-			default :
+			default:
 				levelCurrent++;
 				break;
 			}
 			break;
 		default:
 			switch (stylePrevCh) {
-			case SCE_PL_HERE_QQ :
-			case SCE_PL_HERE_Q :
-			case SCE_PL_HERE_QX :
+			case SCE_PL_HERE_QQ:
+			case SCE_PL_HERE_Q:
+			case SCE_PL_HERE_QX:
 				levelCurrent--;
 				break;
-			default :
+			default:
 				//do nothing;
 				break;
 			}

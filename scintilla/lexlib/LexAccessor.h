@@ -49,15 +49,19 @@ enum EncodingType { enc8bit, encUnicode, encDBCS };
 
 class LexAccessor {
 public:
-	enum {extremePosition=0x7FFFFFFF};
+	enum {
+		extremePosition = 0x7FFFFFFF
+	};
 private:
-	IDocument *pAccess;
+	IDocument * pAccess;
 	/** @a bufferSize is a trade off between time taken to copy the characters
 	 * and retrieval overhead.
 	 * @a slopSize positions the buffer before the desired position
 	 * in case there is some backtracking. */
-	enum {bufferSize=4096, slopSize=bufferSize/8};
-	char buf[bufferSize+1];
+	enum {
+		bufferSize = 4096, slopSize = bufferSize / 8
+	};
+	char buf[bufferSize + 1];
 	Sci_Position startPos;
 	Sci_Position endPos;
 	int codePage;
@@ -78,7 +82,7 @@ public:
 		return pAccess;
 	}
 	/** Safe version of operator[], returning a defined value for invalid position. */
-	char SafeGetCharAt(Sci_Position position, char chDefault='\0');
+	char SafeGetCharAt(Sci_Position position);
 	bool IsLeadByte(char ch) const {
 		return pAccess->IsDBCSLeadByte(ch);
 	}
@@ -88,7 +92,7 @@ public:
 
 	bool Match(Sci_Position pos, const char *s);
 	unsigned char StyleAt(Sci_Position position) const {
-		return static_cast<unsigned char>(pAccess->StyleAt(position));
+		return pAccess->StyleAt(position);
 	}
 	Sci_Position GetLine(Sci_Position position) const {
 		return pAccess->LineFromPosition(position);

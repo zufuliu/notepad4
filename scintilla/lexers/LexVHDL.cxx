@@ -10,9 +10,9 @@
 // Copyright 1998-2002 by Neil Hodgson <neilh@scintilla.org>
 // The License.txt file describes the conditions under which this software may be distributed.
 
-#include <string.h>
-#include <assert.h>
-#include <ctype.h>
+#include <cstring>
+#include <cassert>
+#include <cctype>
 
 #include "ILexer.h"
 #include "Scintilla.h"
@@ -132,11 +132,11 @@ _label_identifier:
 	sc.Complete();
 }
 
-static inline bool IsCommentStyle(int style) {
+static inline bool IsCommentStyle(int style) noexcept {
 	return style == SCE_VHDL_BLOCK_COMMENT || style == SCE_VHDL_COMMENT || style == SCE_VHDL_COMMENTLINEBANG;
 }
 
-static inline bool IsStreamCommentStyle(int style) {
+static inline bool IsStreamCommentStyle(int style) noexcept {
 	return style == SCE_VHDL_BLOCK_COMMENT;
 }
 
@@ -160,8 +160,8 @@ static void FoldVHDLDoc(Sci_PositionU startPos, Sci_Position length, int /*initS
 
 	Sci_Position lineCurrent = styler.GetLine(startPos);
 	int levelCurrent = SC_FOLDLEVELBASE;
-	if(lineCurrent > 0)
-		levelCurrent = styler.LevelAt(lineCurrent-1) >> 16;
+	if (lineCurrent > 0)
+		levelCurrent = styler.LevelAt(lineCurrent - 1) >> 16;
 	//int levelMinCurrent = levelCurrent;
 	int levelMinCurrentElse = levelCurrent; //< Used for folding at 'else'
 	int levelMinCurrentBegin = levelCurrent; //< Used for folding at 'begin'
@@ -177,39 +177,37 @@ static void FoldVHDLDoc(Sci_PositionU startPos, Sci_Position length, int /*initS
 	// This code could be cleaned up.
 	Sci_Position end = 0;
 	Sci_PositionU j;
-	for(j = startPos; j>0; j--) {
+	for (j = startPos; j > 0; j--) {
 		char ch = styler.SafeGetCharAt(j);
-		char chPrev = styler.SafeGetCharAt(j-1);
+		char chPrev = styler.SafeGetCharAt(j - 1);
 		int style = styler.StyleAt(j);
-		int stylePrev = styler.StyleAt(j-1);
+		int stylePrev = styler.StyleAt(j - 1);
 		if ((!IsCommentStyle(stylePrev)) && (stylePrev != SCE_VHDL_STRING)) {
-			if(iswordchar(chPrev) && !iswordchar(ch)) {
+			if (iswordchar(chPrev) && !iswordchar(ch)) {
 				end = j - 1;
 			}
 		}
 		if ((!IsCommentStyle(style)) && (style != SCE_VHDL_STRING)) {
-			if(!iswordchar(chPrev) && iswordstart(ch) && (end != 0)) {
+			if (!iswordchar(chPrev) && iswordstart(ch) && (end != 0)) {
 				char s[32];
 				unsigned int k;
-				for(k=0; (k<31 ) && (k<end-j+1 ); k++) {
-					s[k] = static_cast<char>(tolower(styler[j+k]));
+				for (k = 0; (k < 31) && (k < end - j + 1); k++) {
+					s[k] = static_cast<char>(tolower(styler[j + k]));
 				}
 				s[k] = '\0';
 
-				if(kwFold.InList(s)) {
+				if (kwFold.InList(s)) {
 					strcpy(prevWord, s);
 					break;
 				}
 			}
 		}
 	}
-	for(j = j + (Sci_PositionU)strlen(prevWord); j < endPos; j++) {
+	for (j = j + (Sci_PositionU)strlen(prevWord); j < endPos; j++) {
 		char ch = styler.SafeGetCharAt(j);
 		int style = styler.StyleAt(j);
-		if ((!IsCommentStyle(style)) && (style != SCE_VHDL_STRING))
-		{
-			if((ch == ';') && (strcmp(prevWord, "end") == 0))
-			{
+		if ((!IsCommentStyle(style)) && (style != SCE_VHDL_STRING)) {
+			if ((ch == ';') && (strcmp(prevWord, "end") == 0)) {
 				strcpy(prevWord, ";");
 			}
 		}
@@ -226,8 +224,8 @@ static void FoldVHDLDoc(Sci_PositionU startPos, Sci_Position length, int /*initS
 		chNext = styler.SafeGetCharAt(i + 1);
 		char chNextNonBlank = chNext;
 		j = i + 1;
-		while(isspacechar(chNextNonBlank) && j<endPos) {
-			j ++ ;
+		while (isspacechar(chNextNonBlank) && j < endPos) {
+			j++;
 			chNextNonBlank = styler.SafeGetCharAt(j);
 		}
 		int stylePrev = style;
@@ -236,9 +234,9 @@ static void FoldVHDLDoc(Sci_PositionU startPos, Sci_Position length, int /*initS
 		bool atEOL = (ch == '\r' && chNext != '\n') || (ch == '\n');
 
 		if (foldComment && atEOL && IsCommentLine(lineCurrent)) {
-			if(!IsCommentLine(lineCurrent-1) && IsCommentLine(lineCurrent+1))
+			if (!IsCommentLine(lineCurrent - 1) && IsCommentLine(lineCurrent + 1))
 				levelNext++;
-			else if(IsCommentLine(lineCurrent-1) && !IsCommentLine(lineCurrent+1))
+			else if (IsCommentLine(lineCurrent - 1) && !IsCommentLine(lineCurrent + 1))
 				levelNext--;
 		}
 		if (foldComment && IsStreamCommentStyle(style) && !IsCommentLine(lineCurrent)) {
@@ -250,7 +248,7 @@ static void FoldVHDLDoc(Sci_PositionU startPos, Sci_Position length, int /*initS
 		}
 
 		if ((style == SCE_VHDL_OPERATOR) && foldAtParenthese) {
-			if(ch == '(') {
+			if (ch == '(') {
 				levelNext++;
 			} else if (ch == ')') {
 				levelNext--;
@@ -258,27 +256,27 @@ static void FoldVHDLDoc(Sci_PositionU startPos, Sci_Position length, int /*initS
 		}
 
 		if ((!IsCommentStyle(style)) && (style != SCE_VHDL_STRING)) {
-			if((ch == ';') && (strcmp(prevWord, "end") == 0)) {
+			if ((ch == ';') && (strcmp(prevWord, "end") == 0)) {
 				strcpy(prevWord, ";");
 			}
 
-			if(!iswordchar(chPrev) && iswordstart(ch)) {
+			if (!iswordchar(chPrev) && iswordstart(ch)) {
 				lastStart = i;
 			}
 
-			if(iswordchar(ch) && !iswordchar(chNext)) {
+			if (iswordchar(ch) && !iswordchar(chNext)) {
 				char s[32];
 				unsigned int k;
-				for(k=0; (k<31 ) && (k<i-lastStart+1 ); k++) {
-					s[k] = static_cast<char>(tolower(styler[lastStart+k]));
+				for (k = 0; (k < 31) && (k < i - lastStart + 1); k++) {
+					s[k] = static_cast<char>(tolower(styler[lastStart + k]));
 				}
 				s[k] = '\0';
 
-				if(kwFold.InList(s)) {
+				if (kwFold.InList(s)) {
 					if (
 						strcmp(s, "architecture") == 0 || strcmp(s, "case") == 0 ||
 						strcmp(s, "generate") == 0 || strcmp(s, "loop") == 0 || strcmp(s, "block") == 0 ||
-						strcmp(s, "package") ==0 || strcmp(s, "process") == 0 ||
+						strcmp(s, "package") == 0 || strcmp(s, "process") == 0 ||
 						strcmp(s, "record") == 0 || strcmp(s, "then") == 0 ||
 						strcmp(s, "units") == 0) {
 						if (strcmp(prevWord, "end") != 0) {
@@ -287,8 +285,7 @@ static void FoldVHDLDoc(Sci_PositionU startPos, Sci_Position length, int /*initS
 							}
 							levelNext++;
 						}
-					}
-					else if (
+					} else if (
 						strcmp(s, "component") == 0 ||
 						strcmp(s, "entity") == 0 ||
 						strcmp(s, "configuration") == 0) {
@@ -303,7 +300,7 @@ static void FoldVHDLDoc(Sci_PositionU startPos, Sci_Position length, int /*initS
 								styleAtPos = styler.StyleAt(pos);
 								chAtPos = styler.SafeGetCharAt(pos);
 							} while (pos &&
-									(chAtPos == ' ' || chAtPos == '\t' ||
+								(chAtPos == ' ' || chAtPos == '\t' ||
 									chAtPos == '\n' || chAtPos == '\r' ||
 									IsCommentStyle(styleAtPos)));
 
@@ -315,32 +312,31 @@ static void FoldVHDLDoc(Sci_PositionU startPos, Sci_Position length, int /*initS
 								levelNext++;
 							}
 						}
-					}
-					else if ( strcmp(s, "procedure") == 0 ||strcmp(s, "function") == 0) {
+					} else if (strcmp(s, "procedure") == 0 || strcmp(s, "function") == 0) {
 						if (strcmp(prevWord, "end") != 0) {
-						// check for "end procedure" etc.
-						// This code checks to see if the procedure / function is a definition within a "package"
-							// rather than the actual code in the body.
+							// check for "end procedure" etc.
+							// This code checks to see if the procedure / function is a definition within a "package"
+								// rather than the actual code in the body.
 							int BracketLevel = 0;
-							for(Sci_Position pos=i+1; pos<styler.Length(); pos++) {
+							for (Sci_Position pos = i + 1; pos < styler.Length(); pos++) {
 								int styleAtPos = styler.StyleAt(pos);
 								char chAtPos = styler.SafeGetCharAt(pos);
-								if(chAtPos == '(') BracketLevel++;
-								if(chAtPos == ')') BracketLevel--;
-								if(
+								if (chAtPos == '(') BracketLevel++;
+								if (chAtPos == ')') BracketLevel--;
+								if (
 									(BracketLevel == 0) &&
 									(!IsCommentLine(styleAtPos)) &&
 									(styleAtPos != SCE_VHDL_STRING) &&
-									!iswordchar(styler.SafeGetCharAt(pos-1)) &&
-									(chAtPos|' ')=='i' && (styler.SafeGetCharAt(pos+1)|' ')=='s' &&
-									!iswordchar(styler.SafeGetCharAt(pos+2))) {
+									!iswordchar(styler.SafeGetCharAt(pos - 1)) &&
+									(chAtPos | ' ') == 'i' && (styler.SafeGetCharAt(pos + 1) | ' ') == 's' &&
+									!iswordchar(styler.SafeGetCharAt(pos + 2))) {
 									if (levelMinCurrentElse > levelNext) {
 										levelMinCurrentElse = levelNext;
 									}
 									levelNext++;
 									break;
 								}
-								if((BracketLevel == 0) && (chAtPos == ';')) {
+								if ((BracketLevel == 0) && (chAtPos == ';')) {
 									break;
 								}
 							}
@@ -348,13 +344,13 @@ static void FoldVHDLDoc(Sci_PositionU startPos, Sci_Position length, int /*initS
 
 					} else if (strcmp(s, "end") == 0) {
 						levelNext--;
-					}	 else if(strcmp(s, "elsif") == 0) { // elsif is followed by then so folding occurs correctly
+					} else if (strcmp(s, "elsif") == 0) { // elsif is followed by then so folding occurs correctly
 						levelNext--;
 					} else if (strcmp(s, "else") == 0) {
-						if(strcmp(prevWord, "when") != 0) {	 // ignore a <= x when y else z;
+						if (strcmp(prevWord, "when") != 0) {	 // ignore a <= x when y else z;
 							levelMinCurrentElse = levelNext - 1;	// VHDL else is all on its own so just dec. the min level
 						}
-					} else if(
+					} else if (
 						((strcmp(s, "begin") == 0) && (strcmp(prevWord, "architecture") == 0)) ||
 						((strcmp(s, "begin") == 0) && (strcmp(prevWord, "function") == 0)) ||
 						((strcmp(s, "begin") == 0) && (strcmp(prevWord, "procedure") == 0))) {
@@ -367,7 +363,7 @@ static void FoldVHDLDoc(Sci_PositionU startPos, Sci_Position length, int /*initS
 
 		if (!isspacechar(ch))
 			visibleChars++;
-		if (atEOL || (i == endPos-1)) {
+		if (atEOL || (i == endPos - 1)) {
 			int levelUse = levelCurrent;
 			if (foldAtElse && (levelMinCurrentElse < levelUse)) {
 				levelUse = levelMinCurrentElse;

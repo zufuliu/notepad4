@@ -5,9 +5,9 @@
  **/
 // The License.txt file describes the conditions under which this software may be distributed.
 
-#include <stdlib.h>
-#include <assert.h>
-#include <ctype.h>
+#include <cstdlib>
+#include <cassert>
+#include <cctype>
 
 #include "ILexer.h"
 #include "Scintilla.h"
@@ -22,7 +22,7 @@
 
 using namespace Scintilla;
 
-static inline bool IsFSOperator(int ch) {
+static inline bool IsFSOperator(int ch) noexcept {
 	return isoperator(ch) || (ch < 0x80 && (ch == '\'' || ch == '@' || ch == '$' || ch == '#' || ch == '`'));
 }
 
@@ -63,7 +63,7 @@ static void ColouriseFSharpDoc(Sci_PositionU startPos, Sci_Position length, int 
 				}
 				continue;
 			}
-		 }
+		}
 
 		switch (sc.state) {
 		case SCE_FSHARP_OPERATOR:
@@ -199,7 +199,7 @@ _label_identifier:
 #define IsFSLine(line, word)	IsLexLineStartsWith(line, styler, word, true, SCE_FSHARP_KEYWORD)
 #define IsCommentLine(line) 	IsLexCommentLine(line, styler, SCE_FSHARP_COMMENTLINE)
 
-static inline bool IsStreamCommentStyle(int style) {
+static inline bool IsStreamCommentStyle(int style) noexcept {
 	return style == SCE_FSHARP_COMMENT;
 }
 #define IsOpenLine(line)		IsFSLine(line, "open")
@@ -217,7 +217,7 @@ static void FoldFSharpDoc(Sci_PositionU startPos, Sci_Position length, int initS
 	Sci_Position lineCurrent = styler.GetLine(startPos);
 	int levelCurrent = SC_FOLDLEVELBASE;
 	if (lineCurrent > 0)
-		levelCurrent = styler.LevelAt(lineCurrent-1) >> 16;
+		levelCurrent = styler.LevelAt(lineCurrent - 1) >> 16;
 	int levelNext = levelCurrent;
 
 	char chNext = styler[startPos];
@@ -279,7 +279,7 @@ static void FoldFSharpDoc(Sci_PositionU startPos, Sci_Position length, int initS
 
 		//if (!isspacechar(ch))
 		//	visibleChars++;
-		if (atEOL || (i == endPos-1)) {
+		if (atEOL || (i == endPos - 1)) {
 			int levelUse = levelCurrent;
 			int lev = levelUse | levelNext << 16;
 			//if (visibleChars == 0 && foldCompact)

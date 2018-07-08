@@ -24,19 +24,19 @@ using namespace Scintilla;
 
 static const char styleSubable[] = { 0 };
 
-LexerBase::LexerBase(const LexicalClass *lexClasses_, size_t nClasses_) :
-	lexClasses(lexClasses_), nClasses(nClasses_) {
-	for (int wl = 0; wl < numWordLists; wl++)
+LexerBase::LexerBase() {
+	for (int wl = 0; wl < numWordLists; wl++) {
 		keyWordLists[wl] = new WordList;
-	keyWordLists[numWordLists] = 0;
+	}
+	keyWordLists[numWordLists] = nullptr;
 }
 
 LexerBase::~LexerBase() {
 	for (int wl = 0; wl < numWordLists; wl++) {
 		delete keyWordLists[wl];
-		keyWordLists[wl] = 0;
+		keyWordLists[wl] = nullptr;
 	}
-	keyWordLists[numWordLists] = 0;
+	keyWordLists[numWordLists] = nullptr;
 }
 
 void SCI_METHOD LexerBase::Release() {
@@ -62,7 +62,7 @@ const char * SCI_METHOD LexerBase::DescribeProperty(const char *) const {
 Sci_Position SCI_METHOD LexerBase::PropertySet(const char *key, const char *val) {
 	const char *valOld = props.Get(key);
 	if (strcmp(val, valOld) != 0) {
-		props.Set(key, val);
+		props.Set(key, val, strlen(key), strlen(val));
 		return 0;
 	} else {
 		return -1;
@@ -128,17 +128,17 @@ const char * SCI_METHOD LexerBase::GetSubStyleBases() const {
 }
 
 int SCI_METHOD LexerBase::NamedStyles() const {
-	return static_cast<int>(nClasses);
+	return -1;
 }
 
-const char * SCI_METHOD LexerBase::NameOfStyle(int style) const {
-	return (style < NamedStyles()) ? lexClasses[style].name : "";
+const char * SCI_METHOD LexerBase::NameOfStyle(int) const {
+	return "";
 }
 
-const char * SCI_METHOD LexerBase::TagsOfStyle(int style) const {
-	return (style < NamedStyles()) ? lexClasses[style].tags : "";
+const char * SCI_METHOD LexerBase::TagsOfStyle(int) const {
+	return "";
 }
 
-const char * SCI_METHOD LexerBase::DescriptionOfStyle(int style) const {
-	return (style < NamedStyles()) ? lexClasses[style].description : "";
+const char * SCI_METHOD LexerBase::DescriptionOfStyle(int) const {
+	return "";
 }

@@ -1,6 +1,6 @@
-#include <string.h>
-#include <assert.h>
-#include <ctype.h>
+#include <cstring>
+#include <cassert>
+#include <cctype>
 
 #include "ILexer.h"
 #include "Scintilla.h"
@@ -15,7 +15,7 @@
 
 using namespace Scintilla;
 
-static inline bool IsTexiSpec(int ch) {
+static inline bool IsTexiSpec(int ch) noexcept {
 	return ch == '@' || ch == '{' || ch == '}' ||
 		ch == '*' || ch == '/' || ch == '-' ||
 		ch == ':' || ch == '.' || ch == '?' || ch == '?' ||
@@ -41,9 +41,9 @@ static void ColouriseTexiDoc(Sci_PositionU startPos, Sci_Position length, int in
 	Sci_Position lineCurrent = styler.GetLine(startPos);
 	int levelCurrent = SC_FOLDLEVELBASE;
 	if (lineCurrent > 0)
-		levelCurrent = styler.LevelAt(lineCurrent-1) >> 16;
+		levelCurrent = styler.LevelAt(lineCurrent - 1) >> 16;
 	int levelNext = levelCurrent;
-	char buf[MAX_WORD_LENGTH + 1] = {0};
+	char buf[MAX_WORD_LENGTH + 1] = { 0 };
 	int wordLen = 0;
 	bool isCommand = false;
 
@@ -141,7 +141,7 @@ static void ColouriseTexiDoc(Sci_PositionU startPos, Sci_Position length, int in
 			}
 		}
 
-		if (atEOL || i == endPos-1) {
+		if (atEOL || i == endPos - 1) {
 			if (fold) {
 				int levelUse = levelCurrent;
 				int lev = levelUse | levelNext << 16;

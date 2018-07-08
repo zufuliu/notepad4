@@ -5,11 +5,14 @@
 // Copyright 2009 by Neil Hodgson <neilh@scintilla.org>
 // The License.txt file describes the conditions under which this software may be distributed.
 
+#include <cstddef>
 #include <cstdlib>
 
 #include <stdexcept>
+#include <string_view>
 #include <vector>
 #include <algorithm>
+#include <memory>
 
 #include "Platform.h"
 
@@ -178,10 +181,9 @@ Selection::Selection() : mainRange(0), moveExtends(false), tentativeMain(false),
 	AddSelection(SelectionRange(SelectionPosition(0)));
 }
 
-Selection::~Selection() {
-}
+Selection::~Selection() = default;
 
-bool Selection::IsRectangular() const {
+bool Selection::IsRectangular() const noexcept {
 	return (selType == selRectangle) || (selType == selThin);
 }
 
@@ -202,7 +204,7 @@ SelectionSegment Selection::Limits() const {
 		return SelectionSegment();
 	} else {
 		SelectionSegment sr(ranges[0].anchor, ranges[0].caret);
-		for (size_t i=1; i<ranges.size(); i++) {
+		for (size_t i = 1; i < ranges.size(); i++) {
 			sr.Extend(ranges[i].anchor);
 			sr.Extend(ranges[i].caret);
 		}
@@ -284,14 +286,14 @@ SelectionPosition Selection::Last() const {
 
 Sci::Position Selection::Length() const {
 	Sci::Position len = 0;
-	for (const SelectionRange &range : ranges) {
+	for (const auto &range : ranges) {
 		len += range.Length();
 	}
 	return len;
 }
 
 void Selection::MovePositions(bool insertion, Sci::Position startChange, Sci::Position length) {
-	for (SelectionRange &range : ranges) {
+	for (auto &range : ranges) {
 		range.MoveForInsertDelete(insertion, startChange, length);
 	}
 	if (selType == selRectangle) {
@@ -300,12 +302,12 @@ void Selection::MovePositions(bool insertion, Sci::Position startChange, Sci::Po
 }
 
 void Selection::TrimSelection(const SelectionRange &range) {
-	for (size_t i=0; i<ranges.size();) {
+	for (size_t i = 0; i < ranges.size();) {
 		if ((i != mainRange) && (ranges[i].Trim(range))) {
 			// Trimmed to empty so remove
-			for (size_t j=i; j<ranges.size()-1; j++) {
-				ranges[j] = ranges[j+1];
-				if (j == mainRange-1)
+			for (size_t j = i; j < ranges.size() - 1; j++) {
+				ranges[j] = ranges[j + 1];
+				if (j == mainRange - 1)
 					mainRange--;
 			}
 			ranges.pop_back();
@@ -316,7 +318,7 @@ void Selection::TrimSelection(const SelectionRange &range) {
 }
 
 void Selection::TrimOtherSelections(size_t r, SelectionRange range) {
-	for (size_t i = 0; i<ranges.size(); ++i) {
+	for (size_t i = 0; i < ranges.size(); ++i) {
 		if (i != r) {
 			ranges[i].Trim(range);
 		}
@@ -375,7 +377,7 @@ void Selection::CommitTentative() {
 }
 
 int Selection::CharacterInSelection(Sci::Position posCharacter) const {
-	for (size_t i=0; i<ranges.size(); i++) {
+	for (size_t i = 0; i < ranges.size(); i++) {
 		if (ranges[i].ContainsCharacter(posCharacter))
 			return i == mainRange ? 1 : 2;
 	}
@@ -383,7 +385,7 @@ int Selection::CharacterInSelection(Sci::Position posCharacter) const {
 }
 
 int Selection::InSelectionForEOL(Sci::Position pos) const {
-	for (size_t i=0; i<ranges.size(); i++) {
+	for (size_t i = 0; i < ranges.size(); i++) {
 		if (!ranges[i].Empty() && (pos > ranges[i].Start().Position()) && (pos <= ranges[i].End().Position()))
 			return i == mainRange ? 1 : 2;
 	}
@@ -392,7 +394,7 @@ int Selection::InSelectionForEOL(Sci::Position pos) const {
 
 Sci::Position Selection::VirtualSpaceFor(Sci::Position pos) const {
 	Sci::Position virtualSpace = 0;
-	for (const SelectionRange &range : ranges) {
+	for (const auto &range : ranges) {
 		if ((range.caret.Position() == pos) && (virtualSpace < range.caret.VirtualSpace()))
 			virtualSpace = range.caret.VirtualSpace();
 		if ((range.anchor.Position() == pos) && (virtualSpace < range.anchor.VirtualSpace()))
@@ -403,7 +405,7 @@ Sci::Position Selection::VirtualSpaceFor(Sci::Position pos) const {
 
 void Selection::Clear() {
 	ranges.clear();
-	ranges.push_back(SelectionRange());
+	ranges.emplace_back();
 	mainRange = ranges.size() - 1;
 	selType = selStream;
 	moveExtends = false;
@@ -412,10 +414,10 @@ void Selection::Clear() {
 }
 
 void Selection::RemoveDuplicates() {
-	for (size_t i=0; i<ranges.size()-1; i++) {
+	for (size_t i = 0; i < ranges.size() - 1; i++) {
 		if (ranges[i].Empty()) {
-			size_t j=i+1;
-			while (j<ranges.size()) {
+			size_t j = i + 1;
+			while (j < ranges.size()) {
 				if (ranges[i] == ranges[j]) {
 					ranges.erase(ranges.begin() + j);
 					if (mainRange >= j)

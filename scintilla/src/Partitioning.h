@@ -23,10 +23,11 @@ public:
 	}
 	// Deleted so SplitVectorWithRangeAdd objects can not be copied.
 	SplitVectorWithRangeAdd(const SplitVectorWithRangeAdd &) = delete;
+	SplitVectorWithRangeAdd(SplitVectorWithRangeAdd &&) = delete;
 	void operator=(const SplitVectorWithRangeAdd &) = delete;
-	~SplitVectorWithRangeAdd() {
-	}
-	void RangeAddDelta(ptrdiff_t start, ptrdiff_t end, T delta) {
+	void operator=(SplitVectorWithRangeAdd &&) = delete;
+	~SplitVectorWithRangeAdd() = default;
+	void RangeAddDelta(ptrdiff_t start, ptrdiff_t end, T delta) noexcept {
 		// end is 1 past end, so end-start is number of elements to change
 		ptrdiff_t i = 0;
 		const ptrdiff_t rangeLength = end - start;
@@ -63,21 +64,21 @@ private:
 	std::unique_ptr<SplitVectorWithRangeAdd<T>> body;
 
 	// Move step forward
-	void ApplyStep(T partitionUpTo) {
+	void ApplyStep(T partitionUpTo) noexcept {
 		if (stepLength != 0) {
-			body->RangeAddDelta(stepPartition+1, partitionUpTo + 1, stepLength);
+			body->RangeAddDelta(stepPartition + 1, partitionUpTo + 1, stepLength);
 		}
 		stepPartition = partitionUpTo;
-		if (stepPartition >= body->Length()-1) {
+		if (stepPartition >= body->Length() - 1) {
 			stepPartition = Partitions();
 			stepLength = 0;
 		}
 	}
 
 	// Move step backward
-	void BackStep(T partitionDownTo) {
+	void BackStep(T partitionDownTo) noexcept {
 		if (stepLength != 0) {
-			body->RangeAddDelta(partitionDownTo+1, stepPartition+1, -stepLength);
+			body->RangeAddDelta(partitionDownTo + 1, stepPartition + 1, -stepLength);
 		}
 		stepPartition = partitionDownTo;
 	}
@@ -91,19 +92,20 @@ private:
 	}
 
 public:
-	explicit Partitioning(int growSize) {
+	explicit Partitioning(int growSize) : stepPartition(0), stepLength(0) {
 		Allocate(growSize);
 	}
 
 	// Deleted so Partitioning objects can not be copied.
 	Partitioning(const Partitioning &) = delete;
+	Partitioning(Partitioning &&) = delete;
 	void operator=(const Partitioning &) = delete;
+	void operator=(Partitioning &&) = delete;
 
-	~Partitioning() {
-	}
+	~Partitioning() = default;
 
-	T Partitions() const {
-		return static_cast<T>(body->Length())-1;
+	T Partitions() const noexcept {
+		return static_cast<T>(body->Length()) - 1;
 	}
 
 	void InsertPartition(T partition, T pos) {
@@ -114,8 +116,8 @@ public:
 		stepPartition++;
 	}
 
-	void SetPartitionStartPosition(T partition, T pos) {
-		ApplyStep(partition+1);
+	void SetPartitionStartPosition(T partition, T pos) noexcept {
+		ApplyStep(partition + 1);
 		if ((partition < 0) || (partition > body->Length())) {
 			return;
 		}
@@ -154,10 +156,11 @@ public:
 		body->Delete(partition);
 	}
 
-	T PositionFromPartition(T partition) const {
+	T PositionFromPartition(T partition) const noexcept {
 		PLATFORM_ASSERT(partition >= 0);
 		PLATFORM_ASSERT(partition < body->Length());
-		if ((partition < 0) || (partition >= body->Length())) {
+		const ptrdiff_t lengthBody = body->Length();
+		if ((partition < 0) || (partition >= lengthBody)) {
 			return 0;
 		}
 		T pos = body->ValueAt(partition);
@@ -167,7 +170,7 @@ public:
 	}
 
 	/// Return value in range [0 .. Partitions() - 1] even for arguments outside interval
-	T PartitionFromPosition(T pos) const {
+	T PartitionFromPosition(T pos) const noexcept {
 		if (body->Length() <= 1)
 			return 0;
 		if (pos >= (PositionFromPartition(Partitions())))

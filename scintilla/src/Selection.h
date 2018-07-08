@@ -14,7 +14,7 @@ class SelectionPosition {
 	Sci::Position position;
 	Sci::Position virtualSpace;
 public:
-	explicit SelectionPosition(Sci::Position position_=INVALID_POSITION, Sci::Position virtualSpace_=0) : position(position_), virtualSpace(virtualSpace_) {
+	explicit SelectionPosition(Sci::Position position_ = INVALID_POSITION, Sci::Position virtualSpace_ = 0) : position(position_), virtualSpace(virtualSpace_) {
 		PLATFORM_ASSERT(virtualSpace < 800000);
 		if (virtualSpace < 0)
 			virtualSpace = 0;
@@ -58,8 +58,7 @@ public:
 struct SelectionSegment {
 	SelectionPosition start;
 	SelectionPosition end;
-	SelectionSegment() : start(), end() {
-	}
+	SelectionSegment() = default;
 	SelectionSegment(const SelectionPosition &a, const SelectionPosition &b) {
 		if (a < b) {
 			start = a;
@@ -84,16 +83,11 @@ struct SelectionRange {
 	SelectionPosition caret;
 	SelectionPosition anchor;
 
-	SelectionRange() : caret(), anchor() {
-	}
-	explicit SelectionRange(const SelectionPosition &single) : caret(single), anchor(single) {
-	}
-	explicit SelectionRange(Sci::Position single) : caret(single), anchor(single) {
-	}
-	SelectionRange(const SelectionPosition &caret_, const SelectionPosition &anchor_) : caret(caret_), anchor(anchor_) {
-	}
-	SelectionRange(Sci::Position caret_, Sci::Position anchor_) : caret(caret_), anchor(anchor_) {
-	}
+	SelectionRange() = default;
+	explicit SelectionRange(const SelectionPosition &single) : caret(single), anchor(single) {}
+	explicit SelectionRange(Sci::Position single) : caret(single), anchor(single) {}
+	SelectionRange(const SelectionPosition &caret_, const SelectionPosition &anchor_) : caret(caret_), anchor(anchor_) {}
+	SelectionRange(Sci::Position caret_, Sci::Position anchor_) : caret(caret_), anchor(anchor_) {}
 	bool Empty() const {
 		return anchor == caret;
 	}
@@ -138,12 +132,14 @@ class Selection {
 	bool moveExtends;
 	bool tentativeMain;
 public:
-	enum selTypes { noSel, selStream, selRectangle, selLines, selThin };
+	enum selTypes {
+		noSel, selStream, selRectangle, selLines, selThin
+	};
 	selTypes selType;
 
 	Selection();
 	~Selection();
-	bool IsRectangular() const;
+	bool IsRectangular() const noexcept;
 	Sci::Position MainCaret() const;
 	Sci::Position MainAnchor() const;
 	SelectionRange &Rectangular();
@@ -181,7 +177,9 @@ public:
 	void Clear();
 	void RemoveDuplicates();
 	void RotateMain();
-	bool Tentative() const { return tentativeMain; }
+	bool Tentative() const noexcept {
+		return tentativeMain;
+	}
 	std::vector<SelectionRange> RangesCopy() const {
 		return ranges;
 	}

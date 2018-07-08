@@ -645,6 +645,8 @@ val INDIC_FULLBOX=16
 val INDIC_TEXTFORE=17
 val INDIC_POINT=18
 val INDIC_POINTCHARACTER=19
+val INDIC_GRADIENT=20
+val INDIC_GRADIENTCENTRE=21
 val INDIC_IME=32
 val INDIC_IME_MAX=35
 val INDIC_MAX=35
@@ -928,6 +930,7 @@ get int GetPrintMagnification=2147(,)
 
 enu PrintOption=SC_PRINT_
 # PrintColourMode - use same colours as screen.
+# with the exception of line number margins, which use a white background
 val SC_PRINT_NORMAL=0
 # PrintColourMode - invert the light value of each style for printing.
 val SC_PRINT_INVERTLIGHT=1
@@ -937,6 +940,8 @@ val SC_PRINT_BLACKONWHITE=2
 val SC_PRINT_COLOURONWHITE=3
 # PrintColourMode - only the default-background is forced to be white for printing.
 val SC_PRINT_COLOURONWHITEDEFAULTBG=4
+# PrintColourMode - use same colours as screen, including line number margins.
+val SC_PRINT_SCREENCOLOURS=5
 
 # Modify colours when printing for clearer printed text.
 set void SetPrintColourMode=2148(int mode,)
@@ -1360,6 +1365,7 @@ enu WrapIndentMode=SC_WRAPINDENT_
 val SC_WRAPINDENT_FIXED=0
 val SC_WRAPINDENT_SAME=1
 val SC_WRAPINDENT_INDENT=2
+val SC_WRAPINDENT_DEEPINDENT=3
 
 # Sets how wrapped sublines are placed. Default is fixed.
 set void SetWrapIndentMode=2472(int wrapIndentMode,)
@@ -1779,15 +1785,19 @@ get int GetZoom=2374(,)
 
 enu DocumentOption=SC_DOCUMENTOPTION_
 val SC_DOCUMENTOPTION_DEFAULT=0
-val SC_DOCUMENTOPTION_STYLES_NONE=1
+val SC_DOCUMENTOPTION_STYLES_NONE=0x1
+val SC_DOCUMENTOPTION_TEXT_LARGE=0x100
 
 # Create a new document object.
 # Starts with reference count of 1 and not selected into editor.
-fun int CreateDocument=2375(int bytes, int documentOption)
+fun int CreateDocument=2375(int bytes, int documentOptions)
 # Extend life of document.
 fun void AddRefDocument=2376(, int doc)
 # Release a reference to the document, deleting document if it fades to black.
 fun void ReleaseDocument=2377(, int doc)
+
+# Get which document options are set.
+get int GetDocumentOptions=2379(,)
 
 # Get which document modification events are sent to the container.
 get int GetModEventMask=2378(,)
@@ -2568,7 +2578,7 @@ set void SetTechnology=2630(int technology,)
 get int GetTechnology=2631(,)
 
 # Create an ILoader*.
-fun int CreateLoader=2632(int bytes, int documentOption)
+fun int CreateLoader=2632(int bytes, int documentOptions)
 
 # On OS X, show a find indicator.
 fun void FindIndicatorShow=2640(position start, position end)

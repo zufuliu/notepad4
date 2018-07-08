@@ -542,10 +542,16 @@
     <ClInclude Include="..\..\scintilla\src\Editor.h">
       <Filter>Scintilla\src</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\scintilla\src\ElapsedPeriod.h">
+      <Filter>Scintilla\src</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\scintilla\src\FontQuality.h">
       <Filter>Scintilla\src</Filter>
     </ClInclude>
     <ClInclude Include="..\..\scintilla\src\Indicator.h">
+      <Filter>Scintilla\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\scintilla\src\IntegerRectangle.h">
       <Filter>Scintilla\src</Filter>
     </ClInclude>
     <ClInclude Include="..\..\scintilla\src\KeyMap.h">
@@ -625,9 +631,6 @@
     </ClInclude>
     <ClInclude Include="..\..\src\VersionRev.h">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\scintilla\lexlib\StringCopy.h">
-      <Filter>Scintilla\lexlib</Filter>
     </ClInclude>
     <ClInclude Include="..\..\scintilla\src\MarginView.h">
       <Filter>Scintilla\src</Filter>

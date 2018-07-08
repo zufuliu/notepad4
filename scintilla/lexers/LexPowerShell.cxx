@@ -1,8 +1,8 @@
 // Lexer for PowerShell.
 
-#include <stdlib.h>
-#include <assert.h>
-#include <ctype.h>
+#include <cstdlib>
+#include <cassert>
+#include <cctype>
 
 #include "ILexer.h"
 #include "Scintilla.h"
@@ -18,7 +18,7 @@
 using namespace Scintilla;
 
 // Extended to accept accented characters
-static inline bool IsPSWordChar(int ch) {
+static inline bool IsPSWordChar(int ch) noexcept {
 	return ch >= 0x80 || isalnum(ch) || ch == '-' || ch == '_';
 }
 
@@ -143,7 +143,7 @@ static void FoldPowerShellDoc(Sci_PositionU startPos, Sci_Position length, int i
 	Sci_Position lineCurrent = styler.GetLine(startPos);
 	int levelCurrent = SC_FOLDLEVELBASE;
 	if (lineCurrent > 0)
-		levelCurrent = styler.LevelAt(lineCurrent-1) >> 16;
+		levelCurrent = styler.LevelAt(lineCurrent - 1) >> 16;
 	int levelMinCurrent = levelCurrent;
 	int levelNext = levelCurrent;
 	char chNext = styler[startPos];
@@ -176,7 +176,7 @@ static void FoldPowerShellDoc(Sci_PositionU startPos, Sci_Position length, int i
 		}
 		if (!isspacechar(ch))
 			visibleChars++;
-		if (atEOL || (i == endPos-1)) {
+		if (atEOL || (i == endPos - 1)) {
 			int levelUse = levelCurrent;
 			if (foldAtElse) {
 				levelUse = levelMinCurrent;

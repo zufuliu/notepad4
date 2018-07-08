@@ -1,8 +1,8 @@
 // Lexer for CMake.
 
-#include <string.h>
-#include <assert.h>
-#include <ctype.h>
+#include <cstring>
+#include <cassert>
+#include <cctype>
 
 #include "ILexer.h"
 #include "Scintilla.h"
@@ -26,7 +26,7 @@ using namespace Scintilla;
 	0
 }*/
 
-static inline bool IsCmakeOperator(char ch) {
+static inline bool IsCmakeOperator(char ch) noexcept {
 	return ch == '(' || ch == ')' || ch == '=' || ch == ':' || ch == ';';
 }
 
@@ -157,7 +157,7 @@ static void FoldCmakeDoc(Sci_PositionU startPos, Sci_Position length, int initSt
 	Sci_Position lineCurrent = styler.GetLine(startPos);
 	int levelCurrent = SC_FOLDLEVELBASE;
 	if (lineCurrent > 0)
-		levelCurrent = styler.LevelAt(lineCurrent-1) >> 16;
+		levelCurrent = styler.LevelAt(lineCurrent - 1) >> 16;
 	int levelNext = levelCurrent;
 
 	char chNext = styler[startPos];
@@ -198,7 +198,7 @@ static void FoldCmakeDoc(Sci_PositionU startPos, Sci_Position length, int initSt
 
 		//if (!isspacechar(ch))
 		//	visibleChars++;
-		if (atEOL || (i == endPos-1)) {
+		if (atEOL || (i == endPos - 1)) {
 			int levelUse = levelCurrent;
 			int lev = levelUse | levelNext << 16;
 			//if (visibleChars == 0 && foldCompact)

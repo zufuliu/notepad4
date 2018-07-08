@@ -1,13 +1,13 @@
 // Scintilla source code edit control
-/** @file LexNull.cxx
+/** @file Lexnullptr.cxx
  ** Lexer for no language. Used for plain text and unrecognized files.
  **/
 // Copyright 1998-2001 by Neil Hodgson <neilh@scintilla.org>
 // The License.txt file describes the conditions under which this software may be distributed.
 
-#include <string.h>
-#include <assert.h>
-#include <ctype.h>
+#include <cstring>
+#include <cassert>
+#include <cctype>
 
 #include <algorithm>
 
@@ -48,10 +48,10 @@ static void FoldNullDoc(Sci_PositionU startPos, Sci_Position length, int /* init
 	// at least one line in all cases)
 	int spaceFlags = 0;
 	Sci_Position lineCurrent = styler.GetLine(startPos);
-	int indentCurrent = Accessor::LexIndentAmount(styler, lineCurrent, &spaceFlags, NULL);
+	int indentCurrent = Accessor::LexIndentAmount(styler, lineCurrent, &spaceFlags, nullptr);
 	while (lineCurrent > 0) {
 		lineCurrent--;
-		indentCurrent = Accessor::LexIndentAmount(styler, lineCurrent, &spaceFlags, NULL);
+		indentCurrent = Accessor::LexIndentAmount(styler, lineCurrent, &spaceFlags, nullptr);
 		if (!(indentCurrent & SC_FOLDLEVELWHITEFLAG))
 			break;
 	}
@@ -66,7 +66,7 @@ static void FoldNullDoc(Sci_PositionU startPos, Sci_Position length, int /* init
 		int indentNext = indentCurrent;
 		if (lineNext <= docLines) {
 			// Information about next line is only available if not at end of document
-			indentNext = Accessor::LexIndentAmount(styler, lineNext, &spaceFlags, NULL);
+			indentNext = Accessor::LexIndentAmount(styler, lineNext, &spaceFlags, nullptr);
 		}
 		int indentCurrentLevel = indentCurrent & SC_FOLDLEVELNUMBERMASK;
 		if (indentNext & SC_FOLDLEVELWHITEFLAG)
@@ -75,7 +75,7 @@ static void FoldNullDoc(Sci_PositionU startPos, Sci_Position length, int /* init
 		// Skip past any blank lines for next indent level info
 		while ((lineNext < docLines) && (indentNext & SC_FOLDLEVELWHITEFLAG)) {
 			lineNext++;
-			indentNext = Accessor::LexIndentAmount(styler, lineNext, &spaceFlags, NULL);
+			indentNext = Accessor::LexIndentAmount(styler, lineNext, &spaceFlags, nullptr);
 		}
 
 		const int levelAfterBlank = indentNext & SC_FOLDLEVELNUMBERMASK;
@@ -90,7 +90,7 @@ static void FoldNullDoc(Sci_PositionU startPos, Sci_Position length, int /* init
 		int skipLevel = levelAfterBlank;
 
 		while (--skipLine > lineCurrent) {
-			int skipLineIndent = Accessor::LexIndentAmount(styler, skipLine, &spaceFlags, NULL);
+			int skipLineIndent = Accessor::LexIndentAmount(styler, skipLine, &spaceFlags, nullptr);
 
 			if (foldCompact) {
 				if ((skipLineIndent & SC_FOLDLEVELNUMBERMASK) > levelAfterBlank)

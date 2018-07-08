@@ -23,15 +23,16 @@ public:
 		setAlpha = setLower | setUpper,
 		setAlphaNum = setAlpha | setDigits
 	};
-	CharacterSet(setBase base=setNone, const char *initialSet="", int size_=0x80, bool valueAfter_=false);
-	CharacterSet(const CharacterSet &other);
-	CharacterSet &operator=(CharacterSet &&other);
+	CharacterSet(setBase base = setNone, const char *initialSet = "", int size_ = 0x80, bool valueAfter_ = false);
+	CharacterSet(const CharacterSet &other) = delete;
+	CharacterSet(CharacterSet &&other) = delete;
+	CharacterSet& operator=(const CharacterSet &other) = delete;
+	CharacterSet &operator=(CharacterSet &&other) = delete;
 	~CharacterSet() {
-		delete []bset;
-		bset = 0;
+		delete[]bset;
+		bset = nullptr;
 		size = 0;
 	}
-	CharacterSet& operator=(const CharacterSet &other);
 	void Add(int val) {
 		assert(val >= 0);
 		assert(val < size);
@@ -47,25 +48,25 @@ public:
 
 // Functions for classifying characters
 
-static inline bool IsASpace(int ch) {
+inline bool IsASpace(int ch) noexcept {
     return (ch == ' ') || ((ch >= 0x09) && (ch <= 0x0d));
 }
 
-static inline bool IsASpaceOrTab(int ch) {
+inline bool IsASpaceOrTab(int ch) noexcept {
 	return (ch == ' ') || (ch == '\t');
 }
 
-static inline bool IsADigit(int ch) {
+inline bool IsADigit(int ch) noexcept  {
 	return (ch >= '0') && (ch <= '9');
 }
 
-static inline bool IsHexDigit(int ch) {
+inline bool IsHexDigit(int ch) noexcept {
 	return (ch >= '0' && ch <= '9')
 		|| (ch >= 'A' && ch <= 'F')
 		|| (ch >= 'a' && ch <= 'f');
 }
 
-static inline bool IsADigit(int ch, int base) {
+inline bool IsADigit(int ch, int base) noexcept {
 	if (base <= 10) {
 		return (ch >= '0') && (ch < '0' + base);
 	} else {
@@ -75,24 +76,24 @@ static inline bool IsADigit(int ch, int base) {
 	}
 }
 
-static inline bool IsASCII(int ch) {
+inline bool IsASCII(int ch) noexcept {
 	return (ch >= 0) && (ch < 0x80);
 }
 
-static inline bool IsLowerCase(int ch) {
+inline bool IsLowerCase(int ch) noexcept {
 	return (ch >= 'a') && (ch <= 'z');
 }
 
-static inline bool IsUpperCase(int ch) {
+inline bool IsUpperCase(int ch) noexcept {
 	return (ch >= 'A') && (ch <= 'Z');
 }
 
-static inline bool IsAlpha(int ch) {
+inline bool IsAlpha(int ch) noexcept {
 	return 	((ch >= 'a') && (ch <= 'z')) ||
 			((ch >= 'A') && (ch <= 'Z'));
 }
 
-static inline bool IsAlphaNumeric(int ch) {
+inline bool IsAlphaNumeric(int ch) noexcept {
 	return
 		((ch >= '0') && (ch <= '9')) ||
 		((ch >= 'a') && (ch <= 'z')) ||
@@ -103,49 +104,50 @@ static inline bool IsAlphaNumeric(int ch) {
  * Check if a character is a space.
  * This is ASCII specific but is safe with chars >= 0x80.
  */
-static inline bool isspacechar(int ch) {
+inline bool isspacechar(int ch) noexcept {
     return (ch == ' ') || ((ch >= 0x09) && (ch <= 0x0d));
 }
 
-static inline bool iswordchar(int ch) {
+inline bool iswordchar(int ch) noexcept {
 	return IsAlphaNumeric(ch) || ch == '.' || ch == '_';
 }
 
-static inline bool iswordstart(int ch) {
+inline bool iswordstart(int ch) noexcept {
 	return IsAlphaNumeric(ch) || ch == '_';
 }
 
-static inline bool isoperator(int ch) {
+inline bool isoperator(int ch) noexcept {
 	if (IsAlphaNumeric(ch))
 		return false;
 	if (ch == '%' || ch == '^' || ch == '&' || ch == '*' ||
-	        ch == '(' || ch == ')' || ch == '-' || ch == '+' ||
-	        ch == '=' || ch == '|' || ch == '{' || ch == '}' ||
-	        ch == '[' || ch == ']' || ch == ':' || ch == ';' ||
-	        ch == '<' || ch == '>' || ch == ',' || ch == '/' ||
-	        ch == '?' || ch == '!' || ch == '.' || ch == '~')
+		ch == '(' || ch == ')' || ch == '-' || ch == '+' ||
+		ch == '=' || ch == '|' || ch == '{' || ch == '}' ||
+		ch == '[' || ch == ']' || ch == ':' || ch == ';' ||
+		ch == '<' || ch == '>' || ch == ',' || ch == '/' ||
+		ch == '?' || ch == '!' || ch == '.' || ch == '~')
 		return true;
 	return false;
 }
 
 // Simple case functions for ASCII.
-
-static inline int MakeUpperCase(int ch) {
+template <typename T>
+inline T MakeUpperCase(T ch) noexcept {
 	if (ch < 'a' || ch > 'z')
 		return ch;
 	else
 		return (ch - 'a' + 'A');
 }
 
-static inline int MakeLowerCase(int ch) {
+template <typename T>
+inline T MakeLowerCase(T ch) noexcept {
 	if (ch < 'A' || ch > 'Z')
 		return ch;
 	else
 		return ch - 'A' + 'a';
 }
 
-int CompareCaseInsensitive(const char *a, const char *b);
-int CompareNCaseInsensitive(const char *a, const char *b, size_t len);
+int CompareCaseInsensitive(const char *a, const char *b) noexcept;
+int CompareNCaseInsensitive(const char *a, const char *b, size_t len) noexcept;
 
 }
 

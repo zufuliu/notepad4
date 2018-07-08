@@ -5,12 +5,9 @@
 // Copyright 1998-2001 by Andre Arpin <arpin@kingston.net>
 // The License.txt file describes the conditions under which this software may be distributed.
 
-#include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
-#include <stdarg.h>
-#include <assert.h>
-#include <ctype.h>
+#include <cstring>
+#include <cassert>
+#include <cctype>
 
 #include "ILexer.h"
 #include "Scintilla.h"
@@ -26,24 +23,24 @@
 using namespace Scintilla;
 
 // Extended to accept accented characters
-static inline bool IsAWordChar(int ch) {
+static inline bool IsAWordChar(int ch) noexcept {
 	return ch >= 0x80 ||
-	       (isalnum(ch) || ch == '_' || ch ==':' || ch=='.'); // : name space separator
+		(isalnum(ch) || ch == '_' || ch == ':' || ch == '.'); // : name space separator
 }
 
-static inline bool IsAWordStart(int ch) {
-	return ch >= 0x80 || (ch ==':' || isalpha(ch) || ch == '_');
+static inline bool IsAWordStart(int ch) noexcept {
+	return ch >= 0x80 || (ch == ':' || isalpha(ch) || ch == '_');
 }
 
-static inline bool IsANumberChar(int ch) {
+static inline bool IsANumberChar(int ch) noexcept {
 	// Not exactly following number definition (several dots are seen as OK, etc.)
 	// but probably enough in most cases.
 	return (ch < 0x80) &&
-	       (IsADigit(ch, 0x10) || toupper(ch) == 'E' ||
-	        ch == '.' || ch == '-' || ch == '+');
+		(IsADigit(ch, 0x10) || toupper(ch) == 'E' ||
+			ch == '.' || ch == '-' || ch == '+');
 }
 
-static void ColouriseTCLDoc(Sci_PositionU startPos, Sci_Position length, int , LexerWordList keywordLists, Accessor &styler) {
+static void ColouriseTCLDoc(Sci_PositionU startPos, Sci_Position length, int, LexerWordList keywordLists, Accessor &styler) {
 #define  isComment(s) (s==SCE_TCL_COMMENT || s==SCE_TCL_COMMENTLINE || s==SCE_TCL_COMMENT_BOX || s==SCE_TCL_BLOCK_COMMENT)
 	const bool foldComment = styler.GetPropertyInt("fold.comment") != 0;
 	bool commentLevel = false;
@@ -59,8 +56,8 @@ static void ColouriseTCLDoc(Sci_PositionU startPos, Sci_Position length, int , L
 	} lineState = LS_DEFAULT;
 	bool prevSlash = false;
 	int currentLevel = 0;
-	bool expected = 0;
-	bool subParen = 0;
+	bool expected = false;
+	bool subParen = false;
 
 	Sci_Position currentLine = styler.GetLine(startPos);
 	if (currentLine > 0)
@@ -94,7 +91,7 @@ static void ColouriseTCLDoc(Sci_PositionU startPos, Sci_Position length, int , L
 	StyleContext sc(startPos, length, SCE_TCL_DEFAULT, styler);
 	for (; ; sc.Forward()) {
 next:
-		if (sc.ch=='\r' && sc.chNext == '\n') // only ignore \r on PC process on the mac
+		if (sc.ch == '\r' && sc.chNext == '\n') // only ignore \r on PC process on the mac
 			continue;
 		bool atEnd = !sc.More();  // make sure we coloured the last word
 		if (lineState != LS_DEFAULT) {
@@ -103,7 +100,7 @@ next:
 				sc.SetState(SCE_TCL_COMMENTLINE);
 			else if (lineState == LS_OPEN_DOUBLE_QUOTE)
 				sc.SetState(SCE_TCL_IN_QUOTE);
-			else if (lineState == LS_COMMENT_BOX && (sc.ch == '#' || (sc.ch == ' ' && sc.chNext=='#')))
+			else if (lineState == LS_COMMENT_BOX && (sc.ch == '#' || (sc.ch == ' ' && sc.chNext == '#')))
 				sc.SetState(SCE_TCL_COMMENT_BOX);
 			lineState = LS_DEFAULT;
 		}
@@ -117,18 +114,18 @@ next:
 				sc.SetState(SCE_TCL_SUB_BRACE);
 			if (!sc.atLineEnd)
 				continue;
-		} else if (sc.state == SCE_TCL_DEFAULT || sc.state ==SCE_TCL_OPERATOR) {
-			expected &= isspacechar(static_cast<unsigned char>(sc.ch)) || IsAWordStart(sc.ch) || sc.ch =='#';
+		} else if (sc.state == SCE_TCL_DEFAULT || sc.state == SCE_TCL_OPERATOR) {
+			expected &= isspacechar(static_cast<unsigned char>(sc.ch)) || IsAWordStart(sc.ch) || sc.ch == '#';
 		} else if (sc.state == SCE_TCL_SUBSTITUTION) {
 			switch (sc.ch) {
 			case '(':
-				subParen=true;
+				subParen = true;
 				sc.SetState(SCE_TCL_OPERATOR);
 				sc.ForwardSetState(SCE_TCL_SUBSTITUTION);
 				continue;
 			case ')':
 				sc.SetState(SCE_TCL_OPERATOR);
-				subParen=false;
+				subParen = false;
 				continue;
 			case '$':
 				continue;
@@ -137,26 +134,26 @@ next:
 				if (subParen)
 					sc.ForwardSetState(SCE_TCL_SUBSTITUTION);
 				continue;
-			default :
+			default:
 				// maybe spaces should be allowed ???
 				if (!IsAWordChar(sc.ch)) { // probably the code is wrong
 					sc.SetState(SCE_TCL_DEFAULT);
-					subParen = 0;
+					subParen = false;
 				}
 				break;
 			}
 		} else if (isComment(sc.state)) {
 		} else if (!IsAWordChar(sc.ch)) {
-			if ((sc.state == SCE_TCL_IDENTIFIER && expected) ||  sc.state == SCE_TCL_MODIFIER) {
+			if ((sc.state == SCE_TCL_IDENTIFIER && expected) || sc.state == SCE_TCL_MODIFIER) {
 				char w[100];
-				char *s=w;
+				char *s = w;
 				sc.GetCurrent(w, sizeof(w));
-				if (w[strlen(w)-1]=='\r')
-					w[strlen(w)-1]=0;
+				if (w[strlen(w) - 1] == '\r')
+					w[strlen(w) - 1] = 0;
 				while (*s == ':') // ignore leading : like in ::set a 10
 					++s;
 				bool quote = sc.state == SCE_TCL_IN_QUOTE;
-				if (commentLevel  || expected) {
+				if (commentLevel || expected) {
 					if (keywords.InList(s)) {
 						sc.ChangeState(quote ? SCE_TCL_WORD_IN_QUOTE : SCE_TCL_WORD);
 					} else if (keywords2.InList(s)) {
@@ -165,8 +162,8 @@ next:
 						sc.ChangeState(quote ? SCE_TCL_WORD_IN_QUOTE : SCE_TCL_WORD3);
 					} else if (keywords4.InList(s)) {
 						sc.ChangeState(quote ? SCE_TCL_WORD_IN_QUOTE : SCE_TCL_WORD4);
-					} else if (sc.GetRelative(-static_cast<int>(strlen(s))-1) == '{' &&
-					           keywords5.InList(s) && sc.ch == '}') { // {keyword} exactly no spaces
+					} else if (sc.GetRelative(-static_cast<int>(strlen(s)) - 1) == '{' &&
+						keywords5.InList(s) && sc.ch == '}') { // {keyword} exactly no spaces
 						sc.ChangeState(SCE_TCL_EXPAND);
 					}
 					if (keywords6.InList(s)) {
@@ -190,7 +187,7 @@ next:
 		if (sc.atLineEnd) {
 			lineState = LS_DEFAULT;
 			currentLine = styler.GetLine(sc.currentPos);
-			if (foldComment && sc.state!=SCE_TCL_COMMENT && isComment(sc.state)) {
+			if (foldComment && sc.state != SCE_TCL_COMMENT && isComment(sc.state)) {
 				if (currentLevel == 0) {
 					++currentLevel;
 					commentLevel = true;
@@ -220,8 +217,8 @@ next:
 					lineState = LS_COMMENT_BOX;
 			}
 			styler.SetLineState(currentLine,
-			                    (subBrace ? LS_BRACE_ONLY : 0) |
-			                    (expected ? LS_COMMAND_EXPECTED : 0)  | lineState);
+				(subBrace ? LS_BRACE_ONLY : 0) |
+				(expected ? LS_COMMAND_EXPECTED : 0) | lineState);
 			if (lineState == LS_COMMENT_BOX)
 				sc.ForwardSetState(SCE_TCL_COMMENT_BOX);
 			else if (lineState == LS_OPEN_DOUBLE_QUOTE)
@@ -244,10 +241,9 @@ next:
 			continue;
 		if (sc.atLineStart) {
 			visibleChars = false;
-			if (sc.state!=SCE_TCL_IN_QUOTE && !isComment(sc.state))
-			{
+			if (sc.state != SCE_TCL_IN_QUOTE && !isComment(sc.state)) {
 				sc.SetState(SCE_TCL_DEFAULT);
-				expected = IsAWordStart(sc.ch)|| isspacechar(static_cast<unsigned char>(sc.ch));
+				expected = IsAWordStart(sc.ch) || isspacechar(static_cast<unsigned char>(sc.ch));
 			}
 		}
 
@@ -329,7 +325,7 @@ next:
 					expected = true;
 					break;
 				case '$':
-					subParen = 0;
+					subParen = false;
 					if (sc.chNext != '{') {
 						sc.SetState(SCE_TCL_SUBSTITUTION);
 					} else {
@@ -340,12 +336,12 @@ next:
 					}
 					break;
 				case '#':
-					if ((isspacechar(static_cast<unsigned char>(sc.chPrev))||
-					        isoperator(static_cast<char>(sc.chPrev))) && IsADigit(sc.chNext,0x10))
+					if ((isspacechar(static_cast<unsigned char>(sc.chPrev)) ||
+						isoperator(static_cast<char>(sc.chPrev))) && IsADigit(sc.chNext, 0x10))
 						sc.SetState(SCE_TCL_NUMBER);
 					break;
 				case '-':
-					sc.SetState(IsADigit(sc.chNext)? SCE_TCL_NUMBER: SCE_TCL_MODIFIER);
+					sc.SetState(IsADigit(sc.chNext) ? SCE_TCL_NUMBER : SCE_TCL_MODIFIER);
 					break;
 				default:
 					if (isoperator(static_cast<char>(sc.ch))) {

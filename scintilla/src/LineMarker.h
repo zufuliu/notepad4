@@ -19,7 +19,9 @@ typedef void (*DrawLineMarkerFn)(Surface *surface, const PRectangle &rcWhole, co
  */
 class LineMarker {
 public:
-	enum typeOfFold { undefined, head, body, tail, headWithTail };
+	enum typeOfFold {
+		undefined, head, body, tail, headWithTail
+	};
 
 	int markType;
 	ColourDesired fore;

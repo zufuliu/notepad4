@@ -5,12 +5,9 @@
 // Copyright 2001- by Clemens Wyss <wys@helbling.ch>
 // The License.txt file describes the conditions under which this software may be distributed.
 
-#include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
-#include <stdarg.h>
-#include <assert.h>
-#include <ctype.h>
+#include <cstring>
+#include <cassert>
+#include <cctype>
 
 #include "ILexer.h"
 #include "Scintilla.h"
@@ -27,7 +24,7 @@
 using namespace Scintilla;
 
 //XXX Identical to Perl, put in common area
-static inline bool isEOLChar(char ch) {
+static inline bool isEOLChar(char ch) noexcept {
 	return (ch == '\r') || (ch == '\n');
 }
 
@@ -35,23 +32,23 @@ static inline bool isEOLChar(char ch) {
 // This one's redundant, but makes for more readable code
 #define isHighBitChar(ch) ((unsigned int)(ch) > 127)
 
-static inline bool isSafeAlpha(char ch) {
+static inline bool isSafeAlpha(char ch) noexcept {
 	return (isSafeASCII(ch) && isalpha(ch)) || ch == '_';
 }
 
-static inline bool isSafeAlnum(char ch) {
+static inline bool isSafeAlnum(char ch) noexcept {
 	return (isSafeASCII(ch) && isalnum(ch)) || ch == '_';
 }
 
-static inline bool isSafeAlnumOrHigh(char ch) {
+static inline bool isSafeAlnumOrHigh(char ch) noexcept {
 	return isHighBitChar(ch) || isalnum(ch) || ch == '_';
 }
 
-static inline bool isSafeDigit(char ch) {
+static inline bool isSafeDigit(char ch) noexcept {
 	return isSafeASCII(ch) && isdigit(ch);
 }
 
-static inline bool isSafeWordcharOrHigh(char ch) {
+static inline bool isSafeWordcharOrHigh(char ch) noexcept {
 	// Error: scintilla's KeyWords.h includes '.' as a word-char
 	// we want to separate things that can take methods from the
 	// methods.
@@ -230,8 +227,8 @@ static void enterInnerExpression(int *p_inner_string_types,
 	++inner_string_count;
 }
 
-static void exitInnerExpression(int *p_inner_string_types,
-	int *p_inner_expn_brace_counts, QuoteCls *p_inner_quotes, int& inner_string_count,
+static void exitInnerExpression(const int *p_inner_string_types,
+	const int *p_inner_expn_brace_counts, QuoteCls *p_inner_quotes, int& inner_string_count,
 	int& state, int& brace_counts, QuoteCls& curr_quote) {
 	--inner_string_count;
 	state = p_inner_string_types[inner_string_count];
@@ -242,7 +239,7 @@ static void exitInnerExpression(int *p_inner_string_types,
 static bool isEmptyLine(Sci_Position pos, Accessor &styler) {
 	int spaceFlags = 0;
 	Sci_Position lineCurrent = styler.GetLine(pos);
-	int indentCurrent = Accessor::LexIndentAmount(styler, lineCurrent, &spaceFlags, NULL);
+	int indentCurrent = Accessor::LexIndentAmount(styler, lineCurrent, &spaceFlags, nullptr);
 	return (indentCurrent & SC_FOLDLEVELWHITEFLAG) != 0;
 }
 
@@ -870,7 +867,7 @@ static void ColouriseRbDoc(Sci_PositionU startPos, Sci_Position length, int init
 				if (strchr(q_chars, chNext) && !isSafeWordcharOrHigh(chNext2)) {
 					Quote.New();
 					const char *hit = strchr(q_chars, chNext);
-					if (hit != NULL) {
+					if (hit != nullptr) {
 						state = q_states[hit - q_chars];
 						Quote.Open(chNext2);
 						i += 2;
@@ -933,7 +930,7 @@ static void ColouriseRbDoc(Sci_PositionU startPos, Sci_Position length, int init
 										inner_string_count,
 										state, brace_counts, Quote);
 				} else {
-					preferRE = (strchr(")}].", ch) == NULL);
+					preferRE = (strchr(")}].", ch) == nullptr);
 				}
 				// Stay in default state
 			} else if (isEOLChar(ch)) {
@@ -956,7 +953,7 @@ static void ColouriseRbDoc(Sci_PositionU startPos, Sci_Position length, int init
 				if (ch == '='
 					&& isSafeWordcharOrHigh(chPrev)
 					&& (chNext == '('
-						|| strchr(" \t\n\r", chNext) != NULL)
+						|| strchr(" \t\n\r", chNext) != nullptr)
 					&& (!strcmp(prevWord, "def")
 						|| followsDot(styler.GetStartSegment(), styler))) {
 					// <name>= is a name only when being def'd -- Get it the next time
@@ -964,7 +961,7 @@ static void ColouriseRbDoc(Sci_PositionU startPos, Sci_Position length, int init
 					// <name>, (op, =), <name>
 				} else if (ch == ':'
 						   && isSafeWordcharOrHigh(chPrev)
-						   && strchr(" \t\n\r", chNext) != NULL) {
+						   && strchr(" \t\n\r", chNext) != nullptr) {
 					state = SCE_RB_SYMBOL;
 				} else if ((ch == '?' || ch == '!')
 							&& isSafeWordcharOrHigh(chPrev)
@@ -1187,7 +1184,7 @@ static void ColouriseRbDoc(Sci_PositionU startPos, Sci_Position length, int init
 			}
 		} else if (state == SCE_RB_POD) {
 			// PODs end with ^=end\s, -- any whitespace can follow =end
-			if (strchr(" \t\n\r", ch) != NULL
+			if (strchr(" \t\n\r", ch) != nullptr
 				&& i > 5
 				&& isEOLChar(styler[i - 5])
 				&& isMatch(styler, lengthDoc, i - 4, "=end")) {

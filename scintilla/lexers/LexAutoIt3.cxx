@@ -7,9 +7,9 @@
 // The License.txt file describes the conditions under which this software may be distributed.
 // Scintilla source code edit control
 
-#include <string.h>
-#include <assert.h>
-#include <ctype.h>
+#include <cstring>
+#include <cassert>
+#include <cctype>
 
 #include "ILexer.h"
 #include "Scintilla.h"
@@ -24,24 +24,24 @@
 
 using namespace Scintilla;
 
-static inline bool IsAu3TypeCharacter(int ch) {
+static inline bool IsAu3TypeCharacter(int ch) noexcept {
 	return ch == '$';
 }
-static inline bool IsAu3WordChar(int ch) {
+static inline bool IsAu3WordChar(int ch) noexcept {
 	return (ch < 0x80) && (isalnum(ch) || ch == '_');
 }
 
-static inline bool IsAu3WordStart(int ch) {
+static inline bool IsAu3WordStart(int ch) noexcept {
 	return (ch < 0x80) && (isalnum(ch) || ch == '_' || ch == '@' || ch == '#' || ch == '$' || ch == '.');
 }
 
-static inline bool IsAu3Operator(int ch) {
+static inline bool IsAu3Operator(int ch) noexcept {
 	if (IsASCII(ch) && isalnum(ch)) {
 		return false;
 	}
 	if (ch == '+' || ch == '-' || ch == '*' || ch == '/' ||
-			ch == '&' || ch == '^' || ch == '=' || ch == '<' || ch == '>' ||
-			ch == '(' || ch == ')' || ch == '[' || ch == ']' || ch == ',') {
+		ch == '&' || ch == '^' || ch == '=' || ch == '<' || ch == '>' ||
+		ch == '(' || ch == ')' || ch == '[' || ch == ']' || ch == ',') {
 		return true;
 	}
 	return false;
@@ -84,7 +84,7 @@ static int GetSendKey(const char *szLine, char *szKey) {
 				// Save second portion into var...
 				szSpecial[nSpecPos++] = cTemp;
 				// check if Second portion is all numbers for repeat fuction
-				if (isdigit(cTemp) == false) {
+				if (!isdigit(cTemp)) {
 					nSpecNum = 0;
 				}
 			}
@@ -97,7 +97,7 @@ static int GetSendKey(const char *szLine, char *szKey) {
 	// Check if the second portion is either a number or one of these keywords
 	szKey[nKeyPos] = '\0';
 	szSpecial[nSpecPos] = '\0';
-	if (strcmp(szSpecial, "down") == 0 || strcmp(szSpecial, "up") == 0  ||
+	if (strcmp(szSpecial, "down") == 0 || strcmp(szSpecial, "up") == 0 ||
 		strcmp(szSpecial, "on") == 0 || strcmp(szSpecial, "off") == 0 ||
 		strcmp(szSpecial, "toggle") == 0 || nSpecNum == 1) {
 		nFlag = 0;
@@ -119,7 +119,7 @@ static bool IsContinuationLine(Sci_PositionU szLine, Accessor &styler) {
 		//stylech = styler.StyleAt(nePos);
 		int stylech = styler.StyleAt(nsPos);
 		if (!(stylech == SCE_AU3_COMMENT)) {
-			char ch = styler.SafeGetCharAt(nePos, '\0');
+			char ch = styler.SafeGetCharAt(nePos);
 			if (!isspacechar(ch)) {
 				return ch == '_';
 			}
@@ -157,10 +157,10 @@ static void ColouriseAU3Doc(Sci_PositionU startPos, Sci_Position length, int ini
 	// When not inside a Block comment: find First line without _
 	if (!(initStyle == SCE_AU3_COMMENTBLOCK)) {
 		while ((lineCurrent > 0 && IsContinuationLine(lineCurrent, styler)) ||
-				(lineCurrent > 1 && IsContinuationLine(lineCurrent - 1, styler))) {
+			(lineCurrent > 1 && IsContinuationLine(lineCurrent - 1, styler))) {
 			lineCurrent--;
 			startPos = styler.LineStart(lineCurrent); // get start position
-			initStyle =  0;		// reset the start style to 0
+			initStyle = 0;		// reset the start style to 0
 		}
 	}
 	// Set the new length to include it from the start and set the start position
@@ -192,7 +192,8 @@ static void ColouriseAU3Doc(Sci_PositionU startPos, Sci_Position length, int ini
 		// **********************************************
 		//
 		switch (sc.state) {
-		case SCE_AU3_COMMENTBLOCK: {
+		case SCE_AU3_COMMENTBLOCK:
+		{
 			//Reset at line end
 			if (sc.atLineEnd) {
 				ci = 0;
@@ -231,13 +232,15 @@ static void ColouriseAU3Doc(Sci_PositionU startPos, Sci_Position length, int ini
 			}
 			break;
 		}
-		case SCE_AU3_COMMENT: {
+		case SCE_AU3_COMMENT:
+		{
 			if (sc.atLineStart) {
 				sc.SetState(SCE_AU3_DEFAULT);
 			}
 			break;
 		}
-		case SCE_AU3_OPERATOR: {
+		case SCE_AU3_OPERATOR:
+		{
 			// check if its a COMobject
 			if (sc.chPrev == '.' && IsAu3WordChar(sc.ch)) {
 				sc.SetState(SCE_AU3_COMOBJ);
@@ -246,7 +249,8 @@ static void ColouriseAU3Doc(Sci_PositionU startPos, Sci_Position length, int ini
 			}
 			break;
 		}
-		case SCE_AU3_SPECIAL: {
+		case SCE_AU3_SPECIAL:
+		{
 			if (sc.ch == ';') {
 				sc.SetState(SCE_AU3_COMMENT);
 			}
@@ -255,7 +259,8 @@ static void ColouriseAU3Doc(Sci_PositionU startPos, Sci_Position length, int ini
 			}
 			break;
 		}
-		case SCE_AU3_KEYWORD: {
+		case SCE_AU3_KEYWORD:
+		{
 			if (!(IsAu3WordChar(sc.ch) || (sc.ch == '-' && (strcmp(s, "#comments") == 0 || strcmp(s, "#include") == 0)))) {
 				if (!IsAu3TypeCharacter(sc.ch)) {
 					if (strcmp(s, "#cs") == 0 || strcmp(s, "#comments-start") == 0) {
@@ -300,7 +305,8 @@ static void ColouriseAU3Doc(Sci_PositionU startPos, Sci_Position length, int ini
 			}
 			break;
 		}
-		case SCE_AU3_NUMBER: {
+		case SCE_AU3_NUMBER:
+		{
 			// Numeric indicator error=9 normal=0 normal+dec=1 hex=2 E-not=3
 			//
 			// test for Hex notation
@@ -315,8 +321,8 @@ static void ColouriseAU3Doc(Sci_PositionU startPos, Sci_Position length, int ini
 			}
 			//  Allow Hex characters inside hex numeric strings
 			if ((ni == 2) &&
-					(sc.ch == 'a' || sc.ch == 'b' || sc.ch == 'c' || sc.ch == 'd' || sc.ch == 'e' || sc.ch == 'f' ||
-					 sc.ch == 'A' || sc.ch == 'B' || sc.ch == 'C' || sc.ch == 'D' || sc.ch == 'E' || sc.ch == 'F')) {
+				(sc.ch == 'a' || sc.ch == 'b' || sc.ch == 'c' || sc.ch == 'd' || sc.ch == 'e' || sc.ch == 'f' ||
+					sc.ch == 'A' || sc.ch == 'B' || sc.ch == 'C' || sc.ch == 'D' || sc.ch == 'E' || sc.ch == 'F')) {
 				break;
 			}
 			// test for 1 dec point only
@@ -337,7 +343,8 @@ static void ColouriseAU3Doc(Sci_PositionU startPos, Sci_Position length, int ini
 			}
 			break;
 		}
-		case SCE_AU3_VARIABLE: {
+		case SCE_AU3_VARIABLE:
+		{
 			// Check if its a COMObject
 			if (sc.ch == '.' && !IsADigit(sc.chNext)) {
 				sc.SetState(SCE_AU3_OPERATOR);
@@ -346,13 +353,15 @@ static void ColouriseAU3Doc(Sci_PositionU startPos, Sci_Position length, int ini
 			}
 			break;
 		}
-		case SCE_AU3_COMOBJ: {
+		case SCE_AU3_COMOBJ:
+		{
 			if (!(IsAu3WordChar(sc.ch))) {
 				sc.SetState(SCE_AU3_DEFAULT);
 			}
 			break;
 		}
-		case SCE_AU3_STRING: {
+		case SCE_AU3_STRING:
+		{
 			// check for " to end a double qouted string or
 			// check for ' to end a single qouted string
 			if ((si == 1 && sc.ch == '\"') || (si == 2 && sc.ch == '\'') || (si == 3 && sc.ch == '>')) {
@@ -375,7 +384,8 @@ static void ColouriseAU3Doc(Sci_PositionU startPos, Sci_Position length, int ini
 			}
 			break;
 		}
-		case SCE_AU3_SENT: {
+		case SCE_AU3_SENT:
+		{
 			// Send key string ended
 			if (sc.chPrev == '}' && sc.ch != '}') {
 				// set color to SENDKEY when valid sendkey .. else set back to regular string
@@ -544,7 +554,7 @@ static void ColouriseAU3Doc(Sci_PositionU startPos, Sci_Position length, int ini
 }
 
 //
-static inline  bool IsStreamCommentStyle(int style) {
+static inline  bool IsStreamCommentStyle(int style) noexcept {
 	return style == SCE_AU3_COMMENT || style == SCE_AU3_COMMENTBLOCK;
 }
 
@@ -554,7 +564,7 @@ static inline  bool IsStreamCommentStyle(int style) {
 static int GetStyleFirstWord(Sci_PositionU szLine, Accessor &styler) {
 	Sci_Position nsPos = styler.LineStart(szLine);
 	Sci_Position nePos = styler.LineStart(szLine + 1) - 1;
-	while (isspacechar(styler.SafeGetCharAt(nsPos, '\0')) && nsPos < nePos) {
+	while (isspacechar(styler.SafeGetCharAt(nsPos)) && nsPos < nePos) {
 		nsPos++; // skip to next char
 
 	} // End While
@@ -587,7 +597,7 @@ static void FoldAU3Doc(Sci_PositionU startPos, Sci_Position length, int, LexerWo
 	int stylePrev = 0;
 	// find the first previous line without continuation character at the end
 	while ((lineCurrent > 0 && IsContinuationLine(lineCurrent, styler)) ||
-			(lineCurrent > 1 && IsContinuationLine(lineCurrent - 1, styler))) {
+		(lineCurrent > 1 && IsContinuationLine(lineCurrent - 1, styler))) {
 		lineCurrent--;
 		startPos = styler.LineStart(lineCurrent);
 	}
@@ -672,10 +682,10 @@ static void FoldAU3Doc(Sci_PositionU startPos, Sci_Position length, int, LexerWo
 			// if a keyword is found on the current line and the line doesn't end with _ (continuation)
 			//    and we are not inside a commentblock.
 			if (szKeywordlen > 0 && (!(chPrev == '_')) &&
-					((!(IsStreamCommentStyle(style)) || foldInComment))) {
+				((!(IsStreamCommentStyle(style)) || foldInComment))) {
 				szKeyword[szKeywordlen] = '\0';
 				// only fold "if" last keyword is "then"  (else its a one line if)
-				if (strcmp(szKeyword, "if") == 0  && ThenFoundLast) {
+				if (strcmp(szKeyword, "if") == 0 && ThenFoundLast) {
 					levelNext++;
 				}
 				// create new fold for these words
@@ -738,12 +748,12 @@ static void FoldAU3Doc(Sci_PositionU startPos, Sci_Position length, int, LexerWo
 				}
 				// fold till the last line for normal comment lines
 				else if (IsStreamCommentStyle(stylePrev) && !(styleNext == SCE_AU3_COMMENT)
-						 && stylePrev == SCE_AU3_COMMENT && style == SCE_AU3_COMMENT) {
+					&& stylePrev == SCE_AU3_COMMENT && style == SCE_AU3_COMMENT) {
 					levelNext--;
 				}
 				// fold till the one but last line for Blockcomment lines
 				else if (IsStreamCommentStyle(stylePrev)
-						 && !(styleNext == SCE_AU3_COMMENTBLOCK) && style == SCE_AU3_COMMENTBLOCK) {
+					&& !(styleNext == SCE_AU3_COMMENTBLOCK) && style == SCE_AU3_COMMENTBLOCK) {
 					levelNext--;
 					levelCurrent--;
 				}

@@ -9,6 +9,7 @@
 #include <cstring>
 
 #include <stdexcept>
+#include <string_view>
 #include <vector>
 #include <map>
 #include <algorithm>
@@ -21,7 +22,9 @@
 
 using namespace Scintilla;
 
-static const char *NextField(const char *s) {
+namespace {
+
+const char *NextField(const char *s) {
 	// In case there are leading spaces in the string
 	while (*s == ' ') {
 		s++;
@@ -36,11 +39,32 @@ static const char *NextField(const char *s) {
 }
 
 // Data lines in XPM can be terminated either with NUL or "
-static size_t MeasureLength(const char *s) {
+size_t MeasureLength(const char *s) {
 	size_t i = 0;
-	while (s[i] && (s[i] != '\"'))
+	while (s[i] && (s[i] != '\"')) {
 		i++;
+	}
 	return i;
+}
+
+unsigned int ValueOfHex(const char ch) noexcept {
+	if (ch >= '0' && ch <= '9')
+		return ch - '0';
+	else if (ch >= 'A' && ch <= 'F')
+		return ch - 'A' + 10;
+	else if (ch >= 'a' && ch <= 'f')
+		return ch - 'a' + 10;
+	else
+		return 0;
+}
+
+ColourDesired ColourFromHex(const char *val) noexcept {
+	const unsigned int r = ValueOfHex(val[0]) * 16 + ValueOfHex(val[1]);
+	const unsigned int g = ValueOfHex(val[2]) * 16 + ValueOfHex(val[3]);
+	const unsigned int b = ValueOfHex(val[4]) * 16 + ValueOfHex(val[5]);
+	return ColourDesired(r, g, b);
+}
+
 }
 
 ColourDesired XPM::ColourFromCode(int ch) const {
@@ -62,8 +86,7 @@ XPM::XPM(const char *const *linesForm) {
 	Init(linesForm);
 }
 
-XPM::~XPM() {
-}
+XPM::~XPM() = default;
 
 void XPM::Init(const char *textForm) {
 	// Test done is two parts to avoid possibility of overstepping the memory
@@ -89,7 +112,7 @@ void XPM::Init(const char *const *linesForm) {
 	if (!linesForm)
 		return;
 
-	std::fill(colourCodeTable, std::end(colourCodeTable), 0);
+	std::fill(colourCodeTable, std::end(colourCodeTable), ColourDesired(0));
 	const char *line0 = linesForm[0];
 	width = atoi(line0);
 	line0 = NextField(line0);
@@ -103,24 +126,25 @@ void XPM::Init(const char *const *linesForm) {
 		return;
 	}
 
-	for (int c=0; c<nColours; c++) {
-		const char *colourDef = linesForm[c+1];
-		int code = static_cast<unsigned char>(colourDef[0]);
+	for (int c = 0; c < nColours; c++) {
+		const char *colourDef = linesForm[c + 1];
+		const char code = colourDef[0];
 		colourDef += 4;
 		ColourDesired colour(0xff, 0xff, 0xff);
 		if (*colourDef == '#') {
-			colour.Set(colourDef);
+			colour = ColourFromHex(colourDef + 1);
 		} else {
-			codeTransparent = static_cast<char>(code);
+			codeTransparent = code;
 		}
-		colourCodeTable[code] = colour;
+		colourCodeTable[static_cast<unsigned char>(code)] = colour;
 	}
 
-	for (int y=0; y<height; y++) {
-		const char *lform = linesForm[y+nColours+1];
+	for (int y = 0; y < height; y++) {
+		const char *lform = linesForm[y + nColours + 1];
 		const size_t len = MeasureLength(lform);
-		for (size_t x = 0; x<len; x++)
-			pixels[y * width + x] = static_cast<unsigned char>(lform[x]);
+		for (size_t x = 0; x < len; x++) {
+			pixels[y * width + x] = lform[x];
+		}
 	}
 }
 
@@ -131,10 +155,10 @@ void XPM::Draw(Surface *surface, const PRectangle &rc) {
 	// Centre the pixmap
 	const int startY = static_cast<int>(rc.top + (rc.Height() - height) / 2);
 	const int startX = static_cast<int>(rc.left + (rc.Width() - width) / 2);
-	for (int y=0; y<height; y++) {
+	for (int y = 0; y < height; y++) {
 		int prevCode = 0;
 		int xStartRun = 0;
-		for (int x=0; x<width; x++) {
+		for (int x = 0; x < width; x++) {
 			const int code = pixels[y * width + x];
 			if (code != prevCode) {
 				FillRun(surface, prevCode, startX + xStartRun, startY + y, startX + x);
@@ -147,17 +171,17 @@ void XPM::Draw(Surface *surface, const PRectangle &rc) {
 }
 
 void XPM::PixelAt(int x, int y, ColourDesired &colour, bool &transparent) const {
-	if (pixels.empty() || (x<0) || (x >= width) || (y<0) || (y >= height)) {
-		colour = 0;
+	if (pixels.empty() || (x < 0) || (x >= width) || (y < 0) || (y >= height)) {
+		colour = ColourDesired(0);;
 		transparent = true;
 		return;
 	}
-	int code = pixels[y * width + x];
+	const int code = pixels[y * width + x];
 	transparent = code == codeTransparent;
 	if (transparent) {
-		colour = 0;
+		colour = ColourDesired(0);;
 	} else {
-		colour = ColourFromCode(code).AsLong();
+		colour = ColourFromCode(code);
 	}
 }
 
@@ -165,9 +189,9 @@ std::vector<const char *> XPM::LinesFormFromTextForm(const char *textForm) {
 	// Build the lines form out of the text form
 	std::vector<const char *> linesForm;
 	int countQuotes = 0;
-	int strings=1;
-	int j=0;
-	for (; countQuotes < (2*strings) && textForm[j] != '\0'; j++) {
+	int strings = 1;
+	int j = 0;
+	for (; countQuotes < (2 * strings) && textForm[j] != '\0'; j++) {
 		if (textForm[j] == '\"') {
 			if (countQuotes == 0) {
 				// First field: width, height, number of colors, chars per pixel
@@ -210,8 +234,8 @@ RGBAImage::RGBAImage(const XPM &xpm) {
 	width = xpm.GetWidth();
 	scale = 1;
 	pixelBytes.resize(CountBytes());
-	for (int y=0; y<height; y++) {
-		for (int x=0; x<width; x++) {
+	for (int y = 0; y < height; y++) {
+		for (int x = 0; x < width; x++) {
 			ColourDesired colour;
 			bool transparent = false;
 			xpm.PixelAt(x, y, colour, transparent);
@@ -220,8 +244,7 @@ RGBAImage::RGBAImage(const XPM &xpm) {
 	}
 }
 
-RGBAImage::~RGBAImage() {
-}
+RGBAImage::~RGBAImage() = default;
 
 int RGBAImage::CountBytes() const {
 	return width * height * 4;
@@ -232,11 +255,11 @@ const unsigned char *RGBAImage::Pixels() const {
 }
 
 void RGBAImage::SetPixel(int x, int y, const ColourDesired &colour, int alpha) {
-	unsigned char *pixel = &pixelBytes[0] + (y*width+x) * 4;
+	unsigned char *pixel = &pixelBytes[0] + (y*width + x) * 4;
 	// RGBA
-	pixel[0] = static_cast<unsigned char>(colour.GetRed());
-	pixel[1] = static_cast<unsigned char>(colour.GetGreen());
-	pixel[2] = static_cast<unsigned char>(colour.GetBlue());
+	pixel[0] = colour.GetRed();
+	pixel[1] = colour.GetGreen();
+	pixel[2] = colour.GetBlue();
 	pixel[3] = static_cast<unsigned char>(alpha);
 }
 
@@ -256,7 +279,7 @@ void RGBAImageSet::Clear() {
 
 /// Add an image.
 void RGBAImageSet::Add(int ident, RGBAImage *image) {
-	ImageMap::iterator it=images.find(ident);
+	auto it = images.find(ident);
 	if (it == images.end()) {
 		images[ident] = std::unique_ptr<RGBAImage>(image);
 	} else {
@@ -267,8 +290,8 @@ void RGBAImageSet::Add(int ident, RGBAImage *image) {
 }
 
 /// Get image by id.
-RGBAImage *RGBAImageSet::Get(int ident) {
-	ImageMap::iterator it = images.find(ident);
+RGBAImage *RGBAImageSet::Get(int ident) const {
+	const auto it = images.find(ident);
 	if (it != images.end()) {
 		return it->second.get();
 	}
@@ -278,7 +301,7 @@ RGBAImage *RGBAImageSet::Get(int ident) {
 /// Give the largest height of the set.
 int RGBAImageSet::GetHeight() const {
 	if (height < 0) {
-		for (const std::pair<const int, std::unique_ptr<RGBAImage>> &image : images) {
+		for (const auto &image : images) {
 			if (height < image.second->GetHeight()) {
 				height = image.second->GetHeight();
 			}
@@ -290,7 +313,7 @@ int RGBAImageSet::GetHeight() const {
 /// Give the largest width of the set.
 int RGBAImageSet::GetWidth() const {
 	if (width < 0) {
-		for (const std::pair<const int, std::unique_ptr<RGBAImage>> &image : images) {
+		for (const auto &image : images) {
 			if (width < image.second->GetWidth()) {
 				width = image.second->GetWidth();
 			}

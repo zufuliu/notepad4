@@ -1,6 +1,8 @@
 // Scintilla source code edit control
 /** @file Catalogue.cxx
- ** Colourise for particular languages.
+ ** Lexer infrastructure.
+ ** Contains a list of LexerModules which can be searched to find a module appropriate for a
+ ** particular language.
  **/
 // Copyright 1998-2002 by Neil Hodgson <neilh@scintilla.org>
 // The License.txt file describes the conditions under which this software may be distributed.
@@ -26,24 +28,24 @@ static int nextLanguage = SCLEX_AUTOMATIC+1;
 
 const LexerModule *Catalogue::Find(int language) {
 	Scintilla_LinkLexers();
-	for (const LexerModule *lm : lexerCatalogue) {
+	for (const auto *lm : lexerCatalogue) {
 		if (lm->GetLanguage() == language) {
 			return lm;
 		}
 	}
-	return 0;
+	return nullptr;
 }
 
 const LexerModule *Catalogue::Find(const char *languageName) {
 	Scintilla_LinkLexers();
 	if (languageName) {
-		for (const LexerModule *lm : lexerCatalogue) {
+		for (const auto *lm : lexerCatalogue) {
 			if (lm->languageName && (0 == strcmp(lm->languageName, languageName))) {
 				return lm;
 			}
 		}
 	}
-	return 0;
+	return nullptr;
 }
 
 void Catalogue::AddLexerModule(LexerModule *plm) {
