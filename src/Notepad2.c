@@ -1437,6 +1437,8 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		SendMessage(hwndEdit, SCI_SETWRAPINDENTMODE, SC_WRAPINDENT_SAME, 0);
 	} else if (iWordWrapIndent == 6) {
 		SendMessage(hwndEdit, SCI_SETWRAPINDENTMODE, SC_WRAPINDENT_INDENT, 0);
+	} else if (iWordWrapIndent == 7) {
+		SendMessage(hwndEdit, SCI_SETWRAPINDENTMODE, SC_WRAPINDENT_DEEPINDENT, 0);
 	} else {
 		int i = 0;
 		switch (iWordWrapIndent) {
@@ -3672,6 +3674,8 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 				SendMessage(hwndEdit, SCI_SETWRAPINDENTMODE, SC_WRAPINDENT_SAME, 0);
 			} else if (iWordWrapIndent == 6) {
 				SendMessage(hwndEdit, SCI_SETWRAPINDENTMODE, SC_WRAPINDENT_INDENT, 0);
+			} else if (iWordWrapIndent == 7) {
+				SendMessage(hwndEdit, SCI_SETWRAPINDENTMODE, SC_WRAPINDENT_DEEPINDENT, 0);
 			} else {
 				int i = 0;
 				switch (iWordWrapIndent) {
@@ -5204,7 +5208,7 @@ void LoadSettings(void) {
 	iWordWrapMode = clamp_i(iWordWrapMode, 0, 1);
 
 	iWordWrapIndent = IniSectionGetInt(pIniSection, L"WordWrapIndent", 0);
-	iWordWrapIndent = clamp_i(iWordWrapIndent, 0, 6);
+	iWordWrapIndent = clamp_i(iWordWrapIndent, 0, 7);
 
 	iWordWrapSymbols = IniSectionGetInt(pIniSection, L"WordWrapSymbols", 22);
 	iWordWrapSymbols = clamp_i(iWordWrapSymbols % 10, 0, 2) + clamp_i((iWordWrapSymbols % 100 - iWordWrapSymbols % 10) / 10, 0, 2) * 10;
