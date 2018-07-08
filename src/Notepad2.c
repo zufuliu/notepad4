@@ -5282,7 +5282,7 @@ void LoadSettings(void) {
 	iPrintFooter = clamp_i(iPrintFooter, 0, 1);
 
 	iPrintColor = IniSectionGetInt(pIniSection, L"PrintColorMode", 3);
-	iPrintColor = clamp_i(iPrintColor, 0, 4);
+	iPrintColor = clamp_i(iPrintColor, 0, 5);
 
 	iPrintZoom = IniSectionGetInt(pIniSection, L"PrintZoom", 10) - 10;
 	iPrintZoom = clamp_i(iPrintZoom, -10, 20);
