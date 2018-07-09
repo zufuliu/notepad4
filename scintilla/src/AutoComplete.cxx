@@ -158,7 +158,7 @@ void AutoComplete::SetList(const char *list) {
 
 	Sorter IndexSort(this, list);
 	sortMatrix.clear();
-	sortMatrix.reserve(IndexSort.indices.size() / 2 + 1);
+	sortMatrix.reserve(IndexSort.indices.size() / 2);
 	for (int i = 0; i < static_cast<int>(IndexSort.indices.size()) / 2; ++i) {
 		sortMatrix.push_back(i);
 	}

@@ -63,7 +63,7 @@ private:
 	CLSID CLSID_HanjaDic;
 
 public:
-	IHanjaDic * HJinterface;
+	IHanjaDic *HJinterface;
 
 	HanjaDic() : HJinterface(nullptr) {
 		hr = CLSIDFromProgID(OLESTR("mshjdic.hanjadic"), &CLSID_HanjaDic);

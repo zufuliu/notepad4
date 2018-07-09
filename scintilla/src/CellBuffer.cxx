@@ -26,8 +26,6 @@
 #include "CellBuffer.h"
 #include "UniConversion.h"
 
-using namespace Scintilla;
-
 namespace Scintilla {
 
 class ILineVector {
@@ -74,7 +72,6 @@ public:
 	void InsertText(Sci::Line line, Sci::Position delta) override {
 		starts.InsertText(static_cast<POS>(line), static_cast<POS>(delta));
 	}
-
 	void InsertLine(Sci::Line line, Sci::Position position, bool lineStart) override {
 		starts.InsertPartition(static_cast<POS>(line), static_cast<POS>(position));
 		if (perLine) {

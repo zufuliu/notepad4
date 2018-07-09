@@ -67,6 +67,7 @@ ColourDesired ColourFromHex(const char *val) noexcept {
 
 }
 
+
 ColourDesired XPM::ColourFromCode(int ch) const {
 	return colourCodeTable[ch];
 }
@@ -170,7 +171,7 @@ void XPM::Draw(Surface *surface, const PRectangle &rc) {
 	}
 }
 
-void XPM::PixelAt(int x, int y, ColourDesired &colour, bool &transparent) const {
+void XPM::PixelAt(int x, int y, ColourDesired colour, bool &transparent) const {
 	if (pixels.empty() || (x < 0) || (x >= width) || (y < 0) || (y >= height)) {
 		colour = ColourDesired(0);;
 		transparent = true;
@@ -254,7 +255,7 @@ const unsigned char *RGBAImage::Pixels() const {
 	return &pixelBytes[0];
 }
 
-void RGBAImage::SetPixel(int x, int y, const ColourDesired &colour, int alpha) {
+void RGBAImage::SetPixel(int x, int y, ColourDesired colour, int alpha) {
 	unsigned char *pixel = &pixelBytes[0] + (y*width + x) * 4;
 	// RGBA
 	pixel[0] = colour.GetRed();

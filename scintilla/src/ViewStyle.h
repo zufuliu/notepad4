@@ -66,7 +66,7 @@ enum WrapMode { eWrapNone, eWrapWord, eWrapChar, eWrapWhitespace };
 class ColourOptional : public ColourDesired {
 public:
 	bool isSet;
-	ColourOptional(const ColourDesired& colour_ = ColourDesired(0, 0, 0), bool isSet_ = false) : ColourDesired(colour_), isSet(isSet_) {}
+	ColourOptional(ColourDesired colour_ = ColourDesired(0, 0, 0), bool isSet_ = false) : ColourDesired(colour_), isSet(isSet_) {}
 	ColourOptional(uptr_t wParam, sptr_t lParam) : ColourDesired(static_cast<int>(lParam)), isSet(wParam != 0) {}
 };
 

@@ -40,7 +40,7 @@ public:
 	int GetWidth() const noexcept {
 		return width;
 	}
-	void PixelAt(int x, int y, ColourDesired &colour, bool &transparent) const;
+	void PixelAt(int x, int y, ColourDesired colour, bool &transparent) const;
 private:
 	static std::vector<const char *>LinesFormFromTextForm(const char *textForm);
 };
@@ -79,7 +79,7 @@ public:
 	}
 	int CountBytes() const;
 	const unsigned char *Pixels() const;
-	void SetPixel(int x, int y, const ColourDesired &colour, int alpha);
+	void SetPixel(int x, int y, ColourDesired colour, int alpha);
 };
 
 /**

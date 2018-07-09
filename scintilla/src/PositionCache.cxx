@@ -87,6 +87,7 @@ void LineLayout::Resize(int maxLineLength_) {
 		if (bidiData) {
 			bidiData->Resize(maxLineLength_);
 		}
+
 		maxLineLength = maxLineLength_;
 	}
 }
@@ -607,10 +608,11 @@ TextSegment BreakFinder::Next() {
 		while (nextBreak < lineRange.end) {
 			int charWidth = 1;
 			if (encodingFamily == efUnicode)
+				charWidth = UTF8DrawBytes(reinterpret_cast<unsigned char *>(&ll->chars[nextBreak]),
+					static_cast<int>(lineRange.end - nextBreak));
+			else if (encodingFamily == efDBCS)
 				charWidth = pdoc->DBCSDrawBytes(
 					std::string_view(&ll->chars[nextBreak], lineRange.end - nextBreak));
-			else if (encodingFamily == efDBCS)
-				charWidth = pdoc->IsDBCSLeadByte(ll->chars[nextBreak]) ? 2 : 1;
 			const Representation *repr = preprs->RepresentationFromCharacter(&ll->chars[nextBreak], charWidth);
 			if (((nextBreak > 0) && (ll->styles[nextBreak] != ll->styles[nextBreak - 1])) ||
 				repr ||

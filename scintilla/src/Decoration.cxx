@@ -316,3 +316,4 @@ std::unique_ptr<IDecorationList> DecorationListCreate(bool largeDocument) {
 }
 
 }
+

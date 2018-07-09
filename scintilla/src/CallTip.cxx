@@ -326,7 +326,7 @@ void CallTip::SetPosition(bool aboveText) noexcept {
 
 // It might be better to have two access functions for this and to use
 // them for all settings of colours.
-void CallTip::SetForeBack(const ColourDesired &fore, const ColourDesired &back) noexcept {
+void CallTip::SetForeBack(ColourDesired fore, ColourDesired back) noexcept {
 	colourBG = back;
 	colourUnSel = fore;
 }

@@ -378,8 +378,8 @@ SelectionPosition Editor::ClampPositionIntoDocument(const SelectionPosition &sp_
 }
 
 Point Editor::LocationFromPosition(const SelectionPosition &pos, PointEnd pe) {
-	RefreshStyleData();
 	const PRectangle rcClient = GetTextRectangle();
+	RefreshStyleData();
 	AutoSurface surface(this);
 	return view.LocationFromPosition(surface, *this, pos, topLine, vs, pe, rcClient);
 }
@@ -403,8 +403,6 @@ SelectionPosition Editor::SPositionFromLocation(const Point &pt, bool canReturnI
 	rcClient.Move(-ptOrigin.x, -ptOrigin.y);
 
 	if (canReturnInvalid) {
-		// May be in scroll view coordinates so translate back to main view
-		rcClient.Move(-ptOrigin.x, -ptOrigin.y);
 		if (!rcClient.Contains(pt))
 			return SelectionPosition(INVALID_POSITION);
 		if (pt.x < vs.textStart)
@@ -766,7 +764,7 @@ void Editor::MultipleSelectAdd(AddNumber addNumber) {
 			searchRanges.push_back(rangeTarget);
 		}
 
-		for (std::vector<Range>::const_iterator it = searchRanges.begin(); it != searchRanges.end(); ++it) {
+		for (auto it = searchRanges.begin(); it != searchRanges.end(); ++it) {
 			Sci::Position searchStart = it->start;
 			const Sci::Position searchEnd = it->end;
 			for (;;) {
@@ -1899,7 +1897,8 @@ void Editor::AddCharUTF(const char *s, unsigned int len, bool treatAsDBCS) {
 		UndoGroup ug(pdoc, (sel.Count() > 1) || !sel.Empty() || inOverstrike);
 
 		// Vector elements point into selection in order to change selection.
-		std::vector<SelectionRange *> selPtrs(sel.Count());
+		std::vector<SelectionRange *> selPtrs;
+		selPtrs.reserve(sel.Count());
 		for (size_t r = 0; r < sel.Count(); r++) {
 			selPtrs.push_back(&sel.Range(r));
 		}
@@ -3559,8 +3558,7 @@ int Editor::HorizontalMove(unsigned int iMessage) {
 			case SCI_VCHOMEWRAPEXTEND:
 			case SCI_LINEENDEXTEND:
 			case SCI_LINEENDDISPLAYEXTEND:
-			case SCI_LINEENDWRAPEXTEND:
-			{
+			case SCI_LINEENDWRAPEXTEND: {
 				SelectionRange rangeNew = SelectionRange(spCaret, sel.Range(r).anchor);
 				sel.TrimOtherSelections(r, SelectionRange(rangeNew));
 				sel.Range(r) = rangeNew;
@@ -3855,16 +3853,14 @@ int Editor::KeyCommand(unsigned int iMessage) {
 	case SCI_DELLINERIGHT:
 		return DelWordOrLine(iMessage);
 
-	case SCI_LINECOPY:
-	{
+	case SCI_LINECOPY: {
 		const Sci::Line lineStart = pdoc->SciLineFromPosition(SelectionStart().Position());
 		const Sci::Line lineEnd = pdoc->SciLineFromPosition(SelectionEnd().Position());
 		CopyRangeToClipboard(pdoc->LineStart(lineStart),
 			pdoc->LineStart(lineEnd + 1));
 	}
 	break;
-	case SCI_LINECUT:
-	{
+	case SCI_LINECUT: {
 		const Sci::Line lineStart = pdoc->SciLineFromPosition(SelectionStart().Position());
 		const Sci::Line lineEnd = pdoc->SciLineFromPosition(SelectionEnd().Position());
 		const Sci::Position start = pdoc->LineStart(lineStart);
@@ -3874,8 +3870,7 @@ int Editor::KeyCommand(unsigned int iMessage) {
 		SetLastXChosen();
 	}
 	break;
-	case SCI_LINEDELETE:
-	{
+	case SCI_LINEDELETE: {
 		const Sci::Line line = pdoc->SciLineFromPosition(sel.MainCaret());
 		const Sci::Position start = pdoc->LineStart(line);
 		const Sci::Position end = pdoc->LineStart(line + 1);
