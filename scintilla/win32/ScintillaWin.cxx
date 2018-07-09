@@ -1277,8 +1277,7 @@ sptr_t ScintillaWin::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam
 		case WM_PAINT:
 			return WndPaint(wParam);
 
-		case WM_PRINTCLIENT:
-		{
+		case WM_PRINTCLIENT: {
 			HDC hdc = reinterpret_cast<HDC>(wParam);
 			if (!IsCompatibleDC(hdc)) {
 				return ::DefWindowProc(MainHWND(), iMessage, wParam, lParam);
@@ -1295,8 +1294,7 @@ sptr_t ScintillaWin::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam
 			HorizontalScrollMessage(wParam);
 			break;
 
-		case WM_SIZE:
-		{
+		case WM_SIZE: {
 #if defined(USE_D2D)
 			if (paintState == notPainting) {
 				DropRenderTarget();
@@ -1407,8 +1405,7 @@ sptr_t ScintillaWin::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam
 		case WM_GETMINMAXINFO:
 			return ::DefWindowProc(MainHWND(), iMessage, wParam, lParam);
 
-		case WM_LBUTTONDOWN:
-		{
+		case WM_LBUTTONDOWN: {
 			// For IME, set the composition string as the result string.
 			IMContext imc(MainHWND());
 			::ImmNotifyIME(imc.hIMC, NI_COMPOSITIONSTR, CPS_COMPLETE, 0);
@@ -1423,8 +1420,7 @@ sptr_t ScintillaWin::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam
 		}
 		break;
 
-		case WM_MOUSEMOVE:
-		{
+		case WM_MOUSEMOVE: {
 			const Point pt = PointFromLParam(lParam);
 
 			// Windows might send WM_MOUSEMOVE even though the mouse has not been moved:
@@ -1446,8 +1442,7 @@ sptr_t ScintillaWin::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam
 				::GetMessageTime(), MouseModifiers(wParam));
 			break;
 
-		case WM_RBUTTONDOWN:
-		{
+		case WM_RBUTTONDOWN: {
 			::SetFocus(MainHWND());
 			const Point pt = PointFromLParam(lParam);
 			if (!PointInSelection(pt)) {
@@ -1515,8 +1510,7 @@ sptr_t ScintillaWin::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam
 			}
 
 		case WM_SYSKEYDOWN:
-		case WM_KEYDOWN:
-		{
+		case WM_KEYDOWN: {
 			//Platform::DebugPrintf("S keydown %d %x %x %x %x\n",iMessage, wParam, lParam, ::IsKeyDown(VK_SHIFT), ::IsKeyDown(VK_CONTROL));
 			lastKeyDownConsumed = false;
 			const int ret = KeyDownWithModifiers(KeyTranslate(static_cast<int>(wParam)),
@@ -1530,16 +1524,14 @@ sptr_t ScintillaWin::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam
 			break;
 		}
 
-		case WM_IME_KEYDOWN:
-		{
+		case WM_IME_KEYDOWN: {
 			if (wParam == VK_HANJA) {
 				ToggleHanja();
 			}
 			return ::DefWindowProc(MainHWND(), iMessage, wParam, lParam);
 		}
 
-		case WM_IME_REQUEST:
-		{
+		case WM_IME_REQUEST: {
 			if (wParam == IMR_RECONVERTSTRING) {
 				return ImeOnReconvert(lParam);
 			}
@@ -1560,8 +1552,7 @@ sptr_t ScintillaWin::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam
 		case WM_GETDLGCODE:
 			return DLGC_HASSETSEL | DLGC_WANTALLKEYS;
 
-		case WM_KILLFOCUS:
-		{
+		case WM_KILLFOCUS: {
 			HWND wOther = reinterpret_cast<HWND>(wParam);
 			HWND wThis = MainHWND();
 			const HWND wCT = static_cast<HWND>(ct.wCallTip.GetID());
@@ -1608,8 +1599,7 @@ sptr_t ScintillaWin::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam
 				return HandleCompositionWindowed(wParam, lParam);
 			}
 
-		case WM_CONTEXTMENU:
-		{
+		case WM_CONTEXTMENU: {
 			Point pt = PointFromLParam(lParam);
 			POINT rpt = { static_cast<int>(pt.x), static_cast<int>(pt.y) };
 			::ScreenToClient(MainHWND(), &rpt);
@@ -1691,8 +1681,7 @@ sptr_t ScintillaWin::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam
 			}
 			return MAKELONG(SelectionStart().Position(), SelectionEnd().Position());
 
-		case EM_EXGETSEL:
-		{
+		case EM_EXGETSEL: {
 			if (lParam == 0) {
 				return 0;
 			}
@@ -1702,8 +1691,7 @@ sptr_t ScintillaWin::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam
 		}
 		break;
 
-		case EM_SETSEL:
-		{
+		case EM_SETSEL: {
 			Sci::Position nStart = static_cast<Sci::Position>(wParam);
 			Sci::Position nEnd = static_cast<Sci::Position>(lParam);
 			if (nStart == 0 && nEnd == -1) {
@@ -1717,8 +1705,7 @@ sptr_t ScintillaWin::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam
 		}
 		break;
 
-		case EM_EXSETSEL:
-		{
+		case EM_EXSETSEL: {
 			if (lParam == 0) {
 				return 0;
 			}
@@ -2920,8 +2907,7 @@ void ScintillaWin::HorizontalScrollMessage(WPARAM wParam) {
 		xPos = scrollWidth;
 		break;
 	case SB_THUMBPOSITION:
-	case SB_THUMBTRACK:
-	{
+	case SB_THUMBTRACK: {
 		// Do NOT use wParam, its 16 bit and not enough for very long lines. Its still possible to overflow the 32 bit but you have to try harder =]
 		SCROLLINFO si;
 		si.cbSize = sizeof(si);

@@ -85,7 +85,7 @@ public:
 	}
 
 	// Modify foreground and background colours
-	void SetForeBack(const ColourDesired &fore, const ColourDesired &back) noexcept;
+	void SetForeBack(ColourDesired fore, ColourDesired back) noexcept;
 };
 
 }

@@ -14,7 +14,7 @@ struct StyleAndColour {
 	int style;
 	ColourDesired fore;
 	StyleAndColour() : style(INDIC_PLAIN), fore(0, 0, 0) {}
-	StyleAndColour(int style_, const ColourDesired &fore_ = ColourDesired(0, 0, 0)) : style(style_), fore(fore_) {}
+	StyleAndColour(int style_, ColourDesired fore_ = ColourDesired(0, 0, 0)) : style(style_), fore(fore_) {}
 	bool operator==(const StyleAndColour &other) const {
 		return (style == other.style) && (fore == other.fore);
 	}

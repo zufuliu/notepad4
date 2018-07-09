@@ -20,6 +20,7 @@
 #include <algorithm>
 #include <memory>
 #include <chrono>
+
 #ifndef NO_CXX11_REGEX
 #include <regex>
 #endif
@@ -578,7 +579,7 @@ int Document::LenChar(Sci::Position pos) {
 	} else if (IsCrLf(pos)) {
 		return 2;
 	} else if (SC_CP_UTF8 == dbcsCodePage) {
-		const unsigned char leadByte = cb.CharAt(pos);
+		const unsigned char leadByte = cb.UCharAt(pos);
 		const int widthCharBytes = UTF8BytesOfLead(leadByte);
 		const Sci::Position lengthDoc = Length();
 		if ((pos + widthCharBytes) > lengthDoc)
@@ -599,7 +600,7 @@ bool Document::InGoodUTF8(Sci::Position pos, Sci::Position &start, Sci::Position
 	}
 	start = (trail > 0) ? trail - 1 : trail;
 
-	const unsigned char leadByte = cb.CharAt(start);
+	const unsigned char leadByte = cb.UCharAt(start);
 	const int widthCharBytes = UTF8BytesOfLead(leadByte);
 	if (widthCharBytes == 1) {
 		return false;
@@ -609,7 +610,7 @@ bool Document::InGoodUTF8(Sci::Position pos, Sci::Position &start, Sci::Position
 		if (len > trailBytes)
 			// pos too far from lead
 			return false;
-		unsigned char charBytes[UTF8MaxBytes] = { leadByte,0,0,0 };
+		unsigned char charBytes[UTF8MaxBytes] = { leadByte, 0, 0, 0 };
 		for (Sci::Position b = 1; b < widthCharBytes && ((start + b) < cb.Length()); b++) {
 			charBytes[b] = cb.CharAt(start + b);
 		}
@@ -644,7 +645,7 @@ Sci::Position Document::MovePositionOutsideChar(Sci::Position pos, Sci::Position
 
 	if (dbcsCodePage) {
 		if (SC_CP_UTF8 == dbcsCodePage) {
-			const unsigned char ch = cb.CharAt(pos);
+			const unsigned char ch = cb.UCharAt(pos);
 			// If ch is not a trail byte then pos is valid intercharacter position
 			if (UTF8IsTrailByte(ch)) {
 				Sci::Position startUTF = pos;
@@ -706,7 +707,7 @@ Sci::Position Document::NextPosition(Sci::Position pos, int moveDir) const noexc
 		if (SC_CP_UTF8 == dbcsCodePage) {
 			if (increment == 1) {
 				// Simple forward movement case so can avoid some checks
-				const unsigned char leadByte = cb.CharAt(pos);
+				const unsigned char leadByte = cb.UCharAt(pos);
 				if (UTF8IsAscii(leadByte)) {
 					// Single byte character or invalid
 					pos++;
@@ -725,7 +726,7 @@ Sci::Position Document::NextPosition(Sci::Position pos, int moveDir) const noexc
 			} else {
 				// Examine byte before position
 				pos--;
-				const unsigned char ch = cb.CharAt(pos);
+				const unsigned char ch = cb.UCharAt(pos);
 				// If ch is not a trail byte then pos is valid intercharacter position
 				if (UTF8IsTrailByte(ch)) {
 					// If ch is a trail byte in a valid UTF-8 character then return start of character
@@ -788,7 +789,7 @@ Document::CharacterExtracted Document::CharacterAfter(Sci::Position position) co
 	if (position >= Length()) {
 		return CharacterExtracted(unicodeReplacementChar, 0);
 	}
-	const unsigned char leadByte = cb.CharAt(position);
+	const unsigned char leadByte = cb.UCharAt(position);
 	if (!dbcsCodePage || UTF8IsAscii(leadByte)) {
 		// Common case: ASCII character
 		return CharacterExtracted(leadByte, 1);
@@ -797,7 +798,7 @@ Document::CharacterExtracted Document::CharacterAfter(Sci::Position position) co
 		const int widthCharBytes = UTF8BytesOfLead(leadByte);
 		unsigned char charBytes[UTF8MaxBytes] = { leadByte, 0, 0, 0 };
 		for (int b = 1; b < widthCharBytes; b++) {
-			charBytes[b] = cb.CharAt(position + b);
+			charBytes[b] = cb.UCharAt(position + b);
 		}
 		const int utf8status = UTF8Classify(charBytes, widthCharBytes);
 		if (utf8status & UTF8MaskInvalid) {
@@ -808,7 +809,7 @@ Document::CharacterExtracted Document::CharacterAfter(Sci::Position position) co
 		}
 	} else {
 		if (IsDBCSLeadByte(leadByte) && ((position + 1) < Length())) {
-			return CharacterExtracted::DBCS(leadByte, cb.CharAt(position + 1));
+			return CharacterExtracted::DBCS(leadByte, cb.UCharAt(position + 1));
 		} else {
 			return CharacterExtracted(leadByte, 1);
 		}
@@ -819,7 +820,7 @@ Document::CharacterExtracted Document::CharacterBefore(Sci::Position position) c
 	if (position <= 0) {
 		return CharacterExtracted(unicodeReplacementChar, 0);
 	}
-	const unsigned char previousByte = cb.CharAt(position - 1);
+	const unsigned char previousByte = cb.UCharAt(position - 1);
 	if (0 == dbcsCodePage) {
 		return CharacterExtracted(previousByte, 1);
 	}
@@ -837,7 +838,7 @@ Document::CharacterExtracted Document::CharacterBefore(Sci::Position position) c
 				const int widthCharBytes = static_cast<int>(endUTF - startUTF);
 				unsigned char charBytes[UTF8MaxBytes] = { 0, 0, 0, 0 };
 				for (int b = 0; b < widthCharBytes; b++) {
-					charBytes[b] = cb.CharAt(startUTF + b);
+					charBytes[b] = cb.UCharAt(startUTF + b);
 				}
 				const int utf8status = UTF8Classify(charBytes, widthCharBytes);
 				if (utf8status & UTF8MaskInvalid) {
@@ -902,7 +903,7 @@ int SCI_METHOD Document::GetCharacterAndWidth(Sci_Position position, Sci_Positio
 	int character;
 	int bytesInCharacter = 1;
 	if (dbcsCodePage) {
-		const unsigned char leadByte = cb.CharAt(position);
+		const unsigned char leadByte = cb.UCharAt(position);
 		if (SC_CP_UTF8 == dbcsCodePage) {
 			if (UTF8IsAscii(leadByte)) {
 				// Single byte character or invalid
@@ -911,7 +912,7 @@ int SCI_METHOD Document::GetCharacterAndWidth(Sci_Position position, Sci_Positio
 				const int widthCharBytes = UTF8BytesOfLead(leadByte);
 				unsigned char charBytes[UTF8MaxBytes] = { leadByte,0,0,0 };
 				for (int b = 1; b < widthCharBytes; b++) {
-					charBytes[b] = cb.CharAt(position + b);
+					charBytes[b] = cb.UCharAt(position + b);
 				}
 				const int utf8status = UTF8Classify(charBytes, widthCharBytes);
 				if (utf8status & UTF8MaskInvalid) {
@@ -1826,7 +1827,7 @@ void Document::SetCaseFolder(CaseFolder *pcf_) {
 }
 
 Document::CharacterExtracted Document::ExtractCharacter(Sci::Position position) const noexcept {
-	const unsigned char leadByte = cb.CharAt(position);
+	const unsigned char leadByte = cb.UCharAt(position);
 	if (UTF8IsAscii(leadByte)) {
 		// Common case: ASCII character
 		return CharacterExtracted(leadByte, 1);
@@ -1834,7 +1835,7 @@ Document::CharacterExtracted Document::ExtractCharacter(Sci::Position position) 
 	const int widthCharBytes = UTF8BytesOfLead(leadByte);
 	unsigned char charBytes[UTF8MaxBytes] = { leadByte, 0, 0, 0 };
 	for (int b = 1; b < widthCharBytes; b++) {
-		charBytes[b] = cb.CharAt(position + b);
+		charBytes[b] = cb.UCharAt(position + b);
 	}
 	const int utf8status = UTF8Classify(charBytes, widthCharBytes);
 	if (utf8status & UTF8MaskInvalid) {
@@ -1910,7 +1911,7 @@ Sci::Position Document::FindText(Sci::Position minPos, Sci::Position maxPos, con
 				size_t indexSearch = 0;
 				bool characterMatches = true;
 				for (;;) {
-					const unsigned char leadByte = cb.CharAt(posIndexDocument);
+					const unsigned char leadByte = cb.UCharAt(posIndexDocument);
 					bytes[0] = leadByte;
 					int widthChar = 1;
 					if (!UTF8IsAscii(leadByte)) {
@@ -1970,6 +1971,7 @@ Sci::Position Document::FindText(Sci::Position minPos, Sci::Position maxPos, con
 						break;
 					char folded[maxBytesCharacter * maxFoldingExpansion + 1];
 					const size_t lenFlat = pcf->Fold(folded, sizeof(folded), bytes, widthChar);
+					// memcmp may examine lenFlat bytes in both arguments so assert it doesn't read past end of searchThing
 					assert((indexSearch + lenFlat) <= searchThing.size());
 					// Does folded match the buffer
 					characterMatches = 0 == memcmp(folded, &searchThing[0] + indexSearch, lenFlat);
@@ -2519,7 +2521,6 @@ Sci::Position Document::BraceMatch(Sci::Position position, Sci::Position /*maxRe
 class BuiltinRegex : public RegexSearchBase {
 public:
 	explicit BuiltinRegex(CharClassify *charClassTable) : search(charClassTable) {}
-
 	BuiltinRegex(const BuiltinRegex &) = delete;
 	BuiltinRegex(BuiltinRegex &&) = delete;
 	BuiltinRegex &operator=(const BuiltinRegex &) = delete;

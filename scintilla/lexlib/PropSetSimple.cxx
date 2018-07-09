@@ -77,7 +77,7 @@ void PropSetSimple::SetMultiple(const char *s) {
 
 const char *PropSetSimple::Get(const char *key) const {
 	mapss *props = PropsFromPointer(impl);
-	mapss::const_iterator keyPos = props->find(std::string(key));
+	const auto keyPos = props->find(std::string(key));
 	if (keyPos != props->end()) {
 		return keyPos->second.c_str();
 	} else {

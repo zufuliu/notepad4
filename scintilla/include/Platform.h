@@ -189,11 +189,9 @@ public:
 	unsigned char GetRed() const noexcept {
 		return co & 0xff;
 	}
-
 	unsigned char GetGreen() const noexcept {
 		return (co >> 8) & 0xff;
 	}
-
 	unsigned char GetBlue() const noexcept {
 		return (co >> 16) & 0xff;
 	}
@@ -222,7 +220,7 @@ public:
 	ColourAlpha(unsigned int red, unsigned int green, unsigned int blue, unsigned int alpha) noexcept :
 		ColourDesired(red | (green << 8) | (blue << 16) | (alpha << 24)) {}
 
-	ColourAlpha(const ColourDesired &cd, unsigned int alpha) noexcept :
+	ColourAlpha(ColourDesired cd, unsigned int alpha) noexcept :
 		ColourDesired(cd.AsInteger() | (alpha << 24)) {}
 
 	ColourDesired GetColour() const noexcept {
@@ -237,7 +235,7 @@ public:
 		return GetAlpha() / componentMaximum;
 	}
 
-	ColourAlpha MixedWith(const ColourAlpha &other) const noexcept {
+	ColourAlpha MixedWith(ColourAlpha other) const noexcept {
 		const unsigned int red = (GetRed() + other.GetRed()) / 2;
 		const unsigned int green = (GetGreen() + other.GetGreen()) / 2;
 		const unsigned int blue = (GetBlue() + other.GetBlue()) / 2;
@@ -361,31 +359,31 @@ public:
 
 	virtual void Release() = 0;
 	virtual bool Initialised() const = 0;
-	virtual void PenColour(const ColourDesired &fore) = 0;
+	virtual void PenColour(ColourDesired fore) = 0;
 	virtual int LogPixelsY() const = 0;
 	virtual int DeviceHeightFont(int points) const = 0;
 	virtual void MoveTo(int x_, int y_) = 0;
 	virtual void LineTo(int x_, int y_) = 0;
-	virtual void Polygon(const Point *pts, size_t npts, const ColourDesired &fore, const ColourDesired &back) = 0;
-	virtual void RectangleDraw(const PRectangle &rc, const ColourDesired &fore, const ColourDesired &back) = 0;
-	virtual void FillRectangle(const PRectangle &rc, const ColourDesired &back) = 0;
+	virtual void Polygon(const Point *pts, size_t npts, ColourDesired fore, ColourDesired back) = 0;
+	virtual void RectangleDraw(const PRectangle &rc, ColourDesired fore, ColourDesired back) = 0;
+	virtual void FillRectangle(const PRectangle &rc, ColourDesired back) = 0;
 	virtual void FillRectangle(const PRectangle &rc, const Surface &surfacePattern) = 0;
-	virtual void RoundedRectangle(const PRectangle &rc, const ColourDesired &fore, const ColourDesired &back) = 0;
-	virtual void AlphaRectangle(const PRectangle &rc, int cornerSize, const ColourDesired &fill, int alphaFill,
-		const ColourDesired &outline, int alphaOutline, int flags) = 0;
+	virtual void RoundedRectangle(const PRectangle &rc, ColourDesired fore, ColourDesired back) = 0;
+	virtual void AlphaRectangle(const PRectangle &rc, int cornerSize, ColourDesired fill, int alphaFill,
+		ColourDesired outline, int alphaOutline, int flags) = 0;
 	enum class GradientOptions {
 		leftToRight, topToBottom
 	};
 	virtual void GradientRectangle(const PRectangle &rc, const std::vector<ColourStop> &stops, GradientOptions options) = 0;
 	virtual void DrawRGBAImage(const PRectangle &rc, int width, int height, const unsigned char *pixelsImage) = 0;
-	virtual void Ellipse(const PRectangle &rc, const ColourDesired &fore, const ColourDesired &back) = 0;
+	virtual void Ellipse(const PRectangle &rc, ColourDesired fore, ColourDesired back) = 0;
 	virtual void Copy(const PRectangle &rc, const Point &from, const Surface &surfaceSource) = 0;
 
 	virtual std::unique_ptr<IScreenLineLayout> Layout(const IScreenLine *screenLine) = 0;
 
-	virtual void DrawTextNoClip(const PRectangle &rc, const Font &font_, XYPOSITION ybase, std::string_view text, const ColourDesired &fore, const ColourDesired &back) = 0;
-	virtual void DrawTextClipped(const PRectangle &rc, const Font &font_, XYPOSITION ybase, std::string_view text, const ColourDesired &fore, const ColourDesired &back) = 0;
-	virtual void DrawTextTransparent(const PRectangle &rc, const Font &font_, XYPOSITION ybase, std::string_view text, const ColourDesired &fore) = 0;
+	virtual void DrawTextNoClip(const PRectangle &rc, const Font &font_, XYPOSITION ybase, std::string_view text, ColourDesired fore, ColourDesired back) = 0;
+	virtual void DrawTextClipped(const PRectangle &rc, const Font &font_, XYPOSITION ybase, std::string_view text, ColourDesired fore, ColourDesired back) = 0;
+	virtual void DrawTextTransparent(const PRectangle &rc, const Font &font_, XYPOSITION ybase, std::string_view text, ColourDesired fore) = 0;
 	virtual void MeasureWidths(const Font &font_, std::string_view text, XYPOSITION *positions) = 0;
 	virtual XYPOSITION WidthText(const Font &font_, std::string_view text) = 0;
 	virtual XYPOSITION Ascent(const Font &font_) = 0;

@@ -435,15 +435,15 @@ void EditView::LayoutLine(const EditModel &model, Sci::Line line, Surface *surfa
 			for (int charInLine = 0; charInLine < lineLength; charInLine++) {
 				const char chDoc = ll->chars[charInLine];
 				if (vstyle.styles[ll->styles[charInLine]].caseForce == Style::caseUpper)
-					ll->chars[charInLine] = static_cast<char>(MakeUpperCase(chDoc));
+					ll->chars[charInLine] = MakeUpperCase(chDoc);
 				else if (vstyle.styles[ll->styles[charInLine]].caseForce == Style::caseLower)
-					ll->chars[charInLine] = static_cast<char>(MakeLowerCase(chDoc));
+					ll->chars[charInLine] = MakeLowerCase(chDoc);
 				else if (vstyle.styles[ll->styles[charInLine]].caseForce == Style::caseCamel) {
 					if ((model.pdoc->IsASCIIWordByte(ll->chars[charInLine])) &&
 						((charInLine == 0) || (!model.pdoc->IsASCIIWordByte(ll->chars[charInLine - 1])))) {
-						ll->chars[charInLine] = static_cast<char>(MakeUpperCase(chDoc));
+						ll->chars[charInLine] = MakeUpperCase(chDoc);
 					} else {
-						ll->chars[charInLine] = static_cast<char>(MakeLowerCase(chDoc));
+						ll->chars[charInLine] = MakeLowerCase(chDoc);
 					}
 				}
 			}
@@ -868,14 +868,14 @@ void EditView::DrawIndentGuide(Surface *surface, Sci::Line lineVisible, int line
 		highlight ? *pixmapIndentGuideHighlight : *pixmapIndentGuide);
 }
 
-static void SimpleAlphaRectangle(Surface *surface, const PRectangle &rc, const ColourDesired &fill, int alpha) {
+static void SimpleAlphaRectangle(Surface *surface, const PRectangle &rc, ColourDesired fill, int alpha) {
 	if (alpha != SC_ALPHA_NOALPHA) {
 		surface->AlphaRectangle(rc, 0, fill, alpha, fill, alpha, 0);
 	}
 }
 
 static void DrawTextBlob(Surface *surface, const ViewStyle &vsDraw, const PRectangle &rcSegment,
-	std::string_view text, const ColourDesired &textBack, const ColourDesired &textFore, bool fillBackground) {
+	std::string_view text, ColourDesired textBack, ColourDesired textFore, bool fillBackground) {
 	if (rcSegment.Empty())
 		return;
 	if (fillBackground) {
@@ -932,7 +932,7 @@ static void DrawCaretLineFramed(Surface *surface, const ViewStyle &vsDraw, const
 
 void EditView::DrawEOL(Surface *surface, const EditModel &model, const ViewStyle &vsDraw, const LineLayout *ll,
 	const PRectangle &rcLine, Sci::Line line, Sci::Position lineEnd, int xStart, int subLine, XYACCUMULATOR subLineStart,
-	const ColourOptional &background) {
+	ColourOptional background) {
 
 	const Sci::Position posLineStart = model.pdoc->LineStart(line);
 	PRectangle rcSegment = rcLine;
@@ -1349,7 +1349,7 @@ void EditView::DrawAnnotation(Surface *surface, const EditModel &model, const Vi
 }
 
 static void DrawBlockCaret(Surface *surface, const EditModel &model, const ViewStyle &vsDraw, const LineLayout *ll,
-	int subLine, int xStart, Sci::Position offset, Sci::Position posCaret, const PRectangle &rcCaret_, const ColourDesired &caretColour) {
+	int subLine, int xStart, Sci::Position offset, Sci::Position posCaret, const PRectangle &rcCaret_, ColourDesired caretColour) {
 	PRectangle rcCaret = rcCaret_;
 	const Sci::Position lineStart = ll->LineStart(subLine);
 	Sci::Position posBefore = posCaret;
@@ -1517,7 +1517,7 @@ void EditView::DrawCarets(Surface *surface, const EditModel &model, const ViewSt
 }
 
 static void DrawWrapIndentAndMarker(Surface *surface, const ViewStyle &vsDraw, const LineLayout *ll,
-	int xStart, const PRectangle &rcLine, const ColourOptional &background, DrawWrapMarkerFn customDrawWrapMarker,
+	int xStart, const PRectangle &rcLine, ColourOptional background, DrawWrapMarkerFn customDrawWrapMarker,
 	bool caretActive) {
 	// default bgnd here..
 	surface->FillRectangle(rcLine, background.isSet ? background :
@@ -1553,7 +1553,7 @@ static void DrawWrapIndentAndMarker(Surface *surface, const ViewStyle &vsDraw, c
 
 void EditView::DrawBackground(Surface *surface, const EditModel &model, const ViewStyle &vsDraw, const LineLayout *ll,
 	const PRectangle &rcLine, const Range &lineRange, Sci::Position posLineStart, int xStart,
-	int subLine, const ColourOptional &background) const {
+	int subLine, ColourOptional background) const {
 
 	const bool selBackDrawn = vsDraw.SelectionBackgroundDrawn();
 	bool inIndentation = subLine == 0;	// Do not handle indentation except on first subline.
@@ -1765,7 +1765,7 @@ static void DrawTranslucentLineState(Surface *surface, const EditModel &model, c
 
 void EditView::DrawForeground(Surface *surface, const EditModel &model, const ViewStyle &vsDraw, const LineLayout *ll,
 	Sci::Line lineVisible, const PRectangle &rcLine, const Range &lineRange, Sci::Position posLineStart, int xStart,
-	int subLine, const ColourOptional &background) {
+	int subLine, ColourOptional background) {
 
 	const bool selBackDrawn = vsDraw.SelectionBackgroundDrawn();
 	const bool drawWhitespaceBackground = vsDraw.WhitespaceBackgroundDrawn() && !background.isSet;
@@ -2171,7 +2171,6 @@ void EditView::PaintText(Surface *surfaceWindow, const EditModel &model, const P
 		double durCopy = 0.0;
 		ElapsedPeriod epWhole;
 #endif
-
 		const bool bracesIgnoreStyle = ((vsDraw.braceHighlightIndicatorSet && (model.bracesMatchStyle == STYLE_BRACELIGHT)) ||
 			(vsDraw.braceBadLightIndicatorSet && (model.bracesMatchStyle == STYLE_BRACEBAD)));
 
@@ -2213,7 +2212,6 @@ void EditView::PaintText(Surface *surfaceWindow, const EditModel &model, const P
 #if defined(TIME_PAINTING)
 				durLayout += ep.Duration(true);
 #endif
-
 				if (ll) {
 					ll->containsCaret = !hideSelection && (lineDoc == lineCaret);
 					ll->hotspot = model.GetHotSpotRange();
@@ -2246,7 +2244,6 @@ void EditView::PaintText(Surface *surfaceWindow, const EditModel &model, const P
 #if defined(TIME_PAINTING)
 					durPaint += ep.Duration(true);
 #endif
-
 					// Restore the previous styles for the brace highlights in case layout is in cache.
 					ll->RestoreBracesHighlight(rangeLine, model.braces, bracesIgnoreStyle);
 
@@ -2286,7 +2283,6 @@ void EditView::PaintText(Surface *surfaceWindow, const EditModel &model, const P
 		if (durPaint < 0.00000001)
 			durPaint = 0.00000001;
 #endif
-
 		// Right column limit indicator
 		PRectangle rcBeyondEOF = (vsDraw.marginInside) ? rcClient : rcArea;
 		rcBeyondEOF.left = static_cast<XYPOSITION>(vsDraw.textStart);
@@ -2350,7 +2346,7 @@ void EditView::FillLineRemainder(Surface *surface, const EditModel &model, const
 // Space (3 space characters) between line numbers and text when printing.
 #define lineNumberPrintSpace "   "
 
-static ColourDesired InvertedLight(const ColourDesired &orig) {
+static ColourDesired InvertedLight(ColourDesired orig) {
 	unsigned int r = orig.GetRed();
 	unsigned int g = orig.GetGreen();
 	unsigned int b = orig.GetBlue();

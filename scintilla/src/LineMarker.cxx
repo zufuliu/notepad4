@@ -79,7 +79,7 @@ void LineMarker::SetRGBAImage(const Point &sizeRGBAImage, float scale, const uns
 	markType = SC_MARK_RGBAIMAGE;
 }
 
-static void DrawBox(Surface *surface, int centreX, int centreY, int armSize, const ColourDesired &fore, const ColourDesired &back) {
+static void DrawBox(Surface *surface, int centreX, int centreY, int armSize, ColourDesired fore, ColourDesired back) {
 	const PRectangle rc = PRectangle::FromInts(
 		centreX - armSize,
 		centreY - armSize,
@@ -88,7 +88,7 @@ static void DrawBox(Surface *surface, int centreX, int centreY, int armSize, con
 	surface->RectangleDraw(rc, back, fore);
 }
 
-static void DrawCircle(Surface *surface, int centreX, int centreY, int armSize, const ColourDesired &fore, const ColourDesired &back) {
+static void DrawCircle(Surface *surface, int centreX, int centreY, int armSize, ColourDesired fore, ColourDesired back) {
 	const PRectangle rcCircle = PRectangle::FromInts(
 		centreX - armSize,
 		centreY - armSize,
@@ -97,14 +97,14 @@ static void DrawCircle(Surface *surface, int centreX, int centreY, int armSize, 
 	surface->Ellipse(rcCircle, back, fore);
 }
 
-static void DrawPlus(Surface *surface, int centreX, int centreY, int armSize, const ColourDesired &fore) {
+static void DrawPlus(Surface *surface, int centreX, int centreY, int armSize, ColourDesired fore) {
 	const PRectangle rcV = PRectangle::FromInts(centreX, centreY - armSize + 2, centreX + 1, centreY + armSize - 2 + 1);
 	surface->FillRectangle(rcV, fore);
 	const PRectangle rcH = PRectangle::FromInts(centreX - armSize + 2, centreY, centreX + armSize - 2 + 1, centreY + 1);
 	surface->FillRectangle(rcH, fore);
 }
 
-static void DrawMinus(Surface *surface, int centreX, int centreY, int armSize, const ColourDesired &fore) {
+static void DrawMinus(Surface *surface, int centreX, int centreY, int armSize, ColourDesired fore) {
 	const PRectangle rcH = PRectangle::FromInts(centreX - armSize + 2, centreY, centreX + armSize - 2 + 1, centreY + 1);
 	surface->FillRectangle(rcH, fore);
 }

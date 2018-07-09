@@ -523,7 +523,7 @@ class SurfaceGDI : public Surface {
 
 	int codePage;
 
-	void BrushColor(const ColourDesired &back);
+	void BrushColor(ColourDesired back);
 	void SetFont(const Font &font_);
 	void Clear();
 
@@ -543,29 +543,29 @@ public:
 
 	void Release() override;
 	bool Initialised() const override;
-	void PenColour(const ColourDesired &fore) override;
+	void PenColour(ColourDesired fore) override;
 	int LogPixelsY() const override;
 	int DeviceHeightFont(int points) const override;
 	void MoveTo(int x_, int y_) override;
 	void LineTo(int x_, int y_) override;
-	void Polygon(const Point *pts, size_t npts, const ColourDesired &fore, const ColourDesired &back) override;
-	void RectangleDraw(const PRectangle &rc, const ColourDesired &fore, const ColourDesired &back) override;
-	void FillRectangle(const PRectangle &rc, const ColourDesired &back) override;
+	void Polygon(const Point *pts, size_t npts, ColourDesired fore, ColourDesired back) override;
+	void RectangleDraw(const PRectangle &rc, ColourDesired fore, ColourDesired back) override;
+	void FillRectangle(const PRectangle &rc, ColourDesired back) override;
 	void FillRectangle(const PRectangle &rc, const Surface &surfacePattern) override;
-	void RoundedRectangle(const PRectangle &rc, const ColourDesired &fore, const ColourDesired &back) override;
-	void AlphaRectangle(const PRectangle &rc, int cornerSize, const ColourDesired &fill, int alphaFill,
-		const ColourDesired &outline, int alphaOutline, int flags) override;
+	void RoundedRectangle(const PRectangle &rc, ColourDesired fore, ColourDesired back) override;
+	void AlphaRectangle(const PRectangle &rc, int cornerSize, ColourDesired fill, int alphaFill,
+		ColourDesired outline, int alphaOutline, int flags) override;
 	void GradientRectangle(const PRectangle &rc, const std::vector<ColourStop> &stops, GradientOptions options) override;
 	void DrawRGBAImage(const PRectangle &rc, int width, int height, const unsigned char *pixelsImage) override;
-	void Ellipse(const PRectangle &rc, const ColourDesired &fore, const ColourDesired &back) override;
+	void Ellipse(const PRectangle &rc, ColourDesired fore, ColourDesired back) override;
 	void Copy(const PRectangle &rc, const Point &from, const Surface &surfaceSource) override;
 
 	std::unique_ptr<IScreenLineLayout> Layout(const IScreenLine *screenLine) override;
 
 	void DrawTextCommon(const PRectangle &rc, const Font &font_, XYPOSITION ybase, std::string_view text, UINT fuOptions);
-	void DrawTextNoClip(const PRectangle &rc, const Font &font_, XYPOSITION ybase, std::string_view text, const ColourDesired &fore, const ColourDesired &back) override;
-	void DrawTextClipped(const PRectangle &rc, const Font &font_, XYPOSITION ybase, std::string_view text, const ColourDesired &fore, const ColourDesired &back) override;
-	void DrawTextTransparent(const PRectangle &rc, const Font &font_, XYPOSITION ybase, std::string_view text, const ColourDesired &fore) override;
+	void DrawTextNoClip(const PRectangle &rc, const Font &font_, XYPOSITION ybase, std::string_view text, ColourDesired fore, ColourDesired back) override;
+	void DrawTextClipped(const PRectangle &rc, const Font &font_, XYPOSITION ybase, std::string_view text, ColourDesired fore, ColourDesired back) override;
+	void DrawTextTransparent(const PRectangle &rc, const Font &font_, XYPOSITION ybase, std::string_view text, ColourDesired fore) override;
 	void MeasureWidths(const Font &font_, std::string_view text, XYPOSITION *positions) override;
 	XYPOSITION WidthText(const Font &font_, std::string_view text) override;
 	XYPOSITION Ascent(const Font &font_) override;
@@ -665,7 +665,7 @@ void SurfaceGDI::InitPixMap(int width, int height, Surface *surface_, WindowID) 
 	SetDBCSMode(psurfOther->codePage);
 }
 
-void SurfaceGDI::PenColour(const ColourDesired &fore) {
+void SurfaceGDI::PenColour(ColourDesired fore) {
 	if (pen) {
 		::SelectObject(hdc, penOld);
 		::DeleteObject(pen);
@@ -676,7 +676,7 @@ void SurfaceGDI::PenColour(const ColourDesired &fore) {
 	penOld = static_cast<HPEN>(::SelectObject(hdc, pen));
 }
 
-void SurfaceGDI::BrushColor(const ColourDesired &back) {
+void SurfaceGDI::BrushColor(ColourDesired back) {
 	if (brush) {
 		::SelectObject(hdc, brushOld);
 		::DeleteObject(brush);
@@ -718,10 +718,11 @@ void SurfaceGDI::LineTo(int x_, int y_) {
 	::LineTo(hdc, x_, y_);
 }
 
-void SurfaceGDI::Polygon(const Point *pts, size_t npts, const ColourDesired &fore, const ColourDesired &back) {
+void SurfaceGDI::Polygon(const Point *pts, size_t npts, ColourDesired fore, ColourDesired back) {
 	PenColour(fore);
 	BrushColor(back);
-	std::vector<POINT> outline(npts);
+	std::vector<POINT> outline;
+	outline.reserve(npts);
 	for (size_t i = 0; i < npts; i++) {
 		POINT pt = { static_cast<LONG>(pts[i].x), static_cast<LONG>(pts[i].y) };
 		outline.push_back(pt);
@@ -729,14 +730,14 @@ void SurfaceGDI::Polygon(const Point *pts, size_t npts, const ColourDesired &for
 	::Polygon(hdc, &outline[0], static_cast<int>(npts));
 }
 
-void SurfaceGDI::RectangleDraw(const PRectangle &rc, const ColourDesired &fore, const ColourDesired &back) {
+void SurfaceGDI::RectangleDraw(const PRectangle &rc, ColourDesired fore, ColourDesired back) {
 	PenColour(fore);
 	BrushColor(back);
 	const RECT rcw = RectFromPRectangle(rc);
 	::Rectangle(hdc, rcw.left, rcw.top, rcw.right, rcw.bottom);
 }
 
-void SurfaceGDI::FillRectangle(const PRectangle &rc, const ColourDesired &back) {
+void SurfaceGDI::FillRectangle(const PRectangle &rc, ColourDesired back) {
 	// Using ExtTextOut rather than a FillRect ensures that no dithering occurs.
 	// There is no need to allocate a brush either.
 	const RECT rcw = RectFromPRectangle(rc);
@@ -755,7 +756,7 @@ void SurfaceGDI::FillRectangle(const PRectangle &rc, const Surface &surfacePatte
 	::DeleteObject(br);
 }
 
-void SurfaceGDI::RoundedRectangle(const PRectangle &rc, const ColourDesired &fore, const ColourDesired &back) {
+void SurfaceGDI::RoundedRectangle(const PRectangle &rc, ColourDesired fore, ColourDesired back) {
 	PenColour(fore);
 	BrushColor(back);
 	const RECT rcw = RectFromPRectangle(rc);
@@ -766,6 +767,7 @@ void SurfaceGDI::RoundedRectangle(const PRectangle &rc, const ColourDesired &for
 }
 
 namespace {
+
 // Plot a point into a DWORD buffer symmetrically to all 4 quadrants
 void AllFour(DWORD *pixels, int width, int height, int x, int y, DWORD val) {
 	pixels[y*width + x] = val;
@@ -796,8 +798,8 @@ DWORD dwordMultiplied(ColourDesired colour, unsigned int alpha) {
 
 }
 
-void SurfaceGDI::AlphaRectangle(const PRectangle &rc, int cornerSize, const ColourDesired &fill, int alphaFill,
-	const ColourDesired &outline, int alphaOutline, int /* flags*/) {
+void SurfaceGDI::AlphaRectangle(const PRectangle &rc, int cornerSize, ColourDesired fill, int alphaFill,
+	ColourDesired outline, int alphaOutline, int /* flags*/) {
 	const RECT rcw = RectFromPRectangle(rc);
 	if (rc.Width() > 0) {
 		HDC hMemDC = ::CreateCompatibleDC(hdc);
@@ -902,7 +904,7 @@ void SurfaceGDI::DrawRGBAImage(const PRectangle &rc_, int width, int height, con
 	}
 }
 
-void SurfaceGDI::Ellipse(const PRectangle &rc, const ColourDesired &fore, const ColourDesired &back) {
+void SurfaceGDI::Ellipse(const PRectangle &rc, ColourDesired fore, ColourDesired back) {
 	PenColour(fore);
 	BrushColor(back);
 	const RECT rcw = RectFromPRectangle(rc);
@@ -938,21 +940,21 @@ void SurfaceGDI::DrawTextCommon(const PRectangle &rc, const Font &font_, XYPOSIT
 }
 
 void SurfaceGDI::DrawTextNoClip(const PRectangle &rc, const Font &font_, XYPOSITION ybase, std::string_view text,
-	const ColourDesired &fore, const ColourDesired &back) {
+	ColourDesired fore, ColourDesired back) {
 	::SetTextColor(hdc, fore.AsInteger());
 	::SetBkColor(hdc, back.AsInteger());
 	DrawTextCommon(rc, font_, ybase, text, ETO_OPAQUE);
 }
 
 void SurfaceGDI::DrawTextClipped(const PRectangle &rc, const Font &font_, XYPOSITION ybase, std::string_view text,
-	const ColourDesired &fore, const ColourDesired &back) {
+	ColourDesired fore, ColourDesired back) {
 	::SetTextColor(hdc, fore.AsInteger());
 	::SetBkColor(hdc, back.AsInteger());
 	DrawTextCommon(rc, font_, ybase, text, ETO_OPAQUE | ETO_CLIPPED);
 }
 
 void SurfaceGDI::DrawTextTransparent(const PRectangle &rc, const Font &font_, XYPOSITION ybase, std::string_view text,
-	const ColourDesired &fore) {
+	ColourDesired fore) {
 	// Avoid drawing spaces in transparent mode
 	for (size_t i = 0; i < text.length(); i++) {
 		if (text[i] != ' ') {
@@ -1125,30 +1127,30 @@ public:
 
 	HRESULT FlushDrawing() const;
 
-	void PenColour(const ColourDesired &fore) override;
-	void D2DPenColour(const ColourDesired &fore, int alpha = 255);
+	void PenColour(ColourDesired fore) override;
+	void D2DPenColour(ColourDesired fore, int alpha = 255);
 	int LogPixelsY() const override;
 	int DeviceHeightFont(int points) const override;
 	void MoveTo(int x_, int y_) override;
 	void LineTo(int x_, int y_) override;
-	void Polygon(const Point *pts, size_t npts, const ColourDesired &fore, const ColourDesired &back) override;
-	void RectangleDraw(const PRectangle &rc, const ColourDesired &fore, const ColourDesired &back) override;
-	void FillRectangle(const PRectangle &rc, const ColourDesired &back) override;
+	void Polygon(const Point *pts, size_t npts, ColourDesired fore, ColourDesired back) override;
+	void RectangleDraw(const PRectangle &rc, ColourDesired fore, ColourDesired back) override;
+	void FillRectangle(const PRectangle &rc, ColourDesired back) override;
 	void FillRectangle(const PRectangle &rc, const Surface &surfacePattern) override;
-	void RoundedRectangle(const PRectangle &rc, const ColourDesired &fore, const ColourDesired &back) override;
-	void AlphaRectangle(const PRectangle &rc, int cornerSize, const ColourDesired &fill, int alphaFill,
-		const ColourDesired &outline, int alphaOutline, int flags) override;
+	void RoundedRectangle(const PRectangle &rc, ColourDesired fore, ColourDesired back) override;
+	void AlphaRectangle(const PRectangle &rc, int cornerSize, ColourDesired fill, int alphaFill,
+		ColourDesired outline, int alphaOutline, int flags) override;
 	void GradientRectangle(const PRectangle &rc, const std::vector<ColourStop> &stops, GradientOptions options) override;
 	void DrawRGBAImage(const PRectangle &rc, int width, int height, const unsigned char *pixelsImage) override;
-	void Ellipse(const PRectangle &rc, const ColourDesired &fore, const ColourDesired &back) override;
+	void Ellipse(const PRectangle &rc, ColourDesired fore, ColourDesired back) override;
 	void Copy(const PRectangle &rc, const Point &from, const Surface &surfaceSource) override;
 
 	std::unique_ptr<IScreenLineLayout> Layout(const IScreenLine *screenLine) override;
 
 	void DrawTextCommon(const PRectangle &rc, const Font &font_, XYPOSITION ybase, std::string_view text, UINT fuOptions);
-	void DrawTextNoClip(const PRectangle &rc, const Font &font_, XYPOSITION ybase, std::string_view text, const ColourDesired &fore, const ColourDesired &back) override;
-	void DrawTextClipped(const PRectangle &rc, const Font &font_, XYPOSITION ybase, std::string_view text, const ColourDesired &fore, const ColourDesired &back) override;
-	void DrawTextTransparent(const PRectangle &rc, const Font &font_, XYPOSITION ybase, std::string_view text, const ColourDesired &fore) override;
+	void DrawTextNoClip(const PRectangle &rc, const Font &font_, XYPOSITION ybase, std::string_view text, ColourDesired fore, ColourDesired back) override;
+	void DrawTextClipped(const PRectangle &rc, const Font &font_, XYPOSITION ybase, std::string_view text, ColourDesired fore, ColourDesired back) override;
+	void DrawTextTransparent(const PRectangle &rc, const Font &font_, XYPOSITION ybase, std::string_view text, ColourDesired fore) override;
 	void MeasureWidths(const Font &font_, std::string_view text, XYPOSITION *positions) override;
 	XYPOSITION WidthText(const Font &font_, std::string_view text) override;
 	XYPOSITION Ascent(const Font &font_) override;
@@ -1265,11 +1267,11 @@ void SurfaceD2D::InitPixMap(int width, int height, Surface *surface_, WindowID) 
 	SetDBCSMode(psurfOther->codePage);
 }
 
-void SurfaceD2D::PenColour(const ColourDesired &fore) {
+void SurfaceD2D::PenColour(ColourDesired fore) {
 	D2DPenColour(fore);
 }
 
-void SurfaceD2D::D2DPenColour(const ColourDesired &fore, int alpha) {
+void SurfaceD2D::D2DPenColour(ColourDesired fore, int alpha) {
 	if (pRenderTarget) {
 		D2D_COLOR_F col;
 		col.r = (fore.AsInteger() & 0xff) / 255.0f;
@@ -1365,7 +1367,7 @@ void SurfaceD2D::LineTo(int x_, int y_) {
 	}
 }
 
-void SurfaceD2D::Polygon(const Point *pts, size_t npts, const ColourDesired &fore, const ColourDesired &back) {
+void SurfaceD2D::Polygon(const Point *pts, size_t npts, ColourDesired fore, ColourDesired back) {
 	if (pRenderTarget) {
 		ID2D1Factory *pFactory = nullptr;
 		pRenderTarget->GetFactory(&pFactory);
@@ -1394,7 +1396,7 @@ void SurfaceD2D::Polygon(const Point *pts, size_t npts, const ColourDesired &for
 	}
 }
 
-void SurfaceD2D::RectangleDraw(const PRectangle &rc, const ColourDesired &fore, const ColourDesired &back) {
+void SurfaceD2D::RectangleDraw(const PRectangle &rc, ColourDesired fore, ColourDesired back) {
 	if (pRenderTarget) {
 		const D2D1_RECT_F rectangle1 = D2D1::RectF(round(rc.left) + 0.5f, rc.top + 0.5f, round(rc.right) - 0.5f, rc.bottom - 0.5f);
 		D2DPenColour(back);
@@ -1404,7 +1406,7 @@ void SurfaceD2D::RectangleDraw(const PRectangle &rc, const ColourDesired &fore, 
 	}
 }
 
-void SurfaceD2D::FillRectangle(const PRectangle &rc, const ColourDesired &back) {
+void SurfaceD2D::FillRectangle(const PRectangle &rc, ColourDesired back) {
 	if (pRenderTarget) {
 		D2DPenColour(back);
 		const D2D1_RECT_F rectangle1 = D2D1::RectF(round(rc.left), rc.top, round(rc.right), rc.bottom);
@@ -1436,7 +1438,7 @@ void SurfaceD2D::FillRectangle(const PRectangle &rc, const Surface &surfacePatte
 	}
 }
 
-void SurfaceD2D::RoundedRectangle(const PRectangle &rc, const ColourDesired &fore, const ColourDesired &back) {
+void SurfaceD2D::RoundedRectangle(const PRectangle &rc, ColourDesired fore, ColourDesired back) {
 	if (pRenderTarget) {
 		D2D1_ROUNDED_RECT roundedRectFill = {
 			D2D1::RectF(rc.left + 1.0f, rc.top + 1.0f, rc.right - 1.0f, rc.bottom - 1.0f),
@@ -1452,8 +1454,8 @@ void SurfaceD2D::RoundedRectangle(const PRectangle &rc, const ColourDesired &for
 	}
 }
 
-void SurfaceD2D::AlphaRectangle(const PRectangle &rc, int cornerSize, const ColourDesired &fill, int alphaFill,
-	const ColourDesired &outline, int alphaOutline, int /* flags*/) {
+void SurfaceD2D::AlphaRectangle(const PRectangle &rc, int cornerSize, ColourDesired fill, int alphaFill,
+	ColourDesired outline, int alphaOutline, int /* flags*/) {
 	if (pRenderTarget) {
 		if (cornerSize == 0) {
 			// When corner size is zero, draw square rectangle to prevent blurry pixels at corners
@@ -1483,7 +1485,7 @@ void SurfaceD2D::AlphaRectangle(const PRectangle &rc, int cornerSize, const Colo
 
 namespace {
 
-D2D_COLOR_F ColorFromColourAlpha(const ColourAlpha &colour) noexcept {
+D2D_COLOR_F ColorFromColourAlpha(ColourAlpha colour) noexcept {
 	D2D_COLOR_F col;
 	col.r = colour.GetRedComponent();
 	col.g = colour.GetGreenComponent();
@@ -1508,7 +1510,8 @@ void SurfaceD2D::GradientRectangle(const PRectangle &rc, const std::vector<Colou
 			break;
 		}
 
-		std::vector<D2D1_GRADIENT_STOP> gradientStops(stops.size());
+		std::vector<D2D1_GRADIENT_STOP> gradientStops;
+		gradientStops.reserve(stops.size());
 		for (const ColourStop &stop : stops) {
 			gradientStops.push_back({ stop.position, ColorFromColourAlpha(stop.colour) });
 		}
@@ -1567,7 +1570,7 @@ void SurfaceD2D::DrawRGBAImage(const PRectangle &rc_, int width, int height, con
 	}
 }
 
-void SurfaceD2D::Ellipse(const PRectangle &rc, const ColourDesired &fore, const ColourDesired &back) {
+void SurfaceD2D::Ellipse(const PRectangle &rc, ColourDesired fore, ColourDesired back) {
 	if (pRenderTarget) {
 		const FLOAT radius = rc.Width() / 2.0f;
 		D2D1_ELLIPSE ellipse = {
@@ -2016,7 +2019,7 @@ void SurfaceD2D::DrawTextCommon(const PRectangle &rc, const Font &font_, XYPOSIT
 }
 
 void SurfaceD2D::DrawTextNoClip(const PRectangle &rc, const Font &font_, XYPOSITION ybase, std::string_view text,
-	const ColourDesired &fore, const ColourDesired &back) {
+	ColourDesired fore, ColourDesired back) {
 	if (pRenderTarget) {
 		FillRectangle(rc, back);
 		D2DPenColour(fore);
@@ -2025,7 +2028,7 @@ void SurfaceD2D::DrawTextNoClip(const PRectangle &rc, const Font &font_, XYPOSIT
 }
 
 void SurfaceD2D::DrawTextClipped(const PRectangle &rc, const Font &font_, XYPOSITION ybase, std::string_view text,
-	const ColourDesired &fore, const ColourDesired &back) {
+	ColourDesired fore, ColourDesired back) {
 	if (pRenderTarget) {
 		FillRectangle(rc, back);
 		D2DPenColour(fore);
@@ -2034,7 +2037,7 @@ void SurfaceD2D::DrawTextClipped(const PRectangle &rc, const Font &font_, XYPOSI
 }
 
 void SurfaceD2D::DrawTextTransparent(const PRectangle &rc, const Font &font_, XYPOSITION ybase, std::string_view text,
-	const ColourDesired &fore) {
+	ColourDesired fore) {
 	// Avoid drawing spaces in transparent mode
 	for (size_t i = 0; i < text.length(); i++) {
 		if (text[i] != ' ') {
@@ -2220,7 +2223,6 @@ Surface *Surface::Allocate(int technology) {
 	return new SurfaceGDI;
 #endif
 }
-
 
 namespace {
 
@@ -3014,8 +3016,7 @@ LRESULT ListBoxX::NcHitTest(WPARAM wParam, LPARAM lParam) const {
 		break;
 
 	case HTTOP:
-	case HTTOPRIGHT:
-	{
+	case HTTOPRIGHT: {
 		// Valid only if caret below list
 		if (location.y < rc.top)
 			hit = HTERROR;
@@ -3023,8 +3024,7 @@ LRESULT ListBoxX::NcHitTest(WPARAM wParam, LPARAM lParam) const {
 	break;
 
 	case HTBOTTOM:
-	case HTBOTTOMRIGHT:
-	{
+	case HTBOTTOMRIGHT: {
 		// Valid only if caret above list
 		if (rc.bottom <= location.y)
 			hit = HTERROR;
@@ -3098,8 +3098,7 @@ LRESULT PASCAL ListBoxX::ControlWndProc(HWND hWnd, UINT iMessage, WPARAM wParam,
 		case WM_ERASEBKGND:
 			return TRUE;
 
-		case WM_PAINT:
-		{
+		case WM_PAINT: {
 			PAINTSTRUCT ps;
 			HDC hDC = ::BeginPaint(hWnd, &ps);
 			if (lbx) {
@@ -3113,8 +3112,7 @@ LRESULT PASCAL ListBoxX::ControlWndProc(HWND hWnd, UINT iMessage, WPARAM wParam,
 			// This prevents the view activating when the scrollbar is clicked
 			return MA_NOACTIVATE;
 
-		case WM_LBUTTONDOWN:
-		{
+		case WM_LBUTTONDOWN: {
 			// We must take control of selection to prevent the ListBox activating
 			// the popup
 			const LRESULT lResult = ::SendMessage(hWnd, LB_ITEMFROMPOINT, 0, lParam);
@@ -3131,8 +3129,7 @@ LRESULT PASCAL ListBoxX::ControlWndProc(HWND hWnd, UINT iMessage, WPARAM wParam,
 		case WM_LBUTTONUP:
 			return 0;
 
-		case WM_LBUTTONDBLCLK:
-		{
+		case WM_LBUTTONDBLCLK: {
 			if (lbx) {
 				lbx->OnDoubleClick();
 			}
@@ -3157,8 +3154,7 @@ LRESULT PASCAL ListBoxX::ControlWndProc(HWND hWnd, UINT iMessage, WPARAM wParam,
 
 LRESULT ListBoxX::WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam) {
 	switch (iMessage) {
-	case WM_CREATE:
-	{
+	case WM_CREATE: {
 		HINSTANCE hinstanceParent = GetWindowInstance(HwndFromWindowID(parent->GetID()));
 		// Note that LBS_NOINTEGRALHEIGHT is specified to fix cosmetic issue when resizing the list
 		// but has useful side effect of speeding up list population significantly
@@ -3185,8 +3181,7 @@ LRESULT ListBoxX::WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam
 		}
 		break;
 
-	case WM_PAINT:
-	{
+	case WM_PAINT: {
 		PAINTSTRUCT ps;
 		::BeginPaint(hWnd, &ps);
 		::EndPaint(hWnd, &ps);
@@ -3199,8 +3194,7 @@ LRESULT ListBoxX::WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam
 		::SendMessage(HwndFromWindowID(parent->GetID()), iMessage, wParam, lParam);
 		break;
 
-	case WM_MEASUREITEM:
-	{
+	case WM_MEASUREITEM: {
 		MEASUREITEMSTRUCT *pMeasureItem = reinterpret_cast<MEASUREITEMSTRUCT *>(lParam);
 		pMeasureItem->itemHeight = ItemHeight();
 	}
@@ -3220,8 +3214,7 @@ LRESULT ListBoxX::WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam
 		// completely covered by its child.
 		return TRUE;
 
-	case WM_GETMINMAXINFO:
-	{
+	case WM_GETMINMAXINFO: {
 		MINMAXINFO *minMax = reinterpret_cast<MINMAXINFO*>(lParam);
 		minMax->ptMaxTrackSize = MaxTrackSize();
 		minMax->ptMinTrackSize = MinTrackSize();
@@ -3240,8 +3233,7 @@ LRESULT ListBoxX::WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam
 		StartResize(wParam);
 		return 0;
 
-	case WM_MOUSEMOVE:
-	{
+	case WM_MOUSEMOVE: {
 		if (resizeHit == 0) {
 			return ::DefWindowProc(hWnd, iMessage, wParam, lParam);
 		} else {
