@@ -163,7 +163,7 @@ public:
 	Sci::Position Length() const;
 	void MovePositions(bool insertion, Sci::Position startChange, Sci::Position length);
 	void TrimSelection(const SelectionRange &range);
-	void TrimOtherSelections(size_t r, SelectionRange range);
+	void TrimOtherSelections(size_t r, const SelectionRange &range);
 	void SetSelection(const SelectionRange &range);
 	void AddSelection(const SelectionRange &range);
 	void AddSelectionWithoutTrim(const SelectionRange &range);

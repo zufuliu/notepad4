@@ -42,13 +42,13 @@ void QuoteCls::Start(int u) {
 	Count = 0;
 	Open(u);
 }
-QuoteCls::QuoteCls(const QuoteCls& q) { // copy constructor -- use this for copying in
+QuoteCls::QuoteCls(const QuoteCls &q) { // copy constructor -- use this for copying in
 	Rep = q.Rep;
 	Count = q.Count;
 	Up = q.Up;
 	Down = q.Down;
 }
-QuoteCls& QuoteCls::operator=(const QuoteCls& q) { // assignment constructor
+QuoteCls& QuoteCls::operator=(const QuoteCls &q) { // assignment constructor
 	if (this != &q) {
 		Rep = q.Rep;
 		Count = q.Count;

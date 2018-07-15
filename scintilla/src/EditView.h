@@ -40,7 +40,7 @@ void DrawTextNoClipPhase(Surface *surface, const PRectangle &rc, const Style &st
 void DrawStyledText(Surface *surface, const ViewStyle &vs, int styleOffset, const PRectangle &rcText,
 	const StyledText &st, size_t start, size_t length, DrawPhase phase);
 
-typedef void (*DrawTabArrowFn)(Surface *surface, const PRectangle& rcTab, int ymid);
+typedef void (*DrawTabArrowFn)(Surface *surface, const PRectangle &rcTab, int ymid);
 
 class LineTabstops;
 

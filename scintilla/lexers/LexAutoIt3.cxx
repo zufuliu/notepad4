@@ -694,7 +694,7 @@ static void FoldAU3Doc(Sci_PositionU startPos, Sci_Position length, int, LexerWo
 					strcmp(szKeyword, "with") == 0 || strcmp(szKeyword, "#region") == 0) {
 					levelNext++;
 				}
-				// create double Fold for select&switch because Case will subtract one of the current level
+				// create double Fold for select and switch because Case will subtract one of the current level
 				if (strcmp(szKeyword, "select") == 0 || strcmp(szKeyword, "switch") == 0) {
 					levelNext++;
 					levelNext++;

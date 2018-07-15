@@ -899,14 +899,14 @@ static void DrawTextBlob(Surface *surface, const ViewStyle &vsDraw, const PRecta
 		textBack, textFore);
 }
 
-static void DrawFrame(Surface *surface, ColourDesired colour, int alpha, const PRectangle& rcFrame) {
+static void DrawFrame(Surface *surface, ColourDesired colour, int alpha, const PRectangle &rcFrame) {
 	if (alpha != SC_ALPHA_NOALPHA)
 		surface->AlphaRectangle(rcFrame, 0, colour, alpha, colour, alpha, 0);
 	else
 		surface->FillRectangle(rcFrame, colour);
 }
 
-static void DrawCaretLineFramed(Surface *surface, const ViewStyle &vsDraw, const LineLayout *ll, const PRectangle& rcLine, int subLine) {
+static void DrawCaretLineFramed(Surface *surface, const ViewStyle &vsDraw, const LineLayout *ll, const PRectangle &rcLine, int subLine) {
 	const int width = vsDraw.GetFrameWidth();
 	if (subLine == 0 || ll->wrapIndent == 0 || vsDraw.caretLineAlpha != SC_ALPHA_NOALPHA) {
 		// Left

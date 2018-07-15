@@ -317,7 +317,7 @@ void Selection::TrimSelection(const SelectionRange &range) {
 	}
 }
 
-void Selection::TrimOtherSelections(size_t r, SelectionRange range) {
+void Selection::TrimOtherSelections(size_t r, const SelectionRange &range) {
 	for (size_t i = 0; i < ranges.size(); ++i) {
 		if (i != r) {
 			ranges[i].Trim(range);
