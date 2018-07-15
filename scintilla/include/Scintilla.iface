@@ -868,6 +868,9 @@ get int GetColumn=2129(position pos,)
 # Count characters between two positions.
 fun int CountCharacters=2633(position start, position end)
 
+# Count code units between two positions.
+fun int CountCodeUnits=2715(position start, position end)
+
 # Show or hide the horizontal scroll bar.
 set void SetHScrollBar=2130(bool visible,)
 # Is the horizontal scroll bar visible?
@@ -1968,6 +1971,11 @@ fun position PositionAfter=2418(position pos,)
 # of characters. Returned value is always between 0 and last position in document.
 fun position PositionRelative=2670(position pos, int relative)
 
+# Given a valid document position, return a position that differs in a number
+# of UTF-16 code units. Returned value is always between 0 and last position in document.
+# The result may point half way (2 bytes) inside a non-BMP character.
+fun position PositionRelativeCodeUnits=2716(position pos, int relative)
+
 # Copy a range of text to the clipboard. Positions are clipped into the document.
 fun void CopyRange=2419(position start, position end)
 
@@ -2883,6 +2891,26 @@ get int GetBidirectional=2708(,)
 
 # Set bidirectional text display state.
 set void SetBidirectional=2709(int bidirectional,)
+
+enu LineCharacterIndexType=SC_LINECHARACTERINDEX_
+val SC_LINECHARACTERINDEX_NONE=0
+val SC_LINECHARACTERINDEX_UTF32=1
+val SC_LINECHARACTERINDEX_UTF16=2
+
+# Retrieve line character index state.
+get int GetLineCharacterIndex=2710(,)
+
+# Request line character index be created or its use count increased.
+fun void AllocateLineCharacterIndex=2711(int lineCharacterIndex,)
+
+# Decrease use count of line character index and remove if 0.
+fun void ReleaseLineCharacterIndex=2712(int lineCharacterIndex,)
+
+# Retrieve the document line containing a position measured in index units.
+fun int LineFromIndexPosition=2713(position posUTF32, int lineCharacterIndex)
+
+# Retrieve the position measured in index units at the start of a document line.
+fun position IndexPositionFromLine=2714(int line, int lineCharacterIndex)
 
 cat Deprecated
 

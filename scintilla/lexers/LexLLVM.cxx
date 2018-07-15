@@ -19,7 +19,7 @@ using namespace Scintilla;
 
 #define MAX_WORD_LENGTH	31
 
-static void CheckLLVMVarType(Sci_PositionU pos, Sci_PositionU endPos, Accessor &styler, bool& is_func, bool& is_type) {
+static void CheckLLVMVarType(Sci_PositionU pos, Sci_PositionU endPos, Accessor &styler, bool &is_func, bool &is_type) {
 	char c = 0;
 	while (pos < endPos) {
 		c = styler.SafeGetCharAt(pos);

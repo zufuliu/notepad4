@@ -120,6 +120,7 @@ Document::Document(int options) :
 	decorations = DecorationListCreate(IsLarge());
 
 	cb.SetPerLine(this);
+	cb.SetUTF8Substance(SC_CP_UTF8 == dbcsCodePage);
 }
 
 Document::~Document() {
@@ -195,6 +196,7 @@ bool Document::SetDBCSCodePage(int dbcsCodePage_) {
 		dbcsCodePage = dbcsCodePage_;
 		SetCaseFolder(nullptr);
 		cb.SetLineEndTypes(lineEndBitSet & LineEndTypesSupported());
+		cb.SetUTF8Substance(SC_CP_UTF8 == dbcsCodePage);
 		return true;
 	} else {
 		return false;
@@ -420,6 +422,14 @@ Sci::Position Document::VCHomePosition(Sci::Position position) const {
 		return startPosition;
 	else
 		return startText;
+}
+
+Sci::Position Document::IndexLineStart(Sci::Line line, int lineCharacterIndex) const {
+	return cb.IndexLineStart(line, lineCharacterIndex);
+}
+
+Sci::Line Document::LineFromPositionIndex(Sci::Position pos, int lineCharacterIndex) const {
+	return cb.LineFromPositionIndex(pos, lineCharacterIndex);
 }
 
 int SCI_METHOD Document::SetLevel(Sci_Position line, int level) {
@@ -2016,6 +2026,18 @@ const char *Document::SubstituteByPosition(const char *text, Sci::Position *leng
 		return regex->SubstituteByPosition(this, text, length);
 	else
 		return nullptr;
+}
+
+int Document::LineCharacterIndex() const {
+	return cb.LineCharacterIndex();
+}
+
+void Document::AllocateLineCharacterIndex(int lineCharacterIndex) {
+	return cb.AllocateLineCharacterIndex(lineCharacterIndex);
+}
+
+void Document::ReleaseLineCharacterIndex(int lineCharacterIndex) {
+	return cb.ReleaseLineCharacterIndex(lineCharacterIndex);
 }
 
 Sci::Line Document::LinesTotal() const noexcept {

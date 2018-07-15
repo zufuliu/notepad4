@@ -135,7 +135,7 @@ public:
 		return (pt.x >= left) && (pt.x <= right) &&
 			(pt.y >= top) && (pt.y <= bottom);
 	}
-	bool ContainsWholePixel(const Point& pt) const noexcept {
+	bool ContainsWholePixel(const Point &pt) const noexcept {
 		// Does the rectangle contain all of the pixel to left/below the point
 		return (pt.x >= left) && ((pt.x + 1) <= right) &&
 			(pt.y >= top) && ((pt.y + 1) <= bottom);
@@ -438,7 +438,7 @@ public:
 		cursorInvalid, cursorText, cursorArrow, cursorUp, cursorWait, cursorHoriz, cursorVert, cursorReverseArrow, cursorHand
 	};
 	void SetCursor(Cursor curs);
-	PRectangle GetMonitorRect(const Point& pt) const;
+	PRectangle GetMonitorRect(const Point &pt) const;
 private:
 	Cursor cursorLast;
 };

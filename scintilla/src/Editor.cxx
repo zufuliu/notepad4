@@ -841,7 +841,7 @@ SelectionPosition Editor::MovePositionOutsideChar(const SelectionPosition &pos_,
 	return pos;
 }
 
-void Editor::MovedCaret(const SelectionPosition& newPos, SelectionPosition previousPos, bool ensureVisible) {
+void Editor::MovedCaret(const SelectionPosition &newPos, SelectionPosition previousPos, bool ensureVisible) {
 	const Sci::Line currentLine = pdoc->SciLineFromPosition(newPos.Position());
 	if (ensureVisible) {
 		// In case in need of wrapping to ensure DisplayFromDoc works.
@@ -873,7 +873,7 @@ void Editor::MovedCaret(const SelectionPosition& newPos, SelectionPosition previ
 	}
 }
 
-void Editor::MovePositionTo(const SelectionPosition& newPos_, Selection::selTypes selt, bool ensureVisible) {
+void Editor::MovePositionTo(const SelectionPosition &newPos_, Selection::selTypes selt, bool ensureVisible) {
 	const SelectionPosition spCaret = ((sel.Count() == 1) && sel.Empty()) ?
 		sel.Last() : SelectionPosition(INVALID_POSITION);
 	SelectionPosition newPos = newPos_;
@@ -1465,7 +1465,7 @@ void Editor::NotifyCaretMove() {
 void Editor::UpdateSystemCaret() {
 }
 
-bool Editor::Wrapping() const {
+bool Editor::Wrapping() const noexcept {
 	return vs.wrapState != eWrapNone;
 }
 
@@ -3084,7 +3084,7 @@ void Editor::NewLine() {
 	ShowCaretAtCurrentPosition();
 }
 
-SelectionPosition Editor::PositionUpOrDown(const SelectionPosition& spStart, int direction, int lastX) {
+SelectionPosition Editor::PositionUpOrDown(const SelectionPosition &spStart, int direction, int lastX) {
 	const Point pt = LocationFromPosition(spStart);
 	int skipLines = 0;
 
@@ -4151,7 +4151,7 @@ void Editor::GoToLine(Sci::Line lineNo) {
 	EnsureCaretVisible();
 }
 
-static bool Close(const Point& pt1, const Point& pt2, const Point& threshold) {
+static bool Close(const Point &pt1, const Point &pt2, const Point &threshold) {
 	if (std::abs(pt1.x - pt2.x) > threshold.x)
 		return false;
 	if (std::abs(pt1.y - pt2.y) > threshold.y)
@@ -5131,7 +5131,7 @@ bool Editor::PaintContains(const PRectangle &rc) const {
 	}
 }
 
-bool Editor::PaintContainsMargin() {
+bool Editor::PaintContainsMargin() const {
 	if (wMargin.GetID()) {
 		// With separate margin view, paint of text view
 		// never contains margin.
@@ -6035,6 +6035,11 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 			static_cast<Sci::Position>(wParam), static_cast<Sci::Position>(lParam)),
 			0, pdoc->Length());
 
+	case SCI_POSITIONRELATIVECODEUNITS:
+		return std::clamp<Sci::Position>(pdoc->GetRelativePositionUTF16(
+			static_cast<Sci::Position>(wParam), static_cast<Sci::Position>(lParam)),
+			0, pdoc->Length());
+
 	case SCI_LINESCROLL:
 		ScrollTo(topLine + static_cast<Sci::Line>(lParam));
 		HorizontalScrollTo(xOffset + static_cast<int>(wParam) * static_cast<int>(vs.spaceWidth));
@@ -6799,6 +6804,23 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 
 	case SCI_GETBIDIRECTIONAL:
 		return static_cast<sptr_t>(bidirectional);
+
+	case SCI_GETLINECHARACTERINDEX:
+		return pdoc->LineCharacterIndex();
+
+	case SCI_ALLOCATELINECHARACTERINDEX:
+		pdoc->AllocateLineCharacterIndex(static_cast<int>(wParam));
+		break;
+
+	case SCI_RELEASELINECHARACTERINDEX:
+		pdoc->ReleaseLineCharacterIndex(static_cast<int>(wParam));
+		break;
+
+	case SCI_LINEFROMINDEXPOSITION:
+		return pdoc->LineFromPositionIndex(static_cast<Sci::Position>(wParam), static_cast<int>(lParam));
+
+	case SCI_INDEXPOSITIONFROMLINE:
+		return pdoc->IndexLineStart(static_cast<Sci::Line>(wParam), static_cast<int>(lParam));
 
 		// Marker definition and setting
 	case SCI_MARKERDEFINE:
@@ -8206,6 +8228,9 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 
 	case SCI_COUNTCHARACTERS:
 		return pdoc->CountCharacters(static_cast<Sci::Position>(wParam), static_cast<Sci::Position>(lParam));
+
+	case SCI_COUNTCODEUNITS:
+		return pdoc->CountUTF16(static_cast<Sci::Position>(wParam), static_cast<Sci::Position>(lParam));
 
 	default:
 		return DefWndProc(iMessage, wParam, lParam);

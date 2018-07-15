@@ -40,8 +40,8 @@ public:
 	void New(int r = 1);
 	void Open(int u);
 	void Start(int u);
-	QuoteCls(const QuoteCls& q);
-	QuoteCls& operator=(const QuoteCls& q);
+	QuoteCls(const QuoteCls &q);
+	QuoteCls& operator=(const QuoteCls &q);
 };
 
 // Class to manage quote pairs that nest

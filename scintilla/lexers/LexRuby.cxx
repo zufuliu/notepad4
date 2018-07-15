@@ -188,7 +188,7 @@ static void advance_char(Sci_Position &i, char &ch, char &chNext, char &chNext2)
 }
 
 // precondition: startPos points to one after the EOL char
-static bool currLineContainsHereDelims(Sci_Position& startPos, Accessor &styler) {
+static bool currLineContainsHereDelims(Sci_Position &startPos, Accessor &styler) {
 	if (startPos <= 1)
 		return false;
 
@@ -217,8 +217,8 @@ static bool currLineContainsHereDelims(Sci_Position& startPos, Accessor &styler)
 }
 
 static void enterInnerExpression(int *p_inner_string_types,
-	int *p_inner_expn_brace_counts, QuoteCls *p_inner_quotes, int& inner_string_count,
-	int& state, int& brace_counts, QuoteCls& curr_quote) {
+	int *p_inner_expn_brace_counts, QuoteCls *p_inner_quotes, int &inner_string_count,
+	int &state, int &brace_counts, QuoteCls &curr_quote) {
 	p_inner_string_types[inner_string_count] = state;
 	state = SCE_RB_DEFAULT;
 	p_inner_expn_brace_counts[inner_string_count] = brace_counts;
@@ -228,8 +228,8 @@ static void enterInnerExpression(int *p_inner_string_types,
 }
 
 static void exitInnerExpression(const int *p_inner_string_types,
-	const int *p_inner_expn_brace_counts, QuoteCls *p_inner_quotes, int& inner_string_count,
-	int& state, int& brace_counts, QuoteCls& curr_quote) {
+	const int *p_inner_expn_brace_counts, QuoteCls *p_inner_quotes, int &inner_string_count,
+	int &state, int &brace_counts, QuoteCls &curr_quote) {
 	--inner_string_count;
 	state = p_inner_string_types[inner_string_count];
 	brace_counts = p_inner_expn_brace_counts[inner_string_count];

@@ -328,10 +328,10 @@ public:
 	void * SCI_METHOD ConvertToDocument() override;
 	Sci::Position Undo();
 	Sci::Position Redo();
-	bool CanUndo() const {
+	bool CanUndo() const noexcept {
 		return cb.CanUndo();
 	}
-	bool CanRedo() const {
+	bool CanRedo() const noexcept {
 		return cb.CanRedo();
 	}
 	void DeleteUndoHistory() {
@@ -340,7 +340,7 @@ public:
 	bool SetUndoCollection(bool collectUndo) {
 		return cb.SetUndoCollection(collectUndo);
 	}
-	bool IsCollectingUndo() const {
+	bool IsCollectingUndo() const noexcept {
 		return cb.IsCollectingUndo();
 	}
 	void BeginUndoAction() {
@@ -391,10 +391,10 @@ public:
 	void SetReadOnly(bool set) {
 		cb.SetReadOnly(set);
 	}
-	bool IsReadOnly() const {
+	bool IsReadOnly() const noexcept {
 		return cb.IsReadOnly();
 	}
-	bool IsLarge() const {
+	bool IsLarge() const noexcept {
 		return cb.IsLarge();
 	}
 	int Options() const noexcept;
@@ -432,6 +432,8 @@ public:
 	bool IsLineEndPosition(Sci::Position position) const;
 	bool IsPositionInLineEnd(Sci::Position position) const;
 	Sci::Position VCHomePosition(Sci::Position position) const;
+	Sci::Position IndexLineStart(Sci::Line line, int lineCharacterIndex) const;
+	Sci::Line LineFromPositionIndex(Sci::Position pos, int lineCharacterIndex) const;
 
 	int SCI_METHOD SetLevel(Sci_Position line, int level) override;
 	int SCI_METHOD GetLevel(Sci_Position line) const override;
@@ -461,6 +463,9 @@ public:
 	void SetCaseFolder(CaseFolder *pcf_);
 	Sci::Position FindText(Sci::Position minPos, Sci::Position maxPos, const char *search, int flags, Sci::Position *length);
 	const char *SubstituteByPosition(const char *text, Sci::Position *length);
+	int LineCharacterIndex() const;
+	void AllocateLineCharacterIndex(int lineCharacterIndex);
+	void ReleaseLineCharacterIndex(int lineCharacterIndex);
 	Sci::Line LinesTotal() const noexcept;
 
 	void SetDefaultCharClasses(bool includeWordClass);

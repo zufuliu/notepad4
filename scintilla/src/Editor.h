@@ -333,8 +333,8 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	bool SelectionContainsProtected();
 	Sci::Position MovePositionOutsideChar(Sci::Position pos, Sci::Position moveDir, bool checkLineEnd = true) const;
 	SelectionPosition MovePositionOutsideChar(const SelectionPosition &pos, Sci::Position moveDir, bool checkLineEnd = true) const;
-	void MovedCaret(const SelectionPosition& newPos, SelectionPosition previousPos, bool ensureVisible);
-	void MovePositionTo(const SelectionPosition& newPos, Selection::selTypes selt = Selection::noSel, bool ensureVisible = true);
+	void MovedCaret(const SelectionPosition &newPos, SelectionPosition previousPos, bool ensureVisible);
+	void MovePositionTo(const SelectionPosition &newPos, Selection::selTypes selt = Selection::noSel, bool ensureVisible = true);
 	void MovePositionTo(Sci::Position newPos, Selection::selTypes selt = Selection::noSel, bool ensureVisible = true);
 	SelectionPosition MovePositionSoVisible(const SelectionPosition &pos, int moveDir);
 	SelectionPosition MovePositionSoVisible(Sci::Position pos, int moveDir);
@@ -376,7 +376,7 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	virtual void NotifyCaretMove();
 	virtual void UpdateSystemCaret();
 
-	bool Wrapping() const;
+	bool Wrapping() const noexcept;
 	void NeedWrapping(Sci::Line docLineStart = 0, Sci::Line docLineEnd = WrapPending::lineLarge);
 	bool WrapOneLine(Surface *surface, Sci::Line lineToWrap);
 	enum class WrapScope {
@@ -473,7 +473,7 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	void Duplicate(bool forLine);
 	virtual void CancelModes();
 	void NewLine();
-	SelectionPosition PositionUpOrDown(const SelectionPosition& spStart, int direction, int lastX);
+	SelectionPosition PositionUpOrDown(const SelectionPosition &spStart, int direction, int lastX);
 	void CursorUpOrDown(int direction, Selection::selTypes selt);
 	void ParaUpOrDown(int direction, Selection::selTypes selt);
 	Range RangeDisplayLine(Sci::Line lineVisible);
@@ -547,7 +547,7 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	virtual void QueueIdleWork(WorkNeeded::workItems items, Sci::Position upTo = 0);
 
 	virtual bool PaintContains(const PRectangle &rc)  const;
-	bool PaintContainsMargin();
+	bool PaintContainsMargin() const;
 	void CheckForChangeOutsidePaint(const Range &r);
 	void SetBraceHighlight(Sci::Position pos0, Sci::Position pos1, int matchStyle);
 

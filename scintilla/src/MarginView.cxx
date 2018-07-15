@@ -55,7 +55,7 @@ using namespace Scintilla;
 
 namespace Scintilla {
 
-void DrawWrapMarker(Surface *surface, const PRectangle& rcPlace,
+void DrawWrapMarker(Surface *surface, const PRectangle &rcPlace,
 	bool isEndMarker, ColourDesired wrapColour) {
 	surface->PenColour(wrapColour);
 

@@ -145,7 +145,7 @@ inline void SetWindowID(HWND hWnd, int identifier) {
 	::SetWindowLongPtr(hWnd, GWLP_ID, identifier);
 }
 
-inline Point PointFromPOINT(POINT pt) {
+inline Point PointFromPOINT(const POINT &pt) {
 	return Point::FromInts(pt.x, pt.y);
 }
 
@@ -153,7 +153,7 @@ inline Point PointFromLParam(sptr_t lpoint) {
 	return Point::FromInts(GET_X_LPARAM(lpoint), GET_Y_LPARAM(lpoint));
 }
 
-constexpr POINT POINTFromPoint(Point pt) noexcept {
+constexpr POINT POINTFromPoint(const Point &pt) noexcept {
 	return POINT{ static_cast<LONG>(pt.x), static_cast<LONG>(pt.y) };
 }
 
@@ -956,8 +956,8 @@ void ScintillaWin::SetCandidateWindowPos() {
 		CANDIDATEFORM CandForm;
 		CandForm.dwIndex = 0;
 		CandForm.dwStyle = CFS_CANDIDATEPOS;
-		CandForm.ptCurrentPos.x = static_cast<int>(pos.x);
-		CandForm.ptCurrentPos.y = static_cast<int>(pos.y + vs.lineHeight);
+		CandForm.ptCurrentPos.x = static_cast<LONG>(pos.x);
+		CandForm.ptCurrentPos.y = static_cast<LONG>(pos.y + vs.lineHeight);
 		::ImmSetCandidateWindow(imc.hIMC, &CandForm);
 	}
 }
@@ -1601,7 +1601,7 @@ sptr_t ScintillaWin::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam
 
 		case WM_CONTEXTMENU: {
 			Point pt = PointFromLParam(lParam);
-			POINT rpt = { static_cast<int>(pt.x), static_cast<int>(pt.y) };
+			POINT rpt = POINTFromPoint(pt);
 			::ScreenToClient(MainHWND(), &rpt);
 			const Point ptClient = PointFromPOINT(rpt);
 			if (ShouldDisplayPopup(ptClient)) {

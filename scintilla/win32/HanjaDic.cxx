@@ -84,7 +84,7 @@ public:
 		}
 	}
 
-	bool HJdictAvailable() {
+	bool HJdictAvailable() const {
 		return SUCCEEDED(hr);
 	}
 
