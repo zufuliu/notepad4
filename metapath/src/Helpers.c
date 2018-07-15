@@ -1574,7 +1574,8 @@ DLGTEMPLATE *LoadThemedDialogTemplate(LPCTSTR lpDialogTemplateID, HINSTANCE hIns
 	pRsrcMem = (DLGTEMPLATE *)LockResource(hRsrcMem);
 	dwTemplateSize = (UINT)SizeofResource(hInstance, hRsrc);
 
-	if ((dwTemplateSize == 0) || (pTemplate = LocalAlloc(LPTR, dwTemplateSize + LF_FACESIZE * 2)) == NULL) {
+	pTemplate = dwTemplateSize ? LocalAlloc(LPTR, dwTemplateSize + LF_FACESIZE * 2) : NULL;
+	if (pTemplate == NULL) {
 		UnlockResource(hRsrcMem);
 		FreeResource(hRsrcMem);
 		return NULL;
