@@ -358,8 +358,8 @@ BOOL EditCopyAppend(HWND hwnd) {
 		lstrcpy(pszNew, pszOld);
 		lstrcat(pszNew, pszTextW);
 
-		GlobalUnlock(hNew);
 		GlobalUnlock(hOld);
+		GlobalUnlock(hNew);
 
 		EmptyClipboard();
 		SetClipboardData(CF_UNICODETEXT, hNew);
