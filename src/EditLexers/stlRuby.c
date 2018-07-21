@@ -1,16 +1,21 @@
 #include "EditLexer.h"
 #include "EditStyle.h"
 
-// http://www.ruby-lang.org/en/
+// https://www.ruby-lang.org/en/documentation/
+// https://docs.ruby-lang.org/en/
 
 static KEYWORDLIST Keywords_Ruby = {{
-"__FILE__ __LINE__ __END__ BEGIN END "
+"__ENCODING__ __FILE__ __LINE__ __END__ BEGIN END "
 "alias and begin break case class def defined? do else elsif end ensure false for if in module next nil "
 "not or redo rescue retry return self super then true undef unless until when while yield "
-"ARGF ARGV ENV DATA FALSE NIL TRUE STDERR STDIN STDOUT "
+// Pre-defined global constants
+"ARGF ARGV ENV DATA FALSE NIL TRUE STDERR STDIN STDOUT RUBY_VERSION RUBY_RELEASE_DATE  RUBY_PLATFORM"
 "require raise public private protected include extend "
 
-, "", "", "", "", "", "", ""
+, // Pre-defined variables
+"$DEBUG $LOADED_FEATURES $FILENAME $LOAD_PATH $stderr $stdin $stdout $VERBOSE "
+
+,"", "", "", "", "", ""
 
 , // 8 Fold
 "and begin break case do else elsif if next return when unless until not or"
