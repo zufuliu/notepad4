@@ -86,6 +86,7 @@ BOOL IsDocWordChar(int ch) {
 	case NP2LEX_SCALA:
 	case NP2LEX_PYTHON:
 	case NP2LEX_PERL:
+	case NP2LEX_RUBY:
 	case NP2LEX_SQL:
 		return (ch == '$' || ch == '@');
 	case NP2LEX_RC:
