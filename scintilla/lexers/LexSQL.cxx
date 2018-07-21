@@ -114,12 +114,17 @@ _label_identifier:
 			if (!IsSqlWordChar(sc.ch, sqlAllowDottedWord)) {
 				int nextState = SCE_SQL_DEFAULT;
 				char s[128];
+				char chNext = LexGetNextChar(sc.currentPos, styler);
 				sc.GetCurrentLowered(s, sizeof(s));
 				if (keywords1.InList(s)) {
-					sc.ChangeState(SCE_SQL_WORD);
+					if (chNext == '(' && strcmp(s, "repeat") == 0) {
+						sc.ChangeState(SCE_SQL_USER1);
+					} else {
+						sc.ChangeState(SCE_SQL_WORD);
+					}
 				} else if (keywords2.InList(s)) {
 					sc.ChangeState(SCE_SQL_WORD2);
-				} else if (LexGetNextChar(sc.currentPos, styler) == '(' && kw_user1.InListAbbreviated(s, '(')) {
+				} else if (chNext == '(' && kw_user1.InListAbbreviated(s, '(')) {
 					sc.ChangeState(SCE_SQL_USER1);
 				}
 				//} else if (kw_sqlplus.InListAbbreviated(s, '~')) {
