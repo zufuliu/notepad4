@@ -90,7 +90,7 @@
 		* javap
 		* Jasmin
 	* SQL Query
-		* [MySQL](../master/tools/lang/MySQL.sql), up to 5.7.
+		* [MySQL](../master/tools/lang/MySQL.sql), up to MySQL 8.0, MariaDB 10.3.
 		* [SQLite3](../master/tools/lang/SQLite3.sql)
 	* TCL
 	* Texinfo
@@ -137,7 +137,7 @@
 	* Python Script
 	* PHP Script
 	* SQL Query
-		* [MySQL](../master/tools/lang/MySQL.sql), up to 5.7.
+		* [MySQL](../master/tools/lang/MySQL.sql), up to MySQL 8.0, MariaDB 10.3.
 		* [SQLite3](../master/tools/lang/SQLite3.sql)
 * Syntax highlighting for function and type for C/C++ family language
 * Syntax highlighting for annotation for Java like JVM based language
