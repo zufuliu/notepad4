@@ -4850,6 +4850,9 @@ INT_PTR CALLBACK EditFindReplaceDlgProcW(HWND hwnd, UINT umsg, WPARAM wParam, LP
 	}
 	break;
 
+	case WM_ACTIVATE :
+		SetWindowTransparentMode(hwnd, LOWORD(wParam) == WA_INACTIVE);
+		break;
 	}
 
 	return FALSE;

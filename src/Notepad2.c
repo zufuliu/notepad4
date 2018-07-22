@@ -174,7 +174,6 @@ int		iEscFunction;
 BOOL	bAlwaysOnTop;
 BOOL	bMinimizeToTray;
 BOOL	bTransparentMode;
-BOOL	bTransparentModeAvailable;
 BOOL	bShowToolbar;
 BOOL	bShowStatusbar;
 
@@ -2236,8 +2235,9 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	CheckCmd(hmenu, IDM_VIEW_STICKYWINPOS, bStickyWinPos);
 	CheckCmd(hmenu, IDM_VIEW_ALWAYSONTOP, ((bAlwaysOnTop || flagAlwaysOnTop == 2) && flagAlwaysOnTop != 1));
 	CheckCmd(hmenu, IDM_VIEW_MINTOTRAY, bMinimizeToTray);
-	CheckCmd(hmenu, IDM_VIEW_TRANSPARENT, bTransparentMode && bTransparentModeAvailable);
-	EnableCmd(hmenu, IDM_VIEW_TRANSPARENT, bTransparentModeAvailable);
+	i = IsWin2KAndAbove(); // bTransparentModeAvailable
+	CheckCmd(hmenu, IDM_VIEW_TRANSPARENT, bTransparentMode && i);
+	EnableCmd(hmenu, IDM_VIEW_TRANSPARENT, i);
 
 	CheckCmd(hmenu, IDM_VIEW_NOSAVERECENT, bSaveRecentFiles);
 	CheckCmd(hmenu, IDM_VIEW_NOSAVEFINDREPL, bSaveFindReplace);
@@ -5316,7 +5316,6 @@ void LoadSettings(void) {
 	bAlwaysOnTop = IniSectionGetBool(pIniSection, L"AlwaysOnTop", 0);
 	bMinimizeToTray = IniSectionGetBool(pIniSection, L"MinimizeToTray", 0);
 	bTransparentMode = IniSectionGetBool(pIniSection, L"TransparentMode", 0);
-	bTransparentModeAvailable = IsWin2KAndAbove();
 
 	IniSectionGetString(pIniSection, L"ToolbarButtons", L"", tchToolbarButtons, COUNTOF(tchToolbarButtons));
 
