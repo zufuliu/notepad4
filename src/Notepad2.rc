@@ -461,6 +461,12 @@ BEGIN
             MENUITEM "Direct2D Retain", IDM_SET_RENDER_TECH_D2DRETAIN
             MENUITEM "Direct2D GDI DC", IDM_SET_RENDER_TECH_D2DDC
         END
+        POPUP "Bidirectional"
+        BEGIN
+            MENUITEM "None",            IDM_SET_BIDIRECTIONAL_NONE
+            MENUITEM "Left to Right",   IDM_SET_BIDIRECTIONAL_L2R
+            MENUITEM "Right to Left",   IDM_SET_BIDIRECTIONAL_R2L
+        END
         MENUITEM SEPARATOR
         MENUITEM "Single &File Instance",       IDM_VIEW_SINGLEFILEINSTANCE
         MENUITEM "File &Change Notification...\tAlt+F5", IDM_VIEW_CHANGENOTIFY
