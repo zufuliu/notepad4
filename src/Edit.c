@@ -52,6 +52,7 @@ extern BOOL bFixLineEndings;
 extern BOOL bAutoStripBlanks;
 
 extern int iRenderingTechnology;
+extern int iBidirectional;
 // Default Codepage and Character Set
 extern int iDefaultCodePage;
 //extern int iDefaultCharSet;
@@ -84,6 +85,7 @@ HWND EditCreate(HWND hwndParent) {
 						  NULL);
 
 	SendMessage(hwnd, SCI_SETTECHNOLOGY, iRenderingTechnology, 0);
+	SendMessage(hwnd, SCI_SETBIDIRECTIONAL, iBidirectional, 0);
 	SendMessage(hwnd, SCI_SETCODEPAGE, iDefaultCodePage, 0);
 	SendMessage(hwnd, SCI_SETEOLMODE, SC_EOL_CRLF, 0);
 	SendMessage(hwnd, SCI_SETPASTECONVERTENDINGS, 1, 0);
