@@ -5309,7 +5309,7 @@ void LoadSettings(void) {
 		iDefaultEncoding = CPI_UTF8;
 	}
 
-	bSkipUnicodeDetection = IniSectionGetBool(pIniSection, L"SkipUnicodeDetection", 0);
+	bSkipUnicodeDetection = IniSectionGetBool(pIniSection, L"SkipUnicodeDetection", 1);
 	bLoadASCIIasUTF8 = IniSectionGetBool(pIniSection, L"LoadASCIIasUTF8", 0);
 	bLoadNFOasOEM = IniSectionGetBool(pIniSection, L"LoadNFOasOEM", 1);
 	bNoEncodingTags = IniSectionGetBool(pIniSection, L"NoEncodingTags", 0);
