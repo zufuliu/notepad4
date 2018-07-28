@@ -454,6 +454,13 @@ BEGIN
         MENUITEM "&Always On Top\tAlt+Shift+T", IDM_VIEW_ALWAYSONTOP
         MENUITEM "Minimi&ze to Tray",           IDM_VIEW_MINTOTRAY
         MENUITEM "Transparent &Mode\tCtrl+0",   IDM_VIEW_TRANSPARENT
+        POPUP "Rendering Technology"
+        BEGIN
+            MENUITEM "Default GDI",     IDM_SET_RENDER_TECH_DEFAULT
+            MENUITEM "Direct2D",        IDM_SET_RENDER_TECH_D2D
+            MENUITEM "Direct2D Retain", IDM_SET_RENDER_TECH_D2DRETAIN
+            MENUITEM "Direct2D GDI DC", IDM_SET_RENDER_TECH_D2DDC
+        END
         MENUITEM SEPARATOR
         MENUITEM "Single &File Instance",       IDM_VIEW_SINGLEFILEINSTANCE
         MENUITEM "File &Change Notification...\tAlt+F5", IDM_VIEW_CHANGENOTIFY

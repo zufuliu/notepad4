@@ -178,6 +178,7 @@ int		iEscFunction;
 BOOL	bAlwaysOnTop;
 BOOL	bMinimizeToTray;
 BOOL	bTransparentMode;
+int		iRenderingTechnology;
 BOOL	bShowToolbar;
 BOOL	bShowStatusbar;
 
@@ -1421,6 +1422,8 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	hwndEdit = EditCreate(hwnd);
 	InitScintillaHandle(hwndEdit);
 
+	iRenderingTechnology = (int)SendMessage(hwndEdit, SCI_GETTECHNOLOGY, 0, 0);
+
 	SendMessage(hwndEdit, SCI_SETZOOM, iZoomLevel, 0);
 	// Tabs
 	SendMessage(hwndEdit, SCI_SETUSETABS, !bTabsAsSpaces, 0);
@@ -2248,6 +2251,9 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	i = IsWin2KAndAbove(); // bTransparentModeAvailable
 	CheckCmd(hmenu, IDM_VIEW_TRANSPARENT, bTransparentMode && i);
 	EnableCmd(hmenu, IDM_VIEW_TRANSPARENT, i);
+
+	i = IDM_SET_RENDER_TECH_DEFAULT + iRenderingTechnology;
+	CheckMenuRadioItem(hmenu, IDM_SET_RENDER_TECH_DEFAULT, IDM_SET_RENDER_TECH_D2DDC, i, MF_BYCOMMAND);
 
 	CheckCmd(hmenu, IDM_VIEW_NOSAVERECENT, bSaveRecentFiles);
 	CheckCmd(hmenu, IDM_VIEW_NOSAVEFINDREPL, bSaveFindReplace);
@@ -4122,6 +4128,14 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		SetWindowTransparentMode(hwnd, bTransparentMode);
 		break;
 
+	case IDM_SET_RENDER_TECH_DEFAULT:
+	case IDM_SET_RENDER_TECH_D2D:
+	case IDM_SET_RENDER_TECH_D2DRETAIN:
+	case IDM_SET_RENDER_TECH_D2DDC:
+		SendMessage(hwndEdit, SCI_SETTECHNOLOGY, LOWORD(wParam) - IDM_SET_RENDER_TECH_DEFAULT, 0);
+		iRenderingTechnology = (int)SendMessage(hwndEdit, SCI_GETTECHNOLOGY, 0, 0);
+		break;
+
 	case IDM_VIEW_SHOWFILENAMEONLY:
 		iPathNameFormat = 0;
 		lstrcpy(szTitleExcerpt, L"");
@@ -5333,6 +5347,9 @@ void LoadSettings(void) {
 	bMinimizeToTray = IniSectionGetBool(pIniSection, L"MinimizeToTray", 0);
 	bTransparentMode = IniSectionGetBool(pIniSection, L"TransparentMode", 0);
 
+	iRenderingTechnology = IniSectionGetInt(pIniSection, L"RenderingTechnology", 0);
+	iRenderingTechnology = clamp_i(iRenderingTechnology, SC_TECHNOLOGY_DEFAULT, SC_TECHNOLOGY_DIRECTWRITEDC);
+
 	IniSectionGetString(pIniSection, L"ToolbarButtons", L"", tchToolbarButtons, COUNTOF(tchToolbarButtons));
 
 	bShowToolbar = IniSectionGetBool(pIniSection, L"ShowToolbar", 1);
@@ -5562,6 +5579,7 @@ void SaveSettings(BOOL bSaveSettingsNow) {
 	IniSectionSetBool(pIniSection, L"AlwaysOnTop", bAlwaysOnTop);
 	IniSectionSetBool(pIniSection, L"MinimizeToTray", bMinimizeToTray);
 	IniSectionSetBool(pIniSection, L"TransparentMode", bTransparentMode);
+	IniSectionSetInt(pIniSection, L"RenderingTechnology", iRenderingTechnology);
 	Toolbar_GetButtons(hwndToolbar, IDT_FILE_NEW, tchToolbarButtons, COUNTOF(tchToolbarButtons));
 	IniSectionSetString(pIniSection, L"ToolbarButtons", tchToolbarButtons);
 	IniSectionSetBool(pIniSection, L"ShowToolbar", bShowToolbar);
