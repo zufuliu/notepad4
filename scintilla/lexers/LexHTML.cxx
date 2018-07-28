@@ -37,17 +37,16 @@ enum script_mode { eHtml = 0, eNonHtmlScript, eNonHtmlPreProc, eNonHtmlScriptPre
 
 void GetTextSegment(Accessor &styler, Sci_PositionU start, Sci_PositionU end, char *s, size_t len) {
 	Sci_PositionU i = 0;
-	for (; (i < end - start + 1) && (i < len-1); i++) {
+	for (; (i < end - start + 1) && (i < len - 1); i++) {
 		s[i] = MakeLowerCase(styler[start + i]);
 	}
 	s[i] = '\0';
 }
 
 const char *GetNextWord(Accessor &styler, Sci_PositionU start, char *s, size_t sLen) {
-
 	Sci_PositionU i = 0;
-	for (; i < sLen-1; i++) {
-		char ch = static_cast<char>(styler.SafeGetCharAt(start + i));
+	for (; i < sLen - 1; i++) {
+		const char ch = styler.SafeGetCharAt(start + i);
 		if ((i == 0) && !iswordstart(ch))
 			break;
 		if ((i > 0) && !iswordchar(ch))
@@ -77,7 +76,7 @@ script_type segIsScriptingIndicator(Accessor &styler, Sci_PositionU start, Sci_P
 		return eScriptPHP;
 	if (strstr(s, "xml")) {
 		const char *xml = strstr(s, "xml");
-		for (const char *t=s; t<xml; t++) {
+		for (const char *t = s; t < xml; t++) {
 			if (!isspacechar(*t)) {
 				return prevValue;
 			}
@@ -151,7 +150,7 @@ int stateForPrintState(int StateToPrint) {
 
 bool IsNumber(Sci_PositionU start, Accessor &styler) {
 	return IsADigit(styler[start]) || (styler[start] == '.') ||
-	       (styler[start] == '-') || (styler[start] == '#');
+		(styler[start] == '-') || (styler[start] == '#');
 }
 
 bool isStringState(int state) {
@@ -180,7 +179,7 @@ bool isStringState(int state) {
 	case SCE_HPHP_COMPLEX_VARIABLE:
 		bResult = true;
 		break;
-	default :
+	default:
 		bResult = false;
 		break;
 	}
@@ -215,7 +214,7 @@ bool isCommentASPState(int state) {
 	case SCE_HPHP_COMMENTLINE:
 		bResult = true;
 		break;
-	default :
+	default:
 		bResult = false;
 		break;
 	}
@@ -240,22 +239,22 @@ void classifyAttribHTML(Sci_PositionU start, Sci_PositionU end, const WordList &
 }
 
 int classifyTagHTML(Sci_PositionU start, Sci_PositionU end,
-                           const WordList &keywords, Accessor &styler, bool &tagDontFold,
-			   bool caseSensitive, bool isXml, bool allowScripts) {
+	const WordList &keywords, Accessor &styler, bool &tagDontFold,
+	bool caseSensitive, bool isXml, bool allowScripts) {
 	char withSpace[30 + 2] = " ";
 	const char *s = withSpace + 1;
 	// Copy after the '<'
 	Sci_PositionU i = 1;
 	if (caseSensitive) {
 		for (Sci_PositionU cPos = start; cPos <= end && i < 30; cPos++) {
-			char ch = styler[cPos];
+			const char ch = styler[cPos];
 			if ((ch != '<') && (ch != '/')) {
 				withSpace[i++] = ch;
 			}
 		}
 	} else {
 		for (Sci_PositionU cPos = start; cPos <= end && i < 30; cPos++) {
-			char ch = styler[cPos];
+			const char ch = styler[cPos];
 			if ((ch != '<') && (ch != '/')) {
 				withSpace[i++] = MakeLowerCase(ch);
 			}
@@ -265,17 +264,17 @@ int classifyTagHTML(Sci_PositionU start, Sci_PositionU end,
 	//The following is only a quick hack, to see if this whole thing would work
 	//we first need the tagname with a trailing space...
 	withSpace[i] = ' ';
-	withSpace[i+1] = '\0';
+	withSpace[i + 1] = '\0';
 
 	// if the current language is XML, I can fold any tag
 	// if the current language is HTML, I don't want to fold certain tags (input, meta, etc.)
 	//...to find it in the list of no-container-tags
 	tagDontFold = (!isXml) && (nullptr != strstr(
-	// void elements
-	" area base basefont br col command embed frame hr img input isindex keygen link meta param source track wbr "
-	// end tag may omittd
-	" p "
-	, withSpace));
+		// void elements
+		" area base basefont br col command embed frame hr img input isindex keygen link meta param source track wbr "
+		// end tag may omittd
+		" p "
+		, withSpace));
 
 	//now we can remove the trailing space
 	withSpace[i] = '\0';
@@ -293,7 +292,7 @@ int classifyTagHTML(Sci_PositionU start, Sci_PositionU end,
 			// check to see if this is a self-closing tag by sniffing ahead
 			bool isSelfClose = false;
 			for (Sci_PositionU cPos = end; cPos <= end + 200; cPos++) {
-				char ch = styler.SafeGetCharAt(cPos);
+				const char ch = styler.SafeGetCharAt(cPos);
 				if (ch == '\0' || ch == '>')
 					break;
 				else if (ch == '/' && styler.SafeGetCharAt(cPos + 1) == '>') {
@@ -313,7 +312,7 @@ int classifyTagHTML(Sci_PositionU start, Sci_PositionU end,
 }
 
 void classifyWordHTJS(Sci_PositionU start, Sci_PositionU end,
-                             const WordList &keywords, Accessor &styler, script_mode inScriptType) {
+	const WordList &keywords, Accessor &styler, script_mode inScriptType) {
 	char s[30 + 1];
 	Sci_PositionU i = 0;
 	for (; i < end - start + 1 && i < 30; i++) {
@@ -379,7 +378,7 @@ void classifyWordHTPy(Sci_PositionU start, Sci_PositionU end, const WordList &ke
 // Called when in a PHP word
 void classifyWordHTPHP(Sci_PositionU start, Sci_PositionU end, const WordList &keywords, Accessor &styler) {
 	char chAttr = SCE_HPHP_DEFAULT;
-	const bool wordIsNumber = IsADigit(styler[start]) || (styler[start] == '.' && start+1 <= end && IsADigit(styler[start+1]));
+	const bool wordIsNumber = IsADigit(styler[start]) || (styler[start] == '.' && start + 1 <= end && IsADigit(styler[start + 1]));
 	if (wordIsNumber) {
 		chAttr = SCE_HPHP_NUMBER;
 	} else {
@@ -478,9 +477,9 @@ bool isMakoBlockEnd(const int ch, const int chNext, const char *blockType) {
 	if (strlen(blockType) == 0) {
 		return ((ch == '%') && (chNext == '>'));
 	} else if ((0 == strcmp(blockType, "inherit")) ||
-			   (0 == strcmp(blockType, "namespace")) ||
-			   (0 == strcmp(blockType, "include")) ||
-			   (0 == strcmp(blockType, "page"))) {
+		(0 == strcmp(blockType, "namespace")) ||
+		(0 == strcmp(blockType, "include")) ||
+		(0 == strcmp(blockType, "page"))) {
 		return ((ch == '/') && (chNext == '>'));
 	} else if (0 == strcmp(blockType, "%")) {
 		if (ch == '/' && isLineEnd(chNext))
@@ -522,8 +521,9 @@ Sci_Position FindPhpStringDelimiter(char *phpStringDelimiter, const int phpStrin
 	bool isValidSimpleString = false;
 	heardocQuotes = 0;
 
-	while (i < lengthDoc && (styler[i] == ' ' || styler[i] == '\t'))
+	while (i < lengthDoc && (styler[i] == ' ' || styler[i] == '\t')) {
 		i++;
+	}
 
 	char ch = styler.SafeGetCharAt(i);
 	const char chNext = styler.SafeGetCharAt(i + 1);
@@ -552,7 +552,7 @@ Sci_Position FindPhpStringDelimiter(char *phpStringDelimiter, const int phpStrin
 			}
 		}
 		if (j - i < phpStringDelimiterSize - 2)
-			phpStringDelimiter[j-i+1] = styler[j];
+			phpStringDelimiter[j - i + 1] = styler[j];
 		else
 			i++;
 	}
@@ -560,7 +560,7 @@ Sci_Position FindPhpStringDelimiter(char *phpStringDelimiter, const int phpStrin
 		phpStringDelimiter[0] = '\0';
 		return beginning;
 	}
-	phpStringDelimiter[j-i+1 - (heardocQuotes ? 1 : 0)] = '\0';
+	phpStringDelimiter[j - i + 1 - (heardocQuotes ? 1 : 0)] = '\0';
 	return j - 1;
 }
 
@@ -600,7 +600,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 	// If inside a tag, it may be a script tag, so reread from the start of line starting tag to ensure any language tags are seen
 	if (InTagState(state)) {
 		while ((startPos > 0) && (InTagState(styler.StyleAt(startPos - 1)))) {
-			Sci_Position backLineStart = styler.LineStart(styler.GetLine(startPos-1));
+			const Sci_Position backLineStart = styler.LineStart(styler.GetLine(startPos-1));
 			length += startPos - backLineStart;
 			startPos = backLineStart;
 		}
@@ -2193,8 +2193,7 @@ void ColouriseXMLDoc(Sci_PositionU startPos, Sci_Position length, int initStyle,
 	ColouriseHyperTextDoc(startPos, length, initStyle, keywordLists, styler, true);
 }
 
-void ColouriseHTMLDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists,
-                                  Accessor &styler) {
+void ColouriseHTMLDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
 	// Passing in false because we're notlexing XML
 	const int lexType = styler.GetPropertyInt("lexer.lang.type", LEX_HTML);
 	if (lexType == LEX_PHP && startPos == 0)

@@ -82,7 +82,7 @@ Style::Style() : FontSpecification() {
 
 Style::Style(const Style &source) : FontSpecification(), FontMeasurements() {
 	Clear(ColourDesired(0, 0, 0), ColourDesired(0xff, 0xff, 0xff),
-		0, nullptr, 0,
+		0, nullptr, SC_CHARSET_DEFAULT,
 		SC_WEIGHT_NORMAL, false, false, false, false, caseMixed, true, true, false);
 	fore = source.fore;
 	back = source.back;

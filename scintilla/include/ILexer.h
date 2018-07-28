@@ -12,7 +12,9 @@
 
 namespace Scintilla {
 
-enum { dvRelease4=2 };
+enum {
+	dvRelease4 = 2
+};
 
 class IDocument {
 public:
@@ -42,7 +44,9 @@ public:
 	virtual int SCI_METHOD GetCharacterAndWidth(Sci_Position position, Sci_Position *pWidth) const = 0;
 };
 
-enum { lvRelease4=2 };
+enum {
+	lvRelease4 = 2
+};
 
 class ILexer4 {
 public:

@@ -197,6 +197,7 @@ bool Document::SetDBCSCodePage(int dbcsCodePage_) {
 		SetCaseFolder(nullptr);
 		cb.SetLineEndTypes(lineEndBitSet & LineEndTypesSupported());
 		cb.SetUTF8Substance(SC_CP_UTF8 == dbcsCodePage);
+		ModifiedAt(0);	// Need to restyle whole document
 		return true;
 	} else {
 		return false;

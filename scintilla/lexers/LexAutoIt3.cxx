@@ -91,7 +91,7 @@ static int GetSendKey(const char *szLine, char *szKey) {
 		}
 		nPos++; // skip to next char
 
-	} // End While
+	}
 
 
 	// Check if the second portion is either a number or one of these keywords
@@ -106,7 +106,7 @@ static int GetSendKey(const char *szLine, char *szKey) {
 	}
 	return nFlag;  // 1 is bad, 0 is good
 
-} // GetSendKey()
+}
 
 //
 // Routine to check the last "none comment" character on a line to see if its a continuation
@@ -125,9 +125,9 @@ static bool IsContinuationLine(Sci_PositionU szLine, Accessor &styler) {
 			}
 		}
 		nePos--; // skip to next char
-	} // End While
+	}
 	return false;
-} // IsContinuationLine()
+}
 
 /*static const char * const AU3WordLists[] = {
 	"#autoit keywords",
@@ -570,7 +570,7 @@ static int GetStyleFirstWord(Sci_PositionU szLine, Accessor &styler) {
 	} // End While
 	return styler.StyleAt(nsPos);
 
-} // GetStyleFirstWord()
+}
 
 
 //
