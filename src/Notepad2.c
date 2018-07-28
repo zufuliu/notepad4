@@ -38,6 +38,8 @@
 #define NP2_DEBUG_FOLD_LEVEL	0
 // enable the .LOG feature
 #define NP2_ENABLE_DOT_LOG_FEATURE	0
+// enable call tips (currently not yet implemented)
+#define NP2_ENABLE_SHOW_CALL_TIPS	0
 
 /******************************************************************************
 *
@@ -146,8 +148,10 @@ int		iAutoCMinNumberLength = 3;
 BOOL	bAutoCIncludeDocWord = TRUE;
 BOOL	bAutoCloseBracesQuotes;
 BOOL	bShowCodeFolding;
+#if NP2_ENABLE_SHOW_CALL_TIPS
 BOOL	bShowCallTips = FALSE;
 int		iCallTipsWaitTime = 500; // 500 ms
+#endif
 BOOL	bViewWhiteSpace;
 BOOL	bViewEOLs;
 int		iDefaultEncoding;
@@ -1404,8 +1408,10 @@ static inline void UpdateFoldMarginWidth() {
 	SciCall_SetMarginWidth(MARGIN_FOLD_INDEX, width);
 }
 
+#if NP2_ENABLE_SHOW_CALL_TIPS
 #define SetCallTipsWaitTime() \
 	SendMessage(hwndEdit, SCI_SETMOUSEDWELLTIME, bShowCallTips? iCallTipsWaitTime : SC_TIME_FOREVER, 0);
+#endif
 
 LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	HINSTANCE hInstance = ((LPCREATESTRUCT)lParam)->hInstance;
@@ -1522,8 +1528,10 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 #endif
 	// highlight for current folding block
 	SciCall_MarkerEnableHighlight(TRUE);
+#if NP2_ENABLE_SHOW_CALL_TIPS
 	// CallTips
 	SetCallTipsWaitTime();
+#endif
 
 	// Nonprinting characters
 	SendMessage(hwndEdit, SCI_SETVIEWWS, (bViewWhiteSpace) ? SCWS_VISIBLEALWAYS : SCWS_INVISIBLE, 0);
@@ -2216,7 +2224,9 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	CheckCmd(hmenu, IDM_VIEW_SHOWWHITESPACE, bViewWhiteSpace);
 	CheckCmd(hmenu, IDM_VIEW_SHOWEOLS, bViewEOLs);
 	CheckCmd(hmenu, IDM_VIEW_WORDWRAPSYMBOLS, bShowWordWrapSymbols);
+#if NP2_ENABLE_SHOW_CALL_TIPS
 	CheckCmd(hmenu, IDM_VIEW_SHOWCALLTIPS, bShowCallTips);
+#endif
 	CheckCmd(hmenu, IDM_VIEW_MATCHBRACES, bMatchBraces);
 	CheckCmd(hmenu, IDM_VIEW_TOOLBAR, bShowToolbar);
 	EnableCmd(hmenu, IDM_VIEW_CUSTOMIZETB, bShowToolbar);
@@ -3958,10 +3968,12 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		}
 		break;
 
+#if NP2_ENABLE_SHOW_CALL_TIPS
 	case IDM_VIEW_SHOWCALLTIPS:
 		bShowCallTips = (bShowCallTips) ? FALSE : TRUE;
 		SetCallTipsWaitTime();
 		break;
+#endif
 
 	case IDM_VIEW_MATCHBRACES:
 		bMatchBraces = (bMatchBraces) ? FALSE : TRUE;
@@ -5014,6 +5026,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		}
 		break;
 
+#if NP2_ENABLE_SHOW_CALL_TIPS
 		// CallTips
 		case SCN_DWELLSTART:
 			if (bShowCallTips && scn->position >= 0) {
@@ -5024,6 +5037,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		case SCN_DWELLEND:
 			SendMessage(hwndEdit, SCI_CALLTIPCANCEL, 0, 0);
 			break;
+#endif
 
 		case SCN_MODIFIED:
 		case SCN_ZOOM:
@@ -5223,7 +5237,9 @@ void LoadSettings(void) {
 	bAutoCloseBracesQuotes = IniSectionGetBool(pIniSection, L"AutoCloseBracesQuotes", 1);
 	bAutoCompleteWords = IniSectionGetBool(pIniSection, L"AutoCompleteWords", 1);
 	bAutoCIncludeDocWord = IniSectionGetBool(pIniSection, L"AutoCIncludeDocWord", 1);
+#if NP2_ENABLE_SHOW_CALL_TIPS
 	bShowCallTips = IniSectionGetBool(pIniSection, L"ShowCallTips", 0);
+#endif
 
 	bTabsAsSpaces = IniSectionGetBool(pIniSection, L"TabsAsSpaces", 0);
 	bTabsAsSpacesG = bTabsAsSpaces;
@@ -5385,7 +5401,9 @@ void LoadSettings(void) {
 	iAutoCDefaultShowItemCount = IniSectionGetInt(pIniSection, L"AutoCDefaultShowItemCount", 15);
 	iAutoCMinWordLength = IniSectionGetInt(pIniSection, L"AutoCMinWordLength", 1);
 	iAutoCMinNumberLength = IniSectionGetInt(pIniSection, L"AutoCMinNumberLength", 3);
+#if NP2_ENABLE_SHOW_CALL_TIPS
 	iCallTipsWaitTime = IniSectionGetInt(pIniSection, L"CallTipsWaitTime", 500);
+#endif
 
 	bStickyWinPos = IniSectionGetBool(pIniSection, L"StickyWindowPosition", 0);
 
@@ -5500,7 +5518,9 @@ void SaveSettings(BOOL bSaveSettingsNow) {
 	IniSectionSetBool(pIniSection, L"AutoCloseBracesQuotes", bAutoCloseBracesQuotes);
 	IniSectionSetBool(pIniSection, L"AutoCompleteWords", bAutoCompleteWords);
 	IniSectionSetBool(pIniSection, L"AutoCIncludeDocWord", bAutoCIncludeDocWord);
+#if NP2_ENABLE_SHOW_CALL_TIPS
 	IniSectionSetBool(pIniSection, L"ShowCallTips", bShowCallTips);
+#endif
 	IniSectionSetBool(pIniSection, L"TabsAsSpaces", bTabsAsSpacesG);
 	IniSectionSetBool(pIniSection, L"TabIndents", bTabIndentsG);
 	IniSectionSetBool(pIniSection, L"BackspaceUnindents", bBackspaceUnindents);
