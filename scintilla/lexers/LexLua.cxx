@@ -29,8 +29,9 @@ using namespace Scintilla;
 // The maximum number of '=' characters allowed is 254.
 static int LongDelimCheck(StyleContext &sc) {
 	int sep = 1;
-	while (sc.GetRelative(sep) == '=' && sep < 0xFF)
+	while (sc.GetRelative(sep) == '=' && sep < 0xFF) {
 		sep++;
+	}
 	if (sc.GetRelative(sep) == sc.ch)
 		return sep;
 	return 0;
