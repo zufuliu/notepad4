@@ -253,7 +253,6 @@
         <Preprocessor Value="_UNICODE"/>
         <Preprocessor Value="SCI_LEXER"/>
         <Preprocessor Value="BOOKMARK_EDITION"/>
-        <Preprocessor Value="DISABLE_D2D"/>
         <Preprocessor Value="NO_CXX11_REGEX"/>
       </Compiler>
       <Linker Options="-mwindows;-mthreads;-municode">
