@@ -5314,8 +5314,8 @@ void LoadSettings(void) {
 	bLoadNFOasOEM = IniSectionGetBool(pIniSection, L"LoadNFOasOEM", 1);
 	bNoEncodingTags = IniSectionGetBool(pIniSection, L"NoEncodingTags", 0);
 
-	iDefaultEOLMode = IniSectionGetInt(pIniSection, L"DefaultEOLMode", 0);
-	iDefaultEOLMode = clamp_i(iDefaultEOLMode, 0, 2);
+	iDefaultEOLMode = IniSectionGetInt(pIniSection, L"DefaultEOLMode", SC_EOL_CRLF);
+	iDefaultEOLMode = clamp_i(iDefaultEOLMode, SC_EOL_CRLF, SC_EOL_LF);
 
 	bFixLineEndings = IniSectionGetBool(pIniSection, L"FixLineEndings", 1);
 	bAutoStripBlanks = IniSectionGetBool(pIniSection, L"FixTrailingBlanks", 0);
@@ -5326,8 +5326,8 @@ void LoadSettings(void) {
 	iPrintFooter = IniSectionGetInt(pIniSection, L"PrintFooter", 0);
 	iPrintFooter = clamp_i(iPrintFooter, 0, 1);
 
-	iPrintColor = IniSectionGetInt(pIniSection, L"PrintColorMode", 3);
-	iPrintColor = clamp_i(iPrintColor, 0, 5);
+	iPrintColor = IniSectionGetInt(pIniSection, L"PrintColorMode", SC_PRINT_COLOURONWHITE);
+	iPrintColor = clamp_i(iPrintColor, SC_PRINT_NORMAL, SC_PRINT_SCREENCOLOURS);
 
 	iPrintZoom = IniSectionGetInt(pIniSection, L"PrintZoom", 10) - 10;
 	iPrintZoom = clamp_i(iPrintZoom, -10, 20);
