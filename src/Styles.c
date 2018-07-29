@@ -24,6 +24,7 @@
 #include <commctrl.h>
 #include <commdlg.h>
 #include <stdio.h>
+#include <math.h>
 #include "Notepad2.h"
 #include "Edit.h"
 #include "Styles.h"
@@ -211,7 +212,7 @@ COLORREF	crCustom[16];
 BOOL	bUse2ndDefaultStyle;
 BOOL	fStylesModified = FALSE;
 BOOL	fWarnedNoIniFile = FALSE;
-int		iBaseFontSize = 11;
+int		iBaseFontSize = 10*SC_FONT_SIZE_MULTIPLIER + SC_FONT_SIZE_MULTIPLIER/2; // 10.5pt
 int		iDefaultLexer;
 BOOL	bAutoSelect;
 int		cxStyleSelectDlg;
@@ -665,7 +666,7 @@ void Style_SetLexer(HWND hwnd, PEDITLEXER pLexNew) {
 	SendMessage(hwnd, SCI_STYLESETCHARACTERSET, STYLE_DEFAULT, (LPARAM)DEFAULT_CHARSET);
 
 	Style_SetStyles(hwnd, lexDefault.Styles[0 + iIdx].iStyle, lexDefault.Styles[0 + iIdx].szValue);	 // default
-	Style_StrGetSize(lexDefault.Styles[0 + iIdx].szValue, &iBaseFontSize);	// base size
+	Style_StrGetSizeEx(lexDefault.Styles[0 + iIdx].szValue, &iBaseFontSize);	// base size
 
 	// Auto-select codepage according to charset
 	//Style_SetACPfromCharSet(hwnd);
@@ -2139,12 +2140,12 @@ BOOL Style_StrGetCharSet(LPCWSTR lpszStyle, int *i) {
 //
 // Style_StrGetSize()
 //
-BOOL Style_StrGetSize(LPCWSTR lpszStyle, int *i) {
+BOOL Style_StrGetSizeEx(LPCWSTR lpszStyle, int *i) {
 	WCHAR *p;
 
 	if ((p = StrStrI(lpszStyle, L"size:")) != NULL) {
 		WCHAR tch[256];
-		int	 iValue;
+		float value;
 		int	 iSign = 0;
 		int	 itok;
 		lstrcpy(tch, p + CSTRLEN(L"size:"));
@@ -2159,19 +2160,27 @@ BOOL Style_StrGetSize(LPCWSTR lpszStyle, int *i) {
 			*p = L'\0';
 		}
 		TrimString(tch);
-		itok = swscanf(tch, L"%i", &iValue);
+		itok = swscanf(tch, L"%f", &value);
 		if (itok == 1) {
-			if (iSign == 0) {
-				*i = iValue;
-			} else {
-				*i = max_i(0, iBaseFontSize + iValue * iSign);    // size must be +
+			int iValue = (int)lroundf(value * SC_FONT_SIZE_MULTIPLIER);
+			if (iSign != 0) {
+				iValue = iBaseFontSize + iValue*iSign;
+				iValue = max_i(0, iValue); // size must be +
 			}
+			*i = iValue;
 			return TRUE;
 		}
 	}
 	return FALSE;
 }
 
+BOOL Style_StrGetSize(LPCWSTR lpszStyle, int *i) {
+	if (Style_StrGetSizeEx(lpszStyle, i)) {
+		*i /= SC_FONT_SIZE_MULTIPLIER;
+		return TRUE;
+	}
+	return FALSE;
+}
 //=============================================================================
 //
 // Style_StrGetSizeStr()
@@ -2553,9 +2562,9 @@ void Style_SetStyles(HWND hwnd, int iStyle, LPCWSTR lpszStyle) {
 	}
 
 	// Size
-	if (Style_StrGetSize(lpszStyle, &iValue)) {
-		iValue = MulDiv(iValue, g_uCurrentDPI, USER_DEFAULT_SCREEN_DPI);
-		SendMessage(hwnd, SCI_STYLESETSIZE, iStyle, (LPARAM)iValue);
+	if (Style_StrGetSizeEx(lpszStyle, &iValue)) {
+		iValue = (iValue * g_uCurrentDPI + USER_DEFAULT_SCREEN_DPI/2) / USER_DEFAULT_SCREEN_DPI;
+		SendMessage(hwnd, SCI_STYLESETSIZEFRACTIONAL, iStyle, (LPARAM)iValue);
 	}
 
 	// Fore
