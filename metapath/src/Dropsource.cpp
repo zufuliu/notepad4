@@ -29,7 +29,7 @@
 STDMETHODIMP CDropSource::QueryInterface(REFIID iid, void FAR *FAR *ppv) {
 	if (iid == IID_IUnknown || iid == IID_IDropSource) {
 		*ppv = this;
-		++m_refs;
+		InterlockedIncrement(&m_refs);
 		return NOERROR;
 	}
 	*ppv = nullptr;
@@ -37,15 +37,15 @@ STDMETHODIMP CDropSource::QueryInterface(REFIID iid, void FAR *FAR *ppv) {
 }
 
 STDMETHODIMP_(ULONG) CDropSource::AddRef() {
-	return ++m_refs;
+	return InterlockedIncrement(&m_refs);
 }
 
 STDMETHODIMP_(ULONG) CDropSource::Release() {
-	if (--m_refs == 0) {
+	ULONG refs = InterlockedDecrement(&m_refs);
+	if (refs == 0) {
 		delete this;
-		return 0;
 	}
-	return m_refs;
+	return refs;
 }
 
 /******************************************************************************
