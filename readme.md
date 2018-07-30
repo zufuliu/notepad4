@@ -2,11 +2,11 @@
 
 > *A modified version (fork) of Notepad2-mod
 
-## Changes compared to the official Notepad2 or Notepad2-mod:
+## Changes compared to the official [Notepad2](http://www.flos-freeware.ch/notepad2.html) or [Notepad2-mod](https://xhmikosr.github.io/notepad2-mod/):
 
 * Code folding
 * Support for bookmarks
-* Option to mark all occurrences of a word
+* Option to mark all occurrences of a word or selection, and show matched count
 * [Word auto-completion](https://github.com/zufuliu/notepad2/wiki/Auto-Completion-in-Notepad2#auto-complete-words)
 * [Auto indentation](https://github.com/zufuliu/notepad2/wiki/Auto-Completion-in-Notepad2#auto-indent-text)
 * [Auto completion for braces, brackets, quotes](https://github.com/zufuliu/notepad2/wiki/Auto-Completion-in-Notepad2#auto-close-bracesquotes)
@@ -139,10 +139,10 @@
 	* SQL Query
 		* [MySQL](../master/tools/lang/MySQL.sql), up to MySQL 8.0, MariaDB 10.3.
 		* [SQLite3](../master/tools/lang/SQLite3.sql)
-* Syntax highlighting for function and type for C/C++ family language
-* Syntax highlighting for annotation for Java like JVM based language
-* Syntax highlighting for attribute for C# like language
-* Syntax highlighting for decorator for Python like language
+* Syntax highlighting for function and type for C/C++ family languages
+* Syntax highlighting for annotation for Java like JVM based languages
+* Syntax highlighting for attribute for C# like languages
+* Syntax highlighting for decorator for Python like languages
 * Folding for plain text
 * Toggle folding for specific level or current block.
 * Insert new GUID and current timestamps
@@ -152,7 +152,7 @@
 * Improved support for NFO ANSI art
 * Support replacing Windows Notepad using a clean, unintuitive registry-based method
 * Support [adding Notepad2 to Windows explorer context menu](https://github.com/zufuliu/notepad2/wiki/Open-with-Notepad2)
-* Support rendering using Direct2D DirectWrite, and swicth between GDI and Direct2D.
+* Support rendering using Direct2D DirectWrite, and switch between GDI and Direct2D.
 * Support bidirectional, useful for Arabic and Hebrew.
 * Support using fractional font size.
 * Other various major or minor changes and tweaks
