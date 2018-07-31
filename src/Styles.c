@@ -192,11 +192,12 @@ PEDITLEXER pLexArray[NUMLEXERS] = {
 	&lexANSI
 };
 
-#define	NUM_MONO_FONT	5
+#define	NUM_MONO_FONT	6
 const WCHAR *SysMonoFontName[NUM_MONO_FONT] = {
 	L"DejaVu Sans Mono",
 	//L"Bitstream Vera Sans Mono",
 	L"Consolas",
+	L"Source Code Pro",
 	L"Monaco",
 	L"Inconsolata",
 	L"Lucida Console",
@@ -2645,17 +2646,18 @@ void Style_SetFontQuality(HWND hwnd, LPCWSTR lpszStyle) {
 	} else {
 		if (Style_StrGetFont(lpszStyle, tch, COUNTOF(tch))) {
 			if (lstrcmpi(tch, L"DejaVu Sans Mono") == 0 ||
-					lstrcmpi(tch, L"Consolas") == 0 ||
-					lstrcmpi(tch, L"Inconsolata") == 0 ||
-					lstrcmpi(tch, L"Lucida Console") == 0 ||
-					lstrcmpi(tch, L"Monaco") == 0 ||
-					lstrcmpi(tch, L"Bitstream Vera Sans Mono") == 0 ||
-					lstrcmpi(tch, L"Calibri") == 0 ||
-					lstrcmpi(tch, L"Cambria") == 0 ||
-					lstrcmpi(tch, L"Candara") == 0 ||
-					lstrcmpi(tch, L"Constantia") == 0 ||
-					lstrcmpi(tch, L"Corbel") == 0 ||
-					lstrcmpi(tch, L"Segoe UI") == 0) {
+				lstrcmpi(tch, L"Consolas") == 0 ||
+				lstrcmpi(tch, L"Source Code Pro") == 0 ||
+				lstrcmpi(tch, L"Inconsolata") == 0 ||
+				lstrcmpi(tch, L"Lucida Console") == 0 ||
+				lstrcmpi(tch, L"Monaco") == 0 ||
+				lstrcmpi(tch, L"Bitstream Vera Sans Mono") == 0 ||
+				lstrcmpi(tch, L"Calibri") == 0 ||
+				lstrcmpi(tch, L"Cambria") == 0 ||
+				lstrcmpi(tch, L"Candara") == 0 ||
+				lstrcmpi(tch, L"Constantia") == 0 ||
+				lstrcmpi(tch, L"Corbel") == 0 ||
+				lstrcmpi(tch, L"Segoe UI") == 0) {
 				wQuality = SC_EFF_QUALITY_LCD_OPTIMIZED;
 			}
 		} else {
