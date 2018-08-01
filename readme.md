@@ -158,7 +158,10 @@
 * Other various major or minor changes and tweaks
 
 ## Supported Operating Systems:
-* XP (SP3, SP2 might or might not work), Vista, 7, 8, 8.1 and 10 both 32-bit and 64-bit
+* Windows Desktop XP, Vista, 7, 8, 8.1 and 10, both 32-bit and 64-bit
+* Windows Server 2003, 2008, 2012 and 2016, both 32-bit and 64-bit
+* Unix-like Operating Systems (Linux, macOS, BSD, etc.) using [Wine](https://www.winehq.org/)
+* [ReactOS](https://www.reactos.org/)
 
 ## [Screenshots]
 TBD.
@@ -167,8 +170,8 @@ TBD.
 Prebuild binaries for each release can be downloaded from [release list](https://github.com/zufuliu/notepad2/releases).
 
 ## Notes:
+* The default *Win32* build require [SSE2](https://en.wikipedia.org/wiki/SSE2)(Pentium 4), which can be turned off if you [build Notepad2 and metapath](https://github.com/zufuliu/notepad2/wiki/Build-Notepad2) yourself.
 * If you find any bugs or have any suggestions feel free to **provide patches/pull requests**.
-* I'm not interested in any **localization** of Notepad2.
 
 ## Contributors:
 * [XhmikosR](https://xhmikosr.github.io/notepad2-mod/)
