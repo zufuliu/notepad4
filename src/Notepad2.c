@@ -2259,7 +2259,6 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	i = IDM_SET_BIDIRECTIONAL_NONE + iBidirectional;
 	CheckMenuRadioItem(hmenu, IDM_SET_BIDIRECTIONAL_NONE, IDM_SET_BIDIRECTIONAL_R2L, i, MF_BYCOMMAND);
 
-	CheckCmd(hmenu, IDM_VIEW_NOSAVERECENT, bSaveRecentFiles);
 	CheckCmd(hmenu, IDM_VIEW_NOSAVEFINDREPL, bSaveFindReplace);
 	CheckCmd(hmenu, IDM_VIEW_SAVEBEFORERUNNINGTOOLS, bSaveBeforeRunningTools);
 
@@ -2291,7 +2290,6 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	EnableCmd(hmenu, IDM_VIEW_REUSEWINDOW, i);
 	EnableCmd(hmenu, IDM_VIEW_STICKYWINPOS, i);
 	EnableCmd(hmenu, IDM_VIEW_SINGLEFILEINSTANCE, i);
-	EnableCmd(hmenu, IDM_VIEW_NOSAVERECENT, i);
 	EnableCmd(hmenu, IDM_VIEW_NOSAVEFINDREPL, i);
 	EnableCmd(hmenu, IDM_VIEW_SAVESETTINGS, i);
 
@@ -4176,10 +4174,6 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		SetWindowTitle(hwnd, uidsAppTitle, fIsElevated, IDS_UNTITLED, szCurFile,
 					   iPathNameFormat, bModified || iEncoding != iOriginalEncoding,
 					   IDS_READONLY, bReadOnly, szTitleExcerpt);
-		break;
-
-	case IDM_VIEW_NOSAVERECENT:
-		bSaveRecentFiles = (bSaveRecentFiles) ? FALSE : TRUE;
 		break;
 
 	case IDM_VIEW_NOSAVEFINDREPL:
