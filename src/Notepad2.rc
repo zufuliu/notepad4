@@ -964,8 +964,8 @@ BEGIN
     ICON            IDI_STYLES,IDC_STATIC,189,19,20,20
     LTEXT           "Customize Schemes",IDC_TITLE,220,25,200,12
     LTEXT           "Filename extensions must be separated by semicolon (;)",IDC_STATIC,191,44,247,13
-    LTEXT           "Style format:\n\tfont:Name;size:nn.mm;bold;italic;underline;strike;\n\tfore:#ffffff;back:#bbbbbb;eolfilled",IDC_STATIC,191,60,247,27
-    LTEXT           "Style propertie can be copied using copy and paste or drag and drop.\n\nThe ""Preview"" button will not apply any changes.",IDC_STATIC,191,90,247,34
+    LTEXT           "Style format:\n\tfont:Name; size:[+|-]nn.mm; bold; italic; underline; strike;\n\tsmoothing:[none|standard|cleartype|default]; charset:dd; case:[U|L];\n\tfore:#ffffff; back:#bbbbbb; alpha:aa; eolfilled; block; noblink;",IDC_STATIC,191,60,260,34
+    LTEXT           "Style properties can be copied using copy and paste or drag and drop.\n\nThe ""Preview"" button will not apply any changes.",IDC_STATIC,191,100,247,30
     LTEXT           "Associated file&name extensions:|Style &settings:",IDC_STYLELABELS,315,230,152,8,NOT WS_VISIBLE
 END
 
