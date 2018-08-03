@@ -180,8 +180,8 @@ UINT GetCurrentDPI(HWND hwnd) {
 HBITMAP ResizeImageForCurrentDPI(HBITMAP hbmp) {
 	BITMAP bmp;
 	if (g_uCurrentDPI > USER_DEFAULT_SCREEN_DPI && GetObject(hbmp, sizeof(BITMAP), &bmp)) {
-		int width = MulDiv(bmp.bmWidth, g_uCurrentDPI, USER_DEFAULT_SCREEN_DPI);
-		int height = MulDiv(bmp.bmHeight, g_uCurrentDPI, USER_DEFAULT_SCREEN_DPI);
+		int width = RoundToCurrentDPI(bmp.bmWidth);
+		int height = RoundToCurrentDPI(bmp.bmHeight);
 		HBITMAP hCopy = CopyImage(hbmp, IMAGE_BITMAP, width, height, LR_COPYRETURNORG | LR_COPYDELETEORG);
 		if (hCopy != NULL) {
 			hbmp = hCopy;

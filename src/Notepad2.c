@@ -1401,12 +1401,12 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 //
 //
 static inline void UpdateSelectionMarginWidth() {
-	int width = bShowSelectionMargin ? MulDiv(16, g_uCurrentDPI, USER_DEFAULT_SCREEN_DPI) : 0;
+	int width = bShowSelectionMargin ? RoundToCurrentDPI(16) : 0;
 	SendMessage(hwndEdit, SCI_SETMARGINWIDTHN, 1, width);
 }
 
 static inline void UpdateFoldMarginWidth() {
-	int width = bShowCodeFolding ? MulDiv(13, g_uCurrentDPI, USER_DEFAULT_SCREEN_DPI) : 0;
+	int width = bShowCodeFolding ? RoundToCurrentDPI(13) : 0;
 	SciCall_SetMarginWidth(MARGIN_FOLD_INDEX, width);
 }
 

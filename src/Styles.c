@@ -2564,7 +2564,7 @@ void Style_SetStyles(HWND hwnd, int iStyle, LPCWSTR lpszStyle) {
 
 	// Size
 	if (Style_StrGetSizeEx(lpszStyle, &iValue)) {
-		iValue = (iValue * g_uCurrentDPI + USER_DEFAULT_SCREEN_DPI/2) / USER_DEFAULT_SCREEN_DPI;
+		iValue = RoundToCurrentDPI(iValue);
 		SendMessage(hwnd, SCI_STYLESETSIZEFRACTIONAL, iStyle, (LPARAM)iValue);
 	}
 

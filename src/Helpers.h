@@ -80,6 +80,8 @@ extern WCHAR szIniFile[MAX_PATH];
 #define USER_DEFAULT_SCREEN_DPI		96
 #endif
 
+#define RoundToCurrentDPI(value)	((g_uCurrentDPI*(value) + USER_DEFAULT_SCREEN_DPI/2) / USER_DEFAULT_SCREEN_DPI)
+
 #define NP2HeapAlloc(size)			HeapAlloc(g_hDefaultHeap, HEAP_ZERO_MEMORY, (size))
 #define NP2HeapFree(hMem)			HeapFree(g_hDefaultHeap, 0, hMem)
 #define NP2HeapReAlloc(hMem, size)	HeapReAlloc(g_hDefaultHeap, HEAP_ZERO_MEMORY, hMem, (size))
