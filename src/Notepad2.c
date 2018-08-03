@@ -26,6 +26,7 @@
 #include <commdlg.h>
 #include <stdio.h>
 #include <time.h>
+#include <inttypes.h>
 #include "Notepad2.h"
 #include "Edit.h"
 #include "Styles.h"
@@ -3288,7 +3289,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			date.QuadPart *= 100U;
 			break;
 		}
-		sprintf(mszBuf, "%I64u", date.QuadPart);
+		sprintf(mszBuf, "%" PRIu64, date.QuadPart);
 		SendMessage(hwndEdit, SCI_REPLACESEL, 0, (LPARAM)mszBuf);
 	}
 	break;

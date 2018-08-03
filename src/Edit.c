@@ -24,6 +24,7 @@
 #include <commdlg.h>
 #include <stdio.h>
 #include <limits.h>
+#include <inttypes.h>
 #include "Notepad2.h"
 #include "Edit.h"
 #include "Styles.h"
@@ -1559,10 +1560,10 @@ static inline BOOL iswordchar(int ch) {
 static int ConvertNumRadix(char *tch, ULONG64 num, int radix) {
 	switch (radix) {
 	case 16:
-		return sprintf(tch, "0x%I64x", num);
+		return sprintf(tch, "0x%" PRIx64, num);
 
 	case 10:
-		return sprintf(tch, "%I64u", num);
+		return sprintf(tch, "%" PRIu64, num);
 
 	case 8: {
 		char buf[2 + 22 + 1] = "";
