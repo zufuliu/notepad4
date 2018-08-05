@@ -90,3 +90,18 @@ if [[ "$newmanifest" != "$(<"$manifestfile")" ]]; then
   # Update the revision number in the manifest file
   echo "$newmanifest" > "$manifestfile"
 fi
+
+# Update metapath's manifest and version information
+if [[ $# -ne 0 ]]; then
+  versionfile="./metapath/src/VersionRev.h"
+  manifestfile="./metapath/res/metapath.exe.manifest"
+  if [[ ! -f "$versionfile" ]] || [[ "$version_info" != "$(<"$versionfile")" ]]; then
+    echo "$version_info" > "$versionfile"
+  fi
+
+  base_ver="4.0.13"
+  newmanifest="$(sed -Ee "s/(${base_ver}.)([0-9]+)/\1${ver}/g" "$manifestfile")"
+  if [[ "$newmanifest" != "$(<"$manifestfile")" ]]; then
+    echo "$newmanifest" > "$manifestfile"
+  fi
+fi

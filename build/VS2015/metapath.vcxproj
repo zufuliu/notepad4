@@ -204,6 +204,7 @@
     <ClInclude Include="..\..\metapath\src\metapath.h" />
     <ClInclude Include="..\..\metapath\src\resource.h" />
     <ClInclude Include="..\..\metapath\src\version.h" />
+    <ClInclude Include="..\..\metapath\src\VersionRev.h" />
   </ItemGroup>
   <ItemGroup>
     <Manifest Include="..\..\metapath\res\metapath.exe.manifest" />
