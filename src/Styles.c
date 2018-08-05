@@ -2303,6 +2303,9 @@ BOOL Style_SelectFont(HWND hwnd, LPWSTR lpszStyle, int cchStyle, BOOL bDefaultSt
 	if (Style_StrGetCharSet(lpszStyle, &iValue)) {
 		lf.lfCharSet = (BYTE)iValue;
 	}
+	if (Style_StrGetColor(TRUE, lpszStyle, &iValue)) {
+		cf.rgbColors = iValue;
+	}
 	if (Style_StrGetSize(lpszStyle, &iValue)) {
 		HDC hdc = GetDC(hwnd);
 		lf.lfHeight = -MulDiv(iValue, GetDeviceCaps(hdc, LOGPIXELSY), 72);
@@ -2310,12 +2313,13 @@ BOOL Style_SelectFont(HWND hwnd, LPWSTR lpszStyle, int cchStyle, BOOL bDefaultSt
 	}
 	lf.lfWeight = (StrStrI(lpszStyle, L"bold")) ? FW_BOLD : FW_NORMAL;
 	lf.lfItalic = (StrStrI(lpszStyle, L"italic")) ? 1 : 0;
+	lf.lfStrikeOut = (StrStrI(lpszStyle, L"strike")) ? 1 : 0;
 
 	// Init cf
 	cf.lStructSize = sizeof(CHOOSEFONT);
 	cf.hwndOwner = hwnd;
 	cf.lpLogFont = &lf;
-	cf.Flags = CF_INITTOLOGFONTSTRUCT /*| CF_NOSCRIPTSEL*/ | CF_SCREENFONTS;
+	cf.Flags = CF_INITTOLOGFONTSTRUCT /*| CF_NOSCRIPTSEL*/ | CF_SCREENFONTS | CF_EFFECTS;
 
 	if (HIBYTE(GetKeyState(VK_SHIFT))) {
 		cf.Flags |= CF_FIXEDPITCHONLY;
@@ -2350,15 +2354,15 @@ BOOL Style_SelectFont(HWND hwnd, LPWSTR lpszStyle, int cchStyle, BOOL bDefaultSt
 		lstrcat(szNewStyle, L"; italic");
 	}
 
-	if (StrStrI(lpszStyle, L"underline")) {
+	if (lf.lfUnderline /*StrStrI(lpszStyle, L"underline")*/) {
 		lstrcat(szNewStyle, L"; underline");
 	}
 
-	if (StrStrI(lpszStyle, L"strike")) {
+	if (lf.lfStrikeOut /*StrStrI(lpszStyle, L"strike")*/) {
 		lstrcat(szNewStyle, L"; strike");
 	}
 
-	// save colors
+	// save colors, ignore colors selected by user
 	if (Style_StrGetColor(TRUE, lpszStyle, &iValue)) {
 		wsprintf(tch, L"; fore:#%02X%02X%02X",
 				 (int)GetRValue(iValue),
