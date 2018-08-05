@@ -21,9 +21,27 @@
 #ifndef METAPATH_VERSION_H_
 #define METAPATH_VERSION_H_
 
+#include "VersionRev.h"
+
+#ifndef _T
+#if !defined(ISPP_INVOKED) && (defined(UNICODE) || defined(_UNICODE))
+#define _T(text) L##text
+#else
+#define _T(text) text
+#endif
+#endif
+
+#define DO_STRINGIFY(x) _T(#x)
+#define STRINGIFY(x)    DO_STRINGIFY(x)
+
+#define VERSION_MAJOR   4
+#define VERSION_MINOR   0
+#define VERSION_BUILD   13
+
 #define MY_APPNAME                   L"metapath"
-#define VERSION_FILEVERSION_NUM      4,0,13,0
-#define VERSION_FILEVERSION          L"metapath 4.0.13"
+#define VERSION_FILEVERSION_NUM      VERSION_MAJOR,VERSION_MINOR,VERSION_BUILD,VERSION_REV
+#define VERSION_FILEVERSION          STRINGIFY(VERSION_MAJOR) "." STRINGIFY(VERSION_MINOR) "." \
+									STRINGIFY(VERSION_BUILD) "." STRINGIFY(VERSION_REV)
 #define VERSION_LEGALCOPYRIGHT_SHORT L"Copyright \xA9 1996-2018"
 #define VERSION_LEGALCOPYRIGHT_LONG  L"\xA9 1996-2018 Florian Balmer"
 #define VERSION_AUTHORNAME           L"Florian Balmer"
@@ -33,9 +51,13 @@
 #define VERSION_NEWPAGE_DISPLAY      L"https://github.com/zufuliu/notepad2"
 
 #if defined(_WIN64)
-#define VERSION_FILEVERSION_LONG     L"metapath (64-bit) 4.0.13"
+#define VERSION_FILEVERSION_LONG	L"metapath (64-bit) " STRINGIFY(VERSION_MAJOR) L"." \
+									STRINGIFY(VERSION_MINOR) L"." STRINGIFY(VERSION_BUILD)  \
+									L" r" STRINGIFY(VERSION_REV) L" (" VERSION_HASH L")"
 #else
-#define VERSION_FILEVERSION_LONG     L"metapath 4.0.13"
+#define VERSION_FILEVERSION_LONG	L"metapath " STRINGIFY(VERSION_MAJOR) L"."         \
+									STRINGIFY(VERSION_MINOR) L"." STRINGIFY(VERSION_BUILD) \
+									L" r" STRINGIFY(VERSION_REV) L" (" VERSION_HASH L")"
 #endif
 
 #endif // METAPATH_VERSION_H_

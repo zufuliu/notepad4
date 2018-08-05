@@ -17,6 +17,7 @@
     <File Name="../../metapath/src/metapath.h"/>
     <File Name="../../metapath/src/resource.h"/>
     <File Name="../../metapath/src/version.h"/>
+    <File Name="../../metapath/src/VersionRev.h"/>
   </VirtualDirectory>
   <VirtualDirectory Name="Resource Files">
     <File Name="../../metapath/res/cross1.ico"/>

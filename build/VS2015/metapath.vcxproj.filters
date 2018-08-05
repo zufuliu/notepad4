@@ -53,6 +53,9 @@
     <ClInclude Include="..\..\metapath\src\version.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\metapath\src\VersionRev.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Manifest Include="..\..\metapath\res\metapath.exe.manifest">
