@@ -2306,9 +2306,10 @@ BOOL Style_SelectFont(HWND hwnd, LPWSTR lpszStyle, int cchStyle, BOOL bDefaultSt
 	if (Style_StrGetColor(TRUE, lpszStyle, &iValue)) {
 		cf.rgbColors = iValue;
 	}
-	if (Style_StrGetSize(lpszStyle, &iValue)) {
+	if (Style_StrGetSizeEx(lpszStyle, &iValue)) {
 		HDC hdc = GetDC(hwnd);
-		lf.lfHeight = -MulDiv(iValue, GetDeviceCaps(hdc, LOGPIXELSY), 72);
+		cf.iPointSize = iValue / (SC_FONT_SIZE_MULTIPLIER / 10);
+		lf.lfHeight = -MulDiv(iValue, GetDeviceCaps(hdc, LOGPIXELSY), 72*SC_FONT_SIZE_MULTIPLIER);
 		ReleaseDC(hwnd, hdc);
 	}
 	lf.lfWeight = (StrStrI(lpszStyle, L"bold")) ? FW_BOLD : FW_NORMAL;
@@ -2347,6 +2348,13 @@ BOOL Style_SelectFont(HWND hwnd, LPWSTR lpszStyle, int cchStyle, BOOL bDefaultSt
 	lstrcat(szNewStyle, L"; size:");
 	wsprintf(tch, L"%i", cf.iPointSize / 10);
 	lstrcat(szNewStyle, tch);
+	iValue = cf.iPointSize % 10;
+	if (iValue != 0) {
+		tch[0] = '.';
+		tch[1] = (WCHAR)(L'0' + iValue);
+		tch[2] = 0;
+		lstrcat(szNewStyle, tch);
+	}
 	if (cf.nFontType & BOLD_FONTTYPE) {
 		lstrcat(szNewStyle, L"; bold");
 	}
