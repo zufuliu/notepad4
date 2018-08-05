@@ -47,8 +47,8 @@
 #define IDC_TARGETPATH                  102
 #define IDC_FULLROWSELECT               102
 #define IDC_FAVORITES                   102
-#define IDC_WEBPAGE                     102
-#define IDC_WEBPAGE2                    103
+#define IDC_WEBPAGE_LINK                102
+#define IDC_WEBPAGE_TEXT                103
 #define IDD_FILTER                      103
 #define IDC_FUNCCOPY                    103
 #define IDC_CLEARREADONLY               103
@@ -74,14 +74,14 @@
 #define IDC_SENDDROPMSG                 105
 #define IDC_MINIMIZETOTRAY              105
 #define IDI_ITEMS                       105
-#define IDC_EMAIL                       105
+#define IDC_EMAIL_LINK                  105
 #define IDD_OPENWITH                    106
 #define IDC_NOCONFIRMDELETE             106
 #define IDC_COLOR_SAMP2                 106
 #define IDC_USEDDE                      106
 #define IDC_REUSEWINDOW                 106
 #define IDI_PROGS                       106
-#define IDC_EMAIL2                      106
+#define IDC_EMAIL_TEXT                  106
 #define IDD_NEWDIR                      107
 #define IDC_ESCFUNCTION                 107
 #define IDC_COLOR_PICK2                 107
@@ -95,6 +95,8 @@
 #define IDC_ESCEXIT                     109
 #define IDD_FINDWIN                     109
 #define IDC_DDEAPP                      109
+#define IDC_NEW_PAGE_TEXT				109
+#define IDC_NEW_PAGE_LINK				110
 #define IDPP_GENERAL                    110
 #define IDC_DDETOPIC                    110
 #define IDPP_ADVANCED                   111
