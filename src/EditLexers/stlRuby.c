@@ -37,7 +37,7 @@ EDITLEXER lexRuby = { SCLEX_RUBY, NP2LEX_RUBY, L"Ruby Script", L"rb; ruby; rbw; 
 	{ SCE_RB_COMMENTLINE, NP2STYLE_Comment, L"Comment", L"fore:#008000", L"" },
 	{ MULTI_STYLE(SCE_RB_STRING, SCE_RB_CHARACTER, 0, 0), NP2STYLE_String, L"String", L"fore:#008000", L"" },
 	{ SCE_RB_POD, 63472, L"POD", L"fore:#004000; back:#C0FFC0; eolfilled", L"" },
-	{ SCE_RB_BACKTICKS, NP2STYLE_BackTicks, L"Back Ticks", L"fore:#FF0080", L"" },
+	{ SCE_RB_BACKTICKS, NP2STYLE_Backticks, L"Backticks", L"fore:#FF0080", L"" },
 	{ SCE_RB_REGEX, NP2STYLE_Regex, L"Regex", L"fore:#000000; back:#A0FFA0", L"" },
 	{ SCE_RB_SYMBOL, 63473, L"Symbol", L"bold; fore:#FF4F0F", L"" },
 	{ MULTI_STYLE(SCE_RB_CLASS_VAR, SCE_RB_INSTANCE_VAR, SCE_RB_GLOBAL, 0), NP2STYLE_Variable, L"Variable", L"fore:#003CE6", L"" },

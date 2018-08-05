@@ -59,7 +59,7 @@
 #define NP2STYLE_HexString			63343
 #define NP2STYLE_Instruction		63344
 #define NP2STYLE_Register			63345
-#define NP2STYLE_BackTicks			63346
+#define NP2STYLE_Backticks			63346
 #define NP2STYLE_TripleString		63347
 #define NP2STYLE_BasicFunction		63348
 #define NP2STYLE_PredefinedVariable	63349
