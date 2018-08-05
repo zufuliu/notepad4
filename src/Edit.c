@@ -3615,7 +3615,7 @@ void EditWrapToColumn(HWND hwnd, int nColumn/*, int nTabWidth*/) {
 	cchConvW = 0;
 	iLineLength = 0;
 
-#define ISDELIMITER(wc) StrChr(L",;.:-+%&\x00A6|/*?!\"\'~\x0384#=", wc)
+#define ISDELIMITER(wc) StrChr(L",;.:-+%&\xA6|/*?!\"\'~\xB4#=", wc)
 #define ISWHITE(wc) StrChr(L" \t", wc)
 #define ISWORDEND(wc) (/*ISDELIMITER(wc) ||*/ StrChr(L" \t\r\n", wc))
 

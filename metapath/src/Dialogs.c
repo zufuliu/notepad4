@@ -2198,7 +2198,7 @@ INT_PTR CALLBACK FindTargetDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 		//	DestroyWindow(hwndToolTip);
 		//}
 
-		// Bitmap f \x00FC r den Browse-Button
+		// Bitmap for the Browse button
 		MakeBitmapButton(hwnd, IDC_BROWSE, g_hInstance, IDB_OPEN);
 		//MakeBitmapButton(hwnd, IDC_FINDWIN, g_hInstance, IDB_BROWSE);
 
@@ -2293,7 +2293,7 @@ INT_PTR CALLBACK FindTargetDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 			GetString(IDS_FILTER_EXE, szFilter, COUNTOF(szFilter));
 			PrepareFilterStr(szFilter);
 
-			// ofn ausf \x00FC llen
+			// ofn fill out
 			ofn.lStructSize = sizeof(OPENFILENAME);
 			ofn.hwndOwner   = hwnd;
 			ofn.lpstrFilter = szFilter;
