@@ -496,7 +496,7 @@ BEGIN
     END
     POPUP "&?"
     BEGIN
-        MENUITEM "&About...\tF1",               IDM_HELP_ABOUT
+        MENUITEM "&About Notepad2\tF1",         IDM_HELP_ABOUT
         MENUITEM "&Command Line Help",          IDM_CMDLINE_HELP
     END
 END
@@ -1111,7 +1111,7 @@ BEGIN
     LTEXT           "Continuous number.",IDC_STATIC,51,78,107,8
     LTEXT           "$(I)",204,7,88,21,8
     LTEXT           "$(0I)",205,27,88,25,8
-    LTEXT           "Continuous number(zero-based).",IDC_STATIC,51,88,125,8
+    LTEXT           "Continuous number (zero-based).",IDC_STATIC,51,88,125,8
 END
 
 IDD_INSERTTAG DIALOGEX 0, 0, 264, 90
@@ -1119,9 +1119,9 @@ STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSM
 CAPTION "Insert HTML/XML Tag"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
-    LTEXT           "&Opening tag(with attributes):",IDC_STATIC,7,7,130,8
+    LTEXT           "&Opening tag (with attributes):",IDC_STATIC,7,7,130,8
     EDITTEXT        100,7,18,250,14,ES_AUTOHSCROLL
-    LTEXT           "&Closing tag(can be edited):",IDC_STATIC,7,37,118,8
+    LTEXT           "&Closing tag (can be edited):",IDC_STATIC,7,37,118,8
     EDITTEXT        101,7,48,250,14,ES_AUTOHSCROLL
     DEFPUSHBUTTON   "OK",IDOK,79,69,50,14
     PUSHBUTTON      "Cancel",IDCANCEL,181,69,50,14
