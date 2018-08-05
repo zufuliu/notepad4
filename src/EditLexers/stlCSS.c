@@ -69,10 +69,10 @@ EDITLEXER lexCSS = { SCLEX_CSS, NP2LEX_CSS, L"CSS Style Sheet", L"css", L"", &Ke
 	//{ SCE_CSS_DEFAULT, L"Default", L"", L"" },
 	{ SCE_CSS_COMMENT, NP2STYLE_Comment, L"Comment", L"fore:#008000", L"" },
 	{ SCE_CSS_TAG, 63161, L"HTML Tag", L"bold; fore:#0A246A", L"" },
-	{ SCE_CSS_CLASS, 63301, L"Tag-Class", L"fore:#648000", L"" },
-	{ SCE_CSS_ID, 63302, L"Tag-Id", L"fore:#648000", L"" },
-	{ SCE_CSS_ATTRIBUTE, 63303, L"Tag-Attribute", L"italic; fore:#648000", L"" },
-	{ MULTI_STYLE(SCE_CSS_PSEUDOCLASS, SCE_CSS_EXTENDED_PSEUDOCLASS, SCE_CSS_PSEUDOELEMENT, SCE_CSS_EXTENDED_PSEUDOELEMENT), 63304, L"Pseudo-class/element", L"fore:#B000B0", L"" },
+	{ SCE_CSS_CLASS, 63301, L"Tag Class", L"fore:#648000", L"" },
+	{ SCE_CSS_ID, 63302, L"Tag Id", L"fore:#648000", L"" },
+	{ SCE_CSS_ATTRIBUTE, 63303, L"Tag Attribute", L"italic; fore:#648000", L"" },
+	{ MULTI_STYLE(SCE_CSS_PSEUDOCLASS, SCE_CSS_EXTENDED_PSEUDOCLASS, SCE_CSS_PSEUDOELEMENT, SCE_CSS_EXTENDED_PSEUDOELEMENT), 63304, L"Pseudo Class/Element", L"fore:#B000B0", L"" },
 	{ MULTI_STYLE(SCE_CSS_IDENTIFIER, SCE_CSS_IDENTIFIER2, SCE_CSS_IDENTIFIER3, SCE_CSS_EXTENDED_IDENTIFIER), 63306, L"CSS Property", L"fore:#FF4000", L"" },
 	{ MULTI_STYLE(SCE_CSS_DOUBLESTRING, SCE_CSS_SINGLESTRING, 0, 0), NP2STYLE_String, L"String", L"fore:#008000", L"" },
 	{ SCE_CSS_VALUE, 63309, L"Value", L"fore:#3A6EA5", L"" },
@@ -81,7 +81,7 @@ EDITLEXER lexCSS = { SCLEX_CSS, NP2LEX_CSS, L"CSS Style Sheet", L"css", L"", &Ke
 	{ SCE_CSS_DIRECTIVE, NP2STYLE_Directive, L"Directive", L"bold; fore:#000000; back:#FFF1A8", L"" },
 	{ SCE_CSS_MEDIA, 63382, L"Media", L"bold; fore:#0A246A", L"" },
 	{ SCE_CSS_VARIABLE, NP2STYLE_Variable, L"Variable", L"bold; fore:#FF4000", L"" },
-	{ SCE_CSS_UNKNOWN_PSEUDOCLASS, 63305, L"Unknown Pseudo-class", L"fore:#C80000; back:#FFFF80", L"" },
+	{ SCE_CSS_UNKNOWN_PSEUDOCLASS, 63305, L"Unknown Pseudo Class", L"fore:#C80000; back:#FFFF80", L"" },
 	{ SCE_CSS_UNKNOWN_IDENTIFIER, 63307, L"Unknown Property", L"fore:#C80000; back:#FFFF80", L"" },
 	{ -1, 00000, L"", L"", L"" }
 }
