@@ -1352,6 +1352,7 @@ BOOL ColumnWrapDlg(HWND hwnd, UINT uidDlg, int *iNumber) {
 // 202 Text
 // 203 Text
 //
+extern BOOL fWordWrap;
 extern int iWordWrapMode;
 extern int iWordWrapIndent;
 extern int iWordWrapSymbols;
@@ -1404,7 +1405,12 @@ INT_PTR CALLBACK WordWrapSettingsDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LP
 			}
 
 			iSel = (int)SendDlgItemMessage(hwnd, 103, CB_GETCURSEL, 0, 0);
-			iWordWrapMode = iSel;
+			if (iSel == SC_WRAP_NONE) {
+				fWordWrap = FALSE;
+			} else {
+				fWordWrap = TRUE;
+				iWordWrapMode = iSel;
+			}
 			EndDialog(hwnd, IDOK);
 		}
 		break;
