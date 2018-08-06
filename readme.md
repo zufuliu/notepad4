@@ -1,7 +1,6 @@
 # Notepad2 and metapath
 
-> *Notepad2 is a modified version (fork) of [Notepad2-mod](https://xhmikosr.github.io/notepad2-mod/)
-> *metapath is a bug-fixed version of original [metapath](http://www.flos-freeware.ch/archive.html)
+> *Notepad2* is a modified version (fork) of [Notepad2-mod](https://xhmikosr.github.io/notepad2-mod/). *metapath* is a bug-fixed version of original [metapath](http://www.flos-freeware.ch/archive.html).
 
 ## Changes compared to the official [Notepad2](http://www.flos-freeware.ch/notepad2.html) or [Notepad2-mod](https://xhmikosr.github.io/notepad2-mod/):
 
