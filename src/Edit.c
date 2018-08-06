@@ -6413,11 +6413,7 @@ BOOL FileVars_Apply(HWND hwnd, LPFILEVARS lpfv) {
 		fWordWrap = fWordWrapG;
 	}
 
-	if (!fWordWrap) {
-		SendMessage(hwndEdit, SCI_SETWRAPMODE, SC_WRAP_NONE, 0);
-	} else {
-		SendMessage(hwndEdit, SCI_SETWRAPMODE, (iWordWrapMode == 0) ? SC_WRAP_WORD : SC_WRAP_CHAR, 0);
-	}
+	SendMessage(hwndEdit, SCI_SETWRAPMODE, (fWordWrap? iWordWrapMode : SC_WRAP_NONE), 0);
 
 	if (lpfv->mask & FV_LONGLINESLIMIT) {
 		iLongLinesLimit = lpfv->iLongLinesLimit;
