@@ -1596,7 +1596,7 @@ BEGIN
     IDS_ASK_CREATE          """%s"" not found.\nWould you like to create this file?"
     IDS_PRINT_HEADER        "Filename, Current Date and Time|Filename, Current Date|Filename|Leave blank"
     IDS_PRINT_FOOTER        "Page Number|Leave blank"
-    IDS_PRINT_COLOR         "Normal|Invert light (dark background)|Black on white|Color on white|Color on white (except line numbers)|Current screen color"
+    IDS_PRINT_COLOR         "Normal|Invert light (dark background)|Black on white|Color on white|Color on white (except line numbers)|Current screen color (WYSIWYG)"
     IDS_PRINT_PAGENUM       "Page %i"
     IDS_PRINT_EMPTY         "This document doesn't contain any text to be printed."
     IDS_PRINT_ERROR         "Error printing ""%s""!"
