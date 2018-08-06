@@ -112,7 +112,7 @@ extern EDITLEXER lexVB;
 extern EDITLEXER lexANSI;
 
 // This array holds all the lexers...
-PEDITLEXER pLexArray[NUMLEXERS] = {
+static const PEDITLEXER pLexArray[NUMLEXERS] = {
 	&lexDefault,
 
 	&lexCPP,
@@ -193,7 +193,7 @@ PEDITLEXER pLexArray[NUMLEXERS] = {
 };
 
 #define	NUM_MONO_FONT	6
-const WCHAR *SysMonoFontName[NUM_MONO_FONT] = {
+static const WCHAR *SysMonoFontName[NUM_MONO_FONT] = {
 	L"DejaVu Sans Mono",
 	//L"Bitstream Vera Sans Mono",
 	L"Consolas",

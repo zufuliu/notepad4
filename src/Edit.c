@@ -48,7 +48,7 @@ extern int yFindReplaceDlg;
 
 extern int iDefaultEncoding;
 extern int iDefaultEOLMode;
-extern int iLineEndings[3];
+extern const int iLineEndings[3];
 extern BOOL bFixLineEndings;
 extern BOOL bAutoStripBlanks;
 
@@ -63,7 +63,7 @@ extern int iSrcEncoding;
 extern int iWeakSrcEncoding;
 
 extern int g_DOSEncoding;
-extern	NP2ENCODING mEncoding[];
+extern const NP2ENCODING mEncoding[];
 
 extern LPMRULIST mruFind;
 extern LPMRULIST mruReplace;
