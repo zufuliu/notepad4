@@ -1011,7 +1011,7 @@ BEGIN
     LTEXT           "No wrap indent|Wrap indent by 1 character|Wrap indent by 2 characters|Wrap indent by 1 level|Wrap indent by 2 levels|Wrap indent as first subline|Wrap indent 1 level more than first subline|Wrap indent 2 levels more than first subline",200,0,0,615,8,NOT WS_VISIBLE
     LTEXT           "No visual indicators before wrap|Show visual indicators before wrap (near text)|Show visual indicators before wrap (near borders)",201,0,0,418,8,NOT WS_VISIBLE
     LTEXT           "No visual indicators after wrap|Show visual indicators after wrap (near text)|Show visual indicators after wrap (near borders)",202,0,0,402,8,NOT WS_VISIBLE
-    LTEXT           "Wrap text between words|Wrap text between any glyphs",203,0,0,187,8,NOT WS_VISIBLE
+    LTEXT           "No wrap|Wrap text between words|Wrap text between any characters (preferred for CJK text)|Wrap text on whitespace",203,0,0,187,8,NOT WS_VISIBLE
 END
 
 IDD_PAGESETUP DIALOGEX 5, 5, 356, 260

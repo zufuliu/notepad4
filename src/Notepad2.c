@@ -3679,6 +3679,8 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case IDM_VIEW_WORDWRAPSETTINGS:
 		if (WordWrapSettingsDlg(hwnd, IDD_WORDWRAP, &iWordWrapIndent)) {
 			SendMessage(hwndEdit, SCI_SETWRAPMODE, (fWordWrap? iWordWrapMode : SC_WRAP_NONE), 0);
+			fWordWrapG = fWordWrap;
+			UpdateToolbar();
 			if (iWordWrapIndent == 5) {
 				SendMessage(hwndEdit, SCI_SETWRAPINDENTMODE, SC_WRAPINDENT_SAME, 0);
 			} else if (iWordWrapIndent == 6) {
@@ -5228,8 +5230,8 @@ void LoadSettings(void) {
 	fWordWrap = IniSectionGetBool(pIniSection, L"WordWrap", 1);
 	fWordWrapG = fWordWrap;
 
-	iWordWrapMode = IniSectionGetInt(pIniSection, L"WordWrapMode", 0);
-	iWordWrapMode = clamp_i(iWordWrapMode, 0, 1);
+	iWordWrapMode = IniSectionGetInt(pIniSection, L"WordWrapMode", SC_WRAP_WORD);
+	iWordWrapMode = clamp_i(iWordWrapMode, SC_WRAP_WORD, SC_WRAP_WHITESPACE);
 
 	iWordWrapIndent = IniSectionGetInt(pIniSection, L"WordWrapIndent", 0);
 	iWordWrapIndent = clamp_i(iWordWrapIndent, 0, 7);
