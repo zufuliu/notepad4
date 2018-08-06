@@ -60,7 +60,7 @@ HWND	hDlgFindReplace = NULL;
 #define NUMINITIALTOOLS		24
 #define MARGIN_FOLD_INDEX	2
 
-TBBUTTON  tbbMainWnd[] = {
+static TBBUTTON  tbbMainWnd[] = {
 	{0, 	IDT_FILE_NEW, 		TBSTATE_ENABLED, TBSTYLE_BUTTON, {0}, 0, 0},
 	{1, 	IDT_FILE_OPEN, 		TBSTATE_ENABLED, TBSTYLE_BUTTON, {0}, 0, 0},
 	{2, 	IDT_FILE_BROWSE, 	TBSTATE_ENABLED, TBSTYLE_BUTTON, {0}, 0, 0},
@@ -262,9 +262,9 @@ static EDITFINDREPLACE efrData;
 UINT	cpLastFind = 0;
 BOOL	bReplaceInitialized = FALSE;
 
-extern	NP2ENCODING mEncoding[];
+extern const NP2ENCODING mEncoding[];
 
-int iLineEndings[3] = {
+const int iLineEndings[3] = {
 	SC_EOL_CRLF,
 	SC_EOL_LF,
 	SC_EOL_CR

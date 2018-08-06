@@ -18,8 +18,8 @@ extern int iDefaultCodePage;
 int g_DOSEncoding;
 
 // Supported Encodings
-WCHAR wchANSI[8] = L"";
-WCHAR wchOEM [8] = L"";
+static WCHAR wchANSI[8] = L"";
+static WCHAR wchOEM [8] = L"";
 
 // Encoding
 NP2ENCODING mEncoding[] = {
