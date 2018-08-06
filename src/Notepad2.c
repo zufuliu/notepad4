@@ -1439,11 +1439,7 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	Style_SetIndentGuides(hwndEdit, bShowIndentGuides);
 
 	// Word wrap
-	if (!fWordWrap) {
-		SendMessage(hwndEdit, SCI_SETWRAPMODE, SC_WRAP_NONE, 0);
-	} else {
-		SendMessage(hwndEdit, SCI_SETWRAPMODE, (iWordWrapMode == 0) ? SC_WRAP_WORD : SC_WRAP_CHAR, 0);
-	}
+	SendMessage(hwndEdit, SCI_SETWRAPMODE, (fWordWrap? iWordWrapMode : SC_WRAP_NONE), 0);
 	if (iWordWrapIndent == 5) {
 		SendMessage(hwndEdit, SCI_SETWRAPINDENTMODE, SC_WRAPINDENT_SAME, 0);
 	} else if (iWordWrapIndent == 6) {
@@ -3675,20 +3671,14 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	case IDM_VIEW_WORDWRAP:
 		fWordWrap = (fWordWrap) ? FALSE : TRUE;
-		if (!fWordWrap) {
-			SendMessage(hwndEdit, SCI_SETWRAPMODE, SC_WRAP_NONE, 0);
-		} else {
-			SendMessage(hwndEdit, SCI_SETWRAPMODE, (iWordWrapMode == 0) ? SC_WRAP_WORD : SC_WRAP_CHAR, 0);
-		}
+		SendMessage(hwndEdit, SCI_SETWRAPMODE, (fWordWrap? iWordWrapMode : SC_WRAP_NONE), 0);
 		fWordWrapG = fWordWrap;
 		UpdateToolbar();
 		break;
 
 	case IDM_VIEW_WORDWRAPSETTINGS:
 		if (WordWrapSettingsDlg(hwnd, IDD_WORDWRAP, &iWordWrapIndent)) {
-			if (fWordWrap) {
-				SendMessage(hwndEdit, SCI_SETWRAPMODE, (iWordWrapMode == 0) ? SC_WRAP_WORD : SC_WRAP_CHAR, 0);
-			}
+			SendMessage(hwndEdit, SCI_SETWRAPMODE, (fWordWrap? iWordWrapMode : SC_WRAP_NONE), 0);
 			if (iWordWrapIndent == 5) {
 				SendMessage(hwndEdit, SCI_SETWRAPINDENTMODE, SC_WRAPINDENT_SAME, 0);
 			} else if (iWordWrapIndent == 6) {
