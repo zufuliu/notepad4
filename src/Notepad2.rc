@@ -494,10 +494,10 @@ BEGIN
         MENUITEM "Save Settings &Now\tF7",      IDM_VIEW_SAVESETTINGSNOW
         MENUITEM "&Open Notepad2.ini\tCtrl+F7", CMD_OPENINIFILE
     END
-    POPUP "&?"
+    POPUP "&Help"
     BEGIN
-        MENUITEM "&About Notepad2\tF1",         IDM_HELP_ABOUT
         MENUITEM "&Command Line Help",          IDM_CMDLINE_HELP
+        MENUITEM "&About Notepad2\tF1",         IDM_HELP_ABOUT
     END
 END
 
