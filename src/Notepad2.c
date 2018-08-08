@@ -1416,30 +1416,26 @@ static inline void UpdateFoldMarginWidth() {
 	SendMessage(hwndEdit, SCI_SETMOUSEDWELLTIME, bShowCallTips? iCallTipsWaitTime : SC_TIME_FOREVER, 0);
 #endif
 
-LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) {
-	HINSTANCE hInstance = ((LPCREATESTRUCT)lParam)->hInstance;
-	g_uCurrentDPI = GetCurrentDPI(hwnd);
+void SetWrapStartIndent(void) {
+	int i = 0;
+	switch (iWordWrapIndent) {
+	case 1:
+		i = 1;
+		break;
+	case 2:
+		i = 2;
+		break;
+	case 3:
+		i = (iIndentWidth) ? 1 * iIndentWidth : 1 * iTabWidth;
+		break;
+	case 4:
+		i = (iIndentWidth) ? 2 * iIndentWidth : 2 * iTabWidth;
+		break;
+	}
+	SendMessage(hwndEdit, SCI_SETWRAPSTARTINDENT, i, 0);	
+}
 
-	// Setup edit control
-	hwndEdit = EditCreate(hwnd);
-	InitScintillaHandle(hwndEdit);
-
-	iRenderingTechnology = (int)SendMessage(hwndEdit, SCI_GETTECHNOLOGY, 0, 0);
-	iBidirectional = (int)SendMessage(hwndEdit, SCI_GETBIDIRECTIONAL, 0, 0);
-
-	SendMessage(hwndEdit, SCI_SETZOOM, iZoomLevel, 0);
-	// Tabs
-	SendMessage(hwndEdit, SCI_SETUSETABS, !bTabsAsSpaces, 0);
-	SendMessage(hwndEdit, SCI_SETTABINDENTS, bTabIndents, 0);
-	SendMessage(hwndEdit, SCI_SETBACKSPACEUNINDENTS, bBackspaceUnindents, 0);
-	SendMessage(hwndEdit, SCI_SETTABWIDTH, iTabWidth, 0);
-	SendMessage(hwndEdit, SCI_SETINDENT, iIndentWidth, 0);
-
-	// Indent Guides
-	Style_SetIndentGuides(hwndEdit, bShowIndentGuides);
-
-	// Word wrap
-	SendMessage(hwndEdit, SCI_SETWRAPMODE, (fWordWrap? iWordWrapMode : SC_WRAP_NONE), 0);
+void SetWrapIndentMode(void) {
 	if (iWordWrapIndent == 5) {
 		SendMessage(hwndEdit, SCI_SETWRAPINDENTMODE, SC_WRAPINDENT_SAME, 0);
 	} else if (iWordWrapIndent == 6) {
@@ -1447,25 +1443,12 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	} else if (iWordWrapIndent == 7) {
 		SendMessage(hwndEdit, SCI_SETWRAPINDENTMODE, SC_WRAPINDENT_DEEPINDENT, 0);
 	} else {
-		int i = 0;
-		switch (iWordWrapIndent) {
-		case 1:
-			i = 1;
-			break;
-		case 2:
-			i = 2;
-			break;
-		case 3:
-			i = (iIndentWidth) ? 1 * iIndentWidth : 1 * iTabWidth;
-			break;
-		case 4:
-			i = (iIndentWidth) ? 2 * iIndentWidth : 2 * iTabWidth;
-			break;
-		}
-		SendMessage(hwndEdit, SCI_SETWRAPSTARTINDENT, i, 0);
+		SetWrapStartIndent();
 		SendMessage(hwndEdit, SCI_SETWRAPINDENTMODE, SC_WRAPINDENT_FIXED, 0);
 	}
+}
 
+void SetWrapVisualFlags(void) {
 	if (bShowWordWrapSymbols) {
 		int wrapVisualFlags = 0;
 		int wrapVisualFlagsLocation = 0;
@@ -1495,6 +1478,34 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	} else {
 		SendMessage(hwndEdit, SCI_SETWRAPVISUALFLAGS, 0, 0);
 	}
+}
+
+LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) {
+	HINSTANCE hInstance = ((LPCREATESTRUCT)lParam)->hInstance;
+	g_uCurrentDPI = GetCurrentDPI(hwnd);
+
+	// Setup edit control
+	hwndEdit = EditCreate(hwnd);
+	InitScintillaHandle(hwndEdit);
+
+	iRenderingTechnology = (int)SendMessage(hwndEdit, SCI_GETTECHNOLOGY, 0, 0);
+	iBidirectional = (int)SendMessage(hwndEdit, SCI_GETBIDIRECTIONAL, 0, 0);
+
+	SendMessage(hwndEdit, SCI_SETZOOM, iZoomLevel, 0);
+	// Tabs
+	SendMessage(hwndEdit, SCI_SETUSETABS, !bTabsAsSpaces, 0);
+	SendMessage(hwndEdit, SCI_SETTABINDENTS, bTabIndents, 0);
+	SendMessage(hwndEdit, SCI_SETBACKSPACEUNINDENTS, bBackspaceUnindents, 0);
+	SendMessage(hwndEdit, SCI_SETTABWIDTH, iTabWidth, 0);
+	SendMessage(hwndEdit, SCI_SETINDENT, iIndentWidth, 0);
+
+	// Indent Guides
+	Style_SetIndentGuides(hwndEdit, bShowIndentGuides);
+
+	// Word wrap
+	SendMessage(hwndEdit, SCI_SETWRAPMODE, (fWordWrap? iWordWrapMode : SC_WRAP_NONE), 0);
+	SetWrapIndentMode();
+	SetWrapVisualFlags();
 
 	// Long Lines
 	if (bMarkLongLines) {
@@ -3681,60 +3692,8 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			SendMessage(hwndEdit, SCI_SETWRAPMODE, (fWordWrap? iWordWrapMode : SC_WRAP_NONE), 0);
 			fWordWrapG = fWordWrap;
 			UpdateToolbar();
-			if (iWordWrapIndent == 5) {
-				SendMessage(hwndEdit, SCI_SETWRAPINDENTMODE, SC_WRAPINDENT_SAME, 0);
-			} else if (iWordWrapIndent == 6) {
-				SendMessage(hwndEdit, SCI_SETWRAPINDENTMODE, SC_WRAPINDENT_INDENT, 0);
-			} else if (iWordWrapIndent == 7) {
-				SendMessage(hwndEdit, SCI_SETWRAPINDENTMODE, SC_WRAPINDENT_DEEPINDENT, 0);
-			} else {
-				int i = 0;
-				switch (iWordWrapIndent) {
-				case 1:
-					i = 1;
-					break;
-				case 2:
-					i = 2;
-					break;
-				case 3:
-					i = (iIndentWidth) ? 1 * iIndentWidth : 1 * iTabWidth;
-					break;
-				case 4:
-					i = (iIndentWidth) ? 2 * iIndentWidth : 2 * iTabWidth;
-					break;
-				}
-				SendMessage(hwndEdit, SCI_SETWRAPSTARTINDENT, i, 0);
-				SendMessage(hwndEdit, SCI_SETWRAPINDENTMODE, SC_WRAPINDENT_FIXED, 0);
-			}
-			if (bShowWordWrapSymbols) {
-				int wrapVisualFlags = 0;
-				int wrapVisualFlagsLocation = 0;
-				if (iWordWrapSymbols == 0) {
-					iWordWrapSymbols = 22;
-				}
-				switch (iWordWrapSymbols % 10) {
-				case 1:
-					wrapVisualFlags |= SC_WRAPVISUALFLAG_END;
-					wrapVisualFlagsLocation |= SC_WRAPVISUALFLAGLOC_END_BY_TEXT;
-					break;
-				case 2:
-					wrapVisualFlags |= SC_WRAPVISUALFLAG_END;
-					break;
-				}
-				switch (((iWordWrapSymbols % 100) - (iWordWrapSymbols % 10)) / 10) {
-				case 1:
-					wrapVisualFlags |= SC_WRAPVISUALFLAG_START;
-					wrapVisualFlagsLocation |= SC_WRAPVISUALFLAGLOC_START_BY_TEXT;
-					break;
-				case 2:
-					wrapVisualFlags |= SC_WRAPVISUALFLAG_START;
-					break;
-				}
-				SendMessage(hwndEdit, SCI_SETWRAPVISUALFLAGSLOCATION, wrapVisualFlagsLocation, 0);
-				SendMessage(hwndEdit, SCI_SETWRAPVISUALFLAGS, wrapVisualFlags, 0);
-			} else {
-				SendMessage(hwndEdit, SCI_SETWRAPVISUALFLAGS, 0, 0);
-			}
+			SetWrapIndentMode();
+			SetWrapVisualFlags();
 		}
 		break;
 
@@ -3781,22 +3740,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			iTabWidthG		 = iTabWidth;
 			iIndentWidthG	 = iIndentWidth;
 			if (SendMessage(hwndEdit, SCI_GETWRAPINDENTMODE, 0, 0) == SC_WRAPINDENT_FIXED) {
-				int i = 0;
-				switch (iWordWrapIndent) {
-				case 1:
-					i = 1;
-					break;
-				case 2:
-					i = 2;
-					break;
-				case 3:
-					i = (iIndentWidth) ? 1 * iIndentWidth : 1 * iTabWidth;
-					break;
-				case 4:
-					i = (iIndentWidth) ? 2 * iIndentWidth : 2 * iTabWidth;
-					break;
-				}
-				SendMessage(hwndEdit, SCI_SETWRAPSTARTINDENT, i, 0);
+				SetWrapStartIndent();
 			}
 		}
 		break;
@@ -3938,35 +3882,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	case IDM_VIEW_WORDWRAPSYMBOLS:
 		bShowWordWrapSymbols = (bShowWordWrapSymbols) ? 0 : 1;
-		if (bShowWordWrapSymbols) {
-			int wrapVisualFlags = 0;
-			int wrapVisualFlagsLocation = 0;
-			if (iWordWrapSymbols == 0) {
-				iWordWrapSymbols = 22;
-			}
-			switch (iWordWrapSymbols % 10) {
-			case 1:
-				wrapVisualFlags |= SC_WRAPVISUALFLAG_END;
-				wrapVisualFlagsLocation |= SC_WRAPVISUALFLAGLOC_END_BY_TEXT;
-				break;
-			case 2:
-				wrapVisualFlags |= SC_WRAPVISUALFLAG_END;
-				break;
-			}
-			switch (((iWordWrapSymbols % 100) - (iWordWrapSymbols % 10)) / 10) {
-			case 1:
-				wrapVisualFlags |= SC_WRAPVISUALFLAG_START;
-				wrapVisualFlagsLocation |= SC_WRAPVISUALFLAGLOC_START_BY_TEXT;
-				break;
-			case 2:
-				wrapVisualFlags |= SC_WRAPVISUALFLAG_START;
-				break;
-			}
-			SendMessage(hwndEdit, SCI_SETWRAPVISUALFLAGSLOCATION, wrapVisualFlagsLocation, 0);
-			SendMessage(hwndEdit, SCI_SETWRAPVISUALFLAGS, wrapVisualFlags, 0);
-		} else {
-			SendMessage(hwndEdit, SCI_SETWRAPVISUALFLAGS, 0, 0);
-		}
+		SetWrapVisualFlags();
 		break;
 
 #if NP2_ENABLE_SHOW_CALL_TIPS
