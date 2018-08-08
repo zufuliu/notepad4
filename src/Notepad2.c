@@ -4045,6 +4045,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case IDM_SET_RENDER_TECH_D2DDC:
 		SendMessage(hwndEdit, SCI_SETTECHNOLOGY, LOWORD(wParam) - IDM_SET_RENDER_TECH_DEFAULT, 0);
 		iRenderingTechnology = (int)SendMessage(hwndEdit, SCI_GETTECHNOLOGY, 0, 0);
+		iBidirectional = (int)SendMessage(hwndEdit, SCI_GETBIDIRECTIONAL, 0, 0);
 		break;
 
 	case IDM_SET_BIDIRECTIONAL_NONE:
