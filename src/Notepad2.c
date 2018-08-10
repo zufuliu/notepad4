@@ -2263,10 +2263,17 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	CheckCmd(hmenu, IDM_VIEW_TRANSPARENT, bTransparentMode && i);
 	EnableCmd(hmenu, IDM_VIEW_TRANSPARENT, i);
 
+	// Rendering Technology
+	i = IsVistaAndAbove();
+	EnableCmd(hmenu, IDM_SET_RENDER_TECH_D2D, i);
+	EnableCmd(hmenu, IDM_SET_RENDER_TECH_D2DRETAIN, i);
+	EnableCmd(hmenu, IDM_SET_RENDER_TECH_D2DDC, i);
 	i = IDM_SET_RENDER_TECH_DEFAULT + iRenderingTechnology;
 	CheckMenuRadioItem(hmenu, IDM_SET_RENDER_TECH_DEFAULT, IDM_SET_RENDER_TECH_D2DDC, i, MF_BYCOMMAND);
+	// Buffered Draw
 	EnableCmd(hmenu, IDM_SET_BUFFERED_DRAW, (iRenderingTechnology == SC_TECHNOLOGY_DEFAULT));
 	CheckCmd(hmenu, IDM_SET_BUFFERED_DRAW, bBufferedDrawGDI);
+	// Bidirectional
 	i = iRenderingTechnology != SC_TECHNOLOGY_DEFAULT;
 	EnableCmd(hmenu, IDM_SET_BIDIRECTIONAL_L2R, i);
 	EnableCmd(hmenu, IDM_SET_BIDIRECTIONAL_R2L, i);
