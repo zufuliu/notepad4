@@ -2267,6 +2267,9 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	i = IDM_SET_RENDER_TECH_DEFAULT + iRenderingTechnology;
 	CheckMenuRadioItem(hmenu, IDM_SET_RENDER_TECH_DEFAULT, IDM_SET_RENDER_TECH_D2DDC, i, MF_BYCOMMAND);
 	CheckCmd(hmenu, IDM_SET_BUFFERED_DRAW, ((iRenderingTechnology == SC_TECHNOLOGY_DEFAULT)? bBufferedDrawGDI : bBufferedDrawD2D));
+	i = iRenderingTechnology != SC_TECHNOLOGY_DEFAULT;
+	EnableCmd(hmenu, IDM_SET_BIDIRECTIONAL_L2R, i);
+	EnableCmd(hmenu, IDM_SET_BIDIRECTIONAL_R2L, i);
 	i = IDM_SET_BIDIRECTIONAL_NONE + iBidirectional;
 	CheckMenuRadioItem(hmenu, IDM_SET_BIDIRECTIONAL_NONE, IDM_SET_BIDIRECTIONAL_R2L, i, MF_BYCOMMAND);
 
