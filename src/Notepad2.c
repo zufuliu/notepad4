@@ -181,7 +181,6 @@ BOOL	bMinimizeToTray;
 BOOL	bTransparentMode;
 int		iRenderingTechnology;
 BOOL	bBufferedDrawGDI;
-BOOL	bBufferedDrawD2D;
 int		iBidirectional;
 BOOL	bShowToolbar;
 BOOL	bShowStatusbar;
@@ -2266,7 +2265,8 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	i = IDM_SET_RENDER_TECH_DEFAULT + iRenderingTechnology;
 	CheckMenuRadioItem(hmenu, IDM_SET_RENDER_TECH_DEFAULT, IDM_SET_RENDER_TECH_D2DDC, i, MF_BYCOMMAND);
-	CheckCmd(hmenu, IDM_SET_BUFFERED_DRAW, ((iRenderingTechnology == SC_TECHNOLOGY_DEFAULT)? bBufferedDrawGDI : bBufferedDrawD2D));
+	EnableCmd(hmenu, IDM_SET_BUFFERED_DRAW, (iRenderingTechnology == SC_TECHNOLOGY_DEFAULT));
+	CheckCmd(hmenu, IDM_SET_BUFFERED_DRAW, bBufferedDrawGDI);
 	i = iRenderingTechnology != SC_TECHNOLOGY_DEFAULT;
 	EnableCmd(hmenu, IDM_SET_BIDIRECTIONAL_L2R, i);
 	EnableCmd(hmenu, IDM_SET_BIDIRECTIONAL_R2L, i);
@@ -4050,7 +4050,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case IDM_SET_RENDER_TECH_D2DRETAIN:
 	case IDM_SET_RENDER_TECH_D2DDC:
 		iRenderingTechnology = LOWORD(wParam) - IDM_SET_RENDER_TECH_DEFAULT;
-		SendMessage(hwndEdit, SCI_SETBUFFEREDDRAW, ((iRenderingTechnology == SC_TECHNOLOGY_DEFAULT)? bBufferedDrawGDI : bBufferedDrawD2D), 0);
+		SendMessage(hwndEdit, SCI_SETBUFFEREDDRAW, ((iRenderingTechnology == SC_TECHNOLOGY_DEFAULT) && bBufferedDrawGDI), 0);
 		SendMessage(hwndEdit, SCI_SETTECHNOLOGY, iRenderingTechnology, 0);
 		iRenderingTechnology = (int)SendMessage(hwndEdit, SCI_GETTECHNOLOGY, 0, 0);
 		iBidirectional = (int)SendMessage(hwndEdit, SCI_GETBIDIRECTIONAL, 0, 0);
@@ -4060,11 +4060,8 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		if (iRenderingTechnology == SC_TECHNOLOGY_DEFAULT) {
 			bBufferedDrawGDI = bBufferedDrawGDI ? FALSE : TRUE;
 			SendMessage(hwnd, SCI_SETBUFFEREDDRAW, bBufferedDrawGDI, 0);
-		} else {
-			bBufferedDrawD2D = bBufferedDrawD2D ? FALSE : TRUE;
-			SendMessage(hwnd, SCI_SETBUFFEREDDRAW, bBufferedDrawD2D, 0);
+			InvalidateRect(hwndEdit, NULL, TRUE);
 		}
-		InvalidateRect(hwndEdit, NULL, TRUE);
 		break;
 
 	case IDM_SET_BIDIRECTIONAL_NONE:
@@ -5284,7 +5281,6 @@ void LoadSettings(void) {
 	iRenderingTechnology = IniSectionGetInt(pIniSection, L"RenderingTechnology", SC_TECHNOLOGY_DEFAULT);
 	iRenderingTechnology = clamp_i(iRenderingTechnology, SC_TECHNOLOGY_DEFAULT, SC_TECHNOLOGY_DIRECTWRITEDC);
 	bBufferedDrawGDI = IniSectionGetBool(pIniSection, L"BufferedDrawGDI", TRUE);
-	bBufferedDrawD2D = IniSectionGetBool(pIniSection, L"BufferedDrawD2D", FALSE);
 	iBidirectional = IniSectionGetInt(pIniSection, L"Bidirectional", SC_BIDIRECTIONAL_DISABLED);
 	iBidirectional = clamp_i(iBidirectional, SC_BIDIRECTIONAL_DISABLED, SC_BIDIRECTIONAL_R2L);
 
@@ -5519,7 +5515,6 @@ void SaveSettings(BOOL bSaveSettingsNow) {
 	IniSectionSetBool(pIniSection, L"TransparentMode", bTransparentMode);
 	IniSectionSetInt(pIniSection, L"RenderingTechnology", iRenderingTechnology);
 	IniSectionSetBool(pIniSection, L"BufferedDrawGDI", bBufferedDrawGDI);
-	IniSectionSetBool(pIniSection, L"BufferedDrawD2D", bBufferedDrawD2D);
 	IniSectionSetInt(pIniSection, L"Bidirectional", iBidirectional);
 	Toolbar_GetButtons(hwndToolbar, IDT_FILE_NEW, tchToolbarButtons, COUNTOF(tchToolbarButtons));
 	IniSectionSetString(pIniSection, L"ToolbarButtons", tchToolbarButtons);

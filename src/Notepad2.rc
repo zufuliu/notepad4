@@ -460,8 +460,8 @@ BEGIN
             MENUITEM "Direct2D",        IDM_SET_RENDER_TECH_D2D
             MENUITEM "Direct2D Retain", IDM_SET_RENDER_TECH_D2DRETAIN
             MENUITEM "Direct2D GDI DC", IDM_SET_RENDER_TECH_D2DDC
-			MENUITEM SEPARATOR
-            MENUITEM "Buffered Draw",	IDM_SET_BUFFERED_DRAW
+            MENUITEM SEPARATOR
+            MENUITEM "Buffered Draw",   IDM_SET_BUFFERED_DRAW
         END
         POPUP "Bidirectional"
         BEGIN
