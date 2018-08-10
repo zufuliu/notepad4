@@ -346,7 +346,7 @@ FontCached::FontCached(const FontParameters &fp) :
 		HRESULT hr = pIDWriteFactory->CreateTextFormat(wszFace, nullptr,
 			static_cast<DWRITE_FONT_WEIGHT>(fp.weight),
 			style,
-			DWRITE_FONT_STRETCH_NORMAL, fHeight, L"en-us", &pTextFormat);
+			DWRITE_FONT_STRETCH_NORMAL, fHeight, L"", &pTextFormat);
 		if (SUCCEEDED(hr)) {
 			pTextFormat->SetWordWrapping(DWRITE_WORD_WRAPPING_NO_WRAP);
 
