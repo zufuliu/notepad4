@@ -2691,7 +2691,7 @@ void Style_SaveFontQuality(void) {
 	LPWSTR lpszStyle = lexDefault.Styles[0 + iIdx].szValue;
 	WCHAR *p = StrStrI(lpszStyle, L"smoothing:");
 	if (p != NULL) {
-		lstrcpyn(szNewStyle, lpszStyle, p - lpszStyle);
+		lstrcpyn(szNewStyle, lpszStyle, (int)(p - lpszStyle));
 	} else {
 		lstrcpy(szNewStyle, lpszStyle);
 	}
