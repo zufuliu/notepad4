@@ -1538,6 +1538,11 @@ INT_PTR CALLBACK CopyMoveDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPa
 		SetWindowPos(GetDlgItem(hwnd, IDC_RESIZEGRIP2), NULL, rc.left + dxClient, rc.top + dyClient, 0, 0, SWP_NOZORDER | SWP_NOSIZE);
 		InvalidateRect(GetDlgItem(hwnd, IDC_RESIZEGRIP2), NULL, TRUE);
 
+		GetWindowRect(GetDlgItem(hwnd, IDC_EMPTY_MRU), &rc);
+		MapWindowPoints(NULL, hwnd, (LPPOINT)&rc, 2);
+		SetWindowPos(GetDlgItem(hwnd, IDC_EMPTY_MRU), NULL, rc.left + dxClient, rc.top + dyClient, 0, 0, SWP_NOZORDER | SWP_NOSIZE);
+		InvalidateRect(GetDlgItem(hwnd, IDC_EMPTY_MRU), NULL, TRUE);
+
 		GetWindowRect(GetDlgItem(hwnd, IDOK), &rc);
 		MapWindowPoints(NULL, hwnd, (LPPOINT)&rc, 2);
 		SetWindowPos(GetDlgItem(hwnd, IDOK), NULL, rc.left + dxClient, rc.top + dyClient, 0, 0, SWP_NOZORDER | SWP_NOSIZE);
@@ -1570,6 +1575,14 @@ INT_PTR CALLBACK CopyMoveDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPa
 		lpmmi->ptMinTrackSize.x = mmiPtMinX;
 		lpmmi->ptMinTrackSize.y = mmiPtMaxY;
 		lpmmi->ptMaxTrackSize.y = mmiPtMaxY;
+	}
+	return TRUE;
+
+	case WM_NOTIFY: {
+		LPNMHDR pnmhdr = (LPNMHDR)lParam;
+		if (pnmhdr->idFrom == IDC_EMPTY_MRU && (pnmhdr->code == NM_CLICK || pnmhdr->code == NM_RETURN)) {
+			MRU_ClearCombobox(GetDlgItem(hwnd, IDC_DESTINATION), L"Copy/Move MRU");
+		}
 	}
 	return TRUE;
 
