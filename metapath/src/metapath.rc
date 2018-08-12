@@ -684,7 +684,7 @@ BEGIN
     IDS_ERR_CMDLINE         "metapath\nError accessing file or directory specified in command line."
     IDS_ERR_STARTUPDIR      "metapath\nNo access to startup directory."
     IDS_ERR_DROP1           "metapath\nNo access to dropped file or directory."
-    IDS_ERR_DROP2           "metapath\nOnly a single file or directory can be dropped at a time."
+    //IDS_ERR_DROP2           "metapath\nOnly a single file or directory can be dropped at a time."
     IDS_ERR_FAVORITES       "Favorites\nNo access to ""Favorites"" folder.\nSpecify a valid directory in the ""Options"" dialog box."
     IDS_ERR_LNK_GETPATH     "Link Error\nNo valid filesystem-path available for linked object.\nProbably the link doesn't refer to a file or directory."
     IDS_ERR_LNK_NOACCESS    "Link Error\nNo access to filesystem-path of linked object.\nCheck the disk or the network connection."

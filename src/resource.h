@@ -506,7 +506,7 @@
 #define IDS_ERR_UNICODE					50015
 #define IDS_ERR_UNICODE2				50016
 #define IDS_WARNLOADBIGFILE				50017
-#define IDS_ERR_DROP					50018
+//#define IDS_ERR_DROP					50018
 #define IDS_ASK_SAVE					50019
 #define IDS_ASK_REVERT					50020
 #define IDS_ASK_RECODE					50021

@@ -505,9 +505,9 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 		DragQueryFile(hDrop, 0, szBuf, COUNTOF(szBuf));
 		DisplayPath(szBuf, IDS_ERR_DROP1);
 
-		if (DragQueryFile(hDrop, (UINT)(-1), NULL, 0) > 1) {
-			ErrorMessage(1, IDS_ERR_DROP2);
-		}
+		//if (DragQueryFile(hDrop, (UINT)(-1), NULL, 0) > 1) {
+		//	ErrorMessage(1, IDS_ERR_DROP2);
+		//}
 
 		DragFinish(hDrop);
 	}

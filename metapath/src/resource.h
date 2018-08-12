@@ -195,7 +195,7 @@
 #define IDS_ERR_CMDLINE                 50006
 #define IDS_ERR_STARTUPDIR              50007
 #define IDS_ERR_DROP1                   50008
-#define IDS_ERR_DROP2                   50009
+//#define IDS_ERR_DROP2                   50009
 #define IDS_ERR_FAVORITES               50010
 #define IDS_ERR_LNK_GETPATH             50011
 #define IDS_ERR_LNK_NOACCESS            50012
