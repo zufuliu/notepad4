@@ -1039,6 +1039,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 		//	PostMessage(hwnd, APPM_CHANGENOTIFY, 0, 0);
 		break;
 
+#if 0 // SCN_URIDROPPED is used to handle drag and drop
 	case WM_DROPFILES: {
 		WCHAR szBuf[MAX_PATH + 40];
 		HDROP hDrop = (HDROP)wParam;
@@ -1063,13 +1064,14 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 			FileLoad(FALSE, FALSE, FALSE, FALSE, szBuf);
 		}
 
-		if (DragQueryFile(hDrop, (UINT)(-1), NULL, 0) > 1) {
-			MsgBox(MBWARN, IDS_ERR_DROP);
-		}
+		//if (DragQueryFile(hDrop, (UINT)(-1), NULL, 0) > 1) {
+		//	MsgBox(MBWARN, IDS_ERR_DROP);
+		//}
 
 		DragFinish(hDrop);
 	}
 	break;
+#endif
 
 	case WM_COPYDATA: {
 		PCOPYDATASTRUCT pcds = (PCOPYDATASTRUCT)lParam;
