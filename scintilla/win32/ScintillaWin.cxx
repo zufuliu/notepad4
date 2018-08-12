@@ -3141,8 +3141,24 @@ STDMETHODIMP ScintillaWin::Drop(LPDATAOBJECT pIDataSource, DWORD grfKeyState,
 			if (SUCCEEDED(hr) && medium.hGlobal) {
 				GlobalMemory memDrop(medium.hGlobal);
 				const char *cdata = static_cast<const char *>(memDrop.ptr);
-				if (cdata)
-					data.assign(cdata, cdata + strlen(cdata));
+				if (cdata) {
+					const size_t len = strlen(cdata);
+					// In Unicode mode, convert text to UTF-8
+					if (IsUnicodeMode()) {
+						std::vector<wchar_t> uptr(len + 1);
+
+						const int ilen = static_cast<int>(len);
+						const size_t ulen = WideCharFromMultiByte(CP_ACP,
+							std::string_view(cdata, ilen), &uptr[0], ilen + 1);
+
+						const std::wstring_view wsv(&uptr[0], ulen);
+						const size_t mlen = UTF8Length(wsv);
+						data.resize(mlen + 1);
+						UTF8FromUTF16(wsv, &data[0], mlen);
+					} else {
+						data.assign(cdata, cdata + len);
+					}
+				}
 				memDrop.Unlock();
 			} else {
 				FORMATETC fmtd = { CF_HDROP, nullptr, DVASPECT_CONTENT, -1, TYMED_HGLOBAL };
