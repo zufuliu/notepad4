@@ -192,6 +192,7 @@ BOOL MRU_Load(LPMRULIST pmru);
 BOOL MRU_Save(LPMRULIST pmru);
 void MRU_LoadToCombobox(HWND hwnd, LPCWSTR pszKey);
 void MRU_AddOneItem(LPCWSTR pszKey, LPCWSTR pszNewItem);
+void MRU_ClearCombobox(HWND hwnd, LPCWSTR pszKey);
 
 //==== Themed Dialogs =========================================================
 #ifndef DLGTEMPLATEEX

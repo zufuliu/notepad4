@@ -82,6 +82,7 @@
 #define IDC_REUSEWINDOW                 106
 #define IDI_PROGS                       106
 #define IDC_EMAIL_TEXT                  106
+#define IDC_EMPTY_MRU                   106
 #define IDD_NEWDIR                      107
 #define IDC_ESCFUNCTION                 107
 #define IDC_COLOR_PICK2                 107

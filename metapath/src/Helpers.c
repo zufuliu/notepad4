@@ -1449,6 +1449,15 @@ void MRU_AddOneItem(LPCWSTR pszKey, LPCWSTR pszNewItem) {
 	}
 }
 
+void MRU_ClearCombobox(HWND hwnd, LPCWSTR pszKey) {
+	LPMRULIST pmru = MRU_Create(pszKey, MRU_NOCASE, 8);
+	MRU_Load(pmru);
+	MRU_Empty(pmru);
+	MRU_Save(pmru);
+	MRU_Destroy(pmru);
+	SendMessage(hwnd, CB_RESETCONTENT, 0, 0);
+}
+
 /*
 
   Themed Dialogs
