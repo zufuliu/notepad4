@@ -5020,6 +5020,26 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 						   iPathNameFormat, bModified || iEncoding != iOriginalEncoding,
 						   IDS_READONLY, bReadOnly, szTitleExcerpt);
 			break;
+
+		case SCN_URIDROPPED: {
+			// see WM_DROPFILES
+			WCHAR szBuf[MAX_PATH + 40];
+			if (MultiByteToWideChar(CP_UTF8, 0, scn->text, -1, szBuf, COUNTOF(szBuf)) > 0) {
+				if (IsIconic(hwnd)) {
+					ShowWindow(hwnd, SW_RESTORE);
+				}
+				//SetForegroundWindow(hwnd);
+				if (PathIsDirectory(szBuf)) {
+					WCHAR tchFile[MAX_PATH];
+					if (OpenFileDlg(hwndMain, tchFile, COUNTOF(tchFile), szBuf)) {
+						FileLoad(FALSE, FALSE, FALSE, FALSE, tchFile);
+					}
+				} else {
+					FileLoad(FALSE, FALSE, FALSE, FALSE, szBuf);
+				}
+			}
+		}
+		break;
 		}
 		break;
 
