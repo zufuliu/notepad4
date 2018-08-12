@@ -214,6 +214,7 @@ BOOL	bUse2ndDefaultStyle;
 BOOL	fStylesModified = FALSE;
 BOOL	fWarnedNoIniFile = FALSE;
 int		iBaseFontSize = 10*SC_FONT_SIZE_MULTIPLIER + SC_FONT_SIZE_MULTIPLIER/2; // 10.5pt
+int		iFontQuality = SC_EFF_QUALITY_LCD_OPTIMIZED;
 int		iDefaultLexer;
 BOOL	bAutoSelect;
 int		cxStyleSelectDlg;
@@ -650,8 +651,9 @@ void Style_SetLexer(HWND hwnd, PEDITLEXER pLexNew) {
 	// Use 2nd default style
 	iIdx = (bUse2ndDefaultStyle) ? 12 : 0;
 
-	// Font quality setup, check availability of Consolas
+	// Font quality setup
 	Style_SetFontQuality(hwnd, lexDefault.Styles[0 + iIdx].szValue);
+	// Check font availability
 	for (int i = 0; i < NUM_MONO_FONT; i++) {
 		if (IsFontAvailable(SysMonoFontName[i])) {
 			np2MonoFontIndex = i;
@@ -2642,7 +2644,7 @@ void Style_SetStyles(HWND hwnd, int iStyle, LPCWSTR lpszStyle) {
 // Style_SetFontQuality()
 //
 void Style_SetFontQuality(HWND hwnd, LPCWSTR lpszStyle) {
-	WPARAM wQuality = SC_EFF_QUALITY_DEFAULT;
+	int wQuality = SC_EFF_QUALITY_DEFAULT;
 	WCHAR tch[32];
 
 	if (Style_StrGetFontQuality(lpszStyle, tch, COUNTOF(tch))) {
@@ -2676,7 +2678,48 @@ void Style_SetFontQuality(HWND hwnd, LPCWSTR lpszStyle) {
 			wQuality = SC_EFF_QUALITY_DEFAULT;
 		}
 	}
+
+	iFontQuality = wQuality;
 	SendMessage(hwnd, SCI_SETFONTQUALITY, wQuality, 0);
+}
+
+void Style_SaveFontQuality(void) {
+	WCHAR szNewStyle[512];
+	// Use 2nd default style
+	int iIdx = (bUse2ndDefaultStyle) ? 12 : 0;
+
+	LPWSTR lpszStyle = lexDefault.Styles[0 + iIdx].szValue;
+	WCHAR *p = StrStrI(lpszStyle, L"smoothing:");
+	if (p != NULL) {
+		lstrcpyn(szNewStyle, lpszStyle, p - lpszStyle);
+	} else {
+		lstrcpy(szNewStyle, lpszStyle);
+	}
+	lstrcat(szNewStyle, L"smoothing:");
+	switch (iFontQuality) {
+	case SC_EFF_QUALITY_NON_ANTIALIASED:
+		lstrcat(szNewStyle, L"none");
+		break;
+	case SC_EFF_QUALITY_ANTIALIASED:
+		lstrcat(szNewStyle, L"standard");
+		break;
+	case SC_EFF_QUALITY_LCD_OPTIMIZED:
+		lstrcat(szNewStyle, L"cleartype");
+		break;
+	case SC_EFF_QUALITY_DEFAULT:
+	default:
+		lstrcat(szNewStyle, L"default");
+		break;
+	}
+	lstrcat(szNewStyle, L";");
+	if (p != NULL) {
+		p += CSTRLEN(L"smoothing:");
+		p = StrChr(p, L';');
+		if (p != NULL) {
+			lstrcat(szNewStyle, p + 1);
+		}
+	}
+	lstrcpy(lpszStyle, szNewStyle);
 }
 
 //=============================================================================

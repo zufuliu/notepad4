@@ -80,6 +80,7 @@ BOOL	Style_SelectFont(HWND hwnd, LPWSTR lpszStyle, int cchStyle, BOOL bDefaultSt
 BOOL	Style_SelectColor(HWND hwnd, BOOL bFore, LPWSTR lpszStyle, int cchStyle);
 void	Style_SetStyles(HWND hwnd, int iStyle, LPCWSTR lpszStyle);
 void	Style_SetFontQuality(HWND hwnd, LPCWSTR lpszStyle);
+void	Style_SaveFontQuality(void);
 
 int 				Style_GetLexerIconId(PEDITLEXER pLex);
 INT_PTR CALLBACK	Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam);
