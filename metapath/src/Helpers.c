@@ -1432,7 +1432,7 @@ void MRU_LoadToCombobox(HWND hwnd, LPCWSTR pszKey) {
 	WCHAR tch[MAX_PATH];
 	LPMRULIST pmru = MRU_Create(pszKey, MRU_NOCASE, 8);
 	MRU_Load(pmru);
-	for (int i = 0; i < MRU_Enum(pmru, 0, NULL, 0); i++) {
+	for (int i = 0; i < MRU_GetCount(pmru); i++) {
 		MRU_Enum(pmru, i, tch, COUNTOF(tch));
 		SendMessage(hwnd, CB_ADDSTRING, 0, (LPARAM)tch);
 	}

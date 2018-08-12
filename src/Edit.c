@@ -4416,12 +4416,12 @@ INT_PTR CALLBACK EditFindReplaceDlgProcW(HWND hwnd, UINT umsg, WPARAM wParam, LP
 		uCPEdit = (UINT)SendMessage(lpefr->hwnd, SCI_GETCODEPAGE, 0, 0);
 
 		// Load MRUs
-		for (int i = 0; i < MRU_Enum(mruFind, 0, NULL, 0); i++) {
+		for (int i = 0; i < MRU_GetCount(mruFind); i++) {
 			MRU_Enum(mruFind, i, tch, COUNTOF(tch));
 			SendDlgItemMessage(hwnd, IDC_FINDTEXT, CB_ADDSTRING, 0, (LPARAM)tch);
 		}
 
-		for (int i = 0; i < MRU_Enum(mruReplace, 0, NULL, 0); i++) {
+		for (int i = 0; i < MRU_GetCount(mruReplace); i++) {
 			MRU_Enum(mruReplace, i, tch, COUNTOF(tch));
 			SendDlgItemMessage(hwnd, IDC_REPLACETEXT, CB_ADDSTRING, 0, (LPARAM)tch);
 		}
@@ -4707,12 +4707,12 @@ INT_PTR CALLBACK EditFindReplaceDlgProcW(HWND hwnd, UINT umsg, WPARAM wParam, LP
 			SendDlgItemMessage(hwnd, IDC_FINDTEXT, CB_RESETCONTENT, 0, 0);
 			SendDlgItemMessage(hwnd, IDC_REPLACETEXT, CB_RESETCONTENT, 0, 0);
 
-			for (int i = 0; i < MRU_Enum(mruFind, 0, NULL, 0); i++) {
+			for (int i = 0; i < MRU_GetCount(mruFind); i++) {
 				MRU_Enum(mruFind, i, tch, COUNTOF(tch));
 				SendDlgItemMessage(hwnd, IDC_FINDTEXT, CB_ADDSTRING, 0, (LPARAM)tch);
 			}
 
-			for (int i = 0; i < MRU_Enum(mruReplace, 0, NULL, 0); i++) {
+			for (int i = 0; i < MRU_GetCount(mruReplace); i++) {
 				MRU_Enum(mruReplace, i, tch, COUNTOF(tch));
 				SendDlgItemMessage(hwnd, IDC_REPLACETEXT, CB_ADDSTRING, 0, (LPARAM)tch);
 			}

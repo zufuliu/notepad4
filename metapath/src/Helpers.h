@@ -185,6 +185,9 @@ BOOL MRU_Add(LPMRULIST pmru, LPCWSTR pszNew);
 BOOL MRU_Delete(LPMRULIST pmru, int iIndex);
 BOOL MRU_Empty(LPMRULIST pmru);
 int MRU_Enum(LPMRULIST pmru, int iIndex, LPWSTR pszItem, int cchItem);
+static inline int MRU_GetCount(LPMRULIST pmru) {
+	return MRU_Enum(pmru, 0, NULL, 0);
+}
 BOOL MRU_Load(LPMRULIST pmru);
 BOOL MRU_Save(LPMRULIST pmru);
 void MRU_LoadToCombobox(HWND hwnd, LPCWSTR pszKey);
