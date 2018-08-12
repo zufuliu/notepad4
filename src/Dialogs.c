@@ -82,7 +82,7 @@ int MsgBox(int iType, UINT uIdMsg, ...) {
 		StrCatBuff(szText, lpMsgBuf, COUNTOF(szText));
 		LocalFree(lpMsgBuf);
 		wcht = *CharPrev(szText, StrEnd(szText));
-		if (IsCharAlphaNumeric(wcht) || wcht == '"' || wcht == '\'') {
+		if (IsCharAlphaNumeric(wcht) || wcht == L'"' || wcht == L'\'') {
 			StrCatBuff(szText, L".", COUNTOF(szText));
 		}
 	}
