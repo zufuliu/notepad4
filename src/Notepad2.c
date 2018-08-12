@@ -2058,7 +2058,7 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	}
 	CheckMenuRadioItem(hmenu, IDM_LINEENDINGS_CRLF, IDM_LINEENDINGS_CR, i, MF_BYCOMMAND);
 
-	EnableCmd(hmenu, IDM_FILE_RECENT, (MRU_Enum(pFileMRU, 0, NULL, 0) > 0));
+	EnableCmd(hmenu, IDM_FILE_RECENT, (MRU_GetCount(pFileMRU) > 0));
 
 	EnableCmd(hmenu, IDM_EDIT_UNDO, SendMessage(hwndEdit, SCI_CANUNDO, 0, 0) /*&& !bReadOnly*/);
 	EnableCmd(hmenu, IDM_EDIT_REDO, SendMessage(hwndEdit, SCI_CANREDO, 0, 0) /*&& !bReadOnly*/);
@@ -2687,7 +2687,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	break;
 
 	case IDM_FILE_RECENT:
-		if (MRU_Enum(pFileMRU, 0, NULL, 0) > 0) {
+		if (MRU_GetCount(pFileMRU) > 0) {
 			if (FileSave(FALSE, TRUE, FALSE, FALSE)) {
 				WCHAR tchFile[MAX_PATH];
 				if (FileMRUDlg(hwnd, tchFile)) {

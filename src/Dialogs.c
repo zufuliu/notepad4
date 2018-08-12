@@ -1130,7 +1130,7 @@ INT_PTR CALLBACK FileMRUDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPar
 						  SHGFI_USEFILEATTRIBUTES | SHGFI_SMALLICON | SHGFI_SYSICONINDEX);
 			lvi.iImage = shfi.iIcon;
 
-			for (int i = 0; i < MRU_Enum(pFileMRU, 0, NULL, 0); i++) {
+			for (int i = 0; i < MRU_GetCount(pFileMRU); i++) {
 				MRU_Enum(pFileMRU, i, tch, COUNTOF(tch));
 				PathAbsoluteFromApp(tch, NULL, 0, TRUE);
 				//	SendDlgItemMessage(hwnd, IDC_FILEMRU, LB_ADDSTRING, 0, (LPARAM)tch); }
