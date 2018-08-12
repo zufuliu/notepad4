@@ -1011,6 +1011,7 @@ INT_PTR CALLBACK FileMRUDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPar
 		hdwp = DeferCtlPos(hdwp, hwnd, IDOK, dx, dy, SWP_NOSIZE);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDCANCEL, dx, dy, SWP_NOSIZE);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDC_FILEMRU, dx, dy, SWP_NOMOVE);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDC_EMPTY_MRU, dx, dy, SWP_NOSIZE);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDC_SAVEMRU, 0, dy, SWP_NOSIZE);
 		EndDeferWindowPos(hdwp);
 		ListView_SetColumnWidth(GetDlgItem(hwnd, IDC_FILEMRU), 0, LVSCW_AUTOSIZE_USEHEADER);
@@ -1022,8 +1023,9 @@ INT_PTR CALLBACK FileMRUDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPar
 		return TRUE;
 
 	case WM_NOTIFY: {
-		if (((LPNMHDR)(lParam))->idFrom == IDC_FILEMRU) {
-			switch (((LPNMHDR)(lParam))->code) {
+		LPNMHDR pnmhdr = (LPNMHDR)lParam;
+		if (pnmhdr->idFrom == IDC_FILEMRU) {
+			switch (pnmhdr->code) {
 			case NM_DBLCLK:
 				SendMessage(hwnd, WM_COMMAND, MAKELONG(IDOK, 1), 0);
 				break;
@@ -1095,6 +1097,15 @@ INT_PTR CALLBACK FileMRUDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPar
 			case LVN_DELETEITEM:
 				EnableWindow(GetDlgItem(hwnd, IDOK), ListView_GetSelectedCount(GetDlgItem(hwnd, IDC_FILEMRU)));
 				break;
+			}
+		} else if (pnmhdr->idFrom == IDC_EMPTY_MRU) {
+			if ((pnmhdr->code == NM_CLICK || pnmhdr->code == NM_RETURN)) {
+				MRU_Empty(pFileMRU);
+				if (lstrlen(szCurFile) > 0) {
+					MRU_Add(pFileMRU, szCurFile);
+				}
+				MRU_Save(pFileMRU);
+				SendMessage(hwnd, WM_COMMAND, MAKELONG(0x00A0, 1), 0);
 			}
 		}
 	}

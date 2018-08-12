@@ -51,6 +51,7 @@
 #define IDC_STYLEFORE					103
 #define IDC_AUTOSTRIPBLANKS				103
 #define IDC_ENCODINGFROMFILEVARS		103
+#define IDC_EMPTY_MRU					103
 
 #define IDD_ABOUT						100
 #define IDC_VERSION						100
