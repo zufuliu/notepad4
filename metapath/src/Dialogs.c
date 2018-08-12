@@ -58,7 +58,7 @@ int ErrorMessage(int iLevel, UINT uIdMsg, ...) {
 	c = StrChr(szTitle, L'\n');
 	if (c) {
 		lstrcpy(szText, (c + 1));
-		*c = '\0';
+		*c = L'\0';
 	} else {
 		lstrcpy(szText, szTitle);
 		lstrcpy(szTitle, L"");

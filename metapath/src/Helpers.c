@@ -71,12 +71,12 @@ BOOL IniSectionGetBool(LPCWSTR lpCachedIniSection, LPCWSTR lpName, BOOL bDefault
 				WCHAR *t = p + ich;
 				while (*t) {
 					switch (*t) {
-					case '1':
+					case L'1':
 						return TRUE;
-					case '0':
+					case L'0':
 						return FALSE;
-					case ' ':
-					case '\t':
+					case L' ':
+					case L'\t':
 						t++;
 						break;
 					}
