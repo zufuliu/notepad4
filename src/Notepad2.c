@@ -281,6 +281,7 @@ int		iSortOptions = 0;
 int		iAlignMode	 = 0;
 int		iMatchesCount = 0;
 int		iAutoCItemCount = 0;
+extern int iFontQuality;
 
 BOOL	fIsElevated = FALSE;
 WCHAR	wchWndClass[16] = WC_NOTEPAD2;
@@ -2206,6 +2207,8 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	CheckCmd(hmenu, IDM_VIEW_USE2NDDEFAULT, Style_GetUse2ndDefault(hwndEdit));
 
 	CheckCmd(hmenu, IDM_VIEW_WORDWRAP, fWordWrap);
+	i = IDM_VIEW_FONTQUALITY_DEFAULT + iFontQuality;
+	CheckMenuRadioItem(hmenu, IDM_VIEW_FONTQUALITY_DEFAULT, IDM_VIEW_FONTQUALITY_CLEARTYPE, i, MF_BYCOMMAND);
 	CheckCmd(hmenu, IDM_VIEW_LONGLINEMARKER, bMarkLongLines);
 	CheckCmd(hmenu, IDM_VIEW_TABSASSPACES, bTabsAsSpaces);
 	CheckCmd(hmenu, IDM_VIEW_SHOWINDENTGUIDES, bShowIndentGuides);
@@ -4078,6 +4081,15 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case IDM_SET_BIDIRECTIONAL_R2L:
 		SendMessage(hwndEdit, SCI_SETBIDIRECTIONAL, LOWORD(wParam) - IDM_SET_BIDIRECTIONAL_NONE, 0);
 		iBidirectional = (int)SendMessage(hwndEdit, SCI_GETBIDIRECTIONAL, 0, 0);
+		break;
+
+	case IDM_VIEW_FONTQUALITY_DEFAULT:
+	case IDM_VIEW_FONTQUALITY_NONE:
+	case IDM_VIEW_FONTQUALITY_STANDARD:
+	case IDM_VIEW_FONTQUALITY_CLEARTYPE:
+		iFontQuality = LOWORD(wParam) - IDM_VIEW_FONTQUALITY_DEFAULT;
+		SendMessage(hwndEdit, SCI_SETFONTQUALITY, iFontQuality, 0);
+		Style_SaveFontQuality();
 		break;
 
 	case IDM_VIEW_SHOWFILENAMEONLY:

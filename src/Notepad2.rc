@@ -330,6 +330,13 @@ BEGIN
         MENUITEM "&2nd Default Scheme\tShift+F12", IDM_VIEW_USE2NDDEFAULT
         MENUITEM "&Customize Schemes...\tCtrl+F12", IDM_VIEW_SCHEMECONFIG
         MENUITEM "&Default Font...\tAlt+F12",   IDM_VIEW_FONT
+        POPUP "Font &Quality"
+        BEGIN
+            MENUITEM "&Default",                    IDM_VIEW_FONTQUALITY_DEFAULT
+            MENUITEM "&None",                       IDM_VIEW_FONTQUALITY_NONE
+            MENUITEM "&Standard",                   IDM_VIEW_FONTQUALITY_STANDARD
+            MENUITEM "&ClearType",                  IDM_VIEW_FONTQUALITY_CLEARTYPE
+        END
         MENUITEM SEPARATOR
         MENUITEM "Word W&rap\tCtrl+W",          IDM_VIEW_WORDWRAP
         MENUITEM "&Long Line Marker\tCtrl+Shift+L", IDM_VIEW_LONGLINEMARKER
