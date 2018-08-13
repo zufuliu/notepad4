@@ -904,6 +904,23 @@ static inline void NP2ExitWind(HWND hwnd) {
 	}
 }
 
+void OnDropOneFile(HWND hwnd, LPCWSTR szBuf) {
+	// Reset Change Notify
+	//bPendingChangeNotify = FALSE;
+	if (IsIconic(hwnd)) {
+		ShowWindow(hwnd, SW_RESTORE);
+	}
+	//SetForegroundWindow(hwnd);
+	if (PathIsDirectory(szBuf)) {
+		WCHAR tchFile[MAX_PATH];
+		if (OpenFileDlg(hwndMain, tchFile, COUNTOF(tchFile), szBuf)) {
+			FileLoad(FALSE, FALSE, FALSE, FALSE, tchFile);
+		}
+	} else {
+		FileLoad(FALSE, FALSE, FALSE, FALSE, szBuf);
+	}
+}
+
 LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
 	static BOOL bShutdownOK;
 
@@ -1040,30 +1057,12 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 		//	PostMessage(hwnd, APPM_CHANGENOTIFY, 0, 0);
 		break;
 
-#if 0 // SCN_URIDROPPED is used to handle drag and drop
 	case WM_DROPFILES: {
 		WCHAR szBuf[MAX_PATH + 40];
 		HDROP hDrop = (HDROP)wParam;
 
-		// Reset Change Notify
-		//bPendingChangeNotify = FALSE;
-
-		if (IsIconic(hwnd)) {
-			ShowWindow(hwnd, SW_RESTORE);
-		}
-
-		//SetForegroundWindow(hwnd);
-
 		DragQueryFile(hDrop, 0, szBuf, COUNTOF(szBuf));
-
-		if (PathIsDirectory(szBuf)) {
-			WCHAR tchFile[MAX_PATH];
-			if (OpenFileDlg(hwndMain, tchFile, COUNTOF(tchFile), szBuf)) {
-				FileLoad(FALSE, FALSE, FALSE, FALSE, tchFile);
-			}
-		} else {
-			FileLoad(FALSE, FALSE, FALSE, FALSE, szBuf);
-		}
+		OnDropOneFile(hwnd, szBuf);
 
 		//if (DragQueryFile(hDrop, (UINT)(-1), NULL, 0) > 1) {
 		//	MsgBox(MBWARN, IDS_ERR_DROP);
@@ -1072,7 +1071,6 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 		DragFinish(hDrop);
 	}
 	break;
-#endif
 
 	case WM_COPYDATA: {
 		PCOPYDATASTRUCT pcds = (PCOPYDATASTRUCT)lParam;
@@ -5036,21 +5034,9 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			break;
 
 		case SCN_URIDROPPED: {
-			// see WM_DROPFILES
 			WCHAR szBuf[MAX_PATH + 40];
 			if (MultiByteToWideChar(CP_UTF8, 0, scn->text, -1, szBuf, COUNTOF(szBuf)) > 0) {
-				if (IsIconic(hwnd)) {
-					ShowWindow(hwnd, SW_RESTORE);
-				}
-				//SetForegroundWindow(hwnd);
-				if (PathIsDirectory(szBuf)) {
-					WCHAR tchFile[MAX_PATH];
-					if (OpenFileDlg(hwndMain, tchFile, COUNTOF(tchFile), szBuf)) {
-						FileLoad(FALSE, FALSE, FALSE, FALSE, tchFile);
-					}
-				} else {
-					FileLoad(FALSE, FALSE, FALSE, FALSE, szBuf);
-				}
+				OnDropOneFile(hwnd, szBuf);
 			}
 		}
 		break;
