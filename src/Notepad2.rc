@@ -803,7 +803,7 @@ BEGIN
     CONTROL         "W&ildcard Search",IDC_WILDCARDSEARCH,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,132,61,74,10
     CONTROL         "<a>(?)</a>",IDC_WILDCARDHELP,"SysLink",0x0,208,61,14,10
 //#endif
-    CONTROL         "<a>Clear History</a>", IDC_CLEAR_FIND, "SysLink", WS_TABSTOP, 174, 7, 48, 10
+    CONTROL         "<a>Clear History</a>",IDC_CLEAR_FIND,"SysLink",WS_TABSTOP,173,7,48,10
 END
 
 IDD_REPLACE DIALOGEX 0, 0, 290, 130
@@ -835,8 +835,8 @@ BEGIN
     CONTROL         "W&ildcard Search",IDC_WILDCARDSEARCH,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,132,90,74,10
     CONTROL         "<a>(?)</a>",IDC_WILDCARDHELP,"SysLink",0x0,208,90,14,10
 //#endif
-    CONTROL         "<a>Clear History</a>", IDC_CLEAR_FIND, "SysLink", WS_TABSTOP, 174, 6, 48, 10 
-    CONTROL         "<a>Clear History</a>", IDC_CLEAR_REPLACE, "SysLink", WS_TABSTOP, 174, 35, 48, 10 
+    CONTROL         "<a>Clear History</a>",IDC_CLEAR_FIND,"SysLink",WS_TABSTOP,173,6,48,10 
+    CONTROL         "<a>Clear History</a>",IDC_CLEAR_REPLACE,"SysLink",WS_TABSTOP,173,35,48,10 
 END
 
 IDD_RUN DIALOGEX 0, 0, 234, 86
@@ -919,7 +919,7 @@ FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     CONTROL         "",IDC_FILEMRU,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_SHAREIMAGELISTS | LVS_AUTOARRANGE | LVS_NOCOLUMNHEADER | WS_BORDER | WS_TABSTOP,7,7,212,158
     CONTROL         "&Remember recent files on exit.",IDC_SAVEMRU,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,169,114,10
-    CONTROL         "<a>Clear History</a>",IDC_EMPTY_MRU,"SysLink",WS_TABSTOP,169,169,48,10
+    CONTROL         "<a>Clear History</a>",IDC_EMPTY_MRU,"SysLink",WS_TABSTOP,172,169,48,10
     DEFPUSHBUTTON   "OK",IDOK,67,183,50,14,WS_DISABLED
     PUSHBUTTON      "Cancel",IDCANCEL,169,183,50,14
     SCROLLBAR       IDC_RESIZEGRIP,7,187,10,10
