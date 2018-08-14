@@ -4852,6 +4852,19 @@ INT_PTR CALLBACK EditFindReplaceDlgProcW(HWND hwnd, UINT umsg, WPARAM wParam, LP
 				MsgBox(MBINFO, IDS_WILDCARDHELP);
 			}
 #endif
+			else if (pnmhdr->idFrom == IDC_CLEAR_FIND) {
+				GetDlgItemText(hwnd, IDC_FINDTEXT, tch, COUNTOF(tch));
+				SendDlgItemMessage(hwnd, IDC_FINDTEXT, CB_RESETCONTENT, 0, 0);
+				MRU_Empty(mruFind);
+				MRU_Save(mruFind);
+				SetDlgItemText(hwnd, IDC_FINDTEXT, tch);
+			} else if (pnmhdr->idFrom == IDC_CLEAR_REPLACE) {
+				GetDlgItemText(hwnd, IDC_REPLACETEXT, tch, COUNTOF(tch));
+				SendDlgItemMessage(hwnd, IDC_REPLACETEXT, CB_RESETCONTENT, 0, 0);
+				MRU_Empty(mruReplace);
+				MRU_Save(mruReplace);
+				SetDlgItemText(hwnd, IDC_REPLACETEXT, tch);
+			}
 			break;
 		}
 	}
