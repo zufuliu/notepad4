@@ -1581,7 +1581,10 @@ INT_PTR CALLBACK CopyMoveDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPa
 	case WM_NOTIFY: {
 		LPNMHDR pnmhdr = (LPNMHDR)lParam;
 		if (pnmhdr->idFrom == IDC_EMPTY_MRU && (pnmhdr->code == NM_CLICK || pnmhdr->code == NM_RETURN)) {
+			WCHAR tch[MAX_PATH];
+			GetDlgItemText(hwnd, IDC_DESTINATION, tch, COUNTOF(tch));
 			MRU_ClearCombobox(GetDlgItem(hwnd, IDC_DESTINATION), L"Copy/Move MRU");
+			SetDlgItemText(hwnd, IDC_DESTINATION, tch);
 		}
 	}
 	return TRUE;

@@ -119,6 +119,8 @@
 #define IDC_REGEXPHELP					152
 #define IDC_WILDCARDHELP				153
 #define IDC_WILDCARDSEARCH				154
+#define IDC_CLEAR_FIND					155
+#define IDC_CLEAR_REPLACE				156
 #define IDACC_FIND						200
 #define IDACC_REPLACE					201
 #define IDACC_SAVEPOS					202
