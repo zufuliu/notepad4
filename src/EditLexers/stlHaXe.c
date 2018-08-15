@@ -32,7 +32,7 @@ static KEYWORDLIST Keywords_HaXe = {{
 , "", "", "", "", "", ""
 
 , // 15 Code Snippet
-"for^() if^() switch^() while^() else^if^() "
+"for^() if^() switch^() while^() else^if^() else^{} "
 }};
 
 EDITLEXER lexHaXe = { SCLEX_CPP, NP2LEX_HAXE, L"HaXe Script", L"hx", L"", &Keywords_HaXe,

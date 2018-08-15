@@ -83,7 +83,7 @@ static KEYWORDLIST Keywords_Gradle = {{
 ""
 
 , // 15 Code Snippet
-"for^() if^() switch^() while^() catch^() else^if^()  "
+"for^() if^() switch^() while^() catch^() else^if^() else^{} "
 "def^() "
 
 // Script block

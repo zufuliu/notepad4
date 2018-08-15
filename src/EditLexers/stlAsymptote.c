@@ -33,7 +33,7 @@ static KEYWORDLIST Keywords_ASY = {{
 , "", "", "", "", "", ""
 
 , // 15 Code Snippet
-"for^() if^() while^() else^if^() "
+"for^() if^() while^() else^if^() else^{} "
 }};
 
 EDITLEXER lexASY = { SCLEX_CPP, NP2LEX_ASY, L"Asymptote Code", L"asy", L"", &Keywords_ASY,
