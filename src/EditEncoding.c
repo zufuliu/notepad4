@@ -83,7 +83,7 @@ NP2ENCODING mEncoding[] = {
 	//{ NCP_8BIT | NCP_RECODE, 10001, "x-mac-japanese,xmacjapanese,", 61045, L"" },// Japanese (Mac)
 	{ NCP_8BIT | NCP_RECODE, 932, "Shift_JIS,ShiftJIS,Shiftjs,csshiftjis,cswindows31j,mskanji,xmscp932,xsjis,", 61046, L"" },// ANSI/OEM Japanese; Japanese (Shift-JIS)
 	//{ NCP_8BIT | NCP_RECODE, 10003, "x-mac-korean,xmackorean,", 0, L"" },// Korean (Mac)
-	{ NCP_8BIT | NCP_RECODE, 949, "Windows-949,Windows949,ksc56011987,csksc5601,euckr,isoir149,korean,ksc56011989", 61048, L"" },// ANSI/OEM Korean (Unified Hangul Code)
+	{ NCP_8BIT | NCP_RECODE, 949, "Windows-949,Windows949,ksx1001,ksc56011987,csksc5601,euckr,isoir149,korean,ksc56011989", 61048, L"" },// ANSI/OEM Korean (Unified Hangul Code)
 	{ NCP_8BIT | NCP_RECODE, 28593, "iso-8859-3,iso88593,latin3,isoir109,l3,", 61049, L"" },// Latin 3 (ISO 8859-3)
 	{ NCP_8BIT | NCP_RECODE, 28605, "iso-8859-15,iso885915,latin9,l9,", 61050, L"" },// Latin 9 (ISO 8859-15)
 	{ NCP_8BIT | NCP_RECODE, 28600, "ISO-8859-10,ISO885910,Windows-28600,Windows28600,", 61051, L"" },// Nordic (ISO 8859-10)
