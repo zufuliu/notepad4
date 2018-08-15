@@ -30,7 +30,7 @@ static KEYWORDLIST Keywords_Awk = {{
 , "", "", "", "", "", ""
 
 , // 15 Code Snippet
-"for^() if^() switch^() while^() else^if^() "
+"for^() if^() switch^() while^() else^if^() else^{} "
 }};
 
 EDITLEXER lexAwk = { SCLEX_CPP, NP2LEX_AWK, L"Awk Script", L"awk", L"", &Keywords_Awk,

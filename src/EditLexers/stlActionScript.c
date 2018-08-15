@@ -34,7 +34,7 @@ static KEYWORDLIST Keywords_AS = {{
 , "", "", "", "", "", ""
 
 , // 15 Code Snippet
-"for^() if^() switch^() while^() else^if^() "
+"for^() if^() switch^() while^() else^if^() else^{} "
 }};
 
 EDITLEXER lexAS = { SCLEX_CPP, NP2LEX_AS, L"ActionScript", L"as", L"", &Keywords_AS,

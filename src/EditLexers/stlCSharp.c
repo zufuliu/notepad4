@@ -64,7 +64,7 @@ static KEYWORDLIST Keywords_CSharp = {{
 , "", "", "", "", "", ""
 
 , // 15 Code Snippet
-"for^() if^() switch^() while^() catch^() else^if^() foreach^() sizeof() typeof() using^() fixed^() lock^() "
+"for^() if^() switch^() while^() catch^() else^if^() else^{} foreach^() sizeof() typeof() using^() fixed^() lock^() "
 "base() this() checked() default() delegate() nameof()"
 }};
 

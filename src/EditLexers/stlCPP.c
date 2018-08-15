@@ -428,7 +428,7 @@ static KEYWORDLIST Keywords_CPP = {{
 
 , // 15 Code Snippet
 "_Pragma() defined() comment() __has_include() __has_include_next() __has_attribute() "
-"sizeof() for^() if^() switch^() while^() catch^() else^if^() "
+"sizeof() for^() if^() switch^() while^() catch^() else^if^() else^{} "
 "alignas() alignof() delete[] decltype() noexcept() typeid() typeof() static_assert() "
 "static_cast<> const_cast<> dynamic_cast<> reinterpret_cast<> "
 "_Alignas() _Alignof() _Static_assert() "

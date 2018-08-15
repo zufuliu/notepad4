@@ -35,7 +35,7 @@ static KEYWORDLIST Keywords_Scala = {{
 , "", "", "", "", "", ""
 
 , // 15 Code Snippet
-"for^() if^() switch^() while^() catch^() else^if^() "
+"for^() if^() switch^() while^() catch^() else^if^() else^{} "
 }};
 
 EDITLEXER lexScala = { SCLEX_CPP, NP2LEX_SCALA, L"Scala Script", L"scala", L"", &Keywords_Scala,

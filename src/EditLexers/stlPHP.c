@@ -234,7 +234,7 @@ static KEYWORDLIST Keywords_PHP = {{
 ""
 
 , // 15 Code Snippet
-"for^() if^() switch^() while^() elseif^() foreach^() catch^() "
+"for^() if^() switch^() while^() elseif^() else^{} foreach^() catch^() "
 "declare() define() defined() die() echo() empty() eval() exit() isset() list() unset() require() require_once() __halt_compiler() "
 "__autoload() __call() __callStatic() __clone() __construct() __destruct() __get() __invoke()  __isset() __set() __set_state() __sleep() __toString() __unset() __wakeup() "
 }};

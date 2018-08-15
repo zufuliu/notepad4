@@ -38,7 +38,7 @@ static KEYWORDLIST Keywords_Groovy = {{
 , "", "", "", "", "", ""
 
 , // 15 Code Snippet
-"for^() if^() switch^() while^() catch^() else^if^() "
+"for^() if^() switch^() while^() catch^() else^if^() else^{} "
 "def^() "
 }};
 

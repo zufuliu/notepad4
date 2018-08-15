@@ -64,7 +64,7 @@ static KEYWORDLIST Keywords_D = {{
 , "", ""
 
 , // 15 Code Snippet
-"for^() if^() switch^() while^() else^if^() foreach^() foreach_reverse^() with^() "
+"for^() if^() switch^() while^() else^if^() else^{} foreach^() foreach_reverse^() with^() "
 " synchronized^() catch^() scope^() version^() mixin^() "
 }};
 

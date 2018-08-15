@@ -139,7 +139,7 @@ static KEYWORDLIST Keywords_JS = {{
 , "", "", ""
 
 , // 15 Code Snippet
-"for^() if^() switch^() while^() else^if^() function() "
+"for^() if^() switch^() while^() else^if^() else^{} function() "
 }};
 
 EDITLEXER lexJS = { SCLEX_CPP, NP2LEX_JS, L"JavaScript", L"js; jse; jsm", L"", &Keywords_JS,

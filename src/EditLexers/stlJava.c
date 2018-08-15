@@ -110,7 +110,7 @@ static KEYWORDLIST Keywords_Java = {{
 , "", "", "", "", ""
 
 , // 15 Code Snippet
-"for^() if^() switch^() while^() catch^() else^if^() synchronized^() try^() "
+"for^() if^() switch^() while^() catch^() else^if^() else^{} synchronized^() try^() "
 }};
 
 EDITLEXER lexJava = { SCLEX_CPP, NP2LEX_JAVA, L"Java Source", L"java", L"", &Keywords_Java,
