@@ -94,7 +94,7 @@ NP2ENCODING mEncoding[] = {
 	{ NCP_8BIT | NCP_RECODE, 28606, "ISO-8859-16,ISO885916,Windows-28606,Windows28606", 61054, L"" },// Latin-10 (ISO 8859-16)
 	//{ NCP_8BIT | NCP_RECODE, 10010, "x-mac-romanian,xmacromanian,", 0, L"" },// Romanian (Mac)
 	//{ NCP_8BIT | NCP_RECODE, 10021, "x-mac-thai,xmacthai,", 61056, L"" },// Thai (Mac)
-	{ NCP_8BIT | NCP_RECODE, 874, "Windows-874,Windows874,dos874,iso885911,tis620,", 61057, L"" },// ANSI/OEM Thai (ISO 8859-11); Thai (Windows)
+	{ NCP_8BIT | NCP_RECODE, 874, "Windows-874,Windows874,dos874,iso885911,tis-620,tis620,isoir166", 61057, L"" },// ANSI/OEM Thai (ISO 8859-11); Thai (Windows)
 	//{ NCP_8BIT | NCP_RECODE, 857, "ibm857,ibm857,", 61058, L"" },// OEM Turkish; Turkish (DOS)
 	{ NCP_8BIT | NCP_RECODE, 28599, "iso-8859-9,iso88599,latin5,isoir148,l5,", 61059, L"" },// Turkish (ISO 8859-9)
 	//{ NCP_8BIT | NCP_RECODE, 10081, "x-mac-turkish,xmacturkish,", 61060, L"" },// Turkish (Mac)
