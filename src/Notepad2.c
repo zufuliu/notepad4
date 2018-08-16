@@ -5429,9 +5429,8 @@ void LoadSettings(void) {
 
 	iDefaultCodePage = 0;
 	{
-		int acp = GetACP();
-		// 932 Shift-JIS, 936 GBK, 949 UHC, 950 Big5, 1361 Johab
-		if (acp == 932 || acp == 936 || acp == 949 || acp == 950 || acp == 1361) {
+		UINT acp = GetACP();
+		if (IsDBCSCodePage(acp)) {
 			iDefaultCodePage = acp;
 		}
 	}

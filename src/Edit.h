@@ -182,6 +182,11 @@ typedef struct _np2encoding {
 	WCHAR	wchLabel[32];
 } NP2ENCODING;
 
+// 932 Shift-JIS, 936 GBK, 949 UHC, 950 Big5, 1361 Johab
+static inline BOOL IsDBCSCodePage(UINT page) {
+	return page == 932 || page == 936 || page == 949 || page == 950 || page == 1361;
+}
+
 // in EditEncoding.c
 void	Encoding_InitDefaults(void);
 int 	Encoding_MapIniSetting(BOOL bLoad, int iSetting);

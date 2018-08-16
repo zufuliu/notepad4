@@ -195,35 +195,24 @@ NP2ENCODING mEncoding[] = {
 //
 BOOL EditSetNewEncoding(HWND hwnd, int iCurrentEncoding, int iNewEncoding, BOOL bNoUI, BOOL bSetSavePoint) {
 	if (iCurrentEncoding != iNewEncoding) {
-		if ((iCurrentEncoding == CPI_DEFAULT && iNewEncoding == CPI_DEFAULT) ||
-				(iCurrentEncoding != CPI_DEFAULT && iNewEncoding != CPI_DEFAULT)) {
+		if (iCurrentEncoding != CPI_DEFAULT && iNewEncoding != CPI_DEFAULT) {
 			return TRUE;
 		}
 
-		UINT cpSrc = (iCurrentEncoding == CPI_DEFAULT) ? GetACP() : mEncoding[iCurrentEncoding].uCodePage;
-		UINT cpDest = (iNewEncoding == CPI_DEFAULT) ? GetACP() : mEncoding[iNewEncoding].uCodePage;
-		bNoUI = bNoUI || (cpSrc == cpDest)
-			|| (cpSrc == 936 && cpDest == 54936); // GBK/GB2312 to GB18030
+		const UINT cpSrc = (mEncoding[iCurrentEncoding].uFlags & NCP_DEFAULT) ? iDefaultCodePage : SC_CP_UTF8;
+		const UINT cpDest = (mEncoding[iNewEncoding].uFlags & NCP_DEFAULT) ? iDefaultCodePage : SC_CP_UTF8;
 
 		if (SendMessage(hwnd, SCI_GETLENGTH, 0, 0) == 0) {
 			BOOL bIsEmptyUndoHistory =
 				(SendMessage(hwnd, SCI_CANUNDO, 0, 0) == 0 && SendMessage(hwnd, SCI_CANREDO, 0, 0) == 0);
 
-			if ((iCurrentEncoding == CPI_DEFAULT || iNewEncoding == CPI_DEFAULT) &&
-					(bNoUI || bIsEmptyUndoHistory || InfoBox(MBYESNO, L"MsgConv2", IDS_ASK_ENCODING2) == IDYES)) {
-				EditConvertText(hwnd,
-								(mEncoding[iCurrentEncoding].uFlags & NCP_DEFAULT) ? iDefaultCodePage : SC_CP_UTF8,
-								(mEncoding[iNewEncoding].uFlags & NCP_DEFAULT) ? iDefaultCodePage : SC_CP_UTF8,
-								bSetSavePoint);
+			if (bNoUI || bIsEmptyUndoHistory || InfoBox(MBYESNO, L"MsgConv2", IDS_ASK_ENCODING2) == IDYES) {
+				EditConvertText(hwnd, cpSrc, cpDest, bSetSavePoint);
 				return TRUE;
 			}
-		} else if ((iCurrentEncoding == CPI_DEFAULT || iNewEncoding == CPI_DEFAULT) &&
-				   (bNoUI || InfoBox(MBYESNO, L"MsgConv1", IDS_ASK_ENCODING) == IDYES)) {
+		} else if (bNoUI || InfoBox(MBYESNO, L"MsgConv1", IDS_ASK_ENCODING) == IDYES) {
 			BeginWaitCursor();
-			EditConvertText(hwnd,
-							(mEncoding[iCurrentEncoding].uFlags & NCP_DEFAULT) ? iDefaultCodePage : SC_CP_UTF8,
-							(mEncoding[iNewEncoding].uFlags & NCP_DEFAULT) ? iDefaultCodePage : SC_CP_UTF8,
-							FALSE);
+			EditConvertText(hwnd, cpSrc, cpDest, FALSE);
 			EndWaitCursor();
 			return TRUE;
 		}
