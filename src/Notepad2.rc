@@ -1711,7 +1711,7 @@ END
 STRINGTABLE
 BEGIN
     //61056                   "C;Thai (Mac);Mac (Thai)"
-    61057                   "C;Thai (Windows-874, TIS-620, ISO 8859-11);Windows-874"
+    61057                   "C;Thai (Windows-874, TIS-620, ISO 8859-11);TIS-620"
     //61058                   "C;Turkish (DOS-857);DOS-857"
     61059                   "C;Turkish (Latin 5, ISO 8859-9);ISO 8859-9"
     //61060                   "C;Turkish (Mac);Mac (Turkish)"
