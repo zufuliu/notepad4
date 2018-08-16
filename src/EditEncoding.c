@@ -200,6 +200,11 @@ BOOL EditSetNewEncoding(HWND hwnd, int iCurrentEncoding, int iNewEncoding, BOOL 
 			return TRUE;
 		}
 
+		UINT cpSrc = (iCurrentEncoding == CPI_DEFAULT) ? GetACP() : mEncoding[iCurrentEncoding].uCodePage;
+		UINT cpDest = (iNewEncoding == CPI_DEFAULT) ? GetACP() : mEncoding[iNewEncoding].uCodePage;
+		bNoUI = bNoUI || (cpSrc == cpDest)
+			|| (cpSrc == 936 && cpDest == 54936); // GBK/GB2312 to GB18030
+
 		if (SendMessage(hwnd, SCI_GETLENGTH, 0, 0) == 0) {
 			BOOL bIsEmptyUndoHistory =
 				(SendMessage(hwnd, SCI_CANUNDO, 0, 0) == 0 && SendMessage(hwnd, SCI_CANREDO, 0, 0) == 0);
