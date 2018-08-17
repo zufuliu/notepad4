@@ -23,6 +23,7 @@ enum CharacterCategory {
 CharacterCategory CategoriseCharacter(int character);
 
 // Common definitions of allowable characters in identifiers from UAX #31.
+// Unicode Identifier and Pattern Syntax http://unicode.org/reports/tr31/
 bool IsIdStart(int character);
 bool IsIdContinue(int character);
 bool IsXidStart(int character);
