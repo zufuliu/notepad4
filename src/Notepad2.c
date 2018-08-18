@@ -6673,7 +6673,7 @@ void UpdateLineNumberWidth(void) {
 //	FileIO()
 //
 //
-BOOL FileIO(BOOL fLoad, LPCWSTR psz, BOOL bNoEncDetect, int *ienc, int *ieol,
+BOOL FileIO(BOOL fLoad, LPWSTR psz, BOOL bNoEncDetect, int *ienc, int *ieol,
 			BOOL *pbUnicodeErr, BOOL *pbFileTooBig,
 			BOOL *pbCancelDataLoss, BOOL bSaveCopy) {
 	WCHAR tch[MAX_PATH + 40];

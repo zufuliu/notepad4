@@ -79,14 +79,11 @@ bool LoadD2D() {
 	static bool triedLoadingD2D = false;
 	if (!triedLoadingD2D) {
 		DWORD loadLibraryFlags = 0;
-		HMODULE kernel32 = ::GetModuleHandle(TEXT("kernel32.dll"));
-		if (kernel32) {
-			if (::GetProcAddress(kernel32, "SetDefaultDllDirectories")) {
-				// Availability of SetDefaultDllDirectories implies Windows 8+ or
-				// that KB2533623 has been installed so LoadLibraryEx can be called
-				// with LOAD_LIBRARY_SEARCH_SYSTEM32.
-				loadLibraryFlags = LOAD_LIBRARY_SEARCH_SYSTEM32;
-			}
+		if (::GetProcAddress(::GetModuleHandle(TEXT("kernel32.dll")), "SetDefaultDllDirectories")) {
+			// Availability of SetDefaultDllDirectories implies Windows 8+ or
+			// that KB2533623 has been installed so LoadLibraryEx can be called
+			// with LOAD_LIBRARY_SEARCH_SYSTEM32.
+			loadLibraryFlags = LOAD_LIBRARY_SEARCH_SYSTEM32;
 		}
 
 		typedef HRESULT(WINAPI *D2D1CFSig)(D2D1_FACTORY_TYPE factoryType, REFIID riid,

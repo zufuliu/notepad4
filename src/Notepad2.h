@@ -114,7 +114,7 @@ void UpdateStatusBarWidth(void);
 void UpdateToolbar(void);
 void UpdateLineNumberWidth(void);
 
-BOOL FileIO(BOOL fLoad, LPCWSTR psz, BOOL bNoEncDetect, int *ienc, int *ieol,
+BOOL FileIO(BOOL fLoad, LPWSTR psz, BOOL bNoEncDetect, int *ienc, int *ieol,
 			BOOL *pbUnicodeErr, BOOL *pbFileTooBig,
 			BOOL *pbCancelDataLoss, BOOL bSaveCopy);
 BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect, LPCWSTR lpszFile);
