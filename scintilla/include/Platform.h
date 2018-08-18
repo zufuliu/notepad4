@@ -535,8 +535,8 @@ public:
 	static const char *DefaultFont();
 	static int DefaultFontSize();
 	static unsigned int DoubleClickTime();
-	static void DebugDisplay(const char *s);
 
+	static void DebugDisplay(const char *s);
 	static void DebugPrintf(const char *format, ...);
 	static bool ShowAssertionPopUps(bool assertionPopUps_);
 	static void Assert(const char *c, const char *file, int line) CLANG_ANALYZER_NORETURN;
