@@ -34,6 +34,12 @@
 #include <shlobj.h>
 #include <shellapi.h>
 
+/*
+CF_VSSTGPROJECTITEMS, CF_VSREFPROJECTITEMS
+https://docs.microsoft.com/en-us/visualstudio/extensibility/ux-guidelines/application-patterns-for-visual-studio
+*/
+#define EnableDrop_VisualStudioProjectItem		1
+
 #if !defined(DISABLE_D2D)
 #define USE_D2D 1
 #endif
@@ -272,6 +278,11 @@ class ScintillaWin :
 	CLIPFORMAT cfLineSelect;
 	CLIPFORMAT cfVSLineTag;
 
+#if EnableDrop_VisualStudioProjectItem
+	CLIPFORMAT cfVSStgProjectItem;
+	CLIPFORMAT cfVSRefProjectItem;
+#endif
+
 	// supported drag & drop format
 	std::vector<CLIPFORMAT> dropFormat;
 
@@ -464,7 +475,16 @@ ScintillaWin::ScintillaWin(HWND hwnd) {
 	cfVSLineTag = static_cast<CLIPFORMAT>(
 		::RegisterClipboardFormat(TEXT("VisualStudioEditorOperationsLineCutCopyClipboardTag")));
 
+#if EnableDrop_VisualStudioProjectItem
+	cfVSStgProjectItem = static_cast<CLIPFORMAT>(::RegisterClipboardFormat(TEXT("CF_VSSTGPROJECTITEMS")));
+	cfVSRefProjectItem = static_cast<CLIPFORMAT>(::RegisterClipboardFormat(TEXT("CF_VSREFPROJECTITEMS")));
+#endif
+
 	dropFormat.push_back(CF_HDROP);
+#if EnableDrop_VisualStudioProjectItem
+	dropFormat.push_back(cfVSStgProjectItem);
+	dropFormat.push_back(cfVSRefProjectItem);
+#endif
 	// text format comes last
 	dropFormat.push_back(CF_UNICODETEXT);
 	dropFormat.push_back(CF_TEXT);
@@ -3156,11 +3176,24 @@ STDMETHODIMP ScintillaWin::Drop(LPDATAOBJECT pIDataSource, DWORD grfKeyState,
 			hr = pIDataSource->GetData(&fmtu, &medium);
 			if (SUCCEEDED(hr) && medium.hGlobal) {
 				// File Drop
-				if (fmt == CF_HDROP) {
+				if (fmt == CF_HDROP
+#if EnableDrop_VisualStudioProjectItem
+					|| fmt == cfVSStgProjectItem || fmt == cfVSRefProjectItem
+#endif
+					) {
 					fileDrop = true;
 					WCHAR pathDropped[1024];
 					if (::DragQueryFileW(static_cast<HDROP>(medium.hGlobal), 0, pathDropped, sizeof(pathDropped)/sizeof(WCHAR)) > 0) {
 						WCHAR *p = pathDropped;
+#if EnableDrop_VisualStudioProjectItem
+						if (fmt == cfVSStgProjectItem || fmt == cfVSRefProjectItem) {
+							// {UUID}|Solution\Project.[xx]proj|path
+							WCHAR *t = StrRChrW(p, NULL, L'|');
+							if (t) {
+								p = t + 1;
+							}
+						}
+#endif
 						// Convert UTF-16 to UTF-8
 						const std::wstring_view wsv(p);
 						const size_t dataLen = UTF8Length(wsv);
