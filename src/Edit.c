@@ -410,7 +410,7 @@ int EditDetectEOLMode(HWND hwnd, LPCSTR lpData) {
 //
 // EditLoadFile()
 //
-BOOL EditLoadFile(HWND hwnd, LPCWSTR pszFile, BOOL bSkipEncodingDetection,
+BOOL EditLoadFile(HWND hwnd, LPWSTR pszFile, BOOL bSkipEncodingDetection,
 				  int *iEncoding, int *iEOLMode, BOOL *pbUnicodeErr, BOOL *pbFileTooBig) {
 	HANDLE hFile;
 
@@ -459,6 +459,22 @@ BOOL EditLoadFile(HWND hwnd, LPCWSTR pszFile, BOOL bSkipEncodingDetection,
 			iSrcEncoding = -1;
 			iWeakSrcEncoding = -1;
 			return FALSE;
+		}
+	}
+
+	// display real path name
+	if (IsVistaAndAbove()) {
+		WCHAR path[MAX_PATH] = L"";
+		FARPROC pfnGetFinalPathNameByHandle = GetProcAddress(GetModuleHandle(L"kernel32.dll"), "GetFinalPathNameByHandleW");
+		if (pfnGetFinalPathNameByHandle && pfnGetFinalPathNameByHandle(hFile, path, MAX_PATH, /*FILE_NAME_OPENED*/0x8) > 0) {
+			if (StrCmpN(path, L"\\\\?\\", 4) == 0) {
+				WCHAR *p = path + 4;
+				if (StrCmpN(p, L"UNC\\", 4) == 0) {
+					p += 2;
+					*p = L'\\';
+				}
+				lstrcpy(pszFile, p);
+			}
 		}
 	}
 

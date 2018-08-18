@@ -490,11 +490,8 @@ void ScintillaWin::Init() {
 	hrOle = ::OleInitialize(nullptr);
 
 	// Find SetCoalescableTimer which is only available from Windows 8+
-	HMODULE user32 = ::GetModuleHandle(TEXT("user32.dll"));
-	if (user32) {
-		SetCoalescableTimerFn = reinterpret_cast<SetCoalescableTimerSig>(
-			::GetProcAddress(user32, "SetCoalescableTimer"));
-	}
+	SetCoalescableTimerFn = reinterpret_cast<SetCoalescableTimerSig>(
+		::GetProcAddress(::GetModuleHandle(TEXT("user32.dll")), "SetCoalescableTimer"));
 
 	vs.indicators[SC_INDICATOR_UNKNOWN] = Indicator(INDIC_HIDDEN, ColourDesired(0, 0, 0xff));
 	vs.indicators[SC_INDICATOR_INPUT] = Indicator(INDIC_DOTS, ColourDesired(0, 0, 0xff));
