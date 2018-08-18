@@ -2174,10 +2174,10 @@ void ScintillaWin::CopyAllowLine() {
 bool ScintillaWin::CanPaste() {
 	if (!Editor::CanPaste())
 		return false;
+	if (::IsClipboardFormatAvailable(CF_UNICODETEXT))
+		return true;
 	if (::IsClipboardFormatAvailable(CF_TEXT))
 		return true;
-	if (IsUnicodeMode())
-		return ::IsClipboardFormatAvailable(CF_UNICODETEXT) != 0;
 	return false;
 }
 
@@ -3051,8 +3051,8 @@ STDMETHODIMP ScintillaWin::DragEnter(LPDATAOBJECT pIDataSource, DWORD grfKeyStat
 	}
 	if (!hasOKText) {
 		FORMATETC fmtd = { CF_HDROP, nullptr, DVASPECT_CONTENT, -1, TYMED_HGLOBAL };
-		const HRESULT hrHasText = pIDataSource->QueryGetData(&fmtd);
-		hasOKText = (hrHasText == S_OK);
+		const HRESULT hrHasDrop = pIDataSource->QueryGetData(&fmtd);
+		hasOKText = (hrHasDrop == S_OK);
 	}
 	if (!hasOKText) {
 		*pdwEffect = DROPEFFECT_NONE;
@@ -3211,8 +3211,7 @@ STDMETHODIMP ScintillaWin::Drop(LPDATAOBJECT pIDataSource, DWORD grfKeyState,
 /// Implement important part of IDataObject
 STDMETHODIMP ScintillaWin::GetData(FORMATETC *pFEIn, STGMEDIUM *pSTM) {
 	const bool formatOK = (pFEIn->cfFormat == CF_TEXT) ||
-		((pFEIn->cfFormat == CF_UNICODETEXT) && IsUnicodeMode()) ||
-		(pFEIn->cfFormat == CF_HDROP);
+		((pFEIn->cfFormat == CF_UNICODETEXT) && IsUnicodeMode());
 	if (!formatOK ||
 		pFEIn->ptd != nullptr ||
 		(pFEIn->dwAspect & DVASPECT_CONTENT) == 0 ||
