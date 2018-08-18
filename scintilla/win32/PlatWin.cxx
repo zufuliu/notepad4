@@ -3359,18 +3359,23 @@ const char *Platform::DefaultFont() {
 }
 
 int Platform::DefaultFontSize() {
-	return 8;
+	return 10;
 }
 
 unsigned int Platform::DoubleClickTime() {
 	return ::GetDoubleClickTime();
 }
 
+//#define TRACE
+
+#ifdef TRACE
 void Platform::DebugDisplay(const char *s) {
 	::OutputDebugStringA(s);
 }
-
-//#define TRACE
+#else
+void Platform::DebugDisplay(const char *) {
+}
+#endif
 
 #ifdef TRACE
 void Platform::DebugPrintf(const char *format, ...) {
@@ -3386,6 +3391,7 @@ void Platform::DebugPrintf(const char *, ...) {
 }
 #endif
 
+#ifdef TRACE
 static bool assertionPopUps = true;
 
 bool Platform::ShowAssertionPopUps(bool assertionPopUps_) {
@@ -3393,7 +3399,13 @@ bool Platform::ShowAssertionPopUps(bool assertionPopUps_) {
 	assertionPopUps = assertionPopUps_;
 	return ret;
 }
+#else
+bool Platform::ShowAssertionPopUps(bool) {
+	return false;
+}
+#endif
 
+#ifdef TRACE
 void Platform::Assert(const char *c, const char *file, int line) {
 	char buffer[2000];
 	sprintf(buffer, "Assertion [%s] failed at %s %d%s", c, file, line, assertionPopUps ? "" : "\r\n");
@@ -3413,6 +3425,10 @@ void Platform::Assert(const char *c, const char *file, int line) {
 		abort();
 	}
 }
+#else
+void Platform::Assert(const char *, const char *, int) {
+}
+#endif
 
 void Platform_Initialise(void *hInstance) {
 	::InitializeCriticalSection(&crPlatformLock);
