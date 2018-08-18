@@ -2326,12 +2326,7 @@ void ScintillaWin::Paste() {
 			const char *ptr = static_cast<const char *>(memSelection.ptr);
 			if (ptr) {
 				const size_t bytes = memSelection.Size();
-				size_t len = bytes;
-				for (size_t i = 0; i < bytes; i++) {
-					if ((len == bytes) && (0 == ptr[i]))
-						len = i;
-				}
-
+				const size_t len = strnlen(ptr, bytes);
 				// In Unicode mode, convert clipboard text to UTF-8
 				if (IsUnicodeMode()) {
 					std::vector<wchar_t> uptr(len + 1);
@@ -3064,7 +3059,7 @@ STDMETHODIMP_(ULONG) ScintillaWin::Release() {
 	return 1;
 }
 
-#ifndef NDEBUG
+#if 0//ndef NDEBUG
 extern "C" void DLog(const char *fmt, ...); // in Notepad2's Helpers.c
 
 // https://docs.microsoft.com/en-us/windows/desktop/api/objidl/nf-objidl-idataobject-enumformatetc
@@ -3102,7 +3097,7 @@ STDMETHODIMP ScintillaWin::DragEnter(LPDATAOBJECT pIDataSource, DWORD grfKeyStat
 	if (!pIDataSource)
 		return E_POINTER;
 
-	EnumDataSourceFormat("DragEnter", pIDataSource);
+	//EnumDataSourceFormat("DragEnter", pIDataSource);
 
 	hasOKText = false;
 	for (CLIPFORMAT fmt : dropFormat) {
@@ -3232,7 +3227,8 @@ STDMETHODIMP ScintillaWin::Drop(LPDATAOBJECT pIDataSource, DWORD grfKeyState,
 					GlobalMemory memDrop(medium.hGlobal);
 					const char *cdata = static_cast<const char *>(memDrop.ptr);
 					if (cdata) {
-						const size_t len = strlen(cdata);
+						const size_t bytes = memDrop.Size();
+						const size_t len = strnlen(cdata, bytes);
 						// In Unicode mode, convert text to UTF-8
 						if (IsUnicodeMode()) {
 							std::vector<wchar_t> uptr(len + 1);
