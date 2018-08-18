@@ -30,6 +30,9 @@
 #include <windowsx.h>
 #include <zmouse.h>
 #include <ole2.h>
+#include <shlwapi.h>
+#include <shlobj.h>
+#include <shellapi.h>
 
 #if !defined(DISABLE_D2D)
 #define USE_D2D 1
@@ -173,7 +176,7 @@ typedef void VFunction(void);
 class FormatEnumerator {
 public:
 	VFunction **vtbl;
-	int ref;
+	ULONG ref;
 	unsigned int pos;
 	std::vector<CLIPFORMAT> formats;
 	FormatEnumerator(int pos_, const CLIPFORMAT formats_[], size_t formatsLen_);
@@ -2368,14 +2371,14 @@ STDMETHODIMP FormatEnumerator_QueryInterface(FormatEnumerator *fe, REFIID riid, 
 	return S_OK;
 }
 STDMETHODIMP_(ULONG)FormatEnumerator_AddRef(FormatEnumerator *fe) {
-	return ++fe->ref;
+	return InterlockedIncrement(&fe->ref);
 }
 STDMETHODIMP_(ULONG)FormatEnumerator_Release(FormatEnumerator *fe) {
-	fe->ref--;
-	if (fe->ref > 0)
-		return fe->ref;
-	delete fe;
-	return 0;
+	ULONG refs = InterlockedDecrement(&fe->ref);
+	if (refs == 0) {
+		delete fe;
+	}
+	return refs;
 }
 /// Implement IEnumFORMATETC
 STDMETHODIMP FormatEnumerator_Next(FormatEnumerator *fe, ULONG celt, FORMATETC *rgelt, ULONG *pceltFetched) {
@@ -3033,11 +3036,45 @@ STDMETHODIMP_(ULONG) ScintillaWin::Release() {
 	return 1;
 }
 
+#ifndef NDEBUG
+extern "C" void DLog(const char *fmt, ...); // in Notepad2's Helpers.c
+
+// https://docs.microsoft.com/en-us/windows/desktop/api/objidl/nf-objidl-idataobject-enumformatetc
+static void EnumDataSourceFormat(const char *tag, LPDATAOBJECT pIDataSource) {
+	IEnumFORMATETC *fmtEnum = nullptr;
+	HRESULT hr = pIDataSource->EnumFormatEtc(DATADIR_GET, &fmtEnum);
+	if (hr == S_OK && fmtEnum) {
+		FORMATETC fetc[16] = {};
+		ULONG fetched = 0;
+		hr = fmtEnum->Next(sizeof(fetc) / sizeof(fetc[0]), fetc, &fetched);
+		if (fetched > 0) {
+			char name[1024];
+			for (ULONG i = 0; i < fetched; i++) {
+				const CLIPFORMAT fmt = fetc[i].cfFormat;
+				int len = GetClipboardFormatNameA(fmt, name, sizeof(name));
+				if (len <= 0) {
+					strcpy(name, "Unknown");
+				}
+				//Platform::DebugPrintf("%s: fmt[%ld]=%d, 0x%04X, tymed=%d, name=%s\n", tag, i, fmt, fmt, fetc[i].tymed, name);
+				DLog("%s: fmt[%ld]=%d, 0x%04X, tymed=%d, name=%s\n", tag, i, fmt, fmt, fetc[i].tymed, name);
+			}
+		}
+	}
+	if (fmtEnum) {
+		fmtEnum->Release();
+	}
+}
+#else
+#define EnumDataSourceFormat(tag, pIDataSource)
+#endif
+
 /// Implement IDropTarget
 STDMETHODIMP ScintillaWin::DragEnter(LPDATAOBJECT pIDataSource, DWORD grfKeyState,
 	POINTL, PDWORD pdwEffect) {
 	if (!pIDataSource)
 		return E_POINTER;
+
+	EnumDataSourceFormat("DragEnter", pIDataSource);
 	FORMATETC fmtu = { CF_UNICODETEXT, nullptr, DVASPECT_CONTENT, -1, TYMED_HGLOBAL };
 	const HRESULT hrHasUText = pIDataSource->QueryGetData(&fmtu);
 	hasOKText = (hrHasUText == S_OK);
@@ -3105,9 +3142,26 @@ STDMETHODIMP ScintillaWin::Drop(LPDATAOBJECT pIDataSource, DWORD grfKeyState,
 
 		std::vector<char> data;	// Includes terminating NUL
 		bool fileDrop = false;
+		bool succeed = false;
 
+		EnumDataSourceFormat("Drop", pIDataSource);
+		FORMATETC fmtd = { CF_HDROP, nullptr, DVASPECT_CONTENT, -1, TYMED_HGLOBAL };
+		HRESULT hr = pIDataSource->GetData(&fmtd, &medium);
+		if (SUCCEEDED(hr) && medium.hGlobal) {
+			succeed = true;
+			fileDrop = true;
+			WCHAR pathDropped[MAX_PATH];
+			if (::DragQueryFileW(static_cast<HDROP>(medium.hGlobal), 0, pathDropped, MAX_PATH) > 0) {
+				// Convert UTF-16 to UTF-8
+				const std::wstring_view wsv(pathDropped);
+				const size_t dataLen = UTF8Length(wsv);
+				data.resize(dataLen + 1); // NUL
+				UTF8FromUTF16(wsv, &data[0], dataLen);
+			}
+		}
+		if (!succeed) {
 		FORMATETC fmtu = { CF_UNICODETEXT, nullptr, DVASPECT_CONTENT, -1, TYMED_HGLOBAL };
-		HRESULT hr = pIDataSource->GetData(&fmtu, &medium);
+		hr = pIDataSource->GetData(&fmtu, &medium);
 		if (SUCCEEDED(hr) && medium.hGlobal) {
 			GlobalMemory memUDrop(medium.hGlobal);
 			const wchar_t *udata = static_cast<const wchar_t *>(memUDrop.ptr);
@@ -3157,21 +3211,8 @@ STDMETHODIMP ScintillaWin::Drop(LPDATAOBJECT pIDataSource, DWORD grfKeyState,
 					}
 				}
 				memDrop.Unlock();
-			} else {
-				FORMATETC fmtd = { CF_HDROP, nullptr, DVASPECT_CONTENT, -1, TYMED_HGLOBAL };
-				hr = pIDataSource->GetData(&fmtd, &medium);
-				if (SUCCEEDED(hr) && medium.hGlobal) {
-					fileDrop = true;
-					WCHAR pathDropped[MAX_PATH];
-					if (::DragQueryFileW(static_cast<HDROP>(medium.hGlobal), 0, pathDropped, MAX_PATH) > 0) {
-						// Convert UTF-16 to UTF-8
-						const std::wstring_view wsv(pathDropped);
-						const size_t dataLen = UTF8Length(wsv);
-						data.resize(dataLen + 1); // NUL
-						UTF8FromUTF16(wsv, &data[0], dataLen);
-					}
-				}
 			}
+		}
 		}
 
 		if (!SUCCEEDED(hr) || data.empty()) {
