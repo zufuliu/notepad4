@@ -39,6 +39,11 @@ CF_VSSTGPROJECTITEMS, CF_VSREFPROJECTITEMS
 https://docs.microsoft.com/en-us/visualstudio/extensibility/ux-guidelines/application-patterns-for-visual-studio
 */
 #define EnableDrop_VisualStudioProjectItem		1
+/*
+Chromium Web Custom MIME Data Format
+Used VSCode, Atom etc.
+*/
+#define Enable_ChromiumWebCustomMIMEDataFormat	0
 
 #if !defined(DISABLE_D2D)
 #define USE_D2D 1
@@ -282,6 +287,9 @@ class ScintillaWin :
 	CLIPFORMAT cfVSStgProjectItem;
 	CLIPFORMAT cfVSRefProjectItem;
 #endif
+#if Enable_ChromiumWebCustomMIMEDataFormat
+	CLIPFORMAT cfChromiumCustomMIME;
+#endif
 
 	// supported drag & drop format
 	std::vector<CLIPFORMAT> dropFormat;
@@ -479,11 +487,17 @@ ScintillaWin::ScintillaWin(HWND hwnd) {
 	cfVSStgProjectItem = static_cast<CLIPFORMAT>(::RegisterClipboardFormat(TEXT("CF_VSSTGPROJECTITEMS")));
 	cfVSRefProjectItem = static_cast<CLIPFORMAT>(::RegisterClipboardFormat(TEXT("CF_VSREFPROJECTITEMS")));
 #endif
+#if Enable_ChromiumWebCustomMIMEDataFormat
+	cfChromiumCustomMIME = static_cast<CLIPFORMAT>(::RegisterClipboardFormat(TEXT("Chromium Web Custom MIME Data Format")));
+#endif
 
 	dropFormat.push_back(CF_HDROP);
 #if EnableDrop_VisualStudioProjectItem
 	dropFormat.push_back(cfVSStgProjectItem);
 	dropFormat.push_back(cfVSRefProjectItem);
+#endif
+#if Enable_ChromiumWebCustomMIMEDataFormat
+	dropFormat.push_back(cfChromiumCustomMIME);
 #endif
 	// text format comes last
 	dropFormat.push_back(CF_UNICODETEXT);
@@ -3196,6 +3210,19 @@ STDMETHODIMP ScintillaWin::Drop(LPDATAOBJECT pIDataSource, DWORD grfKeyState,
 						UTF8FromUTF16(wsv, &data[0], dataLen);
 					}
 				}
+#if Enable_ChromiumWebCustomMIMEDataFormat
+				else if (fmt == cfChromiumCustomMIME) {
+					GlobalMemory memUDrop(medium.hGlobal);
+					const wchar_t *udata = static_cast<const wchar_t *>(memUDrop.ptr);
+					if (udata) {
+						const size_t tlen = memUDrop.Size();
+						const std::wstring_view wsv(udata, tlen / 2);
+						// parse file url: "resource":"file:///path"
+						const size_t dataLen = UTF8Length(wsv);
+					}
+					memUDrop.Unlock();
+				}
+#endif
 				// Unicode Text
 				else if (fmt == CF_UNICODETEXT) {
 					GlobalMemory memUDrop(medium.hGlobal);
