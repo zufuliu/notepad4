@@ -272,6 +272,9 @@ class ScintillaWin :
 	CLIPFORMAT cfLineSelect;
 	CLIPFORMAT cfVSLineTag;
 
+	// supported drag & drop format
+	std::vector<CLIPFORMAT> dropFormat;
+
 	HRESULT hrOle;
 	DropSource ds;
 	DataObject dob;
@@ -460,8 +463,13 @@ ScintillaWin::ScintillaWin(HWND hwnd) {
 		::RegisterClipboardFormat(TEXT("MSDEVLineSelect")));
 	cfVSLineTag = static_cast<CLIPFORMAT>(
 		::RegisterClipboardFormat(TEXT("VisualStudioEditorOperationsLineCutCopyClipboardTag")));
-	hrOle = E_FAIL;
 
+	dropFormat.push_back(CF_HDROP);
+	// text format comes last
+	dropFormat.push_back(CF_UNICODETEXT);
+	dropFormat.push_back(CF_TEXT);
+
+	hrOle = E_FAIL;
 	wMain = hwnd;
 
 	dob.sci = this;
@@ -3075,19 +3083,17 @@ STDMETHODIMP ScintillaWin::DragEnter(LPDATAOBJECT pIDataSource, DWORD grfKeyStat
 		return E_POINTER;
 
 	EnumDataSourceFormat("DragEnter", pIDataSource);
-	FORMATETC fmtu = { CF_UNICODETEXT, nullptr, DVASPECT_CONTENT, -1, TYMED_HGLOBAL };
-	const HRESULT hrHasUText = pIDataSource->QueryGetData(&fmtu);
-	hasOKText = (hrHasUText == S_OK);
-	if (!hasOKText) {
-		FORMATETC fmte = { CF_TEXT, nullptr, DVASPECT_CONTENT, -1, TYMED_HGLOBAL };
-		const HRESULT hrHasText = pIDataSource->QueryGetData(&fmte);
-		hasOKText = (hrHasText == S_OK);
+
+	hasOKText = false;
+	for (CLIPFORMAT fmt : dropFormat) {
+		FORMATETC fmtu = { fmt, nullptr, DVASPECT_CONTENT, -1, TYMED_HGLOBAL };
+		const HRESULT hrHasUText = pIDataSource->QueryGetData(&fmtu);
+		hasOKText = (hrHasUText == S_OK);
+		if (hasOKText) {
+			break;
+		}
 	}
-	if (!hasOKText) {
-		FORMATETC fmtd = { CF_HDROP, nullptr, DVASPECT_CONTENT, -1, TYMED_HGLOBAL };
-		const HRESULT hrHasDrop = pIDataSource->QueryGetData(&fmtd);
-		hasOKText = (hrHasDrop == S_OK);
-	}
+
 	if (!hasOKText) {
 		*pdwEffect = DROPEFFECT_NONE;
 		return S_OK;
@@ -3142,77 +3148,78 @@ STDMETHODIMP ScintillaWin::Drop(LPDATAOBJECT pIDataSource, DWORD grfKeyState,
 
 		std::vector<char> data;	// Includes terminating NUL
 		bool fileDrop = false;
-		bool succeed = false;
+		HRESULT hr = DV_E_FORMATETC;
 
-		EnumDataSourceFormat("Drop", pIDataSource);
-		FORMATETC fmtd = { CF_HDROP, nullptr, DVASPECT_CONTENT, -1, TYMED_HGLOBAL };
-		HRESULT hr = pIDataSource->GetData(&fmtd, &medium);
-		if (SUCCEEDED(hr) && medium.hGlobal) {
-			succeed = true;
-			fileDrop = true;
-			WCHAR pathDropped[MAX_PATH];
-			if (::DragQueryFileW(static_cast<HDROP>(medium.hGlobal), 0, pathDropped, MAX_PATH) > 0) {
-				// Convert UTF-16 to UTF-8
-				const std::wstring_view wsv(pathDropped);
-				const size_t dataLen = UTF8Length(wsv);
-				data.resize(dataLen + 1); // NUL
-				UTF8FromUTF16(wsv, &data[0], dataLen);
-			}
-		}
-		if (!succeed) {
-		FORMATETC fmtu = { CF_UNICODETEXT, nullptr, DVASPECT_CONTENT, -1, TYMED_HGLOBAL };
-		hr = pIDataSource->GetData(&fmtu, &medium);
-		if (SUCCEEDED(hr) && medium.hGlobal) {
-			GlobalMemory memUDrop(medium.hGlobal);
-			const wchar_t *udata = static_cast<const wchar_t *>(memUDrop.ptr);
-			if (udata) {
-				if (IsUnicodeMode()) {
-					const size_t tlen = memUDrop.Size();
-					// Convert UTF-16 to UTF-8
-					const std::wstring_view wsv(udata, tlen / 2);
-					const size_t dataLen = UTF8Length(wsv);
-					data.resize(dataLen);
-					UTF8FromUTF16(wsv, &data[0], dataLen);
-				} else {
-					// Convert UTF-16 to ANSI
-					//
-					// Default Scintilla behavior in Unicode mode
-					// CF_UNICODETEXT available, but not in Unicode mode
-					// Convert from Unicode to current Scintilla code page
-					const UINT cpDest = CodePageOfDocument();
-					const int tlen = MultiByteLenFromWideChar(cpDest, udata);
-					data.resize(tlen);
-					MultiByteFromWideChar(cpDest, udata, &data[0], tlen);
-				}
-			}
-			memUDrop.Unlock();
-		} else {
-			FORMATETC fmte = { CF_TEXT, nullptr, DVASPECT_CONTENT, -1, TYMED_HGLOBAL };
-			hr = pIDataSource->GetData(&fmte, &medium);
+		//EnumDataSourceFormat("Drop", pIDataSource);
+		for (CLIPFORMAT fmt : dropFormat) {
+			FORMATETC fmtu = { fmt, nullptr, DVASPECT_CONTENT, -1, TYMED_HGLOBAL };
+			hr = pIDataSource->GetData(&fmtu, &medium);
 			if (SUCCEEDED(hr) && medium.hGlobal) {
-				GlobalMemory memDrop(medium.hGlobal);
-				const char *cdata = static_cast<const char *>(memDrop.ptr);
-				if (cdata) {
-					const size_t len = strlen(cdata);
-					// In Unicode mode, convert text to UTF-8
-					if (IsUnicodeMode()) {
-						std::vector<wchar_t> uptr(len + 1);
-
-						const int ilen = static_cast<int>(len);
-						const size_t ulen = WideCharFromMultiByte(CP_ACP,
-							std::string_view(cdata, ilen), &uptr[0], ilen + 1);
-
-						const std::wstring_view wsv(&uptr[0], ulen);
-						const size_t mlen = UTF8Length(wsv);
-						data.resize(mlen + 1);
-						UTF8FromUTF16(wsv, &data[0], mlen);
-					} else {
-						data.assign(cdata, cdata + len);
+				// File Drop
+				if (fmt == CF_HDROP) {
+					fileDrop = true;
+					WCHAR pathDropped[1024];
+					if (::DragQueryFileW(static_cast<HDROP>(medium.hGlobal), 0, pathDropped, sizeof(pathDropped)/sizeof(WCHAR)) > 0) {
+						WCHAR *p = pathDropped;
+						// Convert UTF-16 to UTF-8
+						const std::wstring_view wsv(p);
+						const size_t dataLen = UTF8Length(wsv);
+						data.resize(dataLen + 1); // NUL
+						UTF8FromUTF16(wsv, &data[0], dataLen);
 					}
 				}
-				memDrop.Unlock();
+				// Unicode Text
+				else if (fmt == CF_UNICODETEXT) {
+					GlobalMemory memUDrop(medium.hGlobal);
+					const wchar_t *udata = static_cast<const wchar_t *>(memUDrop.ptr);
+					if (udata) {
+						if (IsUnicodeMode()) {
+							const size_t tlen = memUDrop.Size();
+							// Convert UTF-16 to UTF-8
+							const std::wstring_view wsv(udata, tlen / 2);
+							const size_t dataLen = UTF8Length(wsv);
+							data.resize(dataLen);
+							UTF8FromUTF16(wsv, &data[0], dataLen);
+						} else {
+							// Convert UTF-16 to ANSI
+							//
+							// Default Scintilla behavior in Unicode mode
+							// CF_UNICODETEXT available, but not in Unicode mode
+							// Convert from Unicode to current Scintilla code page
+							const UINT cpDest = CodePageOfDocument();
+							const int tlen = MultiByteLenFromWideChar(cpDest, udata);
+							data.resize(tlen);
+							MultiByteFromWideChar(cpDest, udata, &data[0], tlen);
+						}
+					}
+					memUDrop.Unlock();
+				}
+				// ANSI Text
+				else if (fmt == CF_TEXT) {
+					GlobalMemory memDrop(medium.hGlobal);
+					const char *cdata = static_cast<const char *>(memDrop.ptr);
+					if (cdata) {
+						const size_t len = strlen(cdata);
+						// In Unicode mode, convert text to UTF-8
+						if (IsUnicodeMode()) {
+							std::vector<wchar_t> uptr(len + 1);
+
+							const int ilen = static_cast<int>(len);
+							const size_t ulen = WideCharFromMultiByte(CP_ACP,
+								std::string_view(cdata, ilen), &uptr[0], ilen + 1);
+
+							const std::wstring_view wsv(&uptr[0], ulen);
+							const size_t mlen = UTF8Length(wsv);
+							data.resize(mlen + 1);
+							UTF8FromUTF16(wsv, &data[0], mlen);
+						} else {
+							data.assign(cdata, cdata + len);
+						}
+					}
+					memDrop.Unlock();
+				}
+				break;
 			}
-		}
 		}
 
 		if (!SUCCEEDED(hr) || data.empty()) {
@@ -3223,14 +3230,14 @@ STDMETHODIMP ScintillaWin::Drop(LPDATAOBJECT pIDataSource, DWORD grfKeyState,
 		if (fileDrop) {
 			NotifyURIDropped(data.data());
 		} else {
-		FORMATETC fmtr = { cfColumnSelect, nullptr, DVASPECT_CONTENT, -1, TYMED_HGLOBAL };
-		const HRESULT hrRectangular = pIDataSource->QueryGetData(&fmtr);
+			FORMATETC fmtr = { cfColumnSelect, nullptr, DVASPECT_CONTENT, -1, TYMED_HGLOBAL };
+			const HRESULT hrRectangular = pIDataSource->QueryGetData(&fmtr);
 
-		POINT rpt = { pt.x, pt.y };
-		::ScreenToClient(MainHWND(), &rpt);
-		const SelectionPosition movePos = SPositionFromLocation(PointFromPOINT(rpt), false, false, UserVirtualSpace());
+			POINT rpt = { pt.x, pt.y };
+			::ScreenToClient(MainHWND(), &rpt);
+			const SelectionPosition movePos = SPositionFromLocation(PointFromPOINT(rpt), false, false, UserVirtualSpace());
 
-		DropAt(movePos, &data[0], data.size(), *pdwEffect == DROPEFFECT_MOVE, hrRectangular == S_OK);
+			DropAt(movePos, &data[0], data.size(), *pdwEffect == DROPEFFECT_MOVE, hrRectangular == S_OK);
 		}
 
 		// Free data
