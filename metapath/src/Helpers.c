@@ -325,7 +325,7 @@ BOOL BitmapGrayScale(HBITMAP hbmp) {
 //
 BOOL SetWindowPathTitle(HWND hwnd, LPCWSTR lpszFile) {
 	WCHAR szTitle[256] = L"";
-	if (lstrlen(lpszFile)) {
+	if (StrNotEmpty(lpszFile)) {
 		if (!PathIsRoot(lpszFile)) {
 			SHFILEINFO shfi;
 			SHGetFileInfo(lpszFile, 0, &shfi, sizeof(SHFILEINFO), SHGFI_DISPLAYNAME);
@@ -743,7 +743,7 @@ BOOL PathGetLnkPath(LPCWSTR pszLnkFile, LPWSTR pszResPath, int cchResPath) {
 	}
 
 	// This additional check seems reasonable
-	if (!lstrlen(pszResPath)) {
+	if (StrIsEmpty(pszResPath)) {
 		bSucceeded = FALSE;
 	}
 
@@ -1013,7 +1013,7 @@ int FormatNumberStr(LPWSTR lpNumberStr) {
 	WCHAR szSep[8];
 	int  i = 0;
 
-	if (!lstrlen(lpNumberStr)) {
+	if (StrIsEmpty(lpNumberStr)) {
 		return 0;
 	}
 
@@ -1114,7 +1114,7 @@ BOOL ExecDDECommand(LPCWSTR lpszCmdLine, LPCWSTR lpszDDEMsg, LPCWSTR lpszDDEApp,
 	DWORD idInst = 0;
 	BOOL bSuccess = TRUE;
 
-	if (lstrlen(lpszCmdLine) == 0 || lstrlen(lpszDDEMsg) == 0 || lstrlen(lpszDDEApp) == 0 || lstrlen(lpszDDETopic) == 0) {
+	if (StrIsEmpty(lpszCmdLine) || StrIsEmpty(lpszDDEMsg) || StrIsEmpty(lpszDDEApp) || StrIsEmpty(lpszDDETopic)) {
 		return FALSE;
 	}
 
@@ -1440,7 +1440,7 @@ void MRU_LoadToCombobox(HWND hwnd, LPCWSTR pszKey) {
 }
 
 void MRU_AddOneItem(LPCWSTR pszKey, LPCWSTR pszNewItem) {
-	if (lstrlen(pszNewItem) > 0) {
+	if (StrNotEmpty(pszNewItem)) {
 		LPMRULIST pmru = MRU_Create(pszKey, MRU_NOCASE, 8);
 		MRU_Load(pmru);
 		MRU_Add(pmru, pszNewItem);

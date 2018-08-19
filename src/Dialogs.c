@@ -362,7 +362,7 @@ INT_PTR CALLBACK RunDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) 
 
 			if (GetOpenFileName(&ofn)) {
 				PathQuoteSpaces(szFile);
-				if (lstrlen(szArg2)) {
+				if (StrNotEmpty(szArg2)) {
 					lstrcat(szFile, L" ");
 					lstrcat(szFile, szArg2);
 				}
@@ -379,7 +379,7 @@ INT_PTR CALLBACK RunDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) 
 
 			if (GetDlgItemText(hwnd, IDC_COMMANDLINE, args, MAX_PATH)) {
 				if (ExtractFirstArgument(args, args, NULL)) {
-					if (lstrlen(args)) {
+					if (StrNotEmpty(args)) {
 						bEnableOK = TRUE;
 					}
 				}
@@ -406,7 +406,7 @@ INT_PTR CALLBACK RunDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) 
 					bQuickExit = TRUE;
 				}
 
-				if (lstrlen(szCurFile)) {
+				if (StrNotEmpty(szCurFile)) {
 					lstrcpy(wchDirectory, szCurFile);
 					PathRemoveFileSpec(wchDirectory);
 				}
@@ -602,7 +602,7 @@ BOOL OpenWithDlg(HWND hwnd, LPCWSTR lpstrFile) {
 		WCHAR szParam[MAX_PATH];
 		WCHAR wchDirectory[MAX_PATH] = L"";
 
-		if (lstrlen(szCurFile)) {
+		if (StrNotEmpty(szCurFile)) {
 			lstrcpy(wchDirectory, szCurFile);
 			PathRemoveFileSpec(wchDirectory);
 		}
@@ -1101,7 +1101,7 @@ INT_PTR CALLBACK FileMRUDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPar
 		} else if (pnmhdr->idFrom == IDC_EMPTY_MRU) {
 			if ((pnmhdr->code == NM_CLICK || pnmhdr->code == NM_RETURN)) {
 				MRU_Empty(pFileMRU);
-				if (lstrlen(szCurFile) > 0) {
+				if (StrNotEmpty(szCurFile)) {
 					MRU_Add(pFileMRU, szCurFile);
 				}
 				MRU_Save(pFileMRU);
@@ -2000,7 +2000,7 @@ INT_PTR InfoBox(int iType, LPCWSTR lpstrSetting, int uidMessage, ...) {
 
 	iMode = IniGetInt(L"Suppressed Messages", lpstrSetting, 0);
 
-	if (lstrlen(lpstrSetting) > 0 && iMode == 1) {
+	if (StrNotEmpty(lpstrSetting) && iMode == 1) {
 		return (iType == MBYESNO) ? IDYES : IDOK;
 	}
 
@@ -2013,7 +2013,7 @@ INT_PTR InfoBox(int iType, LPCWSTR lpstrSetting, int uidMessage, ...) {
 	wvsprintf(ib.lpstrMessage, wchFormat, va);
 	va_end(va);
 	ib.lpstrSetting = (LPWSTR)lpstrSetting;
-	ib.bDisableCheckBox = (lstrlen(szIniFile) == 0 || lstrlen(lpstrSetting) == 0 || iMode == 2) ? TRUE : FALSE;
+	ib.bDisableCheckBox = (StrIsEmpty(szIniFile) || StrIsEmpty(lpstrSetting) || iMode == 2) ? TRUE : FALSE;
 
 	if (iType == MBYESNO) {
 		idDlg = IDD_INFOBOX2;

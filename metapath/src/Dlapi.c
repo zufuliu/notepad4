@@ -23,6 +23,7 @@
 #include <shlobj.h>
 #include <commctrl.h>
 #include "Dlapi.h"
+#include "Helpers.h"
 
 //==== DirList ================================================================
 //==== DLDATA Structure =======================================================
@@ -718,12 +719,12 @@ BOOL DirList_SelectItem(HWND hwnd, LPCWSTR lpszDisplayName, LPCWSTR lpszFullPath
 
 	int i = -1;
 
-	if (!lpszFullPath || !lstrlen(lpszFullPath)) {
+	if (StrIsEmpty(lpszFullPath)) {
 		return FALSE;
 	}
 
 	GetShortPathName(lpszFullPath, szShortPath, MAX_PATH);
-	if (!lpszDisplayName || !lstrlen(lpszDisplayName)) {
+	if (StrIsEmpty(lpszDisplayName)) {
 		SHGetFileInfo(lpszFullPath, 0, &shfi, sizeof(SHFILEINFO), SHGFI_DISPLAYNAME);
 	} else {
 		lstrcpyn(shfi.szDisplayName, lpszDisplayName, MAX_PATH);
@@ -780,7 +781,7 @@ void DirList_CreateFilter(PDL_FILTER pdlf, LPCWSTR lpszFileSpec, BOOL bExcludeFi
 	lstrcpyn(pdlf->tFilterBuf, lpszFileSpec, (DL_FILTER_BUFSIZE - 1));
 	pdlf->bExcludeFilter = bExcludeFilter;
 
-	if (!lstrcmp(lpszFileSpec, L"*.*") || !lstrlen(lpszFileSpec)) {
+	if (StrIsEmpty(lpszFileSpec) || lstrcmp(lpszFileSpec, L"*.*") == 0) {
 		return;
 	}
 

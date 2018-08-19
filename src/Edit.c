@@ -1803,7 +1803,8 @@ void EditModifyNumber(HWND hwnd, BOOL bIncrease) {
 						if (!bIncrease && iNumber > 0) {
 							iNumber--;
 						}
-						for (int i = lstrlenA(chNumber) - 1 ; i >= 0; i--) {
+						const int len = lstrlenA(chNumber) - 1;
+						for (int i = len; i >= 0; i--) {
 							if (IsCharLowerA(chNumber[i])) {
 								break;
 							}
@@ -2353,10 +2354,10 @@ void EditModifyLines(HWND hwnd, LPCWSTR pwszPrefix, LPCWSTR pwszAppend) {
 		mbcp = CP_ACP;
 	}
 
-	if (lstrlen(pwszPrefix)) {
+	if (StrNotEmpty(pwszPrefix)) {
 		WideCharToMultiByte(mbcp, 0, pwszPrefix, -1, mszPrefix1, COUNTOF(mszPrefix1), NULL, NULL);
 	}
-	if (lstrlen(pwszAppend)) {
+	if (StrNotEmpty(pwszAppend)) {
 		WideCharToMultiByte(mbcp, 0, pwszAppend, -1, mszAppend1, COUNTOF(mszAppend1), NULL, NULL);
 	}
 
@@ -2391,7 +2392,7 @@ void EditModifyLines(HWND hwnd, LPCWSTR pwszPrefix, LPCWSTR pwszAppend) {
 			}
 		}
 
-		if (lstrlenA(mszPrefix1)) {
+		if (StrNotEmptyA(mszPrefix1)) {
 			p = mszPrefix1;
 			while (!bPrefixNum && (p = StrStrA(p, "$(")) != NULL) {
 				if (StrCmpNA(p, "$(I)", CSTRLEN("$(I)")) == 0) {
@@ -2453,7 +2454,7 @@ void EditModifyLines(HWND hwnd, LPCWSTR pwszPrefix, LPCWSTR pwszAppend) {
 			}
 		}
 
-		if (lstrlenA(mszAppend1)) {
+		if (StrNotEmptyA(mszAppend1)) {
 			p = mszAppend1;
 			while (!bAppendNum && (p = StrStrA(p, "$(")) != NULL) {
 				if (StrCmpNA(p, "$(I)", CSTRLEN("$(I)")) == 0) {
@@ -2520,7 +2521,7 @@ void EditModifyLines(HWND hwnd, LPCWSTR pwszPrefix, LPCWSTR pwszAppend) {
 		for (iLine = iLineStart; iLine <= iLineEnd; iLine++) {
 			int iPos;
 
-			if (lstrlen(pwszPrefix)) {
+			if (StrNotEmpty(pwszPrefix)) {
 				char mszInsert[512];
 				lstrcpyA(mszInsert, mszPrefix1);
 
@@ -2540,7 +2541,7 @@ void EditModifyLines(HWND hwnd, LPCWSTR pwszPrefix, LPCWSTR pwszAppend) {
 				SendMessage(hwnd, SCI_REPLACETARGET, (WPARAM)lstrlenA(mszInsert), (LPARAM)mszInsert);
 			}
 
-			if (lstrlen(pwszAppend)) {
+			if (StrNotEmpty(pwszAppend)) {
 				char mszInsert[512];
 				lstrcpyA(mszInsert, mszAppend1);
 
@@ -2866,24 +2867,24 @@ void EditEncloseSelection(HWND hwnd, LPCWSTR pwszOpen, LPCWSTR pwszClose) {
 		mbcp = CP_ACP;
 	}
 
-	if (lstrlen(pwszOpen)) {
+	if (StrNotEmpty(pwszOpen)) {
 		WideCharToMultiByte(mbcp, 0, pwszOpen, -1, mszOpen, COUNTOF(mszOpen), NULL, NULL);
 	}
 
-	if (lstrlen(pwszClose)) {
+	if (StrNotEmpty(pwszClose)) {
 		WideCharToMultiByte(mbcp, 0, pwszClose, -1, mszClose, COUNTOF(mszClose), NULL, NULL);
 	}
 
 	if (SC_SEL_RECTANGLE != SendMessage(hwnd, SCI_GETSELECTIONMODE, 0, 0)) {
 		SendMessage(hwnd, SCI_BEGINUNDOACTION, 0, 0);
 
-		if (lstrlenA(mszOpen)) {
+		if (StrNotEmptyA(mszOpen)) {
 			SendMessage(hwnd, SCI_SETTARGETSTART, (WPARAM)iSelStart, 0);
 			SendMessage(hwnd, SCI_SETTARGETEND, (WPARAM)iSelStart, 0);
 			SendMessage(hwnd, SCI_REPLACETARGET, (WPARAM)lstrlenA(mszOpen), (LPARAM)mszOpen);
 		}
 
-		if (lstrlenA(mszClose)) {
+		if (StrNotEmptyA(mszClose)) {
 			SendMessage(hwnd, SCI_SETTARGETSTART, (WPARAM)iSelEnd + lstrlenA(mszOpen), 0);
 			SendMessage(hwnd, SCI_SETTARGETEND, (WPARAM)iSelEnd + lstrlenA(mszOpen), 0);
 			SendMessage(hwnd, SCI_REPLACETARGET, (WPARAM)lstrlenA(mszClose), (LPARAM)mszClose);
@@ -2932,7 +2933,7 @@ void EditToggleLineComments(HWND hwnd, LPCWSTR pwszComment, BOOL bInsertAtStart)
 		mbcp = CP_ACP;
 	}
 
-	if (lstrlen(pwszComment)) {
+	if (StrNotEmpty(pwszComment)) {
 		WideCharToMultiByte(mbcp, 0, pwszComment, -1, mszComment, COUNTOF(mszComment), NULL, NULL);
 	}
 	cchComment = lstrlenA(mszComment);
@@ -4085,7 +4086,7 @@ void EditSortLines(HWND hwnd, int iSortFlags) {
 
 	for (i = 0; i < iLineCount; i++) {
 		BOOL bDropLine = FALSE;
-		if (pLines[i].pwszLine && ((iSortFlags & SORT_SHUFFLE) || lstrlen(pLines[i].pwszLine))) {
+		if (pLines[i].pwszLine && ((iSortFlags & SORT_SHUFFLE) || StrNotEmpty(pLines[i].pwszLine))) {
 			if (!(iSortFlags & SORT_SHUFFLE)) {
 				if ((iSortFlags & SORT_MERGEDUP) || (iSortFlags & SORT_UNIQDUP) || (iSortFlags & SORT_UNIQUNIQ)) {
 					if (i < iLineCount - 1) {
@@ -4457,9 +4458,10 @@ INT_PTR CALLBACK EditFindReplaceDlgProcW(HWND hwnd, UINT umsg, WPARAM wParam, LP
 				// First time you bring up find/replace dialog, copy content from clipboard to find box (but only if nothing is selected in the editor)
 				if (lstrcmpA(lpszSelection, "") == 0 && bFirstTime) {
 					char *pClip = EditGetClipboardText(hwndEdit);
-					if (lstrlenA(pClip) > 0	 &&	 lstrlenA(pClip) <= NP2_FIND_REPLACE_LIMIT) {
+					const int len = lstrlenA(pClip);
+					if (len > 0 && len <= NP2_FIND_REPLACE_LIMIT) {
 						GlobalFree(lpszSelection);
-						lpszSelection = GlobalAlloc(GPTR, lstrlenA(pClip) + 2);
+						lpszSelection = GlobalAlloc(GPTR, len + 2);
 						lstrcpynA(lpszSelection, pClip, NP2_FIND_REPLACE_LIMIT);
 					}
 					LocalFree(pClip);
@@ -4688,13 +4690,13 @@ INT_PTR CALLBACK EditFindReplaceDlgProcW(HWND hwnd, UINT umsg, WPARAM wParam, LP
 
 			if (!bSwitchedFindReplace) {
 				// Save MRUs
-				if (lstrlenA(lpefr->szFind)) {
+				if (StrNotEmptyA(lpefr->szFind)) {
 					if (GetDlgItemTextA2W(CP_UTF8, hwnd, IDC_FINDTEXT, lpefr->szFindUTF8, COUNTOF(lpefr->szFindUTF8))) {
 						GetDlgItemText(hwnd, IDC_FINDTEXT, tch, COUNTOF(tch));
 						MRU_Add(mruFind, tch);
 					}
 				}
-				if (lstrlenA(lpefr->szReplace)) {
+				if (StrNotEmptyA(lpefr->szReplace)) {
 					if (GetDlgItemTextA2W(CP_UTF8, hwnd, IDC_REPLACETEXT, lpefr->szReplaceUTF8, COUNTOF(lpefr->szReplaceUTF8))) {
 						GetDlgItemText(hwnd, IDC_REPLACETEXT, tch, COUNTOF(tch));
 						MRU_Add(mruReplace, tch);
@@ -4953,7 +4955,7 @@ BOOL EditFindNext(HWND hwnd, LPCEDITFINDREPLACE lpefr, BOOL fExtendSelection) {
 	char szFind2[NP2_FIND_REPLACE_LIMIT];
 	BOOL bSuppressNotFound = FALSE;
 
-	if (!lstrlenA(lpefr->szFind)) {
+	if (StrIsEmptyA(lpefr->szFind)) {
 		return /*EditFindReplaceDlg(hwnd, lpefr, FALSE)*/FALSE;
 	}
 
@@ -4963,7 +4965,7 @@ BOOL EditFindNext(HWND hwnd, LPCEDITFINDREPLACE lpefr, BOOL fExtendSelection) {
 							 (UINT)SendMessage(hwnd, SCI_GETCODEPAGE, 0, 0));
 	}
 
-	if (lstrlenA(szFind2) == 0) {
+	if (StrIsEmptyA(szFind2)) {
 		InfoBox(0, L"MsgNotFound", IDS_NOTFOUND);
 		return FALSE;
 	}
@@ -5023,7 +5025,7 @@ BOOL EditFindPrev(HWND hwnd, LPCEDITFINDREPLACE lpefr, BOOL fExtendSelection) {
 	char szFind2[NP2_FIND_REPLACE_LIMIT];
 	BOOL bSuppressNotFound = FALSE;
 
-	if (!lstrlenA(lpefr->szFind)) {
+	if (StrIsEmptyA(lpefr->szFind)) {
 		return /*EditFindReplaceDlg(hwnd, lpefr, FALSE)*/FALSE;
 	}
 
@@ -5033,7 +5035,7 @@ BOOL EditFindPrev(HWND hwnd, LPCEDITFINDREPLACE lpefr, BOOL fExtendSelection) {
 							 (UINT)SendMessage(hwnd, SCI_GETCODEPAGE, 0, 0));
 	}
 
-	if (lstrlenA(szFind2) == 0) {
+	if (StrIsEmptyA(szFind2)) {
 		InfoBox(0, L"MsgNotFound", IDS_NOTFOUND);
 		return FALSE;
 	}
@@ -5096,7 +5098,7 @@ BOOL EditReplace(HWND hwnd, LPCEDITFINDREPLACE lpefr) {
 	char *pszReplace2;
 	BOOL bSuppressNotFound = FALSE;
 
-	if (!lstrlenA(lpefr->szFind)) {
+	if (StrIsEmptyA(lpefr->szFind)) {
 		return /*EditFindReplaceDlg(hwnd, lpefr, TRUE)*/FALSE;
 	}
 
@@ -5106,7 +5108,7 @@ BOOL EditReplace(HWND hwnd, LPCEDITFINDREPLACE lpefr) {
 							 (UINT)SendMessage(hwnd, SCI_GETCODEPAGE, 0, 0));
 	}
 
-	if (lstrlenA(szFind2) == 0) {
+	if (StrIsEmptyA(szFind2)) {
 		InfoBox(0, L"MsgNotFound", IDS_NOTFOUND);
 		return FALSE;
 	}
@@ -5304,7 +5306,7 @@ BOOL EditReplaceAll(HWND hwnd, LPCEDITFINDREPLACE lpefr, BOOL bShowInfo) {
 	BOOL bRegexStartOfLine;
 	BOOL bRegexStartOrEndOfLine;
 
-	if (!lstrlenA(lpefr->szFind)) {
+	if (StrIsEmptyA(lpefr->szFind)) {
 		return /*EditFindReplaceDlg(hwnd, lpefr, TRUE)*/FALSE;
 	}
 
@@ -5317,7 +5319,7 @@ BOOL EditReplaceAll(HWND hwnd, LPCEDITFINDREPLACE lpefr, BOOL bShowInfo) {
 							 (UINT)SendMessage(hwnd, SCI_GETCODEPAGE, 0, 0));
 	}
 
-	if (lstrlenA(szFind2) == 0) {
+	if (StrIsEmptyA(szFind2)) {
 		InfoBox(0, L"MsgNotFound", IDS_NOTFOUND);
 		return FALSE;
 	}
@@ -5440,7 +5442,7 @@ BOOL EditReplaceAllInSelection(HWND hwnd, LPCEDITFINDREPLACE lpefr, BOOL bShowIn
 		return FALSE;
 	}
 
-	if (!lstrlenA(lpefr->szFind)) {
+	if (StrIsEmptyA(lpefr->szFind)) {
 		return /*EditFindReplaceDlg(hwnd, lpefr, TRUE)*/FALSE;
 	}
 
@@ -5453,7 +5455,7 @@ BOOL EditReplaceAllInSelection(HWND hwnd, LPCEDITFINDREPLACE lpefr, BOOL bShowIn
 							 (UINT)SendMessage(hwnd, SCI_GETCODEPAGE, 0, 0));
 	}
 
-	if (lstrlenA(szFind2) == 0) {
+	if (StrIsEmptyA(szFind2)) {
 		InfoBox(0, L"MsgNotFound", IDS_NOTFOUND);
 		return FALSE;
 	}

@@ -825,7 +825,7 @@ BOOL FileVars_IsUTF8(LPFILEVARS lpfv) {
 //
 BOOL FileVars_IsNonUTF8(LPFILEVARS lpfv) {
 	if (lpfv->mask & FV_ENCODING) {
-		if (lstrlenA(lpfv->tchEncoding) &&
+		if (StrNotEmptyA(lpfv->tchEncoding) &&
 				lstrcmpiA(lpfv->tchEncoding, "utf-8") != 0 && lstrcmpiA(lpfv->tchEncoding, "utf8") != 0) {
 			return TRUE;
 		}

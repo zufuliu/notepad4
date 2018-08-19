@@ -355,11 +355,12 @@ extern "C" BOOL EditPrint(HWND hwnd, LPCWSTR pszDocTitle, LPCWSTR pszPageFormat)
 			// Print date in header
 			if (iPrintHeader == 0 || iPrintHeader == 1) {
 				SIZE sizeInfo;
+				const int len = lstrlen(dateString);
 				SelectObject(hdc, fontFooter);
-				GetTextExtentPoint32(hdc, dateString, lstrlen(dateString), &sizeInfo);
+				GetTextExtentPoint32(hdc, dateString, len, &sizeInfo);
 				ExtTextOut(hdc, frPrint.rc.right - 5 - sizeInfo.cx, frPrint.rc.top - headerLineHeight / 2,
 						   /*ETO_OPAQUE*/0, &rcw, dateString,
-						   lstrlen(dateString), nullptr);
+						   len, nullptr);
 			}
 
 			if (iPrintHeader < 3) {
@@ -390,10 +391,11 @@ extern "C" BOOL EditPrint(HWND hwnd, LPCWSTR pszDocTitle, LPCWSTR pszPageFormat)
 
 			if (iPrintFooter == 0) {
 				SIZE sizeFooter;
-				GetTextExtentPoint32(hdc, pageString, lstrlen(pageString), &sizeFooter);
+				const int len = lstrlen(pageString);
+				GetTextExtentPoint32(hdc, pageString, len, &sizeFooter);
 				ExtTextOut(hdc, frPrint.rc.right - 5 - sizeFooter.cx, frPrint.rc.bottom + footerLineHeight / 2,
 						   /*ETO_OPAQUE*/0, &rcw, pageString,
-						   lstrlen(pageString), nullptr);
+						   len, nullptr);
 
 				SetTextAlign(hdc, ta);
 				pen = ::CreatePen(0, 1, RGB(0, 0, 0));
