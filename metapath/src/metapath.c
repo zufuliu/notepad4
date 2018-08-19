@@ -837,7 +837,7 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) {
 
 	// Add normal Toolbar Bitmap
 	hbmp = NULL;
-	if (lstrlen(tchToolbarBitmap)) {
+	if (StrNotEmpty(tchToolbarBitmap)) {
 		if (!SearchPath(NULL, tchToolbarBitmap, NULL, COUNTOF(szTmp), szTmp, NULL)) {
 			lstrcpy(szTmp, tchToolbarBitmap);
 		}
@@ -862,7 +862,7 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) {
 
 	// Optionally add hot Toolbar Bitmap
 	hbmp = NULL;
-	if (lstrlen(tchToolbarBitmapHot)) {
+	if (StrNotEmpty(tchToolbarBitmapHot)) {
 		if (!SearchPath(NULL, tchToolbarBitmapHot, NULL, COUNTOF(szTmp), szTmp, NULL)) {
 			lstrcpy(szTmp, tchToolbarBitmapHot);
 		}
@@ -877,7 +877,7 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) {
 
 	// Optionally add disabled Toolbar Bitmap
 	hbmp = NULL;
-	if (lstrlen(tchToolbarBitmapDisabled)) {
+	if (StrNotEmpty(tchToolbarBitmapDisabled)) {
 		if (!SearchPath(NULL, tchToolbarBitmapDisabled, NULL, COUNTOF(szTmp), szTmp, NULL)) {
 			lstrcpy(szTmp, tchToolbarBitmapDisabled);
 		}
@@ -1139,7 +1139,7 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	CheckCmd(hmenu, IDM_SORT_REVERSE, fSortRev);
 	CheckCmd(hmenu, SC_ALWAYSONTOP, bAlwaysOnTop);
 
-	i = (lstrlen(szIniFile) > 0 || lstrlen(szIniFile2) > 0);
+	i = StrNotEmpty(szIniFile) || StrNotEmpty(szIniFile2);
 	EnableCmd(hmenu, IDM_VIEW_SAVESETTINGS, i);
 }
 
@@ -1309,7 +1309,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			GetShortPathName(dli.szFileName, szTmp, COUNTOF(szTmp));
 		}
 
-		if (lstrlen(szQuickviewParams)) {
+		if (StrNotEmpty(szQuickviewParams)) {
 			StrCatBuff(szParam, szQuickviewParams, COUNTOF(szParam));
 			StrCatBuff(szParam, L" ", COUNTOF(szParam));
 		}
@@ -1741,8 +1741,8 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case IDM_VIEW_SAVESETTINGS: {
 		BOOL bCreateFailure = FALSE;
 
-		if (lstrlen(szIniFile) == 0) {
-			if (lstrlen(szIniFile2) > 0) {
+		if (StrIsEmpty(szIniFile)) {
+			if (StrNotEmpty(szIniFile2)) {
 				if (CreateIniFileEx(szIniFile2)) {
 					lstrcpy(szIniFile, szIniFile2);
 					lstrcpy(szIniFile2, L"");
@@ -1923,7 +1923,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	case ACC_SELECTINIFILE:
-		if (lstrlen(szIniFile)) {
+		if (StrNotEmpty(szIniFile)) {
 			CreateIniFile();
 			DisplayPath(szIniFile, IDS_ERR_INIOPEN);
 		}
@@ -2551,7 +2551,7 @@ void SaveSettings(BOOL bSaveSettingsNow) {
 
 	WCHAR wchTmp[MAX_PATH];
 
-	if (lstrlen(szIniFile) == 0) {
+	if (StrIsEmpty(szIniFile)) {
 		return;
 	}
 
@@ -2898,7 +2898,7 @@ int FindIniFile(void) {
 	WCHAR tchModule[MAX_PATH];
 	GetModuleFileName(NULL, tchModule, COUNTOF(tchModule));
 
-	if (lstrlen(szIniFile)) {
+	if (StrNotEmpty(szIniFile)) {
 		if (lstrcmpi(szIniFile, L"*?") == 0) {
 			return 0;
 		}
@@ -3007,7 +3007,7 @@ BOOL DisplayPath(LPCWSTR lpPath, UINT uIdError) {
 	WCHAR  szPath[MAX_PATH];
 	WCHAR  szTmp[MAX_PATH];
 
-	if (!lstrlen(lpPath)) {
+	if (StrIsEmpty(lpPath)) {
 		return FALSE;
 	}
 
@@ -3291,7 +3291,7 @@ void GetRelaunchParameters(LPWSTR szParameters) {
 	WCHAR szDirName[MAX_PATH + 4];
 
 	lstrcpy(szParameters, L" -f");
-	if (lstrlen(szIniFile)) {
+	if (StrNotEmpty(szIniFile)) {
 		lstrcat(szParameters, L" \"");
 		lstrcat(szParameters, szIniFile);
 		lstrcat(szParameters, L"\"");
@@ -3403,7 +3403,7 @@ void LaunchTarget(LPCWSTR lpFileName, BOOL bOpenNew) {
 		IniSectionGetString(pIniSection, L"DDEMessage", szDDEMsg, szDDEMsg, COUNTOF(szDDEMsg));
 		IniSectionGetString(pIniSection, L"DDEApplication", szDDEApp, szDDEApp, COUNTOF(szDDEApp));
 		IniSectionGetString(pIniSection, L"DDETopic", szDDETopic, szDDETopic, COUNTOF(szDDETopic));
-	} else if (iUseTargetApplication && lstrlen(szTargetApplication) == 0) {
+	} else if (iUseTargetApplication && StrIsEmpty(szTargetApplication)) {
 		iUseTargetApplication = 1;
 		iTargetApplicationMode = 1;
 		lstrcpy(szTargetApplication, L"Notepad2.exe");
@@ -3417,7 +3417,7 @@ void LaunchTarget(LPCWSTR lpFileName, BOOL bOpenNew) {
 	LocalFree(pIniSection);
 
 	if (iUseTargetApplication == 4 ||
-			(iUseTargetApplication && lstrlen(szTargetApplication) == 0)) {
+			(iUseTargetApplication && StrIsEmpty(szTargetApplication))) {
 		ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_FINDTARGET),
 							 hwndMain, FindTargetDlgProc, (LPARAM)NULL);
 		return;
@@ -3482,7 +3482,7 @@ void LaunchTarget(LPCWSTR lpFileName, BOOL bOpenNew) {
 			//else
 			GetShortPathName(lpParam, lpParam, MAX_PATH);
 
-			if (lstrlen(szTargetApplicationParams)) {
+			if (StrNotEmpty(szTargetApplicationParams)) {
 				StrCpyN(szParam, szTargetApplicationParams, COUNTOF(szParam));
 				StrCatBuff(szParam, L" ", COUNTOF(szParam));
 			}
@@ -3522,7 +3522,7 @@ void LaunchTarget(LPCWSTR lpFileName, BOOL bOpenNew) {
 			return;
 		}
 
-		if (!iUseTargetApplication && lstrlen(lpFileName) == 0) {
+		if (!iUseTargetApplication && StrIsEmpty(lpFileName)) {
 			return;
 		}
 		{
@@ -3541,7 +3541,7 @@ void LaunchTarget(LPCWSTR lpFileName, BOOL bOpenNew) {
 			//else
 			GetShortPathName(lpParam, lpParam, MAX_PATH);
 
-			if (lstrlen(szTargetApplicationParams)) {
+			if (StrNotEmpty(szTargetApplicationParams)) {
 				StrCpyN(szParam, szTargetApplicationParams, COUNTOF(szParam));
 				StrCatBuff(szParam, L" ", COUNTOF(szParam));
 			}
@@ -3597,7 +3597,7 @@ void SnapToTarget(HWND hwnd) {
 		IniGetString(L"Target Application", L"TargetApplicationWndClass",
 					 szTargetApplicationWndClass, szTargetApplicationWndClass, COUNTOF(szTargetApplicationWndClass));
 
-		if (!lstrlen(szTargetApplicationWndClass)) {
+		if (StrIsEmpty(szTargetApplicationWndClass)) {
 			return;
 		}
 		lstrcpy(szGlobalWndClass, szTargetApplicationWndClass);

@@ -36,6 +36,25 @@ static inline int clamp_i(int x, int lower, int upper) {
 	return (x < lower) ? lower : (x > upper) ? upper : x;
 }
 
+static inline BOOL StrIsEmptyA(LPCSTR s) {
+	return s == NULL || *s == '\0';
+}
+
+static inline BOOL StrIsEmptyW(LPCWSTR s) {
+	return s == NULL || *s == L'\0';
+}
+
+static inline BOOL StrNotEmptyA(LPCSTR s) {
+	return s != NULL && *s != '\0';
+}
+
+static inline BOOL StrNotEmptyW(LPCWSTR s) {
+	return s != NULL && *s != L'\0';
+}
+
+#define StrIsEmpty		StrIsEmptyW
+#define StrNotEmpty		StrNotEmptyW
+
 extern HINSTANCE g_hInstance;
 extern UINT16 g_uWinVer;
 

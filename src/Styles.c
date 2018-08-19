@@ -624,7 +624,7 @@ void Style_SetLexer(HWND hwnd, PEDITLEXER pLexNew) {
 	// Add keyword lists
 	for (int i = 0; i < NUMKEYWORD; i++) {
 		const char *pKeywords = pLexNew->pKeyWords->pszKeyWords[i];
-		if (pKeywords && *pKeywords && !(currentLexKeywordAttr[i] & KeywordAttr_NoLexer)) {
+		if (StrNotEmptyA(pKeywords) && !(currentLexKeywordAttr[i] & KeywordAttr_NoLexer)) {
 			if (currentLexKeywordAttr[i] & KeywordAttr_MakeLower) {
 				char *lowerKeywords;
 				char ch;
@@ -800,7 +800,7 @@ void Style_SetLexer(HWND hwnd, PEDITLEXER pLexNew) {
 
 	if (StrStr(lexDefault.Styles[9 + iIdx].szValue, L"noblink")) {
 		SendMessage(hwnd, SCI_SETCARETPERIOD, (WPARAM)0, 0);
-		if (lstrlen(wchCaretStyle)) {
+		if (StrNotEmpty(wchCaretStyle)) {
 			lstrcat(wchCaretStyle, L"; ");
 		}
 		lstrcat(wchCaretStyle, L"noblink");
@@ -817,7 +817,7 @@ void Style_SetLexer(HWND hwnd, PEDITLEXER pLexNew) {
 				 (int)GetRValue(rgb),
 				 (int)GetGValue(rgb),
 				 (int)GetBValue(rgb));
-		if (lstrlen(wchCaretStyle)) {
+		if (StrNotEmpty(wchCaretStyle)) {
 			lstrcat(wchCaretStyle, L"; ");
 		}
 		lstrcat(wchCaretStyle, wch);
@@ -1672,7 +1672,7 @@ void Style_SetLexerFromFile(HWND hwnd, LPCWSTR lpszFile) {
 	PEDITLEXER pLexSniffed;
 
 	if (!bFound && bAutoSelect && /* bAutoSelect == FALSE skips lexer search */
-			(lpszFile && lstrlen(lpszFile) > 0 && *lpszExt)) {
+			(StrNotEmpty(lpszFile) && StrNotEmpty(lpszExt))) {
 
 		if (*lpszExt == L'.') {
 			lpszExt++;
@@ -2052,7 +2052,7 @@ void Style_SetIndentGuides(HWND hwnd, BOOL bShow) {
 extern WCHAR tchFileDlgFilters[5 * 1024];
 
 BOOL Style_GetOpenDlgFilterStr(LPWSTR lpszFilter, int cchFilter) {
-	if (lstrlen(tchFileDlgFilters) == 0) {
+	if (StrIsEmpty(tchFileDlgFilters)) {
 		GetString(IDS_FILTER_ALL, lpszFilter, cchFilter);
 	} else {
 		lstrcpyn(lpszFilter, tchFileDlgFilters, cchFilter - 2);
@@ -2328,7 +2328,7 @@ BOOL Style_SelectFont(HWND hwnd, LPWSTR lpszStyle, int cchStyle, BOOL bDefaultSt
 		cf.Flags |= CF_FIXEDPITCHONLY;
 	}
 
-	if (!ChooseFont(&cf) || !lstrlen(lf.lfFaceName)) {
+	if (!ChooseFont(&cf) || StrIsEmpty(lf.lfFaceName)) {
 		return FALSE;
 	}
 
@@ -2454,21 +2454,21 @@ BOOL Style_SelectColor(HWND hwnd, BOOL bFore, LPWSTR lpszStyle, int cchStyle) {
 		lstrcat(szNewStyle, tch);
 	}
 	if (Style_StrGetFontQuality(lpszStyle, tch, COUNTOF(tch))) {
-		if (lstrlen(szNewStyle)) {
+		if (StrNotEmpty(szNewStyle)) {
 			lstrcat(szNewStyle, L"; ");
 		}
 		lstrcat(szNewStyle, L"smoothing:");
 		lstrcat(szNewStyle, tch);
 	}
 	if (Style_StrGetCharSet(lpszStyle, &iValue)) {
-		if (lstrlen(szNewStyle)) {
+		if (StrNotEmpty(szNewStyle)) {
 			lstrcat(szNewStyle, L"; ");
 		}
 		wsprintf(tch, L"charset:%i", iValue);
 		lstrcat(szNewStyle, tch);
 	}
 	if (Style_StrGetSizeStr(lpszStyle, tch, COUNTOF(tch))) {
-		if (lstrlen(szNewStyle)) {
+		if (StrNotEmpty(szNewStyle)) {
 			lstrcat(szNewStyle, L"; ");
 		}
 		lstrcat(szNewStyle, L"size:");
@@ -2476,32 +2476,32 @@ BOOL Style_SelectColor(HWND hwnd, BOOL bFore, LPWSTR lpszStyle, int cchStyle) {
 	}
 
 	if (StrStrI(lpszStyle, L"bold")) {
-		if (lstrlen(szNewStyle)) {
+		if (StrNotEmpty(szNewStyle)) {
 			lstrcat(szNewStyle, L"; ");
 		}
 		lstrcat(szNewStyle, L"bold");
 	}
 	if (StrStrI(lpszStyle, L"italic")) {
-		if (lstrlen(szNewStyle)) {
+		if (StrNotEmpty(szNewStyle)) {
 			lstrcat(szNewStyle, L"; ");
 		}
 		lstrcat(szNewStyle, L"italic");
 	}
 	if (StrStrI(lpszStyle, L"underline")) {
-		if (lstrlen(szNewStyle)) {
+		if (StrNotEmpty(szNewStyle)) {
 			lstrcat(szNewStyle, L"; ");
 		}
 		lstrcat(szNewStyle, L"underline");
 	}
 	if (StrStrI(lpszStyle, L"strike")) {
-		if (lstrlen(szNewStyle)) {
+		if (StrNotEmpty(szNewStyle)) {
 			lstrcat(szNewStyle, L"; ");
 		}
 		lstrcat(szNewStyle, L"strike");
 	}
 
 	if (bFore) {
-		if (lstrlen(szNewStyle)) {
+		if (StrNotEmpty(szNewStyle)) {
 			lstrcat(szNewStyle, L"; ");
 		}
 		wsprintf(tch, L"fore:#%02X%02X%02X",
@@ -2517,7 +2517,7 @@ BOOL Style_SelectColor(HWND hwnd, BOOL bFore, LPWSTR lpszStyle, int cchStyle) {
 			lstrcat(szNewStyle, tch);
 		}
 	} else {
-		if (lstrlen(szNewStyle)) {
+		if (StrNotEmpty(szNewStyle)) {
 			lstrcat(szNewStyle, L"; ");
 		}
 		if (Style_StrGetColor(TRUE, lpszStyle, &iValue)) {
@@ -2733,7 +2733,7 @@ int Style_GetLexerIconId(PEDITLEXER pLex) {
 
 	SHFILEINFO shfi;
 
-	if (lstrlen(pLex->szExtensions)) {
+	if (StrNotEmpty(pLex->szExtensions)) {
 		pszExtensions = pLex->szExtensions;
 	} else {
 		pszExtensions = pLex->pszDefExt;
@@ -3345,7 +3345,7 @@ void Style_ConfigDlg(HWND hwnd) {
 		}
 	} else {
 		fStylesModified = TRUE;
-		if (lstrlen(szIniFile) == 0 && !fWarnedNoIniFile) {
+		if (StrIsEmpty(szIniFile) && !fWarnedNoIniFile) {
 			MsgBox(MBWARN, IDS_SETTINGSNOTSAVED);
 			fWarnedNoIniFile = TRUE;
 		}

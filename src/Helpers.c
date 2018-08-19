@@ -216,7 +216,7 @@ BOOL PrivateIsAppThemed(void) {
 HRESULT PrivateSetCurrentProcessExplicitAppUserModelID(PCWSTR AppID) {
 	FARPROC pfnSetCurrentProcessExplicitAppUserModelID;
 
-	if (lstrlen(AppID) == 0) {
+	if (StrIsEmpty(AppID)) {
 		return S_OK;
 	}
 
@@ -445,13 +445,13 @@ BOOL SetWindowTitle(HWND hwnd, UINT uIDAppName, BOOL bIsElevated, UINT uIDUntitl
 
 	lstrcpy(szTitle, (bModified ? pszMod : L""));
 
-	if (lstrlen(lpszExcerpt)) {
+	if (StrNotEmpty(lpszExcerpt)) {
 		WCHAR szExcrptQuot[256];
 		WCHAR szExcrptFmt[32];
 		GetString(IDS_TITLEEXCERPT, szExcrptFmt, COUNTOF(szExcrptFmt));
 		wsprintf(szExcrptQuot, szExcrptFmt, lpszExcerpt);
 		StrCat(szTitle, szExcrptQuot);
-	} else if (lstrlen(lpszFile)) {
+	} else if (StrNotEmpty(lpszFile)) {
 		if (iFormat < 2 && !PathIsRoot(lpszFile)) {
 			if (lstrcmp(szCachedFile, lpszFile) != 0) {
 				SHFILEINFO shfi;
@@ -1135,7 +1135,7 @@ BOOL PathGetLnkPath(LPCWSTR pszLnkFile, LPWSTR pszResPath, int cchResPath) {
 	}
 
 	// This additional check seems reasonable
-	if (!lstrlen(pszResPath)) {
+	if (StrIsEmpty(pszResPath)) {
 		bSucceeded = FALSE;
 	}
 
@@ -1192,7 +1192,7 @@ BOOL PathCreateDeskLnk(LPCWSTR pszDocument) {
 	BOOL bSucceeded = FALSE;
 	BOOL fMustCopy;
 
-	if (!pszDocument || lstrlen(pszDocument) == 0) {
+	if (StrIsEmpty(pszDocument)) {
 		return TRUE;
 	}
 
@@ -1254,7 +1254,7 @@ BOOL PathCreateFavLnk(LPCWSTR pszName, LPCWSTR pszTarget, LPCWSTR pszDir) {
 	IShellLink *psl;
 	BOOL bSucceeded = FALSE;
 
-	if (!pszName || lstrlen(pszName) == 0) {
+	if (StrIsEmpty(pszName)) {
 		return TRUE;
 	}
 
@@ -1494,7 +1494,7 @@ int FormatNumberStr(LPWSTR lpNumberStr) {
 	WCHAR szSep[8];
 	int	 i = 0;
 
-	if (!lstrlen(lpNumberStr)) {
+	if (StrIsEmpty(lpNumberStr)) {
 		return 0;
 	}
 

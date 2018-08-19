@@ -228,7 +228,7 @@ INT_PTR CALLBACK RunDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) 
 			if (GetOpenFileName(&ofn)) {
 				QuotateFilenameStr(szFile);
 
-				if (lstrlen(szArg2)) {
+				if (StrNotEmpty(szArg2)) {
 					lstrcat(szFile, L" ");
 					lstrcat(szFile, szArg2);
 				}
@@ -244,7 +244,7 @@ INT_PTR CALLBACK RunDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) 
 
 			if (GetDlgItemText(hwnd, IDC_COMMANDLINE, args, MAX_PATH)) {
 				if (ExtractFirstArgument(args, args, NULL)) {
-					if (lstrlen(args)) {
+					if (StrNotEmpty(args)) {
 						bEnableOK = TRUE;
 					}
 				}
@@ -587,7 +587,7 @@ extern int  iEscFunction;
 INT_PTR CALLBACK GeneralPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
 	switch (umsg) {
 	case WM_INITDIALOG:
-		if (lstrlen(szIniFile)) {
+		if (StrNotEmpty(szIniFile)) {
 			if (bSaveSettings) {
 				CheckDlgButton(hwnd, IDC_SAVESETTINGS, BST_CHECKED);
 			}
@@ -973,7 +973,7 @@ INT_PTR CALLBACK ProgPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam
 
 		lstrcpy(tch, szQuickview);
 		PathQuoteSpaces(tch);
-		if (lstrlen(szQuickviewParams)) {
+		if (StrNotEmpty(szQuickviewParams)) {
 			StrCatBuff(tch, L" ", COUNTOF(tch));
 			StrCatBuff(tch, szQuickviewParams, COUNTOF(tch));
 		}
@@ -1023,7 +1023,7 @@ INT_PTR CALLBACK ProgPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam
 			if (GetOpenFileName(&ofn)) {
 				StrCpyN(tchBuf, szFile, COUNTOF(tchBuf));
 				PathQuoteSpaces(tchBuf);
-				if (lstrlen(szParams)) {
+				if (StrNotEmpty(szParams)) {
 					StrCatBuff(tchBuf, L" ", COUNTOF(tchBuf));
 					StrCatBuff(tchBuf, szParams, COUNTOF(tchBuf));
 				}
@@ -2240,7 +2240,7 @@ INT_PTR CALLBACK FindTargetDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 			IniSectionGetString(pIniSection, L"DDEMessage", szDDEMsg, szDDEMsg, COUNTOF(szDDEMsg));
 			IniSectionGetString(pIniSection, L"DDEApplication", szDDEApp, szDDEApp, COUNTOF(szDDEApp));
 			IniSectionGetString(pIniSection, L"DDETopic", szDDETopic, szDDETopic, COUNTOF(szDDETopic));
-		} else if (iUseTargetApplication && lstrlen(szTargetApplication) == 0) {
+		} else if (iUseTargetApplication && StrIsEmpty(szTargetApplication)) {
 			iUseTargetApplication = 1;
 			iTargetApplicationMode = 1;
 			lstrcpy(szTargetApplication, L"Notepad2.exe");
@@ -2261,7 +2261,7 @@ INT_PTR CALLBACK FindTargetDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 
 		lstrcpy(wch, szTargetApplication);
 		PathQuoteSpaces(wch);
-		if (lstrlen(szTargetApplicationParams)) {
+		if (StrNotEmpty(szTargetApplicationParams)) {
 			StrCatBuff(wch, L" ", COUNTOF(wch));
 			StrCatBuff(wch, szTargetApplicationParams, COUNTOF(wch));
 		}
@@ -2324,7 +2324,7 @@ INT_PTR CALLBACK FindTargetDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 				StrCpyN(tchBuf, szFile, COUNTOF(tchBuf));
 				PathRelativeToApp(tchBuf, tchBuf, COUNTOF(tchBuf), TRUE, TRUE, flagPortableMyDocs);
 				PathQuoteSpaces(tchBuf);
-				if (lstrlen(szParams)) {
+				if (StrNotEmpty(szParams)) {
 					StrCatBuff(tchBuf, L" ", COUNTOF(tchBuf));
 					StrCatBuff(tchBuf, szParams, COUNTOF(tchBuf));
 				}
@@ -2344,7 +2344,7 @@ INT_PTR CALLBACK FindTargetDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 		//
 		//	if (GetDlgItemText(hwnd, IDC_COMMANDLINE, tchArgs, COUNTOF(tchArgs))) {
 		//		if (ExtractFirstArgument(tchArgs, tchArgs, NULL)) {
-		//			if (lstrlen(tchArgs)) {
+		//			if (StrNotEmpty(tchArgs)) {
 		//				bEnableOK = TRUE;
 		//			}
 		//		}
@@ -2403,7 +2403,7 @@ INT_PTR CALLBACK FindTargetDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 
 			// input validation
 			if ((IsDlgButtonChecked(hwnd, IDC_TARGET) && GetDlgItemText(hwnd, IDC_TARGETPATH, tch, COUNTOF(tch)) == 0) ||
-					(IsDlgButtonChecked(hwnd, IDC_SENDDROPMSG) && lstrlen(szTargetWndClass) == 0) ||
+					(IsDlgButtonChecked(hwnd, IDC_SENDDROPMSG) && StrIsEmpty(szTargetWndClass)) ||
 					(IsDlgButtonChecked(hwnd, IDC_USEDDE) &&
 					 (GetDlgItemText(hwnd, IDC_DDEMSG, tch, COUNTOF(tch)) == 0 ||
 					  GetDlgItemText(hwnd, IDC_DDEAPP, tch, COUNTOF(tch)) == 0 ||
