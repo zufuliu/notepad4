@@ -104,7 +104,7 @@ int GetHangulOfHanja(wchar_t *inout) {
 	int changed = 0;
 	HanjaDic dict;
 	if (dict.HJdictAvailable()) {
-		const size_t len = wcslen(inout);
+		const size_t len = lstrlenW(inout);
 		wchar_t conv[UTF8MaxBytes] = { 0 };
 		BSTR bstrHangul = SysAllocString(conv);
 		for (size_t i = 0; i < len; i++) {
