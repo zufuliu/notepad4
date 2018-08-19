@@ -3192,7 +3192,8 @@ STDMETHODIMP ScintillaWin::Drop(LPDATAOBJECT pIDataSource, DWORD grfKeyState,
 					) {
 					fileDrop = true;
 					WCHAR pathDropped[1024];
-					if (::DragQueryFileW(static_cast<HDROP>(medium.hGlobal), 0, pathDropped, sizeof(pathDropped)/sizeof(WCHAR)) > 0) {
+					HDROP hDrop = static_cast<HDROP>(medium.hGlobal);
+					if (::DragQueryFileW(hDrop, 0, pathDropped, sizeof(pathDropped)/sizeof(WCHAR)) > 0) {
 						WCHAR *p = pathDropped;
 #if EnableDrop_VisualStudioProjectItem
 						if (fmt == cfVSStgProjectItem || fmt == cfVSRefProjectItem) {
@@ -3209,6 +3210,7 @@ STDMETHODIMP ScintillaWin::Drop(LPDATAOBJECT pIDataSource, DWORD grfKeyState,
 						data.resize(dataLen + 1); // NUL
 						UTF8FromUTF16(wsv, &data[0], dataLen);
 					}
+					::DragFinish(hDrop);
 				}
 #if Enable_ChromiumWebCustomMIMEDataFormat
 				else if (fmt == cfChromiumCustomMIME) {
@@ -3297,10 +3299,7 @@ STDMETHODIMP ScintillaWin::Drop(LPDATAOBJECT pIDataSource, DWORD grfKeyState,
 		}
 
 		// Free data
-		if (medium.pUnkForRelease)
-			medium.pUnkForRelease->Release();
-		else
-			::GlobalFree(medium.hGlobal);
+		::ReleaseStgMedium(&medium);
 
 		return S_OK;
 	} catch (...) {
