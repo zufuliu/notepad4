@@ -804,8 +804,6 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 //
 //
 void CreateBars(HWND hwnd, HINSTANCE hInstance) {
-	REBARINFO rbi;
-	REBARBANDINFO rbBand;
 	RECT rc;
 
 	BITMAP bmp;
@@ -814,22 +812,9 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) {
 	WCHAR szTmp[MAX_PATH];
 	BOOL bExternalBitmap = FALSE;
 
-	DWORD dwToolbarStyle   = WS_TOOLBAR | TBSTYLE_FLAT | CCS_ADJUSTABLE;
-	DWORD dwStatusbarStyle = WS_CHILD | WS_CLIPSIBLINGS;
-	DWORD dwReBarStyle = WS_REBAR;
-
 	BOOL bIsAppThemed = PrivateIsAppThemed();
 
-	WCHAR tchDesc[256];
-	WCHAR tchIndex[256];
-
-	WCHAR *pIniSection = NULL;
-	int   cbIniSection = 0;
-
-	if (bShowToolbar) {
-		dwReBarStyle |= WS_VISIBLE;
-	}
-
+	const DWORD dwToolbarStyle = WS_TOOLBAR | TBSTYLE_FLAT | CCS_ADJUSTABLE;
 	hwndToolbar = CreateWindowEx(0, TOOLBARCLASSNAME, NULL, dwToolbarStyle,
 								 0, 0, 0, 0, hwnd, (HMENU)IDC_TOOLBAR, hInstance, NULL);
 
@@ -912,26 +897,36 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) {
 	}
 
 	// Load toolbar labels
-	pIniSection = LocalAlloc(LPTR, sizeof(WCHAR) * 32 * 1024);
-	cbIniSection = (int)LocalSize(pIniSection) / sizeof(WCHAR);
+	WCHAR *pIniSection = LocalAlloc(LPTR, sizeof(WCHAR) * 32 * 1024);
+	int cbIniSection = (int)LocalSize(pIniSection) / sizeof(WCHAR);
 	LoadIniSection(L"Toolbar Labels", pIniSection, cbIniSection);
-
-	for (unsigned i = 0, n = 1; i < COUNTOF(tbbMainWnd); i++) {
-		if (tbbMainWnd[i].fsStyle == TBSTYLE_SEP) {
-			continue;
+	if (StrIsEmpty(pIniSection)) {
+		for (unsigned i = 0; i < COUNTOF(tbbMainWnd); i++) {
+			if (tbbMainWnd[i].fsStyle != TBSTYLE_SEP) {
+				tbbMainWnd[i].fsStyle &= ~(BTNS_AUTOSIZE | BTNS_SHOWTEXT);
+			}
 		}
+	} else {
+		WCHAR tchDesc[256];
+		WCHAR tchIndex[256];
 
-		wsprintf(tchIndex, L"%02u", n++);
+		for (unsigned i = 0, n = 1; i < COUNTOF(tbbMainWnd); i++) {
+			if (tbbMainWnd[i].fsStyle == TBSTYLE_SEP) {
+				continue;
+			}
 
-		if (IniSectionGetString(pIniSection, tchIndex, L"", tchDesc, COUNTOF(tchDesc)) && lstrcmpi(tchDesc, L"(none)") != 0) {
-			tbbMainWnd[i].iString = SendMessage(hwndToolbar, TB_ADDSTRING, 0, (LPARAM)tchDesc);
-			tbbMainWnd[i].fsStyle |= BTNS_AUTOSIZE | BTNS_SHOWTEXT;
-		} else if ((n == 5 || n == 8) && lstrcmpi(tchDesc, L"(none)") != 0) {
-			GetString(42000 + n, tchDesc, COUNTOF(tchDesc));
-			tbbMainWnd[i].iString = SendMessage(hwndToolbar, TB_ADDSTRING, 0, (LPARAM)tchDesc);
-			tbbMainWnd[i].fsStyle |= BTNS_AUTOSIZE | BTNS_SHOWTEXT;
-		} else {
-			tbbMainWnd[i].fsStyle &= ~(BTNS_AUTOSIZE | BTNS_SHOWTEXT);
+			wsprintf(tchIndex, L"%02u", n++);
+
+			if (IniSectionGetString(pIniSection, tchIndex, L"", tchDesc, COUNTOF(tchDesc)) && lstrcmpi(tchDesc, L"(none)") != 0) {
+				tbbMainWnd[i].iString = SendMessage(hwndToolbar, TB_ADDSTRING, 0, (LPARAM)tchDesc);
+				tbbMainWnd[i].fsStyle |= BTNS_AUTOSIZE | BTNS_SHOWTEXT;
+			} else if ((n == 5 || n == 8) && lstrcmpi(tchDesc, L"(none)") != 0) {
+				GetString(42000 + n, tchDesc, COUNTOF(tchDesc));
+				tbbMainWnd[i].iString = SendMessage(hwndToolbar, TB_ADDSTRING, 0, (LPARAM)tchDesc);
+				tbbMainWnd[i].fsStyle |= BTNS_AUTOSIZE | BTNS_SHOWTEXT;
+			} else {
+				tbbMainWnd[i].fsStyle &= ~(BTNS_AUTOSIZE | BTNS_SHOWTEXT);
+			}
 		}
 	}
 	LocalFree(pIniSection);
@@ -947,21 +942,21 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) {
 	SendMessage(hwndToolbar, TB_GETITEMRECT, 0, (LPARAM)&rc);
 	//SendMessage(hwndToolbar, TB_SETINDENT, 2, 0);
 
-	if (bShowStatusbar) {
-		dwStatusbarStyle |= WS_VISIBLE;
-	}
-
+	const DWORD dwStatusbarStyle = bShowStatusbar ? (WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE) : (WS_CHILD | WS_CLIPSIBLINGS);
 	hwndStatus = CreateStatusWindow(dwStatusbarStyle, NULL, hwnd, IDC_STATUSBAR);
 
 	// Create ReBar and add Toolbar
+	const DWORD dwReBarStyle = bShowToolbar ? (WS_REBAR | WS_VISIBLE) : WS_REBAR;
 	hwndReBar = CreateWindowEx(WS_EX_TOOLWINDOW, REBARCLASSNAME, NULL, dwReBarStyle,
 							   0, 0, 0, 0, hwnd, (HMENU)IDC_REBAR, hInstance, NULL);
 
+	REBARINFO rbi;
 	rbi.cbSize = sizeof(REBARINFO);
 	rbi.fMask  = 0;
 	rbi.himl   = (HIMAGELIST)NULL;
 	SendMessage(hwndReBar, RB_SETBARINFO, 0, (LPARAM)&rbi);
 
+	REBARBANDINFO rbBand;
 	rbBand.cbSize  = sizeof(REBARBANDINFO);
 	rbBand.fMask   = /*RBBIM_COLORS | RBBIM_TEXT | RBBIM_BACKGROUND | */
 		RBBIM_STYLE | RBBIM_CHILD | RBBIM_CHILDSIZE /*| RBBIM_SIZE*/;
