@@ -3035,15 +3035,23 @@ bool ScintillaWin::IsCompatibleDC(HDC hOtherDC) {
 	return isCompatible;
 }
 
+// https://docs.microsoft.com/en-us/windows/desktop/api/oleidl/nf-oleidl-idroptarget-dragenter
 DWORD ScintillaWin::EffectFromState(DWORD grfKeyState) const {
 	// These are the Wordpad semantics.
-	DWORD dwEffect;
+	// DROPEFFECT_COPY not works for some applications like Github Atom.
+	DWORD dwEffect = DROPEFFECT_MOVE;
+#if 0
 	if (inDragDrop == ddDragging)	// Internal defaults to move
 		dwEffect = DROPEFFECT_MOVE;
 	else
 		dwEffect = DROPEFFECT_COPY;
-	if (grfKeyState & MK_ALT)
+	if ((grfKeyState & MK_CONTROL) && (grfKeyState & MK_SHIFT))
+		dwEffect = DROPEFFECT_LINK;
+	else
+	if (grfKeyState & (MK_ALT | MK_SHIFT))
 		dwEffect = DROPEFFECT_MOVE;
+	else
+#endif
 	if (grfKeyState & MK_CONTROL)
 		dwEffect = DROPEFFECT_COPY;
 	return dwEffect;
@@ -3114,7 +3122,7 @@ STDMETHODIMP ScintillaWin::DragEnter(LPDATAOBJECT pIDataSource, DWORD grfKeyStat
 	//EnumDataSourceFormat("DragEnter", pIDataSource);
 
 	hasOKText = false;
-	for (CLIPFORMAT fmt : dropFormat) {
+	for (const CLIPFORMAT fmt : dropFormat) {
 		FORMATETC fmtu = { fmt, nullptr, DVASPECT_CONTENT, -1, TYMED_HGLOBAL };
 		const HRESULT hrHasUText = pIDataSource->QueryGetData(&fmtu);
 		hasOKText = (hrHasUText == S_OK);
@@ -3180,7 +3188,7 @@ STDMETHODIMP ScintillaWin::Drop(LPDATAOBJECT pIDataSource, DWORD grfKeyState,
 		HRESULT hr = DV_E_FORMATETC;
 
 		//EnumDataSourceFormat("Drop", pIDataSource);
-		for (CLIPFORMAT fmt : dropFormat) {
+		for (const CLIPFORMAT fmt : dropFormat) {
 			FORMATETC fmtu = { fmt, nullptr, DVASPECT_CONTENT, -1, TYMED_HGLOBAL };
 			hr = pIDataSource->GetData(&fmtu, &medium);
 			if (SUCCEEDED(hr) && medium.hGlobal) {
