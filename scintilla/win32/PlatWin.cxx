@@ -30,6 +30,7 @@
 #include <commctrl.h>
 #include <richedit.h>
 #include <windowsx.h>
+#include <shlwapi.h>
 
 #if !defined(DISABLE_D2D)
 #define USE_D2D 1
@@ -388,7 +389,7 @@ bool FontCached::SameAs(const FontParameters &fp) const {
 		(technology == fp.technology)) {
 		wchar_t wszFace[LF_FACESIZE] = L"";
 		UTF16FromUTF8(fp.faceName, wszFace, LF_FACESIZE);
-		return 0 == wcscmp(lf.lfFaceName, wszFace);
+		return 0 == lstrcmpW(lf.lfFaceName, wszFace);
 	}
 	return false;
 }
@@ -1065,7 +1066,7 @@ void SurfaceGDI::FlushCachedState() {
 }
 
 void SurfaceGDI::SetUnicodeMode(bool unicodeMode_) {
-	unicodeMode=unicodeMode_;
+	unicodeMode = unicodeMode_;
 }
 
 void SurfaceGDI::SetDBCSMode(int codePage_) {
@@ -2174,7 +2175,7 @@ XYPOSITION SurfaceD2D::AverageCharWidth(const Font &font_) {
 		// Create a layout
 		IDWriteTextLayout *pTextLayout = nullptr;
 		const WCHAR wszAllAlpha[] = L"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-		const size_t lenAllAlpha = wcslen(wszAllAlpha);
+		const size_t lenAllAlpha = lstrlenW(wszAllAlpha);
 		const HRESULT hr = pIDWriteFactory->CreateTextLayout(wszAllAlpha, static_cast<UINT32>(lenAllAlpha),
 			pTextFormat, 1000.0, 1000.0, &pTextLayout);
 		if (SUCCEEDED(hr)) {
@@ -2701,7 +2702,7 @@ int ListBoxX::Find(const char *) {
 
 void ListBoxX::GetValue(int n, char *value, int len) const {
 	const ListItemData item = lti.Get(n);
-	strncpy(value, item.text, len);
+	lstrcpynA(value, item.text, len);
 	value[len - 1] = '\0';
 }
 
