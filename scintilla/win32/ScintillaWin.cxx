@@ -41,7 +41,7 @@ https://docs.microsoft.com/en-us/visualstudio/extensibility/ux-guidelines/applic
 #define EnableDrop_VisualStudioProjectItem		1
 /*
 Chromium Web Custom MIME Data Format
-Used VSCode, Atom etc.
+Used by VSCode, Atom etc.
 */
 #define Enable_ChromiumWebCustomMIMEDataFormat	0
 
@@ -3181,16 +3181,17 @@ STDMETHODIMP ScintillaWin::Drop(LPDATAOBJECT pIDataSource, DWORD grfKeyState,
 
 		SetDragPosition(SelectionPosition(Sci::invalidPosition));
 
-		STGMEDIUM medium = { 0, {nullptr}, nullptr };
-
 		std::vector<char> data;	// Includes terminating NUL
 		bool fileDrop = false;
+		bool succeed = false;
 		HRESULT hr = DV_E_FORMATETC;
 
 		//EnumDataSourceFormat("Drop", pIDataSource);
 		for (const CLIPFORMAT fmt : dropFormat) {
 			FORMATETC fmtu = { fmt, nullptr, DVASPECT_CONTENT, -1, TYMED_HGLOBAL };
+			STGMEDIUM medium = {};
 			hr = pIDataSource->GetData(&fmtu, &medium);
+			succeed = false;
 			if (SUCCEEDED(hr) && medium.hGlobal) {
 				// File Drop
 				if (fmt == CF_HDROP
@@ -3198,7 +3199,6 @@ STDMETHODIMP ScintillaWin::Drop(LPDATAOBJECT pIDataSource, DWORD grfKeyState,
 					|| fmt == cfVSStgProjectItem || fmt == cfVSRefProjectItem
 #endif
 					) {
-					fileDrop = true;
 					WCHAR pathDropped[1024];
 					HDROP hDrop = static_cast<HDROP>(medium.hGlobal);
 					if (::DragQueryFileW(hDrop, 0, pathDropped, sizeof(pathDropped)/sizeof(WCHAR)) > 0) {
@@ -3215,9 +3215,11 @@ STDMETHODIMP ScintillaWin::Drop(LPDATAOBJECT pIDataSource, DWORD grfKeyState,
 						// Convert UTF-16 to UTF-8
 						const std::wstring_view wsv(p);
 						const size_t dataLen = UTF8Length(wsv);
+						fileDrop = succeed = dataLen != 0;
 						data.resize(dataLen + 1); // NUL
 						UTF8FromUTF16(wsv, &data[0], dataLen);
 					}
+					// TODO: This seems not required, MSDN only says it need be called in WM_DROPFILES
 					::DragFinish(hDrop);
 				}
 #if Enable_ChromiumWebCustomMIMEDataFormat
@@ -3243,6 +3245,7 @@ STDMETHODIMP ScintillaWin::Drop(LPDATAOBJECT pIDataSource, DWORD grfKeyState,
 							// Convert UTF-16 to UTF-8
 							const std::wstring_view wsv(udata, tlen / 2);
 							const size_t dataLen = UTF8Length(wsv);
+							succeed = dataLen != 0;
 							data.resize(dataLen);
 							UTF8FromUTF16(wsv, &data[0], dataLen);
 						} else {
@@ -3253,6 +3256,7 @@ STDMETHODIMP ScintillaWin::Drop(LPDATAOBJECT pIDataSource, DWORD grfKeyState,
 							// Convert from Unicode to current Scintilla code page
 							const UINT cpDest = CodePageOfDocument();
 							const int tlen = MultiByteLenFromWideChar(cpDest, udata);
+							succeed = tlen != 0;
 							data.resize(tlen);
 							MultiByteFromWideChar(cpDest, udata, &data[0], tlen);
 						}
@@ -3276,20 +3280,26 @@ STDMETHODIMP ScintillaWin::Drop(LPDATAOBJECT pIDataSource, DWORD grfKeyState,
 
 							const std::wstring_view wsv(&uptr[0], ulen);
 							const size_t mlen = UTF8Length(wsv);
+							succeed = mlen != 0;
 							data.resize(mlen + 1);
 							UTF8FromUTF16(wsv, &data[0], mlen);
 						} else {
+							succeed = len != 0;
 							data.assign(cdata, cdata + len);
 						}
 					}
 					memDrop.Unlock();
 				}
+			}
+
+			::ReleaseStgMedium(&medium);
+			if (succeed) {
 				break;
 			}
 		}
 
-		if (!SUCCEEDED(hr) || data.empty()) {
-			//Platform::DebugPrintf("Bad data format: 0x%x\n", hres);
+		if (!succeed) {
+			//Platform::DebugPrintf("Bad data format: 0x%x\n", hr);
 			return hr;
 		}
 
@@ -3305,9 +3315,6 @@ STDMETHODIMP ScintillaWin::Drop(LPDATAOBJECT pIDataSource, DWORD grfKeyState,
 
 			DropAt(movePos, &data[0], data.size(), *pdwEffect == DROPEFFECT_MOVE, hrRectangular == S_OK);
 		}
-
-		// Free data
-		::ReleaseStgMedium(&medium);
 
 		return S_OK;
 	} catch (...) {
