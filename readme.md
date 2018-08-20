@@ -156,6 +156,7 @@
 * Support rendering using Direct2D DirectWrite, and switch between GDI and Direct2D
 * Support bidirectional, useful for Arabic and Hebrew
 * Support using fractional font size
+* Extra support for drag and drop file from Visual Studio, Android Studio, IntelliJ IDEA, etc.
 * Other various major or minor changes and tweaks
 
 ## Supported Operating Systems:
