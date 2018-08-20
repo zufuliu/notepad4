@@ -142,6 +142,14 @@ BOOL IniSectionSetString(LPWSTR lpCachedIniSection, LPCWSTR lpName, LPCWSTR lpSt
 	return FALSE;
 }
 
+UINT GetCurrentPPI(HWND hwnd) {
+	HDC hDC = GetDC(hwnd);
+	UINT ppi = GetDeviceCaps(hDC, LOGPIXELSY);
+	ReleaseDC(hwnd, hDC);
+	ppi = max_u(ppi, USER_DEFAULT_SCREEN_DPI);
+	return ppi;
+}
+
 UINT GetCurrentDPI(HWND hwnd) {
 	UINT dpi = 0;
 	if (IsWin10AndAbove()) {
@@ -167,9 +175,8 @@ UINT GetCurrentDPI(HWND hwnd) {
 	}
 
 	if (dpi == 0) {
-		// FIXME: seems always get 96
 		HDC hDC = GetDC(hwnd);
-		dpi = GetDeviceCaps(hDC, LOGPIXELSX);
+		dpi = GetDeviceCaps(hDC, LOGPIXELSY);
 		ReleaseDC(hwnd, hDC);
 	}
 
@@ -487,6 +494,11 @@ BOOL SetWindowTitle(HWND hwnd, UINT uIDAppName, BOOL bIsElevated, UINT uIDUntitl
 
 	lstrcat(szTitle, pszSep);
 	lstrcat(szTitle, szAppName);
+
+#if 0
+	wsprintf(szAppName, L"; dpi=%u, %u", g_uCurrentDPI, g_uCurrentPPI);
+	lstrcat(szTitle, szAppName);
+#endif
 
 	return SetWindowText(hwnd, szTitle);
 }

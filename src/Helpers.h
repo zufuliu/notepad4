@@ -73,6 +73,7 @@ extern HINSTANCE g_hInstance;
 extern HANDLE g_hDefaultHeap;
 extern UINT16 g_uWinVer;
 extern UINT g_uCurrentDPI;
+extern UINT g_uCurrentPPI;
 extern WCHAR szIniFile[MAX_PATH];
 
 // MSDN: Operating System Version
@@ -100,6 +101,7 @@ extern WCHAR szIniFile[MAX_PATH];
 #endif
 
 #define RoundToCurrentDPI(value)	((g_uCurrentDPI*(value) + USER_DEFAULT_SCREEN_DPI/2) / USER_DEFAULT_SCREEN_DPI)
+#define ScaleFontSize(value)		MulDiv(g_uCurrentDPI, (value), g_uCurrentPPI)
 
 #define NP2HeapAlloc(size)			HeapAlloc(g_hDefaultHeap, HEAP_ZERO_MEMORY, (size))
 #define NP2HeapFree(hMem)			HeapFree(g_hDefaultHeap, 0, hMem)
@@ -153,6 +155,7 @@ static inline void EndWaitCursor(void) {
 	SetCursorPos(pt.x, pt.y);
 }
 
+UINT GetCurrentPPI(HWND hwnd);
 UINT GetCurrentDPI(HWND hwnd);
 BOOL PrivateIsAppThemed(void);
 HRESULT PrivateSetCurrentProcessExplicitAppUserModelID(PCWSTR AppID);

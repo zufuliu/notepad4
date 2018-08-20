@@ -2578,7 +2578,7 @@ void Style_SetStyles(HWND hwnd, int iStyle, LPCWSTR lpszStyle) {
 
 	// Size
 	if (Style_StrGetSizeEx(lpszStyle, &iValue)) {
-		iValue = RoundToCurrentDPI(iValue);
+		iValue = ScaleFontSize(iValue);
 		SendMessage(hwnd, SCI_STYLESETSIZEFRACTIONAL, iStyle, (LPARAM)iValue);
 	}
 
