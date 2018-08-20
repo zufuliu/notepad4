@@ -292,6 +292,7 @@ HANDLE		g_hDefaultHeap;
 HANDLE		g_hScintilla;
 UINT16		g_uWinVer;
 UINT		g_uCurrentDPI = USER_DEFAULT_SCREEN_DPI;
+UINT		g_uCurrentPPI = USER_DEFAULT_SCREEN_DPI;
 WCHAR		g_wchAppUserModelID[38] = L"";
 WCHAR		g_wchWorkingDirectory[MAX_PATH] = L"";
 
@@ -1405,12 +1406,12 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 //
 //
 static inline void UpdateSelectionMarginWidth() {
-	int width = bShowSelectionMargin ? RoundToCurrentDPI(16) : 0;
+	int width = bShowSelectionMargin ? ScaleFontSize(16) : 0;
 	SendMessage(hwndEdit, SCI_SETMARGINWIDTHN, 1, width);
 }
 
 static inline void UpdateFoldMarginWidth() {
-	int width = bShowCodeFolding ? RoundToCurrentDPI(13) : 0;
+	int width = bShowCodeFolding ? ScaleFontSize(13) : 0;
 	SciCall_SetMarginWidth(MARGIN_FOLD_INDEX, width);
 }
 
@@ -1486,6 +1487,7 @@ void SetWrapVisualFlags(void) {
 LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	HINSTANCE hInstance = ((LPCREATESTRUCT)lParam)->hInstance;
 	g_uCurrentDPI = GetCurrentDPI(hwnd);
+	g_uCurrentPPI = GetCurrentPPI(hwnd);
 
 	// Setup edit control
 	hwndEdit = EditCreate(hwnd);
@@ -1827,11 +1829,12 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) {
 //
 void MsgDPIChanged(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	g_uCurrentDPI = HIWORD(wParam);
+	g_uCurrentPPI = GetCurrentPPI(hwnd);
 	RECT* const rc = (RECT *)lParam;
 	Sci_Position pos = SciCall_GetCurrentPos();
 #if 0
-	char buf[64];
-	sprintf(buf, "WM_DPICHANGED: dpi=%u\n", g_uCurrentDPI);
+	char buf[128];
+	sprintf(buf, "WM_DPICHANGED: dpi=%u, %u\n", g_uCurrentDPI, g_uCurrentPPI);
 	SendMessage(hwndEdit, SCI_INSERTTEXT, 0, (LPARAM)buf);
 #endif
 
