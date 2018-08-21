@@ -34,6 +34,8 @@
 #include <shlobj.h>
 #include <shellapi.h>
 
+#define DebugDragAndDropDataFormat		0
+
 /*
 CF_VSSTGPROJECTITEMS, CF_VSREFPROJECTITEMS
 https://docs.microsoft.com/en-us/visualstudio/extensibility/ux-guidelines/application-patterns-for-visual-studio
@@ -318,6 +320,9 @@ class ScintillaWin :
 	void DropRenderTarget();
 #endif
 	HWND MainHWND();
+#if DebugDragAndDropDataFormat
+	void EnumDataSourceFormat(const char *tag, LPDATAOBJECT pIDataSource);
+#endif
 
 	static sptr_t DirectFunction(
 		sptr_t ptr, UINT iMessage, uptr_t wParam, sptr_t lParam);
@@ -3081,27 +3086,66 @@ STDMETHODIMP_(ULONG) ScintillaWin::Release() {
 	return 1;
 }
 
-#if 0//ndef NDEBUG
-extern "C" void DLog(const char *fmt, ...); // in Notepad2's Helpers.c
+#if DebugDragAndDropDataFormat
+
+namespace {
+
+const char* GetStorageMediumType(DWORD tymed) {
+	switch (tymed) {
+	case TYMED_HGLOBAL:
+		return "TYMED_HGLOBAL";
+	case TYMED_FILE:
+		return "TYMED_FILE";
+	case TYMED_ISTREAM:
+		return "TYMED_ISTREAM";
+	case TYMED_ISTORAGE:
+		return "TYMED_ISTORAGE";
+	default:
+		return "Unknown";
+	}
+}
+
+const char* GetSourceFormatName(CLIPFORMAT fmt, char name[], int cchName) {
+	int len = GetClipboardFormatNameA(fmt, name, cchName);
+	if (len <= 0) {
+		switch (fmt) {
+		case CF_TEXT:
+			return "CF_TEXT";
+		case CF_UNICODETEXT:
+			return "CF_UNICODETEXT";
+		case CF_HDROP:
+			return "CF_HDROP";
+		case CF_LOCALE:
+			return "CF_LOCALE";
+		default:
+			return "Unknown";
+		}
+	}
+
+	return name;
+}
+
+}
 
 // https://docs.microsoft.com/en-us/windows/desktop/api/objidl/nf-objidl-idataobject-enumformatetc
-static void EnumDataSourceFormat(const char *tag, LPDATAOBJECT pIDataSource) {
+void ScintillaWin::EnumDataSourceFormat(const char *tag, LPDATAOBJECT pIDataSource) {
 	IEnumFORMATETC *fmtEnum = nullptr;
 	HRESULT hr = pIDataSource->EnumFormatEtc(DATADIR_GET, &fmtEnum);
 	if (hr == S_OK && fmtEnum) {
-		FORMATETC fetc[16] = {};
+		FORMATETC fetc[32] = {};
 		ULONG fetched = 0;
 		hr = fmtEnum->Next(sizeof(fetc) / sizeof(fetc[0]), fetc, &fetched);
 		if (fetched > 0) {
 			char name[1024];
+			char buf[2048];
 			for (ULONG i = 0; i < fetched; i++) {
 				const CLIPFORMAT fmt = fetc[i].cfFormat;
-				int len = GetClipboardFormatNameA(fmt, name, sizeof(name));
-				if (len <= 0) {
-					strcpy(name, "Unknown");
-				}
-				//Platform::DebugPrintf("%s: fmt[%ld]=%d, 0x%04X, tymed=%d, name=%s\n", tag, i, fmt, fmt, fetc[i].tymed, name);
-				DLog("%s: fmt[%ld]=%d, 0x%04X, tymed=%d, name=%s\n", tag, i, fmt, fmt, fetc[i].tymed, name);
+				const DWORD tymed = fetc[i].tymed;
+				const char *typeName = GetStorageMediumType(tymed);
+				const char *fmtName = GetSourceFormatName(fmt, name, sizeof(name));
+				int len = sprintf(buf, "%s: fmt[%lu]=%d, 0x%04X; tymed=%lu, %s; name=%s\n",
+					tag, i, fmt, fmt, tymed, typeName, fmtName);
+				AddCharUTF(buf, len);
 			}
 		}
 	}
@@ -3109,6 +3153,7 @@ static void EnumDataSourceFormat(const char *tag, LPDATAOBJECT pIDataSource) {
 		fmtEnum->Release();
 	}
 }
+
 #else
 #define EnumDataSourceFormat(tag, pIDataSource)
 #endif
