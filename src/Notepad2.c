@@ -5427,8 +5427,8 @@ void LoadSettings(void) {
 
 	iDefaultCodePage = 0;
 	{
-		UINT acp = GetACP();
-		if (IsDBCSCodePage(acp)) {
+		const UINT acp = GetACP();
+		if (IsDBCSCodePage(acp) || acp == CP_UTF8) {
 			iDefaultCodePage = acp;
 		}
 	}
