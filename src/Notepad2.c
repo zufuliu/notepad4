@@ -58,7 +58,9 @@ HWND	hDlgFindReplace = NULL;
 
 #define NUMTOOLBITMAPS		25
 #define NUMINITIALTOOLS		24
-#define MARGIN_FOLD_INDEX	2
+#define MARGIN_LINE_NUMBER	0	// line number
+#define MARGIN_SELECTION	1	// selection margin
+#define MARGIN_FOLD_INDEX	2	// folding index
 
 static TBBUTTON  tbbMainWnd[] = {
 	{0, 	IDT_FILE_NEW, 		TBSTATE_ENABLED, TBSTYLE_BUTTON, {0}, 0, 0},
@@ -881,13 +883,6 @@ HWND InitInstance(HINSTANCE hInstance, int nCmdShow) {
 	return hwndMain;
 }
 
-//=============================================================================
-//
-// MainWndProc()
-//
-// Messages are distributed to the MsgXXX-handlers
-//
-//
 static inline void NP2MinimizeWind(HWND hwnd) {
 	MinimizeWndToTray(hwnd);
 	ShowNotifyIcon(hwnd, TRUE);
@@ -923,6 +918,13 @@ void OnDropOneFile(HWND hwnd, LPCWSTR szBuf) {
 	}
 }
 
+//=============================================================================
+//
+// MainWndProc()
+//
+// Messages are distributed to the MsgXXX-handlers
+//
+//
 LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
 	static BOOL bShutdownOK;
 
@@ -1400,18 +1402,13 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 	return 0;
 }
 
-//=============================================================================
-//
-// MsgCreate() - Handles WM_CREATE
-//
-//
 static inline void UpdateSelectionMarginWidth() {
-	int width = bShowSelectionMargin ? ScaleFontSize(16) : 0;
-	SendMessage(hwndEdit, SCI_SETMARGINWIDTHN, 1, width);
+	int width = bShowSelectionMargin ? RoundToCurrentDPI(16) : 0;
+	SciCall_SetMarginWidth(MARGIN_SELECTION, width);
 }
 
 static inline void UpdateFoldMarginWidth() {
-	int width = bShowCodeFolding ? ScaleFontSize(13) : 0;
+	int width = bShowCodeFolding ? RoundToCurrentDPI(13) : 0;
 	SciCall_SetMarginWidth(MARGIN_FOLD_INDEX, width);
 }
 
@@ -1484,6 +1481,11 @@ void SetWrapVisualFlags(void) {
 	}
 }
 
+//=============================================================================
+//
+// MsgCreate() - Handles WM_CREATE
+//
+//
 LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	HINSTANCE hInstance = ((LPCREATESTRUCT)lParam)->hInstance;
 	g_uCurrentDPI = GetCurrentDPI(hwnd);
@@ -1521,9 +1523,8 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	SendMessage(hwndEdit, SCI_SETEDGECOLUMN, iLongLinesLimit, 0);
 
 	// Margins
-	SendMessage(hwndEdit, SCI_SETMARGINWIDTHN, 2, 0);
-	UpdateSelectionMarginWidth();	// type 1 SelectionMargin
-	UpdateLineNumberWidth();		// type 0 LineNumber
+	UpdateSelectionMarginWidth();
+	UpdateLineNumberWidth();
 
 	// Margins
 	SciCall_SetMarginType(MARGIN_FOLD_INDEX, SC_MARGIN_SYMBOL);
@@ -1829,7 +1830,6 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) {
 //
 void MsgDPIChanged(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	g_uCurrentDPI = HIWORD(wParam);
-	g_uCurrentPPI = GetCurrentPPI(hwnd);
 	RECT* const rc = (RECT *)lParam;
 	Sci_Position pos = SciCall_GetCurrentPos();
 #if 0
@@ -6646,23 +6646,23 @@ void UpdateStatusbar(void) {
 void UpdateLineNumberWidth(void) {
 	if (bShowLineNumbers) {
 		char tchLines[32];
-		int	 iLineMarginWidthNow;
-		int	 iLineMarginWidthFit;
 
-		wsprintfA(tchLines, "_%i_", SendMessage(hwndEdit, SCI_GETLINECOUNT, 0, 0));
+		const int iLines = (int)SendMessage(hwndEdit, SCI_GETLINECOUNT, 0, 0);
+		wsprintfA(tchLines, "_%i_", iLines);
 
-		iLineMarginWidthNow = (int)SendMessage(hwndEdit, SCI_GETMARGINWIDTHN, 0, 0);
-		iLineMarginWidthFit = (int)SendMessage(hwndEdit, SCI_TEXTWIDTH, STYLE_LINENUMBER, (LPARAM)tchLines);
+		const iLineMarginWidthNow = (int)SendMessage(hwndEdit, SCI_GETMARGINWIDTHN, 0, 0);
+		const iLineMarginWidthFit = (int)SendMessage(hwndEdit, SCI_TEXTWIDTH, STYLE_LINENUMBER, (LPARAM)tchLines);
 
 		if (iLineMarginWidthNow != iLineMarginWidthFit) {
 #if !NP2_DEBUG_FOLD_LEVEL
-			SendMessage(hwndEdit, SCI_SETMARGINWIDTHN, 0, iLineMarginWidthFit);
+			SciCall_SetMarginWidth(MARGIN_LINE_NUMBER, iLineMarginWidthFit);
+
 #else
-			SendMessage(hwndEdit, SCI_SETMARGINWIDTHN, 0, 100);
+			SciCall_SetMarginWidth(MARGIN_LINE_NUMBER, RoundToCurrentDPI(100));
 #endif
 		}
 	} else {
-		SendMessage(hwndEdit, SCI_SETMARGINWIDTHN, 0, 0);
+		SciCall_SetMarginWidth(MARGIN_LINE_NUMBER, 0);
 	}
 }
 
