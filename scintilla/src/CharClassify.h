@@ -12,18 +12,18 @@ namespace Scintilla {
 
 class CharClassify {
 public:
-	CharClassify();
+	CharClassify() noexcept;
 
 	enum cc {
 		ccSpace, ccNewLine, ccWord, ccPunctuation
 	};
-	void SetDefaultCharClasses(bool includeWordClass);
-	void SetCharClasses(const unsigned char *chars, cc newCharClass);
-	int GetCharsOfClass(cc characterClass, unsigned char *buffer) const;
-	cc GetClass(unsigned char ch) const {
+	void SetDefaultCharClasses(bool includeWordClass) noexcept;
+	void SetCharClasses(const unsigned char *chars, cc newCharClass) noexcept;
+	int GetCharsOfClass(cc characterClass, unsigned char *buffer) const noexcept;
+	cc GetClass(unsigned char ch) const noexcept {
 		return static_cast<cc>(charClass[ch]);
 	}
-	bool IsWord(unsigned char ch) const {
+	bool IsWord(unsigned char ch) const noexcept {
 		return static_cast<cc>(charClass[ch]) == ccWord;
 	}
 

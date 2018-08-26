@@ -15,7 +15,7 @@
 
 using namespace Scintilla;
 
-static inline bool IsTexiSpec(int ch) noexcept {
+static constexpr bool IsTexiSpec(int ch) noexcept {
 	return ch == '@' || ch == '{' || ch == '}' ||
 		ch == '*' || ch == '/' || ch == '-' ||
 		ch == ':' || ch == '.' || ch == '?' || ch == '?' ||
@@ -35,7 +35,7 @@ static void ColouriseTexiDoc(Sci_PositionU startPos, Sci_Position length, int in
 	styler.StartAt(startPos);
 	styler.StartSegment(startPos);
 	Sci_PositionU endPos = startPos + length;
-	if (endPos == (Sci_PositionU)styler.Length())
+	if (endPos == static_cast<Sci_PositionU>(styler.Length()))
 		++endPos;
 
 	Sci_Position lineCurrent = styler.GetLine(startPos);
@@ -53,7 +53,7 @@ static void ColouriseTexiDoc(Sci_PositionU startPos, Sci_Position length, int in
 		chNext = styler.SafeGetCharAt(i + 1);
 
 		const bool atEOL = (ch == '\r' && chNext != '\n') || (ch == '\n');
-		const bool atLineStart = i == (Sci_PositionU)styler.LineStart(lineCurrent);
+		const bool atLineStart = i == static_cast<Sci_PositionU>(styler.LineStart(lineCurrent));
 
 		switch (state) {
 		case SCE_L_OPERATOR:
@@ -73,7 +73,7 @@ static void ColouriseTexiDoc(Sci_PositionU startPos, Sci_Position length, int in
 					levelNext--;
 					isCommand = true;
 				} else {
-					if (buf[0] == '@' && keywords2.InList(&buf[1])) {
+					if (buf[0] == '@' && keywords2.InList(buf + 1)) {
 						levelNext++;
 					}
 					if (strcmp(buf, "@settitle") == 0) {
@@ -94,7 +94,7 @@ static void ColouriseTexiDoc(Sci_PositionU startPos, Sci_Position length, int in
 				}
 				wordLen = 0;
 			} else if (wordLen < MAX_WORD_LENGTH) {
-				buf[wordLen++] = (char)ch;
+				buf[wordLen++] = static_cast<char>(ch);
 			}
 			break;
 		case SCE_L_TAG:
@@ -121,7 +121,7 @@ static void ColouriseTexiDoc(Sci_PositionU startPos, Sci_Position length, int in
 		if (state == SCE_L_DEFAULT) {
 			if (lineCurrent == 0 && i == 0 && ch == '\\' && chNext == 'i') { // \input texinfo.tex
 				state = SCE_L_COMMAND;
-				buf[wordLen++] = (char)ch;
+				buf[wordLen++] = static_cast<char>(ch);
 			} else if (ch == '@') {
 				if (IsTexiSpec(chNext)) {
 					styler.ColourTo(i - 1, state);
@@ -129,7 +129,7 @@ static void ColouriseTexiDoc(Sci_PositionU startPos, Sci_Position length, int in
 				} else if (IsAlpha(chNext)) {
 					styler.ColourTo(i - 1, state);
 					state = SCE_L_COMMAND;
-					buf[wordLen++] = (char)ch;
+					buf[wordLen++] = static_cast<char>(ch);
 				}
 			} else if (ch == '@' || ch == '{' || ch == '}' ||
 				(ch == '-' && !IsAlpha(chPrev) && !IsAlpha(chNext))) {
@@ -143,7 +143,7 @@ static void ColouriseTexiDoc(Sci_PositionU startPos, Sci_Position length, int in
 
 		if (atEOL || i == endPos - 1) {
 			if (fold) {
-				int levelUse = levelCurrent;
+				const int levelUse = levelCurrent;
 				int lev = levelUse | levelNext << 16;
 				if (levelUse < levelNext)
 					lev |= SC_FOLDLEVELHEADERFLAG;

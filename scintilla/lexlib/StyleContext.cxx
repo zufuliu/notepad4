@@ -18,7 +18,7 @@
 
 using namespace Scintilla;
 
-void StyleContext::GetNextChar() {
+void StyleContext::GetNextChar() noexcept {
 	if (multiByteAccess) {
 		chNext = multiByteAccess->GetCharacterAndWidth(currentPos + width, &widthNext);
 	} else {
@@ -34,7 +34,7 @@ void StyleContext::GetNextChar() {
 }
 
 StyleContext::StyleContext(Sci_PositionU startPos, Sci_PositionU length,
-	int initStyle, LexAccessor &styler_, unsigned char chMask) :
+	int initStyle, LexAccessor &styler_, unsigned char chMask) noexcept :
 	styler(styler_),
 	multiByteAccess(nullptr),
 	endPos(startPos + length),
@@ -78,7 +78,7 @@ void StyleContext::Complete() {
 	styler.Flush();
 }
 
-void StyleContext::Forward() {
+void StyleContext::Forward() noexcept {
 	if (currentPos < endPos) {
 		atLineStart = atLineEnd;
 		if (atLineStart) {
@@ -99,13 +99,13 @@ void StyleContext::Forward() {
 	}
 }
 
-void StyleContext::Forward(Sci_Position nb) {
+void StyleContext::Forward(Sci_Position nb) noexcept {
 	for (Sci_Position i = 0; i < nb; i++) {
 		Forward();
 	}
 }
 
-void StyleContext::ForwardBytes(Sci_Position nb) {
+void StyleContext::ForwardBytes(Sci_Position nb) noexcept {
 	const Sci_PositionU forwardPos = currentPos + nb;
 	const Sci_PositionU currentPosStart = currentPos;
 	while (forwardPos > currentPos) {
@@ -128,7 +128,7 @@ void StyleContext::ForwardSetState(int state_) {
 	state = state_;
 }
 
-int StyleContext::GetRelativeCharacter(Sci_Position n) {
+int StyleContext::GetRelativeCharacter(Sci_Position n) noexcept {
 	if (n == 0)
 		return ch;
 	if (multiByteAccess) {

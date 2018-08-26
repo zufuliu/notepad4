@@ -34,19 +34,19 @@ protected:
 	LexerFactoryFunction fnFactory;
 
 public:
-	const char *languageName;
+	const char* const languageName;
 	LexerModule(
 		int language_,
 		LexerFunction fnLexer_,
 		const char *languageName_ = nullptr,
-		LexerFunction fnFolder_ = nullptr);
+		LexerFunction fnFolder_ = nullptr) noexcept;
 	LexerModule(
 		int language_,
 		LexerFactoryFunction fnFactory_,
-		const char *languageName_ = nullptr);
+		const char *languageName_ = nullptr) noexcept;
 	virtual ~LexerModule();
 
-	int GetLanguage() const;
+	int GetLanguage() const noexcept;
 
 	ILexer4 *Create() const;
 

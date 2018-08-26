@@ -750,8 +750,8 @@ void EditAutoCloseXMLTag(HWND hwnd) {
 		if (tchBuf[iSize - 2] != '/') {
 			char tchIns[516] = "</";
 			int	 cchIns = 2;
-			const char *pBegin = &tchBuf[0];
-			const char *pCur = &tchBuf[iSize - 2];
+			const char *pBegin = tchBuf;
+			const char *pCur = tchBuf + iSize - 2;
 
 			while (pCur > pBegin && *pCur != '<' && *pCur != '>') {
 				--pCur;

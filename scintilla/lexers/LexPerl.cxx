@@ -71,7 +71,7 @@ using namespace Scintilla;
 // we also assume SCE_PL_STRING_VAR is the interpolated style with the smallest value
 #define	INTERPOLATE_SHIFT	(SCE_PL_STRING_VAR - SCE_PL_STRING)
 
-static bool isPerlKeyword(Sci_PositionU start, Sci_PositionU end, const WordList &keywords, LexAccessor &styler) {
+static bool isPerlKeyword(Sci_PositionU start, Sci_PositionU end, const WordList &keywords, LexAccessor &styler) noexcept {
 	// old-style keyword matcher; needed because GetCurrent() needs
 	// current segment to be committed, but we may abandon early...
 	char s[100];
@@ -85,7 +85,7 @@ static bool isPerlKeyword(Sci_PositionU start, Sci_PositionU end, const WordList
 }
 
 static int disambiguateBareword(LexAccessor &styler, Sci_PositionU bk, Sci_PositionU fw,
-	int backFlag, Sci_PositionU backPos, Sci_PositionU endPos) {
+	int backFlag, Sci_PositionU backPos, Sci_PositionU endPos) noexcept {
 	// identifiers are recognized by Perl as barewords under some
 	// conditions, the following attempts to do the disambiguation
 	// by looking backward and forward; result in 2 LSB
@@ -134,7 +134,7 @@ static int disambiguateBareword(LexAccessor &styler, Sci_PositionU bk, Sci_Posit
 	return result;
 }
 
-static void skipWhitespaceComment(LexAccessor &styler, Sci_PositionU &p) {
+static void skipWhitespaceComment(const LexAccessor &styler, Sci_PositionU &p) noexcept {
 	// when backtracking, we need to skip whitespace and comments
 	while (p > 0) {
 		const int style = styler.StyleAt(p);
@@ -144,7 +144,7 @@ static void skipWhitespaceComment(LexAccessor &styler, Sci_PositionU &p) {
 	}
 }
 
-static int findPrevLexeme(LexAccessor &styler, Sci_PositionU &bk, int &style) {
+static int findPrevLexeme(const LexAccessor &styler, Sci_PositionU &bk, int &style) noexcept {
 	// scan backward past whitespace and comments to find a lexeme
 	skipWhitespaceComment(styler, bk);
 	if (bk == 0)
@@ -160,7 +160,7 @@ static int findPrevLexeme(LexAccessor &styler, Sci_PositionU &bk, int &style) {
 	return sz;
 }
 
-static int styleBeforeBracePair(LexAccessor &styler, Sci_PositionU bk) {
+static int styleBeforeBracePair(LexAccessor &styler, Sci_PositionU bk) noexcept {
 	// backtrack to find open '{' corresponding to a '}', balanced
 	// return significant style to be tested for '/' disambiguation
 	int braceCount = 1;
@@ -168,7 +168,7 @@ static int styleBeforeBracePair(LexAccessor &styler, Sci_PositionU bk) {
 		return SCE_PL_DEFAULT;
 	while (--bk > 0) {
 		if (styler.StyleAt(bk) == SCE_PL_OPERATOR) {
-			int bkch = static_cast<unsigned char>(styler.SafeGetCharAt(bk));
+			const int bkch = static_cast<unsigned char>(styler.SafeGetCharAt(bk));
 			if (bkch == ';') {	// early out
 				break;
 			} else if (bkch == '}') {
@@ -187,7 +187,7 @@ static int styleBeforeBracePair(LexAccessor &styler, Sci_PositionU bk) {
 	return SCE_PL_DEFAULT;
 }
 
-static int styleCheckIdentifier(LexAccessor &styler, Sci_PositionU bk) {
+static int styleCheckIdentifier(LexAccessor &styler, Sci_PositionU bk) noexcept {
 	// backtrack to classify sub-styles of identifier under test
 	// return sub-style to be tested for '/' disambiguation
 	if (styler.SafeGetCharAt(bk) == '>')	// inputsymbol, like <foo>
@@ -197,7 +197,7 @@ static int styleCheckIdentifier(LexAccessor &styler, Sci_PositionU bk) {
 		bk--;
 	}
 	while (bk > 0) {
-		int bkstyle = styler.StyleAt(bk);
+		const int bkstyle = styler.StyleAt(bk);
 		if (bkstyle == SCE_PL_DEFAULT
 			|| bkstyle == SCE_PL_COMMENTLINE) {
 			// skip whitespace, comments
@@ -212,11 +212,11 @@ static int styleCheckIdentifier(LexAccessor &styler, Sci_PositionU bk) {
 	return 0;
 }
 
-static int podLineScan(LexAccessor &styler, Sci_PositionU &pos, Sci_PositionU endPos) {
+static int podLineScan(LexAccessor &styler, Sci_PositionU &pos, Sci_PositionU endPos) noexcept {
 	// forward scan the current line to classify line for POD style
 	int state = -1;
 	while (pos < endPos) {
-		int ch = static_cast<unsigned char>(styler.SafeGetCharAt(pos));
+		const int ch = static_cast<unsigned char>(styler.SafeGetCharAt(pos));
 		if (ch == '\n' || ch == '\r') {
 			if (ch == '\r' && styler.SafeGetCharAt(pos + 1) == '\n') pos++;
 			break;
@@ -248,11 +248,11 @@ static bool styleCheckSubPrototype(LexAccessor &styler, Sci_PositionU bk) {
 		// find two lexemes, lexeme 2 follows lexeme 1
 		int style2 = SCE_PL_DEFAULT;
 		Sci_PositionU pos2 = bk;
-		int len2 = findPrevLexeme(styler, pos2, style2);
+		const int len2 = findPrevLexeme(styler, pos2, style2);
 		int style1 = SCE_PL_DEFAULT;
 		Sci_PositionU pos1 = pos2;
 		if (pos1 > 0) pos1--;
-		int len1 = findPrevLexeme(styler, pos1, style1);
+		const int len1 = findPrevLexeme(styler, pos1, style1);
 		if (len1 == 0 || len2 == 0)		// lexeme pair must exist
 			break;
 
@@ -302,17 +302,17 @@ static int actualNumStyle(int numberStyle) noexcept {
 	return SCE_PL_NUMBER;
 }
 
-static bool IsPackageLine(Sci_Position line, LexAccessor &styler) {
-	Sci_Position pos = styler.LineStart(line);
-	int style = styler.StyleAt(pos);
+static bool IsPackageLine(Sci_Position line, LexAccessor &styler) noexcept {
+	const Sci_Position pos = styler.LineStart(line);
+	const int style = styler.StyleAt(pos);
 	if (style == SCE_PL_WORD && styler.Match(pos, "package")) {
 		return true;
 	}
 	return false;
 }
 
-static int PodHeadingLevel(Sci_Position pos, LexAccessor &styler) {
-	int lvl = static_cast<unsigned char>(styler.SafeGetCharAt(pos + 5));
+static int PodHeadingLevel(Sci_Position pos, LexAccessor &styler) noexcept {
+	const int lvl = static_cast<unsigned char>(styler.SafeGetCharAt(pos + 5));
 	if (lvl >= '1' && lvl <= '4') {
 		return lvl - '0';
 	}
@@ -326,7 +326,7 @@ static const char *const perlWordListDesc[] = {
 };
 */
 
-static int InputSymbolScan(StyleContext &sc) {
+static int InputSymbolScan(StyleContext &sc) noexcept {
 	// forward scan for matching > on same line; file handles
 	int c, sLen = 0;
 	while ((c = sc.GetRelativeCharacter(++sLen)) != 0) {
@@ -367,7 +367,7 @@ static void InterpolateSegment(StyleContext &sc, int maxSeg, bool isPattern = fa
 				braces = true;
 			}
 			if (maxSeg > sLen) {
-				int c = sc.GetRelativeCharacter(sLen);
+				const int c = sc.GetRelativeCharacter(sLen);
 				if (setWordStart.Contains(c)) {	// word (various)
 					sLen++;
 					isVar = true;
@@ -389,7 +389,7 @@ static void InterpolateSegment(StyleContext &sc, int maxSeg, bool isPattern = fa
 			}
 		}
 		if (!isVar && (maxSeg > 1)) {	// $- or @-specific variable patterns
-			int c = sc.chNext;
+			const int c = sc.chNext;
 			if (sc.ch == '$') {
 				sLen = 1;
 				if (IsADigit(c)) {	// $[0-9] and slurp trailing digits
@@ -475,7 +475,7 @@ static void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int in
 	int numState = PERLNUM_DECIMAL;
 	int dotCount = 0;
 
-	Sci_PositionU endPos = startPos + length;
+	const Sci_PositionU endPos = startPos + length;
 
 	// Backtrack to beginning of style if required...
 	// If in a long distance lexical state, backtrack to find quote characters.
@@ -489,7 +489,7 @@ static void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int in
 		|| initStyle == SCE_PL_HERE_QX_VAR
 		) {
 		// backtrack through multiple styles to reach the delimiter start
-		int delim = (initStyle == SCE_PL_FORMAT) ? SCE_PL_FORMAT_IDENT : SCE_PL_HERE_DELIM;
+		const int delim = (initStyle == SCE_PL_FORMAT) ? SCE_PL_FORMAT_IDENT : SCE_PL_HERE_DELIM;
 		while ((startPos > 1) && (styler.StyleAt(startPos) != delim)) {
 			startPos--;
 		}
@@ -512,10 +512,10 @@ static void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int in
 		|| initStyle == SCE_PL_REGSUBST_VAR
 		) {
 		// for interpolation, must backtrack through a mix of two different styles
-		int otherStyle = (initStyle >= SCE_PL_STRING_VAR) ?
+		const int otherStyle = (initStyle >= SCE_PL_STRING_VAR) ?
 			initStyle - INTERPOLATE_SHIFT : initStyle + INTERPOLATE_SHIFT;
 		while (startPos > 1) {
-			int st = styler.StyleAt(startPos - 1);
+			const int st = styler.StyleAt(startPos - 1);
 			if ((st != initStyle) && (st != otherStyle))
 				break;
 			startPos--;
@@ -777,7 +777,7 @@ static void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int in
 			// also implies HereDoc.State == 2
 			sc.Complete();
 			if (HereDoc.DelimiterLength == 0 || sc.Match(HereDoc.Delimiter)) {
-				int c = sc.GetRelative(HereDoc.DelimiterLength);
+				const int c = sc.GetRelative(HereDoc.DelimiterLength);
 				if (c == '\r' || c == '\n') {	// peek first, do not consume match
 					sc.ForwardBytes(HereDoc.DelimiterLength);
 					sc.SetState(SCE_PL_DEFAULT);
@@ -821,7 +821,7 @@ static void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int in
 		case SCE_PL_POD_VERB:
 		{
 			Sci_PositionU fw = sc.currentPos;
-			Sci_Position ln = styler.GetLine(fw);
+			const Sci_Position ln = styler.GetLine(fw);
 			if (sc.atLineStart && sc.Match("=cut")) {	// end of POD
 				sc.SetState(SCE_PL_POD);
 				sc.Forward(4);
@@ -903,7 +903,7 @@ static void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int in
 				Quote.Open(sc.ch);
 			} else {
 				int c, sLen = 0, endType = 0;
-				bool isPattern = (Quote.Rep == 2);
+				const bool isPattern = (Quote.Rep == 2);
 				while ((c = sc.GetRelativeCharacter(sLen)) != 0) {
 					// scan to break string into segments
 					if (c == '\\' && Quote.Up != '\\') {
@@ -1129,7 +1129,7 @@ static void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int in
 				if (sc.chPrev == ':' && sc.GetRelative(-2) == ':') {
 					sc.ChangeState(SCE_PL_IDENTIFIER);
 				}
-				Sci_PositionU bk = sc.currentPos;
+				const Sci_PositionU bk = sc.currentPos;
 				Sci_PositionU fw = sc.currentPos + 1;
 				// first check for possible quote-like delimiter
 				if (sc.ch == 's' && !setWord.Contains(sc.chNext)) {
@@ -1234,7 +1234,7 @@ static void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int in
 				// Find first previous significant lexed element and interpret.
 				// A few symbols shares this code for disambiguation.
 				bool preferRE = false;
-				bool isHereDoc = sc.Match('<', '<');
+				const bool isHereDoc = sc.Match('<', '<');
 				bool hereDocSpace = false;		// for: SCALAR [whitespace] '<<'
 				Sci_PositionU bk = (sc.currentPos > 0) ? sc.currentPos - 1 : 0;
 				sc.Complete();
@@ -1247,7 +1247,7 @@ static void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int in
 					preferRE = true;
 				} else {
 					int bkstyle = styler.StyleAt(bk);
-					int bkch = static_cast<unsigned char>(styler.SafeGetCharAt(bk));
+					const int bkch = static_cast<unsigned char>(styler.SafeGetCharAt(bk));
 					switch (bkstyle) {
 					case SCE_PL_OPERATOR:
 						preferRE = true;
@@ -1305,7 +1305,7 @@ static void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int in
 							// keywords always forced as /PATTERN/: split, if, elsif, while
 							// everything else /PATTERN/ unless digit/space immediately after '/'
 							// for '//', defined-or favoured unless special keywords
-							Sci_PositionU bkend = bk + 1;
+							const Sci_PositionU bkend = bk + 1;
 							while (bk > 0 && styler.StyleAt(bk - 1) == SCE_PL_WORD) {
 								bk--;
 							}
@@ -1376,7 +1376,7 @@ static void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int in
 				} else if (sc.ch == '<') {	// handle '<', inputsymbol
 					if (preferRE) {
 						// forward scan
-						int i = InputSymbolScan(sc);
+						const int i = InputSymbolScan(sc);
 						if (i > 0) {
 							sc.SetState(SCE_PL_IDENTIFIER);
 							sc.Forward(i);
@@ -1404,7 +1404,7 @@ static void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int in
 				sc.SetState(SCE_PL_POD);
 				backFlag = BACK_NONE;
 			} else if (sc.ch == '-' && setWordStart.Contains(sc.chNext)) {	// extended '-' cases
-				Sci_PositionU bk = sc.currentPos;
+				const Sci_PositionU bk = sc.currentPos;
 				Sci_PositionU fw = 2;
 				if (setSingleCharOp.Contains(sc.chNext) &&	// file test operators
 					!setWord.Contains(sc.GetRelative(2))) {
@@ -1467,7 +1467,7 @@ static void FoldPerlDoc(Sci_PositionU startPos, Sci_Position length, int /*initS
 	const bool foldCommentExplicit = styler.GetPropertyInt("fold.perl.comment.explicit", 0) != 0;
 	const bool foldAtElse = styler.GetPropertyInt("fold.perl.at.else", 0) != 0;
 
-	Sci_PositionU endPos = startPos + length;
+	const Sci_PositionU endPos = startPos + length;
 	int visibleChars = 0;
 	Sci_Position lineCurrent = styler.GetLine(startPos);
 
@@ -1490,13 +1490,13 @@ static void FoldPerlDoc(Sci_PositionU startPos, Sci_Position length, int /*initS
 	bool isPackageLine = false;
 	int podHeading = 0;
 	for (Sci_PositionU i = startPos; i < endPos; i++) {
-		char ch = chNext;
+		const char ch = chNext;
 		chNext = styler.SafeGetCharAt(i + 1);
-		int style = styleNext;
+		const int style = styleNext;
 		styleNext = styler.StyleAt(i + 1);
-		int stylePrevCh = (i) ? styler.StyleAt(i - 1) : SCE_PL_DEFAULT;
-		bool atEOL = (ch == '\r' && chNext != '\n') || (ch == '\n');
-		bool atLineStart = ((chPrev == '\r') || (chPrev == '\n')) || i == 0;
+		const int stylePrevCh = (i) ? styler.StyleAt(i - 1) : SCE_PL_DEFAULT;
+		const bool atEOL = (ch == '\r' && chNext != '\n') || (ch == '\n');
+		const bool atLineStart = ((chPrev == '\r') || (chPrev == '\n')) || i == 0;
 		// Comment folding
 		if (foldComment && atEOL && IsCommentLine(lineCurrent)) {
 			if (!IsCommentLine(lineCurrent - 1) && IsCommentLine(lineCurrent + 1))
@@ -1538,7 +1538,7 @@ static void FoldPerlDoc(Sci_PositionU startPos, Sci_Position length, int /*initS
 				else if (styler.Match(i, "=head"))
 					podHeading = PodHeadingLevel(i, styler);
 			} else if (style == SCE_PL_DATASECTION) {
-				if (ch == '=' && IsASCII(chNext) && isalpha(chNext) && levelCurrent == SC_FOLDLEVELBASE)
+				if (ch == '=' && IsAlpha(chNext) && levelCurrent == SC_FOLDLEVELBASE)
 					levelCurrent++;
 				else if (styler.Match(i, "=cut") && levelCurrent > SC_FOLDLEVELBASE)
 					levelCurrent = (levelCurrent & ~PERL_HEADFOLD_MASK) - 1;
@@ -1630,7 +1630,7 @@ static void FoldPerlDoc(Sci_PositionU startPos, Sci_Position length, int /*initS
 		chPrev = ch;
 	}
 	// Fill in the real level of the next line, keeping the current flags as they will be filled in later
-	int flagsNext = styler.LevelAt(lineCurrent) & ~SC_FOLDLEVELNUMBERMASK;
+	const int flagsNext = styler.LevelAt(lineCurrent) & ~SC_FOLDLEVELNUMBERMASK;
 	styler.SetLevel(lineCurrent, levelPrev | flagsNext);
 }
 

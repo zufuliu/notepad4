@@ -51,7 +51,7 @@ static inline bool IsAsmNumber(int ch, int chPrev) noexcept {
 	0
 };*/
 
-extern bool IsCppInDefine(Sci_Position currentPos, LexAccessor &styler);
+extern bool IsCppInDefine(Sci_Position currentPos, LexAccessor &styler) noexcept;
 
 static void ColouriseAsmDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
 	const WordList &cpuInstruction = *keywordLists[0];
@@ -68,9 +68,9 @@ static void ColouriseAsmDoc(Sci_PositionU startPos, Sci_Position length, int ini
 	// Do not leak onto next line
 	if (initStyle == SCE_ASM_STRINGEOL)
 		initStyle = SCE_ASM_DEFAULT;
-	Sci_PositionU endPos = startPos + length;
+	const Sci_PositionU endPos = startPos + length;
 	StyleContext sc(startPos, length, initStyle, styler);
-	Sci_Position lineCurrent = styler.GetLine(startPos);
+	const Sci_Position lineCurrent = styler.GetLine(startPos);
 	bool isIncludePreprocessor = false;
 	static bool isGnuAsmSource = false;
 	Sci_Position lastGnuAsmDefLine = -1;
@@ -114,13 +114,13 @@ _label_identifier:
 					sc.ChangeState(SCE_ASM_MATHINSTRUCTION);
 				} else if (registers.InList(s)) {
 					sc.ChangeState(SCE_ASM_REGISTER);
-				} else if (s[0] == '%' && registers.InList(&s[1])) {
+				} else if (s[0] == '%' && registers.InList(s + 1)) {
 					isGnuAsmSource = true;
 					sc.ChangeState(SCE_ASM_REGISTER);
 				} else if (directive.InList(s)) {
 					sc.ChangeState(SCE_ASM_DIRECTIVE);
 					IsDirective = true;
-				} else if (s[0] == '.' && GNUdirective.InList(&s[1])) {
+				} else if (s[0] == '.' && GNUdirective.InList(s + 1)) {
 					isGnuAsmSource = true;
 					sc.ChangeState(SCE_ASM_DIRECTIVE);
 					if (strcmp(s, ".def") == 0)
@@ -129,16 +129,16 @@ _label_identifier:
 					sc.ChangeState(SCE_ASM_DIRECTIVEOPERAND);
 				} else if (extInstruction.InList(s)) {
 					sc.ChangeState(SCE_ASM_EXTINSTRUCTION);
-				} else if ((s[0] == '#' || s[0] == '%') && kwProprocessor.InList(&s[1])) {
+				} else if ((s[0] == '#' || s[0] == '%') && kwProprocessor.InList(s + 1)) {
 					sc.ChangeState(SCE_ASM_PREPROCESSOR);
 					IsDirective = true;
-				} else if (s[0] == '.' && isdigit(s[1])) {
+				} else if (s[0] == '.' && isdigit(static_cast<unsigned char>(s[1]))) {
 					sc.ChangeState(SCE_ASM_NUMBER);
 				} else if (sc.ch == ':') {
 					Sci_Position pos = sc.currentPos + 1;
 					while (IsASpaceOrTab(styler.SafeGetCharAt(pos)))
 						pos++;
-					if (isspace(styler.SafeGetCharAt(pos))) {
+					if (isspace(static_cast<unsigned char>(styler.SafeGetCharAt(pos)))) {
 						sc.Forward();
 						sc.ChangeState(SCE_ASM_LABEL);
 					}
@@ -166,7 +166,7 @@ _label_identifier:
 					sc.SetState(SCE_ASM_DEFAULT);
 				}
 				if (IsDirective && !strcmp(s, "comment")) {
-					char delimiter = delimiters.empty() ? '~' : delimiters.c_str()[0];
+					const char delimiter = delimiters.empty() ? '~' : delimiters.c_str()[0];
 					while (IsASpaceOrTab(sc.ch) && !sc.atLineEnd) {
 						sc.ForwardSetState(SCE_ASM_DEFAULT);
 					}
@@ -176,7 +176,7 @@ _label_identifier:
 				}
 			}
 		} else if (sc.state == SCE_ASM_COMMENTDIRECTIVE) {
-			char delimiter = delimiters.empty() ? '~' : delimiters.c_str()[0];
+			const char delimiter = delimiters.empty() ? '~' : delimiters.c_str()[0];
 			if (sc.ch == delimiter) {
 				while (!sc.atLineEnd) {
 					sc.Forward();
@@ -267,8 +267,8 @@ _label_identifier:
 					sc.SetState(SCE_ASM_IDENTIFIER);
 				} else {
 					char pp[128];
-					Sci_Position pos = LexSkipSpaceTab(sc.currentPos + 1, endPos, styler);
-					Sci_PositionU len = LexGetRange(pos, styler, iswordstart, pp, sizeof(pp));
+					const Sci_Position pos = LexSkipSpaceTab(sc.currentPos + 1, endPos, styler);
+					const Sci_PositionU len = LexGetRange(pos, styler, iswordstart, pp, sizeof(pp));
 					if (kwProprocessor.InList(pp)) {
 						sc.SetState(SCE_ASM_PREPROCESSOR);
 						sc.Forward(pos - sc.currentPos + len);
@@ -317,17 +317,17 @@ _label_identifier:
 	sc.Complete();
 }
 
-static inline bool IsStreamCommentStyle(int style) noexcept {
+static constexpr bool IsStreamCommentStyle(int style) noexcept {
 	return style == SCE_ASM_COMMENT || style == SCE_ASM_COMMENT2 || style == SCE_ASM_COMMENTDIRECTIVE;
 }
 #define IsCommentLine(line)		IsLexCommentLine(line, styler, SCE_ASM_COMMENTLINE)
 
-static inline bool IsAsmDefaultStyle(int style) noexcept {
+static constexpr bool IsAsmDefaultStyle(int style) noexcept {
 	return style == SCE_ASM_DEFAULT || style == SCE_ASM_IDENTIFIER;
 }
-static bool IsEquLine(Sci_Position line, LexAccessor &styler) {
-	Sci_Position startPos = styler.LineStart(line);
-	Sci_Position endPos = styler.LineStart(line + 1) - 1;
+static bool IsEquLine(Sci_Position line, LexAccessor &styler) noexcept {
+	const Sci_Position startPos = styler.LineStart(line);
+	const Sci_Position endPos = styler.LineStart(line + 1) - 1;
 	Sci_Position pos = LexSkipWhiteSpace(startPos, endPos, styler, IsAsmDefaultStyle);
 	if (styler.StyleAt(pos) == SCE_ASM_DIRECTIVE) {
 		if (styler[pos] == '.')
@@ -336,12 +336,12 @@ static bool IsEquLine(Sci_Position line, LexAccessor &styler) {
 	}
 	return false;
 }
-static bool IsAsmDefineLine(Sci_Position line, LexAccessor &styler) {
-	Sci_Position startPos = styler.LineStart(line);
-	Sci_Position endPos = styler.LineStart(line + 1) - 1;
+static bool IsAsmDefineLine(Sci_Position line, LexAccessor &styler) noexcept {
+	const Sci_Position startPos = styler.LineStart(line);
+	const Sci_Position endPos = styler.LineStart(line + 1) - 1;
 	Sci_Position pos = LexSkipSpaceTab(startPos, endPos, styler);
-	char ch = styler[pos];
-	int stl = styler.StyleAt(pos);
+	const char ch = styler[pos];
+	const int stl = styler.StyleAt(pos);
 	if (stl == SCE_ASM_DIRECTIVE) {
 		if (ch == '.')
 			pos++;
@@ -368,7 +368,7 @@ static void FoldAsmDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 	const WordList &directives4foldstart = *keywordLists[6];
 	const WordList &directives4foldend = *keywordLists[7];
 
-	Sci_PositionU endPos = startPos + length;
+	const Sci_PositionU endPos = startPos + length;
 	int visibleChars = 0;
 	Sci_Position lineCurrent = styler.GetLine(startPos);
 	int levelCurrent = SC_FOLDLEVELBASE;
@@ -383,12 +383,12 @@ static void FoldAsmDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 	int wordlen = 0;
 
 	for (Sci_PositionU i = startPos; i < endPos; i++) {
-		char ch = chNext;
+		const char ch = chNext;
 		chNext = styler.SafeGetCharAt(i + 1);
-		int stylePrev = style;
+		const int stylePrev = style;
 		style = styleNext;
 		styleNext = styler.StyleAt(i + 1);
-		bool atEOL = (ch == '\r' && chNext != '\n') || (ch == '\n');
+		const bool atEOL = (ch == '\r' && chNext != '\n') || (ch == '\n');
 
 		if (foldComment && IsStreamCommentStyle(style)) {
 			if (!IsStreamCommentStyle(stylePrev)) {
@@ -445,7 +445,7 @@ static void FoldAsmDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 				if (directives4foldstart.InList(word)) {
 					levelNext++;
 					if (strcmp(word, "dialog") == 0) {
-						Sci_Position pos = LexSkipSpaceTab(i + 1, endPos, styler);
+						const Sci_Position pos = LexSkipSpaceTab(i + 1, endPos, styler);
 						if (styler[pos] == '\"')
 							levelNext--;
 					}
@@ -455,12 +455,12 @@ static void FoldAsmDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 				} else if (directives4foldend.InList(word)) {
 					levelNext--;
 					if (strcmp(word, "enddialog") == 0) {
-						Sci_Position pos = LexSkipSpaceTab(i + 1, endPos, styler);
+						const Sci_Position pos = LexSkipSpaceTab(i + 1, endPos, styler);
 						if (styler[pos] == ',')
 							levelNext++;
 					}
 					if (strcmp(word, "endproc") == 0) {
-						Sci_Position pos = LexSkipSpaceTab(i + 1, endPos, styler);
+						const Sci_Position pos = LexSkipSpaceTab(i + 1, endPos, styler);
 						if (styler[pos] == '(')
 							levelNext++;
 					}
@@ -470,7 +470,7 @@ static void FoldAsmDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 		if (!isspacechar(ch))
 			visibleChars++;
 		if (atEOL || (i == endPos - 1)) {
-			int levelUse = levelCurrent;
+			const int levelUse = levelCurrent;
 			int lev = levelUse | levelNext << 16;
 			if (visibleChars == 0 && foldCompact)
 				lev |= SC_FOLDLEVELWHITEFLAG;

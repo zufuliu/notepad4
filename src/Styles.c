@@ -1239,7 +1239,7 @@ int Style_GetDocTypeLanguage() {
 	}
 	if (*p == '<') {
 		p++;
-		if (!isalpha(*p)) {
+		if (!isalpha((unsigned char)(*p))) {
 			return 0;
 		}
 	} else {
@@ -1341,7 +1341,7 @@ BOOL MatchCPPKeyword(char *p, int index) {
 	while (len < 30 && (*p == '_' || (*p >= 'a' && *p <= 'z'))) {
 		word[len++] = *p++;
 	}
-	if (len == 30 || isalnum(*p)) {
+	if (len == 30 || isalnum((unsigned char)(*p))) {
 		return FALSE;
 	}
 	word[len++] = ' ';
@@ -2344,7 +2344,7 @@ BOOL Style_SelectFont(HWND hwnd, LPWSTR lpszStyle, int cchStyle, BOOL bDefaultSt
 			lf.lfCharSet != ANSI_CHARSET &&
 			lf.lfCharSet != iDefaultCharSet) {
 		lstrcat(szNewStyle, L"; charset:");
-		wsprintf(tch, L"%i", lf.lfCharSet);
+		wsprintf(tch, L"%u", lf.lfCharSet);
 		lstrcat(szNewStyle, tch);
 	}
 	lstrcat(szNewStyle, L"; size:");

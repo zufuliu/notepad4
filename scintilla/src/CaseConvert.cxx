@@ -572,7 +572,7 @@ class CaseConverter : public ICaseConverter {
 	};
 	struct ConversionString {
 		char conversion[maxConversionLength + 1];
-		ConversionString() : conversion{} {}
+		ConversionString() noexcept : conversion{} {}
 	};
 	// Conversions are initially store in a vector of structs but then decomposed into
 	// parallel arrays as that is about 10% faster to search.
@@ -597,15 +597,15 @@ class CaseConverter : public ICaseConverter {
 	std::vector<ConversionString> conversions;
 
 public:
-	CaseConverter() = default;
+	CaseConverter() noexcept = default;
 	virtual ~CaseConverter() = default;
-	bool Initialised() const {
+	bool Initialised() const noexcept {
 		return !characters.empty();
 	}
 	void Add(int character, const char *conversion) {
 		characterToConversion.emplace_back(character, conversion);
 	}
-	const char *Find(int character) {
+	const char *Find(int character) const {
 		const auto it = std::lower_bound(characters.begin(), characters.end(), character);
 		if (it == characters.end())
 			return nullptr;
@@ -776,7 +776,7 @@ void SetupConversions(enum CaseConversion conversion) {
 	}
 }
 
-CaseConverter *ConverterForConversion(enum CaseConversion conversion) {
+CaseConverter *ConverterForConversion(enum CaseConversion conversion) noexcept {
 	switch (conversion) {
 	case CaseConversionFold:
 		return &caseConvFold;
@@ -800,7 +800,7 @@ ICaseConverter *ConverterFor(enum CaseConversion conversion) {
 }
 
 const char *CaseConvert(int character, enum CaseConversion conversion) {
-	CaseConverter *pCaseConv = ConverterForConversion(conversion);
+	const CaseConverter *pCaseConv = ConverterForConversion(conversion);
 	if (!pCaseConv->Initialised())
 		SetupConversions(conversion);
 	return pCaseConv->Find(character);
@@ -815,7 +815,7 @@ size_t CaseConvertString(char *converted, size_t sizeConverted, const char *mixe
 
 std::string CaseConvertString(const std::string &s, enum CaseConversion conversion) {
 	std::string retMapped(s.length() * maxExpansionCaseConversion, 0);
-	const size_t lenMapped = CaseConvertString(&retMapped[0], retMapped.length(), s.c_str(), s.length(),
+	const size_t lenMapped = CaseConvertString(retMapped.data(), retMapped.length(), s.c_str(), s.length(),
 		conversion);
 	retMapped.resize(lenMapped);
 	return retMapped;

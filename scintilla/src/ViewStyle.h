@@ -20,7 +20,7 @@ public:
 	int mask;
 	bool sensitive;
 	int cursor;
-	MarginStyle(int style_ = SC_MARGIN_SYMBOL, int width_ = 0, int mask_ = 0);
+	MarginStyle(int style_ = SC_MARGIN_SYMBOL, int width_ = 0, int mask_ = 0) noexcept;
 };
 
 /**
@@ -29,21 +29,21 @@ class FontNames {
 private:
 	std::vector<UniqueString> names;
 public:
-	FontNames();
+	FontNames() noexcept;
 	// FontNames objects can not be copied.
 	FontNames(const FontNames &) = delete;
 	FontNames(FontNames &&) = delete;
 	FontNames &operator=(const FontNames &) = delete;
 	FontNames &operator=(FontNames &&) = delete;
 	~FontNames();
-	void Clear();
+	void Clear() noexcept;
 	const char *Save(const char *name);
 };
 
 class FontRealised : public FontMeasurements {
 public:
 	Font font;
-	FontRealised();
+	FontRealised() noexcept;
 	// FontRealised objects can not be copied.
 	FontRealised(const FontRealised &) = delete;
 	FontRealised(FontRealised &&) = delete;
@@ -66,8 +66,8 @@ enum WrapMode { eWrapNone, eWrapWord, eWrapChar, eWrapWhitespace };
 class ColourOptional : public ColourDesired {
 public:
 	bool isSet;
-	ColourOptional(ColourDesired colour_ = ColourDesired(0, 0, 0), bool isSet_ = false) : ColourDesired(colour_), isSet(isSet_) {}
-	ColourOptional(uptr_t wParam, sptr_t lParam) : ColourDesired(static_cast<int>(lParam)), isSet(wParam != 0) {}
+	ColourOptional(ColourDesired colour_ = ColourDesired(0, 0, 0), bool isSet_ = false) noexcept : ColourDesired(colour_), isSet(isSet_) {}
+	ColourOptional(uptr_t wParam, sptr_t lParam) noexcept : ColourDesired(static_cast<int>(lParam)), isSet(wParam != 0) {}
 };
 
 struct ForeBackColours {
@@ -78,9 +78,9 @@ struct ForeBackColours {
 struct EdgeProperties {
 	int column;
 	ColourDesired colour;
-	EdgeProperties(int column_ = 0, ColourDesired colour_ = ColourDesired(0)) :
+	EdgeProperties(int column_ = 0, ColourDesired colour_ = ColourDesired(0)) noexcept :
 		column(column_), colour(colour_) {}
-	EdgeProperties(uptr_t wParam, sptr_t lParam) :
+	EdgeProperties(uptr_t wParam, sptr_t lParam) noexcept :
 		column(static_cast<int>(wParam)), colour(static_cast<int>(lParam)) {}
 };
 
@@ -182,31 +182,31 @@ public:
 	void CalculateMarginWidthAndMask();
 	void Init(size_t stylesSize_ = 256);
 	void Refresh(Surface &surface, int tabInChars);
-	void ReleaseAllExtendedStyles();
+	void ReleaseAllExtendedStyles() noexcept;
 	int AllocateExtendedStyles(int numberStyles);
 	void EnsureStyle(size_t index);
 	void ResetDefaultStyle();
 	void ClearStyles();
 	void SetStyleFontName(int styleIndex, const char *name);
-	bool ProtectionActive() const;
-	int ExternalMarginWidth() const;
+	bool ProtectionActive() const noexcept;
+	int ExternalMarginWidth() const noexcept;
 	int MarginFromLocation(const Point &pt) const;
-	bool ValidStyle(size_t styleIndex) const;
-	void CalcLargestMarkerHeight();
-	int GetFrameWidth() const;
-	bool IsLineFrameOpaque(bool caretActive, bool lineContainsCaret) const;
+	bool ValidStyle(size_t styleIndex) const noexcept;
+	void CalcLargestMarkerHeight() noexcept;
+	int GetFrameWidth() const noexcept;
+	bool IsLineFrameOpaque(bool caretActive, bool lineContainsCaret) const noexcept;
 	ColourOptional Background(int marksOfLine, bool caretActive, bool lineContainsCaret) const;
-	bool SelectionBackgroundDrawn() const;
-	bool WhitespaceBackgroundDrawn() const;
+	bool SelectionBackgroundDrawn() const noexcept;
+	bool WhitespaceBackgroundDrawn() const noexcept;
 	ColourDesired WrapColour() const;
 
-	bool SetWrapState(int wrapState_);
-	bool SetWrapVisualFlags(int wrapVisualFlags_);
-	bool SetWrapVisualFlagsLocation(int wrapVisualFlagsLocation_);
-	bool SetWrapVisualStartIndent(int wrapVisualStartIndent_);
-	bool SetWrapIndentMode(int wrapIndentMode_);
+	bool SetWrapState(int wrapState_) noexcept;
+	bool SetWrapVisualFlags(int wrapVisualFlags_) noexcept;
+	bool SetWrapVisualFlagsLocation(int wrapVisualFlagsLocation_) noexcept;
+	bool SetWrapVisualStartIndent(int wrapVisualStartIndent_) noexcept;
+	bool SetWrapIndentMode(int wrapIndentMode_) noexcept;
 
-	bool WhiteSpaceVisible(bool inIndent) const;
+	bool WhiteSpaceVisible(bool inIndent) const noexcept;
 
 private:
 	void AllocStyles(size_t sizeNew);

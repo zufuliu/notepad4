@@ -64,7 +64,7 @@ static constexpr bool IsControlCharacter(int ch) noexcept {
 	return ch >= 0 && ch < ' ';
 }
 
-PrintParameters::PrintParameters() {
+PrintParameters::PrintParameters() noexcept {
 	magnification = 0;
 	colourMode = SC_PRINT_NORMAL;
 	wrapState = eWrapWord;
@@ -72,7 +72,7 @@ PrintParameters::PrintParameters() {
 
 namespace Scintilla {
 
-bool ValidStyledText(const ViewStyle &vs, size_t styleOffset, const StyledText &st) {
+bool ValidStyledText(const ViewStyle &vs, size_t styleOffset, const StyledText &st) noexcept {
 	if (st.multipleStyles) {
 		for (size_t iStyle = 0; iStyle < st.length; iStyle++) {
 			if (!vs.ValidStyle(styleOffset + st.styles[iStyle]))
@@ -194,36 +194,36 @@ EditView::EditView() {
 
 EditView::~EditView() = default;
 
-bool EditView::SetTwoPhaseDraw(bool twoPhaseDraw) {
+bool EditView::SetTwoPhaseDraw(bool twoPhaseDraw) noexcept {
 	const PhasesDraw phasesDrawNew = twoPhaseDraw ? phasesTwo : phasesOne;
 	const bool redraw = phasesDraw != phasesDrawNew;
 	phasesDraw = phasesDrawNew;
 	return redraw;
 }
 
-bool EditView::SetPhasesDraw(int phases) {
+bool EditView::SetPhasesDraw(int phases) noexcept {
 	const PhasesDraw phasesDrawNew = static_cast<PhasesDraw>(phases);
 	const bool redraw = phasesDraw != phasesDrawNew;
 	phasesDraw = phasesDrawNew;
 	return redraw;
 }
 
-bool EditView::LinesOverlap() const {
+bool EditView::LinesOverlap() const noexcept {
 	return phasesDraw == phasesMultiple;
 }
 
-void EditView::ClearAllTabstops() {
+void EditView::ClearAllTabstops() noexcept {
 	ldTabstops.reset();
 }
 
-XYPOSITION EditView::NextTabstopPos(Sci::Line line, XYPOSITION x, XYPOSITION tabWidth) const {
+XYPOSITION EditView::NextTabstopPos(Sci::Line line, XYPOSITION x, XYPOSITION tabWidth) const noexcept {
 	const int next = GetNextTabstop(line, static_cast<int>(x + tabWidthMinimumPixels));
 	if (next > 0)
 		return static_cast<XYPOSITION>(next);
 	return (static_cast<int>((x + tabWidthMinimumPixels) / tabWidth) + 1) * tabWidth;
 }
 
-bool EditView::ClearTabstops(Sci::Line line) {
+bool EditView::ClearTabstops(Sci::Line line) noexcept {
 	return ldTabstops && ldTabstops->ClearTabstops(line);
 }
 
@@ -234,7 +234,7 @@ bool EditView::AddTabstop(Sci::Line line, int x) {
 	return ldTabstops && ldTabstops->AddTabstop(line, x);
 }
 
-int EditView::GetNextTabstop(Sci::Line line, int x) const {
+int EditView::GetNextTabstop(Sci::Line line, int x) const noexcept {
 	if (ldTabstops) {
 		return ldTabstops->GetNextTabstop(line, x);
 	} else {
@@ -256,7 +256,7 @@ void EditView::LinesAddedOrRemoved(Sci::Line lineOfPos, Sci::Line linesAdded) {
 	}
 }
 
-void EditView::DropGraphics(bool freeObjects) {
+void EditView::DropGraphics(bool freeObjects) noexcept {
 	if (freeObjects) {
 		pixmapLine.reset();
 		pixmapIndentGuide.reset();
@@ -280,7 +280,7 @@ void EditView::AllocateGraphics(const ViewStyle &vsDraw) {
 		pixmapIndentGuideHighlight.reset(Surface::Allocate(vsDraw.technology));
 }
 
-static const char *ControlCharacterString(unsigned char ch) {
+static const char *ControlCharacterString(unsigned char ch) noexcept {
 	static const char * const reps[] = {
 		"NUL", "SOH", "STX", "ETX", "EOT", "ENQ", "ACK", "BEL",
 		"BS", "HT", "LF", "VT", "FF", "CR", "SO", "SI",
@@ -294,7 +294,7 @@ static const char *ControlCharacterString(unsigned char ch) {
 	}
 }
 
-static void DrawTabArrow(Surface *surface, const PRectangle &rcTab, int ymid, const ViewStyle &vsDraw) {
+static void DrawTabArrow(Surface *surface, const PRectangle &rcTab, int ymid, const ViewStyle &vsDraw) noexcept {
 	const IntegerRectangle ircTab(rcTab);
 	if ((rcTab.left + 2) < (rcTab.right - 1))
 		surface->MoveTo(ircTab.left + 2, ymid);
@@ -354,7 +354,7 @@ void EditView::LayoutLine(const EditModel &model, Sci::Line line, Surface *surfa
 		return;
 
 	PLATFORM_ASSERT(line < model.pdoc->LinesTotal());
-	PLATFORM_ASSERT(ll->chars != NULL);
+	PLATFORM_ASSERT(ll->chars != nullptr);
 	const Sci::Position posLineStart = model.pdoc->LineStart(line);
 	Sci::Position posLineEnd = model.pdoc->LineStart(line + 1);
 	// If the line is very long, limit the treatment to a length that should fit in the viewport
@@ -829,7 +829,7 @@ Sci::Position EditView::StartEndDisplayLine(Surface *surface, const EditModel &m
 	return posRet;
 }
 
-static ColourDesired SelectionBackground(const ViewStyle &vsDraw, bool main, bool primarySelection) {
+static ColourDesired SelectionBackground(const ViewStyle &vsDraw, bool main, bool primarySelection) noexcept {
 	return main ?
 		(primarySelection ? vsDraw.selColours.back : vsDraw.selBackground2) :
 		vsDraw.selAdditionalBackground;
@@ -2346,7 +2346,7 @@ void EditView::FillLineRemainder(Surface *surface, const EditModel &model, const
 // Space (3 space characters) between line numbers and text when printing.
 #define lineNumberPrintSpace "   "
 
-static ColourDesired InvertedLight(ColourDesired orig) {
+static ColourDesired InvertedLight(ColourDesired orig) noexcept {
 	unsigned int r = orig.GetRed();
 	unsigned int g = orig.GetGreen();
 	unsigned int b = orig.GetBlue();

@@ -1565,7 +1565,7 @@ void EditShowHex(HWND hwnd) {
 
 //=============================================================================
 //
-// EditHex2Dec()
+// EditConvertNumRadix()
 //
 static inline BOOL iswordstart(int ch) {
 	return (ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z') || ch == '.' || ch == '_';
@@ -1767,7 +1767,7 @@ void EditModifyNumber(HWND hwnd, BOOL bIncrease) {
 
 		if (iSelEnd - iSelStart) {
 			if (SendMessage(hwnd, SCI_GETSELTEXT, 0, 0) < 32) {
-				char chNumber[32];
+				char chNumber[32] = "";
 				char chFormat[32] = "";
 				int	 iNumber;
 				unsigned uNumber;
@@ -1874,7 +1874,7 @@ void EditTabsToSpaces(HWND hwnd, int nTabWidth, BOOL bOnlyIndentingWS) {
 		//iSelStart = 0;
 		//iSelEnd		= SendMessage(hwnd, SCI_GETLENGTH, 0, 0);
 		return;
-	}  else {
+	} else {
 		iSelStart	= (int)SendMessage(hwnd, SCI_GETSELECTIONSTART, 0, 0);
 		iSelEnd		= (int)SendMessage(hwnd, SCI_GETSELECTIONEND, 0, 0);
 	}
@@ -2005,7 +2005,7 @@ void EditSpacesToTabs(HWND hwnd, int nTabWidth, BOOL bOnlyIndentingWS) {
 		//iSelStart = 0;
 		//iSelEnd		= SendMessage(hwnd, SCI_GETLENGTH, 0, 0);
 		return;
-	}  else {
+	} else {
 		iSelStart	= (int)SendMessage(hwnd, SCI_GETSELECTIONSTART, 0, 0);
 		iSelEnd		= (int)SendMessage(hwnd, SCI_GETSELECTIONEND, 0, 0);
 	}
@@ -2970,7 +2970,7 @@ void EditToggleLineComments(HWND hwnd, LPCWSTR pwszComment, BOOL bInsertAtStart)
 		for (iLine = iLineStart; iLine <= iLineEnd; iLine++) {
 			int iCommentPos;
 			int iIndentPos = (int)SendMessage(hwnd, SCI_GETLINEINDENTPOSITION, (WPARAM)iLine, 0);
-			char tchBuf[32];
+			char tchBuf[32] = "";
 			struct Sci_TextRange tr;
 			BOOL bWhitespaceLine = FALSE;
 			int ch;
@@ -3026,7 +3026,7 @@ void EditToggleLineComments(HWND hwnd, LPCWSTR pwszComment, BOOL bInsertAtStart)
 							memset(tchComment, '\t', ch);
 							mbcp -= ch * iTabWidth;
 						}
-						memset(&tchComment[ch], ' ', mbcp);
+						memset(tchComment + ch, ' ', mbcp);
 						lstrcatA(tchComment, mszComment);
 						SendMessage(hwnd, SCI_INSERTTEXT, (WPARAM)iCommentPos, (LPARAM)tchComment);
 					}
@@ -5274,8 +5274,9 @@ void EditMarkAll(HWND hwnd, int iMarkOccurrences, BOOL bMarkOccurrencesMatchCase
 	ttf.lpstrText = pszText;
 
 	// set style
+	const COLORREF fore = 0xff << ((iMarkOccurrences - 1) << 3);
 	SendMessage(hwnd, SCI_INDICSETALPHA, 1, 100);
-	SendMessage(hwnd, SCI_INDICSETFORE, 1, 0xff << ((iMarkOccurrences - 1) << 3));
+	SendMessage(hwnd, SCI_INDICSETFORE, 1, fore);
 	SendMessage(hwnd, SCI_INDICSETSTYLE, 1, INDIC_ROUNDBOX);
 
 	findFlag = (bMarkOccurrencesMatchCase ? SCFIND_MATCHCASE : 0) | (bMarkOccurrencesMatchWords ? SCFIND_WHOLEWORD : 0);
@@ -6035,7 +6036,7 @@ INT_PTR CALLBACK EditInsertTagDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARA
 					if (wchBuf[0] == L'<') {
 						WCHAR wchIns[256] = L"</";
 						int	cchIns = 2;
-						const WCHAR *pwCur = &wchBuf[1];
+						const WCHAR *pwCur = wchBuf + 1;
 
 						while (*pwCur &&
 								*pwCur != L'<' &&
@@ -6620,7 +6621,7 @@ BOOL FileVars_ParseStr(LPCSTR pszData, LPCSTR pszName, char *pszValue, int cchVa
 //					RECT rcClient;
 //
 //					if (pfnGetThemeBackgroundContentRect(
-//								hTheme, NULL, /*EP_EDITTEXT*/1, /*ETS_NORMAL*/1, &csp->rgrc[0], &rcClient) == S_OK) {
+//								hTheme, NULL, /*EP_EDITTEXT*/1, /*ETS_NORMAL*/1, &csp->rgrc, &rcClient) == S_OK) {
 //						InflateRect(&rcClient, -1, -1);
 //
 //						rcContent.left = rcClient.left - csp->rgrc[0].left;
@@ -6628,7 +6629,7 @@ BOOL FileVars_ParseStr(LPCSTR pszData, LPCSTR pszName, char *pszValue, int cchVa
 //						rcContent.right = csp->rgrc[0].right - rcClient.right;
 //						rcContent.bottom = csp->rgrc[0].bottom - rcClient.bottom;
 //
-//						CopyRect(&csp->rgrc[0], &rcClient);
+//						CopyRect(&csp->rgrc, &rcClient);
 //						bSuccess = TRUE;
 //					}
 //					pfnCloseThemeData(hTheme);

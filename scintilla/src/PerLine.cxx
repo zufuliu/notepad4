@@ -27,7 +27,7 @@
 
 using namespace Scintilla;
 
-MarkerHandleSet::MarkerHandleSet() = default;
+MarkerHandleSet::MarkerHandleSet() noexcept = default;
 
 MarkerHandleSet::~MarkerHandleSet() {
 	mhList.clear();
@@ -103,7 +103,7 @@ void LineMarkers::RemoveLine(Sci::Line line) {
 	}
 }
 
-Sci::Line LineMarkers::LineFromHandle(int markerHandle) {
+Sci::Line LineMarkers::LineFromHandle(int markerHandle) noexcept {
 	if (markers.Length()) {
 		for (Sci::Line line = 0; line < markers.Length(); line++) {
 			if (markers[line]) {
@@ -132,7 +132,7 @@ int LineMarkers::MarkValue(Sci::Line line) noexcept {
 		return 0;
 }
 
-Sci::Line LineMarkers::MarkerNext(Sci::Line lineStart, int mask) const {
+Sci::Line LineMarkers::MarkerNext(Sci::Line lineStart, int mask) const noexcept {
 	if (lineStart < 0)
 		lineStart = 0;
 	const Sci::Line length = static_cast<Sci::Line>(markers.Length());
@@ -236,7 +236,7 @@ int LineLevels::SetLevel(Sci::Line line, int level, Sci::Line lines) {
 	return prev;
 }
 
-int LineLevels::GetLevel(Sci::Line line) const {
+int LineLevels::GetLevel(Sci::Line line) const noexcept {
 	if (levels.Length() && (line >= 0) && (line < levels.Length())) {
 		return levels[line];
 	} else {
@@ -278,7 +278,7 @@ int LineState::GetLineState(Sci::Line line) {
 	return lineStates[line];
 }
 
-Sci::Line LineState::GetMaxLineState() const {
+Sci::Line LineState::GetMaxLineState() const noexcept {
 	return static_cast<Sci::Line>(lineStates.Length());
 }
 
@@ -329,28 +329,28 @@ void LineAnnotation::RemoveLine(Sci::Line line) {
 	}
 }
 
-bool LineAnnotation::MultipleStyles(Sci::Line line) const {
+bool LineAnnotation::MultipleStyles(Sci::Line line) const noexcept {
 	if (annotations.Length() && (line >= 0) && (line < annotations.Length()) && annotations[line])
 		return reinterpret_cast<AnnotationHeader *>(annotations[line].get())->style == IndividualStyles;
 	else
 		return false;
 }
 
-int LineAnnotation::Style(Sci::Line line) const {
+int LineAnnotation::Style(Sci::Line line) const noexcept {
 	if (annotations.Length() && (line >= 0) && (line < annotations.Length()) && annotations[line])
 		return reinterpret_cast<AnnotationHeader *>(annotations[line].get())->style;
 	else
 		return 0;
 }
 
-const char *LineAnnotation::Text(Sci::Line line) const {
+const char *LineAnnotation::Text(Sci::Line line) const noexcept {
 	if (annotations.Length() && (line >= 0) && (line < annotations.Length()) && annotations[line])
 		return annotations[line].get() + sizeof(AnnotationHeader);
 	else
 		return nullptr;
 }
 
-const unsigned char *LineAnnotation::Styles(Sci::Line line) const {
+const unsigned char *LineAnnotation::Styles(Sci::Line line) const noexcept {
 	if (annotations.Length() && (line >= 0) && (line < annotations.Length()) && annotations[line] && MultipleStyles(line))
 		return reinterpret_cast<unsigned char *>(annotations[line].get() + sizeof(AnnotationHeader) + Length(line));
 	else
@@ -415,14 +415,14 @@ void LineAnnotation::SetStyles(Sci::Line line, const unsigned char *styles) {
 	}
 }
 
-int LineAnnotation::Length(Sci::Line line) const {
+int LineAnnotation::Length(Sci::Line line) const noexcept {
 	if (annotations.Length() && (line >= 0) && (line < annotations.Length()) && annotations[line])
 		return reinterpret_cast<AnnotationHeader *>(annotations[line].get())->length;
 	else
 		return 0;
 }
 
-int LineAnnotation::Lines(Sci::Line line) const {
+int LineAnnotation::Lines(Sci::Line line) const noexcept {
 	if (annotations.Length() && (line >= 0) && (line < annotations.Length()) && annotations[line])
 		return reinterpret_cast<AnnotationHeader *>(annotations[line].get())->lines;
 	else
@@ -451,7 +451,7 @@ void LineTabstops::RemoveLine(Sci::Line line) {
 	}
 }
 
-bool LineTabstops::ClearTabstops(Sci::Line line) {
+bool LineTabstops::ClearTabstops(Sci::Line line) noexcept {
 	if (line < tabstops.Length()) {
 		TabstopList *tl = tabstops[line].get();
 		if (tl) {
@@ -481,7 +481,7 @@ bool LineTabstops::AddTabstop(Sci::Line line, int x) {
 	return false;
 }
 
-int LineTabstops::GetNextTabstop(Sci::Line line, int x) const {
+int LineTabstops::GetNextTabstop(Sci::Line line, int x) const noexcept {
 	if (line < tabstops.Length()) {
 		TabstopList *tl = tabstops[line].get();
 		if (tl) {

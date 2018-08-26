@@ -47,7 +47,7 @@ HGLOBAL hDevNames = nullptr;
 //
 extern "C" HWND hwndStatus;
 
-void StatusUpdatePrintPage(int iPageNum) {
+void StatusUpdatePrintPage(int iPageNum) noexcept {
 	WCHAR tch[32];
 
 	FormatString(tch, COUNTOF(tch), IDS_PRINTFILE, iPageNum);
@@ -322,7 +322,7 @@ extern "C" BOOL EditPrint(HWND hwnd, LPCWSTR pszDocTitle, LPCWSTR pszPageFormat)
 	pageNum = 1;
 
 	while (lengthPrinted < lengthDoc) {
-		BOOL printPage = !(pdlg.Flags & PD_PAGENUMS) || (pageNum >= pdlg.nFromPage && pageNum <= pdlg.nToPage);
+		const BOOL printPage = !(pdlg.Flags & PD_PAGENUMS) || (pageNum >= pdlg.nFromPage && pageNum <= pdlg.nToPage);
 
 		wsprintf(pageString, pszPageFormat, pageNum);
 
@@ -339,7 +339,7 @@ extern "C" BOOL EditPrint(HWND hwnd, LPCWSTR pszDocTitle, LPCWSTR pszPageFormat)
 			SetTextColor(hdc, RGB(0, 0, 0));
 			SetBkColor(hdc, RGB(255, 255, 255));
 			SelectObject(hdc, fontHeader);
-			UINT ta = SetTextAlign(hdc, TA_BOTTOM);
+			const UINT ta = SetTextAlign(hdc, TA_BOTTOM);
 			RECT rcw = {
 				frPrint.rc.left, frPrint.rc.top - headerLineHeight - headerLineHeight / 2,
 				frPrint.rc.right, frPrint.rc.top - headerLineHeight / 2
@@ -383,7 +383,7 @@ extern "C" BOOL EditPrint(HWND hwnd, LPCWSTR pszDocTitle, LPCWSTR pszPageFormat)
 			SetTextColor(hdc, RGB(0, 0, 0));
 			SetBkColor(hdc, RGB(255, 255, 255));
 			SelectObject(hdc, fontFooter);
-			UINT ta = SetTextAlign(hdc, TA_TOP);
+			const UINT ta = SetTextAlign(hdc, TA_TOP);
 			RECT rcw = {
 				frPrint.rc.left, frPrint.rc.bottom + footerLineHeight / 2,
 				frPrint.rc.right, frPrint.rc.bottom + footerLineHeight + footerLineHeight / 2
@@ -507,7 +507,7 @@ extern "C" UINT_PTR CALLBACK PageSetupHook(HWND hwnd, UINT uiMsg, WPARAM wParam,
 
 	case WM_COMMAND:
 		if (LOWORD(wParam) == IDOK) {
-			LONG lPos = (LONG)SendDlgItemMessage(hwnd, 31, UDM_GETPOS, 0, 0);
+			const LONG lPos = (LONG)SendDlgItemMessage(hwnd, 31, UDM_GETPOS, 0, 0);
 			if (HIWORD(lPos) == 0) {
 				iPrintZoom = (int)(short)LOWORD(lPos);
 			} else {

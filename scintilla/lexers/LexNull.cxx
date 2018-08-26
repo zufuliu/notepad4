@@ -68,7 +68,7 @@ static void FoldNullDoc(Sci_PositionU startPos, Sci_Position length, int /* init
 			// Information about next line is only available if not at end of document
 			indentNext = Accessor::LexIndentAmount(styler, lineNext, &spaceFlags, nullptr);
 		}
-		int indentCurrentLevel = indentCurrent & SC_FOLDLEVELNUMBERMASK;
+		const int indentCurrentLevel = indentCurrent & SC_FOLDLEVELNUMBERMASK;
 		if (indentNext & SC_FOLDLEVELWHITEFLAG)
 			indentNext = SC_FOLDLEVELWHITEFLAG | indentCurrentLevel;
 
@@ -90,13 +90,13 @@ static void FoldNullDoc(Sci_PositionU startPos, Sci_Position length, int /* init
 		int skipLevel = levelAfterBlank;
 
 		while (--skipLine > lineCurrent) {
-			int skipLineIndent = Accessor::LexIndentAmount(styler, skipLine, &spaceFlags, nullptr);
+			const int skipLineIndent = Accessor::LexIndentAmount(styler, skipLine, &spaceFlags, nullptr);
 
 			if (foldCompact) {
 				if ((skipLineIndent & SC_FOLDLEVELNUMBERMASK) > levelAfterBlank)
 					skipLevel = levelBeforeBlank;
 
-				int whiteFlag = skipLineIndent & SC_FOLDLEVELWHITEFLAG;
+				const int whiteFlag = skipLineIndent & SC_FOLDLEVELWHITEFLAG;
 				styler.SetLevel(skipLine, skipLevel | whiteFlag);
 			} else {
 				if ((skipLineIndent & SC_FOLDLEVELNUMBERMASK) > levelAfterBlank &&

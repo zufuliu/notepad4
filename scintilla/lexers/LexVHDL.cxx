@@ -132,11 +132,11 @@ _label_identifier:
 	sc.Complete();
 }
 
-static inline bool IsCommentStyle(int style) noexcept {
+static constexpr bool IsCommentStyle(int style) noexcept {
 	return style == SCE_VHDL_BLOCK_COMMENT || style == SCE_VHDL_COMMENT || style == SCE_VHDL_COMMENTLINEBANG;
 }
 
-static inline bool IsStreamCommentStyle(int style) noexcept {
+static constexpr bool IsStreamCommentStyle(int style) noexcept {
 	return style == SCE_VHDL_BLOCK_COMMENT;
 }
 
@@ -156,7 +156,7 @@ static void FoldVHDLDoc(Sci_PositionU startPos, Sci_Position length, int /*initS
 	//const bool foldAtWhen = styler.GetPropertyInt("fold.at.When", 1) != 0; //< fold at when in case statements
 
 	int	 visibleChars = 0;
-	Sci_PositionU endPos = startPos + length;
+	const Sci_PositionU endPos = startPos + length;
 
 	Sci_Position lineCurrent = styler.GetLine(startPos);
 	int levelCurrent = SC_FOLDLEVELBASE;
@@ -178,10 +178,10 @@ static void FoldVHDLDoc(Sci_PositionU startPos, Sci_Position length, int /*initS
 	Sci_Position end = 0;
 	Sci_PositionU j;
 	for (j = startPos; j > 0; j--) {
-		char ch = styler.SafeGetCharAt(j);
-		char chPrev = styler.SafeGetCharAt(j - 1);
-		int style = styler.StyleAt(j);
-		int stylePrev = styler.StyleAt(j - 1);
+		const char ch = styler.SafeGetCharAt(j);
+		const char chPrev = styler.SafeGetCharAt(j - 1);
+		const int style = styler.StyleAt(j);
+		const int stylePrev = styler.StyleAt(j - 1);
 		if ((!IsCommentStyle(stylePrev)) && (stylePrev != SCE_VHDL_STRING)) {
 			if (iswordchar(chPrev) && !iswordchar(ch)) {
 				end = j - 1;
@@ -203,9 +203,9 @@ static void FoldVHDLDoc(Sci_PositionU startPos, Sci_Position length, int /*initS
 			}
 		}
 	}
-	for (j = j + (Sci_PositionU)strlen(prevWord); j < endPos; j++) {
-		char ch = styler.SafeGetCharAt(j);
-		int style = styler.StyleAt(j);
+	for (j = j + static_cast<Sci_PositionU>(strlen(prevWord)); j < endPos; j++) {
+		const char ch = styler.SafeGetCharAt(j);
+		const int style = styler.StyleAt(j);
 		if ((!IsCommentStyle(style)) && (style != SCE_VHDL_STRING)) {
 			if ((ch == ';') && (strcmp(prevWord, "end") == 0)) {
 				strcpy(prevWord, ";");
@@ -219,7 +219,7 @@ static void FoldVHDLDoc(Sci_PositionU startPos, Sci_Position length, int /*initS
 	styleNext = styler.StyleAt(startPos);
 
 	for (Sci_PositionU i = startPos; i < endPos; i++) {
-		char chPrev = ch;
+		const char chPrev = ch;
 		ch = chNext;
 		chNext = styler.SafeGetCharAt(i + 1);
 		char chNextNonBlank = chNext;
@@ -228,10 +228,10 @@ static void FoldVHDLDoc(Sci_PositionU startPos, Sci_Position length, int /*initS
 			j++;
 			chNextNonBlank = styler.SafeGetCharAt(j);
 		}
-		int stylePrev = style;
+		const int stylePrev = style;
 		style = styleNext;
 		styleNext = styler.StyleAt(i + 1);
-		bool atEOL = (ch == '\r' && chNext != '\n') || (ch == '\n');
+		const bool atEOL = (ch == '\r' && chNext != '\n') || (ch == '\n');
 
 		if (foldComment && atEOL && IsCommentLine(lineCurrent)) {
 			if (!IsCommentLine(lineCurrent - 1) && IsCommentLine(lineCurrent + 1))
@@ -319,8 +319,8 @@ static void FoldVHDLDoc(Sci_PositionU startPos, Sci_Position length, int /*initS
 								// rather than the actual code in the body.
 							int BracketLevel = 0;
 							for (Sci_Position pos = i + 1; pos < styler.Length(); pos++) {
-								int styleAtPos = styler.StyleAt(pos);
-								char chAtPos = styler.SafeGetCharAt(pos);
+								const int styleAtPos = styler.StyleAt(pos);
+								const char chAtPos = styler.SafeGetCharAt(pos);
 								if (chAtPos == '(') BracketLevel++;
 								if (chAtPos == ')') BracketLevel--;
 								if (

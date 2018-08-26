@@ -255,7 +255,7 @@ int		fKeepTitleExcerpt = 0;
 
 HANDLE	hChangeHandle = NULL;
 BOOL	bRunningWatch = FALSE;
-BOOL	dwChangeNotifyTime = 0;
+DWORD	dwChangeNotifyTime = 0;
 
 UINT	msgTaskbarCreated = 0;
 
@@ -409,7 +409,7 @@ int		flagDisplayHelp			= 0;
 // WinMain()
 //
 //
-int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nCmdShow) {
+int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nShowCmd) {
 	MSG msg;
 	HWND hwnd;
 	HACCEL hAccMain;
@@ -526,7 +526,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 		return FALSE;
 	}
 
-	if ((hwnd = InitInstance(hInstance, nCmdShow)) == NULL) {
+	if ((hwnd = InitInstance(hInstance, nShowCmd)) == NULL) {
 		OleUninitialize();
 		return FALSE;
 	}
@@ -1831,7 +1831,7 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) {
 void MsgDPIChanged(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	g_uCurrentDPI = HIWORD(wParam);
 	RECT* const rc = (RECT *)lParam;
-	Sci_Position pos = SciCall_GetCurrentPos();
+	const Sci_Position pos = SciCall_GetCurrentPos();
 #if 0
 	char buf[128];
 	sprintf(buf, "WM_DPICHANGED: dpi=%u, %u\n", g_uCurrentDPI, g_uCurrentPPI);
@@ -3192,9 +3192,9 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 				*p = 0;
 			}
 			if (pLexCurrent->iLexer == SCLEX_PYTHON) {
-				Sci_Position iCurrentPos = SciCall_GetCurrentPos();
-				int iCurLine = SciCall_LineFromPosition(iCurrentPos);
-				Sci_Position iCurrentLinePos = iCurrentPos - SciCall_PositionFromLine(iCurLine);
+				const Sci_Position iCurrentPos = SciCall_GetCurrentPos();
+				const int iCurLine = SciCall_LineFromPosition(iCurrentPos);
+				const Sci_Position iCurrentLinePos = iCurrentPos - SciCall_PositionFromLine(iCurLine);
 				if (iCurLine < 2 && iCurrentLinePos == 0) {
 					char cmsz[128];
 					wnsprintfA(cmsz, COUNTOF(cmsz), "#-*- coding: %s -*-", msz);
@@ -3218,7 +3218,6 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		WCHAR tchTemplate[256];
 		SYSTEMTIME st;
 		char	mszBuf[256 * kMaxMultiByteCount];
-		UINT	uCP;
 		//int		iSelStart;
 
 		GetLocalTime(&st);
@@ -3248,7 +3247,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			wsprintf(tchDateTime, L"%s %s", tchTime, tchDate);
 		}
 
-		uCP = (SendMessage(hwndEdit, SCI_GETCODEPAGE, 0, 0) == SC_CP_UTF8) ? CP_UTF8 : CP_ACP;
+		const UINT uCP = (SendMessage(hwndEdit, SCI_GETCODEPAGE, 0, 0) == SC_CP_UTF8) ? CP_UTF8 : CP_ACP;
 		WideCharToMultiByte(uCP, 0, tchDateTime, -1, mszBuf, COUNTOF(mszBuf), NULL, NULL);
 		//iSelStart = SendMessage(hwndEdit, SCI_GETSELECTIONSTART, 0, 0);
 		SendMessage(hwndEdit, SCI_REPLACESEL, 0, (LPARAM)mszBuf);
@@ -3263,9 +3262,9 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		// Local
 		GetLocalTime(&lt);
 		if (LOWORD(wParam) == IDM_EDIT_INSERT_LOC_DATE) {
-			sprintf(mszBuf, "%04d-%02d-%02d", lt.wYear, lt.wMonth, lt.wDay);
+			sprintf(mszBuf, "%04u-%02u-%02u", lt.wYear, lt.wMonth, lt.wDay);
 		} else {
-			sprintf(mszBuf, "%04d-%02d-%02d %02d:%02d:%02d", lt.wYear, lt.wMonth, lt.wDay, lt.wHour, lt.wMinute, lt.wSecond);
+			sprintf(mszBuf, "%04u-%02u-%02u %02u:%02u:%02u", lt.wYear, lt.wMonth, lt.wDay, lt.wHour, lt.wMinute, lt.wSecond);
 		}
 		SendMessage(hwndEdit, SCI_REPLACESEL, 0, (LPARAM)mszBuf);
 	}
@@ -3276,7 +3275,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		char	mszBuf[38];
 		// UTC
 		GetSystemTime(&lt);
-		sprintf(mszBuf, "%04d-%02d-%02dT%02d:%02d:%02dZ", lt.wYear, lt.wMonth, lt.wDay, lt.wHour, lt.wMinute, lt.wSecond);
+		sprintf(mszBuf, "%04u-%02u-%02uT%02u:%02u:%02uZ", lt.wYear, lt.wMonth, lt.wDay, lt.wHour, lt.wMinute, lt.wSecond);
 		SendMessage(hwndEdit, SCI_REPLACESEL, 0, (LPARAM)mszBuf);
 	}
 	break;
@@ -3346,10 +3345,9 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 				|| LOWORD(wParam) == CMD_COPYPATHNAME) {
 			SetClipDataW(hwnd, pszInsert);
 		} else {
-			UINT uCP;
 			//int iSelStart;
 			char mszBuf[MAX_PATH * kMaxMultiByteCount];
-			uCP = (SendMessage(hwndEdit, SCI_GETCODEPAGE, 0, 0) == SC_CP_UTF8) ? CP_UTF8 : CP_ACP;
+			const UINT uCP = (SendMessage(hwndEdit, SCI_GETCODEPAGE, 0, 0) == SC_CP_UTF8) ? CP_UTF8 : CP_ACP;
 			WideCharToMultiByte(uCP, 0, pszInsert, -1, mszBuf, COUNTOF(mszBuf), NULL, NULL);
 			//iSelStart = SendMessage(hwndEdit, SCI_GETSELECTIONSTART, 0, 0);
 			SendMessage(hwndEdit, SCI_REPLACESEL, 0, (LPARAM)mszBuf);
@@ -6435,7 +6433,7 @@ int CreateIniFile(void) {
 }
 
 int CreateIniFileEx(LPCWSTR lpszIniFile) {
-	if (*lpszIniFile) {
+	if (StrNotEmpty(lpszIniFile)) {
 		HANDLE hFile;
 		WCHAR *pwchTail;
 
@@ -6650,8 +6648,8 @@ void UpdateLineNumberWidth(void) {
 		const int iLines = (int)SendMessage(hwndEdit, SCI_GETLINECOUNT, 0, 0);
 		wsprintfA(tchLines, "_%i_", iLines);
 
-		const iLineMarginWidthNow = (int)SendMessage(hwndEdit, SCI_GETMARGINWIDTHN, 0, 0);
-		const iLineMarginWidthFit = (int)SendMessage(hwndEdit, SCI_TEXTWIDTH, STYLE_LINENUMBER, (LPARAM)tchLines);
+		const int iLineMarginWidthNow = (int)SendMessage(hwndEdit, SCI_GETMARGINWIDTHN, 0, 0);
+		const int iLineMarginWidthFit = (int)SendMessage(hwndEdit, SCI_TEXTWIDTH, STYLE_LINENUMBER, (LPARAM)tchLines);
 
 		if (iLineMarginWidthNow != iLineMarginWidthFit) {
 #if !NP2_DEBUG_FOLD_LEVEL
@@ -7440,7 +7438,10 @@ BOOL RelaunchMultiInst(void) {
 			si.cb = sizeof(STARTUPINFO);
 			ZeroMemory(&pi, sizeof(PROCESS_INFORMATION));
 
-			CreateProcess(NULL, lpCmdLineNew, NULL, NULL, FALSE, 0, NULL, g_wchWorkingDirectory, &si, &pi);
+			if (CreateProcess(NULL, lpCmdLineNew, NULL, NULL, FALSE, 0, NULL, g_wchWorkingDirectory, &si, &pi)) {
+				CloseHandle(pi.hProcess);
+				CloseHandle(pi.hThread);
+			}
 		}
 
 		LocalFree(lpCmdLineNew);

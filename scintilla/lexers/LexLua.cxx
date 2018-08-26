@@ -27,7 +27,7 @@ using namespace Scintilla;
 // Test for [=[ ... ]=] delimiters, returns 0 if it's only a [ or ],
 // return 1 for [[ or ]], returns >=2 for [=[ or ]=] and so on.
 // The maximum number of '=' characters allowed is 254.
-static int LongDelimCheck(StyleContext &sc) {
+static int LongDelimCheck(const StyleContext &sc) noexcept {
 	int sep = 1;
 	while (sc.GetRelative(sep) == '=' && sep < 0xFF) {
 		sep++;
@@ -137,7 +137,7 @@ static void ColouriseLuaDoc(Sci_PositionU startPos, Sci_Position length, int ini
 				Sci_Position ln = 0;
 				while (IsASpaceOrTab(sc.GetRelative(ln)))	// skip over spaces/tabs
 					ln++;
-				Sci_Position ws1 = ln;
+				const Sci_Position ws1 = ln;
 				if (setWordStart.Contains(sc.GetRelative(ln))) {
 					int c, i = 0;
 					char s[128];
@@ -146,11 +146,12 @@ static void ColouriseLuaDoc(Sci_PositionU startPos, Sci_Position length, int ini
 							s[i++] = static_cast<char>(c);
 						ln++;
 					}
-					s[i] = '\0'; Sci_Position lbl = ln;
+					s[i] = '\0';
+					const Sci_Position lbl = ln;
 					if (!keywords.InList(s)) {
 						while (IsASpaceOrTab(sc.GetRelative(ln)))	// skip over spaces/tabs
 							ln++;
-						Sci_Position ws2 = ln - lbl;
+						const Sci_Position ws2 = ln - lbl;
 						if (sc.GetRelative(ln) == ':' && sc.GetRelative(ln + 1) == ':') {
 							// final :: found, complete valid label construct
 							sc.ChangeState(SCE_LUA_LABEL);
@@ -268,7 +269,7 @@ _label_identifier:
 					sc.Forward();
 				}
 			} else if (sc.ch == ']') {
-				int sep = LongDelimCheck(sc);
+				const int sep = LongDelimCheck(sc);
 				if (sep == 1 && sepCount == 1) {    // un-nest with ]]-only
 					nestLevel--;
 					sc.Forward();
@@ -415,7 +416,7 @@ static void FoldLuaDoc(Sci_PositionU startPos, Sci_Position length, int /* initS
 	}
 	// Fill in the real level of the next line, keeping the current flags as they will be filled in later
 
-	int flagsNext = styler.LevelAt(lineCurrent) & ~SC_FOLDLEVELNUMBERMASK;
+	const int flagsNext = styler.LevelAt(lineCurrent) & ~SC_FOLDLEVELNUMBERMASK;
 	styler.SetLevel(lineCurrent, levelPrev | flagsNext);
 }
 

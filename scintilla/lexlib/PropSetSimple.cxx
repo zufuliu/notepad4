@@ -21,11 +21,11 @@ namespace {
 
 typedef std::map<std::string, std::string> mapss;
 
-inline mapss *PropsFromPointer(void *impl) {
+inline mapss *PropsFromPointer(void *impl) noexcept {
 	return static_cast<mapss *>(impl);
 }
 
-inline bool IsASpaceCharacter(unsigned int ch) {
+constexpr bool IsASpaceCharacter(unsigned int ch) noexcept {
 	return (ch == ' ') || ((ch >= 0x09) && (ch <= 0x0d));
 }
 
@@ -91,9 +91,9 @@ const char *PropSetSimple::Get(const char *key) const {
 // for that, through a recursive function and a simple chain of pointers.
 
 struct VarChain {
-	VarChain(const char *var_ = nullptr, const VarChain *link_ = nullptr) : var(var_), link(link_) {}
+	VarChain(const char *var_ = nullptr, const VarChain *link_ = nullptr) noexcept : var(var_), link(link_) {}
 
-	bool contains(const char *testVar) const {
+	bool contains(const char *testVar) const noexcept {
 		return (var && (0 == strcmp(var, testVar)))
 			|| (link && link->contains(testVar));
 	}

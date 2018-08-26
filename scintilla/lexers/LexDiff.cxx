@@ -97,7 +97,7 @@ static void ColouriseDiffDoc(Sci_PositionU startPos, Sci_Position length, int, L
 	styler.StartAt(startPos);
 	styler.StartSegment(startPos);
 	Sci_PositionU linePos = 0;
-	Sci_PositionU endPos = startPos + length;
+	const Sci_PositionU endPos = startPos + length;
 	for (Sci_PositionU i = startPos; i < endPos; i++) {
 		if (IsLexAtEOL(i, styler)) {
 			if (linePos < DIFF_BUFFER_START_SIZE) {

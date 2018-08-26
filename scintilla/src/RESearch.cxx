@@ -267,7 +267,7 @@ RESearch::~RESearch() {
 	Clear();
 }
 
-void RESearch::Clear() {
+void RESearch::Clear() noexcept {
 	for (int i = 0; i < MAXTAG; i++) {
 		pat[i].clear();
 		bopat[i] = NOTFOUND;
@@ -278,7 +278,7 @@ void RESearch::Clear() {
 void RESearch::GrabMatches(const CharacterIndexer &ci) {
 	for (unsigned int i = 0; i < MAXTAG; i++) {
 		if ((bopat[i] != NOTFOUND) && (eopat[i] != NOTFOUND)) {
-			Sci::Position len = eopat[i] - bopat[i];
+			const Sci::Position len = eopat[i] - bopat[i];
 			pat[i].resize(len);
 			for (Sci::Position j = 0; j < len; j++) {
 				pat[i][j] = ci.CharAt(bopat[i] + j);
@@ -287,11 +287,11 @@ void RESearch::GrabMatches(const CharacterIndexer &ci) {
 	}
 }
 
-void RESearch::ChSet(unsigned char c) {
+void RESearch::ChSet(unsigned char c) noexcept {
 	bittab[((c)& BLKIND) >> 3] |= bitarr[(c)& BITIND];
 }
 
-void RESearch::ChSetWithCase(unsigned char c, bool caseSensitive) {
+void RESearch::ChSetWithCase(unsigned char c, bool caseSensitive) noexcept {
 	ChSet(c);
 	if (!caseSensitive) {
 		if ((c >= 'a') && (c <= 'z')) {
@@ -302,7 +302,7 @@ void RESearch::ChSetWithCase(unsigned char c, bool caseSensitive) {
 	}
 }
 
-static inline unsigned char escapeValue(unsigned char ch) {
+static inline unsigned char escapeValue(unsigned char ch) noexcept {
 	switch (ch) {
 	case 'a':	return '\a';
 	case 'b':	return '\b';
@@ -315,7 +315,7 @@ static inline unsigned char escapeValue(unsigned char ch) {
 	return 0;
 }
 
-static int GetHexaChar(unsigned char hd1, unsigned char hd2) {
+static int GetHexaChar(unsigned char hd1, unsigned char hd2) noexcept {
 	int hexValue = 0;
 	if (hd1 >= '0' && hd1 <= '9') {
 		hexValue += 16 * (hd1 - '0');
@@ -348,7 +348,7 @@ static int GetHexaChar(unsigned char hd1, unsigned char hd2) {
  */
 int RESearch::GetBackslashExpression(
 	const char *pattern,
-	int &incr) {
+	int &incr) noexcept {
 	// Since error reporting is primitive and messages are not used anyway,
 	// I choose to interpret unexpected syntax in a logical way instead
 	// of reporting errors. Otherwise, we can stick on, eg., PCRE behavior.
@@ -432,11 +432,11 @@ int RESearch::GetBackslashExpression(
 	return result;
 }
 
-const char *RESearch::Compile(const char *pattern, Sci::Position length, bool caseSensitive, bool posix) {
+const char *RESearch::Compile(const char *pattern, Sci::Position length, bool caseSensitive, bool posix) noexcept {
 	char *mp = nfa;          /* nfa pointer       */
 	char *lp;              /* saved pointer     */
 	char *sp = nfa;          /* another one       */
-	char *mpMax = mp + MAXNFA - BITBLK - 10;
+	const char *mpMax = mp + MAXNFA - BITBLK - 10;
 
 	int tagi = 0;          /* tag stack index   */
 	int tagc = 1;          /* actual tag count  */
@@ -558,7 +558,7 @@ const char *RESearch::Compile(const char *pattern, Sci::Position length, bool ca
 					i++;
 					p++;
 					int incr;
-					int c = GetBackslashExpression(p, incr);
+					const int c = GetBackslashExpression(p, incr);
 					i += incr;
 					p += incr;
 					if (c >= 0) {
@@ -839,7 +839,7 @@ int RESearch::Execute(const CharacterIndexer &ci, Sci::Position lp, Sci::Positio
 
 //extern void re_fail(char *,char);
 
-static inline int isinset(const char *ap, unsigned char c) {
+static inline int isinset(const char *ap, unsigned char c) noexcept {
 	return ap[(c & BLKIND) >> 3] & bitarr[c & BITIND];
 }
 

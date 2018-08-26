@@ -82,7 +82,7 @@ _label_identifier:
 				sc.GetCurrent(s, sizeof(s));
 				if (keywords.InList(s)) {
 					sc.ChangeState(SCE_V_WORD);
-				} else if (s[0] == '$' && keywords2.InList(&s[1])) { // $ System Tasks and Functions
+				} else if (s[0] == '$' && keywords2.InList(s + 1)) { // $ System Tasks and Functions
 					sc.ChangeState(SCE_V_WORD2);
 				} else if (keywords3.InList(s)) {
 					sc.ChangeState(SCE_V_WORD3);
@@ -153,7 +153,7 @@ _label_identifier:
 	sc.Complete();
 }
 
-static bool IsStreamCommentStyle(int style) noexcept {
+static constexpr bool IsStreamCommentStyle(int style) noexcept {
 	return style == SCE_V_COMMENT;
 }
 #define IsCommentLine(line) IsLexCommentLine(line, styler, MultiStyle(SCE_V_COMMENTLINE, SCE_V_COMMENTLINEBANG))
@@ -166,7 +166,7 @@ static void FoldVerilogDoc(Sci_PositionU startPos, Sci_Position length, int init
 	const bool foldCompact = styler.GetPropertyInt("fold.compact", 0) != 0;
 	const bool foldAtElse = styler.GetPropertyInt("fold.at.else", 0) != 0;
 
-	Sci_PositionU endPos = startPos + length;
+	const Sci_PositionU endPos = startPos + length;
 	int visibleChars = 0;
 	Sci_Position lineCurrent = styler.GetLine(startPos);
 	int levelCurrent = SC_FOLDLEVELBASE;
@@ -180,12 +180,12 @@ static void FoldVerilogDoc(Sci_PositionU startPos, Sci_Position length, int init
 	int styleNext = styler.StyleAt(startPos);
 
 	for (Sci_PositionU i = startPos; i < endPos; i++) {
-		char ch = chNext;
+		const char ch = chNext;
 		chNext = styler.SafeGetCharAt(i + 1);
-		int stylePrev = style;
+		const int stylePrev = style;
 		style = styleNext;
 		styleNext = styler.StyleAt(i + 1);
-		bool atEOL = (ch == '\r' && chNext != '\n') || (ch == '\n');
+		const bool atEOL = (ch == '\r' && chNext != '\n') || (ch == '\n');
 
 		if (foldComment && IsStreamCommentStyle(style)) {
 			if (!IsStreamCommentStyle(stylePrev)) {
@@ -201,7 +201,7 @@ static void FoldVerilogDoc(Sci_PositionU startPos, Sci_Position length, int init
 				levelNext--;
 		}
 		if (foldPreprocessor && ch == '`' && (style == SCE_V_PREPROCESSOR)) {
-			Sci_Position pos = LexSkipSpaceTab(i + 1, endPos, styler);
+			const Sci_Position pos = LexSkipSpaceTab(i + 1, endPos, styler);
 			if (styler.Match(pos, "if")) {
 				levelNext++;
 			} else if (styler.Match(pos, "end")) {
@@ -216,7 +216,7 @@ static void FoldVerilogDoc(Sci_PositionU startPos, Sci_Position length, int init
 			}
 		}
 		if (style == SCE_V_WORD && stylePrev != SCE_V_WORD) {
-			Sci_PositionU j = i;
+			const Sci_PositionU j = i;
 			if (styler.Match(j, "case") ||
 				styler.Match(j, "class") || styler.Match(j, "function") || styler.Match(j, "generate") ||
 				styler.Match(j, "covergroup") || styler.Match(j, "package") || styler.Match(j, "primitive") ||

@@ -80,10 +80,10 @@ void DrawWrapMarker(Surface *surface, const PRectangle &rcPlace,
 		int xDir;
 		int yBase;
 		int yDir;
-		void MoveTo(int xRelative, int yRelative) {
+		void MoveTo(int xRelative, int yRelative) noexcept {
 			surface->MoveTo(xBase + xDir * xRelative, yBase + yDir * yRelative);
 		}
-		void LineTo(int xRelative, int yRelative) {
+		void LineTo(int xRelative, int yRelative) noexcept {
 			surface->LineTo(xBase + xDir * xRelative, yBase + yDir * yRelative);
 		}
 	};
@@ -103,12 +103,12 @@ void DrawWrapMarker(Surface *surface, const PRectangle &rcPlace,
 		y - 2 * dy);
 }
 
-MarginView::MarginView() {
+MarginView::MarginView() noexcept {
 	wrapMarkerPaddingRight = 3;
 	customDrawWrapMarker = nullptr;
 }
 
-void MarginView::DropGraphics(bool freeObjects) {
+void MarginView::DropGraphics(bool freeObjects) noexcept {
 	if (freeObjects) {
 		pixmapSelMargin.reset();
 		pixmapSelPattern.reset();

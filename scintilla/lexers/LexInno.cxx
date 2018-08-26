@@ -44,14 +44,14 @@ static void ColouriseInnoDoc(Sci_PositionU startPos, Sci_Position length, int, L
 	static bool sectionFound = false;
 	char ch = 0;
 	char chNext = styler[startPos];
-	Sci_PositionU lengthDoc = startPos + length;
+	const Sci_PositionU lengthDoc = startPos + length;
 	char *buffer = new char[length + 1];
 	Sci_Position bufferCount = 0;
-	bool isBOL, isEOL, isWS, isBOLWS = false;
+	bool isBOLWS = false;
 	bool isCStyleComment = false;
 
 	Sci_Position curLine = styler.GetLine(startPos);
-	Sci_Position curLineState = curLine > 0 ? styler.GetLineState(curLine - 1) : 0;
+	const Sci_Position curLineState = curLine > 0 ? styler.GetLineState(curLine - 1) : 0;
 	bool isCode = (curLineState == 1);
 
 	// Go through all provided text segment
@@ -69,10 +69,10 @@ static void ColouriseInnoDoc(Sci_PositionU startPos, Sci_Position length, int, L
 			continue;
 		}
 
-		isBOL = (chPrev == 0) || (chPrev == '\n') || (chPrev == '\r' && ch != '\n');
+		const bool isBOL = (chPrev == 0) || (chPrev == '\n') || (chPrev == '\r' && ch != '\n');
 		isBOLWS = (isBOL) ? true : (isBOLWS && (chPrev == ' ' || chPrev == '\t'));
-		isEOL = (ch == '\n' || ch == '\r');
-		isWS = (ch == ' ' || ch == '\t');
+		const bool isEOL = (ch == '\n' || ch == '\r');
+		const bool isWS = (ch == ' ' || ch == '\t');
 
 		if ((ch == '\r' && chNext != '\n') || (ch == '\n')) {
 			// Remember the line state for future incremental lexing
@@ -110,7 +110,7 @@ static void ColouriseInnoDoc(Sci_PositionU startPos, Sci_Position length, int, L
 			} else if (ch == '\'') {
 				// Start of a single-quote string
 				state = SCE_INNO_STRING_SINGLE;
-			} else if (IsASCII(ch) && (isalpha(ch) || (ch == '_'))) {
+			} else if (IsAlpha(ch) || ch == '_') {
 				// Start of an identifier
 				bufferCount = 0;
 				buffer[bufferCount++] = static_cast<char>(tolower(ch));
@@ -129,7 +129,7 @@ static void ColouriseInnoDoc(Sci_PositionU startPos, Sci_Position length, int, L
 			break;
 
 		case SCE_INNO_IDENTIFIER:
-			if (IsASCII(ch) && (isalnum(ch) || (ch == '_'))) {
+			if (IsAlphaNumeric(ch) || ch == '_') {
 				buffer[bufferCount++] = static_cast<char>(tolower(ch));
 			} else {
 				state = SCE_INNO_DEFAULT;
@@ -166,7 +166,7 @@ static void ColouriseInnoDoc(Sci_PositionU startPos, Sci_Position length, int, L
 				} else {
 					styler.ColourTo(i, SCE_INNO_DEFAULT);
 				}
-			} else if (IsASCII(ch) && (isalnum(ch) || (ch == '_'))) {
+			} else if (IsAlphaNumeric(ch) || ch == '_') {
 				buffer[bufferCount++] = static_cast<char>(tolower(ch));
 			} else {
 				state = SCE_INNO_DEFAULT;
@@ -176,7 +176,7 @@ static void ColouriseInnoDoc(Sci_PositionU startPos, Sci_Position length, int, L
 
 		case SCE_INNO_PREPROC:
 			if (isWS || isEOL) {
-				if (IsASCII(chPrev) && isalpha(chPrev)) {
+				if (IsAlpha(chPrev)) {
 					state = SCE_INNO_DEFAULT;
 					buffer[bufferCount] = '\0';
 
@@ -191,7 +191,7 @@ static void ColouriseInnoDoc(Sci_PositionU startPos, Sci_Position length, int, L
 					chNext = styler[i--];
 					ch = chPrev;
 				}
-			} else if (IsASCII(ch) && isalpha(ch)) {
+			} else if (IsAlpha(ch)) {
 				if (chPrev == '#' || chPrev == ' ' || chPrev == '\t')
 					bufferCount = 0;
 				buffer[bufferCount++] = static_cast<char>(tolower(ch));
@@ -243,13 +243,13 @@ static void ColouriseInnoDoc(Sci_PositionU startPos, Sci_Position length, int, L
 
 #define LexMatchIC(pos, str)	LexMatchIgnoreCase(pos, styler, str)
 #define IsCommentLine(line)		IsLexCommentLine(line, styler, SCE_INNO_COMMENT)
-static inline bool IsStreamCommentStyle(int style) noexcept {
+static constexpr  bool IsStreamCommentStyle(int style) noexcept {
 	return style == SCE_INNO_COMMENT_PASCAL;
 }
-static bool IsSectionEnd(Sci_Position curPos, Accessor &styler) {
-	Sci_Position curLine = styler.GetLine(curPos);
-	Sci_Position pos = LexSkipSpaceTab(styler.LineStart(curLine + 1), styler.LineStart(curLine + 2) - 1, styler);
-	char ch = styler.SafeGetCharAt(pos);
+static bool IsSectionEnd(Sci_Position curPos, Accessor &styler) noexcept {
+	const Sci_Position curLine = styler.GetLine(curPos);
+	const Sci_Position pos = LexSkipSpaceTab(styler.LineStart(curLine + 1), styler.LineStart(curLine + 2) - 1, styler);
+	const char ch = styler.SafeGetCharAt(pos);
 	if (ch == '[' && styler.StyleAt(pos) == SCE_INNO_SECTION)
 		return true;
 	return false;
@@ -262,7 +262,7 @@ static void FoldInnoDoc(Sci_PositionU startPos, Sci_Position length, int initSty
 	const bool foldPreprocessor = styler.GetPropertyInt("fold.preprocessor", 1) != 0;
 	//const bool foldCompact = styler.GetPropertyInt("fold.compact", 0) != 0;
 
-	Sci_PositionU endPos = startPos + length;
+	const Sci_PositionU endPos = startPos + length;
 	static Sci_Position sectionFound = -1;
 	//int visibleChars = 0;
 	Sci_Position lineCurrent = styler.GetLine(startPos);
@@ -276,12 +276,12 @@ static void FoldInnoDoc(Sci_PositionU startPos, Sci_Position length, int initSty
 	int style = initStyle;
 
 	for (Sci_PositionU i = startPos; i < endPos; i++) {
-		char ch = chNext;
+		const char ch = chNext;
 		chNext = styler.SafeGetCharAt(i + 1);
-		int stylePrev = style;
+		const int stylePrev = style;
 		style = styleNext;
 		styleNext = styler.StyleAt(i + 1);
-		bool atEOL = (ch == '\r' && chNext != '\n') || (ch == '\n');
+		const bool atEOL = (ch == '\r' && chNext != '\n') || (ch == '\n');
 
 		if (foldComment && IsStreamCommentStyle(style)) {
 			if (!IsStreamCommentStyle(stylePrev)) {
@@ -298,7 +298,7 @@ static void FoldInnoDoc(Sci_PositionU startPos, Sci_Position length, int initSty
 		}
 
 		if (ch == '[' && style == SCE_INNO_SECTION) {
-			Sci_Position curLine = styler.GetLine(i);
+			const Sci_Position curLine = styler.GetLine(i);
 			if (sectionFound == -1 || sectionFound > curLine)
 				sectionFound = curLine;
 			levelNext++;
@@ -308,7 +308,7 @@ static void FoldInnoDoc(Sci_PositionU startPos, Sci_Position length, int initSty
 		}
 
 		if (foldPreprocessor && ch == '#' && style == SCE_INNO_PREPROC) {
-			Sci_Position pos = LexSkipSpaceTab(i + 1, endPos, styler);
+			const Sci_Position pos = LexSkipSpaceTab(i + 1, endPos, styler);
 			if (LexMatchIC(pos, "if")) {
 				levelNext++;
 			} else if (LexMatchIC(pos, "end")) {
@@ -328,7 +328,7 @@ static void FoldInnoDoc(Sci_PositionU startPos, Sci_Position length, int initSty
 		//if (!isspacechar(ch))
 		//	visibleChars++;
 		if (atEOL || (i == endPos - 1)) {
-			int levelUse = levelCurrent;
+			const int levelUse = levelCurrent;
 			int lev = levelUse | levelNext << 16;
 			//if (visibleChars == 0 && foldCompact)
 			//	lev |= SC_FOLDLEVELWHITEFLAG;

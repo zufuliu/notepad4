@@ -86,7 +86,7 @@ static int getBashNumberBase(const char *s) noexcept {
 	0
 };*/
 
-static int GlobScan(StyleContext &sc) {
+static int GlobScan(StyleContext &sc) noexcept {
 	// forward scan for zsh globs, disambiguate versus bash arrays
 	// complex expressions may still fail, e.g. unbalanced () '' "" etc
 	int c, sLen = 0;
@@ -137,7 +137,7 @@ static void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int in
 
 	int numBase = 0;
 	int digit;
-	Sci_PositionU endPos = startPos + length;
+	const Sci_PositionU endPos = startPos + length;
 	int cmdState = BASH_CMD_START;
 	int testExprType = 0;
 
@@ -181,7 +181,7 @@ static void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int in
 		int cmdStateNew = BASH_CMD_BODY;
 		if (cmdState == BASH_CMD_TEST || cmdState == BASH_CMD_ARITH || cmdState == BASH_CMD_WORD)
 			cmdStateNew = cmdState;
-		int stylePrev = sc.state;
+		const int stylePrev = sc.state;
 
 		// Determine if the current state should terminate.
 		switch (sc.state) {
@@ -201,7 +201,7 @@ static void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int in
 				// allow keywords ending in a whitespace or command delimiter
 				s2[0] = static_cast<char>(sc.ch);
 				s2[1] = '\0';
-				bool keywordEnds = IsASpace(sc.ch) || cmdDelimiter.InList(s2);
+				const bool keywordEnds = IsASpace(sc.ch) || cmdDelimiter.InList(s2);
 				// 'in' or 'do' may be construct keywords
 				if (cmdState == BASH_CMD_WORD) {
 					if (strcmp(s, "in") == 0 && keywordEnds)
@@ -626,7 +626,7 @@ static void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int in
 				sc.SetState(SCE_SH_OPERATOR);
 				// globs have no whitespace, do not appear in arithmetic expressions
 				if (cmdState != BASH_CMD_ARITH && sc.ch == '(' && sc.chNext != '(') {
-					int i = GlobScan(sc);
+					const int i = GlobScan(sc);
 					if (i > 1) {
 						sc.SetState(SCE_SH_IDENTIFIER);
 						sc.Forward(i);
@@ -704,7 +704,7 @@ static void FoldBashDoc(Sci_PositionU startPos, Sci_Position length, int, LexerW
 		return;
 	const bool foldComment = styler.GetPropertyInt("fold.comment") != 0;
 	const bool foldCompact = styler.GetPropertyInt("fold.compact", 1) != 0;
-	Sci_PositionU endPos = startPos + length;
+	const Sci_PositionU endPos = startPos + length;
 	int visibleChars = 0;
 	int skipHereCh = 0;
 	Sci_Position lineCurrent = styler.GetLine(startPos);
@@ -715,11 +715,11 @@ static void FoldBashDoc(Sci_PositionU startPos, Sci_Position length, int, LexerW
 	char word[128] = { 0 };
 	int wordlen = 0;
 	for (Sci_PositionU i = startPos; i < endPos; i++) {
-		char ch = chNext;
+		const char ch = chNext;
 		chNext = styler.SafeGetCharAt(i + 1);
-		int style = styleNext;
+		const int style = styleNext;
 		styleNext = styler.StyleAt(i + 1);
-		bool atEOL = (ch == '\r' && chNext != '\n') || (ch == '\n');
+		const bool atEOL = (ch == '\r' && chNext != '\n') || (ch == '\n');
 		// Comment folding
 		if (foldComment && atEOL && IsCommentLine(lineCurrent)) {
 			if (!IsCommentLine(lineCurrent - 1) && IsCommentLine(lineCurrent + 1))
@@ -785,7 +785,7 @@ static void FoldBashDoc(Sci_PositionU startPos, Sci_Position length, int, LexerW
 		}
 	}
 	// Fill in the real level of the next line, keeping the current flags as they will be filled in later
-	int flagsNext = styler.LevelAt(lineCurrent) & ~SC_FOLDLEVELNUMBERMASK;
+	const int flagsNext = styler.LevelAt(lineCurrent) & ~SC_FOLDLEVELNUMBERMASK;
 	styler.SetLevel(lineCurrent, levelPrev | flagsNext);
 }
 

@@ -23,7 +23,7 @@
 
 using namespace Scintilla;
 
-static inline PRectangle PixelGridAlign(const PRectangle &rc) {
+static inline PRectangle PixelGridAlign(const PRectangle &rc) noexcept {
 	// Move left and right side to nearest pixel to avoid blurry visuals
 	return PRectangle(round(rc.left), floor(rc.top),
 		round(rc.right), floor(rc.bottom));
@@ -164,7 +164,7 @@ void Indicator::Draw(Surface *surface, const PRectangle &rc, const PRectangle &r
 		PRectangle rcBox = PixelGridAlign(rc);
 		rcBox.top = rcLine.top + 1;
 		rcBox.bottom = rcLine.bottom;
-		IntegerRectangle ircBox(rcBox);
+		const IntegerRectangle ircBox(rcBox);
 		// Cap width at 4000 to avoid large allocations when mistakes made
 		const int width = std::min(ircBox.Width(), 4000);
 		RGBAImage image(width, ircBox.Height(), 1.0, nullptr);
@@ -220,6 +220,6 @@ void Indicator::Draw(Surface *surface, const PRectangle &rc, const PRectangle &r
 	}
 }
 
-void Indicator::SetFlags(int attributes_) {
+void Indicator::SetFlags(int attributes_) noexcept {
 	attributes = attributes_;
 }

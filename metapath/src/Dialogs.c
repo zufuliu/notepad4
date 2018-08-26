@@ -40,10 +40,8 @@
 extern HWND hwndMain;
 
 int ErrorMessage(int iLevel, UINT uIdMsg, ...) {
-	WCHAR szText [256 * 2];
+	WCHAR szText[256 * 2];
 	WCHAR szTitle[256 * 2];
-	WCHAR *c;
-	int iIcon;
 	HWND hwnd;
 	va_list va;
 
@@ -55,7 +53,7 @@ int ErrorMessage(int iLevel, UINT uIdMsg, ...) {
 	wvsprintf(szTitle, szText, va);
 	va_end(va);
 
-	c = StrChr(szTitle, L'\n');
+	WCHAR *c = StrChr(szTitle, L'\n');
 	if (c) {
 		lstrcpy(szText, (c + 1));
 		*c = L'\0';
@@ -64,12 +62,11 @@ int ErrorMessage(int iLevel, UINT uIdMsg, ...) {
 		lstrcpy(szTitle, L"");
 	}
 
-	iIcon = (iLevel > 1) ? MB_ICONEXCLAMATION : MB_ICONINFORMATION;
-
 	if ((hwnd = GetActiveWindow()) == NULL) {
 		hwnd = hwndMain;
 	}
 
+	const int iIcon = (iLevel > 1) ? MB_ICONEXCLAMATION : MB_ICONINFORMATION;
 	PostMessage(hwndMain, APPM_CENTER_MESSAGE_BOX, (WPARAM)hwnd, 0);
 	return MessageBoxEx(hwnd, szText, szTitle, MB_SETFOREGROUND | iIcon, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT));
 }
@@ -92,7 +89,6 @@ int CALLBACK BFFCallBack(HWND hwnd, UINT umsg, LPARAM lParam, LPARAM lpData) {
 //
 BOOL GetDirectory(HWND hwndParent, int iTitle, LPWSTR pszFolder, LPCWSTR pszBase) {
 	BROWSEINFO bi;
-	LPITEMIDLIST pidl;
 	WCHAR szTitle[256];
 	WCHAR szBase[MAX_PATH];
 	BOOL fOk = FALSE;
@@ -100,7 +96,7 @@ BOOL GetDirectory(HWND hwndParent, int iTitle, LPWSTR pszFolder, LPCWSTR pszBase
 	lstrcpy(szTitle, L"");
 	GetString(iTitle, szTitle, COUNTOF(szTitle));
 
-	if (!pszBase || !*pszBase) {
+	if (StrIsEmpty(pszBase)) {
 		GetCurrentDirectory(MAX_PATH, szBase);
 	} else {
 		lstrcpy(szBase, pszBase);
@@ -115,7 +111,7 @@ BOOL GetDirectory(HWND hwndParent, int iTitle, LPWSTR pszFolder, LPCWSTR pszBase
 	bi.lParam = (LPARAM)szBase;
 	bi.iImage = 0;
 
-	pidl = SHBrowseForFolder(&bi);
+	LPITEMIDLIST pidl = SHBrowseForFolder(&bi);
 	if (pidl) {
 		SHGetPathFromIDList(pidl, pszFolder);
 		CoTaskMemFree((LPVOID)pidl);
@@ -131,7 +127,7 @@ BOOL GetDirectory(HWND hwndParent, int iTitle, LPWSTR pszFolder, LPCWSTR pszBase
 //
 BOOL GetDirectory2(HWND hwndParent, int iTitle, LPWSTR pszFolder, int iBase) {
 	BROWSEINFO bi;
-	LPITEMIDLIST pidl, pidlRoot;
+	LPITEMIDLIST pidlRoot;
 	WCHAR szTitle[256];
 	BOOL fOk = FALSE;
 
@@ -152,7 +148,7 @@ BOOL GetDirectory2(HWND hwndParent, int iTitle, LPWSTR pszFolder, int iBase) {
 	bi.lParam = (LPARAM)0;
 	bi.iImage = 0;
 
-	pidl = SHBrowseForFolder(&bi);
+	LPITEMIDLIST pidl = SHBrowseForFolder(&bi);
 	if (pidl) {
 		SHGetPathFromIDList(pidl, pszFolder);
 		CoTaskMemFree((LPVOID)pidl);
@@ -255,19 +251,19 @@ INT_PTR CALLBACK RunDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) 
 
 		case IDOK: {
 			WCHAR arg1[MAX_PATH];
-			WCHAR arg2[MAX_PATH];
-			SHELLEXECUTEINFO sei;
 
 			if (GetDlgItemText(hwnd, IDC_COMMANDLINE, arg1, MAX_PATH)) {
+				WCHAR arg2[MAX_PATH];
 				if (*arg1 == L'/') {
 					EndDialog(hwnd, IDOK);
 					// Call DisplayPath() when dialog ended
-					ExtractFirstArgument(&arg1[1], arg1, arg2);
+					ExtractFirstArgument(arg1 + 1, arg1, arg2);
 					DisplayPath(arg1, IDS_ERR_CMDLINE);
 				} else {
 					ExpandEnvironmentStringsEx(arg1, COUNTOF(arg1));
 					ExtractFirstArgument(arg1, arg1, arg2);
 
+					SHELLEXECUTEINFO sei;
 					ZeroMemory(&sei, sizeof(SHELLEXECUTEINFO));
 					sei.cbSize = sizeof(SHELLEXECUTEINFO);
 					sei.fMask = 0;
@@ -326,7 +322,6 @@ INT_PTR CALLBACK GotoDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 		RECT rc;
 		WCHAR tch[64];
 		int cGrip;
-		FARPROC fp;
 
 		GetClientRect(hwnd, &rc);
 		cxClient = rc.right - rc.left;
@@ -368,10 +363,11 @@ INT_PTR CALLBACK GotoDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 		}
 
 		// since Windows Vista
-		if ((fp = GetProcAddress(GetModuleHandle(L"user32.dll"), "GetComboBoxInfo")) != NULL) {
+		FARPROC fpGetComboBoxInfo = GetProcAddress(GetModuleHandle(L"user32.dll"), "GetComboBoxInfo");
+		if (fpGetComboBoxInfo != NULL) {
 			COMBOBOXINFO cbi;
 			cbi.cbSize = sizeof(COMBOBOXINFO);
-			if (fp(GetDlgItem(hwnd, IDC_GOTO), &cbi)) {
+			if (fpGetComboBoxInfo(GetDlgItem(hwnd, IDC_GOTO), &cbi)) {
 				SHAutoComplete(cbi.hwndItem, SHACF_FILESYSTEM);
 			}
 		}
@@ -1268,7 +1264,7 @@ INT_PTR CALLBACK GetFilterDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lP
 					if (IniGetString(L"Filters", tchName, L"", tchValue, COUNTOF(tchValue))) {
 						if (tchValue[0] == L'-') { // Negative Filter
 							if (tchValue[1]) {
-								SetDlgItemText(hwnd, IDC_FILTER, &tchValue[1]);
+								SetDlgItemText(hwnd, IDC_FILTER, tchValue + 1);
 								CheckDlgButton(hwnd, IDC_NEGFILTER, TRUE);
 							} else {
 								MessageBeep(0);
@@ -1394,8 +1390,6 @@ INT_PTR CALLBACK RenameFileDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 BOOL RenameFileDlg(HWND hwnd) {
 	DLITEM dli;
 	FILEOPDLGDATA fod;
-	SHFILEOPSTRUCT shfos;
-	WCHAR tchSource[MAX_PATH + 4];
 
 	dli.mask = DLI_FILENAME;
 	if (DirList_GetItem(hwndDirList, -1, &dli) != -1) {
@@ -1405,8 +1399,11 @@ BOOL RenameFileDlg(HWND hwnd) {
 	}
 
 	if (IDOK == ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_RENAME), hwnd, RenameFileDlgProc, (LPARAM)&fod)) {
+		SHFILEOPSTRUCT shfos;
+		WCHAR tchSource[MAX_PATH + 4];
 		WCHAR szFullDestination[MAX_PATH];
 		WCHAR tchDestination[MAX_PATH + 4];
+
 		ZeroMemory(&shfos, sizeof(SHFILEOPSTRUCT));
 		shfos.hwnd = hwnd;
 		shfos.wFunc = FO_RENAME;
@@ -1645,10 +1642,6 @@ INT_PTR CALLBACK CopyMoveDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPa
 BOOL CopyMoveDlg(HWND hwnd, UINT *wFunc) {
 	DLITEM dli;
 	FILEOPDLGDATA fod;
-	SHFILEOPSTRUCT shfos;
-
-	WCHAR tchSource[MAX_PATH + 4];
-	WCHAR tchDestination[MAX_PATH + 4];
 
 	fod.wFunc = *wFunc;
 
@@ -1660,6 +1653,10 @@ BOOL CopyMoveDlg(HWND hwnd, UINT *wFunc) {
 	}
 
 	if (IDOK == ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_COPYMOVE), hwnd, CopyMoveDlgProc, (LPARAM)&fod)) {
+		SHFILEOPSTRUCT shfos;
+		WCHAR tchSource[MAX_PATH + 4];
+		WCHAR tchDestination[MAX_PATH + 4];
+
 		ZeroMemory(&shfos, sizeof(SHFILEOPSTRUCT));
 		shfos.hwnd = hwnd;
 		shfos.wFunc = fod.wFunc;
@@ -1961,7 +1958,7 @@ BOOL OpenWithDlg(HWND hwnd, LPDLITEM lpdliParam) {
 				lstrcpy(szParam, lpdliParam->szFileName);
 			}
 
-			GetShortPathName(szParam, szParam, sizeof(WCHAR)*COUNTOF(szParam));
+			GetShortPathName(szParam, szParam, COUNTOF(szParam));
 			ShellExecuteEx(&sei);
 			return TRUE;
 		}
@@ -2132,7 +2129,7 @@ INT_PTR CALLBACK FindWinDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPar
 				SendMessage(hwnd, WM_LBUTTONUP, 0, 0);
 			} else {
 				if (LOWORD(wParam) == IDOK) {
-					WCHAR tch[256] = L"";
+					WCHAR tch[MAX_PATH] = L"";
 					if (GetDlgItemText(hwnd, IDC_WINMODULE, tch, COUNTOF(tch))) {
 						PathRelativeToApp(tch, tch, COUNTOF(tch), TRUE, TRUE, flagPortableMyDocs);
 						PathQuoteSpaces(tch);
@@ -2173,7 +2170,7 @@ extern WCHAR szDDEApp[256];
 extern WCHAR szDDETopic[256];
 
 INT_PTR CALLBACK FindTargetDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
-	static WCHAR szTargetWndClass[256];
+	static WCHAR szTargetWndClass[256] = L"";
 
 	switch (umsg) {
 	case WM_INITDIALOG: {

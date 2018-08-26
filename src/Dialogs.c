@@ -176,7 +176,7 @@ BOOL GetDirectory(HWND hwndParent, int iTitle, LPWSTR pszFolder, LPCWSTR pszBase
 	lstrcpy(szTitle, L"");
 	GetString(iTitle, szTitle, COUNTOF(szTitle));
 
-	if (!pszBase || !*pszBase) {
+	if (StrIsEmpty(pszBase)) {
 		GetCurrentDirectory(MAX_PATH, szBase);
 	} else {
 		lstrcpy(szBase, pszBase);
@@ -1006,7 +1006,7 @@ INT_PTR CALLBACK FileMRUDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPar
 
 		ResizeDlg_Size(hwnd, lParam, &dx, &dy);
 
-		hdwp = BeginDeferWindowPos(5);
+		hdwp = BeginDeferWindowPos(6);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDC_RESIZEGRIP, dx, dy, SWP_NOSIZE);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDOK, dx, dy, SWP_NOSIZE);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDCANCEL, dx, dy, SWP_NOSIZE);

@@ -32,9 +32,9 @@ public:
 	 * existing platforms must implement as empty. */
 	DrawWrapMarkerFn customDrawWrapMarker;
 
-	MarginView();
+	MarginView() noexcept;
 
-	void DropGraphics(bool freeObjects);
+	void DropGraphics(bool freeObjects) noexcept;
 	void AllocateGraphics(const ViewStyle &vsDraw);
 	void RefreshPixMaps(Surface *surfaceWindow, WindowID wid, const ViewStyle &vsDraw);
 	void PaintMargin(Surface *surface, Sci::Line topLine, const PRectangle &rc, const PRectangle &rcMargin,

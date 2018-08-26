@@ -251,11 +251,11 @@ static void ColourisePascalDoc(Sci_PositionU startPos, Sci_Position length, int 
 	sc.Complete();
 }
 
-static inline bool IsStreamCommentStyle(int style) noexcept {
+static constexpr bool IsStreamCommentStyle(int style) noexcept {
 	return style == SCE_PAS_COMMENT || style == SCE_PAS_COMMENT2;
 }
 
-static unsigned int GetFoldInPreprocessorLevelFlag(int lineFoldStateCurrent) noexcept {
+static constexpr unsigned int GetFoldInPreprocessorLevelFlag(int lineFoldStateCurrent) noexcept {
 	return lineFoldStateCurrent & stateFoldInPreprocessorLevelMask;
 }
 
@@ -367,7 +367,7 @@ static void ClassifyPascalWordFoldPoint(int &levelCurrent, int &lineFoldStateCur
 			ignoreKeyword = false;
 		}
 		if (!ignoreKeyword) {
-			Sci_PositionU k = LexSkipWhiteSpace(currentPos, endPos, styler);
+			const Sci_PositionU k = LexSkipWhiteSpace(currentPos, endPos, styler);
 			if (k < endPos && styler.SafeGetCharAt(k) == ';') {
 				// Handle forward interface declarations ("type IMyInterface = interface;")
 				ignoreKeyword = true;
@@ -379,7 +379,7 @@ static void ClassifyPascalWordFoldPoint(int &levelCurrent, int &lineFoldStateCur
 	} else if (strcmp(s, "dispinterface") == 0) {
 		// "dispinterface" keyword requires special handling...
 		bool ignoreKeyword = false;
-		Sci_PositionU j = LexSkipWhiteSpace(currentPos, endPos, styler);
+		const Sci_PositionU j = LexSkipWhiteSpace(currentPos, endPos, styler);
 		if (j < endPos && styler.SafeGetCharAt(j) == ';') {
 			// Handle forward dispinterface declarations ("type IMyInterface = dispinterface;")
 			ignoreKeyword = true;
@@ -404,7 +404,7 @@ static void FoldPascalDoc(Sci_PositionU startPos, Sci_Position length, int initS
 	const bool foldComment = styler.GetPropertyInt("fold.comment") != 0;
 	const bool foldPreprocessor = styler.GetPropertyInt("fold.preprocessor") != 0;
 	const bool foldCompact = styler.GetPropertyInt("fold.compact", 1) != 0;
-	Sci_PositionU endPos = startPos + length;
+	const Sci_PositionU endPos = startPos + length;
 	int visibleChars = 0;
 	Sci_Position lineCurrent = styler.GetLine(startPos);
 	int levelPrev = styler.LevelAt(lineCurrent) & SC_FOLDLEVELNUMBERMASK;
@@ -418,12 +418,12 @@ static void FoldPascalDoc(Sci_PositionU startPos, Sci_Position length, int initS
 	const CharacterSet setWord(CharacterSet::setAlphaNum, "_", 0x80, true);
 
 	for (Sci_PositionU i = startPos; i < endPos; i++) {
-		char ch = chNext;
+		const char ch = chNext;
 		chNext = styler.SafeGetCharAt(i + 1);
-		int stylePrev = style;
+		const int stylePrev = style;
 		style = styleNext;
 		styleNext = styler.StyleAt(i + 1);
-		bool atEOL = (ch == '\r' && chNext != '\n') || (ch == '\n');
+		const bool atEOL = (ch == '\r' && chNext != '\n') || (ch == '\n');
 
 		if (foldComment && IsStreamCommentStyle(style)) {
 			if (!IsStreamCommentStyle(stylePrev)) {
@@ -470,7 +470,7 @@ static void FoldPascalDoc(Sci_PositionU startPos, Sci_Position length, int initS
 			if (lev != styler.LevelAt(lineCurrent)) {
 				styler.SetLevel(lineCurrent, lev);
 			}
-			int newLineState = (styler.GetLineState(lineCurrent) & ~stateFoldMaskAll) | lineFoldStateCurrent;
+			const int newLineState = (styler.GetLineState(lineCurrent) & ~stateFoldMaskAll) | lineFoldStateCurrent;
 			styler.SetLineState(lineCurrent, newLineState);
 			lineCurrent++;
 			levelPrev = levelCurrent;

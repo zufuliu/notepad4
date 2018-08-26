@@ -20,7 +20,7 @@ class XPM {
 	std::vector<unsigned char> pixels;
 	ColourDesired colourCodeTable[256];
 	char codeTransparent = ' ';
-	ColourDesired ColourFromCode(int ch) const;
+	ColourDesired ColourFromCode(int ch) const noexcept;
 	void FillRun(Surface *surface, int code, int startX, int y, int x) const;
 public:
 	explicit XPM(const char *textForm);
@@ -34,10 +34,10 @@ public:
 	void Init(const char *const *linesForm);
 	/// Decompose image into runs and use FillRectangle for each run
 	void Draw(Surface *surface, const PRectangle &rc);
-	int GetHeight() const noexcept {
+	constexpr int GetHeight() const noexcept {
 		return height;
 	}
-	int GetWidth() const noexcept {
+	constexpr int GetWidth() const noexcept {
 		return width;
 	}
 	void PixelAt(int x, int y, ColourDesired &colour, bool &transparent) const;
@@ -62,13 +62,13 @@ public:
 	RGBAImage &operator=(const RGBAImage &) = delete;
 	RGBAImage &operator=(RGBAImage &&) = delete;
 	virtual ~RGBAImage();
-	int GetHeight() const noexcept {
+	constexpr int GetHeight() const noexcept {
 		return height;
 	}
-	int GetWidth() const noexcept {
+	constexpr int GetWidth() const noexcept {
 		return width;
 	}
-	float GetScale() const noexcept {
+	constexpr float GetScale() const noexcept {
 		return scale;
 	}
 	float GetScaledHeight() const noexcept {
@@ -77,9 +77,9 @@ public:
 	float GetScaledWidth() const noexcept {
 		return width / scale;
 	}
-	int CountBytes() const;
-	const unsigned char *Pixels() const;
-	void SetPixel(int x, int y, ColourDesired colour, int alpha);
+	int CountBytes() const noexcept;
+	const unsigned char *Pixels() const noexcept;
+	void SetPixel(int x, int y, ColourDesired colour, int alpha) noexcept;
 };
 
 /**
@@ -91,7 +91,7 @@ class RGBAImageSet {
 	mutable int height;	///< Memorize largest height of the set.
 	mutable int width;	///< Memorize largest width of the set.
 public:
-	RGBAImageSet();
+	RGBAImageSet() noexcept;
 	// Deleted so RGBAImageSet objects can not be copied.
 	RGBAImageSet(const RGBAImageSet &) = delete;
 	RGBAImageSet(RGBAImageSet &&) = delete;
@@ -99,7 +99,7 @@ public:
 	RGBAImageSet &operator=(RGBAImageSet &&) = delete;
 	~RGBAImageSet();
 	/// Remove all images.
-	void Clear();
+	void Clear() noexcept;
 	/// Add an image.
 	void Add(int ident, RGBAImage *image);
 	/// Get image by id.

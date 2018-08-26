@@ -168,7 +168,7 @@ int flagPosParam        = 0;
 //  WinMain()
 //
 //
-int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nCmdShow) {
+int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nShowCmd) {
 	MSG    msg;
 	HWND   hwnd;
 	HACCEL hAcc;
@@ -209,7 +209,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 		return FALSE;
 	}
 
-	if ((hwnd = InitInstance(hInstance, nCmdShow)) == NULL) {
+	if ((hwnd = InitInstance(hInstance, nShowCmd)) == NULL) {
 		return FALSE;
 	}
 
@@ -2178,7 +2178,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 					wsprintf(tch, L"%s | %s %s | %s", tchsize, tchdate, tchtime, tchattr);
 				} else {
 					WCHAR tchnum[64];
-					wsprintf(tchnum, L"%u", ListView_GetItemCount(hwndDirList));
+					wsprintf(tchnum, L"%i", ListView_GetItemCount(hwndDirList));
 					FormatNumberStr(tchnum);
 					FormatString(tch, COUNTOF(tch),
 								 (lstrcmp(tchFilter, L"*.*") || bNegFilter) ? IDS_NUMFILES2 : IDS_NUMFILES, tchnum);
@@ -2966,7 +2966,7 @@ int CreateIniFile(void) {
 }
 
 int CreateIniFileEx(LPCWSTR lpszIniFile) {
-	if (*lpszIniFile) {
+	if (StrNotEmpty(lpszIniFile)) {
 		HANDLE hFile;
 		WCHAR *pwchTail;
 

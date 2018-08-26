@@ -21,8 +21,8 @@
 #ifndef METAPATH_HELPERS_H_
 #define METAPATH_HELPERS_H_
 
-#define COUNTOF(ar)		(sizeof(ar)/sizeof(ar[0]))
-#define CSTRLEN(s)		(COUNTOF(s)-1)
+#define COUNTOF(ar)		(sizeof(ar)/sizeof((ar)[0]))
+#define CSTRLEN(s)		(COUNTOF(s) - 1)
 
 static inline int min_i(int x, int y) {
 	return (x < y) ? x : y;
@@ -134,8 +134,8 @@ LRESULT SendWMSize(HWND hwnd);
 #define EnableCmd(hmenu, id, b) EnableMenuItem(hmenu, id, (b)? (MF_BYCOMMAND | MF_ENABLED) : (MF_BYCOMMAND | MF_GRAYED))
 #define CheckCmd(hmenu, id, b)  CheckMenuItem(hmenu, id, (b)? (MF_BYCOMMAND | MF_CHECKED) : (MF_BYCOMMAND | MF_UNCHECKED))
 
-#define GetString(id,pb,cb) LoadString(g_hInstance, id, pb, cb)
-#define StrEnd(pStart) (pStart + lstrlen(pStart))
+#define GetString(id, pb, cb)	LoadString(g_hInstance, id, pb, cb)
+#define StrEnd(pStart)			((pStart) + lstrlen(pStart))
 
 int FormatString(LPWSTR lpOutput, int nOutput, UINT uIdFormat, ...);
 

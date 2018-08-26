@@ -16,11 +16,11 @@
 
 using namespace Scintilla;
 
-static inline bool IsCILOp(int ch) noexcept {
+static constexpr bool IsCILOp(int ch) noexcept {
 	return ch == '{' || ch == '}' || ch == '[' || ch == ']' || ch == '(' || ch == ')' || ch == '=' || ch == '&'
 		|| ch == ':' || ch == ',' || ch == '+' || ch == '-' || ch == '.';
 }
-static inline bool IsCILWordChar(int ch) noexcept {
+static constexpr bool IsCILWordChar(int ch) noexcept {
 	return iswordchar(ch) || ch == '-' || ch == '/' || ch == '$';
 }
 
@@ -35,7 +35,7 @@ static void ColouriseCILDoc(Sci_PositionU startPos, Sci_Position length, int ini
 	styler.StartAt(startPos);
 	styler.StartSegment(startPos);
 	Sci_PositionU endPos = startPos + length;
-	if (endPos == (Sci_PositionU)styler.Length())
+	if (endPos == static_cast<Sci_PositionU>(styler.Length()))
 		++endPos;
 
 	Sci_Position lineCurrent = styler.GetLine(startPos);
@@ -43,12 +43,12 @@ static void ColouriseCILDoc(Sci_PositionU startPos, Sci_Position length, int ini
 	int wordLen = 0;
 
 	for (Sci_PositionU i = startPos; i < endPos; i++) {
-		int chPrev = ch;
+		const int chPrev = ch;
 		ch = chNext;
 		chNext = styler.SafeGetCharAt(i + 1);
 
 		const bool atEOL = (ch == '\r' && chNext != '\n') || (ch == '\n');
-		const bool atLineStart = i == (Sci_PositionU)styler.LineStart(lineCurrent);
+		const bool atLineStart = i == static_cast<Sci_PositionU>(styler.LineStart(lineCurrent));
 		if (atEOL || i == endPos - 1) {
 			lineCurrent++;
 		}
@@ -86,7 +86,7 @@ static void ColouriseCILDoc(Sci_PositionU startPos, Sci_Position length, int ini
 				}
 				wordLen = 0;
 			} else if (wordLen < MAX_WORD_LENGTH) {
-				buf[wordLen++] = (char)ch;
+				buf[wordLen++] = static_cast<char>(ch);
 			}
 			break;
 		case SCE_C_STRING:
@@ -147,7 +147,7 @@ static void ColouriseCILDoc(Sci_PositionU startPos, Sci_Position length, int ini
 			} else if (iswordstart(ch)) {
 				styler.ColourTo(i - 1, state);
 				state = SCE_C_IDENTIFIER;
-				buf[wordLen++] = (char)ch;
+				buf[wordLen++] = static_cast<char>(ch);
 			} else if (IsCILOp(ch)) {
 				styler.ColourTo(i - 1, state);
 				state = SCE_C_OPERATOR;
@@ -167,7 +167,7 @@ static void FoldCILDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 	const bool foldComment = styler.GetPropertyInt("fold.comment") != 0;
 	const bool foldCompact = styler.GetPropertyInt("fold.compact", 1) != 0;
 
-	Sci_PositionU endPos = startPos + length;
+	const Sci_PositionU endPos = startPos + length;
 	int visibleChars = 0;
 	Sci_Position lineCurrent = styler.GetLine(startPos);
 	int levelCurrent = SC_FOLDLEVELBASE;
@@ -180,12 +180,12 @@ static void FoldCILDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 	int style = initStyle;
 
 	for (Sci_PositionU i = startPos; i < endPos; i++) {
-		int ch = chNext;
+		const int ch = chNext;
 		chNext = styler.SafeGetCharAt(i + 1);
-		int stylePrev = style;
+		const int stylePrev = style;
 		style = styleNext;
 		styleNext = styler.StyleAt(i + 1);
-		bool atEOL = (ch == '\r' && chNext != '\n') || (ch == '\n');
+		const bool atEOL = (ch == '\r' && chNext != '\n') || (ch == '\n');
 
 		if (foldComment && atEOL && IsCommentLine(lineCurrent)) {
 			if (!IsCommentLine(lineCurrent - 1) && IsCommentLine(lineCurrent + 1))
@@ -213,7 +213,7 @@ static void FoldCILDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 			visibleChars++;
 
 		if (atEOL || (i == endPos - 1)) {
-			int levelUse = levelCurrent;
+			const int levelUse = levelCurrent;
 			int lev = levelUse | levelNext << 16;
 			if (visibleChars == 0 && foldCompact)
 				lev |= SC_FOLDLEVELWHITEFLAG;

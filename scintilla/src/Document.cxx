@@ -78,7 +78,7 @@ void LexInterface::Colourise(Sci::Position start, Sci::Position end) {
 	}
 }
 
-int LexInterface::LineEndTypesSupported() const {
+int LexInterface::LineEndTypesSupported() const noexcept {
 	if (instance) {
 		return instance->LineEndTypesSupported();
 	}
@@ -103,7 +103,7 @@ Document::Document(int options) :
 	insertionSet = false;
 	tabInChars = 8;
 	indentInChars = 0;
-	actualIndentInChars = 8;
+	actualIndentInChars = 4;
 	useTabs = true;
 	tabIndents = true;
 	backspaceUnindents = false;
@@ -130,13 +130,13 @@ Document::~Document() {
 }
 
 // Increase reference count and return its previous value.
-int Document::AddRef() {
+int Document::AddRef() noexcept {
 	return refCount++;
 }
 
 // Decrease reference count and return its previous value.
 // Delete the document if reference count reaches zero.
-int SCI_METHOD Document::Release() {
+int SCI_METHOD Document::Release() noexcept {
 	const int curRefCount = --refCount;
 	if (curRefCount == 0)
 		delete this;
@@ -164,27 +164,27 @@ void Document::RemoveLine(Sci::Line line) {
 	}
 }
 
-LineMarkers *Document::Markers() const {
+LineMarkers *Document::Markers() const noexcept {
 	return static_cast<LineMarkers *>(perLineData[ldMarkers].get());
 }
 
-LineLevels *Document::Levels() const {
+LineLevels *Document::Levels() const noexcept {
 	return static_cast<LineLevels *>(perLineData[ldLevels].get());
 }
 
-LineState *Document::States() const {
+LineState *Document::States() const noexcept {
 	return static_cast<LineState *>(perLineData[ldState].get());
 }
 
-LineAnnotation *Document::Margins() const {
+LineAnnotation *Document::Margins() const noexcept {
 	return static_cast<LineAnnotation *>(perLineData[ldMargin].get());
 }
 
-LineAnnotation *Document::Annotations() const {
+LineAnnotation *Document::Annotations() const noexcept {
 	return static_cast<LineAnnotation *>(perLineData[ldAnnotation].get());
 }
 
-int Document::LineEndTypesSupported() const {
+int Document::LineEndTypesSupported() const noexcept {
 	if ((SC_CP_UTF8 == dbcsCodePage) && pli)
 		return pli->LineEndTypesSupported();
 	else
@@ -220,7 +220,7 @@ bool Document::SetLineEndTypesAllowed(int lineEndBitSet_) {
 	}
 }
 
-void Document::SetSavePoint() {
+void Document::SetSavePoint() noexcept {
 	cb.SetSavePoint();
 	NotifySavePoint(true);
 }
@@ -286,11 +286,11 @@ void Document::TentativeUndo() {
 	}
 }
 
-int Document::GetMark(Sci::Line line) const {
+int Document::GetMark(Sci::Line line) const noexcept {
 	return Markers()->MarkValue(line);
 }
 
-Sci::Line Document::MarkerNext(Sci::Line lineStart, int mask) const {
+Sci::Line Document::MarkerNext(Sci::Line lineStart, int mask) const noexcept {
 	return Markers()->MarkerNext(lineStart, mask);
 }
 
@@ -344,19 +344,19 @@ void Document::DeleteAllMarks(int markerNum) {
 	}
 }
 
-Sci::Line Document::LineFromHandle(int markerHandle) const {
+Sci::Line Document::LineFromHandle(int markerHandle) const noexcept {
 	return Markers()->LineFromHandle(markerHandle);
 }
 
-Sci_Position SCI_METHOD Document::LineStart(Sci_Position line) const {
+Sci_Position SCI_METHOD Document::LineStart(Sci_Position line) const noexcept {
 	return cb.LineStart(static_cast<Sci::Line>(line));
 }
 
-bool Document::IsLineStartPosition(Sci::Position position) const {
+bool Document::IsLineStartPosition(Sci::Position position) const noexcept {
 	return LineStart(LineFromPosition(position)) == position;
 }
 
-Sci_Position SCI_METHOD Document::LineEnd(Sci_Position line) const {
+Sci_Position SCI_METHOD Document::LineEnd(Sci_Position line) const noexcept {
 	if (line >= LinesTotal() - 1) {
 		return LineStart(line + 1);
 	} else {
@@ -383,14 +383,14 @@ Sci_Position SCI_METHOD Document::LineEnd(Sci_Position line) const {
 	}
 }
 
-void SCI_METHOD Document::SetErrorStatus(int status) {
+void SCI_METHOD Document::SetErrorStatus(int status) noexcept {
 	// Tell the watchers an error has occurred.
 	for (const auto &watcher : watchers) {
 		watcher.watcher->NotifyErrorOccurred(this, watcher.userData, status);
 	}
 }
 
-Sci_Position SCI_METHOD Document::LineFromPosition(Sci_Position pos) const {
+Sci_Position SCI_METHOD Document::LineFromPosition(Sci_Position pos) const noexcept {
 	return cb.LineFromPosition(pos);
 }
 
@@ -399,19 +399,19 @@ Sci::Line Document::SciLineFromPosition(Sci::Position pos) const noexcept {
 	return cb.LineFromPosition(pos);
 }
 
-Sci::Position Document::LineEndPosition(Sci::Position position) const {
+Sci::Position Document::LineEndPosition(Sci::Position position) const noexcept {
 	return LineEnd(LineFromPosition(position));
 }
 
-bool Document::IsLineEndPosition(Sci::Position position) const {
+bool Document::IsLineEndPosition(Sci::Position position) const noexcept {
 	return LineEnd(LineFromPosition(position)) == position;
 }
 
-bool Document::IsPositionInLineEnd(Sci::Position position) const {
+bool Document::IsPositionInLineEnd(Sci::Position position) const noexcept {
 	return position >= LineEnd(LineFromPosition(position));
 }
 
-Sci::Position Document::VCHomePosition(Sci::Position position) const {
+Sci::Position Document::VCHomePosition(Sci::Position position) const noexcept {
 	const Sci::Line line = SciLineFromPosition(position);
 	const Sci::Position startPosition = LineStart(line);
 	const Sci::Position endLine = LineEnd(line);
@@ -425,11 +425,11 @@ Sci::Position Document::VCHomePosition(Sci::Position position) const {
 		return startText;
 }
 
-Sci::Position Document::IndexLineStart(Sci::Line line, int lineCharacterIndex) const {
+Sci::Position Document::IndexLineStart(Sci::Line line, int lineCharacterIndex) const noexcept {
 	return cb.IndexLineStart(line, lineCharacterIndex);
 }
 
-Sci::Line Document::LineFromPositionIndex(Sci::Position pos, int lineCharacterIndex) const {
+Sci::Line Document::LineFromPositionIndex(Sci::Position pos, int lineCharacterIndex) const noexcept {
 	return cb.LineFromPositionIndex(pos, lineCharacterIndex);
 }
 
@@ -445,7 +445,7 @@ int SCI_METHOD Document::SetLevel(Sci_Position line, int level) {
 	return prev;
 }
 
-int SCI_METHOD Document::GetLevel(Sci_Position line) const {
+int SCI_METHOD Document::GetLevel(Sci_Position line) const noexcept {
 	return Levels()->GetLevel(static_cast<Sci::Line>(line));
 }
 
@@ -485,7 +485,7 @@ Sci::Line Document::GetLastChild(Sci::Line lineParent, int level, Sci::Line last
 	return lineMaxSubord;
 }
 
-Sci::Line Document::GetFoldParent(Sci::Line line) const {
+Sci::Line Document::GetFoldParent(Sci::Line line) const noexcept {
 	const int level = LevelNumber(GetLevel(line));
 	Sci::Line lineLook = line - 1;
 	while ((lineLook > 0) && (
@@ -572,7 +572,7 @@ void Document::GetHighlightDelimiters(HighlightDelimiter &highlightDelimiter, Sc
 	highlightDelimiter.firstChangeableLineAfter = firstChangeableLineAfter;
 }
 
-Sci::Position Document::ClampPositionIntoDocument(Sci::Position pos) const {
+Sci::Position Document::ClampPositionIntoDocument(Sci::Position pos) const noexcept {
 	return std::clamp<Sci::Position>(pos, 0, Length());
 }
 
@@ -584,7 +584,7 @@ bool Document::IsCrLf(Sci::Position pos) const noexcept {
 	return (cb.CharAt(pos) == '\r') && (cb.CharAt(pos + 1) == '\n');
 }
 
-int Document::LenChar(Sci::Position pos) {
+int Document::LenChar(Sci::Position pos) noexcept {
 	if (pos < 0) {
 		return 1;
 	} else if (IsCrLf(pos)) {
@@ -638,7 +638,7 @@ bool Document::InGoodUTF8(Sci::Position pos, Sci::Position &start, Sci::Position
 // When lines are terminated with \r\n pairs which should be treated as one character.
 // When displaying DBCS text such as Japanese.
 // If moving, move the position in the indicated direction.
-Sci::Position Document::MovePositionOutsideChar(Sci::Position pos, Sci::Position moveDir, bool checkLineEnd) const {
+Sci::Position Document::MovePositionOutsideChar(Sci::Position pos, Sci::Position moveDir, bool checkLineEnd) const noexcept {
 	//Platform::DebugPrintf("NoCRLF %d %d\n", pos, moveDir);
 	// If out of range, just return minimum/maximum value.
 	if (pos <= 0)
@@ -796,7 +796,7 @@ bool Document::NextCharacter(Sci::Position &pos, int moveDir) const noexcept {
 	}
 }
 
-Document::CharacterExtracted Document::CharacterAfter(Sci::Position position) const {
+Document::CharacterExtracted Document::CharacterAfter(Sci::Position position) const noexcept {
 	if (position >= Length()) {
 		return CharacterExtracted(unicodeReplacementChar, 0);
 	}
@@ -827,7 +827,7 @@ Document::CharacterExtracted Document::CharacterAfter(Sci::Position position) co
 	}
 }
 
-Document::CharacterExtracted Document::CharacterBefore(Sci::Position position) const {
+Document::CharacterExtracted Document::CharacterBefore(Sci::Position position) const noexcept {
 	if (position <= 0) {
 		return CharacterExtracted(unicodeReplacementChar, 0);
 	}
@@ -870,7 +870,7 @@ Document::CharacterExtracted Document::CharacterBefore(Sci::Position position) c
 }
 
 // Return -1  on out-of-bounds
-Sci_Position SCI_METHOD Document::GetRelativePosition(Sci_Position positionStart, Sci_Position characterOffset) const {
+Sci_Position SCI_METHOD Document::GetRelativePosition(Sci_Position positionStart, Sci_Position characterOffset) const noexcept {
 	Sci::Position pos = positionStart;
 	if (dbcsCodePage) {
 		const int increment = (characterOffset > 0) ? 1 : -1;
@@ -889,7 +889,7 @@ Sci_Position SCI_METHOD Document::GetRelativePosition(Sci_Position positionStart
 	return pos;
 }
 
-Sci::Position Document::GetRelativePositionUTF16(Sci::Position positionStart, Sci::Position characterOffset) const {
+Sci::Position Document::GetRelativePositionUTF16(Sci::Position positionStart, Sci::Position characterOffset) const noexcept {
 	Sci::Position pos = positionStart;
 	if (dbcsCodePage) {
 		const int increment = (characterOffset > 0) ? 1 : -1;
@@ -910,7 +910,7 @@ Sci::Position Document::GetRelativePositionUTF16(Sci::Position positionStart, Sc
 	return pos;
 }
 
-int SCI_METHOD Document::GetCharacterAndWidth(Sci_Position position, Sci_Position *pWidth) const {
+int SCI_METHOD Document::GetCharacterAndWidth(Sci_Position position, Sci_Position *pWidth) const noexcept {
 	int character;
 	int bytesInCharacter = 1;
 	if (dbcsCodePage) {
@@ -951,7 +951,7 @@ int SCI_METHOD Document::GetCharacterAndWidth(Sci_Position position, Sci_Positio
 	return character;
 }
 
-int SCI_METHOD Document::CodePage() const {
+int SCI_METHOD Document::CodePage() const noexcept {
 	return dbcsCodePage;
 }
 
@@ -979,7 +979,7 @@ int Document::DBCSDrawBytes(std::string_view text) const noexcept {
 	}
 }
 
-static inline bool IsSpaceOrTab(int ch) noexcept {
+static constexpr bool IsSpaceOrTab(int ch) noexcept {
 	return ch == ' ' || ch == '\t';
 }
 
@@ -1042,7 +1042,7 @@ void Document::ModifiedAt(Sci::Position pos) noexcept {
 		endStyled = pos;
 }
 
-void Document::CheckReadOnly() {
+void Document::CheckReadOnly() noexcept {
 	if (cb.IsReadOnly() && enteredReadOnlyCount == 0) {
 		enteredReadOnlyCount++;
 		NotifyModifyAttempt();
@@ -1159,7 +1159,7 @@ int SCI_METHOD Document::AddData(const char *data, Sci_Position length) {
 	return 0;
 }
 
-void * SCI_METHOD Document::ConvertToDocument() {
+void * SCI_METHOD Document::ConvertToDocument() noexcept {
 	return this;
 }
 
@@ -1325,7 +1325,7 @@ void Document::DelCharBack(Sci::Position pos) {
 	}
 }
 
-static Sci::Position NextTab(Sci::Position pos, Sci::Position tabSize) noexcept {
+static constexpr Sci::Position NextTab(Sci::Position pos, Sci::Position tabSize) noexcept {
 	return ((pos / tabSize) + 1) * tabSize;
 }
 
@@ -1344,7 +1344,7 @@ static std::string CreateIndentation(Sci::Position indent, int tabSize, bool ins
 	return indentation;
 }
 
-int SCI_METHOD Document::GetLineIndentation(Sci_Position line) const {
+int SCI_METHOD Document::GetLineIndentation(Sci_Position line) const noexcept {
 	int indent = 0;
 	if ((line >= 0) && (line < LinesTotal())) {
 		const Sci::Position lineStart = LineStart(line);
@@ -1379,7 +1379,7 @@ Sci::Position Document::SetLineIndentation(Sci::Line line, Sci::Position indent)
 	}
 }
 
-Sci::Position Document::GetLineIndentPosition(Sci::Line line) const {
+Sci::Position Document::GetLineIndentPosition(Sci::Line line) const noexcept {
 	if (line < 0)
 		return 0;
 	Sci::Position pos = LineStart(line);
@@ -1390,7 +1390,7 @@ Sci::Position Document::GetLineIndentPosition(Sci::Line line) const {
 	return pos;
 }
 
-Sci::Position Document::GetColumn(Sci::Position pos) {
+Sci::Position Document::GetColumn(Sci::Position pos) noexcept {
 	Sci::Position column = 0;
 	const Sci::Line line = SciLineFromPosition(pos);
 	if ((line >= 0) && (line < LinesTotal())) {
@@ -1414,7 +1414,7 @@ Sci::Position Document::GetColumn(Sci::Position pos) {
 	return column;
 }
 
-Sci::Position Document::CountCharacters(Sci::Position startPos, Sci::Position endPos) const {
+Sci::Position Document::CountCharacters(Sci::Position startPos, Sci::Position endPos) const noexcept {
 	startPos = MovePositionOutsideChar(startPos, 1, false);
 	endPos = MovePositionOutsideChar(endPos, -1, false);
 	Sci::Position count = 0;
@@ -1426,7 +1426,7 @@ Sci::Position Document::CountCharacters(Sci::Position startPos, Sci::Position en
 	return count;
 }
 
-Sci::Position Document::CountUTF16(Sci::Position startPos, Sci::Position endPos) const {
+Sci::Position Document::CountUTF16(Sci::Position startPos, Sci::Position endPos) const noexcept {
 	startPos = MovePositionOutsideChar(startPos, 1, false);
 	endPos = MovePositionOutsideChar(endPos, -1, false);
 	Sci::Position count = 0;
@@ -1441,7 +1441,7 @@ Sci::Position Document::CountUTF16(Sci::Position startPos, Sci::Position endPos)
 	return count;
 }
 
-Sci::Position Document::FindColumn(Sci::Line line, Sci::Position column) {
+Sci::Position Document::FindColumn(Sci::Line line, Sci::Position column) noexcept {
 	Sci::Position position = LineStart(line);
 	if ((line >= 0) && (line < LinesTotal())) {
 		Sci::Position columnCurrent = 0;
@@ -1546,7 +1546,7 @@ int Document::Options() const noexcept {
 		(cb.HasStyles() ? 0 : SC_DOCUMENTOPTION_STYLES_NONE);
 }
 
-bool Document::IsWhiteLine(Sci::Line line) const {
+bool Document::IsWhiteLine(Sci::Line line) const noexcept {
 	Sci::Position currentChar = LineStart(line);
 	const Sci::Position endLine = LineEnd(line);
 	while (currentChar < endLine) {
@@ -1558,7 +1558,7 @@ bool Document::IsWhiteLine(Sci::Line line) const {
 	return true;
 }
 
-Sci::Position Document::ParaUp(Sci::Position pos) const {
+Sci::Position Document::ParaUp(Sci::Position pos) const noexcept {
 	Sci::Line line = SciLineFromPosition(pos);
 	line--;
 	while (line >= 0 && IsWhiteLine(line)) { // skip empty lines
@@ -1571,7 +1571,7 @@ Sci::Position Document::ParaUp(Sci::Position pos) const {
 	return LineStart(line);
 }
 
-Sci::Position Document::ParaDown(Sci::Position pos) const {
+Sci::Position Document::ParaDown(Sci::Position pos) const noexcept {
 	Sci::Line line = SciLineFromPosition(pos);
 	while (line < LinesTotal() && !IsWhiteLine(line)) { // skip non-empty lines
 		line++;
@@ -1585,7 +1585,7 @@ Sci::Position Document::ParaDown(Sci::Position pos) const {
 		return LineEnd(line - 1);
 }
 
-bool Document::IsASCIIWordByte(unsigned char ch) const {
+bool Document::IsASCIIWordByte(unsigned char ch) const noexcept {
 	if (IsASCII(ch)) {
 		return charClass.GetClass(ch) == CharClassify::ccWord;
 	} else {
@@ -1833,7 +1833,7 @@ bool Document::HasCaseFolder() const noexcept {
 	return pcf != nullptr;
 }
 
-void Document::SetCaseFolder(CaseFolder *pcf_) {
+void Document::SetCaseFolder(CaseFolder *pcf_) noexcept {
 	pcf.reset(pcf_);
 }
 
@@ -1913,7 +1913,7 @@ Sci::Position Document::FindText(Sci::Position minPos, Sci::Position maxPos, con
 			const size_t maxFoldingExpansion = 4;
 			std::vector<char> searchThing((lengthFind + 1) * UTF8MaxBytes * maxFoldingExpansion + 1);
 			const size_t lenSearch =
-				pcf->Fold(&searchThing[0], searchThing.size(), search, lengthFind);
+				pcf->Fold(searchThing.data(), searchThing.size(), search, lengthFind);
 			char bytes[UTF8MaxBytes + 1] = "";
 			char folded[UTF8MaxBytes * maxFoldingExpansion + 1] = "";
 			while (forward ? (pos < endPos) : (pos >= endPos)) {
@@ -1940,7 +1940,7 @@ Sci::Position Document::FindText(Sci::Position minPos, Sci::Position maxPos, con
 					// memcmp may examine lenFlat bytes in both arguments so assert it doesn't read past end of searchThing
 					assert((indexSearch + lenFlat) <= searchThing.size());
 					// Does folded match the buffer
-					characterMatches = 0 == memcmp(folded, &searchThing[0] + indexSearch, lenFlat);
+					characterMatches = 0 == memcmp(folded, searchThing.data() + indexSearch, lenFlat);
 					if (!characterMatches)
 						break;
 					posIndexDocument += widthChar;
@@ -1965,7 +1965,7 @@ Sci::Position Document::FindText(Sci::Position minPos, Sci::Position maxPos, con
 			const size_t maxBytesCharacter = 2;
 			const size_t maxFoldingExpansion = 4;
 			std::vector<char> searchThing((lengthFind + 1) * maxBytesCharacter * maxFoldingExpansion + 1);
-			const size_t lenSearch = pcf->Fold(&searchThing[0], searchThing.size(), search, lengthFind);
+			const size_t lenSearch = pcf->Fold(searchThing.data(), searchThing.size(), search, lengthFind);
 			while (forward ? (pos < endPos) : (pos >= endPos)) {
 				Sci::Position indexDocument = 0;
 				size_t indexSearch = 0;
@@ -1985,7 +1985,7 @@ Sci::Position Document::FindText(Sci::Position minPos, Sci::Position maxPos, con
 					// memcmp may examine lenFlat bytes in both arguments so assert it doesn't read past end of searchThing
 					assert((indexSearch + lenFlat) <= searchThing.size());
 					// Does folded match the buffer
-					characterMatches = 0 == memcmp(folded, &searchThing[0] + indexSearch, lenFlat);
+					characterMatches = 0 == memcmp(folded, searchThing.data() + indexSearch, lenFlat);
 					indexDocument += widthChar;
 					indexSearch += lenFlat;
 				}
@@ -2001,7 +2001,7 @@ Sci::Position Document::FindText(Sci::Position minPos, Sci::Position maxPos, con
 		} else {
 			const Sci::Position endSearch = (startPos <= endPos) ? endPos - lengthFind + 1 : endPos;
 			std::vector<char> searchThing(lengthFind + 1);
-			pcf->Fold(&searchThing[0], searchThing.size(), search, lengthFind);
+			pcf->Fold(searchThing.data(), searchThing.size(), search, lengthFind);
 			while (forward ? (pos < endSearch) : (pos >= endSearch)) {
 				bool found = (pos + lengthFind) <= limitPos;
 				for (int indexSearch = 0; (indexSearch < lengthFind) && found; indexSearch++) {
@@ -2029,7 +2029,7 @@ const char *Document::SubstituteByPosition(const char *text, Sci::Position *leng
 		return nullptr;
 }
 
-int Document::LineCharacterIndex() const {
+int Document::LineCharacterIndex() const noexcept {
 	return cb.LineCharacterIndex();
 }
 
@@ -2045,19 +2045,19 @@ Sci::Line Document::LinesTotal() const noexcept {
 	return cb.Lines();
 }
 
-void Document::SetDefaultCharClasses(bool includeWordClass) {
+void Document::SetDefaultCharClasses(bool includeWordClass) noexcept {
 	charClass.SetDefaultCharClasses(includeWordClass);
 }
 
-void Document::SetCharClasses(const unsigned char *chars, CharClassify::cc newCharClass) {
+void Document::SetCharClasses(const unsigned char *chars, CharClassify::cc newCharClass) noexcept {
     charClass.SetCharClasses(chars, newCharClass);
 }
 
-int Document::GetCharsOfClass(CharClassify::cc characterClass, unsigned char *buffer) const {
+int Document::GetCharsOfClass(CharClassify::cc characterClass, unsigned char *buffer) const noexcept {
     return charClass.GetCharsOfClass(characterClass, buffer);
 }
 
-void SCI_METHOD Document::StartStyling(Sci_Position position) {
+void SCI_METHOD Document::StartStyling(Sci_Position position) noexcept {
 	endStyled = position;
 }
 
@@ -2157,11 +2157,11 @@ void Document::LexerChanged() {
 	}
 }
 
-LexInterface *Document::GetLexInterface() const {
+LexInterface *Document::GetLexInterface() const noexcept {
 	return pli.get();
 }
 
-void Document::SetLexInterface(LexInterface *pLexInterface) {
+void Document::SetLexInterface(LexInterface *pLexInterface) noexcept {
 	pli.reset(pLexInterface);
 }
 
@@ -2179,7 +2179,7 @@ int SCI_METHOD Document::GetLineState(Sci_Position line) const {
 	return States()->GetLineState(static_cast<Sci::Line>(line));
 }
 
-Sci::Line Document::GetMaxLineState() const {
+Sci::Line Document::GetMaxLineState() const noexcept {
 	return States()->GetMaxLineState();
 }
 
@@ -2189,7 +2189,7 @@ void SCI_METHOD Document::ChangeLexerState(Sci_Position start, Sci_Position end)
 	NotifyModified(mh);
 }
 
-StyledText Document::MarginStyledText(Sci::Line line) const {
+StyledText Document::MarginStyledText(Sci::Line line) const noexcept {
 	const LineAnnotation *pla = Margins();
 	return StyledText(pla->Length(line), pla->Text(line),
 		pla->MultipleStyles(line), pla->Style(line), pla->Styles(line));
@@ -2223,7 +2223,7 @@ void Document::MarginClearAll() {
 	Margins()->ClearAll();
 }
 
-StyledText Document::AnnotationStyledText(Sci::Line line) const {
+StyledText Document::AnnotationStyledText(Sci::Line line) const noexcept {
 	const LineAnnotation *pla = Annotations();
 	return StyledText(pla->Length(line), pla->Text(line),
 		pla->MultipleStyles(line), pla->Style(line), pla->Styles(line));
@@ -2254,7 +2254,7 @@ void Document::AnnotationSetStyles(Sci::Line line, const unsigned char *styles) 
 	}
 }
 
-int Document::AnnotationLines(Sci::Line line) const {
+int Document::AnnotationLines(Sci::Line line) const noexcept {
 	return Annotations()->Lines(line);
 }
 
@@ -2271,7 +2271,7 @@ void Document::IncrementStyleClock() noexcept {
 	styleClock = (styleClock + 1) % 0x100000;
 }
 
-void SCI_METHOD Document::DecorationSetCurrentIndicator(int indicator) {
+void SCI_METHOD Document::DecorationSetCurrentIndicator(int indicator) noexcept {
 	decorations->SetCurrentIndicator(indicator);
 }
 
@@ -2303,13 +2303,13 @@ bool Document::RemoveWatcher(DocWatcher *watcher, void *userData) {
 	return false;
 }
 
-void Document::NotifyModifyAttempt() {
+void Document::NotifyModifyAttempt() noexcept {
 	for (const auto &watcher : watchers) {
 		watcher.watcher->NotifyModifyAttempt(this, watcher.userData);
 	}
 }
 
-void Document::NotifySavePoint(bool atSavePoint) {
+void Document::NotifySavePoint(bool atSavePoint) noexcept {
 	for (const auto &watcher : watchers) {
 		watcher.watcher->NotifySavePoint(this, watcher.userData, atSavePoint);
 	}
@@ -2467,11 +2467,11 @@ Sci::Position Document::WordPartRight(Sci::Position pos) const {
 	return pos;
 }
 
-static inline bool IsLineEndChar(char c) noexcept {
+static constexpr bool IsLineEndChar(char c) noexcept {
 	return (c == '\n' || c == '\r');
 }
 
-Sci::Position Document::ExtendStyleRange(Sci::Position pos, int delta, bool singleLine) {
+Sci::Position Document::ExtendStyleRange(Sci::Position pos, int delta, bool singleLine) noexcept {
 	const int sStart = cb.StyleAt(pos);
 	if (delta < 0) {
 		while (pos > 0 && (cb.StyleAt(pos) == sStart) && (!singleLine || !IsLineEndChar(cb.CharAt(pos))))
@@ -2508,7 +2508,7 @@ static inline char BraceOpposite(char ch) noexcept {
 }
 
 // TODO: should be able to extend styled region to find matching brace
-Sci::Position Document::BraceMatch(Sci::Position position, Sci::Position /*maxReStyle*/) {
+Sci::Position Document::BraceMatch(Sci::Position position, Sci::Position /*maxReStyle*/) noexcept {
 	const char chBrace = CharAt(position);
 	const char chSeek = BraceOpposite(chBrace);
 	if (chSeek == '\0')
@@ -2575,7 +2575,7 @@ public:
 	Sci::Line lineRangeStart;
 	Sci::Line lineRangeEnd;
 	Sci::Line lineRangeBreak;
-	RESearchRange(const Document *doc_, Sci::Position minPos, Sci::Position maxPos) : doc(doc_) {
+	RESearchRange(const Document *doc_, Sci::Position minPos, Sci::Position maxPos) noexcept : doc(doc_) {
 		increment = (minPos <= maxPos) ? 1 : -1;
 
 		// Range endpoints should not be inside DBCS characters or between a CR and LF,
@@ -2587,7 +2587,7 @@ public:
 		lineRangeEnd = doc->SciLineFromPosition(endPos);
 		lineRangeBreak = lineRangeEnd + increment;
 	}
-	Range LineRange(Sci::Line line) const {
+	Range LineRange(Sci::Line line) const noexcept {
 		Range range(doc->LineStart(line), doc->LineEnd(line));
 		if (increment == 1) {
 			if (line == lineRangeStart)
@@ -2974,13 +2974,13 @@ Sci::Position Cxx11RegexFindText(const Document *doc, Sci::Position minPos, Sci:
 			const size_t lenS = sv.length();
 			std::vector<wchar_t> ws(sv.length() + 1);
 #if WCHAR_T_IS_16
-			const size_t outLen = UTF16FromUTF8(sv, &ws[0], lenS);
+			const size_t outLen = UTF16FromUTF8(sv, ws.data(), lenS);
 #else
-			const size_t outLen = UTF32FromUTF8(sv, reinterpret_cast<unsigned int *>(&ws[0]), lenS);
+			const size_t outLen = UTF32FromUTF8(sv, reinterpret_cast<unsigned int *>(ws.data()), lenS);
 #endif
 			ws[outLen] = 0;
 			std::wregex regexp;
-			regexp.assign(&ws[0], flagsRe);
+			regexp.assign(ws.data(), flagsRe);
 			matched = MatchOnLines<UTF8Iterator>(doc, regexp, resr, search);
 
 		} else {

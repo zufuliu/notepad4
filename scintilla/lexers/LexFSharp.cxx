@@ -90,7 +90,7 @@ _label_identifier:
 					sc.ChangeState(SCE_FSHARP_KEYWORD);
 				} else if (keywords2.InList(s)) {
 					sc.ChangeState(SCE_FSHARP_TYPEKEYWORD);
-				} else if (s[0] == '#' && keywords3.InList(&s[1])) {
+				} else if (s[0] == '#' && keywords3.InList(s + 1)) {
 					sc.ChangeState(SCE_FSHARP_PREPROCESSOR);
 				} else if (keywords4.InList(s)) {
 					sc.ChangeState(SCE_FSHARP_ATTRIBUTE);
@@ -199,7 +199,7 @@ _label_identifier:
 #define IsFSLine(line, word)	IsLexLineStartsWith(line, styler, word, true, SCE_FSHARP_KEYWORD)
 #define IsCommentLine(line) 	IsLexCommentLine(line, styler, SCE_FSHARP_COMMENTLINE)
 
-static inline bool IsStreamCommentStyle(int style) noexcept {
+static constexpr bool IsStreamCommentStyle(int style) noexcept {
 	return style == SCE_FSHARP_COMMENT;
 }
 #define IsOpenLine(line)		IsFSLine(line, "open")
@@ -212,7 +212,7 @@ static void FoldFSharpDoc(Sci_PositionU startPos, Sci_Position length, int initS
 	const bool foldPreprocessor = styler.GetPropertyInt("fold.preprocessor", 1) != 0;
 	//const bool foldCompact = styler.GetPropertyInt("fold.compact") != 0;
 
-	Sci_PositionU endPos = startPos + length;
+	const Sci_PositionU endPos = startPos + length;
 	//int visibleChars = 0;
 	Sci_Position lineCurrent = styler.GetLine(startPos);
 	int levelCurrent = SC_FOLDLEVELBASE;
@@ -225,12 +225,12 @@ static void FoldFSharpDoc(Sci_PositionU startPos, Sci_Position length, int initS
 	int style = initStyle;
 
 	for (Sci_PositionU i = startPos; i < endPos; i++) {
-		char ch = chNext;
+		const char ch = chNext;
 		chNext = styler.SafeGetCharAt(i + 1);
-		int stylePrev = style;
+		const int stylePrev = style;
 		style = styleNext;
 		styleNext = styler.StyleAt(i + 1);
-		bool atEOL = (ch == '\r' && chNext != '\n') || (ch == '\n');
+		const bool atEOL = (ch == '\r' && chNext != '\n') || (ch == '\n');
 
 		if (foldComment && IsStreamCommentStyle(style)) {
 			if (!IsStreamCommentStyle(stylePrev)) {
@@ -280,7 +280,7 @@ static void FoldFSharpDoc(Sci_PositionU startPos, Sci_Position length, int initS
 		//if (!isspacechar(ch))
 		//	visibleChars++;
 		if (atEOL || (i == endPos - 1)) {
-			int levelUse = levelCurrent;
+			const int levelUse = levelCurrent;
 			int lev = levelUse | levelNext << 16;
 			//if (visibleChars == 0 && foldCompact)
 			//	lev |= SC_FOLDLEVELWHITEFLAG;

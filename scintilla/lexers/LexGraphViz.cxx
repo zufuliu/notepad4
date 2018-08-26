@@ -17,7 +17,7 @@
 
 using namespace Scintilla;
 
-static inline bool IsGraphOp(int ch) noexcept {
+static constexpr bool IsGraphOp(int ch) noexcept {
 	return ch == '{' || ch == '}' || ch == '[' || ch == ']' || ch == '='
 		|| ch == ';' || ch == ',' || ch == '>' || ch == '+' || ch == '-'
 		|| ch == ':' || ch == '<' || ch == '/';
@@ -33,7 +33,7 @@ static void ColouriseGraphDoc(Sci_PositionU startPos, Sci_Position length, int i
 	styler.StartAt(startPos);
 	styler.StartSegment(startPos);
 	Sci_PositionU endPos = startPos + length;
-	if (endPos == (Sci_PositionU)styler.Length())
+	if (endPos == static_cast<Sci_PositionU>(styler.Length()))
 		++endPos;
 
 	Sci_Position lineCurrent = styler.GetLine(startPos);
@@ -46,17 +46,17 @@ static void ColouriseGraphDoc(Sci_PositionU startPos, Sci_Position length, int i
 	int chPrevNonWhite = 0;
 
 	for (Sci_PositionU i = startPos; i < endPos; i++) {
-		int chPrev = ch;
+		const int chPrev = ch;
 		if (!IsASpace(ch) && state != SCE_C_COMMENTLINE && state != SCE_C_COMMENT && state != SCE_C_COMMENTDOC)
 			chPrevNonWhite = ch;
 		ch = chNext;
 		chNext = styler.SafeGetCharAt(i + 1);
 
 		const bool atEOL = (ch == '\r' && chNext != '\n') || (ch == '\n');
-		const bool atLineStart = i == (Sci_PositionU)styler.LineStart(lineCurrent);
+		const bool atLineStart = i == static_cast<Sci_PositionU>(styler.LineStart(lineCurrent));
 		if (atEOL || i == endPos - 1) {
 			if (fold) {
-				int levelUse = levelCurrent;
+				const int levelUse = levelCurrent;
 				int lev = levelUse | levelNext << 16;
 				if (levelUse < levelNext)
 					lev |= SC_FOLDLEVELHEADERFLAG;
@@ -92,7 +92,7 @@ static void ColouriseGraphDoc(Sci_PositionU startPos, Sci_Position length, int i
 				state = SCE_C_DEFAULT;
 				wordLen = 0;
 			} else if (wordLen < MAX_WORD_LENGTH) {
-				buf[wordLen++] = (char)ch;
+				buf[wordLen++] = static_cast<char>(ch);
 			}
 			break;
 		case SCE_C_LABEL:
@@ -176,7 +176,7 @@ static void ColouriseGraphDoc(Sci_PositionU startPos, Sci_Position length, int i
 			} else if (iswordstart(ch)) {
 				styler.ColourTo(i - 1, state);
 				state = SCE_C_IDENTIFIER;
-				buf[wordLen++] = (char)ch;
+				buf[wordLen++] = static_cast<char>(ch);
 			} else if (ch == '>' && !(chPrevNonWhite == '-' || chPrevNonWhite == '>')) {
 				styler.ColourTo(i, SCE_C_DIRECTIVE);
 			} else if (IsGraphOp(ch)) {

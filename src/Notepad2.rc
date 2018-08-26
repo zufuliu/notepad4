@@ -835,8 +835,8 @@ BEGIN
     CONTROL         "W&ildcard Search",IDC_WILDCARDSEARCH,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,132,90,74,10
     CONTROL         "<a>(?)</a>",IDC_WILDCARDHELP,"SysLink",0x0,208,90,14,10
 //#endif
-    CONTROL         "<a>Clear History</a>",IDC_CLEAR_FIND,"SysLink",WS_TABSTOP,173,6,48,10 
-    CONTROL         "<a>Clear History</a>",IDC_CLEAR_REPLACE,"SysLink",WS_TABSTOP,173,35,48,10 
+    CONTROL         "<a>Clear History</a>",IDC_CLEAR_FIND,"SysLink",WS_TABSTOP,173,6,48,10
+    CONTROL         "<a>Clear History</a>",IDC_CLEAR_REPLACE,"SysLink",WS_TABSTOP,173,35,48,10
 END
 
 IDD_RUN DIALOGEX 0, 0, 234, 86
@@ -1719,9 +1719,9 @@ BEGIN
     //61062                   "C;Ukrainian (Mac);Mac (Ukrainian)"
     61063                   "C;Vietnamese (Windows-1258);Windows-1258"
     //61064                   "B;Western European (DOS-850);DOS-850"
-    61065                   "B;Western European (Latin-1, ISO 8859-1);ISO 8859-1"
+    61065                   "B;Western European (Latin 1, ISO 8859-1);ISO 8859-1"
     //61066                   "B;Western European (Mac);Mac (Western)"
-    61067                   "B;Western European (Latin-1, Windows-1252);Windows-1252"
+    61067                   "B;Western European (Latin 1, Windows-1252);Windows-1252"
     //61068                   "D0;IBM EBCDIC (US-Canada);EBCDIC (US)"
     //61069                   "D1;IBM EBCDIC (International);EBCDIC (Int.)"
     //61070                   "D2;IBM EBCDIC (Greek Modern);EBCDIC (GR)"

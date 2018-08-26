@@ -65,7 +65,7 @@ private:
 public:
 	IHanjaDic *HJinterface;
 
-	HanjaDic() : HJinterface(nullptr) {
+	HanjaDic() noexcept : HJinterface(nullptr) {
 		hr = CLSIDFromProgID(OLESTR("mshjdic.hanjadic"), &CLSID_HanjaDic);
 		if (SUCCEEDED(hr)) {
 			hr = CoCreateInstance(CLSID_HanjaDic, nullptr,
@@ -84,11 +84,11 @@ public:
 		}
 	}
 
-	bool HJdictAvailable() const {
+	bool HJdictAvailable() const noexcept {
 		return SUCCEEDED(hr);
 	}
 
-	bool IsHanja(int hanja) {
+	bool IsHanja(int hanja) noexcept {
 		HANJA_TYPE hanjaType;
 		hr = HJinterface->GetHanjaType(static_cast<unsigned short>(hanja), &hanjaType);
 		if (SUCCEEDED(hr)) {
@@ -98,7 +98,7 @@ public:
 	}
 };
 
-int GetHangulOfHanja(wchar_t *inout) {
+int GetHangulOfHanja(wchar_t *inout) noexcept {
 	// Convert every hanja to hangul.
 	// Return the number of characters converted.
 	int changed = 0;

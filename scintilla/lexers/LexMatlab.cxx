@@ -23,48 +23,49 @@ using namespace Scintilla;
 #define LEX_GNUPLOT		65
 #define LEX_JULIA		66
 
-static inline bool IsMatlabOctave(int lexType) noexcept {
+static constexpr bool IsMatlabOctave(int lexType) noexcept {
 	return lexType == LEX_MATLAB || lexType == LEX_OCTAVE;
 }
 
-static bool IsLineCommentStart(int lexType, StyleContext &sc, int visibleChars) {
-	int ch = sc.ch, chNext = sc.chNext;
+static bool IsLineCommentStart(int lexType, const StyleContext &sc, int visibleChars) noexcept {
+	const int ch = sc.ch;
+	const int chNext = sc.chNext;
 	return ch == '#'	// Octave, Julia, Gnuplot, Shebang or invalid character
 		|| (IsMatlabOctave(lexType) && (ch == '%' || (visibleChars == 0 && ch == '.' && chNext == '.' && sc.GetRelative(2) == '.')))
 		|| (lexType != LEX_JULIA && ch == '/' && chNext == '/'); // Scilab
 }
 
-static bool IsNestedCommentStart(int lexType, int ch, int chNext, int visibleChars, LexAccessor &styler, Sci_PositionU currentPos) {
+static bool IsNestedCommentStart(int lexType, int ch, int chNext, int visibleChars, LexAccessor &styler, Sci_PositionU currentPos) noexcept {
 	return visibleChars == 0 && chNext == '{'
 		&& ((lexType == LEX_MATLAB && ch == '%') || (lexType == LEX_OCTAVE && (ch == '%' || ch == '#')))
 		&& IsLexSpaceToEOL(styler, currentPos + 2);
 }
 
-static bool IsNestedCommentEnd(int lexType, int ch, int chNext, int visibleChars, LexAccessor &styler, Sci_PositionU currentPos) {
+static bool IsNestedCommentEnd(int lexType, int ch, int chNext, int visibleChars, LexAccessor &styler, Sci_PositionU currentPos) noexcept {
 	return visibleChars == 0 && chNext == '}'
 		&& ((lexType == LEX_MATLAB && ch == '%') || (lexType == LEX_OCTAVE && (ch == '%' || ch == '#')))
 		&& IsLexSpaceToEOL(styler, currentPos + 2);
 }
 
-static bool IsBlockCommentStart(int lexType, int ch, int chNext, int visibleChars, LexAccessor &styler, Sci_PositionU currentPos) {
+static bool IsBlockCommentStart(int lexType, int ch, int chNext, int visibleChars, LexAccessor &styler, Sci_PositionU currentPos) noexcept {
 	return IsNestedCommentStart(lexType, ch, chNext, visibleChars, styler, currentPos)
 		|| (ch == '/' && chNext == '*'); // Scilab
 }
 
-static bool IsBlockCommentEnd(int lexType, int ch, int chNext, int visibleChars, LexAccessor &styler, Sci_PositionU currentPos) {
+static bool IsBlockCommentEnd(int lexType, int ch, int chNext, int visibleChars, LexAccessor &styler, Sci_PositionU currentPos) noexcept {
 	return IsNestedCommentEnd(lexType, ch, chNext, visibleChars, styler, currentPos)
 		|| (ch == '*' && chNext == '/'); // Scilab
 }
 
-static bool IsBlockCommentStart(int lexType, StyleContext &sc, int visibleChars) {
+static bool IsBlockCommentStart(int lexType, StyleContext &sc, int visibleChars) noexcept {
 	return IsBlockCommentStart(lexType, sc.ch, sc.chNext, visibleChars, sc.styler, sc.currentPos);
 }
 
-static bool IsBlockCommentEnd(int lexType, StyleContext &sc, int visibleChars) {
+static bool IsBlockCommentEnd(int lexType, StyleContext &sc, int visibleChars) noexcept {
 	return IsBlockCommentEnd(lexType, sc.ch, sc.chNext, visibleChars, sc.styler, sc.currentPos);
 }
 
-static bool IsNestedCommentStart(int lexType, StyleContext &sc, int visibleChars) {
+static bool IsNestedCommentStart(int lexType, StyleContext &sc, int visibleChars) noexcept {
 	return IsNestedCommentStart(lexType, sc.ch, sc.chNext, visibleChars, sc.styler, sc.currentPos);
 }
 
@@ -251,7 +252,7 @@ _label_identifier:
 					sc.SetState(SCE_MAT_COMMENT);
 					// Octave demo/test section, always placed in end of file
 					if ((lexType == LEX_OCTAVE) && sc.atLineStart && sc.ch == '%' && sc.chNext == '!') {
-						Sci_Position pos = static_cast<Sci_Position>(sc.currentPos) + 2;
+						const Sci_Position pos = static_cast<Sci_Position>(sc.currentPos) + 2;
 						if (!hasTest && (styler.Match(pos, "test") || styler.Match(pos, "demo")
 							|| styler.Match(pos, "assert") || styler.Match(pos, "error") || styler.Match(pos, "warning")
 							|| styler.Match(pos, "fail") || styler.Match(pos, "shared") || styler.Match(pos, "function"))) {
@@ -322,12 +323,12 @@ _label_identifier:
 }
 
 // character after the "end" statement (skiped space and tabs)
-static bool IsMatEndChar(char chEnd, int style) noexcept {
+static constexpr bool IsMatEndChar(char chEnd, int style) noexcept {
 	return (chEnd == '\r' || chEnd == '\n' || chEnd == ';')
 		|| (style == SCE_MAT_COMMENT || style == SCE_MAT_COMMENTBLOCK);
 }
 
-static inline bool IsStreamCommentStyle(int style) noexcept {
+static constexpr bool IsStreamCommentStyle(int style) noexcept {
 	return style == SCE_MAT_COMMENTBLOCK;
 }
 
@@ -341,7 +342,7 @@ static void FoldMatlabDoc(Sci_PositionU startPos, Sci_Position length, int initS
 	const bool foldComment = styler.GetPropertyInt("fold.comment") != 0;
 	const bool foldCompact = styler.GetPropertyInt("fold.compact", 1) != 0;
 
-	Sci_PositionU endPos = startPos + length;
+	const Sci_PositionU endPos = startPos + length;
 	int visibleChars = 0;
 	int numBrace = 0;
 	Sci_Position lineCurrent = styler.GetLine(startPos);
@@ -356,13 +357,13 @@ static void FoldMatlabDoc(Sci_PositionU startPos, Sci_Position length, int initS
 	int styleNext = styler.StyleAt(startPos);
 
 	for (Sci_PositionU i = startPos; i < endPos; i++) {
-		char chPrev = ch;
+		const char chPrev = ch;
 		ch = chNext;
 		chNext = styler.SafeGetCharAt(i + 1);
-		int stylePrev = style;
+		const int stylePrev = style;
 		style = styleNext;
 		styleNext = styler.StyleAt(i + 1);
-		bool atEOL = (ch == '\r' && chNext != '\n') || (ch == '\n');
+		const bool atEOL = (ch == '\r' && chNext != '\n') || (ch == '\n');
 
 		if (foldComment && IsStreamCommentStyle(style)) {
 			if (IsMatlabOctave(lexType)) {
@@ -388,7 +389,7 @@ static void FoldMatlabDoc(Sci_PositionU startPos, Sci_Position length, int initS
 
 		if (style == SCE_MAT_KEYWORD && stylePrev != SCE_MAT_KEYWORD && numBrace == 0 && chPrev != '.' && chPrev != ':') {
 			char word[32];
-			Sci_PositionU len = LexGetRange(i, styler, iswordstart, word, sizeof(word));
+			const Sci_PositionU len = LexGetRange(i, styler, iswordstart, word, sizeof(word));
 			if ((StrEqu(word, "function") && ((lexType == LEX_JULIA) || (!(lexType == LEX_JULIA) && LexGetNextChar(i + len, styler) != '(')))
 				|| StrEqu(word, "if")
 				|| StrEqu(word, "for")
@@ -418,7 +419,7 @@ static void FoldMatlabDoc(Sci_PositionU startPos, Sci_Position length, int initS
 				|| StrEqu(word, "properties") || StrEqu(word, "events") || StrEqu(word, "enumeration"))) {
 				// Matlab classdef
 				Sci_Position pos = LexSkipSpaceTab(i + len, endPos, styler);
-				char chEnd = styler.SafeGetCharAt(pos);
+				const char chEnd = styler.SafeGetCharAt(pos);
 				if (IsMatEndChar(chEnd, styler.StyleAt(pos))) {
 					levelNext++;
 				} else if (chEnd == '(') {
@@ -444,7 +445,7 @@ static void FoldMatlabDoc(Sci_PositionU startPos, Sci_Position length, int initS
 			visibleChars++;
 
 		if (atEOL || (i == endPos - 1)) {
-			int levelUse = levelCurrent;
+			const int levelUse = levelCurrent;
 			int lev = levelUse | levelNext << 16;
 			if (visibleChars == 0 && foldCompact)
 				lev |= SC_FOLDLEVELWHITEFLAG;

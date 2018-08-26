@@ -19,7 +19,7 @@ using namespace Scintilla;
 
 #define MAX_WORD_LENGTH	31
 
-static void CheckLLVMVarType(Sci_PositionU pos, Sci_PositionU endPos, Accessor &styler, bool &is_func, bool &is_type) {
+static void CheckLLVMVarType(Sci_PositionU pos, Sci_PositionU endPos, Accessor &styler, bool &is_func, bool &is_type) noexcept {
 	char c = 0;
 	while (pos < endPos) {
 		c = styler.SafeGetCharAt(pos);
@@ -61,7 +61,7 @@ static void ColouriseLLVMDoc(Sci_PositionU startPos, Sci_Position length, int in
 	styler.StartAt(startPos);
 	styler.StartSegment(startPos);
 	Sci_PositionU endPos = startPos + length;
-	if (endPos == (Sci_PositionU)styler.Length())
+	if (endPos == static_cast<Sci_PositionU>(styler.Length()))
 		++endPos;
 
 	Sci_Position lineCurrent = styler.GetLine(startPos);
@@ -73,7 +73,7 @@ static void ColouriseLLVMDoc(Sci_PositionU startPos, Sci_Position length, int in
 		chNext = styler.SafeGetCharAt(i + 1);
 
 		const bool atEOL = (ch == '\r' && chNext != '\n') || (ch == '\n');
-		const bool atLineStart = i == (Sci_PositionU)styler.LineStart(lineCurrent);
+		const bool atLineStart = i == static_cast<Sci_PositionU>(styler.LineStart(lineCurrent));
 
 		switch (state) {
 		case SCE_C_OPERATOR:
@@ -90,7 +90,7 @@ static void ColouriseLLVMDoc(Sci_PositionU startPos, Sci_Position length, int in
 			if (!iswordchar(ch)) {
 				buf[wordLen] = 0;
 				if (buf[0] == '@' || buf[0] == '%') {
-					if (strncmp(&buf[1], "llvm.", 5) == 0) {
+					if (strncmp(buf + 1, "llvm.", 5) == 0) {
 						styler.ColourTo(i - 1, SCE_C_DIRECTIVE);
 					} else {
 						bool is_func = false, is_type = false;
@@ -118,7 +118,7 @@ static void ColouriseLLVMDoc(Sci_PositionU startPos, Sci_Position length, int in
 				state = SCE_C_DEFAULT;
 				wordLen = 0;
 			} else if (wordLen < MAX_WORD_LENGTH) {
-				buf[wordLen++] = (char)ch;
+				buf[wordLen++] = static_cast<char>(ch);
 			}
 			break;
 		case SCE_C_WORD2:
@@ -176,7 +176,7 @@ static void ColouriseLLVMDoc(Sci_PositionU startPos, Sci_Position length, int in
 			} else if (iswordstart(ch) || ch == '@' || ch == '%') {
 				styler.ColourTo(i - 1, state);
 				state = SCE_C_IDENTIFIER;
-				buf[wordLen++] = (char)ch;
+				buf[wordLen++] = static_cast<char>(ch);
 			} else if (isoperator(ch)) {
 				styler.ColourTo(i - 1, state);
 				state = SCE_C_OPERATOR;
@@ -199,7 +199,7 @@ static void FoldLLVMDoc(Sci_PositionU startPos, Sci_Position length, int initSty
 	const bool foldComment = styler.GetPropertyInt("fold.comment") != 0;
 	const bool foldCompact = styler.GetPropertyInt("fold.compact", 1) != 0;
 
-	Sci_PositionU endPos = startPos + length;
+	const Sci_PositionU endPos = startPos + length;
 	int visibleChars = 0;
 	Sci_Position lineCurrent = styler.GetLine(startPos);
 	int levelCurrent = SC_FOLDLEVELBASE;
@@ -212,11 +212,11 @@ static void FoldLLVMDoc(Sci_PositionU startPos, Sci_Position length, int initSty
 	int style = initStyle;
 
 	for (Sci_PositionU i = startPos; i < endPos; i++) {
-		char ch = chNext;
+		const char ch = chNext;
 		chNext = styler.SafeGetCharAt(i + 1);
 		style = styleNext;
 		styleNext = styler.StyleAt(i + 1);
-		bool atEOL = (ch == '\r' && chNext != '\n') || (ch == '\n');
+		const bool atEOL = (ch == '\r' && chNext != '\n') || (ch == '\n');
 
 		if (foldComment && atEOL && IsCommentLine(lineCurrent)) {
 			if (!IsCommentLine(lineCurrent - 1) && IsCommentLine(lineCurrent + 1))
@@ -237,7 +237,7 @@ static void FoldLLVMDoc(Sci_PositionU startPos, Sci_Position length, int initSty
 			visibleChars++;
 
 		if (atEOL || (i == endPos - 1)) {
-			int levelUse = levelCurrent;
+			const int levelUse = levelCurrent;
 			int lev = levelUse | levelNext << 16;
 			if (visibleChars == 0 && foldCompact)
 				lev |= SC_FOLDLEVELWHITEFLAG;

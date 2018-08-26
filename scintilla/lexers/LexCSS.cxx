@@ -49,11 +49,11 @@ static inline bool IsCssOperator(int ch) noexcept {
 }
 
 // look behind (from start of document to our start position) to determine current nesting level
-static int NestingLevelLookBehind(Sci_PositionU startPos, Accessor &styler) {
+static int NestingLevelLookBehind(Sci_PositionU startPos, Accessor &styler) noexcept {
 	int nestingLevel = 0;
 
 	for (Sci_PositionU i = 0; i < startPos; i++) {
-		int ch = styler.SafeGetCharAt(i);
+		const int ch = styler.SafeGetCharAt(i);
 		if (ch == '{')
 			nestingLevel++;
 		else if (ch == '}')
@@ -98,18 +98,18 @@ static void ColouriseCssDoc(Sci_PositionU startPos, Sci_Position length, int ini
 
 	// property lexer.css.scss.language
 	//	Set to 1 for Sassy CSS (.scss)
-	bool isScssDocument = styler.GetPropertyInt("lexer.css.scss.language") != 0;
+	const bool isScssDocument = styler.GetPropertyInt("lexer.css.scss.language") != 0;
 
 	// property lexer.css.less.language
 	// Set to 1 for Less CSS (.less)
-	bool isLessDocument = styler.GetPropertyInt("lexer.css.less.language") != 0;
+	const bool isLessDocument = styler.GetPropertyInt("lexer.css.less.language") != 0;
 
 	// property lexer.css.hss.language
 	// Set to 1 for HSS (.hss)
-	bool isHssDocument = styler.GetPropertyInt("lexer.css.hss.language") != 0;
+	const bool isHssDocument = styler.GetPropertyInt("lexer.css.hss.language") != 0;
 
 	// SCSS/LESS/HSS have the concept of variable
-	bool hasVariables = isScssDocument || isLessDocument || isHssDocument;
+	const bool hasVariables = isScssDocument || isLessDocument || isHssDocument;
 	char varPrefix = 0;
 	if (hasVariables)
 		varPrefix = isLessDocument ? '@' : '$';
@@ -119,7 +119,7 @@ static void ColouriseCssDoc(Sci_PositionU startPos, Sci_Position length, int ini
 		eCommentBlock = 0, eCommentLine = 1
 	} CommentMode;
 	CommentMode comment_mode = eCommentBlock;
-	bool hasSingleLineComments = isScssDocument || isLessDocument || isHssDocument;
+	const bool hasSingleLineComments = isScssDocument || isLessDocument || isHssDocument;
 
 	// must keep track of nesting level in document types that support it (SCSS/LESS/HSS)
 	bool hasNesting = false;
@@ -386,10 +386,10 @@ static void ColouriseCssDoc(Sci_PositionU startPos, Sci_Position length, int ini
 			// check for nested rule selector
 			if (sc.state == SCE_CSS_IDENTIFIER && (IsAWordChar(sc.ch) || sc.ch == ':' || sc.ch == '.' || sc.ch == '#')) {
 				// look ahead to see whether { comes before next ; and }
-				Sci_PositionU endPos = startPos + length;
+				const Sci_PositionU endPos = startPos + length;
 
 				for (Sci_PositionU i = sc.currentPos; i < endPos; i++) {
-					int ch = styler.SafeGetCharAt(i);
+					const int ch = styler.SafeGetCharAt(i);
 					if (ch == ';' || ch == '}')
 						break;
 					if (ch == '{') {
@@ -508,9 +508,9 @@ static void ColouriseCssDoc(Sci_PositionU startPos, Sci_Position length, int ini
 }
 
 static void FoldCSSDoc(Sci_PositionU startPos, Sci_Position length, int, LexerWordList, Accessor &styler) {
-	bool foldComment = styler.GetPropertyInt("fold.comment") != 0;
-	bool foldCompact = styler.GetPropertyInt("fold.compact", 1) != 0;
-	Sci_PositionU endPos = startPos + length;
+	const bool foldComment = styler.GetPropertyInt("fold.comment") != 0;
+	const bool foldCompact = styler.GetPropertyInt("fold.compact", 1) != 0;
+	const Sci_PositionU endPos = startPos + length;
 	int visibleChars = 0;
 	Sci_Position lineCurrent = styler.GetLine(startPos);
 	int levelPrev = styler.LevelAt(lineCurrent) & SC_FOLDLEVELNUMBERMASK;
@@ -518,10 +518,10 @@ static void FoldCSSDoc(Sci_PositionU startPos, Sci_Position length, int, LexerWo
 	char chNext = styler[startPos];
 	bool inComment = (styler.StyleAt(startPos - 1) == SCE_CSS_COMMENT);
 	for (Sci_PositionU i = startPos; i < endPos; i++) {
-		char ch = chNext;
+		const char ch = chNext;
 		chNext = styler.SafeGetCharAt(i + 1);
-		int style = styler.StyleAt(i);
-		bool atEOL = (ch == '\r' && chNext != '\n') || (ch == '\n');
+		const int style = styler.StyleAt(i);
+		const bool atEOL = (ch == '\r' && chNext != '\n') || (ch == '\n');
 		if (foldComment) {
 			if (!inComment && (style == SCE_CSS_COMMENT))
 				levelCurrent++;
@@ -553,7 +553,7 @@ static void FoldCSSDoc(Sci_PositionU startPos, Sci_Position length, int, LexerWo
 			visibleChars++;
 	}
 	// Fill in the real level of the next line, keeping the current flags as they will be filled in later
-	int flagsNext = styler.LevelAt(lineCurrent) & ~SC_FOLDLEVELNUMBERMASK;
+	const int flagsNext = styler.LevelAt(lineCurrent) & ~SC_FOLDLEVELNUMBERMASK;
 	styler.SetLevel(lineCurrent, levelPrev | flagsNext);
 }
 

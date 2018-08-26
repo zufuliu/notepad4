@@ -26,7 +26,7 @@ using namespace Scintilla;
 	0
 }*/
 
-static inline bool IsCmakeOperator(char ch) noexcept {
+static constexpr bool IsCmakeOperator(char ch) noexcept {
 	return ch == '(' || ch == ')' || ch == '=' || ch == ':' || ch == ';';
 }
 
@@ -152,7 +152,7 @@ static void FoldCmakeDoc(Sci_PositionU startPos, Sci_Position length, int initSt
 	const bool foldComment = styler.GetPropertyInt("fold.comment", 1) != 0;
 	//const bool foldCompact = styler.GetPropertyInt("fold.compact") != 0;
 
-	Sci_PositionU endPos = startPos + length;
+	const Sci_PositionU endPos = startPos + length;
 	//int visibleChars = 0;
 	Sci_Position lineCurrent = styler.GetLine(startPos);
 	int levelCurrent = SC_FOLDLEVELBASE;
@@ -165,12 +165,12 @@ static void FoldCmakeDoc(Sci_PositionU startPos, Sci_Position length, int initSt
 	int style = initStyle;
 
 	for (Sci_PositionU i = startPos; i < endPos; i++) {
-		char ch = chNext;
+		const char ch = chNext;
 		chNext = styler.SafeGetCharAt(i + 1);
-		int stylePrev = style;
+		const int stylePrev = style;
 		style = styleNext;
 		styleNext = styler.StyleAt(i + 1);
-		bool atEOL = (ch == '\r' && chNext != '\n') || (ch == '\n');
+		const bool atEOL = (ch == '\r' && chNext != '\n') || (ch == '\n');
 
 		if (foldComment && atEOL && IsCommentLine(lineCurrent)) {
 			if (!IsCommentLine(lineCurrent - 1) && IsCommentLine(lineCurrent + 1))
@@ -199,7 +199,7 @@ static void FoldCmakeDoc(Sci_PositionU startPos, Sci_Position length, int initSt
 		//if (!isspacechar(ch))
 		//	visibleChars++;
 		if (atEOL || (i == endPos - 1)) {
-			int levelUse = levelCurrent;
+			const int levelUse = levelCurrent;
 			int lev = levelUse | levelNext << 16;
 			//if (visibleChars == 0 && foldCompact)
 			//	lev |= SC_FOLDLEVELWHITEFLAG;

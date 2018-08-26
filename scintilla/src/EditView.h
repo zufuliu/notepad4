@@ -14,7 +14,7 @@ struct PrintParameters {
 	int magnification;
 	int colourMode;
 	WrapMode wrapState;
-	PrintParameters();
+	PrintParameters() noexcept;
 };
 
 /**
@@ -33,7 +33,7 @@ enum DrawPhase {
 	drawAll = 0x1FF
 };
 
-bool ValidStyledText(const ViewStyle &vs, size_t styleOffset, const StyledText &st);
+bool ValidStyledText(const ViewStyle &vs, size_t styleOffset, const StyledText &st) noexcept;
 int WidestLineWidth(Surface *surface, const ViewStyle &vs, int styleOffset, const StyledText &st);
 void DrawTextNoClipPhase(Surface *surface, const PRectangle &rc, const Style &style, XYPOSITION ybase,
 	std::string_view text, DrawPhase phase);
@@ -99,18 +99,18 @@ public:
 	void operator=(EditView &&) = delete;
 	virtual ~EditView();
 
-	bool SetTwoPhaseDraw(bool twoPhaseDraw);
-	bool SetPhasesDraw(int phases);
-	bool LinesOverlap() const;
+	bool SetTwoPhaseDraw(bool twoPhaseDraw) noexcept;
+	bool SetPhasesDraw(int phases) noexcept;
+	bool LinesOverlap() const noexcept;
 
-	void ClearAllTabstops();
-	XYPOSITION NextTabstopPos(Sci::Line line, XYPOSITION x, XYPOSITION tabWidth) const;
-	bool ClearTabstops(Sci::Line line);
+	void ClearAllTabstops() noexcept;
+	XYPOSITION NextTabstopPos(Sci::Line line, XYPOSITION x, XYPOSITION tabWidth) const noexcept;
+	bool ClearTabstops(Sci::Line line) noexcept;
 	bool AddTabstop(Sci::Line line, int x);
-	int GetNextTabstop(Sci::Line line, int x) const;
+	int GetNextTabstop(Sci::Line line, int x) const noexcept;
 	void LinesAddedOrRemoved(Sci::Line lineOfPos, Sci::Line linesAdded);
 
-	void DropGraphics(bool freeObjects);
+	void DropGraphics(bool freeObjects) noexcept;
 	void AllocateGraphics(const ViewStyle &vsDraw);
 	void RefreshPixMaps(Surface *surfaceWindow, WindowID wid, const ViewStyle &vsDraw);
 
@@ -164,7 +164,7 @@ class AutoLineLayout {
 	LineLayoutCache &llc;
 	LineLayout *ll;
 public:
-	AutoLineLayout(LineLayoutCache &llc_, LineLayout *ll_) : llc(llc_), ll(ll_) {}
+	AutoLineLayout(LineLayoutCache &llc_, LineLayout *ll_) noexcept : llc(llc_), ll(ll_) {}
 	// Deleted so AutoLineLayout objects can not be copied.
 	AutoLineLayout(const AutoLineLayout &) = delete;
 	AutoLineLayout(AutoLineLayout &&) = delete;
@@ -180,7 +180,7 @@ public:
 	operator LineLayout *() const noexcept {
 		return ll;
 	}
-	void Set(LineLayout *ll_) {
+	void Set(LineLayout *ll_) noexcept {
 		llc.Dispose(ll);
 		ll = ll_;
 	}

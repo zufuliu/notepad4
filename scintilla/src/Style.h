@@ -17,29 +17,29 @@ struct FontSpecification {
 	int size;
 	int characterSet;
 	int extraFontFlag;
-	FontSpecification() :
+	FontSpecification() noexcept :
 		fontName(nullptr),
 		weight(SC_WEIGHT_NORMAL),
 		italic(false),
 		size(10 * SC_FONT_SIZE_MULTIPLIER),
 		characterSet(0),
 		extraFontFlag(0) {}
-	bool operator==(const FontSpecification &other) const;
-	bool operator<(const FontSpecification &other) const;
+	bool operator==(const FontSpecification &other) const noexcept;
+	bool operator<(const FontSpecification &other) const noexcept;
 };
 
 // Just like Font but only has a copy of the FontID so should not delete it
 class FontAlias : public Font {
 public:
-	FontAlias();
+	FontAlias() noexcept;
 	// FontAlias objects can not be assigned except for initialization
-	FontAlias(const FontAlias &);
+	FontAlias(const FontAlias &) noexcept;
 	FontAlias(FontAlias &&) = delete;
 	FontAlias &operator=(const FontAlias &) = delete;
 	FontAlias &operator=(FontAlias &&) = delete;
 	~FontAlias() override;
-	void MakeAlias(const Font &fontOrigin);
-	void ClearFont();
+	void MakeAlias(const Font &fontOrigin) noexcept;
+	void ClearFont() noexcept;
 };
 
 struct FontMeasurements {
@@ -49,8 +49,8 @@ struct FontMeasurements {
 	XYPOSITION aveCharWidth;
 	XYPOSITION spaceWidth;
 	int sizeZoomed;
-	FontMeasurements();
-	void ClearMeasurements();
+	FontMeasurements() noexcept;
+	void ClearMeasurements() noexcept;
 };
 
 /**
@@ -72,21 +72,21 @@ public:
 
 	FontAlias font;
 
-	Style();
-	Style(const Style &source);
+	Style() noexcept;
+	Style(const Style &source) noexcept;
 	Style(Style &&) = delete;
 	~Style();
-	Style &operator=(const Style &source);
+	Style &operator=(const Style &source) noexcept;
 	Style &operator=(Style &&) = delete;
 	void Clear(ColourDesired fore_, ColourDesired back_,
 		int size_,
 		const char *fontName_, int characterSet_,
 		int weight_, bool italic_, bool eolFilled_,
 		bool underline_, bool strike_, ecaseForced caseForce_,
-		bool visible_, bool changeable_, bool hotspot_);
-	void ClearTo(const Style &source);
-	void Copy(Font &font_, const FontMeasurements &fm_);
-	bool IsProtected() const {
+		bool visible_, bool changeable_, bool hotspot_) noexcept;
+	void ClearTo(const Style &source) noexcept;
+	void Copy(const Font &font_, const FontMeasurements &fm_) noexcept;
+	bool IsProtected() const noexcept {
 		return !(changeable && visible);
 	}
 };

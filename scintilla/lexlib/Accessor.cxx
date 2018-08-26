@@ -19,14 +19,14 @@
 
 using namespace Scintilla;
 
-Accessor::Accessor(IDocument *pAccess_, PropSetSimple *pprops_) : LexAccessor(pAccess_), pprops(pprops_) {
+Accessor::Accessor(IDocument *pAccess_, PropSetSimple *pprops_) noexcept : LexAccessor(pAccess_), pprops(pprops_) {
 }
 
 int Accessor::GetPropertyInt(const char *key, int defaultValue) const {
 	return pprops->GetInt(key, defaultValue);
 }
 
-int Accessor::LexIndentAmount(Accessor &styler, Sci_Position line, int *flags, PFNIsCommentLeader pfnIsCommentLeader) {
+int Accessor::LexIndentAmount(Accessor &styler, Sci_Position line, int *flags, PFNIsCommentLeader pfnIsCommentLeader) noexcept {
 	const Sci_Position end = styler.Length();
 	int spaceFlags = 0;
 

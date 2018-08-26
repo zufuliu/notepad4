@@ -35,10 +35,10 @@ public:
 	 * it instead of creating a new method(s) in the Surface class that existing
 	 * platforms must implement as empty. */
 	DrawLineMarkerFn customDraw;
-	LineMarker();
-	LineMarker(const LineMarker &);
+	LineMarker() noexcept;
+	LineMarker(const LineMarker &) noexcept;
 	virtual ~LineMarker();
-	LineMarker &operator=(const LineMarker &other);
+	LineMarker &operator=(const LineMarker &other) noexcept;
 	void SetXPM(const char *textForm);
 	void SetXPM(const char *const *linesForm);
 	void SetRGBAImage(const Point &sizeRGBAImage, float scale, const unsigned char *pixelsRGBAImage);
