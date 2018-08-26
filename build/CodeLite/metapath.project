@@ -5,14 +5,14 @@
   <VirtualDirectory Name="Source Files">
     <File Name="../../metapath/src/Dialogs.c"/>
     <File Name="../../metapath/src/Dlapi.c"/>
-    <File Name="../../metapath/src/Dropsource.cpp"/>
+    <File Name="../../metapath/src/DropSource.cpp"/>
     <File Name="../../metapath/src/Helpers.c"/>
     <File Name="../../metapath/src/metapath.c"/>
   </VirtualDirectory>
   <VirtualDirectory Name="Header Files">
     <File Name="../../metapath/src/Dialogs.h"/>
     <File Name="../../metapath/src/Dlapi.h"/>
-    <File Name="../../metapath/src/Dropsource.h"/>
+    <File Name="../../metapath/src/DropSource.h"/>
     <File Name="../../metapath/src/Helpers.h"/>
     <File Name="../../metapath/src/metapath.h"/>
     <File Name="../../metapath/src/resource.h"/>

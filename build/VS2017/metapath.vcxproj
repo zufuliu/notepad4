@@ -387,14 +387,14 @@
   <ItemGroup>
     <ClCompile Include="..\..\metapath\src\Dialogs.c" />
     <ClCompile Include="..\..\metapath\src\Dlapi.c" />
-    <ClCompile Include="..\..\metapath\src\Dropsource.cpp" />
+    <ClCompile Include="..\..\metapath\src\DropSource.cpp" />
     <ClCompile Include="..\..\metapath\src\Helpers.c" />
     <ClCompile Include="..\..\metapath\src\metapath.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\metapath\src\Dialogs.h" />
     <ClInclude Include="..\..\metapath\src\Dlapi.h" />
-    <ClInclude Include="..\..\metapath\src\Dropsource.h" />
+    <ClInclude Include="..\..\metapath\src\DropSource.h" />
     <ClInclude Include="..\..\metapath\src\Helpers.h" />
     <ClInclude Include="..\..\metapath\src\metapath.h" />
     <ClInclude Include="..\..\metapath\src\resource.h" />
