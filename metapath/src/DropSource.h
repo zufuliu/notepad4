@@ -3,7 +3,7 @@
 *
 * metapath - The universal Explorer-like Plugin
 *
-* Dropsource.h
+* DropSource.h
 *   OLE drop source functionality
 *
 * See Readme.txt for more information about this source code.
@@ -21,7 +21,7 @@
 #ifndef METAPATH_DROPSOURCE_H_
 #define METAPATH_DROPSOURCE_H_
 
-class FAR CDropSource : public IDropSource {
+class CDropSource : public IDropSource {
 public:
 	CDropSource() noexcept;
 	virtual ~CDropSource() = default;

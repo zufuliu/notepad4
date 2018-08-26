@@ -3,7 +3,7 @@
 *
 * metapath - The universal Explorer-like Plugin
 *
-* Dropsource.cpp
+* DropSource.cpp
 *   OLE drop source functionality
 *
 * See Readme.txt for more information about this source code.

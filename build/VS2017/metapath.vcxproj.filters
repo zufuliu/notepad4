@@ -21,7 +21,7 @@
     <ClCompile Include="..\..\metapath\src\Dlapi.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\metapath\src\Dropsource.cpp">
+    <ClCompile Include="..\..\metapath\src\DropSource.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\metapath\src\Helpers.c">
@@ -38,7 +38,7 @@
     <ClInclude Include="..\..\metapath\src\Dlapi.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\metapath\src\Dropsource.h">
+    <ClInclude Include="..\..\metapath\src\DropSource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\metapath\src\Helpers.h">
