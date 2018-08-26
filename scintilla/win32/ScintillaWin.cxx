@@ -181,45 +181,86 @@ inline bool KeyboardIsKeyDown(int key) noexcept {
 
 class ScintillaWin; 	// Forward declaration for COM interface subobjects
 
-typedef void VFunction(void);
-
-
 /**
  */
-class FormatEnumerator {
-public:
-	VFunction **vtbl;
+class FormatEnumerator : public IEnumFORMATETC {
 	ULONG ref;
 	unsigned int pos;
 	std::vector<CLIPFORMAT> formats;
+
+public:
 	FormatEnumerator(int pos_, const CLIPFORMAT formats_[], size_t formatsLen_);
+
+	// IUnknown
+	STDMETHODIMP QueryInterface(REFIID riid, PVOID *ppv) noexcept override;
+	STDMETHODIMP_(ULONG)AddRef() noexcept override;
+	STDMETHODIMP_(ULONG)Release() noexcept override;
+
+	// IEnumFORMATETC
+	STDMETHODIMP Next(ULONG celt, FORMATETC *rgelt, ULONG *pceltFetched) override;
+	STDMETHODIMP Skip(ULONG celt) noexcept override;
+	STDMETHODIMP Reset() noexcept override;
+	STDMETHODIMP Clone(IEnumFORMATETC **ppenum) override;
 };
 
 /**
  */
-class DropSource {
+class DropSource : public IDropSource {
 public:
-	VFunction **vtbl;
 	ScintillaWin *sci;
 	DropSource() noexcept;
+
+	// IUnknown
+	STDMETHODIMP QueryInterface(REFIID riid, PVOID *ppv) noexcept override;
+	STDMETHODIMP_(ULONG)AddRef() noexcept override;
+	STDMETHODIMP_(ULONG)Release() noexcept override;
+
+	// IDropSource
+	STDMETHODIMP QueryContinueDrag(BOOL fEsc, DWORD grfKeyState) noexcept override;
+	STDMETHODIMP GiveFeedback(DWORD) noexcept override;
 };
 
 /**
  */
-class DataObject {
+class DataObject : public IDataObject {
 public:
-	VFunction **vtbl;
 	ScintillaWin *sci;
 	DataObject() noexcept;
+
+	// IUnknown
+	STDMETHODIMP QueryInterface(REFIID riid, PVOID *ppv) noexcept override;
+	STDMETHODIMP_(ULONG)AddRef() noexcept override;
+	STDMETHODIMP_(ULONG)Release() noexcept override;
+
+	// IDataObject
+	STDMETHODIMP GetData(FORMATETC *pFEIn, STGMEDIUM *pSTM) override;
+	STDMETHODIMP GetDataHere(FORMATETC *, STGMEDIUM *) noexcept override;
+	STDMETHODIMP QueryGetData(FORMATETC *pFE) noexcept override;
+	STDMETHODIMP GetCanonicalFormatEtc(FORMATETC *, FORMATETC *pFEOut) noexcept override;
+	STDMETHODIMP SetData(FORMATETC *, STGMEDIUM *, BOOL) noexcept override;
+	STDMETHODIMP EnumFormatEtc(DWORD dwDirection, IEnumFORMATETC **ppEnum) override;
+	STDMETHODIMP DAdvise(FORMATETC *, DWORD, IAdviseSink *, PDWORD) noexcept override;
+	STDMETHODIMP DUnadvise(DWORD) noexcept override;
+	STDMETHODIMP EnumDAdvise(IEnumSTATDATA **) noexcept override;
 };
 
 /**
  */
-class DropTarget {
+class DropTarget : public IDropTarget {
 public:
-	VFunction **vtbl;
 	ScintillaWin *sci;
 	DropTarget() noexcept;
+
+	// IUnknown
+	STDMETHODIMP QueryInterface(REFIID riid, PVOID *ppv) noexcept override;
+	STDMETHODIMP_(ULONG)AddRef() noexcept override;
+	STDMETHODIMP_(ULONG)Release() noexcept override;
+
+	// IDropTarget
+	STDMETHODIMP DragEnter(LPDATAOBJECT pIDataSource, DWORD grfKeyState, POINTL pt, PDWORD pdwEffect) override;
+	STDMETHODIMP DragOver(DWORD grfKeyState, POINTL pt, PDWORD pdwEffect) override;
+	STDMETHODIMP DragLeave() override;
+	STDMETHODIMP Drop(LPDATAOBJECT pIDataSource, DWORD grfKeyState, POINTL pt, PDWORD pdwEffect) override;
 };
 
 namespace {
@@ -2399,97 +2440,84 @@ void ScintillaWin::ClaimSelection() noexcept {
 }
 
 /// Implement IUnknown
-
-STDMETHODIMP_(ULONG)FormatEnumerator_AddRef(FormatEnumerator *fe);
-STDMETHODIMP FormatEnumerator_QueryInterface(FormatEnumerator *fe, REFIID riid, PVOID *ppv) {
+STDMETHODIMP FormatEnumerator::QueryInterface(REFIID riid, PVOID *ppv) noexcept {
 	//Platform::DebugPrintf("EFE QI");
 	*ppv = nullptr;
 	if (riid == IID_IUnknown)
-		*ppv = reinterpret_cast<IEnumFORMATETC *>(fe);
+		*ppv = this;
 	if (riid == IID_IEnumFORMATETC)
-		*ppv = reinterpret_cast<IEnumFORMATETC *>(fe);
+		*ppv = this;
 	if (!*ppv)
 		return E_NOINTERFACE;
-	FormatEnumerator_AddRef(fe);
+	AddRef();
 	return S_OK;
 }
-STDMETHODIMP_(ULONG)FormatEnumerator_AddRef(FormatEnumerator *fe) {
-	return InterlockedIncrement(&fe->ref);
+STDMETHODIMP_(ULONG)FormatEnumerator::AddRef() noexcept {
+	return InterlockedIncrement(&ref);
 }
-STDMETHODIMP_(ULONG)FormatEnumerator_Release(FormatEnumerator *fe) {
-	const ULONG refs = InterlockedDecrement(&fe->ref);
+STDMETHODIMP_(ULONG)FormatEnumerator::Release() noexcept {
+	const ULONG refs = InterlockedDecrement(&ref);
 	if (refs == 0) {
-		delete fe;
+		delete this;
 	}
 	return refs;
 }
+
 /// Implement IEnumFORMATETC
-STDMETHODIMP FormatEnumerator_Next(FormatEnumerator *fe, ULONG celt, FORMATETC *rgelt, ULONG *pceltFetched) {
+STDMETHODIMP FormatEnumerator::Next(ULONG celt, FORMATETC *rgelt, ULONG *pceltFetched) {
 	if (!rgelt) return E_POINTER;
 	unsigned int putPos = 0;
-	while ((fe->pos < fe->formats.size()) && (putPos < celt)) {
-		rgelt->cfFormat = fe->formats[fe->pos];
+	while ((pos < formats.size()) && (putPos < celt)) {
+		rgelt->cfFormat = formats[pos];
 		rgelt->ptd = nullptr;
 		rgelt->dwAspect = DVASPECT_CONTENT;
 		rgelt->lindex = -1;
 		rgelt->tymed = TYMED_HGLOBAL;
 		rgelt++;
-		fe->pos++;
+		pos++;
 		putPos++;
 	}
 	if (pceltFetched)
 		*pceltFetched = putPos;
 	return putPos ? S_OK : S_FALSE;
 }
-STDMETHODIMP FormatEnumerator_Skip(FormatEnumerator *fe, ULONG celt) noexcept {
-	fe->pos += celt;
+STDMETHODIMP FormatEnumerator::Skip(ULONG celt) noexcept {
+	pos += celt;
 	return S_OK;
 }
-STDMETHODIMP FormatEnumerator_Reset(FormatEnumerator *fe) noexcept {
-	fe->pos = 0;
+STDMETHODIMP FormatEnumerator::Reset() noexcept {
+	pos = 0;
 	return S_OK;
 }
-STDMETHODIMP FormatEnumerator_Clone(FormatEnumerator *fe, IEnumFORMATETC **ppenum) {
+STDMETHODIMP FormatEnumerator::Clone(IEnumFORMATETC **ppenum) {
 	FormatEnumerator *pfe;
 	try {
-		pfe = new FormatEnumerator(fe->pos, fe->formats.data(), fe->formats.size());
+		pfe = new FormatEnumerator(pos, formats.data(), formats.size());
 	} catch (...) {
 		return E_OUTOFMEMORY;
 	}
-	return FormatEnumerator_QueryInterface(pfe, IID_IEnumFORMATETC,
-		reinterpret_cast<void **>(ppenum));
+	return pfe->QueryInterface(IID_IEnumFORMATETC, reinterpret_cast<PVOID *>(ppenum));
 }
 
-static VFunction *vtFormatEnumerator[] = {
-	(VFunction *)(FormatEnumerator_QueryInterface),
-	(VFunction *)(FormatEnumerator_AddRef),
-	(VFunction *)(FormatEnumerator_Release),
-	(VFunction *)(FormatEnumerator_Next),
-	(VFunction *)(FormatEnumerator_Skip),
-	(VFunction *)(FormatEnumerator_Reset),
-	(VFunction *)(FormatEnumerator_Clone)
-};
-
 FormatEnumerator::FormatEnumerator(int pos_, const CLIPFORMAT formats_[], size_t formatsLen_) {
-	vtbl = vtFormatEnumerator;
 	ref = 0;   // First QI adds first reference...
 	pos = pos_;
 	formats.insert(formats.begin(), formats_, formats_ + formatsLen_);
 }
 
 /// Implement IUnknown
-STDMETHODIMP DropSource_QueryInterface(DropSource *ds, REFIID riid, PVOID *ppv) noexcept {
-	return ds->sci->QueryInterface(riid, ppv);
+STDMETHODIMP DropSource::QueryInterface(REFIID riid, PVOID *ppv) noexcept {
+	return sci->QueryInterface(riid, ppv);
 }
-STDMETHODIMP_(ULONG)DropSource_AddRef(DropSource *ds) noexcept {
-	return ds->sci->AddRef();
+STDMETHODIMP_(ULONG)DropSource::AddRef() noexcept {
+	return sci->AddRef();
 }
-STDMETHODIMP_(ULONG)DropSource_Release(DropSource *ds) noexcept {
-	return ds->sci->Release();
+STDMETHODIMP_(ULONG)DropSource::Release() noexcept {
+	return sci->Release();
 }
 
 /// Implement IDropSource
-STDMETHODIMP DropSource_QueryContinueDrag(DropSource *, BOOL fEsc, DWORD grfKeyState) noexcept {
+STDMETHODIMP DropSource::QueryContinueDrag(BOOL fEsc, DWORD grfKeyState) noexcept {
 	if (fEsc)
 		return DRAGDROP_S_CANCEL;
 	if (!(grfKeyState & MK_LBUTTON))
@@ -2497,46 +2525,38 @@ STDMETHODIMP DropSource_QueryContinueDrag(DropSource *, BOOL fEsc, DWORD grfKeyS
 	return S_OK;
 }
 
-STDMETHODIMP DropSource_GiveFeedback(DropSource *, DWORD) noexcept {
+STDMETHODIMP DropSource::GiveFeedback(DWORD) noexcept {
 	return DRAGDROP_S_USEDEFAULTCURSORS;
 }
 
-static VFunction *vtDropSource[] = {
-	(VFunction *)(DropSource_QueryInterface),
-	(VFunction *)(DropSource_AddRef),
-	(VFunction *)(DropSource_Release),
-	(VFunction *)(DropSource_QueryContinueDrag),
-	(VFunction *)(DropSource_GiveFeedback)
-};
-
 DropSource::DropSource() noexcept {
-	vtbl = vtDropSource;
 	sci = nullptr;
 }
 
 /// Implement IUnkown
-STDMETHODIMP DataObject_QueryInterface(DataObject *pd, REFIID riid, PVOID *ppv) noexcept {
-	//Platform::DebugPrintf("DO QI %x\n", pd);
-	return pd->sci->QueryInterface(riid, ppv);
+STDMETHODIMP DataObject::QueryInterface(REFIID riid, PVOID *ppv) noexcept {
+	//Platform::DebugPrintf("DO QI %x\n", this);
+	return sci->QueryInterface(riid, ppv);
 }
-STDMETHODIMP_(ULONG)DataObject_AddRef(DataObject *pd) noexcept {
-	return pd->sci->AddRef();
+STDMETHODIMP_(ULONG)DataObject::AddRef() noexcept {
+	return sci->AddRef();
 }
-STDMETHODIMP_(ULONG)DataObject_Release(DataObject *pd) noexcept {
-	return pd->sci->Release();
-}
-/// Implement IDataObject
-STDMETHODIMP DataObject_GetData(DataObject *pd, FORMATETC *pFEIn, STGMEDIUM *pSTM) {
-	return pd->sci->GetData(pFEIn, pSTM);
+STDMETHODIMP_(ULONG)DataObject::Release() noexcept {
+	return sci->Release();
 }
 
-STDMETHODIMP DataObject_GetDataHere(DataObject *, FORMATETC *, STGMEDIUM *) noexcept {
+/// Implement IDataObject
+STDMETHODIMP DataObject::GetData(FORMATETC *pFEIn, STGMEDIUM *pSTM) {
+	return sci->GetData(pFEIn, pSTM);
+}
+
+STDMETHODIMP DataObject::GetDataHere(FORMATETC *, STGMEDIUM *) noexcept {
 	//Platform::DebugPrintf("DOB GetDataHere\n");
 	return E_NOTIMPL;
 }
 
-STDMETHODIMP DataObject_QueryGetData(DataObject *pd, FORMATETC *pFE) noexcept {
-	if (pd->sci->DragIsRectangularOK(pFE->cfFormat) &&
+STDMETHODIMP DataObject::QueryGetData(FORMATETC *pFE) noexcept {
+	if (sci->DragIsRectangularOK(pFE->cfFormat) &&
 		pFE->ptd == nullptr &&
 		(pFE->dwAspect & DVASPECT_CONTENT) != 0 &&
 		pFE->lindex == -1 &&
@@ -2546,7 +2566,7 @@ STDMETHODIMP DataObject_QueryGetData(DataObject *pd, FORMATETC *pFE) noexcept {
 	}
 
 	const bool formatOK = (pFE->cfFormat == CF_TEXT) ||
-		((pFE->cfFormat == CF_UNICODETEXT) && pd->sci->IsUnicodeMode());
+		((pFE->cfFormat == CF_UNICODETEXT) && sci->IsUnicodeMode());
 	if (!formatOK ||
 		pFE->ptd != nullptr ||
 		(pFE->dwAspect & DVASPECT_CONTENT) == 0 ||
@@ -2561,9 +2581,9 @@ STDMETHODIMP DataObject_QueryGetData(DataObject *pd, FORMATETC *pFE) noexcept {
 	return S_OK;
 }
 
-STDMETHODIMP DataObject_GetCanonicalFormatEtc(DataObject *pd, FORMATETC *, FORMATETC *pFEOut) noexcept {
+STDMETHODIMP DataObject::GetCanonicalFormatEtc(FORMATETC *, FORMATETC *pFEOut) noexcept {
 	//Platform::DebugPrintf("DOB GetCanon\n");
-	if (pd->sci->IsUnicodeMode())
+	if (sci->IsUnicodeMode())
 		pFEOut->cfFormat = CF_UNICODETEXT;
 	else
 		pFEOut->cfFormat = CF_TEXT;
@@ -2574,12 +2594,12 @@ STDMETHODIMP DataObject_GetCanonicalFormatEtc(DataObject *pd, FORMATETC *, FORMA
 	return S_OK;
 }
 
-STDMETHODIMP DataObject_SetData(DataObject *, FORMATETC *, STGMEDIUM *, BOOL) noexcept {
+STDMETHODIMP DataObject::SetData(FORMATETC *, STGMEDIUM *, BOOL) noexcept {
 	//Platform::DebugPrintf("DOB SetData\n");
 	return E_FAIL;
 }
 
-STDMETHODIMP DataObject_EnumFormatEtc(DataObject *pd, DWORD dwDirection, IEnumFORMATETC **ppEnum) {
+STDMETHODIMP DataObject::EnumFormatEtc(DWORD dwDirection, IEnumFORMATETC **ppEnum) {
 	try {
 		//Platform::DebugPrintf("DOB EnumFormatEtc %d\n", dwDirection);
 		if (dwDirection != DATADIR_GET) {
@@ -2587,119 +2607,89 @@ STDMETHODIMP DataObject_EnumFormatEtc(DataObject *pd, DWORD dwDirection, IEnumFO
 			return E_FAIL;
 		}
 		FormatEnumerator *pfe;
-		if (pd->sci->IsUnicodeMode()) {
+		if (sci->IsUnicodeMode()) {
 			const CLIPFORMAT formats[] = { CF_UNICODETEXT, CF_TEXT };
 			pfe = new FormatEnumerator(0, formats, std::size(formats));
 		} else {
 			const CLIPFORMAT formats[] = { CF_TEXT };
 			pfe = new FormatEnumerator(0, formats, std::size(formats));
 		}
-		return FormatEnumerator_QueryInterface(pfe, IID_IEnumFORMATETC,
-			reinterpret_cast<void **>(ppEnum));
+		return pfe->QueryInterface(IID_IEnumFORMATETC, reinterpret_cast<PVOID *>(ppEnum));
 	} catch (std::bad_alloc &) {
-		pd->sci->errorStatus = SC_STATUS_BADALLOC;
+		sci->errorStatus = SC_STATUS_BADALLOC;
 		return E_OUTOFMEMORY;
 	} catch (...) {
-		pd->sci->errorStatus = SC_STATUS_FAILURE;
+		sci->errorStatus = SC_STATUS_FAILURE;
 		return E_FAIL;
 	}
 }
 
-STDMETHODIMP DataObject_DAdvise(DataObject *, FORMATETC *, DWORD, IAdviseSink *, PDWORD) noexcept {
+STDMETHODIMP DataObject::DAdvise(FORMATETC *, DWORD, IAdviseSink *, PDWORD) noexcept {
 	//Platform::DebugPrintf("DOB DAdvise\n");
 	return E_FAIL;
 }
 
-STDMETHODIMP DataObject_DUnadvise(DataObject *, DWORD) noexcept {
+STDMETHODIMP DataObject::DUnadvise(DWORD) noexcept {
 	//Platform::DebugPrintf("DOB DUnadvise\n");
 	return E_FAIL;
 }
 
-STDMETHODIMP DataObject_EnumDAdvise(DataObject *, IEnumSTATDATA **) noexcept {
+STDMETHODIMP DataObject::EnumDAdvise(IEnumSTATDATA **) noexcept {
 	//Platform::DebugPrintf("DOB EnumDAdvise\n");
 	return E_FAIL;
 }
 
-static VFunction *vtDataObject[] = {
-	(VFunction *)(DataObject_QueryInterface),
-	(VFunction *)(DataObject_AddRef),
-	(VFunction *)(DataObject_Release),
-	(VFunction *)(DataObject_GetData),
-	(VFunction *)(DataObject_GetDataHere),
-	(VFunction *)(DataObject_QueryGetData),
-	(VFunction *)(DataObject_GetCanonicalFormatEtc),
-	(VFunction *)(DataObject_SetData),
-	(VFunction *)(DataObject_EnumFormatEtc),
-	(VFunction *)(DataObject_DAdvise),
-	(VFunction *)(DataObject_DUnadvise),
-	(VFunction *)(DataObject_EnumDAdvise)
-};
-
 DataObject::DataObject() noexcept {
-	vtbl = vtDataObject;
 	sci = nullptr;
 }
 
 /// Implement IUnknown
-STDMETHODIMP DropTarget_QueryInterface(DropTarget *dt, REFIID riid, PVOID *ppv) noexcept {
-	//Platform::DebugPrintf("DT QI %x\n", dt);
-	return dt->sci->QueryInterface(riid, ppv);
+STDMETHODIMP DropTarget::QueryInterface(REFIID riid, PVOID *ppv) noexcept {
+	//Platform::DebugPrintf("DT QI %x\n", this);
+	return sci->QueryInterface(riid, ppv);
 }
-STDMETHODIMP_(ULONG)DropTarget_AddRef(DropTarget *dt) noexcept {
-	return dt->sci->AddRef();
+STDMETHODIMP_(ULONG)DropTarget::AddRef() noexcept {
+	return sci->AddRef();
 }
-STDMETHODIMP_(ULONG)DropTarget_Release(DropTarget *dt) noexcept {
-	return dt->sci->Release();
+STDMETHODIMP_(ULONG)DropTarget::Release() noexcept {
+	return sci->Release();
 }
 
 /// Implement IDropTarget by forwarding to Scintilla
-STDMETHODIMP DropTarget_DragEnter(DropTarget *dt, LPDATAOBJECT pIDataSource, DWORD grfKeyState,
-	POINTL pt, PDWORD pdwEffect) {
+STDMETHODIMP DropTarget::DragEnter(LPDATAOBJECT pIDataSource, DWORD grfKeyState, POINTL pt, PDWORD pdwEffect) {
 	try {
-		return dt->sci->DragEnter(pIDataSource, grfKeyState, pt, pdwEffect);
+		return sci->DragEnter(pIDataSource, grfKeyState, pt, pdwEffect);
 	} catch (...) {
-		dt->sci->errorStatus = SC_STATUS_FAILURE;
+		sci->errorStatus = SC_STATUS_FAILURE;
 	}
 	return E_FAIL;
 }
-STDMETHODIMP DropTarget_DragOver(DropTarget *dt, DWORD grfKeyState, POINTL pt, PDWORD pdwEffect) {
+STDMETHODIMP DropTarget::DragOver(DWORD grfKeyState, POINTL pt, PDWORD pdwEffect) {
 	try {
-		return dt->sci->DragOver(grfKeyState, pt, pdwEffect);
+		return sci->DragOver(grfKeyState, pt, pdwEffect);
 	} catch (...) {
-		dt->sci->errorStatus = SC_STATUS_FAILURE;
+		sci->errorStatus = SC_STATUS_FAILURE;
 	}
 	return E_FAIL;
 }
-STDMETHODIMP DropTarget_DragLeave(DropTarget *dt) {
+STDMETHODIMP DropTarget::DragLeave() {
 	try {
-		return dt->sci->DragLeave();
+		return sci->DragLeave();
 	} catch (...) {
-		dt->sci->errorStatus = SC_STATUS_FAILURE;
+		sci->errorStatus = SC_STATUS_FAILURE;
 	}
 	return E_FAIL;
 }
-STDMETHODIMP DropTarget_Drop(DropTarget *dt, LPDATAOBJECT pIDataSource, DWORD grfKeyState,
-	POINTL pt, PDWORD pdwEffect) {
+STDMETHODIMP DropTarget::Drop(LPDATAOBJECT pIDataSource, DWORD grfKeyState, POINTL pt, PDWORD pdwEffect) {
 	try {
-		return dt->sci->Drop(pIDataSource, grfKeyState, pt, pdwEffect);
+		return sci->Drop(pIDataSource, grfKeyState, pt, pdwEffect);
 	} catch (...) {
-		dt->sci->errorStatus = SC_STATUS_FAILURE;
+		sci->errorStatus = SC_STATUS_FAILURE;
 	}
 	return E_FAIL;
 }
-
-static VFunction *vtDropTarget[] = {
-	(VFunction *)(DropTarget_QueryInterface),
-	(VFunction *)(DropTarget_AddRef),
-	(VFunction *)(DropTarget_Release),
-	(VFunction *)(DropTarget_DragEnter),
-	(VFunction *)(DropTarget_DragOver),
-	(VFunction *)(DropTarget_DragLeave),
-	(VFunction *)(DropTarget_Drop)
-};
 
 DropTarget::DropTarget() noexcept {
-	vtbl = vtDropTarget;
 	sci = nullptr;
 }
 
@@ -3067,13 +3057,13 @@ DWORD ScintillaWin::EffectFromState(DWORD grfKeyState) const noexcept {
 STDMETHODIMP ScintillaWin::QueryInterface(REFIID riid, PVOID *ppv) noexcept {
 	*ppv = nullptr;
 	if (riid == IID_IUnknown)
-		*ppv = reinterpret_cast<IDropTarget *>(&dt);
+		*ppv = &dt;
 	if (riid == IID_IDropSource)
-		*ppv = reinterpret_cast<IDropSource *>(&ds);
+		*ppv = &ds;
 	if (riid == IID_IDropTarget)
-		*ppv = reinterpret_cast<IDropTarget *>(&dt);
+		*ppv = &dt;
 	if (riid == IID_IDataObject)
-		*ppv = reinterpret_cast<IDataObject *>(&dob);
+		*ppv = &dob;
 	if (!*ppv)
 		return E_NOINTERFACE;
 	return S_OK;
@@ -3160,8 +3150,7 @@ void ScintillaWin::EnumDataSourceFormat(const char *tag, LPDATAOBJECT pIDataSour
 #endif
 
 /// Implement IDropTarget
-STDMETHODIMP ScintillaWin::DragEnter(LPDATAOBJECT pIDataSource, DWORD grfKeyState,
-	POINTL, PDWORD pdwEffect) {
+STDMETHODIMP ScintillaWin::DragEnter(LPDATAOBJECT pIDataSource, DWORD grfKeyState, POINTL, PDWORD pdwEffect) {
 	if (!pIDataSource)
 		return E_POINTER;
 
@@ -3217,8 +3206,7 @@ STDMETHODIMP ScintillaWin::DragLeave() {
 	return E_FAIL;
 }
 
-STDMETHODIMP ScintillaWin::Drop(LPDATAOBJECT pIDataSource, DWORD grfKeyState,
-	POINTL pt, PDWORD pdwEffect) {
+STDMETHODIMP ScintillaWin::Drop(LPDATAOBJECT pIDataSource, DWORD grfKeyState, POINTL pt, PDWORD pdwEffect) {
 	try {
 		*pdwEffect = EffectFromState(grfKeyState);
 

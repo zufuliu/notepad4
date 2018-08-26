@@ -27,13 +27,13 @@ public:
 	virtual ~CDropSource() = default;
 
 	/* IUnknown methods */
-	STDMETHOD(QueryInterface)(REFIID riid, PVOID *ppvObj) noexcept override;
-	STDMETHOD_(ULONG, AddRef)() noexcept override;
-	STDMETHOD_(ULONG, Release)() noexcept override;
+	STDMETHODIMP QueryInterface(REFIID riid, PVOID *ppv) noexcept override;
+	STDMETHODIMP_(ULONG)AddRef() noexcept override;
+	STDMETHODIMP_(ULONG)Release() noexcept override;
 
 	/* IDropSource methods */
-	STDMETHOD(QueryContinueDrag)(BOOL fEscapePressed, DWORD grfKeyState) noexcept override;
-	STDMETHOD(GiveFeedback)(DWORD dwEffect) noexcept override;
+	STDMETHODIMP QueryContinueDrag(BOOL fEsc, DWORD grfKeyState) noexcept override;
+	STDMETHODIMP GiveFeedback(DWORD) noexcept override;
 
 private:
 	ULONG m_refs;
