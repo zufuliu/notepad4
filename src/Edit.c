@@ -53,7 +53,6 @@ extern BOOL bFixLineEndings;
 extern BOOL bAutoStripBlanks;
 
 extern int iRenderingTechnology;
-extern BOOL bBufferedDraw;
 extern int iBidirectional;
 // Default Codepage and Character Set
 extern int iDefaultCodePage;
@@ -86,7 +85,7 @@ HWND EditCreate(HWND hwndParent) {
 						  g_hInstance,
 						  NULL);
 
-	SendMessage(hwnd, SCI_SETBUFFEREDDRAW, ((iRenderingTechnology == SC_TECHNOLOGY_DEFAULT) && bBufferedDraw), 0);
+	SendMessage(hwnd, SCI_SETBUFFEREDDRAW, (iRenderingTechnology == SC_TECHNOLOGY_DEFAULT), 0);
 	SendMessage(hwnd, SCI_SETTECHNOLOGY, iRenderingTechnology, 0);
 	SendMessage(hwnd, SCI_SETBIDIRECTIONAL, iBidirectional, 0);
 	SendMessage(hwnd, SCI_SETCODEPAGE, iDefaultCodePage, 0);
