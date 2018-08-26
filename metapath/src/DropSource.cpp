@@ -29,7 +29,7 @@
 STDMETHODIMP CDropSource::QueryInterface(REFIID iid, PVOID *ppv) noexcept {
 	if (iid == IID_IUnknown || iid == IID_IDropSource) {
 		*ppv = this;
-		InterlockedIncrement(&m_refs);
+		AddRef();
 		return NOERROR;
 	}
 	*ppv = nullptr;
