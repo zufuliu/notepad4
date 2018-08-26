@@ -18,10 +18,10 @@
 using namespace Scintilla;
 
 // / \ : * ? < > " |
-static inline bool IsBatSpec(int ch) noexcept {
+static constexpr bool IsBatSpec(int ch) noexcept {
 	return (ch < 0x80) && (ch == ':' || ch == '?' || ch == '%' || ch == '\'' || ch == '\"' || ch == '`');
 }
-static inline bool IsBatOp(int ch) noexcept {
+static constexpr bool IsBatOp(int ch) noexcept {
 	return (ch < 0x80) && (ch == '(' || ch == ')' || ch == '=' || ch == '@' || ch == '|' || ch == '<' || ch == '>' || ch == ';' || ch == '*' || ch == '&');
 }
 static inline bool IsWordStart(int ch) noexcept {

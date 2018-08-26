@@ -33,13 +33,13 @@ public:
 		bset = nullptr;
 		size = 0;
 	}
-	void Add(int val) {
+	void Add(int val) noexcept {
 		assert(val >= 0);
 		assert(val < size);
 		bset[val] = true;
 	}
-	void AddString(const char *setToAdd);
-	bool Contains(int val) const {
+	void AddString(const char *setToAdd) noexcept;
+	bool Contains(int val) const noexcept {
 		assert(val >= 0);
 		if (val < 0) return false;
 		return (val < size) ? bset[val] : valueAfter;
@@ -48,19 +48,19 @@ public:
 
 // Functions for classifying characters
 
-inline bool IsASpace(int ch) noexcept {
+constexpr bool IsASpace(int ch) noexcept {
     return (ch == ' ') || ((ch >= 0x09) && (ch <= 0x0d));
 }
 
-inline bool IsASpaceOrTab(int ch) noexcept {
+constexpr bool IsASpaceOrTab(int ch) noexcept {
 	return (ch == ' ') || (ch == '\t');
 }
 
-inline bool IsADigit(int ch) noexcept  {
+constexpr bool IsADigit(int ch) noexcept  {
 	return (ch >= '0') && (ch <= '9');
 }
 
-inline bool IsHexDigit(int ch) noexcept {
+constexpr bool IsHexDigit(int ch) noexcept {
 	return (ch >= '0' && ch <= '9')
 		|| (ch >= 'A' && ch <= 'F')
 		|| (ch >= 'a' && ch <= 'f');
@@ -76,24 +76,24 @@ inline bool IsADigit(int ch, int base) noexcept {
 	}
 }
 
-inline bool IsASCII(int ch) noexcept {
+constexpr bool IsASCII(int ch) noexcept {
 	return (ch >= 0) && (ch < 0x80);
 }
 
-inline bool IsLowerCase(int ch) noexcept {
+constexpr bool IsLowerCase(int ch) noexcept {
 	return (ch >= 'a') && (ch <= 'z');
 }
 
-inline bool IsUpperCase(int ch) noexcept {
+constexpr bool IsUpperCase(int ch) noexcept {
 	return (ch >= 'A') && (ch <= 'Z');
 }
 
-inline bool IsAlpha(int ch) noexcept {
+constexpr bool IsAlpha(int ch) noexcept {
 	return 	((ch >= 'a') && (ch <= 'z')) ||
 			((ch >= 'A') && (ch <= 'Z'));
 }
 
-inline bool IsAlphaNumeric(int ch) noexcept {
+constexpr bool IsAlphaNumeric(int ch) noexcept {
 	return
 		((ch >= '0') && (ch <= '9')) ||
 		((ch >= 'a') && (ch <= 'z')) ||
@@ -104,15 +104,15 @@ inline bool IsAlphaNumeric(int ch) noexcept {
  * Check if a character is a space.
  * This is ASCII specific but is safe with chars >= 0x80.
  */
-inline bool isspacechar(int ch) noexcept {
+constexpr bool isspacechar(int ch) noexcept {
     return (ch == ' ') || ((ch >= 0x09) && (ch <= 0x0d));
 }
 
-inline bool iswordchar(int ch) noexcept {
+constexpr bool iswordchar(int ch) noexcept {
 	return IsAlphaNumeric(ch) || ch == '.' || ch == '_';
 }
 
-inline bool iswordstart(int ch) noexcept {
+constexpr bool iswordstart(int ch) noexcept {
 	return IsAlphaNumeric(ch) || ch == '_';
 }
 

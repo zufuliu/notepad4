@@ -676,7 +676,7 @@ void PathAbsoluteFromApp(LPWSTR lpszSrc, LPWSTR lpszDest, int cchDest, BOOL bExp
 BOOL PathIsLnkFile(LPCWSTR pszPath) {
 	//WCHAR *pszExt;
 
-	if (!pszPath || !*pszPath) {
+	if (StrIsEmpty(pszPath)) {
 		return FALSE;
 	}
 
@@ -734,17 +734,13 @@ BOOL PathGetLnkPath(LPCWSTR pszLnkFile, LPWSTR pszResPath, int cchResPath) {
 
 			if (SUCCEEDED(ppf->lpVtbl->Load(ppf, wsz, STGM_READ))) {
 				if (NOERROR == psl->lpVtbl->GetPath(psl, pszResPath, cchResPath, &fd, 0)) {
-					bSucceeded = TRUE;
+					// This additional check seems reasonable
+					bSucceeded = StrNotEmpty(pszResPath);
 				}
 			}
 			ppf->lpVtbl->Release(ppf);
 		}
 		psl->lpVtbl->Release(psl);
-	}
-
-	// This additional check seems reasonable
-	if (StrIsEmpty(pszResPath)) {
-		bSucceeded = FALSE;
 	}
 
 	if (bSucceeded) {
@@ -1083,7 +1079,7 @@ HDROP CreateDropHandle(LPCWSTR lpFileName) {
 	lpdf->fNC    = TRUE;
 	lpdf->fWide  = TRUE;
 
-	lstrcpy((WCHAR *)&lpdf[1], lpFileName);
+	lstrcpy((WCHAR *)(lpdf + 1), lpFileName);
 	GlobalUnlock(hDrop);
 
 	return hDrop;
@@ -1195,14 +1191,7 @@ BOOL History_Add(PHISTORY ph, LPCWSTR pszNew) {
 		}
 	}
 
-	if (ph->iCurItem == (HISTORY_ITEMS - 1)) {
-		// Shift
-		if (ph->psz[0]) {
-			LocalFree(ph->psz[0]);
-		}
-
-		MoveMemory(ph->psz, ph->psz + 1, (HISTORY_ITEMS - 1) * sizeof(WCHAR *));
-	} else {
+	if (ph->iCurItem < (HISTORY_ITEMS - 1)) {
 		ph->iCurItem++;
 		for (int i = ph->iCurItem; i < HISTORY_ITEMS; i++) {
 			if (ph->psz[i]) {
@@ -1210,6 +1199,13 @@ BOOL History_Add(PHISTORY ph, LPCWSTR pszNew) {
 			}
 			ph->psz[i] = NULL;
 		}
+	} else {
+		// Shift
+		if (ph->psz[0]) {
+			LocalFree(ph->psz[0]);
+		}
+
+		MoveMemory(ph->psz, ph->psz + 1, (HISTORY_ITEMS - 1) * sizeof(WCHAR *));
 	}
 
 	ph->psz[ph->iCurItem] = StrDup(pszNew);

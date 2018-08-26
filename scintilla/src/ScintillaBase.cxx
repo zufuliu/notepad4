@@ -63,7 +63,7 @@
 
 using namespace Scintilla;
 
-ScintillaBase::ScintillaBase() {
+ScintillaBase::ScintillaBase() noexcept {
 	displayPopupMenu = SC_POPUP_ALL;
 	listType = 0;
 	maxListWidth = 0;
@@ -322,7 +322,7 @@ void ScintillaBase::AutoCompleteStart(Sci::Position lenEntered, const char *list
 	}
 }
 
-void ScintillaBase::AutoCompleteCancel() {
+void ScintillaBase::AutoCompleteCancel() noexcept {
 	if (ac.Active()) {
 		SCNotification scn = {};
 		scn.nmhdr.code = SCN_AUTOCCANCELLED;
@@ -429,7 +429,7 @@ void ScintillaBase::AutoCompleteCompleted(char ch, unsigned int completionMethod
 
 }
 
-int ScintillaBase::AutoCompleteGetCurrent() const {
+int ScintillaBase::AutoCompleteGetCurrent() const noexcept {
 	if (!ac.Active())
 		return -1;
 	return ac.GetSelection();
@@ -494,14 +494,14 @@ void ScintillaBase::CallTipShow(const Point &pt_, const char *defn) {
 	ct.wCallTip.Show();
 }
 
-void ScintillaBase::CallTipClick() {
+void ScintillaBase::CallTipClick() noexcept {
 	SCNotification scn = {};
 	scn.nmhdr.code = SCN_CALLTIPCLICK;
 	scn.position = ct.clickPlace;
 	NotifyParent(scn);
 }
 
-bool ScintillaBase::ShouldDisplayPopup(const Point &ptInWindowCoordinates) const {
+bool ScintillaBase::ShouldDisplayPopup(const Point &ptInWindowCoordinates) const noexcept {
 	return (displayPopupMenu == SC_POPUP_ALL ||
 		(displayPopupMenu == SC_POPUP_TEXT && !PointInSelMargin(ptInWindowCoordinates)));
 }
@@ -560,32 +560,32 @@ public:
 	~LexState() override;
 	void SetLexer(uptr_t wParam);
 	void SetLexerLanguage(const char *languageName);
-	const char *DescribeWordListSets();
+	const char *DescribeWordListSets() noexcept;
 	void SetWordList(int n, const char *wl);
-	const char *GetName() const;
-	void *PrivateCall(int operation, void *pointer);
-	const char *PropertyNames();
-	int PropertyType(const char *name);
-	const char *DescribeProperty(const char *name);
+	const char *GetName() const noexcept;
+	void *PrivateCall(int operation, void *pointer) noexcept;
+	const char *PropertyNames() noexcept;
+	int PropertyType(const char *name) noexcept;
+	const char *DescribeProperty(const char *name) noexcept;
 	void PropSet(const char *key, const char *val);
 	const char *PropGet(const char *key) const;
 	int PropGetInt(const char *key, int defaultValue = 0) const;
 	int PropGetExpanded(const char *key, char *result) const;
 
-	int LineEndTypesSupported() const override;
-	int AllocateSubStyles(int styleBase, int numberStyles);
-	int SubStylesStart(int styleBase);
-	int SubStylesLength(int styleBase);
-	int StyleFromSubStyle(int subStyle);
-	int PrimaryStyleFromStyle(int style);
-	void FreeSubStyles();
-	void SetIdentifiers(int style, const char *identifiers);
-	int DistanceToSecondaryStyles();
-	const char *GetSubStyleBases();
-	int NamedStyles();
-	const char *NameOfStyle(int style);
-	const char *TagsOfStyle(int style);
-	const char *DescriptionOfStyle(int style);
+	int LineEndTypesSupported() const noexcept override;
+	int AllocateSubStyles(int styleBase, int numberStyles) noexcept;
+	int SubStylesStart(int styleBase) noexcept;
+	int SubStylesLength(int styleBase) noexcept;
+	int StyleFromSubStyle(int subStyle) noexcept;
+	int PrimaryStyleFromStyle(int style) noexcept;
+	void FreeSubStyles() noexcept;
+	void SetIdentifiers(int style, const char *identifiers) noexcept;
+	int DistanceToSecondaryStyles() noexcept;
+	const char *GetSubStyleBases() noexcept;
+	int NamedStyles() noexcept;
+	const char *NameOfStyle(int style) noexcept;
+	const char *TagsOfStyle(int style) noexcept;
+	const char *DescriptionOfStyle(int style) noexcept;
 };
 
 }
@@ -648,7 +648,7 @@ void LexState::SetLexerLanguage(const char *languageName) {
 	SetLexerModule(lex);
 }
 
-const char *LexState::DescribeWordListSets() {
+const char *LexState::DescribeWordListSets() noexcept {
 	if (instance) {
 		return instance->DescribeWordListSets();
 	} else {
@@ -665,11 +665,11 @@ void LexState::SetWordList(int n, const char *wl) {
 	}
 }
 
-const char *LexState::GetName() const {
+const char *LexState::GetName() const noexcept {
 	return lexCurrent ? lexCurrent->languageName : "";
 }
 
-void *LexState::PrivateCall(int operation, void *pointer) {
+void *LexState::PrivateCall(int operation, void *pointer) noexcept {
 	if (pdoc && instance) {
 		return instance->PrivateCall(operation, pointer);
 	} else {
@@ -677,7 +677,7 @@ void *LexState::PrivateCall(int operation, void *pointer) {
 	}
 }
 
-const char *LexState::PropertyNames() {
+const char *LexState::PropertyNames() noexcept {
 	if (instance) {
 		return instance->PropertyNames();
 	} else {
@@ -685,7 +685,7 @@ const char *LexState::PropertyNames() {
 	}
 }
 
-int LexState::PropertyType(const char *name) {
+int LexState::PropertyType(const char *name) noexcept {
 	if (instance) {
 		return instance->PropertyType(name);
 	} else {
@@ -693,7 +693,7 @@ int LexState::PropertyType(const char *name) {
 	}
 }
 
-const char *LexState::DescribeProperty(const char *name) {
+const char *LexState::DescribeProperty(const char *name) noexcept {
 	if (instance) {
 		return instance->DescribeProperty(name);
 	} else {
@@ -723,76 +723,76 @@ int LexState::PropGetExpanded(const char *key, char *result) const {
 	return props.GetExpanded(key, result);
 }
 
-int LexState::LineEndTypesSupported() const {
+int LexState::LineEndTypesSupported() const noexcept {
 	if (instance) {
 		return instance->LineEndTypesSupported();
 	}
 	return 0;
 }
 
-int LexState::AllocateSubStyles(int styleBase, int numberStyles) {
+int LexState::AllocateSubStyles(int styleBase, int numberStyles) noexcept {
 	if (instance) {
 		return instance->AllocateSubStyles(styleBase, numberStyles);
 	}
 	return -1;
 }
 
-int LexState::SubStylesStart(int styleBase) {
+int LexState::SubStylesStart(int styleBase) noexcept {
 	if (instance) {
 		return instance->SubStylesStart(styleBase);
 	}
 	return -1;
 }
 
-int LexState::SubStylesLength(int styleBase) {
+int LexState::SubStylesLength(int styleBase) noexcept {
 	if (instance) {
 		return instance->SubStylesLength(styleBase);
 	}
 	return 0;
 }
 
-int LexState::StyleFromSubStyle(int subStyle) {
+int LexState::StyleFromSubStyle(int subStyle) noexcept {
 	if (instance) {
 		return instance->StyleFromSubStyle(subStyle);
 	}
 	return 0;
 }
 
-int LexState::PrimaryStyleFromStyle(int style) {
+int LexState::PrimaryStyleFromStyle(int style) noexcept {
 	if (instance) {
 		return instance->PrimaryStyleFromStyle(style);
 	}
 	return 0;
 }
 
-void LexState::FreeSubStyles() {
+void LexState::FreeSubStyles() noexcept {
 	if (instance) {
 		instance->FreeSubStyles();
 	}
 }
 
-void LexState::SetIdentifiers(int style, const char *identifiers) {
+void LexState::SetIdentifiers(int style, const char *identifiers) noexcept {
 	if (instance) {
 		instance->SetIdentifiers(style, identifiers);
 		pdoc->ModifiedAt(0);
 	}
 }
 
-int LexState::DistanceToSecondaryStyles() {
+int LexState::DistanceToSecondaryStyles() noexcept {
 	if (instance) {
 		return instance->DistanceToSecondaryStyles();
 	}
 	return 0;
 }
 
-const char *LexState::GetSubStyleBases() {
+const char *LexState::GetSubStyleBases() noexcept {
 	if (instance) {
 		return instance->GetSubStyleBases();
 	}
 	return "";
 }
 
-int LexState::NamedStyles() {
+int LexState::NamedStyles() noexcept {
 	if (instance) {
 		return instance->NamedStyles();
 	} else {
@@ -800,7 +800,7 @@ int LexState::NamedStyles() {
 	}
 }
 
-const char *LexState::NameOfStyle(int style) {
+const char *LexState::NameOfStyle(int style) noexcept {
 	if (instance) {
 		return instance->NameOfStyle(style);
 	} else {
@@ -808,7 +808,7 @@ const char *LexState::NameOfStyle(int style) {
 	}
 }
 
-const char *LexState::TagsOfStyle(int style) {
+const char *LexState::TagsOfStyle(int style) noexcept {
 	if (instance) {
 		return instance->TagsOfStyle(style);
 	} else {
@@ -816,7 +816,7 @@ const char *LexState::TagsOfStyle(int style) {
 	}
 }
 
-const char *LexState::DescriptionOfStyle(int style) {
+const char *LexState::DescriptionOfStyle(int style) noexcept {
 	if (instance) {
 		return instance->DescriptionOfStyle(style);
 	} else {

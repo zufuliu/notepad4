@@ -28,7 +28,7 @@
 
 using namespace Scintilla;
 
-CallTip::CallTip() {
+CallTip::CallTip() noexcept {
 	wCallTip = nullptr;
 	inCallTipMode = false;
 	posStartCallTip = 0;
@@ -68,7 +68,7 @@ CallTip::~CallTip() {
 }
 
 // Although this test includes 0, we should never see a \0 character.
-static inline bool IsArrowCharacter(char ch) {
+static constexpr bool IsArrowCharacter(char ch) noexcept {
 	return (ch == 0) || (ch == '\001') || (ch == '\002');
 }
 
@@ -154,7 +154,7 @@ void CallTip::DrawChunk(Surface *surface, int &x, const char *s,
 			} else if (IsTabCharacter(s[startSeg])) {
 				xEnd = NextTabPos(x);
 			} else {
-				std::string_view segText(s + startSeg, endSeg - startSeg);
+				const std::string_view segText(s + startSeg, endSeg - startSeg);
 				xEnd = x + static_cast<int>(lround(surface->WidthText(font, segText)));
 				if (draw) {
 					rcClient.left = static_cast<XYPOSITION>(x);
@@ -247,7 +247,7 @@ void CallTip::PaintCT(Surface *surfaceWindow) {
 #endif
 }
 
-void CallTip::MouseClick(const Point &pt) {
+void CallTip::MouseClick(const Point &pt) noexcept {
 	clickPlace = 0;
 	if (rectUp.Contains(pt))
 		clickPlace = 1;
@@ -293,14 +293,14 @@ PRectangle CallTip::CallTipStart(Sci::Position pos, const Point &pt, int textHei
 	}
 }
 
-void CallTip::CallTipCancel() {
+void CallTip::CallTipCancel() noexcept {
 	inCallTipMode = false;
 	if (wCallTip.Created()) {
 		wCallTip.Destroy();
 	}
 }
 
-void CallTip::SetHighlight(int start, int end) {
+void CallTip::SetHighlight(int start, int end) noexcept {
 	// Avoid flashing by checking something has really changed
 	if ((start != startHighlight) || (end != endHighlight)) {
 		startHighlight = start;

@@ -51,7 +51,7 @@ public:
 
 	/// Display the auto completion list positioned to be near a character position
 	void Start(const Window &parent, int ctrlID, Sci::Position position, const Point &location,
-		Sci::Position startLen_, int lineHeight, bool unicodeMode, int technology);
+		Sci::Position startLen_, int lineHeight, bool unicodeMode, int technology) noexcept;
 
 	/// The stop chars are characters which, when typed, cause the auto completion list to disappear
 	void SetStopChars(const char *stopChars_);
@@ -62,24 +62,24 @@ public:
 	bool IsFillUpChar(char ch) const noexcept;
 
 	/// The separator character is used when interpreting the list in SetList
-	void SetSeparator(char separator_);
+	void SetSeparator(char separator_) noexcept;
 	char GetSeparator() const noexcept;
 
 	/// The typesep character is used for separating the word from the type
-	void SetTypesep(char separator_);
+	void SetTypesep(char separator_) noexcept;
 	char GetTypesep() const noexcept;
 
 	/// The list string contains a sequence of words separated by the separator character
 	void SetList(const char *list);
 
 	/// Return the position of the currently selected list item
-	int GetSelection() const;
+	int GetSelection() const noexcept;
 
 	/// Return the value of an item in the list
 	std::string GetValue(int item) const;
 
 	void Show(bool show);
-	void Cancel();
+	void Cancel() noexcept;
 
 	/// Move the current list element by delta, scrolling appropriately
 	void Move(int delta);

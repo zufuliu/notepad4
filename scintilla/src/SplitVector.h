@@ -65,7 +65,7 @@ protected:
 
 public:
 	/// Construct a split buffer.
-	SplitVector() : empty(), lengthBody(0), part1Length(0), gapLength(0), growSize(8) {
+	SplitVector() noexcept : empty(), lengthBody(0), part1Length(0), gapLength(0), growSize(8) {
 	}
 
 	// Deleted so SplitVector objects can not be copied.
@@ -80,7 +80,7 @@ public:
 		return growSize;
 	}
 
-	void SetGrowSize(ptrdiff_t growSize_) {
+	void SetGrowSize(ptrdiff_t growSize_) noexcept {
 		growSize = growSize_;
 	}
 
@@ -290,7 +290,7 @@ public:
 		std::copy(body.data() + position, body.data() + position + range1Length, buffer);
 		buffer += range1Length;
 		position = position + range1Length + gapLength;
-		ptrdiff_t range2Length = retrieveLength - range1Length;
+		const ptrdiff_t range2Length = retrieveLength - range1Length;
 		std::copy(body.data() + position, body.data() + position + range2Length, buffer);
 	}
 

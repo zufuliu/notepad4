@@ -46,7 +46,7 @@ static char **ArrayFromWordList(char *wordlist, int *len, bool onlyLineEnds = fa
 		for (size_t k = 0; k < slen; k++) {
 			if (!wordSeparator[static_cast<unsigned char>(wordlist[k])]) {
 				if (!prev) {
-					keywords[wordsStore] = &wordlist[k];
+					keywords[wordsStore] = wordlist + k;
 					wordsStore++;
 				}
 			} else {
@@ -56,12 +56,12 @@ static char **ArrayFromWordList(char *wordlist, int *len, bool onlyLineEnds = fa
 		}
 	}
 	assert(wordsStore < (words + 1));
-	keywords[wordsStore] = &wordlist[slen];
+	keywords[wordsStore] = wordlist + slen;
 	*len = wordsStore;
 	return keywords;
 }
 
-WordList::WordList(bool onlyLineEnds_) :
+WordList::WordList(bool onlyLineEnds_) noexcept :
 	words(nullptr), list(nullptr), len(0), onlyLineEnds(onlyLineEnds_) {
 	// Prevent warnings by static analyzers about uninitialized starts.
 	starts[0] = -1;
@@ -71,11 +71,11 @@ WordList::~WordList() {
 	Clear();
 }
 
-WordList::operator bool() const {
+WordList::operator bool() const noexcept {
 	return len != 0;
 }
 
-bool WordList::operator!=(const WordList &other) const {
+bool WordList::operator!=(const WordList &other) const noexcept {
 	if (len != other.len)
 		return true;
 	for (int i = 0; i < len; i++) {
@@ -85,11 +85,11 @@ bool WordList::operator!=(const WordList &other) const {
 	return false;
 }
 
-int WordList::Length() const {
+int WordList::Length() const noexcept {
 	return len;
 }
 
-void WordList::Clear() {
+void WordList::Clear() noexcept {
 	if (words) {
 		delete[]list;
 		delete[]words;
@@ -101,17 +101,17 @@ void WordList::Clear() {
 
 #ifdef _MSC_VER
 
-static bool cmpWords(const char *a, const char *b) {
+static bool cmpWords(const char *a, const char *b) noexcept {
 	return strcmp(a, b) < 0;
 }
 
 #else
 
-static int cmpWords(const void *a, const void *b) {
+static int cmpWords(const void *a, const void *b) noexcept {
 	return strcmp(*static_cast<const char * const *>(a), *static_cast<const char * const *>(b));
 }
 
-static void SortWordList(char **words, unsigned int len) {
+static void SortWordList(char **words, unsigned int len) noexcept {
 	qsort(words, len, sizeof(*words), cmpWords);
 }
 
@@ -140,7 +140,7 @@ void WordList::Set(const char *s) {
  * Prefix elements start with '^' and match all strings that start with the rest of the element
  * so '^GTK_' matches 'GTK_X', 'GTK_MAJOR_VERSION', and 'GTK_'.
  */
-bool WordList::InList(const char *s) const {
+bool WordList::InList(const char *s) const noexcept {
 	if (nullptr == words)
 		return false;
 	const unsigned char firstChar = s[0];
@@ -182,7 +182,7 @@ bool WordList::InList(const char *s) const {
  * with def to be a keyword, but also defi, defin and define are valid.
  * The marker is ~ in this case.
  */
-bool WordList::InListAbbreviated(const char *s, const char marker) const {
+bool WordList::InListAbbreviated(const char *s, const char marker) const noexcept {
 	if (nullptr == words)
 		return false;
 	const unsigned char firstChar = s[0];
@@ -236,7 +236,7 @@ bool WordList::InListAbbreviated(const char *s, const char marker) const {
 * The marker is ~ in this case.
 * No multiple markers check is done and wont work.
 */
-bool WordList::InListAbridged(const char *s, const char marker) const {
+bool WordList::InListAbridged(const char *s, const char marker) const noexcept {
 	if (nullptr == words)
 		return false;
 	const unsigned char firstChar = s[0];
@@ -289,7 +289,7 @@ bool WordList::InListAbridged(const char *s, const char marker) const {
 	return false;
 }
 
-const char *WordList::WordAt(int n) const {
+const char *WordList::WordAt(int n) const noexcept {
 	return words[n];
 }
 

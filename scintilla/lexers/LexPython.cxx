@@ -38,23 +38,23 @@ using namespace Scintilla;
 #define PY_DEF_FUNC	2
 #define PY_DEF_ENUM	3	// Boo
 
-static inline bool IsPyStringPrefix(int ch) noexcept {
+static constexpr bool IsPyStringPrefix(int ch) noexcept {
 	ch |= 32;
 	return ch == 'r' || ch == 'u' || ch == 'b' || ch == 'f';
 }
-static inline bool IsPyTripleStyle(int style) noexcept {
+static constexpr bool IsPyTripleStyle(int style) noexcept {
 	return style == SCE_PY_TRIPLE_STRING1 || style == SCE_PY_TRIPLE_STRING2
 		|| style == SCE_PY_TRIPLE_BYTES1 || style == SCE_PY_TRIPLE_BYTES2
 		|| style == SCE_PY_TRIPLE_FMT_STRING1 || style == SCE_PY_TRIPLE_FMT_STRING2;
 }
-static inline bool IsPyStringStyle(int style) noexcept {
+static constexpr bool IsPyStringStyle(int style) noexcept {
 	return style == SCE_PY_STRING1 || style == SCE_PY_STRING2
 		|| style == SCE_PY_BYTES1 || style == SCE_PY_BYTES2
 		|| style == SCE_PY_RAW_STRING1 || style == SCE_PY_RAW_STRING2
 		|| style == SCE_PY_RAW_BYTES1 || style == SCE_PY_RAW_BYTES2
 		|| style == SCE_PY_FMT_STRING1 || style == SCE_PY_FMT_STRING2;
 }
-static inline bool IsSpaceEquiv(int state) noexcept {
+static constexpr bool IsSpaceEquiv(int state) noexcept {
 	// including SCE_PY_DEFAULT, SCE_PY_COMMENTLINE, SCE_PY_COMMENTBLOCK
 	return (state <= SCE_PY_COMMENTLINE) || (state == SCE_PY_COMMENTBLOCK);
 }
@@ -349,8 +349,8 @@ _label_identifier:
 
 #define IsCommentLine(line)		IsLexCommentLine(line, styler, MultiStyle(SCE_PY_COMMENTLINE, SCE_PY_COMMENTBLOCK))
 
-static inline bool IsQuoteLine(Sci_Position line, Accessor &styler) {
-	int style = styler.StyleAt(styler.LineStart(line));
+static inline bool IsQuoteLine(Sci_Position line, const Accessor &styler) noexcept {
+	const int style = styler.StyleAt(styler.LineStart(line));
 	return IsPyTripleStyle(style);
 }
 
@@ -404,8 +404,8 @@ static void FoldPyDoc(Sci_PositionU startPos, Sci_Position length, int, LexerWor
 		if (lineNext <= docLines) {
 			// Information about next line is only available if not at end of document
 			indentNext = Accessor::LexIndentAmount(styler, lineNext, &spaceFlags, nullptr);
-			Sci_Position lookAtPos = (styler.LineStart(lineNext) == styler.Length()) ? styler.Length() - 1 : styler.LineStart(lineNext);
-			int style = styler.StyleAt(lookAtPos);
+			const Sci_Position lookAtPos = (styler.LineStart(lineNext) == styler.Length()) ? styler.Length() - 1 : styler.LineStart(lineNext);
+			const int style = styler.StyleAt(lookAtPos);
 			quote = foldQuotes && IsPyTripleStyle(style);
 		}
 		const int quote_start = (quote && !prevQuote);
@@ -456,13 +456,13 @@ static void FoldPyDoc(Sci_PositionU startPos, Sci_Position length, int, LexerWor
 		int skipLevel = levelAfterComments;
 
 		while (--skipLine > lineCurrent) {
-			int skipLineIndent = Accessor::LexIndentAmount(styler, skipLine, &spaceFlags, nullptr);
+			const int skipLineIndent = Accessor::LexIndentAmount(styler, skipLine, &spaceFlags, nullptr);
 
 			if (foldCompact) {
 				if ((skipLineIndent & SC_FOLDLEVELNUMBERMASK) > levelAfterComments)
 					skipLevel = levelBeforeComments;
 
-				int whiteFlag = skipLineIndent & SC_FOLDLEVELWHITEFLAG;
+				const int whiteFlag = skipLineIndent & SC_FOLDLEVELWHITEFLAG;
 
 				styler.SetLevel(skipLine, skipLevel | whiteFlag);
 			} else {

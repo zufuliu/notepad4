@@ -35,7 +35,7 @@ namespace {
 enum script_type { eScriptNone = 0, eScriptJS, eScriptVBS, eScriptPython, eScriptPHP, eScriptXML, eScriptSGML, eScriptSGMLblock, eScriptComment };
 enum script_mode { eHtml = 0, eNonHtmlScript, eNonHtmlPreProc, eNonHtmlScriptPreProc };
 
-void GetTextSegment(Accessor &styler, Sci_PositionU start, Sci_PositionU end, char *s, size_t len) {
+void GetTextSegment(Accessor &styler, Sci_PositionU start, Sci_PositionU end, char *s, size_t len) noexcept {
 	Sci_PositionU i = 0;
 	for (; (i < end - start + 1) && (i < len - 1); i++) {
 		s[i] = MakeLowerCase(styler[start + i]);
@@ -43,7 +43,7 @@ void GetTextSegment(Accessor &styler, Sci_PositionU start, Sci_PositionU end, ch
 	s[i] = '\0';
 }
 
-const char *GetNextWord(Accessor &styler, Sci_PositionU start, char *s, size_t sLen) {
+const char *GetNextWord(Accessor &styler, Sci_PositionU start, char *s, size_t sLen) noexcept {
 	Sci_PositionU i = 0;
 	for (; i < sLen - 1; i++) {
 		const char ch = styler.SafeGetCharAt(start + i);
@@ -87,7 +87,7 @@ script_type segIsScriptingIndicator(Accessor &styler, Sci_PositionU start, Sci_P
 	return prevValue;
 }
 
-int PrintScriptingIndicatorOffset(Accessor &styler, Sci_PositionU start, Sci_PositionU end) {
+int PrintScriptingIndicatorOffset(Accessor &styler, Sci_PositionU start, Sci_PositionU end) noexcept {
 	int iResult = 0;
 	char s[128];
 	GetTextSegment(styler, start, end, s, sizeof(s));
@@ -98,64 +98,64 @@ int PrintScriptingIndicatorOffset(Accessor &styler, Sci_PositionU start, Sci_Pos
 	return iResult;
 }
 
-script_type ScriptOfState(int state) {
+script_type ScriptOfState(int state) noexcept {
 	if ((state >= SCE_HP_START) && (state <= SCE_HP_IDENTIFIER)) {
 		return eScriptPython;
-	} else if ((state >= SCE_HB_START) && (state <= SCE_HB_STRINGEOL)) {
-		return eScriptVBS;
-	} else if ((state >= SCE_HJ_START) && (state <= SCE_HJ_REGEX)) {
-		return eScriptJS;
-	} else if ((state >= SCE_HPHP_DEFAULT) && (state <= SCE_HPHP_COMMENTLINE)) {
-		return eScriptPHP;
-	} else if ((state >= SCE_H_SGML_DEFAULT) && (state < SCE_H_SGML_BLOCK_DEFAULT)) {
-		return eScriptSGML;
-	} else if (state == SCE_H_SGML_BLOCK_DEFAULT) {
-		return eScriptSGMLblock;
-	} else {
-		return eScriptNone;
 	}
+	if ((state >= SCE_HB_START) && (state <= SCE_HB_STRINGEOL)) {
+		return eScriptVBS;
+	}
+	if ((state >= SCE_HJ_START) && (state <= SCE_HJ_REGEX)) {
+		return eScriptJS;
+	}
+	if ((state >= SCE_HPHP_DEFAULT) && (state <= SCE_HPHP_COMMENTLINE)) {
+		return eScriptPHP;
+	}
+	if ((state >= SCE_H_SGML_DEFAULT) && (state < SCE_H_SGML_BLOCK_DEFAULT)) {
+		return eScriptSGML;
+	}
+	if (state == SCE_H_SGML_BLOCK_DEFAULT) {
+		return eScriptSGMLblock;
+	}
+	return eScriptNone;
 }
 
-int statePrintForState(int state, script_mode inScriptType) {
-	int StateToPrint = state;
-
+constexpr int statePrintForState(int state, script_mode inScriptType) noexcept {
 	if (state >= SCE_HJ_START) {
 		if ((state >= SCE_HP_START) && (state <= SCE_HP_IDENTIFIER)) {
-			StateToPrint = state + ((inScriptType == eNonHtmlScript) ? 0 : SCE_HA_PYTHON);
-		} else if ((state >= SCE_HB_START) && (state <= SCE_HB_STRINGEOL)) {
-			StateToPrint = state + ((inScriptType == eNonHtmlScript) ? 0 : SCE_HA_VBS);
-		} else if ((state >= SCE_HJ_START) && (state <= SCE_HJ_REGEX)) {
-			StateToPrint = state + ((inScriptType == eNonHtmlScript) ? 0 : SCE_HA_JS);
+			return state + ((inScriptType == eNonHtmlScript) ? 0 : SCE_HA_PYTHON);
 		}
-	}
-
-	return StateToPrint;
-}
-
-int stateForPrintState(int StateToPrint) {
-	int state;
-
-	if ((StateToPrint >= SCE_HPA_START) && (StateToPrint <= SCE_HPA_IDENTIFIER)) {
-		state = StateToPrint - SCE_HA_PYTHON;
-	} else if ((StateToPrint >= SCE_HBA_START) && (StateToPrint <= SCE_HBA_STRINGEOL)) {
-		state = StateToPrint - SCE_HA_VBS;
-	} else if ((StateToPrint >= SCE_HJA_START) && (StateToPrint <= SCE_HJA_REGEX)) {
-		state = StateToPrint - SCE_HA_JS;
-	} else {
-		state = StateToPrint;
+		if ((state >= SCE_HB_START) && (state <= SCE_HB_STRINGEOL)) {
+			return state + ((inScriptType == eNonHtmlScript) ? 0 : SCE_HA_VBS);
+		}
+		if ((state >= SCE_HJ_START) && (state <= SCE_HJ_REGEX)) {
+			return state + ((inScriptType == eNonHtmlScript) ? 0 : SCE_HA_JS);
+		}
 	}
 
 	return state;
 }
 
-bool IsNumber(Sci_PositionU start, Accessor &styler) {
+constexpr int stateForPrintState(int StateToPrint) noexcept {
+	if ((StateToPrint >= SCE_HPA_START) && (StateToPrint <= SCE_HPA_IDENTIFIER)) {
+		return StateToPrint - SCE_HA_PYTHON;
+	}
+	if ((StateToPrint >= SCE_HBA_START) && (StateToPrint <= SCE_HBA_STRINGEOL)) {
+		return StateToPrint - SCE_HA_VBS;
+	}
+	if ((StateToPrint >= SCE_HJA_START) && (StateToPrint <= SCE_HJA_REGEX)) {
+		return StateToPrint - SCE_HA_JS;
+	}
+
+	return StateToPrint;
+}
+
+bool IsNumber(Sci_PositionU start, Accessor &styler) noexcept {
 	return IsADigit(styler[start]) || (styler[start] == '.') ||
 		(styler[start] == '-') || (styler[start] == '#');
 }
 
-bool isStringState(int state) {
-	bool bResult;
-
+constexpr bool isStringState(int state) noexcept {
 	switch (state) {
 	case SCE_HJ_DOUBLESTRING:
 	case SCE_HJ_SINGLESTRING:
@@ -177,16 +177,13 @@ bool isStringState(int state) {
 	case SCE_HPHP_NOWDOC:
 	case SCE_HPHP_HSTRING_VARIABLE:
 	case SCE_HPHP_COMPLEX_VARIABLE:
-		bResult = true;
-		break;
+		return true;
 	default:
-		bResult = false;
-		break;
+		return false;
 	}
-	return bResult;
 }
 
-bool stateAllowsTermination(int state) {
+constexpr bool stateAllowsTermination(int state) noexcept {
 	bool allowTermination = !isStringState(state);
 	if (allowTermination) {
 		switch (state) {
@@ -201,24 +198,14 @@ bool stateAllowsTermination(int state) {
 }
 
 // not really well done, since it's only comments that should lex the %> and <%
-bool isCommentASPState(int state) {
-	bool bResult;
-
-	switch (state) {
-	case SCE_HJ_COMMENT:
-	case SCE_HJ_COMMENTLINE:
-	case SCE_HJ_COMMENTDOC:
-	case SCE_HB_COMMENTLINE:
-	case SCE_HP_COMMENTLINE:
-	case SCE_HPHP_COMMENT:
-	case SCE_HPHP_COMMENTLINE:
-		bResult = true;
-		break;
-	default:
-		bResult = false;
-		break;
-	}
-	return bResult;
+constexpr bool isCommentASPState(int state) noexcept {
+	return state == SCE_HJ_COMMENT
+		|| state == SCE_HJ_COMMENTLINE
+		|| state == SCE_HJ_COMMENTDOC
+		|| state == SCE_HB_COMMENTLINE
+		|| state == SCE_HP_COMMENTLINE
+		|| state == SCE_HPHP_COMMENT
+		|| state == SCE_HPHP_COMMENTLINE;
 }
 
 void classifyAttribHTML(Sci_PositionU start, Sci_PositionU end, const WordList &keywords, Accessor &styler) {
@@ -390,7 +377,7 @@ void classifyWordHTPHP(Sci_PositionU start, Sci_PositionU end, const WordList &k
 	styler.ColourTo(end, chAttr);
 }
 
-bool isWordHSGML(Sci_PositionU start, Sci_PositionU end, const WordList &keywords, Accessor &styler) {
+bool isWordHSGML(Sci_PositionU start, Sci_PositionU end, const WordList &keywords, Accessor &styler) noexcept {
 	char s[30 + 1];
 	Sci_PositionU i = 0;
 	for (; i < end - start + 1 && i < 30; i++) {
@@ -400,7 +387,7 @@ bool isWordHSGML(Sci_PositionU start, Sci_PositionU end, const WordList &keyword
 	return keywords.InList(s);
 }
 
-bool isWordCdata(Sci_PositionU start, Sci_PositionU end, Accessor &styler) {
+bool isWordCdata(Sci_PositionU start, Sci_PositionU end, Accessor &styler) noexcept {
 	char s[30 + 1];
 	Sci_PositionU i = 0;
 	for (; i < end - start + 1 && i < 30; i++) {
@@ -411,48 +398,39 @@ bool isWordCdata(Sci_PositionU start, Sci_PositionU end, Accessor &styler) {
 }
 
 // Return the first state to reach when entering a scripting language
-int StateForScript(script_type scriptLanguage) {
-	int Result;
+constexpr int StateForScript(script_type scriptLanguage) noexcept {
 	switch (scriptLanguage) {
 	case eScriptVBS:
-		Result = SCE_HB_START;
-		break;
+		return SCE_HB_START;
 	case eScriptPython:
-		Result = SCE_HP_START;
-		break;
+		return SCE_HP_START;
 	case eScriptPHP:
-		Result = SCE_HPHP_DEFAULT;
-		break;
+		return SCE_HPHP_DEFAULT;
 	case eScriptXML:
-		Result = SCE_H_TAGUNKNOWN;
-		break;
+		return SCE_H_TAGUNKNOWN;
 	case eScriptSGML:
-		Result = SCE_H_SGML_DEFAULT;
-		break;
+		return SCE_H_SGML_DEFAULT;
 	case eScriptComment:
-		Result = SCE_H_COMMENT;
-		break;
+		return SCE_H_COMMENT;
 	default :
-		Result = SCE_HJ_START;
-		break;
+		return SCE_HJ_START;
 	}
-	return Result;
 }
 
-bool issgmlwordchar(int ch) {
+bool issgmlwordchar(int ch) noexcept {
 	return !IsASCII(ch) ||
 		(isalnum(ch) || ch == '.' || ch == '_' || ch == ':' || ch == '!' || ch == '#' || ch == '[');
 }
 
-bool IsPhpWordStart(int ch) {
+bool IsPhpWordStart(int ch) noexcept {
 	return (IsASCII(ch) && (isalpha(ch) || (ch == '_'))) || (ch >= 0x7f);
 }
 
-bool IsPhpWordChar(int ch) {
+bool IsPhpWordChar(int ch) noexcept {
 	return IsADigit(ch) || IsPhpWordStart(ch);
 }
 
-bool InTagState(int state) {
+constexpr bool InTagState(int state) noexcept {
 	return state == SCE_H_TAG || state == SCE_H_TAGUNKNOWN ||
 	       state == SCE_H_SCRIPT ||
 	       state == SCE_H_ATTRIBUTE || state == SCE_H_ATTRIBUTEUNKNOWN ||
@@ -460,20 +438,20 @@ bool InTagState(int state) {
 	       state == SCE_H_DOUBLESTRING || state == SCE_H_SINGLESTRING;
 }
 
-bool IsCommentState(const int state) {
+constexpr bool IsCommentState(const int state) noexcept {
 	return state == SCE_H_COMMENT || state == SCE_H_SGML_COMMENT;
 }
 
-bool IsScriptCommentState(const int state) {
+constexpr bool IsScriptCommentState(const int state) noexcept {
 	return state == SCE_HJ_COMMENT || state == SCE_HJ_COMMENTLINE || state == SCE_HJA_COMMENT ||
 		   state == SCE_HJA_COMMENTLINE || state == SCE_HB_COMMENTLINE || state == SCE_HBA_COMMENTLINE;
 }
 
-bool isLineEnd(int ch) {
-	return ch == '\r' || ch == '\n';
+constexpr bool isLineEnd(int ch) noexcept {
+ 	return ch == '\r' || ch == '\n';
 }
 
-bool isMakoBlockEnd(const int ch, const int chNext, const char *blockType) {
+bool isMakoBlockEnd(const int ch, const int chNext, const char *blockType) noexcept {
 	if (strlen(blockType) == 0) {
 		return ((ch == '%') && (chNext == '>'));
 	} else if ((0 == strcmp(blockType, "inherit")) ||
@@ -493,7 +471,7 @@ bool isMakoBlockEnd(const int ch, const int chNext, const char *blockType) {
 	}
 }
 
-bool isDjangoBlockEnd(const int ch, const int chNext, const char *blockType) {
+bool isDjangoBlockEnd(const int ch, const int chNext, const char *blockType) noexcept {
 	if (strlen(blockType) == 0) {
 		return false;
 	} else if (0 == strcmp(blockType, "%")) {
@@ -505,7 +483,7 @@ bool isDjangoBlockEnd(const int ch, const int chNext, const char *blockType) {
 	}
 }
 
-bool isPHPStringState(int state) {
+constexpr bool isPHPStringState(int state) noexcept {
 	return
 	    (state == SCE_HPHP_HSTRING) ||
 	    (state == SCE_HPHP_SIMPLESTRING) ||
@@ -515,7 +493,7 @@ bool isPHPStringState(int state) {
 	    (state == SCE_HPHP_COMPLEX_VARIABLE);
 }
 
-Sci_Position FindPhpStringDelimiter(char *phpStringDelimiter, const int phpStringDelimiterSize, Sci_Position i, const Sci_Position lengthDoc, Accessor &styler, int &heardocQuotes) {
+Sci_Position FindPhpStringDelimiter(char *phpStringDelimiter, const int phpStringDelimiterSize, Sci_Position i, const Sci_Position lengthDoc, Accessor &styler, int &heardocQuotes) noexcept {
 	Sci_Position j;
 	const Sci_Position beginning = i - 1;
 	bool isValidSimpleString = false;
@@ -642,12 +620,12 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 		//	To change this to VBScript set asp.default.language to 2. Python is 3.
 		lineState |= styler.GetPropertyInt("asp.default.language", eScriptJS) << 4;
 	}
-	script_mode inScriptType = script_mode((lineState >> 0) & 0x03); // 2 bits of scripting mode
+	script_mode inScriptType = static_cast<script_mode>((lineState >> 0) & 0x03); // 2 bits of scripting mode
 	bool tagOpened = (lineState >> 2) & 0x01; // 1 bit to know if we are in an opened tag
 	bool tagClosing = (lineState >> 3) & 0x01; // 1 bit to know if we are in a closing tag
 	bool tagDontFold = false; //some HTML tags should not be folded
-	script_type aspScript = script_type((lineState >> 4) & 0x0F); // 4 bits of script name
-	script_type clientScript = script_type((lineState >> 8) & 0x0F); // 4 bits of script name
+	script_type aspScript = static_cast<script_type>((lineState >> 4) & 0x0F); // 4 bits of script name
+	script_type clientScript = static_cast<script_type>((lineState >> 8) & 0x0F); // 4 bits of script name
 	int beforePreProc = (lineState >> 12) & 0xFF; // 8 bits of state
 
 	script_type scriptLanguage = ScriptOfState(state);

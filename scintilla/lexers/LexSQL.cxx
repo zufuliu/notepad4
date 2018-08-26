@@ -35,7 +35,7 @@ static inline bool IsSqlWordChar(int ch, bool sqlAllowDottedWord) noexcept {
 		return (ch < 0x80) && (IsAlphaNumeric(ch) || ch == '_' || ch == '.');
 }
 
-static inline  bool IsANumberChar(int ch, int chPrev) noexcept {
+static constexpr bool IsANumberChar(int ch, int chPrev) noexcept {
 	return (ch < 0x80) && (IsADigit(ch) || (ch == '.' && chPrev != '.')
 		|| ((ch == '+' || ch == '-') && (chPrev == 'e' || chPrev == 'E'))
 		|| ((ch == 'e' || ch == 'E') && (chPrev < 0x80) && IsADigit(chPrev)));
@@ -112,9 +112,9 @@ static void ColouriseSqlDoc(Sci_PositionU startPos, Sci_Position length, int ini
 		case SCE_SQL_IDENTIFIER:
 _label_identifier:
 			if (!IsSqlWordChar(sc.ch, sqlAllowDottedWord)) {
-				int nextState = SCE_SQL_DEFAULT;
+				const int nextState = SCE_SQL_DEFAULT;
 				char s[128];
-				char chNext = LexGetNextChar(sc.currentPos, styler);
+				const char chNext = LexGetNextChar(sc.currentPos, styler);
 				sc.GetCurrentLowered(s, sizeof(s));
 				if (keywords1.InList(s)) {
 					if (chNext == '(' && strcmp(s, "repeat") == 0) {
@@ -302,7 +302,7 @@ public:
 		}
 	}
 
-	static sql_state_t IgnoreWhen(sql_state_t sqlStatesLine, bool enable) noexcept {
+	static constexpr sql_state_t IgnoreWhen(sql_state_t sqlStatesLine, bool enable) noexcept {
 		if (enable)
 			sqlStatesLine |= MASK_IGNORE_WHEN;
 		else
@@ -311,7 +311,7 @@ public:
 		return sqlStatesLine;
 	}
 
-	static sql_state_t IntoCondition(sql_state_t sqlStatesLine, bool enable) noexcept {
+	static constexpr sql_state_t IntoCondition(sql_state_t sqlStatesLine, bool enable) noexcept {
 		if (enable)
 			sqlStatesLine |= MASK_INTO_CONDITION;
 		else
@@ -320,7 +320,7 @@ public:
 		return sqlStatesLine;
 	}
 
-	static sql_state_t IntoExceptionBlock(sql_state_t sqlStatesLine, bool enable) noexcept {
+	static constexpr sql_state_t IntoExceptionBlock(sql_state_t sqlStatesLine, bool enable) noexcept {
 		if (enable)
 			sqlStatesLine |= MASK_INTO_EXCEPTION;
 		else
@@ -329,7 +329,7 @@ public:
 		return sqlStatesLine;
 	}
 
-	static sql_state_t IntoDeclareBlock(sql_state_t sqlStatesLine, bool enable) noexcept {
+	static constexpr sql_state_t IntoDeclareBlock(sql_state_t sqlStatesLine, bool enable) noexcept {
 		if (enable)
 			sqlStatesLine |= MASK_INTO_DECLARE;
 		else
@@ -338,7 +338,7 @@ public:
 		return sqlStatesLine;
 	}
 
-	static sql_state_t IntoMergeStatement(sql_state_t sqlStatesLine, bool enable) noexcept {
+	static constexpr sql_state_t IntoMergeStatement(sql_state_t sqlStatesLine, bool enable) noexcept {
 		if (enable)
 			sqlStatesLine |= MASK_MERGE_STATEMENT;
 		else
@@ -347,7 +347,7 @@ public:
 		return sqlStatesLine;
 	}
 
-	static sql_state_t CaseMergeWithoutWhenFound(sql_state_t sqlStatesLine, bool found) noexcept {
+	static constexpr sql_state_t CaseMergeWithoutWhenFound(sql_state_t sqlStatesLine, bool found) noexcept {
 		if (found)
 			sqlStatesLine |= MASK_CASE_MERGE_WITHOUT_WHEN_FOUND;
 		else
@@ -356,7 +356,7 @@ public:
 		return sqlStatesLine;
 	}
 
-	static sql_state_t IntoSelectStatementOrAssignment(sql_state_t sqlStatesLine, bool found) noexcept {
+	static constexpr sql_state_t IntoSelectStatementOrAssignment(sql_state_t sqlStatesLine, bool found) noexcept {
 		if (found)
 			sqlStatesLine |= MASK_INTO_SELECT_STATEMENT_OR_ASSIGNEMENT;
 		else
@@ -365,21 +365,21 @@ public:
 		return sqlStatesLine;
 	}
 
-	static sql_state_t BeginCaseBlock(sql_state_t sqlStatesLine) noexcept {
+	static constexpr sql_state_t BeginCaseBlock(sql_state_t sqlStatesLine) noexcept {
 		if ((sqlStatesLine & MASK_NESTED_CASES) < MASK_NESTED_CASES) {
 			sqlStatesLine++;
 		}
 		return sqlStatesLine;
 	}
 
-	static sql_state_t EndCaseBlock(sql_state_t sqlStatesLine) noexcept {
+	static constexpr sql_state_t EndCaseBlock(sql_state_t sqlStatesLine) noexcept {
 		if ((sqlStatesLine & MASK_NESTED_CASES) > 0) {
 			sqlStatesLine--;
 		}
 		return sqlStatesLine;
 	}
 
-	static sql_state_t IntoCreateStatement(sql_state_t sqlStatesLine, bool enable) noexcept {
+	static constexpr sql_state_t IntoCreateStatement(sql_state_t sqlStatesLine, bool enable) noexcept {
 		if (enable)
 			sqlStatesLine |= MASK_INTO_CREATE;
 		else
@@ -388,7 +388,7 @@ public:
 		return sqlStatesLine;
 	}
 
-	static sql_state_t IntoCreateViewStatement(sql_state_t sqlStatesLine, bool enable) noexcept {
+	static constexpr sql_state_t IntoCreateViewStatement(sql_state_t sqlStatesLine, bool enable) noexcept {
 		if (enable)
 			sqlStatesLine |= MASK_INTO_CREATE_VIEW;
 		else
@@ -397,7 +397,7 @@ public:
 		return sqlStatesLine;
 	}
 
-	static sql_state_t IntoCreateViewAsStatement(sql_state_t sqlStatesLine, bool enable) noexcept {
+	static constexpr sql_state_t IntoCreateViewAsStatement(sql_state_t sqlStatesLine, bool enable) noexcept {
 		if (enable)
 			sqlStatesLine |= MASK_INTO_CREATE_VIEW_AS_STATEMENT;
 		else
@@ -406,47 +406,47 @@ public:
 		return sqlStatesLine;
 	}
 
-	static bool IsIgnoreWhen(sql_state_t sqlStatesLine) noexcept {
+	static constexpr bool IsIgnoreWhen(sql_state_t sqlStatesLine) noexcept {
 		return (sqlStatesLine & MASK_IGNORE_WHEN) != 0;
 	}
 
-	static bool IsIntoCondition(sql_state_t sqlStatesLine) noexcept {
+	static constexpr bool IsIntoCondition(sql_state_t sqlStatesLine) noexcept {
 		return (sqlStatesLine & MASK_INTO_CONDITION) != 0;
 	}
 
-	static bool IsIntoCaseBlock(sql_state_t sqlStatesLine) noexcept {
+	static constexpr bool IsIntoCaseBlock(sql_state_t sqlStatesLine) noexcept {
 		return (sqlStatesLine & MASK_NESTED_CASES) != 0;
 	}
 
-	static bool IsIntoExceptionBlock(sql_state_t sqlStatesLine) noexcept {
+	static constexpr bool IsIntoExceptionBlock(sql_state_t sqlStatesLine) noexcept {
 		return (sqlStatesLine & MASK_INTO_EXCEPTION) != 0;
 	}
 
-	static bool IsIntoSelectStatementOrAssignment(sql_state_t sqlStatesLine) noexcept {
+	static constexpr bool IsIntoSelectStatementOrAssignment(sql_state_t sqlStatesLine) noexcept {
 		return (sqlStatesLine & MASK_INTO_SELECT_STATEMENT_OR_ASSIGNEMENT) != 0;
 	}
 
-	static bool IsCaseMergeWithoutWhenFound(sql_state_t sqlStatesLine) noexcept {
+	static constexpr bool IsCaseMergeWithoutWhenFound(sql_state_t sqlStatesLine) noexcept {
 		return (sqlStatesLine & MASK_CASE_MERGE_WITHOUT_WHEN_FOUND) != 0;
 	}
 
-	static bool IsIntoDeclareBlock(sql_state_t sqlStatesLine) noexcept {
+	static constexpr bool IsIntoDeclareBlock(sql_state_t sqlStatesLine) noexcept {
 		return (sqlStatesLine & MASK_INTO_DECLARE) != 0;
 	}
 
-	static bool IsIntoMergeStatement(sql_state_t sqlStatesLine) noexcept {
+	static constexpr bool IsIntoMergeStatement(sql_state_t sqlStatesLine) noexcept {
 		return (sqlStatesLine & MASK_MERGE_STATEMENT) != 0;
 	}
 
-	static bool IsIntoCreateStatement(sql_state_t sqlStatesLine) noexcept {
+	static constexpr bool IsIntoCreateStatement(sql_state_t sqlStatesLine) noexcept {
 		return (sqlStatesLine & MASK_INTO_CREATE) != 0;
 	}
 
-	static bool IsIntoCreateViewStatement(sql_state_t sqlStatesLine) noexcept {
+	static constexpr bool IsIntoCreateViewStatement(sql_state_t sqlStatesLine) noexcept {
 		return (sqlStatesLine & MASK_INTO_CREATE_VIEW) != 0;
 	}
 
-	static bool IsIntoCreateViewAsStatement(sql_state_t sqlStatesLine) noexcept {
+	static constexpr bool IsIntoCreateViewAsStatement(sql_state_t sqlStatesLine) noexcept {
 		return (sqlStatesLine & MASK_INTO_CREATE_VIEW_AS_STATEMENT) != 0;
 	}
 
@@ -462,11 +462,11 @@ private:
 	std::vector<sql_state_t> sqlStatement;
 };
 
-static inline bool IsStreamCommentStyle(int style) noexcept {
+static constexpr bool IsStreamCommentStyle(int style) noexcept {
 	return style == SCE_SQL_COMMENT;
 }
 
-static inline bool IsCommentStyle (int style) noexcept {
+static constexpr bool IsCommentStyle (int style) noexcept {
 	return style == SCE_SQL_COMMENT || style == SCE_SQL_COMMENTLINE || style == SCE_SQL_COMMENTLINEDOC;
 }
 
@@ -491,7 +491,7 @@ static void FoldSqlDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 		// And keep going back until we find an operator ';' followed
 		// by white-space and/or comments. This will improve folding.
 		while (--startPos > 0) {
-			char ch = styler[startPos];
+			const char ch = styler[startPos];
 			if (ch == '\n' || (ch == '\r' && styler[startPos + 1] != '\n')) {
 				lastNLPos = startPos;
 			} else if (ch == ';' && styler.StyleAt(startPos) == SCE_SQL_OPERATOR) {
@@ -499,7 +499,7 @@ static void FoldSqlDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 				for (Sci_Position tempPos = startPos + 1;
 					tempPos < lastNLPos;
 					++tempPos) {
-					int tempStyle = styler.StyleAt(tempPos);
+					const int tempStyle = styler.StyleAt(tempPos);
 					if (!IsCommentStyle(tempStyle)
 						&& tempStyle != SCE_SQL_DEFAULT) {
 						isAllClear = false;
@@ -519,7 +519,7 @@ static void FoldSqlDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 	// And because folding ends at ';', keep going until we find one
 	// Otherwise if create ... view ... as is split over multiple
 	// lines the folding won't always update immediately.
-	Sci_PositionU docLength = styler.Length();
+	const Sci_PositionU docLength = styler.Length();
 	for (; endPos < docLength; ++endPos) {
 		if (styler.SafeGetCharAt(endPos) == ';') {
 			break;
@@ -776,7 +776,7 @@ static void FoldSqlDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 			visibleChars++;
 		}
 		if (atEOL || (i == endPos - 1)) {
-			int levelUse = levelCurrent;
+			const int levelUse = levelCurrent;
 			int lev = levelUse | levelNext << 16;
 			if (visibleChars == 0 && foldCompact)
 				lev |= SC_FOLDLEVELWHITEFLAG;

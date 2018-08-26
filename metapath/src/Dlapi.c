@@ -203,7 +203,7 @@ int DirList_Fill(HWND hwnd, LPCWSTR lpszDir, DWORD grfFlags, LPCWSTR lpszFileSpe
 	DirList_TerminateIconThread(hwnd);
 
 	// A Directory is strongly required
-	if (!lpszDir || !*lpszDir) {
+	if (StrIsEmpty(lpszDir)) {
 		return -1;
 	}
 
@@ -786,7 +786,7 @@ void DirList_CreateFilter(PDL_FILTER pdlf, LPCWSTR lpszFileSpec, BOOL bExcludeFi
 	}
 
 	pdlf->nCount = 1;
-	pdlf->pFilter[0] = &pdlf->tFilterBuf[0];    // Zeile zum Ausprobieren
+	pdlf->pFilter[0] = pdlf->tFilterBuf;    // Zeile zum Ausprobieren
 
 	while ((p = StrChr(pdlf->pFilter[pdlf->nCount - 1], L';')) != NULL) {
 		*p = L'\0';                              // Replace L';' by L'\0'
@@ -1224,7 +1224,7 @@ BOOL IL_GetDisplayName(LPSHELLFOLDER lpsf, LPCITEMIDLIST pidl, DWORD dwFlags, LP
 
 	if (NOERROR == lpsf->lpVtbl->GetDisplayNameOf(lpsf, pidl, dwFlags, &str)) {
 		// Shlwapi.dll provides new function:
-		return StrRetToBuf(&str, pidl, lpszDisplayName, nDisplayName);
+		return StrRetToBuf(&str, pidl, lpszDisplayName, nDisplayName) == S_OK;
 		// ...but I suppose my version is faster ;-)
 		//switch (str.uType) {
 		//case STRRET_WSTR:

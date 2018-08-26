@@ -10,9 +10,9 @@
 
 namespace Scintilla {
 
-const int UTF8MaxBytes = 4;
+constexpr int UTF8MaxBytes = 4;
 
-const int unicodeReplacementChar = 0xFFFD;
+constexpr int unicodeReplacementChar = 0xFFFD;
 
 size_t UTF8Length(std::wstring_view wsv) noexcept;
 size_t UTF8PositionFromUTF16Position(std::string_view u8Text, size_t positionUTF16) noexcept;
@@ -53,11 +53,11 @@ inline bool UTF8IsTrailByte(unsigned char ch) noexcept {
 	return (UTF8ClassifyTable[ch] & UTF8ClassifyMaskTrailByte) != 0;
 }
 
-inline bool UTF8IsAscii(unsigned char ch) noexcept {
+constexpr bool UTF8IsAscii(unsigned char ch) noexcept {
 	return (ch & 0x80) == 0;
 }
 
-inline bool UTF8IsAscii(unsigned int ch) noexcept {
+constexpr bool UTF8IsAscii(unsigned int ch) noexcept {
 	return ch < 0x80;
 }
 
@@ -75,40 +75,32 @@ int UTF8DrawBytes(const unsigned char *us, int len) noexcept;
 
 // Line separator is U+2028 \xe2\x80\xa8
 // Paragraph separator is U+2029 \xe2\x80\xa9
-const int UTF8SeparatorLength = 3;
+constexpr int UTF8SeparatorLength = 3;
 inline bool UTF8IsSeparator(const unsigned char *us) noexcept {
 	const unsigned int value = (us[0] << 16) | (us[1] << 8) | us[2];
 	return value == 0xe280a8 || value == 0xe280a9;
 }
 
 // NEL is U+0085 \xc2\x85
-const int UTF8NELLength = 2;
+constexpr int UTF8NELLength = 2;
 inline bool UTF8IsNEL(const unsigned char *us) noexcept {
 	const unsigned int value = (us[0] << 8) | us[1];
 	return value == 0xc285;
 }
 
 enum {
-	SURROGATE_LEAD_FIRST = 0xD800
-};
-enum {
-	SURROGATE_LEAD_LAST = 0xDBFF
-};
-enum {
-	SURROGATE_TRAIL_FIRST = 0xDC00
-};
-enum {
-	SURROGATE_TRAIL_LAST = 0xDFFF
-};
-enum {
-	SUPPLEMENTAL_PLANE_FIRST = 0x10000
+	SURROGATE_LEAD_FIRST = 0xD800,
+	SURROGATE_LEAD_LAST = 0xDBFF,
+	SURROGATE_TRAIL_FIRST = 0xDC00,
+	SURROGATE_TRAIL_LAST = 0xDFFF,
+	SUPPLEMENTAL_PLANE_FIRST = 0x10000,
 };
 
-inline unsigned int UTF16CharLength(wchar_t uch) noexcept {
+constexpr unsigned int UTF16CharLength(wchar_t uch) noexcept {
 	return ((uch >= SURROGATE_LEAD_FIRST) && (uch <= SURROGATE_LEAD_LAST)) ? 2 : 1;
 }
 
-inline unsigned int UTF16LengthFromUTF8ByteCount(unsigned int byteCount) noexcept {
+constexpr unsigned int UTF16LengthFromUTF8ByteCount(unsigned int byteCount) noexcept {
 	return (byteCount < 4) ? 1 : 2;
 }
 

@@ -17,7 +17,7 @@
 
 using namespace Scintilla;
 
-static inline bool IsJsonOp(int ch) noexcept {
+static constexpr bool IsJsonOp(int ch) noexcept {
 	return ch == '{' || ch == '}' || ch == '[' || ch == ']' || ch == ':' || ch == ',' || ch == '+' || ch == '-';
 }
 
@@ -30,7 +30,7 @@ static void ColouriseJSONDoc(Sci_PositionU startPos, Sci_Position length, int in
 	styler.StartAt(startPos);
 	styler.StartSegment(startPos);
 	Sci_PositionU endPos = startPos + length;
-	if (endPos == (Sci_PositionU)styler.Length())
+	if (endPos == static_cast<Sci_PositionU>(styler.Length()))
 		++endPos;
 
 	Sci_Position lineCurrent = styler.GetLine(startPos);
@@ -46,10 +46,10 @@ static void ColouriseJSONDoc(Sci_PositionU startPos, Sci_Position length, int in
 		chNext = styler.SafeGetCharAt(i + 1);
 
 		const bool atEOL = (ch == '\r' && chNext != '\n') || (ch == '\n');
-		const bool atLineStart = i == (Sci_PositionU)styler.LineStart(lineCurrent);
+		const bool atLineStart = i == static_cast<Sci_PositionU>(styler.LineStart(lineCurrent));
 		if (atEOL || i == endPos - 1) {
 			if (fold) {
-				int levelUse = levelCurrent;
+				const int levelUse = levelCurrent;
 				int lev = levelUse | levelNext << 16;
 				if (levelUse < levelNext)
 					lev |= SC_FOLDLEVELHEADERFLAG;
@@ -81,7 +81,7 @@ static void ColouriseJSONDoc(Sci_PositionU startPos, Sci_Position length, int in
 				state = SCE_C_DEFAULT;
 				wordLen = 0;
 			} else if (wordLen < MAX_WORD_LENGTH) {
-				buf[wordLen++] = (char)ch;
+				buf[wordLen++] = static_cast<char>(ch);
 			}
 			break;
 		case SCE_C_STRING:
@@ -141,7 +141,7 @@ static void ColouriseJSONDoc(Sci_PositionU startPos, Sci_Position length, int in
 			} else if (iswordstart(ch)) {
 				styler.ColourTo(i - 1, state);
 				state = SCE_C_IDENTIFIER;
-				buf[wordLen++] = (char)ch;
+				buf[wordLen++] = static_cast<char>(ch);
 			} else if (IsJsonOp(ch)) {
 				styler.ColourTo(i - 1, state);
 				state = SCE_C_OPERATOR;

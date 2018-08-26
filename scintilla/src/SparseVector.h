@@ -18,7 +18,7 @@ private:
 	std::unique_ptr<Partitioning<Sci::Position>> starts;
 	std::unique_ptr<SplitVector<T>> values;
 	T empty;
-	void ClearValue(Sci::Position partition) {
+	void ClearValue(Sci::Position partition) noexcept {
 		values->SetValueAt(partition, T());
 	}
 public:
@@ -49,7 +49,7 @@ public:
 	Sci::Position PositionOfElement(int element) const {
 		return starts->PositionFromPartition(element);
 	}
-	const T& ValueAt(Sci::Position position) const {
+	const T& ValueAt(Sci::Position position) const noexcept {
 		assert(position < Length());
 		const Sci::Position partition = starts->PartitionFromPosition(position);
 		const Sci::Position startPartition = starts->PositionFromPartition(partition);

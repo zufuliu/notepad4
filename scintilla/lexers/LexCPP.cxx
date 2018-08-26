@@ -43,43 +43,43 @@ using namespace Scintilla;
 #define		LEX_AWK		51	// Awk
 #define		LEX_JAM		52	// Jamfile
 
-static inline bool _hasPreprocessor(int lex) noexcept { // #[space]preprocessor
+static constexpr bool _hasPreprocessor(int lex) noexcept { // #[space]preprocessor
 	return lex == LEX_CPP || lex == LEX_CS || lex == LEX_RC || lex == LEX_OBJC;
 }
-static inline bool _hasAnotation(int lex) noexcept { // @anotation
+static constexpr bool _hasAnotation(int lex) noexcept { // @anotation
 	return lex == LEX_JAVA || lex == LEX_GROOVY || lex == LEX_SCALA;
 }
-static inline bool _hasRegex(int lex) noexcept { // Javascript /regex/
+static constexpr bool _hasRegex(int lex) noexcept { // Javascript /regex/
 	return lex == LEX_JS || lex == LEX_GROOVY || lex == LEX_AS || lex == LEX_HX || lex == LEX_AWK;
 }
-static inline bool _hasTripleVerbatim(int lex) noexcept {
+static constexpr bool _hasTripleVerbatim(int lex) noexcept {
 	return lex == LEX_GROOVY || lex == LEX_SCALA;
 }
-static inline bool _sharpComment(int lex) noexcept {
+static constexpr bool _sharpComment(int lex) noexcept {
 	return lex == LEX_AWK || lex == LEX_JAM;
 }
-static inline bool _hasXML(int lex) noexcept {
+static constexpr bool _hasXML(int lex) noexcept {
 	return lex == LEX_JS || lex == LEX_AS || lex == LEX_SCALA;
 }
-static inline bool _squareBraceAfterType(int lex) noexcept {
+static constexpr bool _squareBraceAfterType(int lex) noexcept {
 	return lex == LEX_JAVA || lex == LEX_CS || lex == LEX_JS || lex == LEX_AS || lex == LEX_HX || lex == LEX_GROOVY || lex == LEX_SCALA;
 }
-static inline bool IsDStrFix(int ch) noexcept {
+static constexpr bool IsDStrFix(int ch) noexcept {
 	return (ch < 0x80) && (ch == 'c' || ch == 'w' || ch == 'd');
 }
-static inline bool _use2ndKeyword(int lex) noexcept {
+static constexpr bool _use2ndKeyword(int lex) noexcept {
 	return lex == LEX_OBJC;
 }
-static inline bool _use2ndKeyword2(int lex) noexcept {
+static constexpr bool _use2ndKeyword2(int lex) noexcept {
 	return lex == LEX_CPP || lex == LEX_OBJC;
 }
 #define	strequ(str1, str2)	(!strcmp(str1, str2))
-static inline bool IsSpaceEquiv(int state) noexcept {
+static constexpr bool IsSpaceEquiv(int state) noexcept {
 	// including SCE_C_DEFAULT, SCE_C_COMMENT, SCE_C_COMMENTLINE
 	// SCE_C_COMMENTDOC, SCE_C_COMMENTLINEDOC, SCE_C_COMMENTDOC_TAG, SCE_C_COMMENTDOC_TAG_XML
 	return (state < SCE_C_IDENTIFIER) || (state == SCE_C_DNESTEDCOMMENT);
 }
-static inline bool IsEscapeChar(int ch) noexcept {
+static constexpr bool IsEscapeChar(int ch) noexcept {
 	return ch == '\\' || ch == '\'' || ch == '\"'
 		|| ch == '$'; // PHP
 }
@@ -137,7 +137,7 @@ static void ColouriseCppDoc(Sci_PositionU startPos, Sci_Position length, int ini
 	}
 
 	Sci_Position lineCurrent = styler.GetLine(startPos);
-	int curLineState = (lineCurrent > 0) ? styler.GetLineState(lineCurrent - 1) : 0;
+	const int curLineState = (lineCurrent > 0) ? styler.GetLineState(lineCurrent - 1) : 0;
 	int lineState = (curLineState >> 24);
 	int numCBrace = (curLineState >> 18) & 0x3F;
 	int numSBrace = (curLineState >> 13) & 0x1F;
@@ -175,8 +175,8 @@ static void ColouriseCppDoc(Sci_PositionU startPos, Sci_Position length, int ini
 	if (initStyle == SCE_C_COMMENTLINE || initStyle == SCE_C_COMMENTLINEDOC || initStyle == SCE_C_PREPROCESSOR) {
 		// Set continuationLine if last character of previous line is '\'
 		if (lineCurrent > 0) {
-			int chBack = styler.SafeGetCharAt(startPos - 1);
-			int chBack2 = styler.SafeGetCharAt(startPos - 2);
+			const int chBack = styler.SafeGetCharAt(startPos - 1);
+			const int chBack2 = styler.SafeGetCharAt(startPos - 2);
 			int lineEndChar = '!';
 			if (chBack2 == '\r' && chBack == '\n') {
 				lineEndChar = styler.SafeGetCharAt(startPos - 3);
@@ -266,11 +266,11 @@ _label_identifier:
 				//bool pps = (len > 4 && s[0] == '_' && s[1] == '_' && s[len - 1] == '_' && s[len - 2] == '_');
 				//char tu[256] = {0};
 				//if (pps)
-				//	strncpy(tu, &s[2], len - 4);
+				//	strncpy(tu, s + 2, len - 4);
 				// __attribute__()
-				bool hasAttr = (lexType == LEX_CPP || lexType == LEX_OBJC || isObjCSource || lexType == LEX_CS);
-				bool mayAttr = lastWordWasAttr && (numRBrace > 0 || (lineState & LEX_BLOCK_MASK_DEFINE));
-				bool mayCSAttr = (lexType == LEX_CS) && numSBrace == 1 && numRBrace == 0;
+				const bool hasAttr = (lexType == LEX_CPP || lexType == LEX_OBJC || isObjCSource || lexType == LEX_CS);
+				const bool mayAttr = lastWordWasAttr && (numRBrace > 0 || (lineState & LEX_BLOCK_MASK_DEFINE));
+				const bool mayCSAttr = (lexType == LEX_CS) && numSBrace == 1 && numRBrace == 0;
 				const char nextChar = LexGetNextChar(sc.currentPos, styler);
 
 				if (lastPPDefineWord) {
@@ -291,7 +291,7 @@ _label_identifier:
 					sc.ChangeState(SCE_C_ASM_REGISTER);
 				} else if ((lexType == LEX_D) && (lineState & LEX_BLOCK_MASK_ASM) && kw2ndKeyword.InList(s)) {
 					sc.ChangeState(SCE_C_2NDWORD);
-				} else if (((s[0] == '#' || s[0] == '!') && keywords3.InList(&s[1]))
+				} else if (((s[0] == '#' || s[0] == '!') && keywords3.InList(s + 1))
 					|| (isPreprocessorWord && keywords3.InList(s))) {
 					sc.ChangeState(SCE_C_PREPROCESSOR);
 					lastWordWasAttr = false;
@@ -299,7 +299,7 @@ _label_identifier:
 						isPreprocessorWord = false;
 						char *ppw = s;
 						if (s[0] == '#')
-							ppw = &s[1];
+							ppw = s + 1;
 						isPragmaPreprocessor = strequ(ppw, "pragma") || strequ(ppw, "line");
 						isIncludePreprocessor = strcmp(ppw, "include") >= 0 || strequ(ppw, "import") || strequ(ppw, "using");
 						isMessagePreprocessor = strequ(ppw, "error") || strequ(ppw, "warning") || strequ(ppw, "message") ||
@@ -339,13 +339,13 @@ _label_identifier:
 					sc.ChangeState(SCE_C_DIRECTIVE);
 					while (iswordchar(sc.ch))
 						sc.Forward();
-				} else if (lexType != LEX_CS && s[0] == '@' && keywords4.InList(&s[1])) {
+				} else if (lexType != LEX_CS && s[0] == '@' && keywords4.InList(s + 1)) {
 					sc.ChangeState(SCE_C_DIRECTIVE);
 					if (lexType == LEX_CPP || lexType == LEX_OBJC || isObjCSource) {
 						if (!isObjCSource)
 							isObjCSource = true;
 						if (!lastWordWasAttr)
-							lastWordWasAttr = strequ(&s[1], "property");
+							lastWordWasAttr = strequ(s + 1, "property");
 					}
 				} else if (kwClass.InList(s)) {
 					sc.ChangeState(SCE_C_CLASS);
@@ -375,7 +375,7 @@ _label_identifier:
 					|| sc.ch == '*' || sc.ch == '&' || sc.ch == ':')) {
 					bool is_class = false;
 					Sci_PositionU pos = sc.currentPos;
-					int next_char = IsASpace(sc.ch) ? nextChar : sc.ch;
+					const int next_char = IsASpace(sc.ch) ? nextChar : sc.ch;
 
 					if (sc.ch == ':' && sc.chNext == ':') { // C++, Java, PHP
 						is_class = true;
@@ -392,7 +392,7 @@ _label_identifier:
 						const bool next_is_word = iswordstart(ch);
 						if (next_char == ')' || next_char == '>') {
 							if (next_is_word || (ch == '(')) {
-								pos = sc.currentPos - (uint32_t)strlen(s) - 1;
+								pos = sc.currentPos - static_cast<Sci_PositionU>(strlen(s)) - 1;
 								while (IsASpace(styler.SafeGetCharAt(pos))) pos--;
 								ch = styler.SafeGetCharAt(pos);
 								if (next_char == '>' && (ch == '<' || ch == ',')) {
@@ -415,7 +415,7 @@ _label_identifier:
 							if (ch == '=') {
 								is_class = true;
 							} else if (ch == ',' || ch == ';') {
-								pos = sc.currentPos - (uint32_t)strlen(s) - 1;
+								pos = sc.currentPos - static_cast<Sci_PositionU>(strlen(s)) - 1;
 								while (IsASpace(styler.SafeGetCharAt(pos))) pos--;
 								ch = styler.SafeGetCharAt(pos);
 								if (iswordchar(ch) || ch == ';' || ch == '{') {
@@ -618,7 +618,7 @@ _label_identifier:
 				Sci_PositionU len = 0;
 				bool rawEnd = false;
 				while (pos > startPos && len < 16) {
-					char ch = styler.SafeGetCharAt(pos);
+					const char ch = styler.SafeGetCharAt(pos);
 					if (ch == ')') {
 						rawEnd = true;
 						break;
@@ -895,7 +895,7 @@ _label_identifier:
 					} else if (sc.ch == '/') { // bug
 						// RegExp only appears in assignment or function argument
 						//if (_hasRegex(lexType) && (isAssignStmt || numRBrace > 0) && (strchr("([{=,:;!%^&*|?~+-", chPrevNonWhite) || followsReturn)
-						bool isJsRegex = (isAssignStmt && (chPrevNonWhite == '=' || chPrevNonWhite == ':')) 	// assignment
+						const bool isJsRegex = (isAssignStmt && (chPrevNonWhite == '=' || chPrevNonWhite == ':')) 	// assignment
 							|| (numRBrace > 0 && strchr("(,!&|", chPrevNonWhite))	// argument
 							|| (strchr("};", chPrevNonWhite))
 							|| followsReturn;
@@ -1099,9 +1099,9 @@ _label_identifier:
 	sc.Complete();
 }
 
-static bool IsCppDefineLine(Sci_Position line, LexAccessor &styler, Sci_Position &DefinePos) {
+static bool IsCppDefineLine(Sci_Position line, LexAccessor &styler, Sci_Position &DefinePos) noexcept {
 	Sci_Position pos = styler.LineStart(line);
-	Sci_Position endPos = styler.LineStart(line + 1) - 1;
+	const Sci_Position endPos = styler.LineStart(line + 1) - 1;
 	pos = LexSkipSpaceTab(pos, endPos, styler);
 	if (styler[pos] == '#' && styler.StyleAt(pos) == SCE_C_PREPROCESSOR) {
 		pos++;
@@ -1114,7 +1114,7 @@ static bool IsCppDefineLine(Sci_Position line, LexAccessor &styler, Sci_Position
 	return false;
 }
 // also used in LexAsm.cxx
-bool IsCppInDefine(Sci_Position currentPos, LexAccessor &styler) {
+bool IsCppInDefine(Sci_Position currentPos, LexAccessor &styler) noexcept {
 	Sci_Position line = styler.GetLine(currentPos);
 	Sci_Position pos;
 	if (IsCppDefineLine(line, styler, pos)) {
@@ -1129,11 +1129,11 @@ bool IsCppInDefine(Sci_Position currentPos, LexAccessor &styler) {
 	}
 	return false;
 }
-static bool IsCppFoldingLine(Sci_Position line, LexAccessor &styler, int kind) {
-	Sci_Position startPos = styler.LineStart(line);
-	Sci_Position endPos = styler.LineStart(line + 1) - 1;
+static bool IsCppFoldingLine(Sci_Position line, LexAccessor &styler, int kind) noexcept {
+	const Sci_Position startPos = styler.LineStart(line);
+	const Sci_Position endPos = styler.LineStart(line + 1) - 1;
 	Sci_Position pos = LexSkipSpaceTab(startPos, endPos, styler);
-	int stl = styler.StyleAt(pos);
+	const int stl = styler.StyleAt(pos);
 	char ch = styler[pos];
 	switch (kind) {
 		//case 0:
@@ -1168,14 +1168,14 @@ static bool IsCppFoldingLine(Sci_Position line, LexAccessor &styler, int kind) {
 #define IsDefineLine(line)		IsCppFoldingLine(line, styler, 4)
 #define IsUnDefLine(line)		IsCppFoldingLine(line, styler, 5)
 
-static inline bool IsStreamCommentStyle(int style) noexcept {
+static constexpr bool IsStreamCommentStyle(int style) noexcept {
 	return style == SCE_C_COMMENT || style == SCE_C_COMMENTDOC
 		|| style == SCE_C_COMMENTDOC_TAG || style == SCE_C_COMMENTDOC_TAG_XML;
 }
-static inline bool IsHear_NowDocStyle(int style) noexcept {
+static constexpr bool IsHear_NowDocStyle(int style) noexcept {
 	return style == SCE_C_HEREDOC || style == SCE_C_NOWDOC;
 }
-static bool IsOpenBraceLine(Sci_Position line, LexAccessor &styler) {
+static bool IsOpenBraceLine(Sci_Position line, LexAccessor &styler) noexcept {
 	// above line
 	Sci_Position startPos = styler.LineStart(line - 1);
 	Sci_Position endPos = styler.LineStart(line) - 1;
@@ -1221,7 +1221,7 @@ static void FoldCppDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 	const int lexType = styler.GetPropertyInt("lexer.lang.type", LEX_CPP);
 	const bool hasPreprocessor = _hasPreprocessor(lexType);
 
-	Sci_PositionU endPos = startPos + length;
+	const Sci_PositionU endPos = startPos + length;
 	int visibleChars = 0;
 	Sci_Position lineCurrent = styler.GetLine(startPos);
 	int levelCurrent = SC_FOLDLEVELBASE;
@@ -1236,12 +1236,12 @@ static void FoldCppDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 	bool isObjCProtocol = false;
 
 	for (Sci_PositionU i = startPos; i < endPos; i++) {
-		int ch = chNext;
+		const int ch = chNext;
 		chNext = styler.SafeGetCharAt(i + 1);
-		int stylePrev = style;
+		const int stylePrev = style;
 		style = styleNext;
 		styleNext = styler.StyleAt(i + 1);
-		bool atEOL = (ch == '\r' && chNext != '\n') || (ch == '\n');
+		const bool atEOL = (ch == '\r' && chNext != '\n') || (ch == '\n');
 
 		if (foldComment && atEOL && IsCommentLine(lineCurrent)) {
 			if (!IsCommentLine(lineCurrent - 1) && IsCommentLine(lineCurrent + 1))
@@ -1403,7 +1403,7 @@ static void FoldCppDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 		if (!isspacechar(ch))
 			visibleChars++;
 		if (atEOL || (i == endPos - 1)) {
-			int levelUse = levelCurrent;
+			const int levelUse = levelCurrent;
 			//if (foldAtElse) {
 			//	levelUse = levelMinCurrent;
 			//}

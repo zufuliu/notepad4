@@ -50,7 +50,7 @@ public:
 	int borderHeight;
 	int verticalOffset; // pixel offset up or down of the calltip with respect to the line
 
-	CallTip();
+	CallTip() noexcept;
 	// Deleted so CallTip objects can not be copied.
 	CallTip(const CallTip &) = delete;
 	CallTip(CallTip &&) = delete;
@@ -60,18 +60,18 @@ public:
 
 	void PaintCT(Surface *surfaceWindow);
 
-	void MouseClick(const Point &pt);
+	void MouseClick(const Point &pt) noexcept;
 
 	/// Setup the calltip and return a rectangle of the area required.
 	PRectangle CallTipStart(Sci::Position pos, const Point &pt, int textHeight, const char *defn,
 		const char *faceName, int size, int codePage_,
 		int characterSet, int technology, const Window &wParent);
 
-	void CallTipCancel();
+	void CallTipCancel() noexcept;
 
 	/// Set a range of characters to be displayed in a highlight style.
 	/// Commonly used to highlight the current parameter.
-	void SetHighlight(int start, int end);
+	void SetHighlight(int start, int end) noexcept;
 
 	/// Set the tab size in pixels for the call tip. 0 or -ve means no tab expand.
 	void SetTabSize(int tabSz) noexcept;

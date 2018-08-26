@@ -17,7 +17,7 @@
 
 using namespace Scintilla;
 
-static inline bool IsNsisOp(int ch) noexcept {
+static constexpr bool IsNsisOp(int ch) noexcept {
 	return ch == '(' || ch == ')' || ch == '+' || ch == '-' || ch == '&' || ch == '|'
 		|| ch == '=' || ch == ':' || ch == ',' || ch == '<' || ch == '>'
 		|| ch == '!' || ch == '.';
@@ -30,7 +30,7 @@ static void ColouriseNSISDoc(Sci_PositionU startPos, Sci_Position length, int in
 	styler.StartAt(startPos);
 	styler.StartSegment(startPos);
 	Sci_PositionU endPos = startPos + length;
-	if (endPos == (Sci_PositionU)styler.Length())
+	if (endPos == static_cast<Sci_PositionU>(styler.Length()))
 		++endPos;
 
 	int visibleChars = 0;
@@ -44,7 +44,7 @@ static void ColouriseNSISDoc(Sci_PositionU startPos, Sci_Position length, int in
 		chNext = styler.SafeGetCharAt(i + 1);
 
 		const bool atEOL = (ch == '\r' && chNext != '\n') || (ch == '\n');
-		const bool atLineStart = i == (Sci_PositionU)styler.LineStart(lineCurrent);
+		const bool atLineStart = i == static_cast<Sci_PositionU>(styler.LineStart(lineCurrent));
 
 		switch (state) {
 		case SCE_C_OPERATOR:
@@ -207,11 +207,11 @@ static void ColouriseNSISDoc(Sci_PositionU startPos, Sci_Position length, int in
 
 #define IsCommentLine(line)			IsLexCommentLine(line, styler, SCE_C_COMMENTLINE)
 #define IsStreamCommantStyle(style)	(style == SCE_C_COMMENT)
-static inline bool IsNsisFoldWordStart(int ch) noexcept {
+static constexpr bool IsNsisFoldWordStart(int ch) noexcept {
 	return (ch == 'S' || ch == 'F' || ch == 'P')
 		|| (ch == 's' || ch == 'f' || ch == 'p');
 }
-static inline bool IsNsisFoldPPStart(int ch) noexcept {
+static constexpr bool IsNsisFoldPPStart(int ch) noexcept {
 	return (ch == 'i' || ch == 'e' || ch == 'm')
 		|| (ch == 'I' || ch == 'E' || ch == 'M');
 }
@@ -222,7 +222,7 @@ static void FoldNSISDoc(Sci_PositionU startPos, Sci_Position length, int initSty
 	const bool foldComment = styler.GetPropertyInt("fold.comment") != 0;
 	const bool foldCompact = styler.GetPropertyInt("fold.compact", 1) != 0;
 
-	Sci_PositionU endPos = startPos + length;
+	const Sci_PositionU endPos = startPos + length;
 	int visibleChars = 0;
 	Sci_Position lineCurrent = styler.GetLine(startPos);
 	int levelCurrent = SC_FOLDLEVELBASE;
@@ -235,12 +235,12 @@ static void FoldNSISDoc(Sci_PositionU startPos, Sci_Position length, int initSty
 	int style = initStyle;
 
 	for (Sci_PositionU i = startPos; i < endPos; i++) {
-		int ch = chNext;
+		const int ch = chNext;
 		chNext = styler.SafeGetCharAt(i + 1);
-		int stylePrev = style;
+		const int stylePrev = style;
 		style = styleNext;
 		styleNext = styler.StyleAt(i + 1);
-		bool atEOL = (ch == '\r' && chNext != '\n') || (ch == '\n');
+		const bool atEOL = (ch == '\r' && chNext != '\n') || (ch == '\n');
 
 		if (foldComment && atEOL && IsCommentLine(lineCurrent)) {
 			if (!IsCommentLine(lineCurrent - 1) && IsCommentLine(lineCurrent + 1))
@@ -277,7 +277,7 @@ static void FoldNSISDoc(Sci_PositionU startPos, Sci_Position length, int initSty
 			visibleChars++;
 
 		if (atEOL || (i == endPos - 1)) {
-			int levelUse = levelCurrent;
+			const int levelUse = levelCurrent;
 			int lev = levelUse | levelNext << 16;
 			if (visibleChars == 0 && foldCompact)
 				lev |= SC_FOLDLEVELWHITEFLAG;

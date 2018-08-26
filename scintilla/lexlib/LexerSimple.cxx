@@ -24,7 +24,7 @@
 
 using namespace Scintilla;
 
-LexerSimple::LexerSimple(const LexerModule *module_) :
+LexerSimple::LexerSimple(const LexerModule *module_) noexcept :
 	module(module_) {
 }
 

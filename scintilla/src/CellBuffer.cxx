@@ -62,16 +62,16 @@ struct CountWidths {
 class ILineVector {
 public:
 	virtual void Init() = 0;
-	virtual void SetPerLine(PerLine *pl) = 0;
-	virtual void InsertText(Sci::Line line, Sci::Position delta) = 0;
+	virtual void SetPerLine(PerLine *pl) noexcept = 0;
+	virtual void InsertText(Sci::Line line, Sci::Position delta) noexcept = 0;
 	virtual void InsertLine(Sci::Line line, Sci::Position position, bool lineStart) = 0;
 	virtual void SetLineStart(Sci::Line line, Sci::Position position) noexcept = 0;
 	virtual void RemoveLine(Sci::Line line) = 0;
 	virtual Sci::Line Lines() const noexcept = 0;
 	virtual Sci::Line LineFromPosition(Sci::Position pos) const noexcept = 0;
 	virtual Sci::Position LineStart(Sci::Line line) const noexcept = 0;
-	virtual void InsertCharacters(Sci::Line line, CountWidths delta) = 0;
-	virtual void SetLineCharactersWidth(Sci::Line line, CountWidths width) = 0;
+	virtual void InsertCharacters(Sci::Line line, CountWidths delta) noexcept = 0;
+	virtual void SetLineCharactersWidth(Sci::Line line, CountWidths width) noexcept = 0;
 	virtual int LineCharacterIndex() const noexcept = 0;
 	virtual bool AllocateLineCharacterIndex(int lineCharacterIndex, Sci::Line lines) = 0;
 	virtual bool ReleaseLineCharacterIndex(int lineCharacterIndex) = 0;
@@ -125,7 +125,7 @@ public:
 		return starts.PositionFromPartition(static_cast<POS>(line) + 1) -
 			starts.PositionFromPartition(static_cast<POS>(line));
 	}
-	void SetLineWidth(Sci::Line line, Sci::Position width) {
+	void SetLineWidth(Sci::Line line, Sci::Position width) noexcept {
 		const Sci::Position widthCurrent = LineWidth(line);
 		starts.InsertText(static_cast<POS>(line), static_cast<POS>(width - widthCurrent));
 	}
@@ -155,10 +155,10 @@ public:
 		startsUTF32.starts.DeleteAll();
 		startsUTF16.starts.DeleteAll();
 	}
-	void SetPerLine(PerLine *pl) override {
+	void SetPerLine(PerLine *pl) noexcept override {
 		perLine = pl;
 	}
-	void InsertText(Sci::Line line, Sci::Position delta) override {
+	void InsertText(Sci::Line line, Sci::Position delta) noexcept override {
 		starts.InsertText(static_cast<POS>(line), static_cast<POS>(delta));
 	}
 	void InsertLine(Sci::Line line, Sci::Position position, bool lineStart) override {
@@ -202,7 +202,7 @@ public:
 	Sci::Position LineStart(Sci::Line line) const noexcept override {
 		return starts.PositionFromPartition(static_cast<POS>(line));
 	}
-	void InsertCharacters(Sci::Line line, CountWidths delta) override {
+	void InsertCharacters(Sci::Line line, CountWidths delta) noexcept override {
 		if (startsUTF32.Active()) {
 			startsUTF32.starts.InsertText(static_cast<POS>(line), static_cast<POS>(delta.WidthUTF32()));
 		}
@@ -210,7 +210,7 @@ public:
 			startsUTF16.starts.InsertText(static_cast<POS>(line), static_cast<POS>(delta.WidthUTF16()));
 		}
 	}
-	void SetLineCharactersWidth(Sci::Line line, CountWidths width) override {
+	void SetLineCharactersWidth(Sci::Line line, CountWidths width) noexcept override {
 		if (startsUTF32.Active()) {
 			assert(startsUTF32.starts.Partitions() == starts.Partitions());
 			startsUTF32.SetLineWidth(line, width.WidthUTF32());
@@ -269,7 +269,7 @@ public:
 	}
 };
 
-Action::Action() {
+Action::Action() noexcept {
 	at = startAction;
 	position = 0;
 	lenData = 0;
@@ -284,13 +284,13 @@ void Action::Create(actionType at_, Sci::Position position_, const char *data_, 
 	at = at_;
 	if (lenData_) {
 		data = std::make_unique<char[]>(lenData_);
-		memcpy(&data[0], data_, lenData_);
+		memcpy(data.get(), data_, lenData_);
 	}
 	lenData = lenData_;
 	mayCoalesce = mayCoalesce_;
 }
 
-void Action::Clear() {
+void Action::Clear() noexcept {
 	data = nullptr;
 	lenData = 0;
 }
@@ -435,7 +435,7 @@ void UndoHistory::EndUndoAction() {
 	}
 }
 
-void UndoHistory::DropUndoSequence() {
+void UndoHistory::DropUndoSequence() noexcept {
 	undoSequenceDepth = 0;
 }
 
@@ -450,19 +450,19 @@ void UndoHistory::DeleteUndoHistory() {
 	tentativePoint = -1;
 }
 
-void UndoHistory::SetSavePoint() {
+void UndoHistory::SetSavePoint() noexcept {
 	savePoint = currentAction;
 }
 
-bool UndoHistory::IsSavePoint() const {
+bool UndoHistory::IsSavePoint() const noexcept {
 	return savePoint == currentAction;
 }
 
-void UndoHistory::TentativeStart() {
+void UndoHistory::TentativeStart() noexcept {
 	tentativePoint = currentAction;
 }
 
-void UndoHistory::TentativeCommit() {
+void UndoHistory::TentativeCommit() noexcept {
 	tentativePoint = -1;
 	// Truncate undo history
 	maxAction = currentAction;
@@ -499,7 +499,7 @@ const Action &UndoHistory::GetUndoStep() const {
 	return actions[currentAction];
 }
 
-void UndoHistory::CompletedUndoStep() {
+void UndoHistory::CompletedUndoStep() noexcept {
 	currentAction--;
 }
 
@@ -524,7 +524,7 @@ const Action &UndoHistory::GetRedoStep() const {
 	return actions[currentAction];
 }
 
-void UndoHistory::CompletedRedoStep() {
+void UndoHistory::CompletedRedoStep() noexcept {
 	currentAction++;
 }
 
@@ -550,7 +550,7 @@ unsigned char CellBuffer::UCharAt(Sci::Position position) const noexcept {
 	return substance.ValueAt(position);
 }
 
-void CellBuffer::GetCharRange(char *buffer, Sci::Position position, Sci::Position lengthRetrieve) const {
+void CellBuffer::GetCharRange(char *buffer, Sci::Position position, Sci::Position lengthRetrieve) const noexcept {
 	if (lengthRetrieve <= 0)
 		return;
 	if (position < 0)
@@ -588,11 +588,11 @@ const char *CellBuffer::BufferPointer() {
 	return substance.BufferPointer();
 }
 
-const char *CellBuffer::RangePointer(Sci::Position position, Sci::Position rangeLength) {
+const char *CellBuffer::RangePointer(Sci::Position position, Sci::Position rangeLength) noexcept {
 	return substance.RangePointer(position, rangeLength);
 }
 
-Sci::Position CellBuffer::GapPosition() const {
+Sci::Position CellBuffer::GapPosition() const noexcept {
 	return static_cast<Sci::Position>(substance.GapPosition());
 }
 
@@ -612,7 +612,7 @@ const char *CellBuffer::InsertString(Sci::Position position, const char *s, Sci:
 	return data;
 }
 
-bool CellBuffer::SetStyleAt(Sci::Position position, char styleValue) {
+bool CellBuffer::SetStyleAt(Sci::Position position, char styleValue) noexcept {
 	if (!hasStyles) {
 		return false;
 	}
@@ -625,7 +625,7 @@ bool CellBuffer::SetStyleAt(Sci::Position position, char styleValue) {
 	}
 }
 
-bool CellBuffer::SetStyleFor(Sci::Position position, Sci::Position lengthStyle, char styleValue) {
+bool CellBuffer::SetStyleFor(Sci::Position position, Sci::Position lengthStyle, char styleValue) noexcept {
 	if (!hasStyles) {
 		return false;
 	}
@@ -688,7 +688,7 @@ void CellBuffer::SetLineEndTypes(int utf8LineEnds_) {
 	}
 }
 
-bool CellBuffer::ContainsLineEnd(const char *s, Sci::Position length) const {
+bool CellBuffer::ContainsLineEnd(const char *s, Sci::Position length) const noexcept {
 	unsigned char chBeforePrev = 0;
 	unsigned char chPrev = 0;
 	for (Sci::Position i = 0; i < length; i++) {
@@ -707,7 +707,7 @@ bool CellBuffer::ContainsLineEnd(const char *s, Sci::Position length) const {
 	return false;
 }
 
-void CellBuffer::SetPerLine(PerLine *pl) {
+void CellBuffer::SetPerLine(PerLine *pl) noexcept {
 	plv->SetPerLine(pl);
 }
 
@@ -757,7 +757,7 @@ bool CellBuffer::IsReadOnly() const noexcept {
 	return readOnly;
 }
 
-void CellBuffer::SetReadOnly(bool set) {
+void CellBuffer::SetReadOnly(bool set) noexcept {
 	readOnly = set;
 }
 
@@ -769,19 +769,19 @@ bool CellBuffer::HasStyles() const noexcept {
 	return hasStyles;
 }
 
-void CellBuffer::SetSavePoint() {
+void CellBuffer::SetSavePoint() noexcept {
 	uh.SetSavePoint();
 }
 
-bool CellBuffer::IsSavePoint() const {
+bool CellBuffer::IsSavePoint() const noexcept {
 	return uh.IsSavePoint();
 }
 
-void CellBuffer::TentativeStart() {
+void CellBuffer::TentativeStart() noexcept {
 	uh.TentativeStart();
 }
 
-void CellBuffer::TentativeCommit() {
+void CellBuffer::TentativeCommit() noexcept {
 	uh.TentativeCommit();
 }
 
@@ -789,7 +789,7 @@ int CellBuffer::TentativeSteps() {
 	return uh.TentativeSteps();
 }
 
-bool CellBuffer::TentativeActive() const {
+bool CellBuffer::TentativeActive() const noexcept {
 	return uh.TentativeActive();
 }
 
@@ -803,7 +803,7 @@ void CellBuffer::RemoveLine(Sci::Line line) {
 	plv->RemoveLine(line);
 }
 
-bool CellBuffer::UTF8LineEndOverlaps(Sci::Position position) const {
+bool CellBuffer::UTF8LineEndOverlaps(Sci::Position position) const noexcept {
 	const unsigned char bytes[] = {
 		static_cast<unsigned char>(substance.ValueAt(position - 2)),
 		static_cast<unsigned char>(substance.ValueAt(position - 1)),
@@ -1117,7 +1117,7 @@ void CellBuffer::BasicDeleteChars(Sci::Position position, Sci::Position deleteLe
 	}
 }
 
-bool CellBuffer::SetUndoCollection(bool collectUndo) {
+bool CellBuffer::SetUndoCollection(bool collectUndo) noexcept {
 	collectingUndo = collectUndo;
 	uh.DropUndoSequence();
 	return collectingUndo;

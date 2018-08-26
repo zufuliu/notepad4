@@ -26,7 +26,7 @@ using namespace Scintilla;
 static std::vector<LexerModule *> lexerCatalogue;
 static int nextLanguage = SCLEX_AUTOMATIC+1;
 
-const LexerModule *Catalogue::Find(int language) {
+const LexerModule *Catalogue::Find(int language) noexcept {
 	Scintilla_LinkLexers();
 	for (const auto *lm : lexerCatalogue) {
 		if (lm->GetLanguage() == language) {
@@ -36,7 +36,7 @@ const LexerModule *Catalogue::Find(int language) {
 	return nullptr;
 }
 
-const LexerModule *Catalogue::Find(const char *languageName) {
+const LexerModule *Catalogue::Find(const char *languageName) noexcept {
 	Scintilla_LinkLexers();
 	if (languageName) {
 		for (const auto *lm : lexerCatalogue) {

@@ -173,7 +173,7 @@ public:
 /**
  * Holds an RGB colour with 8 bits for each component.
  */
-constexpr const float componentMaximum = 255.0f;
+constexpr float componentMaximum = 255.0f;
 class ColourDesired {
 	int co;
 public:
@@ -305,7 +305,7 @@ public:
 	virtual ~Font();
 
 	virtual void Create(const FontParameters &fp);
-	virtual void Release();
+	virtual void Release() noexcept;
 
 	FontID GetID() const noexcept {
 		return fid;
@@ -326,10 +326,10 @@ public:
 	virtual XYPOSITION Width() const noexcept = 0;
 	virtual XYPOSITION Height() const noexcept = 0;
 	virtual XYPOSITION TabWidth() const noexcept = 0;
-	virtual XYPOSITION TabWidthMinimumPixels() const = 0;
+	virtual XYPOSITION TabWidthMinimumPixels() const noexcept = 0;
 	virtual const Font *FontOfPosition(size_t position) const = 0;
 	virtual XYPOSITION RepresentationWidth(size_t position) const = 0;
-	virtual XYPOSITION TabPositionAfter(XYPOSITION xPosition) const = 0;
+	virtual XYPOSITION TabPositionAfter(XYPOSITION xPosition) const noexcept = 0;
 };
 
 struct Interval {
@@ -341,7 +341,7 @@ class IScreenLineLayout {
 public:
 	virtual ~IScreenLineLayout() = default;
 	virtual size_t PositionFromX(XYPOSITION xDistance, bool charPosition) = 0;
-	virtual XYPOSITION XFromPosition(size_t caretPosition) = 0;
+	virtual XYPOSITION XFromPosition(size_t caretPosition) noexcept = 0;
 	virtual std::vector<Interval> FindRangeIntervals(size_t start, size_t end) = 0;
 };
 
@@ -358,17 +358,17 @@ public:
 	virtual ~Surface() = default;
 	static Surface *Allocate(int technology);
 
-	virtual void Init(WindowID wid) = 0;
-	virtual void Init(SurfaceID sid, WindowID wid) = 0;
-	virtual void InitPixMap(int width, int height, Surface *surface_, WindowID wid) = 0;
+	virtual void Init(WindowID wid) noexcept = 0;
+	virtual void Init(SurfaceID sid, WindowID wid) noexcept = 0;
+	virtual void InitPixMap(int width, int height, Surface *surface_, WindowID wid) noexcept = 0;
 
-	virtual void Release() = 0;
-	virtual bool Initialised() const = 0;
+	virtual void Release() noexcept = 0;
+	virtual bool Initialised() const noexcept = 0;
 	virtual void PenColour(ColourDesired fore) = 0;
-	virtual int LogPixelsY() const = 0;
-	virtual int DeviceHeightFont(int points) const = 0;
-	virtual void MoveTo(int x_, int y_) = 0;
-	virtual void LineTo(int x_, int y_) = 0;
+	virtual int LogPixelsY() const noexcept = 0;
+	virtual int DeviceHeightFont(int points) const noexcept = 0;
+	virtual void MoveTo(int x_, int y_) noexcept = 0;
+	virtual void LineTo(int x_, int y_) noexcept = 0;
 	virtual void Polygon(const Point *pts, size_t npts, ColourDesired fore, ColourDesired back) = 0;
 	virtual void RectangleDraw(const PRectangle &rc, ColourDesired fore, ColourDesired back) = 0;
 	virtual void FillRectangle(const PRectangle &rc, ColourDesired back) = 0;
@@ -391,18 +391,18 @@ public:
 	virtual void DrawTextTransparent(const PRectangle &rc, const Font &font_, XYPOSITION ybase, std::string_view text, ColourDesired fore) = 0;
 	virtual void MeasureWidths(const Font &font_, std::string_view text, XYPOSITION *positions) = 0;
 	virtual XYPOSITION WidthText(const Font &font_, std::string_view text) = 0;
-	virtual XYPOSITION Ascent(const Font &font_) = 0;
-	virtual XYPOSITION Descent(const Font &font_) = 0;
-	virtual XYPOSITION InternalLeading(const Font &font_) = 0;
-	virtual XYPOSITION Height(const Font &font_) = 0;
+	virtual XYPOSITION Ascent(const Font &font_) noexcept = 0;
+	virtual XYPOSITION Descent(const Font &font_) noexcept = 0;
+	virtual XYPOSITION InternalLeading(const Font &font_) noexcept = 0;
+	virtual XYPOSITION Height(const Font &font_) noexcept = 0;
 	virtual XYPOSITION AverageCharWidth(const Font &font_) = 0;
 
-	virtual void SetClip(const PRectangle &rc) = 0;
-	virtual void FlushCachedState() = 0;
+	virtual void SetClip(const PRectangle &rc) noexcept = 0;
+	virtual void FlushCachedState() noexcept = 0;
 
-	virtual void SetUnicodeMode(bool unicodeMode_) = 0;
-	virtual void SetDBCSMode(int codePage) = 0;
-	virtual void SetBidiR2L(bool bidiR2L_) = 0;
+	virtual void SetUnicodeMode(bool unicodeMode_) noexcept = 0;
+	virtual void SetDBCSMode(int codePage) noexcept = 0;
+	virtual void SetBidiR2L(bool bidiR2L_) noexcept = 0;
 };
 
 /**
@@ -430,20 +430,20 @@ public:
 	bool Created() const noexcept {
 		return wid != nullptr;
 	}
-	void Destroy();
-	PRectangle GetPosition() const;
-	void SetPosition(const PRectangle &rc);
-	void SetPositionRelative(PRectangle &rc, const Window *relativeTo);
-	PRectangle GetClientPosition() const;
-	void Show(bool show = true) const;
-	void InvalidateAll();
-	void InvalidateRectangle(const PRectangle &rc);
-	virtual void SetFont(const Font &font);
+	void Destroy() noexcept;
+	PRectangle GetPosition() const noexcept;
+	void SetPosition(const PRectangle &rc) noexcept;
+	void SetPositionRelative(PRectangle &rc, const Window *relativeTo) noexcept;
+	PRectangle GetClientPosition() const noexcept;
+	void Show(bool show = true) const noexcept;
+	void InvalidateAll() noexcept;
+	void InvalidateRectangle(const PRectangle &rc) noexcept;
+	virtual void SetFont(const Font &font) noexcept;
 	enum Cursor {
 		cursorInvalid, cursorText, cursorArrow, cursorUp, cursorWait, cursorHoriz, cursorVert, cursorReverseArrow, cursorHand
 	};
-	void SetCursor(Cursor curs);
-	PRectangle GetMonitorRect(const Point &pt) const;
+	void SetCursor(Cursor curs) noexcept;
+	PRectangle GetMonitorRect(const Point &pt) const noexcept;
 private:
 	Cursor cursorLast;
 };
@@ -472,24 +472,24 @@ public:
 	~ListBox() override;
 	static ListBox *Allocate();
 
-	void SetFont(const Font &font) override = 0;
-	virtual void Create(const Window &parent, int ctrlID, const Point &location, int lineHeight_, bool unicodeMode_, int technology_) = 0;
-	virtual void SetAverageCharWidth(int width) = 0;
-	virtual void SetVisibleRows(int rows) = 0;
-	virtual int GetVisibleRows() const = 0;
+	void SetFont(const Font &font) noexcept override = 0;
+	virtual void Create(const Window &parent, int ctrlID, const Point &location, int lineHeight_, bool unicodeMode_, int technology_) noexcept = 0;
+	virtual void SetAverageCharWidth(int width) noexcept = 0;
+	virtual void SetVisibleRows(int rows) noexcept = 0;
+	virtual int GetVisibleRows() const noexcept = 0;
 	virtual PRectangle GetDesiredRect() = 0;
 	virtual int CaretFromEdge() const = 0;
-	virtual void Clear() = 0;
-	virtual void Append(const char *s, int type = -1) = 0;
-	virtual int Length() const = 0;
+	virtual void Clear() noexcept = 0;
+	virtual void Append(const char *s, int type = -1) const noexcept = 0;
+	virtual int Length() const noexcept = 0;
 	virtual void Select(int n) = 0;
-	virtual int GetSelection() = 0;
-	virtual int Find(const char *prefix) = 0;
+	virtual int GetSelection() const noexcept = 0;
+	virtual int Find(const char *prefix) const noexcept = 0;
 	virtual void GetValue(int n, char *value, int len) const = 0;
 	virtual void RegisterImage(int type, const char *xpm_data) = 0;
 	virtual void RegisterRGBAImage(int type, int width, int height, const unsigned char *pixelsImage) = 0;
-	virtual void ClearRegisteredImages() = 0;
-	virtual void SetDelegate(IListBoxDelegate *lbDelegate) = 0;
+	virtual void ClearRegisteredImages() noexcept = 0;
+	virtual void SetDelegate(IListBoxDelegate *lbDelegate) noexcept = 0;
 	virtual void SetList(const char* list, char separator, char typesep) = 0;
 };
 
@@ -503,9 +503,9 @@ public:
 	MenuID GetID() const noexcept {
 		return mid;
 	}
-	void CreatePopUp();
-	void Destroy();
-	void Show(const Point &pt, const Window &w);
+	void CreatePopUp() noexcept;
+	void Destroy() noexcept;
+	void Show(const Point &pt, const Window &w) noexcept;
 };
 
 #if defined(__clang__)
@@ -524,22 +524,23 @@ public:
  */
 class Platform {
 public:
-	Platform() = default;
+	Platform() noexcept = default;
 	Platform(const Platform &) = delete;
 	Platform(Platform &&) = delete;
 	Platform &operator=(const Platform &) = delete;
 	Platform &operator=(Platform &&) = delete;
 	~Platform() = default;
-	static ColourDesired Chrome();
-	static ColourDesired ChromeHighlight();
-	static const char *DefaultFont();
-	static int DefaultFontSize();
-	static unsigned int DoubleClickTime();
 
-	static void DebugDisplay(const char *s);
-	static void DebugPrintf(const char *format, ...);
-	static bool ShowAssertionPopUps(bool assertionPopUps_);
-	static void Assert(const char *c, const char *file, int line) CLANG_ANALYZER_NORETURN;
+	static ColourDesired Chrome() noexcept;
+	static ColourDesired ChromeHighlight() noexcept;
+	static const char *DefaultFont() noexcept;
+	static int DefaultFontSize() noexcept;
+	static unsigned int DoubleClickTime() noexcept;
+
+	static void DebugDisplay(const char *s) noexcept;
+	static void DebugPrintf(const char *format, ...) noexcept;
+	static bool ShowAssertionPopUps(bool assertionPopUps_) noexcept;
+	static void Assert(const char *c, const char *file, int line) noexcept CLANG_ANALYZER_NORETURN;
 };
 
 #ifdef  NDEBUG

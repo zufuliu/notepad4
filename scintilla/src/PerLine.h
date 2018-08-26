@@ -17,7 +17,7 @@ namespace Scintilla {
 struct MarkerHandleNumber {
 	int handle;
 	int number;
-	MarkerHandleNumber(int handle_, int number_) : handle(handle_), number(number_) {}
+	MarkerHandleNumber(int handle_, int number_) noexcept : handle(handle_), number(number_) {}
 };
 
 /**
@@ -27,7 +27,7 @@ class MarkerHandleSet {
 	std::forward_list<MarkerHandleNumber> mhList;
 
 public:
-	MarkerHandleSet();
+	MarkerHandleSet() noexcept;
 	// Deleted so MarkerHandleSet objects can not be copied.
 	MarkerHandleSet(const MarkerHandleSet &) = delete;
 	MarkerHandleSet(MarkerHandleSet &&) = delete;
@@ -48,7 +48,7 @@ class LineMarkers : public PerLine {
 	/// Handles are allocated sequentially and should never have to be reused as 32 bit ints are very big.
 	int handleCurrent;
 public:
-	LineMarkers() : handleCurrent(0) {}
+	LineMarkers() noexcept : handleCurrent(0) {}
 	// Deleted so LineMarkers objects can not be copied.
 	LineMarkers(const LineMarkers &) = delete;
 	LineMarkers(LineMarkers &&) = delete;
@@ -60,12 +60,12 @@ public:
 	void RemoveLine(Sci::Line line) override;
 
 	int MarkValue(Sci::Line line) noexcept;
-	Sci::Line MarkerNext(Sci::Line lineStart, int mask) const;
+	Sci::Line MarkerNext(Sci::Line lineStart, int mask) const noexcept;
 	int AddMark(Sci::Line line, int markerNum, Sci::Line lines);
 	void MergeMarkers(Sci::Line line);
 	bool DeleteMark(Sci::Line line, int markerNum, bool all);
 	void DeleteMarkFromHandle(int markerHandle);
-	Sci::Line LineFromHandle(int markerHandle);
+	Sci::Line LineFromHandle(int markerHandle) noexcept;
 };
 
 class LineLevels : public PerLine {
@@ -85,7 +85,7 @@ public:
 	void ExpandLevels(Sci::Line sizeNew = -1);
 	void ClearLevels();
 	int SetLevel(Sci::Line line, int level, Sci::Line lines);
-	int GetLevel(Sci::Line line) const;
+	int GetLevel(Sci::Line line) const noexcept;
 };
 
 class LineState : public PerLine {
@@ -104,7 +104,7 @@ public:
 
 	int SetLineState(Sci::Line line, int state);
 	int GetLineState(Sci::Line line);
-	Sci::Line GetMaxLineState() const;
+	Sci::Line GetMaxLineState() const noexcept;
 };
 
 class LineAnnotation : public PerLine {
@@ -121,16 +121,16 @@ public:
 	void InsertLine(Sci::Line line) override;
 	void RemoveLine(Sci::Line line) override;
 
-	bool MultipleStyles(Sci::Line line) const;
-	int Style(Sci::Line line) const;
-	const char *Text(Sci::Line line) const;
-	const unsigned char *Styles(Sci::Line line) const;
+	bool MultipleStyles(Sci::Line line) const noexcept;
+	int Style(Sci::Line line) const noexcept;
+	const char *Text(Sci::Line line) const noexcept;
+	const unsigned char *Styles(Sci::Line line) const noexcept;
 	void SetText(Sci::Line line, const char *text);
 	void ClearAll();
 	void SetStyle(Sci::Line line, int style);
 	void SetStyles(Sci::Line line, const unsigned char *styles);
-	int Length(Sci::Line line) const;
-	int Lines(Sci::Line line) const;
+	int Length(Sci::Line line) const noexcept;
+	int Lines(Sci::Line line) const noexcept;
 };
 
 typedef std::vector<int> TabstopList;
@@ -138,7 +138,7 @@ typedef std::vector<int> TabstopList;
 class LineTabstops : public PerLine {
 	SplitVector<std::unique_ptr<TabstopList>> tabstops;
 public:
-	LineTabstops() = default;
+	LineTabstops() noexcept = default;
 	// Deleted so LineTabstops objects can not be copied.
 	LineTabstops(const LineTabstops &) = delete;
 	LineTabstops(LineTabstops &&) = delete;
@@ -149,9 +149,9 @@ public:
 	void InsertLine(Sci::Line line) override;
 	void RemoveLine(Sci::Line line) override;
 
-	bool ClearTabstops(Sci::Line line);
+	bool ClearTabstops(Sci::Line line) noexcept;
 	bool AddTabstop(Sci::Line line, int x);
-	int GetNextTabstop(Sci::Line line, int x) const;
+	int GetNextTabstop(Sci::Line line, int x) const noexcept;
 };
 
 }

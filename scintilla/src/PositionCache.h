@@ -10,7 +10,7 @@
 
 namespace Scintilla {
 
-inline bool IsEOLChar(char ch) noexcept {
+inline constexpr bool IsEOLChar(char ch) noexcept {
 	return (ch == '\r') || (ch == '\n');
 }
 
@@ -98,8 +98,8 @@ public:
 	virtual ~LineLayout();
 	void Resize(int maxLineLength_);
 	void EnsureBidiData();
-	void Free();
-	void Invalidate(validLevel validity_);
+	void Free() noexcept;
+	void Invalidate(validLevel validity_) noexcept;
 	int LineStart(int line) const;
 	int LineLength(int line) const;
 	enum class Scope {
@@ -143,10 +143,10 @@ struct ScreenLine : public IScreenLine {
 	XYPOSITION Width() const noexcept override;
 	XYPOSITION Height() const noexcept override;
 	XYPOSITION TabWidth() const noexcept override;
-	XYPOSITION TabWidthMinimumPixels() const override;
+	XYPOSITION TabWidthMinimumPixels() const noexcept override;
 	const Font *FontOfPosition(size_t position) const override;
 	XYPOSITION RepresentationWidth(size_t position) const override;
-	XYPOSITION TabPositionAfter(XYPOSITION xPosition) const override;
+	XYPOSITION TabPositionAfter(XYPOSITION xPosition) const noexcept override;
 };
 
 /**
@@ -167,21 +167,21 @@ public:
 	void operator=(const LineLayoutCache &) = delete;
 	void operator=(LineLayoutCache &&) = delete;
 	virtual ~LineLayoutCache();
-	void Deallocate();
+	void Deallocate() noexcept;
 	enum {
 		llcNone = SC_CACHE_NONE,
 		llcCaret = SC_CACHE_CARET,
 		llcPage = SC_CACHE_PAGE,
 		llcDocument = SC_CACHE_DOCUMENT
 	};
-	void Invalidate(LineLayout::validLevel validity_);
-	void SetLevel(int level_);
+	void Invalidate(LineLayout::validLevel validity_) noexcept;
+	void SetLevel(int level_) noexcept;
 	int GetLevel() const noexcept {
 		return level;
 	}
 	LineLayout *Retrieve(Sci::Line lineNumber, Sci::Line lineCaret, int maxChars, int styleClock_,
 		Sci::Line linesOnScreen, Sci::Line linesInDoc);
-	void Dispose(LineLayout *ll);
+	void Dispose(LineLayout *ll) noexcept;
 };
 
 class PositionCacheEntry {
@@ -190,7 +190,7 @@ class PositionCacheEntry {
 	unsigned int clock : 16;
 	std::unique_ptr<XYPOSITION[]> positions;
 public:
-	PositionCacheEntry();
+	PositionCacheEntry() noexcept;
 	// Copy constructor not currently used, but needed for being element in std::vector.
 	PositionCacheEntry(const PositionCacheEntry &);
 	PositionCacheEntry(PositionCacheEntry &&) = delete;
@@ -199,17 +199,17 @@ public:
 	void operator=(PositionCacheEntry &&) = delete;
 	~PositionCacheEntry();
 	void Set(unsigned int styleNumber_, const char *s_, unsigned int len_, const XYPOSITION *positions_, unsigned int clock_);
-	void Clear();
+	void Clear() noexcept;
 	bool Retrieve(unsigned int styleNumber_, const char *s_, unsigned int len_, XYPOSITION *positions_) const;
-	static unsigned int Hash(unsigned int styleNumber_, const char *s, unsigned int len_);
-	bool NewerThan(const PositionCacheEntry &other) const;
-	void ResetClock();
+	static unsigned int Hash(unsigned int styleNumber_, const char *s, unsigned int len_) noexcept;
+	bool NewerThan(const PositionCacheEntry &other) const noexcept;
+	void ResetClock() noexcept;
 };
 
 class Representation {
 public:
 	std::string stringRep;
-	explicit Representation(const char *value = "") : stringRep(value) {}
+	explicit Representation(const char *value = "") noexcept : stringRep(value) {}
 };
 
 typedef std::map<unsigned int, Representation> MapRepresentation;
@@ -218,7 +218,7 @@ class SpecialRepresentations {
 	MapRepresentation mapReprs;
 	short startByteHasReprs[0x100];
 public:
-	SpecialRepresentations();
+	SpecialRepresentations() noexcept;
 	void SetRepresentation(const char *charBytes, const char *value);
 	void ClearRepresentation(const char *charBytes);
 	const Representation *RepresentationFromCharacter(const char *charBytes, size_t len) const;
@@ -270,7 +270,7 @@ public:
 	void operator=(BreakFinder &&) = delete;
 	~BreakFinder();
 	TextSegment Next();
-	bool More() const;
+	bool More() const noexcept;
 };
 
 class PositionCache {
@@ -285,7 +285,7 @@ public:
 	void operator=(const PositionCache &) = delete;
 	void operator=(PositionCache &&) = delete;
 	~PositionCache();
-	void Clear();
+	void Clear() noexcept;
 	void SetSize(size_t size_);
 	size_t GetSize() const noexcept {
 		return pces.size();

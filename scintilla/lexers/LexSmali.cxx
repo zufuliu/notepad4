@@ -16,26 +16,26 @@
 
 using namespace Scintilla;
 
-static inline bool IsSmaliOp(int ch) noexcept {
+static constexpr bool IsSmaliOp(int ch) noexcept {
 	return ch == ';' || ch == '{' || ch == '}' || ch == '(' || ch == ')' || ch == '='
 		|| ch == ',' || ch == '<' || ch == '>' || ch == '+' || ch == '-' || ch == ':' || ch == '.'
 		|| ch == '/' || ch == '&' || ch == '|' || ch == '^' || ch == '!' || ch == '~' || ch == '*' || ch == '%';
 }
-static inline bool IsDelimiter(int ch) noexcept {
+static constexpr bool IsDelimiter(int ch) noexcept {
 	return ch != '/' && ch != '$' && (IsASpace(ch) || IsSmaliOp(ch));
 }
-static inline bool IsSmaliWordChar(int ch) noexcept {
+static constexpr bool IsSmaliWordChar(int ch) noexcept {
 	return iswordstart(ch) || ch == '-';
 }
-static inline bool IsSmaliWordCharX(int ch) noexcept {
+static constexpr bool IsSmaliWordCharX(int ch) noexcept {
 	return iswordchar(ch) || ch == '-';
 }
 
-static inline bool IsOpcodeChar(int ch) noexcept {
+static constexpr bool IsOpcodeChar(int ch) noexcept {
 	return ch == '_' || ch == '-' || IsAlpha(ch);
 }
 
-static inline bool IsJavaTypeChar(int ch) noexcept {
+static constexpr bool IsJavaTypeChar(int ch) noexcept {
 	return ch == 'V'	// void
 		|| ch == 'Z'	// boolean
 		|| ch == 'B'	// byte
@@ -77,7 +77,7 @@ static void ColouriseSmaliDoc(Sci_PositionU startPos, Sci_Position length, int i
 	styler.StartAt(startPos);
 	styler.StartSegment(startPos);
 	Sci_PositionU endPos = startPos + length;
-	if (endPos == (Sci_PositionU)styler.Length())
+	if (endPos == static_cast<Sci_PositionU>(styler.Length()))
 		++endPos;
 
 	Sci_Position lineCurrent = styler.GetLine(startPos);
@@ -93,7 +93,7 @@ static void ColouriseSmaliDoc(Sci_PositionU startPos, Sci_Position length, int i
 		chNext = styler.SafeGetCharAt(i + 1);
 
 		const bool atEOL = (ch == '\r' && chNext != '\n') || (ch == '\n');
-		const bool atLineStart = i == (Sci_PositionU)styler.LineStart(lineCurrent);
+		const bool atLineStart = i == static_cast<Sci_PositionU>(styler.LineStart(lineCurrent));
 
 		switch (state) {
 		case SCE_SMALI_OPERATOR:
@@ -125,18 +125,18 @@ static void ColouriseSmaliDoc(Sci_PositionU startPos, Sci_Position length, int i
 			if (!IsSmaliWordChar(ch)) {
 				buf[wordLen] = 0;
 				if (buf[0] == '.') {
-					if (!(strcmp(&buf[1], "end") && strcmp(&buf[1], "restart") && strcmp(&buf[1], "limit"))) {
+					if (!(strcmp(buf + 1,"end") && strcmp(buf + 1,"restart") && strcmp(buf + 1,"limit"))) {
 						nextWordType = kWordType_Directive;
-					} else if (!strcmp(&buf[1], "field")) {
+					} else if (!strcmp(buf + 1,"field")) {
 						nextWordType = kWrodType_Field;
-					} else if (!strcmp(&buf[1], "method")) {
+					} else if (!strcmp(buf + 1,"method")) {
 						nextWordType = kWordType_Method;
 					}
-					if (!(strcmp(&buf[1], "annotation") && strcmp(&buf[1], "subannotation"))) {
+					if (!(strcmp(buf + 1,"annotation") && strcmp(buf + 1,"subannotation"))) {
 						curLineState = 1;
-					} else if (!(strcmp(&buf[1], "packed-switch") && strcmp(&buf[1], "sparse-switch"))) {
+					} else if (!(strcmp(buf + 1,"packed-switch") && strcmp(buf + 1,"sparse-switch"))) {
 						curLineState = 2;
-					} else if (!strcmp(&buf[1], "end")) {
+					} else if (!strcmp(buf + 1,"end")) {
 						curLineState = 0;
 					}
 				}
@@ -144,7 +144,7 @@ static void ColouriseSmaliDoc(Sci_PositionU startPos, Sci_Position length, int i
 				state = SCE_L_DEFAULT;
 				wordLen = 0;
 			} else if (wordLen < MAX_WORD_LENGTH) {
-				buf[wordLen++] = (char)ch;
+				buf[wordLen++] = static_cast<char>(ch);
 			}
 			break;
 		case SCE_SMALI_REGISTER:
@@ -211,7 +211,7 @@ static void ColouriseSmaliDoc(Sci_PositionU startPos, Sci_Position length, int i
 				}
 				wordLen = 0;
 			} else if (wordLen < MAX_WORD_LENGTH) {
-				buf[wordLen++] = (char)ch;
+				buf[wordLen++] = static_cast<char>(ch);
 			}
 			break;
 		case SCE_SMALI_LABEL_EOL:	// packed-switch sparse-switch
@@ -258,7 +258,7 @@ static void ColouriseSmaliDoc(Sci_PositionU startPos, Sci_Position length, int i
 			} else if (ch == '.' && visibleChars == 0 && IsAlpha(chNext)) {
 				styler.ColourTo(i - 1, state);
 				state = SCE_SMALI_DIRECTIVE;
-				buf[wordLen++] = (char)ch;
+				buf[wordLen++] = static_cast<char>(ch);
 			} else if ((ch == 'v' || ch == 'p') && IsADigit(chNext)) {
 				styler.ColourTo(i - 1, state);
 				state = SCE_SMALI_REGISTER;
@@ -280,7 +280,7 @@ static void ColouriseSmaliDoc(Sci_PositionU startPos, Sci_Position length, int i
 					styler.ColourTo(i, SCE_SMALI_OPERATOR);
 				}
 				state = SCE_SMALI_IDENTIFIER;
-				buf[wordLen++] = (char)ch;
+				buf[wordLen++] = static_cast<char>(ch);
 			} else if (IsSmaliOp(ch) || (ch == '[' || ch == ']')) {
 				styler.ColourTo(i - 1, state);
 				state = SCE_SMALI_OPERATOR;
@@ -317,12 +317,12 @@ static inline bool IsFoldWord(const char *word) noexcept {
 		|| strcmp(word, "attribute") == 0;
 }
 // field/parameter with annotation?
-static bool IsAnnotationLine(Sci_Position line, Accessor &styler) {
+static bool IsAnnotationLine(Sci_Position line, Accessor &styler) noexcept {
 	Sci_Position scan_line = 10;
 	while (scan_line-- > 0) {
-		Sci_Position startPos = styler.LineStart(line);
-		Sci_Position endPos = styler.LineStart(line + 1) - 1;
-		Sci_Position pos = LexSkipSpaceTab(startPos, endPos, styler);
+		const Sci_Position startPos = styler.LineStart(line);
+		const Sci_Position endPos = styler.LineStart(line + 1) - 1;
+		const Sci_Position pos = LexSkipSpaceTab(startPos, endPos, styler);
 		if (styler[pos] == '.') {
 			return styler.StyleAt(pos) == SCE_SMALI_DIRECTIVE && styler[pos + 1] == 'a';
 		}
@@ -337,7 +337,7 @@ static void FoldSmaliDoc(Sci_PositionU startPos, Sci_Position length, int initSt
 	const bool foldComment = styler.GetPropertyInt("fold.comment") != 0;
 	const bool foldCompact = styler.GetPropertyInt("fold.compact", 1) != 0;
 
-	Sci_PositionU endPos = startPos + length;
+	const Sci_PositionU endPos = startPos + length;
 	int visibleChars = 0;
 	Sci_Position lineCurrent = styler.GetLine(startPos);
 	int levelCurrent = SC_FOLDLEVELBASE;
@@ -350,12 +350,12 @@ static void FoldSmaliDoc(Sci_PositionU startPos, Sci_Position length, int initSt
 	int style = initStyle;
 
 	for (Sci_PositionU i = startPos; i < endPos; i++) {
-		int ch = chNext;
+		const int ch = chNext;
 		chNext = styler.SafeGetCharAt(i + 1);
-		int stylePrev = style;
+		const int stylePrev = style;
 		style = styleNext;
 		styleNext = styler.StyleAt(i + 1);
-		bool atEOL = (ch == '\r' && chNext != '\n') || (ch == '\n');
+		const bool atEOL = (ch == '\r' && chNext != '\n') || (ch == '\n');
 
 		if (foldComment && atEOL && IsCommentLine(lineCurrent)) {
 			if (!IsCommentLine(lineCurrent - 1) && IsCommentLine(lineCurrent + 1))
@@ -367,7 +367,7 @@ static void FoldSmaliDoc(Sci_PositionU startPos, Sci_Position length, int initSt
 		if (iswordchar(ch) && style == SCE_SMALI_DIRECTIVE && stylePrev != SCE_SMALI_DIRECTIVE) {
 			char buf[MAX_WORD_LENGTH + 1];
 			LexGetRange(i, styler, IsSmaliWordCharX, buf, sizeof(buf));
-			if (buf[0] == '.' && (IsFoldWord(&buf[1]) || (strcmp(&buf[1], "field") == 0 && IsAnnotationLine(lineCurrent + 1, styler)))) {
+			if (buf[0] == '.' && (IsFoldWord(buf + 1) || (strcmp(buf + 1,"field") == 0 && IsAnnotationLine(lineCurrent + 1, styler)))) {
 				levelNext++;
 			} else if (buf[0] != '.' && (IsFoldWord(buf) || strcmp(buf, "field") == 0)) {
 				levelNext--;
@@ -378,7 +378,7 @@ static void FoldSmaliDoc(Sci_PositionU startPos, Sci_Position length, int initSt
 			visibleChars++;
 
 		if (atEOL || (i == endPos - 1)) {
-			int levelUse = levelCurrent;
+			const int levelUse = levelCurrent;
 			int lev = levelUse | levelNext << 16;
 			if (visibleChars == 0 && foldCompact)
 				lev |= SC_FOLDLEVELWHITEFLAG;

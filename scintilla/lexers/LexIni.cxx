@@ -22,7 +22,7 @@
 
 using namespace Scintilla;
 
-static inline bool isassignchar(int ch) noexcept {
+static constexpr bool isassignchar(int ch) noexcept {
 	return (ch == '=') || (ch == ':');
 }
 
@@ -71,7 +71,7 @@ static void ColourisePropsDoc(Sci_PositionU startPos, Sci_Position length, int, 
 	styler.StartSegment(startPos);
 	Sci_PositionU linePos = 0;
 	Sci_PositionU startLine = startPos;
-	Sci_PositionU endPos = startPos + length;
+	const Sci_PositionU endPos = startPos + length;
 
 	// property lexer.props.allow.initial.spaces
 	//	For properties files, set to 0 to style all lines that start with whitespace in the default style.
@@ -107,7 +107,7 @@ static void FoldPropsDoc(Sci_PositionU startPos, Sci_Position length, int, Lexer
 	if (styler.GetPropertyInt("fold") == 0)
 		return;
 	const bool foldCompact = styler.GetPropertyInt("fold.compact", 1) != 0;
-	Sci_PositionU endPos = startPos + length;
+	const Sci_PositionU endPos = startPos + length;
 	int visibleChars = 0;
 	Sci_Position lineCurrent = styler.GetLine(startPos);
 
@@ -117,12 +117,12 @@ static void FoldPropsDoc(Sci_PositionU startPos, Sci_Position length, int, Lexer
 	int lev;
 
 	for (Sci_PositionU i = startPos; i < endPos; i++) {
-		char ch = chNext;
+		const char ch = chNext;
 		chNext = styler[i + 1];
 
-		int style = styleNext;
+		const int style = styleNext;
 		styleNext = styler.StyleAt(i + 1);
-		bool atEOL = (ch == '\r' && chNext != '\n') || (ch == '\n');
+		const bool atEOL = (ch == '\r' && chNext != '\n') || (ch == '\n');
 
 		if (style == SCE_PROPS_SECTION) {
 			headerPoint = true;
@@ -132,7 +132,7 @@ static void FoldPropsDoc(Sci_PositionU startPos, Sci_Position length, int, Lexer
 			lev = SC_FOLDLEVELBASE;
 
 			if (lineCurrent > 0) {
-				int levelPrevious = styler.LevelAt(lineCurrent - 1);
+				const int levelPrevious = styler.LevelAt(lineCurrent - 1);
 
 				if (levelPrevious & SC_FOLDLEVELHEADERFLAG) {
 					lev = SC_FOLDLEVELBASE + 1;
@@ -163,7 +163,7 @@ static void FoldPropsDoc(Sci_PositionU startPos, Sci_Position length, int, Lexer
 	}
 
 	if (lineCurrent > 0) {
-		int levelPrevious = styler.LevelAt(lineCurrent - 1);
+		const int levelPrevious = styler.LevelAt(lineCurrent - 1);
 		if (levelPrevious & SC_FOLDLEVELHEADERFLAG) {
 			lev = SC_FOLDLEVELBASE + 1;
 		} else {
@@ -172,7 +172,8 @@ static void FoldPropsDoc(Sci_PositionU startPos, Sci_Position length, int, Lexer
 	} else {
 		lev = SC_FOLDLEVELBASE;
 	}
-	int flagsNext = styler.LevelAt(lineCurrent);
+
+	const int flagsNext = styler.LevelAt(lineCurrent);
 	styler.SetLevel(lineCurrent, lev | (flagsNext & ~SC_FOLDLEVELNUMBERMASK));
 }
 

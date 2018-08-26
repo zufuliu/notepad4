@@ -17,33 +17,33 @@ class LexAccessor;
 	((stl1) | ((stl2) << 8))
 #define MultiStyle4(stl1, stl2, stl3, stl4) \
 	((stl1) | ((stl2) << 8) | ((stl3) << 16) | ((stl4) << 24))
-bool IsLexCommentLine(Sci_Position line, LexAccessor &styler, int style);
+bool IsLexCommentLine(Sci_Position line, LexAccessor &styler, int style) noexcept;
 
-bool IsBackslashLine(Sci_Position line, LexAccessor &styler);
+bool IsBackslashLine(Sci_Position line, LexAccessor &styler) noexcept;
 
-bool IsLexLineStartsWith(Sci_Position line, LexAccessor &styler, const char* word, bool matchCase, int style);
+bool IsLexLineStartsWith(Sci_Position line, LexAccessor &styler, const char* word, bool matchCase, int style) noexcept;
 
-Sci_Position LexLineSkipSpaceTab(Sci_Position line, LexAccessor &styler);
-Sci_Position LexSkipSpaceTab  (Sci_Position startPos, Sci_Position endPos, LexAccessor &styler);
-Sci_Position LexSkipWhiteSpace(Sci_Position startPos, Sci_Position endPos, LexAccessor &styler);
-Sci_Position LexSkipWhiteSpace(Sci_Position startPos, Sci_Position endPos, LexAccessor &styler, bool IsStreamCommentStyle(int));
+Sci_Position LexLineSkipSpaceTab(Sci_Position line, LexAccessor &styler) noexcept;
+Sci_Position LexSkipSpaceTab  (Sci_Position startPos, Sci_Position endPos, LexAccessor &styler) noexcept;
+Sci_Position LexSkipWhiteSpace(Sci_Position startPos, Sci_Position endPos, LexAccessor &styler) noexcept;
+Sci_Position LexSkipWhiteSpace(Sci_Position startPos, Sci_Position endPos, LexAccessor &styler, bool IsStreamCommentStyle(int)) noexcept;
 Sci_Position LexSkipWhiteSpace(Sci_Position startPos, Sci_Position endPos, LexAccessor &styler,
-											bool IsStreamCommentStyle(int), const CharacterSet &charSet);
-bool IsLexSpaceToEOL(LexAccessor &styler, Sci_Position startPos);
-bool IsLexEmptyLine(LexAccessor &styler, Sci_Position line);
+											bool IsStreamCommentStyle(int), const CharacterSet &charSet) noexcept;
+bool IsLexSpaceToEOL(LexAccessor &styler, Sci_Position startPos) noexcept;
+bool IsLexEmptyLine(LexAccessor &styler, Sci_Position line) noexcept;
 
-Sci_PositionU LexGetRange			(Sci_Position startPos, Sci_Position endPos, LexAccessor &styler, char *s, Sci_PositionU len);
-Sci_PositionU LexGetRangeLowered	(Sci_Position startPos, Sci_Position endPos, LexAccessor &styler, char *s, Sci_PositionU len);
-Sci_PositionU LexGetRange			(Sci_Position startPos, LexAccessor &styler, bool IsWordChar(int), char *s, Sci_PositionU len);
-Sci_PositionU LexGetRangeLowered	(Sci_Position startPos, LexAccessor &styler, bool IsWordChar(int), char *s, Sci_PositionU len);
-Sci_PositionU LexGetRange			(Sci_Position startPos, LexAccessor &styler, const CharacterSet &charSet, char *s, Sci_PositionU len);
-Sci_PositionU LexGetRangeLowered	(Sci_Position startPos, LexAccessor &styler, const CharacterSet &charSet, char *s, Sci_PositionU len);
+Sci_PositionU LexGetRange			(Sci_Position startPos, Sci_Position endPos, LexAccessor &styler, char *s, Sci_PositionU len) noexcept;
+Sci_PositionU LexGetRangeLowered	(Sci_Position startPos, Sci_Position endPos, LexAccessor &styler, char *s, Sci_PositionU len) noexcept;
+Sci_PositionU LexGetRange			(Sci_Position startPos, LexAccessor &styler, bool IsWordChar(int), char *s, Sci_PositionU len) noexcept;
+Sci_PositionU LexGetRangeLowered	(Sci_Position startPos, LexAccessor &styler, bool IsWordChar(int), char *s, Sci_PositionU len) noexcept;
+Sci_PositionU LexGetRange			(Sci_Position startPos, LexAccessor &styler, const CharacterSet &charSet, char *s, Sci_PositionU len) noexcept;
+Sci_PositionU LexGetRangeLowered	(Sci_Position startPos, LexAccessor &styler, const CharacterSet &charSet, char *s, Sci_PositionU len) noexcept;
 
-char LexGetPrevChar     (Sci_Position endPos, LexAccessor &styler);
-char LexGetNextChar		(Sci_Position startPos, LexAccessor &styler);
-bool IsLexAtEOL			(Sci_Position pos, LexAccessor &styler);
-bool LexMatch			(Sci_Position pos, LexAccessor &styler, const char *s);
-bool LexMatchIgnoreCase (Sci_Position pos, LexAccessor &styler, const char *s);
+char LexGetPrevChar     (Sci_Position endPos, LexAccessor &styler) noexcept;
+char LexGetNextChar		(Sci_Position startPos, LexAccessor &styler) noexcept;
+bool IsLexAtEOL			(Sci_Position pos, LexAccessor &styler) noexcept;
+bool LexMatch			(Sci_Position pos, LexAccessor &styler, const char *s) noexcept;
+bool LexMatchIgnoreCase (Sci_Position pos, LexAccessor &styler, const char *s) noexcept;
 
 enum EncodingType { enc8bit, encUnicode, encDBCS };
 
@@ -73,38 +73,42 @@ private:
 	Sci_Position startPosStyling;
 	int documentVersion;
 
-	void Fill(Sci_Position position);
+	void Fill(Sci_Position position) noexcept;
 
 public:
-	explicit LexAccessor(IDocument *pAccess_);
-	char operator[](Sci_Position position);
-	IDocument *MultiByteAccess() const {
+	explicit LexAccessor(IDocument *pAccess_) noexcept;
+	char operator[](Sci_Position position) noexcept;
+	constexpr IDocument *MultiByteAccess() const noexcept {
 		return pAccess;
 	}
 	/** Safe version of operator[], returning a defined value for invalid position. */
-	char SafeGetCharAt(Sci_Position position);
-	bool IsLeadByte(char ch) const {
+	char SafeGetCharAt(Sci_Position position) noexcept;
+	bool IsLeadByte(char ch) const noexcept {
 		return pAccess->IsDBCSLeadByte(ch);
 	}
-	EncodingType Encoding() const {
+	constexpr EncodingType Encoding() const noexcept {
 		return encodingType;
 	}
 
-	bool Match(Sci_Position pos, const char *s);
-	unsigned char StyleAt(Sci_Position position) const {
+	bool Match(Sci_Position pos, const char *s) noexcept {
+		return LexMatch(pos, *this, s);
+	}
+	unsigned char StyleAt(Sci_Position position) const noexcept {
 		return pAccess->StyleAt(position);
 	}
-	Sci_Position GetLine(Sci_Position position) const {
+	Sci_Position GetLine(Sci_Position position) const noexcept {
 		return pAccess->LineFromPosition(position);
 	}
-	Sci_Position LineStart(Sci_Position line) const {
+	Sci_Position LineStart(Sci_Position line) const noexcept {
 		return pAccess->LineStart(line);
 	}
-	Sci_Position LineEnd(Sci_Position line) const;
-	int LevelAt(Sci_Position line) const {
+	Sci_Position LineEnd(Sci_Position line) const noexcept {
+		return pAccess->LineEnd(line);
+	}
+	int LevelAt(Sci_Position line) const noexcept {
 		return pAccess->GetLevel(line);
 	}
-	Sci_Position Length() const {
+	constexpr Sci_Position Length() const noexcept {
 		return lenDoc;
 	}
 	void Flush();
@@ -115,11 +119,11 @@ public:
 		return pAccess->SetLineState(line, state);
 	}
 	// Style setting
-	void StartAt(Sci_PositionU start);
-	Sci_PositionU GetStartSegment() const {
+	void StartAt(Sci_PositionU start) noexcept;
+	Sci_PositionU GetStartSegment() const noexcept {
 		return startSeg;
 	}
-	void StartSegment(Sci_PositionU pos) {
+	void StartSegment(Sci_PositionU pos) noexcept {
 		startSeg = pos;
 	}
 	void ColourTo(Sci_PositionU pos, int chAttr);

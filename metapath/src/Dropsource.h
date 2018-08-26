@@ -23,17 +23,17 @@
 
 class FAR CDropSource : public IDropSource {
 public:
-	CDropSource();
+	CDropSource() noexcept;
 	virtual ~CDropSource() = default;
 
 	/* IUnknown methods */
-	STDMETHOD(QueryInterface)(REFIID riid, void FAR *FAR *ppvObj);
-	STDMETHOD_(ULONG, AddRef)();
-	STDMETHOD_(ULONG, Release)();
+	STDMETHOD(QueryInterface)(REFIID riid, PVOID *ppvObj) noexcept override;
+	STDMETHOD_(ULONG, AddRef)() noexcept override;
+	STDMETHOD_(ULONG, Release)() noexcept override;
 
 	/* IDropSource methods */
-	STDMETHOD(QueryContinueDrag)(BOOL fEscapePressed, DWORD grfKeyState);
-	STDMETHOD(GiveFeedback)(DWORD dwEffect);
+	STDMETHOD(QueryContinueDrag)(BOOL fEscapePressed, DWORD grfKeyState) noexcept override;
+	STDMETHOD(GiveFeedback)(DWORD dwEffect) noexcept override;
 
 private:
 	ULONG m_refs;

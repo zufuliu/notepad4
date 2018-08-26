@@ -124,7 +124,7 @@ public:
 		body->SetValueAt(partition, pos);
 	}
 
-	void InsertText(T partitionInsert, T delta) {
+	void InsertText(T partitionInsert, T delta) noexcept {
 		// Point all the partitions after the insertion point further along in the buffer
 		if (stepLength != 0) {
 			if (partitionInsert >= stepPartition) {

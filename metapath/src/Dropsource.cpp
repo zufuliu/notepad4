@@ -26,7 +26,7 @@
 * IUnknown Implementation
 *
 ******************************************************************************/
-STDMETHODIMP CDropSource::QueryInterface(REFIID iid, void FAR *FAR *ppv) {
+STDMETHODIMP CDropSource::QueryInterface(REFIID iid, PVOID *ppv) noexcept {
 	if (iid == IID_IUnknown || iid == IID_IDropSource) {
 		*ppv = this;
 		InterlockedIncrement(&m_refs);
@@ -36,12 +36,12 @@ STDMETHODIMP CDropSource::QueryInterface(REFIID iid, void FAR *FAR *ppv) {
 	return E_NOINTERFACE;
 }
 
-STDMETHODIMP_(ULONG) CDropSource::AddRef() {
+STDMETHODIMP_(ULONG) CDropSource::AddRef() noexcept {
 	return InterlockedIncrement(&m_refs);
 }
 
-STDMETHODIMP_(ULONG) CDropSource::Release() {
-	ULONG refs = InterlockedDecrement(&m_refs);
+STDMETHODIMP_(ULONG) CDropSource::Release() noexcept {
+	const ULONG refs = InterlockedDecrement(&m_refs);
 	if (refs == 0) {
 		delete this;
 	}
@@ -53,7 +53,7 @@ STDMETHODIMP_(ULONG) CDropSource::Release() {
 * CDropSource Constructor
 *
 ******************************************************************************/
-CDropSource::CDropSource() {
+CDropSource::CDropSource() noexcept {
 	m_refs = 1;
 }
 
@@ -62,7 +62,7 @@ CDropSource::CDropSource() {
 * IDropSource Implementation
 *
 ******************************************************************************/
-STDMETHODIMP CDropSource::QueryContinueDrag(BOOL fEscapePressed, DWORD grfKeyState) {
+STDMETHODIMP CDropSource::QueryContinueDrag(BOOL fEscapePressed, DWORD grfKeyState) noexcept {
 	if (fEscapePressed) {
 		return DRAGDROP_S_CANCEL;
 	}
@@ -72,7 +72,7 @@ STDMETHODIMP CDropSource::QueryContinueDrag(BOOL fEscapePressed, DWORD grfKeySta
 	return NOERROR;
 }
 
-STDMETHODIMP CDropSource::GiveFeedback(DWORD dwEffect) {
+STDMETHODIMP CDropSource::GiveFeedback(DWORD dwEffect) noexcept {
 	return DRAGDROP_S_USEDEFAULTCURSORS;
 }
 

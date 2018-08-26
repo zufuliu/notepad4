@@ -22,8 +22,8 @@ public:
 	int DelimiterLength;	// strlen(Delimiter)
 	char Delimiter[HERE_DELIM_MAX];	// the Delimiter
 
-	HereDocCls();
-	void Append(int ch);
+	HereDocCls() noexcept;
+	void Append(int ch) noexcept;
 	~HereDocCls() = default;
 };
 
@@ -34,14 +34,14 @@ public:
 	int	Count;
 	int Up, Down;
 
-	QuoteCls() {
+	QuoteCls() noexcept {
 		this->New();
 	}
-	void New(int r = 1);
-	void Open(int u);
-	void Start(int u);
-	QuoteCls(const QuoteCls &q);
-	QuoteCls& operator=(const QuoteCls &q);
+	void New(int r = 1) noexcept;
+	void Open(int u) noexcept;
+	void Start(int u) noexcept;
+	QuoteCls(const QuoteCls &q) noexcept;
+	QuoteCls& operator=(const QuoteCls &q) noexcept;
 };
 
 // Class to manage quote pairs that nest
@@ -55,10 +55,10 @@ public:
 	int UpStack[QUOTE_DELIM_STACK_MAX];
 	int StyleStack[QUOTE_DELIM_STACK_MAX];
 
-	QuoteStackCls();
-	void Start(int u, int s);
-	void Push(int u, int s);
-	void Pop();
+	QuoteStackCls() noexcept;
+	void Start(int u, int s) noexcept;
+	void Push(int u, int s) noexcept;
+	void Pop() noexcept;
 	~QuoteStackCls() = default;
 };
 

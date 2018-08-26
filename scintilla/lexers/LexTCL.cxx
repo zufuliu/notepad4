@@ -77,10 +77,10 @@ static void ColouriseTCLDoc(Sci_PositionU startPos, Sci_Position length, int, Le
 	const WordList &keywords9 = *keywordLists[8];
 
 	if (currentLine > 0) {
-		Sci_Position ls = styler.GetLineState(currentLine - 1);
-		lineState = tLineState(ls & LS_MASK_STATE);
-		expected = LS_COMMAND_EXPECTED == tLineState(ls & LS_COMMAND_EXPECTED);
-		subBrace = LS_BRACE_ONLY == tLineState(ls & LS_BRACE_ONLY);
+		const Sci_Position ls = styler.GetLineState(currentLine - 1);
+		lineState = static_cast<tLineState>(ls & LS_MASK_STATE);
+		expected = LS_COMMAND_EXPECTED == (ls & LS_COMMAND_EXPECTED);
+		subBrace = LS_BRACE_ONLY == (ls & LS_BRACE_ONLY);
 		currentLevel = styler.LevelAt(currentLine - 1) >> 17;
 		commentLevel = (styler.LevelAt(currentLine - 1) >> 16) & 1;
 	} else
@@ -93,7 +93,7 @@ static void ColouriseTCLDoc(Sci_PositionU startPos, Sci_Position length, int, Le
 next:
 		if (sc.ch == '\r' && sc.chNext == '\n') // only ignore \r on PC process on the mac
 			continue;
-		bool atEnd = !sc.More();  // make sure we coloured the last word
+		const bool atEnd = !sc.More();  // make sure we coloured the last word
 		if (lineState != LS_DEFAULT) {
 			sc.SetState(SCE_TCL_DEFAULT);
 			if (lineState == LS_OPEN_COMMENT)
@@ -152,7 +152,7 @@ next:
 					w[strlen(w) - 1] = 0;
 				while (*s == ':') // ignore leading : like in ::set a 10
 					++s;
-				bool quote = sc.state == SCE_TCL_IN_QUOTE;
+				const bool quote = sc.state == SCE_TCL_IN_QUOTE;
 				if (commentLevel || expected) {
 					if (keywords.InList(s)) {
 						sc.ChangeState(quote ? SCE_TCL_WORD_IN_QUOTE : SCE_TCL_WORD);

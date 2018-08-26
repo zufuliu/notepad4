@@ -48,7 +48,7 @@
 
 using namespace Scintilla;
 
-Caret::Caret() :
+Caret::Caret() noexcept :
 	active(false), on(false), period(500) {}
 
 EditModel::EditModel() : braces{} {

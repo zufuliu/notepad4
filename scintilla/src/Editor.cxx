@@ -61,7 +61,7 @@ using namespace Scintilla;
 	return whether this modification represents an operation that
 	may reasonably be deferred (not done now OR [possibly] at all)
 */
-static bool CanDeferToLastStep(const DocModification &mh) {
+static bool CanDeferToLastStep(const DocModification &mh) noexcept {
 	if (mh.modificationType & (SC_MOD_BEFOREINSERT | SC_MOD_BEFOREDELETE))
 		return true;	// CAN skip
 	if (!(mh.modificationType & (SC_PERFORMED_UNDO | SC_PERFORMED_REDO)))
@@ -71,7 +71,7 @@ static bool CanDeferToLastStep(const DocModification &mh) {
 	return false;		// PRESUMABLY must do
 }
 
-static inline bool CanEliminate(const DocModification &mh) {
+static inline bool CanEliminate(const DocModification &mh) noexcept {
 	return
 		(mh.modificationType & (SC_MOD_BEFOREINSERT | SC_MOD_BEFOREDELETE)) != 0;
 }
@@ -80,7 +80,7 @@ static inline bool CanEliminate(const DocModification &mh) {
 	return whether this modification represents the FINAL step
 	in a [possibly lengthy] multi-step Undo/Redo sequence
 */
-static bool IsLastStep(const DocModification &mh) {
+static bool IsLastStep(const DocModification &mh) noexcept {
 	return
 		(mh.modificationType & (SC_PERFORMED_UNDO | SC_PERFORMED_REDO)) != 0
 		&& (mh.modificationType & SC_MULTISTEPUNDOREDO) != 0
@@ -88,13 +88,13 @@ static bool IsLastStep(const DocModification &mh) {
 		&& (mh.modificationType & SC_MULTILINEUNDOREDO) != 0;
 }
 
-Timer::Timer() :
+Timer::Timer() noexcept :
 		ticking(false), ticksToWait(0), tickerID(nullptr) {}
 
-Idler::Idler() :
+Idler::Idler() noexcept :
 		state(false), idlerID(nullptr) {}
 
-static inline bool IsAllSpacesOrTabs(const char *s, unsigned int len) {
+static inline bool IsAllSpacesOrTabs(const char *s, unsigned int len) noexcept {
 	for (unsigned int i = 0; i < len; i++) {
 		// This is safe because IsSpaceOrTab() will return false for null terminators
 		if (!IsSpaceOrTab(s[i]))
@@ -256,7 +256,7 @@ void Editor::SetRepresentations() {
 	}
 }
 
-void Editor::DropGraphics(bool freeObjects) {
+void Editor::DropGraphics(bool freeObjects) noexcept {
 	marginView.DropGraphics(freeObjects);
 	view.DropGraphics(freeObjects);
 }
@@ -293,11 +293,11 @@ void Editor::RefreshStyleData() {
 	}
 }
 
-Point Editor::GetVisibleOriginInMain() const {
+Point Editor::GetVisibleOriginInMain() const noexcept {
 	return Point(0, 0);
 }
 
-PointDocument Editor::DocumentPointFromView(const Point &ptView) const {
+PointDocument Editor::DocumentPointFromView(const Point &ptView) const noexcept {
 	PointDocument ptDocument(ptView);
 	if (wMargin.GetID()) {
 		const Point ptOrigin = GetVisibleOriginInMain();
@@ -310,36 +310,36 @@ PointDocument Editor::DocumentPointFromView(const Point &ptView) const {
 	return ptDocument;
 }
 
-Sci::Line Editor::TopLineOfMain() const {
+Sci::Line Editor::TopLineOfMain() const noexcept {
 	if (wMargin.GetID())
 		return 0;
 	else
 		return topLine;
 }
 
-PRectangle Editor::GetClientRectangle() const {
+PRectangle Editor::GetClientRectangle() const noexcept {
 	return wMain.GetClientPosition();
 }
 
-PRectangle Editor::GetClientDrawingRectangle() const {
+PRectangle Editor::GetClientDrawingRectangle() const noexcept {
 	return GetClientRectangle();
 }
 
-PRectangle Editor::GetTextRectangle() const {
+PRectangle Editor::GetTextRectangle() const noexcept {
 	PRectangle rc = GetClientRectangle();
 	rc.left += vs.textStart;
 	rc.right -= vs.rightMarginWidth;
 	return rc;
 }
 
-Sci::Line Editor::LinesOnScreen() const {
+Sci::Line Editor::LinesOnScreen() const noexcept {
 	const PRectangle rcClient = GetClientRectangle();
 	const int htClient = static_cast<int>(rcClient.bottom - rcClient.top);
 	//Platform::DebugPrintf("lines on screen = %d\n", htClient / lineHeight + 1);
 	return htClient / vs.lineHeight;
 }
 
-Sci::Line Editor::LinesToScroll() const {
+Sci::Line Editor::LinesToScroll() const noexcept {
 	const Sci::Line retVal = LinesOnScreen() - 1;
 	if (retVal < 1)
 		return 1;
@@ -347,7 +347,7 @@ Sci::Line Editor::LinesToScroll() const {
 		return retVal;
 }
 
-Sci::Line Editor::MaxScrollPos() const {
+Sci::Line Editor::MaxScrollPos() const noexcept {
 	//Platform::DebugPrintf("Lines %d screen = %d maxScroll = %d\n",
 	//LinesTotal(), LinesOnScreen(), LinesTotal() - LinesOnScreen() + 1);
 	Sci::Line retVal = pcs->LinesDisplayed();
@@ -363,7 +363,7 @@ Sci::Line Editor::MaxScrollPos() const {
 	}
 }
 
-SelectionPosition Editor::ClampPositionIntoDocument(const SelectionPosition &sp_) const {
+SelectionPosition Editor::ClampPositionIntoDocument(const SelectionPosition &sp_) const noexcept {
 	SelectionPosition sp = sp_;
 	if (sp.Position() < 0) {
 		return SelectionPosition(0);
@@ -437,11 +437,11 @@ Sci::Position Editor::PositionFromLineX(Sci::Line lineDoc, int x) {
 	return SPositionFromLineX(lineDoc, x).Position();
 }
 
-Sci::Line Editor::LineFromLocation(const Point &pt) const {
+Sci::Line Editor::LineFromLocation(const Point &pt) const noexcept {
 	return pcs->DocFromDisplay(static_cast<int>(pt.y) / vs.lineHeight + topLine);
 }
 
-void Editor::SetTopLine(Sci::Line topLineNew) {
+void Editor::SetTopLine(Sci::Line topLineNew) noexcept {
 	if ((topLine != topLineNew) && (topLineNew >= 0)) {
 		topLine = topLineNew;
 		ContainerNeedsUpdate(SC_UPDATE_V_SCROLL);
@@ -453,14 +453,14 @@ void Editor::SetTopLine(Sci::Line topLineNew) {
  * If painting then abandon the painting because a wider redraw is needed.
  * @return true if calling code should stop drawing.
  */
-bool Editor::AbandonPaint() {
+bool Editor::AbandonPaint() noexcept {
 	if ((paintState == painting) && !paintingAllText) {
 		paintState = paintAbandoned;
 	}
 	return paintState == paintAbandoned;
 }
 
-void Editor::RedrawRect(const PRectangle &rc_) {
+void Editor::RedrawRect(const PRectangle &rc_) noexcept {
 	PRectangle rc = rc_;
 	//Platform::DebugPrintf("Redraw %0d,%0d - %0d,%0d\n", rc.left, rc.top, rc.right, rc.bottom);
 
@@ -480,11 +480,11 @@ void Editor::RedrawRect(const PRectangle &rc_) {
 	}
 }
 
-void Editor::DiscardOverdraw() {
+void Editor::DiscardOverdraw() noexcept {
 	// Overridden on platforms that may draw outside visible area.
 }
 
-void Editor::Redraw() {
+void Editor::Redraw() noexcept {
 	//Platform::DebugPrintf("Redraw all\n");
 	const PRectangle rcClient = GetClientRectangle();
 	wMain.InvalidateRectangle(rcClient);
@@ -493,7 +493,7 @@ void Editor::Redraw() {
 	//wMain.InvalidateAll();
 }
 
-void Editor::RedrawSelMargin(Sci::Line line, bool allAfter) {
+void Editor::RedrawSelMargin(Sci::Line line, bool allAfter) noexcept {
 	const bool markersInText = vs.maskInLine || vs.maskDrawInText;
 	if (!wMargin.GetID() || markersInText) {	// May affect text area so may need to abandon and retry
 		if (AbandonPaint()) {
@@ -538,7 +538,7 @@ void Editor::RedrawSelMargin(Sci::Line line, bool allAfter) {
 	}
 }
 
-PRectangle Editor::RectangleFromRange(const Range &r, int overlap) const {
+PRectangle Editor::RectangleFromRange(const Range &r, int overlap) const noexcept {
 	const Sci::Line minLine = pcs->DisplayFromDoc(
 		pdoc->SciLineFromPosition(r.First()));
 	const Sci::Line maxLine = pcs->DisplayLastFromDoc(
@@ -557,7 +557,7 @@ PRectangle Editor::RectangleFromRange(const Range &r, int overlap) const {
 	return rc;
 }
 
-void Editor::InvalidateRange(Sci::Position start, Sci::Position end) {
+void Editor::InvalidateRange(Sci::Position start, Sci::Position end) noexcept {
 	RedrawRect(RectangleFromRange(Range(start, end), view.LinesOverlap() ? vs.lineOverlap : 0));
 }
 
@@ -565,7 +565,7 @@ Sci::Position Editor::CurrentPosition() const {
 	return sel.MainCaret();
 }
 
-bool Editor::SelectionEmpty() const {
+bool Editor::SelectionEmpty() const noexcept {
 	return sel.Empty();
 }
 
@@ -639,7 +639,7 @@ void Editor::InvalidateWholeSelection() {
 
 /* For Line selection - the anchor and caret are always
    at the beginning and end of the region lines. */
-SelectionRange Editor::LineSelectionRange(const SelectionPosition &currentPos, const SelectionPosition &anchor) const {
+SelectionRange Editor::LineSelectionRange(const SelectionPosition &currentPos, const SelectionPosition &anchor) const noexcept {
 	SelectionPosition currentPos_ = currentPos, anchor_ = anchor;
 	if (currentPos_ > anchor_) {
 		anchor_ = SelectionPosition(
@@ -656,8 +656,8 @@ SelectionRange Editor::LineSelectionRange(const SelectionPosition &currentPos, c
 }
 
 void Editor::SetSelection(const SelectionPosition &currentPos, const SelectionPosition &anchor) {
-	SelectionPosition currentPos_ = ClampPositionIntoDocument(currentPos);
-	SelectionPosition anchor_ = ClampPositionIntoDocument(anchor);
+	const SelectionPosition currentPos_ = ClampPositionIntoDocument(currentPos);
+	const SelectionPosition anchor_ = ClampPositionIntoDocument(anchor);
 	const Sci::Line currentLine = pdoc->SciLineFromPosition(currentPos_.Position());
 	SelectionRange rangeNew(currentPos_, anchor_);
 	if (sel.selType == Selection::selLines) {
@@ -683,7 +683,7 @@ void Editor::SetSelection(Sci::Position currentPos_, Sci::Position anchor_) {
 
 // Just move the caret on the main selection
 void Editor::SetSelection(const SelectionPosition &currentPos) {
-	SelectionPosition currentPos_ = ClampPositionIntoDocument(currentPos);
+	const SelectionPosition currentPos_ = ClampPositionIntoDocument(currentPos);
 	const Sci::Line currentLine = pdoc->SciLineFromPosition(currentPos_.Position());
 	if (sel.Count() > 1 || !(sel.RangeMain().caret == currentPos_)) {
 		InvalidateSelection(SelectionRange(currentPos_));
@@ -1459,7 +1459,7 @@ void Editor::InvalidateCaret() {
 	UpdateSystemCaret();
 }
 
-void Editor::NotifyCaretMove() {
+void Editor::NotifyCaretMove() noexcept {
 }
 
 void Editor::UpdateSystemCaret() {
@@ -1469,7 +1469,7 @@ bool Editor::Wrapping() const noexcept {
 	return vs.wrapState != eWrapNone;
 }
 
-void Editor::NeedWrapping(Sci::Line docLineStart, Sci::Line docLineEnd) {
+void Editor::NeedWrapping(Sci::Line docLineStart, Sci::Line docLineEnd) noexcept {
 	//Platform::DebugPrintf("\nNeedWrapping: %0d..%0d\n", docLineStart, docLineEnd);
 	if (wrapPending.AddRange(docLineStart, docLineEnd)) {
 		view.llc.Invalidate(LineLayout::llPositions);
@@ -1606,7 +1606,7 @@ void Editor::LinesJoin() {
 	}
 }
 
-const char *Editor::StringFromEOLMode(int eolMode) {
+const char *Editor::StringFromEOLMode(int eolMode) noexcept {
 	if (eolMode == SC_EOL_CRLF) {
 		return "\r\n";
 	} else if (eolMode == SC_EOL_CR) {
@@ -1816,7 +1816,7 @@ int Editor::TextWidth(int style, const char *text) {
 }
 
 // Empty method is overridden on GTK+ to show / hide scrollbars
-void Editor::ReconfigureScrollBars() {}
+void Editor::ReconfigureScrollBars() noexcept {}
 
 void Editor::SetScrollBars() {
 	RefreshStyleData();
@@ -1904,7 +1904,7 @@ void Editor::AddCharUTF(const char *s, unsigned int len, bool treatAsDBCS) {
 		}
 		// Order selections by position in document.
 		std::sort(selPtrs.begin(), selPtrs.end(),
-			[](const SelectionRange *a, const SelectionRange *b) {return *a < *b; });
+			[](const SelectionRange *a, const SelectionRange *b) noexcept {return *a < *b; });
 
 		// Loop in reverse to avoid disturbing positions of selections yet to be processed.
 		for (auto rit = selPtrs.rbegin(); rit != selPtrs.rend(); ++rit) {
@@ -2304,7 +2304,7 @@ void Editor::NotifyFocus(bool focus) {
 	NotifyParent(scn);
 }
 
-void Editor::SetCtrlID(int identifier) {
+void Editor::SetCtrlID(int identifier) noexcept {
 	ctrlID = identifier;
 }
 
@@ -2322,18 +2322,18 @@ void Editor::NotifyStyleNeeded(Document *, void *, Sci::Position endStyleNeeded)
 void Editor::NotifyLexerChanged(Document *, void *) {
 }
 
-void Editor::NotifyErrorOccurred(Document *, void *, int status) {
+void Editor::NotifyErrorOccurred(Document *, void *, int status) noexcept {
 	errorStatus = status;
 }
 
-void Editor::NotifyChar(int ch) {
+void Editor::NotifyChar(int ch) noexcept {
 	SCNotification scn = {};
 	scn.nmhdr.code = SCN_CHARADDED;
 	scn.ch = ch;
 	NotifyParent(scn);
 }
 
-void Editor::NotifySavePoint(bool isSavePoint) {
+void Editor::NotifySavePoint(bool isSavePoint) noexcept {
 	SCNotification scn = {};
 	if (isSavePoint) {
 		scn.nmhdr.code = SCN_SAVEPOINTREACHED;
@@ -2343,7 +2343,7 @@ void Editor::NotifySavePoint(bool isSavePoint) {
 	NotifyParent(scn);
 }
 
-void Editor::NotifyModifyAttempt() {
+void Editor::NotifyModifyAttempt() noexcept {
 	SCNotification scn = {};
 	scn.nmhdr.code = SCN_MODIFYATTEMPTRO;
 	NotifyParent(scn);
@@ -2358,7 +2358,7 @@ void Editor::NotifyDoubleClick(const Point &pt, int modifiers) {
 	NotifyParent(scn);
 }
 
-void Editor::NotifyHotSpotDoubleClicked(Sci::Position position, int modifiers) {
+void Editor::NotifyHotSpotDoubleClicked(Sci::Position position, int modifiers) noexcept {
 	SCNotification scn = {};
 	scn.nmhdr.code = SCN_HOTSPOTDOUBLECLICK;
 	scn.position = position;
@@ -2366,7 +2366,7 @@ void Editor::NotifyHotSpotDoubleClicked(Sci::Position position, int modifiers) {
 	NotifyParent(scn);
 }
 
-void Editor::NotifyHotSpotClicked(Sci::Position position, int modifiers) {
+void Editor::NotifyHotSpotClicked(Sci::Position position, int modifiers) noexcept {
 	SCNotification scn = {};
 	scn.nmhdr.code = SCN_HOTSPOTCLICK;
 	scn.position = position;
@@ -2374,7 +2374,7 @@ void Editor::NotifyHotSpotClicked(Sci::Position position, int modifiers) {
 	NotifyParent(scn);
 }
 
-void Editor::NotifyHotSpotReleaseClick(Sci::Position position, int modifiers) {
+void Editor::NotifyHotSpotReleaseClick(Sci::Position position, int modifiers) noexcept {
 	SCNotification scn = {};
 	scn.nmhdr.code = SCN_HOTSPOTRELEASECLICK;
 	scn.position = position;
@@ -2382,7 +2382,7 @@ void Editor::NotifyHotSpotReleaseClick(Sci::Position position, int modifiers) {
 	NotifyParent(scn);
 }
 
-bool Editor::NotifyUpdateUI() {
+bool Editor::NotifyUpdateUI() noexcept {
 	if (needUpdateUI) {
 		SCNotification scn = {};
 		scn.nmhdr.code = SCN_UPDATEUI;
@@ -2394,13 +2394,13 @@ bool Editor::NotifyUpdateUI() {
 	return false;
 }
 
-void Editor::NotifyPainted() {
+void Editor::NotifyPainted() noexcept {
 	SCNotification scn = {};
 	scn.nmhdr.code = SCN_PAINTED;
 	NotifyParent(scn);
 }
 
-void Editor::NotifyIndicatorClick(bool click, Sci::Position position, int modifiers) {
+void Editor::NotifyIndicatorClick(bool click, Sci::Position position, int modifiers) noexcept {
 	const int mask = pdoc->decorations->AllOnFor(position);
 	if ((click && mask) || pdoc->decorations->ClickNotified()) {
 		SCNotification scn = {};
@@ -2466,7 +2466,7 @@ bool Editor::NotifyMarginRightClick(const Point &pt, int modifiers) {
 	}
 }
 
-void Editor::NotifyNeedShown(Sci::Position pos, Sci::Position len) {
+void Editor::NotifyNeedShown(Sci::Position pos, Sci::Position len) noexcept {
 	SCNotification scn = {};
 	scn.nmhdr.code = SCN_NEEDSHOWN;
 	scn.position = pos;
@@ -2483,19 +2483,19 @@ void Editor::NotifyDwelling(const Point &pt, bool state) {
 	NotifyParent(scn);
 }
 
-void Editor::NotifyZoom() {
+void Editor::NotifyZoom() noexcept {
 	SCNotification scn = {};
 	scn.nmhdr.code = SCN_ZOOM;
 	NotifyParent(scn);
 }
 
 // Notifications from document
-void Editor::NotifyModifyAttempt(Document *, void *) {
+void Editor::NotifyModifyAttempt(Document *, void *) noexcept {
 	//Platform::DebugPrintf("** Modify Attempt\n");
 	NotifyModifyAttempt();
 }
 
-void Editor::NotifySavePoint(Document *, void *, bool atSavePoint) {
+void Editor::NotifySavePoint(Document *, void *, bool atSavePoint) noexcept {
 	//Platform::DebugPrintf("** Save Point %s\n", atSavePoint ? "On" : "Off");
 	NotifySavePoint(atSavePoint);
 }
@@ -2515,7 +2515,7 @@ void Editor::CheckModificationForWrap(const DocModification &mh) {
 }
 
 // Move a position so it is still after the same character as before the insertion.
-static inline Sci::Position MovePositionForInsertion(Sci::Position position, Sci::Position startInsertion, Sci::Position length) {
+static inline Sci::Position MovePositionForInsertion(Sci::Position position, Sci::Position startInsertion, Sci::Position length) noexcept {
 	if (position > startInsertion) {
 		return position + length;
 	}
@@ -2524,7 +2524,7 @@ static inline Sci::Position MovePositionForInsertion(Sci::Position position, Sci
 
 // Move a position so it is still after the same character as before the deletion if that
 // character is still present else after the previous surviving character.
-static inline Sci::Position MovePositionForDeletion(Sci::Position position, Sci::Position startDeletion, Sci::Position length) {
+static inline Sci::Position MovePositionForDeletion(Sci::Position position, Sci::Position startDeletion, Sci::Position length) noexcept {
 	if (position > startDeletion) {
 		const Sci::Position endDeletion = startDeletion + length;
 		if (position > endDeletion) {
@@ -2703,11 +2703,11 @@ void Editor::NotifyModified(Document *, const DocModification &mh, void *) {
 	}
 }
 
-void Editor::NotifyDeleted(Document *, void *) {
+void Editor::NotifyDeleted(Document *, void *) noexcept {
 	/* Do nothing */
 }
 
-void Editor::NotifyMacroRecord(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
+void Editor::NotifyMacroRecord(unsigned int iMessage, uptr_t wParam, sptr_t lParam) noexcept {
 
 	// Enumerates all macroable messages
 	switch (iMessage) {
@@ -2839,7 +2839,7 @@ void Editor::NotifyMacroRecord(unsigned int iMessage, uptr_t wParam, sptr_t lPar
 }
 
 // Something has changed that the container should know about
-void Editor::ContainerNeedsUpdate(int flags) {
+void Editor::ContainerNeedsUpdate(int flags) noexcept {
 	needUpdateUI |= flags;
 }
 
@@ -3216,15 +3216,15 @@ Sci::Position Editor::StartEndDisplayLine(Sci::Position pos, bool start) {
 
 namespace {
 
-constexpr inline short HighShortFromWParam(uptr_t x) {
+constexpr short HighShortFromWParam(uptr_t x) noexcept {
 	return static_cast<short>(x >> 16);
 }
 
-constexpr inline short LowShortFromWParam(uptr_t x) {
+constexpr short LowShortFromWParam(uptr_t x) noexcept {
 	return static_cast<short>(x & 0xffff);
 }
 
-unsigned int WithExtends(unsigned int iMessage) {
+unsigned int WithExtends(unsigned int iMessage) noexcept {
 	switch (iMessage) {
 	case SCI_CHARLEFT: return SCI_CHARLEFTEXTEND;
 	case SCI_CHARRIGHT: return SCI_CHARRIGHTEXTEND;
@@ -3251,7 +3251,7 @@ unsigned int WithExtends(unsigned int iMessage) {
 	}
 }
 
-int NaturalDirection(unsigned int iMessage) {
+int NaturalDirection(unsigned int iMessage) noexcept {
 	switch (iMessage) {
 	case SCI_CHARLEFT:
 	case SCI_CHARLEFTEXTEND:
@@ -3282,7 +3282,7 @@ int NaturalDirection(unsigned int iMessage) {
 	}
 }
 
-bool IsRectExtend(unsigned int iMessage, bool isRectMoveExtends) {
+bool IsRectExtend(unsigned int iMessage, bool isRectMoveExtends) noexcept {
 	switch (iMessage) {
 	case SCI_CHARLEFTRECTEXTEND:
 	case SCI_CHARRIGHTRECTEXTEND:
@@ -3905,7 +3905,7 @@ int Editor::KeyCommand(unsigned int iMessage) {
 	return 0;
 }
 
-int Editor::KeyDefault(int, int) {
+int Editor::KeyDefault(int, int) noexcept {
 	return 0;
 }
 
@@ -4007,7 +4007,7 @@ void Editor::Indent(bool forwards) {
 
 class CaseFolderASCII : public CaseFolderTable {
 public:
-	CaseFolderASCII() {
+	CaseFolderASCII() noexcept {
 		StandardASCII();
 	}
 	~CaseFolderASCII() override = default;
@@ -4151,7 +4151,7 @@ void Editor::GoToLine(Sci::Line lineNo) {
 	EnsureCaretVisible();
 }
 
-static bool Close(const Point &pt1, const Point &pt2, const Point &threshold) {
+static bool Close(const Point &pt1, const Point &pt2, const Point &threshold) noexcept {
 	if (std::abs(pt1.x - pt2.x) > threshold.x)
 		return false;
 	if (std::abs(pt1.y - pt2.y) > threshold.y)
@@ -4239,14 +4239,14 @@ void Editor::SetDragPosition(const SelectionPosition &newPos_) {
 	}
 }
 
-void Editor::DisplayCursor(Window::Cursor c) {
+void Editor::DisplayCursor(Window::Cursor c) noexcept {
 	if (cursorMode == SC_CURSORNORMAL)
 		wMain.SetCursor(c);
 	else
 		wMain.SetCursor(static_cast<Window::Cursor>(cursorMode));
 }
 
-bool Editor::DragThreshold(const Point &ptStart, const Point &ptNow) {
+bool Editor::DragThreshold(const Point &ptStart, const Point &ptNow) noexcept {
 	const XYPOSITION xMove = ptStart.x - ptNow.x;
 	const XYPOSITION yMove = ptStart.y - ptNow.y;
 	const XYPOSITION distanceSquared = xMove * xMove + yMove * yMove;
@@ -4363,7 +4363,7 @@ bool Editor::PointInSelection(const Point &pt) {
 	return false;
 }
 
-bool Editor::PointInSelMargin(const Point &pt) const {
+bool Editor::PointInSelMargin(const Point &pt) const noexcept {
 	// Really means: "Point in a margin"
 	if (vs.fixedColumnWidth > 0) {	// There is a margin
 		PRectangle rcSelMargin = GetClientRectangle();
@@ -4377,7 +4377,7 @@ bool Editor::PointInSelMargin(const Point &pt) const {
 	}
 }
 
-Window::Cursor Editor::GetMarginCursor(const Point &pt) const {
+Window::Cursor Editor::GetMarginCursor(const Point &pt) const noexcept {
 	int x = 0;
 	for (const auto &m : vs.ms) {
 		if ((pt.x >= x) && (pt.x < x + m.width))
@@ -4469,7 +4469,7 @@ void Editor::MouseLeave() {
 	}
 }
 
-static bool AllowVirtualSpace(int virtualSpaceOptions, bool rectangular) noexcept {
+static constexpr bool AllowVirtualSpace(int virtualSpaceOptions, bool rectangular) noexcept {
 	return (!rectangular && ((virtualSpaceOptions & SCVS_USERACCESSIBLE) != 0))
 		|| (rectangular && ((virtualSpaceOptions & SCVS_RECTANGULARSELECTION) != 0));
 }
@@ -4724,7 +4724,7 @@ void Editor::SetHotSpotRange(const Point *pt) {
 	}
 }
 
-Range Editor::GetHotSpotRange() const {
+Range Editor::GetHotSpotRange() const noexcept {
 	return hotspot;
 }
 
@@ -4995,20 +4995,20 @@ void Editor::TickFor(TickReason reason) {
 
 // FineTickerStart is be overridden by subclasses that support fine ticking so
 // this method should never be called.
-bool Editor::FineTickerRunning(TickReason) {
+bool Editor::FineTickerRunning(TickReason) noexcept {
 	assert(false);
 	return false;
 }
 
 // FineTickerStart is be overridden by subclasses that support fine ticking so
 // this method should never be called.
-void Editor::FineTickerStart(TickReason, int, int) {
+void Editor::FineTickerStart(TickReason, int, int) noexcept {
 	assert(false);
 }
 
 // FineTickerCancel is be overridden by subclasses that support fine ticking so
 // this method should never be called.
-void Editor::FineTickerCancel(TickReason) {
+void Editor::FineTickerCancel(TickReason) noexcept {
 	assert(false);
 }
 
@@ -5021,7 +5021,7 @@ void Editor::SetFocusState(bool focusState) {
 	ShowCaretAtCurrentPosition();
 }
 
-Sci::Position Editor::PositionAfterArea(const PRectangle &rcArea) const {
+Sci::Position Editor::PositionAfterArea(const PRectangle &rcArea) const noexcept {
 	// The start of the document line after the display line after the area
 	// This often means that the line after a modification is restyled which helps
 	// detect multiline comment additions and heals single line comments
@@ -5050,7 +5050,7 @@ void Editor::StyleToPositionInView(Sci::Position pos) {
 	}
 }
 
-Sci::Position Editor::PositionAfterMaxStyling(Sci::Position posMax, bool scrolling) const {
+Sci::Position Editor::PositionAfterMaxStyling(Sci::Position posMax, bool scrolling) const noexcept {
 	if ((idleStyling == SC_IDLESTYLING_NONE) || (idleStyling == SC_IDLESTYLING_AFTERVISIBLE)) {
 		// Both states do not limit styling
 		return posMax;
@@ -5068,7 +5068,7 @@ Sci::Position Editor::PositionAfterMaxStyling(Sci::Position posMax, bool scrolli
 	return std::min(pdoc->LineStart(stylingMaxLine), posMax);
 }
 
-void Editor::StartIdleStyling(bool truncatedLastStyling) {
+void Editor::StartIdleStyling(bool truncatedLastStyling) noexcept {
 	if ((idleStyling == SC_IDLESTYLING_ALL) || (idleStyling == SC_IDLESTYLING_AFTERVISIBLE)) {
 		if (pdoc->GetEndStyled() < pdoc->Length()) {
 			// Style remainder of document in idle time
@@ -5119,11 +5119,11 @@ void Editor::IdleWork() {
 	workNeeded.Reset();
 }
 
-void Editor::QueueIdleWork(WorkNeeded::workItems items, Sci::Position upTo) {
+void Editor::QueueIdleWork(WorkNeeded::workItems items, Sci::Position upTo) noexcept {
 	workNeeded.Need(items, upTo);
 }
 
-bool Editor::PaintContains(const PRectangle &rc) const {
+bool Editor::PaintContains(const PRectangle &rc) const noexcept {
 	if (rc.Empty()) {
 		return true;
 	} else {
@@ -5131,7 +5131,7 @@ bool Editor::PaintContains(const PRectangle &rc) const {
 	}
 }
 
-bool Editor::PaintContainsMargin() const {
+bool Editor::PaintContainsMargin() const noexcept {
 	if (wMargin.GetID()) {
 		// With separate margin view, paint of text view
 		// never contains margin.
@@ -5142,7 +5142,7 @@ bool Editor::PaintContainsMargin() const {
 	return PaintContains(rcSelMargin);
 }
 
-void Editor::CheckForChangeOutsidePaint(const Range &r) {
+void Editor::CheckForChangeOutsidePaint(const Range &r) noexcept {
 	if (paintState == painting && !paintingAllText) {
 		//Platform::DebugPrintf("Checking range in paint %d-%d\n", r.start, r.end);
 		if (!r.Valid())
@@ -5164,7 +5164,7 @@ void Editor::CheckForChangeOutsidePaint(const Range &r) {
 	}
 }
 
-void Editor::SetBraceHighlight(Sci::Position pos0, Sci::Position pos1, int matchStyle) {
+void Editor::SetBraceHighlight(Sci::Position pos0, Sci::Position pos1, int matchStyle) noexcept {
 	if ((pos0 != braces[0]) || (pos1 != braces[1]) || (matchStyle != bracesMatchStyle)) {
 		if ((braces[0] != pos0) || (matchStyle != bracesMatchStyle)) {
 			CheckForChangeOutsidePaint(Range(braces[0]));
@@ -5357,7 +5357,7 @@ void Editor::FoldExpand(Sci::Line line, int action, int level) {
 	Redraw();
 }
 
-Sci::Line Editor::ContractedFoldNext(Sci::Line lineStart) const {
+Sci::Line Editor::ContractedFoldNext(Sci::Line lineStart) const noexcept {
 	for (Sci::Line line = lineStart; line < pdoc->LinesTotal();) {
 		if (!pcs->GetExpanded(line) && (pdoc->GetLevel(line) & SC_FOLDLEVELHEADERFLAG))
 			return line;
@@ -5564,11 +5564,11 @@ Sci::Position Editor::ReplaceTarget(bool replacePatterns, const char *text, Sci:
 	return length;
 }
 
-bool Editor::IsUnicodeMode() const {
+bool Editor::IsUnicodeMode() const noexcept {
 	return pdoc && (SC_CP_UTF8 == pdoc->dbcsCodePage);
 }
 
-int Editor::CodePage() const {
+int Editor::CodePage() const noexcept {
 	if (pdoc)
 		return pdoc->dbcsCodePage;
 	else
@@ -5604,7 +5604,7 @@ void Editor::AddStyledText(const char *buffer, Sci::Position appendLength) {
 	SetEmptySelection(sel.MainCaret() + lengthInserted);
 }
 
-bool Editor::ValidMargin(uptr_t wParam) const {
+bool Editor::ValidMargin(uptr_t wParam) const noexcept {
 	return wParam < vs.ms.size();
 }
 
@@ -5740,7 +5740,7 @@ void Editor::SetSelectionNMessage(unsigned int iMessage, uptr_t wParam, sptr_t l
 	ContainerNeedsUpdate(SC_UPDATE_SELECTION);
 }
 
-sptr_t Editor::StringResult(sptr_t lParam, const char *val) {
+sptr_t Editor::StringResult(sptr_t lParam, const char *val) noexcept {
 	const size_t len = val ? strlen(val) : 0;
 	if (lParam) {
 		char *ptr = CharPtrFromSPtr(lParam);
@@ -5752,7 +5752,7 @@ sptr_t Editor::StringResult(sptr_t lParam, const char *val) {
 	return len;	// Not including NUL
 }
 
-sptr_t Editor::BytesResult(sptr_t lParam, const unsigned char *val, size_t len) {
+sptr_t Editor::BytesResult(sptr_t lParam, const unsigned char *val, size_t len) noexcept {
 	// No NUL termination: len is number of valid/displayed bytes
 	if ((lParam) && (len > 0)) {
 		char *ptr = CharPtrFromSPtr(lParam);
@@ -7655,7 +7655,7 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 			doc->Allocate(static_cast<Sci::Position>(wParam));
 			doc->SetUndoCollection(false);
 			pcs = ContractionStateCreate(pdoc->IsLarge());
-			return reinterpret_cast<sptr_t>(static_cast<ILoader *>(doc));
+			return reinterpret_cast<sptr_t>(doc);
 		}
 
 	case SCI_SETMODEVENTMASK:

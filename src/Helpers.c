@@ -430,8 +430,8 @@ BOOL SetWindowTitle(HWND hwnd, UINT uIDAppName, BOOL bIsElevated, UINT uIDUntitl
 	WCHAR szAppName[128];
 	WCHAR szReadOnly[32];
 	WCHAR szTitle[512];
-	static WCHAR szCachedFile[MAX_PATH];
-	static WCHAR szCachedDisplayName[MAX_PATH];
+	static WCHAR szCachedFile[MAX_PATH] = L"";
+	static WCHAR szCachedDisplayName[MAX_PATH] = L"";
 	static const WCHAR *pszSep = L" - ";
 	static const WCHAR *pszMod = L"* ";
 
@@ -1138,17 +1138,13 @@ BOOL PathGetLnkPath(LPCWSTR pszLnkFile, LPWSTR pszResPath, int cchResPath) {
 
 			if (SUCCEEDED(ppf->lpVtbl->Load(ppf, wsz, STGM_READ))) {
 				if (NOERROR == psl->lpVtbl->GetPath(psl, pszResPath, cchResPath, &fd, 0)) {
-					bSucceeded = TRUE;
+					// This additional check seems reasonable
+					bSucceeded = StrNotEmpty(pszResPath);
 				}
 			}
 			ppf->lpVtbl->Release(ppf);
 		}
 		psl->lpVtbl->Release(psl);
-	}
-
-	// This additional check seems reasonable
-	if (StrIsEmpty(pszResPath)) {
-		bSucceeded = FALSE;
 	}
 
 	if (bSucceeded) {

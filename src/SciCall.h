@@ -33,9 +33,9 @@ static inline void InitScintillaHandle(HWND hwnd) {
 //
 //
 LRESULT WINAPI Scintilla_DirectFunction(HANDLE, UINT, WPARAM, LPARAM);
-#define SciCall0(m)			Scintilla_DirectFunction(g_hScintilla, m, 0, 0)
-#define SciCall1(m, w)		Scintilla_DirectFunction(g_hScintilla, m, (WPARAM)w, 0)
-#define SciCall2(m, w, l)	Scintilla_DirectFunction(g_hScintilla, m, (WPARAM)w, (LPARAM)l)
+#define SciCall0(m)			Scintilla_DirectFunction(g_hScintilla, (m), 0, 0)
+#define SciCall1(m, w)		Scintilla_DirectFunction(g_hScintilla, (m), (WPARAM)(w), 0)
+#define SciCall2(m, w, l)	Scintilla_DirectFunction(g_hScintilla, (m), (WPARAM)(w), (LPARAM)(l))
 
 //=============================================================================
 //

@@ -21,7 +21,7 @@ using namespace Scintilla;
 #define MAKE_TYPE_NMAKE 1
 #define MAKE_TYPE_BMAKE 2
 #define MAKE_TYPE_QMAKE 3
-static inline bool IsMakeOp(int ch, int chNext) noexcept {
+static constexpr bool IsMakeOp(int ch, int chNext) noexcept {
 	return ch == '=' || ch == ':' || ch == '{' || ch == '}' || ch == '(' || ch == ')' || ch == ','
 		|| ch == '$' || ch == '@' || ch == '%' || ch == '<' || ch == '?' || ch == '^'
 		|| ch == '|' || ch == '*' || ch == '>' || ch == ';' || ch == '&' || ch == '!'
@@ -37,7 +37,7 @@ static void ColouriseMakeDoc(Sci_PositionU startPos, Sci_Position length, int in
 	styler.StartAt(startPos);
 	styler.StartSegment(startPos);
 	Sci_PositionU endPos = startPos + length;
-	if (endPos == (Sci_PositionU)styler.Length())
+	if (endPos == static_cast<Sci_PositionU>(styler.Length()))
 		++endPos;
 
 	int visibleChars = 0;
@@ -53,7 +53,7 @@ static void ColouriseMakeDoc(Sci_PositionU startPos, Sci_Position length, int in
 		chNext = styler.SafeGetCharAt(i + 1);
 
 		const bool atEOL = (ch == '\r' && chNext != '\n') || (ch == '\n');
-		const bool atLineStart = i == (Sci_PositionU)styler.LineStart(lineCurrent);
+		const bool atLineStart = i == static_cast<Sci_PositionU>(styler.LineStart(lineCurrent));
 
 		switch (state) {
 		case SCE_MAKE_OPERATOR:
@@ -71,7 +71,7 @@ static void ColouriseMakeDoc(Sci_PositionU startPos, Sci_Position length, int in
 				wordLen = 0;
 				state = SCE_MAKE_DEFAULT;
 			} else if (wordLen < MAX_WORD_LENGTH) {
-				buf[wordLen++] = (char)ch;
+				buf[wordLen++] = static_cast<char>(ch);
 			}
 			break;
 		case SCE_MAKE_TARGET:
@@ -97,7 +97,7 @@ static void ColouriseMakeDoc(Sci_PositionU startPos, Sci_Position length, int in
 				state = SCE_MAKE_DEFAULT;
 				wordLen = 0;
 			} else if (wordLen < MAX_WORD_LENGTH) {
-				buf[wordLen++] = (char)ch;
+				buf[wordLen++] = static_cast<char>(ch);
 			}
 			break;
 		case SCE_MAKE_VARIABLE:
@@ -200,7 +200,7 @@ static void ColouriseMakeDoc(Sci_PositionU startPos, Sci_Position length, int in
 				state = SCE_MAKE_OPERATOR;
 			} else if (isgraph(ch)) {
 				styler.ColourTo(i - 1, state);
-				buf[wordLen++] = (char)ch;
+				buf[wordLen++] = static_cast<char>(ch);
 				state = (visibleChars == 0) ? SCE_MAKE_TARGET : SCE_MAKE_IDENTIFIER;
 			}
 		}
@@ -226,7 +226,7 @@ static void FoldMakeDoc(Sci_PositionU startPos, Sci_Position length, int initSty
 	const bool foldComment = styler.GetPropertyInt("fold.comment") != 0;
 	const bool foldCompact = styler.GetPropertyInt("fold.compact", 1) != 0;
 
-	Sci_PositionU endPos = startPos + length;
+	const Sci_PositionU endPos = startPos + length;
 	int visibleChars = 0;
 	Sci_Position lineCurrent = styler.GetLine(startPos);
 	int levelCurrent = SC_FOLDLEVELBASE;
@@ -239,12 +239,12 @@ static void FoldMakeDoc(Sci_PositionU startPos, Sci_Position length, int initSty
 	int style = initStyle;
 
 	for (Sci_PositionU i = startPos; i < endPos; i++) {
-		char ch = chNext;
+		const char ch = chNext;
 		chNext = styler.SafeGetCharAt(i + 1);
-		int stylePrev = style;
+		const int stylePrev = style;
 		style = styleNext;
 		styleNext = styler.StyleAt(i + 1);
-		bool atEOL = (ch == '\r' && chNext != '\n') || (ch == '\n');
+		const bool atEOL = (ch == '\r' && chNext != '\n') || (ch == '\n');
 
 		if (foldComment && atEOL && IsCommentLine(lineCurrent)) {
 			if (!IsCommentLine(lineCurrent - 1) && IsCommentLine(lineCurrent + 1))
@@ -284,7 +284,7 @@ static void FoldMakeDoc(Sci_PositionU startPos, Sci_Position length, int initSty
 			visibleChars++;
 
 		if (atEOL || (i == endPos - 1)) {
-			int levelUse = levelCurrent;
+			const int levelUse = levelCurrent;
 			int lev = levelUse | levelNext << 16;
 			if (visibleChars == 0 && foldCompact)
 				lev |= SC_FOLDLEVELWHITEFLAG;

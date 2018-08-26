@@ -50,9 +50,9 @@ protected:
 	LexState *DocumentLexState();
 #endif
 
-	ScintillaBase();
+	ScintillaBase() noexcept;
 	~ScintillaBase() override;
-	void Initialise() override {}
+	void Initialise() noexcept override {}
 	void Finalise() override;
 
 	void AddCharUTF(const char *s, unsigned int len, bool treatAsDBCS = false) override;
@@ -62,9 +62,9 @@ protected:
 
 	void AutoCompleteInsert(Sci::Position startPos, Sci::Position removeLen, const char *text, Sci::Position textLen);
 	void AutoCompleteStart(Sci::Position lenEntered, const char *list);
-	void AutoCompleteCancel();
+	void AutoCompleteCancel() noexcept;
 	void AutoCompleteMove(int delta);
-	int AutoCompleteGetCurrent() const;
+	int AutoCompleteGetCurrent() const noexcept;
 	int AutoCompleteGetCurrentText(char *buffer) const;
 	void AutoCompleteCharacterAdded(char ch);
 	void AutoCompleteCharacterDeleted();
@@ -73,12 +73,12 @@ protected:
 	void AutoCompleteSelection();
 	void ListNotify(ListBoxEvent *plbe) override;
 
-	void CallTipClick();
+	void CallTipClick() noexcept;
 	void CallTipShow(const Point &pt, const char *defn);
-	virtual void CreateCallTipWindow(const PRectangle &rc) = 0;
+	virtual void CreateCallTipWindow(const PRectangle &rc) noexcept = 0;
 
-	virtual void AddToPopUp(const char *label, int cmd = 0, bool enabled = true) = 0;
-	bool ShouldDisplayPopup(const Point &ptInWindowCoordinates) const;
+	virtual void AddToPopUp(const char *label, int cmd = 0, bool enabled = true) noexcept = 0;
+	bool ShouldDisplayPopup(const Point &ptInWindowCoordinates) const noexcept;
 	void ContextMenu(const Point &pt);
 
 	void ButtonDownWithModifiers(const Point &pt, unsigned int curTime, int modifiers) override;

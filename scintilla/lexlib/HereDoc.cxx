@@ -4,7 +4,7 @@
 
 using namespace Scintilla;
 
-static int opposite(int ch) {
+static int opposite(int ch) noexcept {
 	if (ch == '(') return ')';
 	if (ch == '[') return ']';
 	if (ch == '{') return '}';
@@ -13,7 +13,7 @@ static int opposite(int ch) {
 }
 
 
-HereDocCls::HereDocCls() {
+HereDocCls::HereDocCls() noexcept {
 	State = 0;
 	Quote = 0;
 	Quoted = false;
@@ -21,34 +21,34 @@ HereDocCls::HereDocCls() {
 	DelimiterLength = 0;
 	Delimiter[0] = '\0';
 }
-void HereDocCls::Append(int ch) {
+void HereDocCls::Append(int ch) noexcept {
 	Delimiter[DelimiterLength++] = static_cast<char>(ch);
 	Delimiter[DelimiterLength] = '\0';
 }
 
 
-void QuoteCls::New(int r) {
+void QuoteCls::New(int r) noexcept {
 	Rep   = r;
 	Count = 0;
 	Up = '\0';
 	Down = '\0';
 }
-void QuoteCls::Open(int u) {
+void QuoteCls::Open(int u) noexcept {
 	Count++;
 	Up = u;
 	Down = opposite(Up);
 }
-void QuoteCls::Start(int u) {
+void QuoteCls::Start(int u) noexcept {
 	Count = 0;
 	Open(u);
 }
-QuoteCls::QuoteCls(const QuoteCls &q) { // copy constructor -- use this for copying in
+QuoteCls::QuoteCls(const QuoteCls &q) noexcept { // copy constructor -- use this for copying in
 	Rep = q.Rep;
 	Count = q.Count;
 	Up = q.Up;
 	Down = q.Down;
 }
-QuoteCls& QuoteCls::operator=(const QuoteCls &q) { // assignment constructor
+QuoteCls& QuoteCls::operator=(const QuoteCls &q) noexcept { // assignment constructor
 	if (this != &q) {
 		Rep = q.Rep;
 		Count = q.Count;
@@ -59,20 +59,20 @@ QuoteCls& QuoteCls::operator=(const QuoteCls &q) { // assignment constructor
 }
 
 
-QuoteStackCls::QuoteStackCls() {
+QuoteStackCls::QuoteStackCls() noexcept {
 	Count = 0;
 	Up    = '\0';
 	Down  = '\0';
 	Style = 0;
 	Depth = 0;
 }
-void QuoteStackCls::Start(int u, int s) {
+void QuoteStackCls::Start(int u, int s) noexcept {
 	Count = 1;
 	Up    = u;
 	Down  = opposite(Up);
 	Style = s;
 }
-void QuoteStackCls::Push(int u, int s) {
+void QuoteStackCls::Push(int u, int s) noexcept {
 	if (Depth >= QUOTE_DELIM_STACK_MAX)
 		return;
 	CountStack[Depth] = Count;
@@ -84,7 +84,7 @@ void QuoteStackCls::Push(int u, int s) {
 	Down  = opposite(Up);
 	Style = s;
 }
-void QuoteStackCls::Pop() {
+void QuoteStackCls::Pop() noexcept {
 	if (Depth <= 0)
 		return;
 	Depth--;

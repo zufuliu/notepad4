@@ -18,7 +18,7 @@ public:
 	bool on;
 	int period;
 
-	Caret();
+	Caret() noexcept;
 };
 
 class EditModel {
@@ -62,10 +62,10 @@ public:
 	EditModel &operator=(const EditModel &) = delete;
 	EditModel &operator=(EditModel &&) = delete;
 	virtual ~EditModel();
-	virtual Sci::Line TopLineOfMain() const = 0;
-	virtual Point GetVisibleOriginInMain() const = 0;
-	virtual Sci::Line LinesOnScreen() const = 0;
-	virtual Range GetHotSpotRange() const = 0;
+	virtual Sci::Line TopLineOfMain() const noexcept = 0;
+	virtual Point GetVisibleOriginInMain() const noexcept = 0;
+	virtual Sci::Line LinesOnScreen() const noexcept = 0;
+	virtual Range GetHotSpotRange() const noexcept = 0;
 	bool BidirectionalEnabled() const noexcept;
 	bool BidirectionalR2L() const noexcept;
 };

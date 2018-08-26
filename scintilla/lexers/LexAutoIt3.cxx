@@ -24,7 +24,7 @@
 
 using namespace Scintilla;
 
-static inline bool IsAu3TypeCharacter(int ch) noexcept {
+static constexpr bool IsAu3TypeCharacter(int ch) noexcept {
 	return ch == '$';
 }
 static inline bool IsAu3WordChar(int ch) noexcept {
@@ -53,7 +53,7 @@ static inline bool IsAu3Operator(int ch) noexcept {
 // also check if the second portion is valid... (up,down.on.off,toggle or a number)
 ///////////////////////////////////////////////////////////////////////////////
 
-static int GetSendKey(const char *szLine, char *szKey) {
+static int GetSendKey(const char *szLine, char *szKey) noexcept {
 	int nFlag = 0;
 	int nStartFound = 0;
 	int nKeyPos = 0;
@@ -84,7 +84,7 @@ static int GetSendKey(const char *szLine, char *szKey) {
 				// Save second portion into var...
 				szSpecial[nSpecPos++] = cTemp;
 				// check if Second portion is all numbers for repeat fuction
-				if (!isdigit(cTemp)) {
+				if (!isdigit(static_cast<unsigned char>(cTemp))) {
 					nSpecNum = 0;
 				}
 			}
@@ -111,15 +111,15 @@ static int GetSendKey(const char *szLine, char *szKey) {
 //
 // Routine to check the last "none comment" character on a line to see if its a continuation
 //
-static bool IsContinuationLine(Sci_PositionU szLine, Accessor &styler) {
-	Sci_Position nsPos = styler.LineStart(szLine);
+static bool IsContinuationLine(Sci_PositionU szLine, Accessor &styler) noexcept {
+	const Sci_Position nsPos = styler.LineStart(szLine);
 	Sci_Position nePos = styler.LineStart(szLine + 1) - 2;
 	//int stylech = styler.StyleAt(nsPos);
 	while (nsPos < nePos) {
 		//stylech = styler.StyleAt(nePos);
-		int stylech = styler.StyleAt(nsPos);
+		const int stylech = styler.StyleAt(nsPos);
 		if (!(stylech == SCE_AU3_COMMENT)) {
-			char ch = styler.SafeGetCharAt(nePos);
+			const char ch = styler.SafeGetCharAt(nePos);
 			if (!isspacechar(ch)) {
 				return ch == '_';
 			}
@@ -153,7 +153,7 @@ static void ColouriseAU3Doc(Sci_PositionU startPos, Sci_Position length, int ini
 	const WordList &keywords8 = *keywordLists[7];
 	// find the first previous line without continuation character at the end
 	Sci_Position lineCurrent = styler.GetLine(startPos);
-	Sci_Position s_startPos = startPos;
+	const Sci_Position s_startPos = startPos;
 	// When not inside a Block comment: find First line without _
 	if (!(initStyle == SCE_AU3_COMMENTBLOCK)) {
 		while ((lineCurrent > 0 && IsContinuationLine(lineCurrent, styler)) ||
@@ -554,16 +554,16 @@ static void ColouriseAU3Doc(Sci_PositionU startPos, Sci_Position length, int ini
 }
 
 //
-static inline  bool IsStreamCommentStyle(int style) noexcept {
+static constexpr bool IsStreamCommentStyle(int style) noexcept {
 	return style == SCE_AU3_COMMENT || style == SCE_AU3_COMMENTBLOCK;
 }
 
 //
 // Routine to find first none space on the current line and return its Style
 // needed for comment lines not starting on pos 1
-static int GetStyleFirstWord(Sci_PositionU szLine, Accessor &styler) {
+static int GetStyleFirstWord(Sci_PositionU szLine, Accessor &styler) noexcept {
 	Sci_Position nsPos = styler.LineStart(szLine);
-	Sci_Position nePos = styler.LineStart(szLine + 1) - 1;
+	const Sci_Position nePos = styler.LineStart(szLine + 1) - 1;
 	while (isspacechar(styler.SafeGetCharAt(nsPos)) && nsPos < nePos) {
 		nsPos++; // skip to next char
 
@@ -578,7 +578,7 @@ static void FoldAU3Doc(Sci_PositionU startPos, Sci_Position length, int, LexerWo
 	if (styler.GetPropertyInt("fold") == 0) {
 		return;
 	}
-	Sci_Position endPos = startPos + length;
+	const Sci_Position endPos = startPos + length;
 	// get settings from the config files for folding comments and preprocessor lines
 	const bool foldComment = styler.GetPropertyInt("fold.comment") != 0;
 	const bool foldInComment = styler.GetPropertyInt("fold.comment") == 2;
@@ -624,13 +624,13 @@ static void FoldAU3Doc(Sci_PositionU startPos, Sci_Position length, int, LexerWo
 	char chPrev = ' ';
 	//
 	for (Sci_Position i = startPos; i < endPos; i++) {
-		char ch = chNext;
+		const char ch = chNext;
 		chNext = styler.SafeGetCharAt(i + 1);
 		if (IsAu3WordChar(ch)) {
 			visibleChars++;
 		}
 		// get the syle for the current character neede to check in comment
-		int stylech = styler.StyleAt(i);
+		const int stylech = styler.StyleAt(i);
 		// get first word for the line for indent check max 9 characters
 		if (FirstWordStart && (!(FirstWordEnd))) {
 			if (!IsAu3WordChar(ch)) {
@@ -724,7 +724,7 @@ static void FoldAU3Doc(Sci_PositionU startPos, Sci_Position length, int, LexerWo
 				}
 			}
 			// Preprocessor and Comment folding
-			int styleNext = GetStyleFirstWord(lineCurrent + 1, styler);
+			const int styleNext = GetStyleFirstWord(lineCurrent + 1, styler);
 			// *************************************
 			// Folding logic for preprocessor blocks
 			// *************************************
@@ -758,7 +758,7 @@ static void FoldAU3Doc(Sci_PositionU startPos, Sci_Position length, int, LexerWo
 					levelCurrent--;
 				}
 			}
-			int levelUse = levelCurrent;
+			const int levelUse = levelCurrent;
 			int lev = levelUse | levelNext << 16;
 			if (visibleChars == 0 && foldCompact) {
 				lev |= SC_FOLDLEVELWHITEFLAG;

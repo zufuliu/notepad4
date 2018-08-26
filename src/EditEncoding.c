@@ -91,7 +91,7 @@ NP2ENCODING mEncoding[] = {
 	//{ NCP_8BIT | NCP_RECODE, 437, "ibm437,ibm437,437,cp437,cspc8,codepage437,", 0, L"" },// OEM United States
 	//{ NCP_8BIT | NCP_RECODE, 858, "ibm858,ibm858,ibm00858,", 0, L"" },// OEM Multilingual Latin 1 + Euro symbol
 	//{ NCP_8BIT | NCP_RECODE, 860, "ibm860,ibm860,", 0, L"" },// OEM Portuguese; Portuguese (DOS)
-	{ NCP_8BIT | NCP_RECODE, 28606, "ISO-8859-16,ISO885916,Windows-28606,Windows28606", 61054, L"" },// Latin-10 (ISO 8859-16)
+	{ NCP_8BIT | NCP_RECODE, 28606, "ISO-8859-16,ISO885916,Windows-28606,Windows28606", 61054, L"" },// Latin 10 (ISO 8859-16)
 	//{ NCP_8BIT | NCP_RECODE, 10010, "x-mac-romanian,xmacromanian,", 0, L"" },// Romanian (Mac)
 	//{ NCP_8BIT | NCP_RECODE, 10021, "x-mac-thai,xmacthai,", 61056, L"" },// Thai (Mac)
 	{ NCP_8BIT | NCP_RECODE, 874, "Windows-874,Windows874,dos874,iso885911,tis-620,tis620,isoir166", 61057, L"" },// ANSI/OEM Thai (ISO 8859-11); Thai (Windows)
@@ -226,7 +226,7 @@ BOOL EditSetNewEncoding(HWND hwnd, int iCurrentEncoding, int iNewEncoding, BOOL 
 // Encoding Helper Functions
 //
 void Encoding_InitDefaults(void) {
-	wsprintf(wchANSI, L" (%i)", GetACP());
+	wsprintf(wchANSI, L" (%u)", GetACP());
 	mEncoding[CPI_OEM].uCodePage = GetOEMCP();
 	wsprintf(wchOEM, L" (%u)", mEncoding[CPI_OEM].uCodePage);
 

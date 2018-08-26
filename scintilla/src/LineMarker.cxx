@@ -28,7 +28,7 @@ using namespace Scintilla;
 
 LineMarker::~LineMarker() = default;
 
-LineMarker::LineMarker() {
+LineMarker::LineMarker() noexcept {
 	markType = SC_MARK_CIRCLE;
 	fore = ColourDesired(0, 0, 0);
 	back = ColourDesired(0xff, 0xff, 0xff);
@@ -37,7 +37,7 @@ LineMarker::LineMarker() {
 	customDraw = nullptr;
 }
 
-LineMarker::LineMarker(const LineMarker &) {
+LineMarker::LineMarker(const LineMarker &) noexcept {
 	// Defined to avoid pxpm and image being blindly copied, not as a complete copy constructor.
 	markType = SC_MARK_CIRCLE;
 	fore = ColourDesired(0, 0, 0);
@@ -49,7 +49,7 @@ LineMarker::LineMarker(const LineMarker &) {
 	customDraw = nullptr;
 }
 
-LineMarker &LineMarker::operator=(const LineMarker &other) {
+LineMarker &LineMarker::operator=(const LineMarker &other) noexcept {
 	// Defined to avoid pxpm and image being blindly copied, not as a complete assignment operator.
 	if (this != &other) {
 		markType = SC_MARK_CIRCLE;

@@ -23,9 +23,9 @@ typedef bool (*PFNIsCommentLeader)(Accessor &styler, Sci_Position pos, Sci_Posit
 class Accessor : public LexAccessor {
 public:
 	PropSetSimple *pprops;
-	Accessor(IDocument *pAccess_, PropSetSimple *pprops_);
+	Accessor(IDocument *pAccess_, PropSetSimple *pprops_) noexcept;
 	int GetPropertyInt(const char *, int defaultValue = 0) const;
-	static int LexIndentAmount(Accessor &styler, Sci_Position line, int *flags, PFNIsCommentLeader pfnIsCommentLeader = nullptr);
+	static int LexIndentAmount(Accessor &styler, Sci_Position line, int *flags, PFNIsCommentLeader pfnIsCommentLeader = nullptr) noexcept;
 };
 
 }

@@ -12,10 +12,10 @@
 
 class ILoader {
 public:
-	virtual int SCI_METHOD Release() = 0;
+	virtual int SCI_METHOD Release() noexcept = 0;
 	// Returns a status code from SC_STATUS_*
 	virtual int SCI_METHOD AddData(const char *data, Sci_Position length) = 0;
-	virtual void * SCI_METHOD ConvertToDocument() = 0;
+	virtual void * SCI_METHOD ConvertToDocument() noexcept = 0;
 };
 
 #endif

@@ -10,13 +10,13 @@
 
 namespace Scintilla {
 
-extern void Platform_Initialise(void *hInstance);
-extern void Platform_Finalise(bool fromDllMain);
+extern void Platform_Initialise(void *hInstance) noexcept;
+extern void Platform_Finalise(bool fromDllMain) noexcept;
 
 RECT RectFromPRectangle(const PRectangle &prc) noexcept;
 
 #if defined(USE_D2D)
-extern bool LoadD2D();
+extern bool LoadD2D() noexcept;
 extern ID2D1Factory *pD2DFactory;
 extern IDWriteFactory *pIDWriteFactory;
 #endif

@@ -57,7 +57,7 @@ bool AutoComplete::Active() const noexcept {
 
 void AutoComplete::Start(const Window &parent, int ctrlID,
 	Sci::Position position, const Point &location, Sci::Position startLen_,
-	int lineHeight, bool unicodeMode, int technology) {
+	int lineHeight, bool unicodeMode, int technology) noexcept {
 	if (active) {
 		Cancel();
 	}
@@ -84,7 +84,7 @@ bool AutoComplete::IsFillUpChar(char ch) const noexcept {
 	return ch && (fillUpChars.find(ch) != std::string::npos);
 }
 
-void AutoComplete::SetSeparator(char separator_) {
+void AutoComplete::SetSeparator(char separator_) noexcept {
 	separator = separator_;
 }
 
@@ -92,7 +92,7 @@ char AutoComplete::GetSeparator() const noexcept {
 	return separator;
 }
 
-void AutoComplete::SetTypesep(char separator_) {
+void AutoComplete::SetTypesep(char separator_) noexcept {
 	typesep = separator_;
 }
 
@@ -196,7 +196,7 @@ void AutoComplete::SetList(const char *list) {
 	lb->SetList(sortedList.c_str(), separator, typesep);
 }
 
-int AutoComplete::GetSelection() const {
+int AutoComplete::GetSelection() const noexcept {
 	return lb->GetSelection();
 }
 
@@ -212,7 +212,7 @@ void AutoComplete::Show(bool show) {
 		lb->Select(0);
 }
 
-void AutoComplete::Cancel() {
+void AutoComplete::Cancel() noexcept {
 	if (lb->Created()) {
 		lb->Clear();
 		lb->Destroy();

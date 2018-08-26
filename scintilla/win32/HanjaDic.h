@@ -13,7 +13,7 @@ namespace Scintilla {
 
 namespace HanjaDict {
 
-int GetHangulOfHanja(wchar_t *inout);
+int GetHangulOfHanja(wchar_t *inout) noexcept;
 
 }
 
