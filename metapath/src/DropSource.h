@@ -24,6 +24,11 @@
 class CDropSource : public IDropSource {
 public:
 	CDropSource() noexcept;
+	// Defaulted so CDropSource objects can be copied.
+	CDropSource(const CDropSource &) = default;
+	CDropSource(CDropSource &&) = default;
+	CDropSource &operator=(const CDropSource &) = default;
+	CDropSource &operator=(CDropSource &&) = default;
 	virtual ~CDropSource() = default;
 
 	/* IUnknown methods */
@@ -41,4 +46,4 @@ private:
 
 #endif // METAPATH_DROPSOURCE_H_
 
-// End of Dropsource.h
+// End of DropSource.h

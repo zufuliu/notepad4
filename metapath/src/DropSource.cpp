@@ -19,7 +19,7 @@
 ******************************************************************************/
 
 #include <windows.h>
-#include "Dropsource.h"
+#include "DropSource.h"
 
 /******************************************************************************
 *
@@ -84,4 +84,4 @@ LPDROPSOURCE CreateDropSource(void) {
 
 }
 
-// End of Dropsource.cpp
+// End of DropSource.cpp
