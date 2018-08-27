@@ -587,7 +587,6 @@ void Style_SetLexer(HWND hwnd, PEDITLEXER pLexNew) {
 	//WCHAR *p;
 	int rgb;
 	int iValue;
-	int iIdx;
 	WCHAR wchCaretStyle[64] = L"";
 	char msg[10];
 
@@ -649,10 +648,7 @@ void Style_SetLexer(HWND hwnd, PEDITLEXER pLexNew) {
 	}
 
 	// Use 2nd default style
-	iIdx = (bUse2ndDefaultStyle) ? 12 : 0;
-
-	// Font quality setup
-	Style_SetFontQuality(hwnd, lexDefault.Styles[0 + iIdx].szValue);
+	const int iIdx = (bUse2ndDefaultStyle) ? 12 : 0;
 	// Check font availability
 	for (int i = 0; i < NUM_MONO_FONT; i++) {
 		if (IsFontAvailable(SysMonoFontName[i])) {
@@ -660,6 +656,8 @@ void Style_SetLexer(HWND hwnd, PEDITLEXER pLexNew) {
 			break;
 		}
 	}
+	// Font quality setup
+	Style_SetFontQuality(hwnd, lexDefault.Styles[0 + iIdx].szValue);
 
 	// Clear
 	SendMessage(hwnd, SCI_CLEARDOCUMENTSTYLE, 0, 0);
@@ -860,7 +858,7 @@ void Style_SetLexer(HWND hwnd, PEDITLEXER pLexNew) {
 	} else {
 		SendMessage(hwnd, SCI_SETEXTRAASCENT, 0, 0);
 		SendMessage(hwnd, SCI_SETEXTRADESCENT, 0, 0);
-		//wsprintf(lexDefault.Styles[11+iIdx].szValue, L"size:0");
+		//wsprintf(lexDefault.Styles[11 + iIdx].szValue, L"size:0");
 	}
 
 	// set folding style; braces are for scoping only
@@ -2654,8 +2652,6 @@ void Style_SetFontQuality(HWND hwnd, LPCWSTR lpszStyle) {
 			wQuality = SC_EFF_QUALITY_ANTIALIASED;
 		} else if (lstrcmpi(tch, L"cleartype") == 0) {
 			wQuality = SC_EFF_QUALITY_LCD_OPTIMIZED;
-		} else {
-			wQuality = SC_EFF_QUALITY_DEFAULT;
 		}
 	} else {
 		if (Style_StrGetFont(lpszStyle, tch, COUNTOF(tch))) {
@@ -2674,8 +2670,6 @@ void Style_SetFontQuality(HWND hwnd, LPCWSTR lpszStyle) {
 				lstrcmpi(tch, L"Segoe UI") == 0) {
 				wQuality = SC_EFF_QUALITY_LCD_OPTIMIZED;
 			}
-		} else {
-			wQuality = SC_EFF_QUALITY_DEFAULT;
 		}
 	}
 
@@ -2686,7 +2680,7 @@ void Style_SetFontQuality(HWND hwnd, LPCWSTR lpszStyle) {
 void Style_SaveFontQuality(void) {
 	WCHAR szNewStyle[512];
 	// Use 2nd default style
-	int iIdx = (bUse2ndDefaultStyle) ? 12 : 0;
+	const int iIdx = (bUse2ndDefaultStyle) ? 12 : 0;
 
 	LPWSTR lpszStyle = lexDefault.Styles[0 + iIdx].szValue;
 	WCHAR *p = StrStrI(lpszStyle, L"smoothing:");
