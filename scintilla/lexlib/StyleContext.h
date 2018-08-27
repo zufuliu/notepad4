@@ -47,7 +47,9 @@ public:
 		int initStyle, LexAccessor &styler_, unsigned char chMask = '\377') noexcept;
 	// Deleted so StyleContext objects can not be copied.
 	StyleContext(const StyleContext &) = delete;
+	StyleContext(StyleContext &&) = delete;
 	StyleContext &operator=(const StyleContext &) = delete;
+	StyleContext &operator=(StyleContext &&) = delete;
 	void Complete();
 	bool More() const noexcept {
 		return currentPos < endPos;

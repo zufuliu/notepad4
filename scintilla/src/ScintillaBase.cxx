@@ -72,7 +72,7 @@ ScintillaBase::ScintillaBase() noexcept {
 
 ScintillaBase::~ScintillaBase() = default;
 
-void ScintillaBase::Finalise() {
+void ScintillaBase::Finalise() noexcept {
 	Editor::Finalise();
 	popup.Destroy();
 }
@@ -523,7 +523,7 @@ void ScintillaBase::ContextMenu(const Point &pt) {
 	}
 }
 
-void ScintillaBase::CancelModes() {
+void ScintillaBase::CancelModes() noexcept {
 	AutoCompleteCancel();
 	ct.CallTipCancel();
 	Editor::CancelModes();

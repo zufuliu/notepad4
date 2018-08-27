@@ -197,7 +197,7 @@ Editor::~Editor() {
 	DropGraphics(true);
 }
 
-void Editor::Finalise() {
+void Editor::Finalise() noexcept {
 	SetIdle(false);
 	CancelModes();
 }
@@ -3030,7 +3030,7 @@ void Editor::Duplicate(bool forLine) {
 	}
 }
 
-void Editor::CancelModes() {
+void Editor::CancelModes() noexcept {
 	sel.SetMoveExtends(false);
 }
 

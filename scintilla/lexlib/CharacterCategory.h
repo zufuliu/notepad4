@@ -20,14 +20,14 @@ enum CharacterCategory {
 	ccCc, ccCf, ccCs, ccCo, ccCn
 };
 
-CharacterCategory CategoriseCharacter(int character);
+CharacterCategory CategoriseCharacter(int character) noexcept;
 
 // Common definitions of allowable characters in identifiers from UAX #31.
 // Unicode Identifier and Pattern Syntax http://unicode.org/reports/tr31/
-bool IsIdStart(int character);
-bool IsIdContinue(int character);
-bool IsXidStart(int character);
-bool IsXidContinue(int character);
+bool IsIdStart(int character) noexcept;
+bool IsIdContinue(int character) noexcept;
+bool IsXidStart(int character) noexcept;
+bool IsXidContinue(int character) noexcept;
 
 }
 

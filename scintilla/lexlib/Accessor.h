@@ -24,7 +24,7 @@ class Accessor : public LexAccessor {
 public:
 	PropSetSimple *pprops;
 	Accessor(IDocument *pAccess_, PropSetSimple *pprops_) noexcept;
-	int GetPropertyInt(const char *, int defaultValue = 0) const;
+	int GetPropertyInt(const char *key, int defaultValue = 0) const;
 	static int LexIndentAmount(Accessor &styler, Sci_Position line, int *flags, PFNIsCommentLeader pfnIsCommentLeader = nullptr) noexcept;
 };
 

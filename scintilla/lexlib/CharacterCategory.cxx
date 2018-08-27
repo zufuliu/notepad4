@@ -3809,7 +3809,7 @@ constexpr int maskCategory = 0x1F;
 // possibly for 0..0xff for most Western European text or 0..0xfff for most
 // alphabetic languages.
 
-CharacterCategory CategoriseCharacter(int character) {
+CharacterCategory CategoriseCharacter(int character) noexcept {
 	if (character < 0 || character > maxUnicode)
 		return ccCn;
 	const int baseValue = character * (maskCategory + 1) + maskCategory;
@@ -3851,7 +3851,7 @@ OtherID OtherIDOfCharacter(int character) noexcept {
 // Pattern_Syntax|Pattern_White_Space.
 // As of Unicode 9, only VERTICAL TILDE which is in Lm and has Pattern_Syntax matches.
 // Should really generate from PropList.txt a list of Pattern_Syntax and Pattern_White_Space.
-constexpr bool IsIdPattern(int character) {
+constexpr bool IsIdPattern(int character) noexcept {
 	return character == 0x2E2F;
 }
 
@@ -3917,7 +3917,7 @@ bool OmitXidContinue(int character) noexcept {
 
 // UAX #31 defines ID_Start as
 // [[:L:][:Nl:][:Other_ID_Start:]--[:Pattern_Syntax:]--[:Pattern_White_Space:]]
-bool IsIdStart(int character) {
+bool IsIdStart(int character) noexcept {
 	if (IsIdPattern(character)) {
 		return false;
 	}
@@ -3932,7 +3932,7 @@ bool IsIdStart(int character) {
 
 // UAX #31 defines ID_Continue as
 // [[:ID_Start:][:Mn:][:Mc:][:Nd:][:Pc:][:Other_ID_Continue:]--[:Pattern_Syntax:]--[:Pattern_White_Space:]]
-bool IsIdContinue(int character) {
+bool IsIdContinue(int character) noexcept {
 	if (IsIdPattern(character)) {
 		return false;
 	}
@@ -3946,7 +3946,7 @@ bool IsIdContinue(int character) {
 }
 
 // XID_Start is ID_Start modified for Normalization Form KC in UAX #31
-bool IsXidStart(int character) {
+bool IsXidStart(int character) noexcept {
 	if (OmitXidStart(character)) {
 		return false;
 	} else {
@@ -3955,7 +3955,7 @@ bool IsXidStart(int character) {
 }
 
 // XID_Continue is ID_Continue modified for Normalization Form KC in UAX #31
-bool IsXidContinue(int character) {
+bool IsXidContinue(int character) noexcept {
 	if (OmitXidContinue(character)) {
 		return false;
 	} else {

@@ -1631,11 +1631,6 @@ class BlobInline : public IDWriteInlineObject {
 		DWRITE_BREAK_CONDITION *breakConditionAfter) noexcept override;
 public:
 	BlobInline(XYPOSITION width_ = 0.0f) noexcept : width(width_) {}
-	// Defaulted so BlobInline objects can be copied.
-	BlobInline(const BlobInline &) = default;
-	BlobInline(BlobInline &&) = default;
-	BlobInline &operator=(const BlobInline &) = default;
-	BlobInline &operator=(BlobInline &&) = default;
 	virtual ~BlobInline() = default;
 };
 
