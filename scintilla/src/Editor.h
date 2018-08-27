@@ -266,8 +266,8 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 
 	Editor();
 	~Editor() override;
-	virtual void Initialise() = 0;
-	virtual void Finalise();
+	virtual void Initialise() noexcept = 0;
+	virtual void Finalise() noexcept;
 
 	void InvalidateStyleData();
 	void InvalidateStyleRedraw();
@@ -471,7 +471,7 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	void LineTranspose();
 	void LineReverse();
 	void Duplicate(bool forLine);
-	virtual void CancelModes();
+	virtual void CancelModes() noexcept;
 	void NewLine();
 	SelectionPosition PositionUpOrDown(const SelectionPosition &spStart, int direction, int lastX);
 	void CursorUpOrDown(int direction, Selection::selTypes selt);

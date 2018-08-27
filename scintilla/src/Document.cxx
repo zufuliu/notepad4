@@ -1593,7 +1593,7 @@ bool Document::IsASCIIWordByte(unsigned char ch) const noexcept {
 	}
 }
 
-CharClassify::cc Document::WordCharacterClass(unsigned int ch) const {
+CharClassify::cc Document::WordCharacterClass(unsigned int ch) const noexcept {
 	if (dbcsCodePage && (!UTF8IsAscii(ch))) {
 		if (SC_CP_UTF8 == dbcsCodePage) {
 			// Use hard coded Unicode class

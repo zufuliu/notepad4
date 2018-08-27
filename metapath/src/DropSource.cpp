@@ -37,11 +37,11 @@ STDMETHODIMP CDropSource::QueryInterface(REFIID iid, PVOID *ppv) noexcept {
 }
 
 STDMETHODIMP_(ULONG) CDropSource::AddRef() noexcept {
-	return InterlockedIncrement(&m_refs);
+	return ++m_refs;
 }
 
 STDMETHODIMP_(ULONG) CDropSource::Release() noexcept {
-	const ULONG refs = InterlockedDecrement(&m_refs);
+	const ULONG refs = --m_refs;
 	if (refs == 0) {
 		delete this;
 	}

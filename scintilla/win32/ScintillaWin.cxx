@@ -190,11 +190,6 @@ class FormatEnumerator : public IEnumFORMATETC {
 
 public:
 	FormatEnumerator(int pos_, const CLIPFORMAT formats_[], size_t formatsLen_);
-	// Defaulted so FormatEnumerator objects can be copied.
-	FormatEnumerator(const FormatEnumerator &) = default;
-	FormatEnumerator(FormatEnumerator &&) = default;
-	FormatEnumerator &operator=(const FormatEnumerator &) = default;
-	FormatEnumerator &operator=(FormatEnumerator &&) = default;
 	virtual ~FormatEnumerator() = default;
 
 	// IUnknown
@@ -215,11 +210,6 @@ class DropSource : public IDropSource {
 public:
 	ScintillaWin *sci;
 	DropSource() noexcept;
-	// Defaulted so DropSource objects can be copied.
-	DropSource(const DropSource &) = default;
-	DropSource(DropSource &&) = default;
-	DropSource &operator=(const DropSource &) = default;
-	DropSource &operator=(DropSource &&) = default;
 	virtual ~DropSource() = default;
 
 	// IUnknown
@@ -238,11 +228,6 @@ class DataObject : public IDataObject {
 public:
 	ScintillaWin *sci;
 	DataObject() noexcept;
-	// Defaulted so DataObject objects can be copied.
-	DataObject(const DataObject &) = default;
-	DataObject(DataObject &&) = default;
-	DataObject &operator=(const DataObject &) = default;
-	DataObject &operator=(DataObject &&) = default;
 	virtual ~DataObject() = default;
 
 	// IUnknown
@@ -268,11 +253,6 @@ class DropTarget : public IDropTarget {
 public:
 	ScintillaWin *sci;
 	DropTarget() noexcept;
-	// Defaulted so DropTarget objects can be copied.
-	DropTarget(const DropTarget &) = default;
-	DropTarget(DropTarget &&) = default;
-	DropTarget &operator=(const DropTarget &) = default;
-	DropTarget &operator=(DropTarget &&) = default;
 	virtual ~DropTarget() = default;
 
 	// IUnknown
@@ -379,10 +359,10 @@ class ScintillaWin :
 	~ScintillaWin() override;
 
 	void Init();
-	void Finalise() override;
+	void Finalise() noexcept override;
 #if defined(USE_D2D)
 	void EnsureRenderTarget(HDC hdc);
-	void DropRenderTarget();
+	void DropRenderTarget() noexcept;
 #endif
 	HWND MainHWND() const noexcept;
 #if DebugDragAndDropDataFormat
@@ -614,7 +594,7 @@ void ScintillaWin::Init() {
 	vs.indicators[SC_INDICATOR_TARGET] = Indicator(INDIC_STRAIGHTBOX, ColourDesired(0, 0, 0xff));
 }
 
-void ScintillaWin::Finalise() {
+void ScintillaWin::Finalise() noexcept {
 	ScintillaBase::Finalise();
 	for (int tr = tickCaret; tr <= tickDwell; tr = tr + 1) {
 		FineTickerCancel(static_cast<TickReason>(tr));
@@ -709,7 +689,7 @@ void ScintillaWin::EnsureRenderTarget(HDC hdc) {
 	}
 }
 
-void ScintillaWin::DropRenderTarget() {
+void ScintillaWin::DropRenderTarget() noexcept {
 	if (pRenderTarget) {
 		pRenderTarget->Release();
 		pRenderTarget = nullptr;
@@ -2477,10 +2457,10 @@ STDMETHODIMP FormatEnumerator::QueryInterface(REFIID riid, PVOID *ppv) noexcept 
 	return S_OK;
 }
 STDMETHODIMP_(ULONG)FormatEnumerator::AddRef() noexcept {
-	return InterlockedIncrement(&ref);
+	return ++ref;
 }
 STDMETHODIMP_(ULONG)FormatEnumerator::Release() noexcept {
-	const ULONG refs = InterlockedDecrement(&ref);
+	const ULONG refs = --ref;
 	if (refs == 0) {
 		delete this;
 	}

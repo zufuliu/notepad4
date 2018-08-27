@@ -53,11 +53,11 @@ protected:
 	ScintillaBase() noexcept;
 	~ScintillaBase() override;
 	void Initialise() noexcept override {}
-	void Finalise() override;
+	void Finalise() noexcept override;
 
 	void AddCharUTF(const char *s, unsigned int len, bool treatAsDBCS = false) override;
 	void Command(int cmdId);
-	void CancelModes() override;
+	void CancelModes() noexcept override;
 	int KeyCommand(unsigned int iMessage) override;
 
 	void AutoCompleteInsert(Sci::Position startPos, Sci::Position removeLen, const char *text, Sci::Position textLen);

@@ -26,7 +26,7 @@ public:
 	CharacterSet(setBase base = setNone, const char *initialSet = "", int size_ = 0x80, bool valueAfter_ = false);
 	CharacterSet(const CharacterSet &other) = delete;
 	CharacterSet(CharacterSet &&other) = delete;
-	CharacterSet& operator=(const CharacterSet &other) = delete;
+	CharacterSet &operator=(const CharacterSet &other) = delete;
 	CharacterSet &operator=(CharacterSet &&other) = delete;
 	~CharacterSet() {
 		delete[]bset;
