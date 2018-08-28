@@ -54,6 +54,7 @@ extern BOOL bAutoStripBlanks;
 
 extern int iRenderingTechnology;
 extern int iBidirectional;
+extern BOOL bUseInlineIME;
 // Default Codepage and Character Set
 extern int iDefaultCodePage;
 //extern int iDefaultCharSet;
@@ -85,9 +86,11 @@ HWND EditCreate(HWND hwndParent) {
 						  g_hInstance,
 						  NULL);
 
+	InitScintillaHandle(hwnd);
 	SendMessage(hwnd, SCI_SETBUFFEREDDRAW, (iRenderingTechnology == SC_TECHNOLOGY_DEFAULT), 0);
 	SendMessage(hwnd, SCI_SETTECHNOLOGY, iRenderingTechnology, 0);
 	SendMessage(hwnd, SCI_SETBIDIRECTIONAL, iBidirectional, 0);
+	SendMessage(hwnd, SCI_SETIMEINTERACTION, bUseInlineIME, 0);
 	SendMessage(hwnd, SCI_SETCODEPAGE, iDefaultCodePage, 0);
 	SendMessage(hwnd, SCI_SETEOLMODE, SC_EOL_CRLF, 0);
 	SendMessage(hwnd, SCI_SETPASTECONVERTENDINGS, 1, 0);
