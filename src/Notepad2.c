@@ -182,6 +182,7 @@ BOOL	bAlwaysOnTop;
 BOOL	bMinimizeToTray;
 BOOL	bTransparentMode;
 int		iRenderingTechnology;
+BOOL	bUseInlineIME;
 int		iBidirectional;
 BOOL	bShowToolbar;
 BOOL	bShowStatusbar;
@@ -1492,10 +1493,10 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	// Setup edit control
 	hwndEdit = EditCreate(hwnd);
-	InitScintillaHandle(hwndEdit);
 
 	iRenderingTechnology = (int)SendMessage(hwndEdit, SCI_GETTECHNOLOGY, 0, 0);
 	iBidirectional = (int)SendMessage(hwndEdit, SCI_GETBIDIRECTIONAL, 0, 0);
+	bUseInlineIME = (BOOL)SendMessage(hwndEdit, SCI_GETIMEINTERACTION, 0, 0);
 
 	SendMessage(hwndEdit, SCI_SETZOOM, iZoomLevel, 0);
 	// Tabs
@@ -2277,6 +2278,7 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	EnableCmd(hmenu, IDM_SET_BIDIRECTIONAL_R2L, i);
 	i = IDM_SET_BIDIRECTIONAL_NONE + iBidirectional;
 	CheckMenuRadioItem(hmenu, IDM_SET_BIDIRECTIONAL_NONE, IDM_SET_BIDIRECTIONAL_R2L, i, MF_BYCOMMAND);
+	CheckCmd(hmenu, IDM_SET_USE_INLINE_IME, bUseInlineIME);
 
 	CheckCmd(hmenu, IDM_VIEW_NOSAVEFINDREPL, bSaveFindReplace);
 	CheckCmd(hmenu, IDM_VIEW_SAVEBEFORERUNNINGTOOLS, bSaveBeforeRunningTools);
@@ -2305,6 +2307,7 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	i = StrNotEmpty(szIniFile);
 	CheckCmd(hmenu, IDM_VIEW_SAVESETTINGS, bSaveSettings && i);
+	EnableCmd(hmenu, CMD_OPENINIFILE, i);
 
 	EnableCmd(hmenu, IDM_VIEW_REUSEWINDOW, i);
 	EnableCmd(hmenu, IDM_VIEW_STICKYWINPOS, i);
@@ -4065,6 +4068,12 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		SendMessage(hwndEdit, SCI_SETBIDIRECTIONAL, LOWORD(wParam) - IDM_SET_BIDIRECTIONAL_NONE, 0);
 		iBidirectional = (int)SendMessage(hwndEdit, SCI_GETBIDIRECTIONAL, 0, 0);
 		break;
+		
+	case IDM_SET_USE_INLINE_IME:
+		bUseInlineIME = bUseInlineIME? SC_IME_WINDOWED : SC_IME_INLINE;
+		SendMessage(hwndEdit, SCI_SETIMEINTERACTION, bUseInlineIME, 0);
+		bUseInlineIME = (BOOL)SendMessage(hwndEdit, SCI_GETIMEINTERACTION, 0, 0);
+		break;
 
 	case IDM_VIEW_FONTQUALITY_DEFAULT:
 	case IDM_VIEW_FONTQUALITY_NONE:
@@ -5294,6 +5303,7 @@ void LoadSettings(void) {
 	iRenderingTechnology = clamp_i(iRenderingTechnology, SC_TECHNOLOGY_DEFAULT, SC_TECHNOLOGY_DIRECTWRITEDC);
 	iBidirectional = IniSectionGetInt(pIniSection, L"Bidirectional", SC_BIDIRECTIONAL_DISABLED);
 	iBidirectional = clamp_i(iBidirectional, SC_BIDIRECTIONAL_DISABLED, SC_BIDIRECTIONAL_R2L);
+	bUseInlineIME = IniSectionGetInt(pIniSection, L"UseInlineIME", SC_IME_WINDOWED);
 
 	IniSectionGetString(pIniSection, L"ToolbarButtons", L"", tchToolbarButtons, COUNTOF(tchToolbarButtons));
 
@@ -5526,6 +5536,7 @@ void SaveSettings(BOOL bSaveSettingsNow) {
 	IniSectionSetBool(pIniSection, L"TransparentMode", bTransparentMode);
 	IniSectionSetInt(pIniSection, L"RenderingTechnology", iRenderingTechnology);
 	IniSectionSetInt(pIniSection, L"Bidirectional", iBidirectional);
+	IniSectionSetBool(pIniSection, L"UseInlineIME", bUseInlineIME);
 	Toolbar_GetButtons(hwndToolbar, IDT_FILE_NEW, tchToolbarButtons, COUNTOF(tchToolbarButtons));
 	IniSectionSetString(pIniSection, L"ToolbarButtons", tchToolbarButtons);
 	IniSectionSetBool(pIniSection, L"ShowToolbar", bShowToolbar);
