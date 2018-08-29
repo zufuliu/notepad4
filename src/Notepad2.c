@@ -426,7 +426,8 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 	g_uWinVer = MAKEWORD(HIBYTE(g_uWinVer), LOBYTE(g_uWinVer));
 
 	g_hDefaultHeap = GetProcessHeap();
-#ifdef NDEBUG
+	// https://docs.microsoft.com/en-us/windows/desktop/Memory/low-fragmentation-heap
+#if 0 // default enabled since Vista
 	if (IsWinXPAndAbove()) {
 		// Enable the low-fragmenation heap (LFH).
 		ULONG HeapInformation = 2;//HEAP_LFH;
