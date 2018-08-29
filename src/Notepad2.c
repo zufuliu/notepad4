@@ -1496,7 +1496,6 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	iRenderingTechnology = (int)SendMessage(hwndEdit, SCI_GETTECHNOLOGY, 0, 0);
 	iBidirectional = (int)SendMessage(hwndEdit, SCI_GETBIDIRECTIONAL, 0, 0);
-	bUseInlineIME = (BOOL)SendMessage(hwndEdit, SCI_GETIMEINTERACTION, 0, 0);
 
 	SendMessage(hwndEdit, SCI_SETZOOM, iZoomLevel, 0);
 	// Tabs
@@ -1993,6 +1992,18 @@ void UpdateStatusBarWidth(void) {
 	aWidth[5] = -1;
 
 	SendMessage(hwndStatus, SB_SETPARTS, COUNTOF(aWidth), (LPARAM)aWidth);
+}
+
+BOOL IsInlineIMEActive(void) {
+	BOOL result = FALSE;
+	if (bUseInlineIME) {
+		HIMC himc = ImmGetContext(hwndEdit);
+		if (himc) {
+			result = ImmGetOpenStatus(himc);
+			ImmReleaseContext(hwndEdit, himc);
+		}
+	}
+	return result;
 }
 
 //=============================================================================
@@ -4068,11 +4079,10 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		SendMessage(hwndEdit, SCI_SETBIDIRECTIONAL, LOWORD(wParam) - IDM_SET_BIDIRECTIONAL_NONE, 0);
 		iBidirectional = (int)SendMessage(hwndEdit, SCI_GETBIDIRECTIONAL, 0, 0);
 		break;
-		
+
 	case IDM_SET_USE_INLINE_IME:
 		bUseInlineIME = bUseInlineIME? SC_IME_WINDOWED : SC_IME_INLINE;
 		SendMessage(hwndEdit, SCI_SETIMEINTERACTION, bUseInlineIME, 0);
-		bUseInlineIME = (BOOL)SendMessage(hwndEdit, SCI_GETIMEINTERACTION, 0, 0);
 		break;
 
 	case IDM_VIEW_FONTQUALITY_DEFAULT:
@@ -4957,10 +4967,16 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			}
 			// Auto close braces/quotes
 			else if (bAutoCloseBracesQuotes && (scn->ch < 0x80) && StrChrA("([{<\"\'`,", (char)(scn->ch))) {
+				if (scn->ch == '\'' && IsInlineIMEActive()) { // Chinese Pinyin separator
+					return 0;
+				}
 				EditAutoCloseBraceQuote(hwndEdit, scn->ch);
 			} else if (bAutoCompleteWords/* && !SendMessage(hwndEdit, SCI_AUTOCACTIVE, 0, 0)*/) {
 				// many items int auto-complete list (> iAutoCDefaultShowItemCount), recreate it
 				if (!SendMessage(hwndEdit, SCI_AUTOCACTIVE, 0, 0) || iAutoCItemCount > iAutoCDefaultShowItemCount) {
+					if (IsInlineIMEActive()) {
+						return 0;
+					}
 					EditCompleteWord(hwndEdit, FALSE);
 				}
 			}
@@ -5303,7 +5319,7 @@ void LoadSettings(void) {
 	iRenderingTechnology = clamp_i(iRenderingTechnology, SC_TECHNOLOGY_DEFAULT, SC_TECHNOLOGY_DIRECTWRITEDC);
 	iBidirectional = IniSectionGetInt(pIniSection, L"Bidirectional", SC_BIDIRECTIONAL_DISABLED);
 	iBidirectional = clamp_i(iBidirectional, SC_BIDIRECTIONAL_DISABLED, SC_BIDIRECTIONAL_R2L);
-	bUseInlineIME = IniSectionGetInt(pIniSection, L"UseInlineIME", SC_IME_WINDOWED);
+	bUseInlineIME = IniSectionGetInt(pIniSection, L"UseInlineIME", SC_IME_INLINE);
 
 	IniSectionGetString(pIniSection, L"ToolbarButtons", L"", tchToolbarButtons, COUNTOF(tchToolbarButtons));
 
