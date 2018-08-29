@@ -1999,7 +1999,10 @@ BOOL IsInlineIMEActive(void) {
 	if (bUseInlineIME) {
 		HIMC himc = ImmGetContext(hwndEdit);
 		if (himc) {
-			result = ImmGetOpenStatus(himc);
+			DWORD dwConversion = IME_CMODE_ALPHANUMERIC, dwSentence = 0;
+			if (ImmGetConversionStatus(himc, &dwConversion, &dwSentence)) {
+				result = !(dwConversion == IME_CMODE_ALPHANUMERIC);
+			}
 			ImmReleaseContext(hwndEdit, himc);
 		}
 	}
