@@ -456,11 +456,6 @@ BEGIN
             MENUITEM "&Include Document Words",     IDM_VIEW_AUTOCWITHDOCWORDS
         END
         MENUITEM SEPARATOR
-        MENUITEM "&Reuse Window",               IDM_VIEW_REUSEWINDOW
-        MENUITEM "Sticky Window &Position",     IDM_VIEW_STICKYWINPOS
-        MENUITEM "&Always On Top\tAlt+Shift+T", IDM_VIEW_ALWAYSONTOP
-        MENUITEM "Minimi&ze to Tray",           IDM_VIEW_MINTOTRAY
-        MENUITEM "Transparent &Mode\tCtrl+0",   IDM_VIEW_TRANSPARENT
         POPUP "Rendering Technology"
         BEGIN
             MENUITEM "Default GDI",     IDM_SET_RENDER_TECH_DEFAULT
@@ -478,6 +473,14 @@ BEGIN
         MENUITEM SEPARATOR
         MENUITEM "Single &File Instance",       IDM_VIEW_SINGLEFILEINSTANCE
         MENUITEM "File &Change Notification...\tAlt+F5", IDM_VIEW_CHANGENOTIFY
+        POPUP "Window Options"
+        BEGIN
+            MENUITEM "&Always On Top\tAlt+Shift+T", IDM_VIEW_ALWAYSONTOP
+            MENUITEM "Transparent &Mode\tCtrl+0",   IDM_VIEW_TRANSPARENT
+            MENUITEM "Minimi&ze to Tray",           IDM_VIEW_MINTOTRAY
+            MENUITEM "&Reuse Window",               IDM_VIEW_REUSEWINDOW
+            MENUITEM "Sticky Window &Position",     IDM_VIEW_STICKYWINPOS
+        END
         POPUP "Window Title Displa&y"
         BEGIN
             MENUITEM "FileName &Only",              IDM_VIEW_SHOWFILENAMEONLY
