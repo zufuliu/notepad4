@@ -2000,9 +2000,11 @@ BOOL IsInlineIMEActive(void) {
 	if (bUseInlineIME) {
 		HIMC himc = ImmGetContext(hwndEdit);
 		if (himc) {
-			DWORD dwConversion = IME_CMODE_ALPHANUMERIC, dwSentence = 0;
-			if (ImmGetConversionStatus(himc, &dwConversion, &dwSentence)) {
-				result = !(dwConversion == IME_CMODE_ALPHANUMERIC);
+			if (ImmGetOpenStatus(himc)) {
+				DWORD dwConversion = IME_CMODE_ALPHANUMERIC, dwSentence = 0;
+				if (ImmGetConversionStatus(himc, &dwConversion, &dwSentence)) {
+					result = !(dwConversion == IME_CMODE_ALPHANUMERIC);
+				}
 			}
 			ImmReleaseContext(hwndEdit, himc);
 		}
@@ -5323,7 +5325,7 @@ void LoadSettings(void) {
 	iRenderingTechnology = clamp_i(iRenderingTechnology, SC_TECHNOLOGY_DEFAULT, SC_TECHNOLOGY_DIRECTWRITEDC);
 	iBidirectional = IniSectionGetInt(pIniSection, L"Bidirectional", SC_BIDIRECTIONAL_DISABLED);
 	iBidirectional = clamp_i(iBidirectional, SC_BIDIRECTIONAL_DISABLED, SC_BIDIRECTIONAL_R2L);
-	bUseInlineIME = IniSectionGetInt(pIniSection, L"UseInlineIME", SC_IME_INLINE);
+	bUseInlineIME = IniSectionGetInt(pIniSection, L"UseInlineIME", SC_IME_WINDOWED);
 
 	IniSectionGetString(pIniSection, L"ToolbarButtons", L"", tchToolbarButtons, COUNTOF(tchToolbarButtons));
 
