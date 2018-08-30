@@ -38,7 +38,7 @@
 									STRINGIFY(VERSION_BUILD) "." STRINGIFY(VERSION_REV)
 #define VERSION_LEGALCOPYRIGHT_SHORT L"Copyright \xA9 2004-2018"
 #define VERSION_LEGALCOPYRIGHT_LONG  L"\xA9 Florian Balmer 2004-2018"
-#define VERSION_AUTHORNAME           L"Florian Balmer"
+#define VERSION_AUTHORNAME           L"Florian Balmer et al."
 #define VERSION_COMPANYNAME          L"Florian Balmer et al."
 #define VERSION_WEBPAGE_DISPLAY      L"flo's freeware - http://www.flos-freeware.ch"
 #define VERSION_EMAIL_DISPLAY        L"florian.balmer@gmail.com"
