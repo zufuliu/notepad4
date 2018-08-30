@@ -507,7 +507,14 @@ BEGIN
     END
     POPUP "&Help"
     BEGIN
+        MENUITEM "Project Home",                IDM_HELP_PROJECT_HOME
+        MENUITEM "Latest Release",              IDM_HELP_LATEST_RELEASE
+        MENUITEM "Report Issue",                IDM_HELP_REPORT_ISSUE
+        MENUITEM "Feature Request",             IDM_HELP_FEATURE_REQUEST
+        MENUITEM SEPARATOR
+        MENUITEM "Online Wiki",                 IDM_HELP_ONLINE_WIKI
         MENUITEM "&Command Line Help",          IDM_CMDLINE_HELP
+        MENUITEM SEPARATOR
         MENUITEM "&About Notepad2\tF1",         IDM_HELP_ABOUT
     END
 END

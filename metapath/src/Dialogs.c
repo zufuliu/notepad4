@@ -468,6 +468,25 @@ void GotoDlg(HWND hwnd) {
 	ThemedDialogBox(g_hInstance, MAKEINTRESOURCE(IDD_GOTO), hwnd, GotoDlgProc);
 }
 
+void OpenHelpLink(HWND hwnd, int cmd) {
+	LPCWSTR link = NULL;
+	switch (cmd) {
+	case IDC_WEBPAGE_LINK:
+		link = L"http://www.flos-freeware.ch";
+		break;
+	case IDC_EMAIL_LINK:
+		link = L"mailto:florian.balmer@gmail.com";
+		break;
+	case IDC_NEW_PAGE_LINK:
+		link = VERSION_NEWPAGE_DISPLAY;
+		break;
+	}
+
+	if (StrNotEmpty(link)) {
+		ShellExecute(hwnd, L"open", link, NULL, NULL, SW_SHOWNORMAL);
+	}
+}
+
 //=============================================================================
 //
 //  AboutDlgProc()
@@ -528,20 +547,9 @@ INT_PTR CALLBACK AboutDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam
 		LPNMHDR pnmhdr = (LPNMHDR)lParam;
 		switch (pnmhdr->code) {
 		case NM_CLICK:
-		case NM_RETURN: {
-			switch (pnmhdr->idFrom) {
-			case IDC_WEBPAGE_LINK:
-				ShellExecute(hwnd, L"open", L"http://www.flos-freeware.ch", NULL, NULL, SW_SHOWNORMAL);
-				break;
-			case IDC_EMAIL_LINK:
-				ShellExecute(hwnd, L"open", L"mailto:florian.balmer@gmail.com", NULL, NULL, SW_SHOWNORMAL);
-				break;
-			case IDC_NEW_PAGE_LINK:
-				ShellExecute(hwnd, L"open", L"https://github.com/zufuliu/notepad2", NULL, NULL, SW_SHOWNORMAL);
-				break;
-			}
-		}
-		break;
+		case NM_RETURN:
+			OpenHelpLink(hwnd, (int)(pnmhdr->idFrom));
+			break;
 		}
 	}
 	break;

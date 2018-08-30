@@ -30,28 +30,17 @@ int  ErrorMessage(int iLevel, UINT uIdMsg, ...);
 BOOL GetDirectory(HWND hwndParent, int iTitle, LPWSTR pszFolder, LPCWSTR pszBase);
 BOOL GetDirectory2(HWND hwndParent, int iTitle, LPWSTR pszFolder, int iBase);
 
-INT_PTR CALLBACK RunDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam);
 void RunDlg(HWND hwnd);
-
-INT_PTR CALLBACK GotoDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam);
 void GotoDlg(HWND hwnd);
 
+void OpenHelpLink(HWND hwnd, int cmd);
 INT_PTR CALLBACK AboutDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam);
 INT_PTR OptionsPropSheet(HWND hwnd, HINSTANCE hInstance);
 
-INT_PTR CALLBACK GetFilterDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam);
 BOOL GetFilterDlg(HWND hwnd);
-
-INT_PTR CALLBACK RenameFileDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam);
 BOOL RenameFileDlg(HWND hwnd);
-
-INT_PTR CALLBACK CopyMoveDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam);
 BOOL CopyMoveDlg(HWND hwnd, UINT *wFunc);
-
-INT_PTR CALLBACK OpenWithDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam);
 BOOL OpenWithDlg(HWND hwnd, LPDLITEM lpdliParam);
-
-INT_PTR CALLBACK NewDirDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam);
 BOOL NewDirDlg(HWND hwnd, LPWSTR pszNewDir);
 
 INT_PTR CALLBACK FindWinDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam);
