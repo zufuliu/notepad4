@@ -4206,6 +4206,14 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		DisplayCmdLineHelp(hwnd);
 		break;
 
+	case IDM_HELP_PROJECT_HOME:
+	case IDM_HELP_LATEST_RELEASE:
+	case IDM_HELP_REPORT_ISSUE:
+	case IDM_HELP_FEATURE_REQUEST:
+	case IDM_HELP_ONLINE_WIKI:
+		OpenHelpLink(hwnd, LOWORD(wParam));
+		break;
+
 	case CMD_ESCAPE:
 		//close the AutoComplete box
 		SendMessage(hwndEdit, SCI_AUTOCCANCEL, 0, 0);
