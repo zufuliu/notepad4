@@ -381,6 +381,7 @@ BEGIN
         MENUITEM "Zoom &In\tCtrl++",            IDM_VIEW_ZOOMIN
         MENUITEM "Zoom &Out\tCtrl+-",           IDM_VIEW_ZOOMOUT
         MENUITEM "Reset &Zoom\tCtrl+\\",        IDM_VIEW_RESETZOOM
+        MENUITEM "Toggle Full Screen\tF11",     IDM_VIEW_TOGGLE_FULLSCREEN
     END
     POPUP "Sche&me"
     BEGIN
@@ -670,6 +671,7 @@ BEGIN
     VK_ESCAPE,      CMD_ESCAPE,             VIRTKEY, NOINVERT
     VK_ESCAPE,      CMD_SHIFTESC,           VIRTKEY, SHIFT, NOINVERT
     VK_F1,          IDM_HELP_ABOUT,         VIRTKEY, NOINVERT
+    VK_F11,         IDM_VIEW_TOGGLE_FULLSCREEN, VIRTKEY, NOINVERT
     VK_F12,         IDM_VIEW_SCHEME,        VIRTKEY, NOINVERT
     VK_F12,         IDM_VIEW_SCHEMECONFIG,  VIRTKEY, CONTROL, NOINVERT
     VK_F12,         IDM_VIEW_FONT,          VIRTKEY, ALT, NOINVERT
