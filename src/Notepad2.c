@@ -2287,8 +2287,8 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	EnableCmd(hmenu, IDM_SET_RENDER_TECH_D2D, i);
 	EnableCmd(hmenu, IDM_SET_RENDER_TECH_D2DRETAIN, i);
 	EnableCmd(hmenu, IDM_SET_RENDER_TECH_D2DDC, i);
-	i = IDM_SET_RENDER_TECH_DEFAULT + iRenderingTechnology;
-	CheckMenuRadioItem(hmenu, IDM_SET_RENDER_TECH_DEFAULT, IDM_SET_RENDER_TECH_D2DDC, i, MF_BYCOMMAND);
+	i = IDM_SET_RENDER_TECH_GDI + iRenderingTechnology;
+	CheckMenuRadioItem(hmenu, IDM_SET_RENDER_TECH_GDI, IDM_SET_RENDER_TECH_D2DDC, i, MF_BYCOMMAND);
 	// Bidirectional
 	i = iRenderingTechnology != SC_TECHNOLOGY_DEFAULT;
 	EnableCmd(hmenu, IDM_SET_BIDIRECTIONAL_L2R, i);
@@ -4068,11 +4068,11 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		SetWindowTransparentMode(hwnd, bTransparentMode);
 		break;
 
-	case IDM_SET_RENDER_TECH_DEFAULT:
+	case IDM_SET_RENDER_TECH_GDI:
 	case IDM_SET_RENDER_TECH_D2D:
 	case IDM_SET_RENDER_TECH_D2DRETAIN:
 	case IDM_SET_RENDER_TECH_D2DDC:
-		iRenderingTechnology = LOWORD(wParam) - IDM_SET_RENDER_TECH_DEFAULT;
+		iRenderingTechnology = LOWORD(wParam) - IDM_SET_RENDER_TECH_GDI;
 		SendMessage(hwndEdit, SCI_SETBUFFEREDDRAW, (iRenderingTechnology == SC_TECHNOLOGY_DEFAULT), 0);
 		SendMessage(hwndEdit, SCI_SETTECHNOLOGY, iRenderingTechnology, 0);
 		iRenderingTechnology = (int)SendMessage(hwndEdit, SCI_GETTECHNOLOGY, 0, 0);
