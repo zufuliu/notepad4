@@ -6615,11 +6615,11 @@ void UpdateStatusbar(void) {
 	FormatNumberStr(tchMatchesCount);
 
 	FormatString(tchDocPos, COUNTOF(tchDocPos), IDS_DOCPOS, tchLn, tchLines,
-				 tchCol, tchCols, tchCh, tchChs, tchSel, tchSelCh, tchLinesSelected, tchMatchesCount);
+				 tchCol, tchCols, tchCh, tchChs, tchSelCh, tchSel, tchLinesSelected, tchMatchesCount);
 
 #else
 
-	FormatString(tchDocPos, COUNTOF(tchDocPos), IDS_DOCPOS, tchLn, tchLines, tchCol, tchCols, tchCh, tchChs, tchSel, tchSelCh);
+	FormatString(tchDocPos, COUNTOF(tchDocPos), IDS_DOCPOS, tchLn, tchLines, tchCol, tchCols, tchCh, tchChs, tchSelCh, tchSel);
 #endif
 
 	iBytes = (int)SendMessage(hwndEdit, SCI_GETLENGTH, 0, 0);
