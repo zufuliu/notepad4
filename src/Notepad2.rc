@@ -326,9 +326,6 @@ BEGIN
     END
     POPUP "&View"
     BEGIN
-        MENUITEM "&Syntax Scheme...\tF12",      IDM_VIEW_SCHEME
-        MENUITEM "&2nd Default Scheme\tShift+F12", IDM_VIEW_USE2NDDEFAULT
-        MENUITEM "&Customize Schemes...\tCtrl+F12", IDM_VIEW_SCHEMECONFIG
         MENUITEM "&Default Font...\tAlt+F12",   IDM_VIEW_FONT
         POPUP "Font &Quality"
         BEGIN
@@ -387,7 +384,11 @@ BEGIN
     END
     POPUP "Sche&me"
     BEGIN
-        MENUITEM "Default &Text",          IDM_LANG_DEFAULT
+        MENUITEM "&Syntax Scheme...\tF12",          IDM_VIEW_SCHEME
+        MENUITEM "&2nd Default Scheme\tShift+F12",  IDM_VIEW_USE2NDDEFAULT
+        MENUITEM "&Customize Schemes...\tCtrl+F12", IDM_VIEW_SCHEMECONFIG
+        MENUITEM SEPARATOR
+        MENUITEM "Default &Text",                   IDM_LANG_DEFAULT
         POPUP "&Web Source Code"
         BEGIN
             MENUITEM "&Web Source Code",            IDM_LANG_WEB
@@ -669,9 +670,6 @@ BEGIN
     VK_ESCAPE,      CMD_ESCAPE,             VIRTKEY, NOINVERT
     VK_ESCAPE,      CMD_SHIFTESC,           VIRTKEY, SHIFT, NOINVERT
     VK_F1,          IDM_HELP_ABOUT,         VIRTKEY, NOINVERT
-    //VK_F11,         CMD_LEXDEFAULT,         VIRTKEY, NOINVERT
-    //VK_F11,         CMD_LEXXML,             VIRTKEY, CONTROL, NOINVERT
-    //VK_F11,         CMD_LEXHTML,            VIRTKEY, SHIFT, NOINVERT
     VK_F12,         IDM_VIEW_SCHEME,        VIRTKEY, NOINVERT
     VK_F12,         IDM_VIEW_SCHEMECONFIG,  VIRTKEY, CONTROL, NOINVERT
     VK_F12,         IDM_VIEW_FONT,          VIRTKEY, ALT, NOINVERT
