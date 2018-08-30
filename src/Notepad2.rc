@@ -458,7 +458,7 @@ BEGIN
         MENUITEM SEPARATOR
         POPUP "Rendering Technology"
         BEGIN
-            MENUITEM "Default GDI",     IDM_SET_RENDER_TECH_DEFAULT
+            MENUITEM "Legacy GDI",      IDM_SET_RENDER_TECH_DEFAULT
             MENUITEM "Direct2D",        IDM_SET_RENDER_TECH_D2D
             MENUITEM "Direct2D Retain", IDM_SET_RENDER_TECH_D2DRETAIN
             MENUITEM "Direct2D GDI DC", IDM_SET_RENDER_TECH_D2DDC
