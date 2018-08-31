@@ -68,6 +68,7 @@ typedef struct np2params {
 #define STATUS_EOLMODE		3
 #define STATUS_OVRMODE		4
 #define STATUS_DOCSIZE		5
+#define STATUS_DOCZOOM		6
 #define STATUS_HELP			255
 
 //==== Change Notifications ===================================================

@@ -129,7 +129,9 @@ BOOL	bTabsAsSpacesG;
 BOOL	bTabIndents;
 BOOL	bTabIndentsG;
 BOOL	bBackspaceUnindents;
-int		iZoomLevel;
+int		iZoomLevel = 0;
+int		iZoomPercent = 100;
+extern int iBaseFontSize;
 int		iTabWidth;
 int		iTabWidthG;
 int		iIndentWidth;
@@ -1971,26 +1973,29 @@ void UpdateStatusBarWidth(void) {
 	WCHAR tchLexerName[128];
 	int cx;
 	RECT rc;
-	int aWidth[6];
+	int aWidth[7];
 
 	GetClientRect(hwndMain, &rc);
 	cx = rc.right - rc.left;
 
 	Encoding_GetLabel(iEncoding);
 	Style_GetCurrentLexerName(tchLexerName, COUNTOF(tchLexerName));
+	const int iBytes = (int)SendMessage(hwndEdit, SCI_GETLENGTH, 0, 0);
 
 	aWidth[1] = StatusCalcPaneWidth(hwndStatus, tchLexerName) + 4;
 	aWidth[2] = StatusCalcPaneWidth(hwndStatus, mEncoding[iEncoding].wchLabel) + 4;
 	aWidth[3] = StatusCalcPaneWidth(hwndStatus, L"CR+LF");
 	aWidth[4] = StatusCalcPaneWidth(hwndStatus, L"OVR");
-	aWidth[5] = StatusCalcPaneWidth(hwndStatus, L"9,999,999 Bytes");
+	aWidth[5] = StatusCalcPaneWidth(hwndStatus, ((iBytes < 1024)? L"1,023 Bytes" : L"99.9 MiB"));
+	aWidth[6] = StatusCalcPaneWidth(hwndStatus, L"500%") + 16;
 
-	aWidth[0] = max_i(120, cx - (aWidth[1] + aWidth[2] + aWidth[3] + aWidth[4] + aWidth[5]));
+	aWidth[0] = max_i(120, cx - (aWidth[1] + aWidth[2] + aWidth[3] + aWidth[4] + aWidth[5] + aWidth[6]));
 	aWidth[1] += aWidth[0];
 	aWidth[2] += aWidth[1];
 	aWidth[3] += aWidth[2];
 	aWidth[4] += aWidth[3];
-	aWidth[5] = -1;
+	aWidth[5] += aWidth[4];
+	aWidth[6] = -1;
 
 	SendMessage(hwndStatus, SB_SETPARTS, COUNTOF(aWidth), (LPARAM)aWidth);
 }
@@ -2010,6 +2015,14 @@ BOOL IsInlineIMEActive(void) {
 		}
 	}
 	return result;
+}
+
+void MsgNotifyZoom(void) {
+	iZoomLevel = (int)SendMessage(hwndEdit, SCI_GETZOOM, 0, 0);
+	iZoomPercent = (100*(iZoomLevel*SC_FONT_SIZE_MULTIPLIER + iBaseFontSize) + iBaseFontSize/2) / iBaseFontSize;
+
+	UpdateLineNumberWidth();
+	UpdateStatusbar();
 }
 
 //=============================================================================
@@ -3946,20 +3959,14 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	case IDM_VIEW_ZOOMIN:
 		SendMessage(hwndEdit, SCI_ZOOMIN, 0, 0);
-		iZoomLevel = (int)SendMessage(hwndEdit, SCI_GETZOOM, 0, 0);
-		//UpdateLineNumberWidth();
 		break;
 
 	case IDM_VIEW_ZOOMOUT:
 		SendMessage(hwndEdit, SCI_ZOOMOUT, 0, 0);
-		iZoomLevel = (int)SendMessage(hwndEdit, SCI_GETZOOM, 0, 0);
-		//UpdateLineNumberWidth();
 		break;
 
 	case IDM_VIEW_RESETZOOM:
 		SendMessage(hwndEdit, SCI_SETZOOM, 0, 0);
-		iZoomLevel = 0;
-		//UpdateLineNumberWidth();
 		break;
 
 	case IDM_VIEW_TOOLBAR:
@@ -5028,8 +5035,13 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 #endif
 
 		case SCN_MODIFIED:
+			if (scn->linesAdded) {
+				UpdateLineNumberWidth();
+			}
+			break;
+
 		case SCN_ZOOM:
-			UpdateLineNumberWidth();
+			MsgNotifyZoom();
 			break;
 
 		case SCN_SAVEPOINTREACHED:
@@ -6547,6 +6559,7 @@ void UpdateStatusbar(void) {
 	int iBytes;
 	WCHAR tchBytes[64];
 	WCHAR tchDocSize[256];
+	WCHAR tchZoom[32];
 
 	WCHAR tchEOLMode[32];
 	WCHAR tchOvrMode[32];
@@ -6652,6 +6665,7 @@ void UpdateStatusbar(void) {
 	}
 
 	Style_GetCurrentLexerName(tchLexerName, COUNTOF(tchLexerName));
+	wsprintf(tchZoom, L" %i%%", iZoomPercent);
 
 	StatusSetText(hwndStatus, STATUS_DOCPOS, tchDocPos);
 	StatusSetText(hwndStatus, STATUS_LEXER, tchLexerName);
@@ -6659,6 +6673,7 @@ void UpdateStatusbar(void) {
 	StatusSetText(hwndStatus, STATUS_EOLMODE, tchEOLMode);
 	StatusSetText(hwndStatus, STATUS_OVRMODE, tchOvrMode);
 	StatusSetText(hwndStatus, STATUS_DOCSIZE, tchDocSize);
+	StatusSetText(hwndStatus, STATUS_DOCZOOM, tchZoom);
 
 	//InvalidateRect(hwndStatus, NULL, TRUE);
 }
