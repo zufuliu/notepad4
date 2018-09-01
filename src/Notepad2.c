@@ -5347,7 +5347,15 @@ void LoadSettings(void) {
 	iBidirectional = clamp_i(iBidirectional, SC_BIDIRECTIONAL_DISABLED, SC_BIDIRECTIONAL_R2L);
 	iFontQuality = IniSectionGetInt(pIniSection, L"FontQuality", SC_EFF_QUALITY_LCD_OPTIMIZED);
 	iFontQuality = clamp_i(iFontQuality, SC_EFF_QUALITY_DEFAULT, SC_EFF_QUALITY_LCD_OPTIMIZED);
-	bUseInlineIME = IniSectionGetInt(pIniSection, L"UseInlineIME", SC_IME_WINDOWED);
+	// Korean IME use inline mode (and block caret in inline mode) by default
+	bUseInlineIME = IniSectionGetBool(pIniSection, L"UseInlineIME", -1);
+	if (bUseInlineIME == -1) {
+		// ScintillaWin::KoreanIME()
+		const int codePage = Scintilla_InputCodePage();
+		if (codePage == 949 || codePage == 1361) {
+			bUseInlineIME = TRUE;
+		}
+	}
 
 	IniSectionGetString(pIniSection, L"ToolbarButtons", L"", tchToolbarButtons, COUNTOF(tchToolbarButtons));
 
