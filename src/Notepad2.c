@@ -2019,6 +2019,7 @@ BOOL IsInlineIMEActive(void) {
 
 void MsgNotifyZoom(void) {
 	iZoomLevel = (int)SendMessage(hwndEdit, SCI_GETZOOM, 0, 0);
+	// scintilla/src/ViewStyle.cxx FontRealised::Realise()
 	iZoomPercent = (100*(iZoomLevel*SC_FONT_SIZE_MULTIPLIER + iBaseFontSize) + iBaseFontSize/2) / iBaseFontSize;
 
 	UpdateLineNumberWidth();
