@@ -3667,3 +3667,7 @@ int ResourcesRelease(bool fromDllMain) noexcept {
 int Scintilla_ReleaseResources(void) {
 	return Scintilla::ResourcesRelease(false);
 }
+
+int Scintilla_InputCodePage(void) {
+	return InputCodePage();
+}

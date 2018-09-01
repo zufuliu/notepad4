@@ -19,6 +19,7 @@ extern "C" {
 /* Return false on failure: */
 int Scintilla_RegisterClasses(void *hInstance);
 int Scintilla_ReleaseResources(void);
+int Scintilla_InputCodePage(void);
 #endif
 int Scintilla_LinkLexers(void);
 
