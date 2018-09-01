@@ -657,7 +657,7 @@ void Style_SetLexer(HWND hwnd, PEDITLEXER pLexNew) {
 		}
 	}
 	// Font quality setup
-	Style_SetFontQuality(hwnd, lexDefault.Styles[0 + iIdx].szValue);
+	SendMessage(hwnd, SCI_SETFONTQUALITY, iFontQuality, 0);
 
 	// Clear
 	SendMessage(hwnd, SCI_CLEARDOCUMENTSTYLE, 0, 0);
@@ -2091,29 +2091,6 @@ BOOL Style_StrGetFont(LPCWSTR lpszStyle, LPWSTR lpszFont, int cchFont) {
 
 //=============================================================================
 //
-// Style_StrGetFontQuality()
-//
-BOOL Style_StrGetFontQuality(LPCWSTR lpszStyle, LPWSTR lpszQuality, int cchQuality) {
-	WCHAR *p;
-
-	if ((p = StrStrI(lpszStyle, L"smoothing:")) != NULL) {
-		WCHAR tch[256];
-		lstrcpy(tch, p + CSTRLEN(L"smoothing:"));
-		if ((p = StrChr(tch, L';')) != NULL) {
-			*p = L'\0';
-		}
-		TrimString(tch);
-		if (lstrcmpi(tch, L"none") == 0 || lstrcmpi(tch, L"standard") == 0 ||
-				lstrcmpi(tch, L"cleartype") == 0 || lstrcmpi(tch, L"default") == 0) {
-			lstrcpyn(lpszQuality, tch, cchQuality);
-			return TRUE;
-		}
-	}
-	return FALSE;
-}
-
-//=============================================================================
-//
 // Style_StrGetCharSet()
 //
 BOOL Style_StrGetCharSet(LPCWSTR lpszStyle, int *i) {
@@ -2333,10 +2310,6 @@ BOOL Style_SelectFont(HWND hwnd, LPWSTR lpszStyle, int cchStyle, BOOL bDefaultSt
 	// Map back to lpszStyle
 	lstrcpy(szNewStyle, L"font:");
 	lstrcat(szNewStyle, lf.lfFaceName);
-	if (Style_StrGetFontQuality(lpszStyle, tch, COUNTOF(tch))) {
-		lstrcat(szNewStyle, L"; smoothing:");
-		lstrcat(szNewStyle, tch);
-	}
 	if (bDefaultStyle &&
 			lf.lfCharSet != DEFAULT_CHARSET &&
 			lf.lfCharSet != ANSI_CHARSET &&
@@ -2449,13 +2422,6 @@ BOOL Style_SelectColor(HWND hwnd, BOOL bFore, LPWSTR lpszStyle, int cchStyle) {
 	lstrcpy(szNewStyle, L"");
 	if (Style_StrGetFont(lpszStyle, tch, COUNTOF(tch))) {
 		lstrcat(szNewStyle, L"font:");
-		lstrcat(szNewStyle, tch);
-	}
-	if (Style_StrGetFontQuality(lpszStyle, tch, COUNTOF(tch))) {
-		if (StrNotEmpty(szNewStyle)) {
-			lstrcat(szNewStyle, L"; ");
-		}
-		lstrcat(szNewStyle, L"smoothing:");
 		lstrcat(szNewStyle, tch);
 	}
 	if (Style_StrGetCharSet(lpszStyle, &iValue)) {
@@ -2635,85 +2601,6 @@ void Style_SetStyles(HWND hwnd, int iStyle, LPCWSTR lpszStyle) {
 		SendMessage(hwnd, SCI_STYLESETCHARACTERSET, iStyle, (LPARAM)iValue);
 	}
 
-}
-
-//=============================================================================
-//
-// Style_SetFontQuality()
-//
-void Style_SetFontQuality(HWND hwnd, LPCWSTR lpszStyle) {
-	int wQuality = SC_EFF_QUALITY_DEFAULT;
-	WCHAR tch[32];
-
-	if (Style_StrGetFontQuality(lpszStyle, tch, COUNTOF(tch))) {
-		if (lstrcmpi(tch, L"none") == 0) {
-			wQuality = SC_EFF_QUALITY_NON_ANTIALIASED;
-		} else if (lstrcmpi(tch, L"standard") == 0) {
-			wQuality = SC_EFF_QUALITY_ANTIALIASED;
-		} else if (lstrcmpi(tch, L"cleartype") == 0) {
-			wQuality = SC_EFF_QUALITY_LCD_OPTIMIZED;
-		}
-	} else {
-		if (Style_StrGetFont(lpszStyle, tch, COUNTOF(tch))) {
-			if (lstrcmpi(tch, L"DejaVu Sans Mono") == 0 ||
-				lstrcmpi(tch, L"Consolas") == 0 ||
-				lstrcmpi(tch, L"Source Code Pro") == 0 ||
-				lstrcmpi(tch, L"Inconsolata") == 0 ||
-				lstrcmpi(tch, L"Lucida Console") == 0 ||
-				lstrcmpi(tch, L"Monaco") == 0 ||
-				lstrcmpi(tch, L"Bitstream Vera Sans Mono") == 0 ||
-				lstrcmpi(tch, L"Calibri") == 0 ||
-				lstrcmpi(tch, L"Cambria") == 0 ||
-				lstrcmpi(tch, L"Candara") == 0 ||
-				lstrcmpi(tch, L"Constantia") == 0 ||
-				lstrcmpi(tch, L"Corbel") == 0 ||
-				lstrcmpi(tch, L"Segoe UI") == 0) {
-				wQuality = SC_EFF_QUALITY_LCD_OPTIMIZED;
-			}
-		}
-	}
-
-	iFontQuality = wQuality;
-	SendMessage(hwnd, SCI_SETFONTQUALITY, wQuality, 0);
-}
-
-void Style_SaveFontQuality(void) {
-	WCHAR szNewStyle[512];
-	// Use 2nd default style
-	const int iIdx = (bUse2ndDefaultStyle) ? 12 : 0;
-
-	LPWSTR lpszStyle = lexDefault.Styles[0 + iIdx].szValue;
-	WCHAR *p = StrStrI(lpszStyle, L"smoothing:");
-	if (p != NULL) {
-		lstrcpyn(szNewStyle, lpszStyle, (int)(p - lpszStyle));
-	} else {
-		lstrcpy(szNewStyle, lpszStyle);
-	}
-	lstrcat(szNewStyle, L"smoothing:");
-	switch (iFontQuality) {
-	case SC_EFF_QUALITY_NON_ANTIALIASED:
-		lstrcat(szNewStyle, L"none");
-		break;
-	case SC_EFF_QUALITY_ANTIALIASED:
-		lstrcat(szNewStyle, L"standard");
-		break;
-	case SC_EFF_QUALITY_LCD_OPTIMIZED:
-		lstrcat(szNewStyle, L"cleartype");
-		break;
-	case SC_EFF_QUALITY_DEFAULT:
-	default:
-		lstrcat(szNewStyle, L"default");
-		break;
-	}
-	lstrcat(szNewStyle, L";");
-	if (p != NULL) {
-		p += CSTRLEN(L"smoothing:");
-		p = StrChr(p, L';');
-		if (p != NULL) {
-			lstrcat(szNewStyle, p + 1);
-		}
-	}
-	lstrcpy(lpszStyle, szNewStyle);
 }
 
 //=============================================================================

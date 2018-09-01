@@ -4104,7 +4104,6 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case IDM_VIEW_FONTQUALITY_CLEARTYPE:
 		iFontQuality = LOWORD(wParam) - IDM_VIEW_FONTQUALITY_DEFAULT;
 		SendMessage(hwndEdit, SCI_SETFONTQUALITY, iFontQuality, 0);
-		Style_SaveFontQuality();
 		break;
 
 	case IDM_VIEW_SHOWFILENAMEONLY:
@@ -5345,6 +5344,8 @@ void LoadSettings(void) {
 	iRenderingTechnology = clamp_i(iRenderingTechnology, SC_TECHNOLOGY_DEFAULT, SC_TECHNOLOGY_DIRECTWRITEDC);
 	iBidirectional = IniSectionGetInt(pIniSection, L"Bidirectional", SC_BIDIRECTIONAL_DISABLED);
 	iBidirectional = clamp_i(iBidirectional, SC_BIDIRECTIONAL_DISABLED, SC_BIDIRECTIONAL_R2L);
+	iFontQuality = IniSectionGetInt(pIniSection, L"FontQuality", SC_EFF_QUALITY_LCD_OPTIMIZED);
+	iFontQuality = clamp_i(iFontQuality, SC_EFF_QUALITY_DEFAULT, SC_EFF_QUALITY_LCD_OPTIMIZED);
 	bUseInlineIME = IniSectionGetInt(pIniSection, L"UseInlineIME", SC_IME_WINDOWED);
 
 	IniSectionGetString(pIniSection, L"ToolbarButtons", L"", tchToolbarButtons, COUNTOF(tchToolbarButtons));
@@ -5578,6 +5579,7 @@ void SaveSettings(BOOL bSaveSettingsNow) {
 	IniSectionSetBool(pIniSection, L"TransparentMode", bTransparentMode);
 	IniSectionSetInt(pIniSection, L"RenderingTechnology", iRenderingTechnology);
 	IniSectionSetInt(pIniSection, L"Bidirectional", iBidirectional);
+	IniSectionSetInt(pIniSection, L"FontQuality", iFontQuality);
 	IniSectionSetBool(pIniSection, L"UseInlineIME", bUseInlineIME);
 	Toolbar_GetButtons(hwndToolbar, IDT_FILE_NEW, tchToolbarButtons, COUNTOF(tchToolbarButtons));
 	IniSectionSetString(pIniSection, L"ToolbarButtons", tchToolbarButtons);

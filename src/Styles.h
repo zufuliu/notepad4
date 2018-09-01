@@ -68,7 +68,6 @@ BOOL	Style_GetUse2ndDefault(HWND hwnd);
 BOOL	Style_GetOpenDlgFilterStr(LPWSTR lpszFilter, int cchFilter);
 
 BOOL	Style_StrGetFont(LPCWSTR lpszStyle, LPWSTR lpszFont, int cchFont);
-BOOL	Style_StrGetFontQuality(LPCWSTR lpszStyle, LPWSTR lpszQuality, int cchQuality);
 BOOL	Style_StrGetCharSet(LPCWSTR lpszStyle, int *i);
 BOOL	Style_StrGetSizeEx(LPCWSTR lpszStyle, int *i);
 BOOL	Style_StrGetSize(LPCWSTR lpszStyle, int *i);
@@ -79,8 +78,6 @@ BOOL	Style_StrGetAlpha(LPCWSTR lpszStyle, int *i);
 BOOL	Style_SelectFont(HWND hwnd, LPWSTR lpszStyle, int cchStyle, BOOL bDefaultStyle);
 BOOL	Style_SelectColor(HWND hwnd, BOOL bFore, LPWSTR lpszStyle, int cchStyle);
 void	Style_SetStyles(HWND hwnd, int iStyle, LPCWSTR lpszStyle);
-void	Style_SetFontQuality(HWND hwnd, LPCWSTR lpszStyle);
-void	Style_SaveFontQuality(void);
 
 int 				Style_GetLexerIconId(PEDITLEXER pLex);
 INT_PTR CALLBACK	Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam);
