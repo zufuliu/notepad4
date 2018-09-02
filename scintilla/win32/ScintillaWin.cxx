@@ -391,7 +391,9 @@ class ScintillaWin :
 
 	sptr_t HandleCompositionWindowed(uptr_t wParam, sptr_t lParam);
 	sptr_t HandleCompositionInline(uptr_t wParam, sptr_t lParam);
+#if 0
 	static bool KoreanIME() noexcept;
+#endif
 	void MoveImeCarets(Sci::Position offset);
 	void DrawImeIndicator(int indicator, int len);
 	void SetCandidateWindowPos();
@@ -1013,10 +1015,12 @@ sptr_t ScintillaWin::HandleCompositionWindowed(uptr_t wParam, sptr_t lParam) {
 	return ::DefWindowProc(MainHWND(), WM_IME_COMPOSITION, wParam, lParam);
 }
 
+#if 0
 bool ScintillaWin::KoreanIME() noexcept {
 	const int codePage = InputCodePage();
 	return codePage == 949 || codePage == 1361;
 }
+#endif
 
 void ScintillaWin::MoveImeCarets(Sci::Position offset) {
 	// Move carets relatively by bytes.
@@ -1224,7 +1228,7 @@ sptr_t ScintillaWin::HandleCompositionInline(uptr_t, sptr_t lParam) {
 
 		MoveImeCarets(-CurrentPosition() + imeCaretPosDoc);
 
-		if (KoreanIME()) {
+		if (inlineIMEUseBlockCaret) {
 			view.imeCaretBlockOverride = true;
 		}
 	} else if (lParam & GCS_RESULTSTR) {

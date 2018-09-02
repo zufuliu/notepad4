@@ -266,6 +266,12 @@ get int GetIMEInteraction=2678(,)
 # Choose to display the the IME in a winow or inline.
 set void SetIMEInteraction=2679(int imeInteraction,)
 
+# Is block caret used in inline IME
+get bool GetInlineIMEUseBlockCaret=2638(,)
+
+# Set inline IME to use block caret
+set void SetInlineIMEUseBlockCaret=2639(bool useBlockCaret,)
+
 enu MarkerSymbol=SC_MARK_
 val MARKER_MAX=31
 val SC_MARK_CIRCLE=0

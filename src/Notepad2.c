@@ -185,6 +185,7 @@ BOOL	bMinimizeToTray;
 BOOL	bTransparentMode;
 int		iRenderingTechnology;
 BOOL	bUseInlineIME;
+BOOL	bInlineIMEUseBlockCaret;
 int		iBidirectional;
 BOOL	bShowToolbar;
 BOOL	bShowStatusbar;
@@ -2315,6 +2316,7 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	i = IDM_SET_BIDIRECTIONAL_NONE + iBidirectional;
 	CheckMenuRadioItem(hmenu, IDM_SET_BIDIRECTIONAL_NONE, IDM_SET_BIDIRECTIONAL_R2L, i, MF_BYCOMMAND);
 	CheckCmd(hmenu, IDM_SET_USE_INLINE_IME, bUseInlineIME);
+	CheckCmd(hmenu, IDM_SET_USE_BLOCK_CARET, bInlineIMEUseBlockCaret);
 
 	CheckCmd(hmenu, IDM_VIEW_NOSAVEFINDREPL, bSaveFindReplace);
 	CheckCmd(hmenu, IDM_VIEW_SAVEBEFORERUNNINGTOOLS, bSaveBeforeRunningTools);
@@ -4104,6 +4106,11 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		SendMessage(hwndEdit, SCI_SETIMEINTERACTION, bUseInlineIME, 0);
 		break;
 
+	case IDM_SET_USE_BLOCK_CARET:
+		bInlineIMEUseBlockCaret = bInlineIMEUseBlockCaret? FALSE : TRUE;
+		SendMessage(hwndEdit, SCI_SETINLINEIMEUSEBLOCKCARET, bInlineIMEUseBlockCaret, 0);
+		break;
+
 	case IDM_VIEW_FONTQUALITY_DEFAULT:
 	case IDM_VIEW_FONTQUALITY_NONE:
 	case IDM_VIEW_FONTQUALITY_STANDARD:
@@ -5370,11 +5377,13 @@ void LoadSettings(void) {
 	iCaretBlinkPeriod = IniSectionGetInt(pIniSection, L"CaretBlinkPeriod", -1);
 	// Korean IME use inline mode (and block caret in inline mode) by default
 	bUseInlineIME = IniSectionGetBool(pIniSection, L"UseInlineIME", -1);
+	bInlineIMEUseBlockCaret = IniSectionGetBool(pIniSection, L"InlineIMEUseBlockCaret", 0);
 	if (bUseInlineIME == -1) {
 		// ScintillaWin::KoreanIME()
 		const int codePage = Scintilla_InputCodePage();
 		if (codePage == 949 || codePage == 1361) {
 			bUseInlineIME = TRUE;
+			bInlineIMEUseBlockCaret = TRUE;
 		}
 	}
 
@@ -5613,6 +5622,7 @@ void SaveSettings(BOOL bSaveSettingsNow) {
 	IniSectionSetInt(pIniSection, L"CaretStyle", iCaretStyle);
 	IniSectionSetInt(pIniSection, L"CaretBlinkPeriod", iCaretBlinkPeriod);
 	IniSectionSetBool(pIniSection, L"UseInlineIME", bUseInlineIME);
+	IniSectionSetBool(pIniSection, L"InlineIMEUseBlockCaret", bInlineIMEUseBlockCaret);
 	Toolbar_GetButtons(hwndToolbar, IDT_FILE_NEW, tchToolbarButtons, COUNTOF(tchToolbarButtons));
 	IniSectionSetString(pIniSection, L"ToolbarButtons", tchToolbarButtons);
 	IniSectionSetBool(pIniSection, L"ShowToolbar", bShowToolbar);
