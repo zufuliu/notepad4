@@ -215,6 +215,8 @@ BOOL	fStylesModified = FALSE;
 BOOL	fWarnedNoIniFile = FALSE;
 int		iBaseFontSize = 10*SC_FONT_SIZE_MULTIPLIER + SC_FONT_SIZE_MULTIPLIER/2; // 10.5pt
 int		iFontQuality = SC_EFF_QUALITY_LCD_OPTIMIZED;
+int		iCaretStyle = 1; // width 1, 0 for block
+int		iCaretBlinkPeriod = -1; // system default, 0 for noblink
 int		iDefaultLexer;
 BOOL	bAutoSelect;
 int		cxStyleSelectDlg;
@@ -482,6 +484,19 @@ void Style_OnDPIChanged(HWND hwnd) {
 	Style_SetLexer(hwnd, pLexCurrent);
 }
 
+void Style_UpdateCaret(HWND hwnd) {
+	// caret style and width
+	if (iCaretStyle == 0) {
+		SendMessage(hwnd, SCI_SETCARETSTYLE, CARETSTYLE_BLOCK, 0);
+	} else {
+		SendMessage(hwnd, SCI_SETCARETSTYLE, CARETSTYLE_LINE, 0);
+		SendMessage(hwnd, SCI_SETCARETWIDTH, iCaretStyle, 0);
+	}
+
+	const int iValue = (iCaretBlinkPeriod < 0)? GetCaretBlinkTime() : iCaretBlinkPeriod;
+	SendMessage(hwnd, SCI_SETCARETPERIOD, iValue, 0);
+}
+
 // set folding style; braces are for scoping only
 static const int iMarkerIDs[] = {
 	SC_MARKNUM_FOLDEROPEN,
@@ -587,7 +602,7 @@ void Style_SetLexer(HWND hwnd, PEDITLEXER pLexNew) {
 	//WCHAR *p;
 	int rgb;
 	int iValue;
-	WCHAR wchCaretStyle[64] = L"";
+	WCHAR wchCaretStyle[32] = L"";
 	char msg[10];
 
 	// Select default if NULL is specified
@@ -780,32 +795,7 @@ void Style_SetLexer(HWND hwnd, PEDITLEXER pLexNew) {
 		SendMessage(hwnd, SCI_SETCARETLINEVISIBLE, FALSE, 0);
 	}
 
-	// caret style and width
-	if (StrStr(lexDefault.Styles[9 + iIdx].szValue, L"block")) {
-		SendMessage(hwnd, SCI_SETCARETSTYLE, CARETSTYLE_BLOCK, 0);
-		lstrcpy(wchCaretStyle, L"block");
-	} else {
-		iValue = 1;
-		if (Style_StrGetSize(lexDefault.Styles[9 + iIdx].szValue, &iValue)) {
-			WCHAR wch[32];
-			iValue = clamp_i(iValue, 1, 3);
-			wsprintf(wch, L"size:%i", iValue);
-			lstrcat(wchCaretStyle, wch);
-		}
-		SendMessage(hwnd, SCI_SETCARETSTYLE, CARETSTYLE_LINE, 0);
-		SendMessage(hwnd, SCI_SETCARETWIDTH, iValue, 0);
-	}
-
-	if (StrStr(lexDefault.Styles[9 + iIdx].szValue, L"noblink")) {
-		SendMessage(hwnd, SCI_SETCARETPERIOD, (WPARAM)0, 0);
-		if (StrNotEmpty(wchCaretStyle)) {
-			lstrcat(wchCaretStyle, L"; ");
-		}
-		lstrcat(wchCaretStyle, L"noblink");
-	} else {
-		SendMessage(hwnd, SCI_SETCARETPERIOD, (WPARAM)GetCaretBlinkTime(), 0);
-	}
-
+	Style_UpdateCaret(hwnd);
 	// caret fore
 	if (!Style_StrGetColor(TRUE, lexDefault.Styles[9 + iIdx].szValue, &rgb)) {
 		rgb = GetSysColor(COLOR_WINDOWTEXT);
@@ -2511,14 +2501,6 @@ BOOL Style_SelectColor(HWND hwnd, BOOL bFore, LPWSTR lpszStyle, int cchStyle) {
 		lstrcat(szNewStyle, L"; alpha:");
 		wsprintf(tch, L"%i", iValue);
 		lstrcat(szNewStyle, tch);
-	}
-
-	if (StrStrI(lpszStyle, L"block")) {
-		lstrcat(szNewStyle, L"; block");
-	}
-
-	if (StrStrI(lpszStyle, L"noblink")) {
-		lstrcat(szNewStyle, L"; noblink");
 	}
 
 	lstrcpyn(lpszStyle, szNewStyle, cchStyle);
