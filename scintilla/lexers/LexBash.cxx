@@ -712,7 +712,7 @@ static void FoldBashDoc(Sci_PositionU startPos, Sci_Position length, int, LexerW
 	int levelCurrent = levelPrev;
 	char chNext = styler[startPos];
 	int styleNext = styler.StyleAt(startPos);
-	char word[128] = { 0 };
+	char word[128] = { '\0' };
 	int wordlen = 0;
 	for (Sci_PositionU i = startPos; i < endPos; i++) {
 		const char ch = chNext;
@@ -729,8 +729,8 @@ static void FoldBashDoc(Sci_PositionU startPos, Sci_Position length, int, LexerW
 		}
 
 		if (style == SCE_SH_WORD) {
-			word[wordlen++] = static_cast<char>(tolower(ch));
-			if (wordlen == 128) {                   // prevent overflow
+			word[wordlen++] = ch;
+			if (wordlen == sizeof(word)) { // prevent overflow
 				word[0] = '\0';
 				wordlen = 1;
 			}
