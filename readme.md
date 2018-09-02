@@ -156,6 +156,7 @@
 * Support rendering using Direct2D DirectWrite, and switch between GDI and Direct2D
 * Support bidirectional, useful for Arabic and Hebrew
 * Support using fractional font size
+* Support Inline IME
 * Extra support for drag and drop file from Visual Studio, Android Studio, IntelliJ IDEA, etc.
 * Other various major or minor changes and tweaks
 
@@ -172,7 +173,7 @@ TBD.
 Prebuild binaries for each release can be downloaded from [release list](https://github.com/zufuliu/notepad2/releases).
 
 ## Notes:
-* The default *Win32* build require [SSE2](https://en.wikipedia.org/wiki/SSE2)(Pentium 4), which can be turned off if you [build Notepad2 and metapath](https://github.com/zufuliu/notepad2/wiki/Build-Notepad2) yourself.
+* The default *Win32* build require [SSE2](https://en.wikipedia.org/wiki/SSE2) (Pentium 4), which can be turned off if you [build Notepad2 and metapath](https://github.com/zufuliu/notepad2/wiki/Build-Notepad2) yourself.
 * If you find any bugs or have any suggestions feel free to **write proposals/issues** and/or **provide patches/pull requests**.
 
 ## Contributors:

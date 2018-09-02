@@ -55,6 +55,7 @@ extern BOOL bAutoStripBlanks;
 extern int iRenderingTechnology;
 extern int iBidirectional;
 extern BOOL bUseInlineIME;
+extern BOOL bInlineIMEUseBlockCaret;
 // Default Codepage and Character Set
 extern int iDefaultCodePage;
 //extern int iDefaultCharSet;
@@ -91,6 +92,7 @@ HWND EditCreate(HWND hwndParent) {
 	SendMessage(hwnd, SCI_SETTECHNOLOGY, iRenderingTechnology, 0);
 	SendMessage(hwnd, SCI_SETBIDIRECTIONAL, iBidirectional, 0);
 	SendMessage(hwnd, SCI_SETIMEINTERACTION, bUseInlineIME, 0);
+	SendMessage(hwnd, SCI_SETINLINEIMEUSEBLOCKCARET, bInlineIMEUseBlockCaret, 0);
 	SendMessage(hwnd, SCI_SETCODEPAGE, iDefaultCodePage, 0);
 	SendMessage(hwnd, SCI_SETEOLMODE, SC_EOL_CRLF, 0);
 	SendMessage(hwnd, SCI_SETPASTECONVERTENDINGS, 1, 0);

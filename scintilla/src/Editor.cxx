@@ -6798,6 +6798,13 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 	case SCI_GETIMEINTERACTION:
 		return imeInteraction;
 
+	case SCI_SETINLINEIMEUSEBLOCKCARET:
+		inlineIMEUseBlockCaret = wParam != 0;
+		break;
+
+	case SCI_GETINLINEIMEUSEBLOCKCARET:
+		return inlineIMEUseBlockCaret;
+
 	case SCI_SETBIDIRECTIONAL:
 		// SCI_SETBIDIRECTIONAL is implemented on platform subclasses if they support bidirectional text.
 		break;
