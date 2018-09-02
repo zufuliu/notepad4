@@ -61,6 +61,7 @@ void	Style_SetXMLLexer(HWND hwnd);
 
 void	Style_SetDefaultFont(HWND hwnd);
 void	Style_SetIndentGuides(HWND hwnd, BOOL bShow);
+void	Style_UpdateCaret(HWND hwnd);
 void	Style_SetLongLineColors(HWND hwnd);
 void	Style_SetCurrentLineBackground(HWND hwnd);
 void	Style_ToggleUse2ndDefault(HWND hwnd);

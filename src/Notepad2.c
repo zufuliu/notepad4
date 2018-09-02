@@ -287,6 +287,8 @@ int		iAlignMode	 = 0;
 int		iMatchesCount = 0;
 int		iAutoCItemCount = 0;
 extern int iFontQuality;
+extern int iCaretStyle;
+extern int iCaretBlinkPeriod;
 
 BOOL	fIsElevated = FALSE;
 WCHAR	wchWndClass[16] = WC_NOTEPAD2;
@@ -2237,6 +2239,9 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	CheckCmd(hmenu, IDM_VIEW_WORDWRAP, fWordWrap);
 	i = IDM_VIEW_FONTQUALITY_DEFAULT + iFontQuality;
 	CheckMenuRadioItem(hmenu, IDM_VIEW_FONTQUALITY_DEFAULT, IDM_VIEW_FONTQUALITY_CLEARTYPE, i, MF_BYCOMMAND);
+	i = IDM_VIEW_CARET_STYLE_BLOCK + iCaretStyle;
+	CheckMenuRadioItem(hmenu, IDM_VIEW_CARET_STYLE_BLOCK, IDM_VIEW_CARET_STYLE_WIDTH3, i, MF_BYCOMMAND);
+	CheckCmd(hmenu, IDM_VIEW_CARET_STYLE_NOBLINK, iCaretBlinkPeriod == 0);
 	CheckCmd(hmenu, IDM_VIEW_LONGLINEMARKER, bMarkLongLines);
 	CheckCmd(hmenu, IDM_VIEW_TABSASSPACES, bTabsAsSpaces);
 	CheckCmd(hmenu, IDM_VIEW_SHOWINDENTGUIDES, bShowIndentGuides);
@@ -4107,6 +4112,19 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		SendMessage(hwndEdit, SCI_SETFONTQUALITY, iFontQuality, 0);
 		break;
 
+	case IDM_VIEW_CARET_STYLE_BLOCK:
+	case IDM_VIEW_CARET_STYLE_WIDTH1:
+	case IDM_VIEW_CARET_STYLE_WIDTH2:
+	case IDM_VIEW_CARET_STYLE_WIDTH3:
+		iCaretStyle = LOWORD(wParam) -  IDM_VIEW_CARET_STYLE_BLOCK;
+		Style_UpdateCaret(hwndEdit);
+		break;
+
+	case IDM_VIEW_CARET_STYLE_NOBLINK:
+		iCaretBlinkPeriod = (iCaretBlinkPeriod == 0)? -1 : 0;
+		Style_UpdateCaret(hwndEdit);
+		break;
+
 	case IDM_VIEW_SHOWFILENAMEONLY:
 		iPathNameFormat = 0;
 		lstrcpy(szTitleExcerpt, L"");
@@ -5347,6 +5365,9 @@ void LoadSettings(void) {
 	iBidirectional = clamp_i(iBidirectional, SC_BIDIRECTIONAL_DISABLED, SC_BIDIRECTIONAL_R2L);
 	iFontQuality = IniSectionGetInt(pIniSection, L"FontQuality", SC_EFF_QUALITY_LCD_OPTIMIZED);
 	iFontQuality = clamp_i(iFontQuality, SC_EFF_QUALITY_DEFAULT, SC_EFF_QUALITY_LCD_OPTIMIZED);
+	iCaretStyle = IniSectionGetInt(pIniSection, L"CaretStyle", 1);
+	iCaretStyle = clamp_i(iCaretStyle, 0, 3);
+	iCaretBlinkPeriod = IniSectionGetInt(pIniSection, L"CaretBlinkPeriod", -1);
 	// Korean IME use inline mode (and block caret in inline mode) by default
 	bUseInlineIME = IniSectionGetBool(pIniSection, L"UseInlineIME", -1);
 	if (bUseInlineIME == -1) {
@@ -5589,6 +5610,8 @@ void SaveSettings(BOOL bSaveSettingsNow) {
 	IniSectionSetInt(pIniSection, L"RenderingTechnology", iRenderingTechnology);
 	IniSectionSetInt(pIniSection, L"Bidirectional", iBidirectional);
 	IniSectionSetInt(pIniSection, L"FontQuality", iFontQuality);
+	IniSectionSetInt(pIniSection, L"CaretStyle", iCaretStyle);
+	IniSectionSetInt(pIniSection, L"CaretBlinkPeriod", iCaretBlinkPeriod);
 	IniSectionSetBool(pIniSection, L"UseInlineIME", bUseInlineIME);
 	Toolbar_GetButtons(hwndToolbar, IDT_FILE_NEW, tchToolbarButtons, COUNTOF(tchToolbarButtons));
 	IniSectionSetString(pIniSection, L"ToolbarButtons", tchToolbarButtons);

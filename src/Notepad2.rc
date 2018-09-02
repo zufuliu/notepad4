@@ -334,6 +334,16 @@ BEGIN
             MENUITEM "&Standard",                   IDM_VIEW_FONTQUALITY_STANDARD
             MENUITEM "&ClearType",                  IDM_VIEW_FONTQUALITY_CLEARTYPE
         END
+        POPUP "Caret Style"
+        BEGIN
+            MENUITEM "Block",                       IDM_VIEW_CARET_STYLE_BLOCK
+            MENUITEM SEPARATOR
+            MENUITEM "Width 1",                     IDM_VIEW_CARET_STYLE_WIDTH1
+            MENUITEM "Width 2",                     IDM_VIEW_CARET_STYLE_WIDTH2
+            MENUITEM "Width 3",                     IDM_VIEW_CARET_STYLE_WIDTH3
+            MENUITEM SEPARATOR
+            MENUITEM "No Blink",                    IDM_VIEW_CARET_STYLE_NOBLINK
+        END
         MENUITEM SEPARATOR
         MENUITEM "Word W&rap\tCtrl+W",          IDM_VIEW_WORDWRAP
         MENUITEM "&Long Line Marker\tCtrl+Shift+L", IDM_VIEW_LONGLINEMARKER
@@ -985,7 +995,7 @@ BEGIN
     ICON            IDI_STYLES,IDC_STATIC,189,19,20,20
     LTEXT           "Customize Schemes",IDC_TITLE,220,25,200,12
     LTEXT           "Filename extensions must be separated by semicolon (;)",IDC_STATIC,191,44,247,13
-    LTEXT           "Style format:\n\tfont:Name; size:[+|-]nn.mm; bold; italic; underline; strike;\n\tcharset:dd; case:[U|L];\n\tfore:#ffffff; back:#bbbbbb; alpha:aa; eolfilled; block; noblink;",IDC_STATIC,191,60,260,34
+    LTEXT           "Style format:\n\tfont:Name; size:[+|-]nn.mm; bold; italic; underline; strike;\n\tcharset:dd; case:[U|L];\n\tfore:#ffffff; back:#bbbbbb; alpha:aa; eolfilled;",IDC_STATIC,191,60,260,34
     LTEXT           "Style properties can be copied using copy and paste or drag and drop.\n\nThe ""Preview"" button will not apply any changes.",IDC_STATIC,191,100,247,30
     LTEXT           "Associated file&name extensions:|Style &settings:",IDC_STYLELABELS,315,230,152,8,NOT WS_VISIBLE
 END

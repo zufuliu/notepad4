@@ -20,7 +20,7 @@ EDITLEXER lexDefault = { SCLEX_NULL, NP2LEX_DEFAULT, L"Default Text", L"txt; tex
 	{ SCI_SETSELFORE + SCI_SETSELBACK, 63106, L"Selected Text (Colors)", L"back:#0A246A; eolfilled; alpha:95", L"" },
 	{ SCI_SETWHITESPACEFORE + SCI_SETWHITESPACEBACK + SCI_SETWHITESPACESIZE, 63107, L"Whitespace (Colors, Size 0-5)", L"fore:#FF4000", L"" },
 	{ SCI_SETCARETLINEBACK, 63108, L"Current Line Background (Color)", L"back:#FFFF00; alpha:50", L"" },
-	{ SCI_SETCARETFORE + SCI_SETCARETWIDTH, 63109, L"Caret (Color, Size 1-3)", L"", L"" },
+	{ SCI_SETCARETFORE + SCI_SETCARETWIDTH, 63109, L"Caret (Color)", L"", L"" },
 	{ SCI_SETEDGECOLOUR, 63110, L"Long Line Marker (Colors)", L"fore:#FFC000", L"" },
 	{ SCI_SETEXTRAASCENT + SCI_SETEXTRADESCENT, 63111, L"Extra Line Spacing (Size)", L"size:2", L"" },
 
@@ -34,7 +34,7 @@ EDITLEXER lexDefault = { SCLEX_NULL, NP2LEX_DEFAULT, L"Default Text", L"txt; tex
 	{ SCI_SETSELFORE + SCI_SETSELBACK, 63118, L"2nd Selected Text (Colors)", L"eolfilled", L"" },
 	{ SCI_SETWHITESPACEFORE + SCI_SETWHITESPACEBACK + SCI_SETWHITESPACESIZE, 63119, L"2nd Whitespace (Colors, Size 0-5)", L"fore:#FF4000", L"" },
 	{ SCI_SETCARETLINEBACK, 63120, L"2nd Current Line Background (Color)", L"back:#FFFF00; alpha:50", L"" },
-	{ SCI_SETCARETFORE + SCI_SETCARETWIDTH, 63121, L"2nd Caret (Color, Size 1-3)", L"", L"" },
+	{ SCI_SETCARETFORE + SCI_SETCARETWIDTH, 63121, L"2nd Caret (Color)", L"", L"" },
 	{ SCI_SETEDGECOLOUR, 63122, L"2nd Long Line Marker (Colors)", L"fore:#FFC000", L"" },
 	{ SCI_SETEXTRAASCENT + SCI_SETEXTRADESCENT, 63123, L"2nd Extra Line Spacing (Size)", L"", L"" },
 	{ -1, 00000, L"", L"", L"" }
