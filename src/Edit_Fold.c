@@ -40,6 +40,23 @@ UINT Style_GetDefaultFoldState(void) {
 	return (1 << 1) | (1 << 2);
 }
 
+// zreo based level number
+UINT Style_MapFoldLevelToState(int level) {
+	switch (pLexCurrent->rid) {
+	case NP2LEX_DEFAULT:
+	case NP2LEX_PYTHON:
+		level = min_i(level, 7);
+		level = level * 4;
+		break;
+	default:
+		if (level) {
+			++level;
+		}
+		break;
+	}
+	return 1U << level;
+}
+
 BOOL FoldToggleNode(int line, FOLD_ACTION *pAction) {
 	const BOOL fExpanded = SciCall_GetFoldExpanded(line);
 	FOLD_ACTION action = *pAction;
@@ -96,6 +113,7 @@ void FoldToggleAll(FOLD_ACTION action) {
 
 void FoldToggleLevel(int lev, FOLD_ACTION action) {
 	BOOL fToggled = FALSE;
+	const UINT state = Style_MapFoldLevelToState(lev);
 	const int lineCount = SciCall_GetLineCount();
 
 	for (int line = 0; line < lineCount; ++line) {
@@ -103,7 +121,7 @@ void FoldToggleLevel(int lev, FOLD_ACTION action) {
 		if (level & SC_FOLDLEVELHEADERFLAG) {
 			level -= SC_FOLDLEVELBASE;
 			level &= SC_FOLDLEVELNUMBERMASK;
-			if (lev == level) {
+			if (state & (1U << level)) {
 				if (FoldToggleNode(line, &action)) {
 					fToggled = TRUE;
 				}
@@ -113,9 +131,9 @@ void FoldToggleLevel(int lev, FOLD_ACTION action) {
 
 	++lev;
 	if (fToggled && action == FOLD_ACTION_FOLD) {
-		stateToggleFoldLevel |= (1 << lev);
+		stateToggleFoldLevel |= (1U << lev);
 	} else {
-		stateToggleFoldLevel &= ~(1 << lev);
+		stateToggleFoldLevel &= ~(1U << lev);
 	}
 	if (fToggled) {
 		SciCall_SetXCaretPolicy(CARET_SLOP | CARET_STRICT | CARET_EVEN, 50);
@@ -178,14 +196,14 @@ void FoldToggleDefault(FOLD_ACTION action) {
 			level -= SC_FOLDLEVELBASE;
 			level &= SC_FOLDLEVELNUMBERMASK;
 			++level;
-			if (state & (1 << level)) {
+			if (state & (1U << level)) {
 				if (FoldToggleNode(line, &action)) {
 					fToggled = TRUE;
 				}
 				if (fToggled && action == FOLD_ACTION_FOLD) {
-					stateToggleFoldLevel |= (1 << level);
+					stateToggleFoldLevel |= (1U << level);
 				} else {
-					stateToggleFoldLevel &= ~(1 << level);
+					stateToggleFoldLevel &= ~(1U << level);
 				}
 			}
 		}
