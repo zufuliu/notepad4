@@ -38,7 +38,7 @@ static void ColouriseLispDoc(Sci_PositionU startPos, Sci_Position length, int in
 		++endPos;
 
 	Sci_Position lineCurrent = styler.GetLine(startPos);
-	char buf[MAX_WORD_LENGTH + 1] = { 0 };
+	char buf[MAX_WORD_LENGTH + 1] = "";
 	int wordLen = 0;
 
 	for (Sci_PositionU i = startPos; i < endPos; i++) {

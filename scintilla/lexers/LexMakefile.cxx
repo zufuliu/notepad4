@@ -42,7 +42,7 @@ static void ColouriseMakeDoc(Sci_PositionU startPos, Sci_Position length, int in
 
 	int visibleChars = 0;
 	Sci_Position lineCurrent = styler.GetLine(startPos);
-	char buf[MAX_WORD_LENGTH + 1] = { 0 };
+	char buf[MAX_WORD_LENGTH + 1] = "";
 	int wordLen = 0;
 	int varCount = 0;
 	static int makeType = MAKE_TYPE_GMAKE;

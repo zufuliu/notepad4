@@ -379,7 +379,7 @@ static void FoldAsmDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 	char chNext = styler[startPos];
 	int style = initStyle;
 	int styleNext = styler.StyleAt(startPos);
-	char word[128];
+	char word[16] = "";
 	int wordlen = 0;
 
 	for (Sci_PositionU i = startPos; i < endPos; i++) {
@@ -436,7 +436,7 @@ static void FoldAsmDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 				levelNext--;
 		}
 		if (foldSyntaxBased && (style == SCE_ASM_DIRECTIVE)) {
-			if (wordlen < 128) { // prevent overflow
+			if (wordlen < sizeof(word) - 1) {
 				word[wordlen++] = static_cast<char>(tolower(ch));
 			}
 			if (styleNext != SCE_ASM_DIRECTIVE) {   // reading directive ready

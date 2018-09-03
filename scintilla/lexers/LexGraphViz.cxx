@@ -41,7 +41,7 @@ static void ColouriseGraphDoc(Sci_PositionU startPos, Sci_Position length, int i
 	if (lineCurrent > 0)
 		levelCurrent = styler.LevelAt(lineCurrent - 1) >> 16;
 	int levelNext = levelCurrent;
-	char buf[MAX_WORD_LENGTH + 1] = { 0 };
+	char buf[MAX_WORD_LENGTH + 1] = "";
 	int wordLen = 0;
 	int chPrevNonWhite = 0;
 
