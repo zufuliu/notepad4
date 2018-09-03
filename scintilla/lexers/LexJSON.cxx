@@ -38,7 +38,7 @@ static void ColouriseJSONDoc(Sci_PositionU startPos, Sci_Position length, int in
 	if (lineCurrent > 0)
 		levelCurrent = styler.LevelAt(lineCurrent - 1) >> 16;
 	int levelNext = levelCurrent;
-	char buf[MAX_WORD_LENGTH + 1] = { 0 };
+	char buf[MAX_WORD_LENGTH + 1] = "";
 	int wordLen = 0;
 
 	for (Sci_PositionU i = startPos; i < endPos; i++) {

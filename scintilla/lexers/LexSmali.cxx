@@ -82,7 +82,7 @@ static void ColouriseSmaliDoc(Sci_PositionU startPos, Sci_Position length, int i
 
 	Sci_Position lineCurrent = styler.GetLine(startPos);
 	int curLineState = (lineCurrent > 0) ? styler.GetLineState(lineCurrent - 1) : 0;
-	char buf[MAX_WORD_LENGTH + 1] = { 0 };
+	char buf[MAX_WORD_LENGTH + 1] = "";
 	int wordLen = 0;
 	int visibleChars = 0;
 	int nextWordType = 0;
