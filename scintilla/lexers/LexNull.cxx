@@ -1,5 +1,5 @@
 // Scintilla source code edit control
-/** @file Lexnullptr.cxx
+/** @file LexNull.cxx
  ** Lexer for no language. Used for plain text and unrecognized files.
  **/
 // Copyright 1998-2001 by Neil Hodgson <neilh@scintilla.org>
