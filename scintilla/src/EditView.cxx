@@ -65,7 +65,7 @@ static constexpr bool IsControlCharacter(int ch) noexcept {
 }
 
 PrintParameters::PrintParameters() noexcept {
-	magnification = 0;
+	magnification = 100;
 	colourMode = SC_PRINT_NORMAL;
 	wrapState = eWrapWord;
 }

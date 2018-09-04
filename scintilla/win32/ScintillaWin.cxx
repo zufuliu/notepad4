@@ -24,6 +24,10 @@
 #include <memory>
 #include <chrono>
 
+// Want to use std::min and std::max so don't want Windows.h version of min and max
+#if !defined(NOMINMAX)
+#define NOMINMAX
+#endif
 #include <windows.h>
 #include <commctrl.h>
 #include <richedit.h>
@@ -2722,9 +2726,7 @@ void ScintillaWin::ImeStartComposition() {
 			// The logfont for the IME is recreated here.
 			const int styleHere = pdoc->StyleIndexAt(sel.MainCaret());
 			LOGFONTW lf = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, L"" };
-			int sizeZoomed = vs.styles[styleHere].size + vs.zoomLevel * SC_FONT_SIZE_MULTIPLIER;
-			if (sizeZoomed <= 2 * SC_FONT_SIZE_MULTIPLIER)	// Hangs if sizeZoomed <= 1
-				sizeZoomed = 2 * SC_FONT_SIZE_MULTIPLIER;
+			int sizeZoomed = GetFontSizeZoomed(vs.styles[styleHere].size, vs.zoomLevel);
 			AutoSurface surface(this);
 			int deviceHeight = sizeZoomed;
 			if (surface) {
