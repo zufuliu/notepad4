@@ -159,9 +159,9 @@ BEGIN
         MENUITEM "Clear Clipboar&d",            IDM_EDIT_CLEARCLIPBOARD
         POPUP "Copy to Clipboard"
         BEGIN
-            MENUITEM "&FileName",                       CMD_COPYFILENAME_NOEXT
-            MENUITEM "FileName and &Ext\tShift+F9",     CMD_COPYFILENAME
-            MENUITEM "Full &PathName\tAlt+Shift+F9",    CMD_COPYPATHNAME
+            MENUITEM "&File Name",                       CMD_COPYFILENAME_NOEXT
+            MENUITEM "File Name and &Ext\tShift+F9",     CMD_COPYFILENAME
+            MENUITEM "Full &Path Name\tAlt+Shift+F9",    CMD_COPYPATHNAME
             MENUITEM SEPARATOR
             MENUITEM "Copy A&ll\tAlt+A",            IDM_EDIT_COPYALL
             MENUITEM "Copy &Add\tCtrl+E",           IDM_EDIT_COPYADD
@@ -459,7 +459,7 @@ BEGIN
         MENUITEM "&Tab Settings...\tCtrl+T",    IDM_VIEW_TABSETTINGS
         MENUITEM "&Word Wrap Settings...",      IDM_VIEW_WORDWRAPSETTINGS
         MENUITEM "&Long Line Settings...",      IDM_VIEW_LONGLINESETTINGS
-        POPUP "&Auto Complete"
+        POPUP "&Auto Completion"
         BEGIN
             MENUITEM "&Indent Text",                IDM_VIEW_AUTOINDENTTEXT
             MENUITEM "Close HTML/XML &Tags",        IDM_VIEW_AUTOCLOSETAGS
