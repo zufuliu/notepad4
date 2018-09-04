@@ -85,6 +85,18 @@ typedef struct np2params {
 //==== Reuse Window Lock Timeout ==============================================
 #define REUSEWINDOWLOCKTIMEOUT 1000
 
+// Settings Verion
+enum {
+// No version
+NP2SettingsVerion_None = 0,
+/*
+1. ZoomLevel and PrintZoom changed from relative font size in point to absolute percentage.
+*/
+NP2SettingsVerion_V1 = 1,
+NP2SettingsVerion_Current = NP2SettingsVerion_V1,
+};
+
+
 //==== Function Declarations ==================================================
 BOOL InitApplication(HINSTANCE hInstance);
 HWND InitInstance(HINSTANCE hInstance, int nCmdShow);
