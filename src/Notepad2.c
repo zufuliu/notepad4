@@ -5223,6 +5223,7 @@ void LoadSettings(void) {
 
 	LoadIniSection(L"Settings", pIniSection, cchIniSection);
 
+	const int iSettingsVersion = IniSectionGetInt(pIniSection, L"SettingsVersion", NP2SettingsVerion_None);
 	bSaveSettings = IniSectionGetBool(pIniSection, L"SaveSettings", 1);
 	bSaveRecentFiles = IniSectionGetBool(pIniSection, L"SaveRecentFiles", 0);
 	bSaveFindReplace = IniSectionGetBool(pIniSection, L"SaveFindReplace", 0);
@@ -5280,6 +5281,8 @@ void LoadSettings(void) {
 	bBackspaceUnindents = IniSectionGetBool(pIniSection, L"BackspaceUnindents", 0);
 
 	iZoomLevel = IniSectionGetInt(pIniSection, L"ZoomLevel", 100);
+	// in v4.2.25.1172, stored as a relative font size in point, in range [-10, 20].
+	iZoomLevel = (iSettingsVersion < NP2SettingsVerion_V1)? 100 : iZoomLevel;
 	iZoomLevel = clamp_i(iZoomLevel, SC_MIN_ZOOM_LEVEL, SC_MAX_ZOOM_LEVEL);
 
 	iTabWidth = IniSectionGetInt(pIniSection, L"TabWidth", 4);
@@ -5338,6 +5341,8 @@ void LoadSettings(void) {
 	iPrintColor = clamp_i(iPrintColor, SC_PRINT_NORMAL, SC_PRINT_SCREENCOLOURS);
 
 	iPrintZoom = IniSectionGetInt(pIniSection, L"PrintZoom", 100);
+	// previously stored as a relative font size in point plus 10, in range [-10, 20] + 10
+	iPrintZoom = (iSettingsVersion < NP2SettingsVerion_V1)? 100 : iPrintZoom;
 	iPrintZoom = clamp_i(iPrintZoom, SC_MIN_ZOOM_LEVEL, SC_MAX_ZOOM_LEVEL);
 
 	pagesetupMargin.left = IniSectionGetInt(pIniSection, L"PrintMarginLeft", -1);
@@ -5554,6 +5559,7 @@ void SaveSettings(BOOL bSaveSettingsNow) {
 	pIniSection = LocalAlloc(LPTR, sizeof(WCHAR) * 32 * 1024);
 	//cchIniSection = (int)LocalSize(pIniSection) / sizeof(WCHAR);
 
+	IniSectionSetInt(pIniSection, L"SettingsVersion", NP2SettingsVerion_Current);
 	IniSectionSetBool(pIniSection, L"SaveSettings", bSaveSettings);
 	IniSectionSetBool(pIniSection, L"SaveRecentFiles", bSaveRecentFiles);
 	IniSectionSetBool(pIniSection, L"SaveFindReplace", bSaveFindReplace);
