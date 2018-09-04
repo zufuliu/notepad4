@@ -2312,6 +2312,7 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	EnableCmd(hmenu, IDM_SET_BIDIRECTIONAL_R2L, i);
 	i = IDM_SET_BIDIRECTIONAL_NONE + iBidirectional;
 	CheckMenuRadioItem(hmenu, IDM_SET_BIDIRECTIONAL_NONE, IDM_SET_BIDIRECTIONAL_R2L, i, MF_BYCOMMAND);
+
 	CheckCmd(hmenu, IDM_SET_USE_INLINE_IME, bUseInlineIME);
 	CheckCmd(hmenu, IDM_SET_USE_BLOCK_CARET, bInlineIMEUseBlockCaret);
 
@@ -5367,22 +5368,28 @@ void LoadSettings(void) {
 
 	iRenderingTechnology = IniSectionGetInt(pIniSection, L"RenderingTechnology", (IsVistaAndAbove()? SC_TECHNOLOGY_DIRECTWRITE : SC_TECHNOLOGY_DEFAULT));
 	iRenderingTechnology = clamp_i(iRenderingTechnology, SC_TECHNOLOGY_DEFAULT, SC_TECHNOLOGY_DIRECTWRITEDC);
+
 	iBidirectional = IniSectionGetInt(pIniSection, L"Bidirectional", SC_BIDIRECTIONAL_DISABLED);
 	iBidirectional = clamp_i(iBidirectional, SC_BIDIRECTIONAL_DISABLED, SC_BIDIRECTIONAL_R2L);
+
 	iFontQuality = IniSectionGetInt(pIniSection, L"FontQuality", SC_EFF_QUALITY_LCD_OPTIMIZED);
 	iFontQuality = clamp_i(iFontQuality, SC_EFF_QUALITY_DEFAULT, SC_EFF_QUALITY_LCD_OPTIMIZED);
+
 	iCaretStyle = IniSectionGetInt(pIniSection, L"CaretStyle", 1);
 	iCaretStyle = clamp_i(iCaretStyle, 0, 3);
 	iCaretBlinkPeriod = IniSectionGetInt(pIniSection, L"CaretBlinkPeriod", -1);
+
 	// Korean IME use inline mode (and block caret in inline mode) by default
 	bUseInlineIME = IniSectionGetBool(pIniSection, L"UseInlineIME", -1);
 	bInlineIMEUseBlockCaret = IniSectionGetBool(pIniSection, L"InlineIMEUseBlockCaret", 0);
-	if (bUseInlineIME == -1) {
+	if (bUseInlineIME == -1) { // auto detection once
 		// ScintillaWin::KoreanIME()
 		const int codePage = Scintilla_InputCodePage();
 		if (codePage == 949 || codePage == 1361) {
 			bUseInlineIME = TRUE;
 			bInlineIMEUseBlockCaret = TRUE;
+		} else {
+			bUseInlineIME = FALSE;
 		}
 	}
 
