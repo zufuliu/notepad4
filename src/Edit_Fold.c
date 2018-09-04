@@ -17,9 +17,8 @@ UINT stateToggleFoldLevel = 0;
 UINT Style_GetDefaultFoldState(void) {
 	switch (pLexCurrent->rid) {
 	case NP2LEX_DEFAULT:
-		return (1 << 1);
 	case NP2LEX_ANSI:
-		return 0;
+		return (1 << 1) | (1 << 5);
 	case NP2LEX_CPP:
 	case NP2LEX_CSHARP:
 	case NP2LEX_XML:
@@ -41,9 +40,9 @@ UINT Style_GetDefaultFoldState(void) {
 }
 
 int Style_MapFoldLevel(int level) {
-	switch (pLexCurrent->rid) {
-	case NP2LEX_DEFAULT:
-	case NP2LEX_PYTHON:
+	switch (pLexCurrent->iLexer) {
+	case SCLEX_NULL:
+	case SCLEX_PYTHON:
 		level = (level - 1) * 4 + 1;
 		break;
 	}
