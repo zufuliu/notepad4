@@ -3832,15 +3832,13 @@ int Editor::KeyCommand(unsigned int iMessage) {
 		AddChar('\f');
 		break;
 	case SCI_ZOOMIN:
-		if (vs.zoomLevel < 20) {
-			vs.zoomLevel++;
+		if (vs.ZoomIn()) {
 			InvalidateStyleRedraw();
 			NotifyZoom();
 		}
 		break;
 	case SCI_ZOOMOUT:
-		if (vs.zoomLevel > -10) {
-			vs.zoomLevel--;
+		if (vs.ZoomOut()) {
 			InvalidateStyleRedraw();
 			NotifyZoom();
 		}
@@ -6298,7 +6296,7 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 		break;
 
 	case SCI_SETPRINTMAGNIFICATION:
-		view.printParameters.magnification = static_cast<int>(wParam);
+		view.printParameters.magnification = std::clamp(static_cast<int>(wParam), SC_MIN_ZOOM_LEVEL, SC_MAX_ZOOM_LEVEL);
 		break;
 
 	case SCI_GETPRINTMAGNIFICATION:
@@ -7580,7 +7578,7 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 		break;
 
 	case SCI_SETZOOM:
-		vs.zoomLevel = static_cast<int>(wParam);
+		vs.zoomLevel = std::clamp(static_cast<int>(wParam), SC_MIN_ZOOM_LEVEL, SC_MAX_ZOOM_LEVEL);
 		InvalidateStyleRedraw();
 		NotifyZoom();
 		break;

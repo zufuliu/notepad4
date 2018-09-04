@@ -66,10 +66,7 @@ FontRealised::~FontRealised() {
 
 void FontRealised::Realise(Surface &surface, int zoomLevel, int technology, const FontSpecification &fs) {
 	PLATFORM_ASSERT(fs.fontName);
-	sizeZoomed = fs.size + zoomLevel * SC_FONT_SIZE_MULTIPLIER;
-	if (sizeZoomed <= 2 * SC_FONT_SIZE_MULTIPLIER)	// Hangs if sizeZoomed <= 1
-		sizeZoomed = 2 * SC_FONT_SIZE_MULTIPLIER;
-
+	sizeZoomed = GetFontSizeZoomed(fs.size, zoomLevel);
 	const float deviceHeight = static_cast<float>(surface.DeviceHeightFont(sizeZoomed));
 	const FontParameters fp(fs.fontName, deviceHeight / SC_FONT_SIZE_MULTIPLIER, fs.weight, fs.italic, fs.extraFontFlag, technology, fs.characterSet);
 	font.Create(fp);
@@ -275,7 +272,7 @@ void ViewStyle::Init(size_t stylesSize_) {
 	marginInside = true;
 	CalculateMarginWidthAndMask();
 	textStart = marginInside ? fixedColumnWidth : leftMarginWidth;
-	zoomLevel = 0;
+	zoomLevel = 100;
 	viewWhitespace = wsInvisible;
 	tabDrawMode = tdLongArrow;
 	whitespaceSize = 1;
@@ -568,6 +565,42 @@ bool ViewStyle::SetWrapIndentMode(int wrapIndentMode_) noexcept {
 	const bool changed = wrapIndentMode != wrapIndentMode_;
 	wrapIndentMode = wrapIndentMode_;
 	return changed;
+}
+
+bool ViewStyle::ZoomIn() noexcept {
+	if (zoomLevel < SC_MAX_ZOOM_LEVEL) {
+		int level = zoomLevel;
+		if (level < 200) {
+			level += 10;
+		} else {
+			level += 25;
+		}
+
+		level = std::min(level, SC_MAX_ZOOM_LEVEL);
+		if (level != zoomLevel) {
+			zoomLevel = level;
+			return true;
+		}
+	}
+	return false;
+}
+
+bool ViewStyle::ZoomOut() noexcept {
+	if (zoomLevel > SC_MIN_ZOOM_LEVEL) {
+		int level = zoomLevel;
+		if (level <= 200) {
+			level -= 10;
+		} else {
+			level -= 25;
+		}
+
+		level = std::max(level, SC_MIN_ZOOM_LEVEL);
+		if (level != zoomLevel) {
+			zoomLevel = level;
+			return true;
+		}
+	}
+	return false;
 }
 
 void ViewStyle::AllocStyles(size_t sizeNew) {

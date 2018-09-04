@@ -454,7 +454,7 @@ extern "C" UINT_PTR CALLBACK PageSetupHook(HWND hwnd, UINT uiMsg, WPARAM wParam,
 
 		SendDlgItemMessage(hwnd, 30, EM_LIMITTEXT, 32, 0);
 
-		SendDlgItemMessage(hwnd, 31, UDM_SETRANGE, 0, MAKELONG((short)20, (short) - 10));
+		SendDlgItemMessage(hwnd, 31, UDM_SETRANGE, 0, MAKELONG(SC_MAX_ZOOM_LEVEL, SC_MIN_ZOOM_LEVEL));
 		SendDlgItemMessage(hwnd, 31, UDM_SETPOS, 0, MAKELONG((short)iPrintZoom, 0));
 
 		// Set header options
@@ -511,7 +511,7 @@ extern "C" UINT_PTR CALLBACK PageSetupHook(HWND hwnd, UINT uiMsg, WPARAM wParam,
 			if (HIWORD(lPos) == 0) {
 				iPrintZoom = (int)(short)LOWORD(lPos);
 			} else {
-				iPrintZoom = 0;
+				iPrintZoom = 100;
 			}
 
 			iPrintHeader = (int)SendDlgItemMessage(hwnd, 32, CB_GETCURSEL, 0, 0);

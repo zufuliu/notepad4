@@ -129,8 +129,7 @@ BOOL	bTabsAsSpacesG;
 BOOL	bTabIndents;
 BOOL	bTabIndentsG;
 BOOL	bBackspaceUnindents;
-int		iZoomLevel = 0;
-int		iZoomPercent = 100;
+int		iZoomLevel = 100;
 extern int iBaseFontSize;
 int		iTabWidth;
 int		iTabWidthG;
@@ -172,7 +171,7 @@ BOOL	bAutoStripBlanks;
 int		iPrintHeader;
 int		iPrintFooter;
 int		iPrintColor;
-int		iPrintZoom;
+int		iPrintZoom = 100;
 RECT	pagesetupMargin;
 BOOL	bSaveBeforeRunningTools;
 int		iFileWatchingMode;
@@ -2022,8 +2021,6 @@ BOOL IsInlineIMEActive(void) {
 
 void MsgNotifyZoom(void) {
 	iZoomLevel = (int)SendMessage(hwndEdit, SCI_GETZOOM, 0, 0);
-	// scintilla/src/ViewStyle.cxx FontRealised::Realise()
-	iZoomPercent = (100*(iZoomLevel*SC_FONT_SIZE_MULTIPLIER + iBaseFontSize) + iBaseFontSize/2) / iBaseFontSize;
 
 	UpdateLineNumberWidth();
 	UpdateStatusbar();
@@ -3974,7 +3971,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	case IDM_VIEW_RESETZOOM:
-		SendMessage(hwndEdit, SCI_SETZOOM, 0, 0);
+		SendMessage(hwndEdit, SCI_SETZOOM, 100, 0);
 		break;
 
 	case IDM_VIEW_TOOLBAR:
@@ -5280,7 +5277,9 @@ void LoadSettings(void) {
 	bTabIndentsG = bTabIndents;
 
 	bBackspaceUnindents = IniSectionGetBool(pIniSection, L"BackspaceUnindents", 0);
-	iZoomLevel = IniSectionGetInt(pIniSection, L"ZoomLevel", 0);
+
+	iZoomLevel = IniSectionGetInt(pIniSection, L"ZoomLevel", 100);
+	iZoomLevel = clamp_i(iZoomLevel, SC_MIN_ZOOM_LEVEL, SC_MAX_ZOOM_LEVEL);
 
 	iTabWidth = IniSectionGetInt(pIniSection, L"TabWidth", 4);
 	iTabWidth = clamp_i(iTabWidth, 1, 256);
@@ -5337,8 +5336,8 @@ void LoadSettings(void) {
 	iPrintColor = IniSectionGetInt(pIniSection, L"PrintColorMode", SC_PRINT_COLOURONWHITE);
 	iPrintColor = clamp_i(iPrintColor, SC_PRINT_NORMAL, SC_PRINT_SCREENCOLOURS);
 
-	iPrintZoom = IniSectionGetInt(pIniSection, L"PrintZoom", 10) - 10;
-	iPrintZoom = clamp_i(iPrintZoom, -10, 20);
+	iPrintZoom = IniSectionGetInt(pIniSection, L"PrintZoom", 100);
+	iPrintZoom = clamp_i(iPrintZoom, SC_MIN_ZOOM_LEVEL, SC_MAX_ZOOM_LEVEL);
 
 	pagesetupMargin.left = IniSectionGetInt(pIniSection, L"PrintMarginLeft", -1);
 	pagesetupMargin.left = max_i(pagesetupMargin.left, -1);
@@ -5604,7 +5603,7 @@ void SaveSettings(BOOL bSaveSettingsNow) {
 	IniSectionSetInt(pIniSection, L"PrintHeader", iPrintHeader);
 	IniSectionSetInt(pIniSection, L"PrintFooter", iPrintFooter);
 	IniSectionSetInt(pIniSection, L"PrintColorMode", iPrintColor);
-	IniSectionSetInt(pIniSection, L"PrintZoom", iPrintZoom + 10);
+	IniSectionSetInt(pIniSection, L"PrintZoom", iPrintZoom);
 	IniSectionSetInt(pIniSection, L"PrintMarginLeft", pagesetupMargin.left);
 	IniSectionSetInt(pIniSection, L"PrintMarginTop", pagesetupMargin.top);
 	IniSectionSetInt(pIniSection, L"PrintMarginRight", pagesetupMargin.right);
@@ -6709,7 +6708,7 @@ void UpdateStatusbar(void) {
 	}
 
 	Style_GetCurrentLexerName(tchLexerName, COUNTOF(tchLexerName));
-	wsprintf(tchZoom, L" %i%%", iZoomPercent);
+	wsprintf(tchZoom, L" %i%%", iZoomLevel);
 
 	StatusSetText(hwndStatus, STATUS_DOCPOS, tchDocPos);
 	StatusSetText(hwndStatus, STATUS_LEXER, tchLexerName);
