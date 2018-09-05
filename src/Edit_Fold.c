@@ -143,7 +143,15 @@ void FoldToggleCurrent(FOLD_ACTION action) {
 	int lev = level - SC_FOLDLEVELBASE;
 	lev &= SC_FOLDLEVELNUMBERMASK;
 	if (!(level & SC_FOLDLEVELHEADERFLAG)) {
-		lev -= 1;
+		switch (pLexCurrent->iLexer) {
+		case SCLEX_NULL:
+		case SCLEX_PYTHON:
+			lev -= 4;
+			break;
+		default:
+			lev -= 1;
+			break;
+		}
 	}
 
 	lev += SC_FOLDLEVELBASE;
