@@ -37,7 +37,7 @@ UINT Style_GetDefaultFoldState(void) {
 	return (1 << 0) | (1 << 1);
 }
 
-BOOL FoldToggleNode(int line, FOLD_ACTION *pAction) {
+void FoldToggleNode(int line, FOLD_ACTION *pAction, BOOL *fToggled) {
 	const BOOL fExpanded = SciCall_GetFoldExpanded(line);
 	FOLD_ACTION action = *pAction;
 	if (action == FOLD_ACTION_SNIFF) {
@@ -46,16 +46,16 @@ BOOL FoldToggleNode(int line, FOLD_ACTION *pAction) {
 
 	if ((action == FOLD_ACTION_FOLD && fExpanded) || (action == FOLD_ACTION_EXPAND && !fExpanded)) {
 		SciCall_ToggleFold(line);
-		const BOOL after = SciCall_GetFoldExpanded(line);
-		if (fExpanded != after) {
-			if (*pAction == FOLD_ACTION_SNIFF) {
-				*pAction = action;
+		if (*fToggled == FALSE || *pAction == FOLD_ACTION_SNIFF) {
+			const BOOL after = SciCall_GetFoldExpanded(line);
+			if (fExpanded != after) {
+				*fToggled = TRUE;
+				if (*pAction == FOLD_ACTION_SNIFF) {
+					*pAction = action;
+				}
 			}
-			return TRUE;
 		}
 	}
-
-	return FALSE;
 }
 
 void FoldToggleAll(FOLD_ACTION action) {
@@ -65,9 +65,7 @@ void FoldToggleAll(FOLD_ACTION action) {
 	for (int line = 0; line < lineCount; ++line) {
 		int level = SciCall_GetFoldLevel(line);
 		if (level & SC_FOLDLEVELHEADERFLAG) {
-			if (FoldToggleNode(line, &action)) {
-				fToggled = TRUE;
-			}
+			FoldToggleNode(line, &action, &fToggled);
 		}
 	}
 
@@ -97,9 +95,7 @@ void FoldToggleLevel(int lev, FOLD_ACTION action) {
 		if (level & SC_FOLDLEVELHEADERFLAG) {
 			level &= SC_FOLDLEVELNUMBERMASK;
 			if (lev == level) {
-				if (FoldToggleNode(line, &action)) {
-					fToggled = TRUE;
-				}
+				FoldToggleNode(line, &action, &fToggled);
 			}
 		}
 	}
@@ -151,7 +147,7 @@ void FoldToggleCurrent(FOLD_ACTION action) {
 		}
 	}
 
-	fToggled = FoldToggleNode(line, &action);
+	FoldToggleNode(line, &action, &fToggled);
 	if (fToggled) {
 		SciCall_SetXCaretPolicy(CARET_SLOP | CARET_STRICT | CARET_EVEN, 50);
 		SciCall_SetYCaretPolicy(CARET_SLOP | CARET_STRICT | CARET_EVEN, 5);
@@ -172,9 +168,7 @@ void FoldToggleDefault(FOLD_ACTION action) {
 			level &= SC_FOLDLEVELNUMBERMASK;
 			level -= SC_FOLDLEVELBASE;
 			if (state & (1U << level)) {
-				if (FoldToggleNode(line, &action)) {
-					fToggled = TRUE;
-				}
+				FoldToggleNode(line, &action, &fToggled);
 			}
 		}
 	}
@@ -189,6 +183,7 @@ void FoldToggleDefault(FOLD_ACTION action) {
 }
 
 void FoldPerformAction(int ln, int mode, FOLD_ACTION action) {
+	BOOL fToggled = FALSE;
 	if (mode & (FOLD_CHILDREN | FOLD_SIBLINGS)) {
 		// ln/lvNode: line and level of the source of this fold action
 		const int lnNode = ln;
@@ -212,11 +207,11 @@ void FoldPerformAction(int ln, int mode, FOLD_ACTION action) {
 				return;
 			}
 			if (fHeader && (lv == lvNode || (lv > lvNode && (mode & FOLD_CHILDREN)))) {
-				FoldToggleNode(ln, &action);
+				FoldToggleNode(ln, &action, &fToggled);
 			}
 		}
 	} else {
-		FoldToggleNode(ln, &action);
+		FoldToggleNode(ln, &action, &fToggled);
 	}
 }
 
