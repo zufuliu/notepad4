@@ -12,8 +12,6 @@ typedef enum {
 #define FOLD_CHILDREN SCMOD_CTRL
 #define FOLD_SIBLINGS SCMOD_SHIFT
 
-UINT stateToggleFoldLevel = 0;
-
 UINT Style_GetDefaultFoldState(void) {
 	switch (pLexCurrent->rid) {
 	case NP2LEX_DEFAULT:
@@ -37,17 +35,6 @@ UINT Style_GetDefaultFoldState(void) {
 		return (1 << 0) | (1 << 4) | (1 << 8);
 	}
 	return (1 << 0) | (1 << 1);
-}
-
-// zero based level number
-int Style_MapFoldLevel(int level) {
-	switch (pLexCurrent->iLexer) {
-	case SCLEX_NULL:
-	case SCLEX_PYTHON:
-		level = level * 4;
-		break;
-	}
-	return level + SC_FOLDLEVELBASE;
 }
 
 BOOL FoldToggleNode(int line, FOLD_ACTION *pAction) {
@@ -74,7 +61,6 @@ BOOL FoldToggleNode(int line, FOLD_ACTION *pAction) {
 void FoldToggleAll(FOLD_ACTION action) {
 	BOOL fToggled = FALSE;
 	const int lineCount = SciCall_GetLineCount();
-	int maxLevel = 0;
 
 	for (int line = 0; line < lineCount; ++line) {
 		int level = SciCall_GetFoldLevel(line);
@@ -82,20 +68,10 @@ void FoldToggleAll(FOLD_ACTION action) {
 			if (FoldToggleNode(line, &action)) {
 				fToggled = TRUE;
 			}
-			level &= SC_FOLDLEVELNUMBERMASK;
-			level -= SC_FOLDLEVELBASE;
-			if (level <= 10 && maxLevel < level) {
-				maxLevel = level;
-			}
 		}
 	}
 
-	stateToggleFoldLevel = 0;
 	if (fToggled) {
-		if (action == FOLD_ACTION_FOLD) {
-			++maxLevel;
-			stateToggleFoldLevel = (1 << (maxLevel + 1)) - 1;
-		}
 		SciCall_SetXCaretPolicy(CARET_SLOP | CARET_STRICT | CARET_EVEN, 50);
 		SciCall_SetYCaretPolicy(CARET_SLOP | CARET_STRICT | CARET_EVEN, 5);
 		SciCall_ScrollCaret();
@@ -106,14 +82,21 @@ void FoldToggleAll(FOLD_ACTION action) {
 
 void FoldToggleLevel(int lev, FOLD_ACTION action) {
 	BOOL fToggled = FALSE;
-	const int usedLevel = Style_MapFoldLevel(lev);
 	const int lineCount = SciCall_GetLineCount();
+
+	switch (pLexCurrent->iLexer) {
+	case SCLEX_NULL:
+	case SCLEX_PYTHON:
+		lev = lev * 4;
+		break;
+	}
+	lev += SC_FOLDLEVELBASE;
 
 	for (int line = 0; line < lineCount; ++line) {
 		int level = SciCall_GetFoldLevel(line);
 		if (level & SC_FOLDLEVELHEADERFLAG) {
 			level &= SC_FOLDLEVELNUMBERMASK;
-			if (usedLevel == level) {
+			if (lev == level) {
 				if (FoldToggleNode(line, &action)) {
 					fToggled = TRUE;
 				}
@@ -122,12 +105,6 @@ void FoldToggleLevel(int lev, FOLD_ACTION action) {
 	}
 
 	if (fToggled) {
-		++lev;
-		if (action == FOLD_ACTION_FOLD) {
-			stateToggleFoldLevel |= (1U << lev);
-		} else {
-			stateToggleFoldLevel &= ~(1U << lev);
-		}
 		SciCall_SetXCaretPolicy(CARET_SLOP | CARET_STRICT | CARET_EVEN, 50);
 		SciCall_SetYCaretPolicy(CARET_SLOP | CARET_STRICT | CARET_EVEN, 5);
 		SciCall_ScrollCaret();
@@ -140,9 +117,13 @@ void FoldToggleCurrent(FOLD_ACTION action) {
 	BOOL fToggled = FALSE;
 	int line = SciCall_LineFromPosition(SciCall_GetCurrentPos());
 	int level = SciCall_GetFoldLevel(line);
-	int lev = level - SC_FOLDLEVELBASE;
-	lev &= SC_FOLDLEVELNUMBERMASK;
+
 	if (!(level & SC_FOLDLEVELHEADERFLAG)) {
+#if 1
+		// Document::GetFoldParent(Sci::Line line)
+		line = SciCall_GetFoldParent(line);
+#else
+		int lev = level & SC_FOLDLEVELNUMBERMASK;
 		switch (pLexCurrent->iLexer) {
 		case SCLEX_NULL:
 		case SCLEX_PYTHON:
@@ -152,22 +133,25 @@ void FoldToggleCurrent(FOLD_ACTION action) {
 			lev -= 1;
 			break;
 		}
-	}
 
-	lev += SC_FOLDLEVELBASE;
-	for (; line >= 0; --line) {
-		level = SciCall_GetFoldLevel(line);
-		if (level & SC_FOLDLEVELHEADERFLAG) {
-			level &= SC_FOLDLEVELNUMBERMASK;
-			if (lev == level) {
-				if (FoldToggleNode(line, &action)) {
-					fToggled = TRUE;
+		--line;
+		while (line >= 0) {
+			level = SciCall_GetFoldLevel(line);
+			if (level & SC_FOLDLEVELHEADERFLAG) {
+				level &= SC_FOLDLEVELNUMBERMASK;
+				if (lev == level) {
+					break;
 				}
-				break;
 			}
+			--line;
+		}
+#endif
+		if (line < 0) {
+			return;
 		}
 	}
 
+	fToggled = FoldToggleNode(line, &action);
 	if (fToggled) {
 		SciCall_SetXCaretPolicy(CARET_SLOP | CARET_STRICT | CARET_EVEN, 50);
 		SciCall_SetYCaretPolicy(CARET_SLOP | CARET_STRICT | CARET_EVEN, 5);
@@ -179,16 +163,8 @@ void FoldToggleCurrent(FOLD_ACTION action) {
 
 void FoldToggleDefault(FOLD_ACTION action) {
 	BOOL fToggled = FALSE;
-	stateToggleFoldLevel = 0;
-
 	const UINT state = Style_GetDefaultFoldState();
-	if (state == 0) {
-		return;
-	}
 	const int lineCount = SciCall_GetLineCount();
-	if (lineCount < 2)	{
-		return;
-	}
 
 	for (int line = 0; line < lineCount; ++line) {
 		int level = SciCall_GetFoldLevel(line);
@@ -198,11 +174,6 @@ void FoldToggleDefault(FOLD_ACTION action) {
 			if (state & (1U << level)) {
 				if (FoldToggleNode(line, &action)) {
 					fToggled = TRUE;
-					if (action == FOLD_ACTION_FOLD) {
-						stateToggleFoldLevel |= (1U << level);
-					} else {
-						stateToggleFoldLevel &= ~(1U << level);
-					}
 				}
 			}
 		}

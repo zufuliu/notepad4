@@ -227,6 +227,10 @@ static inline void SciCall_SetFoldFlags(int flags) {
 	SciCall1(SCI_SETFOLDFLAGS, flags);
 }
 
+static inline int SciCall_GetLastChild(int line) {
+	return (int)SciCall2(SCI_GETLASTCHILD, line, -1);
+}
+
 static inline int SciCall_GetFoldParent(int line) {
 	return (int)SciCall1(SCI_GETFOLDPARENT, line);
 }

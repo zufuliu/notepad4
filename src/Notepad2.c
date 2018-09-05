@@ -2228,9 +2228,6 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	//EnableCmd(hmenu, IDM_VIEW_FOLD_LEVEL9, i && bShowCodeFolding);
 	//EnableCmd(hmenu, IDM_VIEW_FOLD_LEVEL10, i && bShowCodeFolding);
 	CheckCmd(hmenu, IDM_VIEW_FOLDING, bShowCodeFolding);
-	for (i = 1; i <= 10; i++) {
-		CheckCmd(hmenu, IDM_VIEW_FOLD_ALL + i, !!(stateToggleFoldLevel & (1 << i)));
-	}
 
 	CheckCmd(hmenu, IDM_VIEW_USE2NDDEFAULT, Style_GetUse2ndDefault(hwndEdit));
 
@@ -6832,7 +6829,6 @@ BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect, LPCWST
 		}
 	}
 
-	stateToggleFoldLevel = 0;
 	if (bNew) {
 		lstrcpy(szCurFile, L"");
 		SetDlgItemText(hwndMain, IDC_FILENAME, szCurFile);
