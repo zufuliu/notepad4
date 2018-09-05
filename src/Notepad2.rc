@@ -249,9 +249,9 @@ BEGIN
             MENUITEM "&HTML/XML Tags...\tAlt+X",        IDM_EDIT_INSERT_XMLTAG
             MENUITEM "New &GUID",                       IDM_EDIT_INSERT_GUID
             MENUITEM SEPARATOR
-            MENUITEM "&FileName",                       CMD_INSERTFILENAME_NOEXT
-            MENUITEM "FileName and &Ext\tCtrl+F9",      IDM_EDIT_INSERT_FILENAME
-            MENUITEM "Full &PathName\tCtrl+Shift+F9",   IDM_EDIT_INSERT_PATHNAME
+            MENUITEM "&File Name",                      CMD_INSERTFILENAME_NOEXT
+            MENUITEM "File Name and &Ext\tCtrl+F9",     IDM_EDIT_INSERT_FILENAME
+            MENUITEM "Full &Path Name\tCtrl+Shift+F9",  IDM_EDIT_INSERT_PATHNAME
             MENUITEM SEPARATOR
             MENUITEM "Current Date",                IDM_EDIT_INSERT_LOC_DATE
             MENUITEM "Current Date Time",           IDM_EDIT_INSERT_LOC_DATETIME
@@ -391,7 +391,7 @@ BEGIN
         MENUITEM "Zoom &In\tCtrl++",            IDM_VIEW_ZOOMIN
         MENUITEM "Zoom &Out\tCtrl+-",           IDM_VIEW_ZOOMOUT
         MENUITEM "Reset &Zoom\tCtrl+\\",        IDM_VIEW_RESETZOOM
-        MENUITEM "Toggle Full Screen\tF11",     IDM_VIEW_TOGGLE_FULLSCREEN
+        MENUITEM "Toggle Full Screen\tF11 [ESC]",IDM_VIEW_TOGGLE_FULLSCREEN
     END
     POPUP "Sche&me"
     BEGIN
@@ -499,9 +499,9 @@ BEGIN
         END
         POPUP "Window Title Displa&y"
         BEGIN
-            MENUITEM "FileName &Only",              IDM_VIEW_SHOWFILENAMEONLY
-            MENUITEM "FileName and &Directory",     IDM_VIEW_SHOWFILENAMEFIRST
-            MENUITEM "Full &PathName",              IDM_VIEW_SHOWFULLPATH
+            MENUITEM "File Name &Only",             IDM_VIEW_SHOWFILENAMEONLY
+            MENUITEM "File Name and &Directory",    IDM_VIEW_SHOWFILENAMEFIRST
+            MENUITEM "Full &Path Name",             IDM_VIEW_SHOWFULLPATH
             MENUITEM "&Text Excerpt",               IDM_VIEW_SHOWEXCERPT
         END
         POPUP "Esc &Key Function"
