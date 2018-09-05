@@ -3914,7 +3914,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case IDM_VIEW_FOLD_LEVEL9:
 	case IDM_VIEW_FOLD_LEVEL10:
 		if (bShowCodeFolding) {
-			FoldToggleLevel(LOWORD(wParam) - IDM_VIEW_FOLD_LEVEL1 + 1, FOLD_ACTION_SNIFF);
+			FoldToggleLevel(LOWORD(wParam) - IDM_VIEW_FOLD_LEVEL1, FOLD_ACTION_SNIFF);
 		}
 		break;
 
