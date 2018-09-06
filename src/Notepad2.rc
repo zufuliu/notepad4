@@ -391,7 +391,7 @@ BEGIN
         MENUITEM "Zoom &In\tCtrl++",            IDM_VIEW_ZOOMIN
         MENUITEM "Zoom &Out\tCtrl+-",           IDM_VIEW_ZOOMOUT
         MENUITEM "Reset &Zoom\tCtrl+\\",        IDM_VIEW_RESETZOOM
-        MENUITEM "Toggle Full Screen\tF11 [ESC]",IDM_VIEW_TOGGLE_FULLSCREEN
+        MENUITEM "Toggle Full Screen\tF11 [Esc]",IDM_VIEW_TOGGLE_FULLSCREEN
     END
     POPUP "Sche&me"
     BEGIN

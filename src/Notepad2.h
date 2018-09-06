@@ -122,6 +122,7 @@ int  TestIniFile(void);
 int  CreateIniFile(void);
 int  CreateIniFileEx(LPCWSTR lpszIniFile);
 
+void UpdateWindowTitle(void);
 void UpdateStatusbar(void);
 void UpdateStatusBarWidth(void);
 void UpdateToolbar(void);
