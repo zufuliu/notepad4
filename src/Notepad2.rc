@@ -516,6 +516,12 @@ BEGIN
         MENUITEM "Sh&ow Toolbar",               IDM_VIEW_TOOLBAR
         MENUITEM "C&ustomize Toolbar...",       IDM_VIEW_CUSTOMIZETB
         MENUITEM "Sh&ow Statusbar",             IDM_VIEW_STATUSBAR
+        POPUP "Full Screen Mode"
+        BEGIN
+            MENUITEM "Hide Menu",               IDM_VIEW_FULLSCREEN_HIDE_MENU
+            MENUITEM "Hide Toolbar",            IDM_VIEW_FULLSCREEN_HIDE_TOOL
+            MENUITEM "Hide Statusbar",          IDM_VIEW_FULLSCREEN_HIDE_STATUS
+        END
         MENUITEM SEPARATOR
         MENUITEM "Save Settings On E&xit",      IDM_VIEW_SAVESETTINGS
         MENUITEM "Save Settings &Now\tF7",      IDM_VIEW_SAVESETTINGSNOW
