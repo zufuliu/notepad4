@@ -6,8 +6,8 @@
 
 static KEYWORDLIST Keywords_Julia = {{
 "abstract begin bitstype break catch continue const do else elseif end export for function global if in import "
-"let local macro module quote return try type typealias using while "
-"true false nothing ans Inf NaN Inf32 NaN32 Inf16 NaN16"
+"let local macro module mutable primitive quote return struct try type typealias using where while "
+"true false nothing missing ans Inf NaN Inf32 NaN32 Inf16 NaN16"
 
 , // 1 Type Keyword
 "ANY Any Void Exception String Number Real Float Integer Signed Unsigned "
@@ -44,6 +44,8 @@ EDITLEXER lexJulia = { SCLEX_MATLAB, NP2LEX_JULIA, L"Julia Script", L"jl", L"", 
 	{ SCE_MAT_FUNCTION, NP2STYLE_Function, L"Function", L"fore:#A46000", L"" },
 	{ MULTI_STYLE(SCE_MAT_COMMENT, SCE_MAT_COMMENTBLOCK, 0, 0), NP2STYLE_Comment, L"Comment", L"fore:#008000", L"" },
 	{ MULTI_STYLE(SCE_MAT_STRING, SCE_MAT_DOUBLEQUOTESTRING, 0, 0), NP2STYLE_String, L"String", L"fore:#008000", L"" },
+	{ SCE_MAT_RAW_STRING2, NP2STYLE_RawString, L"Raw String", L"fore:#008080", L"" },
+	{ SCE_MAT_TRIPLE_STRING2, NP2STYLE_TripleString, L"Triple Quoted String", L"fore:#F08000", L"" },
 	{ MULTI_STYLE(SCE_MAT_NUMBER, SCE_MAT_HEXNUM, 0, 0), NP2STYLE_Number, L"Number", L"fore:#FF0000", L"" },
 	{ SCE_MAT_BACKTICK, NP2STYLE_Backticks, L"Backticks", L"fore:#FF0080", L"" },
 	{ SCE_MAT_REGEX, NP2STYLE_Regex, L"Regex", L"fore:#006633; back:#FFF1A8", L"" },
