@@ -1407,14 +1407,23 @@ void UpdateWindowTitle(void) {
 				IDS_READONLY, bReadOnly, szTitleExcerpt);
 }
 
-static inline void UpdateSelectionMarginWidth() {
+void UpdateSelectionMarginWidth() {
+	// fixed width to put arrow cursor.
 	int width = bShowSelectionMargin ? RoundToCurrentDPI(16) : 0;
 	SciCall_SetMarginWidth(MARGIN_SELECTION, width);
 }
 
-static inline void UpdateFoldMarginWidth() {
-	int width = bShowCodeFolding ? RoundToCurrentDPI(13) : 0;
-	SciCall_SetMarginWidth(MARGIN_FOLD_INDEX, width);
+void UpdateFoldMarginWidth() {
+	if (bShowCodeFolding) {
+		const int iLineMarginWidthNow = (int)SendMessage(hwndEdit, SCI_GETMARGINWIDTHN, MARGIN_FOLD_INDEX, 0);
+		const int iLineMarginWidthFit = (int)SendMessage(hwndEdit, SCI_TEXTWIDTH, STYLE_LINENUMBER, (LPARAM)"+_");
+
+		if (iLineMarginWidthNow != iLineMarginWidthFit) {
+			SciCall_SetMarginWidth(MARGIN_FOLD_INDEX, iLineMarginWidthFit);
+		}
+	} else {
+		SciCall_SetMarginWidth(MARGIN_FOLD_INDEX, 0);
+	}
 }
 
 #if NP2_ENABLE_SHOW_CALL_TIPS
@@ -1528,12 +1537,10 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	// Margins
 	UpdateSelectionMarginWidth();
-	UpdateLineNumberWidth();
 
 	// Margins
 	SciCall_SetMarginType(MARGIN_FOLD_INDEX, SC_MARGIN_SYMBOL);
 	SciCall_SetMarginMask(MARGIN_FOLD_INDEX, SC_MASK_FOLDERS);
-	UpdateFoldMarginWidth();
 	SciCall_SetMarginSensitive(MARGIN_FOLD_INDEX, TRUE);
 	// Code folding, Box tree
 	SciCall_MarkerDefine(SC_MARKNUM_FOLDEROPEN, SC_MARK_BOXMINUS);
@@ -1844,8 +1851,6 @@ void MsgDPIChanged(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	Style_OnDPIChanged(hwndEdit);
 	UpdateSelectionMarginWidth();
-	UpdateLineNumberWidth();
-	UpdateFoldMarginWidth();
 	SciCall_GotoPos(pos);
 
 	// recreate toolbar and statusbar
@@ -2023,6 +2028,7 @@ void MsgNotifyZoom(void) {
 	iZoomLevel = (int)SendMessage(hwndEdit, SCI_GETZOOM, 0, 0);
 
 	UpdateLineNumberWidth();
+	UpdateFoldMarginWidth();
 	UpdateStatusbar();
 }
 
@@ -3696,26 +3702,18 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	case IDM_VIEW_SCHEME:
 		Style_SelectLexerDlg(hwndEdit);
-		UpdateStatusbar();
-		UpdateLineNumberWidth();
 		break;
 
 	case IDM_VIEW_USE2NDDEFAULT:
 		Style_ToggleUse2ndDefault(hwndEdit);
-		UpdateStatusbar();
-		UpdateLineNumberWidth();
 		break;
 
 	case IDM_VIEW_SCHEMECONFIG:
 		Style_ConfigDlg(hwndEdit);
-		UpdateStatusbar();
-		UpdateLineNumberWidth();
 		break;
 
 	case IDM_VIEW_FONT:
 		Style_SetDefaultFont(hwndEdit);
-		UpdateStatusbar();
-		UpdateLineNumberWidth();
 		break;
 
 	case IDM_VIEW_WORDWRAP:
@@ -4345,15 +4343,11 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case IDM_LANG_DEFAULT:
 		np2LexLangIndex = 0;
 		Style_SetDefaultLexer(hwndEdit);
-		UpdateStatusbar();
-		UpdateLineNumberWidth();
 		break;
 
 	case IDM_LANG_APACHE:
 		np2LexLangIndex = LOWORD(wParam);
 		Style_SetConfLexer(hwndEdit);
-		UpdateStatusbar();
-		UpdateLineNumberWidth();
 		break;
 
 	//case CMD_LEXHTML:
@@ -4366,8 +4360,6 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case IDM_LANG_ASP_JS:
 		np2LexLangIndex = (LOWORD(wParam) - IDM_LANG_WEB <= 0) ? 0 : LOWORD(wParam);
 		Style_SetHTMLLexer(hwndEdit);
-		UpdateStatusbar();
-		UpdateLineNumberWidth();
 		break;
 
 	//case CMD_LEXXML:
@@ -4402,8 +4394,6 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case IDM_LANG_SVG:
 		np2LexLangIndex = (LOWORD(wParam) - IDM_LANG_XML <= 0) ? 0 : LOWORD(wParam);
 		Style_SetXMLLexer(hwndEdit);
-		UpdateStatusbar();
-		UpdateLineNumberWidth();
 		break;
 
 	case CMD_TIMESTAMPS: {
@@ -6810,7 +6800,6 @@ BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect, LPCWST
 		FileVars_Init(NULL, 0, &fvCurFile);
 		EditSetNewText(hwndEdit, "", 0);
 		Style_SetLexer(hwndEdit, NULL);
-		UpdateLineNumberWidth();
 		bModified = FALSE;
 		bReadOnly = FALSE;
 		iEOLMode = iLineEndings[iDefaultEOLMode];
@@ -6898,16 +6887,17 @@ BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect, LPCWST
 		if (!keepTitleExcerpt) {
 			lstrcpy(szTitleExcerpt, L"");
 		}
+		iOriginalEncoding = iEncoding;
+		bModified = FALSE;
 		if (!lexerSpecified) { // flagLexerSpecified will be cleared
 			np2LexLangIndex = 0;
 			Style_SetLexerFromFile(hwndEdit, szCurFile);
-		}
-		UpdateLineNumberWidth();
-		iOriginalEncoding = iEncoding;
-		bModified = FALSE;
-		if (bReload) {
+		} else if (bReload) {
 			UpdateStatusBarWidth();
 			UpdateStatusbar();
+		}
+		if (!lexerSpecified) {
+			UpdateLineNumberWidth();
 		}
 		//bReadOnly = FALSE;
 		SendMessage(hwndEdit, SCI_SETEOLMODE, iEOLMode, 0);
@@ -7047,8 +7037,6 @@ BOOL FileSave(BOOL bSaveAlways, BOOL bAsk, BOOL bSaveAs, BOOL bSaveCopy) {
 						lstrcpy(szTitleExcerpt, L"");
 					}
 					Style_SetLexerFromFile(hwndEdit, szCurFile);
-					UpdateStatusbar();
-					UpdateLineNumberWidth();
 				} else {
 					lstrcpy(tchLastSaveCopyDir, tchFile);
 					PathRemoveFileSpec(tchLastSaveCopyDir);

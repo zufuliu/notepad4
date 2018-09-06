@@ -126,6 +126,7 @@ void UpdateWindowTitle(void);
 void UpdateStatusbar(void);
 void UpdateStatusBarWidth(void);
 void UpdateToolbar(void);
+void UpdateFoldMarginWidth(void);
 void UpdateLineNumberWidth(void);
 
 BOOL FileIO(BOOL fLoad, LPWSTR psz, BOOL bNoEncDetect, int *ienc, int *ieol,

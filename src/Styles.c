@@ -213,7 +213,7 @@ COLORREF	crCustom[16];
 BOOL	bUse2ndDefaultStyle;
 BOOL	fStylesModified = FALSE;
 BOOL	fWarnedNoIniFile = FALSE;
-int		iBaseFontSize = 10*SC_FONT_SIZE_MULTIPLIER + SC_FONT_SIZE_MULTIPLIER/2; // 10.5pt
+int		iBaseFontSize = 11*SC_FONT_SIZE_MULTIPLIER; // 11 pt in lexDefault
 int		iFontQuality = SC_EFF_QUALITY_LCD_OPTIMIZED;
 int		iCaretStyle = 1; // width 1, 0 for block
 int		iCaretBlinkPeriod = -1; // system default, 0 for noblink
@@ -1012,6 +1012,9 @@ void Style_SetLexer(HWND hwnd, PEDITLEXER pLexNew) {
 	// Save current lexer
 	pLexCurrent = pLexNew;
 	UpdateStatusBarWidth();
+	UpdateStatusbar();
+	UpdateLineNumberWidth();
+	UpdateFoldMarginWidth();
 }
 
 //=============================================================================
@@ -3142,7 +3145,6 @@ INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM
 			}
 
 			Style_SetLexer(hwndEdit, pLexCurrent);
-			UpdateLineNumberWidth();
 		}
 		break;
 
