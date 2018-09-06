@@ -130,7 +130,6 @@ BOOL	bTabIndents;
 BOOL	bTabIndentsG;
 BOOL	bBackspaceUnindents;
 int		iZoomLevel = 100;
-extern int iBaseFontSize;
 int		iTabWidth;
 int		iTabWidthG;
 int		iIndentWidth;
@@ -857,11 +856,8 @@ HWND InitInstance(HINSTANCE hInstance, int nCmdShow) {
 		bLastCopyFromMe = TRUE;
 		hwndNextCBChain = SetClipboardViewer(hwndMain);
 		uidsAppTitle = IDS_APPTITLE_PASTEBOARD;
-		SetWindowTitle(hwndMain, uidsAppTitle, fIsElevated, IDS_UNTITLED, szCurFile,
-					   iPathNameFormat, bModified || iEncoding != iOriginalEncoding,
-					   IDS_READONLY, bReadOnly, szTitleExcerpt);
+		UpdateWindowTitle();
 		bLastCopyFromMe = FALSE;
-
 		dwLastCopyTime = 0;
 		SetTimer(hwndMain, ID_PASTEBOARDTIMER, 100, PasteBoardTimer);
 	}
@@ -1157,9 +1153,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 
 					if (params->flagTitleExcerpt) {
 						lstrcpyn(szTitleExcerpt, StrEnd(&params->wchData) + 1, COUNTOF(szTitleExcerpt));
-						SetWindowTitle(hwnd, uidsAppTitle, fIsElevated, IDS_UNTITLED, szCurFile,
-									   iPathNameFormat, bModified || iEncoding != iOriginalEncoding,
-									   IDS_READONLY, bReadOnly, szTitleExcerpt);
+						UpdateWindowTitle();
 					}
 				}
 				// reset
@@ -1405,6 +1399,12 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 
 	}
 	return 0;
+}
+
+void UpdateWindowTitle(void) {
+	SetWindowTitle(hwndMain, uidsAppTitle, fIsElevated, IDS_UNTITLED, szCurFile,
+				iPathNameFormat, bModified || iEncoding != iOriginalEncoding,
+				IDS_READONLY, bReadOnly, szTitleExcerpt);
 }
 
 static inline void UpdateSelectionMarginWidth() {
@@ -2461,9 +2461,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 				bReadOnly = (dwFileAttributes & FILE_ATTRIBUTE_READONLY);
 			}
 
-			SetWindowTitle(hwnd, uidsAppTitle, fIsElevated, IDS_UNTITLED, szCurFile,
-						   iPathNameFormat, bModified || iEncoding != iOriginalEncoding,
-						   IDS_READONLY, bReadOnly, szTitleExcerpt);
+			UpdateWindowTitle();
 		}
 		break;
 
@@ -2773,10 +2771,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			UpdateToolbar();
 			UpdateStatusBarWidth();
 			UpdateStatusbar();
-
-			SetWindowTitle(hwnd, uidsAppTitle, fIsElevated, IDS_UNTITLED, szCurFile,
-						   iPathNameFormat, bModified || iEncoding != iOriginalEncoding,
-						   IDS_READONLY, bReadOnly, szTitleExcerpt);
+			UpdateWindowTitle();
 		}
 	}
 	break;
@@ -2823,9 +2818,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		EditFixPositions(hwndEdit);
 		UpdateToolbar();
 		UpdateStatusbar();
-		SetWindowTitle(hwnd, uidsAppTitle, fIsElevated, IDS_UNTITLED, szCurFile,
-					   iPathNameFormat, bModified || iEncoding != iOriginalEncoding,
-					   IDS_READONLY, bReadOnly, szTitleExcerpt);
+		UpdateWindowTitle();
 	}
 	break;
 
@@ -4128,34 +4121,16 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	case IDM_VIEW_SHOWFILENAMEONLY:
-		iPathNameFormat = 0;
-		lstrcpy(szTitleExcerpt, L"");
-		SetWindowTitle(hwnd, uidsAppTitle, fIsElevated, IDS_UNTITLED, szCurFile,
-					   iPathNameFormat, bModified || iEncoding != iOriginalEncoding,
-					   IDS_READONLY, bReadOnly, szTitleExcerpt);
-		break;
-
 	case IDM_VIEW_SHOWFILENAMEFIRST:
-		iPathNameFormat = 1;
-		lstrcpy(szTitleExcerpt, L"");
-		SetWindowTitle(hwnd, uidsAppTitle, fIsElevated, IDS_UNTITLED, szCurFile,
-					   iPathNameFormat, bModified || iEncoding != iOriginalEncoding,
-					   IDS_READONLY, bReadOnly, szTitleExcerpt);
-		break;
-
 	case IDM_VIEW_SHOWFULLPATH:
-		iPathNameFormat = 2;
+		iPathNameFormat = LOWORD(wParam) - IDM_VIEW_SHOWFILENAMEONLY;
 		lstrcpy(szTitleExcerpt, L"");
-		SetWindowTitle(hwnd, uidsAppTitle, fIsElevated, IDS_UNTITLED, szCurFile,
-					   iPathNameFormat, bModified || iEncoding != iOriginalEncoding,
-					   IDS_READONLY, bReadOnly, szTitleExcerpt);
+		UpdateWindowTitle();
 		break;
 
 	case IDM_VIEW_SHOWEXCERPT:
 		EditGetExcerpt(hwndEdit, szTitleExcerpt, COUNTOF(szTitleExcerpt));
-		SetWindowTitle(hwnd, uidsAppTitle, fIsElevated, IDS_UNTITLED, szCurFile,
-					   iPathNameFormat, bModified || iEncoding != iOriginalEncoding,
-					   IDS_READONLY, bReadOnly, szTitleExcerpt);
+		UpdateWindowTitle();
 		break;
 
 	case IDM_VIEW_NOSAVEFINDREPL:
@@ -5066,9 +5041,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 		case SCN_SAVEPOINTREACHED:
 			bModified = FALSE;
-			SetWindowTitle(hwnd, uidsAppTitle, fIsElevated, IDS_UNTITLED, szCurFile,
-						   iPathNameFormat, bModified || iEncoding != iOriginalEncoding,
-						   IDS_READONLY, bReadOnly, szTitleExcerpt);
+			UpdateWindowTitle();
 			break;
 
 		case SCN_MARGINCLICK:
@@ -5084,9 +5057,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 		case SCN_SAVEPOINTLEFT:
 			bModified = TRUE;
-			SetWindowTitle(hwnd, uidsAppTitle, fIsElevated, IDS_UNTITLED, szCurFile,
-						   iPathNameFormat, bModified || iEncoding != iOriginalEncoding,
-						   IDS_READONLY, bReadOnly, szTitleExcerpt);
+			UpdateWindowTitle();
 			break;
 
 		case SCN_URIDROPPED: {
@@ -6743,7 +6714,7 @@ void UpdateLineNumberWidth(void) {
 		const int iLines = (int)SendMessage(hwndEdit, SCI_GETLINECOUNT, 0, 0);
 		wsprintfA(tchLines, "_%i_", iLines);
 
-		const int iLineMarginWidthNow = (int)SendMessage(hwndEdit, SCI_GETMARGINWIDTHN, 0, 0);
+		const int iLineMarginWidthNow = (int)SendMessage(hwndEdit, SCI_GETMARGINWIDTHN, MARGIN_LINE_NUMBER, 0);
 		const int iLineMarginWidthFit = (int)SendMessage(hwndEdit, SCI_TEXTWIDTH, STYLE_LINENUMBER, (LPARAM)tchLines);
 
 		if (iLineMarginWidthNow != iLineMarginWidthFit) {
@@ -6847,10 +6818,7 @@ BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect, LPCWST
 		iEncoding = iDefaultEncoding;
 		iOriginalEncoding = iDefaultEncoding;
 		SendMessage(hwndEdit, SCI_SETCODEPAGE, (iDefaultEncoding == CPI_DEFAULT) ? iDefaultCodePage : SC_CP_UTF8, 0);
-		//EditSetNewText(hwndEdit, "", 0);
-		SetWindowTitle(hwndMain, uidsAppTitle, fIsElevated, IDS_UNTITLED, szCurFile,
-					   iPathNameFormat, bModified || iEncoding != iOriginalEncoding,
-					   IDS_READONLY, bReadOnly, szTitleExcerpt);
+		UpdateWindowTitle();
 
 		// Terminate file watching
 		if (bResetFileWatching) {
@@ -6947,9 +6915,7 @@ BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect, LPCWST
 		if (flagUseSystemMRU == 2) {
 			SHAddToRecentDocs(SHARD_PATHW, szFileName);
 		}
-		SetWindowTitle(hwndMain, uidsAppTitle, fIsElevated, IDS_UNTITLED, szFileName,
-					   iPathNameFormat, bModified || iEncoding != iOriginalEncoding,
-					   IDS_READONLY, bReadOnly, szTitleExcerpt);
+		UpdateWindowTitle();
 
 		// Install watching of the current file
 		if (!bReload && bResetFileWatching) {
@@ -7044,9 +7010,7 @@ BOOL FileSave(BOOL bSaveAlways, BOOL bAsk, BOOL bSaveAs, BOOL bSaveCopy) {
 			bReadOnly = (dwFileAttributes & FILE_ATTRIBUTE_READONLY);
 		}
 		if (bReadOnly) {
-			SetWindowTitle(hwndMain, uidsAppTitle, fIsElevated, IDS_UNTITLED, szCurFile,
-						   iPathNameFormat, bModified || iEncoding != iOriginalEncoding,
-						   IDS_READONLY, bReadOnly, szTitleExcerpt);
+			UpdateWindowTitle();
 			if (MsgBox(MBYESNOWARN, IDS_READONLY_SAVE, szCurFile) == IDYES) {
 				bSaveAs = TRUE;
 			} else {
@@ -7108,9 +7072,7 @@ BOOL FileSave(BOOL bSaveAlways, BOOL bAsk, BOOL bSaveAs, BOOL bSaveCopy) {
 			if (flagRelaunchElevated == 2 && bSaveAs && iPathNameFormat == 0) {
 				iPathNameFormat = 1;
 			}
-			SetWindowTitle(hwndMain, uidsAppTitle, fIsElevated, IDS_UNTITLED, szCurFile,
-						   iPathNameFormat, bModified || iEncoding != iOriginalEncoding,
-						   IDS_READONLY, bReadOnly, szTitleExcerpt);
+			UpdateWindowTitle();
 
 			// Install watching of the current file
 			if (bSaveAs && bResetFileWatching) {
@@ -7123,10 +7085,7 @@ BOOL FileSave(BOOL bSaveAlways, BOOL bAsk, BOOL bSaveAs, BOOL bSaveCopy) {
 			lstrcpy(tchFile, szCurFile);
 		}
 
-		SetWindowTitle(hwndMain, uidsAppTitle, fIsElevated, IDS_UNTITLED, szCurFile,
-					   iPathNameFormat, bModified || iEncoding != iOriginalEncoding,
-					   IDS_READONLY, bReadOnly, szTitleExcerpt);
-
+		UpdateWindowTitle();
 		MsgBox(MBWARN, IDS_ERR_SAVEFILE, tchFile);
 	}
 
