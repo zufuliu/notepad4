@@ -14,7 +14,7 @@
 * Syntax highlighting and auto-completion support for:
 	* Plain Text
 	* ActionScript
-	* Assembler
+	* Assembler, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#assembler)
 		* MASM
 		* GNU Assembler
 		* NASM
@@ -22,12 +22,12 @@
 	* AutoIt Script
 	* AWK
 		* GNU AWK
-	* Bash Script
-	* Windows Batch Script
+	* Bash Script, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#shell-script)
+	* Windows Batch Script, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#batch)
 	* .NET IL
-	* CMake
+	* CMake, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#cmake)
 	* C/C++, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#cc)
-		* Objective-C/C++
+		* Objective-C/C++, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#objective-cc)
 	* C#, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#c)
 		* C# Doc
 		* Vala
@@ -41,8 +41,8 @@
 		* GNU Fortran
 	* F#
 	* Go
-	* Gradle
-	* GraphViz Dot
+	* Gradle, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#gradle)
+	* GraphViz Dot, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#graphviz)
 	* Groovy
 	* Haxe
 	* [HTML](../master/tools/lang/html.html), up to 5.2. [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#html)
@@ -57,25 +57,25 @@
 		* JavaDoc
 	* [JavaScript](../master/tools/lang/JavaScript.js), up to ECMAScript 2018, 9ed.
 	* JSON Document
-	* [Julia Script](https://julialang.org/)
+	* [Julia Script](https://julialang.org/), up to 1.0. [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#julia)
 	* LaTeX
 	* Lisp Script
 		* Common Lisp
 	* LLVM IR
 	* Lua Script
-	* Makefile
+	* Makefile, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#makefile)
 		* nmake
 		* gmake
 		* Borland bmake
 		* qmake (syntax highlighting only)
-	* Matlab
+	* MATLAB, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#matlab-octave)
 		* Octave
 		* Scilab
 		* Gnuplot
 	* NSIS
 	* Pascal
 		* Delphi
-	* Perl
+	* Perl, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#perl)
 	* PowerShell
 	* Python, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#python)
 		* IronPython
@@ -87,13 +87,13 @@
 	* Windows Rescouce Script
 	* Ruby, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#ruby)
 	* Scala Script
-	* Android Dalvik Smali
+	* Android Dalvik Smali, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#android-smali)
 		* javap
 		* Jasmin
 	* SQL Query
 		* [MySQL](../master/tools/lang/MySQL.sql), up to MySQL 8.0, MariaDB 10.3.
 		* [SQLite3](../master/tools/lang/SQLite3.sql)
-	* TCL
+	* TCL, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#tcl)
 	* Texinfo
 	* Visual Basic
 		* VB6
@@ -102,7 +102,7 @@
 	* VHDL
 	* Verilog HDL
 	* Vim
-	* XML Document
+	* XML Document, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#xml)
 		* XML Schema
 		* XML Stylesheet
 		* XML DTD SGML
