@@ -26,9 +26,9 @@
 	* Windows Batch Script
 	* .NET IL
 	* CMake
-	* C/C++
+	* C/C++, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#cc)
 		* Objective-C/C++
-	* C#
+	* C#, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#c)
 		* C# Doc
 		* Vala
 	* CSS
@@ -45,7 +45,7 @@
 	* GraphViz Dot
 	* Groovy
 	* Haxe
-	* [HTML](../master/tools/lang/html.html), up to 5.2.
+	* [HTML](../master/tools/lang/html.html), up to 5.2. [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#html)
 		* ASP
 		* ASP.NET
 		* JSP
@@ -53,7 +53,7 @@
 	* INI Configuration File
 	* Inno Setup
 	* Boost Jam
-	* Java
+	* Java, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#java)
 		* JavaDoc
 	* [JavaScript](../master/tools/lang/JavaScript.js), up to ECMAScript 2018, 9ed.
 	* JSON Document
@@ -77,15 +77,15 @@
 		* Delphi
 	* Perl
 	* PowerShell
-	* Python
+	* Python, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#python)
 		* IronPython
 		* Cobra
 		* Jython
 		* Boo
-	* PHP Script
+	* PHP Script, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#php)
 		* PHPDoc
 	* Windows Rescouce Script
-	* Ruby
+	* Ruby, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#ruby)
 	* Scala Script
 	* Android Dalvik Smali
 		* javap
@@ -166,8 +166,8 @@
 * Unix-like Operating Systems (Linux, macOS, BSD, etc.) using [Wine](https://www.winehq.org/)
 * [ReactOS](https://www.reactos.org/)
 
-## [Screenshots]
-TBD.
+## [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots)
+Some screenshots is available on [Wiki page](https://github.com/zufuliu/notepad2/wiki/Screenshots).
 
 ## Download
 Prebuild binaries for each release can be downloaded from [release list](https://github.com/zufuliu/notepad2/releases).
