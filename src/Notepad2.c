@@ -187,6 +187,11 @@ BOOL	bInlineIMEUseBlockCaret;
 int		iBidirectional;
 BOOL	bShowToolbar;
 BOOL	bShowStatusbar;
+BOOL	bInFullScreenMode;
+BOOL	bFullScreenOnStartup;
+BOOL	bFullScreenHideMenu;
+BOOL	bFullScreenHideToolbar;
+BOOL	bFullScreenHideStatusbar;
 
 typedef struct _wi {
 	int x;
@@ -1652,6 +1657,9 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		return -1;
 	}
 
+	if (bInFullScreenMode) {
+		ToggleFullScreenMode();
+	}
 	return 0;
 }
 
@@ -2284,6 +2292,11 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	CheckCmd(hmenu, IDM_VIEW_TOOLBAR, bShowToolbar);
 	EnableCmd(hmenu, IDM_VIEW_CUSTOMIZETB, bShowToolbar);
 	CheckCmd(hmenu, IDM_VIEW_STATUSBAR, bShowStatusbar);
+
+	CheckCmd(hmenu, IDM_VIEW_FULLSCREEN_ON_START, bFullScreenOnStartup);
+	CheckCmd(hmenu, IDM_VIEW_FULLSCREEN_HIDE_MENU, bFullScreenHideMenu);
+	CheckCmd(hmenu, IDM_VIEW_FULLSCREEN_HIDE_TOOL, bFullScreenHideToolbar);
+	CheckCmd(hmenu, IDM_VIEW_FULLSCREEN_HIDE_STATUS, bFullScreenHideStatusbar);
 
 	//i = (int)SendMessage(hwndEdit, SCI_GETLEXER, 0, 0);
 	//EnableCmd(hmenu, IDM_VIEW_AUTOCLOSETAGS, (i == SCLEX_HTML || i == SCLEX_XML));
@@ -4049,6 +4062,9 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	case IDM_VIEW_ALWAYSONTOP:
+		if (bInFullScreenMode) {
+			return 0;
+		}
 		if ((bAlwaysOnTop || flagAlwaysOnTop == 2) && flagAlwaysOnTop != 1) {
 			bAlwaysOnTop = 0;
 			flagAlwaysOnTop = 0;
@@ -4214,11 +4230,44 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		OpenHelpLink(hwnd, LOWORD(wParam));
 		break;
 
-	case CMD_ESCAPE:
-		//close the AutoComplete box
-		SendMessage(hwndEdit, SCI_AUTOCCANCEL, 0, 0);
+	case IDM_VIEW_TOGGLE_FULLSCREEN:
+		bInFullScreenMode = bInFullScreenMode ? FALSE : TRUE;
+		ToggleFullScreenMode();
+		break;
 
-		if (iEscFunction == 1) {
+	case IDM_VIEW_FULLSCREEN_ON_START:
+		bFullScreenOnStartup = bFullScreenOnStartup ? FALSE : TRUE;
+		break;
+
+	case IDM_VIEW_FULLSCREEN_HIDE_MENU:
+		bFullScreenHideMenu = bFullScreenHideMenu ? FALSE : TRUE;
+		if (bInFullScreenMode) {
+			ToggleFullScreenMode();
+		}
+		break;
+
+	case IDM_VIEW_FULLSCREEN_HIDE_TOOL:
+		bFullScreenHideToolbar = bFullScreenHideToolbar ? FALSE : TRUE;
+		if (bInFullScreenMode) {
+			ToggleFullScreenMode();
+		}
+		break;
+
+	case IDM_VIEW_FULLSCREEN_HIDE_STATUS:
+		bFullScreenHideStatusbar = bFullScreenHideStatusbar ? FALSE : TRUE;
+		if (bInFullScreenMode) {
+			ToggleFullScreenMode();
+		}
+		break;
+
+	case CMD_ESCAPE:
+		if (SendMessage(hwndEdit, SCI_AUTOCACTIVE, 0, 0)) {
+			//close the AutoComplete box
+			SendMessage(hwndEdit, SCI_AUTOCCANCEL, 0, 0);
+		} else if (bInFullScreenMode) {
+			bInFullScreenMode = FALSE;
+			ToggleFullScreenMode();
+		} else if (iEscFunction == 1) {
 			SendMessage(hwnd, WM_SYSCOMMAND, SC_MINIMIZE, 0);
 		} else if (iEscFunction == 2) {
 			NP2ExitWind(hwnd);
@@ -5361,6 +5410,12 @@ void LoadSettings(void) {
 	bShowToolbar = IniSectionGetBool(pIniSection, L"ShowToolbar", 1);
 	bShowStatusbar = IniSectionGetBool(pIniSection, L"ShowStatusbar", 1);
 
+	bFullScreenOnStartup = IniSectionGetBool(pIniSection, L"FullScreenOnStartup", 0);
+	bInFullScreenMode = bFullScreenOnStartup;
+	bFullScreenHideMenu = IniSectionGetBool(pIniSection, L"FullScreenHideMenu", 0);
+	bFullScreenHideToolbar = IniSectionGetBool(pIniSection, L"FullScreenHideToolbar", 0);
+	bFullScreenHideStatusbar = IniSectionGetBool(pIniSection, L"FullScreenHideStatusbar", 0);
+
 	cxEncodingDlg = IniSectionGetInt(pIniSection, L"EncodingDlgSizeX", 256);
 	cxEncodingDlg = max_i(cxEncodingDlg, 0);
 
@@ -5597,6 +5652,10 @@ void SaveSettings(BOOL bSaveSettingsNow) {
 	IniSectionSetString(pIniSection, L"ToolbarButtons", tchToolbarButtons);
 	IniSectionSetBool(pIniSection, L"ShowToolbar", bShowToolbar);
 	IniSectionSetBool(pIniSection, L"ShowStatusbar", bShowStatusbar);
+	IniSectionSetBool(pIniSection, L"FullScreenOnStartup", bFullScreenOnStartup);
+	IniSectionSetBool(pIniSection, L"FullScreenHideMenu", bFullScreenHideMenu);
+	IniSectionSetBool(pIniSection, L"FullScreenHideToolbar", bFullScreenHideToolbar);
+	IniSectionSetBool(pIniSection, L"FullScreenHideStatusbar", bFullScreenHideStatusbar);
 	IniSectionSetInt(pIniSection, L"EncodingDlgSizeX", cxEncodingDlg);
 	IniSectionSetInt(pIniSection, L"EncodingDlgSizeY", cyEncodingDlg);
 	IniSectionSetInt(pIniSection, L"RecodeDlgSizeX", cxRecodeDlg);
@@ -6717,6 +6776,12 @@ void UpdateLineNumberWidth(void) {
 		}
 	} else {
 		SciCall_SetMarginWidth(MARGIN_LINE_NUMBER, 0);
+	}
+}
+
+void ToggleFullScreenMode(void) {
+	if (bInFullScreenMode) {
+	} else {
 	}
 }
 

@@ -128,6 +128,7 @@ void UpdateStatusBarWidth(void);
 void UpdateToolbar(void);
 void UpdateFoldMarginWidth(void);
 void UpdateLineNumberWidth(void);
+void ToggleFullScreenMode(void);
 
 BOOL FileIO(BOOL fLoad, LPWSTR psz, BOOL bNoEncDetect, int *ienc, int *ieol,
 			BOOL *pbUnicodeErr, BOOL *pbFileTooBig,

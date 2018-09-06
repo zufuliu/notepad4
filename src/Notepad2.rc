@@ -98,7 +98,7 @@ BEGIN
             MENUITEM "&Empty Window\tAlt+0",        IDM_FILE_NEWWINDOW2
             MENUITEM SEPARATOR
             MENUITEM "Execute &Document",           IDM_FILE_LAUNCH
-            MENUITEM "&Open with...",               IDM_FILE_OPENWITH
+            MENUITEM "&Open With...",               IDM_FILE_OPENWITH
             MENUITEM "&Command...\tCtrl+R",         IDM_FILE_RUN
             MENUITEM SEPARATOR
             MENUITEM "Web Template &1\tCtrl+Shift+1",   CMD_WEBACTION1
@@ -504,7 +504,7 @@ BEGIN
             MENUITEM "Full &Path Name",             IDM_VIEW_SHOWFULLPATH
             MENUITEM "&Text Excerpt",               IDM_VIEW_SHOWEXCERPT
         END
-        POPUP "Esc &Key Function"
+        POPUP "Extra Esc &Key Function"
         BEGIN
             MENUITEM "&None",                       IDM_VIEW_NOESCFUNC
             MENUITEM "&Minimize Notepad2",          IDM_VIEW_ESCMINIMIZE
@@ -518,9 +518,11 @@ BEGIN
         MENUITEM "Sh&ow Statusbar",             IDM_VIEW_STATUSBAR
         POPUP "Full Screen Mode"
         BEGIN
-            MENUITEM "Hide Menu",               IDM_VIEW_FULLSCREEN_HIDE_MENU
-            MENUITEM "Hide Toolbar",            IDM_VIEW_FULLSCREEN_HIDE_TOOL
-            MENUITEM "Hide Statusbar",          IDM_VIEW_FULLSCREEN_HIDE_STATUS
+            MENUITEM "On Startup",                  IDM_VIEW_FULLSCREEN_ON_START
+            MENUITEM SEPARATOR
+            MENUITEM "Hide Menu\tAlt+F11",          IDM_VIEW_FULLSCREEN_HIDE_MENU
+            MENUITEM "Hide Toolbar\tCtrl+F11",      IDM_VIEW_FULLSCREEN_HIDE_TOOL
+            MENUITEM "Hide Statusbar\tShift+F11",   IDM_VIEW_FULLSCREEN_HIDE_STATUS
         END
         MENUITEM SEPARATOR
         MENUITEM "Save Settings On E&xit",      IDM_VIEW_SAVESETTINGS
@@ -691,7 +693,10 @@ BEGIN
     VK_ESCAPE,      CMD_ESCAPE,             VIRTKEY, NOINVERT
     VK_ESCAPE,      CMD_SHIFTESC,           VIRTKEY, SHIFT, NOINVERT
     VK_F1,          IDM_HELP_ABOUT,         VIRTKEY, NOINVERT
-    VK_F11,         IDM_VIEW_TOGGLE_FULLSCREEN, VIRTKEY, NOINVERT
+    VK_F11,         IDM_VIEW_TOGGLE_FULLSCREEN,      VIRTKEY, NOINVERT
+    VK_F11,         IDM_VIEW_FULLSCREEN_HIDE_TOOL,   VIRTKEY, CONTROL, NOINVERT
+    VK_F11,         IDM_VIEW_FULLSCREEN_HIDE_MENU,   VIRTKEY, ALT, NOINVERT
+    VK_F11,         IDM_VIEW_FULLSCREEN_HIDE_STATUS, VIRTKEY, SHIFT, NOINVERT
     VK_F12,         IDM_VIEW_SCHEME,        VIRTKEY, NOINVERT
     VK_F12,         IDM_VIEW_SCHEMECONFIG,  VIRTKEY, CONTROL, NOINVERT
     VK_F12,         IDM_VIEW_FONT,          VIRTKEY, ALT, NOINVERT
