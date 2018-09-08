@@ -48,7 +48,7 @@ static inline BOOL StrIsEmptyA(LPCSTR s) {
 	return s == NULL || *s == '\0';
 }
 
-static inline BOOL StrIsEmptyW(LPCWSTR s) {
+static inline BOOL StrIsEmpty(LPCWSTR s) {
 	return s == NULL || *s == L'\0';
 }
 
@@ -56,12 +56,9 @@ static inline BOOL StrNotEmptyA(LPCSTR s) {
 	return s != NULL && *s != '\0';
 }
 
-static inline BOOL StrNotEmptyW(LPCWSTR s) {
+static inline BOOL StrNotEmpty(LPCWSTR s) {
 	return s != NULL && *s != L'\0';
 }
-
-#define StrIsEmpty		StrIsEmptyW
-#define StrNotEmpty		StrNotEmptyW
 
 #ifdef NDEBUG
 #define DLog(fmt, ...)

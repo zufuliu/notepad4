@@ -501,28 +501,6 @@ void ScintillaBase::CallTipClick() noexcept {
 	NotifyParent(scn);
 }
 
-bool ScintillaBase::ShouldDisplayPopup(const Point &ptInWindowCoordinates) const noexcept {
-	return (displayPopupMenu == SC_POPUP_ALL ||
-		(displayPopupMenu == SC_POPUP_TEXT && !PointInSelMargin(ptInWindowCoordinates)));
-}
-
-void ScintillaBase::ContextMenu(const Point &pt) {
-	if (displayPopupMenu) {
-		const bool writable = !WndProc(SCI_GETREADONLY, 0, 0);
-		popup.CreatePopUp();
-		AddToPopUp("Undo", idcmdUndo, writable && pdoc->CanUndo());
-		AddToPopUp("Redo", idcmdRedo, writable && pdoc->CanRedo());
-		AddToPopUp("");
-		AddToPopUp("Cut", idcmdCut, writable && !sel.Empty());
-		AddToPopUp("Copy", idcmdCopy, !sel.Empty());
-		AddToPopUp("Paste", idcmdPaste, writable && WndProc(SCI_CANPASTE, 0, 0));
-		AddToPopUp("Delete", idcmdDelete, writable && !sel.Empty());
-		AddToPopUp("");
-		AddToPopUp("Select All", idcmdSelectAll);
-		popup.Show(pt, wMain);
-	}
-}
-
 void ScintillaBase::CancelModes() noexcept {
 	AutoCompleteCancel();
 	ct.CallTipCancel();

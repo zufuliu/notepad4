@@ -10,9 +10,6 @@
 #include <cassert>
 #include <cstring>
 
-#include <windows.h>
-#include <shlwapi.h>
-
 #include "CharacterSet.h"
 
 using namespace Scintilla;
@@ -41,10 +38,8 @@ void CharacterSet::AddString(const char *setToAdd) noexcept {
 	}
 }
 
+#if 0
 int CompareCaseInsensitive(const char *a, const char *b) noexcept {
-#if 1
-	return lstrcmpiA(a, b);
-#else
 	while (*a && *b) {
 		if (*a != *b) {
 			const char upperA = MakeUpperCase(*a);
@@ -57,13 +52,9 @@ int CompareCaseInsensitive(const char *a, const char *b) noexcept {
 	}
 	// Either *a or *b is nul
 	return *a - *b;
-#endif
 }
 
 int CompareNCaseInsensitive(const char *a, const char *b, size_t len) noexcept {
-#if 1
-	return StrCmpNIA(a, b, static_cast<int>(len));
-#else
 	while (*a && *b && len) {
 		if (*a != *b) {
 			const char upperA = MakeUpperCase(*a);
@@ -80,6 +71,6 @@ int CompareNCaseInsensitive(const char *a, const char *b, size_t len) noexcept {
 	else
 		// Either *a or *b is nul
 		return *a - *b;
-#endif
 }
+#endif
 }

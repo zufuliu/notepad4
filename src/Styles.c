@@ -493,7 +493,7 @@ void Style_UpdateCaret(HWND hwnd) {
 		SendMessage(hwnd, SCI_SETCARETWIDTH, iCaretStyle, 0);
 	}
 
-	const int iValue = (iCaretBlinkPeriod < 0)? GetCaretBlinkTime() : iCaretBlinkPeriod;
+	const int iValue = (iCaretBlinkPeriod < 0)? (int)GetCaretBlinkTime() : iCaretBlinkPeriod;
 	SendMessage(hwnd, SCI_SETCARETPERIOD, iValue, 0);
 }
 
@@ -1035,7 +1035,7 @@ PEDITLEXER __fastcall Style_SniffShebang(char *pchText) {
 			pch++;
 			name = len ? pch : name;
 		}
-		if ((pch - name) >= 3 && (StrCmpNIA(name, "env", 3) == 0 || StrCmpNIA(name, "winpty", 6) == 0)) {
+		if ((pch - name) >= 3 && (_strnicmp(name, "env", 3) == 0 || _strnicmp(name, "winpty", 6) == 0)) {
 			while (*pch == ' ' || *pch == '\t') {
 				pch++;
 			}
@@ -1063,68 +1063,68 @@ PEDITLEXER __fastcall Style_SniffShebang(char *pchText) {
 
 		if (len >= 4) {
 			if (len >= 5) {
-				if (!StrCmpNA(name, "python", 5)) {
+				if (!strncmp(name, "python", 5)) {
 					return &lexPython;
 				}
-				if (!StrCmpNA(name, "groovy", 5)) {
+				if (!strncmp(name, "groovy", 5)) {
 					return &lexGroovy;
 				}
-				if (!StrCmpNA(name, "scala", 5)) {
+				if (!strncmp(name, "scala", 5)) {
 					return (&lexScala);
 				}
 			}
 
-			if (!StrCmpNA(name, "bash", 4) || !StrCmpNA(name, "dash", 4) || !StrCmpNA(name, "tcsh", 4)) {
+			if (!strncmp(name, "bash", 4) || !strncmp(name, "dash", 4) || !strncmp(name, "tcsh", 4)) {
 				return &lexBash;
 			}
-			if (!StrCmpNA(name, "perl", 4)) {
+			if (!strncmp(name, "perl", 4)) {
 				return &lexPerl;
 			}
-			if (!StrCmpNA(name, "ruby", 4)) {
+			if (!strncmp(name, "ruby", 4)) {
 				return &lexRuby;
 			}
-			if (!StrCmpNA(name, "gawk", 4) || !StrCmpNA(name, "nawk", 4)) {
+			if (!strncmp(name, "gawk", 4) || !strncmp(name, "nawk", 4)) {
 				return &lexAwk;
 			}
-			if (!StrCmpNA(name, "node", 4)) {
+			if (!strncmp(name, "node", 4)) {
 				return &lexJS;
 			}
-			if (!StrCmpNA(name, "wish", 4)) {
+			if (!strncmp(name, "wish", 4)) {
 				return &lexTcl;
 			}
-			if (!StrCmpNA(name, "wlua", 4)) {
+			if (!strncmp(name, "wlua", 4)) {
 				return &lexLua;
 			}
 		}
 		if (len >= 3) {
-			if (!StrCmpNA(name, "awk", 3)) {
+			if (!strncmp(name, "awk", 3)) {
 				return &lexAwk;
 			}
-			if (!StrCmpNA(name, "lua", 3)) {
+			if (!strncmp(name, "lua", 3)) {
 				return &lexLua;
 			}
-			if (!StrCmpNA(name, "php", 3)) {
+			if (!strncmp(name, "php", 3)) {
 				//np2LexLangIndex = IDM_LANG_PHP;
 				return &lexPHP;
 			}
-			if (!StrCmpNA(name, "tcl", 3)) {
+			if (!strncmp(name, "tcl", 3)) {
 				return &lexTcl;
 			}
-			if (!StrCmpNA(name, "ash", 3) || !StrCmpNA(name, "zsh", 3) || !StrCmpNA(name, "ksh", 3) || !StrCmpNA(name, "csh", 3)) {
+			if (!strncmp(name, "ash", 3) || !strncmp(name, "zsh", 3) || !strncmp(name, "ksh", 3) || !strncmp(name, "csh", 3)) {
 				return &lexBash;
 			}
-			if (!StrCmpNA(name, "ipy", 3)) {
+			if (!strncmp(name, "ipy", 3)) {
 				return &lexPython;
 			}
 		}
 		if (len >= 2) {
-			if (!StrCmpNA(name, "sh", 2)) {
+			if (!strncmp(name, "sh", 2)) {
 				return &lexBash;
 			}
-			if (!StrCmpNA(name, "py", 2)) {
+			if (!strncmp(name, "py", 2)) {
 				return &lexPython;
 			}
-			if (!StrCmpNA(name, "go", 2)) {
+			if (!strncmp(name, "go", 2)) {
 				return &lexGo;
 			}
 		}
@@ -1147,12 +1147,12 @@ int Style_GetDocTypeLanguage() {
 		while (*p == ' ' || *p == '=' || *p == '\"') {
 			p++;
 		}
-		//if (!StrCmpNIA(p, "html", 4))
+		//if (!_strnicmp(p, "html", 4))
 		//	return IDM_LANG_WEB;
-		if (!(StrCmpNA(p, "struts", 6) && StrCmpNA(p, "xwork", 5) && StrCmpNA(p, "validators", 10))) {
+		if (!(strncmp(p, "struts", 6) && strncmp(p, "xwork", 5) && strncmp(p, "validators", 10))) {
 			return IDM_LANG_STRUTS;
 		}
-		if (!StrCmpNA(p, "hibernate", 9)) {
+		if (!strncmp(p, "hibernate", 9)) {
 			p += 9;
 			if (*p == '-') {
 				p++;
@@ -1162,18 +1162,18 @@ int Style_GetDocTypeLanguage() {
 			}
 			return IDM_LANG_HIB_CFG;
 		}
-		//if (!StrCmpNA(p, "plist", 5))
+		//if (!strncmp(p, "plist", 5))
 		//	return IDM_LANG_PROPERTY_LIST;
-		if (!StrCmpNA(p, "schema", 6)) {
+		if (!strncmp(p, "schema", 6)) {
 			return IDM_LANG_XSD;
 		}
-		if (!StrCmpNA(p, "jboss", 5)) {
+		if (!strncmp(p, "jboss", 5)) {
 			return IDM_LANG_JBOSS;
 		}
-		if (!StrCmpNA(p, "beans", 5)) {
+		if (!strncmp(p, "beans", 5)) {
 			return IDM_LANG_SPRING_BEANS;
 		}
-		if (!StrCmpNIA(p, "module", 6)) {
+		if (!_strnicmp(p, "module", 6)) {
 			return IDM_LANG_CHECKSTYLE;
 		}
 	}
@@ -1187,19 +1187,19 @@ int Style_GetDocTypeLanguage() {
 		while (*p == ' ' || *p == '=' || *p == '\"') {
 			p++;
 		}
-		if (!StrCmpNIA(p, "C#", 2)) {
+		if (!_strnicmp(p, "C#", 2)) {
 			return IDM_LANG_ASPX_CS;
 		}
-		if (!StrCmpNIA(p, "VBScript", 7)) {
+		if (!_strnicmp(p, "VBScript", 7)) {
 			return IDM_LANG_ASP_VBS;
 		}
-		if (!StrCmpNIA(p, "VB", 2)) {
+		if (!_strnicmp(p, "VB", 2)) {
 			return IDM_LANG_ASPX_VB;
 		}
-		if (!StrCmpNIA(p, "JScript", 7)) {
+		if (!_strnicmp(p, "JScript", 7)) {
 			return IDM_LANG_ASP_JS;
 		}
-		if (!StrCmpNIA(p, "Java", 4)) {
+		if (!_strnicmp(p, "Java", 4)) {
 			return IDM_LANG_JSP;
 		}
 	}
@@ -1210,14 +1210,14 @@ int Style_GetDocTypeLanguage() {
 		if ((p = StrChrA(p, '<')) == NULL) {
 			return 0;
 		}
-		if (!StrCmpNA(p, "<!--", 4)) {
+		if (!strncmp(p, "<!--", 4)) {
 			p += 4;
 			if ((p = StrStrA(p, "-->")) != NULL) {
 				p += 3;
 			} else {
 				return 0;
 			}
-		} else if (!(StrCmpNA(p, "<?", 2) && StrCmpNA(p, "<!", 2))) {
+		} else if (!(strncmp(p, "<?", 2) && strncmp(p, "<!", 2))) {
 			p += 2;
 			if ((p = StrChrA(p, '>')) != NULL) {
 				p++;
@@ -1238,73 +1238,73 @@ int Style_GetDocTypeLanguage() {
 	}
 	pb = p;
 
-	//if (!StrCmpNIA(p, "html", 4))
+	//if (!_strnicmp(p, "html", 4))
 	//	return IDM_LANG_WEB;
-	if (!StrCmpNA(p, "schema", 6)) {
+	if (!strncmp(p, "schema", 6)) {
 		return IDM_LANG_XSD;
 	}
-	//if (!(StrCmpNA(p, "schema", 6) && StrCmpNA(p, "xsd:schema", 10) && StrCmpNA(p, "xs:schema", 9)))
+	//if (!(strncmp(p, "schema", 6) && strncmp(p, "xsd:schema", 10) && strncmp(p, "xs:schema", 9)))
 	//	return IDM_LANG_XSD;
-	//if (!StrCmpNA(p, "xsl:stylesheet", 14))
+	//if (!strncmp(p, "xsl:stylesheet", 14))
 	//	return IDM_LANG_XSLT;
 
-	if (!StrCmpNA(p, "project", 7)) {
+	if (!strncmp(p, "project", 7)) {
 		return IDM_LANG_ANT_BUILD;
 	}
-	//if (!StrCmpNA(p, "project", 7)) {
+	//if (!strncmp(p, "project", 7)) {
 	//	p += 7;
 	//	if (StrStrA(p, "maven") && StrStrA(p, "POM"))
 	//		return IDM_LANG_MAVEN_POM;
 	//	return IDM_LANG_ANT_BUILD;
 	//}
-	if (!StrCmpNA(p, "settings", 8)) {
+	if (!strncmp(p, "settings", 8)) {
 		return IDM_LANG_MAVEN_SETTINGS;
 	}
-	if (!StrCmpNA(p, "ivy", 3)) {
+	if (!strncmp(p, "ivy", 3)) {
 		if (*(p + 3) == '-') {
 			return IDM_LANG_IVY_MODULE;
 		}
 		return IDM_LANG_IVY_SETTINGS;
 	}
-	if (!StrCmpNA(p, "ruleset", 7)) {
+	if (!strncmp(p, "ruleset", 7)) {
 		return IDM_LANG_PMD_RULESET;
 	}
-	if (!StrCmpNA(p, "module", 6)) {
+	if (!strncmp(p, "module", 6)) {
 		return IDM_LANG_CHECKSTYLE;
 	}
 
-	//if (!StrCmpNA(p, "Server"))
+	//if (!strncmp(p, "Server"))
 	//	return IDM_LANG_TOMCAT;
-	//if (!StrCmpNA(p, "web-app"))
+	//if (!strncmp(p, "web-app"))
 	//	return IDM_LANG_WEB_JAVA;
-	if (!(StrCmpNA(p, "struts", 6) && StrCmpNA(p, "xwork", 5) && StrCmpNA(p, "validators", 10))) {
+	if (!(strncmp(p, "struts", 6) && strncmp(p, "xwork", 5) && strncmp(p, "validators", 10))) {
 		return IDM_LANG_STRUTS;
 	}
-	if (!StrCmpNA(p, "hibernate", 9)) {
+	if (!strncmp(p, "hibernate", 9)) {
 		if (*(p + 10) == 'm') {
 			return IDM_LANG_HIB_MAP;
 		}
 		return IDM_LANG_HIB_CFG;
 	}
-	if (!StrCmpNA(p, "jboss", 5)) {
+	if (!strncmp(p, "jboss", 5)) {
 		return IDM_LANG_JBOSS;
 	}
-	if (!StrCmpNA(p, "beans", 5)) {
+	if (!strncmp(p, "beans", 5)) {
 		return IDM_LANG_SPRING_BEANS;
 	}
 
-	//if (!StrCmpNA(p, "configuration", 10))
+	//if (!strncmp(p, "configuration", 10))
 	//	return IDM_LANG_WEB_NET;
-	//if (!StrCmpNA(p, "root", 4))
+	//if (!strncmp(p, "root", 4))
 	//	return IDM_LANG_RESX;
-	//if (!StrCmpNA(p, "Canvas", 6))
+	//if (!strncmp(p, "Canvas", 6))
 	//	return IDM_LANG_XAML;
 
-	//if (!StrCmpNA(p, "plist", 5))
+	//if (!strncmp(p, "plist", 5))
 	//	return IDM_LANG_PROPERTY_LIST;
-	//if (!StrCmpNA(p, "manifest", 8))
+	//if (!strncmp(p, "manifest", 8))
 	//	return IDM_LANG_ANDROID_MANIFEST;
-	//if (!StrCmpNA(p, "svg", 3))
+	//if (!strncmp(p, "svg", 3))
 	//	return IDM_LANG_SVG;
 	if (((p = StrStrA(pb, "Layout")) != NULL && StrStrA(p + 6, "xmlns:android")) ||
 			((p = StrStrA(pb, "View")) != NULL && StrStrA(p + 4, "xmlns:android")) ||
@@ -1385,12 +1385,12 @@ PEDITLEXER Style_DetectObjCAndMatlab(void) {
 			}
 			break;
 		case 'f':	// Matlab function
-			if (StrCmpNA(p, "function", 8) == 0 && (IsASpace(p[8]) || p[8] == '[')) {
+			if (strncmp(p, "function", 8) == 0 && (IsASpace(p[8]) || p[8] == '[')) {
 				return &lexMatlab;
 			}
 			break;
 		case 'c':	// Matlab classdef
-			if (StrCmpNA(p, "classdef", 8) == 0 && IsASpace(p[8])) {
+			if (strncmp(p, "classdef", 8) == 0 && IsASpace(p[8])) {
 				return &lexMatlab;
 			}
 			break;
