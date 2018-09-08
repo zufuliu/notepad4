@@ -357,6 +357,7 @@ static bool IsAsmDefineLine(Sci_Position line, LexAccessor &styler) noexcept {
 
 #define IsEndLine(line)			IsLexLineStartsWith(line, styler, "end", false, SCE_ASM_DIRECTIVE)
 
+#define MAX_ASM_WORD_LEN	15
 static void FoldAsmDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
 	if (styler.GetPropertyInt("fold") == 0)
 		return;
@@ -379,7 +380,7 @@ static void FoldAsmDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 	char chNext = styler[startPos];
 	int style = initStyle;
 	int styleNext = styler.StyleAt(startPos);
-	char word[16] = "";
+	char word[MAX_ASM_WORD_LEN + 1] = "";
 	int wordlen = 0;
 
 	for (Sci_PositionU i = startPos; i < endPos; i++) {
@@ -436,7 +437,7 @@ static void FoldAsmDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 				levelNext--;
 		}
 		if (foldSyntaxBased && (style == SCE_ASM_DIRECTIVE)) {
-			if (wordlen < sizeof(word) - 1) {
+			if (wordlen < MAX_ASM_WORD_LEN) {
 				word[wordlen++] = static_cast<char>(tolower(ch));
 			}
 			if (styleNext != SCE_ASM_DIRECTIVE) {   // reading directive ready

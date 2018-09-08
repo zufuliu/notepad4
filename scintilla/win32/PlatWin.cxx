@@ -2701,7 +2701,7 @@ int ListBoxX::Find(const char *) const noexcept {
 
 void ListBoxX::GetValue(int n, char *value, int len) const {
 	const ListItemData item = lti.Get(n);
-	lstrcpynA(value, item.text, len);
+	strncpy(value, item.text, len);
 	value[len - 1] = '\0';
 }
 

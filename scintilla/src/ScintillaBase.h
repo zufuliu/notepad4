@@ -77,10 +77,6 @@ protected:
 	void CallTipShow(const Point &pt, const char *defn);
 	virtual void CreateCallTipWindow(const PRectangle &rc) noexcept = 0;
 
-	virtual void AddToPopUp(const char *label, int cmd = 0, bool enabled = true) noexcept = 0;
-	bool ShouldDisplayPopup(const Point &ptInWindowCoordinates) const noexcept;
-	void ContextMenu(const Point &pt);
-
 	void ButtonDownWithModifiers(const Point &pt, unsigned int curTime, int modifiers) override;
 	void RightButtonDownWithModifiers(const Point &pt, unsigned int curTime, int modifiers) override;
 

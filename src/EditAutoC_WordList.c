@@ -21,8 +21,8 @@ static inline unsigned int bswap32(unsigned int x) {
 struct WordNode;
 struct WordList {
 	char wordBuf[1024];
-	int (WINAPI *WL_StrCmpA)(LPCSTR, LPCSTR);
-	int (WINAPI *WL_StrCmpNA)(LPCSTR, LPCSTR, int);
+	int (*WL_strcmp)(LPCSTR, LPCSTR);
+	int (*WL_strcnmp)(LPCSTR, LPCSTR, size_t);
 #if NP2_AUTOC_USE_STRING_ORDER
 	int (*WL_OrderFunc)(const void *, unsigned int);
 #endif
@@ -95,10 +95,10 @@ void WordList_AddWord(struct WordList *pWList, LPCSTR pWord, int len) {
 #if NP2_AUTOC_USE_STRING_ORDER
 		diff = order - head->order;
 		if (diff == 0 && (len > NP2_AUTOC_ORDER_LENGTH || head->len > NP2_AUTOC_ORDER_LENGTH)) {
-			diff = pWList->WL_StrCmpA(pWord, head->word);
+			diff = pWList->WL_strcmp(pWord, head->word);
 		}
 #else
-		diff = pWList->WL_StrCmpA(pWord, head->word);
+		diff = pWList->WL_strcmp(pWord, head->word);
 #endif
 		if (diff <= 0) {
 			break;
@@ -323,10 +323,10 @@ void WordList_AddWord(struct WordList *pWList, LPCSTR pWord, int len) {
 #if NP2_AUTOC_USE_STRING_ORDER
 			dir = iter->order - order;
 			if (dir == 0 && (len > NP2_AUTOC_ORDER_LENGTH || iter->len > NP2_AUTOC_ORDER_LENGTH)) {
-				dir = pWList->WL_StrCmpA(iter->word, pWord);
+				dir = pWList->WL_strcmp(iter->word, pWord);
 			}
 #else
-			dir = pWList->WL_StrCmpA(iter->word, pWord);
+			dir = pWList->WL_strcmp(iter->word, pWord);
 #endif
 			if (dir == 0) {
 				return;
@@ -492,14 +492,14 @@ struct WordList *WordList_Alloc(LPCSTR pRoot, int iRootLen, BOOL bIgnoreCase) {
 	pWList->bufferList[0] = pWList->buffer;
 #endif
 	if (bIgnoreCase) {
-		pWList->WL_StrCmpA = StrCmpIA;
-		pWList->WL_StrCmpNA = StrCmpNIA;
+		pWList->WL_strcmp = _stricmp;
+		pWList->WL_strcnmp = _strnicmp;
 #if NP2_AUTOC_USE_STRING_ORDER
 		pWList->WL_OrderFunc = WordList_OrderCase;
 #endif
 	} else {
-		pWList->WL_StrCmpA = StrCmpA;
-		pWList->WL_StrCmpNA = StrCmpNA;
+		pWList->WL_strcmp = strcmp;
+		pWList->WL_strcnmp = strncmp;
 #if NP2_AUTOC_USE_STRING_ORDER
 		pWList->WL_OrderFunc = WordList_Order;
 #endif
@@ -519,14 +519,14 @@ struct WordList *WordList_Alloc(LPCSTR pRoot, int iRootLen, BOOL bIgnoreCase) {
 static inline BOOL WordList_StartsWith(struct WordList *pWList, LPCSTR pWord) {
 #if NP2_AUTOC_USE_STRING_ORDER
 	if (pWList->iStartLen > NP2_AUTOC_ORDER_LENGTH) {
-		return pWList->WL_StrCmpNA(pWList->pWordStart, pWord, pWList->iStartLen) == 0;
+		return pWList->WL_strcnmp(pWList->pWordStart, pWord, pWList->iStartLen) == 0;
 	}
 	if (pWList->orderStart != pWList->WL_OrderFunc(pWord, pWList->iStartLen)) {
 		return FALSE;
 	}
 	return TRUE;
 #else
-	return pWList->WL_StrCmpNA(pWList->pWordStart, pWord, pWList->iStartLen) == 0;
+	return pWList->WL_strcnmp(pWList->pWordStart, pWord, pWList->iStartLen) == 0;
 #endif
 }
 

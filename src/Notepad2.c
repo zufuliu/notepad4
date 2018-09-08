@@ -3241,7 +3241,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 				const Sci_Position iCurrentLinePos = iCurrentPos - SciCall_PositionFromLine(iCurLine);
 				if (iCurLine < 2 && iCurrentLinePos == 0) {
 					char cmsz[128];
-					wnsprintfA(cmsz, COUNTOF(cmsz), "#-*- coding: %s -*-", msz);
+					wsprintfA(cmsz, "#-*- coding: %s -*-", msz);
 					SendMessage(hwndEdit, SCI_REPLACESEL, 0, (LPARAM)cmsz);
 					done = TRUE;
 				}

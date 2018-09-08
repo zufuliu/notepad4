@@ -811,7 +811,7 @@ INT UTF8_mbslen(LPCSTR source, INT byte_length) {
 //
 BOOL FileVars_IsUTF8(LPFILEVARS lpfv) {
 	if (lpfv->mask & FV_ENCODING) {
-		if (lstrcmpiA(lpfv->tchEncoding, "utf-8") == 0 || lstrcmpiA(lpfv->tchEncoding, "utf8") == 0) {
+		if (_stricmp(lpfv->tchEncoding, "utf-8") == 0 || _stricmp(lpfv->tchEncoding, "utf8") == 0) {
 			return TRUE;
 		}
 	}
@@ -826,7 +826,7 @@ BOOL FileVars_IsUTF8(LPFILEVARS lpfv) {
 BOOL FileVars_IsNonUTF8(LPFILEVARS lpfv) {
 	if (lpfv->mask & FV_ENCODING) {
 		if (StrNotEmptyA(lpfv->tchEncoding) &&
-				lstrcmpiA(lpfv->tchEncoding, "utf-8") != 0 && lstrcmpiA(lpfv->tchEncoding, "utf8") != 0) {
+				_stricmp(lpfv->tchEncoding, "utf-8") != 0 && _stricmp(lpfv->tchEncoding, "utf8") != 0) {
 			return TRUE;
 		}
 	}
