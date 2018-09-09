@@ -1526,6 +1526,13 @@ void Style_GetCurrentLexerName(LPWSTR lpszName, int cchName) {
 				lang = L"SVG Document";
 				break;
 
+			case IDM_LANG_BASH:
+				lang = L"Shell Script";
+				break;
+			case IDM_LANG_M4:
+				lang = L"M4 Macro";
+				break;
+
 			default:
 				break;
 			}
@@ -1609,6 +1616,10 @@ PEDITLEXER __fastcall Style_MatchLexer(LPCWSTR lpszMatch, BOOL bCheckNames) {
 		if (StrCaseEqual(L"sci", lpszMatch)) {
 			lexMatlab.rid = NP2LEX_SCILAB;
 			return (&lexMatlab);
+		}
+		if (StrCaseEqual(L"m4", lpszMatch)) {
+			np2LexLangIndex = IDM_LANG_M4;
+			return (&lexBash);
 		}
 		if (bAutoSelect && StrCaseEqual(L"m", lpszMatch)) {
 			PEDITLEXER lex = Style_DetectObjCAndMatlab();
@@ -1864,45 +1875,97 @@ void Style_SetLexerFromName(HWND hwnd, LPCWSTR lpszFile, LPCWSTR lpszName) {
 	}
 }
 
-//=============================================================================
-//
-// Style_SetDefaultLexer()
-//
-void Style_SetDefaultLexer(HWND hwnd) {
-	np2LexLangIndex = 0;
-	Style_SetLexer(hwnd, pLexArray[0]);
-}
+void Style_SetLexerByLangIndex(HWND hwnd, int lang) {
+	np2LexLangIndex = lang;
 
-//=============================================================================
-//
-// Style_SetConfLexer()
-//
-void Style_SetConfLexer(HWND hwnd) {
-	Style_SetLexer(hwnd, &lexCONF);
-}
+	switch (lang) {
+	case IDM_LANG_DEFAULT:
+		Style_SetLexer(hwnd, &lexDefault);
+		break;
 
-//=============================================================================
-//
-// Style_SetHTMLLexer()
-//
-void Style_SetHTMLLexer(HWND hwnd) {
-	//Style_SetLexer(hwnd, Style_MatchLexer(L"Web Source Code", TRUE));
-	if (np2LexLangIndex == 0) {
-		np2LexLangIndex = Style_GetDocTypeLanguage();
+	case IDM_LANG_APACHE:
+		Style_SetLexer(hwnd, &lexCONF);
+		break;
+
+	case IDM_LANG_WEB:
+	case IDM_LANG_PHP:
+	case IDM_LANG_JSP:
+	case IDM_LANG_ASPX_CS:
+	case IDM_LANG_ASPX_VB:
+	case IDM_LANG_ASP_VBS:
+	case IDM_LANG_ASP_JS:
+		if (lang == IDM_LANG_WEB) {
+			np2LexLangIndex = Style_GetDocTypeLanguage();
+		}
+		Style_SetLexer(hwnd, &lexHTML);
+		break;
+
+	case IDM_LANG_XML:
+	case IDM_LANG_XSD:
+	case IDM_LANG_XSLT:
+	case IDM_LANG_DTD:
+
+	case IDM_LANG_ANT_BUILD:
+	case IDM_LANG_MAVEN_POM:
+	case IDM_LANG_MAVEN_SETTINGS:
+	case IDM_LANG_IVY_MODULE:
+	case IDM_LANG_IVY_SETTINGS:
+	case IDM_LANG_PMD_RULESET:
+	case IDM_LANG_CHECKSTYLE:
+
+	case IDM_LANG_TOMCAT:
+	case IDM_LANG_WEB_JAVA:
+	case IDM_LANG_STRUTS:
+	case IDM_LANG_HIB_CFG:
+	case IDM_LANG_HIB_MAP:
+	case IDM_LANG_SPRING_BEANS:
+	case IDM_LANG_JBOSS:
+
+	case IDM_LANG_WEB_NET:
+	case IDM_LANG_RESX:
+	case IDM_LANG_XAML:
+
+	case IDM_LANG_PROPERTY_LIST:
+	case IDM_LANG_ANDROID_MANIFEST:
+	case IDM_LANG_ANDROID_LAYOUT:
+	case IDM_LANG_SVG:
+		if (lang == IDM_LANG_XML) {
+			np2LexLangIndex = Style_GetDocTypeLanguage();
+		}
+		Style_SetLexer(hwnd, &lexXML);
+		break;
+
+	case IDM_LANG_BASH:
+	case IDM_LANG_M4:
+		Style_SetLexer(hwnd, &lexBash);
+		break;
 	}
-	Style_SetLexer(hwnd, &lexHTML);
 }
 
-//=============================================================================
-//
-// Style_SetXMLLexer()
-//
-void Style_SetXMLLexer(HWND hwnd) {
-	//Style_SetLexer(hwnd, Style_MatchLexer(L"XML Document", TRUE));
-	if (np2LexLangIndex == 0) {
-		np2LexLangIndex = Style_GetDocTypeLanguage();
+void Style_UpdateSchemeMenu(HMENU hmenu) {
+	int lang = np2LexLangIndex;
+	if (lang == 0) {
+		switch (pLexCurrent->rid) {
+		case NP2LEX_DEFAULT:
+			lang = IDM_LANG_DEFAULT;
+			break;
+		case NP2LEX_HTML:
+			lang = IDM_LANG_WEB;
+			break;
+		case NP2LEX_XML:
+			lang = IDM_LANG_XML;
+			break;
+		case NP2LEX_BASH:
+			lang = IDM_LANG_BASH;
+			break;
+		}
 	}
-	Style_SetLexer(hwnd, &lexXML);
+	for (int i = IDM_LANG_DEFAULT; i < IDM_LANG_NULL; i++) {
+		CheckCmd(hmenu, i, FALSE);
+	}
+	if (lang >= IDM_LANG_DEFAULT) {
+		CheckCmd(hmenu, lang, TRUE);
+	}
 }
 
 //=============================================================================

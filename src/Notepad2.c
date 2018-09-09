@@ -2382,28 +2382,7 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	i = i || StrNotEmpty(szIniFile2);
 	EnableCmd(hmenu, IDM_VIEW_SAVESETTINGSNOW, i);
 
-	i = np2LexLangIndex;
-	if (i == 0) {
-		switch (pLexCurrent->rid) {
-		case NP2LEX_DEFAULT:
-			i = IDM_LANG_DEFAULT;
-			break;
-		case NP2LEX_HTML:
-			i = IDM_LANG_WEB;
-			break;
-		case NP2LEX_XML:
-			i = IDM_LANG_XML;
-			break;
-		}
-	}
-	//if (i >= IDM_LANG_DEFAULT)
-	//	CheckMenuRadioItem(hmenu, IDM_LANG_DEFAULT, IDM_LANG_NULL, i, MF_BYCOMMAND);
-	for (i2 = IDM_LANG_DEFAULT; i2 < IDM_LANG_NULL; i2++) {
-		CheckCmd(hmenu, i2, FALSE);
-	}
-	if (i >= IDM_LANG_DEFAULT) {
-		CheckCmd(hmenu, i, TRUE);
-	}
+	Style_UpdateSchemeMenu(hmenu);
 }
 
 //=============================================================================
@@ -4402,18 +4381,8 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	}
 	break;
 
-	//case CMD_LEXDEFAULT:
 	case IDM_LANG_DEFAULT:
-		np2LexLangIndex = 0;
-		Style_SetDefaultLexer(hwndEdit);
-		break;
-
 	case IDM_LANG_APACHE:
-		np2LexLangIndex = LOWORD(wParam);
-		Style_SetConfLexer(hwndEdit);
-		break;
-
-	//case CMD_LEXHTML:
 	case IDM_LANG_WEB:
 	case IDM_LANG_PHP:
 	case IDM_LANG_JSP:
@@ -4421,11 +4390,6 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case IDM_LANG_ASPX_VB:
 	case IDM_LANG_ASP_VBS:
 	case IDM_LANG_ASP_JS:
-		np2LexLangIndex = (LOWORD(wParam) - IDM_LANG_WEB <= 0) ? 0 : LOWORD(wParam);
-		Style_SetHTMLLexer(hwndEdit);
-		break;
-
-	//case CMD_LEXXML:
 	case IDM_LANG_XML:
 	case IDM_LANG_XSD:
 	case IDM_LANG_XSLT:
@@ -4455,8 +4419,10 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case IDM_LANG_ANDROID_MANIFEST:
 	case IDM_LANG_ANDROID_LAYOUT:
 	case IDM_LANG_SVG:
-		np2LexLangIndex = (LOWORD(wParam) - IDM_LANG_XML <= 0) ? 0 : LOWORD(wParam);
-		Style_SetXMLLexer(hwndEdit);
+
+	case IDM_LANG_BASH:
+	case IDM_LANG_M4:
+		Style_SetLexerByLangIndex(hwndEdit, LOWORD(wParam));
 		break;
 
 	case CMD_TIMESTAMPS: {
