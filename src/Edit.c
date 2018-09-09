@@ -471,9 +471,9 @@ BOOL EditLoadFile(HWND hwnd, LPWSTR pszFile, BOOL bSkipEncodingDetection,
 		WCHAR path[MAX_PATH] = L"";
 		FARPROC pfnGetFinalPathNameByHandle = GetProcAddress(GetModuleHandle(L"kernel32.dll"), "GetFinalPathNameByHandleW");
 		if (pfnGetFinalPathNameByHandle && pfnGetFinalPathNameByHandle(hFile, path, MAX_PATH, /*FILE_NAME_OPENED*/0x8) > 0) {
-			if (StrCmpN(path, L"\\\\?\\", 4) == 0) {
+			if (StrNEqual(path, L"\\\\?\\", 4)) {
 				WCHAR *p = path + 4;
-				if (StrCmpN(p, L"UNC\\", 4) == 0) {
+				if (StrNEqual(p, L"UNC\\", 4)) {
 					p += 2;
 					*p = L'\\';
 				}
@@ -496,7 +496,7 @@ BOOL EditLoadFile(HWND hwnd, LPWSTR pszFile, BOOL bSkipEncodingDetection,
 
 	if (bLoadNFOasOEM) {
 		PCWSTR pszExt = pszFile + lstrlen(pszFile) - 4;
-		if (pszExt >= pszFile && !(lstrcmpi(pszExt, L".nfo") && lstrcmpi(pszExt, L".diz"))) {
+		if (pszExt >= pszFile && (StrCaseEqual(pszExt, L".nfo") || StrCaseEqual(pszExt, L".diz"))) {
 			bPreferOEM = TRUE;
 		}
 	}
@@ -6059,16 +6059,16 @@ INT_PTR CALLBACK EditInsertTagDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARA
 							wchIns[cchIns++] = L'>';
 							wchIns[cchIns] = L'\0';
 
-							if (cchIns > 3 &&
-									lstrcmpi(wchIns, L"</base>") &&
-									lstrcmpi(wchIns, L"</bgsound>") &&
-									lstrcmpi(wchIns, L"</br>") &&
-									lstrcmpi(wchIns, L"</embed>") &&
-									lstrcmpi(wchIns, L"</hr>") &&
-									lstrcmpi(wchIns, L"</img>") &&
-									lstrcmpi(wchIns, L"</input>") &&
-									lstrcmpi(wchIns, L"</link>") &&
-									lstrcmpi(wchIns, L"</meta>")) {
+							if (cchIns > 3 && !(
+									StrCaseEqual(wchIns, L"</base>") &&
+									StrCaseEqual(wchIns, L"</bgsound>") &&
+									StrCaseEqual(wchIns, L"</br>") &&
+									StrCaseEqual(wchIns, L"</embed>") &&
+									StrCaseEqual(wchIns, L"</hr>") &&
+									StrCaseEqual(wchIns, L"</img>") &&
+									StrCaseEqual(wchIns, L"</input>") &&
+									StrCaseEqual(wchIns, L"</link>") &&
+									StrCaseEqual(wchIns, L"</meta>"))) {
 
 								SetDlgItemTextW(hwnd, 101, wchIns);
 								bClear = FALSE;
@@ -6473,7 +6473,7 @@ BOOL FileVars_ParseInt(LPCSTR pszData, LPCSTR pszName, int *piValue) {
 	char tch[32];
 	LPCSTR pvStart = pszData;
 
-	while ((pvStart = StrStrIA(pvStart, pszName)) != NULL) {
+	while ((pvStart = StrStrA(pvStart, pszName)) != NULL) {
 		char chPrev = (pvStart > pszData) ? *(pvStart - 1) : 0;
 		if (!IsCharAlphaNumericA(chPrev) && chPrev != '-' && chPrev != '_') {
 			pvStart += lstrlenA(pszName);
@@ -6533,7 +6533,7 @@ BOOL FileVars_ParseStr(LPCSTR pszData, LPCSTR pszName, char *pszValue, int cchVa
 	LPCSTR pvStart = pszData;
 	BOOL bQuoted = FALSE;
 
-	while ((pvStart = StrStrIA(pvStart, pszName)) != NULL) {
+	while ((pvStart = StrStrA(pvStart, pszName)) != NULL) {
 		char chPrev = (pvStart > pszData) ? *(pvStart - 1) : 0;
 		if (!IsCharAlphaNumericA(chPrev) && chPrev != '-' && chPrev != '_') {
 			pvStart += lstrlenA(pszName);

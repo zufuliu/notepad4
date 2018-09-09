@@ -1177,7 +1177,7 @@ INT_PTR OptionsPropSheet(HWND hwnd, HINSTANCE hInstance) {
 			}
 		}
 
-		if (lstrcmp(tchFilter, L"*.*") || bNegFilter) {
+		if (!StrEqual(tchFilter, L"*.*") || bNegFilter) {
 			ListView_SetTextColor(hwndDirList, (bDefCrFilter) ? GetSysColor(COLOR_WINDOWTEXT) : crFilter);
 			ListView_RedrawItems(hwndDirList, 0, ListView_GetItemCount(hwndDirList) - 1);
 		} else {
@@ -1238,8 +1238,8 @@ INT_PTR CALLBACK GetFilterDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lP
 					*CharPrev(pszFilterName, pszFilterValue) = 0;
 					AppendMenu(hMenu, MF_ENABLED | MF_STRING, 1234 + dwIndex, pszFilterName);
 					// Find description for current filter
-					if ((!lstrcmpi(pszFilterValue, szTypedFilter) && IsDlgButtonChecked(hwnd, IDC_NEGFILTER) != BST_CHECKED) ||
-							(!lstrcmpi(CharNext(pszFilterValue), szTypedFilter) &&
+					if ((StrCaseEqual(pszFilterValue, szTypedFilter) && IsDlgButtonChecked(hwnd, IDC_NEGFILTER) != BST_CHECKED) ||
+							(StrCaseEqual(CharNext(pszFilterValue), szTypedFilter) &&
 							 IsDlgButtonChecked(hwnd, IDC_NEGFILTER) == BST_CHECKED &&
 							 *pszFilterValue == L'-')) {
 						dwCheck = dwIndex;
@@ -1327,7 +1327,7 @@ BOOL GetFilterDlg(HWND hwnd) {
 	bOldNegFilter = bNegFilter;
 
 	if (IDOK == ThemedDialogBox(g_hInstance, MAKEINTRESOURCE(IDD_FILTER), hwnd, GetFilterDlgProc)) {
-		if (!lstrcmpi(tchFilter, tchOldFilter) && (bOldNegFilter == bNegFilter)) {
+		if (StrCaseEqual(tchFilter, tchOldFilter) && (bOldNegFilter == bNegFilter)) {
 			return FALSE;    // Old and new filters are identical
 		}
 		return TRUE;

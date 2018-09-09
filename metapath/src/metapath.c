@@ -429,7 +429,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 	case WM_SYSCOLORCHANGE: {
 		LRESULT lret = DefWindowProc(hwnd, umsg, wParam, lParam);
 
-		if (lstrcmp(tchFilter, L"*.*") || bNegFilter) {
+		if (!StrEqual(tchFilter, L"*.*") || bNegFilter) {
 			ListView_SetTextColor(hwndDirList, (bDefCrFilter) ? GetSysColor(COLOR_WINDOWTEXT) : crFilter);
 			ListView_RedrawItems(hwndDirList, 0, ListView_GetItemCount(hwndDirList) - 1);
 		} else {
@@ -917,10 +917,10 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) {
 
 			wsprintf(tchIndex, L"%02u", n++);
 
-			if (IniSectionGetString(pIniSection, tchIndex, L"", tchDesc, COUNTOF(tchDesc)) && lstrcmpi(tchDesc, L"(none)") != 0) {
+			if (IniSectionGetString(pIniSection, tchIndex, L"", tchDesc, COUNTOF(tchDesc)) && !StrCaseEqual(tchDesc, L"(none)")) {
 				tbbMainWnd[i].iString = SendMessage(hwndToolbar, TB_ADDSTRING, 0, (LPARAM)tchDesc);
 				tbbMainWnd[i].fsStyle |= BTNS_AUTOSIZE | BTNS_SHOWTEXT;
-			} else if ((n == 5 || n == 8) && lstrcmpi(tchDesc, L"(none)") != 0) {
+			} else if ((n == 5 || n == 8) && !StrCaseEqual(tchDesc, L"(none)")) {
 				GetString(42000 + n, tchDesc, COUNTOF(tchDesc));
 				tbbMainWnd[i].iString = SendMessage(hwndToolbar, TB_ADDSTRING, 0, (LPARAM)tchDesc);
 				tbbMainWnd[i].fsStyle |= BTNS_AUTOSIZE | BTNS_SHOWTEXT;
@@ -1122,7 +1122,7 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	CheckCmd(hmenu, IDM_VIEW_FILES, (dwFillMask & DL_NONFOLDERS));
 	CheckCmd(hmenu, IDM_VIEW_HIDDEN, (dwFillMask & DL_INCLHIDDEN));
 
-	EnableCmd(hmenu, IDM_VIEW_FILTERALL, (lstrcmp(tchFilter, L"*.*") || bNegFilter));
+	EnableCmd(hmenu, IDM_VIEW_FILTERALL, (!StrEqual(tchFilter, L"*.*") || bNegFilter));
 
 	CheckCmd(hmenu, IDM_VIEW_TOOLBAR, bShowToolbar);
 	EnableCmd(hmenu, IDM_VIEW_CUSTOMIZETB, bShowToolbar);
@@ -1640,11 +1640,11 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			}
 		}
 		Toolbar_SetButtonImage(hwndToolbar, IDT_VIEW_FILTER,
-							   (lstrcmp(tchFilter, L"*.*") || bNegFilter) ? TBFILTERBMP : TBFILTERBMP + 1);
+							   (!StrEqual(tchFilter, L"*.*") || bNegFilter) ? TBFILTERBMP : TBFILTERBMP + 1);
 		break;
 
 	case IDM_VIEW_FILTERALL:
-		if (lstrcmp(tchFilter, L"*.*") || bNegFilter) {
+		if (!StrEqual(tchFilter, L"*.*") || bNegFilter) {
 			DLITEM dli;
 
 			lstrcpy(tchFilter, L"*.*");
@@ -2181,7 +2181,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 					wsprintf(tchnum, L"%i", ListView_GetItemCount(hwndDirList));
 					FormatNumberStr(tchnum);
 					FormatString(tch, COUNTOF(tch),
-								 (lstrcmp(tchFilter, L"*.*") || bNegFilter) ? IDS_NUMFILES2 : IDS_NUMFILES, tchnum);
+								 (!StrEqual(tchFilter, L"*.*") || bNegFilter) ? IDS_NUMFILES2 : IDS_NUMFILES, tchnum);
 				}
 
 				StatusSetText(hwndStatus, ID_FILEINFO, tch);
@@ -2232,7 +2232,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			History_UpdateToolbar(&mHistory, hwndToolbar,
 								  IDT_HISTORY_BACK, IDT_HISTORY_FORWARD);
 			Toolbar_SetButtonImage(hwndToolbar, IDT_VIEW_FILTER,
-								   (lstrcmp(tchFilter, L"*.*") || bNegFilter) ? TBFILTERBMP : TBFILTERBMP + 1);
+								   (!StrEqual(tchFilter, L"*.*") || bNegFilter) ? TBFILTERBMP : TBFILTERBMP + 1);
 			break;
 
 		case TBN_QUERYDELETE:
@@ -2320,7 +2320,7 @@ BOOL ChangeDirectory(HWND hwnd, LPCWSTR lpszNewDir, BOOL bUpdateHistory) {
 
 		SetWindowPathTitle(hwnd, szCurDir);
 
-		if (lstrcmp(tchFilter, L"*.*") || bNegFilter) {
+		if (!StrEqual(tchFilter, L"*.*") || bNegFilter) {
 			ListView_SetTextColor(hwndDirList, (bDefCrFilter) ? GetSysColor(COLOR_WINDOWTEXT) : crFilter);
 			Toolbar_SetButtonImage(hwndToolbar, IDT_VIEW_FILTER, TBFILTERBMP);
 		} else {
@@ -2363,7 +2363,7 @@ BOOL ChangeDirectory(HWND hwnd, LPCWSTR lpszNewDir, BOOL bUpdateHistory) {
 		wsprintf(tchnum, L"%d", cItems);
 		FormatNumberStr(tchnum);
 		FormatString(tch, COUNTOF(tch),
-					 (lstrcmp(tchFilter, L"*.*") || bNegFilter) ? IDS_NUMFILES2 : IDS_NUMFILES, tchnum);
+					 (!StrEqual(tchFilter, L"*.*") || bNegFilter) ? IDS_NUMFILES2 : IDS_NUMFILES, tchnum);
 		StatusSetText(hwndStatus, ID_FILEINFO, tch);
 
 		// Update History
@@ -2894,7 +2894,7 @@ int FindIniFile(void) {
 	GetModuleFileName(NULL, tchModule, COUNTOF(tchModule));
 
 	if (StrNotEmpty(szIniFile)) {
-		if (lstrcmpi(szIniFile, L"*?") == 0) {
+		if (StrEqual(szIniFile, L"*?")) {
 			return 0;
 		}
 		if (!CheckIniFile(szIniFile, tchModule)) {
@@ -2933,7 +2933,7 @@ int FindIniFile(void) {
 }
 
 int TestIniFile(void) {
-	if (lstrcmpi(szIniFile, L"*?") == 0) {
+	if (StrEqual(szIniFile, L"*?")) {
 		lstrcpy(szIniFile2, L"");
 		lstrcpy(szIniFile, L"");
 		return 0;
@@ -3184,7 +3184,7 @@ BOOL CALLBACK EnumWndProc(HWND hwnd, LPARAM lParam) {
 	WCHAR szClassName[64];
 
 	if (GetClassName(hwnd, szClassName, COUNTOF(szClassName))) {
-		if (lstrcmpi(szClassName, WC_METAPATH) == 0) {
+		if (StrCaseEqual(szClassName, WC_METAPATH)) {
 			*(HWND *)lParam = hwnd;
 			if (IsWindowEnabled(hwnd)) {
 				bContinue = FALSE;
@@ -3369,7 +3369,7 @@ BOOL CALLBACK EnumWndProc2(HWND hwnd, LPARAM lParam) {
 	WCHAR szClassName[64];
 
 	if (GetClassName(hwnd, szClassName, COUNTOF(szClassName))) {
-		if (lstrcmpi(szClassName, szGlobalWndClass) == 0) {
+		if (StrCaseEqual(szClassName, szGlobalWndClass)) {
 			*(HWND *)lParam = hwnd;
 			if (IsWindowEnabled(hwnd)) {
 				bContinue = FALSE;

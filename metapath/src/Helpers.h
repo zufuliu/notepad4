@@ -44,6 +44,24 @@ static inline BOOL StrNotEmpty(LPCWSTR s) {
 	return s != NULL && *s != L'\0';
 }
 
+static inline BOOL StrEqual(LPCWSTR s1, LPCWSTR s2) {
+	//return CompareStringW(LOCALE_INVARIANT, 0, s1, -1, s2, -1) == CSTR_EQUAL;
+	return wcscmp(s1, s2) == 0;
+}
+
+static inline BOOL StrCaseEqual(LPCWSTR s1, LPCWSTR s2) {
+	//return CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, s1, -1, s2, -1) == CSTR_EQUAL;
+	return _wcsicmp(s1, s2) == 0;
+}
+
+static inline BOOL StrNEqual(LPCWSTR s1, LPCWSTR s2, int cch) {
+	return wcsncmp(s1, s2, cch) == 0;
+}
+
+static inline BOOL StrNCaseEqual(LPCWSTR s1, LPCWSTR s2, int cch) {
+	return _wcsnicmp(s1, s2, cch) == 0;
+}
+
 extern HINSTANCE g_hInstance;
 extern UINT16 g_uWinVer;
 
