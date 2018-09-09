@@ -631,6 +631,12 @@ void Style_SetLexer(HWND hwnd, PEDITLEXER pLexNew) {
 		SciCall_SetProperty("fold.hypertext.comment", "1");
 		SciCall_SetProperty("fold.hypertext.heredoc", "1");
 		break;
+
+	case NP2LEX_CSS:
+		SciCall_SetProperty("lexer.css.scss.language", ((np2LexLangIndex == IDM_LANG_SCSS)? "1" : "0"));
+		SciCall_SetProperty("lexer.css.less.language", ((np2LexLangIndex == IDM_LANG_LESS)? "1" : "0"));
+		SciCall_SetProperty("lexer.css.hss.language", ((np2LexLangIndex == IDM_LANG_HSS)? "1" : "0"));
+		break;
 	}
 
 	Style_UpdateLexerKeywords(pLexNew);
@@ -1545,6 +1551,19 @@ void Style_GetCurrentLexerName(LPWSTR lpszName, int cchName) {
 				lang = L"Scilab Code";
 				break;
 
+			case IDM_LANG_CSS:
+				lang = L"CSS Style Sheet";
+				break;
+			case IDM_LANG_SCSS:
+				lang = L"Sassy CSS";
+				break;
+			case IDM_LANG_LESS:
+				lang = L"Less CSS";
+				break;
+			case IDM_LANG_HSS:
+				lang = L"HSS";
+				break;
+
 			default:
 				break;
 			}
@@ -1634,6 +1653,18 @@ PEDITLEXER __fastcall Style_MatchLexer(LPCWSTR lpszMatch, BOOL bCheckNames) {
 		if (StrCaseEqual(L"m4", lpszMatch)) {
 			np2LexLangIndex = IDM_LANG_M4;
 			return (&lexBash);
+		}
+		if (StrCaseEqual(L"scss", lpszMatch)) {
+			np2LexLangIndex = IDM_LANG_SCSS;
+			return (&lexCSS);
+		}
+		if (StrCaseEqual(L"less", lpszMatch)) {
+			np2LexLangIndex = IDM_LANG_LESS;
+			return (&lexCSS);
+		}
+		if (StrCaseEqual(L"hss", lpszMatch)) {
+			np2LexLangIndex = IDM_LANG_HSS;
+			return (&lexCSS);
 		}
 		if (bAutoSelect && StrCaseEqual(L"m", lpszMatch)) {
 			PEDITLEXER lex = Style_DetectObjCAndMatlab();
@@ -1966,6 +1997,13 @@ void Style_SetLexerByLangIndex(HWND hwnd, int lang) {
 		lexMatlab.rid = NP2LEX_SCILAB;
 		Style_SetLexer(hwnd, &lexMatlab);
 		break;
+
+	case IDM_LANG_CSS:
+	case IDM_LANG_SCSS:
+	case IDM_LANG_LESS:
+	case IDM_LANG_HSS:
+		Style_SetLexer(hwnd, &lexCSS);
+		break;
 	}
 }
 
@@ -1994,7 +2032,11 @@ void Style_UpdateSchemeMenu(HMENU hmenu) {
 		case NP2LEX_SCILAB:
 			lang = IDM_LANG_SCILAB;
 			break;
+		case NP2LEX_CSS:
+			lang = IDM_LANG_CSS;
+			break;
 		}
+		np2LexLangIndex = lang;
 	}
 	for (int i = IDM_LANG_DEFAULT; i < IDM_LANG_NULL; i++) {
 		CheckCmd(hmenu, i, FALSE);

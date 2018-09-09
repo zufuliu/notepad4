@@ -4426,6 +4426,11 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case IDM_LANG_MATLAB:
 	case IDM_LANG_OCTAVE:
 	case IDM_LANG_SCILAB:
+
+	case IDM_LANG_CSS:
+	case IDM_LANG_SCSS:
+	case IDM_LANG_LESS:
+	case IDM_LANG_HSS:
 		Style_SetLexerByLangIndex(hwndEdit, LOWORD(wParam));
 		break;
 

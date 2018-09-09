@@ -400,6 +400,13 @@ BEGIN
         MENUITEM "&Customize Schemes...\tCtrl+F12", IDM_VIEW_SCHEMECONFIG
         MENUITEM SEPARATOR
         MENUITEM "Default &Text",                   IDM_LANG_DEFAULT
+        POPUP "CSS Style Sheet"
+        BEGIN
+            MENUITEM "CSS",                         IDM_LANG_CSS
+            MENUITEM "Sassy CSS",                   IDM_LANG_SCSS
+            MENUITEM "Less CSS",                    IDM_LANG_LESS
+            MENUITEM "HSS",                         IDM_LANG_HSS
+        END
         POPUP "&Web Source Code"
         BEGIN
             MENUITEM "&Web Source Code",            IDM_LANG_WEB

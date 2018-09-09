@@ -63,7 +63,7 @@ static KEYWORDLIST Keywords_CSS = {{
 , "", "", "", "", "", "", ""
 }};
 
-EDITLEXER lexCSS = { SCLEX_CSS, NP2LEX_CSS, L"CSS Style Sheet", L"css", L"", &Keywords_CSS,
+EDITLEXER lexCSS = { SCLEX_CSS, NP2LEX_CSS, L"CSS Style Sheet", L"css; scss; less; hss", L"", &Keywords_CSS,
 {
 	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
 	//{ SCE_CSS_DEFAULT, L"Default", L"", L"" },
