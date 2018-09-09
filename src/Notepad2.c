@@ -1297,7 +1297,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 					 else if (SendMessage(hwndEdit, SCI_GETLENGTH, 0, 0) >= 4) {
 						char tch[5] = "";
 						SendMessage(hwndEdit, SCI_GETTEXT, 5, (LPARAM)tch);
-						if (StrCmp(tch, ".LOG") != 0) {
+						if (StrEqual(tch, ".LOG")) {
 							int iNewTopLine;
 							SendMessage(hwndEdit, SCI_SETSEL, iAnchorPos, iCurPos);
 							SendMessage(hwndEdit, SCI_ENSUREVISIBLE, (WPARAM)iDocTopLine, 0);
@@ -2428,7 +2428,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 				if (SendMessage(hwndEdit, SCI_GETLENGTH, 0, 0) >= 4) {
 					char tch[5] = "";
 					SendMessage(hwndEdit, SCI_GETTEXT, 5, (LPARAM)tch);
-					if (StrCmp(tch, ".LOG") != 0) {
+					if (StrEqual(tch, ".LOG")) {
 						int iNewTopLine;
 						SendMessage(hwndEdit, SCI_SETSEL, iAnchorPos, iCurPos);
 						SendMessage(hwndEdit, SCI_ENSUREVISIBLE, (WPARAM)iDocTopLine, 0);
@@ -5736,20 +5736,20 @@ int ParseCommandLineEncoding(LPCWSTR opt, int idmLE, int idmBE) {
 	if (*opt == '-') {
 		++opt;
 	}
-	if (StrCmpNI(opt, L"LE", CSTRLEN(L"LE")) == 0){
+	if (StrNCaseEqual(opt, L"LE", CSTRLEN(L"LE"))){
 		flag = idmLE;
 		opt += CSTRLEN(L"LE");
 		if (*opt == '-') {
 			++opt;
 		}
-	} else if (StrCmpNI(opt, L"BE", CSTRLEN(L"BE")) == 0) {
+	} else if (StrNCaseEqual(opt, L"BE", CSTRLEN(L"BE"))) {
 		flag = idmBE;
 		opt += CSTRLEN(L"BE");
 		if (*opt == '-') {
 			++opt;
 		}
 	}
-	if (*opt == 0 || lstrcmpi(opt, L"BOM") == 0 || lstrcmpi(opt, L"SIG") == 0 || lstrcmpi(opt, L"SIGNATURE") == 0) {
+	if (*opt == 0 || StrCaseEqual(opt, L"BOM") || StrCaseEqual(opt, L"SIG") || StrCaseEqual(opt, L"SIGNATURE")) {
 		flagSetEncoding = flag - IDM_ENCODING_ANSI + 1;
 		return 1;
 	}
@@ -5996,10 +5996,10 @@ int ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2, BOOL *bIsNotepadReplacement) 
 	state = 0;
 	switch (*CharUpper(opt)) {
 	case L'A':
-		if (lstrcmpi(opt, L"ANSI") == 0) {
+		if (StrCaseEqual(opt, L"ANSI")) {
 			flagSetEncoding = IDM_ENCODING_ANSI - IDM_ENCODING_ANSI + 1;
 			state = 1;
-		} else if (StrCmpNI(opt, L"appid=", CSTRLEN(L"appid=")) == 0) {
+		} else if (StrNCaseEqual(opt, L"appid=", CSTRLEN(L"appid="))) {
 			// Shell integration
 			opt += CSTRLEN(L"appid=");
 			StrCpyN(g_wchAppUserModelID, opt, COUNTOF(g_wchAppUserModelID));
@@ -6025,7 +6025,7 @@ int ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2, BOOL *bIsNotepadReplacement) 
 		break;
 
 	case L'M':
-		if (lstrcmpi(opt, L"MBCS") == 0) {
+		if (StrCaseEqual(opt, L"MBCS")) {
 			flagSetEncoding = IDM_ENCODING_ANSI - IDM_ENCODING_ANSI + 1;
 			state = 1;
 		} else {
@@ -6088,7 +6088,7 @@ int ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2, BOOL *bIsNotepadReplacement) 
 			break;
 		}
 
-		if (StrCmpNI(opt, L"POS", CSTRLEN(L"POS")) == 0) {
+		if (StrNCaseEqual(opt, L"POS", CSTRLEN(L"POS"))) {
 			opt += CSTRLEN(L"POS");
 		} else {
 			++opt;
@@ -6204,7 +6204,7 @@ int ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2, BOOL *bIsNotepadReplacement) 
 
 	case L'S':
 		// Shell integration
-		if (StrCmpNI(opt, L"sysmru=", CSTRLEN(L"sysmru=")) == 0) {
+		if (StrNCaseEqual(opt, L"sysmru=", CSTRLEN(L"sysmru="))) {
 			opt += CSTRLEN(L"sysmru=");
 			if (opt[1] == 0) {
 				switch (*opt) {
@@ -6223,7 +6223,7 @@ int ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2, BOOL *bIsNotepadReplacement) 
 		break;
 
 	case L'U':
-		if (StrCmpNI(opt, L"UTF", CSTRLEN(L"UTF")) == 0) {
+		if (StrNCaseEqual(opt, L"UTF", CSTRLEN(L"UTF"))) {
 			opt += CSTRLEN(L"UTF");
 			if (*opt == '-') {
 				++opt;
@@ -6236,7 +6236,7 @@ int ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2, BOOL *bIsNotepadReplacement) 
 				if (*opt == 0) {
 					flagSetEncoding = IDM_ENCODING_UTF8 - IDM_ENCODING_ANSI + 1;
 					state = 1;
-				} else if (lstrcmpi(opt, L"BOM") == 0 || lstrcmpi(opt, L"SIG") == 0 || lstrcmpi(opt, L"SIGNATURE") == 0) {
+				} else if (StrCaseEqual(opt, L"BOM") || StrCaseEqual(opt, L"SIG") || StrCaseEqual(opt, L"SIGNATURE")) {
 					flagSetEncoding = IDM_ENCODING_UTF8SIGN - IDM_ENCODING_ANSI + 1;
 					state = 1;
 				}
@@ -6244,7 +6244,7 @@ int ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2, BOOL *bIsNotepadReplacement) 
 				opt += 2;
 				state = ParseCommandLineEncoding(opt, IDM_ENCODING_UNICODE, IDM_ENCODING_UNICODEREV);
 			}
-		} else if (StrCmpNI(opt, L"UNICODE", CSTRLEN(L"UNICODE")) == 0) {
+		} else if (StrNCaseEqual(opt, L"UNICODE", CSTRLEN(L"UNICODE"))) {
 			opt += CSTRLEN(L"UNICODE");
 			state = ParseCommandLineEncoding(opt, IDM_ENCODING_UNICODE, IDM_ENCODING_UNICODEREV);
 		}
@@ -6472,7 +6472,7 @@ int FindIniFile(void) {
 	GetModuleFileName(NULL, tchModule, COUNTOF(tchModule));
 
 	if (StrNotEmpty(szIniFile)) {
-		if (lstrcmpi(szIniFile, L"*?") == 0) {
+		if (StrEqual(szIniFile, L"*?")) {
 			return 0;
 		}
 		if (!CheckIniFile(szIniFile, tchModule)) {
@@ -6511,7 +6511,7 @@ int FindIniFile(void) {
 }
 
 int TestIniFile(void) {
-	if (lstrcmpi(szIniFile, L"*?") == 0) {
+	if (StrEqual(szIniFile, L"*?")) {
 		lstrcpy(szIniFile2, L"");
 		lstrcpy(szIniFile, L"");
 		return 0;
@@ -6840,7 +6840,7 @@ BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect, LPCWST
 
 	if (!bNew && StrNotEmpty(lpszFile)) {
 		lstrcpy(tch, lpszFile);
-		if (lpszFile == szCurFile || lstrcmpi(lpszFile, szCurFile) == 0) {
+		if (lpszFile == szCurFile || StrCaseEqual(lpszFile, szCurFile)) {
 			Sci_Position pos = SciCall_GetCurrentPos();
 			line = SciCall_LineFromPosition(pos) + 1;
 			col = SciCall_GetColumn(pos) + 1;
@@ -6987,7 +6987,7 @@ BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect, LPCWST
 		if (SendMessage(hwndEdit, SCI_GETLENGTH, 0, 0) >= 4) {
 			char tchLog[5] = "";
 			SendMessage(hwndEdit, SCI_GETTEXT, 5, (LPARAM)tchLog);
-			if (StrCmp(tchLog, ".LOG") == 0) {
+			if (StrEqual(tchLog, ".LOG")) {
 				EditJumpTo(hwndEdit, -1, 0);
 				SendMessage(hwndEdit, SCI_BEGINUNDOACTION, 0, 0);
 				SendMessage(hwndEdit, SCI_NEWLINE, 0, 0);
@@ -7261,7 +7261,7 @@ BOOL CALLBACK EnumWndProc(HWND hwnd, LPARAM lParam) {
 	WCHAR szClassName[64];
 
 	if (GetClassName(hwnd, szClassName, COUNTOF(szClassName))) {
-		if (lstrcmpi(szClassName, wchWndClass) == 0) {
+		if (StrCaseEqual(szClassName, wchWndClass)) {
 			DWORD dwReuseLock = GetDlgItemInt(hwnd, IDC_REUSELOCK, NULL, FALSE);
 			if (GetTickCount() - dwReuseLock >= REUSEWINDOWLOCKTIMEOUT) {
 				*(HWND *)lParam = hwnd;
@@ -7279,7 +7279,7 @@ BOOL CALLBACK EnumWndProc2(HWND hwnd, LPARAM lParam) {
 	WCHAR szClassName[64];
 
 	if (GetClassName(hwnd, szClassName, COUNTOF(szClassName))) {
-		if (lstrcmpi(szClassName, wchWndClass) == 0) {
+		if (StrCaseEqual(szClassName, wchWndClass)) {
 			DWORD dwReuseLock = GetDlgItemInt(hwnd, IDC_REUSELOCK, NULL, FALSE);
 			if (GetTickCount() - dwReuseLock >= REUSEWINDOWLOCKTIMEOUT) {
 				WCHAR tchFileName[MAX_PATH] = L"";
@@ -7289,7 +7289,7 @@ BOOL CALLBACK EnumWndProc2(HWND hwnd, LPARAM lParam) {
 				}
 
 				GetDlgItemText(hwnd, IDC_FILENAME, tchFileName, COUNTOF(tchFileName));
-				if (lstrcmpi(tchFileName, lpFileArg) == 0) {
+				if (StrCaseEqual(tchFileName, lpFileArg)) {
 					*(HWND *)lParam = hwnd;
 				} else {
 					bContinue = TRUE;
@@ -7713,7 +7713,7 @@ BOOL RelaunchElevated(void) {
 				return FALSE;
 			}
 
-			exit = lstrcmpi(tchFile, szCurFile) == 0;
+			exit = StrCaseEqual(tchFile, szCurFile);
 			lpArg1 = LocalAlloc(LPTR, sizeof(WCHAR) * MAX_PATH);
 			GetModuleFileName(NULL, lpArg1, MAX_PATH);
 			lpArg2 = LocalAlloc(LPTR, sizeof(WCHAR) * 1024);

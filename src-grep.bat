@@ -1,0 +1,1 @@
+@grep --exclude-dir=.git --exclude-dir=build --exclude-dir=doc --exclude-dir=res -nr "%1"

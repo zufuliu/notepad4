@@ -57,7 +57,7 @@ int IniSectionGetString(LPCWSTR lpCachedIniSection, LPCWSTR lpName, LPCWSTR lpDe
 		ich = lstrlen(tch);
 
 		while (*p) {
-			if (StrCmpNI(p, tch, ich) == 0) {
+			if (StrNEqual(p, tch, ich)) {
 				lstrcpyn(lpReturnedString, p + ich, cchReturnedString);
 				return lstrlen(lpReturnedString);
 			}
@@ -79,7 +79,7 @@ BOOL IniSectionGetBool(LPCWSTR lpCachedIniSection, LPCWSTR lpName, BOOL bDefault
 		ich = lstrlen(tch);
 
 		while (*p) {
-			if (StrCmpNI(p, tch, ich) == 0) {
+			if (StrNEqual(p, tch, ich)) {
 				WCHAR *t = p + ich;
 				while (*t) {
 					switch (*t) {
@@ -113,7 +113,7 @@ int IniSectionGetInt(LPCWSTR lpCachedIniSection, LPCWSTR lpName, int iDefault) {
 		ich = lstrlen(tch);
 
 		while (*p) {
-			if (StrCmpNI(p, tch, ich) == 0) {
+			if (StrNEqual(p, tch, ich)) {
 				if (swscanf(p + ich, L"%i", &i) == 1) {
 					return i;
 				}
@@ -227,7 +227,7 @@ HRESULT PrivateSetCurrentProcessExplicitAppUserModelID(PCWSTR AppID) {
 		return S_OK;
 	}
 
-	if (lstrcmpi(AppID, L"(default)") == 0) {
+	if (StrCaseEqual(AppID, L"(default)")) {
 		return S_OK;
 	}
 
@@ -460,7 +460,7 @@ BOOL SetWindowTitle(HWND hwnd, UINT uIDAppName, BOOL bIsElevated, UINT uIDUntitl
 		StrCat(szTitle, szExcrptQuot);
 	} else if (StrNotEmpty(lpszFile)) {
 		if (iFormat < 2 && !PathIsRoot(lpszFile)) {
-			if (lstrcmp(szCachedFile, lpszFile) != 0) {
+			if (!StrCaseEqual(szCachedFile, lpszFile)) {
 				SHFILEINFO shfi;
 				lstrcpy(szCachedFile, lpszFile);
 				if (SHGetFileInfo2(lpszFile, 0, &shfi, sizeof(SHFILEINFO), SHGFI_DISPLAYNAME)) {
@@ -584,7 +584,7 @@ void SnapToDefaultButton(HWND hwndBox) {
 		if (btn != NULL) {
 			WCHAR className[8] = L"";
 			GetClassName(btn, className, COUNTOF(className));
-			if (lstrcmpi(className, L"Button") == 0) {
+			if (StrCaseEqual(className, L"Button")) {
 				RECT rect;
 				int x, y;
 				GetWindowRect(btn, &rect);
@@ -1041,7 +1041,7 @@ void PathAbsoluteFromApp(LPWSTR lpszSrc, LPWSTR lpszDest, int cchDest, BOOL bExp
 	WCHAR wchPath[MAX_PATH];
 	WCHAR wchResult[MAX_PATH];
 
-	if (StrCmpNI(lpszSrc, L"%CSIDL:MYDOCUMENTS%", CSTRLEN("%CSIDL:MYDOCUMENTS%")) == 0) {
+	if (StrNEqual(lpszSrc, L"%CSIDL:MYDOCUMENTS%", CSTRLEN("%CSIDL:MYDOCUMENTS%"))) {
 		SHGetFolderPath(NULL, CSIDL_PERSONAL, NULL, SHGFP_TYPE_CURRENT, wchPath);
 		PathAppend(wchPath, lpszSrc + CSTRLEN("%CSIDL:MYDOCUMENTS%"));
 	} else {
@@ -1095,18 +1095,18 @@ BOOL PathIsLnkFile(LPCWSTR pszPath) {
 	if (!pszExt) {
 		return FALSE;
 	}
-	if (!lstrcmpi(pszExt, L".lnk")) {
+	if (StrCaseEqual(pszExt, L".lnk")) {
 		return TRUE;
 	}
 	return FALSE;
 
-	if (!lstrcmpi(PathFindExtension(pszPath), L".lnk")) {
+	if (StrCaseEqual(PathFindExtension(pszPath), L".lnk")) {
 		return TRUE;
 	}
 	return FALSE;
 	*/
 
-	if (lstrcmpi(PathFindExtension(pszPath), L".lnk")) {
+	if (!StrCaseEqual(PathFindExtension(pszPath), L".lnk")) {
 		return FALSE;
 	}
 	return PathGetLnkPath(pszPath, tchResPath, COUNTOF(tchResPath));
@@ -1598,10 +1598,7 @@ BOOL MRU_Destroy(LPMRULIST pmru) {
 }
 
 int MRU_Compare(LPMRULIST pmru, LPCWSTR psz1, LPCWSTR psz2) {
-	if (pmru->iFlags & MRU_NOCASE) {
-		return lstrcmpi(psz1, psz2);
-	}
-	return lstrcmp(psz1, psz2);
+	return (pmru->iFlags & MRU_NOCASE) ? StrCmpI(psz1, psz2) : StrCmp(psz1, psz2);
 }
 
 BOOL MRU_Add(LPMRULIST pmru, LPCWSTR pszNew) {
@@ -1626,14 +1623,14 @@ BOOL MRU_AddFile(LPMRULIST pmru, LPCWSTR pszFile, BOOL bRelativePath, BOOL bUnex
 		if (pmru->pszItems[i] == NULL) {
 			break;
 		}
-		if (lstrcmpi(pmru->pszItems[i], pszFile) == 0) {
+		if (StrCaseEqual(pmru->pszItems[i], pszFile)) {
 			LocalFree(pmru->pszItems[i]);
 			break;
 		}
 		{
 			WCHAR wchItem[MAX_PATH];
 			PathAbsoluteFromApp(pmru->pszItems[i], wchItem, COUNTOF(wchItem), TRUE);
-			if (lstrcmpi(wchItem, pszFile) == 0) {
+			if (StrCaseEqual(wchItem, pszFile)) {
 				LocalFree(pmru->pszItems[i]);
 				break;
 			}
@@ -1686,7 +1683,7 @@ BOOL MRU_DeleteFileFromStore(LPMRULIST pmru, LPCWSTR pszFile) {
 
 	while (MRU_Enum(pmruStore, i, wchItem, COUNTOF(wchItem)) != -1) {
 		PathAbsoluteFromApp(wchItem, wchItem, COUNTOF(wchItem), TRUE);
-		if (lstrcmpi(wchItem, pszFile) == 0) {
+		if (StrCaseEqual(wchItem, pszFile)) {
 			MRU_Delete(pmruStore, i);
 		} else {
 			i++;

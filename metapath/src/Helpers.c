@@ -44,7 +44,7 @@ int IniSectionGetString(LPCWSTR lpCachedIniSection, LPCWSTR lpName, LPCWSTR lpDe
 		ich = lstrlen(tch);
 
 		while (*p) {
-			if (StrCmpNI(p, tch, ich) == 0) {
+			if (StrNEqual(p, tch, ich)) {
 				lstrcpyn(lpReturnedString, p + ich, cchReturnedString);
 				return lstrlen(lpReturnedString);
 			}
@@ -67,7 +67,7 @@ BOOL IniSectionGetBool(LPCWSTR lpCachedIniSection, LPCWSTR lpName, BOOL bDefault
 		ich = lstrlen(tch);
 
 		while (*p) {
-			if (StrCmpNI(p, tch, ich) == 0) {
+			if (StrNEqual(p, tch, ich)) {
 				WCHAR *t = p + ich;
 				while (*t) {
 					switch (*t) {
@@ -101,7 +101,7 @@ int IniSectionGetInt(LPCWSTR lpCachedIniSection, LPCWSTR lpName, int iDefault) {
 		ich = lstrlen(tch);
 
 		while (*p) {
-			if (StrCmpNI(p, tch, ich) == 0) {
+			if (StrNEqual(p, tch, ich)) {
 				if (swscanf(p + ich, L"%i", &i) == 1) {
 					return i;
 				}
@@ -394,7 +394,7 @@ void SnapToDefaultButton(HWND hwndBox) {
 		if (btn != NULL) {
 			WCHAR className[8] = L"";
 			GetClassName(btn, className, COUNTOF(className));
-			if (lstrcmpi(className, L"Button") == 0) {
+			if (StrCaseEqual(className, L"Button")) {
 				RECT rect;
 				int x, y;
 				GetWindowRect(btn, &rect);
@@ -632,7 +632,7 @@ void PathAbsoluteFromApp(LPWSTR lpszSrc, LPWSTR lpszDest, int cchDest, BOOL bExp
 	WCHAR wchPath[MAX_PATH];
 	WCHAR wchResult[MAX_PATH];
 
-	if (StrCmpNI(lpszSrc, L"%CSIDL:MYDOCUMENTS%", COUNTOF("%CSIDL:MYDOCUMENTS%") - 1) == 0) {
+	if (StrNEqual(lpszSrc, L"%CSIDL:MYDOCUMENTS%", COUNTOF("%CSIDL:MYDOCUMENTS%") - 1)) {
 		SHGetFolderPath(NULL, CSIDL_PERSONAL, NULL, SHGFP_TYPE_CURRENT, wchPath);
 		PathAppend(wchPath, lpszSrc + COUNTOF("%CSIDL:MYDOCUMENTS%") - 1);
 	} else {
@@ -686,20 +686,20 @@ BOOL PathIsLnkFile(LPCWSTR pszPath) {
 		return FALSE;
 	}
 
-	if (!lstrcmpi(pszExt, L".lnk")) {
+	if (StrCaseEqual(pszExt, L".lnk")) {
 		return TRUE;
 	} else {
 		return FALSE;
 	}
 
-	if (!lstrcmpi(PathFindExtension(pszPath), L".lnk")) {
+	if (StrCaseEqual(PathFindExtension(pszPath), L".lnk")) {
 		return TRUE;
 	} else {
 		return FALSE;
 	}
 	*/
 
-	if (lstrcmpi(PathFindExtension(pszPath), L".lnk")) {
+	if (!StrCaseEqual(PathFindExtension(pszPath), L".lnk")) {
 		return FALSE;
 	}
 	{
@@ -981,8 +981,8 @@ extern WCHAR szCurDir[MAX_PATH];
 DWORD SearchPathEx(LPCWSTR lpPath, LPCWSTR lpFileName, LPCWSTR lpExtension, DWORD nBufferLength, LPWSTR lpBuffer, LPWSTR *lpFilePart) {
 	DWORD dwRetVal = 0;
 
-	if (lstrcmp(lpFileName, L"..") == 0 || lstrcmp(lpFileName, L".") == 0) {
-		if (lstrcmp(lpFileName, L"..") == 0 && PathIsRoot(szCurDir)) {
+	if (StrEqual(lpFileName, L"..") || StrEqual(lpFileName, L".")) {
+		if (StrEqual(lpFileName, L"..") && PathIsRoot(szCurDir)) {
 			lstrcpyn(lpBuffer, L"*.*", nBufferLength);
 			dwRetVal = 1;
 		} else {
@@ -1186,7 +1186,7 @@ BOOL History_Add(PHISTORY ph, LPCWSTR pszNew) {
 
 	// Item to be added is equal to current item
 	if (ph->iCurItem >= 0 && ph->iCurItem <= (HISTORY_ITEMS - 1)) {
-		if (!lstrcmpi(pszNew, ph->psz[ph->iCurItem])) {
+		if (StrCaseEqual(pszNew, ph->psz[ph->iCurItem])) {
 			return FALSE;
 		}
 	}
@@ -1313,7 +1313,7 @@ BOOL MRU_Destroy(LPMRULIST pmru) {
 }
 
 int MRU_Compare(LPMRULIST pmru, LPCWSTR psz1, LPCWSTR psz2) {
-	return (pmru->iFlags & MRU_NOCASE) ? lstrcmpi(psz1, psz2) : lstrcmp(psz1, psz2);
+	return (pmru->iFlags & MRU_NOCASE) ? StrCmpI(psz1, psz2) : StrCmp(psz1, psz2);
 }
 
 BOOL MRU_Add(LPMRULIST pmru, LPCWSTR pszNew) {

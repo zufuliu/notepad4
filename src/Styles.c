@@ -732,7 +732,7 @@ void Style_SetLexer(HWND hwnd, PEDITLEXER pLexNew) {
 		SendMessage(hwnd, SCI_SETADDITIONALSELALPHA, SC_ALPHA_NOALPHA, 0);
 	}
 
-	if (StrStrI(lexDefault.Styles[6 + iIdx].szValue, L"eolfilled")) { // selection eolfilled
+	if (StrStr(lexDefault.Styles[6 + iIdx].szValue, L"eolfilled")) { // selection eolfilled
 		SendMessage(hwnd, SCI_SETSELEOLFILLED, 1, 0);
 	} else {
 		SendMessage(hwnd, SCI_SETSELEOLFILLED, 0, 0);
@@ -1543,22 +1543,22 @@ PEDITLEXER __fastcall Style_MatchLexer(LPCWSTR lpszMatch, BOOL bCheckNames) {
 	WCHAR	 *p1, *p2;
 
 	if (!bCheckNames) {
-		//if (!(StrCmpNI(L"php", lpszMatch, 3) && lstrcmpi(L"phtml", lpszMatch))) {
+		//if (StrNCaseEqual(L"php", lpszMatch, 3) || StrCaseEqual(L"phtml", lpszMatch))) {
 		//	np2LexLangIndex = IDM_LANG_PHP;
 		//	return (&lexPHP);
 		//}
-		if (!lstrcmpi(L"jsp", lpszMatch)) {
+		if (StrCaseEqual(L"jsp", lpszMatch)) {
 			np2LexLangIndex = IDM_LANG_JSP;
 			return (&lexHTML);
 		}
-		if (!lstrcmpi(L"aspx", lpszMatch)) {
+		if (StrCaseEqual(L"aspx", lpszMatch)) {
 			np2LexLangIndex = Style_GetDocTypeLanguage();
 			if (np2LexLangIndex == 0) {
 				np2LexLangIndex = IDM_LANG_ASPX_CS;
 			}
 			return (&lexHTML);
 		}
-		if (!lstrcmpi(L"asp", lpszMatch)) {
+		if (StrCaseEqual(L"asp", lpszMatch)) {
 			np2LexLangIndex = Style_GetDocTypeLanguage();
 			if (np2LexLangIndex == 0) {
 				np2LexLangIndex = IDM_LANG_ASP_VBS;
@@ -1566,51 +1566,51 @@ PEDITLEXER __fastcall Style_MatchLexer(LPCWSTR lpszMatch, BOOL bCheckNames) {
 			return (&lexHTML);
 		}
 
-		if (!lstrcmpi(L"xsd", lpszMatch)) {
+		if (StrCaseEqual(L"xsd", lpszMatch)) {
 			np2LexLangIndex = IDM_LANG_XSD;
 			return (&lexXML);
 		}
-		if (!StrCmpNI(L"xsl", lpszMatch, 3)) {
+		if (StrNCaseEqual(L"xsl", lpszMatch, 3)) {
 			np2LexLangIndex = IDM_LANG_XSLT;
 			return (&lexXML);
 		}
-		if (!lstrcmpi(L"dtd", lpszMatch)) {
+		if (StrCaseEqual(L"dtd", lpszMatch)) {
 			np2LexLangIndex = IDM_LANG_DTD;
 			return (&lexXML);
 		}
-		if (!lstrcmpi(L"pom", lpszMatch)) {
+		if (StrCaseEqual(L"pom", lpszMatch)) {
 			np2LexLangIndex = IDM_LANG_MAVEN_POM;
 			return (&lexXML);
 		}
-		if (!lstrcmpi(L"resx", lpszMatch)) {
+		if (StrCaseEqual(L"resx", lpszMatch)) {
 			np2LexLangIndex = IDM_LANG_RESX;
 			return (&lexXML);
 		}
-		if (!lstrcmpi(L"xaml", lpszMatch)) {
+		if (StrCaseEqual(L"xaml", lpszMatch)) {
 			np2LexLangIndex = IDM_LANG_XAML;
 			return (&lexXML);
 		}
-		if (!lstrcmpi(L"plist", lpszMatch)) {
+		if (StrCaseEqual(L"plist", lpszMatch)) {
 			np2LexLangIndex = IDM_LANG_PROPERTY_LIST;
 			return (&lexXML);
 		}
-		if (!lstrcmpi(L"svg", lpszMatch)) {
+		if (StrCaseEqual(L"svg", lpszMatch)) {
 			np2LexLangIndex = IDM_LANG_SVG;
 			return (&lexXML);
 		}
-		if (!lstrcmpi(L"xml", lpszMatch)) {
+		if (StrCaseEqual(L"xml", lpszMatch)) {
 			np2LexLangIndex = Style_GetDocTypeLanguage();
 			return (&lexXML);
 		}
-		if (!lstrcmpi(L"sce", lpszMatch)) {
+		if (StrCaseEqual(L"sce", lpszMatch)) {
 			lexMatlab.rid = NP2LEX_SCILAB;
 			return (&lexMatlab);
 		}
-		if (!lstrcmpi(L"sci", lpszMatch)) {
+		if (StrCaseEqual(L"sci", lpszMatch)) {
 			lexMatlab.rid = NP2LEX_SCILAB;
 			return (&lexMatlab);
 		}
-		if (bAutoSelect && !lstrcmpi(L"m", lpszMatch)) {
+		if (bAutoSelect && StrCaseEqual(L"m", lpszMatch)) {
 			PEDITLEXER lex = Style_DetectObjCAndMatlab();
 			if (lex != NULL) {
 				return lex;
@@ -1628,7 +1628,7 @@ PEDITLEXER __fastcall Style_MatchLexer(LPCWSTR lpszMatch, BOOL bCheckNames) {
 					p2 = StrEnd(p1);
 				}
 				StrTrim(p1, L" .");
-				if (lstrcmpi(p1, lpszMatch) == 0) {
+				if (StrCaseEqual(p1, lpszMatch)) {
 					return pLexArray[i];
 				}
 				p1 = p2 + 1;
@@ -1638,7 +1638,7 @@ PEDITLEXER __fastcall Style_MatchLexer(LPCWSTR lpszMatch, BOOL bCheckNames) {
 		int cch = lstrlen(lpszMatch);
 		if (cch >= 3) {
 			for (int i = 0; i < NUMLEXERS; i++) {
-				if (StrCmpNI(pLexArray[i]->pszName, lpszMatch, cch) == 0) {
+				if (StrNCaseEqual(pLexArray[i]->pszName, lpszMatch, cch)) {
 					return pLexArray[i];
 				}
 			}
@@ -1669,7 +1669,7 @@ void Style_SetLexerFromFile(HWND hwnd, LPCWSTR lpszFile) {
 			lpszExt++;
 		}
 
-		if (!fNoCGIGuess && !(lstrcmpi(lpszExt, L"cgi") && lstrcmpi(lpszExt, L"fcgi"))) {
+		if (!fNoCGIGuess && (StrCaseEqual(lpszExt, L"cgi") || StrCaseEqual(lpszExt, L"fcgi"))) {
 			char tchText[256];
 			SendMessage(hwnd, SCI_GETTEXT, (WPARAM)COUNTOF(tchText) - 1, (LPARAM)tchText);
 			StrTrimA(tchText, " \t\n\r");
@@ -1679,78 +1679,78 @@ void Style_SetLexerFromFile(HWND hwnd, LPCWSTR lpszFile) {
 			}
 		}
 
-		if (!bFound && !(lstrcmpi(lpszName, L"build.xml") && lstrcmpi(lpszName, L"javadoc.xml"))) {
+		if (!bFound && (StrCaseEqual(lpszName, L"build.xml") || StrCaseEqual(lpszName, L"javadoc.xml"))) {
 			pLexNew = &lexXML;
 			bFound = TRUE;
 			np2LexLangIndex = IDM_LANG_ANT_BUILD;
 		}
-		if (!bFound && !lstrcmpi(lpszName, L"pom.xml")) {
+		if (!bFound && StrCaseEqual(lpszName, L"pom.xml")) {
 			pLexNew = &lexXML;
 			bFound = TRUE;
 			np2LexLangIndex = IDM_LANG_MAVEN_POM;
 		}
-		if (!bFound && !lstrcmpi(lpszName, L"settings.xml")) {
+		if (!bFound && StrCaseEqual(lpszName, L"settings.xml")) {
 			pLexNew = &lexXML;
 			bFound = TRUE;
 			np2LexLangIndex = IDM_LANG_MAVEN_SETTINGS;
 		}
-		if (!bFound && !lstrcmpi(lpszName, L"AndroidManifest.xml")) {
+		if (!bFound && StrCaseEqual(lpszName, L"AndroidManifest.xml")) {
 			pLexNew = &lexXML;
 			bFound = TRUE;
 			np2LexLangIndex = IDM_LANG_ANDROID_MANIFEST;
 		}
-		if (!bFound && ((!lstrcmpi(lpszExt, L"conf") && !StrCmpNI(lpszName, L"httpd", 5)) || !lstrcmpi(lpszExt, L"htaccess"))) {
+		if (!bFound && ((StrCaseEqual(lpszExt, L"conf") && StrNCaseEqual(lpszName, L"httpd", 5)) || StrCaseEqual(lpszExt, L"htaccess"))) {
 			pLexNew = &lexCONF;
 			bFound = TRUE;
 			np2LexLangIndex = IDM_LANG_APACHE;
 		}
 		// MySQL ini/cnf
-		if (!bFound && !StrCmpNI(lpszName, L"my", 2) && (!lstrcmpi(lpszExt, L"ini") || !lstrcmpi(lpszExt, L"cnf"))) {
+		if (!bFound && StrNCaseEqual(lpszName, L"my", 2) && (StrCaseEqual(lpszExt, L"ini") || StrCaseEqual(lpszExt, L"cnf"))) {
 			pLexNew = &lexCONF;
 			bFound = TRUE;
 		}
-		if (!bFound && !lstrcmpi(lpszName, L"server.xml")) {
+		if (!bFound && StrCaseEqual(lpszName, L"server.xml")) {
 			pLexNew = &lexXML;
 			bFound = TRUE;
 			np2LexLangIndex = IDM_LANG_TOMCAT;
 		}
-		if (!bFound && !lstrcmpi(lpszName, L"web.xml")) {
+		if (!bFound && StrCaseEqual(lpszName, L"web.xml")) {
 			pLexNew = &lexXML;
 			bFound = TRUE;
 			np2LexLangIndex = IDM_LANG_WEB_JAVA;
 		}
-		if (!bFound && !lstrcmpi(lpszName, L"web.config")) {
+		if (!bFound && StrCaseEqual(lpszName, L"web.config")) {
 			pLexNew = &lexXML;
 			bFound = TRUE;
 			np2LexLangIndex = IDM_LANG_WEB_NET;
 		}
-		if (!bFound && !(lstrcmpi(lpszName, L"struts.xml") && lstrcmpi(lpszName, L"struts-config.xml"))) {
+		if (!bFound && (StrCaseEqual(lpszName, L"struts.xml") || StrCaseEqual(lpszName, L"struts-config.xml"))) {
 			pLexNew = &lexXML;
 			bFound = TRUE;
 			np2LexLangIndex = IDM_LANG_STRUTS;
 		}
-		if (!bFound && !lstrcmpi(lpszName, L"hibernate.cfg.xml")) {
+		if (!bFound && StrCaseEqual(lpszName, L"hibernate.cfg.xml")) {
 			pLexNew = &lexXML;
 			bFound = TRUE;
 			np2LexLangIndex = IDM_LANG_HIB_CFG;
 		}
-		if (!bFound && !lstrcmpi(lpszName, L"ivy.xml")) {
+		if (!bFound && StrCaseEqual(lpszName, L"ivy.xml")) {
 			pLexNew = &lexXML;
 			bFound = TRUE;
 			np2LexLangIndex = IDM_LANG_IVY_MODULE;
 		}
-		if (!bFound && !lstrcmpi(lpszName, L"ivysettings.xml")) {
+		if (!bFound && StrCaseEqual(lpszName, L"ivysettings.xml")) {
 			pLexNew = &lexXML;
 			bFound = TRUE;
 			np2LexLangIndex = IDM_LANG_IVY_SETTINGS;
 		}
-		if (!bFound && !lstrcmpi(lpszName, L"pmd.xml")) {
+		if (!bFound && StrCaseEqual(lpszName, L"pmd.xml")) {
 			pLexNew = &lexXML;
 			bFound = TRUE;
 			np2LexLangIndex = IDM_LANG_PMD_RULESET;
 		}
 
-		if (!bFound && (!lstrcmpi(lpszName, L"CMakeLists.txt") || !lstrcmpi(lpszName, L"CMakeCache.txt") || StrRStrI(lpszFile, NULL, L".cmake.in"))) {
+		if (!bFound && (StrCaseEqual(lpszName, L"CMakeLists.txt") || StrCaseEqual(lpszName, L"CMakeCache.txt") || StrRStrI(lpszFile, NULL, L".cmake.in"))) {
 			pLexNew = &lexCMake;
 			bFound = TRUE;
 		}
@@ -1765,24 +1765,24 @@ void Style_SetLexerFromFile(HWND hwnd, LPCWSTR lpszFile) {
 	}
 
 	if (!bFound && bAutoSelect && lpszFile) {
-		if (!StrCmpNIW(lpszName, L"Readme", 6)) {
+		if (StrNCaseEqual(lpszName, L"Readme", 6)) {
 			pLexNew = &lexDefault;
 			bFound = TRUE;
 		}
-		if (!bFound && !StrCmpNIW(lpszName, L"Makefile", 8)) {
+		if (!bFound && StrNCaseEqual(lpszName, L"Makefile", 8)) {
 			pLexNew = &lexMake;
 			bFound = TRUE;
 		}
-		if (!bFound && !lstrcmpi(lpszName, L"Rakefile")) {
+		if (!bFound && StrCaseEqual(lpszName, L"Rakefile")) {
 			pLexNew = &lexRuby;
 			bFound = TRUE;
 		}
-		if (!bFound && !lstrcmpi(lpszName, L"mozconfig")) {
+		if (!bFound && StrCaseEqual(lpszName, L"mozconfig")) {
 			pLexNew = &lexBash;
 			bFound = TRUE;
 		}
 		// Boost build
-		if (!bFound && !(lstrcmpi(lpszName, L"Jamroot") && StrCmpNIW(lpszName, L"Jamfile", 7))) {
+		if (!bFound && (StrCaseEqual(lpszName, L"Jamroot") || StrNCaseEqual(lpszName, L"Jamfile", 7))) {
 			pLexNew = &lexJAM;
 			bFound = TRUE;
 		}
@@ -1814,13 +1814,13 @@ void Style_SetLexerFromFile(HWND hwnd, LPCWSTR lpszFile) {
 		UINT cp = (UINT)SendMessage(hwnd, SCI_GETCODEPAGE, 0, 0);
 		MultiByteToWideChar(cp, 0, fvCurFile.tchMode, -1, wchMode, COUNTOF(wchMode));
 
-		if (!fNoCGIGuess && !(lstrcmpi(wchMode, L"cgi") && lstrcmpi(wchMode, L"fcgi"))) {
+		if (!fNoCGIGuess && (StrCaseEqual(wchMode, L"cgi") || StrCaseEqual(wchMode, L"fcgi"))) {
 			char tchText[256];
 			SendMessage(hwnd, SCI_GETTEXT, (WPARAM)COUNTOF(tchText) - 1, (LPARAM)tchText);
 			StrTrimA(tchText, " \t\n\r");
 			if ((pLexSniffed = Style_SniffShebang(tchText)) != NULL) {
 				if (iEncoding != g_DOSEncoding || pLexSniffed != &lexDefault
-						|| (lstrcmpi(lpszExt, L"nfo") && lstrcmpi(lpszExt, L"diz"))) {
+						|| !(StrCaseEqual(lpszExt, L"nfo") || StrCaseEqual(lpszExt, L"diz"))) {
 					// Although .nfo and .diz were removed from the default lexer's
 					// default extensions list, they may still presist in the user's INI
 					pLexNew = pLexSniffed;
@@ -2060,7 +2060,7 @@ BOOL Style_GetOpenDlgFilterStr(LPWSTR lpszFilter, int cchFilter) {
 BOOL Style_StrGetFont(LPCWSTR lpszStyle, LPWSTR lpszFont, int cchFont) {
 	WCHAR *p;
 
-	if ((p = StrStrI(lpszStyle, L"font:")) != NULL) {
+	if ((p = StrStr(lpszStyle, L"font:")) != NULL) {
 		WCHAR tch[256];
 		lstrcpy(tch, p + CSTRLEN(L"font:"));
 		if ((p = StrChr(tch, L';')) != NULL) {
@@ -2068,7 +2068,7 @@ BOOL Style_StrGetFont(LPCWSTR lpszStyle, LPWSTR lpszFont, int cchFont) {
 		}
 		TrimString(tch);
 
-		if (lstrcmpi(tch, L"Default") == 0 || !IsFontAvailable(tch)) {
+		if (StrCaseEqual(tch, L"Default") || !IsFontAvailable(tch)) {
 			if (np2MonoFontIndex < NUM_MONO_FONT) {
 				lstrcpyn(lpszFont, SysMonoFontName[np2MonoFontIndex], cchFont);
 			} else {
@@ -2089,7 +2089,7 @@ BOOL Style_StrGetFont(LPCWSTR lpszStyle, LPWSTR lpszFont, int cchFont) {
 BOOL Style_StrGetCharSet(LPCWSTR lpszStyle, int *i) {
 	WCHAR *p;
 
-	if ((p = StrStrI(lpszStyle, L"charset:")) != NULL) {
+	if ((p = StrStr(lpszStyle, L"charset:")) != NULL) {
 		WCHAR tch[256];
 		int	 iValue;
 		int	 itok;
@@ -2114,7 +2114,7 @@ BOOL Style_StrGetCharSet(LPCWSTR lpszStyle, int *i) {
 BOOL Style_StrGetSizeEx(LPCWSTR lpszStyle, int *i) {
 	WCHAR *p;
 
-	if ((p = StrStrI(lpszStyle, L"size:")) != NULL) {
+	if ((p = StrStr(lpszStyle, L"size:")) != NULL) {
 		WCHAR tch[256];
 		float value;
 		int	 iSign = 0;
@@ -2159,7 +2159,7 @@ BOOL Style_StrGetSize(LPCWSTR lpszStyle, int *i) {
 BOOL Style_StrGetSizeStr(LPCWSTR lpszStyle, LPWSTR lpszSize, int cchSize) {
 	WCHAR *p;
 
-	if ((p = StrStrI(lpszStyle, L"size:")) != NULL) {
+	if ((p = StrStr(lpszStyle, L"size:")) != NULL) {
 		WCHAR tch[256];
 		lstrcpy(tch, p + CSTRLEN(L"size:"));
 		if ((p = StrChr(tch, L';')) != NULL) {
@@ -2180,7 +2180,7 @@ BOOL Style_StrGetColor(BOOL bFore, LPCWSTR lpszStyle, int *rgb) {
 	WCHAR *p;
 	const WCHAR *pItem = (bFore) ? L"fore:" : L"back:";
 
-	if ((p = StrStrI(lpszStyle, pItem)) != NULL) {
+	if ((p = StrStr(lpszStyle, pItem)) != NULL) {
 		WCHAR tch[256];
 		unsigned int iValue;
 		int	itok;
@@ -2208,7 +2208,7 @@ BOOL Style_StrGetColor(BOOL bFore, LPCWSTR lpszStyle, int *rgb) {
 BOOL Style_StrGetCase(LPCWSTR lpszStyle, int *i) {
 	WCHAR *p;
 
-	if ((p = StrStrI(lpszStyle, L"case:")) != NULL) {
+	if ((p = StrStr(lpszStyle, L"case:")) != NULL) {
 		WCHAR tch[256];
 		lstrcpy(tch, p + CSTRLEN(L"case:"));
 		if ((p = StrChr(tch, L';')) != NULL) {
@@ -2234,7 +2234,7 @@ BOOL Style_StrGetCase(LPCWSTR lpszStyle, int *i) {
 BOOL Style_StrGetAlpha(LPCWSTR lpszStyle, int *i) {
 	WCHAR *p;
 
-	if ((p = StrStrI(lpszStyle, L"alpha:")) != NULL) {
+	if ((p = StrStr(lpszStyle, L"alpha:")) != NULL) {
 		WCHAR tch[256];
 		int	 iValue;
 		int	 itok;
@@ -2282,9 +2282,9 @@ BOOL Style_SelectFont(HWND hwnd, LPWSTR lpszStyle, int cchStyle, BOOL bDefaultSt
 		lf.lfHeight = -MulDiv(iValue, GetDeviceCaps(hdc, LOGPIXELSY), 72*SC_FONT_SIZE_MULTIPLIER);
 		ReleaseDC(hwnd, hdc);
 	}
-	lf.lfWeight = (StrStrI(lpszStyle, L"bold")) ? FW_BOLD : FW_NORMAL;
-	lf.lfItalic = (StrStrI(lpszStyle, L"italic")) ? 1 : 0;
-	lf.lfStrikeOut = (StrStrI(lpszStyle, L"strike")) ? 1 : 0;
+	lf.lfWeight = (StrStr(lpszStyle, L"bold")) ? FW_BOLD : FW_NORMAL;
+	lf.lfItalic = (StrStr(lpszStyle, L"italic")) ? 1 : 0;
+	lf.lfStrikeOut = (StrStr(lpszStyle, L"strike")) ? 1 : 0;
 
 	// Init cf
 	cf.lStructSize = sizeof(CHOOSEFONT);
@@ -2328,11 +2328,11 @@ BOOL Style_SelectFont(HWND hwnd, LPWSTR lpszStyle, int cchStyle, BOOL bDefaultSt
 		lstrcat(szNewStyle, L"; italic");
 	}
 
-	if (lf.lfUnderline /*StrStrI(lpszStyle, L"underline")*/) {
+	if (lf.lfUnderline /*StrStr(lpszStyle, L"underline")*/) {
 		lstrcat(szNewStyle, L"; underline");
 	}
 
-	if (lf.lfStrikeOut /*StrStrI(lpszStyle, L"strike")*/) {
+	if (lf.lfStrikeOut /*StrStr(lpszStyle, L"strike")*/) {
 		lstrcat(szNewStyle, L"; strike");
 	}
 
@@ -2352,7 +2352,7 @@ BOOL Style_SelectFont(HWND hwnd, LPWSTR lpszStyle, int cchStyle, BOOL bDefaultSt
 		lstrcat(szNewStyle, tch);
 	}
 
-	if (StrStrI(lpszStyle, L"eolfilled")) {
+	if (StrStr(lpszStyle, L"eolfilled")) {
 		lstrcat(szNewStyle, L"; eolfilled");
 	}
 
@@ -2432,25 +2432,25 @@ BOOL Style_SelectColor(HWND hwnd, BOOL bFore, LPWSTR lpszStyle, int cchStyle) {
 		lstrcat(szNewStyle, tch);
 	}
 
-	if (StrStrI(lpszStyle, L"bold")) {
+	if (StrStr(lpszStyle, L"bold")) {
 		if (StrNotEmpty(szNewStyle)) {
 			lstrcat(szNewStyle, L"; ");
 		}
 		lstrcat(szNewStyle, L"bold");
 	}
-	if (StrStrI(lpszStyle, L"italic")) {
+	if (StrStr(lpszStyle, L"italic")) {
 		if (StrNotEmpty(szNewStyle)) {
 			lstrcat(szNewStyle, L"; ");
 		}
 		lstrcat(szNewStyle, L"italic");
 	}
-	if (StrStrI(lpszStyle, L"underline")) {
+	if (StrStr(lpszStyle, L"underline")) {
 		if (StrNotEmpty(szNewStyle)) {
 			lstrcat(szNewStyle, L"; ");
 		}
 		lstrcat(szNewStyle, L"underline");
 	}
-	if (StrStrI(lpszStyle, L"strike")) {
+	if (StrStr(lpszStyle, L"strike")) {
 		if (StrNotEmpty(szNewStyle)) {
 			lstrcat(szNewStyle, L"; ");
 		}
@@ -2491,7 +2491,7 @@ BOOL Style_SelectColor(HWND hwnd, BOOL bFore, LPWSTR lpszStyle, int cchStyle) {
 		lstrcat(szNewStyle, tch);
 	}
 
-	if (StrStrI(lpszStyle, L"eolfilled")) {
+	if (StrStr(lpszStyle, L"eolfilled")) {
 		lstrcat(szNewStyle, L"; eolfilled");
 	}
 
@@ -2542,35 +2542,35 @@ void Style_SetStyles(HWND hwnd, int iStyle, LPCWSTR lpszStyle) {
 	}
 
 	// Bold
-	if (StrStrI(lpszStyle, L"bold")) {
+	if (StrStr(lpszStyle, L"bold")) {
 		SendMessage(hwnd, SCI_STYLESETBOLD, iStyle, (LPARAM)TRUE);
 	} else {
 		SendMessage(hwnd, SCI_STYLESETBOLD, iStyle, (LPARAM)FALSE);
 	}
 
 	// Italic
-	if (StrStrI(lpszStyle, L"italic")) {
+	if (StrStr(lpszStyle, L"italic")) {
 		SendMessage(hwnd, SCI_STYLESETITALIC, iStyle, (LPARAM)TRUE);
 	} else {
 		SendMessage(hwnd, SCI_STYLESETITALIC, iStyle, (LPARAM)FALSE);
 	}
 
 	// Underline
-	if (StrStrI(lpszStyle, L"underline")) {
+	if (StrStr(lpszStyle, L"underline")) {
 		SendMessage(hwnd, SCI_STYLESETUNDERLINE, iStyle, (LPARAM)TRUE);
 	} else {
 		SendMessage(hwnd, SCI_STYLESETUNDERLINE, iStyle, (LPARAM)FALSE);
 	}
 
 	// Strike
-	if (StrStrI(lpszStyle, L"strike")) {
+	if (StrStr(lpszStyle, L"strike")) {
 		SendMessage(hwnd, SCI_STYLESETSTRIKE, iStyle, (LPARAM)TRUE);
 	} else {
 		SendMessage(hwnd, SCI_STYLESETSTRIKE, iStyle, (LPARAM)FALSE);
 	}
 
 	// EOL Filled
-	if (StrStrI(lpszStyle, L"eolfilled")) {
+	if (StrStr(lpszStyle, L"eolfilled")) {
 		SendMessage(hwnd, SCI_STYLESETEOLFILLED, iStyle, (LPARAM)TRUE);
 	} else {
 		SendMessage(hwnd, SCI_STYLESETEOLFILLED, iStyle, (LPARAM)FALSE);
@@ -2723,7 +2723,7 @@ INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM
 
 		// Add lexers
 		for (int i = 0; i < NUMLEXERS; i++) {
-			if (!found && lstrcmp(pLexArray[i]->pszName, pLexCurrent->pszName) == 0) {
+			if (!found && StrEqual(pLexArray[i]->pszName, pLexCurrent->pszName)) {
 				found = 1;
 				currentLex = Style_AddLexerToTreeView(hwndTV, pLexArray[i]);
 			} else {
@@ -2987,8 +2987,8 @@ INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM
 				WCHAR tch[256];
 				GetDlgItemText(hwnd, IDC_STYLEEDIT, tch, COUNTOF(tch));
 				if (Style_SelectFont(hwnd, tch, COUNTOF(tch),
-									 lstrcmpi(pCurrentStyle->pszName, L"Default Style") == 0 ||
-									 lstrcmpi(pCurrentStyle->pszName, L"2nd Default Style") == 0)) {
+									 StrEqual(pCurrentStyle->pszName, L"Default Style") ||
+									 StrEqual(pCurrentStyle->pszName, L"2nd Default Style"))) {
 					SetDlgItemText(hwnd, IDC_STYLEEDIT, tch);
 					//CheckDlgButton(hwnd, IDC_STYLEBOLD, (Style_StrGetAttribute(tch, L"bold") ? BST_CHECKED : BST_UNCHECKED));
 					//CheckDlgButton(hwnd, IDC_STYLEITALIC, (Style_StrGetAttribute(tch, L"italic") ? BST_CHECKED : BST_UNCHECKED));
@@ -3304,7 +3304,7 @@ INT_PTR CALLBACK Style_SelectLexerDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, L
 		for (int i = 0; i < lvItems; i++) {
 			lvi.iItem = i;
 			ListView_GetItem(hwndLV, &lvi);
-			if (lstrcmp(((PEDITLEXER)lvi.lParam)->pszName, pLexCurrent->pszName) == 0) {
+			if (StrEqual(((PEDITLEXER)lvi.lParam)->pszName, pLexCurrent->pszName)) {
 				ListView_SetItemState(hwndLV, i, LVIS_FOCUSED | LVIS_SELECTED, LVIS_FOCUSED | LVIS_SELECTED);
 				ListView_EnsureVisible(hwndLV, i, FALSE);
 				if (iDefaultLexer == i) {

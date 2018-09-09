@@ -723,7 +723,7 @@ BOOL DirList_SelectItem(HWND hwnd, LPCWSTR lpszDisplayName, LPCWSTR lpszFullPath
 		DirList_GetItem(hwnd, i, &dli);
 		GetShortPathName(dli.szFileName, dli.szFileName, MAX_PATH);
 
-		if (!lstrcmpi(dli.szFileName, szShortPath)) {
+		if (StrCaseEqual(dli.szFileName, szShortPath)) {
 			ListView_SetItemState(hwnd, i, LVIS_FLAGS, LVIS_FLAGS);
 			ListView_EnsureVisible(hwnd, i, FALSE);
 			return TRUE;
@@ -746,7 +746,7 @@ void DirList_CreateFilter(PDL_FILTER pdlf, LPCWSTR lpszFileSpec, BOOL bExcludeFi
 	lstrcpyn(pdlf->tFilterBuf, lpszFileSpec, (DL_FILTER_BUFSIZE - 1));
 	pdlf->bExcludeFilter = bExcludeFilter;
 
-	if (StrIsEmpty(lpszFileSpec) || lstrcmp(lpszFileSpec, L"*.*") == 0) {
+	if (StrIsEmpty(lpszFileSpec) || StrEqual(lpszFileSpec, L"*.*")) {
 		return;
 	}
 
