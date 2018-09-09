@@ -169,6 +169,9 @@ int flagPosParam        = 0;
 //
 //
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nShowCmd) {
+	UNREFERENCED_PARAMETER(hPrevInstance);
+	UNREFERENCED_PARAMETER(lpCmdLine);
+
 	MSG    msg;
 	HWND   hwnd;
 	HACCEL hAcc;
@@ -689,6 +692,8 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 //
 //
 LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) {
+	UNREFERENCED_PARAMETER(wParam);
+
 	HWND hwndTT;
 	TOOLINFO ti;
 
@@ -986,6 +991,9 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) {
 //
 //
 void MsgThemeChanged(HWND hwnd, WPARAM wParam, LPARAM lParam) {
+	UNREFERENCED_PARAMETER(wParam);
+	UNREFERENCED_PARAMETER(lParam);
+
 	RECT rc;
 	WCHAR chStatus[255];
 	HINSTANCE hInstance = (HINSTANCE)(INT_PTR)GetWindowLongPtr(hwnd, GWLP_HINSTANCE);
@@ -1031,6 +1039,8 @@ void MsgThemeChanged(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 //
 //
 void MsgSize(HWND hwnd, WPARAM wParam, LPARAM lParam) {
+	UNREFERENCED_PARAMETER(hwnd);
+
 	RECT rc;
 	int  x, y, cx, cy;
 	HDWP hdwp;
@@ -1097,6 +1107,9 @@ void MsgSize(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 //
 //
 void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
+	UNREFERENCED_PARAMETER(hwnd);
+	UNREFERENCED_PARAMETER(lParam);
+
 	int i; // Helper
 	DLITEM dli;
 	HMENU hmenu = (HMENU)wParam;
@@ -1144,6 +1157,8 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 //
 //
 LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
+	UNREFERENCED_PARAMETER(lParam);
+
 	switch (LOWORD(wParam)) {
 	case IDC_DRIVEBOX:
 		switch (HIWORD(wParam)) {
@@ -2114,6 +2129,8 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 //
 //
 LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
+	UNREFERENCED_PARAMETER(wParam);
+
 	LPNMHDR pnmh = (LPNMHDR)lParam;
 
 	switch (pnmh->idFrom) {

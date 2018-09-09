@@ -390,6 +390,8 @@ BOOL EditCopyAppend(HWND hwnd) {
 // EditDetectEOLMode() - moved here to handle Unicode files correctly
 //
 int EditDetectEOLMode(HWND hwnd, LPCSTR lpData) {
+	UNREFERENCED_PARAMETER(hwnd);
+
 	int iEOLMode = iLineEndings[iDefaultEOLMode];
 	LPCSTR cp = lpData ? StrPBrkA(lpData, "\r\n") : NULL;
 
@@ -5588,6 +5590,8 @@ BOOL EditReplaceAllInSelection(HWND hwnd, LPCEDITFINDREPLACE lpefr, BOOL bShowIn
 // EditLineNumDlgProc()
 //
 INT_PTR CALLBACK EditLineNumDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
+	UNREFERENCED_PARAMETER(lParam);
+
 	switch (umsg) {
 	case WM_INITDIALOG: {
 		int iCurLine = (int)SendMessage(hwndEdit, SCI_LINEFROMPOSITION,

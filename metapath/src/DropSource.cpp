@@ -72,7 +72,7 @@ STDMETHODIMP CDropSource::QueryContinueDrag(BOOL fEscapePressed, DWORD grfKeySta
 	return NOERROR;
 }
 
-STDMETHODIMP CDropSource::GiveFeedback(DWORD dwEffect) noexcept {
+STDMETHODIMP CDropSource::GiveFeedback(DWORD /*dwEffect*/) noexcept {
 	return DRAGDROP_S_USEDEFAULTCURSORS;
 }
 

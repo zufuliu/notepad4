@@ -52,6 +52,8 @@ static const WCHAR *pDirListProp = L"DirListData";
 //  Initializes the DLDATA structure and sets up the listview control
 //
 BOOL DirList_Init(HWND hwnd, LPCWSTR pszHeader) {
+	UNREFERENCED_PARAMETER(pszHeader);
+
 	HIMAGELIST hil;
 	SHFILEINFO shfi;
 
@@ -403,6 +405,9 @@ DWORD WINAPI DirList_IconThread(LPVOID lpParam) {
 //  the listview control
 //
 BOOL DirList_GetDispInfo(HWND hwnd, LPARAM lParam, BOOL bNoFadeHidden) {
+	UNREFERENCED_PARAMETER(hwnd);
+	UNREFERENCED_PARAMETER(bNoFadeHidden);
+
 	LV_DISPINFO *lpdi = (LPVOID)lParam;
 
 	LPLV_ITEMDATA lplvid = (LPLV_ITEMDATA)lpdi->item.lParam;
@@ -1117,6 +1122,8 @@ LRESULT DriveBox_DeleteItem(HWND hwnd, LPARAM lParam) {
 //  DriveBox_GetDispInfo
 //
 LRESULT DriveBox_GetDispInfo(HWND hwnd, LPARAM lParam) {
+	UNREFERENCED_PARAMETER(hwnd);
+
 	NMCOMBOBOXEX *lpnmcbe;
 	LPDC_ITEMDATA lpdcid;
 	SHFILEINFO shfi;

@@ -446,7 +446,7 @@ extern "C" BOOL EditPrint(HWND hwnd, LPCWSTR pszDocTitle, LPCWSTR pszPageFormat)
 // 33 Footer
 // 34 Colors
 //
-extern "C" UINT_PTR CALLBACK PageSetupHook(HWND hwnd, UINT uiMsg, WPARAM wParam, LPARAM lParam) {
+extern "C" UINT_PTR CALLBACK PageSetupHook(HWND hwnd, UINT uiMsg, WPARAM wParam, LPARAM /*lParam*/) {
 	switch (uiMsg) {
 	case WM_INITDIALOG: {
 		WCHAR tch[512];

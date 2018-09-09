@@ -76,6 +76,9 @@ int ErrorMessage(int iLevel, UINT uIdMsg, ...) {
 // BFFCallBack()
 //
 int CALLBACK BFFCallBack(HWND hwnd, UINT umsg, LPARAM lParam, LPARAM lpData) {
+	UNREFERENCED_PARAMETER(lParam);
+	UNREFERENCED_PARAMETER(lpData);
+
 	if (umsg == BFFM_INITIALIZED) {
 		SendMessage(hwnd, BFFM_SETSELECTION, TRUE, lpData);
 	}
@@ -169,6 +172,8 @@ extern WCHAR szCurDir[MAX_PATH + 40];
 extern HWND hwndDirList;
 
 INT_PTR CALLBACK RunDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
+	UNREFERENCED_PARAMETER(lParam);
+
 	switch (umsg) {
 	case WM_INITDIALOG: {
 		DLITEM dli;
@@ -589,6 +594,9 @@ extern int  iStartupDir;
 extern int  iEscFunction;
 
 INT_PTR CALLBACK GeneralPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
+	UNREFERENCED_PARAMETER(wParam);
+	UNREFERENCED_PARAMETER(lParam);
+
 	switch (umsg) {
 	case WM_INITDIALOG:
 		if (StrNotEmpty(szIniFile)) {
@@ -1195,6 +1203,8 @@ INT_PTR OptionsPropSheet(HWND hwnd, HINSTANCE hInstance) {
 //
 //
 INT_PTR CALLBACK GetFilterDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
+	UNREFERENCED_PARAMETER(lParam);
+
 	switch (umsg) {
 	case WM_INITDIALOG: {
 		MakeBitmapButton(hwnd, IDC_BROWSEFILTER, NULL, OBM_COMBO);
@@ -2178,6 +2188,8 @@ extern WCHAR szDDEApp[256];
 extern WCHAR szDDETopic[256];
 
 INT_PTR CALLBACK FindTargetDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
+	UNREFERENCED_PARAMETER(lParam);
+
 	static WCHAR szTargetWndClass[256] = L"";
 
 	switch (umsg) {

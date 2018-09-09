@@ -230,6 +230,8 @@ static inline BOOL NeedSpaceAfterKeyword(const char *word, int length) {
 }
 
 void AutoC_AddDocWord(HWND hwnd, struct WordList *pWList, BOOL bIgnore) {
+	UNREFERENCED_PARAMETER(hwnd);
+
 	LPCSTR pRoot = pWList->pWordStart;
 	int iRootLen = pWList->iStartLen;
 	struct Sci_TextToFind ft = {{0, 0}, 0, {0, 0}};
