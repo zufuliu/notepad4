@@ -389,7 +389,7 @@ bool FontCached::SameAs(const FontParameters &fp) const {
 		(technology == fp.technology)) {
 		wchar_t wszFace[LF_FACESIZE] = L"";
 		UTF16FromUTF8(fp.faceName, wszFace, LF_FACESIZE);
-		return 0 == lstrcmpW(lf.lfFaceName, wszFace);
+		return 0 == wcscmp(lf.lfFaceName, wszFace);
 	}
 	return false;
 }
