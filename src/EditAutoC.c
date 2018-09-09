@@ -857,7 +857,22 @@ const char *EditKeywordIndent(const char *head, int *indent) {
 			*indent = 1;
 		} else if (!strcmp(word, "if") || !strcmp(word, "for") || !strcmp(word, "while") || !strcmp(word, "switch") || !strcmp(word, "try")) {
 			*indent = 2;
-			endPart = "end";
+			if (pLexCurrent->rid == NP2LEX_OCTAVE) {
+				if (strcmp(word, "if") == 0) {
+					endPart = "endif";
+				} else if (strcmp(word, "for") == 0) {
+					endPart = "endfor";
+				} else if (strcmp(word, "while") == 0) {
+					endPart = "endwhile";
+				} else if (strcmp(word, "switch") == 0) {
+					endPart = "endswitch";
+				} else if (strcmp(word, "try") == 0) {
+					endPart = "end_try_catch";
+				}
+			}
+			if (endPart == NULL) {
+				endPart = "end";
+			}
 		}
 		break;
 	case SCLEX_LUA:
@@ -1127,9 +1142,9 @@ void EditAutoIndent(HWND hwnd) {
 
 
 void EditToggleCommentLine(HWND hwnd) {
+	BeginWaitCursor();
 	switch (pLexCurrent->iLexer) {
 	case SCLEX_CPP:
-		BeginWaitCursor();
 		switch (pLexCurrent->rid) {
 		case NP2LEX_AWK:
 		case NP2LEX_JAM:
@@ -1139,7 +1154,6 @@ void EditToggleCommentLine(HWND hwnd) {
 			EditToggleLineComments(hwnd, L"//", FALSE);
 			break;
 		}
-		EndWaitCursor();
 		break;
 	case SCLEX_CSS:
 	case SCLEX_PASCAL:
@@ -1147,91 +1161,70 @@ void EditToggleCommentLine(HWND hwnd) {
 	case SCLEX_FSHARP:
 	case SCLEX_GRAPHVIZ:
 	case SCLEX_JSON:
-		BeginWaitCursor();
 		EditToggleLineComments(hwnd, L"//", FALSE);
-		EndWaitCursor();
 		break;
 	case SCLEX_VBSCRIPT:
 	case SCLEX_VB:
-		BeginWaitCursor();
 		EditToggleLineComments(hwnd, L"'", TRUE);
-		EndWaitCursor();
 		break;
 	case SCLEX_PYTHON:
 	case SCLEX_RUBY:
 	case SCLEX_SMALI:
 	case SCLEX_MAKEFILE:
-		BeginWaitCursor();
 		EditToggleLineComments(hwnd, L"#", FALSE);
-		EndWaitCursor();
 		break;
 	case SCLEX_BASH:
-		BeginWaitCursor();
 		EditToggleLineComments(hwnd, ((np2LexLangIndex == IDM_LANG_M4)? L"dnl " : L"#"), FALSE);
-		EndWaitCursor();
 		break;
 	case SCLEX_PERL:
 	case SCLEX_CONF:
 	case SCLEX_TCL:
 	case SCLEX_POWERSHELL:
 	case SCLEX_CMAKE:
-		BeginWaitCursor();
 		EditToggleLineComments(hwnd, L"#", TRUE);
-		EndWaitCursor();
 		break;
 	case SCLEX_ASM:
 	case SCLEX_PROPERTIES:
 	case SCLEX_AU3:
 	case SCLEX_INNOSETUP:
-		BeginWaitCursor();
 		EditToggleLineComments(hwnd, L";", TRUE);
-		EndWaitCursor();
 		break;
 	case SCLEX_SQL:
-		BeginWaitCursor();
 		EditToggleLineComments(hwnd, L"-- ", TRUE); // extra space
-		EndWaitCursor();
 		break;
 	case SCLEX_LUA:
 	case SCLEX_VHDL:
-		BeginWaitCursor();
 		EditToggleLineComments(hwnd, L"--", TRUE);
-		EndWaitCursor();
 		break;
 	case SCLEX_BATCH:
-		BeginWaitCursor();
 		EditToggleLineComments(hwnd, L"@rem ", TRUE);
-		EndWaitCursor();
 		break;
 	case SCLEX_LATEX:
+		EditToggleLineComments(hwnd, L"# ", TRUE);
+		break;
 	case SCLEX_MATLAB:
-		BeginWaitCursor();
 		if (pLexCurrent->rid == NP2LEX_JULIA) {
 			EditToggleLineComments(hwnd, L"#", FALSE);
+		} else if (pLexCurrent->rid == NP2LEX_SCILAB) {
+			EditToggleLineComments(hwnd, L"//", FALSE);
 		} else {
 			EditToggleLineComments(hwnd, L"%", FALSE);
 		}
-		EndWaitCursor();
 		break;
 	case SCLEX_LISP:
 	case SCLEX_LLVM:
-		BeginWaitCursor();
 		EditToggleLineComments(hwnd, L";", FALSE);
-		EndWaitCursor();
 		break;
 	case SCLEX_VIM:
-		BeginWaitCursor();
 		EditToggleLineComments(hwnd, L"\" ", FALSE);
-		EndWaitCursor();
 		break;
 	case SCLEX_TEXINFO:
-		BeginWaitCursor();
 		EditToggleLineComments(hwnd, L"@c ", FALSE);
-		EndWaitCursor();
 		break;
 	default:
 		break;
 	}
+	EndWaitCursor();
 }
 
 void EditEncloseSelectionNewLine(HWND hwnd, LPCWSTR pwszOpen, LPCWSTR pwszClose) {
@@ -1298,7 +1291,13 @@ void EditToggleCommentBlock(HWND hwnd) {
 		EditEncloseSelectionNewLine(hwnd, L"\\begin{comment}", L"\\end{comment}");
 		break;
 	case SCLEX_MATLAB:
-		EditEncloseSelectionNewLine(hwnd, L"%{", L"%}");
+		if (pLexCurrent->rid == NP2LEX_JULIA) {
+			EditEncloseSelectionNewLine(hwnd, L"#=", L"=#");
+		} else if (pLexCurrent->rid == NP2LEX_SCILAB) {
+			EditEncloseSelectionNewLine(hwnd, L"/*", L"*/");
+		} else {
+			EditEncloseSelectionNewLine(hwnd, L"%{", L"%}");
+		}
 		break;
 	default:
 		break;

@@ -1363,6 +1363,7 @@ PEDITLEXER Style_DetectObjCAndMatlab(void) {
 					return &lexCPP;
 				}
 				lexMatlab.rid = NP2LEX_OCTAVE;
+				np2LexLangIndex = IDM_LANG_OCTAVE;
 				return &lexMatlab;
 			}
 			break;
@@ -1383,6 +1384,7 @@ PEDITLEXER Style_DetectObjCAndMatlab(void) {
 			if (*p == '/' || *p == '*') {
 				return &lexCPP;
 			}
+			break;
 			break;
 		case 'f':	// Matlab function
 			if (strncmp(p, "function", 8) == 0 && (IsASpace(p[8]) || p[8] == '[')) {
@@ -1533,6 +1535,16 @@ void Style_GetCurrentLexerName(LPWSTR lpszName, int cchName) {
 				lang = L"M4 Macro";
 				break;
 
+			case IDM_LANG_MATLAB:
+				lang = L"MATLAB Code";
+				break;
+			case IDM_LANG_OCTAVE:
+				lang = L"Octave Code";
+				break;
+			case IDM_LANG_SCILAB:
+				lang = L"Scilab Code";
+				break;
+
 			default:
 				break;
 			}
@@ -1611,10 +1623,12 @@ PEDITLEXER __fastcall Style_MatchLexer(LPCWSTR lpszMatch, BOOL bCheckNames) {
 		}
 		if (StrCaseEqual(L"sce", lpszMatch)) {
 			lexMatlab.rid = NP2LEX_SCILAB;
+			np2LexLangIndex = IDM_LANG_SCILAB;
 			return (&lexMatlab);
 		}
 		if (StrCaseEqual(L"sci", lpszMatch)) {
 			lexMatlab.rid = NP2LEX_SCILAB;
+			np2LexLangIndex = IDM_LANG_SCILAB;
 			return (&lexMatlab);
 		}
 		if (StrCaseEqual(L"m4", lpszMatch)) {
@@ -1939,6 +1953,19 @@ void Style_SetLexerByLangIndex(HWND hwnd, int lang) {
 	case IDM_LANG_M4:
 		Style_SetLexer(hwnd, &lexBash);
 		break;
+
+	case IDM_LANG_MATLAB:
+		lexMatlab.rid = NP2LEX_MATLAB;
+		Style_SetLexer(hwnd, &lexMatlab);
+		break;
+	case IDM_LANG_OCTAVE:
+		lexMatlab.rid = NP2LEX_OCTAVE;
+		Style_SetLexer(hwnd, &lexMatlab);
+		break;
+	case IDM_LANG_SCILAB:
+		lexMatlab.rid = NP2LEX_SCILAB;
+		Style_SetLexer(hwnd, &lexMatlab);
+		break;
 	}
 }
 
@@ -1957,6 +1984,15 @@ void Style_UpdateSchemeMenu(HMENU hmenu) {
 			break;
 		case NP2LEX_BASH:
 			lang = IDM_LANG_BASH;
+			break;
+		case NP2LEX_MATLAB:
+			lang = IDM_LANG_MATLAB;
+			break;
+		case NP2LEX_OCTAVE:
+			lang = IDM_LANG_OCTAVE;
+			break;
+		case NP2LEX_SCILAB:
+			lang = IDM_LANG_SCILAB;
 			break;
 		}
 	}
