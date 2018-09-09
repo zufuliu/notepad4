@@ -410,6 +410,12 @@ BEGIN
             MENUITEM "ASP (V&BScript)",             IDM_LANG_ASP_VBS
             MENUITEM "ASP (J&Script)",              IDM_LANG_ASP_JS
         END
+        POPUP "Math"
+        BEGIN
+            MENUITEM "MATLAB",                      IDM_LANG_MATLAB
+            MENUITEM "Octave",                      IDM_LANG_OCTAVE
+            MENUITEM "Scilab",                      IDM_LANG_SCILAB
+        END
         POPUP "Shell Script"
         BEGIN
             MENUITEM "Shell Script",                IDM_LANG_BASH
