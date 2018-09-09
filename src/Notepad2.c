@@ -418,6 +418,9 @@ int		flagDisplayHelp			= 0;
 //
 //
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nShowCmd) {
+	UNREFERENCED_PARAMETER(hPrevInstance);
+	UNREFERENCED_PARAMETER(lpCmdLine);
+
 	MSG msg;
 	HWND hwnd;
 	HACCEL hAccMain;
@@ -1506,6 +1509,8 @@ void SetWrapVisualFlags(void) {
 //
 //
 LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) {
+	UNREFERENCED_PARAMETER(wParam);
+
 	HINSTANCE hInstance = ((LPCREATESTRUCT)lParam)->hInstance;
 	g_uCurrentDPI = GetCurrentDPI(hwnd);
 	g_uCurrentPPI = GetCurrentPPI(hwnd);
@@ -1879,6 +1884,9 @@ void MsgDPIChanged(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 //
 //
 void MsgThemeChanged(HWND hwnd, WPARAM wParam, LPARAM lParam) {
+	UNREFERENCED_PARAMETER(wParam);
+	UNREFERENCED_PARAMETER(lParam);
+
 	RECT rc, rc2;
 	HINSTANCE hInstance = (HINSTANCE)(INT_PTR)GetWindowLongPtr(hwnd, GWLP_HINSTANCE);
 
@@ -1931,6 +1939,8 @@ void MsgThemeChanged(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 //
 //
 void MsgSize(HWND hwnd, WPARAM wParam, LPARAM lParam) {
+	UNREFERENCED_PARAMETER(hwnd);
+
 	RECT rc;
 	int x, y, cx, cy;
 	HDWP hdwp;
@@ -2046,6 +2056,8 @@ void MsgNotifyZoom(void) {
 //
 //
 void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
+	UNREFERENCED_PARAMETER(lParam);
+
 	int i, i2;
 	HMENU hmenu = (HMENU)wParam;
 
@@ -2243,7 +2255,7 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	//EnableCmd(hmenu, IDM_VIEW_FOLD_LEVEL10, i && bShowCodeFolding);
 	CheckCmd(hmenu, IDM_VIEW_FOLDING, bShowCodeFolding);
 
-	CheckCmd(hmenu, IDM_VIEW_USE2NDDEFAULT, Style_GetUse2ndDefault(hwndEdit));
+	CheckCmd(hmenu, IDM_VIEW_USE2NDDEFAULT, Style_GetUse2ndDefault());
 
 	CheckCmd(hmenu, IDM_VIEW_WORDWRAP, fWordWrap);
 	i = IDM_VIEW_FONTQUALITY_DEFAULT + iFontQuality;
@@ -2400,6 +2412,8 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 //
 //
 LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
+	UNREFERENCED_PARAMETER(lParam);
+
 	switch (LOWORD(wParam)) {
 	case IDM_FILE_NEW:
 		FileLoad(FALSE, TRUE, FALSE, FALSE, L"");
@@ -4935,6 +4949,8 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 //
 //
 LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
+	UNREFERENCED_PARAMETER(wParam);
+
 	LPNMHDR pnmh = (LPNMHDR)lParam;
 	struct SCNotification *scn = (struct SCNotification *)lParam;
 
@@ -7930,6 +7946,11 @@ void InstallFileWatching(LPCWSTR lpszFile) {
 //
 //
 void CALLBACK WatchTimerProc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime) {
+	UNREFERENCED_PARAMETER(hwnd);
+	UNREFERENCED_PARAMETER(uMsg);
+	UNREFERENCED_PARAMETER(idEvent);
+	UNREFERENCED_PARAMETER(dwTime);
+
 	if (bRunningWatch) {
 		if (dwChangeNotifyTime > 0 && GetTickCount() - dwChangeNotifyTime > dwAutoReloadTimeout) {
 			if (hChangeHandle) {
@@ -7984,6 +8005,11 @@ void CALLBACK WatchTimerProc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTim
 //
 //
 void CALLBACK PasteBoardTimer(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime) {
+	UNREFERENCED_PARAMETER(hwnd);
+	UNREFERENCED_PARAMETER(uMsg);
+	UNREFERENCED_PARAMETER(idEvent);
+	UNREFERENCED_PARAMETER(dwTime);
+
 	if (dwLastCopyTime > 0 && GetTickCount() - dwLastCopyTime > 200) {
 		if (SendMessage(hwndEdit, SCI_CANPASTE, 0, 0)) {
 			BOOL bAutoIndent2 = bAutoIndent;

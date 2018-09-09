@@ -1,3 +1,9 @@
+/wd4200 /wd4201 /wd4204
+Disabled warnings:
+	C4200: nonstandard extension used: zero-sized array in struct/union.
+	C4201: nonstandard extension used: nameless struct/union.
+	C4204: nonstandard extension used: non-constant aggregate initializer.
+
 /wd26429 /wd26446 /wd26451 /wd26454 /wd26472 /wd26481 /wd26482 /wd26485 /wd26486 /wd26489 /wd26494 /wd26495
 Disabled Code Analysis warnings:
 	C26429: Symbol is never tested for nullness, it can be marked as not_null (f.23).

@@ -193,6 +193,8 @@ void OpenHelpLink(HWND hwnd, int cmd) {
 // BFFCallBack()
 //
 int CALLBACK BFFCallBack(HWND hwnd, UINT umsg, LPARAM lParam, LPARAM lpData) {
+	UNREFERENCED_PARAMETER(lParam);
+
 	if (umsg == BFFM_INITIALIZED) {
 		SendMessage(hwnd, BFFM_SETSELECTION, TRUE, lpData);
 	}
@@ -1266,6 +1268,8 @@ extern int iFileWatchingMode;
 extern BOOL bResetFileWatching;
 
 INT_PTR CALLBACK ChangeNotifyDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
+	UNREFERENCED_PARAMETER(lParam);
+
 	switch (umsg) {
 	case WM_INITDIALOG:
 		CheckRadioButton(hwnd, 100, 102, 100 + iFileWatchingMode);
@@ -1391,6 +1395,8 @@ extern int iWordWrapSymbols;
 extern BOOL bShowWordWrapSymbols;
 
 INT_PTR CALLBACK WordWrapSettingsDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
+	UNREFERENCED_PARAMETER(lParam);
+
 	switch (umsg) {
 	case WM_INITDIALOG: {
 		WCHAR tch[512];
@@ -1560,6 +1566,8 @@ extern BOOL bTabIndents;
 extern BOOL bBackspaceUnindents;
 
 INT_PTR CALLBACK TabSettingsDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
+	UNREFERENCED_PARAMETER(lParam);
+
 	switch (umsg) {
 	case WM_INITDIALOG: {
 		SetDlgItemInt(hwnd, 100, iTabWidth, FALSE);

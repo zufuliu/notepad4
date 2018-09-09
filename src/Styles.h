@@ -65,7 +65,7 @@ void	Style_UpdateCaret(HWND hwnd);
 void	Style_SetLongLineColors(HWND hwnd);
 void	Style_SetCurrentLineBackground(HWND hwnd);
 void	Style_ToggleUse2ndDefault(HWND hwnd);
-BOOL	Style_GetUse2ndDefault(HWND hwnd);
+BOOL	Style_GetUse2ndDefault();
 BOOL	Style_GetOpenDlgFilterStr(LPWSTR lpszFilter, int cchFilter);
 
 BOOL	Style_StrGetFont(LPCWSTR lpszStyle, LPWSTR lpszFont, int cchFont);

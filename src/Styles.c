@@ -1957,7 +1957,7 @@ void Style_ToggleUse2ndDefault(HWND hwnd) {
 //
 // Style_GetUse2ndDefault()
 //
-BOOL Style_GetUse2ndDefault(HWND hwnd) {
+BOOL Style_GetUse2ndDefault() {
 	return bUse2ndDefaultStyle;
 }
 
