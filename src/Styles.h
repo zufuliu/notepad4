@@ -54,10 +54,8 @@ int		Style_GetDocTypeLanguage();
 void	Style_UpdateLexerKeywords(PEDITLEXER pLexNew);
 void	Style_UpdateLexerKeywordAttr(PEDITLEXER pLexNew);
 void	Style_GetCurrentLexerName(LPWSTR lpszName, int cchName);
-void	Style_SetDefaultLexer(HWND hwnd);
-void	Style_SetConfLexer(HWND hwnd);
-void	Style_SetHTMLLexer(HWND hwnd);
-void	Style_SetXMLLexer(HWND hwnd);
+void	Style_SetLexerByLangIndex(HWND hwnd, int lang);
+void	Style_UpdateSchemeMenu(HMENU hmenu);
 
 void	Style_SetDefaultFont(HWND hwnd);
 void	Style_SetIndentGuides(HWND hwnd, BOOL bShow);

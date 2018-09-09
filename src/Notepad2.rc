@@ -410,6 +410,11 @@ BEGIN
             MENUITEM "ASP (V&BScript)",             IDM_LANG_ASP_VBS
             MENUITEM "ASP (J&Script)",              IDM_LANG_ASP_JS
         END
+        POPUP "Shell Script"
+        BEGIN
+            MENUITEM "Shell Script",                IDM_LANG_BASH
+            MENUITEM "M4 Macro",                    IDM_LANG_M4
+        END
         // "&SQL Dialect"
         POPUP "&XML Document"
         BEGIN

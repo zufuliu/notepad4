@@ -440,6 +440,9 @@
 #define IDM_LANG_ASP_VBS				41006
 #define IDM_LANG_ASP_JS					41007
 
+#define IDM_LANG_BASH					41008
+#define IDM_LANG_M4						41009
+
 #define IDM_LANG_XML					41010
 #define IDM_LANG_XSD					41011
 #define IDM_LANG_XSLT					41012

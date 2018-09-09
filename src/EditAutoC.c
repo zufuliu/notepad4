@@ -1165,9 +1165,13 @@ void EditToggleCommentLine(HWND hwnd) {
 		EditToggleLineComments(hwnd, L"#", FALSE);
 		EndWaitCursor();
 		break;
+	case SCLEX_BASH:
+		BeginWaitCursor();
+		EditToggleLineComments(hwnd, ((np2LexLangIndex == IDM_LANG_M4)? L"dnl " : L"#"), FALSE);
+		EndWaitCursor();
+		break;
 	case SCLEX_PERL:
 	case SCLEX_CONF:
-	case SCLEX_BASH:
 	case SCLEX_TCL:
 	case SCLEX_POWERSHELL:
 	case SCLEX_CMAKE:
