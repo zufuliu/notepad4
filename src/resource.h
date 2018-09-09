@@ -166,9 +166,6 @@
 #define CMD_RELOADOEM					20008	// Ctrl+Shift+O
 #define CMD_RELOADASCIIASUTF8			20009	// Shift+F8
 #define CMD_RELOADNOFILEVARS			20010	// Alt+F8
-//#define CMD_LEXDEFAULT					20011	// F11
-//#define CMD_LEXHTML						20012	// Ctrl+F11
-//#define CMD_LEXXML						20013	// Shift+F11
 #define CMD_TIMESTAMPS					20014	// Shift+F5
 #define CMD_WEBACTION1					20015	// Ctrl+Shift+1
 #define CMD_WEBACTION2					20016	// Ctrl+Shift+2

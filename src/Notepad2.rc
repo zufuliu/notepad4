@@ -467,10 +467,11 @@ BEGIN
         POPUP "&Auto Completion"
         BEGIN
             MENUITEM "&Indent Text",                IDM_VIEW_AUTOINDENTTEXT
-            MENUITEM "Close HTML/XML &Tags",        IDM_VIEW_AUTOCLOSETAGS
-            MENUITEM "Close &Braces/Quotes",        IDM_VIEW_AUTOCOMPLETEQUOTE
+            MENUITEM "Close HTML and XML &Tags",    IDM_VIEW_AUTOCLOSETAGS
+            MENUITEM "Close &Braces and Quotes",    IDM_VIEW_AUTOCOMPLETEQUOTE
+            MENUITEM SEPARATOR
             MENUITEM "Complete &Words",             IDM_VIEW_AUTOCOMPLETEWORDS
-            MENUITEM "&Include Document Words",     IDM_VIEW_AUTOCWITHDOCWORDS
+            MENUITEM "&Words in Current Document",  IDM_VIEW_AUTOCWITHDOCWORDS
         END
         MENUITEM SEPARATOR
         POPUP "Rendering Technology"
