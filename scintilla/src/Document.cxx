@@ -1659,7 +1659,7 @@ CharClassify::cc Document::WordCharacterClass(unsigned int ch) const noexcept {
  * Used by commmands that want to select whole words.
  * Finds the start of word at pos when delta < 0 or the end of the word when delta >= 0.
  */
-Sci::Position Document::ExtendWordSelect(Sci::Position pos, int delta, bool onlyWordCharacters) const {
+Sci::Position Document::ExtendWordSelect(Sci::Position pos, int delta, bool onlyWordCharacters) const noexcept {
 	CharClassify::cc ccStart = CharClassify::ccWord;
 	if (delta < 0) {
 		if (!onlyWordCharacters) {
@@ -1694,7 +1694,7 @@ Sci::Position Document::ExtendWordSelect(Sci::Position pos, int delta, bool only
  * additional movement to transit white space.
  * Used by cursor movement by word commands.
  */
-Sci::Position Document::NextWordStart(Sci::Position pos, int delta) const {
+Sci::Position Document::NextWordStart(Sci::Position pos, int delta) const noexcept {
 	if (delta < 0) {
 		while (pos > 0) {
 			const CharacterExtracted ce = CharacterBefore(pos);
@@ -1738,7 +1738,7 @@ Sci::Position Document::NextWordStart(Sci::Position pos, int delta) const {
  * additional movement to transit white space.
  * Used by cursor movement by word commands.
  */
-Sci::Position Document::NextWordEnd(Sci::Position pos, int delta) const {
+Sci::Position Document::NextWordEnd(Sci::Position pos, int delta) const noexcept {
 	if (delta < 0) {
 		if (pos > 0) {
 			CharacterExtracted ce = CharacterBefore(pos);
@@ -1783,7 +1783,7 @@ Sci::Position Document::NextWordEnd(Sci::Position pos, int delta) const {
  * Check that the character at the given position is a word or punctuation character and that
  * the previous character is of a different character class.
  */
-bool Document::IsWordStartAt(Sci::Position pos) const {
+bool Document::IsWordStartAt(Sci::Position pos) const noexcept {
 	if (pos >= Length())
 		return false;
 	if (pos > 0) {
@@ -1801,7 +1801,7 @@ bool Document::IsWordStartAt(Sci::Position pos) const {
  * Check that the character at the given position is a word or punctuation character and that
  * the next character is of a different character class.
  */
-bool Document::IsWordEndAt(Sci::Position pos) const {
+bool Document::IsWordEndAt(Sci::Position pos) const noexcept {
 	if (pos <= 0)
 		return false;
 	if (pos < Length()) {
@@ -1819,11 +1819,11 @@ bool Document::IsWordEndAt(Sci::Position pos) const {
  * Check that the given range is has transitions between character classes at both
  * ends and where the characters on the inside are word or punctuation characters.
  */
-bool Document::IsWordAt(Sci::Position start, Sci::Position end) const {
+bool Document::IsWordAt(Sci::Position start, Sci::Position end) const noexcept {
 	return (start < end) && IsWordStartAt(start) && IsWordEndAt(end);
 }
 
-bool Document::MatchesWordOptions(bool word, bool wordStart, Sci::Position pos, Sci::Position length) const {
+bool Document::MatchesWordOptions(bool word, bool wordStart, Sci::Position pos, Sci::Position length) const noexcept {
 	return (!word && !wordStart) ||
 		(word && IsWordAt(pos, pos + length)) ||
 		(wordStart && IsWordStartAt(pos));
@@ -2367,11 +2367,11 @@ static bool IsASCIIPunctuationCharacter(unsigned int ch) noexcept {
 	}
 }
 
-bool Document::IsWordPartSeparator(unsigned int ch) const {
+bool Document::IsWordPartSeparator(unsigned int ch) const noexcept {
 	return (WordCharacterClass(ch) == CharClassify::ccWord) && IsASCIIPunctuationCharacter(ch);
 }
 
-Sci::Position Document::WordPartLeft(Sci::Position pos) const {
+Sci::Position Document::WordPartLeft(Sci::Position pos) const noexcept {
 	if (pos > 0) {
 		pos -= CharacterBefore(pos).widthBytes;
 		CharacterExtracted ceStart = CharacterAfter(pos);
@@ -2427,7 +2427,7 @@ Sci::Position Document::WordPartLeft(Sci::Position pos) const {
 	return pos;
 }
 
-Sci::Position Document::WordPartRight(Sci::Position pos) const {
+Sci::Position Document::WordPartRight(Sci::Position pos) const noexcept {
 	CharacterExtracted ceStart = CharacterAfter(pos);
 	const Sci::Position length = Length();
 	if (IsWordPartSeparator(ceStart.character)) {

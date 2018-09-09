@@ -442,9 +442,9 @@ public:
 	Sci::Line GetFoldParent(Sci::Line line) const noexcept;
 	void GetHighlightDelimiters(HighlightDelimiter &highlightDelimiter, Sci::Line line, Sci::Line lastLine);
 
-	Sci::Position ExtendWordSelect(Sci::Position pos, int delta, bool onlyWordCharacters = false) const;
-	Sci::Position NextWordStart(Sci::Position pos, int delta) const;
-	Sci::Position NextWordEnd(Sci::Position pos, int delta) const;
+	Sci::Position ExtendWordSelect(Sci::Position pos, int delta, bool onlyWordCharacters = false) const noexcept;
+	Sci::Position NextWordStart(Sci::Position pos, int delta) const noexcept;
+	Sci::Position NextWordEnd(Sci::Position pos, int delta) const noexcept;
 	Sci_Position SCI_METHOD Length() const noexcept override {
 		return cb.Length();
 	}
@@ -454,11 +454,11 @@ public:
 
 	CharacterExtracted ExtractCharacter(Sci::Position position) const noexcept;
 
-	bool IsWordStartAt(Sci::Position pos) const;
-	bool IsWordEndAt(Sci::Position pos) const;
-	bool IsWordAt(Sci::Position start, Sci::Position end) const;
+	bool IsWordStartAt(Sci::Position pos) const noexcept;
+	bool IsWordEndAt(Sci::Position pos) const noexcept;
+	bool IsWordAt(Sci::Position start, Sci::Position end) const noexcept;
 
-	bool MatchesWordOptions(bool word, bool wordStart, Sci::Position pos, Sci::Position length) const;
+	bool MatchesWordOptions(bool word, bool wordStart, Sci::Position pos, Sci::Position length) const noexcept;
 	bool HasCaseFolder() const noexcept;
 	void SetCaseFolder(CaseFolder *pcf_) noexcept;
 	Sci::Position FindText(Sci::Position minPos, Sci::Position maxPos, const char *search, int flags, Sci::Position *length);
@@ -512,9 +512,9 @@ public:
 
 	bool IsASCIIWordByte(unsigned char ch) const noexcept;
 	CharClassify::cc WordCharacterClass(unsigned int ch) const noexcept;
-	bool IsWordPartSeparator(unsigned int ch) const;
-	Sci::Position WordPartLeft(Sci::Position pos) const;
-	Sci::Position WordPartRight(Sci::Position pos) const;
+	bool IsWordPartSeparator(unsigned int ch) const noexcept;
+	Sci::Position WordPartLeft(Sci::Position pos) const noexcept;
+	Sci::Position WordPartRight(Sci::Position pos) const noexcept;
 	Sci::Position ExtendStyleRange(Sci::Position pos, int delta, bool singleLine = false) noexcept;
 	bool IsWhiteLine(Sci::Line line) const noexcept;
 	Sci::Position ParaUp(Sci::Position pos) const noexcept;
