@@ -1,4 +1,3 @@
-#define NP2_AUTOC_USE_LIST	0
 #define NP2_AUTOC_USE_BUF	1
 #define NP2_AUTOC_USE_NODE_CACHE	1
 #define NP2_AUTOC_USE_STRING_ORDER	1
@@ -22,7 +21,7 @@ struct WordNode;
 struct WordList {
 	char wordBuf[1024];
 	int (*WL_strcmp)(LPCSTR, LPCSTR);
-	int (*WL_strcnmp)(LPCSTR, LPCSTR, size_t);
+	int (*WL_strncmp)(LPCSTR, LPCSTR, size_t);
 #if NP2_AUTOC_USE_STRING_ORDER
 	int (*WL_OrderFunc)(const void *, unsigned int);
 #endif
@@ -70,174 +69,6 @@ int WordList_OrderCase(const void *pWord, unsigned int len) {
 	return high;
 }
 #endif
-
-#if NP2_AUTOC_USE_LIST
-// Linked List
-struct WordNode {
-	struct WordNode *next;
-	char *word;
-#if NP2_AUTOC_USE_STRING_ORDER
-	int order;
-#endif
-	int len;
-};
-
-void WordList_AddWord(struct WordList *pWList, LPCSTR pWord, int len) {
-	struct WordNode * *pListHead = &(pWList->pListHead);
-	struct WordNode *head = *pListHead;
-	struct WordNode *prev = NULL;
-	int diff = 1;
-#if NP2_AUTOC_USE_STRING_ORDER
-	int order = (pWList->iStartLen > NP2_AUTOC_ORDER_LENGTH) ? 0 : pWList->WL_OrderFunc(pWord, len);
-#endif
-
-	while (head) {
-#if NP2_AUTOC_USE_STRING_ORDER
-		diff = order - head->order;
-		if (diff == 0 && (len > NP2_AUTOC_ORDER_LENGTH || head->len > NP2_AUTOC_ORDER_LENGTH)) {
-			diff = pWList->WL_strcmp(pWord, head->word);
-		}
-#else
-		diff = pWList->WL_strcmp(pWord, head->word);
-#endif
-		if (diff <= 0) {
-			break;
-		}
-		prev = head;
-		head = head->next;
-	}
-
-	if (diff) {
-		struct WordNode *node;
-#if NP2_AUTOC_USE_NODE_CACHE
-		if (pWList->cacheIndex + 1 > pWList->cacheCapacity) {
-#if !NP2_AUTOC_USE_BUF
-			pWList->cacheIndexList[pWList->cacheCount - 1] = pWList->cacheIndex;
-#endif
-			pWList->cacheCapacity <<= 1;
-			pWList->cacheIndex = 0;
-			pWList->nodeCache = (struct WordNode *)NP2HeapAlloc(pWList->cacheCapacity * sizeof(struct WordNode));
-			pWList->nodeCacheList[pWList->cacheCount++] = pWList->nodeCache;
-		}
-		node = pWList->nodeCache + pWList->cacheIndex++;
-#else
-		node = (struct WordNode *)NP2HeapAlloc(sizeof(struct WordNode));
-#endif
-
-#if NP2_AUTOC_USE_BUF
-		if (pWList->capacity < pWList->offset + len + 1) {
-			pWList->capacity <<= 1;
-			pWList->offset = 0;
-			pWList->buffer = (char *)NP2HeapAlloc(pWList->capacity);
-			pWList->bufferList[pWList->bufferCount++] = pWList->buffer;
-		}
-		node->word = pWList->buffer + pWList->offset;
-#else
-		node->word = NP2HeapAlloc(len + 1);
-#endif
-
-		CopyMemory(node->word, pWord, len);
-#if NP2_AUTOC_USE_STRING_ORDER
-		node->order = order;
-#endif
-		node->len = len;
-		node->next = head;
-		if (prev) {
-			prev->next = node;
-		} else {
-			*pListHead = node;
-		}
-
-		pWList->nWordCount++;
-		pWList->nTotalLen += len + 1;
-#if NP2_AUTOC_USE_BUF
-		pWList->offset += align_up(len + 1);
-#endif
-		if (len > pWList->iMaxLength) {
-			pWList->iMaxLength = len;
-		}
-	}
-}
-
-void WordList_Free(struct WordList *pWList) {
-#if NP2_AUTOC_USE_NODE_CACHE || NP2_AUTOC_USE_BUF
-	int i;
-#endif
-#if NP2_AUTOC_USE_NODE_CACHE
-#if !NP2_AUTOC_USE_BUF
-	pWList->cacheIndexList[pWList->cacheCount - 1] = pWList->cacheIndex;
-#endif
-	for (i = 0; i < pWList->cacheCount; i++) {
-#if !NP2_AUTOC_USE_BUF
-		int j, cacheIndex = pWList->cacheIndexList[i];
-		struct WordNode *nodeCache = pWList->nodeCacheList[i];
-		for (j = 0; j < cacheIndex; j++) {
-			struct WordNode *iter = &(nodeCache[j]);
-			NP2HeapFree(iter->word);
-		}
-#endif
-		NP2HeapFree(pWList->nodeCacheList[i]);
-	}
-#else
-	struct WordNode *head = pWList->pListHead;
-	struct WordNode *prev;
-
-	while (head) {
-#if !NP2_AUTOC_USE_BUF
-		NP2HeapFree(head->word);
-#endif
-		prev = head;
-		head = head->next;
-		NP2HeapFree(prev);
-	}
-#endif
-#if NP2_AUTOC_USE_BUF
-	for (i = 0; i < pWList->bufferCount; i++) {
-		NP2HeapFree(pWList->bufferList[i]);
-	}
-#endif
-}
-
-void WordList_GetList(struct WordList *pWList, char * *pList) {
-	struct WordNode *head = pWList->pListHead;
-	struct WordNode *prev;
-	char *buf;
-#if NP2_AUTOC_USE_NODE_CACHE || NP2_AUTOC_USE_BUF
-	int i;
-#endif
-	*pList = NP2HeapAlloc(pWList->nTotalLen + 1);// additional separator
-	buf = *pList;
-
-	while (head) {
-		CopyMemory(buf, head->word, head->len);
-		buf += head->len;
-		*buf++ = '\n'; // the separator char
-#if !NP2_AUTOC_USE_BUF
-		NP2HeapFree(head->word);
-#endif
-		prev = head;
-		head = head->next;
-#if !NP2_AUTOC_USE_NODE_CACHE
-		NP2HeapFree(prev);
-#endif
-	}
-#if NP2_AUTOC_USE_NODE_CACHE
-	for (i = 0; i < pWList->cacheCount; i++) {
-		NP2HeapFree(pWList->nodeCacheList[i]);
-	}
-#endif
-#if NP2_AUTOC_USE_BUF
-	for (i = 0; i < pWList->bufferCount; i++) {
-		NP2HeapFree(pWList->bufferList[i]);
-	}
-#endif
-	// trim last separator char
-	if (buf && buf != *pList) {
-		*(--buf) = 0;
-	}
-}
-
-#else
 
 // Tree
 struct WordNode {
@@ -465,8 +296,6 @@ void WordList_GetList(struct WordList *pWList, char * *pList) {
 	WordList_Free(pWList);
 }
 
-#endif
-
 struct WordList *WordList_Alloc(LPCSTR pRoot, int iRootLen, BOOL bIgnoreCase) {
 	struct WordList *pWList = (struct WordList *)NP2HeapAlloc(sizeof(struct WordList));
 	pWList->pListHead =  NULL;
@@ -483,13 +312,13 @@ struct WordList *WordList_Alloc(LPCSTR pRoot, int iRootLen, BOOL bIgnoreCase) {
 #endif
 	if (bIgnoreCase) {
 		pWList->WL_strcmp = _stricmp;
-		pWList->WL_strcnmp = _strnicmp;
+		pWList->WL_strncmp = _strnicmp;
 #if NP2_AUTOC_USE_STRING_ORDER
 		pWList->WL_OrderFunc = WordList_OrderCase;
 #endif
 	} else {
 		pWList->WL_strcmp = strcmp;
-		pWList->WL_strcnmp = strncmp;
+		pWList->WL_strncmp = strncmp;
 #if NP2_AUTOC_USE_STRING_ORDER
 		pWList->WL_OrderFunc = WordList_Order;
 #endif
@@ -509,14 +338,14 @@ struct WordList *WordList_Alloc(LPCSTR pRoot, int iRootLen, BOOL bIgnoreCase) {
 static inline BOOL WordList_StartsWith(struct WordList *pWList, LPCSTR pWord) {
 #if NP2_AUTOC_USE_STRING_ORDER
 	if (pWList->iStartLen > NP2_AUTOC_ORDER_LENGTH) {
-		return pWList->WL_strcnmp(pWList->pWordStart, pWord, pWList->iStartLen) == 0;
+		return pWList->WL_strncmp(pWList->pWordStart, pWord, pWList->iStartLen) == 0;
 	}
 	if (pWList->orderStart != pWList->WL_OrderFunc(pWord, pWList->iStartLen)) {
 		return FALSE;
 	}
 	return TRUE;
 #else
-	return pWList->WL_strcnmp(pWList->pWordStart, pWord, pWList->iStartLen) == 0;
+	return pWList->WL_strncmp(pWList->pWordStart, pWord, pWList->iStartLen) == 0;
 #endif
 }
 
