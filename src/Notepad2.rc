@@ -576,6 +576,8 @@ BEGIN
         MENUITEM "Cl&ear",                      IDM_EDIT_CLEAR
         MENUITEM SEPARATOR
         MENUITEM "&Select All",                 IDM_EDIT_SELECTALL
+        MENUITEM SEPARATOR
+        MENUITEM "&Toggle Fold",                IDM_VIEW_FOLD_CURRENT
     END
     POPUP "+"
     BEGIN
