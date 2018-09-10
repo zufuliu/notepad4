@@ -882,15 +882,28 @@ const char *EditKeywordIndent(const char *head, int *indent) {
 		}
 		break;
 	case SCLEX_BASH:
-		if (!strcmp(word, "if")) {
-			*indent = 2;
-			endPart = "fi";
-		} else if (!strcmp(word, "case")) {
-			*indent = 2;
-			endPart = "esac";
-		} else if (!strcmp(word, "do")) {
-			*indent = 2;
-			endPart = "done";
+		if (np2LexLangIndex == IDM_LANG_CSHELL) {
+			if (!strcmp(word, "if")) {
+				*indent = 2;
+				endPart = "endif";
+			} else if (!strcmp(word, "switch")) {
+				*indent = 2;
+				endPart = "endif";
+			} else if (!strcmp(word, "foreach") || !strcmp(word, "while")) {
+				*indent = 2;
+				endPart = "end";
+			}
+		} else {
+			if (!strcmp(word, "if")) {
+				*indent = 2;
+				endPart = "fi";
+			} else if (!strcmp(word, "case")) {
+				*indent = 2;
+				endPart = "esac";
+			} else if (!strcmp(word, "do")) {
+				*indent = 2;
+				endPart = "done";
+			}
 		}
 		break;
 	case SCLEX_MAKEFILE:

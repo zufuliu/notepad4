@@ -426,6 +426,7 @@ BEGIN
         POPUP "Shell Script"
         BEGIN
             MENUITEM "Shell Script",                IDM_LANG_BASH
+            MENUITEM "C Shell",                     IDM_LANG_CSHELL
             MENUITEM "M4 Macro",                    IDM_LANG_M4
         END
         // "&SQL Dialect"
