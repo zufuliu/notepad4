@@ -30,7 +30,10 @@
 	* C#, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#c)
 		* C# Doc
 		* Vala
-	* CSS
+	* CSS Style Sheet
+		* Sassy CSS
+		* Less CSS
+		* HSS
 	* Configuration / Properties File
 		* Apache Configuration File
 	* D
