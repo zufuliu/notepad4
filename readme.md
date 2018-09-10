@@ -90,7 +90,8 @@
 	* Ruby, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#ruby)
 	* Scala Script
 	* Shell Script
-		* Bash, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#shell-script)
+		* Bash likes (sh, bash, dash, ash, zsh, ksh), [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#shell-script)
+		* C Shell (csh, tcsh)
 		* M4 Macro, limited support
 	* Android Dalvik Smali, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#android-smali)
 		* javap

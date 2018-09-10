@@ -637,6 +637,10 @@ void Style_SetLexer(HWND hwnd, PEDITLEXER pLexNew) {
 		SciCall_SetProperty("lexer.css.less.language", ((np2LexLangIndex == IDM_LANG_LESS)? "1" : "0"));
 		SciCall_SetProperty("lexer.css.hss.language", ((np2LexLangIndex == IDM_LANG_HSS)? "1" : "0"));
 		break;
+
+	case NP2LEX_BASH:
+		SciCall_SetProperty("lexer.bash.csh.language", ((np2LexLangIndex == IDM_LANG_CSHELL)? "1" : "0"));
+		break;
 	}
 
 	Style_UpdateLexerKeywords(pLexNew);
@@ -1076,11 +1080,15 @@ PEDITLEXER __fastcall Style_SniffShebang(char *pchText) {
 					return &lexGroovy;
 				}
 				if (!strncmp(name, "scala", 5)) {
-					return (&lexScala);
+					return &lexScala;
 				}
 			}
 
-			if (!strncmp(name, "bash", 4) || !strncmp(name, "dash", 4) || !strncmp(name, "tcsh", 4)) {
+			if (!strncmp(name, "bash", 4) || !strncmp(name, "dash", 4)) {
+				return &lexBash;
+			}
+			if (!strncmp(name, "tcsh", 4)) {
+				np2LexLangIndex = IDM_LANG_CSHELL;
 				return &lexBash;
 			}
 			if (!strncmp(name, "perl", 4)) {
@@ -1116,7 +1124,11 @@ PEDITLEXER __fastcall Style_SniffShebang(char *pchText) {
 			if (!strncmp(name, "tcl", 3)) {
 				return &lexTcl;
 			}
-			if (!strncmp(name, "ash", 3) || !strncmp(name, "zsh", 3) || !strncmp(name, "ksh", 3) || !strncmp(name, "csh", 3)) {
+			if (!strncmp(name, "ash", 3) || !strncmp(name, "zsh", 3) || !strncmp(name, "ksh", 3)) {
+				return &lexBash;
+			}
+			if (!strncmp(name, "csh", 3)) {
+				np2LexLangIndex = IDM_LANG_CSHELL;
 				return &lexBash;
 			}
 			if (!strncmp(name, "ipy", 3)) {
@@ -1537,6 +1549,9 @@ void Style_GetCurrentLexerName(LPWSTR lpszName, int cchName) {
 			case IDM_LANG_BASH:
 				lang = L"Shell Script";
 				break;
+			case IDM_LANG_CSHELL:
+				lang = L"C Shell";
+				break;
 			case IDM_LANG_M4:
 				lang = L"M4 Macro";
 				break;
@@ -1583,88 +1598,87 @@ PEDITLEXER __fastcall Style_MatchLexer(LPCWSTR lpszMatch, BOOL bCheckNames) {
 	if (!bCheckNames) {
 		//if (StrNCaseEqual(L"php", lpszMatch, 3) || StrCaseEqual(L"phtml", lpszMatch))) {
 		//	np2LexLangIndex = IDM_LANG_PHP;
-		//	return (&lexPHP);
+		//	return &lexPHP;
 		//}
 		if (StrCaseEqual(L"jsp", lpszMatch)) {
 			np2LexLangIndex = IDM_LANG_JSP;
-			return (&lexHTML);
+			return &lexHTML;
 		}
 		if (StrCaseEqual(L"aspx", lpszMatch)) {
 			np2LexLangIndex = Style_GetDocTypeLanguage();
 			if (np2LexLangIndex == 0) {
 				np2LexLangIndex = IDM_LANG_ASPX_CS;
 			}
-			return (&lexHTML);
+			return &lexHTML;
 		}
 		if (StrCaseEqual(L"asp", lpszMatch)) {
 			np2LexLangIndex = Style_GetDocTypeLanguage();
 			if (np2LexLangIndex == 0) {
 				np2LexLangIndex = IDM_LANG_ASP_VBS;
 			}
-			return (&lexHTML);
+			return &lexHTML;
 		}
 
 		if (StrCaseEqual(L"xsd", lpszMatch)) {
 			np2LexLangIndex = IDM_LANG_XSD;
-			return (&lexXML);
+			return &lexXML;
 		}
 		if (StrNCaseEqual(L"xsl", lpszMatch, 3)) {
 			np2LexLangIndex = IDM_LANG_XSLT;
-			return (&lexXML);
+			return &lexXML;
 		}
 		if (StrCaseEqual(L"dtd", lpszMatch)) {
 			np2LexLangIndex = IDM_LANG_DTD;
-			return (&lexXML);
+			return &lexXML;
 		}
 		if (StrCaseEqual(L"pom", lpszMatch)) {
 			np2LexLangIndex = IDM_LANG_MAVEN_POM;
-			return (&lexXML);
+			return &lexXML;
 		}
 		if (StrCaseEqual(L"resx", lpszMatch)) {
 			np2LexLangIndex = IDM_LANG_RESX;
-			return (&lexXML);
+			return &lexXML;
 		}
 		if (StrCaseEqual(L"xaml", lpszMatch)) {
 			np2LexLangIndex = IDM_LANG_XAML;
-			return (&lexXML);
+			return &lexXML;
 		}
 		if (StrCaseEqual(L"plist", lpszMatch)) {
 			np2LexLangIndex = IDM_LANG_PROPERTY_LIST;
-			return (&lexXML);
+			return &lexXML;
 		}
 		if (StrCaseEqual(L"svg", lpszMatch)) {
 			np2LexLangIndex = IDM_LANG_SVG;
-			return (&lexXML);
+			return &lexXML;
 		}
 		if (StrCaseEqual(L"xml", lpszMatch)) {
 			np2LexLangIndex = Style_GetDocTypeLanguage();
-			return (&lexXML);
+			return &lexXML;
 		}
-		if (StrCaseEqual(L"sce", lpszMatch)) {
+		if (StrCaseEqual(L"sce", lpszMatch) || StrCaseEqual(L"sci", lpszMatch)) {
 			lexMatlab.rid = NP2LEX_SCILAB;
 			np2LexLangIndex = IDM_LANG_SCILAB;
-			return (&lexMatlab);
-		}
-		if (StrCaseEqual(L"sci", lpszMatch)) {
-			lexMatlab.rid = NP2LEX_SCILAB;
-			np2LexLangIndex = IDM_LANG_SCILAB;
-			return (&lexMatlab);
+			return &lexMatlab;
 		}
 		if (StrCaseEqual(L"m4", lpszMatch)) {
 			np2LexLangIndex = IDM_LANG_M4;
-			return (&lexBash);
+			return &lexBash;
+		}
+		if (StrCaseEqual(L"csh", lpszMatch) || StrCaseEqual(L"tcsh", lpszMatch)) {
+			np2LexLangIndex = IDM_LANG_CSHELL;
+			return &lexBash;
 		}
 		if (StrCaseEqual(L"scss", lpszMatch)) {
 			np2LexLangIndex = IDM_LANG_SCSS;
-			return (&lexCSS);
+			return &lexCSS;
 		}
 		if (StrCaseEqual(L"less", lpszMatch)) {
 			np2LexLangIndex = IDM_LANG_LESS;
-			return (&lexCSS);
+			return &lexCSS;
 		}
 		if (StrCaseEqual(L"hss", lpszMatch)) {
 			np2LexLangIndex = IDM_LANG_HSS;
-			return (&lexCSS);
+			return &lexCSS;
 		}
 		if (bAutoSelect && StrCaseEqual(L"m", lpszMatch)) {
 			PEDITLEXER lex = Style_DetectObjCAndMatlab();
@@ -1981,6 +1995,7 @@ void Style_SetLexerByLangIndex(HWND hwnd, int lang) {
 		break;
 
 	case IDM_LANG_BASH:
+	case IDM_LANG_CSHELL:
 	case IDM_LANG_M4:
 		Style_SetLexer(hwnd, &lexBash);
 		break;

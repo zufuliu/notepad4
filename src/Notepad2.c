@@ -4421,6 +4421,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case IDM_LANG_SVG:
 
 	case IDM_LANG_BASH:
+	case IDM_LANG_CSHELL:
 	case IDM_LANG_M4:
 
 	case IDM_LANG_MATLAB:

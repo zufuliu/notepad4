@@ -1,14 +1,21 @@
 #include "EditLexer.h"
 #include "EditStyle.h"
 
+// https://en.wikipedia.org/wiki/Almquist_shell
+// https://en.wikipedia.org/wiki/Bourne_shell
 // https://www.gnu.org/software/bash/manual/
+// https://en.wikipedia.org/wiki/C_shell
+// https://en.wikipedia.org/wiki/KornShell
+// https://en.wikipedia.org/wiki/Z_shell
 
 static KEYWORDLIST Keywords_Bash = {{
 // build-in
-"alias true false yes no if then fi elif else end endif for foreach function functions in return "
+"alias true false yes no if then fi elif else for function functions in return while "
 " case esac eval ex exec do done du echo EOF "
+// C Shell
+"end endif foreach switch default breaksw endsw repeat "
 // common
-"ar asa awk banner basename bash bc bdiff break bunzip2 bzip2 cal calendar  cat "
+"ar asa awk banner basename bash bc bdiff break bunzip2 bzip2 cal calendar cat "
 "cc cd chmod cksum clear cmp col comm compress continue cp cpio crypt csplit ctags cut date "
 "dc dd declare deroff dev df diff diff3 dircmp dirname ed egrep "
 "env exit expand export expr fc fgrep file find fmt fold  "
@@ -18,7 +25,7 @@ static KEYWORDLIST Keywords_Bash = {{
 "read readonly red rev rm rmdir sed select set sh shift size sleep sort spell split "
 "start stop strings strip stty sum suspend sync tail tar tee test time times touch tr "
 "trap tsort tty type typeset ulimit umask unalias uname uncompress unexpand uniq unpack "
-"unset until uudecode uuencode vi vim vpax wait wc whence which while who wpaste wstart xargs "
+"unset until uudecode uuencode vi vim vpax wait wc whence which who wpaste wstart xargs "
 "zcat chgrp chown chroot dir dircolors factor groups hostid install link md5sum mkfifo mknod "
 "nice pinky printenv ptx readlink seq sha1sum shred stat su tac unlink users vdir whoami yes dnl"
 
@@ -31,7 +38,7 @@ static KEYWORDLIST Keywords_Bash = {{
 , "", "", "", "", "", "", ""
 }};
 
-EDITLEXER lexBash = { SCLEX_BASH, NP2LEX_BASH, L"Shell Script", L"sh; m4; in; po", L"", &Keywords_Bash,
+EDITLEXER lexBash = { SCLEX_BASH, NP2LEX_BASH, L"Shell Script", L"sh; csh; zsh; bash; tcsh; m4; in; po", L"", &Keywords_Bash,
 {
 	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
 	//{ SCE_SH_ERROR, 63531, L"Error", L"", L"" },

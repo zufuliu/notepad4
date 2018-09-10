@@ -699,12 +699,13 @@ static void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int in
 
 #define IsCommentLine(line)	IsLexCommentLine(line, styler, SCE_SH_COMMENTLINE)
 
-#define MAX_BASH_WORD_LEN	7
+#define MAX_BASH_WORD_LEN	15
 static void FoldBashDoc(Sci_PositionU startPos, Sci_Position length, int, LexerWordList, Accessor &styler) {
 	if (styler.GetPropertyInt("fold") == 0)
 		return;
 	const bool foldComment = styler.GetPropertyInt("fold.comment") != 0;
 	const bool foldCompact = styler.GetPropertyInt("fold.compact", 1) != 0;
+	const bool isCShell = styler.GetPropertyInt("lexer.bash.csh.language") != 0;
 	const Sci_PositionU endPos = startPos + length;
 	int visibleChars = 0;
 	int skipHereCh = 0;
@@ -736,10 +737,18 @@ static void FoldBashDoc(Sci_PositionU startPos, Sci_Position length, int, LexerW
 			if (styleNext != SCE_SH_WORD) {
 				word[wordlen] = '\0';
 				wordlen = 0;
-				if (strcmp(word, "if") == 0 || strcmp(word, "case") == 0 || strcmp(word, "do") == 0) {
-					levelCurrent++;
-				} else if (strcmp(word, "fi") == 0 || strcmp(word, "esac") == 0 || strcmp(word, "done") == 0) {
-					levelCurrent--;
+				if (isCShell) {
+					if (strcmp(word, "if") == 0 || strcmp(word, "foreach") == 0 || strcmp(word, "switch") == 0 || strcmp(word, "while") == 0) {
+						levelCurrent++;
+					} else if (strcmp(word, "end") == 0 || strcmp(word, "endif") == 0 || strcmp(word, "endsw") == 0) {
+						levelCurrent--;
+					}
+				} else {
+					if (strcmp(word, "if") == 0 || strcmp(word, "case") == 0 || strcmp(word, "do") == 0) {
+						levelCurrent++;
+					} else if (strcmp(word, "fi") == 0 || strcmp(word, "esac") == 0 || strcmp(word, "done") == 0) {
+						levelCurrent--;
+					}
 				}
 			}
 		}
