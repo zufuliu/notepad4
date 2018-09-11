@@ -1790,7 +1790,7 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) {
 
 			wsprintf(tchIndex, L"%02u", n++);
 
-			if (IniSectionGetString(pIniSection, tchIndex, L"", tchDesc, COUNTOF(tchDesc))) {
+			if (IniSectionGetStringImpl(pIniSection, tchIndex, 2, L"", tchDesc, COUNTOF(tchDesc))) {
 				tbbMainWnd[i].iString = SendMessage(hwndToolbar, TB_ADDSTRING, 0, (LPARAM)tchDesc);
 				tbbMainWnd[i].fsStyle |= BTNS_AUTOSIZE | BTNS_SHOWTEXT;
 			} else {
@@ -5506,11 +5506,11 @@ void LoadSettings(void) {
 
 		LoadIniSection(L"Window", pIniSection, cchIniSection);
 
-		wi.x	= IniSectionGetInt(pIniSection, tchPosX, CW_USEDEFAULT);
-		wi.y	= IniSectionGetInt(pIniSection, tchPosY, CW_USEDEFAULT);
-		wi.cx	= IniSectionGetInt(pIniSection, tchSizeX, CW_USEDEFAULT);
-		wi.cy	= IniSectionGetInt(pIniSection, tchSizeY, CW_USEDEFAULT);
-		wi.max	= IniSectionGetInt(pIniSection, tchMaximized, 0);
+		wi.x	= IniSectionGetIntEx(pIniSection, tchPosX, CW_USEDEFAULT);
+		wi.y	= IniSectionGetIntEx(pIniSection, tchPosY, CW_USEDEFAULT);
+		wi.cx	= IniSectionGetIntEx(pIniSection, tchSizeX, CW_USEDEFAULT);
+		wi.cy	= IniSectionGetIntEx(pIniSection, tchSizeY, CW_USEDEFAULT);
+		wi.max	= IniSectionGetIntEx(pIniSection, tchMaximized, 0);
 		if (wi.max) {
 			wi.max = 1;
 		}

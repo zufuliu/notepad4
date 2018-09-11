@@ -261,7 +261,7 @@ void Style_Load(void) {
 		WCHAR tch[32];
 		WCHAR wch[32];
 		wsprintf(tch, L"%02u", i + 1);
-		if (IniSectionGetString(pIniSection, tch, L"", wch, COUNTOF(wch))) {
+		if (IniSectionGetStringImpl(pIniSection, tch, 2, L"", wch, COUNTOF(wch))) {
 			if (wch[0] == L'#') {
 				unsigned int irgb;
 				int itok = swscanf(CharNext(wch), L"%x", &irgb);
@@ -302,7 +302,7 @@ void Style_Load(void) {
 					 COUNTOF(pLexArray[iLexer]->szExtensions));
 		}
 		while (pLexArray[iLexer]->Styles[i].iStyle != -1) {
-			IniSectionGetString(pIniSection, pLexArray[iLexer]->Styles[i].pszName,
+			IniSectionGetStringEx(pIniSection, pLexArray[iLexer]->Styles[i].pszName,
 								pLexArray[iLexer]->Styles[i].pszDefault,
 								pLexArray[iLexer]->Styles[i].szValue,
 								COUNTOF(pLexArray[iLexer]->Styles[i].szValue));
@@ -413,7 +413,7 @@ BOOL Style_Import(HWND hwnd) {
 							 COUNTOF(pLexArray[iLexer]->szExtensions));
 				}
 				while (pLexArray[iLexer]->Styles[i].iStyle != -1) {
-					IniSectionGetString(pIniSection,
+					IniSectionGetStringEx(pIniSection,
 										pLexArray[iLexer]->Styles[i].pszName,
 										pLexArray[iLexer]->Styles[i].pszDefault,
 										pLexArray[iLexer]->Styles[i].szValue,
