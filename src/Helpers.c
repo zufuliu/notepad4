@@ -45,55 +45,36 @@ void DLog(const char *fmt, ...) {
 //
 // Manipulation of (cached) ini file sections
 //
-int IniSectionGetString(LPCWSTR lpCachedIniSection, LPCWSTR lpName, LPCWSTR lpDefault,
-						LPWSTR lpReturnedString, int cchReturnedString) {
-	WCHAR *p = (WCHAR *)lpCachedIniSection;
-
+int IniSectionGetStringImpl(LPCWSTR lpCachedIniSection, LPCWSTR lpName, int keyLen, LPCWSTR lpDefault, LPWSTR lpReturnedString, int cchReturnedString) {
+	LPCWSTR p = lpCachedIniSection;
 	if (p) {
-		WCHAR tch[256];
-		int	 ich;
-		lstrcpy(tch, lpName);
-		lstrcat(tch, L"=");
-		ich = lstrlen(tch);
-
 		while (*p) {
-			if (StrNEqual(p, tch, ich)) {
-				lstrcpyn(lpReturnedString, p + ich, cchReturnedString);
+			if (StrNEqual(p, lpName, keyLen) && p[keyLen] == L'=') {
+				lstrcpyn(lpReturnedString, p + keyLen + 1, cchReturnedString);
 				return lstrlen(lpReturnedString);
 			}
 			p = StrEnd(p) + 1;
 		}
 	}
+
 	lstrcpyn(lpReturnedString, lpDefault, cchReturnedString);
 	return lstrlen(lpReturnedString);
 }
 
-BOOL IniSectionGetBool(LPCWSTR lpCachedIniSection, LPCWSTR lpName, BOOL bDefault) {
-	WCHAR *p = (WCHAR *)lpCachedIniSection;
-
+BOOL IniSectionGetBoolImpl(LPCWSTR lpCachedIniSection, LPCWSTR lpName, int keyLen, BOOL bDefault) {
+	LPCWSTR p = lpCachedIniSection;
 	if (p) {
-		WCHAR tch[256];
-		int	 ich;
-		lstrcpy(tch, lpName);
-		lstrcat(tch, L"=");
-		ich = lstrlen(tch);
-
 		while (*p) {
-			if (StrNEqual(p, tch, ich)) {
-				WCHAR *t = p + ich;
-				while (*t) {
-					switch (*t) {
-					case L'1':
-						return TRUE;
-					case L'0':
-						return FALSE;
-					case L' ':
-					case L'\t':
-						t++;
-						break;
-					}
+			if (StrNEqual(p, lpName, keyLen) && p[keyLen] == L'=') {
+				LPCWSTR t = p + keyLen + 1;
+				switch (*t) {
+				case L'1':
+					return TRUE;
+				case L'0':
+					return FALSE;
+				default:
+					return bDefault;
 				}
-				return bDefault;
 			}
 			p = StrEnd(p) + 1;
 		}
@@ -101,20 +82,14 @@ BOOL IniSectionGetBool(LPCWSTR lpCachedIniSection, LPCWSTR lpName, BOOL bDefault
 	return bDefault;
 }
 
-int IniSectionGetInt(LPCWSTR lpCachedIniSection, LPCWSTR lpName, int iDefault) {
-	WCHAR *p = (WCHAR *)lpCachedIniSection;
-
+int IniSectionGetIntImpl(LPCWSTR lpCachedIniSection, LPCWSTR lpName, int keyLen, int iDefault) {
+	LPCWSTR p = lpCachedIniSection;
 	if (p) {
-		WCHAR tch[256];
-		int	 ich;
-		int	 i;
-		lstrcpy(tch, lpName);
-		lstrcat(tch, L"=");
-		ich = lstrlen(tch);
+		int i;
 
 		while (*p) {
-			if (StrNEqual(p, tch, ich)) {
-				if (swscanf(p + ich, L"%i", &i) == 1) {
+			if (StrNEqual(p, lpName, keyLen) && p[keyLen] == L'=') {
+				if (swscanf(p + keyLen + 1, L"%i", &i) == 1) {
 					return i;
 				}
 				return iDefault;
@@ -1734,8 +1709,8 @@ BOOL MRU_Load(LPMRULIST pmru) {
 	LoadIniSection(pmru->szRegKey, pIniSection, (int)LocalSize(pIniSection) / sizeof(WCHAR));
 
 	for (int i = 0, n = 0; i < pmru->iSize; i++) {
-		wsprintf(tchName, L"%.2i", i + 1);
-		if (IniSectionGetString(pIniSection, tchName, L"", tchItem, COUNTOF(tchItem))) {
+		wsprintf(tchName, L"%02i", i + 1);
+		if (IniSectionGetStringImpl(pIniSection, tchName, 2, L"", tchItem, COUNTOF(tchItem))) {
 			/*if (pmru->iFlags & MRU_UTF8) {
 				WCHAR wchItem[1024];
 				int cbw = MultiByteToWideChar(CP_UTF7, 0, tchItem, -1, wchItem, COUNTOF(wchItem));
@@ -1759,7 +1734,7 @@ BOOL MRU_Save(LPMRULIST pmru) {
 
 	for (int i = 0; i < pmru->iSize; i++) {
 		if (pmru->pszItems[i]) {
-			wsprintf(tchName, L"%.2i", i + 1);
+			wsprintf(tchName, L"%02i", i + 1);
 			/*if (pmru->iFlags & MRU_UTF8) {
 				WCHAR	 tchItem[1024];
 				WCHAR wchItem[1024];
