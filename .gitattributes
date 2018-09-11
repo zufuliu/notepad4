@@ -1,2 +1,2 @@
-*.sh    eol=lf
-*.bat   eol=crlf
+*.sh	text eol=lf
+*.bat	text eol=crlf
