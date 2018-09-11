@@ -54,8 +54,7 @@ BOOL IniSectionGetBoolImpl(LPCWSTR lpCachedIniSection, LPCWSTR lpName, int keyLe
 	if (p) {
 		while (*p) {
 			if (StrNEqual(p, lpName, keyLen) && p[keyLen] == L'=') {
-				LPCWSTR t = p + keyLen + 1;
-				switch (*t) {
+				switch (p[keyLen + 1]) {
 				case L'1':
 					return TRUE;
 				case L'0':
