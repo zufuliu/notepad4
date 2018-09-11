@@ -632,9 +632,9 @@ void PathAbsoluteFromApp(LPWSTR lpszSrc, LPWSTR lpszDest, int cchDest, BOOL bExp
 	WCHAR wchPath[MAX_PATH];
 	WCHAR wchResult[MAX_PATH];
 
-	if (StrNEqual(lpszSrc, L"%CSIDL:MYDOCUMENTS%", COUNTOF("%CSIDL:MYDOCUMENTS%") - 1)) {
+	if (StrNEqual(lpszSrc, L"%CSIDL:MYDOCUMENTS%", CSTRLEN("%CSIDL:MYDOCUMENTS%"))) {
 		SHGetFolderPath(NULL, CSIDL_PERSONAL, NULL, SHGFP_TYPE_CURRENT, wchPath);
-		PathAppend(wchPath, lpszSrc + COUNTOF("%CSIDL:MYDOCUMENTS%") - 1);
+		PathAppend(wchPath, lpszSrc + CSTRLEN("%CSIDL:MYDOCUMENTS%"));
 	} else {
 		lstrcpyn(wchPath, lpszSrc, COUNTOF(wchPath));
 	}
