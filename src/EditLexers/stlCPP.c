@@ -21,7 +21,6 @@ static KEYWORDLIST Keywords_CPP = {{
 "__alignof __asm __assume __based __cdecl __declspec __event __except __fastcall __finally __forceinline __identifier __inline __interface __leave __raise __stdcall __clrcall __super __thiscall __try __unaligned __uuidof __hook __unhook __noop __vectorcall "
 // GCC
 "typeof __typeof__ __alignof__ __label__ __asm__ __thread __attribute__ __volatile__ __restrict__ __restrict __inline__ __extension__ "
-"__auto_type "
 "__nonnull __nullable __covariant __kindof nullable nonnull "
 // Keil
 "sfr sfr16 interrupt "
@@ -31,7 +30,7 @@ static KEYWORDLIST Keywords_CPP = {{
 "CONST ENUM "
 
 , // 1 Type Keyword
-"auto char double float int long short signed unsigned void "
+"__auto_type auto char double float int long short signed unsigned void "
 "bool char16_t char32_t wchar_t nullptr_t nothrow_t "
 "_Bool complex _Complex _Imaginary "
 "__w64 __wchar_t __int8 __int16 __int32 __int64 __m128 __m128d __m128i __m256 __m256d __m256i __m64 __int3264 __ptr32 __ptr64 __sptr __uptr "
@@ -431,7 +430,7 @@ static KEYWORDLIST Keywords_CPP = {{
 "sizeof() for^() if^() switch^() while^() catch^() else^if^() else^{} "
 "alignas() alignof() delete[] decltype() noexcept() typeid() typeof() static_assert() "
 "static_cast<> const_cast<> dynamic_cast<> reinterpret_cast<> "
-"_Alignas() _Alignof() _Static_assert() "
+"_Alignas() _Alignof() _Generic() _Static_assert() "
 "__attribute__() __typeof__() __alignof__() "
 "__except^() __alignof() __declspec() __uuidof() "
 }};
