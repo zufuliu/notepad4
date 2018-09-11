@@ -2750,7 +2750,7 @@ void Style_SetStyles(HWND hwnd, int iStyle, LPCWSTR lpszStyle) {
 //
 int Style_GetLexerIconId(PEDITLEXER pLex) {
 	WCHAR *p;
-	WCHAR *pszExtensions;
+	LPCWSTR pszExtensions;
 	WCHAR *pszFile;
 
 	SHFILEINFO shfi;
@@ -2800,7 +2800,7 @@ HTREEITEM Style_AddLexerToTreeView(HWND hwnd, PEDITLEXER pLex) {
 	if (GetString(pLex->rid, tch, COUNTOF(tch))) {
 		tvis.item.pszText = tch;
 	} else {
-		tvis.item.pszText = pLex->pszName;
+		tvis.item.pszText = (WCHAR *)pLex->pszName;
 	}
 	tvis.item.iImage = Style_GetLexerIconId(pLex);
 	tvis.item.iSelectedImage = tvis.item.iImage;
@@ -2818,7 +2818,7 @@ HTREEITEM Style_AddLexerToTreeView(HWND hwnd, PEDITLEXER pLex) {
 		if (GetString(pLex->Styles[i].rid, tch, COUNTOF(tch))) {
 			tvis.item.pszText = tch;
 		} else {
-			tvis.item.pszText = pLex->Styles[i].pszName;
+			tvis.item.pszText = (WCHAR *)pLex->Styles[i].pszName;
 		}
 		tvis.item.lParam = (LPARAM)(&pLex->Styles[i]);
 		TreeView_InsertItem(hwnd, &tvis);
@@ -2842,7 +2842,7 @@ void Style_AddLexerToListView(HWND hwnd, PEDITLEXER pLex) {
 	if (GetString(pLex->rid, tch, COUNTOF(tch))) {
 		lvi.pszText = tch;
 	} else {
-		lvi.pszText = pLex->pszName;
+		lvi.pszText = (WCHAR *)pLex->pszName;
 	}
 	lvi.iImage = Style_GetLexerIconId(pLex);
 	lvi.lParam = (LPARAM)pLex;
