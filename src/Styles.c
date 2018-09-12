@@ -1164,7 +1164,7 @@ int Style_GetDocTypeLanguage() {
 		}
 		//if (!_strnicmp(p, "html", 4))
 		//	return IDM_LANG_WEB;
-		if (!(strncmp(p, "struts", 6) && strncmp(p, "xwork", 5) && strncmp(p, "validators", 10))) {
+		if (!strncmp(p, "struts", 6) || !strncmp(p, "xwork", 5) || !strncmp(p, "validators", 10)) {
 			return IDM_LANG_STRUTS;
 		}
 		if (!strncmp(p, "hibernate", 9)) {
@@ -1232,7 +1232,7 @@ int Style_GetDocTypeLanguage() {
 			} else {
 				return 0;
 			}
-		} else if (!(strncmp(p, "<?", 2) && strncmp(p, "<!", 2))) {
+		} else if (!strncmp(p, "<?", 2) || !strncmp(p, "<!", 2)) {
 			p += 2;
 			if ((p = StrChrA(p, '>')) != NULL) {
 				p++;
@@ -1258,7 +1258,7 @@ int Style_GetDocTypeLanguage() {
 	if (!strncmp(p, "schema", 6)) {
 		return IDM_LANG_XSD;
 	}
-	//if (!(strncmp(p, "schema", 6) && strncmp(p, "xsd:schema", 10) && strncmp(p, "xs:schema", 9)))
+	//if (!strncmp(p, "schema", 6) || !strncmp(p, "xsd:schema", 10) || !strncmp(p, "xs:schema", 9))
 	//	return IDM_LANG_XSD;
 	//if (!strncmp(p, "xsl:stylesheet", 14))
 	//	return IDM_LANG_XSLT;
@@ -1292,7 +1292,7 @@ int Style_GetDocTypeLanguage() {
 	//	return IDM_LANG_TOMCAT;
 	//if (!strncmp(p, "web-app"))
 	//	return IDM_LANG_WEB_JAVA;
-	if (!(strncmp(p, "struts", 6) && strncmp(p, "xwork", 5) && strncmp(p, "validators", 10))) {
+	if (!strncmp(p, "struts", 6) || !strncmp(p, "xwork", 5) || !strncmp(p, "validators", 10)) {
 		return IDM_LANG_STRUTS;
 	}
 	if (!strncmp(p, "hibernate", 9)) {
