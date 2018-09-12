@@ -28,7 +28,7 @@
 // trigger warning for non-literal string: GCC: division by zero [-Wdiv-by-zero]. Clang: division by zero is undefined [-Wdivision-by-zero].
 #define CSTRLEN(s)	(__builtin_constant_p(s) ? (_countof(s) - 1) : (1 / 0))
 #else
-// using template based version of _countof() from stdlib.h
+// C++ template based version of _countof(), or plain old unsafe version
 #define COUNTOF(ar)	_countof(ar)
 #define CSTRLEN(s)	(_countof(s) - 1)
 #endif

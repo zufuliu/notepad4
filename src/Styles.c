@@ -291,21 +291,23 @@ void Style_Load(void) {
 	cyStyleSelectDlg = max_i(cyStyleSelectDlg, 324);
 
 	for (iLexer = 0; iLexer < NUMLEXERS; iLexer++) {
+		PEDITLEXER lex = pLexArray[iLexer];
 		unsigned int i = 0;
-		LoadIniSection(pLexArray[iLexer]->pszName, pIniSection, cchIniSection);
-		if (!IniSectionGetString(pIniSection, L"FileNameExtensions",
-								 pLexArray[iLexer]->pszDefExt,
-								 pLexArray[iLexer]->szExtensions,
-								 COUNTOF(pLexArray[iLexer]->szExtensions))) {
-			lstrcpyn(pLexArray[iLexer]->szExtensions,
-					 pLexArray[iLexer]->pszDefExt,
-					 COUNTOF(pLexArray[iLexer]->szExtensions));
+		LoadIniSection(lex->pszName, pIniSection, cchIniSection);
+		if (StrIsEmpty(pIniSection)) {
+			lstrcpyn(lex->szExtensions, lex->pszDefExt, COUNTOF(lex->szExtensions));
+			while (lex->Styles[i].iStyle != -1) {
+				lstrcpyn(lex->Styles[i].szValue, lex->Styles[i].pszDefault, COUNTOF(lex->Styles[i].szValue));
+				i++;
+			}
+			continue;
 		}
-		while (pLexArray[iLexer]->Styles[i].iStyle != -1) {
-			IniSectionGetStringEx(pIniSection, pLexArray[iLexer]->Styles[i].pszName,
-								pLexArray[iLexer]->Styles[i].pszDefault,
-								pLexArray[iLexer]->Styles[i].szValue,
-								COUNTOF(pLexArray[iLexer]->Styles[i].szValue));
+		if (!IniSectionGetString(pIniSection, L"FileNameExtensions", lex->pszDefExt, lex->szExtensions, COUNTOF(lex->szExtensions))) {
+			lstrcpyn(lex->szExtensions, lex->pszDefExt, COUNTOF(lex->szExtensions));
+		}
+		while (lex->Styles[i].iStyle != -1) {
+			IniSectionGetStringEx(pIniSection, lex->Styles[i].pszName, lex->Styles[i].pszDefault,
+								lex->Styles[i].szValue, COUNTOF(lex->Styles[i].szValue));
 			i++;
 		}
 	}
@@ -356,19 +358,23 @@ void Style_Save(void) {
 		return;
 	}
 
-	ZeroMemory(pIniSection, cchIniSection);
 	for (iLexer = 0; iLexer < NUMLEXERS; iLexer++) {
+		PEDITLEXER lex = pLexArray[iLexer];
 		unsigned int i = 0;
-		IniSectionSetString(pIniSection, L"FileNameExtensions",
-							pLexArray[iLexer]->szExtensions);
-		while (pLexArray[iLexer]->Styles[i].iStyle != -1) {
-			IniSectionSetString(pIniSection,
-								pLexArray[iLexer]->Styles[i].pszName,
-								pLexArray[iLexer]->Styles[i].szValue);
+		BOOL changed = FALSE;
+		ZeroMemory(pIniSection, cchIniSection);
+		if (!StrCaseEqual(lex->pszDefExt, lex->szExtensions)) {
+			changed = TRUE;
+			IniSectionSetString(pIniSection, L"FileNameExtensions", lex->szExtensions);
+		}
+		while (lex->Styles[i].iStyle != -1) {
+			if (!StrCaseEqual(lex->Styles[i].pszDefault, lex->Styles[i].szValue)) {
+				changed = TRUE;
+				IniSectionSetString(pIniSection, lex->Styles[i].pszName, lex->Styles[i].szValue);
+			}
 			i++;
 		}
-		SaveIniSection(pLexArray[iLexer]->pszName, pIniSection);
-		ZeroMemory(pIniSection, cchIniSection);
+		SaveIniSection(lex->pszName, (changed ? pIniSection : NULL));
 	}
 	LocalFree(pIniSection);
 }
@@ -401,23 +407,15 @@ BOOL Style_Import(HWND hwnd) {
 		int		cchIniSection = (int)LocalSize(pIniSection) / sizeof(WCHAR);
 
 		for (iLexer = 0; iLexer < NUMLEXERS; iLexer++) {
-			if (GetPrivateProfileSection(pLexArray[iLexer]->pszName, pIniSection, cchIniSection, szFile)) {
+			PEDITLEXER lex = pLexArray[iLexer];
+			if (GetPrivateProfileSection(lex->pszName, pIniSection, cchIniSection, szFile)) {
 				unsigned int i = 0;
-				if (!IniSectionGetString(pIniSection,
-										 L"FileNameExtensions",
-										 pLexArray[iLexer]->pszDefExt,
-										 pLexArray[iLexer]->szExtensions,
-										 COUNTOF(pLexArray[iLexer]->szExtensions))) {
-					lstrcpyn(pLexArray[iLexer]->szExtensions,
-							 pLexArray[iLexer]->pszDefExt,
-							 COUNTOF(pLexArray[iLexer]->szExtensions));
+				if (!IniSectionGetString(pIniSection, L"FileNameExtensions", lex->pszDefExt, lex->szExtensions, COUNTOF(lex->szExtensions))) {
+					lstrcpyn(lex->szExtensions, lex->pszDefExt,  COUNTOF(lex->szExtensions));
 				}
-				while (pLexArray[iLexer]->Styles[i].iStyle != -1) {
-					IniSectionGetStringEx(pIniSection,
-										pLexArray[iLexer]->Styles[i].pszName,
-										pLexArray[iLexer]->Styles[i].pszDefault,
-										pLexArray[iLexer]->Styles[i].szValue,
-										COUNTOF(pLexArray[iLexer]->Styles[i].szValue));
+				while (lex->Styles[i].iStyle != -1) {
+					IniSectionGetStringEx(pIniSection, lex->Styles[i].pszName, lex->Styles[i].pszDefault,
+										lex->Styles[i].szValue, COUNTOF(lex->Styles[i].szValue));
 					i++;
 				}
 			}
@@ -457,15 +455,14 @@ BOOL Style_Export(HWND hwnd) {
 		int		cchIniSection = (int)LocalSize(pIniSection) / sizeof(WCHAR);
 
 		for (iLexer = 0; iLexer < NUMLEXERS; iLexer++) {
+			PEDITLEXER lex = pLexArray[iLexer];
 			unsigned int i = 0;
-			IniSectionSetString(pIniSection, L"FileNameExtensions", pLexArray[iLexer]->szExtensions);
-			while (pLexArray[iLexer]->Styles[i].iStyle != -1) {
-				IniSectionSetString(pIniSection,
-									pLexArray[iLexer]->Styles[i].pszName,
-									pLexArray[iLexer]->Styles[i].szValue);
+			IniSectionSetString(pIniSection, L"FileNameExtensions", lex->szExtensions);
+			while (lex->Styles[i].iStyle != -1) {
+				IniSectionSetString(pIniSection, lex->Styles[i].pszName, lex->Styles[i].szValue);
 				i++;
 			}
-			if (!WritePrivateProfileSection(pLexArray[iLexer]->pszName, pIniSection, szFile)) {
+			if (!WritePrivateProfileSection(lex->pszName, pIniSection, szFile)) {
 				dwError = GetLastError();
 			}
 			ZeroMemory(pIniSection, cchIniSection);
@@ -3336,14 +3333,16 @@ INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM
 void Style_ConfigDlg(HWND hwnd) {
 	WCHAR *StyleBackup[1024];
 	int c, cItems, i, iLexer;
+	BOOL changed = FALSE;
 
 	// Backup Styles
 	c = 0;
 	for (iLexer = 0; iLexer < NUMLEXERS; iLexer++) {
-		StyleBackup[c++] = StrDup(pLexArray[iLexer]->szExtensions);
+		PEDITLEXER lex = pLexArray[iLexer];
+		StyleBackup[c++] = StrDup(lex->szExtensions);
 		i = 0;
-		while (pLexArray[iLexer]->Styles[i].iStyle != -1) {
-			StyleBackup[c++] = StrDup(pLexArray[iLexer]->Styles[i].szValue);
+		while (lex->Styles[i].iStyle != -1) {
+			StyleBackup[c++] = StrDup(lex->Styles[i].szValue);
 			i++;
 		}
 	}
@@ -3357,15 +3356,17 @@ void Style_ConfigDlg(HWND hwnd) {
 		// Restore Styles
 		c = 0;
 		for (iLexer = 0; iLexer < NUMLEXERS; iLexer++) {
-			lstrcpy(pLexArray[iLexer]->szExtensions, StyleBackup[c++]);
+			PEDITLEXER lex = pLexArray[iLexer];
+			lstrcpy(lex->szExtensions, StyleBackup[c++]);
 			i = 0;
-			while (pLexArray[iLexer]->Styles[i].iStyle != -1) {
-				lstrcpy(pLexArray[iLexer]->Styles[i].szValue, StyleBackup[c++]);
+			while (lex->Styles[i].iStyle != -1) {
+				lstrcpy(lex->Styles[i].szValue, StyleBackup[c++]);
 				i++;
 			}
 		}
 	} else {
 		fStylesModified = TRUE;
+		changed = TRUE;
 		if (StrIsEmpty(szIniFile) && !fWarnedNoIniFile) {
 			MsgBox(MBWARN, IDS_SETTINGSNOTSAVED);
 			fWarnedNoIniFile = TRUE;
@@ -3377,7 +3378,7 @@ void Style_ConfigDlg(HWND hwnd) {
 	}
 
 	// Apply new (or previous) Styles
-	if (fStylesModified) {
+	if (changed) {
 		Style_SetLexer(hwnd, pLexCurrent);
 	}
 }
