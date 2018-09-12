@@ -90,19 +90,19 @@ struct WordNode {
 
 // Andersson Tree, source from http://www.eternallyconfuzzled.com/tuts/datastructures/jsw_tut_andersson.aspx
 #define aa_tree_skew(t) \
-	if (t->level && t->left && t->level == t->left->level) {\
-		struct WordNode *save = t->left;					\
-		t->left = save->right;								\
-		save->right = t;									\
-		t = save;											\
+	if ((t)->level && (t)->left && (t)->level == (t)->left->level) {\
+		struct WordNode *save = (t)->left;					\
+		(t)->left = save->right;							\
+		save->right = (t);									\
+		(t) = save;											\
 	}
 #define aa_tree_split(t) \
-	if (t->level && t->right && t->right->right && t->level == t->right->right->level) {\
-		struct WordNode *save = t->right;					\
-		t->right = save->left;								\
-		save->left = t;										\
-		t = save;											\
-		++t->level;											\
+	if ((t)->level && (t)->right && (t)->right->right && (t)->level == (t)->right->right->level) {\
+		struct WordNode *save = (t)->right;					\
+		(t)->right = save->left;							\
+		save->left = (t);									\
+		(t) = save;											\
+		++(t)->level;										\
 	}
 
 static inline void WordList_AddBuffer(struct WordList *pWList) {
