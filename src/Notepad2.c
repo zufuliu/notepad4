@@ -5211,6 +5211,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	return 0;
 }
 
+extern BOOL fStylesModified;
 //=============================================================================
 //
 // LoadSettings()
@@ -5223,6 +5224,7 @@ void LoadSettings(void) {
 	LoadIniSection(L"Settings", pIniSection, cchIniSection);
 
 	const int iSettingsVersion = IniSectionGetInt(pIniSection, L"SettingsVersion", NP2SettingsVersion_None);
+	fStylesModified = iSettingsVersion != NP2SettingsVersion_Current; // compress old ini file on save
 	bSaveSettings = IniSectionGetBool(pIniSection, L"SaveSettings", 1);
 	bSaveRecentFiles = IniSectionGetBool(pIniSection, L"SaveRecentFiles", 0);
 	bSaveFindReplace = IniSectionGetBool(pIniSection, L"SaveFindReplace", 0);
