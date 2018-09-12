@@ -151,7 +151,8 @@
 * Syntax highlighting for attribute for C# like languages
 * Syntax highlighting for decorator for Python like languages
 * Folding for plain text
-* Toggle folding for specific level or current block
+* Toggle fold for specific level, shortcuts: <kbd>Alt</kbd>+<kbd>Number</kbd>
+* Toggle fold for current block without scrolling back to the block start line, shortcut: <kbd>Alt</kbd>+<kbd>C</kbd>, or context menu "Toggle Fold"
 * Insert new GUID and current timestamps
 * Number conversion between decimal, hexadecimal, octal and binary
 * Display caret location and length of selected text in count of characters

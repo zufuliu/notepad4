@@ -5019,7 +5019,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 				}
 				EditAutoCloseBraceQuote(hwndEdit, scn->ch);
 			} else if (bAutoCompleteWords/* && !SendMessage(hwndEdit, SCI_AUTOCACTIVE, 0, 0)*/) {
-				// many items int auto-complete list (> iAutoCDefaultShowItemCount), recreate it
+				// many items in auto-completion list (> iAutoCDefaultShowItemCount), recreate it
 				if (!SendMessage(hwndEdit, SCI_AUTOCACTIVE, 0, 0) || iAutoCItemCount > iAutoCDefaultShowItemCount) {
 					if (IsInlineIMEActive()) {
 						return 0;
