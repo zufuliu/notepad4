@@ -2025,23 +2025,6 @@ void UpdateStatusBarWidth(void) {
 	SendMessage(hwndStatus, SB_SETPARTS, COUNTOF(aWidth), (LPARAM)aWidth);
 }
 
-BOOL IsInlineIMEActive(void) {
-	BOOL result = FALSE;
-	if (bUseInlineIME) {
-		HIMC himc = ImmGetContext(hwndEdit);
-		if (himc) {
-			if (ImmGetOpenStatus(himc)) {
-				DWORD dwConversion = IME_CMODE_ALPHANUMERIC, dwSentence = 0;
-				if (ImmGetConversionStatus(himc, &dwConversion, &dwSentence)) {
-					result = !(dwConversion == IME_CMODE_ALPHANUMERIC);
-				}
-			}
-			ImmReleaseContext(hwndEdit, himc);
-		}
-	}
-	return result;
-}
-
 void MsgNotifyZoom(void) {
 	iZoomLevel = (int)SendMessage(hwndEdit, SCI_GETZOOM, 0, 0);
 
@@ -5014,16 +4997,10 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			}
 			// Auto close braces/quotes
 			else if (bAutoCloseBracesQuotes && (scn->ch < 0x80) && StrChrA("([{<\"\'`,", (char)(scn->ch))) {
-				if (scn->ch == '\'' && IsInlineIMEActive()) { // Chinese Pinyin separator
-					return 0;
-				}
 				EditAutoCloseBraceQuote(hwndEdit, scn->ch);
 			} else if (bAutoCompleteWords/* && !SendMessage(hwndEdit, SCI_AUTOCACTIVE, 0, 0)*/) {
 				// many items in auto-completion list (> iAutoCDefaultShowItemCount), recreate it
 				if (!SendMessage(hwndEdit, SCI_AUTOCACTIVE, 0, 0) || iAutoCItemCount > iAutoCDefaultShowItemCount) {
-					if (IsInlineIMEActive()) {
-						return 0;
-					}
 					EditCompleteWord(hwndEdit, FALSE);
 				}
 			}

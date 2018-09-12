@@ -145,8 +145,6 @@ Used by VSCode, Atom etc.
 typedef UINT_PTR (WINAPI *SetCoalescableTimerSig)(HWND hwnd, UINT_PTR nIDEvent,
 	UINT uElapse, TIMERPROC lpTimerFunc, ULONG uToleranceDelay);
 
-// GCC has trouble with the standard COM ABI so do it the old C way with explicit vtables.
-
 using namespace Scintilla;
 
 namespace {
@@ -1212,6 +1210,7 @@ sptr_t ScintillaWin::HandleCompositionInline(uptr_t, sptr_t lParam) {
 
 		const bool tmpRecordingMacro = recordingMacro;
 		recordingMacro = false;
+		inlineIMEComposition = true;
 		const int codePage = CodePageOfDocument();
 		for (size_t i = 0; i < wcs.size(); ) {
 			const size_t ucWidth = UTF16CharLength(wcs[i]);
@@ -1223,6 +1222,7 @@ sptr_t ScintillaWin::HandleCompositionInline(uptr_t, sptr_t lParam) {
 			DrawImeIndicator(imeIndicator[i], static_cast<unsigned int>(docChar.size()));
 			i += ucWidth;
 		}
+		inlineIMEComposition = false;
 		recordingMacro = tmpRecordingMacro;
 
 		// Move IME caret from current last position to imeCaretPos.
