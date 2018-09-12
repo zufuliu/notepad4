@@ -239,7 +239,7 @@ static KEYWORDLIST Keywords_PHP = {{
 "__autoload() __call() __callStatic() __clone() __construct() __destruct() __get() __invoke()  __isset() __set() __set_state() __sleep() __toString() __unset() __wakeup() "
 }};
 
-EDITLEXER lexPHP = { SCLEX_CPP, NP2LEX_PHP, L"PHP Script", L"php;", L"", &Keywords_PHP,
+EDITLEXER lexPHP = { SCLEX_CPP, NP2LEX_PHP, L"PHP Script", L"php; phpt; phtml; eyecode", L"", &Keywords_PHP,
 {
 	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
 	//{ SCE_C_DEFAULT, 63181, L"PHP Default", L"", L"" },
@@ -252,10 +252,10 @@ EDITLEXER lexPHP = { SCLEX_CPP, NP2LEX_PHP, L"PHP Script", L"php;", L"", &Keywor
 	{ SCE_C_WORD2, 63361, L"Magic Method", L"fore:#0080C0", L"" },
 	{ SCE_C_ATTRIBUTE, 63362, L"Magic Constant", L"fore:#FF8000", L""},
 	{ SCE_C_ENUMERATION, NP2STYLE_PredefinedVariable, L"Predefined Variable", L"bold; italic; fore:#0080C0", L""},
-	{ SCE_C_CONSTANT, NP2STYLE_Constant, L"Constant", L"bold; fore:#B000B0", L""},
-	{ MULTI_STYLE(SCE_C_COMMENT, SCE_C_COMMENTLINE, 0, 0), NP2STYLE_Comment, L"Comment", L"fore:#008000", L"" },
-	{ SCE_C_COMMENTDOC_TAG, NP2STYLE_DocCommentTag, L"Doc Comment Tag", L"bold; fore:#008000F", L"" },
-	{ MULTI_STYLE(SCE_C_COMMENTDOC, SCE_C_COMMENTLINEDOC, SCE_C_COMMENTDOC_TAG_XML, 0), NP2STYLE_DocComment, L"Doc Comment", L"fore:#008000", L"" },
+	{ SCE_C_CONSTANT, NP2STYLE_Constant, L"Constant", L"fore:#B000B0", L""},
+	{ MULTI_STYLE(SCE_C_COMMENT, SCE_C_COMMENTLINE, 0, 0), NP2STYLE_Comment, L"Comment", L"fore:#608060", L"" },
+	{ SCE_C_COMMENTDOC_TAG, NP2STYLE_DocCommentTag, L"Doc Comment Tag", L"fore:#408080", L"" },
+	{ MULTI_STYLE(SCE_C_COMMENTDOC, SCE_C_COMMENTLINEDOC, SCE_C_COMMENTDOC_TAG_XML, 0), NP2STYLE_DocComment, L"Doc Comment", L"fore:#408040", L"" },
 	{ MULTI_STYLE(SCE_C_STRING, SCE_C_CHARACTER, SCE_C_STRINGEOL, 0), NP2STYLE_String, L"String", L"fore:#008000", L"" },
 	{ SCE_C_HEREDOC, 63364, L"Heredoc String", L"fore:#648000", L"" },
 	{ SCE_C_NOWDOC, 63365, L"Nowdoc String", L"fore:#A46000", L"" },
@@ -263,7 +263,7 @@ EDITLEXER lexPHP = { SCLEX_CPP, NP2LEX_PHP, L"PHP Script", L"php;", L"", &Keywor
 	{ SCE_C_NUMBER, NP2STYLE_Number, L"Number", L"fore:#FF0000", L"" },
 	{ MULTI_STYLE(SCE_C_VARIABLE, SCE_C_VARIABLE2, 0, 0), NP2STYLE_Variable, L"Variable", L"italic; fore:#003CE6", L"" },
 	{ SCE_C_OPERATOR, NP2STYLE_Operator, L"Operator", L"fore:#B000B0", L"" },
-	{ SCE_C_XML_TAG, 63366, L"PHP Tag", L"fore:#8B008B", L"" },
+	{ SCE_C_XML_TAG, 63366, L"PHP Tag", L"bold; fore:#8B008B", L"" },
 	{ -1, 00000, L"", L"", L"" }
 }
 };

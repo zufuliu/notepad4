@@ -29,7 +29,7 @@ static KEYWORDLIST Keywords_FSharp = {{
 , "", "", "", "", "", "", ""
 }};
 
-EDITLEXER lexFSharp = { SCLEX_FSHARP, NP2LEX_FSHARP, L"F# Source", L"fs; fsi; fsx; fsscript; fsl; fsy", L"", &Keywords_FSharp,
+EDITLEXER lexFSharp = { SCLEX_FSHARP, NP2LEX_FSHARP, L"F# Source", L"fs; fsi; fsx; fsscript; fsl; fsy; ml; mli; sml; nb", L"", &Keywords_FSharp,
 {
 	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
 	//{ SCE_FSHARP_DEFAULT, L"Default", L"", L"" },
@@ -37,7 +37,7 @@ EDITLEXER lexFSharp = { SCLEX_FSHARP, NP2LEX_FSHARP, L"F# Source", L"fs; fsi; fs
 	{ SCE_FSHARP_TYPEKEYWORD, NP2STYLE_TypeKeyword, L"Type Keyword", L"fore:#1E90FF", L"" },
 	{ SCE_FSHARP_PREPROCESSOR, NP2STYLE_Preprocessor, L"Preprocessor", L"fore:#FF8000", L"" },
 	{ SCE_FSHARP_ATTRIBUTE, NP2STYLE_Attribute, L"Attribute", L"fore:#FF8000", L""},
-	{ MULTI_STYLE(SCE_FSHARP_COMMENT, SCE_FSHARP_COMMENTLINE, 0, 0), NP2STYLE_Comment, L"Comment", L"fore:#008000", L"" },
+	{ MULTI_STYLE(SCE_FSHARP_COMMENT, SCE_FSHARP_COMMENTLINE, 0, 0), NP2STYLE_Comment, L"Comment", L"fore:#608060", L"" },
 	{ MULTI_STYLE(SCE_FSHARP_STRING, SCE_FSHARP_STRINGEOL, SCE_FSHARP_CHARACTER, 0), NP2STYLE_String, L"String", L"fore:#008000", L"" },
 	{ SCE_FSHARP_VERBATIM, NP2STYLE_VerbatimString, L"Verbatim String", L"fore:#008080", L"" },
 	{ SCE_FSHARP_QUOTATION, NP2STYLE_CodeQuotation, L"Code Quotation", L"fore:#006633; back:#FFF1A8", L"" },

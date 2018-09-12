@@ -45,7 +45,7 @@ EDITLEXER lexCMake = { SCLEX_CMAKE, NP2LEX_CMAKE, L"CMake Script", L"cmake; ctes
 	//{ SCE_CMAKE_DEFAULT, L"Default", L"", L"" },
 	{ SCE_CMAKE_WORD, NP2STYLE_Keyword, L"Keyword", L"fore:#0000FF", L"" },
 	{ SCE_CMAKE_COMMANDS, NP2STYLE_Command, L"Command", L"fore:#FF8000", L"" },
-	{ SCE_CMAKE_COMMENT, NP2STYLE_Comment, L"Comment", L"fore:#008000", L"" },
+	{ SCE_CMAKE_COMMENT, NP2STYLE_Comment, L"Comment", L"fore:#608060", L"" },
 	{ MULTI_STYLE(SCE_CMAKE_STRINGDQ, SCE_CMAKE_STRINGSQ, SCE_CMAKE_STRINGBT, 0), NP2STYLE_String, L"String", L"fore:#008080", L"" },
 	//{ SCE_CMAKE_NUMBER, NP2STYLE_Number, L"Number", L"fore:#FF0000", L"" },
 	{ SCE_CMAKE_VARIABLE, NP2STYLE_Variable, L"Variable", L"fore:#CC3300", L"" },

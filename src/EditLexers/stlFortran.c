@@ -16,13 +16,13 @@ static KEYWORDLIST Keywords_Fortran = {{
 , "", "", "", "", "", "", ""
 }};
 
-EDITLEXER lexFortran = { SCLEX_FORTRAN, NP2LEX_FORTRAN, L"Fortran Source", L"f; for; f90; f95; f03; f08; hf", L"", &Keywords_Fortran,
+EDITLEXER lexFortran = { SCLEX_FORTRAN, NP2LEX_FORTRAN, L"Fortran Source", L"f; for; ftn; fpp; f90; f95; f03; f08; hf", L"", &Keywords_Fortran,
 {
 	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
 	//{ SCE_F_DEFAULT, L"Default", L"", L"" },
 	{ SCE_F_WORD, NP2STYLE_Keyword, L"Keyword", L"fore:#0000FF", L"" },
 	{ SCE_F_WORD2, NP2STYLE_BasicFunction, L"Basic Function", L"fore:#0080FF", L"" },
-	{ SCE_F_COMMENT, NP2STYLE_Comment, L"Comment", L"fore:#008000", L"" },
+	{ SCE_F_COMMENT, NP2STYLE_Comment, L"Comment", L"fore:#608060", L"" },
 	{ MULTI_STYLE(SCE_F_STRING1, SCE_F_STRING2, SCE_F_STRINGEOL, 0), NP2STYLE_String, L"String", L"fore:#008000", L"" },
 	{ SCE_F_NUMBER, NP2STYLE_Number, L"Number", L"fore:#FF0000", L"" },
 	{ MULTI_STYLE(SCE_F_OPERATOR, SCE_F_OPERATOR2, 0, 0), NP2STYLE_Operator, L"Operator", L"fore:#B000B0", L"" },

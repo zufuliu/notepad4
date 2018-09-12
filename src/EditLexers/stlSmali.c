@@ -118,7 +118,7 @@ static KEYWORDLIST Keywords_Smail = {{
 , "", "", "", ""
 }};
 
-EDITLEXER lexSmali = { SCLEX_SMALI, NP2LEX_SMALI, L"Android Smali", L"smali", L"", &Keywords_Smail,
+EDITLEXER lexSmali = { SCLEX_SMALI, NP2LEX_SMALI, L"Android Smali", L"smali; ddx", L"", &Keywords_Smail,
 {
 	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
 	//{ SCE_SMALI_DEFAULT, L"Default", L"", L"" },
@@ -129,9 +129,9 @@ EDITLEXER lexSmali = { SCLEX_SMALI, NP2LEX_SMALI, L"Android Smali", L"smali", L"
 	{ SCE_SMALI_TYPE, NP2STYLE_Type, L"Type", L"bold; fore:#007F7F", L"" },
 	{ SCE_SMALI_FIELD, NP2STYLE_Field, L"Field", L"fore:#648000", L"" },
 	{ SCE_SMALI_METHOD, NP2STYLE_Method, L"Method", L"fore:#A46000", L"" },
-	{ SCE_SMALI_COMMENTLINE, NP2STYLE_Comment, L"Comment", L"fore:#008000", L"" },
+	{ SCE_SMALI_COMMENTLINE, NP2STYLE_Comment, L"Comment", L"fore:#608060", L"" },
 	{ MULTI_STYLE(SCE_SMALI_STRING, SCE_SMALI_CHARACTER, 0, 0), NP2STYLE_String, L"String", L"fore:#008000", L"" },
-	{ MULTI_STYLE(SCE_SMALI_LABEL, SCE_SMALI_LABEL_EOL, 0, 0), NP2STYLE_Label, L"Label", L"fore:#000000; back:#FFC040", L""},
+	{ MULTI_STYLE(SCE_SMALI_LABEL, SCE_SMALI_LABEL_EOL, 0, 0), NP2STYLE_Label, L"Label", L"fore:#000000; back:#FFC040; eolfilled", L""},
 	{ SCE_SMALI_NUMBER, NP2STYLE_Number, L"Number", L"fore:#FF0000", L"" },
 	{ SCE_SMALI_OPERATOR, NP2STYLE_Operator, L"Operator", L"fore:#B000B0", L"" },
 	{ -1, 00000, L"", L"", L"" }

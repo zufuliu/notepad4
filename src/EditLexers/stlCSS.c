@@ -67,7 +67,7 @@ EDITLEXER lexCSS = { SCLEX_CSS, NP2LEX_CSS, L"CSS Style Sheet", L"css; scss; les
 {
 	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
 	//{ SCE_CSS_DEFAULT, L"Default", L"", L"" },
-	{ SCE_CSS_COMMENT, NP2STYLE_Comment, L"Comment", L"fore:#008000", L"" },
+	{ SCE_CSS_COMMENT, NP2STYLE_Comment, L"Comment", L"fore:#608060", L"" },
 	{ SCE_CSS_TAG, 63161, L"HTML Tag", L"bold; fore:#0A246A", L"" },
 	{ SCE_CSS_CLASS, 63301, L"Tag Class", L"fore:#648000", L"" },
 	{ SCE_CSS_ID, 63302, L"Tag Id", L"fore:#648000", L"" },

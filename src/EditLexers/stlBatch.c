@@ -46,7 +46,7 @@ EDITLEXER lexBatch = { SCLEX_BATCH, NP2LEX_BATCH, L"Batch File", L"bat; cmd", L"
 	//{ SCE_BAT_DEFAULT, L"Default", L"", L"" },
 	{ SCE_BAT_COMMENT, NP2STYLE_Comment, L"Comment", L"fore:#008000", L"" },
 	{ SCE_BAT_WORD, NP2STYLE_Keyword, L"Keyword", L"bold; fore:#FF8000", L"" },
-	{ SCE_BAT_COMMAND, NP2STYLE_Command, L"Command", L"bold", L"" },
+	{ SCE_BAT_COMMAND, NP2STYLE_Command, L"Command", L"bold; fore:#0080FF", L"" },
 	{ MULTI_STYLE(SCE_BAT_STRINGDQ, SCE_BAT_STRINGSQ, SCE_BAT_STRINGBT, 0), NP2STYLE_String, L"String", L"fore:#008080", L"" },
 	{ SCE_BAT_VARIABLE, NP2STYLE_Variable, L"Variable", L"fore:#003CE6; back:#FFF1A8", L"" },
 	{ SCE_BAT_OPERATOR, NP2STYLE_Operator, L"Operator", L"fore:#B000B0", L"" },

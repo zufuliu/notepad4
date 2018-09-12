@@ -13,7 +13,7 @@ EDITLEXER lexLaTeX = { SCLEX_LATEX, NP2LEX_LATEX, L"LaTeX File", L"tex; latex; s
 {
 	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
 	{ SCE_L_COMMAND, NP2STYLE_Command, L"Command", L"fore:#0000FF", L"" },
-	{ MULTI_STYLE(SCE_L_COMMENT, SCE_L_COMMENT2, 0, 0), NP2STYLE_Comment, L"Comment", L"fore:#008000", L"" },
+	{ MULTI_STYLE(SCE_L_COMMENT, SCE_L_COMMENT2, 0, 0), NP2STYLE_Comment, L"Comment", L"fore:#608060", L"" },
 	{ SCE_L_TITLE, 63575, L"Title", L"fore:#008000", L"" },
 	{ SCE_L_CHAPTER, 63579, L"Chapter", L"fore:#008000", L"" },
 	{ MULTI_STYLE(SCE_L_SECTION, SCE_L_SECTION1, SCE_L_SECTION2, 0), 63511, L"Section", L"fore:#008000", L"" },
@@ -66,10 +66,10 @@ EDITLEXER lexTexinfo = { SCLEX_TEXINFO, NP2LEX_TEXINFO, L"Texinfo File", L"texi;
 {
 	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
 	{ SCE_L_COMMAND, NP2STYLE_Command, L"Command", L"fore:#0000FF", L"" },
-	{ MULTI_STYLE(SCE_L_COMMENT, SCE_L_COMMENT2, 0, 0), NP2STYLE_Comment, L"Comment", L"fore:#008000", L"" },
-	{ SCE_L_TITLE, 63575, L"Title", L"fore:#008000", L"" },
-	{ SCE_L_CHAPTER, 63579, L"Chapter", L"fore:#008000", L"" },
-	{ MULTI_STYLE(SCE_L_SECTION, SCE_L_SECTION1, SCE_L_SECTION2, 0), 63511, L"Section", L"fore:#008000", L"" },
+	{ MULTI_STYLE(SCE_L_COMMENT, SCE_L_COMMENT2, 0, 0), NP2STYLE_Comment, L"Comment", L"fore:#608060", L"" },
+	{ SCE_L_TITLE, 63575, L"Title", L"back:#FF8040; eolfilled", L"" },
+	{ SCE_L_CHAPTER, 63579, L"Chapter", L"back:#FF8040; eolfilled", L"" },
+	{ MULTI_STYLE(SCE_L_SECTION, SCE_L_SECTION1, SCE_L_SECTION2, 0), 63511, L"Section", L"back:#FF8040; eolfilled", L"" },
 	{ SCE_L_SPECIAL, 63572, L"Special Char", L"fore:#3A6EA5", L"" },
 	{ SCE_L_OPERATOR, NP2STYLE_Operator, L"Operator", L"fore:#B000B0", L"" },
 	{ -1, 00000, L"", L"", L"" }

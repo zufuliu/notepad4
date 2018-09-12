@@ -113,7 +113,7 @@ static KEYWORDLIST Keywords_Java = {{
 "for^() if^() switch^() while^() catch^() else^if^() else^{} synchronized^() try^() "
 }};
 
-EDITLEXER lexJava = { SCLEX_CPP, NP2LEX_JAVA, L"Java Source", L"java", L"", &Keywords_Java,
+EDITLEXER lexJava = { SCLEX_CPP, NP2LEX_JAVA, L"Java Source", L"java; jad; aidl", L"", &Keywords_Java,
 {
 	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
 	//{ SCE_C_DEFAULT, L"Default", L"", L"" },
@@ -125,11 +125,11 @@ EDITLEXER lexJava = { SCLEX_CPP, NP2LEX_JAVA, L"Java Source", L"java", L"", &Key
 	{ SCE_C_INTERFACE, NP2STYLE_Interface, L"Interface", L"bold; fore:#1E90FF", L""},
 	{ SCE_C_FUNCTION, NP2STYLE_Method, L"Method", L"fore:#A46000", L"" },
 	{ SCE_C_ENUMERATION, NP2STYLE_Enumeration, L"Enumeration", L"fore:#FF8000", L""},
-	{ SCE_C_CONSTANT, NP2STYLE_Constant, L"Constant", L"bold; fore:#B000B0", L""},
-	{ MULTI_STYLE(SCE_C_COMMENT, SCE_C_COMMENTLINE, 0, 0), NP2STYLE_Comment, L"Comment", L"fore:#008000", L"" },
-	{ SCE_C_COMMENTDOC_TAG, NP2STYLE_DocCommentTag, L"Doc Comment Tag", L"bold; fore:#008000F", L"" },
-	{ SCE_C_COMMENTDOC_TAG_XML, NP2STYLE_DocCommentTagHTML, L"Doc Comment HTML Tag", L"bold; fore:#008000F", L"" },
-	{ MULTI_STYLE(SCE_C_COMMENTDOC, SCE_C_COMMENTLINEDOC, 0, 0), NP2STYLE_DocComment, L"Doc Comment", L"fore:#008000", L"" },
+	{ SCE_C_CONSTANT, NP2STYLE_Constant, L"Constant", L"fore:#B000B0", L""},
+	{ MULTI_STYLE(SCE_C_COMMENT, SCE_C_COMMENTLINE, 0, 0), NP2STYLE_Comment, L"Comment", L"fore:#608060", L"" },
+	{ SCE_C_COMMENTDOC_TAG, NP2STYLE_DocCommentTag, L"Doc Comment Tag", L"fore:#408080", L"" },
+	{ SCE_C_COMMENTDOC_TAG_XML, NP2STYLE_DocCommentTagHTML, L"Doc Comment HTML Tag", L"fore:#808080", L"" },
+	{ MULTI_STYLE(SCE_C_COMMENTDOC, SCE_C_COMMENTLINEDOC, 0, 0), NP2STYLE_DocComment, L"Doc Comment", L"fore:#408040", L"" },
 	{ MULTI_STYLE(SCE_C_STRING, SCE_C_CHARACTER, SCE_C_STRINGEOL, 0), NP2STYLE_String, L"String", L"fore:#008000", L"" },
 	{ SCE_C_LABEL, NP2STYLE_Label, L"Label", L"fore:#000000; back:#FFC040", L""},
 	{ SCE_C_NUMBER, NP2STYLE_Number, L"Number", L"fore:#FF0000", L"" },

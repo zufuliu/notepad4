@@ -10,7 +10,7 @@ static KEYWORDLIST Keywords_JSON = {{
 "", "", "", "", "", "", "", ""
 }};
 
-EDITLEXER lexJSON = { SCLEX_JSON, NP2LEX_JSON, L"JSON Document", L"json", L"", &Keywords_JSON,
+EDITLEXER lexJSON = { SCLEX_JSON, NP2LEX_JSON, L"JSON Document", L"json; har; ipynb", L"", &Keywords_JSON,
 {
 	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
 	//{ SCE_C_DEFAULT, L"Default", L"", L"" },
@@ -19,7 +19,7 @@ EDITLEXER lexJSON = { SCLEX_JSON, NP2LEX_JSON, L"JSON Document", L"json", L"", &
 	{ SCE_C_STRING, NP2STYLE_String, L"String", L"fore:#008000", L"" },
 	{ SCE_C_NUMBER, NP2STYLE_Number, L"Number", L"fore:#FF0000", L"" },
 	{ SCE_C_OPERATOR, NP2STYLE_Operator, L"Operator", L"fore:#B000B0", L"" },
-	{ MULTI_STYLE(SCE_C_COMMENT, SCE_C_COMMENTLINE, 0, 0), NP2STYLE_Comment, L"Comment", L"fore:#008000", L"" },
+	{ MULTI_STYLE(SCE_C_COMMENT, SCE_C_COMMENTLINE, 0, 0), NP2STYLE_Comment, L"Comment", L"fore:#608060", L"" },
 	{ -1, 00000, L"", L"", L"" }
 }
 };
