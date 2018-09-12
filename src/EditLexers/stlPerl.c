@@ -37,7 +37,7 @@ EDITLEXER lexPerl = { SCLEX_PERL, NP2LEX_PERL, L"Perl Script", L"pl; pm; cgi; po
 {
 	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
 	//{ SCE_PL_DEFAULT, L"Default", L"", L"" },
-	{ SCE_PL_COMMENTLINE, NP2STYLE_Comment, L"Comment", L"fore:#008000", L"" },
+	{ SCE_PL_COMMENTLINE, NP2STYLE_Comment, L"Comment", L"fore:#608060", L"" },
 	{ SCE_PL_WORD, NP2STYLE_Keyword, L"Keyword", L"bold; fore:#FF8000", L"" },
 	{ MULTI_STYLE(SCE_PL_STRING, SCE_PL_CHARACTER, 0, 0), NP2STYLE_String, L"String", L"fore:#008000", L"" },
 	{ SCE_PL_NUMBER, NP2STYLE_Number, L"Number", L"fore:#FF0000", L"" },

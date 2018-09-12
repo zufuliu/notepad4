@@ -37,7 +37,7 @@ static KEYWORDLIST Keywords_Matlab = {{
 , "", "", "", "", "", "", ""
 }};
 
-EDITLEXER lexMatlab = { SCLEX_MATLAB, NP2LEX_MATLAB, L"MATLAB Code", L"m", L"", &Keywords_Matlab,
+EDITLEXER lexMatlab = { SCLEX_MATLAB, NP2LEX_MATLAB, L"MATLAB Code", L"m; sce; sci", L"", &Keywords_Matlab,
 {
 	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
 	//	{ SCE_MAT_DEFAULT, L"Default", L"", L"" },
@@ -47,7 +47,7 @@ EDITLEXER lexMatlab = { SCLEX_MATLAB, NP2LEX_MATLAB, L"MATLAB Code", L"m", L"", 
 	{ MULTI_STYLE(SCE_MAT_FUNCTION1, SCE_MAT_FUNCTION2, 0, 0), NP2STYLE_BasicFunction, L"Basic Function", L"fore:#FF0080", L"" },
 	{ SCE_MAT_FUNCTION, NP2STYLE_Function, L"Function", L"fore:#A46000", L"" },
 	{ SCE_MAT_CALLBACK, NP2STYLE_Callback, L"Callback", L"fore:#FF0080", L"" },
-	{ MULTI_STYLE(SCE_MAT_COMMENT, SCE_MAT_COMMENTBLOCK, 0, 0), NP2STYLE_Comment, L"Comment", L"fore:#008000", L"" },
+	{ MULTI_STYLE(SCE_MAT_COMMENT, SCE_MAT_COMMENTBLOCK, 0, 0), NP2STYLE_Comment, L"Comment", L"fore:#608060", L"" },
 	{ MULTI_STYLE(SCE_MAT_STRING, SCE_MAT_DOUBLEQUOTESTRING, 0, 0), NP2STYLE_String, L"String", L"fore:#008000", L"" },
 	{ MULTI_STYLE(SCE_MAT_NUMBER, SCE_MAT_HEXNUM, 0, 0), NP2STYLE_Number, L"Number", L"fore:#FF0000", L"" },
 	{ SCE_MAT_OPERATOR, NP2STYLE_Operator, L"Operator", L"fore:#B000B0", L"" },

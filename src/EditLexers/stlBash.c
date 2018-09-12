@@ -42,8 +42,8 @@ EDITLEXER lexBash = { SCLEX_BASH, NP2LEX_BASH, L"Shell Script", L"sh; csh; zsh; 
 {
 	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
 	//{ SCE_SH_ERROR, 63531, L"Error", L"", L"" },
-	{ MULTI_STYLE(SCE_SH_COMMENTLINE, 0, 0, 0), NP2STYLE_Comment, L"Comment", L"fore:#008000", L"" },
-	{ SCE_SH_WORD, NP2STYLE_Keyword, L"Keyword", L"fore:#0000FF", L"" },
+	{ MULTI_STYLE(SCE_SH_COMMENTLINE, 0, 0, 0), NP2STYLE_Comment, L"Comment", L"fore:#608060", L"" },
+	{ SCE_SH_WORD, NP2STYLE_Keyword, L"Keyword", L"bold; fore:#FF8000", L"" },
 	{ SCE_SH_STRING, 63532, L"Double Quoted String", L"fore:#008080", L"" },
 	{ SCE_SH_CHARACTER, 63533, L"Single Quoted String", L"fore:#800080", L"" },
 	{ SCE_SH_NUMBER, NP2STYLE_Number, L"Number", L"fore:#FF0000", L"" },
@@ -51,8 +51,8 @@ EDITLEXER lexBash = { SCLEX_BASH, NP2LEX_BASH, L"Shell Script", L"sh; csh; zsh; 
 	{ SCE_SH_SCALAR, 63534, L"Scalar", L"fore:#808000", L"" },
 	{ SCE_SH_PARAM, 63535, L"Parameter Expansion", L"fore:#808000; back:#FFFF99", L"" },
 	{ SCE_SH_BACKTICKS, NP2STYLE_Backticks, L"Backticks", L"fore:#FF0080", L"" },
-	{ SCE_SH_HERE_DELIM, 63537, L"Here-doc (Delimiter)", L"fore:#008080", L"" },
-	{ SCE_SH_HERE_Q, 63538, L"Here-doc (Single Quoted, q)", L"fore:#008080", L"" },
+	{ SCE_SH_HERE_DELIM, 63537, L"Here-doc (Delimiter)", L"fore:#A46000; back:#FFFFC0; eolfilled", L"" },
+	{ SCE_SH_HERE_Q, 63538, L"Here-doc (Single Quoted, q)", L"fore:#A46000; back:#FFFFC0; eolfilled", L"" },
 	{ -1, 00000, L"", L"", L"" }
 }
 };

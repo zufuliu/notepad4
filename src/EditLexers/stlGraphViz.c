@@ -44,7 +44,7 @@ EDITLEXER lexDOT = { SCLEX_GRAPHVIZ, NP2LEX_DOT, L"GraphViz Dot", L"dot; gv", L"
 	{ SCE_C_WORD2, NP2STYLE_Attribute, L"Attribute", L"fore:#FF8000", L""},
 	{ SCE_C_LABEL, NP2STYLE_XMLValue, L"Value", L"fore:#008287", L""},
 	{ SCE_C_DIRECTIVE, NP2STYLE_Label, L"Label", L"fore:#008287", L""},
-	{ MULTI_STYLE(SCE_C_COMMENT, SCE_C_COMMENTLINE, SCE_C_COMMENTDOC, 0), NP2STYLE_Comment, L"Comment", L"fore:#008000", L"" },
+	{ MULTI_STYLE(SCE_C_COMMENT, SCE_C_COMMENTLINE, SCE_C_COMMENTDOC, 0), NP2STYLE_Comment, L"Comment", L"fore:#608060", L"" },
 	{ SCE_C_STRING, NP2STYLE_String, L"String", L"fore:#008000", L"" },
 	{ SCE_C_NUMBER, NP2STYLE_Number, L"Number", L"fore:#FF0000", L"" },
 	{ SCE_C_OPERATOR, NP2STYLE_Operator, L"Operator", L"fore:#B000B0", L"" },

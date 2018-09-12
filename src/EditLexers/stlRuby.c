@@ -23,7 +23,7 @@ static KEYWORDLIST Keywords_Ruby = {{
 , "", "", "", "", "", "", ""
 }};
 
-EDITLEXER lexRuby = { SCLEX_RUBY, NP2LEX_RUBY, L"Ruby Script", L"rb; ruby; rbw; rake; rjs", L"", &Keywords_Ruby,
+EDITLEXER lexRuby = { SCLEX_RUBY, NP2LEX_RUBY, L"Ruby Script", L"rb; ruby; rbw; rake; rjs; podspec", L"", &Keywords_Ruby,
 {
 	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
 	//{ SCE_P_DEFAULT, L"Default", L"", L"" },
@@ -34,7 +34,7 @@ EDITLEXER lexRuby = { SCLEX_RUBY, NP2LEX_RUBY, L"Ruby Script", L"rb; ruby; rbw; 
 	{ SCE_RB_FUNCTION, NP2STYLE_Function, L"Function", L"fore:#A46000", L"" },
 	{ SCE_RB_NUMBER, NP2STYLE_Number, L"Number", L"fore:#FF0000", L"" },
 	{ SCE_RB_OPERATOR, NP2STYLE_Operator, L"Operator", L"fore:#B000B0", L"" },
-	{ SCE_RB_COMMENTLINE, NP2STYLE_Comment, L"Comment", L"fore:#008000", L"" },
+	{ SCE_RB_COMMENTLINE, NP2STYLE_Comment, L"Comment", L"fore:#608060", L"" },
 	{ MULTI_STYLE(SCE_RB_STRING, SCE_RB_CHARACTER, 0, 0), NP2STYLE_String, L"String", L"fore:#008000", L"" },
 	{ SCE_RB_POD, 63472, L"POD", L"fore:#004000; back:#C0FFC0; eolfilled", L"" },
 	{ SCE_RB_BACKTICKS, NP2STYLE_Backticks, L"Backticks", L"fore:#FF0080", L"" },

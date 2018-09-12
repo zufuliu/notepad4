@@ -119,7 +119,7 @@ EDITLEXER lexAU3 = { SCLEX_AU3, NP2LEX_AU3, L"AutoIt3 Script", L"au3", L"", &Key
 	{ SCE_AU3_KEYWORD, NP2STYLE_Keyword, L"Keyword", L"fore:#0000FF", L"" },
 	{ SCE_AU3_FUNCTION, NP2STYLE_Function, L"Function", L"fore:#0000FF", L"" },
 	{ SCE_AU3_MACRO, NP2STYLE_Macro, L"Macro", L"fore:#0080FF", L"" },
-	{ MULTI_STYLE(SCE_AU3_COMMENT, SCE_AU3_COMMENTBLOCK, 0, 0), NP2STYLE_Comment, L"Comment", L"fore:#008000", L"" },
+	{ MULTI_STYLE(SCE_AU3_COMMENT, SCE_AU3_COMMENTBLOCK, 0, 0), NP2STYLE_Comment, L"Comment", L"fore:#608060", L"" },
 	{ SCE_AU3_STRING, NP2STYLE_String, L"String", L"fore:#008080", L"" },
 	{ SCE_AU3_NUMBER, NP2STYLE_Number, L"Number", L"fore:#FF0000", L"" },
 	{ SCE_AU3_OPERATOR, NP2STYLE_Operator, L"Operator", L"fore:#C000C0", L"" },

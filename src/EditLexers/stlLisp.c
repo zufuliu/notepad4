@@ -13,7 +13,7 @@ static KEYWORDLIST Keywords_LISP = {{
 "", "", "", "", "", "", "", ""
 }};
 
-EDITLEXER lexLisp = { SCLEX_LISP, NP2LEX_LISP, L"Lisp Script", L"lisp; el; lsp", L"", &Keywords_LISP,
+EDITLEXER lexLisp = { SCLEX_LISP, NP2LEX_LISP, L"Lisp Script", L"lisp; el; lsp; clj; cljs", L"", &Keywords_LISP,
 {
 	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
 	//{ SCE_C_DEFAULT, L"Default", L"", L"" },

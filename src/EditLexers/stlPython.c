@@ -292,7 +292,7 @@ static KEYWORDLIST Keywords_Python = {{
 , "", "", ""
 }};
 
-EDITLEXER lexPython  = { SCLEX_PYTHON, NP2LEX_PYTHON, L"Python Script", L"py; pyw", L"", &Keywords_Python,
+EDITLEXER lexPython  = { SCLEX_PYTHON, NP2LEX_PYTHON, L"Python Script", L"py; pyw; pyx; boo; empy; cobra", L"", &Keywords_Python,
 {
 	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
 	//{ SCE_PY_DEFAULT, L"Default", L"", L"" },
@@ -305,8 +305,8 @@ EDITLEXER lexPython  = { SCLEX_PYTHON, NP2LEX_PYTHON, L"Python Script", L"py; py
 	{ SCE_PY_DECORATOR, 63465, L"Decorator", L"fore:#C65D09", L""},
 	{ SCE_PY_BUILDIN_CONST, 63468, L"Build-in Constant", L"bold; fore:#008080", L"" },
 	{ SCE_PY_BUILDIN_FUNC, 63466, L"Build-in Function", L"fore:#0080C0", L"" },
-	{ SCE_PY_OBJ_FUNC, 63467, L"object Method", L"fore:#FF8000", L"" },
-	{ MULTI_STYLE(SCE_PY_COMMENTLINE, SCE_PY_COMMENTBLOCK, 0, 0), NP2STYLE_Comment, L"Comment", L"fore:#008000", L"" },
+	{ SCE_PY_OBJ_FUNC, 63467, L"object Method", L"fore:#0080C0", L"" },
+	{ MULTI_STYLE(SCE_PY_COMMENTLINE, SCE_PY_COMMENTBLOCK, 0, 0), NP2STYLE_Comment, L"Comment", L"fore:#608060", L"" },
 	{ MULTI_STYLE(SCE_PY_STRING1, SCE_PY_STRING2, 0, 0), NP2STYLE_String, L"String", L"fore:#008000", L"" },
 	{ MULTI_STYLE(SCE_PY_RAW_STRING1, SCE_PY_RAW_STRING2, 0, 0), NP2STYLE_RawString, L"Raw String", L"fore:#008080", L"" },
 	{ MULTI_STYLE(SCE_PY_TRIPLE_STRING1, SCE_PY_TRIPLE_STRING2, 0, 0), NP2STYLE_TripleString, L"Triple Quoted String", L"fore:#F08000", L"" },

@@ -40,8 +40,8 @@ static KEYWORDLIST Keywords_Tcl = {{
 EDITLEXER lexTcl = { SCLEX_TCL, NP2LEX_TCL, L"Tcl Script", L"tcl; itcl; tm", L"", &Keywords_Tcl,
 {
 	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
-	{ SCE_TCL__MULTI_KEYWORD, NP2STYLE_Keyword, L"Keyword", L"bold; fore:#0000FF", L"" },
-	{ SCE_TCL__MULTI_COMMENT, NP2STYLE_Comment, L"Comment", L"fore:#008000", L"" },
+	{ SCE_TCL__MULTI_KEYWORD, NP2STYLE_Keyword, L"Keyword", L"bold; fore:#FF8000", L"" },
+	{ SCE_TCL__MULTI_COMMENT, NP2STYLE_Comment, L"Comment", L"fore:#608060", L"" },
 	{ SCE_TCL_IN_QUOTE, NP2STYLE_String, L"String", L"fore:#008000", L"" },
 	{ SCE_TCL_NUMBER, NP2STYLE_Number, L"Number", L"fore:#FF0000", L"" },
 	{ SCE_TCL_OPERATOR, NP2STYLE_Operator, L"Operator", L"fore:#B000B0", L"" },
