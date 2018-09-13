@@ -31,7 +31,7 @@
 #include "resource.h"
 
 #ifndef NDEBUG
-void DLog(const char *fmt, ...) {
+void DLogf(const char *fmt, ...) {
 	char buf[1024] = "";
 	va_list va;
 	va_start(va, fmt);

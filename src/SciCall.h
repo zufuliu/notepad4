@@ -86,6 +86,10 @@ static inline int SciCall_GetLineLength(int line) {
 	return (int)SciCall1(SCI_GETLINE, line);
 }
 
+static inline Sci_Position SciCall_GetLineEndPosition(int line) {
+	return (Sci_Position)SciCall1(SCI_GETLINEENDPOSITION, line);
+}
+
 static inline int SciCall_GetLine(int line, char *buffer) {
 	return (int)SciCall2(SCI_GETLINE, line, buffer);
 }
@@ -171,6 +175,14 @@ static inline void SciCall_SetMarginType(int margin, int marginType) {
 
 static inline void SciCall_SetMarginWidth(int margin, int pixelWidth) {
 	SciCall2(SCI_SETMARGINWIDTHN, margin, pixelWidth);
+}
+
+static inline int SciCall_GetMarginWidth(int margin) {
+	return (int)SciCall1(SCI_GETMARGINWIDTHN, margin);
+}
+
+static inline int SciCall_TextWidth(int style, const char *text) {
+	return (int)SciCall2(SCI_TEXTWIDTH, style, text);
 }
 
 static inline void SciCall_SetMarginMask(int margin, int mask) {

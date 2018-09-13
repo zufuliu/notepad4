@@ -297,6 +297,15 @@ extern int iCaretBlinkPeriod;
 BOOL	fIsElevated = FALSE;
 WCHAR	wchWndClass[16] = WC_NOTEPAD2;
 
+// rarely changed statusbar items
+struct CachedStatusItem {
+	WCHAR tchLexerName[128];
+	WCHAR tchZoom[16];
+
+	LPCWSTR pszLexerName; // point to tchLexerName or a literal string
+	LPCWSTR pszOvrMode;
+} cachedStatusItem;
+
 HINSTANCE	g_hInstance;
 HANDLE		g_hDefaultHeap;
 HANDLE		g_hScintilla;
@@ -1423,8 +1432,8 @@ void UpdateSelectionMarginWidth() {
 
 void UpdateFoldMarginWidth() {
 	if (bShowCodeFolding) {
-		const int iLineMarginWidthNow = (int)SendMessage(hwndEdit, SCI_GETMARGINWIDTHN, MARGIN_FOLD_INDEX, 0);
-		const int iLineMarginWidthFit = (int)SendMessage(hwndEdit, SCI_TEXTWIDTH, STYLE_LINENUMBER, (LPARAM)"+_");
+		const int iLineMarginWidthNow = SciCall_GetMarginWidth(MARGIN_FOLD_INDEX);
+		const int iLineMarginWidthFit = SciCall_TextWidth(STYLE_LINENUMBER, "+_");
 
 		if (iLineMarginWidthNow != iLineMarginWidthFit) {
 			SciCall_SetMarginWidth(MARGIN_FOLD_INDEX, iLineMarginWidthFit);
@@ -1614,6 +1623,7 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	// Create Toolbar and Statusbar
 	CreateBars(hwnd, hInstance);
+	UpdateStatusBarCache(STATUS_OVRMODE);
 
 	// Window Initialization
 
@@ -1994,20 +2004,33 @@ void MsgSize(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	UpdateStatusBarWidth();
 }
 
+void UpdateStatusBarCache(int item) {
+	switch (item) {
+	case STATUS_LEXER:
+		cachedStatusItem.pszLexerName = Style_GetCurrentLexerName(cachedStatusItem.tchLexerName, COUNTOF(cachedStatusItem.tchLexerName));
+		break;
+
+	case STATUS_OVRMODE:
+		cachedStatusItem.pszOvrMode = SendMessage(hwndEdit, SCI_GETOVERTYPE, 0, 0) ? L"OVR" : L"INS";
+		break;
+
+	case STATUS_DOCZOOM:
+		wsprintf(cachedStatusItem.tchZoom, L" %i%%", iZoomLevel);
+		break;
+	}
+}
+
 void UpdateStatusBarWidth(void) {
-	WCHAR tchLexerName[128];
-	int cx;
 	RECT rc;
 	int aWidth[7];
 
 	GetClientRect(hwndMain, &rc);
-	cx = rc.right - rc.left;
+	const int cx = rc.right - rc.left;
 
 	Encoding_GetLabel(iEncoding);
-	Style_GetCurrentLexerName(tchLexerName, COUNTOF(tchLexerName));
-	const int iBytes = (int)SendMessage(hwndEdit, SCI_GETLENGTH, 0, 0);
+	const int iBytes = SciCall_GetLength();
 
-	aWidth[1] = StatusCalcPaneWidth(hwndStatus, tchLexerName) + 4;
+	aWidth[1] = StatusCalcPaneWidth(hwndStatus, cachedStatusItem.pszLexerName) + 4;
 	aWidth[2] = StatusCalcPaneWidth(hwndStatus, mEncoding[iEncoding].wchLabel) + 4;
 	aWidth[3] = StatusCalcPaneWidth(hwndStatus, L"CR+LF");
 	aWidth[4] = StatusCalcPaneWidth(hwndStatus, L"OVR");
@@ -2028,6 +2051,7 @@ void UpdateStatusBarWidth(void) {
 void MsgNotifyZoom(void) {
 	iZoomLevel = (int)SendMessage(hwndEdit, SCI_GETZOOM, 0, 0);
 
+	UpdateStatusBarCache(STATUS_DOCZOOM);
 	UpdateLineNumberWidth();
 	UpdateFoldMarginWidth();
 	UpdateStatusbar();
@@ -5157,6 +5181,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 			case STATUS_OVRMODE:
 				SendMessage(hwndEdit, SCI_EDITTOGGLEOVERTYPE, 0, 0);
+				UpdateStatusBarCache(STATUS_OVRMODE);
 				return TRUE;
 
 			default:
@@ -6586,10 +6611,6 @@ void UpdateToolbar(void) {
 //
 //
 void UpdateStatusbar(void) {
-	int iPos;
-	int iLn;
-	int iLines;
-	int iCol;
 	WCHAR tchLn[32];
 	WCHAR tchLines[32];
 	WCHAR tchCol[32];
@@ -6600,22 +6621,10 @@ void UpdateStatusbar(void) {
 	WCHAR tchSelCh[32];
 	WCHAR tchDocPos[256];
 
-	int iBytes;
-	WCHAR tchBytes[64];
-	WCHAR tchDocSize[256];
-	WCHAR tchZoom[32];
+	WCHAR tchBytes[32];
+	WCHAR tchDocSize[32];
 
-	WCHAR tchEOLMode[32];
-	WCHAR tchOvrMode[32];
-	WCHAR tchLexerName[128];
-
-	int iSelStart;
-	int iSelEnd;
-	int iLineStart;
-	int iLineEnd;
 #ifdef BOOKMARK_EDITION
-	int iStartOfLinePos;
-	int iLinesSelected;
 	WCHAR tchLinesSelected[32];
 	WCHAR tchMatchesCount[32];
 #endif
@@ -6624,40 +6633,43 @@ void UpdateStatusbar(void) {
 		return;
 	}
 
-	iPos = (int)SendMessage(hwndEdit, SCI_GETCURRENTPOS, 0, 0);
+	int iPos =  SciCall_GetCurrentPos();
 
-	iLn = (int)SendMessage(hwndEdit, SCI_LINEFROMPOSITION, iPos, 0) + 1;
+	const int iLn = SciCall_LineFromPosition(iPos) + 1;
 	wsprintf(tchLn, L"%i", iLn);
 	FormatNumberStr(tchLn);
 
-	iLines = (int)SendMessage(hwndEdit, SCI_GETLINECOUNT, 0, 0);
+	const int iLines = SciCall_GetLineCount();
 	wsprintf(tchLines, L"%i", iLines);
 	FormatNumberStr(tchLines);
 
-	iCol = (int)SendMessage(hwndEdit, SCI_GETCOLUMN, iPos, 0) + 1;
+	int iCol = SciCall_GetColumn(iPos) + 1;
 	wsprintf(tchCol, L"%i", iCol);
 	FormatNumberStr(tchCol);
 
-	iLineStart = (int)SendMessage(hwndEdit, SCI_POSITIONFROMLINE, iLn - 1, 0);
-	iLineEnd = (int)SendMessage(hwndEdit, SCI_GETLINEENDPOSITION, iLn - 1, 0);
-	iPos = (int)SendMessage(hwndEdit, SCI_COUNTCHARACTERS, iLineStart, iPos) + 1;
-	iCol = (int)SendMessage(hwndEdit, SCI_COUNTCHARACTERS, iLineStart, iLineEnd);
+	int iLineStart = SciCall_PositionFromLine(iLn - 1);
+	int iLineEnd = SciCall_GetLineEndPosition(iLn - 1);
+	iPos = SciCall_CountCharacters(iLineStart, iPos) + 1;
+	iCol = SciCall_CountCharacters(iLineStart, iLineEnd);
 	wsprintf(tchCh, L"%i", iPos);
 	wsprintf(tchChs, L"%i", iCol);
 	FormatNumberStr(tchCh);
 	FormatNumberStr(tchChs);
 
-	iCol = (int)SendMessage(hwndEdit, SCI_GETCOLUMN, iLineEnd, 0);
+	iCol = SciCall_GetColumn(iLineEnd);
 	wsprintf(tchCols, L"%i", iCol);
 	FormatNumberStr(tchCols);
 
-	iSelStart = (int)SendMessage(hwndEdit, SCI_GETSELECTIONSTART, 0, 0);
-	iSelEnd = (int)SendMessage(hwndEdit, SCI_GETSELECTIONEND, 0, 0);
-	if (SC_SEL_RECTANGLE != SendMessage(hwndEdit, SCI_GETSELECTIONMODE, 0, 0)) {
-		int iSel = (int)SendMessage(hwndEdit, SCI_GETSELTEXT, 0, 0) - 1;
+	const int iSelStart = SciCall_GetSelectionStart();
+	const int iSelEnd = SciCall_GetSelectionEnd();
+	if (iSelStart == iSelEnd) {
+		lstrcpy(tchSel, L"0");
+		lstrcpy(tchSelCh, L"0");
+	} else if (SC_SEL_RECTANGLE != SciCall_GetSelectionMode()) {
+		int iSel = SciCall_GetSelText(NULL) - 1;
 		wsprintf(tchSel, L"%i", iSel);
 		FormatNumberStr(tchSel);
-		iSel = (int)SendMessage(hwndEdit, SCI_COUNTCHARACTERS, iSelStart, iSelEnd);
+		iSel = SciCall_CountCharacters(iSelStart, iSelEnd);
 		wsprintf(tchSelCh, L"%i", iSel);
 		FormatNumberStr(tchSelCh);
 	} else {
@@ -6667,17 +6679,22 @@ void UpdateStatusbar(void) {
 
 #ifdef BOOKMARK_EDITION
 	// Print number of lines selected lines in statusbar
-	iLineStart = (int)SendMessage(hwndEdit, SCI_LINEFROMPOSITION, iSelStart, 0);
-	iLineEnd = (int)SendMessage(hwndEdit, SCI_LINEFROMPOSITION, iSelEnd, 0);
-	iStartOfLinePos = (int)SendMessage(hwndEdit, SCI_POSITIONFROMLINE, iLineEnd, 0);
-	iLinesSelected = iLineEnd - iLineStart;
-	if (iSelStart != iSelEnd && iStartOfLinePos != iSelEnd) {
-		iLinesSelected += 1;
+	if (iSelStart == iSelEnd) {
+		lstrcpy(tchLinesSelected, L"0");
+		lstrcpy(tchMatchesCount, L"0");
+	} else {
+		iLineStart = SciCall_LineFromPosition(iSelStart);
+		iLineEnd = SciCall_LineFromPosition(iSelEnd);
+		int iStartOfLinePos = SciCall_PositionFromLine(iLineEnd);
+		int iLinesSelected = iLineEnd - iLineStart;
+		if (iSelStart != iSelEnd && iStartOfLinePos != iSelEnd) {
+			iLinesSelected += 1;
+		}
+		wsprintf(tchLinesSelected, L"%i", iLinesSelected);
+		FormatNumberStr(tchLinesSelected);
+		wsprintf(tchMatchesCount, L"%i", iMatchesCount);
+		FormatNumberStr(tchMatchesCount);
 	}
-	wsprintf(tchLinesSelected, L"%i", iLinesSelected);
-	FormatNumberStr(tchLinesSelected);
-	wsprintf(tchMatchesCount, L"%i", iMatchesCount);
-	FormatNumberStr(tchMatchesCount);
 
 	FormatString(tchDocPos, COUNTOF(tchDocPos), IDS_DOCPOS, tchLn, tchLines,
 				 tchCol, tchCols, tchCh, tchChs, tchSelCh, tchSel, tchLinesSelected, tchMatchesCount);
@@ -6687,37 +6704,20 @@ void UpdateStatusbar(void) {
 	FormatString(tchDocPos, COUNTOF(tchDocPos), IDS_DOCPOS, tchLn, tchLines, tchCol, tchCols, tchCh, tchChs, tchSelCh, tchSel);
 #endif
 
-	iBytes = (int)SendMessage(hwndEdit, SCI_GETLENGTH, 0, 0);
+	const int iBytes = SciCall_GetLength();
 	StrFormatByteSize(iBytes, tchBytes, COUNTOF(tchBytes));
-
 	FormatString(tchDocSize, COUNTOF(tchDocSize), IDS_DOCSIZE, tchBytes);
 
 	Encoding_GetLabel(iEncoding);
-
-	if (iEOLMode == SC_EOL_CR) {
-		lstrcpy(tchEOLMode, L"CR");
-	} else if (iEOLMode == SC_EOL_LF) {
-		lstrcpy(tchEOLMode, L"LF");
-	} else {
-		lstrcpy(tchEOLMode, L"CR+LF");
-	}
-
-	if (SendMessage(hwndEdit, SCI_GETOVERTYPE, 0, 0)) {
-		lstrcpy(tchOvrMode, L"OVR");
-	} else {
-		lstrcpy(tchOvrMode, L"INS");
-	}
-
-	Style_GetCurrentLexerName(tchLexerName, COUNTOF(tchLexerName));
-	wsprintf(tchZoom, L" %i%%", iZoomLevel);
+	LPCWSTR pszEOLMode = (iEOLMode == SC_EOL_LF) ? L"LF" : ((iEOLMode == SC_EOL_CR) ? L"CR" : L"CR+LF");
 
 	StatusSetText(hwndStatus, STATUS_DOCPOS, tchDocPos);
-	StatusSetText(hwndStatus, STATUS_LEXER, tchLexerName);
+	StatusSetText(hwndStatus, STATUS_LEXER, cachedStatusItem.pszLexerName);
 	StatusSetText(hwndStatus, STATUS_CODEPAGE, mEncoding[iEncoding].wchLabel);
-	StatusSetText(hwndStatus, STATUS_EOLMODE, tchEOLMode);
-	StatusSetText(hwndStatus, STATUS_OVRMODE, tchOvrMode);
+	StatusSetText(hwndStatus, STATUS_EOLMODE, pszEOLMode);
+	StatusSetText(hwndStatus, STATUS_OVRMODE, cachedStatusItem.pszOvrMode);
 	StatusSetText(hwndStatus, STATUS_DOCSIZE, tchDocSize);
-	StatusSetText(hwndStatus, STATUS_DOCZOOM, tchZoom);
+	StatusSetText(hwndStatus, STATUS_DOCZOOM, cachedStatusItem.tchZoom);
 
 	//InvalidateRect(hwndStatus, NULL, TRUE);
 }
@@ -6731,11 +6731,11 @@ void UpdateLineNumberWidth(void) {
 	if (bShowLineNumbers) {
 		char tchLines[32];
 
-		const int iLines = (int)SendMessage(hwndEdit, SCI_GETLINECOUNT, 0, 0);
+		const int iLines = SciCall_GetLineCount();
 		wsprintfA(tchLines, "_%i_", iLines);
 
-		const int iLineMarginWidthNow = (int)SendMessage(hwndEdit, SCI_GETMARGINWIDTHN, MARGIN_LINE_NUMBER, 0);
-		const int iLineMarginWidthFit = (int)SendMessage(hwndEdit, SCI_TEXTWIDTH, STYLE_LINENUMBER, (LPARAM)tchLines);
+		const int iLineMarginWidthNow = SciCall_GetMarginWidth(MARGIN_LINE_NUMBER);
+		const int iLineMarginWidthFit = SciCall_TextWidth(STYLE_LINENUMBER, tchLines);
 
 		if (iLineMarginWidthNow != iLineMarginWidthFit) {
 #if !NP2_DEBUG_FOLD_LEVEL
@@ -6907,7 +6907,6 @@ BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect, LPCWST
 				}
 				SendMessage(hwndEdit, SCI_SETCODEPAGE, (iEncoding == CPI_DEFAULT) ? iDefaultCodePage : SC_CP_UTF8, 0);
 				bReadOnly = FALSE;
-				//EditSetNewText(hwndEdit, "", 0);
 			}
 		} else {
 			return FALSE;
@@ -7638,15 +7637,16 @@ void GetRelaunchParameters(LPWSTR szParameters, LPCWSTR lpszFile, BOOL newWind, 
 			lstrcat(szParameters, L" -x");
 			break;
 
-		default:
+		default: {
 			ZeroMemory(tch, sizeof(tch));
 			x = np2LexLangIndex;
 			np2LexLangIndex = 0;
-			Style_GetCurrentLexerName(tch, COUNTOF(tch));
+			LPCWSTR pszLexerName = Style_GetCurrentLexerName(tch, COUNTOF(tch));
 			np2LexLangIndex = x;
 			lstrcat(szParameters, L" -s \"");
-			lstrcat(szParameters, tch);
+			lstrcat(szParameters, pszLexerName);
 			lstrcat(szParameters, L"\"");
+		}
 		}
 
 		// position
