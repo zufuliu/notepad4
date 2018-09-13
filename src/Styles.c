@@ -1018,6 +1018,7 @@ void Style_SetLexer(HWND hwnd, PEDITLEXER pLexNew) {
 
 	// Save current lexer
 	pLexCurrent = pLexNew;
+	UpdateStatusBarCache(STATUS_LEXER);
 	UpdateStatusBarWidth();
 	UpdateStatusbar();
 	UpdateLineNumberWidth();
@@ -1427,160 +1428,114 @@ PEDITLEXER Style_DetectObjCAndMatlab(void) {
 //
 // Style_GetCurrentLexerName()
 //
-void Style_GetCurrentLexerName(LPWSTR lpszName, int cchName) {
-	if (!GetString(pLexCurrent->rid, lpszName, cchName)) {
-		if (!np2LexLangIndex) {
-			lstrcpyn(lpszName, pLexCurrent->pszName, cchName);
-		} else {
-			LPWSTR lang = L"";
-			switch (np2LexLangIndex) {
-			case IDM_LANG_DEFAULT:
-				lang = L"Default Text";
-				break;
+LPCWSTR Style_GetCurrentLexerName(LPWSTR lpszName, int cchName) {
+	if (GetString(pLexCurrent->rid, lpszName, cchName)) {
+		return lpszName;
+	}
+	if (np2LexLangIndex == 0) {
+		return pLexCurrent->pszName;
+	}
+	switch (np2LexLangIndex) {
+	case IDM_LANG_DEFAULT:
+		return L"Default Text";
 
-			case IDM_LANG_WEB:
-				lang = L"Web Source Code";
-				break;
-			case IDM_LANG_PHP:
-				lang = L"PHP Page";
-				break;
-			case IDM_LANG_JSP:
-				lang = L"JSP Page";
-				break;
-			case IDM_LANG_ASPX_CS:
-				lang = L"ASP.NET (C#)";
-				break;
-			case IDM_LANG_ASPX_VB:
-				lang = L"ASP.NET (VB.NET)";
-				break;
-			case IDM_LANG_ASP_VBS:
-				lang = L"ASP (VBScript)";
-				break;
-			case IDM_LANG_ASP_JS:
-				lang = L"ASP (JScript)";
-				break;
+	case IDM_LANG_WEB:
+		return L"Web Source Code";
+	case IDM_LANG_PHP:
+		return L"PHP Page";
+	case IDM_LANG_JSP:
+		return L"JSP Page";
+	case IDM_LANG_ASPX_CS:
+		return L"ASP.NET (C#)";
+	case IDM_LANG_ASPX_VB:
+		return L"ASP.NET (VB.NET)";
+	case IDM_LANG_ASP_VBS:
+		return L"ASP (VBScript)";
+	case IDM_LANG_ASP_JS:
+		return L"ASP (JScript)";
 
-			case IDM_LANG_XML:
-				lang = L"XML Document";
-				break;
-			case IDM_LANG_XSD:
-				lang = L"XML Schema";
-				break;
-			case IDM_LANG_XSLT:
-				lang = L"XSLT Stylesheet";
-				break;
-			case IDM_LANG_DTD:
-				lang = L"XML DTD";
-				break;
+	case IDM_LANG_XML:
+		return L"XML Document";
+	case IDM_LANG_XSD:
+		return L"XML Schema";
+	case IDM_LANG_XSLT:
+		return L"XSLT Stylesheet";
+	case IDM_LANG_DTD:
+		return L"XML DTD";
 
-			case IDM_LANG_ANT_BUILD:
-				lang = L"Ant Build";
-				break;
-			case IDM_LANG_MAVEN_POM:
-				lang = L"Maven POM";
-				break;
-			case IDM_LANG_MAVEN_SETTINGS:
-				lang = L"Maven Settings";
-				break;
-			case IDM_LANG_IVY_MODULE:
-				lang = L"Ivy Module";
-				break;
-			case IDM_LANG_IVY_SETTINGS:
-				lang = L"Ivy Settings";
-				break;
-			case IDM_LANG_PMD_RULESET:
-				lang = L"PMD Ruleset";
-				break;
-			case IDM_LANG_CHECKSTYLE:
-				lang = L"Checkstyle";
-				break;
+	case IDM_LANG_ANT_BUILD:
+		return L"Ant Build";
+	case IDM_LANG_MAVEN_POM:
+		return L"Maven POM";
+	case IDM_LANG_MAVEN_SETTINGS:
+		return L"Maven Settings";
+	case IDM_LANG_IVY_MODULE:
+		return L"Ivy Module";
+	case IDM_LANG_IVY_SETTINGS:
+		return L"Ivy Settings";
+	case IDM_LANG_PMD_RULESET:
+		return L"PMD Ruleset";
+	case IDM_LANG_CHECKSTYLE:
+		return L"Checkstyle";
 
-			case IDM_LANG_APACHE:
-				lang = L"Apache Config";
-				break;
-			case IDM_LANG_TOMCAT:
-				lang = L"Tomcat Config";
-				break;
-			case IDM_LANG_WEB_JAVA:
-				lang = L"Java Web Config";
-				break;
-			case IDM_LANG_STRUTS:
-				lang = L"Struts Config";
-				break;
-			case IDM_LANG_HIB_CFG:
-				lang = L"Hibernate Config";
-				break;
-			case IDM_LANG_HIB_MAP:
-				lang = L"Hibernate Mapping";
-				break;
-			case IDM_LANG_SPRING_BEANS:
-				lang = L"Spring Beans";
-				break;
-			case IDM_LANG_JBOSS:
-				lang = L"JBoss Config";
-				break;
+	case IDM_LANG_APACHE:
+		return L"Apache Config";
+	case IDM_LANG_TOMCAT:
+		return L"Tomcat Config";
+	case IDM_LANG_WEB_JAVA:
+		return L"Java Web Config";
+	case IDM_LANG_STRUTS:
+		return L"Struts Config";
+	case IDM_LANG_HIB_CFG:
+		return L"Hibernate Config";
+	case IDM_LANG_HIB_MAP:
+		return L"Hibernate Mapping";
+	case IDM_LANG_SPRING_BEANS:
+		return L"Spring Beans";
+	case IDM_LANG_JBOSS:
+		return L"JBoss Config";
 
-			case IDM_LANG_WEB_NET:
-				lang = L"ASP.NET Web Config";
-				break;
-			case IDM_LANG_RESX:
-				lang = L"ResX Schema";
-				break;
-			case IDM_LANG_XAML:
-				lang = L"WPF XAML";
-				break;
+	case IDM_LANG_WEB_NET:
+		return L"ASP.NET Web Config";
+	case IDM_LANG_RESX:
+		return L"ResX Schema";
+	case IDM_LANG_XAML:
+		return L"WPF XAML";
 
-			case IDM_LANG_PROPERTY_LIST:
-				lang = L"Property List";
-				break;
-			case IDM_LANG_ANDROID_MANIFEST:
-				lang = L"Android Manifest";
-				break;
-			case IDM_LANG_ANDROID_LAYOUT:
-				lang = L"Android Layout";
-				break;
-			case IDM_LANG_SVG:
-				lang = L"SVG Document";
-				break;
+	case IDM_LANG_PROPERTY_LIST:
+		return L"Property List";
+	case IDM_LANG_ANDROID_MANIFEST:
+		return L"Android Manifest";
+	case IDM_LANG_ANDROID_LAYOUT:
+		return L"Android Layout";
+	case IDM_LANG_SVG:
+		return L"SVG Document";
 
-			case IDM_LANG_BASH:
-				lang = L"Shell Script";
-				break;
-			case IDM_LANG_CSHELL:
-				lang = L"C Shell";
-				break;
-			case IDM_LANG_M4:
-				lang = L"M4 Macro";
-				break;
+	case IDM_LANG_BASH:
+		return L"Shell Script";
+	case IDM_LANG_CSHELL:
+		return L"C Shell";
+	case IDM_LANG_M4:
+		return L"M4 Macro";
 
-			case IDM_LANG_MATLAB:
-				lang = L"MATLAB Code";
-				break;
-			case IDM_LANG_OCTAVE:
-				lang = L"Octave Code";
-				break;
-			case IDM_LANG_SCILAB:
-				lang = L"Scilab Code";
-				break;
+	case IDM_LANG_MATLAB:
+		return L"MATLAB Code";
+	case IDM_LANG_OCTAVE:
+		return L"Octave Code";
+	case IDM_LANG_SCILAB:
+		return L"Scilab Code";
 
-			case IDM_LANG_CSS:
-				lang = L"CSS Style Sheet";
-				break;
-			case IDM_LANG_SCSS:
-				lang = L"Sassy CSS";
-				break;
-			case IDM_LANG_LESS:
-				lang = L"Less CSS";
-				break;
-			case IDM_LANG_HSS:
-				lang = L"HSS";
-				break;
+	case IDM_LANG_CSS:
+		return L"CSS Style Sheet";
+	case IDM_LANG_SCSS:
+		return L"Sassy CSS";
+	case IDM_LANG_LESS:
+		return L"Less CSS";
+	case IDM_LANG_HSS:
+		return L"HSS";
 
-			default:
-				break;
-			}
-			lstrcpyn(lpszName, lang, cchName);
-		}
+	default:
+		return L"Error";
 	}
 }
 
@@ -3581,7 +3536,6 @@ INT_PTR CALLBACK Style_SelectLexerDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, L
 				np2LexLangIndex = 0;
 				iDefaultLexer = iInternalDefault;
 				bAutoSelect = (IsDlgButtonChecked(hwnd, IDC_AUTOSELECT) == BST_CHECKED) ? 1 : 0;
-				UpdateStatusBarWidth();
 				EndDialog(hwnd, IDOK);
 			}
 		}

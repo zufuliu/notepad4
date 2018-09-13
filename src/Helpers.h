@@ -88,9 +88,11 @@ static inline BOOL StrNCaseEqual(LPCWSTR s1, LPCWSTR s2, int cch) {
 }
 
 #ifdef NDEBUG
-#define DLog(fmt, ...)
+#define DLog(msg)
+#define DLogf(fmt, ...)
 #else
-void DLog(const char *fmt, ...);
+#define DLog(msg)	OutputDebugStringA(msg)
+void DLogf(const char *fmt, ...);
 #endif
 
 extern HINSTANCE g_hInstance;
