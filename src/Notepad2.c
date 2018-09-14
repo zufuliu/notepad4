@@ -2048,6 +2048,21 @@ void UpdateStatusBarWidth(void) {
 	SendMessage(hwndStatus, SB_SETPARTS, COUNTOF(aWidth), (LPARAM)aWidth);
 }
 
+BOOL IsIMEInNativeMode(void) {
+	BOOL result = FALSE;
+	HIMC himc = ImmGetContext(hwndEdit);
+	if (himc) {
+		if (ImmGetOpenStatus(himc)) {
+			DWORD dwConversion = IME_CMODE_ALPHANUMERIC, dwSentence = IME_SMODE_NONE;
+			if (ImmGetConversionStatus(himc, &dwConversion, &dwSentence)) {
+				result = dwConversion != IME_CMODE_ALPHANUMERIC;
+			}
+		}
+		ImmReleaseContext(hwndEdit, himc);
+	}
+	return result;
+}
+
 void MsgNotifyZoom(void) {
 	iZoomLevel = (int)SendMessage(hwndEdit, SCI_GETZOOM, 0, 0);
 
@@ -5008,6 +5023,9 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			break;
 
 		case SCN_CHARADDED:
+			if (scn->ch > 0x7F) {
+				return 0;
+			}
 			// Auto indent
 			if (bAutoIndent && (scn->ch == '\r' || scn->ch == '\n')) {
 				// in CRLF mode handle LF only...
@@ -5020,7 +5038,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 				EditAutoCloseXMLTag(hwndEdit);
 			}
 			// Auto close braces/quotes
-			else if (bAutoCloseBracesQuotes && (scn->ch < 0x80) && StrChrA("([{<\"\'`,", (char)(scn->ch))) {
+			else if (bAutoCloseBracesQuotes && StrChrA("([{<\"\'`,", (char)(scn->ch))) {
 				EditAutoCloseBraceQuote(hwndEdit, scn->ch);
 			} else if (bAutoCompleteWords/* && !SendMessage(hwndEdit, SCI_AUTOCACTIVE, 0, 0)*/) {
 				// many items in auto-completion list (> iAutoCDefaultShowItemCount), recreate it
