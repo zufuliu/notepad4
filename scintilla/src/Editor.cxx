@@ -1962,13 +1962,14 @@ void Editor::AddCharUTF(const char *s, unsigned int len, bool treatAsDBCS) {
 		SetLastXChosen();
 	}
 
-	if (!inlineIMEComposition) {
+	// We don't handle inline IME tentative characters
+	if (charAddedSource != SC_CHARADDED_TENTATIVE) {
 		if (treatAsDBCS) {
 			NotifyChar((static_cast<unsigned char>(s[0]) << 8) |
 				static_cast<unsigned char>(s[1]));
 		} else if (len > 0) {
-			int byte = static_cast<unsigned char>(s[0]);
-			if ((byte < 0xC0) || (1 == len)) {
+			int ch = static_cast<unsigned char>(s[0]);
+			if ((ch < 0xC0) || (1 == len)) {
 				// Handles UTF-8 characters between 0x01 and 0x7F and single byte
 				// characters when not in UTF-8 mode.
 				// Also treats \0 and naked trail bytes 0x80 to 0xBF as valid
@@ -1976,9 +1977,9 @@ void Editor::AddCharUTF(const char *s, unsigned int len, bool treatAsDBCS) {
 			} else {
 				unsigned int utf32[1] = { 0 };
 				UTF32FromUTF8(std::string_view(s, len), utf32, std::size(utf32));
-				byte = utf32[0];
+				ch = utf32[0];
 			}
-			NotifyChar(byte);
+			NotifyChar(ch);
 		}
 	}
 
@@ -2332,6 +2333,7 @@ void Editor::NotifyChar(int ch) noexcept {
 	SCNotification scn = {};
 	scn.nmhdr.code = SCN_CHARADDED;
 	scn.ch = ch;
+	scn.modifiers = charAddedSource;
 	NotifyParent(scn);
 }
 

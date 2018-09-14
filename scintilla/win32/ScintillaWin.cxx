@@ -1002,7 +1002,9 @@ sptr_t ScintillaWin::HandleCompositionWindowed(uptr_t wParam, sptr_t lParam) {
 	if (lParam & GCS_RESULTSTR) {
 		IMContext imc(MainHWND());
 		if (imc.hIMC) {
+			charAddedSource = SC_CHARADDED_IME;
 			AddWString(imc.GetCompositionString(GCS_RESULTSTR));
+			charAddedSource = SC_CHARADDED_NORMAL;
 
 			// Set new position after converted
 			const Point pos = PointMainCaret();
@@ -1210,7 +1212,7 @@ sptr_t ScintillaWin::HandleCompositionInline(uptr_t, sptr_t lParam) {
 
 		const bool tmpRecordingMacro = recordingMacro;
 		recordingMacro = false;
-		inlineIMEComposition = true;
+		charAddedSource = SC_CHARADDED_TENTATIVE;
 		const int codePage = CodePageOfDocument();
 		for (size_t i = 0; i < wcs.size(); ) {
 			const size_t ucWidth = UTF16CharLength(wcs[i]);
@@ -1222,7 +1224,7 @@ sptr_t ScintillaWin::HandleCompositionInline(uptr_t, sptr_t lParam) {
 			DrawImeIndicator(imeIndicator[i], static_cast<unsigned int>(docChar.size()));
 			i += ucWidth;
 		}
-		inlineIMEComposition = false;
+		charAddedSource = SC_CHARADDED_NORMAL;
 		recordingMacro = tmpRecordingMacro;
 
 		// Move IME caret from current last position to imeCaretPos.
@@ -1235,7 +1237,9 @@ sptr_t ScintillaWin::HandleCompositionInline(uptr_t, sptr_t lParam) {
 			view.imeCaretBlockOverride = true;
 		}
 	} else if (lParam & GCS_RESULTSTR) {
+		charAddedSource = SC_CHARADDED_IME;
 		AddWString(imc.GetCompositionString(GCS_RESULTSTR));
+		charAddedSource = SC_CHARADDED_NORMAL;
 	}
 	EnsureCaretVisible();
 	SetCandidateWindowPos();

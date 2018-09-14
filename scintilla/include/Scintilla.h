@@ -1049,6 +1049,9 @@ typedef sptr_t (*SciFnDirect)(sptr_t ptr, unsigned int iMessage, uptr_t wParam, 
 #define SC_MOD_INSERTCHECK 0x100000
 #define SC_MOD_CHANGETABSTOPS 0x200000
 #define SC_MODEVENTMASKALL 0x3FFFFF
+#define SC_CHARADDED_NORMAL 0
+#define SC_CHARADDED_TENTATIVE 1
+#define SC_CHARADDED_IME 2
 #define SC_UPDATE_CONTENT 0x1
 #define SC_UPDATE_SELECTION 0x2
 #define SC_UPDATE_V_SCROLL 0x4

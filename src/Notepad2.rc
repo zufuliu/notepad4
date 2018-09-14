@@ -480,12 +480,13 @@ BEGIN
         MENUITEM "&Long Line Settings...",      IDM_VIEW_LONGLINESETTINGS
         POPUP "&Auto Completion"
         BEGIN
-            MENUITEM "&Indent Text",                IDM_VIEW_AUTOINDENTTEXT
+            MENUITEM "Auto &Indent Text",           IDM_VIEW_AUTOINDENTTEXT
             MENUITEM "Close HTML and XML &Tags",    IDM_VIEW_AUTOCLOSETAGS
             MENUITEM "Close &Braces and Quotes",    IDM_VIEW_AUTOCOMPLETEQUOTE
             MENUITEM SEPARATOR
-            MENUITEM "Complete &Words",             IDM_VIEW_AUTOCOMPLETEWORDS
-            MENUITEM "&Words in Current Document",  IDM_VIEW_AUTOCWITHDOCWORDS
+            MENUITEM "Auto Complete &Words",        IDM_VIEW_AUTOCOMPLETEWORDS
+            MENUITEM "Words in Current &Document",  IDM_VIEW_AUTOCWITHDOCWORDS
+            MENUITEM "Only in &English IME Mode",   IDM_VIEW_AUTOC_ENGLISH_ONLY
         END
         MENUITEM SEPARATOR
         POPUP "Rendering Technology"
