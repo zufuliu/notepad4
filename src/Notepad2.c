@@ -299,11 +299,17 @@ WCHAR	wchWndClass[16] = WC_NOTEPAD2;
 
 // rarely changed statusbar items
 struct CachedStatusItem {
-	WCHAR tchLexerName[128];
 	WCHAR tchZoom[16];
 
-	LPCWSTR pszLexerName; // point to tchLexerName or a literal string
+	LPCWSTR pszLexerName;
+	LPCWSTR pszEOLMode;
 	LPCWSTR pszOvrMode;
+
+	BOOL lexerNameChanged;	// STATUS_LEXER
+	BOOL encodingChanged;	// STATUS_CODEPAGE
+	BOOL eolModeChanged;	// STATUS_EOLMODE
+	BOOL ovrModeChanged;	// STATUS_OVRMODE
+	BOOL zoomChanged;		// STATUS_DOCZOOM
 } cachedStatusItem;
 
 HINSTANCE	g_hInstance;
@@ -744,9 +750,9 @@ HWND InitInstance(HINSTANCE hInstance, int nCmdShow) {
 		iSrcEncoding = Encoding_MatchW(lpEncodingArg);
 	}
 
+	BOOL bOpened = FALSE;
 	// Pathname parameter
 	if (lpFileArg /*&& !flagNewFromClipboard*/) {
-		BOOL bOpened = FALSE;
 
 		// Open from Directory
 		if (PathIsDirectory(lpFileArg)) {
@@ -786,7 +792,7 @@ HWND InitInstance(HINSTANCE hInstance, int nCmdShow) {
 	}
 
 	if (!bFileLoadCalled) {
-		FileLoad(TRUE, TRUE, FALSE, FALSE, L"");
+		bOpened = FileLoad(TRUE, TRUE, FALSE, FALSE, L"");
 	}
 
 	// reset
@@ -895,6 +901,12 @@ HWND InitInstance(HINSTANCE hInstance, int nCmdShow) {
 		SetNotifyIconTitle(hwndMain);
 	}
 
+	if (!bOpened) {
+		UpdateStatusBarCache(STATUS_CODEPAGE);
+		UpdateStatusBarCache(STATUS_EOLMODE);
+	}
+	UpdateStatusBarCache(STATUS_OVRMODE);
+	UpdateStatusBarCache(STATUS_DOCZOOM);
 	UpdateToolbar();
 	UpdateStatusbar();
 
@@ -1424,13 +1436,13 @@ void UpdateWindowTitle(void) {
 				IDS_READONLY, bReadOnly, szTitleExcerpt);
 }
 
-void UpdateSelectionMarginWidth() {
+void UpdateSelectionMarginWidth(void) {
 	// fixed width to put arrow cursor.
 	int width = bShowSelectionMargin ? RoundToCurrentDPI(16) : 0;
 	SciCall_SetMarginWidth(MARGIN_SELECTION, width);
 }
 
-void UpdateFoldMarginWidth() {
+void UpdateFoldMarginWidth(void) {
 	if (bShowCodeFolding) {
 		const int iLineMarginWidthNow = SciCall_GetMarginWidth(MARGIN_FOLD_INDEX);
 		const int iLineMarginWidthFit = SciCall_TextWidth(STYLE_LINENUMBER, "+_");
@@ -1623,7 +1635,6 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	// Create Toolbar and Statusbar
 	CreateBars(hwnd, hInstance);
-	UpdateStatusBarCache(STATUS_OVRMODE);
 
 	// Window Initialization
 
@@ -2007,15 +2018,30 @@ void MsgSize(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 void UpdateStatusBarCache(int item) {
 	switch (item) {
 	case STATUS_LEXER:
-		cachedStatusItem.pszLexerName = Style_GetCurrentLexerName(cachedStatusItem.tchLexerName, COUNTOF(cachedStatusItem.tchLexerName));
+		cachedStatusItem.pszLexerName = Style_GetCurrentLexerName();
+		cachedStatusItem.lexerNameChanged = TRUE;
+		UpdateStatusBarWidth();
+		break;
+
+	case STATUS_CODEPAGE:
+		Encoding_GetLabel(iEncoding);
+		cachedStatusItem.encodingChanged = TRUE;
+		UpdateStatusBarWidth();
+		break;
+
+	case STATUS_EOLMODE:
+		cachedStatusItem.pszEOLMode = (iEOLMode == SC_EOL_LF) ? L"LF" : ((iEOLMode == SC_EOL_CR) ? L"CR" : L"CR+LF");
+		cachedStatusItem.eolModeChanged = TRUE;
 		break;
 
 	case STATUS_OVRMODE:
 		cachedStatusItem.pszOvrMode = SendMessage(hwndEdit, SCI_GETOVERTYPE, 0, 0) ? L"OVR" : L"INS";
+		cachedStatusItem.ovrModeChanged = TRUE;
 		break;
 
 	case STATUS_DOCZOOM:
 		wsprintf(cachedStatusItem.tchZoom, L" %i%%", iZoomLevel);
+		cachedStatusItem.zoomChanged = TRUE;
 		break;
 	}
 }
@@ -2026,8 +2052,6 @@ void UpdateStatusBarWidth(void) {
 
 	GetClientRect(hwndMain, &rc);
 	const int cx = rc.right - rc.left;
-
-	Encoding_GetLabel(iEncoding);
 	const int iBytes = SciCall_GetLength();
 
 	aWidth[1] = StatusCalcPaneWidth(hwndStatus, cachedStatusItem.pszLexerName) + 4;
@@ -2802,8 +2826,8 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 				iEncoding = iNewEncoding;
 			}
 
+			UpdateStatusBarCache(STATUS_CODEPAGE);
 			UpdateToolbar();
-			UpdateStatusBarWidth();
 			UpdateStatusbar();
 			UpdateWindowTitle();
 		}
@@ -2850,6 +2874,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		SendMessage(hwndEdit, SCI_SETEOLMODE, iEOLMode, 0);
 		SendMessage(hwndEdit, SCI_CONVERTEOLS, iEOLMode, 0);
 		EditFixPositions(hwndEdit);
+		UpdateStatusBarCache(STATUS_EOLMODE);
 		UpdateToolbar();
 		UpdateStatusbar();
 		UpdateWindowTitle();
@@ -6726,18 +6751,28 @@ void UpdateStatusbar(void) {
 	StrFormatByteSize(iBytes, tchBytes, COUNTOF(tchBytes));
 	FormatString(tchDocSize, COUNTOF(tchDocSize), IDS_DOCSIZE, tchBytes);
 
-	Encoding_GetLabel(iEncoding);
-	LPCWSTR pszEOLMode = (iEOLMode == SC_EOL_LF) ? L"LF" : ((iEOLMode == SC_EOL_CR) ? L"CR" : L"CR+LF");
-
 	StatusSetText(hwndStatus, STATUS_DOCPOS, tchDocPos);
-	StatusSetText(hwndStatus, STATUS_LEXER, cachedStatusItem.pszLexerName);
-	StatusSetText(hwndStatus, STATUS_CODEPAGE, mEncoding[iEncoding].wchLabel);
-	StatusSetText(hwndStatus, STATUS_EOLMODE, pszEOLMode);
-	StatusSetText(hwndStatus, STATUS_OVRMODE, cachedStatusItem.pszOvrMode);
+	if (cachedStatusItem.lexerNameChanged) {
+		StatusSetText(hwndStatus, STATUS_LEXER, cachedStatusItem.pszLexerName);
+		cachedStatusItem.lexerNameChanged = FALSE;
+	}
+	if (cachedStatusItem.encodingChanged) {
+		StatusSetText(hwndStatus, STATUS_CODEPAGE, mEncoding[iEncoding].wchLabel);
+		cachedStatusItem.encodingChanged = FALSE;
+	}
+	if (cachedStatusItem.eolModeChanged) {
+		StatusSetText(hwndStatus, STATUS_EOLMODE, cachedStatusItem.pszEOLMode);
+		cachedStatusItem.eolModeChanged = FALSE;
+	}
+	if (cachedStatusItem.ovrModeChanged) {
+		StatusSetText(hwndStatus, STATUS_OVRMODE, cachedStatusItem.pszOvrMode);
+		cachedStatusItem.ovrModeChanged = FALSE;
+	}
 	StatusSetText(hwndStatus, STATUS_DOCSIZE, tchDocSize);
-	StatusSetText(hwndStatus, STATUS_DOCZOOM, cachedStatusItem.tchZoom);
-
-	//InvalidateRect(hwndStatus, NULL, TRUE);
+	if (cachedStatusItem.zoomChanged) {
+		StatusSetText(hwndStatus, STATUS_DOCZOOM, cachedStatusItem.tchZoom);
+		cachedStatusItem.zoomChanged = FALSE;
+	}
 }
 
 //=============================================================================
@@ -6861,6 +6896,8 @@ BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect, LPCWST
 		iEncoding = iDefaultEncoding;
 		iOriginalEncoding = iDefaultEncoding;
 		SendMessage(hwndEdit, SCI_SETCODEPAGE, (iDefaultEncoding == CPI_DEFAULT) ? iDefaultCodePage : SC_CP_UTF8, 0);
+		UpdateStatusBarCache(STATUS_CODEPAGE);
+		UpdateStatusBarCache(STATUS_EOLMODE);
 		UpdateWindowTitle();
 
 		// Terminate file watching
@@ -6942,12 +6979,11 @@ BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect, LPCWST
 		}
 		iOriginalEncoding = iEncoding;
 		bModified = FALSE;
+		UpdateStatusBarCache(STATUS_CODEPAGE);
+		UpdateStatusBarCache(STATUS_EOLMODE);
 		if (!lexerSpecified) { // flagLexerSpecified will be cleared
 			np2LexLangIndex = 0;
 			Style_SetLexerFromFile(hwndEdit, szCurFile);
-		} else if (bReload) {
-			UpdateStatusBarWidth();
-			UpdateStatusbar();
 		}
 		if (!lexerSpecified) {
 			UpdateLineNumberWidth();
@@ -6958,7 +6994,6 @@ BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect, LPCWST
 		if (flagUseSystemMRU == 2) {
 			SHAddToRecentDocs(SHARD_PATHW, szFileName);
 		}
-		UpdateWindowTitle();
 
 		// Install watching of the current file
 		if (!bReload && bResetFileWatching) {
@@ -6988,6 +7023,9 @@ BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect, LPCWST
 			}
 		}
 #endif
+
+		UpdateStatusbar();
+		UpdateWindowTitle();
 		// Show warning: Unicode file loaded as ANSI
 		if (bUnicodeErr) {
 			MsgBox(MBWARN, IDS_ERR_UNICODE);
@@ -7655,16 +7693,11 @@ void GetRelaunchParameters(LPWSTR szParameters, LPCWSTR lpszFile, BOOL newWind, 
 			lstrcat(szParameters, L" -x");
 			break;
 
-		default: {
-			ZeroMemory(tch, sizeof(tch));
-			x = np2LexLangIndex;
-			np2LexLangIndex = 0;
-			LPCWSTR pszLexerName = Style_GetCurrentLexerName(tch, COUNTOF(tch));
-			np2LexLangIndex = x;
+		default:
 			lstrcat(szParameters, L" -s \"");
-			lstrcat(szParameters, pszLexerName);
+			lstrcat(szParameters, pLexCurrent->pszName);
 			lstrcat(szParameters, L"\"");
-		}
+			break;
 		}
 
 		// position
