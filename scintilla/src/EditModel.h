@@ -39,7 +39,7 @@ public:
 	enum IMEInteraction {
 		imeWindowed, imeInline
 	} imeInteraction;
-	bool inlineIMEComposition;
+	int charAddedSource;
 	bool inlineIMEUseBlockCaret;
 	enum class Bidirectional {
 		bidiDisabled, bidiL2R, bidiR2L

@@ -148,7 +148,8 @@ BOOL 	bAutoCompleteWords;
 int		iAutoCDefaultShowItemCount = 15;
 int		iAutoCMinWordLength = 1;
 int		iAutoCMinNumberLength = 3;
-BOOL	bAutoCIncludeDocWord = TRUE;
+BOOL	bAutoCIncludeDocWord;
+BOOL	bAutoCEnglishIMEModeOnly;
 BOOL	bAutoCloseBracesQuotes;
 BOOL	bShowCodeFolding;
 #if NP2_ENABLE_SHOW_CALL_TIPS
@@ -2319,6 +2320,7 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	CheckCmd(hmenu, IDM_VIEW_AUTOCOMPLETEQUOTE, bAutoCloseBracesQuotes);
 	CheckCmd(hmenu, IDM_VIEW_AUTOCOMPLETEWORDS, bAutoCompleteWords);
 	CheckCmd(hmenu, IDM_VIEW_AUTOCWITHDOCWORDS, bAutoCIncludeDocWord);
+	CheckCmd(hmenu, IDM_VIEW_AUTOC_ENGLISH_ONLY, bAutoCEnglishIMEModeOnly);
 
 	switch (iMarkOccurrences) {
 	case 0:
@@ -3881,6 +3883,10 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		bAutoCIncludeDocWord = !bAutoCIncludeDocWord;
 		break;
 
+	case IDM_VIEW_AUTOC_ENGLISH_ONLY:
+		bAutoCEnglishIMEModeOnly = !bAutoCEnglishIMEModeOnly;
+		break;
+
 	case IDM_VIEW_MARKOCCURRENCES_OFF:
 		iMarkOccurrences = 0;
 		// clear all marks
@@ -5068,6 +5074,9 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			} else if (bAutoCompleteWords/* && !SendMessage(hwndEdit, SCI_AUTOCACTIVE, 0, 0)*/) {
 				// many items in auto-completion list (> iAutoCDefaultShowItemCount), recreate it
 				if (!SendMessage(hwndEdit, SCI_AUTOCACTIVE, 0, 0) || iAutoCItemCount > iAutoCDefaultShowItemCount) {
+					if (bAutoCEnglishIMEModeOnly && scn->modifiers) { // ignore IME input
+						return 0;
+					}
 					EditCompleteWord(hwndEdit, FALSE);
 				}
 			}
@@ -5315,6 +5324,7 @@ void LoadSettings(void) {
 	bAutoCloseBracesQuotes = IniSectionGetBool(pIniSection, L"AutoCloseBracesQuotes", 1);
 	bAutoCompleteWords = IniSectionGetBool(pIniSection, L"AutoCompleteWords", 1);
 	bAutoCIncludeDocWord = IniSectionGetBool(pIniSection, L"AutoCIncludeDocWord", 1);
+	bAutoCEnglishIMEModeOnly = IniSectionGetBool(pIniSection, L"AutoCEnglishIMEModeOnly", 0);
 #if NP2_ENABLE_SHOW_CALL_TIPS
 	bShowCallTips = IniSectionGetBool(pIniSection, L"ShowCallTips", 0);
 #endif
@@ -5636,6 +5646,7 @@ void SaveSettings(BOOL bSaveSettingsNow) {
 	IniSectionSetBool(pIniSection, L"AutoCloseBracesQuotes", bAutoCloseBracesQuotes);
 	IniSectionSetBool(pIniSection, L"AutoCompleteWords", bAutoCompleteWords);
 	IniSectionSetBool(pIniSection, L"AutoCIncludeDocWord", bAutoCIncludeDocWord);
+	IniSectionSetBool(pIniSection, L"AutoCEnglishIMEModeOnly", bAutoCEnglishIMEModeOnly);
 #if NP2_ENABLE_SHOW_CALL_TIPS
 	IniSectionSetBool(pIniSection, L"ShowCallTips", bShowCallTips);
 #endif
