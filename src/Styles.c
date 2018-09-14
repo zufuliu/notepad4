@@ -1019,7 +1019,6 @@ void Style_SetLexer(HWND hwnd, PEDITLEXER pLexNew) {
 	// Save current lexer
 	pLexCurrent = pLexNew;
 	UpdateStatusBarCache(STATUS_LEXER);
-	UpdateStatusBarWidth();
 	UpdateStatusbar();
 	UpdateLineNumberWidth();
 	UpdateFoldMarginWidth();
@@ -1152,7 +1151,7 @@ PEDITLEXER __fastcall Style_SniffShebang(char *pchText) {
 // find lexer from <!DOCTYPE type PUBLIC > or <%@ Page Language="lang" %>
 // Style_GetDocTypeLanguage()
 //
-int Style_GetDocTypeLanguage() {
+int Style_GetDocTypeLanguage(void) {
 	char *p = NULL, *pb = NULL;
 	char tchText[4096] = ""; // maybe contains header comments
 	SendMessage(hwndEdit, SCI_GETTEXT, (WPARAM)(COUNTOF(tchText) - 1), (LPARAM)tchText);
@@ -1428,10 +1427,7 @@ PEDITLEXER Style_DetectObjCAndMatlab(void) {
 //
 // Style_GetCurrentLexerName()
 //
-LPCWSTR Style_GetCurrentLexerName(LPWSTR lpszName, int cchName) {
-	if (GetString(pLexCurrent->rid, lpszName, cchName)) {
-		return lpszName;
-	}
+LPCWSTR Style_GetCurrentLexerName(void) {
 	if (np2LexLangIndex == 0) {
 		return pLexCurrent->pszName;
 	}
@@ -2065,7 +2061,7 @@ void Style_ToggleUse2ndDefault(HWND hwnd) {
 //
 // Style_GetUse2ndDefault()
 //
-BOOL Style_GetUse2ndDefault() {
+BOOL Style_GetUse2ndDefault(void) {
 	return bUse2ndDefaultStyle;
 }
 
