@@ -31,6 +31,9 @@
 #include "metapath.h"
 #include "resource.h"
 
+// enable customize toolbar labels
+#define NP2_ENABLE_CUSTOMIZE_TOOLBAR_LABELS		0
+
 /******************************************************************************
 *
 * Local Variables for metapath.c
@@ -903,6 +906,7 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) {
 		DeleteObject(hbmpCopy);
 	}
 
+#if NP2_ENABLE_CUSTOMIZE_TOOLBAR_LABELS
 	// Load toolbar labels
 	WCHAR *pIniSection = NP2HeapAlloc(sizeof(WCHAR) * 32 * 1024);
 	const int cbIniSection = (int)NP2HeapSize(pIniSection) / sizeof(WCHAR);
@@ -937,6 +941,7 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) {
 		}
 	}
 	NP2HeapFree(pIniSection);
+#endif
 
 	SendMessage(hwndToolbar, TB_SETEXTENDEDSTYLE, 0,
 				SendMessage(hwndToolbar, TB_GETEXTENDEDSTYLE, 0, 0) | TBSTYLE_EX_MIXEDBUTTONS);
