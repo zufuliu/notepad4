@@ -45,58 +45,93 @@ void DLogf(const char *fmt, ...) {
 //
 // Manipulation of (cached) ini file sections
 //
-int IniSectionGetStringImpl(LPCWSTR lpCachedIniSection, LPCWSTR lpName, int keyLen, LPCWSTR lpDefault, LPWSTR lpReturnedString, int cchReturnedString) {
-	LPCWSTR p = lpCachedIniSection;
-	if (p) {
-		while (*p) {
-			if (StrNEqual(p, lpName, keyLen) && p[keyLen] == L'=') {
-				lstrcpyn(lpReturnedString, p + keyLen + 1, cchReturnedString);
-				return lstrlen(lpReturnedString);
-			}
-			p = StrEnd(p) + 1;
+BOOL IniSectionParseEx(IniSection *section, LPWSTR lpCachedIniSection, UINT flag) {
+	IniSectionClear(section);
+	if (StrIsEmpty(lpCachedIniSection)) {
+		return FALSE;
+	}
+
+	const int capacity = section->capacity;
+	LPWSTR p = lpCachedIniSection;
+	int count = 0;
+	do {
+		IniKeyValueNode *node = &section->nodeList[count];
+		LPWSTR v = StrChr(p, L'=');
+		*v++ = L'\0';
+		const UINT keyLen = (UINT)(v - p - 1);
+		node->hash = p[0] | (p[1] << 8) | (keyLen << 16);
+		node->key = p;
+		node->value = v;
+		++count;
+		p = StrEnd(v) + 1;
+	} while (*p && count < capacity);
+
+	section->count = count;
+	if (flag != IniSectionParseFlag_Array) {
+		section->head = &section->nodeList[0];
+		--count;
+		section->nodeList[count].next = NULL;
+		while (count != 0) {
+			section->nodeList[count - 1].next = &section->nodeList[count];
+			--count;
 		}
 	}
 
-	lstrcpyn(lpReturnedString, lpDefault, cchReturnedString);
-	return lstrlen(lpReturnedString);
+	return TRUE;
 }
 
-BOOL IniSectionGetBoolImpl(LPCWSTR lpCachedIniSection, LPCWSTR lpName, int keyLen, BOOL bDefault) {
-	LPCWSTR p = lpCachedIniSection;
-	if (p) {
-		while (*p) {
-			if (StrNEqual(p, lpName, keyLen) && p[keyLen] == L'=') {
-				switch (p[keyLen + 1]) {
-				case L'1':
-					return TRUE;
-				case L'0':
-					return FALSE;
-				default:
-					return bDefault;
-				}
+LPCWSTR IniSectionUnsafeGetValue(IniSection *section, LPCWSTR key, int keyLen) {
+	if (keyLen < 0) {
+		keyLen = lstrlen(key);
+	}
+
+	const UINT hash = key[0] | (key[1] << 8) | (keyLen << 16);
+	IniKeyValueNode *node = section->head;
+	IniKeyValueNode *prev = NULL;
+	do {
+		IniKeyValueNode *next = node->next;
+		if (node->hash == hash && StrEqual(node->key, key)) {
+			// remove the node
+			--section->count;
+			if (prev == NULL) {
+				section->head = next;
+			} else {
+				prev->next = next;
 			}
-			p = StrEnd(p) + 1;
+			return node->value;
+		}
+		prev = node;
+		node = next;
+	} while (node);
+	return NULL;
+}
+
+BOOL IniSectionGetStringImpl(IniSection *section, LPCWSTR key, int keyLen, LPCWSTR lpDefault, LPWSTR lpReturnedString, int cchReturnedString) {
+	LPCWSTR value = IniSectionGetValueImpl(section, key, keyLen);
+	// allow empty string value
+	lstrcpyn(lpReturnedString, ((value == NULL) ? lpDefault : value), cchReturnedString);
+	return StrNotEmpty(lpReturnedString);
+}
+
+int IniSectionGetIntImpl(IniSection *section, LPCWSTR key, int keyLen, int iDefault) {
+	LPCWSTR value = IniSectionGetValueImpl(section, key, keyLen);
+	if (value && (*value >= L'0' && *value <= L'9')) {
+		return StrToInt(value);
+	}
+	return iDefault;
+}
+
+BOOL IniSectionGetBoolImpl(IniSection *section, LPCWSTR key, int keyLen, BOOL bDefault) {
+	LPCWSTR value = IniSectionGetValueImpl(section, key, keyLen);
+	if (value) {
+		switch (*value) {
+		case L'1':
+			return TRUE;
+		case L'0':
+			return FALSE;
 		}
 	}
 	return bDefault;
-}
-
-int IniSectionGetIntImpl(LPCWSTR lpCachedIniSection, LPCWSTR lpName, int keyLen, int iDefault) {
-	LPCWSTR p = lpCachedIniSection;
-	if (p) {
-		int i;
-
-		while (*p) {
-			if (StrNEqual(p, lpName, keyLen) && p[keyLen] == L'=') {
-				if (swscanf(p + keyLen + 1, L"%i", &i) == 1) {
-					return i;
-				}
-				return iDefault;
-			}
-			p = StrEnd(p) + 1;
-		}
-	}
-	return iDefault;
 }
 
 BOOL IniSectionSetString(LPWSTR lpCachedIniSection, LPCWSTR lpName, LPCWSTR lpString) {
@@ -1698,17 +1733,22 @@ int MRU_Enum(LPMRULIST pmru, int iIndex, LPWSTR pszItem, int cchItem) {
 }
 
 BOOL MRU_Load(LPMRULIST pmru) {
-	WCHAR tchName[32];
-	WCHAR tchItem[1024];
-	WCHAR *pIniSection = NP2HeapAlloc(sizeof(WCHAR) * 32 * 1024);
-	const int cchIniSection = (int)NP2HeapSize(pIniSection) / sizeof(WCHAR);
+	IniSection section;
+	WCHAR *pIniSectionBuf = NP2HeapAlloc(sizeof(WCHAR) * 32 * 1024);
+	const int cchIniSection = (int)NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR);
+	IniSection *pIniSection = &section;
 
 	MRU_Empty(pmru);
-	LoadIniSection(pmru->szRegKey, pIniSection, cchIniSection);
+	IniSectionInit(pIniSection, MRU_MAXITEMS);
 
-	for (int i = 0, n = 0; i < pmru->iSize; i++) {
-		wsprintf(tchName, L"%02i", i + 1);
-		if (IniSectionGetStringImpl(pIniSection, tchName, 2, L"", tchItem, COUNTOF(tchItem))) {
+	LoadIniSection(pmru->szRegKey, pIniSectionBuf, cchIniSection);
+	IniSectionParseEx(pIniSection, pIniSectionBuf, IniSectionParseFlag_Array);
+	const int count = min_i(pIniSection->count, pmru->iSize);
+
+	for (int i = 0, n = 0; i < count; i++) {
+		const IniKeyValueNode *node = &pIniSection->nodeList[i];
+		LPCWSTR tchItem = node->value;
+		if (StrNotEmpty(tchItem)) {
 			/*if (pmru->iFlags & MRU_UTF8) {
 				WCHAR wchItem[1024];
 				int cbw = MultiByteToWideChar(CP_UTF7, 0, tchItem, -1, wchItem, COUNTOF(wchItem));
@@ -1720,7 +1760,8 @@ BOOL MRU_Load(LPMRULIST pmru) {
 		}
 	}
 
-	NP2HeapFree(pIniSection);
+	IniSectionFree(pIniSection);
+	NP2HeapFree(pIniSectionBuf);
 	return TRUE;
 }
 

@@ -102,29 +102,85 @@ static inline BOOL IniSetInt(LPCWSTR lpSection, LPCWSTR lpName, int i) {
 #define SaveIniSection(lpSection, lpBuf) \
 	WritePrivateProfileSection(lpSection, lpBuf, szIniFile)
 
-int IniSectionGetStringImpl(LPCWSTR lpCachedIniSection, LPCWSTR lpName, int keyLen, LPCWSTR lpDefault, LPWSTR lpReturnedString, int cchReturnedString);
-int IniSectionGetIntImpl(LPCWSTR lpCachedIniSection, LPCWSTR lpName, int keyLen, int iDefault);
-BOOL IniSectionGetBoolImpl(LPCWSTR lpCachedIniSection, LPCWSTR lpName, int keyLen, BOOL bDefault);
+struct IniKeyValueNode;
+typedef struct IniKeyValueNode {
+	struct IniKeyValueNode *next;
+	UINT hash;
+	LPCWSTR key;
+	LPCWSTR value;
+} IniKeyValueNode;
+
+typedef struct IniSection {
+	int count;
+	int capacity;
+	IniKeyValueNode *head;
+	IniKeyValueNode *nodeList;
+} IniSection;
+
+static inline void IniSectionInit(IniSection *section, int capacity) {
+	section->count = 0;
+	section->capacity = capacity;
+	section->head = NULL;
+	section->nodeList = (IniKeyValueNode *)NP2HeapAlloc(capacity * sizeof(IniKeyValueNode));
+}
+
+static inline void IniSectionFree(IniSection *section) {
+	NP2HeapFree(section->nodeList);
+}
+
+static inline void IniSectionClear(IniSection *section) {
+	section->count = 0;
+	section->head = NULL;
+}
+
+static inline BOOL IniSectionIsEmpty(const IniSection *section) {
+	return section->count == 0;
+}
+
+#define IniSectionParseFlag_Default	0
+#define IniSectionParseFlag_Array	1
+
+BOOL IniSectionParseEx(IniSection *section, LPWSTR lpCachedIniSection, UINT flag);
+LPCWSTR IniSectionUnsafeGetValue(IniSection *section, LPCWSTR key, int keyLen);
+
+static inline BOOL IniSectionParse(IniSection *section, LPWSTR lpCachedIniSection) {
+	return IniSectionParseEx(section, lpCachedIniSection, IniSectionParseFlag_Default);
+}
+
+static inline LPCWSTR IniSectionGetValueImpl(IniSection *section, LPCWSTR key, int keyLen) {
+	return section->count ? IniSectionUnsafeGetValue(section, key, keyLen) : NULL;
+}
+
+BOOL IniSectionGetStringImpl(IniSection *section, LPCWSTR key, int keyLen, LPCWSTR lpDefault, LPWSTR lpReturnedString, int cchReturnedString);
+int IniSectionGetIntImpl(IniSection *section, LPCWSTR key, int keyLen, int iDefault);
+BOOL IniSectionGetBoolImpl(IniSection *section, LPCWSTR key, int keyLen, BOOL bDefault);
+
+#define IniSectionGetValue(section, key) \
+	IniSectionGetValueImpl(section, key, CSTRLEN(key))
+#define IniSectionGetInt(section, key, iDefault) \
+	IniSectionGetIntImpl(section, key, CSTRLEN(key), (iDefault))
+#define IniSectionGetBool(section, key, bDefault) \
+	IniSectionGetBoolImpl(section, key, CSTRLEN(key), (bDefault))
+#define IniSectionGetString(section, key, lpDefault, lpReturnedString, cchReturnedString) \
+	IniSectionGetStringImpl(section, key, CSTRLEN(key), (lpDefault), (lpReturnedString), (cchReturnedString))
+
+static inline LPCWSTR IniSectionGetValueEx(IniSection *section, LPCWSTR key) {
+	return IniSectionGetValueImpl(section, key, -1);
+}
+
+static inline int IniSectionGetIntEx(IniSection *section, LPCWSTR key, int iDefault) {
+	return IniSectionGetIntImpl(section, key, -1, iDefault);
+}
+
+static inline BOOL IniSectionGetBoolEx(IniSection *section, LPCWSTR key, BOOL bDefault) {
+	return IniSectionGetBoolImpl(section, key, -1, bDefault);
+}
+
+static inline BOOL IniSectionGetStringEx(IniSection *section, LPCWSTR key, LPCWSTR lpDefault, LPWSTR lpReturnedString, int cchReturnedString) {
+	return IniSectionGetStringImpl(section, key, -1, lpDefault, lpReturnedString, cchReturnedString);
+}
+
 BOOL IniSectionSetString(LPWSTR lpCachedIniSection, LPCWSTR lpName, LPCWSTR lpString);
-
-#define IniSectionGetInt(lpCachedIniSection, lpName, iDefault) \
-	IniSectionGetIntImpl(lpCachedIniSection, lpName, CSTRLEN(lpName), (iDefault))
-#define IniSectionGetBool(lpCachedIniSection, lpName, bDefault) \
-	IniSectionGetBoolImpl(lpCachedIniSection, lpName, CSTRLEN(lpName), (bDefault))
-#define IniSectionGetString(lpCachedIniSection, lpName, lpDefault, lpReturnedString, cchReturnedString) \
-	IniSectionGetStringImpl(lpCachedIniSection, lpName, CSTRLEN(lpName), (lpDefault), (lpReturnedString), (cchReturnedString))
-
-static inline int IniSectionGetIntEx(LPCWSTR lpCachedIniSection, LPCWSTR lpName, int iDefault) {
-	return IniSectionGetIntImpl(lpCachedIniSection, lpName, lstrlen(lpName), iDefault);
-}
-
-static inline BOOL IniSectionGetBoolEx(LPCWSTR lpCachedIniSection, LPCWSTR lpName, BOOL bDefault) {
-	return IniSectionGetBoolImpl(lpCachedIniSection, lpName, lstrlen(lpName), bDefault);
-}
-
-static inline BOOL IniSectionGetStringEx(LPWSTR lpCachedIniSection, LPCWSTR lpName, LPCWSTR lpDefault, LPWSTR lpReturnedString, int cchReturnedString) {
-	return IniSectionGetStringImpl(lpCachedIniSection, lpName, lstrlen(lpName), lpDefault, lpReturnedString, cchReturnedString);
-}
 
 static inline BOOL IniSectionSetInt(LPWSTR lpCachedIniSection, LPCWSTR lpName, int i) {
 	WCHAR tch[32];

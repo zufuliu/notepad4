@@ -235,8 +235,11 @@ extern BOOL	bHiliteCurrentLine;
 //
 void Style_Load(void) {
 	unsigned int iLexer;
-	WCHAR *pIniSection = NP2HeapAlloc(sizeof(WCHAR) * 32 * 1024);
-	const int cchIniSection = (int)NP2HeapSize(pIniSection) / sizeof(WCHAR);
+	IniSection section;
+	WCHAR *pIniSectionBuf = NP2HeapAlloc(sizeof(WCHAR) * 32 * 1024);
+	const int cchIniSection = (int)NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR);
+	IniSection *pIniSection = &section;
+	IniSectionInit(pIniSection, 128);
 
 	// Custom colors
 	crCustom [0] = RGB(0x00, 0x00, 0x00);
@@ -256,23 +259,24 @@ void Style_Load(void) {
 	crCustom[14] = RGB(0xB0, 0x00, 0xB0);
 	crCustom[15] = RGB(0xB2, 0x8B, 0x40);
 
-	LoadIniSection(L"Custom Colors", pIniSection, cchIniSection);
-	for (unsigned int i = 0; i < 16; i++) {
-		WCHAR tch[32];
-		WCHAR wch[32];
-		wsprintf(tch, L"%02u", i + 1);
-		if (IniSectionGetStringImpl(pIniSection, tch, 2, L"", wch, COUNTOF(wch))) {
-			if (wch[0] == L'#') {
-				unsigned int irgb;
-				int itok = swscanf(CharNext(wch), L"%x", &irgb);
-				if (itok == 1) {
-					crCustom[i] = RGB((irgb & 0xFF0000) >> 16, (irgb & 0xFF00) >> 8, irgb & 0xFF);
-				}
+	LoadIniSection(L"Custom Colors", pIniSectionBuf, cchIniSection);
+	IniSectionParseEx(pIniSection, pIniSectionBuf, IniSectionParseFlag_Array);
+
+	const int count = min_i(pIniSection->count, 16);
+	for (int i = 0; i < count; i++) {
+		const IniKeyValueNode *node = &pIniSection->nodeList[i];
+		LPCWSTR wch = node->value;
+		if (wch != NULL && *wch == L'#') {
+			unsigned int irgb;
+			if (swscanf(wch + 1, L"%x", &irgb) == 1) {
+				crCustom[i] = RGB((irgb & 0xFF0000) >> 16, (irgb & 0xFF00) >> 8, irgb & 0xFF);
 			}
 		}
 	}
 
-	LoadIniSection(L"Styles", pIniSection, cchIniSection);
+	LoadIniSection(L"Styles", pIniSectionBuf, cchIniSection);
+	IniSectionParse(pIniSection, pIniSectionBuf);
+
 	// 2nd default
 	bUse2ndDefaultStyle = IniSectionGetBool(pIniSection, L"Use2ndDefaultStyle", 0);
 
@@ -293,8 +297,8 @@ void Style_Load(void) {
 	for (iLexer = 0; iLexer < NUMLEXERS; iLexer++) {
 		PEDITLEXER lex = pLexArray[iLexer];
 		unsigned int i = 0;
-		LoadIniSection(lex->pszName, pIniSection, cchIniSection);
-		if (StrIsEmpty(pIniSection)) {
+		LoadIniSection(lex->pszName, pIniSectionBuf, cchIniSection);
+		if (!IniSectionParse(pIniSection, pIniSectionBuf)) {
 			lstrcpyn(lex->szExtensions, lex->pszDefExt, COUNTOF(lex->szExtensions));
 			while (lex->Styles[i].iStyle != -1) {
 				lstrcpyn(lex->Styles[i].szValue, lex->Styles[i].pszDefault, COUNTOF(lex->Styles[i].szValue));
@@ -311,7 +315,9 @@ void Style_Load(void) {
 			i++;
 		}
 	}
-	NP2HeapFree(pIniSection);
+
+	IniSectionFree(pIniSection);
+	NP2HeapFree(pIniSectionBuf);
 }
 
 //=============================================================================
@@ -403,12 +409,18 @@ BOOL Style_Import(HWND hwnd) {
 
 	if (GetOpenFileName(&ofn)) {
 		unsigned int iLexer;
-		WCHAR *pIniSection = NP2HeapAlloc(sizeof(WCHAR) * 32 * 1024);
-		const int cchIniSection = (int)NP2HeapSize(pIniSection) / sizeof(WCHAR);
+		IniSection section;
+		WCHAR *pIniSectionBuf = NP2HeapAlloc(sizeof(WCHAR) * 32 * 1024);
+		const int cchIniSection = (int)NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR);
+		IniSection *pIniSection = &section;
 
+		IniSectionInit(pIniSection, 128);
 		for (iLexer = 0; iLexer < NUMLEXERS; iLexer++) {
 			PEDITLEXER lex = pLexArray[iLexer];
-			if (GetPrivateProfileSection(lex->pszName, pIniSection, cchIniSection, szFile)) {
+			if (GetPrivateProfileSection(lex->pszName, pIniSectionBuf, cchIniSection, szFile)) {
+				if (!IniSectionParse(pIniSection, pIniSectionBuf)) {
+					continue;
+				}
 				unsigned int i = 0;
 				if (!IniSectionGetString(pIniSection, L"FileNameExtensions", lex->pszDefExt, lex->szExtensions, COUNTOF(lex->szExtensions))) {
 					lstrcpyn(lex->szExtensions, lex->pszDefExt,  COUNTOF(lex->szExtensions));
@@ -420,7 +432,9 @@ BOOL Style_Import(HWND hwnd) {
 				}
 			}
 		}
-		NP2HeapFree(pIniSection);
+
+		IniSectionFree(pIniSection);
+		NP2HeapFree(pIniSectionBuf);
 		return TRUE;
 	}
 	return FALSE;

@@ -1795,35 +1795,33 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) {
 
 #if NP2_ENABLE_CUSTOMIZE_TOOLBAR_LABELS
 	// Load toolbar labels
-	WCHAR *pIniSection = NP2HeapAlloc(sizeof(WCHAR) * 32 * 1024);
-	const int cchIniSection = (int)(NP2HeapSize(pIniSection) / sizeof(WCHAR));
-	LoadIniSection(L"Toolbar Labels", pIniSection, cchIniSection);
-	if (StrIsEmpty(pIniSection)) {
-		for (unsigned int i = 0; i < COUNTOF(tbbMainWnd); i++) {
-			if (tbbMainWnd[i].fsStyle != TBSTYLE_SEP) {
-				tbbMainWnd[i].fsStyle &= ~(BTNS_AUTOSIZE | BTNS_SHOWTEXT);
-			}
+	IniSection section;
+	WCHAR *pIniSectionBuf = NP2HeapAlloc(sizeof(WCHAR) * 32 * 1024);
+	const int cchIniSection = (int)(NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR));
+	IniSection *pIniSection = &section;
+
+	IniSectionInit(pIniSection, COUNTOF(tbbMainWnd));
+	LoadIniSection(L"Toolbar Labels", pIniSectionBuf, cchIniSection);
+	IniSectionParseEx(pIniSection, pIniSectionBuf, IniSectionParseFlag_Array);
+
+	for (int n = 0; n < pIniSection->count; n++) {
+		const IniKeyValueNode *node = &pIniSection->nodeList[n];
+		const UINT i = StrToInt(node->key) - 1;
+		if (i >= COUNTOF(tbbMainWnd) || tbbMainWnd[i].fsStyle == TBSTYLE_SEP) {
+			continue;
 		}
-	} else {
-		WCHAR tchDesc[256];
-		WCHAR tchIndex[256];
 
-		for (unsigned int i = 0, n = 1; i < COUNTOF(tbbMainWnd); i++) {
-			if (tbbMainWnd[i].fsStyle == TBSTYLE_SEP) {
-				continue;
-			}
-
-			wsprintf(tchIndex, L"%02u", n++);
-
-			if (IniSectionGetStringImpl(pIniSection, tchIndex, 2, L"", tchDesc, COUNTOF(tchDesc))) {
-				tbbMainWnd[i].iString = SendMessage(hwndToolbar, TB_ADDSTRING, 0, (LPARAM)tchDesc);
-				tbbMainWnd[i].fsStyle |= BTNS_AUTOSIZE | BTNS_SHOWTEXT;
-			} else {
-				tbbMainWnd[i].fsStyle &= ~(BTNS_AUTOSIZE | BTNS_SHOWTEXT);
-			}
+		LPCWSTR tchDesc = node->value;
+		if (StrNotEmpty(tchDesc)) {
+			tbbMainWnd[i].iString = SendMessage(hwndToolbar, TB_ADDSTRING, 0, (LPARAM)tchDesc);
+			tbbMainWnd[i].fsStyle |= BTNS_AUTOSIZE | BTNS_SHOWTEXT;
+		} else {
+			tbbMainWnd[i].fsStyle &= ~(BTNS_AUTOSIZE | BTNS_SHOWTEXT);
 		}
 	}
-	NP2HeapFree(pIniSection);
+
+	IniSectionFree(pIniSection);
+	NP2HeapFree(pIniSectionBuf);
 #endif
 
 	SendMessage(hwndToolbar, TB_SETEXTENDEDSTYLE, 0,
@@ -5274,10 +5272,14 @@ extern BOOL fStylesModified;
 //
 //
 void LoadSettings(void) {
-	WCHAR *pIniSection = NP2HeapAlloc(sizeof(WCHAR) * 32 * 1024);
-	const int cchIniSection = (int)NP2HeapSize(pIniSection) / sizeof(WCHAR);
+	IniSection section;
+	WCHAR *pIniSectionBuf = NP2HeapAlloc(sizeof(WCHAR) * 32 * 1024);
+	const int cchIniSection = (int)NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR);
+	IniSection *pIniSection = &section;
+	IniSectionInit(pIniSection, 128);
 
-	LoadIniSection(L"Settings", pIniSection, cchIniSection);
+	LoadIniSection(L"Settings", pIniSectionBuf, cchIniSection);
+	IniSectionParse(pIniSection, pIniSectionBuf);
 
 	const int iSettingsVersion = IniSectionGetInt(pIniSection, L"SettingsVersion", NP2SettingsVersion_None);
 	fStylesModified = iSettingsVersion != NP2SettingsVersion_Current; // compress old ini file on save
@@ -5525,7 +5527,8 @@ void LoadSettings(void) {
 
 //////////////////////////////// Settings2 ///////////////////////////////////////////
 
-	LoadIniSection(L"Settings2", pIniSection, cchIniSection);
+	LoadIniSection(L"Settings2", pIniSectionBuf, cchIniSection);
+	IniSectionParse(pIniSection, pIniSectionBuf);
 
 	iAutoCDefaultShowItemCount = IniSectionGetInt(pIniSection, L"AutoCDefaultShowItemCount", 15);
 	iAutoCMinWordLength = IniSectionGetInt(pIniSection, L"AutoCMinWordLength", 1);
@@ -5547,7 +5550,9 @@ void LoadSettings(void) {
 	dwFileCheckInverval = IniSectionGetInt(pIniSection, L"FileCheckInverval", 1000);
 	dwAutoReloadTimeout = IniSectionGetInt(pIniSection, L"AutoReloadTimeout", 1000);
 
-	LoadIniSection(L"Toolbar Images", pIniSection, cchIniSection);
+	LoadIniSection(L"Toolbar Images", pIniSectionBuf, cchIniSection);
+	IniSectionParse(pIniSection, pIniSectionBuf);
+
 	IniSectionGetString(pIniSection, L"BitmapDefault", L"", tchToolbarBitmap, COUNTOF(tchToolbarBitmap));
 	IniSectionGetString(pIniSection, L"BitmapHot", L"", tchToolbarBitmapHot, COUNTOF(tchToolbarBitmap));
 	IniSectionGetString(pIniSection, L"BitmapDisabled", L"", tchToolbarBitmapDisabled, COUNTOF(tchToolbarBitmap));
@@ -5563,7 +5568,8 @@ void LoadSettings(void) {
 		wsprintf(tchSizeY, L"%ix%i SizeY", ResX, ResY);
 		wsprintf(tchMaximized, L"%ix%i Maximized", ResX, ResY);
 
-		LoadIniSection(L"Window", pIniSection, cchIniSection);
+		LoadIniSection(L"Window", pIniSectionBuf, cchIniSection);
+		IniSectionParse(pIniSection, pIniSectionBuf);
 
 		wi.x	= IniSectionGetIntEx(pIniSection, tchPosX, CW_USEDEFAULT);
 		wi.y	= IniSectionGetIntEx(pIniSection, tchPosY, CW_USEDEFAULT);
@@ -5575,7 +5581,8 @@ void LoadSettings(void) {
 		}
 	}
 
-	NP2HeapFree(pIniSection);
+	IniSectionFree(pIniSection);
+	NP2HeapFree(pIniSectionBuf);
 
 	iDefaultCodePage = 0;
 	{
@@ -6412,10 +6419,14 @@ void ParseCommandLine(void) {
 //
 //
 void LoadFlags(void) {
-	WCHAR *pIniSection = NP2HeapAlloc(sizeof(WCHAR) * 32 * 1024);
-	const int cchIniSection = (int)NP2HeapSize(pIniSection) / sizeof(WCHAR);
+	IniSection section;
+	WCHAR *pIniSectionBuf = NP2HeapAlloc(sizeof(WCHAR) * 32 * 1024);
+	const int cchIniSection = (int)NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR);
+	IniSection *pIniSection = &section;
+	IniSectionInit(pIniSection, 64);
 
-	LoadIniSection(L"Settings2", pIniSection, cchIniSection);
+	LoadIniSection(L"Settings2", pIniSectionBuf, cchIniSection);
+	IniSectionParse(pIniSection, pIniSectionBuf);
 
 	if (!flagReuseWindow && !flagNoReuseWindow) {
 		flagNoReuseWindow = !IniSectionGetBool(pIniSection, L"ReuseWindow", 0);
@@ -6450,7 +6461,8 @@ void LoadFlags(void) {
 		}
 	}
 
-	NP2HeapFree(pIniSection);
+	IniSectionFree(pIniSection);
+	NP2HeapFree(pIniSectionBuf);
 }
 
 //=============================================================================
