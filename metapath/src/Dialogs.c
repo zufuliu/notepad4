@@ -592,6 +592,7 @@ extern BOOL fUseRecycleBin;
 extern BOOL fNoConfirmDelete;
 extern int  iStartupDir;
 extern int  iEscFunction;
+extern BOOL bReuseWindow;
 
 INT_PTR CALLBACK GeneralPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
 	UNREFERENCED_PARAMETER(wParam);
@@ -631,7 +632,7 @@ INT_PTR CALLBACK GeneralPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPa
 			CheckDlgButton(hwnd, IDC_MINIMIZETOTRAY, BST_CHECKED);
 		}
 
-		if (IniGetInt(L"Settings2", L"ReuseWindow", 1)) {
+		if (bReuseWindow) {
 			CheckDlgButton(hwnd, IDC_REUSEWINDOW, BST_CHECKED);
 		}
 		return TRUE;
@@ -2178,6 +2179,7 @@ INT_PTR CALLBACK FindWinDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPar
 //
 extern int iUseTargetApplication;
 extern int iTargetApplicationMode;
+extern BOOL bLoadLaunchSetingsLoaded;
 extern WCHAR szTargetApplication[MAX_PATH];
 extern WCHAR szTargetApplicationParams[MAX_PATH];
 extern WCHAR szTargetApplicationWndClass[MAX_PATH];
@@ -2238,7 +2240,9 @@ INT_PTR CALLBACK FindTargetDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 		SendDlgItemMessage(hwnd, IDC_DDEAPP, EM_LIMITTEXT, 128, 0);
 		SendDlgItemMessage(hwnd, IDC_DDETOPIC, EM_LIMITTEXT, 128, 0);
 
-		LoadLaunchSetings();
+		if (!bLoadLaunchSetingsLoaded) {
+			LoadLaunchSetings();
+		}
 		if (iUseTargetApplication) {
 			CheckRadioButton(hwnd, IDC_LAUNCH, IDC_TARGET, IDC_TARGET);
 		} else {
