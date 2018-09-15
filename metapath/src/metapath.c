@@ -48,6 +48,7 @@ HWND      hwndReBar;
 
 #define TBFILTERBMP 13
 
+#define DefaultToolbarButtons	L"1 2 3 4 5 0 8"
 static TBBUTTON tbbMainWnd[] = {
 	{0, IDT_HISTORY_BACK, TBSTATE_ENABLED, TBSTYLE_BUTTON, {0}, 0, 0},
 	{1, IDT_HISTORY_FORWARD, TBSTATE_ENABLED, TBSTYLE_BUTTON, {0}, 0, 0},
@@ -131,6 +132,7 @@ int       cyDriveBoxFrame;
 int       nIdFocus = IDC_DIRLIST;
 
 WCHAR      szCurDir[MAX_PATH + 40];
+WCHAR	szMRUDirectory[MAX_PATH];
 DWORD     dwFillMask;
 int       nSortFlags;
 BOOL      fSortRev;
@@ -160,10 +162,13 @@ UINT16		g_uWinVer;
 // Flags
 //
 int flagNoReuseWindow   = 0;
+BOOL bReuseWindow       = FALSE;
 int flagStartAsTrayIcon = 0;
 int flagPortableMyDocs  = 0;
 int flagGotoFavorites   = 0;
+int iAutoRefreshRate    = 0; // unit: 1/10 sec
 int flagNoFadeHidden    = 0;
+int iOpacityLevel       = 75;
 int flagToolbarLook     = 0;
 int flagPosParam        = 0;
 
@@ -353,12 +358,11 @@ HWND InitInstance(HINSTANCE hInstance, int nCmdShow) {
 	} else if (iStartupDir) {
 		// Use a startup directory
 		if (iStartupDir == 1) {
-			WCHAR tch[MAX_PATH];
-			if (!IniGetString(L"Settings", L"MRUDirectory", L"", tch, COUNTOF(tch))) {
-				GetModuleFileName(NULL, tch, COUNTOF(tch));
-				PathRemoveFileSpec(tch);
+			if (!StrIsEmpty(szMRUDirectory)) {
+				GetModuleFileName(NULL, szMRUDirectory, COUNTOF(szMRUDirectory));
+				PathRemoveFileSpec(szMRUDirectory);
 			}
-			DisplayPath(tch, IDS_ERR_STARTUPDIR);
+			DisplayPath(szMRUDirectory, IDS_ERR_STARTUPDIR);
 		} else {
 			DisplayPath(tchFavoritesDir, IDS_ERR_STARTUPDIR);
 		}
@@ -388,8 +392,6 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 	switch (umsg) {
 	case WM_CREATE: {
 		// Init directory watching
-		// iAutoRefreshRate is in 1/10 sec
-		int iAutoRefreshRate = IniGetInt(L"Settings2", L"AutoRefreshRate", 30);
 		if (iAutoRefreshRate) {
 			SetTimer(hwnd, ID_TIMER, (iAutoRefreshRate * 100), NULL);
 		}
@@ -2424,11 +2426,13 @@ void LoadSettings(void) {
 	bMinimizeToTray = IniSectionGetBool(pIniSection, L"MinimizeToTray", 0);
 	bTransparentMode = IniSectionGetBool(pIniSection, L"TransparentMode", 0);
 
-	iEscFunction = IniSectionGetInt(pIniSection, L"EscFunction", 2);
+	iEscFunction = IniSectionGetInt(pIniSection, L"EscFunction", 1);
 	iEscFunction = clamp_i(iEscFunction, 0, 2);
 
 	iStartupDir = IniSectionGetInt(pIniSection, L"StartupDirectory", 1);
 	iStartupDir = clamp_i(iStartupDir, 0, 2);
+
+	IniSectionGetString(pIniSection, L"MRUDirectory", L"", szMRUDirectory, COUNTOF(szMRUDirectory));
 
 	if (!IniSectionGetString(pIniSection, L"Favorites", L"",
 							 tchFavoritesDir, COUNTOF(tchFavoritesDir))) {
@@ -2488,9 +2492,9 @@ void LoadSettings(void) {
 	crNoFilt = IniSectionGetInt(pIniSection, L"ColorNoFilter", GetSysColor(COLOR_WINDOWTEXT));
 	crFilter = IniSectionGetInt(pIniSection, L"ColorFilter", GetSysColor(COLOR_HIGHLIGHT));
 
-	if (IniSectionGetString(pIniSection, L"ToolbarButtons", L"",
-							tchToolbarButtons, COUNTOF(tchToolbarButtons)) == 0) {
-		lstrcpy(tchToolbarButtons, L"1 2 3 4 5 0 8");
+	if (!IniSectionGetString(pIniSection, L"ToolbarButtons", L"",
+							tchToolbarButtons, COUNTOF(tchToolbarButtons))) {
+		lstrcpy(tchToolbarButtons, DefaultToolbarButtons);
 	}
 
 	bShowToolbar = IniSectionGetBool(pIniSection, L"ShowToolbar", 1);
@@ -2840,14 +2844,24 @@ void LoadFlags(void) {
 	LoadIniSection(L"Settings2", pIniSectionBuf, cchIniSection);
 	IniSectionParse(pIniSection, pIniSectionBuf);
 
+	bReuseWindow = IniSectionGetBool(pIniSection, L"ReuseWindow", 0);
 	if (!flagNoReuseWindow) {
-		flagNoReuseWindow = !IniSectionGetBool(pIniSection, L"ReuseWindow", 1);
+		flagNoReuseWindow = !bReuseWindow;
 	}
 
 	flagPortableMyDocs = IniSectionGetBool(pIniSection, L"PortableMyDocs", 1);
+
+	iAutoRefreshRate = IniSectionGetInt(pIniSection, L"AutoRefreshRate", 30);
+	iAutoRefreshRate = max_i(iAutoRefreshRate, 0);
+
 	flagNoFadeHidden = IniSectionGetBool(pIniSection, L"NoFadeHidden", 0);
 
-	flagToolbarLook = IniSectionGetInt(pIniSection, L"ToolbarLook", 0);
+	iOpacityLevel = IniSectionGetInt(pIniSection, L"OpacityLevel", 75);
+	if (iOpacityLevel < 0 || iOpacityLevel > 100) {
+		iOpacityLevel = 75;
+	}
+
+	flagToolbarLook = IniSectionGetInt(pIniSection, L"ToolbarLook", IsWinXPAndAbove() ? 1 : 2);
 	flagToolbarLook = clamp_i(flagToolbarLook, 0, 2);
 
 	IniSectionFree(pIniSection);
@@ -3389,6 +3403,7 @@ void ShowNotifyIcon(HWND hwnd, BOOL bAdd) {
 //
 //
 WCHAR szGlobalWndClass[256] = L"";
+BOOL bLoadLaunchSetingsLoaded = FALSE;
 
 BOOL CALLBACK EnumWndProc2(HWND hwnd, LPARAM lParam) {
 	BOOL bContinue = TRUE;
@@ -3407,11 +3422,6 @@ BOOL CALLBACK EnumWndProc2(HWND hwnd, LPARAM lParam) {
 }
 
 void LoadLaunchSetings(void) {
-	static BOOL done = FALSE;
-	if (done) {
-		return;
-	}
-
 	IniSection section;
 	WCHAR *pIniSectionBuf = NP2HeapAlloc(sizeof(WCHAR) * 32 * 1024);
 	const int cbIniSection = (int)NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR);
@@ -3421,11 +3431,11 @@ void LoadLaunchSetings(void) {
 	LoadIniSection(L"Target Application", pIniSectionBuf, cbIniSection);
 	IniSectionParse(pIniSection, pIniSectionBuf);
 
-	if (IniSectionGetInt(pIniSection, L"UseTargetApplication", 0xFB) != 0xFB) {
-		iUseTargetApplication = IniSectionGetInt(pIniSection, L"UseTargetApplication", iUseTargetApplication);
-		iTargetApplicationMode = IniSectionGetInt(pIniSection, L"TargetApplicationMode", iTargetApplicationMode);
+	iUseTargetApplication = IniSectionGetInt(pIniSection, L"UseTargetApplication", 0xFB);
+	if (iUseTargetApplication != 0xFB) {
 		IniSectionGetString(pIniSection, L"TargetApplicationPath", szTargetApplication, szTargetApplication, COUNTOF(szTargetApplication));
 		IniSectionGetString(pIniSection, L"TargetApplicationParams", szTargetApplicationParams, szTargetApplicationParams, COUNTOF(szTargetApplicationParams));
+		iTargetApplicationMode = IniSectionGetInt(pIniSection, L"TargetApplicationMode", iTargetApplicationMode);
 		IniSectionGetString(pIniSection, L"TargetApplicationWndClass", szTargetApplicationWndClass, szTargetApplicationWndClass, COUNTOF(szTargetApplicationWndClass));
 		IniSectionGetString(pIniSection, L"DDEMessage", szDDEMsg, szDDEMsg, COUNTOF(szDDEMsg));
 		IniSectionGetString(pIniSection, L"DDEApplication", szDDEApp, szDDEApp, COUNTOF(szDDEApp));
@@ -3441,16 +3451,19 @@ void LoadLaunchSetings(void) {
 		lstrcpy(szDDETopic, L"");
 	}
 
+	lstrcpy(szGlobalWndClass, szTargetApplicationWndClass);
 	IniSectionFree(pIniSection);
 	NP2HeapFree(pIniSectionBuf);
-	done = TRUE;
+	bLoadLaunchSetingsLoaded = TRUE;
 }
 
 void LaunchTarget(LPCWSTR lpFileName, BOOL bOpenNew) {
 	HWND  hwnd  = NULL;
 	HDROP hDrop = NULL;
 
-	LoadLaunchSetings();
+	if (!bLoadLaunchSetingsLoaded) {
+		LoadLaunchSetings();
+	}
 	if (iUseTargetApplication == 4 ||
 			(iUseTargetApplication && StrIsEmpty(szTargetApplication))) {
 		ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_FINDTARGET),
@@ -3459,8 +3472,6 @@ void LaunchTarget(LPCWSTR lpFileName, BOOL bOpenNew) {
 	}
 
 	if (iUseTargetApplication && iTargetApplicationMode == 1) {
-		lstrcpy(szGlobalWndClass, szTargetApplicationWndClass);
-
 		if (!bOpenNew) { // hwnd == NULL
 			EnumWindows(EnumWndProc2, (LPARAM)&hwnd);
 		}
@@ -3628,16 +3639,8 @@ void SnapToTarget(HWND hwnd) {
 	RECT rcOld, rcNew, rc2;
 	HWND hwnd2;
 
-	if (IniGetInt(L"Target Application", L"UseTargetApplication", 0xFB) != 0xFB) {
-		IniGetString(L"Target Application", L"TargetApplicationWndClass",
-					 szTargetApplicationWndClass, szTargetApplicationWndClass, COUNTOF(szTargetApplicationWndClass));
-
-		if (StrIsEmpty(szTargetApplicationWndClass)) {
-			return;
-		}
-		lstrcpy(szGlobalWndClass, szTargetApplicationWndClass);
-	} else {
-		lstrcpy(szGlobalWndClass, L"Notepad2");
+	if (!bLoadLaunchSetingsLoaded) {
+		LoadLaunchSetings();
 	}
 
 	hwnd2 = NULL;

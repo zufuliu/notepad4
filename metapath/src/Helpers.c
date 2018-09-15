@@ -448,20 +448,12 @@ void DeleteBitmapButton(HWND hwnd, int nCtlId) {
 //
 //  SetWindowTransparentMode()
 //
+extern int iOpacityLevel;
 void SetWindowTransparentMode(HWND hwnd, BOOL bTransparentMode) {
 	if (bTransparentMode) {
 		if (IsWin2KAndAbove()) {
-			int  iAlphaPercent;
-			BYTE bAlpha;
 			SetWindowLongPtr(hwnd, GWL_EXSTYLE, GetWindowLongPtr(hwnd, GWL_EXSTYLE) | WS_EX_LAYERED);
-
-			// get opacity level from registry
-			iAlphaPercent = IniGetInt(L"Settings2", L"OpacityLevel", 75);
-			if (iAlphaPercent < 0 || iAlphaPercent > 100) {
-				iAlphaPercent = 75;
-			}
-			bAlpha = (BYTE)(iAlphaPercent * 255 / 100);
-
+			const BYTE bAlpha = (BYTE)(iOpacityLevel * 255 / 100);
 			SetLayeredWindowAttributes(hwnd, 0, bAlpha, LWA_ALPHA);
 		}
 	} else {

@@ -416,12 +416,12 @@ int EditDetectEOLMode(HWND hwnd, LPCSTR lpData) {
 //
 // EditLoadFile()
 //
+extern DWORD dwFileLoadWarningMB;
 BOOL EditLoadFile(HWND hwnd, LPWSTR pszFile, BOOL bSkipEncodingDetection,
 				  int *iEncoding, int *iEOLMode, BOOL *pbUnicodeErr, BOOL *pbFileTooBig) {
 	HANDLE hFile;
 
 	DWORD	 dwFileSize;
-	DWORD	 dwFileSizeLimit;
 	DWORD	 dwBufSize;
 	BOOL	 bReadSuccess;
 
@@ -457,8 +457,7 @@ BOOL EditLoadFile(HWND hwnd, LPWSTR pszFile, BOOL bSkipEncodingDetection,
 	dwBufSize	 = dwFileSize + 10;
 
 	// Check if a warning message should be displayed for large files
-	dwFileSizeLimit = IniGetInt(L"Settings2", L"FileLoadWarningMB", 64);
-	if (dwFileSizeLimit != 0 && dwFileSizeLimit * 1024 * 1024 < dwFileSize) {
+	if (dwFileLoadWarningMB != 0 && dwFileLoadWarningMB * 1024 * 1024 < dwFileSize) {
 		if (InfoBox(MBYESNO, L"MsgFileSizeWarning", IDS_WARNLOADBIGFILE) != IDYES) {
 			CloseHandle(hFile);
 			*pbFileTooBig = TRUE;

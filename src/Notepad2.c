@@ -64,6 +64,7 @@ HWND	hDlgFindReplace = NULL;
 #define MARGIN_SELECTION	1	// selection margin
 #define MARGIN_FOLD_INDEX	2	// folding index
 
+#define DefaultToolbarButtons	L"22 3 0 1 2 0 4 18 19 0 5 6 0 7 20 8 9 0 10 11 0 12 0 24 0 13 14 0 15 16 17 0"
 static TBBUTTON  tbbMainWnd[] = {
 	{0, 	IDT_FILE_NEW, 		TBSTATE_ENABLED, TBSTYLE_BUTTON, {0}, 0, 0},
 	{1, 	IDT_FILE_OPEN, 		TBSTATE_ENABLED, TBSTYLE_BUTTON, {0}, 0, 0},
@@ -180,6 +181,7 @@ int		iFileWatchingMode;
 BOOL	bResetFileWatching;
 DWORD	dwFileCheckInverval;
 DWORD	dwAutoReloadTimeout;
+DWORD	dwFileLoadWarningMB;
 int		iEscFunction;
 BOOL	bAlwaysOnTop;
 BOOL	bMinimizeToTray;
@@ -396,6 +398,8 @@ static char *bookmark_pixmap[] = {
 //
 int		flagNoReuseWindow		= 0;
 int		flagReuseWindow			= 0;
+BOOL	bSingleFileInstance		= TRUE;
+BOOL	bReuseWindow			= FALSE;
 int		flagMultiFileArg		= 0;
 int		flagSingleFileInstance	= 1;
 int		flagStartAsTrayIcon		= 0;
@@ -403,6 +407,7 @@ int		flagAlwaysOnTop			= 0;
 int		flagRelativeFileMRU		= 0;
 int		flagPortableMyDocs		= 0;
 int		flagNoFadeHidden		= 0;
+int		iOpacityLevel			= 75;
 int		flagToolbarLook			= 0;
 int		flagSimpleIndentGuides	= 0;
 int 	fNoHTMLGuess			= 0;
@@ -2365,11 +2370,8 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	CheckCmd(hmenu, IDM_VIEW_AUTOCLOSETAGS, bAutoCloseTags /*&& (i == SCLEX_HTML || i == SCLEX_XML)*/);
 	CheckCmd(hmenu, IDM_VIEW_HILITECURRENTLINE, bHiliteCurrentLine);
 
-	i = IniGetInt(L"Settings2", L"ReuseWindow", 0);
-	CheckCmd(hmenu, IDM_VIEW_REUSEWINDOW, i);
-	i = IniGetInt(L"Settings2", L"SingleFileInstance", 0);
-	CheckCmd(hmenu, IDM_VIEW_SINGLEFILEINSTANCE, i);
-	bStickyWinPos = IniGetInt(L"Settings2", L"StickyWindowPosition", 0);
+	CheckCmd(hmenu, IDM_VIEW_REUSEWINDOW, bReuseWindow);
+	CheckCmd(hmenu, IDM_VIEW_SINGLEFILEINSTANCE, bSingleFileInstance);
 	CheckCmd(hmenu, IDM_VIEW_STICKYWINPOS, bStickyWinPos);
 	CheckCmd(hmenu, IDM_VIEW_ALWAYSONTOP, ((bAlwaysOnTop || flagAlwaysOnTop == 2) && flagAlwaysOnTop != 1));
 	CheckCmd(hmenu, IDM_VIEW_MINTOTRAY, bMinimizeToTray);
@@ -4053,8 +4055,9 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	case IDM_VIEW_STICKYWINPOS:
-		bStickyWinPos = IniGetInt(L"Settings2", L"StickyWindowPosition", bStickyWinPos);
-		if (!bStickyWinPos) {
+		bStickyWinPos = !bStickyWinPos;
+		IniSetInt(L"Settings2", L"StickyWindowPosition", 1);
+		if (bStickyWinPos) {
 			WINDOWPLACEMENT wndpl;
 			WCHAR tchPosX[32], tchPosY[32], tchSizeX[32], tchSizeY[32], tchMaximized[32];
 
@@ -4077,9 +4080,6 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			wsprintf(tchSizeY, L"%ix%i SizeY", ResX, ResY);
 			wsprintf(tchMaximized, L"%ix%i Maximized", ResX, ResY);
 
-			bStickyWinPos = 1;
-			IniSetInt(L"Settings2", L"StickyWindowPosition", 1);
-
 			IniSetInt(L"Window", tchPosX, wi.x);
 			IniSetInt(L"Window", tchPosY, wi.y);
 			IniSetInt(L"Window", tchSizeX, wi.cx);
@@ -4087,26 +4087,17 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			IniSetInt(L"Window", tchMaximized, wi.max);
 
 			InfoBox(0, L"MsgStickyWinPos", IDS_STICKYWINPOS);
-		} else {
-			bStickyWinPos = 0;
-			IniSetInt(L"Settings2", L"StickyWindowPosition", 0);
 		}
 		break;
 
 	case IDM_VIEW_REUSEWINDOW:
-		if (IniGetInt(L"Settings2", L"ReuseWindow", 0)) {
-			IniSetInt(L"Settings2", L"ReuseWindow", 0);
-		} else {
-			IniSetInt(L"Settings2", L"ReuseWindow", 1);
-		}
+		bReuseWindow = !bReuseWindow;
+		IniSetInt(L"Settings2", L"ReuseWindow", bReuseWindow);
 		break;
 
 	case IDM_VIEW_SINGLEFILEINSTANCE:
-		if (IniGetInt(L"Settings2", L"SingleFileInstance", 0)) {
-			IniSetInt(L"Settings2", L"SingleFileInstance", 0);
-		} else {
-			IniSetInt(L"Settings2", L"SingleFileInstance", 1);
-		}
+		bSingleFileInstance = !bSingleFileInstance;
+		IniSetInt(L"Settings2", L"SingleFileInstance", bSingleFileInstance);
 		break;
 
 	case IDM_VIEW_ALWAYSONTOP:
@@ -5329,8 +5320,14 @@ void LoadSettings(void) {
 	bAutoCompleteWords = IniSectionGetBool(pIniSection, L"AutoCompleteWords", 1);
 	bAutoCIncludeDocWord = IniSectionGetBool(pIniSection, L"AutoCIncludeDocWord", 1);
 	bAutoCEnglishIMEModeOnly = IniSectionGetBool(pIniSection, L"AutoCEnglishIMEModeOnly", 0);
+
+	iAutoCDefaultShowItemCount = IniSectionGetInt(pIniSection, L"AutoCDefaultShowItemCount", 16);
+	iAutoCMinWordLength = IniSectionGetInt(pIniSection, L"AutoCMinWordLength", 1);
+	iAutoCMinNumberLength = IniSectionGetInt(pIniSection, L"AutoCMinNumberLength", 3);
+
 #if NP2_ENABLE_SHOW_CALL_TIPS
 	bShowCallTips = IniSectionGetBool(pIniSection, L"ShowCallTips", 0);
+	iCallTipsWaitTime = IniSectionGetInt(pIniSection, L"CallTipsWaitTime", 500);
 #endif
 
 	bTabsAsSpaces = IniSectionGetBool(pIniSection, L"TabsAsSpaces", 0);
@@ -5385,7 +5382,7 @@ void LoadSettings(void) {
 	bLoadNFOasOEM = IniSectionGetBool(pIniSection, L"LoadNFOasOEM", 1);
 	bNoEncodingTags = IniSectionGetBool(pIniSection, L"NoEncodingTags", 0);
 
-	iDefaultEOLMode = IniSectionGetInt(pIniSection, L"DefaultEOLMode", SC_EOL_CRLF);
+	iDefaultEOLMode = IniSectionGetInt(pIniSection, L"DefaultEOLMode", 0);
 	iDefaultEOLMode = clamp_i(iDefaultEOLMode, SC_EOL_CRLF, SC_EOL_LF);
 
 	bFixLineEndings = IniSectionGetBool(pIniSection, L"FixLineEndings", 1);
@@ -5419,7 +5416,7 @@ void LoadSettings(void) {
 
 	bSaveBeforeRunningTools = IniSectionGetBool(pIniSection, L"SaveBeforeRunningTools", 0);
 
-	iFileWatchingMode = IniSectionGetInt(pIniSection, L"FileWatchingMode", 0);
+	iFileWatchingMode = IniSectionGetInt(pIniSection, L"FileWatchingMode", 2);
 	iFileWatchingMode = clamp_i(iFileWatchingMode, 0, 2);
 
 	bResetFileWatching = IniSectionGetBool(pIniSection, L"ResetFileWatching", 0);
@@ -5458,7 +5455,9 @@ void LoadSettings(void) {
 		}
 	}
 
-	IniSectionGetString(pIniSection, L"ToolbarButtons", L"", tchToolbarButtons, COUNTOF(tchToolbarButtons));
+	if (!IniSectionGetString(pIniSection, L"ToolbarButtons", L"", tchToolbarButtons, COUNTOF(tchToolbarButtons))) {
+		lstrcpy(tchToolbarButtons, DefaultToolbarButtons);
+	}
 
 	bShowToolbar = IniSectionGetBool(pIniSection, L"ShowToolbar", 1);
 	bShowStatusbar = IniSectionGetBool(pIniSection, L"ShowStatusbar", 1);
@@ -5524,31 +5523,6 @@ void LoadSettings(void) {
 		efrData.bWildcardSearch = IniSectionGetBool(pIniSection, L"FindReplaceWildcardSearch", 0);
 #endif
 	}
-
-//////////////////////////////// Settings2 ///////////////////////////////////////////
-
-	LoadIniSection(L"Settings2", pIniSectionBuf, cchIniSection);
-	IniSectionParse(pIniSection, pIniSectionBuf);
-
-	iAutoCDefaultShowItemCount = IniSectionGetInt(pIniSection, L"AutoCDefaultShowItemCount", 15);
-	iAutoCMinWordLength = IniSectionGetInt(pIniSection, L"AutoCMinWordLength", 1);
-	iAutoCMinNumberLength = IniSectionGetInt(pIniSection, L"AutoCMinNumberLength", 3);
-#if NP2_ENABLE_SHOW_CALL_TIPS
-	iCallTipsWaitTime = IniSectionGetInt(pIniSection, L"CallTipsWaitTime", 500);
-#endif
-
-	bStickyWinPos = IniSectionGetBool(pIniSection, L"StickyWindowPosition", 0);
-
-	IniSectionGetString(pIniSection, L"DefaultExtension", L"txt", tchDefaultExtension, COUNTOF(tchDefaultExtension));
-	StrTrim(tchDefaultExtension, L" \t.\"");
-
-	IniSectionGetString(pIniSection, L"DefaultDirectory", L"", tchDefaultDir, COUNTOF(tchDefaultDir));
-
-	ZeroMemory(tchFileDlgFilters, sizeof(tchFileDlgFilters));
-	IniSectionGetString(pIniSection, L"FileDlgFilters", L"", tchFileDlgFilters, COUNTOF(tchFileDlgFilters) - 2);
-
-	dwFileCheckInverval = IniSectionGetInt(pIniSection, L"FileCheckInverval", 1000);
-	dwAutoReloadTimeout = IniSectionGetInt(pIniSection, L"AutoReloadTimeout", 1000);
 
 	LoadIniSection(L"Toolbar Images", pIniSectionBuf, cchIniSection);
 	IniSectionParse(pIniSection, pIniSectionBuf);
@@ -5643,16 +5617,20 @@ void SaveSettings(BOOL bSaveSettingsNow) {
 	IniSectionSetInt(pIniSection, L"WordWrapSymbols", iWordWrapSymbols);
 	IniSectionSetBool(pIniSection, L"ShowWordWrapSymbols", bShowWordWrapSymbols);
 	IniSectionSetBool(pIniSection, L"MatchBraces", bMatchBraces);
-	IniSectionSetBool(pIniSection, L"AutoCloseTags", bAutoCloseTags);
 	IniSectionSetBool(pIniSection, L"HighlightCurrentLine", bHiliteCurrentLine);
 	IniSectionSetBool(pIniSection, L"ShowIndentGuides", bShowIndentGuides);
 	IniSectionSetBool(pIniSection, L"AutoIndent", bAutoIndent);
+	IniSectionSetBool(pIniSection, L"AutoCloseTags", bAutoCloseTags);
 	IniSectionSetBool(pIniSection, L"AutoCloseBracesQuotes", bAutoCloseBracesQuotes);
 	IniSectionSetBool(pIniSection, L"AutoCompleteWords", bAutoCompleteWords);
 	IniSectionSetBool(pIniSection, L"AutoCIncludeDocWord", bAutoCIncludeDocWord);
 	IniSectionSetBool(pIniSection, L"AutoCEnglishIMEModeOnly", bAutoCEnglishIMEModeOnly);
+	IniSectionSetInt(pIniSection, L"AutoCDefaultShowItemCount", iAutoCDefaultShowItemCount);
+	IniSectionSetInt(pIniSection, L"AutoCMinWordLength", iAutoCMinWordLength);
+	IniSectionSetInt(pIniSection, L"AutoCMinNumberLength", iAutoCMinNumberLength);
 #if NP2_ENABLE_SHOW_CALL_TIPS
 	IniSectionSetBool(pIniSection, L"ShowCallTips", bShowCallTips);
+	IniSectionSetInt(pIniSection, L"CallTipsWaitTime", iCallTipsWaitTime);
 #endif
 	IniSectionSetBool(pIniSection, L"TabsAsSpaces", bTabsAsSpacesG);
 	IniSectionSetBool(pIniSection, L"TabIndents", bTabIndentsG);
@@ -5758,7 +5736,7 @@ void SaveSettings(BOOL bSaveSettingsNow) {
 		wi.max = (IsZoomed(hwndMain) || (wndpl.flags & WPF_RESTORETOMAXIMIZED));
 	}
 
-	if (!IniGetInt(L"Settings2", L"StickyWindowPosition", 0)) {
+	if (!bStickyWinPos) {
 		WCHAR tchPosX[32], tchPosY[32], tchSizeX[32], tchSizeY[32], tchMaximized[32];
 		int ResX = GetSystemMetrics(SM_CXSCREEN);
 		int ResY = GetSystemMetrics(SM_CYSCREEN);
@@ -6428,9 +6406,13 @@ void LoadFlags(void) {
 	LoadIniSection(L"Settings2", pIniSectionBuf, cchIniSection);
 	IniSectionParse(pIniSection, pIniSectionBuf);
 
+	bSingleFileInstance = IniSectionGetBool(pIniSection, L"SingleFileInstance", 1);
+	bReuseWindow = IniSectionGetBool(pIniSection, L"ReuseWindow", 0);
+	bStickyWinPos = IniSectionGetBool(pIniSection, L"StickyWindowPosition", 0);
+
 	if (!flagReuseWindow && !flagNoReuseWindow) {
-		flagNoReuseWindow = !IniSectionGetBool(pIniSection, L"ReuseWindow", 0);
-		flagSingleFileInstance = IniSectionGetBool(pIniSection, L"SingleFileInstance", 1);
+		flagNoReuseWindow = !bReuseWindow;
+		flagSingleFileInstance = bSingleFileInstance;
 	}
 
 	if (flagMultiFileArg == 0) {
@@ -6442,7 +6424,25 @@ void LoadFlags(void) {
 	flagRelativeFileMRU = IniSectionGetBool(pIniSection, L"RelativeFileMRU", 1);
 	flagPortableMyDocs = IniSectionGetBool(pIniSection, L"PortableMyDocs", flagRelativeFileMRU);
 
+	IniSectionGetString(pIniSection, L"DefaultExtension", L"txt", tchDefaultExtension, COUNTOF(tchDefaultExtension));
+	StrTrim(tchDefaultExtension, L" \t.\"");
+
+	IniSectionGetString(pIniSection, L"DefaultDirectory", L"", tchDefaultDir, COUNTOF(tchDefaultDir));
+
+	ZeroMemory(tchFileDlgFilters, sizeof(tchFileDlgFilters));
+	IniSectionGetString(pIniSection, L"FileDlgFilters", L"", tchFileDlgFilters, COUNTOF(tchFileDlgFilters) - 2);
+
+	dwFileCheckInverval = IniSectionGetInt(pIniSection, L"FileCheckInverval", 1000);
+	dwAutoReloadTimeout = IniSectionGetInt(pIniSection, L"AutoReloadTimeout", 1000);
+	dwFileLoadWarningMB = IniSectionGetInt(pIniSection, L"FileLoadWarningMB", 64);
+
 	flagNoFadeHidden = IniSectionGetBool(pIniSection, L"NoFadeHidden", 0);
+
+	iOpacityLevel = IniSectionGetInt(pIniSection, L"OpacityLevel", 75);
+	if (iOpacityLevel < 0 || iOpacityLevel > 100) {
+		iOpacityLevel = 75;
+	}
+
 	flagToolbarLook = IniSectionGetInt(pIniSection, L"ToolbarLook", IsWinXPAndAbove() ? 1 : 2);
 	flagToolbarLook = clamp_i(flagToolbarLook, 0, 2);
 
