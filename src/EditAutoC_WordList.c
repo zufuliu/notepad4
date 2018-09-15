@@ -26,7 +26,7 @@ struct WordList {
 	int (*WL_strcmp)(LPCSTR, LPCSTR);
 	int (*WL_strncmp)(LPCSTR, LPCSTR, size_t);
 #if NP2_AUTOC_USE_STRING_ORDER
-	int (*WL_OrderFunc)(const void *, unsigned int);
+	UINT (*WL_OrderFunc)(const void *, unsigned int);
 #endif
 	struct WordNode *pListHead;
 	LPCSTR pWordStart;
@@ -39,7 +39,7 @@ struct WordList {
 
 	int nWordCount;
 	int nTotalLen;
-	int orderStart;
+	UINT orderStart;
 	int iStartLen;
 	int iMaxLength;
 
@@ -53,16 +53,16 @@ struct WordList {
 #if NP2_AUTOC_USE_STRING_ORDER
 #define NP2_AUTOC_ORDER_LENGTH	4
 
-int WordList_Order(const void *pWord, unsigned int len) {
+UINT WordList_Order(const void *pWord, unsigned int len) {
 	unsigned int high = *(const unsigned int *)pWord;
 	high &= (len < NP2_AUTOC_ORDER_LENGTH) ? ((1U << len * 8) - 1) : UINT_MAX;
 	high = bswap32(high);
 	return high;
 }
 
-int WordList_OrderCase(const void *pWord, unsigned int len) {
+UINT WordList_OrderCase(const void *pWord, unsigned int len) {
 	unsigned int high = *(const unsigned int *)pWord;
-	high |= 0x20202020;
+	high |= 0x20202020; /// TODO: fix this
 	high &= (len < NP2_AUTOC_ORDER_LENGTH) ? ((1U << len * 8) - 1) : UINT_MAX;
 	high = bswap32(high);
 	return high;
@@ -80,7 +80,7 @@ struct WordNode {
 	};
 	char *word;
 #if NP2_AUTOC_USE_STRING_ORDER
-	int order;
+	UINT order;
 #endif
 	int len;
 	int level;
@@ -117,7 +117,7 @@ static inline void WordList_AddBuffer(struct WordList *pWList) {
 void WordList_AddWord(struct WordList *pWList, LPCSTR pWord, int len) {
 	struct WordNode *root = pWList->pListHead;
 #if NP2_AUTOC_USE_STRING_ORDER
-	int order = (pWList->iStartLen > NP2_AUTOC_ORDER_LENGTH) ? 0 : pWList->WL_OrderFunc(pWord, len);
+	const UINT order = (pWList->iStartLen > NP2_AUTOC_ORDER_LENGTH) ? 0 : pWList->WL_OrderFunc(pWord, len);
 #endif
 	if (root == NULL) {
 		struct WordNode *node;
