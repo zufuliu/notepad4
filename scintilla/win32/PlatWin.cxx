@@ -1630,7 +1630,7 @@ class BlobInline : public IDWriteInlineObject {
 		DWRITE_BREAK_CONDITION *breakConditionBefore,
 		DWRITE_BREAK_CONDITION *breakConditionAfter) noexcept override;
 public:
-	BlobInline(XYPOSITION width_ = 0.0f) noexcept : width(width_) {}
+	explicit BlobInline(XYPOSITION width_ = 0.0f) noexcept : width(width_) {}
 	virtual ~BlobInline() = default;
 };
 
@@ -1711,7 +1711,7 @@ class ScreenLineLayout : public IScreenLineLayout {
 	static std::wstring ReplaceRepresentation(std::string_view text);
 	static size_t GetPositionInLayout(std::string_view text, size_t position) noexcept;
 public:
-	ScreenLineLayout(const IScreenLine *screenLine);
+	explicit ScreenLineLayout(const IScreenLine *screenLine);
 	// Deleted so ScreenLineLayout objects can not be copied
 	ScreenLineLayout(const ScreenLineLayout &) = delete;
 	ScreenLineLayout(ScreenLineLayout &&) = delete;

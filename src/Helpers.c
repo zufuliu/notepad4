@@ -644,7 +644,7 @@ void ResizeDlg_Init(HWND hwnd, int cxFrame, int cyFrame, int nIdGrip) {
 	RECT rc;
 	WCHAR wch[64];
 	int cGrip;
-	RESIZEDLG *pm = LocalAlloc(LPTR, sizeof(RESIZEDLG));
+	RESIZEDLG *pm = NP2HeapAlloc(sizeof(RESIZEDLG));
 
 	GetClientRect(hwnd, &rc);
 	pm->cxClient = rc.right - rc.left;
@@ -689,7 +689,7 @@ void ResizeDlg_Destroy(HWND hwnd, int *cxFrame, int *cyFrame) {
 	*cyFrame = rc.bottom - rc.top;
 
 	RemoveProp(hwnd, L"ResizeDlg");
-	LocalFree(pm);
+	NP2HeapFree(pm);
 }
 
 void ResizeDlg_Size(HWND hwnd, LPARAM lParam, int *cx, int *cy) {
@@ -948,7 +948,7 @@ BOOL IsCmdEnabled(HWND hwnd, UINT uId) {
 // FormatString()
 //
 int FormatString(LPWSTR lpOutput, int nOutput, UINT uIdFormat, ...) {
-	WCHAR *p = LocalAlloc(LPTR, sizeof(WCHAR) * nOutput);
+	WCHAR *p = NP2HeapAlloc(sizeof(WCHAR) * nOutput);
 
 	if (GetString(uIdFormat, p, nOutput)) {
 		va_list va;
@@ -957,8 +957,7 @@ int FormatString(LPWSTR lpOutput, int nOutput, UINT uIdFormat, ...) {
 		va_end(va);
 	}
 
-	LocalFree(p);
-
+	NP2HeapFree(p);
 	return lstrlen(lpOutput);
 }
 
@@ -1555,8 +1554,7 @@ UINT CodePageFromCharSet(UINT uCharSet) {
 // MRU functions
 //
 LPMRULIST MRU_Create(LPCWSTR pszRegKey, int iFlags, int iSize) {
-	LPMRULIST pmru = LocalAlloc(LPTR, sizeof(MRULIST));
-	ZeroMemory(pmru, sizeof(MRULIST));
+	LPMRULIST pmru = NP2HeapAlloc(sizeof(MRULIST));
 	lstrcpyn(pmru->szRegKey, pszRegKey, COUNTOF(pmru->szRegKey));
 	pmru->iFlags = iFlags;
 	pmru->iSize = min_i(iSize, MRU_MAXITEMS);
@@ -1571,7 +1569,7 @@ BOOL MRU_Destroy(LPMRULIST pmru) {
 	}
 
 	ZeroMemory(pmru, sizeof(MRULIST));
-	LocalFree(pmru);
+	NP2HeapFree(pmru);
 	return TRUE;
 }
 
@@ -1702,10 +1700,11 @@ int MRU_Enum(LPMRULIST pmru, int iIndex, LPWSTR pszItem, int cchItem) {
 BOOL MRU_Load(LPMRULIST pmru) {
 	WCHAR tchName[32];
 	WCHAR tchItem[1024];
-	WCHAR *pIniSection = LocalAlloc(LPTR, sizeof(WCHAR) * 32 * 1024);
+	WCHAR *pIniSection = NP2HeapAlloc(sizeof(WCHAR) * 32 * 1024);
+	const int cchIniSection = (int)NP2HeapSize(pIniSection) / sizeof(WCHAR);
 
 	MRU_Empty(pmru);
-	LoadIniSection(pmru->szRegKey, pIniSection, (int)LocalSize(pIniSection) / sizeof(WCHAR));
+	LoadIniSection(pmru->szRegKey, pIniSection, cchIniSection);
 
 	for (int i = 0, n = 0; i < pmru->iSize; i++) {
 		wsprintf(tchName, L"%02i", i + 1);
@@ -1721,15 +1720,13 @@ BOOL MRU_Load(LPMRULIST pmru) {
 		}
 	}
 
-	LocalFree(pIniSection);
+	NP2HeapFree(pIniSection);
 	return TRUE;
 }
 
 BOOL MRU_Save(LPMRULIST pmru) {
 	WCHAR tchName[32];
-	WCHAR *pIniSection = LocalAlloc(LPTR, sizeof(WCHAR) * 32 * 1024);
-
-	//IniDeleteSection(pmru->szRegKey);
+	WCHAR *pIniSection = NP2HeapAlloc(sizeof(WCHAR) * 32 * 1024);
 
 	for (int i = 0; i < pmru->iSize; i++) {
 		if (pmru->pszItems[i]) {
@@ -1747,7 +1744,7 @@ BOOL MRU_Save(LPMRULIST pmru) {
 	}
 
 	SaveIniSection(pmru->szRegKey, pIniSection);
-	LocalFree(pIniSection);
+	NP2HeapFree(pIniSection);
 	return TRUE;
 }
 
@@ -1899,7 +1896,7 @@ DLGTEMPLATE *LoadThemedDialogTemplate(LPCTSTR lpDialogTemplateID, HINSTANCE hIns
 	pRsrcMem = (DLGTEMPLATE *)LockResource(hRsrcMem);
 	dwTemplateSize = (UINT)SizeofResource(hInstance, hRsrc);
 
-	pTemplate = dwTemplateSize ? LocalAlloc(LPTR, dwTemplateSize + LF_FACESIZE * 2) : NULL;
+	pTemplate = dwTemplateSize ? NP2HeapAlloc(dwTemplateSize + LF_FACESIZE * 2) : NULL;
 	if (pTemplate == NULL) {
 		UnlockResource(hRsrcMem);
 		FreeResource(hRsrcMem);
@@ -1952,7 +1949,7 @@ INT_PTR ThemedDialogBoxParam(HINSTANCE hInstance, LPCTSTR lpTemplate,
 	pDlgTemplate = LoadThemedDialogTemplate(lpTemplate, hInstance);
 	ret = DialogBoxIndirectParam(hInstance, pDlgTemplate, hWndParent, lpDialogFunc, dwInitParam);
 	if (pDlgTemplate) {
-		LocalFree(pDlgTemplate);
+		NP2HeapFree(pDlgTemplate);
 	}
 
 	return ret;
@@ -1966,7 +1963,7 @@ HWND CreateThemedDialogParam(HINSTANCE hInstance, LPCTSTR lpTemplate,
 	pDlgTemplate = LoadThemedDialogTemplate(lpTemplate, hInstance);
 	hwnd = CreateDialogIndirectParam(hInstance, pDlgTemplate, hWndParent, lpDialogFunc, dwInitParam);
 	if (pDlgTemplate) {
-		LocalFree(pDlgTemplate);
+		NP2HeapFree(pDlgTemplate);
 	}
 
 	return hwnd;

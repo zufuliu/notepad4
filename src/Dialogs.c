@@ -1992,7 +1992,7 @@ INT_PTR CALLBACK InfoBoxDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPar
 		if (lpib->bDisableCheckBox) {
 			EnableWindow(GetDlgItem(hwnd, IDC_INFOBOXCHECK), FALSE);
 		}
-		LocalFree(lpib->lpstrMessage);
+		NP2HeapFree(lpib->lpstrMessage);
 		CenterDlgInParent(hwnd);
 		return TRUE;
 
@@ -2037,7 +2037,7 @@ INT_PTR InfoBox(int iType, LPCWSTR lpstrSetting, int uidMessage, ...) {
 		return -1;
 	}
 
-	ib.lpstrMessage = LocalAlloc(LPTR, 1024 * sizeof(WCHAR));
+	ib.lpstrMessage = NP2HeapAlloc(1024 * sizeof(WCHAR));
 	va_start(va, uidMessage);
 	wvsprintf(ib.lpstrMessage, wchFormat, va);
 	va_end(va);

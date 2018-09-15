@@ -1024,7 +1024,7 @@ void EditAutoIndent(HWND hwnd) {
 		if (iPrevLineLength < 2) {
 			return;
 		}
-		pLineBuf = GlobalAlloc(GPTR, 2 * iPrevLineLength + 1 + iIndentWidth * 2 + 2 + 64);
+		pLineBuf = NP2HeapAlloc(2 * iPrevLineLength + 1 + iIndentWidth * 2 + 2 + 64);
 		if (pLineBuf) {
 			char *pPos;
 			int indent = 0;
@@ -1143,7 +1143,7 @@ void EditAutoIndent(HWND hwnd) {
 				//	SendMessage(hwnd, SCI_ENDUNDOACTION, 0, 0);
 				//}
 			}
-			GlobalFree(pLineBuf);
+			NP2HeapFree(pLineBuf);
 			//int iIndent = (int)SendMessage(hwnd, SCI_GETLINEINDENTATION, (WPARAM)iCurLine, 0);
 			//SendMessage(hwnd, SCI_SETLINEINDENTATION, (WPARAM)iCurLine, (LPARAM)iIndentBefore);
 			//iIndentLen = /*- iIndent +*/ SendMessage(hwnd, SCI_GETLINEINDENTATION, (WPARAM)iCurLine, 0);

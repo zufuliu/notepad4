@@ -144,11 +144,11 @@ PWSTR StrNCatW(PWSTR psz1, PCWSTR psz2, int cchMax);
 	wchar_t* wcsncat(wchar_t *dest, const wchar_t *src, size_t n);
 
 // https://docs.microsoft.com/en-us/windows/desktop/api/shlwapi/nf-shlwapi-strdupa
-PSTR StrDupA(PCSTR pszSrch);
+PSTR StrDupA(PCSTR pszSrch); // LocalFree()
 	char* strdup(const char *s);
 
 // https://docs.microsoft.com/en-us/windows/desktop/api/shlwapi/nf-shlwapi-strdupw
-PWSTR StrDupW(PCWSTR pszSrch);
+PWSTR StrDupW(PCWSTR pszSrch); // LocalFree()
 	wchar_t* wcsdup(const wchar_t *s);
 
 

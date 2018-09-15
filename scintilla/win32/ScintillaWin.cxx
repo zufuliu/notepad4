@@ -449,7 +449,7 @@ class ScintillaWin :
 	void HorizontalScrollMessage(WPARAM wParam);
 	void FullPaint();
 	void FullPaintDC(HDC hdc);
-	bool IsCompatibleDC(HDC hOtherDC) noexcept;
+	bool IsCompatibleDC(HDC hOtherDC) const noexcept;
 	DWORD EffectFromState(DWORD grfKeyState) const noexcept;
 
 	int SetScrollInfo(int nBar, LPCSCROLLINFO lpsi, BOOL bRedraw) const noexcept;
@@ -3002,7 +3002,7 @@ inline bool CompareDevCap(HDC hdc, HDC hOtherDC, int nIndex) noexcept {
 
 }
 
-bool ScintillaWin::IsCompatibleDC(HDC hOtherDC) noexcept {
+bool ScintillaWin::IsCompatibleDC(HDC hOtherDC) const noexcept {
 	HDC hdc = ::GetDC(MainHWND());
 	const bool isCompatible =
 		CompareDevCap(hdc, hOtherDC, TECHNOLOGY) &&

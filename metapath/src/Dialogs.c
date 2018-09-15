@@ -433,7 +433,7 @@ INT_PTR CALLBACK GotoDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 						  CB_ERR != SendDlgItemMessage(hwnd, IDC_GOTO, CB_GETCURSEL, 0, 0)));
 
 			if (HIWORD(wParam) == CBN_CLOSEUP) {
-				LONG lSelEnd;
+				LONG lSelEnd = 0;
 				SendDlgItemMessage(hwnd, IDC_GOTO, CB_GETEDITSEL, 0, (LPARAM)&lSelEnd);
 				SendDlgItemMessage(hwnd, IDC_GOTO, CB_SETEDITSEL, 0, MAKELPARAM(lSelEnd, lSelEnd));
 			}
@@ -1147,16 +1147,16 @@ INT_PTR OptionsPropSheet(HWND hwnd, HINSTANCE hInstance) {
 	nResult = PropertySheet(&psh);
 
 	if (psp[0].pResource) {
-		LocalFree((HLOCAL)psp[0].pResource);
+		NP2HeapFree((LPVOID)psp[0].pResource);
 	}
 	if (psp[1].pResource) {
-		LocalFree((HLOCAL)psp[1].pResource);
+		NP2HeapFree((LPVOID)psp[1].pResource);
 	}
 	if (psp[2].pResource) {
-		LocalFree((HLOCAL)psp[2].pResource);
+		NP2HeapFree((LPVOID)psp[2].pResource);
 	}
 	if (psp[3].pResource) {
-		LocalFree((HLOCAL)psp[3].pResource);
+		NP2HeapFree((LPVOID)psp[3].pResource);
 	}
 
 	// Apply the results
@@ -1226,8 +1226,6 @@ INT_PTR CALLBACK GetFilterDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lP
 		switch (LOWORD(wParam)) {
 		case IDC_BROWSEFILTER: {
 			HMENU hMenu;
-			WCHAR *pIniSection;
-			int   cbIniSection;
 			WCHAR *pszFilterName;
 			WCHAR  szTypedFilter[512];
 			DWORD dwIndex = 0;
@@ -1237,8 +1235,8 @@ INT_PTR CALLBACK GetFilterDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lP
 
 			hMenu = CreatePopupMenu();
 
-			pIniSection = LocalAlloc(LPTR, sizeof(WCHAR) * 32 * 1024);
-			cbIniSection = (int)LocalSize(pIniSection) / sizeof(WCHAR);
+			WCHAR *pIniSection = NP2HeapAlloc(sizeof(WCHAR) * 32 * 1024);
+			const int cbIniSection = (int)NP2HeapSize(pIniSection) / sizeof(WCHAR);
 			LoadIniSection(L"Filters", pIniSection, cbIniSection);
 
 			pszFilterName = pIniSection;
@@ -1259,7 +1257,7 @@ INT_PTR CALLBACK GetFilterDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lP
 				dwIndex++;
 				pszFilterName = StrEnd(pszFilterValue) + 1;
 			}
-			LocalFree(pIniSection);
+			NP2HeapFree(pIniSection);
 
 			if (dwCheck != 0xFFFF) { // check description for current filter
 				CheckMenuRadioItem(hMenu, 0, dwIndex, dwCheck, MF_BYPOSITION);
@@ -2199,9 +2197,6 @@ INT_PTR CALLBACK FindTargetDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 
 		WCHAR wch[MAX_PATH];
 
-		WCHAR *pIniSection;
-		int   cbIniSection;
-
 		// ToolTip for browse button
 		hwndToolTip = CreateWindowEx(0, TOOLTIPS_CLASS, NULL, 0, 0, 0, 0, 0, hwnd, NULL, g_hInstance, NULL);
 
@@ -2243,8 +2238,8 @@ INT_PTR CALLBACK FindTargetDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 		SendDlgItemMessage(hwnd, IDC_DDEAPP, EM_LIMITTEXT, 128, 0);
 		SendDlgItemMessage(hwnd, IDC_DDETOPIC, EM_LIMITTEXT, 128, 0);
 
-		pIniSection  = LocalAlloc(LPTR, sizeof(WCHAR) * 32 * 1024);
-		cbIniSection = (int)LocalSize(pIniSection) / sizeof(WCHAR);
+		WCHAR *pIniSection = NP2HeapAlloc(sizeof(WCHAR) * 32 * 1024);
+		const int cbIniSection = (int)NP2HeapSize(pIniSection) / sizeof(WCHAR);
 
 		LoadIniSection(L"Target Application", pIniSection, cbIniSection);
 
@@ -2268,7 +2263,7 @@ INT_PTR CALLBACK FindTargetDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 			lstrcpy(szDDETopic, L"");
 		}
 
-		LocalFree(pIniSection);
+		NP2HeapFree(pIniSection);
 
 		if (iUseTargetApplication) {
 			CheckRadioButton(hwnd, IDC_LAUNCH, IDC_TARGET, IDC_TARGET);
@@ -2428,7 +2423,7 @@ INT_PTR CALLBACK FindTargetDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 				ErrorMessage(1, IDS_ERR_INVALIDTARGET);
 			} else {
 				int i;
-				WCHAR *pIniSection = LocalAlloc(LPTR, sizeof(WCHAR) * 32 * 1024);
+				WCHAR *pIniSection = NP2HeapAlloc(sizeof(WCHAR) * 32 * 1024);
 
 				i = IsDlgButtonChecked(hwnd, IDC_LAUNCH);
 				iUseTargetApplication = i ? 0 : 1;
@@ -2491,7 +2486,7 @@ INT_PTR CALLBACK FindTargetDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 				IniSectionSetString(pIniSection, L"DDETopic", szDDETopic);
 
 				SaveIniSection(L"Target Application", pIniSection);
-				LocalFree(pIniSection);
+				NP2HeapFree(pIniSection);
 
 				EndDialog(hwnd, IDOK);
 			}

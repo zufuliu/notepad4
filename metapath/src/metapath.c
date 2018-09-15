@@ -148,8 +148,9 @@ WCHAR szDDEMsg[256] = L"";
 WCHAR szDDEApp[256] = L"";
 WCHAR szDDETopic[256] = L"";
 
-HINSTANCE g_hInstance;
-UINT16    g_uWinVer;
+HINSTANCE	g_hInstance;
+HANDLE		g_hDefaultHeap;
+UINT16		g_uWinVer;
 
 //=============================================================================
 //
@@ -182,6 +183,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 	// Set the Windows version global variable
 	g_uWinVer = LOWORD(GetVersion());
 	g_uWinVer = MAKEWORD(HIBYTE(g_uWinVer), LOBYTE(g_uWinVer));
+	g_hDefaultHeap = GetProcessHeap();
 
 	SetErrorMode(SEM_FAILCRITICALERRORS | SEM_NOOPENFILEERRORBOX);
 	// Command Line, Ini File and Flags
@@ -520,12 +522,12 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 		PCOPYDATASTRUCT pcds = (PCOPYDATASTRUCT)lParam;
 
 		if (pcds->dwData == DATA_METAPATH_PATHARG) {
-			LPWSTR lpsz = LocalAlloc(LPTR, pcds->cbData);
+			LPWSTR lpsz = NP2HeapAlloc(pcds->cbData);
 			CopyMemory(lpsz, pcds->lpData, pcds->cbData);
 
 			DisplayPath(lpsz, IDS_ERR_CMDLINE);
 
-			LocalFree(lpsz);
+			NP2HeapFree(lpsz);
 		}
 	}
 	return TRUE;
@@ -902,8 +904,8 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) {
 	}
 
 	// Load toolbar labels
-	WCHAR *pIniSection = LocalAlloc(LPTR, sizeof(WCHAR) * 32 * 1024);
-	int cbIniSection = (int)LocalSize(pIniSection) / sizeof(WCHAR);
+	WCHAR *pIniSection = NP2HeapAlloc(sizeof(WCHAR) * 32 * 1024);
+	const int cbIniSection = (int)NP2HeapSize(pIniSection) / sizeof(WCHAR);
 	LoadIniSection(L"Toolbar Labels", pIniSection, cbIniSection);
 	if (StrIsEmpty(pIniSection)) {
 		for (unsigned i = 0; i < COUNTOF(tbbMainWnd); i++) {
@@ -934,7 +936,7 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) {
 			}
 		}
 	}
-	LocalFree(pIniSection);
+	NP2HeapFree(pIniSection);
 
 	SendMessage(hwndToolbar, TB_SETEXTENDEDSTYLE, 0,
 				SendMessage(hwndToolbar, TB_GETEXTENDEDSTYLE, 0, 0) | TBSTYLE_EX_MIXEDBUTTONS);
@@ -2401,8 +2403,8 @@ BOOL ChangeDirectory(HWND hwnd, LPCWSTR lpszNewDir, BOOL bUpdateHistory) {
 //
 //
 void LoadSettings(void) {
-	WCHAR *pIniSection = LocalAlloc(LPTR, sizeof(WCHAR) * 32 * 1024);
-	int   cbIniSection = (int)LocalSize(pIniSection) / sizeof(WCHAR);
+	WCHAR *pIniSection = NP2HeapAlloc(sizeof(WCHAR) * 32 * 1024);
+	const int cbIniSection = (int)NP2HeapSize(pIniSection) / sizeof(WCHAR);
 
 	LoadIniSection(L"Settings", pIniSection, cbIniSection);
 
@@ -2531,7 +2533,7 @@ void LoadSettings(void) {
 	IniSectionGetString(pIniSection, L"BitmapDisabled", L"",
 						tchToolbarBitmapDisabled, COUNTOF(tchToolbarBitmap));
 
-	LocalFree(pIniSection);
+	NP2HeapFree(pIniSection);
 
 	// Initialize custom colors for ChooseColor()
 	crCustom[0] = RGB(0, 0, 128);
@@ -2558,11 +2560,6 @@ void LoadSettings(void) {
 //
 //
 void SaveSettings(BOOL bSaveSettingsNow) {
-	WCHAR *pIniSection;
-	//int   cbIniSection;
-
-	WCHAR wchTmp[MAX_PATH];
-
 	if (StrIsEmpty(szIniFile)) {
 		return;
 	}
@@ -2577,8 +2574,8 @@ void SaveSettings(BOOL bSaveSettingsNow) {
 		return;
 	}
 
-	pIniSection = LocalAlloc(LPTR, sizeof(WCHAR) * 32 * 1024);
-	//cbIniSection = (int)LocalSize(pIniSection) / sizeof(WCHAR);
+	WCHAR wchTmp[MAX_PATH];
+	WCHAR *pIniSection = NP2HeapAlloc(sizeof(WCHAR) * 32 * 1024);
 
 	IniSectionSetBool(pIniSection, L"SaveSettings", bSaveSettings);
 	IniSectionSetBool(pIniSection, L"SingleClick", bSingleClick);
@@ -2625,7 +2622,7 @@ void SaveSettings(BOOL bSaveSettingsNow) {
 	IniSectionSetInt(pIniSection, L"CopyMoveDlgSizeX", cxCopyMoveDlg);
 
 	SaveIniSection(L"Settings", pIniSection);
-	LocalFree(pIniSection);
+	NP2HeapFree(pIniSection);
 
 	/*
 	  SaveSettingsNow(): query Window Dimensions
@@ -2704,10 +2701,10 @@ int ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2) {
 			state = 2;
 			if (ExtractFirstArgument(lp2, lp1, lp2)) {
 				if (lpFilterArg) {
-					GlobalFree(lpFilterArg);
+					NP2HeapFree(lpFilterArg);
 				}
 
-				lpFilterArg = GlobalAlloc(GPTR, sizeof(WCHAR) * (lstrlen(lp1) + 1));
+				lpFilterArg = NP2HeapAlloc(sizeof(WCHAR) * (lstrlen(lp1) + 1));
 				lstrcpy(lpFilterArg, lp1);
 				state = 1;
 			}
@@ -2783,17 +2780,17 @@ void ParseCommandLine(void) {
 	// Good old console can also send args separated by Tabs
 	StrTab2Space(lpCmdLine);
 
-	lp1 = LocalAlloc(LPTR, cmdSize);
-	lp3 = LocalAlloc(LPTR, cmdSize);
+	lp1 = NP2HeapAlloc(cmdSize);
+	lp3 = NP2HeapAlloc(cmdSize);
 
 	// Start with 2nd argument
 	if (!(ExtractFirstArgument(lpCmdLine, lp1, lp3) && *lp3)) {
-		LocalFree(lp1);
-		LocalFree(lp3);
+		NP2HeapFree(lp1);
+		NP2HeapFree(lp3);
 		return;
 	}
 
-	lp2 = LocalAlloc(LPTR, cmdSize);
+	lp2 = NP2HeapAlloc(cmdSize);
 	while (ExtractFirstArgument(lp3, lp1, lp2)) {
 		// options
 		if ((*lp1 == L'/' || *lp1 == L'-') && lp1[1] != 0) {
@@ -2816,9 +2813,9 @@ void ParseCommandLine(void) {
 		}
 	}
 
-	LocalFree(lp2);
-	LocalFree(lp1);
-	LocalFree(lp3);
+	NP2HeapFree(lp2);
+	NP2HeapFree(lp1);
+	NP2HeapFree(lp3);
 }
 
 //=============================================================================
@@ -2827,8 +2824,8 @@ void ParseCommandLine(void) {
 //
 //
 void LoadFlags(void) {
-	WCHAR *pIniSection = LocalAlloc(LPTR, sizeof(WCHAR) * 32 * 1024);
-	int   cchIniSection = (int)LocalSize(pIniSection) / sizeof(WCHAR);
+	WCHAR *pIniSection = NP2HeapAlloc(sizeof(WCHAR) * 32 * 1024);
+	const int cchIniSection = (int)NP2HeapSize(pIniSection) / sizeof(WCHAR);
 
 	LoadIniSection(L"Settings2", pIniSection, cchIniSection);
 
@@ -2842,7 +2839,7 @@ void LoadFlags(void) {
 	flagToolbarLook = IniSectionGetInt(pIniSection, L"ToolbarLook", 0);
 	flagToolbarLook = clamp_i(flagToolbarLook, 0, 2);
 
-	LocalFree(pIniSection);
+	NP2HeapFree(pIniSection);
 }
 
 //=============================================================================
@@ -3401,8 +3398,8 @@ void LaunchTarget(LPCWSTR lpFileName, BOOL bOpenNew) {
 	HWND  hwnd  = NULL;
 	HDROP hDrop = NULL;
 
-	WCHAR *pIniSection = LocalAlloc(LPTR, sizeof(WCHAR) * 32 * 1024);
-	int   cbIniSection = (int)LocalSize(pIniSection) / sizeof(WCHAR);
+	WCHAR *pIniSection = NP2HeapAlloc(sizeof(WCHAR) * 32 * 1024);
+	const int cbIniSection = (int)NP2HeapSize(pIniSection) / sizeof(WCHAR);
 
 	LoadIniSection(L"Target Application", pIniSection, cbIniSection);
 
@@ -3426,7 +3423,7 @@ void LaunchTarget(LPCWSTR lpFileName, BOOL bOpenNew) {
 		lstrcpy(szDDETopic, L"");
 	}
 
-	LocalFree(pIniSection);
+	NP2HeapFree(pIniSection);
 
 	if (iUseTargetApplication == 4 ||
 			(iUseTargetApplication && StrIsEmpty(szTargetApplication))) {

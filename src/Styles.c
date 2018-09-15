@@ -235,8 +235,8 @@ extern BOOL	bHiliteCurrentLine;
 //
 void Style_Load(void) {
 	unsigned int iLexer;
-	WCHAR	*pIniSection = LocalAlloc(LPTR, sizeof(WCHAR) * 32 * 1024);
-	int		cchIniSection = (int)LocalSize(pIniSection) / sizeof(WCHAR);
+	WCHAR *pIniSection = NP2HeapAlloc(sizeof(WCHAR) * 32 * 1024);
+	const int cchIniSection = (int)NP2HeapSize(pIniSection) / sizeof(WCHAR);
 
 	// Custom colors
 	crCustom [0] = RGB(0x00, 0x00, 0x00);
@@ -311,7 +311,7 @@ void Style_Load(void) {
 			i++;
 		}
 	}
-	LocalFree(pIniSection);
+	NP2HeapFree(pIniSection);
 }
 
 //=============================================================================
@@ -320,8 +320,8 @@ void Style_Load(void) {
 //
 void Style_Save(void) {
 	unsigned iLexer;
-	WCHAR	*pIniSection = LocalAlloc(LPTR, sizeof(WCHAR) * 32 * 1024);
-	int		cchIniSection = (int)LocalSize(pIniSection) / sizeof(WCHAR);
+	WCHAR *pIniSection = NP2HeapAlloc(sizeof(WCHAR) * 32 * 1024);
+	const int cchIniSection = (int)NP2HeapSize(pIniSection) / sizeof(WCHAR);
 
 	// Custom colors
 	for (unsigned int i = 0; i < 16; i++) {
@@ -354,7 +354,7 @@ void Style_Save(void) {
 	SaveIniSection(L"Styles", pIniSection);
 
 	if (!fStylesModified) {
-		LocalFree(pIniSection);
+		NP2HeapFree(pIniSection);
 		return;
 	}
 
@@ -376,7 +376,7 @@ void Style_Save(void) {
 		}
 		SaveIniSection(lex->pszName, (changed ? pIniSection : NULL));
 	}
-	LocalFree(pIniSection);
+	NP2HeapFree(pIniSection);
 }
 
 //=============================================================================
@@ -403,8 +403,8 @@ BOOL Style_Import(HWND hwnd) {
 
 	if (GetOpenFileName(&ofn)) {
 		unsigned int iLexer;
-		WCHAR	*pIniSection = LocalAlloc(LPTR, sizeof(WCHAR) * 32 * 1024);
-		int		cchIniSection = (int)LocalSize(pIniSection) / sizeof(WCHAR);
+		WCHAR *pIniSection = NP2HeapAlloc(sizeof(WCHAR) * 32 * 1024);
+		const int cchIniSection = (int)NP2HeapSize(pIniSection) / sizeof(WCHAR);
 
 		for (iLexer = 0; iLexer < NUMLEXERS; iLexer++) {
 			PEDITLEXER lex = pLexArray[iLexer];
@@ -420,7 +420,7 @@ BOOL Style_Import(HWND hwnd) {
 				}
 			}
 		}
-		LocalFree(pIniSection);
+		NP2HeapFree(pIniSection);
 		return TRUE;
 	}
 	return FALSE;
@@ -451,8 +451,8 @@ BOOL Style_Export(HWND hwnd) {
 
 	if (GetSaveFileName(&ofn)) {
 		unsigned int iLexer;
-		WCHAR *pIniSection = LocalAlloc(LPTR, sizeof(WCHAR) * 32 * 1024);
-		int		cchIniSection = (int)LocalSize(pIniSection) / sizeof(WCHAR);
+		WCHAR *pIniSection = NP2HeapAlloc(sizeof(WCHAR) * 32 * 1024);
+		const int cchIniSection = (int)NP2HeapSize(pIniSection) / sizeof(WCHAR);
 
 		for (iLexer = 0; iLexer < NUMLEXERS; iLexer++) {
 			PEDITLEXER lex = pLexArray[iLexer];
@@ -467,7 +467,7 @@ BOOL Style_Export(HWND hwnd) {
 			}
 			ZeroMemory(pIniSection, cchIniSection);
 		}
-		LocalFree(pIniSection);
+		NP2HeapFree(pIniSection);
 
 		if (dwError != ERROR_SUCCESS) {
 			MsgBox(MBINFO, IDS_EXPORT_FAIL, szFile);
@@ -650,7 +650,7 @@ void Style_SetLexer(HWND hwnd, PEDITLEXER pLexNew) {
 				char *lowerKeywords;
 				char ch;
 				int len = lstrlenA(pKeywords);
-				lowerKeywords = LocalAlloc(LPTR, len + 1);
+				lowerKeywords = NP2HeapAlloc(len + 1);
 				lstrcpyA(lowerKeywords, pKeywords);
 				while ((ch = *lowerKeywords) != '\0') {
 					if (ch >= 'A' && ch <= 'Z') {
@@ -660,7 +660,7 @@ void Style_SetLexer(HWND hwnd, PEDITLEXER pLexNew) {
 				}
 				lowerKeywords -= len;
 				SendMessage(hwnd, SCI_SETKEYWORDS, i, (LPARAM)lowerKeywords);
-				LocalFree(lowerKeywords);
+				NP2HeapFree(lowerKeywords);
 			} else {
 				SendMessage(hwnd, SCI_SETKEYWORDS, i, (LPARAM)pKeywords);
 			}
@@ -1400,7 +1400,6 @@ PEDITLEXER Style_DetectObjCAndMatlab(void) {
 				return &lexCPP;
 			}
 			break;
-			break;
 		case 'f':	// Matlab function
 			if (strncmp(p, "function", 8) == 0 && (IsASpace(p[8]) || p[8] == '[')) {
 				return &lexMatlab;
@@ -1540,9 +1539,6 @@ LPCWSTR Style_GetCurrentLexerName(void) {
 // Style_MatchLexer()
 //
 PEDITLEXER __fastcall Style_MatchLexer(LPCWSTR lpszMatch, BOOL bCheckNames) {
-	WCHAR	 tch[256 + 16];
-	WCHAR	 *p1, *p2;
-
 	if (!bCheckNames) {
 		//if (StrNCaseEqual(L"php", lpszMatch, 3) || StrCaseEqual(L"phtml", lpszMatch))) {
 		//	np2LexLangIndex = IDM_LANG_PHP;
@@ -1635,10 +1631,11 @@ PEDITLEXER __fastcall Style_MatchLexer(LPCWSTR lpszMatch, BOOL bCheckNames) {
 			}
 		}
 
+		WCHAR tch[128];
+		ZeroMemory(tch, sizeof(tch));
 		for (int i = 0; i < NUMLEXERS; i++) {
-			ZeroMemory(tch, sizeof(tch));
+			WCHAR *p1 = tch, *p2;
 			lstrcpy(tch, pLexArray[i]->szExtensions);
-			p1 = tch;
 			while (*p1) {
 				if ((p2 = StrChr(p1, L';')) != NULL) {
 					*p2 = L'\0';
@@ -2709,7 +2706,7 @@ int Style_GetLexerIconId(PEDITLEXER pLex) {
 		pszExtensions = pLex->pszDefExt;
 	}
 
-	pszFile = GlobalAlloc(GPTR, sizeof(WCHAR) * (lstrlen(pszExtensions) + CSTRLEN(L"*.txt") + 16));
+	pszFile = NP2HeapAlloc(sizeof(WCHAR) * (lstrlen(pszExtensions) + CSTRLEN(L"*.txt") + 16));
 	lstrcpy(pszFile, L"*.");
 	lstrcat(pszFile, pszExtensions);
 	if ((p = StrChr(pszFile, L';')) != NULL) {
@@ -2724,7 +2721,7 @@ int Style_GetLexerIconId(PEDITLEXER pLex) {
 	SHGetFileInfo(pszFile, FILE_ATTRIBUTE_NORMAL, &shfi, sizeof(SHFILEINFO),
 				  SHGFI_SMALLICON | SHGFI_SYSICONINDEX | SHGFI_USEFILEATTRIBUTES);
 
-	GlobalFree(pszFile);
+	NP2HeapFree(pszFile);
 
 	return (shfi.iIcon);
 }

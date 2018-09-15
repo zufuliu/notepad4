@@ -379,7 +379,7 @@ void Encoding_AddToListView(HWND hwnd, int idSel, BOOL bRecodeOnly) {
 	LVITEM lvi;
 	WCHAR wchBuf[256];
 
-	PENCODINGENTRY pEE = LocalAlloc(LPTR, COUNTOF(mEncoding) * sizeof(ENCODINGENTRY));
+	PENCODINGENTRY pEE = NP2HeapAlloc(COUNTOF(mEncoding) * sizeof(ENCODINGENTRY));
 	for (unsigned int i = 0; i < COUNTOF(mEncoding); i++) {
 		pEE[i].id = i;
 		GetString(mEncoding[i].idsName, pEE[i].wch, COUNTOF(pEE[i].wch));
@@ -429,7 +429,7 @@ void Encoding_AddToListView(HWND hwnd, int idSel, BOOL bRecodeOnly) {
 		}
 	}
 
-	LocalFree(pEE);
+	NP2HeapFree(pEE);
 
 	if (iSelItem != -1) {
 		ListView_SetItemState(hwnd, iSelItem, LVIS_SELECTED | LVIS_FOCUSED, LVIS_SELECTED | LVIS_FOCUSED);
@@ -463,7 +463,7 @@ void Encoding_AddToComboboxEx(HWND hwnd, int idSel, BOOL bRecodeOnly) {
 	COMBOBOXEXITEM cbei;
 	WCHAR wchBuf[256];
 
-	PENCODINGENTRY pEE = LocalAlloc(LPTR, COUNTOF(mEncoding) * sizeof(ENCODINGENTRY));
+	PENCODINGENTRY pEE = NP2HeapAlloc(COUNTOF(mEncoding) * sizeof(ENCODINGENTRY));
 	for (unsigned int i = 0; i < COUNTOF(mEncoding); i++) {
 		pEE[i].id = i;
 		GetString(mEncoding[i].idsName, pEE[i].wch, COUNTOF(pEE[i].wch));
@@ -517,7 +517,7 @@ void Encoding_AddToComboboxEx(HWND hwnd, int idSel, BOOL bRecodeOnly) {
 		}
 	}
 
-	LocalFree(pEE);
+	NP2HeapFree(pEE);
 
 	if (iSelItem != -1) {
 		SendMessage(hwnd, CB_SETCURSEL, (WPARAM)iSelItem, 0);
