@@ -2238,33 +2238,7 @@ INT_PTR CALLBACK FindTargetDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 		SendDlgItemMessage(hwnd, IDC_DDEAPP, EM_LIMITTEXT, 128, 0);
 		SendDlgItemMessage(hwnd, IDC_DDETOPIC, EM_LIMITTEXT, 128, 0);
 
-		WCHAR *pIniSection = NP2HeapAlloc(sizeof(WCHAR) * 32 * 1024);
-		const int cbIniSection = (int)NP2HeapSize(pIniSection) / sizeof(WCHAR);
-
-		LoadIniSection(L"Target Application", pIniSection, cbIniSection);
-
-		if (IniSectionGetInt(pIniSection, L"UseTargetApplication", 0xFB) != 0xFB) {
-			iUseTargetApplication = IniSectionGetInt(pIniSection, L"UseTargetApplication", iUseTargetApplication);
-			iTargetApplicationMode = IniSectionGetInt(pIniSection, L"TargetApplicationMode", iTargetApplicationMode);
-			IniSectionGetString(pIniSection, L"TargetApplicationPath", szTargetApplication, szTargetApplication, COUNTOF(szTargetApplication));
-			IniSectionGetString(pIniSection, L"TargetApplicationParams", szTargetApplicationParams, szTargetApplicationParams, COUNTOF(szTargetApplicationParams));
-			IniSectionGetString(pIniSection, L"TargetApplicationWndClass", szTargetApplicationWndClass, szTargetApplicationWndClass, COUNTOF(szTargetApplicationWndClass));
-			IniSectionGetString(pIniSection, L"DDEMessage", szDDEMsg, szDDEMsg, COUNTOF(szDDEMsg));
-			IniSectionGetString(pIniSection, L"DDEApplication", szDDEApp, szDDEApp, COUNTOF(szDDEApp));
-			IniSectionGetString(pIniSection, L"DDETopic", szDDETopic, szDDETopic, COUNTOF(szDDETopic));
-		} else if (iUseTargetApplication && StrIsEmpty(szTargetApplication)) {
-			iUseTargetApplication = 1;
-			iTargetApplicationMode = 1;
-			lstrcpy(szTargetApplication, L"Notepad2.exe");
-			lstrcpy(szTargetApplicationParams, L"");
-			lstrcpy(szTargetApplicationWndClass, L"Notepad2");
-			lstrcpy(szDDEMsg, L"");
-			lstrcpy(szDDEApp, L"");
-			lstrcpy(szDDETopic, L"");
-		}
-
-		NP2HeapFree(pIniSection);
-
+		LoadLaunchSetings();
 		if (iUseTargetApplication) {
 			CheckRadioButton(hwnd, IDC_LAUNCH, IDC_TARGET, IDC_TARGET);
 		} else {

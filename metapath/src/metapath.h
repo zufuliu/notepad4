@@ -91,6 +91,7 @@ void SaveSettings(BOOL bSaveSettingsNow);
 
 void ParseCommandLine(void);
 void LoadFlags(void);
+void LoadLaunchSetings(void);
 int CheckIniFile(LPWSTR lpszFile, LPCWSTR lpszModule);
 int CheckIniFileRedirect(LPWSTR lpszFile, LPCWSTR lpszModule);
 int FindIniFile(void);
