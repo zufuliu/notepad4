@@ -67,7 +67,7 @@ BOOL	EditConvertText(HWND hwnd, UINT cpSource, UINT cpDest, BOOL bSetSavePoint);
 BOOL	EditSetNewEncoding(HWND hwnd, int iCurrentEncoding,
 						   int iNewEncoding, BOOL bNoUI, BOOL bSetSavePoint);
 
-char	*EditGetClipboardText(HWND hwnd);
+char	*EditGetClipboardText(HWND hwnd); // LocalFree()
 BOOL	EditCopyAppend(HWND hwnd);
 int 	EditDetectEOLMode(HWND hwnd, LPCSTR lpData);
 BOOL	EditLoadFile(HWND hwnd, LPWSTR pszFile, BOOL bSkipEncodingDetection,

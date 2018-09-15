@@ -771,7 +771,7 @@ HWND InitInstance(HINSTANCE hInstance, int nCmdShow) {
 				}
 			}
 		}
-		GlobalFree(lpFileArg);
+		NP2HeapFree(lpFileArg);
 
 		if (bOpened) {
 			if (flagChangeNotify == 1) {
@@ -872,7 +872,7 @@ HWND InitInstance(HINSTANCE hInstance, int nCmdShow) {
 				EditEnsureSelectionVisible(hwndEdit);
 			}
 		}
-		GlobalFree(lpMatchArg);
+		LocalFree(lpMatchArg);
 	}
 
 	// Check for Paste Board option -- after loading files
@@ -1116,7 +1116,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 		SetDlgItemInt(hwnd, IDC_REUSELOCK, GetTickCount(), FALSE);
 
 		if (pcds->dwData == DATA_NOTEPAD2_PARAMS) {
-			LPNP2PARAMS params = LocalAlloc(LPTR, pcds->cbData);
+			LPNP2PARAMS params = NP2HeapAlloc(pcds->cbData);
 			CopyMemory(params, pcds->lpData, pcds->cbData);
 
 			if (params->flagLexerSpecified) {
@@ -1201,7 +1201,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 			flagLexerSpecified = 0;
 			flagQuietCreate = 0;
 
-			LocalFree(params);
+			NP2HeapFree(params);
 
 			UpdateStatusbar();
 		}
@@ -1792,8 +1792,8 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) {
 	}
 
 	// Load toolbar labels
-	WCHAR *pIniSection = LocalAlloc(LPTR, sizeof(WCHAR) * 32 * 1024);
-	int cchIniSection = (int)(LocalSize(pIniSection) / sizeof(WCHAR));
+	WCHAR *pIniSection = NP2HeapAlloc(sizeof(WCHAR) * 32 * 1024);
+	const int cchIniSection = (int)(NP2HeapSize(pIniSection) / sizeof(WCHAR));
 	LoadIniSection(L"Toolbar Labels", pIniSection, cchIniSection);
 	if (StrIsEmpty(pIniSection)) {
 		for (unsigned int i = 0; i < COUNTOF(tbbMainWnd); i++) {
@@ -1820,7 +1820,7 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) {
 			}
 		}
 	}
-	LocalFree(pIniSection);
+	NP2HeapFree(pIniSection);
 
 	SendMessage(hwndToolbar, TB_SETEXTENDEDSTYLE, 0,
 				SendMessage(hwndToolbar, TB_GETEXTENDEDSTYLE, 0, 0) | TBSTYLE_EX_MIXEDBUTTONS);
@@ -2590,7 +2590,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		}
 
 		GetModuleFileName(NULL, szModuleName, COUNTOF(szModuleName));
-		szParameters = LocalAlloc(LPTR, sizeof(WCHAR) * 1024);
+		szParameters = NP2HeapAlloc(sizeof(WCHAR) * 1024);
 		GetRelaunchParameters(szParameters, szCurFile, TRUE, emptyWind);
 
 		ZeroMemory(&sei, sizeof(SHELLEXECUTEINFO));
@@ -2604,7 +2604,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		sei.nShow = SW_SHOWNORMAL;
 
 		ShellExecuteEx(&sei);
-		LocalFree(szParameters);
+		NP2HeapFree(szParameters);
 	}
 	break;
 
@@ -4543,17 +4543,11 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	case CMD_WEBACTION1:
 	case CMD_WEBACTION2: {
-		BOOL	bCmdEnabled = FALSE;
 		LPWSTR lpszTemplateName;
-		WCHAR	 szCmdTemplate[256];
-		LPWSTR lpszCommand;
-		LPWSTR lpszArgs;
-		SHELLEXECUTEINFO sei;
-		WCHAR wchDirectory[MAX_PATH] = L"";
+		WCHAR szCmdTemplate[256];
 
 		lpszTemplateName = (LOWORD(wParam) == CMD_WEBACTION1) ? L"WebTemplate1" : L"WebTemplate2";
-
-		bCmdEnabled = IniGetString(L"Settings2", lpszTemplateName, L"", szCmdTemplate, COUNTOF(szCmdTemplate));
+		const BOOL bCmdEnabled = IniGetString(L"Settings2", lpszTemplateName, L"", szCmdTemplate, COUNTOF(szCmdTemplate));
 
 		if (bCmdEnabled) {
 			DWORD cchSelection = (int)SendMessage(hwndEdit, SCI_GETSELECTIONEND, 0, 0)
@@ -4572,15 +4566,19 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 				}
 
 				if (StrNotEmptyA(mszSelection)) {
+					SHELLEXECUTEINFO sei;
+					WCHAR wchDirectory[MAX_PATH] = L"";
 					WCHAR wszSelection[512];
-					UINT uCP = (SendMessage(hwndEdit, SCI_GETCODEPAGE, 0, 0) == SC_CP_UTF8) ? CP_UTF8 : CP_ACP;
+
+					const UINT uCP = (SendMessage(hwndEdit, SCI_GETCODEPAGE, 0, 0) == SC_CP_UTF8) ? CP_UTF8 : CP_ACP;
 					MultiByteToWideChar(uCP, 0, mszSelection, -1, wszSelection, COUNTOF(wszSelection));
 
-					lpszCommand = GlobalAlloc(GPTR, sizeof(WCHAR) * (512 + COUNTOF(szCmdTemplate) + MAX_PATH + 32));
+					LPWSTR lpszCommand = NP2HeapAlloc(sizeof(WCHAR) * (512 + COUNTOF(szCmdTemplate) + MAX_PATH + 32));
+					const SIZE_T cbCommand = NP2HeapSize(lpszCommand);
 					wsprintf(lpszCommand, szCmdTemplate, wszSelection);
-					ExpandEnvironmentStringsEx(lpszCommand, (DWORD)GlobalSize(lpszCommand) / sizeof(WCHAR));
+					ExpandEnvironmentStringsEx(lpszCommand, (DWORD)(cbCommand / sizeof(WCHAR)));
 
-					lpszArgs = GlobalAlloc(GPTR, GlobalSize(lpszCommand));
+					LPWSTR lpszArgs = NP2HeapAlloc(cbCommand);
 					ExtractFirstArgument(lpszCommand, lpszCommand, lpszArgs);
 
 					if (StrNotEmpty(szCurFile)) {
@@ -4601,8 +4599,8 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 					ShellExecuteEx(&sei);
 
-					GlobalFree(lpszCommand);
-					GlobalFree(lpszArgs);
+					NP2HeapFree(lpszCommand);
+					NP2HeapFree(lpszArgs);
 				}
 			}
 		}
@@ -5272,8 +5270,8 @@ extern BOOL fStylesModified;
 //
 //
 void LoadSettings(void) {
-	WCHAR *pIniSection = LocalAlloc(LPTR, sizeof(WCHAR) * 32 * 1024);
-	int		cchIniSection = (int)LocalSize(pIniSection) / sizeof(WCHAR);
+	WCHAR *pIniSection = NP2HeapAlloc(sizeof(WCHAR) * 32 * 1024);
+	const int cchIniSection = (int)NP2HeapSize(pIniSection) / sizeof(WCHAR);
 
 	LoadIniSection(L"Settings", pIniSection, cchIniSection);
 
@@ -5573,7 +5571,7 @@ void LoadSettings(void) {
 		}
 	}
 
-	LocalFree(pIniSection);
+	NP2HeapFree(pIniSection);
 
 	iDefaultCodePage = 0;
 	{
@@ -5602,11 +5600,6 @@ void LoadSettings(void) {
 //
 //
 void SaveSettings(BOOL bSaveSettingsNow) {
-	WCHAR *pIniSection = NULL;
-	//int		cchIniSection = 0;
-
-	WCHAR wchTmp[MAX_PATH];
-
 	if (StrIsEmpty(szIniFile)) {
 		return;
 	}
@@ -5618,8 +5611,8 @@ void SaveSettings(BOOL bSaveSettingsNow) {
 		return;
 	}
 
-	pIniSection = LocalAlloc(LPTR, sizeof(WCHAR) * 32 * 1024);
-	//cchIniSection = (int)LocalSize(pIniSection) / sizeof(WCHAR);
+	WCHAR wchTmp[MAX_PATH];
+	WCHAR *pIniSection = NP2HeapAlloc(sizeof(WCHAR) * 32 * 1024);
 
 	IniSectionSetInt(pIniSection, L"SettingsVersion", NP2SettingsVersion_Current);
 	IniSectionSetBool(pIniSection, L"SaveSettings", bSaveSettings);
@@ -5734,7 +5727,7 @@ void SaveSettings(BOOL bSaveSettingsNow) {
 	}
 
 	SaveIniSection(L"Settings", pIniSection);
-	LocalFree(pIniSection);
+	NP2HeapFree(pIniSection);
 
 	/*
 		SaveSettingsNow(): query Window Dimensions
@@ -6107,7 +6100,7 @@ int ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2, BOOL *bIsNotepadReplacement) 
 			state = 2;
 			if (ExtractFirstArgument(lp2, lp1, lp2)) {
 				if (lpMatchArg) {
-					GlobalFree(lpMatchArg);
+					LocalFree(lpMatchArg);
 				}
 
 				lpMatchArg = StrDup(lp1);
@@ -6319,17 +6312,17 @@ void ParseCommandLine(void) {
 	// Good old console can also send args separated by Tabs
 	StrTab2Space(lpCmdLine);
 
-	lp1 = LocalAlloc(LPTR, cmdSize);
-	lp3 = LocalAlloc(LPTR, cmdSize);
+	lp1 = NP2HeapAlloc(cmdSize);
+	lp3 = NP2HeapAlloc(cmdSize);
 
 	// Start with 2nd argument
 	if (!(ExtractFirstArgument(lpCmdLine, lp1, lp3) && *lp3)) {
-		LocalFree(lp1);
-		LocalFree(lp3);
+		NP2HeapFree(lp1);
+		NP2HeapFree(lp3);
 		return;
 	}
 
-	lp2 = LocalAlloc(LPTR, cmdSize);
+	lp2 = NP2HeapAlloc(cmdSize);
 	while (ExtractFirstArgument(lp3, lp1, lp2)) {
 		// options
 		if (!bIsFileArg) {
@@ -6363,13 +6356,13 @@ void ParseCommandLine(void) {
 
 		// pathname
 		{
-			LPWSTR lpFileBuf = LocalAlloc(LPTR, cmdSize);
+			LPWSTR lpFileBuf = NP2HeapAlloc(cmdSize);
 
 			if (lpFileArg) {
-				GlobalFree(lpFileArg);
+				NP2HeapFree(lpFileArg);
 			}
 
-			lpFileArg = GlobalAlloc(GPTR, sizeof(WCHAR) * (MAX_PATH + 2)); // changed for ActivatePrevInst() needs
+			lpFileArg = NP2HeapAlloc(sizeof(WCHAR) * (MAX_PATH + 2)); // changed for ActivatePrevInst() needs
 			if (flagMultiFileArg == 2) {
 				// multiple file arguments with quoted spaces
 				StrCpyN(lpFileArg, lp1, MAX_PATH);
@@ -6399,14 +6392,14 @@ void ParseCommandLine(void) {
 				}
 			}
 
-			LocalFree(lpFileBuf);
+			NP2HeapFree(lpFileBuf);
 			break;
 		}
 	}
 
-	LocalFree(lp2);
-	LocalFree(lp1);
-	LocalFree(lp3);
+	NP2HeapFree(lp2);
+	NP2HeapFree(lp1);
+	NP2HeapFree(lp3);
 }
 
 //=============================================================================
@@ -6415,8 +6408,8 @@ void ParseCommandLine(void) {
 //
 //
 void LoadFlags(void) {
-	WCHAR *pIniSection = LocalAlloc(LPTR, sizeof(WCHAR) * 32 * 1024);
-	int		cchIniSection = (int)LocalSize(pIniSection) / sizeof(WCHAR);
+	WCHAR *pIniSection = NP2HeapAlloc(sizeof(WCHAR) * 32 * 1024);
+	const int cchIniSection = (int)NP2HeapSize(pIniSection) / sizeof(WCHAR);
 
 	LoadIniSection(L"Settings2", pIniSection, cchIniSection);
 
@@ -6453,7 +6446,7 @@ void LoadFlags(void) {
 		}
 	}
 
-	LocalFree(pIniSection);
+	NP2HeapFree(pIniSection);
 }
 
 //=============================================================================
@@ -7350,7 +7343,7 @@ BOOL ActivatePrevInst(void) {
 		// lpFileArg is at least MAX_PATH+2 bytes
 		WCHAR tchTmp[MAX_PATH];
 
-		ExpandEnvironmentStringsEx(lpFileArg, (DWORD)GlobalSize(lpFileArg) / sizeof(WCHAR));
+		ExpandEnvironmentStringsEx(lpFileArg, (DWORD)NP2HeapSize(lpFileArg) / sizeof(WCHAR));
 
 		if (PathIsRelative(lpFileArg)) {
 			StrCpyN(tchTmp, g_wchWorkingDirectory, COUNTOF(tchTmp));
@@ -7469,7 +7462,7 @@ BOOL ActivatePrevInst(void) {
 				DWORD cb = sizeof(NP2PARAMS);
 				int cchTitleExcerpt;
 
-				ExpandEnvironmentStringsEx(lpFileArg, (DWORD)GlobalSize(lpFileArg) / sizeof(WCHAR));
+				ExpandEnvironmentStringsEx(lpFileArg, (DWORD)NP2HeapSize(lpFileArg) / sizeof(WCHAR));
 
 				if (PathIsRelative(lpFileArg)) {
 					StrCpyN(tchTmp, g_wchWorkingDirectory, COUNTOF(tchTmp));
@@ -7529,7 +7522,7 @@ BOOL ActivatePrevInst(void) {
 
 				SendMessage(hwnd, WM_COPYDATA, (WPARAM)NULL, (LPARAM)&cds);
 				GlobalFree(params);
-				GlobalFree(lpFileArg);
+				NP2HeapFree(lpFileArg);
 			}
 			return TRUE;
 		}
@@ -7557,8 +7550,8 @@ BOOL RelaunchMultiInst(void) {
 
 		LPWSTR lpCmdLineNew = StrDup(GetCommandLine());
 		size_t cmdSize = sizeof(WCHAR) * (lstrlen(lpCmdLineNew) + 1);
-		LPWSTR lp1 = LocalAlloc(LPTR, cmdSize);
-		LPWSTR lp2 = LocalAlloc(LPTR, cmdSize);
+		LPWSTR lp1 = NP2HeapAlloc(cmdSize);
+		LPWSTR lp2 = NP2HeapAlloc(cmdSize);
 
 		StrTab2Space(lpCmdLineNew);
 		lstrcpy(lpCmdLineNew + cchiFileList, L"");
@@ -7588,9 +7581,9 @@ BOOL RelaunchMultiInst(void) {
 		}
 
 		LocalFree(lpCmdLineNew);
-		LocalFree(lp1);
-		LocalFree(lp2);
-		GlobalFree(lpFileArg);
+		NP2HeapFree(lp1);
+		NP2HeapFree(lp2);
+		NP2HeapFree(lpFileArg);
 
 		return TRUE;
 	}
@@ -7747,15 +7740,15 @@ BOOL RelaunchElevated(void) {
 			}
 
 			exit = StrCaseEqual(tchFile, szCurFile);
-			lpArg1 = LocalAlloc(LPTR, sizeof(WCHAR) * MAX_PATH);
+			lpArg1 = NP2HeapAlloc(sizeof(WCHAR) * MAX_PATH);
 			GetModuleFileName(NULL, lpArg1, MAX_PATH);
-			lpArg2 = LocalAlloc(LPTR, sizeof(WCHAR) * 1024);
+			lpArg2 = NP2HeapAlloc(sizeof(WCHAR) * 1024);
 			GetRelaunchParameters(lpArg2, tchFile, !exit, FALSE);
 		} else {
 			LPWSTR lpCmdLine = GetCommandLine();
 			size_t cmdSize = sizeof(WCHAR) * (lstrlen(lpCmdLine) + 1);
-			lpArg1 = LocalAlloc(LPTR, cmdSize);
-			lpArg2 = LocalAlloc(LPTR, cmdSize);
+			lpArg1 = NP2HeapAlloc(cmdSize);
+			lpArg2 = NP2HeapAlloc(cmdSize);
 			ExtractFirstArgument(lpCmdLine, lpArg1, lpArg2);
 		}
 
@@ -7776,8 +7769,8 @@ BOOL RelaunchElevated(void) {
 			exit = FALSE;
 		}
 
-		LocalFree(lpArg1);
-		LocalFree(lpArg2);
+		NP2HeapFree(lpArg1);
+		NP2HeapFree(lpArg2);
 		return exit;
 	}
 }
