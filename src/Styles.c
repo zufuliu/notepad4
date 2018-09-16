@@ -2064,7 +2064,7 @@ int Style_GetEditLexerId(int lexer) {
 // Style_ToggleUse2ndDefault()
 //
 void Style_ToggleUse2ndDefault(HWND hwnd) {
-	bUse2ndDefaultStyle = (bUse2ndDefaultStyle) ? 0 : 1;
+	bUse2ndDefaultStyle = !bUse2ndDefaultStyle;
 	Style_SetLexer(hwnd, pLexCurrent);
 }
 
@@ -2398,8 +2398,8 @@ BOOL Style_SelectFont(HWND hwnd, LPWSTR lpszStyle, int cchStyle, BOOL bDefaultSt
 		ReleaseDC(hwnd, hdc);
 	}
 	lf.lfWeight = (StrStr(lpszStyle, L"bold")) ? FW_BOLD : FW_NORMAL;
-	lf.lfItalic = (StrStr(lpszStyle, L"italic")) ? 1 : 0;
-	lf.lfStrikeOut = (StrStr(lpszStyle, L"strike")) ? 1 : 0;
+	lf.lfItalic = StrStr(lpszStyle, L"italic") != NULL;
+	lf.lfStrikeOut = StrStr(lpszStyle, L"strike") != NULL;
 
 	// Init cf
 	cf.lStructSize = sizeof(CHOOSEFONT);
@@ -3163,7 +3163,7 @@ INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM
 		//	if (pCurrentStyle) {
 		//		WCHAR tch[256];
 		//		GetDlgItemText(hwnd, IDC_STYLEEDIT, tch, COUNTOF(tch));
-		//		Style_StrSetAttribute(tch, COUNTOF(tch), L"bold", IsDlgButtonChecked(hwnd, IDC_STYLEBOLD));
+		//		Style_StrSetAttribute(tch, COUNTOF(tch), L"bold", IsButtonChecked(hwnd, IDC_STYLEBOLD));
 		//		SetDlgItemText(hwnd, IDC_STYLEEDIT, tch);
 		//	}
 		//	break;
@@ -3172,7 +3172,7 @@ INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM
 		//	if (pCurrentStyle) {
 		//		WCHAR tch[256];
 		//		GetDlgItemText(hwnd, IDC_STYLEEDIT, tch, COUNTOF(tch));
-		//		Style_StrSetAttribute(tch, COUNTOF(tch), L"italic", IsDlgButtonChecked(hwnd, IDC_STYLEITALIC));
+		//		Style_StrSetAttribute(tch, COUNTOF(tch), L"italic", IsButtonChecked(hwnd, IDC_STYLEITALIC));
 		//		SetDlgItemText(hwnd, IDC_STYLEEDIT, tch);
 		//	}
 		//	break;
@@ -3181,7 +3181,7 @@ INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM
 		//	if (pCurrentStyle) {
 		//		WCHAR tch[256];
 		//		GetDlgItemText(hwnd, IDC_STYLEEDIT, tch, COUNTOF(tch));
-		//		Style_StrSetAttribute(tch, COUNTOF(tch), L"underline", IsDlgButtonChecked(hwnd, IDC_STYLEUNDERLINE));
+		//		Style_StrSetAttribute(tch, COUNTOF(tch), L"underline", IsButtonChecked(hwnd, IDC_STYLEUNDERLINE));
 		//		SetDlgItemText(hwnd, IDC_STYLEEDIT, tch);
 		//	}
 		//	break;
@@ -3190,7 +3190,7 @@ INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM
 		//	if (pCurrentStyle) {
 		//		WCHAR tch[256];
 		//		GetDlgItemText(hwnd, IDC_STYLEEDIT, tch, COUNTOF(tch));
-		//		Style_StrSetAttribute(tch, COUNTOF(tch), L"eolfilled", IsDlgButtonChecked(hwnd, IDC_STYLEEOLFILLED));
+		//		Style_StrSetAttribute(tch, COUNTOF(tch), L"eolfilled", IsButtonChecked(hwnd, IDC_STYLEEOLFILLED));
 		//		SetDlgItemText(hwnd, IDC_STYLEEDIT, tch);
 		//	}
 		//	break;
@@ -3526,7 +3526,7 @@ INT_PTR CALLBACK Style_SelectLexerDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, L
 	case WM_COMMAND:
 		switch (LOWORD(wParam)) {
 		case IDC_DEFAULTSCHEME:
-			if (IsDlgButtonChecked(hwnd, IDC_DEFAULTSCHEME) == BST_CHECKED) {
+			if (IsButtonChecked(hwnd, IDC_DEFAULTSCHEME)) {
 				iInternalDefault = ListView_GetNextItem(hwndLV, -1, LVNI_ALL | LVNI_SELECTED);
 			} else {
 				iInternalDefault = 0;
@@ -3542,7 +3542,7 @@ INT_PTR CALLBACK Style_SelectLexerDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, L
 				pLexCurrent = (PEDITLEXER)lvi.lParam;
 				np2LexLangIndex = 0;
 				iDefaultLexer = iInternalDefault;
-				bAutoSelect = (IsDlgButtonChecked(hwnd, IDC_AUTOSELECT) == BST_CHECKED) ? 1 : 0;
+				bAutoSelect = IsButtonChecked(hwnd, IDC_AUTOSELECT);
 				EndDialog(hwnd, IDOK);
 			}
 		}

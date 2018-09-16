@@ -4470,7 +4470,7 @@ INT_PTR CALLBACK EditFindReplaceDlgProcW(HWND hwnd, UINT umsg, WPARAM wParam, LP
 		break;
 
 		case IDC_FINDREGEXP:
-			if (IsDlgButtonChecked(hwnd, IDC_FINDREGEXP) == BST_CHECKED) {
+			if (IsButtonChecked(hwnd, IDC_FINDREGEXP)) {
 				CheckDlgButton(hwnd, IDC_FINDTRANSFORMBS, BST_UNCHECKED);
 #ifdef BOOKMARK_EDITION
 				// Can not use wildcard search together with regexp
@@ -4480,7 +4480,7 @@ INT_PTR CALLBACK EditFindReplaceDlgProcW(HWND hwnd, UINT umsg, WPARAM wParam, LP
 			break;
 
 		case IDC_FINDTRANSFORMBS:
-			if (IsDlgButtonChecked(hwnd, IDC_FINDTRANSFORMBS) == BST_CHECKED) {
+			if (IsButtonChecked(hwnd, IDC_FINDTRANSFORMBS)) {
 				CheckDlgButton(hwnd, IDC_FINDREGEXP, BST_UNCHECKED);
 			}
 			break;
@@ -4490,7 +4490,7 @@ INT_PTR CALLBACK EditFindReplaceDlgProcW(HWND hwnd, UINT umsg, WPARAM wParam, LP
 
 		case IDC_WILDCARDSEARCH:
 			CheckDlgButton(hwnd, IDC_FINDREGEXP, BST_UNCHECKED);
-			//if (IsDlgButtonChecked(hwnd, IDC_FINDWILDCARDS) == BST_CHECKED)
+			//if (IsButtonChecked(hwnd, IDC_FINDWILDCARDS))
 			//	CheckDlgButton(hwnd, IDC_FINDREGEXP, BST_UNCHECKED);
 			break;
 #endif
@@ -4534,36 +4534,34 @@ INT_PTR CALLBACK EditFindReplaceDlgProcW(HWND hwnd, UINT umsg, WPARAM wParam, LP
 			}
 
 #ifdef BOOKMARK_EDITION
-			lpefr->bWildcardSearch = (IsDlgButtonChecked(hwnd, IDC_WILDCARDSEARCH) == BST_CHECKED) ? TRUE : FALSE;
+			lpefr->bWildcardSearch = IsButtonChecked(hwnd, IDC_WILDCARDSEARCH);
 #endif
 
 			lpefr->fuFlags = 0;
 
-			if (IsDlgButtonChecked(hwnd, IDC_FINDCASE) == BST_CHECKED) {
+			if (IsButtonChecked(hwnd, IDC_FINDCASE)) {
 				lpefr->fuFlags |= SCFIND_MATCHCASE;
 			}
 
-			if (IsDlgButtonChecked(hwnd, IDC_FINDWORD) == BST_CHECKED) {
+			if (IsButtonChecked(hwnd, IDC_FINDWORD)) {
 				lpefr->fuFlags |= SCFIND_WHOLEWORD;
 			}
 
-			if (IsDlgButtonChecked(hwnd, IDC_FINDSTART) == BST_CHECKED) {
+			if (IsButtonChecked(hwnd, IDC_FINDSTART)) {
 				lpefr->fuFlags |= SCFIND_WORDSTART;
 			}
 
-			if (IsDlgButtonChecked(hwnd, IDC_FINDREGEXP) == BST_CHECKED) {
+			if (IsButtonChecked(hwnd, IDC_FINDREGEXP)) {
 				lpefr->fuFlags |= SCFIND_REGEXP | SCFIND_POSIX;
 			}
 
-			lpefr->bTransformBS =
-				(IsDlgButtonChecked(hwnd, IDC_FINDTRANSFORMBS) == BST_CHECKED) ? TRUE : FALSE;
-
-			lpefr->bNoFindWrap = (IsDlgButtonChecked(hwnd, IDC_NOWRAP) == BST_CHECKED) ? TRUE : FALSE;
+			lpefr->bTransformBS = IsButtonChecked(hwnd, IDC_FINDTRANSFORMBS);
+			lpefr->bNoFindWrap = IsButtonChecked(hwnd, IDC_NOWRAP);
 
 			if (bIsFindDlg) {
-				lpefr->bFindClose = (IsDlgButtonChecked(hwnd, IDC_FINDCLOSE) == BST_CHECKED) ? TRUE : FALSE;
+				lpefr->bFindClose = IsButtonChecked(hwnd, IDC_FINDCLOSE);
 			} else {
-				lpefr->bReplaceClose = (IsDlgButtonChecked(hwnd, IDC_FINDCLOSE) == BST_CHECKED) ? TRUE : FALSE;
+				lpefr->bReplaceClose = IsButtonChecked(hwnd, IDC_FINDCLOSE);
 			}
 
 			if (!bSwitchedFindReplace) {
@@ -5744,7 +5742,7 @@ BOOL EditModifyLinesDlg(HWND hwnd, LPWSTR pwsz1, LPWSTR pwsz2) {
 								   hwnd,
 								   EditModifyLinesDlgProc,
 								   (LPARAM)&data);
-	return (iResult == IDOK) ? TRUE : FALSE;
+	return iResult == IDOK;
 }
 
 //=============================================================================
@@ -5771,15 +5769,15 @@ INT_PTR CALLBACK EditAlignDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lP
 		switch (LOWORD(wParam)) {
 		case IDOK: {
 			*piAlignMode = 0;
-			if (IsDlgButtonChecked(hwnd, 100) == BST_CHECKED) {
+			if (IsButtonChecked(hwnd, 100)) {
 				*piAlignMode = ALIGN_LEFT;
-			} else if (IsDlgButtonChecked(hwnd, 101) == BST_CHECKED) {
+			} else if (IsButtonChecked(hwnd, 101)) {
 				*piAlignMode = ALIGN_RIGHT;
-			} else if (IsDlgButtonChecked(hwnd, 102) == BST_CHECKED) {
+			} else if (IsButtonChecked(hwnd, 102)) {
 				*piAlignMode = ALIGN_CENTER;
-			} else if (IsDlgButtonChecked(hwnd, 103) == BST_CHECKED) {
+			} else if (IsButtonChecked(hwnd, 103)) {
 				*piAlignMode = ALIGN_JUSTIFY;
-			} else if (IsDlgButtonChecked(hwnd, 104) == BST_CHECKED) {
+			} else if (IsButtonChecked(hwnd, 104)) {
 				*piAlignMode = ALIGN_JUSTIFY_EX;
 			}
 			EndDialog(hwnd, IDOK);
@@ -5808,7 +5806,7 @@ BOOL EditAlignDlg(HWND hwnd, int *piAlignMode) {
 								   EditAlignDlgProc,
 								   (LPARAM)piAlignMode);
 
-	return (iResult == IDOK) ? TRUE : FALSE;
+	return iResult == IDOK;
 }
 
 //=============================================================================
@@ -5871,7 +5869,7 @@ BOOL EditEncloseSelectionDlg(HWND hwnd, LPWSTR pwszOpen, LPWSTR pwszClose) {
 								   EditEncloseSelectionDlgProc,
 								   (LPARAM)&data);
 
-	return (iResult == IDOK) ? TRUE : FALSE;
+	return iResult == IDOK;
 }
 
 //=============================================================================
@@ -5992,7 +5990,7 @@ BOOL EditInsertTagDlg(HWND hwnd, LPWSTR pwszOpen, LPWSTR pwszClose) {
 								   EditInsertTagDlgProc,
 								   (LPARAM)&data);
 
-	return (iResult == IDOK) ? TRUE : FALSE;
+	return iResult == IDOK;
 }
 
 //=============================================================================
@@ -6064,28 +6062,28 @@ INT_PTR CALLBACK EditSortDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPa
 		switch (LOWORD(wParam)) {
 		case IDOK: {
 			*piSortFlags = 0;
-			if (IsDlgButtonChecked(hwnd, 101) == BST_CHECKED) {
+			if (IsButtonChecked(hwnd, 101)) {
 				*piSortFlags |= SORT_DESCENDING;
 			}
-			if (IsDlgButtonChecked(hwnd, 102) == BST_CHECKED) {
+			if (IsButtonChecked(hwnd, 102)) {
 				*piSortFlags |= SORT_SHUFFLE;
 			}
-			if (IsDlgButtonChecked(hwnd, 103) == BST_CHECKED) {
+			if (IsButtonChecked(hwnd, 103)) {
 				*piSortFlags |= SORT_MERGEDUP;
 			}
-			if (IsDlgButtonChecked(hwnd, 104) == BST_CHECKED) {
+			if (IsButtonChecked(hwnd, 104)) {
 				*piSortFlags |= SORT_UNIQDUP;
 			}
-			if (IsDlgButtonChecked(hwnd, 105) == BST_CHECKED) {
+			if (IsButtonChecked(hwnd, 105)) {
 				*piSortFlags |= SORT_UNIQUNIQ;
 			}
-			if (IsDlgButtonChecked(hwnd, 106) == BST_CHECKED) {
+			if (IsButtonChecked(hwnd, 106)) {
 				*piSortFlags |= SORT_NOCASE;
 			}
-			if (IsDlgButtonChecked(hwnd, 107) == BST_CHECKED) {
+			if (IsButtonChecked(hwnd, 107)) {
 				*piSortFlags |= SORT_LOGICAL;
 			}
-			if (IsDlgButtonChecked(hwnd, 108) == BST_CHECKED) {
+			if (IsButtonChecked(hwnd, 108)) {
 				*piSortFlags |= SORT_COLUMN;
 			}
 			EndDialog(hwnd, IDOK);
@@ -6098,7 +6096,7 @@ INT_PTR CALLBACK EditSortDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPa
 
 		case 100:
 		case 101:
-			EnableWindow(GetDlgItem(hwnd, 103), IsDlgButtonChecked(hwnd, 105) != BST_CHECKED);
+			EnableWindow(GetDlgItem(hwnd, 103), !IsButtonChecked(hwnd, 105));
 			EnableWindow(GetDlgItem(hwnd, 104), TRUE);
 			EnableWindow(GetDlgItem(hwnd, 105), TRUE);
 			EnableWindow(GetDlgItem(hwnd, 106), TRUE);
@@ -6114,7 +6112,7 @@ INT_PTR CALLBACK EditSortDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPa
 			break;
 
 		case 104:
-			EnableWindow(GetDlgItem(hwnd, 103), IsDlgButtonChecked(hwnd, 104) != BST_CHECKED);
+			EnableWindow(GetDlgItem(hwnd, 103), !IsButtonChecked(hwnd, 104));
 			break;
 		}
 		return TRUE;
@@ -6135,7 +6133,7 @@ BOOL EditSortDlg(HWND hwnd, int *piSortFlags) {
 								   EditSortDlgProc,
 								   (LPARAM)piSortFlags);
 
-	return (iResult == IDOK) ? TRUE : FALSE;
+	return iResult == IDOK;
 }
 
 //=============================================================================
@@ -6177,17 +6175,17 @@ BOOL FileVars_Init(LPCSTR lpData, DWORD cbData, LPFILEVARS lpfv) {
 			}
 
 			if (FileVars_ParseInt(tch, "indent-tabs-mode", &i)) {
-				lpfv->bTabsAsSpaces = (i) ? FALSE : TRUE;
+				lpfv->bTabsAsSpaces = i == 0;
 				lpfv->mask |= FV_TABSASSPACES;
 			}
 
 			if (FileVars_ParseInt(tch, "c-tab-always-indent", &i)) {
-				lpfv->bTabIndents = (i) ? TRUE : FALSE;
+				lpfv->bTabIndents = i != 0;
 				lpfv->mask |= FV_TABINDENTS;
 			}
 
 			if (FileVars_ParseInt(tch, "truncate-lines", &i)) {
-				lpfv->fWordWrap = (i) ? FALSE : TRUE;
+				lpfv->fWordWrap = i == 0;
 				lpfv->mask |= FV_WORDWRAP;
 			}
 
@@ -6233,17 +6231,17 @@ BOOL FileVars_Init(LPCSTR lpData, DWORD cbData, LPFILEVARS lpfv) {
 				}
 
 				if (FileVars_ParseInt(tch, "indent-tabs-mode", &i)) {
-					lpfv->bTabsAsSpaces = (i) ? FALSE : TRUE;
+					lpfv->bTabsAsSpaces = i == 0;
 					lpfv->mask |= FV_TABSASSPACES;
 				}
 
 				if (FileVars_ParseInt(tch, "c-tab-always-indent", &i)) {
-					lpfv->bTabIndents = (i) ? TRUE : FALSE;
+					lpfv->bTabIndents = i != 0;
 					lpfv->mask |= FV_TABINDENTS;
 				}
 
 				if (FileVars_ParseInt(tch, "truncate-lines", &i)) {
-					lpfv->fWordWrap = (i) ? FALSE : TRUE;
+					lpfv->fWordWrap = i == 0;
 					lpfv->mask |= FV_WORDWRAP;
 				}
 
@@ -6283,8 +6281,8 @@ BOOL FileVars_Init(LPCSTR lpData, DWORD cbData, LPFILEVARS lpfv) {
 // FileVars_Apply()
 //
 
-extern int fWordWrap;
-extern int fWordWrapG;
+extern BOOL fWordWrap;
+extern BOOL fWordWrapG;
 extern int iWordWrapMode;
 extern int iLongLinesLimit;
 extern int iLongLinesLimitG;

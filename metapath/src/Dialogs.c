@@ -641,55 +641,17 @@ INT_PTR CALLBACK GeneralPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPa
 		switch (((LPNMHDR)lParam)->code) {
 		case PSN_APPLY:
 			if (IsWindowEnabled(GetDlgItem(hwnd, IDC_SAVESETTINGS))) {
-				if (IsDlgButtonChecked(hwnd, IDC_SAVESETTINGS)) {
-					bSaveSettings = 1;
-				} else {
-					bSaveSettings = 0;
-				}
+				bSaveSettings = IsButtonChecked(hwnd, IDC_SAVESETTINGS);
 			}
 
-			if (IsDlgButtonChecked(hwnd, IDC_SINGLECLICK)) {
-				bSingleClick = 1;
-			} else {
-				bSingleClick = 0;
-			}
+			bSingleClick = IsButtonChecked(hwnd, IDC_SINGLECLICK);
+			bTrackSelect = IsButtonChecked(hwnd, IDC_TRACKSELECT);
+			bFullRowSelect = IsButtonChecked(hwnd, IDC_FULLROWSELECT);
+			bFocusEdit = IsButtonChecked(hwnd, IDC_FOCUSEDIT);
+			bAlwaysOnTop = IsButtonChecked(hwnd, IDC_ALWAYSONTOP);
+			bMinimizeToTray = IsButtonChecked(hwnd, IDC_MINIMIZETOTRAY);
 
-			if (IsDlgButtonChecked(hwnd, IDC_TRACKSELECT)) {
-				bTrackSelect = 1;
-			} else {
-				bTrackSelect = 0;
-			}
-
-			if (IsDlgButtonChecked(hwnd, IDC_FULLROWSELECT)) {
-				bFullRowSelect = 1;
-			} else {
-				bFullRowSelect  = 0;
-			}
-
-			if (IsDlgButtonChecked(hwnd, IDC_FOCUSEDIT)) {
-				bFocusEdit = 1;
-			} else {
-				bFocusEdit = 0;
-			}
-
-			if (IsDlgButtonChecked(hwnd, IDC_ALWAYSONTOP)) {
-				bAlwaysOnTop = 1;
-			} else {
-				bAlwaysOnTop = 0;
-			}
-
-			if (IsDlgButtonChecked(hwnd, IDC_MINIMIZETOTRAY)) {
-				bMinimizeToTray = 1;
-			} else {
-				bMinimizeToTray = 0;
-			}
-
-			if (IsDlgButtonChecked(hwnd, IDC_REUSEWINDOW)) {
-				IniSetInt(L"Settings2", L"ReuseWindow", 1);
-			} else {
-				IniSetInt(L"Settings2", L"ReuseWindow", 0);
-			}
-
+			IniSetInt(L"Settings2", L"ReuseWindow", IsButtonChecked(hwnd, IDC_REUSEWINDOW));
 			SetWindowLongPtr(hwnd, DWLP_MSGRESULT, PSNRET_NOERROR);
 			return TRUE;
 		}
@@ -751,7 +713,7 @@ INT_PTR CALLBACK AdvancedPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lP
 
 	case WM_COMMAND:
 		if (LOWORD(wParam) == IDC_STARTUPDIR) {
-			if (IsDlgButtonChecked(hwnd, IDC_STARTUPDIR)) {
+			if (IsButtonChecked(hwnd, IDC_STARTUPDIR)) {
 				EnableWindow(GetDlgItem(hwnd, IDC_GOTOMRU), TRUE);
 				EnableWindow(GetDlgItem(hwnd, IDC_GOTOFAV), TRUE);
 			} else {
@@ -759,7 +721,7 @@ INT_PTR CALLBACK AdvancedPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lP
 				EnableWindow(GetDlgItem(hwnd, IDC_GOTOFAV), FALSE);
 			}
 		} else if (LOWORD(wParam) == IDC_ESCFUNCTION) {
-			if (IsDlgButtonChecked(hwnd, IDC_ESCFUNCTION)) {
+			if (IsButtonChecked(hwnd, IDC_ESCFUNCTION)) {
 				EnableWindow(GetDlgItem(hwnd, IDC_ESCMIN), TRUE);
 				EnableWindow(GetDlgItem(hwnd, IDC_ESCEXIT), TRUE);
 			} else {
@@ -772,46 +734,19 @@ INT_PTR CALLBACK AdvancedPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lP
 	case WM_NOTIFY:
 		switch (((LPNMHDR)lParam)->code) {
 		case PSN_APPLY:
-			if (IsDlgButtonChecked(hwnd, IDC_CLEARREADONLY)) {
-				bClearReadOnly = 1;
-			} else {
-				bClearReadOnly = 0;
-			}
+			bClearReadOnly = IsButtonChecked(hwnd, IDC_CLEARREADONLY);
+			bRenameOnCollision = IsButtonChecked(hwnd, IDC_RENAMEONCOLLISION);
+			fUseRecycleBin = IsButtonChecked(hwnd, IDC_USERECYCLEBIN);
+			fNoConfirmDelete = IsButtonChecked(hwnd, IDC_NOCONFIRMDELETE);
 
-			if (IsDlgButtonChecked(hwnd, IDC_RENAMEONCOLLISION)) {
-				bRenameOnCollision = 1;
-			} else {
-				bRenameOnCollision = 0;
-			}
-
-			if (IsDlgButtonChecked(hwnd, IDC_USERECYCLEBIN)) {
-				fUseRecycleBin = 1;
-			} else {
-				fUseRecycleBin = 0;
-			}
-
-			if (IsDlgButtonChecked(hwnd, IDC_NOCONFIRMDELETE)) {
-				fNoConfirmDelete = 1;
-			} else {
-				fNoConfirmDelete = 0;
-			}
-
-			if (IsDlgButtonChecked(hwnd, IDC_STARTUPDIR)) {
-				if (IsDlgButtonChecked(hwnd, IDC_GOTOMRU)) {
-					iStartupDir = 1;
-				} else {
-					iStartupDir = 2;
-				}
+			if (IsButtonChecked(hwnd, IDC_STARTUPDIR)) {
+				iStartupDir = IsButtonChecked(hwnd, IDC_GOTOMRU) ? 1 : 2;
 			} else {
 				iStartupDir = 0;
 			}
 
-			if (IsDlgButtonChecked(hwnd, IDC_ESCFUNCTION)) {
-				if (IsDlgButtonChecked(hwnd, IDC_ESCMIN)) {
-					iEscFunction = 1;
-				} else {
-					iEscFunction = 2;
-				}
+			if (IsButtonChecked(hwnd, IDC_ESCFUNCTION)) {
+				iEscFunction = IsButtonChecked(hwnd, IDC_ESCMIN) ? 1 : 2;
 			} else {
 				iEscFunction = 0;
 			}
@@ -882,27 +817,15 @@ INT_PTR CALLBACK ItemsPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPara
 		switch (LOWORD(wParam)) {
 		case IDC_COLOR_DEF1:
 		case IDC_COLOR_CUST1:
-			if (IsDlgButtonChecked(hwnd, IDC_COLOR_CUST1)) {
-				m_bDefCrNoFilt = FALSE;
-				EnableWindow(GetDlgItem(hwnd, IDC_COLOR_PICK1), TRUE);
-			} else {
-				m_bDefCrNoFilt = TRUE;
-				EnableWindow(GetDlgItem(hwnd, IDC_COLOR_PICK1), FALSE);
-			}
-
+			m_bDefCrNoFilt = !IsButtonChecked(hwnd, IDC_COLOR_CUST1);
+			EnableWindow(GetDlgItem(hwnd, IDC_COLOR_PICK1), !m_bDefCrNoFilt);
 			InvalidateRect(GetDlgItem(hwnd, IDC_COLOR_SAMP1), NULL, TRUE);
 			break;
 
 		case IDC_COLOR_DEF2:
 		case IDC_COLOR_CUST2:
-			if (IsDlgButtonChecked(hwnd, IDC_COLOR_CUST2)) {
-				m_bDefCrFilter = FALSE;
-				EnableWindow(GetDlgItem(hwnd, IDC_COLOR_PICK2), TRUE);
-			} else {
-				m_bDefCrFilter = TRUE;
-				EnableWindow(GetDlgItem(hwnd, IDC_COLOR_PICK2), FALSE);
-			}
-
+			m_bDefCrFilter = !IsButtonChecked(hwnd, IDC_COLOR_CUST2);
+			EnableWindow(GetDlgItem(hwnd, IDC_COLOR_PICK2), !m_bDefCrFilter);
 			InvalidateRect(GetDlgItem(hwnd, IDC_COLOR_SAMP2), NULL, TRUE);
 			break;
 
@@ -1247,10 +1170,10 @@ INT_PTR CALLBACK GetFilterDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lP
 					*CharPrev(pszFilterName, pszFilterValue) = 0;
 					AppendMenu(hMenu, MF_ENABLED | MF_STRING, 1234 + dwIndex, pszFilterName);
 					// Find description for current filter
-					if ((StrCaseEqual(pszFilterValue, szTypedFilter) && IsDlgButtonChecked(hwnd, IDC_NEGFILTER) != BST_CHECKED) ||
+					const BOOL negFilter = IsButtonChecked(hwnd, IDC_NEGFILTER);
+					if ((StrCaseEqual(pszFilterValue, szTypedFilter) && !negFilter) ||
 							(StrCaseEqual(CharNext(pszFilterValue), szTypedFilter) &&
-							 IsDlgButtonChecked(hwnd, IDC_NEGFILTER) == BST_CHECKED &&
-							 *pszFilterValue == L'-')) {
+							 negFilter && *pszFilterValue == L'-')) {
 						dwCheck = dwIndex;
 					}
 				}
@@ -1305,7 +1228,7 @@ INT_PTR CALLBACK GetFilterDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lP
 
 		case IDOK:
 			if (GetDlgItemText(hwnd, IDC_FILTER, tchFilter, COUNTOF(tchFilter) - 1)) {
-				bNegFilter = IsDlgButtonChecked(hwnd, IDC_NEGFILTER) ? TRUE : FALSE;
+				bNegFilter = IsButtonChecked(hwnd, IDC_NEGFILTER);
 			} else {
 				lstrcpy(tchFilter, L"*.*");
 				bNegFilter = FALSE;
@@ -1626,13 +1549,7 @@ INT_PTR CALLBACK CopyMoveDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPa
 			/*text*/
 			lpfod = (LPFILEOPDLGDATA)GetWindowLongPtr(hwnd, DWLP_USER);
 			if (GetDlgItemText(hwnd, IDC_DESTINATION, lpfod->szDestination, COUNTOF(lpfod->szDestination) - 1)) {
-				/*wfunc*/
-				if (IsDlgButtonChecked(hwnd, IDC_FUNCCOPY)) {
-					lpfod->wFunc = FO_COPY;
-				} else {
-					lpfod->wFunc = FO_MOVE;
-				}
-
+				lpfod->wFunc = IsButtonChecked(hwnd, IDC_FUNCCOPY) ? FO_COPY : FO_MOVE;
 				EndDialog(hwnd, IDOK);
 			} else {
 				EnableWindow(GetDlgItem(hwnd, IDOK),
@@ -2392,9 +2309,9 @@ INT_PTR CALLBACK FindTargetDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 			WCHAR tch[MAX_PATH];
 
 			// input validation
-			if ((IsDlgButtonChecked(hwnd, IDC_TARGET) && GetDlgItemText(hwnd, IDC_TARGETPATH, tch, COUNTOF(tch)) == 0) ||
-					(IsDlgButtonChecked(hwnd, IDC_SENDDROPMSG) && StrIsEmpty(szTargetWndClass)) ||
-					(IsDlgButtonChecked(hwnd, IDC_USEDDE) &&
+			if ((IsButtonChecked(hwnd, IDC_TARGET) && GetDlgItemText(hwnd, IDC_TARGETPATH, tch, COUNTOF(tch)) == 0) ||
+					(IsButtonChecked(hwnd, IDC_SENDDROPMSG) && StrIsEmpty(szTargetWndClass)) ||
+					(IsButtonChecked(hwnd, IDC_USEDDE) &&
 					 (GetDlgItemText(hwnd, IDC_DDEMSG, tch, COUNTOF(tch)) == 0 ||
 					  GetDlgItemText(hwnd, IDC_DDEAPP, tch, COUNTOF(tch)) == 0 ||
 					  GetDlgItemText(hwnd, IDC_DDETOPIC, tch, COUNTOF(tch)) == 0))) {
@@ -2403,8 +2320,8 @@ INT_PTR CALLBACK FindTargetDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 				int i;
 				WCHAR *pIniSection = NP2HeapAlloc(sizeof(WCHAR) * 32 * 1024);
 
-				i = IsDlgButtonChecked(hwnd, IDC_LAUNCH);
-				iUseTargetApplication = i ? 0 : 1;
+				i = IsButtonChecked(hwnd, IDC_LAUNCH);
+				iUseTargetApplication = !i;
 				IniSectionSetInt(pIniSection, L"UseTargetApplication", iUseTargetApplication);
 
 				if (iUseTargetApplication) {
@@ -2421,10 +2338,10 @@ INT_PTR CALLBACK FindTargetDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 					iTargetApplicationMode = 0;
 					IniSectionSetInt(pIniSection, L"TargetApplicationMode", iTargetApplicationMode);
 				} else {
-					if (BST_CHECKED == IsDlgButtonChecked(hwnd, IDC_ALWAYSRUN)) {
+					if (IsButtonChecked(hwnd, IDC_ALWAYSRUN)) {
 						iTargetApplicationMode = 0;
 						IniSectionSetInt(pIniSection, L"TargetApplicationMode", iTargetApplicationMode);
-					} else if (BST_CHECKED == IsDlgButtonChecked(hwnd, IDC_SENDDROPMSG)) {
+					} else if (IsButtonChecked(hwnd, IDC_SENDDROPMSG)) {
 						iTargetApplicationMode = 1;
 						IniSectionSetInt(pIniSection, L"TargetApplicationMode", iTargetApplicationMode);
 					} else {
@@ -2433,7 +2350,7 @@ INT_PTR CALLBACK FindTargetDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 					}
 				}
 
-				if (BST_CHECKED == IsDlgButtonChecked(hwnd, IDC_SENDDROPMSG) && !i) {
+				if (IsButtonChecked(hwnd, IDC_SENDDROPMSG) && !i) {
 					lstrcpy(szTargetApplicationWndClass, szTargetWndClass);
 					IniSectionSetString(pIniSection, L"TargetApplicationWndClass", szTargetApplicationWndClass);
 				} else {
@@ -2441,7 +2358,7 @@ INT_PTR CALLBACK FindTargetDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 					IniSectionSetString(pIniSection, L"TargetApplicationWndClass", szTargetApplicationWndClass);
 				}
 
-				i = (BST_CHECKED == IsDlgButtonChecked(hwnd, IDC_USEDDE));
+				i = IsButtonChecked(hwnd, IDC_USEDDE);
 				if (i) {
 					GetDlgItemText(hwnd, IDC_DDEMSG, szDDEMsg, COUNTOF(szDDEMsg));
 				} else {

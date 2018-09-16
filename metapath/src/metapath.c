@@ -2004,7 +2004,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		dli.ntype = DLE_NONE;
 		dli.mask = DLI_TYPE | DLI_FILENAME;
 
-		d = (ListView_GetSelectedCount(hwndDirList)) ? 1 : 0;
+		d = ListView_GetSelectedCount(hwndDirList) ? 1 : 0;
 
 		for (i = iItem + d; DirList_GetItem(hwndDirList, i, &dli) != (-1); i++) {
 			if (dli.ntype == DLE_FILE && !PathIsLnkToDirectory(dli.szFileName, tch, COUNTOF(tch))) {
@@ -2426,7 +2426,7 @@ void LoadSettings(void) {
 	bMinimizeToTray = IniSectionGetBool(pIniSection, L"MinimizeToTray", 0);
 	bTransparentMode = IniSectionGetBool(pIniSection, L"TransparentMode", 0);
 
-	iEscFunction = IniSectionGetInt(pIniSection, L"EscFunction", 1);
+	iEscFunction = IniSectionGetInt(pIniSection, L"EscFunction", 0);
 	iEscFunction = clamp_i(iEscFunction, 0, 2);
 
 	iStartupDir = IniSectionGetInt(pIniSection, L"StartupDirectory", 1);

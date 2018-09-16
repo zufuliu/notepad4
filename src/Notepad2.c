@@ -813,7 +813,7 @@ HWND InitInstance(HINSTANCE hInstance, int nCmdShow) {
 	if (flagNewFromClipboard) {
 		if (SendMessage(hwndEdit, SCI_CANPASTE, 0, 0)) {
 			BOOL bAutoIndent2 = bAutoIndent;
-			bAutoIndent = 0;
+			bAutoIndent = FALSE;
 			EditJumpTo(hwndEdit, -1, 0);
 			SendMessage(hwndEdit, SCI_BEGINUNDOACTION, 0, 0);
 			if (SendMessage(hwndEdit, SCI_GETLENGTH, 0, 0) > 0) {
@@ -2501,10 +2501,9 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	case IDM_FILE_READONLY:
-		//bReadOnly = (bReadOnly) ? FALSE : TRUE;
+		//bReadOnly = !bReadOnly;
 		//SendMessage(hwndEdit, SCI_SETREADONLY, bReadOnly, 0);
 		//UpdateToolbar();
-		//UpdateStatusbar();
 		if (StrNotEmpty(szCurFile)) {
 			DWORD dwFileAttributes = GetFileAttributes(szCurFile);
 			if (dwFileAttributes != INVALID_FILE_ATTRIBUTES) {
@@ -2521,10 +2520,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			}
 
 			dwFileAttributes = GetFileAttributes(szCurFile);
-			if (dwFileAttributes != INVALID_FILE_ATTRIBUTES) {
-				bReadOnly = (dwFileAttributes & FILE_ATTRIBUTE_READONLY);
-			}
-
+			bReadOnly = (dwFileAttributes != INVALID_FILE_ATTRIBUTES) && (dwFileAttributes & FILE_ATTRIBUTE_READONLY);
 			UpdateWindowTitle();
 		}
 		break;
@@ -3776,7 +3772,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	case IDM_VIEW_WORDWRAP:
-		fWordWrap = (fWordWrap) ? FALSE : TRUE;
+		fWordWrap = !fWordWrap;
 		SendMessage(hwndEdit, SCI_SETWRAPMODE, (fWordWrap? iWordWrapMode : SC_WRAP_NONE), 0);
 		fWordWrapG = fWordWrap;
 		UpdateToolbar();
@@ -3793,14 +3789,13 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	case IDM_VIEW_LONGLINEMARKER:
-		bMarkLongLines = (bMarkLongLines) ? FALSE : TRUE;
+		bMarkLongLines = !bMarkLongLines;
 		if (bMarkLongLines) {
 			SendMessage(hwndEdit, SCI_SETEDGEMODE, (iLongLineMode == EDGE_LINE) ? EDGE_LINE : EDGE_BACKGROUND, 0);
 			Style_SetLongLineColors(hwndEdit);
 		} else {
 			SendMessage(hwndEdit, SCI_SETEDGEMODE, EDGE_NONE, 0);
 		}
-		UpdateStatusbar();
 		break;
 
 	case IDM_VIEW_LONGLINESETTINGS:
@@ -3810,13 +3805,12 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			Style_SetLongLineColors(hwndEdit);
 			iLongLinesLimit = clamp_i(iLongLinesLimit, 0, NP2_LONG_LINE_LIMIT);
 			SendMessage(hwndEdit, SCI_SETEDGECOLUMN, iLongLinesLimit, 0);
-			UpdateStatusbar();
 			iLongLinesLimitG = iLongLinesLimit;
 		}
 		break;
 
 	case IDM_VIEW_TABSASSPACES:
-		bTabsAsSpaces = (bTabsAsSpaces) ? FALSE : TRUE;
+		bTabsAsSpaces = !bTabsAsSpaces;
 		SendMessage(hwndEdit, SCI_SETUSETABS, !bTabsAsSpaces, 0);
 		bTabsAsSpacesG = bTabsAsSpaces;
 		break;
@@ -3841,21 +3835,21 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	case IDM_VIEW_SHOWINDENTGUIDES:
-		bShowIndentGuides = (bShowIndentGuides) ? FALSE : TRUE;
+		bShowIndentGuides = !bShowIndentGuides;
 		Style_SetIndentGuides(hwndEdit, bShowIndentGuides);
 		break;
 
 	case IDM_VIEW_AUTOINDENTTEXT:
-		bAutoIndent = (bAutoIndent) ? FALSE : TRUE;
+		bAutoIndent = !bAutoIndent;
 		break;
 
 	case IDM_VIEW_LINENUMBERS:
-		bShowLineNumbers = (bShowLineNumbers) ? FALSE : TRUE;
+		bShowLineNumbers = !bShowLineNumbers;
 		UpdateLineNumberWidth();
 		break;
 
 	case IDM_VIEW_MARGIN:
-		bShowSelectionMargin = (bShowSelectionMargin) ? FALSE : TRUE;
+		bShowSelectionMargin = !bShowSelectionMargin;
 		UpdateSelectionMarginWidth();
 
 #ifdef BOOKMARK_EDITION
@@ -3917,18 +3911,18 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	case IDM_VIEW_MARKOCCURRENCES_CASE:
-		bMarkOccurrencesMatchCase = (bMarkOccurrencesMatchCase) ? FALSE : TRUE;
+		bMarkOccurrencesMatchCase = !bMarkOccurrencesMatchCase;
 		EditMarkAll(hwndEdit, iMarkOccurrences, bMarkOccurrencesMatchCase, bMarkOccurrencesMatchWords);
 		break;
 
 	case IDM_VIEW_MARKOCCURRENCES_WORD:
-		bMarkOccurrencesMatchWords = (bMarkOccurrencesMatchWords) ? FALSE : TRUE;
+		bMarkOccurrencesMatchWords = !bMarkOccurrencesMatchWords;
 		EditMarkAll(hwndEdit, iMarkOccurrences, bMarkOccurrencesMatchCase, bMarkOccurrencesMatchWords);
 		UpdateStatusbar();
 		break;
 
 	case IDM_VIEW_FOLDING:
-		bShowCodeFolding = (bShowCodeFolding) ? FALSE : TRUE;
+		bShowCodeFolding = !bShowCodeFolding;
 		UpdateFoldMarginWidth();
 		UpdateToolbar();
 		if (!bShowCodeFolding) {
@@ -3970,29 +3964,29 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	case IDM_VIEW_SHOWWHITESPACE:
-		bViewWhiteSpace = (bViewWhiteSpace) ? FALSE : TRUE;
+		bViewWhiteSpace = !bViewWhiteSpace;
 		SendMessage(hwndEdit, SCI_SETVIEWWS, (bViewWhiteSpace) ? SCWS_VISIBLEALWAYS : SCWS_INVISIBLE, 0);
 		break;
 
 	case IDM_VIEW_SHOWEOLS:
-		bViewEOLs = (bViewEOLs) ? FALSE : TRUE;
+		bViewEOLs = !bViewEOLs;
 		SendMessage(hwndEdit, SCI_SETVIEWEOL, bViewEOLs, 0);
 		break;
 
 	case IDM_VIEW_WORDWRAPSYMBOLS:
-		bShowWordWrapSymbols = (bShowWordWrapSymbols) ? 0 : 1;
+		bShowWordWrapSymbols = !bShowWordWrapSymbols;
 		SetWrapVisualFlags();
 		break;
 
 #if NP2_ENABLE_SHOW_CALL_TIPS
 	case IDM_VIEW_SHOWCALLTIPS:
-		bShowCallTips = (bShowCallTips) ? FALSE : TRUE;
+		bShowCallTips = !bShowCallTips;
 		SetCallTipsWaitTime();
 		break;
 #endif
 
 	case IDM_VIEW_MATCHBRACES:
-		bMatchBraces = (bMatchBraces) ? FALSE : TRUE;
+		bMatchBraces = !bMatchBraces;
 		if (bMatchBraces) {
 			struct SCNotification scn;
 			scn.nmhdr.hwndFrom = hwndEdit;
@@ -4006,11 +4000,11 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	case IDM_VIEW_AUTOCLOSETAGS:
-		bAutoCloseTags = (bAutoCloseTags) ? FALSE : TRUE;
+		bAutoCloseTags = !bAutoCloseTags;
 		break;
 
 	case IDM_VIEW_HILITECURRENTLINE:
-		bHiliteCurrentLine = (bHiliteCurrentLine) ? FALSE : TRUE;
+		bHiliteCurrentLine = !bHiliteCurrentLine;
 		Style_SetCurrentLineBackground(hwndEdit);
 		break;
 
@@ -4116,11 +4110,11 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	case IDM_VIEW_MINTOTRAY:
-		bMinimizeToTray = (bMinimizeToTray) ? FALSE : TRUE;
+		bMinimizeToTray = !bMinimizeToTray;
 		break;
 
 	case IDM_VIEW_TRANSPARENT:
-		bTransparentMode = (bTransparentMode) ? FALSE : TRUE;
+		bTransparentMode = !bTransparentMode;
 		SetWindowTransparentMode(hwnd, bTransparentMode);
 		break;
 
@@ -4148,7 +4142,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	case IDM_SET_USE_BLOCK_CARET:
-		bInlineIMEUseBlockCaret = bInlineIMEUseBlockCaret? FALSE : TRUE;
+		bInlineIMEUseBlockCaret = !bInlineIMEUseBlockCaret;
 		SendMessage(hwndEdit, SCI_SETINLINEIMEUSEBLOCKCARET, bInlineIMEUseBlockCaret, 0);
 		break;
 
@@ -4187,11 +4181,11 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	case IDM_VIEW_NOSAVEFINDREPL:
-		bSaveFindReplace = (bSaveFindReplace) ? FALSE : TRUE;
+		bSaveFindReplace = !bSaveFindReplace;
 		break;
 
 	case IDM_VIEW_SAVEBEFORERUNNINGTOOLS:
-		bSaveBeforeRunningTools = (bSaveBeforeRunningTools) ? FALSE : TRUE;
+		bSaveBeforeRunningTools = !bSaveBeforeRunningTools;
 		break;
 
 	case IDM_VIEW_CHANGENOTIFY:
@@ -4213,7 +4207,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	case IDM_VIEW_SAVESETTINGS:
-		bSaveSettings = (bSaveSettings) ? FALSE : TRUE;
+		bSaveSettings = !bSaveSettings;
 		break;
 
 	case IDM_VIEW_SAVESETTINGSNOW: {
@@ -4270,30 +4264,30 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	case IDM_VIEW_TOGGLE_FULLSCREEN:
-		bInFullScreenMode = bInFullScreenMode ? FALSE : TRUE;
+		bInFullScreenMode = !bInFullScreenMode;
 		ToggleFullScreenMode();
 		break;
 
 	case IDM_VIEW_FULLSCREEN_ON_START:
-		bFullScreenOnStartup = bFullScreenOnStartup ? FALSE : TRUE;
+		bFullScreenOnStartup = !bFullScreenOnStartup;
 		break;
 
 	case IDM_VIEW_FULLSCREEN_HIDE_MENU:
-		bFullScreenHideMenu = bFullScreenHideMenu ? FALSE : TRUE;
+		bFullScreenHideMenu = !bFullScreenHideMenu;
 		if (bInFullScreenMode) {
 			ToggleFullScreenMode();
 		}
 		break;
 
 	case IDM_VIEW_FULLSCREEN_HIDE_TOOL:
-		bFullScreenHideToolbar = bFullScreenHideToolbar ? FALSE : TRUE;
+		bFullScreenHideToolbar = !bFullScreenHideToolbar;
 		if (bInFullScreenMode) {
 			ToggleFullScreenMode();
 		}
 		break;
 
 	case IDM_VIEW_FULLSCREEN_HIDE_STATUS:
-		bFullScreenHideStatusbar = bFullScreenHideStatusbar ? FALSE : TRUE;
+		bFullScreenHideStatusbar = !bFullScreenHideStatusbar;
 		if (bInFullScreenMode) {
 			ToggleFullScreenMode();
 		}
@@ -4319,9 +4313,9 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	// Newline with toggled auto indent setting
 	case CMD_CTRLENTER:
-		bAutoIndent = (bAutoIndent) ? 0 : 1;
+		bAutoIndent = !bAutoIndent;
 		SendMessage(hwndEdit, SCI_NEWLINE, 0, 0);
-		bAutoIndent = (bAutoIndent) ? 0 : 1;
+		bAutoIndent = !bAutoIndent;
 		break;
 
 	case CMD_CTRLBACK: {
@@ -5702,10 +5696,10 @@ void SaveSettings(BOOL bSaveSettingsNow) {
 	IniSectionSetInt(pIniSection, L"FindReplaceDlgPosY", yFindReplaceDlg);
 
 	if (bSaveFindReplace) {
-		IniSectionSetBool(pIniSection, L"FindReplaceMatchCase", (efrData.fuFlags & SCFIND_MATCHCASE) ? 1 : 0 );
-		IniSectionSetBool(pIniSection, L"FindReplaceMatchWholeWorldOnly", (efrData.fuFlags & SCFIND_WHOLEWORD) ? 1 : 0 );
-		IniSectionSetBool(pIniSection, L"FindReplaceMatchBeginingWordOnly", (efrData.fuFlags & SCFIND_WORDSTART) ? 1 : 0 );
-		IniSectionSetBool(pIniSection, L"FindReplaceRegExpSearch", (efrData.fuFlags & (SCFIND_REGEXP | SCFIND_POSIX)) ? 1 : 0 );
+		IniSectionSetBool(pIniSection, L"FindReplaceMatchCase", (efrData.fuFlags & SCFIND_MATCHCASE));
+		IniSectionSetBool(pIniSection, L"FindReplaceMatchWholeWorldOnly", (efrData.fuFlags & SCFIND_WHOLEWORD));
+		IniSectionSetBool(pIniSection, L"FindReplaceMatchBeginingWordOnly", (efrData.fuFlags & SCFIND_WORDSTART));
+		IniSectionSetBool(pIniSection, L"FindReplaceRegExpSearch", (efrData.fuFlags & (SCFIND_REGEXP | SCFIND_POSIX)));
 		IniSectionSetBool(pIniSection, L"FindReplaceTransformBackslash", efrData.bTransformBS);
 		IniSectionSetBool(pIniSection, L"FindReplaceDontWrapRound", efrData.bNoFindWrap);
 		IniSectionSetBool(pIniSection, L"FindReplaceCloseAfterFind", efrData.bFindClose);
@@ -6858,7 +6852,7 @@ BOOL FileIO(BOOL fLoad, LPWSTR psz, BOOL bNoEncDetect, int *ienc, int *ieol,
 	}
 
 	dwFileAttributes = GetFileAttributes(psz);
-	bReadOnly = (dwFileAttributes != INVALID_FILE_ATTRIBUTES && dwFileAttributes & FILE_ATTRIBUTE_READONLY);
+	bReadOnly = (dwFileAttributes != INVALID_FILE_ATTRIBUTES) && (dwFileAttributes & FILE_ATTRIBUTE_READONLY);
 
 	StatusSetSimple(hwndStatus, FALSE);
 
@@ -7107,9 +7101,7 @@ BOOL FileSave(BOOL bSaveAlways, BOOL bAsk, BOOL bSaveAs, BOOL bSaveCopy) {
 	// Read only...
 	if (!bSaveAs && !bSaveCopy && !Untitled) {
 		DWORD dwFileAttributes = GetFileAttributes(szCurFile);
-		if (dwFileAttributes != INVALID_FILE_ATTRIBUTES) {
-			bReadOnly = (dwFileAttributes & FILE_ATTRIBUTE_READONLY);
-		}
+		bReadOnly = (dwFileAttributes != INVALID_FILE_ATTRIBUTES) && (dwFileAttributes & FILE_ATTRIBUTE_READONLY);
 		if (bReadOnly) {
 			UpdateWindowTitle();
 			if (MsgBox(MBYESNOWARN, IDS_READONLY_SAVE, szCurFile) == IDYES) {
@@ -7620,7 +7612,7 @@ void GetRelaunchParameters(LPWSTR szParameters, LPCWSTR lpszFile, BOOL newWind, 
 	wsprintf(tch, L"-appid=\"%s\"", g_wchAppUserModelID);
 	lstrcpy(szParameters, tch);
 
-	wsprintf(tch, L" -sysmru=%i", (flagUseSystemMRU == 2) ? 1 : 0);
+	wsprintf(tch, L" -sysmru=%i", (flagUseSystemMRU == 2));
 	lstrcat(szParameters, tch);
 
 	lstrcat(szParameters, L" -f");
@@ -8039,7 +8031,7 @@ void CALLBACK PasteBoardTimer(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTi
 	if (dwLastCopyTime > 0 && GetTickCount() - dwLastCopyTime > 200) {
 		if (SendMessage(hwndEdit, SCI_CANPASTE, 0, 0)) {
 			BOOL bAutoIndent2 = bAutoIndent;
-			bAutoIndent = 0;
+			bAutoIndent = FALSE;
 			EditJumpTo(hwndEdit, -1, 0);
 			SendMessage(hwndEdit, SCI_BEGINUNDOACTION, 0, 0);
 			if (SendMessage(hwndEdit, SCI_GETLENGTH, 0, 0) > 0) {

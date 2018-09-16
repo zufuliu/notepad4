@@ -306,6 +306,7 @@ LRESULT SendWMSize(HWND hwnd);
 #define CheckCmd(hmenu, id, b)	CheckMenuItem(hmenu, id, (b)? (MF_BYCOMMAND | MF_CHECKED) : (MF_BYCOMMAND | MF_UNCHECKED))
 
 BOOL IsCmdEnabled(HWND hwnd, UINT uId);
+#define IsButtonChecked(hwnd, uId)	(IsDlgButtonChecked(hwnd, (uId)) == BST_CHECKED)
 
 #define GetString(id, pb, cb)	LoadString(g_hInstance, id, pb, cb)
 #define StrEnd(pStart)			((pStart) + lstrlen(pStart))
