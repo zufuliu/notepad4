@@ -651,7 +651,7 @@ INT_PTR CALLBACK GeneralPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPa
 			bAlwaysOnTop = IsButtonChecked(hwnd, IDC_ALWAYSONTOP);
 			bMinimizeToTray = IsButtonChecked(hwnd, IDC_MINIMIZETOTRAY);
 
-			IniSetInt(L"Settings2", L"ReuseWindow", IsButtonChecked(hwnd, IDC_REUSEWINDOW));
+			IniSetBool(L"Settings2", L"ReuseWindow", IsButtonChecked(hwnd, IDC_REUSEWINDOW));
 			SetWindowLongPtr(hwnd, DWLP_MSGRESULT, PSNRET_NOERROR);
 			return TRUE;
 		}
@@ -2322,7 +2322,7 @@ INT_PTR CALLBACK FindTargetDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 
 				i = IsButtonChecked(hwnd, IDC_LAUNCH);
 				iUseTargetApplication = !i;
-				IniSectionSetInt(pIniSection, L"UseTargetApplication", iUseTargetApplication);
+				IniSectionSetBool(pIniSection, L"UseTargetApplication", iUseTargetApplication);
 
 				if (iUseTargetApplication) {
 					GetDlgItemText(hwnd, IDC_TARGETPATH, tch, COUNTOF(tch));
@@ -2336,27 +2336,23 @@ INT_PTR CALLBACK FindTargetDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 
 				if (!iUseTargetApplication) {
 					iTargetApplicationMode = 0;
-					IniSectionSetInt(pIniSection, L"TargetApplicationMode", iTargetApplicationMode);
 				} else {
 					if (IsButtonChecked(hwnd, IDC_ALWAYSRUN)) {
 						iTargetApplicationMode = 0;
-						IniSectionSetInt(pIniSection, L"TargetApplicationMode", iTargetApplicationMode);
 					} else if (IsButtonChecked(hwnd, IDC_SENDDROPMSG)) {
 						iTargetApplicationMode = 1;
-						IniSectionSetInt(pIniSection, L"TargetApplicationMode", iTargetApplicationMode);
 					} else {
 						iTargetApplicationMode = 2;
-						IniSectionSetInt(pIniSection, L"TargetApplicationMode", iTargetApplicationMode);
 					}
 				}
+				IniSectionSetInt(pIniSection, L"TargetApplicationMode", iTargetApplicationMode);
 
 				if (IsButtonChecked(hwnd, IDC_SENDDROPMSG) && !i) {
 					lstrcpy(szTargetApplicationWndClass, szTargetWndClass);
-					IniSectionSetString(pIniSection, L"TargetApplicationWndClass", szTargetApplicationWndClass);
 				} else {
 					lstrcpy(szTargetApplicationWndClass, L"");
-					IniSectionSetString(pIniSection, L"TargetApplicationWndClass", szTargetApplicationWndClass);
 				}
+				IniSectionSetString(pIniSection, L"TargetApplicationWndClass", szTargetApplicationWndClass);
 
 				i = IsButtonChecked(hwnd, IDC_USEDDE);
 				if (i) {

@@ -4050,7 +4050,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	case IDM_VIEW_STICKYWINPOS:
 		bStickyWinPos = !bStickyWinPos;
-		IniSetInt(L"Settings2", L"StickyWindowPosition", 1);
+		IniSetBool(L"Settings2", L"StickyWindowPosition", bStickyWinPos);
 		if (bStickyWinPos) {
 			WINDOWPLACEMENT wndpl;
 			WCHAR tchPosX[32], tchPosY[32], tchSizeX[32], tchSizeY[32], tchMaximized[32];
@@ -4086,12 +4086,12 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	case IDM_VIEW_REUSEWINDOW:
 		bReuseWindow = !bReuseWindow;
-		IniSetInt(L"Settings2", L"ReuseWindow", bReuseWindow);
+		IniSetBool(L"Settings2", L"ReuseWindow", bReuseWindow);
 		break;
 
 	case IDM_VIEW_SINGLEFILEINSTANCE:
 		bSingleFileInstance = !bSingleFileInstance;
-		IniSetInt(L"Settings2", L"SingleFileInstance", bSingleFileInstance);
+		IniSetBool(L"Settings2", L"SingleFileInstance", bSingleFileInstance);
 		break;
 
 	case IDM_VIEW_ALWAYSONTOP:
@@ -5586,7 +5586,7 @@ void SaveSettings(BOOL bSaveSettingsNow) {
 	CreateIniFile();
 
 	if (!bSaveSettings && !bSaveSettingsNow) {
-		IniSetInt(L"Settings", L"SaveSettings", bSaveSettings);
+		IniSetBool(L"Settings", L"SaveSettings", bSaveSettings);
 		return;
 	}
 

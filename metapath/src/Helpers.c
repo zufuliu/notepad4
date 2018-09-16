@@ -76,19 +76,18 @@ LPCWSTR IniSectionUnsafeGetValue(IniSection *section, LPCWSTR key, int keyLen) {
 	IniKeyValueNode *node = section->head;
 	IniKeyValueNode *prev = NULL;
 	do {
-		IniKeyValueNode *next = node->next;
 		if (node->hash == hash && StrEqual(node->key, key)) {
 			// remove the node
 			--section->count;
 			if (prev == NULL) {
-				section->head = next;
+				section->head = node->next;
 			} else {
-				prev->next = next;
+				prev->next = node->next;
 			}
 			return node->value;
 		}
 		prev = node;
-		node = next;
+		node = node->next;
 	} while (node);
 	return NULL;
 }
@@ -121,7 +120,7 @@ BOOL IniSectionGetBoolImpl(IniSection *section, LPCWSTR key, int keyLen, BOOL bD
 	return bDefault;
 }
 
-BOOL IniSectionSetString(LPWSTR lpCachedIniSection, LPCWSTR lpName, LPCWSTR lpString) {
+void IniSectionSetString(LPWSTR lpCachedIniSection, LPCWSTR lpName, LPCWSTR lpString) {
 	WCHAR *p = lpCachedIniSection;
 
 	if (p) {
@@ -133,9 +132,7 @@ BOOL IniSectionSetString(LPWSTR lpCachedIniSection, LPCWSTR lpName, LPCWSTR lpSt
 		lstrcpy(p, tch);
 		p = StrEnd(p) + 1;
 		*p = 0;
-		return TRUE;
 	}
-	return FALSE;
 }
 
 //=============================================================================

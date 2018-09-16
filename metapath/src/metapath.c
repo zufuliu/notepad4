@@ -2581,7 +2581,7 @@ void SaveSettings(BOOL bSaveSettingsNow) {
 		if (iStartupDir == 1) {
 			IniSetString(L"Settings", L"MRUDirectory", szCurDir);
 		}
-		IniSetInt(L"Settings", L"SaveSettings", bSaveSettings);
+		IniSetBool(L"Settings", L"SaveSettings", bSaveSettings);
 		return;
 	}
 
