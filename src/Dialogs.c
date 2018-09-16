@@ -2002,7 +2002,7 @@ INT_PTR CALLBACK InfoBoxDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPar
 		case IDNO:
 			lpib = (LPINFOBOX)GetWindowLongPtr(hwnd, DWLP_USER);
 			if (IsButtonChecked(hwnd, IDC_INFOBOXCHECK)) {
-				IniSetInt(L"Suppressed Messages", lpib->lpstrSetting, 1);
+				IniSetBool(L"Suppressed Messages", lpib->lpstrSetting, 1);
 			}
 			EndDialog(hwnd, LOWORD(wParam));
 			break;

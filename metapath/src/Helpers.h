@@ -91,10 +91,14 @@ extern WCHAR szIniFile[MAX_PATH];
 #define IniDeleteSection(lpSection) \
 	WritePrivateProfileSection(lpSection, NULL, szIniFile)
 
-static inline BOOL IniSetInt(LPCWSTR lpSection, LPCWSTR lpName, int i) {
-	WCHAR tch[32];
+static inline void IniSetInt(LPCWSTR lpSection, LPCWSTR lpName, int i) {
+	WCHAR tch[16];
 	wsprintf(tch, L"%i", i);
-	return WritePrivateProfileString(lpSection, lpName, tch, szIniFile);
+	IniSetString(lpSection, lpName, tch);
+}
+
+static inline void IniSetBool(LPCWSTR lpSection, LPCWSTR lpName, BOOL b) {
+	IniSetString(lpSection, lpName, (b ? L"1" : L"0"));
 }
 
 #define LoadIniSection(lpSection, lpBuf, cchBuf) \
@@ -180,16 +184,16 @@ static inline BOOL IniSectionGetStringEx(IniSection *section, LPCWSTR key, LPCWS
 	return IniSectionGetStringImpl(section, key, -1, lpDefault, lpReturnedString, cchReturnedString);
 }
 
-BOOL IniSectionSetString(LPWSTR lpCachedIniSection, LPCWSTR lpName, LPCWSTR lpString);
+void IniSectionSetString(LPWSTR lpCachedIniSection, LPCWSTR lpName, LPCWSTR lpString);
 
-static inline BOOL IniSectionSetInt(LPWSTR lpCachedIniSection, LPCWSTR lpName, int i) {
-	WCHAR tch[32];
+static inline void IniSectionSetInt(LPWSTR lpCachedIniSection, LPCWSTR lpName, int i) {
+	WCHAR tch[16];
 	wsprintf(tch, L"%i", i);
-	return IniSectionSetString(lpCachedIniSection, lpName, tch);
+	IniSectionSetString(lpCachedIniSection, lpName, tch);
 }
 
-static inline BOOL IniSectionSetBool(LPWSTR lpCachedIniSection, LPCWSTR lpName, BOOL b) {
-	return IniSectionSetString(lpCachedIniSection, lpName, (b ? L"1" : L"0"));
+static inline void IniSectionSetBool(LPWSTR lpCachedIniSection, LPCWSTR lpName, BOOL b) {
+	IniSectionSetString(lpCachedIniSection, lpName, (b ? L"1" : L"0"));
 }
 
 void BeginWaitCursor(void);
