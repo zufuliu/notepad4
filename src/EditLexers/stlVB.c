@@ -69,7 +69,7 @@ static KEYWORDLIST Keywords_VB = {{
 , "", "", "", "", "", "", ""
 }};
 
-EDITLEXER lexVB = { SCLEX_VB, NP2LEX_VB, L"Visual Basic", L"vb; bas; frm; cls; ctl; pag; dsr; dob", L"", &Keywords_VB,
+EDITLEXER lexVB = { SCLEX_VB, NP2LEX_VB, EDITLEXER_HOLE, L"Visual Basic", L"vb; bas; frm; cls; ctl; pag; dsr; dob", L"", &Keywords_VB,
 {
 	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
 	//{ SCE_B_DEFAULT, L"Default", L"", L"" },

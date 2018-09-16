@@ -99,7 +99,7 @@ static KEYWORDLIST Keywords_Gradle = {{
 "java&{} resources^{}"
 }};
 
-EDITLEXER lexGradle = { SCLEX_CPP, NP2LEX_GRADLE, L"Gradle Build Script", L"gradle", L"", &Keywords_Gradle,
+EDITLEXER lexGradle = { SCLEX_CPP, NP2LEX_GRADLE, EDITLEXER_HOLE, L"Gradle Build Script", L"gradle", L"", &Keywords_Gradle,
 {
 	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
 	//{ SCE_C_DEFAULT, L"Default", L"", L"" },

@@ -33,7 +33,7 @@ static KEYWORDLIST Keywords_Perl = {{
 , "", "", "", "", "", "", ""
 }};
 
-EDITLEXER lexPerl = { SCLEX_PERL, NP2LEX_PERL, L"Perl Script", L"pl; pm; cgi; pod; plx; stp", L"", &Keywords_Perl,
+EDITLEXER lexPerl = { SCLEX_PERL, NP2LEX_PERL, EDITLEXER_HOLE, L"Perl Script", L"pl; pm; cgi; pod; plx; stp", L"", &Keywords_Perl,
 {
 	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
 	//{ SCE_PL_DEFAULT, L"Default", L"", L"" },

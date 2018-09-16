@@ -33,12 +33,18 @@ typedef struct _keywordlist {
 typedef struct _editlexer {
 	int iLexer;
 	int rid;
+	struct {
+		BOOL bStyleLoaded;
+		BOOL bStyleChanged;
+	};
 	LPCWSTR pszName;
 	LPCWSTR pszDefExt;
 	WCHAR	szExtensions[128];
 	PKEYWORDLIST	pKeyWords;
 	EDITSTYLE		Styles[];
 } EDITLEXER, *PEDITLEXER;
+
+#define EDITLEXER_HOLE	{ 0,  0 }
 
 // NP2LEX_, rid for EDITLEXER
 #define NP2LEX_DEFAULT	63000	// SCLEX_NULL		Default Text

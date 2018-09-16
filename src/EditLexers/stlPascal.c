@@ -25,7 +25,7 @@ static KEYWORDLIST Keywords_Pascal = {{
 , "", "", "", "", "", "", ""
 }};
 
-EDITLEXER lexPascal = { SCLEX_PASCAL, NP2LEX_PASCAL, L"Pascal Source", L"pas; inc; dpr; dpk; dfm; pp; lfm; lpr; fpd", L"", &Keywords_Pascal,
+EDITLEXER lexPascal = { SCLEX_PASCAL, NP2LEX_PASCAL, EDITLEXER_HOLE, L"Pascal Source", L"pas; inc; dpr; dpk; dfm; pp; lfm; lpr; fpd", L"", &Keywords_Pascal,
 {
 	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
 	//{ SCE_PAS_DEFAULT, L"Default", L"", L"" },

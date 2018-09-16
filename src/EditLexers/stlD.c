@@ -68,7 +68,7 @@ static KEYWORDLIST Keywords_D = {{
 " synchronized^() catch^() scope^() version^() mixin^() "
 }};
 
-EDITLEXER lexD = { SCLEX_CPP, NP2LEX_D, L"D Source", L"d; di", L"", &Keywords_D,
+EDITLEXER lexD = { SCLEX_CPP, NP2LEX_D, EDITLEXER_HOLE, L"D Source", L"d; di", L"", &Keywords_D,
 {
 	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
 	//{ SCE_C_DEFAULT, L"Default", L"", L"" },

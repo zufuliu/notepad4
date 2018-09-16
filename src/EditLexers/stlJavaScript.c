@@ -142,7 +142,7 @@ static KEYWORDLIST Keywords_JS = {{
 "for^() if^() switch^() while^() else^if^() else^{} function() "
 }};
 
-EDITLEXER lexJS = { SCLEX_CPP, NP2LEX_JS, L"JavaScript", L"js; jse; jsm", L"", &Keywords_JS,
+EDITLEXER lexJS = { SCLEX_CPP, NP2LEX_JS, EDITLEXER_HOLE, L"JavaScript", L"js; jse; jsm", L"", &Keywords_JS,
 {
 	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
 	//{ SCE_C_DEFAULT, L"Default", L"", L"" },

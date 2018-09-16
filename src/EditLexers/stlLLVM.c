@@ -74,7 +74,7 @@ static KEYWORDLIST Keywords_LLVM = {{
 , "", "", "",  "", ""
 }};
 
-EDITLEXER lexLLVM = { SCLEX_LLVM, NP2LEX_LLVM, L"LLVM IR", L"ll", L"", &Keywords_LLVM,
+EDITLEXER lexLLVM = { SCLEX_LLVM, NP2LEX_LLVM, EDITLEXER_HOLE, L"LLVM IR", L"ll", L"", &Keywords_LLVM,
 {
 	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
 	//{ SCE_C_DEFAULT, L"Default", L"", L"" },

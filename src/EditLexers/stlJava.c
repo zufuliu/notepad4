@@ -113,7 +113,7 @@ static KEYWORDLIST Keywords_Java = {{
 "for^() if^() switch^() while^() catch^() else^if^() else^{} synchronized^() try^() "
 }};
 
-EDITLEXER lexJava = { SCLEX_CPP, NP2LEX_JAVA, L"Java Source", L"java; jad; aidl", L"", &Keywords_Java,
+EDITLEXER lexJava = { SCLEX_CPP, NP2LEX_JAVA, EDITLEXER_HOLE, L"Java Source", L"java; jad; aidl", L"", &Keywords_Java,
 {
 	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
 	//{ SCE_C_DEFAULT, L"Default", L"", L"" },

@@ -78,7 +78,7 @@ static KEYWORDLIST Keywords_CIL = {{
 "ctor() "
 }};
 
-EDITLEXER lexCIL = { SCLEX_CIL, NP2LEX_CIL, L".NET IL", L"il", L"", &Keywords_CIL,
+EDITLEXER lexCIL = { SCLEX_CIL, NP2LEX_CIL, EDITLEXER_HOLE, L".NET IL", L"il", L"", &Keywords_CIL,
 {
 	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
 	//{ SCE_C_DEFAULT, L"Default", L"", L"" },
