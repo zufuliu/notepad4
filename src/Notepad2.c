@@ -2427,6 +2427,7 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	EnableCmd(hmenu, IDM_VIEW_REUSEWINDOW, i);
 	EnableCmd(hmenu, IDM_VIEW_STICKYWINPOS, i);
+	EnableCmd(hmenu, IDM_VIEW_CLEARWINPOS, i);
 	EnableCmd(hmenu, IDM_VIEW_SINGLEFILEINSTANCE, i);
 	EnableCmd(hmenu, IDM_VIEW_NOSAVEFINDREPL, i);
 	EnableCmd(hmenu, IDM_VIEW_SAVESETTINGS, i);
@@ -4082,6 +4083,10 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 			InfoBox(0, L"MsgStickyWinPos", IDS_STICKYWINPOS);
 		}
+		break;
+
+	case IDM_VIEW_CLEARWINPOS:
+		SaveIniSection(L"Window", L"");
 		break;
 
 	case IDM_VIEW_REUSEWINDOW:
