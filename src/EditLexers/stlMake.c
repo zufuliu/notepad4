@@ -46,7 +46,7 @@ static KEYWORDLIST Keywords_MAK = {{
 }};
 
 
-EDITLEXER lexMake = { SCLEX_MAKEFILE, NP2LEX_MAKE, L"Makefile", L"mak; make; mk; dsp; dsw; am; pro; pri; gmk", L"", &Keywords_MAK,
+EDITLEXER lexMake = { SCLEX_MAKEFILE, NP2LEX_MAKE, EDITLEXER_HOLE, L"Makefile", L"mak; make; mk; dsp; dsw; am; pro; pri; gmk", L"", &Keywords_MAK,
 {
 	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
 	//{ SCE_MAKE_DEFAULT, L"Default", L"", L"" },

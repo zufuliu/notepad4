@@ -7,7 +7,7 @@ static KEYWORDLIST Keywords_NULL = {{
 , "", "", "", "", "", "", ""
 }};
 
-EDITLEXER lexDefault = { SCLEX_NULL, NP2LEX_DEFAULT, L"Default Text", L"txt; text; wtx; log; asc; doc", L"", &Keywords_NULL,
+EDITLEXER lexDefault = { SCLEX_NULL, NP2LEX_DEFAULT, EDITLEXER_HOLE, L"Default Text", L"txt; text; wtx; log; asc; doc", L"", &Keywords_NULL,
 {
 	{ STYLE_DEFAULT, 63100, L"Default Style", L"font:Default; size:11", L"" },
 	//{ STYLE_DEFAULT, 63100, L"Default Style", L"font:DejaVu Sans Mono; size:11", L"" },
@@ -41,7 +41,7 @@ EDITLEXER lexDefault = { SCLEX_NULL, NP2LEX_DEFAULT, L"Default Text", L"txt; tex
 }
 };
 
-EDITLEXER lexANSI = { SCLEX_NULL, NP2LEX_ANSI, L"ANSI Art", L"nfo; diz", L"", &Keywords_NULL,
+EDITLEXER lexANSI = { SCLEX_NULL, NP2LEX_ANSI, EDITLEXER_HOLE, L"ANSI Art", L"nfo; diz", L"", &Keywords_NULL,
 {
 	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"font:Lucida Console", L"" },
 	{ STYLE_LINENUMBER, 63101, L"Margins and Line Numbers", L"font:Lucida Console; size:-2", L"" },
@@ -51,7 +51,7 @@ EDITLEXER lexANSI = { SCLEX_NULL, NP2LEX_ANSI, L"ANSI Art", L"nfo; diz", L"", &K
 }
 };
 
-EDITLEXER lexCONF = { SCLEX_CONF, NP2LEX_CONF, L"Config File", L"conf; cfg; cnf; htaccess; properties; prefs; iface; prop", L"", &Keywords_NULL,
+EDITLEXER lexCONF = { SCLEX_CONF, NP2LEX_CONF, EDITLEXER_HOLE, L"Config File", L"conf; cfg; cnf; htaccess; properties; prefs; iface; prop", L"", &Keywords_NULL,
 {
 	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
 	{ SCE_CONF_DIRECTIVE, NP2STYLE_Directive, L"Directive", L"fore:#003CE6", L"" },
@@ -68,7 +68,7 @@ EDITLEXER lexCONF = { SCLEX_CONF, NP2LEX_CONF, L"Config File", L"conf; cfg; cnf;
 }
 };
 
-EDITLEXER lexINI = { SCLEX_PROPERTIES, NP2LEX_INI, L"Ini Config File", L"ini; inf; reg; oem; sif; url; sed; theme; clw", L"", &Keywords_NULL,
+EDITLEXER lexINI = { SCLEX_PROPERTIES, NP2LEX_INI, EDITLEXER_HOLE, L"Ini Config File", L"ini; inf; reg; oem; sif; url; sed; theme; clw", L"", &Keywords_NULL,
 {
 	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
 	//{ SCE_PROPS_DEFAULT, L"Default", L"", L"" },
@@ -80,7 +80,7 @@ EDITLEXER lexINI = { SCLEX_PROPERTIES, NP2LEX_INI, L"Ini Config File", L"ini; in
 }
 };
 
-EDITLEXER lexDIFF = { SCLEX_DIFF, NP2LEX_DIFF, L"Diff File", L"diff; patch", L"", &Keywords_NULL,
+EDITLEXER lexDIFF = { SCLEX_DIFF, NP2LEX_DIFF, EDITLEXER_HOLE, L"Diff File", L"diff; patch", L"", &Keywords_NULL,
 {
 	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
 	//{ SCE_DIFF_DEFAULT, L"Default", L"", L"" },

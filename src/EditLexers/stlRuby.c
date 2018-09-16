@@ -23,7 +23,7 @@ static KEYWORDLIST Keywords_Ruby = {{
 , "", "", "", "", "", "", ""
 }};
 
-EDITLEXER lexRuby = { SCLEX_RUBY, NP2LEX_RUBY, L"Ruby Script", L"rb; ruby; rbw; rake; rjs; podspec", L"", &Keywords_Ruby,
+EDITLEXER lexRuby = { SCLEX_RUBY, NP2LEX_RUBY, EDITLEXER_HOLE, L"Ruby Script", L"rb; ruby; rbw; rake; rjs; podspec", L"", &Keywords_Ruby,
 {
 	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
 	//{ SCE_P_DEFAULT, L"Default", L"", L"" },

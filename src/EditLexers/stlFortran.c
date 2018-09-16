@@ -16,7 +16,7 @@ static KEYWORDLIST Keywords_Fortran = {{
 , "", "", "", "", "", "", ""
 }};
 
-EDITLEXER lexFortran = { SCLEX_FORTRAN, NP2LEX_FORTRAN, L"Fortran Source", L"f; for; ftn; fpp; f90; f95; f03; f08; hf", L"", &Keywords_Fortran,
+EDITLEXER lexFortran = { SCLEX_FORTRAN, NP2LEX_FORTRAN, EDITLEXER_HOLE, L"Fortran Source", L"f; for; ftn; fpp; f90; f95; f03; f08; hf", L"", &Keywords_Fortran,
 {
 	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
 	//{ SCE_F_DEFAULT, L"Default", L"", L"" },

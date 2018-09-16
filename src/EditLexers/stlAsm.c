@@ -157,7 +157,7 @@ static KEYWORDLIST Keywords_ASM = {{
 , "", "", "", "", "", ""
 }};
 
-EDITLEXER lexASM = { SCLEX_ASM, NP2LEX_ASM, L"Assembler Source", L"asm; s; sx; inc; a51", L"", &Keywords_ASM,
+EDITLEXER lexASM = { SCLEX_ASM, NP2LEX_ASM, EDITLEXER_HOLE, L"Assembler Source", L"asm; s; sx; inc; a51", L"", &Keywords_ASM,
 {
 	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
 	//{ SCE_ASM_DEFAULT, L"Default", L"", L"" },

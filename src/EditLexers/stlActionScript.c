@@ -37,11 +37,11 @@ static KEYWORDLIST Keywords_AS = {{
 "for^() if^() switch^() while^() else^if^() else^{} "
 }};
 
-EDITLEXER lexAS = { SCLEX_CPP, NP2LEX_AS, L"ActionScript", L"as", L"", &Keywords_AS,
+EDITLEXER lexAS = { SCLEX_CPP, NP2LEX_AS, EDITLEXER_HOLE, L"ActionScript", L"as", L"", &Keywords_AS,
 {
 	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
 	//{ SCE_C_DEFAULT, L"Default", L"", L"" },
-{ SCE_C_WORD, NP2STYLE_Keyword, L"Keyword", L"fore:#0000FF", L"" },
+	{ SCE_C_WORD, NP2STYLE_Keyword, L"Keyword", L"fore:#0000FF", L"" },
 	{ SCE_C_WORD2, NP2STYLE_TypeKeyword, L"Type Keyword", L"fore:#1E90FF", L"" },
 	{ SCE_C_CLASS, NP2STYLE_Class, L"Class", L"fore:#0000FF", L"" },
 	{ SCE_C_INTERFACE, NP2STYLE_Interface, L"Interface", L"bold; fore:#1E90FF", L""},

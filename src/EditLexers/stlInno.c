@@ -50,7 +50,7 @@ static KEYWORDLIST Keywords_INNO = {{
 , "", "", "", "", "", "", ""
 }};
 
-EDITLEXER lexINNO = { SCLEX_INNOSETUP, NP2LEX_INNO, L"Inno Setup Script", L"iss; isl; islu", L"", &Keywords_INNO,
+EDITLEXER lexINNO = { SCLEX_INNOSETUP, NP2LEX_INNO, EDITLEXER_HOLE, L"Inno Setup Script", L"iss; isl; islu", L"", &Keywords_INNO,
 {
 	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
 	//{ SCE_INNO_DEFAULT, L"Default", L"", L"" },

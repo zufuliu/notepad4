@@ -39,7 +39,7 @@ static KEYWORDLIST Keywords_CMake = {{
 , "", "", "", "", "", "", ""
 }};
 
-EDITLEXER lexCMake = { SCLEX_CMAKE, NP2LEX_CMAKE, L"CMake Script", L"cmake; ctest", L"", &Keywords_CMake,
+EDITLEXER lexCMake = { SCLEX_CMAKE, NP2LEX_CMAKE, EDITLEXER_HOLE, L"CMake Script", L"cmake; ctest", L"", &Keywords_CMake,
 {
 	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
 	//{ SCE_CMAKE_DEFAULT, L"Default", L"", L"" },

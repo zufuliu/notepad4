@@ -38,7 +38,7 @@ static KEYWORDLIST Keywords_Bash = {{
 , "", "", "", "", "", "", ""
 }};
 
-EDITLEXER lexBash = { SCLEX_BASH, NP2LEX_BASH, L"Shell Script", L"sh; csh; zsh; bash; tcsh; m4; in; po", L"", &Keywords_Bash,
+EDITLEXER lexBash = { SCLEX_BASH, NP2LEX_BASH, EDITLEXER_HOLE, L"Shell Script", L"sh; csh; zsh; bash; tcsh; m4; in; po", L"", &Keywords_Bash,
 {
 	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
 	//{ SCE_SH_ERROR, 63531, L"Error", L"", L"" },

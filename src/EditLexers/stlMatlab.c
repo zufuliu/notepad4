@@ -37,7 +37,7 @@ static KEYWORDLIST Keywords_Matlab = {{
 , "", "", "", "", "", "", ""
 }};
 
-EDITLEXER lexMatlab = { SCLEX_MATLAB, NP2LEX_MATLAB, L"MATLAB Code", L"m; sce; sci", L"", &Keywords_Matlab,
+EDITLEXER lexMatlab = { SCLEX_MATLAB, NP2LEX_MATLAB, EDITLEXER_HOLE, L"MATLAB Code", L"m; sce; sci", L"", &Keywords_Matlab,
 {
 	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
 	//	{ SCE_MAT_DEFAULT, L"Default", L"", L"" },

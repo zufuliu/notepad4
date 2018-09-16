@@ -69,7 +69,7 @@ static KEYWORDLIST Keywords_CSharp = {{
 "base() this() checked() default() delegate() nameof()"
 }};
 
-EDITLEXER lexCSharp = { SCLEX_CPP, NP2LEX_CSHARP, L"C# Source", L"cs; csx; vala", L"", &Keywords_CSharp,
+EDITLEXER lexCSharp = { SCLEX_CPP, NP2LEX_CSHARP, EDITLEXER_HOLE, L"C# Source", L"cs; csx; vala", L"", &Keywords_CSharp,
 {
 	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
 	//{ SCE_C_DEFAULT, L"Default", L"", L"" },
