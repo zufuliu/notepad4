@@ -378,6 +378,7 @@ void Style_Save(void) {
 			IniSectionSetStringEx(pIniSection, lex->Styles[i].pszName, lex->Styles[i].szValue, lex->Styles[i].pszDefault);
 			i++;
 		}
+		// delete this section if nothing changed
 		SaveIniSection(lex->pszName, StrIsEmpty(pIniSectionBuf) ? NULL : pIniSectionBuf);
 	}
 	NP2HeapFree(pIniSectionBuf);

@@ -47,7 +47,7 @@ BOOL IniSectionParseEx(IniSection *section, LPWSTR lpCachedIniSection, UINT flag
 		LPWSTR v = StrChr(p, L'=');
 		*v++ = L'\0';
 		const UINT keyLen = (UINT)(v - p - 1);
-		node->hash = p[0] | (p[1] << 8) | (keyLen << 16);
+		node->hash = keyLen | (p[0] << 8) | (p[1] << 16);
 		node->key = p;
 		node->value = v;
 		++count;
@@ -72,7 +72,7 @@ LPCWSTR IniSectionUnsafeGetValue(IniSection *section, LPCWSTR key, int keyLen) {
 		keyLen = lstrlen(key);
 	}
 
-	const UINT hash = key[0] | (key[1] << 8) | (keyLen << 16);
+	const UINT hash = keyLen | (key[0] << 8) | (key[1] << 16);
 	IniKeyValueNode *node = section->head;
 	IniKeyValueNode *prev = NULL;
 	do {
