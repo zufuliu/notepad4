@@ -2318,7 +2318,10 @@ INT_PTR CALLBACK FindTargetDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 				ErrorMessage(1, IDS_ERR_INVALIDTARGET);
 			} else {
 				int i;
-				WCHAR *pIniSection = NP2HeapAlloc(sizeof(WCHAR) * 32 * 1024);
+				IniSectionOnSave section;
+				WCHAR *pIniSectionBuf = NP2HeapAlloc(sizeof(WCHAR) * 32 * 1024);
+				IniSectionOnSave *pIniSection = &section;
+				pIniSection->next = pIniSectionBuf;
 
 				i = IsButtonChecked(hwnd, IDC_LAUNCH);
 				iUseTargetApplication = !i;
@@ -2376,8 +2379,8 @@ INT_PTR CALLBACK FindTargetDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 				}
 				IniSectionSetString(pIniSection, L"DDETopic", szDDETopic);
 
-				SaveIniSection(L"Target Application", pIniSection);
-				NP2HeapFree(pIniSection);
+				SaveIniSection(L"Target Application", pIniSectionBuf);
+				NP2HeapFree(pIniSectionBuf);
 
 				EndDialog(hwnd, IDOK);
 			}
