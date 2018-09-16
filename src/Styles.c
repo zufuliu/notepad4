@@ -326,8 +326,11 @@ void Style_Load(void) {
 //
 void Style_Save(void) {
 	unsigned iLexer;
-	WCHAR *pIniSection = NP2HeapAlloc(sizeof(WCHAR) * 32 * 1024);
-	const int cchIniSection = (int)NP2HeapSize(pIniSection) / sizeof(WCHAR);
+	IniSectionOnSave section;
+	WCHAR *pIniSectionBuf = NP2HeapAlloc(sizeof(WCHAR) * 32 * 1024);
+	const int cchIniSection = (int)NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR);
+	IniSectionOnSave *pIniSection = &section;
+	pIniSection->next = pIniSectionBuf;
 
 	// Custom colors
 	for (unsigned int i = 0; i < 16; i++) {
@@ -341,8 +344,9 @@ void Style_Save(void) {
 		IniSectionSetString(pIniSection, tch, wch);
 	}
 
-	SaveIniSection(L"Custom Colors", pIniSection);
-	ZeroMemory(pIniSection, cchIniSection);
+	SaveIniSection(L"Custom Colors", pIniSectionBuf);
+	ZeroMemory(pIniSectionBuf, cchIniSection);
+	pIniSection->next = pIniSectionBuf;
 
 	// auto select
 	IniSectionSetBool(pIniSection, L"Use2ndDefaultStyle", bUse2ndDefaultStyle);
@@ -357,32 +361,30 @@ void Style_Save(void) {
 	IniSectionSetInt(pIniSection, L"SelectDlgSizeX", cxStyleSelectDlg);
 	IniSectionSetInt(pIniSection, L"SelectDlgSizeY", cyStyleSelectDlg);
 
-	SaveIniSection(L"Styles", pIniSection);
+	SaveIniSection(L"Styles", pIniSectionBuf);
 
 	if (!fStylesModified) {
-		NP2HeapFree(pIniSection);
+		NP2HeapFree(pIniSectionBuf);
 		return;
 	}
 
 	for (iLexer = 0; iLexer < NUMLEXERS; iLexer++) {
 		PEDITLEXER lex = pLexArray[iLexer];
 		unsigned int i = 0;
-		BOOL changed = FALSE;
-		ZeroMemory(pIniSection, cchIniSection);
+		ZeroMemory(pIniSectionBuf, cchIniSection);
+		pIniSection->next = pIniSectionBuf;
 		if (!StrCaseEqual(lex->pszDefExt, lex->szExtensions)) {
-			changed = TRUE;
 			IniSectionSetString(pIniSection, L"FileNameExtensions", lex->szExtensions);
 		}
 		while (lex->Styles[i].iStyle != -1) {
 			if (!StrCaseEqual(lex->Styles[i].pszDefault, lex->Styles[i].szValue)) {
-				changed = TRUE;
 				IniSectionSetString(pIniSection, lex->Styles[i].pszName, lex->Styles[i].szValue);
 			}
 			i++;
 		}
-		SaveIniSection(lex->pszName, (changed ? pIniSection : NULL));
+		SaveIniSection(lex->pszName, StrIsEmpty(pIniSectionBuf) ? NULL : pIniSectionBuf);
 	}
-	NP2HeapFree(pIniSection);
+	NP2HeapFree(pIniSectionBuf);
 }
 
 //=============================================================================
@@ -465,23 +467,26 @@ BOOL Style_Export(HWND hwnd) {
 
 	if (GetSaveFileName(&ofn)) {
 		unsigned int iLexer;
-		WCHAR *pIniSection = NP2HeapAlloc(sizeof(WCHAR) * 32 * 1024);
-		const int cchIniSection = (int)NP2HeapSize(pIniSection) / sizeof(WCHAR);
+		IniSectionOnSave section;
+		WCHAR *pIniSectionBuf = NP2HeapAlloc(sizeof(WCHAR) * 32 * 1024);
+		const int cchIniSection = (int)NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR);
+		IniSectionOnSave *pIniSection = &section;
 
 		for (iLexer = 0; iLexer < NUMLEXERS; iLexer++) {
 			PEDITLEXER lex = pLexArray[iLexer];
 			unsigned int i = 0;
+			pIniSection->next = pIniSectionBuf;
 			IniSectionSetString(pIniSection, L"FileNameExtensions", lex->szExtensions);
 			while (lex->Styles[i].iStyle != -1) {
 				IniSectionSetString(pIniSection, lex->Styles[i].pszName, lex->Styles[i].szValue);
 				i++;
 			}
-			if (!WritePrivateProfileSection(lex->pszName, pIniSection, szFile)) {
+			if (!WritePrivateProfileSection(lex->pszName, pIniSectionBuf, szFile)) {
 				dwError = GetLastError();
 			}
-			ZeroMemory(pIniSection, cchIniSection);
+			ZeroMemory(pIniSectionBuf, cchIniSection);
 		}
-		NP2HeapFree(pIniSection);
+		NP2HeapFree(pIniSectionBuf);
 
 		if (dwError != ERROR_SUCCESS) {
 			MsgBox(MBINFO, IDS_EXPORT_FAIL, szFile);

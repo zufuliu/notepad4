@@ -120,19 +120,14 @@ BOOL IniSectionGetBoolImpl(IniSection *section, LPCWSTR key, int keyLen, BOOL bD
 	return bDefault;
 }
 
-void IniSectionSetString(LPWSTR lpCachedIniSection, LPCWSTR lpName, LPCWSTR lpString) {
-	WCHAR *p = lpCachedIniSection;
-
-	if (p) {
-		WCHAR tch[256];
-		while (*p) {
-			p = StrEnd(p) + 1;
-		}
-		wsprintf(tch, L"%s=%s", lpName, lpString);
-		lstrcpy(p, tch);
-		p = StrEnd(p) + 1;
-		*p = 0;
-	}
+void IniSectionSetString(IniSectionOnSave *section, LPCWSTR key, LPCWSTR value) {
+	LPWSTR p = section->next;
+	lstrcpy(p, key);
+	lstrcat(p, L"=");
+	lstrcat(p, value);
+	p = StrEnd(p) + 1;
+	*p = L'\0';
+	section->next = p;
 }
 
 //=============================================================================
@@ -1411,10 +1406,13 @@ BOOL MRU_Load(LPMRULIST pmru) {
 
 BOOL MRU_Save(LPMRULIST pmru) {
 	WCHAR tchName[32];
-	WCHAR *pIniSection = NP2HeapAlloc(sizeof(WCHAR) * 32 * 1024);
+	IniSectionOnSave section;
+	WCHAR *pIniSectionBuf = NP2HeapAlloc(sizeof(WCHAR) * 32 * 1024);
+	IniSectionOnSave *pIniSection = &section;
+	pIniSection->next = pIniSectionBuf;
 
 	for (int i = 0; i < pmru->iSize; i++) {
-		if (pmru->pszItems[i]) {
+		if (StrNotEmpty(pmru->pszItems[i])) {
 			wsprintf(tchName, L"%02i", i + 1);
 			/*if (pmru->iFlags & MRU_UTF8) {
 				WCHAR  tchItem[1024];
@@ -1428,8 +1426,8 @@ BOOL MRU_Save(LPMRULIST pmru) {
 		}
 	}
 
-	SaveIniSection(pmru->szRegKey, pIniSection);
-	NP2HeapFree(pIniSection);
+	SaveIniSection(pmru->szRegKey, pIniSectionBuf);
+	NP2HeapFree(pIniSectionBuf);
 	return TRUE;
 }
 

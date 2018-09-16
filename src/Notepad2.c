@@ -5591,7 +5591,10 @@ void SaveSettings(BOOL bSaveSettingsNow) {
 	}
 
 	WCHAR wchTmp[MAX_PATH];
-	WCHAR *pIniSection = NP2HeapAlloc(sizeof(WCHAR) * 32 * 1024);
+	IniSectionOnSave section;
+	WCHAR *pIniSectionBuf = NP2HeapAlloc(sizeof(WCHAR) * 32 * 1024);
+	IniSectionOnSave *pIniSection = &section;
+	pIniSection->next = pIniSectionBuf;
 
 	IniSectionSetInt(pIniSection, L"SettingsVersion", NP2SettingsVersion_Current);
 	IniSectionSetBool(pIniSection, L"SaveSettings", bSaveSettings);
@@ -5709,8 +5712,8 @@ void SaveSettings(BOOL bSaveSettingsNow) {
 #endif
 	}
 
-	SaveIniSection(L"Settings", pIniSection);
-	NP2HeapFree(pIniSection);
+	SaveIniSection(L"Settings", pIniSectionBuf);
+	NP2HeapFree(pIniSectionBuf);
 
 	/*
 		SaveSettingsNow(): query Window Dimensions

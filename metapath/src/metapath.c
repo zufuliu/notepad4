@@ -2586,7 +2586,10 @@ void SaveSettings(BOOL bSaveSettingsNow) {
 	}
 
 	WCHAR wchTmp[MAX_PATH];
-	WCHAR *pIniSection = NP2HeapAlloc(sizeof(WCHAR) * 32 * 1024);
+	IniSectionOnSave section;
+	WCHAR *pIniSectionBuf = NP2HeapAlloc(sizeof(WCHAR) * 32 * 1024);
+	IniSectionOnSave *pIniSection = &section;
+	pIniSection->next = pIniSectionBuf;
 
 	IniSectionSetBool(pIniSection, L"SaveSettings", bSaveSettings);
 	IniSectionSetBool(pIniSection, L"SingleClick", bSingleClick);
@@ -2632,8 +2635,8 @@ void SaveSettings(BOOL bSaveSettingsNow) {
 	IniSectionSetInt(pIniSection, L"OpenWithDlgSizeY", cyOpenWithDlg);
 	IniSectionSetInt(pIniSection, L"CopyMoveDlgSizeX", cxCopyMoveDlg);
 
-	SaveIniSection(L"Settings", pIniSection);
-	NP2HeapFree(pIniSection);
+	SaveIniSection(L"Settings", pIniSectionBuf);
+	NP2HeapFree(pIniSectionBuf);
 
 	/*
 	  SaveSettingsNow(): query Window Dimensions

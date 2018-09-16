@@ -238,16 +238,20 @@ static inline BOOL IniSectionGetStringEx(IniSection *section, LPCWSTR key, LPCWS
 	return IniSectionGetStringImpl(section, key, -1, lpDefault, lpReturnedString, cchReturnedString);
 }
 
-void IniSectionSetString(LPWSTR lpCachedIniSection, LPCWSTR lpName, LPCWSTR lpString);
+typedef struct IniSectionOnSave {
+	LPWSTR next;
+} IniSectionOnSave;
 
-static inline void IniSectionSetInt(LPWSTR lpCachedIniSection, LPCWSTR lpName, int i) {
+void IniSectionSetString(IniSectionOnSave *section, LPCWSTR key, LPCWSTR value);
+
+static inline void IniSectionSetInt(IniSectionOnSave *section, LPCWSTR key, int i) {
 	WCHAR tch[16];
 	wsprintf(tch, L"%i", i);
-	IniSectionSetString(lpCachedIniSection, lpName, tch);
+	IniSectionSetString(section, key, tch);
 }
 
-static inline void IniSectionSetBool(LPWSTR lpCachedIniSection, LPCWSTR lpName, BOOL b) {
-	IniSectionSetString(lpCachedIniSection, lpName, (b ? L"1" : L"0"));
+static inline void IniSectionSetBool(IniSectionOnSave *section, LPCWSTR key, BOOL b) {
+	IniSectionSetString(section, key, (b ? L"1" : L"0"));
 }
 
 extern HWND hwndEdit;
