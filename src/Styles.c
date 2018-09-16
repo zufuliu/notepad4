@@ -349,13 +349,13 @@ void Style_Save(void) {
 	pIniSection->next = pIniSectionBuf;
 
 	// auto select
-	IniSectionSetBool(pIniSection, L"Use2ndDefaultStyle", bUse2ndDefaultStyle);
+	IniSectionSetBoolEx(pIniSection, L"Use2ndDefaultStyle", bUse2ndDefaultStyle, 0);
 
 	// default scheme
-	IniSectionSetInt(pIniSection, L"DefaultScheme", iDefaultLexer);
+	IniSectionSetIntEx(pIniSection, L"DefaultScheme", iDefaultLexer, 0);
 
 	// auto select
-	IniSectionSetBool(pIniSection, L"AutoSelect", bAutoSelect);
+	IniSectionSetBoolEx(pIniSection, L"AutoSelect", bAutoSelect, 1);
 
 	// scheme select dlg dimensions
 	IniSectionSetInt(pIniSection, L"SelectDlgSizeX", cxStyleSelectDlg);
@@ -373,13 +373,9 @@ void Style_Save(void) {
 		unsigned int i = 0;
 		ZeroMemory(pIniSectionBuf, cchIniSection);
 		pIniSection->next = pIniSectionBuf;
-		if (!StrCaseEqual(lex->pszDefExt, lex->szExtensions)) {
-			IniSectionSetString(pIniSection, L"FileNameExtensions", lex->szExtensions);
-		}
+		IniSectionSetStringEx(pIniSection, L"FileNameExtensions", lex->szExtensions, lex->pszDefExt);
 		while (lex->Styles[i].iStyle != -1) {
-			if (!StrCaseEqual(lex->Styles[i].pszDefault, lex->Styles[i].szValue)) {
-				IniSectionSetString(pIniSection, lex->Styles[i].pszName, lex->Styles[i].szValue);
-			}
+			IniSectionSetStringEx(pIniSection, lex->Styles[i].pszName, lex->Styles[i].szValue, lex->Styles[i].pszDefault);
 			i++;
 		}
 		SaveIniSection(lex->pszName, StrIsEmpty(pIniSectionBuf) ? NULL : pIniSectionBuf);

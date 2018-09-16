@@ -2465,7 +2465,7 @@ void LoadSettings(void) {
 		dwFillMask = DL_ALLOBJECTS;
 	}
 
-	nSortFlags = IniSectionGetInt(pIniSection, L"SortOptions", DS_TYPE);
+	nSortFlags = IniSectionGetInt(pIniSection, L"SortOptions", DS_NAME);
 	nSortFlags = clamp_i(nSortFlags, 0, 3);
 
 	fSortRev = IniSectionGetBool(pIniSection, L"SortReverse", 0);
@@ -2592,20 +2592,20 @@ void SaveSettings(BOOL bSaveSettingsNow) {
 	pIniSection->next = pIniSectionBuf;
 
 	IniSectionSetBool(pIniSection, L"SaveSettings", bSaveSettings);
-	IniSectionSetBool(pIniSection, L"SingleClick", bSingleClick);
-	IniSectionSetBool(pIniSection, L"TrackSelect", bTrackSelect);
-	IniSectionSetBool(pIniSection, L"FullRowSelect", bFullRowSelect);
-	IniSectionSetBool(pIniSection, L"UseRecycleBin", fUseRecycleBin);
-	IniSectionSetBool(pIniSection, L"NoConfirmDelete", fNoConfirmDelete);
-	IniSectionSetBool(pIniSection, L"ClearReadOnly", bClearReadOnly);
-	IniSectionSetBool(pIniSection, L"RenameOnCollision", bRenameOnCollision);
-	IniSectionSetBool(pIniSection, L"FocusEdit", bFocusEdit);
-	IniSectionSetBool(pIniSection, L"AlwaysOnTop", bAlwaysOnTop);
-	IniSectionSetBool(pIniSection, L"MinimizeToTray", bMinimizeToTray);
-	IniSectionSetBool(pIniSection, L"TransparentMode", bTransparentMode);
-	IniSectionSetBool(pIniSection, L"EscFunction", iEscFunction);
+	IniSectionSetBoolEx(pIniSection, L"SingleClick", bSingleClick, 1);
+	IniSectionSetBoolEx(pIniSection, L"TrackSelect", bTrackSelect, 1);
+	IniSectionSetBoolEx(pIniSection, L"FullRowSelect", bFullRowSelect, 0);
+	IniSectionSetBoolEx(pIniSection, L"UseRecycleBin", fUseRecycleBin, 0);
+	IniSectionSetBoolEx(pIniSection, L"NoConfirmDelete", fNoConfirmDelete, 0);
+	IniSectionSetBoolEx(pIniSection, L"ClearReadOnly", bClearReadOnly, 1);
+	IniSectionSetBoolEx(pIniSection, L"RenameOnCollision", bRenameOnCollision, 0);
+	IniSectionSetBoolEx(pIniSection, L"FocusEdit", bFocusEdit, 1);
+	IniSectionSetBoolEx(pIniSection, L"AlwaysOnTop", bAlwaysOnTop, 0);
+	IniSectionSetBoolEx(pIniSection, L"MinimizeToTray", bMinimizeToTray, 0);
+	IniSectionSetBoolEx(pIniSection, L"TransparentMode", bTransparentMode, 0);
+	IniSectionSetBoolEx(pIniSection, L"EscFunction", iEscFunction, 0);
 
-	IniSectionSetInt(pIniSection, L"StartupDirectory", iStartupDir);
+	IniSectionSetIntEx(pIniSection, L"StartupDirectory", iStartupDir, 1);
 	if (iStartupDir == 1) {
 		IniSectionSetString(pIniSection, L"MRUDirectory", szCurDir);
 	}
@@ -2613,23 +2613,23 @@ void SaveSettings(BOOL bSaveSettingsNow) {
 	IniSectionSetString(pIniSection, L"Favorites", wchTmp);
 	PathRelativeToApp(szQuickview, wchTmp, COUNTOF(wchTmp), FALSE, TRUE, flagPortableMyDocs);
 	IniSectionSetString(pIniSection, L"Quikview.exe", wchTmp);
-	IniSectionSetString(pIniSection, L"QuikviewParams", szQuickviewParams);
+	IniSectionSetStringEx(pIniSection, L"QuikviewParams", szQuickviewParams, L"");
 	PathRelativeToApp(tchOpenWithDir, wchTmp, COUNTOF(wchTmp), FALSE, TRUE, flagPortableMyDocs);
 	IniSectionSetString(pIniSection, L"OpenWithDir", wchTmp);
-	IniSectionSetInt(pIniSection, L"FillMask", dwFillMask);
-	IniSectionSetInt(pIniSection, L"SortOptions", nSortFlags);
-	IniSectionSetBool(pIniSection, L"SortReverse", fSortRev);
-	IniSectionSetString(pIniSection, L"FileFilter", tchFilter);
-	IniSectionSetBool(pIniSection, L"NegativeFilter", bNegFilter);
-	IniSectionSetBool(pIniSection, L"DefColorNoFilter", bDefCrNoFilt);
-	IniSectionSetBool(pIniSection, L"DefColorFilter", bDefCrFilter);
-	IniSectionSetInt(pIniSection, L"ColorNoFilter", crNoFilt);
-	IniSectionSetInt(pIniSection, L"ColorFilter", crFilter);
+	IniSectionSetIntEx(pIniSection, L"FillMask", dwFillMask, DL_ALLOBJECTS);
+	IniSectionSetIntEx(pIniSection, L"SortOptions", nSortFlags, DS_NAME);
+	IniSectionSetBoolEx(pIniSection, L"SortReverse", fSortRev, 0);
+	IniSectionSetStringEx(pIniSection, L"FileFilter", tchFilter, L"*.*");
+	IniSectionSetBoolEx(pIniSection, L"NegativeFilter", bNegFilter, 0);
+	IniSectionSetBoolEx(pIniSection, L"DefColorNoFilter", bDefCrNoFilt, 1);
+	IniSectionSetBoolEx(pIniSection, L"DefColorFilter", bDefCrFilter, 1);
+	IniSectionSetIntEx(pIniSection, L"ColorNoFilter", crNoFilt, GetSysColor(COLOR_WINDOWTEXT));
+	IniSectionSetIntEx(pIniSection, L"ColorFilter", crFilter, GetSysColor(COLOR_HIGHLIGHT));
 	Toolbar_GetButtons(hwndToolbar, IDT_HISTORY_BACK, tchToolbarButtons, COUNTOF(tchToolbarButtons));
-	IniSectionSetString(pIniSection, L"ToolbarButtons", tchToolbarButtons);
-	IniSectionSetBool(pIniSection, L"ShowToolbar", bShowToolbar);
-	IniSectionSetBool(pIniSection, L"ShowStatusbar", bShowStatusbar);
-	IniSectionSetBool(pIniSection, L"ShowDriveBox", bShowDriveBox);
+	IniSectionSetStringEx(pIniSection, L"ToolbarButtons", tchToolbarButtons, DefaultToolbarButtons);
+	IniSectionSetBoolEx(pIniSection, L"ShowToolbar", bShowToolbar, 1);
+	IniSectionSetBoolEx(pIniSection, L"ShowStatusbar", bShowStatusbar, 1);
+	IniSectionSetBoolEx(pIniSection, L"ShowDriveBox", bShowDriveBox, 1);
 	IniSectionSetInt(pIniSection, L"GotoDlgSizeX", cxGotoDlg);
 	IniSectionSetInt(pIniSection, L"OpenWithDlgSizeX", cxOpenWithDlg);
 	IniSectionSetInt(pIniSection, L"OpenWithDlgSizeY", cyOpenWithDlg);
