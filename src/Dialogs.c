@@ -1016,7 +1016,7 @@ INT_PTR CALLBACK FileMRUDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPar
 		RemoveProp(hwnd, L"it");
 		GlobalFree(lpit);
 
-		bSaveRecentFiles = (IsDlgButtonChecked(hwnd, IDC_SAVEMRU)) ? 1 : 0;
+		bSaveRecentFiles = IsButtonChecked(hwnd, IDC_SAVEMRU);
 
 		ResizeDlg_Destroy(hwnd, &cxFileMRUDlg, &cyFileMRUDlg);
 	}
@@ -1282,14 +1282,14 @@ INT_PTR CALLBACK ChangeNotifyDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM
 	case WM_COMMAND:
 		switch (LOWORD(wParam)) {
 		case IDOK:
-			if (IsDlgButtonChecked(hwnd, 100) == BST_CHECKED) {
+			if (IsButtonChecked(hwnd, 100)) {
 				iFileWatchingMode = 0;
-			} else if (IsDlgButtonChecked(hwnd, 101) == BST_CHECKED) {
+			} else if (IsButtonChecked(hwnd, 101)) {
 				iFileWatchingMode = 1;
 			} else {
 				iFileWatchingMode = 2;
 			}
-			bResetFileWatching = (IsDlgButtonChecked(hwnd, 103) == BST_CHECKED) ? TRUE : FALSE;
+			bResetFileWatching = IsButtonChecked(hwnd, 103);
 			EndDialog(hwnd, IDOK);
 			break;
 
@@ -1312,7 +1312,7 @@ BOOL ChangeNotifyDlg(HWND hwnd) {
 	iResult = ThemedDialogBoxParam(g_hInstance,  MAKEINTRESOURCEW(IDD_CHANGENOTIFY),
 								   hwnd, ChangeNotifyDlgProc, 0);
 
-	return (iResult == IDOK) ? TRUE : FALSE;
+	return iResult == IDOK;
 }
 
 //=============================================================================
@@ -1372,7 +1372,7 @@ BOOL ColumnWrapDlg(HWND hwnd, UINT uidDlg, int *iNumber) {
 	iResult = ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(uidDlg),
 								   hwnd, ColumnWrapDlgProc, (LPARAM)iNumber);
 
-	return (iResult == IDOK) ? TRUE : FALSE;
+	return iResult == IDOK;
 }
 
 //=============================================================================
@@ -1474,7 +1474,7 @@ BOOL WordWrapSettingsDlg(HWND hwnd, UINT uidDlg, int *iNumber) {
 	iResult = ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(uidDlg),
 								   hwnd, WordWrapSettingsDlgProc, (LPARAM)iNumber);
 
-	return (iResult == IDOK) ? TRUE : FALSE;
+	return iResult == IDOK;
 }
 
 //=============================================================================
@@ -1516,7 +1516,7 @@ INT_PTR CALLBACK LongLineSettingsDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LP
 
 			if (fTranslated) {
 				*piNumber = iNewNumber;
-				iLongLineMode = (IsDlgButtonChecked(hwnd, 101)) ? EDGE_LINE : EDGE_BACKGROUND;
+				iLongLineMode = IsButtonChecked(hwnd, 101) ? EDGE_LINE : EDGE_BACKGROUND;
 
 				EndDialog(hwnd, IDOK);
 			} else {
@@ -1546,7 +1546,7 @@ BOOL LongLineSettingsDlg(HWND hwnd, UINT uidDlg, int *iNumber) {
 	iResult = ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(uidDlg),
 								   hwnd, LongLineSettingsDlgProc, (LPARAM)iNumber);
 
-	return (iResult == IDOK) ? TRUE : FALSE;
+	return iResult == IDOK;
 }
 
 //=============================================================================
@@ -1604,11 +1604,9 @@ INT_PTR CALLBACK TabSettingsDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM 
 				iTabWidth = iNewTabWidth;
 				iIndentWidth = iNewIndentWidth;
 
-				bTabsAsSpaces = (IsDlgButtonChecked(hwnd, 102)) ? TRUE : FALSE;
-
-				bTabIndents = (IsDlgButtonChecked(hwnd, 103)) ? TRUE : FALSE;
-
-				bBackspaceUnindents = (IsDlgButtonChecked(hwnd, 104)) ? TRUE : FALSE;
+				bTabsAsSpaces = IsButtonChecked(hwnd, 102);
+				bTabIndents = IsButtonChecked(hwnd, 103);
+				bBackspaceUnindents = IsButtonChecked(hwnd, 104);
 
 				EndDialog(hwnd, IDOK);
 			} else {
@@ -1638,7 +1636,7 @@ BOOL TabSettingsDlg(HWND hwnd, UINT uidDlg, int *iNumber) {
 	iResult = ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(uidDlg),
 								   hwnd, TabSettingsDlgProc, (LPARAM)iNumber);
 
-	return (iResult == IDOK) ? TRUE : FALSE;
+	return iResult == IDOK;
 }
 
 //=============================================================================
@@ -1696,10 +1694,10 @@ INT_PTR CALLBACK SelectDefEncodingDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, L
 		switch (LOWORD(wParam)) {
 		case IDOK: {
 			if (Encoding_GetFromComboboxEx(GetDlgItem(hwnd, IDC_ENCODINGLIST), &pdd->idEncoding)) {
-				bSkipUnicodeDetection = (IsDlgButtonChecked(hwnd, IDC_NOUNICODEDETECTION) == BST_CHECKED) ? 1 : 0;
-				bLoadASCIIasUTF8 = (IsDlgButtonChecked(hwnd, IDC_ASCIIASUTF8) == BST_CHECKED) ? 1 : 0;
-				bLoadNFOasOEM = (IsDlgButtonChecked(hwnd, IDC_NFOASOEM) == BST_CHECKED) ? 1 : 0;
-				bNoEncodingTags = (IsDlgButtonChecked(hwnd, IDC_ENCODINGFROMFILEVARS) == BST_CHECKED) ? 1 : 0;
+				bSkipUnicodeDetection = IsButtonChecked(hwnd, IDC_NOUNICODEDETECTION);
+				bLoadASCIIasUTF8 = IsButtonChecked(hwnd, IDC_ASCIIASUTF8);
+				bLoadNFOasOEM = IsButtonChecked(hwnd, IDC_NFOASOEM);
+				bNoEncodingTags = IsButtonChecked(hwnd, IDC_ENCODINGFROMFILEVARS);
 				EndDialog(hwnd, IDOK);
 			} else {
 				PostMessage(hwnd, WM_NEXTDLGCTL, (WPARAM)(GetDlgItem(hwnd, IDC_ENCODINGLIST)), 1);
@@ -1940,8 +1938,8 @@ INT_PTR CALLBACK SelectDefLineEndingDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 		switch (LOWORD(wParam)) {
 		case IDOK: {
 			*piOption = (int)SendDlgItemMessage(hwnd, 100, CB_GETCURSEL, 0, 0);
-			bFixLineEndings = (IsDlgButtonChecked(hwnd, IDC_CONSISTENTEOLS) == BST_CHECKED) ? 1 : 0;
-			bAutoStripBlanks = (IsDlgButtonChecked(hwnd, IDC_AUTOSTRIPBLANKS) == BST_CHECKED) ? 1 : 0;
+			bFixLineEndings = IsButtonChecked(hwnd, IDC_CONSISTENTEOLS);
+			bAutoStripBlanks = IsButtonChecked(hwnd, IDC_AUTOSTRIPBLANKS);
 			EndDialog(hwnd, IDOK);
 		}
 		break;
@@ -1965,7 +1963,7 @@ BOOL SelectDefLineEndingDlg(HWND hwnd, int *iOption) {
 	iResult = ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_DEFEOLMODE),
 								   hwnd, SelectDefLineEndingDlgProc, (LPARAM)iOption);
 
-	return (iResult == IDOK) ? TRUE : FALSE;
+	return iResult == IDOK;
 }
 
 //=============================================================================
@@ -2003,7 +2001,7 @@ INT_PTR CALLBACK InfoBoxDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPar
 		case IDYES:
 		case IDNO:
 			lpib = (LPINFOBOX)GetWindowLongPtr(hwnd, DWLP_USER);
-			if (IsDlgButtonChecked(hwnd, IDC_INFOBOXCHECK)) {
+			if (IsButtonChecked(hwnd, IDC_INFOBOXCHECK)) {
 				IniSetInt(L"Suppressed Messages", lpib->lpstrSetting, 1);
 			}
 			EndDialog(hwnd, LOWORD(wParam));
@@ -2042,7 +2040,7 @@ INT_PTR InfoBox(int iType, LPCWSTR lpstrSetting, int uidMessage, ...) {
 	wvsprintf(ib.lpstrMessage, wchFormat, va);
 	va_end(va);
 	ib.lpstrSetting = (LPWSTR)lpstrSetting;
-	ib.bDisableCheckBox = (StrIsEmpty(szIniFile) || StrIsEmpty(lpstrSetting) || iMode == 2) ? TRUE : FALSE;
+	ib.bDisableCheckBox = StrIsEmpty(szIniFile) || StrIsEmpty(lpstrSetting) || iMode == 2;
 
 	if (iType == MBYESNO) {
 		idDlg = IDD_INFOBOX2;

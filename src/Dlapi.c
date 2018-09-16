@@ -805,7 +805,7 @@ BOOL DirList_MatchFilter(LPSHELLFOLDER lpsf, LPCITEMIDLIST pidl, PDL_FILTER pdlf
 	}
 
 	// No matching
-	return (pdlf->bExcludeFilter) ? TRUE : FALSE;
+	return pdlf->bExcludeFilter;
 }
 
 //==== DriveBox ===============================================================

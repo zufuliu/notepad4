@@ -2343,7 +2343,7 @@ static VOID GetTrayWndRect(LPRECT lpTrayRect) {
 	ai.cbSize = sizeof(ai);
 	SystemParametersInfo(SPI_GETANIMATION, sizeof(ai), &ai, 0);
 
-	return ai.iMinAnimate ? TRUE : FALSE;
+	return ai.iMinAnimate != 0;
 }
 
 VOID MinimizeWndToTray(HWND hwnd) {

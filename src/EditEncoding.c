@@ -573,12 +573,11 @@ BOOL IsUnicode(const char *pBuffer, int cb, LPBOOL lpbBOM, LPBOOL lpbReverse) {
 			 !(i & IS_TEXT_UNICODE_ILLEGAL_CHARS && !(i & IS_TEXT_UNICODE_REVERSE_SIGNATURE)) &&
 			 !((i & IS_TEXT_UNICODE_REVERSE_MASK) == IS_TEXT_UNICODE_REVERSE_STATISTICS))) {
 		if (lpbBOM) {
-			*lpbBOM = (bHasBOM || bHasRBOM ||
-					   (i & (IS_TEXT_UNICODE_SIGNATURE | IS_TEXT_UNICODE_REVERSE_SIGNATURE)))
-					  ? TRUE : FALSE;
+			*lpbBOM = bHasBOM || bHasRBOM ||
+					   (i & (IS_TEXT_UNICODE_SIGNATURE | IS_TEXT_UNICODE_REVERSE_SIGNATURE));
 		}
 		if (lpbReverse) {
-			*lpbReverse = (bHasRBOM || (i & IS_TEXT_UNICODE_REVERSE_MASK)) ? TRUE : FALSE;
+			*lpbReverse = bHasRBOM || (i & IS_TEXT_UNICODE_REVERSE_MASK);
 		}
 		return TRUE;
 	}
@@ -646,7 +645,7 @@ BOOL IsUTF8(const char *pTest, int nLength) {
 		}
 	}
 
-	return (current == kSTART) ? TRUE : FALSE;
+	return current == kSTART;
 }
 
 #else

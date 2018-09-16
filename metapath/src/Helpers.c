@@ -188,7 +188,7 @@ BOOL Is32bitExe(LPCWSTR lpszExeName) {
 		dwExeType = SHGetFileInfo(lpszExeName, 0, &shfi, sizeof(SHFILEINFO), SHGFI_EXETYPE);
 	}
 
-	return (HIWORD(dwExeType) && LOWORD(dwExeType)) ? TRUE : FALSE;
+	return (HIWORD(dwExeType) && LOWORD(dwExeType)) != 0;
 }
 */
 
@@ -1787,7 +1787,7 @@ static VOID GetTrayWndRect(LPRECT lpTrayRect) {
 	ai.cbSize = sizeof(ai);
 	SystemParametersInfo(SPI_GETANIMATION, sizeof(ai), &ai, 0);
 
-	return ai.iMinAnimate ? TRUE : FALSE;
+	return ai.iMinAnimate != 0;
 }
 
 VOID MinimizeWndToTray(HWND hwnd) {
