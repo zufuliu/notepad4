@@ -4086,7 +4086,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	case IDM_VIEW_CLEARWINPOS:
-		SaveIniSection(L"Window", L"");
+		IniClearSection(L"Window");
 		break;
 
 	case IDM_VIEW_REUSEWINDOW:
