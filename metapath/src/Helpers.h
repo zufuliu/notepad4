@@ -200,6 +200,25 @@ static inline void IniSectionSetBool(IniSectionOnSave *section, LPCWSTR key, BOO
 	IniSectionSetString(section, key, (b ? L"1" : L"0"));
 }
 
+static inline void IniSectionSetStringEx(IniSectionOnSave *section, LPCWSTR key, LPCWSTR value, LPCWSTR lpDefault) {
+	if (!StrCaseEqual(value, lpDefault)) {
+		IniSectionSetString(section, key, value);
+	}
+}
+
+static inline void IniSectionSetIntEx(IniSectionOnSave *section, LPCWSTR key, int i, int iDefault) {
+	if (i != iDefault) {
+		IniSectionSetInt(section, key, i);
+	}
+}
+
+static inline void IniSectionSetBoolEx(IniSectionOnSave *section, LPCWSTR key, BOOL b, BOOL bDefault) {
+	if (b != bDefault) {
+		IniSectionSetString(section, key, (b ? L"1" : L"0"));
+	}
+}
+
+
 void BeginWaitCursor(void);
 void EndWaitCursor(void);
 
