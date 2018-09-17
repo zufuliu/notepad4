@@ -54,20 +54,32 @@ BOOL IniSectionParseEx(IniSection *section, LPWSTR lpCachedIniSection, UINT flag
 	const int capacity = section->capacity;
 	LPWSTR p = lpCachedIniSection;
 	int count = 0;
-	do {
-		IniKeyValueNode *node = &section->nodeList[count];
-		LPWSTR v = StrChr(p, L'=');
-		*v++ = L'\0';
-		const UINT keyLen = (UINT)(v - p - 1);
-		node->hash = keyLen | (p[0] << 8) | (p[1] << 16);
-		node->key = p;
-		node->value = v;
-		++count;
-		p = StrEnd(v) + 1;
-	} while (*p && count < capacity);
 
-	section->count = count;
-	if (flag != IniSectionParseFlag_Array) {
+	if (flag == IniSectionParseFlag_Array) {
+		do {
+			IniKeyValueNode *node = &section->nodeList[count];
+			LPWSTR v = StrChr(p, L'=');
+			*v++ = L'\0';
+			node->key = p;
+			node->value = v;
+			++count;
+			p = StrEnd(v) + 1;
+		} while (*p && count < capacity);
+		section->count = count;
+	} else {
+		do {
+			IniKeyValueNode *node = &section->nodeList[count];
+			LPWSTR v = StrChr(p, L'=');
+			*v++ = L'\0';
+			const UINT keyLen = (UINT)(v - p - 1);
+			node->hash = keyLen | (p[0] << 8) | (p[1] << 16);
+			node->key = p;
+			node->value = v;
+			++count;
+			p = StrEnd(v) + 1;
+		} while (*p && count < capacity);
+
+		section->count = count;
 		section->head = &section->nodeList[0];
 		--count;
 		section->nodeList[count].next = NULL;
@@ -76,7 +88,6 @@ BOOL IniSectionParseEx(IniSection *section, LPWSTR lpCachedIniSection, UINT flag
 			--count;
 		}
 	}
-
 	return TRUE;
 }
 
@@ -1727,9 +1738,10 @@ BOOL MRU_Load(LPMRULIST pmru) {
 
 	LoadIniSection(pmru->szRegKey, pIniSectionBuf, cchIniSection);
 	IniSectionParseEx(pIniSection, pIniSectionBuf, IniSectionParseFlag_Array);
-	const int count = min_i(pIniSection->count, pmru->iSize);
+	const int count = pIniSection->count;
+	const int size = pmru->iSize;
 
-	for (int i = 0, n = 0; i < count; i++) {
+	for (int i = 0, n = 0; i < count && n < size; i++) {
 		const IniKeyValueNode *node = &pIniSection->nodeList[i];
 		LPCWSTR tchItem = node->value;
 		if (StrNotEmpty(tchItem)) {
