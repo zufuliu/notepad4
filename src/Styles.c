@@ -262,14 +262,15 @@ void Style_Load(void) {
 	LoadIniSection(L"Custom Colors", pIniSectionBuf, cchIniSection);
 	IniSectionParseEx(pIniSection, pIniSectionBuf, IniSectionParseFlag_Array);
 
-	const int count = min_i(pIniSection->count, 16);
+	const int count = min_i(pIniSection->count, COUNTOF(crCustom));
 	for (int i = 0; i < count; i++) {
 		const IniKeyValueNode *node = &pIniSection->nodeList[i];
+		const UINT n = StrToInt(node->key) - 1;
 		LPCWSTR wch = node->value;
-		if (wch != NULL && *wch == L'#') {
+		if (n < COUNTOF(crCustom) && *wch == L'#') {
 			unsigned int irgb;
 			if (swscanf(wch + 1, L"%x", &irgb) == 1) {
-				crCustom[i] = RGB((irgb & 0xFF0000) >> 16, (irgb & 0xFF00) >> 8, irgb & 0xFF);
+				crCustom[n] = RGB((irgb & 0xFF0000) >> 16, (irgb & 0xFF00) >> 8, irgb & 0xFF);
 			}
 		}
 	}

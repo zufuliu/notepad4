@@ -1808,20 +1808,21 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) {
 	IniSectionInit(pIniSection, COUNTOF(tbbMainWnd));
 	LoadIniSection(L"Toolbar Labels", pIniSectionBuf, cchIniSection);
 	IniSectionParseEx(pIniSection, pIniSectionBuf, IniSectionParseFlag_Array);
+	const int count = pIniSection->count;
 
-	for (int n = 0; n < pIniSection->count; n++) {
-		const IniKeyValueNode *node = &pIniSection->nodeList[n];
-		const UINT i = StrToInt(node->key) - 1;
-		if (i >= COUNTOF(tbbMainWnd) || tbbMainWnd[i].fsStyle == TBSTYLE_SEP) {
+	for (int i = 0; i < count; i++) {
+		const IniKeyValueNode *node = &pIniSection->nodeList[i];
+		const UINT n = StrToInt(node->key) - 1;
+		if (n >= COUNTOF(tbbMainWnd) || tbbMainWnd[n].fsStyle == TBSTYLE_SEP) {
 			continue;
 		}
 
 		LPCWSTR tchDesc = node->value;
 		if (StrNotEmpty(tchDesc)) {
-			tbbMainWnd[i].iString = SendMessage(hwndToolbar, TB_ADDSTRING, 0, (LPARAM)tchDesc);
-			tbbMainWnd[i].fsStyle |= BTNS_AUTOSIZE | BTNS_SHOWTEXT;
+			tbbMainWnd[n].iString = SendMessage(hwndToolbar, TB_ADDSTRING, 0, (LPARAM)tchDesc);
+			tbbMainWnd[n].fsStyle |= BTNS_AUTOSIZE | BTNS_SHOWTEXT;
 		} else {
-			tbbMainWnd[i].fsStyle &= ~(BTNS_AUTOSIZE | BTNS_SHOWTEXT);
+			tbbMainWnd[n].fsStyle &= ~(BTNS_AUTOSIZE | BTNS_SHOWTEXT);
 		}
 	}
 
