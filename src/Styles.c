@@ -222,6 +222,9 @@ BOOL	bAutoSelect;
 int		cxStyleSelectDlg;
 int		cyStyleSelectDlg;
 
+// used in Style_ConfigDlg() to backup all styles
+#define MAX_TOTAL_EDIT_STYLE_COUNT		1024
+
 // Notepad2.c
 extern int	iEncoding;
 extern int	g_DOSEncoding;
@@ -234,7 +237,6 @@ extern BOOL	bHiliteCurrentLine;
 // Style_Load()
 //
 void Style_Load(void) {
-	unsigned int iLexer;
 	IniSection section;
 	WCHAR *pIniSectionBuf = NP2HeapAlloc(sizeof(WCHAR) * 32 * 1024);
 	const int cchIniSection = (int)NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR);
@@ -298,7 +300,7 @@ void Style_Load(void) {
 	cyStyleSelectDlg = IniSectionGetInt(pIniSection, L"SelectDlgSizeY", 0);
 	cyStyleSelectDlg = max_i(cyStyleSelectDlg, 324);
 
-	for (iLexer = 0; iLexer < NUMLEXERS; iLexer++) {
+	for (int iLexer = 0; iLexer < NUMLEXERS; iLexer++) {
 		PEDITLEXER lex = pLexArray[iLexer];
 		unsigned int i = 0;
 		LoadIniSection(lex->pszName, pIniSectionBuf, cchIniSection);
@@ -329,7 +331,6 @@ void Style_Load(void) {
 //	Style_Save()
 //
 void Style_Save(void) {
-	unsigned iLexer;
 	IniSectionOnSave section;
 	WCHAR *pIniSectionBuf = NP2HeapAlloc(sizeof(WCHAR) * 32 * 1024);
 	const int cchIniSection = (int)NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR);
@@ -372,7 +373,7 @@ void Style_Save(void) {
 		return;
 	}
 
-	for (iLexer = 0; iLexer < NUMLEXERS; iLexer++) {
+	for (int iLexer = 0; iLexer < NUMLEXERS; iLexer++) {
 		PEDITLEXER lex = pLexArray[iLexer];
 		unsigned int i = 0;
 		ZeroMemory(pIniSectionBuf, cchIniSection);
@@ -411,14 +412,13 @@ BOOL Style_Import(HWND hwnd) {
 					  | OFN_PATHMUSTEXIST | OFN_SHAREAWARE /*| OFN_NODEREFERENCELINKS*/;
 
 	if (GetOpenFileName(&ofn)) {
-		unsigned int iLexer;
 		IniSection section;
 		WCHAR *pIniSectionBuf = NP2HeapAlloc(sizeof(WCHAR) * 32 * 1024);
 		const int cchIniSection = (int)NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR);
 		IniSection *pIniSection = &section;
 
 		IniSectionInit(pIniSection, 128);
-		for (iLexer = 0; iLexer < NUMLEXERS; iLexer++) {
+		for (int iLexer = 0; iLexer < NUMLEXERS; iLexer++) {
 			PEDITLEXER lex = pLexArray[iLexer];
 			if (GetPrivateProfileSection(lex->pszName, pIniSectionBuf, cchIniSection, szFile)) {
 				if (!IniSectionParse(pIniSection, pIniSectionBuf)) {
@@ -467,13 +467,12 @@ BOOL Style_Export(HWND hwnd) {
 			| OFN_PATHMUSTEXIST | OFN_SHAREAWARE /*| OFN_NODEREFERENCELINKS*/ | OFN_OVERWRITEPROMPT;
 
 	if (GetSaveFileName(&ofn)) {
-		unsigned int iLexer;
 		IniSectionOnSave section;
 		WCHAR *pIniSectionBuf = NP2HeapAlloc(sizeof(WCHAR) * 32 * 1024);
 		const int cchIniSection = (int)NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR);
 		IniSectionOnSave *pIniSection = &section;
 
-		for (iLexer = 0; iLexer < NUMLEXERS; iLexer++) {
+		for (int iLexer = 0; iLexer < NUMLEXERS; iLexer++) {
 			PEDITLEXER lex = pLexArray[iLexer];
 			unsigned int i = 0;
 			pIniSection->next = pIniSectionBuf;
@@ -1670,7 +1669,7 @@ PEDITLEXER __fastcall Style_MatchLexer(LPCWSTR lpszMatch, BOOL bCheckNames) {
 			}
 		}
 	} else {
-		int cch = lstrlen(lpszMatch);
+		const int cch = lstrlen(lpszMatch);
 		if (cch >= 3) {
 			for (int i = 0; i < NUMLEXERS; i++) {
 				if (StrNCaseEqual(pLexArray[i]->pszName, lpszMatch, cch)) {
@@ -2076,21 +2075,13 @@ void Style_ToggleUse2ndDefault(HWND hwnd) {
 
 //=============================================================================
 //
-// Style_GetUse2ndDefault()
-//
-BOOL Style_GetUse2ndDefault(void) {
-	return bUse2ndDefaultStyle;
-}
-
-//=============================================================================
-//
 // Style_SetLongLineColors()
 //
 void Style_SetLongLineColors(HWND hwnd) {
 	int rgb;
 
 	// Use 2nd default style
-	int iIdx = (bUse2ndDefaultStyle) ? 12 : 0;
+	const int iIdx = (bUse2ndDefaultStyle) ? 12 : 0;
 
 	if (SendMessage(hwnd, SCI_GETEDGEMODE, 0, 0) == EDGE_LINE) {
 		if (Style_StrGetColor(TRUE, lexDefault.Styles[10 + iIdx].szValue, &rgb)) { // edge fore
@@ -2115,7 +2106,7 @@ void Style_SetCurrentLineBackground(HWND hwnd) {
 	int rgb, iValue;
 
 	// Use 2nd default style
-	int iIdx = (bUse2ndDefaultStyle) ? 12 : 0;
+	const int iIdx = (bUse2ndDefaultStyle) ? 12 : 0;
 
 	if (bHiliteCurrentLine) {
 		if (Style_StrGetColor(FALSE, lexDefault.Styles[8 + iIdx].szValue, &rgb)) { // caret line back
@@ -2214,9 +2205,6 @@ BOOL Style_StrGetCharSet(LPCWSTR lpszStyle, int *i) {
 		WCHAR tch[256];
 		int	 iValue;
 		lstrcpy(tch, p + CSTRLEN(L"charset:"));
-		if ((p = StrChr(tch, L';')) != NULL) {
-			*p = L'\0';
-		}
 		if (StrToIntEx(tch, STIF_DEFAULT, &iValue)) {
 			*i = iValue;
 			return TRUE;
@@ -2243,9 +2231,6 @@ BOOL Style_StrGetSizeEx(LPCWSTR lpszStyle, int *i) {
 		} else if (tch[0] == L'-') {
 			iSign = -1;
 			tch[0] = L' ';
-		}
-		if ((p = StrChr(tch, L';')) != NULL) {
-			*p = L'\0';
 		}
 		if (swscanf(tch, L"%f", &value) == 1) {
 			int iValue = (int)lroundf(value * SC_FONT_SIZE_MULTIPLIER);
@@ -2298,15 +2283,12 @@ BOOL Style_StrGetColor(BOOL bFore, LPCWSTR lpszStyle, int *rgb) {
 	if ((p = StrStr(lpszStyle, pItem)) != NULL) {
 		WCHAR tch[256];
 		int iValue;
-		lstrcpy(tch + 1, p + lstrlen(pItem));
+		lstrcpy(tch + 1, p + CSTRLEN("fore:"));
 		if (tch[1] != L'#') {
 			return FALSE;
 		}
 		tch[0] = L'0';
 		tch[1] = L'x';
-		if ((p = StrChr(tch, L';')) != NULL) {
-			*p = L'\0';
-		}
 		if (StrToIntEx(tch, STIF_SUPPORT_HEX, &iValue)) {
 			*rgb = RGB((iValue & 0xFF0000) >> 16, (iValue & 0xFF00) >> 8, iValue & 0xFF);
 			return TRUE;
@@ -2352,9 +2334,6 @@ BOOL Style_StrGetAlpha(LPCWSTR lpszStyle, int *i) {
 		WCHAR tch[256];
 		int	 iValue;
 		lstrcpy(tch, p + CSTRLEN(L"alpha:"));
-		if ((p = StrChr(tch, L';')) != NULL) {
-			*p = L'\0';
-		}
 		if (StrToIntEx(tch, STIF_DEFAULT, &iValue)) {
 			*i = clamp_i(iValue, SC_ALPHA_TRANSPARENT, SC_ALPHA_OPAQUE);
 			return TRUE;
@@ -2487,7 +2466,7 @@ BOOL Style_SelectFont(HWND hwnd, LPWSTR lpszStyle, int cchStyle, BOOL bDefaultSt
 // Style_SetDefaultFont()
 //
 void Style_SetDefaultFont(HWND hwnd) {
-	int iIdx = (bUse2ndDefaultStyle) ? 12 : 0;
+	const int iIdx = (bUse2ndDefaultStyle) ? 12 : 0;
 	if (Style_SelectFont(hwnd, lexDefault.Styles[0 + iIdx].szValue, COUNTOF(lexDefault.Styles[0].szValue), TRUE)) {
 		fStylesModified = TRUE;
 		Style_SetLexer(hwnd, pLexCurrent);
@@ -3289,16 +3268,16 @@ INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM
 // Style_ConfigDlg()
 //
 void Style_ConfigDlg(HWND hwnd) {
-	WCHAR *StyleBackup[1024];
-	int c, cItems, i, iLexer;
+	WCHAR *StyleBackup[MAX_TOTAL_EDIT_STYLE_COUNT];
+	int c, cItems;
 	BOOL changed = FALSE;
 
 	// Backup Styles
 	c = 0;
-	for (iLexer = 0; iLexer < NUMLEXERS; iLexer++) {
+	for (int iLexer = 0; iLexer < NUMLEXERS; iLexer++) {
 		PEDITLEXER lex = pLexArray[iLexer];
 		StyleBackup[c++] = StrDup(lex->szExtensions);
-		i = 0;
+		int i = 0;
 		while (lex->Styles[i].iStyle != -1) {
 			StyleBackup[c++] = StrDup(lex->Styles[i].szValue);
 			i++;
@@ -3313,10 +3292,10 @@ void Style_ConfigDlg(HWND hwnd) {
 										 (LPARAM)&StyleBackup)) {
 		// Restore Styles
 		c = 0;
-		for (iLexer = 0; iLexer < NUMLEXERS; iLexer++) {
+		for (int iLexer = 0; iLexer < NUMLEXERS; iLexer++) {
 			PEDITLEXER lex = pLexArray[iLexer];
 			lstrcpy(lex->szExtensions, StyleBackup[c++]);
-			i = 0;
+			int i = 0;
 			while (lex->Styles[i].iStyle != -1) {
 				lstrcpy(lex->Styles[i].szValue, StyleBackup[c++]);
 				i++;
