@@ -21,6 +21,11 @@
 #ifndef METAPATH_HELPERS_H_
 #define METAPATH_HELPERS_H_
 
+#if defined(__cplusplus)
+#undef NULL
+#define NULL	nullptr
+#endif
+
 #if (defined(__GNUC__) || defined(__clang__)) && !defined(__cplusplus)
 // https://stackoverflow.com/questions/19452971/array-size-macro-that-rejects-pointers
 // trigger error for pointer: GCC: void value not ignored as it ought to be. Clang: invalid operands to binary expression.
