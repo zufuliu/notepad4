@@ -196,15 +196,9 @@ static inline BOOL IniSectionIsEmpty(const IniSection *section) {
 	return section->count == 0;
 }
 
-#define IniSectionParseFlag_Default	0
-#define IniSectionParseFlag_Array	1
-
-BOOL IniSectionParseEx(IniSection *section, LPWSTR lpCachedIniSection, UINT flag);
+BOOL IniSectionParseArray(IniSection *section, LPWSTR lpCachedIniSection);
+BOOL IniSectionParse(IniSection *section, LPWSTR lpCachedIniSection);
 LPCWSTR IniSectionUnsafeGetValue(IniSection *section, LPCWSTR key, int keyLen);
-
-static inline BOOL IniSectionParse(IniSection *section, LPWSTR lpCachedIniSection) {
-	return IniSectionParseEx(section, lpCachedIniSection, IniSectionParseFlag_Default);
-}
 
 static inline LPCWSTR IniSectionGetValueImpl(IniSection *section, LPCWSTR key, int keyLen) {
 	return section->count ? IniSectionUnsafeGetValue(section, key, keyLen) : NULL;
