@@ -1701,7 +1701,6 @@ void EditModifyNumber(HWND hwnd, BOOL bIncrease) {
 				char chNumber[32] = "";
 				char chFormat[32] = "";
 				int	 iNumber;
-				unsigned uNumber;
 				int	 iWidth;
 				SendMessage(hwnd, SCI_GETSELTEXT, 0, (LPARAM)chNumber);
 
@@ -1709,7 +1708,7 @@ void EditModifyNumber(HWND hwnd, BOOL bIncrease) {
 					return;
 				}
 
-				if (!StrChrIA(chNumber, 'x') && sscanf(chNumber, "%d", &iNumber) == 1) {
+				if (!StrChrIA(chNumber, 'x') && StrToIntExA(chNumber, STIF_DEFAULT, &iNumber)) {
 					iWidth = lstrlenA(chNumber);
 					if (iNumber >= 0) {
 						if (bIncrease && iNumber < INT_MAX) {
@@ -1723,9 +1722,8 @@ void EditModifyNumber(HWND hwnd, BOOL bIncrease) {
 						SendMessage(hwnd, SCI_REPLACESEL, 0, (LPARAM)chNumber);
 						SendMessage(hwnd, SCI_SETSEL, iSelStart, iSelStart + lstrlenA(chNumber));
 					}
-				} else if (sscanf(chNumber, "%x", &uNumber) == 1) {
+				} else if (StrToIntExA(chNumber, STIF_SUPPORT_HEX, &iNumber)) {
 					BOOL bUppercase = FALSE;
-					iNumber = uNumber;
 					iWidth = lstrlenA(chNumber) - 2;
 					if (iNumber >= 0) {
 						if (bIncrease && iNumber < INT_MAX) {
@@ -6364,7 +6362,6 @@ BOOL FileVars_ParseInt(LPCSTR pszData, LPCSTR pszName, int *piValue) {
 
 	if (pvStart) {
 		char *pvEnd;
-		int	itok;
 
 		while (*pvStart && StrChrA(":=\"' \t", *pvStart)) {
 			pvStart++;
@@ -6379,8 +6376,7 @@ BOOL FileVars_ParseInt(LPCSTR pszData, LPCSTR pszName, int *piValue) {
 		*pvEnd = 0;
 		StrTrimA(tch, " \t:=\"'");
 
-		itok = sscanf(tch, "%i", piValue);
-		if (itok == 1) {
+		if (StrToIntExA(tch, STIF_DEFAULT, piValue)) {
 			return TRUE;
 		}
 
