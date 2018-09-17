@@ -266,10 +266,13 @@ void Style_Load(void) {
 	for (int i = 0; i < count; i++) {
 		const IniKeyValueNode *node = &pIniSection->nodeList[i];
 		const UINT n = StrToInt(node->key) - 1;
-		LPCWSTR wch = node->value;
+		LPWSTR wch = (LPWSTR)node->value;
 		if (n < COUNTOF(crCustom) && *wch == L'#') {
-			unsigned int irgb;
-			if (swscanf(wch + 1, L"%x", &irgb) == 1) {
+			int irgb;
+			*wch = L'x';
+			--wch;
+			*wch = L'0';
+			if (StrToIntEx(wch, STIF_SUPPORT_HEX, &irgb)) {
 				crCustom[n] = RGB((irgb & 0xFF0000) >> 16, (irgb & 0xFF00) >> 8, irgb & 0xFF);
 			}
 		}
@@ -2210,14 +2213,11 @@ BOOL Style_StrGetCharSet(LPCWSTR lpszStyle, int *i) {
 	if ((p = StrStr(lpszStyle, L"charset:")) != NULL) {
 		WCHAR tch[256];
 		int	 iValue;
-		int	 itok;
 		lstrcpy(tch, p + CSTRLEN(L"charset:"));
 		if ((p = StrChr(tch, L';')) != NULL) {
 			*p = L'\0';
 		}
-		TrimString(tch);
-		itok = swscanf(tch, L"%i", &iValue);
-		if (itok == 1) {
+		if (StrToIntEx(tch, STIF_DEFAULT, &iValue)) {
 			*i = iValue;
 			return TRUE;
 		}
@@ -2236,7 +2236,6 @@ BOOL Style_StrGetSizeEx(LPCWSTR lpszStyle, int *i) {
 		WCHAR tch[256];
 		float value;
 		int	 iSign = 0;
-		int	 itok;
 		lstrcpy(tch, p + CSTRLEN(L"size:"));
 		if (tch[0] == L'+') {
 			iSign = 1;
@@ -2248,9 +2247,7 @@ BOOL Style_StrGetSizeEx(LPCWSTR lpszStyle, int *i) {
 		if ((p = StrChr(tch, L';')) != NULL) {
 			*p = L'\0';
 		}
-		TrimString(tch);
-		itok = swscanf(tch, L"%f", &value);
-		if (itok == 1) {
+		if (swscanf(tch, L"%f", &value) == 1) {
 			int iValue = (int)lroundf(value * SC_FONT_SIZE_MULTIPLIER);
 			if (iSign != 0) {
 				iValue = iBaseFontSize + iValue*iSign;
@@ -2300,18 +2297,17 @@ BOOL Style_StrGetColor(BOOL bFore, LPCWSTR lpszStyle, int *rgb) {
 
 	if ((p = StrStr(lpszStyle, pItem)) != NULL) {
 		WCHAR tch[256];
-		unsigned int iValue;
-		int	itok;
-		lstrcpy(tch, p + lstrlen(pItem));
-		if (tch[0] == L'#') {
-			tch[0] = L' ';
+		int iValue;
+		lstrcpy(tch + 1, p + lstrlen(pItem));
+		if (tch[1] != L'#') {
+			return FALSE;
 		}
+		tch[0] = L'0';
+		tch[1] = L'x';
 		if ((p = StrChr(tch, L';')) != NULL) {
 			*p = L'\0';
 		}
-		TrimString(tch);
-		itok = swscanf(tch, L"%x", &iValue);
-		if (itok == 1) {
+		if (StrToIntEx(tch, STIF_SUPPORT_HEX, &iValue)) {
 			*rgb = RGB((iValue & 0xFF0000) >> 16, (iValue & 0xFF00) >> 8, iValue & 0xFF);
 			return TRUE;
 		}
@@ -2355,14 +2351,11 @@ BOOL Style_StrGetAlpha(LPCWSTR lpszStyle, int *i) {
 	if ((p = StrStr(lpszStyle, L"alpha:")) != NULL) {
 		WCHAR tch[256];
 		int	 iValue;
-		int	 itok;
 		lstrcpy(tch, p + CSTRLEN(L"alpha:"));
 		if ((p = StrChr(tch, L';')) != NULL) {
 			*p = L'\0';
 		}
-		TrimString(tch);
-		itok = swscanf(tch, L"%i", &iValue);
-		if (itok == 1) {
+		if (StrToIntEx(tch, STIF_DEFAULT, &iValue)) {
 			*i = clamp_i(iValue, SC_ALPHA_TRANSPARENT, SC_ALPHA_OPAQUE);
 			return TRUE;
 		}

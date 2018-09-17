@@ -125,8 +125,8 @@ BOOL IniSectionGetStringImpl(IniSection *section, LPCWSTR key, int keyLen, LPCWS
 
 int IniSectionGetIntImpl(IniSection *section, LPCWSTR key, int keyLen, int iDefault) {
 	LPCWSTR value = IniSectionGetValueImpl(section, key, keyLen);
-	if (value && (*value >= L'0' && *value <= L'9')) {
-		return StrToInt(value);
+	if (value && StrToIntEx(value, STIF_DEFAULT, &keyLen)) {
+		return keyLen;
 	}
 	return iDefault;
 }
@@ -941,7 +941,7 @@ int Toolbar_SetButtons(HWND hwnd, int cmdBase, LPCWSTR lpszButtons, LPCTBBUTTON 
 
 	p = tchButtons;
 	while (*p) {
-		if (swscanf(p, L"%i", &iCmd) == 1) {
+		if (StrToIntEx(p, STIF_DEFAULT, &iCmd)) {
 			iCmd = (iCmd == 0) ? 0 : iCmd + cmdBase - 1;
 			for (int i = 0; i < ctbb; i++) {
 				if (ptbb[i].idCommand == iCmd) {

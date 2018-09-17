@@ -230,3 +230,9 @@ BOOL StrTrimA(PSTR psz, PCSTR pszTrimChars);
 
 // https://docs.microsoft.com/en-us/windows/desktop/api/shlwapi/nf-shlwapi-strtrimw
 BOOL StrTrimW(PWSTR psz, PCWSTR pszTrimChars);
+
+// https://docs.microsoft.com/en-us/windows/desktop/api/shlwapi/nf-shlwapi-strtointexa
+BOOL StrToIntExA(PCSTR pszString, STIF_FLAGS dwFlags, int *piRet);
+
+// https://docs.microsoft.com/en-us/windows/desktop/api/shlwapi/nf-shlwapi-strtointexw
+BOOL StrToIntExW(PCWSTR pszString, STIF_FLAGS dwFlags, int *piRet);
