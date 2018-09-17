@@ -2397,6 +2397,7 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	CheckCmd(hmenu, IDM_SET_USE_INLINE_IME, bUseInlineIME);
 	CheckCmd(hmenu, IDM_SET_USE_BLOCK_CARET, bInlineIMEUseBlockCaret);
 
+	CheckCmd(hmenu, IDM_VIEW_NOSAVERECENT, bSaveRecentFiles);
 	CheckCmd(hmenu, IDM_VIEW_NOSAVEFINDREPL, bSaveFindReplace);
 	CheckCmd(hmenu, IDM_VIEW_SAVEBEFORERUNNINGTOOLS, bSaveBeforeRunningTools);
 
@@ -2430,6 +2431,7 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	EnableCmd(hmenu, IDM_VIEW_STICKYWINPOS, i);
 	EnableCmd(hmenu, IDM_VIEW_CLEARWINPOS, i);
 	EnableCmd(hmenu, IDM_VIEW_SINGLEFILEINSTANCE, i);
+	EnableCmd(hmenu, IDM_VIEW_NOSAVERECENT, i);
 	EnableCmd(hmenu, IDM_VIEW_NOSAVEFINDREPL, i);
 	EnableCmd(hmenu, IDM_VIEW_SAVESETTINGS, i);
 
@@ -4184,6 +4186,10 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case IDM_VIEW_SHOWEXCERPT:
 		EditGetExcerpt(hwndEdit, szTitleExcerpt, COUNTOF(szTitleExcerpt));
 		UpdateWindowTitle();
+		break;
+
+	case IDM_VIEW_NOSAVERECENT:
+		bSaveRecentFiles = !bSaveRecentFiles;
 		break;
 
 	case IDM_VIEW_NOSAVEFINDREPL:

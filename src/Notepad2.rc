@@ -533,8 +533,12 @@ BEGIN
             MENUITEM "&Minimize Notepad2",          IDM_VIEW_ESCMINIMIZE
             MENUITEM "E&xit Notepad2",              IDM_VIEW_ESCEXIT
         END
-        MENUITEM "Sa&ve Before Running Tools",  IDM_VIEW_SAVEBEFORERUNNINGTOOLS
-        MENUITEM "Remember S&earch Options",    IDM_VIEW_NOSAVEFINDREPL
+        POPUP "Other Settings"
+        BEGIN
+            MENUITEM "Remember Recent F&iles",      IDM_VIEW_NOSAVERECENT
+            MENUITEM "Remember S&earch Options",    IDM_VIEW_NOSAVEFINDREPL
+            MENUITEM "Sa&ve Before Running Tools",  IDM_VIEW_SAVEBEFORERUNNINGTOOLS
+        END
         MENUITEM SEPARATOR
         MENUITEM "Sh&ow Toolbar",               IDM_VIEW_TOOLBAR
         MENUITEM "C&ustomize Toolbar...",       IDM_VIEW_CUSTOMIZETB
