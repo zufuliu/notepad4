@@ -1,5 +1,6 @@
 // https://docs.microsoft.com/en-us/windows/desktop/Intl/security-considerations--international-features
 // https://docs.microsoft.com/en-us/windows/desktop/Intl/handling-sorting-in-your-applications
+// https://en.wikipedia.org/wiki/C_string_handling
 
 // https://docs.microsoft.com/en-us/windows/desktop/api/stringapiset/nf-stringapiset-comparestringordinal
 int CompareStringOrdinal(LPCWCH lpString1, int cchCount1, LPCWCH lpString2, int cchCount2, BOOL bIgnoreCase);

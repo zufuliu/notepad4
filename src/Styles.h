@@ -34,6 +34,7 @@
 
 extern PEDITLEXER pLexCurrent;
 extern int np2LexLangIndex;
+extern BOOL bUse2ndDefaultStyle;
 extern UINT8 currentLexKeywordAttr[NUMKEYWORD];
 
 BOOL IsDocWordChar(int ch);
@@ -63,7 +64,6 @@ void	Style_UpdateCaret(HWND hwnd);
 void	Style_SetLongLineColors(HWND hwnd);
 void	Style_SetCurrentLineBackground(HWND hwnd);
 void	Style_ToggleUse2ndDefault(HWND hwnd);
-BOOL	Style_GetUse2ndDefault(void);
 BOOL	Style_GetOpenDlgFilterStr(LPWSTR lpszFilter, int cchFilter);
 
 BOOL	Style_StrGetFont(LPCWSTR lpszStyle, LPWSTR lpszFont, int cchFont);

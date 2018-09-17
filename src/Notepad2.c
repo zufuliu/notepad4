@@ -2310,7 +2310,7 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	//EnableCmd(hmenu, IDM_VIEW_FOLD_LEVEL10, i && bShowCodeFolding);
 	CheckCmd(hmenu, IDM_VIEW_FOLDING, bShowCodeFolding);
 
-	CheckCmd(hmenu, IDM_VIEW_USE2NDDEFAULT, Style_GetUse2ndDefault());
+	CheckCmd(hmenu, IDM_VIEW_USE2NDDEFAULT, bUse2ndDefaultStyle);
 
 	CheckCmd(hmenu, IDM_VIEW_WORDWRAP, fWordWrap);
 	i = IDM_VIEW_FONTQUALITY_DEFAULT + iFontQuality;
