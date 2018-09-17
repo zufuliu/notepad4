@@ -5522,9 +5522,6 @@ void LoadSettings(void) {
 			efrData.fuFlags |= SCFIND_REGEXP | SCFIND_POSIX;
 		}
 		efrData.bTransformBS = IniSectionGetBool(pIniSection, L"FindReplaceTransformBackslash", 0);
-		efrData.bNoFindWrap = IniSectionGetBool(pIniSection, L"FindReplaceDontWrapRound", 0);
-		efrData.bFindClose = IniSectionGetBool(pIniSection, L"FindReplaceCloseAfterFind", 0);
-		efrData.bReplaceClose = IniSectionGetBool(pIniSection, L"FindReplaceCloseAfterReplace", 0);
 #ifdef BOOKMARK_EDITION
 		efrData.bWildcardSearch = IniSectionGetBool(pIniSection, L"FindReplaceWildcardSearch", 0);
 #endif
@@ -5711,16 +5708,13 @@ void SaveSettings(BOOL bSaveSettingsNow) {
 	IniSectionSetInt(pIniSection, L"FindReplaceDlgPosY", yFindReplaceDlg);
 
 	if (bSaveFindReplace) {
-		IniSectionSetBool(pIniSection, L"FindReplaceMatchCase", (efrData.fuFlags & SCFIND_MATCHCASE));
-		IniSectionSetBool(pIniSection, L"FindReplaceMatchWholeWorldOnly", (efrData.fuFlags & SCFIND_WHOLEWORD));
-		IniSectionSetBool(pIniSection, L"FindReplaceMatchBeginingWordOnly", (efrData.fuFlags & SCFIND_WORDSTART));
-		IniSectionSetBool(pIniSection, L"FindReplaceRegExpSearch", (efrData.fuFlags & (SCFIND_REGEXP | SCFIND_POSIX)));
-		IniSectionSetBool(pIniSection, L"FindReplaceTransformBackslash", efrData.bTransformBS);
-		IniSectionSetBool(pIniSection, L"FindReplaceDontWrapRound", efrData.bNoFindWrap);
-		IniSectionSetBool(pIniSection, L"FindReplaceCloseAfterFind", efrData.bFindClose);
-		IniSectionSetBool(pIniSection, L"FindReplaceCloseAfterReplace", efrData.bReplaceClose);
+		IniSectionSetBoolEx(pIniSection, L"FindReplaceMatchCase", (efrData.fuFlags & SCFIND_MATCHCASE), 0);
+		IniSectionSetBoolEx(pIniSection, L"FindReplaceMatchWholeWorldOnly", (efrData.fuFlags & SCFIND_WHOLEWORD), 0);
+		IniSectionSetBoolEx(pIniSection, L"FindReplaceMatchBeginingWordOnly", (efrData.fuFlags & SCFIND_WORDSTART), 0);
+		IniSectionSetBoolEx(pIniSection, L"FindReplaceRegExpSearch", (efrData.fuFlags & (SCFIND_REGEXP | SCFIND_POSIX)), 0);
+		IniSectionSetBoolEx(pIniSection, L"FindReplaceTransformBackslash", efrData.bTransformBS, 0);
 #ifdef BOOKMARK_EDITION
-		IniSectionSetBool(pIniSection, L"FindReplaceWildcardSearch", efrData.bWildcardSearch);
+		IniSectionSetBoolEx(pIniSection, L"FindReplaceWildcardSearch", efrData.bWildcardSearch, 0);
 #endif
 	}
 
