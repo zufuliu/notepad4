@@ -260,7 +260,7 @@ void Style_Load(void) {
 	crCustom[15] = RGB(0xB2, 0x8B, 0x40);
 
 	LoadIniSection(L"Custom Colors", pIniSectionBuf, cchIniSection);
-	IniSectionParseEx(pIniSection, pIniSectionBuf, IniSectionParseFlag_Array);
+	IniSectionParseArray(pIniSection, pIniSectionBuf);
 
 	const int count = min_i(pIniSection->count, COUNTOF(crCustom));
 	for (int i = 0; i < count; i++) {

@@ -45,7 +45,7 @@ void DLogf(const char *fmt, ...) {
 //
 // Manipulation of (cached) ini file sections
 //
-BOOL IniSectionParseEx(IniSection *section, LPWSTR lpCachedIniSection, UINT flag) {
+BOOL IniSectionParseArray(IniSection *section, LPWSTR lpCachedIniSection) {
 	IniSectionClear(section);
 	if (StrIsEmpty(lpCachedIniSection)) {
 		return FALSE;
@@ -55,38 +55,49 @@ BOOL IniSectionParseEx(IniSection *section, LPWSTR lpCachedIniSection, UINT flag
 	LPWSTR p = lpCachedIniSection;
 	int count = 0;
 
-	if (flag == IniSectionParseFlag_Array) {
-		do {
-			IniKeyValueNode *node = &section->nodeList[count];
-			LPWSTR v = StrChr(p, L'=');
-			*v++ = L'\0';
-			node->key = p;
-			node->value = v;
-			++count;
-			p = StrEnd(v) + 1;
-		} while (*p && count < capacity);
-		section->count = count;
-	} else {
-		do {
-			IniKeyValueNode *node = &section->nodeList[count];
-			LPWSTR v = StrChr(p, L'=');
-			*v++ = L'\0';
-			const UINT keyLen = (UINT)(v - p - 1);
-			node->hash = keyLen | (p[0] << 8) | (p[1] << 16);
-			node->key = p;
-			node->value = v;
-			++count;
-			p = StrEnd(v) + 1;
-		} while (*p && count < capacity);
+	do {
+		IniKeyValueNode *node = &section->nodeList[count];
+		LPWSTR v = StrChr(p, L'=');
+		*v++ = L'\0';
+		node->key = p;
+		node->value = v;
+		++count;
+		p = StrEnd(v) + 1;
+	} while (*p && count < capacity);
 
-		section->count = count;
-		section->head = &section->nodeList[0];
+	section->count = count;
+	return TRUE;
+}
+
+BOOL IniSectionParse(IniSection *section, LPWSTR lpCachedIniSection) {
+	IniSectionClear(section);
+	if (StrIsEmpty(lpCachedIniSection)) {
+		return FALSE;
+	}
+
+	const int capacity = section->capacity;
+	LPWSTR p = lpCachedIniSection;
+	int count = 0;
+
+	do {
+		IniKeyValueNode *node = &section->nodeList[count];
+		LPWSTR v = StrChr(p, L'=');
+		*v++ = L'\0';
+		const UINT keyLen = (UINT)(v - p - 1);
+		node->hash = keyLen | (p[0] << 8) | (p[1] << 16);
+		node->key = p;
+		node->value = v;
+		++count;
+		p = StrEnd(v) + 1;
+	} while (*p && count < capacity);
+
+	section->count = count;
+	section->head = &section->nodeList[0];
+	--count;
+	section->nodeList[count].next = NULL;
+	while (count != 0) {
+		section->nodeList[count - 1].next = &section->nodeList[count];
 		--count;
-		section->nodeList[count].next = NULL;
-		while (count != 0) {
-			section->nodeList[count - 1].next = &section->nodeList[count];
-			--count;
-		}
 	}
 	return TRUE;
 }
@@ -1737,7 +1748,7 @@ BOOL MRU_Load(LPMRULIST pmru) {
 	IniSectionInit(pIniSection, MRU_MAXITEMS);
 
 	LoadIniSection(pmru->szRegKey, pIniSectionBuf, cchIniSection);
-	IniSectionParseEx(pIniSection, pIniSectionBuf, IniSectionParseFlag_Array);
+	IniSectionParseArray(pIniSection, pIniSectionBuf);
 	const int count = pIniSection->count;
 	const int size = pmru->iSize;
 

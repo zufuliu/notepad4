@@ -917,7 +917,7 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) {
 
 	IniSectionInit(pIniSection, COUNTOF(tbbMainWnd));
 	LoadIniSection(L"Toolbar Labels", pIniSectionBuf, cbIniSection);
-	IniSectionParseEx(pIniSection, pIniSectionBuf, IniSectionParseFlag_Array);
+	IniSectionParseArray(pIniSection, pIniSectionBuf);
 	const int count = pIniSection->count;
 
 	for (int i = 0; i < count; i++) {
