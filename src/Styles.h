@@ -54,6 +54,9 @@ int		Style_GetEditLexerId(int lexer);
 int		Style_GetDocTypeLanguage(void);
 void	Style_UpdateLexerKeywords(PEDITLEXER pLexNew);
 void	Style_UpdateLexerKeywordAttr(PEDITLEXER pLexNew);
+#if NP2_GET_LEXER_STYLE_NAME_FROM_RES
+LPCWSTR Style_GetCurrentLexerDisplayName(LPWSTR lpszName, int cchName);
+#endif
 LPCWSTR Style_GetCurrentLexerName(void);
 void	Style_SetLexerByLangIndex(HWND hwnd, int lang);
 void	Style_UpdateSchemeMenu(HMENU hmenu);

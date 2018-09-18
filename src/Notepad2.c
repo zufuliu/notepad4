@@ -304,7 +304,10 @@ WCHAR	wchWndClass[16] = WC_NOTEPAD2;
 
 // rarely changed statusbar items
 struct CachedStatusItem {
-	WCHAR tchZoom[16];
+#if NP2_GET_LEXER_STYLE_NAME_FROM_RES
+	WCHAR tchLexerName[MAX_EDITLEXER_NAME_SIZE];
+#endif
+	WCHAR tchZoom[8];
 
 	LPCWSTR pszLexerName;
 	LPCWSTR pszEOLMode;
@@ -2027,7 +2030,11 @@ void MsgSize(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 void UpdateStatusBarCache(int item) {
 	switch (item) {
 	case STATUS_LEXER:
+#if NP2_GET_LEXER_STYLE_NAME_FROM_RES
+		cachedStatusItem.pszLexerName = Style_GetCurrentLexerDisplayName(cachedStatusItem.tchLexerName, MAX_EDITLEXER_NAME_SIZE);
+#else
 		cachedStatusItem.pszLexerName = Style_GetCurrentLexerName();
+#endif
 		cachedStatusItem.lexerNameChanged = TRUE;
 		UpdateStatusBarWidth();
 		break;
