@@ -82,7 +82,11 @@ BOOL IniSectionParse(IniSection *section, LPWSTR lpCachedIniSection) {
 	section->count = count;
 	section->head = &section->nodeList[0];
 	--count;
+#if IniSectionImplUseSentinelNode
+	section->nodeList[count].next = section->sentinel;
+#else
 	section->nodeList[count].next = NULL;
+#endif
 	while (count != 0) {
 		section->nodeList[count - 1].next = &section->nodeList[count];
 		--count;
@@ -98,6 +102,28 @@ LPCWSTR IniSectionUnsafeGetValue(IniSection *section, LPCWSTR key, int keyLen) {
 	const UINT hash = keyLen | (key[0] << 8) | (key[1] << 16);
 	IniKeyValueNode *node = section->head;
 	IniKeyValueNode *prev = NULL;
+#if IniSectionImplUseSentinelNode
+	section->sentinel->hash = hash;
+	do {
+		if (node->hash == hash) {
+			if (node == section->sentinel) {
+				return NULL;
+			}
+			if (StrEqual(node->key, key)) {
+				// remove the node
+				--section->count;
+				if (prev == NULL) {
+					section->head = node->next;
+				} else {
+					prev->next = node->next;
+				}
+				return node->value;
+			}
+		}
+		prev = node;
+		node = node->next;
+	} while (TRUE);
+#else
 	do {
 		if (node->hash == hash && StrEqual(node->key, key)) {
 			// remove the node
@@ -113,6 +139,7 @@ LPCWSTR IniSectionUnsafeGetValue(IniSection *section, LPCWSTR key, int keyLen) {
 		node = node->next;
 	} while (node);
 	return NULL;
+#endif
 }
 
 BOOL IniSectionGetStringImpl(IniSection *section, LPCWSTR key, int keyLen, LPCWSTR lpDefault, LPWSTR lpReturnedString, int cchReturnedString) {
