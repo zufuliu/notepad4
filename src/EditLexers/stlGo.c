@@ -33,7 +33,7 @@ static KEYWORDLIST Keywords_Go = {{
 , "", "", "", "", "", "", ""
 }};
 
-EDITLEXER lexGo = { SCLEX_CPP, NP2LEX_GO, EDITLEXER_HOLE, L"Go Source", L"go", L"", &Keywords_Go,
+EDITLEXER lexGo = { SCLEX_CPP, NP2LEX_GO, EDITLEXER_HOLE(L"Go Source"), L"go", L"", &Keywords_Go,
 {
 	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
 	{ SCE_C_WORD, NP2STYLE_Keyword, L"Keyword", L"fore:#0000FF", L"" },

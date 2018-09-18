@@ -239,7 +239,7 @@ static KEYWORDLIST Keywords_PHP = {{
 "__autoload() __call() __callStatic() __clone() __construct() __destruct() __get() __invoke()  __isset() __set() __set_state() __sleep() __toString() __unset() __wakeup() "
 }};
 
-EDITLEXER lexPHP = { SCLEX_CPP, NP2LEX_PHP, EDITLEXER_HOLE, L"PHP Script", L"php; phpt; phtml; eyecode", L"", &Keywords_PHP,
+EDITLEXER lexPHP = { SCLEX_CPP, NP2LEX_PHP, EDITLEXER_HOLE(L"PHP Script"), L"php; phpt; phtml; eyecode", L"", &Keywords_PHP,
 {
 	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
 	{ SCE_C_WORD, NP2STYLE_Keyword, L"Keyword", L"bold; fore:#FF8000", L"" },

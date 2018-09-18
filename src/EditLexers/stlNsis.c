@@ -23,7 +23,7 @@ static KEYWORDLIST Keywords_NSIS = {{
 , "", "", "", "", "", "", ""
 }};
 
-EDITLEXER lexNsis = { SCLEX_NSIS, NP2LEX_NSIS, EDITLEXER_HOLE, L"Nsis Setup Script", L"nsi; nsh", L"", &Keywords_NSIS,
+EDITLEXER lexNsis = { SCLEX_NSIS, NP2LEX_NSIS, EDITLEXER_HOLE(L"Nsis Setup Script"), L"nsi; nsh", L"", &Keywords_NSIS,
 {
 	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
 	{ SCE_C_WORD, NP2STYLE_Keyword, L"Keyword", L"fore:#0000FF", L"" },

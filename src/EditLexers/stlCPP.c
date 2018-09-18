@@ -435,7 +435,7 @@ static KEYWORDLIST Keywords_CPP = {{
 "__except^() __alignof() __declspec() __uuidof() "
 }};
 
-EDITLEXER lexCPP = { SCLEX_CPP, NP2LEX_CPP, EDITLEXER_HOLE, L"C/C++ Source", L"c; cpp; cxx; cc; h; hpp; hxx; hh; inl; pch; mm", L"", &Keywords_CPP,
+EDITLEXER lexCPP = { SCLEX_CPP, NP2LEX_CPP, EDITLEXER_HOLE(L"C/C++ Source"), L"c; cpp; cxx; cc; h; hpp; hxx; hh; inl; pch; mm", L"", &Keywords_CPP,
 {
 	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
 	{ MULTI_STYLE(SCE_C_WORD, SCE_C_2NDWORD, 0, 0), NP2STYLE_Keyword, L"Keyword", L"fore:#0000FF", L"" },

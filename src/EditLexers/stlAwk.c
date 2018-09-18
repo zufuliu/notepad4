@@ -33,7 +33,7 @@ static KEYWORDLIST Keywords_Awk = {{
 "for^() if^() switch^() while^() else^if^() else^{} "
 }};
 
-EDITLEXER lexAwk = { SCLEX_CPP, NP2LEX_AWK, EDITLEXER_HOLE, L"Awk Script", L"awk", L"", &Keywords_Awk,
+EDITLEXER lexAwk = { SCLEX_CPP, NP2LEX_AWK, EDITLEXER_HOLE(L"Awk Script"), L"awk", L"", &Keywords_Awk,
 {
 	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
 	{ SCE_C_WORD, NP2STYLE_Keyword, L"Keyword", L"fore:#0000FF", L"" },

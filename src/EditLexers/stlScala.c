@@ -38,7 +38,7 @@ static KEYWORDLIST Keywords_Scala = {{
 "for^() if^() switch^() while^() catch^() else^if^() else^{} "
 }};
 
-EDITLEXER lexScala = { SCLEX_CPP, NP2LEX_SCALA, EDITLEXER_HOLE, L"Scala Script", L"scala", L"", &Keywords_Scala,
+EDITLEXER lexScala = { SCLEX_CPP, NP2LEX_SCALA, EDITLEXER_HOLE(L"Scala Script"), L"scala", L"", &Keywords_Scala,
 {
 	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
 	{ SCE_C_WORD, NP2STYLE_Keyword, L"Keyword", L"fore:#0000FF", L"" },

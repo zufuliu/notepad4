@@ -2,8 +2,10 @@
 #define NOTEPAD2_EDITLEXER_H_
 
 #include <windows.h>
+#include <commctrl.h>
 #include "Scintilla.h"
 #include "SciLexer.h"
+#include "Helpers.h"
 
 #define	MULTI_STYLE(a, b, c, d)	((a) | ((b) << 8) | ((c) << 16) | ((d) << 24))
 #define	NUMKEYWORD				(KEYWORDSET_MAX + 1)
@@ -36,17 +38,18 @@ typedef struct _editlexer {
 	int iLexer;
 	int rid;
 	struct {
-		BOOL bStyleLoaded;
-		BOOL bStyleChanged;
+		UINT8 bStyleLoaded;
+		UINT8 bStyleChanged;
+		const int iNameLen;
+		LPCWSTR pszName;
 	};
-	LPCWSTR pszName;
 	LPCWSTR pszDefExt;
 	WCHAR	szExtensions[128];
 	PKEYWORDLIST	pKeyWords;
 	EDITSTYLE		Styles[];
 } EDITLEXER, *PEDITLEXER;
 
-#define EDITLEXER_HOLE	{ 0,  0 }
+#define EDITLEXER_HOLE(name)	{ 0,  0, CSTRLEN(name), (name) }
 
 // NP2LEX_, rid for EDITLEXER
 #define NP2LEX_DEFAULT	63000	// SCLEX_NULL		Default Text
