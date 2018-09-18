@@ -13,6 +13,11 @@
 #define MAX_EDITSTYLE_VALUE_SIZE	128
 #define MAX_EDITLEXER_EXT_SIZE		128
 
+// localization, get lexer and style name from resuorce
+#define NP2_GET_LEXER_STYLE_NAME_FROM_RES	0
+#define MAX_EDITLEXER_NAME_SIZE		128
+#define MAX_EDITSTYLE_NAME_SIZE		128
+
 typedef struct _editstyle {
 	union {
 		const INT32 iStyle;

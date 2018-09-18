@@ -1451,6 +1451,15 @@ PEDITLEXER Style_DetectObjCAndMatlab(void) {
 //
 // Style_GetCurrentLexerName()
 //
+#if NP2_GET_LEXER_STYLE_NAME_FROM_RES
+LPCWSTR Style_GetCurrentLexerDisplayName(LPWSTR lpszName, int cchName) {
+	if (GetString(pLexCurrent->rid, lpszName, cchName)) {
+		return lpszName;
+	}
+	return Style_GetCurrentLexerName();
+}
+#endif
+
 LPCWSTR Style_GetCurrentLexerName(void) {
 	if (np2LexLangIndex == 0) {
 		return pLexCurrent->pszName;
@@ -2719,8 +2728,9 @@ int Style_GetLexerIconId(PEDITLEXER pLex) {
 //
 HTREEITEM Style_AddLexerToTreeView(HWND hwnd, PEDITLEXER pLex) {
 	int i = 0;
+#if NP2_GET_LEXER_STYLE_NAME_FROM_RES
 	WCHAR tch[128];
-
+#endif
 	HTREEITEM hTreeNode;
 
 	TVINSERTSTRUCT tvis;
@@ -2729,11 +2739,15 @@ HTREEITEM Style_AddLexerToTreeView(HWND hwnd, PEDITLEXER pLex) {
 	tvis.hInsertAfter = TVI_LAST;
 
 	tvis.item.mask = TVIF_TEXT | TVIF_IMAGE | TVIF_SELECTEDIMAGE | TVIF_PARAM;
+#if NP2_GET_LEXER_STYLE_NAME_FROM_RES
 	if (GetString(pLex->rid, tch, COUNTOF(tch))) {
 		tvis.item.pszText = tch;
 	} else {
 		tvis.item.pszText = (WCHAR *)pLex->pszName;
 	}
+#else
+	tvis.item.pszText = (WCHAR *)pLex->pszName;
+#endif
 	tvis.item.iImage = Style_GetLexerIconId(pLex);
 	tvis.item.iSelectedImage = tvis.item.iImage;
 	tvis.item.lParam = (LPARAM)pLex;
@@ -2747,11 +2761,15 @@ HTREEITEM Style_AddLexerToTreeView(HWND hwnd, PEDITLEXER pLex) {
 	//tvis.item.iSelectedImage = -1;
 
 	while (pLex->Styles[i].iStyle != -1) {
+#if NP2_GET_LEXER_STYLE_NAME_FROM_RES
 		if (GetString(pLex->Styles[i].rid, tch, COUNTOF(tch))) {
 			tvis.item.pszText = tch;
 		} else {
 			tvis.item.pszText = (WCHAR *)pLex->Styles[i].pszName;
 		}
+#else
+		tvis.item.pszText = (WCHAR *)pLex->Styles[i].pszName;
+#endif
 		tvis.item.lParam = (LPARAM)(&pLex->Styles[i]);
 		TreeView_InsertItem(hwnd, &tvis);
 		i++;
@@ -2765,17 +2783,23 @@ HTREEITEM Style_AddLexerToTreeView(HWND hwnd, PEDITLEXER pLex) {
 // Style_AddLexerToListView()
 //
 void Style_AddLexerToListView(HWND hwnd, PEDITLEXER pLex) {
-	WCHAR tch[128];
+#if NP2_GET_LEXER_STYLE_NAME_FROM_RES
+	WCHAR tch[MAX_EDITLEXER_NAME_SIZE];
+#endif
 	LVITEM lvi;
 	ZeroMemory(&lvi, sizeof(LVITEM));
 
 	lvi.mask = LVIF_IMAGE | LVIF_PARAM | LVIF_TEXT;
 	lvi.iItem = ListView_GetItemCount(hwnd);
+#if NP2_GET_LEXER_STYLE_NAME_FROM_RES
 	if (GetString(pLex->rid, tch, COUNTOF(tch))) {
 		lvi.pszText = tch;
 	} else {
 		lvi.pszText = (WCHAR *)pLex->pszName;
 	}
+#else
+	lvi.pszText = (WCHAR *)pLex->pszName;
+#endif
 	lvi.iImage = Style_GetLexerIconId(pLex);
 	lvi.lParam = (LPARAM)pLex;
 
