@@ -10,6 +10,9 @@
 #define	MULTI_STYLE(a, b, c, d)	((a) | ((b) << 8) | ((c) << 16) | ((d) << 24))
 #define	NUMKEYWORD				(KEYWORDSET_MAX + 1)
 
+#define MAX_EDITSTYLE_VALUE_SIZE	128
+#define MAX_EDITLEXER_EXT_SIZE		128
+
 typedef struct _editstyle {
 	union {
 		const INT32 iStyle;
@@ -18,7 +21,7 @@ typedef struct _editstyle {
 	const int rid;
 	LPCWSTR const pszName;
 	LPCWSTR const pszDefault;
-	WCHAR szValue[128];
+	WCHAR szValue[MAX_EDITSTYLE_VALUE_SIZE];
 } EDITSTYLE, *PEDITSTYLE;
 
 #define EDITSTYLE_SENTINEL 		{ -1, 0, L"", L"", L"" }
@@ -44,7 +47,7 @@ typedef struct _editlexer {
 		LPCWSTR const pszName;
 	};
 	LPCWSTR const pszDefExt;
-	WCHAR szExtensions[128];
+	WCHAR szExtensions[MAX_EDITLEXER_EXT_SIZE];
 	const PKEYWORDLIST pKeyWords;
 	EDITSTYLE Styles[];
 } EDITLEXER, *PEDITLEXER;

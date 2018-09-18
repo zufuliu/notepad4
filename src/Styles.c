@@ -305,19 +305,19 @@ void Style_Load(void) {
 		unsigned int i = 0;
 		LoadIniSection(lex->pszName, pIniSectionBuf, cchIniSection);
 		if (!IniSectionParse(pIniSection, pIniSectionBuf)) {
-			lstrcpyn(lex->szExtensions, lex->pszDefExt, COUNTOF(lex->szExtensions));
+			lstrcpyn(lex->szExtensions, lex->pszDefExt, MAX_EDITLEXER_EXT_SIZE);
 			while (lex->Styles[i].iStyle != -1) {
-				lstrcpyn(lex->Styles[i].szValue, lex->Styles[i].pszDefault, COUNTOF(lex->Styles[i].szValue));
+				lstrcpyn(lex->Styles[i].szValue, lex->Styles[i].pszDefault, MAX_EDITSTYLE_VALUE_SIZE);
 				i++;
 			}
 			continue;
 		}
-		if (!IniSectionGetString(pIniSection, L"FileNameExtensions", lex->pszDefExt, lex->szExtensions, COUNTOF(lex->szExtensions))) {
-			lstrcpyn(lex->szExtensions, lex->pszDefExt, COUNTOF(lex->szExtensions));
+		if (!IniSectionGetString(pIniSection, L"FileNameExtensions", lex->pszDefExt, lex->szExtensions, MAX_EDITLEXER_EXT_SIZE)) {
+			lstrcpyn(lex->szExtensions, lex->pszDefExt, MAX_EDITLEXER_EXT_SIZE);
 		}
 		while (lex->Styles[i].iStyle != -1) {
 			IniSectionGetStringEx(pIniSection, lex->Styles[i].pszName, lex->Styles[i].pszDefault,
-								lex->Styles[i].szValue, COUNTOF(lex->Styles[i].szValue));
+								lex->Styles[i].szValue, MAX_EDITSTYLE_VALUE_SIZE);
 			i++;
 		}
 	}
@@ -425,12 +425,12 @@ BOOL Style_Import(HWND hwnd) {
 					continue;
 				}
 				unsigned int i = 0;
-				if (!IniSectionGetString(pIniSection, L"FileNameExtensions", lex->pszDefExt, lex->szExtensions, COUNTOF(lex->szExtensions))) {
-					lstrcpyn(lex->szExtensions, lex->pszDefExt,  COUNTOF(lex->szExtensions));
+				if (!IniSectionGetString(pIniSection, L"FileNameExtensions", lex->pszDefExt, lex->szExtensions, MAX_EDITLEXER_EXT_SIZE)) {
+					lstrcpyn(lex->szExtensions, lex->pszDefExt,  MAX_EDITLEXER_EXT_SIZE);
 				}
 				while (lex->Styles[i].iStyle != -1) {
 					IniSectionGetStringEx(pIniSection, lex->Styles[i].pszName, lex->Styles[i].pszDefault,
-										lex->Styles[i].szValue, COUNTOF(lex->Styles[i].szValue));
+										lex->Styles[i].szValue, MAX_EDITSTYLE_VALUE_SIZE);
 					i++;
 				}
 			}
@@ -787,8 +787,8 @@ void Style_SetLexer(HWND hwnd, PEDITLEXER pLexNew) {
 	iValue = 1;
 	if (Style_StrGetSize(lexDefault.Styles[7 + iIdx].szValue, &iValue)) {
 		WCHAR tch[32];
-		WCHAR wchStyle[COUNTOF(lexDefault.Styles[0].szValue)];
-		lstrcpyn(wchStyle, lexDefault.Styles[7 + iIdx].szValue, COUNTOF(lexDefault.Styles[0].szValue));
+		WCHAR wchStyle[MAX_EDITSTYLE_VALUE_SIZE];
+		lstrcpyn(wchStyle, lexDefault.Styles[7 + iIdx].szValue, MAX_EDITSTYLE_VALUE_SIZE);
 
 		iValue = clamp_i(iValue, 0, 5);
 		wsprintf(lexDefault.Styles[7 + iIdx].szValue, L"size:%i", iValue);
@@ -2465,7 +2465,7 @@ BOOL Style_SelectFont(HWND hwnd, LPWSTR lpszStyle, int cchStyle, BOOL bDefaultSt
 //
 void Style_SetDefaultFont(HWND hwnd) {
 	const int iIdx = (bUse2ndDefaultStyle) ? 12 : 0;
-	if (Style_SelectFont(hwnd, lexDefault.Styles[0 + iIdx].szValue, COUNTOF(lexDefault.Styles[0].szValue), TRUE)) {
+	if (Style_SelectFont(hwnd, lexDefault.Styles[0 + iIdx].szValue, MAX_EDITSTYLE_VALUE_SIZE, TRUE)) {
 		fStylesModified = TRUE;
 		Style_SetLexer(hwnd, pLexCurrent);
 	}
@@ -2825,7 +2825,7 @@ INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM
 		//TreeView_Expand(hwndTV, TreeView_GetRoot(hwndTV), TVE_EXPAND);
 		TreeView_Select(hwndTV, currentLex, TVGN_CARET);
 
-		SendDlgItemMessage(hwnd, IDC_STYLEEDIT, EM_LIMITTEXT, COUNTOF(lexDefault.Styles[0].szValue) - 1, 0);
+		SendDlgItemMessage(hwnd, IDC_STYLEEDIT, EM_LIMITTEXT, MAX_EDITSTYLE_VALUE_SIZE - 1, 0);
 
 		MakeBitmapButton(hwnd, IDC_PREVSTYLE, g_hInstance, IDB_PREV);
 		MakeBitmapButton(hwnd, IDC_NEXTSTYLE, g_hInstance, IDB_NEXT);
@@ -2858,9 +2858,9 @@ INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM
 			switch (lpnmtv->hdr.code) {
 			case TVN_SELCHANGED: {
 				if (pCurrentStyle) {
-					GetDlgItemText(hwnd, IDC_STYLEEDIT, pCurrentStyle->szValue, COUNTOF(pCurrentStyle->szValue));
+					GetDlgItemText(hwnd, IDC_STYLEEDIT, pCurrentStyle->szValue, MAX_EDITSTYLE_VALUE_SIZE);
 				} else if (pCurrentLexer) {
-					if (!GetDlgItemText(hwnd, IDC_STYLEEDIT, pCurrentLexer->szExtensions, COUNTOF(pCurrentLexer->szExtensions))) {
+					if (!GetDlgItemText(hwnd, IDC_STYLEEDIT, pCurrentLexer->szExtensions, MAX_EDITLEXER_EXT_SIZE)) {
 						lstrcpy(pCurrentLexer->szExtensions, pCurrentLexer->pszDefExt);
 					}
 				}
@@ -2961,7 +2961,7 @@ INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM
 				//HIMAGELIST himl;
 
 				//if (pCurrentStyle)
-				//	GetDlgItemText(hwnd, IDC_STYLEEDIT, pCurrentStyle->szValue, COUNTOF(pCurrentStyle->szValue));
+				//	GetDlgItemText(hwnd, IDC_STYLEEDIT, pCurrentStyle->szValue, MAX_EDITSTYLE_VALUE_SIZE);
 				TreeView_Select(hwndTV, lpnmtv->itemNew.hItem, TVGN_CARET);
 
 				//himl = TreeView_CreateDragImage(hwndTV, lpnmtv->itemNew.hItem);
@@ -3190,9 +3190,9 @@ INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM
 			hwndTV = GetDlgItem(hwnd, IDC_STYLELIST);
 
 			if (pCurrentStyle) {
-				GetDlgItemText(hwnd, IDC_STYLEEDIT, pCurrentStyle->szValue, COUNTOF(pCurrentStyle->szValue));
+				GetDlgItemText(hwnd, IDC_STYLEEDIT, pCurrentStyle->szValue, MAX_EDITSTYLE_VALUE_SIZE);
 			} else if (pCurrentLexer) {
-				if (!GetDlgItemText(hwnd, IDC_STYLEEDIT, pCurrentLexer->szExtensions, COUNTOF(pCurrentLexer->szExtensions))) {
+				if (!GetDlgItemText(hwnd, IDC_STYLEEDIT, pCurrentLexer->szExtensions, MAX_EDITLEXER_EXT_SIZE)) {
 					lstrcpy(pCurrentLexer->szExtensions, pCurrentLexer->pszDefExt);
 				}
 			}
@@ -3212,9 +3212,9 @@ INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM
 
 		case IDC_EXPORT: {
 			if (pCurrentStyle) {
-				GetDlgItemText(hwnd, IDC_STYLEEDIT, pCurrentStyle->szValue, COUNTOF(pCurrentStyle->szValue));
+				GetDlgItemText(hwnd, IDC_STYLEEDIT, pCurrentStyle->szValue, MAX_EDITSTYLE_VALUE_SIZE);
 			} else if (pCurrentLexer) {
-				if (!GetDlgItemText(hwnd, IDC_STYLEEDIT, pCurrentLexer->szExtensions, COUNTOF(pCurrentLexer->szExtensions))) {
+				if (!GetDlgItemText(hwnd, IDC_STYLEEDIT, pCurrentLexer->szExtensions, MAX_EDITLEXER_EXT_SIZE)) {
 					lstrcpy(pCurrentLexer->szExtensions, pCurrentLexer->pszDefExt);
 				}
 			}
@@ -3225,9 +3225,9 @@ INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM
 
 		case IDC_PREVIEW: {
 			if (pCurrentStyle) {
-				GetDlgItemText(hwnd, IDC_STYLEEDIT, pCurrentStyle->szValue, COUNTOF(pCurrentStyle->szValue));
+				GetDlgItemText(hwnd, IDC_STYLEEDIT, pCurrentStyle->szValue, MAX_EDITSTYLE_VALUE_SIZE);
 			} else if (pCurrentLexer) {
-				if (!GetDlgItemText(hwnd, IDC_STYLEEDIT, pCurrentLexer->szExtensions, COUNTOF(pCurrentLexer->szExtensions))) {
+				if (!GetDlgItemText(hwnd, IDC_STYLEEDIT, pCurrentLexer->szExtensions, MAX_EDITLEXER_EXT_SIZE)) {
 					lstrcpy(pCurrentLexer->szExtensions, pCurrentLexer->pszDefExt);
 				}
 			}
@@ -3238,9 +3238,9 @@ INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM
 
 		case IDOK:
 			if (pCurrentStyle) {
-				GetDlgItemText(hwnd, IDC_STYLEEDIT, pCurrentStyle->szValue, COUNTOF(pCurrentStyle->szValue));
+				GetDlgItemText(hwnd, IDC_STYLEEDIT, pCurrentStyle->szValue, MAX_EDITSTYLE_VALUE_SIZE);
 			} else if (pCurrentLexer) {
-				if (!GetDlgItemText(hwnd, IDC_STYLEEDIT, pCurrentLexer->szExtensions, COUNTOF(pCurrentLexer->szExtensions))) {
+				if (!GetDlgItemText(hwnd, IDC_STYLEEDIT, pCurrentLexer->szExtensions, MAX_EDITLEXER_EXT_SIZE)) {
 					lstrcpy(pCurrentLexer->szExtensions, pCurrentLexer->pszDefExt);
 				}
 			}
