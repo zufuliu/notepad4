@@ -41,7 +41,7 @@ static KEYWORDLIST Keywords_RC = {{
 "defined() code_page() __has_include() "
 }};
 
-EDITLEXER lexRC = { SCLEX_CPP, NP2LEX_RC, EDITLEXER_HOLE, L"Resource Script", L"rc; rc2; rct; rh; dlg", L"", &Keywords_RC,
+EDITLEXER lexRC = { SCLEX_CPP, NP2LEX_RC, EDITLEXER_HOLE(L"Resource Script"), L"rc; rc2; rct; rh; dlg", L"", &Keywords_RC,
 {
 	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
 	{ SCE_C_WORD, NP2STYLE_Keyword, L"Keyword", L"fore:#0000FF", L"" },

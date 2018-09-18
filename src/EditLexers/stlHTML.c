@@ -128,7 +128,7 @@ static KEYWORDLIST Keywords_HTML = {{
 , "", "", "", "", "", "", ""
 }};
 
-EDITLEXER lexHTML = { SCLEX_HTML, NP2LEX_HTML, EDITLEXER_HOLE, L"Web Source Code", L"html; htm; shtml; xhtml; asp; aspx; jsp; mht; htd; htt; hta; htc; cfm; tpl; jd", L"", &Keywords_HTML,
+EDITLEXER lexHTML = { SCLEX_HTML, NP2LEX_HTML, EDITLEXER_HOLE(L"Web Source Code"), L"html; htm; shtml; xhtml; asp; aspx; jsp; mht; htd; htt; hta; htc; cfm; tpl; jd", L"", &Keywords_HTML,
 {
 	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
 	{ MULTI_STYLE(SCE_H_TAG, SCE_H_TAGEND, 0, 0), 63161, L"HTML Tag", L"fore:#648000", L"" },

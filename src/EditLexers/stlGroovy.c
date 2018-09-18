@@ -42,7 +42,7 @@ static KEYWORDLIST Keywords_Groovy = {{
 "def^() "
 }};
 
-EDITLEXER lexGroovy = { SCLEX_CPP, NP2LEX_GROOVY, EDITLEXER_HOLE, L"Groovy Script", L"groovy; gvy; gy; gsh; gpp; grunit", L"", &Keywords_Groovy,
+EDITLEXER lexGroovy = { SCLEX_CPP, NP2LEX_GROOVY, EDITLEXER_HOLE(L"Groovy Script"), L"groovy; gvy; gy; gsh; gpp; grunit", L"", &Keywords_Groovy,
 {
 	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
 	{ SCE_C_WORD, NP2STYLE_Keyword, L"Keyword", L"fore:#0000FF", L"" },

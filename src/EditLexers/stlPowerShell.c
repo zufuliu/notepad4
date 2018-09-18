@@ -64,7 +64,7 @@ static KEYWORDLIST Keywords_PS1 = {{
 , "", "", "", "", "", "", ""
 }};
 
-EDITLEXER lexPS1 = { SCLEX_POWERSHELL, NP2LEX_PS1, EDITLEXER_HOLE, L"PowerShell Script", L"ps1; psc1; psd1; psm1", L"", &Keywords_PS1,
+EDITLEXER lexPS1 = { SCLEX_POWERSHELL, NP2LEX_PS1, EDITLEXER_HOLE(L"PowerShell Script"), L"ps1; psc1; psd1; psm1", L"", &Keywords_PS1,
 {
 	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
 	{ MULTI_STYLE(SCE_POWERSHELL_COMMENT, SCE_POWERSHELL_COMMENTSTREAM, 0, 0), NP2STYLE_Comment, L"Comment", L"fore:#608060", L"" },

@@ -118,7 +118,7 @@ static KEYWORDLIST Keywords_Smail = {{
 , "", "", "", ""
 }};
 
-EDITLEXER lexSmali = { SCLEX_SMALI, NP2LEX_SMALI, EDITLEXER_HOLE, L"Android Smali", L"smali; ddx", L"", &Keywords_Smail,
+EDITLEXER lexSmali = { SCLEX_SMALI, NP2LEX_SMALI, EDITLEXER_HOLE(L"Android Smali"), L"smali; ddx", L"", &Keywords_Smail,
 {
 	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
 	{ SCE_SMALI_WORD, NP2STYLE_Keyword, L"Keyword", L"fore:#0000FF", L"" },

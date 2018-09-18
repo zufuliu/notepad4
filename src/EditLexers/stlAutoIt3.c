@@ -113,7 +113,7 @@ static KEYWORDLIST Keywords_AU3 = {{
 , "", "", "", "", "", "", ""
 }};
 
-EDITLEXER lexAU3 = { SCLEX_AU3, NP2LEX_AU3, EDITLEXER_HOLE, L"AutoIt3 Script", L"au3", L"", &Keywords_AU3,
+EDITLEXER lexAU3 = { SCLEX_AU3, NP2LEX_AU3, EDITLEXER_HOLE(L"AutoIt3 Script"), L"au3", L"", &Keywords_AU3,
 {
 	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
 	{ SCE_AU3_KEYWORD, NP2STYLE_Keyword, L"Keyword", L"fore:#0000FF", L"" },

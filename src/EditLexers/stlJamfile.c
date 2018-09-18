@@ -27,7 +27,7 @@ static KEYWORDLIST Keywords_JAM = {{
 , "", "", "", "", "", "", ""
 }};
 
-EDITLEXER lexJAM = { SCLEX_CPP, NP2LEX_JAM, EDITLEXER_HOLE, L"Jamfile", L"jam", L"", &Keywords_JAM,
+EDITLEXER lexJAM = { SCLEX_CPP, NP2LEX_JAM, EDITLEXER_HOLE(L"Jamfile"), L"jam", L"", &Keywords_JAM,
 {
 	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
 	{ SCE_C_WORD, NP2STYLE_Keyword, L"Keyword", L"fore:#0000FF", L"" },

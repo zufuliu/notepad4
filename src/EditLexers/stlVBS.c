@@ -55,7 +55,7 @@ static KEYWORDLIST Keywords_VBS = {{
 }};
 
 
-EDITLEXER lexVBS = { SCLEX_VBSCRIPT, NP2LEX_VBS, EDITLEXER_HOLE, L"VBScript", L"vbs; dsm", L"", &Keywords_VBS,
+EDITLEXER lexVBS = { SCLEX_VBSCRIPT, NP2LEX_VBS, EDITLEXER_HOLE(L"VBScript"), L"vbs; dsm", L"", &Keywords_VBS,
 {
 	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
 	{ SCE_B_KEYWORD, NP2STYLE_Keyword, L"Keyword", L"fore:#0000FF", L"" },
