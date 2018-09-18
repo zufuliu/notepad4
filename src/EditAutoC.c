@@ -857,7 +857,7 @@ const char *EditKeywordIndent(const char *head, int *indent) {
 			*indent = 1;
 		} else if (!strcmp(word, "if") || !strcmp(word, "for") || !strcmp(word, "while") || !strcmp(word, "switch") || !strcmp(word, "try")) {
 			*indent = 2;
-			if (pLexCurrent->rid == NP2LEX_OCTAVE) {
+			if (pLexCurrent->rid == NP2LEX_OCTAVE || np2LexLangIndex == IDM_LANG_OCTAVE) {
 				if (strcmp(word, "if") == 0) {
 					endPart = "endif";
 				} else if (strcmp(word, "for") == 0) {
@@ -1218,7 +1218,7 @@ void EditToggleCommentLine(HWND hwnd) {
 	case SCLEX_MATLAB:
 		if (pLexCurrent->rid == NP2LEX_JULIA) {
 			EditToggleLineComments(hwnd, L"#", FALSE);
-		} else if (pLexCurrent->rid == NP2LEX_SCILAB) {
+		} else if (pLexCurrent->rid == NP2LEX_SCILAB || np2LexLangIndex == IDM_LANG_SCILAB) {
 			EditToggleLineComments(hwnd, L"//", FALSE);
 		} else {
 			EditToggleLineComments(hwnd, L"%", FALSE);
@@ -1306,7 +1306,7 @@ void EditToggleCommentBlock(HWND hwnd) {
 	case SCLEX_MATLAB:
 		if (pLexCurrent->rid == NP2LEX_JULIA) {
 			EditEncloseSelectionNewLine(hwnd, L"#=", L"=#");
-		} else if (pLexCurrent->rid == NP2LEX_SCILAB) {
+		} else if (pLexCurrent->rid == NP2LEX_SCILAB || np2LexLangIndex == IDM_LANG_SCILAB) {
 			EditEncloseSelectionNewLine(hwnd, L"/*", L"*/");
 		} else {
 			EditEncloseSelectionNewLine(hwnd, L"%{", L"%}");
