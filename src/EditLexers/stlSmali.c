@@ -121,7 +121,6 @@ static KEYWORDLIST Keywords_Smail = {{
 EDITLEXER lexSmali = { SCLEX_SMALI, NP2LEX_SMALI, EDITLEXER_HOLE, L"Android Smali", L"smali; ddx", L"", &Keywords_Smail,
 {
 	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
-	//{ SCE_SMALI_DEFAULT, L"Default", L"", L"" },
 	{ SCE_SMALI_WORD, NP2STYLE_Keyword, L"Keyword", L"fore:#0000FF", L"" },
 	{ SCE_SMALI_DIRECTIVE, NP2STYLE_Directive, L"Directive", L"fore:#FF8000", L"" },
 	{ SCE_SMALI_INSTRUCTION, NP2STYLE_Instruction, L"Instruction", L"fore:#0080FF", L"" },
@@ -134,6 +133,6 @@ EDITLEXER lexSmali = { SCLEX_SMALI, NP2LEX_SMALI, EDITLEXER_HOLE, L"Android Smal
 	{ MULTI_STYLE(SCE_SMALI_LABEL, SCE_SMALI_LABEL_EOL, 0, 0), NP2STYLE_Label, L"Label", L"fore:#000000; back:#FFC040; eolfilled", L""},
 	{ SCE_SMALI_NUMBER, NP2STYLE_Number, L"Number", L"fore:#FF0000", L"" },
 	{ SCE_SMALI_OPERATOR, NP2STYLE_Operator, L"Operator", L"fore:#B000B0", L"" },
-	{ -1, 00000, L"", L"", L"" }
+	EDITSTYLE_SENTINEL
 }
 };

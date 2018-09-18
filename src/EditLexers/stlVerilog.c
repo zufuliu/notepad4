@@ -25,7 +25,6 @@ static KEYWORDLIST Keywords_Verilog = {{
 EDITLEXER lexVerilog = { SCLEX_VERILOG, NP2LEX_VERILOG, EDITLEXER_HOLE, L"Verilog HDL Source", L"v; vl", L"", &Keywords_Verilog,
 {
 	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
-	// { SCE_V_DEFAULT, L"Default", L"", L"" },
 	{ SCE_V_WORD, NP2STYLE_Keyword, L"Keyword", L"fore:#0000FF", L"" },
 	{ SCE_V_WORD2, 63586, L"System Task and Function", L"fore:#0080FF", L"" },
 	{ MULTI_STYLE(SCE_V_COMMENT, SCE_V_COMMENTLINE, SCE_V_COMMENTLINEBANG, 0), NP2STYLE_Comment, L"Comment", L"fore:#608060", L"" },
@@ -34,6 +33,6 @@ EDITLEXER lexVerilog = { SCLEX_VERILOG, NP2LEX_VERILOG, EDITLEXER_HOLE, L"Verilo
 	{ SCE_V_OPERATOR, NP2STYLE_Operator, L"Operator", L"fore:#B000B0", L"" },
 	{ SCE_V_PREPROCESSOR, NP2STYLE_Preprocessor, L"Preprocessor", L"fore:#FF8000", L"" },
 	{ SCE_V_USER, 63585, L"User Define", L"fore:#B5E71F", L"" },
-	{ -1, 00000, L"", L"", L"" }
+	EDITSTYLE_SENTINEL
 }
 };

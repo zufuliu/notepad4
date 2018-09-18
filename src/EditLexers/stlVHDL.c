@@ -46,7 +46,6 @@ static KEYWORDLIST Keywords_VHDL = {{
 EDITLEXER lexVHDL = { SCLEX_VHDL, NP2LEX_VHDL, EDITLEXER_HOLE, L"VHDL Source", L"vhd; vhdl", L"", &Keywords_VHDL,
 {
 	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
-	// { SCE_VHDL_DEFAULT, L"Default", L"", L"" },
 	{ SCE_VHDL_KEYWORD, NP2STYLE_Keyword, L"Keyword", L"fore:#0000FF", L"" },
 	{ MULTI_STYLE(SCE_VHDL_COMMENT, SCE_VHDL_COMMENTLINEBANG, SCE_VHDL_BLOCK_COMMENT, 0), NP2STYLE_Comment, L"Comment", L"fore:#608060", L"" },
 	{ SCE_VHDL_STRING, NP2STYLE_String, L"String", L"fore:#008000", L"" },
@@ -58,6 +57,6 @@ EDITLEXER lexVHDL = { SCLEX_VHDL, NP2LEX_VHDL, EDITLEXER_HOLE, L"VHDL Source", L
 	{ SCE_VHDL_STDFUNCTION, 63583, L"STD Function", L"bold; fore:#0080C0", L"" },
 	{ SCE_VHDL_STDTYPE, 63584, L"STD Type", L"bold; fore:#FF8000", L"" },
 	{ SCE_VHDL_USERWORD, 63585, L"User Define", L"fore:#B5E71F", L"" },
-	{ -1, 00000, L"", L"", L"" }
+	EDITSTYLE_SENTINEL
 }
 };

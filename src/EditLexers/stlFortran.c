@@ -19,7 +19,6 @@ static KEYWORDLIST Keywords_Fortran = {{
 EDITLEXER lexFortran = { SCLEX_FORTRAN, NP2LEX_FORTRAN, EDITLEXER_HOLE, L"Fortran Source", L"f; for; ftn; fpp; f90; f95; f03; f08; hf", L"", &Keywords_Fortran,
 {
 	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
-	//{ SCE_F_DEFAULT, L"Default", L"", L"" },
 	{ SCE_F_WORD, NP2STYLE_Keyword, L"Keyword", L"fore:#0000FF", L"" },
 	{ SCE_F_WORD2, NP2STYLE_BasicFunction, L"Basic Function", L"fore:#0080FF", L"" },
 	{ SCE_F_COMMENT, NP2STYLE_Comment, L"Comment", L"fore:#608060", L"" },
@@ -27,6 +26,6 @@ EDITLEXER lexFortran = { SCLEX_FORTRAN, NP2LEX_FORTRAN, EDITLEXER_HOLE, L"Fortra
 	{ SCE_F_NUMBER, NP2STYLE_Number, L"Number", L"fore:#FF0000", L"" },
 	{ MULTI_STYLE(SCE_F_OPERATOR, SCE_F_OPERATOR2, 0, 0), NP2STYLE_Operator, L"Operator", L"fore:#B000B0", L"" },
 	{ SCE_F_PREPROCESSOR, NP2STYLE_Preprocessor, L"Preprocessor", L"fore:#FF8000", L"" },
-	{ -1, 00000, L"", L"", L"" }
+	EDITSTYLE_SENTINEL
 }
 };

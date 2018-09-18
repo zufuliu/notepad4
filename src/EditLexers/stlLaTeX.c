@@ -26,7 +26,7 @@ EDITLEXER lexLaTeX = { SCLEX_LATEX, NP2LEX_LATEX, EDITLEXER_HOLE, L"LaTeX File",
 	{ MULTI_STYLE(SCE_L_VERBATIM, SCE_L_VERBATIM2, 0, 0), 63577, L"Verbatim Segment", L"fore:#666666", L"" },
 	{ SCE_L_LISTCODE, 63578, L"List Code", L"fore:#808080", L"" },
 	{ SCE_L_OPERATOR, NP2STYLE_Operator, L"Operator", L"fore:#B000B0", L"" },
-	{ -1, 00000, L"", L"", L"" }
+	EDITSTYLE_SENTINEL
 }
 };
 
@@ -72,6 +72,6 @@ EDITLEXER lexTexinfo = { SCLEX_TEXINFO, NP2LEX_TEXINFO, EDITLEXER_HOLE, L"Texinf
 	{ MULTI_STYLE(SCE_L_SECTION, SCE_L_SECTION1, SCE_L_SECTION2, 0), 63511, L"Section", L"back:#FF8040; eolfilled", L"" },
 	{ SCE_L_SPECIAL, 63572, L"Special Char", L"fore:#3A6EA5", L"" },
 	{ SCE_L_OPERATOR, NP2STYLE_Operator, L"Operator", L"fore:#B000B0", L"" },
-	{ -1, 00000, L"", L"", L"" }
+	EDITSTYLE_SENTINEL
 }
 };

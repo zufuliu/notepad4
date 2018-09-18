@@ -58,7 +58,6 @@ static KEYWORDLIST Keywords_VBS = {{
 EDITLEXER lexVBS = { SCLEX_VBSCRIPT, NP2LEX_VBS, EDITLEXER_HOLE, L"VBScript", L"vbs; dsm", L"", &Keywords_VBS,
 {
 	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
-	//{ SCE_B_DEFAULT, L"Default", L"", L"" },
 	{ SCE_B_KEYWORD, NP2STYLE_Keyword, L"Keyword", L"fore:#0000FF", L"" },
 	{ SCE_B_KEYWORD2, NP2STYLE_TypeKeyword, L"Type Keyword", L"fore:#0000FF", L"" },
 	{ SCE_B_CONSTANT, NP2STYLE_Constant, L"Constant", L"fore:#B000B0", L""},
@@ -67,6 +66,6 @@ EDITLEXER lexVBS = { SCLEX_VBSCRIPT, NP2LEX_VBS, EDITLEXER_HOLE, L"VBScript", L"
 	{ SCE_B_LABEL, NP2STYLE_Label, L"Label", L"fore:#000000; back:#FFC040", L""},
 	{ SCE_B_NUMBER, NP2STYLE_Number, L"Number", L"fore:#FF0000", L"" },
 	{ SCE_B_OPERATOR, NP2STYLE_Operator, L"Operator", L"fore:#B000B0", L"" },
-	{ -1, 00000, L"", L"", L"" }
+	EDITSTYLE_SENTINEL
 }
 };

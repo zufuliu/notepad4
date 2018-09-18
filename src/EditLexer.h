@@ -19,6 +19,8 @@ typedef struct _editstyle {
 	WCHAR	szValue[128];
 } EDITSTYLE, *PEDITSTYLE;
 
+#define EDITSTYLE_SENTINEL 		{ -1, 0, L"", L"", L"" }
+
 // Not used by Scintilla lexer, listed for auto completion.
 #define KeywordAttr_NoLexer		1
 // Convert to lower case before pass to Scintilla.

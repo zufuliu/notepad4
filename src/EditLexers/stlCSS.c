@@ -66,7 +66,6 @@ static KEYWORDLIST Keywords_CSS = {{
 EDITLEXER lexCSS = { SCLEX_CSS, NP2LEX_CSS, EDITLEXER_HOLE, L"CSS Style Sheet", L"css; scss; less; hss", L"", &Keywords_CSS,
 {
 	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
-	//{ SCE_CSS_DEFAULT, L"Default", L"", L"" },
 	{ SCE_CSS_COMMENT, NP2STYLE_Comment, L"Comment", L"fore:#608060", L"" },
 	{ SCE_CSS_TAG, 63161, L"HTML Tag", L"bold; fore:#0A246A", L"" },
 	{ SCE_CSS_CLASS, 63301, L"Tag Class", L"fore:#648000", L"" },
@@ -83,6 +82,6 @@ EDITLEXER lexCSS = { SCLEX_CSS, NP2LEX_CSS, EDITLEXER_HOLE, L"CSS Style Sheet", 
 	{ SCE_CSS_VARIABLE, NP2STYLE_Variable, L"Variable", L"bold; fore:#FF4000", L"" },
 	{ SCE_CSS_UNKNOWN_PSEUDOCLASS, 63305, L"Unknown Pseudo Class", L"fore:#C80000; back:#FFFF80", L"" },
 	{ SCE_CSS_UNKNOWN_IDENTIFIER, 63307, L"Unknown Property", L"fore:#C80000; back:#FFFF80", L"" },
-	{ -1, 00000, L"", L"", L"" }
+	EDITSTYLE_SENTINEL
 }
 };

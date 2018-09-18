@@ -72,7 +72,6 @@ static KEYWORDLIST Keywords_VB = {{
 EDITLEXER lexVB = { SCLEX_VB, NP2LEX_VB, EDITLEXER_HOLE, L"Visual Basic", L"vb; bas; frm; cls; ctl; pag; dsr; dob", L"", &Keywords_VB,
 {
 	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
-	//{ SCE_B_DEFAULT, L"Default", L"", L"" },
 	{ MULTI_STYLE(SCE_B_KEYWORD, SCE_B_KEYWORD3, 0, 0), NP2STYLE_Keyword, L"Keyword", L"fore:#0000FF", L"" },
 	{ SCE_B_KEYWORD2, NP2STYLE_TypeKeyword, L"Type Keyword", L"fore:#0000FF", L"" },
 	{ SCE_B_PREPROCESSOR, NP2STYLE_Preprocessor, L"Preprocessor", L"fore:#FF9C00", L"" },
@@ -83,6 +82,6 @@ EDITLEXER lexVB = { SCLEX_VB, NP2LEX_VB, EDITLEXER_HOLE, L"Visual Basic", L"vb; 
 	{ SCE_B_LABEL, NP2STYLE_Label, L"Label", L"fore:#000000; back:#FFC040", L""},
 	{ MULTI_STYLE(SCE_B_NUMBER, SCE_B_DATE, 0, 0), NP2STYLE_Number, L"Number", L"fore:#FF0000", L"" },
 	{ SCE_B_OPERATOR, NP2STYLE_Operator, L"Operator", L"fore:#B000B0", L"" },
-	{ -1, 00000, L"", L"", L"" }
+	EDITSTYLE_SENTINEL
 }
 };

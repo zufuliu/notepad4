@@ -71,7 +71,6 @@ static KEYWORDLIST Keywords_D = {{
 EDITLEXER lexD = { SCLEX_CPP, NP2LEX_D, EDITLEXER_HOLE, L"D Source", L"d; di", L"", &Keywords_D,
 {
 	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
-	//{ SCE_C_DEFAULT, L"Default", L"", L"" },
 	{ SCE_C_WORD, NP2STYLE_Keyword, L"Keyword", L"fore:#0000FF", L"" },
 	{ SCE_C_WORD2, NP2STYLE_TypeKeyword, L"Type Keyword", L"fore:#0000FF", L"" },
 	{ SCE_C_PREPROCESSOR, NP2STYLE_Preprocessor, L"Preprocessor", L"fore:#FF8000", L"" },
@@ -97,6 +96,6 @@ EDITLEXER lexD = { SCLEX_CPP, NP2LEX_D, EDITLEXER_HOLE, L"D Source", L"d; di", L
 	{ SCE_C_OPERATOR, NP2STYLE_Operator, L"Operator", L"fore:#B000B0", L"" },
 	{ SCE_C_ASM_INSTRUCTION, NP2STYLE_Instruction, L"Instruction", L"fore:#0080FF", L"" },
 	{ SCE_C_ASM_REGISTER, NP2STYLE_Register, L"Register", L"fore:#FF8000", L"" },
-	{ -1, 00000, L"", L"", L"" }
+	EDITSTYLE_SENTINEL
 }
 };

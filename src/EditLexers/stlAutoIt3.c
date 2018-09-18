@@ -127,6 +127,6 @@ EDITLEXER lexAU3 = { SCLEX_AU3, NP2LEX_AU3, EDITLEXER_HOLE, L"AutoIt3 Script", L
 	{ SCE_AU3_SENT, 63491, L"Send Key", L"fore:#FF0000", L"" },
 	{ SCE_AU3_PREPROCESSOR, NP2STYLE_Preprocessor, L"Preprocessor", L"fore:#FF8000", L"" },
 	{ SCE_AU3_SPECIAL, 63492, L"Special", L"fore:#FF8000", L"" },
-	{ -1, 00000, L"", L"", L"" }
+	EDITSTYLE_SENTINEL
 }
 };

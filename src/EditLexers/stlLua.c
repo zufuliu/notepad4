@@ -41,7 +41,6 @@ static KEYWORDLIST Keywords_Lua = {{
 EDITLEXER lexLua = { SCLEX_LUA, NP2LEX_LUA, EDITLEXER_HOLE, L"Lua Script", L"lua; wlua; nse; luadoc; luax", L"", &Keywords_Lua,
 {
 	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
-	//{ SCE_LUA_DEFAULT, L"Default", L"", L"" },
 	{ SCE_LUA_WORD, NP2STYLE_Keyword, L"Keyword", L"fore:#0000FF", L"" },
 	{ SCE_LUA_WORD2, NP2STYLE_BasicFunction, L"Basic Function", L"fore:#FF8000", L"" },
 	{ SCE_LUA_WORD3, 63452, L"String, Table & Math Function", L"fore:#FF0080", L"" },
@@ -52,6 +51,6 @@ EDITLEXER lexLua = { SCLEX_LUA, NP2LEX_LUA, EDITLEXER_HOLE, L"Lua Script", L"lua
 	{ SCE_LUA_NUMBER, NP2STYLE_Number, L"Number", L"fore:#FF0000", L"" },
 	{ SCE_LUA_OPERATOR, NP2STYLE_Operator, L"Operator", L"fore:#B000B0", L"fore:#B000B0" },
 	{ SCE_LUA_PREPROCESSOR, NP2STYLE_Preprocessor, L"Preprocessor", L"fore:#FF8000", L"" },
-	{ -1, 00000, L"", L"", L"" }
+	EDITSTYLE_SENTINEL
 }
 };

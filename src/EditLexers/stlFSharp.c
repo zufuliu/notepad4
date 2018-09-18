@@ -32,7 +32,6 @@ static KEYWORDLIST Keywords_FSharp = {{
 EDITLEXER lexFSharp = { SCLEX_FSHARP, NP2LEX_FSHARP, EDITLEXER_HOLE, L"F# Source", L"fs; fsi; fsx; fsscript; fsl; fsy; ml; mli; sml; nb", L"", &Keywords_FSharp,
 {
 	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
-	//{ SCE_FSHARP_DEFAULT, L"Default", L"", L"" },
 	{ SCE_FSHARP_KEYWORD, NP2STYLE_Keyword, L"Keyword", L"fore:#0000FF", L"" },
 	{ SCE_FSHARP_TYPEKEYWORD, NP2STYLE_TypeKeyword, L"Type Keyword", L"fore:#1E90FF", L"" },
 	{ SCE_FSHARP_PREPROCESSOR, NP2STYLE_Preprocessor, L"Preprocessor", L"fore:#FF8000", L"" },
@@ -43,6 +42,6 @@ EDITLEXER lexFSharp = { SCLEX_FSHARP, NP2LEX_FSHARP, EDITLEXER_HOLE, L"F# Source
 	{ SCE_FSHARP_QUOTATION, NP2STYLE_CodeQuotation, L"Code Quotation", L"fore:#006633; back:#FFF1A8", L"" },
 	{ SCE_FSHARP_NUMBER, NP2STYLE_Number, L"Number", L"fore:#FF0000", L"" },
 	{ SCE_FSHARP_OPERATOR, NP2STYLE_Operator, L"Operator", L"fore:#B000B0", L"" },
-	{ -1, 00000, L"", L"", L"" }
+	EDITSTYLE_SENTINEL
 }
 };

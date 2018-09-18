@@ -295,7 +295,6 @@ static KEYWORDLIST Keywords_Python = {{
 EDITLEXER lexPython  = { SCLEX_PYTHON, NP2LEX_PYTHON, EDITLEXER_HOLE, L"Python Script", L"py; pyw; pyx; boo; empy; cobra", L"", &Keywords_Python,
 {
 	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
-	//{ SCE_PY_DEFAULT, L"Default", L"", L"" },
 	{ SCE_PY_WORD, NP2STYLE_Keyword, L"Keyword", L"bold; fore:#FF8000", L"" },
 	{ SCE_PY_WORD2, NP2STYLE_Type, L"Type", L"fore:#0080FF", L"" },
 	{ SCE_PY_CLASSNAME, NP2STYLE_Class, L"Class", L"bold; fore:#007F7F", L"" },
@@ -317,6 +316,6 @@ EDITLEXER lexPython  = { SCLEX_PYTHON, NP2LEX_PYTHON, EDITLEXER_HOLE, L"Python S
 	{ MULTI_STYLE(SCE_PY_TRIPLE_FMT_STRING1, SCE_PY_TRIPLE_FMT_STRING2, 0, 0), 63470, L"Triple Quoted Formatted String", L"fore:#F08000", L"" },
 	{ SCE_PY_NUMBER, NP2STYLE_Number, L"Number", L"fore:#FF0000", L"" },
 	{ SCE_PY_OPERATOR, NP2STYLE_Operator, L"Operator", L"fore:#B000B0", L"" },
-	{ -1, 00000, L"", L"", L"" }
+	EDITSTYLE_SENTINEL
 }
 };
