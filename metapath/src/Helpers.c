@@ -104,7 +104,7 @@ LPCWSTR IniSectionUnsafeGetValue(IniSection *section, LPCWSTR key, int keyLen) {
 	IniKeyValueNode *prev = NULL;
 #if IniSectionImplUseSentinelNode
 	section->sentinel->hash = hash;
-	do {
+	while (TRUE) {
 		if (node->hash == hash) {
 			if (node == section->sentinel) {
 				return NULL;
@@ -122,7 +122,7 @@ LPCWSTR IniSectionUnsafeGetValue(IniSection *section, LPCWSTR key, int keyLen) {
 		}
 		prev = node;
 		node = node->next;
-	} while (TRUE);
+	}
 #else
 	do {
 		if (node->hash == hash && StrEqual(node->key, key)) {
@@ -1134,7 +1134,6 @@ HDROP CreateDropHandle(LPCWSTR lpFileName) {
 //  Execute a DDE command (Msg,App,Topic)
 //
 //
-
 HDDEDATA CALLBACK DdeCallback(UINT uType, UINT uFmt, HCONV hconv, HSZ hsz1, HSZ hsz2, HDDEDATA hdata, ULONG_PTR  dwData1, ULONG_PTR  dwData2) {
 	UNREFERENCED_PARAMETER(uFmt);
 	UNREFERENCED_PARAMETER(hconv);

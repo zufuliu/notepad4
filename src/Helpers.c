@@ -116,7 +116,7 @@ LPCWSTR IniSectionUnsafeGetValue(IniSection *section, LPCWSTR key, int keyLen) {
 	IniKeyValueNode *prev = NULL;
 #if IniSectionImplUseSentinelNode
 	section->sentinel->hash = hash;
-	do {
+	while (TRUE) {
 		if (node->hash == hash) {
 			if (node == section->sentinel) {
 				return NULL;
@@ -134,7 +134,7 @@ LPCWSTR IniSectionUnsafeGetValue(IniSection *section, LPCWSTR key, int keyLen) {
 		}
 		prev = node;
 		node = node->next;
-	} while (TRUE);
+	}
 #else
 	do {
 		if (node->hash == hash && StrEqual(node->key, key)) {
