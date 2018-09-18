@@ -629,8 +629,15 @@ void Style_SetLexer(HWND hwnd, PEDITLEXER pLexNew) {
 
 	// Lexer
 	SendMessage(hwnd, SCI_SETLEXER, pLexNew->iLexer, 0);
-
-	_itoa(pLexNew->rid - 63000, msg, 10);
+	int rid = pLexNew->rid;
+	if (rid == NP2LEX_MATLAB) {
+		if (np2LexLangIndex == IDM_LANG_OCTAVE) {
+			rid = NP2LEX_OCTAVE;
+		} else if (np2LexLangIndex == IDM_LANG_SCILAB) {
+			rid = NP2LEX_SCILAB;
+		}
+	}
+	_itoa(rid - 63000, msg, 10);
 	SendMessage(hwnd, SCI_SETPROPERTY, (WPARAM)"lexer.lang.type", (LPARAM)msg);
 
 	// Code folding
@@ -640,7 +647,7 @@ void Style_SetLexer(HWND hwnd, PEDITLEXER pLexNew) {
 	SciCall_SetProperty("fold.preprocessor", "1");
 	SciCall_SetProperty("fold.compact", "0");
 
-	switch (pLexNew->rid) {
+	switch (rid) {
 	case NP2LEX_HTML:
 	case NP2LEX_XML:
 		SciCall_SetProperty("fold.html", "1");
@@ -1381,7 +1388,7 @@ PEDITLEXER Style_DetectObjCAndMatlab(void) {
 	SendMessage(hwndEdit, SCI_GETTEXT, (WPARAM)(COUNTOF(tchText) - 2), (LPARAM)tchText);
 
 	p = tchText;
-	lexMatlab.rid = NP2LEX_MATLAB;
+	np2LexLangIndex = 0;
 	while (*p) {
 		while (IsASpace(*p)) {
 			++p;
@@ -1396,7 +1403,6 @@ PEDITLEXER Style_DetectObjCAndMatlab(void) {
 				if (MatchCPPKeyword(p, 2)) {
 					return &lexCPP;
 				}
-				lexMatlab.rid = NP2LEX_OCTAVE;
 				np2LexLangIndex = IDM_LANG_OCTAVE;
 				return &lexMatlab;
 			}
@@ -1619,7 +1625,6 @@ PEDITLEXER __fastcall Style_MatchLexer(LPCWSTR lpszMatch, BOOL bCheckNames) {
 			return &lexXML;
 		}
 		if (StrCaseEqual(L"sce", lpszMatch) || StrCaseEqual(L"sci", lpszMatch)) {
-			lexMatlab.rid = NP2LEX_SCILAB;
 			np2LexLangIndex = IDM_LANG_SCILAB;
 			return &lexMatlab;
 		}
@@ -1965,15 +1970,8 @@ void Style_SetLexerByLangIndex(HWND hwnd, int lang) {
 		break;
 
 	case IDM_LANG_MATLAB:
-		lexMatlab.rid = NP2LEX_MATLAB;
-		Style_SetLexer(hwnd, &lexMatlab);
-		break;
 	case IDM_LANG_OCTAVE:
-		lexMatlab.rid = NP2LEX_OCTAVE;
-		Style_SetLexer(hwnd, &lexMatlab);
-		break;
 	case IDM_LANG_SCILAB:
-		lexMatlab.rid = NP2LEX_SCILAB;
 		Style_SetLexer(hwnd, &lexMatlab);
 		break;
 

@@ -12,13 +12,13 @@
 
 typedef struct _editstyle {
 	union {
-		INT32 iStyle;
-		UINT8 iStyle8[4];
+		const INT32 iStyle;
+		const UINT8 iStyle8[4];
 	};
-	int rid;
-	LPCWSTR pszName;
-	LPCWSTR pszDefault;
-	WCHAR	szValue[128];
+	const int rid;
+	LPCWSTR const pszName;
+	LPCWSTR const pszDefault;
+	WCHAR szValue[128];
 } EDITSTYLE, *PEDITSTYLE;
 
 #define EDITSTYLE_SENTINEL 		{ -1, 0, L"", L"", L"" }
@@ -31,25 +31,25 @@ typedef struct _editstyle {
 #define KeywordAttr_NoAutoComp	4
 
 typedef struct _keywordlist {
-	char *pszKeyWords[NUMKEYWORD];
+	const char * const pszKeyWords[NUMKEYWORD];
 } KEYWORDLIST, *PKEYWORDLIST;
 
 typedef struct _editlexer {
-	int iLexer;
-	int rid;
+	const int iLexer;
+	const int rid;
 	struct {
 		UINT8 bStyleLoaded;
 		UINT8 bStyleChanged;
 		const int iNameLen;
-		LPCWSTR pszName;
+		LPCWSTR const pszName;
 	};
-	LPCWSTR pszDefExt;
-	WCHAR	szExtensions[128];
-	PKEYWORDLIST	pKeyWords;
-	EDITSTYLE		Styles[];
+	LPCWSTR const pszDefExt;
+	WCHAR szExtensions[128];
+	const PKEYWORDLIST pKeyWords;
+	EDITSTYLE Styles[];
 } EDITLEXER, *PEDITLEXER;
 
-#define EDITLEXER_HOLE(name)	{ 0,  0, CSTRLEN(name), (name) }
+#define EDITLEXER_HOLE(name)	{ 0, 0, CSTRLEN(name), (name) }
 
 // NP2LEX_, rid for EDITLEXER
 #define NP2LEX_DEFAULT	63000	// SCLEX_NULL		Default Text
