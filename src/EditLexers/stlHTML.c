@@ -217,6 +217,6 @@ EDITLEXER lexHTML = { SCLEX_HTML, NP2LEX_HTML, EDITLEXER_HOLE, L"Web Source Code
 	//{ SCE_HPA_DEFNAME, L"ASP Phyton Def Name", L"", L"" },
 	//{ SCE_HPA_OPERATOR, L"ASP Phyton Operator", L"", L"" },
 	//{ SCE_HPA_IDENTIFIER, L"ASP Phyton Identifier", L"", L"" },
-	{ -1, 00000, L"", L"", L"" }
+	EDITSTYLE_SENTINEL
 }
 };

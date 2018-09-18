@@ -37,7 +37,7 @@ EDITLEXER lexDefault = { SCLEX_NULL, NP2LEX_DEFAULT, EDITLEXER_HOLE, L"Default T
 	{ SCI_SETCARETFORE + SCI_SETCARETWIDTH, 63121, L"2nd Caret (Color)", L"", L"" },
 	{ SCI_SETEDGECOLOUR, 63122, L"2nd Long Line Marker (Colors)", L"fore:#FFC000", L"" },
 	{ SCI_SETEXTRAASCENT + SCI_SETEXTRADESCENT, 63123, L"2nd Extra Line Spacing (Size)", L"", L"" },
-	{ -1, 00000, L"", L"", L"" }
+	EDITSTYLE_SENTINEL
 }
 };
 
@@ -47,7 +47,7 @@ EDITLEXER lexANSI = { SCLEX_NULL, NP2LEX_ANSI, EDITLEXER_HOLE, L"ANSI Art", L"nf
 	{ STYLE_LINENUMBER, 63101, L"Margins and Line Numbers", L"font:Lucida Console; size:-2", L"" },
 	{ STYLE_BRACELIGHT, 63102, L"Matching Braces", L"size:+0", L"" },
 	{ STYLE_BRACEBAD, 63103, L"Matching Braces Error", L"size:+0", L"" },
-	{ -1, 00000, L"", L"", L"" }
+	EDITSTYLE_SENTINEL
 }
 };
 
@@ -64,26 +64,24 @@ EDITLEXER lexCONF = { SCLEX_CONF, NP2LEX_CONF, EDITLEXER_HOLE, L"Config File", L
 	{ SCE_CONF_OPERATOR, NP2STYLE_Operator, L"Operator", L"fore:#B000B0", L"" },
 	//{ SCE_CONF_PARAMETER, L"Runtime Directive Parameter", L"", L"" },
 	//{ SCE_CONF_EXTENSION, L"Extension", L"", L"" },
-	{ -1, 00000, L"", L"", L"" }
+	EDITSTYLE_SENTINEL
 }
 };
 
 EDITLEXER lexINI = { SCLEX_PROPERTIES, NP2LEX_INI, EDITLEXER_HOLE, L"Ini Config File", L"ini; inf; reg; oem; sif; url; sed; theme; clw", L"", &Keywords_NULL,
 {
 	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
-	//{ SCE_PROPS_DEFAULT, L"Default", L"", L"" },
 	{ SCE_PROPS_COMMENT, NP2STYLE_Comment, L"Comment", L"fore:#008000", L"" },
 	{ SCE_PROPS_SECTION, 63511, L"Section", L"bold; fore:#000000; back:#FFC040; eolfilled", L"" },
 	{ SCE_PROPS_ASSIGNMENT, 63512, L"Assignment", L"fore:#FF0000", L"" },
 	{ SCE_PROPS_DEFVAL, 63513, L"Default Value", L"fore:#FF0000", L"" },
-	{ -1, 00000, L"", L"", L"" }
+	EDITSTYLE_SENTINEL
 }
 };
 
 EDITLEXER lexDIFF = { SCLEX_DIFF, NP2LEX_DIFF, EDITLEXER_HOLE, L"Diff File", L"diff; patch", L"", &Keywords_NULL,
 {
 	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
-	//{ SCE_DIFF_DEFAULT, L"Default", L"", L"" },
 	{ SCE_DIFF_COMMENT, NP2STYLE_Comment, L"Comment", L"fore:#008000", L"" },
 	{ SCE_DIFF_COMMAND, NP2STYLE_Command, L"Command", L"bold; fore:#0A246A", L"" },
 	{ SCE_DIFF_HEADER, 63541, L"Source and Destination", L"fore:#C80000; back:#FFF1A8; eolfilled", L"" },
@@ -91,7 +89,7 @@ EDITLEXER lexDIFF = { SCLEX_DIFF, NP2LEX_DIFF, EDITLEXER_HOLE, L"Diff File", L"d
 	{ MULTI_STYLE(SCE_DIFF_ADDED, SCE_DIFF_PATCH_ADD, SCE_DIFF_REMOVED_PATCH_ADD, 0), 63543, L"Line Addition", L"fore:#002000; back:#80FF80; eolfilled", L"" },
 	{ MULTI_STYLE(SCE_DIFF_DELETED, SCE_DIFF_PATCH_DELETE, SCE_DIFF_REMOVED_PATCH_DELETE, 0), 63544, L"Line Removal", L"fore:#200000; back:#FF8080; eolfilled", L"" },
 	{ SCE_DIFF_CHANGED, 63545, L"Line Change", L"fore:#000020; back:#8080FF; eolfilled", L"" },
-	{ -1, 00000, L"", L"", L"" }
+	EDITSTYLE_SENTINEL
 }
 };
 

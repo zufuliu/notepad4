@@ -36,7 +36,6 @@ static KEYWORDLIST Keywords_Go = {{
 EDITLEXER lexGo = { SCLEX_CPP, NP2LEX_GO, EDITLEXER_HOLE, L"Go Source", L"go", L"", &Keywords_Go,
 {
 	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
-	//{ SCE_C_DEFAULT, L"Default", L"", L"" },
 	{ SCE_C_WORD, NP2STYLE_Keyword, L"Keyword", L"fore:#0000FF", L"" },
 	{ SCE_C_WORD2, NP2STYLE_TypeKeyword, L"Type Keyword", L"fore:#0000FF", L"" },
 	{ SCE_C_ATTRIBUTE, NP2STYLE_BasicFunction, L"Basic Function", L"fore:#FF8000", L"" },
@@ -48,6 +47,6 @@ EDITLEXER lexGo = { SCLEX_CPP, NP2LEX_GO, EDITLEXER_HOLE, L"Go Source", L"go", L
 	{ SCE_C_DSTRINGB, NP2STYLE_Backticks, L"Backticks", L"fore:#F08000", L"" },
 	{ SCE_C_NUMBER, NP2STYLE_Number, L"Number", L"fore:#FF0000", L"" },
 	{ SCE_C_OPERATOR, NP2STYLE_Operator, L"Operator", L"fore:#B000B0", L"" },
-	{ -1, 00000, L"", L"", L"" }
+	EDITSTYLE_SENTINEL
 }
 };

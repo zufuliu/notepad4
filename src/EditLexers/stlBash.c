@@ -53,6 +53,6 @@ EDITLEXER lexBash = { SCLEX_BASH, NP2LEX_BASH, EDITLEXER_HOLE, L"Shell Script", 
 	{ SCE_SH_BACKTICKS, NP2STYLE_Backticks, L"Backticks", L"fore:#FF0080", L"" },
 	{ SCE_SH_HERE_DELIM, 63537, L"Here-doc (Delimiter)", L"fore:#A46000; back:#FFFFC0; eolfilled", L"" },
 	{ SCE_SH_HERE_Q, 63538, L"Here-doc (Single Quoted, q)", L"fore:#A46000; back:#FFFFC0; eolfilled", L"" },
-	{ -1, 00000, L"", L"", L"" }
+	EDITSTYLE_SENTINEL
 }
 };

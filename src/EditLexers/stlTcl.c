@@ -47,6 +47,6 @@ EDITLEXER lexTcl = { SCLEX_TCL, NP2LEX_TCL, EDITLEXER_HOLE, L"Tcl Script", L"tcl
 	{ SCE_TCL_OPERATOR, NP2STYLE_Operator, L"Operator", L"fore:#B000B0", L"" },
 	{ SCE_TCL__MULTI_SUBSTITUTION, 63441, L"Substitution", L"fore:#0080FF", L"" },
 	{ SCE_TCL_MODIFIER, 63442, L"Modifier", L"fore:#FF00FF", L"" },
-	{ -1, 00000, L"", L"", L"" }
+	EDITSTYLE_SENTINEL
 }
 };

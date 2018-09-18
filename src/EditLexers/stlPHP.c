@@ -242,8 +242,6 @@ static KEYWORDLIST Keywords_PHP = {{
 EDITLEXER lexPHP = { SCLEX_CPP, NP2LEX_PHP, EDITLEXER_HOLE, L"PHP Script", L"php; phpt; phtml; eyecode", L"", &Keywords_PHP,
 {
 	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
-	//{ SCE_C_DEFAULT, 63181, L"PHP Default", L"", L"" },
-	//{ SCE_C_XML_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
 	{ SCE_C_WORD, NP2STYLE_Keyword, L"Keyword", L"bold; fore:#FF8000", L"" },
 	{ SCE_C_CLASS, NP2STYLE_Class, L"Class", L"bold; fore:#007F7F", L"" },
 	{ SCE_C_INTERFACE, NP2STYLE_Interface, L"Interface", L"bold; fore:#1E90FF", L""},
@@ -264,6 +262,6 @@ EDITLEXER lexPHP = { SCLEX_CPP, NP2LEX_PHP, EDITLEXER_HOLE, L"PHP Script", L"php
 	{ MULTI_STYLE(SCE_C_VARIABLE, SCE_C_VARIABLE2, 0, 0), NP2STYLE_Variable, L"Variable", L"italic; fore:#003CE6", L"" },
 	{ SCE_C_OPERATOR, NP2STYLE_Operator, L"Operator", L"fore:#B000B0", L"" },
 	{ SCE_C_XML_TAG, 63366, L"PHP Tag", L"bold; fore:#8B008B", L"" },
-	{ -1, 00000, L"", L"", L"" }
+	EDITSTYLE_SENTINEL
 }
 };

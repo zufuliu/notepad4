@@ -49,13 +49,12 @@ static KEYWORDLIST Keywords_MAK = {{
 EDITLEXER lexMake = { SCLEX_MAKEFILE, NP2LEX_MAKE, EDITLEXER_HOLE, L"Makefile", L"mak; make; mk; dsp; dsw; am; pro; pri; gmk", L"", &Keywords_MAK,
 {
 	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
-	//{ SCE_MAKE_DEFAULT, L"Default", L"", L"" },
 	{ SCE_MAKE_COMMENT, NP2STYLE_Comment, L"Comment", L"fore:#008000", L"" },
 	{ SCE_MAKE_PREPROCESSOR, NP2STYLE_Preprocessor, L"Preprocessor", L"fore:#FF8000", L"" },
 	{ SCE_MAKE_FUNCTION, NP2STYLE_Function, L"Function", L"fore:#FF8000", L"" },
 	{ MULTI_STYLE(SCE_MAKE_VARIABLE, SCE_MAKE_VARIABLE2, SCE_MAKE_VARIABLE3, 0), NP2STYLE_Variable, L"Variable", L"fore:#003CE6", L"" },
 	{ SCE_MAKE_OPERATOR, NP2STYLE_Operator, L"Operator", L"fore:#B000B0", L"" },
 	{ SCE_MAKE_TARGET, NP2STYLE_Target, L"Target", L"fore:#003CE6; back:#FFC000", L"" },
-	{ -1, 00000, L"", L"", L"" }
+	EDITSTYLE_SENTINEL
 }
 };

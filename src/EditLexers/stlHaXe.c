@@ -38,7 +38,6 @@ static KEYWORDLIST Keywords_HaXe = {{
 EDITLEXER lexHaXe = { SCLEX_CPP, NP2LEX_HAXE, EDITLEXER_HOLE, L"HaXe Script", L"hx", L"", &Keywords_HaXe,
 {
 	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
-	//{ SCE_C_DEFAULT, L"Default", L"", L"" },
 	{ SCE_C_WORD, NP2STYLE_Keyword, L"Keyword", L"fore:#0000FF", L"" },
 	{ SCE_C_WORD2, NP2STYLE_TypeKeyword, L"Type Keyword", L"fore:#1E90FF", L"" },
 	{ SCE_C_PREPROCESSOR, NP2STYLE_Preprocessor, L"Preprocessor", L"fore:#FF8000", L"" },
@@ -55,6 +54,6 @@ EDITLEXER lexHaXe = { SCLEX_CPP, NP2LEX_HAXE, EDITLEXER_HOLE, L"HaXe Script", L"
 	{ SCE_C_NUMBER, NP2STYLE_Number, L"Number", L"fore:#FF0000", L"" },
 	{ SCE_C_VARIABLE, NP2STYLE_Variable, L"Variable", L"fore:#CC3300", L"" },
 	{ SCE_C_OPERATOR, NP2STYLE_Operator, L"Operator", L"fore:#B000B0", L"" },
-	{ -1, 00000, L"", L"", L"" }
+	EDITSTYLE_SENTINEL
 }
 };

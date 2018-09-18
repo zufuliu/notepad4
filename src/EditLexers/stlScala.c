@@ -41,7 +41,6 @@ static KEYWORDLIST Keywords_Scala = {{
 EDITLEXER lexScala = { SCLEX_CPP, NP2LEX_SCALA, EDITLEXER_HOLE, L"Scala Script", L"scala", L"", &Keywords_Scala,
 {
 	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
-	//{ SCE_C_DEFAULT, L"Default", L"", L"" },
 	{ SCE_C_WORD, NP2STYLE_Keyword, L"Keyword", L"fore:#0000FF", L"" },
 	{ SCE_C_WORD2, NP2STYLE_TypeKeyword, L"Type Keyword", L"fore:#0000FF", L"" },
 	{ SCE_C_DIRECTIVE, NP2STYLE_Annotation, L"Annotation", L"fore:#FF8000", L""},
@@ -58,6 +57,6 @@ EDITLEXER lexScala = { SCLEX_CPP, NP2LEX_SCALA, EDITLEXER_HOLE, L"Scala Script",
 	{ MULTI_STYLE(SCE_C_XML_TAG, SCE_C_XML_ASSIGN, 0, 0), NP2STYLE_XMLTag, L"XML Tag", L"fore:#648000", L"" },
 	{ SCE_C_XML_ATTR, NP2STYLE_XMLAttribute, L"XML Attribute", L"fore:#FF0000", L"" },
 	{ SCE_C_XML_VALUE, NP2STYLE_XMLValue, L"XML Value", L"fore:#1A1AA6", L"" },
-	{ -1, 00000, L"", L"", L"" }
+	EDITSTYLE_SENTINEL
 }
 };

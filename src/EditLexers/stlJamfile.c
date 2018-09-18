@@ -30,7 +30,6 @@ static KEYWORDLIST Keywords_JAM = {{
 EDITLEXER lexJAM = { SCLEX_CPP, NP2LEX_JAM, EDITLEXER_HOLE, L"Jamfile", L"jam", L"", &Keywords_JAM,
 {
 	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
-	//{ SCE_C_DEFAULT, L"Default", L"", L"" },
 	{ SCE_C_WORD, NP2STYLE_Keyword, L"Keyword", L"fore:#0000FF", L"" },
 	{ SCE_C_CONSTANT, NP2STYLE_BuildinRule, L"Build-in Rule", L"fore:#0080FF", L""},
 	{ MULTI_STYLE(SCE_C_COMMENT, SCE_C_COMMENTLINE, SCE_C_COMMENT, SCE_C_COMMENTLINE), NP2STYLE_Comment, L"Comment", L"fore:#608060", L"" },
@@ -38,6 +37,6 @@ EDITLEXER lexJAM = { SCLEX_CPP, NP2LEX_JAM, EDITLEXER_HOLE, L"Jamfile", L"jam", 
 	{ SCE_C_NUMBER, NP2STYLE_Number, L"Number", L"fore:#FF0000", L"" },
 	{ SCE_C_VARIABLE2, NP2STYLE_Variable, L"Variable", L"fore:#CC3300", L"" },
 	{ SCE_C_OPERATOR, NP2STYLE_Operator, L"Operator", L"fore:#B000B0", L"" },
-	{ -1, 00000, L"", L"", L"" }
+	EDITSTYLE_SENTINEL
 }
 };

@@ -77,7 +77,6 @@ static KEYWORDLIST Keywords_LLVM = {{
 EDITLEXER lexLLVM = { SCLEX_LLVM, NP2LEX_LLVM, EDITLEXER_HOLE, L"LLVM IR", L"ll", L"", &Keywords_LLVM,
 {
 	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
-	//{ SCE_C_DEFAULT, L"Default", L"", L"" },
 	{ SCE_C_WORD, NP2STYLE_Keyword, L"Keyword", L"fore:#0000FF", L"" },
 	{ SCE_C_WORD2, NP2STYLE_TypeKeyword, L"Type Keyword", L"fore:#0000FF", L"" },
 	{ SCE_C_DIRECTIVE, NP2STYLE_BuildinRule, L"Intrinsic", L"fore:#FF0080", L"" },
@@ -92,6 +91,6 @@ EDITLEXER lexLLVM = { SCLEX_LLVM, NP2LEX_LLVM, EDITLEXER_HOLE, L"LLVM IR", L"ll"
 	{ SCE_C_LABEL, NP2STYLE_Label, L"Label", L"fore:#000000; back:#FFC040", L""},
 	{ SCE_C_NUMBER, NP2STYLE_Number, L"Number", L"fore:#FF0000", L"" },
 	{ SCE_C_OPERATOR, NP2STYLE_Operator, L"Operator", L"fore:#B000B0", L"" },
-	{ -1, 00000, L"", L"", L"" }
+	EDITSTYLE_SENTINEL
 }
 };

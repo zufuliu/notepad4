@@ -36,7 +36,6 @@ static KEYWORDLIST Keywords_Julia = {{
 EDITLEXER lexJulia = { SCLEX_MATLAB, NP2LEX_JULIA, EDITLEXER_HOLE, L"Julia Script", L"jl", L"", &Keywords_Julia,
 {
 	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
-	//	{ SCE_MAT_DEFAULT, L"Default", L"", L"" },
 	{ SCE_MAT_KEYWORD, NP2STYLE_Keyword, L"Keyword", L"fore:#0000FF", L"" },
 	{ SCE_MAT_ATTRIBUTE, NP2STYLE_TypeKeyword, L"Type Keyword", L"fore:#0080FF", L"" },
 	{ SCE_MAT_CALLBACK, NP2STYLE_Macro, L"Macro", L"fore:#FF8000", L"" },
@@ -51,6 +50,6 @@ EDITLEXER lexJulia = { SCLEX_MATLAB, NP2LEX_JULIA, EDITLEXER_HOLE, L"Julia Scrip
 	{ SCE_MAT_REGEX, NP2STYLE_Regex, L"Regex", L"fore:#006633; back:#FFF1A8", L"" },
 	{ SCE_MAT_VARIABLE, NP2STYLE_Variable, L"Variable", L"fore:#CC3300", L"" },
 	{ SCE_MAT_OPERATOR, NP2STYLE_Operator, L"Operator", L"fore:#B000B0", L"" },
-	{ -1, 00000, L"", L"", L"" }
+	EDITSTYLE_SENTINEL
 }
 };

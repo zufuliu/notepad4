@@ -36,7 +36,6 @@ static KEYWORDLIST Keywords_Awk = {{
 EDITLEXER lexAwk = { SCLEX_CPP, NP2LEX_AWK, EDITLEXER_HOLE, L"Awk Script", L"awk", L"", &Keywords_Awk,
 {
 	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
-	//{ SCE_C_DEFAULT, L"Default", L"", L"" },
 	{ SCE_C_WORD, NP2STYLE_Keyword, L"Keyword", L"fore:#0000FF", L"" },
 	{ SCE_C_FUNCTION, NP2STYLE_Function, L"Function", L"fore:#A46000", L"" },
 	{ SCE_C_WORD2, NP2STYLE_PredefinedVariable, L"Predefined Variable", L"fore:#B000B0", L""},
@@ -46,6 +45,6 @@ EDITLEXER lexAwk = { SCLEX_CPP, NP2LEX_AWK, EDITLEXER_HOLE, L"Awk Script", L"awk
 	{ SCE_C_NUMBER, NP2STYLE_Number, L"Number", L"fore:#FF0000", L"" },
 	{ SCE_C_VARIABLE, NP2STYLE_Variable, L"Variable", L"fore:#CC3300", L"" },
 	{ SCE_C_OPERATOR, NP2STYLE_Operator, L"Operator", L"fore:#B000B0", L"" },
-	{ -1, 00000, L"", L"", L"" }
+	EDITSTYLE_SENTINEL
 }
 };
