@@ -121,6 +121,8 @@ typedef struct IniKeyValueNode {
 	LPCWSTR value;
 } IniKeyValueNode;
 
+// https://en.wikipedia.org/wiki/Sentinel_node
+// https://en.wikipedia.org/wiki/Sentinel_value
 #define IniSectionImplUseSentinelNode	1
 
 typedef struct IniSection {
@@ -139,7 +141,6 @@ static inline void IniSectionInit(IniSection *section, int capacity) {
 	section->head = NULL;
 #if IniSectionImplUseSentinelNode
 	section->nodeList = (IniKeyValueNode *)NP2HeapAlloc((capacity + 1) * sizeof(IniKeyValueNode));
-	// https://en.wikipedia.org/wiki/Sentinel_node
 	section->sentinel = &section->nodeList[capacity];
 #else
 	section->nodeList = (IniKeyValueNode *)NP2HeapAlloc(capacity * sizeof(IniKeyValueNode));
