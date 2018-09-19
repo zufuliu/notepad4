@@ -266,8 +266,14 @@ void SetWindowTransparentMode(HWND hwnd, BOOL bTransparentMode);
 #define StatusSetSimple(hwnd,b) SendMessage(hwnd, SB_SIMPLE, (WPARAM)(b), 0)
 BOOL StatusSetText(HWND hwnd, UINT nPart, LPCWSTR lpszText);
 
+/**
+ * we only has 14 commands in toolbar
+ * max size = 14*(3 + 2) + 1 (each command with a separator)
+ */
+#define MAX_TOOLBAR_ITEM_COUNT_WITH_SEPARATOR	50
+#define MAX_TOOLBAR_BUTTON_CONFIG_BUFFER_SIZE	128
 int Toolbar_GetButtons(HWND hwnd, int cmdBase, LPWSTR lpszButtons, int cchButtons);
-int Toolbar_SetButtons(HWND hwnd, int cmdBase, LPCWSTR lpszButtons, LPCTBBUTTON ptbb, int ctbb);
+int Toolbar_SetButtons(HWND hwnd, LPCWSTR lpszButtons, LPCTBBUTTON ptbb, int ctbb);
 void Toolbar_SetButtonImage(HWND hwnd, int idCommand, int iImage);
 
 LRESULT SendWMSize(HWND hwnd);
