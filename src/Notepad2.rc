@@ -1605,10 +1605,6 @@ BEGIN
     IDT_FILE_OPEN           "Open"
     IDT_FILE_BROWSE         "Browse"
     IDT_FILE_SAVE           "Save"
-END
-
-STRINGTABLE
-BEGIN
     IDT_EDIT_UNDO           "Undo"
     IDT_EDIT_REDO           "Redo"
     IDT_EDIT_CUT            "Cut"
@@ -1625,10 +1621,6 @@ BEGIN
     IDT_FILE_SAVEAS         "Save As"
     IDT_FILE_SAVECOPY       "Save Copy"
     IDT_EDIT_CLEAR          "Clear"
-END
-
-STRINGTABLE
-BEGIN
     IDT_FILE_PRINT          "Print"
     IDT_FILE_OPENFAV        "Favorites"
     IDT_FILE_ADDTOFAV       "Add to Favorites"

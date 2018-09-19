@@ -59,36 +59,30 @@ HWND	hwndNextCBChain = NULL;
 HWND	hDlgFindReplace = NULL;
 
 #define NUMTOOLBITMAPS		25
-#define NUMINITIALTOOLS		24
 #define MARGIN_LINE_NUMBER	0	// line number
 #define MARGIN_SELECTION	1	// selection margin
 #define MARGIN_FOLD_INDEX	2	// folding index
 
+#define TOOLBAR_COMMAND_BASE	IDT_FILE_NEW
 #define DefaultToolbarButtons	L"22 3 0 1 2 0 4 18 19 0 5 6 0 7 20 8 9 0 10 11 0 12 0 24 0 13 14 0 15 16 17 0"
-static TBBUTTON  tbbMainWnd[] = {
+static TBBUTTON tbbMainWnd[] = {
+	{0, 	0, 					0, 				 TBSTYLE_SEP, {0}, 0, 0},
 	{0, 	IDT_FILE_NEW, 		TBSTATE_ENABLED, TBSTYLE_BUTTON, {0}, 0, 0},
 	{1, 	IDT_FILE_OPEN, 		TBSTATE_ENABLED, TBSTYLE_BUTTON, {0}, 0, 0},
 	{2, 	IDT_FILE_BROWSE, 	TBSTATE_ENABLED, TBSTYLE_BUTTON, {0}, 0, 0},
 	{3, 	IDT_FILE_SAVE, 		TBSTATE_ENABLED, TBSTYLE_BUTTON, {0}, 0, 0},
-	{0, 	0, 					0, 				 TBSTYLE_SEP, {0}, 0, 0},
 	{4, 	IDT_EDIT_UNDO, 		TBSTATE_ENABLED, TBSTYLE_BUTTON, {0}, 0, 0},
 	{5, 	IDT_EDIT_REDO, 		TBSTATE_ENABLED, TBSTYLE_BUTTON, {0}, 0, 0},
-	{0, 	0, 					0, 				 TBSTYLE_SEP, {0}, 0, 0},
 	{6, 	IDT_EDIT_CUT, 		TBSTATE_ENABLED, TBSTYLE_BUTTON, {0}, 0, 0},
 	{7, 	IDT_EDIT_COPY, 		TBSTATE_ENABLED, TBSTYLE_BUTTON, {0}, 0, 0},
 	{8, 	IDT_EDIT_PASTE, 	TBSTATE_ENABLED, TBSTYLE_BUTTON, {0}, 0, 0},
-	{0, 	0, 					0, 				 TBSTYLE_SEP, {0}, 0, 0},
 	{9, 	IDT_EDIT_FIND, 		TBSTATE_ENABLED, TBSTYLE_BUTTON, {0}, 0, 0},
 	{10, 	IDT_EDIT_REPLACE, 	TBSTATE_ENABLED, TBSTYLE_BUTTON, {0}, 0, 0},
-	{0, 	0, 					0, 				 TBSTYLE_SEP, {0}, 0, 0},
 	{11, 	IDT_VIEW_WORDWRAP, 	TBSTATE_ENABLED, TBSTYLE_BUTTON, {0}, 0, 0},
-	{0, 	0, 					0, 				 TBSTYLE_SEP, {0}, 0, 0},
 	{12, 	IDT_VIEW_ZOOMIN, 	TBSTATE_ENABLED, TBSTYLE_BUTTON, {0}, 0, 0},
 	{13, 	IDT_VIEW_ZOOMOUT, 	TBSTATE_ENABLED, TBSTYLE_BUTTON, {0}, 0, 0},
-	{0, 	0, 					0, 				 TBSTYLE_SEP, {0}, 0, 0},
 	{14, 	IDT_VIEW_SCHEME, 	TBSTATE_ENABLED, TBSTYLE_BUTTON, {0}, 0, 0},
 	{15, 	IDT_VIEW_SCHEMECONFIG, 	TBSTATE_ENABLED, TBSTYLE_BUTTON, {0}, 0, 0},
-	{0, 	0, 					0, 				 TBSTYLE_SEP, {0}, 0, 0},
 	{16, 	IDT_FILE_EXIT, 		TBSTATE_ENABLED, TBSTYLE_BUTTON, {0}, 0, 0},
 	{17, 	IDT_FILE_SAVEAS, 	TBSTATE_ENABLED, TBSTYLE_BUTTON, {0}, 0, 0},
 	{18, 	IDT_FILE_SAVECOPY, 	TBSTATE_ENABLED, TBSTYLE_BUTTON, {0}, 0, 0},
@@ -97,7 +91,7 @@ static TBBUTTON  tbbMainWnd[] = {
 	{21, 	IDT_FILE_OPENFAV, 	TBSTATE_ENABLED, TBSTYLE_BUTTON, {0}, 0, 0},
 	{22, 	IDT_FILE_ADDTOFAV, 	TBSTATE_ENABLED, TBSTYLE_BUTTON, {0}, 0, 0},
 	{23, 	IDT_VIEW_TOGGLEFOLDS, 	TBSTATE_ENABLED, TBSTYLE_BUTTON, {0}, 0, 0},
-	{24, 	IDT_FILE_LAUNCH, 	TBSTATE_ENABLED, TBSTYLE_BUTTON, {0}, 0, 0}
+	{24, 	IDT_FILE_LAUNCH, 	TBSTATE_ENABLED, TBSTYLE_BUTTON, {0}, 0, 0},
 };
 
 WCHAR	szIniFile[MAX_PATH] = L"";
@@ -111,7 +105,7 @@ WCHAR	tchFavoritesDir[MAX_PATH];
 WCHAR	tchDefaultDir[MAX_PATH];
 WCHAR	tchDefaultExtension[64];
 WCHAR	tchFileDlgFilters[5 * 1024];
-WCHAR	tchToolbarButtons[512];
+WCHAR	tchToolbarButtons[MAX_TOOLBAR_BUTTON_CONFIG_BUFFER_SIZE];
 WCHAR	tchToolbarBitmap[MAX_PATH];
 WCHAR	tchToolbarBitmapHot[MAX_PATH];
 WCHAR	tchToolbarBitmapDisabled[MAX_PATH];
@@ -1815,8 +1809,8 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) {
 
 	for (int i = 0; i < count; i++) {
 		const IniKeyValueNode *node = &pIniSection->nodeList[i];
-		const UINT n = StrToInt(node->key) - 1;
-		if (n >= COUNTOF(tbbMainWnd) || tbbMainWnd[n].fsStyle == TBSTYLE_SEP) {
+		const UINT n = StrToInt(node->key);
+		if (n == 0 || n >= COUNTOF(tbbMainWnd)) {
 			continue;
 		}
 
@@ -1836,9 +1830,8 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) {
 	SendMessage(hwndToolbar, TB_SETEXTENDEDSTYLE, 0,
 				SendMessage(hwndToolbar, TB_GETEXTENDEDSTYLE, 0, 0) | TBSTYLE_EX_MIXEDBUTTONS);
 
-	SendMessage(hwndToolbar, TB_ADDBUTTONS, NUMINITIALTOOLS, (LPARAM)tbbMainWnd);
-	if (Toolbar_SetButtons(hwndToolbar, IDT_FILE_NEW, tchToolbarButtons, tbbMainWnd, COUNTOF(tbbMainWnd)) == 0) {
-		SendMessage(hwndToolbar, TB_ADDBUTTONS, NUMINITIALTOOLS, (LPARAM)tbbMainWnd);
+	if (Toolbar_SetButtons(hwndToolbar, tchToolbarButtons, tbbMainWnd, COUNTOF(tbbMainWnd)) == 0) {
+		Toolbar_SetButtons(hwndToolbar, DefaultToolbarButtons, tbbMainWnd, COUNTOF(tbbMainWnd));
 	}
 	SendMessage(hwndToolbar, TB_GETITEMRECT, 0, (LPARAM)&rc);
 	//SendMessage(hwndToolbar, TB_SETINDENT, 2, 0);
@@ -1900,7 +1893,7 @@ void MsgDPIChanged(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	SciCall_GotoPos(pos);
 
 	// recreate toolbar and statusbar
-	Toolbar_GetButtons(hwndToolbar, IDT_FILE_NEW, tchToolbarButtons, COUNTOF(tchToolbarButtons));
+	Toolbar_GetButtons(hwndToolbar, TOOLBAR_COMMAND_BASE, tchToolbarButtons, COUNTOF(tchToolbarButtons));
 
 	DestroyWindow(hwndToolbar);
 	DestroyWindow(hwndReBar);
@@ -1953,7 +1946,7 @@ void MsgThemeChanged(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	}
 
 	// recreate toolbar and statusbar
-	Toolbar_GetButtons(hwndToolbar, IDT_FILE_NEW, tchToolbarButtons, COUNTOF(tchToolbarButtons));
+	Toolbar_GetButtons(hwndToolbar, TOOLBAR_COMMAND_BASE, tchToolbarButtons, COUNTOF(tchToolbarButtons));
 
 	DestroyWindow(hwndToolbar);
 	DestroyWindow(hwndReBar);
@@ -5169,25 +5162,20 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			return TRUE;
 
 		case TBN_GETBUTTONINFO: {
-			if (((LPTBNOTIFY)lParam)->iItem < (int)COUNTOF(tbbMainWnd)) {
+			LPTBNOTIFY lpTbNotify = (LPTBNOTIFY)lParam;
+			if (lpTbNotify->iItem < (int)COUNTOF(tbbMainWnd)) {
 				WCHAR tch[256];
-				GetString(tbbMainWnd[((LPTBNOTIFY)lParam)->iItem].idCommand, tch, COUNTOF(tch));
-				lstrcpyn(((LPTBNOTIFY)lParam)->pszText, /*StrChr(tch, L'\n')+1*/tch, ((LPTBNOTIFY)lParam)->cchText);
-				CopyMemory(&((LPTBNOTIFY)lParam)->tbButton, &tbbMainWnd[((LPTBNOTIFY)lParam)->iItem], sizeof(TBBUTTON));
+				GetString(tbbMainWnd[lpTbNotify->iItem].idCommand, tch, COUNTOF(tch));
+				lstrcpyn(lpTbNotify->pszText, tch, lpTbNotify->cchText);
+				CopyMemory(&lpTbNotify->tbButton, &tbbMainWnd[lpTbNotify->iItem], sizeof(TBBUTTON));
 				return TRUE;
 			}
 		}
 		return FALSE;
 
-		case TBN_RESET: {
-			int c = (int)SendMessage(hwndToolbar, TB_BUTTONCOUNT, 0, 0);
-			for (int i = 0; i < c; i++) {
-				SendMessage(hwndToolbar, TB_DELETEBUTTON, 0, 0);
-			}
-			SendMessage(hwndToolbar, TB_ADDBUTTONS, NUMINITIALTOOLS, (LPARAM)tbbMainWnd);
-			return 0;
-		}
-
+		case TBN_RESET:
+			Toolbar_SetButtons(hwndToolbar, DefaultToolbarButtons, tbbMainWnd, COUNTOF(tbbMainWnd));
+			return FALSE;
 		}
 		break;
 
@@ -5469,7 +5457,7 @@ void LoadSettings(void) {
 	}
 
 	if (!IniSectionGetString(pIniSection, L"ToolbarButtons", L"", tchToolbarButtons, COUNTOF(tchToolbarButtons))) {
-		lstrcpy(tchToolbarButtons, DefaultToolbarButtons);
+		CopyMemory(tchToolbarButtons, DefaultToolbarButtons, COUNTOF(DefaultToolbarButtons) * sizeof(WCHAR));
 	}
 
 	bShowToolbar = IniSectionGetBool(pIniSection, L"ShowToolbar", 1);
@@ -5693,7 +5681,7 @@ void SaveSettings(BOOL bSaveSettingsNow) {
 	IniSectionSetIntEx(pIniSection, L"CaretBlinkPeriod", iCaretBlinkPeriod, -1);
 	IniSectionSetBool(pIniSection, L"UseInlineIME", bUseInlineIME); // keep result of auto detection
 	IniSectionSetBoolEx(pIniSection, L"InlineIMEUseBlockCaret", bInlineIMEUseBlockCaret, 0);
-	Toolbar_GetButtons(hwndToolbar, IDT_FILE_NEW, tchToolbarButtons, COUNTOF(tchToolbarButtons));
+	Toolbar_GetButtons(hwndToolbar, TOOLBAR_COMMAND_BASE, tchToolbarButtons, COUNTOF(tchToolbarButtons));
 	IniSectionSetStringEx(pIniSection, L"ToolbarButtons", tchToolbarButtons, DefaultToolbarButtons);
 	IniSectionSetBoolEx(pIniSection, L"ShowToolbar", bShowToolbar, 1);
 	IniSectionSetBoolEx(pIniSection, L"ShowStatusbar", bShowStatusbar, 1);

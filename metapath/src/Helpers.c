@@ -517,62 +517,54 @@ BOOL StatusSetText(HWND hwnd, UINT nPart, LPCWSTR lpszText) {
 //  Toolbar_Get/SetButtons()
 //
 int Toolbar_GetButtons(HWND hwnd, int cmdBase, LPWSTR lpszButtons, int cchButtons) {
-	WCHAR tchButtons[512];
-	WCHAR tchItem[32];
-	int c;
-	TBBUTTON tbb;
+	const int count = min_i(MAX_TOOLBAR_ITEM_COUNT_WITH_SEPARATOR, (int)SendMessage(hwnd, TB_BUTTONCOUNT, 0, 0));
+	const int maxCch = cchButtons - 3; // two digits, one space and NULL
+	int len = 0;
 
-	lstrcpy(tchButtons, L"");
-	c = min_i(50, (int)SendMessage(hwnd, TB_BUTTONCOUNT, 0, 0));
-
-	for (int i = 0; i < c; i++) {
+	for (int i = 0; i < count && len < maxCch; i++) {
+		TBBUTTON tbb;
 		SendMessage(hwnd, TB_GETBUTTON, (WPARAM)i, (LPARAM)&tbb);
-		wsprintf(tchItem, L"%i ", (tbb.idCommand == 0) ? 0 : tbb.idCommand - cmdBase + 1);
-		lstrcat(tchButtons, tchItem);
+		const int iCmd = (tbb.idCommand == 0) ? 0 : tbb.idCommand - cmdBase + 1;
+		len += wsprintf(lpszButtons + len, L"%i ", iCmd);
 	}
 
-	TrimString(tchButtons);
-	lstrcpyn(lpszButtons, tchButtons, cchButtons);
-	return c;
+	lpszButtons[len--] = L'\0';
+	if (len) {
+		lpszButtons[len] = L'\0';
+	}
+	return count;
 }
 
-int Toolbar_SetButtons(HWND hwnd, int cmdBase, LPCWSTR lpszButtons, LPCTBBUTTON ptbb, int ctbb) {
-	WCHAR tchButtons[512];
-	WCHAR *p;
-	int c;
-	int iCmd;
-
-	ZeroMemory(tchButtons, sizeof(tchButtons));
-	lstrcpyn(tchButtons, lpszButtons, COUNTOF(tchButtons) - 2);
-	TrimString(tchButtons);
-	while ((p = StrStr(tchButtons, L"  ")) != NULL) {
-		MoveMemory((WCHAR *)p, (WCHAR *)p + 1, (lstrlen(p) + 1) * sizeof(WCHAR));
+int Toolbar_SetButtons(HWND hwnd, LPCWSTR lpszButtons, LPCTBBUTTON ptbb, int ctbb) {
+	const int count = (int)SendMessage(hwnd, TB_BUTTONCOUNT, 0, 0);
+	if (StrIsEmpty(lpszButtons)) {
+		return count;
 	}
 
-	c = (int)SendMessage(hwnd, TB_BUTTONCOUNT, 0, 0);
-	for (int i = 0; i < c; i++) {
+	for (int i = 0; i < count; i++) {
 		SendMessage(hwnd, TB_DELETEBUTTON, 0, 0);
 	}
 
-	for (unsigned int i = 0; i < COUNTOF(tchButtons); i++) {
-		if (tchButtons[i] == L' ') {
-			tchButtons[i] = 0;
+	LPCWSTR p = lpszButtons;
+	ctbb--;
+	while (TRUE) {
+		while (*p == L' ') {
+			p++;
+		}
+		int iCmd;
+		if (StrToIntEx(p, STIF_DEFAULT, &iCmd)) {
+			iCmd = clamp_i(iCmd, 0, ctbb);
+			SendMessage(hwnd, TB_ADDBUTTONS, (WPARAM)1, (LPARAM)&ptbb[iCmd]);
+			p += (iCmd < 10) ? 1 : 2;
+			p = StrChr(p, L' ');
+			if (p == NULL) {
+				break;
+			}
+		} else {
+			break;
 		}
 	}
 
-	p = tchButtons;
-	while (*p) {
-		if (StrToIntEx(p, STIF_DEFAULT, &iCmd)) {
-			iCmd = (iCmd == 0) ? 0 : iCmd + cmdBase - 1;
-			for (int i = 0; i < ctbb; i++) {
-				if (ptbb[i].idCommand == iCmd) {
-					SendMessage(hwnd, TB_ADDBUTTONS, (WPARAM)1, (LPARAM)&ptbb[i]);
-					break;
-				}
-			}
-		}
-		p = StrEnd(p) + 1;
-	}
 	return (int)SendMessage(hwnd, TB_BUTTONCOUNT, 0, 0);
 }
 

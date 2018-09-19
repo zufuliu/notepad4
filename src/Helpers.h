@@ -337,8 +337,14 @@ BOOL StatusSetText(HWND hwnd, UINT nPart, LPCWSTR lpszText);
 BOOL StatusSetTextID(HWND hwnd, UINT nPart, UINT uID);
 int  StatusCalcPaneWidth(HWND hwnd, LPCWSTR lpsz);
 
+/**
+ * we only has 25 commands in toolbar
+ * max size = 25*(3 + 2) + 1 (each command with a separator)
+ */
+#define MAX_TOOLBAR_ITEM_COUNT_WITH_SEPARATOR	50
+#define MAX_TOOLBAR_BUTTON_CONFIG_BUFFER_SIZE	160
 int Toolbar_GetButtons(HWND hwnd, int cmdBase, LPWSTR lpszButtons, int cchButtons);
-int Toolbar_SetButtons(HWND hwnd, int cmdBase, LPCWSTR lpszButtons, LPCTBBUTTON ptbb, int ctbb);
+int Toolbar_SetButtons(HWND hwnd, LPCWSTR lpszButtons, LPCTBBUTTON ptbb, int ctbb);
 
 LRESULT SendWMSize(HWND hwnd);
 
