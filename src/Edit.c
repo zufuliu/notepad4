@@ -121,11 +121,6 @@ HWND EditCreate(HWND hwndParent) {
 	SendMessage(hwnd, SCI_ASSIGNCMDKEY, (SCK_HOME + (SCMOD_SHIFT << 16)), SCI_VCHOMEWRAPEXTEND);
 	SendMessage(hwnd, SCI_ASSIGNCMDKEY, (SCK_END + (SCMOD_SHIFT << 16)), SCI_LINEENDWRAPEXTEND);
 
-	// Init default values for printing
-	EditPrintInit();
-
-	//SciInitThemes(hwnd);
-
 	return hwnd;
 }
 

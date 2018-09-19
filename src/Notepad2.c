@@ -5663,10 +5663,10 @@ void SaveSettings(BOOL bSaveSettingsNow) {
 	IniSectionSetIntEx(pIniSection, L"PrintFooter", iPrintFooter, 0);
 	IniSectionSetIntEx(pIniSection, L"PrintColorMode", iPrintColor, SC_PRINT_COLOURONWHITE);
 	IniSectionSetIntEx(pIniSection, L"PrintZoom", iPrintZoom, 100);
-	IniSectionSetInt(pIniSection, L"PrintMarginLeft", pagesetupMargin.left);
-	IniSectionSetInt(pIniSection, L"PrintMarginTop", pagesetupMargin.top);
-	IniSectionSetInt(pIniSection, L"PrintMarginRight", pagesetupMargin.right);
-	IniSectionSetInt(pIniSection, L"PrintMarginBottom", pagesetupMargin.bottom);
+	IniSectionSetIntEx(pIniSection, L"PrintMarginLeft", pagesetupMargin.left, -1);
+	IniSectionSetIntEx(pIniSection, L"PrintMarginTop", pagesetupMargin.top, -1);
+	IniSectionSetIntEx(pIniSection, L"PrintMarginRight", pagesetupMargin.right, -1);
+	IniSectionSetIntEx(pIniSection, L"PrintMarginBottom", pagesetupMargin.bottom, -1);
 	IniSectionSetBoolEx(pIniSection, L"SaveBeforeRunningTools", bSaveBeforeRunningTools, 0);
 	IniSectionSetIntEx(pIniSection, L"FileWatchingMode", iFileWatchingMode, 2);
 	IniSectionSetBoolEx(pIniSection, L"ResetFileWatching", bResetFileWatching, 0);
