@@ -1334,7 +1334,7 @@ void History_UpdateToolbar(PHISTORY ph, HWND hwnd, int cmdBack, int cmdForward) 
 //
 LPMRULIST MRU_Create(LPCWSTR pszRegKey, int iFlags, int iSize) {
 	LPMRULIST pmru = NP2HeapAlloc(sizeof(MRULIST));
-	lstrcpyn(pmru->szRegKey, pszRegKey, COUNTOF(pmru->szRegKey));
+	pmru->szRegKey = pszRegKey;
 	pmru->iFlags = iFlags;
 	pmru->iSize = min_i(iSize, MRU_MAXITEMS);
 	return pmru;
