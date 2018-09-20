@@ -38,57 +38,57 @@
 #define CSTRLEN(s)	(_countof(s) - 1)
 #endif
 
-static inline int min_i(int x, int y) {
+inline int min_i(int x, int y) {
 	return (x < y) ? x : y;
 }
 
-static inline int max_i(int x, int y) {
+inline int max_i(int x, int y) {
 	return (x > y) ? x : y;
 }
 
-static inline UINT max_u(UINT x, UINT y) {
+inline UINT max_u(UINT x, UINT y) {
 	return (x > y) ? x : y;
 }
 
-static inline long max_l(long x, long y) {
+inline long max_l(long x, long y) {
 	return (x > y) ? x : y;
 }
 
-static inline int clamp_i(int x, int lower, int upper) {
+inline int clamp_i(int x, int lower, int upper) {
 	return (x < lower) ? lower : (x > upper) ? upper : x;
 }
 
-static inline BOOL StrIsEmptyA(LPCSTR s) {
+inline BOOL StrIsEmptyA(LPCSTR s) {
 	return s == NULL || *s == '\0';
 }
 
-static inline BOOL StrIsEmpty(LPCWSTR s) {
+inline BOOL StrIsEmpty(LPCWSTR s) {
 	return s == NULL || *s == L'\0';
 }
 
-static inline BOOL StrNotEmptyA(LPCSTR s) {
+inline BOOL StrNotEmptyA(LPCSTR s) {
 	return s != NULL && *s != '\0';
 }
 
-static inline BOOL StrNotEmpty(LPCWSTR s) {
+inline BOOL StrNotEmpty(LPCWSTR s) {
 	return s != NULL && *s != L'\0';
 }
 
-static inline BOOL StrEqual(LPCWSTR s1, LPCWSTR s2) {
+inline BOOL StrEqual(LPCWSTR s1, LPCWSTR s2) {
 	//return CompareStringW(LOCALE_INVARIANT, 0, s1, -1, s2, -1) == CSTR_EQUAL;
 	return wcscmp(s1, s2) == 0;
 }
 
-static inline BOOL StrCaseEqual(LPCWSTR s1, LPCWSTR s2) {
+inline BOOL StrCaseEqual(LPCWSTR s1, LPCWSTR s2) {
 	//return CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, s1, -1, s2, -1) == CSTR_EQUAL;
 	return _wcsicmp(s1, s2) == 0;
 }
 
-static inline BOOL StrNEqual(LPCWSTR s1, LPCWSTR s2, int cch) {
+inline BOOL StrNEqual(LPCWSTR s1, LPCWSTR s2, int cch) {
 	return wcsncmp(s1, s2, cch) == 0;
 }
 
-static inline BOOL StrNCaseEqual(LPCWSTR s1, LPCWSTR s2, int cch) {
+inline BOOL StrNCaseEqual(LPCWSTR s1, LPCWSTR s2, int cch) {
 	return _wcsnicmp(s1, s2, cch) == 0;
 }
 
@@ -151,13 +151,13 @@ extern WCHAR szIniFile[MAX_PATH];
 #define IniClearSection(lpSection) \
 	WritePrivateProfileSection(lpSection, L"", szIniFile)
 
-static inline void IniSetInt(LPCWSTR lpSection, LPCWSTR lpName, int i) {
+inline void IniSetInt(LPCWSTR lpSection, LPCWSTR lpName, int i) {
 	WCHAR tch[16];
 	wsprintf(tch, L"%i", i);
 	IniSetString(lpSection, lpName, tch);
 }
 
-static inline void IniSetBool(LPCWSTR lpSection, LPCWSTR lpName, BOOL b) {
+inline void IniSetBool(LPCWSTR lpSection, LPCWSTR lpName, BOOL b) {
 	IniSetString(lpSection, lpName, (b ? L"1" : L"0"));
 }
 
@@ -188,7 +188,7 @@ typedef struct IniSection {
 	IniKeyValueNode *nodeList;
 } IniSection;
 
-static inline void IniSectionInit(IniSection *section, int capacity) {
+inline void IniSectionInit(IniSection *section, int capacity) {
 	section->count = 0;
 	section->capacity = capacity;
 	section->head = NULL;
@@ -200,16 +200,16 @@ static inline void IniSectionInit(IniSection *section, int capacity) {
 #endif
 }
 
-static inline void IniSectionFree(IniSection *section) {
+inline void IniSectionFree(IniSection *section) {
 	NP2HeapFree(section->nodeList);
 }
 
-static inline void IniSectionClear(IniSection *section) {
+inline void IniSectionClear(IniSection *section) {
 	section->count = 0;
 	section->head = NULL;
 }
 
-static inline BOOL IniSectionIsEmpty(const IniSection *section) {
+inline BOOL IniSectionIsEmpty(const IniSection *section) {
 	return section->count == 0;
 }
 
@@ -217,7 +217,7 @@ BOOL IniSectionParseArray(IniSection *section, LPWSTR lpCachedIniSection);
 BOOL IniSectionParse(IniSection *section, LPWSTR lpCachedIniSection);
 LPCWSTR IniSectionUnsafeGetValue(IniSection *section, LPCWSTR key, int keyLen);
 
-static inline LPCWSTR IniSectionGetValueImpl(IniSection *section, LPCWSTR key, int keyLen) {
+inline LPCWSTR IniSectionGetValueImpl(IniSection *section, LPCWSTR key, int keyLen) {
 	return section->count ? IniSectionUnsafeGetValue(section, key, keyLen) : NULL;
 }
 
@@ -235,19 +235,19 @@ BOOL IniSectionGetBoolImpl(IniSection *section, LPCWSTR key, int keyLen, BOOL bD
 #define IniSectionGetString(section, key, lpDefault, lpReturnedString, cchReturnedString) \
 	IniSectionGetStringImpl(section, key, CSTRLEN(key), (lpDefault), (lpReturnedString), (cchReturnedString))
 
-static inline LPCWSTR IniSectionGetValueEx(IniSection *section, LPCWSTR key) {
+inline LPCWSTR IniSectionGetValueEx(IniSection *section, LPCWSTR key) {
 	return IniSectionGetValueImpl(section, key, -1);
 }
 
-static inline int IniSectionGetIntEx(IniSection *section, LPCWSTR key, int iDefault) {
+inline int IniSectionGetIntEx(IniSection *section, LPCWSTR key, int iDefault) {
 	return IniSectionGetIntImpl(section, key, -1, iDefault);
 }
 
-static inline BOOL IniSectionGetBoolEx(IniSection *section, LPCWSTR key, BOOL bDefault) {
+inline BOOL IniSectionGetBoolEx(IniSection *section, LPCWSTR key, BOOL bDefault) {
 	return IniSectionGetBoolImpl(section, key, -1, bDefault);
 }
 
-static inline BOOL IniSectionGetStringEx(IniSection *section, LPCWSTR key, LPCWSTR lpDefault, LPWSTR lpReturnedString, int cchReturnedString) {
+inline BOOL IniSectionGetStringEx(IniSection *section, LPCWSTR key, LPCWSTR lpDefault, LPWSTR lpReturnedString, int cchReturnedString) {
 	return IniSectionGetStringImpl(section, key, -1, lpDefault, lpReturnedString, cchReturnedString);
 }
 
@@ -257,29 +257,29 @@ typedef struct IniSectionOnSave {
 
 void IniSectionSetString(IniSectionOnSave *section, LPCWSTR key, LPCWSTR value);
 
-static inline void IniSectionSetInt(IniSectionOnSave *section, LPCWSTR key, int i) {
+inline void IniSectionSetInt(IniSectionOnSave *section, LPCWSTR key, int i) {
 	WCHAR tch[16];
 	wsprintf(tch, L"%i", i);
 	IniSectionSetString(section, key, tch);
 }
 
-static inline void IniSectionSetBool(IniSectionOnSave *section, LPCWSTR key, BOOL b) {
+inline void IniSectionSetBool(IniSectionOnSave *section, LPCWSTR key, BOOL b) {
 	IniSectionSetString(section, key, (b ? L"1" : L"0"));
 }
 
-static inline void IniSectionSetStringEx(IniSectionOnSave *section, LPCWSTR key, LPCWSTR value, LPCWSTR lpDefault) {
+inline void IniSectionSetStringEx(IniSectionOnSave *section, LPCWSTR key, LPCWSTR value, LPCWSTR lpDefault) {
 	if (!StrCaseEqual(value, lpDefault)) {
 		IniSectionSetString(section, key, value);
 	}
 }
 
-static inline void IniSectionSetIntEx(IniSectionOnSave *section, LPCWSTR key, int i, int iDefault) {
+inline void IniSectionSetIntEx(IniSectionOnSave *section, LPCWSTR key, int i, int iDefault) {
 	if (i != iDefault) {
 		IniSectionSetInt(section, key, i);
 	}
 }
 
-static inline void IniSectionSetBoolEx(IniSectionOnSave *section, LPCWSTR key, BOOL b, BOOL bDefault) {
+inline void IniSectionSetBoolEx(IniSectionOnSave *section, LPCWSTR key, BOOL b, BOOL bDefault) {
 	if (b != bDefault) {
 		IniSectionSetString(section, key, (b ? L"1" : L"0"));
 	}
@@ -287,11 +287,11 @@ static inline void IniSectionSetBoolEx(IniSectionOnSave *section, LPCWSTR key, B
 
 
 extern HWND hwndEdit;
-static inline void BeginWaitCursor(void) {
+inline void BeginWaitCursor(void) {
 	SendMessage(hwndEdit, SCI_SETCURSOR, (WPARAM)SC_CURSORWAIT, 0);
 }
 
-static inline void EndWaitCursor(void) {
+inline void EndWaitCursor(void) {
 	POINT pt;
 	SendMessage(hwndEdit, SCI_SETCURSOR, (WPARAM)SC_CURSORNORMAL, 0);
 	GetCursorPos(&pt);
@@ -413,7 +413,7 @@ BOOL	MRU_Delete(LPMRULIST pmru, int iIndex);
 BOOL	MRU_DeleteFileFromStore(LPMRULIST pmru, LPCWSTR pszFile);
 BOOL	MRU_Empty(LPMRULIST pmru);
 int 	MRU_Enum(LPMRULIST pmru, int iIndex, LPWSTR pszItem, int cchItem);
-static inline int MRU_GetCount(LPMRULIST pmru) {
+inline int MRU_GetCount(LPMRULIST pmru) {
 	return MRU_Enum(pmru, 0, NULL, 0);
 }
 BOOL	MRU_Load(LPMRULIST pmru);
