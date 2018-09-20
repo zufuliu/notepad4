@@ -529,7 +529,7 @@ int Toolbar_GetButtons(HWND hwnd, int cmdBase, LPWSTR lpszButtons, int cchButton
 	}
 
 	lpszButtons[len--] = L'\0';
-	if (len) {
+	if (len >= 0) {
 		lpszButtons[len] = L'\0';
 	}
 	return count;
