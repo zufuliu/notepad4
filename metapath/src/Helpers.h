@@ -341,7 +341,7 @@ void History_UpdateToolbar(PHISTORY ph, HWND hwnd, int cmdBack, int cmdForward);
 #define MRU_UTF8      2
 
 typedef struct _mrulist {
-	WCHAR  szRegKey[256];
+	LPCWSTR szRegKey;
 	int   iFlags;
 	int   iSize;
 	LPWSTR pszItems[MRU_MAXITEMS];
