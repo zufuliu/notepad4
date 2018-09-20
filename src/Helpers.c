@@ -1122,7 +1122,7 @@ void PathAbsoluteFromApp(LPWSTR lpszSrc, LPWSTR lpszDest, int cchDest, BOOL bExp
 //
 BOOL PathIsLnkFile(LPCWSTR pszPath) {
 	//WCHAR *pszExt;
-	WCHAR tchResPath[256];
+	WCHAR tchResPath[MAX_PATH];
 
 	if (!pszPath || !*pszPath) {
 		return FALSE;
@@ -1713,7 +1713,7 @@ BOOL MRU_Delete(LPMRULIST pmru, int iIndex) {
 BOOL MRU_DeleteFileFromStore(LPMRULIST pmru, LPCWSTR pszFile) {
 	int i = 0;
 	LPMRULIST pmruStore;
-	WCHAR wchItem[256];
+	WCHAR wchItem[MAX_PATH];
 
 	pmruStore = MRU_Create(pmru->szRegKey, pmru->iFlags, pmru->iSize);
 	MRU_Load(pmruStore);
@@ -1793,7 +1793,7 @@ BOOL MRU_Load(LPMRULIST pmru) {
 }
 
 BOOL MRU_Save(LPMRULIST pmru) {
-	WCHAR tchName[32];
+	WCHAR tchName[16];
 	IniSectionOnSave section;
 	WCHAR *pIniSectionBuf = NP2HeapAlloc(sizeof(WCHAR) * 32 * 1024);
 	IniSectionOnSave *pIniSection = &section;

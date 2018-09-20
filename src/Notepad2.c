@@ -197,7 +197,7 @@ typedef struct _wi {
 	int y;
 	int cx;
 	int cy;
-	int max;
+	BOOL max;
 } WININFO;
 
 WININFO wi;
@@ -298,20 +298,20 @@ WCHAR	wchWndClass[16] = WC_NOTEPAD2;
 
 // rarely changed statusbar items
 struct CachedStatusItem {
-#if NP2_GET_LEXER_STYLE_NAME_FROM_RES
-	WCHAR tchLexerName[MAX_EDITLEXER_NAME_SIZE];
-#endif
-	WCHAR tchZoom[8];
-
-	LPCWSTR pszLexerName;
-	LPCWSTR pszEOLMode;
-	LPCWSTR pszOvrMode;
-
 	BOOL lexerNameChanged;	// STATUS_LEXER
 	BOOL encodingChanged;	// STATUS_CODEPAGE
 	BOOL eolModeChanged;	// STATUS_EOLMODE
 	BOOL ovrModeChanged;	// STATUS_OVRMODE
 	BOOL zoomChanged;		// STATUS_DOCZOOM
+
+	LPCWSTR pszLexerName;
+	LPCWSTR pszEOLMode;
+	LPCWSTR pszOvrMode;
+	WCHAR tchZoom[8];
+
+#if NP2_GET_LEXER_STYLE_NAME_FROM_RES
+	WCHAR tchLexerName[MAX_EDITLEXER_NAME_SIZE];
+#endif
 } cachedStatusItem;
 
 HINSTANCE	g_hInstance;
@@ -2049,7 +2049,7 @@ void UpdateStatusBarCache(int item) {
 		break;
 
 	case STATUS_DOCZOOM:
-		wsprintf(cachedStatusItem.tchZoom, L" %i%%", iZoomLevel);
+		wsprintf(cachedStatusItem.tchZoom, L"%i%%", iZoomLevel);
 		cachedStatusItem.zoomChanged = TRUE;
 		break;
 	}
@@ -2068,7 +2068,7 @@ void UpdateStatusBarWidth(void) {
 	aWidth[3] = StatusCalcPaneWidth(hwndStatus, L"CR+LF");
 	aWidth[4] = StatusCalcPaneWidth(hwndStatus, L"OVR");
 	aWidth[5] = StatusCalcPaneWidth(hwndStatus, ((iBytes < 1024)? L"1,023 Bytes" : L"99.9 MiB"));
-	aWidth[6] = StatusCalcPaneWidth(hwndStatus, L"500%") + 16;
+	aWidth[6] = StatusCalcPaneWidth(hwndStatus, L"500%") + 12;
 
 	aWidth[0] = max_i(120, cx - (aWidth[1] + aWidth[2] + aWidth[3] + aWidth[4] + aWidth[5] + aWidth[6]));
 	aWidth[1] += aWidth[0];
@@ -4082,7 +4082,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			IniSetInt(L"Window", tchPosY, wi.y);
 			IniSetInt(L"Window", tchSizeX, wi.cx);
 			IniSetInt(L"Window", tchSizeY, wi.cy);
-			IniSetInt(L"Window", tchMaximized, wi.max);
+			IniSetBool(L"Window", tchMaximized, wi.max);
 
 			InfoBox(0, L"MsgStickyWinPos", IDS_STICKYWINPOS);
 		}
@@ -5547,10 +5547,7 @@ void LoadSettings(void) {
 		wi.y	= IniSectionGetIntEx(pIniSection, tchPosY, CW_USEDEFAULT);
 		wi.cx	= IniSectionGetIntEx(pIniSection, tchSizeX, CW_USEDEFAULT);
 		wi.cy	= IniSectionGetIntEx(pIniSection, tchSizeY, CW_USEDEFAULT);
-		wi.max	= IniSectionGetIntEx(pIniSection, tchMaximized, 0);
-		if (wi.max) {
-			wi.max = 1;
-		}
+		wi.max	= IniSectionGetBoolEx(pIniSection, tchMaximized, 0);
 	}
 
 	IniSectionFree(pIniSection);
@@ -5749,7 +5746,7 @@ void SaveSettings(BOOL bSaveSettingsNow) {
 		IniSetInt(L"Window", tchPosY, wi.y);
 		IniSetInt(L"Window", tchSizeX, wi.cx);
 		IniSetInt(L"Window", tchSizeY, wi.cy);
-		IniSetInt(L"Window", tchMaximized, wi.max);
+		IniSetBool(L"Window", tchMaximized, wi.max);
 	}
 
 	// Scintilla Styles
@@ -6212,15 +6209,12 @@ int ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2, BOOL *bIsNotepadReplacement) 
 					wi.y = y;
 					wi.cx = cx;
 					wi.cy = cy;
-					wi.max = cm;
+					wi.max = cm != 0;
 					if (wi.cx < 1) {
 						wi.cx = CW_USEDEFAULT;
 					}
 					if (wi.cy < 1) {
 						wi.cy = CW_USEDEFAULT;
-					}
-					if (wi.max) {
-						wi.max = 1;
 					}
 					if (itok == 4) {
 						wi.max = 0;

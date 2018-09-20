@@ -884,11 +884,11 @@ INT_PTR CALLBACK ItemsPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPara
 	case WM_CTLCOLORSTATIC:
 		if (!m_bDefCrNoFilt && GetDlgCtrlID((HWND)lParam) == IDC_COLOR_SAMP1) {
 			return (LRESULT)m_hbrNoFilt;
-		} else if (!m_bDefCrFilter && GetDlgCtrlID((HWND)lParam) == IDC_COLOR_SAMP2) {
-			return (LRESULT)m_hbrFilter;
-		} else {
-			return FALSE;
 		}
+		if (!m_bDefCrFilter && GetDlgCtrlID((HWND)lParam) == IDC_COLOR_SAMP2) {
+			return (LRESULT)m_hbrFilter;
+		}
+		return FALSE;
 	}
 
 	return FALSE;

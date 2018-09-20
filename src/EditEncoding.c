@@ -226,14 +226,15 @@ BOOL EditSetNewEncoding(HWND hwnd, int iCurrentEncoding, int iNewEncoding, BOOL 
 // Encoding Helper Functions
 //
 void Encoding_InitDefaults(void) {
+	const UINT oemcp = GetOEMCP();
 	wsprintf(wchANSI, L" (%u)", GetACP());
-	mEncoding[CPI_OEM].uCodePage = GetOEMCP();
-	wsprintf(wchOEM, L" (%u)", mEncoding[CPI_OEM].uCodePage);
+	mEncoding[CPI_OEM].uCodePage = oemcp;
+	wsprintf(wchOEM, L" (%u)", oemcp);
 
 	g_DOSEncoding = CPI_OEM;
 
 	// Try to set the DOS encoding to DOS-437 if the default OEMCP is not DOS-437
-	if (mEncoding[g_DOSEncoding].uCodePage != 437) {
+	if (oemcp != 437) {
 		for (unsigned int i = CPI_UTF7 + 1; i < COUNTOF(mEncoding); ++i) {
 			if (mEncoding[i].uCodePage == 437 && Encoding_IsValid(i)) {
 				g_DOSEncoding = i;

@@ -374,7 +374,7 @@ BOOL BitmapGrayScale(HBITMAP hbmp) {
 //  SetWindowPathTitle()
 //
 BOOL SetWindowPathTitle(HWND hwnd, LPCWSTR lpszFile) {
-	WCHAR szTitle[256] = L"";
+	WCHAR szTitle[MAX_PATH] = L"";
 	if (StrNotEmpty(lpszFile)) {
 		if (!PathIsRoot(lpszFile)) {
 			SHFILEINFO shfi;
@@ -1447,7 +1447,7 @@ BOOL MRU_Load(LPMRULIST pmru) {
 }
 
 BOOL MRU_Save(LPMRULIST pmru) {
-	WCHAR tchName[32];
+	WCHAR tchName[16];
 	IniSectionOnSave section;
 	WCHAR *pIniSectionBuf = NP2HeapAlloc(sizeof(WCHAR) * 32 * 1024);
 	IniSectionOnSave *pIniSection = &section;

@@ -982,19 +982,6 @@ extern BOOL	bTabIndents;
 extern int	iTabWidth;
 extern int	iIndentWidth;
 
-static inline LPCWSTR EditGetLineEndString(void) {
-	switch (iEOLMode) {
-	case SC_EOL_CRLF:
-		return L"\r\n";
-	case SC_EOL_LF:
-		return L"\n";
-	case SC_EOL_CR:
-		return L"\r";
-	default:
-		return L"\n";
-	}
-}
-
 void EditAutoIndent(HWND hwnd) {
 	char *pLineBuf;
 
@@ -1245,7 +1232,7 @@ void EditEncloseSelectionNewLine(HWND hwnd, LPCWSTR pwszOpen, LPCWSTR pwszClose)
 	WCHAR end[64] = L"";
 	Sci_Position pos;
 	int line;
-	LPCWSTR lineEnd = EditGetLineEndString();
+	LPCWSTR lineEnd = (iEOLMode == SC_EOL_LF) ? L"LF" : ((iEOLMode == SC_EOL_CR) ? L"CR" : L"CR+LF");
 
 	pos = SciCall_GetSelectionStart();
 	line = SciCall_LineFromPosition(pos);

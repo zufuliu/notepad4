@@ -1,3 +1,5 @@
+UNREFERENCED_PARAMETER();
+
 /wd4200 /wd4201 /wd4204
 Disabled warnings:
 	C4200: nonstandard extension used: zero-sized array in struct/union.
