@@ -183,7 +183,7 @@ typedef struct _np2encoding {
 } NP2ENCODING;
 
 // 932 Shift-JIS, 936 GBK, 949 UHC, 950 Big5, 1361 Johab
-static inline BOOL IsDBCSCodePage(UINT page) {
+inline BOOL IsDBCSCodePage(UINT page) {
 	return page == 932 || page == 936 || page == 949 || page == 950 || page == 1361;
 }
 
@@ -208,7 +208,7 @@ INT		UTF8_mbslen_bytes(LPCSTR utf8_string);
 // WideCharToMultiByte, UTF8 encoding of U+0800 to U+FFFF
 #define kMaxMultiByteCount	3
 
-static inline BOOL IsUTF8Signature(const char *p) {
+inline BOOL IsUTF8Signature(const char *p) {
 	UINT value = (*((UNALIGNED UINT*)p)) & 0xFFFFFF;
 	// 0xEF, 0xBB, 0xBF in little endian
 	return value == 0xBFBBEF;
