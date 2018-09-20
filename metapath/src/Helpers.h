@@ -267,7 +267,7 @@ void SetWindowTransparentMode(HWND hwnd, BOOL bTransparentMode);
 BOOL StatusSetText(HWND hwnd, UINT nPart, LPCWSTR lpszText);
 
 /**
- * we only has 14 commands in toolbar
+ * we only have 14 commands in toolbar
  * max size = 14*(3 + 2) + 1 (each command with a separator)
  */
 #define MAX_TOOLBAR_ITEM_COUNT_WITH_SEPARATOR	50

@@ -338,7 +338,7 @@ BOOL StatusSetTextID(HWND hwnd, UINT nPart, UINT uID);
 int  StatusCalcPaneWidth(HWND hwnd, LPCWSTR lpsz);
 
 /**
- * we only has 25 commands in toolbar
+ * we only have 25 commands in toolbar
  * max size = 25*(3 + 2) + 1 (each command with a separator)
  */
 #define MAX_TOOLBAR_ITEM_COUNT_WITH_SEPARATOR	50
