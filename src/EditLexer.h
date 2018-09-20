@@ -53,7 +53,7 @@ typedef struct _editlexer {
 	};
 	LPCWSTR const pszDefExt;
 	WCHAR szExtensions[MAX_EDITLEXER_EXT_SIZE];
-	const PKEYWORDLIST pKeyWords;
+	const KEYWORDLIST * const pKeyWords;
 	EDITSTYLE Styles[];
 } EDITLEXER, *PEDITLEXER;
 

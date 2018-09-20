@@ -193,7 +193,7 @@ static const PEDITLEXER pLexArray[NUMLEXERS] = {
 };
 
 #define	NUM_MONO_FONT	6
-static const WCHAR *SysMonoFontName[NUM_MONO_FONT] = {
+static LPCWSTR const SysMonoFontName[NUM_MONO_FONT + 1] = {
 	L"DejaVu Sans Mono",
 	//L"Bitstream Vera Sans Mono",
 	L"Consolas",
@@ -201,8 +201,9 @@ static const WCHAR *SysMonoFontName[NUM_MONO_FONT] = {
 	L"Monaco",
 	L"Inconsolata",
 	L"Lucida Console",
+	L"Courier New",
 };
-int	np2MonoFontIndex = NUM_MONO_FONT; // Courier New
+static int np2MonoFontIndex = NUM_MONO_FONT; // Courier New
 
 // Currently used lexer
 PEDITLEXER pLexCurrent = &lexDefault;
@@ -231,6 +232,19 @@ extern int	g_DOSEncoding;
 extern int	iDefaultCodePage;
 extern int	iDefaultCharSet;
 extern BOOL	bHiliteCurrentLine;
+
+static inline int GetDefaultStyleStartIndex(void) {
+	return bUse2ndDefaultStyle ? 12 : 0;
+}
+
+static inline int FindDefaultFontIndex(void) {
+	for (int i = 0; i < NUM_MONO_FONT; i++) {
+		if (IsFontAvailable(SysMonoFontName[i])) {
+			return i;
+		}
+	}
+	return NUM_MONO_FONT;
+}
 
 //=============================================================================
 //
@@ -271,8 +285,7 @@ void Style_Load(void) {
 		LPWSTR wch = (LPWSTR)node->value;
 		if (n < COUNTOF(crCustom) && *wch == L'#') {
 			int irgb;
-			*wch = L'x';
-			--wch;
+			*wch-- = L'x';
 			*wch = L'0';
 			if (StrToIntEx(wch, STIF_SUPPORT_HEX, &irgb)) {
 				crCustom[n] = RGB((irgb & 0xFF0000) >> 16, (irgb & 0xFF00) >> 8, irgb & 0xFF);
@@ -297,8 +310,8 @@ void Style_Load(void) {
 	cxStyleSelectDlg = IniSectionGetInt(pIniSection, L"SelectDlgSizeX", 304);
 	cxStyleSelectDlg = max_i(cxStyleSelectDlg, 0);
 
-	cyStyleSelectDlg = IniSectionGetInt(pIniSection, L"SelectDlgSizeY", 0);
-	cyStyleSelectDlg = max_i(cyStyleSelectDlg, 324);
+	cyStyleSelectDlg = IniSectionGetInt(pIniSection, L"SelectDlgSizeY", 324);
+	cyStyleSelectDlg = max_i(cyStyleSelectDlg, 0);
 
 	for (int iLexer = 0; iLexer < NUMLEXERS; iLexer++) {
 		PEDITLEXER lex = pLexArray[iLexer];
@@ -322,6 +335,8 @@ void Style_Load(void) {
 		}
 	}
 
+	np2MonoFontIndex = FindDefaultFontIndex();
+
 	IniSectionFree(pIniSection);
 	NP2HeapFree(pIniSectionBuf);
 }
@@ -339,8 +354,8 @@ void Style_Save(void) {
 
 	// Custom colors
 	for (unsigned int i = 0; i < 16; i++) {
-		WCHAR tch[32];
-		WCHAR wch[32];
+		WCHAR tch[4];
+		WCHAR wch[16];
 		wsprintf(tch, L"%02u", i + 1);
 		wsprintf(wch, L"#%02X%02X%02X",
 				 (int)GetRValue(crCustom[i]),
@@ -696,14 +711,7 @@ void Style_SetLexer(HWND hwnd, PEDITLEXER pLexNew) {
 	}
 
 	// Use 2nd default style
-	const int iIdx = (bUse2ndDefaultStyle) ? 12 : 0;
-	// Check font availability
-	for (int i = 0; i < NUM_MONO_FONT; i++) {
-		if (IsFontAvailable(SysMonoFontName[i])) {
-			np2MonoFontIndex = i;
-			break;
-		}
-	}
+	const int iIdx = GetDefaultStyleStartIndex();
 	// Font quality setup
 	SendMessage(hwnd, SCI_SETFONTQUALITY, iFontQuality, 0);
 
@@ -1664,7 +1672,7 @@ PEDITLEXER __fastcall Style_MatchLexer(LPCWSTR lpszMatch, BOOL bCheckNames) {
 			}
 		}
 
-		WCHAR tch[128];
+		WCHAR tch[MAX_EDITLEXER_EXT_SIZE];
 		ZeroMemory(tch, sizeof(tch));
 		for (int i = 0; i < NUMLEXERS; i++) {
 			WCHAR *p1 = tch, *p2;
@@ -2088,7 +2096,7 @@ void Style_SetLongLineColors(HWND hwnd) {
 	int rgb;
 
 	// Use 2nd default style
-	const int iIdx = (bUse2ndDefaultStyle) ? 12 : 0;
+	const int iIdx = GetDefaultStyleStartIndex();
 
 	if (SendMessage(hwnd, SCI_GETEDGEMODE, 0, 0) == EDGE_LINE) {
 		if (Style_StrGetColor(TRUE, lexDefault.Styles[10 + iIdx].szValue, &rgb)) { // edge fore
@@ -2113,7 +2121,7 @@ void Style_SetCurrentLineBackground(HWND hwnd) {
 	int rgb, iValue;
 
 	// Use 2nd default style
-	const int iIdx = (bUse2ndDefaultStyle) ? 12 : 0;
+	const int iIdx = GetDefaultStyleStartIndex();
 
 	if (bHiliteCurrentLine) {
 		if (Style_StrGetColor(FALSE, lexDefault.Styles[8 + iIdx].szValue, &rgb)) { // caret line back
@@ -2188,11 +2196,7 @@ BOOL Style_StrGetFont(LPCWSTR lpszStyle, LPWSTR lpszFont, int cchFont) {
 		TrimString(tch);
 
 		if (StrCaseEqual(tch, L"Default") || !IsFontAvailable(tch)) {
-			if (np2MonoFontIndex < NUM_MONO_FONT) {
-				lstrcpyn(lpszFont, SysMonoFontName[np2MonoFontIndex], cchFont);
-			} else {
-				lstrcpyn(lpszFont, L"Courier New", cchFont);
-			}
+			lstrcpyn(lpszFont, SysMonoFontName[np2MonoFontIndex], cchFont);
 		} else {
 			lstrcpyn(lpszFont, tch, cchFont);
 		}
@@ -2209,13 +2213,8 @@ BOOL Style_StrGetCharSet(LPCWSTR lpszStyle, int *i) {
 	WCHAR *p;
 
 	if ((p = StrStr(lpszStyle, L"charset:")) != NULL) {
-		WCHAR tch[256];
-		int	 iValue;
-		lstrcpy(tch, p + CSTRLEN(L"charset:"));
-		if (StrToIntEx(tch, STIF_DEFAULT, &iValue)) {
-			*i = iValue;
-			return TRUE;
-		}
+		p += CSTRLEN(L"charset:");
+		return StrToIntEx(p, STIF_DEFAULT, i);
 	}
 	return FALSE;
 }
@@ -2228,23 +2227,13 @@ BOOL Style_StrGetSizeEx(LPCWSTR lpszStyle, int *i) {
 	WCHAR *p;
 
 	if ((p = StrStr(lpszStyle, L"size:")) != NULL) {
-		WCHAR tch[256];
+		p += CSTRLEN(L"size:");
 		float value;
-		int	 iSign = 0;
-		lstrcpy(tch, p + CSTRLEN(L"size:"));
-		if (tch[0] == L'+') {
-			iSign = 1;
-			tch[0] = L' ';
-		} else if (tch[0] == L'-') {
-			iSign = -1;
-			tch[0] = L' ';
-		}
-		if (swscanf(tch, L"%f", &value) == 1) {
+		if (swscanf(p, L"%f", &value) == 1) {
 			int iValue = (int)lroundf(value * SC_FONT_SIZE_MULTIPLIER);
-			if (iSign != 0) {
-				iValue = iBaseFontSize + iValue*iSign;
-				iValue = max_i(0, iValue); // size must be +
-			}
+			iValue += (*p == L'+' || *p == '-')? iBaseFontSize : 0;
+			// scintilla/src/ViewStyle.h GetFontSizeZoomed()
+			iValue = max_i(iValue, 2 * SC_FONT_SIZE_MULTIPLIER);
 			*i = iValue;
 			return TRUE;
 		}
@@ -2267,7 +2256,7 @@ BOOL Style_StrGetSizeStr(LPCWSTR lpszStyle, LPWSTR lpszSize, int cchSize) {
 	WCHAR *p;
 
 	if ((p = StrStr(lpszStyle, L"size:")) != NULL) {
-		WCHAR tch[256];
+		WCHAR tch[MAX_EDITSTYLE_VALUE_SIZE];
 		lstrcpy(tch, p + CSTRLEN(L"size:"));
 		if ((p = StrChr(tch, L';')) != NULL) {
 			*p = L'\0';
@@ -2283,22 +2272,22 @@ BOOL Style_StrGetSizeStr(LPCWSTR lpszStyle, LPWSTR lpszSize, int cchSize) {
 //
 // Style_StrGetColor()
 //
-BOOL Style_StrGetColor(BOOL bFore, LPCWSTR lpszStyle, int *rgb) {
+BOOL Style_StrGetColor(BOOL bFore, LPWSTR lpszStyle, int *rgb) {
 	WCHAR *p;
-	const WCHAR *pItem = (bFore) ? L"fore:" : L"back:";
 
-	if ((p = StrStr(lpszStyle, pItem)) != NULL) {
-		WCHAR tch[256];
-		int iValue;
-		lstrcpy(tch + 1, p + CSTRLEN("fore:"));
-		if (tch[1] != L'#') {
-			return FALSE;
-		}
-		tch[0] = L'0';
-		tch[1] = L'x';
-		if (StrToIntEx(tch, STIF_SUPPORT_HEX, &iValue)) {
-			*rgb = RGB((iValue & 0xFF0000) >> 16, (iValue & 0xFF00) >> 8, iValue & 0xFF);
-			return TRUE;
+	if ((p = StrStr(lpszStyle, (bFore ? L"fore:" : L"back:"))) != NULL) {
+		p += CSTRLEN("fore:");
+		if (*p == L'#') {
+			*p-- = L'x';
+			*p = '0';
+			int iValue;
+			const BOOL result = StrToIntEx(p, STIF_SUPPORT_HEX, &iValue);
+			if (result) {
+				*rgb = RGB((iValue & 0xFF0000) >> 16, (iValue & 0xFF00) >> 8, iValue & 0xFF);
+			}
+			*p++ = L':';
+			*p = L'#';
+			return result;
 		}
 	}
 	return FALSE;
@@ -2312,7 +2301,7 @@ BOOL Style_StrGetCase(LPCWSTR lpszStyle, int *i) {
 	WCHAR *p;
 
 	if ((p = StrStr(lpszStyle, L"case:")) != NULL) {
-		WCHAR tch[256];
+		WCHAR tch[MAX_EDITSTYLE_VALUE_SIZE];
 		lstrcpy(tch, p + CSTRLEN(L"case:"));
 		if ((p = StrChr(tch, L';')) != NULL) {
 			*p = L'\0';
@@ -2338,11 +2327,9 @@ BOOL Style_StrGetAlpha(LPCWSTR lpszStyle, int *i) {
 	WCHAR *p;
 
 	if ((p = StrStr(lpszStyle, L"alpha:")) != NULL) {
-		WCHAR tch[256];
-		int	 iValue;
-		lstrcpy(tch, p + CSTRLEN(L"alpha:"));
-		if (StrToIntEx(tch, STIF_DEFAULT, &iValue)) {
-			*i = clamp_i(iValue, SC_ALPHA_TRANSPARENT, SC_ALPHA_OPAQUE);
+		p += CSTRLEN(L"alpha:");
+		if (StrToIntEx(p, STIF_DEFAULT, i)) {
+			*i = clamp_i(*i, SC_ALPHA_TRANSPARENT, SC_ALPHA_OPAQUE);
 			return TRUE;
 		}
 	}
@@ -2358,7 +2345,7 @@ BOOL Style_SelectFont(HWND hwnd, LPWSTR lpszStyle, int cchStyle, BOOL bDefaultSt
 	LOGFONT lf;
 	WCHAR szNewStyle[512];
 	int	 iValue;
-	WCHAR tch[32];
+	WCHAR tch[32]; // LF_FACESIZE
 
 	ZeroMemory(&cf, sizeof(CHOOSEFONT));
 	ZeroMemory(&lf, sizeof(LOGFONT));
@@ -2473,7 +2460,7 @@ BOOL Style_SelectFont(HWND hwnd, LPWSTR lpszStyle, int cchStyle, BOOL bDefaultSt
 // Style_SetDefaultFont()
 //
 void Style_SetDefaultFont(HWND hwnd) {
-	const int iIdx = (bUse2ndDefaultStyle) ? 12 : 0;
+	const int iIdx = GetDefaultStyleStartIndex();
 	if (Style_SelectFont(hwnd, lexDefault.Styles[0 + iIdx].szValue, MAX_EDITSTYLE_VALUE_SIZE, TRUE)) {
 		fStylesModified = TRUE;
 		Style_SetLexer(hwnd, pLexCurrent);
@@ -2489,7 +2476,7 @@ BOOL Style_SelectColor(HWND hwnd, BOOL bFore, LPWSTR lpszStyle, int cchStyle) {
 	WCHAR szNewStyle[512];
 	int	 iRGBResult;
 	int	 iValue;
-	WCHAR tch[32];
+	WCHAR tch[32]; // LF_FACESIZE
 
 	ZeroMemory(&cc, sizeof(CHOOSECOLOR));
 
@@ -2611,13 +2598,13 @@ BOOL Style_SelectColor(HWND hwnd, BOOL bFore, LPWSTR lpszStyle, int cchStyle) {
 //
 // Style_SetStyles()
 //
-void Style_SetStyles(HWND hwnd, int iStyle, LPCWSTR lpszStyle) {
-	WCHAR tch[256];
+void Style_SetStyles(HWND hwnd, int iStyle, LPWSTR lpszStyle) {
+	WCHAR tch[LF_FACESIZE];
 	int	 iValue;
 
 	// Font
 	if (Style_StrGetFont(lpszStyle, tch, COUNTOF(tch))) {
-		char mch[256 * kMaxMultiByteCount];
+		char mch[LF_FACESIZE * kMaxMultiByteCount];
 		WideCharToMultiByte(CP_UTF8, 0, tch, -1, mch, COUNTOF(mch), NULL, NULL);
 		SendMessage(hwnd, SCI_STYLESETFONT, iStyle, (LPARAM)mch);
 	}
@@ -2891,7 +2878,7 @@ INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM
 
 				// a lexer has been selected
 				if (!TreeView_GetParent(hwndTV, lpnmtv->itemNew.hItem)) {
-					WCHAR wch[128];
+					WCHAR wch[MAX_EDITLEXER_EXT_SIZE];
 
 					GetDlgItemText(hwnd, IDC_STYLELABELS, wch, COUNTOF(wch));
 					if (StrChr(wch, L'|')) {
@@ -2936,7 +2923,7 @@ INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM
 
 				// a style has been selected
 				else {
-					WCHAR wch[128];
+					WCHAR wch[MAX_EDITSTYLE_VALUE_SIZE];
 
 					GetDlgItemText(hwnd, IDC_STYLELABELS, wch, COUNTOF(wch));
 					if (StrChr(wch, L'|')) {
@@ -3306,6 +3293,7 @@ void Style_ConfigDlg(HWND hwnd) {
 		}
 	}
 	cItems = c;
+	DLogf("MAX_TOTAL_EDIT_STYLE_COUNT=%i\n", cItems);
 
 	if (IDCANCEL == ThemedDialogBoxParam(g_hInstance,
 										 MAKEINTRESOURCE(IDD_STYLECONFIG),

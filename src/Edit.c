@@ -338,7 +338,7 @@ BOOL EditCopyAppend(HWND hwnd) {
 	cchTextW = MultiByteToWideChar(uCodePage, 0, pszText, -1, NULL, 0);
 	if (cchTextW > 0) {
 		const WCHAR *pszSep = L"\r\n\r\n";
-		pszTextW = NP2HeapAlloc(sizeof(WCHAR) * (lstrlen(pszSep) + cchTextW + 1));
+		pszTextW = NP2HeapAlloc(sizeof(WCHAR) * (CSTRLEN(L"\r\n\r\n") + cchTextW + 1));
 		lstrcpy(pszTextW, pszSep);
 		MultiByteToWideChar(uCodePage, 0, pszText, -1, StrEnd(pszTextW), (int)NP2HeapSize(pszTextW) / sizeof(WCHAR));
 	} else {
@@ -467,9 +467,9 @@ BOOL EditLoadFile(HWND hwnd, LPWSTR pszFile, BOOL bSkipEncodingDetection,
 		WCHAR path[MAX_PATH] = L"";
 		FARPROC pfnGetFinalPathNameByHandle = GetProcAddress(GetModuleHandle(L"kernel32.dll"), "GetFinalPathNameByHandleW");
 		if (pfnGetFinalPathNameByHandle && pfnGetFinalPathNameByHandle(hFile, path, MAX_PATH, /*FILE_NAME_OPENED*/0x8) > 0) {
-			if (StrNEqual(path, L"\\\\?\\", 4)) {
+			if (StrNEqual(path, L"\\\\?\\", CSTRLEN(L"\\\\?\\"))) {
 				WCHAR *p = path + 4;
-				if (StrNEqual(p, L"UNC\\", 4)) {
+				if (StrNEqual(p, L"UNC\\", CSTRLEN(L"UNC\\"))) {
 					p += 2;
 					*p = L'\\';
 				}
@@ -774,7 +774,7 @@ BOOL EditSaveFile(HWND hwnd, LPCWSTR pszFile, int iEncoding, BOOL *pbCancelDataL
 			LPWSTR lpDataWide = NP2HeapAlloc(cbData * 2 + 16);
 			int cbDataWide = MultiByteToWideChar(CP_UTF8, 0, lpData, cbData, lpDataWide,
 												 (int)NP2HeapSize(lpDataWide) / sizeof(WCHAR));
-			// Special cases: 42, 50220, 50221, 50222, 50225, 50227, 50229, 54936, 57002-11, 65000, 65001
+			// Special cases: 42, 50220, 50221, 50222, 50225, 50227, 50229, 54936 GB18030, 57002-11, 65000, 65001
 			if (uCodePage == CP_UTF7 || uCodePage == 54936) {
 				NP2HeapFree(lpData);
 				lpData = NP2HeapAlloc(NP2HeapSize(lpDataWide) * 2);

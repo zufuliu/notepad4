@@ -2649,7 +2649,7 @@ void SaveSettings(BOOL bSaveSettingsNow) {
 	}
 
 	{
-		WCHAR tchPosX[32], tchPosY[32], tchSizeX[32], tchSizeY[32], tchMaximized[32];
+		WCHAR tchPosX[32], tchPosY[32], tchSizeX[32], tchSizeY[32];
 		int ResX = GetSystemMetrics(SM_CXSCREEN);
 		int ResY = GetSystemMetrics(SM_CYSCREEN);
 
@@ -2657,7 +2657,6 @@ void SaveSettings(BOOL bSaveSettingsNow) {
 		wsprintf(tchPosY, L"%ix%i PosY", ResX, ResY);
 		wsprintf(tchSizeX, L"%ix%i SizeX", ResX, ResY);
 		wsprintf(tchSizeY, L"%ix%i SizeY", ResX, ResY);
-		wsprintf(tchMaximized, L"%ix%i Maximized", ResX, ResY);
 
 		IniSetInt(L"Window", tchPosX, wi.x);
 		IniSetInt(L"Window", tchPosY, wi.y);

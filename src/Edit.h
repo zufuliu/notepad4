@@ -175,10 +175,10 @@ void	EditShowCallTips(HWND hwnd, Sci_Position position);
 #define IDS_EOLMODENAME0		62000
 
 typedef struct _np2encoding {
-	UINT	uFlags;
+	const UINT uFlags;
 	UINT	uCodePage;
-	const char *pszParseNames;
-	int		idsName;
+	const char * const pszParseNames;
+	const int idsName;
 	WCHAR	wchLabel[32];
 } NP2ENCODING;
 

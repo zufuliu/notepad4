@@ -41,7 +41,7 @@ extern "C" RECT pagesetupMargin;
 HGLOBAL hDevMode = nullptr;
 HGLOBAL hDevNames = nullptr;
 
-static void EditPrintInit(void);
+static void EditPrintInit();
 
 //=============================================================================
 //
@@ -574,7 +574,7 @@ extern "C" void EditPrintSetup(HWND hwnd) {
 //
 // EditPrintInit() - Setup default page margin if no values from registry
 //
-static void EditPrintInit(void) {
+static void EditPrintInit() {
 	if (pagesetupMargin.left == -1 || pagesetupMargin.top == -1 ||
 			pagesetupMargin.right == -1 || pagesetupMargin.bottom == -1) {
 		WCHAR localeInfo[3];

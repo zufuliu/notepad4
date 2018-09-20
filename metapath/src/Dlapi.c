@@ -1142,8 +1142,8 @@ LRESULT DriveBox_GetDispInfo(HWND hwnd, LPARAM lParam) {
 
 	// Get Icon Index
 	if (lpnmcbe->ceItem.mask & (CBEIF_IMAGE | CBEIF_SELECTEDIMAGE)) {
-		WCHAR szTemp[256];
-		IL_GetDisplayName(lpdcid->lpsf, lpdcid->pidl, SHGDN_FORPARSING, szTemp, 256);
+		WCHAR szTemp[MAX_PATH];
+		IL_GetDisplayName(lpdcid->lpsf, lpdcid->pidl, SHGDN_FORPARSING, szTemp, MAX_PATH);
 		SHGetFileInfo(szTemp, 0, &shfi, sizeof(SHFILEINFO), SHGFI_SYSICONINDEX | SHGFI_SMALLICON);
 		lpnmcbe->ceItem.iImage = shfi.iIcon;
 		lpnmcbe->ceItem.iSelectedImage = shfi.iIcon;
