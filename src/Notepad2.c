@@ -1225,7 +1225,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 		}
 
 		hmenu = LoadMenu(g_hInstance, MAKEINTRESOURCE(IDR_POPUPMENU));
-		//SetMenuDefaultItem(GetSubMenu(hmenu, 1), 0, FALSE);
+		//SetMenuDefaultItem(GetSubMenu(hmenu, IDP_POPUP_SUBMENU_BAR), 0, FALSE);
 
 		pt.x = GET_X_LPARAM(lParam);
 		pt.y = GET_Y_LPARAM(lParam);
@@ -1249,7 +1249,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 				pt.y = (int)SendMessage(hwndEdit, SCI_POINTYFROMPOSITION, 0, (LPARAM)iCurrentPos);
 				ClientToScreen(hwndEdit, &pt);
 			}
-			imenu = 0;
+			imenu = IDP_POPUP_SUBMENU_EDIT;
 		}
 		break;
 
@@ -1259,7 +1259,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 			if (pt.x == -1 && pt.y == -1) {
 				GetCursorPos(&pt);
 			}
-			imenu = 1;
+			imenu = IDP_POPUP_SUBMENU_BAR;
 			break;
 		}
 
@@ -1379,7 +1379,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 		switch (lParam) {
 		case WM_RBUTTONUP: {
 			HMENU hMenu = LoadMenu(g_hInstance, MAKEINTRESOURCE(IDR_POPUPMENU));
-			HMENU hMenuPopup = GetSubMenu(hMenu, 2);
+			HMENU hMenuPopup = GetSubMenu(hMenu, IDP_POPUP_SUBMENU_TRAY);
 
 			POINT pt;
 			int iCmd;

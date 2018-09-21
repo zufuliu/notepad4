@@ -550,25 +550,25 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 		}
 
 		hmenu = LoadMenu(g_hInstance, MAKEINTRESOURCE(IDR_MAINWND));
-		SetMenuDefaultItem(GetSubMenu(hmenu, 0), IDM_FILE_OPEN, FALSE);
+		SetMenuDefaultItem(GetSubMenu(hmenu, IDP_POPUP_SUBMENU_PATH), IDM_FILE_OPEN, FALSE);
 
 		switch (nID) {
 		case IDC_DIRLIST:
 			if (ListView_GetSelectedCount(hwndDirList)) {
-				imenu = 0;
+				imenu = IDP_POPUP_SUBMENU_PATH;
 			} else {
-				imenu = 1;
+				imenu = IDP_POPUP_SUBMENU_LIST;
 			}
 			break;
 
 		case IDC_DRIVEBOX:
-			imenu = 2;
+			imenu = IDP_POPUP_SUBMENU_DRIVE;
 			break;
 
 		case IDC_TOOLBAR:
 		case IDC_STATUSBAR:
 		case IDC_REBAR:
-			imenu = 3;
+			imenu = IDP_POPUP_SUBMENU_BAR;
 			break;
 		}
 
@@ -635,7 +635,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 		case WM_RBUTTONUP: {
 
 			HMENU hMenu = LoadMenu(g_hInstance, MAKEINTRESOURCE(IDR_MAINWND));
-			HMENU hMenuPopup = GetSubMenu(hMenu, 4);
+			HMENU hMenuPopup = GetSubMenu(hMenu, IDP_POPUP_SUBMENU_TRAY);
 
 			POINT pt;
 			int iCmd;
