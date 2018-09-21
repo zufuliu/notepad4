@@ -71,7 +71,7 @@ static KEYWORDLIST Keywords_CSharp = {{
 
 GCC_NO_WARNING_MISSING_BRACES_BEGIN
 
-EDITLEXER lexCSharp = { SCLEX_CPP, NP2LEX_CSHARP, EDITLEXER_HOLE(L"C# Source"), L"cs; csx; vala", L"", &Keywords_CSharp,
+EDITLEXER lexCSharp = { SCLEX_CPP, NP2LEX_CSHARP, EDITLEXER_HOLE(L"C# Source"), L"cs; csx; vala", &Keywords_CSharp,
 {
 	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
 	{ SCE_C_WORD, NP2STYLE_Keyword, L"Keyword", L"fore:#0000FF", L"" },

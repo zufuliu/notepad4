@@ -224,6 +224,9 @@ BOOL	bAutoSelect;
 int		cxStyleSelectDlg;
 int		cyStyleSelectDlg;
 
+#define ALL_FILE_EXTENSIONS_BYTE_SIZE	((NUMLEXERS * MAX_EDITLEXER_EXT_SIZE) * sizeof(WCHAR))
+static LPWSTR g_AllFileExtensions = NULL;
+
 // used in Style_ConfigDlg() to backup all styles
 #define MAX_TOTAL_EDIT_STYLE_COUNT		1024
 
@@ -247,12 +250,17 @@ static inline int FindDefaultFontIndex(void) {
 	return NUM_MONO_FONT;
 }
 
+void Style_ReleaseResources(void) {
+	NP2HeapFree(g_AllFileExtensions);
+}
+
 //=============================================================================
 //
 // Style_Load()
 //
 void Style_Load(void) {
 	IniSection section;
+	g_AllFileExtensions = NP2HeapAlloc(ALL_FILE_EXTENSIONS_BYTE_SIZE);
 	WCHAR *pIniSectionBuf = NP2HeapAlloc(sizeof(WCHAR) * 32 * 1024);
 	const int cchIniSection = (int)NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR);
 	IniSection *pIniSection = &section;
@@ -315,6 +323,7 @@ void Style_Load(void) {
 	for (int iLexer = 0; iLexer < NUMLEXERS; iLexer++) {
 		PEDITLEXER lex = pLexArray[iLexer];
 		unsigned int i = 0;
+		lex->szExtensions = g_AllFileExtensions + (iLexer * MAX_EDITLEXER_EXT_SIZE);
 		LoadIniSection(lex->pszName, pIniSectionBuf, cchIniSection);
 		if (!IniSectionParse(pIniSection, pIniSectionBuf)) {
 			lstrcpyn(lex->szExtensions, lex->pszDefExt, MAX_EDITLEXER_EXT_SIZE);
@@ -3271,15 +3280,16 @@ INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM
 // Style_ConfigDlg()
 //
 void Style_ConfigDlg(HWND hwnd) {
+	LPWSTR *extBackup = NP2HeapAlloc(ALL_FILE_EXTENSIONS_BYTE_SIZE);
 	WCHAR *StyleBackup[MAX_TOTAL_EDIT_STYLE_COUNT];
 	int c, cItems;
 	BOOL changed = FALSE;
 
 	// Backup Styles
+	CopyMemory(extBackup, g_AllFileExtensions, ALL_FILE_EXTENSIONS_BYTE_SIZE);
 	c = 0;
 	for (int iLexer = 0; iLexer < NUMLEXERS; iLexer++) {
 		PEDITLEXER lex = pLexArray[iLexer];
-		StyleBackup[c++] = StrDup(lex->szExtensions);
 		int i = 0;
 		while (lex->Styles[i].iStyle != -1) {
 			StyleBackup[c++] = StrDup(lex->Styles[i].szValue);
@@ -3295,10 +3305,10 @@ void Style_ConfigDlg(HWND hwnd) {
 										 Style_ConfigDlgProc,
 										 (LPARAM)&StyleBackup)) {
 		// Restore Styles
+		CopyMemory(g_AllFileExtensions, extBackup, ALL_FILE_EXTENSIONS_BYTE_SIZE);
 		c = 0;
 		for (int iLexer = 0; iLexer < NUMLEXERS; iLexer++) {
 			PEDITLEXER lex = pLexArray[iLexer];
-			lstrcpy(lex->szExtensions, StyleBackup[c++]);
 			int i = 0;
 			while (lex->Styles[i].iStyle != -1) {
 				lstrcpy(lex->Styles[i].szValue, StyleBackup[c++]);
@@ -3314,6 +3324,7 @@ void Style_ConfigDlg(HWND hwnd) {
 		}
 	}
 
+	NP2HeapFree(extBackup);
 	for (c = 0; c < cItems; c++) {
 		LocalFree(StyleBackup[c]);
 	}

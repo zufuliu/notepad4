@@ -241,7 +241,7 @@ static KEYWORDLIST Keywords_PHP = {{
 
 GCC_NO_WARNING_MISSING_BRACES_BEGIN
 
-EDITLEXER lexPHP = { SCLEX_CPP, NP2LEX_PHP, EDITLEXER_HOLE(L"PHP Script"), L"php; phpt; phtml; eyecode", L"", &Keywords_PHP,
+EDITLEXER lexPHP = { SCLEX_CPP, NP2LEX_PHP, EDITLEXER_HOLE(L"PHP Script"), L"php; phpt; phtml; eyecode", &Keywords_PHP,
 {
 	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
 	{ SCE_C_WORD, NP2STYLE_Keyword, L"Keyword", L"bold; fore:#FF8000", L"" },

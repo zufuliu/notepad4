@@ -42,6 +42,7 @@ extern UINT8 currentLexKeywordAttr[NUMKEYWORD];
 
 BOOL IsDocWordChar(int ch);
 
+void	Style_ReleaseResources(void);
 void	Style_Load(void);
 void	Style_Save(void);
 BOOL	Style_Import(HWND hwnd);

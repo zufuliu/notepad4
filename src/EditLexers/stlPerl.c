@@ -35,7 +35,7 @@ static KEYWORDLIST Keywords_Perl = {{
 
 GCC_NO_WARNING_MISSING_BRACES_BEGIN
 
-EDITLEXER lexPerl = { SCLEX_PERL, NP2LEX_PERL, EDITLEXER_HOLE(L"Perl Script"), L"pl; pm; cgi; pod; plx; stp", L"", &Keywords_Perl,
+EDITLEXER lexPerl = { SCLEX_PERL, NP2LEX_PERL, EDITLEXER_HOLE(L"Perl Script"), L"pl; pm; cgi; pod; plx; stp", &Keywords_Perl,
 {
 	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
 	{ SCE_PL_COMMENTLINE, NP2STYLE_Comment, L"Comment", L"fore:#608060", L"" },

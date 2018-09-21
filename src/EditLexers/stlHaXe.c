@@ -37,7 +37,7 @@ static KEYWORDLIST Keywords_HaXe = {{
 
 GCC_NO_WARNING_MISSING_BRACES_BEGIN
 
-EDITLEXER lexHaXe = { SCLEX_CPP, NP2LEX_HAXE, EDITLEXER_HOLE(L"HaXe Script"), L"hx", L"", &Keywords_HaXe,
+EDITLEXER lexHaXe = { SCLEX_CPP, NP2LEX_HAXE, EDITLEXER_HOLE(L"HaXe Script"), L"hx", &Keywords_HaXe,
 {
 	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
 	{ SCE_C_WORD, NP2STYLE_Keyword, L"Keyword", L"fore:#0000FF", L"" },

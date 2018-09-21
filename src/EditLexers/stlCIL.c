@@ -80,7 +80,7 @@ static KEYWORDLIST Keywords_CIL = {{
 
 GCC_NO_WARNING_MISSING_BRACES_BEGIN
 
-EDITLEXER lexCIL = { SCLEX_CIL, NP2LEX_CIL, EDITLEXER_HOLE(L".NET IL"), L"il", L"", &Keywords_CIL,
+EDITLEXER lexCIL = { SCLEX_CIL, NP2LEX_CIL, EDITLEXER_HOLE(L".NET IL"), L"il", &Keywords_CIL,
 {
 	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
 	{ SCE_C_WORD, NP2STYLE_Keyword, L"Keyword", L"fore:#0000FF", L"" },

@@ -50,14 +50,14 @@ typedef struct _editlexer {
 		UINT8 bStyleChanged;
 		const int iNameLen;
 		LPCWSTR const pszName;
+		LPWSTR szExtensions;
 	};
 	LPCWSTR const pszDefExt;
-	WCHAR szExtensions[MAX_EDITLEXER_EXT_SIZE];
 	const KEYWORDLIST * const pKeyWords;
 	EDITSTYLE Styles[];
 } EDITLEXER, *PEDITLEXER;
 
-#define EDITLEXER_HOLE(name)	{ 0, 0, CSTRLEN(name), (name) }
+#define EDITLEXER_HOLE(name)	{ 0, 0, CSTRLEN(name), (name), NULL }
 
 // NP2LEX_, rid for EDITLEXER
 #define NP2LEX_DEFAULT	63000	// SCLEX_NULL		Default Text
