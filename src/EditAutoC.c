@@ -451,7 +451,8 @@ void EditCompleteWord(HWND hwnd, BOOL autoInsert) {
 	const Sci_Position iCurrentPos = SciCall_GetCurrentPos();
 	const int iCurrentStyle = SciCall_GetStyleAt(iCurrentPos);
 	int iLine = SciCall_LineFromPosition(iCurrentPos);
-	Sci_Position iCurrentLinePos = iCurrentPos - SciCall_PositionFromLine(iLine);
+	const int iLineStartPos = SciCall_PositionFromLine(iLine);
+	Sci_Position iCurrentLinePos = iCurrentPos - iLineStartPos;
 	Sci_Position iStartWordPos = iCurrentLinePos;
 
 	char *pLine;
@@ -498,8 +499,12 @@ void EditCompleteWord(HWND hwnd, BOOL autoInsert) {
 		}
 	}
 	// word after escape char
-	if (iStartWordPos > 1 && pLine[iStartWordPos - 1] == '\\' && IsEscapeChar(pLine[iStartWordPos])) {
-		if (!(iStartWordPos > 2 && pLine[iStartWordPos - 2] == '\\')) {
+	if (iStartWordPos > 1) {
+		if (pLine[iStartWordPos - 1] == '\\' && IsEscapeChar(pLine[iStartWordPos])) {
+			if (!(iStartWordPos > 2 && pLine[iStartWordPos - 2] == '\\')) {
+				++iStartWordPos;
+			}
+		} else if (pLine[iStartWordPos - 1] == '%' && IsStringFormatChar(pLine[iStartWordPos], SciCall_GetStyleAt(iLineStartPos + iStartWordPos - 1))) {
 			++iStartWordPos;
 		}
 	}
