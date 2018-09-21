@@ -19,6 +19,7 @@
 ******************************************************************************/
 
 #include <windows.h>
+#include <windowsx.h>
 #include <shlwapi.h>
 #include <commctrl.h>
 #include <shlobj.h>
@@ -468,8 +469,8 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 		msg.wParam = wParam;
 		msg.lParam = lParam;
 		msg.time = GetMessageTime();
-		msg.pt.x = HIWORD(GetMessagePos());
-		msg.pt.y = LOWORD(GetMessagePos());
+		msg.pt.x = GET_X_LPARAM(lParam);
+		msg.pt.y = GET_Y_LPARAM(lParam);
 
 		SendMessage(hwndTT, TTM_RELAYEVENT, 0, (LPARAM)&msg);
 	}
@@ -539,7 +540,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 	case WM_CONTEXTMENU: {
 		HMENU hmenu;
 		int   imenu = 0;
-		DWORD dwpts;
+		POINT pt;
 		int   nID = GetDlgCtrlID((HWND)wParam);
 
 		if (nID != IDC_DIRLIST && nID != IDC_DRIVEBOX &&
@@ -571,11 +572,12 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 			break;
 		}
 
-		dwpts = GetMessagePos();
+		pt.x = GET_X_LPARAM(lParam);
+		pt.y = GET_Y_LPARAM(lParam);
 
 		TrackPopupMenuEx(GetSubMenu(hmenu, imenu),
 						 TPM_LEFTBUTTON | TPM_RIGHTBUTTON,
-						 (int)(short)LOWORD(dwpts) + 1, (int)(short)HIWORD(dwpts) + 1, hwnd, NULL);
+						 pt.x + 1, pt.y + 1, hwnd, NULL);
 
 		DestroyMenu(hmenu);
 	}

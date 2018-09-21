@@ -19,6 +19,7 @@
 ******************************************************************************/
 
 #include <windows.h>
+#include <windowsx.h>
 #include <shlwapi.h>
 #include <shlobj.h>
 #include <commctrl.h>
@@ -2989,8 +2990,8 @@ INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM
 		TVHITTESTINFO tvht;
 
 		if (fDragging && pCurrentStyle) {
-			LONG xCur = LOWORD(lParam);
-			LONG yCur = HIWORD(lParam);
+			LONG xCur = GET_X_LPARAM(lParam);
+			LONG yCur = GET_Y_LPARAM(lParam);
 
 			//ImageList_DragMove(xCur, yCur);
 			//ImageList_DragShowNolock(FALSE);

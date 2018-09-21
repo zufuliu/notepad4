@@ -20,6 +20,7 @@
 
 #define OEMRESOURCE  // use OBM_ resource constants
 #include <windows.h>
+#include <windowsx.h>
 #include <shlwapi.h>
 #include <shlobj.h>
 #include <shellapi.h>
@@ -1986,8 +1987,8 @@ INT_PTR CALLBACK FindWinDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPar
 
 	case WM_LBUTTONDOWN: {
 		POINT pt;
-		pt.x = LOWORD(lParam);
-		pt.y = HIWORD(lParam);
+		pt.x = GET_X_LPARAM(lParam);
+		pt.y = GET_Y_LPARAM(lParam);
 		if (GetDlgCtrlID((ChildWindowFromPoint(hwnd, pt))) == IDC_CROSSCURSOR) {
 			SetCapture(hwnd);
 			bHasCapture = TRUE;

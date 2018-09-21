@@ -19,6 +19,7 @@
 ******************************************************************************/
 
 #include <windows.h>
+#include <windowsx.h>
 #include <shlwapi.h>
 #include <shlobj.h>
 #include <shellapi.h>
@@ -1226,8 +1227,8 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 		hmenu = LoadMenu(g_hInstance, MAKEINTRESOURCE(IDR_POPUPMENU));
 		//SetMenuDefaultItem(GetSubMenu(hmenu, 1), 0, FALSE);
 
-		pt.x = (int)(short)LOWORD(lParam);
-		pt.y = (int)(short)HIWORD(lParam);
+		pt.x = GET_X_LPARAM(lParam);
+		pt.y = GET_Y_LPARAM(lParam);
 
 		switch (nID) {
 		case IDC_EDIT: {
