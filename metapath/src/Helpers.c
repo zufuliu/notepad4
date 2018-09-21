@@ -553,7 +553,7 @@ int Toolbar_SetButtons(HWND hwnd, LPCWSTR lpszButtons, LPCTBBUTTON ptbb, int ctb
 	}
 
 	LPCWSTR p = lpszButtons;
-	ctbb--;
+	--ctbb;
 	while (TRUE) {
 		LPWSTR end;
 		int iCmd = (int)wcstol(p, &end, 10);
@@ -562,6 +562,9 @@ int Toolbar_SetButtons(HWND hwnd, LPCWSTR lpszButtons, LPCTBBUTTON ptbb, int ctb
 			SendMessage(hwnd, TB_ADDBUTTONS, (WPARAM)1, (LPARAM)&ptbb[iCmd]);
 			p = end;
 			++count;
+			//if (count == MAX_TOOLBAR_ITEM_COUNT_WITH_SEPARATOR) {
+			//	break;
+			//}
 		} else {
 			break;
 		}
