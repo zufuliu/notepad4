@@ -244,51 +244,25 @@ BOOL Is32bitExe(LPCWSTR lpszExeName) {
 //
 //  PrivateIsAppThemed()
 //
+extern HMODULE hModUxTheme;
 BOOL PrivateIsAppThemed(void) {
 	BOOL bIsAppThemed = FALSE;
-	HMODULE hDll = LoadLibrary(L"uxtheme.dll");
-	if (hDll) {
-		FARPROC fp = GetProcAddress(hDll, "IsAppThemed");
-		if (fp) {
-			bIsAppThemed = (BOOL)fp();
+	if (hModUxTheme) {
+		FARPROC pfnIsAppThemed = GetProcAddress(hModUxTheme, "IsAppThemed");
+		if (pfnIsAppThemed) {
+			bIsAppThemed = (BOOL)pfnIsAppThemed();
 		}
-		FreeLibrary(hDll);
 	}
 	return bIsAppThemed;
 }
 
 //=============================================================================
 //
-//  SetExplorerTheme()
-//
-/*
-BOOL SetExplorerTheme(HWND hwnd) {
-	HMODULE hModUxTheme;
-	FARPROC pfnSetWindowTheme;
-
-	if (IsVistaAndAbove()) {
-		if (hModUxTheme = GetModuleHandle(L"uxtheme.dll")) {
-			pfnSetWindowTheme = GetProcAddress(hModUxTheme, "SetWindowTheme");
-
-			if (pfnSetWindowTheme) {
-				return (S_OK == pfnSetWindowTheme(hwnd, L"Explorer", NULL));
-			}
-		}
-	}
-	return FALSE;
-}
-*/
-
-//=============================================================================
-//
 //  SetTheme()
 //
 BOOL SetTheme(HWND hwnd, LPCWSTR lpszTheme) {
-	HMODULE hModUxTheme;
-	FARPROC pfnSetWindowTheme;
-
-	if ((hModUxTheme = GetModuleHandle(L"uxtheme.dll")) != NULL) {
-		pfnSetWindowTheme = GetProcAddress(hModUxTheme, "SetWindowTheme");
+	if (hModUxTheme) {
+		FARPROC pfnSetWindowTheme = GetProcAddress(hModUxTheme, "SetWindowTheme");
 
 		if (pfnSetWindowTheme) {
 			return (S_OK == pfnSetWindowTheme(hwnd, lpszTheme, NULL));
@@ -1516,20 +1490,16 @@ void MRU_ClearCombobox(HWND hwnd, LPCWSTR pszKey) {
 
 */
 BOOL GetThemedDialogFont(LPWSTR lpFaceName, WORD *wSize) {
-	HDC hDC;
-	int iLogPixelsY;
-	HMODULE hModUxTheme;
-	HTHEME hTheme;
 	LOGFONT lf;
 	BOOL bSucceed = FALSE;
 
-	hDC = GetDC(NULL);
-	iLogPixelsY = GetDeviceCaps(hDC, LOGPIXELSY);
+	HDC hDC = GetDC(NULL);
+	int iLogPixelsY = GetDeviceCaps(hDC, LOGPIXELSY);
 	ReleaseDC(NULL, hDC);
 
-	if ((hModUxTheme = GetModuleHandle(L"uxtheme.dll")) != NULL) {
+	if (hModUxTheme) {
 		if ((BOOL)(GetProcAddress(hModUxTheme, "IsAppThemed"))()) {
-			hTheme = (HTHEME)(INT_PTR)(GetProcAddress(hModUxTheme, "OpenThemeData"))(NULL, L"WINDOWSTYLE;WINDOW");
+			HTHEME hTheme = (HTHEME)(INT_PTR)(GetProcAddress(hModUxTheme, "OpenThemeData"))(NULL, L"WINDOWSTYLE;WINDOW");
 			if (hTheme) {
 				if (S_OK == (HRESULT)(GetProcAddress(hModUxTheme, "GetThemeSysFont"))(hTheme,/*TMT_MSGBOXFONT*/805, &lf)) {
 					if (lf.lfHeight < 0) {

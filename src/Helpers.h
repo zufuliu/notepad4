@@ -138,6 +138,10 @@ extern WCHAR szIniFile[MAX_PATH];
 #define IsWin8p1AndAbove()	(g_uWinVer >= 0x0603)
 #define IsWin10AndAbove()	(g_uWinVer >= 0x0A00)
 
+#ifndef LOAD_LIBRARY_SEARCH_SYSTEM32
+#define LOAD_LIBRARY_SEARCH_SYSTEM32 0x00000800
+#endif
+
 // High DPI Reference
 // https://msdn.microsoft.com/en-us/library/windows/desktop/hh447398(v=vs.85).aspx
 #ifndef WM_DPICHANGED
@@ -319,7 +323,11 @@ UINT GetCurrentDPI(HWND hwnd);
 BOOL PrivateIsAppThemed(void);
 HRESULT PrivateSetCurrentProcessExplicitAppUserModelID(PCWSTR AppID);
 BOOL IsElevated(void);
-//BOOL SetExplorerTheme(HWND hwnd);
+
+//BOOL SetTheme(HWND hwnd, LPCWSTR lpszTheme)
+//inline BOOL SetExplorerTheme(HWND hwnd) {
+//	return SetTheme(hwnd, L"Explorer");
+//}
 
 HBITMAP ResizeImageForCurrentDPI(HBITMAP hbmp);
 BOOL BitmapMergeAlpha(HBITMAP hbmp, COLORREF crDest);

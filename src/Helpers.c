@@ -232,7 +232,7 @@ UINT GetCurrentDPI(HWND hwnd) {
 	}
 
 	if (dpi == 0 && IsWin8p1AndAbove()) {
-		HMODULE hShcore = LoadLibrary(L"shcore.dll");
+		HMODULE hShcore = LoadLibraryEx(L"shcore.dll", NULL, LOAD_LIBRARY_SEARCH_SYSTEM32);
 		if (hShcore) {
 			FARPROC pfnGetDpiForMonitor = GetProcAddress(hShcore, "GetDpiForMonitor");
 			if (pfnGetDpiForMonitor) {
@@ -276,11 +276,10 @@ HBITMAP ResizeImageForCurrentDPI(HBITMAP hbmp) {
 //
 extern HMODULE hModUxTheme;
 BOOL PrivateIsAppThemed(void) {
-	FARPROC pfnIsAppThemed;
 	BOOL bIsAppThemed = FALSE;
 
 	if (hModUxTheme) {
-		pfnIsAppThemed = GetProcAddress(hModUxTheme, "IsAppThemed");
+		FARPROC pfnIsAppThemed = GetProcAddress(hModUxTheme, "IsAppThemed");
 		if (pfnIsAppThemed) {
 			bIsAppThemed = (BOOL)pfnIsAppThemed();
 		}
@@ -343,15 +342,14 @@ BOOL IsElevated(void) {
 
 //=============================================================================
 //
-// SetExplorerTheme()
+//  SetTheme()
 //
-//BOOL SetExplorerTheme(HWND hwnd) {
-//	FARPROC pfnSetWindowTheme;
-//	if (IsVistaAndAbove()) {
-//		if (hModUxTheme) {
-//			pfnSetWindowTheme = GetProcAddress(hModUxTheme, "SetWindowTheme");
-//			if (pfnSetWindowTheme)
-//				return (S_OK == pfnSetWindowTheme(hwnd, L"Explorer", NULL));
+//BOOL SetTheme(HWND hwnd, LPCWSTR lpszTheme) {
+//	if (hModUxTheme) {
+//		FARPROC pfnSetWindowTheme = GetProcAddress(hModUxTheme, "SetWindowTheme");
+//
+//		if (pfnSetWindowTheme) {
+//			return (S_OK == pfnSetWindowTheme(hwnd, lpszTheme, NULL));
 //		}
 //	}
 //	return FALSE;
@@ -1875,19 +1873,16 @@ BOOL MRU_MergeSave(LPMRULIST pmru, BOOL bAddFiles, BOOL bRelativePath, BOOL bUne
 
 */
 BOOL GetThemedDialogFont(LPWSTR lpFaceName, WORD *wSize) {
-	HDC hDC;
-	int iLogPixelsY;
-	HTHEME hTheme;
 	LOGFONT lf;
 	BOOL bSucceed = FALSE;
 
-	hDC = GetDC(NULL);
-	iLogPixelsY = GetDeviceCaps(hDC, LOGPIXELSY);
+	HDC hDC = GetDC(NULL);
+	int iLogPixelsY = GetDeviceCaps(hDC, LOGPIXELSY);
 	ReleaseDC(NULL, hDC);
 
 	if (hModUxTheme) {
 		if ((BOOL)(GetProcAddress(hModUxTheme, "IsAppThemed"))()) {
-			hTheme = (HTHEME)(INT_PTR)(GetProcAddress(hModUxTheme, "OpenThemeData"))(NULL, L"WINDOWSTYLE;WINDOW");
+			HTHEME hTheme = (HTHEME)(INT_PTR)(GetProcAddress(hModUxTheme, "OpenThemeData"))(NULL, L"WINDOWSTYLE;WINDOW");
 			if (hTheme) {
 				if (S_OK == (HRESULT)(GetProcAddress(hModUxTheme, "GetThemeSysFont"))(hTheme, /*TMT_MSGBOXFONT*/805, &lf)) {
 					if (lf.lfHeight < 0) {
