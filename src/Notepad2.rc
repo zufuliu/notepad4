@@ -598,6 +598,22 @@ BEGIN
         MENUITEM SEPARATOR
         MENUITEM "&Exit Notepad2",              IDM_TRAY_EXIT
     END
+    POPUP "+"
+    BEGIN
+        MENUITEM "&Default",                    IDM_VIEW_TOGGLEFOLDS
+        MENUITEM "&All",                        IDM_VIEW_FOLD_ALL
+        MENUITEM "&Current",                    IDM_VIEW_FOLD_CURRENT
+        MENUITEM "Level &1",                    IDM_VIEW_FOLD_LEVEL1
+        MENUITEM "Level &2",                    IDM_VIEW_FOLD_LEVEL2
+        MENUITEM "Level &3",                    IDM_VIEW_FOLD_LEVEL3
+        MENUITEM "Level &4",                    IDM_VIEW_FOLD_LEVEL4
+        MENUITEM "Level &5",                    IDM_VIEW_FOLD_LEVEL5
+        MENUITEM "Level &6",                    IDM_VIEW_FOLD_LEVEL6
+        MENUITEM "Level &7",                    IDM_VIEW_FOLD_LEVEL7
+        MENUITEM "Level &8",                    IDM_VIEW_FOLD_LEVEL8
+        MENUITEM "Level &9",                    IDM_VIEW_FOLD_LEVEL9
+        MENUITEM "Level 1&0",                   IDM_VIEW_FOLD_LEVEL10
+    END
 END
 
 
@@ -1624,7 +1640,7 @@ BEGIN
     IDT_FILE_PRINT          "Print"
     IDT_FILE_OPENFAV        "Favorites"
     IDT_FILE_ADDTOFAV       "Add to Favorites"
-    IDT_VIEW_TOGGLEFOLDS    "Toggle Default Folds"
+    IDT_VIEW_TOGGLEFOLDS    "Toggle Folds"
     IDT_FILE_LAUNCH         "Execute Document"
 END
 

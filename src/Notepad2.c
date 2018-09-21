@@ -91,7 +91,7 @@ static TBBUTTON tbbMainWnd[] = {
 	{20, 	IDT_FILE_PRINT, 	TBSTATE_ENABLED, TBSTYLE_BUTTON, {0}, 0, 0},
 	{21, 	IDT_FILE_OPENFAV, 	TBSTATE_ENABLED, TBSTYLE_BUTTON, {0}, 0, 0},
 	{22, 	IDT_FILE_ADDTOFAV, 	TBSTATE_ENABLED, TBSTYLE_BUTTON, {0}, 0, 0},
-	{23, 	IDT_VIEW_TOGGLEFOLDS, 	TBSTATE_ENABLED, TBSTYLE_BUTTON, {0}, 0, 0},
+	{23, 	IDT_VIEW_TOGGLEFOLDS, 	TBSTATE_ENABLED, BTNS_WHOLEDROPDOWN, {0}, 0, 0},
 	{24, 	IDT_FILE_LAUNCH, 	TBSTATE_ENABLED, TBSTYLE_BUTTON, {0}, 0, 0},
 };
 
@@ -5177,6 +5177,22 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		case TBN_RESET:
 			Toolbar_SetButtons(hwndToolbar, DefaultToolbarButtons, tbbMainWnd, COUNTOF(tbbMainWnd));
 			return FALSE;
+
+		case TBN_DROPDOWN: {
+			LPTBNOTIFY lpTbNotify = (LPTBNOTIFY)lParam;
+			RECT rc;
+			SendMessage(hwndToolbar, TB_GETRECT, (WPARAM)lpTbNotify->iItem, (LPARAM)&rc);
+			MapWindowPoints(hwndToolbar, HWND_DESKTOP, (LPPOINT)&rc, 2);
+			HMENU hmenu = LoadMenu(g_hInstance, MAKEINTRESOURCE(IDR_POPUPMENU));
+			TPMPARAMS tpm;
+			tpm.cbSize = sizeof(TPMPARAMS);
+			tpm.rcExclude = rc;
+			TrackPopupMenuEx(GetSubMenu(hmenu, IDP_POPUP_SUBMENU_FOLD),
+							TPM_LEFTALIGN | TPM_LEFTBUTTON | TPM_VERTICAL,
+							rc.left, rc.bottom, hwndMain, &tpm);
+			DestroyMenu(hmenu);
+		}
+		return FALSE;
 		}
 		break;
 

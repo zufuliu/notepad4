@@ -65,6 +65,7 @@ typedef struct np2params {
 #define IDP_POPUP_SUBMENU_EDIT	0
 #define IDP_POPUP_SUBMENU_BAR	1
 #define IDP_POPUP_SUBMENU_TRAY	2
+#define IDP_POPUP_SUBMENU_FOLD	3
 
 //==== Statusbar ==============================================================
 #define STATUS_DOCPOS		0
