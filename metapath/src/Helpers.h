@@ -252,11 +252,18 @@ inline void EndWaitCursor(void) {
 #define IsWin7AndAbove()	(g_uWinVer >= 0x0601)
 #define IsWin8AndAbove()	(g_uWinVer >= 0x0602)
 
+#ifndef LOAD_LIBRARY_SEARCH_SYSTEM32
+#define LOAD_LIBRARY_SEARCH_SYSTEM32 0x00000800
+#endif
+
 BOOL ExeNameFromWnd(HWND hwnd, LPWSTR szExeName, int cchExeName);
 //BOOL Is32bitExe(LPCWSTR lpszExeName);
 BOOL PrivateIsAppThemed(void);
-//BOOL SetExplorerTheme(HWND hwnd);
 BOOL SetTheme(HWND hwnd, LPCWSTR lpszTheme);
+inline BOOL SetExplorerTheme(HWND hwnd) {
+	return SetTheme(hwnd, L"Explorer");
+}
+
 BOOL BitmapMergeAlpha(HBITMAP hbmp, COLORREF crDest);
 BOOL BitmapAlphaBlend(HBITMAP hbmp, COLORREF crDest, BYTE alpha);
 BOOL BitmapGrayScale(HBITMAP hbmp);

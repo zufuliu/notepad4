@@ -547,7 +547,8 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 
 	msgTaskbarCreated = RegisterWindowMessage(L"TaskbarCreated");
 
-	hModUxTheme = LoadLibrary(L"uxtheme.dll");
+	const DWORD loadLibraryFlags = (IsWin8AndAbove() || GetProcAddress(GetModuleHandle(TEXT("kernel32.dll")), "SetDefaultDllDirectories")) ? LOAD_LIBRARY_SEARCH_SYSTEM32 : 0;
+	hModUxTheme = LoadLibraryEx(L"uxtheme.dll", NULL, loadLibraryFlags);
 
 	Scintilla_RegisterClasses(hInstance);
 

@@ -76,16 +76,16 @@ IDWriteRenderingParams *customClearTypeRenderingParams = nullptr;
 static HMODULE hDLLD2D = nullptr;
 static HMODULE hDLLDWrite = nullptr;
 
+extern "C" UINT16 g_uWinVer;
+#define IsWin8AndAbove()	(g_uWinVer >= 0x0602)
+
 bool LoadD2D() noexcept {
 	static bool triedLoadingD2D = false;
 	if (!triedLoadingD2D) {
-		DWORD loadLibraryFlags = 0;
-		if (::GetProcAddress(::GetModuleHandle(TEXT("kernel32.dll")), "SetDefaultDllDirectories")) {
-			// Availability of SetDefaultDllDirectories implies Windows 8+ or
-			// that KB2533623 has been installed so LoadLibraryEx can be called
-			// with LOAD_LIBRARY_SEARCH_SYSTEM32.
-			loadLibraryFlags = LOAD_LIBRARY_SEARCH_SYSTEM32;
-		}
+		// Availability of SetDefaultDllDirectories implies Windows 8+ or
+		// that KB2533623 has been installed so LoadLibraryEx can be called
+		// with LOAD_LIBRARY_SEARCH_SYSTEM32.
+		const DWORD loadLibraryFlags = (IsWin8AndAbove() || ::GetProcAddress(::GetModuleHandle(TEXT("kernel32.dll")), "SetDefaultDllDirectories")) ? LOAD_LIBRARY_SEARCH_SYSTEM32 : 0;
 
 		typedef HRESULT(WINAPI *D2D1CFSig)(D2D1_FACTORY_TYPE factoryType, REFIID riid,
 			CONST D2D1_FACTORY_OPTIONS *pFactoryOptions, IUnknown **factory);

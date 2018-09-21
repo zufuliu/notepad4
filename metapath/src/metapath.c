@@ -156,6 +156,7 @@ WCHAR szDDETopic[256] = L"";
 HINSTANCE	g_hInstance;
 HANDLE		g_hDefaultHeap;
 UINT16		g_uWinVer;
+HMODULE		hModUxTheme = NULL;
 
 //=============================================================================
 //
@@ -218,6 +219,9 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 	// Load Settings
 	LoadSettings();
 
+	const DWORD loadLibraryFlags = (IsWin8AndAbove() || GetProcAddress(GetModuleHandle(TEXT("kernel32.dll")), "SetDefaultDllDirectories")) ? LOAD_LIBRARY_SEARCH_SYSTEM32 : 0;
+	hModUxTheme = LoadLibraryEx(L"uxtheme.dll", NULL, loadLibraryFlags);
+
 	if (!InitApplication(hInstance)) {
 		return FALSE;
 	}
@@ -233,6 +237,10 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
 		}
+	}
+
+	if (hModUxTheme) {
+		FreeLibrary(hModUxTheme);
 	}
 
 	OleUninitialize();
@@ -766,7 +774,7 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 											LVS_EX_FULLROWSELECT,
 											LVS_EX_FULLROWSELECT);
 		if (IsVistaAndAbove()) {
-			SetTheme(hwndDirList, L"Explorer");
+			SetExplorerTheme(hwndDirList);
 		}
 	}
 
@@ -1008,7 +1016,7 @@ void MsgThemeChanged(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		SetWindowLongPtr(hwndDirList, GWL_EXSTYLE, GetWindowLongPtr(hwndDirList, GWL_EXSTYLE) & ~WS_EX_CLIENTEDGE);
 		SetWindowPos(hwndDirList, NULL, 0, 0, 0, 0, SWP_NOZORDER | SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE);
 		if (bFullRowSelect) {
-			SetTheme(hwndDirList, L"Explorer");
+			SetExplorerTheme(hwndDirList);
 		} else {
 			SetTheme(hwndDirList, L"Listview");
 		}
