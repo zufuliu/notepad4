@@ -69,6 +69,8 @@ static KEYWORDLIST Keywords_VB = {{
 , "", "", "", "", "", "", ""
 }};
 
+GCC_NO_WARNING_MISSING_BRACES_BEGIN
+
 EDITLEXER lexVB = { SCLEX_VB, NP2LEX_VB, EDITLEXER_HOLE(L"Visual Basic"), L"vb; bas; frm; cls; ctl; pag; dsr; dob", L"", &Keywords_VB,
 {
 	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
@@ -85,3 +87,5 @@ EDITLEXER lexVB = { SCLEX_VB, NP2LEX_VB, EDITLEXER_HOLE(L"Visual Basic"), L"vb; 
 	EDITSTYLE_SENTINEL
 }
 };
+
+GCC_NO_WARNING_MISSING_BRACES_END

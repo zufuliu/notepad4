@@ -63,6 +63,8 @@ static KEYWORDLIST Keywords_CSS = {{
 , "", "", "", "", "", "", ""
 }};
 
+GCC_NO_WARNING_MISSING_BRACES_BEGIN
+
 EDITLEXER lexCSS = { SCLEX_CSS, NP2LEX_CSS, EDITLEXER_HOLE(L"CSS Style Sheet"), L"css; scss; less; hss", L"", &Keywords_CSS,
 {
 	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
@@ -85,3 +87,5 @@ EDITLEXER lexCSS = { SCLEX_CSS, NP2LEX_CSS, EDITLEXER_HOLE(L"CSS Style Sheet"), 
 	EDITSTYLE_SENTINEL
 }
 };
+
+GCC_NO_WARNING_MISSING_BRACES_END

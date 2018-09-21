@@ -292,6 +292,8 @@ static KEYWORDLIST Keywords_Python = {{
 , "", "", ""
 }};
 
+GCC_NO_WARNING_MISSING_BRACES_BEGIN
+
 EDITLEXER lexPython  = { SCLEX_PYTHON, NP2LEX_PYTHON, EDITLEXER_HOLE(L"Python Script"), L"py; pyw; pyx; boo; empy; cobra", L"", &Keywords_Python,
 {
 	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
@@ -319,3 +321,5 @@ EDITLEXER lexPython  = { SCLEX_PYTHON, NP2LEX_PYTHON, EDITLEXER_HOLE(L"Python Sc
 	EDITSTYLE_SENTINEL
 }
 };
+
+GCC_NO_WARNING_MISSING_BRACES_END

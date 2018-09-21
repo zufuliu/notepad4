@@ -36,6 +36,8 @@ static KEYWORDLIST Keywords_DOT = {{
 , "", "", "", "", "", "", ""
 }};
 
+GCC_NO_WARNING_MISSING_BRACES_BEGIN
+
 EDITLEXER lexDOT = { SCLEX_GRAPHVIZ, NP2LEX_DOT, EDITLEXER_HOLE(L"GraphViz Dot"), L"dot; gv", L"", &Keywords_DOT,
 {
 	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
@@ -50,3 +52,5 @@ EDITLEXER lexDOT = { SCLEX_GRAPHVIZ, NP2LEX_DOT, EDITLEXER_HOLE(L"GraphViz Dot")
 	EDITSTYLE_SENTINEL
 }
 };
+
+GCC_NO_WARNING_MISSING_BRACES_END

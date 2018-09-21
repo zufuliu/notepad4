@@ -244,7 +244,7 @@
   </VirtualDirectory>
   <Settings Type="Executable">
     <GlobalSettings>
-      <Compiler Options="-std=gnu++17;-mthreads;-municode;-Wall;-Wextra;-Wshadow;-Wno-missing-braces;-Wimplicit-fallthrough" C_Options="-std=gnu11;-mthreads;-municode;-Wall;-Wextra;-Wshadow;-Wno-missing-braces;-Wimplicit-fallthrough" Assembler="">
+      <Compiler Options="-std=gnu++17;-mthreads;-municode;-Wall;-Wextra;-Wshadow;-Wimplicit-fallthrough" C_Options="-std=gnu11;-mthreads;-municode;-Wall;-Wextra;-Wshadow;-Wimplicit-fallthrough" Assembler="">
         <IncludePath Value="../../src"/>
         <IncludePath Value="../../scintilla/include"/>
         <IncludePath Value="../../scintilla/lexlib"/>

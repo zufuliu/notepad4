@@ -40,6 +40,8 @@ static KEYWORDLIST Keywords_Batch = {{
 , "", "", "", "", "", "", ""
 }};
 
+GCC_NO_WARNING_MISSING_BRACES_BEGIN
+
 EDITLEXER lexBatch = { SCLEX_BATCH, NP2LEX_BATCH, EDITLEXER_HOLE(L"Batch File"), L"bat; cmd", L"", &Keywords_Batch,
 {
 	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
@@ -53,3 +55,5 @@ EDITLEXER lexBatch = { SCLEX_BATCH, NP2LEX_BATCH, EDITLEXER_HOLE(L"Batch File"),
 	EDITSTYLE_SENTINEL
 }
 };
+
+GCC_NO_WARNING_MISSING_BRACES_END

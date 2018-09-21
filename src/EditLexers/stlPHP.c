@@ -239,6 +239,8 @@ static KEYWORDLIST Keywords_PHP = {{
 "__autoload() __call() __callStatic() __clone() __construct() __destruct() __get() __invoke()  __isset() __set() __set_state() __sleep() __toString() __unset() __wakeup() "
 }};
 
+GCC_NO_WARNING_MISSING_BRACES_BEGIN
+
 EDITLEXER lexPHP = { SCLEX_CPP, NP2LEX_PHP, EDITLEXER_HOLE(L"PHP Script"), L"php; phpt; phtml; eyecode", L"", &Keywords_PHP,
 {
 	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
@@ -265,3 +267,5 @@ EDITLEXER lexPHP = { SCLEX_CPP, NP2LEX_PHP, EDITLEXER_HOLE(L"PHP Script"), L"php
 	EDITSTYLE_SENTINEL
 }
 };
+
+GCC_NO_WARNING_MISSING_BRACES_END

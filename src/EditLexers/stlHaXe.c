@@ -35,6 +35,8 @@ static KEYWORDLIST Keywords_HaXe = {{
 "for^() if^() switch^() while^() else^if^() else^{} "
 }};
 
+GCC_NO_WARNING_MISSING_BRACES_BEGIN
+
 EDITLEXER lexHaXe = { SCLEX_CPP, NP2LEX_HAXE, EDITLEXER_HOLE(L"HaXe Script"), L"hx", L"", &Keywords_HaXe,
 {
 	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
@@ -57,3 +59,5 @@ EDITLEXER lexHaXe = { SCLEX_CPP, NP2LEX_HAXE, EDITLEXER_HOLE(L"HaXe Script"), L"
 	EDITSTYLE_SENTINEL
 }
 };
+
+GCC_NO_WARNING_MISSING_BRACES_END

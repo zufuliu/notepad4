@@ -113,6 +113,8 @@ static KEYWORDLIST Keywords_Java = {{
 "for^() if^() switch^() while^() catch^() else^if^() else^{} synchronized^() try^() "
 }};
 
+GCC_NO_WARNING_MISSING_BRACES_BEGIN
+
 EDITLEXER lexJava = { SCLEX_CPP, NP2LEX_JAVA, EDITLEXER_HOLE(L"Java Source"), L"java; jad; aidl", L"", &Keywords_Java,
 {
 	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
@@ -136,3 +138,5 @@ EDITLEXER lexJava = { SCLEX_CPP, NP2LEX_JAVA, EDITLEXER_HOLE(L"Java Source"), L"
 	EDITSTYLE_SENTINEL
 }
 };
+
+GCC_NO_WARNING_MISSING_BRACES_END

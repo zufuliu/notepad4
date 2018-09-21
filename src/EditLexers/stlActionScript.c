@@ -37,6 +37,8 @@ static KEYWORDLIST Keywords_AS = {{
 "for^() if^() switch^() while^() else^if^() else^{} "
 }};
 
+GCC_NO_WARNING_MISSING_BRACES_BEGIN
+
 EDITLEXER lexAS = { SCLEX_CPP, NP2LEX_AS, EDITLEXER_HOLE(L"ActionScript"), L"as", L"", &Keywords_AS,
 {
 	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
@@ -56,3 +58,5 @@ EDITLEXER lexAS = { SCLEX_CPP, NP2LEX_AS, EDITLEXER_HOLE(L"ActionScript"), L"as"
 	EDITSTYLE_SENTINEL
 }
 };
+
+GCC_NO_WARNING_MISSING_BRACES_END

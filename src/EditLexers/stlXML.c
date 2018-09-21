@@ -20,6 +20,8 @@ static KEYWORDLIST Keywords_XML = {{
 , "", "", "", "", "", "", ""
 }};
 
+GCC_NO_WARNING_MISSING_BRACES_BEGIN
+
 EDITLEXER lexXML = { SCLEX_XML, NP2LEX_XML, EDITLEXER_HOLE(L"XML Document"), L"xml; xsl; xslt; xsd; dtd; rss; svg; xul; axl; rdf; xaml; resx; plist", L"", &Keywords_XML,
 {
 	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
@@ -37,3 +39,5 @@ EDITLEXER lexXML = { SCLEX_XML, NP2LEX_XML, EDITLEXER_HOLE(L"XML Document"), L"x
 	EDITSTYLE_SENTINEL
 }
 };
+
+GCC_NO_WARNING_MISSING_BRACES_END
