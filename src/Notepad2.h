@@ -61,6 +61,11 @@ typedef struct np2params {
 #define IDC_FILENAME		0xFB05
 #define IDC_REUSELOCK		0xFB06
 
+// submenu in popup menu, IDR_POPUPMENU
+#define IDP_POPUP_SUBMENU_EDIT	0
+#define IDP_POPUP_SUBMENU_BAR	1
+#define IDP_POPUP_SUBMENU_TRAY	2
+
 //==== Statusbar ==============================================================
 #define STATUS_DOCPOS		0
 #define STATUS_LEXER		1

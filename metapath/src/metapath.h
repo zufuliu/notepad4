@@ -68,6 +68,13 @@
 #define IDC_DRIVEBOX  0xA000
 #define IDC_DIRLIST   0xA001
 
+// submenu in popup menu, IDR_MAINWND
+#define IDP_POPUP_SUBMENU_PATH	0
+#define IDP_POPUP_SUBMENU_LIST	1
+#define IDP_POPUP_SUBMENU_DRIVE	2
+#define IDP_POPUP_SUBMENU_BAR	3
+#define IDP_POPUP_SUBMENU_TRAY	4
+
 //==== Statusbar ==============================================================
 #define ID_FILEINFO   0
 #define ID_MENUHELP 255
