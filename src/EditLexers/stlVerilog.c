@@ -24,7 +24,7 @@ static KEYWORDLIST Keywords_Verilog = {{
 
 GCC_NO_WARNING_MISSING_BRACES_BEGIN
 
-EDITLEXER lexVerilog = { SCLEX_VERILOG, NP2LEX_VERILOG, EDITLEXER_HOLE(L"Verilog HDL Source"), L"v; vl", L"", &Keywords_Verilog,
+EDITLEXER lexVerilog = { SCLEX_VERILOG, NP2LEX_VERILOG, EDITLEXER_HOLE(L"Verilog HDL Source"), L"v; vl", &Keywords_Verilog,
 {
 	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
 	{ SCE_V_WORD, NP2STYLE_Keyword, L"Keyword", L"fore:#0000FF", L"" },

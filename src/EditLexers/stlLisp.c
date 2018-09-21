@@ -15,7 +15,7 @@ static KEYWORDLIST Keywords_LISP = {{
 
 GCC_NO_WARNING_MISSING_BRACES_BEGIN
 
-EDITLEXER lexLisp = { SCLEX_LISP, NP2LEX_LISP, EDITLEXER_HOLE(L"Lisp Script"), L"lisp; el; lsp; clj; cljs", L"", &Keywords_LISP,
+EDITLEXER lexLisp = { SCLEX_LISP, NP2LEX_LISP, EDITLEXER_HOLE(L"Lisp Script"), L"lisp; el; lsp; clj; cljs", &Keywords_LISP,
 {
 	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
 	{ SCE_C_WORD, NP2STYLE_Keyword, L"Keyword", L"fore:#FF8000", L"" },

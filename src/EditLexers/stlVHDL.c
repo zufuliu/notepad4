@@ -45,7 +45,7 @@ static KEYWORDLIST Keywords_VHDL = {{
 
 GCC_NO_WARNING_MISSING_BRACES_BEGIN
 
-EDITLEXER lexVHDL = { SCLEX_VHDL, NP2LEX_VHDL, EDITLEXER_HOLE(L"VHDL Source"), L"vhd; vhdl", L"", &Keywords_VHDL,
+EDITLEXER lexVHDL = { SCLEX_VHDL, NP2LEX_VHDL, EDITLEXER_HOLE(L"VHDL Source"), L"vhd; vhdl", &Keywords_VHDL,
 {
 	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
 	{ SCE_VHDL_KEYWORD, NP2STYLE_Keyword, L"Keyword", L"fore:#0000FF", L"" },

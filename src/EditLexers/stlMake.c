@@ -47,7 +47,7 @@ static KEYWORDLIST Keywords_MAK = {{
 
 GCC_NO_WARNING_MISSING_BRACES_BEGIN
 
-EDITLEXER lexMake = { SCLEX_MAKEFILE, NP2LEX_MAKE, EDITLEXER_HOLE(L"Makefile"), L"mak; make; mk; dsp; dsw; am; pro; pri; gmk", L"", &Keywords_MAK,
+EDITLEXER lexMake = { SCLEX_MAKEFILE, NP2LEX_MAKE, EDITLEXER_HOLE(L"Makefile"), L"mak; make; mk; dsp; dsw; am; pro; pri; gmk", &Keywords_MAK,
 {
 	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
 	{ SCE_MAKE_COMMENT, NP2STYLE_Comment, L"Comment", L"fore:#008000", L"" },
