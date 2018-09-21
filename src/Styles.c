@@ -282,12 +282,10 @@ void Style_Load(void) {
 	for (int i = 0; i < count; i++) {
 		const IniKeyValueNode *node = &pIniSection->nodeList[i];
 		const UINT n = StrToInt(node->key) - 1;
-		LPWSTR wch = (LPWSTR)node->value;
+		LPCWSTR wch = node->value;
 		if (n < COUNTOF(crCustom) && *wch == L'#') {
 			int irgb;
-			*wch-- = L'x';
-			*wch = L'0';
-			if (StrToIntEx(wch, STIF_SUPPORT_HEX, &irgb)) {
+			if (HexStrToInt(wch + 1, &irgb)) {
 				crCustom[n] = RGB((irgb & 0xFF0000) >> 16, (irgb & 0xFF00) >> 8, irgb & 0xFF);
 			}
 		}
@@ -2229,7 +2227,7 @@ BOOL Style_StrGetSizeEx(LPCWSTR lpszStyle, int *i) {
 	if ((p = StrStr(lpszStyle, L"size:")) != NULL) {
 		p += CSTRLEN(L"size:");
 		float value;
-		if (swscanf(p, L"%f", &value) == 1) {
+		if (StrToFloat(p, &value)) {
 			int iValue = (int)lroundf(value * SC_FONT_SIZE_MULTIPLIER);
 			iValue += (*p == L'+' || *p == '-')? iBaseFontSize : 0;
 			// scintilla/src/ViewStyle.h GetFontSizeZoomed()
@@ -2272,22 +2270,17 @@ BOOL Style_StrGetSizeStr(LPCWSTR lpszStyle, LPWSTR lpszSize, int cchSize) {
 //
 // Style_StrGetColor()
 //
-BOOL Style_StrGetColor(BOOL bFore, LPWSTR lpszStyle, int *rgb) {
+BOOL Style_StrGetColor(BOOL bFore, LPCWSTR lpszStyle, int *rgb) {
 	WCHAR *p;
 
 	if ((p = StrStr(lpszStyle, (bFore ? L"fore:" : L"back:"))) != NULL) {
 		p += CSTRLEN("fore:");
 		if (*p == L'#') {
-			*p-- = L'x';
-			*p = '0';
 			int iValue;
-			const BOOL result = StrToIntEx(p, STIF_SUPPORT_HEX, &iValue);
-			if (result) {
+			if (HexStrToInt(p + 1, &iValue)) {
 				*rgb = RGB((iValue & 0xFF0000) >> 16, (iValue & 0xFF00) >> 8, iValue & 0xFF);
+				return TRUE;
 			}
-			*p++ = L':';
-			*p = L'#';
-			return result;
 		}
 	}
 	return FALSE;
@@ -2598,7 +2591,7 @@ BOOL Style_SelectColor(HWND hwnd, BOOL bFore, LPWSTR lpszStyle, int cchStyle) {
 //
 // Style_SetStyles()
 //
-void Style_SetStyles(HWND hwnd, int iStyle, LPWSTR lpszStyle) {
+void Style_SetStyles(HWND hwnd, int iStyle, LPCWSTR lpszStyle) {
 	WCHAR tch[LF_FACESIZE];
 	int	 iValue;
 

@@ -192,6 +192,28 @@ void IniSectionSetString(IniSectionOnSave *section, LPCWSTR key, LPCWSTR value) 
 	section->next = p;
 }
 
+int ParseCommaList(LPCWSTR str, int result[], int count) {
+	if (StrIsEmpty(str)) {
+		return 0;
+	}
+
+	int index = 0;
+	while (index < count) {
+		LPWSTR end;
+		result[index] = (int)wcstol(str, &end, 10);
+		if (str == end) {
+			break;
+		}
+
+		++index;
+		if (*end == L',') {
+			++end;
+		}
+		str = end;
+	}
+	return index;
+}
+
 UINT GetCurrentPPI(HWND hwnd) {
 	HDC hDC = GetDC(hwnd);
 	UINT ppi = GetDeviceCaps(hDC, LOGPIXELSY);
@@ -966,18 +988,12 @@ int Toolbar_SetButtons(HWND hwnd, LPCWSTR lpszButtons, LPCTBBUTTON ptbb, int ctb
 	LPCWSTR p = lpszButtons;
 	ctbb--;
 	while (TRUE) {
-		while (*p == L' ') {
-			p++;
-		}
-		int iCmd;
-		if (StrToIntEx(p, STIF_DEFAULT, &iCmd)) {
+		LPWSTR end;
+		int iCmd = (int)wcstol(p, &end, 10);
+		if (p != end) {
 			iCmd = clamp_i(iCmd, 0, ctbb);
 			SendMessage(hwnd, TB_ADDBUTTONS, (WPARAM)1, (LPARAM)&ptbb[iCmd]);
-			p += (iCmd < 10) ? 1 : 2;
-			p = StrChr(p, L' ');
-			if (p == NULL) {
-				break;
-			}
+			p = end;
 		} else {
 			break;
 		}

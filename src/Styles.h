@@ -74,12 +74,12 @@ BOOL	Style_StrGetCharSet(LPCWSTR lpszStyle, int *i);
 BOOL	Style_StrGetSizeEx(LPCWSTR lpszStyle, int *i);
 BOOL	Style_StrGetSize(LPCWSTR lpszStyle, int *i);
 BOOL	Style_StrGetSizeStr(LPCWSTR lpszStyle, LPWSTR lpszSize, int cchSize);
-BOOL	Style_StrGetColor(BOOL bFore, LPWSTR lpszStyle, int *rgb);
+BOOL	Style_StrGetColor(BOOL bFore, LPCWSTR lpszStyle, int *rgb);
 BOOL	Style_StrGetCase(LPCWSTR lpszStyle, int *i);
 BOOL	Style_StrGetAlpha(LPCWSTR lpszStyle, int *i);
 BOOL	Style_SelectFont(HWND hwnd, LPWSTR lpszStyle, int cchStyle, BOOL bDefaultStyle);
 BOOL	Style_SelectColor(HWND hwnd, BOOL bFore, LPWSTR lpszStyle, int cchStyle);
-void	Style_SetStyles(HWND hwnd, int iStyle, LPWSTR lpszStyle);
+void	Style_SetStyles(HWND hwnd, int iStyle, LPCWSTR lpszStyle);
 
 int 				Style_GetLexerIconId(PEDITLEXER pLex);
 INT_PTR CALLBACK	Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam);
