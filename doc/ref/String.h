@@ -237,3 +237,12 @@ BOOL StrToIntExA(PCSTR pszString, STIF_FLAGS dwFlags, int *piRet);
 
 // https://docs.microsoft.com/en-us/windows/desktop/api/shlwapi/nf-shlwapi-strtointexw
 BOOL StrToIntExW(PCWSTR pszString, STIF_FLAGS dwFlags, int *piRet);
+
+int swscanf(const wchar_t *ws, const wchar_t *format, ...);
+	double wcstod(const wchar_t *nptr, wchar_t **endptr);
+	float wcstof(const wchar_t *nptr, wchar_t **endptr);
+	long double wcstold(const wchar_t *nptr, wchar_t **endptr);
+	long wcstol(const wchar_t *nptr, wchar_t **endptr, int base);
+	long long wcstoll(const wchar_t *nptr, wchar_t **endptr, int base);
+	unsigned long wcstoul(const wchar_t *nptr, wchar_t **endptr, int base);
+	unsigned long long wcstoull(const wchar_t *nptr, wchar_t **endptr, int base);

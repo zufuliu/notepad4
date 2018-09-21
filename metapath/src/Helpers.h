@@ -76,6 +76,8 @@ inline BOOL StrNCaseEqual(LPCWSTR s1, LPCWSTR s2, int cch) {
 	return _wcsnicmp(s1, s2, cch) == 0;
 }
 
+int ParseCommaList(LPCWSTR str, int result[], int count);
+
 extern HINSTANCE g_hInstance;
 extern HANDLE g_hDefaultHeap;
 extern UINT16 g_uWinVer;
@@ -231,9 +233,13 @@ inline void IniSectionSetBoolEx(IniSectionOnSave *section, LPCWSTR key, BOOL b, 
 	}
 }
 
+inline void BeginWaitCursor(void) {
+	DestroyCursor(SetCursor(LoadCursor(NULL, IDC_WAIT)));
+}
 
-void BeginWaitCursor(void);
-void EndWaitCursor(void);
+inline void EndWaitCursor(void) {
+	DestroyCursor(SetCursor(LoadCursor(NULL, IDC_ARROW)));
+}
 
 #if 0
 #define IsWin2KAndAbove()	(g_uWinVer >= 0x0500)

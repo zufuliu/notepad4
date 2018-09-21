@@ -92,6 +92,22 @@ inline BOOL StrNCaseEqual(LPCWSTR s1, LPCWSTR s2, int cch) {
 	return _wcsnicmp(s1, s2, cch) == 0;
 }
 
+// str MUST not be NULL, can be empty
+inline BOOL StrToFloat(LPCWSTR str, float *value) {
+	LPWSTR end;
+	*value = wcstof(str, &end);
+	return str != end;
+}
+
+// str MUST not be NULL, can be empty
+inline BOOL HexStrToInt(LPCWSTR str, int *value) {
+	LPWSTR end;
+	*value = (int)wcstol(str, &end, 16);
+	return str != end;
+}
+
+int ParseCommaList(LPCWSTR str, int result[], int count);
+
 #ifdef NDEBUG
 #define DLog(msg)
 #define DLogf(fmt, ...)

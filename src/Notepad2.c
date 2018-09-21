@@ -5845,13 +5845,13 @@ int ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2, BOOL *bIsNotepadReplacement) 
 		case L'G':
 			state = 2;
 			if (ExtractFirstArgument(lp2, lp1, lp2)) {
-				int x = 0, y = 0;
-				int itok = swscanf(lp1, L"%i,%i", &x, &y);
-				if (itok == 1 || itok == 2) { // scan successful
+				int cord[2] = { 0 };
+				const int itok = ParseCommaList(lp1, cord, COUNTOF(cord));
+				if (itok != 0) {
 					flagJumpTo = 1;
 					state = 1;
-					iInitialLine = x;
-					iInitialColumn = y;
+					iInitialLine = cord[0];
+					iInitialColumn = cord[1];
 				}
 			}
 			break;
@@ -6199,17 +6199,17 @@ int ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2, BOOL *bIsNotepadReplacement) 
 		default:
 			state = 2;
 			if (ExtractFirstArgument(lp2, lp1, lp2)) {
-				int x = 0, y = 0, cx = 0, cy = 0, cm = 0;
-				int itok = swscanf(lp1, L"%i,%i,%i,%i,%i", &x, &y, &cx, &cy, &cm);
-				if (itok == 4 || itok == 5) { // scan successful
+				int cord[5] = { 0 };
+				const int itok = ParseCommaList(lp1, cord, COUNTOF(cord));
+				if (itok >= 4) {
 					flagPosParam = 1;
 					flagDefaultPos = 0;
 					state = 1;
-					wi.x = x;
-					wi.y = y;
-					wi.cx = cx;
-					wi.cy = cy;
-					wi.max = cm != 0;
+					wi.x = cord[0];
+					wi.y = cord[1];
+					wi.cx = cord[2];
+					wi.cy = cord[3];
+					wi.max = cord[4] != 0;
 					if (wi.cx < 1) {
 						wi.cx = CW_USEDEFAULT;
 					}

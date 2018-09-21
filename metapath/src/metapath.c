@@ -2724,15 +2724,15 @@ int ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2) {
 		case L'P':
 			state = 2;
 			if (ExtractFirstArgument(lp2, lp1, lp2)) {
-				int x = 0, y = 0, cx = 0, cy = 0;
-				int itok = swscanf(lp1, L"%i,%i,%i,%i", &x, &y, &cx, &cy);
-				if (itok == 4) { // scan successful
+				int cord[4] = { 0 };
+				const int itok = ParseCommaList(lp1, cord, COUNTOF(cord));
+				if (itok == 4) {
 					flagPosParam = 1;
 					state = 1;
-					wi.x = x;
-					wi.y = y;
-					wi.cx = cx;
-					wi.cy = cy;
+					wi.x = cord[0];
+					wi.y = cord[1];
+					wi.cx = cord[2];
+					wi.cy = cord[3];
 					if (wi.cx < 1) {
 						wi.cx = CW_USEDEFAULT;
 					}
