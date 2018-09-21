@@ -128,6 +128,8 @@ static KEYWORDLIST Keywords_HTML = {{
 , "", "", "", "", "", "", ""
 }};
 
+GCC_NO_WARNING_MISSING_BRACES_BEGIN
+
 EDITLEXER lexHTML = { SCLEX_HTML, NP2LEX_HTML, EDITLEXER_HOLE(L"Web Source Code"), L"html; htm; shtml; xhtml; asp; aspx; jsp; mht; htd; htt; hta; htc; cfm; tpl; jd", L"", &Keywords_HTML,
 {
 	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
@@ -220,3 +222,5 @@ EDITLEXER lexHTML = { SCLEX_HTML, NP2LEX_HTML, EDITLEXER_HOLE(L"Web Source Code"
 	EDITSTYLE_SENTINEL
 }
 };
+
+GCC_NO_WARNING_MISSING_BRACES_END

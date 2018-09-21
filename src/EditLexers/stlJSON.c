@@ -10,6 +10,8 @@ static KEYWORDLIST Keywords_JSON = {{
 "", "", "", "", "", "", "", ""
 }};
 
+GCC_NO_WARNING_MISSING_BRACES_BEGIN
+
 EDITLEXER lexJSON = { SCLEX_JSON, NP2LEX_JSON, EDITLEXER_HOLE(L"JSON Document"), L"json; har; ipynb", L"", &Keywords_JSON,
 {
 	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
@@ -22,3 +24,5 @@ EDITLEXER lexJSON = { SCLEX_JSON, NP2LEX_JSON, EDITLEXER_HOLE(L"JSON Document"),
 	EDITSTYLE_SENTINEL
 }
 };
+
+GCC_NO_WARNING_MISSING_BRACES_END

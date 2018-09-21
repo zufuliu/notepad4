@@ -33,6 +33,8 @@ static KEYWORDLIST Keywords_Awk = {{
 "for^() if^() switch^() while^() else^if^() else^{} "
 }};
 
+GCC_NO_WARNING_MISSING_BRACES_BEGIN
+
 EDITLEXER lexAwk = { SCLEX_CPP, NP2LEX_AWK, EDITLEXER_HOLE(L"Awk Script"), L"awk", L"", &Keywords_Awk,
 {
 	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
@@ -48,3 +50,5 @@ EDITLEXER lexAwk = { SCLEX_CPP, NP2LEX_AWK, EDITLEXER_HOLE(L"Awk Script"), L"awk
 	EDITSTYLE_SENTINEL
 }
 };
+
+GCC_NO_WARNING_MISSING_BRACES_END

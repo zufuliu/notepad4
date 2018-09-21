@@ -113,6 +113,8 @@ static KEYWORDLIST Keywords_AU3 = {{
 , "", "", "", "", "", "", ""
 }};
 
+GCC_NO_WARNING_MISSING_BRACES_BEGIN
+
 EDITLEXER lexAU3 = { SCLEX_AU3, NP2LEX_AU3, EDITLEXER_HOLE(L"AutoIt3 Script"), L"au3", L"", &Keywords_AU3,
 {
 	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
@@ -130,3 +132,5 @@ EDITLEXER lexAU3 = { SCLEX_AU3, NP2LEX_AU3, EDITLEXER_HOLE(L"AutoIt3 Script"), L
 	EDITSTYLE_SENTINEL
 }
 };
+
+GCC_NO_WARNING_MISSING_BRACES_END

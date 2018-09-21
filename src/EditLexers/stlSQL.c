@@ -134,6 +134,8 @@ static KEYWORDLIST Keywords_SQL = {{
 , "", "", "", "", "", "", ""
 }};
 
+GCC_NO_WARNING_MISSING_BRACES_BEGIN
+
 EDITLEXER lexSQL = { SCLEX_SQL, NP2LEX_SQL, EDITLEXER_HOLE(L"SQL Query"), L"sql; mysql", L"", &Keywords_SQL,
 {
 	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
@@ -152,3 +154,5 @@ EDITLEXER lexSQL = { SCLEX_SQL, NP2LEX_SQL, EDITLEXER_HOLE(L"SQL Query"), L"sql;
 	EDITSTYLE_SENTINEL
 }
 };
+
+GCC_NO_WARNING_MISSING_BRACES_END

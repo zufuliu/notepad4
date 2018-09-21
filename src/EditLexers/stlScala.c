@@ -38,6 +38,8 @@ static KEYWORDLIST Keywords_Scala = {{
 "for^() if^() switch^() while^() catch^() else^if^() else^{} "
 }};
 
+GCC_NO_WARNING_MISSING_BRACES_BEGIN
+
 EDITLEXER lexScala = { SCLEX_CPP, NP2LEX_SCALA, EDITLEXER_HOLE(L"Scala Script"), L"scala", L"", &Keywords_Scala,
 {
 	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
@@ -60,3 +62,5 @@ EDITLEXER lexScala = { SCLEX_CPP, NP2LEX_SCALA, EDITLEXER_HOLE(L"Scala Script"),
 	EDITSTYLE_SENTINEL
 }
 };
+
+GCC_NO_WARNING_MISSING_BRACES_END

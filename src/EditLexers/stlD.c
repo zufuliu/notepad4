@@ -68,6 +68,8 @@ static KEYWORDLIST Keywords_D = {{
 " synchronized^() catch^() scope^() version^() mixin^() "
 }};
 
+GCC_NO_WARNING_MISSING_BRACES_BEGIN
+
 EDITLEXER lexD = { SCLEX_CPP, NP2LEX_D, EDITLEXER_HOLE(L"D Source"), L"d; di", L"", &Keywords_D,
 {
 	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
@@ -99,3 +101,5 @@ EDITLEXER lexD = { SCLEX_CPP, NP2LEX_D, EDITLEXER_HOLE(L"D Source"), L"d; di", L
 	EDITSTYLE_SENTINEL
 }
 };
+
+GCC_NO_WARNING_MISSING_BRACES_END
