@@ -2166,7 +2166,7 @@ void Style_SetIndentGuides(HWND hwnd, BOOL bShow) {
 //
 // Style_GetFileOpenDlgFilter()
 //
-extern WCHAR tchFileDlgFilters[5 * 1024];
+extern LPWSTR tchFileDlgFilters;
 
 BOOL Style_GetOpenDlgFilterStr(LPWSTR lpszFilter, int cchFilter) {
 	if (StrIsEmpty(tchFileDlgFilters)) {

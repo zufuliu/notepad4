@@ -25,6 +25,9 @@
 // Number of Lexers in pLexArray
 #define NUMLEXERS 57
 
+// all schemes with "All Files (*.*)"
+#define MAX_OPEN_SAVE_FILE_DIALOG_FILTER_SIZE	((NUMLEXERS + 1) * 128)
+
 /**
  * used in ParseCommandLine() for option /d, /h and /x.
  */

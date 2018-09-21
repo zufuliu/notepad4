@@ -105,7 +105,7 @@ WCHAR	tchOpenWithDir[MAX_PATH];
 WCHAR	tchFavoritesDir[MAX_PATH];
 WCHAR	tchDefaultDir[MAX_PATH];
 WCHAR	tchDefaultExtension[64];
-WCHAR	tchFileDlgFilters[5 * 1024];
+LPWSTR	tchFileDlgFilters = NULL;
 WCHAR	tchToolbarButtons[MAX_TOOLBAR_BUTTON_CONFIG_BUFFER_SIZE];
 WCHAR	tchToolbarBitmap[MAX_PATH];
 WCHAR	tchToolbarBitmapHot[MAX_PATH];
@@ -582,6 +582,9 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 	}
 
 	// Save Settings is done elsewhere
+	if (tchFileDlgFilters != NULL) {
+		LocalFree(tchFileDlgFilters);
+	}
 
 	Scintilla_ReleaseResources();
 	UnregisterClass(wchWndClass, hInstance);
@@ -6439,8 +6442,10 @@ void LoadFlags(void) {
 
 	IniSectionGetString(pIniSection, L"DefaultDirectory", L"", tchDefaultDir, COUNTOF(tchDefaultDir));
 
-	ZeroMemory(tchFileDlgFilters, sizeof(tchFileDlgFilters));
-	IniSectionGetString(pIniSection, L"FileDlgFilters", L"", tchFileDlgFilters, COUNTOF(tchFileDlgFilters) - 2);
+	LPCWSTR szFilter = IniSectionGetValue(pIniSection, L"FileDlgFilters");
+	if (StrNotEmpty(szFilter)) {
+		tchFileDlgFilters = StrDup(szFilter);
+	}
 
 	dwFileCheckInverval = IniSectionGetInt(pIniSection, L"FileCheckInverval", 1000);
 	dwAutoReloadTimeout = IniSectionGetInt(pIniSection, L"AutoReloadTimeout", 1000);
@@ -7207,11 +7212,11 @@ BOOL FileSave(BOOL bSaveAlways, BOOL bAsk, BOOL bSaveAs, BOOL bSaveCopy) {
 BOOL OpenFileDlg(HWND hwnd, LPWSTR lpstrFile, int cchFile, LPCWSTR lpstrInitialDir) {
 	OPENFILENAME ofn;
 	WCHAR szFile[MAX_PATH];
-	WCHAR szFilter[NUMLEXERS * 1024];
+	LPWSTR szFilter = NP2HeapAlloc(MAX_OPEN_SAVE_FILE_DIALOG_FILTER_SIZE * sizeof(WCHAR));
 	WCHAR tchInitialDir[MAX_PATH] = L"";
 
 	lstrcpy(szFile, L"");
-	Style_GetOpenDlgFilterStr(szFilter, COUNTOF(szFilter));
+	Style_GetOpenDlgFilterStr(szFilter, MAX_OPEN_SAVE_FILE_DIALOG_FILTER_SIZE);
 
 	if (!lpstrInitialDir) {
 		if (StrNotEmpty(szCurFile)) {
@@ -7243,12 +7248,12 @@ BOOL OpenFileDlg(HWND hwnd, LPWSTR lpstrFile, int cchFile, LPCWSTR lpstrInitialD
 				OFN_SHAREAWARE /*| OFN_NODEREFERENCELINKS*/;
 	ofn.lpstrDefExt = StrNotEmpty(tchDefaultExtension) ? tchDefaultExtension : NULL;
 
-	if (GetOpenFileName(&ofn)) {
+	const BOOL success = GetOpenFileName(&ofn);
+	if (success) {
 		lstrcpyn(lpstrFile, szFile, cchFile);
-		return TRUE;
 	}
-
-	return FALSE;
+	NP2HeapFree(szFilter);
+	return success;
 }
 
 //=============================================================================
@@ -7259,11 +7264,11 @@ BOOL OpenFileDlg(HWND hwnd, LPWSTR lpstrFile, int cchFile, LPCWSTR lpstrInitialD
 BOOL SaveFileDlg(HWND hwnd, LPWSTR lpstrFile, int cchFile, LPCWSTR lpstrInitialDir) {
 	OPENFILENAME ofn;
 	WCHAR szNewFile[MAX_PATH];
-	WCHAR szFilter[NUMLEXERS * 1024];
+	LPWSTR szFilter = NP2HeapAlloc(MAX_OPEN_SAVE_FILE_DIALOG_FILTER_SIZE * sizeof(WCHAR));
 	WCHAR tchInitialDir[MAX_PATH] = L"";
 
 	lstrcpy(szNewFile, lpstrFile);
-	Style_GetOpenDlgFilterStr(szFilter, COUNTOF(szFilter));
+	Style_GetOpenDlgFilterStr(szFilter, MAX_OPEN_SAVE_FILE_DIALOG_FILTER_SIZE);
 
 	if (StrNotEmpty(lpstrInitialDir)) {
 		lstrcpy(tchInitialDir, lpstrInitialDir);
@@ -7295,11 +7300,12 @@ BOOL SaveFileDlg(HWND hwnd, LPWSTR lpstrFile, int cchFile, LPCWSTR lpstrInitialD
 				OFN_DONTADDTORECENT | OFN_PATHMUSTEXIST;
 	ofn.lpstrDefExt = StrNotEmpty(tchDefaultExtension) ? tchDefaultExtension : NULL;
 
-	if (GetSaveFileName(&ofn)) {
+	const BOOL success = GetSaveFileName(&ofn);
+	if (success) {
 		lstrcpyn(lpstrFile, szNewFile, cchFile);
-		return TRUE;
 	}
-	return FALSE;
+	NP2HeapFree(szFilter);
+	return success;
 }
 
 /******************************************************************************
