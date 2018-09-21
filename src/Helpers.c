@@ -976,13 +976,14 @@ int Toolbar_GetButtons(HWND hwnd, int cmdBase, LPWSTR lpszButtons, int cchButton
 }
 
 int Toolbar_SetButtons(HWND hwnd, LPCWSTR lpszButtons, LPCTBBUTTON ptbb, int ctbb) {
-	const int count = (int)SendMessage(hwnd, TB_BUTTONCOUNT, 0, 0);
+	int count = (int)SendMessage(hwnd, TB_BUTTONCOUNT, 0, 0);
 	if (StrIsEmpty(lpszButtons)) {
 		return count;
 	}
 
-	for (int i = 0; i < count; i++) {
+	while (count) {
 		SendMessage(hwnd, TB_DELETEBUTTON, 0, 0);
+		--count;
 	}
 
 	LPCWSTR p = lpszButtons;
@@ -994,12 +995,13 @@ int Toolbar_SetButtons(HWND hwnd, LPCWSTR lpszButtons, LPCTBBUTTON ptbb, int ctb
 			iCmd = clamp_i(iCmd, 0, ctbb);
 			SendMessage(hwnd, TB_ADDBUTTONS, (WPARAM)1, (LPARAM)&ptbb[iCmd]);
 			p = end;
+			++count;
 		} else {
 			break;
 		}
 	}
 
-	return (int)SendMessage(hwnd, TB_BUTTONCOUNT, 0, 0);
+	return count;
 }
 
 //=============================================================================
