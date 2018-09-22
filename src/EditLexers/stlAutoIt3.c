@@ -117,7 +117,7 @@ GCC_NO_WARNING_MISSING_BRACES_BEGIN
 
 EDITLEXER lexAU3 = { SCLEX_AU3, NP2LEX_AU3, EDITLEXER_HOLE(L"AutoIt3 Script"), L"au3", &Keywords_AU3,
 {
-	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
+	EDITSTYLE_DEFAULT,
 	{ SCE_AU3_KEYWORD, NP2STYLE_Keyword, L"Keyword", L"fore:#0000FF", L"" },
 	{ SCE_AU3_FUNCTION, NP2STYLE_Function, L"Function", L"fore:#0000FF", L"" },
 	{ SCE_AU3_MACRO, NP2STYLE_Macro, L"Macro", L"fore:#0080FF", L"" },

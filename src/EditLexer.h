@@ -29,7 +29,8 @@ typedef struct _editstyle {
 	WCHAR szValue[MAX_EDITSTYLE_VALUE_SIZE];
 } EDITSTYLE, *PEDITSTYLE;
 
-#define EDITSTYLE_SENTINEL 		{ -1, 0, L"", L"", L"" }
+#define EDITSTYLE_DEFAULT		{ { STYLE_DEFAULT }, NP2STYLE_Default, L"Default", L"", L"" }
+#define EDITSTYLE_SENTINEL 		{ { -1 }, 0, NULL, NULL, L"" }
 
 // Not used by Scintilla lexer, listed for auto completion.
 #define KeywordAttr_NoLexer		1

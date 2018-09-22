@@ -43,7 +43,7 @@ GCC_NO_WARNING_MISSING_BRACES_BEGIN
 
 EDITLEXER lexCMake = { SCLEX_CMAKE, NP2LEX_CMAKE, EDITLEXER_HOLE(L"CMake Script"), L"cmake; ctest", &Keywords_CMake,
 {
-	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
+	EDITSTYLE_DEFAULT,
 	{ SCE_CMAKE_WORD, NP2STYLE_Keyword, L"Keyword", L"fore:#0000FF", L"" },
 	{ SCE_CMAKE_COMMANDS, NP2STYLE_Command, L"Command", L"fore:#FF8000", L"" },
 	{ SCE_CMAKE_COMMENT, NP2STYLE_Comment, L"Comment", L"fore:#608060", L"" },

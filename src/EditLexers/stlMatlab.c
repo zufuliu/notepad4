@@ -41,7 +41,7 @@ GCC_NO_WARNING_MISSING_BRACES_BEGIN
 
 EDITLEXER lexMatlab = { SCLEX_MATLAB, NP2LEX_MATLAB, EDITLEXER_HOLE(L"MATLAB Code"), L"m; sce; sci", &Keywords_Matlab,
 {
-	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
+	EDITSTYLE_DEFAULT,
 	{ SCE_MAT_KEYWORD, NP2STYLE_Keyword, L"Keyword", L"fore:#0000FF", L"" },
 	{ SCE_MAT_ATTRIBUTE, NP2STYLE_Attribute, L"Attribte", L"fore:#FF8000", L"" },
 	{ MULTI_STYLE(SCE_MAT_INTERNALCOMMAND, SCE_MAT_COMMAND, 0, 0), NP2STYLE_Command, L"Command", L"bold; fore:#FF8000", L"" },

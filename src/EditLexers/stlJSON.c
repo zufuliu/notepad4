@@ -14,7 +14,7 @@ GCC_NO_WARNING_MISSING_BRACES_BEGIN
 
 EDITLEXER lexJSON = { SCLEX_JSON, NP2LEX_JSON, EDITLEXER_HOLE(L"JSON Document"), L"json; har; ipynb", &Keywords_JSON,
 {
-	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
+	EDITSTYLE_DEFAULT,
 	{ SCE_C_WORD, NP2STYLE_Keyword, L"Keyword", L"fore:#0000FF", L"" },
 	{ SCE_C_LABEL, NP2STYLE_JSONKey, L"Key", L"fore:#A46000", L"" },
 	{ SCE_C_STRING, NP2STYLE_String, L"String", L"fore:#008000", L"" },

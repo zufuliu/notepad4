@@ -132,7 +132,7 @@ GCC_NO_WARNING_MISSING_BRACES_BEGIN
 
 EDITLEXER lexHTML = { SCLEX_HTML, NP2LEX_HTML, EDITLEXER_HOLE(L"Web Source Code"), L"html; htm; shtml; xhtml; asp; aspx; jsp; mht; htd; htt; hta; htc; cfm; tpl; jd", &Keywords_HTML,
 {
-	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
+	EDITSTYLE_DEFAULT,
 	{ MULTI_STYLE(SCE_H_TAG, SCE_H_TAGEND, 0, 0), 63161, L"HTML Tag", L"fore:#648000", L"" },
 	{ SCE_H_TAGUNKNOWN, 63162, L"HTML Unknown Tag", L"fore:#C80000", L"" },
 	{ SCE_H_ATTRIBUTE, 63163, L"HTML Attribute", L"fore:#FF4000", L"" },
