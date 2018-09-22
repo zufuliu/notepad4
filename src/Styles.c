@@ -211,9 +211,16 @@ PEDITLEXER pLexCurrent = &lexDefault;
 int np2LexLangIndex = 0;
 UINT8 currentLexKeywordAttr[NUMKEYWORD] = {0};
 
+#define STYLESMODIFIED_NONE			0
+#define STYLESMODIFIED_SOME_SRTLE	1
+#define STYLESMODIFIED_ALL_STYLE	2
+#define STYLESMODIFIED_STYLE_MASK	3
+#define STYLESMODIFIED_COLOR		4
+#define STYLESMODIFIED_FILE_EXT		8
+
 COLORREF	crCustom[16];
 BOOL	bUse2ndDefaultStyle;
-BOOL	fStylesModified = FALSE;
+static UINT fStylesModified = STYLESMODIFIED_NONE;
 BOOL	fWarnedNoIniFile = FALSE;
 int		iBaseFontSize = 11*SC_FONT_SIZE_MULTIPLIER; // 11 pt in lexDefault
 int		iFontQuality = SC_EFF_QUALITY_LCD_OPTIMIZED;
@@ -226,6 +233,7 @@ int		cyStyleSelectDlg;
 
 #define ALL_FILE_EXTENSIONS_BYTE_SIZE	((NUMLEXERS * MAX_EDITLEXER_EXT_SIZE) * sizeof(WCHAR))
 static LPWSTR g_AllFileExtensions = NULL;
+#define INI_FILE_EXTENSIONS_NAME		L"File Extensions"
 
 // Notepad2.c
 extern int	iEncoding;
@@ -338,21 +346,29 @@ void Style_Load(void) {
 	cyStyleSelectDlg = IniSectionGetInt(pIniSection, L"SelectDlgSizeY", 324);
 	cyStyleSelectDlg = max_i(cyStyleSelectDlg, 0);
 
+	LoadIniSection(INI_FILE_EXTENSIONS_NAME, pIniSectionBuf, cchIniSection);
+	IniSectionParse(pIniSection, pIniSectionBuf);
+	for (int iLexer = 0; iLexer < NUMLEXERS; iLexer++) {
+		PEDITLEXER pLex = pLexArray[iLexer];
+		pLex->szExtensions = g_AllFileExtensions + (iLexer * MAX_EDITLEXER_EXT_SIZE);
+		LPCWSTR value = IniSectionGetValueImpl(pIniSection, pLex->pszName, pLex->iNameLen);
+		if (StrIsEmpty(value)) {
+			lstrcpy(pLex->szExtensions, pLex->pszDefExt);
+		} else {
+			lstrcpyn(pLex->szExtensions, value, MAX_EDITLEXER_EXT_SIZE);
+		}
+	}
+
 	for (int iLexer = 0; iLexer < NUMLEXERS; iLexer++) {
 		PEDITLEXER lex = pLexArray[iLexer];
-		lex->szExtensions = g_AllFileExtensions + (iLexer * MAX_EDITLEXER_EXT_SIZE);
 		Style_Alloc(lex);
 		const int iStyleCount = lex->iStyleCount;
 		LoadIniSection(lex->pszName, pIniSectionBuf, cchIniSection);
 		if (!IniSectionParse(pIniSection, pIniSectionBuf)) {
-			lstrcpyn(lex->szExtensions, lex->pszDefExt, MAX_EDITLEXER_EXT_SIZE);
 			for (int i = 0; i < iStyleCount; i++) {
 				lstrcpyn(lex->Styles[i].szValue, lex->Styles[i].pszDefault, MAX_EDITSTYLE_VALUE_SIZE);
 			}
 			continue;
-		}
-		if (!IniSectionGetString(pIniSection, L"FileNameExtensions", lex->pszDefExt, lex->szExtensions, MAX_EDITLEXER_EXT_SIZE)) {
-			lstrcpyn(lex->szExtensions, lex->pszDefExt, MAX_EDITLEXER_EXT_SIZE);
 		}
 		for (int i = 0; i < iStyleCount; i++) {
 			IniSectionGetStringEx(pIniSection, lex->Styles[i].pszName, lex->Styles[i].pszDefault,
@@ -408,6 +424,16 @@ void Style_Save(void) {
 
 	SaveIniSection(L"Styles", pIniSectionBuf);
 
+	if (fStylesModified & STYLESMODIFIED_FILE_EXT) {
+		ZeroMemory(pIniSectionBuf, cchIniSection);
+		pIniSection->next = pIniSectionBuf;
+		for (int iLexer = 0; iLexer < NUMLEXERS; iLexer++) {
+			PEDITLEXER pLex = pLexArray[iLexer];
+			IniSectionSetStringEx(pIniSection, pLex->pszName, pLex->szExtensions, pLex->pszDefExt);
+		}
+		SaveIniSection(INI_FILE_EXTENSIONS_NAME, pIniSectionBuf);
+	}
+
 	if (!fStylesModified) {
 		NP2HeapFree(pIniSectionBuf);
 		return;
@@ -417,7 +443,6 @@ void Style_Save(void) {
 		PEDITLEXER lex = pLexArray[iLexer];
 		ZeroMemory(pIniSectionBuf, cchIniSection);
 		pIniSection->next = pIniSectionBuf;
-		IniSectionSetStringEx(pIniSection, L"FileNameExtensions", lex->szExtensions, lex->pszDefExt);
 		const int iStyleCount = lex->iStyleCount;
 		for (int i = 0; i < iStyleCount; i++) {
 			IniSectionSetStringEx(pIniSection, lex->Styles[i].pszName, lex->Styles[i].szValue, lex->Styles[i].pszDefault);
@@ -457,14 +482,26 @@ BOOL Style_Import(HWND hwnd) {
 		IniSection *pIniSection = &section;
 
 		IniSectionInit(pIniSection, 128);
+		if (GetPrivateProfileSection(INI_FILE_EXTENSIONS_NAME, pIniSectionBuf, cchIniSection, szFile)) {
+			if (IniSectionParse(pIniSection, pIniSectionBuf)) {
+				for (int iLexer = 0; iLexer < NUMLEXERS; iLexer++) {
+					PEDITLEXER pLex = pLexArray[iLexer];
+					LPCWSTR value = IniSectionGetValueImpl(pIniSection, pLex->pszName, pLex->iNameLen);
+					if (StrNotEmpty(value)) {
+						lstrcpyn(pLex->szExtensions, value, MAX_EDITLEXER_EXT_SIZE);
+					}
+					if (pIniSection->count == 0) {
+						break;
+					}
+				}
+			}
+		}
+
 		for (int iLexer = 0; iLexer < NUMLEXERS; iLexer++) {
 			PEDITLEXER lex = pLexArray[iLexer];
 			if (GetPrivateProfileSection(lex->pszName, pIniSectionBuf, cchIniSection, szFile)) {
 				if (!IniSectionParse(pIniSection, pIniSectionBuf)) {
 					continue;
-				}
-				if (!IniSectionGetString(pIniSection, L"FileNameExtensions", lex->pszDefExt, lex->szExtensions, MAX_EDITLEXER_EXT_SIZE)) {
-					lstrcpyn(lex->szExtensions, lex->pszDefExt,  MAX_EDITLEXER_EXT_SIZE);
 				}
 				const int iStyleCount = lex->iStyleCount;
 				for (int i = 0; i < iStyleCount; i++) {
@@ -510,10 +547,19 @@ BOOL Style_Export(HWND hwnd) {
 		const int cchIniSection = (int)NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR);
 		IniSectionOnSave *pIniSection = &section;
 
+		pIniSection->next = pIniSectionBuf;
+		for (int iLexer = 0; iLexer < NUMLEXERS; iLexer++) {
+			PEDITLEXER pLex = pLexArray[iLexer];
+			IniSectionSetString(pIniSection, pLex->pszName, pLex->szExtensions);
+		}
+		if (!WritePrivateProfileSection(INI_FILE_EXTENSIONS_NAME, pIniSectionBuf, szFile)) {
+			dwError = GetLastError();
+		}
+
 		for (int iLexer = 0; iLexer < NUMLEXERS; iLexer++) {
 			PEDITLEXER lex = pLexArray[iLexer];
+			ZeroMemory(pIniSectionBuf, cchIniSection);
 			pIniSection->next = pIniSectionBuf;
-			IniSectionSetString(pIniSection, L"FileNameExtensions", lex->szExtensions);
 			const int iStyleCount = lex->iStyleCount;
 			for (int i = 0; i < iStyleCount; i++) {
 				IniSectionSetString(pIniSection, lex->Styles[i].pszName, lex->Styles[i].szValue);
@@ -521,7 +567,6 @@ BOOL Style_Export(HWND hwnd) {
 			if (!WritePrivateProfileSection(lex->pszName, pIniSectionBuf, szFile)) {
 				dwError = GetLastError();
 			}
-			ZeroMemory(pIniSectionBuf, cchIniSection);
 		}
 		NP2HeapFree(pIniSectionBuf);
 
@@ -3316,9 +3361,13 @@ void Style_ConfigDlg(HWND hwnd) {
 			CopyMemory(lex->szStyleBuf, styleBackup[iLexer], lex->iStyleBufSize);
 		}
 	} else {
-		fStylesModified = TRUE;
 		changed = TRUE;
-		if (StrIsEmpty(szIniFile) && !fWarnedNoIniFile) {
+		if (!(fStylesModified & STYLESMODIFIED_FILE_EXT)) {
+			if (memcmp(extBackup, g_AllFileExtensions, ALL_FILE_EXTENSIONS_BYTE_SIZE) != 0) {
+				fStylesModified  |= STYLESMODIFIED_FILE_EXT;
+			}
+		}
+		if (fStylesModified != STYLESMODIFIED_NONE && StrIsEmpty(szIniFile) && !fWarnedNoIniFile) {
 			MsgBox(MBWARN, IDS_SETTINGSNOTSAVED);
 			fWarnedNoIniFile = TRUE;
 		}
