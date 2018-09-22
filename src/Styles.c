@@ -502,15 +502,20 @@ BOOL Style_Import(HWND hwnd) {
 		}
 
 		for (int iLexer = 0; iLexer < NUMLEXERS; iLexer++) {
-			PEDITLEXER lex = pLexArray[iLexer];
-			if (GetPrivateProfileSection(lex->pszName, pIniSectionBuf, cchIniSection, szFile)) {
+			PEDITLEXER pLex = pLexArray[iLexer];
+			if (GetPrivateProfileSection(pLex->pszName, pIniSectionBuf, cchIniSection, szFile)) {
 				if (!IniSectionParse(pIniSection, pIniSectionBuf)) {
 					continue;
 				}
-				const int iStyleCount = lex->iStyleCount;
+				const int iStyleCount = pLex->iStyleCount;
 				for (int i = 0; i < iStyleCount; i++) {
-					IniSectionGetStringEx(pIniSection, lex->Styles[i].pszName, lex->Styles[i].pszDefault,
-										lex->Styles[i].szValue, MAX_EDITSTYLE_VALUE_SIZE);
+					LPCWSTR value = IniSectionGetValueImpl(pIniSection, pLex->Styles[i].pszName, pLex->Styles[i].iNameLen);
+					if (value != NULL) {
+						lstrcpyn(pLex->Styles[i].szValue, value, MAX_EDITSTYLE_VALUE_SIZE);
+					}
+					if (pIniSection->count == 0) {
+						break;
+					}
 				}
 			}
 		}
@@ -561,14 +566,14 @@ BOOL Style_Export(HWND hwnd) {
 		}
 
 		for (int iLexer = 0; iLexer < NUMLEXERS; iLexer++) {
-			PEDITLEXER lex = pLexArray[iLexer];
+			PEDITLEXER pLex = pLexArray[iLexer];
 			ZeroMemory(pIniSectionBuf, cchIniSection);
 			pIniSection->next = pIniSectionBuf;
-			const int iStyleCount = lex->iStyleCount;
+			const int iStyleCount = pLex->iStyleCount;
 			for (int i = 0; i < iStyleCount; i++) {
-				IniSectionSetString(pIniSection, lex->Styles[i].pszName, lex->Styles[i].szValue);
+				IniSectionSetString(pIniSection, pLex->Styles[i].pszName, pLex->Styles[i].szValue);
 			}
-			if (!WritePrivateProfileSection(lex->pszName, pIniSectionBuf, szFile)) {
+			if (!WritePrivateProfileSection(pLex->pszName, pIniSectionBuf, szFile)) {
 				dwError = GetLastError();
 			}
 		}
