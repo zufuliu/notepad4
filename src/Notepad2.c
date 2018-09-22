@@ -586,6 +586,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 		LocalFree(tchFileDlgFilters);
 	}
 
+	Encoding_ReleaseResources();
 	Style_ReleaseResources();
 	Scintilla_ReleaseResources();
 	UnregisterClass(wchWndClass, hInstance);
