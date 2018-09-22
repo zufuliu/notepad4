@@ -2444,30 +2444,30 @@ void LoadSettings(void) {
 
 	IniSectionGetString(pIniSection, L"MRUDirectory", L"", szMRUDirectory, COUNTOF(szMRUDirectory));
 
-	if (!IniSectionGetString(pIniSection, L"Favorites", L"",
-							 tchFavoritesDir, COUNTOF(tchFavoritesDir))) {
+	LPCWSTR strValue = IniSectionGetValue(pIniSection, L"Favorites");
+	if (StrIsEmpty(strValue)) {
 		SHGetFolderPath(NULL, CSIDL_PERSONAL, NULL, SHGFP_TYPE_CURRENT, tchFavoritesDir);
 	} else {
-		PathAbsoluteFromApp(tchFavoritesDir, NULL, COUNTOF(tchFavoritesDir), TRUE);
+		PathAbsoluteFromApp(strValue, tchFavoritesDir, COUNTOF(tchFavoritesDir), TRUE);
 	}
 
-	if (!IniSectionGetString(pIniSection, L"Quikview.exe", L"",
-							 szQuickview, COUNTOF(szQuickview))) {
+	strValue = IniSectionGetValue(pIniSection, L"Quikview.exe");
+	if (StrIsEmpty(strValue)) {
 		GetSystemDirectory(szQuickview, COUNTOF(szQuickview));
 		PathAddBackslash(szQuickview);
 		lstrcat(szQuickview, L"Viewers\\Quikview.exe");
 	} else {
-		PathAbsoluteFromApp(szQuickview, NULL, COUNTOF(szQuickview), TRUE);
+		PathAbsoluteFromApp(strValue, szQuickview, COUNTOF(szQuickview), TRUE);
 	}
 
 	IniSectionGetString(pIniSection, L"QuikviewParams", L"",
 						szQuickviewParams, COUNTOF(szQuickviewParams));
 
-	if (!IniSectionGetString(pIniSection, L"OpenWithDir", L"",
-							 tchOpenWithDir, COUNTOF(tchOpenWithDir))) {
+	strValue = IniSectionGetValue(pIniSection, L"OpenWithDir");
+	if (StrIsEmpty(strValue)) {
 		SHGetSpecialFolderPath(NULL, tchOpenWithDir, CSIDL_DESKTOPDIRECTORY, TRUE);
 	} else {
-		PathAbsoluteFromApp(tchOpenWithDir, NULL, COUNTOF(tchOpenWithDir), TRUE);
+		PathAbsoluteFromApp(strValue, tchOpenWithDir, COUNTOF(tchOpenWithDir), TRUE);
 	}
 
 	dwFillMask = IniSectionGetInt(pIniSection, L"FillMask", DL_ALLOBJECTS);
@@ -2481,9 +2481,11 @@ void LoadSettings(void) {
 	fSortRev = IniSectionGetBool(pIniSection, L"SortReverse", 0);
 
 	if (!lpFilterArg) {
-		if (!IniSectionGetString(pIniSection, L"FileFilter", L"",
-								 tchFilter, COUNTOF(tchFilter))) {
+		strValue = IniSectionGetValue(pIniSection, L"FileFilter");
+		if (StrIsEmpty(strValue)) {
 			lstrcpy(tchFilter, L"*.*");
+		} else {
+			lstrcpyn(tchFilter, strValue, COUNTOF(tchFilter));
 		}
 		bNegFilter = IniSectionGetBool(pIniSection, L"NegativeFilter", 0);
 	} else { // ignore filter if /m was specified
@@ -2502,9 +2504,11 @@ void LoadSettings(void) {
 	crNoFilt = IniSectionGetInt(pIniSection, L"ColorNoFilter", GetSysColor(COLOR_WINDOWTEXT));
 	crFilter = IniSectionGetInt(pIniSection, L"ColorFilter", GetSysColor(COLOR_HIGHLIGHT));
 
-	if (!IniSectionGetString(pIniSection, L"ToolbarButtons", L"",
-							tchToolbarButtons, COUNTOF(tchToolbarButtons))) {
+	strValue = IniSectionGetValue(pIniSection, L"ToolbarButtons");
+	if (StrIsEmpty(strValue)) {
 		CopyMemory(tchToolbarButtons, DefaultToolbarButtons, COUNTOF(DefaultToolbarButtons) * sizeof(WCHAR));
+	} else {
+		lstrcpyn(tchToolbarButtons, strValue, COUNTOF(DefaultToolbarButtons));
 	}
 
 	bShowToolbar = IniSectionGetBool(pIniSection, L"ShowToolbar", 1);
