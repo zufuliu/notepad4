@@ -118,17 +118,17 @@ GCC_NO_WARNING_MISSING_BRACES_BEGIN
 EDITLEXER lexAU3 = { SCLEX_AU3, NP2LEX_AU3, EDITLEXER_HOLE(L"AutoIt3 Script"), L"au3", &Keywords_AU3,
 {
 	EDITSTYLE_DEFAULT,
-	{ SCE_AU3_KEYWORD, NP2STYLE_Keyword, L"Keyword", L"fore:#0000FF", L"" },
-	{ SCE_AU3_FUNCTION, NP2STYLE_Function, L"Function", L"fore:#0000FF", L"" },
-	{ SCE_AU3_MACRO, NP2STYLE_Macro, L"Macro", L"fore:#0080FF", L"" },
-	{ MULTI_STYLE(SCE_AU3_COMMENT, SCE_AU3_COMMENTBLOCK, 0, 0), NP2STYLE_Comment, L"Comment", L"fore:#608060", L"" },
-	{ SCE_AU3_STRING, NP2STYLE_String, L"String", L"fore:#008080", L"" },
-	{ SCE_AU3_NUMBER, NP2STYLE_Number, L"Number", L"fore:#FF0000", L"" },
-	{ SCE_AU3_OPERATOR, NP2STYLE_Operator, L"Operator", L"fore:#C000C0", L"" },
-	{ SCE_AU3_VARIABLE, NP2STYLE_Variable, L"Variable", L"fore:#808000", L"" },
-	{ SCE_AU3_SENT, 63491, L"Send Key", L"fore:#FF0000", L"" },
-	{ SCE_AU3_PREPROCESSOR, NP2STYLE_Preprocessor, L"Preprocessor", L"fore:#FF8000", L"" },
-	{ SCE_AU3_SPECIAL, 63492, L"Special", L"fore:#FF8000", L"" },
+	{ SCE_AU3_KEYWORD, NP2STYLE_Keyword, EDITSTYLE_HOLE(L"Keyword"), L"fore:#0000FF" },
+	{ SCE_AU3_FUNCTION, NP2STYLE_Function, EDITSTYLE_HOLE(L"Function"), L"fore:#0000FF" },
+	{ SCE_AU3_MACRO, NP2STYLE_Macro, EDITSTYLE_HOLE(L"Macro"), L"fore:#0080FF" },
+	{ MULTI_STYLE(SCE_AU3_COMMENT, SCE_AU3_COMMENTBLOCK, 0, 0), NP2STYLE_Comment, EDITSTYLE_HOLE(L"Comment"), L"fore:#608060" },
+	{ SCE_AU3_STRING, NP2STYLE_String, EDITSTYLE_HOLE(L"String"), L"fore:#008080" },
+	{ SCE_AU3_NUMBER, NP2STYLE_Number, EDITSTYLE_HOLE(L"Number"), L"fore:#FF0000" },
+	{ SCE_AU3_OPERATOR, NP2STYLE_Operator, EDITSTYLE_HOLE(L"Operator"), L"fore:#C000C0" },
+	{ SCE_AU3_VARIABLE, NP2STYLE_Variable, EDITSTYLE_HOLE(L"Variable"), L"fore:#808000" },
+	{ SCE_AU3_SENT, 63491, EDITSTYLE_HOLE(L"Send Key"), L"fore:#FF0000" },
+	{ SCE_AU3_PREPROCESSOR, NP2STYLE_Preprocessor, EDITSTYLE_HOLE(L"Preprocessor"), L"fore:#FF8000" },
+	{ SCE_AU3_SPECIAL, 63492, EDITSTYLE_HOLE(L"Special"), L"fore:#FF8000" },
 	EDITSTYLE_SENTINEL
 }
 };

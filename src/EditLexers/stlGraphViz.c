@@ -41,14 +41,14 @@ GCC_NO_WARNING_MISSING_BRACES_BEGIN
 EDITLEXER lexDOT = { SCLEX_GRAPHVIZ, NP2LEX_DOT, EDITLEXER_HOLE(L"GraphViz Dot"), L"dot; gv", &Keywords_DOT,
 {
 	EDITSTYLE_DEFAULT,
-	{ SCE_C_WORD, NP2STYLE_Keyword, L"Keyword", L"fore:#0000FF", L"" },
-	{ SCE_C_WORD2, NP2STYLE_Attribute, L"Attribute", L"fore:#FF8000", L""},
-	{ SCE_C_LABEL, NP2STYLE_XMLValue, L"Value", L"fore:#008287", L""},
-	{ SCE_C_DIRECTIVE, NP2STYLE_Label, L"Label", L"fore:#008287", L""},
-	{ MULTI_STYLE(SCE_C_COMMENT, SCE_C_COMMENTLINE, SCE_C_COMMENTDOC, 0), NP2STYLE_Comment, L"Comment", L"fore:#608060", L"" },
-	{ SCE_C_STRING, NP2STYLE_String, L"String", L"fore:#008000", L"" },
-	{ SCE_C_NUMBER, NP2STYLE_Number, L"Number", L"fore:#FF0000", L"" },
-	{ SCE_C_OPERATOR, NP2STYLE_Operator, L"Operator", L"fore:#B000B0", L"" },
+	{ SCE_C_WORD, NP2STYLE_Keyword, EDITSTYLE_HOLE(L"Keyword"), L"fore:#0000FF" },
+	{ SCE_C_WORD2, NP2STYLE_Attribute, EDITSTYLE_HOLE(L"Attribute"), L"fore:#FF8000" },
+	{ SCE_C_LABEL, NP2STYLE_XMLValue, EDITSTYLE_HOLE(L"Value"), L"fore:#008287" },
+	{ SCE_C_DIRECTIVE, NP2STYLE_Label, EDITSTYLE_HOLE(L"Label"), L"fore:#008287" },
+	{ MULTI_STYLE(SCE_C_COMMENT, SCE_C_COMMENTLINE, SCE_C_COMMENTDOC, 0), NP2STYLE_Comment, EDITSTYLE_HOLE(L"Comment"), L"fore:#608060" },
+	{ SCE_C_STRING, NP2STYLE_String, EDITSTYLE_HOLE(L"String"), L"fore:#008000" },
+	{ SCE_C_NUMBER, NP2STYLE_Number, EDITSTYLE_HOLE(L"Number"), L"fore:#FF0000" },
+	{ SCE_C_OPERATOR, NP2STYLE_Operator, EDITSTYLE_HOLE(L"Operator"), L"fore:#B000B0"  },
 	EDITSTYLE_SENTINEL
 }
 };

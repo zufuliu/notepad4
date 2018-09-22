@@ -59,14 +59,14 @@ GCC_NO_WARNING_MISSING_BRACES_BEGIN
 EDITLEXER lexVBS = { SCLEX_VBSCRIPT, NP2LEX_VBS, EDITLEXER_HOLE(L"VBScript"), L"vbs; dsm", &Keywords_VBS,
 {
 	EDITSTYLE_DEFAULT,
-	{ SCE_B_KEYWORD, NP2STYLE_Keyword, L"Keyword", L"fore:#0000FF", L"" },
-	{ SCE_B_KEYWORD2, NP2STYLE_TypeKeyword, L"Type Keyword", L"fore:#0000FF", L"" },
-	{ SCE_B_CONSTANT, NP2STYLE_Constant, L"Constant", L"fore:#B000B0", L""},
-	{ SCE_B_COMMENT, NP2STYLE_Comment, L"Comment", L"fore:#608060", L"" },
-	{ MULTI_STYLE(SCE_B_STRING, SCE_B_STRINGEOL, 0, 0), NP2STYLE_String, L"String", L"fore:#008000", L"" },
-	{ SCE_B_LABEL, NP2STYLE_Label, L"Label", L"fore:#000000; back:#FFC040", L""},
-	{ SCE_B_NUMBER, NP2STYLE_Number, L"Number", L"fore:#FF0000", L"" },
-	{ SCE_B_OPERATOR, NP2STYLE_Operator, L"Operator", L"fore:#B000B0", L"" },
+	{ SCE_B_KEYWORD, NP2STYLE_Keyword, EDITSTYLE_HOLE(L"Keyword"), L"fore:#0000FF" },
+	{ SCE_B_KEYWORD2, NP2STYLE_TypeKeyword, EDITSTYLE_HOLE(L"Type Keyword"), L"fore:#0000FF" },
+	{ SCE_B_CONSTANT, NP2STYLE_Constant, EDITSTYLE_HOLE(L"Constant"), L"fore:#B000B0" },
+	{ SCE_B_COMMENT, NP2STYLE_Comment, EDITSTYLE_HOLE(L"Comment"), L"fore:#608060" },
+	{ MULTI_STYLE(SCE_B_STRING, SCE_B_STRINGEOL, 0, 0), NP2STYLE_String, EDITSTYLE_HOLE(L"String"), L"fore:#008000" },
+	{ SCE_B_LABEL, NP2STYLE_Label, EDITSTYLE_HOLE(L"Label"), L"fore:#000000; back:#FFC040" },
+	{ SCE_B_NUMBER, NP2STYLE_Number, EDITSTYLE_HOLE(L"Number"), L"fore:#FF0000" },
+	{ SCE_B_OPERATOR, NP2STYLE_Operator, EDITSTYLE_HOLE(L"Operator"), L"fore:#B000B0" },
 	EDITSTYLE_SENTINEL
 }
 };

@@ -55,17 +55,17 @@ GCC_NO_WARNING_MISSING_BRACES_BEGIN
 EDITLEXER lexINNO = { SCLEX_INNOSETUP, NP2LEX_INNO, EDITLEXER_HOLE(L"Inno Setup Script"), L"iss; isl; islu", &Keywords_INNO,
 {
 	EDITSTYLE_DEFAULT,
-	{ MULTI_STYLE(SCE_INNO_COMMENT, SCE_INNO_COMMENT_PASCAL, 0, 0), NP2STYLE_Comment, L"Comment", L"fore:#008000", L"" },
-	{ SCE_INNO_KEYWORD, NP2STYLE_Keyword, L"Keyword", L"fore:#0000FF", L"" },
-	{ SCE_INNO_PREPROC, NP2STYLE_Preprocessor, L"Preprocessor", L"fore:#FF8000", L"" },
-	{ SCE_INNO_KEYWORD_PASCAL, 63501, L"Pascal Keyword", L"fore:#0000FF", L"" },
-	//{ SCE_INNO_PAS_TYPE, NP2STYLE_TypeKeyword, L"Pascal Type Keyword", L"bold; fore:#1E90FF", L"" },
-	{ SCE_INNO_SECTION, 63502, L"Section", L"bold; fore:#000080; back:#FF8000; eolfilled", L"" },
-	{ SCE_INNO_PARAMETER, 63503, L"Parameter", L"fore:#0000FF", L"" },
-	{ SCE_INNO_INLINE_EXPANSION, 63504, L"Inline Expansion", L"fore:#800080", L"" },
-	{ MULTI_STYLE(SCE_INNO_STRING_DOUBLE, SCE_INNO_STRING_SINGLE, 0, 0), NP2STYLE_String, L"String", L"fore:#808000", L"" },
-	//{ SCE_INNO_NUMBER, NP2STYLE_Number, L"Number", L"fore:#FF0000", L"" },
-	//{ SCE_INNO_OPERATOR, NP2STYLE_Operator, L"Operator", L"fore:#B000B0", L"" },
+	{ MULTI_STYLE(SCE_INNO_COMMENT, SCE_INNO_COMMENT_PASCAL, 0, 0), NP2STYLE_Comment, EDITSTYLE_HOLE(L"Comment"), L"fore:#008000" },
+	{ SCE_INNO_KEYWORD, NP2STYLE_Keyword, EDITSTYLE_HOLE(L"Keyword"), L"fore:#0000FF" },
+	{ SCE_INNO_PREPROC, NP2STYLE_Preprocessor, EDITSTYLE_HOLE(L"Preprocessor"), L"fore:#FF8000" },
+	{ SCE_INNO_KEYWORD_PASCAL, 63501, EDITSTYLE_HOLE(L"Pascal Keyword"), L"fore:#0000FF" },
+	//{ SCE_INNO_PAS_TYPE, NP2STYLE_TypeKeyword, EDITSTYLE_HOLE(L"Pascal Type Keyword"), L"bold; fore:#1E90FF" },
+	{ SCE_INNO_SECTION, 63502, EDITSTYLE_HOLE(L"Section"), L"bold; fore:#000080; back:#FF8000; eolfilled" },
+	{ SCE_INNO_PARAMETER, 63503, EDITSTYLE_HOLE(L"Parameter"), L"fore:#0000FF" },
+	{ SCE_INNO_INLINE_EXPANSION, 63504, EDITSTYLE_HOLE(L"Inline Expansion"), L"fore:#800080" },
+	{ MULTI_STYLE(SCE_INNO_STRING_DOUBLE, SCE_INNO_STRING_SINGLE, 0, 0), NP2STYLE_String, EDITSTYLE_HOLE(L"String"), L"fore:#808000" },
+	//{ SCE_INNO_NUMBER, NP2STYLE_Number, EDITSTYLE_HOLE(L"Number"), L"fore:#FF0000" },
+	//{ SCE_INNO_OPERATOR, NP2STYLE_Operator, EDITSTYLE_HOLE(L"Operator"), L"fore:#B000B0" },
 	EDITSTYLE_SENTINEL
 }
 };

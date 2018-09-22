@@ -45,13 +45,13 @@ GCC_NO_WARNING_MISSING_BRACES_BEGIN
 EDITLEXER lexBatch = { SCLEX_BATCH, NP2LEX_BATCH, EDITLEXER_HOLE(L"Batch File"), L"bat; cmd", &Keywords_Batch,
 {
 	EDITSTYLE_DEFAULT,
-	{ SCE_BAT_COMMENT, NP2STYLE_Comment, L"Comment", L"fore:#008000", L"" },
-	{ SCE_BAT_WORD, NP2STYLE_Keyword, L"Keyword", L"bold; fore:#FF8000", L"" },
-	{ SCE_BAT_COMMAND, NP2STYLE_Command, L"Command", L"bold; fore:#0080FF", L"" },
-	{ MULTI_STYLE(SCE_BAT_STRINGDQ, SCE_BAT_STRINGSQ, SCE_BAT_STRINGBT, 0), NP2STYLE_String, L"String", L"fore:#008080", L"" },
-	{ SCE_BAT_VARIABLE, NP2STYLE_Variable, L"Variable", L"fore:#003CE6; back:#FFF1A8", L"" },
-	{ SCE_BAT_OPERATOR, NP2STYLE_Operator, L"Operator", L"fore:#B000B0", L"" },
-	{ SCE_BAT_LABEL, NP2STYLE_Label, L"Label", L"fore:#C80000; back:#F4F4F4", L"" },
+	{ SCE_BAT_COMMENT, NP2STYLE_Comment, EDITSTYLE_HOLE(L"Comment"), L"fore:#008000" },
+	{ SCE_BAT_WORD, NP2STYLE_Keyword, EDITSTYLE_HOLE(L"Keyword"), L"bold; fore:#FF8000" },
+	{ SCE_BAT_COMMAND, NP2STYLE_Command, EDITSTYLE_HOLE(L"Command"), L"bold; fore:#0080FF" },
+	{ MULTI_STYLE(SCE_BAT_STRINGDQ, SCE_BAT_STRINGSQ, SCE_BAT_STRINGBT, 0), NP2STYLE_String, EDITSTYLE_HOLE(L"String"), L"fore:#008080" },
+	{ SCE_BAT_VARIABLE, NP2STYLE_Variable, EDITSTYLE_HOLE(L"Variable"), L"fore:#003CE6; back:#FFF1A8" },
+	{ SCE_BAT_OPERATOR, NP2STYLE_Operator, EDITSTYLE_HOLE(L"Operator"), L"fore:#B000B0" },
+	{ SCE_BAT_LABEL, NP2STYLE_Label, EDITSTYLE_HOLE(L"Label"), L"fore:#C80000; back:#F4F4F4" },
 	EDITSTYLE_SENTINEL
 }
 };
