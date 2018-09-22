@@ -178,6 +178,16 @@ int flagPosParam        = 0;
 //  WinMain()
 //
 //
+static void CleanUpResources(BOOL initialized) {
+	if (hModUxTheme) {
+		FreeLibrary(hModUxTheme);
+	}
+	if (initialized) {
+		UnregisterClass(WC_METAPATH, g_hInstance);
+	}
+	OleUninitialize();
+}
+
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nShowCmd) {
 	UNREFERENCED_PARAMETER(hPrevInstance);
 	UNREFERENCED_PARAMETER(lpCmdLine);
@@ -223,10 +233,12 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 	hModUxTheme = LoadLibraryEx(L"uxtheme.dll", NULL, loadLibraryFlags);
 
 	if (!InitApplication(hInstance)) {
+		CleanUpResources(FALSE);
 		return FALSE;
 	}
 
 	if ((hwnd = InitInstance(hInstance, nShowCmd)) == NULL) {
+		CleanUpResources(TRUE);
 		return FALSE;
 	}
 
@@ -239,12 +251,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 		}
 	}
 
-	if (hModUxTheme) {
-		FreeLibrary(hModUxTheme);
-	}
-
-	OleUninitialize();
-
+	CleanUpResources(TRUE);
 	return (int)(msg.wParam);
 }
 
