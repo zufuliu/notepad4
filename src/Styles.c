@@ -3280,7 +3280,7 @@ INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM
 // Style_ConfigDlg()
 //
 void Style_ConfigDlg(HWND hwnd) {
-	LPWSTR *extBackup = NP2HeapAlloc(ALL_FILE_EXTENSIONS_BYTE_SIZE);
+	LPWSTR extBackup = NP2HeapAlloc(ALL_FILE_EXTENSIONS_BYTE_SIZE);
 	WCHAR *StyleBackup[MAX_TOTAL_EDIT_STYLE_COUNT];
 	int c, cItems;
 	BOOL changed = FALSE;

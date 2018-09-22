@@ -55,7 +55,7 @@ EDITLEXER lexANSI = { SCLEX_NULL, NP2LEX_ANSI, EDITLEXER_HOLE(L"ANSI Art"), L"nf
 
 EDITLEXER lexCONF = { SCLEX_CONF, NP2LEX_CONF, EDITLEXER_HOLE(L"Config File"), L"conf; cfg; cnf; htaccess; properties; prefs; iface; prop", &Keywords_NULL,
 {
-	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
+	EDITSTYLE_DEFAULT,
 	{ SCE_CONF_DIRECTIVE, NP2STYLE_Directive, L"Directive", L"fore:#003CE6", L"" },
 	{ SCE_CONF_COMMENT, NP2STYLE_Comment, L"Comment", L"fore:#008000", L"" },
 	{ SCE_CONF_STRING, NP2STYLE_String, L"String", L"fore:#B000B0", L"" },
@@ -72,7 +72,7 @@ EDITLEXER lexCONF = { SCLEX_CONF, NP2LEX_CONF, EDITLEXER_HOLE(L"Config File"), L
 
 EDITLEXER lexINI = { SCLEX_PROPERTIES, NP2LEX_INI, EDITLEXER_HOLE(L"Ini Config File"), L"ini; inf; reg; oem; sif; url; sed; theme; clw", &Keywords_NULL,
 {
-	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
+	EDITSTYLE_DEFAULT,
 	{ SCE_PROPS_COMMENT, NP2STYLE_Comment, L"Comment", L"fore:#008000", L"" },
 	{ SCE_PROPS_SECTION, 63511, L"Section", L"bold; fore:#000000; back:#FFC040; eolfilled", L"" },
 	{ SCE_PROPS_ASSIGNMENT, 63512, L"Assignment", L"fore:#FF0000", L"" },
@@ -83,7 +83,7 @@ EDITLEXER lexINI = { SCLEX_PROPERTIES, NP2LEX_INI, EDITLEXER_HOLE(L"Ini Config F
 
 EDITLEXER lexDIFF = { SCLEX_DIFF, NP2LEX_DIFF, EDITLEXER_HOLE(L"Diff File"), L"diff; patch", &Keywords_NULL,
 {
-	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
+	EDITSTYLE_DEFAULT,
 	{ SCE_DIFF_COMMENT, NP2STYLE_Comment, L"Comment", L"fore:#008000", L"" },
 	{ SCE_DIFF_COMMAND, NP2STYLE_Command, L"Command", L"bold; fore:#0A246A", L"" },
 	{ SCE_DIFF_HEADER, 63541, L"Source and Destination", L"fore:#C80000; back:#FFF1A8; eolfilled", L"" },

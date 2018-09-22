@@ -42,7 +42,7 @@ GCC_NO_WARNING_MISSING_BRACES_BEGIN
 
 EDITLEXER lexBash = { SCLEX_BASH, NP2LEX_BASH, EDITLEXER_HOLE(L"Shell Script"), L"sh; csh; zsh; bash; tcsh; m4; in; po", &Keywords_Bash,
 {
-	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
+	EDITSTYLE_DEFAULT,
 	//{ SCE_SH_ERROR, 63531, L"Error", L"", L"" },
 	{ MULTI_STYLE(SCE_SH_COMMENTLINE, 0, 0, 0), NP2STYLE_Comment, L"Comment", L"fore:#608060", L"" },
 	{ SCE_SH_WORD, NP2STYLE_Keyword, L"Keyword", L"bold; fore:#FF8000", L"" },

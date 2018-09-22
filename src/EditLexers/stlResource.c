@@ -45,7 +45,7 @@ GCC_NO_WARNING_MISSING_BRACES_BEGIN
 
 EDITLEXER lexRC = { SCLEX_CPP, NP2LEX_RC, EDITLEXER_HOLE(L"Resource Script"), L"rc; rc2; rct; rh; dlg", &Keywords_RC,
 {
-	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
+	EDITSTYLE_DEFAULT,
 	{ SCE_C_WORD, NP2STYLE_Keyword, L"Keyword", L"fore:#0000FF", L"" },
 	{ SCE_C_PREPROCESSOR, NP2STYLE_Preprocessor, L"Preprocessor", L"fore:#FF8000", L"" },
 	{ MULTI_STYLE(SCE_C_COMMENT, SCE_C_COMMENTLINE, SCE_C_COMMENTDOC, SCE_C_COMMENTLINEDOC), NP2STYLE_Comment, L"Comment", L"fore:#608060", L"" },

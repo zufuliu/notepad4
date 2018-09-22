@@ -42,7 +42,7 @@ GCC_NO_WARNING_MISSING_BRACES_BEGIN
 
 EDITLEXER lexLua = { SCLEX_LUA, NP2LEX_LUA, EDITLEXER_HOLE(L"Lua Script"), L"lua; wlua; nse; luadoc; luax", &Keywords_Lua,
 {
-	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
+	EDITSTYLE_DEFAULT,
 	{ SCE_LUA_WORD, NP2STYLE_Keyword, L"Keyword", L"fore:#0000FF", L"" },
 	{ SCE_LUA_WORD2, NP2STYLE_BasicFunction, L"Basic Function", L"fore:#FF8000", L"" },
 	{ SCE_LUA_WORD3, 63452, L"String, Table & Math Function", L"fore:#FF0080", L"" },

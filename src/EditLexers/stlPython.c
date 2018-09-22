@@ -296,7 +296,7 @@ GCC_NO_WARNING_MISSING_BRACES_BEGIN
 
 EDITLEXER lexPython  = { SCLEX_PYTHON, NP2LEX_PYTHON, EDITLEXER_HOLE(L"Python Script"), L"py; pyw; pyx; boo; empy; cobra", &Keywords_Python,
 {
-	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
+	EDITSTYLE_DEFAULT,
 	{ SCE_PY_WORD, NP2STYLE_Keyword, L"Keyword", L"bold; fore:#FF8000", L"" },
 	{ SCE_PY_WORD2, NP2STYLE_Type, L"Type", L"fore:#0080FF", L"" },
 	{ SCE_PY_CLASSNAME, NP2STYLE_Class, L"Class", L"bold; fore:#007F7F", L"" },

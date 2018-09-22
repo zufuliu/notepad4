@@ -26,7 +26,7 @@ GCC_NO_WARNING_MISSING_BRACES_BEGIN
 
 EDITLEXER lexVerilog = { SCLEX_VERILOG, NP2LEX_VERILOG, EDITLEXER_HOLE(L"Verilog HDL Source"), L"v; vl", &Keywords_Verilog,
 {
-	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
+	EDITSTYLE_DEFAULT,
 	{ SCE_V_WORD, NP2STYLE_Keyword, L"Keyword", L"fore:#0000FF", L"" },
 	{ SCE_V_WORD2, 63586, L"System Task and Function", L"fore:#0080FF", L"" },
 	{ MULTI_STYLE(SCE_V_COMMENT, SCE_V_COMMENTLINE, SCE_V_COMMENTLINEBANG, 0), NP2STYLE_Comment, L"Comment", L"fore:#608060", L"" },

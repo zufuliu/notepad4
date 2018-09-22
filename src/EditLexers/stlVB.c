@@ -73,7 +73,7 @@ GCC_NO_WARNING_MISSING_BRACES_BEGIN
 
 EDITLEXER lexVB = { SCLEX_VB, NP2LEX_VB, EDITLEXER_HOLE(L"Visual Basic"), L"vb; bas; frm; cls; ctl; pag; dsr; dob", &Keywords_VB,
 {
-	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
+	EDITSTYLE_DEFAULT,
 	{ MULTI_STYLE(SCE_B_KEYWORD, SCE_B_KEYWORD3, 0, 0), NP2STYLE_Keyword, L"Keyword", L"fore:#0000FF", L"" },
 	{ SCE_B_KEYWORD2, NP2STYLE_TypeKeyword, L"Type Keyword", L"fore:#0000FF", L"" },
 	{ SCE_B_PREPROCESSOR, NP2STYLE_Preprocessor, L"Preprocessor", L"fore:#FF9C00", L"" },

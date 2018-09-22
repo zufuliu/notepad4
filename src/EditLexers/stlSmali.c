@@ -122,7 +122,7 @@ GCC_NO_WARNING_MISSING_BRACES_BEGIN
 
 EDITLEXER lexSmali = { SCLEX_SMALI, NP2LEX_SMALI, EDITLEXER_HOLE(L"Android Smali"), L"smali; ddx", &Keywords_Smail,
 {
-	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
+	EDITSTYLE_DEFAULT,
 	{ SCE_SMALI_WORD, NP2STYLE_Keyword, L"Keyword", L"fore:#0000FF", L"" },
 	{ SCE_SMALI_DIRECTIVE, NP2STYLE_Directive, L"Directive", L"fore:#FF8000", L"" },
 	{ SCE_SMALI_INSTRUCTION, NP2STYLE_Instruction, L"Instruction", L"fore:#0080FF", L"" },

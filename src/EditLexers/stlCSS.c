@@ -67,7 +67,7 @@ GCC_NO_WARNING_MISSING_BRACES_BEGIN
 
 EDITLEXER lexCSS = { SCLEX_CSS, NP2LEX_CSS, EDITLEXER_HOLE(L"CSS Style Sheet"), L"css; scss; less; hss", &Keywords_CSS,
 {
-	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
+	EDITSTYLE_DEFAULT,
 	{ SCE_CSS_COMMENT, NP2STYLE_Comment, L"Comment", L"fore:#608060", L"" },
 	{ SCE_CSS_TAG, 63161, L"HTML Tag", L"bold; fore:#0A246A", L"" },
 	{ SCE_CSS_CLASS, 63301, L"Tag Class", L"fore:#648000", L"" },

@@ -243,7 +243,7 @@ GCC_NO_WARNING_MISSING_BRACES_BEGIN
 
 EDITLEXER lexPHP = { SCLEX_CPP, NP2LEX_PHP, EDITLEXER_HOLE(L"PHP Script"), L"php; phpt; phtml; eyecode", &Keywords_PHP,
 {
-	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
+	EDITSTYLE_DEFAULT,
 	{ SCE_C_WORD, NP2STYLE_Keyword, L"Keyword", L"bold; fore:#FF8000", L"" },
 	{ SCE_C_CLASS, NP2STYLE_Class, L"Class", L"bold; fore:#007F7F", L"" },
 	{ SCE_C_INTERFACE, NP2STYLE_Interface, L"Interface", L"bold; fore:#1E90FF", L""},

@@ -146,7 +146,7 @@ GCC_NO_WARNING_MISSING_BRACES_BEGIN
 
 EDITLEXER lexJS = { SCLEX_CPP, NP2LEX_JS, EDITLEXER_HOLE(L"JavaScript"), L"js; jse; jsm", &Keywords_JS,
 {
-	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
+	EDITSTYLE_DEFAULT,
 	{ SCE_C_WORD, NP2STYLE_Keyword, L"Keyword", L"fore:#0000FF", L"" },
 	{ SCE_C_WORD2, NP2STYLE_ReservedWord, L"Reserved Word", L"fore:#B000B0", L"" },
 	{ SCE_C_CLASS, NP2STYLE_Object, L"Object", L"bold; fore:#0080C0", L"" },

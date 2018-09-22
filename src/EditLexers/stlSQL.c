@@ -138,7 +138,7 @@ GCC_NO_WARNING_MISSING_BRACES_BEGIN
 
 EDITLEXER lexSQL = { SCLEX_SQL, NP2LEX_SQL, EDITLEXER_HOLE(L"SQL Query"), L"sql; mysql", &Keywords_SQL,
 {
-	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
+	EDITSTYLE_DEFAULT,
 	{ SCE_SQL_WORD, NP2STYLE_Keyword, L"Keyword", L"bold; fore:#FF8040", L"" },
 	{ SCE_SQL_WORD2, NP2STYLE_TypeKeyword, L"Type Keyword", L"bold; fore:#1E90FF", L"" },
 	{ SCE_SQL_USER1, NP2STYLE_BasicFunction, L"Basic Function", L"fore:#FF0080", L"" },

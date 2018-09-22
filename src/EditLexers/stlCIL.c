@@ -82,7 +82,7 @@ GCC_NO_WARNING_MISSING_BRACES_BEGIN
 
 EDITLEXER lexCIL = { SCLEX_CIL, NP2LEX_CIL, EDITLEXER_HOLE(L".NET IL"), L"il", &Keywords_CIL,
 {
-	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
+	EDITSTYLE_DEFAULT,
 	{ SCE_C_WORD, NP2STYLE_Keyword, L"Keyword", L"fore:#0000FF", L"" },
 	{ SCE_C_WORD2, NP2STYLE_TypeKeyword, L"Type Keyword", L"fore:#0000FF", L"" },
 	{ SCE_C_DIRECTIVE, NP2STYLE_Directive, L"Directive", L"fore:#FF8000", L"" },

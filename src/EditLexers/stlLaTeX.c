@@ -13,7 +13,7 @@ GCC_NO_WARNING_MISSING_BRACES_BEGIN
 
 EDITLEXER lexLaTeX = { SCLEX_LATEX, NP2LEX_LATEX, EDITLEXER_HOLE(L"LaTeX File"), L"tex; latex; sty; cls; tpx; bbl; bib; ltx; dtx; ins; toc; info", &Keywords_TEX,
 {
-	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
+	EDITSTYLE_DEFAULT,
 	{ SCE_L_COMMAND, NP2STYLE_Command, L"Command", L"fore:#0000FF", L"" },
 	{ MULTI_STYLE(SCE_L_COMMENT, SCE_L_COMMENT2, 0, 0), NP2STYLE_Comment, L"Comment", L"fore:#608060", L"" },
 	{ SCE_L_TITLE, 63575, L"Title", L"fore:#008000", L"" },
@@ -69,7 +69,7 @@ GCC_NO_WARNING_MISSING_BRACES_BEGIN
 
 EDITLEXER lexTexinfo = { SCLEX_TEXINFO, NP2LEX_TEXINFO, EDITLEXER_HOLE(L"Texinfo File"), L"texi; texinfo; txi", &Keywords_TEXI,
 {
-	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
+	EDITSTYLE_DEFAULT,
 	{ SCE_L_COMMAND, NP2STYLE_Command, L"Command", L"fore:#0000FF", L"" },
 	{ MULTI_STYLE(SCE_L_COMMENT, SCE_L_COMMENT2, 0, 0), NP2STYLE_Comment, L"Comment", L"fore:#608060", L"" },
 	{ SCE_L_TITLE, 63575, L"Title", L"back:#FF8040; eolfilled", L"" },

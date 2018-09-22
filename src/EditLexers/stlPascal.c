@@ -29,7 +29,7 @@ GCC_NO_WARNING_MISSING_BRACES_BEGIN
 
 EDITLEXER lexPascal = { SCLEX_PASCAL, NP2LEX_PASCAL, EDITLEXER_HOLE(L"Pascal Source"), L"pas; inc; dpr; dpk; dfm; pp; lfm; lpr; fpd", &Keywords_Pascal,
 {
-	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
+	EDITSTYLE_DEFAULT,
 	{ SCE_PAS_WORD, NP2STYLE_Keyword, L"Keyword", L"bold; fore:#FF8000", L"" },
 	{ SCE_PAS_TYPE, NP2STYLE_TypeKeyword, L"Type Keyword", L"bold; fore:#1E90FF", L"" },
 	{ SCE_PAS_FUNCTION, NP2STYLE_BasicFunction, L"Basic Function", L"fore:#0080FF", L"" },

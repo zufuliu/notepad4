@@ -58,7 +58,7 @@ GCC_NO_WARNING_MISSING_BRACES_BEGIN
 
 EDITLEXER lexVBS = { SCLEX_VBSCRIPT, NP2LEX_VBS, EDITLEXER_HOLE(L"VBScript"), L"vbs; dsm", &Keywords_VBS,
 {
-	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
+	EDITSTYLE_DEFAULT,
 	{ SCE_B_KEYWORD, NP2STYLE_Keyword, L"Keyword", L"fore:#0000FF", L"" },
 	{ SCE_B_KEYWORD2, NP2STYLE_TypeKeyword, L"Type Keyword", L"fore:#0000FF", L"" },
 	{ SCE_B_CONSTANT, NP2STYLE_Constant, L"Constant", L"fore:#B000B0", L""},

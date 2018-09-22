@@ -40,7 +40,7 @@ GCC_NO_WARNING_MISSING_BRACES_BEGIN
 
 EDITLEXER lexASY = { SCLEX_CPP, NP2LEX_ASY, EDITLEXER_HOLE(L"Asymptote Code"), L"asy", &Keywords_ASY,
 {
-	{ STYLE_DEFAULT, NP2STYLE_Default, L"Default", L"", L"" },
+	EDITSTYLE_DEFAULT,
 	{ SCE_C_WORD, NP2STYLE_Keyword, L"Keyword", L"fore:#0000FF", L"" },
 	{ SCE_C_WORD2, NP2STYLE_TypeKeyword, L"Type Keyword", L"fore:#1E90FF", L"" },
 	{ SCE_C_STRUCT, NP2STYLE_Struct, L"Struct", L"bold; fore:#007F7F", L"" },
