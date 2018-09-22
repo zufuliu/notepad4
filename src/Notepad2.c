@@ -438,6 +438,24 @@ int		flagDisplayHelp			= 0;
 // WinMain()
 //
 //
+static void CleanUpResources(BOOL initialized) {
+	if (tchFileDlgFilters != NULL) {
+		LocalFree(tchFileDlgFilters);
+	}
+
+	Encoding_ReleaseResources();
+	Style_ReleaseResources();
+	Scintilla_ReleaseResources();
+
+	if (hModUxTheme) {
+		FreeLibrary(hModUxTheme);
+	}
+	if (initialized) {
+		UnregisterClass(wchWndClass, g_hInstance);
+	}
+	OleUninitialize();
+}
+
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nShowCmd) {
 	UNREFERENCED_PARAMETER(hPrevInstance);
 	UNREFERENCED_PARAMETER(lpCmdLine);
@@ -556,12 +574,12 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 	LoadSettings();
 
 	if (!InitApplication(hInstance)) {
-		OleUninitialize();
+		CleanUpResources(FALSE);
 		return FALSE;
 	}
 
 	if ((hwnd = InitInstance(hInstance, nShowCmd)) == NULL) {
-		OleUninitialize();
+		CleanUpResources(TRUE);
 		return FALSE;
 	}
 
@@ -581,22 +599,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 		}
 	}
 
-	// Save Settings is done elsewhere
-	if (tchFileDlgFilters != NULL) {
-		LocalFree(tchFileDlgFilters);
-	}
-
-	Encoding_ReleaseResources();
-	Style_ReleaseResources();
-	Scintilla_ReleaseResources();
-	UnregisterClass(wchWndClass, hInstance);
-
-	if (hModUxTheme) {
-		FreeLibrary(hModUxTheme);
-	}
-
-	OleUninitialize();
-
+	CleanUpResources(TRUE);
 	return (int)(msg.wParam);
 }
 
