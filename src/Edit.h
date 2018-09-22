@@ -174,12 +174,14 @@ void	EditShowCallTips(HWND hwnd, Sci_Position position);
 #define IDS_ENCODINGNAME0		61000
 #define IDS_EOLMODENAME0		62000
 
+#define MAX_ENCODING_LABEL_SIZE		32
+
 typedef struct _np2encoding {
 	const UINT uFlags;
-	UINT	uCodePage;
+	/*const*/UINT uCodePage;
 	const char * const pszParseNames;
 	const int idsName;
-	WCHAR	wchLabel[32];
+	LPWSTR wchLabel;
 } NP2ENCODING;
 
 // 932 Shift-JIS, 936 GBK, 949 UHC, 950 Big5, 1361 Johab
@@ -188,6 +190,7 @@ inline BOOL IsDBCSCodePage(UINT page) {
 }
 
 // in EditEncoding.c
+void	Encoding_ReleaseResources(void);
 void	Encoding_InitDefaults(void);
 int 	Encoding_MapIniSetting(BOOL bLoad, int iSetting);
 void	Encoding_GetLabel(int iEncoding);
