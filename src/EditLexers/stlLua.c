@@ -43,16 +43,16 @@ GCC_NO_WARNING_MISSING_BRACES_BEGIN
 EDITLEXER lexLua = { SCLEX_LUA, NP2LEX_LUA, EDITLEXER_HOLE(L"Lua Script"), L"lua; wlua; nse; luadoc; luax", &Keywords_Lua,
 {
 	EDITSTYLE_DEFAULT,
-	{ SCE_LUA_WORD, NP2STYLE_Keyword, L"Keyword", L"fore:#0000FF", L"" },
-	{ SCE_LUA_WORD2, NP2STYLE_BasicFunction, L"Basic Function", L"fore:#FF8000", L"" },
-	{ SCE_LUA_WORD3, 63452, L"String, Table & Math Function", L"fore:#FF0080", L"" },
-	{ SCE_LUA_WORD4, 63453, L"Input, Output & System Facility", L"fore:#0080FF", L"" },
-	{ SCE_LUA_FUNCTION, NP2STYLE_Function, L"Function", L"fore:#A46000", L"" },
-	{ MULTI_STYLE(SCE_LUA_COMMENT, SCE_LUA_COMMENTLINE, SCE_LUA_COMMENTDOC, 0), NP2STYLE_Comment, L"Comment", L"fore:#608060", L"" },
-	{ MULTI_STYLE(SCE_LUA_STRING, SCE_LUA_STRINGEOL, SCE_LUA_LITERALSTRING, SCE_LUA_CHARACTER), NP2STYLE_String, L"String", L"fore:#008000", L"" },
-	{ SCE_LUA_NUMBER, NP2STYLE_Number, L"Number", L"fore:#FF0000", L"" },
-	{ SCE_LUA_OPERATOR, NP2STYLE_Operator, L"Operator", L"fore:#B000B0", L"fore:#B000B0" },
-	{ SCE_LUA_PREPROCESSOR, NP2STYLE_Preprocessor, L"Preprocessor", L"fore:#FF8000", L"" },
+	{ SCE_LUA_WORD, NP2STYLE_Keyword, EDITSTYLE_HOLE(L"Keyword"), L"fore:#0000FF" },
+	{ SCE_LUA_WORD2, NP2STYLE_BasicFunction, EDITSTYLE_HOLE(L"Basic Function"), L"fore:#FF8000" },
+	{ SCE_LUA_WORD3, 63452, EDITSTYLE_HOLE(L"String, Table & Math Function"), L"fore:#FF0080" },
+	{ SCE_LUA_WORD4, 63453, EDITSTYLE_HOLE(L"Input, Output & System Facility"), L"fore:#0080FF" },
+	{ SCE_LUA_FUNCTION, NP2STYLE_Function, EDITSTYLE_HOLE(L"Function"), L"fore:#A46000" },
+	{ MULTI_STYLE(SCE_LUA_COMMENT, SCE_LUA_COMMENTLINE, SCE_LUA_COMMENTDOC, 0), NP2STYLE_Comment, EDITSTYLE_HOLE(L"Comment"), L"fore:#608060" },
+	{ MULTI_STYLE(SCE_LUA_STRING, SCE_LUA_STRINGEOL, SCE_LUA_LITERALSTRING, SCE_LUA_CHARACTER), NP2STYLE_String, EDITSTYLE_HOLE(L"String"), L"fore:#008000" },
+	{ SCE_LUA_NUMBER, NP2STYLE_Number, EDITSTYLE_HOLE(L"Number"), L"fore:#FF0000" },
+	{ SCE_LUA_OPERATOR, NP2STYLE_Operator, EDITSTYLE_HOLE(L"Operator"), L"fore:#B000B0" },
+	{ SCE_LUA_PREPROCESSOR, NP2STYLE_Preprocessor, EDITSTYLE_HOLE(L"Preprocessor"), L"fore:#FF8000" },
 	EDITSTYLE_SENTINEL
 }
 };

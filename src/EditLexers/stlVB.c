@@ -74,16 +74,16 @@ GCC_NO_WARNING_MISSING_BRACES_BEGIN
 EDITLEXER lexVB = { SCLEX_VB, NP2LEX_VB, EDITLEXER_HOLE(L"Visual Basic"), L"vb; bas; frm; cls; ctl; pag; dsr; dob", &Keywords_VB,
 {
 	EDITSTYLE_DEFAULT,
-	{ MULTI_STYLE(SCE_B_KEYWORD, SCE_B_KEYWORD3, 0, 0), NP2STYLE_Keyword, L"Keyword", L"fore:#0000FF", L"" },
-	{ SCE_B_KEYWORD2, NP2STYLE_TypeKeyword, L"Type Keyword", L"fore:#0000FF", L"" },
-	{ SCE_B_PREPROCESSOR, NP2STYLE_Preprocessor, L"Preprocessor", L"fore:#FF9C00", L"" },
-	{ SCE_B_KEYWORD4, NP2STYLE_Attribute, L"Attribute", L"fore:#FF8000", L""},
-	{ SCE_B_CONSTANT, NP2STYLE_Constant, L"Constant", L"fore:#B000B0", L""},
-	{ SCE_B_COMMENT, NP2STYLE_Comment, L"Comment", L"fore:#608060", L"" },
-	{ MULTI_STYLE(SCE_B_STRING, SCE_B_STRINGEOL, 0, 0), NP2STYLE_String, L"String", L"fore:#008000", L"" },
-	{ SCE_B_LABEL, NP2STYLE_Label, L"Label", L"fore:#000000; back:#FFC040", L""},
-	{ MULTI_STYLE(SCE_B_NUMBER, SCE_B_DATE, 0, 0), NP2STYLE_Number, L"Number", L"fore:#FF0000", L"" },
-	{ SCE_B_OPERATOR, NP2STYLE_Operator, L"Operator", L"fore:#B000B0", L"" },
+	{ MULTI_STYLE(SCE_B_KEYWORD, SCE_B_KEYWORD3, 0, 0), NP2STYLE_Keyword, EDITSTYLE_HOLE(L"Keyword"), L"fore:#0000FF" },
+	{ SCE_B_KEYWORD2, NP2STYLE_TypeKeyword, EDITSTYLE_HOLE(L"Type Keyword"), L"fore:#0000FF" },
+	{ SCE_B_PREPROCESSOR, NP2STYLE_Preprocessor, EDITSTYLE_HOLE(L"Preprocessor"), L"fore:#FF9C00" },
+	{ SCE_B_KEYWORD4, NP2STYLE_Attribute, EDITSTYLE_HOLE(L"Attribute"), L"fore:#FF8000" },
+	{ SCE_B_CONSTANT, NP2STYLE_Constant, EDITSTYLE_HOLE(L"Constant"), L"fore:#B000B0" },
+	{ SCE_B_COMMENT, NP2STYLE_Comment, EDITSTYLE_HOLE(L"Comment"), L"fore:#608060" },
+	{ MULTI_STYLE(SCE_B_STRING, SCE_B_STRINGEOL, 0, 0), NP2STYLE_String, EDITSTYLE_HOLE(L"String"), L"fore:#008000" },
+	{ SCE_B_LABEL, NP2STYLE_Label, EDITSTYLE_HOLE(L"Label"), L"fore:#000000; back:#FFC040" },
+	{ MULTI_STYLE(SCE_B_NUMBER, SCE_B_DATE, 0, 0), NP2STYLE_Number, EDITSTYLE_HOLE(L"Number"), L"fore:#FF0000" },
+	{ SCE_B_OPERATOR, NP2STYLE_Operator, EDITSTYLE_HOLE(L"Operator"), L"fore:#B000B0" },
 	EDITSTYLE_SENTINEL
 }
 };

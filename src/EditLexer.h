@@ -24,13 +24,17 @@ typedef struct _editstyle {
 		const UINT8 iStyle8[4];
 	};
 	const int rid;
-	LPCWSTR const pszName;
+	struct {
+		const int iNameLen;
+		LPCWSTR const pszName;
+		LPWSTR szValue;
+	};
 	LPCWSTR const pszDefault;
-	WCHAR szValue[MAX_EDITSTYLE_VALUE_SIZE];
 } EDITSTYLE, *PEDITSTYLE;
 
-#define EDITSTYLE_DEFAULT		{ { STYLE_DEFAULT }, NP2STYLE_Default, L"Default", L"", L"" }
-#define EDITSTYLE_SENTINEL 		{ { -1 }, 0, NULL, NULL, L"" }
+#define EDITSTYLE_HOLE(name)	{ CSTRLEN(name), (name), NULL }
+#define EDITSTYLE_DEFAULT 		{ { STYLE_DEFAULT }, NP2STYLE_Default, EDITSTYLE_HOLE(L"Default"), L"" }
+#define EDITSTYLE_SENTINEL 		{ { -1 }, 0, { 0, NULL, NULL }, NULL }
 
 // Not used by Scintilla lexer, listed for auto completion.
 #define KeywordAttr_NoLexer		1
@@ -47,18 +51,20 @@ typedef struct _editlexer {
 	const int iLexer;
 	const int rid;
 	struct {
-		UINT8 bStyleLoaded;
-		UINT8 bStyleChanged;
+		int iStyleCount;
+		BOOL bStyleChanged;
+		int iStyleBufSize;		// in bytes
 		const int iNameLen;
 		LPCWSTR const pszName;
 		LPWSTR szExtensions;
+		LPWSTR szStyleBuf;
 	};
 	LPCWSTR const pszDefExt;
 	const KEYWORDLIST * const pKeyWords;
 	EDITSTYLE Styles[];
 } EDITLEXER, *PEDITLEXER;
 
-#define EDITLEXER_HOLE(name)	{ 0, 0, CSTRLEN(name), (name), NULL }
+#define EDITLEXER_HOLE(name)	{ 0, FALSE, 0, CSTRLEN(name), (name), NULL, NULL }
 
 // NP2LEX_, rid for EDITLEXER
 #define NP2LEX_DEFAULT	63000	// SCLEX_NULL		Default Text
