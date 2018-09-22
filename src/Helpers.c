@@ -154,11 +154,10 @@ LPCWSTR IniSectionUnsafeGetValue(IniSection *section, LPCWSTR key, int keyLen) {
 #endif
 }
 
-BOOL IniSectionGetStringImpl(IniSection *section, LPCWSTR key, int keyLen, LPCWSTR lpDefault, LPWSTR lpReturnedString, int cchReturnedString) {
+void IniSectionGetStringImpl(IniSection *section, LPCWSTR key, int keyLen, LPCWSTR lpDefault, LPWSTR lpReturnedString, int cchReturnedString) {
 	LPCWSTR value = IniSectionGetValueImpl(section, key, keyLen);
 	// allow empty string value
 	lstrcpyn(lpReturnedString, ((value == NULL) ? lpDefault : value), cchReturnedString);
-	return StrNotEmpty(lpReturnedString);
 }
 
 int IniSectionGetIntImpl(IniSection *section, LPCWSTR key, int keyLen, int iDefault) {
@@ -1045,7 +1044,7 @@ int FormatString(LPWSTR lpOutput, int nOutput, UINT uIdFormat, ...) {
 //
 // PathRelativeToApp()
 //
-void PathRelativeToApp(LPWSTR lpszSrc, LPWSTR lpszDest, int cchDest,
+void PathRelativeToApp(LPCWSTR lpszSrc, LPWSTR lpszDest, int cchDest,
 					   BOOL bSrcIsFile, BOOL bUnexpandEnv, BOOL bUnexpandMyDocs) {
 	WCHAR wchAppPath[MAX_PATH];
 	WCHAR wchWinDir[MAX_PATH];
@@ -1083,18 +1082,14 @@ void PathRelativeToApp(LPWSTR lpszSrc, LPWSTR lpszDest, int cchDest,
 		lstrcpyn(wchResult, wchPath, COUNTOF(wchResult));
 	}
 
-	if (lpszDest == NULL || lpszSrc == lpszDest) {
-		lstrcpyn(lpszSrc, wchResult, (cchDest == 0) ? MAX_PATH : cchDest);
-	} else {
-		lstrcpyn(lpszDest, wchResult, (cchDest == 0) ? MAX_PATH : cchDest);
-	}
+	lstrcpyn(lpszDest, wchResult, (cchDest == 0) ? MAX_PATH : cchDest);
 }
 
 //=============================================================================
 //
 // PathAbsoluteFromApp()
 //
-void PathAbsoluteFromApp(LPWSTR lpszSrc, LPWSTR lpszDest, int cchDest, BOOL bExpandEnv) {
+void PathAbsoluteFromApp(LPCWSTR lpszSrc, LPWSTR lpszDest, int cchDest, BOOL bExpandEnv) {
 	WCHAR wchPath[MAX_PATH];
 	WCHAR wchResult[MAX_PATH];
 
@@ -1122,11 +1117,7 @@ void PathAbsoluteFromApp(LPWSTR lpszSrc, LPWSTR lpszDest, int cchDest, BOOL bExp
 		CharUpperBuff(wchResult, 1);
 	}
 
-	if (lpszDest == NULL || lpszSrc == lpszDest) {
-		lstrcpyn(lpszSrc, wchResult, (cchDest == 0) ? MAX_PATH : cchDest);
-	} else {
-		lstrcpyn(lpszDest, wchResult, (cchDest == 0) ? MAX_PATH : cchDest);
-	}
+	lstrcpyn(lpszDest, wchResult, (cchDest == 0) ? MAX_PATH : cchDest);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1699,7 +1690,7 @@ BOOL MRU_AddFile(LPMRULIST pmru, LPCWSTR pszFile, BOOL bRelativePath, BOOL bUnex
 
 	if (bRelativePath) {
 		WCHAR wchFile[MAX_PATH];
-		PathRelativeToApp((LPWSTR)pszFile, wchFile, COUNTOF(wchFile), TRUE, TRUE, bUnexpandMyDocs);
+		PathRelativeToApp(pszFile, wchFile, COUNTOF(wchFile), TRUE, TRUE, bUnexpandMyDocs);
 		pmru->pszItems[0] = StrDup(wchFile);
 	} else {
 		pmru->pszItems[0] = StrDup(pszFile);

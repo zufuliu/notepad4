@@ -1166,7 +1166,7 @@ INT_PTR CALLBACK FileMRUDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPar
 
 			for (int i = 0; i < MRU_GetCount(pFileMRU); i++) {
 				MRU_Enum(pFileMRU, i, tch, COUNTOF(tch));
-				PathAbsoluteFromApp(tch, NULL, 0, TRUE);
+				PathAbsoluteFromApp(tch, tch, COUNTOF(tch), TRUE);
 				//	SendDlgItemMessage(hwnd, IDC_FILEMRU, LB_ADDSTRING, 0, (LPARAM)tch); }
 				//	SendDlgItemMessage(hwnd, IDC_FILEMRU, LB_SETCARETINDEX, 0, FALSE);
 				lvi.iItem = i;

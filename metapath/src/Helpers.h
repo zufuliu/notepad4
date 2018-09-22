@@ -175,7 +175,7 @@ inline LPCWSTR IniSectionGetValueImpl(IniSection *section, LPCWSTR key, int keyL
 	return section->count ? IniSectionUnsafeGetValue(section, key, keyLen) : NULL;
 }
 
-BOOL IniSectionGetStringImpl(IniSection *section, LPCWSTR key, int keyLen, LPCWSTR lpDefault, LPWSTR lpReturnedString, int cchReturnedString);
+void IniSectionGetStringImpl(IniSection *section, LPCWSTR key, int keyLen, LPCWSTR lpDefault, LPWSTR lpReturnedString, int cchReturnedString);
 int IniSectionGetIntImpl(IniSection *section, LPCWSTR key, int keyLen, int iDefault);
 BOOL IniSectionGetBoolImpl(IniSection *section, LPCWSTR key, int keyLen, BOOL bDefault);
 
@@ -200,8 +200,8 @@ inline BOOL IniSectionGetBoolEx(IniSection *section, LPCWSTR key, BOOL bDefault)
 	return IniSectionGetBoolImpl(section, key, -1, bDefault);
 }
 
-inline BOOL IniSectionGetStringEx(IniSection *section, LPCWSTR key, LPCWSTR lpDefault, LPWSTR lpReturnedString, int cchReturnedString) {
-	return IniSectionGetStringImpl(section, key, -1, lpDefault, lpReturnedString, cchReturnedString);
+inline void IniSectionGetStringEx(IniSection *section, LPCWSTR key, LPCWSTR lpDefault, LPWSTR lpReturnedString, int cchReturnedString) {
+	IniSectionGetStringImpl(section, key, -1, lpDefault, lpReturnedString, cchReturnedString);
 }
 
 typedef struct IniSectionOnSave {
@@ -306,9 +306,9 @@ LRESULT SendWMSize(HWND hwnd);
 
 int FormatString(LPWSTR lpOutput, int nOutput, UINT uIdFormat, ...);
 
-void PathRelativeToApp(LPWSTR lpszSrc, LPWSTR lpszDest, int cchDest, BOOL bSrcIsFile,
+void PathRelativeToApp(LPCWSTR lpszSrc, LPWSTR lpszDest, int cchDest, BOOL bSrcIsFile,
 					   BOOL bUnexpandEnv, BOOL bUnexpandMyDocs);
-void PathAbsoluteFromApp(LPWSTR lpszSrc, LPWSTR lpszDest, int cchDest, BOOL bExpandEnv);
+void PathAbsoluteFromApp(LPCWSTR lpszSrc, LPWSTR lpszDest, int cchDest, BOOL bExpandEnv);
 
 BOOL PathIsLnkFile(LPCWSTR pszPath);
 BOOL PathGetLnkPath(LPCWSTR pszLnkFile, LPWSTR pszResPath, int cchResPath);

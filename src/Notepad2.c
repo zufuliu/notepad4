@@ -5283,7 +5283,6 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	return 0;
 }
 
-extern BOOL fStylesModified;
 //=============================================================================
 //
 // LoadSettings()
@@ -5300,7 +5299,6 @@ void LoadSettings(void) {
 	IniSectionParse(pIniSection, pIniSectionBuf);
 
 	const int iSettingsVersion = IniSectionGetInt(pIniSection, L"SettingsVersion", NP2SettingsVersion_None);
-	fStylesModified = iSettingsVersion != NP2SettingsVersion_Current; // compress old ini file on save
 	bSaveSettings = IniSectionGetBool(pIniSection, L"SaveSettings", 1);
 	bSaveRecentFiles = IniSectionGetBool(pIniSection, L"SaveRecentFiles", 0);
 	bSaveFindReplace = IniSectionGetBool(pIniSection, L"SaveFindReplace", 0);
@@ -5309,16 +5307,18 @@ void LoadSettings(void) {
 	efrData.bReplaceClose = IniSectionGetBool(pIniSection, L"CloseReplace", 0);
 	efrData.bNoFindWrap = IniSectionGetBool(pIniSection, L"NoFindWrap", 0);
 
-	if (!IniSectionGetString(pIniSection, L"OpenWithDir", L"", tchOpenWithDir, COUNTOF(tchOpenWithDir))) {
+	LPCWSTR strValue = IniSectionGetValue(pIniSection, L"OpenWithDir");
+	if (StrIsEmpty(strValue)) {
 		SHGetSpecialFolderPath(NULL, tchOpenWithDir, CSIDL_DESKTOPDIRECTORY, TRUE);
 	} else {
-		PathAbsoluteFromApp(tchOpenWithDir, NULL, COUNTOF(tchOpenWithDir), TRUE);
+		PathAbsoluteFromApp(strValue, tchOpenWithDir, COUNTOF(tchOpenWithDir), TRUE);
 	}
 
-	if (!IniSectionGetString(pIniSection, L"Favorites", L"", tchFavoritesDir, COUNTOF(tchFavoritesDir))) {
+	strValue = IniSectionGetValue(pIniSection, L"Favorites");
+	if (StrIsEmpty(strValue)) {
 		SHGetFolderPath(NULL, CSIDL_PERSONAL, NULL, SHGFP_TYPE_CURRENT, tchFavoritesDir);
 	} else {
-		PathAbsoluteFromApp(tchFavoritesDir, NULL, COUNTOF(tchFavoritesDir), TRUE);
+		PathAbsoluteFromApp(strValue, tchFavoritesDir, COUNTOF(tchFavoritesDir), TRUE);
 	}
 
 	iPathNameFormat = IniSectionGetInt(pIniSection, L"PathNameFormat", 1);
@@ -5482,8 +5482,11 @@ void LoadSettings(void) {
 		}
 	}
 
-	if (!IniSectionGetString(pIniSection, L"ToolbarButtons", L"", tchToolbarButtons, COUNTOF(tchToolbarButtons))) {
+	strValue = IniSectionGetValue(pIniSection, L"ToolbarButtons");
+	if (StrIsEmpty(strValue)) {
 		CopyMemory(tchToolbarButtons, DefaultToolbarButtons, COUNTOF(DefaultToolbarButtons) * sizeof(WCHAR));
+	} else {
+		lstrcpyn(tchToolbarButtons, strValue, COUNTOF(tchToolbarButtons));
 	}
 
 	bShowToolbar = IniSectionGetBool(pIniSection, L"ShowToolbar", 1);
@@ -6447,9 +6450,9 @@ void LoadFlags(void) {
 
 	IniSectionGetString(pIniSection, L"DefaultDirectory", L"", tchDefaultDir, COUNTOF(tchDefaultDir));
 
-	LPCWSTR szFilter = IniSectionGetValue(pIniSection, L"FileDlgFilters");
-	if (StrNotEmpty(szFilter)) {
-		tchFileDlgFilters = StrDup(szFilter);
+	LPCWSTR strValue = IniSectionGetValue(pIniSection, L"FileDlgFilters");
+	if (StrNotEmpty(strValue)) {
+		tchFileDlgFilters = StrDup(strValue);
 	}
 
 	dwFileCheckInverval = IniSectionGetInt(pIniSection, L"FileCheckInverval", 1000);
