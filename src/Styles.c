@@ -212,7 +212,7 @@ int np2LexLangIndex = 0;
 UINT8 currentLexKeywordAttr[NUMKEYWORD] = {0};
 
 #define STYLESMODIFIED_NONE			0
-#define STYLESMODIFIED_SOME_SRTLE	1
+#define STYLESMODIFIED_SOME_STYLE	1
 #define STYLESMODIFIED_ALL_STYLE	2
 #define STYLESMODIFIED_STYLE_MASK	3
 #define STYLESMODIFIED_COLOR		4
@@ -434,22 +434,26 @@ void Style_Save(void) {
 		SaveIniSection(INI_FILE_EXTENSIONS_NAME, pIniSectionBuf);
 	}
 
-	if (!fStylesModified) {
-		NP2HeapFree(pIniSectionBuf);
-		return;
+	if (fStylesModified & STYLESMODIFIED_STYLE_MASK) {
+		for (int iLexer = 0; iLexer < NUMLEXERS; iLexer++) {
+			PEDITLEXER pLex = pLexArray[iLexer];
+			if (!pLex->bStyleChanged) {
+				continue;
+			}
+
+			ZeroMemory(pIniSectionBuf, cchIniSection);
+			pIniSection->next = pIniSectionBuf;
+			const int iStyleCount = pLex->iStyleCount;
+			for (int i = 0; i < iStyleCount; i++) {
+				IniSectionSetStringEx(pIniSection, pLex->Styles[i].pszName, pLex->Styles[i].szValue, pLex->Styles[i].pszDefault);
+			}
+			// delete this section if nothing changed
+			SaveIniSection(pLex->pszName, StrIsEmpty(pIniSectionBuf) ? NULL : pIniSectionBuf);
+			pLex->bStyleChanged = FALSE;
+		}
 	}
 
-	for (int iLexer = 0; iLexer < NUMLEXERS; iLexer++) {
-		PEDITLEXER lex = pLexArray[iLexer];
-		ZeroMemory(pIniSectionBuf, cchIniSection);
-		pIniSection->next = pIniSectionBuf;
-		const int iStyleCount = lex->iStyleCount;
-		for (int i = 0; i < iStyleCount; i++) {
-			IniSectionSetStringEx(pIniSection, lex->Styles[i].pszName, lex->Styles[i].szValue, lex->Styles[i].pszDefault);
-		}
-		// delete this section if nothing changed
-		SaveIniSection(lex->pszName, StrIsEmpty(pIniSectionBuf) ? NULL : pIniSectionBuf);
-	}
+	fStylesModified = STYLESMODIFIED_NONE;
 	NP2HeapFree(pIniSectionBuf);
 }
 
@@ -3338,14 +3342,14 @@ INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM
 void Style_ConfigDlg(HWND hwnd) {
 	LPWSTR extBackup = NP2HeapAlloc(ALL_FILE_EXTENSIONS_BYTE_SIZE);
 	LPWSTR styleBackup[NUMLEXERS];
-	BOOL changed = FALSE;
+	BOOL apply = FALSE;
 
 	// Backup Styles
 	CopyMemory(extBackup, g_AllFileExtensions, ALL_FILE_EXTENSIONS_BYTE_SIZE);
 	for (int iLexer = 0; iLexer < NUMLEXERS; iLexer++) {
-		PEDITLEXER lex = pLexArray[iLexer];
-		LPWSTR szStyleBuf = NP2HeapAlloc(lex->iStyleBufSize);
-		CopyMemory(szStyleBuf, lex->szStyleBuf, lex->iStyleBufSize);
+		PEDITLEXER pLex = pLexArray[iLexer];
+		LPWSTR szStyleBuf = NP2HeapAlloc(pLex->iStyleBufSize);
+		CopyMemory(szStyleBuf, pLex->szStyleBuf, pLex->iStyleBufSize);
 		styleBackup[iLexer] = szStyleBuf;
 	}
 
@@ -3357,15 +3361,25 @@ void Style_ConfigDlg(HWND hwnd) {
 		// Restore Styles
 		CopyMemory(g_AllFileExtensions, extBackup, ALL_FILE_EXTENSIONS_BYTE_SIZE);
 		for (int iLexer = 0; iLexer < NUMLEXERS; iLexer++) {
-			PEDITLEXER lex = pLexArray[iLexer];
-			CopyMemory(lex->szStyleBuf, styleBackup[iLexer], lex->iStyleBufSize);
+			PEDITLEXER pLex = pLexArray[iLexer];
+			CopyMemory(pLex->szStyleBuf, styleBackup[iLexer], pLex->iStyleBufSize);
 		}
 	} else {
-		changed = TRUE;
+		apply = TRUE;
 		if (!(fStylesModified & STYLESMODIFIED_FILE_EXT)) {
 			if (memcmp(extBackup, g_AllFileExtensions, ALL_FILE_EXTENSIONS_BYTE_SIZE) != 0) {
 				fStylesModified  |= STYLESMODIFIED_FILE_EXT;
 			}
+		}
+		if (!(fStylesModified & STYLESMODIFIED_ALL_STYLE)) {
+			int count = 0;
+			for (int iLexer = 0; iLexer < NUMLEXERS; iLexer++) {
+				PEDITLEXER pLex = pLexArray[iLexer];
+				if (pLex->bStyleChanged || memcmp(styleBackup[iLexer], pLex->szStyleBuf, pLex->iStyleBufSize) != 0) {
+					++count;
+				}
+			}
+			fStylesModified |= (count == 0) ? STYLESMODIFIED_NONE : ((count == NUMLEXERS) ? STYLESMODIFIED_ALL_STYLE : STYLESMODIFIED_SOME_STYLE);
 		}
 		if (fStylesModified != STYLESMODIFIED_NONE && StrIsEmpty(szIniFile) && !fWarnedNoIniFile) {
 			MsgBox(MBWARN, IDS_SETTINGSNOTSAVED);
@@ -3379,7 +3393,7 @@ void Style_ConfigDlg(HWND hwnd) {
 	}
 
 	// Apply new (or previous) Styles
-	if (changed) {
+	if (apply) {
 		Style_SetLexer(hwnd, pLexCurrent);
 	}
 }
