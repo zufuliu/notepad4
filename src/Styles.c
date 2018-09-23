@@ -215,10 +215,36 @@ UINT8 currentLexKeywordAttr[NUMKEYWORD] = {0};
 #define STYLESMODIFIED_SOME_STYLE	1
 #define STYLESMODIFIED_ALL_STYLE	2
 #define STYLESMODIFIED_STYLE_MASK	3
-#define STYLESMODIFIED_COLOR		4
-#define STYLESMODIFIED_FILE_EXT		8
+#define STYLESMODIFIED_FILE_EXT		4
+#define STYLESMODIFIED_WARN_MASK	7
+#define STYLESMODIFIED_COLOR		8
 
-COLORREF	crCustom[16];
+#define MAX_CUSTOM_COLOR_COUNT		16
+// run tools/CountColor.py on exported scheme file
+static const COLORREF defaultCustomColor[MAX_CUSTOM_COLOR_COUNT] = {
+	RGB(0xB0, 0x00, 0xB0),	// Constant, Macro, Operator
+	RGB(0xFF, 0x80, 0x00),	// Indentation, Preprocessor, Keyword, Attribute, Enumeration, Annotation, Register
+	RGB(0x00, 0x80, 0x00),	// String, Comment
+	//RGB(0x00, 0x00, 0xFF),	// Keyword, Type Keyword
+	//RGB(0xFF, 0x00, 0x00),	// Number
+	RGB(0x60, 0x80, 0x60),	// Comment
+	RGB(0xA4, 0x60, 0x00),	// Function, Here-doc, Now-doc
+	RGB(0x00, 0x80, 0xFF),	// Class, Instruction, Struct
+	RGB(0xFF, 0xF1, 0xAB),	// Regex, Backticks
+	RGB(0xFF, 0xC0, 0x40),	// Label, Section
+	RGB(0x1E, 0x90, 0xFF),	// Interface, Type Keyword
+	RGB(0x64, 0x80, 0x00),	// Field, Here-doc
+	RGB(0x00, 0x66, 0x33),	// Regex
+	RGB(0x40, 0x80, 0x80),	// Doc Comment Tag
+	RGB(0x00, 0x80, 0x80),	// String, Verbatim String
+	RGB(0xFF, 0x00, 0x80),	// Backticks, Basic Function
+	RGB(0x40, 0x80, 0x40),	// Doc Comment
+	RGB(0x00, 0x80, 0xC0),	// Build-in Function
+	//RGB(0x00, 0x3C, 0xE6),	// Variable
+	//RGB(0x00, 0x7F, 0x7F),	// Class, Trait
+};
+static COLORREF customColor[MAX_CUSTOM_COLOR_COUNT];
+
 BOOL	bUse2ndDefaultStyle;
 static UINT fStylesModified = STYLESMODIFIED_NONE;
 BOOL	fWarnedNoIniFile = FALSE;
@@ -293,35 +319,20 @@ void Style_Load(void) {
 	IniSectionInit(pIniSection, 128);
 
 	// Custom colors
-	crCustom [0] = RGB(0x00, 0x00, 0x00);
-	crCustom [1] = RGB(0x0A, 0x24, 0x6A);
-	crCustom [2] = RGB(0x3A, 0x6E, 0xA5);
-	crCustom [3] = RGB(0x00, 0x3C, 0xE6);
-	crCustom [4] = RGB(0x00, 0x66, 0x33);
-	crCustom [5] = RGB(0x60, 0x80, 0x20);
-	crCustom [6] = RGB(0x64, 0x80, 0x00);
-	crCustom [7] = RGB(0xA4, 0x60, 0x00);
-	crCustom [8] = RGB(0xFF, 0xFF, 0xFF);
-	crCustom [9] = RGB(0xFF, 0xFF, 0xE2);
-	crCustom[10] = RGB(0xFF, 0xF1, 0xA8);
-	crCustom[11] = RGB(0xFF, 0xC0, 0x00);
-	crCustom[12] = RGB(0xFF, 0x40, 0x00);
-	crCustom[13] = RGB(0xC8, 0x00, 0x00);
-	crCustom[14] = RGB(0xB0, 0x00, 0xB0);
-	crCustom[15] = RGB(0xB2, 0x8B, 0x40);
+	CopyMemory(customColor, defaultCustomColor, MAX_CUSTOM_COLOR_COUNT * sizeof(COLORREF));
 
 	LoadIniSection(L"Custom Colors", pIniSectionBuf, cchIniSection);
 	IniSectionParseArray(pIniSection, pIniSectionBuf);
 
-	const int count = min_i(pIniSection->count, COUNTOF(crCustom));
+	const int count = min_i(pIniSection->count, MAX_CUSTOM_COLOR_COUNT);
 	for (int i = 0; i < count; i++) {
 		const IniKeyValueNode *node = &pIniSection->nodeList[i];
 		const UINT n = StrToInt(node->key) - 1;
 		LPCWSTR wch = node->value;
-		if (n < COUNTOF(crCustom) && *wch == L'#') {
+		if (n < MAX_CUSTOM_COLOR_COUNT && *wch == L'#') {
 			int irgb;
 			if (HexStrToInt(wch + 1, &irgb)) {
-				crCustom[n] = RGB((irgb & 0xFF0000) >> 16, (irgb & 0xFF00) >> 8, irgb & 0xFF);
+				customColor[n] = RGB((irgb & 0xFF0000) >> 16, (irgb & 0xFF00) >> 8, irgb & 0xFF);
 			}
 		}
 	}
@@ -394,20 +405,22 @@ void Style_Save(void) {
 	pIniSection->next = pIniSectionBuf;
 
 	// Custom colors
-	for (unsigned int i = 0; i < 16; i++) {
-		WCHAR tch[4];
-		WCHAR wch[16];
-		wsprintf(tch, L"%02u", i + 1);
-		wsprintf(wch, L"#%02X%02X%02X",
-				 (int)GetRValue(crCustom[i]),
-				 (int)GetGValue(crCustom[i]),
-				 (int)GetBValue(crCustom[i]));
-		IniSectionSetString(pIniSection, tch, wch);
-	}
+	if (fStylesModified & STYLESMODIFIED_COLOR) {
+		for (int i = 0; i < MAX_CUSTOM_COLOR_COUNT; i++) {
+			const COLORREF color = customColor[i];
+			if (color != defaultCustomColor[i]) {
+				WCHAR tch[4];
+				WCHAR wch[16];
+				wsprintf(tch, L"%02u", i + 1);
+				wsprintf(wch, L"#%02X%02X%02X", (int)GetRValue(color), (int)GetGValue(color), (int)GetBValue(color));
+				IniSectionSetString(pIniSection, tch, wch);
+			}
+		}
 
-	SaveIniSection(L"Custom Colors", pIniSectionBuf);
-	ZeroMemory(pIniSectionBuf, cchIniSection);
-	pIniSection->next = pIniSectionBuf;
+		SaveIniSection(L"Custom Colors", pIniSectionBuf);
+		ZeroMemory(pIniSectionBuf, cchIniSection);
+		pIniSection->next = pIniSectionBuf;
+	}
 
 	// auto select
 	IniSectionSetBoolEx(pIniSection, L"Use2ndDefaultStyle", bUse2ndDefaultStyle, 0);
@@ -2555,7 +2568,7 @@ BOOL Style_SelectColor(HWND hwnd, BOOL bFore, LPWSTR lpszStyle, int cchStyle) {
 	cc.lStructSize = sizeof(CHOOSECOLOR);
 	cc.hwndOwner = hwnd;
 	cc.rgbResult = iRGBResult;
-	cc.lpCustColors = crCustom;
+	cc.lpCustColors = customColor;
 	cc.Flags = CC_FULLOPEN | CC_RGBINIT | CC_SOLIDCOLOR;
 
 	if (!ChooseColor(&cc)) {
@@ -3346,11 +3359,13 @@ INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM
 //
 void Style_ConfigDlg(HWND hwnd) {
 	LPWSTR extBackup = NP2HeapAlloc(ALL_FILE_EXTENSIONS_BYTE_SIZE);
+	COLORREF colorBackup[MAX_CUSTOM_COLOR_COUNT];
 	LPWSTR styleBackup[NUMLEXERS];
 	BOOL apply = FALSE;
 
 	// Backup Styles
 	CopyMemory(extBackup, g_AllFileExtensions, ALL_FILE_EXTENSIONS_BYTE_SIZE);
+	CopyMemory(colorBackup, customColor, MAX_CUSTOM_COLOR_COUNT * sizeof(COLORREF));
 	for (int iLexer = 0; iLexer < NUMLEXERS; iLexer++) {
 		PEDITLEXER pLex = pLexArray[iLexer];
 		LPWSTR szStyleBuf = NP2HeapAlloc(pLex->iStyleBufSize);
@@ -3362,9 +3377,10 @@ void Style_ConfigDlg(HWND hwnd) {
 										 MAKEINTRESOURCE(IDD_STYLECONFIG),
 										 GetParent(hwnd),
 										 Style_ConfigDlgProc,
-										 (LPARAM)&styleBackup)) {
+										 0)) {
 		// Restore Styles
 		CopyMemory(g_AllFileExtensions, extBackup, ALL_FILE_EXTENSIONS_BYTE_SIZE);
+		CopyMemory(customColor, colorBackup, MAX_CUSTOM_COLOR_COUNT * sizeof(COLORREF));
 		for (int iLexer = 0; iLexer < NUMLEXERS; iLexer++) {
 			PEDITLEXER pLex = pLexArray[iLexer];
 			CopyMemory(pLex->szStyleBuf, styleBackup[iLexer], pLex->iStyleBufSize);
@@ -3373,7 +3389,12 @@ void Style_ConfigDlg(HWND hwnd) {
 		apply = TRUE;
 		if (!(fStylesModified & STYLESMODIFIED_FILE_EXT)) {
 			if (memcmp(extBackup, g_AllFileExtensions, ALL_FILE_EXTENSIONS_BYTE_SIZE) != 0) {
-				fStylesModified  |= STYLESMODIFIED_FILE_EXT;
+				fStylesModified |= STYLESMODIFIED_FILE_EXT;
+			}
+		}
+		if (!(fStylesModified & STYLESMODIFIED_COLOR)) {
+			if (memcmp(colorBackup, customColor, MAX_CUSTOM_COLOR_COUNT * sizeof(COLORREF)) != 0) {
+				fStylesModified |= STYLESMODIFIED_COLOR;
 			}
 		}
 		if (!(fStylesModified & STYLESMODIFIED_ALL_STYLE)) {
@@ -3386,7 +3407,7 @@ void Style_ConfigDlg(HWND hwnd) {
 			}
 			fStylesModified |= (count == 0) ? STYLESMODIFIED_NONE : ((count == NUMLEXERS) ? STYLESMODIFIED_ALL_STYLE : STYLESMODIFIED_SOME_STYLE);
 		}
-		if (fStylesModified != STYLESMODIFIED_NONE && StrIsEmpty(szIniFile) && !fWarnedNoIniFile) {
+		if ((fStylesModified & STYLESMODIFIED_WARN_MASK) && StrIsEmpty(szIniFile) && !fWarnedNoIniFile) {
 			MsgBox(MBWARN, IDS_SETTINGSNOTSAVED);
 			fWarnedNoIniFile = TRUE;
 		}
