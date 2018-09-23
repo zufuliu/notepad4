@@ -2275,7 +2275,7 @@ BOOL Style_StrGetFont(LPCWSTR lpszStyle, LPWSTR lpszFont, int cchFont) {
 	WCHAR *p;
 
 	if ((p = StrStr(lpszStyle, L"font:")) != NULL) {
-		WCHAR tch[256];
+		WCHAR tch[MAX_EDITSTYLE_VALUE_SIZE];
 		lstrcpy(tch, p + CSTRLEN(L"font:"));
 		if ((p = StrChr(tch, L';')) != NULL) {
 			*p = L'\0';
@@ -2917,7 +2917,7 @@ INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM
 		//TreeView_Expand(hwndTV, TreeView_GetRoot(hwndTV), TVE_EXPAND);
 		TreeView_Select(hwndTV, currentLex, TVGN_CARET);
 
-		SendDlgItemMessage(hwnd, IDC_STYLEEDIT, EM_LIMITTEXT, MAX_EDITSTYLE_VALUE_SIZE - 1, 0);
+		SendDlgItemMessage(hwnd, IDC_STYLEEDIT, EM_LIMITTEXT, MAX_LEXER_STYLE_EDIT_SIZE - 1, 0);
 
 		MakeBitmapButton(hwnd, IDC_PREVSTYLE, g_hInstance, IDB_PREV);
 		MakeBitmapButton(hwnd, IDC_NEXTSTYLE, g_hInstance, IDB_NEXT);
@@ -3111,7 +3111,7 @@ INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM
 			//ImageList_EndDrag();
 
 			if ((htiTarget = TreeView_GetDropHilight(hwndTV)) != NULL) {
-				WCHAR tchCopy[256];
+				WCHAR tchCopy[MAX_LEXER_STYLE_EDIT_SIZE];
 				TreeView_SelectDropTarget(hwndTV, NULL);
 				GetDlgItemText(hwnd, IDC_STYLEEDIT, tchCopy, COUNTOF(tchCopy));
 				TreeView_Select(hwndTV, htiTarget, TVGN_CARET);
@@ -3164,7 +3164,7 @@ INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM
 
 		case IDC_STYLEFONT:
 			if (pCurrentStyle) {
-				WCHAR tch[256];
+				WCHAR tch[MAX_LEXER_STYLE_EDIT_SIZE];
 				GetDlgItemText(hwnd, IDC_STYLEEDIT, tch, COUNTOF(tch));
 				if (Style_SelectFont(hwnd, tch, COUNTOF(tch),
 									 StrEqual(pCurrentStyle->pszName, L"Default Style") ||
@@ -3181,7 +3181,7 @@ INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM
 
 		case IDC_STYLEFORE:
 			if (pCurrentStyle) {
-				WCHAR tch[256];
+				WCHAR tch[MAX_LEXER_STYLE_EDIT_SIZE];
 				GetDlgItemText(hwnd, IDC_STYLEEDIT, tch, COUNTOF(tch));
 				if (Style_SelectColor(hwnd, TRUE, tch, COUNTOF(tch))) {
 					SetDlgItemText(hwnd, IDC_STYLEEDIT, tch);
@@ -3196,7 +3196,7 @@ INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM
 
 		case IDC_STYLEBACK:
 			if (pCurrentStyle) {
-				WCHAR tch[256];
+				WCHAR tch[MAX_LEXER_STYLE_EDIT_SIZE];
 				GetDlgItemText(hwnd, IDC_STYLEEDIT, tch, COUNTOF(tch));
 				if (Style_SelectColor(hwnd, FALSE, tch, COUNTOF(tch))) {
 					SetDlgItemText(hwnd, IDC_STYLEEDIT, tch);
@@ -3226,7 +3226,7 @@ INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM
 
 		//case IDC_STYLEBOLD:
 		//	if (pCurrentStyle) {
-		//		WCHAR tch[256];
+		//		WCHAR tch[MAX_LEXER_STYLE_EDIT_SIZE];
 		//		GetDlgItemText(hwnd, IDC_STYLEEDIT, tch, COUNTOF(tch));
 		//		Style_StrSetAttribute(tch, COUNTOF(tch), L"bold", IsButtonChecked(hwnd, IDC_STYLEBOLD));
 		//		SetDlgItemText(hwnd, IDC_STYLEEDIT, tch);
@@ -3235,7 +3235,7 @@ INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM
 
 		//case IDC_STYLEITALIC:
 		//	if (pCurrentStyle) {
-		//		WCHAR tch[256];
+		//		WCHAR tch[MAX_LEXER_STYLE_EDIT_SIZE];
 		//		GetDlgItemText(hwnd, IDC_STYLEEDIT, tch, COUNTOF(tch));
 		//		Style_StrSetAttribute(tch, COUNTOF(tch), L"italic", IsButtonChecked(hwnd, IDC_STYLEITALIC));
 		//		SetDlgItemText(hwnd, IDC_STYLEEDIT, tch);
@@ -3244,7 +3244,7 @@ INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM
 
 		//case IDC_STYLEUNDERLINE:
 		//	if (pCurrentStyle) {
-		//		WCHAR tch[256];
+		//		WCHAR tch[MAX_LEXER_STYLE_EDIT_SIZE];
 		//		GetDlgItemText(hwnd, IDC_STYLEEDIT, tch, COUNTOF(tch));
 		//		Style_StrSetAttribute(tch, COUNTOF(tch), L"underline", IsButtonChecked(hwnd, IDC_STYLEUNDERLINE));
 		//		SetDlgItemText(hwnd, IDC_STYLEEDIT, tch);
@@ -3253,7 +3253,7 @@ INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM
 
 		//case IDC_STYLEEOLFILLED:
 		//	if (pCurrentStyle) {
-		//		WCHAR tch[256];
+		//		WCHAR tch[MAX_LEXER_STYLE_EDIT_SIZE];
 		//		GetDlgItemText(hwnd, IDC_STYLEEDIT, tch, COUNTOF(tch));
 		//		Style_StrSetAttribute(tch, COUNTOF(tch), L"eolfilled", IsButtonChecked(hwnd, IDC_STYLEEOLFILLED));
 		//		SetDlgItemText(hwnd, IDC_STYLEEDIT, tch);
@@ -3263,7 +3263,7 @@ INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM
 		case IDC_STYLEEDIT: {
 			if (HIWORD(wParam) == EN_CHANGE) {
 				int cr;
-				WCHAR tch[256];
+				WCHAR tch[MAX_LEXER_STYLE_EDIT_SIZE];
 
 				GetDlgItemText(hwnd, IDC_STYLEEDIT, tch, COUNTOF(tch));
 
