@@ -1684,13 +1684,13 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	DragAcceptFiles(hwnd, TRUE);
 
 	// File MRU
-	pFileMRU = MRU_Create(L"Recent Files", MRU_NOCASE, 32);
+	pFileMRU = MRU_Create(MRU_KEY_RECENT_FILES, MRU_NOCASE, 32);
 	MRU_Load(pFileMRU);
 
-	mruFind = MRU_Create(L"Recent Find", (/*IsWindowsNT()*/1) ? MRU_UTF8 : 0, 16);
+	mruFind = MRU_Create(MRU_KEY_RECENT_FIND, (/*IsWindowsNT()*/1) ? MRU_UTF8 : 0, 16);
 	MRU_Load(mruFind);
 
-	mruReplace = MRU_Create(L"Recent Replace", (/*IsWindowsNT()*/1) ? MRU_UTF8 : 0, 16);
+	mruReplace = MRU_Create(MRU_KEY_RECENT_REPLACE, (/*IsWindowsNT()*/1) ? MRU_UTF8 : 0, 16);
 	MRU_Load(mruReplace);
 
 	if (hwndEdit == NULL || hwndEditFrame == NULL ||
@@ -1808,12 +1808,12 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) {
 #if NP2_ENABLE_CUSTOMIZE_TOOLBAR_LABELS
 	// Load toolbar labels
 	IniSection section;
-	WCHAR *pIniSectionBuf = NP2HeapAlloc(sizeof(WCHAR) * 32 * 1024);
+	WCHAR *pIniSectionBuf = NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_TOOLBAR_LABELS);
 	const int cchIniSection = (int)(NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR));
 	IniSection *pIniSection = &section;
 
 	IniSectionInit(pIniSection, COUNTOF(tbbMainWnd));
-	LoadIniSection(L"Toolbar Labels", pIniSectionBuf, cchIniSection);
+	LoadIniSection(INI_SECTION_NAME_TOOLBAR_LABELS, pIniSectionBuf, cchIniSection);
 	IniSectionParseArray(pIniSection, pIniSectionBuf);
 	const int count = pIniSection->count;
 
@@ -2545,7 +2545,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		WCHAR tchExeFile[MAX_PATH + 4];
 		WCHAR tchTemp[MAX_PATH + 4];
 
-		if (!IniGetString(L"Settings2", L"filebrowser.exe", L"", tchTemp, COUNTOF(tchTemp))) {
+		if (!IniGetString(INI_SECTION_NAME_FLAGS, L"filebrowser.exe", L"", tchTemp, COUNTOF(tchTemp))) {
 			if (!SearchPath(NULL, L"metapath.exe", NULL, COUNTOF(tchExeFile), tchExeFile, NULL)) {
 				GetModuleFileName(NULL, tchExeFile, COUNTOF(tchExeFile));
 				PathRemoveFileSpec(tchExeFile);
@@ -3322,7 +3322,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 		GetLocalTime(&st);
 
-		if (IniGetString(L"Settings2",
+		if (IniGetString(INI_SECTION_NAME_FLAGS,
 						 (LOWORD(wParam) == IDM_EDIT_INSERT_SHORTDATE) ? L"DateTimeShort" : L"DateTimeLong",
 						 L"", tchTemplate, COUNTOF(tchTemplate))) {
 			struct tm sst;
@@ -4064,7 +4064,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	case IDM_VIEW_STICKYWINPOS:
 		bStickyWinPos = !bStickyWinPos;
-		IniSetBool(L"Settings2", L"StickyWindowPosition", bStickyWinPos);
+		IniSetBool(INI_SECTION_NAME_FLAGS, L"StickyWindowPosition", bStickyWinPos);
 		if (bStickyWinPos) {
 			WINDOWPLACEMENT wndpl;
 			WCHAR tchPosX[32], tchPosY[32], tchSizeX[32], tchSizeY[32], tchMaximized[32];
@@ -4088,28 +4088,28 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			wsprintf(tchSizeY, L"%ix%i SizeY", ResX, ResY);
 			wsprintf(tchMaximized, L"%ix%i Maximized", ResX, ResY);
 
-			IniSetInt(L"Window", tchPosX, wi.x);
-			IniSetInt(L"Window", tchPosY, wi.y);
-			IniSetInt(L"Window", tchSizeX, wi.cx);
-			IniSetInt(L"Window", tchSizeY, wi.cy);
-			IniSetBool(L"Window", tchMaximized, wi.max);
+			IniSetInt(INI_SECTION_NAME_WINDOW_POSITION, tchPosX, wi.x);
+			IniSetInt(INI_SECTION_NAME_WINDOW_POSITION, tchPosY, wi.y);
+			IniSetInt(INI_SECTION_NAME_WINDOW_POSITION, tchSizeX, wi.cx);
+			IniSetInt(INI_SECTION_NAME_WINDOW_POSITION, tchSizeY, wi.cy);
+			IniSetBool(INI_SECTION_NAME_WINDOW_POSITION, tchMaximized, wi.max);
 
 			InfoBox(0, L"MsgStickyWinPos", IDS_STICKYWINPOS);
 		}
 		break;
 
 	case IDM_VIEW_CLEARWINPOS:
-		IniClearSection(L"Window");
+		IniClearSection(INI_SECTION_NAME_WINDOW_POSITION);
 		break;
 
 	case IDM_VIEW_REUSEWINDOW:
 		bReuseWindow = !bReuseWindow;
-		IniSetBool(L"Settings2", L"ReuseWindow", bReuseWindow);
+		IniSetBool(INI_SECTION_NAME_FLAGS, L"ReuseWindow", bReuseWindow);
 		break;
 
 	case IDM_VIEW_SINGLEFILEINSTANCE:
 		bSingleFileInstance = !bSingleFileInstance;
-		IniSetBool(L"Settings2", L"SingleFileInstance", bSingleFileInstance);
+		IniSetBool(INI_SECTION_NAME_FLAGS, L"SingleFileInstance", bSingleFileInstance);
 		break;
 
 	case IDM_VIEW_ALWAYSONTOP:
@@ -4249,7 +4249,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		}
 
 		if (!bCreateFailure) {
-			if (WritePrivateProfileString(L"Settings", L"WriteTest", L"ok", szIniFile)) {
+			if (WritePrivateProfileString(INI_SECTION_NAME_SETTINGS, L"WriteTest", L"ok", szIniFile)) {
 				BeginWaitCursor();
 				StatusSetTextID(hwndStatus, STATUS_HELP, IDS_SAVINGSETTINGS);
 				StatusSetSimple(hwndStatus, TRUE);
@@ -4512,7 +4512,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			.hwnd = hwndEdit,
 		};
 
-		IniGetString(L"Settings2", L"TimeStamp", L"\\$Date:[^\\$]+\\$ | $Date: %Y/%m/%d %H:%M:%S $", wchFind, COUNTOF(wchFind));
+		IniGetString(INI_SECTION_NAME_FLAGS, L"TimeStamp", L"\\$Date:[^\\$]+\\$ | $Date: %Y/%m/%d %H:%M:%S $", wchFind, COUNTOF(wchFind));
 
 		if ((pwchSep = StrChr(wchFind, L'|')) != NULL) {
 			lstrcpy(wchTemplate, pwchSep + 1);
@@ -4556,7 +4556,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		WCHAR szCmdTemplate[256];
 
 		lpszTemplateName = (LOWORD(wParam) == CMD_WEBACTION1) ? L"WebTemplate1" : L"WebTemplate2";
-		const BOOL bCmdEnabled = IniGetString(L"Settings2", lpszTemplateName, L"", szCmdTemplate, COUNTOF(szCmdTemplate));
+		const BOOL bCmdEnabled = IniGetString(INI_SECTION_NAME_FLAGS, lpszTemplateName, L"", szCmdTemplate, COUNTOF(szCmdTemplate));
 
 		if (bCmdEnabled) {
 			DWORD cchSelection = (int)SendMessage(hwndEdit, SCI_GETSELECTIONEND, 0, 0)
@@ -5290,12 +5290,12 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 //
 void LoadSettings(void) {
 	IniSection section;
-	WCHAR *pIniSectionBuf = NP2HeapAlloc(sizeof(WCHAR) * 32 * 1024);
+	WCHAR *pIniSectionBuf = NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_SETTINGS);
 	const int cchIniSection = (int)NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR);
 	IniSection *pIniSection = &section;
 	IniSectionInit(pIniSection, 128);
 
-	LoadIniSection(L"Settings", pIniSectionBuf, cchIniSection);
+	LoadIniSection(INI_SECTION_NAME_SETTINGS, pIniSectionBuf, cchIniSection);
 	IniSectionParse(pIniSection, pIniSectionBuf);
 
 	const int iSettingsVersion = IniSectionGetInt(pIniSection, L"SettingsVersion", NP2SettingsVersion_None);
@@ -5484,7 +5484,7 @@ void LoadSettings(void) {
 
 	strValue = IniSectionGetValue(pIniSection, L"ToolbarButtons");
 	if (StrIsEmpty(strValue)) {
-		CopyMemory(tchToolbarButtons, DefaultToolbarButtons, COUNTOF(DefaultToolbarButtons) * sizeof(WCHAR));
+		CopyMemory(tchToolbarButtons, DefaultToolbarButtons, sizeof(DefaultToolbarButtons));
 	} else {
 		lstrcpyn(tchToolbarButtons, strValue, COUNTOF(tchToolbarButtons));
 	}
@@ -5551,7 +5551,7 @@ void LoadSettings(void) {
 #endif
 	}
 
-	LoadIniSection(L"Toolbar Images", pIniSectionBuf, cchIniSection);
+	LoadIniSection(INI_SECTION_NAME_TOOLBAR_IMAGES, pIniSectionBuf, cchIniSection);
 	IniSectionParse(pIniSection, pIniSectionBuf);
 
 	IniSectionGetString(pIniSection, L"BitmapDefault", L"", tchToolbarBitmap, COUNTOF(tchToolbarBitmap));
@@ -5569,7 +5569,7 @@ void LoadSettings(void) {
 		wsprintf(tchSizeY, L"%ix%i SizeY", ResX, ResY);
 		wsprintf(tchMaximized, L"%ix%i Maximized", ResX, ResY);
 
-		LoadIniSection(L"Window", pIniSectionBuf, cchIniSection);
+		LoadIniSection(INI_SECTION_NAME_WINDOW_POSITION, pIniSectionBuf, cchIniSection);
 		IniSectionParse(pIniSection, pIniSectionBuf);
 
 		wi.x	= IniSectionGetIntEx(pIniSection, tchPosX, CW_USEDEFAULT);
@@ -5616,13 +5616,13 @@ void SaveSettings(BOOL bSaveSettingsNow) {
 	CreateIniFile();
 
 	if (!bSaveSettings && !bSaveSettingsNow) {
-		IniSetBool(L"Settings", L"SaveSettings", bSaveSettings);
+		IniSetBool(INI_SECTION_NAME_SETTINGS, L"SaveSettings", bSaveSettings);
 		return;
 	}
 
 	WCHAR wchTmp[MAX_PATH];
 	IniSectionOnSave section;
-	WCHAR *pIniSectionBuf = NP2HeapAlloc(sizeof(WCHAR) * 32 * 1024);
+	WCHAR *pIniSectionBuf = NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_SETTINGS);
 	IniSectionOnSave *pIniSection = &section;
 	pIniSection->next = pIniSectionBuf;
 
@@ -5739,7 +5739,7 @@ void SaveSettings(BOOL bSaveSettingsNow) {
 #endif
 	}
 
-	SaveIniSection(L"Settings", pIniSectionBuf);
+	SaveIniSection(INI_SECTION_NAME_SETTINGS, pIniSectionBuf);
 	NP2HeapFree(pIniSectionBuf);
 
 	/*
@@ -5771,11 +5771,11 @@ void SaveSettings(BOOL bSaveSettingsNow) {
 		wsprintf(tchSizeY, L"%ix%i SizeY", ResX, ResY);
 		wsprintf(tchMaximized, L"%ix%i Maximized", ResX, ResY);
 
-		IniSetInt(L"Window", tchPosX, wi.x);
-		IniSetInt(L"Window", tchPosY, wi.y);
-		IniSetInt(L"Window", tchSizeX, wi.cx);
-		IniSetInt(L"Window", tchSizeY, wi.cy);
-		IniSetBool(L"Window", tchMaximized, wi.max);
+		IniSetInt(INI_SECTION_NAME_WINDOW_POSITION, tchPosX, wi.x);
+		IniSetInt(INI_SECTION_NAME_WINDOW_POSITION, tchPosY, wi.y);
+		IniSetInt(INI_SECTION_NAME_WINDOW_POSITION, tchSizeX, wi.cx);
+		IniSetInt(INI_SECTION_NAME_WINDOW_POSITION, tchSizeY, wi.cy);
+		IniSetBool(INI_SECTION_NAME_WINDOW_POSITION, tchMaximized, wi.max);
 	}
 
 	// Scintilla Styles
@@ -6419,12 +6419,12 @@ void ParseCommandLine(void) {
 //
 void LoadFlags(void) {
 	IniSection section;
-	WCHAR *pIniSectionBuf = NP2HeapAlloc(sizeof(WCHAR) * 32 * 1024);
+	WCHAR *pIniSectionBuf = NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_FLAGS);
 	const int cchIniSection = (int)NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR);
 	IniSection *pIniSection = &section;
 	IniSectionInit(pIniSection, 64);
 
-	LoadIniSection(L"Settings2", pIniSectionBuf, cchIniSection);
+	LoadIniSection(INI_SECTION_NAME_FLAGS, pIniSectionBuf, cchIniSection);
 	IniSectionParse(pIniSection, pIniSectionBuf);
 
 	bSingleFileInstance = IniSectionGetBool(pIniSection, L"SingleFileInstance", 1);
@@ -6529,7 +6529,7 @@ int CheckIniFile(LPWSTR lpszFile, LPCWSTR lpszModule) {
 
 int CheckIniFileRedirect(LPWSTR lpszFile, LPCWSTR lpszModule) {
 	WCHAR tch[MAX_PATH];
-	if (GetPrivateProfileString(L"Notepad2", L"Notepad2.ini", L"", tch, COUNTOF(tch), lpszFile)) {
+	if (GetPrivateProfileString(INI_SECTION_NAME_NOTEPAD2, L"Notepad2.ini", L"", tch, COUNTOF(tch), lpszFile)) {
 		if (CheckIniFile(tch, lpszModule)) {
 			lstrcpy(lpszFile, tch);
 		} else {

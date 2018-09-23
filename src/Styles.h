@@ -28,6 +28,12 @@
 // all schemes with "All Files (*.*)"
 #define MAX_OPEN_SAVE_FILE_DIALOG_FILTER_SIZE	((NUMLEXERS + 1) * 128)
 
+#define INI_SECTION_NAME_STYLES				L"Styles"
+#define INI_SECTION_NAME_FILE_EXTENSIONS	L"File Extensions"
+#define INI_SECTION_NAME_CUSTOM_COLORS		L"Custom Colors"
+
+#define MAX_INI_SECTION_SIZE_STYLES			(8 * 1024)
+
 /**
  * used in ParseCommandLine() for option /d, /h and /x.
  */

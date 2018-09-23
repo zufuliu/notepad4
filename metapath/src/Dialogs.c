@@ -652,7 +652,7 @@ INT_PTR CALLBACK GeneralPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPa
 			bAlwaysOnTop = IsButtonChecked(hwnd, IDC_ALWAYSONTOP);
 			bMinimizeToTray = IsButtonChecked(hwnd, IDC_MINIMIZETOTRAY);
 
-			IniSetBool(L"Settings2", L"ReuseWindow", IsButtonChecked(hwnd, IDC_REUSEWINDOW));
+			IniSetBool(INI_SECTION_NAME_FLAGS, L"ReuseWindow", IsButtonChecked(hwnd, IDC_REUSEWINDOW));
 			SetWindowLongPtr(hwnd, DWLP_MSGRESULT, PSNRET_NOERROR);
 			return TRUE;
 		}
@@ -1151,8 +1151,7 @@ INT_PTR CALLBACK GetFilterDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lP
 		switch (LOWORD(wParam)) {
 		case IDC_BROWSEFILTER: {
 			HMENU hMenu;
-			WCHAR *pszFilterName;
-			WCHAR  szTypedFilter[512];
+			WCHAR szTypedFilter[512];
 			DWORD dwIndex = 0;
 			DWORD dwCheck = 0xFFFF; // index of current filter
 
@@ -1160,16 +1159,20 @@ INT_PTR CALLBACK GetFilterDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lP
 
 			hMenu = CreatePopupMenu();
 
-			WCHAR *pIniSection = NP2HeapAlloc(sizeof(WCHAR) * 32 * 1024);
-			const int cbIniSection = (int)NP2HeapSize(pIniSection) / sizeof(WCHAR);
-			LoadIniSection(L"Filters", pIniSection, cbIniSection);
+			IniSection section;
+			WCHAR *pIniSectionBuf = NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_FILTERS);
+			const int cbIniSection = (int)NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR);
+			IniSection *pIniSection = &section;
+			IniSectionInit(pIniSection, 128);
 
-			pszFilterName = pIniSection;
-			while (*pszFilterName) {
-				WCHAR *pszFilterValue = CharNext(StrChr(pszFilterName, L'='));
+			LoadIniSection(INI_SECTION_NAME_FILTERS, pIniSectionBuf, cbIniSection);
+			IniSectionParseArray(pIniSection, pIniSectionBuf);
+
+			for (int i = 0; i < pIniSection->count; i++) {
+				const IniKeyValueNode *node = &pIniSection->nodeList[i];
+				LPCWSTR pszFilterValue = node->value;
 				if (*pszFilterValue) {
-					*CharPrev(pszFilterName, pszFilterValue) = 0;
-					AppendMenu(hMenu, MF_ENABLED | MF_STRING, 1234 + dwIndex, pszFilterName);
+					AppendMenu(hMenu, MF_ENABLED | MF_STRING, 1234 + dwIndex, node->key);
 					// Find description for current filter
 					const BOOL negFilter = IsButtonChecked(hwnd, IDC_NEGFILTER);
 					if ((StrCaseEqual(pszFilterValue, szTypedFilter) && !negFilter) ||
@@ -1180,9 +1183,9 @@ INT_PTR CALLBACK GetFilterDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lP
 				}
 
 				dwIndex++;
-				pszFilterName = StrEnd(pszFilterValue) + 1;
 			}
-			NP2HeapFree(pIniSection);
+			IniSectionFree(pIniSection);
+			NP2HeapFree(pIniSectionBuf);
 
 			if (dwCheck != 0xFFFF) { // check description for current filter
 				CheckMenuRadioItem(hMenu, 0, dwIndex, dwCheck, MF_BYPOSITION);
@@ -1202,7 +1205,7 @@ INT_PTR CALLBACK GetFilterDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lP
 					WCHAR tchValue[256];
 					GetMenuString(hMenu, dwCmd, tchName, COUNTOF(tchName), MF_BYCOMMAND);
 
-					if (IniGetString(L"Filters", tchName, L"", tchValue, COUNTOF(tchValue))) {
+					if (IniGetString(INI_SECTION_NAME_FILTERS, tchName, L"", tchValue, COUNTOF(tchValue))) {
 						if (tchValue[0] == L'-') { // Negative Filter
 							if (tchValue[1]) {
 								SetDlgItemText(hwnd, IDC_FILTER, tchValue + 1);
@@ -1431,7 +1434,7 @@ INT_PTR CALLBACK CopyMoveDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPa
 		lpfod = (LPFILEOPDLGDATA)lParam;
 		SetWindowLongPtr(hwnd, DWLP_USER, (LONG_PTR)lpfod);
 
-		MRU_LoadToCombobox(GetDlgItem(hwnd, IDC_DESTINATION), L"Copy/Move MRU");
+		MRU_LoadToCombobox(GetDlgItem(hwnd, IDC_DESTINATION), MRU_KEY_COPY_MOVE_HISTORY);
 		SendDlgItemMessage(hwnd, IDC_DESTINATION, CB_SETCURSEL, 0, 0);
 
 		SetDlgItemText(hwnd, IDC_SOURCE, lpfod->szSource);
@@ -1521,7 +1524,7 @@ INT_PTR CALLBACK CopyMoveDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPa
 		if (pnmhdr->idFrom == IDC_EMPTY_MRU && (pnmhdr->code == NM_CLICK || pnmhdr->code == NM_RETURN)) {
 			WCHAR tch[MAX_PATH];
 			GetDlgItemText(hwnd, IDC_DESTINATION, tch, COUNTOF(tch));
-			MRU_ClearCombobox(GetDlgItem(hwnd, IDC_DESTINATION), L"Copy/Move MRU");
+			MRU_ClearCombobox(GetDlgItem(hwnd, IDC_DESTINATION), MRU_KEY_COPY_MOVE_HISTORY);
 			SetDlgItemText(hwnd, IDC_DESTINATION, tch);
 		}
 	}
@@ -1603,7 +1606,7 @@ BOOL CopyMoveDlg(HWND hwnd, UINT *wFunc) {
 		}
 
 		// Save item
-		MRU_AddOneItem(L"Copy/Move MRU", fod.szDestination);
+		MRU_AddOneItem(MRU_KEY_COPY_MOVE_HISTORY, fod.szDestination);
 		ExpandEnvironmentStringsEx(fod.szDestination, COUNTOF(fod.szDestination));
 
 		// Double null terminated strings are essential!!!
@@ -2320,7 +2323,7 @@ INT_PTR CALLBACK FindTargetDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 			} else {
 				int i;
 				IniSectionOnSave section;
-				WCHAR *pIniSectionBuf = NP2HeapAlloc(sizeof(WCHAR) * 32 * 1024);
+				WCHAR *pIniSectionBuf = NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_TARGET_APPLICATION);
 				IniSectionOnSave *pIniSection = &section;
 				pIniSection->next = pIniSectionBuf;
 
@@ -2380,7 +2383,7 @@ INT_PTR CALLBACK FindTargetDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 				}
 				IniSectionSetString(pIniSection, L"DDETopic", szDDETopic);
 
-				SaveIniSection(L"Target Application", pIniSectionBuf);
+				SaveIniSection(INI_SECTION_NAME_TARGET_APPLICATION, pIniSectionBuf);
 				NP2HeapFree(pIniSectionBuf);
 
 				EndDialog(hwnd, IDOK);

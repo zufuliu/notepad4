@@ -1770,7 +1770,7 @@ int MRU_Enum(LPMRULIST pmru, int iIndex, LPWSTR pszItem, int cchItem) {
 
 BOOL MRU_Load(LPMRULIST pmru) {
 	IniSection section;
-	WCHAR *pIniSectionBuf = NP2HeapAlloc(sizeof(WCHAR) * 32 * 1024);
+	WCHAR *pIniSectionBuf = NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_MRU);
 	const int cchIniSection = (int)NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR);
 	IniSection *pIniSection = &section;
 
@@ -1803,9 +1803,14 @@ BOOL MRU_Load(LPMRULIST pmru) {
 }
 
 BOOL MRU_Save(LPMRULIST pmru) {
+	if (MRU_GetCount(pmru) == 0) {
+		IniClearSection(pmru->szRegKey);
+		return TRUE;
+	}
+
 	WCHAR tchName[16];
 	IniSectionOnSave section;
-	WCHAR *pIniSectionBuf = NP2HeapAlloc(sizeof(WCHAR) * 32 * 1024);
+	WCHAR *pIniSectionBuf = NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_MRU);
 	IniSectionOnSave *pIniSection = &section;
 	pIniSection->next = pIniSectionBuf;
 

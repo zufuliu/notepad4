@@ -2002,7 +2002,7 @@ INT_PTR CALLBACK InfoBoxDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPar
 		case IDNO:
 			lpib = (LPINFOBOX)GetWindowLongPtr(hwnd, DWLP_USER);
 			if (IsButtonChecked(hwnd, IDC_INFOBOXCHECK)) {
-				IniSetBool(L"Suppressed Messages", lpib->lpstrSetting, 1);
+				IniSetBool(INI_SECTION_NAME_SUPPRESSED_MESSAGES, lpib->lpstrSetting, 1);
 			}
 			EndDialog(hwnd, LOWORD(wParam));
 			break;
@@ -2025,7 +2025,7 @@ INT_PTR InfoBox(int iType, LPCWSTR lpstrSetting, int uidMessage, ...) {
 	int iMode;
 	va_list va;
 
-	iMode = IniGetInt(L"Suppressed Messages", lpstrSetting, 0);
+	iMode = IniGetInt(INI_SECTION_NAME_SUPPRESSED_MESSAGES, lpstrSetting, 0);
 
 	if (StrNotEmpty(lpstrSetting) && iMode == 1) {
 		return (iType == MBYESNO) ? IDYES : IDOK;

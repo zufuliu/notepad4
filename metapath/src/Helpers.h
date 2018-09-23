@@ -358,6 +358,9 @@ void History_UpdateToolbar(PHISTORY ph, HWND hwnd, int cmdBack, int cmdForward);
 #define MRU_NOCASE    1
 #define MRU_UTF8      2
 
+// MRU_MAXITEMS * (MAX_PATH + 4)
+#define MAX_INI_SECTION_SIZE_MRU	(8 * 1024)
+
 typedef struct _mrulist {
 	LPCWSTR szRegKey;
 	int   iFlags;
