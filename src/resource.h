@@ -100,6 +100,7 @@
 #define IDC_STYLELABELS					113
 #define IDD_INSERTTAG					114
 #define IDC_REPLACEINSEL				114
+#define IDC_RESETALL					114
 #define IDD_SORT						115
 #define IDC_TOGGLEFINDREPLACE			115
 #define IDD_COLUMNWRAP					116
