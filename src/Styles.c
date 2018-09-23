@@ -299,9 +299,9 @@ static void Style_Alloc(PEDITLEXER pLex) {
 void Style_ReleaseResources(void) {
 	NP2HeapFree(g_AllFileExtensions);
 	for (int iLexer = 0; iLexer < NUMLEXERS; iLexer++) {
-		PEDITLEXER lex = pLexArray[iLexer];
-		if (lex->szStyleBuf) {
-			NP2HeapFree(lex->szStyleBuf);
+		PEDITLEXER pLex = pLexArray[iLexer];
+		if (pLex->szStyleBuf) {
+			NP2HeapFree(pLex->szStyleBuf);
 		}
 	}
 }
@@ -598,6 +598,19 @@ BOOL Style_Export(HWND hwnd) {
 		return TRUE;
 	}
 	return FALSE;
+}
+
+static void Style_ResetAll(void) {
+	CopyMemory(customColor, defaultCustomColor, MAX_CUSTOM_COLOR_COUNT * sizeof(COLORREF));
+	for (int iLexer = 0; iLexer < NUMLEXERS; iLexer++) {
+		PEDITLEXER pLex = pLexArray[iLexer];
+		lstrcpy(pLex->szExtensions, pLex->pszDefExt);
+		pLex->bStyleChanged = TRUE;
+		const int iStyleCount = pLex->iStyleCount;
+		for (int i = 0; i < iStyleCount; i++) {
+			lstrcpy(pLex->Styles[i].szValue, pLex->Styles[i].pszDefault);
+		}
+	}
 }
 
 void Style_OnDPIChanged(HWND hwnd) {
@@ -3209,6 +3222,9 @@ INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM
 			PostMessage(hwnd, WM_NEXTDLGCTL, (WPARAM)(GetDlgItem(hwnd, IDC_STYLEEDIT)), 1);
 			break;
 
+		case IDC_RESETALL:
+			Style_ResetAll();
+			// fall through
 		case IDC_STYLEDEFAULT:
 			if (pCurrentStyle) {
 				lstrcpy(pCurrentStyle->szValue, pCurrentStyle->pszDefault);
@@ -3278,9 +3294,10 @@ INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM
 		}
 		break;
 
-		case IDC_IMPORT: {
-			hwndTV = GetDlgItem(hwnd, IDC_STYLELIST);
-
+		case IDC_IMPORT:
+		case IDC_EXPORT:
+		case IDC_PREVIEW:
+		case IDOK: {
 			if (pCurrentStyle) {
 				GetDlgItemText(hwnd, IDC_STYLEEDIT, pCurrentStyle->szValue, MAX_EDITSTYLE_VALUE_SIZE);
 			} else if (pCurrentLexer) {
@@ -3289,55 +3306,35 @@ INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM
 				}
 			}
 
-			if (Style_Import(hwnd)) {
+			switch (LOWORD(wParam)) {
+			case IDC_IMPORT:
+				if (Style_Import(hwnd)) {
+					hwndTV = GetDlgItem(hwnd, IDC_STYLELIST);
 
-				if (pCurrentStyle) {
-					SetDlgItemText(hwnd, IDC_STYLEEDIT, pCurrentStyle->szValue);
-				} else if (pCurrentLexer) {
-					SetDlgItemText(hwnd, IDC_STYLEEDIT, pCurrentLexer->szExtensions);
+					if (pCurrentStyle) {
+						SetDlgItemText(hwnd, IDC_STYLEEDIT, pCurrentStyle->szValue);
+					} else if (pCurrentLexer) {
+						SetDlgItemText(hwnd, IDC_STYLEEDIT, pCurrentLexer->szExtensions);
+					}
+
+					TreeView_Select(hwndTV, TreeView_GetRoot(hwndTV), TVGN_CARET);
 				}
+				break;
 
-				TreeView_Select(hwndTV, TreeView_GetRoot(hwndTV), TVGN_CARET);
+			case IDC_EXPORT:
+				Style_Export(hwnd);
+				break;
+
+			case IDC_PREVIEW:
+				Style_SetLexer(hwndEdit, pLexCurrent);
+				break;
+
+			case IDOK:
+				EndDialog(hwnd, IDOK);
+				break;
 			}
 		}
 		break;
-
-		case IDC_EXPORT: {
-			if (pCurrentStyle) {
-				GetDlgItemText(hwnd, IDC_STYLEEDIT, pCurrentStyle->szValue, MAX_EDITSTYLE_VALUE_SIZE);
-			} else if (pCurrentLexer) {
-				if (!GetDlgItemText(hwnd, IDC_STYLEEDIT, pCurrentLexer->szExtensions, MAX_EDITLEXER_EXT_SIZE)) {
-					lstrcpy(pCurrentLexer->szExtensions, pCurrentLexer->pszDefExt);
-				}
-			}
-
-			Style_Export(hwnd);
-		}
-		break;
-
-		case IDC_PREVIEW: {
-			if (pCurrentStyle) {
-				GetDlgItemText(hwnd, IDC_STYLEEDIT, pCurrentStyle->szValue, MAX_EDITSTYLE_VALUE_SIZE);
-			} else if (pCurrentLexer) {
-				if (!GetDlgItemText(hwnd, IDC_STYLEEDIT, pCurrentLexer->szExtensions, MAX_EDITLEXER_EXT_SIZE)) {
-					lstrcpy(pCurrentLexer->szExtensions, pCurrentLexer->pszDefExt);
-				}
-			}
-
-			Style_SetLexer(hwndEdit, pLexCurrent);
-		}
-		break;
-
-		case IDOK:
-			if (pCurrentStyle) {
-				GetDlgItemText(hwnd, IDC_STYLEEDIT, pCurrentStyle->szValue, MAX_EDITSTYLE_VALUE_SIZE);
-			} else if (pCurrentLexer) {
-				if (!GetDlgItemText(hwnd, IDC_STYLEEDIT, pCurrentLexer->szExtensions, MAX_EDITLEXER_EXT_SIZE)) {
-					lstrcpy(pCurrentLexer->szExtensions, pCurrentLexer->pszDefExt);
-				}
-			}
-			EndDialog(hwnd, IDOK);
-			break;
 
 		case IDCANCEL:
 			if (fDragging) {
@@ -3402,6 +3399,7 @@ void Style_ConfigDlg(HWND hwnd) {
 			for (int iLexer = 0; iLexer < NUMLEXERS; iLexer++) {
 				PEDITLEXER pLex = pLexArray[iLexer];
 				if (pLex->bStyleChanged || memcmp(styleBackup[iLexer], pLex->szStyleBuf, pLex->iStyleBufSize) != 0) {
+					pLex->bStyleChanged = TRUE;
 					++count;
 				}
 			}
