@@ -245,6 +245,9 @@ static const COLORREF defaultCustomColor[MAX_CUSTOM_COLOR_COUNT] = {
 };
 static COLORREF customColor[MAX_CUSTOM_COLOR_COUNT];
 
+static BOOL bCustomColorLoaded = FALSE;
+static int iLexerLoadedCount = 0;
+
 BOOL	bUse2ndDefaultStyle;
 static UINT fStylesModified = STYLESMODIFIED_NONE;
 BOOL	fWarnedNoIniFile = FALSE;
@@ -306,6 +309,27 @@ void Style_ReleaseResources(void) {
 	}
 }
 
+static void Style_LoadOneEx(PEDITLEXER pLex, IniSection *pIniSection, WCHAR *pIniSectionBuf, int cchIniSection) {
+	LoadIniSection(pLex->pszName, pIniSectionBuf, cchIniSection);
+	Style_Alloc(pLex);
+	const int iStyleCount = pLex->iStyleCount;
+	if (!IniSectionParse(pIniSection, pIniSectionBuf)) {
+		for (int i = 0; i < iStyleCount; i++) {
+			lstrcpy(pLex->Styles[i].szValue, pLex->Styles[i].pszDefault);
+		}
+	} else {
+		for (int i = 0; i < iStyleCount; i++) {
+			LPCWSTR value = IniSectionGetValueImpl(pIniSection, pLex->Styles[i].pszName, pLex->Styles[i].iNameLen);
+			if (value != NULL) {
+				lstrcpyn(pLex->Styles[i].szValue, value, MAX_EDITSTYLE_VALUE_SIZE);
+			} else {
+				lstrcpy(pLex->Styles[i].szValue, pLex->Styles[i].pszDefault);
+			}
+		}
+	}
+	++iLexerLoadedCount;
+}
+
 //=============================================================================
 //
 // Style_Load()
@@ -317,25 +341,6 @@ void Style_Load(void) {
 	const int cchIniSection = (int)NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR);
 	IniSection *pIniSection = &section;
 	IniSectionInit(pIniSection, 128);
-
-	// Custom colors
-	CopyMemory(customColor, defaultCustomColor, MAX_CUSTOM_COLOR_COUNT * sizeof(COLORREF));
-
-	LoadIniSection(L"Custom Colors", pIniSectionBuf, cchIniSection);
-	IniSectionParseArray(pIniSection, pIniSectionBuf);
-
-	const int count = min_i(pIniSection->count, MAX_CUSTOM_COLOR_COUNT);
-	for (int i = 0; i < count; i++) {
-		const IniKeyValueNode *node = &pIniSection->nodeList[i];
-		const UINT n = StrToInt(node->key) - 1;
-		LPCWSTR wch = node->value;
-		if (n < MAX_CUSTOM_COLOR_COUNT && *wch == L'#') {
-			int irgb;
-			if (HexStrToInt(wch + 1, &irgb)) {
-				customColor[n] = RGB((irgb & 0xFF0000) >> 16, (irgb & 0xFF00) >> 8, irgb & 0xFF);
-			}
-		}
-	}
 
 	LoadIniSection(L"Styles", pIniSectionBuf, cchIniSection);
 	IniSectionParse(pIniSection, pIniSectionBuf);
@@ -370,25 +375,64 @@ void Style_Load(void) {
 		}
 	}
 
-	for (int iLexer = 0; iLexer < NUMLEXERS; iLexer++) {
-		PEDITLEXER lex = pLexArray[iLexer];
-		Style_Alloc(lex);
-		const int iStyleCount = lex->iStyleCount;
-		LoadIniSection(lex->pszName, pIniSectionBuf, cchIniSection);
-		if (!IniSectionParse(pIniSection, pIniSectionBuf)) {
-			for (int i = 0; i < iStyleCount; i++) {
-				lstrcpyn(lex->Styles[i].szValue, lex->Styles[i].pszDefault, MAX_EDITSTYLE_VALUE_SIZE);
+	Style_LoadOneEx(&lexDefault, pIniSection, pIniSectionBuf, cchIniSection);
+	if (iDefaultLexer != 0) {
+		Style_LoadOneEx(pLexArray[iDefaultLexer], pIniSection, pIniSectionBuf, cchIniSection);
+	}
+	np2MonoFontIndex = FindDefaultFontIndex();
+
+	IniSectionFree(pIniSection);
+	NP2HeapFree(pIniSectionBuf);
+}
+
+static void Style_LoadOne(PEDITLEXER pLex) {
+	IniSection section;
+	WCHAR *pIniSectionBuf = NP2HeapAlloc(sizeof(WCHAR) * 32 * 1024);
+	const int cchIniSection = (int)NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR);
+	IniSection *pIniSection = &section;
+	IniSectionInit(pIniSection, 128);
+	Style_LoadOneEx(pLex, pIniSection, pIniSectionBuf, cchIniSection);
+	IniSectionFree(pIniSection);
+	NP2HeapFree(pIniSectionBuf);
+}
+
+static void Style_LoadAll(void) {
+	IniSection section;
+	WCHAR *pIniSectionBuf = NP2HeapAlloc(sizeof(WCHAR) * 32 * 1024);
+	const int cchIniSection = (int)NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR);
+	IniSection *pIniSection = &section;
+	IniSectionInit(pIniSection, 128);
+
+	// Custom colors
+	if (!bCustomColorLoaded) {
+		bCustomColorLoaded = TRUE;
+		CopyMemory(customColor, defaultCustomColor, MAX_CUSTOM_COLOR_COUNT * sizeof(COLORREF));
+
+		LoadIniSection(L"Custom Colors", pIniSectionBuf, cchIniSection);
+		IniSectionParseArray(pIniSection, pIniSectionBuf);
+
+		const int count = min_i(pIniSection->count, MAX_CUSTOM_COLOR_COUNT);
+		for (int i = 0; i < count; i++) {
+			const IniKeyValueNode *node = &pIniSection->nodeList[i];
+			const UINT n = StrToInt(node->key) - 1;
+			LPCWSTR wch = node->value;
+			if (n < MAX_CUSTOM_COLOR_COUNT && *wch == L'#') {
+				int irgb;
+				if (HexStrToInt(wch + 1, &irgb)) {
+					customColor[n] = RGB((irgb & 0xFF0000) >> 16, (irgb & 0xFF00) >> 8, irgb & 0xFF);
+				}
 			}
-			continue;
-		}
-		for (int i = 0; i < iStyleCount; i++) {
-			IniSectionGetStringEx(pIniSection, lex->Styles[i].pszName, lex->Styles[i].pszDefault,
-								lex->Styles[i].szValue, MAX_EDITSTYLE_VALUE_SIZE);
 		}
 	}
 
-	np2MonoFontIndex = FindDefaultFontIndex();
+	for (int iLexer = 0; iLexer < NUMLEXERS; iLexer++) {
+		PEDITLEXER pLex = pLexArray[iLexer];
+		if (!pLex->szStyleBuf) {
+			Style_LoadOneEx(pLex, pIniSection, pIniSectionBuf, cchIniSection);
+		}
+	}
 
+	iLexerLoadedCount = NUMLEXERS;
 	IniSectionFree(pIniSection);
 	NP2HeapFree(pIniSectionBuf);
 }
@@ -611,6 +655,8 @@ static void Style_ResetAll(void) {
 			lstrcpy(pLex->Styles[i].szValue, pLex->Styles[i].pszDefault);
 		}
 	}
+
+	fStylesModified |= STYLESMODIFIED_ALL_STYLE | STYLESMODIFIED_FILE_EXT | STYLESMODIFIED_COLOR;
 }
 
 void Style_OnDPIChanged(HWND hwnd) {
@@ -742,6 +788,9 @@ void Style_SetLexer(HWND hwnd, PEDITLEXER pLexNew) {
 	if (!pLexNew) {
 		np2LexLangIndex = 0;
 		pLexNew = pLexArray[iDefaultLexer];
+	}
+	if (!pLexNew->szStyleBuf) {
+		Style_LoadOne(pLexNew);
 	}
 
 	// Lexer
@@ -3359,6 +3408,10 @@ void Style_ConfigDlg(HWND hwnd) {
 	COLORREF colorBackup[MAX_CUSTOM_COLOR_COUNT];
 	LPWSTR styleBackup[NUMLEXERS];
 	BOOL apply = FALSE;
+
+	if (!bCustomColorLoaded || iLexerLoadedCount != NUMLEXERS) {
+		Style_LoadAll();
+	}
 
 	// Backup Styles
 	CopyMemory(extBackup, g_AllFileExtensions, ALL_FILE_EXTENSIONS_BYTE_SIZE);
