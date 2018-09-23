@@ -85,6 +85,23 @@
 //==== Callback Message from System Tray ======================================
 #define APPM_TRAYMESSAGE	(WM_APP + 4)
 
+#define INI_SECTION_NAME_METAPATH			L"metapath"
+#define INI_SECTION_NAME_SETTINGS			L"Settings"
+#define INI_SECTION_NAME_FLAGS				L"Settings2"
+#define INI_SECTION_NAME_WINDOW_POSITION	L"Window"
+#define INI_SECTION_NAME_TOOLBAR_LABELS		L"Toolbar Labels"
+#define INI_SECTION_NAME_TOOLBAR_IMAGES		L"Toolbar Images"
+#define INI_SECTION_NAME_FILTERS			L"Filters"
+#define INI_SECTION_NAME_TARGET_APPLICATION	L"Target Application"
+
+#define MRU_KEY_COPY_MOVE_HISTORY			L"Copy/Move MRU"
+
+#define MAX_INI_SECTION_SIZE_SETTINGS			(4 * 1024)
+#define MAX_INI_SECTION_SIZE_FLAGS				(4 * 1024)
+#define MAX_INI_SECTION_SIZE_TOOLBAR_LABELS		(2 * 1024)
+#define MAX_INI_SECTION_SIZE_FILTERS			(4 * 1024)
+#define MAX_INI_SECTION_SIZE_TARGET_APPLICATION	(4 * 1024)
+
 //==== Function Declarations ==================================================
 BOOL InitApplication(HINSTANCE hInstance);
 HWND InitInstance(HINSTANCE hInstance,  int nCmdShow);

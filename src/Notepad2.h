@@ -102,6 +102,21 @@ NP2SettingsVersion_V1 = 1,
 NP2SettingsVersion_Current = NP2SettingsVersion_V1,
 };
 
+#define INI_SECTION_NAME_NOTEPAD2				L"Notepad2"
+#define INI_SECTION_NAME_SETTINGS				L"Settings"
+#define INI_SECTION_NAME_FLAGS					L"Settings2"
+#define INI_SECTION_NAME_WINDOW_POSITION		L"Window"
+#define INI_SECTION_NAME_TOOLBAR_LABELS			L"Toolbar Labels"
+#define INI_SECTION_NAME_TOOLBAR_IMAGES			L"Toolbar Images"
+#define INI_SECTION_NAME_SUPPRESSED_MESSAGES	L"Suppressed Messages"
+
+#define MRU_KEY_RECENT_FILES					L"Recent Files"
+#define MRU_KEY_RECENT_FIND						L"Recent Find"
+#define MRU_KEY_RECENT_REPLACE					L"Recent Replace"
+
+#define MAX_INI_SECTION_SIZE_SETTINGS			(8 * 1024)
+#define MAX_INI_SECTION_SIZE_FLAGS				(4 * 1024)
+#define MAX_INI_SECTION_SIZE_TOOLBAR_LABELS		(2 * 1024)
 
 //==== Function Declarations ==================================================
 BOOL InitApplication(HINSTANCE hInstance);

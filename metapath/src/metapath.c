@@ -927,12 +927,12 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) {
 #if NP2_ENABLE_CUSTOMIZE_TOOLBAR_LABELS
 	// Load toolbar labels
 	IniSection section;
-	WCHAR *pIniSectionBuf = NP2HeapAlloc(sizeof(WCHAR) * 32 * 1024);
+	WCHAR *pIniSectionBuf = NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_TOOLBAR_LABELS);
 	const int cbIniSection = (int)NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR);
 	IniSection *pIniSection = &section;
 
 	IniSectionInit(pIniSection, COUNTOF(tbbMainWnd));
-	LoadIniSection(L"Toolbar Labels", pIniSectionBuf, cbIniSection);
+	LoadIniSection(INI_SECTION_NAME_TOOLBAR_LABELS, pIniSectionBuf, cbIniSection);
 	IniSectionParseArray(pIniSection, pIniSectionBuf);
 	const int count = pIniSection->count;
 
@@ -1784,7 +1784,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		}
 
 		if (!bCreateFailure) {
-			if (WritePrivateProfileString(L"Settings", L"WriteTest", L"ok", szIniFile)) {
+			if (WritePrivateProfileString(INI_SECTION_NAME_SETTINGS, L"WriteTest", L"ok", szIniFile)) {
 				BeginWaitCursor();
 				SaveSettings(TRUE);
 				EndWaitCursor();
@@ -2415,12 +2415,12 @@ BOOL ChangeDirectory(HWND hwnd, LPCWSTR lpszNewDir, BOOL bUpdateHistory) {
 //
 void LoadSettings(void) {
 	IniSection section;
-	WCHAR *pIniSectionBuf = NP2HeapAlloc(sizeof(WCHAR) * 32 * 1024);
+	WCHAR *pIniSectionBuf = NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_SETTINGS);
 	const int cbIniSection = (int)NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR);
 	IniSection *pIniSection = &section;
 
 	IniSectionInit(pIniSection, 128);
-	LoadIniSection(L"Settings", pIniSectionBuf, cbIniSection);
+	LoadIniSection(INI_SECTION_NAME_SETTINGS, pIniSectionBuf, cbIniSection);
 	IniSectionParse(pIniSection, pIniSectionBuf);
 
 	bSaveSettings = IniSectionGetBool(pIniSection, L"SaveSettings", 1);
@@ -2506,7 +2506,7 @@ void LoadSettings(void) {
 
 	strValue = IniSectionGetValue(pIniSection, L"ToolbarButtons");
 	if (StrIsEmpty(strValue)) {
-		CopyMemory(tchToolbarButtons, DefaultToolbarButtons, COUNTOF(DefaultToolbarButtons) * sizeof(WCHAR));
+		CopyMemory(tchToolbarButtons, DefaultToolbarButtons, sizeof(DefaultToolbarButtons));
 	} else {
 		lstrcpyn(tchToolbarButtons, strValue, COUNTOF(DefaultToolbarButtons));
 	}
@@ -2538,7 +2538,7 @@ void LoadSettings(void) {
 		wsprintf(tchSizeX, L"%ix%i SizeX", ResX, ResY);
 		wsprintf(tchSizeY, L"%ix%i SizeY", ResX, ResY);
 
-		LoadIniSection(L"Window", pIniSectionBuf, cbIniSection);
+		LoadIniSection(INI_SECTION_NAME_WINDOW_POSITION, pIniSectionBuf, cbIniSection);
 		IniSectionParse(pIniSection, pIniSectionBuf);
 
 		wi.x = IniSectionGetIntEx(pIniSection, tchPosX, CW_USEDEFAULT);
@@ -2547,7 +2547,7 @@ void LoadSettings(void) {
 		wi.cy = IniSectionGetIntEx(pIniSection, tchSizeY, CW_USEDEFAULT);
 	}
 
-	LoadIniSection(L"Toolbar Images", pIniSectionBuf, cbIniSection);
+	LoadIniSection(INI_SECTION_NAME_TOOLBAR_IMAGES, pIniSectionBuf, cbIniSection);
 	IniSectionParse(pIniSection, pIniSectionBuf);
 
 	IniSectionGetString(pIniSection, L"BitmapDefault", L"",
@@ -2593,15 +2593,15 @@ void SaveSettings(BOOL bSaveSettingsNow) {
 
 	if (!bSaveSettings && !bSaveSettingsNow) {
 		if (iStartupDir == 1) {
-			IniSetString(L"Settings", L"MRUDirectory", szCurDir);
+			IniSetString(INI_SECTION_NAME_SETTINGS, L"MRUDirectory", szCurDir);
 		}
-		IniSetBool(L"Settings", L"SaveSettings", bSaveSettings);
+		IniSetBool(INI_SECTION_NAME_SETTINGS, L"SaveSettings", bSaveSettings);
 		return;
 	}
 
 	WCHAR wchTmp[MAX_PATH];
 	IniSectionOnSave section;
-	WCHAR *pIniSectionBuf = NP2HeapAlloc(sizeof(WCHAR) * 32 * 1024);
+	WCHAR *pIniSectionBuf = NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_SETTINGS);
 	IniSectionOnSave *pIniSection = &section;
 	pIniSection->next = pIniSectionBuf;
 
@@ -2649,7 +2649,7 @@ void SaveSettings(BOOL bSaveSettingsNow) {
 	IniSectionSetInt(pIniSection, L"OpenWithDlgSizeY", cyOpenWithDlg);
 	IniSectionSetInt(pIniSection, L"CopyMoveDlgSizeX", cxCopyMoveDlg);
 
-	SaveIniSection(L"Settings", pIniSectionBuf);
+	SaveIniSection(INI_SECTION_NAME_SETTINGS, pIniSectionBuf);
 	NP2HeapFree(pIniSectionBuf);
 
 	/*
@@ -2679,10 +2679,10 @@ void SaveSettings(BOOL bSaveSettingsNow) {
 		wsprintf(tchSizeX, L"%ix%i SizeX", ResX, ResY);
 		wsprintf(tchSizeY, L"%ix%i SizeY", ResX, ResY);
 
-		IniSetInt(L"Window", tchPosX, wi.x);
-		IniSetInt(L"Window", tchPosY, wi.y);
-		IniSetInt(L"Window", tchSizeX, wi.cx);
-		IniSetInt(L"Window", tchSizeY, wi.cy);
+		IniSetInt(INI_SECTION_NAME_WINDOW_POSITION, tchPosX, wi.x);
+		IniSetInt(INI_SECTION_NAME_WINDOW_POSITION, tchPosY, wi.y);
+		IniSetInt(INI_SECTION_NAME_WINDOW_POSITION, tchSizeX, wi.cx);
+		IniSetInt(INI_SECTION_NAME_WINDOW_POSITION, tchSizeY, wi.cy);
 	}
 }
 
@@ -2852,12 +2852,12 @@ void ParseCommandLine(void) {
 //
 void LoadFlags(void) {
 	IniSection section;
-	WCHAR *pIniSectionBuf = NP2HeapAlloc(sizeof(WCHAR) * 32 * 1024);
+	WCHAR *pIniSectionBuf = NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_FLAGS);
 	const int cchIniSection = (int)NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR);
 	IniSection *pIniSection = &section;
 
 	IniSectionInit(pIniSection, 16);
-	LoadIniSection(L"Settings2", pIniSectionBuf, cchIniSection);
+	LoadIniSection(INI_SECTION_NAME_FLAGS, pIniSectionBuf, cchIniSection);
 	IniSectionParse(pIniSection, pIniSectionBuf);
 
 	bReuseWindow = IniSectionGetBool(pIniSection, L"ReuseWindow", 0);
@@ -2925,7 +2925,7 @@ int CheckIniFile(LPWSTR lpszFile, LPCWSTR lpszModule) {
 
 int CheckIniFileRedirect(LPWSTR lpszFile, LPCWSTR lpszModule) {
 	WCHAR tch[MAX_PATH];
-	if (GetPrivateProfileString(L"metapath", L"metapath.ini", L"", tch, COUNTOF(tch), lpszFile)) {
+	if (GetPrivateProfileString(INI_SECTION_NAME_METAPATH, L"metapath.ini", L"", tch, COUNTOF(tch), lpszFile)) {
 		if (CheckIniFile(tch, lpszModule)) {
 			lstrcpy(lpszFile, tch);
 		} else {
@@ -3439,12 +3439,12 @@ BOOL CALLBACK EnumWndProc2(HWND hwnd, LPARAM lParam) {
 
 void LoadLaunchSetings(void) {
 	IniSection section;
-	WCHAR *pIniSectionBuf = NP2HeapAlloc(sizeof(WCHAR) * 32 * 1024);
+	WCHAR *pIniSectionBuf = NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_TARGET_APPLICATION);
 	const int cbIniSection = (int)NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR);
 	IniSection *pIniSection = &section;
 
 	IniSectionInit(pIniSection, 16);
-	LoadIniSection(L"Target Application", pIniSectionBuf, cbIniSection);
+	LoadIniSection(INI_SECTION_NAME_TARGET_APPLICATION, pIniSectionBuf, cbIniSection);
 	IniSectionParse(pIniSection, pIniSectionBuf);
 
 	iUseTargetApplication = IniSectionGetInt(pIniSection, L"UseTargetApplication", 0xFB);

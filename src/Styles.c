@@ -262,7 +262,6 @@ int		cyStyleSelectDlg;
 
 #define ALL_FILE_EXTENSIONS_BYTE_SIZE	((NUMLEXERS * MAX_EDITLEXER_EXT_SIZE) * sizeof(WCHAR))
 static LPWSTR g_AllFileExtensions = NULL;
-#define INI_FILE_EXTENSIONS_NAME		L"File Extensions"
 
 // Notepad2.c
 extern int	iEncoding;
@@ -337,12 +336,12 @@ static void Style_LoadOneEx(PEDITLEXER pLex, IniSection *pIniSection, WCHAR *pIn
 void Style_Load(void) {
 	IniSection section;
 	g_AllFileExtensions = NP2HeapAlloc(ALL_FILE_EXTENSIONS_BYTE_SIZE);
-	WCHAR *pIniSectionBuf = NP2HeapAlloc(sizeof(WCHAR) * 32 * 1024);
+	WCHAR *pIniSectionBuf = NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_STYLES);
 	const int cchIniSection = (int)NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR);
 	IniSection *pIniSection = &section;
 	IniSectionInit(pIniSection, 128);
 
-	LoadIniSection(L"Styles", pIniSectionBuf, cchIniSection);
+	LoadIniSection(INI_SECTION_NAME_STYLES, pIniSectionBuf, cchIniSection);
 	IniSectionParse(pIniSection, pIniSectionBuf);
 
 	// 2nd default
@@ -362,7 +361,7 @@ void Style_Load(void) {
 	cyStyleSelectDlg = IniSectionGetInt(pIniSection, L"SelectDlgSizeY", 324);
 	cyStyleSelectDlg = max_i(cyStyleSelectDlg, 0);
 
-	LoadIniSection(INI_FILE_EXTENSIONS_NAME, pIniSectionBuf, cchIniSection);
+	LoadIniSection(INI_SECTION_NAME_FILE_EXTENSIONS, pIniSectionBuf, cchIniSection);
 	IniSectionParse(pIniSection, pIniSectionBuf);
 	for (int iLexer = 0; iLexer < NUMLEXERS; iLexer++) {
 		PEDITLEXER pLex = pLexArray[iLexer];
@@ -387,7 +386,7 @@ void Style_Load(void) {
 
 static void Style_LoadOne(PEDITLEXER pLex) {
 	IniSection section;
-	WCHAR *pIniSectionBuf = NP2HeapAlloc(sizeof(WCHAR) * 32 * 1024);
+	WCHAR *pIniSectionBuf = NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_STYLES);
 	const int cchIniSection = (int)NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR);
 	IniSection *pIniSection = &section;
 	IniSectionInit(pIniSection, 128);
@@ -398,7 +397,7 @@ static void Style_LoadOne(PEDITLEXER pLex) {
 
 static void Style_LoadAll(void) {
 	IniSection section;
-	WCHAR *pIniSectionBuf = NP2HeapAlloc(sizeof(WCHAR) * 32 * 1024);
+	WCHAR *pIniSectionBuf = NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_STYLES);
 	const int cchIniSection = (int)NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR);
 	IniSection *pIniSection = &section;
 	IniSectionInit(pIniSection, 128);
@@ -408,7 +407,7 @@ static void Style_LoadAll(void) {
 		bCustomColorLoaded = TRUE;
 		CopyMemory(customColor, defaultCustomColor, MAX_CUSTOM_COLOR_COUNT * sizeof(COLORREF));
 
-		LoadIniSection(L"Custom Colors", pIniSectionBuf, cchIniSection);
+		LoadIniSection(INI_SECTION_NAME_CUSTOM_COLORS, pIniSectionBuf, cchIniSection);
 		IniSectionParseArray(pIniSection, pIniSectionBuf);
 
 		const int count = min_i(pIniSection->count, MAX_CUSTOM_COLOR_COUNT);
@@ -443,14 +442,14 @@ static void Style_LoadAll(void) {
 //
 void Style_Save(void) {
 	IniSectionOnSave section;
-	WCHAR *pIniSectionBuf = NP2HeapAlloc(sizeof(WCHAR) * 32 * 1024);
+	WCHAR *pIniSectionBuf = NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_STYLES);
 	const int cchIniSection = (int)NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR);
 	IniSectionOnSave *pIniSection = &section;
 	pIniSection->next = pIniSectionBuf;
 
 	// Custom colors
 	if (fStylesModified & STYLESMODIFIED_COLOR) {
-		for (int i = 0; i < MAX_CUSTOM_COLOR_COUNT; i++) {
+		for (unsigned int i = 0; i < MAX_CUSTOM_COLOR_COUNT; i++) {
 			const COLORREF color = customColor[i];
 			if (color != defaultCustomColor[i]) {
 				WCHAR tch[4];
@@ -461,7 +460,7 @@ void Style_Save(void) {
 			}
 		}
 
-		SaveIniSection(L"Custom Colors", pIniSectionBuf);
+		SaveIniSection(INI_SECTION_NAME_CUSTOM_COLORS, pIniSectionBuf);
 		ZeroMemory(pIniSectionBuf, cchIniSection);
 		pIniSection->next = pIniSectionBuf;
 	}
@@ -479,7 +478,7 @@ void Style_Save(void) {
 	IniSectionSetInt(pIniSection, L"SelectDlgSizeX", cxStyleSelectDlg);
 	IniSectionSetInt(pIniSection, L"SelectDlgSizeY", cyStyleSelectDlg);
 
-	SaveIniSection(L"Styles", pIniSectionBuf);
+	SaveIniSection(INI_SECTION_NAME_STYLES, pIniSectionBuf);
 
 	if (fStylesModified & STYLESMODIFIED_FILE_EXT) {
 		ZeroMemory(pIniSectionBuf, cchIniSection);
@@ -488,7 +487,7 @@ void Style_Save(void) {
 			PEDITLEXER pLex = pLexArray[iLexer];
 			IniSectionSetStringEx(pIniSection, pLex->pszName, pLex->szExtensions, pLex->pszDefExt);
 		}
-		SaveIniSection(INI_FILE_EXTENSIONS_NAME, pIniSectionBuf);
+		SaveIniSection(INI_SECTION_NAME_FILE_EXTENSIONS, pIniSectionBuf);
 	}
 
 	if (fStylesModified & STYLESMODIFIED_STYLE_MASK) {
@@ -538,12 +537,12 @@ BOOL Style_Import(HWND hwnd) {
 
 	if (GetOpenFileName(&ofn)) {
 		IniSection section;
-		WCHAR *pIniSectionBuf = NP2HeapAlloc(sizeof(WCHAR) * 32 * 1024);
+		WCHAR *pIniSectionBuf = NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_STYLES);
 		const int cchIniSection = (int)NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR);
 		IniSection *pIniSection = &section;
 
 		IniSectionInit(pIniSection, 128);
-		if (GetPrivateProfileSection(INI_FILE_EXTENSIONS_NAME, pIniSectionBuf, cchIniSection, szFile)) {
+		if (GetPrivateProfileSection(INI_SECTION_NAME_FILE_EXTENSIONS, pIniSectionBuf, cchIniSection, szFile)) {
 			if (IniSectionParse(pIniSection, pIniSectionBuf)) {
 				for (int iLexer = 0; iLexer < NUMLEXERS; iLexer++) {
 					PEDITLEXER pLex = pLexArray[iLexer];
@@ -609,7 +608,7 @@ BOOL Style_Export(HWND hwnd) {
 
 	if (GetSaveFileName(&ofn)) {
 		IniSectionOnSave section;
-		WCHAR *pIniSectionBuf = NP2HeapAlloc(sizeof(WCHAR) * 32 * 1024);
+		WCHAR *pIniSectionBuf = NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_STYLES);
 		const int cchIniSection = (int)NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR);
 		IniSectionOnSave *pIniSection = &section;
 
@@ -618,7 +617,7 @@ BOOL Style_Export(HWND hwnd) {
 			PEDITLEXER pLex = pLexArray[iLexer];
 			IniSectionSetString(pIniSection, pLex->pszName, pLex->szExtensions);
 		}
-		if (!WritePrivateProfileSection(INI_FILE_EXTENSIONS_NAME, pIniSectionBuf, szFile)) {
+		if (!WritePrivateProfileSection(INI_SECTION_NAME_FILE_EXTENSIONS, pIniSectionBuf, szFile)) {
 			dwError = GetLastError();
 		}
 
