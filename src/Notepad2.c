@@ -4996,7 +4996,6 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		case SCN_UPDATEUI:
 			if (scn->updated & ~(SC_UPDATE_V_SCROLL | SC_UPDATE_H_SCROLL)) {
 				UpdateToolbar();
-				UpdateStatusbar();
 
 				// Invalidate invalid selections
 				// TODO: Remove check for invalid selections once fixed in Scintilla

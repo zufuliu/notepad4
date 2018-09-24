@@ -1210,7 +1210,7 @@ void Style_SetLexer(HWND hwnd, PEDITLEXER pLexNew) {
 // find lexer from script interpreter
 // Style_SniffShebang()
 //
-PEDITLEXER __fastcall Style_SniffShebang(char *pchText) {
+PEDITLEXER Style_SniffShebang(char *pchText) {
 	if (pchText[0] == '#' && pchText[1] == '!') {
 		size_t len = 0;
 		char *pch = pchText + 2;
@@ -1728,7 +1728,7 @@ LPCWSTR Style_GetCurrentLexerName(void) {
 // find lexer from file extension
 // Style_MatchLexer()
 //
-PEDITLEXER __fastcall Style_MatchLexer(LPCWSTR lpszMatch, BOOL bCheckNames) {
+PEDITLEXER Style_MatchLexer(LPCWSTR lpszMatch, BOOL bCheckNames) {
 	if (!bCheckNames) {
 		//if (StrNCaseEqual(L"php", lpszMatch, 3) || StrCaseEqual(L"phtml", lpszMatch))) {
 		//	np2LexLangIndex = IDM_LANG_PHP;

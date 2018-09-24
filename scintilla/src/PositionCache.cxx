@@ -491,13 +491,16 @@ SpecialRepresentations::SpecialRepresentations() noexcept {
 }
 
 void SpecialRepresentations::SetRepresentation(const char *charBytes, const char *value) {
-	const auto it = mapReprs.find(KeyFromString(charBytes, UTF8MaxBytes));
+	const unsigned int key = KeyFromString(charBytes, UTF8MaxBytes);
+	auto it = mapReprs.find(key);
 	if (it == mapReprs.end()) {
 		// New entry so increment for first byte
 		const unsigned char ucStart = charBytes[0];
 		startByteHasReprs[ucStart]++;
+		mapReprs.insert(std::make_pair(key, Representation(value)));
+	} else {
+		it->second = Representation(value);
 	}
-	mapReprs[KeyFromString(charBytes, UTF8MaxBytes)] = Representation(value);
 }
 
 void SpecialRepresentations::ClearRepresentation(const char *charBytes) {
