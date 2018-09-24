@@ -41,7 +41,7 @@ extern "C" RECT pagesetupMargin;
 HGLOBAL hDevMode = nullptr;
 HGLOBAL hDevNames = nullptr;
 
-static void EditPrintInit();
+static void EditPrintInit() noexcept;
 
 //=============================================================================
 //
@@ -449,7 +449,7 @@ extern "C" BOOL EditPrint(HWND hwnd, LPCWSTR pszDocTitle, LPCWSTR pszPageFormat)
 // 33 Footer
 // 34 Colors
 //
-extern "C" UINT_PTR CALLBACK PageSetupHook(HWND hwnd, UINT uiMsg, WPARAM wParam, LPARAM /*lParam*/) {
+static UINT_PTR CALLBACK PageSetupHook(HWND hwnd, UINT uiMsg, WPARAM wParam, LPARAM /*lParam*/) noexcept {
 	switch (uiMsg) {
 	case WM_INITDIALOG: {
 		WCHAR tch[512];
@@ -512,7 +512,7 @@ extern "C" UINT_PTR CALLBACK PageSetupHook(HWND hwnd, UINT uiMsg, WPARAM wParam,
 		if (LOWORD(wParam) == IDOK) {
 			const LONG lPos = (LONG)SendDlgItemMessage(hwnd, 31, UDM_GETPOS, 0, 0);
 			if (HIWORD(lPos) == 0) {
-				iPrintZoom = (int)(short)LOWORD(lPos);
+				iPrintZoom = LOWORD(lPos);
 			} else {
 				iPrintZoom = 100;
 			}
@@ -574,7 +574,7 @@ extern "C" void EditPrintSetup(HWND hwnd) {
 //
 // EditPrintInit() - Setup default page margin if no values from registry
 //
-static void EditPrintInit() {
+static void EditPrintInit() noexcept {
 	if (pagesetupMargin.left == -1 || pagesetupMargin.top == -1 ||
 			pagesetupMargin.right == -1 || pagesetupMargin.bottom == -1) {
 		WCHAR localeInfo[3];

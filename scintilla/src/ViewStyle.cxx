@@ -619,7 +619,7 @@ void ViewStyle::CreateAndAddFont(const FontSpecification &fs) {
 	if (fs.fontName) {
 		const auto it = fonts.find(fs);
 		if (it == fonts.end()) {
-			fonts[fs] = std::make_unique<FontRealised>();
+			fonts.insert(std::make_pair(fs, std::make_unique<FontRealised>()));
 		}
 	}
 }

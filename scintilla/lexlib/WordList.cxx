@@ -99,35 +99,15 @@ void WordList::Clear() noexcept {
 	len = 0;
 }
 
-#ifdef _MSC_VER
-
-static bool cmpWords(const char *a, const char *b) noexcept {
-	return strcmp(a, b) < 0;
-}
-
-#else
-
-static int cmpWords(const void *a, const void *b) noexcept {
-	return strcmp(*static_cast<const char * const *>(a), *static_cast<const char * const *>(b));
-}
-
-static void SortWordList(char **words, unsigned int len) noexcept {
-	qsort(words, len, sizeof(*words), cmpWords);
-}
-
-#endif
-
 void WordList::Set(const char *s) {
 	Clear();
 	const size_t lenS = strlen(s) + 1;
 	list = new char[lenS];
 	memcpy(list, s, lenS);
 	words = ArrayFromWordList(list, &len, onlyLineEnds);
-#ifdef _MSC_VER
-	std::sort(words, words + len, cmpWords);
-#else
-	SortWordList(words, len);
-#endif
+	std::sort(words, words + len, [](const char *a, const char *b) noexcept {
+		return strcmp(a, b) < 0;
+	});
 	std::fill(starts, std::end(starts), -1);
 	for (int l = len - 1; l >= 0; l--) {
 		unsigned char indexChar = words[l][0];
