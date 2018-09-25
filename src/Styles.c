@@ -2444,17 +2444,15 @@ BOOL Style_StrGetCase(LPCWSTR lpszStyle, int *i) {
 	WCHAR *p;
 
 	if ((p = StrStr(lpszStyle, L"case:")) != NULL) {
-		WCHAR tch[MAX_EDITSTYLE_VALUE_SIZE];
-		lstrcpy(tch, p + CSTRLEN(L"case:"));
-		if ((p = StrChr(tch, L';')) != NULL) {
-			*p = L'\0';
-		}
-		TrimString(tch);
-		if (tch[0] == L'u' || tch[0] == L'U') {
+		p += CSTRLEN(L"case:");
+		p += StrSpn(p, L" ");
+		switch (*p) {
+		case L'u':
+		case L'U':
 			*i = SC_CASE_UPPER;
 			return TRUE;
-		}
-		if (tch[0] == L'l' || tch[0] == L'L') {
+		case L'l':
+		case L'L':
 			*i = SC_CASE_LOWER;
 			return TRUE;
 		}
