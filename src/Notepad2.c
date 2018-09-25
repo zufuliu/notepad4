@@ -5106,6 +5106,10 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		}
 		break;
 
+		case SCN_AUTOCCHARDELETED:
+			EditCompleteWord(hwndEdit, FALSE);
+			break;
+
 #if NP2_ENABLE_SHOW_CALL_TIPS
 		// CallTips
 		case SCN_DWELLSTART:
