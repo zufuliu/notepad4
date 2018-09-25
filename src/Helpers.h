@@ -409,8 +409,10 @@ BOOL PathIsLnkToDirectory(LPCWSTR pszPath, LPWSTR pszResPath, int cchResPath);
 BOOL PathCreateDeskLnk(LPCWSTR pszDocument);
 BOOL PathCreateFavLnk(LPCWSTR pszName, LPCWSTR pszTarget, LPCWSTR pszDir);
 
-BOOL StrLTrim(LPWSTR pszSource, LPCWSTR pszTrimChars);
-BOOL TrimString(LPWSTR lpString);
+inline void TrimString(LPWSTR lpString) {
+	StrTrim(lpString, L" ");
+}
+
 BOOL ExtractFirstArgument(LPCWSTR lpArgs, LPWSTR lpArg1, LPWSTR lpArg2);
 
 void PrepareFilterStr(LPWSTR lpFilter);

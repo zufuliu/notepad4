@@ -1216,8 +1216,9 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 				// in HTML, fold on tag open and unfold on tag close
 				tagOpened = true;
 				tagClosing = (chNext == '/');
-				if (isXml && !(chNext == '/' || chNext == '?' || chNext == '!' || chNext == '-' || chNext == '%'))
+				if (isXml && !(chNext == '/' || chNext == '?' || chNext == '!' || chNext == '-' || chNext == '%')) {
 					levelCurrent++;
+				}
 				if (isXml && chNext == '/') {
 					levelCurrent--;
 				}

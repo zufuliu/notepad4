@@ -497,7 +497,7 @@ void SpecialRepresentations::SetRepresentation(const char *charBytes, const char
 		// New entry so increment for first byte
 		const unsigned char ucStart = charBytes[0];
 		startByteHasReprs[ucStart]++;
-		mapReprs.insert(std::make_pair(key, Representation(value)));
+		mapReprs.emplace(key, value);
 	} else {
 		it->second = Representation(value);
 	}

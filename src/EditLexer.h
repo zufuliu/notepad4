@@ -3,6 +3,7 @@
 
 #include <windows.h>
 #include <commctrl.h>
+#include <shlwapi.h>
 #include "Scintilla.h"
 #include "SciLexer.h"
 #include "Helpers.h"

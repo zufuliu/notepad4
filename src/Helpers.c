@@ -1346,57 +1346,6 @@ BOOL PathCreateFavLnk(LPCWSTR pszName, LPCWSTR pszTarget, LPCWSTR pszDir) {
 
 //=============================================================================
 //
-// StrLTrim()
-//
-BOOL StrLTrim(LPWSTR pszSource, LPCWSTR pszTrimChars) {
-	LPWSTR psz;
-
-	if (!pszSource || !*pszSource) {
-		return FALSE;
-	}
-
-	psz = pszSource;
-	while (StrChrI(pszTrimChars, *psz)) {
-		psz++;
-	}
-
-	MoveMemory(pszSource, psz, sizeof(WCHAR) * (lstrlen(psz) + 1));
-
-	return TRUE;
-}
-
-//=============================================================================
-//
-// TrimString()
-//
-BOOL TrimString(LPWSTR lpString) {
-	LPWSTR psz;
-
-	if (!lpString || !*lpString) {
-		return FALSE;
-	}
-
-	// Trim left
-	psz = lpString;
-
-	while (*psz == L' ') {
-		psz = CharNext(psz);
-	}
-
-	MoveMemory(lpString, psz, sizeof(WCHAR) * (lstrlen(psz) + 1));
-
-	// Trim right
-	psz = StrEnd(lpString);
-
-	while (*(psz = CharPrev(lpString, psz)) == L' ') {
-		*psz = L'\0';
-	}
-
-	return TRUE;
-}
-
-//=============================================================================
-//
 // ExtractFirstArgument()
 //
 BOOL ExtractFirstArgument(LPCWSTR lpArgs, LPWSTR lpArg1, LPWSTR lpArg2) {
@@ -1408,7 +1357,8 @@ BOOL ExtractFirstArgument(LPCWSTR lpArgs, LPWSTR lpArg1, LPWSTR lpArg2) {
 		*lpArg2 = L'\0';
 	}
 
-	if (!TrimString(lpArg1)) {
+	TrimString(lpArg1);
+	if (!*lpArg1) {
 		return FALSE;
 	}
 
