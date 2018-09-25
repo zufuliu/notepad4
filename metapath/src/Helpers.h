@@ -315,7 +315,11 @@ BOOL PathGetLnkPath(LPCWSTR pszLnkFile, LPWSTR pszResPath, int cchResPath);
 BOOL PathIsLnkToDirectory(LPCWSTR pszPath, LPWSTR pszResPath, int cchResPath);
 BOOL PathCreateLnk(LPCWSTR pszLnkDir, LPCWSTR pszPath);
 
-BOOL TrimString(LPWSTR lpString);
+
+inline void TrimString(LPWSTR lpString) {
+	StrTrim(lpString, L" ");
+}
+
 BOOL ExtractFirstArgument(LPCWSTR lpArgs, LPWSTR lpArg1, LPWSTR lpArg2);
 
 LPWSTR QuotateFilenameStr(LPWSTR lpFile);

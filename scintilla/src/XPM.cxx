@@ -282,7 +282,7 @@ void RGBAImageSet::Clear() noexcept {
 void RGBAImageSet::Add(int ident, RGBAImage *image) {
 	const auto it = images.find(ident);
 	if (it == images.end()) {
-		images.insert(std::make_pair(ident, std::unique_ptr<RGBAImage>(image)));
+		images.emplace(ident, image);
 	} else {
 		it->second.reset(image);
 	}
