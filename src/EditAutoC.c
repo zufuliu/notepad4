@@ -609,7 +609,7 @@ label_show_word_list:
 		SendMessage(hwnd, SCI_AUTOCSETORDER, SC_ORDER_PRESORTED, 0); // pre-sorted
 		SendMessage(hwnd, SCI_AUTOCSETIGNORECASE, 1, 0); // case insensitive
 		SendMessage(hwnd, SCI_AUTOCSETSEPARATOR, '\n', 0);
-		SendMessage(hwnd, SCI_AUTOCSETFILLUPS, 0, (LPARAM)" \t\n\r;,:!?^&*([<>]){}\\/\"\'");
+		SendMessage(hwnd, SCI_AUTOCSETFILLUPS, 0, (LPARAM)" \t\n\r;,([]){}\\/");
 		SendMessage(hwnd, SCI_AUTOCSETCHOOSESINGLE, 0, 0);
 		//SendMessage(hwnd, SCI_AUTOCSETDROPRESTOFWORD, 1, 0); // delete orginal text: pRoot
 		maxWordLength <<= 1;
