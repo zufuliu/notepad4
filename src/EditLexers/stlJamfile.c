@@ -27,7 +27,6 @@ static KEYWORDLIST Keywords_JAM = {{
 , "", "", "", "", "", "", ""
 }};
 
-GCC_NO_WARNING_MISSING_BRACES_BEGIN
 
 EDITLEXER lexJAM = { SCLEX_CPP, NP2LEX_JAM, EDITLEXER_HOLE(L"Jamfile"), L"jam", &Keywords_JAM,
 {
@@ -43,4 +42,3 @@ EDITLEXER lexJAM = { SCLEX_CPP, NP2LEX_JAM, EDITLEXER_HOLE(L"Jamfile"), L"jam", 
 }
 };
 
-GCC_NO_WARNING_MISSING_BRACES_END

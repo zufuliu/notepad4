@@ -64,7 +64,6 @@ static KEYWORDLIST Keywords_PS1 = {{
 , "", "", "", "", "", "", ""
 }};
 
-GCC_NO_WARNING_MISSING_BRACES_BEGIN
 
 EDITLEXER lexPS1 = { SCLEX_POWERSHELL, NP2LEX_PS1, EDITLEXER_HOLE(L"PowerShell Script"), L"ps1; psc1; psd1; psm1", &Keywords_PS1,
 {
@@ -81,4 +80,3 @@ EDITLEXER lexPS1 = { SCLEX_POWERSHELL, NP2LEX_PS1, EDITLEXER_HOLE(L"PowerShell S
 }
 };
 
-GCC_NO_WARNING_MISSING_BRACES_END

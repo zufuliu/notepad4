@@ -41,7 +41,6 @@ static KEYWORDLIST Keywords_RC = {{
 "defined() code_page() __has_include() "
 }};
 
-GCC_NO_WARNING_MISSING_BRACES_BEGIN
 
 EDITLEXER lexRC = { SCLEX_CPP, NP2LEX_RC, EDITLEXER_HOLE(L"Resource Script"), L"rc; rc2; rct; rh; dlg", &Keywords_RC,
 {
@@ -56,4 +55,3 @@ EDITLEXER lexRC = { SCLEX_CPP, NP2LEX_RC, EDITLEXER_HOLE(L"Resource Script"), L"
 }
 };
 
-GCC_NO_WARNING_MISSING_BRACES_END

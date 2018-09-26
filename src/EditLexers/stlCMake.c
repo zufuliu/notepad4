@@ -39,7 +39,6 @@ static KEYWORDLIST Keywords_CMake = {{
 , "", "", "", "", "", "", ""
 }};
 
-GCC_NO_WARNING_MISSING_BRACES_BEGIN
 
 EDITLEXER lexCMake = { SCLEX_CMAKE, NP2LEX_CMAKE, EDITLEXER_HOLE(L"CMake Script"), L"cmake; ctest", &Keywords_CMake,
 {
@@ -57,4 +56,3 @@ EDITLEXER lexCMake = { SCLEX_CMAKE, NP2LEX_CMAKE, EDITLEXER_HOLE(L"CMake Script"
 }
 };
 
-GCC_NO_WARNING_MISSING_BRACES_END

@@ -33,7 +33,6 @@ static KEYWORDLIST Keywords_Go = {{
 , "", "", "", "", "", "", ""
 }};
 
-GCC_NO_WARNING_MISSING_BRACES_BEGIN
 
 EDITLEXER lexGo = { SCLEX_CPP, NP2LEX_GO, EDITLEXER_HOLE(L"Go Source"), L"go", &Keywords_Go,
 {
@@ -53,4 +52,3 @@ EDITLEXER lexGo = { SCLEX_CPP, NP2LEX_GO, EDITLEXER_HOLE(L"Go Source"), L"go", &
 }
 };
 
-GCC_NO_WARNING_MISSING_BRACES_END

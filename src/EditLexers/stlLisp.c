@@ -13,7 +13,6 @@ static KEYWORDLIST Keywords_LISP = {{
 "", "", "", "", "", "", "", ""
 }};
 
-GCC_NO_WARNING_MISSING_BRACES_BEGIN
 
 EDITLEXER lexLisp = { SCLEX_LISP, NP2LEX_LISP, EDITLEXER_HOLE(L"Lisp Script"), L"lisp; el; lsp; clj; cljs", &Keywords_LISP,
 {
@@ -27,4 +26,3 @@ EDITLEXER lexLisp = { SCLEX_LISP, NP2LEX_LISP, EDITLEXER_HOLE(L"Lisp Script"), L
 }
 };
 
-GCC_NO_WARNING_MISSING_BRACES_END

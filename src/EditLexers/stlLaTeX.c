@@ -9,7 +9,6 @@ static KEYWORDLIST Keywords_TEX = {{
 , "", "", "", "", "", "", ""
 }};
 
-GCC_NO_WARNING_MISSING_BRACES_BEGIN
 
 EDITLEXER lexLaTeX = { SCLEX_LATEX, NP2LEX_LATEX, EDITLEXER_HOLE(L"LaTeX File"), L"tex; latex; sty; cls; tpx; bbl; bib; ltx; dtx; ins; toc; info", &Keywords_TEX,
 {
@@ -32,7 +31,6 @@ EDITLEXER lexLaTeX = { SCLEX_LATEX, NP2LEX_LATEX, EDITLEXER_HOLE(L"LaTeX File"),
 }
 };
 
-GCC_NO_WARNING_MISSING_BRACES_END
 
 // https://www.gnu.org/software/texinfo/
 
@@ -65,7 +63,6 @@ static KEYWORDLIST Keywords_TEXI = {{
 , "", "", "", "", "", "", ""
 }};
 
-GCC_NO_WARNING_MISSING_BRACES_BEGIN
 
 EDITLEXER lexTexinfo = { SCLEX_TEXINFO, NP2LEX_TEXINFO, EDITLEXER_HOLE(L"Texinfo File"), L"texi; texinfo; txi", &Keywords_TEXI,
 {
@@ -81,4 +78,3 @@ EDITLEXER lexTexinfo = { SCLEX_TEXINFO, NP2LEX_TEXINFO, EDITLEXER_HOLE(L"Texinfo
 }
 };
 
-GCC_NO_WARNING_MISSING_BRACES_END

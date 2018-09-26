@@ -23,7 +23,6 @@ static KEYWORDLIST Keywords_Ruby = {{
 , "", "", "", "", "", "", ""
 }};
 
-GCC_NO_WARNING_MISSING_BRACES_BEGIN
 
 EDITLEXER lexRuby = { SCLEX_RUBY, NP2LEX_RUBY, EDITLEXER_HOLE(L"Ruby Script"), L"rb; ruby; rbw; rake; rjs; podspec", &Keywords_Ruby,
 {
@@ -47,4 +46,3 @@ EDITLEXER lexRuby = { SCLEX_RUBY, NP2LEX_RUBY, EDITLEXER_HOLE(L"Ruby Script"), L
 }
 };
 
-GCC_NO_WARNING_MISSING_BRACES_END

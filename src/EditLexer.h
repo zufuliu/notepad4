@@ -21,10 +21,7 @@
 #define MAX_EDITSTYLE_NAME_SIZE		128
 
 typedef struct _editstyle {
-	union {
-		const INT32 iStyle;
-		const UINT8 iStyle8[4];
-	};
+	const INT32 iStyle;
 	const int rid;
 	struct {
 		const int iNameLen;
@@ -35,8 +32,8 @@ typedef struct _editstyle {
 } EDITSTYLE, *PEDITSTYLE;
 
 #define EDITSTYLE_HOLE(name)	{ CSTRLEN(name), (name), NULL }
-#define EDITSTYLE_DEFAULT 		{ { STYLE_DEFAULT }, NP2STYLE_Default, EDITSTYLE_HOLE(L"Default"), L"" }
-#define EDITSTYLE_SENTINEL 		{ { -1 }, 0, { 0, NULL, NULL }, NULL }
+#define EDITSTYLE_DEFAULT 		{ STYLE_DEFAULT, NP2STYLE_Default, EDITSTYLE_HOLE(L"Default"), L"" }
+#define EDITSTYLE_SENTINEL 		{ 0, 0, { 0, NULL, NULL }, NULL }
 
 // Not used by Scintilla lexer, listed for auto completion.
 #define KeywordAttr_NoLexer		1

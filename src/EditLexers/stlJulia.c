@@ -33,7 +33,6 @@ static KEYWORDLIST Keywords_Julia = {{
 , "", "", "", "", "", "", ""
 }};
 
-GCC_NO_WARNING_MISSING_BRACES_BEGIN
 
 EDITLEXER lexJulia = { SCLEX_MATLAB, NP2LEX_JULIA, EDITLEXER_HOLE(L"Julia Script"), L"jl", &Keywords_Julia,
 {
@@ -56,4 +55,3 @@ EDITLEXER lexJulia = { SCLEX_MATLAB, NP2LEX_JULIA, EDITLEXER_HOLE(L"Julia Script
 }
 };
 
-GCC_NO_WARNING_MISSING_BRACES_END

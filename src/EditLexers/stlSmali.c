@@ -118,7 +118,6 @@ static KEYWORDLIST Keywords_Smail = {{
 , "", "", "", ""
 }};
 
-GCC_NO_WARNING_MISSING_BRACES_BEGIN
 
 EDITLEXER lexSmali = { SCLEX_SMALI, NP2LEX_SMALI, EDITLEXER_HOLE(L"Android Smali"), L"smali; ddx", &Keywords_Smail,
 {
@@ -139,4 +138,3 @@ EDITLEXER lexSmali = { SCLEX_SMALI, NP2LEX_SMALI, EDITLEXER_HOLE(L"Android Smali
 }
 };
 
-GCC_NO_WARNING_MISSING_BRACES_END

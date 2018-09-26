@@ -99,7 +99,6 @@ static KEYWORDLIST Keywords_Gradle = {{
 "java&{} resources^{}"
 }};
 
-GCC_NO_WARNING_MISSING_BRACES_BEGIN
 
 EDITLEXER lexGradle = { SCLEX_CPP, NP2LEX_GRADLE, EDITLEXER_HOLE(L"Gradle Build Script"), L"gradle", &Keywords_Gradle,
 {
@@ -126,4 +125,3 @@ EDITLEXER lexGradle = { SCLEX_CPP, NP2LEX_GRADLE, EDITLEXER_HOLE(L"Gradle Build 
 }
 };
 
-GCC_NO_WARNING_MISSING_BRACES_END

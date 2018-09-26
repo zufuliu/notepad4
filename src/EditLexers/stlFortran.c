@@ -16,7 +16,6 @@ static KEYWORDLIST Keywords_Fortran = {{
 , "", "", "", "", "", "", ""
 }};
 
-GCC_NO_WARNING_MISSING_BRACES_BEGIN
 
 EDITLEXER lexFortran = { SCLEX_FORTRAN, NP2LEX_FORTRAN, EDITLEXER_HOLE(L"Fortran Source"), L"f; for; ftn; fpp; f90; f95; f03; f08; hf", &Keywords_Fortran,
 {
@@ -32,4 +31,3 @@ EDITLEXER lexFortran = { SCLEX_FORTRAN, NP2LEX_FORTRAN, EDITLEXER_HOLE(L"Fortran
 }
 };
 
-GCC_NO_WARNING_MISSING_BRACES_END

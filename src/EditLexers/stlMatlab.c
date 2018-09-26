@@ -37,7 +37,6 @@ static KEYWORDLIST Keywords_Matlab = {{
 , "", "", "", "", "", "", ""
 }};
 
-GCC_NO_WARNING_MISSING_BRACES_BEGIN
 
 EDITLEXER lexMatlab = { SCLEX_MATLAB, NP2LEX_MATLAB, EDITLEXER_HOLE(L"MATLAB Code"), L"m; sce; sci", &Keywords_Matlab,
 {
@@ -56,4 +55,3 @@ EDITLEXER lexMatlab = { SCLEX_MATLAB, NP2LEX_MATLAB, EDITLEXER_HOLE(L"MATLAB Cod
 }
 };
 
-GCC_NO_WARNING_MISSING_BRACES_END
