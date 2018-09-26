@@ -142,7 +142,6 @@ static KEYWORDLIST Keywords_JS = {{
 "for^() if^() switch^() while^() else^if^() else^{} function() "
 }};
 
-GCC_NO_WARNING_MISSING_BRACES_BEGIN
 
 EDITLEXER lexJS = { SCLEX_CPP, NP2LEX_JS, EDITLEXER_HOLE(L"JavaScript"), L"js; jse; jsm", &Keywords_JS,
 {
@@ -165,4 +164,3 @@ EDITLEXER lexJS = { SCLEX_CPP, NP2LEX_JS, EDITLEXER_HOLE(L"JavaScript"), L"js; j
 }
 };
 
-GCC_NO_WARNING_MISSING_BRACES_END

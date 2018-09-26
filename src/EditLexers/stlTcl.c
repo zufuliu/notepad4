@@ -33,7 +33,6 @@ static KEYWORDLIST Keywords_Tcl = {{
 , "", "", "", "", "", "", ""
 }};
 
-GCC_NO_WARNING_MISSING_BRACES_BEGIN
 
 EDITLEXER lexTcl = { SCLEX_TCL, NP2LEX_TCL, EDITLEXER_HOLE(L"Tcl Script"), L"tcl; itcl; tm", &Keywords_Tcl,
 {
@@ -49,4 +48,3 @@ EDITLEXER lexTcl = { SCLEX_TCL, NP2LEX_TCL, EDITLEXER_HOLE(L"Tcl Script"), L"tcl
 }
 };
 
-GCC_NO_WARNING_MISSING_BRACES_END

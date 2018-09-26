@@ -7,7 +7,6 @@ static KEYWORDLIST Keywords_NULL = {{
 , "", "", "", "", "", "", ""
 }};
 
-GCC_NO_WARNING_MISSING_BRACES_BEGIN
 
 EDITLEXER lexDefault = { SCLEX_NULL, NP2LEX_DEFAULT, EDITLEXER_HOLE(L"Default Text"), L"txt; text; wtx; log; asc; doc", &Keywords_NULL,
 {
@@ -95,4 +94,3 @@ EDITLEXER lexDIFF = { SCLEX_DIFF, NP2LEX_DIFF, EDITLEXER_HOLE(L"Diff File"), L"d
 }
 };
 
-GCC_NO_WARNING_MISSING_BRACES_END

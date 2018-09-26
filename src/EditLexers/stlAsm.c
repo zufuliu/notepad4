@@ -157,7 +157,6 @@ static KEYWORDLIST Keywords_ASM = {{
 , "", "", "", "", "", ""
 }};
 
-GCC_NO_WARNING_MISSING_BRACES_BEGIN
 
 EDITLEXER lexASM = { SCLEX_ASM, NP2LEX_ASM, EDITLEXER_HOLE(L"Assembler Source"), L"asm; s; sx; inc; a51", &Keywords_ASM,
 {
@@ -178,4 +177,3 @@ EDITLEXER lexASM = { SCLEX_ASM, NP2LEX_ASM, EDITLEXER_HOLE(L"Assembler Source"),
 }
 };
 
-GCC_NO_WARNING_MISSING_BRACES_END

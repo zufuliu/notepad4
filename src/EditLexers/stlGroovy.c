@@ -42,7 +42,6 @@ static KEYWORDLIST Keywords_Groovy = {{
 "def^() "
 }};
 
-GCC_NO_WARNING_MISSING_BRACES_BEGIN
 
 EDITLEXER lexGroovy = { SCLEX_CPP, NP2LEX_GROOVY, EDITLEXER_HOLE(L"Groovy Script"), L"groovy; gvy; gy; gsh; gpp; grunit", &Keywords_Groovy,
 {
@@ -68,4 +67,3 @@ EDITLEXER lexGroovy = { SCLEX_CPP, NP2LEX_GROOVY, EDITLEXER_HOLE(L"Groovy Script
 }
 };
 
-GCC_NO_WARNING_MISSING_BRACES_END

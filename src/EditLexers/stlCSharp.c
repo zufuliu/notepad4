@@ -69,7 +69,6 @@ static KEYWORDLIST Keywords_CSharp = {{
 "base() this() checked() default() delegate() nameof()"
 }};
 
-GCC_NO_WARNING_MISSING_BRACES_BEGIN
 
 EDITLEXER lexCSharp = { SCLEX_CPP, NP2LEX_CSHARP, EDITLEXER_HOLE(L"C# Source"), L"cs; csx; vala", &Keywords_CSharp,
 {
@@ -97,4 +96,3 @@ EDITLEXER lexCSharp = { SCLEX_CPP, NP2LEX_CSHARP, EDITLEXER_HOLE(L"C# Source"), 
 }
 };
 
-GCC_NO_WARNING_MISSING_BRACES_END

@@ -29,7 +29,6 @@ static KEYWORDLIST Keywords_FSharp = {{
 , "", "", "", "", "", "", ""
 }};
 
-GCC_NO_WARNING_MISSING_BRACES_BEGIN
 
 EDITLEXER lexFSharp = { SCLEX_FSHARP, NP2LEX_FSHARP, EDITLEXER_HOLE(L"F# Source"), L"fs; fsi; fsx; fsscript; fsl; fsy; ml; mli; sml; nb", &Keywords_FSharp,
 {
@@ -48,4 +47,3 @@ EDITLEXER lexFSharp = { SCLEX_FSHARP, NP2LEX_FSHARP, EDITLEXER_HOLE(L"F# Source"
 }
 };
 
-GCC_NO_WARNING_MISSING_BRACES_END

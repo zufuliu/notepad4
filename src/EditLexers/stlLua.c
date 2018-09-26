@@ -38,7 +38,6 @@ static KEYWORDLIST Keywords_Lua = {{
 , "", "", "", "", "", "", ""
 }};
 
-GCC_NO_WARNING_MISSING_BRACES_BEGIN
 
 EDITLEXER lexLua = { SCLEX_LUA, NP2LEX_LUA, EDITLEXER_HOLE(L"Lua Script"), L"lua; wlua; nse; luadoc; luax", &Keywords_Lua,
 {
@@ -57,4 +56,3 @@ EDITLEXER lexLua = { SCLEX_LUA, NP2LEX_LUA, EDITLEXER_HOLE(L"Lua Script"), L"lua
 }
 };
 
-GCC_NO_WARNING_MISSING_BRACES_END

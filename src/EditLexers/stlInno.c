@@ -50,7 +50,6 @@ static KEYWORDLIST Keywords_INNO = {{
 , "", "", "", "", "", "", ""
 }};
 
-GCC_NO_WARNING_MISSING_BRACES_BEGIN
 
 EDITLEXER lexINNO = { SCLEX_INNOSETUP, NP2LEX_INNO, EDITLEXER_HOLE(L"Inno Setup Script"), L"iss; isl; islu", &Keywords_INNO,
 {
@@ -70,4 +69,3 @@ EDITLEXER lexINNO = { SCLEX_INNOSETUP, NP2LEX_INNO, EDITLEXER_HOLE(L"Inno Setup 
 }
 };
 
-GCC_NO_WARNING_MISSING_BRACES_END

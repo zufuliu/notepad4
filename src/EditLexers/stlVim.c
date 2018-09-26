@@ -18,7 +18,6 @@ static KEYWORDLIST Keywords_VIM = {{
 "", "", "", "", "", "", "", ""
 }};
 
-GCC_NO_WARNING_MISSING_BRACES_BEGIN
 
 EDITLEXER lexVim = { SCLEX_VIM, NP2LEX_VIM, EDITLEXER_HOLE(L"Vim Script"), L"vim", &Keywords_VIM,
 {
@@ -32,4 +31,3 @@ EDITLEXER lexVim = { SCLEX_VIM, NP2LEX_VIM, EDITLEXER_HOLE(L"Vim Script"), L"vim
 }
 };
 
-GCC_NO_WARNING_MISSING_BRACES_END

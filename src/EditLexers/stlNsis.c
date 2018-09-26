@@ -23,7 +23,6 @@ static KEYWORDLIST Keywords_NSIS = {{
 , "", "", "", "", "", "", ""
 }};
 
-GCC_NO_WARNING_MISSING_BRACES_BEGIN
 
 EDITLEXER lexNsis = { SCLEX_NSIS, NP2LEX_NSIS, EDITLEXER_HOLE(L"Nsis Setup Script"), L"nsi; nsh", &Keywords_NSIS,
 {
@@ -40,4 +39,3 @@ EDITLEXER lexNsis = { SCLEX_NSIS, NP2LEX_NSIS, EDITLEXER_HOLE(L"Nsis Setup Scrip
 }
 };
 
-GCC_NO_WARNING_MISSING_BRACES_END

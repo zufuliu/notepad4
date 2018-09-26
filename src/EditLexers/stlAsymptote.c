@@ -36,7 +36,6 @@ static KEYWORDLIST Keywords_ASY = {{
 "for^() if^() while^() else^if^() else^{} "
 }};
 
-GCC_NO_WARNING_MISSING_BRACES_BEGIN
 
 EDITLEXER lexASY = { SCLEX_CPP, NP2LEX_ASY, EDITLEXER_HOLE(L"Asymptote Code"), L"asy", &Keywords_ASY,
 {
@@ -53,4 +52,3 @@ EDITLEXER lexASY = { SCLEX_CPP, NP2LEX_ASY, EDITLEXER_HOLE(L"Asymptote Code"), L
 }
 };
 
-GCC_NO_WARNING_MISSING_BRACES_END
