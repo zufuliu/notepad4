@@ -1201,9 +1201,9 @@ void Style_SetLexer(HWND hwnd, PEDITLEXER pLexNew) {
 	// Save current lexer
 	pLexCurrent = pLexNew;
 	UpdateStatusBarCache(STATUS_LEXER);
-	UpdateStatusbar();
 	UpdateLineNumberWidth();
 	UpdateFoldMarginWidth();
+	UpdateStatusbar();
 }
 
 //=============================================================================

@@ -892,15 +892,6 @@ void DeleteBitmapButton(HWND hwnd, int nCtlId) {
 
 //=============================================================================
 //
-// StatusSetText()
-//
-BOOL StatusSetText(HWND hwnd, UINT nPart, LPCWSTR lpszText) {
-	UINT uFlags = (nPart == 255) ? nPart | SBT_NOBORDERS : nPart;
-	return (BOOL)SendMessage(hwnd, SB_SETTEXT, uFlags, (LPARAM)lpszText);
-}
-
-//=============================================================================
-//
 // SendWMSize()
 //
 LRESULT SendWMSize(HWND hwnd) {
@@ -915,18 +906,17 @@ LRESULT SendWMSize(HWND hwnd) {
 //
 BOOL StatusSetTextID(HWND hwnd, UINT nPart, UINT uID) {
 	WCHAR szText[256];
-	UINT uFlags = (nPart == 255) ? nPart | SBT_NOBORDERS : nPart;
 
 	if (!uID) {
-		SendMessage(hwnd, SB_SETTEXT, uFlags, 0);
+		SendMessage(hwnd, SB_SETTEXT, nPart, 0);
 		return TRUE;
 	}
 
-	if (!GetString(uID, szText, 256)) {
+	if (!GetString(uID, szText, COUNTOF(szText))) {
 		return FALSE;
 	}
 
-	return (BOOL)SendMessage(hwnd, SB_SETTEXT, uFlags, (LPARAM)szText);
+	return (BOOL)SendMessage(hwnd, SB_SETTEXT, nPart, (LPARAM)szText);
 }
 
 //=============================================================================

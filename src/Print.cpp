@@ -27,6 +27,7 @@
 extern "C" {
 #include "Dialogs.h"
 #include "Helpers.h"
+#include "Notepad2.h"
 }
 #include "resource.h"
 
@@ -54,7 +55,7 @@ void StatusUpdatePrintPage(int iPageNum) noexcept {
 
 	FormatString(tch, COUNTOF(tch), IDS_PRINTFILE, iPageNum);
 
-	StatusSetText(hwndStatus, 255, tch);
+	StatusSetText(hwndStatus, STATUS_HELP, tch);
 	StatusSetSimple(hwndStatus, TRUE);
 
 	InvalidateRect(hwndStatus, nullptr, TRUE);

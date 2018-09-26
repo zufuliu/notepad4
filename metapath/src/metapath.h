@@ -77,7 +77,7 @@
 
 //==== Statusbar ==============================================================
 #define ID_FILEINFO   0
-#define ID_MENUHELP 255
+#define ID_MENUHELP (255 | SBT_NOBORDERS)
 
 //==== Timer for Change Notifications =========================================
 #define ID_TIMER 0xA000

@@ -282,7 +282,7 @@ void DeleteBitmapButton(HWND hwnd, int nCtlId);
 void SetWindowTransparentMode(HWND hwnd, BOOL bTransparentMode);
 
 #define StatusSetSimple(hwnd,b) SendMessage(hwnd, SB_SIMPLE, (WPARAM)(b), 0)
-BOOL StatusSetText(HWND hwnd, UINT nPart, LPCWSTR lpszText);
+#define StatusSetText(hwnd, nPart, lpszText)	SendMessage(hwnd, SB_SETTEXT, (nPart), (LPARAM)(lpszText))
 
 /**
  * we only have 14 commands in toolbar
