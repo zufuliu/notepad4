@@ -484,15 +484,6 @@ void SetWindowTransparentMode(HWND hwnd, BOOL bTransparentMode) {
 
 //=============================================================================
 //
-//  StatusSetText()
-//
-BOOL StatusSetText(HWND hwnd, UINT nPart, LPCWSTR lpszText) {
-	UINT uFlags = (nPart == 255) ? nPart | SBT_NOBORDERS : nPart;
-	return (BOOL)SendMessage(hwnd, SB_SETTEXT, uFlags, (LPARAM)lpszText);
-}
-
-//=============================================================================
-//
 //  Toolbar_Get/SetButtons()
 //
 int Toolbar_GetButtons(HWND hwnd, int cmdBase, LPWSTR lpszButtons, int cchButtons) {

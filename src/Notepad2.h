@@ -75,7 +75,7 @@ typedef struct np2params {
 #define STATUS_OVRMODE		4
 #define STATUS_DOCSIZE		5
 #define STATUS_DOCZOOM		6
-#define STATUS_HELP			255
+#define STATUS_HELP			(255 | SBT_NOBORDERS)
 
 //==== Change Notifications ===================================================
 #define ID_WATCHTIMER		0xA000

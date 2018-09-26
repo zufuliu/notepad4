@@ -5,7 +5,7 @@ git clone https://github.com/XhmikosR/notepad2-mod.git
 Scintilla
 hg clone http://hg.code.sf.net/p/scintilla/code scintilla
 4.1.1
-2018-09-24 7095:58524eea6d35
+2018-09-26 7096:60dee13d68b2
 
 SciTE
 hg clone http://hg.code.sf.net/p/scintilla/scite

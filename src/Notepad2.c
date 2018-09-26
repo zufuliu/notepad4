@@ -923,7 +923,6 @@ HWND InitInstance(HINSTANCE hInstance, int nCmdShow) {
 	UpdateStatusBarCache(STATUS_OVRMODE);
 	UpdateStatusBarCache(STATUS_DOCZOOM);
 	UpdateToolbar();
-	UpdateStatusbar();
 
 	return hwndMain;
 }
@@ -3159,7 +3158,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case IDM_EDIT_SORTLINES:
 		if (EditSortDlg(hwnd, &iSortOptions)) {
 			BeginWaitCursor();
-			StatusSetText(hwndStatus, 255, L"...");
+			StatusSetText(hwndStatus, STATUS_HELP, L"...");
 			StatusSetSimple(hwndStatus, TRUE);
 			InvalidateRect(hwndStatus, NULL, TRUE);
 			UpdateWindow(hwndStatus);
@@ -6665,8 +6664,6 @@ int CreateIniFileEx(LPCWSTR lpszIniFile) {
 #define CheckTool(id, b)		SendMessage(hwndToolbar, TB_CHECKBUTTON, id, MAKELONG(b, 0))
 
 void UpdateToolbar(void) {
-	int i;
-
 	if (!bShowToolbar) {
 		return;
 	}
@@ -6676,7 +6673,7 @@ void UpdateToolbar(void) {
 	EnableTool(IDT_EDIT_UNDO, SendMessage(hwndEdit, SCI_CANUNDO, 0, 0) /*&& !bReadOnly*/);
 	EnableTool(IDT_EDIT_REDO, SendMessage(hwndEdit, SCI_CANREDO, 0, 0) /*&& !bReadOnly*/);
 
-	i = !EditIsEmptySelection();
+	int i = !EditIsEmptySelection();
 	EnableTool(IDT_EDIT_CUT, i /*&& !bReadOnly*/);
 	i = (int)SendMessage(hwndEdit, SCI_GETLENGTH, 0, 0);
 	EnableTool(IDT_EDIT_COPY, i);
@@ -6700,6 +6697,10 @@ void UpdateToolbar(void) {
 //
 //
 void UpdateStatusbar(void) {
+	if (!bShowStatusbar) {
+		return;
+	}
+
 	WCHAR tchLn[32];
 	WCHAR tchLines[32];
 	WCHAR tchCol[32];
@@ -6717,10 +6718,6 @@ void UpdateStatusbar(void) {
 	WCHAR tchLinesSelected[32];
 	WCHAR tchMatchesCount[32];
 #endif
-
-	if (!bShowStatusbar) {
-		return;
-	}
 
 	int iPos =  SciCall_GetCurrentPos();
 
