@@ -1467,27 +1467,24 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	break;
 
 	case IDM_FILE_SAVEAS: {
-		DLITEM dli;
-		OPENFILENAME ofn;
-		WCHAR szNewFile[MAX_PATH];
-		WCHAR tch[MAX_PATH];
-		WCHAR szFilter[128];
-		BOOL bSuccess = FALSE;
-
 		if (!DirList_IsFileSelected(hwndDirList)) {
 			MessageBeep(0);
 			return 0;
 		}
 
+		DLITEM dli;
 		dli.mask = DLI_ALL;
 		if (DirList_GetItem(hwndDirList, -1, &dli) == -1) {
 			break;
 		}
 
+		WCHAR szNewFile[MAX_PATH];
 		lstrcpy(szNewFile, dli.szFileName);
+		WCHAR szFilter[128];
 		GetString(IDS_FILTER_ALL, szFilter, COUNTOF(szFilter));
 		PrepareFilterStr(szFilter);
 
+		OPENFILENAME ofn;
 		ZeroMemory(&ofn, sizeof(OPENFILENAME));
 
 		ofn.lStructSize = sizeof(OPENFILENAME);
@@ -1505,13 +1502,15 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 		BeginWaitCursor();
 
-		FormatString(tch, COUNTOF(tch), IDS_SAVEFILE, dli.szDisplayName);
+		WCHAR tch[MAX_PATH];
+		WCHAR fmt[64];
+		FormatString(tch, fmt, COUNTOF(fmt), IDS_SAVEFILE, dli.szDisplayName);
 		StatusSetText(hwndStatus, ID_MENUHELP, tch);
 		StatusSetSimple(hwndStatus, TRUE);
 		InvalidateRect(hwndStatus, NULL, TRUE);
 		UpdateWindow(hwndStatus);
 
-		bSuccess = CopyFile(dli.szFileName, szNewFile, FALSE);
+		const BOOL bSuccess = CopyFile(dli.szFileName, szNewFile, FALSE);
 
 		if (!bSuccess) {
 			ErrorMessage(2, IDS_ERR_SAVEAS1, dli.szDisplayName);
@@ -2214,9 +2213,10 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 					wsprintf(tch, L"%s | %s %s | %s", tchsize, tchdate, tchtime, tchattr);
 				} else {
 					WCHAR tchnum[64];
+					WCHAR fmt[32];
 					wsprintf(tchnum, L"%i", ListView_GetItemCount(hwndDirList));
 					FormatNumberStr(tchnum);
-					FormatString(tch, COUNTOF(tch),
+					FormatString(tch, fmt, COUNTOF(fmt),
 								 (!StrEqual(tchFilter, L"*.*") || bNegFilter) ? IDS_NUMFILES2 : IDS_NUMFILES, tchnum);
 				}
 
@@ -2392,7 +2392,8 @@ BOOL ChangeDirectory(HWND hwnd, LPCWSTR lpszNewDir, BOOL bUpdateHistory) {
 
 		wsprintf(tchnum, L"%d", cItems);
 		FormatNumberStr(tchnum);
-		FormatString(tch, COUNTOF(tch),
+		WCHAR fmt[32];
+		FormatString(tch, fmt, COUNTOF(fmt),
 					 (!StrEqual(tchFilter, L"*.*") || bNegFilter) ? IDS_NUMFILES2 : IDS_NUMFILES, tchnum);
 		StatusSetText(hwndStatus, ID_FILEINFO, tch);
 

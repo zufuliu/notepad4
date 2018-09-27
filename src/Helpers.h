@@ -399,7 +399,7 @@ BOOL IsCmdEnabled(HWND hwnd, UINT uId);
 #define GetString(id, pb, cb)	LoadString(g_hInstance, id, pb, cb)
 #define StrEnd(pStart)			((pStart) + lstrlen(pStart))
 
-int FormatString(LPWSTR lpOutput, int nOutput, UINT uIdFormat, ...);
+void FormatString(LPWSTR lpOutput, LPWSTR lpFormat, int nFormat, UINT uIdFormat, ...);
 
 void PathRelativeToApp(LPCWSTR lpszSrc, LPWSTR lpszDest, int cchDest,
 					   BOOL bSrcIsFile, BOOL bUnexpandEnv, BOOL bUnexpandMyDocs);
@@ -428,7 +428,7 @@ DWORD	GetLongPathNameEx(LPWSTR lpszPath, DWORD cchBuffer);
 DWORD_PTR SHGetFileInfo2(LPCWSTR pszPath, DWORD dwFileAttributes,
 						 SHFILEINFO *psfi, UINT cbFileInfo, UINT uFlags);
 
-int		FormatNumberStr(LPWSTR lpNumberStr);
+void	FormatNumberStr(LPWSTR lpNumberStr);
 BOOL	SetDlgItemIntEx(HWND hwnd, int nIdItem, UINT uValue);
 
 UINT	GetDlgItemTextA2W(UINT uCP, HWND hDlg, int nIDDlgItem, LPSTR lpString, int nMaxCount);

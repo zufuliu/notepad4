@@ -519,7 +519,8 @@ BOOL SetWindowTitle(HWND hwnd, UINT uIDAppName, BOOL bIsElevated, UINT uIDUntitl
 
 	if (bIsElevated) {
 		WCHAR szElevatedAppName[128];
-		FormatString(szElevatedAppName, COUNTOF(szElevatedAppName), IDS_APPTITLE_ELEVATED, szAppName);
+		WCHAR fmt[64];
+		FormatString(szElevatedAppName, fmt, COUNTOF(fmt), IDS_APPTITLE_ELEVATED, szAppName);
 		StrCpyN(szAppName, szElevatedAppName, COUNTOF(szAppName));
 	}
 
@@ -1016,18 +1017,13 @@ BOOL IsCmdEnabled(HWND hwnd, UINT uId) {
 //
 // FormatString()
 //
-int FormatString(LPWSTR lpOutput, int nOutput, UINT uIdFormat, ...) {
-	WCHAR *p = NP2HeapAlloc(sizeof(WCHAR) * nOutput);
-
-	if (GetString(uIdFormat, p, nOutput)) {
+void FormatString(LPWSTR lpOutput, LPWSTR lpFormat, int nFormat, UINT uIdFormat, ...) {
+	if (GetString(uIdFormat, lpFormat, nFormat)) {
 		va_list va;
 		va_start(va, uIdFormat);
-		wvsprintf(lpOutput, p, va);
+		wvsprintf(lpOutput, lpFormat, va);
 		va_end(va);
 	}
-
-	NP2HeapFree(p);
-	return lstrlen(lpOutput);
 }
 
 //=============================================================================
@@ -1485,21 +1481,19 @@ DWORD_PTR SHGetFileInfo2(LPCWSTR pszPath, DWORD dwFileAttributes, SHFILEINFO *ps
 //
 // FormatNumberStr()
 //
-int FormatNumberStr(LPWSTR lpNumberStr) {
-	WCHAR *c;
-	WCHAR szSep[8];
-	int	 i = 0;
-
-	if (StrIsEmpty(lpNumberStr)) {
-		return 0;
+void FormatNumberStr(LPWSTR lpNumberStr) {
+	int	i = lstrlen(lpNumberStr);
+	if (i <= 3) {
+		return;
 	}
 
+	WCHAR szSep[8];
 	if (!GetLocaleInfo(LOCALE_USER_DEFAULT, LOCALE_STHOUSAND, szSep, COUNTOF(szSep))) {
 		szSep[0] = L'\'';
 	}
 
-	c = StrEnd(lpNumberStr);
-
+	WCHAR *c = lpNumberStr + i;
+	i = 0;
 	while ((c = CharPrev(lpNumberStr, c)) != lpNumberStr) {
 		if (++i == 3) {
 			i = 0;
@@ -1507,8 +1501,6 @@ int FormatNumberStr(LPWSTR lpNumberStr) {
 			*c = szSep[0];
 		}
 	}
-
-	return lstrlen(lpNumberStr);
 }
 
 //=============================================================================
@@ -1705,7 +1697,7 @@ int MRU_Enum(LPMRULIST pmru, int iIndex, LPWSTR pszItem, int cchItem) {
 		return -1;
 	}
 	lstrcpyn(pszItem, pmru->pszItems[iIndex], cchItem);
-	return lstrlen(pszItem);
+	return TRUE;
 }
 
 BOOL MRU_Load(LPMRULIST pmru) {
