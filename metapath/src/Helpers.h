@@ -304,7 +304,7 @@ LRESULT SendWMSize(HWND hwnd);
 #define GetString(id, pb, cb)	LoadString(g_hInstance, id, pb, cb)
 #define StrEnd(pStart)			((pStart) + lstrlen(pStart))
 
-int FormatString(LPWSTR lpOutput, int nOutput, UINT uIdFormat, ...);
+void FormatString(LPWSTR lpOutput, LPWSTR lpFormat, int nFormat, UINT uIdFormat, ...);
 
 void PathRelativeToApp(LPCWSTR lpszSrc, LPWSTR lpszDest, int cchDest, BOOL bSrcIsFile,
 					   BOOL bUnexpandEnv, BOOL bUnexpandMyDocs);
@@ -331,7 +331,7 @@ void ExpandEnvironmentStringsEx(LPWSTR lpSrc, DWORD dwSrc);
 void PathCanonicalizeEx(LPWSTR lpSrc);
 DWORD SearchPathEx(LPCWSTR lpPath, LPCWSTR lpFileName, LPCWSTR lpExtension,
 				   DWORD nBufferLength, LPWSTR lpBuffer, LPWSTR *lpFilePart);
-int  FormatNumberStr(LPWSTR lpNumberStr);
+void FormatNumberStr(LPWSTR lpNumberStr);
 
 void GetDefaultFavoritesDir(LPWSTR lpFavDir, int cchFavDir);
 void GetDefaultOpenWithDir(LPWSTR lpOpenWithDir, int cchOpenWithDir);
