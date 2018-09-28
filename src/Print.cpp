@@ -54,7 +54,7 @@ void StatusUpdatePrintPage(int iPageNum) noexcept {
 	WCHAR tch[32];
 	WCHAR fmt[32];
 
-	FormatString(tch, fmt, COUNTOF(fmt), IDS_PRINTFILE, iPageNum);
+	FormatString(tch, fmt, IDS_PRINTFILE, iPageNum);
 
 	StatusSetText(hwndStatus, STATUS_HELP, tch);
 	StatusSetSimple(hwndStatus, TRUE);

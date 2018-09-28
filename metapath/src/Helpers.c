@@ -563,19 +563,6 @@ LRESULT SendWMSize(HWND hwnd) {
 
 //=============================================================================
 //
-//  FormatString()
-//
-void FormatString(LPWSTR lpOutput, LPWSTR lpFormat, int nFormat, UINT uIdFormat, ...) {
-	if (GetString(uIdFormat, lpFormat, nFormat)) {
-		va_list va;
-		va_start(va, uIdFormat);
-		wvsprintf(lpOutput, lpFormat, va);
-		va_end(va);
-	}
-}
-
-//=============================================================================
-//
 //  PathRelativeToApp()
 //
 void PathRelativeToApp(LPCWSTR lpszSrc, LPWSTR lpszDest, int cchDest, BOOL bSrcIsFile, BOOL bUnexpandEnv, BOOL bUnexpandMyDocs) {
