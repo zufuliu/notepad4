@@ -1590,7 +1590,6 @@ BEGIN
 //#else
 //    IDS_DOCPOS            "Ln %s / %s  Col %s / %s  Ch %s / %s  Sel %s / %s"
 //#endif
-    //IDS_DOCSIZE             "%s"
     IDS_LOADFILE            "Loading ""%s""..."
     IDS_SAVEFILE            "Saving ""%s""..."
     IDS_PRINTFILE           "Printing page %i..."
