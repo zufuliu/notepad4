@@ -70,6 +70,7 @@
 		* gmake
 		* Borland bmake
 		* qmake (syntax highlighting only)
+		* ninja (syntax highlighting only)
 	* MATLAB, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#matlab-octave)
 		* Octave
 		* Scilab
