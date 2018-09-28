@@ -1504,7 +1504,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 		WCHAR tch[MAX_PATH];
 		WCHAR fmt[64];
-		FormatString(tch, fmt, COUNTOF(fmt), IDS_SAVEFILE, dli.szDisplayName);
+		FormatString(tch, fmt, IDS_SAVEFILE, dli.szDisplayName);
 		StatusSetText(hwndStatus, ID_MENUHELP, tch);
 		StatusSetSimple(hwndStatus, TRUE);
 		InvalidateRect(hwndStatus, NULL, TRUE);
@@ -2216,8 +2216,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 					WCHAR fmt[32];
 					wsprintf(tchnum, L"%i", ListView_GetItemCount(hwndDirList));
 					FormatNumberStr(tchnum);
-					FormatString(tch, fmt, COUNTOF(fmt),
-								 (!StrEqual(tchFilter, L"*.*") || bNegFilter) ? IDS_NUMFILES2 : IDS_NUMFILES, tchnum);
+					FormatString(tch, fmt, (!StrEqual(tchFilter, L"*.*") || bNegFilter) ? IDS_NUMFILES2 : IDS_NUMFILES, tchnum);
 				}
 
 				StatusSetText(hwndStatus, ID_FILEINFO, tch);
@@ -2393,8 +2392,7 @@ BOOL ChangeDirectory(HWND hwnd, LPCWSTR lpszNewDir, BOOL bUpdateHistory) {
 		wsprintf(tchnum, L"%d", cItems);
 		FormatNumberStr(tchnum);
 		WCHAR fmt[32];
-		FormatString(tch, fmt, COUNTOF(fmt),
-					 (!StrEqual(tchFilter, L"*.*") || bNegFilter) ? IDS_NUMFILES2 : IDS_NUMFILES, tchnum);
+		FormatString(tch, fmt, (!StrEqual(tchFilter, L"*.*") || bNegFilter) ? IDS_NUMFILES2 : IDS_NUMFILES, tchnum);
 		StatusSetText(hwndStatus, ID_FILEINFO, tch);
 
 		// Update History

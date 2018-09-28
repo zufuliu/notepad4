@@ -399,7 +399,15 @@ BOOL IsCmdEnabled(HWND hwnd, UINT uId);
 #define GetString(id, pb, cb)	LoadString(g_hInstance, id, pb, cb)
 #define StrEnd(pStart)			((pStart) + lstrlen(pStart))
 
-void FormatString(LPWSTR lpOutput, LPWSTR lpFormat, int nFormat, UINT uIdFormat, ...);
+/**
+ * Variadic Macros
+ * https://gcc.gnu.org/onlinedocs/cpp/Variadic-Macros.html
+ * https://docs.microsoft.com/en-us/cpp/preprocessor/variadic-macros?view=vs-2017
+ */
+#define FormatString(lpOutput, lpFormat, uIdFormat, ...)			\
+	if (GetString((uIdFormat), (lpFormat), COUNTOF(lpFormat))) {	\
+		wsprintf((lpOutput), (lpFormat), __VA_ARGS__);				\
+	}
 
 void PathRelativeToApp(LPCWSTR lpszSrc, LPWSTR lpszDest, int cchDest,
 					   BOOL bSrcIsFile, BOOL bUnexpandEnv, BOOL bUnexpandMyDocs);

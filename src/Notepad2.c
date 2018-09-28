@@ -6711,7 +6711,6 @@ void UpdateStatusbar(void) {
 	WCHAR tchSelCh[32];
 	WCHAR tchDocPos[256];
 
-	//WCHAR tchBytes[32];
 	WCHAR tchDocSize[32];
 
 #ifdef BOOKMARK_EDITION
@@ -6783,18 +6782,17 @@ void UpdateStatusbar(void) {
 	}
 
 	WCHAR tchFmt[96];
-	FormatString(tchDocPos, tchFmt, COUNTOF(tchFmt), IDS_DOCPOS, tchLn, tchLines,
+	FormatString(tchDocPos, tchFmt, IDS_DOCPOS, tchLn, tchLines,
 				 tchCol, tchCols, tchCh, tchChs, tchSelCh, tchSel, tchLinesSelected, tchMatchesCount);
 
 #else
 
 	WCHAR tchFmt[64];
-	FormatString(tchDocPos, tchFmt, COUNTOF(tchFmt), IDS_DOCPOS, tchLn, tchLines, tchCol, tchCols, tchCh, tchChs, tchSelCh, tchSel);
+	FormatString(tchDocPos, tchFmt, IDS_DOCPOS, tchLn, tchLines, tchCol, tchCols, tchCh, tchChs, tchSelCh, tchSel);
 #endif
 
 	const int iBytes = SciCall_GetLength();
 	StrFormatByteSize(iBytes, tchDocSize, COUNTOF(tchDocSize));
-	//FormatString(tchDocSize, COUNTOF(tchDocSize), IDS_DOCSIZE, tchBytes);
 
 	StatusSetText(hwndStatus, STATUS_DOCPOS, tchDocPos);
 	if (cachedStatusItem.lexerNameChanged) {
@@ -6869,7 +6867,7 @@ BOOL FileIO(BOOL fLoad, LPWSTR psz, BOOL bNoEncDetect, int *ienc, int *ieol,
 	BeginWaitCursor();
 
 	WCHAR fmt[64];
-	FormatString(tch, fmt, COUNTOF(fmt), (fLoad) ? IDS_LOADFILE : IDS_SAVEFILE, PathFindFileName(psz));
+	FormatString(tch, fmt, (fLoad) ? IDS_LOADFILE : IDS_SAVEFILE, PathFindFileName(psz));
 
 	StatusSetText(hwndStatus, STATUS_HELP, tch);
 	StatusSetSimple(hwndStatus, TRUE);

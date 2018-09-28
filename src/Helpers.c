@@ -520,7 +520,7 @@ BOOL SetWindowTitle(HWND hwnd, UINT uIDAppName, BOOL bIsElevated, UINT uIDUntitl
 	if (bIsElevated) {
 		WCHAR szElevatedAppName[128];
 		WCHAR fmt[64];
-		FormatString(szElevatedAppName, fmt, COUNTOF(fmt), IDS_APPTITLE_ELEVATED, szAppName);
+		FormatString(szElevatedAppName, fmt, IDS_APPTITLE_ELEVATED, szAppName);
 		StrCpyN(szAppName, szElevatedAppName, COUNTOF(szAppName));
 	}
 
@@ -1011,19 +1011,6 @@ BOOL IsCmdEnabled(HWND hwnd, UINT uId) {
 		return TRUE;
 	}
 	return !(ustate & (MF_GRAYED | MF_DISABLED));
-}
-
-//=============================================================================
-//
-// FormatString()
-//
-void FormatString(LPWSTR lpOutput, LPWSTR lpFormat, int nFormat, UINT uIdFormat, ...) {
-	if (GetString(uIdFormat, lpFormat, nFormat)) {
-		va_list va;
-		va_start(va, uIdFormat);
-		wvsprintf(lpOutput, lpFormat, va);
-		va_end(va);
-	}
 }
 
 //=============================================================================
