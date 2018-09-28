@@ -93,8 +93,6 @@ HWND EditCreate(HWND hwndParent) {
 	SendMessage(hwnd, SCI_SETBIDIRECTIONAL, iBidirectional, 0);
 	SendMessage(hwnd, SCI_SETIMEINTERACTION, bUseInlineIME, 0);
 	SendMessage(hwnd, SCI_SETINLINEIMEUSEBLOCKCARET, bInlineIMEUseBlockCaret, 0);
-	SendMessage(hwnd, SCI_SETCODEPAGE, iDefaultCodePage, 0);
-	SendMessage(hwnd, SCI_SETEOLMODE, SC_EOL_CRLF, 0);
 	SendMessage(hwnd, SCI_SETPASTECONVERTENDINGS, 1, 0);
 	SendMessage(hwnd, SCI_SETMODEVENTMASK, /*SC_MODEVENTMASKALL*/SC_MOD_INSERTTEXT | SC_MOD_DELETETEXT, 0);
 	SendMessage(hwnd, SCI_USEPOPUP, FALSE, 0);
