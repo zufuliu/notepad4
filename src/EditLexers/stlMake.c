@@ -40,13 +40,16 @@ static KEYWORDLIST Keywords_MAK = {{
 , // 6 bmake
 "in defined empty exists "
 
-, "", ""
+, // 7 ninja
+"rule build default "
+
+, ""
 
 , "", "", "", "", "", "", ""
 }};
 
 
-EDITLEXER lexMake = { SCLEX_MAKEFILE, NP2LEX_MAKE, EDITLEXER_HOLE(L"Makefile"), L"mak; make; mk; dsp; dsw; am; pro; pri; gmk", &Keywords_MAK,
+EDITLEXER lexMake = { SCLEX_MAKEFILE, NP2LEX_MAKE, EDITLEXER_HOLE(L"Makefile"), L"mak; make; mk; dsp; dsw; am; pro; pri; gmk; ninja", &Keywords_MAK,
 {
 	EDITSTYLE_DEFAULT,
 	{ SCE_MAKE_COMMENT, NP2STYLE_Comment, EDITSTYLE_HOLE(L"Comment"), L"fore:#008000" },

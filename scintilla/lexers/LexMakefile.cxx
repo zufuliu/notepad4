@@ -21,6 +21,7 @@ using namespace Scintilla;
 #define MAKE_TYPE_NMAKE 1
 #define MAKE_TYPE_BMAKE 2
 #define MAKE_TYPE_QMAKE 3
+#define MAKE_TYPE_NINJA 4
 static constexpr bool IsMakeOp(int ch, int chNext) noexcept {
 	return ch == '=' || ch == ':' || ch == '{' || ch == '}' || ch == '(' || ch == ')' || ch == ','
 		|| ch == '$' || ch == '@' || ch == '%' || ch == '<' || ch == '?' || ch == '^'
@@ -30,8 +31,10 @@ static constexpr bool IsMakeOp(int ch, int chNext) noexcept {
 
 #define MAX_WORD_LENGTH	15
 static void ColouriseMakeDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
-	const WordList &keywordsGP = *keywordLists[0]; // gnu make Preprocessor
-	const WordList &keywordsDP2 = *keywordLists[6];
+	const WordList &keywordsGP = *keywordLists[0];		// gnu make Preprocessor
+	const WordList &keywordsDP2 = *keywordLists[6];		// bmake
+	const WordList &keywordsNinja = *keywordLists[7];	// ninja
+
 	int state = initStyle;
 	int ch = 0, chNext = styler[startPos];
 	styler.StartAt(startPos);
@@ -80,6 +83,9 @@ static void ColouriseMakeDoc(Sci_PositionU startPos, Sci_Position length, int in
 				if (keywordsGP.InList(buf)) { // gmake
 					styler.ColourTo(i - 1, SCE_MAKE_PREPROCESSOR);
 					makeType = MAKE_TYPE_GMAKE;
+				} else if (keywordsNinja.InList(buf)) { // ninja
+					styler.ColourTo(i - 1, SCE_MAKE_PREPROCESSOR);
+					makeType = MAKE_TYPE_NINJA;
 				} else {
 					Sci_Position pos = i;
 					while (IsASpace(styler.SafeGetCharAt(pos++)));
