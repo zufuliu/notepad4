@@ -2216,17 +2216,16 @@ BOOL Style_StrGetFont(LPCWSTR lpszStyle, LPWSTR lpszFont, int cchFont) {
 	WCHAR *p;
 
 	if ((p = StrStr(lpszStyle, L"font:")) != NULL) {
-		WCHAR tch[MAX_EDITSTYLE_VALUE_SIZE];
-		lstrcpy(tch, p + CSTRLEN(L"font:"));
-		if ((p = StrChr(tch, L';')) != NULL) {
+		p += CSTRLEN(L"font:");
+		p += StrSpn(p, L" ");
+		lstrcpyn(lpszFont, p, cchFont);
+		if ((p = StrChr(lpszFont, L';')) != NULL) {
 			*p = L'\0';
 		}
-		TrimString(tch);
+		TrimString(lpszFont);
 
-		if (StrCaseEqual(tch, L"Default") || !IsFontAvailable(tch)) {
+		if (StrCaseEqual(lpszFont, L"Default") || !IsFontAvailable(lpszFont)) {
 			lstrcpyn(lpszFont, SysMonoFontName[np2MonoFontIndex], cchFont);
-		} else {
-			lstrcpyn(lpszFont, tch, cchFont);
 		}
 		return TRUE;
 	}
@@ -2276,6 +2275,7 @@ BOOL Style_StrGetSize(LPCWSTR lpszStyle, int *i) {
 	}
 	return FALSE;
 }
+
 //=============================================================================
 //
 // Style_StrGetSizeStr()
@@ -2284,13 +2284,13 @@ BOOL Style_StrGetSizeStr(LPCWSTR lpszStyle, LPWSTR lpszSize, int cchSize) {
 	WCHAR *p;
 
 	if ((p = StrStr(lpszStyle, L"size:")) != NULL) {
-		WCHAR tch[MAX_EDITSTYLE_VALUE_SIZE];
-		lstrcpy(tch, p + CSTRLEN(L"size:"));
-		if ((p = StrChr(tch, L';')) != NULL) {
+		p += CSTRLEN(L"size:");
+		p += StrSpn(p, L" ");
+		lstrcpyn(lpszSize, p, cchSize);
+		if ((p = StrChr(lpszSize, L';')) != NULL) {
 			*p = L'\0';
 		}
-		TrimString(tch);
-		lstrcpyn(lpszSize, tch, cchSize);
+		TrimString(lpszSize);
 		return TRUE;
 	}
 	return FALSE;
