@@ -1474,20 +1474,32 @@ void FormatNumberStr(LPWSTR lpNumberStr) {
 		return;
 	}
 
-	WCHAR szSep[8];
-	if (!GetLocaleInfo(LOCALE_USER_DEFAULT, LOCALE_STHOUSAND, szSep, COUNTOF(szSep))) {
-		szSep[0] = L'\'';
-	}
+	// https://docs.microsoft.com/en-us/windows/desktop/Intl/locale-sthousand
+	// https://docs.microsoft.com/en-us/windows/desktop/Intl/locale-sgrouping
+	WCHAR szSep[4];
+	const WCHAR sep = GetLocaleInfo(LOCALE_USER_DEFAULT, LOCALE_STHOUSAND, szSep, COUNTOF(szSep))? szSep[0] : L',';
 
 	WCHAR *c = lpNumberStr + i;
+	WCHAR *end = c;
+#if 0
 	i = 0;
 	while ((c = CharPrev(lpNumberStr, c)) != lpNumberStr) {
 		if (++i == 3) {
 			i = 0;
-			MoveMemory(c + 1, c, sizeof(WCHAR) * (lstrlen(c) + 1));
-			*c = szSep[0];
+			MoveMemory(c + 1, c, sizeof(WCHAR) * (end - c + 1));
+			*c = sep;
+			++end;
 		}
 	}
+#else
+	lpNumberStr += 3;
+	do {
+		c -= 3;
+		MoveMemory(c + 1, c, sizeof(WCHAR) * (end - c + 1));
+		*c = sep;
+		++end;
+	} while (c > lpNumberStr);
+#endif
 }
 
 //=============================================================================
@@ -1495,7 +1507,7 @@ void FormatNumberStr(LPWSTR lpNumberStr) {
 // SetDlgItemIntEx()
 //
 BOOL SetDlgItemIntEx(HWND hwnd, int nIdItem, UINT uValue) {
-	WCHAR szBuf[64];
+	WCHAR szBuf[32];
 
 	wsprintf(szBuf, L"%u", uValue);
 	FormatNumberStr(szBuf);
