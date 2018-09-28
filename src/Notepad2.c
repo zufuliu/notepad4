@@ -313,6 +313,11 @@ struct CachedStatusItem {
 #if NP2_GET_LEXER_STYLE_NAME_FROM_RES
 	WCHAR tchLexerName[MAX_EDITLEXER_NAME_SIZE];
 #endif
+#ifdef BOOKMARK_EDITION
+	WCHAR tchDocPosFmt[96];
+#else
+	WCHAR tchDocPosFmt[64];
+#endif
 } cachedStatusItem;
 
 HINSTANCE	g_hInstance;
@@ -1845,6 +1850,7 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) {
 	SendMessage(hwndToolbar, TB_GETITEMRECT, 0, (LPARAM)&rc);
 	//SendMessage(hwndToolbar, TB_SETINDENT, 2, 0);
 
+	GetString(IDS_DOCPOS, cachedStatusItem.tchDocPosFmt, COUNTOF(cachedStatusItem.tchDocPosFmt));
 	const DWORD dwStatusbarStyle = bShowStatusbar ? (WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE) : (WS_CHILD | WS_CLIPSIBLINGS);
 	hwndStatus = CreateStatusWindow(dwStatusbarStyle, NULL, hwnd, IDC_STATUSBAR);
 
@@ -6781,14 +6787,10 @@ void UpdateStatusbar(void) {
 		FormatNumberStr(tchMatchesCount);
 	}
 
-	WCHAR tchFmt[96];
-	FormatString(tchDocPos, tchFmt, IDS_DOCPOS, tchLn, tchLines,
+	wsprintf(tchDocPos, cachedStatusItem.tchDocPosFmt, tchLn, tchLines,
 				 tchCol, tchCols, tchCh, tchChs, tchSelCh, tchSel, tchLinesSelected, tchMatchesCount);
-
 #else
-
-	WCHAR tchFmt[64];
-	FormatString(tchDocPos, tchFmt, IDS_DOCPOS, tchLn, tchLines, tchCol, tchCols, tchCh, tchChs, tchSelCh, tchSel);
+	wsprintf(tchDocPos, cachedStatusItem.tchDocPosFmt, tchLn, tchLines, tchCol, tchCols, tchCh, tchChs, tchSelCh, tchSel);
 #endif
 
 	const int iBytes = SciCall_GetLength();

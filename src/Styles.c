@@ -2217,7 +2217,9 @@ BOOL Style_StrGetFont(LPCWSTR lpszStyle, LPWSTR lpszFont, int cchFont) {
 
 	if ((p = StrStr(lpszStyle, L"font:")) != NULL) {
 		p += CSTRLEN(L"font:");
-		p += StrSpn(p, L" ");
+		while (*p == L' ') {
+			++p;
+		}
 		lstrcpyn(lpszFont, p, cchFont);
 		if ((p = StrChr(lpszFont, L';')) != NULL) {
 			*p = L'\0';
@@ -2285,7 +2287,9 @@ BOOL Style_StrGetSizeStr(LPCWSTR lpszStyle, LPWSTR lpszSize, int cchSize) {
 
 	if ((p = StrStr(lpszStyle, L"size:")) != NULL) {
 		p += CSTRLEN(L"size:");
-		p += StrSpn(p, L" ");
+		while (*p == L' ') {
+			++p;
+		}
 		lstrcpyn(lpszSize, p, cchSize);
 		if ((p = StrChr(lpszSize, L';')) != NULL) {
 			*p = L'\0';
@@ -2325,7 +2329,9 @@ BOOL Style_StrGetCase(LPCWSTR lpszStyle, int *i) {
 
 	if ((p = StrStr(lpszStyle, L"case:")) != NULL) {
 		p += CSTRLEN(L"case:");
-		p += StrSpn(p, L" ");
+		while (*p == L' ') {
+			++p;
+		}
 		switch (*p) {
 		case L'u':
 		case L'U':
