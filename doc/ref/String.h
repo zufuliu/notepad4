@@ -232,6 +232,18 @@ BOOL StrTrimA(PSTR psz, PCSTR pszTrimChars);
 // https://docs.microsoft.com/en-us/windows/desktop/api/shlwapi/nf-shlwapi-strtrimw
 BOOL StrTrimW(PWSTR psz, PCWSTR pszTrimChars);
 
+// https://docs.microsoft.com/en-us/windows/desktop/api/winuser/nf-winuser-charpreva
+LPSTR CharPrevA(LPCSTR lpszStart, LPCSTR lpszCurrent);
+
+// https://docs.microsoft.com/en-us/windows/desktop/api/winuser/nf-winuser-charprevw
+LPWSTR CharPrevW(LPCWSTR lpszStart, LPCWSTR lpszCurrent);
+
+// https://docs.microsoft.com/en-us/windows/desktop/api/winuser/nf-winuser-charnexta
+LPSTR CharNextA(LPCSTR lpsz);
+
+// https://docs.microsoft.com/en-us/windows/desktop/api/winuser/nf-winuser-charnextw
+LPWSTR CharNextW(LPCWSTR lpsz);
+
 // https://docs.microsoft.com/en-us/windows/desktop/api/shlwapi/nf-shlwapi-strtointexa
 BOOL StrToIntExA(PCSTR pszString, STIF_FLAGS dwFlags, int *piRet);
 
