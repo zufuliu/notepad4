@@ -15,6 +15,17 @@ def findCategories(filename):
     print(values)
     return [v[2:] for v in values]
 
+def isCJKLetter(uch):
+    name = ''
+    try:
+        name = unicodedata.name(uch).upper()
+    except:
+        pass
+    return 'CJK' in name \
+        or 'HIRAGANA' in name \
+        or 'KATAKANA' in name \
+        or 'HANGUL' in name
+
 def updateCharacterCategory(filename):
     values = ["// Created with Python %s,  Unicode %s" % (
         platform.python_version(), unicodedata.unidata_version)]
@@ -22,10 +33,13 @@ def updateCharacterCategory(filename):
     startRange = 0
     for ch in range(sys.maxunicode):
         uch = chr(ch)
-        if unicodedata.category(uch) != category:
+        current = unicodedata.category(uch)
+        if current == 'Lo' and isCJKLetter(uch):
+            current = 'CJK'
+        if current != category:
             value = startRange * 32 + categories.index(category)
             values.append("%d," % value)
-            category = unicodedata.category(uch)
+            category = current
             startRange = ch
     value = startRange * 32 + categories.index(category)
     values.append("%d," % value)

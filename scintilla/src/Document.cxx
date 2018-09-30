@@ -1646,10 +1646,12 @@ CharClassify::cc Document::WordCharacterClass(unsigned int ch) const noexcept {
 			case ccSo:
 				return CharClassify::ccPunctuation;
 
+			case ccCJK:
+				return CharClassify::ccCJK;
 			}
 		} else {
 			// Asian DBCS
-			return CharClassify::ccWord;
+			return CharClassify::ccCJK;
 		}
 	}
 	return charClass.GetClass(static_cast<unsigned char>(ch));
