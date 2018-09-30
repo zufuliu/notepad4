@@ -1700,23 +1700,22 @@ PEDITLEXER Style_MatchLexer(LPCWSTR lpszMatch, BOOL bCheckNames) {
 			}
 		}
 
-		WCHAR tch[MAX_EDITLEXER_EXT_SIZE];
-		ZeroMemory(tch, sizeof(tch));
+		const int cch = lstrlen(lpszMatch);
 		for (int i = 0; i < NUMLEXERS; i++) {
-			WCHAR *p1 = tch, *p2;
-			lstrcpy(tch, pLexArray[i]->szExtensions);
-			while (*p1) {
-				if ((p2 = StrChr(p1, L';')) != NULL) {
-					*p2 = L'\0';
-				} else {
-					p2 = StrEnd(p1);
+			LPCWSTR p1 = pLexArray[i]->szExtensions;
+			do {
+				LPCWSTR p2 = StrStrI(p1, lpszMatch);
+				if (p2 == NULL) {
+					break;
 				}
-				StrTrim(p1, L" .");
-				if (StrCaseEqual(p1, lpszMatch)) {
+
+				const WCHAR ch = (p2 == p1)? L'\0' : p2[-1];
+				p2 += cch;
+				if ((ch == L';' || ch == ' ' || ch == L'\0') && (*p2 == L';' || *p2 == L' ' || *p2 == L'\0')) {
 					return pLexArray[i];
 				}
-				p1 = p2 + 1;
-			}
+				p1 = StrChr(p2, L';');
+			} while (p1 != NULL);
 		}
 	} else {
 		const int cch = lstrlen(lpszMatch);
