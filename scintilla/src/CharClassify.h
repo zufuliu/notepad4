@@ -15,7 +15,7 @@ public:
 	CharClassify() noexcept;
 
 	enum cc {
-		ccSpace, ccNewLine, ccWord, ccPunctuation
+		ccSpace, ccNewLine, ccWord, ccPunctuation, ccCJK
 	};
 	void SetDefaultCharClasses(bool includeWordClass) noexcept;
 	void SetCharClasses(const unsigned char *chars, cc newCharClass) noexcept;

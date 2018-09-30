@@ -17,7 +17,8 @@ enum CharacterCategory {
 	ccPc, ccPd, ccPs, ccPe, ccPi, ccPf, ccPo,
 	ccSm, ccSc, ccSk, ccSo,
 	ccZs, ccZl, ccZp,
-	ccCc, ccCf, ccCs, ccCo, ccCn
+	ccCc, ccCf, ccCs, ccCo, ccCn,
+	ccCJK
 };
 
 CharacterCategory CategoriseCharacter(int character) noexcept;
