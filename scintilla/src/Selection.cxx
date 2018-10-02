@@ -96,7 +96,7 @@ bool SelectionRange::Contains(Sci::Position pos) const noexcept {
 		return (pos >= anchor.Position()) && (pos <= caret.Position());
 }
 
-bool SelectionRange::Contains(const SelectionPosition &sp) const noexcept {
+bool SelectionRange::Contains(SelectionPosition sp) const noexcept {
 	if (anchor > caret)
 		return (sp >= caret) && (sp <= anchor);
 	else
@@ -110,7 +110,7 @@ bool SelectionRange::ContainsCharacter(Sci::Position posCharacter) const noexcep
 		return (posCharacter >= anchor.Position()) && (posCharacter < caret.Position());
 }
 
-SelectionSegment SelectionRange::Intersect(const SelectionSegment &check) const noexcept {
+SelectionSegment SelectionRange::Intersect(SelectionSegment check) const noexcept {
 	const SelectionSegment inOrder(caret, anchor);
 	if ((inOrder.start <= check.end) || (inOrder.end >= check.start)) {
 		SelectionSegment portion = check;
@@ -131,7 +131,7 @@ void SelectionRange::Swap() noexcept {
 	std::swap(caret, anchor);
 }
 
-bool SelectionRange::Trim(const SelectionRange &range) noexcept {
+bool SelectionRange::Trim(SelectionRange range) noexcept {
 	const SelectionPosition startRange = range.Start();
 	const SelectionPosition endRange = range.End();
 	SelectionPosition start = Start();
@@ -301,7 +301,7 @@ void Selection::MovePositions(bool insertion, Sci::Position startChange, Sci::Po
 	}
 }
 
-void Selection::TrimSelection(const SelectionRange &range) {
+void Selection::TrimSelection(SelectionRange range) {
 	for (size_t i = 0; i < ranges.size();) {
 		if ((i != mainRange) && (ranges[i].Trim(range))) {
 			// Trimmed to empty so remove
@@ -317,7 +317,7 @@ void Selection::TrimSelection(const SelectionRange &range) {
 	}
 }
 
-void Selection::TrimOtherSelections(size_t r, const SelectionRange &range) {
+void Selection::TrimOtherSelections(size_t r, SelectionRange range) {
 	for (size_t i = 0; i < ranges.size(); ++i) {
 		if (i != r) {
 			ranges[i].Trim(range);
@@ -325,19 +325,19 @@ void Selection::TrimOtherSelections(size_t r, const SelectionRange &range) {
 	}
 }
 
-void Selection::SetSelection(const SelectionRange &range) {
+void Selection::SetSelection(SelectionRange range) {
 	ranges.clear();
 	ranges.push_back(range);
 	mainRange = ranges.size() - 1;
 }
 
-void Selection::AddSelection(const SelectionRange &range) {
+void Selection::AddSelection(SelectionRange range) {
 	TrimSelection(range);
 	ranges.push_back(range);
 	mainRange = ranges.size() - 1;
 }
 
-void Selection::AddSelectionWithoutTrim(const SelectionRange &range) {
+void Selection::AddSelectionWithoutTrim(SelectionRange range) {
 	ranges.push_back(range);
 	mainRange = ranges.size() - 1;
 }
@@ -361,7 +361,7 @@ void Selection::DropAdditionalRanges() {
 	SetSelection(RangeMain());
 }
 
-void Selection::TentativeSelection(const SelectionRange &range) {
+void Selection::TentativeSelection(SelectionRange range) {
 	if (!tentativeMain) {
 		rangesSaved = ranges;
 	}

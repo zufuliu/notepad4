@@ -61,12 +61,6 @@ namespace Scintilla {
 
 UINT CodePageFromCharSet(DWORD characterSet, UINT documentCodePage) noexcept;
 
-RECT RectFromPRectangle(const PRectangle &prc) noexcept {
-	RECT rc = { static_cast<LONG>(prc.left), static_cast<LONG>(prc.top),
-		static_cast<LONG>(prc.right), static_cast<LONG>(prc.bottom) };
-	return rc;
-}
-
 #if defined(USE_D2D)
 IDWriteFactory *pIDWriteFactory = nullptr;
 ID2D1Factory *pD2DFactory = nullptr;
@@ -239,7 +233,7 @@ inline FormatAndMetrics *FamFromFontID(void *fid) noexcept {
 	return static_cast<FormatAndMetrics *>(fid);
 }
 
-BYTE Win32MapFontQuality(int extraFontFlag) noexcept {
+inline BYTE Win32MapFontQuality(int extraFontFlag) noexcept {
 	switch (extraFontFlag & SC_EFF_QUALITY_MASK) {
 
 	case SC_EFF_QUALITY_NON_ANTIALIASED:
@@ -257,7 +251,7 @@ BYTE Win32MapFontQuality(int extraFontFlag) noexcept {
 }
 
 #if defined(USE_D2D)
-D2D1_TEXT_ANTIALIAS_MODE DWriteMapFontQuality(int extraFontFlag) noexcept {
+inline D2D1_TEXT_ANTIALIAS_MODE DWriteMapFontQuality(int extraFontFlag) noexcept {
 	switch (extraFontFlag & SC_EFF_QUALITY_MASK) {
 
 	case SC_EFF_QUALITY_NON_ANTIALIASED:
@@ -547,23 +541,23 @@ public:
 	void MoveTo(int x_, int y_) noexcept override;
 	void LineTo(int x_, int y_) noexcept override;
 	void Polygon(const Point *pts, size_t npts, ColourDesired fore, ColourDesired back) override;
-	void RectangleDraw(const PRectangle &rc, ColourDesired fore, ColourDesired back) noexcept override;
-	void FillRectangle(const PRectangle &rc, ColourDesired back) noexcept override;
-	void FillRectangle(const PRectangle &rc, const Surface &surfacePattern) noexcept override;
-	void RoundedRectangle(const PRectangle &rc, ColourDesired fore, ColourDesired back) noexcept override;
-	void AlphaRectangle(const PRectangle &rc, int cornerSize, ColourDesired fill, int alphaFill,
+	void RectangleDraw(PRectangle rc, ColourDesired fore, ColourDesired back) noexcept override;
+	void FillRectangle(PRectangle rc, ColourDesired back) noexcept override;
+	void FillRectangle(PRectangle rc, Surface &surfacePattern) noexcept override;
+	void RoundedRectangle(PRectangle rc, ColourDesired fore, ColourDesired back) noexcept override;
+	void AlphaRectangle(PRectangle rc, int cornerSize, ColourDesired fill, int alphaFill,
 		ColourDesired outline, int alphaOutline, int flags) noexcept override;
-	void GradientRectangle(const PRectangle &rc, const std::vector<ColourStop> &stops, GradientOptions options) override;
-	void DrawRGBAImage(const PRectangle &rc, int width, int height, const unsigned char *pixelsImage) noexcept override;
-	void Ellipse(const PRectangle &rc, ColourDesired fore, ColourDesired back) noexcept override;
-	void Copy(const PRectangle &rc, const Point &from, const Surface &surfaceSource) noexcept override;
+	void GradientRectangle(PRectangle rc, const std::vector<ColourStop> &stops, GradientOptions options) override;
+	void DrawRGBAImage(PRectangle rc, int width, int height, const unsigned char *pixelsImage) noexcept override;
+	void Ellipse(PRectangle rc, ColourDesired fore, ColourDesired back) noexcept override;
+	void Copy(PRectangle rc, Point from, Surface &surfaceSource) noexcept override;
 
 	std::unique_ptr<IScreenLineLayout> Layout(const IScreenLine *screenLine) noexcept override;
 
-	void DrawTextCommon(const PRectangle &rc, const Font &font_, XYPOSITION ybase, std::string_view text, UINT fuOptions);
-	void DrawTextNoClip(const PRectangle &rc, const Font &font_, XYPOSITION ybase, std::string_view text, ColourDesired fore, ColourDesired back) override;
-	void DrawTextClipped(const PRectangle &rc, const Font &font_, XYPOSITION ybase, std::string_view text, ColourDesired fore, ColourDesired back) override;
-	void DrawTextTransparent(const PRectangle &rc, const Font &font_, XYPOSITION ybase, std::string_view text, ColourDesired fore) override;
+	void DrawTextCommon(PRectangle rc, const Font &font_, XYPOSITION ybase, std::string_view text, UINT fuOptions);
+	void DrawTextNoClip(PRectangle rc, const Font &font_, XYPOSITION ybase, std::string_view text, ColourDesired fore, ColourDesired back) override;
+	void DrawTextClipped(PRectangle rc, const Font &font_, XYPOSITION ybase, std::string_view text, ColourDesired fore, ColourDesired back) override;
+	void DrawTextTransparent(PRectangle rc, const Font &font_, XYPOSITION ybase, std::string_view text, ColourDesired fore) override;
 	void MeasureWidths(const Font &font_, std::string_view text, XYPOSITION *positions) override;
 	XYPOSITION WidthText(const Font &font_, std::string_view text) override;
 	XYPOSITION Ascent(const Font &font_) noexcept override;
@@ -572,7 +566,7 @@ public:
 	XYPOSITION Height(const Font &font_) noexcept override;
 	XYPOSITION AverageCharWidth(const Font &font_) noexcept override;
 
-	void SetClip(const PRectangle &rc) noexcept override;
+	void SetClip(PRectangle rc) noexcept override;
 	void FlushCachedState() noexcept override;
 
 	void SetUnicodeMode(bool unicodeMode_) noexcept override;
@@ -728,14 +722,14 @@ void SurfaceGDI::Polygon(const Point *pts, size_t npts, ColourDesired fore, Colo
 	::Polygon(hdc, outline.data(), static_cast<int>(npts));
 }
 
-void SurfaceGDI::RectangleDraw(const PRectangle &rc, ColourDesired fore, ColourDesired back) noexcept {
+void SurfaceGDI::RectangleDraw(PRectangle rc, ColourDesired fore, ColourDesired back) noexcept {
 	PenColour(fore);
 	BrushColor(back);
 	const RECT rcw = RectFromPRectangle(rc);
 	::Rectangle(hdc, rcw.left, rcw.top, rcw.right, rcw.bottom);
 }
 
-void SurfaceGDI::FillRectangle(const PRectangle &rc, ColourDesired back) noexcept {
+void SurfaceGDI::FillRectangle(PRectangle rc, ColourDesired back) noexcept {
 	// Using ExtTextOut rather than a FillRect ensures that no dithering occurs.
 	// There is no need to allocate a brush either.
 	const RECT rcw = RectFromPRectangle(rc);
@@ -743,10 +737,10 @@ void SurfaceGDI::FillRectangle(const PRectangle &rc, ColourDesired back) noexcep
 	::ExtTextOut(hdc, rcw.left, rcw.top, ETO_OPAQUE, &rcw, TEXT(""), 0, nullptr);
 }
 
-void SurfaceGDI::FillRectangle(const PRectangle &rc, const Surface &surfacePattern) noexcept {
+void SurfaceGDI::FillRectangle(PRectangle rc, Surface &surfacePattern) noexcept {
 	HBRUSH br;
-	if (static_cast<const SurfaceGDI &>(surfacePattern).bitmap)
-		br = ::CreatePatternBrush(static_cast<const SurfaceGDI &>(surfacePattern).bitmap);
+	if (static_cast<SurfaceGDI &>(surfacePattern).bitmap)
+		br = ::CreatePatternBrush(static_cast<SurfaceGDI &>(surfacePattern).bitmap);
 	else	// Something is wrong so display in red
 		br = ::CreateSolidBrush(RGB(0xff, 0, 0));
 	const RECT rcw = RectFromPRectangle(rc);
@@ -754,7 +748,7 @@ void SurfaceGDI::FillRectangle(const PRectangle &rc, const Surface &surfacePatte
 	::DeleteObject(br);
 }
 
-void SurfaceGDI::RoundedRectangle(const PRectangle &rc, ColourDesired fore, ColourDesired back) noexcept {
+void SurfaceGDI::RoundedRectangle(PRectangle rc, ColourDesired fore, ColourDesired back) noexcept {
 	PenColour(fore);
 	BrushColor(back);
 	const RECT rcw = RectFromPRectangle(rc);
@@ -800,7 +794,7 @@ DWORD dwordMultiplied(ColourDesired colour, unsigned int alpha) noexcept {
 
 }
 
-void SurfaceGDI::AlphaRectangle(const PRectangle &rc, int cornerSize, ColourDesired fill, int alphaFill,
+void SurfaceGDI::AlphaRectangle(PRectangle rc, int cornerSize, ColourDesired fill, int alphaFill,
 	ColourDesired outline, int alphaOutline, int /* flags*/) noexcept {
 	const RECT rcw = RectFromPRectangle(rc);
 	if (rc.Width() > 0) {
@@ -855,16 +849,15 @@ void SurfaceGDI::AlphaRectangle(const PRectangle &rc, int cornerSize, ColourDesi
 	}
 }
 
-void SurfaceGDI::GradientRectangle(const PRectangle &rc, const std::vector<ColourStop> &stops, GradientOptions) {
+void SurfaceGDI::GradientRectangle(PRectangle rc, const std::vector<ColourStop> &stops, GradientOptions) {
 	// Would be better to average start and end.
 	const ColourAlpha colourAverage = stops[0].colour.MixedWith(stops[1].colour);
 	AlphaRectangle(rc, 0, colourAverage.GetColour(), colourAverage.GetAlpha(),
 		colourAverage.GetColour(), colourAverage.GetAlpha(), 0);
 }
 
-void SurfaceGDI::DrawRGBAImage(const PRectangle &rc_, int width, int height, const unsigned char *pixelsImage) noexcept {
-	if (rc_.Width() > 0) {
-		PRectangle rc = rc_;
+void SurfaceGDI::DrawRGBAImage(PRectangle rc, int width, int height, const unsigned char *pixelsImage) noexcept {
+	if (rc.Width() > 0) {
 		HDC hMemDC = ::CreateCompatibleDC(hdc);
 		if (rc.Width() > width)
 			rc.left += floor((rc.Width() - width) / 2);
@@ -906,18 +899,18 @@ void SurfaceGDI::DrawRGBAImage(const PRectangle &rc_, int width, int height, con
 	}
 }
 
-void SurfaceGDI::Ellipse(const PRectangle &rc, ColourDesired fore, ColourDesired back) noexcept {
+void SurfaceGDI::Ellipse(PRectangle rc, ColourDesired fore, ColourDesired back) noexcept {
 	PenColour(fore);
 	BrushColor(back);
 	const RECT rcw = RectFromPRectangle(rc);
 	::Ellipse(hdc, rcw.left, rcw.top, rcw.right, rcw.bottom);
 }
 
-void SurfaceGDI::Copy(const PRectangle &rc, const Point &from, const Surface &surfaceSource) noexcept {
+void SurfaceGDI::Copy(PRectangle rc, Point from, Surface &surfaceSource) noexcept {
 	::BitBlt(hdc,
 		static_cast<int>(rc.left), static_cast<int>(rc.top),
 		static_cast<int>(rc.Width()), static_cast<int>(rc.Height()),
-		static_cast<const SurfaceGDI &>(surfaceSource).hdc,
+		static_cast<SurfaceGDI &>(surfaceSource).hdc,
 		static_cast<int>(from.x), static_cast<int>(from.y), SRCCOPY);
 }
 
@@ -927,7 +920,7 @@ std::unique_ptr<IScreenLineLayout> SurfaceGDI::Layout(const IScreenLine *) noexc
 
 typedef VarBuffer<int, stackBufferLength> TextPositionsI;
 
-void SurfaceGDI::DrawTextCommon(const PRectangle &rc, const Font &font_, XYPOSITION ybase, std::string_view text, UINT fuOptions) {
+void SurfaceGDI::DrawTextCommon(PRectangle rc, const Font &font_, XYPOSITION ybase, std::string_view text, UINT fuOptions) {
 	SetFont(font_);
 	const RECT rcw = RectFromPRectangle(rc);
 	const int x = static_cast<int>(rc.left);
@@ -941,21 +934,21 @@ void SurfaceGDI::DrawTextCommon(const PRectangle &rc, const Font &font_, XYPOSIT
 	}
 }
 
-void SurfaceGDI::DrawTextNoClip(const PRectangle &rc, const Font &font_, XYPOSITION ybase, std::string_view text,
+void SurfaceGDI::DrawTextNoClip(PRectangle rc, const Font &font_, XYPOSITION ybase, std::string_view text,
 	ColourDesired fore, ColourDesired back) {
 	::SetTextColor(hdc, fore.AsInteger());
 	::SetBkColor(hdc, back.AsInteger());
 	DrawTextCommon(rc, font_, ybase, text, ETO_OPAQUE);
 }
 
-void SurfaceGDI::DrawTextClipped(const PRectangle &rc, const Font &font_, XYPOSITION ybase, std::string_view text,
+void SurfaceGDI::DrawTextClipped(PRectangle rc, const Font &font_, XYPOSITION ybase, std::string_view text,
 	ColourDesired fore, ColourDesired back) {
 	::SetTextColor(hdc, fore.AsInteger());
 	::SetBkColor(hdc, back.AsInteger());
 	DrawTextCommon(rc, font_, ybase, text, ETO_OPAQUE | ETO_CLIPPED);
 }
 
-void SurfaceGDI::DrawTextTransparent(const PRectangle &rc, const Font &font_, XYPOSITION ybase, std::string_view text,
+void SurfaceGDI::DrawTextTransparent(PRectangle rc, const Font &font_, XYPOSITION ybase, std::string_view text,
 	ColourDesired fore) {
 	// Avoid drawing spaces in transparent mode
 	for (size_t i = 0; i < text.length(); i++) {
@@ -1058,7 +1051,7 @@ XYPOSITION SurfaceGDI::AverageCharWidth(const Font &font_) noexcept {
 	return static_cast<XYPOSITION>(tm.tmAveCharWidth);
 }
 
-void SurfaceGDI::SetClip(const PRectangle &rc) noexcept {
+void SurfaceGDI::SetClip(PRectangle rc) noexcept {
 	::IntersectClipRect(hdc, static_cast<int>(rc.left), static_cast<int>(rc.top),
 		static_cast<int>(rc.right), static_cast<int>(rc.bottom));
 }
@@ -1136,23 +1129,23 @@ public:
 	void MoveTo(int x_, int y_) noexcept override;
 	void LineTo(int x_, int y_) noexcept override;
 	void Polygon(const Point *pts, size_t npts, ColourDesired fore, ColourDesired back) override;
-	void RectangleDraw(const PRectangle &rc, ColourDesired fore, ColourDesired back) override;
-	void FillRectangle(const PRectangle &rc, ColourDesired back) override;
-	void FillRectangle(const PRectangle &rc, const Surface &surfacePattern) override;
-	void RoundedRectangle(const PRectangle &rc, ColourDesired fore, ColourDesired back) override;
-	void AlphaRectangle(const PRectangle &rc, int cornerSize, ColourDesired fill, int alphaFill,
+	void RectangleDraw(PRectangle rc, ColourDesired fore, ColourDesired back) override;
+	void FillRectangle(PRectangle rc, ColourDesired back) override;
+	void FillRectangle(PRectangle rc, Surface &surfacePattern) override;
+	void RoundedRectangle(PRectangle rc, ColourDesired fore, ColourDesired back) override;
+	void AlphaRectangle(PRectangle rc, int cornerSize, ColourDesired fill, int alphaFill,
 		ColourDesired outline, int alphaOutline, int flags) override;
-	void GradientRectangle(const PRectangle &rc, const std::vector<ColourStop> &stops, GradientOptions options) override;
-	void DrawRGBAImage(const PRectangle &rc, int width, int height, const unsigned char *pixelsImage) override;
-	void Ellipse(const PRectangle &rc, ColourDesired fore, ColourDesired back) override;
-	void Copy(const PRectangle &rc, const Point &from, const Surface &surfaceSource) override;
+	void GradientRectangle(PRectangle rc, const std::vector<ColourStop> &stops, GradientOptions options) override;
+	void DrawRGBAImage(PRectangle rc, int width, int height, const unsigned char *pixelsImage) override;
+	void Ellipse(PRectangle rc, ColourDesired fore, ColourDesired back) override;
+	void Copy(PRectangle rc, Point from, Surface &surfaceSource) override;
 
 	std::unique_ptr<IScreenLineLayout> Layout(const IScreenLine *screenLine) override;
 
-	void DrawTextCommon(const PRectangle &rc, const Font &font_, XYPOSITION ybase, std::string_view text, UINT fuOptions);
-	void DrawTextNoClip(const PRectangle &rc, const Font &font_, XYPOSITION ybase, std::string_view text, ColourDesired fore, ColourDesired back) override;
-	void DrawTextClipped(const PRectangle &rc, const Font &font_, XYPOSITION ybase, std::string_view text, ColourDesired fore, ColourDesired back) override;
-	void DrawTextTransparent(const PRectangle &rc, const Font &font_, XYPOSITION ybase, std::string_view text, ColourDesired fore) override;
+	void DrawTextCommon(PRectangle rc, const Font &font_, XYPOSITION ybase, std::string_view text, UINT fuOptions);
+	void DrawTextNoClip(PRectangle rc, const Font &font_, XYPOSITION ybase, std::string_view text, ColourDesired fore, ColourDesired back) override;
+	void DrawTextClipped(PRectangle rc, const Font &font_, XYPOSITION ybase, std::string_view text, ColourDesired fore, ColourDesired back) override;
+	void DrawTextTransparent(PRectangle rc, const Font &font_, XYPOSITION ybase, std::string_view text, ColourDesired fore) override;
 	void MeasureWidths(const Font &font_, std::string_view text, XYPOSITION *positions) override;
 	XYPOSITION WidthText(const Font &font_, std::string_view text) override;
 	XYPOSITION Ascent(const Font &font_) noexcept override;
@@ -1161,7 +1154,7 @@ public:
 	XYPOSITION Height(const Font &font_) noexcept override;
 	XYPOSITION AverageCharWidth(const Font &font_) override;
 
-	void SetClip(const PRectangle &rc) noexcept override;
+	void SetClip(PRectangle rc) noexcept override;
 	void FlushCachedState() noexcept override;
 
 	void SetUnicodeMode(bool unicodeMode_) noexcept override;
@@ -1398,7 +1391,7 @@ void SurfaceD2D::Polygon(const Point *pts, size_t npts, ColourDesired fore, Colo
 	}
 }
 
-void SurfaceD2D::RectangleDraw(const PRectangle &rc, ColourDesired fore, ColourDesired back) {
+void SurfaceD2D::RectangleDraw(PRectangle rc, ColourDesired fore, ColourDesired back) {
 	if (pRenderTarget) {
 		const D2D1_RECT_F rectangle1 = D2D1::RectF(round(rc.left) + 0.5f, rc.top + 0.5f, round(rc.right) - 0.5f, rc.bottom - 0.5f);
 		D2DPenColour(back);
@@ -1408,7 +1401,7 @@ void SurfaceD2D::RectangleDraw(const PRectangle &rc, ColourDesired fore, ColourD
 	}
 }
 
-void SurfaceD2D::FillRectangle(const PRectangle &rc, ColourDesired back) {
+void SurfaceD2D::FillRectangle(PRectangle rc, ColourDesired back) {
 	if (pRenderTarget) {
 		D2DPenColour(back);
 		const D2D1_RECT_F rectangle1 = D2D1::RectF(round(rc.left), rc.top, round(rc.right), rc.bottom);
@@ -1416,8 +1409,8 @@ void SurfaceD2D::FillRectangle(const PRectangle &rc, ColourDesired back) {
 	}
 }
 
-void SurfaceD2D::FillRectangle(const PRectangle &rc, const Surface &surfacePattern) {
-	const SurfaceD2D &surfOther = static_cast<const SurfaceD2D &>(surfacePattern);
+void SurfaceD2D::FillRectangle(PRectangle rc, Surface &surfacePattern) {
+	SurfaceD2D &surfOther = static_cast<SurfaceD2D &>(surfacePattern);
 	surfOther.FlushDrawing();
 	ID2D1Bitmap *pBitmap = nullptr;
 	ID2D1BitmapRenderTarget *pCompatibleRenderTarget = reinterpret_cast<ID2D1BitmapRenderTarget *>(
@@ -1440,7 +1433,7 @@ void SurfaceD2D::FillRectangle(const PRectangle &rc, const Surface &surfacePatte
 	}
 }
 
-void SurfaceD2D::RoundedRectangle(const PRectangle &rc, ColourDesired fore, ColourDesired back) {
+void SurfaceD2D::RoundedRectangle(PRectangle rc, ColourDesired fore, ColourDesired back) {
 	if (pRenderTarget) {
 		D2D1_ROUNDED_RECT roundedRectFill = {
 			D2D1::RectF(rc.left + 1.0f, rc.top + 1.0f, rc.right - 1.0f, rc.bottom - 1.0f),
@@ -1456,7 +1449,7 @@ void SurfaceD2D::RoundedRectangle(const PRectangle &rc, ColourDesired fore, Colo
 	}
 }
 
-void SurfaceD2D::AlphaRectangle(const PRectangle &rc, int cornerSize, ColourDesired fill, int alphaFill,
+void SurfaceD2D::AlphaRectangle(PRectangle rc, int cornerSize, ColourDesired fill, int alphaFill,
 	ColourDesired outline, int alphaOutline, int /* flags*/) {
 	if (pRenderTarget) {
 		if (cornerSize == 0) {
@@ -1487,7 +1480,7 @@ void SurfaceD2D::AlphaRectangle(const PRectangle &rc, int cornerSize, ColourDesi
 
 namespace {
 
-D2D_COLOR_F ColorFromColourAlpha(ColourAlpha colour) noexcept {
+inline D2D_COLOR_F ColorFromColourAlpha(ColourAlpha colour) noexcept {
 	D2D_COLOR_F col;
 	col.r = colour.GetRedComponent();
 	col.g = colour.GetGreenComponent();
@@ -1498,7 +1491,7 @@ D2D_COLOR_F ColorFromColourAlpha(ColourAlpha colour) noexcept {
 
 }
 
-void SurfaceD2D::GradientRectangle(const PRectangle &rc, const std::vector<ColourStop> &stops, GradientOptions options) {
+void SurfaceD2D::GradientRectangle(PRectangle rc, const std::vector<ColourStop> &stops, GradientOptions options) {
 	if (pRenderTarget) {
 		D2D1_LINEAR_GRADIENT_BRUSH_PROPERTIES lgbp;
 		lgbp.startPoint = D2D1::Point2F(rc.left, rc.top);
@@ -1535,9 +1528,8 @@ void SurfaceD2D::GradientRectangle(const PRectangle &rc, const std::vector<Colou
 	}
 }
 
-void SurfaceD2D::DrawRGBAImage(const PRectangle &rc_, int width, int height, const unsigned char *pixelsImage) {
+void SurfaceD2D::DrawRGBAImage(PRectangle rc, int width, int height, const unsigned char *pixelsImage) {
 	if (pRenderTarget) {
-		PRectangle rc = rc_;
 		if (rc.Width() > width)
 			rc.left += floor((rc.Width() - width) / 2);
 		rc.right = rc.left + width;
@@ -1572,7 +1564,7 @@ void SurfaceD2D::DrawRGBAImage(const PRectangle &rc_, int width, int height, con
 	}
 }
 
-void SurfaceD2D::Ellipse(const PRectangle &rc, ColourDesired fore, ColourDesired back) {
+void SurfaceD2D::Ellipse(PRectangle rc, ColourDesired fore, ColourDesired back) {
 	if (pRenderTarget) {
 		const FLOAT radius = rc.Width() / 2.0f;
 		D2D1_ELLIPSE ellipse = {
@@ -1586,8 +1578,8 @@ void SurfaceD2D::Ellipse(const PRectangle &rc, ColourDesired fore, ColourDesired
 	}
 }
 
-void SurfaceD2D::Copy(const PRectangle &rc, const Point &from, const Surface &surfaceSource) {
-	const SurfaceD2D &surfOther = static_cast<const SurfaceD2D &>(surfaceSource);
+void SurfaceD2D::Copy(PRectangle rc, Point from, Surface &surfaceSource) {
+	SurfaceD2D &surfOther = static_cast<SurfaceD2D &>(surfaceSource);
 	surfOther.FlushDrawing();
 	ID2D1BitmapRenderTarget *pCompatibleRenderTarget = reinterpret_cast<ID2D1BitmapRenderTarget *>(
 		surfOther.pRenderTarget);
@@ -1990,7 +1982,7 @@ std::unique_ptr<IScreenLineLayout> SurfaceD2D::Layout(const IScreenLine *screenL
 	return std::make_unique<ScreenLineLayout>(screenLine);
 }
 
-void SurfaceD2D::DrawTextCommon(const PRectangle &rc, const Font &font_, XYPOSITION ybase, std::string_view text, UINT fuOptions) {
+void SurfaceD2D::DrawTextCommon(PRectangle rc, const Font &font_, XYPOSITION ybase, std::string_view text, UINT fuOptions) {
 	SetFont(font_);
 
 	// Use Unicode calls
@@ -2017,7 +2009,7 @@ void SurfaceD2D::DrawTextCommon(const PRectangle &rc, const Font &font_, XYPOSIT
 	}
 }
 
-void SurfaceD2D::DrawTextNoClip(const PRectangle &rc, const Font &font_, XYPOSITION ybase, std::string_view text,
+void SurfaceD2D::DrawTextNoClip(PRectangle rc, const Font &font_, XYPOSITION ybase, std::string_view text,
 	ColourDesired fore, ColourDesired back) {
 	if (pRenderTarget) {
 		FillRectangle(rc, back);
@@ -2026,7 +2018,7 @@ void SurfaceD2D::DrawTextNoClip(const PRectangle &rc, const Font &font_, XYPOSIT
 	}
 }
 
-void SurfaceD2D::DrawTextClipped(const PRectangle &rc, const Font &font_, XYPOSITION ybase, std::string_view text,
+void SurfaceD2D::DrawTextClipped(PRectangle rc, const Font &font_, XYPOSITION ybase, std::string_view text,
 	ColourDesired fore, ColourDesired back) {
 	if (pRenderTarget) {
 		FillRectangle(rc, back);
@@ -2035,7 +2027,7 @@ void SurfaceD2D::DrawTextClipped(const PRectangle &rc, const Font &font_, XYPOSI
 	}
 }
 
-void SurfaceD2D::DrawTextTransparent(const PRectangle &rc, const Font &font_, XYPOSITION ybase, std::string_view text,
+void SurfaceD2D::DrawTextTransparent(PRectangle rc, const Font &font_, XYPOSITION ybase, std::string_view text,
 	ColourDesired fore) {
 	// Avoid drawing spaces in transparent mode
 	for (size_t i = 0; i < text.length(); i++) {
@@ -2174,7 +2166,7 @@ XYPOSITION SurfaceD2D::AverageCharWidth(const Font &font_) {
 		// Create a layout
 		IDWriteTextLayout *pTextLayout = nullptr;
 		const WCHAR wszAllAlpha[] = L"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-		const size_t lenAllAlpha = lstrlenW(wszAllAlpha);
+		const size_t lenAllAlpha = (sizeof(wszAllAlpha) / sizeof(WCHAR)) - 1;
 		const HRESULT hr = pIDWriteFactory->CreateTextLayout(wszAllAlpha, static_cast<UINT32>(lenAllAlpha),
 			pTextFormat, 1000.0, 1000.0, &pTextLayout);
 		if (SUCCEEDED(hr)) {
@@ -2187,7 +2179,7 @@ XYPOSITION SurfaceD2D::AverageCharWidth(const Font &font_) {
 	return width;
 }
 
-void SurfaceD2D::SetClip(const PRectangle &rc) noexcept {
+void SurfaceD2D::SetClip(PRectangle rc) noexcept {
 	if (pRenderTarget) {
 		D2D1_RECT_F rcClip = { rc.left, rc.top, rc.right, rc.bottom };
 		pRenderTarget->PushAxisAlignedClip(rcClip, D2D1_ANTIALIAS_MODE_ALIASED);
@@ -2245,7 +2237,7 @@ PRectangle Window::GetPosition() const noexcept {
 	return PRectangle::FromInts(rc.left, rc.top, rc.right, rc.bottom);
 }
 
-void Window::SetPosition(const PRectangle &rc) noexcept {
+void Window::SetPosition(PRectangle rc) noexcept {
 	::SetWindowPos(HwndFromWindowID(wid),
 		nullptr, static_cast<int>(rc.left), static_cast<int>(rc.top),
 		static_cast<int>(rc.Width()), static_cast<int>(rc.Height()), SWP_NOZORDER | SWP_NOACTIVATE);
@@ -2271,7 +2263,7 @@ RECT RectFromMonitor(HMONITOR hMonitor) noexcept {
 
 }
 
-void Window::SetPositionRelative(PRectangle &rc, const Window *relativeTo) noexcept {
+void Window::SetPositionRelative(PRectangle rc, const Window *relativeTo) noexcept {
 	const LONG style = ::GetWindowLong(HwndFromWindowID(wid), GWL_STYLE);
 	if (style & WS_POPUP) {
 		POINT ptOther = { 0, 0 };
@@ -2320,7 +2312,7 @@ void Window::InvalidateAll() noexcept {
 	::InvalidateRect(HwndFromWindowID(wid), nullptr, FALSE);
 }
 
-void Window::InvalidateRectangle(const PRectangle &rc) noexcept {
+void Window::InvalidateRectangle(PRectangle rc) noexcept {
 	const RECT rcw = RectFromPRectangle(rc);
 	::InvalidateRect(HwndFromWindowID(wid), &rcw, FALSE);
 }
@@ -2357,7 +2349,7 @@ HCURSOR GetReverseArrowCursor() noexcept {
 				FlipBitmap(info.hbmMask, bmp.bmWidth, bmp.bmHeight);
 				if (info.hbmColor)
 					FlipBitmap(info.hbmColor, bmp.bmWidth, bmp.bmHeight);
-				info.xHotspot = static_cast<DWORD>(bmp.bmWidth) - 1 - info.xHotspot;
+				info.xHotspot = bmp.bmWidth - 1 - info.xHotspot;
 
 				reverseArrowCursor = ::CreateIconIndirect(&info);
 				if (reverseArrowCursor)
@@ -2407,7 +2399,7 @@ void Window::SetCursor(Cursor curs) noexcept {
 
 /* Returns rectangle of monitor pt is on, both rect and pt are in Window's
    coordinates */
-PRectangle Window::GetMonitorRect(const Point &pt) const noexcept {
+PRectangle Window::GetMonitorRect(Point pt) const noexcept {
 	const PRectangle rcPosition = GetPosition();
 	POINT ptDesktop = { static_cast<LONG>(pt.x + rcPosition.left),
 		static_cast<LONG>(pt.y + rcPosition.top) };
@@ -2482,7 +2474,7 @@ class ListBoxX : public ListBox {
 	int desiredVisibleRows;
 	unsigned int maxItemCharacters;
 	unsigned int aveCharWidth;
-	const Window *parent;
+	Window *parent;
 	int ctrlID;
 	IListBoxDelegate *delegate;
 	const char *widestItem;
@@ -2529,7 +2521,7 @@ public:
 		}
 	}
 	void SetFont(const Font &font) noexcept override;
-	void Create(const Window &parent_, int ctrlID_, const Point &location_, int lineHeight_, bool unicodeMode_, int technology_) noexcept override;
+	void Create(Window &parent_, int ctrlID_, Point location_, int lineHeight_, bool unicodeMode_, int technology_) noexcept override;
 	void SetAverageCharWidth(int width) noexcept override;
 	void SetVisibleRows(int rows) noexcept override;
 	int GetVisibleRows() const noexcept override;
@@ -2561,7 +2553,7 @@ ListBox *ListBox::Allocate() {
 	return lb;
 }
 
-void ListBoxX::Create(const Window &parent_, int ctrlID_, const Point &location_, int lineHeight_, bool unicodeMode_, int technology_) noexcept {
+void ListBoxX::Create(Window &parent_, int ctrlID_, Point location_, int lineHeight_, bool unicodeMode_, int technology_) noexcept {
 	parent = &parent_;
 	ctrlID = ctrlID_;
 	location = location_;
@@ -3339,7 +3331,7 @@ void Menu::Destroy() noexcept {
 	mid = nullptr;
 }
 
-void Menu::Show(const Point &pt, const Window &w) noexcept {
+void Menu::Show(Point pt, const Window &w) noexcept {
 	::TrackPopupMenu(static_cast<HMENU>(mid),
 		TPM_RIGHTBUTTON, static_cast<int>(pt.x - 4), static_cast<int>(pt.y), 0,
 		HwndFromWindowID(w.GetID()), nullptr);

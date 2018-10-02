@@ -593,7 +593,7 @@ const char *CellBuffer::RangePointer(Sci::Position position, Sci::Position range
 }
 
 Sci::Position CellBuffer::GapPosition() const noexcept {
-	return static_cast<Sci::Position>(substance.GapPosition());
+	return substance.GapPosition();
 }
 
 // The char* returned is to an allocation owned by the undo history
@@ -662,7 +662,7 @@ const char *CellBuffer::DeleteChars(Sci::Position position, Sci::Position delete
 }
 
 Sci::Position CellBuffer::Length() const noexcept {
-	return static_cast<Sci::Position>(substance.Length());
+	return substance.Length();
 }
 
 void CellBuffer::Allocate(Sci::Position newSize) {

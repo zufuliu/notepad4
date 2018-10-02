@@ -349,7 +349,7 @@ Sci::Line Document::LineFromHandle(int markerHandle) const noexcept {
 }
 
 Sci_Position SCI_METHOD Document::LineStart(Sci_Position line) const noexcept {
-	return cb.LineStart(static_cast<Sci::Line>(line));
+	return cb.LineStart(line);
 }
 
 bool Document::IsLineStartPosition(Sci::Position position) const noexcept {
@@ -434,10 +434,10 @@ Sci::Line Document::LineFromPositionIndex(Sci::Position pos, int lineCharacterIn
 }
 
 int SCI_METHOD Document::SetLevel(Sci_Position line, int level) {
-	const int prev = Levels()->SetLevel(static_cast<Sci::Line>(line), level, LinesTotal());
+	const int prev = Levels()->SetLevel(line, level, LinesTotal());
 	if (prev != level) {
 		DocModification mh(SC_MOD_CHANGEFOLD | SC_MOD_CHANGEMARKER,
-			LineStart(line), 0, 0, nullptr, static_cast<Sci::Line>(line));
+			LineStart(line), 0, 0, nullptr, line);
 		mh.foldLevelNow = level;
 		mh.foldLevelPrev = prev;
 		NotifyModified(mh);
@@ -446,7 +446,7 @@ int SCI_METHOD Document::SetLevel(Sci_Position line, int level) {
 }
 
 int SCI_METHOD Document::GetLevel(Sci_Position line) const noexcept {
-	return Levels()->GetLevel(static_cast<Sci::Line>(line));
+	return Levels()->GetLevel(line);
 }
 
 void Document::ClearLevels() {
@@ -1116,7 +1116,7 @@ Sci::Position Document::InsertString(Sci::Position position, const char *s, Sci:
 			0, s));
 	if (insertionSet) {
 		s = insertion.c_str();
-		insertLength = static_cast<Sci::Position>(insertion.length());
+		insertLength = insertion.length();
 	}
 	NotifyModified(
 		DocModification(
@@ -1373,7 +1373,7 @@ Sci::Position Document::SetLineIndentation(Sci::Line line, Sci::Position indent)
 		UndoGroup ug(this);
 		DeleteChars(thisLineStart, indentPos - thisLineStart);
 		return thisLineStart + InsertString(thisLineStart, linebuf.c_str(),
-			static_cast<Sci::Position>(linebuf.length()));
+			linebuf.length());
 	} else {
 		return GetLineIndentPosition(line);
 	}
@@ -2168,17 +2168,16 @@ void Document::SetLexInterface(LexInterface *pLexInterface) noexcept {
 }
 
 int SCI_METHOD Document::SetLineState(Sci_Position line, int state) {
-	const int statePrevious = States()->SetLineState(static_cast<Sci::Line>(line), state);
+	const int statePrevious = States()->SetLineState(line, state);
 	if (state != statePrevious) {
-		const DocModification mh(SC_MOD_CHANGELINESTATE, LineStart(line), 0, 0, nullptr,
-			static_cast<Sci::Line>(line));
+		const DocModification mh(SC_MOD_CHANGELINESTATE, LineStart(line), 0, 0, nullptr, line);
 		NotifyModified(mh);
 	}
 	return statePrevious;
 }
 
 int SCI_METHOD Document::GetLineState(Sci_Position line) const {
-	return States()->GetLineState(static_cast<Sci::Line>(line));
+	return States()->GetLineState(line);
 }
 
 Sci::Line Document::GetMaxLineState() const noexcept {
@@ -2317,7 +2316,7 @@ void Document::NotifySavePoint(bool atSavePoint) noexcept {
 	}
 }
 
-void Document::NotifyModified(const DocModification &mh) {
+void Document::NotifyModified(DocModification mh) {
 	if (mh.modificationType & SC_MOD_INSERTTEXT) {
 		decorations->InsertSpace(mh.position, mh.length);
 	} else if (mh.modificationType & SC_MOD_DELETETEXT) {
@@ -3149,7 +3148,7 @@ const char *BuiltinRegex::SubstituteByPosition(Document *doc, const char *text, 
 			substituted.push_back(text[j]);
 		}
 	}
-	*length = static_cast<Sci::Position>(substituted.length());
+	*length = substituted.length();
 	return substituted.c_str();
 }
 

@@ -423,7 +423,7 @@ int ViewStyle::ExternalMarginWidth() const noexcept {
 	return marginInside ? 0 : fixedColumnWidth;
 }
 
-int ViewStyle::MarginFromLocation(const Point &pt) const {
+int ViewStyle::MarginFromLocation(Point pt) const {
 	int margin = -1;
 	int x = marginInside ? 0 : -fixedColumnWidth;
 	for (size_t i = 0; i < ms.size(); i++) {

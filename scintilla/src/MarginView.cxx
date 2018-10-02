@@ -55,7 +55,7 @@ using namespace Scintilla;
 
 namespace Scintilla {
 
-void DrawWrapMarker(Surface *surface, const PRectangle &rcPlace,
+void DrawWrapMarker(Surface *surface, PRectangle rcPlace,
 	bool isEndMarker, ColourDesired wrapColour) {
 	surface->PenColour(wrapColour);
 
@@ -180,7 +180,7 @@ static int SubstituteMarkerIfEmpty(int markerCheck, int markerDefault, const Vie
 	return markerCheck;
 }
 
-void MarginView::PaintMargin(Surface *surface, Sci::Line topLine, const PRectangle &rc, const PRectangle &rcMargin,
+void MarginView::PaintMargin(Surface *surface, Sci::Line topLine, PRectangle rc, PRectangle rcMargin,
 	const EditModel &model, const ViewStyle &vs) {
 
 	PRectangle rcSelMargin = rcMargin;

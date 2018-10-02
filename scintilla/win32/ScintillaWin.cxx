@@ -163,7 +163,7 @@ inline void SetWindowID(HWND hWnd, int identifier) noexcept {
 	::SetWindowLongPtr(hWnd, GWLP_ID, identifier);
 }
 
-inline Point PointFromPOINT(const POINT &pt) noexcept {
+inline Point PointFromPOINT(POINT pt) noexcept {
 	return Point::FromInts(pt.x, pt.y);
 }
 
@@ -171,7 +171,7 @@ inline Point PointFromLParam(sptr_t lpoint) noexcept {
 	return Point::FromInts(GET_X_LPARAM(lpoint), GET_Y_LPARAM(lpoint));
 }
 
-constexpr POINT POINTFromPoint(const Point &pt) noexcept {
+constexpr POINT POINTFromPoint(Point pt) noexcept {
 	return POINT{ static_cast<LONG>(pt.x), static_cast<LONG>(pt.y) };
 }
 
@@ -382,7 +382,7 @@ class ScintillaWin :
 		invalidTimerID, standardTimerID, idleTimerID, fineTimerStart
 	};
 
-	bool DragThreshold(const Point &ptStart, const Point &ptNow) noexcept override;
+	bool DragThreshold(Point ptStart, Point ptNow) noexcept override;
 	void StartDrag() override;
 	static int MouseModifiers(uptr_t wParam) noexcept;
 
@@ -415,7 +415,7 @@ class ScintillaWin :
 	void SetMouseCapture(bool on) noexcept override;
 	bool HaveMouseCapture() noexcept override;
 	void SetTrackMouseLeaveEvent(bool on) noexcept;
-	bool PaintContains(const PRectangle &rc) const noexcept override;
+	bool PaintContains(PRectangle rc) const noexcept override;
 	void ScrollText(Sci::Line linesToMove) override;
 	void NotifyCaretMove() noexcept override;
 	void UpdateSystemCaret() override;
@@ -426,8 +426,8 @@ class ScintillaWin :
 	void NotifyFocus(bool focus) override;
 	void SetCtrlID(int identifier) noexcept override;
 	int GetCtrlID() const noexcept override;
-	void NotifyParent(SCNotification &scn) noexcept override;
-	void NotifyDoubleClick(const Point &pt, int modifiers) override;
+	void NotifyParent(SCNotification scn) noexcept override;
+	void NotifyDoubleClick(Point pt, int modifiers) override;
 	void NotifyURIDropped(const char *list) noexcept;
 	CaseFolder *CaseFolderForEncoding() override;
 	std::string CaseMapString(const std::string &s, int caseMapping) override;
@@ -435,7 +435,7 @@ class ScintillaWin :
 	void CopyAllowLine() override;
 	bool CanPaste() override;
 	void Paste() override;
-	void CreateCallTipWindow(const PRectangle &rc) noexcept override;
+	void CreateCallTipWindow(PRectangle rc) noexcept override;
 	void ClaimSelection() noexcept override;
 
 	// DBCS
@@ -705,7 +705,7 @@ HWND ScintillaWin::MainHWND() const noexcept {
 	return static_cast<HWND>(wMain.GetID());
 }
 
-bool ScintillaWin::DragThreshold(const Point &ptStart, const Point &ptNow) noexcept {
+bool ScintillaWin::DragThreshold(Point ptStart, Point ptNow) noexcept {
 	const int xMove = static_cast<int>(std::abs(ptStart.x - ptNow.x));
 	const int yMove = static_cast<int>(std::abs(ptStart.y - ptNow.y));
 	return (xMove > ::GetSystemMetrics(SM_CXDRAG)) ||
@@ -786,7 +786,7 @@ int KeyTranslate(int keyIn) noexcept {
 	}
 }
 
-bool BoundsContains(const PRectangle &rcBounds, HRGN hRgnBounds, const PRectangle &rcCheck) noexcept {
+bool BoundsContains(PRectangle rcBounds, HRGN hRgnBounds, PRectangle rcCheck) noexcept {
 	bool contains = true;
 	if (!rcCheck.Empty()) {
 		if (!rcBounds.Contains(rcCheck)) {
@@ -813,19 +813,19 @@ bool BoundsContains(const PRectangle &rcBounds, HRGN hRgnBounds, const PRectangl
 
 // Simplify calling WideCharToMultiByte and MultiByteToWideChar by providing default parameters and using string view.
 
-int MultiByteFromWideChar(UINT codePage, std::wstring_view wsv, LPSTR lpMultiByteStr, ptrdiff_t cbMultiByte) noexcept {
+inline int MultiByteFromWideChar(UINT codePage, std::wstring_view wsv, LPSTR lpMultiByteStr, ptrdiff_t cbMultiByte) noexcept {
 	return ::WideCharToMultiByte(codePage, 0, wsv.data(), static_cast<int>(wsv.length()), lpMultiByteStr, static_cast<int>(cbMultiByte), nullptr, nullptr);
 }
 
-int MultiByteLenFromWideChar(UINT codePage, std::wstring_view wsv) noexcept {
+inline int MultiByteLenFromWideChar(UINT codePage, std::wstring_view wsv) noexcept {
 	return MultiByteFromWideChar(codePage, wsv, nullptr, 0);
 }
 
-int WideCharFromMultiByte(UINT codePage, std::string_view sv, LPWSTR lpWideCharStr, ptrdiff_t cchWideChar) noexcept {
+inline int WideCharFromMultiByte(UINT codePage, std::string_view sv, LPWSTR lpWideCharStr, ptrdiff_t cchWideChar) noexcept {
 	return ::MultiByteToWideChar(codePage, 0, sv.data(), static_cast<int>(sv.length()), lpWideCharStr, static_cast<int>(cchWideChar));
 }
 
-int WideCharLenFromMultiByte(UINT codePage, std::string_view sv) noexcept {
+inline int WideCharLenFromMultiByte(UINT codePage, std::string_view sv) noexcept {
 	return WideCharFromMultiByte(codePage, sv, nullptr, 0);
 }
 
@@ -885,7 +885,7 @@ Sci::Position ScintillaWin::TargetAsUTF8(char *text) const {
 // Translates a nul terminated UTF8 string into the document encoding.
 // Return the length of the result in bytes.
 Sci::Position ScintillaWin::EncodedFromUTF8(const char *utf8, char *encoded) const {
-	const Sci::Position inputLength = (lengthForEncode >= 0) ? lengthForEncode : static_cast<Sci::Position>(strlen(utf8));
+	const Sci::Position inputLength = (lengthForEncode >= 0) ? lengthForEncode : strlen(utf8);
 	if (IsUnicodeMode()) {
 		if (encoded) {
 			memcpy(encoded, utf8, inputLength);
@@ -1080,7 +1080,7 @@ void ScintillaWin::SelectionToHangul() {
 		if (converted > 0) {
 			pdoc->BeginUndoAction();
 			ClearSelection();
-			InsertPaste(documentStr.data(), static_cast<Sci::Position>(documentStr.size()));
+			InsertPaste(documentStr.data(), documentStr.size());
 			pdoc->EndUndoAction();
 		}
 	}
@@ -1776,8 +1776,8 @@ sptr_t ScintillaWin::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam
 		break;
 
 		case EM_SETSEL: {
-			Sci::Position nStart = static_cast<Sci::Position>(wParam);
-			Sci::Position nEnd = static_cast<Sci::Position>(lParam);
+			Sci::Position nStart = wParam;
+			Sci::Position nEnd = lParam;
 			if (nStart == 0 && nEnd == -1) {
 				nEnd = pdoc->Length();
 			}
@@ -1957,7 +1957,7 @@ void ScintillaWin::SetTrackMouseLeaveEvent(bool on) noexcept {
 	trackedMouseLeave = on;
 }
 
-bool ScintillaWin::PaintContains(const PRectangle &rc) const noexcept {
+bool ScintillaWin::PaintContains(PRectangle rc) const noexcept {
 	if (paintState == painting) {
 		return BoundsContains(rcPaint, hRgnUpdate, rc);
 	}
@@ -2091,14 +2091,14 @@ int ScintillaWin::GetCtrlID() const noexcept {
 	return ::GetDlgCtrlID(static_cast<HWND>(wMain.GetID()));
 }
 
-void ScintillaWin::NotifyParent(SCNotification &scn) noexcept {
+void ScintillaWin::NotifyParent(SCNotification scn) noexcept {
 	scn.nmhdr.hwndFrom = MainHWND();
 	scn.nmhdr.idFrom = GetCtrlID();
 	::SendMessage(::GetParent(MainHWND()), WM_NOTIFY,
 		GetCtrlID(), reinterpret_cast<LPARAM>(&scn));
 }
 
-void ScintillaWin::NotifyDoubleClick(const Point &pt, int modifiers) {
+void ScintillaWin::NotifyDoubleClick(Point pt, int modifiers) {
 	//Platform::DebugPrintf("ScintillaWin Double click 0\n");
 	ScintillaBase::NotifyDoubleClick(pt, modifiers);
 	// Send myself a WM_LBUTTONDBLCLK, so the container can handle it too.
@@ -2372,7 +2372,7 @@ void ScintillaWin::Paste() {
 				MultiByteFromWideChar(cpDest, uptr, putf.data(), len);
 			}
 
-			InsertPasteShape(putf.data(), static_cast<Sci::Position>(len), pasteShape);
+			InsertPasteShape(putf.data(), len, pasteShape);
 		}
 		memUSelection.Unlock();
 	} else {
@@ -2396,9 +2396,9 @@ void ScintillaWin::Paste() {
 					std::vector<char> putf(mlen + 1);
 					UTF8FromUTF16(wsv, putf.data(), mlen);
 
-					InsertPasteShape(putf.data(), static_cast<Sci::Position>(mlen), pasteShape);
+					InsertPasteShape(putf.data(), mlen, pasteShape);
 				} else {
-					InsertPasteShape(ptr, static_cast<Sci::Position>(len), pasteShape);
+					InsertPasteShape(ptr, len, pasteShape);
 				}
 			}
 			memSelection.Unlock();
@@ -2408,7 +2408,7 @@ void ScintillaWin::Paste() {
 	Redraw();
 }
 
-void ScintillaWin::CreateCallTipWindow(const PRectangle&) noexcept {
+void ScintillaWin::CreateCallTipWindow(PRectangle) noexcept {
 	if (!ct.wCallTip.Created()) {
 		HWND wnd = ::CreateWindow(callClassName, TEXT("ACallTip"),
 			WS_POPUP, 100, 100, 150, 20,
@@ -2698,8 +2698,8 @@ void ScintillaWin::ImeStartComposition() {
 			// Since the style creation code has been made platform independent,
 			// The logfont for the IME is recreated here.
 			const int styleHere = pdoc->StyleIndexAt(sel.MainCaret());
-			LOGFONTW lf = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, L"" };
-			int sizeZoomed = GetFontSizeZoomed(vs.styles[styleHere].size, vs.zoomLevel);
+			LOGFONTW lf = { };
+			const int sizeZoomed = GetFontSizeZoomed(vs.styles[styleHere].size, vs.zoomLevel);
 			AutoSurface surface(this);
 			int deviceHeight = sizeZoomed;
 			if (surface) {

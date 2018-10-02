@@ -186,7 +186,7 @@ void LineLayout::SetLineStart(int line, int start) {
 	lineStarts[line] = start;
 }
 
-void LineLayout::SetBracesHighlight(const Range &rangeLine, const Sci::Position braces[],
+void LineLayout::SetBracesHighlight(Range rangeLine, const Sci::Position braces[],
 	char bracesMatchStyle, int xHighlight, bool ignoreStyle) {
 	if (!ignoreStyle && rangeLine.ContainsCharacter(braces[0])) {
 		const Sci::Position braceOffset = braces[0] - rangeLine.start;
@@ -208,7 +208,7 @@ void LineLayout::SetBracesHighlight(const Range &rangeLine, const Sci::Position 
 	}
 }
 
-void LineLayout::RestoreBracesHighlight(const Range &rangeLine, const Sci::Position braces[], bool ignoreStyle) {
+void LineLayout::RestoreBracesHighlight(Range rangeLine, const Sci::Position braces[], bool ignoreStyle) {
 	if (!ignoreStyle && rangeLine.ContainsCharacter(braces[0])) {
 		const Sci::Position braceOffset = braces[0] - rangeLine.start;
 		if (braceOffset < numCharsInLine) {
@@ -224,7 +224,7 @@ void LineLayout::RestoreBracesHighlight(const Range &rangeLine, const Sci::Posit
 	xHighlightGuide = 0;
 }
 
-int LineLayout::FindBefore(XYPOSITION x, const Range &range) const {
+int LineLayout::FindBefore(XYPOSITION x, Range range) const {
 	Sci::Position lower = range.start;
 	Sci::Position upper = range.end;
 	do {
@@ -239,7 +239,7 @@ int LineLayout::FindBefore(XYPOSITION x, const Range &range) const {
 	return static_cast<int>(lower);
 }
 
-int LineLayout::FindPositionFromX(XYPOSITION x, const Range &range, bool charPosition) const {
+int LineLayout::FindPositionFromX(XYPOSITION x, Range range, bool charPosition) const {
 	int pos = FindBefore(x, range);
 	while (pos < range.end) {
 		if (charPosition) {
@@ -551,7 +551,7 @@ void BreakFinder::Insert(Sci::Position val) {
 	}
 }
 
-BreakFinder::BreakFinder(const LineLayout *ll_, const Selection *psel, const Range &lineRange_, Sci::Position posLineStart_,
+BreakFinder::BreakFinder(const LineLayout *ll_, const Selection *psel, Range lineRange_, Sci::Position posLineStart_,
 	int xStart, bool breakForSelection, const Document *pdoc_, const SpecialRepresentations *preprs_, const ViewStyle *pvsDraw) :
 	ll(ll_),
 	lineRange(lineRange_),

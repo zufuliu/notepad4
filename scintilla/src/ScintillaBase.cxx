@@ -244,8 +244,8 @@ void ScintillaBase::AutoCompleteStart(Sci::Position lenEntered, const char *list
 	if (ac.chooseSingle && (listType == 0)) {
 		if (list && !strchr(list, ac.GetSeparator())) {
 			const char *typeSep = strchr(list, ac.GetTypesep());
-			const Sci::Position lenInsert = static_cast<Sci::Position>(typeSep ?
-				(typeSep - list) : strlen(list));
+			const Sci::Position lenInsert = typeSep ?
+				(typeSep - list) : strlen(list);
 			if (ac.ignoreCase) {
 				// May need to convert the case before invocation, so remove lenEntered characters
 				AutoCompleteInsert(sel.MainCaret() - lenEntered, lenEntered, list, lenInsert);
@@ -421,7 +421,7 @@ void ScintillaBase::AutoCompleteCompleted(char ch, unsigned int completionMethod
 		endPos = pdoc->ExtendWordSelect(endPos, 1, true);
 	if (endPos < firstPos)
 		return;
-	AutoCompleteInsert(firstPos, endPos - firstPos, selected.c_str(), static_cast<Sci::Position>(selected.length()));
+	AutoCompleteInsert(firstPos, endPos - firstPos, selected.c_str(), selected.length());
 	SetLastXChosen();
 
 	scn.nmhdr.code = SCN_AUTOCCOMPLETED;
@@ -450,9 +450,8 @@ int ScintillaBase::AutoCompleteGetCurrentText(char *buffer) const {
 	return 0;
 }
 
-void ScintillaBase::CallTipShow(const Point &pt_, const char *defn) {
+void ScintillaBase::CallTipShow(Point pt, const char *defn) {
 	ac.Cancel();
-	Point pt = pt_;
 	// If container knows about STYLE_CALLTIP then use it in place of the
 	// STYLE_DEFAULT for the face name, size and character set. Also use it
 	// for the foreground and background colour.
@@ -507,12 +506,12 @@ void ScintillaBase::CancelModes() noexcept {
 	Editor::CancelModes();
 }
 
-void ScintillaBase::ButtonDownWithModifiers(const Point &pt, unsigned int curTime, int modifiers) {
+void ScintillaBase::ButtonDownWithModifiers(Point pt, unsigned int curTime, int modifiers) {
 	CancelModes();
 	Editor::ButtonDownWithModifiers(pt, curTime, modifiers);
 }
 
-void ScintillaBase::RightButtonDownWithModifiers(const Point &pt, unsigned int curTime, int modifiers) {
+void ScintillaBase::RightButtonDownWithModifiers(Point pt, unsigned int curTime, int modifiers) {
 	CancelModes();
 	Editor::RightButtonDownWithModifiers(pt, curTime, modifiers);
 }
@@ -828,7 +827,7 @@ sptr_t ScintillaBase::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lPara
 	switch (iMessage) {
 	case SCI_AUTOCSHOW:
 		listType = 0;
-		AutoCompleteStart(static_cast<Sci::Position>(wParam), ConstCharPtrFromSPtr(lParam));
+		AutoCompleteStart(wParam, ConstCharPtrFromSPtr(lParam));
 		break;
 
 	case SCI_AUTOCCANCEL:
@@ -966,7 +965,7 @@ sptr_t ScintillaBase::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lPara
 		return ac.GetTypesep();
 
 	case SCI_CALLTIPSHOW:
-		CallTipShow(LocationFromPosition(static_cast<Sci::Position>(wParam)),
+		CallTipShow(LocationFromPosition(wParam),
 			ConstCharPtrFromSPtr(lParam));
 		break;
 
@@ -981,7 +980,7 @@ sptr_t ScintillaBase::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lPara
 		return ct.posStartCallTip;
 
 	case SCI_CALLTIPSETPOSSTART:
-		ct.posStartCallTip = static_cast<Sci::Position>(wParam);
+		ct.posStartCallTip = wParam;
 		break;
 
 	case SCI_CALLTIPSETHLT:
@@ -1029,10 +1028,10 @@ sptr_t ScintillaBase::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lPara
 
 	case SCI_COLOURISE:
 		if (DocumentLexState()->lexLanguage == SCLEX_CONTAINER) {
-			pdoc->ModifiedAt(static_cast<Sci::Position>(wParam));
-			NotifyStyleToNeeded((lParam == -1) ? pdoc->Length() : static_cast<Sci::Position>(lParam));
+			pdoc->ModifiedAt(wParam);
+			NotifyStyleToNeeded((lParam == -1) ? pdoc->Length() : lParam);
 		} else {
-			DocumentLexState()->Colourise(static_cast<Sci::Position>(wParam), static_cast<Sci::Position>(lParam));
+			DocumentLexState()->Colourise(wParam, lParam);
 		}
 		Redraw();
 		break;

@@ -136,20 +136,20 @@ public:
 		return (rc.left == left) && (rc.right == right) &&
 			(rc.top == top) && (rc.bottom == bottom);
 	}
-	bool Contains(const Point &pt) const noexcept {
+	bool Contains(Point pt) const noexcept {
 		return (pt.x >= left) && (pt.x <= right) &&
 			(pt.y >= top) && (pt.y <= bottom);
 	}
-	bool ContainsWholePixel(const Point &pt) const noexcept {
+	bool ContainsWholePixel(Point pt) const noexcept {
 		// Does the rectangle contain all of the pixel to left/below the point
 		return (pt.x >= left) && ((pt.x + 1) <= right) &&
 			(pt.y >= top) && ((pt.y + 1) <= bottom);
 	}
-	bool Contains(const PRectangle &rc) const noexcept {
+	bool Contains(PRectangle rc) const noexcept {
 		return (rc.left >= left) && (rc.right <= right) &&
 			(rc.top >= top) && (rc.bottom <= bottom);
 	}
-	bool Intersects(const PRectangle &other) const noexcept {
+	bool Intersects(PRectangle other) const noexcept {
 		return (right > other.left) && (left < other.right) &&
 			(bottom > other.top) && (top < other.bottom);
 	}
@@ -370,25 +370,25 @@ public:
 	virtual void MoveTo(int x_, int y_) noexcept = 0;
 	virtual void LineTo(int x_, int y_) noexcept = 0;
 	virtual void Polygon(const Point *pts, size_t npts, ColourDesired fore, ColourDesired back) = 0;
-	virtual void RectangleDraw(const PRectangle &rc, ColourDesired fore, ColourDesired back) = 0;
-	virtual void FillRectangle(const PRectangle &rc, ColourDesired back) = 0;
-	virtual void FillRectangle(const PRectangle &rc, const Surface &surfacePattern) = 0;
-	virtual void RoundedRectangle(const PRectangle &rc, ColourDesired fore, ColourDesired back) = 0;
-	virtual void AlphaRectangle(const PRectangle &rc, int cornerSize, ColourDesired fill, int alphaFill,
+	virtual void RectangleDraw(PRectangle rc, ColourDesired fore, ColourDesired back) = 0;
+	virtual void FillRectangle(PRectangle rc, ColourDesired back) = 0;
+	virtual void FillRectangle(PRectangle rc, Surface &surfacePattern) = 0;
+	virtual void RoundedRectangle(PRectangle rc, ColourDesired fore, ColourDesired back) = 0;
+	virtual void AlphaRectangle(PRectangle rc, int cornerSize, ColourDesired fill, int alphaFill,
 		ColourDesired outline, int alphaOutline, int flags) = 0;
 	enum class GradientOptions {
 		leftToRight, topToBottom
 	};
-	virtual void GradientRectangle(const PRectangle &rc, const std::vector<ColourStop> &stops, GradientOptions options) = 0;
-	virtual void DrawRGBAImage(const PRectangle &rc, int width, int height, const unsigned char *pixelsImage) = 0;
-	virtual void Ellipse(const PRectangle &rc, ColourDesired fore, ColourDesired back) = 0;
-	virtual void Copy(const PRectangle &rc, const Point &from, const Surface &surfaceSource) = 0;
+	virtual void GradientRectangle(PRectangle rc, const std::vector<ColourStop> &stops, GradientOptions options) = 0;
+	virtual void DrawRGBAImage(PRectangle rc, int width, int height, const unsigned char *pixelsImage) = 0;
+	virtual void Ellipse(PRectangle rc, ColourDesired fore, ColourDesired back) = 0;
+	virtual void Copy(PRectangle rc, Point from, Surface &surfaceSource) = 0;
 
 	virtual std::unique_ptr<IScreenLineLayout> Layout(const IScreenLine *screenLine) = 0;
 
-	virtual void DrawTextNoClip(const PRectangle &rc, const Font &font_, XYPOSITION ybase, std::string_view text, ColourDesired fore, ColourDesired back) = 0;
-	virtual void DrawTextClipped(const PRectangle &rc, const Font &font_, XYPOSITION ybase, std::string_view text, ColourDesired fore, ColourDesired back) = 0;
-	virtual void DrawTextTransparent(const PRectangle &rc, const Font &font_, XYPOSITION ybase, std::string_view text, ColourDesired fore) = 0;
+	virtual void DrawTextNoClip(PRectangle rc, const Font &font_, XYPOSITION ybase, std::string_view text, ColourDesired fore, ColourDesired back) = 0;
+	virtual void DrawTextClipped(PRectangle rc, const Font &font_, XYPOSITION ybase, std::string_view text, ColourDesired fore, ColourDesired back) = 0;
+	virtual void DrawTextTransparent(PRectangle rc, const Font &font_, XYPOSITION ybase, std::string_view text, ColourDesired fore) = 0;
 	virtual void MeasureWidths(const Font &font_, std::string_view text, XYPOSITION *positions) = 0;
 	virtual XYPOSITION WidthText(const Font &font_, std::string_view text) = 0;
 	virtual XYPOSITION Ascent(const Font &font_) noexcept = 0;
@@ -397,7 +397,7 @@ public:
 	virtual XYPOSITION Height(const Font &font_) noexcept = 0;
 	virtual XYPOSITION AverageCharWidth(const Font &font_) = 0;
 
-	virtual void SetClip(const PRectangle &rc) noexcept = 0;
+	virtual void SetClip(PRectangle rc) noexcept = 0;
 	virtual void FlushCachedState() noexcept = 0;
 
 	virtual void SetUnicodeMode(bool unicodeMode_) noexcept = 0;
@@ -432,18 +432,18 @@ public:
 	}
 	void Destroy() noexcept;
 	PRectangle GetPosition() const noexcept;
-	void SetPosition(const PRectangle &rc) noexcept;
-	void SetPositionRelative(PRectangle &rc, const Window *relativeTo) noexcept;
+	void SetPosition(PRectangle rc) noexcept;
+	void SetPositionRelative(PRectangle rc, const Window *relativeTo) noexcept;
 	PRectangle GetClientPosition() const noexcept;
 	void Show(bool show = true) const noexcept;
 	void InvalidateAll() noexcept;
-	void InvalidateRectangle(const PRectangle &rc) noexcept;
+	void InvalidateRectangle(PRectangle rc) noexcept;
 	virtual void SetFont(const Font &font) noexcept;
 	enum Cursor {
 		cursorInvalid, cursorText, cursorArrow, cursorUp, cursorWait, cursorHoriz, cursorVert, cursorReverseArrow, cursorHand
 	};
 	void SetCursor(Cursor curs) noexcept;
-	PRectangle GetMonitorRect(const Point &pt) const noexcept;
+	PRectangle GetMonitorRect(Point pt) const noexcept;
 private:
 	Cursor cursorLast;
 };
@@ -473,7 +473,7 @@ public:
 	static ListBox *Allocate();
 
 	void SetFont(const Font &font) noexcept override = 0;
-	virtual void Create(const Window &parent, int ctrlID, const Point &location, int lineHeight_, bool unicodeMode_, int technology_) noexcept = 0;
+	virtual void Create(Window &parent, int ctrlID, Point location, int lineHeight_, bool unicodeMode_, int technology_) noexcept = 0;
 	virtual void SetAverageCharWidth(int width) noexcept = 0;
 	virtual void SetVisibleRows(int rows) noexcept = 0;
 	virtual int GetVisibleRows() const noexcept = 0;
@@ -505,7 +505,7 @@ public:
 	}
 	void CreatePopUp() noexcept;
 	void Destroy() noexcept;
-	void Show(const Point &pt, const Window &w) noexcept;
+	void Show(Point pt, const Window &w) noexcept;
 };
 
 #if defined(__clang__)

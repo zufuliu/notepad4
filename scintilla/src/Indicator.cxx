@@ -23,13 +23,13 @@
 
 using namespace Scintilla;
 
-static inline PRectangle PixelGridAlign(const PRectangle &rc) noexcept {
+static inline PRectangle PixelGridAlign(PRectangle rc) noexcept {
 	// Move left and right side to nearest pixel to avoid blurry visuals
 	return PRectangle(round(rc.left), floor(rc.top),
 		round(rc.right), floor(rc.bottom));
 }
 
-void Indicator::Draw(Surface *surface, const PRectangle &rc, const PRectangle &rcLine, const PRectangle &rcCharacter, DrawState drawState, int value) const {
+void Indicator::Draw(Surface *surface, PRectangle rc, PRectangle rcLine, PRectangle rcCharacter, DrawState drawState, int value) const {
 	StyleAndColour sacDraw = sacNormal;
 	if (Flags() & SC_INDICFLAG_VALUEFORE) {
 		sacDraw.fore = ColourDesired(value & SC_INDICVALUEMASK);
