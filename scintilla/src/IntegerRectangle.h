@@ -16,7 +16,7 @@ struct IntegerRectangle {
 	int right;
 	int bottom;
 
-	explicit IntegerRectangle(const PRectangle &rc) noexcept :
+	explicit IntegerRectangle(PRectangle rc) noexcept :
 		left(static_cast<int>(rc.left)), top(static_cast<int>(rc.top)),
 		right(static_cast<int>(rc.right)), bottom(static_cast<int>(rc.bottom)) {
 	}

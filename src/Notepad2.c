@@ -6724,7 +6724,7 @@ void UpdateStatusbar(void) {
 	WCHAR tchMatchesCount[32];
 #endif
 
-	int iPos =  SciCall_GetCurrentPos();
+	Sci_Position iPos =  SciCall_GetCurrentPos();
 
 	const int iLn = SciCall_LineFromPosition(iPos) + 1;
 	wsprintf(tchLn, L"%i", iLn);
@@ -6738,8 +6738,8 @@ void UpdateStatusbar(void) {
 	wsprintf(tchCol, L"%i", iCol);
 	FormatNumberStr(tchCol);
 
-	int iLineStart = SciCall_PositionFromLine(iLn - 1);
-	int iLineEnd = SciCall_GetLineEndPosition(iLn - 1);
+	const Sci_Position iLineStart = SciCall_PositionFromLine(iLn - 1);
+	const Sci_Position iLineEnd = SciCall_GetLineEndPosition(iLn - 1);
 	iPos = SciCall_CountCharacters(iLineStart, iPos) + 1;
 	iCol = SciCall_CountCharacters(iLineStart, iLineEnd);
 	wsprintf(tchCh, L"%i", iPos);
@@ -6751,8 +6751,8 @@ void UpdateStatusbar(void) {
 	wsprintf(tchCols, L"%i", iCol);
 	FormatNumberStr(tchCols);
 
-	const int iSelStart = SciCall_GetSelectionStart();
-	const int iSelEnd = SciCall_GetSelectionEnd();
+	const Sci_Position iSelStart = SciCall_GetSelectionStart();
+	const Sci_Position iSelEnd = SciCall_GetSelectionEnd();
 	if (iSelStart == iSelEnd) {
 		lstrcpy(tchSel, L"0");
 		lstrcpy(tchSelCh, L"0");
@@ -6774,10 +6774,10 @@ void UpdateStatusbar(void) {
 		lstrcpy(tchLinesSelected, L"0");
 		lstrcpy(tchMatchesCount, L"0");
 	} else {
-		iLineStart = SciCall_LineFromPosition(iSelStart);
-		iLineEnd = SciCall_LineFromPosition(iSelEnd);
-		int iStartOfLinePos = SciCall_PositionFromLine(iLineEnd);
-		int iLinesSelected = iLineEnd - iLineStart;
+		const int iStartLine = SciCall_LineFromPosition(iSelStart);
+		const int iEndLine = SciCall_LineFromPosition(iSelEnd);
+		const Sci_Position iStartOfLinePos = SciCall_PositionFromLine(iEndLine);
+		int iLinesSelected = iEndLine - iStartLine;
 		if (iSelStart != iSelEnd && iStartOfLinePos != iSelEnd) {
 			iLinesSelected += 1;
 		}

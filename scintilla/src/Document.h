@@ -72,11 +72,11 @@ public:
 		}
 	}
 
-	bool Contains(const Range &other) const noexcept {
+	bool Contains(Range other) const noexcept {
 		return Contains(other.start) && Contains(other.end);
 	}
 
-	bool Overlaps(const Range &other) const noexcept {
+	bool Overlaps(Range other) const noexcept {
 		return
 			Contains(other.start) ||
 			Contains(other.end) ||
@@ -527,7 +527,7 @@ public:
 private:
 	void NotifyModifyAttempt() noexcept;
 	void NotifySavePoint(bool atSavePoint) noexcept;
-	void NotifyModified(const DocModification &mh);
+	void NotifyModified(DocModification mh);
 };
 
 class UndoGroup {
@@ -605,7 +605,7 @@ public:
 
 	virtual void NotifyModifyAttempt(Document *doc, void *userData) noexcept = 0;
 	virtual void NotifySavePoint(Document *doc, void *userData, bool atSavePoint) noexcept = 0;
-	virtual void NotifyModified(Document *doc, const DocModification &mh, void *userData) = 0;
+	virtual void NotifyModified(Document *doc, DocModification mh, void *userData) = 0;
 	virtual void NotifyDeleted(Document *doc, void *userData) noexcept = 0;
 	virtual void NotifyStyleNeeded(Document *doc, void *userData, Sci::Position endPos) = 0;
 	virtual void NotifyLexerChanged(Document *doc, void *userData) = 0;

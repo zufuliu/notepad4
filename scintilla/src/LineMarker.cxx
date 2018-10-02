@@ -74,7 +74,7 @@ void LineMarker::SetXPM(const char *const *linesForm) {
 	markType = SC_MARK_PIXMAP;
 }
 
-void LineMarker::SetRGBAImage(const Point &sizeRGBAImage, float scale, const unsigned char *pixelsRGBAImage) {
+void LineMarker::SetRGBAImage(Point sizeRGBAImage, float scale, const unsigned char *pixelsRGBAImage) {
 	image = std::make_unique<RGBAImage>(static_cast<int>(sizeRGBAImage.x), static_cast<int>(sizeRGBAImage.y), scale, pixelsRGBAImage);
 	markType = SC_MARK_RGBAIMAGE;
 }
@@ -109,7 +109,7 @@ static void DrawMinus(Surface *surface, int centreX, int centreY, int armSize, C
 	surface->FillRectangle(rcH, fore);
 }
 
-void LineMarker::Draw(Surface *surface, const PRectangle &rcWhole, const Font &fontForCharacter, typeOfFold tFold, int marginStyle) const {
+void LineMarker::Draw(Surface *surface, PRectangle rcWhole, const Font &fontForCharacter, typeOfFold tFold, int marginStyle) const {
 	if (customDraw) {
 		customDraw(surface, rcWhole, fontForCharacter, tFold, marginStyle, this);
 		return;

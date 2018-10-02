@@ -90,11 +90,11 @@ int CallTip::NextTabPos(int x) const noexcept {
 // Draw a section of the call tip that does not include \n in one colour.
 // The text may include up to numEnds tabs or arrow characters.
 void CallTip::DrawChunk(Surface *surface, int &x, const char *s,
-	int posStart, int posEnd, int ytext, const PRectangle &rcClient_,
+	int posStart, int posEnd, int ytext, PRectangle rcClient,
 	bool highlight, bool draw) {
 	s += posStart;
 	const int len = posEnd - posStart;
-	PRectangle rcClient = rcClient_;
+
 	// Divide the text into sections that are all text, or that are
 	// single arrows or single tab characters (if tabSize > 0).
 	int maxEnd = 0;
@@ -247,7 +247,7 @@ void CallTip::PaintCT(Surface *surfaceWindow) {
 #endif
 }
 
-void CallTip::MouseClick(const Point &pt) noexcept {
+void CallTip::MouseClick(Point pt) noexcept {
 	clickPlace = 0;
 	if (rectUp.Contains(pt))
 		clickPlace = 1;
@@ -255,7 +255,7 @@ void CallTip::MouseClick(const Point &pt) noexcept {
 		clickPlace = 2;
 }
 
-PRectangle CallTip::CallTipStart(Sci::Position pos, const Point &pt, int textHeight, const char *defn,
+PRectangle CallTip::CallTipStart(Sci::Position pos, Point pt, int textHeight, const char *defn,
 	const char *faceName, int size,
 	int codePage_, int characterSet,
 	int technology, const Window &wParent) {

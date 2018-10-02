@@ -392,7 +392,7 @@ _label_identifier:
 						const bool next_is_word = iswordstart(ch);
 						if (next_char == ')' || next_char == '>') {
 							if (next_is_word || (ch == '(')) {
-								pos = sc.currentPos - static_cast<Sci_PositionU>(strlen(s)) - 1;
+								pos = sc.currentPos - strlen(s) - 1;
 								while (IsASpace(styler.SafeGetCharAt(pos))) pos--;
 								ch = styler.SafeGetCharAt(pos);
 								if (next_char == '>' && (ch == '<' || ch == ',')) {
@@ -415,7 +415,7 @@ _label_identifier:
 							if (ch == '=') {
 								is_class = true;
 							} else if (ch == ',' || ch == ';') {
-								pos = sc.currentPos - static_cast<Sci_PositionU>(strlen(s)) - 1;
+								pos = sc.currentPos - strlen(s) - 1;
 								while (IsASpace(styler.SafeGetCharAt(pos))) pos--;
 								ch = styler.SafeGetCharAt(pos);
 								if (iswordchar(ch) || ch == ';' || ch == '{') {

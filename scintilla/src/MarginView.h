@@ -10,9 +10,9 @@
 
 namespace Scintilla {
 
-void DrawWrapMarker(Surface *surface, const PRectangle &rcPlace, bool isEndMarker, ColourDesired wrapColour);
+void DrawWrapMarker(Surface *surface, PRectangle rcPlace, bool isEndMarker, ColourDesired wrapColour);
 
-typedef void (*DrawWrapMarkerFn)(Surface *surface, const PRectangle &rcPlace, bool isEndMarker, ColourDesired wrapColour);
+typedef void (*DrawWrapMarkerFn)(Surface *surface, PRectangle rcPlace, bool isEndMarker, ColourDesired wrapColour);
 
 /**
 * MarginView draws the margins.
@@ -37,7 +37,7 @@ public:
 	void DropGraphics(bool freeObjects) noexcept;
 	void AllocateGraphics(const ViewStyle &vsDraw);
 	void RefreshPixMaps(Surface *surfaceWindow, WindowID wid, const ViewStyle &vsDraw);
-	void PaintMargin(Surface *surface, Sci::Line topLine, const PRectangle &rc, const PRectangle &rcMargin,
+	void PaintMargin(Surface *surface, Sci::Line topLine, PRectangle rc, PRectangle rcMargin,
 		const EditModel &model, const ViewStyle &vs);
 };
 

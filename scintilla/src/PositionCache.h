@@ -10,11 +10,11 @@
 
 namespace Scintilla {
 
-inline constexpr bool IsEOLChar(char ch) noexcept {
+constexpr bool IsEOLChar(int ch) noexcept {
 	return (ch == '\r') || (ch == '\n');
 }
 
-inline constexpr bool IsSpaceOrTab(int ch) noexcept {
+constexpr bool IsSpaceOrTab(int ch) noexcept {
 	return ch == ' ' || ch == '\t';
 }
 
@@ -30,7 +30,7 @@ public:
 	explicit PointDocument(double x_ = 0, double y_ = 0) noexcept : x(x_), y(y_) {}
 
 	// Conversion from Point.
-	explicit PointDocument(const Point &pt) noexcept : x(pt.x), y(pt.y) {}
+	explicit PointDocument(Point pt) noexcept : x(pt.x), y(pt.y) {}
 };
 
 // There are two points for some positions and this enumeration
@@ -110,11 +110,11 @@ public:
 	bool InLine(int offset, int line) const;
 	int SubLineFromPosition(int posInLine, PointEnd pe) const;
 	void SetLineStart(int line, int start);
-	void SetBracesHighlight(const Range &rangeLine, const Sci::Position braces[],
+	void SetBracesHighlight(Range rangeLine, const Sci::Position braces[],
 		char bracesMatchStyle, int xHighlight, bool ignoreStyle);
-	void RestoreBracesHighlight(const Range &rangeLine, const Sci::Position braces[], bool ignoreStyle);
-	int FindBefore(XYPOSITION x, const Range &range) const;
-	int FindPositionFromX(XYPOSITION x, const Range &range, bool charPosition) const;
+	void RestoreBracesHighlight(Range rangeLine, const Sci::Position braces[], bool ignoreStyle);
+	int FindBefore(XYPOSITION x, Range range) const;
+	int FindPositionFromX(XYPOSITION x, Range range, bool charPosition) const;
 	Point PointFromPosition(int posInLine, int lineHeight, PointEnd pe) const;
 	int EndLineStyle() const;
 };
@@ -261,7 +261,7 @@ public:
 	enum {
 		lengthEachSubdivision = 100
 	};
-	BreakFinder(const LineLayout *ll_, const Selection *psel, const Range &lineRange_, Sci::Position posLineStart_,
+	BreakFinder(const LineLayout *ll_, const Selection *psel, Range lineRange_, Sci::Position posLineStart_,
 		int xStart, bool breakForSelection, const Document *pdoc_, const SpecialRepresentations *preprs_, const ViewStyle *pvsDraw);
 	// Deleted so BreakFinder objects can not be copied.
 	BreakFinder(const BreakFinder &) = delete;

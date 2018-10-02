@@ -311,7 +311,7 @@ enum {
 	UTF8_4ByteMask3  = (1 << 10) | (1 << 1) | (1 << (3 + 1)) | (1 << (3 + 2)),
 };
 
-#define mask_match(mask, test)	((mask & test) == test)
+#define mask_match(mask, test)	(((mask) & (test)) == (test))
 
 const unsigned char UTF8ClassifyTable[256] = {
 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, // 00 - 0F

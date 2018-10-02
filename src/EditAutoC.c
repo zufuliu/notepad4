@@ -222,7 +222,7 @@ static inline BOOL IsStringFormatChar(int ch, int style) {
 	return FALSE;
 }
 
-static inline BOOL NeedSpaceAfterKeyword(const char *word, int length) {
+static inline BOOL NeedSpaceAfterKeyword(const char *word, Sci_Position length) {
 	const char *p = StrStrA(
 		" if for try using while elseif switch foreach synchronized "
 		, word);
@@ -239,18 +239,18 @@ void AutoC_AddDocWord(HWND hwnd, struct WordList *pWList, BOOL bIgnore) {
 	Sci_Position iCurrentPos = SciCall_GetCurrentPos() - iRootLen;
 	int iDocLen = SciCall_GetLength();
 	int findFlag = bIgnore ? SCFIND_WORDSTART : (SCFIND_WORDSTART | SCFIND_MATCHCASE);
-	int iPosFind;
+	Sci_Position iPosFind;
 
 	ft.lpstrText = pRoot;
 	ft.chrg.cpMax = iDocLen;
 	iPosFind = SciCall_FindText(findFlag, &ft);
 
 	while (iPosFind >= 0 && iPosFind < iDocLen) {
-		int wordEnd = iPosFind + iRootLen;
+		Sci_Position wordEnd = iPosFind + iRootLen;
 		int style = SciCall_GetStyleAt(wordEnd - 1);
 		if (iPosFind != iCurrentPos && !IsWordStyleToIgnore(style)) {
 			int chPrev, ch = *pRoot, chNext = SciCall_GetCharAt(wordEnd);
-			int wordLength = -iPosFind;
+			Sci_Position wordLength = -iPosFind;
 			BOOL bSubWord = FALSE;
 			while (wordEnd < iDocLen) {
 				chPrev = ch;
@@ -279,11 +279,8 @@ void AutoC_AddDocWord(HWND hwnd, struct WordList *pWList, BOOL bIgnore) {
 				char *pWord = pWList->wordBuf + DefaultAlignment;
 				bIgnore = TRUE;
 				tr.lpstrText = pWord;
-				tr.chrg.cpMin = iPosFind;
-				tr.chrg.cpMax = wordEnd;
-				if (wordLength > NP2_AUTOC_MAX_WORD_LENGTH) {
-					tr.chrg.cpMax = iPosFind + NP2_AUTOC_MAX_WORD_LENGTH;
-				}
+				tr.chrg.cpMin = (Sci_PositionCR)iPosFind;
+				tr.chrg.cpMax = (Sci_PositionCR)((wordLength > NP2_AUTOC_MAX_WORD_LENGTH)? iPosFind + NP2_AUTOC_MAX_WORD_LENGTH : wordEnd);
 
 				SciCall_GetTextRange(&tr);
 				ch = SciCall_GetCharAt(iPosFind - 1);
@@ -350,13 +347,13 @@ void AutoC_AddDocWord(HWND hwnd, struct WordList *pWList, BOOL bIgnore) {
 							}
 						}
 						pWord[wordLength] = '\0';
-						WordList_AddWord(pWList, pWord, wordLength);
+						WordList_AddWord(pWList, pWord, (int)wordLength);
 					}
 				}
 			}
 		}
 
-		ft.chrg.cpMin = wordEnd;
+		ft.chrg.cpMin = (Sci_PositionCR)wordEnd;
 		iPosFind = SciCall_FindText(findFlag, &ft);
 	}
 }
@@ -450,8 +447,8 @@ INT AutoC_AddSpecWord(struct WordList *pWList, int iCurrentStyle, int ch, int ch
 void EditCompleteWord(HWND hwnd, BOOL autoInsert) {
 	const Sci_Position iCurrentPos = SciCall_GetCurrentPos();
 	const int iCurrentStyle = SciCall_GetStyleAt(iCurrentPos);
-	int iLine = SciCall_LineFromPosition(iCurrentPos);
-	const int iLineStartPos = SciCall_PositionFromLine(iLine);
+	const int iLine = SciCall_LineFromPosition(iCurrentPos);
+	const Sci_Position iLineStartPos = SciCall_PositionFromLine(iLine);
 	Sci_Position iCurrentLinePos = iCurrentPos - iLineStartPos;
 	Sci_Position iStartWordPos = iCurrentLinePos;
 
@@ -510,17 +507,17 @@ void EditCompleteWord(HWND hwnd, BOOL autoInsert) {
 	}
 
 	if (iStartWordPos > 0) {
-		iLine = iStartWordPos - 1;
-		ch = pLine[iLine];
-		if (iLine > 0) {
-			chPrev = pLine[iLine - 1];
+		Sci_Position pos = iStartWordPos - 1;
+		ch = pLine[pos];
+		if (pos > 0) {
+			chPrev = pLine[pos - 1];
 		}
 		if (pLexCurrent->rid == NP2LEX_CPP && (ch == '#' || IsASpace(ch))) {
-			while (iLine >= 0 && IsASpace(ch)) {
-				ch = pLine[iLine--];
+			while (pos >= 0 && IsASpace(ch)) {
+				ch = pLine[pos--];
 			}
-			while (iLine >= 0 && IsASpace(pLine[iLine--])){}
-			if (iLine > 0) {
+			while (pos >= 0 && IsASpace(pLine[pos--])){}
+			if (pos > 0) {
 				ch = '\0';
 				chPrev = '\0';
 			}
@@ -536,7 +533,7 @@ void EditCompleteWord(HWND hwnd, BOOL autoInsert) {
 
 	if (iRootLen) {
 		pRoot = NP2HeapAlloc(iCurrentLinePos - iStartWordPos + iRootLen);
-		lstrcpynA(pRoot, pLine + iStartWordPos, iCurrentLinePos - iStartWordPos + 1);
+		lstrcpynA(pRoot, pLine + iStartWordPos, (int)(iCurrentLinePos - iStartWordPos + 1));
 		iRootLen = lstrlenA(pRoot);
 		if (!iRootLen) {
 			NP2HeapFree(pRoot);
@@ -725,9 +722,9 @@ static inline BOOL IsHtmlVoidTag(const char *word, int length) {
 void EditAutoCloseXMLTag(HWND hwnd) {
 	char tchBuf[512];
 	Sci_Position iCurPos = SciCall_GetCurrentPos();
-	int	 iHelper = iCurPos - (COUNTOF(tchBuf) - 1);
+	int	 iHelper = (int)(iCurPos - (COUNTOF(tchBuf) - 1));
 	int	 iStartPos = max_i(0, iHelper);
-	int	 iSize = iCurPos - iStartPos;
+	Sci_Position iSize = iCurPos - iStartPos;
 	BOOL autoClosed = FALSE;
 
 	if (pLexCurrent->iLexer == SCLEX_CPP) {
@@ -750,7 +747,7 @@ void EditAutoCloseXMLTag(HWND hwnd) {
 	if (iSize >= 3 && iHelper) {
 		struct Sci_TextRange tr;
 		tr.chrg.cpMin = iStartPos;
-		tr.chrg.cpMax = iCurPos;
+		tr.chrg.cpMax = (Sci_PositionCR)iCurPos;
 		tr.lpstrText = tchBuf;
 		SendMessage(hwnd, SCI_GETTEXTRANGE, 0, (LPARAM)&tr);
 

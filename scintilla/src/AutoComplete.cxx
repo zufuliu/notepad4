@@ -55,8 +55,8 @@ bool AutoComplete::Active() const noexcept {
 	return active;
 }
 
-void AutoComplete::Start(const Window &parent, int ctrlID,
-	Sci::Position position, const Point &location, Sci::Position startLen_,
+void AutoComplete::Start(Window &parent, int ctrlID,
+	Sci::Position position, Point location, Sci::Position startLen_,
 	int lineHeight, bool unicodeMode, int technology) noexcept {
 	if (active) {
 		Cancel();
@@ -264,11 +264,11 @@ void AutoComplete::Select(const char *word) {
 				// Check for exact-case match
 				for (; pivot <= end; pivot++) {
 					lb->GetValue(sortMatrix[pivot], item, maxItemLen);
-					if (!strncmp(word, item, lenWord)) {
+					if (strncmp(word, item, lenWord) == 0) {
 						location = pivot;
 						break;
 					}
-					if (CompareNCaseInsensitive(word, item, lenWord))
+					if (CompareNCaseInsensitive(word, item, lenWord) != 0)
 						break;
 				}
 			}
@@ -289,9 +289,9 @@ void AutoComplete::Select(const char *word) {
 			char item[maxItemLen];
 			for (int i = location + 1; i <= end; ++i) {
 				lb->GetValue(sortMatrix[i], item, maxItemLen);
-				if (CompareNCaseInsensitive(word, item, lenWord))
+				if (CompareNCaseInsensitive(word, item, lenWord) != 0)
 					break;
-				if (sortMatrix[i] < sortMatrix[location] && !strncmp(word, item, lenWord))
+				if (sortMatrix[i] < sortMatrix[location] && strncmp(word, item, lenWord) == 0)
 					location = i;
 			}
 		}

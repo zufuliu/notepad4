@@ -197,7 +197,7 @@ public:
 	void SetStyleFontName(int styleIndex, const char *name);
 	bool ProtectionActive() const noexcept;
 	int ExternalMarginWidth() const noexcept;
-	int MarginFromLocation(const Point &pt) const;
+	int MarginFromLocation(Point pt) const;
 	bool ValidStyle(size_t styleIndex) const noexcept;
 	void CalcLargestMarkerHeight() noexcept;
 	int GetFrameWidth() const noexcept;

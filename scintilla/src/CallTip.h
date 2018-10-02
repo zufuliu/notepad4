@@ -26,7 +26,7 @@ class CallTip {
 	bool above;		// if true, display calltip above text
 
 	void DrawChunk(Surface *surface, int &x, const char *s,
-		int posStart, int posEnd, int ytext, const PRectangle &rcClient,
+		int posStart, int posEnd, int ytext, PRectangle rcClient,
 		bool highlight, bool draw);
 	int PaintContents(Surface *surfaceWindow, bool draw);
 	bool IsTabCharacter(char ch) const noexcept;
@@ -60,10 +60,10 @@ public:
 
 	void PaintCT(Surface *surfaceWindow);
 
-	void MouseClick(const Point &pt) noexcept;
+	void MouseClick(Point pt) noexcept;
 
 	/// Setup the calltip and return a rectangle of the area required.
-	PRectangle CallTipStart(Sci::Position pos, const Point &pt, int textHeight, const char *defn,
+	PRectangle CallTipStart(Sci::Position pos, Point pt, int textHeight, const char *defn,
 		const char *faceName, int size, int codePage_,
 		int characterSet, int technology, const Window &wParent);
 

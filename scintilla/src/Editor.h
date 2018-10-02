@@ -279,7 +279,7 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	// The top left visible point in main window coordinates. Will be 0,0 except for
 	// scroll views where it will be equivalent to the current scroll position.
 	Point GetVisibleOriginInMain() const noexcept override;
-	PointDocument DocumentPointFromView(const Point &ptView) const noexcept;  // Convert a point from view space to document
+	PointDocument DocumentPointFromView(Point ptView) const noexcept;  // Convert a point from view space to document
 	Sci::Line TopLineOfMain() const noexcept override;   // Return the line at Main's y coordinate 0
 	virtual PRectangle GetClientRectangle() const noexcept;
 	virtual PRectangle GetClientDrawingRectangle() const noexcept;
@@ -288,23 +288,23 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	Sci::Line LinesOnScreen() const noexcept override;
 	Sci::Line LinesToScroll() const noexcept;
 	Sci::Line MaxScrollPos() const noexcept;
-	SelectionPosition ClampPositionIntoDocument(const SelectionPosition &sp) const noexcept;
-	Point LocationFromPosition(const SelectionPosition &pos, PointEnd pe = peDefault);
+	SelectionPosition ClampPositionIntoDocument(SelectionPosition sp) const noexcept;
+	Point LocationFromPosition(SelectionPosition pos, PointEnd pe = peDefault);
 	Point LocationFromPosition(Sci::Position pos, PointEnd pe = peDefault);
-	int XFromPosition(const SelectionPosition &sp);
-	SelectionPosition SPositionFromLocation(const Point &pt, bool canReturnInvalid = false, bool charPosition = false, bool virtualSpace = true);
-	Sci::Position PositionFromLocation(const Point &pt, bool canReturnInvalid = false, bool charPosition = false);
+	int XFromPosition(SelectionPosition sp);
+	SelectionPosition SPositionFromLocation(Point pt, bool canReturnInvalid = false, bool charPosition = false, bool virtualSpace = true);
+	Sci::Position PositionFromLocation(Point pt, bool canReturnInvalid = false, bool charPosition = false);
 	SelectionPosition SPositionFromLineX(Sci::Line lineDoc, int x);
 	Sci::Position PositionFromLineX(Sci::Line lineDoc, int x);
-	Sci::Line LineFromLocation(const Point &pt) const noexcept;
+	Sci::Line LineFromLocation(Point pt) const noexcept;
 	void SetTopLine(Sci::Line topLineNew) noexcept;
 
 	virtual bool AbandonPaint() noexcept;
-	virtual void RedrawRect(const PRectangle &rc) noexcept;
+	virtual void RedrawRect(PRectangle rc) noexcept;
 	virtual void DiscardOverdraw() noexcept;
 	virtual void Redraw() noexcept;
 	void RedrawSelMargin(Sci::Line line = -1, bool allAfter = false) noexcept;
-	PRectangle RectangleFromRange(const Range &r, int overlap) const noexcept;
+	PRectangle RectangleFromRange(Range r, int overlap) const noexcept;
 	void InvalidateRange(Sci::Position start, Sci::Position end) noexcept;
 
 	bool UserVirtualSpace() const noexcept {
@@ -316,14 +316,14 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	SelectionPosition SelectionEnd();
 	void SetRectangularRange();
 	void ThinRectangularRange();
-	void InvalidateSelection(const SelectionRange &newMain, bool invalidateWholeSelection = false);
+	void InvalidateSelection(SelectionRange newMain, bool invalidateWholeSelection = false);
 	void InvalidateWholeSelection();
-	SelectionRange LineSelectionRange(const SelectionPosition &currentPos_, const SelectionPosition &anchor_) const noexcept;
-	void SetSelection(const SelectionPosition &currentPos, const SelectionPosition &anchor);
+	SelectionRange LineSelectionRange(SelectionPosition currentPos_, SelectionPosition anchor_) const noexcept;
+	void SetSelection(SelectionPosition currentPos_, SelectionPosition anchor_);
 	void SetSelection(Sci::Position currentPos_, Sci::Position anchor_);
-	void SetSelection(const SelectionPosition &currentPos);
+	void SetSelection(SelectionPosition currentPos_);
 	void SetSelection(int currentPos_);
-	void SetEmptySelection(const SelectionPosition &currentPos);
+	void SetEmptySelection(SelectionPosition currentPos_);
 	void SetEmptySelection(Sci::Position currentPos_);
 	enum AddNumber {
 		addOne, addEach
@@ -332,11 +332,11 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	bool RangeContainsProtected(Sci::Position start, Sci::Position end) const;
 	bool SelectionContainsProtected();
 	Sci::Position MovePositionOutsideChar(Sci::Position pos, Sci::Position moveDir, bool checkLineEnd = true) const;
-	SelectionPosition MovePositionOutsideChar(const SelectionPosition &pos, Sci::Position moveDir, bool checkLineEnd = true) const;
-	void MovedCaret(const SelectionPosition &newPos, SelectionPosition previousPos, bool ensureVisible);
-	void MovePositionTo(const SelectionPosition &newPos, Selection::selTypes selt = Selection::noSel, bool ensureVisible = true);
+	SelectionPosition MovePositionOutsideChar(SelectionPosition pos, Sci::Position moveDir, bool checkLineEnd = true) const;
+	void MovedCaret(SelectionPosition newPos, SelectionPosition previousPos, bool ensureVisible);
+	void MovePositionTo(SelectionPosition newPos, Selection::selTypes selt = Selection::noSel, bool ensureVisible = true);
 	void MovePositionTo(Sci::Position newPos, Selection::selTypes selt = Selection::noSel, bool ensureVisible = true);
-	SelectionPosition MovePositionSoVisible(const SelectionPosition &pos, int moveDir);
+	SelectionPosition MovePositionSoVisible(SelectionPosition pos, int moveDir);
 	SelectionPosition MovePositionSoVisible(Sci::Position pos, int moveDir);
 	Point PointMainCaret();
 	void SetLastXChosen();
@@ -365,10 +365,10 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 		xysHorizontal = 0x4,
 		xysDefault = xysUseMargin | xysVertical | xysHorizontal
 	};
-	XYScrollPosition XYScrollToMakeVisible(const SelectionRange &range, XYScrollOptions options);
-	void SetXYScroll(const XYScrollPosition &newXY);
+	XYScrollPosition XYScrollToMakeVisible(SelectionRange range, XYScrollOptions options);
+	void SetXYScroll(XYScrollPosition newXY);
 	void EnsureCaretVisible(bool useMargin = true, bool vert = true, bool horiz = true);
-	void ScrollRange(const SelectionRange &range);
+	void ScrollRange(SelectionRange range);
 	void ShowCaretAtCurrentPosition();
 	void DropCaret();
 	void CaretSetPeriod(int period);
@@ -386,9 +386,9 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	void LinesJoin();
 	void LinesSplit(int pixelWidth);
 
-	void PaintSelMargin(Surface *surfaceWindow, const PRectangle &rc);
+	void PaintSelMargin(Surface *surfaceWindow, PRectangle rc);
 	void RefreshPixMaps(Surface *surfaceWindow);
-	void Paint(Surface *surfaceWindow, const PRectangle &frcArea);
+	void Paint(Surface *surfaceWindow, PRectangle rcArea);
 	Sci::Position FormatRange(bool draw, const Sci_RangeToFormat *pfr);
 	int TextWidth(int style, const char *text);
 
@@ -401,7 +401,7 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 
 	void FilterSelections();
 	Sci::Position RealizeVirtualSpace(Sci::Position position, Sci::Position virtualSpace);
-	SelectionPosition RealizeVirtualSpace(const SelectionPosition &position);
+	SelectionPosition RealizeVirtualSpace(SelectionPosition position);
 	void AddChar(char ch);
 	virtual void AddCharUTF(const char *s, unsigned int len, bool treatAsDBCS = false);
 	void ClearBeforeTentativeStart();
@@ -414,7 +414,7 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	void ClearAll();
 	void ClearDocumentStyle();
 	virtual void Cut();
-	void PasteRectangular(const SelectionPosition &pos, const char *ptr, Sci::Position len);
+	void PasteRectangular(SelectionPosition pos, const char *ptr, Sci::Position len);
 	virtual void Copy() = 0;
 	virtual void CopyAllowLine();
 	virtual bool CanPaste();
@@ -433,28 +433,28 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	virtual int GetCtrlID() const noexcept {
 		return ctrlID;
 	}
-	virtual void NotifyParent(SCNotification &scn) noexcept = 0;
+	virtual void NotifyParent(SCNotification scn) noexcept = 0;
 	virtual void NotifyStyleToNeeded(Sci::Position endStyleNeeded);
 	void NotifyChar(int ch) noexcept;
 	void NotifySavePoint(bool isSavePoint) noexcept;
 	void NotifyModifyAttempt() noexcept;
-	virtual void NotifyDoubleClick(const Point &pt, int modifiers);
+	virtual void NotifyDoubleClick(Point pt, int modifiers);
 	void NotifyHotSpotClicked(Sci::Position position, int modifiers) noexcept;
 	void NotifyHotSpotDoubleClicked(Sci::Position position, int modifiers) noexcept;
 	void NotifyHotSpotReleaseClick(Sci::Position position, int modifiers) noexcept;
 	bool NotifyUpdateUI() noexcept;
 	void NotifyPainted() noexcept;
 	void NotifyIndicatorClick(bool click, Sci::Position position, int modifiers) noexcept;
-	bool NotifyMarginClick(const Point &pt, int modifiers);
-	bool NotifyMarginRightClick(const Point &pt, int modifiers);
+	bool NotifyMarginClick(Point pt, int modifiers);
+	bool NotifyMarginRightClick(Point pt, int modifiers);
 	void NotifyNeedShown(Sci::Position pos, Sci::Position len) noexcept;
-	void NotifyDwelling(const Point &pt, bool state);
+	void NotifyDwelling(Point pt, bool state);
 	void NotifyZoom() noexcept;
 
 	void NotifyModifyAttempt(Document *document, void *userData) noexcept override;
 	void NotifySavePoint(Document *document, void *userData, bool atSavePoint) noexcept override;
-	void CheckModificationForWrap(const DocModification &mh);
-	void NotifyModified(Document *document, const DocModification &mh, void *userData) override;
+	void CheckModificationForWrap(DocModification mh);
+	void NotifyModified(Document *document, DocModification mh, void *userData) override;
 	void NotifyDeleted(Document *document, void *userData) noexcept override;
 	void NotifyStyleNeeded(Document *doc, void *userData, Sci::Position endStyleNeeded) override;
 	void NotifyLexerChanged(Document *doc, void *userData) override;
@@ -473,7 +473,7 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	void Duplicate(bool forLine);
 	virtual void CancelModes() noexcept;
 	void NewLine();
-	SelectionPosition PositionUpOrDown(const SelectionPosition &spStart, int direction, int lastX);
+	SelectionPosition PositionUpOrDown(SelectionPosition spStart, int direction, int lastX);
 	void CursorUpOrDown(int direction, Selection::selTypes selt);
 	void ParaUpOrDown(int direction, Selection::selTypes selt);
 	Range RangeDisplayLine(Sci::Line lineVisible);
@@ -501,26 +501,26 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	void CopySelectionRange(SelectionText *ss, bool allowLineCopy = false);
 	void CopyRangeToClipboard(Sci::Position start, Sci::Position end);
 	void CopyText(size_t length, const char *text);
-	void SetDragPosition(const SelectionPosition &newPos);
+	void SetDragPosition(SelectionPosition newPos);
 	virtual void DisplayCursor(Window::Cursor c) noexcept;
-	virtual bool DragThreshold(const Point &ptStart, const Point &ptNow) noexcept;
+	virtual bool DragThreshold(Point ptStart, Point ptNow) noexcept;
 	virtual void StartDrag();
-	void DropAt(const SelectionPosition &position, const char *value, size_t lengthValue, bool moving, bool rectangular);
-	void DropAt(const SelectionPosition &position, const char *value, bool moving, bool rectangular);
+	void DropAt(SelectionPosition position, const char *value, size_t lengthValue, bool moving, bool rectangular);
+	void DropAt(SelectionPosition position, const char *value, bool moving, bool rectangular);
 	/** PositionInSelection returns true if position in selection. */
 	bool PositionInSelection(Sci::Position pos);
-	bool PointInSelection(const Point &pt);
-	bool PointInSelMargin(const Point &pt) const noexcept;
-	Window::Cursor GetMarginCursor(const Point &pt) const noexcept;
+	bool PointInSelection(Point pt);
+	bool PointInSelMargin(Point pt) const noexcept;
+	Window::Cursor GetMarginCursor(Point pt) const noexcept;
 	void TrimAndSetSelection(Sci::Position currentPos_, Sci::Position anchor_);
 	void LineSelection(Sci::Position lineCurrentPos_, Sci::Position lineAnchorPos_, bool wholeLine);
 	void WordSelection(Sci::Position pos);
 	void DwellEnd(bool mouseMoved);
 	void MouseLeave();
-	virtual void ButtonDownWithModifiers(const Point &pt, unsigned int curTime, int modifiers);
-	virtual void RightButtonDownWithModifiers(const Point &pt, unsigned int curTime, int modifiers);
-	void ButtonMoveWithModifiers(const Point &pt, unsigned int curTime, int modifiers);
-	void ButtonUpWithModifiers(const Point &pt, unsigned int curTime, int modifiers);
+	virtual void ButtonDownWithModifiers(Point pt, unsigned int curTime, int modifiers);
+	virtual void RightButtonDownWithModifiers(Point pt, unsigned int curTime, int modifiers);
+	void ButtonMoveWithModifiers(Point pt, unsigned int curTime, int modifiers);
+	void ButtonUpWithModifiers(Point pt, unsigned int curTime, int modifiers);
 
 	bool Idle();
 	enum TickReason {
@@ -537,18 +537,18 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	virtual bool HaveMouseCapture() noexcept = 0;
 	void SetFocusState(bool focusState);
 
-	Sci::Position PositionAfterArea(const PRectangle &rcArea) const noexcept;
+	Sci::Position PositionAfterArea(PRectangle rcArea) const noexcept;
 	void StyleToPositionInView(Sci::Position pos);
 	Sci::Position PositionAfterMaxStyling(Sci::Position posMax, bool scrolling) const noexcept;
 	void StartIdleStyling(bool truncatedLastStyling) noexcept;
-	void StyleAreaBounded(const PRectangle &rcArea, bool scrolling);
+	void StyleAreaBounded(PRectangle rcArea, bool scrolling);
 	void IdleStyling();
 	virtual void IdleWork();
 	virtual void QueueIdleWork(WorkNeeded::workItems items, Sci::Position upTo = 0) noexcept;
 
-	virtual bool PaintContains(const PRectangle &rc) const noexcept;
+	virtual bool PaintContains(PRectangle rc) const noexcept;
 	bool PaintContainsMargin() const noexcept;
-	void CheckForChangeOutsidePaint(const Range &r) noexcept;
+	void CheckForChangeOutsidePaint(Range r) noexcept;
 	void SetBraceHighlight(Sci::Position pos0, Sci::Position pos1, int matchStyle) noexcept;
 
 	void SetAnnotationHeights(Sci::Line start, Sci::Line end);
@@ -570,11 +570,11 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	Sci::Position ReplaceTarget(bool replacePatterns, const char *text, Sci::Position length = -1);
 
 	bool PositionIsHotspot(Sci::Position position) const;
-	bool PointIsHotspot(const Point &pt);
+	bool PointIsHotspot(Point pt);
 	void SetHotSpotRange(const Point *pt);
 	Range GetHotSpotRange() const noexcept override;
 	void SetHoverIndicatorPosition(Sci::Position position);
-	void SetHoverIndicatorPoint(const Point &pt);
+	void SetHoverIndicatorPoint(Point pt);
 
 	int CodePage() const noexcept;
 	virtual bool ValidCodePage(int /* codePage */) const noexcept {
@@ -670,6 +670,9 @@ public:
 	}
 	operator Surface *() const noexcept {
 		return surf.get();
+	}
+	operator bool() const noexcept {
+		return surf.operator bool();
 	}
 };
 

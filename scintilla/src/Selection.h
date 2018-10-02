@@ -59,7 +59,7 @@ struct SelectionSegment {
 	SelectionPosition start;
 	SelectionPosition end;
 	SelectionSegment() = default;
-	SelectionSegment(const SelectionPosition &a, const SelectionPosition &b) noexcept {
+	SelectionSegment(SelectionPosition a, SelectionPosition b) noexcept {
 		if (a < b) {
 			start = a;
 			end = b;
@@ -71,7 +71,7 @@ struct SelectionSegment {
 	bool Empty() const noexcept {
 		return start == end;
 	}
-	void Extend(const SelectionPosition &p) noexcept {
+	void Extend(SelectionPosition p) noexcept {
 		if (start > p)
 			start = p;
 		if (end < p)
@@ -84,9 +84,9 @@ struct SelectionRange {
 	SelectionPosition anchor;
 
 	SelectionRange() = default;
-	explicit SelectionRange(const SelectionPosition &single) noexcept : caret(single), anchor(single) {}
+	explicit SelectionRange(SelectionPosition single) noexcept : caret(single), anchor(single) {}
 	explicit SelectionRange(Sci::Position single) noexcept : caret(single), anchor(single) {}
-	SelectionRange(const SelectionPosition &caret_, const SelectionPosition &anchor_) noexcept : caret(caret_), anchor(anchor_) {}
+	SelectionRange(SelectionPosition caret_, SelectionPosition anchor_) noexcept : caret(caret_), anchor(anchor_) {}
 	SelectionRange(Sci::Position caret_, Sci::Position anchor_) noexcept : caret(caret_), anchor(anchor_) {}
 	bool Empty() const noexcept {
 		return anchor == caret;
@@ -109,9 +109,9 @@ struct SelectionRange {
 	}
 	void MoveForInsertDelete(bool insertion, Sci::Position startChange, Sci::Position length) noexcept;
 	bool Contains(Sci::Position pos) const noexcept;
-	bool Contains(const SelectionPosition &sp) const noexcept;
+	bool Contains(SelectionPosition sp) const noexcept;
 	bool ContainsCharacter(Sci::Position posCharacter) const noexcept;
-	SelectionSegment Intersect(const SelectionSegment &check) const noexcept;
+	SelectionSegment Intersect(SelectionSegment check) const noexcept;
 	SelectionPosition Start() const noexcept {
 		return (anchor < caret) ? anchor : caret;
 	}
@@ -119,7 +119,7 @@ struct SelectionRange {
 		return (anchor < caret) ? caret : anchor;
 	}
 	void Swap() noexcept;
-	bool Trim(const SelectionRange &range) noexcept;
+	bool Trim(SelectionRange range) noexcept;
 	// If range is all virtual collapse to start of virtual space
 	void MinimizeVirtualSpace() noexcept;
 };
@@ -162,14 +162,14 @@ public:
 	SelectionPosition Last() const noexcept;
 	Sci::Position Length() const noexcept;
 	void MovePositions(bool insertion, Sci::Position startChange, Sci::Position length) noexcept;
-	void TrimSelection(const SelectionRange &range);
-	void TrimOtherSelections(size_t r, const SelectionRange &range);
-	void SetSelection(const SelectionRange &range);
-	void AddSelection(const SelectionRange &range);
-	void AddSelectionWithoutTrim(const SelectionRange &range);
+	void TrimSelection(SelectionRange range);
+	void TrimOtherSelections(size_t r, SelectionRange range);
+	void SetSelection(SelectionRange range);
+	void AddSelection(SelectionRange range);
+	void AddSelectionWithoutTrim(SelectionRange range);
 	void DropSelection(size_t r);
 	void DropAdditionalRanges();
-	void TentativeSelection(const SelectionRange &range);
+	void TentativeSelection(SelectionRange range);
 	void CommitTentative() noexcept;
 	int CharacterInSelection(Sci::Position posCharacter) const;
 	int InSelectionForEOL(Sci::Position pos) const;

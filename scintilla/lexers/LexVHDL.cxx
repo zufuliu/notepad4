@@ -203,7 +203,7 @@ static void FoldVHDLDoc(Sci_PositionU startPos, Sci_Position length, int /*initS
 			}
 		}
 	}
-	for (j = j + static_cast<Sci_PositionU>(strlen(prevWord)); j < endPos; j++) {
+	for (j = j + strlen(prevWord); j < endPos; j++) {
 		const char ch = styler.SafeGetCharAt(j);
 		const int style = styler.StyleAt(j);
 		if ((!IsCommentStyle(style)) && (style != SCE_VHDL_STRING)) {

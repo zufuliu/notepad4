@@ -74,11 +74,11 @@ protected:
 	void ListNotify(ListBoxEvent *plbe) override;
 
 	void CallTipClick() noexcept;
-	void CallTipShow(const Point &pt, const char *defn);
-	virtual void CreateCallTipWindow(const PRectangle &rc) noexcept = 0;
+	void CallTipShow(Point pt, const char *defn);
+	virtual void CreateCallTipWindow(PRectangle rc) noexcept = 0;
 
-	void ButtonDownWithModifiers(const Point &pt, unsigned int curTime, int modifiers) override;
-	void RightButtonDownWithModifiers(const Point &pt, unsigned int curTime, int modifiers) override;
+	void ButtonDownWithModifiers(Point pt, unsigned int curTime, int modifiers) override;
+	void RightButtonDownWithModifiers(Point pt, unsigned int curTime, int modifiers) override;
 
 	void NotifyStyleToNeeded(Sci::Position endStyleNeeded) override;
 	void NotifyLexerChanged(Document *doc, void *userData) override;

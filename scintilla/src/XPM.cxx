@@ -149,7 +149,7 @@ void XPM::Init(const char *const *linesForm) {
 	}
 }
 
-void XPM::Draw(Surface *surface, const PRectangle &rc) {
+void XPM::Draw(Surface *surface, PRectangle rc) {
 	if (pixels.empty()) {
 		return;
 	}
