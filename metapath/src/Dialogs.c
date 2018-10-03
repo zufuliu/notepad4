@@ -640,6 +640,15 @@ INT_PTR CALLBACK GeneralPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPa
 
 	case WM_NOTIFY:
 		switch (((LPNMHDR)lParam)->code) {
+		case NM_CLICK:
+		case NM_RETURN:
+			switch (((LPNMHDR)lParam)->idFrom) {
+			case IDC_CLEARWINPOS:
+				IniClearSection(INI_SECTION_NAME_WINDOW_POSITION);
+				break;
+			}
+			break;
+
 		case PSN_APPLY:
 			if (IsWindowEnabled(GetDlgItem(hwnd, IDC_SAVESETTINGS))) {
 				bSaveSettings = IsButtonChecked(hwnd, IDC_SAVESETTINGS);

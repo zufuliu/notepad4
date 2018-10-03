@@ -378,9 +378,10 @@ BEGIN
     CONTROL         "&Try to reuse existing window when metapath is started.",
                     IDC_REUSEWINDOW,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,
                     133,220,10
-    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,10,151,205,1
+    CONTROL			"<a>Clear window position history</a>",IDC_CLEARWINPOS,"SysLink",WS_TABSTOP,20,145,103,12
+    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,10,161,205,1
     CONTROL         "&Save settings on exit.",IDC_SAVESETTINGS,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,10,160,100,10
+                    BS_AUTOCHECKBOX | WS_TABSTOP,10,170,100,10
 END
 
 IDPP_ADVANCED DIALOGEX 0, 0, 232, 185
