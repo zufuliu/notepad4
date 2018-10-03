@@ -101,6 +101,7 @@
 #define IDC_NEW_PAGE_LINK				110
 #define IDPP_GENERAL                    110
 #define IDC_DDETOPIC                    110
+#define IDC_BUILD_INFO					111
 #define IDPP_ADVANCED                   111
 #define IDPP_ITEMS                      112
 #define IDPP_PROG                       113

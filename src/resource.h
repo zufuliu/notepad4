@@ -95,6 +95,7 @@
 #define IDC_REPLACE						112
 #define IDC_TITLE						112
 #define IDD_ALIGN						112
+#define IDC_BUILD_INFO					113
 #define IDD_ENCLOSESELECTION			113
 #define IDC_REPLACEALL					113
 #define IDC_STYLELABELS					113
