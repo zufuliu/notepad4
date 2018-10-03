@@ -93,6 +93,7 @@
 #define IDD_FINDTARGET                  108
 #define IDC_DDEMSG                      108
 #define IDI_CROSS2                      108
+#define IDC_CLEARWINPOS					108
 #define IDC_ESCEXIT                     109
 #define IDD_FINDWIN                     109
 #define IDC_DDEAPP                      109
