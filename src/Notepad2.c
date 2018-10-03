@@ -5095,17 +5095,20 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 		case SCN_AUTOCSELECTION:
 		case SCN_USERLISTSELECTION: {
-			Sci_Position iCurPos = SciCall_GetCurrentPos();
+			LPCSTR text = scn->text;
+			// function/array/template/generic
+			LPSTR braces = StrPBrkA(text, "([{<");
+			const Sci_Position iCurPos = SciCall_GetCurrentPos();
+			const int ch = SciCall_GetCharAt(iCurPos);
+			if (braces != NULL && *braces == ch) {
+				*braces = L'\0'; // unsafe
+			}
+			const Sci_Position iNewPos = scn->position + ((braces == NULL) ? lstrlenA(text) : (braces - text + 1));
+
 			SendMessage(hwndEdit, SCI_BEGINUNDOACTION, 0, 0);
 			SendMessage(hwndEdit, SCI_SETSEL, scn->position, iCurPos);
-			SendMessage(hwndEdit, SCI_REPLACESEL, 0, (LPARAM)scn->text);
-			// function/array/template/generic
-			if ((iCurPos = lstrlenA(StrPBrkA(scn->text, "([{<"))) != 0) {
-				//if ((iCurPos = lstrlenA(StrChrA(scn->text, '(')))) {
-				iCurPos = 1 - iCurPos;
-			}
-			iCurPos += scn->position + lstrlenA(scn->text);
-			SendMessage(hwndEdit, SCI_SETSEL, iCurPos, iCurPos);
+			SendMessage(hwndEdit, SCI_REPLACESEL, 0, (LPARAM)text);
+			SendMessage(hwndEdit, SCI_SETSEL, iNewPos, iNewPos);
 			SendMessage(hwndEdit, SCI_ENDUNDOACTION, 0, 0);
 			SendMessage(hwndEdit, SCI_AUTOCCANCEL, 0, 0);
 		}
