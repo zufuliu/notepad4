@@ -4032,8 +4032,8 @@ Sci::Position Editor::FindText(
 		pdoc->SetCaseFolder(CaseFolderForEncoding());
 	try {
 		const Sci::Position pos = pdoc->FindText(
-			static_cast<Sci::Position>(ft->chrg.cpMin),
-			static_cast<Sci::Position>(ft->chrg.cpMax),
+			ft->chrg.cpMin,
+			ft->chrg.cpMax,
 			ft->lpstrText,
 			static_cast<int>(wParam),
 			&lengthFound);
@@ -6094,7 +6094,7 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 			if (lParam == 0)
 				return 0;
 			Sci_TextRange *tr = static_cast<Sci_TextRange *>(PtrFromSPtr(lParam));
-			Sci::Position cpMax = static_cast<Sci::Position>(tr->chrg.cpMax);
+			Sci::Position cpMax = tr->chrg.cpMax;
 			if (cpMax == -1)
 				cpMax = pdoc->Length();
 			PLATFORM_ASSERT(cpMax <= pdoc->Length());
