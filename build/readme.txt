@@ -1,3 +1,6 @@
+echo | clang -dM -E -
+echo | gcc -dM -E -
+
 UNREFERENCED_PARAMETER();
 
 /wd4200 /wd4201 /wd4204

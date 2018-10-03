@@ -51,14 +51,25 @@
 #define HELP_LINK_FEATURE_REQUEST	L"https://github.com/zufuliu/notepad2/issues"
 #define HELP_LINK_ONLINE_WIKI		L"https://github.com/zufuliu/notepad2/wiki"
 
+#if defined(__clang__)
+#define VERSION_BUILD_TOOL			L"Clang " __clang_version__
+#elif defined(__GNUC__)
+#define VERSION_BUILD_TOOL			L"GCC " STRINGIFY(__GNUC__ ) L"." STRINGIFY(__GNUC_MINOR__) L"." STRINGIFY(__GNUC_PATCHLEVEL__)
+#elif defined(_MSC_VER)
+#define VERSION_BUILD_TOOL			L"MSVC " STRINGIFY(_MSC_FULL_VER)
+#else
+#define VERSION_BUILD_TOOL			L"Unknown Tool"
+#endif
+#define VERSION_BUILD_INFO			L"Compiled on " __DATE__ L", with " VERSION_BUILD_TOOL L"."
+
 #if defined(_WIN64)
 #define VERSION_FILEVERSION_LONG	L"Notepad2 (64-bit) " STRINGIFY(VERSION_MAJOR) L"." \
 									STRINGIFY(VERSION_MINOR) L"." STRINGIFY(VERSION_BUILD)  \
-									L" r" STRINGIFY(VERSION_REV) L" (" VERSION_HASH L")"
+									L" " VERSION_REV_FULL
 #else
 #define VERSION_FILEVERSION_LONG	L"Notepad2 " STRINGIFY(VERSION_MAJOR) L"."         \
 									STRINGIFY(VERSION_MINOR) L"." STRINGIFY(VERSION_BUILD) \
-									L" r" STRINGIFY(VERSION_REV) L" (" VERSION_HASH L")"
+									L" " VERSION_REV_FULL
 #endif
 
 #endif // NOTEPAD2_VERSION_H

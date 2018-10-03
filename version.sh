@@ -58,7 +58,7 @@ else
 
 fi
 
-ver_full="_T(\"$ver ($hash)$ver_full\")"
+ver_full="_T(\"r$ver ($hash)$ver_full\")"
 
 version_info+="#define VERSION_HASH _T(\"$hash\")"$'\n'
 version_info+="#define VERSION_REV $ver"$'\n'

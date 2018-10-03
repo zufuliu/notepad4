@@ -2,7 +2,7 @@
 <assembly xmlns="urn:schemas-microsoft-com:asm.v1" manifestVersion="1.0">
   <assemblyIdentity
     name="metapath"
-    version="4.0.13.1217"
+    version="4.0.13.1435"
     type="win32"
   />
   <description>metapath</description>
