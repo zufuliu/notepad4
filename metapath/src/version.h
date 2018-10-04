@@ -59,7 +59,7 @@
 #else
 #define VERSION_BUILD_TOOL			L"Unknown Tool"
 #endif
-#define VERSION_BUILD_INFO			L"Compiled on " __DATE__ L", with " VERSION_BUILD_TOOL L"."
+#define VERSION_BUILD_INFO			L"Compiled on " __DATE__ L" with " VERSION_BUILD_TOOL L"."
 
 #if defined(_WIN64)
 #define VERSION_FILEVERSION_LONG	L"metapath (64-bit) " STRINGIFY(VERSION_MAJOR) L"." \

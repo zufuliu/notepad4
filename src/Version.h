@@ -60,7 +60,8 @@
 #else
 #define VERSION_BUILD_TOOL			L"Unknown Tool"
 #endif
-#define VERSION_BUILD_INFO			L"Compiled on " __DATE__ L", with " VERSION_BUILD_TOOL L"."
+#define VERSION_BUILD_INFO			L"Compiled on " __DATE__ L" with " VERSION_BUILD_TOOL L",\n" \
+									L"Scintilla 4.1.2" L"."
 
 #if defined(_WIN64)
 #define VERSION_FILEVERSION_LONG	L"Notepad2 (64-bit) " STRINGIFY(VERSION_MAJOR) L"." \
