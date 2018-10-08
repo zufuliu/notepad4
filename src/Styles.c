@@ -2488,7 +2488,8 @@ BOOL Style_SelectFont(HWND hwnd, LPWSTR lpszStyle, int cchStyle, BOOL bDefaultSt
 void Style_SetDefaultFont(HWND hwnd) {
 	const int iIdx = GetDefaultStyleStartIndex();
 	if (Style_SelectFont(hwnd, lexDefault.Styles[0 + iIdx].szValue, MAX_EDITSTYLE_VALUE_SIZE, TRUE)) {
-		fStylesModified = TRUE;
+		fStylesModified |= STYLESMODIFIED_SOME_STYLE;
+		lexDefault.bStyleChanged = TRUE;
 		Style_SetLexer(hwnd, pLexCurrent);
 	}
 }
