@@ -50,9 +50,9 @@ NP2ENCODING mEncoding[] = {
 	//{ NCP_8BIT | NCP_RECODE, 775, "IBM775,IBM775,CP500,", 61013, NULL },// OEM Baltic; Baltic (DOS)
 	{ NCP_8BIT | NCP_RECODE, 28594, "ISO-8859-4,ISO88594,csisolatin4,isoir110,l4,Latin4,", 61014, NULL },// Baltic (ISO 8859-4); North European
 	{ NCP_8BIT | NCP_RECODE, 1257, "Windows-1257,Windows1257,", 61015, NULL },// ANSI Baltic; Baltic (Windows)
-	//{ NCP_8BIT | NCP_RECODE, 852, "ibm852,ibm852,cp852,", 61016, NULL },// OEM Latin 2; Central European (DOS)
+	//{ NCP_8BIT | NCP_RECODE, 852, "ibm852,ibm852,cp852,", 61016, NULL },// OEM Latin-2; Central European (DOS)
 	{ NCP_8BIT | NCP_RECODE, 28592, "ISO-8859-2,ISO88592,csisolatin2,isoir101,latin2,l2,", 61017, NULL },// Central European (ISO 8859-2); Central European (ISO)
-	//{ NCP_8BIT | NCP_RECODE, 10029, "x-mac-ce,xmacce,", 61018, NULL },// MAC Latin 2; Central European (Mac)
+	//{ NCP_8BIT | NCP_RECODE, 10029, "x-mac-ce,xmacce,", 61018, NULL },// MAC Latin-2; Central European (Mac)
 	{ NCP_8BIT | NCP_RECODE, 1250, "Windows-1250,Windows1250,xcp1250,", 61019, NULL },// ANSI Central European; Central European (Windows)
 	{ NCP_8BIT | NCP_RECODE, 28604, "ISO-8859-14,ISO885914,Windows-28604,Windows28604,", 61055, NULL },// Celtic (ISO 8859-14)
 	{ NCP_8BIT | NCP_RECODE, 936, "GB2312,GB2312,chinese,cngb,csgb2312,csgb231280,gb231280,gbk,", 61020, NULL },// ANSI/OEM Simplified Chinese (PRC, Singapore); Chinese Simplified (GB2312)
@@ -85,14 +85,14 @@ NP2ENCODING mEncoding[] = {
 	{ NCP_8BIT | NCP_RECODE, 932, "Shift_JIS,ShiftJIS,Shiftjs,csshiftjis,cswindows31j,mskanji,xmscp932,xsjis,", 61046, NULL },// ANSI/OEM Japanese; Japanese (Shift-JIS)
 	//{ NCP_8BIT | NCP_RECODE, 10003, "x-mac-korean,xmackorean,", 0, NULL },// Korean (Mac)
 	{ NCP_8BIT | NCP_RECODE, 949, "Windows-949,Windows949,ksx1001,ksc56011987,csksc5601,euckr,isoir149,korean,ksc56011989", 61048, NULL },// ANSI/OEM Korean (Unified Hangul Code)
-	{ NCP_8BIT | NCP_RECODE, 28593, "iso-8859-3,iso88593,latin3,isoir109,l3,", 61049, NULL },// Latin 3 (ISO 8859-3)
-	{ NCP_8BIT | NCP_RECODE, 28605, "iso-8859-15,iso885915,latin9,l9,", 61050, NULL },// Latin 9 (ISO 8859-15)
+	{ NCP_8BIT | NCP_RECODE, 28593, "iso-8859-3,iso88593,latin3,isoir109,l3,", 61049, NULL },// Latin-3 (ISO 8859-3)
+	{ NCP_8BIT | NCP_RECODE, 28605, "iso-8859-15,iso885915,latin9,l9,", 61050, NULL },// Latin-9 (ISO 8859-15)
 	{ NCP_8BIT | NCP_RECODE, 28600, "ISO-8859-10,ISO885910,Windows-28600,Windows28600,", 61051, NULL },// Nordic (ISO 8859-10)
 	//{ NCP_8BIT | NCP_RECODE, 865, "ibm865,ibm865,", 0, NULL },// OEM Nordic; Nordic (DOS)
 	{ NCP_8BIT | NCP_RECODE, 437, "ibm437,ibm437,437,cp437,cspc8,codepage437,", 61072, NULL },// OEM United States
-	//{ NCP_8BIT | NCP_RECODE, 858, "ibm858,ibm858,ibm00858,", 0, NULL },// OEM Multilingual Latin 1 + Euro symbol
+	//{ NCP_8BIT | NCP_RECODE, 858, "ibm858,ibm858,ibm00858,", 0, NULL },// OEM Multilingual Latin-1 + Euro symbol
 	//{ NCP_8BIT | NCP_RECODE, 860, "ibm860,ibm860,", 0, NULL },// OEM Portuguese; Portuguese (DOS)
-	{ NCP_8BIT | NCP_RECODE, 28606, "ISO-8859-16,ISO885916,Windows-28606,Windows28606", 61054, NULL },// Latin 10 (ISO 8859-16)
+	{ NCP_8BIT | NCP_RECODE, 28606, "ISO-8859-16,ISO885916,Windows-28606,Windows28606", 61054, NULL },// Latin-10 (ISO 8859-16)
 	//{ NCP_8BIT | NCP_RECODE, 10010, "x-mac-romanian,xmacromanian,", 0, NULL },// Romanian (Mac)
 	//{ NCP_8BIT | NCP_RECODE, 10021, "x-mac-thai,xmacthai,", 61056, NULL },// Thai (Mac)
 	{ NCP_8BIT | NCP_RECODE, 874, "Windows-874,Windows874,dos874,iso885911,tis-620,tis620,isoir166", 61057, NULL },// ANSI/OEM Thai (ISO 8859-11); Thai (Windows)
@@ -102,17 +102,17 @@ NP2ENCODING mEncoding[] = {
 	{ NCP_8BIT | NCP_RECODE, 1254, "Windows-1254,Windows1254,", 61061, NULL },// ANSI Turkish; Turkish (Windows)
 	//{ NCP_8BIT | NCP_RECODE, 10017, "x-mac-ukrainian,xmacukrainian,", 61062, NULL },// Ukrainian (Mac)
 	{ NCP_8BIT | NCP_RECODE, 1258, "Windows-1258,Windows-258,", 61063, NULL },// ANSI/OEM Vietnamese; Vietnamese (Windows)
-	//{ NCP_8BIT | NCP_RECODE, 850, "ibm850,ibm850,", 61064, NULL },// OEM Multilingual Latin 1; Western European (DOS)
-	{ NCP_8BIT | NCP_RECODE, 28591, "ISO-8859-1,ISO88591,cp819,latin1,ibm819,isoir100,latin1,l1,", 61065, NULL },// ISO 8859-1 Latin 1; Western European (ISO)
+	//{ NCP_8BIT | NCP_RECODE, 850, "ibm850,ibm850,", 61064, NULL },// OEM Multilingual Latin-1; Western European (DOS)
+	{ NCP_8BIT | NCP_RECODE, 28591, "ISO-8859-1,ISO88591,cp819,latin1,ibm819,isoir100,latin1,l1,", 61065, NULL },// ISO 8859-1 Latin-1; Western European (ISO)
 	//{ NCP_8BIT | NCP_RECODE, 29001, "x-Europa,x-Europa,", 0, NULL },// Europa 3
 	//{ NCP_8BIT | NCP_RECODE, 10000, "Macintosh,Macintosh,", 61066, NULL },// MAC Roman; Western European (Mac)
-	{ NCP_8BIT | NCP_RECODE, 1252, "Windows-1252,Windows1252,cp367,cp819,ibm367,us,xansi,", 61067, NULL },// ANSI Latin 1; Western European (Windows)
+	{ NCP_8BIT | NCP_RECODE, 1252, "Windows-1252,Windows1252,cp367,cp819,ibm367,us,xansi,", 61067, NULL },// ANSI Latin-1; Western European (Windows)
 	//{ NCP_8BIT | NCP_RECODE, 37, "ebcdic-cp-us,ebcdiccpus,ebcdiccpca,ebcdiccpwt,ebcdiccpnl,ibm037,cp037,", 61068, NULL },// IBM EBCDIC US-Canada
 	//{ NCP_8BIT | NCP_RECODE, 500, "x-ebcdic-international,xebcdicinternational,", 61069, NULL },// IBM EBCDIC International
-	//{ NCP_8BIT | NCP_RECODE, 870, "CP870,cp870,ebcdiccproece,ebcdiccpyu,csibm870,ibm870,", 00000, NULL },// IBM EBCDIC Multilingual/ROECE (Latin 2); IBM EBCDIC Multilingual Latin 2
+	//{ NCP_8BIT | NCP_RECODE, 870, "CP870,cp870,ebcdiccproece,ebcdiccpyu,csibm870,ibm870,", 00000, NULL },// IBM EBCDIC Multilingual/ROECE (Latin-2); IBM EBCDIC Multilingual Latin-2
 	//{ NCP_8BIT | NCP_RECODE, 875, "x-EBCDIC-GreekModern,xebcdicgreekmodern,", 61070, NULL },// IBM EBCDIC Greek Modern
-	//{ NCP_8BIT | NCP_RECODE, 1026, "CP1026,cp1026,csibm1026,ibm1026,", 61071, NULL },// IBM EBCDIC Turkish (Latin 5)
-	//{ NCP_8BIT | NCP_RECODE, 1047, "IBM01047,ibm01047,", 00000, NULL },// IBM EBCDIC Latin 1/Open System
+	//{ NCP_8BIT | NCP_RECODE, 1026, "CP1026,cp1026,csibm1026,ibm1026,", 61071, NULL },// IBM EBCDIC Turkish (Latin-5)
+	//{ NCP_8BIT | NCP_RECODE, 1047, "IBM01047,ibm01047,", 00000, NULL },// IBM EBCDIC Latin-1/Open System
 	//{ NCP_8BIT | NCP_RECODE, 1140, "x-ebcdic-cp-us-euro,xebcdiccpuseuro,", 00000, NULL },// IBM EBCDIC US-Canada (037 + Euro symbol); IBM EBCDIC (US-Canada-Euro)
 	//{ NCP_8BIT | NCP_RECODE, 1141, "x-ebcdic-germany-euro,xebcdicgermanyeuro,", 00000, NULL },// IBM EBCDIC Germany (20273 + Euro symbol); IBM EBCDIC (Germany-Euro)
 	//{ NCP_8BIT | NCP_RECODE, 1142, "x-ebcdic-denmarknorway-euro,xebcdicdenmarknorwayeuro,", 00000, NULL },// IBM EBCDIC Denmark-Norway (20277 + Euro symbol); IBM EBCDIC (Denmark-Norway-Euro)
@@ -139,7 +139,7 @@ NP2ENCODING mEncoding[] = {
 	//{ NCP_8BIT | NCP_RECODE, 20871, "x-EBCDIC-Icelandic,xebcdicicelandic,ebcdiccpis,", 00000, NULL },// IBM EBCDIC (Icelandic)
 	//{ NCP_8BIT | NCP_RECODE, 20880, "x-EBCDIC-CyrillicRussian,xebcdiccyrillicrussian,ebcdiccyrillic,", 00000, NULL },// IBM EBCDIC (Cyrillic Russian)
 	//{ NCP_8BIT | NCP_RECODE, 20905, "x-EBCDIC-Turkish,xebcdicturkish,ebcdiccptr,", 00000, NULL },// IBM EBCDIC (Turkish)
-	//{ NCP_8BIT | NCP_RECODE, 20924, "IBM00924,ibm00924,ebcdiclatin9euro,", 00000, NULL },// IBM EBCDIC Latin 1/Open System (1047 + Euro symbol)
+	//{ NCP_8BIT | NCP_RECODE, 20924, "IBM00924,ibm00924,ebcdiclatin9euro,", 00000, NULL },// IBM EBCDIC Latin-1/Open System (1047 + Euro symbol)
 	//{ NCP_8BIT | NCP_RECODE, 21025, "x-EBCDIC-CyrillicSerbianBulgarian,xebcdiccyrillicserbianbulgarian,", 00000, NULL },// IBM EBCDIC (Cyrillic Serbian-Bulgarian)
 	//{ NCP_8BIT | NCP_RECODE, 50930, "x-EBCDIC-JapaneseAndKana,xebcdicjapaneseandkana,", 00000, NULL },// IBM EBCDIC Japanese (Katakana) Extended
 	//{ NCP_8BIT | NCP_RECODE, 50931, "x-EBCDIC-JapaneseAndUSCanada,xebcdicjapaneseanduscanada,", 00000, NULL },// IBM EBCDIC (US-Canada and Japanese)
