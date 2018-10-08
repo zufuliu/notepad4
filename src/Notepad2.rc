@@ -1798,6 +1798,7 @@ BEGIN
     //61069                   "D1;IBM EBCDIC (International);EBCDIC (Int.)"
     //61070                   "D2;IBM EBCDIC (Greek Modern);EBCDIC (GR)"
     //61071                   "D3;IBM EBCDIC (Turkish Latin 5);EBCDIC (Latin 5)"
+    61072                   "C;OEM United States (DOS-437);DOS-437"
 END
 
 STRINGTABLE
