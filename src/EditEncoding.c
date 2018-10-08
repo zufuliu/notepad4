@@ -89,7 +89,7 @@ NP2ENCODING mEncoding[] = {
 	{ NCP_8BIT | NCP_RECODE, 28605, "iso-8859-15,iso885915,latin9,l9,", 61050, NULL },// Latin 9 (ISO 8859-15)
 	{ NCP_8BIT | NCP_RECODE, 28600, "ISO-8859-10,ISO885910,Windows-28600,Windows28600,", 61051, NULL },// Nordic (ISO 8859-10)
 	//{ NCP_8BIT | NCP_RECODE, 865, "ibm865,ibm865,", 0, NULL },// OEM Nordic; Nordic (DOS)
-	//{ NCP_8BIT | NCP_RECODE, 437, "ibm437,ibm437,437,cp437,cspc8,codepage437,", 0, NULL },// OEM United States
+	{ NCP_8BIT | NCP_RECODE, 437, "ibm437,ibm437,437,cp437,cspc8,codepage437,", 61072, NULL },// OEM United States
 	//{ NCP_8BIT | NCP_RECODE, 858, "ibm858,ibm858,ibm00858,", 0, NULL },// OEM Multilingual Latin 1 + Euro symbol
 	//{ NCP_8BIT | NCP_RECODE, 860, "ibm860,ibm860,", 0, NULL },// OEM Portuguese; Portuguese (DOS)
 	{ NCP_8BIT | NCP_RECODE, 28606, "ISO-8859-16,ISO885916,Windows-28606,Windows28606", 61054, NULL },// Latin 10 (ISO 8859-16)
