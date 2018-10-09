@@ -596,6 +596,9 @@
     <ClInclude Include="..\..\scintilla\src\XPM.h">
       <Filter>Scintilla\src</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\compiler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\src\Dialogs.h">
       <Filter>Header Files</Filter>
     </ClInclude>

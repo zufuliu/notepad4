@@ -2,11 +2,9 @@
 #define NOTEPAD2_EDITLEXER_H_
 
 #include <windows.h>
-#include <commctrl.h>
-#include <shlwapi.h>
 #include "Scintilla.h"
 #include "SciLexer.h"
-#include "Helpers.h"
+#include "compiler.h"
 
 #define	MULTI_STYLE(a, b, c, d)	((a) | ((b) << 8) | ((c) << 16) | ((d) << 24))
 #define	NUMKEYWORD				(KEYWORDSET_MAX + 1)

@@ -132,7 +132,7 @@ LRESULT DriveBox_GetDispInfo(HWND hwnd, LPARAM lParam);
 //==== ItemID =================================================================
 
 //==== IL_Next() ==============================================================
-inline LPITEMIDLIST IL_Next(LPITEMIDLIST pidl) {
+static inline LPITEMIDLIST IL_Next(LPITEMIDLIST pidl) {
 	return (LPITEMIDLIST)((LPBYTE)(pidl) + pidl->mkid.cb);
 }
 

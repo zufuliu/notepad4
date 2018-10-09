@@ -20,105 +20,71 @@
 
 #ifndef NOTEPAD2_HELPERS_H_
 #define NOTEPAD2_HELPERS_H_
+#include "compiler.h"
 
-#if defined(__cplusplus)
-#undef NULL
-#define NULL	nullptr
-#endif
-
-#if (defined(__GNUC__) || defined(__clang__)) && !defined(__cplusplus)
-// https://stackoverflow.com/questions/19452971/array-size-macro-that-rejects-pointers
-// trigger error for pointer: GCC: void value not ignored as it ought to be. Clang: invalid operands to binary expression.
-#define COUNTOF(ar)	_Generic(&(ar), __typeof__((ar)[0]) **: (void)0, default: _countof(ar))
-// trigger warning for non-literal string: GCC: division by zero [-Wdiv-by-zero]. Clang: division by zero is undefined [-Wdivision-by-zero].
-#if defined(__GNUC__)
-#define CSTRLEN(s)	(__builtin_constant_p(s) ? (_countof(s) - 1) : (1 / 0))
-#else
-// Clang emit warnings when CSTRLEN() is used in some macro, like EDITLEXER_HOLE()
-#define CSTRLEN(s)	(COUNTOF(s) - 1)
-#endif
-#else
-// C++ template based version of _countof(), or plain old unsafe version
-#define COUNTOF(ar)	_countof(ar)
-#define CSTRLEN(s)	(_countof(s) - 1)
-#endif
-
-/*
-#if defined(__GNUC__) || defined(__clang__)
-#define GCC_NO_WARNING_MISSING_BRACES_BEGIN \
-	_Pragma("GCC diagnostic push")			\
-	_Pragma("GCC diagnostic ignored \"-Wmissing-braces\"")
-#define GCC_NO_WARNING_MISSING_BRACES_END	\
-	_Pragma("GCC diagnostic pop")
-#else
-#define GCC_NO_WARNING_MISSING_BRACES_BEGIN
-#define GCC_NO_WARNING_MISSING_BRACES_END
-#endif
-*/
-
-inline int min_i(int x, int y) {
+NP2_inline int min_i(int x, int y) {
 	return (x < y) ? x : y;
 }
 
-inline int max_i(int x, int y) {
+NP2_inline int max_i(int x, int y) {
 	return (x > y) ? x : y;
 }
 
-inline UINT max_u(UINT x, UINT y) {
+NP2_inline UINT max_u(UINT x, UINT y) {
 	return (x > y) ? x : y;
 }
 
-inline long max_l(long x, long y) {
+NP2_inline long max_l(long x, long y) {
 	return (x > y) ? x : y;
 }
 
-inline int clamp_i(int x, int lower, int upper) {
+NP2_inline int clamp_i(int x, int lower, int upper) {
 	return (x < lower) ? lower : (x > upper) ? upper : x;
 }
 
-inline BOOL StrIsEmptyA(LPCSTR s) {
+NP2_inline BOOL StrIsEmptyA(LPCSTR s) {
 	return s == NULL || *s == '\0';
 }
 
-inline BOOL StrIsEmpty(LPCWSTR s) {
+NP2_inline BOOL StrIsEmpty(LPCWSTR s) {
 	return s == NULL || *s == L'\0';
 }
 
-inline BOOL StrNotEmptyA(LPCSTR s) {
+NP2_inline BOOL StrNotEmptyA(LPCSTR s) {
 	return s != NULL && *s != '\0';
 }
 
-inline BOOL StrNotEmpty(LPCWSTR s) {
+NP2_inline BOOL StrNotEmpty(LPCWSTR s) {
 	return s != NULL && *s != L'\0';
 }
 
-inline BOOL StrEqual(LPCWSTR s1, LPCWSTR s2) {
+NP2_inline BOOL StrEqual(LPCWSTR s1, LPCWSTR s2) {
 	//return CompareStringW(LOCALE_INVARIANT, 0, s1, -1, s2, -1) == CSTR_EQUAL;
 	return wcscmp(s1, s2) == 0;
 }
 
-inline BOOL StrCaseEqual(LPCWSTR s1, LPCWSTR s2) {
+NP2_inline BOOL StrCaseEqual(LPCWSTR s1, LPCWSTR s2) {
 	//return CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, s1, -1, s2, -1) == CSTR_EQUAL;
 	return _wcsicmp(s1, s2) == 0;
 }
 
-inline BOOL StrNEqual(LPCWSTR s1, LPCWSTR s2, int cch) {
+NP2_inline BOOL StrNEqual(LPCWSTR s1, LPCWSTR s2, int cch) {
 	return wcsncmp(s1, s2, cch) == 0;
 }
 
-inline BOOL StrNCaseEqual(LPCWSTR s1, LPCWSTR s2, int cch) {
+NP2_inline BOOL StrNCaseEqual(LPCWSTR s1, LPCWSTR s2, int cch) {
 	return _wcsnicmp(s1, s2, cch) == 0;
 }
 
 // str MUST NOT be NULL, can be empty
-inline BOOL StrToFloat(LPCWSTR str, float *value) {
+NP2_inline BOOL StrToFloat(LPCWSTR str, float *value) {
 	LPWSTR end;
 	*value = wcstof(str, &end);
 	return str != end;
 }
 
 // str MUST NOT be NULL, can be empty
-inline BOOL HexStrToInt(LPCWSTR str, int *value) {
+NP2_inline BOOL HexStrToInt(LPCWSTR str, int *value) {
 	LPWSTR end;
 	*value = (int)wcstol(str, &end, 16);
 	return str != end;
@@ -189,13 +155,13 @@ extern WCHAR szIniFile[MAX_PATH];
 #define IniClearSection(lpSection) \
 	WritePrivateProfileSection(lpSection, L"", szIniFile)
 
-inline void IniSetInt(LPCWSTR lpSection, LPCWSTR lpName, int i) {
+NP2_inline void IniSetInt(LPCWSTR lpSection, LPCWSTR lpName, int i) {
 	WCHAR tch[16];
 	wsprintf(tch, L"%i", i);
 	IniSetString(lpSection, lpName, tch);
 }
 
-inline void IniSetBool(LPCWSTR lpSection, LPCWSTR lpName, BOOL b) {
+NP2_inline void IniSetBool(LPCWSTR lpSection, LPCWSTR lpName, BOOL b) {
 	IniSetString(lpSection, lpName, (b ? L"1" : L"0"));
 }
 
@@ -226,7 +192,7 @@ typedef struct IniSection {
 	IniKeyValueNode *nodeList;
 } IniSection;
 
-inline void IniSectionInit(IniSection *section, int capacity) {
+NP2_inline void IniSectionInit(IniSection *section, int capacity) {
 	section->count = 0;
 	section->capacity = capacity;
 	section->head = NULL;
@@ -238,16 +204,16 @@ inline void IniSectionInit(IniSection *section, int capacity) {
 #endif
 }
 
-inline void IniSectionFree(IniSection *section) {
+NP2_inline void IniSectionFree(IniSection *section) {
 	NP2HeapFree(section->nodeList);
 }
 
-inline void IniSectionClear(IniSection *section) {
+NP2_inline void IniSectionClear(IniSection *section) {
 	section->count = 0;
 	section->head = NULL;
 }
 
-inline BOOL IniSectionIsEmpty(const IniSection *section) {
+NP2_inline BOOL IniSectionIsEmpty(const IniSection *section) {
 	return section->count == 0;
 }
 
@@ -255,7 +221,7 @@ BOOL IniSectionParseArray(IniSection *section, LPWSTR lpCachedIniSection);
 BOOL IniSectionParse(IniSection *section, LPWSTR lpCachedIniSection);
 LPCWSTR IniSectionUnsafeGetValue(IniSection *section, LPCWSTR key, int keyLen);
 
-inline LPCWSTR IniSectionGetValueImpl(IniSection *section, LPCWSTR key, int keyLen) {
+NP2_inline LPCWSTR IniSectionGetValueImpl(IniSection *section, LPCWSTR key, int keyLen) {
 	return section->count ? IniSectionUnsafeGetValue(section, key, keyLen) : NULL;
 }
 
@@ -273,19 +239,19 @@ BOOL IniSectionGetBoolImpl(IniSection *section, LPCWSTR key, int keyLen, BOOL bD
 #define IniSectionGetString(section, key, lpDefault, lpReturnedString, cchReturnedString) \
 	IniSectionGetStringImpl(section, key, CSTRLEN(key), (lpDefault), (lpReturnedString), (cchReturnedString))
 
-inline LPCWSTR IniSectionGetValueEx(IniSection *section, LPCWSTR key) {
+NP2_inline LPCWSTR IniSectionGetValueEx(IniSection *section, LPCWSTR key) {
 	return IniSectionGetValueImpl(section, key, -1);
 }
 
-inline int IniSectionGetIntEx(IniSection *section, LPCWSTR key, int iDefault) {
+NP2_inline int IniSectionGetIntEx(IniSection *section, LPCWSTR key, int iDefault) {
 	return IniSectionGetIntImpl(section, key, -1, iDefault);
 }
 
-inline BOOL IniSectionGetBoolEx(IniSection *section, LPCWSTR key, BOOL bDefault) {
+NP2_inline BOOL IniSectionGetBoolEx(IniSection *section, LPCWSTR key, BOOL bDefault) {
 	return IniSectionGetBoolImpl(section, key, -1, bDefault);
 }
 
-inline void IniSectionGetStringEx(IniSection *section, LPCWSTR key, LPCWSTR lpDefault, LPWSTR lpReturnedString, int cchReturnedString) {
+NP2_inline void IniSectionGetStringEx(IniSection *section, LPCWSTR key, LPCWSTR lpDefault, LPWSTR lpReturnedString, int cchReturnedString) {
 	IniSectionGetStringImpl(section, key, -1, lpDefault, lpReturnedString, cchReturnedString);
 }
 
@@ -295,29 +261,29 @@ typedef struct IniSectionOnSave {
 
 void IniSectionSetString(IniSectionOnSave *section, LPCWSTR key, LPCWSTR value);
 
-inline void IniSectionSetInt(IniSectionOnSave *section, LPCWSTR key, int i) {
+NP2_inline void IniSectionSetInt(IniSectionOnSave *section, LPCWSTR key, int i) {
 	WCHAR tch[16];
 	wsprintf(tch, L"%i", i);
 	IniSectionSetString(section, key, tch);
 }
 
-inline void IniSectionSetBool(IniSectionOnSave *section, LPCWSTR key, BOOL b) {
+NP2_inline void IniSectionSetBool(IniSectionOnSave *section, LPCWSTR key, BOOL b) {
 	IniSectionSetString(section, key, (b ? L"1" : L"0"));
 }
 
-inline void IniSectionSetStringEx(IniSectionOnSave *section, LPCWSTR key, LPCWSTR value, LPCWSTR lpDefault) {
+NP2_inline void IniSectionSetStringEx(IniSectionOnSave *section, LPCWSTR key, LPCWSTR value, LPCWSTR lpDefault) {
 	if (!StrCaseEqual(value, lpDefault)) {
 		IniSectionSetString(section, key, value);
 	}
 }
 
-inline void IniSectionSetIntEx(IniSectionOnSave *section, LPCWSTR key, int i, int iDefault) {
+NP2_inline void IniSectionSetIntEx(IniSectionOnSave *section, LPCWSTR key, int i, int iDefault) {
 	if (i != iDefault) {
 		IniSectionSetInt(section, key, i);
 	}
 }
 
-inline void IniSectionSetBoolEx(IniSectionOnSave *section, LPCWSTR key, BOOL b, BOOL bDefault) {
+NP2_inline void IniSectionSetBoolEx(IniSectionOnSave *section, LPCWSTR key, BOOL b, BOOL bDefault) {
 	if (b != bDefault) {
 		IniSectionSetString(section, key, (b ? L"1" : L"0"));
 	}
@@ -325,11 +291,11 @@ inline void IniSectionSetBoolEx(IniSectionOnSave *section, LPCWSTR key, BOOL b, 
 
 
 extern HWND hwndEdit;
-inline void BeginWaitCursor(void) {
+NP2_inline void BeginWaitCursor(void) {
 	SendMessage(hwndEdit, SCI_SETCURSOR, (WPARAM)SC_CURSORWAIT, 0);
 }
 
-inline void EndWaitCursor(void) {
+NP2_inline void EndWaitCursor(void) {
 	POINT pt;
 	SendMessage(hwndEdit, SCI_SETCURSOR, (WPARAM)SC_CURSORNORMAL, 0);
 	GetCursorPos(&pt);
@@ -343,7 +309,7 @@ HRESULT PrivateSetCurrentProcessExplicitAppUserModelID(PCWSTR AppID);
 BOOL IsElevated(void);
 
 //BOOL SetTheme(HWND hwnd, LPCWSTR lpszTheme)
-//inline BOOL SetExplorerTheme(HWND hwnd) {
+//NP2_inline BOOL SetExplorerTheme(HWND hwnd) {
 //	return SetTheme(hwnd, L"Explorer");
 //}
 
@@ -419,7 +385,7 @@ BOOL PathIsLnkToDirectory(LPCWSTR pszPath, LPWSTR pszResPath, int cchResPath);
 BOOL PathCreateDeskLnk(LPCWSTR pszDocument);
 BOOL PathCreateFavLnk(LPCWSTR pszName, LPCWSTR pszTarget, LPCWSTR pszDir);
 
-inline void TrimString(LPWSTR lpString) {
+NP2_inline void TrimString(LPWSTR lpString) {
 	StrTrim(lpString, L" ");
 }
 
@@ -468,7 +434,7 @@ BOOL	MRU_Delete(LPMRULIST pmru, int iIndex);
 BOOL	MRU_DeleteFileFromStore(LPMRULIST pmru, LPCWSTR pszFile);
 BOOL	MRU_Empty(LPMRULIST pmru);
 int 	MRU_Enum(LPMRULIST pmru, int iIndex, LPWSTR pszItem, int cchItem);
-inline int MRU_GetCount(LPMRULIST pmru) {
+NP2_inline int MRU_GetCount(LPMRULIST pmru) {
 	return MRU_Enum(pmru, 0, NULL, 0);
 }
 BOOL	MRU_Load(LPMRULIST pmru);
