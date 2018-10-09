@@ -43,9 +43,9 @@ static KEYWORDLIST Keywords_MAK = {{
 , // 7 ninja
 "rule build default "
 
-, ""
+, NULL
 
-, "", "", "", "", "", "", ""
+, NULL, NULL, NULL, NULL, NULL, NULL, NULL
 }};
 
 

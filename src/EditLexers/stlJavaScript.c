@@ -18,11 +18,11 @@ static KEYWORDLIST Keywords_JS = {{
 "each of get set "
 
 , // 2 Preprocessor
-""
+NULL
 , // 3 Directive
-""
+NULL
 , // 4 Attribute
-""
+NULL
 
 , // 5 Class
 // ECMA-262
@@ -37,9 +37,9 @@ static KEYWORDLIST Keywords_JS = {{
 "XMLHttpRequest FormData jQuery "
 
 , // 6 Interface
-""
+NULL
 , // 7 Enumeration
-""
+NULL
 
 , // 8 Constant
 // Math
@@ -136,7 +136,7 @@ static KEYWORDLIST Keywords_JS = {{
 "append() getAll() "
 // Storage
 "getItem() key() removeItem() setItem() "
-, "", "", ""
+, NULL, NULL, NULL
 
 , // 15 Code Snippet
 "for^() if^() switch^() while^() else^if^() else^{} function() "

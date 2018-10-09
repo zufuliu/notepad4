@@ -18,8 +18,8 @@ extern int iDefaultCodePage;
 int g_DOSEncoding;
 
 // Supported Encodings
-static WCHAR wchANSI[8] = L"";
-static WCHAR wchOEM [8] = L"";
+static WCHAR wchANSI[8];
+static WCHAR wchOEM [8];
 static LPWSTR g_AllEncodingLabel = NULL;
 
 // https://docs.microsoft.com/en-us/windows/desktop/Intl/code-page-identifiers

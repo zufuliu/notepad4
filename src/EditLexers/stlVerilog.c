@@ -17,9 +17,9 @@ static KEYWORDLIST Keywords_Verilog = {{
 " monitoroff dumpon dumpoff dumpfile dumplimit dumpflush dumpvars dumpall reset reset reset reset reset "
 " random getpattern rtoi itor realtobits bitstoreal setup hold setuphold period width skew recovery"
 
-, "", "", "", "", "", "", ""
+, NULL, NULL, NULL, NULL, NULL, NULL, NULL
 
-, "", "", "", "", "", "", ""
+, NULL, NULL, NULL, NULL, NULL, NULL, NULL
 }};
 
 

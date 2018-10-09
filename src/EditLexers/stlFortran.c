@@ -11,9 +11,9 @@ static KEYWORDLIST Keywords_Fortran = {{
 , // 1 Basic Function
 "close format open print read write"
 
-, "", "", "", "", "", "", ""
+, NULL, NULL, NULL, NULL, NULL, NULL, NULL
 
-, "", "", "", "", "", "", ""
+, NULL, NULL, NULL, NULL, NULL, NULL, NULL
 }};
 
 

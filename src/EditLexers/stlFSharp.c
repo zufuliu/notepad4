@@ -24,9 +24,9 @@ static KEYWORDLIST Keywords_FSharp = {{
 , // 3 Attribute
 "DllImport Interface Sealed "
 
-, "", "", "", "", ""
+, NULL, NULL, NULL, NULL, NULL
 
-, "", "", "", "", "", "", ""
+, NULL, NULL, NULL, NULL, NULL, NULL, NULL
 }};
 
 

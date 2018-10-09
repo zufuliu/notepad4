@@ -108,9 +108,9 @@ static KEYWORDLIST Keywords_AU3 = {{
 "#autoit3wrapper_usex64 #autoit3wrapper_version #endregion #forceref #obfuscator_ignore_funcs "
 "#obfuscator_ignore_variables #obfuscator_parameters #region #tidy_parameters"
 
-, "", "", ""
+, NULL, NULL, NULL
 
-, "", "", "", "", "", "", ""
+, NULL, NULL, NULL, NULL, NULL, NULL, NULL
 }};
 
 

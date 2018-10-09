@@ -33,9 +33,9 @@ static KEYWORDLIST Keywords_Lua = {{
 "os.execute os.exit os.getenv os.remove os.rename os.setlocale os.time os.tmpname coroutine.running "
 "package.cpath package.loaded package.loadlib package.path package.preload package.seeall io.popen"
 
-, "", "", "", "", ""
+, NULL, NULL, NULL, NULL, NULL
 
-, "", "", "", "", "", "", ""
+, NULL, NULL, NULL, NULL, NULL, NULL, NULL
 }};
 
 

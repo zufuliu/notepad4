@@ -14,14 +14,14 @@ static KEYWORDLIST Keywords_Gradle = {{
 "boolean byte char class double float int long short void "
 
 , // 2 Preprocessor
-""
+NULL
 
 , // 3 Annotation
 "Managed Model  "
 
 , // 4 Attribute
 // Task types
-""
+NULL
 
 , // 5 Class
 "String Object "
@@ -56,9 +56,9 @@ static KEYWORDLIST Keywords_Gradle = {{
 "classpath options "
 
 , // 9
-""
+NULL
 , // 10
-""
+NULL
 , // 11 Method
 // Project
 "absoluteProjectPath afterEvaluate allprojects beforeEvaluate configure container copy copySpec delete evaluationDependsOn exec file fileTree files findProject getAllTasks getTasksByName hasProperty javaexec mkdir project property relativePath relativeProjectPath setProperty subprojects tarTree task uri zipTree "
@@ -76,11 +76,11 @@ static KEYWORDLIST Keywords_Gradle = {{
 "source "
 
 , // 12
-""
+NULL
 , // 13
-""
+NULL
 , // 14
-""
+NULL
 
 , // 15 Code Snippet
 "for^() if^() switch^() while^() catch^() else^if^() else^{} "

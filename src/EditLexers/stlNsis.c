@@ -8,19 +8,19 @@ static KEYWORDLIST Keywords_NSIS = {{
 "Page UninstPage"
 
 , // 1
-""
+NULL
 
 , // 2 Preprocessor
 "define undef ifdef ifndef if ifmacrodef ifmacrondef else endif insertmacro macro macroend searchparse searchreplace "
 "include addincludedir addplugindir appendfile cd delfile echo error execute packhdr system tempfile warning verbose"
 
 , //
-""
+NULL
 , //
-""
-, "", "", "", ""
+NULL
+, NULL, NULL, NULL, NULL
 
-, "", "", "", "", "", "", ""
+, NULL, NULL, NULL, NULL, NULL, NULL, NULL
 }};
 
 

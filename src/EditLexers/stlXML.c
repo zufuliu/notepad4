@@ -2,7 +2,7 @@
 #include "EditStyle.h"
 
 static KEYWORDLIST Keywords_XML = {{
-"", "", ""
+NULL, NULL, NULL
 
 , // 4 Tag
 "xml xmlns xsi DOCTYPE doctype PUBLIC "
@@ -15,9 +15,9 @@ static KEYWORDLIST Keywords_XML = {{
 "utf-8 UTF-8 ISO-8859-1 "
 "true false yes no on off "
 
-, "", "", ""
+, NULL, NULL, NULL
 
-, "", "", "", "", "", "", ""
+, NULL, NULL, NULL, NULL, NULL, NULL, NULL
 }};
 
 

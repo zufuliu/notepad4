@@ -33,14 +33,14 @@ static KEYWORDLIST Keywords_VHDL = {{
 "unsigned UX01 UX01Z width X01 X01Z"
 
 , // 6 User
-""
+NULL
 , // 7 User2
-""
+NULL
 
 , // 8 Fold
 "architecture begin case component else elsif end entity generate loop package process record then procedure function when"
 
-, "", "", "", "", "", "", ""
+, NULL, NULL, NULL, NULL, NULL, NULL, NULL
 }};
 
 

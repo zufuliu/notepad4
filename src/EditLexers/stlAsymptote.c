@@ -16,21 +16,21 @@ static KEYWORDLIST Keywords_ASY = {{
 "revolution animation "
 
 , // 2 Preprocessor
-""
+NULL
 , // 3 Directive
-""
+NULL
 , // 4 Attribute
-""
+NULL
 , // 5 Class
-""
+NULL
 , // 6 Interface
-""
+NULL
 , // 7 Enumeration
-""
+NULL
 , // 8 Constant
-""
+NULL
 
-, "", "", "", "", "", ""
+, NULL, NULL, NULL, NULL, NULL, NULL
 
 , // 15 Code Snippet
 "for^() if^() while^() else^if^() else^{} "

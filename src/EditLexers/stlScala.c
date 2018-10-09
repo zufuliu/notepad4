@@ -13,7 +13,7 @@ static KEYWORDLIST Keywords_Scala = {{
 "String Object Class Integer Character Void List"
 
 , // 2 Preprocessor
-""
+NULL
 , // 3 Annotation
 "beanGetter beanSetter field getter param setter "
 "bridge elidable implicitNotFound migration serializable strictfp switch tailrec varargs "
@@ -21,18 +21,18 @@ static KEYWORDLIST Keywords_Scala = {{
 "SerialVersionUID specialized throws transient unchecked volatile "
 
 , // 4 Attribute
-""
+NULL
 , // 5 Class
 "Annotation Array Error Exception CharSequence Iterator Option Symbol"
 
 , // 6 Interface
-""
+NULL
 , // 7 Enumeration
-""
+NULL
 , // 8 Constant
-""
+NULL
 
-, "", "", "", "", "", ""
+, NULL, NULL, NULL, NULL, NULL, NULL
 
 , // 15 Code Snippet
 "for^() if^() switch^() while^() catch^() else^if^() else^{} "

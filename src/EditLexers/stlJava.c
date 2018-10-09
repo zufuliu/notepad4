@@ -14,7 +14,7 @@ static KEYWORDLIST Keywords_Java = {{
 "boolean byte char double float int long short void "
 
 , // 2 Preprocessor
-""
+NULL
 
 , // 3 Annotation
 "interface Deprecated Override SuppressWarnings Documented Retention Target Inherited SafeVarargs "
@@ -89,16 +89,15 @@ static KEYWORDLIST Keywords_Java = {{
 // android.widget
 "Adapter "
 // android.graphics
-" "
 
 , // 7 Enumeration
-""
+NULL
 /*
 "ElementType RetentionPolicy "
 */
 
 , // 8 Constant
-""
+NULL
 /*
 "TRUE FALSE MIN_VALUE MAX_VALUE MIN_RADIX MAX_RADIX POSITIVE_INFINITY NEGATIVE_INFINITY NaN MIN_NORMAL MAX_EXPONENT MIN_EXPONENT MAXIMUM_CAPACITY"
 */
@@ -107,7 +106,7 @@ static KEYWORDLIST Keywords_Java = {{
 "java.util "
 "android.widget "
 
-, "", "", "", "", ""
+, NULL, NULL, NULL, NULL, NULL
 
 , // 15 Code Snippet
 "for^() if^() switch^() while^() catch^() else^if^() else^{} synchronized^() try^() "

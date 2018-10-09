@@ -17,19 +17,19 @@ static KEYWORDLIST Keywords_HaXe = {{
 "if elseif else end error"
 
 , // 3 Directive
-""
+NULL
 , // 4 Attribute
-""
+NULL
 , // 5 Class
-""
+NULL
 , // 6 Interface
-""
+NULL
 , // 7 Enumeration
-""
+NULL
 , // 8 Constant
-""
+NULL
 
-, "", "", "", "", "", ""
+, NULL, NULL, NULL, NULL, NULL, NULL
 
 , // 15 Code Snippet
 "for^() if^() switch^() while^() else^if^() else^{} "

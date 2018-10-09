@@ -147,7 +147,7 @@ static KEYWORDLIST Keywords_Python = {{
 // datetime
 "today() fromtimestamp() fromordinal() replace() timetuple() toordinal() weekday() isoweekday() isocalendar() isoformat() ctime() strftime() utcoffset() dst() tzname() now() utcnow() utcfromtimestamp() combine() strptime() date() timetz() astimezone() utctimetuple() timestamp() soweekday() total_seconds() fromutc() "
 // string
-"capwords() ""format() vformat() parse() get_field() get_value() check_unused_args() format_field() convert_field() ""substitute() safe_substitute() "
+"capwords() " "format() vformat() parse() get_field() get_value() check_unused_args() format_field() convert_field() " "substitute() safe_substitute() "
 // re
 "search() match() split() findall() finditer() sub() subn() escape() purge() " "expand() group() groups() groupdict() start() end() span() "
 // textwrap
@@ -236,7 +236,7 @@ static KEYWORDLIST Keywords_Python = {{
 
 , // 12 Attribute
 // builtins
-""
+
 // numbers
 "real imag " "numerator denominator "
 // memoryview
@@ -279,7 +279,7 @@ static KEYWORDLIST Keywords_Python = {{
 // urlparse
 "scheme netloc path query fragment username password hostname port "
 // argparse
-""
+
 // sqlite3
 "version_info sqlite_version sqlite_version_info " "isolation_level in_transaction row_factory text_factory total_changes iterdump " " rowcount lastrowid description "
 // mysql.connector
@@ -289,7 +289,7 @@ static KEYWORDLIST Keywords_Python = {{
 // gzip
 "filename mode compresslevel fileobj "
 
-, "", "", ""
+, NULL, NULL, NULL
 }};
 
 

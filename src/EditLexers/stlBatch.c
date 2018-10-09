@@ -12,7 +12,7 @@ static KEYWORDLIST Keywords_Batch = {{
 "mklink "
 
 , // 1 system cmd
-""
+NULL
 /* // com
 "chcp diskcomp diskcopy format graftabl help loadfix mode more tree "
 */
@@ -25,7 +25,7 @@ static KEYWORDLIST Keywords_Batch = {{
 , // 2
 "dp0"
 
-, "", "", ""
+, NULL, NULL, NULL
 
 , // 6 Upper Case
 "DEFINED DO NOT ELSE FOR GOTO IF IN "
@@ -35,9 +35,9 @@ static KEYWORDLIST Keywords_Batch = {{
 //"CHANGE COM CON COUNTRY CTTY FORFILES ICACLS KILL LOADHIGH LPT MSIEXE ROBOCOPY SCLIST TIMEOUT "
 "MKLINK "
 
-, "" , ""
+, NULL , NULL
 
-, "", "", "", "", "", "", ""
+, NULL, NULL, NULL, NULL, NULL, NULL, NULL
 }};
 
 

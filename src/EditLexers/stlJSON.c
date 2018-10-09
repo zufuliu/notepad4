@@ -5,9 +5,9 @@
 
 static KEYWORDLIST Keywords_JSON = {{
 "true false null"
-, "", "", "", "", "", "", "",
+, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
 
-"", "", "", "", "", "", "", ""
+NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL
 }};
 
 

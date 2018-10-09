@@ -59,9 +59,9 @@ static KEYWORDLIST Keywords_PS1 = {{
 , // 1
 "importsystemmodules prompt psedit tabexpansion"
 
-, "", "", "", "", ""
+, NULL, NULL, NULL, NULL, NULL
 
-, "", "", "", "", "", "", ""
+, NULL, NULL, NULL, NULL, NULL, NULL, NULL
 }};
 
 

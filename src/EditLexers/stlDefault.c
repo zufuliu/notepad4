@@ -2,9 +2,9 @@
 #include "EditStyle.h"
 
 static KEYWORDLIST Keywords_NULL = {{
-"", "", "", "", "", "", "", "", ""
+NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL
 
-, "", "", "", "", "", "", ""
+, NULL, NULL, NULL, NULL, NULL, NULL, NULL
 }};
 
 

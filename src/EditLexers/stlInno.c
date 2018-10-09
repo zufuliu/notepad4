@@ -45,9 +45,9 @@ static KEYWORDLIST Keywords_INNO = {{
 "and begin break case const continue do downto else end except finally for function "
 "if not of or procedure repeat then to try type until uses var while with interface record"
 
-, "", "", "", ""
+, NULL, NULL, NULL, NULL
 
-, "", "", "", "", "", "", ""
+, NULL, NULL, NULL, NULL, NULL, NULL, NULL
 }};
 
 

@@ -15,27 +15,27 @@ static KEYWORDLIST Keywords_Groovy = {{
 "boolean byte char class double float int long short void "
 
 , // 2 Preprocessor
-""
+NULL
 , // 3 Annotation
-""
+NULL
 /*
 "interface Retention Target Override"
 */
 , // 4 Attribute
-""
+NULL
 
 , // 5 Class
 "Void String Double Integer Class Object Byte Short Long Float Boolean Character Boolean BigDecimal BigInteger Number"
 "Map Exception Date File"
 
 , // 6 Interface
-""
+NULL
 , // 7 Enumeration
-""
+NULL
 , // 8 Constant
-""
+NULL
 
-, "", "", "", "", "", ""
+, NULL, NULL, NULL, NULL, NULL, NULL
 
 , // 15 Code Snippet
 "for^() if^() switch^() while^() catch^() else^if^() else^{} "
