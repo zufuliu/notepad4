@@ -65,7 +65,7 @@ static KEYWORDLIST Keywords_SQL = {{
 // SQLite
 "changes() fts3() fts4() instr() json_array_length() json_patch() json_group_array() json_group_object() json_each() json_tree() julianday() last_insert_rowid() likelihood() likely() load_extension() printf() quote() rtree() soundex() sqlite_compileoption_get() sqlite_compileoption_used() sqlite_source_id() sqlite_version() total_changes() unicode() unlikely() "
 
-, "", "", ""
+, NULL, NULL, NULL
 
 , // 6 Upper Case Keyword
 "ABORT ACCESSIBLE ACCOUNT ACTION ACTIVE ADD ADMIN AFTER AGAINST AGGREGATE ALGORITHM ALL ALLOCATE ALTER ALWAYS ANALYSE ANALYZE AND ANY AS ASC ASCII ASENSITIVE AT ATTACH AUDIT AUTHORIZATION AUTHORS AUTO_INCREMENT AUTOEXTEND_SIZE AUTOINCREMENT AVG AVG_ROW_LENGTH "
@@ -131,7 +131,7 @@ static KEYWORDLIST Keywords_SQL = {{
 // SQLite
 "CHANGES() FTS3() FTS4() INSTR() JSON_ARRAY_LENGTH() JSON_PATCH() JSON_GROUP_ARRAY() JSON_GROUP_OBJECT() JSON_EACH() JSON_TREE() JULIANDAY() LAST_INSERT_ROWID() LIKELIHOOD() LIKELY() LOAD_EXTENSION() PRINTF() QUOTE() RTREE() SOUNDEX() SQLITE_COMPILEOPTION_GET() SQLITE_COMPILEOPTION_USED() SQLITE_SOURCE_ID() SQLITE_VERSION() TOTAL_CHANGES() UNICODE() UNLIKELY() "
 
-, "", "", "", "", "", "", ""
+, NULL, NULL, NULL, NULL, NULL, NULL, NULL
 }};
 
 

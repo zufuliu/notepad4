@@ -7,24 +7,24 @@ static KEYWORDLIST Keywords_JAM = {{
 "class else for if import in local module return rule while "
 "switch case actions true false try catch include alias using "
 , // 1 Type Keyword
-""
+NULL
 , // 2 Preprocessor
-""
+NULL
 , // 3 Directive
-""
+NULL
 , // 4 Attribute
-""
+NULL
 , // 5 Class
-""
+NULL
 , // 6 Interface
-""
+NULL
 , // 7 Enumeration
-""
+NULL
 
 , // 8 Constant
 "ECHO EXIT GLOB MATCH "
 
-, "", "", "", "", "", "", ""
+, NULL, NULL, NULL, NULL, NULL, NULL, NULL
 }};
 
 

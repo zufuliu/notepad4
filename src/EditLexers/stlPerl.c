@@ -28,9 +28,9 @@ static KEYWORDLIST Keywords_Perl = {{
 , // 1
 "elsif if split while"
 
-, "", "", "", "", "", "", ""
+, NULL, NULL, NULL, NULL, NULL, NULL, NULL
 
-, "", "", "", "", "", "", ""
+, NULL, NULL, NULL, NULL, NULL, NULL, NULL
 }};
 
 

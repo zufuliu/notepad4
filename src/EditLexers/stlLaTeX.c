@@ -4,9 +4,9 @@
 // http://www.latex-project.org/
 
 static KEYWORDLIST Keywords_TEX = {{
-"", "", "", "", "", "", "", "", ""
+NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL
 
-, "", "", "", "", "", "", ""
+, NULL, NULL, NULL, NULL, NULL, NULL, NULL
 }};
 
 
@@ -58,9 +58,9 @@ static KEYWORDLIST Keywords_TEXI = {{
 // @frenchspacing @allowcodebreaks
 "on off true false "
 
-, "", "", "", "", ""
+, NULL, NULL, NULL, NULL, NULL
 
-, "", "", "", "", "", "", ""
+, NULL, NULL, NULL, NULL, NULL, NULL, NULL
 }};
 
 

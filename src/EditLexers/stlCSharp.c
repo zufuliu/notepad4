@@ -60,9 +60,9 @@ static KEYWORDLIST Keywords_CSharp = {{
 "FontStyle GraphicsUnit KnownColor "
 
 , // 8 Constant
-""
+NULL
 
-, "", "", "", "", "", ""
+, NULL, NULL, NULL, NULL, NULL, NULL
 
 , // 15 Code Snippet
 "for^() if^() switch^() while^() catch^() else^if^() else^{} foreach^() sizeof() typeof() using^() fixed^() lock^() "

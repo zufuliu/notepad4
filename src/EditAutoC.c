@@ -25,7 +25,8 @@ static inline BOOL IsWordStart(int ch) {
 
 static inline BOOL IsEscapeChar(int ch) {
 	return ch == 't' || ch == 'n' || ch == 'r' || ch == 'a' || ch == 'b' || ch == 'v' || ch == 'f'
-		   || ch == '$'; // PHP
+		|| ch == '0'
+		|| ch == '$'; // PHP
 	// x u U
 }
 
@@ -361,8 +362,8 @@ void AutoC_AddDocWord(HWND hwnd, struct WordList *pWList, BOOL bIgnore) {
 void AutoC_AddKeyword(struct WordList *pWList, int iCurrentStyle) {
 	for (int i = 0; i < NUMKEYWORD; i++) {
 		const char *pKeywords = pLexCurrent->pKeyWords->pszKeyWords[i];
-		if (pKeywords && *pKeywords && !(currentLexKeywordAttr[i] & KeywordAttr_NoAutoComp)) {
-			WordList_AddList(pWList, pKeywords);
+		if (StrNotEmptyA(pKeywords) && !(currentLexKeywordAttr[i] & KeywordAttr_NoAutoComp)) {
+			WordList_AddListEx(pWList, pKeywords);
 		}
 	}
 
@@ -406,14 +407,14 @@ INT AutoC_AddSpecWord(struct WordList *pWList, int iCurrentStyle, int ch, int ch
 			   || (pLexCurrent->iLexer == SCLEX_SMALI && iCurrentStyle == SCE_C_DEFAULT)) {
 		if (ch == '#' && pLexCurrent->iLexer == SCLEX_CPP) { // #preprocessor
 			const char *pKeywords = pLexCurrent->pKeyWords->pszKeyWords[2];
-			if (pKeywords && *pKeywords) {
-				WordList_AddList(pWList, pKeywords);
+			if (StrNotEmptyA(pKeywords)) {
+				WordList_AddListEx(pWList, pKeywords);
 				return 0;
 			}
 		} else if (ch == '#' && pLexCurrent->rid == NP2LEX_VB) { // #preprocessor
 			const char *pKeywords = pLexCurrent->pKeyWords->pszKeyWords[3];
-			if (pKeywords && *pKeywords) {
-				WordList_AddList(pWList, pKeywords);
+			if (StrNotEmptyA(pKeywords)) {
+				WordList_AddListEx(pWList, pKeywords);
 				return 0;
 			}
 		} else if (ch == '@') { // @directive, @annotation, @decorator
@@ -423,8 +424,8 @@ INT AutoC_AddSpecWord(struct WordList *pWList, int iCurrentStyle, int ch, int ch
 				//return 0;
 			} else {
 				const char *pKeywords = pLexCurrent->pKeyWords->pszKeyWords[3];
-				if (pKeywords && *pKeywords) {
-					WordList_AddList(pWList, pKeywords);
+				if (StrNotEmptyA(pKeywords)) {
+					WordList_AddListEx(pWList, pKeywords);
 					return 0; // user defined annotation
 				}
 			}

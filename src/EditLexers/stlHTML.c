@@ -35,7 +35,7 @@ static KEYWORDLIST Keywords_HTML = {{
 "Static Stop String Sub Then To True Type Unload Until Variant WEnd While With WithEvents Xor"
 
 , // 3 Python
-""
+NULL
 
 , // 4 PHP
 "abstract and as break callable case catch class clone const continue declare default "
@@ -57,7 +57,7 @@ static KEYWORDLIST Keywords_HTML = {{
 "__CLASS__ __DIR__ __FILE__ __FUNCTION__ __LINE__ __METHOD__ __NAMESPACE__ __TRAIT__ "
 
 , // 5 SGML DTD
-""
+NULL
 
 , // 6 Attribute
 // Attribute
@@ -123,9 +123,9 @@ static KEYWORDLIST Keywords_HTML = {{
 "allow-forms allow-popups allow-same-origin allow-scripts allow-top-navigation "
 "row col rowgroup colgroup any "
 "command context toolbar soft hard "
-, ""
+, NULL
 
-, "", "", "", "", "", "", ""
+, NULL, NULL, NULL, NULL, NULL, NULL, NULL
 }};
 
 

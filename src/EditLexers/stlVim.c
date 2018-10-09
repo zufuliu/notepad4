@@ -7,15 +7,15 @@ static KEYWORDLIST Keywords_VIM = {{
 "finish quit exe silent echo "
 
 , // 1
-""
+NULL
 
 , // 2
 "exists() has() "
 "strlen() stridx() strpart() "
 
-, "", "", "", "", "",
+, NULL, NULL, NULL, NULL, NULL,
 
-"", "", "", "", "", "", "", ""
+NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL
 }};
 
 

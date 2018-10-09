@@ -19,7 +19,7 @@ static KEYWORDLIST Keywords_Julia = {{
 "Module Nothing None TypeName TypeVar "
 
 , // 2
-""
+NULL
 
 , // 3 Basic Function
 "int8 uint8 int16 uint16 int32 uint32 int64 uint64 int128 uint128 int uint float32 float64 bool char "
@@ -28,9 +28,9 @@ static KEYWORDLIST Keywords_Julia = {{
 "ccall() box() unbox() "
 "sizeof() convert() length() size() numel() ndims() isequal() isempty() assign() "
 
-, "", "", "", "", ""
+, NULL, NULL, NULL, NULL, NULL
 
-, "", "", "", "", "", "", ""
+, NULL, NULL, NULL, NULL, NULL, NULL, NULL
 }};
 
 

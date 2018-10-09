@@ -16,10 +16,10 @@ static KEYWORDLIST Keywords_LLVM = {{
 "half float double fp128 x86_fp80 ppc_fp128 x86_mmx label metadata "
 
 , // 2 #Preprocessor
-""
+NULL
 
 , // 3 @Directive
-""
+NULL
 
 , // 4 Attribute
 "unnamed_addr "
@@ -50,16 +50,16 @@ static KEYWORDLIST Keywords_LLVM = {{
 "oeq ogt oge oge ole one ord une uno "			// fcmp
 
 , // 5 Class
-""
+NULL
 , // 6 Interface
-""
+NULL
 , // 7 Enumeration
-""
+NULL
 , // 8 Constant
-""
+NULL
 
 , // 9 2nd Keyword
-""
+NULL
 
 , // 10 Intruction
 "ret br switch indirectbr invoke resume unreachable "			// terminator
@@ -71,7 +71,7 @@ static KEYWORDLIST Keywords_LLVM = {{
 "to trunc zext sext fptrunc fpext fptoui fptosi uitofp sitofp ptrtoint inttoptr bitcast addrspacecast "	// conversion
 "icmp fcmp phi select call va_arg landingpad "
 
-, "", "", "",  "", ""
+, NULL, NULL, NULL,  NULL, NULL
 }};
 
 

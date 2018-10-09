@@ -20,9 +20,9 @@ static KEYWORDLIST Keywords_VBS = {{
 "Err WScript"
 
 , // 3 Preprocessor
-""
+NULL
 , // 4 Attribute/Property
-""
+NULL
 
 , // 5 VB Const
 // String
@@ -49,9 +49,9 @@ static KEYWORDLIST Keywords_VBS = {{
 // Miscellaneous
 "vbObjectError"
 
-, "", "", ""
+, NULL, NULL, NULL
 
-, "", "", "", "", "", "", ""
+, NULL, NULL, NULL, NULL, NULL, NULL, NULL
 }};
 
 

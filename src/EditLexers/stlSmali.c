@@ -21,19 +21,19 @@ static KEYWORDLIST Keywords_Smail = {{
 "boolean byte char double float int long short void "
 
 , // 1 Type Keyword
-""
+NULL
 , // 2 Preprocessor
-""
+NULL
 , // 3 Directive
-""
+NULL
 , // 4 Attribute
-""
+NULL
 , // 5 Class
-""
+NULL
 , // 6 Interface
-""
+NULL
 , // 7 Enumeration
-""
+NULL
 , // 8 Constant
 "init clinit value "
 
@@ -115,7 +115,7 @@ static KEYWORDLIST Keywords_Smail = {{
 , // 11 Instruction
 "from16 high16 jumbo range 2addr lit16 lit8 "
 
-, "", "", "", ""
+, NULL, NULL, NULL, NULL
 }};
 
 

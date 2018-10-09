@@ -14,24 +14,24 @@ static KEYWORDLIST Keywords_AS = {{
 "int uint "
 
 , // 2 Preprocessor
-""
+NULL
 , // 3 Directive
-""
+NULL
 , // 4 Attribute
-""
+NULL
 
 , // 5 Class
 "Array Boolean Class Date Error Function Namespace Number Null Object Void "
 "QName RegExp String Vector XML XMLList"
 
 , // 6 Interface
-""
+NULL
 , // 7 Enumeration
-""
+NULL
 , // 8 Constant
-""
+NULL
 
-, "", "", "", "", "", ""
+, NULL, NULL, NULL, NULL, NULL, NULL
 
 , // 15 Code Snippet
 "for^() if^() switch^() while^() else^if^() else^{} "

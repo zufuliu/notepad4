@@ -29,14 +29,14 @@ static KEYWORDLIST Keywords_CMake = {{
 "ctest_test() ctest_update() ctest_upload() "
 
 , // 1 Variables that Provide Information
-""
+NULL
 , // 2 Variables That Change Behavior
-""
+NULL
 , // 3 Variables That Describe the System
-""
-, "", "", "", ""
+NULL
+, NULL, NULL, NULL, NULL
 
-, "", "", "", "", "", "", ""
+, NULL, NULL, NULL, NULL, NULL, NULL, NULL
 }};
 
 

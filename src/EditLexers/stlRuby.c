@@ -15,12 +15,12 @@ static KEYWORDLIST Keywords_Ruby = {{
 , // Pre-defined variables
 "$DEBUG $LOADED_FEATURES $FILENAME $LOAD_PATH $stderr $stdin $stdout $VERBOSE "
 
-,"", "", "", "", "", ""
+,NULL, NULL, NULL, NULL, NULL, NULL
 
 , // 8 Fold
 "and begin break case do else elsif if next return when unless until not or"
 
-, "", "", "", "", "", "", ""
+, NULL, NULL, NULL, NULL, NULL, NULL, NULL
 }};
 
 

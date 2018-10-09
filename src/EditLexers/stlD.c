@@ -29,15 +29,15 @@ static KEYWORDLIST Keywords_D = {{
 , // 3 Directive
 "disable property safe system trusted "
 , // 4 Attribute
-""
+NULL
 , // 5 Class
 "Object TypeInfo ClassInfo Error Exception "
 "FILE "
 
 , // 6 Interface
-""
+NULL
 , // 7 Enumeration
-""
+NULL
 , // 8 Constant
 "__FILE__ __LINE__ __EOF__ __DATE__ __TIME__ __TIMESTAMP__ __VERSION__ __VENDOR__ __LOCAL_SIZE "
 "CLOCKS_PER_SEC "
@@ -47,7 +47,7 @@ static KEYWORDLIST Keywords_D = {{
 "da db dd de df di dl dq  ds dt dw"
 
 , // 10 2nd Type Keyword
-""
+NULL
 
 , // 11 Assembler Intruction
 "aaa aad aam aas adc add addpd addps addsd addss and andnpd andnps andpd andps arpl bound bsf bsr bswap bt btc btr bts call cbw cdq clc cld clflush cli clts cmc cmova cmovae cmovb cmovbe cmovc cmove cmovg cmovge cmovl cmovle cmovna cmovnae cmovnb cmovnbe cmovnc cmovne cmovng cmovnge cmovnl cmovnle cmovno cmovnp cmovns cmovnz cmovo cmovp cmovpe cmovpo cmovs cmovz cmp cmppd cmpps cmps cmpsb cmpsd cmpss cmpsw cmpxch8b cmpxchg comisd comiss cpuid cvtdq2pd cvtdq2ps cvtpd2dq cvtpd2pi cvtpd2ps cvtpi2pd cvtpi2ps cvtps2dq cvtps2pd cvtps2pi cvtsd2si cvtsd2ss cvtsi2sd cvtsi2ss cvtss2sd cvtss2si cvttpd2dq cvttpd2pi cvttps2dq cvttps2pi cvttsd2si cvttss2si cwd cwde daa das dec div divpd divps divsd divss emms enter "
@@ -61,7 +61,7 @@ static KEYWORDLIST Keywords_D = {{
 "CR0 CR2 CR3 CR4 DR0 DR1 DR2 DR3 DR6 DR7 TR3 TR4 TR5 TR6 TR7 ST ST0 ST1 ST2 ST3 ST4 ST5 ST6 ST7 "
 "MM0 MM1 MM2 MM3 MM4 MM5 MM6 MM7 XMM0 XMM1 XMM2 XMM3 XMM4 XMM5 XMM6 XMM7 "
 
-, "", ""
+, NULL, NULL
 
 , // 15 Code Snippet
 "for^() if^() switch^() while^() else^if^() else^{} foreach^() foreach_reverse^() with^() "

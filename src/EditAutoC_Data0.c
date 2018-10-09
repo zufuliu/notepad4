@@ -5,7 +5,7 @@ static NP2_KEYWORDS kwJavaDoc = {
 "author code docRoot deprecated exception inheritDoc link linkplain literal param "
 "return see serial serialData serialField since throws value version "
 "hide "
-, "", "", ""
+, NULL, NULL, NULL
 };
 
 // PHPDoc
@@ -17,7 +17,7 @@ static NP2_KEYWORDS kwPHPDoc = {
 , // pesudo type
 "resource mixed number callback void scalar "
 ,
-"readonly", ""
+"readonly", NULL
 };
 
 // C# Doc
@@ -27,7 +27,7 @@ static NP2_KEYWORDS kwNETDoc = {
 "cref file path type name "
 , // attribute
 "bullet number table"
-, ""
+, NULL
 };
 
 // Doxygen
@@ -38,7 +38,7 @@ static NP2_KEYWORDS kwDoxyDoc = {
 , // C# Attribute
 "type name cref "
 ,
-""
+NULL
 };
 
 // XML Schema
@@ -55,14 +55,14 @@ static NP2_KEYWORDS kwXmlSchema = {
 "xpath namespace processContents use schemaLocation public system source itemType memberTypes "
 , // value
 "anyType anySimpleType duration dateTime time date gYear gYearMonth gMonth gMonthDay gDay "
-"boolean base64Binary hexBinary float double anyURI QName NOTATION " ""
+"boolean base64Binary hexBinary float double anyURI QName NOTATION "
 "decimal integer long int short byte nonPositiveInteger negativeInteger nonNegativeInteger positiveInteger "
 "unsignedLong unsignedInt unsignedShort unsignedByte "
 "string normalizedString token language NMTOKEN NMTOKENS Name NCName ID IDREF IDREFS ENTITY ENTITIES "
 "equal ordered bounded cardinality numeric " " preserve replace collapse "
 "unqualified qualified strict skip lax prohibited optional required "
 //"blockSet complexDerivationSet XPathExpr URIref "
-, ""
+, NULL
 };
 
 // XML Stylesheet
@@ -85,7 +85,7 @@ static NP2_KEYWORDS kwXmlStylesheet = {
 , // value
 "preserve strip unspecified default omit lax single multiple any alphabetic traditional ascending descending "
 "upper-first lower-first text number xml html xhtml NFC NFD NFKC NFKD fully-normalized none "
-, ""
+, NULL
 };
 
 // XML DTD SGML
@@ -94,7 +94,7 @@ static NP2_KEYWORDS kwXmlDTD = {
 "CDATA PCDATA ID IDREF IDREFS NMTOKEN NMTOKENS ENTITY ENTITIES NOTATION EMPTY SYSTEM PUBLIC ANY "
 ,
 "REQUIRED IMPLIED FIXED "
-, ""
+, NULL
 };
 
 // Ant Build
@@ -107,7 +107,7 @@ static NP2_KEYWORDS kwAntBuild = {
 "value location refid resource file url environment classpath classpathref prefix relative "
 "message " "tofile todir overwrite force includeEmptyDirs " "srcdir destdir   "
 , // value
-"", ""
+NULL, NULL
 };
 
 // Maven POM
@@ -124,9 +124,9 @@ static NP2_KEYWORDS kwMavenPOM = {
 "file missing exists executions execution phase goals goal inherited releases enabled updatePolicy checksumPolicy snapshots "
 "layout classifier scope systemPath exclusions exclusion excludeDefaults reportSets reportSet report uniqueVersion "
 "snapshotRepository downloadUrl relocation message status "
-, "",
+, NULL,
 "jar HEAD"
-, ""
+, NULL
 };
 
 // Maven Settings
@@ -137,9 +137,9 @@ static NP2_KEYWORDS kwMavenSettings = {
 "directoryPermissions configuration mirrorOf url layout mirrorOfLayouts activation properties "
 "repositories pluginRepositories releases snapshots enabled updatePolicy checksumPolicy activeByDefault "
 "jdk os property file missing exists family arch "
-, "",
+, NULL,
 "http default"
-, ""
+, NULL
 };
 
 // Ivy Module
@@ -154,7 +154,7 @@ static NP2_KEYWORDS kwIvyModule = {
 "force changing mapped matcher "
 , // value
 "public private"
-, ""
+, NULL
 };
 
 // Ivy Settings
@@ -179,7 +179,7 @@ static NP2_KEYWORDS kwIvySettings = {
 , // value
 "auto env default warn ignore error HEAD OPTIONS GET POST PUT DELETE TRACE CONNECT no-lock rtifact-lock "
 "all latest-time latest-revision latest-compatible strict latest-cm compatible-cm regexp-cm "
-, ""
+, NULL
 };
 
 // PMD Ruleset
@@ -188,7 +188,7 @@ static NP2_KEYWORDS kwPMDRuleset = {
 , // attribute
 "language minimumLanguageVersion maximumLanguageVersion since ref message "
 "externalInfoUrl class dfa typeResolution deprecated delimiter min max "
-, "", ""
+, NULL, NULL
 };
 
 // Checkstyle Module
@@ -196,7 +196,7 @@ static NP2_KEYWORDS kwCheckstyle = {
 "module property metadata message "
 , // attribute
 "default key"
-, "", ""
+, NULL, NULL
 };
 
 // Apache Config
@@ -229,8 +229,8 @@ static NP2_KEYWORDS kwApache = {
 "SSLRandomSeed SSLRenegBufferSize SSLRequire SSLRequireSSL SSLSessionCache SSLSessionCacheTimeout SSLSessionTicketKeyFile SSLStaplingCache SSLStaplingErrorCacheTimeout SSLStaplingFakeTryLater SSLStaplingForceURL SSLStaplingResponderTimeout SSLStaplingResponseMaxAge SSLStaplingResponseTimeSkew SSLStaplingReturnResponderErrors SSLStaplingStandardCacheTimeout SSLStrictSNIVHostCheck SSLUserName SSLUseStapling SSLVerifyClient SSLVerifyDepth StartServers StartThreads Substitute Suexec SuexecUserGroup "
 "ThreadLimit ThreadsPerChild ThreadStackSize TimeOut TraceEnable TransferLog TypesConfig UnDefine UnsetEnv UseCanonicalName UseCanonicalPhysicalPort User UserDir VHostCGIMode VHostCGIPrivs VHostGroup VHostPrivs VHostSecure VHostUser VirtualDocumentRoot VirtualDocumentRootIP VirtualScriptAlias VirtualScriptAliasIP WatchdogInterval Win32DisableAcceptEx XBitHack xml2EncAlias xml2EncDefault xml2StartParse"
 , // Valves
-""
-, ""
+NULL
+, NULL
 };
 
 // Tomcat Config
@@ -311,7 +311,7 @@ static NP2_KEYWORDS kwTomcat = {
 "AccessLogValve ExtendedAccessLogValve RemoteAddrValve RemoteHostValve RemoteIpValve CrawlerSessionManagerValve StuckThreadDetectionValve "
 "SingleSignOn BasicAuthenticator DigestAuthenticator FormAuthenticator SSLAuthenticator SpnegoAuthenticator "
 "DomainFilterInterceptor MessageDispatch15Interceptor MessageDispatchInterceptor TcpFailureDetector ThroughputInterceptor "
-, ""
+, NULL
 };
 
 // Java web.xml
@@ -345,7 +345,7 @@ static NP2_KEYWORDS kwJavaWebConfig = {
 "message-destination-type message-destination-usage message-destination-link "
 ,
 " metadata-complete  "
-, ""
+, NULL
 };
 
 // Struts config and validators
@@ -359,7 +359,7 @@ static NP2_KEYWORDS kwStruts = {
 "order extends namespace abstract strict-method-invocation externalReferenceResolver "
 "class default exception method converter file scope static optional " "required short-circuit key "
 , // value
-"", ""
+NULL, NULL
 };
 
 // hibernate config
@@ -374,7 +374,7 @@ static NP2_KEYWORDS kwHibConfig = {
 "lock refresh replicate save-update save update pre-load pre-update pre-insert pre-delete pre-collection-recreate "
 "pre-collection-remove pre-collection-update post-load post-update post-insert post-delete post-collection-recreate "
 "post-collection-remove post-collection-update post-commit-update post-commit-insert post-commit-delete "
-, ""
+, NULL
 };
 
 // hibernate mapping
@@ -399,7 +399,7 @@ static NP2_KEYWORDS kwHibMapping = {
 "none property implicit explicit dirty all pojo dom4j dynamic-map join select undefined any null negative vm db never auto "
 "no-proxy exception ignore extra unsorted noaction read-write nonstrict-read-write transactional non-lazy always get normal "
 "put refresh upgrade-nowait upgrade rowcount param "
-, ""
+, NULL
 };
 
 // Spring Beans
@@ -413,7 +413,7 @@ static NP2_KEYWORDS kwSpringBeans = {
 "key index ref local merge value-type key-type key-ref value-ref replacer match "
 , // value
 "default byName byType constructor "
-, ""
+, NULL
 };
 
 // JBoss Config
@@ -427,7 +427,7 @@ static NP2_KEYWORDS kwSpringBeans = {
 // Apple Property List
 static NP2_KEYWORDS kwPList = {
 "plist array data date dict key real integer string "
-, "", "", ""
+, NULL, NULL, NULL
 };
 
 // Android Manifest
@@ -456,7 +456,7 @@ static NP2_KEYWORDS kwAndroidManifest = {
 "undefined nokeys qwerty twelvekey nonav dpad trackball wheel notouch stylus finger "
 "GL_OES_compressed_ETC1_RGB8_texture GL_OES_compressed_paletted_texture GL_AMD_compressed_3DC_texture GL_AMD_compressed_ATC_texture "
 "GL_EXT_texture_compression_latc GL_EXT_texture_compression_dxt1 GL_EXT_texture_compression_s3tc GL_IMG_texture_compression_pvrtc"
-, ""
+, NULL
 };
 
 // Android Layout

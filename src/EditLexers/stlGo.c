@@ -14,23 +14,23 @@ static KEYWORDLIST Keywords_Go = {{
 "rune string uint uintptr uint8 uint16 uint32 uint64 "
 
 , // 2 Preprocessor
-""
+NULL
 , // 3 Directive
-""
+NULL
 
 , // 4 Attribute
 "append cap close complex copy imag len make new panic print println real recover "
 
 , // 5 Class
-""
+NULL
 , // 6 Interface
-""
+NULL
 , // 7 Enumeration
-""
+NULL
 , // 8 Constant
-""
+NULL
 
-, "", "", "", "", "", "", ""
+, NULL, NULL, NULL, NULL, NULL, NULL, NULL
 }};
 
 

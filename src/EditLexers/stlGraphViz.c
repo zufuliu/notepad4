@@ -11,7 +11,7 @@ static KEYWORDLIST Keywords_DOT = {{
 "box polygon ellipse circle point egg triangle plaintext diamond trapezium parallelogram house pentagon hexagon septagon octagon doublecircle doubleoctagon tripleoctagon invtriangle invtrapezium invhouse Mdiamond Msquare Mcircle rect rectangle none note tab folder box3d component "
 
 , // 2 Preprocessor
-""
+NULL
 , // 3 Directive
 // HTML Like Label
 "TABLE TR TD FONT IMG BR "
@@ -22,9 +22,9 @@ static KEYWORDLIST Keywords_DOT = {{
 "ALIGN BALIGN BGCOLOR BORDER CELLBORDER CELLPADDING CELLSPACING COLOR COLSPAN FACE FIXEDSIZE HEIGHT HREF POINT-SIZE PORT ROWSPAN SCALE SRC TARGET TITLE TOOLTIP VALIGN WIDTH "
 
 , // 5 Class
-""
+NULL
 , // 6 Interface
-""
+NULL
 , // 7 Enumeration
 // Style for Node
 "filled invisible diagonals rounded dashed dotted solid bold "
@@ -33,7 +33,7 @@ static KEYWORDLIST Keywords_DOT = {{
 // Color Name
 "aliceblue antiquewhite aquamarine azure beige bisque black blanchedalmond blue blueviolet brown burlywood cadetblue chartreuse chocolate coral cornflowerblue cornsilk crimson cyan darkgoldenrod darkgreen darkkhaki darkolivegreen darkorange darkorchid darksalmon darkseagreen darkslateblue darkslategray darkslategrey darkturquoise darkviolet deeppink deepskyblue dimgray dimgrey dodgerblue firebrick floralwhite forestgreen gainsboro ghostwhite gold goldenrod gray green greenyellow grey honeydew hotpink indianred indigo ivory khaki lavender lavenderblush lawngreen lemonchiffon lightblue lightcoral lightcyan lightgoldenrod lightgoldenrodyellow lightgray lightgrey lightpink lightsalmon lightseagreen lightskyblue lightslateblue lightslategray lightslategrey lightsteelblue lightyellow limegreen linen magenta maroon mediumaquamarine mediumblue mediumorchid mediumpurple mediumseagreen mediumslateblue mediumspringgreen mediumturquoise mediumvioletred midnightblue mintcream mistyrose moccasin navajowhite navy navyblue oldlace olivedrab orange orangered orchid palegoldenrod palegreen paleturquoise palevioletred papayawhip peachpuff peru pink plum powderblue purple red rosybrown royalblue saddlebrown salmon sandybrown seagreen seashell sienna skyblue slateblue slategray slategrey snow springgreen steelblue tan thistle tomato transparent turquoise violet violetred wheat white whitesmoke yellow yellowgreen "
 
-, "", "", "", "", "", "", ""
+, NULL, NULL, NULL, NULL, NULL, NULL, NULL
 }};
 
 

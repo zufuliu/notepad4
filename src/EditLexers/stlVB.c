@@ -64,9 +64,9 @@ static KEYWORDLIST Keywords_VB = {{
 "vbSystem vbUpperCase vbUserDefinedType vbUseSystem vbVolume vbWide"
 "vbHiragana vbKatakana vbSimplifiedChinese vbTraditionalChinese "
 
-, "", "", ""
+, NULL, NULL, NULL
 
-, "", "", "", "", "", "", ""
+, NULL, NULL, NULL, NULL, NULL, NULL, NULL
 }};
 
 

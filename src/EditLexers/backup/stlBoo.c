@@ -1,4 +1,4 @@
-static KEYWORDLIST Keywords_D = {
+static KEYWORDLIST Keywords_BOO = {{
 "namespace assembly "
 "abstract virtual override new static final transient "
 "protected private public internal partial struct interface enum callable of "
@@ -10,19 +10,18 @@ static KEYWORDLIST Keywords_D = {
 ,	// preprocessor
 "__eval__ __switch__ enumerate filter len typeof map max min property using getter required lock range zip checked unchecked rawArrayIndexing normalArrayIndexing array matrix yieldAll"
 ,	// directive
-""
+NULL
 ,	// attribute
-""
+NULL
 ,	// class
-""
+NULL
 ,	// interface
-""
+NULL
 ,	// enumeration
-""
+NULL
 ,	// constant
-""
+NULL
 
-#if NUMKEYWORD == 16
-,"","","","","","",""
-#endif
-};
+, NULL, NULL, NULL, NULL, NULL, NULL
+, NULL
+}};

@@ -295,12 +295,12 @@ static inline BOOL WordList_StartsWith(struct WordList *pWList, LPCSTR pWord) {
 #endif
 }
 
-void WordList_AddList(struct WordList *pWList, LPCSTR pList) {
+void WordList_AddListEx(struct WordList *pWList, LPCSTR pList) {
 	char *word = pWList->wordBuf;
 	int iStartLen = pWList->iStartLen;
 	int len = 0;
 	int ok = 0;
-	while (*pList) {
+	do {
 		char *sub = StrPBrkA(pList, " \t.,();^\n\r");
 		if (sub) {
 			int lenSub = (int)(sub - pList);
@@ -344,5 +344,11 @@ void WordList_AddList(struct WordList *pWList, LPCSTR pList) {
 			}
 			break;
 		}
+	} while (*pList);
+}
+
+static inline void WordList_AddList(struct WordList *pWList, LPCSTR pList) {
+	if (StrNotEmptyA(pList)) {
+		WordList_AddListEx(pWList, pList);
 	}
 }
