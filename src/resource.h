@@ -345,7 +345,7 @@
 #define IDM_VIEW_SHOWEOLS				40408	// Ctrl+Shift+9
 #define IDM_VIEW_WORDWRAPSYMBOLS		40409	// Ctrl+Shift+0
 #define IDM_VIEW_MATCHBRACES			40410	// Ctrl+Shift+V
-#define IDM_VIEW_HILITECURRENTLINE		40411	// Ctrl+Shift+I
+#define IDM_VIEW_HIGHLIGHTCURRENTLINE	40411	// Ctrl+Shift+I
 #define IDM_VIEW_LINENUMBERS			40412	// Ctrl+Shift+N
 #define IDM_VIEW_MARGIN					40413	// Ctrl+Shift+M
 #define IDM_VIEW_ZOOMIN					40414	// Ctrl++
