@@ -268,7 +268,7 @@ extern int	iEncoding;
 extern int	g_DOSEncoding;
 extern int	iDefaultCodePage;
 extern int	iDefaultCharSet;
-extern BOOL	bHiliteCurrentLine;
+extern BOOL	bHighlightCurrentLine;
 
 #define STYLE_MASK_FONT_FACE	(1 << 0)
 #define STYLE_MASK_FONT_SIZE	(1 << 1)
@@ -966,23 +966,7 @@ void Style_SetLexer(HWND hwnd, PEDITLEXER pLexNew) {
 	iValue = clamp_i(iValue, 0, 5);
 	SendMessage(hwnd, SCI_SETWHITESPACESIZE, iValue, 0);
 
-	if (bHiliteCurrentLine) {
-		if (Style_StrGetColor(FALSE, lexDefault.Styles[8 + iIdx].szValue, &iValue)) { // caret line back
-			SendMessage(hwnd, SCI_SETCARETLINEVISIBLE, TRUE, 0);
-			SendMessage(hwnd, SCI_SETCARETLINEBACK, iValue, 0);
-
-			if (Style_StrGetAlpha(lexDefault.Styles[8 + iIdx].szValue, &iValue)) {
-				SendMessage(hwnd, SCI_SETCARETLINEBACKALPHA, iValue, 0);
-			} else {
-				SendMessage(hwnd, SCI_SETCARETLINEBACKALPHA, SC_ALPHA_NOALPHA, 0);
-			}
-		} else {
-			SendMessage(hwnd, SCI_SETCARETLINEVISIBLE, FALSE, 0);
-		}
-	} else {
-		SendMessage(hwnd, SCI_SETCARETLINEVISIBLE, FALSE, 0);
-	}
-
+	Style_SetCurrentLineBackground(hwnd);
 	Style_UpdateCaret(hwnd);
 	// caret fore
 	if (!Style_StrGetColor(TRUE, lexDefault.Styles[9 + iIdx].szValue, &iValue)) {
@@ -994,19 +978,7 @@ void Style_SetLexer(HWND hwnd, PEDITLEXER pLexNew) {
 	SendMessage(hwnd, SCI_SETCARETFORE, iValue, 0);
 	SendMessage(hwnd, SCI_SETADDITIONALCARETFORE, iValue, 0);
 
-	if (SendMessage(hwnd, SCI_GETEDGEMODE, 0, 0) == EDGE_LINE) {
-		if (Style_StrGetColor(TRUE, lexDefault.Styles[10 + iIdx].szValue, &iValue)) { // edge fore
-			SendMessage(hwnd, SCI_SETEDGECOLOUR, iValue, 0);
-		} else {
-			SendMessage(hwnd, SCI_SETEDGECOLOUR, GetSysColor(COLOR_3DLIGHT), 0);
-		}
-	} else {
-		if (Style_StrGetColor(FALSE, lexDefault.Styles[10 + iIdx].szValue, &iValue)) { // edge back
-			SendMessage(hwnd, SCI_SETEDGECOLOUR, iValue, 0);
-		} else {
-			SendMessage(hwnd, SCI_SETEDGECOLOUR, GetSysColor(COLOR_3DLIGHT), 0);
-		}
-	}
+	Style_SetLongLineColors(hwnd);
 
 	// Extra Line Spacing
 	if (rid != NP2LEX_ANSI && Style_StrGetSize(lexDefault.Styles[11 + iIdx].szValue, &iValue)) {
@@ -2145,15 +2117,13 @@ void Style_SetLongLineColors(HWND hwnd) {
 // Style_SetCurrentLineBackground()
 //
 void Style_SetCurrentLineBackground(HWND hwnd) {
-	int rgb, iValue;
-
-	// Use 2nd default style
-	const int iIdx = GetDefaultStyleStartIndex();
-
-	if (bHiliteCurrentLine) {
-		if (Style_StrGetColor(FALSE, lexDefault.Styles[8 + iIdx].szValue, &rgb)) { // caret line back
+	if (bHighlightCurrentLine) {
+		// Use 2nd default style
+		const int iIdx = GetDefaultStyleStartIndex();
+		int iValue;
+		if (Style_StrGetColor(FALSE, lexDefault.Styles[8 + iIdx].szValue, &iValue)) { // caret line back
 			SendMessage(hwnd, SCI_SETCARETLINEVISIBLE, TRUE, 0);
-			SendMessage(hwnd, SCI_SETCARETLINEBACK, rgb, 0);
+			SendMessage(hwnd, SCI_SETCARETLINEBACK, iValue, 0);
 
 			if (Style_StrGetAlpha(lexDefault.Styles[8 + iIdx].szValue, &iValue)) {
 				SendMessage(hwnd, SCI_SETCARETLINEBACKALPHA, iValue, 0);

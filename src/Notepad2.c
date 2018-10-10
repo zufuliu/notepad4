@@ -121,7 +121,7 @@ BOOL	bMatchBraces;
 BOOL	bAutoIndent;
 BOOL	bAutoCloseTags;
 BOOL	bShowIndentGuides;
-BOOL	bHiliteCurrentLine;
+BOOL	bHighlightCurrentLine;
 BOOL	bTabsAsSpaces;
 BOOL	bTabsAsSpacesG;
 BOOL	bTabIndents;
@@ -2384,7 +2384,7 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	//i = (int)SendMessage(hwndEdit, SCI_GETLEXER, 0, 0);
 	//EnableCmd(hmenu, IDM_VIEW_AUTOCLOSETAGS, (i == SCLEX_HTML || i == SCLEX_XML));
 	CheckCmd(hmenu, IDM_VIEW_AUTOCLOSETAGS, bAutoCloseTags /*&& (i == SCLEX_HTML || i == SCLEX_XML)*/);
-	CheckCmd(hmenu, IDM_VIEW_HILITECURRENTLINE, bHiliteCurrentLine);
+	CheckCmd(hmenu, IDM_VIEW_HIGHLIGHTCURRENTLINE, bHighlightCurrentLine);
 
 	CheckCmd(hmenu, IDM_VIEW_REUSEWINDOW, bReuseWindow);
 	CheckCmd(hmenu, IDM_VIEW_SINGLEFILEINSTANCE, bSingleFileInstance);
@@ -4022,8 +4022,8 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		bAutoCloseTags = !bAutoCloseTags;
 		break;
 
-	case IDM_VIEW_HILITECURRENTLINE:
-		bHiliteCurrentLine = !bHiliteCurrentLine;
+	case IDM_VIEW_HIGHLIGHTCURRENTLINE:
+		bHighlightCurrentLine = !bHighlightCurrentLine;
 		Style_SetCurrentLineBackground(hwndEdit);
 		break;
 
@@ -5349,7 +5349,7 @@ void LoadSettings(void) {
 
 	bShowWordWrapSymbols = IniSectionGetBool(pIniSection, L"ShowWordWrapSymbols", 0);
 	bMatchBraces = IniSectionGetBool(pIniSection, L"MatchBraces", 1);
-	bHiliteCurrentLine = IniSectionGetBool(pIniSection, L"HighlightCurrentLine", 0);
+	bHighlightCurrentLine = IniSectionGetBool(pIniSection, L"HighlightCurrentLine", 0);
 	bShowIndentGuides = IniSectionGetBool(pIniSection, L"ShowIndentGuides", 0);
 
 	bAutoIndent = IniSectionGetBool(pIniSection, L"AutoIndent", 1);
@@ -5655,7 +5655,7 @@ void SaveSettings(BOOL bSaveSettingsNow) {
 	IniSectionSetIntEx(pIniSection, L"WordWrapSymbols", iWordWrapSymbols, 22);
 	IniSectionSetBoolEx(pIniSection, L"ShowWordWrapSymbols", bShowWordWrapSymbols, 0);
 	IniSectionSetBoolEx(pIniSection, L"MatchBraces", bMatchBraces, 1);
-	IniSectionSetBoolEx(pIniSection, L"HighlightCurrentLine", bHiliteCurrentLine, 0);
+	IniSectionSetBoolEx(pIniSection, L"HighlightCurrentLine", bHighlightCurrentLine, 0);
 	IniSectionSetBoolEx(pIniSection, L"ShowIndentGuides", bShowIndentGuides, 0);
 	IniSectionSetBoolEx(pIniSection, L"AutoIndent", bAutoIndent, 1);
 	IniSectionSetBoolEx(pIniSection, L"AutoCloseTags", bAutoCloseTags, 1);
