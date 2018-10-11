@@ -241,6 +241,7 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	bool needIdleStyling;
 
 	int modEventMask;
+	bool commandEvents;
 
 	SelectionText drag;
 
