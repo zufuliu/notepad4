@@ -383,26 +383,54 @@ BOOL EditCopyAppend(HWND hwnd) {
 //
 // EditDetectEOLMode() - moved here to handle Unicode files correctly
 //
-int EditDetectEOLMode(HWND hwnd, LPCSTR lpData) {
+extern DWORD dwLineEndingCheckMaxMB;
+int EditDetectEOLMode(HWND hwnd, LPSTR lpData, DWORD cbData) {
 	UNREFERENCED_PARAMETER(hwnd);
 
 	int iEOLMode = iLineEndings[iDefaultEOLMode];
-	LPCSTR cp = lpData ? StrPBrkA(lpData, "\r\n") : NULL;
-
-	if (!cp) {
+	if (lpData == NULL || cbData == 0 || dwLineEndingCheckMaxMB == 0) {
 		return iEOLMode;
 	}
 
-	if (*cp == '\r') {
-		if (*(cp + 1) == '\n') {
-			iEOLMode = SC_EOL_CRLF;
-		} else {
-			iEOLMode = SC_EOL_CR;
-		}
-	} else {
-		iEOLMode = SC_EOL_LF;
+	const DWORD maxCheckLength = dwLineEndingCheckMaxMB * 1024 * 1024;
+	const BOOL reset = cbData > maxCheckLength;
+	const char backup = reset ? lpData[maxCheckLength] : '\0';
+	if (reset) {
+		lpData[maxCheckLength] = '\0';
 	}
 
+	LPCSTR cp = StrPBrkA(lpData, "\r\n");
+	if (cp) {
+		UINT linesCount[3] = { 0, 0, 0 };
+		do {
+			if (*cp == '\r') {
+				if (*(cp + 1) == '\n') {
+					++linesCount[SC_EOL_CRLF];
+					++cp;
+				} else {
+					++linesCount[SC_EOL_CR];
+				}
+			} else {
+				++linesCount[SC_EOL_LF];
+			}
+			cp = StrPBrkA(cp + 1, "\r\n");
+		} while (cp);
+
+		const UINT linesMax = max_u(max_u(linesCount[0], linesCount[1]), linesCount[2]);
+		if (linesMax != linesCount[iEOLMode]) {
+			if (linesMax == linesCount[SC_EOL_CRLF]) {
+				iEOLMode = SC_EOL_CRLF;
+			} else if (linesMax == linesCount[SC_EOL_LF]) {
+				iEOLMode = SC_EOL_LF;
+			} else {
+				iEOLMode = SC_EOL_CR;
+			}
+		}
+	}
+
+	if (reset) {
+		lpData[maxCheckLength] = backup;
+	}
 	return iEOLMode;
 }
 
@@ -567,7 +595,7 @@ BOOL EditLoadFile(HWND hwnd, LPWSTR pszFile, BOOL bSkipEncodingDetection,
 		SendMessage(hwnd, SCI_SETCODEPAGE, SC_CP_UTF8, 0);
 		FileVars_Init(lpDataUTF8, cbData - 1, &fvCurFile);
 		EditSetNewText(hwnd, lpDataUTF8, cbData - 1);
-		*iEOLMode = EditDetectEOLMode(hwnd, lpDataUTF8);
+		*iEOLMode = EditDetectEOLMode(hwnd, lpDataUTF8, cbData - 1);
 		NP2HeapFree(lpDataUTF8);
 	} else {
 		FileVars_Init(lpData, cbData, &fvCurFile);
@@ -585,11 +613,11 @@ BOOL EditLoadFile(HWND hwnd, LPWSTR pszFile, BOOL bSkipEncodingDetection,
 			if (utf8Sig) {
 				EditSetNewText(hwnd, lpData + 3, cbData - 3);
 				*iEncoding = CPI_UTF8SIGN;
-				*iEOLMode = EditDetectEOLMode(hwnd, lpData + 3);
+				*iEOLMode = EditDetectEOLMode(hwnd, lpData + 3, cbData - 3);
 			} else {
 				EditSetNewText(hwnd, lpData, cbData);
 				*iEncoding = CPI_UTF8;
-				*iEOLMode = EditDetectEOLMode(hwnd, lpData);
+				*iEOLMode = EditDetectEOLMode(hwnd, lpData, cbData);
 			}
 		} else {
 			UINT uCodePage = CP_UTF8;
@@ -629,12 +657,12 @@ BOOL EditLoadFile(HWND hwnd, LPWSTR pszFile, BOOL bSkipEncodingDetection,
 
 				SendMessage(hwnd, SCI_SETCODEPAGE, SC_CP_UTF8, 0);
 				EditSetNewText(hwnd, lpData, cbData);
-				*iEOLMode = EditDetectEOLMode(hwnd, lpData);
+				*iEOLMode = EditDetectEOLMode(hwnd, lpData, cbData);
 			} else {
 				SendMessage(hwnd, SCI_SETCODEPAGE, iDefaultCodePage, 0);
 				EditSetNewText(hwnd, lpData, cbData);
 				*iEncoding = CPI_DEFAULT;
-				*iEOLMode = EditDetectEOLMode(hwnd, lpData);
+				*iEOLMode = EditDetectEOLMode(hwnd, lpData, cbData);
 			}
 		}
 	}
