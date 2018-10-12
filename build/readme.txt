@@ -1,4 +1,8 @@
+Build Notepad2 and metapath
+	https://github.com/zufuliu/notepad2/wiki/Build-Notepad2
+
 echo | clang -dM -E -
+echo | clang-cl -Xclang -dM -E -
 echo | gcc -dM -E -
 
 UNREFERENCED_PARAMETER();

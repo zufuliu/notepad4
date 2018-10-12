@@ -14,3 +14,9 @@ hg clone http://hg.code.sf.net/p/scintilla/scite
 
 Notepad++
 https://github.com/notepad-plus-plus/notepad-plus-plus.git
+
+Notepad3
+https://github.com/rizonesoft/Notepad3
+
+Notepad2e
+https://github.com/ProgerXP/Notepad2e

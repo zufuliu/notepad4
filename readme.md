@@ -198,5 +198,6 @@ Prebuild binaries for each release can be downloaded from [release list](https:/
 * [Scintilla's website](http://www.scintilla.org/)
 * [Build Notepad2 and metapath](https://github.com/zufuliu/notepad2/wiki/Build-Notepad2)
 
-## Changed keyboard shortcuts compared to Notepad2 and/or Notepad2-mod:
-Almost every shortcut is available in the menu.
+### Related projects based on (original) Notepad2 and/or Notepad2-mod:
+* [Notepad3](https://github.com/rizonesoft/Notepad3)
+* [Notepad2e](https://github.com/ProgerXP/Notepad2e)
