@@ -6507,12 +6507,16 @@ void LoadFlags(void) {
 	fNoFileVariables = IniSectionGetBool(pIniSection, L"NoFileVariables", 0);
 
 	if (StrIsEmpty(g_wchAppUserModelID)) {
-		IniSectionGetString(pIniSection, L"ShellAppUserModelID", L"(default)",
-							g_wchAppUserModelID, COUNTOF(g_wchAppUserModelID));
+		strValue = IniSectionGetValue(pIniSection, L"ShellAppUserModelID");
+		if (StrNotEmpty(strValue)) {
+			StrCpyN(g_wchAppUserModelID, strValue, COUNTOF(g_wchAppUserModelID));
+		} else {
+			lstrcpy(g_wchAppUserModelID, L"(default)");
+		}
 	}
 
 	if (flagUseSystemMRU == 0) {
-		if (IniSectionGetBool(pIniSection, L"ShellUseSystemMRU", 0)) {
+		if (IniSectionGetBool(pIniSection, L"ShellUseSystemMRU", 1)) {
 			flagUseSystemMRU = 2;
 		}
 	}
