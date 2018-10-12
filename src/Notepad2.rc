@@ -160,7 +160,7 @@ BEGIN
         POPUP "Copy to Clipboard"
         BEGIN
             MENUITEM "&File Name",                       CMD_COPYFILENAME_NOEXT
-            MENUITEM "File Name and &Ext\tShift+F9",     CMD_COPYFILENAME
+            MENUITEM "File Name and &Ext.\tShift+F9",    CMD_COPYFILENAME
             MENUITEM "Full &Path Name\tAlt+Shift+F9",    CMD_COPYPATHNAME
             MENUITEM SEPARATOR
             MENUITEM "Copy A&ll\tAlt+A",            IDM_EDIT_COPYALL
@@ -248,9 +248,29 @@ BEGIN
             MENUITEM SEPARATOR
             MENUITEM "&HTML/XML Tags...\tAlt+X",        IDM_EDIT_INSERT_XMLTAG
             MENUITEM "New &GUID",                       IDM_EDIT_INSERT_GUID
+            POPUP "Unicode Control Character"
+            BEGIN
+                MENUITEM "LRM\t&Left-to-right mark",                IDM_INSERT_UNICODE_LRM
+                MENUITEM "RLM\t&Right-to-left mark",                IDM_INSERT_UNICODE_RLM
+                MENUITEM "ZWJ\tZero width &joiner",                 IDM_INSERT_UNICODE_ZWJ
+                MENUITEM "ZWNJ\tZero width &non-joiner",            IDM_INSERT_UNICODE_ZWNJ
+                MENUITEM "LRE\tStart of left-to-right &embedding",  IDM_INSERT_UNICODE_LRE
+                MENUITEM "RLE\tStart of right-to-left e&mbedding",  IDM_INSERT_UNICODE_RLE
+                MENUITEM "LRO\tStart of left-to-right &override",   IDM_INSERT_UNICODE_LRO
+                MENUITEM "RLO\tStart of right-to-left o&verride",   IDM_INSERT_UNICODE_RLO
+                MENUITEM "PDF\t&Pop directional formatting",        IDM_INSERT_UNICODE_PDF
+                MENUITEM "NADS\tN&ational digit shapes substitution",IDM_INSERT_UNICODE_NADS
+                MENUITEM "NODS\tNominal (European) &digit shapes",  IDM_INSERT_UNICODE_NODS
+                MENUITEM "ASS\tActivate &symmetric swapping",       IDM_INSERT_UNICODE_ASS
+                MENUITEM "ISS\tInhibit s&ymmetric swapping",        IDM_INSERT_UNICODE_ISS
+                MENUITEM "AAFS\tActivate Arabic &form shaping",     IDM_INSERT_UNICODE_AAFS
+                MENUITEM "IAFS\tInhibit Arabic form s&haping",      IDM_INSERT_UNICODE_IAFS
+                MENUITEM "RS\tRecord Separator (&Block separator)", IDM_INSERT_UNICODE_RS
+                MENUITEM "US\tUnit Separator (&Segment separator)", IDM_INSERT_UNICODE_US
+            END
             MENUITEM SEPARATOR
             MENUITEM "&File Name",                      CMD_INSERTFILENAME_NOEXT
-            MENUITEM "File Name and &Ext\tCtrl+F9",     IDM_EDIT_INSERT_FILENAME
+            MENUITEM "File Name and &Extension\tCtrl+F9",IDM_EDIT_INSERT_FILENAME
             MENUITEM "Full &Path Name\tCtrl+Shift+F9",  IDM_EDIT_INSERT_PATHNAME
             MENUITEM SEPARATOR
             MENUITEM "Current Date",                IDM_EDIT_INSERT_LOC_DATE

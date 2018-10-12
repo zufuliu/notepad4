@@ -78,5 +78,33 @@ def GenerateUTF8Table():
     print('UTF8ClassifyTable:', len(UTF8ClassifyTable))
     print('\n'.join(UTF8ClassifyTable))
 
+def GenerateUnicodeControlCharacters():
+	ucc_table = [
+		"\u200E", # U+200E	LRM		Left-to-right mark
+		"\u200F", # U+200F	RLM		Right-to-left mark
+		"\u200D", # U+200D	ZWJ		Zero width joiner
+		"\u200C", # U+200C	ZWNJ	Zero width non-joiner
+		"\u202A", # U+202A	LRE		Start of left-to-right embedding
+		"\u202B", # U+202B	RLE		Start of right-to-left embedding
+		"\u202D", # U+202D	LRO		Start of left-to-right override
+		"\u202E", # U+202E	RLO		Start of right-to-left override
+		"\u202C", # U+202C	PDF		Pop directional formatting
+		"\u206E", # U+206E	NADS	National digit shapes substitution
+		"\u206F", # U+206F	NODS	Nominal (European) digit shapes
+		"\u206B", # U+206B	ASS		Activate symmetric swapping
+		"\u206A", # U+206A	ISS		Inhibit symmetric swapping
+		"\u206D", # U+206D	AAFS	Activate Arabic form shaping
+		"\u206C", # U+206C	IAFS	Inhibit Arabic form shaping
+		"\u001E", # U+001E	RS		Record Separator (Block separator)
+		"\u001F", # U+001F	US		Unit Separator (Segment separator)
+	]
+
+	print('UnicodeControlCharacters:')
+	for ucc in ucc_table:
+		utf8bytes = ucc.encode('utf-8')
+		utf8str = ''.join('\\x%02x' % b for b in utf8bytes)
+		print(utf8str, 'U+%04X' % ord(ucc))
+
 if __name__ == '__main__':
+    GenerateUnicodeControlCharacters();
     GenerateUTF8Table()
