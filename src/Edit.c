@@ -6027,6 +6027,34 @@ BOOL EditInsertTagDlg(HWND hwnd, LPWSTR pwszOpen, LPWSTR pwszClose) {
 	return iResult == IDOK;
 }
 
+void EditInsertUnicodeControlCharacter(HWND hwnd, int ucc) {
+	// scintilla/scripts/GenerateCharTable.py
+	static LPCSTR const ucc_table[] = {
+		"\xe2\x80\x8e", // U+200E	LRM		Left-to-right mark
+		"\xe2\x80\x8f", // U+200F	RLM		Right-to-left mark
+		"\xe2\x80\x8d", // U+200D	ZWJ		Zero width joiner
+		"\xe2\x80\x8c", // U+200C	ZWNJ	Zero width non-joiner
+		"\xe2\x80\xaa", // U+202A	LRE		Start of left-to-right embedding
+		"\xe2\x80\xab", // U+202B	RLE		Start of right-to-left embedding
+		"\xe2\x80\xad", // U+202D	LRO		Start of left-to-right override
+		"\xe2\x80\xae", // U+202E	RLO		Start of right-to-left override
+		"\xe2\x80\xac", // U+202C	PDF		Pop directional formatting
+		"\xe2\x81\xae", // U+206E	NADS	National digit shapes substitution
+		"\xe2\x81\xaf", // U+206F	NODS	Nominal (European) digit shapes
+		"\xe2\x81\xab", // U+206B	ASS		Activate symmetric swapping
+		"\xe2\x81\xaa", // U+206A	ISS		Inhibit symmetric swapping
+		"\xe2\x81\xad", // U+206D	AAFS	Activate Arabic form shaping
+		"\xe2\x81\xac", // U+206C	IAFS	Inhibit Arabic form shaping
+		"\x1e",			// U+001E	RS		Record Separator (Block separator)
+		"\x1f",			// U+001F	US		Unit Separator (Segment separator)
+
+	};
+
+	ucc = ucc - IDM_INSERT_UNICODE_LRM;
+	LPCSTR lpsz = ucc_table[ucc];
+	SendMessage(hwnd, SCI_REPLACESEL, 0, (LPARAM)lpsz);
+}
+
 //=============================================================================
 //
 // EditSortDlgProc()
