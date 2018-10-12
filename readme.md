@@ -197,9 +197,10 @@ Prebuild binaries for each release can be downloaded from [release list](https:/
 * [Official Notepad2-mod website](https://xhmikosr.github.io/notepad2-mod/)
 * [Scintilla's website](http://www.scintilla.org/)
 * [Build Notepad2 and metapath](https://github.com/zufuliu/notepad2/wiki/Build-Notepad2)
+* [Notepad2 Wiki](https://github.com/zufuliu/notepad2/wiki)
 
 ### Related projects based on (original) Notepad2 and/or Notepad2-mod:
 * [Notepad3](https://github.com/rizonesoft/Notepad3)
 * [Notepad2e](https://github.com/ProgerXP/Notepad2e)
 
-## [License](../master/tools/lang/License.txt)
+## [License](../master/License.txt)
