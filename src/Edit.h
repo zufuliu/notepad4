@@ -131,7 +131,8 @@ BOOL	EditLineNumDlg(HWND hwnd);
 BOOL	EditModifyLinesDlg(HWND hwnd, LPWSTR pwsz1, LPWSTR pwsz2);
 BOOL	EditEncloseSelectionDlg(HWND hwnd, LPWSTR pwszOpen, LPWSTR pwszClose);
 BOOL	EditInsertTagDlg(HWND hwnd, LPWSTR pwszOpen, LPWSTR pwszClose);
-void	EditInsertUnicodeControlCharacter(HWND hwnd, int ucc);
+void	EditInsertUnicodeControlCharacter(HWND hwnd, int menu);
+void	EditShowUnicodeControlCharacter(HWND hwnd, BOOL bShow);
 BOOL	EditSortDlg(HWND hwnd, int *piSortFlags);
 BOOL	EditAlignDlg(HWND hwnd, int *piAlignMode);
 

@@ -372,6 +372,7 @@ BEGIN
         MENUITEM "Show &Whitespace\tCtrl+Shift+8", IDM_VIEW_SHOWWHITESPACE
         MENUITEM "Show Line &Endings\tCtrl+Shift+9", IDM_VIEW_SHOWEOLS
         MENUITEM "Show Wrap S&ymbols\tCtrl+Shift+0", IDM_VIEW_WORDWRAPSYMBOLS
+        MENUITEM "Unicode Control Character", IDM_VIEW_UNICODE_CONTROL_CHAR
         //MENUITEM "Show Call Tips", IDM_VIEW_SHOWCALLTIPS
         MENUITEM SEPARATOR
         MENUITEM "Visual &Brace Matching\tCtrl+Shift+V",    IDM_VIEW_MATCHBRACES

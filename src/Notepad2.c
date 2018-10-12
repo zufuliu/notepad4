@@ -117,6 +117,7 @@ int		iWordWrapMode;
 int		iWordWrapIndent;
 int		iWordWrapSymbols;
 BOOL	bShowWordWrapSymbols;
+BOOL	bShowUnicodeControlCharacter;
 BOOL	bMatchBraces;
 BOOL	bAutoIndent;
 BOOL	bAutoCloseTags;
@@ -1578,6 +1579,10 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	SetWrapIndentMode();
 	SetWrapVisualFlags();
 
+	if (bShowUnicodeControlCharacter) {
+		EditShowUnicodeControlCharacter(hwndEdit, TRUE);
+	}
+
 	// Long Lines
 	if (bMarkLongLines) {
 		SendMessage(hwndEdit, SCI_SETEDGEMODE, (iLongLineMode == EDGE_LINE) ? EDGE_LINE : EDGE_BACKGROUND, 0);
@@ -2369,6 +2374,7 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	CheckCmd(hmenu, IDM_VIEW_SHOWWHITESPACE, bViewWhiteSpace);
 	CheckCmd(hmenu, IDM_VIEW_SHOWEOLS, bViewEOLs);
 	CheckCmd(hmenu, IDM_VIEW_WORDWRAPSYMBOLS, bShowWordWrapSymbols);
+	CheckCmd(hmenu, IDM_VIEW_UNICODE_CONTROL_CHAR, bShowUnicodeControlCharacter);
 #if NP2_ENABLE_SHOW_CALL_TIPS
 	CheckCmd(hmenu, IDM_VIEW_SHOWCALLTIPS, bShowCallTips);
 #endif
@@ -4018,6 +4024,11 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		SetWrapVisualFlags();
 		break;
 
+	case IDM_VIEW_UNICODE_CONTROL_CHAR:
+		bShowUnicodeControlCharacter = !bShowUnicodeControlCharacter;
+		EditShowUnicodeControlCharacter(hwndEdit, bShowUnicodeControlCharacter);
+		break;
+
 #if NP2_ENABLE_SHOW_CALL_TIPS
 	case IDM_VIEW_SHOWCALLTIPS:
 		bShowCallTips = !bShowCallTips;
@@ -5369,6 +5380,8 @@ void LoadSettings(void) {
 	iWordWrapSymbols = clamp_i(iWordWrapSymbols % 10, 0, 2) + clamp_i((iWordWrapSymbols % 100 - iWordWrapSymbols % 10) / 10, 0, 2) * 10;
 
 	bShowWordWrapSymbols = IniSectionGetBool(pIniSection, L"ShowWordWrapSymbols", 0);
+	bShowUnicodeControlCharacter = IniSectionGetBool(pIniSection, L"ShowUnicodeControlCharacter", 0);
+
 	bMatchBraces = IniSectionGetBool(pIniSection, L"MatchBraces", 1);
 	bHighlightCurrentLine = IniSectionGetBool(pIniSection, L"HighlightCurrentLine", 0);
 	bShowIndentGuides = IniSectionGetBool(pIniSection, L"ShowIndentGuides", 0);
@@ -5675,6 +5688,7 @@ void SaveSettings(BOOL bSaveSettingsNow) {
 	IniSectionSetIntEx(pIniSection, L"WordWrapIndent", iWordWrapIndent, 0);
 	IniSectionSetIntEx(pIniSection, L"WordWrapSymbols", iWordWrapSymbols, 22);
 	IniSectionSetBoolEx(pIniSection, L"ShowWordWrapSymbols", bShowWordWrapSymbols, 0);
+	IniSectionSetBoolEx(pIniSection, L"ShowUnicodeControlCharacter", bShowUnicodeControlCharacter, 0);
 	IniSectionSetBoolEx(pIniSection, L"MatchBraces", bMatchBraces, 1);
 	IniSectionSetBoolEx(pIniSection, L"HighlightCurrentLine", bHighlightCurrentLine, 0);
 	IniSectionSetBoolEx(pIniSection, L"ShowIndentGuides", bShowIndentGuides, 0);
