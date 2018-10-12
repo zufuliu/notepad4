@@ -201,3 +201,5 @@ Prebuild binaries for each release can be downloaded from [release list](https:/
 ### Related projects based on (original) Notepad2 and/or Notepad2-mod:
 * [Notepad3](https://github.com/rizonesoft/Notepad3)
 * [Notepad2e](https://github.com/ProgerXP/Notepad2e)
+
+## [License](../master/tools/lang/License.txt)

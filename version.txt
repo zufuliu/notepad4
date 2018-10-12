@@ -10,7 +10,7 @@ hg clone http://hg.code.sf.net/p/scintilla/code scintilla
 SciTE
 hg clone http://hg.code.sf.net/p/scintilla/scite
 4.1.2
-2018-10-01 5098:d4daa2d576c1
+2018-10-11 5098:d4daa2d576c1
 
 Notepad++
 https://github.com/notepad-plus-plus/notepad-plus-plus.git
