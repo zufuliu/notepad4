@@ -394,7 +394,7 @@ int EditDetectEOLMode(LPSTR lpData, DWORD cbData) {
 		char backup = '\0';
 		const BOOL reset = cbData > maxCheckLength;
 		if (reset) {
-			if (cp - lpData >= maxCheckLength) {
+			if (cp >= lpData + maxCheckLength) {
 				if (*cp == '\r') {
 					if (*(cp + 1) == '\n') {
 						iEOLMode = SC_EOL_CRLF;
@@ -410,6 +410,9 @@ int EditDetectEOLMode(LPSTR lpData, DWORD cbData) {
 			backup = lpData[maxCheckLength];
 			if (backup == '\r' || backup == '\n') {
 				backup = lpData[++maxCheckLength];
+				if (backup == '\n') {
+					backup = lpData[++maxCheckLength];
+				}
 			}
 			lpData[maxCheckLength] = '\0';
 		}
