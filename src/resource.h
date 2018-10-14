@@ -255,6 +255,8 @@
 #define IDM_INSERT_UNICODE_IAFS			40274
 #define IDM_INSERT_UNICODE_RS			40275
 #define IDM_INSERT_UNICODE_US			40276
+#define IDM_INSERT_UNICODE_LS			40277
+#define IDM_INSERT_UNICODE_PS			40278
 #define IDM_EDIT_UNDO					40300	// Alt+Back Ctrl+Z Ctrl+Shift+Y
 #define IDM_EDIT_REDO					40301	// Ctrl+Y Ctrl+Shift+Z
 #define IDM_EDIT_CUT					40302	// Ctrl+X Shift+Del
