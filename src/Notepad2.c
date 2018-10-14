@@ -3311,6 +3311,8 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case IDM_INSERT_UNICODE_IAFS:
 	case IDM_INSERT_UNICODE_RS:
 	case IDM_INSERT_UNICODE_US:
+	case IDM_INSERT_UNICODE_LS:
+	case IDM_INSERT_UNICODE_PS:
 		EditInsertUnicodeControlCharacter(hwndEdit, LOWORD(wParam));
 		break;
 

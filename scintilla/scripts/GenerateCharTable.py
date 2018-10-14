@@ -97,6 +97,8 @@ def GenerateUnicodeControlCharacters():
 		"\u206C", # U+206C	IAFS	Inhibit Arabic form shaping
 		"\u001E", # U+001E	RS		Record Separator (Block separator)
 		"\u001F", # U+001F	US		Unit Separator (Segment separator)
+		"\u2028", # U+2028	LS		Line Separator
+		"\u2029", # U+2029	PS		Paragraph Separator
 	]
 
 	print('UnicodeControlCharacters:')

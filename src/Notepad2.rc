@@ -267,6 +267,8 @@ BEGIN
                 MENUITEM "IAFS\tInhibit Arabic form s&haping",      IDM_INSERT_UNICODE_IAFS
                 MENUITEM "RS\tRecord Separator (&Block separator)", IDM_INSERT_UNICODE_RS
                 MENUITEM "US\tUnit Separator (&Segment separator)", IDM_INSERT_UNICODE_US
+                MENUITEM "LS\tLine Separator",                      IDM_INSERT_UNICODE_LS
+                MENUITEM "PS\tParagraph Separator",                 IDM_INSERT_UNICODE_PS
             END
             MENUITEM SEPARATOR
             MENUITEM "&File Name",                      CMD_INSERTFILENAME_NOEXT

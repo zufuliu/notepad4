@@ -6035,6 +6035,7 @@ typedef struct UnicodeControlCharacter {
 	LPCSTR representation;
 } UnicodeControlCharacter;
 
+// https://en.wikipedia.org/wiki/Unicode_control_characters
 // scintilla/scripts/GenerateCharTable.py
 static const UnicodeControlCharacter kUnicodeControlCharacterTable[] = {
 	{ "\xe2\x80\x8e", "LRM" },	// U+200E	LRM		Left-to-right mark
@@ -6052,9 +6053,11 @@ static const UnicodeControlCharacter kUnicodeControlCharacterTable[] = {
 	{ "\xe2\x81\xaa", "ISS" },	// U+206A	ISS		Inhibit symmetric swapping
 	{ "\xe2\x81\xad", "AAFS" },	// U+206D	AAFS	Activate Arabic form shaping
 	{ "\xe2\x81\xac", "IAFS" },	// U+206C	IAFS	Inhibit Arabic form shaping
-	// built-in C0 control set
+	// Scintilla built-in, Editor::SetRepresentations()
 	{ "\x1e", NULL },			// U+001E	RS		Record Separator (Block separator)
 	{ "\x1f", NULL },			// U+001F	US		Unit Separator (Segment separator)
+	{ "\xe2\x80\xa8", NULL },	// U+2028	LS		Line Separator
+	{ "\xe2\x80\xa9", NULL },	// U+2029	PS		Unit Separator (Segment separator)
 };
 
 void EditInsertUnicodeControlCharacter(HWND hwnd, int menu) {
