@@ -4027,6 +4027,8 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case IDM_VIEW_UNICODE_CONTROL_CHAR:
 		bShowUnicodeControlCharacter = !bShowUnicodeControlCharacter;
 		EditShowUnicodeControlCharacter(hwndEdit, bShowUnicodeControlCharacter);
+		// temporary fix for issue #77: force InvalidateStyleRedraw().
+		SendMessage(hwndEdit, SCI_SETVIEWEOL, bViewEOLs, 0);
 		break;
 
 #if NP2_ENABLE_SHOW_CALL_TIPS
