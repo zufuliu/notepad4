@@ -6057,7 +6057,7 @@ static const UnicodeControlCharacter kUnicodeControlCharacterTable[] = {
 	{ "\x1e", NULL },			// U+001E	RS		Record Separator (Block separator)
 	{ "\x1f", NULL },			// U+001F	US		Unit Separator (Segment separator)
 	{ "\xe2\x80\xa8", NULL },	// U+2028	LS		Line Separator
-	{ "\xe2\x80\xa9", NULL },	// U+2029	PS		Unit Separator (Segment separator)
+	{ "\xe2\x80\xa9", NULL },	// U+2029	PS		Paragraph Separator
 };
 
 void EditInsertUnicodeControlCharacter(HWND hwnd, int menu) {
