@@ -175,10 +175,8 @@
 * [ReactOS](https://www.reactos.org/)
 
 ## [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots)
-Some screenshots is available on [Wiki page](https://github.com/zufuliu/notepad2/wiki/Screenshots).
 
-## Download
-Prebuild binaries for each release can be downloaded from [release list](https://github.com/zufuliu/notepad2/releases).
+## [Download](https://github.com/zufuliu/notepad2/releases)
 
 ## Notes:
 * The default *Win32* build require [SSE2](https://en.wikipedia.org/wiki/SSE2) (Pentium 4), which can be turned off if you [build Notepad2 and metapath](https://github.com/zufuliu/notepad2/wiki/Build-Notepad2) yourself.
