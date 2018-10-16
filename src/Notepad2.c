@@ -1664,7 +1664,7 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	// Window Initialization
 
-	CreateWindow(
+	(void)CreateWindow(
 		WC_STATIC,
 		NULL,
 		WS_CHILD | WS_CLIPSIBLINGS | WS_CLIPCHILDREN,
@@ -1676,7 +1676,7 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	SetDlgItemText(hwnd, IDC_FILENAME, szCurFile);
 
-	CreateWindow(
+	(void)CreateWindow(
 		WC_STATIC,
 		NULL,
 		WS_CHILD | WS_CLIPSIBLINGS | WS_CLIPCHILDREN,
@@ -6785,10 +6785,10 @@ void UpdateStatusbar(void) {
 
 	const Sci_Position iLineStart = SciCall_PositionFromLine(iLn - 1);
 	const Sci_Position iLineEnd = SciCall_GetLineEndPosition(iLn - 1);
-	iPos = SciCall_CountCharacters(iLineStart, iPos) + 1;
-	iCol = SciCall_CountCharacters(iLineStart, iLineEnd);
-	wsprintf(tchCh, L"%i", iPos);
-	wsprintf(tchChs, L"%i", iCol);
+	iCol = SciCall_CountCharacters(iLineStart, iPos) + 1;
+	const int iLineChar = SciCall_CountCharacters(iLineStart, iLineEnd);
+	wsprintf(tchCh, L"%i", iCol);
+	wsprintf(tchChs, L"%i", iLineChar);
 	FormatNumberStr(tchCh);
 	FormatNumberStr(tchChs);
 
