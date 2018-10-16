@@ -301,7 +301,7 @@ void WordList_AddListEx(struct WordList *pWList, LPCSTR pList) {
 	int len = 0;
 	int ok = 0;
 	do {
-		char *sub = StrPBrkA(pList, " \t.,();^\n\r");
+		char *sub = strpbrk(pList, " \t.,();^\n\r");
 		if (sub) {
 			int lenSub = (int)(sub - pList);
 			lenSub = min_i(NP2_AUTOC_MAX_WORD_LENGTH - len, lenSub);

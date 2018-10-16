@@ -565,7 +565,7 @@ void EditCompleteWord(HWND hwnd, BOOL autoInsert) {
 		if (!AutoC_AddSpecWord(pWList, iCurrentStyle, ch, chPrev) && pWList->nWordCount > 0) {
 			goto label_show_word_list;
 		}
-		pSubRoot = StrPBrkA(pRoot, ":.#@<\\/->");
+		pSubRoot = strpbrk(pRoot, ":.#@<\\/->");
 		if (pSubRoot) {
 			pSubRoot = pRoot;
 			goto label_show_word_list;
@@ -582,7 +582,7 @@ label_add_doc_word:
 label_show_word_list:
 	iAutoCItemCount = pWList->nWordCount;
 	if (iAutoCItemCount == 0 && pSubRoot && *pSubRoot) {
-		pSubRoot = StrPBrkA(pSubRoot, ":.#@<\\/->");
+		pSubRoot = strpbrk(pSubRoot, ":.#@<\\/->");
 		if (pSubRoot) {
 			while (*pSubRoot && StrChrA(":.#@<\\/->", *pSubRoot)) {
 				pSubRoot++;
