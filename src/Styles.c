@@ -614,7 +614,6 @@ BOOL Style_Export(HWND hwnd) {
 	WCHAR szFile[MAX_PATH * 2] = L"";
 	WCHAR szFilter[256];
 	OPENFILENAME ofn;
-	DWORD dwError = ERROR_SUCCESS;
 
 	ZeroMemory(&ofn, sizeof(OPENFILENAME));
 	GetString(IDS_FILTER_INI, szFilter, COUNTOF(szFilter));
@@ -630,6 +629,7 @@ BOOL Style_Export(HWND hwnd) {
 			| OFN_PATHMUSTEXIST | OFN_SHAREAWARE /*| OFN_NODEREFERENCELINKS*/ | OFN_OVERWRITEPROMPT;
 
 	if (GetSaveFileName(&ofn)) {
+		DWORD dwError = ERROR_SUCCESS;
 		IniSectionOnSave section;
 		WCHAR *pIniSectionBuf = NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_STYLES);
 		const int cchIniSection = (int)NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR);
