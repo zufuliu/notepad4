@@ -284,7 +284,7 @@ char *EditGetClipboardText(HWND hwnd) {
 
 		LocalFree(pmch);
 		pmch = LocalAlloc(LPTR, mlen2 + 1);
-		lstrcpyA(pmch, ptmp);
+		strcpy(pmch, ptmp);
 		NP2HeapFree(ptmp);
 	}
 
@@ -1236,16 +1236,16 @@ void EditEscapeCChars(HWND hwnd) {
 
 			SendMessage(hwnd, SCI_BEGINUNDOACTION, 0, 0);
 
-			lstrcpyA(efr.szFind, "\\");
-			lstrcpyA(efr.szReplace, "\\\\");
+			strcpy(efr.szFind, "\\");
+			strcpy(efr.szReplace, "\\\\");
 			EditReplaceAllInSelection(hwnd, &efr, FALSE);
 
-			lstrcpyA(efr.szFind, "\"");
-			lstrcpyA(efr.szReplace, "\\\"");
+			strcpy(efr.szFind, "\"");
+			strcpy(efr.szReplace, "\\\"");
 			EditReplaceAllInSelection(hwnd, &efr, FALSE);
 
-			lstrcpyA(efr.szFind, "\'");
-			lstrcpyA(efr.szReplace, "\\\'");
+			strcpy(efr.szFind, "\'");
+			strcpy(efr.szReplace, "\\\'");
 			EditReplaceAllInSelection(hwnd, &efr, FALSE);
 
 			SendMessage(hwnd, SCI_ENDUNDOACTION, 0, 0);
@@ -1268,16 +1268,16 @@ void EditUnescapeCChars(HWND hwnd) {
 
 			SendMessage(hwnd, SCI_BEGINUNDOACTION, 0, 0);
 
-			lstrcpyA(efr.szFind, "\\\\");
-			lstrcpyA(efr.szReplace, "\\");
+			strcpy(efr.szFind, "\\\\");
+			strcpy(efr.szReplace, "\\");
 			EditReplaceAllInSelection(hwnd, &efr, FALSE);
 
-			lstrcpyA(efr.szFind, "\\\"");
-			lstrcpyA(efr.szReplace, "\"");
+			strcpy(efr.szFind, "\\\"");
+			strcpy(efr.szReplace, "\"");
 			EditReplaceAllInSelection(hwnd, &efr, FALSE);
 
-			lstrcpyA(efr.szFind, "\\\'");
-			lstrcpyA(efr.szReplace, "\'");
+			strcpy(efr.szFind, "\\\'");
+			strcpy(efr.szReplace, "\'");
 			EditReplaceAllInSelection(hwnd, &efr, FALSE);
 
 			SendMessage(hwnd, SCI_ENDUNDOACTION, 0, 0);
@@ -1309,33 +1309,33 @@ void EditEscapeXHTMLChars(HWND hwnd) {
 
 			SendMessage(hwnd, SCI_BEGINUNDOACTION, 0, 0);
 
-			lstrcpyA(efr.szFind, "&");
-			lstrcpyA(efr.szReplace, "&amp;");
+			strcpy(efr.szFind, "&");
+			strcpy(efr.szReplace, "&amp;");
 			EditReplaceAllInSelection(hwnd, &efr, FALSE);
 
-			lstrcpyA(efr.szFind, "\"");
-			lstrcpyA(efr.szReplace, "&quot;");
+			strcpy(efr.szFind, "\"");
+			strcpy(efr.szReplace, "&quot;");
 			EditReplaceAllInSelection(hwnd, &efr, FALSE);
 
-			lstrcpyA(efr.szFind, "\'");
-			lstrcpyA(efr.szReplace, "&apos;");
+			strcpy(efr.szFind, "\'");
+			strcpy(efr.szReplace, "&apos;");
 			EditReplaceAllInSelection(hwnd, &efr, FALSE);
 
-			lstrcpyA(efr.szFind, "<");
-			lstrcpyA(efr.szReplace, "&lt;");
+			strcpy(efr.szFind, "<");
+			strcpy(efr.szReplace, "&lt;");
 			EditReplaceAllInSelection(hwnd, &efr, FALSE);
 
-			lstrcpyA(efr.szFind, ">");
-			lstrcpyA(efr.szReplace, "&gt;");
+			strcpy(efr.szFind, ">");
+			strcpy(efr.szReplace, "&gt;");
 			EditReplaceAllInSelection(hwnd, &efr, FALSE);
 
 			if (pLexCurrent->iLexer != SCLEX_XML) {
-				lstrcpyA(efr.szFind, " ");
-				lstrcpyA(efr.szReplace, "&nbsp;");
+				strcpy(efr.szFind, " ");
+				strcpy(efr.szReplace, "&nbsp;");
 				EditReplaceAllInSelection(hwnd, &efr, FALSE);
 
-				lstrcpyA(efr.szFind, "\t");
-				lstrcpyA(efr.szReplace, "&emsp;");
+				strcpy(efr.szFind, "\t");
+				strcpy(efr.szReplace, "&emsp;");
 				EditReplaceAllInSelection(hwnd, &efr, FALSE);
 			}
 
@@ -1359,32 +1359,32 @@ void EditUnescapeXHTMLChars(HWND hwnd) {
 
 			SendMessage(hwnd, SCI_BEGINUNDOACTION, 0, 0);
 
-			lstrcpyA(efr.szFind, "&quot;");
-			lstrcpyA(efr.szReplace, "\"");
+			strcpy(efr.szFind, "&quot;");
+			strcpy(efr.szReplace, "\"");
 			EditReplaceAllInSelection(hwnd, &efr, FALSE);
 
-			lstrcpyA(efr.szFind, "&apos;");
-			lstrcpyA(efr.szReplace, "\'");
+			strcpy(efr.szFind, "&apos;");
+			strcpy(efr.szReplace, "\'");
 			EditReplaceAllInSelection(hwnd, &efr, FALSE);
 
-			lstrcpyA(efr.szFind, "&lt;");
-			lstrcpyA(efr.szReplace, "<");
+			strcpy(efr.szFind, "&lt;");
+			strcpy(efr.szReplace, "<");
 			EditReplaceAllInSelection(hwnd, &efr, FALSE);
 
-			lstrcpyA(efr.szFind, "&gt;");
-			lstrcpyA(efr.szReplace, ">");
+			strcpy(efr.szFind, "&gt;");
+			strcpy(efr.szReplace, ">");
 			EditReplaceAllInSelection(hwnd, &efr, FALSE);
 
-			lstrcpyA(efr.szFind, "&nbsp;");
-			lstrcpyA(efr.szReplace, " ");
+			strcpy(efr.szFind, "&nbsp;");
+			strcpy(efr.szReplace, " ");
 			EditReplaceAllInSelection(hwnd, &efr, FALSE);
 
-			lstrcpyA(efr.szFind, "&amp;");
-			lstrcpyA(efr.szReplace, "&");
+			strcpy(efr.szFind, "&amp;");
+			strcpy(efr.szReplace, "&");
 			EditReplaceAllInSelection(hwnd, &efr, FALSE);
 
-			lstrcpyA(efr.szFind, "&emsp;");
-			lstrcpyA(efr.szReplace, "\t");
+			strcpy(efr.szFind, "&emsp;");
+			strcpy(efr.szReplace, "\t");
 			EditReplaceAllInSelection(hwnd, &efr, FALSE);
 			SendMessage(hwnd, SCI_ENDUNDOACTION, 0, 0);
 		} else {
@@ -1420,7 +1420,7 @@ void EditChar2Hex(HWND hwnd) {
 			SendMessage(hwnd, SCI_GETSELTEXT, 0, (LPARAM)ch);
 
 			if (ch[0] == 0) {
-				lstrcpyA(ch, "\\x00");
+				strcpy(ch, "\\x00");
 			} else {
 				const UINT cp = (UINT)SendMessage(hwnd, SCI_GETCODEPAGE, 0, 0);
 				int i = 0, j = 0;
@@ -2353,7 +2353,7 @@ void EditModifyLines(HWND hwnd, LPCWSTR pwszPrefix, LPCWSTR pwszAppend) {
 			while (!bPrefixNum && (p = StrStrA(p, "$(")) != NULL) {
 				if (strncmp(p, "$(I)", CSTRLEN("$(I)")) == 0) {
 					*p = 0;
-					StrCpyA(mszPrefix2, p + CSTRLEN("$(I)"));
+					strcpy(mszPrefix2, p + CSTRLEN("$(I)"));
 					bPrefixNum = TRUE;
 					iPrefixNum = 0;
 					for (i = iLineEnd - iLineStart; i >= 10; i = i / 10) {
@@ -2362,7 +2362,7 @@ void EditModifyLines(HWND hwnd, LPCWSTR pwszPrefix, LPCWSTR pwszAppend) {
 					pszPrefixNumPad = "";
 				} else if (strncmp(p, "$(0I)", CSTRLEN("$(0I)")) == 0) {
 					*p = 0;
-					StrCpyA(mszPrefix2, p + CSTRLEN("$(0I)"));
+					strcpy(mszPrefix2, p + CSTRLEN("$(0I)"));
 					bPrefixNum = TRUE;
 					iPrefixNum = 0;
 					for (i = iLineEnd - iLineStart; i >= 10; i = i / 10) {
@@ -2371,7 +2371,7 @@ void EditModifyLines(HWND hwnd, LPCWSTR pwszPrefix, LPCWSTR pwszAppend) {
 					pszPrefixNumPad = "0";
 				} else if (strncmp(p, "$(N)", CSTRLEN("$(N)")) == 0) {
 					*p = 0;
-					StrCpyA(mszPrefix2, p + CSTRLEN("$(N)"));
+					strcpy(mszPrefix2, p + CSTRLEN("$(N)"));
 					bPrefixNum = TRUE;
 					iPrefixNum = 1;
 					for (i = iLineEnd - iLineStart + 1; i >= 10; i = i / 10) {
@@ -2380,7 +2380,7 @@ void EditModifyLines(HWND hwnd, LPCWSTR pwszPrefix, LPCWSTR pwszAppend) {
 					pszPrefixNumPad = "";
 				} else if (strncmp(p, "$(0N)", CSTRLEN("$(0N)")) == 0) {
 					*p = 0;
-					StrCpyA(mszPrefix2, p + CSTRLEN("$(0N)"));
+					strcpy(mszPrefix2, p + CSTRLEN("$(0N)"));
 					bPrefixNum = TRUE;
 					iPrefixNum = 1;
 					for (i = iLineEnd - iLineStart + 1; i >= 10; i = i / 10) {
@@ -2389,7 +2389,7 @@ void EditModifyLines(HWND hwnd, LPCWSTR pwszPrefix, LPCWSTR pwszAppend) {
 					pszPrefixNumPad = "0";
 				} else if (strncmp(p, "$(L)", CSTRLEN("$(L)")) == 0) {
 					*p = 0;
-					StrCpyA(mszPrefix2, p + CSTRLEN("$(L)"));
+					strcpy(mszPrefix2, p + CSTRLEN("$(L)"));
 					bPrefixNum = TRUE;
 					iPrefixNum = iLineStart + 1;
 					for (i = iLineEnd + 1; i >= 10; i = i / 10) {
@@ -2398,7 +2398,7 @@ void EditModifyLines(HWND hwnd, LPCWSTR pwszPrefix, LPCWSTR pwszAppend) {
 					pszPrefixNumPad = "";
 				} else if (strncmp(p, "$(0L)", CSTRLEN("$(0L)")) == 0) {
 					*p = 0;
-					StrCpyA(mszPrefix2, p + CSTRLEN("$(0L)"));
+					strcpy(mszPrefix2, p + CSTRLEN("$(0L)"));
 					bPrefixNum = TRUE;
 					iPrefixNum = iLineStart + 1;
 					for (i = iLineEnd + 1; i >= 10; i = i / 10) {
@@ -2415,7 +2415,7 @@ void EditModifyLines(HWND hwnd, LPCWSTR pwszPrefix, LPCWSTR pwszAppend) {
 			while (!bAppendNum && (p = StrStrA(p, "$(")) != NULL) {
 				if (strncmp(p, "$(I)", CSTRLEN("$(I)")) == 0) {
 					*p = 0;
-					StrCpyA(mszAppend2, p + CSTRLEN("$(I)"));
+					strcpy(mszAppend2, p + CSTRLEN("$(I)"));
 					bAppendNum = TRUE;
 					iAppendNum = 0;
 					for (i = iLineEnd - iLineStart; i >= 10; i = i / 10) {
@@ -2424,7 +2424,7 @@ void EditModifyLines(HWND hwnd, LPCWSTR pwszPrefix, LPCWSTR pwszAppend) {
 					pszAppendNumPad = "";
 				} else if (strncmp(p, "$(0I)", CSTRLEN("$(0I)")) == 0) {
 					*p = 0;
-					StrCpyA(mszAppend2, p + CSTRLEN("$(0I)"));
+					strcpy(mszAppend2, p + CSTRLEN("$(0I)"));
 					bAppendNum = TRUE;
 					iAppendNum = 0;
 					for (i = iLineEnd - iLineStart; i >= 10; i = i / 10) {
@@ -2433,7 +2433,7 @@ void EditModifyLines(HWND hwnd, LPCWSTR pwszPrefix, LPCWSTR pwszAppend) {
 					pszAppendNumPad = "0";
 				} else if (strncmp(p, "$(N)", CSTRLEN("$(N)")) == 0) {
 					*p = 0;
-					StrCpyA(mszAppend2, p + CSTRLEN("$(N)"));
+					strcpy(mszAppend2, p + CSTRLEN("$(N)"));
 					bAppendNum = TRUE;
 					iAppendNum = 1;
 					for (i = iLineEnd - iLineStart + 1; i >= 10; i = i / 10) {
@@ -2442,7 +2442,7 @@ void EditModifyLines(HWND hwnd, LPCWSTR pwszPrefix, LPCWSTR pwszAppend) {
 					pszAppendNumPad = "";
 				} else if (strncmp(p, "$(0N)", CSTRLEN("$(0N)")) == 0) {
 					*p = 0;
-					StrCpyA(mszAppend2, p + CSTRLEN("$(0N)"));
+					strcpy(mszAppend2, p + CSTRLEN("$(0N)"));
 					bAppendNum = TRUE;
 					iAppendNum = 1;
 					for (i = iLineEnd - iLineStart + 1; i >= 10; i = i / 10) {
@@ -2451,7 +2451,7 @@ void EditModifyLines(HWND hwnd, LPCWSTR pwszPrefix, LPCWSTR pwszAppend) {
 					pszAppendNumPad = "0";
 				} else if (strncmp(p, "$(L)", CSTRLEN("$(L)")) == 0) {
 					*p = 0;
-					StrCpyA(mszAppend2, p + CSTRLEN("$(L)"));
+					strcpy(mszAppend2, p + CSTRLEN("$(L)"));
 					bAppendNum = TRUE;
 					iAppendNum = iLineStart + 1;
 					for (i = iLineEnd + 1; i >= 10; i = i / 10) {
@@ -2460,7 +2460,7 @@ void EditModifyLines(HWND hwnd, LPCWSTR pwszPrefix, LPCWSTR pwszAppend) {
 					pszAppendNumPad = "";
 				} else if (strncmp(p, "$(0L)", CSTRLEN("$(0L)")) == 0) {
 					*p = 0;
-					StrCpyA(mszAppend2, p + CSTRLEN("$(0L)"));
+					strcpy(mszAppend2, p + CSTRLEN("$(0L)"));
 					bAppendNum = TRUE;
 					iAppendNum = iLineStart + 1;
 					for (i = iLineEnd + 1; i >= 10; i = i / 10) {
@@ -2479,7 +2479,7 @@ void EditModifyLines(HWND hwnd, LPCWSTR pwszPrefix, LPCWSTR pwszAppend) {
 
 			if (StrNotEmpty(pwszPrefix)) {
 				char mszInsert[512];
-				lstrcpyA(mszInsert, mszPrefix1);
+				strcpy(mszInsert, mszPrefix1);
 
 				if (bPrefixNum) {
 					char tchFmt[64];
@@ -2499,7 +2499,7 @@ void EditModifyLines(HWND hwnd, LPCWSTR pwszPrefix, LPCWSTR pwszAppend) {
 
 			if (StrNotEmpty(pwszAppend)) {
 				char mszInsert[512];
-				lstrcpyA(mszInsert, mszAppend1);
+				strcpy(mszInsert, mszAppend1);
 
 				if (bAppendNum) {
 					char tchFmt[64];
@@ -4629,12 +4629,12 @@ INT_PTR CALLBACK EditFindReplaceDlgProcW(HWND hwnd, UINT umsg, WPARAM wParam, LP
 						MRU_Add(mruReplace, tch);
 					}
 				} else {
-					lstrcpyA(lpefr->szReplaceUTF8, "");
+					strcpy(lpefr->szReplaceUTF8, "");
 				}
 			} else {
 				GetDlgItemTextA2W(CP_UTF8, hwnd, IDC_FINDTEXT, lpefr->szFindUTF8, COUNTOF(lpefr->szFindUTF8));
 				if (!GetDlgItemTextA2W(CP_UTF8, hwnd, IDC_REPLACETEXT, lpefr->szReplaceUTF8, COUNTOF(lpefr->szReplaceUTF8))) {
-					lstrcpyA(lpefr->szReplaceUTF8, "");
+					strcpy(lpefr->szReplaceUTF8, "");
 				}
 			}
 
@@ -5050,7 +5050,7 @@ BOOL EditReplace(HWND hwnd, LPCEDITFINDREPLACE lpefr) {
 		iReplaceMsg = SCI_REPLACETARGET;
 		pszReplace2 = EditGetClipboardText(hwnd);
 	} else {
-		//lstrcpyA(szReplace2, lpefr->szReplace);
+		//strcpy(szReplace2, lpefr->szReplace);
 		pszReplace2 = StrDupA(lpefr->szReplace);
 		if (lpefr->bTransformBS) {
 			TransformBackslashes(pszReplace2, (lpefr->fuFlags & SCFIND_REGEXP),
@@ -5267,7 +5267,7 @@ BOOL EditReplaceAll(HWND hwnd, LPCEDITFINDREPLACE lpefr, BOOL bShowInfo) {
 		iReplaceMsg = SCI_REPLACETARGET;
 		pszReplace2 = EditGetClipboardText(hwnd);
 	} else {
-		//lstrcpyA(szReplace2, lpefr->szReplace);
+		//strcpy(szReplace2, lpefr->szReplace);
 		pszReplace2 = StrDupA(lpefr->szReplace);
 		if (lpefr->bTransformBS) {
 			TransformBackslashes(pszReplace2, (lpefr->fuFlags & SCFIND_REGEXP),
@@ -5403,7 +5403,7 @@ BOOL EditReplaceAllInSelection(HWND hwnd, LPCEDITFINDREPLACE lpefr, BOOL bShowIn
 		iReplaceMsg = SCI_REPLACETARGET;
 		pszReplace2 = EditGetClipboardText(hwnd);
 	} else {
-		//lstrcpyA(szReplace2, lpefr->szReplace);
+		//strcpy(szReplace2, lpefr->szReplace);
 		pszReplace2 = StrDupA(lpefr->szReplace);
 		if (lpefr->bTransformBS) {
 			TransformBackslashes(pszReplace2, (lpefr->fuFlags & SCFIND_REGEXP),

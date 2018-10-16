@@ -3729,8 +3729,8 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 					MultiByteToWideChar(CP_UTF8, 0, efrData.szReplaceUTF8, -1, wch, COUNTOF(wch));
 					WideCharToMultiByte(cp, 0, wch, -1, efrData.szReplace, COUNTOF(efrData.szReplace), NULL, NULL);
 				} else {
-					lstrcpyA(efrData.szFind, efrData.szFindUTF8);
-					lstrcpyA(efrData.szReplace, efrData.szReplaceUTF8);
+					strcpy(efrData.szFind, efrData.szFindUTF8);
+					strcpy(efrData.szReplace, efrData.szReplaceUTF8);
 				}
 			}
 
@@ -4681,14 +4681,14 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			}
 
 			cpLastFind = (UINT)SendMessage(hwndEdit, SCI_GETCODEPAGE, 0, 0);
-			lstrcpyA(efrData.szFind, mszSelection);
+			strcpy(efrData.szFind, mszSelection);
 
 			if (cpLastFind != SC_CP_UTF8) {
 				WCHAR wszBuf[NP2_FIND_REPLACE_LIMIT];
 				MultiByteToWideChar(cpLastFind, 0, mszSelection, -1, wszBuf, COUNTOF(wszBuf));
 				WideCharToMultiByte(CP_UTF8, 0, wszBuf, -1, efrData.szFindUTF8, COUNTOF(efrData.szFindUTF8), NULL, NULL);
 			} else {
-				lstrcpyA(efrData.szFindUTF8, mszSelection);
+				strcpy(efrData.szFindUTF8, mszSelection);
 			}
 
 			efrData.fuFlags &= (~(SCFIND_REGEXP | SCFIND_POSIX));

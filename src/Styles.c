@@ -862,9 +862,9 @@ void Style_SetLexer(HWND hwnd, PEDITLEXER pLexNew) {
 			if (currentLexKeywordAttr[i] & KeywordAttr_MakeLower) {
 				char *lowerKeywords;
 				char ch;
-				int len = lstrlenA(pKeywords);
+				const size_t len = strlen(pKeywords);
 				lowerKeywords = NP2HeapAlloc(len + 1);
-				lstrcpyA(lowerKeywords, pKeywords);
+				CopyMemory(lowerKeywords, pKeywords, len);
 				while ((ch = *lowerKeywords) != '\0') {
 					if (ch >= 'A' && ch <= 'Z') {
 						*lowerKeywords = ch - 'A' + 'a';
