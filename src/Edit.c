@@ -388,6 +388,11 @@ extern DWORD dwLineEndingCheckMaxMB;
 int EditDetectEOLMode(LPSTR lpData, DWORD cbData) {
 	int iEOLMode = iLineEndings[iDefaultEOLMode];
 
+#if 0
+	StopWatch watch;
+	StopWatch_Start(watch);
+#endif
+
 	LPCSTR cp = StrPBrkA(lpData, "\r\n");
 	if (cp) {
 		UINT linesCount[3] = { 0, 0, 0 };
@@ -448,6 +453,14 @@ int EditDetectEOLMode(LPSTR lpData, DWORD cbData) {
 			}
 		}
 	}
+
+#if 0
+	StopWatch_Stop(watch);
+	const double elapsed = StopWatch_Get(&watch);
+	WCHAR buf[64];
+	swprintf(buf, COUNTOF(buf), L"EOL time: %.9f", elapsed);
+	MessageBox(NULL, buf, L"Notepad2", MB_OK);
+#endif
 
 	return iEOLMode;
 }
