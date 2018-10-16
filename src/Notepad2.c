@@ -4608,7 +4608,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 				mszSelection[cchSelection] = 0; // zero terminate
 
 				// Check lpszSelection and truncate bad WCHARs
-				lpsz = StrPBrkA(mszSelection, "\r\n\t");
+				lpsz = strpbrk(mszSelection, "\r\n\t");
 				if (lpsz) {
 					*lpsz = '\0';
 				}
@@ -4675,7 +4675,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			mszSelection[cchSelection] = 0; // zero terminate
 
 			// Check lpszSelection and truncate newlines
-			lpsz = StrPBrkA(mszSelection, "\r\n");
+			lpsz = strpbrk(mszSelection, "\r\n");
 			if (lpsz) {
 				*lpsz = '\0';
 			}
@@ -5131,7 +5131,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		case SCN_USERLISTSELECTION: {
 			LPCSTR text = scn->text;
 			// function/array/template/generic
-			LPSTR braces = StrPBrkA(text, "([{<");
+			LPSTR braces = strpbrk(text, "([{<");
 			const Sci_Position iCurPos = SciCall_GetCurrentPos();
 			const int ch = SciCall_GetCharAt(iCurPos);
 			if (braces != NULL && *braces == ch) {

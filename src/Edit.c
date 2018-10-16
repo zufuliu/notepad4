@@ -393,7 +393,7 @@ int EditDetectEOLMode(LPSTR lpData, DWORD cbData) {
 	StopWatch_Start(watch);
 #endif
 
-	LPCSTR cp = StrPBrkA(lpData, "\r\n");
+	LPCSTR cp = strpbrk(lpData, "\r\n");
 	if (cp) {
 		UINT linesCount[3] = { 0, 0, 0 };
 		DWORD maxCheckLength = dwLineEndingCheckMaxMB * 1024 * 1024;
@@ -435,7 +435,7 @@ int EditDetectEOLMode(LPSTR lpData, DWORD cbData) {
 				++linesCount[SC_EOL_LF];
 			}
 			++cp;
-			cp = StrPBrkA(cp, "\r\n");
+			cp = strpbrk(cp, "\r\n");
 		} while (cp);
 
 		if (reset) {
@@ -4399,7 +4399,7 @@ INT_PTR CALLBACK EditFindReplaceDlgProcW(HWND hwnd, UINT umsg, WPARAM wParam, LP
 #endif
 
 				// Check lpszSelection and truncate bad chars
-				//lpsz = StrPBrkA(lpszSelection, "\r\n\t");
+				//lpsz = strpbrk(lpszSelection, "\r\n\t");
 				//if (lpsz) {
 				//	*lpsz = '\0';
 				//}
