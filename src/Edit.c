@@ -1584,7 +1584,7 @@ static int ConvertNumRadix(char *tch, uint64_t num, int radix) {
 		buf[index--] = 'O';
 		buf[index] = '0';
 		length += 2;
-		lstrcatA(tch, buf + index);
+		strcat(tch, buf + index);
 		return length;
 	}
 	break;
@@ -1611,7 +1611,7 @@ static int ConvertNumRadix(char *tch, uint64_t num, int radix) {
 		buf[index--] = 'b';
 		buf[index] = '0';
 		length += 2;
-		lstrcatA(tch, buf + index);
+		strcat(tch, buf + index);
 		return length;
 	}
 	break;
@@ -2486,8 +2486,8 @@ void EditModifyLines(HWND hwnd, LPCWSTR pwszPrefix, LPCWSTR pwszAppend) {
 					char tchNum[64];
 					wsprintfA(tchFmt, "%%%s%ii", pszPrefixNumPad, iPrefixNumWidth);
 					wsprintfA(tchNum, tchFmt, iPrefixNum);
-					lstrcatA(mszInsert, tchNum);
-					lstrcatA(mszInsert, mszPrefix2);
+					strcat(mszInsert, tchNum);
+					strcat(mszInsert, mszPrefix2);
 					iPrefixNum++;
 				}
 
@@ -2506,8 +2506,8 @@ void EditModifyLines(HWND hwnd, LPCWSTR pwszPrefix, LPCWSTR pwszAppend) {
 					char tchNum[64];
 					wsprintfA(tchFmt, "%%%s%ii", pszAppendNumPad, iAppendNumWidth);
 					wsprintfA(tchNum, tchFmt, iAppendNum);
-					lstrcatA(mszInsert, tchNum);
-					lstrcatA(mszInsert, mszAppend2);
+					strcat(mszInsert, tchNum);
+					strcat(mszInsert, mszAppend2);
 					iAppendNum++;
 				}
 
@@ -2983,7 +2983,7 @@ void EditToggleLineComments(HWND hwnd, LPCWSTR pwszComment, BOOL bInsertAtStart)
 							mbcp -= ch * iTabWidth;
 						}
 						memset(tchComment + ch, ' ', mbcp);
-						lstrcatA(tchComment, mszComment);
+						strcat(tchComment, mszComment);
 						SendMessage(hwnd, SCI_INSERTTEXT, (WPARAM)iCommentPos, (LPARAM)tchComment);
 					}
 					break;
