@@ -92,6 +92,21 @@ NP2_inline BOOL HexStrToInt(LPCWSTR str, int *value) {
 
 int ParseCommaList(LPCWSTR str, int result[], int count);
 
+typedef struct StopWatch {
+	LARGE_INTEGER freq;
+	LARGE_INTEGER begin;
+	LARGE_INTEGER end;
+} StopWatch;
+
+#define StopWatch_Start(watch) { \
+	QueryPerformanceFrequency(&(watch).freq);\
+	QueryPerformanceCounter(&(watch).begin); }
+
+#define StopWatch_Stop(watch) \
+	QueryPerformanceCounter(&(watch).end)
+
+double StopWatch_Get(const StopWatch *watch);
+
 #ifdef NDEBUG
 #define DLog(msg)
 #define DLogf(fmt, ...)
