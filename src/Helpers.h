@@ -116,7 +116,11 @@ typedef struct StopWatch {
 #define StopWatch_Stop(watch) \
 	QueryPerformanceCounter(&(watch).end)
 
-double StopWatch_Get(const StopWatch *watch);
+NP2_inline double StopWatch_Get(const StopWatch *watch) {
+	const LONGLONG diff = watch->end.QuadPart - watch->begin.QuadPart;
+	const double freq = (double)(watch->freq.QuadPart);
+	return (diff / freq) * 1000;
+}
 
 #ifdef NDEBUG
 #define DLog(msg)
