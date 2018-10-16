@@ -2180,7 +2180,7 @@ BOOL AddBackslash(char *pszOut, const char *pszInput) {
 	}
 
 	if (hasSlash && !hasEscapeChar) {
-		lstrcpyA(pszOut, pszInput);
+		strcpy(pszOut, pszInput);
 	}
 	return hasEscapeChar;
 }
