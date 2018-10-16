@@ -93,14 +93,25 @@ NP2_inline BOOL HexStrToInt(LPCWSTR str, int *value) {
 int ParseCommaList(LPCWSTR str, int result[], int count);
 
 typedef struct StopWatch {
-	LARGE_INTEGER freq;
+	LARGE_INTEGER freq; // not changed after system boot
 	LARGE_INTEGER begin;
 	LARGE_INTEGER end;
 } StopWatch;
 
-#define StopWatch_Start(watch) { \
-	QueryPerformanceFrequency(&(watch).freq);\
-	QueryPerformanceCounter(&(watch).begin); }
+#define StopWatch_Start(watch) do { \
+		QueryPerformanceFrequency(&(watch).freq);	\
+		QueryPerformanceCounter(&(watch).begin);	\
+	} while (0)
+
+#define StopWatch_Reset(watch) do { \
+		(watch).begin.QuadPart = 0;	\
+		(watch).end.QuadPart = 0;	\
+	} while (0)
+
+#define StopWatch_Restart(watch) do { \
+		(watch).end.QuadPart = 0;					\
+		QueryPerformanceCounter(&(watch).begin);	\
+	} while (0)
 
 #define StopWatch_Stop(watch) \
 	QueryPerformanceCounter(&(watch).end)
