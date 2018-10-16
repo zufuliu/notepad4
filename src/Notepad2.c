@@ -27,6 +27,7 @@
 #include <commdlg.h>
 #include <stdio.h>
 #include <time.h>
+#include <stdint.h>
 #include <inttypes.h>
 #include "Notepad2.h"
 #include "Edit.h"
@@ -3421,30 +3422,27 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case IDM_EDIT_INSERT_TIMESTAMP_NS: {// nano
 		char mszBuf[32];
 		FILETIME ft;
-		ULARGE_INTEGER date, adjust;
 		// Windows timestamp in 100-nanosecond
 		GetSystemTimeAsFileTime(&ft);
-		//GetSystemTimePreciseAsFileTime(&ft);
-		date.HighPart = ft.dwHighDateTime;
-		date.LowPart = ft.dwLowDateTime;
+		//GetSystemTimePreciseAsFileTime(&ft); // Win8 and above
+		uint64_t timestamp = (((uint64_t)(ft.dwHighDateTime)) << 32) | ft.dwLowDateTime;
 		// Between Jan 1, 1601 and Jan 1, 1970 there are 11644473600 seconds
-		adjust.QuadPart = 11644473600U * 1000 * 1000 * 10;
-		date.QuadPart -= adjust.QuadPart;
+		timestamp -= UINT64_C(11644473600) * 1000 * 1000 * 10;
 		switch (LOWORD(wParam)) {
 		case IDM_EDIT_INSERT_TIMESTAMP:		// second	1000 milli
-			date.QuadPart /= 1000U * 1000 * 10;
+			timestamp /= 1000U * 1000 * 10;
 			break;
 		case IDM_EDIT_INSERT_TIMESTAMP_MS:	// milli	1000 micro
-			date.QuadPart /= 1000U * 10;
+			timestamp /= 1000U * 10;
 			break;
 		case IDM_EDIT_INSERT_TIMESTAMP_US:	// micro 	1000 nano
-			date.QuadPart /= 10U;
+			timestamp /= 10U;
 			break;
 		case IDM_EDIT_INSERT_TIMESTAMP_NS:	// nano
-			date.QuadPart *= 100U;
+			timestamp *= 100U;
 			break;
 		}
-		sprintf(mszBuf, "%" PRIu64, date.QuadPart);
+		sprintf(mszBuf, "%" PRIu64, timestamp);
 		SendMessage(hwndEdit, SCI_REPLACESEL, 0, (LPARAM)mszBuf);
 	}
 	break;

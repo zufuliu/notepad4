@@ -2184,7 +2184,6 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 					FILETIME ft;
 					SYSTEMTIME st;
 					WCHAR tchsize[64], tchdate[64], tchtime[64], tchattr[64];
-					LONGLONG isize;
 					dli.mask  = DLI_FILENAME;
 					dli.ntype = DLE_NONE;
 					DirList_GetItem(hwndDirList, -1, &dli);
@@ -2197,8 +2196,8 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 						}
 					}
 
-					isize = (((LONGLONG)fd.nFileSizeHigh) << 32) + fd.nFileSizeLow;
-					StrFormatByteSize((LONGLONG)isize, tchsize, COUNTOF(tchsize));
+					const LONGLONG isize = (((LONGLONG)fd.nFileSizeHigh) << 32) | fd.nFileSizeLow;
+					StrFormatByteSize(isize, tchsize, COUNTOF(tchsize));
 
 					FileTimeToLocalFileTime(&fd.ftLastWriteTime, &ft);
 					FileTimeToSystemTime(&ft, &st);

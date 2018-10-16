@@ -24,6 +24,7 @@
 #include <commdlg.h>
 #include <stdio.h>
 #include <limits.h>
+#include <stdint.h>
 #include <inttypes.h>
 #include "Notepad2.h"
 #include "Edit.h"
@@ -1545,7 +1546,7 @@ static inline BOOL iswordchar(int ch) {
 	return iswordstart(ch) || (ch >= '0' && ch <= '9') || ch == '$';
 }
 
-static int ConvertNumRadix(char *tch, ULONG64 num, int radix) {
+static int ConvertNumRadix(char *tch, uint64_t num, int radix) {
 	switch (radix) {
 	case 16:
 		return sprintf(tch, "0x%" PRIx64, num);
@@ -1617,7 +1618,7 @@ void EditConvertNumRadix(HWND hwnd, int radix) {
 			char *tch = NP2HeapAlloc(2 + count * 4 + 8 + 1);
 			int cch = 0;
 			char *p = ch;
-			ULONG64 ci = 0;
+			uint64_t ci = 0;
 
 			SendMessage(hwnd, SCI_GETSELTEXT, 0, (LPARAM)ch);
 
