@@ -30,6 +30,10 @@ NP2_inline int max_i(int x, int y) {
 	return (x > y) ? x : y;
 }
 
+NP2_inline UINT min_u(UINT x, UINT y) {
+	return (x < y) ? x : y;
+}
+
 NP2_inline UINT max_u(UINT x, UINT y) {
 	return (x > y) ? x : y;
 }
@@ -121,6 +125,8 @@ NP2_inline double StopWatch_Get(const StopWatch *watch) {
 	const double freq = (double)(watch->freq.QuadPart);
 	return (diff / freq) * 1000;
 }
+
+void StopWatch_Show(const StopWatch *watch, LPCWSTR msg);
 
 #ifdef NDEBUG
 #define DLog(msg)

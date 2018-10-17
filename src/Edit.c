@@ -393,6 +393,7 @@ int EditDetectEOLMode(LPSTR lpData, DWORD cbData) {
 	StopWatch_Start(watch);
 #endif
 
+#if 1
 	LPCSTR cp = strpbrk(lpData, "\r\n");
 	if (cp) {
 		UINT linesCount[3] = { 0, 0, 0 };
@@ -426,8 +427,8 @@ int EditDetectEOLMode(LPSTR lpData, DWORD cbData) {
 		do {
 			if (*cp == '\r') {
 				if (*(cp + 1) == '\n') {
-					++linesCount[SC_EOL_CRLF];
 					++cp;
+					++linesCount[SC_EOL_CRLF];
 				} else {
 					++linesCount[SC_EOL_CR];
 				}
@@ -453,13 +454,80 @@ int EditDetectEOLMode(LPSTR lpData, DWORD cbData) {
 			}
 		}
 	}
+#endif
+
+#if 0
+	// tools/GenerateTable.py
+	static const UINT8 eol_table[256] = {
+		3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // 00 - 1F
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // 20 - 3F
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // 40 - 5F
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // 60 - 7F
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // 80 - 9F
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // A0 - BF
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // C0 - DF
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // E0 - FF
+	};
+
+	const DWORD maxCheckLength = dwLineEndingCheckMaxMB * 1024 * 1024;
+	const UINT8 *ptr = (const UINT8 *)lpData;
+	const UINT8 *end = ptr + min_u(cbData, maxCheckLength);
+	UINT linesCount[3] = { 0, 0, 0 };
+	while (ptr < end) {
+		switch (eol_table[*ptr]) {
+		case 0: // normal
+			++ptr;
+			break;
+		case 1: // '\n'
+			++ptr;
+			++linesCount[SC_EOL_LF];
+			break;
+		case 2: // '\r'
+			++ptr;
+			if (*ptr == '\n') {
+				++ptr;
+				++linesCount[SC_EOL_CRLF];
+			} else {
+				++linesCount[SC_EOL_CR];
+			}
+			break;
+		case 3: // '\0'
+			goto label_eol_end;
+		}
+	}
+
+label_eol_end:
+	const UINT linesMax = max_u(max_u(linesCount[0], linesCount[1]), linesCount[2]);
+	if (linesMax == 0) {
+		// at least one line
+		if (maxCheckLength < cbData && ((LPCSTR)(ptr)) == lpData + maxCheckLength) {
+			LPCSTR cp = strpbrk(lpData + maxCheckLength, "\r\n");
+			if (cp) {
+				if (*cp == '\r') {
+					if (*(cp + 1) == '\n') {
+						iEOLMode = SC_EOL_CRLF;
+					} else {
+						iEOLMode = SC_EOL_CR;
+					}
+				} else {
+					iEOLMode = SC_EOL_LF;
+				}
+			}
+		}
+	} else if (linesMax != linesCount[iEOLMode]) {
+		if (linesMax == linesCount[SC_EOL_CRLF]) {
+			iEOLMode = SC_EOL_CRLF;
+		} else if (linesMax == linesCount[SC_EOL_LF]) {
+			iEOLMode = SC_EOL_LF;
+		} else {
+			iEOLMode = SC_EOL_CR;
+		}
+	}
+#endif
 
 #if 0
 	StopWatch_Stop(watch);
-	const double elapsed = StopWatch_Get(&watch);
-	WCHAR buf[64];
-	swprintf(buf, COUNTOF(buf), L"EOL time: %.9f", elapsed);
-	MessageBox(NULL, buf, L"Notepad2", MB_OK);
+	StopWatch_Show(&watch, L"EOL time");
 #endif
 
 	return iEOLMode;
