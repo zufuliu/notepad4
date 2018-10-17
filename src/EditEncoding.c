@@ -671,6 +671,11 @@ BOOL IsUTF8(const char *pTest, int nLength) {
 		UTF8_REJECT = 12,
 	};
 
+#if 0
+	StopWatch watch;
+	StopWatch_Start(watch);
+#endif
+
 	static const unsigned char utf8_dfa[] = {
 		// The first part of the table maps bytes to character classes that
 		// to reduce the size of the transition table and create bitmasks.
@@ -702,6 +707,11 @@ BOOL IsUTF8(const char *pTest, int nLength) {
 			return FALSE;
 		}
 	}
+
+#if 0
+	StopWatch_Stop(watch);
+	StopWatch_Show(&watch, L"UTF8 time");
+#endif
 
 	return state == UTF8_ACCEPT;
 }

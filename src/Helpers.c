@@ -30,6 +30,13 @@
 #include "Helpers.h"
 #include "resource.h"
 
+void StopWatch_Show(const StopWatch *watch, LPCWSTR msg) {
+	const double elapsed = StopWatch_Get(watch);
+	WCHAR buf[128];
+	swprintf(buf, COUNTOF(buf), L"%s: %.9f", msg, elapsed);
+	MessageBox(NULL, buf, L"Notepad2", MB_OK);
+}
+
 #ifndef NDEBUG
 void DLogf(const char *fmt, ...) {
 	char buf[1024] = "";
