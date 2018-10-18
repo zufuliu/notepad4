@@ -39,8 +39,8 @@ extern "C" int iPrintZoom;
 extern "C" RECT pagesetupMargin;
 
 // Stored objects...
-HGLOBAL hDevMode = nullptr;
-HGLOBAL hDevNames = nullptr;
+static HGLOBAL hDevMode {};
+static HGLOBAL hDevNames {};
 
 static void EditPrintInit() noexcept;
 
