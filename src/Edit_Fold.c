@@ -4,9 +4,9 @@
 //
 //
 typedef enum {
-	FOLD_ACTION_EXPAND	= 1,
-	FOLD_ACTION_SNIFF	= 0,
-	FOLD_ACTION_FOLD	= -1
+	FOLD_ACTION_FOLD	= 0, // SC_FOLDACTION_CONTRACT
+	FOLD_ACTION_EXPAND	= 1, // SC_FOLDACTION_EXPAND
+	FOLD_ACTION_SNIFF	= 2, // SC_FOLDACTION_TOGGLE
 } FOLD_ACTION;
 
 #define FOLD_CHILDREN SCMOD_CTRL
@@ -44,7 +44,7 @@ void FoldToggleNode(int line, FOLD_ACTION *pAction, BOOL *fToggled) {
 		action = fExpanded ? FOLD_ACTION_FOLD : FOLD_ACTION_EXPAND;
 	}
 
-	if ((action == FOLD_ACTION_FOLD && fExpanded) || (action == FOLD_ACTION_EXPAND && !fExpanded)) {
+	if (action ^ fExpanded) {
 		SciCall_ToggleFold(line);
 		if (*fToggled == FALSE || *pAction == FOLD_ACTION_SNIFF) {
 			const BOOL after = SciCall_GetFoldExpanded(line);
