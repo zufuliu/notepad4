@@ -67,8 +67,8 @@ ID2D1Factory *pD2DFactory = nullptr;
 IDWriteRenderingParams *defaultRenderingParams = nullptr;
 IDWriteRenderingParams *customClearTypeRenderingParams = nullptr;
 
-static HMODULE hDLLD2D = nullptr;
-static HMODULE hDLLDWrite = nullptr;
+static HMODULE hDLLD2D {};
+static HMODULE hDLLDWrite {};
 
 extern "C" UINT16 g_uWinVer;
 #define IsWin8AndAbove()	(g_uWinVer >= 0x0602)
@@ -156,7 +156,7 @@ struct FormatAndMetrics {
 		FLOAT yDescent_,
 		FLOAT yInternalLeading_) noexcept :
 		technology(SCWIN_TECH_DIRECTWRITE),
-		hfont(nullptr),
+		hfont{},
 		pTextFormat(pTextFormat_),
 		extraFontFlag(extraFontFlag_),
 		characterSet(characterSet_),
@@ -225,9 +225,9 @@ inline void SetWindowPointer(HWND hWnd, void *ptr) noexcept {
 }
 
 CRITICAL_SECTION crPlatformLock;
-HINSTANCE hinstPlatformRes = nullptr;
+HINSTANCE hinstPlatformRes {};
 
-HCURSOR reverseArrowCursor = nullptr;
+HCURSOR reverseArrowCursor {};
 
 inline FormatAndMetrics *FamFromFontID(void *fid) noexcept {
 	return static_cast<FormatAndMetrics *>(fid);
@@ -394,7 +394,7 @@ void FontCached::Release() noexcept {
 }
 
 FontID FontCached::FindOrCreate(const FontParameters &fp) {
-	FontID ret = nullptr;
+	FontID ret {};
 	::EnterCriticalSection(&crPlatformLock);
 	const int hashFind = HashFont(fp);
 	for (FontCached *cur = first; cur; cur = cur->next) {
@@ -433,7 +433,7 @@ void FontCached::ReleaseId(FontID fid_) noexcept {
 	::LeaveCriticalSection(&crPlatformLock);
 }
 
-Font::Font() noexcept : fid(nullptr) {
+Font::Font() noexcept : fid{} {
 }
 
 Font::~Font() = default;
@@ -499,28 +499,29 @@ public:
 typedef VarBuffer<XYPOSITION, stackBufferLength> TextPositions;
 
 class SurfaceGDI : public Surface {
-	bool unicodeMode;
-	HDC hdc;
-	bool hdcOwned;
-	HPEN pen;
-	HPEN penOld;
-	HBRUSH brush;
-	HBRUSH brushOld;
-	HFONT font;
-	HFONT fontOld;
-	HBITMAP bitmap;
-	HBITMAP bitmapOld;
-	int maxWidthMeasure;
-	int maxLenText;
+	bool unicodeMode = false;
+	HDC hdc{};
+	bool hdcOwned = false;
+	HPEN pen{};
+	HPEN penOld{};
+	HBRUSH brush{};
+	HBRUSH brushOld{};
+	HFONT font{};
+	HFONT fontOld{};
+	HBITMAP bitmap{};
+	HBITMAP bitmapOld{};
+	int maxWidthMeasure = INT_MAX;
+	// There appears to be a 16 bit string length limit in GDI on NT.
+	int maxLenText = 65535;
 
-	int codePage;
+	int codePage = 0;
 
 	void BrushColor(ColourDesired back) noexcept;
 	void SetFont(const Font &font_) noexcept;
 	void Clear() noexcept;
 
 public:
-	SurfaceGDI() noexcept;
+	SurfaceGDI() noexcept = default;
 	// Deleted so SurfaceGDI objects can not be copied.
 	SurfaceGDI(const SurfaceGDI &) = delete;
 	SurfaceGDI(SurfaceGDI &&) = delete;
@@ -573,20 +574,6 @@ public:
 	void SetDBCSMode(int codePage_) noexcept override;
 	void SetBidiR2L(bool bidiR2L_) noexcept override;
 };
-
-SurfaceGDI::SurfaceGDI() noexcept :
-	unicodeMode(false),
-	hdc(nullptr), hdcOwned(false),
-	pen(nullptr), penOld(nullptr),
-	brush(nullptr), brushOld(nullptr),
-	font(nullptr), fontOld(nullptr),
-	bitmap(nullptr), bitmapOld(nullptr) {
-	maxWidthMeasure = INT_MAX;
-	// There appears to be a 16 bit string length limit in GDI on NT.
-	maxLenText = 65535;
-
-	codePage = 0;
-}
 
 SurfaceGDI::~SurfaceGDI() {
 	Clear();
@@ -2509,7 +2496,7 @@ class ListBoxX : public ListBox {
 	static const Point ImageInset;	// Padding around image
 
 public:
-	ListBoxX() noexcept : lineHeight(10), fontCopy(nullptr), technology(0), lb(nullptr), unicodeMode(false),
+	ListBoxX() noexcept : lineHeight(10), fontCopy{}, technology(0), lb{}, unicodeMode(false),
 		desiredVisibleRows(9), maxItemCharacters(0), aveCharWidth(8),
 		parent(nullptr), ctrlID(0),
 		delegate(nullptr),
@@ -3317,7 +3304,7 @@ bool ListBoxX_Unregister() noexcept {
 
 }
 
-Menu::Menu() noexcept : mid(nullptr) {
+Menu::Menu() noexcept : mid{} {
 }
 
 void Menu::CreatePopUp() noexcept {
