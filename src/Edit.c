@@ -384,89 +384,62 @@ BOOL EditCopyAppend(HWND hwnd) {
 //
 // EditDetectEOLMode() - moved here to handle Unicode files correctly
 //
-extern DWORD dwLineEndingCheckMaxMB;
-int EditDetectEOLMode(LPSTR lpData, DWORD cbData) {
+int EditDetectEOLMode(LPCSTR lpData, DWORD cbData) {
 	int iEOLMode = iLineEndings[iDefaultEOLMode];
 
+	if (cbData == 0) {
+		return iEOLMode;
+	}
+
+	UINT linesCount[3] = { 0, 0, 0 };
 #if 0
 	StopWatch watch;
 	StopWatch_Start(watch);
 #endif
 
-#if 1
-	LPCSTR cp = strpbrk(lpData, "\r\n");
-	if (cp) {
-		UINT linesCount[3] = { 0, 0, 0 };
-		DWORD maxCheckLength = dwLineEndingCheckMaxMB * 1024 * 1024;
-		char backup = '\0';
-		const BOOL reset = cbData > maxCheckLength;
-		if (reset) {
-			if (cp >= lpData + maxCheckLength) {
-				if (*cp == '\r') {
-					if (*(cp + 1) == '\n') {
-						iEOLMode = SC_EOL_CRLF;
-					} else {
-						iEOLMode = SC_EOL_CR;
-					}
-				} else {
-					iEOLMode = SC_EOL_LF;
-				}
-				return iEOLMode;
-			}
-
-			backup = lpData[maxCheckLength];
-			if (backup == '\r' || backup == '\n') {
-				backup = lpData[++maxCheckLength];
-				if (backup == '\n') {
-					backup = lpData[++maxCheckLength];
-				}
-			}
-			lpData[maxCheckLength] = '\0';
-		}
-
-		do {
-			if (*cp == '\r') {
-				if (*(cp + 1) == '\n') {
-					++cp;
-					++linesCount[SC_EOL_CRLF];
-				} else {
-					++linesCount[SC_EOL_CR];
-				}
+#if 0
+	LPCSTR cp = lpData;
+	while (*cp) {
+		if (*cp == '\r') {
+			if (*(cp + 1) == '\n') {
+				++cp;
+				++linesCount[SC_EOL_CRLF];
 			} else {
-				++linesCount[SC_EOL_LF];
+				++linesCount[SC_EOL_CR];
 			}
-			++cp;
-			cp = strpbrk(cp, "\r\n");
-		} while (cp);
-
-		if (reset) {
-			lpData[maxCheckLength] = backup;
+		} else if (*cp == '\n') {
+			++linesCount[SC_EOL_LF];
 		}
-
-		const UINT linesMax = max_u(max_u(linesCount[0], linesCount[1]), linesCount[2]);
-		if (linesMax != linesCount[iEOLMode]) {
-			if (linesMax == linesCount[SC_EOL_CRLF]) {
-				iEOLMode = SC_EOL_CRLF;
-			} else if (linesMax == linesCount[SC_EOL_LF]) {
-				iEOLMode = SC_EOL_LF;
-			} else {
-				iEOLMode = SC_EOL_CR;
-			}
-		}
+		++cp;
 	}
 #endif
 
 #if 0
+	LPCSTR cp = strpbrk(lpData, "\r\n");
+	while (cp) {
+		if (*cp == '\r') {
+			if (*(cp + 1) == '\n') {
+				++cp;
+				++linesCount[SC_EOL_CRLF];
+			} else {
+				++linesCount[SC_EOL_CR];
+			}
+		} else {
+			++linesCount[SC_EOL_LF];
+		}
+		++cp;
+		cp = strpbrk(cp, "\r\n");
+	}
+#endif
+
+#if 1
 	// tools/GenerateTable.py
 	static const UINT8 eol_table[256] = {
 		3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 2, 0, 0, // 00 - 0F
 	};
 
-	const DWORD maxCheckLength = dwLineEndingCheckMaxMB * 1024 * 1024;
 	const UINT8 *ptr = (const UINT8 *)lpData;
-	const UINT8 *end = ptr + min_u(cbData, maxCheckLength);
-	UINT linesCount[3] = { 0, 0, 0 };
-	while (ptr < end) {
+	while (TRUE) {
 		switch (eol_table[*ptr]) {
 		case 0: // normal
 			++ptr;
@@ -490,24 +463,10 @@ int EditDetectEOLMode(LPSTR lpData, DWORD cbData) {
 	}
 
 label_eol_end:
+#endif
+
 	const UINT linesMax = max_u(max_u(linesCount[0], linesCount[1]), linesCount[2]);
-	if (linesMax == 0) {
-		// at least one line
-		if (maxCheckLength < cbData && ((LPCSTR)(ptr)) == lpData + maxCheckLength) {
-			LPCSTR cp = strpbrk(lpData + maxCheckLength, "\r\n");
-			if (cp) {
-				if (*cp == '\r') {
-					if (*(cp + 1) == '\n') {
-						iEOLMode = SC_EOL_CRLF;
-					} else {
-						iEOLMode = SC_EOL_CR;
-					}
-				} else {
-					iEOLMode = SC_EOL_LF;
-				}
-			}
-		}
-	} else if (linesMax != linesCount[iEOLMode]) {
+	if (linesMax != linesCount[iEOLMode]) {
 		if (linesMax == linesCount[SC_EOL_CRLF]) {
 			iEOLMode = SC_EOL_CRLF;
 		} else if (linesMax == linesCount[SC_EOL_LF]) {
@@ -516,7 +475,6 @@ label_eol_end:
 			iEOLMode = SC_EOL_CR;
 		}
 	}
-#endif
 
 #if 0
 	StopWatch_Stop(watch);
