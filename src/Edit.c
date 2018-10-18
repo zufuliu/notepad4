@@ -463,6 +463,7 @@ int EditDetectEOLMode(LPCSTR lpData, DWORD cbData) {
 	}
 
 label_eol_end:
+	{} // GCC: a label can only be part of a statement and a declaration is not a statement.
 #endif
 
 	const UINT linesMax = max_u(max_u(linesCount[0], linesCount[1]), linesCount[2]);
