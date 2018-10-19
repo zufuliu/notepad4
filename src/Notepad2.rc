@@ -93,7 +93,7 @@ BEGIN
         END
         POPUP "&Launch"
         BEGIN
-            MENUITEM "&Relaunch Elevated",          IDM_FILE_RELAUNCH_ELEVATED
+            MENUITEM "Run As &Administrator",       IDM_FILE_RELAUNCH_ELEVATED
             MENUITEM "&New Window\tAlt+N",          IDM_FILE_NEWWINDOW
             MENUITEM "&Empty Window\tAlt+0",        IDM_FILE_NEWWINDOW2
             MENUITEM SEPARATOR
