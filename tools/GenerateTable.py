@@ -2,7 +2,6 @@
 
 def GenerateEOLTable():
 	table = [0] * 16
-	table[0] = 3
 	table[ord('\n')] = 1
 	table[ord('\r')] = 2
 	line = ', '.join(str(c) for c in table)

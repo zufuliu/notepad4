@@ -553,7 +553,7 @@ BOOL Encoding_GetFromComboboxEx(HWND hwnd, int *pidEncoding) {
 	return FALSE;
 }
 
-BOOL IsUnicode(const char *pBuffer, int cb, LPBOOL lpbBOM, LPBOOL lpbReverse) {
+BOOL IsUnicode(const char *pBuffer, DWORD cb, LPBOOL lpbBOM, LPBOOL lpbReverse) {
 	int i = 0xFFFF;
 
 	BOOL bIsTextUnicode;
@@ -598,8 +598,7 @@ BOOL IsUnicode(const char *pBuffer, int cb, LPBOOL lpbBOM, LPBOOL lpbReverse) {
 }
 
 #if 0
-
-BOOL IsUTF8(const char *pTest, int nLength) {
+BOOL IsUTF8(const char *pTest, DWORD nLength) {
 	static const int byte_class_table[256] = {
 		/* 00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F */
 		/* 00 */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -648,24 +647,24 @@ BOOL IsUTF8(const char *pTest, int nLength) {
 	utf8_state current = kSTART;
 
 	const unsigned char *pt = (const unsigned char *)pTest;
-	int len = nLength;
+	const unsigned char * const end = pt + nLength;
 
-	for (int i = 0; i < len ; i++, pt++) {
+	while (pt < end) {
 		current = NEXT_STATE(*pt, current);
 		if (kERROR == current) {
 			break;
 		}
+		++pt;
 	}
 
 	return current == kSTART;
 }
-
-#else
+#endif
 
 // Copyright (c) 2008-2010 Bjoern Hoehrmann <bjoern@hoehrmann.de>
 // See http://bjoern.hoehrmann.de/utf-8/decoder/dfa/ for details.
 
-BOOL IsUTF8(const char *pTest, int nLength) {
+BOOL IsUTF8(const char *pTest, DWORD nLength) {
 	enum {
 		UTF8_ACCEPT = 0,
 		UTF8_REJECT = 12,
@@ -698,14 +697,15 @@ BOOL IsUTF8(const char *pTest, int nLength) {
 	};
 
 	const unsigned char *pt = (const unsigned char *)pTest;
-	const unsigned char *end = pt + nLength;
+	const unsigned char * const end = pt + nLength;
 
 	UINT state = UTF8_ACCEPT;
-	while (pt < end && *pt) {
-		state = utf8_dfa[256 + state + utf8_dfa[*pt++]];
+	while (pt < end) {
+		state = utf8_dfa[256 + state + utf8_dfa[*pt]];
 		if (state == UTF8_REJECT) {
 			return FALSE;
 		}
+		++pt;
 	}
 
 #if 0
@@ -716,21 +716,18 @@ BOOL IsUTF8(const char *pTest, int nLength) {
 	return state == UTF8_ACCEPT;
 }
 
-#endif
-
-BOOL IsUTF7(const char *pTest, int nLength) {
+BOOL IsUTF7(const char *pTest, DWORD nLength) {
 	const unsigned char *pt = (const unsigned char *)pTest;
-	const unsigned char *end = pt + nLength;
+	const unsigned char * const end = pt + nLength;
 
-	while (pt < end && *pt && (*pt & 0x80) == 0) {
-		pt++;
+	while (pt < end && (*pt & 0x80) == 0) {
+		++pt;
 	}
 
 	return pt == end;
 }
 
 #if 0
-
 /* byte length of UTF-8 sequence based on value of first byte.
 	 for UTF-16 (21-bit space), max. code length is 4, so we only need to look
 	 at 4 upper bits.
@@ -823,7 +820,6 @@ INT UTF8_mbslen(LPCSTR source, INT byte_length) {
 
 	return wchar_length;
 }
-
 #endif
 
 //=============================================================================

@@ -399,7 +399,8 @@ int EditDetectEOLMode(LPCSTR lpData, DWORD cbData) {
 
 #if 0
 	LPCSTR cp = lpData;
-	while (*cp) {
+	LPCSTR const end = cp + cbData;
+	while (cp < end) {
 		if (*cp == '\r') {
 			if (*(cp + 1) == '\n') {
 				++cp;
@@ -414,32 +415,15 @@ int EditDetectEOLMode(LPCSTR lpData, DWORD cbData) {
 	}
 #endif
 
-#if 0
-	LPCSTR cp = strpbrk(lpData, "\r\n");
-	while (cp) {
-		if (*cp == '\r') {
-			if (*(cp + 1) == '\n') {
-				++cp;
-				++linesCount[SC_EOL_CRLF];
-			} else {
-				++linesCount[SC_EOL_CR];
-			}
-		} else {
-			++linesCount[SC_EOL_LF];
-		}
-		++cp;
-		cp = strpbrk(cp, "\r\n");
-	}
-#endif
-
 #if 1
 	// tools/GenerateTable.py
 	static const UINT8 eol_table[256] = {
-		3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 2, 0, 0, // 00 - 0F
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 2, 0, 0, // 00 - 0F
 	};
 
 	const UINT8 *ptr = (const UINT8 *)lpData;
-	while (TRUE) {
+	const UINT8 * const end = ptr + cbData;
+	while (ptr < end) {
 		switch (eol_table[*ptr]) {
 		case 0: // normal
 			++ptr;
@@ -457,13 +441,8 @@ int EditDetectEOLMode(LPCSTR lpData, DWORD cbData) {
 				++linesCount[SC_EOL_CR];
 			}
 			break;
-		case 3: // '\0'
-			goto label_eol_end;
 		}
 	}
-
-label_eol_end:
-	{} // GCC: a label can only be part of a statement and a declaration is not a statement.
 #endif
 
 	const UINT linesMax = max_u(max_u(linesCount[0], linesCount[1]), linesCount[2]);
