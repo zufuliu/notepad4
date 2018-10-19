@@ -204,9 +204,9 @@ BOOL	Encoding_GetFromListView(HWND hwnd, int *pidEncoding);
 void	Encoding_AddToComboboxEx(HWND hwnd, int idSel, BOOL bRecodeOnly);
 BOOL	Encoding_GetFromComboboxEx(HWND hwnd, int *pidEncoding);
 
-BOOL	IsUnicode(const char *pBuffer, int cb, LPBOOL lpbBOM, LPBOOL lpbReverse);
-BOOL	IsUTF8(const char *pTest, int nLength);
-BOOL	IsUTF7(const char *pTest, int nLength);
+BOOL	IsUnicode(const char *pBuffer, DWORD cb, LPBOOL lpbBOM, LPBOOL lpbReverse);
+BOOL	IsUTF8(const char *pTest, DWORD nLength);
+BOOL	IsUTF7(const char *pTest, DWORD nLength);
 INT		UTF8_mbslen(LPCSTR source, INT byte_length);
 INT		UTF8_mbslen_bytes(LPCSTR utf8_string);
 
