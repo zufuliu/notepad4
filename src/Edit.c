@@ -416,6 +416,31 @@ int EditDetectEOLMode(LPCSTR lpData, DWORD cbData) {
 #endif
 
 #if 1
+	LPCSTR cp = lpData;
+	LPCSTR const end = cp + cbData;
+	while (cp < end) {
+		switch (*cp) {
+		default:
+			++cp;
+			break;
+		case '\n':
+			++cp;
+			++linesCount[SC_EOL_LF];
+			break;
+		case '\r':
+			++cp;
+			if (*cp == '\n') {
+				++cp;
+				++linesCount[SC_EOL_CRLF];
+			} else {
+				++linesCount[SC_EOL_LF];
+			}
+			break;
+		}
+	}
+#endif
+
+#if 0
 	// tools/GenerateTable.py
 	static const UINT8 eol_table[256] = {
 		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 2, 0, 0, // 00 - 0F
