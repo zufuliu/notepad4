@@ -166,6 +166,7 @@ BOOL	bNoEncodingTags;
 int		iSrcEncoding = -1;
 int		iWeakSrcEncoding = -1;
 int		iDefaultEOLMode;
+BOOL	bWarnInconsistentLineEndings;
 BOOL	bFixLineEndings;
 BOOL	bAutoStripBlanks;
 int		iPrintHeader;
@@ -5458,6 +5459,7 @@ void LoadSettings(void) {
 	iDefaultEOLMode = IniSectionGetInt(pIniSection, L"DefaultEOLMode", 0);
 	iDefaultEOLMode = clamp_i(iDefaultEOLMode, SC_EOL_CRLF, SC_EOL_LF);
 
+	bWarnInconsistentLineEndings = IniSectionGetBool(pIniSection, L"WarnInconsistentLineEndings", 1);
 	bFixLineEndings = IniSectionGetBool(pIniSection, L"FixLineEndings", 1);
 	bAutoStripBlanks = IniSectionGetBool(pIniSection, L"FixTrailingBlanks", 0);
 
@@ -5729,6 +5731,7 @@ void SaveSettings(BOOL bSaveSettingsNow) {
 	IniSectionSetBoolEx(pIniSection, L"LoadNFOasOEM", bLoadNFOasOEM, 1);
 	IniSectionSetBoolEx(pIniSection, L"NoEncodingTags", bNoEncodingTags, 0);
 	IniSectionSetIntEx(pIniSection, L"DefaultEOLMode", iDefaultEOLMode, 0);
+	IniSectionSetIntEx(pIniSection, L"WarnInconsistentLineEndings", bWarnInconsistentLineEndings, 1);
 	IniSectionSetBoolEx(pIniSection, L"FixLineEndings", bFixLineEndings, 1);
 	IniSectionSetBoolEx(pIniSection, L"FixTrailingBlanks", bAutoStripBlanks, 0);
 
@@ -7115,7 +7118,7 @@ BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect, LPCWST
 			MsgBox(MBWARN, IDS_ERR_UNICODE);
 		}
 		// Show inconsistent line endings warning
-		if (status.bInconsistent) {
+		if (status.bInconsistent && bWarnInconsistentLineEndings) {
 		}
 	} else if (!status.bFileTooBig) {
 		MsgBox(MBWARN, IDS_ERR_LOADFILE, szFileName);
