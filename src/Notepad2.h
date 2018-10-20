@@ -152,9 +152,21 @@ void UpdateFoldMarginWidth(void);
 void UpdateLineNumberWidth(void);
 void ToggleFullScreenMode(void);
 
-BOOL FileIO(BOOL fLoad, LPWSTR psz, BOOL bNoEncDetect, int *ienc, int *ieol,
-			BOOL *pbUnicodeErr, BOOL *pbFileTooBig,
-			BOOL *pbCancelDataLoss, BOOL bSaveCopy);
+typedef struct EditFileIOStatus {
+	int iEncoding;		// load output, save input
+	int iEOLMode;		// load output
+
+	BOOL bFileTooBig;	// load output
+	BOOL bUnicodeErr;	// load output
+
+	// inconsistent line endings
+	BOOL bInconsistent;	// load output
+	UINT linesCount[3];	// load output
+
+	BOOL bCancelDataLoss;// save output
+} EditFileIOStatus;
+
+BOOL FileIO(BOOL fLoad, LPWSTR pszFile, BOOL bFlag, EditFileIOStatus *status);
 BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect, LPCWSTR lpszFile);
 BOOL FileSave(BOOL bSaveAlways, BOOL bAsk, BOOL bSaveAs, BOOL bSaveCopy);
 BOOL OpenFileDlg(HWND hwnd, LPWSTR lpstrFile, int cchFile, LPCWSTR lpstrInitialDir);

@@ -227,7 +227,7 @@ BOOL EditConvertText(HWND hwnd, UINT cpSource, UINT cpDest, BOOL bSetSavePoint) 
 //
 // EditGetClipboardText()
 //
-char *EditGetClipboardText(HWND hwnd) {
+char* EditGetClipboardText(HWND hwnd) {
 	HANDLE 	hmem;
 	WCHAR 	*pwch;
 	char 	*pmch;
@@ -384,11 +384,12 @@ BOOL EditCopyAppend(HWND hwnd) {
 //
 // EditDetectEOLMode() - moved here to handle Unicode files correctly
 //
-int EditDetectEOLMode(LPCSTR lpData, DWORD cbData) {
+void EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus *status) {
 	int iEOLMode = iLineEndings[iDefaultEOLMode];
 
 	if (cbData == 0) {
-		return iEOLMode;
+		status->iEOLMode = iEOLMode;
+		return;
 	}
 
 	UINT linesCount[3] = { 0, 0, 0 };
@@ -486,7 +487,11 @@ int EditDetectEOLMode(LPCSTR lpData, DWORD cbData) {
 	StopWatch_Show(&watch, L"EOL time");
 #endif
 
-	return iEOLMode;
+	status->iEOLMode = iEOLMode;
+	status->bInconsistent = ((!!linesCount[0]) + (!!linesCount[1]) + (!!linesCount[2])) > 1;
+	status->linesCount[0] = linesCount[0];
+	status->linesCount[1] = linesCount[1];
+	status->linesCount[2] = linesCount[2];
 }
 
 //=============================================================================
@@ -494,28 +499,8 @@ int EditDetectEOLMode(LPCSTR lpData, DWORD cbData) {
 // EditLoadFile()
 //
 extern DWORD dwFileLoadWarningMB;
-BOOL EditLoadFile(HWND hwnd, LPWSTR pszFile, BOOL bSkipEncodingDetection,
-				  int *iEncoding, int *iEOLMode, BOOL *pbUnicodeErr, BOOL *pbFileTooBig) {
-	HANDLE hFile;
-
-	DWORD	 dwFileSize;
-	DWORD	 dwBufSize;
-	BOOL	 bReadSuccess;
-
-	char *lpData;
-	DWORD cbData;
-	//char	*cp;
-	int _iDefaultEncoding;
-
-	BOOL bBOM = FALSE;
-	BOOL bReverse = FALSE;
-	BOOL utf8Sig;
-	BOOL bPreferOEM = FALSE;
-
-	*pbUnicodeErr = FALSE;
-	*pbFileTooBig = FALSE;
-
-	hFile = CreateFile(pszFile,
+BOOL EditLoadFile(HWND hwnd, LPWSTR pszFile, BOOL bSkipEncodingDetection, EditFileIOStatus *status) {
+	HANDLE hFile = CreateFile(pszFile,
 					   GENERIC_READ,
 					   FILE_SHARE_READ | FILE_SHARE_WRITE,
 					   NULL, OPEN_EXISTING,
@@ -530,14 +515,13 @@ BOOL EditLoadFile(HWND hwnd, LPWSTR pszFile, BOOL bSkipEncodingDetection,
 	}
 
 	// calculate buffer limit
-	dwFileSize = GetFileSize(hFile, NULL);
-	dwBufSize	 = dwFileSize + 10;
+	const DWORD dwFileSize = GetFileSize(hFile, NULL);
 
 	// Check if a warning message should be displayed for large files
 	if (dwFileLoadWarningMB != 0 && dwFileLoadWarningMB * 1024 * 1024 < dwFileSize) {
 		if (InfoBox(MBYESNO, L"MsgFileSizeWarning", IDS_WARNLOADBIGFILE) != IDYES) {
 			CloseHandle(hFile);
-			*pbFileTooBig = TRUE;
+			status->bFileTooBig = TRUE;
 			iSrcEncoding = -1;
 			iWeakSrcEncoding = -1;
 			return FALSE;
@@ -560,8 +544,9 @@ BOOL EditLoadFile(HWND hwnd, LPWSTR pszFile, BOOL bSkipEncodingDetection,
 		}
 	}
 
-	lpData = NP2HeapAlloc(dwBufSize);
-	bReadSuccess = ReadFile(hFile, lpData, (DWORD)NP2HeapSize(lpData) - 2, &cbData, NULL);
+	char *lpData = NP2HeapAlloc(dwFileSize + 16);
+	DWORD cbData = 0;
+	const BOOL bReadSuccess = ReadFile(hFile, lpData, (DWORD)NP2HeapSize(lpData) - 2, &cbData, NULL);
 	dwLastIOError = GetLastError();
 	CloseHandle(hFile);
 
@@ -572,8 +557,9 @@ BOOL EditLoadFile(HWND hwnd, LPWSTR pszFile, BOOL bSkipEncodingDetection,
 		return FALSE;
 	}
 
+	BOOL bPreferOEM = FALSE;
 	if (bLoadNFOasOEM) {
-		PCWSTR pszExt = pszFile + lstrlen(pszFile) - 4;
+		LPCWSTR const pszExt = pszFile + lstrlen(pszFile) - 4;
 		if (pszExt >= pszFile && (StrCaseEqual(pszExt, L".nfo") || StrCaseEqual(pszExt, L".diz"))) {
 			bPreferOEM = TRUE;
 		}
@@ -583,37 +569,37 @@ BOOL EditLoadFile(HWND hwnd, LPWSTR pszFile, BOOL bSkipEncodingDetection,
 		iDefaultEncoding = CPI_UTF8;
 	}
 
-	_iDefaultEncoding = (bPreferOEM) ? g_DOSEncoding : iDefaultEncoding;
+	int _iDefaultEncoding = bPreferOEM ? g_DOSEncoding : iDefaultEncoding;
 	if (iWeakSrcEncoding != -1 && Encoding_IsValid(iWeakSrcEncoding)) {
 		_iDefaultEncoding = iWeakSrcEncoding;
 	}
 
-	*iEncoding = CPI_DEFAULT;
-	utf8Sig = cbData? IsUTF8Signature(lpData) : FALSE;
+	int iEncoding = CPI_DEFAULT;
+	const BOOL utf8Sig = cbData? IsUTF8Signature(lpData) : FALSE;
+	BOOL bBOM = FALSE;
+	BOOL bReverse = FALSE;
 
 	if (cbData == 0) {
 		FileVars_Init(NULL, 0, &fvCurFile);
-		*iEOLMode = iLineEndings[iDefaultEOLMode];
+		status->iEOLMode = iLineEndings[iDefaultEOLMode];
 
 		if (iSrcEncoding == -1) {
 			if (bLoadASCIIasUTF8 && !bPreferOEM) {
-				*iEncoding = CPI_UTF8;
+				iEncoding = CPI_UTF8;
 			} else {
-				*iEncoding = _iDefaultEncoding;
+				iEncoding = _iDefaultEncoding;
 			}
 		} else {
-			*iEncoding = iSrcEncoding;
+			iEncoding = iSrcEncoding;
 		}
 
-		SendMessage(hwnd, SCI_SETCODEPAGE, (mEncoding[*iEncoding].uFlags & NCP_DEFAULT) ? iDefaultCodePage : SC_CP_UTF8, 0);
+		SendMessage(hwnd, SCI_SETCODEPAGE, (mEncoding[iEncoding].uFlags & NCP_DEFAULT) ? iDefaultCodePage : SC_CP_UTF8, 0);
 		EditSetNewText(hwnd, "", 0);
-		SendMessage(hwnd, SCI_SETEOLMODE, iLineEndings[iDefaultEOLMode], 0);
+		SendMessage(hwnd, SCI_SETEOLMODE, status->iEOLMode, 0);
 	} else if (!bSkipEncodingDetection &&
 			   (iSrcEncoding == -1 || iSrcEncoding == CPI_UNICODE || iSrcEncoding == CPI_UNICODEBE) &&
 			   (iSrcEncoding == CPI_UNICODE || iSrcEncoding == CPI_UNICODEBE || IsUnicode(lpData, cbData, &bBOM, &bReverse)) &&
 			   (iSrcEncoding == CPI_UNICODE || iSrcEncoding == CPI_UNICODEBE || !utf8Sig)) {
-
-		char *lpDataUTF8;
 
 		if (iSrcEncoding == CPI_UNICODE) {
 			bBOM = (*((UNALIGNED PWCHAR)lpData) == 0xFEFF);
@@ -625,32 +611,32 @@ BOOL EditLoadFile(HWND hwnd, LPWSTR pszFile, BOOL bSkipEncodingDetection,
 		if (iSrcEncoding == CPI_UNICODEBE || bReverse) {
 			_swab(lpData, lpData, cbData);
 			if (bBOM) {
-				*iEncoding = CPI_UNICODEBEBOM;
+				iEncoding = CPI_UNICODEBEBOM;
 			} else {
-				*iEncoding = CPI_UNICODEBE;
+				iEncoding = CPI_UNICODEBE;
 			}
 		} else {
 			if (bBOM) {
-				*iEncoding = CPI_UNICODEBOM;
+				iEncoding = CPI_UNICODEBOM;
 			} else {
-				*iEncoding = CPI_UNICODE;
+				iEncoding = CPI_UNICODE;
 			}
 		}
 
-		lpDataUTF8 = NP2HeapAlloc(cbData * kMaxMultiByteCount + 2);
+		char *lpDataUTF8 = NP2HeapAlloc(cbData * kMaxMultiByteCount + 2);
 		cbData = WideCharToMultiByte(CP_UTF8, 0, (bBOM) ? (LPWSTR)lpData + 1 : (LPWSTR)lpData,
 									 (bBOM) ? (cbData) / sizeof(WCHAR) : cbData / sizeof(WCHAR) + 1,
 									 lpDataUTF8, (int)NP2HeapSize(lpDataUTF8), NULL, NULL);
 		if (cbData == 0) {
 			cbData = WideCharToMultiByte(CP_ACP, 0, (bBOM) ? (LPWSTR)lpData + 1 : (LPWSTR)lpData,
 										 (-1), lpDataUTF8, (int)NP2HeapSize(lpDataUTF8), NULL, NULL);
-			*pbUnicodeErr = TRUE;
+			status->bUnicodeErr = TRUE;
 		}
 
 		SendMessage(hwnd, SCI_SETCODEPAGE, SC_CP_UTF8, 0);
 		FileVars_Init(lpDataUTF8, cbData - 1, &fvCurFile);
 		EditSetNewText(hwnd, lpDataUTF8, cbData - 1);
-		*iEOLMode = EditDetectEOLMode(lpDataUTF8, cbData - 1);
+		EditDetectEOLMode(lpDataUTF8, cbData - 1, status);
 		NP2HeapFree(lpDataUTF8);
 	} else {
 		FileVars_Init(lpData, cbData, &fvCurFile);
@@ -667,42 +653,39 @@ BOOL EditLoadFile(HWND hwnd, LPWSTR pszFile, BOOL bSkipEncodingDetection,
 			SendMessage(hwnd, SCI_SETCODEPAGE, SC_CP_UTF8, 0);
 			if (utf8Sig) {
 				EditSetNewText(hwnd, lpData + 3, cbData - 3);
-				*iEncoding = CPI_UTF8SIGN;
-				*iEOLMode = EditDetectEOLMode(lpData + 3, cbData - 3);
+				iEncoding = CPI_UTF8SIGN;
+				EditDetectEOLMode(lpData + 3, cbData - 3, status);
 			} else {
 				EditSetNewText(hwnd, lpData, cbData);
-				*iEncoding = CPI_UTF8;
-				*iEOLMode = EditDetectEOLMode(lpData, cbData);
+				iEncoding = CPI_UTF8;
+				EditDetectEOLMode(lpData, cbData, status);
 			}
 		} else {
-			UINT uCodePage = CP_UTF8;
-
 			if (iSrcEncoding != -1) {
-				*iEncoding = iSrcEncoding;
+				iEncoding = iSrcEncoding;
 			} else {
-				*iEncoding = FileVars_GetEncoding(&fvCurFile);
-				if (*iEncoding == -1) {
+				iEncoding = FileVars_GetEncoding(&fvCurFile);
+				if (iEncoding == -1) {
 					if (fvCurFile.mask & FV_ENCODING) {
-						*iEncoding = CPI_DEFAULT;
+						iEncoding = CPI_DEFAULT;
 					} else {
 						if (iWeakSrcEncoding == -1) {
-							*iEncoding = _iDefaultEncoding;
+							iEncoding = _iDefaultEncoding;
 						} else if (mEncoding[iWeakSrcEncoding].uFlags & NCP_INTERNAL) {
-							*iEncoding = iDefaultEncoding;
+							iEncoding = iDefaultEncoding;
 						} else {
-							*iEncoding = _iDefaultEncoding;
+							iEncoding = _iDefaultEncoding;
 						}
 					}
 				}
 			}
 
-			if ((mEncoding[*iEncoding].uFlags & NCP_8BIT && mEncoding[*iEncoding].uCodePage != CP_UTF7) ||
-					(mEncoding[*iEncoding].uCodePage == CP_UTF7 && IsUTF7(lpData, cbData))) {
-				LPWSTR lpDataWide;
-				int cbDataWide;
-				uCodePage	 = mEncoding[*iEncoding].uCodePage;
-				lpDataWide = NP2HeapAlloc(cbData * sizeof(WCHAR) + 16);
-				cbDataWide = MultiByteToWideChar(uCodePage, 0, lpData, cbData, lpDataWide,
+			const UINT uCodePage = mEncoding[iEncoding].uCodePage;
+			if (((mEncoding[iEncoding].uFlags & NCP_8BIT) && uCodePage != CP_UTF7) ||
+					(uCodePage == CP_UTF7 && IsUTF7(lpData, cbData))) {
+
+				LPWSTR lpDataWide = NP2HeapAlloc(cbData * sizeof(WCHAR) + 16);
+				const int cbDataWide = MultiByteToWideChar(uCodePage, 0, lpData, cbData, lpDataWide,
 												 (int)NP2HeapSize(lpDataWide) / sizeof(WCHAR));
 				NP2HeapFree(lpData);
 				lpData = NP2HeapAlloc(cbDataWide * kMaxMultiByteCount + 16);
@@ -712,17 +695,18 @@ BOOL EditLoadFile(HWND hwnd, LPWSTR pszFile, BOOL bSkipEncodingDetection,
 
 				SendMessage(hwnd, SCI_SETCODEPAGE, SC_CP_UTF8, 0);
 				EditSetNewText(hwnd, lpData, cbData);
-				*iEOLMode = EditDetectEOLMode(lpData, cbData);
+				EditDetectEOLMode(lpData, cbData, status);
 			} else {
 				SendMessage(hwnd, SCI_SETCODEPAGE, iDefaultCodePage, 0);
 				EditSetNewText(hwnd, lpData, cbData);
-				*iEncoding = CPI_DEFAULT;
-				*iEOLMode = EditDetectEOLMode(lpData, cbData);
+				iEncoding = CPI_DEFAULT;
+				EditDetectEOLMode(lpData, cbData, status);
 			}
 		}
 	}
 
 	NP2HeapFree(lpData);
+	status->iEncoding = iEncoding;
 	iSrcEncoding = -1;
 	iWeakSrcEncoding = -1;
 
@@ -733,17 +717,8 @@ BOOL EditLoadFile(HWND hwnd, LPWSTR pszFile, BOOL bSkipEncodingDetection,
 //
 // EditSaveFile()
 //
-BOOL EditSaveFile(HWND hwnd, LPCWSTR pszFile, int iEncoding, BOOL *pbCancelDataLoss, BOOL bSaveCopy) {
-	HANDLE hFile;
-	BOOL	 bWriteSuccess;
-
-	char *lpData;
-	DWORD cbData;
-	DWORD dwBytesWritten;
-
-	*pbCancelDataLoss = FALSE;
-
-	hFile = CreateFile(pszFile,
+BOOL EditSaveFile(HWND hwnd, LPCWSTR pszFile, BOOL bSaveCopy, EditFileIOStatus *status) {
+	HANDLE hFile = CreateFile(pszFile,
 					   GENERIC_WRITE,
 					   FILE_SHARE_READ | FILE_SHARE_WRITE,
 					   NULL, OPEN_ALWAYS,
@@ -782,17 +757,21 @@ BOOL EditSaveFile(HWND hwnd, LPCWSTR pszFile, int iEncoding, BOOL *pbCancelDataL
 		EditStripTrailingBlanks(hwnd, TRUE);
 	}
 
+	BOOL bWriteSuccess;
 	// get text
-	cbData = (int)SendMessage(hwnd, SCI_GETLENGTH, 0, 0);
-	lpData = NP2HeapAlloc(cbData + 1);
+	DWORD cbData = (DWORD)SendMessage(hwnd, SCI_GETLENGTH, 0, 0);
+	char *lpData = NP2HeapAlloc(cbData + 1);
 	SendMessage(hwnd, SCI_GETTEXT, NP2HeapSize(lpData), (LPARAM)lpData);
 
 	if (cbData == 0) {
 		bWriteSuccess = SetEndOfFile(hFile);
 		dwLastIOError = GetLastError();
 	} else {
+		DWORD dwBytesWritten;
+		const int iEncoding = status->iEncoding;
+		const UINT uFlags = mEncoding[iEncoding].uFlags;
 		// FIXME: move checks in front of disk file access
-		/*if ((mEncoding[iEncoding].uFlags & NCP_UNICODE) == 0 && (mEncoding[iEncoding].uFlags & NCP_UTF8_SIGN) == 0) {
+		/*if ((uFlags & NCP_UNICODE) == 0 && (uFlags & NCP_UTF8_SIGN) == 0) {
 				BOOL bEncodingMismatch = TRUE;
 				FILEVARS fv;
 				FileVars_Init(lpData, cbData, &fv);
@@ -802,7 +781,7 @@ BOOL EditSaveFile(HWND hwnd, LPCWSTR pszFile, int iEncoding, BOOL *pbCancelDataL
 						iAltEncoding = FileVars_GetEncoding(&fv);
 						if (iAltEncoding == iEncoding)
 							bEncodingMismatch = FALSE;
-						else if ((mEncoding[iAltEncoding].uFlags & NCP_UTF8) && (mEncoding[iEncoding].uFlags & NCP_UTF8))
+						else if ((mEncoding[iAltEncoding].uFlags & NCP_UTF8) && (uFlags & NCP_UTF8))
 							bEncodingMismatch = FALSE;
 					}
 					if (bEncodingMismatch) {
@@ -814,25 +793,22 @@ BOOL EditSaveFile(HWND hwnd, LPCWSTR pszFile, int iEncoding, BOOL *pbCancelDataL
 					}
 				}
 			}*/
-		if (mEncoding[iEncoding].uFlags & NCP_UNICODE) {
-			LPWSTR lpDataWide;
-			int		 cbDataWide;
-
+		if (uFlags & NCP_UNICODE) {
 			SetEndOfFile(hFile);
 
-			lpDataWide = NP2HeapAlloc(cbData * sizeof(WCHAR) + 16);
-			cbDataWide = MultiByteToWideChar(CP_UTF8, 0, lpData, cbData, lpDataWide,
+			LPWSTR lpDataWide = NP2HeapAlloc(cbData * sizeof(WCHAR) + 16);
+			const int cbDataWide = MultiByteToWideChar(CP_UTF8, 0, lpData, cbData, lpDataWide,
 											 (int)NP2HeapSize(lpDataWide) / sizeof(WCHAR));
 
-			if (mEncoding[iEncoding].uFlags & NCP_UNICODE_BOM) {
-				if (mEncoding[iEncoding].uFlags & NCP_UNICODE_REVERSE) {
+			if (uFlags & NCP_UNICODE_BOM) {
+				if (uFlags & NCP_UNICODE_REVERSE) {
 					WriteFile(hFile, (LPCVOID)"\xFE\xFF", 2, &dwBytesWritten, NULL);
 				} else {
 					WriteFile(hFile, (LPCVOID)"\xFF\xFE", 2, &dwBytesWritten, NULL);
 				}
 			}
 
-			if (mEncoding[iEncoding].uFlags & NCP_UNICODE_REVERSE) {
+			if (uFlags & NCP_UNICODE_REVERSE) {
 				_swab((char *)lpDataWide, (char *)lpDataWide, cbDataWide * sizeof(WCHAR));
 			}
 
@@ -840,21 +816,21 @@ BOOL EditSaveFile(HWND hwnd, LPCWSTR pszFile, int iEncoding, BOOL *pbCancelDataL
 			dwLastIOError = GetLastError();
 
 			NP2HeapFree(lpDataWide);
-		} else if (mEncoding[iEncoding].uFlags & NCP_UTF8) {
+		} else if (uFlags & NCP_UTF8) {
 			SetEndOfFile(hFile);
 
-			if (mEncoding[iEncoding].uFlags & NCP_UTF8_SIGN) {
+			if (uFlags & NCP_UTF8_SIGN) {
 				WriteFile(hFile, (LPCVOID)"\xEF\xBB\xBF", 3, &dwBytesWritten, NULL);
 			}
 
 			bWriteSuccess = WriteFile(hFile, lpData, cbData, &dwBytesWritten, NULL);
 			dwLastIOError = GetLastError();
-		} else if (mEncoding[iEncoding].uFlags & NCP_8BIT) {
+		} else if (uFlags & NCP_8BIT) {
 			BOOL bCancelDataLoss = FALSE;
-			UINT uCodePage = mEncoding[iEncoding].uCodePage;
+			const UINT uCodePage = mEncoding[iEncoding].uCodePage;
 
 			LPWSTR lpDataWide = NP2HeapAlloc(cbData * 2 + 16);
-			int cbDataWide = MultiByteToWideChar(CP_UTF8, 0, lpData, cbData, lpDataWide,
+			const int cbDataWide = MultiByteToWideChar(CP_UTF8, 0, lpData, cbData, lpDataWide,
 												 (int)NP2HeapSize(lpDataWide) / sizeof(WCHAR));
 			// Special cases: 42, 50220, 50221, 50222, 50225, 50227, 50229, 54936 GB18030, 57002-11, 65000, 65001
 			if (uCodePage == CP_UTF7 || uCodePage == 54936) {
@@ -884,7 +860,7 @@ BOOL EditSaveFile(HWND hwnd, LPCWSTR pszFile, int iEncoding, BOOL *pbCancelDataL
 				dwLastIOError = GetLastError();
 			} else {
 				bWriteSuccess = FALSE;
-				*pbCancelDataLoss = TRUE;
+				status->bCancelDataLoss = TRUE;
 			}
 		} else {
 			SetEndOfFile(hFile);
