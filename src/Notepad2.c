@@ -6902,17 +6902,12 @@ void ToggleFullScreenMode(void) {
 //	FileIO()
 //
 //
-BOOL FileIO(BOOL fLoad, LPWSTR psz, BOOL bNoEncDetect, int *ienc, int *ieol,
-			BOOL *pbUnicodeErr, BOOL *pbFileTooBig,
-			BOOL *pbCancelDataLoss, BOOL bSaveCopy) {
-	WCHAR tch[MAX_PATH + 40];
-	BOOL fSuccess;
-	DWORD dwFileAttributes;
-
+BOOL FileIO(BOOL fLoad, LPWSTR pszFile, BOOL bFlag, EditFileIOStatus *status) {
 	BeginWaitCursor();
 
+	WCHAR tch[MAX_PATH + 40];
 	WCHAR fmt[64];
-	FormatString(tch, fmt, (fLoad) ? IDS_LOADFILE : IDS_SAVEFILE, PathFindFileName(psz));
+	FormatString(tch, fmt, (fLoad ? IDS_LOADFILE : IDS_SAVEFILE), PathFindFileName(pszFile));
 
 	StatusSetText(hwndStatus, STATUS_HELP, tch);
 	StatusSetSimple(hwndStatus, TRUE);
@@ -6920,17 +6915,11 @@ BOOL FileIO(BOOL fLoad, LPWSTR psz, BOOL bNoEncDetect, int *ienc, int *ieol,
 	InvalidateRect(hwndStatus, NULL, TRUE);
 	UpdateWindow(hwndStatus);
 
-	if (fLoad) {
-		fSuccess = EditLoadFile(hwndEdit, psz, bNoEncDetect, ienc, ieol, pbUnicodeErr, pbFileTooBig);
-	} else {
-		fSuccess = EditSaveFile(hwndEdit, psz, *ienc, pbCancelDataLoss, bSaveCopy);
-	}
-
-	dwFileAttributes = GetFileAttributes(psz);
+	const BOOL fSuccess = fLoad ? EditLoadFile(hwndEdit, pszFile, bFlag, status) : EditSaveFile(hwndEdit, pszFile, bFlag, status);
+	const DWORD dwFileAttributes = GetFileAttributes(pszFile);
 	bReadOnly = (dwFileAttributes != INVALID_FILE_ATTRIBUTES) && (dwFileAttributes & FILE_ATTRIBUTE_READONLY);
 
 	StatusSetSimple(hwndStatus, FALSE);
-
 	EndWaitCursor();
 
 	return fSuccess;
@@ -6943,10 +6932,7 @@ BOOL FileIO(BOOL fLoad, LPWSTR psz, BOOL bNoEncDetect, int *ienc, int *ieol,
 //
 BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect, LPCWSTR lpszFile) {
 	WCHAR tch[MAX_PATH] = L"";
-	WCHAR szFileName[MAX_PATH] = L"";
 	BOOL fSuccess = FALSE;
-	BOOL bUnicodeErr = FALSE;
-	BOOL bFileTooBig = FALSE;
 	int line = 0, col = 0;
 	int keepTitleExcerpt = fKeepTitleExcerpt;
 	int lexerSpecified = flagLexerSpecified;
@@ -6954,7 +6940,7 @@ BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect, LPCWST
 	if (!bNew && StrNotEmpty(lpszFile)) {
 		lstrcpy(tch, lpszFile);
 		if (lpszFile == szCurFile || StrCaseEqual(lpszFile, szCurFile)) {
-			Sci_Position pos = SciCall_GetCurrentPos();
+			const Sci_Position pos = SciCall_GetCurrentPos();
 			line = SciCall_LineFromPosition(pos) + 1;
 			col = SciCall_GetColumn(pos) + 1;
 			keepTitleExcerpt = 1;
@@ -7005,6 +6991,7 @@ BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect, LPCWST
 	}
 	fSuccess = FALSE;
 
+	WCHAR szFileName[MAX_PATH] = L"";
 	ExpandEnvironmentStringsEx(tch, COUNTOF(tch));
 
 	if (PathIsRelative(tch)) {
@@ -7027,6 +7014,10 @@ BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect, LPCWST
 		PathGetLnkPath(szFileName, szFileName, COUNTOF(szFileName));
 	}
 
+	EditFileIOStatus status = {
+		.iEncoding = iEncoding,
+		.iEOLMode = iEOLMode,
+	};
 	// Ask to create a new file...
 	if (!bReload && !PathFileExists(szFileName)) {
 		if (flagQuietCreate || MsgBox(MBYESNO, IDS_ASK_CREATE, szFileName) == IDYES) {
@@ -7056,7 +7047,11 @@ BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect, LPCWST
 			return FALSE;
 		}
 	} else {
-		fSuccess = FileIO(TRUE, szFileName, bNoEncDetect, &iEncoding, &iEOLMode, &bUnicodeErr, &bFileTooBig, NULL, FALSE);
+		fSuccess = FileIO(TRUE, szFileName, bNoEncDetect, &status);
+		if (fSuccess) {
+			iEncoding = status.iEncoding;
+			iEOLMode = status.iEOLMode;
+		}
 	}
 
 	if (fSuccess) {
@@ -7116,10 +7111,13 @@ BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect, LPCWST
 		UpdateStatusbar();
 		UpdateWindowTitle();
 		// Show warning: Unicode file loaded as ANSI
-		if (bUnicodeErr) {
+		if (status.bUnicodeErr) {
 			MsgBox(MBWARN, IDS_ERR_UNICODE);
 		}
-	} else if (!bFileTooBig) {
+		// Show inconsistent line endings warning
+		if (status.bInconsistent) {
+		}
+	} else if (!status.bFileTooBig) {
 		MsgBox(MBWARN, IDS_ERR_LOADFILE, szFileName);
 	}
 
@@ -7132,19 +7130,16 @@ BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect, LPCWST
 //
 //
 BOOL FileSave(BOOL bSaveAlways, BOOL bAsk, BOOL bSaveAs, BOOL bSaveCopy) {
-	WCHAR tchFile[MAX_PATH];
-	BOOL fSuccess = FALSE;
-	BOOL bCancelDataLoss = FALSE;
-	BOOL Untitled = StrIsEmpty(szCurFile);
+	const BOOL Untitled = StrIsEmpty(szCurFile);
 	BOOL bIsEmptyNewFile = FALSE;
 
 	if (Untitled) {
-		int cchText = (int)SendMessage(hwndEdit, SCI_GETLENGTH, 0, 0);
+		const int cchText = (int)SendMessage(hwndEdit, SCI_GETLENGTH, 0, 0);
 		if (cchText == 0) {
 			bIsEmptyNewFile = TRUE;
-		} else if (cchText < 1023) {
+		} else if (cchText < 2047) {
 			char tchText[2048];
-			SendMessage(hwndEdit, SCI_GETTEXT, (WPARAM)2047, (LPARAM)tchText);
+			SendMessage(hwndEdit, SCI_GETTEXT, 2047, (LPARAM)tchText);
 			StrTrimA(tchText, " \t\n\r");
 			if (StrIsEmptyA(tchText)) {
 				bIsEmptyNewFile = TRUE;
@@ -7173,9 +7168,16 @@ BOOL FileSave(BOOL bSaveAlways, BOOL bAsk, BOOL bSaveAs, BOOL bSaveCopy) {
 		}
 	}
 
+	BOOL fSuccess = FALSE;
+	WCHAR tchFile[MAX_PATH];
+	EditFileIOStatus status = {
+		.iEncoding = iEncoding,
+		.iEOLMode = iEOLMode,
+	};
+
 	// Read only...
 	if (!bSaveAs && !bSaveCopy && !Untitled) {
-		DWORD dwFileAttributes = GetFileAttributes(szCurFile);
+		const DWORD dwFileAttributes = GetFileAttributes(szCurFile);
 		bReadOnly = (dwFileAttributes != INVALID_FILE_ATTRIBUTES) && (dwFileAttributes & FILE_ATTRIBUTE_READONLY);
 		if (bReadOnly) {
 			UpdateWindowTitle();
@@ -7186,7 +7188,7 @@ BOOL FileSave(BOOL bSaveAlways, BOOL bAsk, BOOL bSaveAs, BOOL bSaveCopy) {
 			}
 		}
 		if (!bSaveAs) {
-			fSuccess = FileIO(FALSE, szCurFile, FALSE, &iEncoding, &iEOLMode, NULL, NULL, &bCancelDataLoss, FALSE);
+			fSuccess = FileIO(FALSE, szCurFile, FALSE, &status);
 			if (!fSuccess) {
 				bSaveAs = TRUE;
 			}
@@ -7205,7 +7207,7 @@ BOOL FileSave(BOOL bSaveAlways, BOOL bAsk, BOOL bSaveAs, BOOL bSaveCopy) {
 		}
 
 		if (SaveFileDlg(hwndMain, tchFile, COUNTOF(tchFile), tchInitialDir)) {
-			fSuccess = FileIO(FALSE, tchFile, FALSE, &iEncoding, &iEOLMode, NULL, NULL, &bCancelDataLoss, bSaveCopy);
+			fSuccess = FileIO(FALSE, tchFile, bSaveCopy, &status);
 			if (fSuccess) {
 				if (!bSaveCopy) {
 					lstrcpy(szCurFile, tchFile);
@@ -7224,7 +7226,7 @@ BOOL FileSave(BOOL bSaveAlways, BOOL bAsk, BOOL bSaveAs, BOOL bSaveCopy) {
 			return FALSE;
 		}
 	} else if (!fSuccess) {
-		fSuccess = FileIO(FALSE, szCurFile, FALSE, &iEncoding, &iEOLMode, NULL, NULL, &bCancelDataLoss, FALSE);
+		fSuccess = FileIO(FALSE, szCurFile, FALSE, &status);
 	}
 
 	if (fSuccess) {
@@ -7246,7 +7248,7 @@ BOOL FileSave(BOOL bSaveAlways, BOOL bAsk, BOOL bSaveAs, BOOL bSaveCopy) {
 			}
 			InstallFileWatching(szCurFile);
 		}
-	} else if (!bCancelDataLoss) {
+	} else if (!status.bCancelDataLoss) {
 		if (StrNotEmpty(szCurFile) != 0) {
 			lstrcpy(tchFile, szCurFile);
 		}

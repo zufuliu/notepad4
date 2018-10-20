@@ -67,12 +67,13 @@ BOOL	EditConvertText(HWND hwnd, UINT cpSource, UINT cpDest, BOOL bSetSavePoint);
 BOOL	EditSetNewEncoding(HWND hwnd, int iCurrentEncoding,
 						   int iNewEncoding, BOOL bNoUI, BOOL bSetSavePoint);
 
-char	*EditGetClipboardText(HWND hwnd); // LocalFree()
+char*	EditGetClipboardText(HWND hwnd); // LocalFree()
 BOOL	EditCopyAppend(HWND hwnd);
-int 	EditDetectEOLMode(LPCSTR lpData, DWORD cbData);
-BOOL	EditLoadFile(HWND hwnd, LPWSTR pszFile, BOOL bSkipEncodingDetection,
-					 int *iEncoding, int *iEOLMode, BOOL *pbUnicodeErr, BOOL *pbFileTooBig);
-BOOL	EditSaveFile(HWND hwnd, LPCWSTR pszFile, int iEncoding, BOOL *pbCancelDataLoss, BOOL bSaveCopy);
+
+struct EditFileIOStatus;
+void 	EditDetectEOLMode(LPCSTR lpData, DWORD cbData, struct EditFileIOStatus *status);
+BOOL	EditLoadFile(HWND hwnd, LPWSTR pszFile, BOOL bSkipEncodingDetection, struct EditFileIOStatus *status);
+BOOL	EditSaveFile(HWND hwnd, LPCWSTR pszFile, BOOL bSaveCopy, struct EditFileIOStatus *status);
 
 void	EditInvertCase(HWND hwnd);
 void	EditTitleCase(HWND hwnd);
