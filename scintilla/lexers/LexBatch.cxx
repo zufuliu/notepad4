@@ -192,10 +192,14 @@ _label_variable:
 				if (inEcho && sc.ch == ')')
 					inEcho = false;
 				if (sc.ch == '|' || sc.ch == '&') { // pipe
-					if (sc.chNext == '&') {	// cmd1 && cmd2
+					if (sc.ch == sc.chNext) {	// cmd1 || cmd2, cmd1 && cmd2
 						sc.Forward();
 					}
-					sc.ForwardSetState(SCE_BAT_DEFAULT);
+					if (IsWordStart(sc.chNext)) {
+						sc.ForwardSetState(SCE_BAT_IDENTIFIER);
+					} else {
+						sc.ForwardSetState(SCE_BAT_DEFAULT);
+					}
 					visibleChars = 0;
 					inEcho = false;
 					continue;
