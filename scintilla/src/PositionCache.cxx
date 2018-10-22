@@ -757,7 +757,6 @@ void PositionCache::Clear() noexcept {
 		for (auto &pce : pces) {
 			pce.Clear();
 		}
-		pces.clear();
 	}
 	clock = 1;
 	allClear = true;
