@@ -5183,11 +5183,14 @@ void EditMarkAll(HWND hwnd, int iMarkOccurrences, BOOL bMarkOccurrencesMatchCase
 
 	// exit if selection is not a word and Match whole words only is enabled
 	if (bMarkOccurrencesMatchWords) {
-		iSelStart = 0;
-		while (iSelStart < iSelCount && pszText[iSelStart]) {
-			if (IsDocWordChar(pszText[iSelStart]) || pszText[iSelStart] == '-') {
-				iSelStart++;
-			} else {
+		const UINT cpEdit = (UINT)SendMessage(hwnd, SCI_GETCODEPAGE, 0, 0);
+		const BOOL dbcs = !(cpEdit == CP_UTF8 || cpEdit == 0);
+		// CharClassify::SetDefaultCharClasses()
+		for (iSelStart = 0; iSelStart < iSelCount; ++iSelStart) {
+			const unsigned char ch = pszText[iSelStart];
+			if (dbcs && IsDBCSLeadByteEx(cpEdit, ch)) {
+				++iSelStart;
+			} else if (!(ch >= 0x80 || isalnum(ch) || ch == '_')) {
 				NP2HeapFree(pszText);
 				return;
 			}
