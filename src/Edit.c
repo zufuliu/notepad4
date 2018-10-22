@@ -489,9 +489,9 @@ void EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus *status) {
 
 	status->iEOLMode = iEOLMode;
 	status->bInconsistent = ((!!linesCount[0]) + (!!linesCount[1]) + (!!linesCount[2])) > 1;
-	status->linesCount[0] = linesCount[0];
-	status->linesCount[1] = linesCount[1];
-	status->linesCount[2] = linesCount[2];
+	status->linesCount[0] = linesCount[SC_EOL_CRLF];
+	status->linesCount[1] = linesCount[SC_EOL_LF];
+	status->linesCount[2] = linesCount[SC_EOL_CR];
 }
 
 //=============================================================================

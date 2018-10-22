@@ -40,7 +40,7 @@ extern BOOL		bLoadASCIIasUTF8;
 extern BOOL		bLoadNFOasOEM;
 extern int		fNoFileVariables;
 extern BOOL		bNoEncodingTags;
-extern BOOL		bWarnInconsistentLineEndings;
+extern BOOL		bWarnLineEndings;
 extern BOOL		bFixLineEndings;
 extern BOOL		bAutoStripBlanks;
 extern WCHAR	szCurFile[MAX_PATH + 40];
@@ -1920,7 +1920,7 @@ INT_PTR CALLBACK SelectDefLineEndingDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 		SendDlgItemMessage(hwnd, IDC_EOLMODELIST, CB_SETCURSEL, (WPARAM)(*piOption), 0);
 		SendDlgItemMessage(hwnd, IDC_EOLMODELIST, CB_SETEXTENDEDUI, TRUE, 0);
 
-		if (bWarnInconsistentLineEndings) {
+		if (bWarnLineEndings) {
 			CheckDlgButton(hwnd, IDC_WARNINCONSISTENTEOLS, BST_CHECKED);
 		}
 
@@ -1940,7 +1940,7 @@ INT_PTR CALLBACK SelectDefLineEndingDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 		switch (LOWORD(wParam)) {
 		case IDOK: {
 			*piOption = (int)SendDlgItemMessage(hwnd, IDC_EOLMODELIST, CB_GETCURSEL, 0, 0);
-			bWarnInconsistentLineEndings = IsButtonChecked(hwnd, IDC_WARNINCONSISTENTEOLS);
+			bWarnLineEndings = IsButtonChecked(hwnd, IDC_WARNINCONSISTENTEOLS);
 			bFixLineEndings = IsButtonChecked(hwnd, IDC_CONSISTENTEOLS);
 			bAutoStripBlanks = IsButtonChecked(hwnd, IDC_AUTOSTRIPBLANKS);
 			EndDialog(hwnd, IDOK);
