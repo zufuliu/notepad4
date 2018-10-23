@@ -2464,6 +2464,17 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	Style_UpdateSchemeMenu(hmenu);
 }
 
+static void ConvertLineEndings(int iNewEOLMode) {
+	iEOLMode = iNewEOLMode;
+	SendMessage(hwndEdit, SCI_SETEOLMODE, iNewEOLMode, 0);
+	SendMessage(hwndEdit, SCI_CONVERTEOLS, iNewEOLMode, 0);
+	EditFixPositions(hwndEdit);
+	UpdateStatusBarCache(STATUS_EOLMODE);
+	UpdateToolbar();
+	UpdateStatusbar();
+	UpdateWindowTitle();
+}
+
 //=============================================================================
 //
 // MsgCommand() - Handles WM_COMMAND
@@ -2898,15 +2909,8 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case IDM_LINEENDINGS_CRLF:
 	case IDM_LINEENDINGS_LF:
 	case IDM_LINEENDINGS_CR: {
-		int iNewEOLMode = iLineEndings[LOWORD(wParam) - IDM_LINEENDINGS_CRLF];
-		iEOLMode = iNewEOLMode;
-		SendMessage(hwndEdit, SCI_SETEOLMODE, iEOLMode, 0);
-		SendMessage(hwndEdit, SCI_CONVERTEOLS, iEOLMode, 0);
-		EditFixPositions(hwndEdit);
-		UpdateStatusBarCache(STATUS_EOLMODE);
-		UpdateToolbar();
-		UpdateStatusbar();
-		UpdateWindowTitle();
+		const int iNewEOLMode = iLineEndings[LOWORD(wParam) - IDM_LINEENDINGS_CRLF];
+		ConvertLineEndings(iNewEOLMode);
 	}
 	break;
 
@@ -5254,11 +5258,9 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		switch (pnmh->code) {
 		case NM_CLICK: {
 			LPNMMOUSE pnmm = (LPNMMOUSE)lParam;
-
 			switch (pnmm->dwItemSpec) {
 			case STATUS_EOLMODE:
-				SendMessage(hwndEdit, SCI_CONVERTEOLS, SendMessage(hwndEdit, SCI_GETEOLMODE, 0, 0), 0);
-				EditFixPositions(hwndEdit);
+				EditEnsureConsistentLineEndings(hwndEdit);
 				return TRUE;
 
 			default:
@@ -5267,9 +5269,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		}
 
 		case NM_DBLCLK: {
-			int i;
 			LPNMMOUSE pnmm = (LPNMMOUSE)lParam;
-
 			switch (pnmm->dwItemSpec) {
 			case STATUS_CODEPAGE:
 				SendMessage(hwnd, WM_COMMAND, MAKELONG(IDM_ENCODING_SELECT, 1), 0);
@@ -5277,17 +5277,13 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 			case STATUS_EOLMODE:
 				if (iEOLMode == SC_EOL_CRLF) {
-					i = IDM_LINEENDINGS_CRLF;
+					iEOLMode = SC_EOL_LF;
 				} else if (iEOLMode == SC_EOL_LF) {
-					i = IDM_LINEENDINGS_LF;
+					iEOLMode = SC_EOL_CR;
 				} else {
-					i = IDM_LINEENDINGS_CR;
+					iEOLMode = SC_EOL_CRLF;
 				}
-				i++;
-				if (i > IDM_LINEENDINGS_CR) {
-					i = IDM_LINEENDINGS_CRLF;
-				}
-				SendMessage(hwnd, WM_COMMAND, MAKELONG(i, 1), 0);
+				ConvertLineEndings(iEOLMode);
 				return TRUE;
 
 			case STATUS_LEXER:
