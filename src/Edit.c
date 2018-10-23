@@ -748,8 +748,7 @@ BOOL EditSaveFile(HWND hwnd, LPCWSTR pszFile, BOOL bSaveCopy, EditFileIOStatus *
 
 	// ensure consistent line endings
 	if (bFixLineEndings) {
-		SendMessage(hwnd, SCI_CONVERTEOLS, SendMessage(hwnd, SCI_GETEOLMODE, 0, 0), 0);
-		EditFixPositions(hwnd);
+		EditEnsureConsistentLineEndings(hwnd);
 	}
 
 	// strip trailing blanks
@@ -4205,6 +4204,11 @@ void EditEnsureSelectionVisible(HWND hwnd) {
 					(WPARAM)SendMessage(hwnd, SCI_LINEFROMPOSITION, (WPARAM)iCurrentPos, 0), 0);
 	}
 	EditSelectEx(hwnd, iAnchorPos, iCurrentPos);
+}
+
+void EditEnsureConsistentLineEndings(HWND hwnd) {
+	SendMessage(hwnd, SCI_CONVERTEOLS, SendMessage(hwnd, SCI_GETEOLMODE, 0, 0), 0);
+	EditFixPositions(hwnd);
 }
 
 //=============================================================================

@@ -115,6 +115,7 @@ void	EditJumpTo(HWND hwnd, int iNewLine, int iNewCol);
 void	EditSelectEx(HWND hwnd, int iAnchorPos, int iCurrentPos);
 void	EditFixPositions(HWND hwnd);
 void	EditEnsureSelectionVisible(HWND hwnd);
+void	EditEnsureConsistentLineEndings(HWND hwnd);
 void	EditGetExcerpt(HWND hwnd, LPWSTR lpszExcerpt, DWORD cchExcerpt);
 
 #define NP2_FIND_REPLACE_LIMIT	2048
