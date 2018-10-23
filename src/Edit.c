@@ -416,20 +416,15 @@ void EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus *status) {
 	}
 #endif
 
-#if 1
+#if 0
 	LPCSTR cp = lpData;
 	LPCSTR const end = cp + cbData;
 	while (cp < end) {
-		switch (*cp) {
-		default:
-			++cp;
-			break;
+		switch (*cp++) {
 		case '\n':
-			++cp;
 			++linesCount[SC_EOL_LF];
 			break;
 		case '\r':
-			++cp;
 			if (*cp == '\n') {
 				++cp;
 				++linesCount[SC_EOL_CRLF];
@@ -441,7 +436,7 @@ void EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus *status) {
 	}
 #endif
 
-#if 0
+#if 1
 	// tools/GenerateTable.py
 	static const UINT8 eol_table[256] = {
 		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 2, 0, 0, // 00 - 0F
@@ -449,17 +444,17 @@ void EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus *status) {
 
 	const UINT8 *ptr = (const UINT8 *)lpData;
 	const UINT8 * const end = ptr + cbData;
-	while (ptr < end) {
-		switch (eol_table[*ptr]) {
-		case 0: // normal
-			++ptr;
-			break;
+	UINT type = 0;
+	do {
+		// skip to line end
+		while (ptr < end && (type = eol_table[*ptr++]) == 0) {
+			// nop
+		}
+		switch (type) {
 		case 1: // '\n'
-			++ptr;
 			++linesCount[SC_EOL_LF];
 			break;
 		case 2: // '\r'
-			++ptr;
 			if (*ptr == '\n') {
 				++ptr;
 				++linesCount[SC_EOL_CRLF];
@@ -468,7 +463,7 @@ void EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus *status) {
 			}
 			break;
 		}
-	}
+	} while (ptr < end);
 #endif
 
 	const UINT linesMax = max_u(max_u(linesCount[0], linesCount[1]), linesCount[2]);
