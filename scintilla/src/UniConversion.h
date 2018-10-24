@@ -64,7 +64,14 @@ constexpr bool UTF8IsAscii(unsigned int ch) noexcept {
 enum {
 	UTF8MaskWidth = 0x7, UTF8MaskInvalid = 0x8
 };
-int UTF8Classify(const unsigned char *us, size_t len) noexcept;
+int UTF8ClassifyMulti(const unsigned char *us, size_t len) noexcept;
+inline int UTF8Classify(const unsigned char *us, size_t len) noexcept {
+	if (us[0] < 0x80) {
+		// ASCII
+		return 1;
+	}
+	return UTF8ClassifyMulti(us, len);
+}
 inline int UTF8Classify(std::string_view sv) noexcept {
 	return UTF8Classify(reinterpret_cast<const unsigned char *>(sv.data()), sv.length());
 }

@@ -630,7 +630,7 @@ public:
 				for (int b = 1; b < widthCharBytes; b++) {
 					bytes[b] = (mixedPos + b < lenMixed) ? mixed[mixedPos + b] : 0;
 				}
-				const int classified = UTF8Classify(bytes, widthCharBytes);
+				const int classified = UTF8ClassifyMulti(bytes, widthCharBytes);
 				if (!(classified & UTF8MaskInvalid)) {
 					// valid UTF-8
 					lenMixedChar = classified & UTF8MaskWidth;

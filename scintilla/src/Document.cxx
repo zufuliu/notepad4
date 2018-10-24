@@ -647,7 +647,7 @@ bool Document::InGoodUTF8(Sci::Position pos, Sci::Position &start, Sci::Position
 		for (Sci::Position b = 1; b < widthCharBytes && ((start + b) < cb.Length()); b++) {
 			charBytes[b] = cb.CharAt(start + b);
 		}
-		const int utf8status = UTF8Classify(charBytes, widthCharBytes);
+		const int utf8status = UTF8ClassifyMulti(charBytes, widthCharBytes);
 		if (utf8status & UTF8MaskInvalid)
 			return false;
 		end = start + widthCharBytes;
@@ -750,7 +750,7 @@ Sci::Position Document::NextPosition(Sci::Position pos, int moveDir) const noexc
 					for (int b = 1; b < widthCharBytes; b++) {
 						charBytes[b] = cb.CharAt(pos + b);
 					}
-					const int utf8status = UTF8Classify(charBytes, widthCharBytes);
+					const int utf8status = UTF8ClassifyMulti(charBytes, widthCharBytes);
 					if (utf8status & UTF8MaskInvalid)
 						pos++;
 					else
@@ -833,7 +833,7 @@ Document::CharacterExtracted Document::CharacterAfter(Sci::Position position) co
 		for (int b = 1; b < widthCharBytes; b++) {
 			charBytes[b] = cb.UCharAt(position + b);
 		}
-		const int utf8status = UTF8Classify(charBytes, widthCharBytes);
+		const int utf8status = UTF8ClassifyMulti(charBytes, widthCharBytes);
 		if (utf8status & UTF8MaskInvalid) {
 			// Treat as invalid and use up just one byte
 			return CharacterExtracted(unicodeReplacementChar, 1);
@@ -873,7 +873,7 @@ Document::CharacterExtracted Document::CharacterBefore(Sci::Position position) c
 				for (int b = 0; b < widthCharBytes; b++) {
 					charBytes[b] = cb.UCharAt(startUTF + b);
 				}
-				const int utf8status = UTF8Classify(charBytes, widthCharBytes);
+				const int utf8status = UTF8ClassifyMulti(charBytes, widthCharBytes);
 				if (utf8status & UTF8MaskInvalid) {
 					// Treat as invalid and use up just one byte
 					return CharacterExtracted(unicodeReplacementChar, 1);
@@ -947,7 +947,7 @@ int SCI_METHOD Document::GetCharacterAndWidth(Sci_Position position, Sci_Positio
 				for (int b = 1; b < widthCharBytes; b++) {
 					charBytes[b] = cb.UCharAt(position + b);
 				}
-				const int utf8status = UTF8Classify(charBytes, widthCharBytes);
+				const int utf8status = UTF8ClassifyMulti(charBytes, widthCharBytes);
 				if (utf8status & UTF8MaskInvalid) {
 					// Report as singleton surrogate values which are invalid Unicode
 					character = 0xDC80 + leadByte;
@@ -1872,7 +1872,7 @@ Document::CharacterExtracted Document::ExtractCharacter(Sci::Position position) 
 	for (int b = 1; b < widthCharBytes; b++) {
 		charBytes[b] = cb.UCharAt(position + b);
 	}
-	const int utf8status = UTF8Classify(charBytes, widthCharBytes);
+	const int utf8status = UTF8ClassifyMulti(charBytes, widthCharBytes);
 	if (utf8status & UTF8MaskInvalid) {
 		// Treat as invalid and use up just one byte
 		return CharacterExtracted(unicodeReplacementChar, 1);
@@ -1954,7 +1954,7 @@ Sci::Position Document::FindText(Sci::Position minPos, Sci::Position maxPos, con
 						for (int b = 1; b < widthCharBytes; b++) {
 							bytes[b] = cb.CharAt(posIndexDocument + b);
 						}
-						widthChar = UTF8Classify(reinterpret_cast<const unsigned char *>(bytes), widthCharBytes) & UTF8MaskWidth;
+						widthChar = UTF8ClassifyMulti(reinterpret_cast<const unsigned char *>(bytes), widthCharBytes) & UTF8MaskWidth;
 					}
 					if (!widthFirstCharacter)
 						widthFirstCharacter = widthChar;
