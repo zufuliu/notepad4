@@ -1815,7 +1815,7 @@ bool Document::IsWordStartAt(Sci::Position pos) const noexcept {
 		const CharClassify::cc ccPos = WordCharacterClass(cePos.character);
 		const CharacterExtracted cePrev = CharacterBefore(pos);
 		const CharClassify::cc ccPrev = WordCharacterClass(cePrev.character);
-		return (ccPos == CharClassify::ccWord || ccPos == CharClassify::ccPunctuation) &&
+		return (ccPos == CharClassify::ccWord || ccPos == CharClassify::ccPunctuation || ccPos == CharClassify::ccCJK) &&
 			(ccPos != ccPrev);
 	}
 	return true;
@@ -1833,7 +1833,7 @@ bool Document::IsWordEndAt(Sci::Position pos) const noexcept {
 		const CharClassify::cc ccPos = WordCharacterClass(cePos.character);
 		const CharacterExtracted cePrev = CharacterBefore(pos);
 		const CharClassify::cc ccPrev = WordCharacterClass(cePrev.character);
-		return (ccPrev == CharClassify::ccWord || ccPrev == CharClassify::ccPunctuation) &&
+		return (ccPrev == CharClassify::ccWord || ccPrev == CharClassify::ccPunctuation || ccPrev == CharClassify::ccCJK) &&
 			(ccPrev != ccPos);
 	}
 	return true;
@@ -2373,7 +2373,8 @@ static bool IsASCIIPunctuationCharacter(unsigned int ch) noexcept {
 }
 
 bool Document::IsWordPartSeparator(unsigned int ch) const noexcept {
-	return (WordCharacterClass(ch) == CharClassify::ccWord) && IsASCIIPunctuationCharacter(ch);
+	const CharClassify::cc cc = WordCharacterClass(ch);
+	return (cc == CharClassify::ccWord || cc == CharClassify::ccCJK) && IsASCIIPunctuationCharacter(ch);
 }
 
 Sci::Position Document::WordPartLeft(Sci::Position pos) const noexcept {

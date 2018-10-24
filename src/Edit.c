@@ -5221,7 +5221,7 @@ void EditMarkAll(HWND hwnd, int iMarkOccurrences, BOOL bMarkOccurrencesMatchCase
 			const unsigned char ch = pszText[iSelStart];
 			if (dbcs && IsDBCSLeadByteEx(cpEdit, ch)) {
 				++iSelStart;
-			} else if (!(ch >= 0x80 || isalnum(ch) || ch == '_')) {
+			} else if (!(ch >= 0x80 || IsDocWordChar(ch))) {
 				NP2HeapFree(pszText);
 				return;
 			}
