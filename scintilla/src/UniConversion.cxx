@@ -338,13 +338,8 @@ const unsigned char UTF8ClassifyTable[256] = {
 // the non-characters *FFFE, *FFFF and FDD0 .. FDEF return 3 or 4 as they can be
 // reasonably treated as code points in some circumstances. They will, however,
 // not have associated glyphs.
-int UTF8Classify(const unsigned char *us, size_t len) noexcept {
+int UTF8ClassifyMulti(const unsigned char *us, size_t len) noexcept {
 	// For the rules: http://www.cl.cam.ac.uk/~mgk25/unicode.html#utf-8
-	if (us[0] < 0x80) {
-		// ASCII
-		return 1;
-	}
-
 	unsigned int mask = UTF8ClassifyTable[us[0]];
 	const size_t byteCount = mask & UTF8ClassifyMaskOctetCount;
 	if (byteCount == 1 || byteCount > len) {
