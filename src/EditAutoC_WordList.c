@@ -54,16 +54,20 @@ struct WordList {
 #define NP2_AUTOC_ORDER_LENGTH	4
 
 UINT WordList_Order(const void *pWord, unsigned int len) {
-	unsigned int high = *(const unsigned int *)pWord;
-	high &= (len < NP2_AUTOC_ORDER_LENGTH) ? ((1U << len * 8) - 1) : UINT_MAX;
+	unsigned int high = *((const unsigned int *)pWord);
+	if (len < NP2_AUTOC_ORDER_LENGTH) {
+		high &= ((1U << len * 8) - 1);
+	}
 	high = bswap32(high);
 	return high;
 }
 
 UINT WordList_OrderCase(const void *pWord, unsigned int len) {
-	unsigned int high = *(const unsigned int *)pWord;
+	unsigned int high = *((const unsigned int *)pWord);
 	high |= 0x20202020; /// TODO: fix this
-	high &= (len < NP2_AUTOC_ORDER_LENGTH) ? ((1U << len * 8) - 1) : UINT_MAX;
+	if (len < NP2_AUTOC_ORDER_LENGTH) {
+		high &= ((1U << len * 8) - 1);
+	}
 	high = bswap32(high);
 	return high;
 }
