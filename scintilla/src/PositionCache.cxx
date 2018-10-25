@@ -477,16 +477,16 @@ void LineLayoutCache::Dispose(LineLayout *ll) noexcept {
 static unsigned int KeyFromString(const char *charBytes, size_t len) noexcept {
 	PLATFORM_ASSERT(len <= 4);
 	unsigned int k = 0;
-	for (size_t i = 0; i < len && charBytes[i]; i++) {
-		k = k * 0x100;
-		const unsigned char uc = charBytes[i];
-		k += uc;
+	while (len && *charBytes) {
+		const unsigned char uc = *charBytes++;
+		k = (k << 8) | uc;
+		--len;
 	}
 	return k;
 }
 
 SpecialRepresentations::SpecialRepresentations() noexcept {
-	const short none = 0;
+	const unsigned char none = 0;
 	std::fill(startByteHasReprs, std::end(startByteHasReprs), none);
 }
 
@@ -535,7 +535,7 @@ bool SpecialRepresentations::Contains(const char *charBytes, size_t len) const {
 
 void SpecialRepresentations::Clear() {
 	mapReprs.clear();
-	const short none = 0;
+	const unsigned char none = 0;
 	std::fill(startByteHasReprs, std::end(startByteHasReprs), none);
 }
 
