@@ -216,7 +216,7 @@ typedef std::map<unsigned int, Representation> MapRepresentation;
 
 class SpecialRepresentations {
 	MapRepresentation mapReprs;
-	short startByteHasReprs[0x100];
+	unsigned char startByteHasReprs[0x100];
 public:
 	SpecialRepresentations() noexcept;
 	void SetRepresentation(const char *charBytes, const char *value);
