@@ -434,6 +434,10 @@ int		flagUseSystemMRU		= 0;
 int		flagRelaunchElevated	= 0;
 int		flagDisplayHelp			= 0;
 
+static inline BOOL IsDocumentModified(void) {
+	return bModified || iEncoding != iOriginalEncoding;
+}
+
 //==============================================================================
 //
 // Folding Functions
@@ -1315,14 +1319,12 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 		return DefWindowProc(hwnd, umsg, wParam, lParam);
 
 	case APPM_CHANGENOTIFY:
-		if (iFileWatchingMode == 1 || bModified || iEncoding != iOriginalEncoding) {
+		if (iFileWatchingMode == 1 || IsDocumentModified()) {
 			SetForegroundWindow(hwnd);
 		}
 
 		if (PathFileExists(szCurFile)) {
-			if ((iFileWatchingMode == 2 && !bModified && iEncoding == iOriginalEncoding) ||
-					MsgBox(MBYESNO, IDS_FILECHANGENOTIFY) == IDYES) {
-
+			if ((iFileWatchingMode == 2 && !IsDocumentModified()) || MsgBox(MBYESNO, IDS_FILECHANGENOTIFY) == IDYES) {
 				int iCurPos		= (int)SendMessage(hwndEdit, SCI_GETCURRENTPOS, 0, 0);
 				int iAnchorPos	= (int)SendMessage(hwndEdit, SCI_GETANCHOR, 0, 0);
 #if NP2_ENABLE_DOT_LOG_FEATURE
@@ -1454,7 +1456,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 
 void UpdateWindowTitle(void) {
 	SetWindowTitle(hwndMain, uidsAppTitle, fIsElevated, IDS_UNTITLED, szCurFile,
-				iPathNameFormat, bModified || iEncoding != iOriginalEncoding,
+				iPathNameFormat, IsDocumentModified(),
 				IDS_READONLY, bReadOnly, szTitleExcerpt);
 }
 
@@ -2501,7 +2503,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			int iDocTopLine	= (int)SendMessage(hwndEdit, SCI_DOCLINEFROMVISIBLE, (WPARAM)iVisTopLine, 0);
 			int iXOffset	= (int)SendMessage(hwndEdit, SCI_GETXOFFSET, 0, 0);
 #endif
-			if ((bModified || iEncoding != iOriginalEncoding) && MsgBox(MBOKCANCEL, IDS_ASK_REVERT) != IDOK) {
+			if (IsDocumentModified() && MsgBox(MBOKCANCEL, IDS_ASK_REVERT) != IDOK) {
 				return 0;
 			}
 
@@ -2890,7 +2892,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 				iNewEncoding = CPI_UNICODEBE;
 			}
 
-			if ((bModified || iEncoding != iOriginalEncoding) && MsgBox(MBOKCANCEL, IDS_ASK_RECODE) != IDOK) {
+			if (IsDocumentModified() && MsgBox(MBOKCANCEL, IDS_ASK_RECODE) != IDOK) {
 				return 0;
 			}
 
@@ -7146,7 +7148,7 @@ BOOL FileSave(BOOL bSaveAlways, BOOL bAsk, BOOL bSaveAs, BOOL bSaveCopy) {
 		}
 	}
 
-	if (!bSaveAlways && ((!bModified && iEncoding == iOriginalEncoding) || bIsEmptyNewFile) && !bSaveAs) {
+	if (!bSaveAlways && (!IsDocumentModified() || bIsEmptyNewFile) && !bSaveAs) {
 		return TRUE;
 	}
 
@@ -7829,6 +7831,7 @@ BOOL RelaunchElevated(void) {
 			GetModuleFileName(NULL, lpArg1, MAX_PATH);
 			lpArg2 = NP2HeapAlloc(sizeof(WCHAR) * 1024);
 			GetRelaunchParameters(lpArg2, tchFile, !exit, FALSE);
+			exit = !IsDocumentModified();
 		} else {
 			LPWSTR lpCmdLine = GetCommandLine();
 			size_t cmdSize = sizeof(WCHAR) * (lstrlen(lpCmdLine) + 1);
@@ -7964,7 +7967,7 @@ void SetNotifyIconTitle(HWND hwnd) {
 		GetString(IDS_UNTITLED, tchTitle, COUNTOF(tchTitle) - 4);
 	}
 
-	if (bModified || iEncoding != iOriginalEncoding) {
+	if (IsDocumentModified()) {
 		lstrcpy(nid.szTip, L"* ");
 	} else {
 		lstrcpy(nid.szTip, L"");
