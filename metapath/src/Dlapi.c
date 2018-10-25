@@ -664,7 +664,7 @@ BOOL DirList_PropertyDlg(HWND hwnd, int iItem) {
 //
 //  Execute an OLE Drag & Drop Operation in response to LVN_BEGIN(R)DRAG
 //
-extern LPDROPSOURCE CreateDropSource(void);
+extern void* CreateDropSource(void);
 
 void DirList_DoDragDrop(HWND hwnd, LPARAM lParam) {
 	LV_ITEM lvi;
@@ -681,7 +681,7 @@ void DirList_DoDragDrop(HWND hwnd, LPARAM lParam) {
 	if (ListView_GetItem(hwnd, &lvi)) {
 		lplvid = (LPLV_ITEMDATA)lvi.lParam;
 		if (SUCCEEDED(lplvid->lpsf->lpVtbl->GetUIObjectOf(lplvid->lpsf, GetParent(hwnd), 1, (LPCITEMIDLIST *)(&lplvid->pidl), &IID_IDataObject, NULL, (void **)(&lpdo)))) {
-			lpds = CreateDropSource();
+			lpds = (LPDROPSOURCE)CreateDropSource();
 
 			DoDragDrop(lpdo, lpds, DROPEFFECT_COPY | DROPEFFECT_MOVE | DROPEFFECT_LINK, &dwEffect);
 

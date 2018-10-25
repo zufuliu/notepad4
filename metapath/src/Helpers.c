@@ -925,7 +925,7 @@ void PathCanonicalizeEx(LPWSTR lpSrc) {
 //  This Expansion also searches the L"Favorites" folder
 //
 extern WCHAR tchFavoritesDir[MAX_PATH];
-extern WCHAR szCurDir[MAX_PATH];
+extern WCHAR szCurDir[MAX_PATH + 40];
 
 DWORD SearchPathEx(LPCWSTR lpPath, LPCWSTR lpFileName, LPCWSTR lpExtension, DWORD nBufferLength, LPWSTR lpBuffer, LPWSTR *lpFilePart) {
 	DWORD dwRetVal = 0;
