@@ -9,6 +9,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <cmath>
+#include <climits>
 
 #include <stdexcept>
 #include <string>
@@ -682,7 +683,6 @@ PositionCacheEntry::PositionCacheEntry(const PositionCacheEntry &other) :
 
 void PositionCacheEntry::Set(unsigned int styleNumber_, const char *s_,
 	unsigned int len_, const XYPOSITION *positions_, unsigned int clock_) {
-	Clear();
 	styleNumber = styleNumber_;
 	len = len_;
 	clock = clock_;
@@ -692,6 +692,8 @@ void PositionCacheEntry::Set(unsigned int styleNumber_, const char *s_,
 			positions[i] = positions_[i];
 		}
 		memcpy(&positions[len], s_, len);
+	} else {
+		positions.reset();
 	}
 }
 
@@ -762,9 +764,28 @@ void PositionCache::Clear() noexcept {
 	allClear = true;
 }
 
+static inline size_t NextPowerOfTwo(size_t x) {
+	x--;
+	x |= x >> 1;
+	x |= x >> 2;
+	x |= x >> 4;
+	x |= x >> 8;
+	x |= x >> 16;
+#if SIZE_MAX > UINT_MAX
+	x |= x >> 32;
+#endif
+	x++;
+	return x;
+}
+
 void PositionCache::SetSize(size_t size_) {
 	Clear();
-	pces.resize(size_);
+	if (size_ != pces.size()) {
+		if (size_ & (size_ - 1)) {
+			size_ = NextPowerOfTwo(size_);
+		}
+		pces.resize(size_);
+	}
 }
 
 void PositionCache::MeasureWidths(Surface *surface, const ViewStyle &vstyle, unsigned int styleNumber,
@@ -772,17 +793,18 @@ void PositionCache::MeasureWidths(Surface *surface, const ViewStyle &vstyle, uns
 
 	allClear = false;
 	size_t probe = pces.size();	// Out of bounds
-	if ((!pces.empty()) && (len < 30)) {
+	if ((len < 30)) {
 		// Only store short strings in the cache so it doesn't churn with
 		// long comments with only a single comment.
+		const size_t mask = probe - 1;
 
 		// Two way associative: try two probe positions.
 		const unsigned int hashValue = PositionCacheEntry::Hash(styleNumber, s, len);
-		probe = hashValue % pces.size();
+		probe = hashValue & mask;
 		if (pces[probe].Retrieve(styleNumber, s, len, positions)) {
 			return;
 		}
-		const unsigned int probe2 = (hashValue * 37) % pces.size();
+		const unsigned int probe2 = (hashValue * 37) & mask;
 		if (pces[probe2].Retrieve(styleNumber, s, len, positions)) {
 			return;
 		}
