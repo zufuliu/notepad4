@@ -66,8 +66,7 @@ enum {
 };
 int UTF8ClassifyMulti(const unsigned char *us, size_t len) noexcept;
 inline int UTF8Classify(const unsigned char *us, size_t len) noexcept {
-	if (us[0] < 0x80) {
-		// ASCII
+	if (UTF8IsAscii(us[0])) {
 		return 1;
 	}
 	return UTF8ClassifyMulti(us, len);
@@ -78,7 +77,14 @@ inline int UTF8Classify(std::string_view sv) noexcept {
 
 // Similar to UTF8Classify but returns a length of 1 for invalid bytes
 // instead of setting the invalid flag
-int UTF8DrawBytes(const unsigned char *us, int len) noexcept;
+inline int UTF8DrawBytes(const unsigned char *us, int len) noexcept {
+	if (UTF8IsAscii(us[0])) {
+		return 1;
+	}
+
+	const int utf8StatusNext = UTF8ClassifyMulti(us, len);
+	return (utf8StatusNext & UTF8MaskInvalid) ? 1 : (utf8StatusNext & UTF8MaskWidth);
+}
 
 // Line separator is U+2028 \xe2\x80\xa8
 // Paragraph separator is U+2029 \xe2\x80\xa9

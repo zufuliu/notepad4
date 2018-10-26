@@ -393,11 +393,6 @@ int UTF8ClassifyMulti(const unsigned char *us, size_t len) noexcept {
 	return UTF8MaskInvalid | 1;
 }
 
-int UTF8DrawBytes(const unsigned char *us, int len) noexcept {
-	const int utf8StatusNext = UTF8Classify(us, len);
-	return (utf8StatusNext & UTF8MaskInvalid) ? 1 : (utf8StatusNext & UTF8MaskWidth);
-}
-
 bool UTF8IsValid(std::string_view sv) noexcept {
 	const unsigned char *us = reinterpret_cast<const unsigned char *>(sv.data());
 	size_t remaining = sv.length();
