@@ -1669,11 +1669,11 @@ CharClassify::cc Document::WordCharacterClass(unsigned int ch) const noexcept {
 				return CharClassify::ccPunctuation;
 
 			case ccCJK:
-				return CharClassify::ccCJK;
+				return CharClassify::ccCJKWord;
 			}
 		} else {
 			// Asian DBCS
-			return CharClassify::ccCJK;
+			return CharClassify::ccCJKWord;
 		}
 	}
 	return charClass.GetClass(static_cast<unsigned char>(ch));
@@ -1815,7 +1815,7 @@ bool Document::IsWordStartAt(Sci::Position pos) const noexcept {
 		const CharClassify::cc ccPos = WordCharacterClass(cePos.character);
 		const CharacterExtracted cePrev = CharacterBefore(pos);
 		const CharClassify::cc ccPrev = WordCharacterClass(cePrev.character);
-		return (ccPos == CharClassify::ccWord || ccPos == CharClassify::ccPunctuation || ccPos == CharClassify::ccCJK) &&
+		return (ccPos == CharClassify::ccWord || ccPos == CharClassify::ccPunctuation || ccPos == CharClassify::ccCJKWord) &&
 			(ccPos != ccPrev);
 	}
 	return true;
@@ -1833,7 +1833,7 @@ bool Document::IsWordEndAt(Sci::Position pos) const noexcept {
 		const CharClassify::cc ccPos = WordCharacterClass(cePos.character);
 		const CharacterExtracted cePrev = CharacterBefore(pos);
 		const CharClassify::cc ccPrev = WordCharacterClass(cePrev.character);
-		return (ccPrev == CharClassify::ccWord || ccPrev == CharClassify::ccPunctuation || ccPrev == CharClassify::ccCJK) &&
+		return (ccPrev == CharClassify::ccWord || ccPrev == CharClassify::ccPunctuation || ccPrev == CharClassify::ccCJKWord) &&
 			(ccPrev != ccPos);
 	}
 	return true;
@@ -2374,7 +2374,7 @@ static bool IsASCIIPunctuationCharacter(unsigned int ch) noexcept {
 
 bool Document::IsWordPartSeparator(unsigned int ch) const noexcept {
 	const CharClassify::cc cc = WordCharacterClass(ch);
-	return (cc == CharClassify::ccWord || cc == CharClassify::ccCJK) && IsASCIIPunctuationCharacter(ch);
+	return (cc == CharClassify::ccWord || cc == CharClassify::ccCJKWord) && IsASCIIPunctuationCharacter(ch);
 }
 
 Sci::Position Document::WordPartLeft(Sci::Position pos) const noexcept {
