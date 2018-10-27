@@ -33,10 +33,10 @@ NP2_inline void InitScintillaHandle(HWND hwnd) {
 //  SciCall()
 //
 //
-LRESULT WINAPI Scintilla_DirectFunction(HANDLE, UINT, WPARAM, LPARAM);
+LRESULT WINAPI Scintilla_DirectFunction(HANDLE handle, UINT msg, WPARAM wParam, LPARAM lParam);
 #define SciCall0(m)			Scintilla_DirectFunction(g_hScintilla, (m), 0, 0)
-#define SciCall1(m, w)		Scintilla_DirectFunction(g_hScintilla, (m), (WPARAM)(w), 0)
-#define SciCall2(m, w, l)	Scintilla_DirectFunction(g_hScintilla, (m), (WPARAM)(w), (LPARAM)(l))
+#define SciCall1(m, w)		Scintilla_DirectFunction(g_hScintilla, (m), (w), 0)
+#define SciCall2(m, w, l)	Scintilla_DirectFunction(g_hScintilla, (m), (w), (l))
 
 //=============================================================================
 //
@@ -92,7 +92,7 @@ NP2_inline Sci_Position SciCall_GetLineEndPosition(int line) {
 }
 
 NP2_inline int SciCall_GetLine(int line, char *buffer) {
-	return (int)SciCall2(SCI_GETLINE, line, buffer);
+	return (int)SciCall2(SCI_GETLINE, line, (LPARAM)buffer);
 }
 
 NP2_inline int SciCall_GetSelTextLength(void) {
@@ -100,7 +100,7 @@ NP2_inline int SciCall_GetSelTextLength(void) {
 }
 
 NP2_inline int SciCall_GetSelText(char *buffer) {
-	return (int)SciCall2(SCI_GETSELTEXT, 0, buffer);
+	return (int)SciCall2(SCI_GETSELTEXT, 0, (LPARAM)buffer);
 }
 
 NP2_inline int SciCall_CountCharacters(Sci_Position start, Sci_Position end) {
@@ -124,11 +124,11 @@ NP2_inline BOOL EditIsEmptySelection(void) {
 }
 
 NP2_inline Sci_Position SciCall_FindText(int searchFlags, struct Sci_TextToFind *ft) {
-	return (Sci_Position)SciCall2(SCI_FINDTEXT, searchFlags, ft);
+	return (Sci_Position)SciCall2(SCI_FINDTEXT, searchFlags, (LPARAM)ft);
 }
 
 NP2_inline int SciCall_GetTextRange(struct Sci_TextRange *tr) {
-	return (int)SciCall2(SCI_GETTEXTRANGE, 0, tr);
+	return (int)SciCall2(SCI_GETTEXTRANGE, 0, (LPARAM)tr);
 }
 
 //=============================================================================
@@ -183,7 +183,7 @@ NP2_inline int SciCall_GetMarginWidth(int margin) {
 }
 
 NP2_inline int SciCall_TextWidth(int style, const char *text) {
-	return (int)SciCall2(SCI_TEXTWIDTH, style, text);
+	return (int)SciCall2(SCI_TEXTWIDTH, style, (LPARAM)text);
 }
 
 NP2_inline void SciCall_SetMarginMask(int margin, int mask) {
@@ -266,7 +266,7 @@ NP2_inline void SciCall_EnsureVisible(int line) {
 //
 //
 NP2_inline void SciCall_SetProperty(const char *key, const char *value) {
-	SciCall2(SCI_SETPROPERTY, key, value);
+	SciCall2(SCI_SETPROPERTY, (WPARAM)key, (LPARAM)value);
 }
 
 #endif // NOTEPAD2_SCICALL_H_

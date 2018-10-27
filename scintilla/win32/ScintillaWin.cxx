@@ -132,8 +132,8 @@ Used by VSCode, Atom etc.
 #define SC_WIN_IDLE 5001
 
 #define SC_INDICATOR_INPUT INDIC_IME
-#define SC_INDICATOR_TARGET INDIC_IME+1
-#define SC_INDICATOR_CONVERTED INDIC_IME+2
+#define SC_INDICATOR_TARGET (INDIC_IME + 1)
+#define SC_INDICATOR_CONVERTED (INDIC_IME + 2)
 #define SC_INDICATOR_UNKNOWN INDIC_IME_MAX
 
 #ifndef SCS_CAP_SETRECONVERTSTRING
@@ -743,14 +743,14 @@ int ScintillaWin::MouseModifiers(uptr_t wParam) noexcept {
 namespace {
 
 int InputCodePage() noexcept {
-	HKL const inputLocale = ::GetKeyboardLayout(0);
+	HKL inputLocale = ::GetKeyboardLayout(0);
 	const LANGID inputLang = LOWORD(inputLocale);
 	WCHAR sCodePage[10];
 	const int res = ::GetLocaleInfo(MAKELCID(inputLang, SORT_DEFAULT),
 		LOCALE_IDEFAULTANSICODEPAGE, sCodePage, sizeof(sCodePage) / sizeof(WCHAR));
 	if (!res)
 		return 0;
-	return StrToInt(sCodePage);
+	return static_cast<int>(wcstol(sCodePage, nullptr, 10));
 }
 
 /** Map the key codes to their equivalent SCK_ form. */
@@ -1659,7 +1659,7 @@ sptr_t ScintillaWin::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam
 		case WM_KILLFOCUS: {
 			HWND wOther = reinterpret_cast<HWND>(wParam);
 			HWND wThis = MainHWND();
-			HWND const wCT = static_cast<HWND>(ct.wCallTip.GetID());
+			HWND wCT = static_cast<HWND>(ct.wCallTip.GetID());
 			if (!wParam ||
 				!(::IsChild(wThis, wOther) || (wOther == wCT))) {
 				SetFocusState(false);

@@ -100,6 +100,8 @@ class Face:
 					elif featureType == "val":
 						try:
 							name, value = featureVal.split("=", 1)
+							if value[0] == '-':
+								value = '(' + value + ')'
 						except ValueError:
 							print("Failure %s" % featureVal)
 							raise Exception()
