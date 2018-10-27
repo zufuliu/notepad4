@@ -194,7 +194,7 @@ static void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int in
 			break;
 		case SCE_SH_WORD:
 			// "." never used in Bash variable names but used in file names
-			if (!setWord.Contains(sc.ch)) {
+			if (!setWord.Contains(sc.ch) || (sc.ch == '+' && sc.chNext == '=')) {
 				char s[512];
 				char s2[10];
 				sc.GetCurrent(s, sizeof(s));
@@ -249,10 +249,13 @@ static void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int in
 				// m4
 				if (strcmp(s, "dnl") == 0) {
 					sc.ChangeState(SCE_SH_COMMENTLINE);
-					if (sc.atLineEnd)
+					if (sc.atLineEnd) {
 						sc.SetState(SCE_SH_DEFAULT);
-				} else
-					sc.SetState(SCE_SH_DEFAULT);
+					}
+				} else {
+					const int nextState = (sc.ch == '+' && sc.chNext == '=') ? SCE_SH_OPERATOR : SCE_SH_DEFAULT;
+					sc.SetState(nextState);
+				}
 			}
 			break;
 		case SCE_SH_IDENTIFIER:
