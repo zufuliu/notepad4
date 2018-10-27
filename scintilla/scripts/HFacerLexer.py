@@ -12,17 +12,17 @@ from FileGenerator import UpdateFile, Generate, Regenerate, UpdateLineInFile, li
 
 def printLexHFile(f):
 	out = []
-	lex = []
+	lex = set()
 	for name in f.order:
 		v = f.features[name]
 		if v["FeatureType"] in ["val"]:
 			if "SCE_" in name or "SCLEX_" in name:
-				val = int(v["Value"])
+				val = int(v["Value"].strip('()'))
 				if "SCLEX_" in name:
 					if val in lex:
 						raise Exception("Duplicate Lexer Value: %s = %d" % (name, val))
 					else:
-						lex.append(val)
+						lex.add(val)
 				else:
 					if val > 31 and val < 40:
 						raise Exception("Invalid Style Value: %s = %d" % (name, val))

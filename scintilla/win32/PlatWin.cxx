@@ -70,8 +70,7 @@ IDWriteRenderingParams *customClearTypeRenderingParams = nullptr;
 static HMODULE hDLLD2D {};
 static HMODULE hDLLDWrite {};
 
-extern "C" UINT16 g_uWinVer;
-#define IsWin8AndAbove()	(g_uWinVer >= 0x0602)
+extern "C" DWORD kSystemLibraryLoadFlags;
 
 bool LoadD2D() noexcept {
 	static bool triedLoadingD2D = false;
@@ -79,14 +78,13 @@ bool LoadD2D() noexcept {
 		// Availability of SetDefaultDllDirectories implies Windows 8+ or
 		// that KB2533623 has been installed so LoadLibraryEx can be called
 		// with LOAD_LIBRARY_SEARCH_SYSTEM32.
-		const DWORD loadLibraryFlags = (IsWin8AndAbove() || ::GetProcAddress(::GetModuleHandle(TEXT("kernel32.dll")), "SetDefaultDllDirectories")) ? LOAD_LIBRARY_SEARCH_SYSTEM32 : 0;
 
 		typedef HRESULT(WINAPI *D2D1CFSig)(D2D1_FACTORY_TYPE factoryType, REFIID riid,
 			CONST D2D1_FACTORY_OPTIONS *pFactoryOptions, IUnknown **factory);
 		typedef HRESULT(WINAPI *DWriteCFSig)(DWRITE_FACTORY_TYPE factoryType, REFIID iid,
 			IUnknown **factory);
 
-		hDLLD2D = ::LoadLibraryEx(TEXT("D2D1.DLL"), nullptr, loadLibraryFlags);
+		hDLLD2D = ::LoadLibraryEx(TEXT("D2D1.DLL"), nullptr, kSystemLibraryLoadFlags);
 		if (hDLLD2D) {
 			D2D1CFSig fnD2DCF = reinterpret_cast<D2D1CFSig>(::GetProcAddress(hDLLD2D, "D2D1CreateFactory"));
 			if (fnD2DCF) {
@@ -97,7 +95,7 @@ bool LoadD2D() noexcept {
 					reinterpret_cast<IUnknown**>(&pD2DFactory));
 			}
 		}
-		hDLLDWrite = ::LoadLibraryEx(TEXT("DWRITE.DLL"), nullptr, loadLibraryFlags);
+		hDLLDWrite = ::LoadLibraryEx(TEXT("DWRITE.DLL"), nullptr, kSystemLibraryLoadFlags);
 		if (hDLLDWrite) {
 			DWriteCFSig fnDWCF = reinterpret_cast<DWriteCFSig>(::GetProcAddress(hDLLDWrite, "DWriteCreateFactory"));
 			if (fnDWCF) {
