@@ -52,7 +52,6 @@
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <CharacterSet>Unicode</CharacterSet>
-    <WholeProgramOptimization>true</WholeProgramOptimization>
     <PlatformToolset>LLVM v141_xp</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
@@ -66,7 +65,6 @@
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <CharacterSet>Unicode</CharacterSet>
-    <WholeProgramOptimization>true</WholeProgramOptimization>
     <PlatformToolset>LLVM v141</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -196,7 +194,6 @@
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <AdditionalOptions>/source-charset:utf-8 -Wextra -Wshadow -Wimplicit-fallthrough -Wcomma %(AdditionalOptions)</AdditionalOptions>
       <DiagnosticsFormat>Caret</DiagnosticsFormat>
-      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <AdditionalDependencies>comctl32.lib;shlwapi.lib;imm32.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -247,7 +244,6 @@
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <AdditionalOptions>/source-charset:utf-8 -Wextra -Wshadow -Wimplicit-fallthrough -Wcomma %(AdditionalOptions)</AdditionalOptions>
       <DiagnosticsFormat>Caret</DiagnosticsFormat>
-      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <AdditionalDependencies>comctl32.lib;shlwapi.lib;imm32.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -315,14 +311,12 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <EnablePREfast>false</EnablePREfast>
       <OmitFramePointers>true</OmitFramePointers>
-      <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
       <ExceptionHandling>Sync</ExceptionHandling>
       <AdditionalOptions>/source-charset:utf-8 /GA -Wextra -Wshadow -Wimplicit-fallthrough -Wcomma %(AdditionalOptions)</AdditionalOptions>
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <DiagnosticsFormat>Caret</DiagnosticsFormat>
-      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <AdditionalDependencies>comctl32.lib;shlwapi.lib;imm32.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -387,7 +381,6 @@
       <FloatingPointModel>Fast</FloatingPointModel>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <OmitFramePointers>true</OmitFramePointers>
-      <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
       <StringPooling>true</StringPooling>
       <BufferSecurityCheck>false</BufferSecurityCheck>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -395,7 +388,6 @@
       <AdditionalOptions>/source-charset:utf-8 /GA -Wextra -Wshadow -Wimplicit-fallthrough -Wcomma %(AdditionalOptions)</AdditionalOptions>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <DiagnosticsFormat>Caret</DiagnosticsFormat>
-      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <AdditionalDependencies>comctl32.lib;shlwapi.lib;imm32.lib;%(AdditionalDependencies)</AdditionalDependencies>
