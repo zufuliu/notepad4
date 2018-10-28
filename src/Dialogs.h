@@ -34,6 +34,13 @@
  */
 #define APPM_CENTER_MESSAGE_BOX		(WM_APP + 1)
 
+extern BOOL bWindowLayoutRTL;
+NP2_inline void InitWindowCommon(HWND hwnd) {
+	if (bWindowLayoutRTL) {
+		SetWindowLayoutRTL(hwnd, TRUE);
+	}
+}
+
 int 	MsgBox(int iType, UINT uIdMsg, ...);
 void	DisplayCmdLineHelp(HWND hwnd);
 void	OpenHelpLink(HWND hwnd, int cmd);

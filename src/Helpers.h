@@ -88,7 +88,7 @@ NP2_inline BOOL StrToFloat(LPCWSTR str, float *value) {
 NP2_inline BOOL CRTStrToInt(LPCWSTR str, int *value) {
 	LPWSTR end;
 	*value = (int)wcstol(str, &end, 10);
-	return str != end;	
+	return str != end;
 }
 
 // str MUST NOT be NULL, can be empty
@@ -365,6 +365,7 @@ BOOL SetWindowTitle(HWND hwnd, UINT uIDAppName, BOOL bIsElevated, UINT uIDUntitl
 					LPCWSTR lpszFile, int iFormat, BOOL bModified,
 					UINT uIDReadOnly, BOOL bReadOnly, LPCWSTR lpszExcerpt);
 void SetWindowTransparentMode(HWND hwnd, BOOL bTransparentMode);
+void SetWindowLayoutRTL(HWND hwnd, BOOL bRTL);
 
 void CenterDlgInParentEx(HWND hDlg, HWND hParent);
 NP2_inline void CenterDlgInParent(HWND hDlg) {

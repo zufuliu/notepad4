@@ -97,6 +97,7 @@
 #define IDC_ESCEXIT                     109
 #define IDD_FINDWIN                     109
 #define IDC_DDEAPP                      109
+#define IDC_RTL_LAYOUT					109
 #define IDC_NEW_PAGE_TEXT				109
 #define IDC_NEW_PAGE_LINK				110
 #define IDPP_GENERAL                    110

@@ -320,8 +320,7 @@ STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION |
 CAPTION "New Directory"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
-    LTEXT           "Enter the name for the new directory:",IDC_STATIC,7,7,
-                    158,8
+    LTEXT           "Enter the name for the new directory:",IDC_STATIC,7,7,158,8
     EDITTEXT        IDC_NEWDIR,7,22,158,13,ES_AUTOHSCROLL
     DEFPUSHBUTTON   "OK",IDOK,59,45,50,14,WS_DISABLED
     PUSHBUTTON      "Cancel",IDCANCEL,115,45,50,14
@@ -342,10 +341,8 @@ BEGIN
     PUSHBUTTON      "",IDC_BROWSEDESTINATION,210,48,13,13
     CONTROL         "<a>Clear Recent History</a>",IDC_EMPTY_MRU,"SysLink",WS_TABSTOP,154,37,70,10
     LTEXT           "Action:",IDC_STATIC,7,72,24,8
-    CONTROL         "&Copy",IDC_FUNCCOPY,"Button",BS_AUTORADIOBUTTON |
-                    WS_TABSTOP,35,71,33,10
-    CONTROL         "&Move",IDC_FUNCMOVE,"Button",BS_AUTORADIOBUTTON,68,71,
-                    33,10
+    CONTROL         "&Copy",IDC_FUNCCOPY,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,35,71,33,10
+    CONTROL         "&Move",IDC_FUNCMOVE,"Button",BS_AUTORADIOBUTTON,68,71,33,10
     DEFPUSHBUTTON   "OK",IDOK,117,74,50,14,WS_DISABLED
     PUSHBUTTON      "Cancel",IDCANCEL,173,74,50,14
     SCROLLBAR       IDC_RESIZEGRIP2,7,78,10,10
@@ -360,25 +357,23 @@ BEGIN
     ICON            IDI_OPTIONS,IDC_STATIC,10,10,20,20
     LTEXT           "Specify general program settings for metapath.",
                     IDC_STATIC,40,15,200,8
+    CONTROL         "Use &RTL Layout.",
+                    IDC_RTL_LAYOUT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,34,190,10
     CONTROL         "&Allow only single mouse-click to open objects.",
-                    IDC_SINGLECLICK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,
-                    46,190,10
+                    IDC_SINGLECLICK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,46,190,10
     CONTROL         "&Enable track selection.",IDC_TRACKSELECT,"Button",
                     BS_AUTOCHECKBOX | WS_TABSTOP,10,58,100,10
     CONTROL         "Enable &full row selection.",IDC_FULLROWSELECT,"Button",
                     BS_AUTOCHECKBOX | WS_TABSTOP,10,70,120,10
     CONTROL         "Always a&ctivate target window when a file is opened.",
-                    IDC_FOCUSEDIT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,
-                    82,220,10
+                    IDC_FOCUSEDIT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,82,220,10
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,10,100,205,1
     CONTROL         "&Keep metapath window always on top.",IDC_ALWAYSONTOP,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,109,150,10
     CONTROL         "&Minimize to system tray (click to reactivate).",
-                    IDC_MINIMIZETOTRAY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
-                    10,121,200,10
+                    IDC_MINIMIZETOTRAY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,121,200,10
     CONTROL         "&Try to reuse existing window when metapath is started.",
-                    IDC_REUSEWINDOW,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,
-                    133,220,10
+                    IDC_REUSEWINDOW,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,133,220,10
     CONTROL			"<a>Clear window position history</a>",IDC_CLEARWINPOS,"SysLink",WS_TABSTOP,20,145,103,12
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,10,161,205,1
     CONTROL         "&Save settings on exit.",IDC_SAVESETTINGS,"Button",
@@ -402,17 +397,13 @@ BEGIN
                     BS_AUTORADIOBUTTON,114,58,90,10
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,10,76,205,1
     CONTROL         "&Clear read-only attribute of saved files.",
-                    IDC_CLEARREADONLY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
-                    10,85,172,10
+                    IDC_CLEARREADONLY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,85,172,10
     CONTROL         "Rename copied files on &name collisions.",
-                    IDC_RENAMEONCOLLISION,"Button",BS_AUTOCHECKBOX |
-                    WS_TABSTOP,10,97,164,10
+                    IDC_RENAMEONCOLLISION,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,97,164,10
     CONTROL         "&Move deleted files to the recycle bin.",
-                    IDC_USERECYCLEBIN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
-                    10,109,160,10
+                    IDC_USERECYCLEBIN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,109,160,10
     CONTROL         "&Don't confirm file delete (not recommended).",
-                    IDC_NOCONFIRMDELETE,"Button",BS_AUTOCHECKBOX |
-                    WS_TABSTOP,10,121,184,10
+                    IDC_NOCONFIRMDELETE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,121,184,10
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,10,139,205,1
     CONTROL         "Enable ""&Esc"" key to...",IDC_ESCFUNCTION,"Button",
                     BS_AUTOCHECKBOX | WS_GROUP | WS_TABSTOP,10,148,104,10
@@ -429,25 +420,21 @@ CAPTION "Items"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
     ICON            IDI_ITEMS,IDC_STATIC,10,10,21,20
-    LTEXT           "Appearance of items in directory list.",IDC_STATIC,40,
-                    15,160,8
+    LTEXT           "Appearance of items in directory list.",IDC_STATIC,40,15,160,8
     GROUPBOX        "Colors",IDC_STATIC,10,41,205,134
-    LTEXT           "Use this text color when NO FILTER is SET:",IDC_STATIC,
-                    20,54,170,8
+    LTEXT           "Use this text color when NO FILTER is SET:",IDC_STATIC,20,54,170,8
     CONTROL         "Default &windows color.",IDC_COLOR_DEF1,"Button",
                     BS_AUTORADIOBUTTON | WS_TABSTOP,20,68,96,10
     CONTROL         "Custom &color:",IDC_COLOR_CUST1,"Button",
                     BS_AUTORADIOBUTTON,20,82,60,10
     EDITTEXT        IDC_COLOR_SAMP1,85,80,30,14,ES_AUTOHSCROLL | WS_DISABLED
     PUSHBUTTON      "Pick Color...",IDC_COLOR_PICK1,120,80,60,14
-    LTEXT           "Use this text color when a FILTER is ACTIVE:",
-                    IDC_STATIC,20,105,180,8
+    LTEXT           "Use this text color when a FILTER is ACTIVE:",IDC_STATIC,20,105,180,8
     CONTROL         "D&efault windows color.",IDC_COLOR_DEF2,"Button",
                     BS_AUTORADIOBUTTON | WS_TABSTOP,20,120,95,10
     CONTROL         "C&ustom color:",IDC_COLOR_CUST2,"Button",
                     BS_AUTORADIOBUTTON,20,133,60,10
-    EDITTEXT        IDC_COLOR_SAMP2,86,130,30,14,ES_AUTOHSCROLL |
-                    WS_DISABLED
+    EDITTEXT        IDC_COLOR_SAMP2,86,130,30,14,ES_AUTOHSCROLL | WS_DISABLED
     PUSHBUTTON      "Pick Color...",IDC_COLOR_PICK2,120,130,60,14
 END
 
@@ -458,10 +445,8 @@ CAPTION "Locations"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
     ICON            IDI_PROGS,IDC_STATIC,10,10,20,20
-    LTEXT           "Specify external programs and paths.",IDC_STATIC,40,15,
-                    180,8
-    LTEXT           "&Default ""Quick View"" program (Ctrl+Q):",IDC_STATIC,
-                    10,41,180,8
+    LTEXT           "Specify external programs and paths.",IDC_STATIC,40,15,180,8
+    LTEXT           "&Default ""Quick View"" program (Ctrl+Q):",IDC_STATIC,10,41,180,8
     EDITTEXT        IDC_QUICKVIEW,10,52,191,13,ES_AUTOHSCROLL
     PUSHBUTTON      "",IDC_BROWSE_Q,203,52,13,13,BS_BITMAP
     LTEXT           "&Favorites Folder (F11):",IDC_STATIC,10,76,120,8
@@ -476,8 +461,7 @@ CAPTION "Target Application"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     CONTROL         "Don't use any specific target application, simply launch the selected file.",
-                    IDC_LAUNCH,"Button",BS_AUTORADIOBUTTON | WS_GROUP |
-                    WS_TABSTOP,7,7,260,10
+                    IDC_LAUNCH,"Button",BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,7,7,260,10
     CONTROL         "Use the following target application:",IDC_TARGET,
                     "Button",BS_AUTORADIOBUTTON | WS_TABSTOP,7,21,160,10
     LTEXT           "Specify the action if the target applicatoin is already running:",
@@ -486,11 +470,9 @@ BEGIN
     PUSHBUTTON      "",IDC_BROWSE,250,35,15,14,BS_BITMAP
     LTEXT           "Message:",IDC_STATIC,20,120,32,8
     CONTROL         "None, run target application each time a file is opened.",
-                    IDC_ALWAYSRUN,"Button",BS_AUTORADIOBUTTON | WS_GROUP |
-                    WS_TABSTOP,7,78,240,10
+                    IDC_ALWAYSRUN,"Button",BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,7,78,240,10
     CONTROL         "Send a file open message to target application window:",
-                    IDC_SENDDROPMSG,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,
-                    7,92,194,10
+                    IDC_SENDDROPMSG,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,7,92,194,10
     CONTROL         "Execute the following DDE command:",IDC_USEDDE,"Button",
                     BS_AUTORADIOBUTTON | WS_TABSTOP,7,106,160,10
     LTEXT           "Application:",IDC_STATIC,128,120,46,8

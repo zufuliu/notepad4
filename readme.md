@@ -162,7 +162,7 @@
 * Support [adding Notepad2 to Windows explorer context menu](https://github.com/zufuliu/notepad2/wiki/Open-with-Notepad2)
 * Per-Monitor DPI-Aware, improved high DPI display
 * Support rendering using Direct2D DirectWrite, and switch between GDI and Direct2D
-* Support bidirectional, useful for Arabic and Hebrew
+* Experimental support for RTL layout (GDI) and bidirectional (Direct2D), useful for Arabic and Hebrew
 * Support using fractional font size
 * Support Inline IME
 * Extra support for drag and drop file from Visual Studio, Android Studio, IntelliJ IDEA, etc.
