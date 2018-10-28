@@ -40,9 +40,9 @@
 * Local Variables for metapath.c
 *
 */
-HWND      hwndStatus;
-HWND      hwndToolbar;
-HWND      hwndReBar;
+HWND	hwndStatus;
+static HWND	hwndToolbar;
+static HWND hwndReBar;
 
 #define NUMTOOLBITMAPS  15
 #define TBFILTERBMP 13
@@ -67,54 +67,52 @@ static TBBUTTON tbbMainWnd[] = {
 	{13, IDT_VIEW_FILTER, TBSTATE_ENABLED, TBSTYLE_BUTTON, {0}, 0, 0},
 };
 
-HWND      hwndDriveBox;
-HWND      hwndDirList;
+static HWND hwndDriveBox;
+HWND	hwndDirList;
+HWND	hwndMain;
 
-HWND      hwndMain;
+static HANDLE hChangeHandle = NULL;
+HISTORY	mHistory;
 
-HANDLE    hChangeHandle = NULL;
+WCHAR	szIniFile[MAX_PATH] = L"";
+WCHAR	szIniFile2[MAX_PATH] = L"";
+BOOL	bSaveSettings;
+WCHAR	szQuickview[MAX_PATH];
+WCHAR	szQuickviewParams[MAX_PATH];
+WCHAR	tchFavoritesDir[MAX_PATH];
+WCHAR	tchOpenWithDir[MAX_PATH];
+static WCHAR tchToolbarButtons[MAX_TOOLBAR_BUTTON_CONFIG_BUFFER_SIZE];
+static WCHAR tchToolbarBitmap[MAX_PATH];
+static WCHAR tchToolbarBitmapHot[MAX_PATH];
+static WCHAR tchToolbarBitmapDisabled[MAX_PATH];
+BOOL	bClearReadOnly;
+BOOL	bRenameOnCollision;
+BOOL	bSingleClick;
+BOOL	bTrackSelect;
+BOOL	bFullRowSelect;
+int		iStartupDir;
+int		iEscFunction;
+BOOL	bFocusEdit;
+BOOL	bAlwaysOnTop;
+static BOOL bTransparentMode;
+BOOL	bMinimizeToTray;
+BOOL	fUseRecycleBin;
+BOOL	fNoConfirmDelete;
+static BOOL bShowToolbar;
+static BOOL bShowStatusbar;
+static BOOL bShowDriveBox;
+int		cxGotoDlg;
+int		cxOpenWithDlg;
+int		cyOpenWithDlg;
+int		cxCopyMoveDlg;
 
-HISTORY   mHistory;
-
-WCHAR      szIniFile[MAX_PATH] = L"";
-WCHAR      szIniFile2[MAX_PATH] = L"";
-BOOL      bSaveSettings;
-WCHAR      szQuickview[MAX_PATH];
-WCHAR      szQuickviewParams[MAX_PATH];
-WCHAR      tchFavoritesDir[MAX_PATH];
-WCHAR      tchOpenWithDir[MAX_PATH];
-WCHAR      tchToolbarButtons[MAX_TOOLBAR_BUTTON_CONFIG_BUFFER_SIZE];
-WCHAR      tchToolbarBitmap[MAX_PATH];
-WCHAR      tchToolbarBitmapHot[MAX_PATH];
-WCHAR      tchToolbarBitmapDisabled[MAX_PATH];
-BOOL      bClearReadOnly;
-BOOL      bRenameOnCollision;
-BOOL      bSingleClick;
-BOOL      bTrackSelect;
-BOOL      bFullRowSelect;
-int       iStartupDir;
-int       iEscFunction;
-BOOL      bFocusEdit;
-BOOL      bAlwaysOnTop;
-BOOL      bTransparentMode;
-BOOL      bMinimizeToTray;
-BOOL      fUseRecycleBin;
-BOOL      fNoConfirmDelete;
-BOOL      bShowToolbar;
-BOOL      bShowStatusbar;
-BOOL      bShowDriveBox;
-int       cxGotoDlg;
-int       cxOpenWithDlg;
-int       cyOpenWithDlg;
-int       cxCopyMoveDlg;
-
-WCHAR      tchFilter[DL_FILTER_BUFSIZE];
-BOOL      bNegFilter;
-BOOL      bDefCrNoFilt;
-BOOL      bDefCrFilter;
-COLORREF  crNoFilt;
-COLORREF  crFilter;
-COLORREF  crCustom[16];
+WCHAR		tchFilter[DL_FILTER_BUFSIZE];
+BOOL		bNegFilter;
+BOOL		bDefColorNoFilter;
+BOOL		bDefColorFilter;
+COLORREF	colorNoFilter;
+COLORREF	colorFilter;
+COLORREF	colorCustom[16];
 
 typedef struct _wi {
 	int x;
@@ -123,35 +121,35 @@ typedef struct _wi {
 	int cy;
 } WININFO;
 
-WININFO   wi;
+static WININFO	wi;
 
-int       cyReBar;
-int       cyReBarFrame;
-int       cyDriveBoxFrame;
+static int cyReBar;
+static int cyReBarFrame;
+static int cyDriveBoxFrame;
 
-int       nIdFocus = IDC_DIRLIST;
+int		nIdFocus = IDC_DIRLIST;
 
-WCHAR      szCurDir[MAX_PATH + 40];
-WCHAR	szMRUDirectory[MAX_PATH];
-DWORD     dwFillMask;
-int       nSortFlags;
-BOOL      fSortRev;
+WCHAR	szCurDir[MAX_PATH + 40];
+static WCHAR szMRUDirectory[MAX_PATH];
+static DWORD dwFillMask;
+static int nSortFlags;
+static BOOL fSortRev;
 
-LPWSTR     lpPathArg = NULL;
-LPWSTR     lpFilterArg = NULL;
+static LPWSTR lpPathArg = NULL;
+static LPWSTR lpFilterArg = NULL;
 
-UINT      wFuncCopyMove = FO_COPY;
+static UINT wFuncCopyMove = FO_COPY;
 
-UINT      msgTaskbarCreated = 0;
+static UINT msgTaskbarCreated = 0;
 
-int iUseTargetApplication = 4;
-int iTargetApplicationMode = 0;
-WCHAR szTargetApplication[MAX_PATH] = L"";
-WCHAR szTargetApplicationParams[MAX_PATH] = L"";
-WCHAR szTargetApplicationWndClass[MAX_PATH] = L"";
-WCHAR szDDEMsg[256] = L"";
-WCHAR szDDEApp[256] = L"";
-WCHAR szDDETopic[256] = L"";
+int		iUseTargetApplication = 4;
+int		iTargetApplicationMode = 0;
+WCHAR	szTargetApplication[MAX_PATH] = L"";
+WCHAR	szTargetApplicationParams[MAX_PATH] = L"";
+WCHAR	szTargetApplicationWndClass[MAX_PATH] = L"";
+WCHAR	szDDEMsg[256] = L"";
+WCHAR	szDDEApp[256] = L"";
+WCHAR	szDDETopic[256] = L"";
 
 HINSTANCE	g_hInstance;
 HANDLE		g_hDefaultHeap;
@@ -162,16 +160,16 @@ HMODULE		hModUxTheme = NULL;
 //
 // Flags
 //
-int flagNoReuseWindow   = 0;
-BOOL bReuseWindow       = FALSE;
-int flagStartAsTrayIcon = 0;
-int flagPortableMyDocs  = 0;
-int flagGotoFavorites   = 0;
-int iAutoRefreshRate    = 0; // unit: 1/10 sec
-int flagNoFadeHidden    = 0;
-int iOpacityLevel       = 75;
-int flagToolbarLook     = 0;
-int flagPosParam        = 0;
+static int	flagNoReuseWindow	= 0;
+BOOL		bReuseWindow		= FALSE;
+static int	flagStartAsTrayIcon	= 0;
+int			flagPortableMyDocs	= 0;
+int			flagGotoFavorites	= 0;
+static int	iAutoRefreshRate	= 0; // unit: 1/10 sec
+int			flagNoFadeHidden	= 0;
+int			iOpacityLevel		= 75;
+static int	flagToolbarLook		= 0;
+static int	flagPosParam		= 0;
 
 //=============================================================================
 //
@@ -191,11 +189,6 @@ static void CleanUpResources(BOOL initialized) {
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nShowCmd) {
 	UNREFERENCED_PARAMETER(hPrevInstance);
 	UNREFERENCED_PARAMETER(lpCmdLine);
-
-	MSG    msg;
-	HWND   hwnd;
-	HACCEL hAcc;
-	INITCOMMONCONTROLSEX icex;
 
 	// Set global variable g_hInstance
 	g_hInstance = hInstance;
@@ -220,6 +213,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 	// Init OLE and Common Controls
 	OleInitialize(NULL);
 
+	INITCOMMONCONTROLSEX icex;
 	icex.dwSize = sizeof(INITCOMMONCONTROLSEX);
 	icex.dwICC  = ICC_WIN95_CLASSES | ICC_COOL_CLASSES | ICC_BAR_CLASSES | ICC_USEREX_CLASSES;
 	InitCommonControlsEx(&icex);
@@ -229,20 +223,22 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 	// Load Settings
 	LoadSettings();
 
-	const DWORD loadLibraryFlags = (IsWin8AndAbove() || GetProcAddress(GetModuleHandle(TEXT("kernel32.dll")), "SetDefaultDllDirectories")) ? LOAD_LIBRARY_SEARCH_SYSTEM32 : 0;
-	hModUxTheme = LoadLibraryEx(L"uxtheme.dll", NULL, loadLibraryFlags);
+	const DWORD kSystemLibraryLoadFlags = (IsWin8AndAbove() || GetProcAddress(GetModuleHandle(TEXT("kernel32.dll")), "SetDefaultDllDirectories")) ? LOAD_LIBRARY_SEARCH_SYSTEM32 : 0;
+	hModUxTheme = LoadLibraryEx(L"uxtheme.dll", NULL, kSystemLibraryLoadFlags);
 
 	if (!InitApplication(hInstance)) {
 		CleanUpResources(FALSE);
 		return FALSE;
 	}
 
+	HWND hwnd;
 	if ((hwnd = InitInstance(hInstance, nShowCmd)) == NULL) {
 		CleanUpResources(TRUE);
 		return FALSE;
 	}
 
-	hAcc = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDR_MAINWND));
+	HACCEL hAcc = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDR_MAINWND));
+	MSG msg;
 
 	while (GetMessage(&msg, NULL, 0, 0)) {
 		if (!TranslateAccelerator(hwnd, hAcc, &msg)) {
@@ -262,7 +258,6 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 //
 BOOL InitApplication(HINSTANCE hInstance) {
 	WNDCLASS wc;
-
 	wc.style         = CS_BYTEALIGNWINDOW;
 	wc.lpfnWndProc   = (WNDPROC)MainWndProc;
 	wc.cbClsExtra    = 0;
@@ -284,10 +279,9 @@ BOOL InitApplication(HINSTANCE hInstance) {
 //
 HWND InitInstance(HINSTANCE hInstance, int nCmdShow) {
 	RECT rc = { wi.x, wi.y, wi.x + wi.cx, wi.y + wi.cy };
-	RECT rc2;
-	MONITORINFO mi;
 
 	HMONITOR hMonitor = MonitorFromRect(&rc, MONITOR_DEFAULTTONEAREST);
+	MONITORINFO mi;
 	mi.cbSize = sizeof(mi);
 	GetMonitorInfo(hMonitor, &mi);
 
@@ -328,6 +322,7 @@ HWND InitInstance(HINSTANCE hInstance, int nCmdShow) {
 		}
 
 		SetRect(&rc, wi.x, wi.y, wi.x + wi.cx, wi.y + wi.cy);
+		RECT rc2;
 		if (!IntersectRect(&rc2, &rc, &mi.rcWork)) {
 			wi.y = mi.rcWork.top + 16;
 			wi.cy = mi.rcWork.bottom - mi.rcWork.top - 32;
@@ -416,13 +411,12 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 	case WM_DESTROY:
 	case WM_ENDSESSION:
 		if (!bShutdownOK) {
-			WINDOWPLACEMENT wndpl;
-
 			// Terminate directory watching
 			KillTimer(hwnd, ID_TIMER);
 			FindCloseChangeNotification(hChangeHandle);
 
 			// GetWindowPlacement
+			WINDOWPLACEMENT wndpl;
 			wndpl.length = sizeof(WINDOWPLACEMENT);
 			GetWindowPlacement(hwnd, &wndpl);
 
@@ -452,13 +446,13 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 
 	// update colors of DirList manually
 	case WM_SYSCOLORCHANGE: {
-		LRESULT lret = DefWindowProc(hwnd, umsg, wParam, lParam);
+		const LRESULT lret = DefWindowProc(hwnd, umsg, wParam, lParam);
 
 		if (!StrEqual(tchFilter, L"*.*") || bNegFilter) {
-			ListView_SetTextColor(hwndDirList, (bDefCrFilter) ? GetSysColor(COLOR_WINDOWTEXT) : crFilter);
+			ListView_SetTextColor(hwndDirList, (bDefColorFilter) ? GetSysColor(COLOR_WINDOWTEXT) : colorFilter);
 			ListView_RedrawItems(hwndDirList, 0, ListView_GetItemCount(hwndDirList) - 1);
 		} else {
-			ListView_SetTextColor(hwndDirList, (bDefCrNoFilt) ? GetSysColor(COLOR_WINDOWTEXT) : crNoFilt);
+			ListView_SetTextColor(hwndDirList, (bDefColorNoFilter) ? GetSysColor(COLOR_WINDOWTEXT) : colorNoFilter);
 			ListView_RedrawItems(hwndDirList, 0, ListView_GetItemCount(hwndDirList) - 1);
 		}
 		return lret;
@@ -471,7 +465,6 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 	case WM_NCMBUTTONDOWN:
 	case WM_NCRBUTTONUP:
 	case WM_NCMBUTTONUP: {
-		MSG  msg;
 		HWND hwndTT = (HWND)SendMessage(hwndToolbar, TB_GETTOOLTIPS, 0, 0);
 
 		if (wParam != HTCAPTION) {
@@ -479,6 +472,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 			return DefWindowProc(hwnd, umsg, wParam, lParam);
 		}
 
+		MSG msg;
 		msg.hwnd = hwnd;
 		msg.message = umsg;
 		msg.wParam = wParam;
@@ -553,20 +547,16 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 	return TRUE;
 
 	case WM_CONTEXTMENU: {
-		HMENU hmenu;
-		int   imenu = 0;
-		POINT pt;
-		int   nID = GetDlgCtrlID((HWND)wParam);
+		const int nID = GetDlgCtrlID((HWND)wParam);
 
-		if (nID != IDC_DIRLIST && nID != IDC_DRIVEBOX &&
-				nID != IDC_TOOLBAR && nID != IDC_STATUSBAR &&
-				nID != IDC_REBAR) {
+		if (!(nID == IDC_DIRLIST || nID == IDC_DRIVEBOX || nID == IDC_TOOLBAR || nID == IDC_STATUSBAR || nID == IDC_REBAR)) {
 			return DefWindowProc(hwnd, umsg, wParam, lParam);
 		}
 
-		hmenu = LoadMenu(g_hInstance, MAKEINTRESOURCE(IDR_MAINWND));
+		HMENU hmenu = LoadMenu(g_hInstance, MAKEINTRESOURCE(IDR_MAINWND));
 		SetMenuDefaultItem(GetSubMenu(hmenu, IDP_POPUP_SUBMENU_PATH), IDM_FILE_OPEN, FALSE);
 
+		int imenu = 0;
 		switch (nID) {
 		case IDC_DIRLIST:
 			if (ListView_GetSelectedCount(hwndDirList)) {
@@ -587,6 +577,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 			break;
 		}
 
+		POINT pt;
 		pt.x = GET_X_LPARAM(lParam);
 		pt.y = GET_Y_LPARAM(lParam);
 
@@ -621,9 +612,9 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 			break;
 
 		case SC_RESTORE: {
-			LRESULT lrv = DefWindowProc(hwnd, umsg, wParam, lParam);
+			const LRESULT lrv = DefWindowProc(hwnd, umsg, wParam, lParam);
 			ShowOwnedPopups(hwnd, TRUE);
-			return (lrv);
+			return lrv;
 		}
 
 		case SC_ALWAYSONTOP:
@@ -648,18 +639,15 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 	case APPM_TRAYMESSAGE:
 		switch (lParam) {
 		case WM_RBUTTONUP: {
-
 			HMENU hMenu = LoadMenu(g_hInstance, MAKEINTRESOURCE(IDR_MAINWND));
 			HMENU hMenuPopup = GetSubMenu(hMenu, IDP_POPUP_SUBMENU_TRAY);
 
-			POINT pt;
-			int iCmd;
-
 			SetForegroundWindow(hwnd);
 
+			POINT pt;
 			GetCursorPos(&pt);
 			SetMenuDefaultItem(hMenuPopup, IDM_TRAY_RESTORE, FALSE);
-			iCmd = TrackPopupMenu(hMenuPopup,
+			const int iCmd = TrackPopupMenu(hMenuPopup,
 								  TPM_NONOTIFY | TPM_RETURNCMD | TPM_LEFTBUTTON | TPM_RIGHTBUTTON,
 								  pt.x, pt.y, 0, hwnd, NULL);
 
@@ -717,17 +705,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	UNREFERENCED_PARAMETER(wParam);
 
-	HWND hwndTT;
-	TOOLINFO ti;
-
-	LVCOLUMN lvc = { LVCF_FMT | LVCF_TEXT, LVCFMT_LEFT, 0, L"", -1, 0, 0, 0 };
-
-	HMENU hmenu;
-	WCHAR  tch[64];
-	MENUITEMINFO mii;
-
 	HINSTANCE hInstance = ((LPCREATESTRUCT)lParam)->hInstance;
-	DWORD dwDriveBoxStyle = WS_DRIVEBOX;
 
 	hwndDirList = CreateWindowEx(
 					  WS_EX_CLIENTEDGE,
@@ -745,10 +723,7 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		SetWindowPos(hwndDirList, NULL, 0, 0, 0, 0, SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE | SWP_FRAMECHANGED);
 	}
 
-	if (bShowDriveBox) {
-		dwDriveBoxStyle |= WS_VISIBLE;
-	}
-
+	const DWORD dwDriveBoxStyle = bShowDriveBox ? (WS_DRIVEBOX | WS_VISIBLE) : WS_DRIVEBOX;
 	hwndDriveBox = CreateWindowEx(
 					   0,
 					   WC_COMBOBOXEX,
@@ -768,6 +743,7 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	DriveBox_Init(hwndDriveBox);
 	SendMessage(hwndDriveBox, CB_SETEXTENDEDUI, TRUE, 0);
 	// DirList
+	LVCOLUMN lvc = { LVCF_FMT | LVCF_TEXT, LVCFMT_LEFT, 0, L"", -1, 0, 0, 0 };
 	ListView_SetExtendedListViewStyle(hwndDirList, LVS_EX_DOUBLEBUFFER | LVS_EX_LABELTIP);
 	ListView_InsertColumn(hwndDirList, 0, &lvc);
 	DirList_Init(hwndDirList, NULL);
@@ -792,6 +768,7 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	History_Init(&mHistory);
 	History_UpdateToolbar(&mHistory, hwndToolbar, IDT_HISTORY_BACK, IDT_HISTORY_FORWARD);
 	// ToolTip with Current Directory
+	TOOLINFO ti;
 	ZeroMemory(&ti, sizeof(TOOLINFO));
 	ti.cbSize = sizeof(TOOLINFO);
 	ti.uFlags = TTF_IDISHWND;
@@ -799,17 +776,18 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	ti.uId = (UINT_PTR)hwnd;
 	ti.lpszText = LPSTR_TEXTCALLBACK;
 
-	hwndTT = (HWND)SendMessage(hwndToolbar, TB_GETTOOLTIPS, 0, 0);
+	HWND hwndTT = (HWND)SendMessage(hwndToolbar, TB_GETTOOLTIPS, 0, 0);
 	SendMessage(hwndTT, TTM_ADDTOOL, 0, (LPARAM)&ti);
 
 	// System Menu
-	hmenu = GetSystemMenu(hwnd, FALSE);
+	HMENU hmenu = GetSystemMenu(hwnd, FALSE);
 
 	// Remove unwanted items
 	DeleteMenu(hmenu, SC_RESTORE, MF_BYCOMMAND);
 	DeleteMenu(hmenu, SC_MAXIMIZE, MF_BYCOMMAND);
 
 	// Mofify the L"Minimize" item
+	MENUITEMINFO mii;
 	mii.cbSize = sizeof(MENUITEMINFO);
 	mii.fMask = MIIM_ID;
 	GetMenuItemInfo(hmenu, SC_MINIMIZE, FALSE, &mii);
@@ -817,6 +795,7 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	SetMenuItemInfo(hmenu, SC_MINIMIZE, FALSE, &mii);
 
 	// Add specific items
+	WCHAR tch[64];
 	GetString(SC_ALWAYSONTOP, tch, COUNTOF(tch));
 	InsertMenu(hmenu, SC_MOVE, MF_BYCOMMAND | MF_STRING | MF_ENABLED, SC_ALWAYSONTOP, tch);
 	GetString(SC_ABOUT, tch, COUNTOF(tch));
@@ -832,24 +811,19 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 //
 //
 void CreateBars(HWND hwnd, HINSTANCE hInstance) {
-	RECT rc;
-
-	BITMAP bmp;
-	HBITMAP hbmp, hbmpCopy = NULL;
-	HIMAGELIST himl;
-	WCHAR szTmp[MAX_PATH];
-	BOOL bExternalBitmap = FALSE;
-
-	BOOL bIsAppThemed = PrivateIsAppThemed();
+	const BOOL bIsAppThemed = PrivateIsAppThemed();
 
 	const DWORD dwToolbarStyle = WS_TOOLBAR | TBSTYLE_FLAT | CCS_ADJUSTABLE;
 	hwndToolbar = CreateWindowEx(0, TOOLBARCLASSNAME, NULL, dwToolbarStyle,
 								 0, 0, 0, 0, hwnd, (HMENU)IDC_TOOLBAR, hInstance, NULL);
 
-	SendMessage(hwndToolbar, TB_BUTTONSTRUCTSIZE, (WPARAM)sizeof(TBBUTTON), 0);
+	SendMessage(hwndToolbar, TB_BUTTONSTRUCTSIZE, sizeof(TBBUTTON), 0);
 
 	// Add normal Toolbar Bitmap
-	hbmp = NULL;
+	WCHAR szTmp[MAX_PATH];
+	HBITMAP hbmp = NULL, hbmpCopy = NULL;
+	BOOL bExternalBitmap = FALSE;
+
 	if (StrNotEmpty(tchToolbarBitmap)) {
 		if (!SearchPath(NULL, tchToolbarBitmap, NULL, COUNTOF(szTmp), szTmp, NULL)) {
 			lstrcpy(szTmp, tchToolbarBitmap);
@@ -863,12 +837,13 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) {
 		hbmpCopy = CopyImage(hbmp, IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION);
 	}
 
+	BITMAP bmp;
 	GetObject(hbmp, sizeof(BITMAP), &bmp);
 	if (!IsWinXPAndAbove()) {
 		BitmapMergeAlpha(hbmp, GetSysColor(COLOR_3DFACE));
 	}
 
-	himl = ImageList_Create(bmp.bmWidth / NUMTOOLBITMAPS, bmp.bmHeight, ILC_COLOR32 | ILC_MASK, 0, 0);
+	HIMAGELIST himl = ImageList_Create(bmp.bmWidth / NUMTOOLBITMAPS, bmp.bmHeight, ILC_COLOR32 | ILC_MASK, 0, 0);
 	ImageList_AddMasked(himl, hbmp, CLR_DEFAULT);
 	DeleteObject(hbmp);
 	SendMessage(hwndToolbar, TB_SETIMAGELIST, 0, (LPARAM)himl);
@@ -938,7 +913,7 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) {
 
 	for (int i = 0; i < count; i++) {
 		const IniKeyValueNode *node = &pIniSection->nodeList[i];
-		const UINT n = StrToInt(node->key);
+		const UINT n = (UINT)wcstol(node->key, NULL, 10);
 		if (n == 0 || n >= COUNTOF(tbbMainWnd)) {
 			continue;
 		}
@@ -963,6 +938,8 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) {
 	if (Toolbar_SetButtons(hwndToolbar, tchToolbarButtons, tbbMainWnd, COUNTOF(tbbMainWnd)) == 0) {
 		Toolbar_SetButtons(hwndToolbar, DefaultToolbarButtons, tbbMainWnd, COUNTOF(tbbMainWnd));
 	}
+
+	RECT rc;
 	SendMessage(hwndToolbar, TB_GETITEMRECT, 0, (LPARAM)&rc);
 	//SendMessage(hwndToolbar, TB_SETINDENT, 2, 0);
 
@@ -994,7 +971,7 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) {
 	rbBand.cxMinChild = (rc.right - rc.left) * COUNTOF(tbbMainWnd);
 	rbBand.cyMinChild = (rc.bottom - rc.top) + 2 * rc.top;
 	rbBand.cx         = 0;
-	SendMessage(hwndReBar, RB_INSERTBAND, (WPARAM) - 1, (LPARAM)&rbBand);
+	SendMessage(hwndReBar, RB_INSERTBAND, (WPARAM)(-1), (LPARAM)&rbBand);
 
 	SetWindowPos(hwndReBar, NULL, 0, 0, 0, 0, SWP_NOZORDER);
 	GetWindowRect(hwndReBar, &rc);
@@ -1013,11 +990,8 @@ void MsgThemeChanged(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	UNREFERENCED_PARAMETER(wParam);
 	UNREFERENCED_PARAMETER(lParam);
 
-	RECT rc;
-	WCHAR chStatus[255];
 	HINSTANCE hInstance = (HINSTANCE)(INT_PTR)GetWindowLongPtr(hwnd, GWLP_HINSTANCE);
-
-	BOOL bIsAppThemed = PrivateIsAppThemed();
+	const BOOL bIsAppThemed = PrivateIsAppThemed();
 
 	if (IsVistaAndAbove() && bIsAppThemed) {
 		SetWindowLongPtr(hwndDirList, GWL_EXSTYLE, GetWindowLongPtr(hwndDirList, GWL_EXSTYLE) & ~WS_EX_CLIENTEDGE);
@@ -1036,6 +1010,7 @@ void MsgThemeChanged(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	}
 
 	// recreate toolbar and statusbar
+	WCHAR chStatus[255];
 	SendMessage(hwndStatus, SB_GETTEXT, ID_FILEINFO, (LPARAM)chStatus);
 
 	// recreate toolbar and statusbar
@@ -1046,6 +1021,7 @@ void MsgThemeChanged(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	DestroyWindow(hwndStatus);
 	CreateBars(hwnd, hInstance);
 
+	RECT rc;
 	GetClientRect(hwnd, &rc);
 	SendMessage(hwnd, WM_SIZE, SIZE_RESTORED, MAKELONG(rc.right, rc.bottom));
 
@@ -1060,20 +1036,15 @@ void MsgThemeChanged(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 void MsgSize(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	UNREFERENCED_PARAMETER(hwnd);
 
-	RECT rc;
-	int  x, y, cx, cy;
-	HDWP hdwp;
-	int  aWidth[1];
-
 	if (wParam == SIZE_MINIMIZED) {
 		return;
 	}
 
-	x  = 0;
-	y  = 0;
-
-	cx = LOWORD(lParam);
-	cy = HIWORD(lParam);
+	RECT rc;
+	int x = 0;
+	int y = 0;
+	int cx = LOWORD(lParam);
+	int cy = HIWORD(lParam);
 
 	if (bShowToolbar) {
 		//SendMessage(hwndToolbar, WM_SIZE, 0, 0);
@@ -1099,7 +1070,7 @@ void MsgSize(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		cy -= (rc.bottom - rc.top);
 	}
 
-	hdwp = BeginDeferWindowPos(2);
+	HDWP hdwp = BeginDeferWindowPos(2);
 	DeferWindowPos(hdwp, hwndDriveBox, NULL, x, y, cx, max_i(cy, 100), SWP_NOZORDER | SWP_NOACTIVATE);
 
 	if (bShowDriveBox) {
@@ -1115,7 +1086,7 @@ void MsgSize(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	ListView_SetColumnWidth(hwndDirList, 0, LVSCW_AUTOSIZE_USEHEADER);
 
 	GetClientRect(hwndStatus, &rc);
-	aWidth[0] = -1;
+	const int aWidth[1] = { -1 };
 	SendMessage(hwndStatus, SB_SETPARTS, COUNTOF(aWidth), (LPARAM)aWidth);
 	InvalidateRect(hwndStatus, NULL, TRUE);
 }
@@ -1129,11 +1100,10 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	UNREFERENCED_PARAMETER(hwnd);
 	UNREFERENCED_PARAMETER(lParam);
 
-	int i; // Helper
-	DLITEM dli;
 	HMENU hmenu = (HMENU)wParam;
 
-	i = ListView_GetSelectedCount(hwndDirList);
+	int i = ListView_GetSelectedCount(hwndDirList);
+	DLITEM dli;
 	dli.mask = DLI_TYPE;
 	dli.ntype = DLE_NONE;
 	DirList_GetItem(hwndDirList, -1, &dli);
@@ -1188,8 +1158,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		case CBN_CLOSEUP: {
 			WCHAR tch[64];
 
-			if (DriveBox_GetSelDrive(hwndDriveBox, tch, COUNTOF(tch), TRUE)
-					&& !PathIsSameRoot(szCurDir, tch)) {
+			if (DriveBox_GetSelDrive(hwndDriveBox, tch, COUNTOF(tch), TRUE) && !PathIsSameRoot(szCurDir, tch)) {
 				if (!ChangeDirectory(hwnd, tch, 1)) {
 					ErrorMessage(2, IDS_ERR_CD);
 					DriveBox_SelectDrive(hwndDriveBox, szCurDir);
@@ -1203,7 +1172,6 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	case IDM_FILE_OPEN: {
 		DLITEM dli = { DLI_ALL, L"", L"", DLE_NONE };
-
 		DirList_GetItem(hwndDirList, -1, &dli);
 
 		switch (dli.ntype) {
@@ -1220,12 +1188,11 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 				LaunchTarget(dli.szFileName, 0);
 			} else {
 				// PathIsLinkFile()
-				WCHAR  tch[MAX_PATH];
+				WCHAR tch[MAX_PATH];
 
 				if (PathGetLnkPath(dli.szFileName, tch, COUNTOF(tch))) {
-					DWORD dwAttr;
 					ExpandEnvironmentStringsEx(tch, COUNTOF(tch));
-					dwAttr = GetFileAttributes(tch);
+					const DWORD dwAttr = GetFileAttributes(tch);
 					if ((dwAttr == (DWORD)(-1)) || (dwAttr & FILE_ATTRIBUTE_DIRECTORY)) {
 						DisplayLnkFile(dli.szFileName);
 					} else {
@@ -1256,12 +1223,11 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 				LaunchTarget(dli.szFileName, 1);
 			} else {
 				// PathIsLinkFile()
-				WCHAR  tch[MAX_PATH];
+				WCHAR tch[MAX_PATH];
 
 				if (PathGetLnkPath(dli.szFileName, tch, COUNTOF(tch))) {
-					DWORD dwAttr;
 					ExpandEnvironmentStringsEx(tch, COUNTOF(tch));
-					dwAttr = GetFileAttributes(tch);
+					const DWORD dwAttr = GetFileAttributes(tch);
 					if ((dwAttr == (DWORD)(-1)) || (dwAttr & FILE_ATTRIBUTE_DIRECTORY)) {
 						DisplayLnkFile(dli.szFileName);
 					} else {
@@ -1285,21 +1251,19 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	case IDM_FILE_LAUNCH: {
-		DLITEM dli;
-		SHELLEXECUTEINFO sei;
-
 		if (!DirList_IsFileSelected(hwndDirList)) {
 			MessageBeep(0);
 			return 0;
 		}
 
+		DLITEM dli;
 		dli.mask = DLI_FILENAME;
 		if (DirList_GetItem(hwndDirList, -1, &dli) == -1) {
 			break;
 		}
 
+		SHELLEXECUTEINFO sei;
 		ZeroMemory(&sei, sizeof(SHELLEXECUTEINFO));
-
 		sei.cbSize = sizeof(SHELLEXECUTEINFO);
 		sei.fMask = 0;
 		sei.hwnd = hwnd;
@@ -1314,36 +1278,33 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	break;
 
 	case IDM_FILE_QUICKVIEW: {
-		DLITEM dli;
-		SHELLEXECUTEINFO sei;
-		WCHAR szParam[MAX_PATH] = L"";
-		WCHAR szTmp[MAX_PATH];
-
 		if (!DirList_IsFileSelected(hwndDirList)) {
 			MessageBeep(0);
 			return 0;
 		}
 
+		DLITEM dli;
 		dli.mask = DLI_FILENAME;
 		if (DirList_GetItem(hwndDirList, -1, &dli) == -1) {
 			break;
 		}
 
-		ZeroMemory(&sei, sizeof(SHELLEXECUTEINFO));
-
-		if (PathIsLnkFile(dli.szFileName) &&
-				PathGetLnkPath(dli.szFileName, szTmp, COUNTOF(szTmp))) {
+		WCHAR szTmp[MAX_PATH];
+		if (PathIsLnkFile(dli.szFileName) && PathGetLnkPath(dli.szFileName, szTmp, COUNTOF(szTmp))) {
 			GetShortPathName(szTmp, szTmp, COUNTOF(szTmp));
 		} else {
 			GetShortPathName(dli.szFileName, szTmp, COUNTOF(szTmp));
 		}
 
+		WCHAR szParam[MAX_PATH] = L"";
 		if (StrNotEmpty(szQuickviewParams)) {
 			StrCatBuff(szParam, szQuickviewParams, COUNTOF(szParam));
 			StrCatBuff(szParam, L" ", COUNTOF(szParam));
 		}
 		StrCatBuff(szParam, szTmp, COUNTOF(szParam));
 
+		SHELLEXECUTEINFO sei;
+		ZeroMemory(&sei, sizeof(SHELLEXECUTEINFO));
 		sei.cbSize = sizeof(SHELLEXECUTEINFO);
 		sei.fMask = 0;
 		sei.hwnd = hwnd;
@@ -1358,13 +1319,12 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	break;
 
 	case IDM_FILE_OPENWITH: {
-		DLITEM dli;
-
 		if (!ListView_GetSelectedCount(hwndDirList)) {
 			MessageBeep(0);
 			return 0;
 		}
 
+		DLITEM dli;
 		dli.mask = DLI_FILENAME;
 		if (DirList_GetItem(hwndDirList, -1, &dli) == -1) {
 			break;
@@ -1379,8 +1339,6 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	case IDM_FILE_NEW: {
-		OPENFILENAME ofn;
-		HANDLE       hFile;
 		WCHAR szNewFile[MAX_PATH];
 		WCHAR szFilter[128];
 		WCHAR szTitle[32];
@@ -1390,8 +1348,8 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		PrepareFilterStr(szFilter);
 		GetString(IDS_NEWFILE, szTitle, COUNTOF(szTitle));
 
+		OPENFILENAME ofn;
 		ZeroMemory(&ofn, sizeof(OPENFILENAME));
-
 		ofn.lStructSize = sizeof(OPENFILENAME);
 		ofn.hwndOwner = hwnd;
 		ofn.lpstrFilter = szFilter;
@@ -1407,7 +1365,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			break;
 		}
 
-		hFile = CreateFile(szNewFile,
+		HANDLE hFile = CreateFile(szNewFile,
 						   GENERIC_READ | GENERIC_WRITE,
 						   FILE_SHARE_READ | FILE_SHARE_WRITE,
 						   NULL,
@@ -1416,18 +1374,17 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 						   NULL);
 
 		if (hFile != INVALID_HANDLE_VALUE) {
-			WCHAR szPath[MAX_PATH];
-			SHFILEINFO shfi;
-
 			CloseHandle(hFile);
 
 			// Extract dir from filename
+			WCHAR szPath[MAX_PATH];
 			lstrcpy(szPath, szNewFile);
 			PathRemoveFileSpec(szPath);
 			SetCurrentDirectory(szPath);
 
 			// Select new file
 			SendMessage(hwnd, WM_COMMAND, MAKELONG(IDM_VIEW_UPDATE, 1), 0);
+			SHFILEINFO shfi;
 			SHGetFileInfo(szNewFile, 0, &shfi, sizeof(SHFILEINFO), SHGFI_DISPLAYNAME);
 			if (!DirList_SelectItem(hwndDirList, shfi.szDisplayName, szNewFile)) {
 				ListView_EnsureVisible(hwndDirList, 0, FALSE);
@@ -1450,9 +1407,9 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	break;
 
 	case IDM_FILE_CREATELINK: {
-		DLITEM dli;
 		WCHAR tchLinkDestination[MAX_PATH];
 
+		DLITEM dli;
 		dli.mask = DLI_FILENAME;
 		if (DirList_GetItem(hwndDirList, -1, &dli) == -1) {
 			break;
@@ -1480,13 +1437,13 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 		WCHAR szNewFile[MAX_PATH];
 		lstrcpy(szNewFile, dli.szFileName);
+
 		WCHAR szFilter[128];
 		GetString(IDS_FILTER_ALL, szFilter, COUNTOF(szFilter));
 		PrepareFilterStr(szFilter);
 
 		OPENFILENAME ofn;
 		ZeroMemory(&ofn, sizeof(OPENFILENAME));
-
 		ofn.lStructSize = sizeof(OPENFILENAME);
 		ofn.hwndOwner = hwnd;
 		ofn.lpstrFilter = szFilter;
@@ -1543,19 +1500,19 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case IDM_FILE_DELETE2:
 	case IDM_FILE_DELETE3: {
 		DLITEM dli;
-		int    iItem;
-		WCHAR   tch[512];
-		SHFILEOPSTRUCT shfos;
+		int iItem;
 
 		dli.mask = DLI_ALL;
 		if ((iItem = DirList_GetItem(hwndDirList, -1, &dli)) == -1) {
 			break;
 		}
 
-		ZeroMemory(&shfos, sizeof(SHFILEOPSTRUCT));
+		WCHAR tch[512];
 		ZeroMemory(tch, sizeof(tch));
 		lstrcpy(tch, dli.szFileName);
 
+		SHFILEOPSTRUCT shfos;
+		ZeroMemory(&shfos, sizeof(SHFILEOPSTRUCT));
 		shfos.hwnd = hwnd;
 		shfos.wFunc = FO_DELETE;
 		shfos.pFrom = tch;
@@ -1660,7 +1617,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		if (GetFilterDlg(hwnd)) {
 			// Store information about currently selected item
 			DLITEM dli;
-			dli.mask  = DLI_ALL;
+			dli.mask = DLI_ALL;
 			dli.ntype = DLE_NONE;
 			DirList_GetItem(hwndDirList, -1, &dli);
 
@@ -1678,13 +1635,12 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	case IDM_VIEW_FILTERALL:
 		if (!StrEqual(tchFilter, L"*.*") || bNegFilter) {
-			DLITEM dli;
-
 			lstrcpy(tchFilter, L"*.*");
 			bNegFilter = FALSE;
 
 			// Store information about currently selected item
-			dli.mask  = DLI_ALL;
+			DLITEM dli;
+			dli.mask = DLI_ALL;
 			dli.ntype = DLE_NONE;
 			DirList_GetItem(hwndDirList, -1, &dli);
 
@@ -1727,13 +1683,8 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	break;
 
 	case IDM_VIEW_TOOLBAR:
-		if (bShowToolbar) {
-			ShowWindow(hwndReBar, SW_HIDE);
-			bShowToolbar = 0;
-		} else {
-			ShowWindow(hwndReBar, SW_SHOW);
-			bShowToolbar = 1;
-		}
+		bShowToolbar = !bShowToolbar;
+		ShowWindow(hwndReBar, bShowToolbar ? SW_SHOW : SW_HIDE);
 		SendWMSize(hwnd);
 		break;
 
@@ -1742,26 +1693,18 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	case IDM_VIEW_STATUSBAR:
-		if (bShowStatusbar) {
-			ShowWindow(hwndStatus, SW_HIDE);
-			bShowStatusbar = 0;
-		} else {
-			ShowWindow(hwndStatus, SW_SHOW);
-			bShowStatusbar = 1;
-		}
+		bShowStatusbar = !bShowStatusbar;
+		ShowWindow(hwndStatus, bShowStatusbar ? SW_SHOW : SW_HIDE);
 		SendWMSize(hwnd);
 		break;
 
 	case IDM_VIEW_DRIVEBOX:
-		if (bShowDriveBox) {
-			ShowWindow(hwndDriveBox, SW_HIDE);
-			bShowDriveBox = 0;
+		bShowDriveBox = !bShowDriveBox;
+		ShowWindow(hwndDriveBox, bShowDriveBox ? SW_SHOW : SW_HIDE);
+		if (!bShowDriveBox) {
 			if (GetDlgCtrlID(GetFocus()) == IDC_DRIVEBOX) {
 				SetFocus(hwndDirList);
 			}
-		} else {
-			ShowWindow(hwndDriveBox, SW_SHOW);
-			bShowDriveBox = 1;
 		}
 		SendWMSize(hwnd);
 		break;
@@ -1799,7 +1742,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	case IDM_VIEW_FINDTARGET:
 		ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_FINDTARGET),
-							 hwnd, FindTargetDlgProc, (LPARAM)NULL);
+							 hwnd, FindTargetDlgProc, 0);
 		break;
 
 	case IDM_VIEW_OPTIONS:
@@ -1832,16 +1775,13 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	case IDM_POP_COPYNAME: {
-		DLITEM  dli;
-		HGLOBAL hData;
-		LPWSTR   pData;
-
+		DLITEM dli;
 		dli.mask = DLI_FILENAME;
 		DirList_GetItem(hwndDirList, -1, &dli);
 
-		hData = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE,
+		HGLOBAL hData = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE,
 							sizeof(WCHAR) * (lstrlen(dli.szFileName) + 1));
-		pData = GlobalLock(hData);
+		LPWSTR pData = GlobalLock(hData);
 		lstrcpy(pData, dli.szFileName);
 		GlobalUnlock(hData);
 
@@ -1888,11 +1828,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	break;
 
 	case ACC_TOGGLE_FOCUSEDIT:
-		if (bFocusEdit) {
-			bFocusEdit = 0;
-		} else {
-			bFocusEdit = 1;
-		}
+		bFocusEdit = !bFocusEdit;
 		break;
 
 	case ACC_SWITCHTRANSPARENCY:
@@ -1935,7 +1871,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	case ACC_SELECTTARGET:
 		ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_FINDTARGET),
-							 hwnd, FindTargetDlgProc, (LPARAM)NULL);
+							 hwnd, FindTargetDlgProc, 0);
 		break;
 
 	case ACC_FIRETARGET:
@@ -2010,17 +1946,15 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	case IDT_FILE_NEXT: {
+		const int iItem = ListView_GetNextItem(hwndDirList, -1, LVNI_ALL | LVNI_FOCUSED);
+		const int d = ListView_GetSelectedCount(hwndDirList) ? 1 : 0;
+
 		DLITEM dli;
-		WCHAR   tch[MAX_PATH];
-
-		int i, d;
-		int iItem = ListView_GetNextItem(hwndDirList, -1, LVNI_ALL | LVNI_FOCUSED);
-
 		dli.ntype = DLE_NONE;
 		dli.mask = DLI_TYPE | DLI_FILENAME;
 
-		d = ListView_GetSelectedCount(hwndDirList) ? 1 : 0;
-
+		int i;
+		WCHAR tch[MAX_PATH];
 		for (i = iItem + d; DirList_GetItem(hwndDirList, i, &dli) != (-1); i++) {
 			if (dli.ntype == DLE_FILE && !PathIsLnkToDirectory(dli.szFileName, tch, COUNTOF(tch))) {
 				break;
@@ -2048,17 +1982,15 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	break;
 
 	case IDT_FILE_PREV: {
+		const int iItem = ListView_GetNextItem(hwndDirList, -1, LVNI_ALL | LVNI_FOCUSED);
+		const int d = (ListView_GetSelectedCount(hwndDirList) || iItem == 0) ? 1 : 0;
+
 		DLITEM dli;
-		WCHAR   tch[MAX_PATH];
-
-		int i, d;
-		int iItem = ListView_GetNextItem(hwndDirList, -1, LVNI_ALL | LVNI_FOCUSED);
-
 		dli.ntype = DLE_NONE;
 		dli.mask = DLI_TYPE | DLI_FILENAME;
 
-		d = (ListView_GetSelectedCount(hwndDirList) || iItem == 0) ? 1 : 0;
-
+		int i;
+		WCHAR tch[MAX_PATH];
 		for (i = iItem - d; i > (-1); i--) {
 			DirList_GetItem(hwndDirList, i, &dli);
 			if (dli.ntype == DLE_FILE && !PathIsLnkToDirectory(dli.szFileName, tch, COUNTOF(tch))) {
@@ -2116,7 +2048,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	case IDT_FILE_DELETE:
 		if (ListView_GetSelectedCount(hwndDirList)) {
-			BOOL fUseRecycleBin2 = fUseRecycleBin;
+			const BOOL fUseRecycleBin2 = fUseRecycleBin;
 			fUseRecycleBin = 1;
 			SendMessage(hwnd, WM_COMMAND, MAKELONG(IDM_FILE_DELETE, 1), 0);
 			fUseRecycleBin = fUseRecycleBin2;
@@ -2181,29 +2113,31 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 				if ((pnmlv->uNewState & LVIS_SELECTED)) {
 					WIN32_FIND_DATA fd;
 					DLITEM dli;
-					FILETIME ft;
-					SYSTEMTIME st;
-					WCHAR tchsize[64], tchdate[64], tchtime[64], tchattr[64];
 					dli.mask  = DLI_FILENAME;
 					dli.ntype = DLE_NONE;
 					DirList_GetItem(hwndDirList, -1, &dli);
 					DirList_GetItemEx(hwndDirList, -1, &fd);
 
 					if (fd.nFileSizeLow >= MAXDWORD) {
-						HANDLE hFile;
-						if ((hFile = FindFirstFile(dli.szFileName, &fd)) != INVALID_HANDLE_VALUE) {
+						HANDLE hFile = FindFirstFile(dli.szFileName, &fd);
+						if (hFile != INVALID_HANDLE_VALUE) {
 							FindClose(hFile);
 						}
 					}
 
 					const LONGLONG isize = (((LONGLONG)fd.nFileSizeHigh) << 32) | fd.nFileSizeLow;
+					WCHAR tchsize[64];
 					StrFormatByteSize(isize, tchsize, COUNTOF(tchsize));
 
+					WCHAR tchdate[64], tchtime[64];
+					FILETIME ft;
+					SYSTEMTIME st;
 					FileTimeToLocalFileTime(&fd.ftLastWriteTime, &ft);
 					FileTimeToSystemTime(&ft, &st);
 					GetDateFormat(LOCALE_USER_DEFAULT, DATE_SHORTDATE, &st, NULL, tchdate, COUNTOF(tchdate));
 					GetTimeFormat(LOCALE_USER_DEFAULT, 0, &st, NULL, tchtime, COUNTOF(tchdate));
 
+					WCHAR tchattr[64];
 					lstrcpy(tchattr, (fd.dwFileAttributes & FILE_ATTRIBUTE_ARCHIVE) ? L"A" : L"-");
 					lstrcat(tchattr, (fd.dwFileAttributes & FILE_ATTRIBUTE_READONLY) ? L"R" : L"-");
 					lstrcat(tchattr, (fd.dwFileAttributes & FILE_ATTRIBUTE_HIDDEN) ? L"H" : L"-");
@@ -2316,13 +2250,12 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 //
 //
 BOOL ChangeDirectory(HWND hwnd, LPCWSTR lpszNewDir, BOOL bUpdateHistory) {
-	BOOL fUpdate = FALSE;
-
 	if (lpszNewDir && !SetCurrentDirectory(lpszNewDir)) {
 		return FALSE;
 	}
 
-	if (!lpszNewDir) {
+	const BOOL fUpdate = lpszNewDir != NULL;
+	if (fUpdate) {
 		// Update call
 		WCHAR szTest[MAX_PATH];
 
@@ -2333,30 +2266,24 @@ BOOL ChangeDirectory(HWND hwnd, LPCWSTR lpszNewDir, BOOL bUpdateHistory) {
 			SetCurrentDirectory(szWinDir);
 			ErrorMessage(2, IDS_ERR_CD);
 		}
-
-		fUpdate = TRUE;
 	}
 
 	BeginWaitCursor();
 	{
-		WCHAR tch[256], tchnum[64];
-		int cItems;
-
-		int iTopItem = ListView_GetTopIndex(hwndDirList);
+		const int iTopItem = ListView_GetTopIndex(hwndDirList);
 
 		GetCurrentDirectory(COUNTOF(szCurDir), szCurDir);
-
 		SetWindowPathTitle(hwnd, szCurDir);
 
 		if (!StrEqual(tchFilter, L"*.*") || bNegFilter) {
-			ListView_SetTextColor(hwndDirList, (bDefCrFilter) ? GetSysColor(COLOR_WINDOWTEXT) : crFilter);
+			ListView_SetTextColor(hwndDirList, (bDefColorFilter) ? GetSysColor(COLOR_WINDOWTEXT) : colorFilter);
 			Toolbar_SetButtonImage(hwndToolbar, IDT_VIEW_FILTER, TBFILTERBMP);
 		} else {
-			ListView_SetTextColor(hwndDirList, (bDefCrNoFilt) ? GetSysColor(COLOR_WINDOWTEXT) : crNoFilt);
+			ListView_SetTextColor(hwndDirList, (bDefColorNoFilter) ? GetSysColor(COLOR_WINDOWTEXT) : colorNoFilter);
 			Toolbar_SetButtonImage(hwndToolbar, IDT_VIEW_FILTER, TBFILTERBMP + 1);
 		}
 
-		cItems = DirList_Fill(hwndDirList, szCurDir, dwFillMask, tchFilter, bNegFilter, flagNoFadeHidden, nSortFlags, fSortRev);
+		const int cItems = DirList_Fill(hwndDirList, szCurDir, dwFillMask, tchFilter, bNegFilter, flagNoFadeHidden, nSortFlags, fSortRev);
 		DirList_StartIconThread(hwndDirList);
 
 		// Get long pathname
@@ -2371,7 +2298,7 @@ BOOL ChangeDirectory(HWND hwnd, LPCWSTR lpszNewDir, BOOL bUpdateHistory) {
 		if (!fUpdate) {
 			ListView_EnsureVisible(hwndDirList, 0, FALSE);
 		} else {
-			int iJump = min_i(iTopItem + ListView_GetCountPerPage(hwndDirList), cItems - 1);
+			const int iJump = min_i(iTopItem + ListView_GetCountPerPage(hwndDirList), cItems - 1);
 			ListView_EnsureVisible(hwndDirList, iJump, TRUE);
 			ListView_EnsureVisible(hwndDirList, iTopItem, TRUE);
 		}
@@ -2388,6 +2315,7 @@ BOOL ChangeDirectory(HWND hwnd, LPCWSTR lpszNewDir, BOOL bUpdateHistory) {
 		DriveBox_Fill(hwndDriveBox);
 		DriveBox_SelectDrive(hwndDriveBox, szCurDir);
 
+		WCHAR tch[256], tchnum[64];
 		wsprintf(tchnum, L"%d", cItems);
 		FormatNumberStr(tchnum);
 		WCHAR fmt[32];
@@ -2496,11 +2424,11 @@ void LoadSettings(void) {
 		}
 	}
 
-	bDefCrNoFilt = IniSectionGetBool(pIniSection, L"DefColorNoFilter", 1);
-	bDefCrFilter = IniSectionGetBool(pIniSection, L"DefColorFilter", 1);
+	bDefColorNoFilter = IniSectionGetBool(pIniSection, L"DefColorNoFilter", 1);
+	bDefColorFilter = IniSectionGetBool(pIniSection, L"DefColorFilter", 1);
 
-	crNoFilt = IniSectionGetInt(pIniSection, L"ColorNoFilter", GetSysColor(COLOR_WINDOWTEXT));
-	crFilter = IniSectionGetInt(pIniSection, L"ColorFilter", GetSysColor(COLOR_HIGHLIGHT));
+	colorNoFilter = IniSectionGetInt(pIniSection, L"ColorNoFilter", GetSysColor(COLOR_WINDOWTEXT));
+	colorFilter = IniSectionGetInt(pIniSection, L"ColorFilter", GetSysColor(COLOR_HIGHLIGHT));
 
 	strValue = IniSectionGetValue(pIniSection, L"ToolbarButtons");
 	if (StrIsEmpty(strValue)) {
@@ -2528,13 +2456,17 @@ void LoadSettings(void) {
 	if (!flagPosParam) {
 		// ignore window position if /p was specified
 		WCHAR tchPosX[32], tchPosY[32], tchSizeX[32], tchSizeY[32];
-		int ResX = GetSystemMetrics(SM_CXSCREEN);
-		int ResY = GetSystemMetrics(SM_CYSCREEN);
+		const int ResX = GetSystemMetrics(SM_CXSCREEN);
+		const int ResY = GetSystemMetrics(SM_CYSCREEN);
 
-		wsprintf(tchPosX, L"%ix%i PosX", ResX, ResY);
-		wsprintf(tchPosY, L"%ix%i PosY", ResX, ResY);
-		wsprintf(tchSizeX, L"%ix%i SizeX", ResX, ResY);
-		wsprintf(tchSizeY, L"%ix%i SizeY", ResX, ResY);
+		const int len = wsprintf(tchPosX, L"%ix%i ", ResX, ResY);
+		lstrcpy(tchPosY, tchPosX);
+		lstrcpy(tchSizeX, tchPosX);
+		lstrcpy(tchSizeY, tchPosX);
+		lstrcpy(tchPosX + len, L"PosX");
+		lstrcpy(tchPosY + len, L"PosY");
+		lstrcpy(tchSizeX + len, L"SizeX");
+		lstrcpy(tchSizeY + len, L"SizeY");
 
 		LoadIniSection(INI_SECTION_NAME_WINDOW_POSITION, pIniSectionBuf, cbIniSection);
 		IniSectionParse(pIniSection, pIniSectionBuf);
@@ -2559,22 +2491,22 @@ void LoadSettings(void) {
 	NP2HeapFree(pIniSectionBuf);
 
 	// Initialize custom colors for ChooseColor()
-	crCustom[0] = RGB(0, 0, 128);
-	crCustom[8]  = RGB(255, 255, 226);
-	crCustom[1] = GetSysColor(COLOR_WINDOWTEXT);
-	crCustom[9]  = GetSysColor(COLOR_WINDOW);
-	crCustom[2] = GetSysColor(COLOR_INFOTEXT);
-	crCustom[10] = GetSysColor(COLOR_INFOBK);
-	crCustom[3] = GetSysColor(COLOR_HIGHLIGHTTEXT);
-	crCustom[11] = GetSysColor(COLOR_HIGHLIGHT);
-	crCustom[4] = GetSysColor(COLOR_ACTIVECAPTION);
-	crCustom[12] = GetSysColor(COLOR_DESKTOP);
-	crCustom[5] = GetSysColor(COLOR_3DFACE);
-	crCustom[13] = GetSysColor(COLOR_3DFACE);
-	crCustom[6] = GetSysColor(COLOR_3DFACE);
-	crCustom[14] = GetSysColor(COLOR_3DFACE);
-	crCustom[7] = GetSysColor(COLOR_3DFACE);
-	crCustom[15] = GetSysColor(COLOR_3DFACE);
+	colorCustom[0] = RGB(0, 0, 128);
+	colorCustom[8]  = RGB(255, 255, 226);
+	colorCustom[1] = GetSysColor(COLOR_WINDOWTEXT);
+	colorCustom[9]  = GetSysColor(COLOR_WINDOW);
+	colorCustom[2] = GetSysColor(COLOR_INFOTEXT);
+	colorCustom[10] = GetSysColor(COLOR_INFOBK);
+	colorCustom[3] = GetSysColor(COLOR_HIGHLIGHTTEXT);
+	colorCustom[11] = GetSysColor(COLOR_HIGHLIGHT);
+	colorCustom[4] = GetSysColor(COLOR_ACTIVECAPTION);
+	colorCustom[12] = GetSysColor(COLOR_DESKTOP);
+	colorCustom[5] = GetSysColor(COLOR_3DFACE);
+	colorCustom[13] = GetSysColor(COLOR_3DFACE);
+	colorCustom[6] = GetSysColor(COLOR_3DFACE);
+	colorCustom[14] = GetSysColor(COLOR_3DFACE);
+	colorCustom[7] = GetSysColor(COLOR_3DFACE);
+	colorCustom[15] = GetSysColor(COLOR_3DFACE);
 }
 
 //=============================================================================
@@ -2633,10 +2565,10 @@ void SaveSettings(BOOL bSaveSettingsNow) {
 	IniSectionSetBoolEx(pIniSection, L"SortReverse", fSortRev, 0);
 	IniSectionSetStringEx(pIniSection, L"FileFilter", tchFilter, L"*.*");
 	IniSectionSetBoolEx(pIniSection, L"NegativeFilter", bNegFilter, 0);
-	IniSectionSetBoolEx(pIniSection, L"DefColorNoFilter", bDefCrNoFilt, 1);
-	IniSectionSetBoolEx(pIniSection, L"DefColorFilter", bDefCrFilter, 1);
-	IniSectionSetIntEx(pIniSection, L"ColorNoFilter", crNoFilt, GetSysColor(COLOR_WINDOWTEXT));
-	IniSectionSetIntEx(pIniSection, L"ColorFilter", crFilter, GetSysColor(COLOR_HIGHLIGHT));
+	IniSectionSetBoolEx(pIniSection, L"DefColorNoFilter", bDefColorNoFilter, 1);
+	IniSectionSetBoolEx(pIniSection, L"DefColorFilter", bDefColorFilter, 1);
+	IniSectionSetIntEx(pIniSection, L"ColorNoFilter", colorNoFilter, GetSysColor(COLOR_WINDOWTEXT));
+	IniSectionSetIntEx(pIniSection, L"ColorFilter", colorFilter, GetSysColor(COLOR_HIGHLIGHT));
 	Toolbar_GetButtons(hwndToolbar, TOOLBAR_COMMAND_BASE, tchToolbarButtons, COUNTOF(tchToolbarButtons));
 	IniSectionSetStringEx(pIniSection, L"ToolbarButtons", tchToolbarButtons, DefaultToolbarButtons);
 	IniSectionSetBoolEx(pIniSection, L"ShowToolbar", bShowToolbar, 1);
@@ -2669,19 +2601,43 @@ void SaveSettings(BOOL bSaveSettingsNow) {
 
 	{
 		WCHAR tchPosX[32], tchPosY[32], tchSizeX[32], tchSizeY[32];
-		int ResX = GetSystemMetrics(SM_CXSCREEN);
-		int ResY = GetSystemMetrics(SM_CYSCREEN);
+		const int ResX = GetSystemMetrics(SM_CXSCREEN);
+		const int ResY = GetSystemMetrics(SM_CYSCREEN);
 
-		wsprintf(tchPosX, L"%ix%i PosX", ResX, ResY);
-		wsprintf(tchPosY, L"%ix%i PosY", ResX, ResY);
-		wsprintf(tchSizeX, L"%ix%i SizeX", ResX, ResY);
-		wsprintf(tchSizeY, L"%ix%i SizeY", ResX, ResY);
+		const int len = wsprintf(tchPosX, L"%ix%i ", ResX, ResY);
+		lstrcpy(tchPosY, tchPosX);
+		lstrcpy(tchSizeX, tchPosX);
+		lstrcpy(tchSizeY, tchPosX);
+		lstrcpy(tchPosX + len, L"PosX");
+		lstrcpy(tchPosY + len, L"PosY");
+		lstrcpy(tchSizeX + len, L"SizeX");
+		lstrcpy(tchSizeY + len, L"SizeY");
 
 		IniSetInt(INI_SECTION_NAME_WINDOW_POSITION, tchPosX, wi.x);
 		IniSetInt(INI_SECTION_NAME_WINDOW_POSITION, tchPosY, wi.y);
 		IniSetInt(INI_SECTION_NAME_WINDOW_POSITION, tchSizeX, wi.cx);
 		IniSetInt(INI_SECTION_NAME_WINDOW_POSITION, tchSizeY, wi.cy);
 	}
+}
+
+void SaveWindowPosition(void) {
+	WCHAR tchPosX[32], tchPosY[32], tchSizeX[32], tchSizeY[32];
+	const int ResX = GetSystemMetrics(SM_CXSCREEN);
+	const int ResY = GetSystemMetrics(SM_CYSCREEN);
+
+	const int len = wsprintf(tchPosX, L"%ix%i ", ResX, ResY);
+	lstrcpy(tchPosY, tchPosX);
+	lstrcpy(tchSizeX, tchPosX);
+	lstrcpy(tchSizeY, tchPosX);
+	lstrcpy(tchPosX + len, L"PosX");
+	lstrcpy(tchPosY + len, L"PosY");
+	lstrcpy(tchSizeX + len, L"SizeX");
+	lstrcpy(tchSizeY + len, L"SizeY");
+
+	IniSetInt(INI_SECTION_NAME_WINDOW_POSITION, tchPosX, wi.x);
+	IniSetInt(INI_SECTION_NAME_WINDOW_POSITION, tchPosY, wi.y);
+	IniSetInt(INI_SECTION_NAME_WINDOW_POSITION, tchSizeX, wi.cx);
+	IniSetInt(INI_SECTION_NAME_WINDOW_POSITION, tchSizeY, wi.cy);
 }
 
 //=============================================================================
@@ -2705,7 +2661,7 @@ int ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2) {
 		case L'F':
 			state = 2;
 			if (ExtractFirstArgument(lp2, lp1, lp2)) {
-				StrCpyN(szIniFile, lp1, COUNTOF(szIniFile));
+				lstrcpyn(szIniFile, lp1, COUNTOF(szIniFile));
 				TrimString(szIniFile);
 				PathUnquoteSpaces(szIniFile);
 				state = 1;
@@ -2795,8 +2751,7 @@ int ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2) {
 
 void ParseCommandLine(void) {
 	LPWSTR lpCmdLine = GetCommandLine();
-	LPWSTR lp1, lp2, lp3;
-	size_t cmdSize = sizeof(WCHAR) * (lstrlen(lpCmdLine) + 1);
+	const size_t cmdSize = sizeof(WCHAR) * (lstrlen(lpCmdLine) + 1);
 
 	if (cmdSize == sizeof(WCHAR)) {
 		return;
@@ -2805,8 +2760,8 @@ void ParseCommandLine(void) {
 	// Good old console can also send args separated by Tabs
 	StrTab2Space(lpCmdLine);
 
-	lp1 = NP2HeapAlloc(cmdSize);
-	lp3 = NP2HeapAlloc(cmdSize);
+	LPWSTR lp1 = NP2HeapAlloc(cmdSize);
+	LPWSTR lp3 = NP2HeapAlloc(cmdSize);
 
 	// Start with 2nd argument
 	if (!(ExtractFirstArgument(lpCmdLine, lp1, lp3) && *lp3)) {
@@ -2815,7 +2770,7 @@ void ParseCommandLine(void) {
 		return;
 	}
 
-	lp2 = NP2HeapAlloc(cmdSize);
+	LPWSTR lp2 = NP2HeapAlloc(cmdSize);
 	while (ExtractFirstArgument(lp3, lp1, lp2)) {
 		// options
 		if ((*lp1 == L'/' || *lp1 == L'-') && lp1[1] != 0) {
@@ -2833,7 +2788,7 @@ void ParseCommandLine(void) {
 			}
 
 			lpPathArg = GlobalAlloc(GPTR, sizeof(WCHAR) * (MAX_PATH + 2));
-			StrCpyN(lpPathArg, lp3, MAX_PATH);
+			lstrcpyn(lpPathArg, lp3, MAX_PATH);
 			break;
 		}
 	}
@@ -2942,7 +2897,6 @@ int CheckIniFileRedirect(LPWSTR lpszFile, LPCWSTR lpszModule) {
 }
 
 int FindIniFile(void) {
-	int bFound = 0;
 	WCHAR tchTest[MAX_PATH];
 	WCHAR tchModule[MAX_PATH];
 	GetModuleFileName(NULL, tchModule, COUNTOF(tchModule));
@@ -2965,7 +2919,7 @@ int FindIniFile(void) {
 
 	lstrcpy(tchTest, PathFindFileName(tchModule));
 	PathRenameExtension(tchTest, L".ini");
-	bFound = CheckIniFile(tchTest, tchModule);
+	int bFound = CheckIniFile(tchTest, tchModule);
 
 	if (!bFound) {
 		lstrcpy(tchTest, L"metapath.ini");
@@ -3021,16 +2975,15 @@ int CreateIniFile(void) {
 
 int CreateIniFileEx(LPCWSTR lpszIniFile) {
 	if (StrNotEmpty(lpszIniFile)) {
-		HANDLE hFile;
 		WCHAR *pwchTail;
 
-		if ((pwchTail = StrRChrW(lpszIniFile, NULL, L'\\')) != NULL) {
+		if ((pwchTail = StrRChr(lpszIniFile, NULL, L'\\')) != NULL) {
 			*pwchTail = 0;
 			SHCreateDirectoryEx(NULL, lpszIniFile, NULL);
 			*pwchTail = L'\\';
 		}
 
-		hFile = CreateFile(lpszIniFile,
+		HANDLE hFile = CreateFile(lpszIniFile,
 						   GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE,
 						   NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 		if (hFile != INVALID_HANDLE_VALUE) {
@@ -3052,17 +3005,15 @@ int CreateIniFileEx(LPCWSTR lpszIniFile) {
 //
 //
 BOOL DisplayPath(LPCWSTR lpPath, UINT uIdError) {
-	DWORD dwAttr;
-	WCHAR  szPath[MAX_PATH];
-	WCHAR  szTmp[MAX_PATH];
-
 	if (StrIsEmpty(lpPath)) {
 		return FALSE;
 	}
 
+	WCHAR szTmp[MAX_PATH];
 	lstrcpy(szTmp, lpPath);
 	ExpandEnvironmentStringsEx(szTmp, COUNTOF(szTmp));
 
+	WCHAR szPath[MAX_PATH];
 	if (!SearchPathEx(NULL, szTmp, NULL, COUNTOF(szPath), szPath, NULL)) {
 		lstrcpy(szPath, szTmp);
 	}
@@ -3071,8 +3022,7 @@ BOOL DisplayPath(LPCWSTR lpPath, UINT uIdError) {
 		return DisplayLnkFile(szPath);
 	}
 
-	dwAttr = GetFileAttributes(szPath);
-
+	const DWORD dwAttr = GetFileAttributes(szPath);
 	if (dwAttr != INVALID_FILE_ATTRIBUTES) {
 		if (dwAttr & FILE_ATTRIBUTE_DIRECTORY) {
 			if (!SetCurrentDirectory(szPath)) {
@@ -3084,14 +3034,13 @@ BOOL DisplayPath(LPCWSTR lpPath, UINT uIdError) {
 			return TRUE;
 		}
 		{ // !(dwAttr & FILE_ATTRIBUTE_DIRECTORY)
-			WCHAR *p;
-			SHFILEINFO shfi;
-
 			// szPath will be modified...
 			lstrcpy(szTmp, szPath);
 
+			SHFILEINFO shfi;
 			SHGetFileInfo(szPath, 0, &shfi, sizeof(SHFILEINFO), SHGFI_DISPLAYNAME);
 
+			WCHAR *p;
 			if ((p = StrRChr(szPath, NULL, L'\\')) != NULL) {
 				*(p + 1) = 0;
 				if (!PathIsRoot(szPath)) {
@@ -3121,21 +3070,17 @@ BOOL DisplayPath(LPCWSTR lpPath, UINT uIdError) {
 //
 //
 BOOL DisplayLnkFile(LPCWSTR pszLnkFile) {
-	DWORD dwAttr;
-	WCHAR  szPath[MAX_PATH];
-	WCHAR  szTmp[MAX_PATH];
-
+	WCHAR szTmp[MAX_PATH];
 	if (!PathGetLnkPath(pszLnkFile, szTmp, COUNTOF(szTmp))) {
 		// Select lnk-file if target is not available
 		if (PathFileExists(pszLnkFile)) {
-			SHFILEINFO shfi;
-
 			lstrcpy(szTmp, pszLnkFile);
 			PathRemoveFileSpec(szTmp);
 			SetCurrentDirectory(szTmp);
 
 			// Select new file
 			SendMessage(hwndMain, WM_COMMAND, MAKELONG(IDM_VIEW_UPDATE, 1), 0);
+			SHFILEINFO shfi;
 			SHGetFileInfo(pszLnkFile, 0, &shfi, sizeof(SHFILEINFO), SHGFI_DISPLAYNAME);
 			if (!DirList_SelectItem(hwndDirList, shfi.szDisplayName, pszLnkFile)) {
 				ListView_EnsureVisible(hwndDirList, 0, FALSE);
@@ -3148,12 +3093,12 @@ BOOL DisplayLnkFile(LPCWSTR pszLnkFile) {
 
 	ExpandEnvironmentStringsEx(szTmp, COUNTOF(szTmp));
 
+	WCHAR szPath[MAX_PATH];
 	if (!SearchPathEx(NULL, szTmp, NULL, COUNTOF(szPath), szPath, NULL)) {
 		lstrcpy(szPath, szTmp);
 	}
 
-	dwAttr = GetFileAttributes(szPath);
-
+	const DWORD dwAttr = GetFileAttributes(szPath);
 	if (dwAttr != INVALID_FILE_ATTRIBUTES) {
 		if (dwAttr & FILE_ATTRIBUTE_DIRECTORY) {
 			if (!SetCurrentDirectory(szPath)) {
@@ -3164,65 +3109,59 @@ BOOL DisplayLnkFile(LPCWSTR pszLnkFile) {
 			ListView_EnsureVisible(hwndDirList, 0, FALSE);
 			return TRUE;
 		}
-		{ // !(dwAttr & FILE_ATTRIBUTE_DIRECTORY)
-			WCHAR *p;
-			int  i;
-			SHFILEINFO  shfi;
-			LV_FINDINFO lvfi;
 
-			// Current file is ShellLink, get dir and desc
-			lstrcpy(szPath, pszLnkFile);
+		// Current file is ShellLink, get dir and desc
+		lstrcpy(szPath, pszLnkFile);
 
-			SHGetFileInfo(szPath, 0, &shfi, sizeof(SHFILEINFO), SHGFI_DISPLAYNAME);
+		SHFILEINFO shfi;
+		SHGetFileInfo(szPath, 0, &shfi, sizeof(SHFILEINFO), SHGFI_DISPLAYNAME);
 
-			if ((p = StrRChr(szPath, NULL, L'\\')) != NULL) {
-				*(p + 1) = 0;
-				if (!PathIsRoot(szPath)) {
-					*p = 0;
-				}
-				SetCurrentDirectory(szPath);
+		WCHAR *p;
+		if ((p = StrRChr(szPath, NULL, L'\\')) != NULL) {
+			*(p + 1) = 0;
+			if (!PathIsRoot(szPath)) {
+				*p = 0;
 			}
-
-			lvfi.flags = LVFI_STRING;
-			lvfi.psz   = shfi.szDisplayName;
-
-			SendMessage(hwndMain, WM_COMMAND, MAKELONG(IDM_VIEW_UPDATE, 1), 0);
-			i = ListView_FindItem(hwndDirList, -1, &lvfi);
-
-			// found item that is currently displayed
-			if (i != -1) {
-				ListView_SetItemState(hwndDirList, i, LVIS_SELECTED | LVIS_FOCUSED,
-									  LVIS_SELECTED | LVIS_FOCUSED);
-				ListView_EnsureVisible(hwndDirList, i, FALSE);
-			} else {
-				ListView_EnsureVisible(hwndDirList, 0, FALSE);
-			}
-
-			return TRUE;
+			SetCurrentDirectory(szPath);
 		}
+
+		LV_FINDINFO lvfi;
+		lvfi.flags = LVFI_STRING;
+		lvfi.psz   = shfi.szDisplayName;
+
+		SendMessage(hwndMain, WM_COMMAND, MAKELONG(IDM_VIEW_UPDATE, 1), 0);
+		const int i = ListView_FindItem(hwndDirList, -1, &lvfi);
+
+		// found item that is currently displayed
+		if (i != -1) {
+			ListView_SetItemState(hwndDirList, i, LVIS_SELECTED | LVIS_FOCUSED,
+								  LVIS_SELECTED | LVIS_FOCUSED);
+			ListView_EnsureVisible(hwndDirList, i, FALSE);
+		} else {
+			ListView_EnsureVisible(hwndDirList, 0, FALSE);
+		}
+
+		return TRUE;
 	}
 
 	// GetFileAttributes() failed
-	{
-		// Select lnk-file if target is not available
-		if (PathFileExists(pszLnkFile)) {
-			SHFILEINFO shfi;
+	// Select lnk-file if target is not available
+	if (PathFileExists(pszLnkFile)) {
+		lstrcpy(szTmp, pszLnkFile);
+		PathRemoveFileSpec(szTmp);
+		SetCurrentDirectory(szTmp);
 
-			lstrcpy(szTmp, pszLnkFile);
-			PathRemoveFileSpec(szTmp);
-			SetCurrentDirectory(szTmp);
-
-			// Select new file
-			SendMessage(hwndMain, WM_COMMAND, MAKELONG(IDM_VIEW_UPDATE, 1), 0);
-			SHGetFileInfo(pszLnkFile, 0, &shfi, sizeof(SHFILEINFO), SHGFI_DISPLAYNAME);
-			if (!DirList_SelectItem(hwndDirList, shfi.szDisplayName, pszLnkFile)) {
-				ListView_EnsureVisible(hwndDirList, 0, FALSE);
-			}
+		// Select new file
+		SendMessage(hwndMain, WM_COMMAND, MAKELONG(IDM_VIEW_UPDATE, 1), 0);
+		SHFILEINFO shfi;
+		SHGetFileInfo(pszLnkFile, 0, &shfi, sizeof(SHFILEINFO), SHGFI_DISPLAYNAME);
+		if (!DirList_SelectItem(hwndDirList, shfi.szDisplayName, pszLnkFile)) {
+			ListView_EnsureVisible(hwndDirList, 0, FALSE);
 		}
-
-		ErrorMessage(2, IDS_ERR_LNK_NOACCESS);
-		return FALSE;
 	}
+
+	ErrorMessage(2, IDS_ERR_LNK_NOACCESS);
+	return FALSE;
 }
 
 /******************************************************************************
@@ -3233,7 +3172,7 @@ BOOL DisplayLnkFile(LPCWSTR pszLnkFile) {
 *
 *
 ******************************************************************************/
-BOOL CALLBACK EnumWndProc(HWND hwnd, LPARAM lParam) {
+static BOOL CALLBACK EnumWndProc(HWND hwnd, LPARAM lParam) {
 	BOOL bContinue = TRUE;
 	WCHAR szClassName[64];
 
@@ -3250,13 +3189,11 @@ BOOL CALLBACK EnumWndProc(HWND hwnd, LPARAM lParam) {
 }
 
 BOOL ActivatePrevInst(void) {
-	HWND hwnd = NULL;
-	COPYDATASTRUCT cds;
-
 	if (flagNoReuseWindow || flagStartAsTrayIcon) {
 		return FALSE;
 	}
 
+	HWND hwnd = NULL;
 	EnumWindows(EnumWndProc, (LPARAM)&hwnd);
 
 	// Found a window
@@ -3295,50 +3232,40 @@ BOOL ActivatePrevInst(void) {
 					lstrcpy(lpPathArg, tchTmp);
 				}
 
+				COPYDATASTRUCT cds;
 				cds.dwData = DATA_METAPATH_PATHARG;
 				cds.cbData = (DWORD)GlobalSize(lpPathArg);
 				cds.lpData = lpPathArg;
 
 				// Send lpPathArg to previous instance
-				SendMessage(hwnd, WM_COPYDATA, (WPARAM)NULL, (LPARAM)&cds);
+				SendMessage(hwnd, WM_COPYDATA, 0, (LPARAM)&cds);
 
 				GlobalFree(lpPathArg);
 			}
 			return TRUE;
 		}
 
-		{ // !IsWindowEnabled()
-			WCHAR szBuf[256];
-			WCHAR *c;
+		WCHAR szBuf[256];
 
-			// Prepare message
-			GetString(IDS_ERR_PREVWINDISABLED, szBuf, COUNTOF(szBuf));
-			c = StrChr(szBuf, L'\n');
-			if (c) {
-				*c = 0;
-				c++;
-			}
-
-			// Ask...
-			if (MessageBox(NULL, c, szBuf, MB_YESNO | MB_ICONQUESTION | MB_SETFOREGROUND) == IDYES) {
-				return FALSE;
-			}
-			return TRUE;
-
+		// Prepare message
+		GetString(IDS_ERR_PREVWINDISABLED, szBuf, COUNTOF(szBuf));
+		WCHAR *c = StrChr(szBuf, L'\n');
+		if (c) {
+			*c = 0;
+			c++;
 		}
+
+		// Ask...
+		if (MessageBox(NULL, c, szBuf, MB_YESNO | MB_ICONQUESTION | MB_SETFOREGROUND) == IDYES) {
+			return FALSE;
+		}
+		return TRUE;
 	}
 
 	return FALSE;
 }
 
 void GetRelaunchParameters(LPWSTR szParameters) {
-	MONITORINFO mi;
-	HMONITOR hMonitor;
-	WINDOWPLACEMENT wndpl;
-	int x, y, cx, cy;
-	WCHAR tch[64];
-	WCHAR szDirName[MAX_PATH + 4];
-
 	lstrcpy(szParameters, L" -f");
 	if (StrNotEmpty(szIniFile)) {
 		lstrcat(szParameters, L" \"");
@@ -3350,18 +3277,20 @@ void GetRelaunchParameters(LPWSTR szParameters) {
 
 	lstrcat(szParameters, L" -n");
 
+	WINDOWPLACEMENT wndpl;
 	wndpl.length = sizeof(WINDOWPLACEMENT);
 	GetWindowPlacement(hwndMain, &wndpl);
 
-	hMonitor = MonitorFromRect(&wndpl.rcNormalPosition, MONITOR_DEFAULTTONEAREST);
+	HMONITOR hMonitor = MonitorFromRect(&wndpl.rcNormalPosition, MONITOR_DEFAULTTONEAREST);
+	MONITORINFO mi;
 	mi.cbSize = sizeof(mi);
 	GetMonitorInfo(hMonitor, &mi);
 
 	// offset new window position +10/+10
-	x = wndpl.rcNormalPosition.left + 10;
-	y = wndpl.rcNormalPosition.top  + 10;
-	cx = wndpl.rcNormalPosition.right - wndpl.rcNormalPosition.left;
-	cy = wndpl.rcNormalPosition.bottom - wndpl.rcNormalPosition.top;
+	int x = wndpl.rcNormalPosition.left + 10;
+	int y = wndpl.rcNormalPosition.top  + 10;
+	const int cx = wndpl.rcNormalPosition.right - wndpl.rcNormalPosition.left;
+	const int cy = wndpl.rcNormalPosition.bottom - wndpl.rcNormalPosition.top;
 
 	// check if window fits monitor
 	if ((x + cx) > mi.rcWork.right || (y + cy) > mi.rcWork.bottom) {
@@ -3369,9 +3298,11 @@ void GetRelaunchParameters(LPWSTR szParameters) {
 		y = mi.rcMonitor.top;
 	}
 
+	WCHAR tch[64];
 	wsprintf(tch, L" -p %i,%i,%i,%i", x, y, cx, cy);
 	lstrcat(szParameters, tch);
 
+	WCHAR szDirName[MAX_PATH + 4];
 	lstrcpy(szDirName, szCurDir);
 	PathQuoteSpaces(szDirName);
 	lstrcat(szParameters, L" ");
@@ -3385,13 +3316,13 @@ void GetRelaunchParameters(LPWSTR szParameters) {
 //
 void ShowNotifyIcon(HWND hwnd, BOOL bAdd) {
 	static HICON hIcon;
-	NOTIFYICONDATA nid;
 
 	if (!hIcon) {
 		hIcon = LoadImage(g_hInstance, MAKEINTRESOURCE(IDR_MAINWND),
 						  IMAGE_ICON, 16, 16, LR_DEFAULTCOLOR);
 	}
 
+	NOTIFYICONDATA nid;
 	ZeroMemory(&nid, sizeof(NOTIFYICONDATA));
 	nid.cbSize = sizeof(NOTIFYICONDATA);
 	nid.hWnd = hwnd;
@@ -3419,7 +3350,7 @@ void ShowNotifyIcon(HWND hwnd, BOOL bAdd) {
 WCHAR szGlobalWndClass[256] = L"";
 BOOL bLoadLaunchSetingsLoaded = FALSE;
 
-BOOL CALLBACK EnumWndProc2(HWND hwnd, LPARAM lParam) {
+static BOOL CALLBACK EnumWndProc2(HWND hwnd, LPARAM lParam) {
 	BOOL bContinue = TRUE;
 	WCHAR szClassName[64];
 
@@ -3472,20 +3403,18 @@ void LoadLaunchSetings(void) {
 }
 
 void LaunchTarget(LPCWSTR lpFileName, BOOL bOpenNew) {
-	HWND  hwnd  = NULL;
-	HDROP hDrop = NULL;
-
 	if (!bLoadLaunchSetingsLoaded) {
 		LoadLaunchSetings();
 	}
 	if (iUseTargetApplication == 4 ||
 			(iUseTargetApplication && StrIsEmpty(szTargetApplication))) {
 		ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_FINDTARGET),
-							 hwndMain, FindTargetDlgProc, (LPARAM)NULL);
+							 hwndMain, FindTargetDlgProc, 0);
 		return;
 	}
 
 	if (iUseTargetApplication && iTargetApplicationMode == 1) {
+		HWND hwnd  = NULL;
 		if (!bOpenNew) { // hwnd == NULL
 			EnumWindows(EnumWndProc2, (LPARAM)&hwnd);
 		}
@@ -3500,23 +3429,16 @@ void LaunchTarget(LPCWSTR lpFileName, BOOL bOpenNew) {
 			}
 
 			if (lpFileName) {
-				hDrop = CreateDropHandle(lpFileName);
-				PostMessage(hwnd, WM_DROPFILES, (WPARAM)hDrop, (LPARAM)0);
+				HDROP hDrop = CreateDropHandle(lpFileName);
+				PostMessage(hwnd, WM_DROPFILES, (WPARAM)hDrop, 0);
 			}
 		} else { // Either no window or disabled - run target.exe
-			SHELLEXECUTEINFO sei;
-			WCHAR  szFile[MAX_PATH];
-			LPWSTR lpParam;
-			WCHAR  szParam[MAX_PATH] = L"";
-			WCHAR  szTmp[MAX_PATH];
-
 			if (hwnd) { // disabled window
 				WCHAR szBuf[256];
-				WCHAR *c;
 
 				// Prepare message
 				GetString(IDS_ERR_TARGETDISABLED, szBuf, COUNTOF(szBuf));
-				c = StrChr(szBuf, L'\n');
+				WCHAR *c = StrChr(szBuf, L'\n');
 				if (c) {
 					*c = 0;
 					c++;
@@ -3529,8 +3451,8 @@ void LaunchTarget(LPCWSTR lpFileName, BOOL bOpenNew) {
 				}
 			}
 
-			ZeroMemory(&sei, sizeof(SHELLEXECUTEINFO));
-
+			LPWSTR lpParam;
+			WCHAR szTmp[MAX_PATH];
 			if (PathIsLnkFile(lpFileName) && PathGetLnkPath(lpFileName, szTmp, COUNTOF(szTmp))) {
 				lpParam = szTmp;
 			} else {
@@ -3542,13 +3464,15 @@ void LaunchTarget(LPCWSTR lpFileName, BOOL bOpenNew) {
 			//else
 			GetShortPathName(lpParam, lpParam, MAX_PATH);
 
+			WCHAR szParam[MAX_PATH] = L"";
 			if (StrNotEmpty(szTargetApplicationParams)) {
-				StrCpyN(szParam, szTargetApplicationParams, COUNTOF(szParam));
+				lstrcpyn(szParam, szTargetApplicationParams, COUNTOF(szParam));
 				StrCatBuff(szParam, L" ", COUNTOF(szParam));
 			}
 			StrCatBuff(szParam, lpParam, COUNTOF(szParam));
 
 			lstrcpy(szTmp, szTargetApplication);
+			WCHAR szFile[MAX_PATH];
 			PathAbsoluteFromApp(szTmp, szFile, COUNTOF(szFile), TRUE);
 			if (!PathFileExists(szFile)) {
 				if (!SearchPath(NULL, szTmp, NULL, COUNTOF(szFile), szFile, NULL)) {
@@ -3558,6 +3482,8 @@ void LaunchTarget(LPCWSTR lpFileName, BOOL bOpenNew) {
 				}
 			}
 
+			SHELLEXECUTEINFO sei;
+			ZeroMemory(&sei, sizeof(SHELLEXECUTEINFO));
 			sei.cbSize = sizeof(SHELLEXECUTEINFO);
 			sei.fMask = 0;
 			sei.hwnd = hwndMain;
@@ -3570,12 +3496,6 @@ void LaunchTarget(LPCWSTR lpFileName, BOOL bOpenNew) {
 			ShellExecuteEx(&sei);
 		}
 	} else {
-		SHELLEXECUTEINFO sei;
-		WCHAR  szFile[MAX_PATH];
-		LPWSTR lpParam;
-		WCHAR  szParam[MAX_PATH] = L"";
-		WCHAR  szTmp[MAX_PATH];
-
 		if (iUseTargetApplication &&
 				iTargetApplicationMode == 2 &&
 				ExecDDECommand(lpFileName, szDDEMsg, szDDEApp, szDDETopic)) {
@@ -3585,60 +3505,61 @@ void LaunchTarget(LPCWSTR lpFileName, BOOL bOpenNew) {
 		if (!iUseTargetApplication && StrIsEmpty(lpFileName)) {
 			return;
 		}
-		{
 
-			ZeroMemory(&sei, sizeof(SHELLEXECUTEINFO));
-
-			if (PathIsLnkFile(lpFileName) &&
-					PathGetLnkPath(lpFileName, szTmp, COUNTOF(szTmp))) {
-				lpParam = szTmp;
-			} else {
-				lpParam = (LPWSTR)lpFileName;
-			}
-
-			//if (Is32bitExe(szTargetApplication))
-			//  PathQuoteSpaces(lpParam);
-			//else
-			GetShortPathName(lpParam, lpParam, MAX_PATH);
-
-			if (StrNotEmpty(szTargetApplicationParams)) {
-				StrCpyN(szParam, szTargetApplicationParams, COUNTOF(szParam));
-				StrCatBuff(szParam, L" ", COUNTOF(szParam));
-			}
-			StrCatBuff(szParam, lpParam, COUNTOF(szParam));
-
-			lstrcpy(szTmp, szTargetApplication);
-			ExpandEnvironmentStringsEx(szTmp, COUNTOF(szTmp));
-
-			if (PathIsRelative(szTmp)) {
-				PathAbsoluteFromApp(szTmp, szFile, COUNTOF(szFile), TRUE);
-				if (!PathFileExists(szFile)) {
-					if (!SearchPath(NULL, szTmp, NULL, COUNTOF(szFile), szFile, NULL)) {
-						GetModuleFileName(NULL, szFile, COUNTOF(szFile));
-						PathRemoveFileSpec(szFile);
-						PathAppend(szFile, szTmp);
-					}
-				}
-			} else {
-				lstrcpy(szFile, szTmp);
-			}
-
-			sei.cbSize = sizeof(SHELLEXECUTEINFO);
-			sei.fMask = 0;
-			sei.hwnd = hwndMain;
-			sei.lpVerb = NULL;
-			if (iUseTargetApplication) {
-				sei.lpFile = szFile;
-				sei.lpParameters = szParam;
-			} else {
-				sei.lpFile = lpParam;
-				sei.lpParameters = NULL;
-			}
-			sei.lpDirectory = szCurDir;
-			sei.nShow = SW_SHOWNORMAL;
-
-			ShellExecuteEx(&sei);
+		LPWSTR lpParam;
+		WCHAR szTmp[MAX_PATH];
+		if (PathIsLnkFile(lpFileName) && PathGetLnkPath(lpFileName, szTmp, COUNTOF(szTmp))) {
+			lpParam = szTmp;
+		} else {
+			lpParam = (LPWSTR)lpFileName;
 		}
+
+		//if (Is32bitExe(szTargetApplication))
+		//  PathQuoteSpaces(lpParam);
+		//else
+		GetShortPathName(lpParam, lpParam, MAX_PATH);
+
+		WCHAR szParam[MAX_PATH] = L"";
+		if (StrNotEmpty(szTargetApplicationParams)) {
+			lstrcpyn(szParam, szTargetApplicationParams, COUNTOF(szParam));
+			StrCatBuff(szParam, L" ", COUNTOF(szParam));
+		}
+		StrCatBuff(szParam, lpParam, COUNTOF(szParam));
+
+		lstrcpy(szTmp, szTargetApplication);
+		ExpandEnvironmentStringsEx(szTmp, COUNTOF(szTmp));
+
+		WCHAR szFile[MAX_PATH];
+		if (PathIsRelative(szTmp)) {
+			PathAbsoluteFromApp(szTmp, szFile, COUNTOF(szFile), TRUE);
+			if (!PathFileExists(szFile)) {
+				if (!SearchPath(NULL, szTmp, NULL, COUNTOF(szFile), szFile, NULL)) {
+					GetModuleFileName(NULL, szFile, COUNTOF(szFile));
+					PathRemoveFileSpec(szFile);
+					PathAppend(szFile, szTmp);
+				}
+			}
+		} else {
+			lstrcpy(szFile, szTmp);
+		}
+
+		SHELLEXECUTEINFO sei;
+		ZeroMemory(&sei, sizeof(SHELLEXECUTEINFO));
+		sei.cbSize = sizeof(SHELLEXECUTEINFO);
+		sei.fMask = 0;
+		sei.hwnd = hwndMain;
+		sei.lpVerb = NULL;
+		if (iUseTargetApplication) {
+			sei.lpFile = szFile;
+			sei.lpParameters = szParam;
+		} else {
+			sei.lpFile = lpParam;
+			sei.lpParameters = NULL;
+		}
+		sei.lpDirectory = szCurDir;
+		sei.nShow = SW_SHOWNORMAL;
+
+		ShellExecuteEx(&sei);
 	}
 }
 
@@ -3650,29 +3571,25 @@ void LaunchTarget(LPCWSTR lpFileName, BOOL bOpenNew) {
 //
 //
 void SnapToTarget(HWND hwnd) {
-	RECT rcOld, rcNew, rc2;
-	HWND hwnd2;
-
 	if (!bLoadLaunchSetingsLoaded) {
 		LoadLaunchSetings();
 	}
 
-	hwnd2 = NULL;
+	HWND hwnd2 = NULL;
 	EnumWindows(EnumWndProc2, (LPARAM)&hwnd2);
 
 	// Found a window
 	if (hwnd2 != NULL) {
-		int  cxScreen;
 		if (IsIconic(hwnd2) || IsZoomed(hwnd2)) {
 			SendMessage(hwnd2, WM_SYSCOMMAND, SC_RESTORE, 0);
 		}
 
 		SetForegroundWindow(hwnd2);
 		BringWindowToTop(hwnd2);
-
 		SetForegroundWindow(hwnd);
 
-		cxScreen = GetSystemMetrics(SM_CXSCREEN);
+		RECT rcOld, rcNew, rc2;
+		int cxScreen = GetSystemMetrics(SM_CXSCREEN);
 		GetWindowRect(hwnd, &rcOld);
 		GetWindowRect(hwnd2, &rc2);
 
@@ -3704,23 +3621,20 @@ void SnapToTarget(HWND hwnd) {
 //
 //
 void SnapToDefaultPos(HWND hwnd) {
-	WINDOWPLACEMENT wndpl;
-	HMONITOR hMonitor;
-	MONITORINFO mi;
-	int x, y, cx, cy;
 	RECT rcOld;
-
 	GetWindowRect(hwnd, &rcOld);
 
-	hMonitor = MonitorFromRect(&rcOld, MONITOR_DEFAULTTONEAREST);
+	HMONITOR hMonitor = MonitorFromRect(&rcOld, MONITOR_DEFAULTTONEAREST);
+	MONITORINFO mi;
 	mi.cbSize = sizeof(mi);
 	GetMonitorInfo(hMonitor, &mi);
 
-	x = mi.rcWork.left + 16;
-	y = mi.rcWork.top + 16;
-	cx = 272;
-	cy = 640;
+	int x = mi.rcWork.left + 16;
+	const int y = mi.rcWork.top + 16;
+	const int cx = 272;
+	const int cy = 640;
 
+	WINDOWPLACEMENT wndpl;
 	wndpl.length = sizeof(WINDOWPLACEMENT);
 	wndpl.flags = WPF_ASYNCWINDOWPLACEMENT;
 	wndpl.showCmd = SW_RESTORE;

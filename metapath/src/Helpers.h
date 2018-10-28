@@ -43,12 +43,10 @@ NP2_inline BOOL StrNotEmpty(LPCWSTR s) {
 }
 
 NP2_inline BOOL StrEqual(LPCWSTR s1, LPCWSTR s2) {
-	//return CompareStringW(LOCALE_INVARIANT, 0, s1, -1, s2, -1) == CSTR_EQUAL;
 	return wcscmp(s1, s2) == 0;
 }
 
 NP2_inline BOOL StrCaseEqual(LPCWSTR s1, LPCWSTR s2) {
-	//return CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, s1, -1, s2, -1) == CSTR_EQUAL;
 	return _wcsicmp(s1, s2) == 0;
 }
 
@@ -58,6 +56,12 @@ NP2_inline BOOL StrNEqual(LPCWSTR s1, LPCWSTR s2, int cch) {
 
 NP2_inline BOOL StrNCaseEqual(LPCWSTR s1, LPCWSTR s2, int cch) {
 	return _wcsnicmp(s1, s2, cch) == 0;
+}
+
+NP2_inline BOOL CRTStrToInt(LPCWSTR str, int *value) {
+	LPWSTR end;
+	*value = (int)wcstol(str, &end, 10);
+	return str != end;
 }
 
 int ParseCommaList(LPCWSTR str, int result[], int count);
@@ -254,13 +258,16 @@ BOOL BitmapGrayScale(HBITMAP hbmp);
 
 BOOL SetWindowPathTitle(HWND hwnd, LPCWSTR lpszFile);
 void CenterDlgInParentEx(HWND hDlg, HWND hParent);
-void CenterDlgInParent(HWND hDlg);
+NP2_inline void CenterDlgInParent(HWND hDlg) {
+	CenterDlgInParentEx(hDlg, GetParent(hDlg));
+}
 void SnapToDefaultButton(HWND hwndBox);
+
 void MakeBitmapButton(HWND hwnd, int nCtlId, HINSTANCE hInstance, UINT uBmpId);
 void DeleteBitmapButton(HWND hwnd, int nCtlId);
 void SetWindowTransparentMode(HWND hwnd, BOOL bTransparentMode);
 
-#define StatusSetSimple(hwnd,b) SendMessage(hwnd, SB_SIMPLE, (WPARAM)(b), 0)
+#define StatusSetSimple(hwnd, b)				SendMessage(hwnd, SB_SIMPLE, (b), 0)
 #define StatusSetText(hwnd, nPart, lpszText)	SendMessage(hwnd, SB_SETTEXT, (nPart), (LPARAM)(lpszText))
 
 /**
@@ -288,10 +295,10 @@ LRESULT SendWMSize(HWND hwnd);
  * https://gcc.gnu.org/onlinedocs/cpp/Variadic-Macros.html
  * https://docs.microsoft.com/en-us/cpp/preprocessor/variadic-macros?view=vs-2017
  */
-#define FormatString(lpOutput, lpFormat, uIdFormat, ...)			\
-	if (GetString((uIdFormat), (lpFormat), COUNTOF(lpFormat))) {	\
-		wsprintf((lpOutput), (lpFormat), __VA_ARGS__);				\
-	}
+#define FormatString(lpOutput, lpFormat, uIdFormat, ...) do {	\
+		GetString((uIdFormat), (lpFormat), COUNTOF(lpFormat));	\
+		wsprintf((lpOutput), (lpFormat), __VA_ARGS__);			\
+	} while (0)
 
 void PathRelativeToApp(LPCWSTR lpszSrc, LPWSTR lpszDest, int cchDest, BOOL bSrcIsFile,
 					   BOOL bUnexpandEnv, BOOL bUnexpandMyDocs);

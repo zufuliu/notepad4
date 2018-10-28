@@ -112,7 +112,6 @@ void ShowNotifyIcon(HWND hwnd, BOOL bAdd);
 BOOL ChangeDirectory(HWND hwnd, LPCWSTR lpszNewDir, BOOL bUpdateHistory);
 void LoadSettings(void);
 void SaveSettings(BOOL bSaveSettingsNow);
-
 void ParseCommandLine(void);
 void LoadFlags(void);
 void LoadLaunchSetings(void);

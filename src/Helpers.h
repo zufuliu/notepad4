@@ -63,12 +63,10 @@ NP2_inline BOOL StrNotEmpty(LPCWSTR s) {
 }
 
 NP2_inline BOOL StrEqual(LPCWSTR s1, LPCWSTR s2) {
-	//return CompareStringW(LOCALE_INVARIANT, 0, s1, -1, s2, -1) == CSTR_EQUAL;
 	return wcscmp(s1, s2) == 0;
 }
 
 NP2_inline BOOL StrCaseEqual(LPCWSTR s1, LPCWSTR s2) {
-	//return CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, s1, -1, s2, -1) == CSTR_EQUAL;
 	return _wcsicmp(s1, s2) == 0;
 }
 
@@ -85,6 +83,12 @@ NP2_inline BOOL StrToFloat(LPCWSTR str, float *value) {
 	LPWSTR end;
 	*value = wcstof(str, &end);
 	return str != end;
+}
+
+NP2_inline BOOL CRTStrToInt(LPCWSTR str, int *value) {
+	LPWSTR end;
+	*value = (int)wcstol(str, &end, 10);
+	return str != end;	
 }
 
 // str MUST NOT be NULL, can be empty
@@ -356,15 +360,18 @@ BOOL BitmapGrayScale(HBITMAP hbmp);
 BOOL VerifyContrast(COLORREF cr1, COLORREF cr2);
 BOOL IsFontAvailable(LPCWSTR lpszFontName);
 
-void SetClipDataW(HWND hwnd, WCHAR *pszData);
+void SetClipData(HWND hwnd, WCHAR *pszData);
 BOOL SetWindowTitle(HWND hwnd, UINT uIDAppName, BOOL bIsElevated, UINT uIDUntitled,
 					LPCWSTR lpszFile, int iFormat, BOOL bModified,
 					UINT uIDReadOnly, BOOL bReadOnly, LPCWSTR lpszExcerpt);
 void SetWindowTransparentMode(HWND hwnd, BOOL bTransparentMode);
 
 void CenterDlgInParentEx(HWND hDlg, HWND hParent);
-void CenterDlgInParent(HWND hDlg);
+NP2_inline void CenterDlgInParent(HWND hDlg) {
+	CenterDlgInParentEx(hDlg, GetParent(hDlg));
+}
 void SnapToDefaultButton(HWND hwndBox);
+
 void GetDlgPos(HWND hDlg, LPINT xDlg, LPINT yDlg);
 void SetDlgPos(HWND hDlg, int xDlg, int yDlg);
 void ResizeDlg_Init(HWND hwnd, int cxFrame, int cyFrame, int nIdGrip);
@@ -376,7 +383,7 @@ void MakeBitmapButton(HWND hwnd, int nCtlId, HINSTANCE hInstance, UINT uBmpId);
 void MakeColorPickButton(HWND hwnd, int nCtlId, HINSTANCE hInstance, COLORREF crColor);
 void DeleteBitmapButton(HWND hwnd, int nCtlId);
 
-#define StatusSetSimple(hwnd, b) SendMessage(hwnd, SB_SIMPLE, (WPARAM)(b), 0)
+#define StatusSetSimple(hwnd, b)				SendMessage(hwnd, SB_SIMPLE, (b), 0)
 #define StatusSetText(hwnd, nPart, lpszText)	SendMessage(hwnd, SB_SETTEXT, (nPart), (LPARAM)(lpszText))
 BOOL StatusSetTextID(HWND hwnd, UINT nPart, UINT uID);
 int  StatusCalcPaneWidth(HWND hwnd, LPCWSTR lpsz);
@@ -406,10 +413,10 @@ BOOL IsCmdEnabled(HWND hwnd, UINT uId);
  * https://gcc.gnu.org/onlinedocs/cpp/Variadic-Macros.html
  * https://docs.microsoft.com/en-us/cpp/preprocessor/variadic-macros?view=vs-2017
  */
-#define FormatString(lpOutput, lpFormat, uIdFormat, ...)			\
-	if (GetString((uIdFormat), (lpFormat), COUNTOF(lpFormat))) {	\
-		wsprintf((lpOutput), (lpFormat), __VA_ARGS__);				\
-	}
+#define FormatString(lpOutput, lpFormat, uIdFormat, ...) do {	\
+		GetString((uIdFormat), (lpFormat), COUNTOF(lpFormat));	\
+		wsprintf((lpOutput), (lpFormat), __VA_ARGS__);			\
+	} while (0)
 
 void PathRelativeToApp(LPCWSTR lpszSrc, LPWSTR lpszDest, int cchDest,
 					   BOOL bSrcIsFile, BOOL bUnexpandEnv, BOOL bUnexpandMyDocs);

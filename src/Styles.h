@@ -91,11 +91,9 @@ BOOL	Style_SelectFont(HWND hwnd, LPWSTR lpszStyle, int cchStyle, BOOL bDefaultSt
 BOOL	Style_SelectColor(HWND hwnd, BOOL bFore, LPWSTR lpszStyle, int cchStyle);
 void	Style_SetStyles(HWND hwnd, int iStyle, LPCWSTR lpszStyle);
 
-int 				Style_GetLexerIconId(PEDITLEXER pLex);
-INT_PTR CALLBACK	Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam);
-void				Style_ConfigDlg(HWND hwnd);
-INT_PTR CALLBACK	Style_SelectLexerDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam);
-void				Style_SelectLexerDlg(HWND hwnd);
+int 	Style_GetLexerIconId(PEDITLEXER pLex);
+void	Style_ConfigDlg(HWND hwnd);
+void	Style_SelectLexerDlg(HWND hwnd);
 
 #endif // NOTEPAD2_STYLES_H_
 

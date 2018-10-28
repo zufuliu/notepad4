@@ -121,8 +121,8 @@ void	EditGetExcerpt(HWND hwnd, LPWSTR lpszExcerpt, DWORD cchExcerpt);
 #define NP2_FIND_REPLACE_LIMIT	2048
 #define NP2_LONG_LINE_LIMIT		4096
 
-void EditSelectWord(HWND hwnd);
-void EditSelectLine(HWND hwnd);
+void	EditSelectWord(HWND hwnd);
+void	EditSelectLine(HWND hwnd);
 HWND	EditFindReplaceDlg(HWND hwnd, LPCEDITFINDREPLACE lpefr, BOOL bReplace);
 BOOL	EditFindNext(HWND hwnd, LPCEDITFINDREPLACE lpefr, BOOL fExtendSelection);
 BOOL	EditFindPrev(HWND hwnd, LPCEDITFINDREPLACE lpefr, BOOL fExtendSelection);
@@ -164,7 +164,7 @@ void	EditShowCallTips(HWND hwnd, Sci_Position position);
 #define NCP_8BIT					64
 #define NCP_INTERNAL				(NCP_DEFAULT|NCP_UTF8|NCP_UTF8_SIGN|NCP_UNICODE|NCP_UNICODE_REVERSE|NCP_UNICODE_BOM)
 #define NCP_RECODE					128
-#define CPI_NONE					-1
+#define CPI_NONE					(-1)
 #define CPI_DEFAULT					0
 #define CPI_OEM						1
 #define CPI_UNICODEBOM				2
@@ -198,7 +198,7 @@ void	Encoding_ReleaseResources(void);
 void	Encoding_InitDefaults(void);
 int 	Encoding_MapIniSetting(BOOL bLoad, int iSetting);
 void	Encoding_GetLabel(int iEncoding);
-int 	Encoding_MatchW(LPCWSTR pwszTest);
+int 	Encoding_Match(LPCWSTR pwszTest);
 int 	Encoding_MatchA(char *pchTest);
 BOOL	Encoding_IsValid(int iTestEncoding);
 void	Encoding_AddToListView(HWND hwnd, int idSel, BOOL bRecodeOnly);
