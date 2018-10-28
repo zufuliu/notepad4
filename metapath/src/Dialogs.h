@@ -27,6 +27,13 @@
  */
 #define APPM_CENTER_MESSAGE_BOX		(WM_APP + 1)
 
+extern BOOL bWindowLayoutRTL;
+NP2_inline void InitWindowCommon(HWND hwnd) {
+	if (bWindowLayoutRTL) {
+		SetWindowLayoutRTL(hwnd, TRUE);
+	}
+}
+
 int  ErrorMessage(int iLevel, UINT uIdMsg, ...);
 BOOL GetDirectory(HWND hwndParent, int iTitle, LPWSTR pszFolder, LPCWSTR pszBase);
 BOOL GetDirectory2(HWND hwndParent, int iTitle, LPWSTR pszFolder, int iBase);

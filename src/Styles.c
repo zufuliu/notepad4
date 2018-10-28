@@ -3434,6 +3434,7 @@ static INT_PTR CALLBACK Style_SelectLexerDlgProc(HWND hwnd, UINT umsg, WPARAM wP
 		SetWindowPos(GetDlgItem(hwnd, IDC_RESIZEGRIP3), NULL, cxClient - cGrip, cyClient - cGrip, cGrip, cGrip, SWP_NOZORDER);
 
 		HWND hwndLV = GetDlgItem(hwnd, IDC_STYLELIST);
+		InitWindowCommon(hwndLV);
 
 		SHFILEINFO shfi;
 		ListView_SetImageList(hwndLV, (HIMAGELIST)SHGetFileInfo(L"C:\\", 0, &shfi,

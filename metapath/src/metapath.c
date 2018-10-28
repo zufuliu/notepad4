@@ -95,6 +95,7 @@ int		iEscFunction;
 BOOL	bFocusEdit;
 BOOL	bAlwaysOnTop;
 static BOOL bTransparentMode;
+BOOL	bWindowLayoutRTL;
 BOOL	bMinimizeToTray;
 BOOL	fUseRecycleBin;
 BOOL	fNoConfirmDelete;
@@ -722,6 +723,7 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		SetWindowLongPtr(hwndDirList, GWL_EXSTYLE, GetWindowLongPtr(hwndDirList, GWL_EXSTYLE) & ~WS_EX_CLIENTEDGE);
 		SetWindowPos(hwndDirList, NULL, 0, 0, 0, 0, SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE | SWP_FRAMECHANGED);
 	}
+	InitWindowCommon(hwndDirList);
 
 	const DWORD dwDriveBoxStyle = bShowDriveBox ? (WS_DRIVEBOX | WS_VISIBLE) : WS_DRIVEBOX;
 	hwndDriveBox = CreateWindowEx(
@@ -1745,9 +1747,14 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 							 hwnd, FindTargetDlgProc, 0);
 		break;
 
-	case IDM_VIEW_OPTIONS:
+	case IDM_VIEW_OPTIONS: {
+		const BOOL back = bWindowLayoutRTL;
 		OptionsPropSheet(hwnd, g_hInstance);
-		break;
+		if (back != bWindowLayoutRTL) {
+			SetWindowLayoutRTL(hwndDirList, bWindowLayoutRTL);
+		}
+	}
+	break;
 
 	case IDM_SORT_NAME:
 		nSortFlags = DS_NAME;
@@ -2361,6 +2368,7 @@ void LoadSettings(void) {
 	bAlwaysOnTop = IniSectionGetBool(pIniSection, L"AlwaysOnTop", 0);
 	bMinimizeToTray = IniSectionGetBool(pIniSection, L"MinimizeToTray", 0);
 	bTransparentMode = IniSectionGetBool(pIniSection, L"TransparentMode", 0);
+	bWindowLayoutRTL = IniSectionGetBool(pIniSection, L"WindowLayoutRTL", 0);
 
 	iEscFunction = IniSectionGetInt(pIniSection, L"EscFunction", 0);
 	iEscFunction = clamp_i(iEscFunction, 0, 2);
@@ -2547,6 +2555,7 @@ void SaveSettings(BOOL bSaveSettingsNow) {
 	IniSectionSetBoolEx(pIniSection, L"AlwaysOnTop", bAlwaysOnTop, 0);
 	IniSectionSetBoolEx(pIniSection, L"MinimizeToTray", bMinimizeToTray, 0);
 	IniSectionSetBoolEx(pIniSection, L"TransparentMode", bTransparentMode, 0);
+	IniSectionSetBoolEx(pIniSection, L"WindowLayoutRTL", bWindowLayoutRTL, 0);
 	IniSectionSetBoolEx(pIniSection, L"EscFunction", iEscFunction, 0);
 
 	IniSectionSetIntEx(pIniSection, L"StartupDirectory", iStartupDir, 1);

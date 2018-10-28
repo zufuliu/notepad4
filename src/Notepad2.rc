@@ -519,7 +519,12 @@ BEGIN
             MENUITEM "Direct2D Retain", IDM_SET_RENDER_TECH_D2DRETAIN
             MENUITEM "Direct2D GDI DC", IDM_SET_RENDER_TECH_D2DDC
         END
-        POPUP "Bidirectional"
+        POPUP "RTL Layout (GDI)"
+        BEGIN
+            MENUITEM "Edit Window",     IDM_SET_RTL_LAYOUT_EDIT
+            MENUITEM "Other Window",    IDM_SET_RTL_LAYOUT_OTHER
+        END
+        POPUP "Bidirectional (Direct2D)"
         BEGIN
             MENUITEM "None",            IDM_SET_BIDIRECTIONAL_NONE
             MENUITEM "Left to Right",   IDM_SET_BIDIRECTIONAL_L2R

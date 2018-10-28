@@ -602,6 +602,10 @@ static INT_PTR CALLBACK GeneralPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LPA
 			EnableWindow(GetDlgItem(hwnd, IDC_SAVESETTINGS), FALSE);
 		}
 
+		if (bWindowLayoutRTL) {
+			CheckDlgButton(hwnd, IDC_RTL_LAYOUT, BST_CHECKED);
+		}
+
 		if (bSingleClick) {
 			CheckDlgButton(hwnd, IDC_SINGLECLICK, BST_CHECKED);
 		}
@@ -647,6 +651,7 @@ static INT_PTR CALLBACK GeneralPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LPA
 				bSaveSettings = IsButtonChecked(hwnd, IDC_SAVESETTINGS);
 			}
 
+			bWindowLayoutRTL = IsButtonChecked(hwnd, IDC_RTL_LAYOUT);
 			bSingleClick = IsButtonChecked(hwnd, IDC_SINGLECLICK);
 			bTrackSelect = IsButtonChecked(hwnd, IDC_TRACKSELECT);
 			bFullRowSelect = IsButtonChecked(hwnd, IDC_FULLROWSELECT);
@@ -1688,6 +1693,7 @@ INT_PTR CALLBACK OpenWithDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPa
 		SetWindowPos(GetDlgItem(hwnd, IDC_RESIZEGRIP3), NULL, cxClient - cGrip, cyClient - cGrip, cGrip, cGrip, SWP_NOZORDER);
 
 		HWND hwndLV = GetDlgItem(hwnd, IDC_OPENWITHDIR);
+		InitWindowCommon(hwndLV);
 		//SetExplorerTheme(hwndLV);
 		ListView_SetExtendedListViewStyle(hwndLV, /*LVS_EX_FULLROWSELECT | */LVS_EX_DOUBLEBUFFER | LVS_EX_LABELTIP);
 		ListView_InsertColumn(hwndLV, 0, &lvc);

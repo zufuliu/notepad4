@@ -598,6 +598,15 @@ void SetWindowTransparentMode(HWND hwnd, BOOL bTransparentMode) {
 	}
 }
 
+void SetWindowLayoutRTL(HWND hwnd, BOOL bRTL) {
+	const LONG_PTR exStyle = GetWindowLongPtr(hwnd, GWL_EXSTYLE);
+	if (bRTL) {
+		SetWindowLongPtr(hwnd, GWL_EXSTYLE,  exStyle | WS_EX_LAYOUTRTL);
+	} else {
+		SetWindowLongPtr(hwnd, GWL_EXSTYLE, exStyle & ~WS_EX_LAYOUTRTL);
+	}
+}
+
 //=============================================================================
 //
 // CenterDlgInParentEx()

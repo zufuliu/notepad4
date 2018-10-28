@@ -184,6 +184,8 @@ static int iEscFunction;
 static BOOL bAlwaysOnTop;
 static BOOL bMinimizeToTray;
 static BOOL bTransparentMode;
+static BOOL bEditLayoutRTL;
+BOOL	bWindowLayoutRTL;
 int		iRenderingTechnology;
 BOOL	bUseInlineIME;
 BOOL	bInlineIMEUseBlockCaret;
@@ -1551,6 +1553,9 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	// Setup edit control
 	hwndEdit = EditCreate(hwnd);
+	if (bEditLayoutRTL) {
+		SetWindowLayoutRTL(hwndEdit, TRUE);
+	}
 
 	iRenderingTechnology = (int)SendMessage(hwndEdit, SCI_GETTECHNOLOGY, 0, 0);
 	iBidirectional = (int)SendMessage(hwndEdit, SCI_GETBIDIRECTIONAL, 0, 0);
@@ -2397,6 +2402,10 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	EnableCmd(hmenu, IDM_SET_RENDER_TECH_D2DDC, i);
 	i = IDM_SET_RENDER_TECH_GDI + iRenderingTechnology;
 	CheckMenuRadioItem(hmenu, IDM_SET_RENDER_TECH_GDI, IDM_SET_RENDER_TECH_D2DDC, i, MF_BYCOMMAND);
+	// RTL Layout
+	EnableCmd(hmenu, IDM_SET_RTL_LAYOUT_EDIT, iRenderingTechnology == SC_TECHNOLOGY_DEFAULT);
+	CheckCmd(hmenu, IDM_SET_RTL_LAYOUT_EDIT, bEditLayoutRTL);
+	CheckCmd(hmenu, IDM_SET_RTL_LAYOUT_OTHER, bWindowLayoutRTL);
 	// Bidirectional
 	i = iRenderingTechnology != SC_TECHNOLOGY_DEFAULT;
 	EnableCmd(hmenu, IDM_SET_BIDIRECTIONAL_L2R, i);
@@ -4150,6 +4159,17 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		iBidirectional = (int)SendMessage(hwndEdit, SCI_GETBIDIRECTIONAL, 0, 0);
 		break;
 
+	case IDM_SET_RTL_LAYOUT_EDIT:
+		bEditLayoutRTL = !bEditLayoutRTL;
+		SetWindowLayoutRTL(hwndEdit, bEditLayoutRTL);
+		// force InvalidateStyleRedraw().
+		SendMessage(hwndEdit, SCI_SETVIEWEOL, bViewEOLs, 0);
+		break;
+
+	case IDM_SET_RTL_LAYOUT_OTHER:
+		bWindowLayoutRTL = !bWindowLayoutRTL;
+		break;
+
 	case IDM_SET_BIDIRECTIONAL_NONE:
 	case IDM_SET_BIDIRECTIONAL_L2R:
 	case IDM_SET_BIDIRECTIONAL_R2L:
@@ -5448,9 +5468,12 @@ void LoadSettings(void) {
 	bAlwaysOnTop = IniSectionGetBool(pIniSection, L"AlwaysOnTop", 0);
 	bMinimizeToTray = IniSectionGetBool(pIniSection, L"MinimizeToTray", 0);
 	bTransparentMode = IniSectionGetBool(pIniSection, L"TransparentMode", 0);
+	bEditLayoutRTL = IniSectionGetBool(pIniSection, L"EditLayoutRTL", 0);
+	bWindowLayoutRTL = IniSectionGetBool(pIniSection, L"WindowLayoutRTL", 0);
 
 	iRenderingTechnology = IniSectionGetInt(pIniSection, L"RenderingTechnology", (IsVistaAndAbove()? SC_TECHNOLOGY_DIRECTWRITE : SC_TECHNOLOGY_DEFAULT));
 	iRenderingTechnology = clamp_i(iRenderingTechnology, SC_TECHNOLOGY_DEFAULT, SC_TECHNOLOGY_DIRECTWRITEDC);
+	bEditLayoutRTL = bEditLayoutRTL && iRenderingTechnology == SC_TECHNOLOGY_DEFAULT;
 
 	iBidirectional = IniSectionGetInt(pIniSection, L"Bidirectional", SC_BIDIRECTIONAL_DISABLED);
 	iBidirectional = clamp_i(iBidirectional, SC_BIDIRECTIONAL_DISABLED, SC_BIDIRECTIONAL_R2L);
@@ -5701,6 +5724,8 @@ void SaveSettings(BOOL bSaveSettingsNow) {
 	IniSectionSetBoolEx(pIniSection, L"AlwaysOnTop", bAlwaysOnTop, 0);
 	IniSectionSetBoolEx(pIniSection, L"MinimizeToTray", bMinimizeToTray, 0);
 	IniSectionSetBoolEx(pIniSection, L"TransparentMode", bTransparentMode, 0);
+	IniSectionSetBoolEx(pIniSection, L"EditLayoutRTL", bEditLayoutRTL, 0);
+	IniSectionSetBoolEx(pIniSection, L"WindowLayoutRTL", bWindowLayoutRTL, 0);
 	IniSectionSetIntEx(pIniSection, L"RenderingTechnology", iRenderingTechnology, (IsVistaAndAbove()? SC_TECHNOLOGY_DIRECTWRITE : SC_TECHNOLOGY_DEFAULT));
 	IniSectionSetIntEx(pIniSection, L"Bidirectional", iBidirectional, SC_BIDIRECTIONAL_DISABLED);
 	IniSectionSetIntEx(pIniSection, L"FontQuality", iFontQuality, SC_EFF_QUALITY_LCD_OPTIMIZED);
