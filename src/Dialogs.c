@@ -27,9 +27,9 @@
 #include "Scintilla.h"
 #include "Notepad2.h"
 #include "Edit.h"
+#include "Helpers.h"
 #include "Dlapi.h"
 #include "Dialogs.h"
-#include "Helpers.h"
 #include "resource.h"
 #include "Version.h"
 
@@ -50,17 +50,12 @@ extern WCHAR	szCurFile[MAX_PATH + 40];
 // MsgBox()
 //
 int MsgBox(int iType, UINT uIdMsg, ...) {
-	WCHAR szText[1024];
 	WCHAR szBuf[1024];
-	WCHAR szTitle[64];
-	int iIcon = 0;
-	HWND hwnd;
+	WCHAR szText[1024];
+
+	GetString(uIdMsg, szBuf, COUNTOF(szBuf));
+
 	va_list va;
-
-	if (!GetString(uIdMsg, szBuf, COUNTOF(szBuf))) {
-		return 0;
-	}
-
 	va_start(va, uIdMsg);
 	wvsprintf(szText, szBuf, va);
 	va_end(va);
@@ -69,7 +64,6 @@ int MsgBox(int iType, UINT uIdMsg, ...) {
 			uIdMsg == IDS_CREATEINI_FAIL || uIdMsg == IDS_WRITEINI_FAIL ||
 			uIdMsg == IDS_EXPORT_FAIL) {
 		LPVOID lpMsgBuf;
-		WCHAR wcht;
 		FormatMessage(
 			FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
 			NULL,
@@ -82,14 +76,16 @@ int MsgBox(int iType, UINT uIdMsg, ...) {
 		StrCatBuff(szText, L"\n", COUNTOF(szText));
 		StrCatBuff(szText, lpMsgBuf, COUNTOF(szText));
 		LocalFree(lpMsgBuf);
-		wcht = *CharPrev(szText, StrEnd(szText));
+		const WCHAR wcht = *CharPrev(szText, StrEnd(szText));
 		if (IsCharAlphaNumeric(wcht) || wcht == L'"' || wcht == L'\'') {
 			StrCatBuff(szText, L".", COUNTOF(szText));
 		}
 	}
 
+	WCHAR szTitle[64];
 	GetString(IDS_APPTITLE, szTitle, COUNTOF(szTitle));
 
+	int iIcon = 0;
 	switch (iType) {
 	case MBINFO:
 		iIcon = MB_ICONINFORMATION;
@@ -111,6 +107,7 @@ int MsgBox(int iType, UINT uIdMsg, ...) {
 		break;
 	}
 
+	HWND hwnd;
 	if ((hwnd = GetActiveWindow()) == NULL) {
 		hwnd = hwndMain;
 	}
@@ -126,14 +123,13 @@ int MsgBox(int iType, UINT uIdMsg, ...) {
 // DisplayCmdLineHelp()
 //
 void DisplayCmdLineHelp(HWND hwnd) {
-	MSGBOXPARAMS mbp;
-
 	WCHAR szTitle[32];
 	WCHAR szText[2048];
 
 	GetString(IDS_APPTITLE, szTitle, COUNTOF(szTitle));
 	GetString(IDS_CMDLINEHELP, szText, COUNTOF(szText));
 
+	MSGBOXPARAMS mbp;
 	mbp.cbSize = sizeof(MSGBOXPARAMS);
 	mbp.hwndOwner = hwnd;
 	mbp.hInstance = g_hInstance;
@@ -193,7 +189,7 @@ void OpenHelpLink(HWND hwnd, int cmd) {
 //
 // BFFCallBack()
 //
-int CALLBACK BFFCallBack(HWND hwnd, UINT umsg, LPARAM lParam, LPARAM lpData) {
+static int CALLBACK BFFCallBack(HWND hwnd, UINT umsg, LPARAM lParam, LPARAM lpData) {
 	UNREFERENCED_PARAMETER(lParam);
 
 	if (umsg == BFFM_INITIALIZED) {
@@ -208,21 +204,18 @@ int CALLBACK BFFCallBack(HWND hwnd, UINT umsg, LPARAM lParam, LPARAM lpData) {
 // GetDirectory()
 //
 BOOL GetDirectory(HWND hwndParent, int iTitle, LPWSTR pszFolder, LPCWSTR pszBase) {
-	BROWSEINFO bi;
-	LPITEMIDLIST pidl;
 	WCHAR szTitle[256];
-	WCHAR szBase[MAX_PATH];
-	BOOL fOk = FALSE;
-
 	lstrcpy(szTitle, L"");
 	GetString(iTitle, szTitle, COUNTOF(szTitle));
 
+	WCHAR szBase[MAX_PATH];
 	if (StrIsEmpty(pszBase)) {
 		GetCurrentDirectory(MAX_PATH, szBase);
 	} else {
 		lstrcpy(szBase, pszBase);
 	}
 
+	BROWSEINFO bi;
 	bi.hwndOwner = hwndParent;
 	bi.pidlRoot = NULL;
 	bi.pszDisplayName = pszFolder;
@@ -232,14 +225,14 @@ BOOL GetDirectory(HWND hwndParent, int iTitle, LPWSTR pszFolder, LPCWSTR pszBase
 	bi.lParam = (LPARAM)szBase;
 	bi.iImage = 0;
 
-	pidl = SHBrowseForFolder(&bi);
+	LPITEMIDLIST pidl = SHBrowseForFolder(&bi);
 	if (pidl) {
 		SHGetPathFromIDList(pidl, pszFolder);
 		CoTaskMemFree((LPVOID)pidl);
-		fOk = TRUE;
+		return TRUE;
 	}
 
-	return fOk;
+	return FALSE;
 }
 
 //=============================================================================
@@ -247,27 +240,26 @@ BOOL GetDirectory(HWND hwndParent, int iTitle, LPWSTR pszFolder, LPCWSTR pszBase
 // AboutDlgProc()
 //
 INT_PTR CALLBACK AboutDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
-	static HFONT hFontTitle;
-
 	switch (umsg) {
 	case WM_INITDIALOG: {
-		WCHAR wch[256];
-		LOGFONT lf;
-
 		SetDlgItemText(hwnd, IDC_VERSION, VERSION_FILEVERSION_LONG);
 		SetDlgItemText(hwnd, IDC_BUILD_INFO, VERSION_BUILD_INFO);
 		SetDlgItemText(hwnd, IDC_COPYRIGHT, VERSION_LEGALCOPYRIGHT_SHORT);
 		SetDlgItemText(hwnd, IDC_AUTHORNAME, VERSION_AUTHORNAME);
 
-		if (NULL == (hFontTitle = (HFONT)SendDlgItemMessage(hwnd, IDC_VERSION, WM_GETFONT, 0, 0))) {
+		HFONT hFontTitle = (HFONT)SendDlgItemMessage(hwnd, IDC_VERSION, WM_GETFONT, 0, 0);
+		if (hFontTitle == NULL) {
 			hFontTitle = GetStockObject(DEFAULT_GUI_FONT);
 		}
 
+		LOGFONT lf;
 		GetObject(hFontTitle, sizeof(LOGFONT), &lf);
 		lf.lfWeight = FW_BOLD;
 		hFontTitle = CreateFontIndirect(&lf);
 		SendDlgItemMessage(hwnd, IDC_VERSION, WM_SETFONT, (WPARAM)hFontTitle, TRUE);
+		SetWindowLongPtr(hwnd, DWLP_USER, (LONG_PTR)(hFontTitle));
 
+		WCHAR wch[256];
 		if (GetDlgItem(hwnd, IDC_WEBPAGE_LINK) == NULL) {
 			SetDlgItemText(hwnd, IDC_WEBPAGE_TEXT, VERSION_WEBPAGE_DISPLAY);
 			ShowWindow(GetDlgItem(hwnd, IDC_WEBPAGE_TEXT), SW_SHOWNORMAL);
@@ -332,9 +324,11 @@ INT_PTR CALLBACK AboutDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam
 		}
 		return TRUE;
 
-	case WM_DESTROY:
+	case WM_DESTROY: {
+		HFONT hFontTitle = (HFONT)GetWindowLongPtr(hwnd, DWLP_USER);
 		DeleteObject(hFontTitle);
-		return TRUE;
+	}
+	return FALSE;
 	}
 	return FALSE;
 }
@@ -343,7 +337,7 @@ INT_PTR CALLBACK AboutDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam
 //
 // RunDlgProc()
 //
-INT_PTR CALLBACK RunDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
+static INT_PTR CALLBACK RunDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
 	switch (umsg) {
 	case WM_INITDIALOG: {
 		MakeBitmapButton(hwnd, IDC_SEARCHEXE, g_hInstance, IDB_OPEN);
@@ -366,17 +360,17 @@ INT_PTR CALLBACK RunDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) 
 			WCHAR szArgs[MAX_PATH];
 			WCHAR szArg2[MAX_PATH];
 			WCHAR szFile[MAX_PATH * 2];
-			WCHAR szFilter[256];
-			OPENFILENAME ofn;
-			ZeroMemory(&ofn, sizeof(OPENFILENAME));
 
 			GetDlgItemText(hwnd, IDC_COMMANDLINE, szArgs, COUNTOF(szArgs));
 			ExpandEnvironmentStringsEx(szArgs, COUNTOF(szArgs));
 			ExtractFirstArgument(szArgs, szFile, szArg2);
 
+			WCHAR szFilter[256];
 			GetString(IDS_FILTER_EXE, szFilter, COUNTOF(szFilter));
 			PrepareFilterStr(szFilter);
 
+			OPENFILENAME ofn;
+			ZeroMemory(&ofn, sizeof(OPENFILENAME));
 			ofn.lStructSize = sizeof(OPENFILENAME);
 			ofn.hwndOwner = hwnd;
 			ofn.lpstrFilter = szFilter;
@@ -416,12 +410,9 @@ INT_PTR CALLBACK RunDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) 
 
 		case IDOK: {
 			WCHAR arg1[MAX_PATH];
-			WCHAR arg2[MAX_PATH];
-			SHELLEXECUTEINFO sei;
-			WCHAR wchDirectory[MAX_PATH] = L"";
-
 			if (GetDlgItemText(hwnd, IDC_COMMANDLINE, arg1, MAX_PATH)) {
 				BOOL bQuickExit = FALSE;
+				WCHAR arg2[MAX_PATH];
 
 				ExpandEnvironmentStringsEx(arg1, COUNTOF(arg1));
 				ExtractFirstArgument(arg1, arg1, arg2);
@@ -431,13 +422,14 @@ INT_PTR CALLBACK RunDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) 
 					bQuickExit = TRUE;
 				}
 
+				WCHAR wchDirectory[MAX_PATH] = L"";
 				if (StrNotEmpty(szCurFile)) {
 					lstrcpy(wchDirectory, szCurFile);
 					PathRemoveFileSpec(wchDirectory);
 				}
 
+				SHELLEXECUTEINFO sei;
 				ZeroMemory(&sei, sizeof(SHELLEXECUTEINFO));
-
 				sei.cbSize = sizeof(SHELLEXECUTEINFO);
 				sei.fMask = 0;
 				sei.hwnd = hwnd;
@@ -492,22 +484,23 @@ extern int flagNoFadeHidden;
 extern int cxOpenWithDlg;
 extern int cyOpenWithDlg;
 
-INT_PTR CALLBACK OpenWithDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
+static INT_PTR CALLBACK OpenWithDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
 	switch (umsg) {
 	case WM_INITDIALOG: {
-		LVCOLUMN lvc = { LVCF_FMT | LVCF_TEXT,  LVCFMT_LEFT,  0,  L"",  -1,  0,  0,  0 };
+		SetWindowLongPtr(hwnd, DWLP_USER, lParam);
 
+		LVCOLUMN lvc = { LVCF_FMT | LVCF_TEXT,  LVCFMT_LEFT,  0,  L"",  -1,  0,  0,  0 };
 		ResizeDlg_Init(hwnd, cxOpenWithDlg, cyOpenWithDlg, IDC_RESIZEGRIP3);
 
-		SetWindowLongPtr(hwnd, DWLP_USER, (LONG_PTR)lParam);
+		HWND hwndLV = GetDlgItem(hwnd, IDC_OPENWITHDIR);
+		//SetExplorerTheme(hwndLV);
+		ListView_SetExtendedListViewStyle(hwndLV, /*LVS_EX_FULLROWSELECT|*/LVS_EX_DOUBLEBUFFER | LVS_EX_LABELTIP);
 
-		//SetExplorerTheme(GetDlgItem(hwnd, IDC_OPENWITHDIR));
-		ListView_SetExtendedListViewStyle(GetDlgItem(hwnd, IDC_OPENWITHDIR), /*LVS_EX_FULLROWSELECT|*/LVS_EX_DOUBLEBUFFER | LVS_EX_LABELTIP);
-		ListView_InsertColumn(GetDlgItem(hwnd, IDC_OPENWITHDIR), 0, &lvc);
-		DirList_Init(GetDlgItem(hwnd, IDC_OPENWITHDIR), NULL);
-		DirList_Fill(GetDlgItem(hwnd, IDC_OPENWITHDIR), tchOpenWithDir, DL_ALLOBJECTS, NULL, FALSE, flagNoFadeHidden, DS_NAME, FALSE);
-		DirList_StartIconThread(GetDlgItem(hwnd, IDC_OPENWITHDIR));
-		ListView_SetItemState(GetDlgItem(hwnd, IDC_OPENWITHDIR), 0, LVIS_FOCUSED, LVIS_FOCUSED);
+		ListView_InsertColumn(hwndLV, 0, &lvc);
+		DirList_Init(hwndLV, NULL);
+		DirList_Fill(hwndLV, tchOpenWithDir, DL_ALLOBJECTS, NULL, FALSE, flagNoFadeHidden, DS_NAME, FALSE);
+		DirList_StartIconThread(hwndLV);
+		ListView_SetItemState(hwndLV, 0, LVIS_FOCUSED, LVIS_FOCUSED);
 
 		MakeBitmapButton(hwnd, IDC_GETOPENWITHDIR, g_hInstance, IDB_OPEN);
 
@@ -518,18 +511,16 @@ INT_PTR CALLBACK OpenWithDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPa
 	case WM_DESTROY:
 		DirList_Destroy(GetDlgItem(hwnd, IDC_OPENWITHDIR));
 		DeleteBitmapButton(hwnd, IDC_GETOPENWITHDIR);
-
 		ResizeDlg_Destroy(hwnd, &cxOpenWithDlg, &cyOpenWithDlg);
 		return FALSE;
 
 	case WM_SIZE: {
 		int dx;
 		int dy;
-		HDWP hdwp;
 
 		ResizeDlg_Size(hwnd, lParam, &dx, &dy);
 
-		hdwp = BeginDeferWindowPos(6);
+		HDWP hdwp = BeginDeferWindowPos(6);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDC_RESIZEGRIP3, dx, dy, SWP_NOSIZE);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDOK, dx, dy, SWP_NOSIZE);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDCANCEL, dx, dy, SWP_NOSIZE);
@@ -578,13 +569,14 @@ INT_PTR CALLBACK OpenWithDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPa
 	case WM_COMMAND:
 		switch (LOWORD(wParam)) {
 		case IDC_GETOPENWITHDIR: {
+			HWND hwndLV = GetDlgItem(hwnd, IDC_OPENWITHDIR);
 			if (GetDirectory(hwnd, IDS_OPENWITH, tchOpenWithDir, tchOpenWithDir)) {
-				DirList_Fill(GetDlgItem(hwnd, IDC_OPENWITHDIR), tchOpenWithDir, DL_ALLOBJECTS, NULL, FALSE, flagNoFadeHidden, DS_NAME, FALSE);
-				DirList_StartIconThread(GetDlgItem(hwnd, IDC_OPENWITHDIR));
-				ListView_EnsureVisible(GetDlgItem(hwnd, IDC_OPENWITHDIR), 0, FALSE);
-				ListView_SetItemState(GetDlgItem(hwnd, IDC_OPENWITHDIR), 0, LVIS_FOCUSED, LVIS_FOCUSED);
+				DirList_Fill(hwndLV, tchOpenWithDir, DL_ALLOBJECTS, NULL, FALSE, flagNoFadeHidden, DS_NAME, FALSE);
+				DirList_StartIconThread(hwndLV);
+				ListView_EnsureVisible(hwndLV, 0, FALSE);
+				ListView_SetItemState(hwndLV, 0, LVIS_FOCUSED, LVIS_FOCUSED);
 			}
-			PostMessage(hwnd, WM_NEXTDLGCTL, (WPARAM)(GetDlgItem(hwnd, IDC_OPENWITHDIR)), 1);
+			PostMessage(hwnd, WM_NEXTDLGCTL, (WPARAM)(hwndLV), 1);
 		}
 		break;
 
@@ -623,7 +615,6 @@ BOOL OpenWithDlg(HWND hwnd, LPCWSTR lpstrFile) {
 
 	if (IDOK == ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_OPENWITH),
 									 hwnd, OpenWithDlgProc, (LPARAM)&dliOpenWith)) {
-		SHELLEXECUTEINFO sei;
 		WCHAR szParam[MAX_PATH];
 		WCHAR wchDirectory[MAX_PATH] = L"";
 
@@ -632,6 +623,7 @@ BOOL OpenWithDlg(HWND hwnd, LPCWSTR lpstrFile) {
 			PathRemoveFileSpec(wchDirectory);
 		}
 
+		SHELLEXECUTEINFO sei;
 		ZeroMemory(&sei, sizeof(SHELLEXECUTEINFO));
 		sei.cbSize = sizeof(SHELLEXECUTEINFO);
 		sei.fMask = 0;
@@ -666,22 +658,23 @@ extern WCHAR tchFavoritesDir[MAX_PATH];
 extern int cxFavoritesDlg;
 extern int cyFavoritesDlg;
 
-INT_PTR CALLBACK FavoritesDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
+static INT_PTR CALLBACK FavoritesDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
 	switch (umsg) {
 	case WM_INITDIALOG: {
+		SetWindowLongPtr(hwnd, DWLP_USER, lParam);
+
 		LVCOLUMN lvc = { LVCF_FMT | LVCF_TEXT,  LVCFMT_LEFT,  0,  L"",  -1,  0,  0,  0 };
 
 		ResizeDlg_Init(hwnd, cxFavoritesDlg, cyFavoritesDlg, IDC_RESIZEGRIP3);
 
-		SetWindowLongPtr(hwnd, DWLP_USER, (LONG_PTR)lParam);
-
-		//SetExplorerTheme(GetDlgItem(hwnd, IDC_FAVORITESDIR));
-		ListView_SetExtendedListViewStyle(GetDlgItem(hwnd, IDC_FAVORITESDIR), /*LVS_EX_FULLROWSELECT|*/LVS_EX_DOUBLEBUFFER | LVS_EX_LABELTIP);
-		ListView_InsertColumn(GetDlgItem(hwnd, IDC_FAVORITESDIR), 0, &lvc);
-		DirList_Init(GetDlgItem(hwnd, IDC_FAVORITESDIR), NULL);
-		DirList_Fill(GetDlgItem(hwnd, IDC_FAVORITESDIR), tchFavoritesDir, DL_ALLOBJECTS, NULL, FALSE, flagNoFadeHidden, DS_NAME, FALSE);
-		DirList_StartIconThread(GetDlgItem(hwnd, IDC_FAVORITESDIR));
-		ListView_SetItemState(GetDlgItem(hwnd, IDC_FAVORITESDIR), 0, LVIS_FOCUSED, LVIS_FOCUSED);
+		HWND hwndLV = GetDlgItem(hwnd, IDC_FAVORITESDIR);
+		//SetExplorerTheme(hwndLV);
+		ListView_SetExtendedListViewStyle(hwndLV, /*LVS_EX_FULLROWSELECT|*/LVS_EX_DOUBLEBUFFER | LVS_EX_LABELTIP);
+		ListView_InsertColumn(hwndLV, 0, &lvc);
+		DirList_Init(hwndLV, NULL);
+		DirList_Fill(hwndLV, tchFavoritesDir, DL_ALLOBJECTS, NULL, FALSE, flagNoFadeHidden, DS_NAME, FALSE);
+		DirList_StartIconThread(hwndLV);
+		ListView_SetItemState(hwndLV, 0, LVIS_FOCUSED, LVIS_FOCUSED);
 
 		MakeBitmapButton(hwnd, IDC_GETFAVORITESDIR, g_hInstance, IDB_OPEN);
 
@@ -699,11 +692,10 @@ INT_PTR CALLBACK FavoritesDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lP
 	case WM_SIZE: {
 		int dx;
 		int dy;
-		HDWP hdwp;
 
 		ResizeDlg_Size(hwnd, lParam, &dx, &dy);
 
-		hdwp = BeginDeferWindowPos(6);
+		HDWP hdwp = BeginDeferWindowPos(6);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDC_RESIZEGRIP3, dx, dy, SWP_NOSIZE);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDOK, dx, dy, SWP_NOSIZE);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDCANCEL, dx, dy, SWP_NOSIZE);
@@ -751,13 +743,14 @@ INT_PTR CALLBACK FavoritesDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lP
 	case WM_COMMAND:
 		switch (LOWORD(wParam)) {
 		case IDC_GETFAVORITESDIR: {
+			HWND hwndLV = GetDlgItem(hwnd, IDC_FAVORITESDIR);
 			if (GetDirectory(hwnd, IDS_FAVORITES, tchFavoritesDir, tchFavoritesDir)) {
-				DirList_Fill(GetDlgItem(hwnd, IDC_FAVORITESDIR), tchFavoritesDir, DL_ALLOBJECTS, NULL, FALSE, flagNoFadeHidden, DS_NAME, FALSE);
-				DirList_StartIconThread(GetDlgItem(hwnd, IDC_FAVORITESDIR));
-				ListView_EnsureVisible(GetDlgItem(hwnd, IDC_FAVORITESDIR), 0, FALSE);
-				ListView_SetItemState(GetDlgItem(hwnd, IDC_FAVORITESDIR), 0, LVIS_FOCUSED, LVIS_FOCUSED);
+				DirList_Fill(hwndLV, tchFavoritesDir, DL_ALLOBJECTS, NULL, FALSE, flagNoFadeHidden, DS_NAME, FALSE);
+				DirList_StartIconThread(hwndLV);
+				ListView_EnsureVisible(hwndLV, 0, FALSE);
+				ListView_SetItemState(hwndLV, 0, LVIS_FOCUSED, LVIS_FOCUSED);
 			}
-			PostMessage(hwnd, WM_NEXTDLGCTL, (WPARAM)(GetDlgItem(hwnd, IDC_FAVORITESDIR)), 1);
+			PostMessage(hwnd, WM_NEXTDLGCTL, (WPARAM)(hwndLV), 1);
 		}
 		break;
 
@@ -809,19 +802,18 @@ BOOL FavoritesDlg(HWND hwnd, LPWSTR lpstrFile) {
 //
 // Controls: 100 Edit
 //
-INT_PTR CALLBACK AddToFavDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
-	WCHAR *pszName;
-
+static INT_PTR CALLBACK AddToFavDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
 	switch (umsg) {
-	case WM_INITDIALOG:
-		pszName = (LPWSTR)lParam;
-		SetWindowLongPtr(hwnd, DWLP_USER, (LONG_PTR)pszName);
+	case WM_INITDIALOG: {
+		SetWindowLongPtr(hwnd, DWLP_USER, lParam);
+		LPWSTR pszName = (LPWSTR)lParam;
 
 		SendDlgItemMessage(hwnd, 100, EM_LIMITTEXT, MAX_PATH - 1, 0);
 		SetDlgItemText(hwnd, 100, pszName);
 
 		CenterDlgInParent(hwnd);
-		return TRUE;
+	}
+	return TRUE;
 
 	case WM_COMMAND:
 		switch (LOWORD(wParam)) {
@@ -829,11 +821,12 @@ INT_PTR CALLBACK AddToFavDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPa
 			EnableWindow(GetDlgItem(hwnd, IDOK),  GetWindowTextLength(GetDlgItem(hwnd, 100)));
 			break;
 
-		case IDOK:
-			pszName = (LPWSTR)GetWindowLongPtr(hwnd, DWLP_USER);
+		case IDOK: {
+			LPWSTR pszName = (LPWSTR)GetWindowLongPtr(hwnd, DWLP_USER);
 			GetDlgItemText(hwnd, 100, pszName,  MAX_PATH - 1);
 			EndDialog(hwnd, IDOK);
-			break;
+		}
+		break;
 
 		case IDCANCEL:
 			EndDialog(hwnd, IDCANCEL);
@@ -851,12 +844,11 @@ INT_PTR CALLBACK AddToFavDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPa
 // AddToFavDlg()
 //
 BOOL AddToFavDlg(HWND hwnd, LPCWSTR lpszName, LPCWSTR lpszTarget) {
-	INT_PTR iResult;
 	WCHAR pszName[MAX_PATH];
 	lstrcpy(pszName, lpszName);
 
-	iResult = ThemedDialogBoxParam(g_hInstance,  MAKEINTRESOURCE(IDD_ADDTOFAV),
-								   hwnd, AddToFavDlgProc, (LPARAM)pszName);
+	const INT_PTR iResult = ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_ADDTOFAV),
+								hwnd, AddToFavDlgProc, (LPARAM)pszName);
 
 	if (iResult == IDOK) {
 		if (PathCreateFavLnk(pszName, lpszTarget, tchFavoritesDir)) {
@@ -886,23 +878,18 @@ typedef struct tagIconThreadInfo {
 	HANDLE hFileMRUIconThread;
 } ICONTHREADINFO,  *LPICONTHREADINFO;
 
-DWORD WINAPI FileMRUIconThread(LPVOID lpParam) {
-	HWND hwnd;
-	LPICONTHREADINFO lpit;
-	LV_ITEM lvi;
+static DWORD WINAPI FileMRUIconThread(LPVOID lpParam) {
 	WCHAR tch[MAX_PATH] = L"";
-	SHFILEINFO shfi;
 	DWORD dwFlags = SHGFI_SMALLICON | SHGFI_SYSICONINDEX | SHGFI_ATTRIBUTES | SHGFI_ATTR_SPECIFIED;
-	DWORD dwAttr	= 0;
-	int iItem = 0;
-	int iMaxItem;
 
-	lpit = (LPICONTHREADINFO)lpParam;
+	LPICONTHREADINFO lpit = (LPICONTHREADINFO)lpParam;
 	ResetEvent(lpit->hTerminatedThread);
 
-	hwnd = lpit->hwnd;
-	iMaxItem = ListView_GetItemCount(hwnd);
+	HWND hwnd = lpit->hwnd;
+	const int iMaxItem = ListView_GetItemCount(hwnd);
+	int iItem = 0;
 
+	LV_ITEM lvi;
 	ZeroMemory(&lvi, sizeof(LV_ITEM));
 
 	while (iItem < iMaxItem && WaitForSingleObject(lpit->hExitThread, 0) != WAIT_OBJECT_0) {
@@ -911,6 +898,8 @@ DWORD WINAPI FileMRUIconThread(LPVOID lpParam) {
 		lvi.cchTextMax = COUNTOF(tch);
 		lvi.iItem = iItem;
 		if (ListView_GetItem(hwnd, &lvi)) {
+			SHFILEINFO shfi;
+			DWORD dwAttr = 0;
 			if (PathIsUNC(tch) || !PathFileExists(tch)) {
 				dwFlags |= SHGFI_USEFILEATTRIBUTES;
 				dwAttr = FILE_ATTRIBUTE_NORMAL;
@@ -962,33 +951,34 @@ DWORD WINAPI FileMRUIconThread(LPVOID lpParam) {
 	ExitThread(0);
 }
 
-INT_PTR CALLBACK FileMRUDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
+static INT_PTR CALLBACK FileMRUDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
 	switch (umsg) {
 	case WM_INITDIALOG: {
-		SHFILEINFO shfi;
+		SetWindowLongPtr(hwnd, DWLP_USER, lParam);
+
 		LVCOLUMN lvc = { LVCF_FMT | LVCF_TEXT,  LVCFMT_LEFT,  0,  L"",  -1,  0,  0,  0 };
+		HWND hwndLV = GetDlgItem(hwnd, IDC_FILEMRU);
 
 		LPICONTHREADINFO lpit = (LPVOID)GlobalAlloc(GPTR, sizeof(ICONTHREADINFO));
 		SetProp(hwnd, L"it", (HANDLE)lpit);
-		lpit->hwnd = GetDlgItem(hwnd, IDC_FILEMRU);
+		lpit->hwnd = hwndLV;
 		lpit->hExitThread = CreateEvent(NULL, TRUE, FALSE, NULL);
 		lpit->hTerminatedThread = CreateEvent(NULL, TRUE, TRUE, NULL);
 
-		SetWindowLongPtr(hwnd, DWLP_USER, (LONG_PTR)lParam);
-
 		ResizeDlg_Init(hwnd, cxFileMRUDlg, cyFileMRUDlg, IDC_RESIZEGRIP);
 
-		ListView_SetImageList(GetDlgItem(hwnd, IDC_FILEMRU),
+		SHFILEINFO shfi;
+		ListView_SetImageList(hwndLV,
 							  (HIMAGELIST)SHGetFileInfo(L"C:\\", 0, &shfi, sizeof(SHFILEINFO), SHGFI_SMALLICON | SHGFI_SYSICONINDEX),
 							  LVSIL_SMALL);
 
-		ListView_SetImageList(GetDlgItem(hwnd, IDC_FILEMRU),
+		ListView_SetImageList(hwndLV,
 							  (HIMAGELIST)SHGetFileInfo(L"C:\\", 0, &shfi, sizeof(SHFILEINFO), SHGFI_LARGEICON | SHGFI_SYSICONINDEX),
 							  LVSIL_NORMAL);
 
-		//SetExplorerTheme(GetDlgItem(hwnd, IDC_FILEMRU));
-		ListView_SetExtendedListViewStyle(GetDlgItem(hwnd, IDC_FILEMRU), /*LVS_EX_FULLROWSELECT|*/LVS_EX_DOUBLEBUFFER | LVS_EX_LABELTIP);
-		ListView_InsertColumn(GetDlgItem(hwnd, IDC_FILEMRU), 0, &lvc);
+		//SetExplorerTheme(hwndLV);
+		ListView_SetExtendedListViewStyle(hwndLV, /*LVS_EX_FULLROWSELECT|*/LVS_EX_DOUBLEBUFFER | LVS_EX_LABELTIP);
+		ListView_InsertColumn(hwndLV, 0, &lvc);
 
 		// Update view
 		SendMessage(hwnd, WM_COMMAND, MAKELONG(0x00A0, 1), 0);
@@ -1027,11 +1017,10 @@ INT_PTR CALLBACK FileMRUDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPar
 	case WM_SIZE: {
 		int dx;
 		int dy;
-		HDWP hdwp;
 
 		ResizeDlg_Size(hwnd, lParam, &dx, &dy);
 
-		hdwp = BeginDeferWindowPos(6);
+		HDWP hdwp = BeginDeferWindowPos(6);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDC_RESIZEGRIP, dx, dy, SWP_NOSIZE);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDOK, dx, dy, SWP_NOSIZE);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDCANCEL, dx, dy, SWP_NOSIZE);
@@ -1060,15 +1049,10 @@ INT_PTR CALLBACK FileMRUDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPar
 				LV_DISPINFO *lpdi = (LPVOID)lParam;
 
 				if (lpdi->item.mask & LVIF_IMAGE) {
-
 					WCHAR tch[MAX_PATH];
+
 					LV_ITEM lvi;
-					SHFILEINFO shfi;
-					DWORD dwFlags = SHGFI_SMALLICON | SHGFI_SYSICONINDEX | SHGFI_ATTRIBUTES | SHGFI_ATTR_SPECIFIED;
-					DWORD dwAttr	= 0;
-
 					ZeroMemory(&lvi, sizeof(LV_ITEM));
-
 					lvi.mask = LVIF_TEXT;
 					lvi.pszText = tch;
 					lvi.cchTextMax = COUNTOF(tch);
@@ -1076,6 +1060,9 @@ INT_PTR CALLBACK FileMRUDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPar
 
 					ListView_GetItem(GetDlgItem(hwnd, IDC_FILEMRU), &lvi);
 
+					DWORD dwFlags = SHGFI_SMALLICON | SHGFI_SYSICONINDEX | SHGFI_ATTRIBUTES | SHGFI_ATTR_SPECIFIED;
+					DWORD dwAttr = 0;
+					SHFILEINFO shfi;
 					if (!PathFileExists(tch)) {
 						dwFlags |= SHGFI_USEFILEATTRIBUTES;
 						dwAttr = FILE_ATTRIBUTE_NORMAL;
@@ -1088,7 +1075,6 @@ INT_PTR CALLBACK FileMRUDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPar
 
 					lpdi->item.iImage = shfi.iIcon;
 					lpdi->item.mask |= LVIF_DI_SETITEM;
-
 					lpdi->item.stateMask = 0;
 					lpdi->item.state = 0;
 
@@ -1139,11 +1125,6 @@ INT_PTR CALLBACK FileMRUDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPar
 	case WM_COMMAND:
 		switch (LOWORD(wParam)) {
 		case 0x00A0: {
-			WCHAR tch[MAX_PATH];
-			LV_ITEM lvi;
-			SHFILEINFO shfi;
-
-			DWORD dwtid;
 			LPICONTHREADINFO lpit = (LPVOID)GetProp(hwnd, L"it");
 
 			SetEvent(lpit->hExitThread);
@@ -1159,13 +1140,16 @@ INT_PTR CALLBACK FileMRUDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPar
 
 			ListView_DeleteAllItems(GetDlgItem(hwnd, IDC_FILEMRU));
 
+			LV_ITEM lvi;
 			ZeroMemory(&lvi, sizeof(LV_ITEM));
 			lvi.mask = LVIF_TEXT | LVIF_IMAGE;
 
+			SHFILEINFO shfi;
 			SHGetFileInfo(L"Icon", FILE_ATTRIBUTE_NORMAL, &shfi, sizeof(SHFILEINFO),
 						  SHGFI_USEFILEATTRIBUTES | SHGFI_SMALLICON | SHGFI_SYSICONINDEX);
 			lvi.iImage = shfi.iIcon;
 
+			WCHAR tch[MAX_PATH];
 			for (int i = 0; i < MRU_GetCount(pFileMRU); i++) {
 				MRU_Enum(pFileMRU, i, tch, COUNTOF(tch));
 				PathAbsoluteFromApp(tch, tch, COUNTOF(tch), TRUE);
@@ -1179,6 +1163,7 @@ INT_PTR CALLBACK FileMRUDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPar
 			ListView_SetItemState(GetDlgItem(hwnd, IDC_FILEMRU), 0, LVIS_FOCUSED, LVIS_FOCUSED);
 			ListView_SetColumnWidth(GetDlgItem(hwnd, IDC_FILEMRU), 0, LVSCW_AUTOSIZE_USEHEADER);
 
+			DWORD dwtid;
 			lpit->hFileMRUIconThread = CreateThread(NULL, 0, FileMRUIconThread, (LPVOID)lpit, 0, &dwtid);
 		}
 		break;
@@ -1188,11 +1173,11 @@ INT_PTR CALLBACK FileMRUDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPar
 
 		case IDOK: {
 			WCHAR tch[MAX_PATH];
-			//int	 iItem;
+			//int iItem;
 
 			//if ((iItem = SendDlgItemMessage(hwnd, IDC_FILEMRU, LB_GETCURSEL, 0, 0)) != LB_ERR)
 			if (ListView_GetSelectedCount(GetDlgItem(hwnd, IDC_FILEMRU))) {
-				//SendDlgItemMessage(hwnd, IDC_FILEMRU, LB_GETTEXT, (WPARAM)iItem, (LPARAM)tch);
+				//SendDlgItemMessage(hwnd, IDC_FILEMRU, LB_GETTEXT, iItem, (LPARAM)tch);
 				LV_ITEM lvi;
 				ZeroMemory(&lvi, sizeof(LV_ITEM));
 
@@ -1212,7 +1197,7 @@ INT_PTR CALLBACK FileMRUDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPar
 						MRU_Delete(pFileMRU, lvi.iItem);
 						MRU_DeleteFileFromStore(pFileMRU, tch);
 
-						//SendDlgItemMessage(hwnd, IDC_FILEMRU, LB_DELETESTRING, (WPARAM)iItem, 0);
+						//SendDlgItemMessage(hwnd, IDC_FILEMRU, LB_DELETESTRING, iItem, 0);
 						//ListView_DeleteItem(GetDlgItem(hwnd, IDC_FILEMRU), lvi.iItem);
 						// must use IDM_VIEW_REFRESH,  index might change...
 						SendMessage(hwnd, WM_COMMAND, MAKELONG(0x00A0, 1), 0);
@@ -1269,7 +1254,7 @@ BOOL FileMRUDlg(HWND hwnd, LPWSTR lpstrFile) {
 extern int iFileWatchingMode;
 extern BOOL bResetFileWatching;
 
-INT_PTR CALLBACK ChangeNotifyDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
+static INT_PTR CALLBACK ChangeNotifyDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
 	UNREFERENCED_PARAMETER(lParam);
 
 	switch (umsg) {
@@ -1309,9 +1294,7 @@ INT_PTR CALLBACK ChangeNotifyDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM
 // ChangeNotifyDlg()
 //
 BOOL ChangeNotifyDlg(HWND hwnd) {
-	INT_PTR iResult;
-
-	iResult = ThemedDialogBoxParam(g_hInstance,  MAKEINTRESOURCEW(IDD_CHANGENOTIFY),
+	const INT_PTR iResult = ThemedDialogBoxParam(g_hInstance,  MAKEINTRESOURCE(IDD_CHANGENOTIFY),
 								   hwnd, ChangeNotifyDlgProc, 0);
 
 	return iResult == IDOK;
@@ -1323,14 +1306,13 @@ BOOL ChangeNotifyDlg(HWND hwnd) {
 //
 // Controls: 100 Edit
 //
-INT_PTR CALLBACK ColumnWrapDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
-	static int *piNumber;
-
+static INT_PTR CALLBACK ColumnWrapDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
 	switch (umsg) {
 	case WM_INITDIALOG: {
-		piNumber = (int *)lParam;
+		SetWindowLongPtr(hwnd, DWLP_USER, lParam);
+		const int iNumber = *((int *)lParam);
 
-		SetDlgItemInt(hwnd, 100, *piNumber, FALSE);
+		SetDlgItemInt(hwnd, 100, iNumber, FALSE);
 		SendDlgItemMessage(hwnd, 100, EM_LIMITTEXT, 15, 0);
 
 		CenterDlgInParent(hwnd);
@@ -1341,9 +1323,10 @@ INT_PTR CALLBACK ColumnWrapDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 		switch (LOWORD(wParam)) {
 		case IDOK: {
 			BOOL fTranslated;
-			int iNewNumber = GetDlgItemInt(hwnd, 100, &fTranslated, FALSE);
+			const int iNewNumber = GetDlgItemInt(hwnd, 100, &fTranslated, FALSE);
 
 			if (fTranslated) {
+				int *piNumber = (int *)GetWindowLongPtr(hwnd, DWLP_USER);
 				*piNumber = iNewNumber;
 
 				EndDialog(hwnd, IDOK);
@@ -1369,9 +1352,7 @@ INT_PTR CALLBACK ColumnWrapDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 // ColumnWrapDlg()
 //
 BOOL ColumnWrapDlg(HWND hwnd, UINT uidDlg, int *iNumber) {
-	INT_PTR iResult;
-
-	iResult = ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(uidDlg),
+	const INT_PTR iResult = ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(uidDlg),
 								   hwnd, ColumnWrapDlgProc, (LPARAM)iNumber);
 
 	return iResult == IDOK;
@@ -1396,13 +1377,12 @@ extern int iWordWrapIndent;
 extern int iWordWrapSymbols;
 extern BOOL bShowWordWrapSymbols;
 
-INT_PTR CALLBACK WordWrapSettingsDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
+static INT_PTR CALLBACK WordWrapSettingsDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
 	UNREFERENCED_PARAMETER(lParam);
 
 	switch (umsg) {
 	case WM_INITDIALOG: {
 		WCHAR tch[512];
-
 		for (int i = 0; i < 4; i++) {
 			WCHAR *p1,  *p2;
 			GetDlgItemText(hwnd, 200 + i, tch, COUNTOF(tch));
@@ -1419,10 +1399,10 @@ INT_PTR CALLBACK WordWrapSettingsDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LP
 			SendDlgItemMessage(hwnd, 100 + i, CB_SETEXTENDEDUI, TRUE, 0);
 		}
 
-		SendDlgItemMessage(hwnd, 100, CB_SETCURSEL, (WPARAM)iWordWrapIndent, 0);
-		SendDlgItemMessage(hwnd, 101, CB_SETCURSEL, (WPARAM)(bShowWordWrapSymbols) ? iWordWrapSymbols % 10 : 0, 0);
-		SendDlgItemMessage(hwnd, 102, CB_SETCURSEL, (WPARAM)(bShowWordWrapSymbols) ? ((iWordWrapSymbols % 100) - (iWordWrapSymbols % 10)) / 10 : 0, 0);
-		SendDlgItemMessage(hwnd, 103, CB_SETCURSEL, (WPARAM)iWordWrapMode, 0);
+		SendDlgItemMessage(hwnd, 100, CB_SETCURSEL, iWordWrapIndent, 0);
+		SendDlgItemMessage(hwnd, 101, CB_SETCURSEL, bShowWordWrapSymbols ? iWordWrapSymbols % 10 : 0, 0);
+		SendDlgItemMessage(hwnd, 102, CB_SETCURSEL, bShowWordWrapSymbols ? ((iWordWrapSymbols % 100) - (iWordWrapSymbols % 10)) / 10 : 0, 0);
+		SendDlgItemMessage(hwnd, 103, CB_SETCURSEL, iWordWrapMode, 0);
 
 		CenterDlgInParent(hwnd);
 	}
@@ -1431,14 +1411,10 @@ INT_PTR CALLBACK WordWrapSettingsDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LP
 	case WM_COMMAND:
 		switch (LOWORD(wParam)) {
 		case IDOK: {
-			int iSel,  iSel2;
-
-			iSel = (int)SendDlgItemMessage(hwnd, 100, CB_GETCURSEL, 0, 0);
-			iWordWrapIndent = iSel;
-
+			iWordWrapIndent = (int)SendDlgItemMessage(hwnd, 100, CB_GETCURSEL, 0, 0);
 			bShowWordWrapSymbols = FALSE;
-			iSel = (int)SendDlgItemMessage(hwnd, 101, CB_GETCURSEL, 0, 0);
-			iSel2 = (int)SendDlgItemMessage(hwnd, 102, CB_GETCURSEL, 0, 0);
+			int iSel = (int)SendDlgItemMessage(hwnd, 101, CB_GETCURSEL, 0, 0);
+			const int iSel2 = (int)SendDlgItemMessage(hwnd, 102, CB_GETCURSEL, 0, 0);
 			if (iSel > 0 || iSel2 > 0) {
 				bShowWordWrapSymbols = TRUE;
 				iWordWrapSymbols = iSel + iSel2 * 10;
@@ -1471,9 +1447,7 @@ INT_PTR CALLBACK WordWrapSettingsDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LP
 // WordWrapSettingsDlg()
 //
 BOOL WordWrapSettingsDlg(HWND hwnd, UINT uidDlg, int *iNumber) {
-	INT_PTR iResult;
-
-	iResult = ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(uidDlg),
+	const INT_PTR iResult = ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(uidDlg),
 								   hwnd, WordWrapSettingsDlgProc, (LPARAM)iNumber);
 
 	return iResult == IDOK;
@@ -1489,14 +1463,13 @@ BOOL WordWrapSettingsDlg(HWND hwnd, UINT uidDlg, int *iNumber) {
 //
 extern int iLongLineMode;
 
-INT_PTR CALLBACK LongLineSettingsDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
-	static int *piNumber;
-
+static INT_PTR CALLBACK LongLineSettingsDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
 	switch (umsg) {
 	case WM_INITDIALOG: {
-		piNumber = (int *)lParam;
+		SetWindowLongPtr(hwnd, DWLP_USER, lParam);
+		const int iNumber = *((int *)lParam);
 
-		SetDlgItemInt(hwnd, 100, *piNumber, FALSE);
+		SetDlgItemInt(hwnd, 100, iNumber, FALSE);
 		SendDlgItemMessage(hwnd, 100, EM_LIMITTEXT, 15, 0);
 
 		if (iLongLineMode == EDGE_LINE) {
@@ -1513,10 +1486,10 @@ INT_PTR CALLBACK LongLineSettingsDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LP
 		switch (LOWORD(wParam)) {
 		case IDOK: {
 			BOOL fTranslated;
-
-			int iNewNumber = GetDlgItemInt(hwnd, 100, &fTranslated, FALSE);
+			const int iNewNumber = GetDlgItemInt(hwnd, 100, &fTranslated, FALSE);
 
 			if (fTranslated) {
+				int *piNumber = (int *)GetWindowLongPtr(hwnd, DWLP_USER);
 				*piNumber = iNewNumber;
 				iLongLineMode = IsButtonChecked(hwnd, 101) ? EDGE_LINE : EDGE_BACKGROUND;
 
@@ -1543,9 +1516,7 @@ INT_PTR CALLBACK LongLineSettingsDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LP
 // LongLineSettingsDlg()
 //
 BOOL LongLineSettingsDlg(HWND hwnd, UINT uidDlg, int *iNumber) {
-	INT_PTR iResult;
-
-	iResult = ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(uidDlg),
+	const INT_PTR iResult = ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(uidDlg),
 								   hwnd, LongLineSettingsDlgProc, (LPARAM)iNumber);
 
 	return iResult == IDOK;
@@ -1567,7 +1538,7 @@ extern BOOL bTabsAsSpaces;
 extern BOOL bTabIndents;
 extern BOOL bBackspaceUnindents;
 
-INT_PTR CALLBACK TabSettingsDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
+static INT_PTR CALLBACK TabSettingsDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
 	UNREFERENCED_PARAMETER(lParam);
 
 	switch (umsg) {
@@ -1599,8 +1570,8 @@ INT_PTR CALLBACK TabSettingsDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM 
 		case IDOK: {
 			BOOL fTranslated1, fTranslated2;
 
-			int iNewTabWidth = GetDlgItemInt(hwnd, 100, &fTranslated1, FALSE);
-			int iNewIndentWidth = GetDlgItemInt(hwnd, 101, &fTranslated2, FALSE);
+			const int iNewTabWidth = GetDlgItemInt(hwnd, 100, &fTranslated1, FALSE);
+			const int iNewIndentWidth = GetDlgItemInt(hwnd, 101, &fTranslated2, FALSE);
 
 			if (fTranslated1 && fTranslated2) {
 				iTabWidth = iNewTabWidth;
@@ -1612,7 +1583,7 @@ INT_PTR CALLBACK TabSettingsDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM 
 
 				EndDialog(hwnd, IDOK);
 			} else {
-				PostMessage(hwnd, WM_NEXTDLGCTL, (WPARAM)(GetDlgItem(hwnd, (fTranslated1) ? 101 : 100)), 1);
+				PostMessage(hwnd, WM_NEXTDLGCTL, (WPARAM)(GetDlgItem(hwnd, fTranslated1 ? 101 : 100)), 1);
 			}
 		}
 		break;
@@ -1633,9 +1604,7 @@ INT_PTR CALLBACK TabSettingsDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM 
 // TabSettingsDlg()
 //
 BOOL TabSettingsDlg(HWND hwnd, UINT uidDlg, int *iNumber) {
-	INT_PTR iResult;
-
-	iResult = ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(uidDlg),
+	const INT_PTR iResult = ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(uidDlg),
 								   hwnd, TabSettingsDlgProc, (LPARAM)iNumber);
 
 	return iResult == IDOK;
@@ -1653,24 +1622,21 @@ typedef struct encodedlg {
 	int  cyDlg;
 } ENCODEDLG,  *PENCODEDLG;
 
-INT_PTR CALLBACK SelectDefEncodingDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
-	static PENCODEDLG pdd;
-
+static INT_PTR CALLBACK SelectDefEncodingDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
 	switch (umsg) {
 	case WM_INITDIALOG: {
-		HBITMAP hbmp;
-		HIMAGELIST himl;
+		SetWindowLongPtr(hwnd, DWLP_USER, lParam);
+		PENCODEDLG pdd = (PENCODEDLG)lParam;
 
-		pdd = (PENCODEDLG)lParam;
-
-		hbmp = LoadImage(g_hInstance, MAKEINTRESOURCE(IDB_ENCODING), IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION);
-		himl = ImageList_Create(16, 16, ILC_COLOR32 | ILC_MASK, 0, 0);
+		HBITMAP hbmp = LoadImage(g_hInstance, MAKEINTRESOURCE(IDB_ENCODING), IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION);
+		HIMAGELIST himl = ImageList_Create(16, 16, ILC_COLOR32 | ILC_MASK, 0, 0);
 		ImageList_AddMasked(himl, hbmp, CLR_DEFAULT);
 		DeleteObject(hbmp);
-		SendDlgItemMessage(hwnd, IDC_ENCODINGLIST, CBEM_SETIMAGELIST, 0, (LPARAM)himl);
-		SendDlgItemMessage(hwnd, IDC_ENCODINGLIST, CB_SETEXTENDEDUI, TRUE, 0);
 
-		Encoding_AddToComboboxEx(GetDlgItem(hwnd, IDC_ENCODINGLIST), pdd->idEncoding, 0);
+		HWND hwndLV = GetDlgItem(hwnd, IDC_ENCODINGLIST);
+		SendMessage(hwndLV, CBEM_SETIMAGELIST, 0, (LPARAM)himl);
+		SendMessage(hwndLV, CB_SETEXTENDEDUI, TRUE, 0);
+		Encoding_AddToComboboxEx(hwndLV, pdd->idEncoding, 0);
 
 		if (bSkipUnicodeDetection) {
 			CheckDlgButton(hwnd, IDC_NOUNICODEDETECTION, BST_CHECKED);
@@ -1695,6 +1661,7 @@ INT_PTR CALLBACK SelectDefEncodingDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, L
 	case WM_COMMAND:
 		switch (LOWORD(wParam)) {
 		case IDOK: {
+			PENCODEDLG pdd = (PENCODEDLG)GetWindowLongPtr(hwnd, DWLP_USER);
 			if (Encoding_GetFromComboboxEx(GetDlgItem(hwnd, IDC_ENCODINGLIST), &pdd->idEncoding)) {
 				bSkipUnicodeDetection = IsButtonChecked(hwnd, IDC_NOUNICODEDETECTION);
 				bLoadASCIIasUTF8 = IsButtonChecked(hwnd, IDC_ASCIIASUTF8);
@@ -1721,13 +1688,12 @@ INT_PTR CALLBACK SelectDefEncodingDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, L
 // SelectDefEncodingDlg()
 //
 BOOL SelectDefEncodingDlg(HWND hwnd, int *pidREncoding) {
-	INT_PTR iResult;
 	ENCODEDLG dd;
 
 	dd.bRecodeOnly = FALSE;
 	dd.idEncoding = *pidREncoding;
 
-	iResult = ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_DEFENCODING),
+	const INT_PTR iResult = ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_DEFENCODING),
 								   hwnd, SelectDefEncodingDlgProc, (LPARAM)&dd);
 
 	if (iResult == IDOK) {
@@ -1742,52 +1708,46 @@ BOOL SelectDefEncodingDlg(HWND hwnd, int *pidREncoding) {
 // SelectEncodingDlgProc()
 //
 //
-INT_PTR CALLBACK SelectEncodingDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
-	static PENCODEDLG pdd;
-	static HWND hwndLV;
-
+static INT_PTR CALLBACK SelectEncodingDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
 	switch (umsg) {
 	case WM_INITDIALOG: {
-		LVCOLUMN lvc = { LVCF_FMT | LVCF_TEXT,  LVCFMT_LEFT,  0,  L"",  -1,  0,  0,  0 };
-		HBITMAP hbmp;
-		HIMAGELIST himl;
+		SetWindowLongPtr(hwnd, DWLP_USER, lParam);
+		PENCODEDLG pdd = (PENCODEDLG)lParam;
 
-		pdd = (PENCODEDLG)lParam;
+		LVCOLUMN lvc = { LVCF_FMT | LVCF_TEXT,  LVCFMT_LEFT,  0,  L"",  -1,  0,  0,  0 };
 
 		ResizeDlg_Init(hwnd, pdd->cxDlg, pdd->cyDlg, IDC_RESIZEGRIP4);
 
-		hwndLV = GetDlgItem(hwnd, IDC_ENCODINGLIST);
-
-		hbmp = LoadImage(g_hInstance, MAKEINTRESOURCE(IDB_ENCODING), IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION);
-		himl = ImageList_Create(16, 16, ILC_COLOR32 | ILC_MASK, 0, 0);
+		HBITMAP hbmp = LoadImage(g_hInstance, MAKEINTRESOURCE(IDB_ENCODING), IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION);
+		HIMAGELIST himl = ImageList_Create(16, 16, ILC_COLOR32 | ILC_MASK, 0, 0);
 		ImageList_AddMasked(himl, hbmp, CLR_DEFAULT);
 		DeleteObject(hbmp);
 		ListView_SetImageList(GetDlgItem(hwnd, IDC_ENCODINGLIST), himl, LVSIL_SMALL);
 
+		HWND hwndLV = GetDlgItem(hwnd, IDC_ENCODINGLIST);
 		//SetExplorerTheme(hwndLV);
 		ListView_SetExtendedListViewStyle(hwndLV, /*LVS_EX_FULLROWSELECT|*/LVS_EX_DOUBLEBUFFER | LVS_EX_LABELTIP);
 		ListView_InsertColumn(hwndLV, 0, &lvc);
-
 		Encoding_AddToListView(hwndLV, pdd->idEncoding, pdd->bRecodeOnly);
-
 		ListView_SetColumnWidth(hwndLV, 0, LVSCW_AUTOSIZE_USEHEADER);
 
 		CenterDlgInParent(hwnd);
 	}
 	return TRUE;
 
-	case WM_DESTROY:
+	case WM_DESTROY: {
+		PENCODEDLG pdd = (PENCODEDLG)GetWindowLongPtr(hwnd, DWLP_USER);
 		ResizeDlg_Destroy(hwnd, &pdd->cxDlg, &pdd->cyDlg);
-		return FALSE;
+	}
+	return FALSE;
 
 	case WM_SIZE: {
 		int dx;
 		int dy;
-		HDWP hdwp;
 
 		ResizeDlg_Size(hwnd, lParam, &dx, &dy);
 
-		hdwp = BeginDeferWindowPos(4);
+		HDWP hdwp = BeginDeferWindowPos(4);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDC_RESIZEGRIP4, dx, dy, SWP_NOSIZE);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDOK, dx, dy, SWP_NOSIZE);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDCANCEL, dx, dy, SWP_NOSIZE);
@@ -1810,7 +1770,7 @@ INT_PTR CALLBACK SelectEncodingDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 
 			case LVN_ITEMCHANGED:
 			case LVN_DELETEITEM: {
-				int i = ListView_GetNextItem(hwndLV, -1, LVNI_ALL | LVNI_SELECTED);
+				const int i = ListView_GetNextItem(GetDlgItem(hwnd, IDC_ENCODINGLIST), -1, LVNI_ALL | LVNI_SELECTED);
 				EnableWindow(GetDlgItem(hwnd, IDOK), i != -1);
 			}
 			break;
@@ -1821,13 +1781,15 @@ INT_PTR CALLBACK SelectEncodingDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 
 	case WM_COMMAND:
 		switch (LOWORD(wParam)) {
-		case IDOK:
-			if (Encoding_GetFromListView(hwndLV, &pdd->idEncoding)) {
+		case IDOK: {
+			PENCODEDLG pdd = (PENCODEDLG)GetWindowLongPtr(hwnd, DWLP_USER);
+			if (Encoding_GetFromListView(GetDlgItem(hwnd, IDC_ENCODINGLIST), &pdd->idEncoding)) {
 				EndDialog(hwnd, IDOK);
 			} else {
-				PostMessage(hwnd, WM_NEXTDLGCTL, (WPARAM)(GetDlgItem(hwnd, IDC_ENCODINGLIST)), 1);
+				PostMessage(hwnd, WM_NEXTDLGCTL, (WPARAM)GetDlgItem(hwnd, IDC_ENCODINGLIST), 1);
 			}
-			break;
+		}
+		break;
 
 		case IDCANCEL:
 			EndDialog(hwnd, IDCANCEL);
@@ -1848,7 +1810,6 @@ extern int cxEncodingDlg;
 extern int cyEncodingDlg;
 
 BOOL SelectEncodingDlg(HWND hwnd, int *pidREncoding) {
-	INT_PTR iResult;
 	ENCODEDLG dd;
 
 	dd.bRecodeOnly = FALSE;
@@ -1856,7 +1817,7 @@ BOOL SelectEncodingDlg(HWND hwnd, int *pidREncoding) {
 	dd.cxDlg = cxEncodingDlg;
 	dd.cyDlg = cyEncodingDlg;
 
-	iResult = ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_ENCODING),
+	const INT_PTR iResult = ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_ENCODING),
 								   hwnd, SelectEncodingDlgProc, (LPARAM)&dd);
 
 	cxEncodingDlg = dd.cxDlg;
@@ -1877,7 +1838,6 @@ extern int cxRecodeDlg;
 extern int cyRecodeDlg;
 
 BOOL RecodeDlg(HWND hwnd, int *pidREncoding) {
-	INT_PTR iResult;
 	ENCODEDLG dd;
 
 	dd.bRecodeOnly = TRUE;
@@ -1885,7 +1845,7 @@ BOOL RecodeDlg(HWND hwnd, int *pidREncoding) {
 	dd.cxDlg = cxRecodeDlg;
 	dd.cyDlg = cyRecodeDlg;
 
-	iResult = ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_RECODE),
+	const INT_PTR iResult = ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_RECODE),
 								   hwnd, SelectEncodingDlgProc, (LPARAM)&dd);
 
 	cxRecodeDlg = dd.cxDlg;
@@ -1902,22 +1862,20 @@ BOOL RecodeDlg(HWND hwnd, int *pidREncoding) {
 //
 // SelectDefLineEndingDlgProc()
 //
-INT_PTR CALLBACK SelectDefLineEndingDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
-	static int *piOption;
-
+static INT_PTR CALLBACK SelectDefLineEndingDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
 	switch (umsg) {
 	case WM_INITDIALOG: {
-		WCHAR wch[128];
-
-		piOption = (int *)lParam;
+		SetWindowLongPtr(hwnd, DWLP_USER, lParam);
+		const int iOption = *((int *)lParam);
 
 		// Load options
+		WCHAR wch[128];
 		for (int i = 0; i < 3; i++) {
 			GetString(IDS_EOLMODENAME0 + i, wch, COUNTOF(wch));
 			SendDlgItemMessage(hwnd, IDC_EOLMODELIST, CB_ADDSTRING, 0, (LPARAM)wch);
 		}
 
-		SendDlgItemMessage(hwnd, IDC_EOLMODELIST, CB_SETCURSEL, (WPARAM)(*piOption), 0);
+		SendDlgItemMessage(hwnd, IDC_EOLMODELIST, CB_SETCURSEL, iOption, 0);
 		SendDlgItemMessage(hwnd, IDC_EOLMODELIST, CB_SETEXTENDEDUI, TRUE, 0);
 
 		if (bWarnLineEndings) {
@@ -1939,6 +1897,7 @@ INT_PTR CALLBACK SelectDefLineEndingDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 	case WM_COMMAND:
 		switch (LOWORD(wParam)) {
 		case IDOK: {
+			int *piOption = (int *)GetWindowLongPtr(hwnd, DWLP_USER);
 			*piOption = (int)SendDlgItemMessage(hwnd, IDC_EOLMODELIST, CB_GETCURSEL, 0, 0);
 			bWarnLineEndings = IsButtonChecked(hwnd, IDC_WARNINCONSISTENTEOLS);
 			bFixLineEndings = IsButtonChecked(hwnd, IDC_CONSISTENTEOLS);
@@ -1961,9 +1920,7 @@ INT_PTR CALLBACK SelectDefLineEndingDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 // SelectDefLineEndingDlg()
 //
 BOOL SelectDefLineEndingDlg(HWND hwnd, int *iOption) {
-	INT_PTR iResult;
-
-	iResult = ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_DEFEOLMODE),
+	const INT_PTR iResult = ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_DEFEOLMODE),
 								   hwnd, SelectDefLineEndingDlgProc, (LPARAM)iOption);
 
 	return iResult == IDOK;
@@ -1980,35 +1937,35 @@ typedef struct _infobox {
 	BOOL   bDisableCheckBox;
 } INFOBOX, *LPINFOBOX;
 
-INT_PTR CALLBACK InfoBoxDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
-	LPINFOBOX lpib;
-
+static INT_PTR CALLBACK InfoBoxDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
 	switch (umsg) {
-	case WM_INITDIALOG:
-		lpib = (LPINFOBOX)lParam;
-		SetWindowLongPtr(hwnd, DWLP_USER, (LONG_PTR)lParam);
-		SendDlgItemMessage(hwnd, IDC_INFOBOXICON, STM_SETICON,
-						   (WPARAM)LoadIcon(NULL, IDI_EXCLAMATION), 0);
+	case WM_INITDIALOG: {
+		SetWindowLongPtr(hwnd, DWLP_USER, lParam);
+		LPINFOBOX lpib = (LPINFOBOX)lParam;
+
+		SendDlgItemMessage(hwnd, IDC_INFOBOXICON, STM_SETICON, (WPARAM)LoadIcon(NULL, IDI_EXCLAMATION), 0);
 		SetDlgItemText(hwnd, IDC_INFOBOXTEXT, lpib->lpstrMessage);
 		if (lpib->bDisableCheckBox) {
 			EnableWindow(GetDlgItem(hwnd, IDC_INFOBOXCHECK), FALSE);
 		}
 		NP2HeapFree(lpib->lpstrMessage);
 		CenterDlgInParent(hwnd);
-		return TRUE;
+	}
+	return TRUE;
 
 	case WM_COMMAND:
 		switch (LOWORD(wParam)) {
 		case IDOK:
 		case IDCANCEL:
 		case IDYES:
-		case IDNO:
-			lpib = (LPINFOBOX)GetWindowLongPtr(hwnd, DWLP_USER);
+		case IDNO: {
+			LPINFOBOX lpib = (LPINFOBOX)GetWindowLongPtr(hwnd, DWLP_USER);
 			if (IsButtonChecked(hwnd, IDC_INFOBOXCHECK)) {
 				IniSetBool(INI_SECTION_NAME_SUPPRESSED_MESSAGES, lpib->lpstrSetting, 1);
 			}
 			EndDialog(hwnd, LOWORD(wParam));
-			break;
+		}
+		break;
 		}
 		return TRUE;
 	}
@@ -2021,37 +1978,34 @@ INT_PTR CALLBACK InfoBoxDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPar
 //
 //
 INT_PTR InfoBox(int iType, LPCWSTR lpstrSetting, int uidMessage, ...) {
-	HWND hwnd;
-	int idDlg = IDD_INFOBOX;
-	INFOBOX ib;
-	WCHAR wchFormat[512];
-	int iMode;
-	va_list va;
-
-	iMode = IniGetInt(INI_SECTION_NAME_SUPPRESSED_MESSAGES, lpstrSetting, 0);
-
+	const int iMode = IniGetInt(INI_SECTION_NAME_SUPPRESSED_MESSAGES, lpstrSetting, 0);
 	if (StrNotEmpty(lpstrSetting) && iMode == 1) {
 		return (iType == MBYESNO) ? IDYES : IDOK;
 	}
 
-	if (!GetString(uidMessage, wchFormat, COUNTOF(wchFormat))) {
-		return -1;
-	}
+	WCHAR wchFormat[512];
+	GetString(uidMessage, wchFormat, COUNTOF(wchFormat));
 
+	INFOBOX ib;
 	ib.lpstrMessage = NP2HeapAlloc(1024 * sizeof(WCHAR));
+
+	va_list va;
 	va_start(va, uidMessage);
 	wvsprintf(ib.lpstrMessage, wchFormat, va);
 	va_end(va);
+
 	ib.lpstrSetting = (LPWSTR)lpstrSetting;
 	ib.bDisableCheckBox = StrIsEmpty(szIniFile) || StrIsEmpty(lpstrSetting) || iMode == 2;
 
+	int idDlg = IDD_INFOBOX;
 	if (iType == MBYESNO) {
 		idDlg = IDD_INFOBOX2;
 	} else if (iType == MBOKCANCEL) {
 		idDlg = IDD_INFOBOX3;
 	}
 
-	if ((hwnd = GetFocus()) == NULL) {
+	HWND hwnd;
+	if ((hwnd = GetActiveWindow()) == NULL) {
 		hwnd = hwndMain;
 	}
 

@@ -41,7 +41,7 @@ else
       # Get where the branch is based on master
       base=$(git merge-base master HEAD)
       base_ver=$(git rev-list --count $svnhash..$base)
-      base_ver=$((base_ver+svnrev))
+      base_ver=$((base_ver + svnrev))
       ver_full=" ($branch) (master@${base_ver:0:7})"
     else
       ver_full=" ($branch)"
@@ -51,7 +51,7 @@ else
   # Count how many changesets we have since the last svn changeset
   ver=$(git rev-list --count $svnhash..HEAD)
   # Now add it with to last svn revision number
-  ver=$((ver+svnrev))
+  ver=$((ver + svnrev))
 
   # Get the abbreviated hash of the current changeset
   hash=$(git rev-parse --short HEAD)

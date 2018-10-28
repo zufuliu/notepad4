@@ -233,22 +233,21 @@ static inline BOOL NeedSpaceAfterKeyword(const char *word, Sci_Position length) 
 void AutoC_AddDocWord(HWND hwnd, struct WordList *pWList, BOOL bIgnore) {
 	UNREFERENCED_PARAMETER(hwnd);
 
-	LPCSTR pRoot = pWList->pWordStart;
-	int iRootLen = pWList->iStartLen;
+	LPCSTR const pRoot = pWList->pWordStart;
+	const int iRootLen = pWList->iStartLen;
 	struct Sci_TextToFind ft = {{0, 0}, 0, {0, 0}};
 	struct Sci_TextRange tr = { { 0, -1 }, NULL };
-	Sci_Position iCurrentPos = SciCall_GetCurrentPos() - iRootLen;
-	int iDocLen = SciCall_GetLength();
-	int findFlag = bIgnore ? SCFIND_WORDSTART : (SCFIND_WORDSTART | SCFIND_MATCHCASE);
-	Sci_Position iPosFind;
+	const Sci_Position iCurrentPos = SciCall_GetCurrentPos() - iRootLen;
+	const int iDocLen = SciCall_GetLength();
+	const int findFlag = bIgnore ? SCFIND_WORDSTART : (SCFIND_WORDSTART | SCFIND_MATCHCASE);
 
 	ft.lpstrText = pRoot;
 	ft.chrg.cpMax = iDocLen;
-	iPosFind = SciCall_FindText(findFlag, &ft);
+	Sci_Position iPosFind = SciCall_FindText(findFlag, &ft);
 
 	while (iPosFind >= 0 && iPosFind < iDocLen) {
 		Sci_Position wordEnd = iPosFind + iRootLen;
-		int style = SciCall_GetStyleAt(wordEnd - 1);
+		const int style = SciCall_GetStyleAt(wordEnd - 1);
 		if (iPosFind != iCurrentPos && !IsWordStyleToIgnore(style)) {
 			int chPrev, ch = *pRoot, chNext = SciCall_GetCharAt(wordEnd);
 			Sci_Position wordLength = -iPosFind;
@@ -332,9 +331,8 @@ void AutoC_AddDocWord(HWND hwnd, struct WordList *pWList, BOOL bIgnore) {
 					}
 					if (wordLength >= iRootLen) {
 						if (bSubWord && !(ch >= '0' && ch <= '9')) {
-							int i;
 							ch = 0; chNext = *pWord;
-							for (i = 0; i < wordLength - 1; i++) {
+							for (int i = 0; i < wordLength - 1; i++) {
 								chPrev = ch;
 								ch = chNext;
 								chNext = pWord[i + 1];
@@ -453,11 +451,8 @@ void EditCompleteWord(HWND hwnd, BOOL autoInsert) {
 	Sci_Position iCurrentLinePos = iCurrentPos - iLineStartPos;
 	Sci_Position iStartWordPos = iCurrentLinePos;
 
-	char *pLine;
 	char *pRoot = NULL;
 	char *pSubRoot = NULL;
-	int iRootLen;
-	int iDocLen;
 #ifdef NDEBUG
 	int ch = 0, chPrev = 0;
 #else
@@ -465,14 +460,12 @@ void EditCompleteWord(HWND hwnd, BOOL autoInsert) {
 #endif
 
 	BOOL bIgnore = FALSE; // ignore number
-	struct WordList *pWList = NULL;
-
 	iAutoCItemCount = 0; // recreate list
 
-	iDocLen = SciCall_GetLineLength(iLine);
-	pLine = NP2HeapAlloc(iDocLen + 1);
+	const int iDocLen = SciCall_GetLineLength(iLine);
+	char * const pLine = NP2HeapAlloc(iDocLen + 1);
 	SciCall_GetLine(iLine, pLine);
-	iRootLen = iAutoCMinWordLength;
+	int iRootLen = iAutoCMinWordLength;
 
 	while (iStartWordPos > 0 && IsDocWordChar(pLine[iStartWordPos - 1])) {
 		iStartWordPos--;
@@ -553,7 +546,7 @@ void EditCompleteWord(HWND hwnd, BOOL autoInsert) {
 	}
 
 	bIgnore = (iStartWordPos >= 0 && pLine[iStartWordPos] >= '0' && pLine[iStartWordPos] <= '9');
-	pWList = WordList_Alloc(pRoot, iRootLen, bIgnore);
+	struct WordList *pWList = WordList_Alloc(pRoot, iRootLen, bIgnore);
 	if (bIgnore) {
 		goto label_add_doc_word;
 	}
@@ -584,7 +577,7 @@ label_show_word_list:
 	if (iAutoCItemCount == 0 && pSubRoot && *pSubRoot) {
 		pSubRoot = strpbrk(pSubRoot, ":.#@<\\/->");
 		if (pSubRoot) {
-			while (*pSubRoot && StrChrA(":.#@<\\/->", *pSubRoot)) {
+			while (*pSubRoot && strchr(":.#@<\\/->", *pSubRoot)) {
 				pSubRoot++;
 			}
 		}
@@ -626,14 +619,13 @@ end:
 	NP2HeapFree(pWList);
 }
 
-
 void EditAutoCloseBraceQuote(HWND hwnd, int ch) {
 	Sci_Position iCurPos = SciCall_GetCurrentPos();
-	int chPrev = SciCall_GetCharAt(iCurPos - 2);
-	int chNext = SciCall_GetCharAt(iCurPos);
-	int iCurrentStyle = SciCall_GetStyleAt(iCurPos - 2);
-	int iNextStyle = SciCall_GetStyleAt(iCurPos);
-	char tchIns[2] = "";
+	const int chPrev = SciCall_GetCharAt(iCurPos - 2);
+	const int chNext = SciCall_GetCharAt(iCurPos);
+	const int iCurrentStyle = SciCall_GetStyleAt(iCurPos - 2);
+	const int iNextStyle = SciCall_GetStyleAt(iCurPos);
+
 	if (pLexCurrent->iLexer == SCLEX_CPP) {
 		// within char
 		if (iCurrentStyle == SCE_C_CHARACTER && iNextStyle == SCE_C_CHARACTER && pLexCurrent->rid != NP2LEX_PHP) {
@@ -643,6 +635,8 @@ void EditAutoCloseBraceQuote(HWND hwnd, int ch) {
 			return;
 		}
 	}
+
+	char tchIns[2] = "";
 	switch (ch) {
 	case '(':
 		tchIns[0] = ')';
@@ -722,10 +716,10 @@ static inline BOOL IsHtmlVoidTag(const char *word, int length) {
 
 void EditAutoCloseXMLTag(HWND hwnd) {
 	char tchBuf[512];
-	Sci_Position iCurPos = SciCall_GetCurrentPos();
-	int	 iHelper = (int)(iCurPos - (COUNTOF(tchBuf) - 1));
-	int	 iStartPos = max_i(0, iHelper);
-	Sci_Position iSize = iCurPos - iStartPos;
+	const Sci_Position iCurPos = SciCall_GetCurrentPos();
+	int iHelper = (int)(iCurPos - (COUNTOF(tchBuf) - 1));
+	const int iStartPos = max_i(0, iHelper);
+	const Sci_Position iSize = iCurPos - iStartPos;
 	BOOL autoClosed = FALSE;
 
 	if (pLexCurrent->iLexer == SCLEX_CPP) {
@@ -733,7 +727,7 @@ void EditAutoCloseXMLTag(HWND hwnd) {
 		if (iCurrentStyle == SCE_C_OPERATOR || iCurrentStyle == SCE_C_DEFAULT) {
 			iHelper = FALSE;
 		} else {
-			int iLine = SciCall_LineFromPosition(iCurPos);
+			const int iLine = SciCall_LineFromPosition(iCurPos);
 			Sci_Position iCurrentLinePos = SciCall_PositionFromLine(iLine);
 			while (iCurrentLinePos < iCurPos && IsASpace(SciCall_GetCharAt(iCurrentLinePos))) {
 				iCurrentLinePos++;
@@ -754,7 +748,7 @@ void EditAutoCloseXMLTag(HWND hwnd) {
 
 		if (tchBuf[iSize - 2] != '/') {
 			char tchIns[516] = "</";
-			int	 cchIns = 2;
+			int cchIns = 2;
 			const char *pBegin = tchBuf;
 			const char *pCur = tchBuf + iSize - 2;
 
@@ -764,7 +758,7 @@ void EditAutoCloseXMLTag(HWND hwnd) {
 
 			if (*pCur == '<') {
 				pCur++;
-				while (StrChrA(":_-.", *pCur) || IsCharAlphaNumericA(*pCur)) {
+				while (strchr(":_-.", *pCur) || isalnum((unsigned char)(*pCur))) {
 					tchIns[cchIns++] = *pCur;
 					pCur++;
 				}
@@ -789,13 +783,12 @@ void EditAutoCloseXMLTag(HWND hwnd) {
 		}
 	}
 	if (!autoClosed && bAutoCompleteWords) {
-		iCurPos = SciCall_GetCurrentPos();
-		if (SciCall_GetCharAt(iCurPos - 2) == '-') {
+		const Sci_Position iPos = SciCall_GetCurrentPos();
+		if (SciCall_GetCharAt(iPos - 2) == '-') {
 			EditCompleteWord(hwnd, FALSE); // obj->field, obj->method
 		}
 	}
 }
-
 
 BOOL IsIndentKeywordStyle(int style) {
 	switch (pLexCurrent->iLexer) {
@@ -839,12 +832,14 @@ const char *EditKeywordIndent(const char *head, int *indent) {
 	int length = 0;
 	const char *endPart = NULL;
 	*indent = 0;
+
 	while (*head && length < 63 && IsAAlpha(*head)) {
 		word[length] = *head;
 		word_low[length] = (*head) | 0x20;
 		++length;
 		++head;
 	}
+
 	switch (pLexCurrent->iLexer) {
 	//case SCLEX_CPP:
 	//case SCLEX_VB:
@@ -979,28 +974,25 @@ const char *EditKeywordIndent(const char *head, int *indent) {
 	return endPart;
 }
 
-extern int	iEOLMode;
 extern BOOL	bTabsAsSpaces;
 extern BOOL	bTabIndents;
 extern int	iTabWidth;
 extern int	iIndentWidth;
 
 void EditAutoIndent(HWND hwnd) {
-	char *pLineBuf;
-
 	int iCurPos = (int)SendMessage(hwnd, SCI_GETCURRENTPOS, 0, 0);
-	//int iAnchorPos = (int)SendMessage(hwnd, SCI_GETANCHOR, 0, 0);
-	int iCurLine = (int)SendMessage(hwnd, SCI_LINEFROMPOSITION, (WPARAM)iCurPos, 0);
-	//int iLineLength = (int)SendMessage(hwnd, SCI_LINELENGTH, iCurLine, 0);
-	//int iIndentBefore = (int)SendMessage(hwnd, SCI_GETLINEINDENTATION, (WPARAM)iCurLine-1, 0);
+	//const int iAnchorPos = (int)SendMessage(hwnd, SCI_GETANCHOR, 0, 0);
+	const int iCurLine = (int)SendMessage(hwnd, SCI_LINEFROMPOSITION, iCurPos, 0);
+	//const int iLineLength = (int)SendMessage(hwnd, SCI_LINELENGTH, iCurLine, 0);
+	//const int iIndentBefore = (int)SendMessage(hwnd, SCI_GETLINEINDENTATION, iCurLine - 1, 0);
 
 #ifdef BOOKMARK_EDITION
 	// Move bookmark along with line if inserting lines (pressing return at beginning of line) because Scintilla does not do this for us
 	if (iCurLine > 0) {
-		int iPrevLineLength = (int)SendMessage(hwnd, SCI_GETLINEENDPOSITION, iCurLine - 1, 0) -
+		const int iPrevLineLength = (int)SendMessage(hwnd, SCI_GETLINEENDPOSITION, iCurLine - 1, 0) -
 							  (int)SendMessage(hwnd, SCI_POSITIONFROMLINE, iCurLine - 1, 0);
 		if (iPrevLineLength == 0) {
-			int bitmask = (int)SendMessage(hwnd, SCI_MARKERGET, iCurLine - 1, 0);
+			const int bitmask = (int)SendMessage(hwnd, SCI_MARKERGET, iCurLine - 1, 0);
 			if (bitmask & 1) {
 				SendMessage(hwnd, SCI_MARKERDELETE, iCurLine - 1, 0);
 				SendMessage(hwnd, SCI_MARKERADD, iCurLine, 0);
@@ -1010,139 +1002,141 @@ void EditAutoIndent(HWND hwnd) {
 #endif
 
 	if (iCurLine > 0/* && iLineLength <= 2*/) {
-		int iPrevLineLength = (int)SendMessage(hwnd, SCI_LINELENGTH, iCurLine - 1, 0);
+		const int iPrevLineLength = (int)SendMessage(hwnd, SCI_LINELENGTH, iCurLine - 1, 0);
 		if (iPrevLineLength < 2) {
 			return;
 		}
-		pLineBuf = NP2HeapAlloc(2 * iPrevLineLength + 1 + iIndentWidth * 2 + 2 + 64);
-		if (pLineBuf) {
-			char *pPos;
-			int indent = 0;
-			int	iIndentLen = 0;
-			int iIndentPos = iCurPos;
-			int ch;
-			const char *endPart = NULL;
-			int commentStyle = 0;
-			SciCall_GetLine(iCurLine - 1, pLineBuf);
-			pLineBuf[iPrevLineLength] = '\0';
-			ch = pLineBuf[iPrevLineLength - 2];
-			if (ch == '\r') {
-				ch = pLineBuf[iPrevLineLength - 3];
-				iIndentLen = 1;
-			}
-			if (ch == '{' || ch == '[' || ch == '(') {
-				indent = 2;
-			} else if (ch == ':') { // case label/Python
+		char *pLineBuf = NP2HeapAlloc(2 * iPrevLineLength + 1 + iIndentWidth * 2 + 2 + 64);
+		if (pLineBuf == NULL) {
+			return;
+		}
+
+		const int iEOLMode = (int)SendMessage(hwnd, SCI_GETEOLMODE, 0, 0);
+		int indent = 0;
+		int	iIndentLen = 0;
+		int commentStyle = 0;
+		SciCall_GetLine(iCurLine - 1, pLineBuf);
+		pLineBuf[iPrevLineLength] = '\0';
+
+		int ch = pLineBuf[iPrevLineLength - 2];
+		if (ch == '\r') {
+			ch = pLineBuf[iPrevLineLength - 3];
+			iIndentLen = 1;
+		}
+		if (ch == '{' || ch == '[' || ch == '(') {
+			indent = 2;
+		} else if (ch == ':') { // case label/Python
+			indent = 1;
+		} else if (ch == '*' || ch == '!') { // indent block comment
+			iIndentLen = iPrevLineLength - (2 + iIndentLen);
+			if (iIndentLen >= 2 && pLineBuf[iIndentLen - 2] == '/' && pLineBuf[iIndentLen - 1] == '*') {
 				indent = 1;
-			} else if (ch == '*' || ch == '!') { // indent block comment
-				iIndentLen = iPrevLineLength - (2 + iIndentLen);
-				if (iIndentLen >= 2 && pLineBuf[iIndentLen - 2] == '/' && pLineBuf[iIndentLen - 1] == '*') {
-					indent = 1;
-					commentStyle = 1;
-				}
+				commentStyle = 1;
 			}
-			iIndentLen = 0;
-			ch = SciCall_GetCharAt(SciCall_PositionFromLine(iCurLine));
-			if (indent == 2 && !(ch == '}' || ch == ']' || ch == ')')) {
-				indent = 1;
-			} else if (!indent && (ch == '}' || ch == ']' || ch == ')')) {
-				indent = 1;
-			}
-			for (pPos = pLineBuf; *pPos; pPos++) {
-				if (*pPos != ' ' && *pPos != '\t') {
-					if (!indent && IsWordStart(*pPos)) { // indent on keywords
-						int style = SciCall_GetStyleAt(SciCall_PositionFromLine(iCurLine - 1) + iIndentLen);
-						if (IsIndentKeywordStyle(style)) {
-							endPart = EditKeywordIndent(pPos, &indent);
-						}
-					}
-					if (indent) {
-						memset(pPos, 0, iPrevLineLength - iIndentLen);
-					}
-					*pPos = '\0';
-					break;
-				}
-				iIndentLen += 1;
-			}
-			if (indent) {
-				int pad = iIndentWidth;
-				iIndentPos += iIndentLen;
-				ch = ' ';
-				if (bTabIndents) {
-					if (bTabsAsSpaces) {
-						pad = iTabWidth;
-						ch = ' ';
-					} else {
-						pad = 1;
-						ch = '\t';
+		}
+		iIndentLen = 0;
+		ch = SciCall_GetCharAt(SciCall_PositionFromLine(iCurLine));
+		if (indent == 2 && !(ch == '}' || ch == ']' || ch == ')')) {
+			indent = 1;
+		} else if (!indent && (ch == '}' || ch == ']' || ch == ')')) {
+			indent = 1;
+		}
+
+		char *pPos;
+		const char *endPart = NULL;
+		for (pPos = pLineBuf; *pPos; pPos++) {
+			if (*pPos != ' ' && *pPos != '\t') {
+				if (!indent && IsWordStart(*pPos)) { // indent on keywords
+					int style = SciCall_GetStyleAt(SciCall_PositionFromLine(iCurLine - 1) + iIndentLen);
+					if (IsIndentKeywordStyle(style)) {
+						endPart = EditKeywordIndent(pPos, &indent);
 					}
 				}
-				if (commentStyle) {
-					iIndentPos += 2;
-					*pPos++ = ' ';
-					*pPos++ = '*';
-				} else {
-					iIndentPos += pad;
-					while (pad-- > 0) {
-						*pPos++ = (char)ch;
-					}
-				}
-				if (iEOLMode == SC_EOL_CRLF || iEOLMode == SC_EOL_CR) {
-					*pPos++ = '\r';
-				}
-				if (iEOLMode == SC_EOL_CRLF || iEOLMode == SC_EOL_LF) {
-					*pPos++ = '\n';
-				}
-				if (indent == 2) {
-					lstrcpynA(pPos, pLineBuf, iIndentLen + 1);
-					pPos += iIndentLen;
-					if (endPart) {
-						iIndentLen = lstrlenA(endPart);
-						lstrcpynA(pPos, endPart, iIndentLen + 1);
-						pPos += iIndentLen;
-					}
+				if (indent) {
+					memset(pPos, 0, iPrevLineLength - iIndentLen);
 				}
 				*pPos = '\0';
+				break;
 			}
-			if (*pLineBuf) {
-				//int iPrevLineStartPos;
-				//int iPrevLineEndPos;
-				//int iPrevLineIndentPos;
-
-				SendMessage(hwnd, SCI_BEGINUNDOACTION, 0, 0);
-				SendMessage(hwnd, SCI_ADDTEXT, lstrlenA(pLineBuf), (LPARAM)pLineBuf);
-				if (indent) {
-					if (indent == 1) {// remove new line
-						iCurPos = iIndentPos + ((iEOLMode == SC_EOL_CRLF) ? 2 : 1);
-						SendMessage(hwnd, SCI_SETSEL, iIndentPos, iCurPos);
-						SendMessage(hwnd, SCI_REPLACESEL, 0, (LPARAM)"");
-					}
-					SendMessage(hwndEdit, SCI_SETSEL, iIndentPos, iIndentPos);
-				}
-				SendMessage(hwnd, SCI_ENDUNDOACTION, 0, 0);
-
-				//iPrevLineStartPos	 = (int)SendMessage(hwnd, SCI_POSITIONFROMLINE, (WPARAM)iCurLine-1, 0);
-				//iPrevLineEndPos	 = (int)SendMessage(hwnd, SCI_GETLINEENDPOSITION, (WPARAM)iCurLine-1, 0);
-				//iPrevLineIndentPos = (int)SendMessage(hwnd, SCI_GETLINEINDENTPOSITION, (WPARAM)iCurLine-1, 0);
-
-				//if (iPrevLineEndPos == iPrevLineIndentPos) {
-				//	SendMessage(hwnd, SCI_BEGINUNDOACTION, 0, 0);
-				//	SendMessage(hwnd, SCI_SETTARGETSTART, (WPARAM)iPrevLineStartPos, 0);
-				//	SendMessage(hwnd, SCI_SETTARGETEND, (WPARAM)iPrevLineEndPos, 0);
-				//	SendMessage(hwnd, SCI_REPLACETARGET, 0, (LPARAM)"");
-				//	SendMessage(hwnd, SCI_ENDUNDOACTION, 0, 0);
-				//}
-			}
-			NP2HeapFree(pLineBuf);
-			//int iIndent = (int)SendMessage(hwnd, SCI_GETLINEINDENTATION, (WPARAM)iCurLine, 0);
-			//SendMessage(hwnd, SCI_SETLINEINDENTATION, (WPARAM)iCurLine, (LPARAM)iIndentBefore);
-			//iIndentLen = /*- iIndent +*/ SendMessage(hwnd, SCI_GETLINEINDENTATION, (WPARAM)iCurLine, 0);
-			//if (iIndentLen > 0)
-			//	SendMessage(hwnd, SCI_SETSEL, (WPARAM)iAnchorPos+iIndentLen, (LPARAM)iCurPos+iIndentLen);
+			iIndentLen += 1;
 		}
+
+		int iIndentPos = iCurPos;
+		if (indent) {
+			int pad = iIndentWidth;
+			iIndentPos += iIndentLen;
+			ch = ' ';
+			if (bTabIndents) {
+				if (bTabsAsSpaces) {
+					pad = iTabWidth;
+					ch = ' ';
+				} else {
+					pad = 1;
+					ch = '\t';
+				}
+			}
+			if (commentStyle) {
+				iIndentPos += 2;
+				*pPos++ = ' ';
+				*pPos++ = '*';
+			} else {
+				iIndentPos += pad;
+				while (pad-- > 0) {
+					*pPos++ = (char)ch;
+				}
+			}
+			if (iEOLMode == SC_EOL_CRLF || iEOLMode == SC_EOL_CR) {
+				*pPos++ = '\r';
+			}
+			if (iEOLMode == SC_EOL_CRLF || iEOLMode == SC_EOL_LF) {
+				*pPos++ = '\n';
+			}
+			if (indent == 2) {
+				lstrcpynA(pPos, pLineBuf, iIndentLen + 1);
+				pPos += iIndentLen;
+				if (endPart) {
+					iIndentLen = lstrlenA(endPart);
+					lstrcpynA(pPos, endPart, iIndentLen + 1);
+					pPos += iIndentLen;
+				}
+			}
+			*pPos = '\0';
+		}
+
+		if (*pLineBuf) {
+			SendMessage(hwnd, SCI_BEGINUNDOACTION, 0, 0);
+			SendMessage(hwnd, SCI_ADDTEXT, strlen(pLineBuf), (LPARAM)pLineBuf);
+			if (indent) {
+				if (indent == 1) {// remove new line
+					iCurPos = iIndentPos + ((iEOLMode == SC_EOL_CRLF) ? 2 : 1);
+					SendMessage(hwnd, SCI_SETSEL, iIndentPos, iCurPos);
+					SendMessage(hwnd, SCI_REPLACESEL, 0, (LPARAM)"");
+				}
+				SendMessage(hwndEdit, SCI_SETSEL, iIndentPos, iIndentPos);
+			}
+			SendMessage(hwnd, SCI_ENDUNDOACTION, 0, 0);
+
+			//const int iPrevLineStartPos = (int)SendMessage(hwnd, SCI_POSITIONFROMLINE, iCurLine - 1, 0);
+			//const int iPrevLineEndPos = (int)SendMessage(hwnd, SCI_GETLINEENDPOSITION, iCurLine - 1, 0);
+			//const int iPrevLineIndentPos = (int)SendMessage(hwnd, SCI_GETLINEINDENTPOSITION, iCurLine - 1, 0);
+
+			//if (iPrevLineEndPos == iPrevLineIndentPos) {
+			//	SendMessage(hwnd, SCI_BEGINUNDOACTION, 0, 0);
+			//	SendMessage(hwnd, SCI_SETTARGETSTART, iPrevLineStartPos, 0);
+			//	SendMessage(hwnd, SCI_SETTARGETEND, iPrevLineEndPos, 0);
+			//	SendMessage(hwnd, SCI_REPLACETARGET, 0, (LPARAM)"");
+			//	SendMessage(hwnd, SCI_ENDUNDOACTION, 0, 0);
+			//}
+		}
+
+		NP2HeapFree(pLineBuf);
+		//const int int iIndent = (int)SendMessage(hwnd, SCI_GETLINEINDENTATION, iCurLine, 0);
+		//SendMessage(hwnd, SCI_SETLINEINDENTATION, iCurLine, iIndentBefore);
+		//iIndentLen = /*- iIndent +*/ SendMessage(hwnd, SCI_GETLINEINDENTATION, iCurLine, 0);
+		//if (iIndentLen > 0)
+		//	SendMessage(hwnd, SCI_SETSEL, iAnchorPos + iIndentLen, iCurPos + iIndentLen);
 	}
 }
-
 
 void EditToggleCommentLine(HWND hwnd) {
 	BeginWaitCursor();
@@ -1233,12 +1227,11 @@ void EditToggleCommentLine(HWND hwnd) {
 void EditEncloseSelectionNewLine(HWND hwnd, LPCWSTR pwszOpen, LPCWSTR pwszClose) {
 	WCHAR start[64] = L"";
 	WCHAR end[64] = L"";
-	Sci_Position pos;
-	int line;
+	const int iEOLMode = (int)SendMessage(hwnd, SCI_GETEOLMODE, 0, 0);
 	LPCWSTR lineEnd = (iEOLMode == SC_EOL_LF) ? L"LF" : ((iEOLMode == SC_EOL_CR) ? L"CR" : L"CR+LF");
 
-	pos = SciCall_GetSelectionStart();
-	line = SciCall_LineFromPosition(pos);
+	Sci_Position pos = SciCall_GetSelectionStart();
+	int line = SciCall_LineFromPosition(pos);
 	if (pos != SciCall_PositionFromLine(line)) {
 		lstrcat(start, lineEnd);
 	}
@@ -1308,13 +1301,11 @@ void EditToggleCommentBlock(HWND hwnd) {
 }
 
 void EditShowCallTips(HWND hwnd, Sci_Position position) {
-	char *text;
-	char *pLine;
-	int iLine = (int)SendMessage(hwnd, SCI_LINEFROMPOSITION, (WPARAM)position, 0);
-	int iDocLen = SciCall_GetLine(iLine, NULL); // get length
-	pLine = NP2HeapAlloc(iDocLen + 1);
+	const int iLine = (int)SendMessage(hwnd, SCI_LINEFROMPOSITION, position, 0);
+	const int iDocLen = SciCall_GetLine(iLine, NULL); // get length
+	char *pLine = NP2HeapAlloc(iDocLen + 1);
 	SciCall_GetLine(iLine, pLine);
-	text = NP2HeapAlloc(iDocLen + 1 + 128);
+	char *text = NP2HeapAlloc(iDocLen + 1 + 128);
 	wsprintfA(text, "ShowCallTips(%d, %d, %d)\n%s", iLine + 1, (int)position, iDocLen, pLine);
 	SendMessage(hwnd, SCI_CALLTIPSHOW, position, (LPARAM)text);
 	NP2HeapFree(pLine);

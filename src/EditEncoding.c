@@ -7,8 +7,8 @@
 #include "Notepad2.h"
 #include "Edit.h"
 #include "Styles.h"
-#include "Dialogs.h"
 #include "Helpers.h"
+#include "Dialogs.h"
 #include "SciCall.h"
 #include "resource.h"
 
@@ -210,7 +210,7 @@ BOOL EditSetNewEncoding(HWND hwnd, int iCurrentEncoding, int iNewEncoding, BOOL 
 		const UINT cpDest = (mEncoding[iNewEncoding].uFlags & NCP_DEFAULT) ? iDefaultCodePage : SC_CP_UTF8;
 
 		if (SendMessage(hwnd, SCI_GETLENGTH, 0, 0) == 0) {
-			BOOL bIsEmptyUndoHistory =
+			const BOOL bIsEmptyUndoHistory =
 				(SendMessage(hwnd, SCI_CANUNDO, 0, 0) == 0 && SendMessage(hwnd, SCI_CANREDO, 0, 0) == 0);
 
 			if (bNoUI || bIsEmptyUndoHistory || InfoBox(MBYESNO, L"MsgConv2", IDS_ASK_ENCODING2) == IDYES) {
@@ -302,7 +302,7 @@ int Encoding_MapIniSetting(BOOL bLoad, int iSetting) {
 		case CPI_UTF7:
 			return 8;
 		default:
-			return (mEncoding[iSetting].uCodePage);
+			return mEncoding[iSetting].uCodePage;
 		}
 	}
 }
@@ -324,11 +324,20 @@ void Encoding_GetLabel(int iEncoding) {
 			g_AllEncodingLabel = NP2HeapAlloc(COUNTOF(mEncoding) * MAX_ENCODING_LABEL_SIZE * sizeof(WCHAR));
 		}
 		mEncoding[iEncoding].wchLabel = g_AllEncodingLabel + iEncoding * MAX_ENCODING_LABEL_SIZE;
-		StrCpyN(mEncoding[iEncoding].wchLabel, pwsz, MAX_ENCODING_LABEL_SIZE);
+		lstrcpyn(mEncoding[iEncoding].wchLabel, pwsz, MAX_ENCODING_LABEL_SIZE);
 	}
 }
 
-int Encoding_MatchW(LPCWSTR pwszTest) {
+static inline BOOL IsValidEncoding(int iEncoding) {
+	if (!(mEncoding[iEncoding].uFlags & NCP_INTERNAL)) {
+		const UINT cp = mEncoding[iEncoding].uCodePage;
+		CPINFO cpi;
+		return IsValidCodePage(cp) && GetCPInfo(cp, &cpi);
+	}
+	return TRUE;
+}
+
+int Encoding_Match(LPCWSTR pwszTest) {
 	char tchTest[256];
 	WideCharToMultiByte(CP_ACP, 0, pwszTest, -1, tchTest, COUNTOF(tchTest), NULL, NULL);
 	return Encoding_MatchA(tchTest);
@@ -341,8 +350,12 @@ int Encoding_MatchA(char *pchTest) {
 
 	*pchDst++ = ',';
 	while (*pchSrc) {
-		if (IsCharAlphaNumericA(*pchSrc)) {
-			*pchDst++ = *CharLowerA(pchSrc);
+		if (isalnum((unsigned char)(*pchSrc))) {
+			if (*pchSrc >= 'A' && *pchSrc <= 'Z') {
+				*pchDst++ = *pchSrc + 'a' - 'A';
+			} else {
+				*pchDst++ = *pchSrc;
+			}
 		}
 		pchSrc++;
 	}
@@ -352,9 +365,7 @@ int Encoding_MatchA(char *pchTest) {
 
 	for (unsigned int i = 0; i < COUNTOF(mEncoding); i++) {
 		if (StrStrIA(mEncoding[i].pszParseNames, chTest)) {
-			CPINFO cpi;
-			if ((mEncoding[i].uFlags & NCP_INTERNAL) ||
-					(IsValidCodePage(mEncoding[i].uCodePage) && GetCPInfo(mEncoding[i].uCodePage, &cpi))) {
+			if (IsValidEncoding(i)) {
 				return i;
 			}
 			break;
@@ -365,21 +376,12 @@ int Encoding_MatchA(char *pchTest) {
 }
 
 BOOL Encoding_IsValid(int iTestEncoding) {
-	CPINFO cpi;
-	if (iTestEncoding >= 0 &&
-			iTestEncoding < (int)COUNTOF(mEncoding)) {
-		if	((mEncoding[iTestEncoding].uFlags & NCP_INTERNAL) ||
-				(IsValidCodePage(mEncoding[iTestEncoding].uCodePage) && GetCPInfo(mEncoding[iTestEncoding].uCodePage, &cpi))) {
-			return TRUE;
-		}
-	}
-
-	return FALSE;
+	return iTestEncoding >= 0 && iTestEncoding < (int)COUNTOF(mEncoding) && IsValidEncoding(iTestEncoding);
 }
 
 typedef struct _ee {
-	int		 id;
-	WCHAR	 wch[256];
+	int id;
+	WCHAR wch[256];
 } ENCODINGENTRY, *PENCODINGENTRY;
 
 int CmpEncoding(const void *s1, const void *s2) {
@@ -387,10 +389,6 @@ int CmpEncoding(const void *s1, const void *s2) {
 }
 
 void Encoding_AddToListView(HWND hwnd, int idSel, BOOL bRecodeOnly) {
-	int iSelItem = -1;
-	LVITEM lvi;
-	WCHAR wchBuf[256];
-
 	PENCODINGENTRY pEE = NP2HeapAlloc(COUNTOF(mEncoding) * sizeof(ENCODINGENTRY));
 	for (unsigned int i = 0; i < COUNTOF(mEncoding); i++) {
 		pEE[i].id = i;
@@ -398,40 +396,35 @@ void Encoding_AddToListView(HWND hwnd, int idSel, BOOL bRecodeOnly) {
 	}
 	qsort(pEE, COUNTOF(mEncoding), sizeof(ENCODINGENTRY), CmpEncoding);
 
+	WCHAR wchBuf[256];
+	LVITEM lvi;
 	ZeroMemory(&lvi, sizeof(LVITEM));
 	lvi.mask = LVIF_PARAM | LVIF_TEXT | LVIF_IMAGE;
 	lvi.pszText = wchBuf;
 
+	int iSelItem = -1;
 	for (unsigned int i = 0; i < COUNTOF(mEncoding); i++) {
-		int id = pEE[i].id;
+		const int id = pEE[i].id;
 		if (!bRecodeOnly || (mEncoding[id].uFlags & NCP_RECODE)) {
-			CPINFO cpi;
 			WCHAR *pwsz;
 
 			lvi.iItem = ListView_GetItemCount(hwnd);
 			if ((pwsz = StrChr(pEE[i].wch, L';')) != NULL) {
-				StrCpyN(wchBuf, CharNext(pwsz), COUNTOF(wchBuf));
+				lstrcpyn(wchBuf, CharNext(pwsz), COUNTOF(wchBuf));
 				if ((pwsz = StrChr(wchBuf, L';')) != NULL) {
 					*pwsz = 0;
 				}
 			} else {
-				StrCpyN(wchBuf, pEE[i].wch, COUNTOF(wchBuf));
+				lstrcpyn(wchBuf, pEE[i].wch, COUNTOF(wchBuf));
 			}
 
 			if (id == CPI_DEFAULT) {
-				StrCatN(wchBuf, wchANSI, COUNTOF(wchBuf));
+				StrCatBuff(wchBuf, wchANSI, COUNTOF(wchBuf));
 			} else if (id == CPI_OEM) {
-				StrCatN(wchBuf, wchOEM, COUNTOF(wchBuf));
+				StrCatBuff(wchBuf, wchOEM, COUNTOF(wchBuf));
 			}
 
-			if ((mEncoding[id].uFlags & NCP_INTERNAL) ||
-					(IsValidCodePage(mEncoding[id].uCodePage) &&
-					 GetCPInfo(mEncoding[id].uCodePage, &cpi))) {
-				lvi.iImage = 0;
-			} else {
-				lvi.iImage = 1;
-			}
-
+			lvi.iImage = IsValidEncoding(id);
 			lvi.lParam = (LPARAM)id;
 			ListView_InsertItem(hwnd, &lvi);
 
@@ -471,10 +464,6 @@ BOOL Encoding_GetFromListView(HWND hwnd, int *pidEncoding) {
 }
 
 void Encoding_AddToComboboxEx(HWND hwnd, int idSel, BOOL bRecodeOnly) {
-	int iSelItem = -1;
-	COMBOBOXEXITEM cbei;
-	WCHAR wchBuf[256];
-
 	PENCODINGENTRY pEE = NP2HeapAlloc(COUNTOF(mEncoding) * sizeof(ENCODINGENTRY));
 	for (unsigned int i = 0; i < COUNTOF(mEncoding); i++) {
 		pEE[i].id = i;
@@ -482,6 +471,8 @@ void Encoding_AddToComboboxEx(HWND hwnd, int idSel, BOOL bRecodeOnly) {
 	}
 	qsort(pEE, COUNTOF(mEncoding), sizeof(ENCODINGENTRY), CmpEncoding);
 
+	WCHAR wchBuf[256];
+	COMBOBOXEXITEM cbei;
 	ZeroMemory(&cbei, sizeof(COMBOBOXEXITEM));
 
 	cbei.mask = CBEIF_TEXT | CBEIF_IMAGE | CBEIF_SELECTEDIMAGE | CBEIF_LPARAM;
@@ -490,36 +481,29 @@ void Encoding_AddToComboboxEx(HWND hwnd, int idSel, BOOL bRecodeOnly) {
 	cbei.iImage = 0;
 	cbei.iSelectedImage = 0;
 
+	int iSelItem = -1;
 	for (unsigned int i = 0; i < COUNTOF(mEncoding); i++) {
-		int id = pEE[i].id;
+		const int id = pEE[i].id;
 		if (!bRecodeOnly || (mEncoding[id].uFlags & NCP_RECODE)) {
-			CPINFO cpi;
 			WCHAR *pwsz;
 
 			cbei.iItem = SendMessage(hwnd, CB_GETCOUNT, 0, 0);
 			if ((pwsz = StrChr(pEE[i].wch, L';')) != NULL) {
-				StrCpyN(wchBuf, CharNext(pwsz), COUNTOF(wchBuf));
+				lstrcpyn(wchBuf, CharNext(pwsz), COUNTOF(wchBuf));
 				if ((pwsz = StrChr(wchBuf, L';')) != NULL) {
 					*pwsz = 0;
 				}
 			} else {
-				StrCpyN(wchBuf, pEE[i].wch, COUNTOF(wchBuf));
+				lstrcpyn(wchBuf, pEE[i].wch, COUNTOF(wchBuf));
 			}
 
 			if (id == CPI_DEFAULT) {
-				StrCatN(wchBuf, wchANSI, COUNTOF(wchBuf));
+				StrCatBuff(wchBuf, wchANSI, COUNTOF(wchBuf));
 			} else if (id == CPI_OEM) {
-				StrCatN(wchBuf, wchOEM, COUNTOF(wchBuf));
+				StrCatBuff(wchBuf, wchOEM, COUNTOF(wchBuf));
 			}
 
-			if ((mEncoding[id].uFlags & NCP_INTERNAL) ||
-					(IsValidCodePage(mEncoding[id].uCodePage) &&
-					 GetCPInfo(mEncoding[id].uCodePage, &cpi))) {
-				cbei.iImage = 0;
-			} else {
-				cbei.iImage = 1;
-			}
-
+			cbei.iImage = IsValidEncoding(id);
 			cbei.lParam = (LPARAM)id;
 			SendMessage(hwnd, CBEM_INSERTITEM, 0, (LPARAM)&cbei);
 
@@ -532,7 +516,7 @@ void Encoding_AddToComboboxEx(HWND hwnd, int idSel, BOOL bRecodeOnly) {
 	NP2HeapFree(pEE);
 
 	if (iSelItem != -1) {
-		SendMessage(hwnd, CB_SETCURSEL, (WPARAM)iSelItem, 0);
+		SendMessage(hwnd, CB_SETCURSEL, iSelItem, 0);
 	}
 }
 
@@ -554,25 +538,14 @@ BOOL Encoding_GetFromComboboxEx(HWND hwnd, int *pidEncoding) {
 }
 
 BOOL IsUnicode(const char *pBuffer, DWORD cb, LPBOOL lpbBOM, LPBOOL lpbReverse) {
-	int i = 0xFFFF;
-
-	BOOL bIsTextUnicode;
-
-	BOOL bHasBOM;
-	BOOL bHasRBOM;
-
-	if (!pBuffer || cb < 2) {
+	if (pBuffer == NULL || cb < 2) {
 		return FALSE;
 	}
 
-	if (!bSkipUnicodeDetection) {
-		bIsTextUnicode = IsTextUnicode(pBuffer, cb, &i);
-	} else {
-		bIsTextUnicode = FALSE;
-	}
-
-	bHasBOM	 = (*((UNALIGNED PWCHAR)pBuffer) == 0xFEFF);
-	bHasRBOM = (*((UNALIGNED PWCHAR)pBuffer) == 0xFFFE);
+	int i = 0xFFFF;
+	const BOOL bIsTextUnicode = bSkipUnicodeDetection ? FALSE : IsTextUnicode(pBuffer, cb, &i);
+	const BOOL bHasBOM	 = (*((UNALIGNED PWCHAR)pBuffer) == 0xFEFF);
+	const BOOL bHasRBOM = (*((UNALIGNED PWCHAR)pBuffer) == 0xFFFE);
 
 	if (i == 0xFFFF) { // i doesn't seem to have been modified ...
 		i = 0;
@@ -756,7 +729,7 @@ INT UTF8_mbslen_bytes(LPCSTR utf8_string) {
 
 	while (*pt) {
 		INT code_size;
-		BYTE ch = *pt;
+		const BYTE ch = *pt;
 
 		if ((ch <= 0xF7) && (0 != (code_size = utf8_lengths[ ch >> 4 ]))) {
 			length += code_size;
@@ -791,7 +764,7 @@ INT UTF8_mbslen(LPCSTR source, INT byte_length) {
 
 	while (byte_length > 0) {
 		INT code_size;
-		BYTE ch = *pt;
+		const BYTE ch = *pt;
 		/* UTF-16 can't encode 5-byte and 6-byte sequences, so maximum value
 			 for first byte is 11110111. Use lookup table to determine sequence
 			 length based on upper 4 bits of first byte */
@@ -856,17 +829,7 @@ BOOL FileVars_IsNonUTF8(LPFILEVARS lpfv) {
 // FileVars_IsValidEncoding()
 //
 BOOL FileVars_IsValidEncoding(LPFILEVARS lpfv) {
-	CPINFO cpi;
-	if (lpfv->mask & FV_ENCODING &&
-			lpfv->iEncoding >= 0 &&
-			lpfv->iEncoding < (int)COUNTOF(mEncoding)) {
-		if ((mEncoding[lpfv->iEncoding].uFlags & NCP_INTERNAL) ||
-				(IsValidCodePage(mEncoding[lpfv->iEncoding].uCodePage) && GetCPInfo(mEncoding[lpfv->iEncoding].uCodePage, &cpi))) {
-			return TRUE;
-		}
-	}
-
-	return FALSE;
+	return (lpfv->mask & FV_ENCODING) && Encoding_IsValid(lpfv->iEncoding);
 }
 
 //=============================================================================

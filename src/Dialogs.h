@@ -20,6 +20,7 @@
 
 #ifndef NOTEPAD2_DIALOGS_H_
 #define NOTEPAD2_DIALOGS_H_
+#include "compiler.h"
 
 #define MBINFO			0
 #define MBWARN			1

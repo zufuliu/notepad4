@@ -26,8 +26,8 @@
 #include <shellapi.h>
 #include <commdlg.h>
 #include "metapath.h"
-#include "Dlapi.h"
 #include "Helpers.h"
+#include "Dlapi.h"
 #include "Dialogs.h"
 #include "resource.h"
 #include "version.h"
@@ -43,13 +43,10 @@ extern HWND hwndMain;
 int ErrorMessage(int iLevel, UINT uIdMsg, ...) {
 	WCHAR szText[256 * 2];
 	WCHAR szTitle[256 * 2];
-	HWND hwnd;
+
+	GetString(uIdMsg, szText, COUNTOF(szText));
+
 	va_list va;
-
-	if (!GetString(uIdMsg, szText, COUNTOF(szText))) {
-		return 0;
-	}
-
 	va_start(va, uIdMsg);
 	wvsprintf(szTitle, szText, va);
 	va_end(va);
@@ -63,6 +60,7 @@ int ErrorMessage(int iLevel, UINT uIdMsg, ...) {
 		lstrcpy(szTitle, L"");
 	}
 
+	HWND hwnd;
 	if ((hwnd = GetActiveWindow()) == NULL) {
 		hwnd = hwndMain;
 	}
@@ -76,7 +74,7 @@ int ErrorMessage(int iLevel, UINT uIdMsg, ...) {
 //
 // BFFCallBack()
 //
-int CALLBACK BFFCallBack(HWND hwnd, UINT umsg, LPARAM lParam, LPARAM lpData) {
+static int CALLBACK BFFCallBack(HWND hwnd, UINT umsg, LPARAM lParam, LPARAM lpData) {
 	UNREFERENCED_PARAMETER(lParam);
 	UNREFERENCED_PARAMETER(lpData);
 
@@ -92,26 +90,24 @@ int CALLBACK BFFCallBack(HWND hwnd, UINT umsg, LPARAM lParam, LPARAM lpData) {
 // GetDirectory()
 //
 BOOL GetDirectory(HWND hwndParent, int iTitle, LPWSTR pszFolder, LPCWSTR pszBase) {
-	BROWSEINFO bi;
 	WCHAR szTitle[256];
-	WCHAR szBase[MAX_PATH];
-	BOOL fOk = FALSE;
-
 	lstrcpy(szTitle, L"");
 	GetString(iTitle, szTitle, COUNTOF(szTitle));
 
+	WCHAR szBase[MAX_PATH];
 	if (StrIsEmpty(pszBase)) {
 		GetCurrentDirectory(MAX_PATH, szBase);
 	} else {
 		lstrcpy(szBase, pszBase);
 	}
 
+	BROWSEINFO bi;
 	bi.hwndOwner = hwndParent;
 	bi.pidlRoot = NULL;
 	bi.pszDisplayName = pszFolder;
 	bi.lpszTitle = szTitle;
 	bi.ulFlags = BIF_RETURNONLYFSDIRS | BIF_NEWDIALOGSTYLE;
-	bi.lpfn = &BFFCallBack;
+	bi.lpfn = BFFCallBack;
 	bi.lParam = (LPARAM)szBase;
 	bi.iImage = 0;
 
@@ -119,10 +115,10 @@ BOOL GetDirectory(HWND hwndParent, int iTitle, LPWSTR pszFolder, LPCWSTR pszBase
 	if (pidl) {
 		SHGetPathFromIDList(pidl, pszFolder);
 		CoTaskMemFree((LPVOID)pidl);
-		fOk = TRUE;
+		return TRUE;
 	}
 
-	return fOk;
+	return FALSE;
 }
 
 //=============================================================================
@@ -130,33 +126,31 @@ BOOL GetDirectory(HWND hwndParent, int iTitle, LPWSTR pszFolder, LPCWSTR pszBase
 // GetDirectory2()
 //
 BOOL GetDirectory2(HWND hwndParent, int iTitle, LPWSTR pszFolder, int iBase) {
-	BROWSEINFO bi;
-	LPITEMIDLIST pidlRoot;
 	WCHAR szTitle[256];
-	BOOL fOk = FALSE;
-
 	lstrcpy(szTitle, L"");
 	GetString(iTitle, szTitle, COUNTOF(szTitle));
 
+	LPITEMIDLIST pidlRoot;
 	if (NOERROR != SHGetSpecialFolderLocation(hwndParent, iBase, &pidlRoot)) {
 		CoTaskMemFree((LPVOID)pidlRoot);
 		return FALSE;
 	}
 
+	BROWSEINFO bi;
 	bi.hwndOwner = hwndParent;
 	bi.pidlRoot = pidlRoot;
 	bi.pszDisplayName = pszFolder;
 	bi.lpszTitle = szTitle;
 	bi.ulFlags = BIF_RETURNONLYFSDIRS | BIF_NEWDIALOGSTYLE;
 	bi.lpfn = NULL;
-	bi.lParam = (LPARAM)0;
+	bi.lParam = 0;
 	bi.iImage = 0;
 
 	LPITEMIDLIST pidl = SHBrowseForFolder(&bi);
-	if (pidl) {
+	const BOOL fOk = pidl != NULL;
+	if (fOk) {
 		SHGetPathFromIDList(pidl, pszFolder);
 		CoTaskMemFree((LPVOID)pidl);
-		fOk = TRUE;
 	}
 
 	CoTaskMemFree((LPVOID)pidlRoot);
@@ -177,14 +171,12 @@ INT_PTR CALLBACK RunDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) 
 
 	switch (umsg) {
 	case WM_INITDIALOG: {
-		DLITEM dli;
-
 		MakeBitmapButton(hwnd, IDC_SEARCHEXE, g_hInstance, IDB_OPEN);
 
+		DLITEM dli;
 		dli.mask = DLI_FILENAME;
 		if (DirList_GetItem(hwndDirList, -1, &dli) != -1) {
-			LPWSTR psz;
-			psz = GetFilenameStr(dli.szFileName);
+			LPWSTR psz = GetFilenameStr(dli.szFileName);
 			QuotateFilenameStr(psz);
 			SetDlgItemText(hwnd, IDC_COMMANDLINE, psz);
 		}
@@ -205,19 +197,19 @@ INT_PTR CALLBACK RunDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) 
 			WCHAR szArgs[MAX_PATH];
 			WCHAR szArg2[MAX_PATH];
 			WCHAR szFile[MAX_PATH * 2];
-			WCHAR szTitle[32];
-			WCHAR szFilter[256];
-			OPENFILENAME ofn;
-			ZeroMemory(&ofn, sizeof(OPENFILENAME));
 
 			GetDlgItemText(hwnd, IDC_COMMANDLINE, szArgs, COUNTOF(szArgs));
 			ExpandEnvironmentStringsEx(szArgs, COUNTOF(szArgs));
 			ExtractFirstArgument(szArgs, szFile, szArg2);
 
+			WCHAR szTitle[32];
+			WCHAR szFilter[256];
 			GetString(IDS_SEARCHEXE, szTitle, COUNTOF(szTitle));
 			GetString(IDS_FILTER_EXE, szFilter, COUNTOF(szFilter));
 			PrepareFilterStr(szFilter);
 
+			OPENFILENAME ofn;
+			ZeroMemory(&ofn, sizeof(OPENFILENAME));
 			ofn.lStructSize = sizeof(OPENFILENAME);
 			ofn.hwndOwner = hwnd;
 			ofn.lpstrFilter = szFilter;
@@ -283,7 +275,7 @@ INT_PTR CALLBACK RunDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) 
 					if (ShellExecuteEx(&sei)) {
 						EndDialog(hwnd, IDOK);
 					} else {
-						PostMessage(hwnd, WM_NEXTDLGCTL, (WPARAM)(GetDlgItem(hwnd, IDC_COMMANDLINE)), 1);
+						PostMessage(hwnd, WM_NEXTDLGCTL, (WPARAM)GetDlgItem(hwnd, IDC_COMMANDLINE), 1);
 					}
 				}
 			}
@@ -326,9 +318,6 @@ INT_PTR CALLBACK GotoDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 	switch (umsg) {
 	case WM_INITDIALOG: {
 		RECT rc;
-		WCHAR tch[64];
-		int cGrip;
-
 		GetClientRect(hwnd, &rc);
 		cxClient = rc.right - rc.left;
 		cyClient = rc.bottom - rc.top;
@@ -345,6 +334,7 @@ INT_PTR CALLBACK GotoDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 		SetWindowLongPtr(hwnd, GWL_STYLE, GetWindowLongPtr(hwnd, GWL_STYLE) | WS_THICKFRAME);
 		SetWindowPos(hwnd, NULL, 0, 0, 0, 0, SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE | SWP_FRAMECHANGED);
 
+		WCHAR tch[64];
 		GetMenuString(GetSystemMenu(GetParent(hwnd), FALSE), SC_SIZE, tch, COUNTOF(tch), MF_BYCOMMAND);
 		InsertMenu(GetSystemMenu(hwnd, FALSE), SC_CLOSE, MF_BYCOMMAND | MF_STRING | MF_ENABLED, SC_SIZE, tch);
 		InsertMenu(GetSystemMenu(hwnd, FALSE), SC_CLOSE, MF_BYCOMMAND | MF_SEPARATOR, 0, NULL);
@@ -352,19 +342,20 @@ INT_PTR CALLBACK GotoDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 		SetWindowLongPtr(GetDlgItem(hwnd, IDC_RESIZEGRIP), GWL_STYLE,
 						 GetWindowLongPtr(GetDlgItem(hwnd, IDC_RESIZEGRIP), GWL_STYLE) | SBS_SIZEGRIP | WS_CLIPSIBLINGS);
 
-		cGrip = GetSystemMetrics(SM_CXHTHUMB);
+		const int cGrip = GetSystemMetrics(SM_CXHTHUMB);
 		SetWindowPos(GetDlgItem(hwnd, IDC_RESIZEGRIP), NULL, cxClient - cGrip, cyClient - cGrip, cGrip, cGrip, SWP_NOZORDER);
 
-		SendDlgItemMessage(hwnd, IDC_GOTO, CB_LIMITTEXT, MAX_PATH - 1, 0);
-		SendDlgItemMessage(hwnd, IDC_GOTO, CB_SETEXTENDEDUI, TRUE, 0);
+		HWND hwndGoto = GetDlgItem(hwnd, IDC_GOTO);
+		SendMessage(hwndGoto, CB_LIMITTEXT, MAX_PATH - 1, 0);
+		SendMessage(hwndGoto, CB_SETEXTENDEDUI, TRUE, 0);
 
 		for (int i = 0; i < HISTORY_ITEMS; i++) {
 			if (mHistory.psz[i]) {
-				int iItem = (int)SendDlgItemMessage(hwnd, IDC_GOTO, CB_FINDSTRINGEXACT, (WPARAM) - 1, (LPARAM)mHistory.psz[i]);
+				const int iItem = (int)SendMessage(hwndGoto, CB_FINDSTRINGEXACT, (WPARAM)(-1), (LPARAM)mHistory.psz[i]);
 				if (iItem != LB_ERR) {
-					SendDlgItemMessage(hwnd, IDC_GOTO, CB_DELETESTRING, iItem, 0);
+					SendMessage(hwndGoto, CB_DELETESTRING, iItem, 0);
 				}
-				SendDlgItemMessage(hwnd, IDC_GOTO, CB_INSERTSTRING, 0, (LPARAM)mHistory.psz[i]);
+				SendMessage(hwndGoto, CB_INSERTSTRING, 0, (LPARAM)mHistory.psz[i]);
 			}
 		}
 
@@ -373,7 +364,7 @@ INT_PTR CALLBACK GotoDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 		if (fpGetComboBoxInfo != NULL) {
 			COMBOBOXINFO cbi;
 			cbi.cbSize = sizeof(COMBOBOXINFO);
-			if (fpGetComboBoxInfo(GetDlgItem(hwnd, IDC_GOTO), &cbi)) {
+			if (fpGetComboBoxInfo(hwndGoto, &cbi)) {
 				SHAutoComplete(cbi.hwndItem, SHACF_FILESYSTEM);
 			}
 		}
@@ -389,13 +380,12 @@ INT_PTR CALLBACK GotoDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 	return FALSE;
 
 	case WM_SIZE: {
-		RECT rc;
-
 		int dxClient = LOWORD(lParam) - cxClient;
 		int dyClient = HIWORD(lParam) - cyClient;
 		cxClient = LOWORD(lParam);
 		cyClient = HIWORD(lParam);
 
+		RECT rc;
 		GetWindowRect(GetDlgItem(hwnd, IDC_RESIZEGRIP), &rc);
 		MapWindowPoints(NULL, hwnd, (LPPOINT)&rc, 2);
 		SetWindowPos(GetDlgItem(hwnd, IDC_RESIZEGRIP), NULL, rc.left + dxClient, rc.top + dyClient, 0, 0, SWP_NOZORDER | SWP_NOSIZE);
@@ -498,30 +488,26 @@ void OpenHelpLink(HWND hwnd, int cmd) {
 //  AboutDlgProc()
 //
 INT_PTR CALLBACK AboutDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
-	static HFONT hFontTitle;
-
 	switch (umsg) {
 	case WM_INITDIALOG: {
-		WCHAR wch[256];
-		LOGFONT lf;
-
 		SetDlgItemText(hwnd, IDC_VERSION, VERSION_FILEVERSION_LONG);
 		SetDlgItemText(hwnd, IDC_BUILD_INFO, VERSION_BUILD_INFO);
 		SetDlgItemText(hwnd, IDC_COPYRIGHT, VERSION_LEGALCOPYRIGHT_SHORT);
 		SetDlgItemText(hwnd, IDC_AUTHORNAME, VERSION_AUTHORNAME);
 
-		if (hFontTitle) {
-			DeleteObject(hFontTitle);
-		}
-
-		if (NULL == (hFontTitle = (HFONT)SendDlgItemMessage(hwnd, IDC_VERSION, WM_GETFONT, 0, 0))) {
+		HFONT hFontTitle = (HFONT)SendDlgItemMessage(hwnd, IDC_VERSION, WM_GETFONT, 0, 0);
+		if (hFontTitle == NULL) {
 			hFontTitle = GetStockObject(DEFAULT_GUI_FONT);
 		}
+
+		LOGFONT lf;
 		GetObject(hFontTitle, sizeof(LOGFONT), &lf);
 		lf.lfWeight = FW_BOLD;
 		hFontTitle = CreateFontIndirect(&lf);
 		SendDlgItemMessage(hwnd, IDC_VERSION, WM_SETFONT, (WPARAM)hFontTitle, TRUE);
+		SetWindowLongPtr(hwnd, DWLP_USER, (LONG_PTR)(hFontTitle));
 
+		WCHAR wch[256];
 		if (GetDlgItem(hwnd, IDC_WEBPAGE_LINK) == NULL) {
 			SetDlgItemText(hwnd, IDC_WEBPAGE_TEXT, VERSION_WEBPAGE_DISPLAY);
 			ShowWindow(GetDlgItem(hwnd, IDC_WEBPAGE_TEXT), SW_SHOWNORMAL);
@@ -569,6 +555,12 @@ INT_PTR CALLBACK AboutDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam
 			break;
 		}
 		return TRUE;
+
+	case WM_DESTROY: {
+		HFONT hFontTitle = (HFONT)GetWindowLongPtr(hwnd, DWLP_USER);
+		DeleteObject(hFontTitle);
+	}
+	return FALSE;
 	}
 	return FALSE;
 }
@@ -596,7 +588,7 @@ extern int  iStartupDir;
 extern int  iEscFunction;
 extern BOOL bReuseWindow;
 
-INT_PTR CALLBACK GeneralPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
+static INT_PTR CALLBACK GeneralPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
 	UNREFERENCED_PARAMETER(wParam);
 	UNREFERENCED_PARAMETER(lParam);
 
@@ -676,7 +668,7 @@ INT_PTR CALLBACK GeneralPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPa
 //  AdvancedPageProc
 //
 //
-INT_PTR CALLBACK AdvancedPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
+static INT_PTR CALLBACK AdvancedPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
 	switch (umsg) {
 	case WM_INITDIALOG:
 		if (bClearReadOnly) {
@@ -775,43 +767,43 @@ INT_PTR CALLBACK AdvancedPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lP
 //  ItemsPageProc
 //
 //
-extern BOOL     bDefCrNoFilt;
-extern BOOL     bDefCrFilter;
-extern COLORREF crNoFilt;
-extern COLORREF crFilter;
-extern COLORREF crCustom[16];
+extern BOOL     bDefColorNoFilter;
+extern BOOL     bDefColorFilter;
+extern COLORREF colorNoFilter;
+extern COLORREF colorFilter;
+extern COLORREF colorCustom[16];
 
-INT_PTR CALLBACK ItemsPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
-	static BOOL m_bDefCrNoFilt;
-	static BOOL m_bDefCrFilter;
+static INT_PTR CALLBACK ItemsPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
+	static BOOL m_bDefColorNoFilter;
+	static BOOL m_bDefColorFilter;
 
-	static COLORREF m_crNoFilt;
-	static COLORREF m_crFilter;
+	static COLORREF m_colorNoFilter;
+	static COLORREF m_colorFilter;
 
-	static HBRUSH m_hbrNoFilt;
+	static HBRUSH m_hbrNoFilter;
 	static HBRUSH m_hbrFilter;
 
 	CHOOSECOLOR cc;
 
 	switch (umsg) {
 	case WM_INITDIALOG:
-		m_bDefCrNoFilt = bDefCrNoFilt;
-		m_bDefCrFilter = bDefCrFilter;
+		m_bDefColorNoFilter = bDefColorNoFilter;
+		m_bDefColorFilter = bDefColorFilter;
 
-		m_crNoFilt = crNoFilt;
-		m_crFilter = crFilter;
+		m_colorNoFilter = colorNoFilter;
+		m_colorFilter = colorFilter;
 
-		m_hbrNoFilt = CreateSolidBrush(m_crNoFilt);
-		m_hbrFilter = CreateSolidBrush(m_crFilter);
+		m_hbrNoFilter = CreateSolidBrush(m_colorNoFilter);
+		m_hbrFilter = CreateSolidBrush(m_colorFilter);
 
-		if (m_bDefCrNoFilt) {
+		if (m_bDefColorNoFilter) {
 			CheckRadioButton(hwnd, IDC_COLOR_DEF1, IDC_COLOR_CUST1, IDC_COLOR_DEF1);
 			EnableWindow(GetDlgItem(hwnd, IDC_COLOR_PICK1), FALSE);
 		} else {
 			CheckRadioButton(hwnd, IDC_COLOR_DEF1, IDC_COLOR_CUST1, IDC_COLOR_CUST1);
 		}
 
-		if (m_bDefCrFilter) {
+		if (m_bDefColorFilter) {
 			CheckRadioButton(hwnd, IDC_COLOR_DEF2, IDC_COLOR_CUST2, IDC_COLOR_DEF2);
 			EnableWindow(GetDlgItem(hwnd, IDC_COLOR_PICK2), FALSE);
 		} else {
@@ -820,7 +812,7 @@ INT_PTR CALLBACK ItemsPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPara
 		return TRUE;
 
 	case WM_DESTROY:
-		DeleteObject(m_hbrNoFilt);
+		DeleteObject(m_hbrNoFilter);
 		DeleteObject(m_hbrFilter);
 		return FALSE;
 
@@ -828,15 +820,15 @@ INT_PTR CALLBACK ItemsPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPara
 		switch (LOWORD(wParam)) {
 		case IDC_COLOR_DEF1:
 		case IDC_COLOR_CUST1:
-			m_bDefCrNoFilt = !IsButtonChecked(hwnd, IDC_COLOR_CUST1);
-			EnableWindow(GetDlgItem(hwnd, IDC_COLOR_PICK1), !m_bDefCrNoFilt);
+			m_bDefColorNoFilter = !IsButtonChecked(hwnd, IDC_COLOR_CUST1);
+			EnableWindow(GetDlgItem(hwnd, IDC_COLOR_PICK1), !m_bDefColorNoFilter);
 			InvalidateRect(GetDlgItem(hwnd, IDC_COLOR_SAMP1), NULL, TRUE);
 			break;
 
 		case IDC_COLOR_DEF2:
 		case IDC_COLOR_CUST2:
-			m_bDefCrFilter = !IsButtonChecked(hwnd, IDC_COLOR_CUST2);
-			EnableWindow(GetDlgItem(hwnd, IDC_COLOR_PICK2), !m_bDefCrFilter);
+			m_bDefColorFilter = !IsButtonChecked(hwnd, IDC_COLOR_CUST2);
+			EnableWindow(GetDlgItem(hwnd, IDC_COLOR_PICK2), !m_bDefColorFilter);
 			InvalidateRect(GetDlgItem(hwnd, IDC_COLOR_SAMP2), NULL, TRUE);
 			break;
 
@@ -845,14 +837,14 @@ INT_PTR CALLBACK ItemsPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPara
 
 			cc.lStructSize = sizeof(CHOOSECOLOR);
 			cc.hwndOwner = hwnd;
-			cc.rgbResult = m_crNoFilt;
-			cc.lpCustColors = crCustom;
+			cc.rgbResult = m_colorNoFilter;
+			cc.lpCustColors = colorCustom;
 			cc.Flags = CC_RGBINIT | CC_SOLIDCOLOR;
 
 			if (ChooseColor(&cc)) {
-				DeleteObject(m_hbrNoFilt);
-				m_crNoFilt = cc.rgbResult;
-				m_hbrNoFilt = CreateSolidBrush(m_crNoFilt);
+				DeleteObject(m_hbrNoFilter);
+				m_colorNoFilter = cc.rgbResult;
+				m_hbrNoFilter = CreateSolidBrush(m_colorNoFilter);
 			}
 
 			InvalidateRect(GetDlgItem(hwnd, IDC_COLOR_SAMP1), NULL, TRUE);
@@ -863,14 +855,14 @@ INT_PTR CALLBACK ItemsPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPara
 
 			cc.lStructSize = sizeof(CHOOSECOLOR);
 			cc.hwndOwner = hwnd;
-			cc.rgbResult = m_crFilter;
-			cc.lpCustColors = crCustom;
+			cc.rgbResult = m_colorFilter;
+			cc.lpCustColors = colorCustom;
 			cc.Flags = CC_RGBINIT | CC_SOLIDCOLOR;
 
 			if (ChooseColor(&cc)) {
 				DeleteObject(m_hbrFilter);
-				m_crFilter = cc.rgbResult;
-				m_hbrFilter = CreateSolidBrush(m_crFilter);
+				m_colorFilter = cc.rgbResult;
+				m_hbrFilter = CreateSolidBrush(m_colorFilter);
 			}
 
 			InvalidateRect(GetDlgItem(hwnd, IDC_COLOR_SAMP2), NULL, TRUE);
@@ -881,11 +873,11 @@ INT_PTR CALLBACK ItemsPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPara
 	case WM_NOTIFY:
 		switch (((LPNMHDR)lParam)->code) {
 		case PSN_APPLY:
-			bDefCrNoFilt = m_bDefCrNoFilt;
-			bDefCrFilter = m_bDefCrFilter;
+			bDefColorNoFilter = m_bDefColorNoFilter;
+			bDefColorFilter = m_bDefColorFilter;
 
-			crNoFilt = m_crNoFilt;
-			crFilter = m_crFilter;
+			colorNoFilter = m_colorNoFilter;
+			colorFilter = m_colorFilter;
 
 			SetWindowLongPtr(hwnd, DWLP_MSGRESULT, PSNRET_NOERROR);
 			return TRUE;
@@ -893,10 +885,10 @@ INT_PTR CALLBACK ItemsPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPara
 		return FALSE;
 
 	case WM_CTLCOLORSTATIC:
-		if (!m_bDefCrNoFilt && GetDlgCtrlID((HWND)lParam) == IDC_COLOR_SAMP1) {
-			return (LRESULT)m_hbrNoFilt;
+		if (!m_bDefColorNoFilter && GetDlgCtrlID((HWND)lParam) == IDC_COLOR_SAMP1) {
+			return (LRESULT)m_hbrNoFilter;
 		}
-		if (!m_bDefCrFilter && GetDlgCtrlID((HWND)lParam) == IDC_COLOR_SAMP2) {
+		if (!m_bDefColorFilter && GetDlgCtrlID((HWND)lParam) == IDC_COLOR_SAMP2) {
 			return (LRESULT)m_hbrFilter;
 		}
 		return FALSE;
@@ -910,14 +902,13 @@ INT_PTR CALLBACK ItemsPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPara
 //  ProgPageProc
 //
 //
-INT_PTR CALLBACK ProgPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
+static INT_PTR CALLBACK ProgPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
 	switch (umsg) {
 	case WM_INITDIALOG: {
-		WCHAR tch[MAX_PATH];
-
 		MakeBitmapButton(hwnd, IDC_BROWSE_Q, g_hInstance, IDB_OPEN);
 		MakeBitmapButton(hwnd, IDC_BROWSE_F, g_hInstance, IDB_OPEN);
 
+		WCHAR tch[MAX_PATH];
 		lstrcpy(tch, szQuickview);
 		PathQuoteSpaces(tch);
 		if (StrNotEmpty(szQuickviewParams)) {
@@ -945,19 +936,18 @@ INT_PTR CALLBACK ProgPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam
 			WCHAR tchBuf[MAX_PATH];
 			WCHAR szFile[MAX_PATH];
 			WCHAR szParams[MAX_PATH];
-			WCHAR szTitle[32];
-			WCHAR szFilter[256];
-			OPENFILENAME ofn;
-
-			ZeroMemory(&ofn, sizeof(OPENFILENAME));
 
 			GetDlgItemText(hwnd, IDC_QUICKVIEW, tchBuf, COUNTOF(tchBuf));
 			ExtractFirstArgument(tchBuf, szFile, szParams);
 
+			WCHAR szTitle[32];
+			WCHAR szFilter[256];
 			GetString(IDS_GETQUICKVIEWER, szTitle, COUNTOF(szTitle));
 			GetString(IDS_FILTER_EXE, szFilter, COUNTOF(szFilter));
 			PrepareFilterStr(szFilter);
 
+			OPENFILENAME ofn;
+			ZeroMemory(&ofn, sizeof(OPENFILENAME));
 			ofn.lStructSize = sizeof(OPENFILENAME);
 			ofn.hwndOwner = hwnd;
 			ofn.lpstrFilter = szFilter;
@@ -968,7 +958,7 @@ INT_PTR CALLBACK ProgPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam
 						| OFN_PATHMUSTEXIST | OFN_SHAREAWARE | OFN_NODEREFERENCELINKS;
 
 			if (GetOpenFileName(&ofn)) {
-				StrCpyN(tchBuf, szFile, COUNTOF(tchBuf));
+				lstrcpyn(tchBuf, szFile, COUNTOF(tchBuf));
 				PathQuoteSpaces(tchBuf);
 				if (StrNotEmpty(szParams)) {
 					StrCatBuff(tchBuf, L" ", COUNTOF(tchBuf));
@@ -1040,7 +1030,7 @@ extern BOOL bNegFilter;
 
 INT_PTR OptionsPropSheet(HWND hwnd, HINSTANCE hInstance) {
 	PROPSHEETHEADER psh;
-	PROPSHEETPAGE   psp[4];
+	PROPSHEETPAGE psp[4];
 	INT_PTR nResult;
 
 	ZeroMemory(&psh, sizeof(PROPSHEETHEADER));
@@ -1121,10 +1111,10 @@ INT_PTR OptionsPropSheet(HWND hwnd, HINSTANCE hInstance) {
 		}
 
 		if (!StrEqual(tchFilter, L"*.*") || bNegFilter) {
-			ListView_SetTextColor(hwndDirList, (bDefCrFilter) ? GetSysColor(COLOR_WINDOWTEXT) : crFilter);
+			ListView_SetTextColor(hwndDirList, bDefColorFilter ? GetSysColor(COLOR_WINDOWTEXT) : colorFilter);
 			ListView_RedrawItems(hwndDirList, 0, ListView_GetItemCount(hwndDirList) - 1);
 		} else {
-			ListView_SetTextColor(hwndDirList, (bDefCrNoFilt) ? GetSysColor(COLOR_WINDOWTEXT) : crNoFilt);
+			ListView_SetTextColor(hwndDirList, bDefColorNoFilter ? GetSysColor(COLOR_WINDOWTEXT) : colorNoFilter);
 			ListView_RedrawItems(hwndDirList, 0, ListView_GetItemCount(hwndDirList) - 1);
 		}
 	}
@@ -1160,14 +1150,11 @@ INT_PTR CALLBACK GetFilterDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lP
 	case WM_COMMAND:
 		switch (LOWORD(wParam)) {
 		case IDC_BROWSEFILTER: {
-			HMENU hMenu;
 			WCHAR szTypedFilter[512];
-			DWORD dwIndex = 0;
-			DWORD dwCheck = 0xFFFF; // index of current filter
 
 			GetDlgItemText(hwnd, IDC_FILTER, szTypedFilter, COUNTOF(szTypedFilter));
 
-			hMenu = CreatePopupMenu();
+			HMENU hMenu = CreatePopupMenu();
 
 			IniSection section;
 			WCHAR *pIniSectionBuf = NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_FILTERS);
@@ -1178,6 +1165,8 @@ INT_PTR CALLBACK GetFilterDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lP
 			LoadIniSection(INI_SECTION_NAME_FILTERS, pIniSectionBuf, cbIniSection);
 			IniSectionParseArray(pIniSection, pIniSectionBuf);
 
+			DWORD dwIndex = 0;
+			DWORD dwCheck = 0xFFFF; // index of current filter
 			for (int i = 0; i < pIniSection->count; i++) {
 				const IniKeyValueNode *node = &pIniSection->nodeList[i];
 				LPCWSTR pszFilterValue = node->value;
@@ -1202,13 +1191,12 @@ INT_PTR CALLBACK GetFilterDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lP
 			}
 
 			if (dwIndex) { // at least 1 item exists
-				DWORD dwCmd;
 				RECT rc;
 
 				GetWindowRect(GetDlgItem(hwnd, IDC_BROWSEFILTER), &rc);
 				//MapWindowPoints(hwnd,NULL,(POINT*)&rc,2);
 				// Seems that TrackPopupMenuEx() works with client coords...?
-				dwCmd = TrackPopupMenuEx(hMenu, TPM_RETURNCMD | TPM_LEFTBUTTON | TPM_RIGHTBUTTON, rc.left + 1, rc.bottom + 1, hwnd, NULL);
+				const DWORD dwCmd = TrackPopupMenuEx(hMenu, TPM_RETURNCMD | TPM_LEFTBUTTON | TPM_RIGHTBUTTON, rc.left + 1, rc.bottom + 1, hwnd, NULL);
 
 				if (dwCmd) {
 					WCHAR tchName[256];
@@ -1267,10 +1255,9 @@ INT_PTR CALLBACK GetFilterDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lP
 //
 BOOL GetFilterDlg(HWND hwnd) {
 	WCHAR tchOldFilter[DL_FILTER_BUFSIZE];
-	BOOL bOldNegFilter;
 
 	lstrcpy(tchOldFilter, tchFilter);
-	bOldNegFilter = bNegFilter;
+	const BOOL bOldNegFilter = bNegFilter;
 
 	if (IDOK == ThemedDialogBox(g_hInstance, MAKEINTRESOURCE(IDD_FILTER), hwnd, GetFilterDlgProc)) {
 		if (StrCaseEqual(tchFilter, tchOldFilter) && (bOldNegFilter == bNegFilter)) {
@@ -1295,12 +1282,10 @@ typedef struct tagFILEOPDLGDATA {
 //
 //
 INT_PTR CALLBACK RenameFileDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
-	LPFILEOPDLGDATA lpfod;
-
 	switch (umsg) {
-	case WM_INITDIALOG:
-		lpfod = (LPFILEOPDLGDATA)lParam;
-		SetWindowLongPtr(hwnd, DWLP_USER, (LONG_PTR)lpfod);
+	case WM_INITDIALOG: {
+		SetWindowLongPtr(hwnd, DWLP_USER, lParam);
+		LPFILEOPDLGDATA lpfod = (LPFILEOPDLGDATA)lParam;
 
 		SetDlgItemText(hwnd, IDC_OLDNAME, lpfod->szSource);
 		SetDlgItemText(hwnd, IDC_NEWNAME, lpfod->szSource);
@@ -1308,7 +1293,8 @@ INT_PTR CALLBACK RenameFileDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 		SendDlgItemMessage(hwnd, IDC_NEWNAME, EM_SETMODIFY, 0, 0);
 
 		CenterDlgInParent(hwnd);
-		return TRUE;
+	}
+	return TRUE;
 
 	case WM_COMMAND:
 		switch (LOWORD(wParam)) {
@@ -1320,7 +1306,7 @@ INT_PTR CALLBACK RenameFileDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 			if (!SendDlgItemMessage(hwnd, IDC_NEWNAME, EM_GETMODIFY, 0, 0)) {
 				EndDialog(hwnd, IDCANCEL);
 			} else {
-				lpfod = (LPFILEOPDLGDATA)(LONG_PTR)GetWindowLongPtr(hwnd, DWLP_USER);
+				LPFILEOPDLGDATA lpfod = (LPFILEOPDLGDATA)GetWindowLongPtr(hwnd, DWLP_USER);
 				GetDlgItemText(hwnd, IDC_NEWNAME, lpfod->szDestination, COUNTOF(lpfod->szDestination) - 1);
 				EndDialog(hwnd, IDOK);
 			}
@@ -1343,21 +1329,21 @@ INT_PTR CALLBACK RenameFileDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 //
 BOOL RenameFileDlg(HWND hwnd) {
 	DLITEM dli;
-	FILEOPDLGDATA fod;
 
 	dli.mask = DLI_FILENAME;
-	if (DirList_GetItem(hwndDirList, -1, &dli) != -1) {
-		lstrcpy(fod.szSource, GetFilenameStr(dli.szFileName));
-	} else {
+	if (DirList_GetItem(hwndDirList, -1, &dli) == -1) {
 		return FALSE;
 	}
 
+	FILEOPDLGDATA fod;
+	lstrcpy(fod.szSource, GetFilenameStr(dli.szFileName));
+
 	if (IDOK == ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_RENAME), hwnd, RenameFileDlgProc, (LPARAM)&fod)) {
-		SHFILEOPSTRUCT shfos;
 		WCHAR tchSource[MAX_PATH + 4];
 		WCHAR szFullDestination[MAX_PATH];
 		WCHAR tchDestination[MAX_PATH + 4];
 
+		SHFILEOPSTRUCT shfos;
 		ZeroMemory(&shfos, sizeof(SHFILEOPSTRUCT));
 		shfos.hwnd = hwnd;
 		shfos.wFunc = FO_RENAME;
@@ -1402,16 +1388,12 @@ INT_PTR CALLBACK CopyMoveDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPa
 	static int cyClient;
 	static int mmiPtMaxY;
 	static int mmiPtMinX;
-	LPFILEOPDLGDATA lpfod;
 
 	switch (umsg) {
 	case WM_INITDIALOG: {
-		RECT rc;
-		WCHAR tch[64];
-		int cGrip;
-		//FARPROC fp;
-		COMBOBOXINFO cbi;
+		SetWindowLongPtr(hwnd, DWLP_USER, lParam);
 
+		RECT rc;
 		GetClientRect(hwnd, &rc);
 		cxClient = rc.right - rc.left;
 		cyClient = rc.bottom - rc.top;
@@ -1428,6 +1410,7 @@ INT_PTR CALLBACK CopyMoveDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPa
 		SetWindowLongPtr(hwnd, GWL_STYLE, GetWindowLongPtr(hwnd, GWL_STYLE) | WS_THICKFRAME);
 		SetWindowPos(hwnd, NULL, 0, 0, 0, 0, SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE | SWP_FRAMECHANGED);
 
+		WCHAR tch[64];
 		GetMenuString(GetSystemMenu(GetParent(hwnd), FALSE), SC_SIZE, tch, COUNTOF(tch), MF_BYCOMMAND);
 		InsertMenu(GetSystemMenu(hwnd, FALSE), SC_CLOSE, MF_BYCOMMAND | MF_STRING | MF_ENABLED, SC_SIZE, tch);
 		InsertMenu(GetSystemMenu(hwnd, FALSE), SC_CLOSE, MF_BYCOMMAND | MF_SEPARATOR, 0, NULL);
@@ -1435,22 +1418,21 @@ INT_PTR CALLBACK CopyMoveDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPa
 		SetWindowLongPtr(GetDlgItem(hwnd, IDC_RESIZEGRIP2), GWL_STYLE,
 						 GetWindowLongPtr(GetDlgItem(hwnd, IDC_RESIZEGRIP2), GWL_STYLE) | SBS_SIZEGRIP | WS_CLIPSIBLINGS);
 
-		cGrip = GetSystemMetrics(SM_CXHTHUMB);
+		const int cGrip = GetSystemMetrics(SM_CXHTHUMB);
 		SetWindowPos(GetDlgItem(hwnd, IDC_RESIZEGRIP2), NULL, cxClient - cGrip,
 					 cyClient - cGrip, cGrip, cGrip, SWP_NOZORDER);
 
 		MakeBitmapButton(hwnd, IDC_BROWSEDESTINATION, g_hInstance, IDB_OPEN);
 
-		lpfod = (LPFILEOPDLGDATA)lParam;
-		SetWindowLongPtr(hwnd, DWLP_USER, (LONG_PTR)lpfod);
-
-		MRU_LoadToCombobox(GetDlgItem(hwnd, IDC_DESTINATION), MRU_KEY_COPY_MOVE_HISTORY);
-		SendDlgItemMessage(hwnd, IDC_DESTINATION, CB_SETCURSEL, 0, 0);
+		LPFILEOPDLGDATA lpfod = (LPFILEOPDLGDATA)lParam;
+		HWND hwndDest = GetDlgItem(hwnd, IDC_DESTINATION);
+		MRU_LoadToCombobox(hwndDest, MRU_KEY_COPY_MOVE_HISTORY);
+		SendMessage(hwndDest, CB_SETCURSEL, 0, 0);
 
 		SetDlgItemText(hwnd, IDC_SOURCE, lpfod->szSource);
-		SendDlgItemMessage(hwnd, IDC_DESTINATION, CB_LIMITTEXT, MAX_PATH - 1, 0);
+		SendMessage(hwndDest, CB_LIMITTEXT, MAX_PATH - 1, 0);
 
-		SendDlgItemMessage(hwnd, IDC_DESTINATION, CB_SETEXTENDEDUI, TRUE, 0);
+		SendMessage(hwndDest, CB_SETEXTENDEDUI, TRUE, 0);
 
 		if (lpfod->wFunc == FO_COPY) {
 			CheckRadioButton(hwnd, IDC_FUNCCOPY, IDC_FUNCMOVE, IDC_FUNCCOPY);
@@ -1458,8 +1440,9 @@ INT_PTR CALLBACK CopyMoveDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPa
 			CheckRadioButton(hwnd, IDC_FUNCCOPY, IDC_FUNCMOVE, IDC_FUNCMOVE);
 		}
 
+		COMBOBOXINFO cbi;
 		cbi.cbSize = sizeof(COMBOBOXINFO);
-		if (GetComboBoxInfo(GetDlgItem(hwnd, IDC_DESTINATION), &cbi)) {
+		if (GetComboBoxInfo(hwndDest, &cbi)) {
 			SHAutoComplete(cbi.hwndItem, SHACF_FILESYSTEM);
 		}
 
@@ -1477,13 +1460,12 @@ INT_PTR CALLBACK CopyMoveDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPa
 	return FALSE;
 
 	case WM_SIZE: {
-		RECT rc;
-
 		int dxClient = LOWORD(lParam) - cxClient;
 		int dyClient = HIWORD(lParam) - cyClient;
 		cxClient = LOWORD(lParam);
 		cyClient = HIWORD(lParam);
 
+		RECT rc;
 		GetWindowRect(GetDlgItem(hwnd, IDC_RESIZEGRIP2), &rc);
 		MapWindowPoints(NULL, hwnd, (LPPOINT)&rc, 2);
 		SetWindowPos(GetDlgItem(hwnd, IDC_RESIZEGRIP2), NULL, rc.left + dxClient, rc.top + dyClient, 0, 0, SWP_NOZORDER | SWP_NOSIZE);
@@ -1559,9 +1541,9 @@ INT_PTR CALLBACK CopyMoveDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPa
 		}
 		break;
 
-		case IDOK:
+		case IDOK: {
 			/*text*/
-			lpfod = (LPFILEOPDLGDATA)GetWindowLongPtr(hwnd, DWLP_USER);
+			LPFILEOPDLGDATA lpfod = (LPFILEOPDLGDATA)GetWindowLongPtr(hwnd, DWLP_USER);
 			if (GetDlgItemText(hwnd, IDC_DESTINATION, lpfod->szDestination, COUNTOF(lpfod->szDestination) - 1)) {
 				lpfod->wFunc = IsButtonChecked(hwnd, IDC_FUNCCOPY) ? FO_COPY : FO_MOVE;
 				EndDialog(hwnd, IDOK);
@@ -1570,7 +1552,8 @@ INT_PTR CALLBACK CopyMoveDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPa
 							 (GetWindowTextLength(GetDlgItem(hwnd, IDC_DESTINATION)) ||
 							  CB_ERR != SendDlgItemMessage(hwnd, IDC_DESTINATION, CB_GETCURSEL, 0, 0)));
 			}
-			break;
+		}
+		break;
 
 		case IDCANCEL:
 			EndDialog(hwnd, IDCANCEL);
@@ -1589,22 +1572,22 @@ INT_PTR CALLBACK CopyMoveDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPa
 //
 BOOL CopyMoveDlg(HWND hwnd, UINT *wFunc) {
 	DLITEM dli;
-	FILEOPDLGDATA fod;
 
-	fod.wFunc = *wFunc;
 
 	dli.mask = DLI_FILENAME;
-	if (DirList_GetItem(hwndDirList, -1, &dli) != -1) {
-		lstrcpy(fod.szSource, GetFilenameStr(dli.szFileName));
-	} else {
+	if (DirList_GetItem(hwndDirList, -1, &dli) == -1) {
 		return FALSE;
 	}
 
+	FILEOPDLGDATA fod;
+	fod.wFunc = *wFunc;
+	lstrcpy(fod.szSource, GetFilenameStr(dli.szFileName));
+
 	if (IDOK == ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_COPYMOVE), hwnd, CopyMoveDlgProc, (LPARAM)&fod)) {
-		SHFILEOPSTRUCT shfos;
 		WCHAR tchSource[MAX_PATH + 4];
 		WCHAR tchDestination[MAX_PATH + 4];
 
+		SHFILEOPSTRUCT shfos;
 		ZeroMemory(&shfos, sizeof(SHFILEOPSTRUCT));
 		shfos.hwnd = hwnd;
 		shfos.wFunc = fod.wFunc;
@@ -1656,7 +1639,7 @@ BOOL CopyMoveDlg(HWND hwnd, UINT *wFunc) {
 }
 
 extern WCHAR tchOpenWithDir[MAX_PATH];
-extern int  flagNoFadeHidden;
+extern int flagNoFadeHidden;
 
 extern int cxOpenWithDlg;
 extern int cyOpenWithDlg;
@@ -1669,11 +1652,11 @@ INT_PTR CALLBACK OpenWithDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPa
 
 	switch (umsg) {
 	case WM_INITDIALOG: {
-		RECT rc;
-		WCHAR tch[MAX_PATH];
-		int cGrip;
+		SetWindowLongPtr(hwnd, DWLP_USER, lParam);
+
 		LVCOLUMN lvc = { LVCF_FMT | LVCF_TEXT, LVCFMT_LEFT, 0, L"", -1, 0, 0, 0 };
 
+		RECT rc;
 		GetClientRect(hwnd, &rc);
 		cxClient = rc.right - rc.left;
 		cyClient = rc.bottom - rc.top;
@@ -1693,6 +1676,7 @@ INT_PTR CALLBACK OpenWithDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPa
 		SetWindowLongPtr(hwnd, GWL_STYLE, GetWindowLongPtr(hwnd, GWL_STYLE) | WS_THICKFRAME);
 		SetWindowPos(hwnd, NULL, 0, 0, 0, 0, SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE | SWP_FRAMECHANGED);
 
+		WCHAR tch[MAX_PATH];
 		GetMenuString(GetSystemMenu(GetParent(hwnd), FALSE), SC_SIZE, tch, COUNTOF(tch), MF_BYCOMMAND);
 		InsertMenu(GetSystemMenu(hwnd, FALSE), SC_CLOSE, MF_BYCOMMAND | MF_STRING | MF_ENABLED, SC_SIZE, tch);
 		InsertMenu(GetSystemMenu(hwnd, FALSE), SC_CLOSE, MF_BYCOMMAND | MF_SEPARATOR, 0, NULL);
@@ -1700,18 +1684,17 @@ INT_PTR CALLBACK OpenWithDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPa
 		SetWindowLongPtr(GetDlgItem(hwnd, IDC_RESIZEGRIP3), GWL_STYLE,
 						 GetWindowLongPtr(GetDlgItem(hwnd, IDC_RESIZEGRIP3), GWL_STYLE) | SBS_SIZEGRIP | WS_CLIPSIBLINGS);
 
-		cGrip = GetSystemMetrics(SM_CXHTHUMB);
+		const int cGrip = GetSystemMetrics(SM_CXHTHUMB);
 		SetWindowPos(GetDlgItem(hwnd, IDC_RESIZEGRIP3), NULL, cxClient - cGrip, cyClient - cGrip, cGrip, cGrip, SWP_NOZORDER);
 
-		SetWindowLongPtr(hwnd, DWLP_USER, (LONG_PTR)lParam);
-
-		//SetExplorerTheme(GetDlgItem(hwnd, IDC_OPENWITHDIR));
-		ListView_SetExtendedListViewStyle(GetDlgItem(hwnd, IDC_OPENWITHDIR), /*LVS_EX_FULLROWSELECT | */LVS_EX_DOUBLEBUFFER | LVS_EX_LABELTIP);
-		ListView_InsertColumn(GetDlgItem(hwnd, IDC_OPENWITHDIR), 0, &lvc);
-		DirList_Init(GetDlgItem(hwnd, IDC_OPENWITHDIR), NULL);
-		DirList_Fill(GetDlgItem(hwnd, IDC_OPENWITHDIR), tchOpenWithDir, DL_ALLOBJECTS, NULL, FALSE, flagNoFadeHidden, DS_NAME, FALSE);
-		DirList_StartIconThread(GetDlgItem(hwnd, IDC_OPENWITHDIR));
-		ListView_SetItemState(GetDlgItem(hwnd, IDC_OPENWITHDIR), 0, LVIS_FOCUSED, LVIS_FOCUSED);
+		HWND hwndLV = GetDlgItem(hwnd, IDC_OPENWITHDIR);
+		//SetExplorerTheme(hwndLV);
+		ListView_SetExtendedListViewStyle(hwndLV, /*LVS_EX_FULLROWSELECT | */LVS_EX_DOUBLEBUFFER | LVS_EX_LABELTIP);
+		ListView_InsertColumn(hwndLV, 0, &lvc);
+		DirList_Init(hwndLV, NULL);
+		DirList_Fill(hwndLV, tchOpenWithDir, DL_ALLOBJECTS, NULL, FALSE, flagNoFadeHidden, DS_NAME, FALSE);
+		DirList_StartIconThread(hwndLV);
+		ListView_SetItemState(hwndLV, 0, LVIS_FOCUSED, LVIS_FOCUSED);
 
 		MakeBitmapButton(hwnd, IDC_GETOPENWITHDIR, g_hInstance, IDB_OPEN);
 
@@ -1720,11 +1703,10 @@ INT_PTR CALLBACK OpenWithDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPa
 	return TRUE;
 
 	case WM_DESTROY: {
-		RECT rc;
-
 		DirList_Destroy(GetDlgItem(hwnd, IDC_OPENWITHDIR));
 		DeleteBitmapButton(hwnd, IDC_GETOPENWITHDIR);
 
+		RECT rc;
 		GetWindowRect(hwnd, &rc);
 		cxOpenWithDlg = rc.right - rc.left;
 		cyOpenWithDlg = rc.bottom - rc.top;
@@ -1732,13 +1714,12 @@ INT_PTR CALLBACK OpenWithDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPa
 	return FALSE;
 
 	case WM_SIZE: {
-		RECT rc;
-
 		int dxClient = LOWORD(lParam) - cxClient;
 		int dyClient = HIWORD(lParam) - cyClient;
 		cxClient = LOWORD(lParam);
 		cyClient = HIWORD(lParam);
 
+		RECT rc;
 		GetWindowRect(GetDlgItem(hwnd, IDC_RESIZEGRIP3), &rc);
 		MapWindowPoints(NULL, hwnd, (LPPOINT)&rc, 2);
 		SetWindowPos(GetDlgItem(hwnd, IDC_RESIZEGRIP3), NULL, rc.left + dxClient, rc.top + dyClient, 0, 0, SWP_NOZORDER | SWP_NOSIZE);
@@ -1782,15 +1763,15 @@ INT_PTR CALLBACK OpenWithDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPa
 
 	case WM_NOTIFY: {
 		LPNMHDR pnmh = (LPNMHDR)lParam;
-
 		if (pnmh->idFrom == IDC_OPENWITHDIR) {
+			HWND hwndLV = GetDlgItem(hwnd, IDC_OPENWITHDIR);
 			switch (pnmh->code) {
 			case LVN_GETDISPINFO:
-				DirList_GetDispInfo(GetDlgItem(hwnd, IDC_OPENWITHDIR), lParam, flagNoFadeHidden);
+				DirList_GetDispInfo(hwndLV, lParam, flagNoFadeHidden);
 				break;
 
 			case LVN_DELETEITEM:
-				DirList_DeleteItem(GetDlgItem(hwnd, IDC_OPENWITHDIR), lParam);
+				DirList_DeleteItem(hwndLV, lParam);
 				break;
 
 			case LVN_ITEMCHANGED: {
@@ -1800,7 +1781,7 @@ INT_PTR CALLBACK OpenWithDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPa
 			break;
 
 			case NM_DBLCLK:
-				if (ListView_GetSelectedCount(GetDlgItem(hwnd, IDC_OPENWITHDIR))) {
+				if (ListView_GetSelectedCount(hwndLV)) {
 					SendMessage(hwnd, WM_COMMAND, MAKELONG(IDOK, 1), 0);
 				}
 				break;
@@ -1812,13 +1793,14 @@ INT_PTR CALLBACK OpenWithDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPa
 	case WM_COMMAND:
 		switch (LOWORD(wParam)) {
 		case IDC_GETOPENWITHDIR: {
+			HWND hwndLV = GetDlgItem(hwnd, IDC_OPENWITHDIR);
 			if (GetDirectory(hwnd, IDS_OPENWITH, tchOpenWithDir, tchOpenWithDir)) {
-				DirList_Fill(GetDlgItem(hwnd, IDC_OPENWITHDIR), tchOpenWithDir, DL_ALLOBJECTS, NULL, FALSE, flagNoFadeHidden, DS_NAME, FALSE);
-				DirList_StartIconThread(GetDlgItem(hwnd, IDC_OPENWITHDIR));
-				ListView_EnsureVisible(GetDlgItem(hwnd, IDC_OPENWITHDIR), 0, FALSE);
-				ListView_SetItemState(GetDlgItem(hwnd, IDC_OPENWITHDIR), 0, LVIS_FOCUSED, LVIS_FOCUSED);
+				DirList_Fill(hwndLV, tchOpenWithDir, DL_ALLOBJECTS, NULL, FALSE, flagNoFadeHidden, DS_NAME, FALSE);
+				DirList_StartIconThread(hwndLV);
+				ListView_EnsureVisible(hwndLV, 0, FALSE);
+				ListView_SetItemState(hwndLV, 0, LVIS_FOCUSED, LVIS_FOCUSED);
 			}
-			PostMessage(hwnd, WM_NEXTDLGCTL, (WPARAM)(GetDlgItem(hwnd, IDC_OPENWITHDIR)), 1);
+			PostMessage(hwnd, WM_NEXTDLGCTL, (WPARAM)(hwndLV), 1);
 		}
 		break;
 
@@ -1859,15 +1841,14 @@ BOOL OpenWithDlg(HWND hwnd, LPDLITEM lpdliParam) {
 		WCHAR szDestination[MAX_PATH + 4];
 		ZeroMemory(szDestination, sizeof(szDestination));
 
-		if (PathIsLnkToDirectory(dliOpenWith.szFileName, szDestination, sizeof(WCHAR)*COUNTOF(szDestination))) {
-			SHFILEOPSTRUCT shfos;
-
+		if (PathIsLnkToDirectory(dliOpenWith.szFileName, szDestination, COUNTOF(szDestination))) {
 			WCHAR szSource[MAX_PATH + 4];
 			ZeroMemory(szSource, sizeof(szSource));
 			lstrcpy(szSource, lpdliParam->szFileName);
 
 			PathAppend(szDestination, PathFindFileName(szSource));
 
+			SHFILEOPSTRUCT shfos;
 			ZeroMemory(&shfos, sizeof(SHFILEOPSTRUCT));
 			shfos.hwnd = hwnd;
 			shfos.wFunc = FO_COPY;
@@ -1921,16 +1902,14 @@ BOOL OpenWithDlg(HWND hwnd, LPDLITEM lpdliParam) {
 //
 //
 INT_PTR CALLBACK NewDirDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
-	LPFILEOPDLGDATA lpfod;
-
 	switch (umsg) {
-	case WM_INITDIALOG:
-		lpfod = (LPFILEOPDLGDATA)lParam;
-		SetWindowLongPtr(hwnd, DWLP_USER, (LONG_PTR)lpfod);
+	case WM_INITDIALOG: {
+		SetWindowLongPtr(hwnd, DWLP_USER, lParam);
 
 		SendDlgItemMessage(hwnd, IDC_NEWDIR, EM_LIMITTEXT, MAX_PATH - 1, 0);
 		CenterDlgInParent(hwnd);
-		return TRUE;
+	}
+	return TRUE;
 
 	case WM_COMMAND:
 		switch (LOWORD(wParam)) {
@@ -1938,11 +1917,12 @@ INT_PTR CALLBACK NewDirDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPara
 			EnableWindow(GetDlgItem(hwnd, IDOK), GetWindowTextLength(GetDlgItem(hwnd, IDC_NEWDIR)));
 			break;
 
-		case IDOK:
-			lpfod = (LPFILEOPDLGDATA)GetWindowLongPtr(hwnd, DWLP_USER);
+		case IDOK: {
+			LPFILEOPDLGDATA lpfod = (LPFILEOPDLGDATA)GetWindowLongPtr(hwnd, DWLP_USER);
 			GetDlgItemText(hwnd, IDC_NEWDIR, lpfod->szDestination, COUNTOF(lpfod->szDestination) - 1);
 			EndDialog(hwnd, IDOK);
-			break;
+		}
+		break;
 
 		case IDCANCEL:
 			EndDialog(hwnd, IDCANCEL);
@@ -1977,7 +1957,7 @@ BOOL NewDirDlg(HWND hwnd, LPWSTR pszNewDir) {
 //
 extern int flagPortableMyDocs;
 
-INT_PTR CALLBACK FindWinDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
+static INT_PTR CALLBACK FindWinDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
 	static WCHAR *pTargetWndClassBuf;
 	static HICON hIconCross1, hIconCross2;
 	static HCURSOR hCursorCross;
@@ -2012,16 +1992,16 @@ INT_PTR CALLBACK FindWinDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPar
 	break;
 
 	case WM_LBUTTONUP: {
-		WCHAR tch[256];
-
 		SetCursor(LoadCursor(NULL, IDC_ARROW));
 		SendDlgItemMessage(hwnd, IDC_CROSSCURSOR, STM_SETICON, (WPARAM)hIconCross1, 0);
 		ReleaseCapture();
 		bHasCapture = FALSE;
 
-		EnableWindow(GetDlgItem(hwnd, IDOK), GetDlgItemText(hwnd, IDC_WINCLASS, tch, COUNTOF(tch)));
-		if (IsWindowEnabled(GetDlgItem(hwnd, IDOK))) {
-			PostMessage(hwnd, WM_NEXTDLGCTL, (WPARAM)(GetDlgItem(hwnd, IDOK)), 1);
+		HWND hwndOK = GetDlgItem(hwnd, IDOK);
+		WCHAR tch[256];
+		EnableWindow(hwndOK, GetDlgItemText(hwnd, IDC_WINCLASS, tch, COUNTOF(tch)));
+		if (IsWindowEnabled(hwndOK)) {
+			PostMessage(hwnd, WM_NEXTDLGCTL, (WPARAM)(hwndOK), 1);
 		}
 
 		//if (GetDlgItemText(hwnd, IDC_WINMODULE, tch, COUNTOF(tch))) {
@@ -2036,13 +2016,11 @@ INT_PTR CALLBACK FindWinDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPar
 	break;
 
 	case WM_MOUSEMOVE: {
-		POINT pt;
-
 		if (bHasCapture) {
-			HWND hwndFind;
+			POINT pt;
 			GetCursorPos(&pt);
-			hwndFind = WindowFromPoint(pt);
 
+			HWND hwndFind = WindowFromPoint(pt);
 			while (GetWindowLongPtr(hwndFind, GWL_STYLE) & WS_CHILD) {
 				hwndFind = GetParent(hwndFind);
 			}
@@ -2070,33 +2048,35 @@ INT_PTR CALLBACK FindWinDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPar
 
 	case WM_COMMAND:
 		switch (LOWORD(wParam)) {
-		case IDOK:
-		case IDCANCEL:
-			if (bHasCapture) {
-				ReleaseCapture();
-				SendMessage(hwnd, WM_LBUTTONUP, 0, 0);
-			} else {
-				if (LOWORD(wParam) == IDOK) {
-					WCHAR tch[MAX_PATH] = L"";
-					if (GetDlgItemText(hwnd, IDC_WINMODULE, tch, COUNTOF(tch))) {
-						PathRelativeToApp(tch, tch, COUNTOF(tch), TRUE, TRUE, flagPortableMyDocs);
-						PathQuoteSpaces(tch);
-						SetDlgItemText(GetParent(hwnd), IDC_TARGETPATH, tch);
-					}
-
-					if (GetDlgItemText(hwnd, IDC_WINCLASS, tch, COUNTOF(tch))) {
-						lstrcpyn(pTargetWndClassBuf, tch, 256);
-					}
-				}
-
-				DestroyIcon(hIconCross1);
-				DestroyIcon(hIconCross2);
-				DestroyCursor(hCursorCross);
-				EndDialog(hwnd, IDOK);
+		case IDOK: {
+			WCHAR tch[MAX_PATH] = L"";
+			if (GetDlgItemText(hwnd, IDC_WINMODULE, tch, COUNTOF(tch))) {
+				PathRelativeToApp(tch, tch, COUNTOF(tch), TRUE, TRUE, flagPortableMyDocs);
+				PathQuoteSpaces(tch);
+				SetDlgItemText(GetParent(hwnd), IDC_TARGETPATH, tch);
 			}
+
+			if (GetDlgItemText(hwnd, IDC_WINCLASS, tch, COUNTOF(tch))) {
+				lstrcpyn(pTargetWndClassBuf, tch, 256);
+			}
+			EndDialog(hwnd, IDOK);
+		} break;
+
+		case IDCANCEL:
+			EndDialog(hwnd, IDCANCEL);
 			break;
 		}
 		return TRUE;
+
+	case WM_DESTROY:
+		if (bHasCapture) {
+			ReleaseCapture();
+			SendMessage(hwnd, WM_LBUTTONUP, 0, 0);
+		}
+		DestroyIcon(hIconCross1);
+		DestroyIcon(hIconCross2);
+		DestroyCursor(hCursorCross);
+		return FALSE;
 	}
 
 	return FALSE;
@@ -2125,14 +2105,10 @@ INT_PTR CALLBACK FindTargetDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 
 	switch (umsg) {
 	case WM_INITDIALOG: {
-		HWND hwndToolTip;
-		TOOLINFO ti;
-
-		WCHAR wch[MAX_PATH];
-
 		// ToolTip for browse button
-		hwndToolTip = CreateWindowEx(0, TOOLTIPS_CLASS, NULL, 0, 0, 0, 0, 0, hwnd, NULL, g_hInstance, NULL);
+		HWND hwndToolTip = CreateWindowEx(0, TOOLTIPS_CLASS, NULL, 0, 0, 0, 0, 0, hwnd, NULL, g_hInstance, NULL);
 
+		TOOLINFO ti;
 		ZeroMemory(&ti, sizeof(TOOLINFO));
 		ti.cbSize   = sizeof(TOOLINFO);
 		ti.uFlags   = TTF_IDISHWND | TTF_SUBCLASS;
@@ -2180,6 +2156,7 @@ INT_PTR CALLBACK FindTargetDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 			CheckRadioButton(hwnd, IDC_LAUNCH, IDC_TARGET, IDC_LAUNCH);
 		}
 
+		WCHAR wch[MAX_PATH];
 		lstrcpy(wch, szTargetApplication);
 		PathQuoteSpaces(wch);
 		if (StrNotEmpty(szTargetApplicationParams)) {
@@ -2189,8 +2166,7 @@ INT_PTR CALLBACK FindTargetDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 		SetDlgItemText(hwnd, IDC_TARGETPATH, wch);
 
 		if (iUseTargetApplication) {
-			int i = iTargetApplicationMode;
-			i = clamp_i(i, 0, 2);
+			const int i = clamp_i(iTargetApplicationMode, 0, 2);
 			CheckRadioButton(hwnd, IDC_ALWAYSRUN, IDC_USEDDE, IDC_ALWAYSRUN + i);
 		}
 
@@ -2215,22 +2191,19 @@ INT_PTR CALLBACK FindTargetDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 			WCHAR tchBuf[MAX_PATH];
 			WCHAR szFile[MAX_PATH];
 			WCHAR szParams[MAX_PATH];
-			WCHAR szTitle[32];
-			WCHAR szFilter[256];
-
-			OPENFILENAME ofn;
-			ZeroMemory(&ofn, sizeof(OPENFILENAME));
 
 			GetDlgItemText(hwnd, IDC_TARGETPATH, tchBuf, COUNTOF(tchBuf));
 			ExtractFirstArgument(tchBuf, szFile, szParams);
 			PathAbsoluteFromApp(szFile, szFile, COUNTOF(szFile), TRUE);
 
-			// Strings laden
+			WCHAR szTitle[32];
+			WCHAR szFilter[256];
 			GetString(IDS_SEARCHEXE, szTitle, COUNTOF(szTitle));
 			GetString(IDS_FILTER_EXE, szFilter, COUNTOF(szFilter));
 			PrepareFilterStr(szFilter);
 
-			// ofn fill out
+			OPENFILENAME ofn;
+			ZeroMemory(&ofn, sizeof(OPENFILENAME));
 			ofn.lStructSize = sizeof(OPENFILENAME);
 			ofn.hwndOwner   = hwnd;
 			ofn.lpstrFilter = szFilter;
@@ -2242,7 +2215,7 @@ INT_PTR CALLBACK FindTargetDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 
 			// execute file open dlg
 			if (GetOpenFileName(&ofn)) {
-				StrCpyN(tchBuf, szFile, COUNTOF(tchBuf));
+				lstrcpyn(tchBuf, szFile, COUNTOF(tchBuf));
 				PathRelativeToApp(tchBuf, tchBuf, COUNTOF(tchBuf), TRUE, TRUE, flagPortableMyDocs);
 				PathQuoteSpaces(tchBuf);
 				if (StrNotEmpty(szParams)) {
@@ -2271,7 +2244,7 @@ INT_PTR CALLBACK FindTargetDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 		//		}
 		//	}
 		//
-		//	// OK Button enablen und disablen
+		//	// OK Button enable and disable
 		//	EnableWindow(GetDlgItem(hwnd, IDOK), bEnableOK);
 		//}
 		//break;
@@ -2331,13 +2304,12 @@ INT_PTR CALLBACK FindTargetDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 					  GetDlgItemText(hwnd, IDC_DDETOPIC, tch, COUNTOF(tch)) == 0))) {
 				ErrorMessage(1, IDS_ERR_INVALIDTARGET);
 			} else {
-				int i;
 				IniSectionOnSave section;
 				WCHAR *pIniSectionBuf = NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_TARGET_APPLICATION);
 				IniSectionOnSave *pIniSection = &section;
 				pIniSection->next = pIniSectionBuf;
 
-				i = IsButtonChecked(hwnd, IDC_LAUNCH);
+				int i = IsButtonChecked(hwnd, IDC_LAUNCH);
 				iUseTargetApplication = !i;
 				IniSectionSetBool(pIniSection, L"UseTargetApplication", iUseTargetApplication);
 

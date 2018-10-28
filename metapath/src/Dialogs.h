@@ -20,6 +20,7 @@
 
 #ifndef METAPATH_DIALOGS_H_
 #define METAPATH_DIALOGS_H_
+#include "compiler.h"
 
 /**
  * App message used to center MessageBox to the window of the program.
@@ -43,7 +44,6 @@ BOOL CopyMoveDlg(HWND hwnd, UINT *wFunc);
 BOOL OpenWithDlg(HWND hwnd, LPDLITEM lpdliParam);
 BOOL NewDirDlg(HWND hwnd, LPWSTR pszNewDir);
 
-INT_PTR CALLBACK FindWinDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam);
 INT_PTR CALLBACK FindTargetDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam);
 
 #endif // METAPATH_DIALOGS_H_

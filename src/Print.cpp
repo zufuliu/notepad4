@@ -25,8 +25,8 @@
 #include <commdlg.h>
 #include "Scintilla.h"
 extern "C" {
-#include "Dialogs.h"
 #include "Helpers.h"
+#include "Dialogs.h"
 #include "Notepad2.h"
 }
 #include "resource.h"
@@ -36,7 +36,7 @@ extern "C" int iPrintHeader;
 extern "C" int iPrintFooter;
 extern "C" int iPrintColor;
 extern "C" int iPrintZoom;
-extern "C" RECT pagesetupMargin;
+extern "C" RECT pageSetupMargin;
 
 // Stored objects...
 static HGLOBAL hDevMode {};
@@ -70,44 +70,6 @@ extern "C" BOOL EditPrint(HWND hwnd, LPCWSTR pszDocTitle, LPCWSTR pszPageFormat)
 		return TRUE;
 	}
 
-	int startPos;
-	int endPos;
-
-	HDC hdc;
-
-	RECT rectMargins;
-	RECT rectPhysMargins;
-	RECT rectSetup;
-	POINT ptPage;
-	POINT ptDpi;
-
-	//RECT rectSetup;
-
-	TEXTMETRIC tm;
-
-	int headerLineHeight;
-	HFONT fontHeader;
-
-	int footerLineHeight;
-	HFONT fontFooter;
-
-	WCHAR dateString[256];
-
-	DOCINFO di = {sizeof(DOCINFO), nullptr, nullptr, nullptr, 0};
-
-	LONG lengthDoc;
-	LONG lengthDocMax;
-	LONG lengthPrinted;
-
-	struct Sci_RangeToFormat frPrint;
-
-	int pageNum;
-
-	WCHAR pageString[32];
-
-	HPEN pen;
-	HPEN penOld;
-
 	PRINTDLG pdlg;
 	ZeroMemory(&pdlg, sizeof(PRINTDLG));
 	pdlg.lStructSize = sizeof(PRINTDLG);
@@ -123,8 +85,8 @@ extern "C" BOOL EditPrint(HWND hwnd, LPCWSTR pszDocTitle, LPCWSTR pszPageFormat)
 	pdlg.hDevMode = hDevMode;
 	pdlg.hDevNames = hDevNames;
 
-	startPos = (int)SendMessage(hwnd, SCI_GETSELECTIONSTART, 0, 0);;
-	endPos = (int)SendMessage(hwnd, SCI_GETSELECTIONEND, 0, 0);
+	const int startPos = (int)SendMessage(hwnd, SCI_GETSELECTIONSTART, 0, 0);;
+	const int endPos = (int)SendMessage(hwnd, SCI_GETSELECTIONEND, 0, 0);
 
 	if (startPos == endPos) {
 		pdlg.Flags |= PD_NOSELECTION;
@@ -144,7 +106,9 @@ extern "C" BOOL EditPrint(HWND hwnd, LPCWSTR pszDocTitle, LPCWSTR pszPageFormat)
 	hDevMode = pdlg.hDevMode;
 	hDevNames = pdlg.hDevNames;
 
-	hdc = pdlg.hDC;
+	HDC hdc = pdlg.hDC;
+	POINT ptDpi;
+	POINT ptPage;
 
 	// Get printer resolution
 	ptDpi.x = GetDeviceCaps(hdc, LOGPIXELSX);		 // dpi in X direction
@@ -154,6 +118,7 @@ extern "C" BOOL EditPrint(HWND hwnd, LPCWSTR pszDocTitle, LPCWSTR pszPageFormat)
 	ptPage.x = GetDeviceCaps(hdc, PHYSICALWIDTH);		// device units
 	ptPage.y = GetDeviceCaps(hdc, PHYSICALHEIGHT);	// device units
 
+	RECT rectPhysMargins;
 	// Get the dimensions of the unprintable
 	// part of the page (in device units).
 	rectPhysMargins.left = GetDeviceCaps(hdc, PHYSICALOFFSETX);
@@ -172,11 +137,13 @@ extern "C" BOOL EditPrint(HWND hwnd, LPCWSTR pszDocTitle, LPCWSTR pszPageFormat)
 
 	// At this point, rectPhysMargins contains the widths of the
 	// unprintable regions on all four sides of the page in device units.
+	RECT rectMargins;
+	RECT rectSetup;
 
 	EditPrintInit();
 	// Take in account the page setup given by the user (if one value is not null)
-	if (pagesetupMargin.left != 0 || pagesetupMargin.right != 0 ||
-			pagesetupMargin.top != 0 || pagesetupMargin.bottom != 0) {
+	if (pageSetupMargin.left != 0 || pageSetupMargin.right != 0 ||
+			pageSetupMargin.top != 0 || pageSetupMargin.bottom != 0) {
 
 		// Convert the hundredths of millimeters (HiMetric) or
 		// thousandths of inches (HiEnglish) margin values
@@ -187,15 +154,15 @@ extern "C" BOOL EditPrint(HWND hwnd, LPCWSTR pszDocTitle, LPCWSTR pszPageFormat)
 		GetLocaleInfo(LOCALE_USER_DEFAULT, LOCALE_IMEASURE, localeInfo, 3);
 
 		if (localeInfo[0] == L'0') {	// Metric system. L'1' is US System
-			rectSetup.left		= MulDiv(pagesetupMargin.left, ptDpi.x, 2540);
-			rectSetup.top		= MulDiv(pagesetupMargin.top, ptDpi.y, 2540);
-			rectSetup.right		= MulDiv(pagesetupMargin.right, ptDpi.x, 2540);
-			rectSetup.bottom	= MulDiv(pagesetupMargin.bottom, ptDpi.y, 2540);
+			rectSetup.left		= MulDiv(pageSetupMargin.left, ptDpi.x, 2540);
+			rectSetup.top		= MulDiv(pageSetupMargin.top, ptDpi.y, 2540);
+			rectSetup.right		= MulDiv(pageSetupMargin.right, ptDpi.x, 2540);
+			rectSetup.bottom	= MulDiv(pageSetupMargin.bottom, ptDpi.y, 2540);
 		} else {
-			rectSetup.left		= MulDiv(pagesetupMargin.left, ptDpi.x, 1000);
-			rectSetup.top		= MulDiv(pagesetupMargin.top, ptDpi.y, 1000);
-			rectSetup.right		= MulDiv(pagesetupMargin.right, ptDpi.x, 1000);
-			rectSetup.bottom	= MulDiv(pagesetupMargin.bottom, ptDpi.y, 1000);
+			rectSetup.left		= MulDiv(pageSetupMargin.left, ptDpi.x, 1000);
+			rectSetup.top		= MulDiv(pageSetupMargin.top, ptDpi.y, 1000);
+			rectSetup.right		= MulDiv(pageSetupMargin.right, ptDpi.x, 1000);
+			rectSetup.bottom	= MulDiv(pageSetupMargin.bottom, ptDpi.y, 1000);
 		}
 
 		// Dont reduce margins below the minimum printable area
@@ -220,8 +187,9 @@ extern "C" BOOL EditPrint(HWND hwnd, LPCWSTR pszDocTitle, LPCWSTR pszPageFormat)
 	// Convert page size to logical units and we're done!
 	DPtoLP(hdc, (LPPOINT) &ptPage, 1);
 
-	headerLineHeight = MulDiv(8, ptDpi.y, 72);
-	fontHeader = CreateFont(headerLineHeight,
+	TEXTMETRIC tm;
+	int headerLineHeight = MulDiv(8, ptDpi.y, 72);
+	HFONT fontHeader = CreateFont(headerLineHeight,
 							0, 0, 0,
 							FW_BOLD,
 							0,
@@ -237,8 +205,8 @@ extern "C" BOOL EditPrint(HWND hwnd, LPCWSTR pszDocTitle, LPCWSTR pszPageFormat)
 		headerLineHeight = 0;
 	}
 
-	footerLineHeight = MulDiv(7, ptDpi.y, 72);
-	fontFooter = CreateFont(footerLineHeight,
+	int footerLineHeight = MulDiv(7, ptDpi.y, 72);
+	HFONT fontFooter = CreateFont(footerLineHeight,
 							0, 0, 0,
 							FW_NORMAL,
 							0,
@@ -254,10 +222,7 @@ extern "C" BOOL EditPrint(HWND hwnd, LPCWSTR pszDocTitle, LPCWSTR pszPageFormat)
 		footerLineHeight = 0;
 	}
 
-	di.lpszDocName = pszDocTitle;
-	di.lpszOutput = nullptr;
-	di.lpszDatatype = nullptr;
-	di.fwType = 0;
+	DOCINFO di = {sizeof(DOCINFO), pszDocTitle, nullptr, nullptr, 0};
 	if (StartDoc(hdc, &di) < 0) {
 		DeleteDC(hdc);
 		if (fontHeader) {
@@ -271,6 +236,7 @@ extern "C" BOOL EditPrint(HWND hwnd, LPCWSTR pszDocTitle, LPCWSTR pszPageFormat)
 
 	// Get current date...
 	SYSTEMTIME st;
+	WCHAR dateString[256];
 	GetLocalTime(&st);
 	GetDateFormat(LOCALE_USER_DEFAULT, DATE_SHORTDATE, &st, nullptr, dateString, 256);
 
@@ -286,11 +252,11 @@ extern "C" BOOL EditPrint(HWND hwnd, LPCWSTR pszDocTitle, LPCWSTR pszPageFormat)
 	SendMessage(hwnd, SCI_SETPRINTCOLOURMODE, iPrintColor, 0);
 
 	// Set print zoom...
-	SendMessage(hwnd, SCI_SETPRINTMAGNIFICATION, (WPARAM)iPrintZoom, 0);
+	SendMessage(hwnd, SCI_SETPRINTMAGNIFICATION, iPrintZoom, 0);
 
-	lengthDoc = (long)SendMessage(hwnd, SCI_GETLENGTH, 0, 0);
-	lengthDocMax = lengthDoc;
-	lengthPrinted = 0;
+	LONG lengthDoc = (LONG)SendMessage(hwnd, SCI_GETLENGTH, 0, 0);
+	const LONG lengthDocMax = lengthDoc;
+	LONG lengthPrinted = 0;
 
 	// Requested to print selection
 	if (pdlg.Flags & PD_SELECTION) {
@@ -311,6 +277,7 @@ extern "C" BOOL EditPrint(HWND hwnd, LPCWSTR pszDocTitle, LPCWSTR pszPageFormat)
 	}
 
 	// We must substract the physical margins from the printable area
+	struct Sci_RangeToFormat frPrint;
 	frPrint.hdc = hdc;
 	frPrint.hdcTarget = hdc;
 	frPrint.rc.left		= rectMargins.left - rectPhysMargins.left;
@@ -323,16 +290,16 @@ extern "C" BOOL EditPrint(HWND hwnd, LPCWSTR pszDocTitle, LPCWSTR pszPageFormat)
 	frPrint.rcPage.bottom	= ptPage.y - rectPhysMargins.top - rectPhysMargins.bottom - 1;
 	frPrint.rc.top		+= headerLineHeight + headerLineHeight / 2;
 	frPrint.rc.bottom	-= footerLineHeight + footerLineHeight / 2;
+
 	// Print each page
-	pageNum = 1;
+	int pageNum = 1;
 
 	while (lengthPrinted < lengthDoc) {
 		const BOOL printPage = !(pdlg.Flags & PD_PAGENUMS) || (pageNum >= pdlg.nFromPage && pageNum <= pdlg.nToPage);
-
+		WCHAR pageString[32];
 		wsprintf(pageString, pszPageFormat, pageNum);
 
 		if (printPage) {
-
 			// Show wait cursor...
 			BeginWaitCursor();
 
@@ -370,8 +337,8 @@ extern "C" BOOL EditPrint(HWND hwnd, LPCWSTR pszDocTitle, LPCWSTR pszPageFormat)
 
 			if (iPrintHeader < 3) {
 				SetTextAlign(hdc, ta);
-				pen = CreatePen(0, 1, RGB(0, 0, 0));
-				penOld = (HPEN)SelectObject(hdc, pen);
+				HPEN pen = CreatePen(0, 1, RGB(0, 0, 0));
+				HPEN penOld = (HPEN)SelectObject(hdc, pen);
 				MoveToEx(hdc, frPrint.rc.left, frPrint.rc.top - headerLineHeight / 4, nullptr);
 				LineTo(hdc, frPrint.rc.right, frPrint.rc.top - headerLineHeight / 4);
 				SelectObject(hdc, penOld);
@@ -382,7 +349,7 @@ extern "C" BOOL EditPrint(HWND hwnd, LPCWSTR pszDocTitle, LPCWSTR pszPageFormat)
 		frPrint.chrg.cpMin = lengthPrinted;
 		frPrint.chrg.cpMax = lengthDoc;
 
-		lengthPrinted = (long)SendMessage(hwnd, SCI_FORMATRANGE, printPage, (LPARAM)&frPrint);
+		lengthPrinted = (LONG)SendMessage(hwnd, SCI_FORMATRANGE, printPage, (LPARAM)&frPrint);
 
 		if (printPage) {
 			SetTextColor(hdc, RGB(0, 0, 0));
@@ -403,8 +370,8 @@ extern "C" BOOL EditPrint(HWND hwnd, LPCWSTR pszDocTitle, LPCWSTR pszPageFormat)
 						   len, nullptr);
 
 				SetTextAlign(hdc, ta);
-				pen = ::CreatePen(0, 1, RGB(0, 0, 0));
-				penOld = (HPEN)SelectObject(hdc, pen);
+				HPEN pen = ::CreatePen(0, 1, RGB(0, 0, 0));
+				HPEN penOld = (HPEN)SelectObject(hdc, pen);
 				SetBkColor(hdc, RGB(0, 0, 0));
 				MoveToEx(hdc, frPrint.rc.left, frPrint.rc.bottom + footerLineHeight / 4, nullptr);
 				LineTo(hdc, frPrint.rc.right, frPrint.rc.bottom + footerLineHeight / 4);
@@ -454,15 +421,14 @@ extern "C" BOOL EditPrint(HWND hwnd, LPCWSTR pszDocTitle, LPCWSTR pszPageFormat)
 static UINT_PTR CALLBACK PageSetupHook(HWND hwnd, UINT uiMsg, WPARAM wParam, LPARAM /*lParam*/) noexcept {
 	switch (uiMsg) {
 	case WM_INITDIALOG: {
-		WCHAR tch[512];
-		WCHAR *p1, *p2;
-
 		SendDlgItemMessage(hwnd, 30, EM_LIMITTEXT, 32, 0);
 
 		SendDlgItemMessage(hwnd, 31, UDM_SETRANGE, 0, MAKELONG(SC_MAX_ZOOM_LEVEL, SC_MIN_ZOOM_LEVEL));
 		SendDlgItemMessage(hwnd, 31, UDM_SETPOS, 0, MAKELONG((short)iPrintZoom, 0));
 
 		// Set header options
+		WCHAR tch[512];
+		WCHAR *p1, *p2;
 		GetString(IDS_PRINT_HEADER, tch, COUNTOF(tch));
 		lstrcat(tch, L"|");
 		p1 = tch;
@@ -473,7 +439,7 @@ static UINT_PTR CALLBACK PageSetupHook(HWND hwnd, UINT uiMsg, WPARAM wParam, LPA
 			}
 			p1 = p2;
 		}
-		SendDlgItemMessage(hwnd, 32, CB_SETCURSEL, (WPARAM)iPrintHeader, 0);
+		SendDlgItemMessage(hwnd, 32, CB_SETCURSEL, iPrintHeader, 0);
 
 		// Set footer options
 		GetString(IDS_PRINT_FOOTER, tch, COUNTOF(tch));
@@ -486,7 +452,7 @@ static UINT_PTR CALLBACK PageSetupHook(HWND hwnd, UINT uiMsg, WPARAM wParam, LPA
 			}
 			p1 = p2;
 		}
-		SendDlgItemMessage(hwnd, 33, CB_SETCURSEL, (WPARAM)iPrintFooter, 0);
+		SendDlgItemMessage(hwnd, 33, CB_SETCURSEL, iPrintFooter, 0);
 
 		// Set color options
 		GetString(IDS_PRINT_COLOR, tch, COUNTOF(tch));
@@ -499,7 +465,7 @@ static UINT_PTR CALLBACK PageSetupHook(HWND hwnd, UINT uiMsg, WPARAM wParam, LPA
 			}
 			p1 = p2;
 		}
-		SendDlgItemMessage(hwnd, 34, CB_SETCURSEL, (WPARAM)iPrintColor, 0);
+		SendDlgItemMessage(hwnd, 34, CB_SETCURSEL, iPrintColor, 0);
 
 		// Make combos handier
 		SendDlgItemMessage(hwnd, 32, CB_SETEXTENDEDUI, TRUE, 0);
@@ -545,25 +511,23 @@ extern "C" void EditPrintSetup(HWND hwnd) {
 	pdlg.hInstance = g_hInstance;
 
 	EditPrintInit();
-	if (pagesetupMargin.left != 0 || pagesetupMargin.right != 0 ||
-			pagesetupMargin.top != 0 || pagesetupMargin.bottom != 0) {
+	if (pageSetupMargin.left != 0 || pageSetupMargin.right != 0 ||
+			pageSetupMargin.top != 0 || pageSetupMargin.bottom != 0) {
 		pdlg.Flags |= PSD_MARGINS;
-
-		pdlg.rtMargin.left		= pagesetupMargin.left;
-		pdlg.rtMargin.top		= pagesetupMargin.top;
-		pdlg.rtMargin.right		= pagesetupMargin.right;
-		pdlg.rtMargin.bottom	= pagesetupMargin.bottom;
+		pdlg.rtMargin.left		= pageSetupMargin.left;
+		pdlg.rtMargin.top		= pageSetupMargin.top;
+		pdlg.rtMargin.right		= pageSetupMargin.right;
+		pdlg.rtMargin.bottom	= pageSetupMargin.bottom;
 	}
 
 	pdlg.hDevMode = hDevMode;
 	pdlg.hDevNames = hDevNames;
 
 	if (PageSetupDlg(&pdlg)) {
-
-		pagesetupMargin.left	= pdlg.rtMargin.left;
-		pagesetupMargin.top		= pdlg.rtMargin.top;
-		pagesetupMargin.right	= pdlg.rtMargin.right;
-		pagesetupMargin.bottom	= pdlg.rtMargin.bottom;
+		pageSetupMargin.left	= pdlg.rtMargin.left;
+		pageSetupMargin.top		= pdlg.rtMargin.top;
+		pageSetupMargin.right	= pdlg.rtMargin.right;
+		pageSetupMargin.bottom	= pdlg.rtMargin.bottom;
 
 		hDevMode = pdlg.hDevMode;
 		hDevNames = pdlg.hDevNames;
@@ -577,21 +541,21 @@ extern "C" void EditPrintSetup(HWND hwnd) {
 // EditPrintInit() - Setup default page margin if no values from registry
 //
 static void EditPrintInit() noexcept {
-	if (pagesetupMargin.left == -1 || pagesetupMargin.top == -1 ||
-			pagesetupMargin.right == -1 || pagesetupMargin.bottom == -1) {
+	if (pageSetupMargin.left == -1 || pageSetupMargin.top == -1 ||
+			pageSetupMargin.right == -1 || pageSetupMargin.bottom == -1) {
 		WCHAR localeInfo[3];
 		GetLocaleInfo(LOCALE_USER_DEFAULT, LOCALE_IMEASURE, localeInfo, 3);
 
 		if (localeInfo[0] == L'0') {	// Metric system. L'1' is US System
-			pagesetupMargin.left = 2000;
-			pagesetupMargin.top = 2000;
-			pagesetupMargin.right = 2000;
-			pagesetupMargin.bottom = 2000;
+			pageSetupMargin.left = 2000;
+			pageSetupMargin.top = 2000;
+			pageSetupMargin.right = 2000;
+			pageSetupMargin.bottom = 2000;
 		} else {
-			pagesetupMargin.left = 1000;
-			pagesetupMargin.top = 1000;
-			pagesetupMargin.right = 1000;
-			pagesetupMargin.bottom = 1000;
+			pageSetupMargin.left = 1000;
+			pageSetupMargin.top = 1000;
+			pageSetupMargin.right = 1000;
+			pageSetupMargin.bottom = 1000;
 		}
 	}
 }
