@@ -4089,6 +4089,7 @@ void EditSelectLine(HWND hwnd) {
 	SendMessage(hwnd, SCI_CHOOSECARETX, 0, 0);
 }
 
+extern int iFindReplaceOpacityLevel;
 //=============================================================================
 //
 // EditFindReplaceDlgProc()
@@ -4561,7 +4562,7 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 	break;
 
 	case WM_ACTIVATE :
-		SetWindowTransparentMode(hwnd, LOWORD(wParam) == WA_INACTIVE);
+		SetWindowTransparentMode(hwnd, LOWORD(wParam) == WA_INACTIVE, iFindReplaceOpacityLevel);
 		break;
 	}
 

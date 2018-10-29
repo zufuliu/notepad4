@@ -364,7 +364,7 @@ void SetClipData(HWND hwnd, WCHAR *pszData);
 BOOL SetWindowTitle(HWND hwnd, UINT uIDAppName, BOOL bIsElevated, UINT uIDUntitled,
 					LPCWSTR lpszFile, int iFormat, BOOL bModified,
 					UINT uIDReadOnly, BOOL bReadOnly, LPCWSTR lpszExcerpt);
-void SetWindowTransparentMode(HWND hwnd, BOOL bTransparentMode);
+void SetWindowTransparentMode(HWND hwnd, BOOL bTransparentMode, int iOpacityLevel);
 void SetWindowLayoutRTL(HWND hwnd, BOOL bRTL);
 
 void CenterDlgInParentEx(HWND hDlg, HWND hParent);

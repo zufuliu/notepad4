@@ -415,7 +415,8 @@ static int	flagAlwaysOnTop			= 0;
 static int	flagRelativeFileMRU		= 0;
 static int	flagPortableMyDocs		= 0;
 int			flagNoFadeHidden		= 0;
-int			iOpacityLevel			= 75;
+static int	iOpacityLevel			= 75;
+int			iFindReplaceOpacityLevel= 75;
 static int	flagToolbarLook			= 0;
 int			flagSimpleIndentGuides	= 0;
 int 		fNoHTMLGuess			= 0;
@@ -755,7 +756,7 @@ HWND InitInstance(HINSTANCE hInstance, int nCmdShow) {
 	}
 
 	if (bTransparentMode) {
-		SetWindowTransparentMode(hwndMain, TRUE);
+		SetWindowTransparentMode(hwndMain, TRUE, iOpacityLevel);
 	}
 
 	// Current file information -- moved in front of ShowWindow()
@@ -4145,7 +4146,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	case IDM_VIEW_TRANSPARENT:
 		bTransparentMode = !bTransparentMode;
-		SetWindowTransparentMode(hwnd, bTransparentMode);
+		SetWindowTransparentMode(hwnd, bTransparentMode, iOpacityLevel);
 		break;
 
 	case IDM_SET_RENDER_TECH_GDI:
@@ -6492,6 +6493,10 @@ void LoadFlags(void) {
 	iOpacityLevel = IniSectionGetInt(pIniSection, L"OpacityLevel", 75);
 	if (iOpacityLevel < 0 || iOpacityLevel > 100) {
 		iOpacityLevel = 75;
+	}
+	iFindReplaceOpacityLevel = IniSectionGetInt(pIniSection, L"FindReplaceOpacityLevel", 75);
+	if (iFindReplaceOpacityLevel < 0 || iFindReplaceOpacityLevel > 100) {
+		iFindReplaceOpacityLevel = 75;
 	}
 
 	flagToolbarLook = IniSectionGetInt(pIniSection, L"ToolbarLook", IsWinXPAndAbove() ? 1 : 2);

@@ -168,7 +168,7 @@ int			flagPortableMyDocs	= 0;
 int			flagGotoFavorites	= 0;
 static int	iAutoRefreshRate	= 0; // unit: 1/10 sec
 int			flagNoFadeHidden	= 0;
-int			iOpacityLevel		= 75;
+static int	iOpacityLevel		= 75;
 static int	flagToolbarLook		= 0;
 static int	flagPosParam		= 0;
 
@@ -351,7 +351,7 @@ HWND InitInstance(HINSTANCE hInstance, int nCmdShow) {
 	}
 
 	if (bTransparentMode) {
-		SetWindowTransparentMode(hwndMain, TRUE);
+		SetWindowTransparentMode(hwndMain, TRUE, iOpacityLevel);
 	}
 
 	if (!flagStartAsTrayIcon) {
@@ -1840,7 +1840,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	case ACC_SWITCHTRANSPARENCY:
 		bTransparentMode = bTransparentMode ? 0 : 1;
-		SetWindowTransparentMode(hwnd, bTransparentMode);
+		SetWindowTransparentMode(hwnd, bTransparentMode, iOpacityLevel);
 		break;
 
 	case ACC_GOTOTARGET: {
