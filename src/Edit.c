@@ -5293,15 +5293,8 @@ static INT_PTR CALLBACK EditLineNumDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, 
 // EditLinenumDlg()
 //
 BOOL EditLineNumDlg(HWND hwnd) {
-	if (IDOK == ThemedDialogBoxParam(g_hInstance,
-									 MAKEINTRESOURCE(IDD_LINENUM),
-									 GetParent(hwnd),
-									 EditLineNumDlgProc,
-									 (LPARAM)hwnd)) {
-		return TRUE;
-	}
-
-	return FALSE;
+	const INT_PTR iResult = ThemedDialogBoxParam(g_hInstance,  MAKEINTRESOURCE(IDD_LINENUM), GetParent(hwnd), EditLineNumDlgProc, (LPARAM)hwnd);
+	return iResult == IDOK;
 }
 
 //=============================================================================
@@ -5491,11 +5484,7 @@ static INT_PTR CALLBACK EditModifyLinesDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 //
 BOOL EditModifyLinesDlg(HWND hwnd, LPWSTR pwsz1, LPWSTR pwsz2) {
 	MODLINESDATA data = { pwsz1, pwsz2 };
-	const INT_PTR iResult = ThemedDialogBoxParam(g_hInstance,
-								   MAKEINTRESOURCE(IDD_MODIFYLINES),
-								   hwnd,
-								   EditModifyLinesDlgProc,
-								   (LPARAM)&data);
+	const INT_PTR iResult = ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_MODIFYLINES), hwnd, EditModifyLinesDlgProc, (LPARAM)&data);
 	return iResult == IDOK;
 }
 
@@ -5555,12 +5544,7 @@ static INT_PTR CALLBACK EditAlignDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LP
 // EditAlignDlg()
 //
 BOOL EditAlignDlg(HWND hwnd, int *piAlignMode) {
-	const INT_PTR iResult = ThemedDialogBoxParam(g_hInstance,
-								   MAKEINTRESOURCE(IDD_ALIGN),
-								   hwnd,
-								   EditAlignDlgProc,
-								   (LPARAM)piAlignMode);
-
+	const INT_PTR iResult = ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_ALIGN), hwnd, EditAlignDlgProc, (LPARAM)piAlignMode);
 	return iResult == IDOK;
 }
 
@@ -5619,12 +5603,7 @@ static INT_PTR CALLBACK EditEncloseSelectionDlgProc(HWND hwnd, UINT umsg, WPARAM
 //
 BOOL EditEncloseSelectionDlg(HWND hwnd, LPWSTR pwszOpen, LPWSTR pwszClose) {
 	ENCLOSESELDATA data = { pwszOpen, pwszClose };
-	const INT_PTR iResult = ThemedDialogBoxParam(g_hInstance,
-								   MAKEINTRESOURCE(IDD_ENCLOSESELECTION),
-								   hwnd,
-								   EditEncloseSelectionDlgProc,
-								   (LPARAM)&data);
-
+	const INT_PTR iResult = ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_ENCLOSESELECTION), hwnd, EditEncloseSelectionDlgProc, (LPARAM)&data);
 	return iResult == IDOK;
 }
 
@@ -5740,12 +5719,7 @@ static INT_PTR CALLBACK EditInsertTagDlgProc(HWND hwnd, UINT umsg, WPARAM wParam
 //
 BOOL EditInsertTagDlg(HWND hwnd, LPWSTR pwszOpen, LPWSTR pwszClose) {
 	TAGSDATA data = { pwszOpen, pwszClose };
-	const INT_PTR iResult = ThemedDialogBoxParam(g_hInstance,
-								   MAKEINTRESOURCE(IDD_INSERTTAG),
-								   hwnd,
-								   EditInsertTagDlgProc,
-								   (LPARAM)&data);
-
+	const INT_PTR iResult = ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_INSERTTAG), hwnd, EditInsertTagDlgProc, (LPARAM)&data);
 	return iResult == IDOK;
 }
 
@@ -5936,12 +5910,7 @@ static INT_PTR CALLBACK EditSortDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPA
 // EditSortDlg()
 //
 BOOL EditSortDlg(HWND hwnd, int *piSortFlags) {
-	const INT_PTR iResult = ThemedDialogBoxParam(g_hInstance,
-								   MAKEINTRESOURCE(IDD_SORT),
-								   hwnd,
-								   EditSortDlgProc,
-								   (LPARAM)piSortFlags);
-
+	const INT_PTR iResult = ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_SORT), hwnd, EditSortDlgProc, (LPARAM)piSortFlags);
 	return iResult == IDOK;
 }
 

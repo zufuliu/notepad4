@@ -3334,11 +3334,7 @@ void Style_ConfigDlg(HWND hwnd) {
 		styleBackup[iLexer] = szStyleBuf;
 	}
 
-	if (IDCANCEL == ThemedDialogBoxParam(g_hInstance,
-										 MAKEINTRESOURCE(IDD_STYLECONFIG),
-										 GetParent(hwnd),
-										 Style_ConfigDlgProc,
-										 0)) {
+	if (IDCANCEL == ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_STYLECONFIG), GetParent(hwnd),  Style_ConfigDlgProc, 0)) {
 		// Restore Styles
 		CopyMemory(g_AllFileExtensions, extBackup, ALL_FILE_EXTENSIONS_BYTE_SIZE);
 		CopyMemory(customColor, colorBackup, MAX_CUSTOM_COLOR_COUNT * sizeof(COLORREF));
@@ -3600,10 +3596,7 @@ static INT_PTR CALLBACK Style_SelectLexerDlgProc(HWND hwnd, UINT umsg, WPARAM wP
 // Style_SelectLexerDlg()
 //
 void Style_SelectLexerDlg(HWND hwnd) {
-	if (IDOK == ThemedDialogBoxParam(g_hInstance,
-									 MAKEINTRESOURCE(IDD_STYLESELECT),
-									 GetParent(hwnd),
-									 Style_SelectLexerDlgProc, 0)) {
+	if (IDOK == ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_STYLESELECT), GetParent(hwnd), Style_SelectLexerDlgProc, 0)) {
 		Style_SetLexer(hwnd, pLexCurrent);
 	}
 }
