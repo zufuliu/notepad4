@@ -380,7 +380,7 @@ void ResizeDlg_Destroy(HWND hwnd, int *cxFrame, int *cyFrame);
 void ResizeDlg_Size(HWND hwnd, LPARAM lParam, int *cx, int *cy);
 void ResizeDlg_GetMinMaxInfo(HWND hwnd, LPARAM lParam);
 HDWP DeferCtlPos(HDWP hdwp, HWND hwndDlg, int nCtlId, int dx, int dy, UINT uFlags);
-void MakeBitmapButton(HWND hwnd, int nCtlId, HINSTANCE hInstance, UINT uBmpId);
+void MakeBitmapButton(HWND hwnd, int nCtlId, HINSTANCE hInstance, WORD uBmpId);
 void MakeColorPickButton(HWND hwnd, int nCtlId, HINSTANCE hInstance, COLORREF crColor);
 void DeleteBitmapButton(HWND hwnd, int nCtlId);
 

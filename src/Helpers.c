@@ -812,7 +812,7 @@ HDWP DeferCtlPos(HDWP hdwp, HWND hwndDlg, int nCtlId, int dx, int dy, UINT uFlag
 //
 // MakeBitmapButton()
 //
-void MakeBitmapButton(HWND hwnd, int nCtlId, HINSTANCE hInstance, UINT uBmpId) {
+void MakeBitmapButton(HWND hwnd, int nCtlId, HINSTANCE hInstance, WORD uBmpId) {
 	HWND hwndCtl = GetDlgItem(hwnd, nCtlId);
 	HBITMAP hBmp = LoadImage(hInstance, MAKEINTRESOURCE(uBmpId), IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION);
 	hBmp = ResizeImageForCurrentDPI(hBmp);
