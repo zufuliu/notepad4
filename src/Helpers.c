@@ -584,8 +584,7 @@ BOOL SetWindowTitle(HWND hwnd, UINT uIDAppName, BOOL bIsElevated, UINT uIDUntitl
 //
 // SetWindowTransparentMode()
 //
-extern int iOpacityLevel;
-void SetWindowTransparentMode(HWND hwnd, BOOL bTransparentMode) {
+void SetWindowTransparentMode(HWND hwnd, BOOL bTransparentMode, int iOpacityLevel) {
 	const LONG_PTR exStyle = GetWindowLongPtr(hwnd, GWL_EXSTYLE);
 	if (bTransparentMode) {
 		if (IsWin2KAndAbove()) {
