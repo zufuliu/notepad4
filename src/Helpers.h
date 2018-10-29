@@ -504,13 +504,11 @@ typedef struct {
 #endif
 
 BOOL	GetThemedDialogFont(LPWSTR lpFaceName, WORD *wSize);
-DLGTEMPLATE *LoadThemedDialogTemplate(LPCTSTR lpDialogTemplateID, HINSTANCE hInstance);
+DLGTEMPLATE *LoadThemedDialogTemplate(LPCWSTR lpDialogTemplateID, HINSTANCE hInstance);
 #define ThemedDialogBox(hInstance, lpTemplate, hWndParent, lpDialogFunc) \
 	ThemedDialogBoxParam(hInstance, lpTemplate, hWndParent, lpDialogFunc, 0)
-INT_PTR ThemedDialogBoxParam(HINSTANCE hInstance, LPCTSTR lpTemplate, HWND hWndParent,
-							 DLGPROC lpDialogFunc, LPARAM dwInitParam);
-HWND	CreateThemedDialogParam(HINSTANCE hInstance, LPCTSTR lpTemplate, HWND hWndParent,
-								DLGPROC lpDialogFunc, LPARAM dwInitParam);
+INT_PTR ThemedDialogBoxParam(HINSTANCE hInstance, LPCWSTR lpTemplate, HWND hWndParent, DLGPROC lpDialogFunc, LPARAM dwInitParam);
+HWND	CreateThemedDialogParam(HINSTANCE hInstance, LPCWSTR lpTemplate, HWND hWndParent, DLGPROC lpDialogFunc, LPARAM dwInitParam);
 
 //==== UnSlash Functions ======================================================
 void TransformBackslashes(char *pszInput, BOOL bRegEx, UINT cpEdit);

@@ -3181,7 +3181,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			iWrapCol = iLongLinesLimit;
 		}
 
-		if (ColumnWrapDlg(hwnd, IDD_COLUMNWRAP, &iWrapCol)) {
+		if (ColumnWrapDlg(hwnd, &iWrapCol)) {
 			iWrapCol = clamp_i(iWrapCol, 1, 512);
 			BeginWaitCursor();
 			EditWrapToColumn(hwndEdit, iWrapCol);
@@ -3818,7 +3818,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	case IDM_VIEW_WORDWRAPSETTINGS:
-		if (WordWrapSettingsDlg(hwnd, IDD_WORDWRAP, &iWordWrapIndent)) {
+		if (WordWrapSettingsDlg(hwnd, &iWordWrapIndent)) {
 			SendMessage(hwndEdit, SCI_SETWRAPMODE, (fWordWrap? iWordWrapMode : SC_WRAP_NONE), 0);
 			fWordWrapG = fWordWrap;
 			UpdateToolbar();
@@ -3838,7 +3838,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	case IDM_VIEW_LONGLINESETTINGS:
-		if (LongLineSettingsDlg(hwnd, IDD_LONGLINES, &iLongLinesLimit)) {
+		if (LongLineSettingsDlg(hwnd, &iLongLinesLimit)) {
 			bMarkLongLines = TRUE;
 			SendMessage(hwndEdit, SCI_SETEDGEMODE, (iLongLineMode == EDGE_LINE) ? EDGE_LINE : EDGE_BACKGROUND, 0);
 			Style_SetLongLineColors(hwndEdit);
@@ -3855,7 +3855,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	case IDM_VIEW_TABSETTINGS:
-		if (TabSettingsDlg(hwnd, IDD_TABSETTINGS, NULL)) {
+		if (TabSettingsDlg(hwnd)) {
 			SendMessage(hwndEdit, SCI_SETUSETABS, !bTabsAsSpaces, 0);
 			SendMessage(hwndEdit, SCI_SETTABINDENTS, bTabIndents, 0);
 			SendMessage(hwndEdit, SCI_SETBACKSPACEUNINDENTS, bBackspaceUnindents, 0);

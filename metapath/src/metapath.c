@@ -1743,8 +1743,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	break;
 
 	case IDM_VIEW_FINDTARGET:
-		ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_FINDTARGET),
-							 hwnd, FindTargetDlgProc, 0);
+		ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_FINDTARGET), hwnd, FindTargetDlgProc, 0);
 		break;
 
 	case IDM_VIEW_OPTIONS: {
@@ -1877,8 +1876,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	break;
 
 	case ACC_SELECTTARGET:
-		ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_FINDTARGET),
-							 hwnd, FindTargetDlgProc, 0);
+		ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_FINDTARGET), hwnd, FindTargetDlgProc, 0);
 		break;
 
 	case ACC_FIRETARGET:
@@ -3415,10 +3413,8 @@ void LaunchTarget(LPCWSTR lpFileName, BOOL bOpenNew) {
 	if (!bLoadLaunchSetingsLoaded) {
 		LoadLaunchSetings();
 	}
-	if (iUseTargetApplication == 4 ||
-			(iUseTargetApplication && StrIsEmpty(szTargetApplication))) {
-		ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_FINDTARGET),
-							 hwndMain, FindTargetDlgProc, 0);
+	if (iUseTargetApplication == 4 || (iUseTargetApplication && StrIsEmpty(szTargetApplication))) {
+		ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_FINDTARGET), hwndMain, FindTargetDlgProc, 0);
 		return;
 	}
 

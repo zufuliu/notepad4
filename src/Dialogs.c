@@ -69,7 +69,7 @@ int MsgBox(int iType, UINT uIdMsg, ...) {
 			NULL,
 			dwLastIOError,
 			MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-			(LPTSTR)&lpMsgBuf,
+			(LPWSTR)&lpMsgBuf,
 			0,
 			NULL);
 		StrTrim(lpMsgBuf, L" \a\b\f\n\r\t\v");
@@ -470,8 +470,7 @@ static INT_PTR CALLBACK RunDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 // RunDlg()
 //
 void RunDlg(HWND hwnd, LPCWSTR lpstrDefault) {
-	ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_RUN),
-						 hwnd, RunDlgProc, (LPARAM)lpstrDefault);
+	ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_RUN), hwnd, RunDlgProc, (LPARAM)lpstrDefault);
 }
 
 //=============================================================================
@@ -614,8 +613,7 @@ BOOL OpenWithDlg(HWND hwnd, LPCWSTR lpstrFile) {
 	DLITEM dliOpenWith;
 	dliOpenWith.mask = DLI_FILENAME;
 
-	if (IDOK == ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_OPENWITH),
-									 hwnd, OpenWithDlgProc, (LPARAM)&dliOpenWith)) {
+	if (IDOK == ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_OPENWITH), hwnd, OpenWithDlgProc, (LPARAM)&dliOpenWith)) {
 		WCHAR szParam[MAX_PATH];
 		WCHAR wchDirectory[MAX_PATH] = L"";
 
@@ -789,8 +787,7 @@ BOOL FavoritesDlg(HWND hwnd, LPWSTR lpstrFile) {
 	DLITEM dliFavorite;
 	dliFavorite.mask = DLI_FILENAME;
 
-	if (IDOK == ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_FAVORITES),
-									 hwnd, FavoritesDlgProc, (LPARAM)&dliFavorite)) {
+	if (IDOK == ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_FAVORITES), hwnd, FavoritesDlgProc, (LPARAM)&dliFavorite)) {
 		lstrcpyn(lpstrFile, dliFavorite.szFileName, MAX_PATH);
 		return TRUE;
 	}
@@ -849,8 +846,7 @@ BOOL AddToFavDlg(HWND hwnd, LPCWSTR lpszName, LPCWSTR lpszTarget) {
 	WCHAR pszName[MAX_PATH];
 	lstrcpy(pszName, lpszName);
 
-	const INT_PTR iResult = ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_ADDTOFAV),
-								hwnd, AddToFavDlgProc, (LPARAM)pszName);
+	const INT_PTR iResult = ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_ADDTOFAV), hwnd, AddToFavDlgProc, (LPARAM)pszName);
 
 	if (iResult == IDOK) {
 		if (PathCreateFavLnk(pszName, lpszTarget, tchFavoritesDir)) {
@@ -1237,12 +1233,8 @@ static INT_PTR CALLBACK FileMRUDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 //
 //
 BOOL FileMRUDlg(HWND hwnd, LPWSTR lpstrFile) {
-	if (IDOK == ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_FILEMRU),
-									 hwnd, FileMRUDlgProc, (LPARAM)lpstrFile)) {
-		return TRUE;
-	}
-
-	return FALSE;
+	const INT_PTR iResult = ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_FILEMRU), hwnd, FileMRUDlgProc, (LPARAM)lpstrFile);
+	return iResult == IDOK;
 }
 
 //=============================================================================
@@ -1297,9 +1289,7 @@ static INT_PTR CALLBACK ChangeNotifyDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 // ChangeNotifyDlg()
 //
 BOOL ChangeNotifyDlg(HWND hwnd) {
-	const INT_PTR iResult = ThemedDialogBoxParam(g_hInstance,  MAKEINTRESOURCE(IDD_CHANGENOTIFY),
-								   hwnd, ChangeNotifyDlgProc, 0);
-
+	const INT_PTR iResult = ThemedDialogBoxParam(g_hInstance,  MAKEINTRESOURCE(IDD_CHANGENOTIFY), hwnd, ChangeNotifyDlgProc, 0);
 	return iResult == IDOK;
 }
 
@@ -1354,10 +1344,8 @@ static INT_PTR CALLBACK ColumnWrapDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, L
 //
 // ColumnWrapDlg()
 //
-BOOL ColumnWrapDlg(HWND hwnd, UINT uidDlg, int *iNumber) {
-	const INT_PTR iResult = ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(uidDlg),
-								   hwnd, ColumnWrapDlgProc, (LPARAM)iNumber);
-
+BOOL ColumnWrapDlg(HWND hwnd, int *iNumber) {
+	const INT_PTR iResult = ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_COLUMNWRAP), hwnd, ColumnWrapDlgProc, (LPARAM)iNumber);
 	return iResult == IDOK;
 }
 
@@ -1449,10 +1437,8 @@ static INT_PTR CALLBACK WordWrapSettingsDlgProc(HWND hwnd, UINT umsg, WPARAM wPa
 //
 // WordWrapSettingsDlg()
 //
-BOOL WordWrapSettingsDlg(HWND hwnd, UINT uidDlg, int *iNumber) {
-	const INT_PTR iResult = ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(uidDlg),
-								   hwnd, WordWrapSettingsDlgProc, (LPARAM)iNumber);
-
+BOOL WordWrapSettingsDlg(HWND hwnd, int *iNumber) {
+	const INT_PTR iResult = ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_WORDWRAP), hwnd, WordWrapSettingsDlgProc, (LPARAM)iNumber);
 	return iResult == IDOK;
 }
 
@@ -1518,10 +1504,8 @@ static INT_PTR CALLBACK LongLineSettingsDlgProc(HWND hwnd, UINT umsg, WPARAM wPa
 //
 // LongLineSettingsDlg()
 //
-BOOL LongLineSettingsDlg(HWND hwnd, UINT uidDlg, int *iNumber) {
-	const INT_PTR iResult = ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(uidDlg),
-								   hwnd, LongLineSettingsDlgProc, (LPARAM)iNumber);
-
+BOOL LongLineSettingsDlg(HWND hwnd, int *iNumber) {
+	const INT_PTR iResult = ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_LONGLINES), hwnd, LongLineSettingsDlgProc, (LPARAM)iNumber);
 	return iResult == IDOK;
 }
 
@@ -1606,10 +1590,8 @@ static INT_PTR CALLBACK TabSettingsDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, 
 //
 // TabSettingsDlg()
 //
-BOOL TabSettingsDlg(HWND hwnd, UINT uidDlg, int *iNumber) {
-	const INT_PTR iResult = ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(uidDlg),
-								   hwnd, TabSettingsDlgProc, (LPARAM)iNumber);
-
+BOOL TabSettingsDlg(HWND hwnd) {
+	const INT_PTR iResult = ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_TABSETTINGS), hwnd, TabSettingsDlgProc, 0);
 	return iResult == IDOK;
 }
 
@@ -1696,8 +1678,7 @@ BOOL SelectDefEncodingDlg(HWND hwnd, int *pidREncoding) {
 	dd.bRecodeOnly = FALSE;
 	dd.idEncoding = *pidREncoding;
 
-	const INT_PTR iResult = ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_DEFENCODING),
-								   hwnd, SelectDefEncodingDlgProc, (LPARAM)&dd);
+	const INT_PTR iResult = ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_DEFENCODING), hwnd, SelectDefEncodingDlgProc, (LPARAM)&dd);
 
 	if (iResult == IDOK) {
 		*pidREncoding = dd.idEncoding;
@@ -1821,8 +1802,7 @@ BOOL SelectEncodingDlg(HWND hwnd, int *pidREncoding) {
 	dd.cxDlg = cxEncodingDlg;
 	dd.cyDlg = cyEncodingDlg;
 
-	const INT_PTR iResult = ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_ENCODING),
-								   hwnd, SelectEncodingDlgProc, (LPARAM)&dd);
+	const INT_PTR iResult = ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_ENCODING), hwnd, SelectEncodingDlgProc, (LPARAM)&dd);
 
 	cxEncodingDlg = dd.cxDlg;
 	cyEncodingDlg = dd.cyDlg;
@@ -1849,8 +1829,7 @@ BOOL RecodeDlg(HWND hwnd, int *pidREncoding) {
 	dd.cxDlg = cxRecodeDlg;
 	dd.cyDlg = cyRecodeDlg;
 
-	const INT_PTR iResult = ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_RECODE),
-								   hwnd, SelectEncodingDlgProc, (LPARAM)&dd);
+	const INT_PTR iResult = ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_RECODE), hwnd, SelectEncodingDlgProc, (LPARAM)&dd);
 
 	cxRecodeDlg = dd.cxDlg;
 	cyRecodeDlg = dd.cyDlg;
@@ -1924,9 +1903,7 @@ static INT_PTR CALLBACK SelectDefLineEndingDlgProc(HWND hwnd, UINT umsg, WPARAM 
 // SelectDefLineEndingDlg()
 //
 BOOL SelectDefLineEndingDlg(HWND hwnd, int *iOption) {
-	const INT_PTR iResult = ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_DEFEOLMODE),
-								   hwnd, SelectDefLineEndingDlgProc, (LPARAM)iOption);
-
+	const INT_PTR iResult = ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_DEFEOLMODE), hwnd, SelectDefLineEndingDlgProc, (LPARAM)iOption);
 	return iResult == IDOK;
 }
 
@@ -2001,12 +1978,7 @@ INT_PTR InfoBox(int iType, LPCWSTR lpstrSetting, int uidMessage, ...) {
 	ib.lpstrSetting = (LPWSTR)lpstrSetting;
 	ib.bDisableCheckBox = StrIsEmpty(szIniFile) || StrIsEmpty(lpstrSetting) || iMode == 2;
 
-	int idDlg = IDD_INFOBOX;
-	if (iType == MBYESNO) {
-		idDlg = IDD_INFOBOX2;
-	} else if (iType == MBOKCANCEL) {
-		idDlg = IDD_INFOBOX3;
-	}
+	const int idDlg = (iType == MBYESNO) ? IDD_INFOBOX2 : ((iType == MBOKCANCEL) ? IDD_INFOBOX3 : IDD_INFOBOX);
 
 	HWND hwnd;
 	if ((hwnd = GetActiveWindow()) == NULL) {
@@ -2015,8 +1987,7 @@ INT_PTR InfoBox(int iType, LPCWSTR lpstrSetting, int uidMessage, ...) {
 
 	MessageBeep(MB_ICONEXCLAMATION);
 
-	return ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(idDlg),
-								hwnd, InfoBoxDlgProc, (LPARAM)&ib);
+	return ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(idDlg), hwnd, InfoBoxDlgProc, (LPARAM)&ib);
 }
 
 // End of Dialogs.c
