@@ -1978,7 +1978,7 @@ INT_PTR InfoBox(int iType, LPCWSTR lpstrSetting, int uidMessage, ...) {
 	ib.lpstrSetting = (LPWSTR)lpstrSetting;
 	ib.bDisableCheckBox = StrIsEmpty(szIniFile) || StrIsEmpty(lpstrSetting) || iMode == 2;
 
-	const int idDlg = (iType == MBYESNO) ? IDD_INFOBOX2 : ((iType == MBOKCANCEL) ? IDD_INFOBOX3 : IDD_INFOBOX);
+	const WORD idDlg = (iType == MBYESNO) ? IDD_INFOBOX2 : ((iType == MBOKCANCEL) ? IDD_INFOBOX3 : IDD_INFOBOX);
 
 	HWND hwnd;
 	if ((hwnd = GetActiveWindow()) == NULL) {

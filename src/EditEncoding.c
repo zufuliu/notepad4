@@ -424,7 +424,7 @@ void Encoding_AddToListView(HWND hwnd, int idSel, BOOL bRecodeOnly) {
 				StrCatBuff(wchBuf, wchOEM, COUNTOF(wchBuf));
 			}
 
-			lvi.iImage = IsValidEncoding(id);
+			lvi.iImage = IsValidEncoding(id) ? 0 : 1;
 			lvi.lParam = (LPARAM)id;
 			ListView_InsertItem(hwnd, &lvi);
 
@@ -503,7 +503,7 @@ void Encoding_AddToComboboxEx(HWND hwnd, int idSel, BOOL bRecodeOnly) {
 				StrCatBuff(wchBuf, wchOEM, COUNTOF(wchBuf));
 			}
 
-			cbei.iImage = IsValidEncoding(id);
+			cbei.iImage = IsValidEncoding(id) ? 0 : 1;
 			cbei.lParam = (LPARAM)id;
 			SendMessage(hwnd, CBEM_INSERTITEM, 0, (LPARAM)&cbei);
 
