@@ -184,6 +184,7 @@ static int iEscFunction;
 static BOOL bAlwaysOnTop;
 static BOOL bMinimizeToTray;
 static BOOL bTransparentMode;
+BOOL	bFindReplaceTransparentMode;
 static BOOL bEditLayoutRTL;
 BOOL	bWindowLayoutRTL;
 int		iRenderingTechnology;
@@ -5469,6 +5470,7 @@ void LoadSettings(void) {
 	bAlwaysOnTop = IniSectionGetBool(pIniSection, L"AlwaysOnTop", 0);
 	bMinimizeToTray = IniSectionGetBool(pIniSection, L"MinimizeToTray", 0);
 	bTransparentMode = IniSectionGetBool(pIniSection, L"TransparentMode", 0);
+	bFindReplaceTransparentMode = IniSectionGetBool(pIniSection, L"FindReplaceTransparentMode", 1);
 	bEditLayoutRTL = IniSectionGetBool(pIniSection, L"EditLayoutRTL", 0);
 	bWindowLayoutRTL = IniSectionGetBool(pIniSection, L"WindowLayoutRTL", 0);
 
@@ -5725,6 +5727,7 @@ void SaveSettings(BOOL bSaveSettingsNow) {
 	IniSectionSetBoolEx(pIniSection, L"AlwaysOnTop", bAlwaysOnTop, 0);
 	IniSectionSetBoolEx(pIniSection, L"MinimizeToTray", bMinimizeToTray, 0);
 	IniSectionSetBoolEx(pIniSection, L"TransparentMode", bTransparentMode, 0);
+	IniSectionSetBoolEx(pIniSection, L"FindReplaceTransparentMode", bFindReplaceTransparentMode, 1);
 	IniSectionSetBoolEx(pIniSection, L"EditLayoutRTL", bEditLayoutRTL, 0);
 	IniSectionSetBoolEx(pIniSection, L"WindowLayoutRTL", bWindowLayoutRTL, 0);
 	IniSectionSetIntEx(pIniSection, L"RenderingTechnology", iRenderingTechnology, (IsVistaAndAbove()? SC_TECHNOLOGY_DIRECTWRITE : SC_TECHNOLOGY_DEFAULT));

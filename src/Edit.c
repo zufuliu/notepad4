@@ -4089,6 +4089,7 @@ void EditSelectLine(HWND hwnd) {
 	SendMessage(hwnd, SCI_CHOOSECARETX, 0, 0);
 }
 
+extern BOOL bFindReplaceTransparentMode;
 extern int iFindReplaceOpacityLevel;
 //=============================================================================
 //
@@ -4235,6 +4236,10 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 			CopyMemory(lpefr, &efrSave, sizeof(EDITFINDREPLACE));
 		}
 
+		if (bFindReplaceTransparentMode) {
+			CheckDlgButton(hwnd, IDC_TRANSPARENT, BST_CHECKED);
+		}
+
 		HMENU hmenu = GetSystemMenu(hwnd, FALSE);
 		GetString(SC_SAVEPOS, tch, COUNTOF(tch));
 		InsertMenu(hmenu, 0, MF_BYPOSITION | MF_STRING | MF_ENABLED, SC_SAVEPOS, tch);
@@ -4290,6 +4295,10 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 			//	CheckDlgButton(hwnd, IDC_FINDREGEXP, BST_UNCHECKED);
 			break;
 #endif
+
+		case IDC_TRANSPARENT:
+			bFindReplaceTransparentMode = IsButtonChecked(hwnd, IDC_TRANSPARENT);
+			break;
 
 		case IDOK:
 		case IDC_FINDPREV:
@@ -4562,7 +4571,7 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 	break;
 
 	case WM_ACTIVATE :
-		SetWindowTransparentMode(hwnd, LOWORD(wParam) == WA_INACTIVE, iFindReplaceOpacityLevel);
+		SetWindowTransparentMode(hwnd, (LOWORD(wParam) == WA_INACTIVE && bFindReplaceTransparentMode), iFindReplaceOpacityLevel);
 		break;
 	}
 
