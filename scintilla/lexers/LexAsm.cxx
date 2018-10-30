@@ -26,16 +26,15 @@ static inline bool IsAsmWordStart(int ch) noexcept {
 	return (ch < 0x80) && (isalnum(ch) || ch == '_' || ch == '.' ||
 		ch == '%' || ch == '@' || ch == '$' || ch == '?' || ch == '#');
 }
-static inline bool IsAsmOperator(int ch) noexcept {
-	return (ch < 0x80) && (isoperator(ch) && !(ch == '%' || ch == '$' || ch == '#'));
+static constexpr bool IsAsmOperator(int ch) noexcept {
+	return isoperator(ch) && !(ch == '%' || ch == '$' || ch == '#');
 }
-static inline bool IsAsmNumber(int ch, int chPrev) noexcept {
-	return (ch < 0x80) && (isxdigit(ch) //|| (isdigit(ch) && chPrev == '.')
+static constexpr bool IsAsmNumber(int ch, int chPrev) noexcept {
+	return IsHexDigit(ch)
 		|| ((ch == 'x' || ch == 'X') && chPrev == '0')
-		|| ((ch == 'H' || ch == 'h') && ch < 0x80 && isxdigit(chPrev))
+		|| ((ch == 'H' || ch == 'h') && IsHexDigit(chPrev))
 		|| ((ch == '+' || ch == '-') && (chPrev == 'E' || chPrev == 'e'))
-		|| ((ch == 'Q' || ch == 'q') && (chPrev >= '0' && chPrev <= '7'))
-		);
+		|| ((ch == 'Q' || ch == 'q') && (chPrev >= '0' && chPrev <= '7'));
 }
 
 /*static const char * const asmWordListDesc[] = {
@@ -132,13 +131,13 @@ _label_identifier:
 				} else if ((s[0] == '#' || s[0] == '%') && kwProprocessor.InList(s + 1)) {
 					sc.ChangeState(SCE_ASM_PREPROCESSOR);
 					IsDirective = true;
-				} else if (s[0] == '.' && isdigit(static_cast<unsigned char>(s[1]))) {
+				} else if (s[0] == '.' && IsADigit(s[1])) {
 					sc.ChangeState(SCE_ASM_NUMBER);
 				} else if (sc.ch == ':') {
 					Sci_Position pos = sc.currentPos + 1;
 					while (IsASpaceOrTab(styler.SafeGetCharAt(pos)))
 						pos++;
-					if (isspace(static_cast<unsigned char>(styler.SafeGetCharAt(pos)))) {
+					if (isspacechar(styler.SafeGetCharAt(pos))) {
 						sc.Forward();
 						sc.ChangeState(SCE_ASM_LABEL);
 					}
@@ -249,9 +248,9 @@ _label_identifier:
 				sc.Forward();
 			} else if (sc.ch == '@') {
 				if (sc.chNext >= '0' && sc.chNext <= '7'
-					&& (IsAsmOperator(sc.chPrev) || isspace(sc.chPrev))) {	// Freescale Octal
+					&& (IsAsmOperator(sc.chPrev) || isspacechar(sc.chPrev))) {	// Freescale Octal
 					sc.SetState(SCE_ASM_NUMBER);
-				} else if (isspace(sc.chNext)) {
+				} else if (isspacechar(sc.chNext)) {
 					sc.SetState(SCE_ASM_COMMENTLINE);
 				} else {
 					sc.SetState(SCE_ASM_IDENTIFIER);
@@ -261,7 +260,7 @@ _label_identifier:
 					sc.SetState(SCE_ASM_OPERATOR);
 					if (sc.chNext == '#')
 						sc.Forward();
-				} else if (isdigit(sc.chNext) || (sc.chNext == '$' && isxdigit(sc.GetRelative(2)))) {
+				} else if (IsADigit(sc.chNext) || (sc.chNext == '$' && IsHexDigit(sc.GetRelative(2)))) {
 					sc.SetState(SCE_ASM_NUMBER);
 				} else if (IsAsmWordStart(sc.chNext)) {
 					sc.SetState(SCE_ASM_IDENTIFIER);
@@ -286,12 +285,12 @@ _label_identifier:
 					} else
 						sc.SetState(SCE_ASM_COMMENTLINE);
 				}
-			} else if (isdigit(sc.ch)
+			} else if (IsADigit(sc.ch)
 				|| (sc.ch == '%' && (sc.chNext == '0' || sc.chNext == '1')) // Freescale Binary
-				|| (sc.ch == '$' && isxdigit(sc.chNext)) // Freescale Hexadecimal
+				|| (sc.ch == '$' && IsHexDigit(sc.chNext)) // Freescale Hexadecimal
 				) {
 				sc.SetState(SCE_ASM_NUMBER);
-			} else if (sc.chNext == '\'' && isxdigit(sc.GetRelative(2)) && (sc.ch == 'B' || sc.ch == 'b'
+			} else if (sc.chNext == '\'' && IsHexDigit(sc.GetRelative(2)) && (sc.ch == 'B' || sc.ch == 'b'
 				|| sc.ch == 'Q' || sc.ch == 'q' || sc.ch == 'D' || sc.ch == 'd'
 				|| sc.ch == 'H' || sc.ch == 'h')) { // ARM
 				sc.SetState(SCE_ASM_NUMBER);
@@ -304,7 +303,7 @@ _label_identifier:
 				sc.SetState(SCE_ASM_CHARACTER);
 			} else if (sc.ch == '\\') {
 				sc.Forward();
-			} else if (IsAsmOperator(static_cast<char>(sc.ch))) {
+			} else if (IsAsmOperator(sc.ch)) {
 				sc.SetState(SCE_ASM_OPERATOR);
 			}
 		}
@@ -438,7 +437,7 @@ static void FoldAsmDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 		}
 		if (foldSyntaxBased && (style == SCE_ASM_DIRECTIVE)) {
 			if (wordlen < MAX_ASM_WORD_LEN) {
-				word[wordlen++] = static_cast<char>(tolower(ch));
+				word[wordlen++] = MakeLowerCase(ch);
 			}
 			if (styleNext != SCE_ASM_DIRECTIVE) {   // reading directive ready
 				word[wordlen] = '\0';

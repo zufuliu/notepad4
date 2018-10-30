@@ -71,23 +71,20 @@ static bool IsNestedCommentStart(int lexType, StyleContext &sc, int visibleChars
 	return IsNestedCommentStart(lexType, sc.ch, sc.chNext, visibleChars, sc.styler, sc.currentPos);
 }
 
-static bool IsMatOperator(int ch) noexcept {
+static constexpr bool IsMatOperator(int ch) noexcept {
 	return isoperator(ch) || ch == '@' || ch == '\\' || ch == '$';
 }
 
 // format: [.] digit [.] [e | E] [+ | -] [i | j]
-static bool IsMatNumber(int ch, int chPrev) noexcept {
-	return (ch < 0x80) && (isdigit(ch) || (ch == '.' && chPrev != '.') // only one dot
+static constexpr bool IsMatNumber(int ch, int chPrev) noexcept {
+	return IsADigit(ch) || (ch == '.' && chPrev != '.') // only one dot
 		|| ((ch == '+' || ch == '-') && (chPrev == 'e' || chPrev == 'E')) // exponent
-		|| ((chPrev < 0x80) && isdigit(chPrev) && (ch == 'e' || ch == 'E'
-			|| ch == 'i' || ch == 'j' || ch == 'I' || ch == 'J')));// complex, 'I','J' in Octave
-}
-static bool IsHexNum(int ch) noexcept {
-	return (ch < 0x80) && isxdigit(ch);
+		|| (IsADigit(chPrev) && (ch == 'e' || ch == 'E'
+			|| ch == 'i' || ch == 'j' || ch == 'I' || ch == 'J'));// complex, 'I','J' in Octave
 }
 
-static bool IsInvalidFileName(int ch) noexcept {
-	return isspace(ch) || ch == '<' || ch == '>' || ch == '/' || ch == '\\' || ch == '\'' || ch == '\"'
+static constexpr bool IsInvalidFileName(int ch) noexcept {
+	return isspacechar(ch) || ch == '<' || ch == '>' || ch == '/' || ch == '\\' || ch == '\'' || ch == '\"'
 		|| ch == '|' || ch == '*' || ch == '?';
 }
 
@@ -143,7 +140,7 @@ static void ColouriseMatlabDoc(Sci_PositionU startPos, Sci_Position length, int 
 			}
 			break;
 		case SCE_MAT_HEXNUM:
-			if (!IsHexNum(sc.ch)) {
+			if (!IsHexDigit(sc.ch)) {
 				sc.SetState(SCE_MAT_DEFAULT);
 				isTransposeOperator = true;
 			}
@@ -325,7 +322,7 @@ _label_identifier:
 				sc.Forward();
 			} else if (iswordstart(sc.ch)) {
 				sc.SetState(SCE_MAT_IDENTIFIER);
-			} else if (IsMatOperator(static_cast<char>(sc.ch))) {
+			} else if (IsMatOperator(sc.ch)) {
 				sc.SetState(SCE_MAT_OPERATOR);
 				if (sc.ch == ')' || sc.ch == ']' || sc.ch == '}') {
 					isTransposeOperator = true;

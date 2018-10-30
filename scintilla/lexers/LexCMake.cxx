@@ -26,7 +26,7 @@ using namespace Scintilla;
 	0
 }*/
 
-static constexpr bool IsCmakeOperator(char ch) noexcept {
+static constexpr bool IsCmakeOperator(int ch) noexcept {
 	return ch == '(' || ch == ')' || ch == '=' || ch == ':' || ch == ';';
 }
 
@@ -129,7 +129,7 @@ _label_var_string:
 				nvarLevel = 1;
 				sc.SetState(SCE_CMAKE_VARIABLE);
 				sc.Forward();
-			} else if (IsCmakeOperator(static_cast<char>(sc.ch))) {
+			} else if (IsCmakeOperator(sc.ch)) {
 				sc.SetState(SCE_CMAKE_OPERATOR);
 				if (userDefType && sc.ch == ')')
 					userDefType = 0;

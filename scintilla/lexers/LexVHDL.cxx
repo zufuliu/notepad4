@@ -120,7 +120,7 @@ _label_identifier:
 				sc.SetState(SCE_VHDL_BLOCK_COMMENT);
 			} else if (sc.ch == '\"') {
 				sc.SetState(SCE_VHDL_STRING);
-			} else if (isoperator(static_cast<char>(sc.ch))) {
+			} else if (isoperator(sc.ch)) {
 				sc.SetState(SCE_VHDL_OPERATOR);
 			}
 		}
@@ -192,7 +192,7 @@ static void FoldVHDLDoc(Sci_PositionU startPos, Sci_Position length, int /*initS
 				char s[32];
 				unsigned int k;
 				for (k = 0; (k < 31) && (k < end - j + 1); k++) {
-					s[k] = static_cast<char>(tolower(styler[j + k]));
+					s[k] = MakeLowerCase(styler[j + k]);
 				}
 				s[k] = '\0';
 
@@ -268,7 +268,7 @@ static void FoldVHDLDoc(Sci_PositionU startPos, Sci_Position length, int /*initS
 				char s[32];
 				unsigned int k;
 				for (k = 0; (k < 31) && (k < i - lastStart + 1); k++) {
-					s[k] = static_cast<char>(tolower(styler[lastStart + k]));
+					s[k] = MakeLowerCase(styler[lastStart + k]);
 				}
 				s[k] = '\0';
 

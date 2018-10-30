@@ -287,7 +287,7 @@ _label_identifier:
 		if (sc.state == SCE_LUA_DEFAULT) {
 			if (IsADigit(sc.ch) || (sc.ch == '.' && IsADigit(sc.chNext))) {
 				sc.SetState(SCE_LUA_NUMBER);
-				if (sc.ch == '0' && toupper(sc.chNext) == 'X') {
+				if (sc.ch == '0' && (sc.chNext == 'x' || sc.chNext == 'X')) {
 					sc.Forward();
 				}
 			} else if (setWordStart.Contains(sc.ch)) {

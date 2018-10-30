@@ -17,7 +17,7 @@
 
 using namespace Scintilla;
 
-static inline bool IsVimOp(int ch) noexcept {
+static constexpr bool IsVimOp(int ch) noexcept {
 	//return ch == '{' || ch == '}' || ch == '[' || ch == ']' || ch == ':' || ch == ',' || ch == '+' || ch == '-';
 	return isoperator(ch);
 }

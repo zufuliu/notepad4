@@ -75,7 +75,7 @@ static void ColourisePowerShellDoc(Sci_PositionU startPos, Sci_Position length, 
 			}
 			break;
 		case SCE_POWERSHELL_OPERATOR:
-			if (!isoperator(static_cast<char>(sc.ch))) {
+			if (!isoperator(sc.ch)) {
 				sc.SetState(SCE_POWERSHELL_DEFAULT);
 			}
 			break;
@@ -115,7 +115,7 @@ _label_identifier:
 				sc.SetState(SCE_POWERSHELL_VARIABLE);
 			} else if (IsADigit(sc.ch) || (sc.ch == '.' && IsADigit(sc.chNext))) {
 				sc.SetState(SCE_POWERSHELL_NUMBER);
-			} else if (isoperator(static_cast<char>(sc.ch))) {
+			} else if (isoperator(sc.ch)) {
 				sc.SetState(SCE_POWERSHELL_OPERATOR);
 			} else if (IsPSWordChar(sc.ch)) {
 				sc.SetState(SCE_POWERSHELL_IDENTIFIER);

@@ -204,7 +204,7 @@ static void ColourisePascalDoc(Sci_PositionU startPos, Sci_Position length, int 
 				if (sc.MatchIgnoreCase("0x")) {
 					sc.SetState(SCE_PAS_HEXNUMBER);
 					sc.Forward(2);
-					while (isxdigit(sc.ch))
+					while (IsHexDigit(sc.ch))
 						sc.Forward();
 				}
 			} else if (setWordStart.Contains(sc.ch)) {

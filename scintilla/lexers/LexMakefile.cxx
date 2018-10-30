@@ -204,7 +204,7 @@ static void ColouriseMakeDoc(Sci_PositionU startPos, Sci_Position length, int in
 			} else if (IsMakeOp(ch, chNext) || (visibleChars == 0 && ch == '-')) {
 				styler.ColourTo(i - 1, state);
 				state = SCE_MAKE_OPERATOR;
-			} else if (isgraph(ch)) {
+			} else if (IsASCII(ch) && isgraph(ch)) {
 				styler.ColourTo(i - 1, state);
 				buf[wordLen++] = static_cast<char>(ch);
 				state = (visibleChars == 0) ? SCE_MAKE_TARGET : SCE_MAKE_IDENTIFIER;

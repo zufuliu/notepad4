@@ -23,11 +23,11 @@
 
 using namespace Scintilla;
 
-static bool IsVWordChar(const int ch) noexcept {
+static inline bool IsVWordChar(int ch) noexcept {
 	return (ch < 0x80) && (isalnum(ch) || ch == '.' || ch == '_' || ch == '\''|| ch == '$');
 }
 
-static bool IsVWordStart(const int ch) noexcept {
+static inline bool IsVWordStart(int ch) noexcept {
 	return (ch < 0x80) && (isalnum(ch) || ch == '_' || ch == '$');
 }
 
@@ -141,7 +141,7 @@ _label_identifier:
 				if (sc.atLineEnd) {
 					sc.SetState(SCE_V_DEFAULT);
 				}
-			} else if (isoperator(static_cast<char>(sc.ch)) || sc.ch == '@' || sc.ch == '#') {
+			} else if (isoperator(sc.ch) || sc.ch == '@' || sc.ch == '#') {
 				sc.SetState(SCE_V_OPERATOR);
 			}
 		}

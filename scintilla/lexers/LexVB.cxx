@@ -27,7 +27,7 @@
 using namespace Scintilla;
 
 // Internal state, highlighted as number
-#define SCE_B_FILENUMBER SCE_B_DEFAULT+100
+#define SCE_B_FILENUMBER	(SCE_B_DEFAULT + 100)
 
 #define LexCharAt(pos)	styler.SafeGetCharAt(pos)
 
@@ -35,15 +35,15 @@ static constexpr bool IsTypeCharacter(int ch) noexcept {
 	return ch == '%' || ch == '&' || ch == '@' || ch == '!' || ch == '#' || ch == '$';
 }
 
-static bool IsVBNumber(int ch, int chPrev) noexcept {
-	return (ch < 0x80) && (isxdigit(ch)
+static constexpr bool IsVBNumber(int ch, int chPrev) noexcept {
+	return IsHexDigit(ch)
 		|| (ch == '.' && chPrev != '.')
 		|| ((ch == '+' || ch == '_') && (chPrev == 'E' || chPrev == 'e'))
 		|| ((ch == 'S' || ch == 'I' || ch == 'L' || ch == 's' || ch == 'i' || ch == 'l')
-			&& (chPrev < 0x80) && (isdigit(chPrev) || chPrev == 'U' || chPrev == 'u'))
+			&& (IsADigit(chPrev) || chPrev == 'U' || chPrev == 'u'))
 		|| ((ch == 'R' || ch == 'r' || ch == '%' || ch == '@' || ch == '!' || ch == '#')
-			&& (chPrev < 0x80) && isdigit(chPrev))
-		|| (ch == '&' && (chPrev < 0x80) && isxdigit(chPrev)));
+			&& IsADigit(chPrev))
+		|| (ch == '&' && IsHexDigit(chPrev));
 }
 
 /*static const char * const vbWordListDesc[] = {
@@ -145,7 +145,7 @@ _label_identifier:
 				if (sc.chNext == '\"') {
 					sc.Forward();
 				} else {
-					if (tolower(sc.chNext) == 'c' || sc.chNext == '$') {
+					if (sc.chNext == 'c' || sc.chNext == 'C' || sc.chNext == '$') {
 						sc.Forward();
 					}
 					sc.ForwardSetState(SCE_B_DEFAULT);
@@ -194,7 +194,7 @@ _label_identifier:
 			} else if (sc.ch == '\"') {
 				sc.SetState(SCE_B_STRING);
 			} else if (sc.ch == '#') {
-				const char chNUp = static_cast<char>(MakeUpperCase(sc.chNext));
+				const int chNUp = MakeUpperCase(sc.chNext);
 				if (chNUp == 'E' || chNUp == 'I' || chNUp == 'R' || chNUp == 'C')
 					sc.SetState(SCE_B_IDENTIFIER);
 				else
@@ -207,11 +207,11 @@ _label_identifier:
 				sc.Forward();
 			} else if (IsADigit(sc.ch) || (sc.ch == '.' && IsADigit(sc.chNext))) {
 				sc.SetState(SCE_B_NUMBER);
-			} else if (sc.ch == '_' && isspace(sc.chNext)) {
+			} else if (sc.ch == '_' && isspacechar(sc.chNext)) {
 				sc.SetState(SCE_B_OPERATOR);
 			} else if (iswordstart(sc.ch) || sc.ch == '[') { // bracketed [keyword] identifier
 				sc.SetState(SCE_B_IDENTIFIER);
-			} else if (isoperator(static_cast<char>(sc.ch)) || (sc.ch == '\\')) { // Integer division
+			} else if (isoperator(sc.ch) || (sc.ch == '\\')) { // Integer division
 				sc.SetState(SCE_B_OPERATOR);
 			}
 		}
@@ -359,12 +359,12 @@ static void FoldVBDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 					numBegin++;
 			} else if (VBMatch("end")) {
 				levelNext--;
-				char chEnd = LexCharAt(i + 3);
+				int chEnd = static_cast<unsigned char>(LexCharAt(i + 3));
 				if (chEnd == ' ' || chEnd == '\t') {
 					const Sci_Position pos = LexSkipSpaceTab(i + 3, endPos, styler);
-					chEnd = LexCharAt(pos);
+					chEnd = static_cast<unsigned char>(LexCharAt(pos));
 					// check if End is used to terminate statement
-					if (isalpha(static_cast<unsigned char>(chEnd)) && (VBMatchNext(pos, "function") || VBMatchNext(pos, "sub")
+					if (isalpha(chEnd) && (VBMatchNext(pos, "function") || VBMatchNext(pos, "sub")
 						|| VBMatchNext(pos, "if") || VBMatchNext(pos, "class") || VBMatchNext(pos, "structure")
 						|| VBMatchNext(pos, "module") || VBMatchNext(pos, "enum") || VBMatchNext(pos, "interface")
 						|| VBMatchNext(pos, "operator") || VBMatchNext(pos, "property") || VBMatchNext(pos, "event")

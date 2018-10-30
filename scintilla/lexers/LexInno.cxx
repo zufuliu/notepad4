@@ -113,7 +113,7 @@ static void ColouriseInnoDoc(Sci_PositionU startPos, Sci_Position length, int, L
 			} else if (IsAlpha(ch) || ch == '_') {
 				// Start of an identifier
 				bufferCount = 0;
-				buffer[bufferCount++] = static_cast<char>(tolower(ch));
+				buffer[bufferCount++] = MakeLowerCase(ch);
 				state = SCE_INNO_IDENTIFIER;
 			} else {
 				// Style it the default style
@@ -130,7 +130,7 @@ static void ColouriseInnoDoc(Sci_PositionU startPos, Sci_Position length, int, L
 
 		case SCE_INNO_IDENTIFIER:
 			if (IsAlphaNumeric(ch) || ch == '_') {
-				buffer[bufferCount++] = static_cast<char>(tolower(ch));
+				buffer[bufferCount++] = MakeLowerCase(ch);
 			} else {
 				state = SCE_INNO_DEFAULT;
 				buffer[bufferCount] = '\0';
@@ -167,7 +167,7 @@ static void ColouriseInnoDoc(Sci_PositionU startPos, Sci_Position length, int, L
 					styler.ColourTo(i, SCE_INNO_DEFAULT);
 				}
 			} else if (IsAlphaNumeric(ch) || ch == '_') {
-				buffer[bufferCount++] = static_cast<char>(tolower(ch));
+				buffer[bufferCount++] = MakeLowerCase(ch);
 			} else {
 				state = SCE_INNO_DEFAULT;
 				styler.ColourTo(i, SCE_INNO_DEFAULT);
@@ -194,7 +194,7 @@ static void ColouriseInnoDoc(Sci_PositionU startPos, Sci_Position length, int, L
 			} else if (IsAlpha(ch)) {
 				if (chPrev == '#' || chPrev == ' ' || chPrev == '\t')
 					bufferCount = 0;
-				buffer[bufferCount++] = static_cast<char>(tolower(ch));
+				buffer[bufferCount++] = MakeLowerCase(ch);
 			}
 			break;
 

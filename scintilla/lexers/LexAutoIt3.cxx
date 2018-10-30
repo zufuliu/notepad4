@@ -35,16 +35,10 @@ static inline bool IsAu3WordStart(int ch) noexcept {
 	return (ch < 0x80) && (isalnum(ch) || ch == '_' || ch == '@' || ch == '#' || ch == '$' || ch == '.');
 }
 
-static inline bool IsAu3Operator(int ch) noexcept {
-	if (IsASCII(ch) && isalnum(ch)) {
-		return false;
-	}
-	if (ch == '+' || ch == '-' || ch == '*' || ch == '/' ||
+static constexpr bool IsAu3Operator(int ch) noexcept {
+	return ch == '+' || ch == '-' || ch == '*' || ch == '/' ||
 		ch == '&' || ch == '^' || ch == '=' || ch == '<' || ch == '>' ||
-		ch == '(' || ch == ')' || ch == '[' || ch == ']' || ch == ',') {
-		return true;
-	}
-	return false;
+		ch == '(' || ch == ')' || ch == '[' || ch == ']' || ch == ',';
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -84,7 +78,7 @@ static int GetSendKey(const char *szLine, char *szKey) noexcept {
 				// Save second portion into var...
 				szSpecial[nSpecPos++] = cTemp;
 				// check if Second portion is all numbers for repeat fuction
-				if (!isdigit(static_cast<unsigned char>(cTemp))) {
+				if (!IsADigit(cTemp)) {
 					nSpecNum = 0;
 				}
 			}
@@ -185,7 +179,7 @@ static void ColouriseAU3Doc(Sci_PositionU startPos, Sci_Position length, int ini
 			strcpy(s_save, s);
 			size_t tp = strlen(s_save);
 			if (tp < 127) {
-				s_save[tp] = static_cast<char>(tolower(sc.ch));
+				s_save[tp] = static_cast<char>(MakeLowerCase(sc.ch));
 				s_save[tp + 1] = '\0';
 			}
 		}
@@ -217,7 +211,7 @@ static void ColouriseAU3Doc(Sci_PositionU startPos, Sci_Position length, int ini
 			}
 			// check when first character is detected on the line
 			if (ci == 0) {
-				if (IsAu3WordStart(static_cast<char>(sc.ch)) || IsAu3Operator(static_cast<char>(sc.ch))) {
+				if (IsAu3WordStart(sc.ch) || IsAu3Operator(sc.ch)) {
 					ci = 1;
 					sc.SetState(SCE_AU3_COMMENTBLOCK);
 				}
@@ -285,7 +279,7 @@ static void ColouriseAU3Doc(Sci_PositionU startPos, Sci_Position length, int ini
 					} else if (keywords6.InList(s)) {
 						sc.ChangeState(SCE_AU3_SPECIAL);
 						sc.SetState(SCE_AU3_SPECIAL);
-					} else if ((keywords7.InList(s)) && (!IsAu3Operator(static_cast<char>(sc.ch)))) {
+					} else if ((keywords7.InList(s)) && (!IsAu3Operator(sc.ch))) {
 						sc.ChangeState(SCE_AU3_EXPAND);
 						sc.SetState(SCE_AU3_DEFAULT);
 					} else if (keywords8.InList(s)) {
@@ -480,7 +474,7 @@ static void ColouriseAU3Doc(Sci_PositionU startPos, Sci_Position length, int ini
 				ni = 0;
 			} else if (IsAu3WordStart(sc.ch)) {
 				sc.SetState(SCE_AU3_KEYWORD);
-			} else if (IsAu3Operator(static_cast<char>(sc.ch))) {
+			} else if (IsAu3Operator(sc.ch)) {
 				sc.SetState(SCE_AU3_OPERATOR);
 			} else if (sc.atLineEnd) {
 				sc.SetState(SCE_AU3_DEFAULT);
@@ -620,12 +614,12 @@ static void FoldAU3Doc(Sci_PositionU startPos, Sci_Position length, int, LexerWo
 	int levelNext = levelCurrent;
 	//
 	int	visibleChars = 0;
-	char chNext = styler.SafeGetCharAt(startPos);
-	char chPrev = ' ';
+	int chNext = static_cast<unsigned char>(styler.SafeGetCharAt(startPos));
+	int chPrev = ' ';
 	//
 	for (Sci_Position i = startPos; i < endPos; i++) {
-		const char ch = chNext;
-		chNext = styler.SafeGetCharAt(i + 1);
+		const int ch = chNext;
+		chNext = static_cast<unsigned char>(styler.SafeGetCharAt(i + 1));
 		if (IsAu3WordChar(ch)) {
 			visibleChars++;
 		}
@@ -638,7 +632,7 @@ static void FoldAU3Doc(Sci_PositionU startPos, Sci_Position length, int, LexerWo
 				szKeyword[szKeywordlen] = '\0';
 			} else {
 				if (szKeywordlen < 10) {
-					szKeyword[szKeywordlen++] = static_cast<char>(tolower(ch));
+					szKeyword[szKeywordlen++] = static_cast<char>(MakeLowerCase(ch));
 				}
 			}
 		}
@@ -646,7 +640,7 @@ static void FoldAU3Doc(Sci_PositionU startPos, Sci_Position length, int, LexerWo
 		if (!(FirstWordStart)) {
 			if (IsAu3WordChar(ch) || IsAu3WordStart(ch) || ch == ';') {
 				FirstWordStart = true;
-				szKeyword[szKeywordlen++] = static_cast<char>(tolower(ch));
+				szKeyword[szKeywordlen++] = static_cast<char>(MakeLowerCase(ch));
 			}
 		}
 		// only process this logic when not in comment section
@@ -662,12 +656,12 @@ static void FoldAU3Doc(Sci_PositionU startPos, Sci_Position length, int, LexerWo
 					szThen[0] = szThen[1];
 					szThen[1] = szThen[2];
 					szThen[2] = szThen[3];
-					szThen[3] = static_cast<char>(tolower(ch));
+					szThen[3] = static_cast<char>(MakeLowerCase(ch));
 					if (strcmp(szThen, "then") == 0) {
 						ThenFoundLast = true;
 					}
 				} else {
-					szThen[szThenlen++] = static_cast<char>(tolower(ch));
+					szThen[szThenlen++] = static_cast<char>(MakeLowerCase(ch));
 					if (szThenlen == 5) {
 						szThen[4] = '\0';
 					}

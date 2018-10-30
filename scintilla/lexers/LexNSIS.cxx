@@ -206,7 +206,7 @@ static void ColouriseNSISDoc(Sci_PositionU startPos, Sci_Position length, int in
 }
 
 #define IsCommentLine(line)			IsLexCommentLine(line, styler, SCE_C_COMMENTLINE)
-#define IsStreamCommantStyle(style)	(style == SCE_C_COMMENT)
+#define IsStreamCommantStyle(style)	((style) == SCE_C_COMMENT)
 static constexpr bool IsNsisFoldWordStart(int ch) noexcept {
 	return (ch == 'S' || ch == 'F' || ch == 'P')
 		|| (ch == 's' || ch == 'f' || ch == 'p');
@@ -259,9 +259,9 @@ static void FoldNSISDoc(Sci_PositionU startPos, Sci_Position length, int initSty
 		if (IsNsisFoldWordStart(ch) && style == SCE_C_WORD && stylePrev != SCE_C_WORD) {
 			char buf[MAX_WORD_LENGTH + 1];
 			LexGetRangeLowered(i, styler, iswordchar, buf, sizeof(buf));
-			if (!(strcmp(buf, "section") && strcmp(buf, "function") && strcmp(buf, "sectiongroup") && strcmp(buf, "pageex")))
+			if (strcmp(buf, "section") == 0 || strcmp(buf, "function") == 0 || strcmp(buf, "sectiongroup") == 0 || strcmp(buf, "pageex") == 0)
 				levelNext++;
-			else if (!(strcmp(buf, "sectionend") && strcmp(buf, "functionend") && strcmp(buf, "sectiongroupend") && strcmp(buf, "pageexend")))
+			else if (strcmp(buf, "sectionend") == 0 || strcmp(buf, "functionend") == 0 || strcmp(buf, "sectiongroupend") == 0 || strcmp(buf, "pageexend") == 0)
 				levelNext--;
 		}
 		if (ch == '!' && IsNsisFoldPPStart(chNext) && style == SCE_C_PREPROCESSOR) {

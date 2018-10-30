@@ -4584,7 +4584,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			DWORD cchSelection = (int)SendMessage(hwndEdit, SCI_GETSELECTIONEND, 0, 0)
 								 - (int)SendMessage(hwndEdit, SCI_GETSELECTIONSTART, 0, 0);
 
-			if (cchSelection > 0 && cchSelection <= 512 && SendMessage(hwndEdit, SCI_GETSELTEXT, 0, 0) < 512) {
+			if (cchSelection > 0 && cchSelection < 512 && SendMessage(hwndEdit, SCI_GETSELTEXT, 0, 0) < 512) {
 				char mszSelection[512] = {0};
 				SendMessage(hwndEdit, SCI_GETSELTEXT, 0, (LPARAM)mszSelection);
 				mszSelection[cchSelection] = 0; // zero terminate

@@ -122,7 +122,7 @@ static void ColouriseLLVMDoc(Sci_PositionU startPos, Sci_Position length, int in
 			}
 			break;
 		case SCE_C_WORD2:
-			if (!isdigit(ch)) {
+			if (!IsADigit(ch)) {
 				styler.ColourTo(i - 1, state);
 				state = SCE_C_DEFAULT;
 			}
@@ -167,7 +167,7 @@ static void ColouriseLLVMDoc(Sci_PositionU startPos, Sci_Position length, int in
 			} else if (IsADigit(ch) || (ch == '.' && IsADigit(chNext))) {
 				styler.ColourTo(i - 1, state);
 				state = SCE_C_NUMBER;
-			} else if (ch == 'i' && isdigit(chNext)) { // iN
+			} else if (ch == 'i' && IsADigit(chNext)) { // iN
 				styler.ColourTo(i - 1, state);
 				state = SCE_C_WORD2;
 			} else if (ch == 'x' && isspacechar(chNext)) {

@@ -142,8 +142,8 @@ static void ColouriseLispDoc(Sci_PositionU startPos, Sci_Position length, int in
 }
 
 #define IsCommentLine(line)			IsLexCommentLine(line, styler, SCE_C_COMMENTLINE)
-#define IsStreamStyle(style)		(style == SCE_C_STRING)
-#define IsStreamCommantStyle(style)	(style == SCE_C_COMMENT)
+#define IsStreamStyle(style)		((style) == SCE_C_STRING)
+#define IsStreamCommantStyle(style)	((style) == SCE_C_COMMENT)
 static void FoldListDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList, Accessor &styler) {
 	if (styler.GetPropertyInt("fold") == 0)
 		return;
