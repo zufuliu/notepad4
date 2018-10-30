@@ -137,6 +137,7 @@ void	EditInsertUnicodeControlCharacter(HWND hwnd, int menu);
 void	EditShowUnicodeControlCharacter(HWND hwnd, BOOL bShow);
 BOOL	EditSortDlg(HWND hwnd, int *piSortFlags);
 BOOL	EditAlignDlg(HWND hwnd, int *piAlignMode);
+void	EditSelectionAction(HWND hwnd, int action);
 
 // in Print.cpp
 BOOL	EditPrint(HWND hwnd, LPCWSTR pszDocTitle, LPCWSTR pszPageFormat);

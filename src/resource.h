@@ -168,9 +168,12 @@
 #define CMD_RELOADOEM					20008	// Ctrl+Shift+O
 #define CMD_RELOADASCIIASUTF8			20009	// Shift+F8
 #define CMD_RELOADNOFILEVARS			20010	// Alt+F8
-#define CMD_TIMESTAMPS					20014	// Shift+F5
-#define CMD_WEBACTION1					20015	// Ctrl+Shift+1
-#define CMD_WEBACTION2					20016	// Ctrl+Shift+2
+#define CMD_TIMESTAMPS					20011	// Shift+F5
+#define CMD_ONLINE_SEARCH_GOOGLE		20012
+#define CMD_ONLINE_SEARCH_BING			20013
+#define CMD_ONLINE_SEARCH_WIKI			20014
+#define CMD_CUSTOM_ACTION1				20015	// Ctrl+Shift+1
+#define CMD_CUSTOM_ACTION2				20016	// Ctrl+Shift+2
 #define CMD_FINDNEXTSEL					20017	// Ctrl+F3
 #define CMD_FINDPREVSEL					20018	// Ctrl+Shift+F3
 #define CMD_INCLINELIMIT				20019	// Alt++

@@ -100,9 +100,6 @@ BEGIN
             MENUITEM "Execute &Document",           IDM_FILE_LAUNCH
             MENUITEM "&Open With...",               IDM_FILE_OPENWITH
             MENUITEM "&Command...\tCtrl+R",         IDM_FILE_RUN
-            MENUITEM SEPARATOR
-            MENUITEM "Web Template &1\tCtrl+Shift+1",   CMD_WEBACTION1
-            MENUITEM "Web Template &2\tCtrl+Shift+2",   CMD_WEBACTION2
         END
         MENUITEM SEPARATOR
         POPUP "&Encoding"
@@ -170,7 +167,7 @@ BEGIN
             MENUITEM "&Window Position\tCtrl+Shift+K",  CMD_COPYWINPOS
         END
         MENUITEM SEPARATOR
-        POPUP "&Block"
+        POPUP "&Selection"
         BEGIN
             MENUITEM "&Duplicate\tAlt+D",           IDM_EDIT_SELECTIONDUPLICATE
             MENUITEM SEPARATOR
@@ -310,6 +307,14 @@ BEGIN
             MENUITEM "Delete Word Right\tCtrl+Del",         CMD_CTRLDEL
             MENUITEM SEPARATOR
             MENUITEM "Update Timestamps\tShift+F5", CMD_TIMESTAMPS
+        END
+        POPUP "&Action on Selection"
+        BEGIN
+            MENUITEM "Search with Google",              CMD_ONLINE_SEARCH_GOOGLE
+            MENUITEM "Search with Bing",                CMD_ONLINE_SEARCH_BING
+            MENUITEM "Search on Wikipedia",             CMD_ONLINE_SEARCH_WIKI
+            MENUITEM "Custom Action &1\tCtrl+Shift+1",  CMD_CUSTOM_ACTION1
+            MENUITEM "Custom Action &2\tCtrl+Shift+2",  CMD_CUSTOM_ACTION2
         END
         MENUITEM SEPARATOR
         POPUP "&Find and Replace"
@@ -657,10 +662,10 @@ BEGIN
     "0",            IDM_VIEW_WORDWRAPSYMBOLS, VIRTKEY, SHIFT, CONTROL, NOINVERT
     "1",            IDM_VIEW_FOLD_LEVEL1,         VIRTKEY, ALT, NOINVERT
     "1",            CMD_STRINGIFYS,         VIRTKEY, CONTROL, NOINVERT
-    "1",            CMD_WEBACTION1,         VIRTKEY, SHIFT, CONTROL, NOINVERT
+    "1",            CMD_CUSTOM_ACTION1,       VIRTKEY, SHIFT, CONTROL, NOINVERT
     "2",            CMD_STRINGIFYD,         VIRTKEY, CONTROL, NOINVERT
     "2",            IDM_VIEW_FOLD_LEVEL2,         VIRTKEY, ALT, NOINVERT
-    "2",            CMD_WEBACTION2,         VIRTKEY, SHIFT, CONTROL, NOINVERT
+    "2",            CMD_CUSTOM_ACTION2,      VIRTKEY, SHIFT, CONTROL, NOINVERT
     "3",            CMD_STRINGIFYT2,         VIRTKEY, CONTROL, NOINVERT
     "3",            IDM_VIEW_FOLD_LEVEL3,         VIRTKEY, ALT, NOINVERT
     "4",            CMD_EMBRACKETR,         VIRTKEY, CONTROL, NOINVERT
