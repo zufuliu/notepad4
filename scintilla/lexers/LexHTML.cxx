@@ -875,10 +875,10 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 						state == SCE_HJ_COMMENTLINE || isXml ? "script" :
 						state == SCE_H_COMMENT ? "comment" : nullptr) {
 					Sci_Position j = i + 2;
-					int chr;
+					char chr;
 					do {
-						chr = static_cast<int>(*tag++);
-					} while (chr != 0 && chr == tolower(styler.SafeGetCharAt(j++)));
+						chr = *tag++;
+					} while (chr != 0 && chr == MakeLowerCase(styler.SafeGetCharAt(j++)));
 					if (chr != 0) break;
 				}
 				// closing tag of the script (it's a closing HTML tag anyway)
@@ -1365,9 +1365,9 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 			}
 			break;
 		case SCE_H_SGML_SPECIAL:
-			if (!(IsASCII(ch) && isupper(ch))) {
+			if (!IsUpperCase(ch)) {
 				styler.ColourTo(i - 1, StateToPrint);
-				if (isalnum(ch)) {
+				if (IsASCII(ch) && isalnum(ch)) {
 					state = SCE_H_SGML_ERROR;
 				} else {
 					state = SCE_H_SGML_DEFAULT;
@@ -1722,7 +1722,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 		case SCE_HJ_REGEX:
 			if (ch == '\r' || ch == '\n' || ch == '/') {
 				if (ch == '/') {
-					while (IsASCII(chNext) && islower(chNext)) {   // gobble regex flags
+					while (IsLowerCase(chNext)) {   // gobble regex flags
 						i++;
 						ch = chNext;
 						chNext = static_cast<unsigned char>(styler.SafeGetCharAt(i + 1));

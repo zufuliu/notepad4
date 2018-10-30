@@ -279,7 +279,7 @@ static void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int in
 				} else if (IsADigit(sc.ch))
 					break;
 			} else if (numBase == BASH_BASE_HEX) {
-				if (IsADigit(sc.ch, 16))
+				if (IsHexDigit(sc.ch))
 					break;
 #ifdef PEDANTIC_OCTAL
 			} else if (numBase == BASH_BASE_OCTAL ||

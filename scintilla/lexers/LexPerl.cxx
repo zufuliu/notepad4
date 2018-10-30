@@ -638,7 +638,7 @@ static void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int in
 						}
 						// number then dot (go through)
 					} else if (numState == PERLNUM_HEX) {
-						if (dotCount <= 1 && IsADigit(sc.chNext, 16)) {
+						if (dotCount <= 1 && IsHexDigit(sc.chNext)) {
 							break;	// hex with one dot is a hex float
 						} else {
 							sc.SetState(SCE_PL_OPERATOR);
@@ -669,7 +669,7 @@ static void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int in
 						sc.Forward();
 					}
 					break;
-				} else if (IsADigit(sc.ch, 16))
+				} else if (IsHexDigit(sc.ch))
 					break;
 				// hex or hex float then word (go through)
 			} else if (numState == PERLNUM_VECTOR || numState == PERLNUM_V_VECTOR) {

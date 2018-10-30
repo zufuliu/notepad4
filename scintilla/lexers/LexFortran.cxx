@@ -28,11 +28,8 @@ static inline bool IsFWordChar(int ch) noexcept {
 static inline bool IsFWordStart(int ch) noexcept {
 	return (ch < 0x80) && isalnum(ch);
 }
-static inline bool IsFOperator(int ch) noexcept {
-	return (ch < 0x80) && isoperator(ch);
-}
-static inline bool IsFNumber(int ch, int) noexcept {
-	return (ch < 0x80) && isxdigit(ch);
+static constexpr bool IsFOperator(int ch) noexcept {
+	return isoperator(ch);
 }
 
 /*static const char *const fortranWordLists[] = {
@@ -99,7 +96,7 @@ static void ColouriseFortranDoc(Sci_PositionU startPos, Sci_Position length, int
 				sc.SetState(SCE_F_DEFAULT);
 			}
 		} else if (sc.state == SCE_F_NUMBER) {
-			if (!IsFNumber(sc.ch, sc.chPrev)) {
+			if (!IsHexDigit(sc.ch)) {
 				sc.SetState(SCE_F_DEFAULT);
 			}
 		} else if (sc.state == SCE_F_OPERATOR) {
@@ -134,7 +131,7 @@ _label_identifier:
 					|| (LexMatchIgnoreCase(sc.currentPos + 1, styler, "ms") && sc.GetRelative(3) == '$')
 					) {
 					sc.SetState(SCE_F_PREPROCESSOR);
-				} else if ((sc.ch == 'C' || sc.ch == 'c') && sc.chNext < 0x80 && isalpha(sc.chNext)) {
+				} else if ((sc.ch == 'C' || sc.ch == 'c') && IsAlpha(sc.chNext)) {
 					sc.SetState(SCE_F_IDENTIFIER);
 				} else {
 					sc.SetState(SCE_F_COMMENT);
@@ -145,14 +142,14 @@ _label_identifier:
 				sc.SetState(SCE_F_STRING2);
 			} else if (sc.ch == '\'') {
 				sc.SetState(SCE_F_STRING1);
-			} else if (isdigit(sc.ch) || (sc.ch == '.' && isdigit(sc.chNext))) {
+			} else if (IsADigit(sc.ch) || (sc.ch == '.' && IsADigit(sc.chNext))) {
 				sc.SetState(SCE_F_NUMBER);
 			} else if (IsFWordStart(sc.ch)) {
 				sc.SetState(SCE_F_IDENTIFIER);
-			} else if (sc.ch == '.' && isalpha(sc.chNext)) {
+			} else if (sc.ch == '.' && IsAlpha(sc.chNext)) {
 				sc.SetState(SCE_F_OPERATOR2);
 				sc.Forward();
-			} else if (IsFOperator(static_cast<char>(sc.ch))) {
+			} else if (IsFOperator(sc.ch)) {
 				sc.SetState(SCE_F_OPERATOR);
 			}
 		}

@@ -125,18 +125,18 @@ static void ColouriseSmaliDoc(Sci_PositionU startPos, Sci_Position length, int i
 			if (!IsSmaliWordChar(ch)) {
 				buf[wordLen] = 0;
 				if (buf[0] == '.') {
-					if (!(strcmp(buf + 1,"end") && strcmp(buf + 1,"restart") && strcmp(buf + 1,"limit"))) {
+					if (strcmp(buf + 1,"end") == 0 || strcmp(buf + 1,"restart") == 0 || strcmp(buf + 1,"limit") == 0) {
 						nextWordType = kWordType_Directive;
-					} else if (!strcmp(buf + 1,"field")) {
+					} else if (strcmp(buf + 1,"field") == 0) {
 						nextWordType = kWrodType_Field;
-					} else if (!strcmp(buf + 1,"method")) {
+					} else if (strcmp(buf + 1,"method") == 0) {
 						nextWordType = kWordType_Method;
 					}
-					if (!(strcmp(buf + 1,"annotation") && strcmp(buf + 1,"subannotation"))) {
+					if (strcmp(buf + 1,"annotation") == 0 || strcmp(buf + 1,"subannotation") == 0) {
 						curLineState = 1;
-					} else if (!(strcmp(buf + 1,"packed-switch") && strcmp(buf + 1,"sparse-switch"))) {
+					} else if (strcmp(buf + 1,"packed-switch") == 0 || strcmp(buf + 1,"sparse-switch") == 0) {
 						curLineState = 2;
-					} else if (!strcmp(buf + 1,"end")) {
+					} else if (strcmp(buf + 1,"end") == 0) {
 						curLineState = 0;
 					}
 				}

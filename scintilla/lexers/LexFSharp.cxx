@@ -22,8 +22,8 @@
 
 using namespace Scintilla;
 
-static inline bool IsFSOperator(int ch) noexcept {
-	return isoperator(ch) || (ch < 0x80 && (ch == '\'' || ch == '@' || ch == '$' || ch == '#' || ch == '`'));
+static constexpr bool IsFSOperator(int ch) noexcept {
+	return isoperator(ch) || (ch == '\'' || ch == '@' || ch == '$' || ch == '#' || ch == '`');
 }
 
 #define	LEX_FSHARP	22
@@ -161,7 +161,7 @@ _label_identifier:
 			} else if (sc.ch == '0' && (sc.chNext == 'x' || sc.chNext == 'X')) {
 				sc.SetState(SCE_FSHARP_NUMBER);
 				sc.Forward();
-			} else if (isdigit(sc.ch) || (sc.ch == '.' && isdigit(sc.chNext))) {
+			} else if (IsADigit(sc.ch) || (sc.ch == '.' && IsADigit(sc.chNext))) {
 				sc.SetState(SCE_FSHARP_NUMBER);
 			} else if (sc.ch == '#' && visibleChars == 0) {
 				if (isspacechar(sc.chNext)) {
@@ -176,7 +176,7 @@ _label_identifier:
 				sc.SetState(SCE_FSHARP_OPERATOR);
 			} else if (iswordstart(sc.ch)) {
 				sc.SetState(SCE_FSHARP_IDENTIFIER);
-			} else if (IsFSOperator(static_cast<char>(sc.ch))) {
+			} else if (IsFSOperator(sc.ch)) {
 				sc.SetState(SCE_FSHARP_OPERATOR);
 			}
 		}

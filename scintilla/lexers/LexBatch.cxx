@@ -19,21 +19,16 @@ using namespace Scintilla;
 
 // / \ : * ? < > " |
 static constexpr bool IsBatSpec(int ch) noexcept {
-	return (ch < 0x80) && (ch == ':' || ch == '?' || ch == '%' || ch == '\'' || ch == '\"' || ch == '`');
+	return ch == ':' || ch == '?' || ch == '%' || ch == '\'' || ch == '\"' || ch == '`';
 }
 static constexpr bool IsBatOp(int ch) noexcept {
-	return (ch < 0x80) && (ch == '(' || ch == ')' || ch == '=' || ch == '@' || ch == '|' || ch == '<' || ch == '>' || ch == ';' || ch == '*' || ch == '&');
+	return ch == '(' || ch == ')' || ch == '=' || ch == '@' || ch == '|' || ch == '<' || ch == '>' || ch == ';' || ch == '*' || ch == '&';
 }
 static inline bool IsWordStart(int ch) noexcept {
-	return (ch >= 0x80) || ((ch < 0x80) && isgraph(ch) && !(IsBatOp(ch) || IsBatSpec(ch) || ch == '.'));
+	return (ch >= 0x80) || (isgraph(ch) && !(IsBatOp(ch) || IsBatSpec(ch) || ch == '.'));
 }
 static inline bool IsWordChar(int ch) noexcept {
-	if (isspacechar(ch))
-		return false;
-	else if (ch >= 0x80)
-		return true;
-	else
-		return isgraph(ch) && !(IsBatOp(ch) || IsBatSpec(ch));
+	return (ch >= 0x80) || (isgraph(ch) && !(IsBatOp(ch) || IsBatSpec(ch)));
 }
 
 /*static const char *const batchWordListDesc[] = {

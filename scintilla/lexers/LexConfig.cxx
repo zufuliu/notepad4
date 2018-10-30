@@ -58,7 +58,8 @@ static void ColouriseConfDoc(Sci_PositionU startPos, Sci_Position length, int in
 					styler.ColourTo(i, state);
 					state = SCE_CONF_DEFAULT;
 					continue;
-				} else if (iswordchar(ch)) {
+				}
+				if (iswordchar(ch)) {
 					state = SCE_CONF_IDENTIFIER;
 				} else {
 					styler.ColourTo(i - 1, state);

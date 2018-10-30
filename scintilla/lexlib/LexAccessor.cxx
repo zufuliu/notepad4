@@ -233,7 +233,7 @@ Sci_PositionU LexGetRangeLowered(Sci_Position startPos, Sci_Position endPos, Lex
 Sci_PositionU LexGetRange(Sci_Position startPos, LexAccessor &styler, bool IsWordChar(int), char *s, Sci_PositionU len) noexcept {
 	Sci_PositionU i = 0;
 	char ch = styler.SafeGetCharAt(startPos + i);
-	while ((i < len - 1) && IsWordChar(ch)) {
+	while ((i < len - 1) && IsWordChar(static_cast<unsigned char>(ch))) {
 		s[i] = ch;
 		i++;
 		ch = styler.SafeGetCharAt(startPos + i);
@@ -244,7 +244,7 @@ Sci_PositionU LexGetRange(Sci_Position startPos, LexAccessor &styler, bool IsWor
 Sci_PositionU LexGetRangeLowered(Sci_Position startPos, LexAccessor &styler, bool IsWordChar(int), char *s, Sci_PositionU len) noexcept {
 	Sci_PositionU i = 0;
 	char ch = MakeLowerCase(styler.SafeGetCharAt(startPos + i));
-	while ((i < len - 1) && IsWordChar(ch)) {
+	while ((i < len - 1) && IsWordChar(static_cast<unsigned char>(ch))) {
 		s[i] = ch;
 		i++;
 		ch = MakeLowerCase(styler.SafeGetCharAt(startPos + i));

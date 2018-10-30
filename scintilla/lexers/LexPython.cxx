@@ -317,7 +317,7 @@ _label_identifier:
 					sc.SetState(SCE_PY_OPERATOR);
 				else
 					sc.SetState(SCE_PY_DECORATOR);
-			} else if (isoperator(static_cast<char>(sc.ch)) || sc.ch == '`') {
+			} else if (isoperator(sc.ch) || sc.ch == '`') {
 				sc.SetState(SCE_PY_OPERATOR);
 				if (defType > 0 && (sc.ch == '(' || sc.ch == ':'))
 					defType = 0;

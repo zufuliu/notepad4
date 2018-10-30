@@ -57,7 +57,7 @@ static constexpr bool isSafeWordcharOrHigh(char ch) noexcept {
 #define MAX_KEYWORD_LENGTH 255
 
 #define STYLE_MASK 63
-#define actual_style(style) (style & STYLE_MASK)
+#define actual_style(style) ((style) & STYLE_MASK)
 
 static bool followsDot(Sci_PositionU pos, Accessor &styler) {
 	styler.Flush();

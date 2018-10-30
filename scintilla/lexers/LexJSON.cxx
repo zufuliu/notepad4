@@ -75,7 +75,7 @@ static void ColouriseJSONDoc(Sci_PositionU startPos, Sci_Position length, int in
 		case SCE_C_IDENTIFIER:
 			if (!iswordstart(ch)) {
 				buf[wordLen] = 0;
-				if (!(strcmp(buf, "true") && strcmp(buf, "false") && strcmp(buf, "null"))) {
+				if (strcmp(buf, "true") == 0 || strcmp(buf, "false") == 0 || strcmp(buf, "null") == 0) {
 					styler.ColourTo(i - 1, SCE_C_WORD);
 				}
 				state = SCE_C_DEFAULT;

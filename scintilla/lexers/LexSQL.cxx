@@ -28,17 +28,14 @@
 
 using namespace Scintilla;
 
-static inline bool IsSqlWordChar(int ch, bool sqlAllowDottedWord) noexcept {
-	if (!sqlAllowDottedWord)
-		return (ch < 0x80) && (IsAlphaNumeric(ch) || ch == '_');
-	else
-		return (ch < 0x80) && (IsAlphaNumeric(ch) || ch == '_' || ch == '.');
+static constexpr bool IsSqlWordChar(int ch, bool sqlAllowDottedWord) noexcept {
+	return IsAlphaNumeric(ch) || ch == '_' || (sqlAllowDottedWord && ch == '.');
 }
 
 static constexpr bool IsANumberChar(int ch, int chPrev) noexcept {
-	return (ch < 0x80) && (IsADigit(ch) || (ch == '.' && chPrev != '.')
+	return IsADigit(ch) || (ch == '.' && chPrev != '.')
 		|| ((ch == '+' || ch == '-') && (chPrev == 'e' || chPrev == 'E'))
-		|| ((ch == 'e' || ch == 'E') && (chPrev < 0x80) && IsADigit(chPrev)));
+		|| ((ch == 'e' || ch == 'E') && IsADigit(chPrev));
 }
 
 /*static const char * const sqlWordListDesc[] = {
@@ -263,7 +260,7 @@ _label_identifier:
 				sc.SetState(SCE_SQL_CHARACTER);
 			} else if (sc.ch == '\"') {
 				sc.SetState(SCE_SQL_STRING);
-			} else if (isoperator(static_cast<char>(sc.ch))) {
+			} else if (isoperator(sc.ch)) {
 				sc.SetState(SCE_SQL_OPERATOR);
 			}
 		}
@@ -620,7 +617,7 @@ static void FoldSqlDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 				if (!iswordchar(styler[i + j])) {
 					break;
 				}
-				s[j] = static_cast<char>(tolower(styler[i + j]));
+				s[j] = MakeLowerCase(styler[i + j]);
 			}
 			if (j == MAX_KW_LEN + 1) {
 				// Keyword too long, don't test it

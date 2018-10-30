@@ -764,7 +764,7 @@ void PositionCache::Clear() noexcept {
 	allClear = true;
 }
 
-static inline size_t NextPowerOfTwo(size_t x) {
+static constexpr size_t NextPowerOfTwo(size_t x) noexcept {
 	x--;
 	x |= x >> 1;
 	x |= x >> 2;

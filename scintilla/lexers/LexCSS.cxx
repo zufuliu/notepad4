@@ -36,16 +36,12 @@ static inline bool IsAWordChar(int ch) noexcept {
 	return ch >= 0x80 || isalnum(ch) || ch == '-' || ch == '_';
 }
 
-static inline bool IsCssOperator(int ch) noexcept {
-	if (!((ch < 0x80) && isalnum(ch)) &&
-		(ch == '{' || ch == '}' || ch == ':' || ch == ',' || ch == ';' ||
+static constexpr bool IsCssOperator(int ch) noexcept {
+	return ch == '{' || ch == '}' || ch == ':' || ch == ',' || ch == ';' ||
 			ch == '.' || ch == '#' || ch == '!' || ch == '@' ||
 			/* CSS2 */
 			ch == '*' || ch == '>' || ch == '+' || ch == '=' || ch == '~' || ch == '|' ||
-			ch == '[' || ch == ']' || ch == '(' || ch == ')')) {
-		return true;
-	}
-	return false;
+			ch == '[' || ch == ']' || ch == '(' || ch == ')';
 }
 
 // look behind (from start of document to our start position) to determine current nesting level
@@ -420,7 +416,7 @@ static void ColouriseCssDoc(Sci_PositionU startPos, Sci_Position length, int ini
 			char s[100];
 			sc.GetCurrentLowered(s, sizeof(s));
 			char *s2 = s;
-			while (*s2 && !IsAWordChar(*s2))
+			while (*s2 && !IsAWordChar(static_cast<unsigned char>(*s2)))
 				s2++;
 			switch (sc.state) {
 			case SCE_CSS_IDENTIFIER:

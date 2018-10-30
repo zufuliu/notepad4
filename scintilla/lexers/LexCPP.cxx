@@ -65,7 +65,7 @@ static constexpr bool _squareBraceAfterType(int lex) noexcept {
 	return lex == LEX_JAVA || lex == LEX_CS || lex == LEX_JS || lex == LEX_AS || lex == LEX_HX || lex == LEX_GROOVY || lex == LEX_SCALA;
 }
 static constexpr bool IsDStrFix(int ch) noexcept {
-	return (ch < 0x80) && (ch == 'c' || ch == 'w' || ch == 'd');
+	return ch == 'c' || ch == 'w' || ch == 'd';
 }
 static constexpr bool _use2ndKeyword(int lex) noexcept {
 	return lex == LEX_OBJC;
@@ -579,10 +579,10 @@ _label_identifier:
 			break;
 		case SCE_C_STRING:
 			if (sc.atLineEnd) {
-				if (lexType == LEX_HX || lexType == LEX_ASY || lexType == LEX_JAM || lexType == LEX_PHP)
+				if (lexType == LEX_HX || lexType == LEX_ASY || lexType == LEX_JAM || lexType == LEX_PHP) {
 					continue;
-				else
-					sc.ChangeState(SCE_C_STRINGEOL);
+				}
+				sc.ChangeState(SCE_C_STRINGEOL);
 			} else if (isIncludePreprocessor && sc.ch == '>') {
 				outerStyle = SCE_C_DEFAULT;
 				sc.ForwardSetState(SCE_C_DEFAULT);
@@ -721,7 +721,7 @@ _label_identifier:
 				sc.SetState(SCE_C_DEFAULT);
 			} else if (sc.ch == '/') {
 				sc.Forward();
-				while ((sc.ch < 0x80) && islower(sc.ch))
+				while (IsLowerCase(sc.ch))
 					sc.Forward();	 // gobble regex flags
 				sc.SetState(SCE_C_DEFAULT);
 			} else if (sc.ch == '\\') {
@@ -1008,7 +1008,7 @@ _label_identifier:
 						} else {
 							sc.SetState(SCE_C_OPERATOR);
 						}
-					} else if (isoperator(static_cast<char>(sc.ch)) || ((lexType == LEX_CS || lexType == LEX_D || lexType == LEX_JS) && sc.ch == '$') || sc.ch == '@'
+					} else if (isoperator(sc.ch) || ((lexType == LEX_CS || lexType == LEX_D || lexType == LEX_JS) && sc.ch == '$') || sc.ch == '@'
 						|| (lexType == LEX_PHP && sc.ch == '\\')) {
 						sc.SetState(SCE_C_OPERATOR);
 						isPragmaPreprocessor = false;
@@ -1344,7 +1344,6 @@ static void FoldCppDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 				levelNext--;
 				isObjCProtocol = false;
 			} else if (styler.Match(i + 1, "protocol")) {
-				//char ch = LexGetNextChar(i+9, styler);
 				if (LexGetNextChar(i + 9, styler) != '(') { // @protocol()
 					isObjCProtocol = true;
 					levelNext++;

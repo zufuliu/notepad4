@@ -18,8 +18,8 @@
 using namespace Scintilla;
 
 static constexpr bool IsLSpecial(int ch) noexcept {
-	return (ch < 0x80) && (ch == '#' || ch == '$' || ch == '%' || ch == '&'
-		|| ch == '^' || ch == '_' || ch == '{' || ch == '}' || ch == '~');
+	return ch == '#' || ch == '$' || ch == '%' || ch == '&'
+		|| ch == '^' || ch == '_' || ch == '{' || ch == '}' || ch == '~';
 }
 static inline bool IsLWordChar(int ch) noexcept {
 	return (ch < 0x80) && isalnum(ch);

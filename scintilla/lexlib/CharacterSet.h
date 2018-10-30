@@ -66,7 +66,8 @@ constexpr bool IsHexDigit(int ch) noexcept {
 		|| (ch >= 'a' && ch <= 'f');
 }
 
-inline bool IsADigit(int ch, int base) noexcept {
+#if 0
+constexpr bool IsADigit(int ch, int base) noexcept {
 	if (base <= 10) {
 		return (ch >= '0') && (ch < '0' + base);
 	} else {
@@ -75,6 +76,7 @@ inline bool IsADigit(int ch, int base) noexcept {
 		       ((ch >= 'a') && (ch < 'a' + base - 10));
 	}
 }
+#endif
 
 constexpr bool IsASCII(int ch) noexcept {
 	return (ch >= 0) && (ch < 0x80);
@@ -116,7 +118,7 @@ constexpr bool iswordstart(int ch) noexcept {
 	return IsAlphaNumeric(ch) || ch == '_';
 }
 
-inline bool isoperator(int ch) noexcept {
+constexpr bool isoperator(int ch) noexcept {
 	if (IsAlphaNumeric(ch))
 		return false;
 	if (ch == '%' || ch == '^' || ch == '&' || ch == '*' ||

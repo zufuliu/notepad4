@@ -24,24 +24,21 @@ using namespace Scintilla;
 
 // Extended to accept accented characters
 static inline bool IsAWordChar(int ch) noexcept {
-	return ch >= 0x80 ||
-		(isalnum(ch) || ch == '_' || ch == ':' || ch == '.'); // : name space separator
+	return ch >= 0x80 || (isalnum(ch) || ch == '_' || ch == ':' || ch == '.'); // : name space separator
 }
 
 static inline bool IsAWordStart(int ch) noexcept {
 	return ch >= 0x80 || (ch == ':' || isalpha(ch) || ch == '_');
 }
 
-static inline bool IsANumberChar(int ch) noexcept {
+static constexpr bool IsANumberChar(int ch) noexcept {
 	// Not exactly following number definition (several dots are seen as OK, etc.)
 	// but probably enough in most cases.
-	return (ch < 0x80) &&
-		(IsADigit(ch, 0x10) || toupper(ch) == 'E' ||
-			ch == '.' || ch == '-' || ch == '+');
+	return IsHexDigit(ch) || ch == 'E' || ch == 'e' || ch == '.' || ch == '-' || ch == '+';
 }
 
 static void ColouriseTCLDoc(Sci_PositionU startPos, Sci_Position length, int, LexerWordList keywordLists, Accessor &styler) {
-#define  isComment(s) (s==SCE_TCL_COMMENT || s==SCE_TCL_COMMENTLINE || s==SCE_TCL_COMMENT_BOX || s==SCE_TCL_BLOCK_COMMENT)
+#define  isComment(s) ((s) == SCE_TCL_COMMENT || (s) == SCE_TCL_COMMENTLINE || (s) == SCE_TCL_COMMENT_BOX || (s) == SCE_TCL_BLOCK_COMMENT)
 	const bool foldComment = styler.GetPropertyInt("fold.comment") != 0;
 	bool commentLevel = false;
 	bool subBrace = false; // substitution begin with a brace ${.....}
@@ -115,7 +112,7 @@ next:
 			if (!sc.atLineEnd)
 				continue;
 		} else if (sc.state == SCE_TCL_DEFAULT || sc.state == SCE_TCL_OPERATOR) {
-			expected &= isspacechar(static_cast<unsigned char>(sc.ch)) || IsAWordStart(sc.ch) || sc.ch == '#';
+			expected &= isspacechar(sc.ch) || IsAWordStart(sc.ch) || sc.ch == '#';
 		} else if (sc.state == SCE_TCL_SUBSTITUTION) {
 			switch (sc.ch) {
 			case '(':
@@ -243,7 +240,7 @@ next:
 			visibleChars = false;
 			if (sc.state != SCE_TCL_IN_QUOTE && !isComment(sc.state)) {
 				sc.SetState(SCE_TCL_DEFAULT);
-				expected = IsAWordStart(sc.ch) || isspacechar(static_cast<unsigned char>(sc.ch));
+				expected = IsAWordStart(sc.ch) || isspacechar(sc.ch);
 			}
 		}
 
@@ -282,7 +279,7 @@ next:
 			}
 		}
 
-		if (!isspacechar(static_cast<unsigned char>(sc.ch))) {
+		if (!isspacechar(sc.ch)) {
 			visibleChars = true;
 		}
 
@@ -336,15 +333,15 @@ next:
 					}
 					break;
 				case '#':
-					if ((isspacechar(static_cast<unsigned char>(sc.chPrev)) ||
-						isoperator(static_cast<char>(sc.chPrev))) && IsADigit(sc.chNext, 0x10))
+					if ((isspacechar(sc.chPrev) ||
+						isoperator(sc.chPrev)) && IsHexDigit(sc.chNext))
 						sc.SetState(SCE_TCL_NUMBER);
 					break;
 				case '-':
 					sc.SetState(IsADigit(sc.chNext) ? SCE_TCL_NUMBER : SCE_TCL_MODIFIER);
 					break;
 				default:
-					if (isoperator(static_cast<char>(sc.ch))) {
+					if (isoperator(sc.ch)) {
 						sc.SetState(SCE_TCL_OPERATOR);
 					}
 				}
