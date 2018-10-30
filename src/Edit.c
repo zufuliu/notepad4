@@ -70,6 +70,7 @@ extern const NP2ENCODING mEncoding[];
 
 extern LPMRULIST mruFind;
 extern LPMRULIST mruReplace;
+extern WCHAR szCurFile[MAX_PATH + 40];
 
 //=============================================================================
 //
@@ -5921,6 +5922,75 @@ static INT_PTR CALLBACK EditSortDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPA
 BOOL EditSortDlg(HWND hwnd, int *piSortFlags) {
 	const INT_PTR iResult = ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_SORT), hwnd, EditSortDlgProc, (LPARAM)piSortFlags);
 	return iResult == IDOK;
+}
+
+void EditSelectionAction(HWND hwnd, int action) {
+	static const LPCWSTR kActionKeys[] = {
+		L"GoogleSearchUrl",
+		L"BingSearchUrl",
+		L"WikiSearchUrl",
+		L"CustomAction1",
+		L"CustomAction2",
+	};
+
+	WCHAR szCmdTemplate[256];
+	LPCWSTR actionKey = kActionKeys[action - CMD_ONLINE_SEARCH_GOOGLE];
+	const BOOL bCmdEnabled = IniGetString(INI_SECTION_NAME_FLAGS, actionKey, L"", szCmdTemplate, COUNTOF(szCmdTemplate));
+	if (!bCmdEnabled) {
+		return;
+	}
+
+	DWORD cchSelection = (int)SendMessage(hwnd, SCI_GETSELECTIONEND, 0, 0)
+						 - (int)SendMessage(hwnd, SCI_GETSELECTIONSTART, 0, 0);
+
+	if (cchSelection > 0 && cchSelection < 512 && SendMessage(hwnd, SCI_GETSELTEXT, 0, 0) < 512) {
+		char mszSelection[512] = {0};
+		SendMessage(hwnd, SCI_GETSELTEXT, 0, (LPARAM)mszSelection);
+		mszSelection[cchSelection] = 0; // zero terminate
+
+		// Check lpszSelection and truncate bad WCHARs
+		char *lpsz = strpbrk(mszSelection, "\r\n\t");
+		if (lpsz) {
+			*lpsz = '\0';
+		}
+
+		if (StrNotEmptyA(mszSelection)) {
+			WCHAR wszSelection[512];
+
+			const UINT cpEdit = (UINT)SendMessage(hwnd, SCI_GETCODEPAGE, 0, 0);
+			MultiByteToWideChar(cpEdit, 0, mszSelection, -1, wszSelection, COUNTOF(wszSelection));
+
+			LPWSTR lpszCommand = NP2HeapAlloc(sizeof(WCHAR) * (512 + COUNTOF(szCmdTemplate) + MAX_PATH + 32));
+			const size_t cbCommand = NP2HeapSize(lpszCommand);
+			wsprintf(lpszCommand, szCmdTemplate, wszSelection);
+			ExpandEnvironmentStringsEx(lpszCommand, (DWORD)(cbCommand / sizeof(WCHAR)));
+
+			LPWSTR lpszArgs = NP2HeapAlloc(cbCommand);
+			ExtractFirstArgument(lpszCommand, lpszCommand, lpszArgs);
+
+			WCHAR wchDirectory[MAX_PATH] = L"";
+			if (StrNotEmpty(szCurFile)) {
+				lstrcpy(wchDirectory, szCurFile);
+				PathRemoveFileSpec(wchDirectory);
+			}
+
+			SHELLEXECUTEINFO sei;
+			ZeroMemory(&sei, sizeof(SHELLEXECUTEINFO));
+			sei.cbSize = sizeof(SHELLEXECUTEINFO);
+			sei.fMask = /*SEE_MASK_NOZONECHECKS*/0x00800000;
+			sei.hwnd = NULL;
+			sei.lpVerb = NULL;
+			sei.lpFile = lpszCommand;
+			sei.lpParameters = lpszArgs;
+			sei.lpDirectory = wchDirectory;
+			sei.nShow = SW_SHOWNORMAL;
+
+			ShellExecuteEx(&sei);
+
+			NP2HeapFree(lpszCommand);
+			NP2HeapFree(lpszArgs);
+		}
+	}
 }
 
 //=============================================================================

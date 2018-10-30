@@ -4573,68 +4573,13 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	}
 	break;
 
-	case CMD_WEBACTION1:
-	case CMD_WEBACTION2: {
-		WCHAR szCmdTemplate[256];
-
-		LPWSTR lpszTemplateName = (LOWORD(wParam) == CMD_WEBACTION1) ? L"WebTemplate1" : L"WebTemplate2";
-		const BOOL bCmdEnabled = IniGetString(INI_SECTION_NAME_FLAGS, lpszTemplateName, L"", szCmdTemplate, COUNTOF(szCmdTemplate));
-
-		if (bCmdEnabled) {
-			DWORD cchSelection = (int)SendMessage(hwndEdit, SCI_GETSELECTIONEND, 0, 0)
-								 - (int)SendMessage(hwndEdit, SCI_GETSELECTIONSTART, 0, 0);
-
-			if (cchSelection > 0 && cchSelection < 512 && SendMessage(hwndEdit, SCI_GETSELTEXT, 0, 0) < 512) {
-				char mszSelection[512] = {0};
-				SendMessage(hwndEdit, SCI_GETSELTEXT, 0, (LPARAM)mszSelection);
-				mszSelection[cchSelection] = 0; // zero terminate
-
-				// Check lpszSelection and truncate bad WCHARs
-				char *lpsz = strpbrk(mszSelection, "\r\n\t");
-				if (lpsz) {
-					*lpsz = '\0';
-				}
-
-				if (StrNotEmptyA(mszSelection)) {
-					WCHAR wszSelection[512];
-
-					const UINT cpEdit = (UINT)SendMessage(hwndEdit, SCI_GETCODEPAGE, 0, 0);
-					MultiByteToWideChar(cpEdit, 0, mszSelection, -1, wszSelection, COUNTOF(wszSelection));
-
-					LPWSTR lpszCommand = NP2HeapAlloc(sizeof(WCHAR) * (512 + COUNTOF(szCmdTemplate) + MAX_PATH + 32));
-					const size_t cbCommand = NP2HeapSize(lpszCommand);
-					wsprintf(lpszCommand, szCmdTemplate, wszSelection);
-					ExpandEnvironmentStringsEx(lpszCommand, (DWORD)(cbCommand / sizeof(WCHAR)));
-
-					LPWSTR lpszArgs = NP2HeapAlloc(cbCommand);
-					ExtractFirstArgument(lpszCommand, lpszCommand, lpszArgs);
-
-					WCHAR wchDirectory[MAX_PATH] = L"";
-					if (StrNotEmpty(szCurFile)) {
-						lstrcpy(wchDirectory, szCurFile);
-						PathRemoveFileSpec(wchDirectory);
-					}
-
-					SHELLEXECUTEINFO sei;
-					ZeroMemory(&sei, sizeof(SHELLEXECUTEINFO));
-					sei.cbSize = sizeof(SHELLEXECUTEINFO);
-					sei.fMask = /*SEE_MASK_NOZONECHECKS*/0x00800000;
-					sei.hwnd = NULL;
-					sei.lpVerb = NULL;
-					sei.lpFile = lpszCommand;
-					sei.lpParameters = lpszArgs;
-					sei.lpDirectory = wchDirectory;
-					sei.nShow = SW_SHOWNORMAL;
-
-					ShellExecuteEx(&sei);
-
-					NP2HeapFree(lpszCommand);
-					NP2HeapFree(lpszArgs);
-				}
-			}
-		}
-	}
-	break;
+	case CMD_ONLINE_SEARCH_GOOGLE:
+	case CMD_ONLINE_SEARCH_BING:
+	case CMD_ONLINE_SEARCH_WIKI:
+	case CMD_CUSTOM_ACTION1:
+	case CMD_CUSTOM_ACTION2:
+		EditSelectionAction(hwndEdit, LOWORD(wParam));
+		break;
 
 	case CMD_FINDNEXTSEL:
 	case CMD_FINDPREVSEL:
