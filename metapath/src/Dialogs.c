@@ -1199,7 +1199,7 @@ INT_PTR CALLBACK GetFilterDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lP
 				RECT rc;
 
 				GetWindowRect(GetDlgItem(hwnd, IDC_BROWSEFILTER), &rc);
-				//MapWindowPoints(hwnd,NULL,(POINT*)&rc,2);
+				//MapWindowPoints(hwnd, NULL, (POINT*)&rc, 2);
 				// Seems that TrackPopupMenuEx() works with client coords...?
 				const DWORD dwCmd = TrackPopupMenuEx(hMenu, TPM_RETURNCMD | TPM_LEFTBUTTON | TPM_RIGHTBUTTON, rc.left + 1, rc.bottom + 1, hwnd, NULL);
 

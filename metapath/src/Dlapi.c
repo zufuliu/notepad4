@@ -150,7 +150,7 @@ BOOL DirList_TerminateIconThread(HWND hwnd) {
 	LPDLDATA lpdl = (LPVOID)GetProp(hwnd, pDirListProp);
 	SetEvent(lpdl->hExitThread);
 
-	//WaitForSingleObject(lpdl->hTerminatedThread,INFINITE);
+	//WaitForSingleObject(lpdl->hTerminatedThread, INFINITE);
 	while (WaitForSingleObject(lpdl->hTerminatedThread, 0) != WAIT_OBJECT_0) {
 		MSG msg;
 		if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
@@ -1172,7 +1172,7 @@ BOOL IL_GetDisplayName(LPSHELLFOLDER lpsf, LPCITEMIDLIST pidl, DWORD dwFlags, LP
 		//	break;
 		//
 		//case STRRET_CSTR:
-		//	lstrcpyn(lpszDisplayName,str.cStr,nDisplayName);
+		//	lstrcpyn(lpszDisplayName, str.cStr, nDisplayName);
 		//	break;
 		//}
 		//return TRUE;

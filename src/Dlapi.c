@@ -34,7 +34,7 @@
 typedef struct tagDLDATA { // dl
 	HWND hwnd;					// HWND of ListView Control
 	UINT cbidl;					// Size of pidl
-	LPITEMIDLIST pidl;		// Directory Id
+	LPITEMIDLIST pidl;			// Directory Id
 	LPSHELLFOLDER lpsf;			// IShellFolder Interface to pidl
 	WCHAR szPath[MAX_PATH];		// Pathname to Directory Id
 	int iDefIconFolder;			// Default Folder Icon

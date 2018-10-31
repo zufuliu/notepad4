@@ -93,7 +93,9 @@ BEGIN
         END
         POPUP "&Launch"
         BEGIN
-            MENUITEM "Reopen As &Admin.",           IDM_FILE_RELAUNCH_ELEVATED
+            MENUITEM "Open Containing Folder",      IDM_FILE_OPEN_CONTAINING_FOLDER
+            MENUITEM "Reopen As &Administrator",    IDM_FILE_RELAUNCH_ELEVATED
+            MENUITEM SEPARATOR
             MENUITEM "&New Window\tAlt+N",          IDM_FILE_NEWWINDOW
             MENUITEM "&Empty Window\tAlt+0",        IDM_FILE_NEWWINDOW2
             MENUITEM SEPARATOR
@@ -310,9 +312,13 @@ BEGIN
         END
         POPUP "&Action on Selection"
         BEGIN
+            MENUITEM "Open File, Folder, Link, etc.",   CMD_OPEN_PATH_OR_LINK
+            MENUITEM "Open Containing Folder",          CMD_OPEN_CONTAINING_FOLDER
+            MENUITEM SEPARATOR
             MENUITEM "Search with Google",              CMD_ONLINE_SEARCH_GOOGLE
             MENUITEM "Search with Bing",                CMD_ONLINE_SEARCH_BING
             MENUITEM "Search on Wikipedia",             CMD_ONLINE_SEARCH_WIKI
+            MENUITEM SEPARATOR
             MENUITEM "Custom Action &1\tCtrl+Shift+1",  CMD_CUSTOM_ACTION1
             MENUITEM "Custom Action &2\tCtrl+Shift+2",  CMD_CUSTOM_ACTION2
         END
@@ -618,6 +624,8 @@ BEGIN
         MENUITEM "&Select All",                 IDM_EDIT_SELECTALL
         MENUITEM SEPARATOR
         MENUITEM "&Toggle Fold",                IDM_VIEW_FOLD_CURRENT
+        MENUITEM SEPARATOR
+        MENUITEM "&Open",                       CMD_OPEN_PATH_OR_LINK
     END
     POPUP "+"
     BEGIN
@@ -1686,7 +1694,7 @@ STRINGTABLE
 BEGIN
     IDS_ERR_LOADFILE        "Error loading ""%s""."
     IDS_ERR_SAVEFILE        "Error saving ""%s""."
-    IDS_ERR_BROWSE          "No file browser plugin was found.\nThe metapath file browser plugin can be downloaded from http://www.flos-freeware.ch."
+    IDS_ERR_BROWSE          "No file browser plugin was found.\nThe metapath file browser plugin can be downloaded from\nhttps://github.com/zufuliu/notepad2/releases.\n\nOpen download page?"
     IDS_ERR_MRUDLG          "No access to the selected file!\nWould you like to remove it from the list?"
     IDS_ERR_CREATELINK      "Error creating the Desktop link."
     IDS_ERR_PREVWINDISABLED "Existing Notepad2 window is busy or has an active dialog box.\nWould you like to open another Notepad2 window?"

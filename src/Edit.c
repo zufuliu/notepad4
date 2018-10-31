@@ -20,6 +20,7 @@
 
 #include <windows.h>
 #include <shlwapi.h>
+#include <shlobj.h>
 #include <commctrl.h>
 #include <commdlg.h>
 #include <stdio.h>
@@ -2490,7 +2491,7 @@ void EditAlignText(HWND hwnd, int nMode) {
 	int iMinIndent = BUFSIZE_ALIGN;
 	int iMaxLength = 0;
 	for (int iLine = iLineStart; iLine <= iLineEnd; iLine++) {
-		int iLineEndPos = (int)SendMessage(hwnd, SCI_GETLINEENDPOSITION,iLine, 0);
+		int iLineEndPos = (int)SendMessage(hwnd, SCI_GETLINEENDPOSITION, iLine, 0);
 		const int iLineIndentPos = (int)SendMessage(hwnd, SCI_GETLINEINDENTPOSITION, iLine, 0);
 
 		if (iLineIndentPos != iLineEndPos) {
@@ -5940,10 +5941,8 @@ void EditSelectionAction(HWND hwnd, int action) {
 		return;
 	}
 
-	DWORD cchSelection = (int)SendMessage(hwnd, SCI_GETSELECTIONEND, 0, 0)
-						 - (int)SendMessage(hwnd, SCI_GETSELECTIONSTART, 0, 0);
-
-	if (cchSelection > 0 && cchSelection < 512 && SendMessage(hwnd, SCI_GETSELTEXT, 0, 0) < 512) {
+	const int cchSelection = (int)SendMessage(hwnd, SCI_GETSELTEXT, 0, 0);
+	if (cchSelection > 0 && cchSelection < 512) {
 		char mszSelection[512] = {0};
 		SendMessage(hwnd, SCI_GETSELTEXT, 0, (LPARAM)mszSelection);
 		mszSelection[cchSelection] = 0; // zero terminate
@@ -5991,6 +5990,235 @@ void EditSelectionAction(HWND hwnd, int action) {
 			NP2HeapFree(lpszArgs);
 		}
 	}
+}
+
+void OpenContainingFolder(HWND hwnd, LPCWSTR pszFile) {
+	LPITEMIDLIST pidlEntry = ILCreateFromPath(pszFile);
+	if (pidlEntry) {
+		WCHAR wchDirectory[MAX_PATH];
+		lstrcpyn(wchDirectory, pszFile, COUNTOF(wchDirectory));
+		PathRemoveFileSpec(wchDirectory);
+		LPITEMIDLIST pidl = ILCreateFromPath(wchDirectory);
+
+		BOOL succ = FALSE;
+		if (pidl) {
+			const HRESULT hr = SHOpenFolderAndSelectItems(pidl, 1, (LPCITEMIDLIST *)(&pidlEntry), 0);
+			ILFree(pidl);
+			succ = hr == S_OK;
+		}
+		ILFree(pidlEntry);
+		if (succ) {
+			return;
+		}
+	}
+
+	// open a new explorer window every time
+	LPWSTR szParameters = (LPWSTR)NP2HeapAlloc((lstrlen(pszFile) + 64) * sizeof(WCHAR));
+	lstrcpy(szParameters, L"/select,");
+	lstrcat(szParameters, L"\"");
+	lstrcat(szParameters, pszFile);
+	lstrcat(szParameters, L"\"");
+	ShellExecute(hwnd, L"open", L"explorer", szParameters, NULL, SW_SHOW);
+	NP2HeapFree(szParameters);
+}
+
+void TryBrowseFile(HWND hwnd, LPCWSTR pszFile, BOOL bWarn) {
+	WCHAR tchParam[MAX_PATH + 4] = L"";
+	WCHAR tchExeFile[MAX_PATH + 4];
+	WCHAR tchTemp[MAX_PATH + 4];
+
+	if (!IniGetString(INI_SECTION_NAME_FLAGS, L"filebrowser.exe", L"", tchTemp, COUNTOF(tchTemp))) {
+		if (!SearchPath(NULL, L"metapath.exe", NULL, COUNTOF(tchExeFile), tchExeFile, NULL)) {
+			GetModuleFileName(NULL, tchExeFile, COUNTOF(tchExeFile));
+			PathRemoveFileSpec(tchExeFile);
+			PathAppend(tchExeFile, L"metapath.exe");
+		}
+	} else {
+		ExtractFirstArgument(tchTemp, tchExeFile, tchParam);
+		if (PathIsRelative(tchExeFile)) {
+			if (!SearchPath(NULL, tchExeFile, NULL, COUNTOF(tchTemp), tchTemp, NULL)) {
+				GetModuleFileName(NULL, tchTemp, COUNTOF(tchTemp));
+				PathRemoveFileSpec(tchTemp);
+				PathAppend(tchTemp, tchExeFile);
+				lstrcpy(tchExeFile, tchTemp);
+			}
+		}
+	}
+
+	if (StrNotEmpty(tchParam) && StrNotEmpty(pszFile)) {
+		StrCatBuff(tchParam, L" ", COUNTOF(tchParam));
+	}
+
+	if (StrNotEmpty(pszFile)) {
+		lstrcpy(tchTemp, pszFile);
+		PathQuoteSpaces(tchTemp);
+		StrCatBuff(tchParam, tchTemp, COUNTOF(tchParam));
+	}
+
+	SHELLEXECUTEINFO sei;
+	ZeroMemory(&sei, sizeof(SHELLEXECUTEINFO));
+
+	sei.cbSize = sizeof(SHELLEXECUTEINFO);
+	sei.fMask = SEE_MASK_FLAG_NO_UI | /*SEE_MASK_NOZONECHECKS*/0x00800000;
+	sei.hwnd = hwnd;
+	sei.lpVerb = NULL;
+	sei.lpFile = tchExeFile;
+	sei.lpParameters = tchParam;
+	sei.lpDirectory = NULL;
+	sei.nShow = SW_SHOWNORMAL;
+
+	ShellExecuteEx(&sei);
+
+	if ((INT_PTR)sei.hInstApp < 32) {
+		if (bWarn) {
+			if (MsgBox(MBYESNOWARN, IDS_ERR_BROWSE) == IDYES) {
+				OpenHelpLink(hwnd, IDM_HELP_LATEST_RELEASE);
+			}
+		} else if (StrNotEmpty(pszFile)) {
+			OpenContainingFolder(hwnd, pszFile);
+		}
+	}
+}
+
+void EditOpenSelection(HWND hwnd, int type) {
+	int cchSelection = (int)SendMessage(hwnd, SCI_GETSELTEXT, 0, 0);
+	char *mszSelection = NULL;
+	if (cchSelection > 1) {
+		mszSelection = (char *)NP2HeapAlloc(cchSelection);
+		SendMessage(hwnd, SCI_GETSELTEXT, 0, (LPARAM)mszSelection);
+		char *lpsz = strpbrk(mszSelection, "\r\n\t");
+		if (lpsz) {
+			*lpsz = '\0';
+		}
+	} else {
+		// get string around caret
+		const int iCurrentPos = (int)SendMessage(hwnd, SCI_GETCURRENTPOS, 0, 0);
+		const int iLine = (int)SendMessage(hwnd, SCI_LINEFROMPOSITION, iCurrentPos, 0);
+		cchSelection = (int)SendMessage(hwnd, SCI_GETLINE, iLine, 0);
+		if (cchSelection == 0) {
+			return;
+		}
+
+		const int iLineStart = (int)SendMessage(hwnd, SCI_POSITIONFROMLINE, iLine, 0);
+		mszSelection = (char *)NP2HeapAlloc(cchSelection);
+		SendMessage(hwnd, SCI_GETLINE, iLine, (LPARAM)mszSelection);
+
+		const int iPos = iCurrentPos - iLineStart;
+		char *lpsz = strpbrk(mszSelection + iPos, " \r\n\t");
+		if (lpsz) {
+			*lpsz = '\0';
+		}
+		lpsz = mszSelection + iPos;
+		while (lpsz >= mszSelection) {
+			if (*lpsz == ' ' || *lpsz == '\t') {
+				*lpsz++ = '\0';
+				break;
+			} else {
+				--lpsz;
+			}
+		}
+
+		cchSelection = lstrlenA(lpsz);
+		if (cchSelection == 0) {
+			NP2HeapFree(mszSelection);
+			return;
+		}
+
+		if (lpsz > mszSelection) {
+			strcpy(mszSelection, lpsz);
+		}
+	}
+
+	/* remove quotes and spaces and some invalid filename characters (except '/', '\' and '?') */
+	StrTrimA(mszSelection, " \"<>|:*");
+	if (StrNotEmptyA(mszSelection)) {
+		LPWSTR wszSelection = (LPWSTR)NP2HeapAlloc((max_i(MAX_PATH, cchSelection) + 32) * sizeof(WCHAR));
+		LPWSTR link = wszSelection + 16;
+
+		const UINT cpEdit = (UINT)SendMessage(hwnd, SCI_GETCODEPAGE, 0, 0);
+		MultiByteToWideChar(cpEdit, 0, mszSelection, -1, link, cchSelection);
+
+		WCHAR wchDirectory[MAX_PATH] = L"";
+		DWORD dwAttributes = GetFileAttributes(link);
+		if (dwAttributes == INVALID_FILE_ATTRIBUTES) {
+			WCHAR path[MAX_PATH];
+			if (StrNotEmpty(szCurFile)) {
+				lstrcpy(wchDirectory, szCurFile);
+				PathRemoveFileSpec(wchDirectory);
+				PathCombine(path, wchDirectory, link);
+				dwAttributes = GetFileAttributes(path);
+			}
+			if (dwAttributes == INVALID_FILE_ATTRIBUTES && GetFullPathName(link, COUNTOF(path), path, NULL)) {
+				dwAttributes = GetFileAttributes(path);
+			}
+			if (dwAttributes != INVALID_FILE_ATTRIBUTES) {
+				lstrcpy(link, path);
+			}
+		}
+
+		if (type == 4) { // containing folder
+			if (dwAttributes == INVALID_FILE_ATTRIBUTES) {
+				type = 0;
+			}
+		} else if (dwAttributes != INVALID_FILE_ATTRIBUTES) {
+			if (dwAttributes & FILE_ATTRIBUTE_DIRECTORY) {
+				type = 3;
+			} else {
+				const BOOL can = Style_CanOpenFile(link);
+				// open supported file in a new window
+				type = can ? 2 : 1;
+			}
+		} else if (StrChr(link, L':')) { // link
+			// TODO: check scheme
+			type = 1;
+		} else if (StrChr(link, L'@')) { // email
+			lstrcpy(wszSelection, L"mailto:");
+			lstrcpy(wszSelection + CSTRLEN(L"mailto:"), link);
+			type = 1;
+			link = wszSelection;
+		}
+
+		switch (type) {
+		case 1:
+			ShellExecute(hwndMain, L"open", link, NULL, NULL, SW_SHOWNORMAL);
+			break;
+
+		case 2: {
+			WCHAR szModuleName[MAX_PATH];
+			GetModuleFileName(NULL, szModuleName, COUNTOF(szModuleName));
+
+			lstrcpyn(wchDirectory, link, COUNTOF(wchDirectory));
+			PathRemoveFileSpec(wchDirectory);
+			PathQuoteSpaces(link);
+
+			SHELLEXECUTEINFO sei;
+			ZeroMemory(&sei, sizeof(SHELLEXECUTEINFO));
+			sei.cbSize = sizeof(SHELLEXECUTEINFO);
+			sei.fMask = /*SEE_MASK_NOZONECHECKS*/0x00800000;
+			sei.hwnd = hwndMain;
+			sei.lpVerb = NULL;
+			sei.lpFile = szModuleName;
+			sei.lpParameters = link;
+			sei.lpDirectory = wchDirectory;
+			sei.nShow = SW_SHOWNORMAL;
+
+			ShellExecuteEx(&sei);
+		}
+		break;
+
+		case 3:
+			TryBrowseFile(hwndMain, link, FALSE);
+			break;
+
+		case 4:
+			OpenContainingFolder(hwndMain, link);
+			break;
+		}
+
+		NP2HeapFree(wszSelection);
+	}
+
+	NP2HeapFree(mszSelection);
 }
 
 //=============================================================================

@@ -1705,21 +1705,19 @@ extern int fNoHTMLGuess;
 extern int fNoCGIGuess;
 extern FILEVARS fvCurFile;
 
-void Style_SetLexerFromFile(HWND hwnd, LPCWSTR lpszFile) {
+static PEDITLEXER Style_GetLexerFromFile(HWND hwnd, LPCWSTR lpszFile, BOOL bCGIGuess, LPWSTR *pszExt) {
 	LPWSTR lpszExt = PathFindExtension(lpszFile);
 	LPWSTR lpszName = PathFindFileName(lpszFile);
 	BOOL bFound = FALSE;
-	PEDITLEXER pLexNew = pLexArray[iDefaultLexer];
-	PEDITLEXER pLexSniffed;
+	PEDITLEXER pLexNew = NULL;
 
-	if (!bFound && bAutoSelect && /* bAutoSelect == FALSE skips lexer search */
-			(StrNotEmpty(lpszFile) && StrNotEmpty(lpszExt))) {
-
+	if (StrNotEmpty(lpszExt)) {
 		if (*lpszExt == L'.') {
 			lpszExt++;
 		}
 
-		if (!fNoCGIGuess && (StrCaseEqual(lpszExt, L"cgi") || StrCaseEqual(lpszExt, L"fcgi"))) {
+		PEDITLEXER pLexSniffed;
+		if (bCGIGuess && (StrCaseEqual(lpszExt, L"cgi") || StrCaseEqual(lpszExt, L"fcgi"))) {
 			char tchText[256];
 			SendMessage(hwnd, SCI_GETTEXT, COUNTOF(tchText) - 1, (LPARAM)tchText);
 			StrTrimA(tchText, " \t\n\r");
@@ -1814,7 +1812,7 @@ void Style_SetLexerFromFile(HWND hwnd, LPCWSTR lpszFile) {
 		}
 	}
 
-	if (!bFound && bAutoSelect && lpszFile) {
+	if (!bFound) {
 		if (StrNCaseEqual(lpszName, L"Readme", 6)) {
 			pLexNew = &lexDefault;
 			bFound = TRUE;
@@ -1836,6 +1834,26 @@ void Style_SetLexerFromFile(HWND hwnd, LPCWSTR lpszFile) {
 			pLexNew = &lexJAM;
 			bFound = TRUE;
 		}
+	}
+
+	if (!bFound && pszExt) {
+		*pszExt = lpszExt;
+	}
+	return pLexNew;
+}
+
+void Style_SetLexerFromFile(HWND hwnd, LPCWSTR lpszFile) {
+	BOOL bFound = TRUE;
+	LPWSTR lpszExt = NULL;
+	PEDITLEXER pLexNew = NULL;
+	PEDITLEXER pLexSniffed;
+
+	if (bAutoSelect) {
+		pLexNew = Style_GetLexerFromFile(hwnd, lpszFile, !fNoCGIGuess, &lpszExt);
+	}
+	if (pLexNew == NULL) {
+		bFound = FALSE;
+		pLexNew = pLexArray[iDefaultLexer];
 	}
 
 	// xml/html
@@ -1912,6 +1930,14 @@ void Style_SetLexerFromName(HWND hwnd, LPCWSTR lpszFile, LPCWSTR lpszName) {
 	} else {
 		Style_SetLexerFromFile(hwnd, lpszFile);
 	}
+}
+
+BOOL Style_CanOpenFile(LPCWSTR lpszFile) {
+	const int lang = np2LexLangIndex;
+	LPWSTR lpszExt = NULL;
+	PEDITLEXER pLexNew = Style_GetLexerFromFile(NULL, lpszFile, FALSE, &lpszExt);
+	np2LexLangIndex = lang;
+	return pLexNew != NULL || StrIsEmpty(lpszExt) || StrCaseEqual(lpszExt, L"cgi") || StrCaseEqual(lpszExt, L"fcgi");
 }
 
 void Style_SetLexerByLangIndex(HWND hwnd, int lang) {

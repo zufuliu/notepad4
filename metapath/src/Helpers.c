@@ -703,7 +703,7 @@ BOOL PathGetLnkPath(LPCWSTR pszLnkFile, LPWSTR pszResPath, int cchResPath) {
 		if (SUCCEEDED(psl->lpVtbl->QueryInterface(psl, &IID_IPersistFile, (void **)(&ppf)))) {
 			WCHAR wsz[MAX_PATH];
 
-			/*MultiByteToWideChar(CP_ACP,MB_PRECOMPOSED, pszLnkFile, -1, wsz, MAX_PATH);*/
+			/*MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, pszLnkFile, -1, wsz, MAX_PATH);*/
 			lstrcpy(wsz, pszLnkFile);
 
 			if (SUCCEEDED(ppf->lpVtbl->Load(ppf, wsz, STGM_READ))) {
@@ -777,7 +777,7 @@ BOOL PathCreateLnk(LPCWSTR pszLnkDir, LPCWSTR pszPath) {
 
 		if (SUCCEEDED(psl->lpVtbl->QueryInterface(psl, &IID_IPersistFile, (void **)(&ppf)))) {
 			WCHAR wsz[MAX_PATH];
-			/*MultiByteToWideChar(CP_ACP,MB_PRECOMPOSED, tchLnkFileName,-1,wsz,MAX_PATH);*/
+			/*MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, tchLnkFileName, -1, wsz, MAX_PATH);*/
 			lstrcpy(wsz, tchLnkFileName);
 
 			if (NOERROR == psl->lpVtbl->SetPath(psl, pszPath) && SUCCEEDED(ppf->lpVtbl->Save(ppf, wsz, TRUE))) {
@@ -1035,7 +1035,7 @@ HDROP CreateDropHandle(LPCWSTR lpFileName) {
 //
 //  ExecDDECommand()
 //
-//  Execute a DDE command (Msg,App,Topic)
+//  Execute a DDE command (Msg, App, Topic)
 //
 //
 HDDEDATA CALLBACK DdeCallback(UINT uType, UINT uFmt, HCONV hconv, HSZ hsz1, HSZ hsz2, HDDEDATA hdata, ULONG_PTR  dwData1, ULONG_PTR  dwData2) {
@@ -1374,9 +1374,9 @@ BOOL MRU_Save(LPMRULIST pmru) {
 			/*if (pmru->iFlags & MRU_UTF8) {
 				WCHAR  tchItem[1024];
 				WCHAR wchItem[1024];
-				int cbw = MultiByteToWideChar(CP_UTF8,0,pmru->pszItems[i],-1,wchItem,COUNTOF(wchItem));
-				WideCharToMultiByte(CP_UTF7,0,wchItem,cbw,tchItem,COUNTOF(tchItem),NULL,NULL);
-				IniSectionSetString(pIniSection,tchName,tchItem);
+				int cbw = MultiByteToWideChar(CP_UTF8, 0, pmru->pszItems[i], -1, wchItem, COUNTOF(wchItem));
+				WideCharToMultiByte(CP_UTF7, 0, wchItem, cbw, tchItem, COUNTOF(tchItem), NULL, NULL);
+				IniSectionSetString(pIniSection, tchName, tchItem);
 			}
 			else*/
 			IniSectionSetString(pIniSection, tchName, pmru->pszItems[i]);
@@ -1435,7 +1435,7 @@ BOOL GetThemedDialogFont(LPWSTR lpFaceName, WORD *wSize) {
 			HTHEME hTheme = (HTHEME)(INT_PTR)(GetProcAddress(hModUxTheme, "OpenThemeData"))(NULL, L"WINDOWSTYLE;WINDOW");
 			if (hTheme) {
 				LOGFONT lf;
-				if (S_OK == (HRESULT)(GetProcAddress(hModUxTheme, "GetThemeSysFont"))(hTheme,/*TMT_MSGBOXFONT*/805, &lf)) {
+				if (S_OK == (HRESULT)(GetProcAddress(hModUxTheme, "GetThemeSysFont"))(hTheme, /*TMT_MSGBOXFONT*/805, &lf)) {
 					if (lf.lfHeight < 0) {
 						lf.lfHeight = -lf.lfHeight;
 					}

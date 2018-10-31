@@ -2145,6 +2145,7 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	EnableCmd(hmenu, IDM_FILE_ADDTOFAV, i);
 
 	EnableCmd(hmenu, IDM_FILE_RELAUNCH_ELEVATED, IsVistaAndAbove() && !fIsElevated);
+	EnableCmd(hmenu, IDM_FILE_OPEN_CONTAINING_FOLDER, i);
 	EnableCmd(hmenu, IDM_FILE_READONLY, i);
 	CheckCmd(hmenu, IDM_FILE_READONLY, bReadOnly);
 
@@ -2190,10 +2191,12 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	i  = !EditIsEmptySelection();
 	const int i2 = (int)SendMessage(hwndEdit, SCI_CANPASTE, 0, 0);
+	const BOOL nonEmpty = SendMessage(hwndEdit, SCI_GETLENGTH, 0, 0) != 0;
 
 	EnableCmd(hmenu, IDM_EDIT_CUT, i /*&& !bReadOnly*/);
 	EnableCmd(hmenu, IDM_EDIT_COPY, i /*&& !bReadOnly*/);
-	EnableCmd(hmenu, IDM_EDIT_COPYALL, SendMessage(hwndEdit, SCI_GETLENGTH, 0, 0) /*&& !bReadOnly*/);
+	EnableCmd(hmenu, IDM_EDIT_COPYALL, nonEmpty /*&& !bReadOnly*/);
+	EnableCmd(hmenu, IDM_EDIT_SELECTALL, nonEmpty);
 	EnableCmd(hmenu, IDM_EDIT_COPYADD, i /*&& !bReadOnly*/);
 	EnableCmd(hmenu, IDM_EDIT_PASTE, i2 /*&& !bReadOnly*/);
 	EnableCmd(hmenu, IDM_EDIT_SWAP, i || i2 /*&& !bReadOnly*/);
@@ -2203,6 +2206,15 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	OpenClipboard(hwnd);
 	EnableCmd(hmenu, IDM_EDIT_CLEARCLIPBOARD, CountClipboardFormats());
 	CloseClipboard();
+
+	EnableCmd(hmenu, IDM_VIEW_FOLD_CURRENT, nonEmpty);
+	EnableCmd(hmenu, CMD_OPEN_PATH_OR_LINK, nonEmpty);
+	EnableCmd(hmenu, CMD_OPEN_CONTAINING_FOLDER, nonEmpty);
+	EnableCmd(hmenu, CMD_ONLINE_SEARCH_GOOGLE, i);
+	EnableCmd(hmenu, CMD_ONLINE_SEARCH_BING, i);
+	EnableCmd(hmenu, CMD_ONLINE_SEARCH_WIKI, i);
+	EnableCmd(hmenu, CMD_CUSTOM_ACTION1, i);
+	EnableCmd(hmenu, CMD_CUSTOM_ACTION2, i);
 
 	//EnableCmd(hmenu, IDM_EDIT_MOVELINEUP, !bReadOnly);
 	//EnableCmd(hmenu, IDM_EDIT_MOVELINEDOWN, !bReadOnly);
@@ -2284,7 +2296,7 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	//EnableCmd(hmenu, IDM_EDIT_INSERT_FILENAME, !bReadOnly);
 	//EnableCmd(hmenu, IDM_EDIT_INSERT_PATHNAME, !bReadOnly);
 
-	i = (int)SendMessage(hwndEdit, SCI_GETLENGTH, 0, 0) > 0;
+	i = nonEmpty;
 	EnableCmd(hmenu, IDM_EDIT_FIND, i);
 	EnableCmd(hmenu, IDM_EDIT_SAVEFIND, i);
 	EnableCmd(hmenu, IDM_EDIT_FINDNEXT, i);
@@ -2560,58 +2572,9 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		}
 		break;
 
-	case IDM_FILE_BROWSE: {
-		WCHAR tchParam[MAX_PATH + 4] = L"";
-		WCHAR tchExeFile[MAX_PATH + 4];
-		WCHAR tchTemp[MAX_PATH + 4];
-
-		if (!IniGetString(INI_SECTION_NAME_FLAGS, L"filebrowser.exe", L"", tchTemp, COUNTOF(tchTemp))) {
-			if (!SearchPath(NULL, L"metapath.exe", NULL, COUNTOF(tchExeFile), tchExeFile, NULL)) {
-				GetModuleFileName(NULL, tchExeFile, COUNTOF(tchExeFile));
-				PathRemoveFileSpec(tchExeFile);
-				PathAppend(tchExeFile, L"metapath.exe");
-			}
-		} else {
-			ExtractFirstArgument(tchTemp, tchExeFile, tchParam);
-			if (PathIsRelative(tchExeFile)) {
-				if (!SearchPath(NULL, tchExeFile, NULL, COUNTOF(tchTemp), tchTemp, NULL)) {
-					GetModuleFileName(NULL, tchTemp, COUNTOF(tchTemp));
-					PathRemoveFileSpec(tchTemp);
-					PathAppend(tchTemp, tchExeFile);
-					lstrcpy(tchExeFile, tchTemp);
-				}
-			}
-		}
-
-		if (StrNotEmpty(tchParam) && StrNotEmpty(szCurFile)) {
-			StrCatBuff(tchParam, L" ", COUNTOF(tchParam));
-		}
-
-		if (StrNotEmpty(szCurFile)) {
-			lstrcpy(tchTemp, szCurFile);
-			PathQuoteSpaces(tchTemp);
-			StrCatBuff(tchParam, tchTemp, COUNTOF(tchParam));
-		}
-
-		SHELLEXECUTEINFO sei;
-		ZeroMemory(&sei, sizeof(SHELLEXECUTEINFO));
-
-		sei.cbSize = sizeof(SHELLEXECUTEINFO);
-		sei.fMask = SEE_MASK_FLAG_NO_UI | /*SEE_MASK_NOZONECHECKS*/0x00800000;
-		sei.hwnd = hwnd;
-		sei.lpVerb = NULL;
-		sei.lpFile = tchExeFile;
-		sei.lpParameters = tchParam;
-		sei.lpDirectory = NULL;
-		sei.nShow = SW_SHOWNORMAL;
-
-		ShellExecuteEx(&sei);
-
-		if ((INT_PTR)sei.hInstApp < 32) {
-			MsgBox(MBWARN, IDS_ERR_BROWSE);
-		}
-	}
-	break;
+	case IDM_FILE_BROWSE:
+		TryBrowseFile(hwnd, szCurFile, TRUE);
+		break;
 
 	case IDM_FILE_NEWWINDOW:
 	case IDM_FILE_NEWWINDOW2: {
@@ -2646,6 +2609,10 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		if (RelaunchElevated()) {
 			DestroyWindow(hwnd);
 		}
+		break;
+
+	case IDM_FILE_OPEN_CONTAINING_FOLDER:
+		OpenContainingFolder(hwnd, szCurFile);
 		break;
 
 	case IDM_FILE_LAUNCH: {
@@ -4572,6 +4539,13 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		}
 	}
 	break;
+
+	case CMD_OPEN_PATH_OR_LINK:
+		EditOpenSelection(hwndEdit, 0);
+		break;
+	case CMD_OPEN_CONTAINING_FOLDER:
+		EditOpenSelection(hwndEdit, 4);
+		break;
 
 	case CMD_ONLINE_SEARCH_GOOGLE:
 	case CMD_ONLINE_SEARCH_BING:
