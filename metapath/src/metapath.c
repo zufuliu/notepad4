@@ -1195,7 +1195,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 				if (PathGetLnkPath(dli.szFileName, tch, COUNTOF(tch))) {
 					ExpandEnvironmentStringsEx(tch, COUNTOF(tch));
 					const DWORD dwAttr = GetFileAttributes(tch);
-					if ((dwAttr == (DWORD)(-1)) || (dwAttr & FILE_ATTRIBUTE_DIRECTORY)) {
+					if ((dwAttr == INVALID_FILE_ATTRIBUTES) || (dwAttr & FILE_ATTRIBUTE_DIRECTORY)) {
 						DisplayLnkFile(dli.szFileName);
 					} else {
 						// Made sure link points to a file
@@ -1230,7 +1230,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 				if (PathGetLnkPath(dli.szFileName, tch, COUNTOF(tch))) {
 					ExpandEnvironmentStringsEx(tch, COUNTOF(tch));
 					const DWORD dwAttr = GetFileAttributes(tch);
-					if ((dwAttr == (DWORD)(-1)) || (dwAttr & FILE_ATTRIBUTE_DIRECTORY)) {
+					if ((dwAttr == INVALID_FILE_ATTRIBUTES) || (dwAttr & FILE_ATTRIBUTE_DIRECTORY)) {
 						DisplayLnkFile(dli.szFileName);
 					} else {
 						// Made sure link points to a file
@@ -3040,7 +3040,7 @@ BOOL DisplayPath(LPCWSTR lpPath, UINT uIdError) {
 			ListView_EnsureVisible(hwndDirList, 0, FALSE);
 			return TRUE;
 		}
-		{ // !(dwAttr & FILE_ATTRIBUTE_DIRECTORY)
+		{
 			// szPath will be modified...
 			lstrcpy(szTmp, szPath);
 
@@ -3066,7 +3066,6 @@ BOOL DisplayPath(LPCWSTR lpPath, UINT uIdError) {
 		}
 	}
 
-	// dwAttr != (DWORD)(-1)
 	ErrorMessage(2, uIdError);
 	return FALSE;
 }

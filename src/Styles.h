@@ -58,6 +58,7 @@ void	Style_OnDPIChanged(HWND hwnd);
 void	Style_SetLexer(HWND hwnd, PEDITLEXER pLexNew);
 void	Style_SetLexerFromFile(HWND hwnd, LPCWSTR lpszFile);
 void	Style_SetLexerFromName(HWND hwnd, LPCWSTR lpszFile, LPCWSTR lpszName);
+BOOL	Style_CanOpenFile(LPCWSTR lpszFile);
 void	Style_SetLexerFromID(HWND hwnd, int id);
 int		Style_GetEditLexerId(int lexer);
 

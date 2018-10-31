@@ -58,7 +58,7 @@ static KEYWORDLIST Keywords_CSS = {{
 "link not nth-child nth-last-child nth-last-of-type nth-of-type only-child only-of-type optional "
 "required right root target valid visited"
 
-,NULL, NULL, NULL, NULL, NULL, NULL, NULL
+, NULL, NULL, NULL, NULL, NULL, NULL, NULL
 
 , NULL, NULL, NULL, NULL, NULL, NULL, NULL
 }};
