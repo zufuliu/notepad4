@@ -6100,8 +6100,8 @@ void EditOpenSelection(HWND hwnd, int type) {
 		}
 	}
 
-	/* remove quotes and spaces and some invalid filename characters (except '/', '\' and '?') */
-	StrTrimA(mszSelection, " \"<>|:*");
+	/* remove quotes, spaces and some invalid filename characters (except '/', '\' and '?') */
+	StrTrimA(mszSelection, " \t\r\n\"<>|:*");
 	if (StrNotEmptyA(mszSelection)) {
 		LPWSTR wszSelection = (LPWSTR)NP2HeapAlloc((max_i(MAX_PATH, cchSelection) + 32) * sizeof(WCHAR));
 		LPWSTR link = wszSelection + 16;
