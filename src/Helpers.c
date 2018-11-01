@@ -1298,6 +1298,59 @@ BOOL PathCreateFavLnk(LPCWSTR pszName, LPCWSTR pszTarget, LPCWSTR pszDir) {
 	return bSucceeded;
 }
 
+void OpenContainingFolder(HWND hwnd, LPCWSTR pszFile, BOOL bSelect) {
+	WCHAR wchDirectory[MAX_PATH];
+	lstrcpyn(wchDirectory, pszFile, COUNTOF(wchDirectory));
+
+	LPCWSTR path = NULL;
+	DWORD dwAttributes = GetFileAttributes(pszFile);
+	if (bSelect || dwAttributes == INVALID_FILE_ATTRIBUTES || !(dwAttributes & FILE_ATTRIBUTE_DIRECTORY)) {
+		PathRemoveFileSpec(wchDirectory);
+	}
+	if (bSelect && dwAttributes != INVALID_FILE_ATTRIBUTES) {
+		// if pszFile is root, open the volume instead of open My Computer and select the volume
+		if ((dwAttributes & FILE_ATTRIBUTE_DIRECTORY) && PathIsRoot(pszFile)) {
+			bSelect = FALSE;
+		} else {
+			path = pszFile;
+		}
+	}
+
+	dwAttributes = GetFileAttributes(wchDirectory);
+	if (dwAttributes == INVALID_FILE_ATTRIBUTES || !(dwAttributes & FILE_ATTRIBUTE_DIRECTORY)) {
+		return;
+	}
+
+	LPITEMIDLIST pidl = ILCreateFromPath(wchDirectory);
+	if (pidl) {
+		HRESULT hr;
+		LPITEMIDLIST pidlEntry = path ? ILCreateFromPath(path) : NULL;
+		if (pidlEntry) {
+			hr = SHOpenFolderAndSelectItems(pidl, 1, (LPCITEMIDLIST *)(&pidlEntry), 0);
+			ILFree(pidlEntry);
+		} else {
+			hr = SHOpenFolderAndSelectItems(pidl, 0, NULL, 0);
+		}
+		ILFree(pidl);
+		if (hr == S_OK) {
+			return;
+		}
+	}
+
+	if (path == NULL) {
+		path = wchDirectory;
+	}
+
+	// open a new explorer window every time
+	LPWSTR szParameters = (LPWSTR)NP2HeapAlloc((lstrlen(path) + 64) * sizeof(WCHAR));
+	lstrcpy(szParameters, bSelect ? L"/select," : L"");
+	lstrcat(szParameters, L"\"");
+	lstrcat(szParameters, path);
+	lstrcat(szParameters, L"\"");
+	ShellExecute(hwnd, L"open", L"explorer", szParameters, NULL, SW_SHOW);
+	NP2HeapFree(szParameters);
+}
+
 //=============================================================================
 //
 // ExtractFirstArgument()

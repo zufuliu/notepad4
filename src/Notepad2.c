@@ -175,6 +175,7 @@ int		iPrintColor;
 int		iPrintZoom = 100;
 RECT	pageSetupMargin;
 static BOOL bSaveBeforeRunningTools;
+BOOL bOpenFolderWithMetapath;
 int		iFileWatchingMode;
 BOOL	bResetFileWatching;
 static DWORD dwFileCheckInverval;
@@ -2433,6 +2434,7 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	CheckCmd(hmenu, IDM_VIEW_NOSAVERECENT, bSaveRecentFiles);
 	CheckCmd(hmenu, IDM_VIEW_NOSAVEFINDREPL, bSaveFindReplace);
 	CheckCmd(hmenu, IDM_VIEW_SAVEBEFORERUNNINGTOOLS, bSaveBeforeRunningTools);
+	CheckCmd(hmenu, IDM_SET_OPEN_FOLDER_METAPATH, bOpenFolderWithMetapath);
 
 	CheckCmd(hmenu, IDM_VIEW_CHANGENOTIFY, iFileWatchingMode);
 
@@ -2612,7 +2614,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	case IDM_FILE_OPEN_CONTAINING_FOLDER:
-		OpenContainingFolder(hwnd, szCurFile);
+		OpenContainingFolder(hwnd, szCurFile, TRUE);
 		break;
 
 	case IDM_FILE_LAUNCH: {
@@ -4202,6 +4204,10 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		bSaveBeforeRunningTools = !bSaveBeforeRunningTools;
 		break;
 
+	case IDM_SET_OPEN_FOLDER_METAPATH:
+		bOpenFolderWithMetapath = !bOpenFolderWithMetapath;
+		break;
+
 	case IDM_VIEW_CHANGENOTIFY:
 		if (ChangeNotifyDlg(hwnd)) {
 			InstallFileWatching(szCurFile);
@@ -5377,6 +5383,7 @@ void LoadSettings(void) {
 	pageSetupMargin.bottom = max_i(pageSetupMargin.bottom, -1);
 
 	bSaveBeforeRunningTools = IniSectionGetBool(pIniSection, L"SaveBeforeRunningTools", 0);
+	bOpenFolderWithMetapath = IniSectionGetBool(pIniSection, L"OpenFolderWithMetapath", 1);
 
 	iFileWatchingMode = IniSectionGetInt(pIniSection, L"FileWatchingMode", 2);
 	iFileWatchingMode = clamp_i(iFileWatchingMode, 0, 2);
@@ -5640,6 +5647,7 @@ void SaveSettings(BOOL bSaveSettingsNow) {
 	IniSectionSetIntEx(pIniSection, L"PrintMarginRight", pageSetupMargin.right, -1);
 	IniSectionSetIntEx(pIniSection, L"PrintMarginBottom", pageSetupMargin.bottom, -1);
 	IniSectionSetBoolEx(pIniSection, L"SaveBeforeRunningTools", bSaveBeforeRunningTools, 0);
+	IniSectionSetBoolEx(pIniSection, L"OpenFolderWithMetapath", bOpenFolderWithMetapath, 1);
 	IniSectionSetIntEx(pIniSection, L"FileWatchingMode", iFileWatchingMode, 2);
 	IniSectionSetBoolEx(pIniSection, L"ResetFileWatching", bResetFileWatching, 0);
 	IniSectionSetIntEx(pIniSection, L"EscFunction", iEscFunction, 0);

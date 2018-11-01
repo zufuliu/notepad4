@@ -20,7 +20,6 @@
 
 #include <windows.h>
 #include <shlwapi.h>
-#include <shlobj.h>
 #include <commctrl.h>
 #include <commdlg.h>
 #include <stdio.h>
@@ -5992,36 +5991,6 @@ void EditSelectionAction(HWND hwnd, int action) {
 	}
 }
 
-void OpenContainingFolder(HWND hwnd, LPCWSTR pszFile) {
-	LPITEMIDLIST pidlEntry = ILCreateFromPath(pszFile);
-	if (pidlEntry) {
-		WCHAR wchDirectory[MAX_PATH];
-		lstrcpyn(wchDirectory, pszFile, COUNTOF(wchDirectory));
-		PathRemoveFileSpec(wchDirectory);
-		LPITEMIDLIST pidl = ILCreateFromPath(wchDirectory);
-
-		BOOL succ = FALSE;
-		if (pidl) {
-			const HRESULT hr = SHOpenFolderAndSelectItems(pidl, 1, (LPCITEMIDLIST *)(&pidlEntry), 0);
-			ILFree(pidl);
-			succ = hr == S_OK;
-		}
-		ILFree(pidlEntry);
-		if (succ) {
-			return;
-		}
-	}
-
-	// open a new explorer window every time
-	LPWSTR szParameters = (LPWSTR)NP2HeapAlloc((lstrlen(pszFile) + 64) * sizeof(WCHAR));
-	lstrcpy(szParameters, L"/select,");
-	lstrcat(szParameters, L"\"");
-	lstrcat(szParameters, pszFile);
-	lstrcat(szParameters, L"\"");
-	ShellExecute(hwnd, L"open", L"explorer", szParameters, NULL, SW_SHOW);
-	NP2HeapFree(szParameters);
-}
-
 void TryBrowseFile(HWND hwnd, LPCWSTR pszFile, BOOL bWarn) {
 	WCHAR tchParam[MAX_PATH + 4] = L"";
 	WCHAR tchExeFile[MAX_PATH + 4];
@@ -6075,10 +6044,12 @@ void TryBrowseFile(HWND hwnd, LPCWSTR pszFile, BOOL bWarn) {
 				OpenHelpLink(hwnd, IDM_HELP_LATEST_RELEASE);
 			}
 		} else if (StrNotEmpty(pszFile)) {
-			OpenContainingFolder(hwnd, pszFile);
+			OpenContainingFolder(hwnd, pszFile, FALSE);
 		}
 	}
 }
+
+extern BOOL bOpenFolderWithMetapath;
 
 void EditOpenSelection(HWND hwnd, int type) {
 	int cchSelection = (int)SendMessage(hwnd, SCI_GETSELTEXT, 0, 0);
@@ -6207,11 +6178,15 @@ void EditOpenSelection(HWND hwnd, int type) {
 		break;
 
 		case 3:
-			TryBrowseFile(hwndMain, link, FALSE);
+			if (bOpenFolderWithMetapath) {
+				TryBrowseFile(hwndMain, link, FALSE);
+			} else {
+				OpenContainingFolder(hwndMain, link, FALSE);
+			}
 			break;
 
 		case 4:
-			OpenContainingFolder(hwndMain, link);
+			OpenContainingFolder(hwndMain, link, TRUE);
 			break;
 		}
 
