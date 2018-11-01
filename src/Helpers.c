@@ -1328,7 +1328,27 @@ void OpenContainingFolder(HWND hwnd, LPCWSTR pszFile, BOOL bSelect) {
 		if (pidlEntry) {
 			hr = SHOpenFolderAndSelectItems(pidl, 1, (LPCITEMIDLIST *)(&pidlEntry), 0);
 			ILFree(pidlEntry);
+		} else if (!bSelect) {
+#if 0
+			// Use an invalid item to open the folder?
+			hr = SHOpenFolderAndSelectItems(pidl, 1, (LPCITEMIDLIST *)(&pidl), 0);
+#else
+			SHELLEXECUTEINFO sei;
+			ZeroMemory(&sei, sizeof(SHELLEXECUTEINFO));
+
+			sei.cbSize = sizeof(SHELLEXECUTEINFO);
+			sei.fMask = SEE_MASK_IDLIST;
+			sei.hwnd = hwnd;
+			//sei.lpVerb = L"explore";
+			sei.lpVerb = L"open";
+			sei.lpIDList = pidl;
+			sei.nShow = SW_SHOW;
+
+			const BOOL result = ShellExecuteEx(&sei);
+			hr = result ? S_OK : S_FALSE;
+#endif
 		} else {
+			// open parent folder and select the folder
 			hr = SHOpenFolderAndSelectItems(pidl, 0, NULL, 0);
 		}
 		ILFree(pidl);
