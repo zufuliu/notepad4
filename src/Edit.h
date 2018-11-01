@@ -138,7 +138,6 @@ void	EditShowUnicodeControlCharacter(HWND hwnd, BOOL bShow);
 BOOL	EditSortDlg(HWND hwnd, int *piSortFlags);
 BOOL	EditAlignDlg(HWND hwnd, int *piAlignMode);
 void	EditSelectionAction(HWND hwnd, int action);
-void	OpenContainingFolder(HWND hwnd, LPCWSTR pszFile);
 void	TryBrowseFile(HWND hwnd, LPCWSTR pszFile, BOOL bWarn);
 void	EditOpenSelection(HWND hwnd, int type);
 

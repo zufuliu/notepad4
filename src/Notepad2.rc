@@ -577,6 +577,7 @@ BEGIN
             MENUITEM "Remember Recent F&iles",      IDM_VIEW_NOSAVERECENT
             MENUITEM "Remember S&earch Options",    IDM_VIEW_NOSAVEFINDREPL
             MENUITEM "Sa&ve Before Running Tools",  IDM_VIEW_SAVEBEFORERUNNINGTOOLS
+            MENUITEM "Use &metapath to Open Folder",IDM_SET_OPEN_FOLDER_METAPATH
         END
         MENUITEM SEPARATOR
         MENUITEM "Sh&ow Toolbar",               IDM_VIEW_TOOLBAR
