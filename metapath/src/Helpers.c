@@ -885,6 +885,21 @@ void StrTab2Space(LPWSTR lpsz) {
 
 //=============================================================================
 //
+// PathFixBackslashes() - in place conversion
+//
+void PathFixBackslashes(LPWSTR lpsz) {
+	WCHAR *c = lpsz;
+	while ((c = StrChr(c, L'/')) != NULL) {
+		if (*CharPrev(lpsz, c) == L':' && *CharNext(c) == L'/') {
+			c += 2;
+		} else {
+			*c = L'\\';
+		}
+	}
+}
+
+//=============================================================================
+//
 //  ExpandEnvironmentStringsEx()
 //
 //  Adjusted for Windows 95

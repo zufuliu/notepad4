@@ -2796,6 +2796,8 @@ void ParseCommandLine(void) {
 
 			lpPathArg = GlobalAlloc(GPTR, sizeof(WCHAR) * (MAX_PATH + 2));
 			lstrcpyn(lpPathArg, lp3, MAX_PATH);
+			PathFixBackslashes(lpPathArg);
+			StrTrim(lpPathArg, L" \"");
 			break;
 		}
 	}
