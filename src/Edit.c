@@ -6109,10 +6109,10 @@ void EditOpenSelection(HWND hwnd, int type) {
 		const UINT cpEdit = (UINT)SendMessage(hwnd, SCI_GETCODEPAGE, 0, 0);
 		MultiByteToWideChar(cpEdit, 0, mszSelection, -1, link, cchSelection);
 
+		WCHAR path[MAX_PATH];
 		WCHAR wchDirectory[MAX_PATH] = L"";
 		DWORD dwAttributes = GetFileAttributes(link);
 		if (dwAttributes == INVALID_FILE_ATTRIBUTES) {
-			WCHAR path[MAX_PATH];
 			if (StrNotEmpty(szCurFile)) {
 				lstrcpy(wchDirectory, szCurFile);
 				PathRemoveFileSpec(wchDirectory);
@@ -6125,6 +6125,8 @@ void EditOpenSelection(HWND hwnd, int type) {
 			if (dwAttributes != INVALID_FILE_ATTRIBUTES) {
 				lstrcpy(link, path);
 			}
+		} else if (GetFullPathName(link, COUNTOF(path), path, NULL)) {
+			lstrcpy(link, path);
 		}
 
 		if (type == 4) { // containing folder
