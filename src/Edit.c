@@ -5944,8 +5944,12 @@ void EditSelectionAction(HWND hwnd, int action) {
 	};
 
 	WCHAR szCmdTemplate[256];
-	LPCWSTR actionKey = kActionKeys[action - CMD_ONLINE_SEARCH_GOOGLE];
-	const BOOL bCmdEnabled = IniGetString(INI_SECTION_NAME_FLAGS, actionKey, L"", szCmdTemplate, COUNTOF(szCmdTemplate));
+	action -= CMD_ONLINE_SEARCH_GOOGLE;
+	LPCWSTR actionKey = kActionKeys[action];
+	BOOL bCmdEnabled = IniGetString(INI_SECTION_NAME_FLAGS, actionKey, L"", szCmdTemplate, COUNTOF(szCmdTemplate));
+	if (!bCmdEnabled && action < 3) {
+		bCmdEnabled = GetString(IDS_GOOGLE_SEARCH_URL + action, szCmdTemplate, COUNTOF(szCmdTemplate));
+	}
 	if (!bCmdEnabled) {
 		return;
 	}

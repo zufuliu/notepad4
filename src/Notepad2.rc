@@ -1757,6 +1757,13 @@ END
 
 STRINGTABLE
 BEGIN
+	IDS_GOOGLE_SEARCH_URL	"https://www.google.com/search?q=%s"
+	IDS_BING_SEARCH_URL		"https://www.bing.com/search?q=%s"
+	IDS_WIKI_SEARCH_URL		"https://en.wikipedia.org/wiki/Special:Search?search=%s"
+END
+
+STRINGTABLE
+BEGIN
     61000                   "A0;ANSI;ANSI"
     61001                   "A1;OEM;OEM"
     61002                   "A2;Unicode (UTF-16 LE BOM);UTF-16 LE BOM"
@@ -1765,10 +1772,6 @@ BEGIN
     61005                   "A5;Unicode (UTF-16 BE);UTF-16 BE"
     61006                   "A6;UTF-8;UTF-8"
     61007                   "A7;UTF-8 BOM;UTF-8 BOM"
-END
-
-STRINGTABLE
-BEGIN
     61008                   "A8;UTF-7;UTF-7"
     //61009                   "C;Arabic (DOS-720);DOS-720"
     61010                   "C;Arabic (ISO 8859-6 Visual);ISO 8859-6"
@@ -1784,10 +1787,6 @@ BEGIN
     61020                   "C;Chinese Simplified (GBK, GB2312);GBK"
     61021                   "C;Chinese Simplified (GB18030);GB18030"
     61022                   "C;Chinese Traditional (Big5);Big5"
-END
-
-STRINGTABLE
-BEGIN
     //61024                   "C;Croatian (Mac);Mac (Croatian)"
     //61025                   "C;Cyrillic (DOS-866);DOS-866"
     61026                   "C;Cyrillic (ISO 8859-5);ISO 8859-5"
@@ -1804,10 +1803,6 @@ BEGIN
     //61037                   "C;Greek, Modern (DOS-869);DOS-869"
     //61038                   "C;Hebrew (DOS-862);DOS-862"
     61039                   "C;Hebrew (ISO 8859-8-I, Logical);ISO 8859-8-I"
-END
-
-STRINGTABLE
-BEGIN
     61040                   "C;Hebrew (ISO 8859-8, Visual);ISO 8859-8"
     //61041                   "C;Hebrew (Mac);Mac (Hebrew)"
     61042                   "C;Hebrew (Windows-1255);Windows-1255"
@@ -1824,10 +1819,6 @@ BEGIN
     61053                   "C;Korean (EUC-KR);EUC-KR"
     61054                   "C;South-Eastern European (Latin-10, ISO 8859-16);ISO 8859-16"
     61055                   "C;Celtic (Latin-8, ISO 8859-14);ISO 8859-14"
-END
-
-STRINGTABLE
-BEGIN
     //61056                   "C;Thai (Mac);Mac (Thai)"
     61057                   "C;Thai (TIS-620, Windows-874, ISO 8859-11);TIS-620"
     //61058                   "C;Turkish (DOS-857);DOS-857"
