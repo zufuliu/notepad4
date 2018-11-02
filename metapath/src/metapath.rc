@@ -82,7 +82,8 @@ BEGIN
         MENUITEM "&Launch",                     IDM_FILE_LAUNCH
         MENUITEM "&Quickview",                  IDM_FILE_QUICKVIEW
         MENUITEM "Open &with...",               IDM_FILE_OPENWITH
-        MENUITEM "&Copy Name",                  IDM_POP_COPYNAME
+        MENUITEM "&Copy Name",                  IDM_POP_COPY_FILENAME
+        MENUITEM "&Copy Path Name",             IDM_POP_COPY_PATHNAME
         MENUITEM SEPARATOR
         MENUITEM "Create Lin&k...",             IDM_FILE_CREATELINK
         MENUITEM "&Save As...",                 IDM_FILE_SAVEAS
@@ -158,6 +159,8 @@ BEGIN
     "3",            IDM_SORT_TYPE,          VIRTKEY, CONTROL, NOINVERT
     "4",            IDM_SORT_DATE,          VIRTKEY, CONTROL, NOINVERT
     "5",            IDM_SORT_REVERSE,       VIRTKEY, CONTROL, NOINVERT
+    "C",            IDM_POP_COPY_FILENAME,  VIRTKEY, CONTROL, NOINVERT
+    "C",            IDM_POP_COPY_PATHNAME,  VIRTKEY, ALT, NOINVERT
     "D",            IDM_FILE_CHANGEDIR,     VIRTKEY, CONTROL, NOINVERT
     "D",            IDM_FILE_NEWDIR,        VIRTKEY, ALT, NOINVERT
     "E",            ACC_TOGGLE_FOCUSEDIT,   VIRTKEY, CONTROL, NOINVERT
