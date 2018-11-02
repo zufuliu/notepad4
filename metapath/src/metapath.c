@@ -1780,15 +1780,21 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		DirList_Sort(hwndDirList, nSortFlags, fSortRev);
 		break;
 
-	case IDM_POP_COPYNAME: {
+	case IDM_POP_COPY_PATHNAME:
+	case IDM_POP_COPY_FILENAME: {
 		DLITEM dli;
 		dli.mask = DLI_FILENAME;
 		DirList_GetItem(hwndDirList, -1, &dli);
 
+		LPCWSTR path = dli.szFileName;
+		if (LOWORD(wParam) == IDM_POP_COPY_FILENAME) {
+			path = PathFindFileName(path);
+		}
+
 		HGLOBAL hData = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE,
-							sizeof(WCHAR) * (lstrlen(dli.szFileName) + 1));
+							sizeof(WCHAR) * (lstrlen(path) + 1));
 		LPWSTR pData = GlobalLock(hData);
-		lstrcpy(pData, dli.szFileName);
+		lstrcpy(pData, path);
 		GlobalUnlock(hData);
 
 		if (OpenClipboard(hwnd)) {

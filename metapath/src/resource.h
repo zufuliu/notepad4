@@ -106,6 +106,7 @@
 #define IDPP_ADVANCED                   111
 #define IDPP_ITEMS                      112
 #define IDPP_PROG                       113
+
 #define IDS_APPTITLE                    10000
 #define IDS_NUMFILES                    10001
 #define IDS_NUMFILES2                   10002
@@ -122,6 +123,7 @@
 #define IDS_COPYMOVE                    11009
 #define IDS_CREATELINK                  11010
 #define IDS_SAVESETTINGS                11011
+
 #define IDM_FILE_OPEN                   40001
 #define IDM_FILE_OPENNEW                40002
 #define IDM_FILE_RUN                    40003
@@ -162,9 +164,11 @@
 #define IDM_SORT_TYPE                   40303
 #define IDM_SORT_DATE                   40304
 #define IDM_SORT_REVERSE                40305
-#define IDM_POP_COPYNAME                40501
+#define IDM_POP_COPY_PATHNAME			40501
+#define IDM_POP_COPY_FILENAME			40502
 #define IDM_TRAY_RESTORE                40601
 #define IDM_TRAY_EXIT                   40602
+
 #define ACC_ESCAPE                      41001
 #define ACC_NEXTCTL                     41002
 #define ACC_PREVCTL                     41003
@@ -176,6 +180,7 @@
 #define ACC_SNAPTOTARGET                41009
 #define ACC_DEFAULTWINPOS               41010
 #define ACC_SELECTINIFILE               41011
+
 #define IDT_HISTORY_BACK                42001
 #define IDT_HISTORY_FORWARD             42002
 #define IDT_UPDIR                       42003
@@ -190,6 +195,7 @@
 #define IDT_FILE_DELETE                 42012
 #define IDT_FILE_DELETE2                42013
 #define IDT_VIEW_FILTER                 42014
+
 #define IDS_ERR_CD                      50000
 #define IDS_ERR_FILE                    50001
 #define IDS_ERR_NEW                     50002
