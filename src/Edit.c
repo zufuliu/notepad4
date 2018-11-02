@@ -5233,11 +5233,21 @@ static INT_PTR CALLBACK EditLineNumDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, 
 	case WM_INITDIALOG: {
 		const int iCurLine = (int)SendMessage(hwndEdit, SCI_LINEFROMPOSITION,
 										SendMessage(hwndEdit, SCI_GETCURRENTPOS, 0, 0), 0) + 1;
+		const int iMaxLine = (int)SendMessage(hwndEdit, SCI_GETLINECOUNT, 0, 0);
 
 		SetDlgItemInt(hwnd, IDC_LINENUM, iCurLine, FALSE);
-		SendDlgItemMessage(hwnd, IDC_LINENUM, EM_LIMITTEXT, 15, 0);
+		SendDlgItemMessage(hwnd, IDC_LINENUM, EM_LIMITTEXT, 20, 0);
+		SendDlgItemMessage(hwnd, IDC_COLNUM, EM_LIMITTEXT, 20, 0);
 
-		SendDlgItemMessage(hwnd, IDC_COLNUM, EM_LIMITTEXT, 15, 0);
+		WCHAR tchLn[32];
+		WCHAR tchLines[64];
+		WCHAR tchFmt[64];
+
+		wsprintf(tchLn, L"%i", iMaxLine);
+		FormatNumberStr(tchLn);
+		GetDlgItemText(hwnd, IDC_LINE_RANGE, tchFmt, COUNTOF(tchFmt));
+		wsprintf(tchLines, tchFmt, tchLn);
+		SetDlgItemText(hwnd, IDC_LINE_RANGE, tchLines);
 
 		CenterDlgInParent(hwnd);
 	}
