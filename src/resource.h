@@ -45,6 +45,7 @@
 #define IDB_PREV						102
 #define IDI_STYLES						102
 #define IDC_ASCIIASUTF8					102
+#define IDC_LINE_RANGE					102
 #define IDD_DEFENCODING					103
 #define IDC_FINDWORD					103
 #define IDC_RESIZEGRIP3					103
