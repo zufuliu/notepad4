@@ -558,6 +558,10 @@
 #define SC_SAVEPOS						40800	// "Save Position"
 #define SC_RESETPOS						40801	// "Reset Position"
 
+#define IDS_GOOGLE_SEARCH_URL			41000
+#define IDS_BING_SEARCH_URL				41001
+#define IDS_WIKI_SEARCH_URL				41002
+
 #define IDS_ERR_LOADFILE				50000
 #define IDS_ERR_SAVEFILE				50001
 #define IDS_ERR_BROWSE					50002
