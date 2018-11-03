@@ -309,7 +309,7 @@ BOOL PathIsLnkFile(LPCWSTR pszPath);
 BOOL PathGetLnkPath(LPCWSTR pszLnkFile, LPWSTR pszResPath, int cchResPath);
 BOOL PathIsLnkToDirectory(LPCWSTR pszPath, LPWSTR pszResPath, int cchResPath);
 BOOL PathCreateLnk(LPCWSTR pszLnkDir, LPCWSTR pszPath);
-
+void OpenContainingFolder(HWND hwnd, LPCWSTR pszFile, BOOL bSelect);
 
 NP2_inline void TrimString(LPWSTR lpString) {
 	StrTrim(lpString, L" ");

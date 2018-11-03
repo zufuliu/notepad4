@@ -85,6 +85,7 @@ BEGIN
         MENUITEM "&Copy Name",                  IDM_POP_COPY_FILENAME
         MENUITEM "&Copy Path Name",             IDM_POP_COPY_PATHNAME
         MENUITEM SEPARATOR
+        MENUITEM "Show in Explorer",            IDM_FILE_EXPLORER
         MENUITEM "Create Lin&k...",             IDM_FILE_CREATELINK
         MENUITEM "&Save As...",                 IDM_FILE_SAVEAS
         MENUITEM "Copy/&Move...",               IDM_FILE_COPYMOVE
@@ -116,6 +117,7 @@ BEGIN
             MENUITEM "&Reverse",                    IDM_SORT_REVERSE
         END
         MENUITEM SEPARATOR
+        MENUITEM "Open in Explorer",            IDM_FILE_EXPLORER
         MENUITEM "&Goto Favorites",             IDM_VIEW_FAVORITES
         MENUITEM "&Edit Favorites",             IDM_VIEW_EDITFAVORITES
         MENUITEM "&Directory...",               IDM_FILE_CHANGEDIR

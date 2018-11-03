@@ -1575,6 +1575,18 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		DriveBox_PropertyDlg(hwndDriveBox);
 		break;
 
+	case IDM_FILE_EXPLORER: {
+		if (ListView_GetSelectedCount(hwndDirList)) {
+			DLITEM dli;
+			dli.mask = DLI_FILENAME;
+			DirList_GetItem(hwndDirList, -1, &dli);
+			OpenContainingFolder(hwndMain, dli.szFileName, TRUE);
+		} else {
+			OpenContainingFolder(hwndMain, szCurDir, FALSE);
+		}
+	}
+	break;
+
 	case IDM_VIEW_NEWWINDOW: {
 		WCHAR szModuleName[MAX_PATH];
 		WCHAR szParameters[1024];
