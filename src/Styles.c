@@ -3413,47 +3413,12 @@ void Style_ConfigDlg(HWND hwnd) {
 // Style_SelectLexerDlgProc()
 //
 static INT_PTR CALLBACK Style_SelectLexerDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
-	static int cxClient;
-	static int cyClient;
-	static int mmiPtMaxY;
-	static int mmiPtMinX;
-
 	static int iInternalDefault;
 
 	switch (umsg) {
 	case WM_INITDIALOG: {
 		LVCOLUMN lvc = { LVCF_FMT | LVCF_TEXT, LVCFMT_LEFT, 0, L"", -1, 0, 0, 0 };
-
-		RECT rc;
-		GetClientRect(hwnd, &rc);
-		cxClient = rc.right - rc.left;
-		cyClient = rc.bottom - rc.top;
-
-		AdjustWindowRectEx(&rc, GetWindowLong(hwnd, GWL_STYLE) | WS_THICKFRAME, FALSE, 0);
-		mmiPtMinX = rc.right - rc.left;
-		mmiPtMaxY = rc.bottom - rc.top;
-
-		if (cxStyleSelectDlg < (rc.right - rc.left)) {
-			cxStyleSelectDlg = rc.right - rc.left;
-		}
-		if (cyStyleSelectDlg < (rc.bottom - rc.top)) {
-			cyStyleSelectDlg = rc.bottom - rc.top;
-		}
-		SetWindowPos(hwnd, NULL, rc.left, rc.top, cxStyleSelectDlg, cyStyleSelectDlg, SWP_NOZORDER);
-
-		SetWindowLongPtr(hwnd, GWL_STYLE, GetWindowLongPtr(hwnd, GWL_STYLE) | WS_THICKFRAME);
-		SetWindowPos(hwnd, NULL, 0, 0, 0, 0, SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE | SWP_FRAMECHANGED);
-
-		WCHAR tch[MAX_PATH];
-		GetMenuString(GetSystemMenu(GetParent(hwnd), FALSE), SC_SIZE, tch, COUNTOF(tch), MF_BYCOMMAND);
-		InsertMenu(GetSystemMenu(hwnd, FALSE), SC_CLOSE, MF_BYCOMMAND | MF_STRING | MF_ENABLED, SC_SIZE, tch);
-		InsertMenu(GetSystemMenu(hwnd, FALSE), SC_CLOSE, MF_BYCOMMAND | MF_SEPARATOR, 0, NULL);
-
-		SetWindowLongPtr(GetDlgItem(hwnd, IDC_RESIZEGRIP3), GWL_STYLE,
-						 GetWindowLongPtr(GetDlgItem(hwnd, IDC_RESIZEGRIP3), GWL_STYLE) | SBS_SIZEGRIP | WS_CLIPSIBLINGS);
-
-		const int cGrip = GetSystemMetrics(SM_CXHTHUMB);
-		SetWindowPos(GetDlgItem(hwnd, IDC_RESIZEGRIP3), NULL, cxClient - cGrip, cyClient - cGrip, cGrip, cGrip, SWP_NOZORDER);
+		ResizeDlg_Init(hwnd, cxStyleSelectDlg, cyStyleSelectDlg, IDC_RESIZEGRIP3);
 
 		HWND hwndLV = GetDlgItem(hwnd, IDC_STYLELIST);
 		InitWindowCommon(hwndLV);
@@ -3502,62 +3467,31 @@ static INT_PTR CALLBACK Style_SelectLexerDlgProc(HWND hwnd, UINT umsg, WPARAM wP
 	}
 	return TRUE;
 
-	case WM_DESTROY: {
-		RECT rc;
-
-		GetWindowRect(hwnd, &rc);
-		cxStyleSelectDlg = rc.right - rc.left;
-		cyStyleSelectDlg = rc.bottom - rc.top;
-	}
-	return FALSE;
+	case WM_DESTROY:
+		ResizeDlg_Destroy(hwnd, &cxStyleSelectDlg, &cyStyleSelectDlg);
+		return FALSE;
 
 	case WM_SIZE: {
-		int dxClient = LOWORD(lParam) - cxClient;
-		int dyClient = HIWORD(lParam) - cyClient;
-		cxClient = LOWORD(lParam);
-		cyClient = HIWORD(lParam);
+		int dx;
+		int dy;
 
-		RECT rc;
-		GetWindowRect(GetDlgItem(hwnd, IDC_RESIZEGRIP3), &rc);
-		MapWindowPoints(NULL, hwnd, (LPPOINT)&rc, 2);
-		SetWindowPos(GetDlgItem(hwnd, IDC_RESIZEGRIP3), NULL, rc.left + dxClient, rc.top + dyClient, 0, 0, SWP_NOZORDER | SWP_NOSIZE);
-		InvalidateRect(GetDlgItem(hwnd, IDC_RESIZEGRIP3), NULL, TRUE);
+		ResizeDlg_Size(hwnd, lParam, &dx, &dy);
+		HDWP hdwp = BeginDeferWindowPos(6);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDC_RESIZEGRIP3, dx, dy, SWP_NOSIZE);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDOK, dx, dy, SWP_NOSIZE);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDCANCEL, dx, dy, SWP_NOSIZE);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDC_STYLELIST, dx, dy, SWP_NOMOVE);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDC_AUTOSELECT, 0, dy, SWP_NOSIZE);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDC_DEFAULTSCHEME, 0, dy, SWP_NOSIZE);
+		EndDeferWindowPos(hdwp);
 
-		GetWindowRect(GetDlgItem(hwnd, IDOK), &rc);
-		MapWindowPoints(NULL, hwnd, (LPPOINT)&rc, 2);
-		SetWindowPos(GetDlgItem(hwnd, IDOK), NULL, rc.left + dxClient, rc.top + dyClient, 0, 0, SWP_NOZORDER | SWP_NOSIZE);
-		InvalidateRect(GetDlgItem(hwnd, IDOK), NULL, TRUE);
-
-		GetWindowRect(GetDlgItem(hwnd, IDCANCEL), &rc);
-		MapWindowPoints(NULL, hwnd, (LPPOINT)&rc, 2);
-		SetWindowPos(GetDlgItem(hwnd, IDCANCEL), NULL, rc.left + dxClient, rc.top + dyClient, 0, 0, SWP_NOZORDER | SWP_NOSIZE);
-		InvalidateRect(GetDlgItem(hwnd, IDCANCEL), NULL, TRUE);
-
-		GetWindowRect(GetDlgItem(hwnd, IDC_STYLELIST), &rc);
-		MapWindowPoints(NULL, hwnd, (LPPOINT)&rc, 2);
-		SetWindowPos(GetDlgItem(hwnd, IDC_STYLELIST), NULL, 0, 0, rc.right - rc.left + dxClient, rc.bottom - rc.top + dyClient, SWP_NOZORDER | SWP_NOMOVE);
 		ListView_SetColumnWidth(GetDlgItem(hwnd, IDC_STYLELIST), 0, LVSCW_AUTOSIZE_USEHEADER);
-		InvalidateRect(GetDlgItem(hwnd, IDC_STYLELIST), NULL, TRUE);
-
-		GetWindowRect(GetDlgItem(hwnd, IDC_AUTOSELECT), &rc);
-		MapWindowPoints(NULL, hwnd, (LPPOINT)&rc, 2);
-		SetWindowPos(GetDlgItem(hwnd, IDC_AUTOSELECT), NULL, rc.left, rc.top + dyClient, 0, 0, SWP_NOZORDER | SWP_NOSIZE);
-		InvalidateRect(GetDlgItem(hwnd, IDC_AUTOSELECT), NULL, TRUE);
-
-		GetWindowRect(GetDlgItem(hwnd, IDC_DEFAULTSCHEME), &rc);
-		MapWindowPoints(NULL, hwnd, (LPPOINT)&rc, 2);
-		SetWindowPos(GetDlgItem(hwnd, IDC_DEFAULTSCHEME), NULL, rc.left, rc.top + dyClient, 0, 0, SWP_NOZORDER | SWP_NOSIZE);
-		InvalidateRect(GetDlgItem(hwnd, IDC_DEFAULTSCHEME), NULL, TRUE);
 	}
 	return TRUE;
 
-	case WM_GETMINMAXINFO: {
-		LPMINMAXINFO lpmmi = (LPMINMAXINFO)lParam;
-		lpmmi->ptMinTrackSize.x = mmiPtMinX;
-		lpmmi->ptMinTrackSize.y = mmiPtMaxY;
-		//lpmmi->ptMaxTrackSize.y = mmiPtMaxY;
-	}
-	return TRUE;
+	case WM_GETMINMAXINFO:
+		ResizeDlg_GetMinMaxInfo(hwnd, lParam);
+		return TRUE;
 
 	case WM_NOTIFY:
 		if (((LPNMHDR)(lParam))->idFrom == IDC_STYLELIST) {
