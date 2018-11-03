@@ -143,6 +143,7 @@
 #define IDM_FILE_CHANGEDIR              40017
 #define IDM_FILE_PROPERTIES             40018
 #define IDM_FILE_DRIVEPROP              40019
+#define IDM_FILE_EXPLORER				40020
 #define IDM_VIEW_NEWWINDOW              40201
 #define IDM_VIEW_FOLDERS                40202
 #define IDM_VIEW_FILES                  40203
