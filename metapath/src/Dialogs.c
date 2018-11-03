@@ -310,40 +310,9 @@ extern HISTORY mHistory;
 extern int cxGotoDlg;
 
 INT_PTR CALLBACK GotoDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
-	static int cxClient;
-	static int cyClient;
-	static int mmiPtMaxY;
-	static int mmiPtMinX;
-
 	switch (umsg) {
 	case WM_INITDIALOG: {
-		RECT rc;
-		GetClientRect(hwnd, &rc);
-		cxClient = rc.right - rc.left;
-		cyClient = rc.bottom - rc.top;
-
-		AdjustWindowRectEx(&rc, GetWindowLong(hwnd, GWL_STYLE) | WS_THICKFRAME, FALSE, 0);
-		mmiPtMinX = rc.right - rc.left;
-		mmiPtMaxY = rc.bottom - rc.top;
-
-		if (cxGotoDlg < (rc.right - rc.left)) {
-			cxGotoDlg = rc.right - rc.left;
-		}
-		SetWindowPos(hwnd, NULL, rc.left, rc.top, cxGotoDlg, rc.bottom - rc.top, SWP_NOZORDER);
-
-		SetWindowLongPtr(hwnd, GWL_STYLE, GetWindowLongPtr(hwnd, GWL_STYLE) | WS_THICKFRAME);
-		SetWindowPos(hwnd, NULL, 0, 0, 0, 0, SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE | SWP_FRAMECHANGED);
-
-		WCHAR tch[64];
-		GetMenuString(GetSystemMenu(GetParent(hwnd), FALSE), SC_SIZE, tch, COUNTOF(tch), MF_BYCOMMAND);
-		InsertMenu(GetSystemMenu(hwnd, FALSE), SC_CLOSE, MF_BYCOMMAND | MF_STRING | MF_ENABLED, SC_SIZE, tch);
-		InsertMenu(GetSystemMenu(hwnd, FALSE), SC_CLOSE, MF_BYCOMMAND | MF_SEPARATOR, 0, NULL);
-
-		SetWindowLongPtr(GetDlgItem(hwnd, IDC_RESIZEGRIP), GWL_STYLE,
-						 GetWindowLongPtr(GetDlgItem(hwnd, IDC_RESIZEGRIP), GWL_STYLE) | SBS_SIZEGRIP | WS_CLIPSIBLINGS);
-
-		const int cGrip = GetSystemMetrics(SM_CXHTHUMB);
-		SetWindowPos(GetDlgItem(hwnd, IDC_RESIZEGRIP), NULL, cxClient - cGrip, cyClient - cGrip, cGrip, cGrip, SWP_NOZORDER);
+		ResizeDlg_InitX(hwnd, cxGotoDlg, IDC_RESIZEGRIP);
 
 		HWND hwndGoto = GetDlgItem(hwnd, IDC_GOTO);
 		SendMessage(hwndGoto, CB_LIMITTEXT, MAX_PATH - 1, 0);
@@ -372,49 +341,27 @@ INT_PTR CALLBACK GotoDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 	}
 	return TRUE;
 
-	case WM_DESTROY: {
-		RECT rc;
-		GetWindowRect(hwnd, &rc);
-		cxGotoDlg = rc.right - rc.left;
-	}
-	return FALSE;
+	case WM_DESTROY:
+		ResizeDlg_Destroy(hwnd, &cxGotoDlg, NULL);
+		return FALSE;
 
 	case WM_SIZE: {
-		int dxClient = LOWORD(lParam) - cxClient;
-		int dyClient = HIWORD(lParam) - cyClient;
-		cxClient = LOWORD(lParam);
-		cyClient = HIWORD(lParam);
+		int dx;
 
-		RECT rc;
-		GetWindowRect(GetDlgItem(hwnd, IDC_RESIZEGRIP), &rc);
-		MapWindowPoints(NULL, hwnd, (LPPOINT)&rc, 2);
-		SetWindowPos(GetDlgItem(hwnd, IDC_RESIZEGRIP), NULL, rc.left + dxClient, rc.top + dyClient, 0, 0, SWP_NOZORDER | SWP_NOSIZE);
-		InvalidateRect(GetDlgItem(hwnd, IDC_RESIZEGRIP), NULL, TRUE);
+		ResizeDlg_Size(hwnd, lParam, &dx, NULL);
 
-		GetWindowRect(GetDlgItem(hwnd, IDOK), &rc);
-		MapWindowPoints(NULL, hwnd, (LPPOINT)&rc, 2);
-		SetWindowPos(GetDlgItem(hwnd, IDOK), NULL, rc.left + dxClient, rc.top + dyClient, 0, 0, SWP_NOZORDER | SWP_NOSIZE);
-		InvalidateRect(GetDlgItem(hwnd, IDOK), NULL, TRUE);
-
-		GetWindowRect(GetDlgItem(hwnd, IDCANCEL), &rc);
-		MapWindowPoints(NULL, hwnd, (LPPOINT)&rc, 2);
-		SetWindowPos(GetDlgItem(hwnd, IDCANCEL), NULL, rc.left + dxClient, rc.top + dyClient, 0, 0, SWP_NOZORDER | SWP_NOSIZE);
-		InvalidateRect(GetDlgItem(hwnd, IDCANCEL), NULL, TRUE);
-
-		GetWindowRect(GetDlgItem(hwnd, IDC_GOTO), &rc);
-		MapWindowPoints(NULL, hwnd, (LPPOINT)&rc, 2);
-		SetWindowPos(GetDlgItem(hwnd, IDC_GOTO), NULL, 0, 0, rc.right - rc.left + dxClient, rc.bottom - rc.top, SWP_NOZORDER | SWP_NOMOVE);
-		InvalidateRect(GetDlgItem(hwnd, IDC_GOTO), NULL, TRUE);
+		HDWP hdwp = BeginDeferWindowPos(4);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDC_RESIZEGRIP, dx, 0, SWP_NOSIZE);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDOK, dx, 0, SWP_NOSIZE);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDCANCEL, dx, 0, SWP_NOSIZE);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDC_GOTO, dx, 0, SWP_NOMOVE);
+		EndDeferWindowPos(hdwp);
 	}
 	return TRUE;
 
-	case WM_GETMINMAXINFO: {
-		LPMINMAXINFO lpmmi = (LPMINMAXINFO)lParam;
-		lpmmi->ptMinTrackSize.x = mmiPtMinX;
-		lpmmi->ptMinTrackSize.y = mmiPtMaxY;
-		lpmmi->ptMaxTrackSize.y = mmiPtMaxY;
-	}
-	return TRUE;
+	case WM_GETMINMAXINFO:
+		ResizeDlg_GetMinMaxInfo(hwnd, lParam);
+		return TRUE;
 
 	case WM_COMMAND:
 		switch (LOWORD(wParam)) {

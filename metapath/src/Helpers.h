@@ -263,6 +263,26 @@ NP2_inline void CenterDlgInParent(HWND hDlg) {
 }
 void SnapToDefaultButton(HWND hwndBox);
 
+void GetDlgPos(HWND hDlg, LPINT xDlg, LPINT yDlg);
+void SetDlgPos(HWND hDlg, int xDlg, int yDlg);
+
+#define ResizeDlgDirection_Both		0
+#define ResizeDlgDirection_OnlyX	1
+#define ResizeDlgDirection_OnlyY	2
+void ResizeDlg_InitEx(HWND hwnd, int cxFrame, int cyFrame, int nIdGrip, int iDirection);
+NP2_inline void ResizeDlg_Init(HWND hwnd, int cxFrame, int cyFrame, int nIdGrip) {
+	ResizeDlg_InitEx(hwnd, cxFrame, cyFrame, nIdGrip, ResizeDlgDirection_Both);
+}
+NP2_inline void ResizeDlg_InitX(HWND hwnd, int cxFrame, int nIdGrip) {
+	ResizeDlg_InitEx(hwnd, cxFrame, 0, nIdGrip, ResizeDlgDirection_OnlyX);
+}
+NP2_inline void ResizeDlg_InitY(HWND hwnd, int cyFrame, int nIdGrip) {
+	ResizeDlg_InitEx(hwnd, 0, cyFrame, nIdGrip, ResizeDlgDirection_OnlyY);
+}
+void ResizeDlg_Destroy(HWND hwnd, int *cxFrame, int *cyFrame);
+void ResizeDlg_Size(HWND hwnd, LPARAM lParam, int *cx, int *cy);
+void ResizeDlg_GetMinMaxInfo(HWND hwnd, LPARAM lParam);
+HDWP DeferCtlPos(HDWP hdwp, HWND hwndDlg, int nCtlId, int dx, int dy, UINT uFlags);
 void MakeBitmapButton(HWND hwnd, int nCtlId, HINSTANCE hInstance, WORD wBmpId);
 void DeleteBitmapButton(HWND hwnd, int nCtlId);
 void SetWindowTransparentMode(HWND hwnd, BOOL bTransparentMode, int iOpacityLevel);

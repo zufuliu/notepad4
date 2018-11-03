@@ -720,16 +720,20 @@ void SetDlgPos(HWND hDlg, int xDlg, int yDlg) {
 // Resize Dialog Helpers()
 //
 typedef struct _resizedlg {
+	int direction;
 	int cxClient;
 	int cyClient;
 	int cxFrame;
 	int cyFrame;
 	int mmiPtMinX;
 	int mmiPtMinY;
+	int mmiPtMaxX;	// only Y direction
+	int mmiPtMaxY;	// only X direction
 } RESIZEDLG, *PRESIZEDLG;
 
-void ResizeDlg_Init(HWND hwnd, int cxFrame, int cyFrame, int nIdGrip) {
+void ResizeDlg_InitEx(HWND hwnd, int cxFrame, int cyFrame, int nIdGrip, int iDirection) {
 	RESIZEDLG *pm = NP2HeapAlloc(sizeof(RESIZEDLG));
+	pm->direction = iDirection;
 
 	RECT rc;
 	GetClientRect(hwnd, &rc);
@@ -742,6 +746,16 @@ void ResizeDlg_Init(HWND hwnd, int cxFrame, int cyFrame, int nIdGrip) {
 	AdjustWindowRectEx(&rc, GetWindowLong(hwnd, GWL_STYLE) | WS_THICKFRAME, FALSE, 0);
 	pm->mmiPtMinX = rc.right - rc.left;
 	pm->mmiPtMinY = rc.bottom - rc.top;
+	// only one direction
+	switch (iDirection) {
+	case ResizeDlgDirection_OnlyX:
+		pm->mmiPtMaxY = pm->mmiPtMinY;
+		break;
+
+	case ResizeDlgDirection_OnlyY:
+		pm->mmiPtMaxX = pm->mmiPtMinX;
+		break;
+	}
 
 	if (pm->cxFrame < (rc.right - rc.left)) {
 		pm->cxFrame = rc.right - rc.left;
@@ -773,8 +787,12 @@ void ResizeDlg_Destroy(HWND hwnd, int *cxFrame, int *cyFrame) {
 
 	RECT rc;
 	GetWindowRect(hwnd, &rc);
-	*cxFrame = rc.right - rc.left;
-	*cyFrame = rc.bottom - rc.top;
+	if (cxFrame) {
+		*cxFrame = rc.right - rc.left;
+	}
+	if (cyFrame) {
+		*cyFrame = rc.bottom - rc.top;
+	}
 
 	RemoveProp(hwnd, L"ResizeDlg");
 	NP2HeapFree(pm);
@@ -783,10 +801,14 @@ void ResizeDlg_Destroy(HWND hwnd, int *cxFrame, int *cyFrame) {
 void ResizeDlg_Size(HWND hwnd, LPARAM lParam, int *cx, int *cy) {
 	PRESIZEDLG pm = GetProp(hwnd, L"ResizeDlg");
 
-	*cx = LOWORD(lParam) - pm->cxClient;
-	*cy = HIWORD(lParam) - pm->cyClient;
-	pm->cxClient = LOWORD(lParam);
-	pm->cyClient = HIWORD(lParam);
+	if (cx) {
+		*cx = LOWORD(lParam) - pm->cxClient;
+		pm->cxClient = LOWORD(lParam);
+	}
+	if (cy) {
+		*cy = HIWORD(lParam) - pm->cyClient;
+		pm->cyClient = HIWORD(lParam);
+	}
 }
 
 void ResizeDlg_GetMinMaxInfo(HWND hwnd, LPARAM lParam) {
@@ -795,6 +817,17 @@ void ResizeDlg_GetMinMaxInfo(HWND hwnd, LPARAM lParam) {
 	LPMINMAXINFO lpmmi = (LPMINMAXINFO)lParam;
 	lpmmi->ptMinTrackSize.x = pm->mmiPtMinX;
 	lpmmi->ptMinTrackSize.y = pm->mmiPtMinY;
+
+	// only one direction
+	switch (pm->direction) {
+	case ResizeDlgDirection_OnlyX:
+		lpmmi->ptMaxTrackSize.y = pm->mmiPtMaxY;
+		break;
+
+	case ResizeDlgDirection_OnlyY:
+		lpmmi->ptMaxTrackSize.x = pm->mmiPtMaxX;
+		break;
+	}
 }
 
 HDWP DeferCtlPos(HDWP hdwp, HWND hwndDlg, int nCtlId, int dx, int dy, UINT uFlags) {
