@@ -1341,7 +1341,7 @@ void OpenContainingFolder(HWND hwnd, LPCWSTR pszFile, BOOL bSelect) {
 			sei.hwnd = hwnd;
 			//sei.lpVerb = L"explore";
 			sei.lpVerb = L"open";
-			sei.lpIDList = pidl;
+			sei.lpIDList = (void *)pidl;
 			sei.nShow = SW_SHOW;
 
 			const BOOL result = ShellExecuteEx(&sei);

@@ -1025,6 +1025,23 @@ BEGIN
     PUSHBUTTON      "Cancel",IDCANCEL,139,24,50,14
 END
 
+IDD_WARNLINEENDS DIALOGEX 0, 0, 196, 100
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Inconsistent Line Endings"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    LTEXT           "The line endings in this file is not consistent:",IDC_STATIC,7,7,180,8
+    LTEXT           "CR+LF: %s line(s).",IDC_EOL_SUM_CRLF,22,18,164,8
+    LTEXT           "LF: %s line(s).",IDC_EOL_SUM_LF,36,28,154,8
+    LTEXT           "CR: %s line(s).",IDC_EOL_SUM_CR,34,38,152,8
+    LTEXT           "&Do you want to normalize the line ending?",IDC_STATIC,7,52,180,8
+    COMBOBOX        IDC_EOLMODELIST,7,64,118,81,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "&Yes",IDOK,138,63,50,14
+    PUSHBUTTON      "&No",IDCANCEL,138,80,50,14
+    CONTROL         "&Always show this dialog.",IDC_WARNINCONSISTENTEOLS,
+                    "Button",BS_AUTOCHECKBOX | BS_VCENTER | WS_TABSTOP,7,82,118,10
+END
+
 IDD_LINENUM DIALOGEX 0, 0, 166, 70
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Goto"
@@ -1757,9 +1774,9 @@ END
 
 STRINGTABLE
 BEGIN
-	IDS_GOOGLE_SEARCH_URL	"https://www.google.com/search?q=%s"
-	IDS_BING_SEARCH_URL		"https://www.bing.com/search?q=%s"
-	IDS_WIKI_SEARCH_URL		"https://en.wikipedia.org/wiki/Special:Search?search=%s"
+    IDS_GOOGLE_SEARCH_URL   "https://www.google.com/search?q=%s"
+    IDS_BING_SEARCH_URL     "https://www.bing.com/search?q=%s"
+    IDS_WIKI_SEARCH_URL     "https://en.wikipedia.org/wiki/Special:Search?search=%s"
 END
 
 STRINGTABLE
@@ -1840,9 +1857,9 @@ END
 
 STRINGTABLE
 BEGIN
-    62000                   "Windows (CR+LF)"
-    62001                   "Unix/Mac (LF)"
-    62002                   "Old Mac (CR)"
+    IDS_EOLMODENAME_CRLF    "Windows (CR+LF)"
+    IDS_EOLMODENAME_LF      "Unix/Mac (LF)"
+    IDS_EOLMODENAME_CR      "Old Mac (CR)"
 END
 
 

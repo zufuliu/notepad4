@@ -7030,6 +7030,10 @@ BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect, LPCWST
 		}
 		// Show inconsistent line endings warning
 		if (status.bInconsistent && bWarnLineEndings) {
+			if (WarnLineEndingDlg(hwndMain, &status)) {
+				const int iNewEOLMode = iLineEndings[status.iEOLMode];
+				ConvertLineEndings(iNewEOLMode);
+			}
 		}
 	} else if (!status.bFileTooBig) {
 		MsgBox(MBWARN, IDS_ERR_LOADFILE, szFileName);
