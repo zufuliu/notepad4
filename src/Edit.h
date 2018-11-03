@@ -178,9 +178,6 @@ void	EditShowCallTips(HWND hwnd, Sci_Position position);
 #define CPI_UTF8SIGN				7
 #define CPI_UTF7					8
 
-#define IDS_ENCODINGNAME0		61000
-#define IDS_EOLMODENAME0		62000
-
 #define MAX_ENCODING_LABEL_SIZE		32
 
 typedef struct _np2encoding {

@@ -60,6 +60,9 @@ BOOL	SelectDefEncodingDlg(HWND hwnd, int *pidREncoding);
 BOOL	SelectEncodingDlg(HWND hwnd, int *pidREncoding);
 BOOL	RecodeDlg(HWND hwnd, int *pidREncoding);
 BOOL	SelectDefLineEndingDlg(HWND hwnd, int *iOption);
+
+struct EditFileIOStatus;
+BOOL	WarnLineEndingDlg(HWND hwnd, struct EditFileIOStatus *status);
 INT_PTR InfoBox(int iType, LPCWSTR lpstrSetting, int uidMessage, ...);
 
 #endif // NOTEPAD2_DIALOGS_H_

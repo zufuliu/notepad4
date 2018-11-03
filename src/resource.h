@@ -46,6 +46,7 @@
 #define IDI_STYLES						102
 #define IDC_ASCIIASUTF8					102
 #define IDC_LINE_RANGE					102
+#define IDC_EOL_SUM_CRLF				102
 #define IDD_DEFENCODING					103
 #define IDC_FINDWORD					103
 #define IDC_RESIZEGRIP3					103
@@ -54,6 +55,8 @@
 #define IDC_AUTOSTRIPBLANKS				103
 #define IDC_ENCODINGFROMFILEVARS		103
 #define IDC_EMPTY_MRU					103
+#define IDC_EOL_SUM_LF					103
+#define IDC_EOL_SUM_CR					104
 
 #define IDD_ABOUT						100
 #define IDC_VERSION						100
@@ -119,6 +122,7 @@
 #define IDD_INFOBOX						126
 #define IDD_INFOBOX2					127
 #define IDD_INFOBOX3					128
+#define IDD_WARNLINEENDS				129
 #define IDC_BACKSLASHHELP				151
 #define IDC_REGEXPHELP					152
 #define IDC_WILDCARDHELP				153
@@ -604,6 +608,9 @@
 #define IDS_SETTINGSNOTSAVED			50039
 #define IDS_EXPORT_FAIL					50040
 #define IDS_CMDLINEHELP					60000
+#define IDS_EOLMODENAME_CRLF			62000
+#define IDS_EOLMODENAME_LF				62001
+#define IDS_EOLMODENAME_CR				62002
 
 // Next default values for new objects
 //

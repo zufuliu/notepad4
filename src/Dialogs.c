@@ -1854,7 +1854,7 @@ static INT_PTR CALLBACK SelectDefLineEndingDlgProc(HWND hwnd, UINT umsg, WPARAM 
 		// Load options
 		WCHAR wch[128];
 		for (int i = 0; i < 3; i++) {
-			GetString(IDS_EOLMODENAME0 + i, wch, COUNTOF(wch));
+			GetString(IDS_EOLMODENAME_CRLF + i, wch, COUNTOF(wch));
 			SendDlgItemMessage(hwnd, IDC_EOLMODELIST, CB_ADDSTRING, 0, (LPARAM)wch);
 		}
 
@@ -1904,6 +1904,67 @@ static INT_PTR CALLBACK SelectDefLineEndingDlgProc(HWND hwnd, UINT umsg, WPARAM 
 //
 BOOL SelectDefLineEndingDlg(HWND hwnd, int *iOption) {
 	const INT_PTR iResult = ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_DEFEOLMODE), hwnd, SelectDefLineEndingDlgProc, (LPARAM)iOption);
+	return iResult == IDOK;
+}
+
+static INT_PTR CALLBACK WarnLineEndingDlgDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
+	switch (umsg) {
+	case WM_INITDIALOG: {
+		SetWindowLongPtr(hwnd, DWLP_USER, lParam);
+		EditFileIOStatus *status = (EditFileIOStatus *)lParam;
+		int iEOLMode = status->iEOLMode;
+		iEOLMode = (iEOLMode == SC_EOL_CRLF) ? 0 : (iEOLMode == SC_EOL_LF) ? 1 : 2;
+
+		// Load options
+		WCHAR wch[128];
+		for (int i = 0; i < 3; i++) {
+			GetString(IDS_EOLMODENAME_CRLF + i, wch, COUNTOF(wch));
+			SendDlgItemMessage(hwnd, IDC_EOLMODELIST, CB_ADDSTRING, 0, (LPARAM)wch);
+		}
+
+		SendDlgItemMessage(hwnd, IDC_EOLMODELIST, CB_SETCURSEL, iEOLMode, 0);
+		SendDlgItemMessage(hwnd, IDC_EOLMODELIST, CB_SETEXTENDEDUI, TRUE, 0);
+
+		WCHAR tchFmt[128];
+		for (int i = 0; i < 3; i++) {
+			WCHAR tchLn[32];
+			wsprintf(tchLn, L"%u", status->linesCount[i]);
+			FormatNumberStr(tchLn);
+			GetDlgItemText(hwnd, IDC_EOL_SUM_CRLF + i, tchFmt, COUNTOF(tchFmt));
+			wsprintf(wch, tchFmt, tchLn);
+			SetDlgItemText(hwnd, IDC_EOL_SUM_CRLF + i, wch);
+		}
+
+		if (bWarnLineEndings) {
+			CheckDlgButton(hwnd, IDC_WARNINCONSISTENTEOLS, BST_CHECKED);
+		}
+
+		CenterDlgInParent(hwnd);
+	}
+	return TRUE;
+
+	case WM_COMMAND:
+		switch (LOWORD(wParam)) {
+		case IDOK: {
+			EditFileIOStatus *status = (EditFileIOStatus *)GetWindowLongPtr(hwnd, DWLP_USER);
+			const int iEOLMode = (int)SendDlgItemMessage(hwnd, IDC_EOLMODELIST, CB_GETCURSEL, 0, 0);
+			status->iEOLMode = iEOLMode;
+			bWarnLineEndings = IsButtonChecked(hwnd, IDC_WARNINCONSISTENTEOLS);
+			EndDialog(hwnd, IDOK);
+		}
+		break;
+
+		case IDCANCEL:
+			EndDialog(hwnd, IDCANCEL);
+			break;
+		}
+		return TRUE;
+	}
+	return FALSE;
+}
+
+BOOL WarnLineEndingDlg(HWND hwnd, struct EditFileIOStatus *status) {
+	const INT_PTR iResult = ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_WARNLINEENDS), hwnd, WarnLineEndingDlgDlgProc, (LPARAM)status);
 	return iResult == IDOK;
 }
 
