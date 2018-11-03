@@ -1527,47 +1527,12 @@ extern int cxOpenWithDlg;
 extern int cyOpenWithDlg;
 
 INT_PTR CALLBACK OpenWithDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
-	static int cxClient;
-	static int cyClient;
-	static int mmiPtMaxY;
-	static int mmiPtMinX;
-
 	switch (umsg) {
 	case WM_INITDIALOG: {
 		SetWindowLongPtr(hwnd, DWLP_USER, lParam);
 
 		LVCOLUMN lvc = { LVCF_FMT | LVCF_TEXT, LVCFMT_LEFT, 0, L"", -1, 0, 0, 0 };
-
-		RECT rc;
-		GetClientRect(hwnd, &rc);
-		cxClient = rc.right - rc.left;
-		cyClient = rc.bottom - rc.top;
-
-		AdjustWindowRectEx(&rc, GetWindowLong(hwnd, GWL_STYLE) | WS_THICKFRAME, FALSE, 0);
-		mmiPtMinX = rc.right - rc.left;
-		mmiPtMaxY = rc.bottom - rc.top;
-
-		if (cxOpenWithDlg < (rc.right - rc.left)) {
-			cxOpenWithDlg = rc.right - rc.left;
-		}
-		if (cyOpenWithDlg < (rc.bottom - rc.top)) {
-			cyOpenWithDlg = rc.bottom - rc.top;
-		}
-		SetWindowPos(hwnd, NULL, rc.left, rc.top, cxOpenWithDlg, cyOpenWithDlg, SWP_NOZORDER);
-
-		SetWindowLongPtr(hwnd, GWL_STYLE, GetWindowLongPtr(hwnd, GWL_STYLE) | WS_THICKFRAME);
-		SetWindowPos(hwnd, NULL, 0, 0, 0, 0, SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE | SWP_FRAMECHANGED);
-
-		WCHAR tch[MAX_PATH];
-		GetMenuString(GetSystemMenu(GetParent(hwnd), FALSE), SC_SIZE, tch, COUNTOF(tch), MF_BYCOMMAND);
-		InsertMenu(GetSystemMenu(hwnd, FALSE), SC_CLOSE, MF_BYCOMMAND | MF_STRING | MF_ENABLED, SC_SIZE, tch);
-		InsertMenu(GetSystemMenu(hwnd, FALSE), SC_CLOSE, MF_BYCOMMAND | MF_SEPARATOR, 0, NULL);
-
-		SetWindowLongPtr(GetDlgItem(hwnd, IDC_RESIZEGRIP3), GWL_STYLE,
-						 GetWindowLongPtr(GetDlgItem(hwnd, IDC_RESIZEGRIP3), GWL_STYLE) | SBS_SIZEGRIP | WS_CLIPSIBLINGS);
-
-		const int cGrip = GetSystemMetrics(SM_CXHTHUMB);
-		SetWindowPos(GetDlgItem(hwnd, IDC_RESIZEGRIP3), NULL, cxClient - cGrip, cyClient - cGrip, cGrip, cGrip, SWP_NOZORDER);
+		ResizeDlg_Init(hwnd, cxOpenWithDlg, cyOpenWithDlg, IDC_RESIZEGRIP3);
 
 		HWND hwndLV = GetDlgItem(hwnd, IDC_OPENWITHDIR);
 		InitWindowCommon(hwndLV);
@@ -1585,64 +1550,34 @@ INT_PTR CALLBACK OpenWithDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPa
 	}
 	return TRUE;
 
-	case WM_DESTROY: {
+	case WM_DESTROY:
 		DirList_Destroy(GetDlgItem(hwnd, IDC_OPENWITHDIR));
 		DeleteBitmapButton(hwnd, IDC_GETOPENWITHDIR);
-
-		RECT rc;
-		GetWindowRect(hwnd, &rc);
-		cxOpenWithDlg = rc.right - rc.left;
-		cyOpenWithDlg = rc.bottom - rc.top;
-	}
-	return FALSE;
+		ResizeDlg_Destroy(hwnd, &cxOpenWithDlg, &cyOpenWithDlg);
+		return FALSE;
 
 	case WM_SIZE: {
-		int dxClient = LOWORD(lParam) - cxClient;
-		int dyClient = HIWORD(lParam) - cyClient;
-		cxClient = LOWORD(lParam);
-		cyClient = HIWORD(lParam);
+		int dx;
+		int dy;
 
-		RECT rc;
-		GetWindowRect(GetDlgItem(hwnd, IDC_RESIZEGRIP3), &rc);
-		MapWindowPoints(NULL, hwnd, (LPPOINT)&rc, 2);
-		SetWindowPos(GetDlgItem(hwnd, IDC_RESIZEGRIP3), NULL, rc.left + dxClient, rc.top + dyClient, 0, 0, SWP_NOZORDER | SWP_NOSIZE);
-		InvalidateRect(GetDlgItem(hwnd, IDC_RESIZEGRIP3), NULL, TRUE);
+		ResizeDlg_Size(hwnd, lParam, &dx, &dy);
 
-		GetWindowRect(GetDlgItem(hwnd, IDOK), &rc);
-		MapWindowPoints(NULL, hwnd, (LPPOINT)&rc, 2);
-		SetWindowPos(GetDlgItem(hwnd, IDOK), NULL, rc.left + dxClient, rc.top + dyClient, 0, 0, SWP_NOZORDER | SWP_NOSIZE);
-		InvalidateRect(GetDlgItem(hwnd, IDOK), NULL, TRUE);
+		HDWP hdwp = BeginDeferWindowPos(6);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDC_RESIZEGRIP3, dx, dy, SWP_NOSIZE);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDOK, dx, dy, SWP_NOSIZE);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDCANCEL, dx, dy, SWP_NOSIZE);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDC_OPENWITHDIR, dx, dy, SWP_NOMOVE);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDC_GETOPENWITHDIR, 0, dy, SWP_NOSIZE);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDC_OPENWITHDESCR, 0, dy, SWP_NOSIZE);
+		EndDeferWindowPos(hdwp);
 
-		GetWindowRect(GetDlgItem(hwnd, IDCANCEL), &rc);
-		MapWindowPoints(NULL, hwnd, (LPPOINT)&rc, 2);
-		SetWindowPos(GetDlgItem(hwnd, IDCANCEL), NULL, rc.left + dxClient, rc.top + dyClient, 0, 0, SWP_NOZORDER | SWP_NOSIZE);
-		InvalidateRect(GetDlgItem(hwnd, IDCANCEL), NULL, TRUE);
-
-		GetWindowRect(GetDlgItem(hwnd, IDC_OPENWITHDIR), &rc);
-		MapWindowPoints(NULL, hwnd, (LPPOINT)&rc, 2);
-		SetWindowPos(GetDlgItem(hwnd, IDC_OPENWITHDIR), NULL, 0, 0, rc.right - rc.left + dxClient, rc.bottom - rc.top + dyClient, SWP_NOZORDER | SWP_NOMOVE);
-		InvalidateRect(GetDlgItem(hwnd, IDC_OPENWITHDIR), NULL, TRUE);
-
-		GetWindowRect(GetDlgItem(hwnd, IDC_GETOPENWITHDIR), &rc);
-		MapWindowPoints(NULL, hwnd, (LPPOINT)&rc, 2);
-		SetWindowPos(GetDlgItem(hwnd, IDC_GETOPENWITHDIR), NULL, rc.left, rc.top + dyClient, 0, 0, SWP_NOZORDER | SWP_NOSIZE);
 		ListView_SetColumnWidth(GetDlgItem(hwnd, IDC_OPENWITHDIR), 0, LVSCW_AUTOSIZE_USEHEADER);
-		InvalidateRect(GetDlgItem(hwnd, IDC_OPENWITHDIR), NULL, TRUE);
-
-		GetWindowRect(GetDlgItem(hwnd, IDC_OPENWITHDESCR), &rc);
-		MapWindowPoints(NULL, hwnd, (LPPOINT)&rc, 2);
-		SetWindowPos(GetDlgItem(hwnd, IDC_OPENWITHDESCR), NULL, rc.left, rc.top + dyClient, 0, 0, SWP_NOZORDER | SWP_NOSIZE);
-		InvalidateRect(GetDlgItem(hwnd, IDC_OPENWITHDESCR), NULL, TRUE);
 	}
 	return TRUE;
 
-	case WM_GETMINMAXINFO: {
-		LPMINMAXINFO lpmmi = (LPMINMAXINFO)lParam;
-		lpmmi->ptMinTrackSize.x = mmiPtMinX;
-		lpmmi->ptMinTrackSize.y = mmiPtMaxY;
-		//lpmmi->ptMaxTrackSize.y = mmiPtMaxY;
-	}
-	return TRUE;
+	case WM_GETMINMAXINFO:
+		ResizeDlg_GetMinMaxInfo(hwnd, lParam);
+		return TRUE;
 
 	case WM_NOTIFY: {
 		LPNMHDR pnmh = (LPNMHDR)lParam;
