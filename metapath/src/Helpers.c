@@ -428,6 +428,179 @@ void SnapToDefaultButton(HWND hwndBox) {
 
 //=============================================================================
 //
+// GetDlgPos()
+//
+void GetDlgPos(HWND hDlg, LPINT xDlg, LPINT yDlg) {
+	RECT rcDlg;
+	GetWindowRect(hDlg, &rcDlg);
+
+	HWND hParent = GetParent(hDlg);
+	RECT rcParent;
+	GetWindowRect(hParent, &rcParent);
+
+	// return positions relative to parent window
+	*xDlg = rcDlg.left - rcParent.left;
+	*yDlg = rcDlg.top - rcParent.top;
+}
+
+//=============================================================================
+//
+// SetDlgPos()
+//
+void SetDlgPos(HWND hDlg, int xDlg, int yDlg) {
+	RECT rcDlg;
+	GetWindowRect(hDlg, &rcDlg);
+
+	HWND hParent = GetParent(hDlg);
+	RECT rcParent;
+	GetWindowRect(hParent, &rcParent);
+
+	HMONITOR hMonitor = MonitorFromRect(&rcParent, MONITOR_DEFAULTTONEAREST);
+	MONITORINFO mi;
+	mi.cbSize = sizeof(mi);
+	GetMonitorInfo(hMonitor, &mi);
+
+	const int xMin = mi.rcWork.left;
+	const int yMin = mi.rcWork.top;
+
+	const int xMax = (mi.rcWork.right) - (rcDlg.right - rcDlg.left);
+	const int yMax = (mi.rcWork.bottom) - (rcDlg.bottom - rcDlg.top);
+
+	// desired positions relative to parent window
+	const int x = rcParent.left + xDlg;
+	const int y = rcParent.top + yDlg;
+
+	SetWindowPos(hDlg, NULL, clamp_i(x, xMin, xMax), clamp_i(y, yMin, yMax), 0, 0, SWP_NOZORDER | SWP_NOSIZE);
+}
+
+//=============================================================================
+//
+// Resize Dialog Helpers()
+//
+typedef struct _resizedlg {
+	int direction;
+	int cxClient;
+	int cyClient;
+	int cxFrame;
+	int cyFrame;
+	int mmiPtMinX;
+	int mmiPtMinY;
+	int mmiPtMaxX;	// only Y direction
+	int mmiPtMaxY;	// only X direction
+} RESIZEDLG, *PRESIZEDLG;
+
+void ResizeDlg_InitEx(HWND hwnd, int cxFrame, int cyFrame, int nIdGrip, int iDirection) {
+	RESIZEDLG *pm = NP2HeapAlloc(sizeof(RESIZEDLG));
+	pm->direction = iDirection;
+
+	RECT rc;
+	GetClientRect(hwnd, &rc);
+	pm->cxClient = rc.right - rc.left;
+	pm->cyClient = rc.bottom - rc.top;
+
+	pm->cxFrame = cxFrame;
+	pm->cyFrame = cyFrame;
+
+	AdjustWindowRectEx(&rc, GetWindowLong(hwnd, GWL_STYLE) | WS_THICKFRAME, FALSE, 0);
+	pm->mmiPtMinX = rc.right - rc.left;
+	pm->mmiPtMinY = rc.bottom - rc.top;
+	// only one direction
+	switch (iDirection) {
+	case ResizeDlgDirection_OnlyX:
+		pm->mmiPtMaxY = pm->mmiPtMinY;
+		break;
+
+	case ResizeDlgDirection_OnlyY:
+		pm->mmiPtMaxX = pm->mmiPtMinX;
+		break;
+	}
+
+	if (pm->cxFrame < (rc.right - rc.left)) {
+		pm->cxFrame = rc.right - rc.left;
+	}
+	if (pm->cyFrame < (rc.bottom - rc.top)) {
+		pm->cyFrame = rc.bottom - rc.top;
+	}
+
+	SetProp(hwnd, L"ResizeDlg", (HANDLE)pm);
+
+	SetWindowPos(hwnd, NULL, rc.left, rc.top, pm->cxFrame, pm->cyFrame, SWP_NOZORDER);
+
+	SetWindowLongPtr(hwnd, GWL_STYLE, GetWindowLongPtr(hwnd, GWL_STYLE) | WS_THICKFRAME);
+	SetWindowPos(hwnd, NULL, 0, 0, 0, 0, SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE | SWP_FRAMECHANGED);
+
+	WCHAR wch[64];
+	GetMenuString(GetSystemMenu(GetParent(hwnd), FALSE), SC_SIZE, wch, COUNTOF(wch), MF_BYCOMMAND);
+	InsertMenu(GetSystemMenu(hwnd, FALSE), SC_CLOSE, MF_BYCOMMAND | MF_STRING | MF_ENABLED, SC_SIZE, wch);
+	InsertMenu(GetSystemMenu(hwnd, FALSE), SC_CLOSE, MF_BYCOMMAND | MF_SEPARATOR, 0, NULL);
+
+	SetWindowLongPtr(GetDlgItem(hwnd, nIdGrip), GWL_STYLE,
+					 GetWindowLongPtr(GetDlgItem(hwnd, nIdGrip), GWL_STYLE) | SBS_SIZEGRIP | WS_CLIPSIBLINGS);
+	const int cGrip = GetSystemMetrics(SM_CXHTHUMB);
+	SetWindowPos(GetDlgItem(hwnd, nIdGrip), NULL, pm->cxClient - cGrip, pm->cyClient - cGrip, cGrip, cGrip, SWP_NOZORDER);
+}
+
+void ResizeDlg_Destroy(HWND hwnd, int *cxFrame, int *cyFrame) {
+	PRESIZEDLG pm = GetProp(hwnd, L"ResizeDlg");
+
+	RECT rc;
+	GetWindowRect(hwnd, &rc);
+	if (cxFrame) {
+		*cxFrame = rc.right - rc.left;
+	}
+	if (cyFrame) {
+		*cyFrame = rc.bottom - rc.top;
+	}
+
+	RemoveProp(hwnd, L"ResizeDlg");
+	NP2HeapFree(pm);
+}
+
+void ResizeDlg_Size(HWND hwnd, LPARAM lParam, int *cx, int *cy) {
+	PRESIZEDLG pm = GetProp(hwnd, L"ResizeDlg");
+
+	if (cx) {
+		*cx = LOWORD(lParam) - pm->cxClient;
+		pm->cxClient = LOWORD(lParam);
+	}
+	if (cy) {
+		*cy = HIWORD(lParam) - pm->cyClient;
+		pm->cyClient = HIWORD(lParam);
+	}
+}
+
+void ResizeDlg_GetMinMaxInfo(HWND hwnd, LPARAM lParam) {
+	PRESIZEDLG pm = GetProp(hwnd, L"ResizeDlg");
+
+	LPMINMAXINFO lpmmi = (LPMINMAXINFO)lParam;
+	lpmmi->ptMinTrackSize.x = pm->mmiPtMinX;
+	lpmmi->ptMinTrackSize.y = pm->mmiPtMinY;
+
+	// only one direction
+	switch (pm->direction) {
+	case ResizeDlgDirection_OnlyX:
+		lpmmi->ptMaxTrackSize.y = pm->mmiPtMaxY;
+		break;
+
+	case ResizeDlgDirection_OnlyY:
+		lpmmi->ptMaxTrackSize.x = pm->mmiPtMaxX;
+		break;
+	}
+}
+
+HDWP DeferCtlPos(HDWP hdwp, HWND hwndDlg, int nCtlId, int dx, int dy, UINT uFlags) {
+	HWND hwndCtl = GetDlgItem(hwndDlg, nCtlId);
+	RECT rc;
+	GetWindowRect(hwndCtl, &rc);
+	MapWindowPoints(NULL, hwndDlg, (LPPOINT)&rc, 2);
+	if (uFlags & SWP_NOSIZE) {
+		return DeferWindowPos(hdwp, hwndCtl, NULL, rc.left + dx, rc.top + dy, 0, 0, SWP_NOZORDER | SWP_NOSIZE);
+	}
+	return DeferWindowPos(hdwp, hwndCtl, NULL, 0, 0, rc.right - rc.left + dx, rc.bottom - rc.top + dy, SWP_NOZORDER | SWP_NOMOVE);
+}
+
+//=============================================================================
+//
 //  MakeBitmapButton()
 //
 void MakeBitmapButton(HWND hwnd, int nCtlId, HINSTANCE hInstance, WORD wBmpId) {
