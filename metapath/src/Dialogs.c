@@ -1336,44 +1336,11 @@ BOOL RenameFileDlg(HWND hwnd) {
 extern int cxCopyMoveDlg;
 
 INT_PTR CALLBACK CopyMoveDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
-	static int cxClient;
-	static int cyClient;
-	static int mmiPtMaxY;
-	static int mmiPtMinX;
-
 	switch (umsg) {
 	case WM_INITDIALOG: {
 		SetWindowLongPtr(hwnd, DWLP_USER, lParam);
 
-		RECT rc;
-		GetClientRect(hwnd, &rc);
-		cxClient = rc.right - rc.left;
-		cyClient = rc.bottom - rc.top;
-
-		AdjustWindowRectEx(&rc, GetWindowLong(hwnd, GWL_STYLE) | WS_THICKFRAME, FALSE, 0);
-		mmiPtMinX = rc.right - rc.left;
-		mmiPtMaxY = rc.bottom - rc.top;
-
-		if (cxCopyMoveDlg < (rc.right - rc.left)) {
-			cxCopyMoveDlg = rc.right - rc.left;
-		}
-		SetWindowPos(hwnd, NULL, rc.left, rc.top, cxCopyMoveDlg, rc.bottom - rc.top, SWP_NOZORDER);
-
-		SetWindowLongPtr(hwnd, GWL_STYLE, GetWindowLongPtr(hwnd, GWL_STYLE) | WS_THICKFRAME);
-		SetWindowPos(hwnd, NULL, 0, 0, 0, 0, SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE | SWP_FRAMECHANGED);
-
-		WCHAR tch[64];
-		GetMenuString(GetSystemMenu(GetParent(hwnd), FALSE), SC_SIZE, tch, COUNTOF(tch), MF_BYCOMMAND);
-		InsertMenu(GetSystemMenu(hwnd, FALSE), SC_CLOSE, MF_BYCOMMAND | MF_STRING | MF_ENABLED, SC_SIZE, tch);
-		InsertMenu(GetSystemMenu(hwnd, FALSE), SC_CLOSE, MF_BYCOMMAND | MF_SEPARATOR, 0, NULL);
-
-		SetWindowLongPtr(GetDlgItem(hwnd, IDC_RESIZEGRIP2), GWL_STYLE,
-						 GetWindowLongPtr(GetDlgItem(hwnd, IDC_RESIZEGRIP2), GWL_STYLE) | SBS_SIZEGRIP | WS_CLIPSIBLINGS);
-
-		const int cGrip = GetSystemMetrics(SM_CXHTHUMB);
-		SetWindowPos(GetDlgItem(hwnd, IDC_RESIZEGRIP2), NULL, cxClient - cGrip,
-					 cyClient - cGrip, cGrip, cGrip, SWP_NOZORDER);
-
+		ResizeDlg_InitX(hwnd, cxCopyMoveDlg, IDC_RESIZEGRIP2);
 		MakeBitmapButton(hwnd, IDC_BROWSEDESTINATION, g_hInstance, IDB_OPEN);
 
 		LPFILEOPDLGDATA lpfod = (LPFILEOPDLGDATA)lParam;
@@ -1402,66 +1369,30 @@ INT_PTR CALLBACK CopyMoveDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPa
 	}
 	return TRUE;
 
-	case WM_DESTROY: {
-		RECT rc;
-		GetWindowRect(hwnd, &rc);
-		cxCopyMoveDlg = rc.right - rc.left;
-
+	case WM_DESTROY:
+		ResizeDlg_Destroy(hwnd, &cxCopyMoveDlg, NULL);
 		DeleteBitmapButton(hwnd, IDC_BROWSEDESTINATION);
-	}
-	return FALSE;
+		return FALSE;
 
 	case WM_SIZE: {
-		int dxClient = LOWORD(lParam) - cxClient;
-		int dyClient = HIWORD(lParam) - cyClient;
-		cxClient = LOWORD(lParam);
-		cyClient = HIWORD(lParam);
+		int dx;
 
-		RECT rc;
-		GetWindowRect(GetDlgItem(hwnd, IDC_RESIZEGRIP2), &rc);
-		MapWindowPoints(NULL, hwnd, (LPPOINT)&rc, 2);
-		SetWindowPos(GetDlgItem(hwnd, IDC_RESIZEGRIP2), NULL, rc.left + dxClient, rc.top + dyClient, 0, 0, SWP_NOZORDER | SWP_NOSIZE);
-		InvalidateRect(GetDlgItem(hwnd, IDC_RESIZEGRIP2), NULL, TRUE);
-
-		GetWindowRect(GetDlgItem(hwnd, IDC_EMPTY_MRU), &rc);
-		MapWindowPoints(NULL, hwnd, (LPPOINT)&rc, 2);
-		SetWindowPos(GetDlgItem(hwnd, IDC_EMPTY_MRU), NULL, rc.left + dxClient, rc.top + dyClient, 0, 0, SWP_NOZORDER | SWP_NOSIZE);
-		InvalidateRect(GetDlgItem(hwnd, IDC_EMPTY_MRU), NULL, TRUE);
-
-		GetWindowRect(GetDlgItem(hwnd, IDOK), &rc);
-		MapWindowPoints(NULL, hwnd, (LPPOINT)&rc, 2);
-		SetWindowPos(GetDlgItem(hwnd, IDOK), NULL, rc.left + dxClient, rc.top + dyClient, 0, 0, SWP_NOZORDER | SWP_NOSIZE);
-		InvalidateRect(GetDlgItem(hwnd, IDOK), NULL, TRUE);
-
-		GetWindowRect(GetDlgItem(hwnd, IDCANCEL), &rc);
-		MapWindowPoints(NULL, hwnd, (LPPOINT)&rc, 2);
-		SetWindowPos(GetDlgItem(hwnd, IDCANCEL), NULL, rc.left + dxClient, rc.top + dyClient, 0, 0, SWP_NOZORDER | SWP_NOSIZE);
-		InvalidateRect(GetDlgItem(hwnd, IDCANCEL), NULL, TRUE);
-
-		GetWindowRect(GetDlgItem(hwnd, IDC_SOURCE), &rc);
-		MapWindowPoints(NULL, hwnd, (LPPOINT)&rc, 2);
-		SetWindowPos(GetDlgItem(hwnd, IDC_SOURCE), NULL, 0, 0, rc.right - rc.left + dxClient, rc.bottom - rc.top, SWP_NOZORDER | SWP_NOMOVE);
-		InvalidateRect(GetDlgItem(hwnd, IDC_SOURCE), NULL, TRUE);
-
-		GetWindowRect(GetDlgItem(hwnd, IDC_DESTINATION), &rc);
-		MapWindowPoints(NULL, hwnd, (LPPOINT)&rc, 2);
-		SetWindowPos(GetDlgItem(hwnd, IDC_DESTINATION), NULL, 0, 0, rc.right - rc.left + dxClient, rc.bottom - rc.top, SWP_NOZORDER | SWP_NOMOVE);
-		InvalidateRect(GetDlgItem(hwnd, IDC_DESTINATION), NULL, TRUE);
-
-		GetWindowRect(GetDlgItem(hwnd, IDC_BROWSEDESTINATION), &rc);
-		MapWindowPoints(NULL, hwnd, (LPPOINT)&rc, 2);
-		SetWindowPos(GetDlgItem(hwnd, IDC_BROWSEDESTINATION), NULL, rc.left + dxClient, rc.top, 0, 0, SWP_NOZORDER | SWP_NOSIZE);
-		InvalidateRect(GetDlgItem(hwnd, IDC_BROWSEDESTINATION), NULL, TRUE);
+		ResizeDlg_Size(hwnd, lParam, &dx, NULL);
+		HDWP hdwp = BeginDeferWindowPos(7);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDC_RESIZEGRIP2, dx, 0, SWP_NOSIZE);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDOK, dx, 0, SWP_NOSIZE);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDCANCEL, dx, 0, SWP_NOSIZE);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDC_EMPTY_MRU, dx, 0, SWP_NOSIZE);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDC_SOURCE, dx, 0, SWP_NOMOVE);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDC_DESTINATION, dx, 0, SWP_NOMOVE);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDC_BROWSEDESTINATION, dx, 0, SWP_NOSIZE);
+		EndDeferWindowPos(hdwp);
 	}
 	return TRUE;
 
-	case WM_GETMINMAXINFO: {
-		LPMINMAXINFO lpmmi = (LPMINMAXINFO)lParam;
-		lpmmi->ptMinTrackSize.x = mmiPtMinX;
-		lpmmi->ptMinTrackSize.y = mmiPtMaxY;
-		lpmmi->ptMaxTrackSize.y = mmiPtMaxY;
-	}
-	return TRUE;
+	case WM_GETMINMAXINFO:
+		ResizeDlg_GetMinMaxInfo(hwnd, lParam);
+		return TRUE;
 
 	case WM_NOTIFY: {
 		LPNMHDR pnmhdr = (LPNMHDR)lParam;
@@ -1524,7 +1455,6 @@ INT_PTR CALLBACK CopyMoveDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPa
 //
 BOOL CopyMoveDlg(HWND hwnd, UINT *wFunc) {
 	DLITEM dli;
-
 
 	dli.mask = DLI_FILENAME;
 	if (DirList_GetItem(hwndDirList, -1, &dli) == -1) {
