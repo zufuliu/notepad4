@@ -134,6 +134,8 @@
 #define IDC_CLEAR_FIND					155
 #define IDC_CLEAR_REPLACE				156
 #define IDC_TRANSPARENT					157
+#define IDC_SAVEPOSITION				158
+#define IDC_RESETPOSITION				159
 #define IDC_MODIFY_LINE_DLN_NP			200
 #define IDC_MODIFY_LINE_DLN_ZP			201
 #define IDC_MODIFY_LINE_CN_NP			202
@@ -569,9 +571,6 @@
 #define IDT_FILE_ADDTOFAV				40722
 #define IDT_VIEW_TOGGLEFOLDS			40723
 #define IDT_FILE_LAUNCH					40724
-
-#define SC_SAVEPOS						40800	// "Save Position"
-#define SC_RESETPOS						40801	// "Reset Position"
 
 #define IDS_GOOGLE_SEARCH_URL			41000
 #define IDS_BING_SEARCH_URL				41001
