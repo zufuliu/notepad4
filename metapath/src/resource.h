@@ -37,7 +37,7 @@
 #define IDC_TRACKSELECT                 101
 #define IDC_BROWSE_Q                    101
 #define IDC_COPYRIGHT                   101
-#define IDC_RESIZEGRIP4					102
+#define IDC_RESIZEGRIP2					102
 #define IDD_GOTO                        102
 #define IDI_GOTO                        102
 #define IDC_BROWSEDESTINATION           102
@@ -72,7 +72,7 @@
 #define IDC_AUTHORNAME                  104
 #define IDC_FINDWINDESC					104
 #define IDD_COPYMOVE                    105
-#define IDC_RESIZEGRIP2                 105
+#define IDC_RESIZEGRIP5                 105
 #define IDC_USERECYCLEBIN               105
 #define IDC_COLOR_CUST2                 105
 #define IDC_SENDDROPMSG                 105
