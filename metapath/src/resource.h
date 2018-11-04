@@ -165,6 +165,8 @@
 #define IDM_VIEW_SAVESETTINGS           40214
 #define IDM_VIEW_FINDTARGET             40215
 #define IDM_VIEW_OPTIONS                40216
+#define IDM_VIEW_ALWAYSONTOP 			40217
+#define IDM_VIEW_ABOUT		 			40218
 #define IDM_SORT_NAME                   40301
 #define IDM_SORT_SIZE                   40302
 #define IDM_SORT_TYPE                   40303
@@ -223,8 +225,6 @@
 #define IDS_ERR_INIOPEN                 50018
 #define IDS_ERR_INICREATE               50019
 #define IDS_ERR_INIWRITE                50020
-#define SC_ALWAYSONTOP                  60001
-#define SC_ABOUT                        60002
 
 // Next default values for new objects
 //

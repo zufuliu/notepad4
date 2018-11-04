@@ -624,20 +624,6 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 			return lrv;
 		}
 
-		case SC_ALWAYSONTOP:
-			if (bAlwaysOnTop) {
-				bAlwaysOnTop = 0;
-				SetWindowPos(hwnd, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
-			} else {
-				bAlwaysOnTop = 1;
-				SetWindowPos(hwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
-			}
-			break;
-
-		case SC_ABOUT:
-			ThemedDialogBox(g_hInstance, MAKEINTRESOURCE(IDD_ABOUT), hwnd, AboutDlgProc);
-			break;
-
 		default:
 			return DefWindowProc(hwnd, umsg, wParam, lParam);
 		}
@@ -801,14 +787,6 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	GetMenuItemInfo(hmenu, SC_MINIMIZE, FALSE, &mii);
 	mii.wID = SC_MINIMIZE | 0x02;
 	SetMenuItemInfo(hmenu, SC_MINIMIZE, FALSE, &mii);
-
-	// Add specific items
-	WCHAR tch[64];
-	GetString(SC_ALWAYSONTOP, tch, COUNTOF(tch));
-	InsertMenu(hmenu, SC_MOVE, MF_BYCOMMAND | MF_STRING | MF_ENABLED, SC_ALWAYSONTOP, tch);
-	GetString(SC_ABOUT, tch, COUNTOF(tch));
-	InsertMenu(hmenu, SC_CLOSE, MF_BYCOMMAND | MF_STRING | MF_ENABLED, SC_ABOUT, tch);
-	InsertMenu(hmenu, SC_CLOSE, MF_BYCOMMAND | MF_SEPARATOR, 0, NULL);
 
 	return 0;
 }
@@ -1142,7 +1120,7 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	CheckMenuRadioItem(hmenu, IDM_SORT_NAME, IDM_SORT_DATE, IDM_SORT_NAME + nSortFlags, MF_BYCOMMAND);
 
 	CheckCmd(hmenu, IDM_SORT_REVERSE, fSortRev);
-	CheckCmd(hmenu, SC_ALWAYSONTOP, bAlwaysOnTop);
+	CheckCmd(hmenu, IDM_VIEW_ALWAYSONTOP, bAlwaysOnTop);
 
 	i = StrNotEmpty(szIniFile) || StrNotEmpty(szIniFile2);
 	EnableCmd(hmenu, IDM_VIEW_SAVESETTINGS, i);
@@ -1772,6 +1750,15 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		}
 	}
 	break;
+
+	case IDM_VIEW_ALWAYSONTOP:
+		bAlwaysOnTop = !bAlwaysOnTop;
+		SetWindowPos(hwnd, (bAlwaysOnTop ? HWND_TOPMOST : HWND_NOTOPMOST), 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
+		break;
+
+	case IDM_VIEW_ABOUT:
+		ThemedDialogBox(g_hInstance, MAKEINTRESOURCE(IDD_ABOUT), hwnd, AboutDlgProc);
+		break;
 
 	case IDM_SORT_NAME:
 		nSortFlags = DS_NAME;
