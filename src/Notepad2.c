@@ -228,6 +228,7 @@ int		cxOpenWithDlg;
 int		cyOpenWithDlg;
 int		cxFavoritesDlg;
 int		cyFavoritesDlg;
+int		cxAddFavoritesDlg;
 int		xFindReplaceDlg;
 int		yFindReplaceDlg;
 
@@ -5456,6 +5457,7 @@ void LoadSettings(void) {
 	cyOpenWithDlg = IniSectionGetInt(pIniSection, L"OpenWithDlgSizeY", 0);
 	cxFavoritesDlg = IniSectionGetInt(pIniSection, L"FavoritesDlgSizeX", 0);
 	cyFavoritesDlg = IniSectionGetInt(pIniSection, L"FavoritesDlgSizeY", 0);
+	cxAddFavoritesDlg = IniSectionGetInt(pIniSection, L"AddFavoritesDlgSizeX", 0);
 	xFindReplaceDlg = IniSectionGetInt(pIniSection, L"FindReplaceDlgPosX", 0);
 	yFindReplaceDlg = IniSectionGetInt(pIniSection, L"FindReplaceDlgPosY", 0);
 
@@ -5665,6 +5667,7 @@ void SaveSettings(BOOL bSaveSettingsNow) {
 	IniSectionSetInt(pIniSection, L"OpenWithDlgSizeY", cyOpenWithDlg);
 	IniSectionSetInt(pIniSection, L"FavoritesDlgSizeX", cxFavoritesDlg);
 	IniSectionSetInt(pIniSection, L"FavoritesDlgSizeY", cyFavoritesDlg);
+	IniSectionSetInt(pIniSection, L"AddFavoritesDlgSizeX", cxAddFavoritesDlg);
 	IniSectionSetInt(pIniSection, L"FindReplaceDlgPosX", xFindReplaceDlg);
 	IniSectionSetInt(pIniSection, L"FindReplaceDlgPosY", yFindReplaceDlg);
 

@@ -679,6 +679,7 @@ extern WCHAR tchFavoritesDir[MAX_PATH];
 
 extern int cxFavoritesDlg;
 extern int cyFavoritesDlg;
+extern int cxAddFavoritesDlg;
 
 static INT_PTR CALLBACK FavoritesDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
 	switch (umsg) {
@@ -708,7 +709,6 @@ static INT_PTR CALLBACK FavoritesDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LP
 	case WM_DESTROY:
 		DirList_Destroy(GetDlgItem(hwnd, IDC_FAVORITESDIR));
 		DeleteBitmapButton(hwnd, IDC_GETFAVORITESDIR);
-
 		ResizeDlg_Destroy(hwnd, &cxFavoritesDlg, &cyFavoritesDlg);
 		return FALSE;
 
@@ -823,30 +823,53 @@ BOOL FavoritesDlg(HWND hwnd, LPWSTR lpstrFile) {
 //
 // AddToFavDlgProc()
 //
-// Controls: 100 Edit
 //
 static INT_PTR CALLBACK AddToFavDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
 	switch (umsg) {
 	case WM_INITDIALOG: {
 		SetWindowLongPtr(hwnd, DWLP_USER, lParam);
-		LPWSTR pszName = (LPWSTR)lParam;
+		ResizeDlg_InitX(hwnd, cxAddFavoritesDlg, IDC_RESIZEGRIP);
 
-		SendDlgItemMessage(hwnd, 100, EM_LIMITTEXT, MAX_PATH - 1, 0);
-		SetDlgItemText(hwnd, 100, pszName);
+		LPWSTR pszName = (LPWSTR)lParam;
+		SendDlgItemMessage(hwnd, IDC_FAVORITESFILE, EM_LIMITTEXT, MAX_PATH - 1, 0);
+		SetDlgItemText(hwnd, IDC_FAVORITESFILE, pszName);
 
 		CenterDlgInParent(hwnd);
 	}
 	return TRUE;
 
+	case WM_DESTROY:
+		ResizeDlg_Destroy(hwnd, &cxAddFavoritesDlg, NULL);
+		return FALSE;
+
+	case WM_SIZE: {
+		int dx;
+
+		ResizeDlg_Size(hwnd, lParam, &dx, NULL);
+		HDWP hdwp = BeginDeferWindowPos(5);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDC_RESIZEGRIP, dx, 0, SWP_NOSIZE);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDOK, dx, 0, SWP_NOSIZE);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDCANCEL, dx, 0, SWP_NOSIZE);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDC_FAVORITESDESCR, dx, 0, SWP_NOMOVE);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDC_FAVORITESFILE, dx, 0, SWP_NOMOVE);
+		EndDeferWindowPos(hdwp);
+		InvalidateRect(GetDlgItem(hwnd, IDC_FAVORITESDESCR), NULL, TRUE);
+	}
+	return TRUE;
+
+	case WM_GETMINMAXINFO:
+		ResizeDlg_GetMinMaxInfo(hwnd, lParam);
+		return TRUE;
+
 	case WM_COMMAND:
 		switch (LOWORD(wParam)) {
-		case 100:
-			EnableWindow(GetDlgItem(hwnd, IDOK),  GetWindowTextLength(GetDlgItem(hwnd, 100)));
+		case IDC_FAVORITESFILE:
+			EnableWindow(GetDlgItem(hwnd, IDOK),  GetWindowTextLength(GetDlgItem(hwnd, IDC_FAVORITESFILE)));
 			break;
 
 		case IDOK: {
 			LPWSTR pszName = (LPWSTR)GetWindowLongPtr(hwnd, DWLP_USER);
-			GetDlgItemText(hwnd, 100, pszName,  MAX_PATH - 1);
+			GetDlgItemText(hwnd, IDC_FAVORITESFILE, pszName,  MAX_PATH - 1);
 			EndDialog(hwnd, IDOK);
 		}
 		break;

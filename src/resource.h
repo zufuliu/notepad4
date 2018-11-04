@@ -11,6 +11,7 @@
 #define IDC_FILEMRU						100
 #define IDC_STYLELIST					100
 #define IDC_FAVORITESDIR				100
+#define IDC_FAVORITESFILE				100
 #define IDC_COLUMNWRAP					100
 #define IDC_INFOBOXICON					100
 #define IDC_COPY						100
