@@ -1257,20 +1257,21 @@ CAPTION "Modify Lines"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
     LTEXT           "&Prefix text to lines:",IDC_STATIC,7,6,96,8
-    EDITTEXT        100,7,18,246,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_MODIFY_LINE_PREFIX,7,18,246,14,ES_AUTOHSCROLL
     LTEXT           "&Append text to lines:",IDC_STATIC,7,37,97,8
-    EDITTEXT        101,7,48,246,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_MODIFY_LINE_APPEND,7,48,246,14,ES_AUTOHSCROLL
     DEFPUSHBUTTON   "OK",IDOK,147,100,50,14
     PUSHBUTTON      "Cancel",IDCANCEL,203,100,50,14
-    LTEXT           "$(L)",200,7,68,21,8
-    LTEXT           "$(0L)",201,27,68,27,8
+    LTEXT           "$(L)",IDC_MODIFY_LINE_DLN_NP,7,68,21,8
+    LTEXT           "$(0L)",IDC_MODIFY_LINE_DLN_ZP,27,68,27,8
     LTEXT           "Document line number.",IDC_STATIC,51,68,118,8
-    LTEXT           "$(N)",202,7,78,22,8
-    LTEXT           "$(0N)",203,27,78,25,8
+    LTEXT           "$(N)",IDC_MODIFY_LINE_CN_NP,7,78,22,8
+    LTEXT           "$(0N)",IDC_MODIFY_LINE_CN_ZP,27,78,25,8
     LTEXT           "Continuous number.",IDC_STATIC,51,78,107,8
-    LTEXT           "$(I)",204,7,88,21,8
-    LTEXT           "$(0I)",205,27,88,25,8
+    LTEXT           "$(I)",IDC_MODIFY_LINE_ZCN_NP,7,88,21,8
+    LTEXT           "$(0I)",IDC_MODIFY_LINE_ZCN_ZP,27,88,25,8
     LTEXT           "Continuous number (zero-based).",IDC_STATIC,51,88,125,8
+    SCROLLBAR       IDC_RESIZEGRIP2,7,100,10,10
 END
 
 IDD_INSERTTAG DIALOGEX 0, 0, 264, 90

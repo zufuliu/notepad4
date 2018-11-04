@@ -5321,14 +5321,14 @@ BOOL EditLineNumDlg(HWND hwnd) {
 //
 // EditModifyLinesDlg()
 //
-// Controls: 100 Input
-// 101 Input
 //
 
 typedef struct _modlinesdata {
 	LPWSTR pwsz1;
 	LPWSTR pwsz2;
 } MODLINESDATA, *PMODLINESDATA;
+
+extern int cxModifyLinesDlg;
 
 static INT_PTR CALLBACK EditModifyLinesDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
 	static int id_hover;
@@ -5343,12 +5343,12 @@ static INT_PTR CALLBACK EditModifyLinesDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 	switch (umsg) {
 	case WM_INITDIALOG: {
 		SetWindowLongPtr(hwnd, DWLP_USER, lParam);
-		PMODLINESDATA pdata = (PMODLINESDATA)lParam;
+		ResizeDlg_InitX(hwnd, cxModifyLinesDlg, IDC_RESIZEGRIP2);
 
 		id_hover = 0;
 		id_capture = 0;
 
-		if (NULL == (hFontNormal = (HFONT)SendDlgItemMessage(hwnd, 200, WM_GETFONT, 0, 0))) {
+		if (NULL == (hFontNormal = (HFONT)SendDlgItemMessage(hwnd, IDC_MODIFY_LINE_DLN_NP, WM_GETFONT, 0, 0))) {
 			hFontNormal = GetStockObject(DEFAULT_GUI_FONT);
 		}
 
@@ -5362,17 +5362,37 @@ static INT_PTR CALLBACK EditModifyLinesDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 			hCursorHover = LoadCursor(g_hInstance, IDC_ARROW);
 		}
 
-		SetDlgItemText(hwnd, 100, pdata->pwsz1);
-		SendDlgItemMessage(hwnd, 100, EM_LIMITTEXT, 255, 0);
-		SetDlgItemText(hwnd, 101, pdata->pwsz2);
-		SendDlgItemMessage(hwnd, 101, EM_LIMITTEXT, 255, 0);
+		PMODLINESDATA pdata = (PMODLINESDATA)lParam;
+		SetDlgItemText(hwnd, IDC_MODIFY_LINE_PREFIX, pdata->pwsz1);
+		SendDlgItemMessage(hwnd, IDC_MODIFY_LINE_PREFIX, EM_LIMITTEXT, 255, 0);
+		SetDlgItemText(hwnd, IDC_MODIFY_LINE_APPEND, pdata->pwsz2);
+		SendDlgItemMessage(hwnd, IDC_MODIFY_LINE_APPEND, EM_LIMITTEXT, 255, 0);
 		CenterDlgInParent(hwnd);
 	}
 	return TRUE;
 
 	case WM_DESTROY:
+		ResizeDlg_Destroy(hwnd, &cxModifyLinesDlg, NULL);
 		DeleteObject(hFontHover);
 		return FALSE;
+
+	case WM_SIZE: {
+		int dx;
+
+		ResizeDlg_Size(hwnd, lParam, &dx, NULL);
+		HDWP hdwp = BeginDeferWindowPos(5);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDC_RESIZEGRIP2, dx, 0, SWP_NOSIZE);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDOK, dx, 0, SWP_NOSIZE);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDCANCEL, dx, 0, SWP_NOSIZE);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDC_MODIFY_LINE_PREFIX, dx, 0, SWP_NOMOVE);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDC_MODIFY_LINE_APPEND, dx, 0, SWP_NOMOVE);
+		EndDeferWindowPos(hdwp);
+	}
+	return TRUE;
+
+	case WM_GETMINMAXINFO:
+		ResizeDlg_GetMinMaxInfo(hwnd, lParam);
+		return TRUE;
 
 	case WM_NCACTIVATE:
 		if (!wParam) {
@@ -5389,7 +5409,7 @@ static INT_PTR CALLBACK EditModifyLinesDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 		const DWORD dwId = GetWindowLong((HWND)lParam, GWL_ID);
 		HDC hdc = (HDC)wParam;
 
-		if (dwId >= 200 && dwId <= 205) {
+		if (dwId >= IDC_MODIFY_LINE_DLN_NP && dwId <= IDC_MODIFY_LINE_ZCN_ZP) {
 			SetBkMode(hdc, TRANSPARENT);
 			if (GetSysColorBrush(COLOR_HOTLIGHT)) {
 				SetTextColor(hdc, GetSysColor(COLOR_HOTLIGHT));
@@ -5408,7 +5428,7 @@ static INT_PTR CALLBACK EditModifyLinesDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 		const DWORD dwId = GetWindowLong(hwndHover, GWL_ID);
 
 		if (GetActiveWindow() == hwnd) {
-			if (dwId >= 200 && dwId <= 205) {
+			if (dwId >= IDC_MODIFY_LINE_DLN_NP && dwId <= IDC_MODIFY_LINE_ZCN_ZP) {
 				if (id_capture == (int)dwId || id_capture == 0) {
 					if (id_hover != id_capture || id_hover == 0) {
 						id_hover = dwId;
@@ -5434,7 +5454,7 @@ static INT_PTR CALLBACK EditModifyLinesDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 		HWND hwndHover = ChildWindowFromPoint(hwnd, pt);
 		const DWORD dwId = GetWindowLong(hwndHover, GWL_ID);
 
-		if (dwId >= 200 && dwId <= 205) {
+		if (dwId >= IDC_MODIFY_LINE_DLN_NP && dwId <= IDC_MODIFY_LINE_ZCN_ZP) {
 			GetCapture();
 			id_hover = dwId;
 			id_capture = dwId;
@@ -5453,7 +5473,7 @@ static INT_PTR CALLBACK EditModifyLinesDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 			ReleaseCapture();
 			if (id_hover == id_capture) {
 				const int id_focus = GetWindowLong(GetFocus(), GWL_ID);
-				if (id_focus == 100 || id_focus == 101) {
+				if (id_focus == IDC_MODIFY_LINE_PREFIX || id_focus == IDC_MODIFY_LINE_APPEND) {
 					WCHAR wch[8];
 					GetDlgItemText(hwnd, id_capture, wch, COUNTOF(wch));
 					SendDlgItemMessage(hwnd, id_focus, EM_SETSEL, 0, -1);
@@ -5481,8 +5501,8 @@ static INT_PTR CALLBACK EditModifyLinesDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 		case IDOK: {
 			PMODLINESDATA pdata = (PMODLINESDATA)GetWindowLongPtr(hwnd, DWLP_USER);
 			if (pdata) {
-				GetDlgItemText(hwnd, 100, pdata->pwsz1, 256);
-				GetDlgItemText(hwnd, 101, pdata->pwsz2, 256);
+				GetDlgItemText(hwnd, IDC_MODIFY_LINE_PREFIX, pdata->pwsz1, 256);
+				GetDlgItemText(hwnd, IDC_MODIFY_LINE_APPEND, pdata->pwsz2, 256);
 			}
 			EndDialog(hwnd, IDOK);
 		}
