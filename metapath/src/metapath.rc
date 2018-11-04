@@ -503,13 +503,14 @@ FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     ICON            IDI_CROSS1,IDC_CROSSCURSOR,7,7,21,20,SS_CENTERIMAGE
     LTEXT           "Drag the crosshair over the window you would like to select as the new target, or press Esc to cancel.",
-                    IDC_STATIC,35,7,168,22
+                    IDC_FINDWINDESC,35,7,168,22
     EDITTEXT        IDC_WINTITLE,7,35,196,14,ES_AUTOHSCROLL | ES_READONLY |
                     NOT WS_TABSTOP
     LTEXT           "Window Class",IDC_WINCLASS,7,60,45,8,NOT WS_VISIBLE
     LTEXT           "Window Module",IDC_WINMODULE,7,70,51,8,NOT WS_VISIBLE
     DEFPUSHBUTTON   "OK",IDOK,97,64,50,14,WS_DISABLED
     PUSHBUTTON      "Cancel",IDCANCEL,153,64,50,14
+    SCROLLBAR       IDC_RESIZEGRIP2,7,64,10,10
 END
 
 

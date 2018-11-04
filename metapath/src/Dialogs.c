@@ -1868,21 +1868,42 @@ BOOL NewDirDlg(HWND hwnd, LPWSTR pszNewDir) {
 //  Find target window helper dialog
 //
 extern int flagPortableMyDocs;
+extern int cxFindWindowDlg;
 
 static INT_PTR CALLBACK FindWinDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
-	static WCHAR *pTargetWndClassBuf;
 	static HICON hIconCross1, hIconCross2;
 	static HCURSOR hCursorCross;
 	static BOOL bHasCapture;
 
 	switch (umsg) {
 	case WM_INITDIALOG:
-		pTargetWndClassBuf = (WCHAR *)lParam;
+		SetWindowLongPtr(hwnd, DWLP_USER, lParam);
+		ResizeDlg_InitX(hwnd, cxFindWindowDlg, IDC_RESIZEGRIP2);
+
 		hIconCross1 = LoadIcon(g_hInstance, MAKEINTRESOURCE(IDI_CROSS1));
 		hIconCross2 = LoadIcon(g_hInstance, MAKEINTRESOURCE(IDI_CROSS2));
 		hCursorCross = LoadCursor(g_hInstance, MAKEINTRESOURCE(IDC_CROSSHAIR));
 		CenterDlgInParent(hwnd);
 		bHasCapture = FALSE;
+		return TRUE;
+
+	case WM_SIZE: {
+		int dx;
+
+		ResizeDlg_Size(hwnd, lParam, &dx, NULL);
+		HDWP hdwp = BeginDeferWindowPos(5);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDC_RESIZEGRIP2, dx, 0, SWP_NOSIZE);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDOK, dx, 0, SWP_NOSIZE);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDCANCEL, dx, 0, SWP_NOSIZE);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDC_FINDWINDESC, dx, 0, SWP_NOMOVE);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDC_WINTITLE, dx, 0, SWP_NOMOVE);
+		EndDeferWindowPos(hdwp);
+		InvalidateRect(GetDlgItem(hwnd, IDC_FINDWINDESC), NULL, TRUE);
+	}
+	return TRUE;
+
+	case WM_GETMINMAXINFO:
+		ResizeDlg_GetMinMaxInfo(hwnd, lParam);
 		return TRUE;
 
 	case WM_CANCELMODE:
@@ -1921,6 +1942,7 @@ static INT_PTR CALLBACK FindWinDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 		//}
 		//
 		//if (GetDlgItemText(hwnd, IDC_WINCLASS, tch, COUNTOF(tch))) {
+		//	LPWSTR pTargetWndClassBuf = (LPWSTR)GetWindowLongPtr(hwnd, DWLP_USER);
 		//	lstrcpyn(pTargetWndClassBuf, tch, 256);
 		//	PostMessage(hwnd, WM_CLOSE, 0, 0);
 		//}
@@ -1969,6 +1991,7 @@ static INT_PTR CALLBACK FindWinDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 			}
 
 			if (GetDlgItemText(hwnd, IDC_WINCLASS, tch, COUNTOF(tch))) {
+				LPWSTR pTargetWndClassBuf = (LPWSTR)GetWindowLongPtr(hwnd, DWLP_USER);
 				lstrcpyn(pTargetWndClassBuf, tch, 256);
 			}
 			EndDialog(hwnd, IDOK);
@@ -1981,6 +2004,7 @@ static INT_PTR CALLBACK FindWinDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 		return TRUE;
 
 	case WM_DESTROY:
+		ResizeDlg_Destroy(hwnd, &cxFindWindowDlg, NULL);
 		if (bHasCapture) {
 			ReleaseCapture();
 			SendMessage(hwnd, WM_LBUTTONUP, 0, 0);
