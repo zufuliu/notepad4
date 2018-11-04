@@ -217,6 +217,7 @@ static int cyReBarFrame;
 static int cxEditFrame;
 static int cyEditFrame;
 
+int		cxRunDlg;
 int		cxEncodingDlg;
 int		cyEncodingDlg;
 int		cxRecodeDlg;
@@ -5444,6 +5445,7 @@ void LoadSettings(void) {
 	bFullScreenHideToolbar = IniSectionGetBool(pIniSection, L"FullScreenHideToolbar", 0);
 	bFullScreenHideStatusbar = IniSectionGetBool(pIniSection, L"FullScreenHideStatusbar", 0);
 
+	cxRunDlg = IniSectionGetInt(pIniSection, L"RunDlgSizeX", 0);
 	cxEncodingDlg = IniSectionGetInt(pIniSection, L"EncodingDlgSizeX", 0);
 	cyEncodingDlg = IniSectionGetInt(pIniSection, L"EncodingDlgSizeY", 0);
 	cxRecodeDlg = IniSectionGetInt(pIniSection, L"RecodeDlgSizeX", 0);
@@ -5652,6 +5654,7 @@ void SaveSettings(BOOL bSaveSettingsNow) {
 	IniSectionSetBoolEx(pIniSection, L"FullScreenHideMenu", bFullScreenHideMenu, 0);
 	IniSectionSetBoolEx(pIniSection, L"FullScreenHideToolbar", bFullScreenHideToolbar, 0);
 	IniSectionSetBoolEx(pIniSection, L"FullScreenHideStatusbar", bFullScreenHideStatusbar, 0);
+	IniSectionSetInt(pIniSection, L"RunDlgSizeX", cxRunDlg);
 	IniSectionSetInt(pIniSection, L"EncodingDlgSizeX", cxEncodingDlg);
 	IniSectionSetInt(pIniSection, L"EncodingDlgSizeY", cyEncodingDlg);
 	IniSectionSetInt(pIniSection, L"RecodeDlgSizeX", cxRecodeDlg);

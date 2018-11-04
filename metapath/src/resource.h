@@ -23,6 +23,7 @@
 #define IDC_SEARCHEXE                   101
 #define IDB_OPEN                        101
 #define IDD_RUN                         101
+#define IDC_RUNDESC						102
 #define IDC_NEWNAME                     101
 #define IDC_DESTINATION                 101
 #define IDC_GOTOMRU                     101

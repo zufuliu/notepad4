@@ -38,6 +38,7 @@
 #define IDC_OPENWITHDESCR				102
 #define IDC_SAVEMRU						102
 #define IDD_RUN							102
+#define IDC_RUNDESC						102
 #define IDC_AUTOSELECT					102
 #define IDC_FAVORITESDESCR				102
 #define IDC_INFOBOXCHECK				102
