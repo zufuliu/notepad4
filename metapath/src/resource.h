@@ -70,6 +70,7 @@
 #define IDC_ALWAYSONTOP                 104
 #define IDI_OPTIONS2                    104
 #define IDC_AUTHORNAME                  104
+#define IDC_FINDWINDESC					104
 #define IDD_COPYMOVE                    105
 #define IDC_RESIZEGRIP2                 105
 #define IDC_USERECYCLEBIN               105
