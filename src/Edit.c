@@ -5330,6 +5330,7 @@ typedef struct _modlinesdata {
 
 extern int cxModifyLinesDlg;
 extern int cxEncloseSelectionDlg;
+extern int cxInsertTagDlg;
 
 static INT_PTR CALLBACK EditModifyLinesDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
 	static int id_hover;
@@ -5686,27 +5687,50 @@ static INT_PTR CALLBACK EditInsertTagDlgProc(HWND hwnd, UINT umsg, WPARAM wParam
 	switch (umsg) {
 	case WM_INITDIALOG: {
 		SetWindowLongPtr(hwnd, DWLP_USER, lParam);
+		ResizeDlg_InitX(hwnd, cxInsertTagDlg, IDC_RESIZEGRIP2);
 
-		SendDlgItemMessage(hwnd, 100, EM_LIMITTEXT, 254, 0);
-		SetDlgItemText(hwnd, 100, L"<tag>");
+		SendDlgItemMessage(hwnd, IDC_MODIFY_LINE_PREFIX, EM_LIMITTEXT, 254, 0);
+		SetDlgItemText(hwnd, IDC_MODIFY_LINE_PREFIX, L"<tag>");
 
-		SendDlgItemMessage(hwnd, 101, EM_LIMITTEXT, 255, 0);
-		SetDlgItemText(hwnd, 101, L"</tag>");
+		SendDlgItemMessage(hwnd, IDC_MODIFY_LINE_APPEND, EM_LIMITTEXT, 255, 0);
+		SetDlgItemText(hwnd, IDC_MODIFY_LINE_APPEND, L"</tag>");
 
-		SetFocus(GetDlgItem(hwnd, 100));
-		PostMessage(GetDlgItem(hwnd, 100), EM_SETSEL, 1, 4);
+		SetFocus(GetDlgItem(hwnd, IDC_MODIFY_LINE_PREFIX));
+		PostMessage(GetDlgItem(hwnd, IDC_MODIFY_LINE_PREFIX), EM_SETSEL, 1, 4);
 		CenterDlgInParent(hwnd);
 	}
 	return FALSE;
 
+	case WM_DESTROY:
+		ResizeDlg_Destroy(hwnd, &cxInsertTagDlg, NULL);
+		return FALSE;
+
+	case WM_SIZE: {
+		int dx;
+
+		ResizeDlg_Size(hwnd, lParam, &dx, NULL);
+		HDWP hdwp = BeginDeferWindowPos(5);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDC_RESIZEGRIP2, dx, 0, SWP_NOSIZE);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDOK, dx, 0, SWP_NOSIZE);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDCANCEL, dx, 0, SWP_NOSIZE);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDC_MODIFY_LINE_PREFIX, dx, 0, SWP_NOMOVE);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDC_MODIFY_LINE_APPEND, dx, 0, SWP_NOMOVE);
+		EndDeferWindowPos(hdwp);
+	}
+	return TRUE;
+
+	case WM_GETMINMAXINFO:
+		ResizeDlg_GetMinMaxInfo(hwnd, lParam);
+		return TRUE;
+
 	case WM_COMMAND:
 		switch (LOWORD(wParam)) {
-		case 100: {
+		case IDC_MODIFY_LINE_PREFIX: {
 			if (HIWORD(wParam) == EN_CHANGE) {
 				WCHAR wchBuf[256];
 				BOOL bClear = TRUE;
 
-				GetDlgItemText(hwnd, 100, wchBuf, 256);
+				GetDlgItemText(hwnd, IDC_MODIFY_LINE_PREFIX, wchBuf, 256);
 				if (lstrlen(wchBuf) >= 3) {
 					if (wchBuf[0] == L'<') {
 						WCHAR wchIns[256] = L"</";
@@ -5741,7 +5765,7 @@ static INT_PTR CALLBACK EditInsertTagDlgProc(HWND hwnd, UINT umsg, WPARAM wParam
 									StrCaseEqual(wchIns, L"</link>") &&
 									StrCaseEqual(wchIns, L"</meta>"))) {
 
-								SetDlgItemText(hwnd, 101, wchIns);
+								SetDlgItemText(hwnd, IDC_MODIFY_LINE_APPEND, wchIns);
 								bClear = FALSE;
 							}
 						}
@@ -5749,7 +5773,7 @@ static INT_PTR CALLBACK EditInsertTagDlgProc(HWND hwnd, UINT umsg, WPARAM wParam
 				}
 
 				if (bClear) {
-					SetDlgItemText(hwnd, 101, L"");
+					SetDlgItemText(hwnd, IDC_MODIFY_LINE_PREFIX, L"");
 				}
 			}
 		}
@@ -5758,8 +5782,8 @@ static INT_PTR CALLBACK EditInsertTagDlgProc(HWND hwnd, UINT umsg, WPARAM wParam
 		case IDOK: {
 			PTAGSDATA pdata = (PTAGSDATA)GetWindowLongPtr(hwnd, DWLP_USER);
 			if (pdata) {
-				GetDlgItemText(hwnd, 100, pdata->pwsz1, 256);
-				GetDlgItemText(hwnd, 101, pdata->pwsz2, 256);
+				GetDlgItemText(hwnd, IDC_MODIFY_LINE_PREFIX, pdata->pwsz1, 256);
+				GetDlgItemText(hwnd, IDC_MODIFY_LINE_APPEND, pdata->pwsz2, 256);
 			}
 			EndDialog(hwnd, IDOK);
 		}
