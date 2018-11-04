@@ -4243,13 +4243,6 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 		if (bFindReplaceTransparentMode) {
 			CheckDlgButton(hwnd, IDC_TRANSPARENT, BST_CHECKED);
 		}
-
-		HMENU hmenu = GetSystemMenu(hwnd, FALSE);
-		GetString(SC_SAVEPOS, tch, COUNTOF(tch));
-		InsertMenu(hmenu, 0, MF_BYPOSITION | MF_STRING | MF_ENABLED, SC_SAVEPOS, tch);
-		GetString(SC_RESETPOS, tch, COUNTOF(tch));
-		InsertMenu(hmenu, 1, MF_BYPOSITION | MF_STRING | MF_ENABLED, SC_RESETPOS, tch);
-		InsertMenu(hmenu, 2, MF_BYPOSITION | MF_SEPARATOR, 0, NULL);
 	}
 	return TRUE;
 
@@ -4262,13 +4255,15 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 
 		const BOOL isReplace = GetDlgItem(hwnd, IDC_REPLACETEXT) != NULL;
 		ResizeDlg_Size(hwnd, lParam, &dx, NULL);
-		HDWP hdwp = BeginDeferWindowPos(isReplace ? 11 : 6);
+		HDWP hdwp = BeginDeferWindowPos(isReplace ? 13 : 8);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDC_RESIZEGRIP2, dx, 0, SWP_NOSIZE);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDOK, dx, 0, SWP_NOSIZE);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDCANCEL, dx, 0, SWP_NOSIZE);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDC_FINDTEXT, dx, 0, SWP_NOMOVE);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDC_CLEAR_FIND, dx, 0, SWP_NOSIZE);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDC_FINDPREV, dx, 0, SWP_NOSIZE);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDC_SAVEPOSITION, dx, 0, SWP_NOSIZE);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDC_RESETPOSITION, dx, 0, SWP_NOSIZE);
 		if (isReplace) {
 			hdwp = DeferCtlPos(hdwp, hwnd, IDC_REPLACETEXT, dx, 0, SWP_NOMOVE);
 			hdwp = DeferCtlPos(hdwp, hwnd, IDC_CLEAR_REPLACE, dx, 0, SWP_NOSIZE);
@@ -4554,51 +4549,56 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 		}
 		return TRUE;
 
-	case WM_SYSCOMMAND:
-		if (wParam == SC_SAVEPOS) {
-			PostMessage(hwnd, WM_COMMAND, MAKELONG(IDACC_SAVEPOS, 0), 0);
-			return TRUE;
-		}
-		if (wParam == SC_RESETPOS) {
-			PostMessage(hwnd, WM_COMMAND, MAKELONG(IDACC_RESETPOS, 0), 0);
-			return TRUE;
-		}
-		return FALSE;
-
 	case WM_NOTIFY: {
 		LPNMHDR pnmhdr = (LPNMHDR)lParam;
 		switch (pnmhdr->code) {
 		case NM_CLICK:
 		case NM_RETURN:
-			if (pnmhdr->idFrom == IDC_TOGGLEFINDREPLACE) {
+			switch (pnmhdr->idFrom) {
+			case IDC_TOGGLEFINDREPLACE:
 				if (GetDlgItem(hwnd, IDC_REPLACE)) {
 					PostMessage(GetParent(hwnd), WM_COMMAND, MAKELONG(IDM_EDIT_FIND, 1), 0);
 				} else {
 					PostMessage(GetParent(hwnd), WM_COMMAND, MAKELONG(IDM_EDIT_REPLACE, 1), 0);
 				}
-			}
+				break;
 #ifdef BOOKMARK_EDITION
 			// Display help messages in the find/replace windows
-			else if (pnmhdr->idFrom == IDC_BACKSLASHHELP) {
+			case IDC_BACKSLASHHELP:
 				MsgBox(MBINFO, IDS_BACKSLASHHELP);
-			} else if (pnmhdr->idFrom == IDC_REGEXPHELP) {
+				break;
+
+			case IDC_REGEXPHELP:
 				MsgBox(MBINFO, IDS_REGEXPHELP);
-			} else if (pnmhdr->idFrom == IDC_WILDCARDHELP) {
+				break;
+
+			case IDC_WILDCARDHELP:
 				MsgBox(MBINFO, IDS_WILDCARDHELP);
-			}
+				break;
 #endif
-			else if (pnmhdr->idFrom == IDC_CLEAR_FIND) {
+			case IDC_CLEAR_FIND:
 				GetDlgItemText(hwnd, IDC_FINDTEXT, tch, COUNTOF(tch));
 				SendDlgItemMessage(hwnd, IDC_FINDTEXT, CB_RESETCONTENT, 0, 0);
 				MRU_Empty(mruFind);
 				MRU_Save(mruFind);
 				SetDlgItemText(hwnd, IDC_FINDTEXT, tch);
-			} else if (pnmhdr->idFrom == IDC_CLEAR_REPLACE) {
+				break;
+
+			case IDC_CLEAR_REPLACE:
 				GetDlgItemText(hwnd, IDC_REPLACETEXT, tch, COUNTOF(tch));
 				SendDlgItemMessage(hwnd, IDC_REPLACETEXT, CB_RESETCONTENT, 0, 0);
 				MRU_Empty(mruReplace);
 				MRU_Save(mruReplace);
 				SetDlgItemText(hwnd, IDC_REPLACETEXT, tch);
+				break;
+
+			case IDC_SAVEPOSITION:
+				PostMessage(hwnd, WM_COMMAND, MAKELONG(IDACC_SAVEPOS, 0), 0);
+				break;
+
+			case IDC_RESETPOSITION:
+				PostMessage(hwnd, WM_COMMAND, MAKELONG(IDACC_RESETPOS, 0), 0);
+				break;
 			}
 			break;
 		}
