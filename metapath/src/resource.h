@@ -37,6 +37,7 @@
 #define IDC_TRACKSELECT                 101
 #define IDC_BROWSE_Q                    101
 #define IDC_COPYRIGHT                   101
+#define IDC_RESIZEGRIP4					102
 #define IDD_GOTO                        102
 #define IDI_GOTO                        102
 #define IDC_BROWSEDESTINATION           102

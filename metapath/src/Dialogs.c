@@ -1274,6 +1274,7 @@ typedef struct tagFILEOPDLGDATA {
 	UINT wFunc;
 } FILEOPDLGDATA, *LPFILEOPDLGDATA;
 
+extern int cxRenameFileDlg;
 //=============================================================================
 //
 //  RenameFileDlgProc()
@@ -1283,6 +1284,7 @@ INT_PTR CALLBACK RenameFileDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 	switch (umsg) {
 	case WM_INITDIALOG: {
 		SetWindowLongPtr(hwnd, DWLP_USER, lParam);
+		ResizeDlg_InitX(hwnd, cxRenameFileDlg, IDC_RESIZEGRIP4);
 		LPFILEOPDLGDATA lpfod = (LPFILEOPDLGDATA)lParam;
 
 		SetDlgItemText(hwnd, IDC_OLDNAME, lpfod->szSource);
@@ -1293,6 +1295,28 @@ INT_PTR CALLBACK RenameFileDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 		CenterDlgInParent(hwnd);
 	}
 	return TRUE;
+
+	case WM_DESTROY:
+		ResizeDlg_Destroy(hwnd, &cxRenameFileDlg, NULL);
+		return FALSE;
+
+	case WM_SIZE: {
+		int dx;
+
+		ResizeDlg_Size(hwnd, lParam, &dx, NULL);
+		HDWP hdwp = BeginDeferWindowPos(5);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDC_RESIZEGRIP4, dx, 0, SWP_NOSIZE);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDOK, dx, 0, SWP_NOSIZE);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDCANCEL, dx, 0, SWP_NOSIZE);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDC_OLDNAME, dx, 0, SWP_NOMOVE);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDC_NEWNAME, dx, 0, SWP_NOMOVE);
+		EndDeferWindowPos(hdwp);
+	}
+	return TRUE;
+
+	case WM_GETMINMAXINFO:
+		ResizeDlg_GetMinMaxInfo(hwnd, lParam);
+		return TRUE;
 
 	case WM_COMMAND:
 		switch (LOWORD(wParam)) {
