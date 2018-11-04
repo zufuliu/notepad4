@@ -1285,7 +1285,7 @@ INT_PTR CALLBACK RenameFileDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 	switch (umsg) {
 	case WM_INITDIALOG: {
 		SetWindowLongPtr(hwnd, DWLP_USER, lParam);
-		ResizeDlg_InitX(hwnd, cxRenameFileDlg, IDC_RESIZEGRIP4);
+		ResizeDlg_InitX(hwnd, cxRenameFileDlg, IDC_RESIZEGRIP2);
 		LPFILEOPDLGDATA lpfod = (LPFILEOPDLGDATA)lParam;
 
 		SetDlgItemText(hwnd, IDC_OLDNAME, lpfod->szSource);
@@ -1306,7 +1306,7 @@ INT_PTR CALLBACK RenameFileDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 
 		ResizeDlg_Size(hwnd, lParam, &dx, NULL);
 		HDWP hdwp = BeginDeferWindowPos(5);
-		hdwp = DeferCtlPos(hdwp, hwnd, IDC_RESIZEGRIP4, dx, 0, SWP_NOSIZE);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDC_RESIZEGRIP2, dx, 0, SWP_NOSIZE);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDOK, dx, 0, SWP_NOSIZE);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDCANCEL, dx, 0, SWP_NOSIZE);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDC_OLDNAME, dx, 0, SWP_NOMOVE);
@@ -1411,7 +1411,7 @@ INT_PTR CALLBACK CopyMoveDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPa
 	case WM_INITDIALOG: {
 		SetWindowLongPtr(hwnd, DWLP_USER, lParam);
 
-		ResizeDlg_InitX(hwnd, cxCopyMoveDlg, IDC_RESIZEGRIP2);
+		ResizeDlg_InitX(hwnd, cxCopyMoveDlg, IDC_RESIZEGRIP5);
 		MakeBitmapButton(hwnd, IDC_BROWSEDESTINATION, g_hInstance, IDB_OPEN);
 
 		LPFILEOPDLGDATA lpfod = (LPFILEOPDLGDATA)lParam;
@@ -1450,7 +1450,7 @@ INT_PTR CALLBACK CopyMoveDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPa
 
 		ResizeDlg_Size(hwnd, lParam, &dx, NULL);
 		HDWP hdwp = BeginDeferWindowPos(7);
-		hdwp = DeferCtlPos(hdwp, hwnd, IDC_RESIZEGRIP2, dx, 0, SWP_NOSIZE);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDC_RESIZEGRIP5, dx, 0, SWP_NOSIZE);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDOK, dx, 0, SWP_NOSIZE);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDCANCEL, dx, 0, SWP_NOSIZE);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDC_EMPTY_MRU, dx, 0, SWP_NOSIZE);
@@ -1878,7 +1878,7 @@ static INT_PTR CALLBACK FindWinDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 	switch (umsg) {
 	case WM_INITDIALOG:
 		SetWindowLongPtr(hwnd, DWLP_USER, lParam);
-		ResizeDlg_InitX(hwnd, cxFindWindowDlg, IDC_RESIZEGRIP2);
+		ResizeDlg_InitX(hwnd, cxFindWindowDlg, IDC_RESIZEGRIP5);
 
 		hIconCross1 = LoadIcon(g_hInstance, MAKEINTRESOURCE(IDI_CROSS1));
 		hIconCross2 = LoadIcon(g_hInstance, MAKEINTRESOURCE(IDI_CROSS2));
@@ -1892,7 +1892,7 @@ static INT_PTR CALLBACK FindWinDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 
 		ResizeDlg_Size(hwnd, lParam, &dx, NULL);
 		HDWP hdwp = BeginDeferWindowPos(5);
-		hdwp = DeferCtlPos(hdwp, hwnd, IDC_RESIZEGRIP2, dx, 0, SWP_NOSIZE);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDC_RESIZEGRIP5, dx, 0, SWP_NOSIZE);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDOK, dx, 0, SWP_NOSIZE);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDCANCEL, dx, 0, SWP_NOSIZE);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDC_FINDWINDESC, dx, 0, SWP_NOMOVE);
