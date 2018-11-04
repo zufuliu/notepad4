@@ -124,10 +124,12 @@ BEGIN
         MENUITEM "&Goto...",                    IDM_FILE_GOTO
         MENUITEM SEPARATOR
         MENUITEM "Show Dri&ves",                IDM_VIEW_DRIVEBOX
+        MENUITEM "&Keep on Top",                IDM_VIEW_ALWAYSONTOP          
         MENUITEM SEPARATOR
         MENUITEM "S&ave Settings",              IDM_VIEW_SAVESETTINGS
         MENUITEM "Setup &Target...",            IDM_VIEW_FINDTARGET
         MENUITEM "O&ptions...",                 IDM_VIEW_OPTIONS
+        MENUITEM "&About metapath",             IDM_VIEW_ABOUT                
     END
     POPUP "+"
     BEGIN
@@ -183,7 +185,7 @@ BEGIN
     "R",            IDM_FILE_RUN,           VIRTKEY, CONTROL, NOINVERT
     "S",            IDM_FILE_SAVEAS,        VIRTKEY, CONTROL, NOINVERT
     "S",            IDM_VIEW_STATUSBAR,     VIRTKEY, ALT, NOINVERT
-    "T",            SC_ALWAYSONTOP,         VIRTKEY, CONTROL, NOINVERT
+    "T",            IDM_VIEW_ALWAYSONTOP,         VIRTKEY, CONTROL, NOINVERT
     "T",            IDM_VIEW_TOOLBAR,       VIRTKEY, ALT, NOINVERT
     "U",            ACC_SWITCHTRANSPARENCY, VIRTKEY, CONTROL, NOINVERT
     "U",            IDM_VIEW_DRIVEBOX,      VIRTKEY, ALT, NOINVERT
@@ -194,7 +196,7 @@ BEGIN
     VK_DELETE,      IDM_FILE_DELETE3,       VIRTKEY, SHIFT, CONTROL, NOINVERT
     VK_DOWN,        IDT_FILE_NEXT,          VIRTKEY, ALT, NOINVERT
     VK_ESCAPE,      ACC_ESCAPE,             VIRTKEY, NOINVERT
-    VK_F1,          SC_ABOUT,               VIRTKEY, NOINVERT
+    VK_F1,          IDM_VIEW_ABOUT,               VIRTKEY, NOINVERT
     VK_F11,         IDM_VIEW_FAVORITES,     VIRTKEY, NOINVERT
     VK_F12,         IDM_VIEW_OPTIONS,       VIRTKEY, NOINVERT
     VK_F12,         ACC_SELECTTARGET,       VIRTKEY, CONTROL, NOINVERT
@@ -709,12 +711,6 @@ BEGIN
     IDS_FILTER_EXE          "Executable files (*.exe;*.com;*.bat;*.lnk;*.pif)\n*.exe;*.com;*.bat;*.lnk;*.pif\nAll files (*.*)\n*.*\n"
     IDS_GETDIRECTORY        "Select a new directory."
     IDS_FAVORITES           "Specify the ""Favorites"" directory."
-END
-
-STRINGTABLE
-BEGIN
-    SC_ALWAYSONTOP          "&Keep on Top"
-    SC_ABOUT                "&About metapath"
 END
 
 STRINGTABLE
