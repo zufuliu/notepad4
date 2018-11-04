@@ -1595,6 +1595,7 @@ extern int flagNoFadeHidden;
 
 extern int cxOpenWithDlg;
 extern int cyOpenWithDlg;
+extern int cxNewDirectoryDlg;
 
 INT_PTR CALLBACK OpenWithDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
 	switch (umsg) {
@@ -1793,11 +1794,33 @@ INT_PTR CALLBACK NewDirDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPara
 	switch (umsg) {
 	case WM_INITDIALOG: {
 		SetWindowLongPtr(hwnd, DWLP_USER, lParam);
+		ResizeDlg_InitX(hwnd, cxNewDirectoryDlg, IDC_RESIZEGRIP);
 
 		SendDlgItemMessage(hwnd, IDC_NEWDIR, EM_LIMITTEXT, MAX_PATH - 1, 0);
 		CenterDlgInParent(hwnd);
 	}
 	return TRUE;
+
+	case WM_DESTROY:
+		ResizeDlg_Destroy(hwnd, &cxNewDirectoryDlg, NULL);
+		return FALSE;
+
+	case WM_SIZE: {
+		int dx;
+
+		ResizeDlg_Size(hwnd, lParam, &dx, NULL);
+		HDWP hdwp = BeginDeferWindowPos(4);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDC_RESIZEGRIP, dx, 0, SWP_NOSIZE);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDOK, dx, 0, SWP_NOSIZE);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDCANCEL, dx, 0, SWP_NOSIZE);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDC_NEWDIR, dx, 0, SWP_NOMOVE);
+		EndDeferWindowPos(hdwp);
+	}
+	return TRUE;
+
+	case WM_GETMINMAXINFO:
+		ResizeDlg_GetMinMaxInfo(hwnd, lParam);
+		return TRUE;
 
 	case WM_COMMAND:
 		switch (LOWORD(wParam)) {

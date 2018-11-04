@@ -106,6 +106,7 @@ int		cxRunDlg;
 int		cxGotoDlg;
 int		cxFileFilterDlg;
 int		cxRenameFileDlg;
+int		cxNewDirectoryDlg;
 int		cxOpenWithDlg;
 int		cyOpenWithDlg;
 int		cxCopyMoveDlg;
@@ -2472,6 +2473,7 @@ void LoadSettings(void) {
 	cxGotoDlg = IniSectionGetInt(pIniSection, L"GotoDlgSizeX", 0);
 	cxFileFilterDlg = IniSectionGetInt(pIniSection, L"FileFilterDlgX", 0);
 	cxRenameFileDlg = IniSectionGetInt(pIniSection, L"RenameFileDlgX", 0);
+	cxNewDirectoryDlg = IniSectionGetInt(pIniSection, L"NewDirectoryDlgX", 0);
 	cxOpenWithDlg = IniSectionGetInt(pIniSection, L"OpenWithDlgSizeX", 0);
 	cyOpenWithDlg = IniSectionGetInt(pIniSection, L"OpenWithDlgSizeY", 0);
 	cxCopyMoveDlg = IniSectionGetInt(pIniSection, L"CopyMoveDlgSizeX", 0);
@@ -2602,6 +2604,7 @@ void SaveSettings(BOOL bSaveSettingsNow) {
 	IniSectionSetInt(pIniSection, L"GotoDlgSizeX", cxGotoDlg);
 	IniSectionSetInt(pIniSection, L"FileFilterDlgX", cxFileFilterDlg);
 	IniSectionSetInt(pIniSection, L"RenameFileDlgX", cxRenameFileDlg);
+	IniSectionSetInt(pIniSection, L"NewDirectoryDlgX", cxNewDirectoryDlg);
 	IniSectionSetInt(pIniSection, L"OpenWithDlgSizeX", cxOpenWithDlg);
 	IniSectionSetInt(pIniSection, L"OpenWithDlgSizeY", cyOpenWithDlg);
 	IniSectionSetInt(pIniSection, L"CopyMoveDlgSizeX", cxCopyMoveDlg);
