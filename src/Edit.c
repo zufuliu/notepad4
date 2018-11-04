@@ -40,12 +40,9 @@ extern HWND hDlgFindReplace;
 extern UINT cpLastFind;
 extern BOOL bReplaceInitialized;
 
-static EDITFINDREPLACE efrSave;
-static BOOL bSwitchedFindReplace = FALSE;
-static int xFindReplaceDlgSave;
-static int yFindReplaceDlgSave;
 extern int xFindReplaceDlg;
 extern int yFindReplaceDlg;
+extern int cxFindReplaceDlg;
 
 extern int iDefaultEncoding;
 extern int iDefaultEOLMode;
@@ -4097,6 +4094,11 @@ extern int iFindReplaceOpacityLevel;
 // EditFindReplaceDlgProc()
 //
 static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
+	static BOOL bSwitchedFindReplace = FALSE;
+	static int xFindReplaceDlgSave;
+	static int yFindReplaceDlgSave;
+	static EDITFINDREPLACE efrSave;
+
 	WCHAR tch[NP2_FIND_REPLACE_LIMIT + 32];
 
 	switch (umsg) {
@@ -4106,8 +4108,9 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 #endif
 
 		SetWindowLongPtr(hwnd, DWLP_USER, lParam);
-		LPEDITFINDREPLACE lpefr = (LPEDITFINDREPLACE)lParam;
+		ResizeDlg_InitX(hwnd, cxFindReplaceDlg, IDC_RESIZEGRIP2);
 
+		LPEDITFINDREPLACE lpefr = (LPEDITFINDREPLACE)lParam;
 		// Get the current code page for Unicode conversion
 		const UINT cpEdit = (UINT)SendMessage(lpefr->hwnd, SCI_GETCODEPAGE, 0, 0);
 
@@ -4249,6 +4252,37 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 		InsertMenu(hmenu, 2, MF_BYPOSITION | MF_SEPARATOR, 0, NULL);
 	}
 	return TRUE;
+
+	case WM_DESTROY:
+		ResizeDlg_Destroy(hwnd, &cxFindReplaceDlg, NULL);
+		return FALSE;
+
+	case WM_SIZE: {
+		int dx;
+
+		const BOOL isReplace = GetDlgItem(hwnd, IDC_REPLACETEXT) != NULL;
+		ResizeDlg_Size(hwnd, lParam, &dx, NULL);
+		HDWP hdwp = BeginDeferWindowPos(isReplace ? 11 : 6);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDC_RESIZEGRIP2, dx, 0, SWP_NOSIZE);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDOK, dx, 0, SWP_NOSIZE);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDCANCEL, dx, 0, SWP_NOSIZE);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDC_FINDTEXT, dx, 0, SWP_NOMOVE);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDC_CLEAR_FIND, dx, 0, SWP_NOSIZE);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDC_FINDPREV, dx, 0, SWP_NOSIZE);
+		if (isReplace) {
+			hdwp = DeferCtlPos(hdwp, hwnd, IDC_REPLACETEXT, dx, 0, SWP_NOMOVE);
+			hdwp = DeferCtlPos(hdwp, hwnd, IDC_CLEAR_REPLACE, dx, 0, SWP_NOSIZE);
+			hdwp = DeferCtlPos(hdwp, hwnd, IDC_REPLACE, dx, 0, SWP_NOSIZE);
+			hdwp = DeferCtlPos(hdwp, hwnd, IDC_REPLACEALL, dx, 0, SWP_NOSIZE);
+			hdwp = DeferCtlPos(hdwp, hwnd, IDC_REPLACEINSEL, dx, 0, SWP_NOSIZE);
+		}
+		EndDeferWindowPos(hdwp);
+	}
+	return TRUE;
+
+	case WM_GETMINMAXINFO:
+		ResizeDlg_GetMinMaxInfo(hwnd, lParam);
+		return TRUE;
 
 	case WM_COMMAND:
 		switch (LOWORD(wParam)) {

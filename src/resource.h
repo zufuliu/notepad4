@@ -37,7 +37,6 @@
 #define IDC_NOUNICODEDETECTION			101
 #define IDC_WARNINCONSISTENTEOLS		101
 #define IDC_STYLEEDIT					102
-#define IDC_FINDCASE					102
 #define IDC_OPENWITHDESCR				102
 #define IDC_SAVEMRU						102
 #define IDD_RUN							102
@@ -52,7 +51,7 @@
 #define IDC_LINE_RANGE					102
 #define IDC_EOL_SUM_CRLF				102
 #define IDD_DEFENCODING					103
-#define IDC_FINDWORD					103
+#define IDC_FINDCASE					103
 #define IDC_RESIZEGRIP3					103
 #define IDB_NEXT						103
 #define IDC_STYLEFORE					103
@@ -61,6 +60,7 @@
 #define IDC_EMPTY_MRU					103
 #define IDC_EOL_SUM_LF					103
 #define IDC_EOL_SUM_CR					104
+#define IDC_FINDWORD					104
 
 #define IDD_ABOUT						100
 #define IDC_VERSION						100
@@ -78,25 +78,25 @@
 #define IDC_SCI_PAGE_LINK				112
 
 #define IDD_ENCODING					104
-#define IDC_FINDSTART					104
 #define IDB_PICK						104
 #define IDC_STYLEBACK					104
+#define IDC_FINDSTART					105
 #define IDD_RECODE						105
-#define IDC_FINDREGEXP					105
 #define IDC_STYLEFONT					105
 #define IDB_ENCODING					105
+#define IDC_FINDREGEXP					106
 #define IDD_DEFEOLMODE					106
-#define IDC_FINDTRANSFORMBS				106
 #define IDC_PREVIEW						106
+#define IDC_FINDTRANSFORMBS				107
 #define IDD_FAVORITES					107
-#define IDC_NOWRAP						107
 #define IDC_STYLEDEFAULT				107
+#define IDC_NOWRAP						108
 #define IDD_ADDTOFAV					108
 #define IDC_PREVSTYLE					108
-#define IDC_FINDCLOSE					108
+#define IDC_FINDCLOSE					109
 #define IDD_FILEMRU						109
-#define IDC_FINDPREV					109
 #define IDC_NEXTSTYLE					109
+#define IDC_FINDPREV					110
 #define IDD_CHANGENOTIFY				110
 #define IDC_IMPORT						110
 #define IDD_MODIFYLINES					111
