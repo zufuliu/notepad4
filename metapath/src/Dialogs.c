@@ -165,12 +165,14 @@ extern WCHAR szCurDir[MAX_PATH + 40];
 //
 //
 extern HWND hwndDirList;
+extern int cxRunDlg;
 
 INT_PTR CALLBACK RunDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
 	UNREFERENCED_PARAMETER(lParam);
 
 	switch (umsg) {
 	case WM_INITDIALOG: {
+		ResizeDlg_InitX(hwnd, cxRunDlg, IDC_RESIZEGRIP3);
 		MakeBitmapButton(hwnd, IDC_SEARCHEXE, g_hInstance, IDB_OPEN);
 
 		DLITEM dli;
@@ -188,8 +190,28 @@ INT_PTR CALLBACK RunDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) 
 	return TRUE;
 
 	case WM_DESTROY:
+		ResizeDlg_Destroy(hwnd, &cxRunDlg, NULL);
 		DeleteBitmapButton(hwnd, IDC_SEARCHEXE);
 		return FALSE;
+
+	case WM_SIZE: {
+		int dx;
+
+		ResizeDlg_Size(hwnd, lParam, &dx, NULL);
+		HDWP hdwp = BeginDeferWindowPos(5);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDC_RESIZEGRIP3, dx, 0, SWP_NOSIZE);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDOK, dx, 0, SWP_NOSIZE);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDCANCEL, dx, 0, SWP_NOSIZE);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDC_SEARCHEXE, dx, 0, SWP_NOSIZE);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDC_COMMANDLINE, dx, 0, SWP_NOMOVE);
+		EndDeferWindowPos(hdwp);
+		ResizeDlgCtl(hwnd, IDC_RUNDESC, dx, 0);
+	}
+	return TRUE;
+
+	case WM_GETMINMAXINFO:
+		ResizeDlg_GetMinMaxInfo(hwnd, lParam);
+		return TRUE;
 
 	case WM_COMMAND:
 		switch (LOWORD(wParam)) {

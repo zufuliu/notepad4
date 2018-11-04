@@ -102,6 +102,7 @@ BOOL	fNoConfirmDelete;
 static BOOL bShowToolbar;
 static BOOL bShowStatusbar;
 static BOOL bShowDriveBox;
+int		cxRunDlg;
 int		cxGotoDlg;
 int		cxOpenWithDlg;
 int		cyOpenWithDlg;
@@ -2465,6 +2466,7 @@ void LoadSettings(void) {
 	bShowStatusbar = IniSectionGetBool(pIniSection, L"ShowStatusbar", 1);
 	bShowDriveBox = IniSectionGetBool(pIniSection, L"ShowDriveBox", 1);
 
+	cxRunDlg = IniSectionGetInt(pIniSection, L"RunDlgSizeX", 0);
 	cxGotoDlg = IniSectionGetInt(pIniSection, L"GotoDlgSizeX", 0);
 	cxOpenWithDlg = IniSectionGetInt(pIniSection, L"OpenWithDlgSizeX", 0);
 	cyOpenWithDlg = IniSectionGetInt(pIniSection, L"OpenWithDlgSizeY", 0);
@@ -2592,6 +2594,7 @@ void SaveSettings(BOOL bSaveSettingsNow) {
 	IniSectionSetBoolEx(pIniSection, L"ShowToolbar", bShowToolbar, 1);
 	IniSectionSetBoolEx(pIniSection, L"ShowStatusbar", bShowStatusbar, 1);
 	IniSectionSetBoolEx(pIniSection, L"ShowDriveBox", bShowDriveBox, 1);
+	IniSectionSetInt(pIniSection, L"RunDlgSizeX", cxRunDlg);
 	IniSectionSetInt(pIniSection, L"GotoDlgSizeX", cxGotoDlg);
 	IniSectionSetInt(pIniSection, L"OpenWithDlgSizeX", cxOpenWithDlg);
 	IniSectionSetInt(pIniSection, L"OpenWithDlgSizeY", cyOpenWithDlg);
