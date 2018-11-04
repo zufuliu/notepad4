@@ -59,6 +59,7 @@
 #define IDC_FOCUSEDIT                   103
 #define IDI_OPTIONS                     103
 #define IDC_BROWSE_F                    103
+#define IDC_GOTODESC					103
 #define IDD_RENAME                      104
 #define IDC_FUNCMOVE                    104
 #define IDC_RENAMEONCOLLISION           104

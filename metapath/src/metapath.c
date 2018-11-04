@@ -1685,7 +1685,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		sei.cbSize = sizeof(SHELLEXECUTEINFO);
 		sei.fMask = 0;
 		sei.hwnd = hwnd;
-		sei.lpVerb = NULL;
+		sei.lpVerb = L"open";
 		sei.lpFile = tchFavoritesDir;
 		sei.lpParameters = NULL;
 		sei.lpDirectory = NULL;
@@ -2466,16 +2466,9 @@ void LoadSettings(void) {
 	bShowDriveBox = IniSectionGetBool(pIniSection, L"ShowDriveBox", 1);
 
 	cxGotoDlg = IniSectionGetInt(pIniSection, L"GotoDlgSizeX", 0);
-	cxGotoDlg = max_i(cxGotoDlg, 0);
-
 	cxOpenWithDlg = IniSectionGetInt(pIniSection, L"OpenWithDlgSizeX", 0);
-	cxOpenWithDlg = max_i(cxOpenWithDlg, 0);
-
 	cyOpenWithDlg = IniSectionGetInt(pIniSection, L"OpenWithDlgSizeY", 0);
-	cyOpenWithDlg = max_i(cyOpenWithDlg, 0);
-
 	cxCopyMoveDlg = IniSectionGetInt(pIniSection, L"CopyMoveDlgSizeX", 0);
-	cxCopyMoveDlg = max_i(cxCopyMoveDlg, 0);
 
 	if (!flagPosParam) {
 		// ignore window position if /p was specified

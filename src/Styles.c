@@ -378,11 +378,8 @@ void Style_Load(void) {
 	bAutoSelect = IniSectionGetBool(pIniSection, L"AutoSelect", 1);
 
 	// scheme select dlg dimensions
-	cxStyleSelectDlg = IniSectionGetInt(pIniSection, L"SelectDlgSizeX", 304);
-	cxStyleSelectDlg = max_i(cxStyleSelectDlg, 0);
-
-	cyStyleSelectDlg = IniSectionGetInt(pIniSection, L"SelectDlgSizeY", 324);
-	cyStyleSelectDlg = max_i(cyStyleSelectDlg, 0);
+	cxStyleSelectDlg = IniSectionGetInt(pIniSection, L"SelectDlgSizeX", 0);
+	cyStyleSelectDlg = IniSectionGetInt(pIniSection, L"SelectDlgSizeY", 0);
 
 	LoadIniSection(INI_SECTION_NAME_FILE_EXTENSIONS, pIniSectionBuf, cchIniSection);
 	IniSectionParse(pIniSection, pIniSectionBuf);
@@ -3472,8 +3469,7 @@ static INT_PTR CALLBACK Style_SelectLexerDlgProc(HWND hwnd, UINT umsg, WPARAM wP
 		return FALSE;
 
 	case WM_SIZE: {
-		int dx;
-		int dy;
+		int dx, dy;
 
 		ResizeDlg_Size(hwnd, lParam, &dx, &dy);
 		HDWP hdwp = BeginDeferWindowPos(6);

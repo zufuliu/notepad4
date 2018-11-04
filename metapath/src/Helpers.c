@@ -599,6 +599,15 @@ HDWP DeferCtlPos(HDWP hdwp, HWND hwndDlg, int nCtlId, int dx, int dy, UINT uFlag
 	return DeferWindowPos(hdwp, hwndCtl, NULL, 0, 0, rc.right - rc.left + dx, rc.bottom - rc.top + dy, SWP_NOZORDER | SWP_NOMOVE);
 }
 
+void ResizeDlgCtl(HWND hwndDlg, int nCtlId, int dx, int dy) {
+	HWND hwndCtl = GetDlgItem(hwndDlg, nCtlId);
+	RECT rc;
+	GetWindowRect(hwndCtl, &rc);
+	MapWindowPoints(NULL, hwndDlg, (LPPOINT)&rc, 2);
+	SetWindowPos(hwndCtl, NULL, 0, 0, rc.right - rc.left + dx, rc.bottom - rc.top + dy, SWP_NOZORDER | SWP_NOMOVE);
+	InvalidateRect(hwndCtl, NULL, TRUE);
+}
+
 //=============================================================================
 //
 //  MakeBitmapButton()

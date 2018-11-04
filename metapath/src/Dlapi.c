@@ -629,7 +629,7 @@ BOOL DirList_PropertyDlg(HWND hwnd, int iItem) {
 //
 //  Execute an OLE Drag & Drop Operation in response to LVN_BEGIN(R)DRAG
 //
-extern void* CreateDropSource(void);
+extern HANDLE CreateDropSource(void);
 
 void DirList_DoDragDrop(HWND hwnd, LPARAM lParam) {
 	NM_LISTVIEW *pnmlv = (LPVOID)lParam;

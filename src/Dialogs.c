@@ -515,8 +515,7 @@ static INT_PTR CALLBACK OpenWithDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPA
 		return FALSE;
 
 	case WM_SIZE: {
-		int dx;
-		int dy;
+		int dx, dy;
 
 		ResizeDlg_Size(hwnd, lParam, &dx, &dy);
 
@@ -529,6 +528,7 @@ static INT_PTR CALLBACK OpenWithDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPA
 		hdwp = DeferCtlPos(hdwp, hwnd, IDC_OPENWITHDESCR, 0, dy, SWP_NOSIZE);
 		EndDeferWindowPos(hdwp);
 
+		ResizeDlgCtl(hwnd, IDC_OPENWITHDESCR, dx, 0);
 		ListView_SetColumnWidth(GetDlgItem(hwnd, IDC_OPENWITHDIR), 0, LVSCW_AUTOSIZE_USEHEADER);
 	}
 	return TRUE;
@@ -690,8 +690,7 @@ static INT_PTR CALLBACK FavoritesDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LP
 		return FALSE;
 
 	case WM_SIZE: {
-		int dx;
-		int dy;
+		int dx, dy;
 
 		ResizeDlg_Size(hwnd, lParam, &dx, &dy);
 
@@ -703,6 +702,8 @@ static INT_PTR CALLBACK FavoritesDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LP
 		hdwp = DeferCtlPos(hdwp, hwnd, IDC_GETFAVORITESDIR, 0, dy, SWP_NOSIZE);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDC_FAVORITESDESCR, 0, dy, SWP_NOSIZE);
 		EndDeferWindowPos(hdwp);
+
+		ResizeDlgCtl(hwnd, IDC_FAVORITESDESCR, dx, 0);
 		ListView_SetColumnWidth(GetDlgItem(hwnd, IDC_FAVORITESDIR), 0, LVSCW_AUTOSIZE_USEHEADER);
 	}
 	return TRUE;
@@ -1014,8 +1015,7 @@ static INT_PTR CALLBACK FileMRUDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 	return FALSE;
 
 	case WM_SIZE: {
-		int dx;
-		int dy;
+		int dx, dy;
 
 		ResizeDlg_Size(hwnd, lParam, &dx, &dy);
 
@@ -1727,8 +1727,7 @@ static INT_PTR CALLBACK SelectEncodingDlgProc(HWND hwnd, UINT umsg, WPARAM wPara
 	return FALSE;
 
 	case WM_SIZE: {
-		int dx;
-		int dy;
+		int dx, dy;
 
 		ResizeDlg_Size(hwnd, lParam, &dx, &dy);
 
