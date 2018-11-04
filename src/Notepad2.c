@@ -234,6 +234,7 @@ int		cxEncloseSelectionDlg;
 int		cxInsertTagDlg;
 int		xFindReplaceDlg;
 int		yFindReplaceDlg;
+int		cxFindReplaceDlg;
 
 static LPWSTR lpFileList[32];
 static int cFileList = 0;
@@ -5466,6 +5467,7 @@ void LoadSettings(void) {
 	cxInsertTagDlg = IniSectionGetInt(pIniSection, L"InsertTagDlgSizeX", 0);
 	xFindReplaceDlg = IniSectionGetInt(pIniSection, L"FindReplaceDlgPosX", 0);
 	yFindReplaceDlg = IniSectionGetInt(pIniSection, L"FindReplaceDlgPosY", 0);
+	cxFindReplaceDlg = IniSectionGetInt(pIniSection, L"FindReplaceDlgSizeX", 0);
 
 	if (bSaveFindReplace) {
 		efrData.fuFlags = 0;
@@ -5679,6 +5681,7 @@ void SaveSettings(BOOL bSaveSettingsNow) {
 	IniSectionSetInt(pIniSection, L"InsertTagDlgSizeX", cxInsertTagDlg);
 	IniSectionSetInt(pIniSection, L"FindReplaceDlgPosX", xFindReplaceDlg);
 	IniSectionSetInt(pIniSection, L"FindReplaceDlgPosY", yFindReplaceDlg);
+	IniSectionSetInt(pIniSection, L"FindReplaceDlgSizeX", cxFindReplaceDlg);
 
 	if (bSaveFindReplace) {
 		IniSectionSetBoolEx(pIniSection, L"FindReplaceMatchCase", (efrData.fuFlags & SCFIND_MATCHCASE), 0);

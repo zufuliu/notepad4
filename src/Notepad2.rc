@@ -927,6 +927,7 @@ BEGIN
 //#endif
     CONTROL         "<a>Clear History</a>",IDC_CLEAR_FIND,"SysLink",WS_TABSTOP,173,7,48,10
     CONTROL         "Transparent mode on losing focus",IDC_TRANSPARENT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,96,124,10
+    SCROLLBAR       IDC_RESIZEGRIP2,230,96,10,10
 END
 
 IDD_REPLACE DIALOGEX 0, 0, 290, 142
@@ -961,6 +962,7 @@ BEGIN
     CONTROL         "<a>Clear History</a>",IDC_CLEAR_FIND,"SysLink",WS_TABSTOP,173,6,48,10
     CONTROL         "<a>Clear History</a>",IDC_CLEAR_REPLACE,"SysLink",WS_TABSTOP,173,35,48,10
     CONTROL         "Transparent mode on losing focus",IDC_TRANSPARENT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,126,124,10
+    SCROLLBAR       IDC_RESIZEGRIP2,230,126,10,10
 END
 
 IDD_RUN DIALOGEX 0, 0, 234, 86
