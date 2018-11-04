@@ -350,12 +350,15 @@ INT_PTR CALLBACK GotoDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 
 		ResizeDlg_Size(hwnd, lParam, &dx, NULL);
 
-		HDWP hdwp = BeginDeferWindowPos(4);
+		HDWP hdwp = BeginDeferWindowPos(5);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDC_RESIZEGRIP, dx, 0, SWP_NOSIZE);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDOK, dx, 0, SWP_NOSIZE);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDCANCEL, dx, 0, SWP_NOSIZE);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDC_GOTO, dx, 0, SWP_NOMOVE);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDC_GOTODESC, dx, 0, SWP_NOMOVE);
 		EndDeferWindowPos(hdwp);
+
+		InvalidateRect(GetDlgItem(hwnd, IDC_GOTODESC), NULL, TRUE);
 	}
 	return TRUE;
 
@@ -1557,8 +1560,7 @@ INT_PTR CALLBACK OpenWithDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPa
 		return FALSE;
 
 	case WM_SIZE: {
-		int dx;
-		int dy;
+		int dx, dy;
 
 		ResizeDlg_Size(hwnd, lParam, &dx, &dy);
 
@@ -1571,6 +1573,7 @@ INT_PTR CALLBACK OpenWithDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPa
 		hdwp = DeferCtlPos(hdwp, hwnd, IDC_OPENWITHDESCR, 0, dy, SWP_NOSIZE);
 		EndDeferWindowPos(hdwp);
 
+		ResizeDlgCtl(hwnd, IDC_OPENWITHDESCR, dx, 0);
 		ListView_SetColumnWidth(GetDlgItem(hwnd, IDC_OPENWITHDIR), 0, LVSCW_AUTOSIZE_USEHEADER);
 	}
 	return TRUE;

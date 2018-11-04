@@ -119,7 +119,7 @@ BEGIN
         MENUITEM SEPARATOR
         MENUITEM "Open in Explorer",            IDM_FILE_EXPLORER
         MENUITEM "&Goto Favorites",             IDM_VIEW_FAVORITES
-        MENUITEM "&Edit Favorites",             IDM_VIEW_EDITFAVORITES
+        MENUITEM "&Open Favorites",             IDM_VIEW_EDITFAVORITES
         MENUITEM "&Directory...",               IDM_FILE_CHANGEDIR
         MENUITEM "&Goto...",                    IDM_FILE_GOTO
         MENUITEM SEPARATOR
@@ -224,7 +224,7 @@ STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_NOFAILCREATE | WS_POPUP | WS
 CAPTION "metapath"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
-    DEFPUSHBUTTON   "OK",IDOK,195,72,50,14
+    DEFPUSHBUTTON   "OK",IDOK,198,75,50,14
     ICON            IDR_MAINWND,IDC_STATIC,7,7,20,20
     LTEXT           "",IDC_VERSION,45,7,200,8
     LTEXT           "",IDC_BUILD_INFO,45,18,200,8
@@ -240,7 +240,7 @@ BEGIN
     CONTROL         "",IDC_EMAIL_LINK,"SysLink",WS_TABSTOP,45,80,140,10
 END
 
-IDD_RUN DIALOGEX 0, 0, 224, 85
+IDD_RUN DIALOGEX 0, 0, 234, 86
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION |
     WS_SYSMENU
 CAPTION "Run"
@@ -249,10 +249,10 @@ BEGIN
     ICON            IDI_RUN,IDC_STATIC,7,7,20,20
     LTEXT           "Enter the name of an executable program file,\na folder or a document to open.",
                     IDC_STATIC,35,7,188,17
-    EDITTEXT        IDC_COMMANDLINE,35,35,165,13,ES_AUTOHSCROLL
-    PUSHBUTTON      "",IDC_SEARCHEXE,204,35,13,13
-    DEFPUSHBUTTON   "OK",IDOK,112,64,50,14
-    PUSHBUTTON      "Cancel",IDCANCEL,167,64,50,14
+    EDITTEXT        IDC_COMMANDLINE,7,35,203,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "",IDC_SEARCHEXE,215,35,14,14
+    DEFPUSHBUTTON   "OK",IDOK,121,65,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,177,65,50,14
 END
 
 IDD_OPENWITH DIALOGEX 0, 0, 165, 128
@@ -268,8 +268,8 @@ BEGIN
     PUSHBUTTON      "",IDC_GETOPENWITHDIR,7,83,13,13
     LTEXT           "Click here to specify the directory with links to your favorite applications.",
                     IDC_OPENWITHDESCR,26,83,132,18
-    DEFPUSHBUTTON   "OK",IDOK,52,108,50,14
-    PUSHBUTTON      "Cancel",IDCANCEL,108,108,50,14
+    DEFPUSHBUTTON   "OK",IDOK,52,107,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,108,107,50,14
     SCROLLBAR       IDC_RESIZEGRIP3,7,112,10,10
 END
 
@@ -280,11 +280,11 @@ CAPTION "Goto"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
     ICON            IDI_GOTO,IDC_STATIC,7,7,20,20
-    LTEXT           "Enter the name of a file or directory to open,\nor select a recently visited directory from the list.",
-                    IDC_STATIC,35,7,182,17
-    COMBOBOX        IDC_GOTO,35,35,182,126,CBS_DROPDOWN | CBS_AUTOHSCROLL |
+    LTEXT           "Enter the name of a file or directory to open, or select a recently visited directory from the list.",
+                    IDC_GOTODESC,35,7,182,17
+    COMBOBOX        IDC_GOTO,7,35,210,126,CBS_DROPDOWN | CBS_AUTOHSCROLL |
                     WS_VSCROLL | WS_TABSTOP
-    DEFPUSHBUTTON   "OK",IDOK,112,66,50,14,WS_DISABLED
+    DEFPUSHBUTTON   "OK",IDOK,111,66,50,14,WS_DISABLED
     PUSHBUTTON      "Cancel",IDCANCEL,167,66,50,14
     SCROLLBAR       IDC_RESIZEGRIP,7,70,10,10
 END
@@ -297,11 +297,11 @@ FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
     LTEXT           "Specify a new file &filter. Separate multiple filters by ;",
                     IDC_STATIC,7,7,170,8
-    EDITTEXT        IDC_FILTER,7,22,153,13,ES_AUTOHSCROLL
-    PUSHBUTTON      "",IDC_BROWSEFILTER,164,22,13,13
+    EDITTEXT        IDC_FILTER,7,22,151,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "",IDC_BROWSEFILTER,163,22,14,14
     CONTROL         "&Exclude files matching the filter.",IDC_NEGFILTER,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,40,170,10
-    DEFPUSHBUTTON   "OK",IDOK,72,58,50,14
+    DEFPUSHBUTTON   "OK",IDOK,71,58,50,14
     PUSHBUTTON      "Cancel",IDCANCEL,127,58,50,14
 END
 
@@ -312,10 +312,10 @@ CAPTION "Rename"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
     LTEXT           "Current:",IDC_STATIC,7,9,28,8
-    EDITTEXT        IDC_OLDNAME,39,7,126,13,ES_AUTOHSCROLL | ES_READONLY |
+    EDITTEXT        IDC_OLDNAME,39,7,126,14,ES_AUTOHSCROLL | ES_READONLY |
                     NOT WS_TABSTOP
-    LTEXT           "&New:",IDC_STATIC,7,26,18,8
-    EDITTEXT        IDC_NEWNAME,39,25,126,13,ES_AUTOHSCROLL
+    LTEXT           "&New:",IDC_STATIC,7,27,18,8
+    EDITTEXT        IDC_NEWNAME,39,26,126,14,ES_AUTOHSCROLL
     DEFPUSHBUTTON   "OK",IDOK,59,53,50,14,WS_DISABLED
     PUSHBUTTON      "Cancel",IDCANCEL,115,53,50,14
 END
@@ -327,7 +327,7 @@ CAPTION "New Directory"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
     LTEXT           "Enter the name for the new directory:",IDC_STATIC,7,7,158,8
-    EDITTEXT        IDC_NEWDIR,7,22,158,13,ES_AUTOHSCROLL
+    EDITTEXT        IDC_NEWDIR,7,22,158,14,ES_AUTOHSCROLL
     DEFPUSHBUTTON   "OK",IDOK,59,45,50,14,WS_DISABLED
     PUSHBUTTON      "Cancel",IDCANCEL,115,45,50,14
 END
@@ -339,7 +339,7 @@ CAPTION "Copy/Move"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
     LTEXT           "Source:",IDC_STATIC,7,7,26,8
-    EDITTEXT        IDC_SOURCE,7,18,216,13,ES_AUTOHSCROLL | ES_READONLY |
+    EDITTEXT        IDC_SOURCE,7,18,216,14,ES_AUTOHSCROLL | ES_READONLY |
                     NOT WS_TABSTOP
     LTEXT           "&Destination:",IDC_STATIC,7,37,40,8
     COMBOBOX        IDC_DESTINATION,7,48,199,105,CBS_DROPDOWN |
@@ -453,11 +453,11 @@ BEGIN
     ICON            IDI_PROGS,IDC_STATIC,10,10,20,20
     LTEXT           "Specify external programs and paths.",IDC_STATIC,40,15,180,8
     LTEXT           "&Default ""Quick View"" program (Ctrl+Q):",IDC_STATIC,10,41,180,8
-    EDITTEXT        IDC_QUICKVIEW,10,52,191,13,ES_AUTOHSCROLL
-    PUSHBUTTON      "",IDC_BROWSE_Q,203,52,13,13,BS_BITMAP
+    EDITTEXT        IDC_QUICKVIEW,10,52,191,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "",IDC_BROWSE_Q,204,52,14,14,BS_BITMAP
     LTEXT           "&Favorites Folder (F11):",IDC_STATIC,10,76,120,8
-    EDITTEXT        IDC_FAVORITES,10,87,191,13,ES_AUTOHSCROLL
-    PUSHBUTTON      "",IDC_BROWSE_F,203,87,13,13,BS_BITMAP
+    EDITTEXT        IDC_FAVORITES,10,87,191,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "",IDC_BROWSE_F,204,87,14,14,BS_BITMAP
 END
 
 IDD_FINDTARGET DIALOGEX 0, 0, 272, 180
@@ -472,8 +472,8 @@ BEGIN
                     "Button",BS_AUTORADIOBUTTON | WS_TABSTOP,7,21,160,10
     LTEXT           "Specify the action if the target applicatoin is already running:",
                     IDC_STATIC,7,64,260,8
-    EDITTEXT        IDC_TARGETPATH,20,35,225,14,ES_AUTOHSCROLL
-    PUSHBUTTON      "",IDC_BROWSE,250,35,15,14,BS_BITMAP
+    EDITTEXT        IDC_TARGETPATH,20,35,226,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "",IDC_BROWSE,251,35,14,14,BS_BITMAP
     LTEXT           "Message:",IDC_STATIC,20,120,32,8
     CONTROL         "None, run target application each time a file is opened.",
                     IDC_ALWAYSRUN,"Button",BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,7,78,240,10
@@ -500,11 +500,11 @@ BEGIN
     ICON            IDI_CROSS1,IDC_CROSSCURSOR,7,7,21,20,SS_CENTERIMAGE
     LTEXT           "Drag the crosshair over the window you would like to select as the new target, or press Esc to cancel.",
                     IDC_STATIC,35,7,168,22
-    EDITTEXT        IDC_WINTITLE,35,35,168,14,ES_AUTOHSCROLL | ES_READONLY |
+    EDITTEXT        IDC_WINTITLE,7,35,196,14,ES_AUTOHSCROLL | ES_READONLY |
                     NOT WS_TABSTOP
     LTEXT           "Window Class",IDC_WINCLASS,7,60,45,8,NOT WS_VISIBLE
     LTEXT           "Window Module",IDC_WINMODULE,7,70,51,8,NOT WS_VISIBLE
-    DEFPUSHBUTTON   "OK",IDOK,99,64,50,14,WS_DISABLED
+    DEFPUSHBUTTON   "OK",IDOK,97,64,50,14,WS_DISABLED
     PUSHBUTTON      "Cancel",IDCANCEL,153,64,50,14
 END
 

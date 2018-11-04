@@ -2761,7 +2761,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		sei.cbSize = sizeof(SHELLEXECUTEINFO);
 		sei.fMask = 0;
 		sei.hwnd = hwnd;
-		sei.lpVerb = NULL;
+		sei.lpVerb = L"open";
 		sei.lpFile = tchFavoritesDir;
 		sei.lpParameters = NULL;
 		sei.lpDirectory = NULL;
@@ -5444,36 +5444,16 @@ void LoadSettings(void) {
 	bFullScreenHideToolbar = IniSectionGetBool(pIniSection, L"FullScreenHideToolbar", 0);
 	bFullScreenHideStatusbar = IniSectionGetBool(pIniSection, L"FullScreenHideStatusbar", 0);
 
-	cxEncodingDlg = IniSectionGetInt(pIniSection, L"EncodingDlgSizeX", 256);
-	cxEncodingDlg = max_i(cxEncodingDlg, 0);
-
-	cyEncodingDlg = IniSectionGetInt(pIniSection, L"EncodingDlgSizeY", 262);
-	cyEncodingDlg = max_i(cyEncodingDlg, 0);
-
-	cxRecodeDlg = IniSectionGetInt(pIniSection, L"RecodeDlgSizeX", 256);
-	cxRecodeDlg = max_i(cxRecodeDlg, 0);
-
-	cyRecodeDlg = IniSectionGetInt(pIniSection, L"RecodeDlgSizeY", 262);
-	cyRecodeDlg = max_i(cyRecodeDlg, 0);
-
-	cxFileMRUDlg = IniSectionGetInt(pIniSection, L"FileMRUDlgSizeX", 412);
-	cxFileMRUDlg = max_i(cxFileMRUDlg, 0);
-
-	cyFileMRUDlg = IniSectionGetInt(pIniSection, L"FileMRUDlgSizeY", 376);
-	cyFileMRUDlg = max_i(cyFileMRUDlg, 0);
-
-	cxOpenWithDlg = IniSectionGetInt(pIniSection, L"OpenWithDlgSizeX", 384);
-	cxOpenWithDlg = max_i(cxOpenWithDlg, 0);
-
-	cyOpenWithDlg = IniSectionGetInt(pIniSection, L"OpenWithDlgSizeY", 386);
-	cyOpenWithDlg = max_i(cyOpenWithDlg, 0);
-
-	cxFavoritesDlg = IniSectionGetInt(pIniSection, L"FavoritesDlgSizeX", 334);
-	cxFavoritesDlg = max_i(cxFavoritesDlg, 0);
-
-	cyFavoritesDlg = IniSectionGetInt(pIniSection, L"FavoritesDlgSizeY", 316);
-	cyFavoritesDlg = max_i(cyFavoritesDlg, 0);
-
+	cxEncodingDlg = IniSectionGetInt(pIniSection, L"EncodingDlgSizeX", 0);
+	cyEncodingDlg = IniSectionGetInt(pIniSection, L"EncodingDlgSizeY", 0);
+	cxRecodeDlg = IniSectionGetInt(pIniSection, L"RecodeDlgSizeX", 0);
+	cyRecodeDlg = IniSectionGetInt(pIniSection, L"RecodeDlgSizeY", 0);
+	cxFileMRUDlg = IniSectionGetInt(pIniSection, L"FileMRUDlgSizeX", 0);
+	cyFileMRUDlg = IniSectionGetInt(pIniSection, L"FileMRUDlgSizeY", 0);
+	cxOpenWithDlg = IniSectionGetInt(pIniSection, L"OpenWithDlgSizeX", 0);
+	cyOpenWithDlg = IniSectionGetInt(pIniSection, L"OpenWithDlgSizeY", 0);
+	cxFavoritesDlg = IniSectionGetInt(pIniSection, L"FavoritesDlgSizeX", 0);
+	cyFavoritesDlg = IniSectionGetInt(pIniSection, L"FavoritesDlgSizeY", 0);
 	xFindReplaceDlg = IniSectionGetInt(pIniSection, L"FindReplaceDlgPosX", 0);
 	yFindReplaceDlg = IniSectionGetInt(pIniSection, L"FindReplaceDlgPosY", 0);
 
