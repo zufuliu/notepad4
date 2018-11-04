@@ -110,6 +110,7 @@ int		cxNewDirectoryDlg;
 int		cxOpenWithDlg;
 int		cyOpenWithDlg;
 int		cxCopyMoveDlg;
+int		cxTargetApplicationDlg;
 int		cxFindWindowDlg;
 
 WCHAR		tchFilter[DL_FILTER_BUFSIZE];
@@ -2478,6 +2479,7 @@ void LoadSettings(void) {
 	cxOpenWithDlg = IniSectionGetInt(pIniSection, L"OpenWithDlgSizeX", 0);
 	cyOpenWithDlg = IniSectionGetInt(pIniSection, L"OpenWithDlgSizeY", 0);
 	cxCopyMoveDlg = IniSectionGetInt(pIniSection, L"CopyMoveDlgSizeX", 0);
+	cxTargetApplicationDlg = IniSectionGetInt(pIniSection, L"TargetApplicationDlgSizeX", 0);
 	cxFindWindowDlg = IniSectionGetInt(pIniSection, L"FindWindowDlgSizeX", 0);
 
 	if (!flagPosParam) {
@@ -2610,6 +2612,7 @@ void SaveSettings(BOOL bSaveSettingsNow) {
 	IniSectionSetInt(pIniSection, L"OpenWithDlgSizeX", cxOpenWithDlg);
 	IniSectionSetInt(pIniSection, L"OpenWithDlgSizeY", cyOpenWithDlg);
 	IniSectionSetInt(pIniSection, L"CopyMoveDlgSizeX", cxCopyMoveDlg);
+	IniSectionSetInt(pIniSection, L"TargetApplicationDlgSizeX", cxTargetApplicationDlg);
 	IniSectionSetInt(pIniSection, L"FindWindowDlgSizeX", cxFindWindowDlg);
 
 	SaveIniSection(INI_SECTION_NAME_SETTINGS, pIniSectionBuf);
