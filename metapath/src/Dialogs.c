@@ -1004,6 +1004,7 @@ extern int nIdFocus;
 
 extern WCHAR tchFilter[128];
 extern BOOL bNegFilter;
+extern int cxFileFilterDlg;
 
 INT_PTR OptionsPropSheet(HWND hwnd, HINSTANCE hInstance) {
 	PROPSHEETHEADER psh;
@@ -1109,6 +1110,7 @@ INT_PTR CALLBACK GetFilterDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lP
 
 	switch (umsg) {
 	case WM_INITDIALOG: {
+		ResizeDlg_InitX(hwnd, cxFileFilterDlg, IDC_RESIZEGRIP3);
 		MakeBitmapButton(hwnd, IDC_BROWSEFILTER, NULL, OBM_COMBO);
 
 		SendDlgItemMessage(hwnd, IDC_FILTER, EM_LIMITTEXT, COUNTOF(tchFilter) - 1, 0);
@@ -1121,8 +1123,27 @@ INT_PTR CALLBACK GetFilterDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lP
 	return TRUE;
 
 	case WM_DESTROY:
+		ResizeDlg_Destroy(hwnd, &cxFileFilterDlg, NULL);
 		DeleteBitmapButton(hwnd, IDC_BROWSEFILTER);
 		return FALSE;
+
+	case WM_SIZE: {
+		int dx;
+
+		ResizeDlg_Size(hwnd, lParam, &dx, NULL);
+		HDWP hdwp = BeginDeferWindowPos(5);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDC_RESIZEGRIP3, dx, 0, SWP_NOSIZE);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDOK, dx, 0, SWP_NOSIZE);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDCANCEL, dx, 0, SWP_NOSIZE);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDC_BROWSEFILTER, dx, 0, SWP_NOSIZE);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDC_FILTER, dx, 0, SWP_NOMOVE);
+		EndDeferWindowPos(hdwp);
+	}
+	return TRUE;
+
+	case WM_GETMINMAXINFO:
+		ResizeDlg_GetMinMaxInfo(hwnd, lParam);
+		return TRUE;
 
 	case WM_COMMAND:
 		switch (LOWORD(wParam)) {

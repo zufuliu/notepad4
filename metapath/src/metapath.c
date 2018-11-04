@@ -104,6 +104,7 @@ static BOOL bShowStatusbar;
 static BOOL bShowDriveBox;
 int		cxRunDlg;
 int		cxGotoDlg;
+int		cxFileFilterDlg;
 int		cxOpenWithDlg;
 int		cyOpenWithDlg;
 int		cxCopyMoveDlg;
@@ -2468,6 +2469,7 @@ void LoadSettings(void) {
 
 	cxRunDlg = IniSectionGetInt(pIniSection, L"RunDlgSizeX", 0);
 	cxGotoDlg = IniSectionGetInt(pIniSection, L"GotoDlgSizeX", 0);
+	cxFileFilterDlg = IniSectionGetInt(pIniSection, L"FileFilterDlgX", 0);
 	cxOpenWithDlg = IniSectionGetInt(pIniSection, L"OpenWithDlgSizeX", 0);
 	cyOpenWithDlg = IniSectionGetInt(pIniSection, L"OpenWithDlgSizeY", 0);
 	cxCopyMoveDlg = IniSectionGetInt(pIniSection, L"CopyMoveDlgSizeX", 0);
@@ -2596,6 +2598,7 @@ void SaveSettings(BOOL bSaveSettingsNow) {
 	IniSectionSetBoolEx(pIniSection, L"ShowDriveBox", bShowDriveBox, 1);
 	IniSectionSetInt(pIniSection, L"RunDlgSizeX", cxRunDlg);
 	IniSectionSetInt(pIniSection, L"GotoDlgSizeX", cxGotoDlg);
+	IniSectionSetInt(pIniSection, L"FileFilterDlgX", cxFileFilterDlg);
 	IniSectionSetInt(pIniSection, L"OpenWithDlgSizeX", cxOpenWithDlg);
 	IniSectionSetInt(pIniSection, L"OpenWithDlgSizeY", cyOpenWithDlg);
 	IniSectionSetInt(pIniSection, L"CopyMoveDlgSizeX", cxCopyMoveDlg);
