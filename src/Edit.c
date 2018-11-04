@@ -5329,6 +5329,7 @@ typedef struct _modlinesdata {
 } MODLINESDATA, *PMODLINESDATA;
 
 extern int cxModifyLinesDlg;
+extern int cxEncloseSelectionDlg;
 
 static INT_PTR CALLBACK EditModifyLinesDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
 	static int id_hover;
@@ -5592,8 +5593,6 @@ BOOL EditAlignDlg(HWND hwnd, int *piAlignMode) {
 //
 // EditEncloseSelectionDlgProc()
 //
-// Controls: 100 Input
-// 101 Input
 //
 
 typedef struct _encloseselectiondata {
@@ -5605,23 +5604,46 @@ static INT_PTR CALLBACK EditEncloseSelectionDlgProc(HWND hwnd, UINT umsg, WPARAM
 	switch (umsg) {
 	case WM_INITDIALOG: {
 		SetWindowLongPtr(hwnd, DWLP_USER, lParam);
-		PENCLOSESELDATA pdata = (PENCLOSESELDATA)lParam;
+		ResizeDlg_InitX(hwnd, cxEncloseSelectionDlg, IDC_RESIZEGRIP2);
 
-		SendDlgItemMessage(hwnd, 100, EM_LIMITTEXT, 255, 0);
-		SetDlgItemText(hwnd, 100, pdata->pwsz1);
-		SendDlgItemMessage(hwnd, 101, EM_LIMITTEXT, 255, 0);
-		SetDlgItemText(hwnd, 101, pdata->pwsz2);
+		PENCLOSESELDATA pdata = (PENCLOSESELDATA)lParam;
+		SendDlgItemMessage(hwnd, IDC_MODIFY_LINE_PREFIX, EM_LIMITTEXT, 255, 0);
+		SetDlgItemText(hwnd, IDC_MODIFY_LINE_PREFIX, pdata->pwsz1);
+		SendDlgItemMessage(hwnd, IDC_MODIFY_LINE_APPEND, EM_LIMITTEXT, 255, 0);
+		SetDlgItemText(hwnd, IDC_MODIFY_LINE_APPEND, pdata->pwsz2);
 		CenterDlgInParent(hwnd);
 	}
 	return TRUE;
+
+	case WM_DESTROY:
+		ResizeDlg_Destroy(hwnd, &cxEncloseSelectionDlg, NULL);
+		return FALSE;
+
+	case WM_SIZE: {
+		int dx;
+
+		ResizeDlg_Size(hwnd, lParam, &dx, NULL);
+		HDWP hdwp = BeginDeferWindowPos(5);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDC_RESIZEGRIP2, dx, 0, SWP_NOSIZE);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDOK, dx, 0, SWP_NOSIZE);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDCANCEL, dx, 0, SWP_NOSIZE);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDC_MODIFY_LINE_PREFIX, dx, 0, SWP_NOMOVE);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDC_MODIFY_LINE_APPEND, dx, 0, SWP_NOMOVE);
+		EndDeferWindowPos(hdwp);
+	}
+	return TRUE;
+
+	case WM_GETMINMAXINFO:
+		ResizeDlg_GetMinMaxInfo(hwnd, lParam);
+		return TRUE;
 
 	case WM_COMMAND:
 		switch (LOWORD(wParam)) {
 		case IDOK: {
 			PENCLOSESELDATA pdata = (PENCLOSESELDATA)GetWindowLongPtr(hwnd, DWLP_USER);
 			if (pdata) {
-				GetDlgItemText(hwnd, 100, pdata->pwsz1, 256);
-				GetDlgItemText(hwnd, 101, pdata->pwsz2, 256);
+				GetDlgItemText(hwnd, IDC_MODIFY_LINE_PREFIX, pdata->pwsz1, 256);
+				GetDlgItemText(hwnd, IDC_MODIFY_LINE_APPEND, pdata->pwsz2, 256);
 			}
 			EndDialog(hwnd, IDOK);
 		}
