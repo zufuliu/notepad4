@@ -124,12 +124,12 @@ BEGIN
         MENUITEM "&Goto...",                    IDM_FILE_GOTO
         MENUITEM SEPARATOR
         MENUITEM "Show Dri&ves",                IDM_VIEW_DRIVEBOX
-        MENUITEM "&Keep on Top",                IDM_VIEW_ALWAYSONTOP          
+        MENUITEM "&Keep on Top",                IDM_VIEW_ALWAYSONTOP
         MENUITEM SEPARATOR
         MENUITEM "S&ave Settings",              IDM_VIEW_SAVESETTINGS
         MENUITEM "Setup &Target...",            IDM_VIEW_FINDTARGET
         MENUITEM "O&ptions...",                 IDM_VIEW_OPTIONS
-        MENUITEM "&About metapath",             IDM_VIEW_ABOUT                
+        MENUITEM "&About metapath",             IDM_VIEW_ABOUT
     END
     POPUP "+"
     BEGIN
@@ -315,10 +315,10 @@ STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION |
 CAPTION "Rename"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
-    LTEXT           "Current:",IDC_STATIC,7,9,28,8
+    LTEXT           "Current:",IDC_STATIC,7,9,28,8,SS_RIGHT
     EDITTEXT        IDC_OLDNAME,39,7,126,14,ES_AUTOHSCROLL | ES_READONLY |
                     NOT WS_TABSTOP
-    LTEXT           "&New:",IDC_STATIC,7,27,18,8
+    LTEXT           "&New:",IDC_STATIC,7,27,28,8,SS_RIGHT
     EDITTEXT        IDC_NEWNAME,39,26,126,14,ES_AUTOHSCROLL
     DEFPUSHBUTTON   "OK",IDOK,59,53,50,14,WS_DISABLED
     PUSHBUTTON      "Cancel",IDCANCEL,115,53,50,14
@@ -480,16 +480,16 @@ BEGIN
                     IDC_STATIC,7,64,260,8
     EDITTEXT        IDC_TARGETPATH,20,35,226,14,ES_AUTOHSCROLL
     PUSHBUTTON      "",IDC_BROWSE,251,35,14,14,BS_BITMAP
-    LTEXT           "Message:",IDC_STATIC,29,124,35,8
     CONTROL         "None, run target application each time a file is opened.",
                     IDC_ALWAYSRUN,"Button",BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,7,78,240,10
     CONTROL         "Send a file open message to target application window:",
                     IDC_SENDDROPMSG,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,7,92,194,10
     CONTROL         "Execute the following DDE command:",IDC_USEDDE,"Button",
                     BS_AUTORADIOBUTTON | WS_TABSTOP,7,106,160,10
-    LTEXT           "Application:",IDC_STATIC,23,145,42,8
     PUSHBUTTON      "Find Window...",IDC_FINDWIN,204,91,60,14
-    LTEXT           "Topic:",IDC_STATIC,40,165,24,8
+    LTEXT           "Message:",IDC_STATIC,19,124,42,8,SS_RIGHT
+    LTEXT           "Application:",IDC_STATIC,19,145,42,8,SS_RIGHT
+    LTEXT           "Topic:",IDC_STATIC,19,165,42,8,SS_RIGHT
     EDITTEXT        IDC_DDEMSG,65,122,200,14,ES_AUTOHSCROLL
     EDITTEXT        IDC_DDEAPP,65,142,200,14,ES_AUTOHSCROLL
     EDITTEXT        IDC_DDETOPIC,65,162,200,14,ES_AUTOHSCROLL

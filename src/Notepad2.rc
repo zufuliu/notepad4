@@ -1038,10 +1038,13 @@ CAPTION "Inconsistent Line Endings"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     LTEXT           "The line endings in this file is not consistent:",IDC_STATIC,7,7,180,8
-    LTEXT           "CR+LF: %s line(s).",IDC_EOL_SUM_CRLF,22,18,164,8
-    LTEXT           "LF: %s line(s).",IDC_EOL_SUM_LF,36,28,154,8
-    LTEXT           "CR: %s line(s).",IDC_EOL_SUM_CR,34,38,152,8
-    LTEXT           "&Do you want to normalize the line ending?",IDC_STATIC,7,52,180,8
+    LTEXT           "CR+LF:",IDC_STATIC,10,18,34,8,SS_RIGHT
+    LTEXT           "LF:",IDC_STATIC,10,28,34,8,SS_RIGHT
+    LTEXT           "CR:",IDC_STATIC,10,38,34,8,SS_RIGHT
+    LTEXT           "%s line(s).",IDC_EOL_SUM_CRLF,48,18,136,8
+    LTEXT           "%s line(s).",IDC_EOL_SUM_LF,48,28,136,8
+    LTEXT           "%s line(s).",IDC_EOL_SUM_CR,48,38,136,8
+    LTEXT           "&Do you want to normalize the line endings?",IDC_STATIC,7,52,180,8
     COMBOBOX        IDC_EOLMODELIST,7,64,118,81,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     PUSHBUTTON      "&Yes",IDOK,138,63,50,14
     PUSHBUTTON      "&No",IDCANCEL,138,80,50,14
@@ -1741,7 +1744,7 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_CMDLINEHELP         "Command Line Help\n\nfile\tMust be the last argument, no quoted spaces by default.\n+\tAccept multiple file arguments (with quoted spaces).\n-\tAccept single file argument (without quoted spaces).\n\x85\tEncoding (/ansi, /unicode, /unicodele, /unicodebe,\n\x85\t/utf8, /utf8sig, /utf8bom, /utf16, /utf16le, /utf16be).\n\x85\tLine ending mode (/crlf, /lf, /cr).\n/e\tFile source encoding.\n/g\tJump to specified position (/g -1 end of file).\n/m\tMatch specified text (/m- last, /mr regex, /mb backslash).\n/l\tAuto-reload modified files.\n/q\tForce creation of new files without prompt.\n/s\tSelect specified syntax scheme.\n/d\tSelect default text scheme.\n/h\tSelect Web Source Code scheme.\n/x\tSelect XML Document scheme.\n/c\tOpen new window and paste clipboard contents.\n/b\tOpen new paste board to collect clipboard entries.\n/n\tAlways open a new window (/ns single file instance).\n/r\tReuse window (/rs single file instance).\n/p\tSet window position and size (/p0, /ps, /pf,l,t,r,b,m).\n/t\tSet window title.\n/i\tStart as tray icon.\n/o\tKeep window on top.\n/f\tSpecify ini-file (/f0 no ini-file).\n/u\tLaunch with elevated privileges.\n/z\tSkip next (usable for registry-based Notepad replacement)."
+    IDS_CMDLINEHELP         "Command Line Help\n\nfile\tMust be the last argument, no quoted spaces by default.\n+\tAccept multiple file arguments (with quoted spaces).\n-\tAccept single file argument (without quoted spaces).\n\x85\tEncoding (/ansi, /unicode, /unicodele, /unicodebe,\n\x85\t/utf8, /utf8sig, /utf8bom, /utf16, /utf16le, /utf16be).\n\x85\tLine ending mode (/crlf, /lf, /cr).\n/e\tFile source encoding.\n/g\tJump to specified position (/g -1 end of file).\n/m\tMatch specified text (/m- last, /mr regex, /mb backslash).\n/l\tAuto-reload modified files.\n/q\tForce creation of new files without prompt.\n/s\tSelect specified syntax scheme.\n/d\tSelect default text scheme.\n/h\tSelect Web Source Code scheme.\n/x\tSelect XML Document scheme.\n/c\tOpen new window and paste clipboard contents.\n/b\tOpen new paste board to collect clipboard entries.\n/n\tAlways open a new window (/ns single file instance).\n/r\tReuse window (/rs single file instance).\n/p\tSet window position and size (/p0, /ps, /pf,l,t,r,b,m).\n/t\tSet window title.\n/i\tStart as tray icon.\n/o\tKeep window on top.\n/f\tSpecify ini-file (/f0 no ini-file).\n/u\tLaunch with elevated privileges (as Administrator).\n/z\tSkip next (usable for registry-based Notepad replacement)."
 END
 
 STRINGTABLE
