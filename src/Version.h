@@ -44,7 +44,7 @@
 #define VERSION_EMAIL_DISPLAY		L"florian.balmer@gmail.com"
 #define VERSION_MODPAGE_DISPLAY		L"https://xhmikosr.github.io/notepad2-mod/"
 #define VERSION_NEWPAGE_DISPLAY		L"https://github.com/zufuliu/notepad2"
-#define VERSION_SCIPAGE_DISPLAY		L"http://www.scintilla.org/"
+#define VERSION_SCIPAGE_DISPLAY		L"https://www.scintilla.org/"
 
 #define HELP_LINK_LATEST_RELEASE	L"https://github.com/zufuliu/notepad2/releases"
 #define HELP_LINK_REPORT_ISSUE		L"https://github.com/zufuliu/notepad2/issues"

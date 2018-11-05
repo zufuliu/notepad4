@@ -40,7 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 License for Scintilla and SciTE
 
-http://www.scintilla.org/
+https://www.scintilla.org/
 
 Copyright 1998-2018 by Neil Hodgson <neilh@scintilla.org>
 
