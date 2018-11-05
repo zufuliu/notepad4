@@ -17,6 +17,10 @@
 #define IDB_ENCODING					105
 // Cursor
 #define IDC_COPY						100
+// Common
+#define IDC_RESIZEGRIP					101
+#define IDC_RESIZEGRIP2					102
+#define IDC_RESIZEGRIP3					103
 
 // About
 #define IDD_ABOUT						100
@@ -33,50 +37,88 @@
 #define IDC_NEW_PAGE_LINK				110
 #define IDC_SCI_PAGE_TEXT				111
 #define IDC_SCI_PAGE_LINK				112
-
+#define IDC_BUILD_INFO					113
+// Find/Replace Text
+#define IDD_FIND						118
+#define IDD_REPLACE						119
 #define IDC_FINDTEXT					100
-#define IDC_LINENUM						100
-#define IDC_COMMANDLINE					100
-#define IDC_OPENWITHDIR					100
-#define IDC_FILEMRU						100
-#define IDC_FAVORITESDIR				100
-#define IDC_FAVORITESFILE				100
-#define IDC_COLUMNWRAP					100
-#define IDC_INFOBOXICON					100
-#define IDC_ENCODINGLIST				100
-#define IDC_EOLMODELIST					100
-#define IDC_MODIFY_LINE_PREFIX			100
-#define IDC_MODIFY_LINE_APPEND			101
-#define IDC_SEARCHEXE					101
-#define IDC_GETOPENWITHDIR				101
-#define IDC_RESIZEGRIP					101
-#define IDD_OPENWITH					101
-#define IDC_REPLACETEXT					101
-#define IDC_COLNUM						101
-#define IDC_GETFAVORITESDIR				101
-#define IDC_INFOBOXTEXT					101
-#define IDC_RESIZEGRIP2					102
-#define IDC_NOUNICODEDETECTION			101
-#define IDC_WARNINCONSISTENTEOLS		101
-#define IDC_OPENWITHDESCR				102
-#define IDC_SAVEMRU						102
-#define IDD_RUN							102
-#define IDC_RUNDESC						102
-#define IDC_FAVORITESDESCR				102
-#define IDC_INFOBOXCHECK				102
-#define IDC_CONSISTENTEOLS				102
-#define IDC_ASCIIASUTF8					102
-#define IDC_LINE_RANGE					102
-#define IDC_EOL_SUM_CRLF				102
-#define IDD_DEFENCODING					103
+#define IDC_REPLACETEXT					101		// Replace
 #define IDC_FINDCASE					103
-#define IDC_RESIZEGRIP3					103
+#define IDC_FINDWORD					104
+#define IDC_FINDSTART					105
+#define IDC_FINDREGEXP					106
+#define IDC_FINDTRANSFORMBS				107
+#define IDC_NOWRAP						108
+#define IDC_FINDCLOSE					109
+#define IDC_FINDPREV					110
+#define IDC_REPLACE						112		// Replace
+#define IDC_REPLACEALL					113		// Replace
+#define IDC_REPLACEINSEL				114		// Replace
+#define IDC_TOGGLEFINDREPLACE			115
+#define IDC_BACKSLASHHELP				151
+#define IDC_REGEXPHELP					152
+#define IDC_WILDCARDHELP				153
+#define IDC_WILDCARDSEARCH				154
+#define IDC_CLEAR_FIND					155
+#define IDC_CLEAR_REPLACE				156		// Replace
+#define IDC_TRANSPARENT					157
+#define IDC_SAVEPOSITION				158
+#define IDC_RESETPOSITION				159
+// IDR_ACCFINDREPLACE
+#define IDACC_FIND						200
+#define IDACC_REPLACE					201
+#define IDACC_SAVEPOS					202
+#define IDACC_RESETPOS					203
+#define IDACC_FINDNEXT					204
+#define IDACC_FINDPREV					205
+#define IDACC_REPLACENEXT				206
+#define IDACC_SAVEFIND					207
+#define IDACC_SELTONEXT					208
+#define IDACC_SELTOPREV					209
+// Run
+#define IDD_RUN							102
+#define IDC_COMMANDLINE					100
+#define IDC_SEARCHEXE					101
+#define IDC_RUNDESC						102
+// Open with
+#define IDD_OPENWITH					101
+#define IDC_OPENWITHDIR					100
+#define IDC_GETOPENWITHDIR				101
+#define IDC_OPENWITHDESCR				102
+// Encoding
+#define IDD_DEFENCODING					103
+#define IDC_ENCODINGLIST				100
+#define IDC_NOUNICODEDETECTION			101
+#define IDC_ASCIIASUTF8					102
+#define IDC_NFOASOEM					103
+#define IDC_ENCODINGFROMFILEVARS		104
+// Encoding
+#define IDD_ENCODING					104
+// Recode
+#define IDD_RECODE						105
+// Line Endings
+#define IDD_DEFEOLMODE					106
+#define IDC_EOLMODELIST					100
+#define IDC_WARNINCONSISTENTEOLS		101
+#define IDC_CONSISTENTEOLS				102
 #define IDC_AUTOSTRIPBLANKS				103
-#define IDC_ENCODINGFROMFILEVARS		103
-#define IDC_EMPTY_MRU					103
+// Inconsistent Line Endings
+#define IDD_WARNLINEENDS				129
+#define IDC_EOL_SUM_CRLF				102
 #define IDC_EOL_SUM_LF					103
 #define IDC_EOL_SUM_CR					104
-#define IDC_FINDWORD					104
+// Goto
+#define IDD_LINENUM						117
+#define IDC_LINENUM						100
+#define IDC_COLNUM						101
+#define IDC_LINE_RANGE					102
+// Open Recent File
+#define IDD_FILEMRU						109
+#define IDC_FILEMRU						100
+#define IDC_SAVEMRU						102
+#define IDC_EMPTY_MRU					103
+// File Change Notification
+#define IDD_CHANGENOTIFY				110
 // Select Scheme
 #define IDD_STYLESELECT					120
 #define IDC_STYLELIST					100
@@ -98,68 +140,50 @@
 #define IDC_TITLE						113
 #define IDC_STYLELABELS					114
 #define IDC_RESETALL					115
-
-#define IDD_ENCODING					104
-#define IDC_FINDSTART					105
-#define IDD_RECODE						105
-#define IDC_FINDREGEXP					106
-#define IDD_DEFEOLMODE					106
-#define IDC_FINDTRANSFORMBS				107
-#define IDD_FAVORITES					107
-#define IDC_NOWRAP						108
-#define IDD_ADDTOFAV					108
-#define IDC_FINDCLOSE					109
-#define IDD_FILEMRU						109
-#define IDC_FINDPREV					110
-#define IDD_CHANGENOTIFY				110
-#define IDD_MODIFYLINES					111
-#define IDC_REPLACE						112
-#define IDD_ALIGN						112
-#define IDC_BUILD_INFO					113
-#define IDD_ENCLOSESELECTION			113
-#define IDC_REPLACEALL					113
-#define IDD_INSERTTAG					114
-#define IDC_REPLACEINSEL				114
-#define IDD_SORT						115
-#define IDC_TOGGLEFINDREPLACE			115
-#define IDD_COLUMNWRAP					116
-#define IDD_LINENUM						117
-#define IDD_FIND						118
-#define IDD_REPLACE						119
-#define IDD_WORDWRAP					122
-#define IDD_LONGLINES					123
+// Tab Settings
 #define IDD_TABSETTINGS					124
+// Long Lines
+#define IDD_LONGLINES					123
+// Word Wrap Settings
+#define IDD_WORDWRAP					122
+// Page Setup
 #define IDD_PAGESETUP					125
-#define IDD_INFOBOX						126
-#define IDD_INFOBOX2					127
-#define IDD_INFOBOX3					128
-#define IDD_WARNLINEENDS				129
-#define IDC_BACKSLASHHELP				151
-#define IDC_REGEXPHELP					152
-#define IDC_WILDCARDHELP				153
-#define IDC_WILDCARDSEARCH				154
-#define IDC_CLEAR_FIND					155
-#define IDC_CLEAR_REPLACE				156
-#define IDC_TRANSPARENT					157
-#define IDC_SAVEPOSITION				158
-#define IDC_RESETPOSITION				159
+// Favorites
+#define IDD_FAVORITES					107
+#define IDC_FAVORITESDIR				100
+#define IDC_GETFAVORITESDIR				101
+#define IDC_FAVORITESDESCR				102
+// Add to Favorites
+#define IDD_ADDTOFAV					108
+#define IDC_FAVORITESFILE				100
+// Column Wrap
+#define IDD_COLUMNWRAP					116
+#define IDC_COLUMNWRAP					100
+// Modify Lines
+#define IDD_MODIFYLINES					111
+#define IDC_MODIFY_LINE_PREFIX			100
+#define IDC_MODIFY_LINE_APPEND			101
 #define IDC_MODIFY_LINE_DLN_NP			200
 #define IDC_MODIFY_LINE_DLN_ZP			201
 #define IDC_MODIFY_LINE_CN_NP			202
 #define IDC_MODIFY_LINE_CN_ZP			203
 #define IDC_MODIFY_LINE_ZCN_NP			204
 #define IDC_MODIFY_LINE_ZCN_ZP			205
-#define IDACC_FIND						200
-#define IDACC_REPLACE					201
-#define IDACC_SAVEPOS					202
-#define IDACC_RESETPOS					203
-#define IDACC_FINDNEXT					204
-#define IDACC_FINDPREV					205
-#define IDACC_REPLACENEXT				206
-#define IDACC_SAVEFIND					207
-#define IDACC_SELTONEXT					208
-#define IDACC_SELTOPREV					209
-#define IDC_NFOASOEM					300
+// Insert HTML/XML Tag
+#define IDD_INSERTTAG					114
+// Enclose Selection
+#define IDD_ENCLOSESELECTION			113
+// InfoBox
+#define IDD_INFOBOX						126 // OK
+#define IDD_INFOBOX2					127 // Yes/No
+#define IDD_INFOBOX3					128 // OK/Cancel
+#define IDC_INFOBOXICON					100
+#define IDC_INFOBOXTEXT					101
+#define IDC_INFOBOXCHECK				102
+// Sort Lines
+#define IDD_SORT						115
+// Align Lines
+#define IDD_ALIGN						112
 
 #define IDS_APPTITLE					10000
 #define IDS_APPTITLE_ELEVATED			10001
