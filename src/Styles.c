@@ -259,6 +259,7 @@ static int	iDefaultLexer;
 static BOOL bAutoSelect;
 static int	cxStyleSelectDlg;
 static int	cyStyleSelectDlg;
+static int	cyStyleCustomizeDlg;
 
 #define ALL_FILE_EXTENSIONS_BYTE_SIZE	((NUMLEXERS * MAX_EDITLEXER_EXT_SIZE) * sizeof(WCHAR))
 static LPWSTR g_AllFileExtensions = NULL;
@@ -380,6 +381,7 @@ void Style_Load(void) {
 	// scheme select dlg dimensions
 	cxStyleSelectDlg = IniSectionGetInt(pIniSection, L"SelectDlgSizeX", 0);
 	cyStyleSelectDlg = IniSectionGetInt(pIniSection, L"SelectDlgSizeY", 0);
+	cyStyleCustomizeDlg = IniSectionGetInt(pIniSection, L"CustomizeDlgSizeY", 0);
 
 	LoadIniSection(INI_SECTION_NAME_FILE_EXTENSIONS, pIniSectionBuf, cchIniSection);
 	IniSectionParse(pIniSection, pIniSectionBuf);
@@ -497,6 +499,7 @@ void Style_Save(void) {
 	// scheme select dlg dimensions
 	IniSectionSetInt(pIniSection, L"SelectDlgSizeX", cxStyleSelectDlg);
 	IniSectionSetInt(pIniSection, L"SelectDlgSizeY", cyStyleSelectDlg);
+	IniSectionSetInt(pIniSection, L"CustomizeDlgSizeY", cyStyleCustomizeDlg);
 
 	SaveIniSection(INI_SECTION_NAME_STYLES, pIniSectionBuf);
 
@@ -2888,6 +2891,8 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 
 	switch (umsg) {
 	case WM_INITDIALOG: {
+		ResizeDlg_InitY(hwnd, cyStyleCustomizeDlg, IDC_RESIZEGRIP3);
+
 		hwndTV = GetDlgItem(hwnd, IDC_STYLELIST);
 		fDragging = FALSE;
 
@@ -2943,8 +2948,29 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 		DeleteBitmapButton(hwnd, IDC_STYLEBACK);
 		DeleteBitmapButton(hwnd, IDC_PREVSTYLE);
 		DeleteBitmapButton(hwnd, IDC_NEXTSTYLE);
+		ResizeDlg_Destroy(hwnd, NULL, &cyStyleCustomizeDlg);
 	}
 	return FALSE;
+
+	case WM_SIZE: {
+		int dy;
+
+		ResizeDlg_Size(hwnd, lParam, NULL, &dy);
+		HDWP hdwp = BeginDeferWindowPos(7);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDC_RESIZEGRIP3, 0, dy, SWP_NOSIZE);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDOK, 0, dy, SWP_NOSIZE);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDCANCEL, 0, dy, SWP_NOSIZE);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDC_STYLELIST, 0, dy, SWP_NOMOVE);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDC_IMPORT, 0, dy, SWP_NOSIZE);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDC_EXPORT, 0, dy, SWP_NOSIZE);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDC_RESETALL, 0, dy, SWP_NOSIZE);
+		EndDeferWindowPos(hdwp);
+	}
+	return TRUE;
+
+	case WM_GETMINMAXINFO:
+		ResizeDlg_GetMinMaxInfo(hwnd, lParam);
+		return TRUE;
 
 	case WM_NOTIFY:
 		if (((LPNMHDR)(lParam))->idFrom == IDC_STYLELIST) {
