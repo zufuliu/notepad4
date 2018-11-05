@@ -5,7 +5,7 @@
 *
 * Print.cpp
 *   Scintilla Printing Functionality
-*   Mostly taken from SciTE, (c) Neil Hodgson, http://www.scintilla.org
+*   Mostly taken from SciTE, (c) Neil Hodgson, https://www.scintilla.org
 *
 * See Readme.txt for more information about this source code.
 * Please send me your comments to this work.

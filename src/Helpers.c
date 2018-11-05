@@ -5,7 +5,7 @@
 *
 * Helpers.c
 *   General helper functions
-*   Parts taken from SciTE, (c) Neil Hodgson, http://www.scintilla.org
+*   Parts taken from SciTE, (c) Neil Hodgson, https://www.scintilla.org
 *   MinimizeToTray (c) 2000 Matthew Ellis
 *
 * See Readme.txt for more information about this source code.
@@ -2053,7 +2053,7 @@ HWND CreateThemedDialogParam(HINSTANCE hInstance, LPCWSTR lpTemplate, HWND hWndP
 /******************************************************************************
 *
 * UnSlash functions
-* Mostly taken from SciTE, (c) Neil Hodgson, http://www.scintilla.org
+* Mostly taken from SciTE, (c) Neil Hodgson, https://www.scintilla.org
 *
 */
 
