@@ -5703,8 +5703,6 @@ BOOL EditEncloseSelectionDlg(HWND hwnd, LPWSTR pwszOpen, LPWSTR pwszClose) {
 //
 // EditInsertTagDlgProc()
 //
-// Controls: 100 Input
-// 101 Input
 //
 
 typedef struct _tagsdata {
@@ -5892,8 +5890,6 @@ void EditShowUnicodeControlCharacter(HWND hwnd, BOOL bShow) {
 //
 // EditSortDlgProc()
 //
-// Controls: 100-102 Radio Button
-// 103-108 Check Box
 //
 static INT_PTR CALLBACK EditSortDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
 	static BOOL bEnableLogicalSort;
@@ -5905,51 +5901,51 @@ static INT_PTR CALLBACK EditSortDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPA
 		const int iSortFlags = *piSortFlags;
 
 		if (iSortFlags & SORT_DESCENDING) {
-			CheckRadioButton(hwnd, 100, 102, 101);
+			CheckRadioButton(hwnd, IDC_SORT_ASC, IDC_SORT_SHUFFLE, IDC_SORT_DESC);
 		} else if (iSortFlags & SORT_SHUFFLE) {
-			CheckRadioButton(hwnd, 100, 102, 102);
-			EnableWindow(GetDlgItem(hwnd, 103), FALSE);
-			EnableWindow(GetDlgItem(hwnd, 104), FALSE);
-			EnableWindow(GetDlgItem(hwnd, 105), FALSE);
-			EnableWindow(GetDlgItem(hwnd, 106), FALSE);
-			EnableWindow(GetDlgItem(hwnd, 107), FALSE);
+			CheckRadioButton(hwnd, IDC_SORT_ASC, IDC_SORT_SHUFFLE, IDC_SORT_SHUFFLE);
+			EnableWindow(GetDlgItem(hwnd, IDC_SORT_MERGE_DUP), FALSE);
+			EnableWindow(GetDlgItem(hwnd, IDC_SORT_REMOVE_DUP), FALSE);
+			EnableWindow(GetDlgItem(hwnd, IDC_SORT_REMOVE_UNIQUE), FALSE);
+			EnableWindow(GetDlgItem(hwnd, IDC_SORT_IGNORE_CASE), FALSE);
+			EnableWindow(GetDlgItem(hwnd, IDC_SORT_LOGICAL_NUMBER), FALSE);
 		} else {
-			CheckRadioButton(hwnd, 100, 102, 100);
+			CheckRadioButton(hwnd, IDC_SORT_ASC, IDC_SORT_SHUFFLE, IDC_SORT_ASC);
 		}
 
 		if (iSortFlags & SORT_MERGEDUP) {
-			CheckDlgButton(hwnd, 103, BST_CHECKED);
+			CheckDlgButton(hwnd, IDC_SORT_MERGE_DUP, BST_CHECKED);
 		}
 
 		if (iSortFlags & SORT_UNIQDUP) {
-			CheckDlgButton(hwnd, 104, BST_CHECKED);
-			EnableWindow(GetDlgItem(hwnd, 103), FALSE);
+			CheckDlgButton(hwnd, IDC_SORT_REMOVE_DUP, BST_CHECKED);
+			EnableWindow(GetDlgItem(hwnd, IDC_SORT_MERGE_DUP), FALSE);
 		}
 
 		if (iSortFlags & SORT_UNIQUNIQ) {
-			CheckDlgButton(hwnd, 105, BST_CHECKED);
+			CheckDlgButton(hwnd, IDC_SORT_REMOVE_UNIQUE, BST_CHECKED);
 		}
 
 		if (iSortFlags & SORT_NOCASE) {
-			CheckDlgButton(hwnd, 106, BST_CHECKED);
+			CheckDlgButton(hwnd, IDC_SORT_IGNORE_CASE, BST_CHECKED);
 		}
 
 		if (IsWinXPAndAbove()) {
 			if (iSortFlags & SORT_LOGICAL) {
-				CheckDlgButton(hwnd, 107, BST_CHECKED);
+				CheckDlgButton(hwnd, IDC_SORT_LOGICAL_NUMBER, BST_CHECKED);
 			}
 			bEnableLogicalSort = TRUE;
 		} else {
-			EnableWindow(GetDlgItem(hwnd, 107), FALSE);
+			EnableWindow(GetDlgItem(hwnd, IDC_SORT_LOGICAL_NUMBER), FALSE);
 			bEnableLogicalSort = FALSE;
 		}
 
 		if (SC_SEL_RECTANGLE != SendMessage(hwndEdit, SCI_GETSELECTIONMODE, 0, 0)) {
 			*piSortFlags &= ~SORT_COLUMN;
-			EnableWindow(GetDlgItem(hwnd, 108), FALSE);
+			EnableWindow(GetDlgItem(hwnd, IDC_SORT_COLUMN), FALSE);
 		} else {
 			*piSortFlags |= SORT_COLUMN;
-			CheckDlgButton(hwnd, 108, BST_CHECKED);
+			CheckDlgButton(hwnd, IDC_SORT_COLUMN, BST_CHECKED);
 		}
 		CenterDlgInParent(hwnd);
 	}
@@ -5960,28 +5956,28 @@ static INT_PTR CALLBACK EditSortDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPA
 		case IDOK: {
 			int *piSortFlags = (int *)GetWindowLongPtr(hwnd, DWLP_USER);
 			int iSortFlags = 0;
-			if (IsButtonChecked(hwnd, 101)) {
+			if (IsButtonChecked(hwnd, IDC_SORT_DESC)) {
 				iSortFlags |= SORT_DESCENDING;
 			}
-			if (IsButtonChecked(hwnd, 102)) {
+			if (IsButtonChecked(hwnd, IDC_SORT_SHUFFLE)) {
 				iSortFlags |= SORT_SHUFFLE;
 			}
-			if (IsButtonChecked(hwnd, 103)) {
+			if (IsButtonChecked(hwnd, IDC_SORT_MERGE_DUP)) {
 				iSortFlags |= SORT_MERGEDUP;
 			}
-			if (IsButtonChecked(hwnd, 104)) {
+			if (IsButtonChecked(hwnd, IDC_SORT_REMOVE_DUP)) {
 				iSortFlags |= SORT_UNIQDUP;
 			}
-			if (IsButtonChecked(hwnd, 105)) {
+			if (IsButtonChecked(hwnd, IDC_SORT_REMOVE_UNIQUE)) {
 				iSortFlags |= SORT_UNIQUNIQ;
 			}
-			if (IsButtonChecked(hwnd, 106)) {
+			if (IsButtonChecked(hwnd, IDC_SORT_IGNORE_CASE)) {
 				iSortFlags |= SORT_NOCASE;
 			}
-			if (IsButtonChecked(hwnd, 107)) {
+			if (IsButtonChecked(hwnd, IDC_SORT_LOGICAL_NUMBER)) {
 				iSortFlags |= SORT_LOGICAL;
 			}
-			if (IsButtonChecked(hwnd, 108)) {
+			if (IsButtonChecked(hwnd, IDC_SORT_COLUMN)) {
 				iSortFlags |= SORT_COLUMN;
 			}
 			*piSortFlags = iSortFlags;
@@ -5993,25 +5989,25 @@ static INT_PTR CALLBACK EditSortDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPA
 			EndDialog(hwnd, IDCANCEL);
 			break;
 
-		case 100:
-		case 101:
-			EnableWindow(GetDlgItem(hwnd, 103), !IsButtonChecked(hwnd, 105));
-			EnableWindow(GetDlgItem(hwnd, 104), TRUE);
-			EnableWindow(GetDlgItem(hwnd, 105), TRUE);
-			EnableWindow(GetDlgItem(hwnd, 106), TRUE);
-			EnableWindow(GetDlgItem(hwnd, 107), bEnableLogicalSort);
+		case IDC_SORT_ASC:
+		case IDC_SORT_DESC:
+			EnableWindow(GetDlgItem(hwnd, IDC_SORT_MERGE_DUP), !IsButtonChecked(hwnd, IDC_SORT_REMOVE_UNIQUE));
+			EnableWindow(GetDlgItem(hwnd, IDC_SORT_REMOVE_DUP), TRUE);
+			EnableWindow(GetDlgItem(hwnd, IDC_SORT_REMOVE_UNIQUE), TRUE);
+			EnableWindow(GetDlgItem(hwnd, IDC_SORT_IGNORE_CASE), TRUE);
+			EnableWindow(GetDlgItem(hwnd, IDC_SORT_LOGICAL_NUMBER), bEnableLogicalSort);
 			break;
 
-		case 102:
-			EnableWindow(GetDlgItem(hwnd, 103), FALSE);
-			EnableWindow(GetDlgItem(hwnd, 104), FALSE);
-			EnableWindow(GetDlgItem(hwnd, 105), FALSE);
-			EnableWindow(GetDlgItem(hwnd, 106), FALSE);
-			EnableWindow(GetDlgItem(hwnd, 107), FALSE);
+		case IDC_SORT_SHUFFLE:
+			EnableWindow(GetDlgItem(hwnd, IDC_SORT_MERGE_DUP), FALSE);
+			EnableWindow(GetDlgItem(hwnd, IDC_SORT_REMOVE_DUP), FALSE);
+			EnableWindow(GetDlgItem(hwnd, IDC_SORT_REMOVE_UNIQUE), FALSE);
+			EnableWindow(GetDlgItem(hwnd, IDC_SORT_IGNORE_CASE), FALSE);
+			EnableWindow(GetDlgItem(hwnd, IDC_SORT_LOGICAL_NUMBER), FALSE);
 			break;
 
-		case 104:
-			EnableWindow(GetDlgItem(hwnd, 103), !IsButtonChecked(hwnd, 104));
+		case IDC_SORT_REMOVE_DUP:
+			EnableWindow(GetDlgItem(hwnd, IDC_SORT_MERGE_DUP), !IsButtonChecked(hwnd, IDC_SORT_REMOVE_DUP));
 			break;
 		}
 		return TRUE;
