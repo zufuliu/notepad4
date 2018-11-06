@@ -5568,18 +5568,13 @@ BOOL EditModifyLinesDlg(HWND hwnd, LPWSTR pwsz1, LPWSTR pwsz2) {
 //
 // EditAlignDlgProc()
 //
-// Controls: 100 Radio Button
-// 101 Radio Button
-// 102 Radio Button
-// 103 Radio Button
-// 104 Radio Button
 //
 static INT_PTR CALLBACK EditAlignDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
 	switch (umsg) {
 	case WM_INITDIALOG: {
 		SetWindowLongPtr(hwnd, DWLP_USER, lParam);
 		const int iAlignMode = *((int *)lParam);
-		CheckRadioButton(hwnd, 100, 104, iAlignMode + 100);
+		CheckRadioButton(hwnd, IDC_ALIGN_LEFT, IDC_ALIGN_JUSTIFY_PAR, iAlignMode + IDC_ALIGN_LEFT);
 		CenterDlgInParent(hwnd);
 	}
 	return TRUE;
@@ -5589,15 +5584,15 @@ static INT_PTR CALLBACK EditAlignDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LP
 		case IDOK: {
 			int *piAlignMode = (int *)GetWindowLongPtr(hwnd, DWLP_USER);
 			int iAlignMode = 0;
-			if (IsButtonChecked(hwnd, 100)) {
+			if (IsButtonChecked(hwnd, IDC_ALIGN_LEFT)) {
 				iAlignMode = ALIGN_LEFT;
-			} else if (IsButtonChecked(hwnd, 101)) {
+			} else if (IsButtonChecked(hwnd, IDC_ALIGN_RIGHT)) {
 				iAlignMode = ALIGN_RIGHT;
-			} else if (IsButtonChecked(hwnd, 102)) {
+			} else if (IsButtonChecked(hwnd, IDC_ALIGN_CENTER)) {
 				iAlignMode = ALIGN_CENTER;
-			} else if (IsButtonChecked(hwnd, 103)) {
+			} else if (IsButtonChecked(hwnd, IDC_ALIGN_JUSTIFY)) {
 				iAlignMode = ALIGN_JUSTIFY;
-			} else if (IsButtonChecked(hwnd, 104)) {
+			} else if (IsButtonChecked(hwnd, IDC_ALIGN_JUSTIFY_PAR)) {
 				iAlignMode = ALIGN_JUSTIFY_EX;
 			}
 			*piAlignMode = iAlignMode;

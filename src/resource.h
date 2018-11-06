@@ -197,6 +197,11 @@
 #define IDD_SORT						115
 // Align Lines
 #define IDD_ALIGN						112
+#define IDC_ALIGN_LEFT					100
+#define IDC_ALIGN_RIGHT					101
+#define IDC_ALIGN_CENTER				102
+#define IDC_ALIGN_JUSTIFY				103
+#define IDC_ALIGN_JUSTIFY_PAR			104
 
 #define IDS_APPTITLE					10000
 #define IDS_APPTITLE_ELEVATED			10001
