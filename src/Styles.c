@@ -1017,13 +1017,18 @@ void Style_SetLexer(HWND hwnd, PEDITLEXER pLexNew) {
 		if (clrFore == 0x7F7F7F) {
 			clrFore = 0x808080;
 		}
+		const COLORREF clrFill = RGB(0xD3, 0xD3, 0xD3);
 #else	// use blue fold color
 		const COLORREF clrFore = RGB(0x80, 0x80, 0xFF);
+		const COLORREF clrFill = RGB(0xAD, 0xD8, 0xE6);
 #endif
 		for (unsigned int i = 0; i < COUNTOF(iMarkerIDs); ++i) {
-			SciCall_MarkerSetBack(iMarkerIDs[i], clrFore);
-			SciCall_MarkerSetFore(iMarkerIDs[i], clrBack);
+			const int marker = iMarkerIDs[i];
+			SciCall_MarkerSetBack(marker, clrFore);
+			SciCall_MarkerSetFore(marker, clrBack);
 		}
+		SciCall_MarkerSetFore(SC_MARKNUM_FOLDER, clrFill);
+		SciCall_MarkerSetFore(SC_MARKNUM_FOLDEREND, clrFill);
 	} // end set folding style
 
 	if (SendMessage(hwnd, SCI_GETINDENTATIONGUIDES, 0, 0) != SC_IV_NONE) {
