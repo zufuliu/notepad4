@@ -1555,11 +1555,6 @@ BOOL LongLineSettingsDlg(HWND hwnd, int *iNumber) {
 //
 // TabSettingsDlgProc()
 //
-// Controls: 100 Edit
-// 101 Edit
-// 102 Check
-// 103 Check
-// 104 Check
 //
 extern int iTabWidth;
 extern int iIndentWidth;
@@ -1572,22 +1567,22 @@ static INT_PTR CALLBACK TabSettingsDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, 
 
 	switch (umsg) {
 	case WM_INITDIALOG: {
-		SetDlgItemInt(hwnd, 100, iTabWidth, FALSE);
-		SendDlgItemMessage(hwnd, 100, EM_LIMITTEXT, 15, 0);
+		SetDlgItemInt(hwnd, IDC_TAB_WIDTH, iTabWidth, FALSE);
+		SendDlgItemMessage(hwnd, IDC_TAB_WIDTH, EM_LIMITTEXT, 15, 0);
 
-		SetDlgItemInt(hwnd, 101, iIndentWidth, FALSE);
-		SendDlgItemMessage(hwnd, 101, EM_LIMITTEXT, 15, 0);
+		SetDlgItemInt(hwnd, IDC_INDENT_WIDTH, iIndentWidth, FALSE);
+		SendDlgItemMessage(hwnd, IDC_INDENT_WIDTH, EM_LIMITTEXT, 15, 0);
 
 		if (bTabsAsSpaces) {
-			CheckDlgButton(hwnd, 102, BST_CHECKED);
+			CheckDlgButton(hwnd, IDC_TAB_AS_SPACE, BST_CHECKED);
 		}
 
 		if (bTabIndents) {
-			CheckDlgButton(hwnd, 103, BST_CHECKED);
+			CheckDlgButton(hwnd, IDC_TAB_INDENT, BST_CHECKED);
 		}
 
 		if (bBackspaceUnindents) {
-			CheckDlgButton(hwnd, 104, BST_CHECKED);
+			CheckDlgButton(hwnd, IDC_BACKSPACE_UNINDENT, BST_CHECKED);
 		}
 
 		CenterDlgInParent(hwnd);
@@ -1599,20 +1594,20 @@ static INT_PTR CALLBACK TabSettingsDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, 
 		case IDOK: {
 			BOOL fTranslated1, fTranslated2;
 
-			const int iNewTabWidth = GetDlgItemInt(hwnd, 100, &fTranslated1, FALSE);
-			const int iNewIndentWidth = GetDlgItemInt(hwnd, 101, &fTranslated2, FALSE);
+			const int iNewTabWidth = GetDlgItemInt(hwnd, IDC_TAB_WIDTH, &fTranslated1, FALSE);
+			const int iNewIndentWidth = GetDlgItemInt(hwnd, IDC_INDENT_WIDTH, &fTranslated2, FALSE);
 
 			if (fTranslated1 && fTranslated2) {
 				iTabWidth = iNewTabWidth;
 				iIndentWidth = iNewIndentWidth;
 
-				bTabsAsSpaces = IsButtonChecked(hwnd, 102);
-				bTabIndents = IsButtonChecked(hwnd, 103);
-				bBackspaceUnindents = IsButtonChecked(hwnd, 104);
+				bTabsAsSpaces = IsButtonChecked(hwnd, IDC_TAB_AS_SPACE);
+				bTabIndents = IsButtonChecked(hwnd, IDC_TAB_INDENT);
+				bBackspaceUnindents = IsButtonChecked(hwnd, IDC_BACKSPACE_UNINDENT);
 
 				EndDialog(hwnd, IDOK);
 			} else {
-				PostMessage(hwnd, WM_NEXTDLGCTL, (WPARAM)(GetDlgItem(hwnd, fTranslated1 ? 101 : 100)), 1);
+				PostMessage(hwnd, WM_NEXTDLGCTL, (WPARAM)(GetDlgItem(hwnd, fTranslated1 ? IDC_INDENT_WIDTH : IDC_TAB_WIDTH)), 1);
 			}
 		}
 		break;
