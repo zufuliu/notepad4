@@ -195,6 +195,15 @@
 #define IDC_INFOBOXCHECK				102
 // Sort Lines
 #define IDD_SORT						115
+#define IDC_SORT_ASC					100
+#define IDC_SORT_DESC					101
+#define IDC_SORT_SHUFFLE				102
+#define IDC_SORT_MERGE_DUP				103
+#define IDC_SORT_REMOVE_DUP				104
+#define IDC_SORT_REMOVE_UNIQUE			105
+#define IDC_SORT_IGNORE_CASE			106
+#define IDC_SORT_LOGICAL_NUMBER			107
+#define IDC_SORT_COLUMN					108
 // Align Lines
 #define IDD_ALIGN						112
 #define IDC_ALIGN_LEFT					100

@@ -1342,15 +1342,15 @@ STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSM
 CAPTION "Sort Lines"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
-    CONTROL         "Sort &ascending.",100,"Button",BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,7,7,85,10
-    CONTROL         "Sort &descending.",101,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,7,19,84,10
-    CONTROL         "Shu&ffle lines.",102,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,7,31,70,10
-    CONTROL         "&Merge duplicate lines.",103,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,50,100,10
-    CONTROL         "&Remove duplicate lines.",104,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,62,100,10
-    CONTROL         "Remove &unique lines.",105,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,74,100,10
-    CONTROL         "&Case insensitive.",106,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,92,81,10
-    CONTROL         "Logical &number comparison.",107,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,104,130,10
-    CONTROL         "Column &sort (rectangular selection).",108,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,122,150,10
+    CONTROL         "Sort &ascending.",IDC_SORT_ASC,"Button",BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,7,7,85,10
+    CONTROL         "Sort &descending.",IDC_SORT_DESC,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,7,19,84,10
+    CONTROL         "Shu&ffle lines.",IDC_SORT_SHUFFLE,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,7,31,70,10
+    CONTROL         "&Merge duplicate lines.",IDC_SORT_MERGE_DUP,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,50,100,10
+    CONTROL         "&Remove duplicate lines.",IDC_SORT_REMOVE_DUP,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,62,100,10
+    CONTROL         "Remove &unique lines.",IDC_SORT_REMOVE_UNIQUE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,74,100,10
+    CONTROL         "&Case insensitive.",IDC_SORT_IGNORE_CASE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,92,81,10
+    CONTROL         "Logical &number comparison.",IDC_SORT_LOGICAL_NUMBER,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,104,130,10
+    CONTROL         "Column &sort (rectangular selection).",IDC_SORT_COLUMN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,122,150,10
     DEFPUSHBUTTON   "OK",IDOK,127,7,50,14
     PUSHBUTTON      "Cancel",IDCANCEL,127,24,50,14
 END
