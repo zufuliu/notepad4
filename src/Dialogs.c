@@ -1339,7 +1339,6 @@ BOOL ChangeNotifyDlg(HWND hwnd) {
 //
 // ColumnWrapDlgProc()
 //
-// Controls: 100 Edit
 //
 static INT_PTR CALLBACK ColumnWrapDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
 	switch (umsg) {
@@ -1347,8 +1346,8 @@ static INT_PTR CALLBACK ColumnWrapDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, L
 		SetWindowLongPtr(hwnd, DWLP_USER, lParam);
 		const int iNumber = *((int *)lParam);
 
-		SetDlgItemInt(hwnd, 100, iNumber, FALSE);
-		SendDlgItemMessage(hwnd, 100, EM_LIMITTEXT, 15, 0);
+		SetDlgItemInt(hwnd, IDC_COLUMNWRAP, iNumber, FALSE);
+		SendDlgItemMessage(hwnd, IDC_COLUMNWRAP, EM_LIMITTEXT, 15, 0);
 
 		CenterDlgInParent(hwnd);
 	}
@@ -1358,7 +1357,7 @@ static INT_PTR CALLBACK ColumnWrapDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, L
 		switch (LOWORD(wParam)) {
 		case IDOK: {
 			BOOL fTranslated;
-			const int iNewNumber = GetDlgItemInt(hwnd, 100, &fTranslated, FALSE);
+			const int iNewNumber = GetDlgItemInt(hwnd, IDC_COLUMNWRAP, &fTranslated, FALSE);
 
 			if (fTranslated) {
 				int *piNumber = (int *)GetWindowLongPtr(hwnd, DWLP_USER);
@@ -1366,7 +1365,7 @@ static INT_PTR CALLBACK ColumnWrapDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, L
 
 				EndDialog(hwnd, IDOK);
 			} else {
-				PostMessage(hwnd, WM_NEXTDLGCTL, (WPARAM)(GetDlgItem(hwnd, 100)), 1);
+				PostMessage(hwnd, WM_NEXTDLGCTL, (WPARAM)(GetDlgItem(hwnd, IDC_COLUMNWRAP)), 1);
 			}
 		}
 		break;
