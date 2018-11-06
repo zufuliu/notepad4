@@ -1394,14 +1394,6 @@ BOOL ColumnWrapDlg(HWND hwnd, int *iNumber) {
 //
 // WordWrapSettingsDlgProc()
 //
-// Controls: 100 Combo
-// 101 Combo
-// 102 Combo
-// 103 Combo
-// 200 Text
-// 201 Text
-// 202 Text
-// 203 Text
 //
 extern BOOL fWordWrap;
 extern int iWordWrapMode;
@@ -1417,24 +1409,24 @@ static INT_PTR CALLBACK WordWrapSettingsDlgProc(HWND hwnd, UINT umsg, WPARAM wPa
 		WCHAR tch[512];
 		for (int i = 0; i < 4; i++) {
 			WCHAR *p1,  *p2;
-			GetDlgItemText(hwnd, 200 + i, tch, COUNTOF(tch));
+			GetDlgItemText(hwnd, IDC_WRAP_INDENT_OPTIONS + i, tch, COUNTOF(tch));
 			lstrcat(tch, L"|");
 			p1 = tch;
 			while ((p2 = StrChr(p1, L'|')) != NULL) {
 				*p2++ = L'\0';
 				if (*p1) {
-					SendDlgItemMessage(hwnd, 100 + i, CB_ADDSTRING, 0, (LPARAM)p1);
+					SendDlgItemMessage(hwnd, IDC_WRAP_INDENT + i, CB_ADDSTRING, 0, (LPARAM)p1);
 				}
 				p1 = p2;
 			}
 
-			SendDlgItemMessage(hwnd, 100 + i, CB_SETEXTENDEDUI, TRUE, 0);
+			SendDlgItemMessage(hwnd, IDC_WRAP_INDENT + i, CB_SETEXTENDEDUI, TRUE, 0);
 		}
 
-		SendDlgItemMessage(hwnd, 100, CB_SETCURSEL, iWordWrapIndent, 0);
-		SendDlgItemMessage(hwnd, 101, CB_SETCURSEL, bShowWordWrapSymbols ? iWordWrapSymbols % 10 : 0, 0);
-		SendDlgItemMessage(hwnd, 102, CB_SETCURSEL, bShowWordWrapSymbols ? ((iWordWrapSymbols % 100) - (iWordWrapSymbols % 10)) / 10 : 0, 0);
-		SendDlgItemMessage(hwnd, 103, CB_SETCURSEL, iWordWrapMode, 0);
+		SendDlgItemMessage(hwnd, IDC_WRAP_INDENT, CB_SETCURSEL, iWordWrapIndent, 0);
+		SendDlgItemMessage(hwnd, IDC_WRAP_SYMBOL_BEFORE, CB_SETCURSEL, bShowWordWrapSymbols ? iWordWrapSymbols % 10 : 0, 0);
+		SendDlgItemMessage(hwnd, IDC_WRAP_SYMBOL_AFTER, CB_SETCURSEL, bShowWordWrapSymbols ? ((iWordWrapSymbols % 100) - (iWordWrapSymbols % 10)) / 10 : 0, 0);
+		SendDlgItemMessage(hwnd, IDC_WRAP_MODE, CB_SETCURSEL, iWordWrapMode, 0);
 
 		CenterDlgInParent(hwnd);
 	}
@@ -1443,16 +1435,16 @@ static INT_PTR CALLBACK WordWrapSettingsDlgProc(HWND hwnd, UINT umsg, WPARAM wPa
 	case WM_COMMAND:
 		switch (LOWORD(wParam)) {
 		case IDOK: {
-			iWordWrapIndent = (int)SendDlgItemMessage(hwnd, 100, CB_GETCURSEL, 0, 0);
+			iWordWrapIndent = (int)SendDlgItemMessage(hwnd, IDC_WRAP_INDENT, CB_GETCURSEL, 0, 0);
 			bShowWordWrapSymbols = FALSE;
-			int iSel = (int)SendDlgItemMessage(hwnd, 101, CB_GETCURSEL, 0, 0);
-			const int iSel2 = (int)SendDlgItemMessage(hwnd, 102, CB_GETCURSEL, 0, 0);
+			int iSel = (int)SendDlgItemMessage(hwnd, IDC_WRAP_SYMBOL_BEFORE, CB_GETCURSEL, 0, 0);
+			const int iSel2 = (int)SendDlgItemMessage(hwnd, IDC_WRAP_SYMBOL_AFTER, CB_GETCURSEL, 0, 0);
 			if (iSel > 0 || iSel2 > 0) {
 				bShowWordWrapSymbols = TRUE;
 				iWordWrapSymbols = iSel + iSel2 * 10;
 			}
 
-			iSel = (int)SendDlgItemMessage(hwnd, 103, CB_GETCURSEL, 0, 0);
+			iSel = (int)SendDlgItemMessage(hwnd, IDC_WRAP_MODE, CB_GETCURSEL, 0, 0);
 			if (iSel == SC_WRAP_NONE) {
 				fWordWrap = FALSE;
 			} else {
