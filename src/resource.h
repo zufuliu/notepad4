@@ -154,6 +154,9 @@
 #define IDC_BACKSPACE_UNINDENT			104
 // Long Lines
 #define IDD_LONGLINES					123
+#define IDC_LONGLINE_LIMIT				100
+#define IDC_LONGLINE_EDGE_LINE			101
+#define IDC_LONGLINE_BACK_COLOR			102
 // Word Wrap Settings
 #define IDD_WORDWRAP					122
 // Page Setup
