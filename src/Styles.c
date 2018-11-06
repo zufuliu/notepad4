@@ -260,6 +260,7 @@ static BOOL bAutoSelect;
 static int	cxStyleSelectDlg;
 static int	cyStyleSelectDlg;
 static int	cyStyleCustomizeDlg;
+static int	cxStyleCustomizeDlg;
 
 #define ALL_FILE_EXTENSIONS_BYTE_SIZE	((NUMLEXERS * MAX_EDITLEXER_EXT_SIZE) * sizeof(WCHAR))
 static LPWSTR g_AllFileExtensions = NULL;
@@ -382,6 +383,7 @@ void Style_Load(void) {
 	cxStyleSelectDlg = IniSectionGetInt(pIniSection, L"SelectDlgSizeX", 0);
 	cyStyleSelectDlg = IniSectionGetInt(pIniSection, L"SelectDlgSizeY", 0);
 	cyStyleCustomizeDlg = IniSectionGetInt(pIniSection, L"CustomizeDlgSizeY", 0);
+	cxStyleCustomizeDlg = IniSectionGetInt(pIniSection, L"CustomizeDlgSizeX", 0);
 
 	LoadIniSection(INI_SECTION_NAME_FILE_EXTENSIONS, pIniSectionBuf, cchIniSection);
 	IniSectionParse(pIniSection, pIniSectionBuf);
@@ -500,6 +502,7 @@ void Style_Save(void) {
 	IniSectionSetInt(pIniSection, L"SelectDlgSizeX", cxStyleSelectDlg);
 	IniSectionSetInt(pIniSection, L"SelectDlgSizeY", cyStyleSelectDlg);
 	IniSectionSetInt(pIniSection, L"CustomizeDlgSizeY", cyStyleCustomizeDlg);
+	IniSectionSetInt(pIniSection, L"CustomizeDlgSizeX", cxStyleCustomizeDlg);
 
 	SaveIniSection(INI_SECTION_NAME_STYLES, pIniSectionBuf);
 
@@ -2903,7 +2906,7 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 
 	switch (umsg) {
 	case WM_INITDIALOG: {
-		ResizeDlg_InitY(hwnd, cyStyleCustomizeDlg, IDC_RESIZEGRIP3);
+		ResizeDlg_Init(hwnd, cxStyleCustomizeDlg, cyStyleCustomizeDlg, IDC_RESIZEGRIP3);
 
 		hwndTV = GetDlgItem(hwnd, IDC_STYLELIST);
 		fDragging = FALSE;
@@ -2960,19 +2963,28 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 		DeleteBitmapButton(hwnd, IDC_STYLEBACK);
 		DeleteBitmapButton(hwnd, IDC_PREVSTYLE);
 		DeleteBitmapButton(hwnd, IDC_NEXTSTYLE);
-		ResizeDlg_Destroy(hwnd, NULL, &cyStyleCustomizeDlg);
+		ResizeDlg_Destroy(hwnd, &cxStyleCustomizeDlg, &cyStyleCustomizeDlg);
 	}
 	return FALSE;
 
 	case WM_SIZE: {
-		int dy;
+		int dx, dy;
 
-		ResizeDlg_Size(hwnd, lParam, NULL, &dy);
-		HDWP hdwp = BeginDeferWindowPos(7);
-		hdwp = DeferCtlPos(hdwp, hwnd, IDC_RESIZEGRIP3, 0, dy, SWP_NOSIZE);
-		hdwp = DeferCtlPos(hdwp, hwnd, IDOK, 0, dy, SWP_NOSIZE);
-		hdwp = DeferCtlPos(hdwp, hwnd, IDCANCEL, 0, dy, SWP_NOSIZE);
+		ResizeDlg_Size(hwnd, lParam, &dx, &dy);
+		HDWP hdwp = BeginDeferWindowPos(16);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDC_RESIZEGRIP3, dx, dy, SWP_NOSIZE);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDOK, dx, dy, SWP_NOSIZE);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDCANCEL, dx, dy, SWP_NOSIZE);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDC_STYLELIST, 0, dy, SWP_NOMOVE);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDC_INFO_GROUPBOX, dx, 0, SWP_NOMOVE);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDC_STYLEEDIT, dx, 0, SWP_NOMOVE);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDC_STYLEFORE, dx, 0, SWP_NOSIZE);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDC_STYLEBACK, dx, 0, SWP_NOSIZE);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDC_STYLEFONT, dx, 0, SWP_NOSIZE);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDC_PREVIEW, dx, 0, SWP_NOSIZE);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDC_STYLEDEFAULT, dx, 0, SWP_NOSIZE);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDC_PREVSTYLE, dx, 0, SWP_NOSIZE);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDC_NEXTSTYLE, dx, 0, SWP_NOSIZE);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDC_IMPORT, 0, dy, SWP_NOSIZE);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDC_EXPORT, 0, dy, SWP_NOSIZE);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDC_RESETALL, 0, dy, SWP_NOSIZE);
