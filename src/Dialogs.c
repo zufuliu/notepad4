@@ -1488,9 +1488,6 @@ BOOL WordWrapSettingsDlg(HWND hwnd, int *iNumber) {
 //
 // LongLineSettingsDlgProc()
 //
-// Controls: 100 Edit
-// 101 Radio1
-// 102 Radio2
 //
 extern int iLongLineMode;
 
@@ -1500,13 +1497,13 @@ static INT_PTR CALLBACK LongLineSettingsDlgProc(HWND hwnd, UINT umsg, WPARAM wPa
 		SetWindowLongPtr(hwnd, DWLP_USER, lParam);
 		const int iNumber = *((int *)lParam);
 
-		SetDlgItemInt(hwnd, 100, iNumber, FALSE);
-		SendDlgItemMessage(hwnd, 100, EM_LIMITTEXT, 15, 0);
+		SetDlgItemInt(hwnd, IDC_LONGLINE_LIMIT, iNumber, FALSE);
+		SendDlgItemMessage(hwnd, IDC_LONGLINE_LIMIT, EM_LIMITTEXT, 15, 0);
 
 		if (iLongLineMode == EDGE_LINE) {
-			CheckRadioButton(hwnd, 101, 102, 101);
+			CheckRadioButton(hwnd, IDC_LONGLINE_EDGE_LINE, IDC_LONGLINE_BACK_COLOR, IDC_LONGLINE_EDGE_LINE);
 		} else {
-			CheckRadioButton(hwnd, 101, 102, 102);
+			CheckRadioButton(hwnd, IDC_LONGLINE_EDGE_LINE, IDC_LONGLINE_BACK_COLOR, IDC_LONGLINE_BACK_COLOR);
 		}
 
 		CenterDlgInParent(hwnd);
@@ -1517,16 +1514,16 @@ static INT_PTR CALLBACK LongLineSettingsDlgProc(HWND hwnd, UINT umsg, WPARAM wPa
 		switch (LOWORD(wParam)) {
 		case IDOK: {
 			BOOL fTranslated;
-			const int iNewNumber = GetDlgItemInt(hwnd, 100, &fTranslated, FALSE);
+			const int iNewNumber = GetDlgItemInt(hwnd, IDC_LONGLINE_LIMIT, &fTranslated, FALSE);
 
 			if (fTranslated) {
 				int *piNumber = (int *)GetWindowLongPtr(hwnd, DWLP_USER);
 				*piNumber = iNewNumber;
-				iLongLineMode = IsButtonChecked(hwnd, 101) ? EDGE_LINE : EDGE_BACKGROUND;
+				iLongLineMode = IsButtonChecked(hwnd, IDC_LONGLINE_EDGE_LINE) ? EDGE_LINE : EDGE_BACKGROUND;
 
 				EndDialog(hwnd, IDOK);
 			} else {
-				PostMessage(hwnd, WM_NEXTDLGCTL, (WPARAM)(GetDlgItem(hwnd, 100)), 1);
+				PostMessage(hwnd, WM_NEXTDLGCTL, (WPARAM)(GetDlgItem(hwnd, IDC_LONGLINE_LIMIT)), 1);
 			}
 		}
 		break;
