@@ -147,6 +147,11 @@
 #define IDC_INFO_GROUPBOX				116
 // Tab Settings
 #define IDD_TABSETTINGS					124
+#define IDC_TAB_WIDTH					100
+#define IDC_INDENT_WIDTH				101
+#define IDC_TAB_AS_SPACE				102
+#define IDC_TAB_INDENT					103
+#define IDC_BACKSPACE_UNINDENT			104
 // Long Lines
 #define IDD_LONGLINES					123
 // Word Wrap Settings
