@@ -140,6 +140,7 @@
 #define IDC_TITLE						113
 #define IDC_STYLELABELS					114
 #define IDC_RESETALL					115
+#define IDC_INFO_GROUPBOX				116
 // Tab Settings
 #define IDD_TABSETTINGS					124
 // Long Lines

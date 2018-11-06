@@ -389,7 +389,6 @@ NP2_inline void ResizeDlg_InitX(HWND hwnd, int cxFrame, int nIdGrip) {
 NP2_inline void ResizeDlg_InitY(HWND hwnd, int cyFrame, int nIdGrip) {
 	ResizeDlg_InitEx(hwnd, 0, cyFrame, nIdGrip, ResizeDlgDirection_OnlyY);
 }
-void ResizeDlg_Init(HWND hwnd, int cxFrame, int cyFrame, int nIdGrip);
 void ResizeDlg_Destroy(HWND hwnd, int *cxFrame, int *cyFrame);
 void ResizeDlg_Size(HWND hwnd, LPARAM lParam, int *cx, int *cy);
 void ResizeDlg_GetMinMaxInfo(HWND hwnd, LPARAM lParam);
