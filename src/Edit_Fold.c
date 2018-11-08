@@ -12,29 +12,38 @@ typedef enum {
 #define FOLD_CHILDREN SCMOD_CTRL
 #define FOLD_SIBLINGS SCMOD_SHIFT
 
-UINT Style_GetDefaultFoldState(void) {
+UINT Style_GetDefaultFoldState(int *maxLevel) {
 	switch (pLexCurrent->rid) {
 	case NP2LEX_DEFAULT:
 	case NP2LEX_ANSI:
+		*maxLevel = 4;
 		return (1 << 0) | (1 << 4);
 	case NP2LEX_CPP:
 	case NP2LEX_CSHARP:
 	case NP2LEX_XML:
 	case NP2LEX_HTML:
 	case NP2LEX_JSON:
+		*maxLevel = 3;
 		return (1 << 0) | (1 << 1) | (1 << 2) | (1 << 3);
 	case NP2LEX_JAVA:
 	case NP2LEX_RC:
 	case NP2LEX_SCALA:
 	case NP2LEX_RUBY:
+		*maxLevel = 2;
 		return (1 << 0) | (1 << 1) | (1 << 2);
 	case NP2LEX_INI:
-	case NP2LEX_DIFF:
+		*maxLevel = 0;
 		return (1 << 0);
+	case NP2LEX_DIFF:
+		*maxLevel = 2;
+		return (1 << 0) | (1 << 2);
 	case NP2LEX_PYTHON:
+		*maxLevel = 8;
 		return (1 << 0) | (1 << 4) | (1 << 8);
+	default:
+		*maxLevel = 1;
+		return (1 << 0) | (1 << 1);
 	}
-	return (1 << 0) | (1 << 1);
 }
 
 void FoldToggleNode(int line, FOLD_ACTION *pAction, BOOL *fToggled) {
@@ -90,14 +99,17 @@ void FoldToggleLevel(int lev, FOLD_ACTION action) {
 	}
 	lev += SC_FOLDLEVELBASE;
 
-	for (int line = 0; line < lineCount; ++line) {
+	int line = 0;
+	while (line < lineCount) {
 		int level = SciCall_GetFoldLevel(line);
 		if (level & SC_FOLDLEVELHEADERFLAG) {
 			level &= SC_FOLDLEVELNUMBERMASK;
 			if (lev == level) {
 				FoldToggleNode(line, &action, &fToggled);
+				line = SciCall_GetLastChild(line);
 			}
 		}
+		++line;
 	}
 
 	if (fToggled) {
@@ -159,18 +171,24 @@ void FoldToggleCurrent(FOLD_ACTION action) {
 
 void FoldToggleDefault(FOLD_ACTION action) {
 	BOOL fToggled = FALSE;
-	const UINT state = Style_GetDefaultFoldState();
+	int maxLevel = 0;
+	const UINT state = Style_GetDefaultFoldState(&maxLevel);
 	const int lineCount = SciCall_GetLineCount();
 
-	for (int line = 0; line < lineCount; ++line) {
+	int line = 0;
+	while (line < lineCount) {
 		int level = SciCall_GetFoldLevel(line);
 		if (level & SC_FOLDLEVELHEADERFLAG) {
 			level &= SC_FOLDLEVELNUMBERMASK;
 			level -= SC_FOLDLEVELBASE;
 			if (state & (1U << level)) {
 				FoldToggleNode(line, &action, &fToggled);
+				if (level == maxLevel) {
+					line = SciCall_GetLastChild(line);
+				}
 			}
 		}
+		++line;
 	}
 
 	if (fToggled) {
