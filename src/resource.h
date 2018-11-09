@@ -145,6 +145,8 @@
 #define IDC_STYLELABELS					114
 #define IDC_RESETALL					115
 #define IDC_INFO_GROUPBOX				116
+#define IDC_STYLELABEL_DEFAULT			117
+#define IDC_STYLEVALUE_DEFAULT			118
 // Tab Settings
 #define IDD_TABSETTINGS					124
 #define IDC_TAB_WIDTH					100

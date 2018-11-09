@@ -2976,24 +2976,28 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 		int dx, dy;
 
 		ResizeDlg_Size(hwnd, lParam, &dx, &dy);
-		HDWP hdwp = BeginDeferWindowPos(16);
+		const int cy = (dy > 0) ? (dy - dy / 2) : (dy / 2);
+		HDWP hdwp = BeginDeferWindowPos(18);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDC_RESIZEGRIP3, dx, dy, SWP_NOSIZE);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDOK, dx, dy, SWP_NOSIZE);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDCANCEL, dx, dy, SWP_NOSIZE);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDC_STYLELIST, 0, dy, SWP_NOMOVE);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDC_INFO_GROUPBOX, dx, 0, SWP_NOMOVE);
-		hdwp = DeferCtlPos(hdwp, hwnd, IDC_STYLEEDIT, dx, 0, SWP_NOMOVE);
-		hdwp = DeferCtlPos(hdwp, hwnd, IDC_STYLEFORE, dx, 0, SWP_NOSIZE);
-		hdwp = DeferCtlPos(hdwp, hwnd, IDC_STYLEBACK, dx, 0, SWP_NOSIZE);
-		hdwp = DeferCtlPos(hdwp, hwnd, IDC_STYLEFONT, dx, 0, SWP_NOSIZE);
-		hdwp = DeferCtlPos(hdwp, hwnd, IDC_PREVIEW, dx, 0, SWP_NOSIZE);
-		hdwp = DeferCtlPos(hdwp, hwnd, IDC_STYLEDEFAULT, dx, 0, SWP_NOSIZE);
-		hdwp = DeferCtlPos(hdwp, hwnd, IDC_PREVSTYLE, dx, 0, SWP_NOSIZE);
-		hdwp = DeferCtlPos(hdwp, hwnd, IDC_NEXTSTYLE, dx, 0, SWP_NOSIZE);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDC_STYLEEDIT, dx, cy, SWP_NOMOVE);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDC_STYLELABEL_DEFAULT, 0, cy, SWP_NOSIZE);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDC_STYLEVALUE_DEFAULT, 0, cy, SWP_NOSIZE);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDC_STYLEFORE, dx, dy, SWP_NOSIZE);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDC_STYLEBACK, dx, dy, SWP_NOSIZE);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDC_STYLEFONT, dx, dy, SWP_NOSIZE);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDC_PREVIEW, dx, dy, SWP_NOSIZE);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDC_STYLEDEFAULT, dx, dy, SWP_NOSIZE);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDC_PREVSTYLE, dx, dy, SWP_NOSIZE);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDC_NEXTSTYLE, dx, dy, SWP_NOSIZE);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDC_IMPORT, 0, dy, SWP_NOSIZE);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDC_EXPORT, 0, dy, SWP_NOSIZE);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDC_RESETALL, 0, dy, SWP_NOSIZE);
 		EndDeferWindowPos(hdwp);
+		ResizeDlgCtl(hwnd, IDC_STYLEVALUE_DEFAULT, dx, dy - cy);
 	}
 	return TRUE;
 
@@ -3040,6 +3044,7 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 						//CheckDlgButton(hwnd, IDC_STYLEUNDERLINE, BST_UNCHECKED);
 						//CheckDlgButton(hwnd, IDC_STYLEEOLFILLED, BST_UNCHECKED);
 						SetDlgItemText(hwnd, IDC_STYLEEDIT, pCurrentLexer->szExtensions);
+						SetDlgItemText(hwnd, IDC_STYLEVALUE_DEFAULT, pCurrentLexer->pszDefExt);
 					} else {
 						SetDlgItemText(hwnd, IDC_STYLELABEL, L"");
 						EnableWindow(GetDlgItem(hwnd, IDC_STYLEEDIT), FALSE);
@@ -3056,6 +3061,7 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 						//CheckDlgButton(hwnd, IDC_STYLEUNDERLINE, BST_UNCHECKED);
 						//CheckDlgButton(hwnd, IDC_STYLEEOLFILLED, BST_UNCHECKED);
 						SetDlgItemText(hwnd, IDC_STYLEEDIT, L"");
+						SetDlgItemText(hwnd, IDC_STYLEVALUE_DEFAULT, L"");
 					}
 				}
 
@@ -3085,6 +3091,7 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 						//CheckDlgButton(hwnd, IDC_STYLEUNDERLINE, Style_StrGetAttribute(pCurrentStyle->szValue, L"underline") ? BST_CHECKED : BST_UNCHECKED);
 						//CheckDlgButton(hwnd, IDC_STYLEEOLFILLED, Style_StrGetAttribute(pCurrentStyle->szValue, L"eolfilled") ? BST_CHECKED : BST_UNCHECKED);
 						SetDlgItemText(hwnd, IDC_STYLEEDIT, pCurrentStyle->szValue);
+						SetDlgItemText(hwnd, IDC_STYLEVALUE_DEFAULT, pCurrentStyle->pszDefault);
 					} else {
 						SetDlgItemText(hwnd, IDC_STYLELABEL, L"");
 						EnableWindow(GetDlgItem(hwnd, IDC_STYLEEDIT), FALSE);
@@ -3101,6 +3108,7 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 						//CheckDlgButton(hwnd, IDC_STYLEUNDERLINE, BST_UNCHECKED);
 						//CheckDlgButton(hwnd, IDC_STYLEEOLFILLED, BST_UNCHECKED);
 						SetDlgItemText(hwnd, IDC_STYLEEDIT, L"");
+						SetDlgItemText(hwnd, IDC_STYLEVALUE_DEFAULT, L"");
 					}
 				}
 			}
