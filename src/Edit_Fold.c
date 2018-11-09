@@ -116,7 +116,6 @@ void FoldToggleLevel(int lev, FOLD_ACTION action) {
 			int level = SciCall_GetFoldLevel(line);
 			if (level & SC_FOLDLEVELHEADERFLAG) {
 				level &= SC_FOLDLEVELNUMBERMASK;
-				level -= SC_FOLDLEVELBASE;
 				EditFoldStack_Push(&foldStack, level);
 				if (lev == foldStack.level_count) {
 					FoldToggleNode(line, &action, &fToggled);
@@ -159,33 +158,7 @@ void FoldToggleCurrent(FOLD_ACTION action) {
 	int level = SciCall_GetFoldLevel(line);
 
 	if (!(level & SC_FOLDLEVELHEADERFLAG)) {
-#if 1
-		// Document::GetFoldParent(Sci::Line line)
 		line = SciCall_GetFoldParent(line);
-#else
-		int lev = level & SC_FOLDLEVELNUMBERMASK;
-		switch (pLexCurrent->iLexer) {
-		case SCLEX_NULL:
-		case SCLEX_PYTHON:
-			lev -= 4;
-			break;
-		default:
-			lev -= 1;
-			break;
-		}
-
-		--line;
-		while (line >= 0) {
-			level = SciCall_GetFoldLevel(line);
-			if (level & SC_FOLDLEVELHEADERFLAG) {
-				level &= SC_FOLDLEVELNUMBERMASK;
-				if (lev == level) {
-					break;
-				}
-			}
-			--line;
-		}
-#endif
 		if (line < 0) {
 			return;
 		}
@@ -216,7 +189,6 @@ void FoldToggleDefault(FOLD_ACTION action) {
 			int level = SciCall_GetFoldLevel(line);
 			if (level & SC_FOLDLEVELHEADERFLAG) {
 				level &= SC_FOLDLEVELNUMBERMASK;
-				level -= SC_FOLDLEVELBASE;
 				EditFoldStack_Push(&foldStack, level);
 				level = foldStack.level_count;
 				if (state & (1U << level)) {
