@@ -10,8 +10,8 @@
 #define	NUMKEYWORD				(KEYWORDSET_MAX + 1)
 
 #define MAX_EDITSTYLE_VALUE_SIZE	256
-#define MAX_EDITLEXER_EXT_SIZE		256
-#define MAX_LEXER_STYLE_EDIT_SIZE	256
+#define MAX_EDITLEXER_EXT_SIZE		512
+#define MAX_LEXER_STYLE_EDIT_SIZE	512
 
 // localization, get lexer and style name from resuorce
 #define NP2_GET_LEXER_STYLE_NAME_FROM_RES	0
