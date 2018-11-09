@@ -14,30 +14,17 @@ typedef enum {
 
 #define MAX_EDIT_TOGGLE_FOLD_LEVEL		10
 struct EditFoldStack {
-	int level_count;
+	int level_count; // 1-based level number at current header line
 	int level_stack[MAX_EDIT_TOGGLE_FOLD_LEVEL];
 };
 
 static void EditFoldStack_Push(struct EditFoldStack *foldStack, int level) {
-	if (foldStack->level_count == 0) {
-		foldStack->level_stack[foldStack->level_count] = level;
-		++foldStack->level_count;
-		return;
+	while (foldStack->level_count != 0 && level <= foldStack->level_stack[foldStack->level_count - 1]) {
+		--foldStack->level_count;
 	}
 
-	const int last = foldStack->level_stack[foldStack->level_count - 1];
-	if (level > last) {
-		foldStack->level_stack[foldStack->level_count] = level;
-		++foldStack->level_count;
-	} else if (level < last) {
-		do {
-			--foldStack->level_count;
-		} while (foldStack->level_count != 0 && level < foldStack->level_stack[foldStack->level_count]);
-		if (foldStack->level_count == 0 || level != foldStack->level_stack[foldStack->level_count - 1]) {
-			foldStack->level_stack[foldStack->level_count] = level;
-			++foldStack->level_count;
-		}
-	}
+	foldStack->level_stack[foldStack->level_count] = level;
+	++foldStack->level_count;
 }
 
 UINT Style_GetDefaultFoldState(int *maxLevel) {
