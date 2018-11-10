@@ -22,6 +22,7 @@ EDITLEXER lexDefault = { SCLEX_NULL, NP2LEX_DEFAULT, EDITLEXER_HOLE(L"Default Te
 	{ SCI_SETCARETFORE + SCI_SETCARETWIDTH, 63109, EDITSTYLE_HOLE(L"Caret (Color)"), L"" },
 	{ SCI_SETEDGECOLOUR, 63110, EDITSTYLE_HOLE(L"Long Line Marker (Colors)"), L"fore:#FFC000" },
 	{ SCI_SETEXTRAASCENT + SCI_SETEXTRADESCENT, 63111, EDITSTYLE_HOLE(L"Extra Line Spacing (Size)"), L"size:2" },
+	{ 0, 63124, EDITSTYLE_HOLE(L"Folding Marker (Color)"), L"fore:#8080FF; back:#ADD8E6" },
 
 	{ STYLE_DEFAULT, 63112, EDITSTYLE_HOLE(L"2nd Default Style"), L"font:Default; size:11" },
 	{ STYLE_LINENUMBER, 63113, EDITSTYLE_HOLE(L"2nd Margins and Line Numbers"), L"font:Tahoma; size:-2; fore:#2B91AF" },
@@ -35,6 +36,7 @@ EDITLEXER lexDefault = { SCLEX_NULL, NP2LEX_DEFAULT, EDITLEXER_HOLE(L"Default Te
 	{ SCI_SETCARETFORE + SCI_SETCARETWIDTH, 63121, EDITSTYLE_HOLE(L"2nd Caret (Color)"), L"" },
 	{ SCI_SETEDGECOLOUR, 63122, EDITSTYLE_HOLE(L"2nd Long Line Marker (Colors)"), L"fore:#FFC000" },
 	{ SCI_SETEXTRAASCENT + SCI_SETEXTRADESCENT, 63123, EDITSTYLE_HOLE(L"2nd Extra Line Spacing (Size)"), L"" },
+	{ 0, 63125, EDITSTYLE_HOLE(L"2nd Folding Marker (Color)"), L"fore:#808080; back:#D3D3D3" },
 	EDITSTYLE_SENTINEL
 }
 };
