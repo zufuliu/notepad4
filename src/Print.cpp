@@ -412,19 +412,14 @@ extern "C" BOOL EditPrint(HWND hwnd, LPCWSTR pszDocTitle, LPCWSTR pszPageFormat)
 //
 // EditPrintSetup() - Code from SciTE
 //
-// Custom controls: 30 Zoom
-// 31 Spin
-// 32 Header
-// 33 Footer
-// 34 Colors
 //
 static UINT_PTR CALLBACK PageSetupHook(HWND hwnd, UINT uiMsg, WPARAM wParam, LPARAM /*lParam*/) noexcept {
 	switch (uiMsg) {
 	case WM_INITDIALOG: {
-		SendDlgItemMessage(hwnd, 30, EM_LIMITTEXT, 32, 0);
+		SendDlgItemMessage(hwnd, IDC_PAGESETUP_ZOOM_EDIT, EM_LIMITTEXT, 32, 0);
 
-		SendDlgItemMessage(hwnd, 31, UDM_SETRANGE, 0, MAKELONG(SC_MAX_ZOOM_LEVEL, SC_MIN_ZOOM_LEVEL));
-		SendDlgItemMessage(hwnd, 31, UDM_SETPOS, 0, MAKELONG((short)iPrintZoom, 0));
+		SendDlgItemMessage(hwnd, IDC_PAGESETUP_ZOOM_UPDOWN, UDM_SETRANGE, 0, MAKELONG(SC_MAX_ZOOM_LEVEL, SC_MIN_ZOOM_LEVEL));
+		SendDlgItemMessage(hwnd, IDC_PAGESETUP_ZOOM_UPDOWN, UDM_SETPOS, 0, MAKELONG((short)iPrintZoom, 0));
 
 		// Set header options
 		WCHAR tch[512];
@@ -435,11 +430,11 @@ static UINT_PTR CALLBACK PageSetupHook(HWND hwnd, UINT uiMsg, WPARAM wParam, LPA
 		while ((p2 = StrChr(p1, L'|')) != nullptr) {
 			*p2++ = L'\0';
 			if (*p1) {
-				SendDlgItemMessage(hwnd, 32, CB_ADDSTRING, 0, (LPARAM)p1);
+				SendDlgItemMessage(hwnd, IDC_PAGESETUP_HEADER_LIST, CB_ADDSTRING, 0, (LPARAM)p1);
 			}
 			p1 = p2;
 		}
-		SendDlgItemMessage(hwnd, 32, CB_SETCURSEL, iPrintHeader, 0);
+		SendDlgItemMessage(hwnd, IDC_PAGESETUP_HEADER_LIST, CB_SETCURSEL, iPrintHeader, 0);
 
 		// Set footer options
 		GetString(IDS_PRINT_FOOTER, tch, COUNTOF(tch));
@@ -448,11 +443,11 @@ static UINT_PTR CALLBACK PageSetupHook(HWND hwnd, UINT uiMsg, WPARAM wParam, LPA
 		while ((p2 = StrChr(p1, L'|')) != nullptr) {
 			*p2++ = L'\0';
 			if (*p1) {
-				SendDlgItemMessage(hwnd, 33, CB_ADDSTRING, 0, (LPARAM)p1);
+				SendDlgItemMessage(hwnd, IDC_PAGESETUP_FOOTER_LIST, CB_ADDSTRING, 0, (LPARAM)p1);
 			}
 			p1 = p2;
 		}
-		SendDlgItemMessage(hwnd, 33, CB_SETCURSEL, iPrintFooter, 0);
+		SendDlgItemMessage(hwnd, IDC_PAGESETUP_FOOTER_LIST, CB_SETCURSEL, iPrintFooter, 0);
 
 		// Set color options
 		GetString(IDS_PRINT_COLOR, tch, COUNTOF(tch));
@@ -461,33 +456,33 @@ static UINT_PTR CALLBACK PageSetupHook(HWND hwnd, UINT uiMsg, WPARAM wParam, LPA
 		while ((p2 = StrChr(p1, L'|')) != nullptr) {
 			*p2++ = L'\0';
 			if (*p1) {
-				SendDlgItemMessage(hwnd, 34, CB_ADDSTRING, 0, (LPARAM)p1);
+				SendDlgItemMessage(hwnd, IDC_PAGESETUP_COLOR_MODE_LIST, CB_ADDSTRING, 0, (LPARAM)p1);
 			}
 			p1 = p2;
 		}
-		SendDlgItemMessage(hwnd, 34, CB_SETCURSEL, iPrintColor, 0);
+		SendDlgItemMessage(hwnd, IDC_PAGESETUP_COLOR_MODE_LIST, CB_SETCURSEL, iPrintColor, 0);
 
 		// Make combos handier
-		SendDlgItemMessage(hwnd, 32, CB_SETEXTENDEDUI, TRUE, 0);
-		SendDlgItemMessage(hwnd, 33, CB_SETEXTENDEDUI, TRUE, 0);
-		SendDlgItemMessage(hwnd, 34, CB_SETEXTENDEDUI, TRUE, 0);
-		SendDlgItemMessage(hwnd, 1137, CB_SETEXTENDEDUI, TRUE, 0);
-		SendDlgItemMessage(hwnd, 1138, CB_SETEXTENDEDUI, TRUE, 0);
+		SendDlgItemMessage(hwnd, IDC_PAGESETUP_HEADER_LIST, CB_SETEXTENDEDUI, TRUE, 0);
+		SendDlgItemMessage(hwnd, IDC_PAGESETUP_FOOTER_LIST, CB_SETEXTENDEDUI, TRUE, 0);
+		SendDlgItemMessage(hwnd, IDC_PAGESETUP_COLOR_MODE_LIST, CB_SETEXTENDEDUI, TRUE, 0);
+		SendDlgItemMessage(hwnd, IDC_PAGESETUP_SOURCE_LIST, CB_SETEXTENDEDUI, TRUE, 0);
+		SendDlgItemMessage(hwnd, IDC_PAGESETUP_ORIENTATION_LIST, CB_SETEXTENDEDUI, TRUE, 0);
 	}
 	break;
 
 	case WM_COMMAND:
 		if (LOWORD(wParam) == IDOK) {
-			const LONG lPos = (LONG)SendDlgItemMessage(hwnd, 31, UDM_GETPOS, 0, 0);
+			const LONG lPos = (LONG)SendDlgItemMessage(hwnd, IDC_PAGESETUP_ZOOM_UPDOWN, UDM_GETPOS, 0, 0);
 			if (HIWORD(lPos) == 0) {
 				iPrintZoom = LOWORD(lPos);
 			} else {
 				iPrintZoom = 100;
 			}
 
-			iPrintHeader = (int)SendDlgItemMessage(hwnd, 32, CB_GETCURSEL, 0, 0);
-			iPrintFooter = (int)SendDlgItemMessage(hwnd, 33, CB_GETCURSEL, 0, 0);
-			iPrintColor	 = (int)SendDlgItemMessage(hwnd, 34, CB_GETCURSEL, 0, 0);
+			iPrintHeader = (int)SendDlgItemMessage(hwnd, IDC_PAGESETUP_HEADER_LIST, CB_GETCURSEL, 0, 0);
+			iPrintFooter = (int)SendDlgItemMessage(hwnd, IDC_PAGESETUP_FOOTER_LIST, CB_GETCURSEL, 0, 0);
+			iPrintColor	 = (int)SendDlgItemMessage(hwnd, IDC_PAGESETUP_COLOR_MODE_LIST, CB_GETCURSEL, 0, 0);
 		}
 		break;
 
