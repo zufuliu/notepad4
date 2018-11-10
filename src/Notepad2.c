@@ -6932,7 +6932,8 @@ BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect, LPCWST
 	};
 	// Ask to create a new file...
 	if (!bReload && !PathFileExists(szFileName)) {
-		if (flagQuietCreate || MsgBox(MBYESNO, IDS_ASK_CREATE, szFileName) == IDYES) {
+		UINT result = IDCANCEL;
+		if (flagQuietCreate || (result = MsgBox(MBYESNOCANCEL, IDS_ASK_CREATE, szFileName)) == IDYES) {
 			HANDLE hFile = CreateFile(szFileName,
 									  GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE,
 									  NULL, CREATE_NEW, FILE_ATTRIBUTE_NORMAL, NULL);
@@ -6955,6 +6956,9 @@ BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect, LPCWST
 				SendMessage(hwndEdit, SCI_SETCODEPAGE, (iEncoding == CPI_DEFAULT) ? iDefaultCodePage : SC_CP_UTF8, 0);
 				bReadOnly = FALSE;
 			}
+		} else if (result == IDCANCEL) {
+			NP2ExitWind(hwndMain);
+			return FALSE;
 		} else {
 			return FALSE;
 		}
