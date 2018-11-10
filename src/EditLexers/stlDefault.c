@@ -11,8 +11,6 @@ NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL
 EDITLEXER lexDefault = { SCLEX_NULL, NP2LEX_DEFAULT, EDITLEXER_HOLE(L"Default Text"), L"txt; text; wtx; log; asc; doc", &Keywords_NULL,
 {
 	{ STYLE_DEFAULT, 63100, EDITSTYLE_HOLE(L"Default Style"), L"font:Default; size:11" },
-	//{ STYLE_DEFAULT, 63100, EDITSTYLE_HOLE(L"Default Style"), L"font:DejaVu Sans Mono; size:11" },
-	//{ STYLE_DEFAULT, 63100, EDITSTYLE_HOLE(L"Default Style"), L"font:Consolas; size:11" },
 	{ STYLE_LINENUMBER, 63101, EDITSTYLE_HOLE(L"Margins and Line Numbers"), L"size:-2; fore:#2B91AF" },
 	{ STYLE_BRACELIGHT, 63102, EDITSTYLE_HOLE(L"Matching Braces"), L"size:+1; bold; fore:#FF0000" },
 	{ STYLE_BRACEBAD, 63103, EDITSTYLE_HOLE(L"Matching Braces Error"), L"size:+1; bold; fore:#000080" },
@@ -26,7 +24,6 @@ EDITLEXER lexDefault = { SCLEX_NULL, NP2LEX_DEFAULT, EDITLEXER_HOLE(L"Default Te
 	{ SCI_SETEXTRAASCENT + SCI_SETEXTRADESCENT, 63111, EDITSTYLE_HOLE(L"Extra Line Spacing (Size)"), L"size:2" },
 
 	{ STYLE_DEFAULT, 63112, EDITSTYLE_HOLE(L"2nd Default Style"), L"font:Default; size:11" },
-	//{ STYLE_DEFAULT, 63112, EDITSTYLE_HOLE(L"2nd Default Style"), L"font:Courier New; size:11" },
 	{ STYLE_LINENUMBER, 63113, EDITSTYLE_HOLE(L"2nd Margins and Line Numbers"), L"font:Tahoma; size:-2; fore:#2B91AF" },
 	{ STYLE_BRACELIGHT, 63114, EDITSTYLE_HOLE(L"2nd Matching Braces"), L"bold; fore:#FF0000" },
 	{ STYLE_BRACEBAD, 63115, EDITSTYLE_HOLE(L"2nd Matching Braces Error"), L"bold; fore:#000080" },
