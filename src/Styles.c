@@ -308,6 +308,7 @@ enum {
 	Style_Caret = 9,
 	Style_LongLineMarker = 10,
 	Style_ExtraLineSpacing = 11,
+	Style_FoldingMarker = 12,
 	Style_MaxDefaultStyle,
 };
 
@@ -717,17 +718,6 @@ void Style_UpdateCaret(HWND hwnd) {
 	SendMessage(hwnd, SCI_SETCARETPERIOD, iValue, 0);
 }
 
-// set folding style; braces are for scoping only
-static const int iMarkerIDs[] = {
-	SC_MARKNUM_FOLDEROPEN,
-	SC_MARKNUM_FOLDER,
-	SC_MARKNUM_FOLDERSUB,
-	SC_MARKNUM_FOLDERTAIL,
-	SC_MARKNUM_FOLDEREND,
-	SC_MARKNUM_FOLDEROPENMID,
-	SC_MARKNUM_FOLDERMIDTAIL
-};
-
 void Style_UpdateLexerKeywordAttr(PEDITLEXER pLexNew) {
 	UINT8 *attr = currentLexKeywordAttr;
 	memset(currentLexKeywordAttr, 0, sizeof(currentLexKeywordAttr));
@@ -1017,7 +1007,29 @@ void Style_SetLexer(HWND hwnd, PEDITLEXER pLexNew) {
 
 	// set folding style; braces are for scoping only
 	{
+		static const int iMarkerIDs[] = {
+			SC_MARKNUM_FOLDEROPEN,
+			SC_MARKNUM_FOLDER,
+			SC_MARKNUM_FOLDERSUB,
+			SC_MARKNUM_FOLDERTAIL,
+			SC_MARKNUM_FOLDEREND,
+			SC_MARKNUM_FOLDEROPENMID,
+			SC_MARKNUM_FOLDERMIDTAIL
+		};
+
 		const COLORREF clrBack = SciCall_StyleGetBack(STYLE_DEFAULT);
+		COLORREF clrFore, clrFill;
+
+		if (Style_StrGetColor(TRUE, lexDefault.Styles[Style_FoldingMarker + iIdx].szValue, &iValue)) {
+			clrFore = iValue;
+		} else {
+			clrFore = iIdx ? RGB(0x80, 0x80, 0xFF) : RGB(0x80, 0x80, 0x80);
+		}
+		if (Style_StrGetColor(FALSE, lexDefault.Styles[Style_FoldingMarker + iIdx].szValue, &iValue)) {
+			clrFill = iValue;
+		} else {
+			clrFill = iIdx ? RGB(0xAD, 0xD8, 0xE6) : RGB(0xD3, 0xD3, 0xD3);
+		}
 
 		SciCall_SetFoldMarginColour(TRUE, clrBack);
 		SciCall_SetFoldMarginHiColour(TRUE, clrBack);
@@ -1033,11 +1045,8 @@ void Style_SetLexer(HWND hwnd, PEDITLEXER pLexNew) {
 		if (clrFore == 0x7F7F7F) {
 			clrFore = 0x808080;
 		}
-		const COLORREF clrFill = RGB(0xD3, 0xD3, 0xD3);
-#else	// use blue fold color
-		const COLORREF clrFore = RGB(0x80, 0x80, 0xFF);
-		const COLORREF clrFill = RGB(0xAD, 0xD8, 0xE6);
 #endif
+
 		for (unsigned int i = 0; i < COUNTOF(iMarkerIDs); ++i) {
 			const int marker = iMarkerIDs[i];
 			SciCall_MarkerSetBack(marker, clrFore);
