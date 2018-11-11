@@ -226,12 +226,13 @@
 // Enclose Selection
 #define IDD_ENCLOSESELECTION			113
 // InfoBox
-#define IDD_INFOBOX						126 // OK
-#define IDD_INFOBOX2					127 // Yes/No
-#define IDD_INFOBOX3					128 // OK/Cancel
-#define IDC_INFOBOXICON					100
-#define IDC_INFOBOXTEXT					101
-#define IDC_INFOBOXCHECK				102
+#define IDD_INFOBOX_OK					126
+#define IDD_INFOBOX_YESNO				127
+#define IDD_INFOBOX_OKCANCEL			128
+#define IDC_INFOBOXRECT					100
+#define IDC_INFOBOXICON					101
+#define IDC_INFOBOXTEXT					102
+#define IDC_INFOBOXCHECK				103
 // Sort Lines
 #define IDD_SORT						115
 #define IDC_SORT_ASC					100
