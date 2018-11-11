@@ -295,25 +295,26 @@ struct DetailStyle {
 	char fontFace[LF_FACESIZE * kMaxMultiByteCount];
 };
 
-enum {
-	Style_Default = 0,
-	Style_LineNumber = 1,
-	Style_MatchBrace = 2,
-	Style_MatchBraceError = 3,
-	Style_ControlCharacter = 4,
-	Style_IndentationGuide = 5,
-	Style_Selection = 6,
-	Style_Whitespace = 7,
-	Style_CurrentLine = 8,
-	Style_Caret = 9,
-	Style_LongLineMarker = 10,
-	Style_ExtraLineSpacing = 11,
-	Style_FoldingMarker = 12,
+//! keep same order as lexDefault
+enum DefaultStyleIndex {
+	Style_Default,
+	Style_LineNumber,
+	Style_MatchBrace,
+	Style_MatchBraceError,
+	Style_ControlCharacter,
+	Style_IndentationGuide,
+	Style_Selection,
+	Style_Whitespace,
+	Style_CurrentLine,
+	Style_Caret,
+	Style_LongLineMarker,
+	Style_ExtraLineSpacing,
+	Style_FoldingMarker,
 	Style_MaxDefaultStyle,
 };
 
 static inline int GetDefaultStyleStartIndex(void) {
-	return bUse2ndDefaultStyle ? Style_MaxDefaultStyle : 0;
+	return bUse2ndDefaultStyle ? Style_MaxDefaultStyle : Style_Default;
 }
 
 static inline int FindDefaultFontIndex(void) {
