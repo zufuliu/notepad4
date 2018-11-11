@@ -5443,9 +5443,9 @@ static INT_PTR CALLBACK EditModifyLinesDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 
 	case WM_CTLCOLORSTATIC: {
 		const DWORD dwId = GetWindowLong((HWND)lParam, GWL_ID);
-		HDC hdc = (HDC)wParam;
 
 		if (dwId >= IDC_MODIFY_LINE_DLN_NP && dwId <= IDC_MODIFY_LINE_ZCN_ZP) {
+			HDC hdc = (HDC)wParam;
 			SetBkMode(hdc, TRANSPARENT);
 			if (GetSysColorBrush(COLOR_HOTLIGHT)) {
 				SetTextColor(hdc, GetSysColor(COLOR_HOTLIGHT));

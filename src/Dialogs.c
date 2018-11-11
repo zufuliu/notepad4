@@ -1988,6 +1988,7 @@ static INT_PTR CALLBACK WarnLineEndingDlgDlgProc(HWND hwnd, UINT umsg, WPARAM wP
 }
 
 BOOL WarnLineEndingDlg(HWND hwnd, struct EditFileIOStatus *status) {
+	MessageBeep(MB_ICONEXCLAMATION);
 	const INT_PTR iResult = ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_WARNLINEENDS), hwnd, WarnLineEndingDlgDlgProc, (LPARAM)status);
 	return iResult == IDOK;
 }
@@ -2018,6 +2019,17 @@ static INT_PTR CALLBACK InfoBoxDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 		CenterDlgInParent(hwnd);
 	}
 	return TRUE;
+
+	case WM_CTLCOLORSTATIC: {
+		const DWORD dwId = GetWindowLong((HWND)lParam, GWL_ID);
+
+		if (dwId >= IDC_INFOBOXRECT && dwId <= IDC_INFOBOXTEXT) {
+			HDC hdc = (HDC)wParam;
+			SetBkMode(hdc, TRANSPARENT);
+			return (LONG_PTR)GetSysColorBrush(COLOR_WINDOW);
+		}
+	}
+	break;
 
 	case WM_COMMAND:
 		switch (LOWORD(wParam)) {
@@ -2063,7 +2075,7 @@ INT_PTR InfoBox(int iType, LPCWSTR lpstrSetting, int uidMessage, ...) {
 	ib.lpstrSetting = (LPWSTR)lpstrSetting;
 	ib.bDisableCheckBox = StrIsEmpty(szIniFile) || StrIsEmpty(lpstrSetting) || iMode == 2;
 
-	const WORD idDlg = (iType == MBYESNO) ? IDD_INFOBOX2 : ((iType == MBOKCANCEL) ? IDD_INFOBOX3 : IDD_INFOBOX);
+	const WORD idDlg = (iType == MBYESNO) ? IDD_INFOBOX_YESNO : ((iType == MBOKCANCEL) ? IDD_INFOBOX_OKCANCEL : IDD_INFOBOX_OK);
 
 	HWND hwnd;
 	if ((hwnd = GetActiveWindow()) == NULL) {
@@ -2071,7 +2083,6 @@ INT_PTR InfoBox(int iType, LPCWSTR lpstrSetting, int uidMessage, ...) {
 	}
 
 	MessageBeep(MB_ICONEXCLAMATION);
-
 	return ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(idDlg), hwnd, InfoBoxDlgProc, (LPARAM)&ib);
 }
 
