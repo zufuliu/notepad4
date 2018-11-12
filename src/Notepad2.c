@@ -292,11 +292,10 @@ const int iLineEndings[3] = {
 	SC_EOL_CR
 };
 
-static WCHAR wchPrefixSelection[256] = L"";
-static WCHAR wchAppendSelection[256] = L"";
-
-static WCHAR wchPrefixLines[256] = L"";
-static WCHAR wchAppendLines[256] = L"";
+static WCHAR wchPrefixSelection[MAX_MODIFY_LINE_SIZE] = L"";
+static WCHAR wchAppendSelection[MAX_MODIFY_LINE_SIZE] = L"";
+static WCHAR wchPrefixLines[MAX_MODIFY_LINE_SIZE] = L"";
+static WCHAR wchAppendLines[MAX_MODIFY_LINE_SIZE] = L"";
 
 static int iSortOptions = 0;
 static int iAlignMode	 = 0;
@@ -3241,14 +3240,9 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		EndWaitCursor();
 		break;
 
-	case IDM_EDIT_INSERT_XMLTAG: {
-		WCHAR wszOpen[256] = L"";
-		WCHAR wszClose[256] = L"";
-		if (EditInsertTagDlg(hwnd, wszOpen, wszClose)) {
-			EditEncloseSelection(hwndEdit, wszOpen, wszClose);
-		}
-	}
-	break;
+	case IDM_EDIT_INSERT_XMLTAG:
+		EditInsertTagDlg(hwnd);
+		break;
 
 	case IDM_EDIT_INSERT_GUID: {
 		GUID guid;
