@@ -23,6 +23,13 @@
 
 #include "Sci_Position.h"
 
+// WideCharToMultiByte, UTF8 encoding of U+0800 to U+FFFF
+#define kMaxMultiByteCount	3
+
+#define NP2_FIND_REPLACE_LIMIT	2048
+#define NP2_LONG_LINE_LIMIT		4096
+#define MAX_MODIFY_LINE_SIZE	256
+
 typedef struct _editfindreplace {
 	char	szFind[512];
 	char	szReplace[512];
@@ -118,9 +125,6 @@ void	EditEnsureSelectionVisible(HWND hwnd);
 void	EditEnsureConsistentLineEndings(HWND hwnd);
 void	EditGetExcerpt(HWND hwnd, LPWSTR lpszExcerpt, DWORD cchExcerpt);
 
-#define NP2_FIND_REPLACE_LIMIT	2048
-#define NP2_LONG_LINE_LIMIT		4096
-
 void	EditSelectWord(HWND hwnd);
 void	EditSelectLine(HWND hwnd);
 HWND	EditFindReplaceDlg(HWND hwnd, LPCEDITFINDREPLACE lpefr, BOOL bReplace);
@@ -132,7 +136,7 @@ BOOL	EditReplaceAllInSelection(HWND hwnd, LPCEDITFINDREPLACE lpefr, BOOL bShowIn
 BOOL	EditLineNumDlg(HWND hwnd);
 BOOL	EditModifyLinesDlg(HWND hwnd, LPWSTR pwsz1, LPWSTR pwsz2);
 BOOL	EditEncloseSelectionDlg(HWND hwnd, LPWSTR pwszOpen, LPWSTR pwszClose);
-BOOL	EditInsertTagDlg(HWND hwnd, LPWSTR pwszOpen, LPWSTR pwszClose);
+void	EditInsertTagDlg(HWND hwnd);
 void	EditInsertUnicodeControlCharacter(HWND hwnd, int menu);
 void	EditShowUnicodeControlCharacter(HWND hwnd, BOOL bShow);
 BOOL	EditSortDlg(HWND hwnd, int *piSortFlags);
@@ -211,9 +215,6 @@ BOOL	IsUTF8(const char *pTest, DWORD nLength);
 BOOL	IsUTF7(const char *pTest, DWORD nLength);
 INT		UTF8_mbslen(LPCSTR source, INT byte_length);
 INT		UTF8_mbslen_bytes(LPCSTR utf8_string);
-
-// WideCharToMultiByte, UTF8 encoding of U+0800 to U+FFFF
-#define kMaxMultiByteCount	3
 
 static inline BOOL IsUTF8Signature(const char *p) {
 	UINT value = (*((UNALIGNED UINT*)p)) & 0xFFFFFF;

@@ -2222,12 +2222,12 @@ void EditModifyLines(HWND hwnd, LPCWSTR pwszPrefix, LPCWSTR pwszAppend) {
 
 	const UINT cpEdit = (UINT)SendMessage(hwnd, SCI_GETCODEPAGE, 0, 0);
 
-	char mszPrefix1[256] = "";
+	char mszPrefix1[MAX_MODIFY_LINE_SIZE * kMaxMultiByteCount] = "";
 	if (StrNotEmpty(pwszPrefix)) {
 		WideCharToMultiByte(cpEdit, 0, pwszPrefix, -1, mszPrefix1, COUNTOF(mszPrefix1), NULL, NULL);
 	}
 
-	char mszAppend1[256] = "";
+	char mszAppend1[MAX_MODIFY_LINE_SIZE * kMaxMultiByteCount] = "";
 	if (StrNotEmpty(pwszAppend)) {
 		WideCharToMultiByte(cpEdit, 0, pwszAppend, -1, mszAppend1, COUNTOF(mszAppend1), NULL, NULL);
 	}
@@ -2249,13 +2249,13 @@ void EditModifyLines(HWND hwnd, LPCWSTR pwszPrefix, LPCWSTR pwszAppend) {
 	}
 
 	const char *pszPrefixNumPad = "";
-	char mszPrefix2[256] = "";
+	char mszPrefix2[MAX_MODIFY_LINE_SIZE * kMaxMultiByteCount] = "";
 	int iPrefixNum = 0;
 	int iPrefixNumWidth = 1;
 	BOOL bPrefixNum = FALSE;
 
 	const char *pszAppendNumPad = "";
-	char mszAppend2[256] = "";
+	char mszAppend2[MAX_MODIFY_LINE_SIZE * kMaxMultiByteCount] = "";
 	int iAppendNum = 0;
 	int iAppendNumWidth = 1;
 	BOOL bAppendNum = FALSE;
@@ -2388,7 +2388,7 @@ void EditModifyLines(HWND hwnd, LPCWSTR pwszPrefix, LPCWSTR pwszAppend) {
 
 	for (int iLine = iLineStart; iLine <= iLineEnd; iLine++) {
 		if (StrNotEmpty(pwszPrefix)) {
-			char mszInsert[512];
+			char mszInsert[2 * MAX_MODIFY_LINE_SIZE * kMaxMultiByteCount];
 			strcpy(mszInsert, mszPrefix1);
 
 			if (bPrefixNum) {
@@ -2408,7 +2408,7 @@ void EditModifyLines(HWND hwnd, LPCWSTR pwszPrefix, LPCWSTR pwszAppend) {
 		}
 
 		if (StrNotEmpty(pwszAppend)) {
-			char mszInsert[512];
+			char mszInsert[2 * MAX_MODIFY_LINE_SIZE * kMaxMultiByteCount];
 			strcpy(mszInsert, mszAppend1);
 
 			if (bAppendNum) {
@@ -2708,12 +2708,12 @@ void EditEncloseSelection(HWND hwnd, LPCWSTR pwszOpen, LPCWSTR pwszClose) {
 	const int iSelEnd = (int)SendMessage(hwnd, SCI_GETSELECTIONEND, 0, 0);
 	const UINT cpEdit = (UINT)SendMessage(hwnd, SCI_GETCODEPAGE, 0, 0);
 
-	char mszOpen[256] = "";
+	char mszOpen[MAX_MODIFY_LINE_SIZE * kMaxMultiByteCount] = "";
 	if (StrNotEmpty(pwszOpen)) {
 		WideCharToMultiByte(cpEdit, 0, pwszOpen, -1, mszOpen, COUNTOF(mszOpen), NULL, NULL);
 	}
 
-	char mszClose[256] = "";
+	char mszClose[MAX_MODIFY_LINE_SIZE * kMaxMultiByteCount] = "";
 	if (StrNotEmpty(pwszClose)) {
 		WideCharToMultiByte(cpEdit, 0, pwszClose, -1, mszClose, COUNTOF(mszClose), NULL, NULL);
 	}
@@ -5400,9 +5400,9 @@ static INT_PTR CALLBACK EditModifyLinesDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 
 		PMODLINESDATA pdata = (PMODLINESDATA)lParam;
 		SetDlgItemText(hwnd, IDC_MODIFY_LINE_PREFIX, pdata->pwsz1);
-		SendDlgItemMessage(hwnd, IDC_MODIFY_LINE_PREFIX, EM_LIMITTEXT, 255, 0);
+		SendDlgItemMessage(hwnd, IDC_MODIFY_LINE_PREFIX, EM_LIMITTEXT, MAX_MODIFY_LINE_SIZE - 1, 0);
 		SetDlgItemText(hwnd, IDC_MODIFY_LINE_APPEND, pdata->pwsz2);
-		SendDlgItemMessage(hwnd, IDC_MODIFY_LINE_APPEND, EM_LIMITTEXT, 255, 0);
+		SendDlgItemMessage(hwnd, IDC_MODIFY_LINE_APPEND, EM_LIMITTEXT, MAX_MODIFY_LINE_SIZE - 1, 0);
 		CenterDlgInParent(hwnd);
 	}
 	return TRUE;
@@ -5537,8 +5537,8 @@ static INT_PTR CALLBACK EditModifyLinesDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 		case IDOK: {
 			PMODLINESDATA pdata = (PMODLINESDATA)GetWindowLongPtr(hwnd, DWLP_USER);
 			if (pdata) {
-				GetDlgItemText(hwnd, IDC_MODIFY_LINE_PREFIX, pdata->pwsz1, 256);
-				GetDlgItemText(hwnd, IDC_MODIFY_LINE_APPEND, pdata->pwsz2, 256);
+				GetDlgItemText(hwnd, IDC_MODIFY_LINE_PREFIX, pdata->pwsz1, MAX_MODIFY_LINE_SIZE);
+				GetDlgItemText(hwnd, IDC_MODIFY_LINE_APPEND, pdata->pwsz2, MAX_MODIFY_LINE_SIZE);
 			}
 			EndDialog(hwnd, IDOK);
 		}
@@ -5637,9 +5637,9 @@ static INT_PTR CALLBACK EditEncloseSelectionDlgProc(HWND hwnd, UINT umsg, WPARAM
 		ResizeDlg_InitX(hwnd, cxEncloseSelectionDlg, IDC_RESIZEGRIP2);
 
 		PENCLOSESELDATA pdata = (PENCLOSESELDATA)lParam;
-		SendDlgItemMessage(hwnd, IDC_MODIFY_LINE_PREFIX, EM_LIMITTEXT, 255, 0);
+		SendDlgItemMessage(hwnd, IDC_MODIFY_LINE_PREFIX, EM_LIMITTEXT, MAX_MODIFY_LINE_SIZE - 1, 0);
 		SetDlgItemText(hwnd, IDC_MODIFY_LINE_PREFIX, pdata->pwsz1);
-		SendDlgItemMessage(hwnd, IDC_MODIFY_LINE_APPEND, EM_LIMITTEXT, 255, 0);
+		SendDlgItemMessage(hwnd, IDC_MODIFY_LINE_APPEND, EM_LIMITTEXT, MAX_MODIFY_LINE_SIZE - 1, 0);
 		SetDlgItemText(hwnd, IDC_MODIFY_LINE_APPEND, pdata->pwsz2);
 		CenterDlgInParent(hwnd);
 	}
@@ -5672,8 +5672,8 @@ static INT_PTR CALLBACK EditEncloseSelectionDlgProc(HWND hwnd, UINT umsg, WPARAM
 		case IDOK: {
 			PENCLOSESELDATA pdata = (PENCLOSESELDATA)GetWindowLongPtr(hwnd, DWLP_USER);
 			if (pdata) {
-				GetDlgItemText(hwnd, IDC_MODIFY_LINE_PREFIX, pdata->pwsz1, 256);
-				GetDlgItemText(hwnd, IDC_MODIFY_LINE_APPEND, pdata->pwsz2, 256);
+				GetDlgItemText(hwnd, IDC_MODIFY_LINE_PREFIX, pdata->pwsz1, MAX_MODIFY_LINE_SIZE);
+				GetDlgItemText(hwnd, IDC_MODIFY_LINE_APPEND, pdata->pwsz2, MAX_MODIFY_LINE_SIZE);
 			}
 			EndDialog(hwnd, IDOK);
 		}
@@ -5704,22 +5704,15 @@ BOOL EditEncloseSelectionDlg(HWND hwnd, LPWSTR pwszOpen, LPWSTR pwszClose) {
 // EditInsertTagDlgProc()
 //
 //
-
-typedef struct _tagsdata {
-	LPWSTR pwsz1;
-	LPWSTR pwsz2;
-} TAGSDATA, *PTAGSDATA;
-
 static INT_PTR CALLBACK EditInsertTagDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
 	switch (umsg) {
 	case WM_INITDIALOG: {
-		SetWindowLongPtr(hwnd, DWLP_USER, lParam);
 		ResizeDlg_InitX(hwnd, cxInsertTagDlg, IDC_RESIZEGRIP2);
 
-		SendDlgItemMessage(hwnd, IDC_MODIFY_LINE_PREFIX, EM_LIMITTEXT, 254, 0);
+		SendDlgItemMessage(hwnd, IDC_MODIFY_LINE_PREFIX, EM_LIMITTEXT, MAX_MODIFY_LINE_SIZE - 1, 0);
 		SetDlgItemText(hwnd, IDC_MODIFY_LINE_PREFIX, L"<tag>");
 
-		SendDlgItemMessage(hwnd, IDC_MODIFY_LINE_APPEND, EM_LIMITTEXT, 255, 0);
+		SendDlgItemMessage(hwnd, IDC_MODIFY_LINE_APPEND, EM_LIMITTEXT, MAX_MODIFY_LINE_SIZE - 1, 0);
 		SetDlgItemText(hwnd, IDC_MODIFY_LINE_APPEND, L"</tag>");
 
 		SetFocus(GetDlgItem(hwnd, IDC_MODIFY_LINE_PREFIX));
@@ -5754,13 +5747,13 @@ static INT_PTR CALLBACK EditInsertTagDlgProc(HWND hwnd, UINT umsg, WPARAM wParam
 		switch (LOWORD(wParam)) {
 		case IDC_MODIFY_LINE_PREFIX: {
 			if (HIWORD(wParam) == EN_CHANGE) {
-				WCHAR wchBuf[256];
+				WCHAR wchBuf[MAX_MODIFY_LINE_SIZE];
 				BOOL bClear = TRUE;
 
-				GetDlgItemText(hwnd, IDC_MODIFY_LINE_PREFIX, wchBuf, 256);
+				GetDlgItemText(hwnd, IDC_MODIFY_LINE_PREFIX, wchBuf, MAX_MODIFY_LINE_SIZE);
 				if (lstrlen(wchBuf) >= 3) {
 					if (wchBuf[0] == L'<') {
-						WCHAR wchIns[256] = L"</";
+						WCHAR wchIns[MAX_MODIFY_LINE_SIZE] = L"</";
 						int	cchIns = 2;
 						const WCHAR *pwCur = wchBuf + 1;
 
@@ -5807,11 +5800,14 @@ static INT_PTR CALLBACK EditInsertTagDlgProc(HWND hwnd, UINT umsg, WPARAM wParam
 		break;
 
 		case IDOK: {
-			PTAGSDATA pdata = (PTAGSDATA)GetWindowLongPtr(hwnd, DWLP_USER);
-			if (pdata) {
-				GetDlgItemText(hwnd, IDC_MODIFY_LINE_PREFIX, pdata->pwsz1, 256);
-				GetDlgItemText(hwnd, IDC_MODIFY_LINE_APPEND, pdata->pwsz2, 256);
-			}
+			WCHAR wszOpen[MAX_MODIFY_LINE_SIZE];
+			WCHAR wszClose[MAX_MODIFY_LINE_SIZE];
+			GetDlgItemText(hwnd, IDC_MODIFY_LINE_PREFIX, wszOpen, COUNTOF(wszOpen));
+			GetDlgItemText(hwnd, IDC_MODIFY_LINE_APPEND, wszClose, COUNTOF(wszClose));
+
+			BeginWaitCursor();
+			EditEncloseSelection(hwndEdit, wszOpen, wszClose);
+			EndWaitCursor();
 			EndDialog(hwnd, IDOK);
 		}
 		break;
@@ -5830,10 +5826,8 @@ static INT_PTR CALLBACK EditInsertTagDlgProc(HWND hwnd, UINT umsg, WPARAM wParam
 //
 // EditInsertTagDlg()
 //
-BOOL EditInsertTagDlg(HWND hwnd, LPWSTR pwszOpen, LPWSTR pwszClose) {
-	TAGSDATA data = { pwszOpen, pwszClose };
-	const INT_PTR iResult = ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_INSERTTAG), hwnd, EditInsertTagDlgProc, (LPARAM)&data);
-	return iResult == IDOK;
+void EditInsertTagDlg(HWND hwnd) {
+	ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_INSERTTAG), hwnd, EditInsertTagDlgProc, 0);
 }
 
 typedef struct UnicodeControlCharacter {
