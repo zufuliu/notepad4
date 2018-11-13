@@ -1759,26 +1759,34 @@ static PEDITLEXER Style_GetLexerFromFile(HWND hwnd, LPCWSTR lpszFile, BOOL bCGIG
 			}
 		}
 
-		if (!bFound && (StrCaseEqual(lpszName, L"build.xml") || StrCaseEqual(lpszName, L"javadoc.xml"))) {
+		if (!bFound && StrCaseEqual(lpszExt, L"xml")) {
 			pLexNew = &lexXML;
 			bFound = TRUE;
-			np2LexLangIndex = IDM_LANG_ANT_BUILD;
+			if (StrCaseEqual(lpszName, L"build.xml") || StrCaseEqual(lpszName, L"javadoc.xml")) {
+				np2LexLangIndex = IDM_LANG_ANT_BUILD;
+			} else if (StrCaseEqual(lpszName, L"pom.xml")) {
+				np2LexLangIndex = IDM_LANG_MAVEN_POM;
+			} else if (StrCaseEqual(lpszName, L"settings.xml")) {
+				np2LexLangIndex = IDM_LANG_MAVEN_SETTINGS;
+			} else if (StrCaseEqual(lpszName, L"AndroidManifest.xml")) {
+				np2LexLangIndex = IDM_LANG_ANDROID_MANIFEST;
+			} else if (StrCaseEqual(lpszName, L"server.xml")) {
+				np2LexLangIndex = IDM_LANG_TOMCAT;
+			} else if (StrCaseEqual(lpszName, L"web.xml")) {
+				np2LexLangIndex = IDM_LANG_WEB_JAVA;
+			} else if (StrCaseEqual(lpszName, L"struts.xml") || StrCaseEqual(lpszName, L"struts-config.xml")) {
+				np2LexLangIndex = IDM_LANG_STRUTS;
+			} else if (StrCaseEqual(lpszName, L"hibernate.cfg.xml")) {
+				np2LexLangIndex = IDM_LANG_HIB_CFG;
+			} else if (StrCaseEqual(lpszName, L"ivy.xml")) {
+				np2LexLangIndex = IDM_LANG_IVY_MODULE;
+			} else if (StrCaseEqual(lpszName, L"ivysettings.xml")) {
+				np2LexLangIndex = IDM_LANG_IVY_SETTINGS;
+			} else if (StrCaseEqual(lpszName, L"pmd.xml")) {
+				np2LexLangIndex = IDM_LANG_PMD_RULESET;
+			}
 		}
-		if (!bFound && StrCaseEqual(lpszName, L"pom.xml")) {
-			pLexNew = &lexXML;
-			bFound = TRUE;
-			np2LexLangIndex = IDM_LANG_MAVEN_POM;
-		}
-		if (!bFound && StrCaseEqual(lpszName, L"settings.xml")) {
-			pLexNew = &lexXML;
-			bFound = TRUE;
-			np2LexLangIndex = IDM_LANG_MAVEN_SETTINGS;
-		}
-		if (!bFound && StrCaseEqual(lpszName, L"AndroidManifest.xml")) {
-			pLexNew = &lexXML;
-			bFound = TRUE;
-			np2LexLangIndex = IDM_LANG_ANDROID_MANIFEST;
-		}
+
 		if (!bFound && ((StrCaseEqual(lpszExt, L"conf") && StrNCaseEqual(lpszName, L"httpd", 5)) || StrCaseEqual(lpszExt, L"htaccess"))) {
 			pLexNew = &lexCONF;
 			bFound = TRUE;
@@ -1789,47 +1797,11 @@ static PEDITLEXER Style_GetLexerFromFile(HWND hwnd, LPCWSTR lpszFile, BOOL bCGIG
 			pLexNew = &lexCONF;
 			bFound = TRUE;
 		}
-		if (!bFound && StrCaseEqual(lpszName, L"server.xml")) {
-			pLexNew = &lexXML;
-			bFound = TRUE;
-			np2LexLangIndex = IDM_LANG_TOMCAT;
-		}
-		if (!bFound && StrCaseEqual(lpszName, L"web.xml")) {
-			pLexNew = &lexXML;
-			bFound = TRUE;
-			np2LexLangIndex = IDM_LANG_WEB_JAVA;
-		}
 		if (!bFound && StrCaseEqual(lpszName, L"web.config")) {
 			pLexNew = &lexXML;
 			bFound = TRUE;
 			np2LexLangIndex = IDM_LANG_WEB_NET;
 		}
-		if (!bFound && (StrCaseEqual(lpszName, L"struts.xml") || StrCaseEqual(lpszName, L"struts-config.xml"))) {
-			pLexNew = &lexXML;
-			bFound = TRUE;
-			np2LexLangIndex = IDM_LANG_STRUTS;
-		}
-		if (!bFound && StrCaseEqual(lpszName, L"hibernate.cfg.xml")) {
-			pLexNew = &lexXML;
-			bFound = TRUE;
-			np2LexLangIndex = IDM_LANG_HIB_CFG;
-		}
-		if (!bFound && StrCaseEqual(lpszName, L"ivy.xml")) {
-			pLexNew = &lexXML;
-			bFound = TRUE;
-			np2LexLangIndex = IDM_LANG_IVY_MODULE;
-		}
-		if (!bFound && StrCaseEqual(lpszName, L"ivysettings.xml")) {
-			pLexNew = &lexXML;
-			bFound = TRUE;
-			np2LexLangIndex = IDM_LANG_IVY_SETTINGS;
-		}
-		if (!bFound && StrCaseEqual(lpszName, L"pmd.xml")) {
-			pLexNew = &lexXML;
-			bFound = TRUE;
-			np2LexLangIndex = IDM_LANG_PMD_RULESET;
-		}
-
 		if (!bFound && (StrCaseEqual(lpszName, L"CMakeLists.txt") || StrCaseEqual(lpszName, L"CMakeCache.txt") || StrRStrI(lpszFile, NULL, L".cmake.in"))) {
 			pLexNew = &lexCMake;
 			bFound = TRUE;
