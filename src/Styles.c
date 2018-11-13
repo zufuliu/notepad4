@@ -1871,11 +1871,15 @@ void Style_SetLexerFromFile(HWND hwnd, LPCWSTR lpszFile) {
 	}
 
 	// xml/html
-	if (!bFound && bAutoSelect && (!fNoHTMLGuess || !fNoCGIGuess)) {
+	if ((!bFound && bAutoSelect && (!fNoHTMLGuess || !fNoCGIGuess)) || (bFound && pLexNew->rid == NP2LEX_PHP)) {
 		char tchText[256];
 		SendMessage(hwnd, SCI_GETTEXT, COUNTOF(tchText) - 1, (LPARAM)tchText);
 		StrTrimA(tchText, " \t\n\r");
-		if (!fNoHTMLGuess && tchText[0] == '<') {
+		if (pLexNew->rid == NP2LEX_PHP) {
+			if (strncmp(tchText, "<?php", 5) != 0) {
+				pLexNew = &lexHTML;
+			}
+		} else if (!fNoHTMLGuess && tchText[0] == '<') {
 			if (StrStrIA(tchText, "<html")) {
 				pLexNew = &lexHTML;
 			} else {
