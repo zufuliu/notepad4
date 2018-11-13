@@ -1269,10 +1269,10 @@ static void FoldCppDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 				levelNext--;
 			}
 		}
-		if (style == SCE_C_TRIPLEVERBATIM) {
-			if (stylePrev != SCE_C_TRIPLEVERBATIM) {
+		if (style == SCE_C_TRIPLEVERBATIM || style == SCE_C_VERBATIM) {
+			if (stylePrev != style) {
 				levelNext++;
-			} else if (styleNext != SCE_C_TRIPLEVERBATIM && !atEOL) {
+			} else if (styleNext != style && !atEOL) {
 				levelNext--;
 			}
 		}
