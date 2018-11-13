@@ -5363,28 +5363,29 @@ typedef struct _modlinesdata {
 } MODLINESDATA, *PMODLINESDATA;
 
 extern int cxModifyLinesDlg;
+extern int cyModifyLinesDlg;
 extern int cxEncloseSelectionDlg;
+extern int cyEncloseSelectionDlg;
 extern int cxInsertTagDlg;
+extern int cyInsertTagDlg;
 
 static INT_PTR CALLBACK EditModifyLinesDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
 	static int id_hover;
 	static int id_capture;
-
-	static HFONT hFontNormal;
 	static HFONT hFontHover;
-
 	static HCURSOR hCursorNormal;
 	static HCURSOR hCursorHover;
 
 	switch (umsg) {
 	case WM_INITDIALOG: {
 		SetWindowLongPtr(hwnd, DWLP_USER, lParam);
-		ResizeDlg_InitX(hwnd, cxModifyLinesDlg, IDC_RESIZEGRIP2);
+		ResizeDlg_Init(hwnd, cxModifyLinesDlg, cyModifyLinesDlg, IDC_RESIZEGRIP2);
 
 		id_hover = 0;
 		id_capture = 0;
 
-		if (NULL == (hFontNormal = (HFONT)SendDlgItemMessage(hwnd, IDC_MODIFY_LINE_DLN_NP, WM_GETFONT, 0, 0))) {
+		HFONT hFontNormal = (HFONT)SendDlgItemMessage(hwnd, IDC_MODIFY_LINE_DLN_NP, WM_GETFONT, 0, 0);
+		if (hFontNormal == NULL) {
 			hFontNormal = GetStockObject(DEFAULT_GUI_FONT);
 		}
 
@@ -5408,21 +5409,34 @@ static INT_PTR CALLBACK EditModifyLinesDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 	return TRUE;
 
 	case WM_DESTROY:
-		ResizeDlg_Destroy(hwnd, &cxModifyLinesDlg, NULL);
+		ResizeDlg_Destroy(hwnd, &cxModifyLinesDlg, &cyModifyLinesDlg);
 		DeleteObject(hFontHover);
 		return FALSE;
 
 	case WM_SIZE: {
 		int dx;
+		int dy;
 
-		ResizeDlg_Size(hwnd, lParam, &dx, NULL);
-		HDWP hdwp = BeginDeferWindowPos(5);
-		hdwp = DeferCtlPos(hdwp, hwnd, IDC_RESIZEGRIP2, dx, 0, SWP_NOSIZE);
-		hdwp = DeferCtlPos(hdwp, hwnd, IDOK, dx, 0, SWP_NOSIZE);
-		hdwp = DeferCtlPos(hdwp, hwnd, IDCANCEL, dx, 0, SWP_NOSIZE);
-		hdwp = DeferCtlPos(hdwp, hwnd, IDC_MODIFY_LINE_PREFIX, dx, 0, SWP_NOMOVE);
-		hdwp = DeferCtlPos(hdwp, hwnd, IDC_MODIFY_LINE_APPEND, dx, 0, SWP_NOMOVE);
+		ResizeDlg_Size(hwnd, lParam, &dx, &dy);
+		const int cy = (dy > 0) ? (dy - dy / 2) : (dy / 2);
+		HDWP hdwp = BeginDeferWindowPos(15);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDC_RESIZEGRIP2, dx, dy, SWP_NOSIZE);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDOK, dx, dy, SWP_NOSIZE);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDCANCEL, dx, dy, SWP_NOSIZE);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDC_MODIFY_LINE_PREFIX, dx, cy, SWP_NOMOVE);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDC_MODIFY_LINE_APPEND, 0, cy, SWP_NOSIZE);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDC_MODIFY_LINE_TIP2, 0, cy, SWP_NOSIZE);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDC_MODIFY_LINE_DLN_NP, 0, dy, SWP_NOSIZE);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDC_MODIFY_LINE_DLN_ZP, 0, dy, SWP_NOSIZE);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDC_MODIFY_LINE_TIP_DLN, 0, dy, SWP_NOSIZE);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDC_MODIFY_LINE_CN_NP, 0, dy, SWP_NOSIZE);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDC_MODIFY_LINE_CN_ZP, 0, dy, SWP_NOSIZE);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDC_MODIFY_LINE_TIP_CN, 0, dy, SWP_NOSIZE);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDC_MODIFY_LINE_ZCN_NP, 0, dy, SWP_NOSIZE);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDC_MODIFY_LINE_ZCN_ZP, 0, dy, SWP_NOSIZE);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDC_MODIFY_LINE_TIP_ZCN, 0, dy, SWP_NOSIZE);
 		EndDeferWindowPos(hdwp);
+		ResizeDlgCtl(hwnd, IDC_MODIFY_LINE_APPEND, dx, dy - cy);
 	}
 	return TRUE;
 
@@ -5634,7 +5648,7 @@ static INT_PTR CALLBACK EditEncloseSelectionDlgProc(HWND hwnd, UINT umsg, WPARAM
 	switch (umsg) {
 	case WM_INITDIALOG: {
 		SetWindowLongPtr(hwnd, DWLP_USER, lParam);
-		ResizeDlg_InitX(hwnd, cxEncloseSelectionDlg, IDC_RESIZEGRIP2);
+		ResizeDlg_Init(hwnd, cxEncloseSelectionDlg, cyEncloseSelectionDlg, IDC_RESIZEGRIP2);
 
 		PENCLOSESELDATA pdata = (PENCLOSESELDATA)lParam;
 		SendDlgItemMessage(hwnd, IDC_MODIFY_LINE_PREFIX, EM_LIMITTEXT, MAX_MODIFY_LINE_SIZE - 1, 0);
@@ -5646,20 +5660,24 @@ static INT_PTR CALLBACK EditEncloseSelectionDlgProc(HWND hwnd, UINT umsg, WPARAM
 	return TRUE;
 
 	case WM_DESTROY:
-		ResizeDlg_Destroy(hwnd, &cxEncloseSelectionDlg, NULL);
+		ResizeDlg_Destroy(hwnd, &cxEncloseSelectionDlg, &cyEncloseSelectionDlg);
 		return FALSE;
 
 	case WM_SIZE: {
 		int dx;
+		int dy;
 
-		ResizeDlg_Size(hwnd, lParam, &dx, NULL);
-		HDWP hdwp = BeginDeferWindowPos(5);
-		hdwp = DeferCtlPos(hdwp, hwnd, IDC_RESIZEGRIP2, dx, 0, SWP_NOSIZE);
-		hdwp = DeferCtlPos(hdwp, hwnd, IDOK, dx, 0, SWP_NOSIZE);
-		hdwp = DeferCtlPos(hdwp, hwnd, IDCANCEL, dx, 0, SWP_NOSIZE);
-		hdwp = DeferCtlPos(hdwp, hwnd, IDC_MODIFY_LINE_PREFIX, dx, 0, SWP_NOMOVE);
-		hdwp = DeferCtlPos(hdwp, hwnd, IDC_MODIFY_LINE_APPEND, dx, 0, SWP_NOMOVE);
+		ResizeDlg_Size(hwnd, lParam, &dx, &dy);
+		const int cy = (dy > 0) ? (dy - dy / 2) : (dy / 2);
+		HDWP hdwp = BeginDeferWindowPos(6);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDC_RESIZEGRIP2, dx, dy, SWP_NOSIZE);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDOK, dx, dy, SWP_NOSIZE);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDCANCEL, dx, dy, SWP_NOSIZE);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDC_MODIFY_LINE_PREFIX, dx, cy, SWP_NOMOVE);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDC_MODIFY_LINE_APPEND, 0, cy, SWP_NOSIZE);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDC_MODIFY_LINE_TIP2, 0, cy, SWP_NOSIZE);
 		EndDeferWindowPos(hdwp);
+		ResizeDlgCtl(hwnd, IDC_MODIFY_LINE_APPEND, dx, dy - cy);
 	}
 	return TRUE;
 
@@ -5707,7 +5725,7 @@ BOOL EditEncloseSelectionDlg(HWND hwnd, LPWSTR pwszOpen, LPWSTR pwszClose) {
 static INT_PTR CALLBACK EditInsertTagDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
 	switch (umsg) {
 	case WM_INITDIALOG: {
-		ResizeDlg_InitX(hwnd, cxInsertTagDlg, IDC_RESIZEGRIP2);
+		ResizeDlg_Init(hwnd, cxInsertTagDlg, cyInsertTagDlg, IDC_RESIZEGRIP2);
 
 		SendDlgItemMessage(hwnd, IDC_MODIFY_LINE_PREFIX, EM_LIMITTEXT, MAX_MODIFY_LINE_SIZE - 1, 0);
 		SetDlgItemText(hwnd, IDC_MODIFY_LINE_PREFIX, L"<tag>");
@@ -5722,20 +5740,23 @@ static INT_PTR CALLBACK EditInsertTagDlgProc(HWND hwnd, UINT umsg, WPARAM wParam
 	return FALSE;
 
 	case WM_DESTROY:
-		ResizeDlg_Destroy(hwnd, &cxInsertTagDlg, NULL);
+		ResizeDlg_Destroy(hwnd, &cxInsertTagDlg, &cyInsertTagDlg);
 		return FALSE;
 
 	case WM_SIZE: {
 		int dx;
+		int dy;
 
-		ResizeDlg_Size(hwnd, lParam, &dx, NULL);
-		HDWP hdwp = BeginDeferWindowPos(5);
-		hdwp = DeferCtlPos(hdwp, hwnd, IDC_RESIZEGRIP2, dx, 0, SWP_NOSIZE);
-		hdwp = DeferCtlPos(hdwp, hwnd, IDOK, dx, 0, SWP_NOSIZE);
-		hdwp = DeferCtlPos(hdwp, hwnd, IDCANCEL, dx, 0, SWP_NOSIZE);
-		hdwp = DeferCtlPos(hdwp, hwnd, IDC_MODIFY_LINE_PREFIX, dx, 0, SWP_NOMOVE);
-		hdwp = DeferCtlPos(hdwp, hwnd, IDC_MODIFY_LINE_APPEND, dx, 0, SWP_NOMOVE);
+		ResizeDlg_Size(hwnd, lParam, &dx, &dy);
+		HDWP hdwp = BeginDeferWindowPos(6);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDC_RESIZEGRIP2, dx, dy, SWP_NOSIZE);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDOK, dx, dy, SWP_NOSIZE);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDCANCEL, dx, dy, SWP_NOSIZE);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDC_MODIFY_LINE_PREFIX, dx, dy, SWP_NOMOVE);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDC_MODIFY_LINE_APPEND, 0, dy, SWP_NOSIZE);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDC_MODIFY_LINE_TIP2, 0, dy, SWP_NOSIZE);
 		EndDeferWindowPos(hdwp);
+		ResizeDlgCtl(hwnd, IDC_MODIFY_LINE_APPEND, dx, 0);
 	}
 	return TRUE;
 
