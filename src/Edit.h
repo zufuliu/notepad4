@@ -42,9 +42,7 @@ typedef struct _editfindreplace {
 	BOOL	bReplaceClose;
 	BOOL	bNoFindWrap;
 	HWND	hwnd;
-#ifdef BOOKMARK_EDITION
 	BOOL	bWildcardSearch;
-#endif
 	//HANDLE hMRUFind;
 	//HANDLE hMRUReplace;
 } EDITFINDREPLACE, *LPEDITFINDREPLACE, *LPCEDITFINDREPLACE;

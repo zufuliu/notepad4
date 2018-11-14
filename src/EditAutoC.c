@@ -986,7 +986,6 @@ void EditAutoIndent(HWND hwnd) {
 	//const int iLineLength = (int)SendMessage(hwnd, SCI_LINELENGTH, iCurLine, 0);
 	//const int iIndentBefore = (int)SendMessage(hwnd, SCI_GETLINEINDENTATION, iCurLine - 1, 0);
 
-#ifdef BOOKMARK_EDITION
 	// Move bookmark along with line if inserting lines (pressing return at beginning of line) because Scintilla does not do this for us
 	if (iCurLine > 0) {
 		const int iPrevLineLength = (int)SendMessage(hwnd, SCI_GETLINEENDPOSITION, iCurLine - 1, 0) -
@@ -999,7 +998,6 @@ void EditAutoIndent(HWND hwnd) {
 			}
 		}
 	}
-#endif
 
 	if (iCurLine > 0/* && iLineLength <= 2*/) {
 		const int iPrevLineLength = (int)SendMessage(hwnd, SCI_LINELENGTH, iCurLine - 1, 0);
