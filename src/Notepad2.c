@@ -327,11 +327,7 @@ struct CachedStatusItem {
 #if NP2_GET_LEXER_STYLE_NAME_FROM_RES
 	WCHAR tchLexerName[MAX_EDITLEXER_NAME_SIZE];
 #endif
-#ifdef BOOKMARK_EDITION
 	WCHAR tchDocPosFmt[96];
-#else
-	WCHAR tchDocPosFmt[64];
-#endif
 } cachedStatusItem;
 
 HINSTANCE	g_hInstance;
@@ -347,7 +343,6 @@ static WCHAR g_wchWorkingDirectory[MAX_PATH] = L"";
 #define	NP2_BookmarkLineForeColor	(0xff << 8)
 #define NP2_BookmarkLineColorAlpha	40
 
-#ifdef BOOKMARK_EDITION
 //Graphics for bookmark indicator
 /* XPM */
 static const char* const bookmark_pixmap[] = {
@@ -408,7 +403,6 @@ static const char* const bookmark_pixmap[] = {
 	"  a2bc}de  ",
 	"           "
 };
-#endif
 
 //=============================================================================
 //
@@ -2322,12 +2316,10 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	EnableCmd(hmenu, IDM_EDIT_SELTOMATCHINGBRACE, i);
 	EnableCmd(hmenu, CMD_JUMP2SELSTART, i);
 	EnableCmd(hmenu, CMD_JUMP2SELEND, i);
-#ifdef BOOKMARK_EDITION
 	EnableCmd(hmenu, BME_EDIT_BOOKMARKPREV, i);
 	EnableCmd(hmenu, BME_EDIT_BOOKMARKNEXT, i);
 	EnableCmd(hmenu, BME_EDIT_BOOKMARKTOGGLE, i);
 	EnableCmd(hmenu, BME_EDIT_BOOKMARKCLEAR, i);
-#endif
 	EnableCmd(hmenu, IDM_EDIT_DELETELINELEFT, i);
 	EnableCmd(hmenu, IDM_EDIT_DELETELINERIGHT, i);
 	EnableCmd(hmenu, CMD_CTRLBACK, i);
@@ -3597,7 +3589,6 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		}
 		break;
 
-#ifdef BOOKMARK_EDITION
 	// Main Bookmark Functions
 	case BME_EDIT_BOOKMARKNEXT: {
 		const int iPos = (int)SendMessage(hwndEdit, SCI_GETCURRENTPOS, 0, 0);
@@ -3666,7 +3657,6 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case BME_EDIT_BOOKMARKCLEAR:
 		SendMessage(hwndEdit, SCI_MARKERDELETEALL, (WPARAM)(-1), 0);
 		break;
-#endif
 
 	case IDM_EDIT_FINDNEXT:
 	case IDM_EDIT_FINDPREV:
@@ -3864,7 +3854,6 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		bShowSelectionMargin = !bShowSelectionMargin;
 		UpdateSelectionMarginWidth();
 
-#ifdef BOOKMARK_EDITION
 		//Depending on if the margin is visible or not, choose different bookmark indication
 		if (bShowSelectionMargin) {
 			SendMessage(hwndEdit, SCI_MARKERDEFINEPIXMAP, 0, (LPARAM)bookmark_pixmap);
@@ -3873,7 +3862,6 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			SendMessage(hwndEdit, SCI_MARKERSETALPHA, 0, NP2_BookmarkLineColorAlpha);
 			SendMessage(hwndEdit, SCI_MARKERDEFINE, 0, SC_MARK_BACKGROUND);
 		}
-#endif
 
 		break;
 
@@ -5484,9 +5472,7 @@ void LoadSettings(void) {
 			efrData.fuFlags |= SCFIND_REGEXP | SCFIND_POSIX;
 		}
 		efrData.bTransformBS = IniSectionGetBool(pIniSection, L"FindReplaceTransformBackslash", 0);
-#ifdef BOOKMARK_EDITION
 		efrData.bWildcardSearch = IniSectionGetBool(pIniSection, L"FindReplaceWildcardSearch", 0);
-#endif
 	}
 
 	LoadIniSection(INI_SECTION_NAME_TOOLBAR_IMAGES, pIniSectionBuf, cchIniSection);
@@ -5692,9 +5678,7 @@ void SaveSettings(BOOL bSaveSettingsNow) {
 		IniSectionSetBoolEx(pIniSection, L"FindReplaceMatchBeginingWordOnly", (efrData.fuFlags & SCFIND_WORDSTART), 0);
 		IniSectionSetBoolEx(pIniSection, L"FindReplaceRegExpSearch", (efrData.fuFlags & (SCFIND_REGEXP | SCFIND_POSIX)), 0);
 		IniSectionSetBoolEx(pIniSection, L"FindReplaceTransformBackslash", efrData.bTransformBS, 0);
-#ifdef BOOKMARK_EDITION
 		IniSectionSetBoolEx(pIniSection, L"FindReplaceWildcardSearch", efrData.bWildcardSearch, 0);
-#endif
 	}
 
 	SaveIniSection(INI_SECTION_NAME_SETTINGS, pIniSectionBuf);
@@ -6674,13 +6658,9 @@ void UpdateStatusbar(void) {
 	WCHAR tchSel[32];
 	WCHAR tchSelCh[32];
 	WCHAR tchDocPos[256];
-
 	WCHAR tchDocSize[32];
-
-#ifdef BOOKMARK_EDITION
 	WCHAR tchLinesSelected[32];
 	WCHAR tchMatchesCount[32];
-#endif
 
 	Sci_Position iPos =  SciCall_GetCurrentPos();
 
@@ -6726,7 +6706,6 @@ void UpdateStatusbar(void) {
 		lstrcpy(tchSelCh, L"--");
 	}
 
-#ifdef BOOKMARK_EDITION
 	// Print number of lines selected lines in statusbar
 	if (iSelStart == iSelEnd) {
 		lstrcpy(tchLinesSelected, L"0");
@@ -6747,9 +6726,6 @@ void UpdateStatusbar(void) {
 
 	wsprintf(tchDocPos, cachedStatusItem.tchDocPosFmt, tchLn, tchLines,
 				 tchCol, tchCols, tchCh, tchChs, tchSelCh, tchSel, tchLinesSelected, tchMatchesCount);
-#else
-	wsprintf(tchDocPos, cachedStatusItem.tchDocPosFmt, tchLn, tchLines, tchCol, tchCols, tchCh, tchChs, tchSelCh, tchSel);
-#endif
 
 	const int iBytes = SciCall_GetLength();
 	StrFormatByteSize(iBytes, tchDocSize, COUNTOF(tchDocSize));

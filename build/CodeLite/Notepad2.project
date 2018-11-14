@@ -253,7 +253,6 @@
         <Preprocessor Value="UNICODE"/>
         <Preprocessor Value="_UNICODE"/>
         <Preprocessor Value="SCI_LEXER"/>
-        <Preprocessor Value="BOOKMARK_EDITION"/>
         <Preprocessor Value="NO_CXX11_REGEX"/>
       </Compiler>
       <Linker Options="-mwindows;-mthreads;-municode">
@@ -270,7 +269,7 @@
         <Library Value="uuid.a"/>
         <Library Value="imm32.a"/>
       </Linker>
-      <ResourceCompiler Options="-DRC_INVOKED;-DUNICODE;-D_UNICODE;-DBOOKMARK_EDITION;"/>
+      <ResourceCompiler Options="-DRC_INVOKED;-DUNICODE;-D_UNICODE;"/>
     </GlobalSettings>
     <Configuration Name="Debug_Win32" CompilerType="MinGW ( gcc )" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
       <Compiler Options="-g;-O0" C_Options="-g;-O0" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
