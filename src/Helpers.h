@@ -394,6 +394,7 @@ void ResizeDlg_Size(HWND hwnd, LPARAM lParam, int *cx, int *cy);
 void ResizeDlg_GetMinMaxInfo(HWND hwnd, LPARAM lParam);
 HDWP DeferCtlPos(HDWP hdwp, HWND hwndDlg, int nCtlId, int dx, int dy, UINT uFlags);
 void ResizeDlgCtl(HWND hwndDlg, int nCtlId, int dx, int dy);
+void MultilineEditSetup(HWND hwnd, int nCtlId);
 void MakeBitmapButton(HWND hwnd, int nCtlId, HINSTANCE hInstance, WORD wBmpId);
 void MakeColorPickButton(HWND hwnd, int nCtlId, HINSTANCE hInstance, COLORREF crColor);
 void DeleteBitmapButton(HWND hwnd, int nCtlId);

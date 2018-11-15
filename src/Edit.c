@@ -5371,8 +5371,10 @@ static INT_PTR CALLBACK EditModifyLinesDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 		}
 
 		PMODLINESDATA pdata = (PMODLINESDATA)lParam;
+		MultilineEditSetup(hwnd, IDC_MODIFY_LINE_PREFIX);
 		SetDlgItemText(hwnd, IDC_MODIFY_LINE_PREFIX, pdata->pwsz1);
 		SendDlgItemMessage(hwnd, IDC_MODIFY_LINE_PREFIX, EM_LIMITTEXT, MAX_MODIFY_LINE_SIZE - 1, 0);
+		MultilineEditSetup(hwnd, IDC_MODIFY_LINE_APPEND);
 		SetDlgItemText(hwnd, IDC_MODIFY_LINE_APPEND, pdata->pwsz2);
 		SendDlgItemMessage(hwnd, IDC_MODIFY_LINE_APPEND, EM_LIMITTEXT, MAX_MODIFY_LINE_SIZE - 1, 0);
 		CenterDlgInParent(hwnd);
@@ -5622,8 +5624,10 @@ static INT_PTR CALLBACK EditEncloseSelectionDlgProc(HWND hwnd, UINT umsg, WPARAM
 		ResizeDlg_Init(hwnd, cxEncloseSelectionDlg, cyEncloseSelectionDlg, IDC_RESIZEGRIP2);
 
 		PENCLOSESELDATA pdata = (PENCLOSESELDATA)lParam;
+		MultilineEditSetup(hwnd, IDC_MODIFY_LINE_PREFIX);
 		SendDlgItemMessage(hwnd, IDC_MODIFY_LINE_PREFIX, EM_LIMITTEXT, MAX_MODIFY_LINE_SIZE - 1, 0);
 		SetDlgItemText(hwnd, IDC_MODIFY_LINE_PREFIX, pdata->pwsz1);
+		MultilineEditSetup(hwnd, IDC_MODIFY_LINE_APPEND);
 		SendDlgItemMessage(hwnd, IDC_MODIFY_LINE_APPEND, EM_LIMITTEXT, MAX_MODIFY_LINE_SIZE - 1, 0);
 		SetDlgItemText(hwnd, IDC_MODIFY_LINE_APPEND, pdata->pwsz2);
 		CenterDlgInParent(hwnd);
@@ -5698,6 +5702,7 @@ static INT_PTR CALLBACK EditInsertTagDlgProc(HWND hwnd, UINT umsg, WPARAM wParam
 	case WM_INITDIALOG: {
 		ResizeDlg_Init(hwnd, cxInsertTagDlg, cyInsertTagDlg, IDC_RESIZEGRIP2);
 
+		MultilineEditSetup(hwnd, IDC_MODIFY_LINE_PREFIX);
 		SendDlgItemMessage(hwnd, IDC_MODIFY_LINE_PREFIX, EM_LIMITTEXT, MAX_MODIFY_LINE_SIZE - 1, 0);
 		SetDlgItemText(hwnd, IDC_MODIFY_LINE_PREFIX, L"<tag>");
 
