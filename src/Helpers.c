@@ -850,6 +850,24 @@ void ResizeDlgCtl(HWND hwndDlg, int nCtlId, int dx, int dy) {
 	InvalidateRect(hwndCtl, NULL, TRUE);
 }
 
+// https://docs.microsoft.com/en-us/windows/desktop/Controls/subclassing-overview
+// https://support.microsoft.com/en-us/help/102589/how-to-use-the-enter-key-from-edit-controls-in-a-dialog-box
+static LRESULT CALLBACK MultilineEditProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData) {
+	UNREFERENCED_PARAMETER(uIdSubclass);
+	UNREFERENCED_PARAMETER(dwRefData);
+
+	switch (umsg) {
+	case WM_GETDLGCODE:
+		return DLGC_WANTALLKEYS;
+	}
+
+	return DefSubclassProc(hwnd, umsg, wParam, lParam);
+}
+
+void MultilineEditSetup(HWND hwnd, int nCtlId) {
+	SetWindowSubclass(GetDlgItem(hwnd, nCtlId), MultilineEditProc, 0, 0);
+}
+
 //=============================================================================
 //
 // MakeBitmapButton()
