@@ -1787,6 +1787,15 @@ static PEDITLEXER Style_GetLexerFromFile(HWND hwnd, LPCWSTR lpszFile, BOOL bCGIG
 			}
 		}
 
+		if (!bFound && StrCaseEqual(lpszExt, L"txt")) {
+			bFound = TRUE;
+			if (StrCaseEqual(lpszName, L"CMakeLists.txt") || StrCaseEqual(lpszName, L"CMakeCache.txt")) {
+				pLexNew = &lexCMake;
+			} else if (StrCaseEqual(lpszName, L"LLVMBuild.txt")) {
+				pLexNew = &lexINI;
+			}
+		}
+
 		if (!bFound && ((StrCaseEqual(lpszExt, L"conf") && StrNCaseEqual(lpszName, L"httpd", 5)) || StrCaseEqual(lpszExt, L"htaccess"))) {
 			pLexNew = &lexCONF;
 			bFound = TRUE;
@@ -1802,7 +1811,7 @@ static PEDITLEXER Style_GetLexerFromFile(HWND hwnd, LPCWSTR lpszFile, BOOL bCGIG
 			bFound = TRUE;
 			np2LexLangIndex = IDM_LANG_WEB_NET;
 		}
-		if (!bFound && (StrCaseEqual(lpszName, L"CMakeLists.txt") || StrCaseEqual(lpszName, L"CMakeCache.txt") || StrRStrI(lpszFile, NULL, L".cmake.in"))) {
+		if (!bFound && StrRStrI(lpszFile, NULL, L".cmake.in")) {
 			pLexNew = &lexCMake;
 			bFound = TRUE;
 		}
@@ -1830,7 +1839,7 @@ static PEDITLEXER Style_GetLexerFromFile(HWND hwnd, LPCWSTR lpszFile, BOOL bCGIG
 			pLexNew = &lexDefault;
 			bFound = TRUE;
 		}
-		if (!bFound && StrNCaseEqual(lpszName, L"Makefile", 8)) {
+		if (!bFound && (StrNCaseEqual(lpszName, L"Makefile", 8) || StrNCaseEqual(lpszName, L"Kbuild", 6))) {
 			pLexNew = &lexMake;
 			bFound = TRUE;
 		}
@@ -1845,6 +1854,10 @@ static PEDITLEXER Style_GetLexerFromFile(HWND hwnd, LPCWSTR lpszFile, BOOL bCGIG
 		// Boost build
 		if (!bFound && (StrCaseEqual(lpszName, L"Jamroot") || StrNCaseEqual(lpszName, L"Jamfile", 7))) {
 			pLexNew = &lexJAM;
+			bFound = TRUE;
+		}
+		if (!bFound && StrNCaseEqual(lpszName, L"Kconfig", 7)) {
+			pLexNew = &lexCONF;
 			bFound = TRUE;
 		}
 	}
