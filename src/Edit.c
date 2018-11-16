@@ -2210,6 +2210,26 @@ void EditMoveDown(HWND hwnd) {
 	}
 }
 
+static void ConvertWinEditLineEndings(char *s, int iEOLMode) {
+	if (iEOLMode != SC_EOL_CRLF) {
+		char *p = s;
+		while (*s) {
+			if (*s == '\r') {
+				if (iEOLMode == SC_EOL_LF) {
+					++s;
+					*p++ = *s++;
+				} else {
+					*p++ = *s++;
+					++s;
+				}
+			} else {
+				*p++ = *s++;
+			}
+		}
+		*p = '\0';
+	}
+}
+
 //=============================================================================
 //
 // EditModifyLines()
@@ -2221,15 +2241,18 @@ void EditModifyLines(HWND hwnd, LPCWSTR pwszPrefix, LPCWSTR pwszAppend) {
 	}
 
 	const UINT cpEdit = (UINT)SendMessage(hwnd, SCI_GETCODEPAGE, 0, 0);
+	const int iEOLMode = (int)SendMessage(hwnd, SCI_GETEOLMODE, 0, 0);
 
 	char mszPrefix1[MAX_MODIFY_LINE_SIZE * kMaxMultiByteCount] = "";
 	if (StrNotEmpty(pwszPrefix)) {
 		WideCharToMultiByte(cpEdit, 0, pwszPrefix, -1, mszPrefix1, COUNTOF(mszPrefix1), NULL, NULL);
+		ConvertWinEditLineEndings(mszPrefix1, iEOLMode);
 	}
 
 	char mszAppend1[MAX_MODIFY_LINE_SIZE * kMaxMultiByteCount] = "";
 	if (StrNotEmpty(pwszAppend)) {
 		WideCharToMultiByte(cpEdit, 0, pwszAppend, -1, mszAppend1, COUNTOF(mszAppend1), NULL, NULL);
+		ConvertWinEditLineEndings(mszAppend1, iEOLMode);
 	}
 
 	const int iSelStart = (int)SendMessage(hwnd, SCI_GETSELECTIONSTART, 0, 0);
@@ -2707,15 +2730,18 @@ void EditEncloseSelection(HWND hwnd, LPCWSTR pwszOpen, LPCWSTR pwszClose) {
 	const int iSelStart = (int)SendMessage(hwnd, SCI_GETSELECTIONSTART, 0, 0);
 	const int iSelEnd = (int)SendMessage(hwnd, SCI_GETSELECTIONEND, 0, 0);
 	const UINT cpEdit = (UINT)SendMessage(hwnd, SCI_GETCODEPAGE, 0, 0);
+	const int iEOLMode = (int)SendMessage(hwnd, SCI_GETEOLMODE, 0, 0);
 
 	char mszOpen[MAX_MODIFY_LINE_SIZE * kMaxMultiByteCount] = "";
 	if (StrNotEmpty(pwszOpen)) {
 		WideCharToMultiByte(cpEdit, 0, pwszOpen, -1, mszOpen, COUNTOF(mszOpen), NULL, NULL);
+		ConvertWinEditLineEndings(mszOpen, iEOLMode);
 	}
 
 	char mszClose[MAX_MODIFY_LINE_SIZE * kMaxMultiByteCount] = "";
 	if (StrNotEmpty(pwszClose)) {
 		WideCharToMultiByte(cpEdit, 0, pwszClose, -1, mszClose, COUNTOF(mszClose), NULL, NULL);
+		ConvertWinEditLineEndings(mszClose, iEOLMode);
 	}
 
 	SendMessage(hwnd, SCI_BEGINUNDOACTION, 0, 0);
