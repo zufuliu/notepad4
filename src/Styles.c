@@ -2953,6 +2953,8 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 		//TreeView_Expand(hwndTV, TreeView_GetRoot(hwndTV), TVE_EXPAND);
 		TreeView_Select(hwndTV, currentLex, TVGN_CARET);
 
+		MultilineEditSetup(hwnd, IDC_STYLEEDIT);
+		MultilineEditSetup(hwnd, IDC_STYLEVALUE_DEFAULT);
 		SendDlgItemMessage(hwnd, IDC_STYLEEDIT, EM_LIMITTEXT, MAX_LEXER_STYLE_EDIT_SIZE - 1, 0);
 
 		MakeBitmapButton(hwnd, IDC_PREVSTYLE, g_hInstance, IDB_PREV);

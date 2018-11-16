@@ -6647,7 +6647,7 @@ BOOL FileVars_ParseStr(LPCSTR pszData, LPCSTR pszName, char *pszValue, int cchVa
 //		pfnDrawThemeParentBackground = GetProcAddress(hModUxTheme, "DrawThemeParentBackground");
 //		pfnIsThemeBackgroundPartiallyTransparent = GetProcAddress(hModUxTheme, "IsThemeBackgroundPartiallyTransparent");
 //
-//		pfnSciWndProc = (WNDPROC)SetWindowLongPtr(hwnd, GWLP_WNDPROC, (LONG_PTR)&SciThemedWndProc);
+//		pfnSciWndProc = (WNDPROC)SetWindowLongPtr(hwnd, GWLP_WNDPROC, (LONG_PTR)SciThemedWndProc);
 //		bThemesPresent = TRUE;
 //	}
 //}
