@@ -1748,13 +1748,22 @@ static PEDITLEXER Style_GetLexerFromFile(HWND hwnd, LPCWSTR lpszFile, BOOL bCGIG
 	if (StrNotEmpty(lpszExt)) {
 		lpszExt++;
 
-		PEDITLEXER pLexSniffed;
-		if (bCGIGuess && (StrCaseEqual(lpszExt, L"cgi") || StrCaseEqual(lpszExt, L"fcgi"))) {
+		if (StrCaseEqual(lpszExt, L"txt")) {
+			bFound = TRUE;
+			if (StrCaseEqual(lpszName, L"CMakeLists.txt") || StrCaseEqual(lpszName, L"CMakeCache.txt")) {
+				pLexNew = &lexCMake;
+			} else if (StrCaseEqual(lpszName, L"LLVMBuild.txt")) {
+				pLexNew = &lexINI;
+			} else {
+				pLexNew = &lexDefault;
+			}
+		}
+
+		if (!bFound && bCGIGuess && (StrCaseEqual(lpszExt, L"cgi") || StrCaseEqual(lpszExt, L"fcgi"))) {
 			char tchText[256];
 			SendMessage(hwnd, SCI_GETTEXT, COUNTOF(tchText) - 1, (LPARAM)tchText);
 			StrTrimA(tchText, " \t\n\r");
-			if ((pLexSniffed = Style_SniffShebang(tchText)) != NULL) {
-				pLexNew = pLexSniffed;
+			if ((pLexNew = Style_SniffShebang(tchText)) != NULL) {
 				bFound = TRUE;
 			}
 		}
@@ -1787,15 +1796,6 @@ static PEDITLEXER Style_GetLexerFromFile(HWND hwnd, LPCWSTR lpszFile, BOOL bCGIG
 			}
 		}
 
-		if (!bFound && StrCaseEqual(lpszExt, L"txt")) {
-			bFound = TRUE;
-			if (StrCaseEqual(lpszName, L"CMakeLists.txt") || StrCaseEqual(lpszName, L"CMakeCache.txt")) {
-				pLexNew = &lexCMake;
-			} else if (StrCaseEqual(lpszName, L"LLVMBuild.txt")) {
-				pLexNew = &lexINI;
-			}
-		}
-
 		if (!bFound && ((StrCaseEqual(lpszExt, L"conf") && StrNCaseEqual(lpszName, L"httpd", 5)) || StrCaseEqual(lpszExt, L"htaccess"))) {
 			pLexNew = &lexCONF;
 			bFound = TRUE;
@@ -1818,8 +1818,7 @@ static PEDITLEXER Style_GetLexerFromFile(HWND hwnd, LPCWSTR lpszFile, BOOL bCGIG
 
 		// check associated extensions
 		if (!bFound) {
-			if ((pLexSniffed = Style_MatchLexer(lpszExt, FALSE)) != NULL) {
-				pLexNew = pLexSniffed;
+			if ((pLexNew = Style_MatchLexer(lpszExt, FALSE)) != NULL) {
 				bFound = TRUE;
 			}
 		}
