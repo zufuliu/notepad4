@@ -5,7 +5,7 @@
 // http://www.ecma-international.org/publications/standards/Ecma-262.htm
 static KEYWORDLIST Keywords_JS = {{
 // ECMA-262
-"async await break case catch class const continue debugger default delete do else export extends finally for function if import in "
+"async await break case catch class const continue debugger default delete do else extends finally for function if in "
 "instanceof let new return static super switch this throw try typeof var void while with yield "
 "null true false undefined NaN Infinity "
 
@@ -22,7 +22,10 @@ NULL
 , // 3 Directive
 NULL
 , // 4 Attribute
-NULL
+// Scripts and Modules
+"export import from as "
+// Node.js
+"module exports require __dirname __filename "
 
 , // 5 Class
 // ECMA-262
@@ -139,7 +142,7 @@ NULL
 , NULL, NULL, NULL
 
 , // 15 Code Snippet
-"for^() if^() switch^() while^() else^if^() else^{} function() "
+"for^() if^() switch^() while^() else^if^() else^{} function() require() "
 }};
 
 
@@ -148,6 +151,7 @@ EDITLEXER lexJS = { SCLEX_CPP, NP2LEX_JS, EDITLEXER_HOLE(L"JavaScript"), L"js; j
 	EDITSTYLE_DEFAULT,
 	{ SCE_C_WORD, NP2STYLE_Keyword, EDITSTYLE_HOLE(L"Keyword"), L"fore:#0000FF" },
 	{ SCE_C_WORD2, NP2STYLE_ReservedWord, EDITSTYLE_HOLE(L"Reserved Word"), L"fore:#B000B0" },
+	{ SCE_C_ATTRIBUTE, NP2STYLE_Directive, EDITSTYLE_HOLE(L"Module Directive"), L"fore:#FF8000" },
 	{ SCE_C_CLASS, NP2STYLE_Object, EDITSTYLE_HOLE(L"Object"), L"bold; fore:#0080C0" },
 	{ SCE_C_FUNCTION, NP2STYLE_Function, EDITSTYLE_HOLE(L"Function"), L"fore:#A46000" },
 	{ SCE_C_CONSTANT, NP2STYLE_Constant, EDITSTYLE_HOLE(L"Constant"), L"fore:#B000B0" },
