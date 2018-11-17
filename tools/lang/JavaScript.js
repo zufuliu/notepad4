@@ -24,6 +24,12 @@ Infinity
 NaN
 undefined
 
+// http://www.ecma-international.org/ecma-262/9.0/index.html#sec-imports
+// http://www.ecma-international.org/ecma-262/9.0/index.html#sec-exports
+import as from;
+export as;
+export default;
+
 eval(x)
 isFinite(number)
 isNaN(number)
@@ -563,3 +569,10 @@ Storage {
 	localStorage
 	sessionStorage
 }
+
+// https://nodejs.org/api/globals.html
+__dirname
+__filename
+exports
+module
+require(path)
