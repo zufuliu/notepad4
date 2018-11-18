@@ -2992,7 +2992,7 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 		int dx, dy;
 
 		ResizeDlg_Size(hwnd, lParam, &dx, &dy);
-		const int cy = (dy >= 0) ? (dy - dy / 2) : ResizeDlg_CalcDeltaY2(hwnd, dy, dy / 2, IDC_STYLEEDIT, IDC_STYLEVALUE_DEFAULT);
+		const int cy = ResizeDlg_CalcDeltaY2(hwnd, dy, 50, IDC_STYLEEDIT, IDC_STYLEVALUE_DEFAULT);
 		HDWP hdwp = BeginDeferWindowPos(18);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDC_RESIZEGRIP3, dx, dy, SWP_NOSIZE);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDOK, dx, dy, SWP_NOSIZE);
