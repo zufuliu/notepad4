@@ -2210,11 +2210,13 @@ void EditMoveDown(HWND hwnd) {
 	}
 }
 
-static void ConvertWinEditLineEndings(char *s, int iEOLMode) {
+static void ConvertWinEditLineEndingsEx(char *s, int iEOLMode, int *linesCount) {
+	int count = 0;
 	if (iEOLMode != SC_EOL_CRLF) {
 		char *p = s;
 		while (*s) {
 			if (*s == '\r') {
+				++count;
 				if (iEOLMode == SC_EOL_LF) {
 					++s;
 					*p++ = *s++;
@@ -2227,7 +2229,22 @@ static void ConvertWinEditLineEndings(char *s, int iEOLMode) {
 			}
 		}
 		*p = '\0';
+		if (linesCount != NULL) {
+			*linesCount = count;
+		}
+	} else if (linesCount != NULL) {
+		while (*s) {
+			if (*s == '\r') {
+				++count;
+			}
+			++s;
+		}
+		*linesCount = count;
 	}
+}
+
+static inline void ConvertWinEditLineEndings(char *s, int iEOLMode) {
+	ConvertWinEditLineEndingsEx(s, iEOLMode, NULL);
 }
 
 //=============================================================================
@@ -2244,15 +2261,17 @@ void EditModifyLines(HWND hwnd, LPCWSTR pwszPrefix, LPCWSTR pwszAppend) {
 	const int iEOLMode = (int)SendMessage(hwnd, SCI_GETEOLMODE, 0, 0);
 
 	char mszPrefix1[MAX_MODIFY_LINE_SIZE * kMaxMultiByteCount] = "";
+	int iPrefixLine = 0;
 	if (StrNotEmpty(pwszPrefix)) {
 		WideCharToMultiByte(cpEdit, 0, pwszPrefix, -1, mszPrefix1, COUNTOF(mszPrefix1), NULL, NULL);
-		ConvertWinEditLineEndings(mszPrefix1, iEOLMode);
+		ConvertWinEditLineEndingsEx(mszPrefix1, iEOLMode, &iPrefixLine);
 	}
 
 	char mszAppend1[MAX_MODIFY_LINE_SIZE * kMaxMultiByteCount] = "";
+	int iAppendLine = 0;
 	if (StrNotEmpty(pwszAppend)) {
 		WideCharToMultiByte(cpEdit, 0, pwszAppend, -1, mszAppend1, COUNTOF(mszAppend1), NULL, NULL);
-		ConvertWinEditLineEndings(mszAppend1, iEOLMode);
+		ConvertWinEditLineEndingsEx(mszAppend1, iEOLMode, &iAppendLine);
 	}
 
 	const int iSelStart = (int)SendMessage(hwnd, SCI_GETSELECTIONSTART, 0, 0);
@@ -2409,7 +2428,7 @@ void EditModifyLines(HWND hwnd, LPCWSTR pwszPrefix, LPCWSTR pwszAppend) {
 
 	SendMessage(hwnd, SCI_BEGINUNDOACTION, 0, 0);
 
-	for (int iLine = iLineStart; iLine <= iLineEnd; iLine++) {
+	for (int iLine = iLineStart, iLineDest = iLineStart; iLine <= iLineEnd; iLine++, iLineDest++) {
 		if (StrNotEmpty(pwszPrefix)) {
 			char mszInsert[2 * MAX_MODIFY_LINE_SIZE * kMaxMultiByteCount];
 			strcpy(mszInsert, mszPrefix1);
@@ -2424,10 +2443,11 @@ void EditModifyLines(HWND hwnd, LPCWSTR pwszPrefix, LPCWSTR pwszAppend) {
 				iPrefixNum++;
 			}
 
-			const int iPos = (int)SendMessage(hwnd, SCI_POSITIONFROMLINE, iLine, 0);
+			const int iPos = (int)SendMessage(hwnd, SCI_POSITIONFROMLINE, iLineDest, 0);
 			SendMessage(hwnd, SCI_SETTARGETSTART, iPos, 0);
 			SendMessage(hwnd, SCI_SETTARGETEND, iPos, 0);
 			SendMessage(hwnd, SCI_REPLACETARGET, strlen(mszInsert), (LPARAM)mszInsert);
+			iLineDest += iPrefixLine;
 		}
 
 		if (StrNotEmpty(pwszAppend)) {
@@ -2444,10 +2464,11 @@ void EditModifyLines(HWND hwnd, LPCWSTR pwszPrefix, LPCWSTR pwszAppend) {
 				iAppendNum++;
 			}
 
-			const int iPos = (int)SendMessage(hwnd, SCI_GETLINEENDPOSITION, iLine, 0);
+			const int iPos = (int)SendMessage(hwnd, SCI_GETLINEENDPOSITION, iLineDest, 0);
 			SendMessage(hwnd, SCI_SETTARGETSTART, iPos, 0);
 			SendMessage(hwnd, SCI_SETTARGETEND, iPos, 0);
 			SendMessage(hwnd, SCI_REPLACETARGET, strlen(mszInsert), (LPARAM)mszInsert);
+			iLineDest += iAppendLine;
 		}
 	}
 	SendMessage(hwnd, SCI_ENDUNDOACTION, 0, 0);
@@ -6210,9 +6231,8 @@ void EditOpenSelection(HWND hwnd, int type) {
 			if (*lpsz == ' ' || *lpsz == '\t') {
 				*lpsz++ = '\0';
 				break;
-			} else {
-				--lpsz;
 			}
+			--lpsz;
 		}
 
 		cchSelection = lstrlenA(lpsz);
