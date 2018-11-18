@@ -719,13 +719,7 @@ void SetDlgPos(HWND hDlg, int xDlg, int yDlg) {
 //
 // Resize Dialog Helpers()
 //
-typedef struct _resizeDlgAttr {
-	int key;
-	int value;
-} RESIZEDLGATTR;
-
-#define MAX_RESIZEDLG_ATTR_COUNT	((64 - 10*sizeof(int)) / sizeof(RESIZEDLGATTR))	// 3
-
+#define RESIZEDLG_PROP_KEY	L"ResizeDlg"
 typedef struct _resizeDlg {
 	int direction;
 	int cxClient;
@@ -736,8 +730,7 @@ typedef struct _resizeDlg {
 	int mmiPtMinY;
 	int mmiPtMaxX;	// only Y direction
 	int mmiPtMaxY;	// only X direction
-	UINT attrCount;
-	RESIZEDLGATTR attrs[MAX_RESIZEDLG_ATTR_COUNT];
+	int attrs[MAX_RESIZEDLG_ATTR_COUNT];
 } RESIZEDLG, *PRESIZEDLG;
 
 void ResizeDlg_InitEx(HWND hwnd, int cxFrame, int cyFrame, int nIdGrip, int iDirection) {
@@ -773,7 +766,7 @@ void ResizeDlg_InitEx(HWND hwnd, int cxFrame, int cyFrame, int nIdGrip, int iDir
 		pm->cyFrame = rc.bottom - rc.top;
 	}
 
-	SetProp(hwnd, L"ResizeDlg", (HANDLE)pm);
+	SetProp(hwnd, RESIZEDLG_PROP_KEY, (HANDLE)pm);
 
 	SetWindowPos(hwnd, NULL, rc.left, rc.top, pm->cxFrame, pm->cyFrame, SWP_NOZORDER);
 
@@ -792,7 +785,7 @@ void ResizeDlg_InitEx(HWND hwnd, int cxFrame, int cyFrame, int nIdGrip, int iDir
 }
 
 void ResizeDlg_Destroy(HWND hwnd, int *cxFrame, int *cyFrame) {
-	PRESIZEDLG pm = GetProp(hwnd, L"ResizeDlg");
+	PRESIZEDLG pm = GetProp(hwnd, RESIZEDLG_PROP_KEY);
 
 	RECT rc;
 	GetWindowRect(hwnd, &rc);
@@ -803,12 +796,12 @@ void ResizeDlg_Destroy(HWND hwnd, int *cxFrame, int *cyFrame) {
 		*cyFrame = rc.bottom - rc.top;
 	}
 
-	RemoveProp(hwnd, L"ResizeDlg");
+	RemoveProp(hwnd, RESIZEDLG_PROP_KEY);
 	NP2HeapFree(pm);
 }
 
 void ResizeDlg_Size(HWND hwnd, LPARAM lParam, int *cx, int *cy) {
-	PRESIZEDLG pm = GetProp(hwnd, L"ResizeDlg");
+	PRESIZEDLG pm = GetProp(hwnd, RESIZEDLG_PROP_KEY);
 
 	if (cx) {
 		*cx = LOWORD(lParam) - pm->cxClient;
@@ -821,7 +814,7 @@ void ResizeDlg_Size(HWND hwnd, LPARAM lParam, int *cx, int *cy) {
 }
 
 void ResizeDlg_GetMinMaxInfo(HWND hwnd, LPARAM lParam) {
-	PRESIZEDLG pm = GetProp(hwnd, L"ResizeDlg");
+	PRESIZEDLG pm = GetProp(hwnd, RESIZEDLG_PROP_KEY);
 
 	LPMINMAXINFO lpmmi = (LPMINMAXINFO)lParam;
 	lpmmi->ptMinTrackSize.x = pm->mmiPtMinX;
@@ -839,28 +832,17 @@ void ResizeDlg_GetMinMaxInfo(HWND hwnd, LPARAM lParam) {
 	}
 }
 
-void ResizeDlg_SetAttr(HWND hwnd, int key, int value) {
-	PRESIZEDLG pm = GetProp(hwnd, L"ResizeDlg");
-	for (UINT i = 0; i < pm->attrCount; i++) {
-		if (pm->attrs[i].key == key) {
-			pm->attrs[i].value = value;
-			return;
-		}
-	}
-
-	if (pm->attrCount < MAX_RESIZEDLG_ATTR_COUNT) {
-		pm->attrs[pm->attrCount].key = key;
-		pm->attrs[pm->attrCount].value = value;
-		++pm->attrCount;
+void ResizeDlg_SetAttr(HWND hwnd, int index, int value) {
+	if (index < MAX_RESIZEDLG_ATTR_COUNT) {
+		PRESIZEDLG pm = GetProp(hwnd, RESIZEDLG_PROP_KEY);
+		pm->attrs[index] = value;
 	}
 }
 
-int ResizeDlg_GetAttr(HWND hwnd, int key) {
-	PRESIZEDLG pm = GetProp(hwnd, L"ResizeDlg");
-	for (UINT i = 0; i < pm->attrCount; i++) {
-		if (pm->attrs[i].key == key) {
-			return pm->attrs[i].value;
-		}
+int ResizeDlg_GetAttr(HWND hwnd, int index) {
+	if (index < MAX_RESIZEDLG_ATTR_COUNT) {
+		PRESIZEDLG pm = GetProp(hwnd, RESIZEDLG_PROP_KEY);
+		return pm->attrs[index];
 	}
 
 	return 0;
@@ -877,8 +859,9 @@ void ResizeDlg_InitY2Ex(HWND hwnd, int cxFrame, int cyFrame, int nIdGrip, int iD
 	const int hMin1 = GetDlgCtlHeight(hwnd, nCtlId1);
 	const int hMin2 = GetDlgCtlHeight(hwnd, nCtlId2);
 	ResizeDlg_InitEx(hwnd, cxFrame, cyFrame, nIdGrip, iDirection);
-	ResizeDlg_SetAttr(hwnd, nCtlId1, hMin1);
-	ResizeDlg_SetAttr(hwnd, nCtlId2, hMin2);
+	PRESIZEDLG pm = GetProp(hwnd, RESIZEDLG_PROP_KEY);
+	pm->attrs[0] = hMin1;
+	pm->attrs[1] = hMin2;
 }
 
 int ResizeDlg_CalcDeltaY2(HWND hwnd, int dy, int cy, int nCtlId1, int nCtlId2) {
@@ -889,8 +872,9 @@ int ResizeDlg_CalcDeltaY2(HWND hwnd, int dy, int cy, int nCtlId1, int nCtlId2) {
 		return MulDiv(dy, cy, 100);
 	}
 
-	const int hMin1 = ResizeDlg_GetAttr(hwnd, nCtlId1);
-	const int hMin2 = ResizeDlg_GetAttr(hwnd, nCtlId2);
+	PRESIZEDLG pm = GetProp(hwnd, RESIZEDLG_PROP_KEY);
+	const int hMin1 = pm->attrs[0];
+	const int hMin2 = pm->attrs[1];
 	const int h1 = GetDlgCtlHeight(hwnd, nCtlId1);
 	const int h2 = GetDlgCtlHeight(hwnd, nCtlId2);
 	// cy + h1 >= hMin1			cy >= hMin1 - h1
