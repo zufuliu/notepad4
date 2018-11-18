@@ -5417,7 +5417,7 @@ static INT_PTR CALLBACK EditModifyLinesDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 		int dy;
 
 		ResizeDlg_Size(hwnd, lParam, &dx, &dy);
-		const int cy = (dy >= 0) ? (dy - dy / 2) : ResizeDlg_CalcDeltaY2(hwnd, dy, dy / 2, IDC_MODIFY_LINE_PREFIX, IDC_MODIFY_LINE_APPEND);
+		const int cy = ResizeDlg_CalcDeltaY2(hwnd, dy, 50, IDC_MODIFY_LINE_PREFIX, IDC_MODIFY_LINE_APPEND);
 		HDWP hdwp = BeginDeferWindowPos(15);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDC_RESIZEGRIP2, dx, dy, SWP_NOSIZE);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDOK, dx, dy, SWP_NOSIZE);
@@ -5669,7 +5669,7 @@ static INT_PTR CALLBACK EditEncloseSelectionDlgProc(HWND hwnd, UINT umsg, WPARAM
 		int dy;
 
 		ResizeDlg_Size(hwnd, lParam, &dx, &dy);
-		const int cy = (dy >= 0) ? (dy - dy / 2) : ResizeDlg_CalcDeltaY2(hwnd, dy, dy / 2, IDC_MODIFY_LINE_PREFIX, IDC_MODIFY_LINE_APPEND);
+		const int cy = ResizeDlg_CalcDeltaY2(hwnd, dy, 50, IDC_MODIFY_LINE_PREFIX, IDC_MODIFY_LINE_APPEND);
 		HDWP hdwp = BeginDeferWindowPos(6);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDC_RESIZEGRIP2, dx, dy, SWP_NOSIZE);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDOK, dx, dy, SWP_NOSIZE);
@@ -5751,7 +5751,7 @@ static INT_PTR CALLBACK EditInsertTagDlgProc(HWND hwnd, UINT umsg, WPARAM wParam
 		int dy;
 
 		ResizeDlg_Size(hwnd, lParam, &dx, &dy);
-		const int cy = (dy >= 0) ? (dy - dy / 4) : ResizeDlg_CalcDeltaY2(hwnd, dy, 3 * dy / 4, IDC_MODIFY_LINE_PREFIX, IDC_MODIFY_LINE_APPEND);
+		const int cy = ResizeDlg_CalcDeltaY2(hwnd, dy, 75, IDC_MODIFY_LINE_PREFIX, IDC_MODIFY_LINE_APPEND);
 		HDWP hdwp = BeginDeferWindowPos(6);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDC_RESIZEGRIP2, dx, dy, SWP_NOSIZE);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDOK, dx, dy, SWP_NOSIZE);

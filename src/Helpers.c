@@ -882,6 +882,13 @@ void ResizeDlg_InitY2Ex(HWND hwnd, int cxFrame, int cyFrame, int nIdGrip, int iD
 }
 
 int ResizeDlg_CalcDeltaY2(HWND hwnd, int dy, int cy, int nCtlId1, int nCtlId2) {
+	if (dy == 0) {
+		return 0;
+	}
+	if (dy > 0) {
+		return MulDiv(dy, cy, 100);
+	}
+
 	const int hMin1 = ResizeDlg_GetAttr(hwnd, nCtlId1);
 	const int hMin2 = ResizeDlg_GetAttr(hwnd, nCtlId2);
 	const int h1 = GetDlgCtlHeight(hwnd, nCtlId1);
@@ -890,6 +897,7 @@ int ResizeDlg_CalcDeltaY2(HWND hwnd, int dy, int cy, int nCtlId1, int nCtlId2) {
 	// dy - cy + h2 >= hMin2	cy <= dy + h2 - hMin2
 	const int cyMin = hMin1 - h1;
 	const int cyMax = dy + h2 - hMin2;
+	cy = dy - MulDiv(dy, 100 - cy, 100);
 	cy = clamp_i(cy, cyMin, cyMax);
 	return cy;
 }
