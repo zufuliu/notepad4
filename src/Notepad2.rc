@@ -191,6 +191,7 @@ BEGIN
         POPUP "&Enclose Selection"
         BEGIN
             MENUITEM "&With...\tAlt+Q",             IDM_EDIT_ENCLOSESELECTION
+            MENUITEM "&HTML/XML Tag\tAlt+X",        IDM_EDIT_INSERT_XMLTAG
             MENUITEM SEPARATOR
             MENUITEM "( )\tCtrl+4",                 CMD_EMBRACKETR
             MENUITEM "{ }\tCtrl+5",                 CMD_EMBRACKETC
@@ -199,8 +200,8 @@ BEGIN
             MENUITEM SEPARATOR
             MENUITEM "&Single Quotes\tCtrl+1",      CMD_STRINGIFYS
             MENUITEM "&Double Quotes\tCtrl+2",      CMD_STRINGIFYD
-            MENUITEM "&Triple Quotes2\tCtrl+3",     CMD_STRINGIFYT2
-            MENUITEM "Triple &Quotes1\tCtrl+9",     CMD_STRINGIFYT1
+            MENUITEM "&Triple Double Quotes\tCtrl+3",CMD_STRINGIFYT2
+            MENUITEM "Triple Single &Quotes\tCtrl+9",CMD_STRINGIFYT1
             MENUITEM "&Backticks\tCtrl+8",          CMD_STRINGIFYB
         END
         POPUP "L&ines"
@@ -243,9 +244,9 @@ BEGIN
         END
         POPUP "I&nsert"
         BEGIN
-            MENUITEM "&Complete Words\tAlt+/",          IDM_EDIT_COMPLETEWORD
+            MENUITEM "&Complete Word\tAlt+/",           IDM_EDIT_COMPLETEWORD
             MENUITEM SEPARATOR
-            MENUITEM "&HTML/XML Tags...\tAlt+X",        IDM_EDIT_INSERT_XMLTAG
+            MENUITEM "&HTML/XML Tag...\tAlt+X",         IDM_EDIT_INSERT_XMLTAG
             MENUITEM "New &GUID",                       IDM_EDIT_INSERT_GUID
             POPUP "Unicode Control Character"
             BEGIN
