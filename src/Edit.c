@@ -5732,6 +5732,7 @@ static INT_PTR CALLBACK EditInsertTagDlgProc(HWND hwnd, UINT umsg, WPARAM wParam
 		SendDlgItemMessage(hwnd, IDC_MODIFY_LINE_PREFIX, EM_LIMITTEXT, MAX_MODIFY_LINE_SIZE - 1, 0);
 		SetDlgItemText(hwnd, IDC_MODIFY_LINE_PREFIX, L"<tag>");
 
+		MultilineEditSetup(hwnd, IDC_MODIFY_LINE_APPEND);
 		SendDlgItemMessage(hwnd, IDC_MODIFY_LINE_APPEND, EM_LIMITTEXT, MAX_MODIFY_LINE_SIZE - 1, 0);
 		SetDlgItemText(hwnd, IDC_MODIFY_LINE_APPEND, L"</tag>");
 
@@ -5750,15 +5751,16 @@ static INT_PTR CALLBACK EditInsertTagDlgProc(HWND hwnd, UINT umsg, WPARAM wParam
 		int dy;
 
 		ResizeDlg_Size(hwnd, lParam, &dx, &dy);
+		const int cy = (dy > 0) ? (dy - dy / 3) : (dy * 2 / 3);
 		HDWP hdwp = BeginDeferWindowPos(6);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDC_RESIZEGRIP2, dx, dy, SWP_NOSIZE);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDOK, dx, dy, SWP_NOSIZE);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDCANCEL, dx, dy, SWP_NOSIZE);
-		hdwp = DeferCtlPos(hdwp, hwnd, IDC_MODIFY_LINE_PREFIX, dx, dy, SWP_NOMOVE);
-		hdwp = DeferCtlPos(hdwp, hwnd, IDC_MODIFY_LINE_APPEND, 0, dy, SWP_NOSIZE);
-		hdwp = DeferCtlPos(hdwp, hwnd, IDC_MODIFY_LINE_TIP2, 0, dy, SWP_NOSIZE);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDC_MODIFY_LINE_PREFIX, dx, cy, SWP_NOMOVE);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDC_MODIFY_LINE_APPEND, 0, cy, SWP_NOSIZE);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDC_MODIFY_LINE_TIP2, 0, cy, SWP_NOSIZE);
 		EndDeferWindowPos(hdwp);
-		ResizeDlgCtl(hwnd, IDC_MODIFY_LINE_APPEND, dx, 0);
+		ResizeDlgCtl(hwnd, IDC_MODIFY_LINE_APPEND, dx, dy - cy);
 	}
 	return TRUE;
 
@@ -5775,16 +5777,18 @@ static INT_PTR CALLBACK EditInsertTagDlgProc(HWND hwnd, UINT umsg, WPARAM wParam
 
 				GetDlgItemText(hwnd, IDC_MODIFY_LINE_PREFIX, wchBuf, MAX_MODIFY_LINE_SIZE);
 				if (lstrlen(wchBuf) >= 3) {
-					if (wchBuf[0] == L'<') {
+					LPCWSTR pwsz1 = StrChr(wchBuf, L'<');
+					if (pwsz1 != NULL) {
 						WCHAR wchIns[MAX_MODIFY_LINE_SIZE] = L"</";
 						int	cchIns = 2;
-						const WCHAR *pwCur = wchBuf + 1;
+						const WCHAR *pwCur = pwsz1 + 1;
 
 						while (*pwCur &&
 								*pwCur != L'<' &&
 								*pwCur != L'>' &&
 								*pwCur != L' ' &&
 								*pwCur != L'\t' &&
+								*pwCur != L'\r' &&
 								(StrChr(L":_-.", *pwCur) || isalnum(*pwCur))) {
 							wchIns[cchIns++] = *pwCur++;
 						}
