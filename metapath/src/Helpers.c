@@ -477,6 +477,7 @@ void SetDlgPos(HWND hDlg, int xDlg, int yDlg) {
 //
 // Resize Dialog Helpers()
 //
+#define RESIZEDLG_PROP_KEY	L"ResizeDlg"
 typedef struct _resizeDlg {
 	int direction;
 	int cxClient;
@@ -522,7 +523,7 @@ void ResizeDlg_InitEx(HWND hwnd, int cxFrame, int cyFrame, int nIdGrip, int iDir
 		pm->cyFrame = rc.bottom - rc.top;
 	}
 
-	SetProp(hwnd, L"ResizeDlg", (HANDLE)pm);
+	SetProp(hwnd, RESIZEDLG_PROP_KEY, (HANDLE)pm);
 
 	SetWindowPos(hwnd, NULL, rc.left, rc.top, pm->cxFrame, pm->cyFrame, SWP_NOZORDER);
 
@@ -541,7 +542,7 @@ void ResizeDlg_InitEx(HWND hwnd, int cxFrame, int cyFrame, int nIdGrip, int iDir
 }
 
 void ResizeDlg_Destroy(HWND hwnd, int *cxFrame, int *cyFrame) {
-	PRESIZEDLG pm = GetProp(hwnd, L"ResizeDlg");
+	PRESIZEDLG pm = GetProp(hwnd, RESIZEDLG_PROP_KEY);
 
 	RECT rc;
 	GetWindowRect(hwnd, &rc);
@@ -552,12 +553,12 @@ void ResizeDlg_Destroy(HWND hwnd, int *cxFrame, int *cyFrame) {
 		*cyFrame = rc.bottom - rc.top;
 	}
 
-	RemoveProp(hwnd, L"ResizeDlg");
+	RemoveProp(hwnd, RESIZEDLG_PROP_KEY);
 	NP2HeapFree(pm);
 }
 
 void ResizeDlg_Size(HWND hwnd, LPARAM lParam, int *cx, int *cy) {
-	PRESIZEDLG pm = GetProp(hwnd, L"ResizeDlg");
+	PRESIZEDLG pm = GetProp(hwnd, RESIZEDLG_PROP_KEY);
 
 	if (cx) {
 		*cx = LOWORD(lParam) - pm->cxClient;
@@ -570,7 +571,7 @@ void ResizeDlg_Size(HWND hwnd, LPARAM lParam, int *cx, int *cy) {
 }
 
 void ResizeDlg_GetMinMaxInfo(HWND hwnd, LPARAM lParam) {
-	PRESIZEDLG pm = GetProp(hwnd, L"ResizeDlg");
+	PRESIZEDLG pm = GetProp(hwnd, RESIZEDLG_PROP_KEY);
 
 	LPMINMAXINFO lpmmi = (LPMINMAXINFO)lParam;
 	lpmmi->ptMinTrackSize.x = pm->mmiPtMinX;

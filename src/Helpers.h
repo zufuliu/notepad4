@@ -392,13 +392,17 @@ NP2_inline void ResizeDlg_InitY(HWND hwnd, int cyFrame, int nIdGrip) {
 void ResizeDlg_Destroy(HWND hwnd, int *cxFrame, int *cyFrame);
 void ResizeDlg_Size(HWND hwnd, LPARAM lParam, int *cx, int *cy);
 void ResizeDlg_GetMinMaxInfo(HWND hwnd, LPARAM lParam);
-void ResizeDlg_SetAttr(HWND hwnd, int key, int value);
-int ResizeDlg_GetAttr(HWND hwnd, int key);
+
+#define MAX_RESIZEDLG_ATTR_COUNT	2
+void ResizeDlg_SetAttr(HWND hwnd, int index, int value);
+int ResizeDlg_GetAttr(HWND hwnd, int index);
+
 void ResizeDlg_InitY2Ex(HWND hwnd, int cxFrame, int cyFrame, int nIdGrip, int iDirection, int nCtlId1, int nCtlId2);
 NP2_inline void ResizeDlg_InitY2(HWND hwnd, int cxFrame, int cyFrame, int nIdGrip, int nCtlId1, int nCtlId2) {
 	ResizeDlg_InitY2Ex(hwnd, cxFrame, cyFrame, nIdGrip, ResizeDlgDirection_Both, nCtlId1, nCtlId2);
 }
 int ResizeDlg_CalcDeltaY2(HWND hwnd, int dy, int cy, int nCtlId1, int nCtlId2);
+
 HDWP DeferCtlPos(HDWP hdwp, HWND hwndDlg, int nCtlId, int dx, int dy, UINT uFlags);
 void ResizeDlgCtl(HWND hwndDlg, int nCtlId, int dx, int dy);
 void MultilineEditSetup(HWND hwndDlg, int nCtlId);
