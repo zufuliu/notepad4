@@ -5376,7 +5376,7 @@ static INT_PTR CALLBACK EditModifyLinesDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 	switch (umsg) {
 	case WM_INITDIALOG: {
 		SetWindowLongPtr(hwnd, DWLP_USER, lParam);
-		ResizeDlg_Init(hwnd, cxModifyLinesDlg, cyModifyLinesDlg, IDC_RESIZEGRIP2);
+		ResizeDlg_InitY2(hwnd, cxModifyLinesDlg, cyModifyLinesDlg, IDC_RESIZEGRIP2, IDC_MODIFY_LINE_PREFIX, IDC_MODIFY_LINE_APPEND);
 
 		id_hover = 0;
 		id_capture = 0;
@@ -5417,7 +5417,7 @@ static INT_PTR CALLBACK EditModifyLinesDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 		int dy;
 
 		ResizeDlg_Size(hwnd, lParam, &dx, &dy);
-		const int cy = (dy > 0) ? (dy - dy / 2) : (dy / 2);
+		const int cy = (dy >= 0) ? (dy - dy / 2) : ResizeDlg_CalcDeltaY2(hwnd, dy, dy / 2, IDC_MODIFY_LINE_PREFIX, IDC_MODIFY_LINE_APPEND);
 		HDWP hdwp = BeginDeferWindowPos(15);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDC_RESIZEGRIP2, dx, dy, SWP_NOSIZE);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDOK, dx, dy, SWP_NOSIZE);
@@ -5647,7 +5647,7 @@ static INT_PTR CALLBACK EditEncloseSelectionDlgProc(HWND hwnd, UINT umsg, WPARAM
 	switch (umsg) {
 	case WM_INITDIALOG: {
 		SetWindowLongPtr(hwnd, DWLP_USER, lParam);
-		ResizeDlg_Init(hwnd, cxEncloseSelectionDlg, cyEncloseSelectionDlg, IDC_RESIZEGRIP2);
+		ResizeDlg_InitY2(hwnd, cxEncloseSelectionDlg, cyEncloseSelectionDlg, IDC_RESIZEGRIP2, IDC_MODIFY_LINE_PREFIX, IDC_MODIFY_LINE_APPEND);
 
 		PENCLOSESELDATA pdata = (PENCLOSESELDATA)lParam;
 		MultilineEditSetup(hwnd, IDC_MODIFY_LINE_PREFIX);
@@ -5669,7 +5669,7 @@ static INT_PTR CALLBACK EditEncloseSelectionDlgProc(HWND hwnd, UINT umsg, WPARAM
 		int dy;
 
 		ResizeDlg_Size(hwnd, lParam, &dx, &dy);
-		const int cy = (dy > 0) ? (dy - dy / 2) : (dy / 2);
+		const int cy = (dy >= 0) ? (dy - dy / 2) : ResizeDlg_CalcDeltaY2(hwnd, dy, dy / 2, IDC_MODIFY_LINE_PREFIX, IDC_MODIFY_LINE_APPEND);
 		HDWP hdwp = BeginDeferWindowPos(6);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDC_RESIZEGRIP2, dx, dy, SWP_NOSIZE);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDOK, dx, dy, SWP_NOSIZE);
@@ -5726,7 +5726,7 @@ BOOL EditEncloseSelectionDlg(HWND hwnd, LPWSTR pwszOpen, LPWSTR pwszClose) {
 static INT_PTR CALLBACK EditInsertTagDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
 	switch (umsg) {
 	case WM_INITDIALOG: {
-		ResizeDlg_Init(hwnd, cxInsertTagDlg, cyInsertTagDlg, IDC_RESIZEGRIP2);
+		ResizeDlg_InitY2(hwnd, cxInsertTagDlg, cyInsertTagDlg, IDC_RESIZEGRIP2, IDC_MODIFY_LINE_PREFIX, IDC_MODIFY_LINE_APPEND);
 
 		MultilineEditSetup(hwnd, IDC_MODIFY_LINE_PREFIX);
 		SendDlgItemMessage(hwnd, IDC_MODIFY_LINE_PREFIX, EM_LIMITTEXT, MAX_MODIFY_LINE_SIZE - 1, 0);
@@ -5751,7 +5751,7 @@ static INT_PTR CALLBACK EditInsertTagDlgProc(HWND hwnd, UINT umsg, WPARAM wParam
 		int dy;
 
 		ResizeDlg_Size(hwnd, lParam, &dx, &dy);
-		const int cy = (dy > 0) ? (dy - dy / 3) : (dy * 2 / 3);
+		const int cy = (dy >= 0) ? (dy - dy / 4) : ResizeDlg_CalcDeltaY2(hwnd, dy, 3 * dy / 4, IDC_MODIFY_LINE_PREFIX, IDC_MODIFY_LINE_APPEND);
 		HDWP hdwp = BeginDeferWindowPos(6);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDC_RESIZEGRIP2, dx, dy, SWP_NOSIZE);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDOK, dx, dy, SWP_NOSIZE);
