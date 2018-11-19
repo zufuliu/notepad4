@@ -171,6 +171,7 @@ static void ColouriseCppDoc(Sci_PositionU startPos, Sci_Position length, int ini
 	bool followsPostfixOperator = false;
 	bool isTripleSingle = false;
 	bool isAssignStmt = false;
+	bool inRERange = false;
 
 	if (initStyle == SCE_C_COMMENTLINE || initStyle == SCE_C_COMMENTLINEDOC || initStyle == SCE_C_PREPROCESSOR) {
 		// Set continuationLine if last character of previous line is '\'
@@ -220,6 +221,9 @@ static void ColouriseCppDoc(Sci_PositionU startPos, Sci_Position length, int ini
 			isPragmaPreprocessor = false;
 			isIncludePreprocessor = false;
 			isMessagePreprocessor = false;
+			if (!(lexType & LEX_AWK)) {
+				inRERange = false;
+			}
 
 			if (!continuationLine) {
 				lineState &= LEX_BLOCK_UMASK_ALL;
@@ -719,16 +723,19 @@ _label_identifier:
 		case SCE_C_REGEX:
 			if (sc.atLineStart && !(lexType & LEX_AWK)) {
 				sc.SetState(SCE_C_DEFAULT);
-			} else if (sc.ch == '/') {
+			} else if (!inRERange && sc.ch == '/') {
 				sc.Forward();
-				while (IsLowerCase(sc.ch))
+				while (IsLowerCase(sc.ch)) {
 					sc.Forward();	 // gobble regex flags
+				}
 				sc.SetState(SCE_C_DEFAULT);
 			} else if (sc.ch == '\\') {
-				// Gobble up the quoted character
-				if (sc.chNext == '\\' || sc.chNext == '/') {
-					sc.Forward();
-				}
+				// Gobble up the escaped character
+				sc.Forward();
+			} else if (sc.ch == '[') {
+				inRERange = true;
+			} else if (sc.ch == ']') {
+				inRERange = false;
 			}
 			break;
 		case SCE_C_VERBATIM:
@@ -903,6 +910,7 @@ _label_identifier:
 							&& !(chPrevNonWhite == '+' || chPrevNonWhite == '-' || followsPostfixOperator)) {
 							sc.SetState(SCE_C_REGEX);	// JavaScript's RegEx
 							followsReturn = false;
+							inRERange = false;
 						} else if ((lexType == LEX_D) && sc.chNext == '+') {
 							++curNcLevel;
 							sc.SetState(SCE_C_DNESTEDCOMMENT);
