@@ -927,6 +927,14 @@ static LRESULT CALLBACK MultilineEditProc(HWND hwnd, UINT umsg, WPARAM wParam, L
 			return TRUE;
 		}
 		break;
+
+	case WM_SETTEXT: {
+		const LRESULT result = DefSubclassProc(hwnd, umsg, wParam, lParam);
+		if (result) {
+			NotifyEditTextChanged(GetParent(hwnd), GetDlgCtrlID(hwnd));
+		}
+		return result;
+	}
 	}
 
 	return DefSubclassProc(hwnd, umsg, wParam, lParam);
@@ -950,6 +958,15 @@ static LRESULT CALLBACK MultilineEditProc(HWND hwnd, UINT umsg, WPARAM wParam, L
 			return TRUE;
 		}
 		break;
+
+	case WM_SETTEXT: {
+		WNDPROC oldWndProc = (WNDPROC)GetProp(hwnd, L"OldWndProc");
+		const LRESULT result = CallWindowProc(oldWndProc, hwnd, umsg, wParam, lParam);
+		if (result) {
+			NotifyEditTextChanged(GetParent(hwnd), GetDlgCtrlID(hwnd));
+		}
+		return result;
+	}
 	}
 
 	WNDPROC oldWndProc = (WNDPROC)GetProp(hwnd, L"OldWndProc");
