@@ -2916,6 +2916,8 @@ void Style_AddLexerToListView(HWND hwnd, PEDITLEXER pLex) {
 // Style_ConfigDlgProc()
 //
 static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
+#define NotifyStyleTextChanged()	NotifyEditTextChanged(hwnd, IDC_STYLEEDIT)
+
 	static HWND hwndTV;
 	static BOOL fDragging;
 	static PEDITLEXER pCurrentLexer;
@@ -3126,6 +3128,7 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 						SetDlgItemText(hwnd, IDC_STYLEEDIT, L"");
 						SetDlgItemText(hwnd, IDC_STYLEVALUE_DEFAULT, L"");
 					}
+					NotifyStyleTextChanged();
 				}
 			}
 			break;
@@ -3202,6 +3205,7 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 					//CheckDlgButton(hwnd, IDC_STYLEITALIC, Style_StrGetAttribute(tchCopy, L"italic") ? BST_CHECKED : BST_UNCHECKED);
 					//CheckDlgButton(hwnd, IDC_STYLEUNDERLINE, Style_StrGetAttribute(tchCopy, L"underline") ? BST_CHECKED : BST_UNCHECKED);
 					//CheckDlgButton(hwnd, IDC_STYLEEOLFILLED, Style_StrGetAttribute(tchCopy, L"eolfilled") ? BST_CHECKED : BST_UNCHECKED);
+					NotifyStyleTextChanged();
 				}
 			}
 			ReleaseCapture();
@@ -3229,6 +3233,7 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 				TreeView_Select(hwndTV, TreeView_GetPrevVisible(hwndTV,
 								TreeView_GetSelection(hwndTV)), TVGN_CARET);
 			}
+			NotifyStyleTextChanged();
 			PostMessage(hwnd, WM_NEXTDLGCTL, (WPARAM)(GetDlgItem(hwnd, IDC_STYLEEDIT)), 1);
 			break;
 
@@ -3237,6 +3242,7 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 				TreeView_Select(hwndTV, TreeView_GetNextVisible(hwndTV,
 								TreeView_GetSelection(hwndTV)), TVGN_CARET);
 			}
+			NotifyStyleTextChanged();
 			PostMessage(hwnd, WM_NEXTDLGCTL, (WPARAM)(GetDlgItem(hwnd, IDC_STYLEEDIT)), 1);
 			break;
 
@@ -3252,6 +3258,7 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 					//CheckDlgButton(hwnd, IDC_STYLEITALIC, (Style_StrGetAttribute(tch, L"italic") ? BST_CHECKED : BST_UNCHECKED));
 					//CheckDlgButton(hwnd, IDC_STYLEUNDERLINE, (Style_StrGetAttribute(tch, L"underline") ? BST_CHECKED : BST_UNCHECKED));
 					//CheckDlgButton(hwnd, IDC_STYLEEOLFILLED, (Style_StrGetAttribute(tch, L"eolfilled") ? BST_CHECKED : BST_UNCHECKED));
+					NotifyStyleTextChanged();
 				}
 			}
 			PostMessage(hwnd, WM_NEXTDLGCTL, (WPARAM)(GetDlgItem(hwnd, IDC_STYLEEDIT)), 1);
@@ -3267,6 +3274,7 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 					//CheckDlgButton(hwnd, IDC_STYLEITALIC, (Style_StrGetAttribute(tch, L"italic") ? BST_CHECKED : BST_UNCHECKED));
 					//CheckDlgButton(hwnd, IDC_STYLEUNDERLINE, (Style_StrGetAttribute(tch, L"underline") ? BST_CHECKED : BST_UNCHECKED));
 					//CheckDlgButton(hwnd, IDC_STYLEEOLFILLED, (Style_StrGetAttribute(tch, L"eolfilled") ? BST_CHECKED : BST_UNCHECKED));
+					NotifyStyleTextChanged();
 				}
 			}
 			PostMessage(hwnd, WM_NEXTDLGCTL, (WPARAM)(GetDlgItem(hwnd, IDC_STYLEEDIT)), 1);
@@ -3282,6 +3290,7 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 					//CheckDlgButton(hwnd, IDC_STYLEITALIC, (Style_StrGetAttribute(tch, L"italic") ? BST_CHECKED : BST_UNCHECKED));
 					//CheckDlgButton(hwnd, IDC_STYLEUNDERLINE, (Style_StrGetAttribute(tch, L"underline") ? BST_CHECKED : BST_UNCHECKED));
 					//CheckDlgButton(hwnd, IDC_STYLEEOLFILLED, (Style_StrGetAttribute(tch, L"eolfilled") ? BST_CHECKED : BST_UNCHECKED));
+					NotifyStyleTextChanged();
 				}
 			}
 			PostMessage(hwnd, WM_NEXTDLGCTL, (WPARAM)(GetDlgItem(hwnd, IDC_STYLEEDIT)), 1);
@@ -3302,6 +3311,7 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 				lstrcpy(pCurrentLexer->szExtensions, pCurrentLexer->pszDefExt);
 				SetDlgItemText(hwnd, IDC_STYLEEDIT, pCurrentLexer->szExtensions);
 			}
+			NotifyStyleTextChanged();
 			PostMessage(hwnd, WM_NEXTDLGCTL, (WPARAM)(GetDlgItem(hwnd, IDC_STYLEEDIT)), 1);
 			break;
 
@@ -3311,6 +3321,7 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 		//		GetDlgItemText(hwnd, IDC_STYLEEDIT, tch, COUNTOF(tch));
 		//		Style_StrSetAttribute(tch, COUNTOF(tch), L"bold", IsButtonChecked(hwnd, IDC_STYLEBOLD));
 		//		SetDlgItemText(hwnd, IDC_STYLEEDIT, tch);
+		//		NotifyStyleTextChanged();
 		//	}
 		//	break;
 
@@ -3320,6 +3331,7 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 		//		GetDlgItemText(hwnd, IDC_STYLEEDIT, tch, COUNTOF(tch));
 		//		Style_StrSetAttribute(tch, COUNTOF(tch), L"italic", IsButtonChecked(hwnd, IDC_STYLEITALIC));
 		//		SetDlgItemText(hwnd, IDC_STYLEEDIT, tch);
+		//		NotifyStyleTextChanged();
 		//	}
 		//	break;
 
@@ -3329,6 +3341,7 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 		//		GetDlgItemText(hwnd, IDC_STYLEEDIT, tch, COUNTOF(tch));
 		//		Style_StrSetAttribute(tch, COUNTOF(tch), L"underline", IsButtonChecked(hwnd, IDC_STYLEUNDERLINE));
 		//		SetDlgItemText(hwnd, IDC_STYLEEDIT, tch);
+		//		NotifyStyleTextChanged();
 		//	}
 		//	break;
 
@@ -3338,11 +3351,12 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 		//		GetDlgItemText(hwnd, IDC_STYLEEDIT, tch, COUNTOF(tch));
 		//		Style_StrSetAttribute(tch, COUNTOF(tch), L"eolfilled", IsButtonChecked(hwnd, IDC_STYLEEOLFILLED));
 		//		SetDlgItemText(hwnd, IDC_STYLEEDIT, tch);
+		//		NotifyStyleTextChanged();
 		//	}
 		//	break;
 
 		case IDC_STYLEEDIT: {
-			if (HIWORD(wParam) == EN_CHANGE) {
+			if (HIWORD(wParam) == EN_CHANGE && pCurrentStyle != NULL) {
 				WCHAR tch[MAX_LEXER_STYLE_EDIT_SIZE];
 
 				GetDlgItemText(hwnd, IDC_STYLEEDIT, tch, COUNTOF(tch));
@@ -3377,6 +3391,7 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 						SetDlgItemText(hwnd, IDC_STYLEEDIT, pCurrentStyle->szValue);
 					} else if (pCurrentLexer) {
 						SetDlgItemText(hwnd, IDC_STYLEEDIT, pCurrentLexer->szExtensions);
+						NotifyStyleTextChanged();
 					}
 
 					TreeView_Select(hwndTV, TreeView_GetRoot(hwndTV), TVGN_CARET);
@@ -3409,6 +3424,8 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 		}
 		return TRUE;
 	}
+
+#undef NotifyStyleTextChanged
 	return FALSE;
 }
 
