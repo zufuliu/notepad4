@@ -406,6 +406,9 @@ int ResizeDlg_CalcDeltaY2(HWND hwnd, int dy, int cy, int nCtlId1, int nCtlId2);
 HDWP DeferCtlPos(HDWP hdwp, HWND hwndDlg, int nCtlId, int dx, int dy, UINT uFlags);
 void ResizeDlgCtl(HWND hwndDlg, int nCtlId, int dx, int dy);
 void MultilineEditSetup(HWND hwndDlg, int nCtlId);
+// EN_CHANGE is not sent when the ES_MULTILINE style is used and the text is sent through WM_SETTEXT.
+// https://docs.microsoft.com/en-us/windows/desktop/Controls/en-change
+#define NotifyEditTextChanged(hwndDlg, nCtlId)	SendMessage(hwndDlg, WM_COMMAND, MAKEWPARAM(nCtlId, EN_CHANGE), 0)
 void MakeBitmapButton(HWND hwnd, int nCtlId, HINSTANCE hInstance, WORD wBmpId);
 void MakeColorPickButton(HWND hwnd, int nCtlId, HINSTANCE hInstance, COLORREF crColor);
 void DeleteBitmapButton(HWND hwnd, int nCtlId);
