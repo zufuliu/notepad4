@@ -252,6 +252,7 @@ NP2_inline BOOL SetExplorerTheme(HWND hwnd) {
 	return SetTheme(hwnd, L"Explorer");
 }
 
+HBITMAP LoadBitmapFile(LPCWSTR path);
 BOOL BitmapMergeAlpha(HBITMAP hbmp, COLORREF crDest);
 BOOL BitmapAlphaBlend(HBITMAP hbmp, COLORREF crDest, BYTE alpha);
 BOOL BitmapGrayScale(HBITMAP hbmp);

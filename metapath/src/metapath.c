@@ -82,9 +82,9 @@ WCHAR	szQuickviewParams[MAX_PATH];
 WCHAR	tchFavoritesDir[MAX_PATH];
 WCHAR	tchOpenWithDir[MAX_PATH];
 static WCHAR tchToolbarButtons[MAX_TOOLBAR_BUTTON_CONFIG_BUFFER_SIZE];
-static WCHAR tchToolbarBitmap[MAX_PATH];
-static WCHAR tchToolbarBitmapHot[MAX_PATH];
-static WCHAR tchToolbarBitmapDisabled[MAX_PATH];
+static LPWSTR tchToolbarBitmap = NULL;
+static LPWSTR tchToolbarBitmapHot = NULL;
+static LPWSTR tchToolbarBitmapDisabled = NULL;
 BOOL	bClearReadOnly;
 BOOL	bRenameOnCollision;
 BOOL	bSingleClick;
@@ -184,6 +184,15 @@ static int	flagPosParam		= 0;
 //
 //
 static void CleanUpResources(BOOL initialized) {
+	if (tchToolbarBitmap != NULL) {
+		LocalFree(tchToolbarBitmap);
+	}
+	if (tchToolbarBitmapHot != NULL) {
+		LocalFree(tchToolbarBitmapHot);
+	}
+	if (tchToolbarBitmapDisabled != NULL) {
+		LocalFree(tchToolbarBitmapDisabled);
+	}
 	if (hModUxTheme) {
 		FreeLibrary(hModUxTheme);
 	}
@@ -806,17 +815,14 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) {
 	SendMessage(hwndToolbar, TB_BUTTONSTRUCTSIZE, sizeof(TBBUTTON), 0);
 
 	// Add normal Toolbar Bitmap
-	WCHAR szTmp[MAX_PATH];
-	HBITMAP hbmp = NULL, hbmpCopy = NULL;
+	HBITMAP hbmp = NULL;
+	HBITMAP hbmpCopy = NULL;
 	BOOL bExternalBitmap = FALSE;
 
-	if (StrNotEmpty(tchToolbarBitmap)) {
-		if (!SearchPath(NULL, tchToolbarBitmap, NULL, COUNTOF(szTmp), szTmp, NULL)) {
-			lstrcpy(szTmp, tchToolbarBitmap);
-		}
-		hbmp = LoadImage(NULL, szTmp, IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION | LR_LOADFROMFILE);
+	if (tchToolbarBitmap != NULL) {
+		hbmp = LoadBitmapFile(tchToolbarBitmap);
 	}
-	if (hbmp) {
+	if (hbmp != NULL) {
 		bExternalBitmap = TRUE;
 	} else {
 		hbmp = LoadImage(hInstance, MAKEINTRESOURCE(IDR_MAINWND), IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION);
@@ -835,12 +841,9 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) {
 	SendMessage(hwndToolbar, TB_SETIMAGELIST, 0, (LPARAM)himl);
 
 	// Optionally add hot Toolbar Bitmap
-	hbmp = NULL;
-	if (StrNotEmpty(tchToolbarBitmapHot)) {
-		if (!SearchPath(NULL, tchToolbarBitmapHot, NULL, COUNTOF(szTmp), szTmp, NULL)) {
-			lstrcpy(szTmp, tchToolbarBitmapHot);
-		}
-		if ((hbmp = LoadImage(NULL, szTmp, IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION | LR_LOADFROMFILE)) != NULL) {
+	if (tchToolbarBitmapHot != NULL) {
+		hbmp = LoadBitmapFile(tchToolbarBitmapHot);
+		if (hbmp != NULL) {
 			GetObject(hbmp, sizeof(BITMAP), &bmp);
 			himl = ImageList_Create(bmp.bmWidth / NUMTOOLBITMAPS, bmp.bmHeight, ILC_COLOR32 | ILC_MASK, 0, 0);
 			ImageList_AddMasked(himl, hbmp, CLR_DEFAULT);
@@ -850,12 +853,9 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) {
 	}
 
 	// Optionally add disabled Toolbar Bitmap
-	hbmp = NULL;
-	if (StrNotEmpty(tchToolbarBitmapDisabled)) {
-		if (!SearchPath(NULL, tchToolbarBitmapDisabled, NULL, COUNTOF(szTmp), szTmp, NULL)) {
-			lstrcpy(szTmp, tchToolbarBitmapDisabled);
-		}
-		if ((hbmp = LoadImage(NULL, szTmp, IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION | LR_LOADFROMFILE)) != NULL) {
+	if (tchToolbarBitmapDisabled != NULL) {
+		hbmp = LoadBitmapFile(tchToolbarBitmapDisabled);
+		if (hbmp != NULL) {
 			GetObject(hbmp, sizeof(BITMAP), &bmp);
 			himl = ImageList_Create(bmp.bmWidth / NUMTOOLBITMAPS, bmp.bmHeight, ILC_COLOR32 | ILC_MASK, 0, 0);
 			ImageList_AddMasked(himl, hbmp, CLR_DEFAULT);
@@ -2496,12 +2496,18 @@ void LoadSettings(void) {
 	LoadIniSection(INI_SECTION_NAME_TOOLBAR_IMAGES, pIniSectionBuf, cbIniSection);
 	IniSectionParse(pIniSection, pIniSectionBuf);
 
-	IniSectionGetString(pIniSection, L"BitmapDefault", L"",
-						tchToolbarBitmap, COUNTOF(tchToolbarBitmap));
-	IniSectionGetString(pIniSection, L"BitmapHot", L"",
-						tchToolbarBitmapHot, COUNTOF(tchToolbarBitmap));
-	IniSectionGetString(pIniSection, L"BitmapDisabled", L"",
-						tchToolbarBitmapDisabled, COUNTOF(tchToolbarBitmap));
+	strValue = IniSectionGetValue(pIniSection, L"BitmapDefault");
+	if (StrNotEmpty(strValue)) {
+		tchToolbarBitmap = StrDup(strValue);
+	}
+	strValue = IniSectionGetValue(pIniSection, L"BitmapHot");
+	if (StrNotEmpty(strValue)) {
+		tchToolbarBitmapHot = StrDup(strValue);
+	}
+	strValue = IniSectionGetValue(pIniSection, L"BitmapDisabled");
+	if (StrNotEmpty(strValue)) {
+		tchToolbarBitmapDisabled = StrDup(strValue);
+	}
 
 	IniSectionFree(pIniSection);
 	NP2HeapFree(pIniSectionBuf);
