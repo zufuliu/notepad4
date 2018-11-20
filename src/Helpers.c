@@ -917,7 +917,7 @@ static LRESULT CALLBACK MultilineEditProc(HWND hwnd, UINT umsg, WPARAM wParam, L
 	switch (umsg) {
 	case WM_GETDLGCODE:
 		if (GetWindowLong(hwnd, GWL_STYLE) & ES_WANTRETURN) {
-			return DLGC_WANTALLKEYS;
+			return DLGC_WANTALLKEYS | DLGC_HASSETSEL;
 		}
 		break;
 
@@ -948,7 +948,7 @@ static LRESULT CALLBACK MultilineEditProc(HWND hwnd, UINT umsg, WPARAM wParam, L
 	switch (umsg) {
 	case WM_GETDLGCODE:
 		if (GetWindowLong(hwnd, GWL_STYLE) & ES_WANTRETURN) {
-			return DLGC_WANTALLKEYS;
+			return DLGC_WANTALLKEYS | DLGC_HASSETSEL;
 		}
 		break;
 
