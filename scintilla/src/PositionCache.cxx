@@ -744,9 +744,14 @@ void PositionCacheEntry::ResetClock() noexcept {
 	}
 }
 
+#define PositionCacheHashSizeUsePowerOfTwo	1
 PositionCache::PositionCache() {
 	clock = 1;
-	pces.resize(0x400);
+#if PositionCacheHashSizeUsePowerOfTwo
+	pces.resize(2048);
+#else
+	pces.resize(2039);
+#endif
 	allClear = true;
 }
 
@@ -764,6 +769,7 @@ void PositionCache::Clear() noexcept {
 	allClear = true;
 }
 
+#if PositionCacheHashSizeUsePowerOfTwo
 static constexpr size_t NextPowerOfTwo(size_t x) noexcept {
 	x--;
 	x |= x >> 1;
@@ -777,13 +783,16 @@ static constexpr size_t NextPowerOfTwo(size_t x) noexcept {
 	x++;
 	return x;
 }
+#endif
 
 void PositionCache::SetSize(size_t size_) {
 	Clear();
 	if (size_ != pces.size()) {
+#if PositionCacheHashSizeUsePowerOfTwo
 		if (size_ & (size_ - 1)) {
 			size_ = NextPowerOfTwo(size_);
 		}
+#endif
 		pces.resize(size_);
 	}
 }
@@ -796,15 +805,26 @@ void PositionCache::MeasureWidths(Surface *surface, const ViewStyle &vstyle, uns
 	if ((len < 30)) {
 		// Only store short strings in the cache so it doesn't churn with
 		// long comments with only a single comment.
+#if PositionCacheHashSizeUsePowerOfTwo
 		const size_t mask = probe - 1;
-
+#else
+		const size_t modulo = probe;
+#endif
 		// Two way associative: try two probe positions.
 		const unsigned int hashValue = PositionCacheEntry::Hash(styleNumber, s, len);
+#if PositionCacheHashSizeUsePowerOfTwo
 		probe = hashValue & mask;
+#else
+		probe = hashValue % modulo;
+#endif
 		if (pces[probe].Retrieve(styleNumber, s, len, positions)) {
 			return;
 		}
+#if PositionCacheHashSizeUsePowerOfTwo
 		const unsigned int probe2 = (hashValue * 37) & mask;
+#else
+		const unsigned int probe2 = (hashValue * 37) % modulo;
+#endif
 		if (pces[probe2].Retrieve(styleNumber, s, len, positions)) {
 			return;
 		}
