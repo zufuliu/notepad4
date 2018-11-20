@@ -1,6 +1,6 @@
 // Scintilla source code edit control
 // @file LexAutoIt3.cxx
-// Lexer for AutoIt3  http://www.hiddensoft.com/autoit3
+// Lexer for AutoIt3 https://www.autoitscript.com/site/
 // by Jos van der Zande, jvdzande@yahoo.com
 //
 // Copyright for Scintilla: 1998-2001 by Neil Hodgson <neilh@scintilla.org>
