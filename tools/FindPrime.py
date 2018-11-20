@@ -1,10 +1,10 @@
 #-*- coding: UTF-8 -*-
 from __future__ import print_function
 import sys
-from math import sqrt, floor
+from math import sqrt
 
 def is_prime_odd(n):
-	m = int(floor(sqrt(n)))
+	m = int(sqrt(n))
 	for k in range(3, m + 1, 2):
 		if (n % k) == 0:
 			return False

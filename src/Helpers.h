@@ -181,6 +181,7 @@ extern WCHAR szIniFile[MAX_PATH];
 // https://docs.microsoft.com/en-us/windows/desktop/Memory/comparing-memory-allocation-methods
 // https://blogs.msdn.microsoft.com/oldnewthing/20120316-00/?p=8083/
 #define NP2HeapAlloc(size)			HeapAlloc(g_hDefaultHeap, HEAP_ZERO_MEMORY, (size))
+#define NP2HeapReAlloc(hMem, size)	HeapReAlloc(g_hDefaultHeap, HEAP_ZERO_MEMORY, (hMem), (size))
 #define NP2HeapFree(hMem)			HeapFree(g_hDefaultHeap, 0, (hMem))
 #define NP2HeapSize(hMem)			HeapSize(g_hDefaultHeap, 0, (hMem))
 
@@ -329,6 +330,21 @@ NP2_inline void IniSectionSetBoolEx(IniSectionOnSave *section, LPCWSTR key, BOOL
 	}
 }
 
+typedef struct DString {
+	LPWSTR buffer;
+	INT capacity;
+} DString;
+
+static inline void DString_Free(DString *s) {
+	if (s->buffer) {
+		NP2HeapFree(s->buffer);
+	}
+}
+
+void DString_GetWindowText(DString *s, HWND hwnd);
+NP2_inline void DString_GetDlgItemText(DString *s, HWND hwndDlg, int nCtlId) {
+	DString_GetWindowText(s, GetDlgItem(hwndDlg, nCtlId));
+}
 
 extern HWND hwndEdit;
 NP2_inline void BeginWaitCursor(void) {
