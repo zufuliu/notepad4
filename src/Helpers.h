@@ -369,6 +369,7 @@ BOOL IsElevated(void);
 //	return SetTheme(hwnd, L"Explorer");
 //}
 
+HBITMAP LoadBitmapFile(LPCWSTR path);
 HBITMAP ResizeImageForCurrentDPI(HBITMAP hbmp);
 BOOL BitmapMergeAlpha(HBITMAP hbmp, COLORREF crDest);
 BOOL BitmapAlphaBlend(HBITMAP hbmp, COLORREF crDest, BYTE alpha);

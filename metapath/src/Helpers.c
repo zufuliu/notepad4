@@ -201,6 +201,16 @@ int ParseCommaList(LPCWSTR str, int result[], int count) {
 	return index;
 }
 
+HBITMAP LoadBitmapFile(LPCWSTR path) {
+	WCHAR szTmp[MAX_PATH];
+	if (SearchPath(NULL, path, NULL, COUNTOF(szTmp), szTmp, NULL)) {
+		path = szTmp;
+	}
+
+	HBITMAP hbmp = LoadImage(NULL, path, IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION | LR_LOADFROMFILE);
+	return hbmp;
+}
+
 //=============================================================================
 //
 //  ExeNameFromWnd()
