@@ -295,14 +295,9 @@ const int iLineEndings[3] = {
 	SC_EOL_CR
 };
 
-static WCHAR wchPrefixSelection[MAX_MODIFY_LINE_SIZE] = L"";
-static WCHAR wchAppendSelection[MAX_MODIFY_LINE_SIZE] = L"";
-static WCHAR wchPrefixLines[MAX_MODIFY_LINE_SIZE] = L"";
-static WCHAR wchAppendLines[MAX_MODIFY_LINE_SIZE] = L"";
-
 static int iSortOptions = 0;
-static int iAlignMode	 = 0;
-int		iMatchesCount = 0;
+static int iAlignMode	= 0;
+int		iMatchesCount	= 0;
 int		iAutoCItemCount = 0;
 extern int iFontQuality;
 extern int iCaretStyle;
@@ -464,6 +459,7 @@ static void CleanUpResources(BOOL initialized) {
 
 	Encoding_ReleaseResources();
 	Style_ReleaseResources();
+	Edit_ReleaseResources();
 	Scintilla_ReleaseResources();
 
 	if (hModUxTheme) {
@@ -3056,11 +3052,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	break;
 
 	case IDM_EDIT_ENCLOSESELECTION:
-		if (EditEncloseSelectionDlg(hwnd, wchPrefixSelection, wchAppendSelection)) {
-			BeginWaitCursor();
-			EditEncloseSelection(hwndEdit, wchPrefixSelection, wchAppendSelection);
-			EndWaitCursor();
-		}
+		EditEncloseSelectionDlg(hwnd);
 		break;
 
 	case IDM_EDIT_SELECTIONDUPLICATE:
@@ -3118,11 +3110,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	case IDM_EDIT_MODIFYLINES:
-		if (EditModifyLinesDlg(hwnd, wchPrefixLines, wchAppendLines)) {
-			BeginWaitCursor();
-			EditModifyLines(hwndEdit, wchPrefixLines, wchAppendLines);
-			EndWaitCursor();
-		}
+		EditModifyLinesDlg(hwnd);
 		break;
 
 	case IDM_EDIT_ALIGN:

@@ -28,7 +28,6 @@
 
 #define NP2_FIND_REPLACE_LIMIT	2048
 #define NP2_LONG_LINE_LIMIT		4096
-#define MAX_MODIFY_LINE_SIZE	256
 
 typedef struct _editfindreplace {
 	char	szFind[512];
@@ -66,6 +65,7 @@ typedef struct _editfindreplace {
 #define SORT_LOGICAL		64
 #define SORT_COLUMN			128
 
+void	Edit_ReleaseResources(void);
 HWND	EditCreate(HWND hwndParent);
 void	EditSetNewText(HWND hwnd, LPCSTR lpstrText, DWORD cbText);
 BOOL	EditConvertText(HWND hwnd, UINT cpSource, UINT cpDest, BOOL bSetSavePoint);
@@ -132,8 +132,8 @@ BOOL	EditReplace(HWND hwnd, LPCEDITFINDREPLACE lpefr);
 BOOL	EditReplaceAll(HWND hwnd, LPCEDITFINDREPLACE lpefr, BOOL bShowInfo);
 BOOL	EditReplaceAllInSelection(HWND hwnd, LPCEDITFINDREPLACE lpefr, BOOL bShowInfo);
 BOOL	EditLineNumDlg(HWND hwnd);
-BOOL	EditModifyLinesDlg(HWND hwnd, LPWSTR pwsz1, LPWSTR pwsz2);
-BOOL	EditEncloseSelectionDlg(HWND hwnd, LPWSTR pwszOpen, LPWSTR pwszClose);
+void	EditModifyLinesDlg(HWND hwnd);
+void	EditEncloseSelectionDlg(HWND hwnd);
 void	EditInsertTagDlg(HWND hwnd);
 void	EditInsertUnicodeControlCharacter(HWND hwnd, int menu);
 void	EditShowUnicodeControlCharacter(HWND hwnd, BOOL bShow);

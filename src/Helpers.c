@@ -198,6 +198,25 @@ void IniSectionSetString(IniSectionOnSave *section, LPCWSTR key, LPCWSTR value) 
 	section->next = p;
 }
 
+void DString_GetWindowText(DString *s, HWND hwnd) {
+	int len = GetWindowTextLength(hwnd);
+	if (len == 0) {
+		if (s->buffer != NULL) {
+			s->buffer[0] = L'\0';
+		}
+	} else {
+		if (len + 1 > s->capacity || s->buffer == NULL) {
+			len = (len + 1) * sizeof(WCHAR);
+			LPWSTR buffer = (s->buffer == NULL) ? NP2HeapAlloc(len) : NP2HeapReAlloc(s->buffer, len);
+			if (buffer != NULL) {
+				s->buffer = buffer;
+				s->capacity = (INT)(NP2HeapSize(buffer) / sizeof(WCHAR));
+			}
+		}
+		GetWindowText(hwnd, s->buffer, s->capacity);
+	}
+}
+
 int ParseCommaList(LPCWSTR str, int result[], int count) {
 	if (StrIsEmpty(str)) {
 		return 0;
