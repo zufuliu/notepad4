@@ -2222,34 +2222,55 @@ void EditMoveDown(HWND hwnd) {
 	}
 }
 
+// only convert CR+LF
 static void ConvertWinEditLineEndingsEx(char *s, int iEOLMode, int *linesCount) {
 	int count = 0;
 	if (iEOLMode != SC_EOL_CRLF) {
 		char *p = s;
+		const char chaEOL = (iEOLMode == SC_EOL_LF) ? '\n' : '\r';
 		while (*s) {
-			if (*s == '\r') {
+			switch (*s) {
+			case '\r':
 				++count;
-				if (iEOLMode == SC_EOL_LF) {
+				if (s[1] == '\n') {
 					++s;
-					*p++ = *s++;
+					*p++ = chaEOL;
 				} else {
-					*p++ = *s++;
-					++s;
+					*p++ = '\r';
 				}
-			} else {
+				++s;
+				break;
+
+			case '\n':
+				++count;
+				*p++ = '\n';
+				++s;
+				break;
+
+			default:
 				*p++ = *s++;
+				break;
 			}
 		}
+
 		*p = '\0';
 		if (linesCount != NULL) {
 			*linesCount = count;
 		}
 	} else if (linesCount != NULL) {
 		while (*s) {
-			if (*s == '\r') {
+			switch (*s++) {
+			case '\r':
 				++count;
+				if (*s == '\n') {
+					++s;
+				}
+				break;
+
+			case '\n':
+				++count;
+				break;
 			}
-			++s;
 		}
 		*linesCount = count;
 	}
@@ -5840,6 +5861,7 @@ static INT_PTR CALLBACK EditInsertTagDlgProc(HWND hwnd, UINT umsg, WPARAM wParam
 								*pwCur != L' ' &&
 								*pwCur != L'\t' &&
 								*pwCur != L'\r' &&
+								*pwCur != L'\n' &&
 								(StrChr(L":_-.", *pwCur) || isalnum(*pwCur))) {
 							wchIns[cchIns++] = *pwCur++;
 						}
