@@ -1226,7 +1226,7 @@ void EditEncloseSelectionNewLine(HWND hwnd, LPCWSTR pwszOpen, LPCWSTR pwszClose)
 	WCHAR start[64] = L"";
 	WCHAR end[64] = L"";
 	const int iEOLMode = (int)SendMessage(hwnd, SCI_GETEOLMODE, 0, 0);
-	LPCWSTR lineEnd = (iEOLMode == SC_EOL_LF) ? L"LF" : ((iEOLMode == SC_EOL_CR) ? L"CR" : L"CR+LF");
+	LPCWSTR lineEnd = (iEOLMode == SC_EOL_LF) ? L"\n" : ((iEOLMode == SC_EOL_CR) ? L"\r" : L"\r\n");
 
 	Sci_Position pos = SciCall_GetSelectionStart();
 	int line = SciCall_LineFromPosition(pos);
