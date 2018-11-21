@@ -416,10 +416,7 @@ extern "C" BOOL EditPrint(HWND hwnd, LPCWSTR pszDocTitle, LPCWSTR pszPageFormat)
 static UINT_PTR CALLBACK PageSetupHook(HWND hwnd, UINT uiMsg, WPARAM wParam, LPARAM /*lParam*/) noexcept {
 	switch (uiMsg) {
 	case WM_INITDIALOG: {
-		SendDlgItemMessage(hwnd, IDC_PAGESETUP_ZOOM_EDIT, EM_LIMITTEXT, 32, 0);
-
-		SendDlgItemMessage(hwnd, IDC_PAGESETUP_ZOOM_UPDOWN, UDM_SETRANGE, 0, MAKELONG(SC_MAX_ZOOM_LEVEL, SC_MIN_ZOOM_LEVEL));
-		SendDlgItemMessage(hwnd, IDC_PAGESETUP_ZOOM_UPDOWN, UDM_SETPOS, 0, MAKELONG((short)iPrintZoom, 0));
+		InitZoomLevelComboBox(hwnd, IDC_PAGESETUP_ZOOMLEVEL, iPrintZoom);
 
 		// Set header options
 		WCHAR tch[512];
@@ -473,9 +470,9 @@ static UINT_PTR CALLBACK PageSetupHook(HWND hwnd, UINT uiMsg, WPARAM wParam, LPA
 
 	case WM_COMMAND:
 		if (LOWORD(wParam) == IDOK) {
-			const LONG lPos = (LONG)SendDlgItemMessage(hwnd, IDC_PAGESETUP_ZOOM_UPDOWN, UDM_GETPOS, 0, 0);
-			if (HIWORD(lPos) == 0) {
-				iPrintZoom = LOWORD(lPos);
+			int zoomLevel;
+			if (GetZoomLevelComboBoxValue(hwnd, IDC_PAGESETUP_ZOOMLEVEL, &zoomLevel)) {
+				iPrintZoom = zoomLevel;
 			} else {
 				iPrintZoom = 100;
 			}

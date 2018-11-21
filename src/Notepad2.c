@@ -5137,6 +5137,10 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 				EditEnsureConsistentLineEndings(hwndEdit);
 				return TRUE;
 
+			case STATUS_DOCZOOM:
+				ZoomLevelDlg(hwnd);
+				return TRUE;
+
 			default:
 				return FALSE;
 			}

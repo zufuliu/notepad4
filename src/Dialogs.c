@@ -1931,7 +1931,7 @@ BOOL SelectDefLineEndingDlg(HWND hwnd, int *iOption) {
 	return iResult == IDOK;
 }
 
-static INT_PTR CALLBACK WarnLineEndingDlgDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
+static INT_PTR CALLBACK WarnLineEndingDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
 	switch (umsg) {
 	case WM_INITDIALOG: {
 		SetWindowLongPtr(hwnd, DWLP_USER, lParam);
@@ -1989,8 +1989,85 @@ static INT_PTR CALLBACK WarnLineEndingDlgDlgProc(HWND hwnd, UINT umsg, WPARAM wP
 
 BOOL WarnLineEndingDlg(HWND hwnd, struct EditFileIOStatus *status) {
 	MessageBeep(MB_ICONEXCLAMATION);
-	const INT_PTR iResult = ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_WARNLINEENDS), hwnd, WarnLineEndingDlgDlgProc, (LPARAM)status);
+	const INT_PTR iResult = ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_WARNLINEENDS), hwnd, WarnLineEndingDlgProc, (LPARAM)status);
 	return iResult == IDOK;
+}
+
+void InitZoomLevelComboBox(HWND hwnd, int nCtlId, int zoomLevel) {
+	WCHAR tch[16];
+	int selIndex = -1;
+	int i = 0;
+	int level = 25;
+
+	HWND hwndCtl = GetDlgItem(hwnd, nCtlId);
+	SendMessage(hwndCtl, CB_LIMITTEXT, 8, 0);
+	for (; level < 200; level += 25) {
+		if (zoomLevel == level) {
+			selIndex = i;
+		}
+		wsprintf(tch, L"%d%%", level);
+		SendMessage(hwndCtl, CB_ADDSTRING, 0, (LPARAM)tch);
+		++i;
+	}
+	for (; level <= SC_MAX_ZOOM_LEVEL; level += 50) {
+		if (zoomLevel == level) {
+			selIndex = i;
+		}
+		wsprintf(tch, L"%d%%", level);
+		SendMessage(hwndCtl, CB_ADDSTRING, 0, (LPARAM)tch);
+		++i;
+	}
+
+	SendMessage(hwndCtl, CB_SETEXTENDEDUI, TRUE, 0);
+	SendMessage(hwndCtl, CB_SETCURSEL, selIndex, 0);
+	if (selIndex == -1) {
+		wsprintf(tch, L"%d%%", zoomLevel);
+		SetWindowText(hwndCtl, tch);
+	}
+}
+
+BOOL GetZoomLevelComboBoxValue(HWND hwnd, int nCtrId, int *zoomLevel) {
+	WCHAR tch[16];
+	GetDlgItemText(hwnd, nCtrId, tch, COUNTOF(tch));
+	return CRTStrToInt(tch, zoomLevel) && *zoomLevel >= SC_MIN_ZOOM_LEVEL && *zoomLevel <= SC_MAX_ZOOM_LEVEL;
+}
+
+static INT_PTR CALLBACK ZoomLevelDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
+	UNREFERENCED_PARAMETER(lParam);
+
+	switch (umsg) {
+	case WM_INITDIALOG: {
+		const int zoomLevel = (int)SendMessage(hwndEdit, SCI_GETZOOM, 0, 0);
+		InitZoomLevelComboBox(hwnd, IDC_ZOOMLEVEL, zoomLevel);
+		CenterDlgInParent(hwnd);
+	}
+	return TRUE;
+
+	case WM_COMMAND:
+		switch (LOWORD(wParam)) {
+		case IDOK:
+		case IDYES: {
+			int zoomLevel;
+			if (GetZoomLevelComboBoxValue(hwnd, IDC_ZOOMLEVEL, &zoomLevel)) {
+				SendMessage(hwndEdit, SCI_SETZOOM, zoomLevel, 0);
+			}
+			if (LOWORD(wParam) == IDOK) {
+				EndDialog(hwnd, IDOK);
+			}
+		}
+		break;
+
+		case IDCANCEL:
+			EndDialog(hwnd, IDCANCEL);
+			break;
+		}
+		return TRUE;
+	}
+	return FALSE;
+}
+
+void ZoomLevelDlg(HWND hwnd) {
+	ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_ZOOMLEVEL), hwnd, ZoomLevelDlgProc, 0);
 }
 
 //=============================================================================
