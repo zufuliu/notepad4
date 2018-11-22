@@ -680,6 +680,22 @@ void CenterDlgInParentEx(HWND hDlg, HWND hParent) {
 	SetWindowPos(hDlg, NULL, clamp_i(x, xMin, xMax), clamp_i(y, yMin, yMax), 0, 0, SWP_NOZORDER | SWP_NOSIZE);
 }
 
+void SetToRightBottomEx(HWND hDlg, HWND hParent) {
+	RECT rcDlg;
+	RECT rcParent;
+	RECT rcClient;
+
+	GetWindowRect(hDlg, &rcDlg);
+	GetWindowRect(hParent, &rcParent);
+	GetClientRect(hParent, &rcClient);
+
+	const int width = (rcDlg.right - rcDlg.left) + ((rcParent.right - rcParent.left) - (rcClient.right - rcClient.left)) / 2;
+	const int height = (rcDlg.bottom - rcDlg.top) + ((rcParent.bottom - rcParent.top) - (rcClient.bottom - rcClient.top)) / 2;
+	const int x = rcParent.right - width;
+	const int y = rcParent.bottom - height;
+	SetWindowPos(hDlg, NULL, x, y, 0, 0, SWP_NOZORDER | SWP_NOSIZE);
+}
+
 // Why doesn’t the "Automatically move pointer to the default button in a dialog box"
 // work for nonstandard dialog boxes, and how do I add it to my own nonstandard dialog boxes?
 // https://blogs.msdn.microsoft.com/oldnewthing/20130826-00/?p=3413/

@@ -2027,13 +2027,15 @@ BOOL GetZoomLevelComboBoxValue(HWND hwnd, int nCtrId, int *zoomLevel) {
 }
 
 static INT_PTR CALLBACK ZoomLevelDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
-	UNREFERENCED_PARAMETER(lParam);
-
 	switch (umsg) {
 	case WM_INITDIALOG: {
 		const int zoomLevel = (int)SendMessage(hwndEdit, SCI_GETZOOM, 0, 0);
 		InitZoomLevelComboBox(hwnd, IDC_ZOOMLEVEL, zoomLevel);
-		CenterDlgInParent(hwnd);
+		if (lParam) {
+			SetToRightBottom(hwnd);
+		} else {
+			CenterDlgInParent(hwnd);
+		}
 	}
 	return TRUE;
 
@@ -2060,8 +2062,8 @@ static INT_PTR CALLBACK ZoomLevelDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LP
 	return FALSE;
 }
 
-void ZoomLevelDlg(HWND hwnd) {
-	ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_ZOOMLEVEL), hwnd, ZoomLevelDlgProc, 0);
+void ZoomLevelDlg(HWND hwnd, BOOL bBottom) {
+	ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_ZOOMLEVEL), hwnd, ZoomLevelDlgProc, bBottom);
 }
 
 //=============================================================================

@@ -391,8 +391,12 @@ void SetWindowTransparentMode(HWND hwnd, BOOL bTransparentMode, int iOpacityLeve
 void SetWindowLayoutRTL(HWND hwnd, BOOL bRTL);
 
 void CenterDlgInParentEx(HWND hDlg, HWND hParent);
+void SetToRightBottomEx(HWND hDlg, HWND hParent);
 NP2_inline void CenterDlgInParent(HWND hDlg) {
 	CenterDlgInParentEx(hDlg, GetParent(hDlg));
+}
+NP2_inline void SetToRightBottom(HWND hDlg) {
+	SetToRightBottomEx(hDlg, GetParent(hDlg));
 }
 void SnapToDefaultButton(HWND hwndBox);
 
