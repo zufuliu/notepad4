@@ -635,7 +635,7 @@ BOOL IsUTF8(const char *pTest, DWORD nLength) {
 #endif
 
 // Copyright (c) 2008-2010 Bjoern Hoehrmann <bjoern@hoehrmann.de>
-// See http://bjoern.hoehrmann.de/utf-8/decoder/dfa/ for details.
+// See https://bjoern.hoehrmann.de/utf-8/decoder/dfa/ for details.
 
 BOOL IsUTF8(const char *pTest, DWORD nLength) {
 	enum {

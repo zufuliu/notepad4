@@ -3359,7 +3359,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	}
 	break;
 
-	// http://www.frenk.com/2009/12/convert-filetime-to-unix-timestamp/
+	// https://www.frenk.com/2009/12/convert-filetime-to-unix-timestamp/
 	case IDM_EDIT_INSERT_TIMESTAMP:		// second	1000 milli
 	case IDM_EDIT_INSERT_TIMESTAMP_MS:	// milli	1000 micro
 	case IDM_EDIT_INSERT_TIMESTAMP_US:	// micro 	1000 nano

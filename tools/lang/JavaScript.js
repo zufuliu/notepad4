@@ -1,5 +1,5 @@
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Lexical_grammar
-// http://www.ecma-international.org/publications/standards/Ecma-262.htm
+// https://www.ecma-international.org/publications/standards/Ecma-262.htm
 
 async await
 break
@@ -24,8 +24,8 @@ Infinity
 NaN
 undefined
 
-// http://www.ecma-international.org/ecma-262/9.0/index.html#sec-imports
-// http://www.ecma-international.org/ecma-262/9.0/index.html#sec-exports
+// https://www.ecma-international.org/ecma-262/9.0/index.html#sec-imports
+// https://www.ecma-international.org/ecma-262/9.0/index.html#sec-exports
 import as from;
 export as;
 export default;

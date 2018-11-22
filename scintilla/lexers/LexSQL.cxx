@@ -250,7 +250,7 @@ _label_identifier:
 				sc.Forward();	// Eat the * so it isn't used for the end of the comment
 			} else if (sc.Match('-', '-')) {
 				// MySQL requires a space or control char after --
-				// http://dev.mysql.com/doc/mysql/en/ansi-diff-comments.html
+				// https://dev.mysql.com/doc/mysql/en/ansi-diff-comments.html
 				// Perhaps we should enforce that with proper property:
 				//~} else if (sc.Match("-- ")) {
 				sc.SetState(SCE_SQL_COMMENTLINE);

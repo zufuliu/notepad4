@@ -537,7 +537,7 @@ static void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int in
 			} else if (IsADigit(sc.ch)) {
 				sc.SetState(SCE_SH_NUMBER);
 				numBase = BASH_BASE_DECIMAL;
-				if (sc.ch == '0') {	// hex,octal
+				if (sc.ch == '0') {	// hex, octal
 					if (sc.chNext == 'x' || sc.chNext == 'X') {
 						numBase = BASH_BASE_HEX;
 						sc.Forward();

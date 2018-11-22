@@ -2310,7 +2310,7 @@ BOOL ChangeDirectory(HWND hwnd, LPCWSTR lpszNewDir, BOOL bUpdateHistory) {
 			ListView_SetItemState(hwndDirList, 0, LVIS_FOCUSED, LVIS_FOCUSED);
 		}
 
-		// new directory -- scroll to 0,0
+		// new directory -- scroll to (0, 0)
 		if (!fUpdate) {
 			ListView_EnsureVisible(hwndDirList, 0, FALSE);
 		} else {

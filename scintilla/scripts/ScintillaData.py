@@ -178,7 +178,7 @@ def FindCredits(historyFile):
                 credits.append(credit)
     return credits
 
-def ciCompare(a,b):
+def ciCompare(a, b):
     return cmp(a.lower(), b.lower())
 
 def ciKey(a):

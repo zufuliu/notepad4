@@ -1,7 +1,7 @@
 #include "EditLexer.h"
 #include "EditStyle.h"
 
-// http://www.tcl.tk/about/language.html
+// https://www.tcl.tk/about/language.html
 
 static KEYWORDLIST Keywords_Tcl = {{
 // 0 TCL Keyword

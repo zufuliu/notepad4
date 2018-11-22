@@ -200,8 +200,8 @@ static NP2_KEYWORDS kwCheckstyle = {
 };
 
 // Apache Config
-//http://httpd.apache.org/docs/2.2/en/mod/directives.html
-//http://httpd.apache.org/docs/2.4/en/mod/directives.html
+// https://httpd.apache.org/docs/2.2/en/mod/directives.html
+// https://httpd.apache.org/docs/2.4/en/mod/directives.html
 static NP2_KEYWORDS kwApache = {
 "AuthnProviderAlias AuthzProviderAlias Directory DirectoryMatch Else ElseIf Files FilesMatch If IfDefine IfModule IfVersion Limit LimitExcept Location LocationMatch Proxy ProxyMatch RequireAll RequireAny RequireNone VirtualHost "
 , // Directive

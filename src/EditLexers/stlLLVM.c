@@ -1,7 +1,7 @@
 #include "EditLexer.h"
 #include "EditStyle.h"
 
-// http://llvm.org/docs/LangRef.html
+// https://llvm.org/docs/LangRef.html
 
 static KEYWORDLIST Keywords_LLVM = {{
 "define declare type alias comdat "

@@ -20,3 +20,8 @@ https://github.com/rizonesoft/Notepad3
 
 Notepad2e
 https://github.com/ProgerXP/Notepad2e
+
+init submodule:
+	git submodule init
+update submodule:
+	git submodule update --remote --merge

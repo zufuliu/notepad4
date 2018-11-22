@@ -1554,7 +1554,7 @@ void SurfaceD2D::Ellipse(PRectangle rc, ColourDesired fore, ColourDesired back) 
 		const FLOAT radius = rc.Width() / 2.0f;
 		D2D1_ELLIPSE ellipse = {
 			D2D1::Point2F((rc.left + rc.right) / 2.0f, (rc.top + rc.bottom) / 2.0f),
-			radius,radius };
+			radius, radius };
 
 		PenColour(back);
 		pRenderTarget->FillEllipse(ellipse, pBrush);
@@ -1828,7 +1828,7 @@ size_t ScreenLineLayout::PositionFromX(XYPOSITION xDistance, bool charPosition) 
 		return 0;
 	}
 
-	// Returns the text position corresponding to the mouse x,y.
+	// Returns the text position corresponding to the mouse (x, y).
 	// If hitting the trailing side of a cluster, return the
 	// leading edge of the following text position.
 
@@ -1883,7 +1883,7 @@ XYPOSITION ScreenLineLayout::XFromPosition(size_t caretPosition) noexcept {
 	// Convert byte positions to wchar_t positions
 	const size_t position = GetPositionInLayout(text, caretPosition);
 
-	// Translate text character offset to point x,y.
+	// Translate text character offset to point (x, y).
 	DWRITE_HIT_TEST_METRICS caretMetrics;
 	Point pt;
 

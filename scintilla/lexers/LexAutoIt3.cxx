@@ -44,7 +44,7 @@ static constexpr bool IsAu3Operator(int ch) noexcept {
 ///////////////////////////////////////////////////////////////////////////////
 // GetSendKey() filters the portion before and after a/multiple space(s)
 // and return the first portion to be looked-up in the table
-// also check if the second portion is valid... (up,down.on.off,toggle or a number)
+// also check if the second portion is valid... (up, down.on.off, toggle or a number)
 ///////////////////////////////////////////////////////////////////////////////
 
 static int GetSendKey(const char *szLine, char *szKey) noexcept {

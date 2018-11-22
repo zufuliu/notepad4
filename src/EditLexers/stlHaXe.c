@@ -1,7 +1,7 @@
 #include "EditLexer.h"
 #include "EditStyle.h"
 
-// http://haxe.org/
+// https://haxe.org/
 
 static KEYWORDLIST Keywords_HaXe = {{
 "break callback case cast catch class continue default do dynamic else enum "

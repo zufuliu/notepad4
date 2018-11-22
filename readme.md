@@ -193,7 +193,7 @@
 ## More information:
 * [Official Notepad2 website](http://www.flos-freeware.ch/notepad2.html)
 * [Official Notepad2-mod website](https://xhmikosr.github.io/notepad2-mod/)
-* [Scintilla's website](http://www.scintilla.org/)
+* [Scintilla's website](https://www.scintilla.org/)
 * [Build Notepad2 and metapath](https://github.com/zufuliu/notepad2/wiki/Build-Notepad2)
 * [Notepad2 Wiki](https://github.com/zufuliu/notepad2/wiki)
 

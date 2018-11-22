@@ -1825,7 +1825,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 					chPrev = ' ';
 					chNext = static_cast<unsigned char>(styler.SafeGetCharAt(i + 1));
 				} else {
-					//					state = statePrintForState(SCE_HP_STRING,inScriptType);
+					//state = statePrintForState(SCE_HP_STRING, inScriptType);
 					state = SCE_HP_STRING;
 				}
 			} else if (ch == '\'') {
@@ -1959,7 +1959,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 			}
 			break;
 		case SCE_HPHP_NUMBER:
-			// recognize bases 8,10 or 16 integers OR floating-point numbers
+			// recognize bases 8, 10 or 16 integers OR floating-point numbers
 			if (!IsADigit(ch)
 				&& strchr(".xXabcdefABCDEF", ch) == nullptr
 				&& ((ch != '-' && ch != '+') || (chPrev != 'e' && chPrev != 'E'))) {

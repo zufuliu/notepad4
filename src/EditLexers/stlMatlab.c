@@ -5,8 +5,8 @@
 // https://www.mathworks.com/help/matlab/matlab_oop/specifying-attributes.html
 // https://www.mathworks.com/help/matlab/ref/matlab.system-class.html
 // https://www.gnu.org/software/octave/
-// http://www.scilab.org/
-// http://gnuplot.info/
+// https://www.scilab.org/
+// https://gnuplot.info/
 
 static KEYWORDLIST Keywords_Matlab = {{
 "break case catch classdef continue else elseif end for function global if otherwise parfor persistent return spmd switch try while "

@@ -147,7 +147,8 @@ extern UINT g_uCurrentDPI;
 extern UINT g_uCurrentPPI;
 extern WCHAR szIniFile[MAX_PATH];
 
-// MSDN: Operating System Version
+// Operating System Version
+// https://docs.microsoft.com/en-us/windows/desktop/SysInfo/operating-system-version
 
 #if 0
 #define IsWin2KAndAbove()	(g_uWinVer >= 0x0500)
@@ -167,7 +168,7 @@ extern WCHAR szIniFile[MAX_PATH];
 #endif
 
 // High DPI Reference
-// https://msdn.microsoft.com/en-us/library/windows/desktop/hh447398(v=vs.85).aspx
+// https://docs.microsoft.com/en-us/windows/desktop/hidpi/high-dpi-reference
 #ifndef WM_DPICHANGED
 #define WM_DPICHANGED	0x02E0
 #endif

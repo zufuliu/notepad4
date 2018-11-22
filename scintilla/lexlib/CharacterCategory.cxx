@@ -3820,7 +3820,7 @@ CharacterCategory CategoriseCharacter(int character) noexcept {
 }
 
 // Implementation of character sets recommended for identifiers in Unicode Standard Annex #31.
-// http://unicode.org/reports/tr31/
+// https://unicode.org/reports/tr31/
 
 namespace {
 
@@ -3828,7 +3828,7 @@ enum class OtherID { oidNone, oidStart, oidContinue };
 
 // Some characters are treated as valid for identifiers even
 // though most characters from their category are not.
-// Values copied from http://www.unicode.org/Public/9.0.0/ucd/PropList.txt
+// Values copied from https://www.unicode.org/Public/11.0.0/ucd/PropList.txt
 OtherID OtherIDOfCharacter(int character) noexcept {
 	if (
 		(character == 0x1885) ||	// MONGOLIAN LETTER ALI GALI BALUDA

@@ -1,9 +1,9 @@
 #include "EditLexer.h"
 #include "EditStyle.h"
 
-// https://msdn.microsoft.com/en-us/library/dd9y37ha.aspx
+// https://docs.microsoft.com/en-us/cpp/build/nmake-reference
 // https://www.gnu.org/software/make/
-// http://doc.qt.io/qt-5/qmake-manual.html
+// https://doc.qt.io/qt-5/qmake-manual.html
 
 static KEYWORDLIST Keywords_MAK = {{
 // gmake

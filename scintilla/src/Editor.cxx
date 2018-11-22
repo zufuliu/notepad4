@@ -5774,7 +5774,7 @@ sptr_t Editor::BytesResult(sptr_t lParam, const unsigned char *val, size_t len) 
 }
 
 sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
-	//Platform::DebugPrintf("S start wnd proc %d %d %d\n",iMessage, wParam, lParam);
+	//Platform::DebugPrintf("S start wnd proc %d %d %d\n", iMessage, wParam, lParam);
 
 	// Optional macro recording hook
 	if (recordingMacro)

@@ -1,7 +1,7 @@
 #include "EditLexer.h"
 #include "EditStyle.h"
 
-// http://www.json.org
+// https://www.json.org
 
 static KEYWORDLIST Keywords_JSON = {{
 "true false null"

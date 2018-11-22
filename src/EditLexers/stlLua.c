@@ -2,7 +2,7 @@
 #include "EditStyle.h"
 
 // https://en.wikipedia.org/wiki/Lua_(programming_language)
-// http://www.lua.org/
+// https://www.lua.org/
 
 static KEYWORDLIST Keywords_Lua = {{
 "and break do else elseif end false for function goto if "

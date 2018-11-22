@@ -1109,7 +1109,7 @@ static void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int in
 				backFlag = BACK_NONE;
 				numState = PERLNUM_DECIMAL;
 				dotCount = 0;
-				if (sc.ch == '0') {		// hex,bin,octal
+				if (sc.ch == '0') {		// hex, bin, octal
 					if (sc.chNext == 'x' || sc.chNext == 'X') {
 						numState = PERLNUM_HEX;
 					} else if (sc.chNext == 'b' || sc.chNext == 'B') {

@@ -64,9 +64,9 @@
 ##     charrange -> range of a min and a max position
 ##     charrangeresult -> like charrange, but output param
 ##     countedstring
-##     point -> x,y
+##     point -> (x, y)
 ##     pointresult  -> like point, but output param
-##     rectangle -> left,top,right,bottom
+##     rectangle -> {left, top, right, bottom}
 ## Client code should ignore definitions containing types it does not understand, except
 ## for possibly #defining the constants
 

@@ -1125,7 +1125,7 @@ void EditURLEncode(HWND hwnd) {
 	MultiByteToWideChar(cpEdit, 0, pszText, iSelCount, pszTextW,
 						(int)NP2HeapSize(pszTextW) / sizeof(WCHAR));
 
-	// https://msdn.microsoft.com/en-us/library/windows/desktop/bb773774(v=vs.85).aspx
+	// https://docs.microsoft.com/en-us/windows/desktop/api/shlwapi/nf-shlwapi-urlescapea
 	char *pszEscaped = NP2HeapAlloc(NP2HeapSize(pszText) * 3); // '&', H1, H0
 	LPWSTR pszEscapedW = NP2HeapAlloc(NP2HeapSize(pszTextW) * 3);
 
@@ -1270,7 +1270,7 @@ void EditUnescapeCChars(HWND hwnd) {
 }
 
 // XML/HTML predefined entity
-// http://en.wikipedia.org/wiki/List_of_XML_and_HTML_character_entity_references
+// https://en.wikipedia.org/wiki/List_of_XML_and_HTML_character_entity_references
 // &quot;	["]
 // &amp;	[&]
 // &apos;	[']

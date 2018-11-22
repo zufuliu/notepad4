@@ -2,7 +2,7 @@
 #include "EditStyle.h"
 
 // https://en.wikipedia.org/wiki/PowerShell
-// https://msdn.microsoft.com/en-us/powershell/mt173057.aspx
+// https://docs.microsoft.com/en-us/powershell/scripting/powershell-scripting
 
 static KEYWORDLIST Keywords_PS1 = {{
 "begin break catch continue data do dynamicparam else elseif end exit filter finally for foreach "
