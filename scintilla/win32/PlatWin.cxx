@@ -2623,7 +2623,7 @@ PRectangle ListBoxX::GetDesiredRect() {
 
 	rcDesired.right = rcDesired.left + TextOffset() + width + (TextInset.x * 2);
 	if (Length() > rows)
-		rcDesired.right += ::GetSystemMetrics(SM_CXVSCROLL);
+		rcDesired.right += GetSystemMetricsEx(SM_CXVSCROLL);
 
 	AdjustWindowRect(&rcDesired);
 	return rcDesired;
@@ -2862,7 +2862,7 @@ POINT ListBoxX::MinTrackSize() const {
 
 POINT ListBoxX::MaxTrackSize() const {
 	const int width = maxCharWidth * maxItemCharacters + static_cast<int>(TextInset.x) * 2 +
-		TextOffset() + ::GetSystemMetrics(SM_CXVSCROLL);
+		TextOffset() + GetSystemMetricsEx(SM_CXVSCROLL);
 	PRectangle rc = PRectangle::FromInts(0, 0,
 		std::max(MinClientWidth(), width),
 		ItemHeight() * lti.Count());
@@ -2975,7 +2975,7 @@ LRESULT ListBoxX::NcHitTest(WPARAM wParam, LPARAM lParam) const noexcept {
 	// window caption height + frame, even if one is hovering over the bottom edge of
 	// the frame, so workaround that here
 	if (hit >= HTTOP && hit <= HTTOPRIGHT) {
-		const int minHeight = GetSystemMetrics(SM_CYMINTRACK);
+		const int minHeight = GetSystemMetricsEx(SM_CYMINTRACK);
 		const int yPos = GET_Y_LPARAM(lParam);
 		if ((rc.Height() < minHeight) && (yPos > ((rc.top + rc.bottom) / 2))) {
 			hit += HTBOTTOM - HTTOP;

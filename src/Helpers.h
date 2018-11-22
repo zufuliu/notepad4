@@ -176,8 +176,13 @@ extern WCHAR szIniFile[MAX_PATH];
 #define USER_DEFAULT_SCREEN_DPI		96
 #endif
 
-#define RoundToCurrentDPI(value)	((g_uCurrentDPI*(value) + USER_DEFAULT_SCREEN_DPI/2) / USER_DEFAULT_SCREEN_DPI)
-#define ScaleFontSize(value)		MulDiv(g_uCurrentDPI, (value), g_uCurrentPPI)
+NP2_inline int RoundToCurrentDPI(int value)	{
+	return (g_uCurrentDPI == USER_DEFAULT_SCREEN_DPI) ? value : MulDiv(g_uCurrentDPI, value, USER_DEFAULT_SCREEN_DPI);
+}
+
+// https://docs.microsoft.com/en-us/windows/desktop/api/winuser/nf-winuser-getsystemmetrics
+// https://docs.microsoft.com/en-us/windows/desktop/api/winuser/nf-winuser-getsystemmetricsfordpi
+int GetSystemMetricsEx(int nIndex);
 
 // https://docs.microsoft.com/en-us/windows/desktop/Memory/comparing-memory-allocation-methods
 // https://blogs.msdn.microsoft.com/oldnewthing/20120316-00/?p=8083/

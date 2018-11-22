@@ -8,6 +8,8 @@
 #ifndef PLATWIN_H
 #define PLATWIN_H
 
+extern "C" int GetSystemMetricsEx(int nIndex);
+
 namespace Scintilla {
 
 extern void Platform_Initialise(void *hInstance) noexcept;
