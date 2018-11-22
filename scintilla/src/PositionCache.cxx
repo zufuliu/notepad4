@@ -66,7 +66,7 @@ LineLayout::LineLayout(int maxLineLength_) :
 	containsCaret(false),
 	edgeColumn(0),
 	bracePreviousStyles{},
-	hotspot(0,0),
+	hotspot(0, 0),
 	widthLine(wrapWidthInfinite),
 	lines(1),
 	wrapIndent(0) {

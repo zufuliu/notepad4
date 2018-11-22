@@ -1,7 +1,7 @@
 #include "EditLexer.h"
 #include "EditStyle.h"
 
-// http://www.latex-project.org/
+// https://www.latex-project.org/
 
 static KEYWORDLIST Keywords_TEX = {{
 NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL

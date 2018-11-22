@@ -746,7 +746,7 @@ Sci::Position Document::NextPosition(Sci::Position pos, int moveDir) const noexc
 					pos++;
 				} else {
 					const int widthCharBytes = UTF8BytesOfLead(leadByte);
-					unsigned char charBytes[UTF8MaxBytes] = { leadByte,0,0,0 };
+					unsigned char charBytes[UTF8MaxBytes] = { leadByte, 0 , 0, 0 };
 					for (int b = 1; b < widthCharBytes; b++) {
 						charBytes[b] = cb.CharAt(pos + b);
 					}
@@ -781,8 +781,10 @@ Sci::Position Document::NextPosition(Sci::Position pos, int moveDir) const noexc
 				// Anchor DBCS calculations at start of line because start of line can
 				// not be a DBCS trail byte.
 				const Sci::Position posStartLine = cb.LineStart(cb.LineFromPosition(pos));
-				// See http://msdn.microsoft.com/en-us/library/cc194792%28v=MSDN.10%29.aspx
-				// http://msdn.microsoft.com/en-us/library/cc194790.aspx
+				// How to Go Backward in a DBCS String
+				// https://msdn.microsoft.com/en-us/library/cc194792.aspx
+				// DBCS-Enabled Programs vs. Non-DBCS-Enabled Programs
+				// https://msdn.microsoft.com/en-us/library/cc194790.aspx
 				if ((pos - 1) <= posStartLine) {
 					return pos - 1;
 				} else if (IsDBCSLeadByte(cb.CharAt(pos - 1))) {
@@ -943,7 +945,7 @@ int SCI_METHOD Document::GetCharacterAndWidth(Sci_Position position, Sci_Positio
 				character = leadByte;
 			} else {
 				const int widthCharBytes = UTF8BytesOfLead(leadByte);
-				unsigned char charBytes[UTF8MaxBytes] = { leadByte,0,0,0 };
+				unsigned char charBytes[UTF8MaxBytes] = { leadByte, 0, 0, 0 };
 				for (int b = 1; b < widthCharBytes; b++) {
 					charBytes[b] = cb.UCharAt(position + b);
 				}

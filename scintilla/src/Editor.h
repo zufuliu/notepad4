@@ -278,7 +278,7 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	void DropGraphics(bool freeObjects) noexcept;
 	void AllocateGraphics();
 
-	// The top left visible point in main window coordinates. Will be 0,0 except for
+	// The top left visible point in main window coordinates. Will be (0, 0) except for
 	// scroll views where it will be equivalent to the current scroll position.
 	Point GetVisibleOriginInMain() const noexcept override;
 	PointDocument DocumentPointFromView(Point ptView) const noexcept;  // Convert a point from view space to document

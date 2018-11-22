@@ -1514,7 +1514,7 @@ sptr_t ScintillaWin::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam
 			IMContext imc(MainHWND());
 			::ImmNotifyIME(imc.hIMC, NI_COMPOSITIONSTR, CPS_COMPLETE, 0);
 			//
-			//Platform::DebugPrintf("Buttdown %d %x %x %x %x %x\n",iMessage, wParam, lParam,
+			//Platform::DebugPrintf("Buttdown %d %x %x %x %x %x\n", iMessage, wParam, lParam,
 			//	KeyboardIsKeyDown(VK_SHIFT),
 			//	KeyboardIsKeyDown(VK_CONTROL),
 			//	KeyboardIsKeyDown(VK_MENU));
@@ -1528,7 +1528,7 @@ sptr_t ScintillaWin::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam
 			const Point pt = PointFromLParam(lParam);
 
 			// Windows might send WM_MOUSEMOVE even though the mouse has not been moved:
-			// http://blogs.msdn.com/b/oldnewthing/archive/2003/10/01/55108.aspx
+			// https://blogs.msdn.com/b/oldnewthing/archive/2003/10/01/55108.aspx
 			if (ptMouseLast.x != pt.x || ptMouseLast.y != pt.y) {
 				SetTrackMouseLeaveEvent(true);
 				ButtonMoveWithModifiers(pt, ::GetMessageTime(), MouseModifiers(wParam));
@@ -1615,7 +1615,7 @@ sptr_t ScintillaWin::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam
 
 		case WM_SYSKEYDOWN:
 		case WM_KEYDOWN: {
-			//Platform::DebugPrintf("S keydown %d %x %x %x %x\n",iMessage, wParam, lParam, ::IsKeyDown(VK_SHIFT), ::IsKeyDown(VK_CONTROL));
+			//Platform::DebugPrintf("S keydown %d %x %x %x %x\n", iMessage, wParam, lParam, ::IsKeyDown(VK_SHIFT), ::IsKeyDown(VK_CONTROL));
 			lastKeyDownConsumed = false;
 			const int ret = KeyDownWithModifiers(KeyTranslate(static_cast<int>(wParam)),
 				ModifierFlags(KeyboardIsKeyDown(VK_SHIFT),
@@ -1643,7 +1643,7 @@ sptr_t ScintillaWin::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam
 		}
 
 		case WM_KEYUP:
-			//Platform::DebugPrintf("S keyup %d %x %x\n",iMessage, wParam, lParam);
+			//Platform::DebugPrintf("S keyup %d %x %x\n", iMessage, wParam, lParam);
 			return ::DefWindowProc(MainHWND(), iMessage, wParam, lParam);
 
 		case WM_SETTINGCHANGE:
@@ -2560,11 +2560,11 @@ STDMETHODIMP DataObject::QueryGetData(FORMATETC *pFE) noexcept {
 		pFE->lindex != -1 ||
 		(pFE->tymed & TYMED_HGLOBAL) == 0
 		) {
-		//Platform::DebugPrintf("DOB QueryGetData No %x\n",pFE->cfFormat);
+		//Platform::DebugPrintf("DOB QueryGetData No %x\n", pFE->cfFormat);
 		//return DATA_E_FORMATETC;
 		return S_FALSE;
 	}
-	//Platform::DebugPrintf("DOB QueryGetData OK %x\n",pFE->cfFormat);
+	//Platform::DebugPrintf("DOB QueryGetData OK %x\n", pFE->cfFormat);
 	return S_OK;
 }
 
@@ -2888,7 +2888,7 @@ void ScintillaWin::ScrollMessage(WPARAM wParam) {
 
 	GetScrollInfo(SB_VERT, &sci);
 
-	//Platform::DebugPrintf("ScrollInfo %d mask=%x min=%d max=%d page=%d pos=%d track=%d\n", b,sci.fMask,
+	//Platform::DebugPrintf("ScrollInfo %d mask=%x min=%d max=%d page=%d pos=%d track=%d\n", b, sci.fMask,
 	//sci.nMin, sci.nMax, sci.nPage, sci.nPos, sci.nTrackPos);
 	Sci::Line topLineNew = topLine;
 	switch (LOWORD(wParam)) {

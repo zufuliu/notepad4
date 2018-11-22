@@ -2,7 +2,7 @@
 #include "EditStyle.h"
 
 // https://en.wikipedia.org/wiki/Common_Intermediate_Language
-// http://www.ecma-international.org/publications/standards/Ecma-335.htm
+// https://www.ecma-international.org/publications/standards/Ecma-335.htm
 
 static KEYWORDLIST Keywords_CIL = {{
 "THE_END abstract algorithm alignment as assembly assert at beforefieldinit catch cdecl "

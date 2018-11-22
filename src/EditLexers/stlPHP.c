@@ -1,7 +1,7 @@
 #include "EditLexer.h"
 #include "EditStyle.h"
 
-// http://php.net/
+// https://php.net/
 
 static KEYWORDLIST Keywords_PHP = {{
 "abstract and as break callable case catch class clone const continue declare "

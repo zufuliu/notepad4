@@ -1,7 +1,7 @@
 #include "EditLexer.h"
 #include "EditStyle.h"
 
-// http://graphviz.org/
+// https://graphviz.org/
 
 static KEYWORDLIST Keywords_DOT = {{
 "node edge graph digraph subgraph strict true false"

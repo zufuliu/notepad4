@@ -4,7 +4,7 @@
 from __future__ import print_function
 import codecs, glob, os, platform, sys, unicodedata
 
-def ciCompare(a,b):
+def ciCompare(a, b):
     return cmp(a.lower(), b.lower())
 
 def ciKey(a):

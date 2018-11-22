@@ -2,7 +2,7 @@
 #include "EditStyle.h"
 
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Lexical_grammar
-// http://www.ecma-international.org/publications/standards/Ecma-262.htm
+// https://www.ecma-international.org/publications/standards/Ecma-262.htm
 static KEYWORDLIST Keywords_JS = {{
 // ECMA-262
 "async await break case catch class const continue debugger default delete do else extends finally for function if in "

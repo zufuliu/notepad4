@@ -1,9 +1,10 @@
 #include "EditLexer.h"
 #include "EditStyle.h"
 
-// http://msdn.microsoft.com/en-us/library/sh9ywfdk.aspx
-// http://msdn.microsoft.com/en-us/library/dd409611.aspx
-// http://msdn.microsoft.com/en-us/library/c157t28f.aspx
+// Visual Basic Language Reference
+// https://docs.microsoft.com/en-us/dotnet/visual-basic/language-reference/
+// https://docs.microsoft.com/en-us/dotnet/visual-basic/language-reference/keywords/
+// https://docs.microsoft.com/en-us/dotnet/visual-basic/language-reference/runtime-library-members
 
 static KEYWORDLIST Keywords_VB = {{
 "AddHandler AddressOf Alias And AndAlso As ByRef ByVal Call Case Catch Class Const Continue "

@@ -14,7 +14,7 @@
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with this program. If not, see <http://www.gnu.org/licenses/>.
+# along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 # This is the last svn changeset, the number and hash can be automatically
 # calculated, but it is slow to do that. So it is better to have it hardcoded.

@@ -24,7 +24,7 @@ enum CharacterCategory {
 CharacterCategory CategoriseCharacter(int character) noexcept;
 
 // Common definitions of allowable characters in identifiers from UAX #31.
-// Unicode Identifier and Pattern Syntax http://unicode.org/reports/tr31/
+// Unicode Identifier and Pattern Syntax https://unicode.org/reports/tr31/
 bool IsIdStart(int character) noexcept;
 bool IsIdContinue(int character) noexcept;
 bool IsXidStart(int character) noexcept;

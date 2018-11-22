@@ -1,7 +1,7 @@
 #include "EditLexer.h"
 #include "EditStyle.h"
 
-// http://www.boost.org/build/doc/html/bbv2/jam.html
+// https://boostorg.github.io/build/manual/develop/index.html
 
 static KEYWORDLIST Keywords_JAM = {{
 "class else for if import in local module return rule while "

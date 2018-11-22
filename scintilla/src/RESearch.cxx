@@ -45,7 +45,7 @@
  *
  *  re_fail:                failure routine for RESearch::Execute. (no longer used)
  *
- *          void re_fail(char *msg, char op)
+ *          void re_fail(const char *msg, char op)
  *
  * Regular Expressions:
  *
@@ -837,7 +837,7 @@ int RESearch::Execute(const CharacterIndexer &ci, Sci::Position lp, Sci::Positio
  *  by tagged expressions (n = 1 to 9).
  */
 
-//extern void re_fail(char *,char);
+//extern void re_fail(const char *, char);
 
 static inline int isinset(const char *ap, unsigned char c) noexcept {
 	return ap[(c & BLKIND) >> 3] & bitarr[c & BITIND];

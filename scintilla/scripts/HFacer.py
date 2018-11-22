@@ -51,7 +51,7 @@ def RegenerateAll(root, showMaxID):
 		valueSet = set(int(x) for x in f.values if int(x) < 3000)
 		maximumID = max(valueSet)
 		print("Maximum ID is %d" % maximumID)
-		#~ valuesUnused = sorted(x for x in range(2001,maximumID) if x not in valueSet)
+		#~ valuesUnused = sorted(x for x in range(2001, maximumID) if x not in valueSet)
 		#~ print("\nUnused values")
 		#~ for v in valuesUnused:
 			#~ print(v)

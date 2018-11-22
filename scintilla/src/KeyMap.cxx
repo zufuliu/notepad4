@@ -160,6 +160,6 @@ const KeyToCommand KeyMap::MapDefault[] = {
     {'D', 			SCI_CTRL,	SCI_SELECTIONDUPLICATE},
     {'U', 			SCI_CTRL,	SCI_LOWERCASE},
     {'U', 			SCI_CSHIFT,	SCI_UPPERCASE},
-    {0,0,0},
+    {0, 0, 0},
 };
 

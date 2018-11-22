@@ -1,8 +1,9 @@
 #include "EditLexer.h"
 #include "EditStyle.h"
 
-// http://msdn.microsoft.com/library/d1wf56tt.aspx
-// http://msdn.microsoft.com/en-us/library/ydz4cfk3.aspx
+// VBScript Language Reference
+// https://docs.microsoft.com/en-us/previous-versions//d1wf56tt(v=vs.85)
+// https://docs.microsoft.com/en-us/previous-versions//ydz4cfk3(v=vs.85)
 
 static KEYWORDLIST Keywords_VBS = {{
 "Alias And As Attribute Array Begin ByRef ByVal Call Case Class Compare Const Continue "

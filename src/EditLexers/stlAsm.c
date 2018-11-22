@@ -1,7 +1,7 @@
 #include "EditLexer.h"
 #include "EditStyle.h"
 
-// https://msdn.microsoft.com/en-us/library/afzk3475.aspx
+// https://docs.microsoft.com/en-us/cpp/assembler/masm/microsoft-macro-assembler-reference
 // https://sourceware.org/binutils/docs/as/
 
 static KEYWORDLIST Keywords_ASM = {{

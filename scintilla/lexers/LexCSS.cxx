@@ -4,7 +4,7 @@
  ** Lexer for Cascading Style Sheets
  ** Written by Jakub Vrána
  ** Improved by Philippe Lhoste (CSS2)
- ** Improved by Ross McKay (SCSS mode; see http://sass-lang.com/ )
+ ** Improved by Ross McKay (SCSS mode; see https://sass-lang.com/ )
  **/
 // Copyright 1998-2002 by Neil Hodgson <neilh@scintilla.org>
 // The License.txt file describes the conditions under which this software may be distributed.

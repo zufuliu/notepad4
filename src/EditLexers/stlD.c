@@ -1,7 +1,7 @@
 #include "EditLexer.h"
 #include "EditStyle.h"
 
-// http://dlang.org/
+// https://dlang.org/
 
 static KEYWORDLIST Keywords_D = {{
 "alias align asm assert body break case cast catch continue debug default delete "
