@@ -342,8 +342,8 @@ BEGIN
             MENUITEM "Select to Begin", IDM_EDIT_SELTOBEGIN
             MENUITEM "Select to Ne&xt\tCtrl+Alt+F2", IDM_EDIT_SELTONEXT
             MENUITEM "Select to Pre&vious\tCtrl+Alt+Shift+F2", IDM_EDIT_SELTOPREV
-            MENUITEM "Jump to Selection Start\tCtrl+,", CMD_JUMP2SELSTART
-            MENUITEM "Jump to Selection End\tCtrl+.",   CMD_JUMP2SELEND
+            MENUITEM "Jump to Selection Start\tAlt+,", CMD_JUMP2SELSTART
+            MENUITEM "Jump to Selection End\tAlt+.",   CMD_JUMP2SELEND
         END
         POPUP "Bookmarks"
         BEGIN
@@ -421,9 +421,13 @@ BEGIN
             MENUITEM "Level 1&0",               IDM_VIEW_FOLD_LEVEL10
         END
         MENUITEM SEPARATOR
-        MENUITEM "Zoom &In\tCtrl++",            IDM_VIEW_ZOOMIN
-        MENUITEM "Zoom &Out\tCtrl+-",           IDM_VIEW_ZOOMOUT
-        MENUITEM "Reset &Zoom\tCtrl+\\",        IDM_VIEW_RESETZOOM
+        POPUP "&Zoom"
+        BEGIN
+            MENUITEM "Zoom &In\tCtrl++",        IDM_VIEW_ZOOMIN
+            MENUITEM "Zoom &Out\tCtrl+-",       IDM_VIEW_ZOOMOUT
+            MENUITEM "Zoom &Level...\tCtrl+.",  IDM_VIEW_ZOOM_LEVEL
+            MENUITEM "&Reset Zoom\tCtrl+\\",    IDM_VIEW_RESETZOOM
+        END
         MENUITEM "Toggle Full Screen\tF11 [Esc]",IDM_VIEW_TOGGLE_FULLSCREEN
     END
     POPUP "Sche&me"
@@ -822,10 +826,11 @@ BEGIN
     VK_OEM_2,       IDM_EDIT_LINECOMMENT,   VIRTKEY, CONTROL, NOINVERT
     VK_OEM_2,       IDM_EDIT_COMPLETEWORD,  VIRTKEY, ALT, NOINVERT
     VK_OEM_5,       IDM_VIEW_RESETZOOM,     VIRTKEY, CONTROL, NOINVERT
-    VK_OEM_COMMA,   CMD_JUMP2SELSTART,      VIRTKEY, CONTROL, NOINVERT
+    VK_OEM_COMMA,   CMD_JUMP2SELSTART,      VIRTKEY, ALT, NOINVERT
     VK_OEM_MINUS,   IDM_VIEW_ZOOMOUT,       VIRTKEY, CONTROL, NOINVERT
     VK_OEM_MINUS,   CMD_DECREASENUM,        VIRTKEY, CONTROL, ALT, NOINVERT
-    VK_OEM_PERIOD,  CMD_JUMP2SELEND,        VIRTKEY, CONTROL, NOINVERT
+    VK_OEM_PERIOD,  IDM_VIEW_ZOOM_LEVEL,    VIRTKEY, CONTROL, NOINVERT
+    VK_OEM_PERIOD,  CMD_JUMP2SELEND,        VIRTKEY, ALT, NOINVERT
     VK_OEM_PLUS,    IDM_VIEW_ZOOMIN,        VIRTKEY, CONTROL, NOINVERT
     VK_OEM_PLUS,    CMD_INCREASENUM,        VIRTKEY, CONTROL, ALT, NOINVERT
     VK_RETURN,      CMD_CTRLENTER,          VIRTKEY, SHIFT, CONTROL, NOINVERT
