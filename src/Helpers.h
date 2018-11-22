@@ -180,6 +180,10 @@ NP2_inline int RoundToCurrentDPI(int value)	{
 	return (g_uCurrentDPI == USER_DEFAULT_SCREEN_DPI) ? value : MulDiv(g_uCurrentDPI, value, USER_DEFAULT_SCREEN_DPI);
 }
 
+NP2_inline int SystemToCurrentDPI(int value) {
+	return (g_uCurrentDPI == g_uCurrentPPI) ? value : MulDiv(g_uCurrentDPI, value, g_uCurrentPPI);	
+}
+
 // https://docs.microsoft.com/en-us/windows/desktop/api/winuser/nf-winuser-getsystemmetrics
 // https://docs.microsoft.com/en-us/windows/desktop/api/winuser/nf-winuser-getsystemmetricsfordpi
 int GetSystemMetricsEx(int nIndex);
