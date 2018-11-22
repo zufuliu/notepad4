@@ -4009,6 +4009,10 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		SendMessage(hwndEdit, SCI_ZOOMOUT, 0, 0);
 		break;
 
+	case IDM_VIEW_ZOOM_LEVEL:
+		ZoomLevelDlg(hwnd);
+		break;
+
 	case IDM_VIEW_RESETZOOM:
 		SendMessage(hwndEdit, SCI_SETZOOM, 100, 0);
 		break;

@@ -1996,26 +1996,20 @@ BOOL WarnLineEndingDlg(HWND hwnd, struct EditFileIOStatus *status) {
 void InitZoomLevelComboBox(HWND hwnd, int nCtlId, int zoomLevel) {
 	WCHAR tch[16];
 	int selIndex = -1;
-	int i = 0;
-	int level = 25;
+	const int levelList[] = {
+		25, 50, 75, 100, 125, 150, 175, 200,
+		250, 300, 350, 400, 450, 500,
+	};
 
 	HWND hwndCtl = GetDlgItem(hwnd, nCtlId);
 	SendMessage(hwndCtl, CB_LIMITTEXT, 8, 0);
-	for (; level < 200; level += 25) {
+	for (int i = 0; i < (int)COUNTOF(levelList); i++) {
+		const int level = levelList[i];
 		if (zoomLevel == level) {
 			selIndex = i;
 		}
 		wsprintf(tch, L"%d%%", level);
 		SendMessage(hwndCtl, CB_ADDSTRING, 0, (LPARAM)tch);
-		++i;
-	}
-	for (; level <= SC_MAX_ZOOM_LEVEL; level += 50) {
-		if (zoomLevel == level) {
-			selIndex = i;
-		}
-		wsprintf(tch, L"%d%%", level);
-		SendMessage(hwndCtl, CB_ADDSTRING, 0, (LPARAM)tch);
-		++i;
 	}
 
 	SendMessage(hwndCtl, CB_SETEXTENDEDUI, TRUE, 0);
