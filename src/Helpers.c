@@ -283,7 +283,7 @@ UINT GetCurrentDPI(HWND hwnd) {
 
 int GetSystemMetricsEx(int nIndex) {
 	int value = GetSystemMetrics(nIndex);
-	value = RoundToCurrentDPI(value);
+	value = SystemToCurrentDPI(value);
 	return value;
 }
 

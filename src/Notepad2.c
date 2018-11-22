@@ -2082,7 +2082,7 @@ void UpdateStatusBarWidth(void) {
 	aWidth[3] = StatusCalcPaneWidth(hwndStatus, L"CR+LF");
 	aWidth[4] = StatusCalcPaneWidth(hwndStatus, L"OVR");
 	aWidth[5] = StatusCalcPaneWidth(hwndStatus, ((iBytes < 1024)? L"1,023 Bytes" : L"99.9 MiB"));
-	aWidth[6] = StatusCalcPaneWidth(hwndStatus, L"500%") + 12;
+	aWidth[6] = StatusCalcPaneWidth(hwndStatus, L"500%") + GetSystemMetricsEx(SM_CXHTHUMB);
 
 	aWidth[0] = max_i(120, cx - (aWidth[1] + aWidth[2] + aWidth[3] + aWidth[4] + aWidth[5] + aWidth[6]));
 	aWidth[1] += aWidth[0];
