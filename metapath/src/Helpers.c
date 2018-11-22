@@ -492,8 +492,6 @@ typedef struct _resizeDlg {
 	int direction;
 	int cxClient;
 	int cyClient;
-	int cxFrame;
-	int cyFrame;
 	int mmiPtMinX;
 	int mmiPtMinY;
 	int mmiPtMaxX;	// only Y direction
@@ -509,9 +507,6 @@ void ResizeDlg_InitEx(HWND hwnd, int cxFrame, int cyFrame, int nIdGrip, int iDir
 	pm->cxClient = rc.right - rc.left;
 	pm->cyClient = rc.bottom - rc.top;
 
-	pm->cxFrame = cxFrame;
-	pm->cyFrame = cyFrame;
-
 	AdjustWindowRectEx(&rc, GetWindowLong(hwnd, GWL_STYLE) | WS_THICKFRAME, FALSE, 0);
 	pm->mmiPtMinX = rc.right - rc.left;
 	pm->mmiPtMinY = rc.bottom - rc.top;
@@ -526,16 +521,12 @@ void ResizeDlg_InitEx(HWND hwnd, int cxFrame, int cyFrame, int nIdGrip, int iDir
 		break;
 	}
 
-	if (pm->cxFrame < (rc.right - rc.left)) {
-		pm->cxFrame = rc.right - rc.left;
-	}
-	if (pm->cyFrame < (rc.bottom - rc.top)) {
-		pm->cyFrame = rc.bottom - rc.top;
-	}
+	cxFrame = max_i(cxFrame, pm->mmiPtMinX);
+	cyFrame = max_i(cyFrame, pm->mmiPtMinY);
 
 	SetProp(hwnd, RESIZEDLG_PROP_KEY, (HANDLE)pm);
 
-	SetWindowPos(hwnd, NULL, rc.left, rc.top, pm->cxFrame, pm->cyFrame, SWP_NOZORDER);
+	SetWindowPos(hwnd, NULL, rc.left, rc.top, cxFrame, cyFrame, SWP_NOZORDER);
 
 	SetWindowLongPtr(hwnd, GWL_STYLE, GetWindowLongPtr(hwnd, GWL_STYLE) | WS_THICKFRAME);
 	SetWindowPos(hwnd, NULL, 0, 0, 0, 0, SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE | SWP_FRAMECHANGED);
@@ -545,10 +536,10 @@ void ResizeDlg_InitEx(HWND hwnd, int cxFrame, int cyFrame, int nIdGrip, int iDir
 	InsertMenu(GetSystemMenu(hwnd, FALSE), SC_CLOSE, MF_BYCOMMAND | MF_STRING | MF_ENABLED, SC_SIZE, wch);
 	InsertMenu(GetSystemMenu(hwnd, FALSE), SC_CLOSE, MF_BYCOMMAND | MF_SEPARATOR, 0, NULL);
 
-	SetWindowLongPtr(GetDlgItem(hwnd, nIdGrip), GWL_STYLE,
-					 GetWindowLongPtr(GetDlgItem(hwnd, nIdGrip), GWL_STYLE) | SBS_SIZEGRIP | WS_CLIPSIBLINGS);
+	HWND hwndCtl = GetDlgItem(hwnd, nIdGrip);
+	SetWindowLongPtr(hwndCtl, GWL_STYLE, GetWindowLongPtr(hwndCtl, GWL_STYLE) | SBS_SIZEGRIP | WS_CLIPSIBLINGS);
 	const int cGrip = GetSystemMetrics(SM_CXHTHUMB);
-	SetWindowPos(GetDlgItem(hwnd, nIdGrip), NULL, pm->cxClient - cGrip, pm->cyClient - cGrip, cGrip, cGrip, SWP_NOZORDER);
+	SetWindowPos(hwndCtl, NULL, pm->cxClient - cGrip, pm->cyClient - cGrip, cGrip, cGrip, SWP_NOZORDER);
 }
 
 void ResizeDlg_Destroy(HWND hwnd, int *cxFrame, int *cyFrame) {

@@ -708,8 +708,8 @@ HWND ScintillaWin::MainHWND() const noexcept {
 bool ScintillaWin::DragThreshold(Point ptStart, Point ptNow) noexcept {
 	const int xMove = static_cast<int>(std::abs(ptStart.x - ptNow.x));
 	const int yMove = static_cast<int>(std::abs(ptStart.y - ptNow.y));
-	return (xMove > ::GetSystemMetrics(SM_CXDRAG)) ||
-		(yMove > ::GetSystemMetrics(SM_CYDRAG));
+	return (xMove > GetSystemMetricsEx(SM_CXDRAG)) ||
+		(yMove > GetSystemMetricsEx(SM_CYDRAG));
 }
 
 void ScintillaWin::StartDrag() {

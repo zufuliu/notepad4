@@ -2662,7 +2662,7 @@ void Style_SetStyles(HWND hwnd, int iStyle, LPCWSTR lpszStyle) {
 
 	// Size
 	if (Style_StrGetSizeEx(lpszStyle, &iValue)) {
-		iValue = ScaleFontSize(iValue);
+		iValue = RoundToCurrentDPI(iValue);
 		SendMessage(hwnd, SCI_STYLESETSIZEFRACTIONAL, iStyle, iValue);
 	}
 
@@ -2710,7 +2710,7 @@ static void Style_Parse(struct DetailStyle *style, LPCWSTR lpszStyle) {
 
 	// Size
 	if (Style_StrGetSizeEx(lpszStyle, &iValue)) {
-		style->fontSize = ScaleFontSize(iValue);
+		style->fontSize = RoundToCurrentDPI(iValue);
 		mask |= STYLE_MASK_FONT_SIZE;
 	}
 
