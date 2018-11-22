@@ -331,7 +331,7 @@ HANDLE		g_hScintilla;
 UINT16		g_uWinVer;
 DWORD		kSystemLibraryLoadFlags = 0;
 UINT		g_uCurrentDPI = USER_DEFAULT_SCREEN_DPI;
-UINT		g_uCurrentPPI = USER_DEFAULT_SCREEN_DPI;
+UINT		g_uDefaultDPI = USER_DEFAULT_SCREEN_DPI;
 static WCHAR g_wchAppUserModelID[38] = L"";
 static WCHAR g_wchWorkingDirectory[MAX_PATH] = L"";
 
@@ -1559,7 +1559,7 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	HINSTANCE hInstance = ((LPCREATESTRUCT)lParam)->hInstance;
 	g_uCurrentDPI = GetCurrentDPI(hwnd);
-	g_uCurrentPPI = GetCurrentPPI(hwnd);
+	g_uDefaultDPI = GetDefaultDPI(hwnd);
 
 	// Setup edit control
 	hwndEdit = EditCreate(hwnd);
@@ -1900,7 +1900,7 @@ void MsgDPIChanged(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	const Sci_Position pos = SciCall_GetCurrentPos();
 #if 0
 	char buf[128];
-	sprintf(buf, "WM_DPICHANGED: dpi=%u, %u\n", g_uCurrentDPI, g_uCurrentPPI);
+	sprintf(buf, "WM_DPICHANGED: dpi=%u, %u\n", g_uCurrentDPI, g_uDefaultDPI);
 	SendMessage(hwndEdit, SCI_INSERTTEXT, 0, (LPARAM)buf);
 #endif
 

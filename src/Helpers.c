@@ -239,7 +239,7 @@ int ParseCommaList(LPCWSTR str, int result[], int count) {
 	return index;
 }
 
-UINT GetCurrentPPI(HWND hwnd) {
+UINT GetDefaultDPI(HWND hwnd) {
 	HDC hDC = GetDC(hwnd);
 	UINT ppi = GetDeviceCaps(hDC, LOGPIXELSY);
 	ReleaseDC(hwnd, hDC);
@@ -283,7 +283,7 @@ UINT GetCurrentDPI(HWND hwnd) {
 
 int GetSystemMetricsEx(int nIndex) {
 	int value = GetSystemMetrics(nIndex);
-	value = SystemToCurrentDPI(value);
+	value = DefaultToCurrentDPI(value);
 	return value;
 }
 
@@ -608,7 +608,7 @@ BOOL SetWindowTitle(HWND hwnd, UINT uIDAppName, BOOL bIsElevated, UINT uIDUntitl
 	lstrcat(szTitle, szAppName);
 
 #if 0
-	wsprintf(szAppName, L"; dpi=%u, %u", g_uCurrentDPI, g_uCurrentPPI);
+	wsprintf(szAppName, L"; dpi=%u, %u", g_uCurrentDPI, g_uDefaultDPI);
 	lstrcat(szTitle, szAppName);
 #endif
 

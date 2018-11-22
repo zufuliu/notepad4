@@ -144,7 +144,7 @@ extern HINSTANCE g_hInstance;
 extern HANDLE g_hDefaultHeap;
 extern UINT16 g_uWinVer;
 extern UINT g_uCurrentDPI;
-extern UINT g_uCurrentPPI;
+extern UINT g_uDefaultDPI;
 extern WCHAR szIniFile[MAX_PATH];
 
 // Operating System Version
@@ -180,8 +180,8 @@ NP2_inline int RoundToCurrentDPI(int value)	{
 	return (g_uCurrentDPI == USER_DEFAULT_SCREEN_DPI) ? value : MulDiv(g_uCurrentDPI, value, USER_DEFAULT_SCREEN_DPI);
 }
 
-NP2_inline int SystemToCurrentDPI(int value) {
-	return (g_uCurrentDPI == g_uCurrentPPI) ? value : MulDiv(g_uCurrentDPI, value, g_uCurrentPPI);	
+NP2_inline int DefaultToCurrentDPI(int value) {
+	return (g_uCurrentDPI == g_uDefaultDPI) ? value : MulDiv(g_uCurrentDPI, value, g_uDefaultDPI);
 }
 
 // https://docs.microsoft.com/en-us/windows/desktop/api/winuser/nf-winuser-getsystemmetrics
@@ -368,7 +368,7 @@ NP2_inline void EndWaitCursor(void) {
 	SetCursorPos(pt.x, pt.y);
 }
 
-UINT GetCurrentPPI(HWND hwnd);
+UINT GetDefaultDPI(HWND hwnd);
 UINT GetCurrentDPI(HWND hwnd);
 BOOL PrivateIsAppThemed(void);
 HRESULT PrivateSetCurrentProcessExplicitAppUserModelID(PCWSTR AppID);
