@@ -4010,7 +4010,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	case IDM_VIEW_ZOOM_LEVEL:
-		ZoomLevelDlg(hwnd);
+		ZoomLevelDlg(hwnd, FALSE);
 		break;
 
 	case IDM_VIEW_RESETZOOM:
@@ -5142,7 +5142,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 				return TRUE;
 
 			case STATUS_DOCZOOM:
-				ZoomLevelDlg(hwnd);
+				ZoomLevelDlg(hwnd, TRUE);
 				return TRUE;
 
 			default:
