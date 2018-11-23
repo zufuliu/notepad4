@@ -560,15 +560,16 @@ void ResizeDlg_Destroy(HWND hwnd, int *cxFrame, int *cyFrame) {
 
 void ResizeDlg_Size(HWND hwnd, LPARAM lParam, int *cx, int *cy) {
 	PRESIZEDLG pm = GetProp(hwnd, RESIZEDLG_PROP_KEY);
-
+	const int cxClient = LOWORD(lParam);
+	const int cyClient = HIWORD(lParam);
 	if (cx) {
-		*cx = LOWORD(lParam) - pm->cxClient;
-		pm->cxClient = LOWORD(lParam);
+		*cx = cxClient - pm->cxClient;
 	}
 	if (cy) {
-		*cy = HIWORD(lParam) - pm->cyClient;
-		pm->cyClient = HIWORD(lParam);
+		*cy = cyClient - pm->cyClient;
 	}
+	pm->cxClient = cxClient;
+	pm->cyClient = cyClient;
 }
 
 void ResizeDlg_GetMinMaxInfo(HWND hwnd, LPARAM lParam) {
