@@ -1463,7 +1463,7 @@ void UpdateWindowTitle(void) {
 
 void UpdateSelectionMarginWidth(void) {
 	// fixed width to put arrow cursor.
-	const int width = bShowSelectionMargin ? RoundToCurrentDPI(16) : 0;
+	const int width = bShowSelectionMargin ? (GetSystemMetrics(SM_CXCURSOR) / 2) : 0;
 	SciCall_SetMarginWidth(MARGIN_SELECTION, width);
 }
 
