@@ -2277,14 +2277,8 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	EnableCmd(hmenu, IDM_VIEW_SHOWEXCERPT, i);
 
-	i = (int)SendMessage(hwndEdit, SCI_GETLEXER, 0, 0);
-	EnableCmd(hmenu, IDM_EDIT_LINECOMMENT,
-			  !(i == SCLEX_NULL || i == SCLEX_CSS || i == SCLEX_DIFF));
-	EnableCmd(hmenu, IDM_EDIT_STREAMCOMMENT,
-			  !(i == SCLEX_NULL || i == SCLEX_VBSCRIPT || i == SCLEX_MAKEFILE || i == SCLEX_VB || i == SCLEX_ASM ||
-				i == SCLEX_SQL || i == SCLEX_PERL || i == SCLEX_PYTHON || i == SCLEX_PROPERTIES || i == SCLEX_CONF ||
-				i == SCLEX_POWERSHELL || i == SCLEX_BATCH || i == SCLEX_DIFF || i == SCLEX_BASH || i == SCLEX_TCL ||
-				i == SCLEX_AU3 || i == SCLEX_RUBY || i == SCLEX_CMAKE));
+	EnableCmd(hmenu, IDM_EDIT_LINECOMMENT, bCurrentLexerHasLineComment);
+	EnableCmd(hmenu, IDM_EDIT_STREAMCOMMENT, bCurrentLexerHasBlockComment);
 
 	EnableCmd(hmenu, IDM_EDIT_INSERT_ENCODING, *mEncoding[iEncoding].pszParseNames);
 
@@ -2390,9 +2384,7 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	CheckCmd(hmenu, IDM_VIEW_FULLSCREEN_HIDE_TOOL, bFullScreenHideToolbar);
 	CheckCmd(hmenu, IDM_VIEW_FULLSCREEN_HIDE_STATUS, bFullScreenHideStatusbar);
 
-	//i = (int)SendMessage(hwndEdit, SCI_GETLEXER, 0, 0);
-	//EnableCmd(hmenu, IDM_VIEW_AUTOCLOSETAGS, (i == SCLEX_HTML || i == SCLEX_XML));
-	CheckCmd(hmenu, IDM_VIEW_AUTOCLOSETAGS, bAutoCloseTags /*&& (i == SCLEX_HTML || i == SCLEX_XML)*/);
+	CheckCmd(hmenu, IDM_VIEW_AUTOCLOSETAGS, bAutoCloseTags);
 	CheckCmd(hmenu, IDM_VIEW_HIGHLIGHTCURRENTLINE, bHighlightCurrentLine);
 
 	CheckCmd(hmenu, IDM_VIEW_REUSEWINDOW, bReuseWindow);

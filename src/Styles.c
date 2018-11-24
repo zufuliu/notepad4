@@ -249,6 +249,8 @@ static BOOL bCustomColorLoaded = FALSE;
 static int iLexerLoadedCount = 0;
 
 BOOL	bUse2ndDefaultStyle;
+BOOL	bCurrentLexerHasLineComment;
+BOOL	bCurrentLexerHasBlockComment;
 static UINT fStylesModified = STYLESMODIFIED_NONE;
 static BOOL fWarnedNoIniFile = FALSE;
 static int	iBaseFontSize = 11*SC_FONT_SIZE_MULTIPLIER; // 11 pt in lexDefault
@@ -805,6 +807,33 @@ void Style_UpdateLexerKeywordAttr(PEDITLEXER pLexNew) {
 	}
 }
 
+static inline BOOL DidLexerHasLineComment(int iLexer) {
+	return !(iLexer == SCLEX_NULL
+		|| iLexer == SCLEX_DIFF
+	);
+}
+
+static inline BOOL DidLexerHasBlockComment(int iLexer) {
+	return !(iLexer == SCLEX_NULL
+		|| iLexer == SCLEX_BASH
+		|| iLexer == SCLEX_BATCH
+		|| iLexer == SCLEX_CMAKE
+		|| iLexer == SCLEX_CONF
+		|| iLexer == SCLEX_DIFF
+		|| iLexer == SCLEX_LLVM
+		|| iLexer == SCLEX_MAKEFILE
+		|| iLexer == SCLEX_PERL
+		|| iLexer == SCLEX_PROPERTIES
+		|| iLexer == SCLEX_PYTHON
+		|| iLexer == SCLEX_RUBY
+		|| iLexer == SCLEX_SMALI
+		|| iLexer == SCLEX_TEXINFO
+		|| iLexer == SCLEX_VB
+		|| iLexer == SCLEX_VBSCRIPT
+		|| iLexer == SCLEX_VIM
+	);
+}
+
 static void Style_Parse(struct DetailStyle *style, LPCWSTR lpszStyle);
 static void Style_SetParsed(HWND hwnd, const struct DetailStyle *style, int iStyle);
 static inline void Style_SetDefaultStyle(HWND hwnd, int index) {
@@ -1083,6 +1112,9 @@ void Style_SetLexer(HWND hwnd, PEDITLEXER pLexNew) {
 
 	// Save current lexer
 	pLexCurrent = pLexNew;
+	rid = pLexCurrent->iLexer;
+	bCurrentLexerHasLineComment = DidLexerHasLineComment(rid);
+	bCurrentLexerHasBlockComment = DidLexerHasBlockComment(rid);
 	UpdateStatusBarCache(STATUS_LEXER);
 	UpdateLineNumberWidth();
 	UpdateFoldMarginWidth();
@@ -2203,7 +2235,7 @@ void Style_SetIndentGuides(HWND hwnd, BOOL bShow) {
 	int iIndentView = SC_IV_NONE;
 	if (bShow) {
 		if (!flagSimpleIndentGuides) {
-			if (SendMessage(hwnd, SCI_GETLEXER, 0, 0) == SCLEX_PYTHON) {
+			if (pLexCurrent->iLexer == SCLEX_PYTHON) {
 				iIndentView = SC_IV_LOOKFORWARD;
 			} else {
 				iIndentView = SC_IV_LOOKBOTH;

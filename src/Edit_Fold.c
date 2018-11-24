@@ -108,8 +108,8 @@ void FoldToggleLevel(int lev, FOLD_ACTION action) {
 	int line = 0;
 
 	switch (pLexCurrent->iLexer) {
-	case SCLEX_NULL:
-	case SCLEX_PYTHON: {
+	case SCLEX_PYTHON:
+	case SCLEX_NULL: {
 		struct EditFoldStack foldStack = { 0, { 0 }};
 		++lev;
 		while (line < lineCount) {
@@ -182,8 +182,8 @@ void FoldToggleDefault(FOLD_ACTION action) {
 	int line = 0;
 
 	switch (pLexCurrent->iLexer) {
-	case SCLEX_NULL:
-	case SCLEX_PYTHON: {
+	case SCLEX_PYTHON:
+	case SCLEX_NULL: {
 		struct EditFoldStack foldStack = { 0, { 0 }};
 		while (line < lineCount) {
 			int level = SciCall_GetFoldLevel(line);
