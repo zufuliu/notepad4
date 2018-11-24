@@ -230,6 +230,43 @@ static inline BOOL NeedSpaceAfterKeyword(const char *word, Sci_Position length) 
 	return p != NULL && p[-1] == ' ' && p[length] == ' ';
 }
 
+#define HTML_TEXT_BLOCK_TAG		0
+#define HTML_TEXT_BLOCK_CDATA	1
+#define HTML_TEXT_BLOCK_JS		2
+#define HTML_TEXT_BLOCK_VBS		3
+#define HTML_TEXT_BLOCK_PYTHON	4
+#define HTML_TEXT_BLOCK_PHP		5
+#define HTML_TEXT_BLOCK_CSS		6
+
+static int GetCurrentHtmlTextBlock(HWND hwnd) {
+	UNREFERENCED_PARAMETER(hwnd);
+
+	const Sci_Position iCurrentPos = SciCall_GetCurrentPos();
+	const int iCurrentStyle = SciCall_GetStyleAt(iCurrentPos);
+	if (iCurrentStyle == SCE_H_CDATA) {
+		return HTML_TEXT_BLOCK_CDATA;
+	}
+	if ((iCurrentStyle >= SCE_HJ_START && iCurrentStyle <= SCE_HJ_REGEX)
+		|| (iCurrentStyle >= SCE_HJA_START && iCurrentStyle <= SCE_HJA_REGEX)) {
+		return HTML_TEXT_BLOCK_JS;
+	}
+	if ((iCurrentStyle >= SCE_HB_START && iCurrentStyle <= SCE_HB_STRINGEOL)
+		|| (iCurrentStyle >= SCE_HBA_START && iCurrentStyle <= SCE_HBA_STRINGEOL)) {
+		return HTML_TEXT_BLOCK_VBS;
+	}
+	if ((iCurrentStyle >= SCE_HP_START && iCurrentStyle <= SCE_HP_IDENTIFIER)
+		|| (iCurrentStyle >= SCE_HPA_START && iCurrentStyle <= SCE_HPA_IDENTIFIER)) {
+		return HTML_TEXT_BLOCK_PYTHON;
+	}
+	if ((iCurrentStyle >= SCE_HPHP_DEFAULT && iCurrentStyle <= SCE_HPHP_OPERATOR)
+		|| iCurrentStyle == SCE_HPHP_HEREDOC
+		|| iCurrentStyle == SCE_HPHP_NOWDOC
+		|| iCurrentStyle == SCE_HPHP_COMPLEX_VARIABLE) {
+		return HTML_TEXT_BLOCK_PHP;
+	}
+	return HTML_TEXT_BLOCK_TAG;
+}
+
 void AutoC_AddDocWord(HWND hwnd, struct WordList *pWList, BOOL bIgnore) {
 	UNREFERENCED_PARAMETER(hwnd);
 
@@ -1192,6 +1229,23 @@ void EditToggleCommentLine(HWND hwnd) {
 
 	case SCLEX_HTML:
 	case SCLEX_XML: {
+		const int block = GetCurrentHtmlTextBlock(hwnd);
+		switch (block) {
+		case HTML_TEXT_BLOCK_VBS:
+			EditToggleLineComments(hwnd, L"'", FALSE);
+			break;
+
+		case HTML_TEXT_BLOCK_PYTHON:
+			EditToggleLineComments(hwnd, L"#", FALSE);
+			break;
+
+		case HTML_TEXT_BLOCK_CDATA:
+		case HTML_TEXT_BLOCK_JS:
+		case HTML_TEXT_BLOCK_PHP:
+		case HTML_TEXT_BLOCK_CSS:
+			EditToggleLineComments(hwnd, L"//", FALSE);
+			break;
+		}
 	} break;
 
 	case SCLEX_LATEX:
@@ -1304,7 +1358,23 @@ void EditToggleCommentBlock(HWND hwnd) {
 
 	case SCLEX_HTML:
 	case SCLEX_XML: {
-		EditEncloseSelection(hwnd, L"<!--", L"-->");
+		const int block = GetCurrentHtmlTextBlock(hwnd);
+		switch (block) {
+		case HTML_TEXT_BLOCK_TAG:
+			EditEncloseSelection(hwnd, L"<!--", L"-->");
+			break;
+
+		case HTML_TEXT_BLOCK_VBS:
+		case HTML_TEXT_BLOCK_PYTHON:
+			break;
+
+		case HTML_TEXT_BLOCK_CDATA:
+		case HTML_TEXT_BLOCK_JS:
+		case HTML_TEXT_BLOCK_PHP:
+		case HTML_TEXT_BLOCK_CSS:
+			EditEncloseSelection(hwnd, L"/*", L"*/");
+			break;
+		}
 	} break;
 
 	case SCLEX_INNOSETUP:
@@ -1328,7 +1398,7 @@ void EditToggleCommentBlock(HWND hwnd) {
 		if (pLexCurrent->rid == NP2LEX_JULIA) {
 			EditEncloseSelectionNewLine(hwnd, L"#=", L"=#");
 		} else if (pLexCurrent->rid == NP2LEX_SCILAB || np2LexLangIndex == IDM_LANG_SCILAB) {
-			EditEncloseSelectionNewLine(hwnd, L"/*", L"*/");
+			EditEncloseSelection(hwnd, L"/*", L"*/");
 		} else {
 			EditEncloseSelectionNewLine(hwnd, L"%{", L"%}");
 		}
