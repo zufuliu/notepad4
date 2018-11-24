@@ -21,7 +21,7 @@ NULL, NULL, NULL
 }};
 
 
-EDITLEXER lexXML = { SCLEX_XML, NP2LEX_XML, EDITLEXER_HOLE(L"XML Document"), L"xml; xsl; xslt; xsd; dtd; rss; svg; xul; axl; rdf; xaml; resx; plist", &Keywords_XML,
+EDITLEXER lexXML = { SCLEX_XML, NP2LEX_XML, EDITLEXER_HOLE(L"XML Document"), L"xml; xsl; xslt; xsd; dtd; rss; svg; xul; axl; rdf; xaml; resx; plist; mm; xrc; fbp", &Keywords_XML,
 {
 	EDITSTYLE_DEFAULT,
 	{ MULTI_STYLE(SCE_H_TAG, SCE_H_TAGUNKNOWN, SCE_H_TAGEND, 0), NP2STYLE_XMLTag, EDITSTYLE_HOLE(L"XML Tag"), L"fore:#8B008B" },

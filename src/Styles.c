@@ -1876,7 +1876,7 @@ static PEDITLEXER Style_GetLexerFromFile(HWND hwnd, LPCWSTR lpszFile, BOOL bCGIG
 			pLexNew = &lexMake;
 			bFound = TRUE;
 		}
-		if (!bFound && StrCaseEqual(lpszName, L"Rakefile")) {
+		if (!bFound && (StrCaseEqual(lpszName, L"Rakefile") || StrCaseEqual(lpszName, L"Podfile"))) {
 			pLexNew = &lexRuby;
 			bFound = TRUE;
 		}
@@ -1889,7 +1889,7 @@ static PEDITLEXER Style_GetLexerFromFile(HWND hwnd, LPCWSTR lpszFile, BOOL bCGIG
 			pLexNew = &lexJAM;
 			bFound = TRUE;
 		}
-		if (!bFound && StrNCaseEqual(lpszName, L"Kconfig", 7)) {
+		if (!bFound && (StrNCaseEqual(lpszName, L"Kconfig", 7) || StrNCaseEqual(lpszName, L"Doxyfile", 8))) {
 			pLexNew = &lexCONF;
 			bFound = TRUE;
 		}

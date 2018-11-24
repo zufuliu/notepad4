@@ -1,0 +1,415 @@
+Default Text
+	txt
+	text
+	wtx				Text Document
+	log
+	asc				PGP ASCII Armored File
+	doc
+
+	Readme
+
+C/C++ Source
+	c
+	cpp
+	cxx
+	cc
+	h
+	hpp
+	hxx
+	hh
+	inl				C++ Inline File
+	pch				Precompiled Header File
+	m				Objective C Source File
+	mm				Objective C++ Source File
+	xpm				X11 Pixmap Graphic
+
+C# Source
+	cs
+	csx				C# Script
+	vala			GNOME Vala
+
+CSS Style Sheet
+	css
+	scss			Sassy CSS
+	less			Less CSS
+	hss				HSS
+
+Java Source
+	java
+	jad				Jad Decompiler
+	aidl			Android IDL
+
+JavaScript
+	js
+	jse				JScript Encoded File
+	jsm
+
+JSON Document
+	json
+	har				Firefox -> Web Developer -> Network
+	ipynb			Jupyter Notebook
+	wxcp			CodeLite wxCrafter Resource
+
+PHP Script
+	php
+	phpt			PHP Test Script
+	phtml
+	eyecode			eyeOS
+
+Python Script
+	py
+	pyw
+	pyx				Cython
+	boo				Boo
+	empy			EmPy
+	cobra			Cobra
+
+Ruby Script
+	rb
+	ruby
+	rbw
+	rake
+	rjs
+	podspec			CocoaPods
+
+	Rakefile
+	Podfile			CocoaPods
+
+SQL Query
+	sql
+	mysql
+
+Web Source Code
+	html
+	htm
+	shtml
+	xhtml
+	asp
+	aspx
+	jsp
+	mht				MHTML Web Archive
+	htd
+	htt
+	hta
+	htc
+	cfm
+	tpl
+	jd
+
+XML Document
+	xml
+	xsl
+	xslt
+	xsd
+	dtd
+	rss
+	svg
+	xul
+	axl
+	rdf
+	xaml			WPF XAML
+	resx			ResX Schema
+	plist			Property List
+	pom				Maven POM
+	mm				FreeMind Mind Map
+	xrc				wxWidgets XML Resource
+	fbp				wxFormBuilder Project
+
+	web.config		ASP.NET Web Configuration
+
+
+ActionScript
+	as
+
+Android Smali
+	smali
+	ddx
+
+Assembler Source
+	asm
+	s
+	sx
+	inc
+	a51				Keil A51
+
+Asymptote Code
+	asy
+
+AutoIt3 Script
+	au3
+
+Awk Script
+	awk
+
+
+Batch File
+	bat
+	cmd
+
+
+CMake Script
+	cmake
+	ctest
+
+	CMakeLists.txt
+	CMakeCache.txt
+	*.cmake.in*
+
+Config File
+	conf
+	cfg
+	cnf
+	htaccess		Apache httpd
+	properties
+	prefs
+	iface			Scintilla
+	prop
+	po				gettext po
+	te				SELinux Policy
+
+	my*.ini			MySQL Configuration
+	my*.cnf			MySQL Configuration
+	Kconfig			Linux Kernel Build Configuration
+	Doxyfile		Doxygen Configuration
+	.*				dot-file
+
+D Source
+	d
+	di
+
+Diff File
+	diff
+	patch
+
+
+Fortran Source
+	f
+	for
+	ftn
+	fpp
+	f90
+	f95
+	f03
+	f08
+	hf
+
+F# Source
+	fs
+	fsi
+	fsx
+	fsscript
+	fsl
+	fsy
+	m				Mathematica Module
+	ml				OCaml
+	mli				OCaml
+	sml				OCaml
+	nb				Mathematica Notebook
+
+
+Gradle Build Script
+	gradle
+
+Go Source
+	go
+
+GraphViz Dot
+	dot
+	gv
+
+Groovy Script
+	groovy
+	gvy
+	gy
+	gsh
+	gpp
+	grunit
+
+
+HaXe Script
+	hx
+
+
+Ini Config File
+	ini
+	inf
+	reg
+	oem
+	sif
+	url
+	sed
+	theme
+	clw
+
+	LLVMBuild.txt
+
+Inno Setup Script
+	iss
+	isl
+	islu
+
+
+Jamfile
+	jam
+
+	Jamroot
+	Jamfile
+
+Julia Script
+	jl
+
+
+LaTeX File
+	tex
+	latex
+	sty
+	cls				LaTeX Document Class File
+	tpx
+	bbl
+	bib
+	ltx
+	dtx
+	ins
+	toc
+	info
+
+Lisp Script
+	lisp
+	el				Emacs Lisp
+	lsp
+	clj				Common Lisp
+	cljs			Common Lisp
+
+LLVM IR
+	ll
+
+Lua Script
+	lua
+	wlua
+	nse
+	luadoc
+	luax
+
+
+Makefile
+	mak
+	make
+	mk
+	dsp				VC6
+	dsw				VC6
+	am				automake / autoconf
+	pro				Qt Creator / qmake
+	pri				Qt Creator / qmake
+	gmk				GNU make
+	ninja			Ninja
+
+	Makefile*
+	Kbuild*			Linux Kernel Build
+
+MATLAB Code
+	m				MATLAB / Octave
+	sce				Scilab
+	sci				Scilab
+
+
+.NET IL
+	il
+
+Nsis Setup Script
+	nsi				NSIS Script
+	nsh				NSIS Header File
+
+
+Pascal Source
+	pas
+	inc
+	dpr
+	dpk
+	dfm
+	pp
+	lfm
+	lpr
+	fpd
+
+Perl Script
+	pl
+	pm				Perl Module
+	cgi
+	pod				Perl POD File
+	plx				Perl Executable File
+	stp
+
+PowerShell Script
+	ps1
+	psc1			PowerShell Console File
+	psd1			PowerShell Data File
+	psm1			PowerShell Script Module File
+
+
+Resource Script
+	rc
+	rc2
+	rct
+	rh
+	dlg
+
+
+Scala Script
+	scala
+
+Shell Script
+	sh
+	csh				C Shell
+	zsh				Z Shell
+	bash
+	tcsh			C Shell
+	m4				M4 Macro
+	in				automake / autoconf
+
+	.bash*
+	.profile
+	mozconfig		Firefox Build Configuration
+
+
+Tcl Script
+	tcl
+	itcl			iWidgets Script
+	tm				Tcl Module
+
+Texinfo File
+	texi
+	texinfo
+	txi
+
+
+VBScript
+	vbs
+	dsm
+
+Verilog HDL Source
+	v
+	vl
+
+VHDL Source
+	vhd
+	vhdl
+
+Vim Script
+	vim
+
+Visual Basic
+	vb
+	bas				BASIC Source Code File
+	frm				Visual Basic Text Form
+	cls				Program Class File
+	ctl				Visual Basic UserControl Object File
+	pag
+	dsr				Visual Basic Active Designer File
+	dob				Visual Basic UserDocument
+
+ANSI Art
+	nfo				System Information File
+	diz				Description in Zip File
+
+https://en.wikipedia.org/wiki/List_of_filename_extensions
+https://fileinfo.com/
