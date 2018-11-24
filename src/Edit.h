@@ -158,6 +158,7 @@ void	EditAutoCloseXMLTag(HWND hwnd);
 void	EditAutoIndent(HWND hwnd);
 void	EditToggleCommentLine(HWND hwnd);
 void	EditToggleCommentBlock(HWND hwnd);
+void	EditInsertScriptShebangLine(HWND hwnd);
 void	EditShowCallTips(HWND hwnd, Sci_Position position);
 
 #define NCP_DEFAULT					1

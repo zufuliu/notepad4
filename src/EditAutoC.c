@@ -1413,6 +1413,92 @@ void EditToggleCommentBlock(HWND hwnd) {
 	}
 }
 
+// see Style_SniffShebang() in Styles.c
+void EditInsertScriptShebangLine(HWND hwnd) {
+	char line[128];
+	strcpy(line, "#!/usr/bin/env ");
+
+	switch (pLexCurrent->iLexer) {
+	case SCLEX_BASH:
+		switch (np2LexLangIndex) {
+		case IDM_LANG_CSHELL:
+			strcpy(line, "#!/bin/csh");
+			break;
+
+		case IDM_LANG_M4:
+			strcat(line, "m4");
+			break;
+
+		default:
+			strcpy(line, "#!/bin/bash");
+			break;
+		}
+		break;
+
+	case SCLEX_CPP:
+		switch (pLexCurrent->rid) {
+		case NP2LEX_AWK:
+			strcat(line, "awk");
+			break;
+
+		case NP2LEX_GO:
+			strcat(line, "go");
+			break;
+
+		case NP2LEX_GROOVY:
+			strcat(line, "groovy");
+			break;
+
+		case NP2LEX_JS:
+			strcat(line, "node");
+			break;
+
+		case NP2LEX_PHP:
+			strcat(line, "php");
+			break;
+
+		case NP2LEX_SCALA:
+			strcat(line, "scala");
+			break;
+
+		default:
+			return;
+		}
+		break;
+
+	case SCLEX_LUA:
+		strcat(line, "lua");
+		break;
+
+	case SCLEX_PERL:
+		strcat(line, "perl");
+		break;
+
+	case SCLEX_PYTHON:
+		strcat(line, "python");
+		break;
+
+	case SCLEX_RUBY:
+		strcat(line, "ruby");
+		break;
+
+	case SCLEX_TCL:
+		strcat(line, "wish");
+		break;
+
+	default:
+		return;
+	}
+
+	const Sci_Position iCurrentPos = SciCall_GetCurrentPos();
+	if (iCurrentPos == 0) {
+		const int iEOLMode = (int)SendMessage(hwnd, SCI_GETEOLMODE, 0, 0);
+		LPCSTR lineEnd = (iEOLMode == SC_EOL_LF) ? "\n" : ((iEOLMode == SC_EOL_CR) ? "\r" : "\r\n");
+		strcat(line, lineEnd);
+	}
+	SendMessage(hwnd, SCI_REPLACESEL, 0, (LPARAM)line);
+}
+
 void EditShowCallTips(HWND hwnd, Sci_Position position) {
 	const int iLine = (int)SendMessage(hwnd, SCI_LINEFROMPOSITION, position, 0);
 	const int iDocLen = SciCall_GetLine(iLine, NULL); // get length

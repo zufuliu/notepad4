@@ -251,6 +251,7 @@ static int iLexerLoadedCount = 0;
 BOOL	bUse2ndDefaultStyle;
 BOOL	bCurrentLexerHasLineComment;
 BOOL	bCurrentLexerHasBlockComment;
+BOOL	bCurrentLexerHasShebangLine;
 static UINT fStylesModified = STYLESMODIFIED_NONE;
 static BOOL fWarnedNoIniFile = FALSE;
 static int	iBaseFontSize = 11*SC_FONT_SIZE_MULTIPLIER; // 11 pt in lexDefault
@@ -836,6 +837,22 @@ static inline BOOL DidLexerHasBlockComment(int iLexer, int rid) {
 	);
 }
 
+static inline BOOL DidLexerHasShebangLine(int iLexer, int rid) {
+	return iLexer == SCLEX_BASH
+		|| iLexer == SCLEX_LUA
+		|| iLexer == SCLEX_PERL
+		|| iLexer == SCLEX_PYTHON
+		|| iLexer == SCLEX_RUBY
+		|| iLexer == SCLEX_TCL
+		|| rid == NP2LEX_AWK
+		|| rid == NP2LEX_GO
+		|| rid == NP2LEX_GROOVY
+		|| rid == NP2LEX_JS
+		|| rid == NP2LEX_PHP
+		|| rid == NP2LEX_SCALA
+	;
+}
+
 static void Style_Parse(struct DetailStyle *style, LPCWSTR lpszStyle);
 static void Style_SetParsed(HWND hwnd, const struct DetailStyle *style, int iStyle);
 static inline void Style_SetDefaultStyle(HWND hwnd, int index) {
@@ -1117,6 +1134,7 @@ void Style_SetLexer(HWND hwnd, PEDITLEXER pLexNew) {
 	pLexCurrent = pLexNew;
 	bCurrentLexerHasLineComment = DidLexerHasLineComment(iLexer);
 	bCurrentLexerHasBlockComment = DidLexerHasBlockComment(iLexer, rid);
+	bCurrentLexerHasShebangLine = DidLexerHasShebangLine(iLexer, rid);
 	UpdateStatusBarCache(STATUS_LEXER);
 	UpdateLineNumberWidth();
 	UpdateFoldMarginWidth();
