@@ -44,6 +44,8 @@
 extern PEDITLEXER pLexCurrent;
 extern int np2LexLangIndex;
 extern BOOL bUse2ndDefaultStyle;
+extern BOOL bCurrentLexerHasLineComment;
+extern BOOL bCurrentLexerHasBlockComment;
 extern UINT8 currentLexKeywordAttr[NUMKEYWORD];
 
 BOOL IsDocWordChar(int ch);
