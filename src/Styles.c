@@ -813,7 +813,7 @@ static inline BOOL DidLexerHasLineComment(int iLexer) {
 	);
 }
 
-static inline BOOL DidLexerHasBlockComment(int iLexer) {
+static inline BOOL DidLexerHasBlockComment(int iLexer, int rid) {
 	return !(iLexer == SCLEX_NULL
 		|| iLexer == SCLEX_BASH
 		|| iLexer == SCLEX_BATCH
@@ -831,6 +831,8 @@ static inline BOOL DidLexerHasBlockComment(int iLexer) {
 		|| iLexer == SCLEX_VB
 		|| iLexer == SCLEX_VBSCRIPT
 		|| iLexer == SCLEX_VIM
+		|| rid == NP2LEX_AWK
+		|| rid == NP2LEX_JAM
 	);
 }
 
@@ -858,7 +860,8 @@ void Style_SetLexer(HWND hwnd, PEDITLEXER pLexNew) {
 	}
 
 	// Lexer
-	SendMessage(hwnd, SCI_SETLEXER, pLexNew->iLexer, 0);
+	const int iLexer = pLexNew->iLexer;
+	SendMessage(hwnd, SCI_SETLEXER, iLexer, 0);
 	int rid = pLexNew->rid;
 	if (rid == NP2LEX_MATLAB) {
 		if (np2LexLangIndex == IDM_LANG_OCTAVE) {
@@ -1112,9 +1115,8 @@ void Style_SetLexer(HWND hwnd, PEDITLEXER pLexNew) {
 
 	// Save current lexer
 	pLexCurrent = pLexNew;
-	rid = pLexCurrent->iLexer;
-	bCurrentLexerHasLineComment = DidLexerHasLineComment(rid);
-	bCurrentLexerHasBlockComment = DidLexerHasBlockComment(rid);
+	bCurrentLexerHasLineComment = DidLexerHasLineComment(iLexer);
+	bCurrentLexerHasBlockComment = DidLexerHasBlockComment(iLexer, rid);
 	UpdateStatusBarCache(STATUS_LEXER);
 	UpdateLineNumberWidth();
 	UpdateFoldMarginWidth();
