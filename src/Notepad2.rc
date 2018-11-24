@@ -289,7 +289,7 @@ BEGIN
             MENUITEM "Time/Date (&Long Form)\tCtrl+Shift+F5", IDM_EDIT_INSERT_LONGDATE
             MENUITEM SEPARATOR
             MENUITEM "&Encoding Identifier\tCtrl+F8", IDM_EDIT_INSERT_ENCODING
-            //MENUITEM "Script She&bang Line", IDM_EDIT_INSERT_SHEBANG
+            MENUITEM "Script She&bang Line",            IDM_EDIT_INSERT_SHEBANG
         END
         POPUP "Spec&ial"
         BEGIN
