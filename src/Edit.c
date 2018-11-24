@@ -2293,6 +2293,8 @@ void EditModifyLines(HWND hwnd, LPCWSTR pwszPrefix, LPCWSTR pwszAppend) {
 		return;
 	}
 
+	BeginWaitCursor();
+
 	const UINT cpEdit = (UINT)SendMessage(hwnd, SCI_GETCODEPAGE, 0, 0);
 	const int iEOLMode = (int)SendMessage(hwnd, SCI_GETEOLMODE, 0, 0);
 
@@ -2541,6 +2543,7 @@ void EditModifyLines(HWND hwnd, LPCWSTR pwszPrefix, LPCWSTR pwszAppend) {
 		SendMessage(hwnd, SCI_SETSEL, iAnchorPos, iCurPos);
 	}
 
+	EndWaitCursor();
 	if (mszPrefix1 != NULL) {
 		NP2HeapFree(mszPrefix1);
 	}
@@ -2807,6 +2810,8 @@ void EditEncloseSelection(HWND hwnd, LPCWSTR pwszOpen, LPCWSTR pwszClose) {
 		return;
 	}
 
+	BeginWaitCursor();
+
 	const int iSelStart = (int)SendMessage(hwnd, SCI_GETSELECTIONSTART, 0, 0);
 	const int iSelEnd = (int)SendMessage(hwnd, SCI_GETSELECTIONEND, 0, 0);
 	const UINT cpEdit = (UINT)SendMessage(hwnd, SCI_GETCODEPAGE, 0, 0);
@@ -2864,6 +2869,7 @@ void EditEncloseSelection(HWND hwnd, LPCWSTR pwszOpen, LPCWSTR pwszClose) {
 		SendMessage(hwnd, SCI_SETSEL, iAnchorPos, iCurPos);
 	}
 
+	EndWaitCursor();
 	if (mszOpen != NULL) {
 		NP2HeapFree(mszOpen);
 	}
@@ -2882,21 +2888,17 @@ void EditToggleLineComments(HWND hwnd, LPCWSTR pwszComment, BOOL bInsertAtStart)
 		return;
 	}
 
+	BeginWaitCursor();
+
 	const int iSelStart = (int)SendMessage(hwnd, SCI_GETSELECTIONSTART, 0, 0);
 	const int iSelEnd = (int)SendMessage(hwnd, SCI_GETSELECTIONEND, 0, 0);
 	int iCurPos = (int)SendMessage(hwnd, SCI_GETCURRENTPOS, 0, 0);
 
 	char mszComment[256] = "";
-	if (StrNotEmpty(pwszComment)) {
-		const UINT cpEdit = (UINT)SendMessage(hwnd, SCI_GETCODEPAGE, 0, 0);
-		WideCharToMultiByte(cpEdit, 0, pwszComment, -1, mszComment, COUNTOF(mszComment), NULL, NULL);
-	}
+	const UINT cpEdit = (UINT)SendMessage(hwnd, SCI_GETCODEPAGE, 0, 0);
+	WideCharToMultiByte(cpEdit, 0, pwszComment, -1, mszComment, COUNTOF(mszComment), NULL, NULL);
 
 	const int cchComment = lstrlenA(mszComment);
-	if (cchComment == 0) {
-		return;
-	}
-
 	int iLineStart = (int)SendMessage(hwnd, SCI_LINEFROMPOSITION, iSelStart, 0);
 	int iLineEnd = (int)SendMessage(hwnd, SCI_LINEFROMPOSITION, iSelEnd, 0);
 
@@ -3007,6 +3009,8 @@ void EditToggleLineComments(HWND hwnd, LPCWSTR pwszComment, BOOL bInsertAtStart)
 		}
 		SendMessage(hwnd, SCI_SETSEL, iAnchorPos, iCurPos);
 	}
+
+	EndWaitCursor();
 }
 
 //=============================================================================
@@ -5636,9 +5640,7 @@ static INT_PTR CALLBACK EditModifyLinesDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 			DString_GetDlgItemText(&wchPrefixLines, hwnd, IDC_MODIFY_LINE_PREFIX);
 			DString_GetDlgItemText(&wchAppendLines, hwnd, IDC_MODIFY_LINE_APPEND);
 
-			BeginWaitCursor();
 			EditModifyLines(hwndEdit, wchPrefixLines.buffer, wchAppendLines.buffer);
-			EndWaitCursor();
 			EndDialog(hwnd, IDOK);
 		}
 		break;
@@ -5766,9 +5768,7 @@ static INT_PTR CALLBACK EditEncloseSelectionDlgProc(HWND hwnd, UINT umsg, WPARAM
 			DString_GetDlgItemText(&wchAppendSelection, hwnd, IDC_MODIFY_LINE_PREFIX);
 			DString_GetDlgItemText(&wchPrefixSelection, hwnd, IDC_MODIFY_LINE_APPEND);
 
-			BeginWaitCursor();
 			EditEncloseSelection(hwndEdit, wchPrefixSelection.buffer, wchAppendSelection.buffer);
-			EndWaitCursor();
 			EndDialog(hwnd, IDOK);
 		}
 		break;
@@ -5907,9 +5907,7 @@ static INT_PTR CALLBACK EditInsertTagDlgProc(HWND hwnd, UINT umsg, WPARAM wParam
 			DString_GetDlgItemText(&wszOpen, hwnd, IDC_MODIFY_LINE_PREFIX);
 			DString_GetDlgItemText(&wszClose, hwnd, IDC_MODIFY_LINE_APPEND);
 
-			BeginWaitCursor();
 			EditEncloseSelection(hwndEdit, wszOpen.buffer, wszClose.buffer);
-			EndWaitCursor();
 			DString_Free(&wszOpen);
 			DString_Free(&wszClose);
 			EndDialog(hwnd, IDOK);

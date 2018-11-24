@@ -1174,7 +1174,6 @@ void EditAutoIndent(HWND hwnd) {
 }
 
 void EditToggleCommentLine(HWND hwnd) {
-	BeginWaitCursor();
 	switch (pLexCurrent->iLexer) {
 	case SCLEX_ASM:
 	case SCLEX_AU3:
@@ -1292,7 +1291,6 @@ void EditToggleCommentLine(HWND hwnd) {
 		EditToggleLineComments(hwnd, L"\"", FALSE);
 		break;
 	}
-	EndWaitCursor();
 }
 
 void EditEncloseSelectionNewLine(HWND hwnd, LPCWSTR pwszOpen, LPCWSTR pwszClose) {
@@ -1342,6 +1340,7 @@ void EditToggleCommentBlock(HWND hwnd) {
 		case NP2LEX_AWK:
 		case NP2LEX_JAM:
 			break;
+
 		default:
 			EditEncloseSelection(hwnd, L"/*", L"*/");
 			break;
