@@ -11,7 +11,7 @@ NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL
 }};
 
 
-EDITLEXER lexJSON = { SCLEX_JSON, NP2LEX_JSON, EDITLEXER_HOLE(L"JSON Document"), L"json; har; ipynb", &Keywords_JSON,
+EDITLEXER lexJSON = { SCLEX_JSON, NP2LEX_JSON, EDITLEXER_HOLE(L"JSON Document"), L"json; har; ipynb; wxcp", &Keywords_JSON,
 {
 	EDITSTYLE_DEFAULT,
 	{ SCE_C_WORD, NP2STYLE_Keyword, EDITSTYLE_HOLE(L"Keyword"), L"fore:#0000FF" },

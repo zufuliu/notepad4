@@ -51,7 +51,7 @@ EDITLEXER lexANSI = { SCLEX_NULL, NP2LEX_ANSI, EDITLEXER_HOLE(L"ANSI Art"), L"nf
 }
 };
 
-EDITLEXER lexCONF = { SCLEX_CONF, NP2LEX_CONF, EDITLEXER_HOLE(L"Config File"), L"conf; cfg; cnf; htaccess; properties; prefs; iface; prop", &Keywords_NULL,
+EDITLEXER lexCONF = { SCLEX_CONF, NP2LEX_CONF, EDITLEXER_HOLE(L"Config File"), L"conf; cfg; cnf; htaccess; properties; prefs; iface; prop; po; te", &Keywords_NULL,
 {
 	EDITSTYLE_DEFAULT,
 	{ SCE_CONF_DIRECTIVE, NP2STYLE_Directive, EDITSTYLE_HOLE(L"Directive"), L"fore:#003CE6" },
