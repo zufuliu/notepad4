@@ -2281,7 +2281,6 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	EnableCmd(hmenu, IDM_EDIT_STREAMCOMMENT, bCurrentLexerHasBlockComment);
 
 	EnableCmd(hmenu, IDM_EDIT_INSERT_ENCODING, *mEncoding[iEncoding].pszParseNames);
-	EnableCmd(hmenu, IDM_EDIT_INSERT_SHEBANG, bCurrentLexerHasShebangLine);
 
 	//EnableCmd(hmenu, IDM_EDIT_INSERT_SHORTDATE, !bReadOnly);
 	//EnableCmd(hmenu, IDM_EDIT_INSERT_LONGDATE, !bReadOnly);

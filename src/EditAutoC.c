@@ -1415,22 +1415,22 @@ void EditToggleCommentBlock(HWND hwnd) {
 
 // see Style_SniffShebang() in Styles.c
 void EditInsertScriptShebangLine(HWND hwnd) {
-	char line[128];
-	strcpy(line, "#!/usr/bin/env ");
+	const char *prefix = "#!/usr/bin/env ";
+	const char *name = NULL;
 
 	switch (pLexCurrent->iLexer) {
 	case SCLEX_BASH:
 		switch (np2LexLangIndex) {
 		case IDM_LANG_CSHELL:
-			strcpy(line, "#!/bin/csh");
+			prefix = "#!/bin/csh";
 			break;
 
 		case IDM_LANG_M4:
-			strcat(line, "m4");
+			name = "m4";
 			break;
 
 		default:
-			strcpy(line, "#!/bin/bash");
+			prefix = "#!/bin/bash";
 			break;
 		}
 		break;
@@ -1438,60 +1438,60 @@ void EditInsertScriptShebangLine(HWND hwnd) {
 	case SCLEX_CPP:
 		switch (pLexCurrent->rid) {
 		case NP2LEX_AWK:
-			strcat(line, "awk");
+			name = "awk";
 			break;
 
 		case NP2LEX_GO:
-			strcat(line, "go");
+			name = "go";
 			break;
 
 		case NP2LEX_GROOVY:
-			strcat(line, "groovy");
+			name = "groovy";
 			break;
 
 		case NP2LEX_JS:
-			strcat(line, "node");
+			name = "node";
 			break;
 
 		case NP2LEX_PHP:
-			strcat(line, "php");
+			name = "php";
 			break;
 
 		case NP2LEX_SCALA:
-			strcat(line, "scala");
+			name = "scala";
 			break;
-
-		default:
-			return;
 		}
 		break;
 
 	case SCLEX_LUA:
-		strcat(line, "lua");
+		name = "lua";
 		break;
 
 	case SCLEX_PERL:
-		strcat(line, "perl");
+		name = "perl";
 		break;
 
 	case SCLEX_PYTHON:
-		strcat(line, "python");
+		name = "python";
 		break;
 
 	case SCLEX_RUBY:
-		strcat(line, "ruby");
+		name = "ruby";
 		break;
 
 	case SCLEX_TCL:
-		strcat(line, "wish");
+		name = "wish";
 		break;
+	}
 
-	default:
-		return;
+	char line[128];
+	strcpy(line, prefix);
+	if (name != NULL) {
+		strcat(line, name);
 	}
 
 	const Sci_Position iCurrentPos = SciCall_GetCurrentPos();
-	if (iCurrentPos == 0) {
+	if (iCurrentPos == 0 && (name != NULL || pLexCurrent->iLexer == SCLEX_BASH)) {
 		const int iEOLMode = (int)SendMessage(hwnd, SCI_GETEOLMODE, 0, 0);
 		LPCSTR lineEnd = (iEOLMode == SC_EOL_LF) ? "\n" : ((iEOLMode == SC_EOL_CR) ? "\r" : "\r\n");
 		strcat(line, lineEnd);
