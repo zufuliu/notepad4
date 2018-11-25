@@ -69,7 +69,7 @@ NULL
 }};
 
 
-EDITLEXER lexD = { SCLEX_CPP, NP2LEX_D, EDITLEXER_HOLE(L"D Source"), L"d; di", &Keywords_D,
+EDITLEXER lexD = { SCLEX_CPP, NP2LEX_D, EDITLEXER_HOLE(L"D Source"), L"d; di; dd", &Keywords_D,
 {
 	EDITSTYLE_DEFAULT,
 	{ SCE_C_WORD, NP2STYLE_Keyword, EDITSTYLE_HOLE(L"Keyword"), L"fore:#0000FF" },

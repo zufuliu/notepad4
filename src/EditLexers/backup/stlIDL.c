@@ -24,7 +24,7 @@ static KEYWORDLIST Keywords_IDL = {{
 , NULL
 }};
 
-EDITLEXER lexIDL = { SCLEX_CPP, NP2LEX_IDL, EDITLEXER_HOLE(L"Interface Definition File"), L"idl; odl", &Keywords_IDL,
+EDITLEXER lexIDL = { SCLEX_CPP, NP2LEX_IDL, EDITLEXER_HOLE(L"Interface Definition File"), L"idl; odl; midl", &Keywords_IDL,
 {
 	EDITSTYLE_DEFAULT,
 	{ SCE_C_WORD, NP2STYLE_Keyword, EDITSTYLE_HOLE(L"Keyword"), L"fore:#0000FF" },
