@@ -11,17 +11,22 @@ Default Text
 C/C++ Source
 	c
 	cpp
-	cxx
-	cc
-	h
-	hpp
-	hxx
-	hh
+	cxx				C++ Source File
+	cc				C++ Source File
+	h				C/C++ Header File
+	hpp				C++ Header File
+	hxx				C++ Header File
+	hh				C++ Header File
 	inl				C++ Inline File
 	pch				Precompiled Header File
+		idl			interface definition language
+		odl			Object Definition Language
+		midl		Microsoft Interface Definition Language
 	m				Objective C Source File
 	mm				Objective C++ Source File
 	xpm				X11 Pixmap Graphic
+
+	*.h.in
 
 C# Source
 	cs
@@ -38,6 +43,7 @@ Java Source
 	java
 	jad				Jad Decompiler
 	aidl			Android IDL
+	bsh				BeanShell
 
 JavaScript
 	js
@@ -49,11 +55,14 @@ JSON Document
 	har				Firefox -> Web Developer -> Network
 	ipynb			Jupyter Notebook
 	wxcp			CodeLite wxCrafter Resource
+	jshintrc		JSHint Configuration File
+	eslintrc		ESLint Configuration File
+	jsonld			JSON for Linked Data
 
 PHP Script
 	php
 	phpt			PHP Test Script
-	phtml
+	phtml			PHP Web Page
 	eyecode			eyeOS
 
 Python Script
@@ -68,11 +77,12 @@ Ruby Script
 	rb
 	ruby
 	rbw
-	rake
-	rjs
+	rake			Ruby makefile
+	rjs				Ruby JavaScript
+	gemspec 		RubyGems Specification
 	podspec			CocoaPods
 
-	Rakefile
+	Rakefile		Ruby makefile
 	Podfile			CocoaPods
 
 SQL Query
@@ -82,32 +92,32 @@ SQL Query
 Web Source Code
 	html
 	htm
-	shtml
-	xhtml
-	asp
-	aspx
-	jsp
+	shtml			Server Side Include HTML File
+	xhtml			Extensible Hypertext Markup Language File
+	asp				Active Server Page
+	aspx			Active Server Page Extended File
+	jsp				Java Server Page
 	mht				MHTML Web Archive
-	htd
-	htt
-	hta
-	htc
-	cfm
-	tpl
+	htd				Adobe ExtendScript HTML file
+	htt				Hypertext Template File
+	hta				HTML Application
+	htc				HTML Component File
+	cfm				ColdFusion Markup File
+	tpl				Document Template
 	jd
 
 XML Document
 	xml
-	xsl
-	xslt
-	xsd
-	dtd
-	rss
-	svg
-	xul
+	xsl				XML Style Sheet
+	xslt			XSL Transformation File
+	xsd				XML Schema Definition
+	dtd				Document Type Definition File
+	rss				Rich Site Summary
+	svg				Scalable Vector Graphics File
+	xul				XML User Interface Language File
 	axl
-	rdf
-	xaml			WPF XAML
+	rdf				Resource Description Framework File
+	xaml			WPF Extensible Application Markup Language
 	resx			ResX Schema
 	plist			Property List
 	pom				Maven POM
@@ -153,7 +163,8 @@ CMake Script
 
 	CMakeLists.txt
 	CMakeCache.txt
-	*.cmake.in*
+	*.cmake.in
+	*.ctest.in
 
 Config File
 	conf
@@ -175,7 +186,8 @@ Config File
 
 D Source
 	d
-	di
+	di				D Interface File
+	dd				Ddoc Source File
 
 Diff File
 	diff
@@ -191,13 +203,14 @@ Fortran Source
 	f95
 	f03
 	f08
+	f2k
 	hf
 
 F# Source
 	fs
-	fsi
-	fsx
-	fsscript
+	fsi				F# Signature File
+	fsx				F# Script File
+	fsscript		F# Script
 	fsl
 	fsy
 	m				Mathematica Module
@@ -221,9 +234,9 @@ Groovy Script
 	groovy
 	gvy
 	gy
-	gsh
-	gpp
-	grunit
+	gsh				Groovy Shell
+	gpp				Groovy Parallel Pattern
+	grunit			GrUnit
 
 
 HaXe Script
@@ -384,7 +397,7 @@ Texinfo File
 
 VBScript
 	vbs
-	dsm
+	dsm				Visual Studio Macro
 
 Verilog HDL Source
 	v
@@ -402,10 +415,10 @@ Visual Basic
 	bas				BASIC Source Code File
 	frm				Visual Basic Text Form
 	cls				Program Class File
-	ctl				Visual Basic UserControl Object File
-	pag
+	ctl				Visual Basic User Control Object File
+	pag				Visual Basic Property Page
 	dsr				Visual Basic Active Designer File
-	dob				Visual Basic UserDocument
+	dob				Visual Basic User Document
 
 ANSI Art
 	nfo				System Information File
@@ -413,3 +426,4 @@ ANSI Art
 
 https://en.wikipedia.org/wiki/List_of_filename_extensions
 https://fileinfo.com/
+https://www.file-extensions.org/

@@ -113,7 +113,7 @@ NULL
 }};
 
 
-EDITLEXER lexJava = { SCLEX_CPP, NP2LEX_JAVA, EDITLEXER_HOLE(L"Java Source"), L"java; jad; aidl", &Keywords_Java,
+EDITLEXER lexJava = { SCLEX_CPP, NP2LEX_JAVA, EDITLEXER_HOLE(L"Java Source"), L"java; jad; aidl; bsh", &Keywords_Java,
 {
 	EDITSTYLE_DEFAULT,
 	{ SCE_C_WORD, NP2STYLE_Keyword, EDITSTYLE_HOLE(L"Keyword"), L"fore:#0000FF" },

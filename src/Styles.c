@@ -1797,9 +1797,8 @@ static PEDITLEXER Style_GetLexerFromFile(HWND hwnd, LPCWSTR lpszFile, BOOL bCGIG
 			char tchText[256];
 			SendMessage(hwnd, SCI_GETTEXT, COUNTOF(tchText) - 1, (LPARAM)tchText);
 			StrTrimA(tchText, " \t\n\r");
-			if ((pLexNew = Style_SniffShebang(tchText)) != NULL) {
-				bFound = TRUE;
-			}
+			pLexNew = Style_SniffShebang(tchText);
+			bFound = pLexNew != NULL;
 		}
 
 		if (!bFound && StrCaseEqual(lpszExt, L"xml")) {
@@ -1830,6 +1829,15 @@ static PEDITLEXER Style_GetLexerFromFile(HWND hwnd, LPCWSTR lpszFile, BOOL bCGIG
 			}
 		}
 
+		// autoconf / automake
+		if (!bFound && StrCaseEqual(lpszExt, L"in") && pDotFile != NULL) {
+			WCHAR tchCopy[MAX_PATH];
+			lstrcpyn(tchCopy, lpszFile, COUNTOF(tchCopy));
+			PathRemoveExtension(tchCopy);
+			pLexNew = Style_GetLexerFromFile(hwnd, tchCopy, FALSE, NULL, NULL);
+			bFound = pLexNew != NULL;
+		}
+
 		if (!bFound && ((StrCaseEqual(lpszExt, L"conf") && StrNCaseEqual(lpszName, L"httpd", 5)) || StrCaseEqual(lpszExt, L"htaccess"))) {
 			pLexNew = &lexCONF;
 			bFound = TRUE;
@@ -1845,21 +1853,18 @@ static PEDITLEXER Style_GetLexerFromFile(HWND hwnd, LPCWSTR lpszFile, BOOL bCGIG
 			bFound = TRUE;
 			np2LexLangIndex = IDM_LANG_WEB_NET;
 		}
-		if (!bFound && StrRStrI(lpszFile, NULL, L".cmake.in")) {
-			pLexNew = &lexCMake;
-			bFound = TRUE;
-		}
 
 		// check associated extensions
 		if (!bFound) {
-			if ((pLexNew = Style_MatchLexer(lpszExt, FALSE)) != NULL) {
-				bFound = TRUE;
-			}
+			pLexNew = Style_MatchLexer(lpszExt, FALSE);
+			bFound = pLexNew != NULL;
 		}
 
 		// dot file
 		if (StrCaseEqual(lpszExt - 1, lpszName)) {
-			*pDotFile = TRUE;
+			if (pDotFile) {
+				*pDotFile = TRUE;
+			}
 			if (StrNEqual(lpszExt, L"bash", 4) || StrEqual(lpszExt, L"profile")) { // .bash_history, .bash_logout, .bash_profile, .bashrc, .profile
 				pLexNew = &lexBash;
 				bFound = TRUE;
