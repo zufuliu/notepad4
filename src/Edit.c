@@ -1104,6 +1104,40 @@ void EditSentenceCase(HWND hwnd) {
 //
 // EditURLEncode()
 //
+LPWSTR EditURLEncodeSelection(HWND hwnd, int *pcchEscaped, BOOL bTrim) {
+	*pcchEscaped = 0;
+	const int iSelCount = (int)SendMessage(hwnd, SCI_GETSELTEXT, 0, 0);
+	if (iSelCount == 0) {
+		return NULL;
+	}
+
+	char *pszText = NP2HeapAlloc(iSelCount);
+	SendMessage(hwnd, SCI_GETSELTEXT, 0, (LPARAM)pszText);
+
+	if (bTrim) {
+		StrTrimA(pszText, " \t\r\n");
+	}
+	if (StrIsEmptyA(pszText)) {
+		NP2HeapFree(pszText);
+		return NULL;
+	}
+
+	LPWSTR pszTextW = NP2HeapAlloc(iSelCount * sizeof(WCHAR));
+	const UINT cpEdit = (UINT)SendMessage(hwnd, SCI_GETCODEPAGE, 0, 0);
+	MultiByteToWideChar(cpEdit, 0, pszText, iSelCount, pszTextW, (int)NP2HeapSize(pszTextW) / sizeof(WCHAR));
+
+	// https://docs.microsoft.com/en-us/windows/desktop/api/shlwapi/nf-shlwapi-urlescapew
+	LPWSTR pszEscapedW = NP2HeapAlloc(NP2HeapSize(pszTextW) * 3);  // '&', H1, H0
+
+	DWORD cchEscapedW = (int)NP2HeapSize(pszEscapedW) / sizeof(WCHAR);
+	UrlEscape(pszTextW, pszEscapedW, &cchEscapedW, URL_ESCAPE_SEGMENT_ONLY);
+
+	NP2HeapFree(pszText);
+	NP2HeapFree(pszTextW);
+	*pcchEscaped = cchEscapedW;
+	return pszEscapedW;
+}
+
 void EditURLEncode(HWND hwnd) {
 	int iCurPos = (int)SendMessage(hwnd, SCI_GETCURRENTPOS, 0, 0);
 	int iAnchorPos = (int)SendMessage(hwnd, SCI_GETANCHOR, 0, 0);
@@ -1115,22 +1149,14 @@ void EditURLEncode(HWND hwnd) {
 		return;
 	}
 
-	const int iSelCount = (int)SendMessage(hwnd, SCI_GETSELTEXT, 0, 0);
+	int cchEscapedW;
+	LPWSTR pszEscapedW = EditURLEncodeSelection(hwnd, &cchEscapedW, FALSE);
+	if (pszEscapedW == NULL) {
+		return;
+	}
 
-	char *pszText = NP2HeapAlloc(iSelCount);
-	LPWSTR pszTextW = NP2HeapAlloc(iSelCount * sizeof(WCHAR));
-
-	SendMessage(hwnd, SCI_GETSELTEXT, 0, (LPARAM)pszText);
 	const UINT cpEdit = (UINT)SendMessage(hwnd, SCI_GETCODEPAGE, 0, 0);
-	MultiByteToWideChar(cpEdit, 0, pszText, iSelCount, pszTextW,
-						(int)NP2HeapSize(pszTextW) / sizeof(WCHAR));
-
-	// https://docs.microsoft.com/en-us/windows/desktop/api/shlwapi/nf-shlwapi-urlescapea
-	char *pszEscaped = NP2HeapAlloc(NP2HeapSize(pszText) * 3); // '&', H1, H0
-	LPWSTR pszEscapedW = NP2HeapAlloc(NP2HeapSize(pszTextW) * 3);
-
-	DWORD cchEscapedW = (int)NP2HeapSize(pszEscapedW) / sizeof(WCHAR);
-	UrlEscape(pszTextW, pszEscapedW, &cchEscapedW, URL_ESCAPE_SEGMENT_ONLY);
+	char *pszEscaped = NP2HeapAlloc(cchEscapedW * kMaxMultiByteCount);
 	const int cchEscaped = WideCharToMultiByte(cpEdit, 0, pszEscapedW, cchEscapedW, pszEscaped,
 									 (int)NP2HeapSize(pszEscaped), NULL, NULL);
 	if (iCurPos < iAnchorPos) {
@@ -1145,8 +1171,6 @@ void EditURLEncode(HWND hwnd) {
 	SendMessage(hwnd, SCI_SETSEL, iAnchorPos, iCurPos);
 	SendMessage(hwnd, SCI_ENDUNDOACTION, 0, 0);
 
-	NP2HeapFree(pszText);
-	NP2HeapFree(pszTextW);
 	NP2HeapFree(pszEscaped);
 	NP2HeapFree(pszEscapedW);
 }
@@ -6141,55 +6165,42 @@ void EditSelectionAction(HWND hwnd, int action) {
 		return;
 	}
 
-	const int cchSelection = (int)SendMessage(hwnd, SCI_GETSELTEXT, 0, 0);
-	if (cchSelection > 0 && cchSelection < 512) {
-		char mszSelection[512] = {0};
-		SendMessage(hwnd, SCI_GETSELTEXT, 0, (LPARAM)mszSelection);
-		mszSelection[cchSelection] = 0; // zero terminate
-
-		// Check lpszSelection and truncate bad WCHARs
-		char *lpsz = strpbrk(mszSelection, "\r\n\t");
-		if (lpsz) {
-			*lpsz = '\0';
-		}
-
-		if (StrNotEmptyA(mszSelection)) {
-			WCHAR wszSelection[512];
-
-			const UINT cpEdit = (UINT)SendMessage(hwnd, SCI_GETCODEPAGE, 0, 0);
-			MultiByteToWideChar(cpEdit, 0, mszSelection, -1, wszSelection, COUNTOF(wszSelection));
-
-			LPWSTR lpszCommand = NP2HeapAlloc(sizeof(WCHAR) * (512 + COUNTOF(szCmdTemplate) + MAX_PATH + 32));
-			const size_t cbCommand = NP2HeapSize(lpszCommand);
-			wsprintf(lpszCommand, szCmdTemplate, wszSelection);
-			ExpandEnvironmentStringsEx(lpszCommand, (DWORD)(cbCommand / sizeof(WCHAR)));
-
-			LPWSTR lpszArgs = NP2HeapAlloc(cbCommand);
-			ExtractFirstArgument(lpszCommand, lpszCommand, lpszArgs);
-
-			WCHAR wchDirectory[MAX_PATH] = L"";
-			if (StrNotEmpty(szCurFile)) {
-				lstrcpy(wchDirectory, szCurFile);
-				PathRemoveFileSpec(wchDirectory);
-			}
-
-			SHELLEXECUTEINFO sei;
-			ZeroMemory(&sei, sizeof(SHELLEXECUTEINFO));
-			sei.cbSize = sizeof(SHELLEXECUTEINFO);
-			sei.fMask = /*SEE_MASK_NOZONECHECKS*/0x00800000;
-			sei.hwnd = NULL;
-			sei.lpVerb = NULL;
-			sei.lpFile = lpszCommand;
-			sei.lpParameters = lpszArgs;
-			sei.lpDirectory = wchDirectory;
-			sei.nShow = SW_SHOWNORMAL;
-
-			ShellExecuteEx(&sei);
-
-			NP2HeapFree(lpszCommand);
-			NP2HeapFree(lpszArgs);
-		}
+	int cchEscapedW;
+	LPWSTR pszEscapedW = EditURLEncodeSelection(hwnd, &cchEscapedW, TRUE);
+	if (pszEscapedW == NULL) {
+		return;
 	}
+
+	LPWSTR lpszCommand = NP2HeapAlloc(sizeof(WCHAR) * (cchEscapedW + COUNTOF(szCmdTemplate) + MAX_PATH + 32));
+	const size_t cbCommand = NP2HeapSize(lpszCommand);
+	wsprintf(lpszCommand, szCmdTemplate, pszEscapedW);
+	ExpandEnvironmentStringsEx(lpszCommand, (DWORD)(cbCommand / sizeof(WCHAR)));
+
+	LPWSTR lpszArgs = NP2HeapAlloc(cbCommand);
+	ExtractFirstArgument(lpszCommand, lpszCommand, lpszArgs);
+
+	WCHAR wchDirectory[MAX_PATH] = L"";
+	if (StrNotEmpty(szCurFile)) {
+		lstrcpy(wchDirectory, szCurFile);
+		PathRemoveFileSpec(wchDirectory);
+	}
+
+	SHELLEXECUTEINFO sei;
+	ZeroMemory(&sei, sizeof(SHELLEXECUTEINFO));
+	sei.cbSize = sizeof(SHELLEXECUTEINFO);
+	sei.fMask = /*SEE_MASK_NOZONECHECKS*/0x00800000;
+	sei.hwnd = NULL;
+	sei.lpVerb = NULL;
+	sei.lpFile = lpszCommand;
+	sei.lpParameters = lpszArgs;
+	sei.lpDirectory = wchDirectory;
+	sei.nShow = SW_SHOWNORMAL;
+
+	ShellExecuteEx(&sei);
+
+	NP2HeapFree(pszEscapedW);
+	NP2HeapFree(lpszCommand);
+	NP2HeapFree(lpszArgs);
 }
 
 void TryBrowseFile(HWND hwnd, LPCWSTR pszFile, BOOL bWarn) {
