@@ -123,7 +123,8 @@ static BOOL bMatchBraces;
 static BOOL bAutoIndent;
 static BOOL bAutoCloseTags;
 static BOOL bShowIndentGuides;
-BOOL	bHighlightCurrentLine;
+BOOL	bHighlightCurrentLineAlways;
+INT		iHighlightCurrentLine;
 BOOL	bTabsAsSpaces;
 BOOL	bTabsAsSpacesG;
 BOOL	bTabIndents;
@@ -2385,7 +2386,9 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	CheckCmd(hmenu, IDM_VIEW_FULLSCREEN_HIDE_STATUS, bFullScreenHideStatusbar);
 
 	CheckCmd(hmenu, IDM_VIEW_AUTOCLOSETAGS, bAutoCloseTags);
-	CheckCmd(hmenu, IDM_VIEW_HIGHLIGHTCURRENTLINE, bHighlightCurrentLine);
+	i = IDM_VIEW_HIGHLIGHTCURRENTLINE_NONE + iHighlightCurrentLine;
+	CheckMenuRadioItem(hmenu, IDM_VIEW_HIGHLIGHTCURRENTLINE_NONE, IDM_VIEW_HIGHLIGHTCURRENTLINE_FRAME, i, MF_BYCOMMAND);
+	CheckCmd(hmenu, IDM_VIEW_HIGHLIGHTCURRENTLINE_ALWAYS, bHighlightCurrentLineAlways);
 
 	CheckCmd(hmenu, IDM_VIEW_REUSEWINDOW, bReuseWindow);
 	CheckCmd(hmenu, IDM_VIEW_SINGLEFILEINSTANCE, bSingleFileInstance);
@@ -3992,9 +3995,16 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		bAutoCloseTags = !bAutoCloseTags;
 		break;
 
-	case IDM_VIEW_HIGHLIGHTCURRENTLINE:
-		bHighlightCurrentLine = !bHighlightCurrentLine;
-		Style_SetCurrentLineBackground(hwndEdit);
+	case IDM_VIEW_HIGHLIGHTCURRENTLINE_NONE:
+	case IDM_VIEW_HIGHLIGHTCURRENTLINE_BACK:
+	case IDM_VIEW_HIGHLIGHTCURRENTLINE_FRAME:
+		iHighlightCurrentLine = LOWORD(wParam) - IDM_VIEW_HIGHLIGHTCURRENTLINE_NONE;
+		Style_HighlightCurrentLine(hwndEdit);
+		break;
+
+	case IDM_VIEW_HIGHLIGHTCURRENTLINE_ALWAYS:
+		bHighlightCurrentLineAlways = !bHighlightCurrentLineAlways;
+		SendMessage(hwndEdit, SCI_SETCARETLINEVISIBLEALWAYS, bHighlightCurrentLineAlways, 0);
 		break;
 
 	case IDM_VIEW_ZOOMIN:
@@ -5259,7 +5269,9 @@ void LoadSettings(void) {
 	bShowUnicodeControlCharacter = IniSectionGetBool(pIniSection, L"ShowUnicodeControlCharacter", 0);
 
 	bMatchBraces = IniSectionGetBool(pIniSection, L"MatchBraces", 1);
-	bHighlightCurrentLine = IniSectionGetBool(pIniSection, L"HighlightCurrentLine", 0);
+	iHighlightCurrentLine = IniSectionGetInt(pIniSection, L"HighlightCurrentLine", 12);
+	bHighlightCurrentLineAlways = iHighlightCurrentLine > 10;
+	iHighlightCurrentLine = clamp_i(iHighlightCurrentLine % 10, 0, 2);
 	bShowIndentGuides = IniSectionGetBool(pIniSection, L"ShowIndentGuides", 0);
 
 	bAutoIndent = IniSectionGetBool(pIniSection, L"AutoIndent", 1);
@@ -5573,7 +5585,7 @@ void SaveSettings(BOOL bSaveSettingsNow) {
 	IniSectionSetBoolEx(pIniSection, L"ShowWordWrapSymbols", bShowWordWrapSymbols, 0);
 	IniSectionSetBoolEx(pIniSection, L"ShowUnicodeControlCharacter", bShowUnicodeControlCharacter, 0);
 	IniSectionSetBoolEx(pIniSection, L"MatchBraces", bMatchBraces, 1);
-	IniSectionSetBoolEx(pIniSection, L"HighlightCurrentLine", bHighlightCurrentLine, 0);
+	IniSectionSetIntEx(pIniSection, L"HighlightCurrentLine", iHighlightCurrentLine + (bHighlightCurrentLineAlways ? 10 : 0), 12);
 	IniSectionSetBoolEx(pIniSection, L"ShowIndentGuides", bShowIndentGuides, 0);
 	IniSectionSetBoolEx(pIniSection, L"AutoIndent", bAutoIndent, 1);
 	IniSectionSetBoolEx(pIniSection, L"AutoCloseTags", bAutoCloseTags, 1);

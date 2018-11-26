@@ -272,7 +272,8 @@ extern int	iEncoding;
 extern int	g_DOSEncoding;
 extern int	iDefaultCodePage;
 extern int	iDefaultCharSet;
-extern BOOL	bHighlightCurrentLine;
+extern BOOL	bHighlightCurrentLineAlways;
+extern INT	iHighlightCurrentLine;
 
 #define STYLE_MASK_FONT_FACE	(1 << 0)
 #define STYLE_MASK_FONT_SIZE	(1 << 1)
@@ -926,7 +927,6 @@ void Style_SetLexer(HWND hwnd, PEDITLEXER pLexNew) {
 		}
 	}
 
-	// Use 2nd default style
 	const int iIdx = GetDefaultStyleStartIndex();
 	// Font quality setup
 	SendMessage(hwnd, SCI_SETFONTQUALITY, iFontQuality, 0);
@@ -1006,7 +1006,7 @@ void Style_SetLexer(HWND hwnd, PEDITLEXER pLexNew) {
 	iValue = clamp_i(iValue, 0, 5);
 	SendMessage(hwnd, SCI_SETWHITESPACESIZE, iValue, 0);
 
-	Style_SetCurrentLineBackground(hwnd);
+	Style_HighlightCurrentLine(hwnd);
 	Style_UpdateCaret(hwnd);
 	// caret fore
 	if (!Style_StrGetColor(TRUE, lexDefault.Styles[Style_Caret + iIdx].szValue, &iValue)) {
@@ -2187,8 +2187,6 @@ void Style_ToggleUse2ndDefault(HWND hwnd) {
 //
 void Style_SetLongLineColors(HWND hwnd) {
 	int rgb;
-
-	// Use 2nd default style
 	const int iIdx = GetDefaultStyleStartIndex();
 
 	if (SendMessage(hwnd, SCI_GETEDGEMODE, 0, 0) == EDGE_LINE) {
@@ -2208,15 +2206,23 @@ void Style_SetLongLineColors(HWND hwnd) {
 
 //=============================================================================
 //
-// Style_SetCurrentLineBackground()
+// Style_HighlightCurrentLine()
 //
-void Style_SetCurrentLineBackground(HWND hwnd) {
-	if (bHighlightCurrentLine) {
-		// Use 2nd default style
+void Style_HighlightCurrentLine(HWND hwnd) {
+	SendMessage(hwnd, SCI_SETCARETLINEVISIBLEALWAYS, bHighlightCurrentLineAlways, 0);
+	if (iHighlightCurrentLine != 0) {
 		const int iIdx = GetDefaultStyleStartIndex();
+		const BOOL backColor = iHighlightCurrentLine == 1;
 		int iValue;
-		if (Style_StrGetColor(FALSE, lexDefault.Styles[Style_CurrentLine + iIdx].szValue, &iValue)) { // caret line back
+		if (Style_StrGetColor(!backColor, lexDefault.Styles[Style_CurrentLine + iIdx].szValue, &iValue)) {
+			int size = 0;
+			if (!backColor) {
+				Style_StrGetRawSize(lexDefault.Styles[Style_CurrentLine + iIdx].szValue, &size);
+				size = max_i(1, RoundToCurrentDPI(size));
+			}
+
 			SendMessage(hwnd, SCI_SETCARETLINEVISIBLE, TRUE, 0);
+			SendMessage(hwnd, SCI_SETCARETLINEFRAME, size, 0);
 			SendMessage(hwnd, SCI_SETCARETLINEBACK, iValue, 0);
 
 			if (Style_StrGetAlpha(lexDefault.Styles[Style_CurrentLine + iIdx].szValue, &iValue)) {
@@ -2224,12 +2230,11 @@ void Style_SetCurrentLineBackground(HWND hwnd) {
 			} else {
 				SendMessage(hwnd, SCI_SETCARETLINEBACKALPHA, SC_ALPHA_NOALPHA, 0);
 			}
-		} else {
-			SendMessage(hwnd, SCI_SETCARETLINEVISIBLE, FALSE, 0);
+			return;
 		}
-	} else {
-		SendMessage(hwnd, SCI_SETCARETLINEVISIBLE, FALSE, 0);
 	}
+
+	SendMessage(hwnd, SCI_SETCARETLINEVISIBLE, FALSE, 0);
 }
 
 //=============================================================================
@@ -2329,6 +2334,16 @@ BOOL Style_StrGetSizeEx(LPCWSTR lpszStyle, int *i) {
 			*i = iValue;
 			return TRUE;
 		}
+	}
+	return FALSE;
+}
+
+BOOL Style_StrGetRawSize(LPCWSTR lpszStyle, int *i) {
+	WCHAR *p;
+
+	if ((p = StrStr(lpszStyle, L"size:")) != NULL) {
+		p += CSTRLEN(L"size:");
+		return CRTStrToInt(p, i);
 	}
 	return FALSE;
 }
