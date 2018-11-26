@@ -84,9 +84,8 @@ BOOL	Style_GetOpenDlgFilterStr(LPWSTR lpszFilter, int cchFilter);
 
 BOOL	Style_StrGetFont(LPCWSTR lpszStyle, LPWSTR lpszFont, int cchFont);
 BOOL	Style_StrGetCharSet(LPCWSTR lpszStyle, int *i);
-BOOL	Style_StrGetSizeEx(LPCWSTR lpszStyle, int *i);
+BOOL	Style_StrGetFontSize(LPCWSTR lpszStyle, int *i);
 BOOL	Style_StrGetRawSize(LPCWSTR lpszStyle, int *i);
-BOOL	Style_StrGetSize(LPCWSTR lpszStyle, int *i);
 BOOL	Style_StrGetSizeStr(LPCWSTR lpszStyle, LPWSTR lpszSize, int cchSize);
 BOOL	Style_StrGetColor(BOOL bFore, LPCWSTR lpszStyle, int *rgb);
 BOOL	Style_StrGetCase(LPCWSTR lpszStyle, int *i);
