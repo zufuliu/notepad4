@@ -188,6 +188,7 @@
 * [RL Vision](http://www.rlvision.com/notepad2/about.asp)
 * Aleksandar Lekov
 * Bruno Barbieri
+* Homam
 * Everyone else on [GitHub](https://github.com/zufuliu/notepad2/graphs/contributors)
 
 ## More information:

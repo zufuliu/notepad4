@@ -197,8 +197,9 @@ BOOL EditConvertText(HWND hwnd, UINT cpSource, UINT cpDest, BOOL bSetSavePoint) 
 			SendMessage(hwnd, SCI_SETSAVEPOINT, 0, 0);
 		}
 	} else {
+		// DBCS: length -> WCHAR: sizeof(WCHAR) * (length / 2) -> UTF-8: kMaxMultiByteCount * (length / 2)
 		struct Sci_TextRange tr = { { 0, -1 }, NULL };
-		char *pchText = NP2HeapAlloc(length * sizeof(WCHAR) + 1);
+		char *pchText = NP2HeapAlloc((length + 1) * sizeof(WCHAR));
 		tr.lpstrText = pchText;
 		SendMessage(hwnd, SCI_GETTEXTRANGE, 0, (LPARAM)&tr);
 
@@ -1848,10 +1849,10 @@ void EditTabsToSpaces(HWND hwnd, int nTabWidth, BOOL bOnlyIndentingWS) {
 	const int iLine = (int)SendMessage(hwnd, SCI_LINEFROMPOSITION, iSelStart, 0);
 	iSelStart = (int)SendMessage(hwnd, SCI_POSITIONFROMLINE, iLine, 0);
 
-	const int iSelCount = (int)SendMessage(hwnd, SCI_GETSELTEXT, 0, 0);
+	const int iSelCount = iSelEnd - iSelStart;
 
-	char *pszText = NP2HeapAlloc(iSelCount);
-	LPWSTR pszTextW = NP2HeapAlloc(iSelCount * sizeof(WCHAR));
+	char *pszText = NP2HeapAlloc(iSelCount + 1);
+	LPWSTR pszTextW = NP2HeapAlloc((iSelCount + 1) * sizeof(WCHAR));
 
 	struct Sci_TextRange tr;
 	tr.chrg.cpMin = iSelStart;
@@ -1860,7 +1861,7 @@ void EditTabsToSpaces(HWND hwnd, int nTabWidth, BOOL bOnlyIndentingWS) {
 	SendMessage(hwnd, SCI_GETTEXTRANGE, 0, (LPARAM)&tr);
 
 	const UINT cpEdit = (UINT)SendMessage(hwnd, SCI_GETCODEPAGE, 0, 0);
-	const int cchTextW = MultiByteToWideChar(cpEdit, 0, pszText, iSelCount - 1, pszTextW,
+	const int cchTextW = MultiByteToWideChar(cpEdit, 0, pszText, iSelCount, pszTextW,
 								   (int)NP2HeapSize(pszTextW) / sizeof(WCHAR));
 	NP2HeapFree(pszText);
 
@@ -1898,7 +1899,6 @@ void EditTabsToSpaces(HWND hwnd, int nTabWidth, BOOL bOnlyIndentingWS) {
 
 		const int cchConvM = WideCharToMultiByte(cpEdit, 0, pszConvW, cchConvW, pszText,
 									   (int)NP2HeapSize(pszText), NULL, NULL);
-		NP2HeapFree(pszConvW);
 
 		if (iAnchorPos > iCurPos) {
 			iCurPos = iSelStart;
@@ -1918,9 +1918,9 @@ void EditTabsToSpaces(HWND hwnd, int nTabWidth, BOOL bOnlyIndentingWS) {
 		SendMessage(hwnd, SCI_ENDUNDOACTION, 0, 0);
 
 		NP2HeapFree(pszText);
-	} else {
-		NP2HeapFree(pszConvW);
 	}
+
+	NP2HeapFree(pszConvW);
 }
 
 //=============================================================================
@@ -1944,10 +1944,10 @@ void EditSpacesToTabs(HWND hwnd, int nTabWidth, BOOL bOnlyIndentingWS) {
 	const int iLine = (int)SendMessage(hwnd, SCI_LINEFROMPOSITION, iSelStart, 0);
 	iSelStart = (int)SendMessage(hwnd, SCI_POSITIONFROMLINE, iLine, 0);
 
-	const int iSelCount = (int)SendMessage(hwnd, SCI_GETSELTEXT, 0, 0);
+	const int iSelCount = iSelEnd - iSelStart;
 
-	char *pszText = NP2HeapAlloc(iSelCount);
-	LPWSTR pszTextW = NP2HeapAlloc(iSelCount * sizeof(WCHAR));
+	char *pszText = NP2HeapAlloc(iSelCount + 1);
+	LPWSTR pszTextW = NP2HeapAlloc((iSelCount + 1) * sizeof(WCHAR));
 
 	struct Sci_TextRange tr;
 	tr.chrg.cpMin = iSelStart;
@@ -1957,7 +1957,7 @@ void EditSpacesToTabs(HWND hwnd, int nTabWidth, BOOL bOnlyIndentingWS) {
 
 	const UINT cpEdit = (UINT)SendMessage(hwnd, SCI_GETCODEPAGE, 0, 0);
 
-	const int cchTextW = MultiByteToWideChar(cpEdit, 0, pszText, iSelCount - 1, pszTextW,
+	const int cchTextW = MultiByteToWideChar(cpEdit, 0, pszText, iSelCount, pszTextW,
 								   (int)NP2HeapSize(pszTextW) / sizeof(WCHAR));
 	NP2HeapFree(pszText);
 
@@ -2013,7 +2013,6 @@ void EditSpacesToTabs(HWND hwnd, int nTabWidth, BOOL bOnlyIndentingWS) {
 		pszText = NP2HeapAlloc(cchConvW * kMaxMultiByteCount + 1);
 		const int cchConvM = WideCharToMultiByte(cpEdit, 0, pszConvW, cchConvW, pszText,
 									   (int)NP2HeapSize(pszText), NULL, NULL);
-		NP2HeapFree(pszConvW);
 
 		if (iAnchorPos > iCurPos) {
 			iCurPos = iSelStart;
@@ -2033,9 +2032,9 @@ void EditSpacesToTabs(HWND hwnd, int nTabWidth, BOOL bOnlyIndentingWS) {
 		SendMessage(hwnd, SCI_ENDUNDOACTION, 0, 0);
 
 		NP2HeapFree(pszText);
-	} else {
-		NP2HeapFree(pszConvW);
 	}
+
+	NP2HeapFree(pszConvW);
 }
 
 //=============================================================================
@@ -3510,8 +3509,8 @@ void EditWrapToColumn(HWND hwnd, int nColumn/*, int nTabWidth*/) {
 	const int iLine = (int)SendMessage(hwnd, SCI_LINEFROMPOSITION, iSelStart, 0);
 	iSelStart = (int)SendMessage(hwnd, SCI_POSITIONFROMLINE, iLine, 0);
 
-	char *pszText = NP2HeapAlloc((iSelCount) + 2);
-	LPWSTR pszTextW = NP2HeapAlloc((iSelCount * 2) + 2);
+	char *pszText = NP2HeapAlloc(iSelCount + 1 + 2);
+	LPWSTR pszTextW = NP2HeapAlloc((iSelCount + 1 + 2) * sizeof(WCHAR));
 
 	struct Sci_TextRange tr;
 	tr.chrg.cpMin = iSelStart;
@@ -3627,7 +3626,6 @@ void EditWrapToColumn(HWND hwnd, int nColumn/*, int nTabWidth*/) {
 		pszText = NP2HeapAlloc(cchConvW * kMaxMultiByteCount);
 		const int cchConvM = WideCharToMultiByte(cpEdit, 0, pszConvW, cchConvW, pszText,
 									   (int)NP2HeapSize(pszText), NULL, NULL);
-		NP2HeapFree(pszConvW);
 
 		if (iAnchorPos > iCurPos) {
 			iCurPos = iSelStart;
@@ -3649,9 +3647,9 @@ void EditWrapToColumn(HWND hwnd, int nColumn/*, int nTabWidth*/) {
 		SendMessage(hwnd, SCI_ENDUNDOACTION, 0, 0);
 
 		NP2HeapFree(pszText);
-	} else {
-		NP2HeapFree(pszConvW);
 	}
+
+	NP2HeapFree(pszConvW);
 }
 
 //=============================================================================
@@ -3675,7 +3673,7 @@ void EditJoinLinesEx(HWND hwnd) {
 	iSelStart = (int)SendMessage(hwnd, SCI_POSITIONFROMLINE, iLine, 0);
 
 	const int iSelCount = iSelEnd - iSelStart;
-	char *pszText = NP2HeapAlloc(iSelCount + 2);
+	char *pszText = NP2HeapAlloc(iSelCount + 1 + 2);
 	char *pszJoin = NP2HeapAlloc(NP2HeapSize(pszText));
 
 	struct Sci_TextRange tr;
