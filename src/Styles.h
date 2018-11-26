@@ -78,13 +78,14 @@ void	Style_SetDefaultFont(HWND hwnd);
 void	Style_SetIndentGuides(HWND hwnd, BOOL bShow);
 void	Style_UpdateCaret(HWND hwnd);
 void	Style_SetLongLineColors(HWND hwnd);
-void	Style_SetCurrentLineBackground(HWND hwnd);
+void	Style_HighlightCurrentLine(HWND hwnd);
 void	Style_ToggleUse2ndDefault(HWND hwnd);
 BOOL	Style_GetOpenDlgFilterStr(LPWSTR lpszFilter, int cchFilter);
 
 BOOL	Style_StrGetFont(LPCWSTR lpszStyle, LPWSTR lpszFont, int cchFont);
 BOOL	Style_StrGetCharSet(LPCWSTR lpszStyle, int *i);
 BOOL	Style_StrGetSizeEx(LPCWSTR lpszStyle, int *i);
+BOOL	Style_StrGetRawSize(LPCWSTR lpszStyle, int *i);
 BOOL	Style_StrGetSize(LPCWSTR lpszStyle, int *i);
 BOOL	Style_StrGetSizeStr(LPCWSTR lpszStyle, LPWSTR lpszSize, int cchSize);
 BOOL	Style_StrGetColor(BOOL bFore, LPCWSTR lpszStyle, int *rgb);
