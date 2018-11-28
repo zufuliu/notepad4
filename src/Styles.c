@@ -272,7 +272,6 @@ extern int	iEncoding;
 extern int	g_DOSEncoding;
 extern int	iDefaultCodePage;
 extern int	iDefaultCharSet;
-extern BOOL	bHighlightCurrentLineAlways;
 extern INT	iHighlightCurrentLine;
 
 #define STYLE_MASK_FONT_FACE	(1 << 0)
@@ -2221,7 +2220,7 @@ void Style_SetLongLineColors(HWND hwnd) {
 // Style_HighlightCurrentLine()
 //
 void Style_HighlightCurrentLine(HWND hwnd) {
-	SendMessage(hwnd, SCI_SETCARETLINEVISIBLEALWAYS, bHighlightCurrentLineAlways, 0);
+	SendMessage(hwnd, SCI_SETCARETLINEVISIBLE, FALSE, 0);
 	if (iHighlightCurrentLine != 0) {
 		const int iIdx = GetDefaultStyleStartIndex();
 		LPCWSTR szValue = lexDefault.Styles[Style_CurrentLine + iIdx].szValue;
@@ -2234,7 +2233,6 @@ void Style_HighlightCurrentLine(HWND hwnd) {
 				size = max_i(1, RoundToCurrentDPI(size));
 			}
 
-			SendMessage(hwnd, SCI_SETCARETLINEVISIBLE, TRUE, 0);
 			SendMessage(hwnd, SCI_SETCARETLINEFRAME, size, 0);
 			SendMessage(hwnd, SCI_SETCARETLINEBACK, iValue, 0);
 
@@ -2243,11 +2241,9 @@ void Style_HighlightCurrentLine(HWND hwnd) {
 			} else {
 				SendMessage(hwnd, SCI_SETCARETLINEBACKALPHA, SC_ALPHA_NOALPHA, 0);
 			}
-			return;
+			SendMessage(hwnd, SCI_SETCARETLINEVISIBLE, TRUE, 0);
 		}
 	}
-
-	SendMessage(hwnd, SCI_SETCARETLINEVISIBLE, FALSE, 0);
 }
 
 //=============================================================================
