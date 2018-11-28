@@ -2200,19 +2200,12 @@ void Style_SetLongLineColors(HWND hwnd) {
 	const int iIdx = GetDefaultStyleStartIndex();
 	LPCWSTR szValue = lexDefault.Styles[Style_LongLineMarker + iIdx].szValue;
 
-	if (SendMessage(hwnd, SCI_GETEDGEMODE, 0, 0) == EDGE_LINE) {
-		if (Style_StrGetColor(TRUE, szValue, &rgb)) { // edge fore
-			SendMessage(hwnd, SCI_SETEDGECOLOUR, rgb, 0);
-		} else {
-			SendMessage(hwnd, SCI_SETEDGECOLOUR, GetSysColor(COLOR_3DLIGHT), 0);
-		}
-	} else {
-		if (Style_StrGetColor(FALSE, szValue, &rgb)) { // edge back
-			SendMessage(hwnd, SCI_SETEDGECOLOUR, rgb, 0);
-		} else {
-			SendMessage(hwnd, SCI_SETEDGECOLOUR, GetSysColor(COLOR_3DLIGHT), 0);
-		}
+	const BOOL foreColor = SendMessage(hwnd, SCI_GETEDGEMODE, 0, 0) == EDGE_LINE;
+	if (!Style_StrGetColor(foreColor, szValue, &rgb)) {
+		rgb = GetSysColor(COLOR_3DLIGHT);
 	}
+
+	SendMessage(hwnd, SCI_SETEDGECOLOUR, rgb, 0);
 }
 
 //=============================================================================
