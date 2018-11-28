@@ -291,19 +291,19 @@ BOOL IniSectionGetBoolImpl(IniSection *section, LPCWSTR key, int keyLen, BOOL bD
 	IniSectionGetStringImpl(section, key, CSTRLEN(key), (lpDefault), (lpReturnedString), (cchReturnedString))
 
 NP2_inline LPCWSTR IniSectionGetValueEx(IniSection *section, LPCWSTR key) {
-	return IniSectionGetValueImpl(section, key, -1);
+	return IniSectionGetValueImpl(section, key, 0);
 }
 
 NP2_inline int IniSectionGetIntEx(IniSection *section, LPCWSTR key, int iDefault) {
-	return IniSectionGetIntImpl(section, key, -1, iDefault);
+	return IniSectionGetIntImpl(section, key, 0, iDefault);
 }
 
 NP2_inline BOOL IniSectionGetBoolEx(IniSection *section, LPCWSTR key, BOOL bDefault) {
-	return IniSectionGetBoolImpl(section, key, -1, bDefault);
+	return IniSectionGetBoolImpl(section, key, 0, bDefault);
 }
 
 NP2_inline void IniSectionGetStringEx(IniSection *section, LPCWSTR key, LPCWSTR lpDefault, LPWSTR lpReturnedString, int cchReturnedString) {
-	IniSectionGetStringImpl(section, key, -1, lpDefault, lpReturnedString, cchReturnedString);
+	IniSectionGetStringImpl(section, key, 0, lpDefault, lpReturnedString, cchReturnedString);
 }
 
 typedef struct IniSectionOnSave {

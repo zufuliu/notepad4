@@ -114,7 +114,7 @@ BOOL IniSectionParse(IniSection *section, LPWSTR lpCachedIniSection) {
 }
 
 LPCWSTR IniSectionUnsafeGetValue(IniSection *section, LPCWSTR key, int keyLen) {
-	if (keyLen < 0) {
+	if (keyLen == 0) {
 		keyLen = lstrlen(key);
 	}
 
