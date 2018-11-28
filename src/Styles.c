@@ -969,30 +969,23 @@ void Style_SetLexer(HWND hwnd, PEDITLEXER pLexNew) {
 		SendMessage(hwnd, SCI_SETSELFORE, TRUE, iValue);
 		SendMessage(hwnd, SCI_SETADDITIONALSELFORE, iValue, 0);
 	} else {
-		SendMessage(hwnd, SCI_SETSELFORE, 0, 0);
+		SendMessage(hwnd, SCI_SETSELFORE, FALSE, 0);
 		SendMessage(hwnd, SCI_SETADDITIONALSELFORE, 0, 0);
 	}
-	if (Style_StrGetColor(FALSE, szValue, &iValue)) {
-		SendMessage(hwnd, SCI_SETSELBACK, TRUE, iValue);
-		SendMessage(hwnd, SCI_SETADDITIONALSELBACK, iValue, 0);
-	} else {
-		SendMessage(hwnd, SCI_SETSELBACK, TRUE, RGB(0xC0, 0xC0, 0xC0));
-		SendMessage(hwnd, SCI_SETADDITIONALSELBACK, RGB(0xC0, 0xC0, 0xC0), 0);
+	// always set background color
+	if (!Style_StrGetColor(FALSE, szValue, &iValue)) {
+		iValue = RGB(0xC0, 0xC0, 0xC0);
 	}
+	SendMessage(hwnd, SCI_SETSELBACK, TRUE, iValue);
+	SendMessage(hwnd, SCI_SETADDITIONALSELBACK, iValue, 0);
 
-	if (Style_StrGetAlpha(szValue, &iValue)) {
-		SendMessage(hwnd, SCI_SETSELALPHA, iValue, 0);
-		SendMessage(hwnd, SCI_SETADDITIONALSELALPHA, iValue, 0);
-	} else {
-		SendMessage(hwnd, SCI_SETSELALPHA, SC_ALPHA_NOALPHA, 0);
-		SendMessage(hwnd, SCI_SETADDITIONALSELALPHA, SC_ALPHA_NOALPHA, 0);
+	if (!Style_StrGetAlpha(szValue, &iValue)) {
+		iValue = SC_ALPHA_NOALPHA;
 	}
+	SendMessage(hwnd, SCI_SETSELALPHA, iValue, 0);
+	SendMessage(hwnd, SCI_SETADDITIONALSELALPHA, iValue, 0);
 
-	if (StrStr(szValue, L"eolfilled")) {
-		SendMessage(hwnd, SCI_SETSELEOLFILLED, 1, 0);
-	} else {
-		SendMessage(hwnd, SCI_SETSELEOLFILLED, 0, 0);
-	}
+	SendMessage(hwnd, SCI_SETSELEOLFILLED, (StrStr(szValue, L"eolfilled") != NULL), 0);
 	//! end Style_Selection
 
 	//! begin Style_Whitespace
@@ -1000,12 +993,12 @@ void Style_SetLexer(HWND hwnd, PEDITLEXER pLexNew) {
 	if (Style_StrGetColor(TRUE, szValue, &iValue)) {
 		SendMessage(hwnd, SCI_SETWHITESPACEFORE, TRUE, iValue);
 	} else {
-		SendMessage(hwnd, SCI_SETWHITESPACEFORE, 0, 0);
+		SendMessage(hwnd, SCI_SETWHITESPACEFORE, FALSE, 0);
 	}
 	if (Style_StrGetColor(FALSE, szValue, &iValue)) {
 		SendMessage(hwnd, SCI_SETWHITESPACEBACK, TRUE, iValue);
 	} else {
-		SendMessage(hwnd, SCI_SETWHITESPACEBACK, 0, 0);
+		SendMessage(hwnd, SCI_SETWHITESPACEBACK, FALSE, 0);
 	}
 
 	// whitespace dot size
@@ -2229,11 +2222,10 @@ void Style_HighlightCurrentLine(HWND hwnd) {
 			SendMessage(hwnd, SCI_SETCARETLINEFRAME, size, 0);
 			SendMessage(hwnd, SCI_SETCARETLINEBACK, iValue, 0);
 
-			if (Style_StrGetAlpha(szValue, &iValue)) {
-				SendMessage(hwnd, SCI_SETCARETLINEBACKALPHA, iValue, 0);
-			} else {
-				SendMessage(hwnd, SCI_SETCARETLINEBACKALPHA, SC_ALPHA_NOALPHA, 0);
+			if (!Style_StrGetAlpha(szValue, &iValue)) {
+				iValue = SC_ALPHA_NOALPHA;
 			}
+			SendMessage(hwnd, SCI_SETCARETLINEBACKALPHA, iValue, 0);
 			SendMessage(hwnd, SCI_SETCARETLINEVISIBLE, TRUE, 0);
 		}
 	}
