@@ -1591,6 +1591,9 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		EditShowUnicodeControlCharacter(hwndEdit, TRUE);
 	}
 
+	// current line
+	SendMessage(hwndEdit, SCI_SETCARETLINEVISIBLEALWAYS, TRUE, 0);
+
 	// Long Lines
 	if (bMarkLongLines) {
 		SendMessage(hwndEdit, SCI_SETEDGEMODE, (iLongLineMode == EDGE_LINE) ? EDGE_LINE : EDGE_BACKGROUND, 0);
