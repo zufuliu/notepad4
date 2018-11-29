@@ -123,7 +123,7 @@ static BOOL bMatchBraces;
 static BOOL bAutoIndent;
 static BOOL bAutoCloseTags;
 static BOOL bShowIndentGuides;
-BOOL	bHighlightCurrentLineAlways;
+BOOL	bHighlightCurrentLineSubLine;
 INT		iHighlightCurrentLine;
 BOOL	bTabsAsSpaces;
 BOOL	bTabsAsSpacesG;
@@ -2393,7 +2393,7 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	CheckCmd(hmenu, IDM_VIEW_AUTOCLOSETAGS, bAutoCloseTags);
 	i = IDM_VIEW_HIGHLIGHTCURRENTLINE_NONE + iHighlightCurrentLine;
 	CheckMenuRadioItem(hmenu, IDM_VIEW_HIGHLIGHTCURRENTLINE_NONE, IDM_VIEW_HIGHLIGHTCURRENTLINE_FRAME, i, MF_BYCOMMAND);
-	CheckCmd(hmenu, IDM_VIEW_HIGHLIGHTCURRENTLINE_ALWAYS, bHighlightCurrentLineAlways);
+	CheckCmd(hmenu, IDM_VIEW_HIGHLIGHTCURRENTLINE_SUBLINE, bHighlightCurrentLineSubLine);
 
 	CheckCmd(hmenu, IDM_VIEW_REUSEWINDOW, bReuseWindow);
 	CheckCmd(hmenu, IDM_VIEW_SINGLEFILEINSTANCE, bSingleFileInstance);
@@ -4007,9 +4007,9 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		Style_HighlightCurrentLine(hwndEdit);
 		break;
 
-	case IDM_VIEW_HIGHLIGHTCURRENTLINE_ALWAYS:
-		bHighlightCurrentLineAlways = !bHighlightCurrentLineAlways;
-		SendMessage(hwndEdit, SCI_SETCARETLINEVISIBLEALWAYS, bHighlightCurrentLineAlways, 0);
+	case IDM_VIEW_HIGHLIGHTCURRENTLINE_SUBLINE:
+		bHighlightCurrentLineSubLine = !bHighlightCurrentLineSubLine;
+		//SendMessage(hwndEdit, SCI_SETCARETLINEVISIBLEALWAYS, bHighlightCurrentLineSubLine, 0);
 		break;
 
 	case IDM_VIEW_ZOOMIN:
@@ -5275,7 +5275,8 @@ void LoadSettings(void) {
 
 	bMatchBraces = IniSectionGetBool(pIniSection, L"MatchBraces", 1);
 	iHighlightCurrentLine = IniSectionGetInt(pIniSection, L"HighlightCurrentLine", 12);
-	bHighlightCurrentLineAlways = iHighlightCurrentLine > 10;
+	iHighlightCurrentLine = (iSettingsVersion < NP2SettingsVersion_V1) ? 12 : iHighlightCurrentLine;
+	bHighlightCurrentLineSubLine = iHighlightCurrentLine > 10;
 	iHighlightCurrentLine = clamp_i(iHighlightCurrentLine % 10, 0, 2);
 	bShowIndentGuides = IniSectionGetBool(pIniSection, L"ShowIndentGuides", 0);
 
@@ -5590,7 +5591,7 @@ void SaveSettings(BOOL bSaveSettingsNow) {
 	IniSectionSetBoolEx(pIniSection, L"ShowWordWrapSymbols", bShowWordWrapSymbols, 0);
 	IniSectionSetBoolEx(pIniSection, L"ShowUnicodeControlCharacter", bShowUnicodeControlCharacter, 0);
 	IniSectionSetBoolEx(pIniSection, L"MatchBraces", bMatchBraces, 1);
-	IniSectionSetIntEx(pIniSection, L"HighlightCurrentLine", iHighlightCurrentLine + (bHighlightCurrentLineAlways ? 10 : 0), 12);
+	IniSectionSetIntEx(pIniSection, L"HighlightCurrentLine", iHighlightCurrentLine + (bHighlightCurrentLineSubLine ? 10 : 0), 12);
 	IniSectionSetBoolEx(pIniSection, L"ShowIndentGuides", bShowIndentGuides, 0);
 	IniSectionSetBoolEx(pIniSection, L"AutoIndent", bAutoIndent, 1);
 	IniSectionSetBoolEx(pIniSection, L"AutoCloseTags", bAutoCloseTags, 1);

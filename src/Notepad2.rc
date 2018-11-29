@@ -394,7 +394,7 @@ BEGIN
             MENUITEM "Background &Color\tCtrl+Shift+I",     IDM_VIEW_HIGHLIGHTCURRENTLINE_BACK
             MENUITEM "Outline &Frame\tCtrl+Shift+F",        IDM_VIEW_HIGHLIGHTCURRENTLINE_FRAME
             MENUITEM SEPARATOR
-            MENUITEM "&Always Highlight",                   IDM_VIEW_HIGHLIGHTCURRENTLINE_ALWAYS
+            MENUITEM "Highlight &Sub-Line",                 IDM_VIEW_HIGHLIGHTCURRENTLINE_SUBLINE
         END
         MENUITEM SEPARATOR
         MENUITEM "Line &Numbers\tCtrl+Shift+N",     IDM_VIEW_LINENUMBERS
