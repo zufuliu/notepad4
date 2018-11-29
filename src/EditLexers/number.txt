@@ -37,39 +37,41 @@ style number must < 32 or > 40
 		63563, L"Predefined Variable"
 		63564, L"Here-doc"
 		63565, L"Now-doc"
-		63566, L"PHP TAG"
+		63566, L"PHP Tag"
 63030	VBScript							no
 63031	Perl Script			63401-63440		yes
 63032	Python Script		63461-63470		yes
-		63461, L"Short String"
-		63462, L"Long String"
-		63463, L"Short Bytes"
-		63464, L"Long Bytes"
+		63461, L"Bytes"
+		63462, L"Raw Bytes"
+		63463, L"Triple Quoted Bytes"
+		63464,
 		63465, L"Decorator"
-		63466, L"Build-in Functions"
+		63466, L"Build-in Function"
 		63467, L"object Method"
-		63468, L"Build-in Constants"
+		63468, L"Build-in Constant"
 		63469, L"Formatted String"
 		63470, L"Triple Quoted Formatted String"
 63033	Ruby Script			63471-63480		yes
 		63471, L"Module"
 		63472, L"POD"
 		63473, L"Symbol"
+		63473,
 		63475, L"Data Section"
 63034	Lua Script			63451-63460		yes
-		63452, L"String, Table & Math Functions"
-		63453, L"Input, Output & System Facilities"
+		63452, L"String, Table & Math Function"
+		63453, L"Input, Output & System Facility"
 63035	TCL Script			63441-63450		yes
 		63441, L"Substitution"
 		63442, L"Modifier"
 63036	Batch File							no
 63037	Shell Script		63531-63540		yes
-		63532, L"String double quoted"
-		63533, L"String single quoted"
+		63532, L"Double Quoted String"
+		63533, L"Single Quoted String"
 		63534, L"Scalar"
-		63535, L"Parameter expansion"
+		63535, L"Parameter Expansion"
+		63536,
 		63537, L"Here-doc (Delimiter)"
-		63538, L"Here-doc (Single quoted, q)"
+		63538, L"Here-doc (Single Quoted, q)"
 63038	PowerShell Script	63481-63490		yes
 		63481, L"Cmdlet"
 		63482, L"Alias"
@@ -88,7 +90,6 @@ style number must < 32 or > 40
 		63577, L"Verbatim Segment"
 		63578, L"List Code"
 		63579, L"Chapter"
-		63580,
 63043	VHDL Source			63581-63590		no
 		63581, L"STD Package"
 		63582, L"STD Operator"
@@ -96,7 +97,7 @@ style number must < 32 or > 40
 		63584, L"STD Type"
 		63585, L"User Define"
 63044	Verilog HDL Source					yes
-		63586, L"System Tasks and Functions"
+		63586, L"System Task and Function"
 63045	Makefiles							no
 63046	CMake Script		63361-63370		no
 63047	Inno Setup Script	63501-63510		no
