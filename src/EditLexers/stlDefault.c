@@ -11,10 +11,10 @@ NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL
 EDITLEXER lexDefault = { SCLEX_NULL, NP2LEX_DEFAULT, EDITLEXER_HOLE(L"Default Text"), L"txt; text; wtx; log; asc; doc", &Keywords_NULL,
 {
 	{ STYLE_DEFAULT, 63100, EDITSTYLE_HOLE(L"Default Style"), L"font:Default; size:11" },
-	{ STYLE_LINENUMBER, 63101, EDITSTYLE_HOLE(L"Margins and Line Numbers"), L"size:-2; fore:#2B91AF" },
-	{ STYLE_BRACELIGHT, 63102, EDITSTYLE_HOLE(L"Matching Braces"), L"size:+1; bold; fore:#FF0000" },
-	{ STYLE_BRACEBAD, 63103, EDITSTYLE_HOLE(L"Matching Braces Error"), L"size:+1; bold; fore:#000080" },
-	{ STYLE_CONTROLCHAR, 63104, EDITSTYLE_HOLE(L"Control Characters"), L"size:-1" },
+	{ STYLE_LINENUMBER, 63101, EDITSTYLE_HOLE(L"Margin and Line Number"), L"size:-2; fore:#2B91AF" },
+	{ STYLE_BRACELIGHT, 63102, EDITSTYLE_HOLE(L"Matching Brace"), L"size:+1; bold; fore:#FF0000" },
+	{ STYLE_BRACEBAD, 63103, EDITSTYLE_HOLE(L"Matching Brace Error"), L"size:+1; bold; fore:#000080" },
+	{ STYLE_CONTROLCHAR, 63104, EDITSTYLE_HOLE(L"Control Character"), L"size:-1" },
 	{ STYLE_INDENTGUIDE, 63105, EDITSTYLE_HOLE(L"Indentation Guide"), L"fore:#FF8000" },
 	{ SCI_SETSELFORE + SCI_SETSELBACK, 63106, EDITSTYLE_HOLE(L"Selected Text"), L"back:#0A246A; eolfilled; alpha:95" },
 	{ SCI_SETWHITESPACEFORE + SCI_SETWHITESPACEBACK + SCI_SETWHITESPACESIZE, 63107, EDITSTYLE_HOLE(L"Whitespace"), L"size:1; fore:#FF4000" },
@@ -25,10 +25,10 @@ EDITLEXER lexDefault = { SCLEX_NULL, NP2LEX_DEFAULT, EDITLEXER_HOLE(L"Default Te
 	{ 0, 63124, EDITSTYLE_HOLE(L"Folding Marker"), L"fore:#8080FF; back:#ADD8E6" },
 
 	{ STYLE_DEFAULT, 63112, EDITSTYLE_HOLE(L"2nd Default Style"), L"font:Default; size:11" },
-	{ STYLE_LINENUMBER, 63113, EDITSTYLE_HOLE(L"2nd Margins and Line Numbers"), L"font:Tahoma; size:-2; fore:#2B91AF" },
-	{ STYLE_BRACELIGHT, 63114, EDITSTYLE_HOLE(L"2nd Matching Braces"), L"bold; fore:#FF0000" },
-	{ STYLE_BRACEBAD, 63115, EDITSTYLE_HOLE(L"2nd Matching Braces Error"), L"bold; fore:#000080" },
-	{ STYLE_CONTROLCHAR, 63116, EDITSTYLE_HOLE(L"2nd Control Characters"), L"size:-1" },
+	{ STYLE_LINENUMBER, 63113, EDITSTYLE_HOLE(L"2nd Margin and Line Number"), L"font:Tahoma; size:-2; fore:#2B91AF" },
+	{ STYLE_BRACELIGHT, 63114, EDITSTYLE_HOLE(L"2nd Matching Brace"), L"bold; fore:#FF0000" },
+	{ STYLE_BRACEBAD, 63115, EDITSTYLE_HOLE(L"2nd Matching Brace Error"), L"bold; fore:#000080" },
+	{ STYLE_CONTROLCHAR, 63116, EDITSTYLE_HOLE(L"2nd Control Character"), L"size:-1" },
 	{ STYLE_INDENTGUIDE, 63117, EDITSTYLE_HOLE(L"2nd Indentation Guide"), L"fore:#FF8000" },
 	{ SCI_SETSELFORE + SCI_SETSELBACK, 63118, EDITSTYLE_HOLE(L"2nd Selected Text"), L"eolfilled" },
 	{ SCI_SETWHITESPACEFORE + SCI_SETWHITESPACEBACK + SCI_SETWHITESPACESIZE, 63119, EDITSTYLE_HOLE(L"2nd Whitespace"), L"size:1; fore:#FF4000" },
@@ -44,9 +44,9 @@ EDITLEXER lexDefault = { SCLEX_NULL, NP2LEX_DEFAULT, EDITLEXER_HOLE(L"Default Te
 EDITLEXER lexANSI = { SCLEX_NULL, NP2LEX_ANSI, EDITLEXER_HOLE(L"ANSI Art"), L"nfo; diz", &Keywords_NULL,
 {
 	{ STYLE_DEFAULT, NP2STYLE_Default, EDITSTYLE_HOLE(L"Default"), L"font:Lucida Console" },
-	{ STYLE_LINENUMBER, 63101, EDITSTYLE_HOLE(L"Margins and Line Numbers"), L"font:Lucida Console; size:-2" },
-	{ STYLE_BRACELIGHT, 63102, EDITSTYLE_HOLE(L"Matching Braces"), L"size:+0" },
-	{ STYLE_BRACEBAD, 63103, EDITSTYLE_HOLE(L"Matching Braces Error"), L"size:+0" },
+	{ STYLE_LINENUMBER, 63101, EDITSTYLE_HOLE(L"Margin and Line Number"), L"font:Lucida Console; size:-2" },
+	{ STYLE_BRACELIGHT, 63102, EDITSTYLE_HOLE(L"Matching Brace"), L"size:+0" },
+	{ STYLE_BRACEBAD, 63103, EDITSTYLE_HOLE(L"Matching Brace Error"), L"size:+0" },
 	EDITSTYLE_SENTINEL
 }
 };
