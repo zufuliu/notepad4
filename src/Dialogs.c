@@ -1306,13 +1306,7 @@ static INT_PTR CALLBACK ChangeNotifyDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 	case WM_COMMAND:
 		switch (LOWORD(wParam)) {
 		case IDOK:
-			if (IsButtonChecked(hwnd, IDC_CHANGENOTIFY_NONE)) {
-				iFileWatchingMode = 0;
-			} else if (IsButtonChecked(hwnd, IDC_CHANGENOTIFY_SHOW_MSG)) {
-				iFileWatchingMode = 1;
-			} else {
-				iFileWatchingMode = 2;
-			}
+			iFileWatchingMode = GetCheckedRadioButton(hwnd, IDC_CHANGENOTIFY_NONE, IDC_CHANGENOTIFY_AUTO_RELOAD) - IDC_CHANGENOTIFY_NONE;
 			bResetFileWatching = IsButtonChecked(hwnd, IDC_CHANGENOTIFY_RESET_WATCH);
 			EndDialog(hwnd, IDOK);
 			break;
@@ -2064,6 +2058,174 @@ static INT_PTR CALLBACK ZoomLevelDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LP
 
 void ZoomLevelDlg(HWND hwnd, BOOL bBottom) {
 	ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_ZOOMLEVEL), hwnd, ZoomLevelDlgProc, bBottom);
+}
+
+extern struct EditAutoCompletionConfig autoCompletionConfig;
+
+static INT_PTR CALLBACK AutoCompletionSettingsDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
+	UNREFERENCED_PARAMETER(wParam);
+	UNREFERENCED_PARAMETER(lParam);
+
+	switch (umsg) {
+	case WM_INITDIALOG: {
+		if (autoCompletionConfig.bIndentText) {
+			CheckDlgButton(hwnd, IDC_AUTO_INDENT_TEXT, BST_CHECKED);
+		}
+
+		if (autoCompletionConfig.bCloseTags) {
+			CheckDlgButton(hwnd, IDC_AUTO_CLOSE_TAGS, BST_CHECKED);
+		}
+
+		if (autoCompletionConfig.bCompleteWord) {
+			CheckDlgButton(hwnd, IDC_AUTO_COMPLETE_WORD, BST_CHECKED);
+		}
+		if (autoCompletionConfig.bScanWordsInDocument) {
+			CheckDlgButton(hwnd, IDC_AUTOC_SCAN_DOCUMENT_WORDS, BST_CHECKED);
+		}
+		if (autoCompletionConfig.bEnglistIMEModeOnly) {
+			CheckDlgButton(hwnd, IDC_AUTOC_ENGLISH_IME_ONLY, BST_CHECKED);
+		}
+
+		SetDlgItemInt(hwnd, IDC_AUTOC_VISIBLE_ITEM_COUNT, autoCompletionConfig.iVisibleItemCount, FALSE);
+		SendDlgItemMessage(hwnd, IDC_AUTOC_VISIBLE_ITEM_COUNT, EM_LIMITTEXT, 8, 0);
+
+		SetDlgItemInt(hwnd, IDC_AUTOC_MIN_WORD_LENGTH, autoCompletionConfig.iMinWordLength, FALSE);
+		SendDlgItemMessage(hwnd, IDC_AUTOC_MIN_WORD_LENGTH, EM_LIMITTEXT, 8, 0);
+
+		SetDlgItemInt(hwnd, IDC_AUTOC_MIN_NUMBER_LENGTH, autoCompletionConfig.iMinNumberLength, FALSE);
+		SendDlgItemMessage(hwnd, IDC_AUTOC_MIN_NUMBER_LENGTH, EM_LIMITTEXT, 8, 0);
+
+		int mask = autoCompletionConfig.fAutoCompleteFillUpMask;
+		if (mask & AutoCompleteFillUpEnter) {
+			CheckDlgButton(hwnd, IDC_AUTOC_FILLUP_ENTER, BST_CHECKED);
+		}
+		if (mask & AutoCompleteFillUpTab) {
+			CheckDlgButton(hwnd, IDC_AUTOC_FILLUP_TAB, BST_CHECKED);
+		}
+		if (mask & AutoCompleteFillUpSpace) {
+			CheckDlgButton(hwnd, IDC_AUTOC_FILLUP_SPACE, BST_CHECKED);
+		}
+		if (mask & AutoCompleteFillUpPunctuation) {
+			CheckDlgButton(hwnd, IDC_AUTOC_FILLUP_PUNCTUATION, BST_CHECKED);
+		}
+
+		SetDlgItemText(hwnd, IDC_AUTOC_FILLUP_PUNCTUATION_LIST, autoCompletionConfig.wszAutoCompleteFillUp);
+		SendDlgItemMessage(hwnd, IDC_AUTOC_FILLUP_PUNCTUATION_LIST, EM_LIMITTEXT, MAX_AUTO_COMPLETE_FILLUP_LENGTH, 0);
+
+		mask = autoCompletionConfig.fAutoInsertMask;
+		if (mask & AutoInsertParenthesis) {
+			CheckDlgButton(hwnd, IDC_AUTO_INSERT_PARENTHESIS, BST_CHECKED);
+		}
+		if (mask & AutoInsertBrace) {
+			CheckDlgButton(hwnd, IDC_AUTO_INSERT_BRACE, BST_CHECKED);
+		}
+		if (mask & AutoInsertSquareBracket) {
+			CheckDlgButton(hwnd, IDC_AUTO_INSERT_SQUARE_BRACKET, BST_CHECKED);
+		}
+		if (mask & AutoInsertAngleBracket) {
+			CheckDlgButton(hwnd, IDC_AUTO_INSERT_ANGLE_BRACKET, BST_CHECKED);
+		}
+		if (mask & AutoInsertDoubleQuote) {
+			CheckDlgButton(hwnd, IDC_AUTO_INSERT_DOUBLE_QUOTE, BST_CHECKED);
+		}
+		if (mask & AutoInsertSingleQuote) {
+			CheckDlgButton(hwnd, IDC_AUTO_INSERT_SINGLE_QUOTE, BST_CHECKED);
+		}
+		if (mask & AutoInsertBacktick) {
+			CheckDlgButton(hwnd, IDC_AUTO_INSERT_BACKTICK, BST_CHECKED);
+		}
+		if (mask & AutoInsertSpaceAfterComma) {
+			CheckDlgButton(hwnd, IDC_AUTO_INSERT_SPACE_COMMA, BST_CHECKED);
+		}
+
+		mask = clamp_i(autoCompletionConfig.iAsmLineCommentChar, AsmLineCommentCharSemicolon, AsmLineCommentCharAt);
+		CheckRadioButton(hwnd, IDC_ASM_LINE_COMMENT_SEMICOLON, IDC_ASM_LINE_COMMENT_AT, IDC_ASM_LINE_COMMENT_SEMICOLON + mask);
+
+		CenterDlgInParent(hwnd);
+	}
+	return TRUE;
+
+	case WM_COMMAND:
+		switch (LOWORD(wParam)) {
+		case IDOK: {
+			autoCompletionConfig.bIndentText = IsButtonChecked(hwnd, IDC_AUTO_INDENT_TEXT);
+			autoCompletionConfig.bCloseTags = IsButtonChecked(hwnd, IDC_AUTO_CLOSE_TAGS);
+
+			autoCompletionConfig.bCompleteWord = IsButtonChecked(hwnd, IDC_AUTO_COMPLETE_WORD);
+			autoCompletionConfig.bScanWordsInDocument = IsButtonChecked(hwnd, IDC_AUTOC_SCAN_DOCUMENT_WORDS);
+			autoCompletionConfig.bEnglistIMEModeOnly = IsButtonChecked(hwnd, IDC_AUTOC_ENGLISH_IME_ONLY);
+
+			int mask = GetDlgItemInt(hwnd, IDC_AUTOC_VISIBLE_ITEM_COUNT, NULL, FALSE);
+			autoCompletionConfig.iVisibleItemCount = max_i(mask, 8);
+
+			mask = GetDlgItemInt(hwnd, IDC_AUTOC_MIN_WORD_LENGTH, NULL, FALSE);
+			autoCompletionConfig.iMinWordLength = max_i(mask, 1);
+
+			mask = GetDlgItemInt(hwnd, IDC_AUTOC_MIN_NUMBER_LENGTH, NULL, FALSE);
+			autoCompletionConfig.iMinNumberLength = mask;
+
+			mask = 0;
+			if (IsButtonChecked(hwnd, IDC_AUTOC_FILLUP_ENTER)) {
+				mask |= AutoCompleteFillUpEnter;
+			}
+			if (IsButtonChecked(hwnd, IDC_AUTOC_FILLUP_TAB)) {
+				mask |= AutoCompleteFillUpTab;
+			}
+			if (IsButtonChecked(hwnd, IDC_AUTOC_FILLUP_SPACE)) {
+				mask |= AutoCompleteFillUpSpace;
+			}
+			if (IsButtonChecked(hwnd, IDC_AUTOC_FILLUP_PUNCTUATION)) {
+				mask |= AutoCompleteFillUpPunctuation;
+			}
+
+			autoCompletionConfig.fAutoCompleteFillUpMask = mask;
+			GetDlgItemText(hwnd, IDC_AUTOC_FILLUP_PUNCTUATION_LIST, autoCompletionConfig.wszAutoCompleteFillUp, COUNTOF(autoCompletionConfig.wszAutoCompleteFillUp));
+
+			mask = 0;
+			if (IsButtonChecked(hwnd, IDC_AUTO_INSERT_PARENTHESIS)) {
+				mask |= AutoInsertParenthesis;
+			}
+			if (IsButtonChecked(hwnd, IDC_AUTO_INSERT_BRACE)) {
+				mask |= AutoInsertBrace;
+			}
+			if (IsButtonChecked(hwnd, IDC_AUTO_INSERT_SQUARE_BRACKET)) {
+				mask |= AutoInsertSquareBracket;
+			}
+			if (IsButtonChecked(hwnd, IDC_AUTO_INSERT_ANGLE_BRACKET)) {
+				mask |= AutoInsertAngleBracket;
+			}
+			if (IsButtonChecked(hwnd, IDC_AUTO_INSERT_DOUBLE_QUOTE)) {
+				mask |= AutoInsertDoubleQuote;
+			}
+			if (IsButtonChecked(hwnd, IDC_AUTO_INSERT_SINGLE_QUOTE)) {
+				mask |= AutoInsertSingleQuote;
+			}
+			if (IsButtonChecked(hwnd, IDC_AUTO_INSERT_BACKTICK)) {
+				mask |= AutoInsertBacktick;
+			}
+			if (IsButtonChecked(hwnd, IDC_AUTO_INSERT_SPACE_COMMA)) {
+				mask |= AutoInsertSpaceAfterComma;
+			}
+
+			autoCompletionConfig.fAutoInsertMask = mask;
+			autoCompletionConfig.iAsmLineCommentChar = GetCheckedRadioButton(hwnd, IDC_ASM_LINE_COMMENT_SEMICOLON, IDC_ASM_LINE_COMMENT_AT) - IDC_ASM_LINE_COMMENT_SEMICOLON;
+			EditCompleteUpdateConfig();
+			EndDialog(hwnd, IDOK);
+		}
+		break;
+
+		case IDCANCEL:
+			EndDialog(hwnd, IDCANCEL);
+			break;
+		}
+		return TRUE;
+	}
+	return FALSE;
+}
+
+BOOL AutoCompletionSettingsDlg(HWND hwnd) {
+	const INT_PTR iResult = ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_AUTOCOMPLETION), hwnd, AutoCompletionSettingsDlgProc, 0);
+	return iResult == IDOK;
 }
 
 //=============================================================================

@@ -62,14 +62,7 @@ static inline BOOL IsSpecialStartChar(int ch, int chPrev) {
 // EditCompleteWord()
 // Auto-complete words
 //
-
-// item count in AutoComplete List
-extern int	iAutoCItemCount;
-extern BOOL	bAutoCompleteWords;
-extern int	iAutoCDefaultShowItemCount;
-extern int	iAutoCMinWordLength;
-extern int	iAutoCMinNumberLength;
-extern BOOL bAutoCIncludeDocWord;
+extern struct EditAutoCompletionConfig autoCompletionConfig;
 
 BOOL IsDocWordChar(int ch) {
 	if ((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z') || (ch >= '0' && ch <= '9') || ch == '_' || ch == '.') {
@@ -480,6 +473,34 @@ INT AutoC_AddSpecWord(struct WordList *pWList, int iCurrentStyle, int ch, int ch
 	return 1;
 }
 
+void EditCompleteUpdateConfig(void) {
+	ZeroMemory(autoCompletionConfig.szAutoCompleteFillUp, sizeof(autoCompletionConfig.szAutoCompleteFillUp));
+	int i = 0;
+	if (autoCompletionConfig.fAutoCompleteFillUpMask & AutoCompleteFillUpEnter) {
+		autoCompletionConfig.szAutoCompleteFillUp[i++] = '\r';
+		autoCompletionConfig.szAutoCompleteFillUp[i++] = '\n';
+	}
+	if (autoCompletionConfig.fAutoCompleteFillUpMask & AutoCompleteFillUpTab) {
+		autoCompletionConfig.szAutoCompleteFillUp[i++] = '\t';
+	}
+	if (autoCompletionConfig.fAutoCompleteFillUpMask & AutoCompleteFillUpSpace) {
+		autoCompletionConfig.szAutoCompleteFillUp[i++] = ' ';
+	}
+
+	const BOOL punctuation = autoCompletionConfig.fAutoCompleteFillUpMask & AutoCompleteFillUpPunctuation;
+	int k = 0;
+	for (UINT j = 0; j < COUNTOF(autoCompletionConfig.wszAutoCompleteFillUp); j++) {
+		const WCHAR c = autoCompletionConfig.wszAutoCompleteFillUp[j];
+		if (c < 0x7f && ispunct((unsigned char)c)) {
+			autoCompletionConfig.wszAutoCompleteFillUp[k++] = c;
+			if (punctuation) {
+				autoCompletionConfig.szAutoCompleteFillUp[i++] = (char)c;
+			}
+		}
+	}
+	ZeroMemory(autoCompletionConfig.wszAutoCompleteFillUp + k, (COUNTOF(autoCompletionConfig.wszAutoCompleteFillUp) - k) * sizeof(WCHAR));
+}
+
 void EditCompleteWord(HWND hwnd, BOOL autoInsert) {
 	const Sci_Position iCurrentPos = SciCall_GetCurrentPos();
 	const int iCurrentStyle = SciCall_GetStyleAt(iCurrentPos);
@@ -497,12 +518,12 @@ void EditCompleteWord(HWND hwnd, BOOL autoInsert) {
 #endif
 
 	BOOL bIgnore = FALSE; // ignore number
-	iAutoCItemCount = 0; // recreate list
+	autoCompletionConfig.iPreviousItemCount = 0; // recreate list
 
 	const int iDocLen = SciCall_GetLineLength(iLine);
 	char * const pLine = NP2HeapAlloc(iDocLen + 1);
 	SciCall_GetLine(iLine, pLine);
-	int iRootLen = iAutoCMinWordLength;
+	int iRootLen = autoCompletionConfig.iMinWordLength;
 
 	while (iStartWordPos > 0 && IsDocWordChar(pLine[iStartWordPos - 1])) {
 		iStartWordPos--;
@@ -517,10 +538,10 @@ void EditCompleteWord(HWND hwnd, BOOL autoInsert) {
 		}
 	}
 	if (iStartWordPos >= 0 && pLine[iStartWordPos] >= '0' && pLine[iStartWordPos] <= '9') {
-		if (iAutoCMinNumberLength <= 0) {
+		if (autoCompletionConfig.iMinNumberLength <= 0) {
 			bIgnore = TRUE;
 		} else {
-			iRootLen = iAutoCMinNumberLength;
+			iRootLen = autoCompletionConfig.iMinNumberLength;
 			if (iStartWordPos < iDocLen && !(pLine[iStartWordPos + 1] >= '0' && pLine[iStartWordPos + 1] <= '9')) {
 				iRootLen += 2;
 			}
@@ -606,12 +627,12 @@ label_retry:
 	// keywords
 	AutoC_AddKeyword(pWList, iCurrentStyle);
 label_add_doc_word:
-	if (bAutoCIncludeDocWord) {
+	if (autoCompletionConfig.bScanWordsInDocument) {
 		AutoC_AddDocWord(hwnd, pWList, bIgnore);
 	}
 label_show_word_list:
-	iAutoCItemCount = pWList->nWordCount;
-	if (iAutoCItemCount == 0 && pSubRoot && *pSubRoot) {
+	autoCompletionConfig.iPreviousItemCount = pWList->nWordCount;
+	if (autoCompletionConfig.iPreviousItemCount == 0 && pSubRoot && *pSubRoot) {
 		pSubRoot = strpbrk(pSubRoot, ":.#@<\\/->");
 		if (pSubRoot) {
 			while (*pSubRoot && strchr(":.#@<\\/->", *pSubRoot)) {
@@ -625,10 +646,10 @@ label_show_word_list:
 			goto label_retry;
 		}
 	}
-	if (iAutoCItemCount > 0) {
+	if (autoCompletionConfig.iPreviousItemCount > 0) {
 		char *pList = NULL;
 		int maxWordLength = pWList->iMaxLength;
-		if (iAutoCItemCount == 1 && maxWordLength == iRootLen) {
+		if (autoCompletionConfig.iPreviousItemCount == 1 && maxWordLength == iRootLen) {
 			WordList_Free(pWList);
 			goto end;
 		}
@@ -637,14 +658,14 @@ label_show_word_list:
 		SendMessage(hwnd, SCI_AUTOCSETORDER, SC_ORDER_PRESORTED, 0); // pre-sorted
 		SendMessage(hwnd, SCI_AUTOCSETIGNORECASE, 1, 0); // case insensitive
 		SendMessage(hwnd, SCI_AUTOCSETSEPARATOR, '\n', 0);
-		SendMessage(hwnd, SCI_AUTOCSETFILLUPS, 0, (LPARAM)" \t\n\r;,([]){}\\/");
+		SendMessage(hwnd, SCI_AUTOCSETFILLUPS, 0, (LPARAM)autoCompletionConfig.szAutoCompleteFillUp);
 		SendMessage(hwnd, SCI_AUTOCSETCHOOSESINGLE, 0, 0);
 		//SendMessage(hwnd, SCI_AUTOCSETDROPRESTOFWORD, 1, 0); // delete orginal text: pRoot
 		maxWordLength <<= 1;
 		SendMessage(hwnd, SCI_AUTOCSETMAXWIDTH, maxWordLength, 0); // width columns, default auto
-		maxWordLength = iAutoCItemCount;
-		if (maxWordLength > iAutoCDefaultShowItemCount) {
-			maxWordLength = iAutoCDefaultShowItemCount;
+		maxWordLength = autoCompletionConfig.iPreviousItemCount;
+		if (maxWordLength > autoCompletionConfig.iVisibleItemCount) {
+			maxWordLength = autoCompletionConfig.iVisibleItemCount;
 		}
 		SendMessage(hwnd, SCI_AUTOCSETMAXHEIGHT, maxWordLength, 0); // height rows, default 5
 		SendMessage(hwnd, SCI_AUTOCSHOW, pWList->iStartLen, (LPARAM)(pList));
@@ -673,21 +694,26 @@ void EditAutoCloseBraceQuote(HWND hwnd, int ch) {
 		}
 	}
 
+	const int mask = autoCompletionConfig.fAutoInsertMask;
 	char tchIns[2] = "";
 	switch (ch) {
 	case '(':
-		tchIns[0] = ')';
+		if (mask & AutoInsertParenthesis) {
+			tchIns[0] = ')';
+		}
 		break;
 	case '[':
-		if (!(pLexCurrent->rid == NP2LEX_SMALI)) { // Smali array type
+		if ((mask & AutoInsertSquareBracket) && !(pLexCurrent->rid == NP2LEX_SMALI)) { // Smali array type
 			tchIns[0] = ']';
 		}
 		break;
 	case '{':
-		tchIns[0] = '}';
+		if (mask & AutoInsertBrace) {
+			tchIns[0] = '}';
+		}
 		break;
 	case '<':
-		if (pLexCurrent->rid == NP2LEX_CPP || pLexCurrent->rid == NP2LEX_CSHARP || pLexCurrent->rid == NP2LEX_JAVA) {
+		if ((mask & AutoInsertAngleBracket) && (pLexCurrent->rid == NP2LEX_CPP || pLexCurrent->rid == NP2LEX_CSHARP || pLexCurrent->rid == NP2LEX_JAVA)) {
 			// geriatric type, template
 			if (iCurrentStyle == SCE_C_CLASS || iCurrentStyle == SCE_C_INTERFACE || iCurrentStyle ==  SCE_C_STRUCT) {
 				tchIns[0] = '>';
@@ -695,12 +721,12 @@ void EditAutoCloseBraceQuote(HWND hwnd, int ch) {
 		}
 		break;
 	case '\"':
-		if (chPrev != '\\') {
+		if ((mask & AutoInsertDoubleQuote) && chPrev != '\\') {
 			tchIns[0] = '\"';
 		}
 		break;
 	case '\'':
-		if (chPrev != '\\' && !(pLexCurrent->iLexer == SCLEX_NULL	// someone's
+		if ((mask & AutoInsertSingleQuote) && chPrev != '\\' && !(pLexCurrent->iLexer == SCLEX_NULL	// someone's
 								|| pLexCurrent->iLexer == SCLEX_HTML || pLexCurrent->iLexer == SCLEX_XML
 								|| pLexCurrent->iLexer == SCLEX_VB			// line comment
 								|| pLexCurrent->iLexer == SCLEX_VBSCRIPT	// line comment
@@ -721,10 +747,12 @@ void EditAutoCloseBraceQuote(HWND hwnd, int ch) {
 		//} else if (0) {
 		//	tchIns[0] = '\'';
 		//}
-		tchIns[0] = '`';
+		if (mask & AutoInsertBacktick) {
+			tchIns[0] = '`';
+		}
 		break;
 	case ',':
-		if (!(chNext == ' ' || chNext == '\t' || (chPrev == '\'' && chNext == '\'') || (chPrev == '\"' && chNext == '\"'))) {
+		if ((mask & AutoInsertSpaceAfterComma) && !(chNext == ' ' || chNext == '\t' || (chPrev == '\'' && chNext == '\'') || (chPrev == '\"' && chNext == '\"'))) {
 			tchIns[0] = ' ';
 		}
 		break;
@@ -819,7 +847,7 @@ void EditAutoCloseXMLTag(HWND hwnd) {
 			}
 		}
 	}
-	if (!autoClosed && bAutoCompleteWords) {
+	if (!autoClosed && autoCompletionConfig.bCompleteWord) {
 		const Sci_Position iPos = SciCall_GetCurrentPos();
 		if (SciCall_GetCharAt(iPos - 2) == '-') {
 			EditCompleteWord(hwnd, FALSE); // obj->field, obj->method
@@ -1175,7 +1203,26 @@ void EditAutoIndent(HWND hwnd) {
 
 void EditToggleCommentLine(HWND hwnd) {
 	switch (pLexCurrent->iLexer) {
-	case SCLEX_ASM:
+	case SCLEX_ASM: {
+		LPCWSTR ch;
+		switch (autoCompletionConfig.iAsmLineCommentChar) {
+		case AsmLineCommentCharSemicolon:
+		default:
+			ch = L";";
+			break;
+		case AsmLineCommentCharSharp:
+			ch = L"# ";
+			break;
+		case AsmLineCommentCharSlash:
+			ch = L"//";
+			break;
+		case AsmLineCommentCharAt:
+			ch = L"@ ";
+			break;
+		}
+		EditToggleLineComments(hwnd, ch, FALSE);
+	} break;
+
 	case SCLEX_AU3:
 	case SCLEX_INNOSETUP:
 	case SCLEX_LISP:

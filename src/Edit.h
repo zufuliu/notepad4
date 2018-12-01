@@ -151,7 +151,60 @@ void	EditPrintInit(void);
 void	EditMarkAll(HWND hwnd, int iMarkOccurrences,
 					BOOL bMarkOccurrencesMatchCase, BOOL bMarkOccurrencesMatchWords);
 
+// auto completion fill-up characters
+#define MAX_AUTO_COMPLETE_FILLUP_LENGTH	32		// Only 32 ASCII punctuation
+#define AUTO_COMPLETE_FILLUP_DEFAULT	L";,()[]{}\\/"
+enum {
+	AutoCompleteFillUpEnter = 1,
+	AutoCompleteFillUpTab = 2,
+	AutoCompleteFillUpSpace = 4,
+	AutoCompleteFillUpPunctuation = 8,
+	// default settings
+	AutoCompleteFillUpDefault = 15,
+};
+
+// auto insert
+enum {
+	AutoInsertParenthesis = 1,			// ()
+	AutoInsertBrace = 2,				// {}
+	AutoInsertSquareBracket = 4,		// []
+	AutoInsertAngleBracket = 8,			// <>
+	AutoInsertDoubleQuote = 16,			// ""
+	AutoInsertSingleQuote = 32,			// ''
+	AutoInsertBacktick = 64,			// ``
+	AutoInsertSpaceAfterComma = 128,	// ', '
+	// default settings
+	AutoInsertDefaultMask = 255,
+};
+
+// asm line comment
+enum {
+	AsmLineCommentCharSemicolon = 0,	// ';'
+	AsmLineCommentCharSharp = 1,		// '#'
+	AsmLineCommentCharSlash = 2,		// '//'
+	AsmLineCommentCharAt = 3,			// '@'
+};
+
+typedef struct EditAutoCompletionConfig {
+	BOOL bIndentText;
+	BOOL bCloseTags;
+	BOOL bCompleteWord;
+	BOOL bScanWordsInDocument;
+	BOOL bEnglistIMEModeOnly;
+	int iVisibleItemCount;
+	int iMinWordLength;
+	int iMinNumberLength;
+	int fAutoCompleteFillUpMask;
+	int fAutoInsertMask;
+	int iAsmLineCommentChar;
+	int iPreviousItemCount;		// status
+	char szAutoCompleteFillUp[MAX_AUTO_COMPLETE_FILLUP_LENGTH + 4];
+	WCHAR wszAutoCompleteFillUp[MAX_AUTO_COMPLETE_FILLUP_LENGTH + 4];
+} EditAutoCompletionConfig;
+
+
 // in EditAutoC.c
+void	EditCompleteUpdateConfig(void);
 void	EditCompleteWord(HWND hwnd, BOOL autoInsert);
 void	EditAutoCloseBraceQuote(HWND hwnd, int ch);
 void	EditAutoCloseXMLTag(HWND hwnd);
