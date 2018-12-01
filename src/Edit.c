@@ -5704,18 +5704,7 @@ static INT_PTR CALLBACK EditAlignDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LP
 		switch (LOWORD(wParam)) {
 		case IDOK: {
 			int *piAlignMode = (int *)GetWindowLongPtr(hwnd, DWLP_USER);
-			int iAlignMode = 0;
-			if (IsButtonChecked(hwnd, IDC_ALIGN_LEFT)) {
-				iAlignMode = ALIGN_LEFT;
-			} else if (IsButtonChecked(hwnd, IDC_ALIGN_RIGHT)) {
-				iAlignMode = ALIGN_RIGHT;
-			} else if (IsButtonChecked(hwnd, IDC_ALIGN_CENTER)) {
-				iAlignMode = ALIGN_CENTER;
-			} else if (IsButtonChecked(hwnd, IDC_ALIGN_JUSTIFY)) {
-				iAlignMode = ALIGN_JUSTIFY;
-			} else if (IsButtonChecked(hwnd, IDC_ALIGN_JUSTIFY_PAR)) {
-				iAlignMode = ALIGN_JUSTIFY_EX;
-			}
+			const int iAlignMode = GetCheckedRadioButton(hwnd, IDC_ALIGN_LEFT, IDC_ALIGN_JUSTIFY_PAR) - IDC_ALIGN_LEFT;
 			*piAlignMode = iAlignMode;
 			EndDialog(hwnd, IDOK);
 		}

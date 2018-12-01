@@ -522,16 +522,7 @@ BEGIN
         MENUITEM "&Tab Settings...\tCtrl+T",    IDM_VIEW_TABSETTINGS
         MENUITEM "&Word Wrap Settings...",      IDM_VIEW_WORDWRAPSETTINGS
         MENUITEM "&Long Line Settings...",      IDM_VIEW_LONGLINESETTINGS
-        POPUP "&Auto Completion"
-        BEGIN
-            MENUITEM "Auto &Indent Text",           IDM_VIEW_AUTOINDENTTEXT
-            MENUITEM "Close HTML and XML &Tags",    IDM_VIEW_AUTOCLOSETAGS
-            MENUITEM "Close &Braces and Quotes",    IDM_VIEW_AUTOCOMPLETEQUOTE
-            MENUITEM SEPARATOR
-            MENUITEM "Auto Complete &Words",        IDM_VIEW_AUTOCOMPLETEWORDS
-            MENUITEM "Words in Current &Document",  IDM_VIEW_AUTOCWITHDOCWORDS
-            MENUITEM "Only in &English IME Mode",   IDM_VIEW_AUTOC_ENGLISH_ONLY
-        END
+        MENUITEM "&Auto Completion Settings...",IDM_VIEW_AUTOCOMPLETEWORDS
         MENUITEM SEPARATOR
         POPUP "Rendering Technology"
         BEGIN
@@ -1427,6 +1418,48 @@ BEGIN
     DEFPUSHBUTTON   "OK",IDOK,7,43,50,14
     PUSHBUTTON      "Cancel",IDCANCEL,63,43,50,14
 END
+
+IDD_AUTOCOMPLETION DIALOGEX 0, 0, 468, 178
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Auto Completion Settings"
+FONT 8, "MS Shell Dlg", 0, 0, 0x0
+BEGIN
+    CONTROL         "Auto indent text",IDC_AUTO_INDENT_TEXT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,7,120,10
+    CONTROL         "Auto close HTML and XML tags",IDC_AUTO_CLOSE_TAGS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,19,120,10
+    GROUPBOX        "",IDC_STATIC,7,35,218,82
+    CONTROL         "Auto complete word while typing",IDC_AUTO_COMPLETE_WORD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,34,122,10
+    LTEXT           "Visible item count in auto completion list:",IDC_STATIC,14,46,148,10,SS_RIGHT
+    EDITTEXT        IDC_AUTOC_VISIBLE_ITEM_COUNT,166,44,50,12,WS_TABSTOP
+    LTEXT           "Minimum length for word:",IDC_STATIC,14,62,148,10,SS_RIGHT
+    EDITTEXT        IDC_AUTOC_MIN_WORD_LENGTH,166,60,50,12,WS_TABSTOP
+    LTEXT           "Minimum length for number (without prefix):",IDC_STATIC,14,78,148,10,SS_RIGHT
+    EDITTEXT        IDC_AUTOC_MIN_NUMBER_LENGTH,166,76,50,12,WS_TABSTOP
+    CONTROL         "Scan words in current document",IDC_AUTOC_SCAN_DOCUMENT_WORDS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,92,160,10
+    CONTROL         "Only trigger auto completion in English IME mode",IDC_AUTOC_ENGLISH_IME_ONLY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,104,180,10
+    GROUPBOX        "Keys used to finish auto completion (use Esc to cancel)",IDC_STATIC,7,123,218,44
+    CONTROL         "Enter",IDC_AUTOC_FILLUP_ENTER,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,135,35,10
+    CONTROL         "Tab",IDC_AUTOC_FILLUP_TAB,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,66,135,35,10
+    CONTROL         "Space",IDC_AUTOC_FILLUP_SPACE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,118,135,35,10
+    CONTROL         "Punctuation:",IDC_AUTOC_FILLUP_PUNCTUATION,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,152,50,10
+    EDITTEXT        IDC_AUTOC_FILLUP_PUNCTUATION_LIST,66,150,150,12,WS_TABSTOP
+    GROUPBOX        "Auto Insert",IDC_STATIC,231,7,230,110
+    CONTROL         ") after typing (",IDC_AUTO_INSERT_PARENTHESIS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,238,19,80,10
+    CONTROL         "} after typing {",IDC_AUTO_INSERT_BRACE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,238,31,80,10
+    CONTROL         "] after typring [, except for Smali, Jasmin and javap",IDC_AUTO_INSERT_SQUARE_BRACKET,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,238,43,200,10
+    CONTROL         "> after typing <, when <> is used to quote generic parameters",IDC_AUTO_INSERT_ANGLE_BRACKET,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,238,55,220,10
+    CONTROL         "Double quote (""), when it's used to quote string / bytes",IDC_AUTO_INSERT_DOUBLE_QUOTE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,238,67,200,10
+    CONTROL         "Single quote ('), when it's used to quote string / bytes",IDC_AUTO_INSERT_SINGLE_QUOTE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,238,79,200,10
+    CONTROL         "Backtick (`)",IDC_AUTO_INSERT_BACKTICK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,238,91,80,10
+    CONTROL         "Space after typing comma (,)",IDC_AUTO_INSERT_SPACE_COMMA,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,238,103,120,10
+    GROUPBOX        "Characters used to toggle line comment for Assembler source",IDC_STATIC,231,123,230,26
+    CONTROL         "Semicolon (;)",IDC_ASM_LINE_COMMENT_SEMICOLON,"Button",BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,238,135,60,10
+    CONTROL         "#",IDC_ASM_LINE_COMMENT_SHARP,"Button",BS_AUTORADIOBUTTON,316,135,22,10
+    CONTROL         "//",IDC_ASM_LINE_COMMENT_SLASH,"Button",BS_AUTORADIOBUTTON,362,135,22,10
+    CONTROL         "@",IDC_ASM_LINE_COMMENT_AT,"Button",BS_AUTORADIOBUTTON,408,135,22,10
+    DEFPUSHBUTTON   "OK",IDOK,355,157,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,411,157,50,14
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //

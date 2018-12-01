@@ -1216,6 +1216,15 @@ BOOL IsCmdEnabled(HWND hwnd, UINT uId) {
 	return !(ustate & (MF_GRAYED | MF_DISABLED));
 }
 
+INT GetCheckedRadioButton(HWND hwnd, int nIDFirstButton, int nIDLastButton) {
+	for (int i = nIDFirstButton; i <= nIDLastButton; i++) {
+		if (IsButtonChecked(hwnd, i)) {
+			return i;
+		}
+	}
+	return -1; // IDC_STATIC;
+}
+
 //=============================================================================
 //
 // PathRelativeToApp()

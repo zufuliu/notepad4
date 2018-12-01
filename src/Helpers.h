@@ -465,6 +465,7 @@ LRESULT SendWMSize(HWND hwnd);
 
 BOOL IsCmdEnabled(HWND hwnd, UINT uId);
 #define IsButtonChecked(hwnd, uId)	(IsDlgButtonChecked(hwnd, (uId)) == BST_CHECKED)
+INT GetCheckedRadioButton(HWND hwnd, int nIDFirstButton, int nIDLastButton);
 
 #define GetString(id, pb, cb)	LoadString(g_hInstance, id, pb, cb)
 #define StrEnd(pStart)			((pStart) + lstrlen(pStart))

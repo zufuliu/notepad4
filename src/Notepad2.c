@@ -120,8 +120,6 @@ int		iWordWrapSymbols;
 BOOL	bShowWordWrapSymbols;
 static BOOL bShowUnicodeControlCharacter;
 static BOOL bMatchBraces;
-static BOOL bAutoIndent;
-static BOOL bAutoCloseTags;
 static BOOL bShowIndentGuides;
 BOOL	bHighlightCurrentLineSubLine;
 INT		iHighlightCurrentLine;
@@ -145,13 +143,7 @@ static BOOL bShowLineNumbers;
 static int iMarkOccurrences;
 static BOOL bMarkOccurrencesMatchCase;
 static BOOL bMarkOccurrencesMatchWords;
-BOOL 	bAutoCompleteWords;
-int		iAutoCDefaultShowItemCount = 15;
-int		iAutoCMinWordLength = 1;
-int		iAutoCMinNumberLength = 3;
-BOOL	bAutoCIncludeDocWord;
-static BOOL bAutoCEnglishIMEModeOnly;
-static BOOL bAutoCloseBracesQuotes;
+struct EditAutoCompletionConfig autoCompletionConfig;
 static BOOL bShowCodeFolding;
 #if NP2_ENABLE_SHOW_CALL_TIPS
 static BOOL bShowCallTips = FALSE;
@@ -299,7 +291,6 @@ const int iLineEndings[3] = {
 static int iSortOptions = 0;
 static int iAlignMode	= 0;
 int		iMatchesCount	= 0;
-int		iAutoCItemCount = 0;
 extern int iFontQuality;
 extern int iCaretStyle;
 extern int iCaretBlinkPeriod;
@@ -840,8 +831,8 @@ HWND InitInstance(HINSTANCE hInstance, int nCmdShow) {
 	/*else */
 	if (flagNewFromClipboard) {
 		if (SendMessage(hwndEdit, SCI_CANPASTE, 0, 0)) {
-			const BOOL bAutoIndent2 = bAutoIndent;
-			bAutoIndent = FALSE;
+			const BOOL back = autoCompletionConfig.bIndentText;
+			autoCompletionConfig.bIndentText = FALSE;
 			EditJumpTo(hwndEdit, -1, 0);
 			SendMessage(hwndEdit, SCI_BEGINUNDOACTION, 0, 0);
 			if (SendMessage(hwndEdit, SCI_GETLENGTH, 0, 0) > 0) {
@@ -850,7 +841,7 @@ HWND InitInstance(HINSTANCE hInstance, int nCmdShow) {
 			SendMessage(hwndEdit, SCI_PASTE, 0, 0);
 			SendMessage(hwndEdit, SCI_NEWLINE, 0, 0);
 			SendMessage(hwndEdit, SCI_ENDUNDOACTION, 0, 0);
-			bAutoIndent = bAutoIndent2;
+			autoCompletionConfig.bIndentText = back;
 			if (flagJumpTo) {
 				EditJumpTo(hwndEdit, iInitialLine, iInitialColumn);
 			}
@@ -2347,11 +2338,6 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	CheckCmd(hmenu, IDM_VIEW_LINENUMBERS, bShowLineNumbers);
 	CheckCmd(hmenu, IDM_VIEW_MARGIN, bShowSelectionMargin);
 	EnableCmd(hmenu, IDM_EDIT_COMPLETEWORD, i);
-	CheckCmd(hmenu, IDM_VIEW_AUTOINDENTTEXT, bAutoIndent);
-	CheckCmd(hmenu, IDM_VIEW_AUTOCOMPLETEQUOTE, bAutoCloseBracesQuotes);
-	CheckCmd(hmenu, IDM_VIEW_AUTOCOMPLETEWORDS, bAutoCompleteWords);
-	CheckCmd(hmenu, IDM_VIEW_AUTOCWITHDOCWORDS, bAutoCIncludeDocWord);
-	CheckCmd(hmenu, IDM_VIEW_AUTOC_ENGLISH_ONLY, bAutoCEnglishIMEModeOnly);
 
 	switch (iMarkOccurrences) {
 	case 0:
@@ -2390,7 +2376,6 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	CheckCmd(hmenu, IDM_VIEW_FULLSCREEN_HIDE_TOOL, bFullScreenHideToolbar);
 	CheckCmd(hmenu, IDM_VIEW_FULLSCREEN_HIDE_STATUS, bFullScreenHideStatusbar);
 
-	CheckCmd(hmenu, IDM_VIEW_AUTOCLOSETAGS, bAutoCloseTags);
 	i = IDM_VIEW_HIGHLIGHTCURRENTLINE_NONE + iHighlightCurrentLine;
 	CheckMenuRadioItem(hmenu, IDM_VIEW_HIGHLIGHTCURRENTLINE_NONE, IDM_VIEW_HIGHLIGHTCURRENTLINE_FRAME, i, MF_BYCOMMAND);
 	CheckCmd(hmenu, IDM_VIEW_HIGHLIGHTCURRENTLINE_SUBLINE, bHighlightCurrentLineSubLine);
@@ -3831,10 +3816,6 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		Style_SetIndentGuides(hwndEdit, bShowIndentGuides);
 		break;
 
-	case IDM_VIEW_AUTOINDENTTEXT:
-		bAutoIndent = !bAutoIndent;
-		break;
-
 	case IDM_VIEW_LINENUMBERS:
 		bShowLineNumbers = !bShowLineNumbers;
 		UpdateLineNumberWidth();
@@ -3852,27 +3833,15 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			SendMessage(hwndEdit, SCI_MARKERSETALPHA, 0, NP2_BookmarkLineColorAlpha);
 			SendMessage(hwndEdit, SCI_MARKERDEFINE, 0, SC_MARK_BACKGROUND);
 		}
-
-		break;
-
-	case IDM_VIEW_AUTOCOMPLETEQUOTE:
-		bAutoCloseBracesQuotes = !bAutoCloseBracesQuotes;
 		break;
 
 	case IDM_VIEW_AUTOCOMPLETEWORDS:
-		bAutoCompleteWords = !bAutoCompleteWords;
-		if (!bAutoCompleteWords) {
-			// close the autocompletion list
-			SendMessage(hwndEdit, SCI_AUTOCCANCEL, 0, 0);
+		if (AutoCompletionSettingsDlg(hwnd)) {
+			if (!autoCompletionConfig.bCompleteWord) {
+				// close the autocompletion list
+				SendMessage(hwndEdit, SCI_AUTOCCANCEL, 0, 0);
+			}
 		}
-		break;
-
-	case IDM_VIEW_AUTOCWITHDOCWORDS:
-		bAutoCIncludeDocWord = !bAutoCIncludeDocWord;
-		break;
-
-	case IDM_VIEW_AUTOC_ENGLISH_ONLY:
-		bAutoCEnglishIMEModeOnly = !bAutoCEnglishIMEModeOnly;
 		break;
 
 	case IDM_VIEW_MARKOCCURRENCES_OFF:
@@ -3994,10 +3963,6 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		} else {
 			SendMessage(hwndEdit, SCI_BRACEHIGHLIGHT, (WPARAM)(-1), -1);
 		}
-		break;
-
-	case IDM_VIEW_AUTOCLOSETAGS:
-		bAutoCloseTags = !bAutoCloseTags;
 		break;
 
 	case IDM_VIEW_HIGHLIGHTCURRENTLINE_NONE:
@@ -4325,9 +4290,9 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	// Newline with toggled auto indent setting
 	case CMD_CTRLENTER:
-		bAutoIndent = !bAutoIndent;
+		autoCompletionConfig.bIndentText = !autoCompletionConfig.bIndentText;
 		SendMessage(hwndEdit, SCI_NEWLINE, 0, 0);
-		bAutoIndent = !bAutoIndent;
+		autoCompletionConfig.bIndentText = !autoCompletionConfig.bIndentText;
 		break;
 
 	case CMD_CTRLBACK: {
@@ -4995,23 +4960,23 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 				return 0;
 			}
 			// Auto indent
-			if (bAutoIndent && (scn->ch == '\r' || scn->ch == '\n')) {
+			if (autoCompletionConfig.bIndentText && (scn->ch == '\r' || scn->ch == '\n')) {
 				// in CRLF mode handle LF only...
 				if ((SC_EOL_CRLF == iEOLMode && scn->ch != '\n') || SC_EOL_CRLF != iEOLMode) {
 					EditAutoIndent(hwndEdit);
 				}
 			}
 			// Auto close tags
-			else if ((bAutoCloseTags || bAutoCompleteWords) && scn->ch == '>') {
+			else if ((autoCompletionConfig.bCloseTags || autoCompletionConfig.bCompleteWord) && scn->ch == '>') {
 				EditAutoCloseXMLTag(hwndEdit);
 			}
 			// Auto close braces/quotes
-			else if (bAutoCloseBracesQuotes && strchr("([{<\"\'`,", scn->ch)) {
+			else if (autoCompletionConfig.fAutoInsertMask && strchr("([{<\"\'`,", scn->ch)) {
 				EditAutoCloseBraceQuote(hwndEdit, scn->ch);
-			} else if (bAutoCompleteWords/* && !SendMessage(hwndEdit, SCI_AUTOCACTIVE, 0, 0)*/) {
-				// many items in auto-completion list (> iAutoCDefaultShowItemCount), recreate it
-				if (!SendMessage(hwndEdit, SCI_AUTOCACTIVE, 0, 0) || iAutoCItemCount > iAutoCDefaultShowItemCount) {
-					if (bAutoCEnglishIMEModeOnly && scn->modifiers) { // ignore IME input
+			} else if (autoCompletionConfig.bCompleteWord/* && !SendMessage(hwndEdit, SCI_AUTOCACTIVE, 0, 0)*/) {
+				// many items in auto-completion list (> autoCompletionConfig.iVisibleItemCount), recreate it
+				if (!SendMessage(hwndEdit, SCI_AUTOCACTIVE, 0, 0) || autoCompletionConfig.iPreviousItemCount > autoCompletionConfig.iVisibleItemCount) {
+					if (autoCompletionConfig.bEnglistIMEModeOnly && scn->modifiers) { // ignore IME input
 						return 0;
 					}
 					EditCompleteWord(hwndEdit, FALSE);
@@ -5280,16 +5245,24 @@ void LoadSettings(void) {
 	iHighlightCurrentLine = clamp_i(iHighlightCurrentLine % 10, 0, 2);
 	bShowIndentGuides = IniSectionGetBool(pIniSection, L"ShowIndentGuides", 0);
 
-	bAutoIndent = IniSectionGetBool(pIniSection, L"AutoIndent", 1);
-	bAutoCloseTags = IniSectionGetBool(pIniSection, L"AutoCloseTags", 1);
-	bAutoCloseBracesQuotes = IniSectionGetBool(pIniSection, L"AutoCloseBracesQuotes", 1);
-	bAutoCompleteWords = IniSectionGetBool(pIniSection, L"AutoCompleteWords", 1);
-	bAutoCIncludeDocWord = IniSectionGetBool(pIniSection, L"AutoCIncludeDocWord", 1);
-	bAutoCEnglishIMEModeOnly = IniSectionGetBool(pIniSection, L"AutoCEnglishIMEModeOnly", 0);
-
-	iAutoCDefaultShowItemCount = IniSectionGetInt(pIniSection, L"AutoCDefaultShowItemCount", 16);
-	iAutoCMinWordLength = IniSectionGetInt(pIniSection, L"AutoCMinWordLength", 1);
-	iAutoCMinNumberLength = IniSectionGetInt(pIniSection, L"AutoCMinNumberLength", 3);
+	autoCompletionConfig.bIndentText = IniSectionGetBool(pIniSection, L"AutoIndent", 1);
+	autoCompletionConfig.bCloseTags = IniSectionGetBool(pIniSection, L"AutoCloseTags", 1);
+	autoCompletionConfig.bCompleteWord = IniSectionGetBool(pIniSection, L"AutoCompleteWords", 1);
+	autoCompletionConfig.bScanWordsInDocument = IniSectionGetBool(pIniSection, L"AutoCScanWordsInDocument", 1);
+	autoCompletionConfig.bEnglistIMEModeOnly = IniSectionGetBool(pIniSection, L"AutoCEnglishIMEModeOnly", 0);
+	autoCompletionConfig.iVisibleItemCount = IniSectionGetInt(pIniSection, L"AutoCVisibleItemCount", 16);
+	autoCompletionConfig.iMinWordLength = IniSectionGetInt(pIniSection, L"AutoCMinWordLength", 1);
+	autoCompletionConfig.iMinNumberLength = IniSectionGetInt(pIniSection, L"AutoCMinNumberLength", 3);
+	autoCompletionConfig.fAutoCompleteFillUpMask = IniSectionGetInt(pIniSection, L"AutoCFillUpMask", AutoCompleteFillUpDefault);
+	autoCompletionConfig.fAutoInsertMask = IniSectionGetInt(pIniSection, L"AutoInsertMask", AutoInsertDefaultMask);
+	autoCompletionConfig.iAsmLineCommentChar = IniSectionGetInt(pIniSection, L"AsmLineCommentChar", AsmLineCommentCharSemicolon);
+	strValue = IniSectionGetValue(pIniSection, L"AutoCFillUpPunctuation");
+	if (StrIsEmpty(strValue)) {
+		lstrcpy(autoCompletionConfig.wszAutoCompleteFillUp, AUTO_COMPLETE_FILLUP_DEFAULT);
+	} else {
+		lstrcpyn(autoCompletionConfig.wszAutoCompleteFillUp, strValue, COUNTOF(autoCompletionConfig.wszAutoCompleteFillUp));
+	}
+	EditCompleteUpdateConfig();
 
 #if NP2_ENABLE_SHOW_CALL_TIPS
 	bShowCallTips = IniSectionGetBool(pIniSection, L"ShowCallTips", 0);
@@ -5593,15 +5566,19 @@ void SaveSettings(BOOL bSaveSettingsNow) {
 	IniSectionSetBoolEx(pIniSection, L"MatchBraces", bMatchBraces, 1);
 	IniSectionSetIntEx(pIniSection, L"HighlightCurrentLine", iHighlightCurrentLine + (bHighlightCurrentLineSubLine ? 10 : 0), 12);
 	IniSectionSetBoolEx(pIniSection, L"ShowIndentGuides", bShowIndentGuides, 0);
-	IniSectionSetBoolEx(pIniSection, L"AutoIndent", bAutoIndent, 1);
-	IniSectionSetBoolEx(pIniSection, L"AutoCloseTags", bAutoCloseTags, 1);
-	IniSectionSetBoolEx(pIniSection, L"AutoCloseBracesQuotes", bAutoCloseBracesQuotes, 1);
-	IniSectionSetBoolEx(pIniSection, L"AutoCompleteWords", bAutoCompleteWords, 1);
-	IniSectionSetBoolEx(pIniSection, L"AutoCIncludeDocWord", bAutoCIncludeDocWord, 1);
-	IniSectionSetBoolEx(pIniSection, L"AutoCEnglishIMEModeOnly", bAutoCEnglishIMEModeOnly, 0);
-	IniSectionSetIntEx(pIniSection, L"AutoCDefaultShowItemCount", iAutoCDefaultShowItemCount, 16);
-	IniSectionSetIntEx(pIniSection, L"AutoCMinWordLength", iAutoCMinWordLength, 1);
-	IniSectionSetIntEx(pIniSection, L"AutoCMinNumberLength", iAutoCMinNumberLength, 3);
+
+	IniSectionSetBoolEx(pIniSection, L"AutoIndent", autoCompletionConfig.bIndentText, 1);
+	IniSectionSetBoolEx(pIniSection, L"AutoCloseTags", autoCompletionConfig.bCloseTags, 1);
+	IniSectionSetBoolEx(pIniSection, L"AutoCompleteWords", autoCompletionConfig.bCompleteWord, 1);
+	IniSectionSetBoolEx(pIniSection, L"AutoCScanWordsInDocument", autoCompletionConfig.bScanWordsInDocument, 1);
+	IniSectionSetBoolEx(pIniSection, L"AutoCEnglishIMEModeOnly", autoCompletionConfig.bEnglistIMEModeOnly, 0);
+	IniSectionSetIntEx(pIniSection, L"AutoCVisibleItemCount", autoCompletionConfig.iVisibleItemCount, 16);
+	IniSectionSetIntEx(pIniSection, L"AutoCMinWordLength", autoCompletionConfig.iMinWordLength, 1);
+	IniSectionSetIntEx(pIniSection, L"AutoCMinNumberLength", autoCompletionConfig.iMinNumberLength, 3);
+	IniSectionSetIntEx(pIniSection, L"AutoCFillUpMask", autoCompletionConfig.fAutoCompleteFillUpMask, AutoCompleteFillUpDefault);
+	IniSectionSetIntEx(pIniSection, L"AutoInsertMask", autoCompletionConfig.fAutoInsertMask, AutoInsertDefaultMask);
+	IniSectionSetIntEx(pIniSection, L"AsmLineCommentChar", autoCompletionConfig.iAsmLineCommentChar, AsmLineCommentCharSemicolon);
+	IniSectionSetStringEx(pIniSection, L"AutoCFillUpPunctuation", autoCompletionConfig.wszAutoCompleteFillUp, AUTO_COMPLETE_FILLUP_DEFAULT);
 #if NP2_ENABLE_SHOW_CALL_TIPS
 	IniSectionSetBoolEx(pIniSection, L"ShowCallTips", bShowCallTips, 1);
 	IniSectionSetIntEx(pIniSection, L"CallTipsWaitTime", iCallTipsWaitTime, 500);
@@ -8002,8 +7979,8 @@ void CALLBACK PasteBoardTimer(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTi
 
 	if (dwLastCopyTime > 0 && GetTickCount() - dwLastCopyTime > 200) {
 		if (SendMessage(hwndEdit, SCI_CANPASTE, 0, 0)) {
-			const BOOL bAutoIndent2 = bAutoIndent;
-			bAutoIndent = FALSE;
+			const BOOL back = autoCompletionConfig.bIndentText;
+			autoCompletionConfig.bIndentText = FALSE;
 			EditJumpTo(hwndEdit, -1, 0);
 			SendMessage(hwndEdit, SCI_BEGINUNDOACTION, 0, 0);
 			if (SendMessage(hwndEdit, SCI_GETLENGTH, 0, 0) > 0) {
@@ -8013,7 +7990,7 @@ void CALLBACK PasteBoardTimer(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTi
 			SendMessage(hwndEdit, SCI_NEWLINE, 0, 0);
 			SendMessage(hwndEdit, SCI_ENDUNDOACTION, 0, 0);
 			EditEnsureSelectionVisible(hwndEdit);
-			bAutoIndent = bAutoIndent2;
+			autoCompletionConfig.bIndentText = back;
 		}
 
 		dwLastCopyTime = 0;

@@ -66,6 +66,7 @@ BOOL	WarnLineEndingDlg(HWND hwnd, struct EditFileIOStatus *status);
 void	InitZoomLevelComboBox(HWND hwnd, int nCtlId, int zoomLevel);
 BOOL	GetZoomLevelComboBoxValue(HWND hwnd, int nCtrId, int *zoomLevel);
 void	ZoomLevelDlg(HWND hwnd, BOOL bBottom);
+BOOL	AutoCompletionSettingsDlg(HWND hwnd);
 INT_PTR InfoBox(int iType, LPCWSTR lpstrSetting, int uidMessage, ...);
 
 #endif // NOTEPAD2_DIALOGS_H_
