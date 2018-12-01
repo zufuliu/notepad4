@@ -1,3 +1,5 @@
-#define VERSION_HASH _T("0ee3099")
-#define VERSION_REV 1435
-#define VERSION_REV_FULL _T("r1435 (0ee3099)")
+#define VERSION_MINOR 18
+#define VERSION_BUILD 12
+#define VERSION_HASH _T("62e0808")
+#define VERSION_REV 1629
+#define VERSION_REV_FULL _T("r1629 (62e0808)")

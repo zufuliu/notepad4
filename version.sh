@@ -60,6 +60,8 @@ fi
 
 ver_full="_T(\"r$ver ($hash)$ver_full\")"
 
+version_info+="#define VERSION_MINOR `date +%y`"$'\n'
+version_info+="#define VERSION_BUILD `date +%m`"$'\n'
 version_info+="#define VERSION_HASH _T(\"$hash\")"$'\n'
 version_info+="#define VERSION_REV $ver"$'\n'
 version_info+="#define VERSION_REV_FULL $ver_full"
@@ -84,8 +86,9 @@ if [[ ! -f "$versionfile" ]] || [[ "$version_info" != "$(<"$versionfile")" ]]; t
 fi
 
 # Update manifest file if version information was changed.
-base_ver="4.2.25"
-newmanifest="$(sed -Ee "s/(${base_ver}.)([0-9]+)/\1${ver}/g" "$manifestfile")"
+base_ver="4"
+new_ver="`date +%y.%m`.${ver}"
+newmanifest="$(sed -Ee "s/(${base_ver}\.)([0-9.]+)/\1${new_ver}/g" "$manifestfile")"
 if [[ "$newmanifest" != "$(<"$manifestfile")" ]]; then
   # Update the revision number in the manifest file
   echo "$newmanifest" > "$manifestfile"
@@ -99,8 +102,8 @@ if [[ $# -ne 0 ]]; then
     echo "$version_info" > "$versionfile"
   fi
 
-  base_ver="4.0.13"
-  newmanifest="$(sed -Ee "s/(${base_ver}.)([0-9]+)/\1${ver}/g" "$manifestfile")"
+  base_ver="4"
+  newmanifest="$(sed -Ee "s/(${base_ver}\.)([0-9.]+)/\1${new_ver}/g" "$manifestfile")"
   if [[ "$newmanifest" != "$(<"$manifestfile")" ]]; then
     echo "$newmanifest" > "$manifestfile"
   fi
