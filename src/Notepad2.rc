@@ -1164,7 +1164,7 @@ BEGIN
     PUSHBUTTON      "Cancel",IDCANCEL,127,24,50,14
 END
 
-IDD_WORDWRAP DIALOGEX 0, 0, 250, 100
+IDD_WORDWRAP DIALOGEX 0, 0, 250, 139
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Word Wrap Settings"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
@@ -1173,12 +1173,15 @@ BEGIN
     COMBOBOX        IDC_WRAP_SYMBOL_BEFORE,7,24,236,196,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     COMBOBOX        IDC_WRAP_SYMBOL_AFTER,7,41,236,196,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     COMBOBOX        IDC_WRAP_MODE,7,58,236,196,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    DEFPUSHBUTTON   "OK",IDOK,137,79,50,14
-    PUSHBUTTON      "Cancel",IDCANCEL,193,79,50,14
+    DEFPUSHBUTTON   "OK",IDOK,137,118,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,193,118,50,14
     LTEXT           "No wrap indent|Wrap indent by 1 character|Wrap indent by 2 characters|Wrap indent by 1 level|Wrap indent by 2 levels|Wrap indent same as first subline|Wrap indent 1 level more than first subline|Wrap indent 2 levels more than first subline",IDC_WRAP_INDENT_OPTIONS,0,0,615,8,NOT WS_VISIBLE
     LTEXT           "No visual indicators before wrap|Show visual indicators before wrap (near text)|Show visual indicators before wrap (near borders)",IDC_WRAP_SYMBOL_BEFORE_OPTIONS,0,0,418,8,NOT WS_VISIBLE
     LTEXT           "No visual indicators after wrap|Show visual indicators after wrap (near text)|Show visual indicators after wrap (near borders)|Show visual indicators after wrap (in line number margin)",IDC_WRAP_SYMBOL_AFTER_OPTIONS,0,0,402,8,NOT WS_VISIBLE
     LTEXT           "No wrap|Wrap text between words|Wrap text between any characters|Wrap text on whitespace",IDC_WRAP_MODE_OPTIONS,0,0,187,8,NOT WS_VISIBLE
+    GROUPBOX        "For wrapped line",IDC_STATIC,7,74,235,38
+    CONTROL         "Only select subline when selecting line from left margin",IDC_WRAP_SELECT_SUBLINE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,84,220,10
+    CONTROL         "Only highligh subline when highlighting current line",IDC_WRAP_HIGHLIGHT_SUBLINE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,96,220,10
 END
 
 IDD_PAGESETUP DIALOGEX 5, 5, 356, 260

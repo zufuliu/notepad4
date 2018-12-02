@@ -118,10 +118,11 @@ int		iWordWrapMode;
 int		iWordWrapIndent;
 int		iWordWrapSymbols;
 BOOL	bShowWordWrapSymbols;
+BOOL	bWordWrapSelectSubLine;
 static BOOL bShowUnicodeControlCharacter;
 static BOOL bMatchBraces;
 static BOOL bShowIndentGuides;
-BOOL	bHighlightCurrentLineSubLine;
+BOOL	bHighlightCurrentSubLine;
 INT		iHighlightCurrentLine;
 BOOL	bTabsAsSpaces;
 BOOL	bTabsAsSpacesG;
@@ -1608,7 +1609,7 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	SciCall_SetMarginMask(MARGIN_FOLD_INDEX, SC_MASK_FOLDERS);
 	SciCall_SetMarginSensitive(MARGIN_FOLD_INDEX, TRUE);
 	// only select sub line of wrapped line
-	//SendMessage(hwndEdit, SCI_SETMARGINOPTIONS, SC_MARGINOPTION_SUBLINESELECT, 0);
+	SendMessage(hwndEdit, SCI_SETMARGINOPTIONS, (bWordWrapSelectSubLine ? SC_MARGINOPTION_SUBLINESELECT : SC_MARGINOPTION_NONE), 0);
 	// Code folding, Box tree
 	SciCall_MarkerDefine(SC_MARKNUM_FOLDEROPEN, SC_MARK_BOXMINUS);
 	SciCall_MarkerDefine(SC_MARKNUM_FOLDER, SC_MARK_BOXPLUS);
@@ -2385,7 +2386,7 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	i = IDM_VIEW_HIGHLIGHTCURRENTLINE_NONE + iHighlightCurrentLine;
 	CheckMenuRadioItem(hmenu, IDM_VIEW_HIGHLIGHTCURRENTLINE_NONE, IDM_VIEW_HIGHLIGHTCURRENTLINE_FRAME, i, MF_BYCOMMAND);
-	CheckCmd(hmenu, IDM_VIEW_HIGHLIGHTCURRENTLINE_SUBLINE, bHighlightCurrentLineSubLine);
+	CheckCmd(hmenu, IDM_VIEW_HIGHLIGHTCURRENTLINE_SUBLINE, bHighlightCurrentSubLine);
 
 	CheckCmd(hmenu, IDM_VIEW_REUSEWINDOW, bReuseWindow);
 	CheckCmd(hmenu, IDM_VIEW_SINGLEFILEINSTANCE, bSingleFileInstance);
@@ -3765,6 +3766,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case IDM_VIEW_WORDWRAPSETTINGS:
 		if (WordWrapSettingsDlg(hwnd, &iWordWrapIndent)) {
 			SendMessage(hwndEdit, SCI_SETWRAPMODE, (fWordWrap? iWordWrapMode : SC_WRAP_NONE), 0);
+			SendMessage(hwndEdit, SCI_SETMARGINOPTIONS, (bWordWrapSelectSubLine ? SC_MARGINOPTION_SUBLINESELECT : SC_MARGINOPTION_NONE), 0);
 			fWordWrapG = fWordWrap;
 			UpdateToolbar();
 			SetWrapIndentMode();
@@ -3980,8 +3982,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	case IDM_VIEW_HIGHLIGHTCURRENTLINE_SUBLINE:
-		bHighlightCurrentLineSubLine = !bHighlightCurrentLineSubLine;
-		//SendMessage(hwndEdit, SCI_SETCARETLINEVISIBLEALWAYS, bHighlightCurrentLineSubLine, 0);
+		bHighlightCurrentSubLine = !bHighlightCurrentSubLine;
 		break;
 
 	case IDM_VIEW_ZOOMIN:
@@ -5244,12 +5245,13 @@ void LoadSettings(void) {
 	iWordWrapSymbols = clamp_i(iValue % 10, EditWrapSymbolBeforeNone, EditWrapSymbolBeforeMaxValue) + (iValue / 10) * 10;
 
 	bShowWordWrapSymbols = IniSectionGetBool(pIniSection, L"ShowWordWrapSymbols", 0);
+	bWordWrapSelectSubLine = IniSectionGetBool(pIniSection, L"WordWrapSelectSubLine", 0);
 	bShowUnicodeControlCharacter = IniSectionGetBool(pIniSection, L"ShowUnicodeControlCharacter", 0);
 
 	bMatchBraces = IniSectionGetBool(pIniSection, L"MatchBraces", 1);
 	iValue = IniSectionGetInt(pIniSection, L"HighlightCurrentLine", 12);
 	iValue = (iSettingsVersion < NP2SettingsVersion_V1) ? 12 : iValue;
-	bHighlightCurrentLineSubLine = iValue > 10;
+	bHighlightCurrentSubLine = iValue > 10;
 	iHighlightCurrentLine = clamp_i(iValue % 10, 0, 2);
 	bShowIndentGuides = IniSectionGetBool(pIniSection, L"ShowIndentGuides", 0);
 
@@ -5581,9 +5583,10 @@ void SaveSettings(BOOL bSaveSettingsNow) {
 	IniSectionSetIntEx(pIniSection, L"WordWrapIndent", iWordWrapIndent, EditWrapIndentNone);
 	IniSectionSetIntEx(pIniSection, L"WordWrapSymbols", iWordWrapSymbols, EditWrapSymbolDefaultValue);
 	IniSectionSetBoolEx(pIniSection, L"ShowWordWrapSymbols", bShowWordWrapSymbols, 0);
+	IniSectionSetBoolEx(pIniSection, L"WordWrapSelectSubLine", bWordWrapSelectSubLine, 0);
 	IniSectionSetBoolEx(pIniSection, L"ShowUnicodeControlCharacter", bShowUnicodeControlCharacter, 0);
 	IniSectionSetBoolEx(pIniSection, L"MatchBraces", bMatchBraces, 1);
-	IniSectionSetIntEx(pIniSection, L"HighlightCurrentLine", iHighlightCurrentLine + (bHighlightCurrentLineSubLine ? 10 : 0), 12);
+	IniSectionSetIntEx(pIniSection, L"HighlightCurrentLine", iHighlightCurrentLine + (bHighlightCurrentSubLine ? 10 : 0), 12);
 	IniSectionSetBoolEx(pIniSection, L"ShowIndentGuides", bShowIndentGuides, 0);
 
 	IniSectionSetBoolEx(pIniSection, L"AutoIndent", autoCompletionConfig.bIndentText, 1);
