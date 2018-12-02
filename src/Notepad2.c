@@ -1480,16 +1480,16 @@ void UpdateFoldMarginWidth(void) {
 void SetWrapStartIndent(void) {
 	int i = 0;
 	switch (iWordWrapIndent) {
-	case 1:
+	case EditWrapIndentOneCharacter:
 		i = 1;
 		break;
-	case 2:
+	case EditWrapIndentTwoCharacter:
 		i = 2;
 		break;
-	case 3:
+	case EditWrapIndentOneLevel:
 		i = (iIndentWidth) ? 1 * iIndentWidth : 1 * iTabWidth;
 		break;
-	case 4:
+	case EditWrapIndentTwoLevel:
 		i = (iIndentWidth) ? 2 * iIndentWidth : 2 * iTabWidth;
 		break;
 	}
@@ -1497,11 +1497,11 @@ void SetWrapStartIndent(void) {
 }
 
 void SetWrapIndentMode(void) {
-	if (iWordWrapIndent == 5) {
+	if (iWordWrapIndent == EditWrapIndentSameAsSubline) {
 		SendMessage(hwndEdit, SCI_SETWRAPINDENTMODE, SC_WRAPINDENT_SAME, 0);
-	} else if (iWordWrapIndent == 6) {
+	} else if (iWordWrapIndent == EditWrapIndentOneLevelThanSubline) {
 		SendMessage(hwndEdit, SCI_SETWRAPINDENTMODE, SC_WRAPINDENT_INDENT, 0);
-	} else if (iWordWrapIndent == 7) {
+	} else if (iWordWrapIndent == EditWrapIndentTwoLevelThanSubline) {
 		SendMessage(hwndEdit, SCI_SETWRAPINDENTMODE, SC_WRAPINDENT_DEEPINDENT, 0);
 	} else {
 		SetWrapStartIndent();
@@ -1514,23 +1514,30 @@ void SetWrapVisualFlags(void) {
 		int wrapVisualFlags = 0;
 		int wrapVisualFlagsLocation = 0;
 		if (iWordWrapSymbols == 0) {
-			iWordWrapSymbols = 22;
+			iWordWrapSymbols = EditWrapSymbolDefaultValue;
 		}
 		switch (iWordWrapSymbols % 10) {
-		case 1:
+		case EditWrapSymbolBeforeNearText:
 			wrapVisualFlags |= SC_WRAPVISUALFLAG_END;
 			wrapVisualFlagsLocation |= SC_WRAPVISUALFLAGLOC_END_BY_TEXT;
 			break;
-		case 2:
+		case EditWrapSymbolBeforeNearBorder:
 			wrapVisualFlags |= SC_WRAPVISUALFLAG_END;
 			break;
+		case EditWrapSymbolLineNumberMargin:
+			wrapVisualFlags |= SC_WRAPVISUALFLAG_MARGIN;
+			if (!bShowLineNumbers) {
+				bShowLineNumbers = TRUE;
+				UpdateLineNumberWidth();
+			}
+			break;
 		}
-		switch (((iWordWrapSymbols % 100) - (iWordWrapSymbols % 10)) / 10) {
-		case 1:
+		switch (iWordWrapSymbols / 10) {
+		case EditWrapSymbolAfterNearText:
 			wrapVisualFlags |= SC_WRAPVISUALFLAG_START;
 			wrapVisualFlagsLocation |= SC_WRAPVISUALFLAGLOC_START_BY_TEXT;
 			break;
-		case 2:
+		case EditWrapSymbolAfterNearBorder:
 			wrapVisualFlags |= SC_WRAPVISUALFLAG_START;
 			break;
 		}
@@ -5229,11 +5236,12 @@ void LoadSettings(void) {
 	iValue = IniSectionGetInt(pIniSection, L"WordWrapMode", SC_WRAP_WORD);
 	iWordWrapMode = clamp_i(iValue, SC_WRAP_WORD, SC_WRAP_WHITESPACE);
 
-	iValue = IniSectionGetInt(pIniSection, L"WordWrapIndent", 0);
-	iWordWrapIndent = clamp_i(iValue, 0, 7);
+	iValue = IniSectionGetInt(pIniSection, L"WordWrapIndent", EditWrapIndentDefaultValue);
+	iWordWrapIndent = clamp_i(iValue, EditWrapIndentNone, EditWrapIndentMaxValue);
 
-	iValue = IniSectionGetInt(pIniSection, L"WordWrapSymbols", 22);
-	iWordWrapSymbols = clamp_i(iValue % 10, 0, 2) + clamp_i((iValue % 100 - iValue % 10) / 10, 0, 2) * 10;
+	iValue = IniSectionGetInt(pIniSection, L"WordWrapSymbols", EditWrapSymbolDefaultValue);
+	iValue = clamp_i(iValue, 0, EditWrapSymbolMaxValue);
+	iWordWrapSymbols = clamp_i(iValue % 10, EditWrapSymbolBeforeNone, EditWrapSymbolBeforeMaxValue) + (iValue / 10) * 10;
 
 	bShowWordWrapSymbols = IniSectionGetBool(pIniSection, L"ShowWordWrapSymbols", 0);
 	bShowUnicodeControlCharacter = IniSectionGetBool(pIniSection, L"ShowUnicodeControlCharacter", 0);
@@ -5570,8 +5578,8 @@ void SaveSettings(BOOL bSaveSettingsNow) {
 	IniSectionSetIntEx(pIniSection, L"PathNameFormat", iPathNameFormat, 1);
 	IniSectionSetBoolEx(pIniSection, L"WordWrap", fWordWrapG, 1);
 	IniSectionSetIntEx(pIniSection, L"WordWrapMode", iWordWrapMode, SC_WRAP_WORD);
-	IniSectionSetIntEx(pIniSection, L"WordWrapIndent", iWordWrapIndent, 0);
-	IniSectionSetIntEx(pIniSection, L"WordWrapSymbols", iWordWrapSymbols, 22);
+	IniSectionSetIntEx(pIniSection, L"WordWrapIndent", iWordWrapIndent, EditWrapIndentNone);
+	IniSectionSetIntEx(pIniSection, L"WordWrapSymbols", iWordWrapSymbols, EditWrapSymbolDefaultValue);
 	IniSectionSetBoolEx(pIniSection, L"ShowWordWrapSymbols", bShowWordWrapSymbols, 0);
 	IniSectionSetBoolEx(pIniSection, L"ShowUnicodeControlCharacter", bShowUnicodeControlCharacter, 0);
 	IniSectionSetBoolEx(pIniSection, L"MatchBraces", bMatchBraces, 1);

@@ -65,6 +65,40 @@ typedef struct _editfindreplace {
 #define SORT_LOGICAL		64
 #define SORT_COLUMN			128
 
+// wrap indent
+enum {
+	EditWrapIndentNone = 0,
+	EditWrapIndentOneCharacter = 1,
+	EditWrapIndentTwoCharacter = 2,
+	EditWrapIndentOneLevel = 3,
+	EditWrapIndentTwoLevel = 4,
+
+	EditWrapIndentSameAsSubline = 5,
+	EditWrapIndentOneLevelThanSubline = 6,
+	EditWrapIndentTwoLevelThanSubline = 7,
+
+	EditWrapIndentMaxValue = EditWrapIndentTwoLevelThanSubline,
+	EditWrapIndentDefaultValue = EditWrapIndentNone,
+};
+
+// wrap symbol
+enum {
+	EditWrapSymbolBeforeNone = 0,
+	EditWrapSymbolBeforeNearText = 1,
+	EditWrapSymbolBeforeNearBorder = 2,
+	EditWrapSymbolLineNumberMargin = 3,
+
+	EditWrapSymbolAfterNone = 0,
+	EditWrapSymbolAfterNearText = 1,
+	EditWrapSymbolAfterNearBorder = 2,
+
+	EditWrapSymbolBeforeMaxValue = EditWrapSymbolLineNumberMargin,
+	EditWrapSymbolAfterMaxValue = EditWrapSymbolAfterNearBorder,
+
+	EditWrapSymbolMaxValue = EditWrapSymbolBeforeMaxValue + 10 * EditWrapSymbolAfterMaxValue,
+	EditWrapSymbolDefaultValue = EditWrapSymbolBeforeNearBorder,
+};
+
 void	Edit_ReleaseResources(void);
 HWND	EditCreate(HWND hwndParent);
 void	EditSetNewText(HWND hwnd, LPCSTR lpstrText, DWORD cbText);
