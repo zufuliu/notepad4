@@ -34,6 +34,10 @@ NP2_inline int clamp_i(int x, int lower, int upper) {
 	return (x < lower) ? lower : (x > upper) ? upper : x;
 }
 
+NP2_inline int validate_i(int x, int lower, int upper, int defaultValue) {
+	return (x < lower || x > upper) ? defaultValue : x;
+}
+
 NP2_inline BOOL StrIsEmpty(LPCWSTR s) {
 	return s == NULL || *s == L'\0';
 }

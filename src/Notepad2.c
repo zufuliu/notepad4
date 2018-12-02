@@ -5226,23 +5226,23 @@ void LoadSettings(void) {
 	fWordWrap = IniSectionGetBool(pIniSection, L"WordWrap", 1);
 	fWordWrapG = fWordWrap;
 
-	iWordWrapMode = IniSectionGetInt(pIniSection, L"WordWrapMode", SC_WRAP_WORD);
-	iWordWrapMode = clamp_i(iWordWrapMode, SC_WRAP_WORD, SC_WRAP_WHITESPACE);
+	iValue = IniSectionGetInt(pIniSection, L"WordWrapMode", SC_WRAP_WORD);
+	iWordWrapMode = clamp_i(iValue, SC_WRAP_WORD, SC_WRAP_WHITESPACE);
 
-	iWordWrapIndent = IniSectionGetInt(pIniSection, L"WordWrapIndent", 0);
-	iWordWrapIndent = clamp_i(iWordWrapIndent, 0, 7);
+	iValue = IniSectionGetInt(pIniSection, L"WordWrapIndent", 0);
+	iWordWrapIndent = clamp_i(iValue, 0, 7);
 
-	iWordWrapSymbols = IniSectionGetInt(pIniSection, L"WordWrapSymbols", 22);
-	iWordWrapSymbols = clamp_i(iWordWrapSymbols % 10, 0, 2) + clamp_i((iWordWrapSymbols % 100 - iWordWrapSymbols % 10) / 10, 0, 2) * 10;
+	iValue = IniSectionGetInt(pIniSection, L"WordWrapSymbols", 22);
+	iWordWrapSymbols = clamp_i(iValue % 10, 0, 2) + clamp_i((iValue % 100 - iValue % 10) / 10, 0, 2) * 10;
 
 	bShowWordWrapSymbols = IniSectionGetBool(pIniSection, L"ShowWordWrapSymbols", 0);
 	bShowUnicodeControlCharacter = IniSectionGetBool(pIniSection, L"ShowUnicodeControlCharacter", 0);
 
 	bMatchBraces = IniSectionGetBool(pIniSection, L"MatchBraces", 1);
-	iHighlightCurrentLine = IniSectionGetInt(pIniSection, L"HighlightCurrentLine", 12);
-	iHighlightCurrentLine = (iSettingsVersion < NP2SettingsVersion_V1) ? 12 : iHighlightCurrentLine;
-	bHighlightCurrentLineSubLine = iHighlightCurrentLine > 10;
-	iHighlightCurrentLine = clamp_i(iHighlightCurrentLine % 10, 0, 2);
+	iValue = IniSectionGetInt(pIniSection, L"HighlightCurrentLine", 12);
+	iValue = (iSettingsVersion < NP2SettingsVersion_V1) ? 12 : iValue;
+	bHighlightCurrentLineSubLine = iValue > 10;
+	iHighlightCurrentLine = clamp_i(iValue % 10, 0, 2);
 	bShowIndentGuides = IniSectionGetBool(pIniSection, L"ShowIndentGuides", 0);
 
 	autoCompletionConfig.bIndentText = IniSectionGetBool(pIniSection, L"AutoIndent", 1);
@@ -5258,7 +5258,8 @@ void LoadSettings(void) {
 	autoCompletionConfig.iMinNumberLength = max_i(iValue, MIN_AUTO_COMPLETION_NUMBER_LENGTH);
 	autoCompletionConfig.fAutoCompleteFillUpMask = IniSectionGetInt(pIniSection, L"AutoCFillUpMask", AutoCompleteFillUpDefault);
 	autoCompletionConfig.fAutoInsertMask = IniSectionGetInt(pIniSection, L"AutoInsertMask", AutoInsertDefaultMask);
-	autoCompletionConfig.iAsmLineCommentChar = IniSectionGetInt(pIniSection, L"AsmLineCommentChar", AsmLineCommentCharSemicolon);
+	iValue = IniSectionGetInt(pIniSection, L"AsmLineCommentChar", AsmLineCommentCharSemicolon);
+	autoCompletionConfig.iAsmLineCommentChar = clamp_i(iValue, AsmLineCommentCharSemicolon, AsmLineCommentCharAt);
 	strValue = IniSectionGetValue(pIniSection, L"AutoCFillUpPunctuation");
 	if (StrIsEmpty(strValue)) {
 		lstrcpy(autoCompletionConfig.wszAutoCompleteFillUp, AUTO_COMPLETION_FILLUP_DEFAULT);
@@ -5269,7 +5270,8 @@ void LoadSettings(void) {
 
 #if NP2_ENABLE_SHOW_CALL_TIPS
 	bShowCallTips = IniSectionGetBool(pIniSection, L"ShowCallTips", 0);
-	iCallTipsWaitTime = IniSectionGetInt(pIniSection, L"CallTipsWaitTime", 500);
+	iValue = IniSectionGetInt(pIniSection, L"CallTipsWaitTime", 500);
+	iCallTipsWaitTime = max_i(iValue, 100);
 #endif
 
 	bTabsAsSpaces = IniSectionGetBool(pIniSection, L"TabsAsSpaces", 0);
@@ -5279,94 +5281,99 @@ void LoadSettings(void) {
 
 	bBackspaceUnindents = IniSectionGetBool(pIniSection, L"BackspaceUnindents", 0);
 
-	iZoomLevel = IniSectionGetInt(pIniSection, L"ZoomLevel", 100);
+	iValue = IniSectionGetInt(pIniSection, L"ZoomLevel", 100);
 	// Added in v4.2.25.1172, stored as a relative font size in point, in range [-10, 20].
-	iZoomLevel = (iSettingsVersion < NP2SettingsVersion_V1)? 100 : iZoomLevel;
-	iZoomLevel = clamp_i(iZoomLevel, SC_MIN_ZOOM_LEVEL, SC_MAX_ZOOM_LEVEL);
+	iValue = (iSettingsVersion < NP2SettingsVersion_V1)? 100 : iValue;
+	iZoomLevel = clamp_i(iValue, SC_MIN_ZOOM_LEVEL, SC_MAX_ZOOM_LEVEL);
 
-	iTabWidth = IniSectionGetInt(pIniSection, L"TabWidth", 4);
-	iTabWidth = clamp_i(iTabWidth, 1, 256);
-	iTabWidthG = iTabWidth;
+	iValue = IniSectionGetInt(pIniSection, L"TabWidth", 4);
+	iValue = clamp_i(iValue, 1, 256);
+	iTabWidth = iValue;
+	iTabWidthG = iValue;
 
-	iIndentWidth = IniSectionGetInt(pIniSection, L"IndentWidth", 4);
-	iIndentWidth = clamp_i(iIndentWidth, 0, 256);
-	iIndentWidthG = iIndentWidth;
+	iValue = IniSectionGetInt(pIniSection, L"IndentWidth", 4);
+	iValue = clamp_i(iValue, 0, 256);
+	iIndentWidth = iValue;
+	iIndentWidthG = iValue;
 
 	bMarkLongLines = IniSectionGetBool(pIniSection, L"MarkLongLines", 1);
 
-	iLongLinesLimit = IniSectionGetInt(pIniSection, L"LongLinesLimit", 80);
-	iLongLinesLimit = clamp_i(iLongLinesLimit, 0, NP2_LONG_LINE_LIMIT);
-	iLongLinesLimitG = iLongLinesLimit;
+	iValue = IniSectionGetInt(pIniSection, L"LongLinesLimit", 80);
+	iValue = clamp_i(iValue, 0, NP2_LONG_LINE_LIMIT);
+	iLongLinesLimit = iValue;
+	iLongLinesLimitG = iValue;
 
-	iLongLineMode = IniSectionGetInt(pIniSection, L"LongLineMode", EDGE_LINE);
-	iLongLineMode = clamp_i(iLongLineMode, EDGE_LINE, EDGE_BACKGROUND);
+	iValue = IniSectionGetInt(pIniSection, L"LongLineMode", EDGE_LINE);
+	iLongLineMode = clamp_i(iValue, EDGE_LINE, EDGE_BACKGROUND);
 
 	bShowSelectionMargin = IniSectionGetBool(pIniSection, L"ShowSelectionMargin", 0);
 	bShowLineNumbers = IniSectionGetBool(pIniSection, L"ShowLineNumbers", 1);
 	bShowCodeFolding = IniSectionGetBool(pIniSection, L"ShowCodeFolding", 1);
 
-	iMarkOccurrences = IniSectionGetInt(pIniSection, L"MarkOccurrences", 3);
+	iValue = IniSectionGetInt(pIniSection, L"MarkOccurrences", 3);
+	iMarkOccurrences = clamp_i(iValue, 0, 3);
 	bMarkOccurrencesMatchCase = IniSectionGetBool(pIniSection, L"MarkOccurrencesMatchCase", 1);
 	bMarkOccurrencesMatchWords = IniSectionGetBool(pIniSection, L"MarkOccurrencesMatchWholeWords", 0);
 
 	bViewWhiteSpace = IniSectionGetBool(pIniSection, L"ViewWhiteSpace", 0);
 	bViewEOLs = IniSectionGetBool(pIniSection, L"ViewEOLs", 0);
 
-	iDefaultEncoding = Encoding_MapIniSetting(FALSE, CPI_UTF8);
-	iDefaultEncoding = IniSectionGetInt(pIniSection, L"DefaultEncoding", iDefaultEncoding);
-	iDefaultEncoding = Encoding_MapIniSetting(TRUE, iDefaultEncoding);
-	if (!Encoding_IsValid(iDefaultEncoding)) {
-		iDefaultEncoding = CPI_UTF8;
+	iValue = Encoding_MapIniSetting(FALSE, CPI_UTF8);
+	iValue = IniSectionGetInt(pIniSection, L"DefaultEncoding", iValue);
+	iValue = Encoding_MapIniSetting(TRUE, iValue);
+	if (!Encoding_IsValid(iValue)) {
+		iValue = CPI_UTF8;
 	}
+	iDefaultEncoding = iValue;
 
 	bSkipUnicodeDetection = IniSectionGetBool(pIniSection, L"SkipUnicodeDetection", 1);
 	bLoadASCIIasUTF8 = IniSectionGetBool(pIniSection, L"LoadASCIIasUTF8", 0);
 	bLoadNFOasOEM = IniSectionGetBool(pIniSection, L"LoadNFOasOEM", 1);
 	bNoEncodingTags = IniSectionGetBool(pIniSection, L"NoEncodingTags", 0);
 
-	iDefaultEOLMode = IniSectionGetInt(pIniSection, L"DefaultEOLMode", 0);
-	iDefaultEOLMode = clamp_i(iDefaultEOLMode, SC_EOL_CRLF, SC_EOL_LF);
+	iValue = IniSectionGetInt(pIniSection, L"DefaultEOLMode", 0);
+	iDefaultEOLMode = clamp_i(iValue, SC_EOL_CRLF, SC_EOL_LF);
 
 	bWarnLineEndings = IniSectionGetBool(pIniSection, L"WarnLineEndings", 1);
 	bFixLineEndings = IniSectionGetBool(pIniSection, L"FixLineEndings", 1);
 	bAutoStripBlanks = IniSectionGetBool(pIniSection, L"FixTrailingBlanks", 0);
 
-	iPrintHeader = IniSectionGetInt(pIniSection, L"PrintHeader", 1);
-	iPrintHeader = clamp_i(iPrintHeader, 0, 3);
+	iValue = IniSectionGetInt(pIniSection, L"PrintHeader", 1);
+	iPrintHeader = clamp_i(iValue, 0, 3);
 
-	iPrintFooter = IniSectionGetInt(pIniSection, L"PrintFooter", 0);
-	iPrintFooter = clamp_i(iPrintFooter, 0, 1);
+	iValue = IniSectionGetInt(pIniSection, L"PrintFooter", 0);
+	iPrintFooter = clamp_i(iValue, 0, 1);
 
-	iPrintColor = IniSectionGetInt(pIniSection, L"PrintColorMode", SC_PRINT_COLOURONWHITE);
-	iPrintColor = clamp_i(iPrintColor, SC_PRINT_NORMAL, SC_PRINT_SCREENCOLOURS);
+	iValue = IniSectionGetInt(pIniSection, L"PrintColorMode", SC_PRINT_COLOURONWHITE);
+	iPrintColor = clamp_i(iValue, SC_PRINT_NORMAL, SC_PRINT_SCREENCOLOURS);
 
-	iPrintZoom = IniSectionGetInt(pIniSection, L"PrintZoom", 100);
+	iValue = IniSectionGetInt(pIniSection, L"PrintZoom", 100);
 	// previously stored as a relative font size in point plus 10, in range [-10, 20] + 10.
-	iPrintZoom = (iSettingsVersion < NP2SettingsVersion_V1)? 100 : iPrintZoom;
-	iPrintZoom = clamp_i(iPrintZoom, SC_MIN_ZOOM_LEVEL, SC_MAX_ZOOM_LEVEL);
+	iValue = (iSettingsVersion < NP2SettingsVersion_V1)? 100 : iValue;
+	iPrintZoom = clamp_i(iValue, SC_MIN_ZOOM_LEVEL, SC_MAX_ZOOM_LEVEL);
 
-	pageSetupMargin.left = IniSectionGetInt(pIniSection, L"PrintMarginLeft", -1);
-	pageSetupMargin.left = max_i(pageSetupMargin.left, -1);
+	iValue = IniSectionGetInt(pIniSection, L"PrintMarginLeft", -1);
+	pageSetupMargin.left = max_i(iValue, -1);
 
-	pageSetupMargin.top = IniSectionGetInt(pIniSection, L"PrintMarginTop", -1);
-	pageSetupMargin.top = max_i(pageSetupMargin.top, -1);
+	iValue = IniSectionGetInt(pIniSection, L"PrintMarginTop", -1);
+	pageSetupMargin.top = max_i(iValue, -1);
 
-	pageSetupMargin.right = IniSectionGetInt(pIniSection, L"PrintMarginRight", -1);
-	pageSetupMargin.right = max_i(pageSetupMargin.right, -1);
+	iValue = IniSectionGetInt(pIniSection, L"PrintMarginRight", -1);
+	pageSetupMargin.right = max_i(iValue, -1);
 
-	pageSetupMargin.bottom = IniSectionGetInt(pIniSection, L"PrintMarginBottom", -1);
-	pageSetupMargin.bottom = max_i(pageSetupMargin.bottom, -1);
+	iValue = IniSectionGetInt(pIniSection, L"PrintMarginBottom", -1);
+	pageSetupMargin.bottom = max_i(iValue, -1);
 
 	bSaveBeforeRunningTools = IniSectionGetBool(pIniSection, L"SaveBeforeRunningTools", 0);
 	bOpenFolderWithMetapath = IniSectionGetBool(pIniSection, L"OpenFolderWithMetapath", 1);
 
-	iFileWatchingMode = IniSectionGetInt(pIniSection, L"FileWatchingMode", 2);
-	iFileWatchingMode = clamp_i(iFileWatchingMode, 0, 2);
+	iValue = IniSectionGetInt(pIniSection, L"FileWatchingMode", 2);
+	iFileWatchingMode = clamp_i(iValue, 0, 2);
 
 	bResetFileWatching = IniSectionGetBool(pIniSection, L"ResetFileWatching", 0);
 
-	iEscFunction = IniSectionGetInt(pIniSection, L"EscFunction", 0);
-	iEscFunction = clamp_i(iEscFunction, 0, 2);
+	iValue = IniSectionGetInt(pIniSection, L"EscFunction", 0);
+	iEscFunction = clamp_i(iValue, 0, 2);
 
 	bAlwaysOnTop = IniSectionGetBool(pIniSection, L"AlwaysOnTop", 0);
 	bMinimizeToTray = IniSectionGetBool(pIniSection, L"MinimizeToTray", 0);
@@ -5375,18 +5382,19 @@ void LoadSettings(void) {
 	bEditLayoutRTL = IniSectionGetBool(pIniSection, L"EditLayoutRTL", 0);
 	bWindowLayoutRTL = IniSectionGetBool(pIniSection, L"WindowLayoutRTL", 0);
 
-	iRenderingTechnology = IniSectionGetInt(pIniSection, L"RenderingTechnology", (IsVistaAndAbove()? SC_TECHNOLOGY_DIRECTWRITE : SC_TECHNOLOGY_DEFAULT));
-	iRenderingTechnology = clamp_i(iRenderingTechnology, SC_TECHNOLOGY_DEFAULT, SC_TECHNOLOGY_DIRECTWRITEDC);
-	bEditLayoutRTL = bEditLayoutRTL && iRenderingTechnology == SC_TECHNOLOGY_DEFAULT;
+	iValue = IniSectionGetInt(pIniSection, L"RenderingTechnology", (IsVistaAndAbove()? SC_TECHNOLOGY_DIRECTWRITE : SC_TECHNOLOGY_DEFAULT));
+	iValue = clamp_i(iValue, SC_TECHNOLOGY_DEFAULT, SC_TECHNOLOGY_DIRECTWRITEDC);
+	iRenderingTechnology = iValue;
+	bEditLayoutRTL = bEditLayoutRTL && iValue == SC_TECHNOLOGY_DEFAULT;
 
-	iBidirectional = IniSectionGetInt(pIniSection, L"Bidirectional", SC_BIDIRECTIONAL_DISABLED);
-	iBidirectional = clamp_i(iBidirectional, SC_BIDIRECTIONAL_DISABLED, SC_BIDIRECTIONAL_R2L);
+	iValue = IniSectionGetInt(pIniSection, L"Bidirectional", SC_BIDIRECTIONAL_DISABLED);
+	iBidirectional = clamp_i(iValue, SC_BIDIRECTIONAL_DISABLED, SC_BIDIRECTIONAL_R2L);
 
-	iFontQuality = IniSectionGetInt(pIniSection, L"FontQuality", SC_EFF_QUALITY_LCD_OPTIMIZED);
-	iFontQuality = clamp_i(iFontQuality, SC_EFF_QUALITY_DEFAULT, SC_EFF_QUALITY_LCD_OPTIMIZED);
+	iValue = IniSectionGetInt(pIniSection, L"FontQuality", SC_EFF_QUALITY_LCD_OPTIMIZED);
+	iFontQuality = clamp_i(iValue, SC_EFF_QUALITY_DEFAULT, SC_EFF_QUALITY_LCD_OPTIMIZED);
 
-	iCaretStyle = IniSectionGetInt(pIniSection, L"CaretStyle", 1);
-	iCaretStyle = clamp_i(iCaretStyle, 0, 3);
+	iValue = IniSectionGetInt(pIniSection, L"CaretStyle", 1);
+	iCaretStyle = clamp_i(iValue, 0, 3);
 	iCaretBlinkPeriod = IniSectionGetInt(pIniSection, L"CaretBlinkPeriod", -1);
 
 	// Korean IME use inline mode (and block caret in inline mode) by default
@@ -6402,17 +6410,14 @@ void LoadFlags(void) {
 
 	flagNoFadeHidden = IniSectionGetBool(pIniSection, L"NoFadeHidden", 0);
 
-	iOpacityLevel = IniSectionGetInt(pIniSection, L"OpacityLevel", 75);
-	if (iOpacityLevel < 0 || iOpacityLevel > 100) {
-		iOpacityLevel = 75;
-	}
-	iFindReplaceOpacityLevel = IniSectionGetInt(pIniSection, L"FindReplaceOpacityLevel", 75);
-	if (iFindReplaceOpacityLevel < 0 || iFindReplaceOpacityLevel > 100) {
-		iFindReplaceOpacityLevel = 75;
-	}
+	int iValue = IniSectionGetInt(pIniSection, L"OpacityLevel", 75);
+	iOpacityLevel = validate_i(iValue, 0, 100, 75);
 
-	flagToolbarLook = IniSectionGetInt(pIniSection, L"ToolbarLook", IsWinXPAndAbove() ? 1 : 2);
-	flagToolbarLook = clamp_i(flagToolbarLook, 0, 2);
+	iValue = IniSectionGetInt(pIniSection, L"FindReplaceOpacityLevel", 75);
+	iFindReplaceOpacityLevel = validate_i(iValue, 0, 100, 75);
+
+	iValue = IniSectionGetInt(pIniSection, L"ToolbarLook", IsWinXPAndAbove() ? 1 : 2);
+	flagToolbarLook = clamp_i(iValue, 0, 2);
 
 	flagSimpleIndentGuides = IniSectionGetBool(pIniSection, L"SimpleIndentGuides", 0);
 	fNoHTMLGuess = IniSectionGetBool(pIniSection, L"NoHTMLGuess", 0);
