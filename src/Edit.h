@@ -152,8 +152,8 @@ void	EditMarkAll(HWND hwnd, int iMarkOccurrences,
 					BOOL bMarkOccurrencesMatchCase, BOOL bMarkOccurrencesMatchWords);
 
 // auto completion fill-up characters
-#define MAX_AUTO_COMPLETE_FILLUP_LENGTH	32		// Only 32 ASCII punctuation
-#define AUTO_COMPLETE_FILLUP_DEFAULT	L";,()[]{}\\/"
+#define MAX_AUTO_COMPLETION_FILLUP_LENGTH	32		// Only 32 ASCII punctuation
+#define AUTO_COMPLETION_FILLUP_DEFAULT		L";,()[]{}\\/"
 enum {
 	AutoCompleteFillUpEnter = 1,
 	AutoCompleteFillUpTab = 2,
@@ -185,6 +185,10 @@ enum {
 	AsmLineCommentCharAt = 3,			// '@'
 };
 
+#define MIN_AUTO_COMPLETION_VISIBLE_ITEM_COUNT	8
+#define MIN_AUTO_COMPLETION_WORD_LENGTH			1
+#define MIN_AUTO_COMPLETION_NUMBER_LENGTH		0
+
 typedef struct EditAutoCompletionConfig {
 	BOOL bIndentText;
 	BOOL bCloseTags;
@@ -198,8 +202,8 @@ typedef struct EditAutoCompletionConfig {
 	int fAutoInsertMask;
 	int iAsmLineCommentChar;
 	int iPreviousItemCount;		// status
-	char szAutoCompleteFillUp[MAX_AUTO_COMPLETE_FILLUP_LENGTH + 4];
-	WCHAR wszAutoCompleteFillUp[MAX_AUTO_COMPLETE_FILLUP_LENGTH + 4];
+	char szAutoCompleteFillUp[MAX_AUTO_COMPLETION_FILLUP_LENGTH + 4];
+	WCHAR wszAutoCompleteFillUp[MAX_AUTO_COMPLETION_FILLUP_LENGTH];
 } EditAutoCompletionConfig;
 
 
