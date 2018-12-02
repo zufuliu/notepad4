@@ -5220,8 +5220,8 @@ void LoadSettings(void) {
 		PathAbsoluteFromApp(strValue, tchFavoritesDir, COUNTOF(tchFavoritesDir), TRUE);
 	}
 
-	iPathNameFormat = IniSectionGetInt(pIniSection, L"PathNameFormat", 1);
-	iPathNameFormat = clamp_i(iPathNameFormat, 0, 2);
+	int iValue = IniSectionGetInt(pIniSection, L"PathNameFormat", 1);
+	iPathNameFormat = clamp_i(iValue, 0, 2);
 
 	fWordWrap = IniSectionGetBool(pIniSection, L"WordWrap", 1);
 	fWordWrapG = fWordWrap;
@@ -5250,15 +5250,18 @@ void LoadSettings(void) {
 	autoCompletionConfig.bCompleteWord = IniSectionGetBool(pIniSection, L"AutoCompleteWords", 1);
 	autoCompletionConfig.bScanWordsInDocument = IniSectionGetBool(pIniSection, L"AutoCScanWordsInDocument", 1);
 	autoCompletionConfig.bEnglistIMEModeOnly = IniSectionGetBool(pIniSection, L"AutoCEnglishIMEModeOnly", 0);
-	autoCompletionConfig.iVisibleItemCount = IniSectionGetInt(pIniSection, L"AutoCVisibleItemCount", 16);
-	autoCompletionConfig.iMinWordLength = IniSectionGetInt(pIniSection, L"AutoCMinWordLength", 1);
-	autoCompletionConfig.iMinNumberLength = IniSectionGetInt(pIniSection, L"AutoCMinNumberLength", 3);
+	iValue = IniSectionGetInt(pIniSection, L"AutoCVisibleItemCount", 16);
+	autoCompletionConfig.iVisibleItemCount = max_i(iValue, MIN_AUTO_COMPLETION_VISIBLE_ITEM_COUNT);
+	iValue = IniSectionGetInt(pIniSection, L"AutoCMinWordLength", 1);
+	autoCompletionConfig.iMinWordLength = max_i(iValue, MIN_AUTO_COMPLETION_WORD_LENGTH);
+	iValue = IniSectionGetInt(pIniSection, L"AutoCMinNumberLength", 3);
+	autoCompletionConfig.iMinNumberLength = max_i(iValue, MIN_AUTO_COMPLETION_NUMBER_LENGTH);
 	autoCompletionConfig.fAutoCompleteFillUpMask = IniSectionGetInt(pIniSection, L"AutoCFillUpMask", AutoCompleteFillUpDefault);
 	autoCompletionConfig.fAutoInsertMask = IniSectionGetInt(pIniSection, L"AutoInsertMask", AutoInsertDefaultMask);
 	autoCompletionConfig.iAsmLineCommentChar = IniSectionGetInt(pIniSection, L"AsmLineCommentChar", AsmLineCommentCharSemicolon);
 	strValue = IniSectionGetValue(pIniSection, L"AutoCFillUpPunctuation");
 	if (StrIsEmpty(strValue)) {
-		lstrcpy(autoCompletionConfig.wszAutoCompleteFillUp, AUTO_COMPLETE_FILLUP_DEFAULT);
+		lstrcpy(autoCompletionConfig.wszAutoCompleteFillUp, AUTO_COMPLETION_FILLUP_DEFAULT);
 	} else {
 		lstrcpyn(autoCompletionConfig.wszAutoCompleteFillUp, strValue, COUNTOF(autoCompletionConfig.wszAutoCompleteFillUp));
 	}
@@ -5578,7 +5581,7 @@ void SaveSettings(BOOL bSaveSettingsNow) {
 	IniSectionSetIntEx(pIniSection, L"AutoCFillUpMask", autoCompletionConfig.fAutoCompleteFillUpMask, AutoCompleteFillUpDefault);
 	IniSectionSetIntEx(pIniSection, L"AutoInsertMask", autoCompletionConfig.fAutoInsertMask, AutoInsertDefaultMask);
 	IniSectionSetIntEx(pIniSection, L"AsmLineCommentChar", autoCompletionConfig.iAsmLineCommentChar, AsmLineCommentCharSemicolon);
-	IniSectionSetStringEx(pIniSection, L"AutoCFillUpPunctuation", autoCompletionConfig.wszAutoCompleteFillUp, AUTO_COMPLETE_FILLUP_DEFAULT);
+	IniSectionSetStringEx(pIniSection, L"AutoCFillUpPunctuation", autoCompletionConfig.wszAutoCompleteFillUp, AUTO_COMPLETION_FILLUP_DEFAULT);
 #if NP2_ENABLE_SHOW_CALL_TIPS
 	IniSectionSetBoolEx(pIniSection, L"ShowCallTips", bShowCallTips, 1);
 	IniSectionSetIntEx(pIniSection, L"CallTipsWaitTime", iCallTipsWaitTime, 500);

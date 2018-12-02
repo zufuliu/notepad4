@@ -2110,7 +2110,7 @@ static INT_PTR CALLBACK AutoCompletionSettingsDlgProc(HWND hwnd, UINT umsg, WPAR
 		}
 
 		SetDlgItemText(hwnd, IDC_AUTOC_FILLUP_PUNCTUATION_LIST, autoCompletionConfig.wszAutoCompleteFillUp);
-		SendDlgItemMessage(hwnd, IDC_AUTOC_FILLUP_PUNCTUATION_LIST, EM_LIMITTEXT, MAX_AUTO_COMPLETE_FILLUP_LENGTH, 0);
+		SendDlgItemMessage(hwnd, IDC_AUTOC_FILLUP_PUNCTUATION_LIST, EM_LIMITTEXT, MAX_AUTO_COMPLETION_FILLUP_LENGTH, 0);
 
 		mask = autoCompletionConfig.fAutoInsertMask;
 		if (mask & AutoInsertParenthesis) {
@@ -2156,13 +2156,13 @@ static INT_PTR CALLBACK AutoCompletionSettingsDlgProc(HWND hwnd, UINT umsg, WPAR
 			autoCompletionConfig.bEnglistIMEModeOnly = IsButtonChecked(hwnd, IDC_AUTOC_ENGLISH_IME_ONLY);
 
 			int mask = GetDlgItemInt(hwnd, IDC_AUTOC_VISIBLE_ITEM_COUNT, NULL, FALSE);
-			autoCompletionConfig.iVisibleItemCount = max_i(mask, 8);
+			autoCompletionConfig.iVisibleItemCount = max_i(mask, MIN_AUTO_COMPLETION_VISIBLE_ITEM_COUNT);
 
 			mask = GetDlgItemInt(hwnd, IDC_AUTOC_MIN_WORD_LENGTH, NULL, FALSE);
-			autoCompletionConfig.iMinWordLength = max_i(mask, 1);
+			autoCompletionConfig.iMinWordLength = max_i(mask, MIN_AUTO_COMPLETION_WORD_LENGTH);
 
 			mask = GetDlgItemInt(hwnd, IDC_AUTOC_MIN_NUMBER_LENGTH, NULL, FALSE);
-			autoCompletionConfig.iMinNumberLength = mask;
+			autoCompletionConfig.iMinNumberLength = max_i(mask, MIN_AUTO_COMPLETION_NUMBER_LENGTH);
 
 			mask = 0;
 			if (IsButtonChecked(hwnd, IDC_AUTOC_FILLUP_ENTER)) {

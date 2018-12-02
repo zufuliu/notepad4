@@ -474,7 +474,6 @@ INT AutoC_AddSpecWord(struct WordList *pWList, int iCurrentStyle, int ch, int ch
 }
 
 void EditCompleteUpdateConfig(void) {
-	ZeroMemory(autoCompletionConfig.szAutoCompleteFillUp, sizeof(autoCompletionConfig.szAutoCompleteFillUp));
 	int i = 0;
 	if (autoCompletionConfig.fAutoCompleteFillUpMask & AutoCompleteFillUpEnter) {
 		autoCompletionConfig.szAutoCompleteFillUp[i++] = '\r';
@@ -491,6 +490,9 @@ void EditCompleteUpdateConfig(void) {
 	int k = 0;
 	for (UINT j = 0; j < COUNTOF(autoCompletionConfig.wszAutoCompleteFillUp); j++) {
 		const WCHAR c = autoCompletionConfig.wszAutoCompleteFillUp[j];
+		if (c == L'\0') {
+			break;
+		}
 		if (c < 0x7f && ispunct((unsigned char)c)) {
 			autoCompletionConfig.wszAutoCompleteFillUp[k++] = c;
 			if (punctuation) {
@@ -498,7 +500,8 @@ void EditCompleteUpdateConfig(void) {
 			}
 		}
 	}
-	ZeroMemory(autoCompletionConfig.wszAutoCompleteFillUp + k, (COUNTOF(autoCompletionConfig.wszAutoCompleteFillUp) - k) * sizeof(WCHAR));
+	autoCompletionConfig.szAutoCompleteFillUp[i] = '\0';
+	autoCompletionConfig.wszAutoCompleteFillUp[k] = L'\0';
 }
 
 void EditCompleteWord(HWND hwnd, BOOL autoInsert) {
