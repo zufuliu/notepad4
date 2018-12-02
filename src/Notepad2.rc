@@ -916,16 +916,16 @@ BEGIN
     CONTROL         "&Transform backslashes",IDC_FINDTRANSFORMBS,"Button", BS_AUTOCHECKBOX | WS_TABSTOP,7,85,95,10
     CONTROL         "&Don't wrap around",IDC_NOWRAP,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,132,37,79,10
     CONTROL         "C&lose after find",IDC_FINDCLOSE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,132,49,77,10
+    CONTROL         "W&ildcard search",IDC_WILDCARDSEARCH,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,132,61,74,10
     DEFPUSHBUTTON   "&Find Next",IDOK,223,7,60,14
     PUSHBUTTON      "Find &Previous",IDC_FINDPREV,223,24,60,14
     PUSHBUTTON      "Close",IDCANCEL,223,41,60,14
-    CONTROL         "<a>Goto Replace (Ctrl+H)</a>",IDC_TOGGLEFINDREPLACE, "SysLink",0x0,138,97,80,10
     CONTROL         "<a>(?)</a>",IDC_REGEXPHELP,"SysLink",0x0,118,73,14,10
     CONTROL         "<a>(?)</a>",IDC_BACKSLASHHELP,"SysLink",0x0,118,85,14,10
-    CONTROL         "W&ildcard search",IDC_WILDCARDSEARCH,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,132,61,74,10
     CONTROL         "<a>(?)</a>",IDC_WILDCARDHELP,"SysLink",0x0,208,61,14,10
     CONTROL         "<a>Clear History</a>",IDC_CLEAR_FIND,"SysLink",WS_TABSTOP,173,7,48,10
     CONTROL         "Transparent mode on losing focus",IDC_TRANSPARENT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,96,124,10
+    CONTROL         "<a>Goto Replace (Ctrl+H)</a>",IDC_TOGGLEFINDREPLACE, "SysLink",WS_TABSTOP,138,97,80,10
     CONTROL         "<a>Save Position (&O)</a>",IDC_SAVEPOSITION,"SysLink",WS_TABSTOP,223,85,60,10
     CONTROL         "<a>Reset Position (&P)</a>",IDC_RESETPOSITION,"SysLink",WS_TABSTOP,223,96,60,10
     SCROLLBAR       IDC_RESIZEGRIP2,230,96,10,10
@@ -947,20 +947,20 @@ BEGIN
     CONTROL         "&Transform backslashes",IDC_FINDTRANSFORMBS,"Button", BS_AUTOCHECKBOX | WS_TABSTOP,7,114,97,10
     CONTROL         "&Don't wrap around",IDC_NOWRAP,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,132,66,79,10
     CONTROL         "C&lose after replace",IDC_FINDCLOSE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,132,78,90,10
+    CONTROL         "W&ildcard search",IDC_WILDCARDSEARCH,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,132,90,74,10
     DEFPUSHBUTTON   "&Find Next",IDOK,223,7,60,14
     PUSHBUTTON      "Find &Previous",IDC_FINDPREV,223,24,60,14
     PUSHBUTTON      "&Replace",IDC_REPLACE,223,41,60,14
     PUSHBUTTON      "Replace &All",IDC_REPLACEALL,223,58,60,14
     PUSHBUTTON      "In &Selection",IDC_REPLACEINSEL,223,75,60,14
     PUSHBUTTON      "Close",IDCANCEL,223,92,60,14
-    CONTROL         "<a>Goto Find (Ctrl+F)</a>",IDC_TOGGLEFINDREPLACE, "SysLink",0x0,138,127,80,10
     CONTROL         "<a>(?)</a>",IDC_REGEXPHELP,"SysLink",0x0,118,102,14,10
     CONTROL         "<a>(?)</a>",IDC_BACKSLASHHELP,"SysLink",0x0,118,114,14,10
-    CONTROL         "W&ildcard search",IDC_WILDCARDSEARCH,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,132,90,74,10
     CONTROL         "<a>(?)</a>",IDC_WILDCARDHELP,"SysLink",0x0,208,90,14,10
     CONTROL         "<a>Clear History</a>",IDC_CLEAR_FIND,"SysLink",WS_TABSTOP,173,6,48,10
     CONTROL         "<a>Clear History</a>",IDC_CLEAR_REPLACE,"SysLink",WS_TABSTOP,173,35,48,10
     CONTROL         "Transparent mode on losing focus",IDC_TRANSPARENT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,126,124,10
+    CONTROL         "<a>Goto Find (Ctrl+F)</a>",IDC_TOGGLEFINDREPLACE, "SysLink",WS_TABSTOP,138,127,80,10
     CONTROL         "<a>Save Position (&O)</a>",IDC_SAVEPOSITION,"SysLink",WS_TABSTOP,223,114,60,10
     CONTROL         "<a>Reset Position (&P)</a>",IDC_RESETPOSITION,"SysLink",WS_TABSTOP,223,126,60,10
     SCROLLBAR       IDC_RESIZEGRIP2,230,126,10,10
@@ -1180,8 +1180,8 @@ BEGIN
     LTEXT           "No visual indicators after wrap|Show visual indicators after wrap (near text)|Show visual indicators after wrap (near borders)|Show visual indicators after wrap (in line number margin)",IDC_WRAP_SYMBOL_AFTER_OPTIONS,0,0,402,8,NOT WS_VISIBLE
     LTEXT           "No wrap|Wrap text between words|Wrap text between any characters|Wrap text on whitespace",IDC_WRAP_MODE_OPTIONS,0,0,187,8,NOT WS_VISIBLE
     GROUPBOX        "For wrapped line",IDC_STATIC,7,74,235,38
-    CONTROL         "Only select subline when selecting line from left margin",IDC_WRAP_SELECT_SUBLINE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,84,220,10
-    CONTROL         "Only highligh subline when highlighting current line",IDC_WRAP_HIGHLIGHT_SUBLINE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,96,220,10
+    CONTROL         "Only select subline when selecting line from left margin.",IDC_WRAP_SELECT_SUBLINE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,84,220,10
+    CONTROL         "Only highligh subline when highlighting current line.",IDC_WRAP_HIGHLIGHT_SUBLINE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,96,220,10
 END
 
 IDD_PAGESETUP DIALOGEX 5, 5, 356, 260
@@ -1427,18 +1427,18 @@ STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSM
 CAPTION "Auto Completion Settings"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
-    CONTROL         "Auto indent text",IDC_AUTO_INDENT_TEXT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,7,120,10
-    CONTROL         "Auto close HTML and XML tags",IDC_AUTO_CLOSE_TAGS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,19,120,10
+    CONTROL         "Auto indent text.",IDC_AUTO_INDENT_TEXT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,7,120,10
+    CONTROL         "Auto close HTML and XML tags.",IDC_AUTO_CLOSE_TAGS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,19,120,10
     GROUPBOX        "",IDC_STATIC,7,35,218,82
-    CONTROL         "Auto complete word while typing",IDC_AUTO_COMPLETE_WORD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,34,122,10
+    CONTROL         "Auto complete word while typing.",IDC_AUTO_COMPLETE_WORD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,34,122,10
     LTEXT           "Visible item count in auto completion list:",IDC_STATIC,14,46,148,10,SS_RIGHT
     EDITTEXT        IDC_AUTOC_VISIBLE_ITEM_COUNT,166,44,50,12,WS_TABSTOP
     LTEXT           "Minimum length for word:",IDC_STATIC,14,62,148,10,SS_RIGHT
     EDITTEXT        IDC_AUTOC_MIN_WORD_LENGTH,166,60,50,12,WS_TABSTOP
     LTEXT           "Minimum length for number (without prefix):",IDC_STATIC,14,78,148,10,SS_RIGHT
     EDITTEXT        IDC_AUTOC_MIN_NUMBER_LENGTH,166,76,50,12,WS_TABSTOP
-    CONTROL         "Scan words in current document",IDC_AUTOC_SCAN_DOCUMENT_WORDS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,92,160,10
-    CONTROL         "Only trigger auto completion in English IME mode",IDC_AUTOC_ENGLISH_IME_ONLY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,104,180,10
+    CONTROL         "Scan words in current document.",IDC_AUTOC_SCAN_DOCUMENT_WORDS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,92,160,10
+    CONTROL         "Only trigger auto completion in English IME mode.",IDC_AUTOC_ENGLISH_IME_ONLY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,104,180,10
     GROUPBOX        "Keys used to finish auto completion (use Esc to cancel)",IDC_STATIC,7,123,218,44
     CONTROL         "Enter",IDC_AUTOC_FILLUP_ENTER,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,135,35,10
     CONTROL         "Tab",IDC_AUTOC_FILLUP_TAB,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,66,135,35,10
@@ -1446,14 +1446,14 @@ BEGIN
     CONTROL         "Punctuation:",IDC_AUTOC_FILLUP_PUNCTUATION,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,152,50,10
     EDITTEXT        IDC_AUTOC_FILLUP_PUNCTUATION_LIST,66,150,150,12,WS_TABSTOP
     GROUPBOX        "Auto Insert",IDC_STATIC,231,7,218,110
-    CONTROL         ") after typing (",IDC_AUTO_INSERT_PARENTHESIS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,238,19,80,10
-    CONTROL         "} after typing {",IDC_AUTO_INSERT_BRACE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,238,31,80,10
-    CONTROL         "] after typring [, except for Smali, Jasmin and javap",IDC_AUTO_INSERT_SQUARE_BRACKET,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,238,43,210,10
-    CONTROL         "> after typing <, when <> is used in generics / template",IDC_AUTO_INSERT_ANGLE_BRACKET,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,238,55,210,10
-    CONTROL         "Double quote (""), when it's used to quote string / bytes",IDC_AUTO_INSERT_DOUBLE_QUOTE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,238,67,210,10
-    CONTROL         "Single quote ('), when it's used to quote string / bytes",IDC_AUTO_INSERT_SINGLE_QUOTE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,238,79,210,10
-    CONTROL         "Backtick (`)",IDC_AUTO_INSERT_BACKTICK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,238,91,80,10
-    CONTROL         "Space after typing comma (,)",IDC_AUTO_INSERT_SPACE_COMMA,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,238,103,120,10
+    CONTROL         ") after typing (.",IDC_AUTO_INSERT_PARENTHESIS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,238,19,80,10
+    CONTROL         "} after typing {.",IDC_AUTO_INSERT_BRACE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,238,31,80,10
+    CONTROL         "] after typring [, except for Smali, Jasmin and javap.",IDC_AUTO_INSERT_SQUARE_BRACKET,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,238,43,210,10
+    CONTROL         "> after typing <, when <> is used in generics / template.",IDC_AUTO_INSERT_ANGLE_BRACKET,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,238,55,210,10
+    CONTROL         "Double quote (""), when it's used to quote string / bytes.",IDC_AUTO_INSERT_DOUBLE_QUOTE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,238,67,210,10
+    CONTROL         "Single quote ('), when it's used to quote string / bytes.",IDC_AUTO_INSERT_SINGLE_QUOTE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,238,79,210,10
+    CONTROL         "Backtick (`).",IDC_AUTO_INSERT_BACKTICK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,238,91,80,10
+    CONTROL         "Space after typing comma (,).",IDC_AUTO_INSERT_SPACE_COMMA,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,238,103,120,10
     GROUPBOX        "Characters used to toggle line comment for Assembler source",IDC_STATIC,231,123,218,26
     CONTROL         "Semicolon (;)",IDC_ASM_LINE_COMMENT_SEMICOLON,"Button",BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,238,135,60,10
     CONTROL         "#",IDC_ASM_LINE_COMMENT_SHARP,"Button",BS_AUTORADIOBUTTON,316,135,22,10
