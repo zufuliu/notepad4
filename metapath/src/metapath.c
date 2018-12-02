@@ -2379,11 +2379,11 @@ void LoadSettings(void) {
 	bTransparentMode = IniSectionGetBool(pIniSection, L"TransparentMode", 0);
 	bWindowLayoutRTL = IniSectionGetBool(pIniSection, L"WindowLayoutRTL", 0);
 
-	iEscFunction = IniSectionGetInt(pIniSection, L"EscFunction", 0);
-	iEscFunction = clamp_i(iEscFunction, 0, 2);
+	int iValue = IniSectionGetInt(pIniSection, L"EscFunction", 0);
+	iEscFunction = clamp_i(iValue, 0, 2);
 
-	iStartupDir = IniSectionGetInt(pIniSection, L"StartupDirectory", 1);
-	iStartupDir = clamp_i(iStartupDir, 0, 2);
+	iValue = IniSectionGetInt(pIniSection, L"StartupDirectory", 1);
+	iStartupDir = clamp_i(iValue, 0, 2);
 
 	IniSectionGetString(pIniSection, L"MRUDirectory", L"", szMRUDirectory, COUNTOF(szMRUDirectory));
 
@@ -2418,8 +2418,8 @@ void LoadSettings(void) {
 		dwFillMask = DL_ALLOBJECTS;
 	}
 
-	nSortFlags = IniSectionGetInt(pIniSection, L"SortOptions", DS_NAME);
-	nSortFlags = clamp_i(nSortFlags, 0, 3);
+	iValue = IniSectionGetInt(pIniSection, L"SortOptions", DS_NAME);
+	nSortFlags = clamp_i(iValue, 0, 3);
 
 	fSortRev = IniSectionGetBool(pIniSection, L"SortReverse", 0);
 
@@ -2851,18 +2851,16 @@ void LoadFlags(void) {
 
 	flagPortableMyDocs = IniSectionGetBool(pIniSection, L"PortableMyDocs", 1);
 
-	iAutoRefreshRate = IniSectionGetInt(pIniSection, L"AutoRefreshRate", 30);
-	iAutoRefreshRate = max_i(iAutoRefreshRate, 0);
+	int iValue = IniSectionGetInt(pIniSection, L"AutoRefreshRate", 30);
+	iAutoRefreshRate = max_i(iValue, 0);
 
 	flagNoFadeHidden = IniSectionGetBool(pIniSection, L"NoFadeHidden", 0);
 
-	iOpacityLevel = IniSectionGetInt(pIniSection, L"OpacityLevel", 75);
-	if (iOpacityLevel < 0 || iOpacityLevel > 100) {
-		iOpacityLevel = 75;
-	}
+	iValue = IniSectionGetInt(pIniSection, L"OpacityLevel", 75);
+	iOpacityLevel = validate_i(iValue, 0, 100, 75);
 
-	flagToolbarLook = IniSectionGetInt(pIniSection, L"ToolbarLook", IsWinXPAndAbove() ? 1 : 2);
-	flagToolbarLook = clamp_i(flagToolbarLook, 0, 2);
+	iValue = IniSectionGetInt(pIniSection, L"ToolbarLook", IsWinXPAndAbove() ? 1 : 2);
+	flagToolbarLook = clamp_i(iValue, 0, 2);
 
 	IniSectionFree(pIniSection);
 	NP2HeapFree(pIniSectionBuf);

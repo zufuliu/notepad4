@@ -393,8 +393,8 @@ void Style_Load(void) {
 	bUse2ndDefaultStyle = IniSectionGetBool(pIniSection, L"Use2ndDefaultStyle", 0);
 
 	// default scheme
-	iDefaultLexer = IniSectionGetInt(pIniSection, L"DefaultScheme", 0);
-	iDefaultLexer = clamp_i(iDefaultLexer, 0, NUMLEXERS - 1);
+	const int iValue = IniSectionGetInt(pIniSection, L"DefaultScheme", 0);
+	iDefaultLexer = clamp_i(iValue, 0, NUMLEXERS - 1);
 
 	// auto select
 	bAutoSelect = IniSectionGetBool(pIniSection, L"AutoSelect", 1);

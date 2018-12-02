@@ -2138,7 +2138,7 @@ static INT_PTR CALLBACK AutoCompletionSettingsDlgProc(HWND hwnd, UINT umsg, WPAR
 			CheckDlgButton(hwnd, IDC_AUTO_INSERT_SPACE_COMMA, BST_CHECKED);
 		}
 
-		mask = clamp_i(autoCompletionConfig.iAsmLineCommentChar, AsmLineCommentCharSemicolon, AsmLineCommentCharAt);
+		mask = autoCompletionConfig.iAsmLineCommentChar;
 		CheckRadioButton(hwnd, IDC_ASM_LINE_COMMENT_SEMICOLON, IDC_ASM_LINE_COMMENT_AT, IDC_ASM_LINE_COMMENT_SEMICOLON + mask);
 
 		CenterDlgInParent(hwnd);
