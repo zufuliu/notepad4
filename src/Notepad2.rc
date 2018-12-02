@@ -394,7 +394,7 @@ BEGIN
             MENUITEM "Background &Color\tCtrl+Shift+I",     IDM_VIEW_HIGHLIGHTCURRENTLINE_BACK
             MENUITEM "Outline &Frame\tCtrl+Shift+F",        IDM_VIEW_HIGHLIGHTCURRENTLINE_FRAME
             MENUITEM SEPARATOR
-            MENUITEM "Highlight &Sub-Line",                 IDM_VIEW_HIGHLIGHTCURRENTLINE_SUBLINE
+            MENUITEM "Highlight &Subline",                  IDM_VIEW_HIGHLIGHTCURRENTLINE_SUBLINE
         END
         MENUITEM SEPARATOR
         MENUITEM "Line &Numbers\tCtrl+Shift+N",     IDM_VIEW_LINENUMBERS
@@ -1175,8 +1175,8 @@ BEGIN
     COMBOBOX        IDC_WRAP_MODE,7,58,236,196,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     DEFPUSHBUTTON   "OK",IDOK,137,79,50,14
     PUSHBUTTON      "Cancel",IDCANCEL,193,79,50,14
-    LTEXT           "No wrap indent|Wrap indent by 1 character|Wrap indent by 2 characters|Wrap indent by 1 level|Wrap indent by 2 levels|Wrap indent as first subline|Wrap indent 1 level more than first subline|Wrap indent 2 levels more than first subline",IDC_WRAP_INDENT_OPTIONS,0,0,615,8,NOT WS_VISIBLE
-    LTEXT           "No visual indicators before wrap|Show visual indicators before wrap (near text)|Show visual indicators before wrap (near borders)",IDC_WRAP_SYMBOL_BEFORE_OPTIONS,0,0,418,8,NOT WS_VISIBLE
+    LTEXT           "No wrap indent|Wrap indent by 1 character|Wrap indent by 2 characters|Wrap indent by 1 level|Wrap indent by 2 levels|Wrap indent same as first subline|Wrap indent 1 level more than first subline|Wrap indent 2 levels more than first subline",IDC_WRAP_INDENT_OPTIONS,0,0,615,8,NOT WS_VISIBLE
+    LTEXT           "No visual indicators before wrap|Show visual indicators before wrap (near text)|Show visual indicators before wrap (near borders)|Show visual indicators in line number margin",IDC_WRAP_SYMBOL_BEFORE_OPTIONS,0,0,418,8,NOT WS_VISIBLE
     LTEXT           "No visual indicators after wrap|Show visual indicators after wrap (near text)|Show visual indicators after wrap (near borders)",IDC_WRAP_SYMBOL_AFTER_OPTIONS,0,0,402,8,NOT WS_VISIBLE
     LTEXT           "No wrap|Wrap text between words|Wrap text between any characters|Wrap text on whitespace",IDC_WRAP_MODE_OPTIONS,0,0,187,8,NOT WS_VISIBLE
 END
