@@ -1524,13 +1524,6 @@ void SetWrapVisualFlags(void) {
 		case EditWrapSymbolBeforeNearBorder:
 			wrapVisualFlags |= SC_WRAPVISUALFLAG_END;
 			break;
-		case EditWrapSymbolLineNumberMargin:
-			wrapVisualFlags |= SC_WRAPVISUALFLAG_MARGIN;
-			if (!bShowLineNumbers) {
-				bShowLineNumbers = TRUE;
-				UpdateLineNumberWidth();
-			}
-			break;
 		}
 		switch (iWordWrapSymbols / 10) {
 		case EditWrapSymbolAfterNearText:
@@ -1539,6 +1532,13 @@ void SetWrapVisualFlags(void) {
 			break;
 		case EditWrapSymbolAfterNearBorder:
 			wrapVisualFlags |= SC_WRAPVISUALFLAG_START;
+			break;
+		case EditWrapSymbolLineNumberMargin:
+			wrapVisualFlags |= SC_WRAPVISUALFLAG_MARGIN;
+			if (!bShowLineNumbers) {
+				bShowLineNumbers = TRUE;
+				UpdateLineNumberWidth();
+			}
 			break;
 		}
 		SendMessage(hwndEdit, SCI_SETWRAPVISUALFLAGSLOCATION, wrapVisualFlagsLocation, 0);

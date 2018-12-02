@@ -86,14 +86,14 @@ enum {
 	EditWrapSymbolBeforeNone = 0,
 	EditWrapSymbolBeforeNearText = 1,
 	EditWrapSymbolBeforeNearBorder = 2,
-	EditWrapSymbolLineNumberMargin = 3,
 
 	EditWrapSymbolAfterNone = 0,
 	EditWrapSymbolAfterNearText = 1,
 	EditWrapSymbolAfterNearBorder = 2,
+	EditWrapSymbolLineNumberMargin = 3,
 
-	EditWrapSymbolBeforeMaxValue = EditWrapSymbolLineNumberMargin,
-	EditWrapSymbolAfterMaxValue = EditWrapSymbolAfterNearBorder,
+	EditWrapSymbolBeforeMaxValue = EditWrapSymbolBeforeNearBorder,
+	EditWrapSymbolAfterMaxValue = EditWrapSymbolLineNumberMargin,
 
 	EditWrapSymbolMaxValue = EditWrapSymbolBeforeMaxValue + 10 * EditWrapSymbolAfterMaxValue,
 	EditWrapSymbolDefaultValue = EditWrapSymbolBeforeNearBorder,
