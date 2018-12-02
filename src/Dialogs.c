@@ -1394,6 +1394,8 @@ extern int iWordWrapMode;
 extern int iWordWrapIndent;
 extern int iWordWrapSymbols;
 extern BOOL bShowWordWrapSymbols;
+extern BOOL bWordWrapSelectSubLine;
+extern BOOL bHighlightCurrentSubLine;
 
 static INT_PTR CALLBACK WordWrapSettingsDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
 	UNREFERENCED_PARAMETER(lParam);
@@ -1422,6 +1424,13 @@ static INT_PTR CALLBACK WordWrapSettingsDlgProc(HWND hwnd, UINT umsg, WPARAM wPa
 		SendDlgItemMessage(hwnd, IDC_WRAP_SYMBOL_AFTER, CB_SETCURSEL, bShowWordWrapSymbols ? (iWordWrapSymbols / 10) : 0, 0);
 		SendDlgItemMessage(hwnd, IDC_WRAP_MODE, CB_SETCURSEL, iWordWrapMode, 0);
 
+		if (bWordWrapSelectSubLine) {
+			CheckDlgButton(hwnd, IDC_WRAP_SELECT_SUBLINE, BST_CHECKED);
+		}
+		if (bHighlightCurrentSubLine) {
+			CheckDlgButton(hwnd, IDC_WRAP_HIGHLIGHT_SUBLINE, BST_CHECKED);
+		}
+
 		CenterDlgInParent(hwnd);
 	}
 	return TRUE;
@@ -1445,6 +1454,9 @@ static INT_PTR CALLBACK WordWrapSettingsDlgProc(HWND hwnd, UINT umsg, WPARAM wPa
 				fWordWrap = TRUE;
 				iWordWrapMode = iSel;
 			}
+
+			bWordWrapSelectSubLine = IsButtonChecked(hwnd, IDC_WRAP_SELECT_SUBLINE);
+			bHighlightCurrentSubLine = IsButtonChecked(hwnd, IDC_WRAP_HIGHLIGHT_SUBLINE);
 			EndDialog(hwnd, IDOK);
 		}
 		break;
