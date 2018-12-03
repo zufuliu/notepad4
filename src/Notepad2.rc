@@ -1450,8 +1450,8 @@ BEGIN
     CONTROL         "} after typing {.",IDC_AUTO_INSERT_BRACE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,238,31,80,10
     CONTROL         "] after typring [, except for Smali, Jasmin and javap.",IDC_AUTO_INSERT_SQUARE_BRACKET,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,238,43,210,10
     CONTROL         "> after typing <, when <> is used in generics / template.",IDC_AUTO_INSERT_ANGLE_BRACKET,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,238,55,210,10
-    CONTROL         "Double quote (""), when it's used to quote string / bytes.",IDC_AUTO_INSERT_DOUBLE_QUOTE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,238,67,210,10
-    CONTROL         "Single quote ('), when it's used to quote string / bytes.",IDC_AUTO_INSERT_SINGLE_QUOTE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,238,79,210,10
+    CONTROL         "Double quote (""), when """" is used to quote string / bytes.",IDC_AUTO_INSERT_DOUBLE_QUOTE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,238,67,210,10
+    CONTROL         "Single quote ('), when '' is used to quote string / bytes.",IDC_AUTO_INSERT_SINGLE_QUOTE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,238,79,210,10
     CONTROL         "Backtick (`).",IDC_AUTO_INSERT_BACKTICK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,238,91,80,10
     CONTROL         "Space after typing comma (,) when appropriate.",IDC_AUTO_INSERT_SPACE_COMMA,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,238,103,180,10
     GROUPBOX        "Characters used to toggle line comment for Assembler source",IDC_STATIC,231,123,218,26
