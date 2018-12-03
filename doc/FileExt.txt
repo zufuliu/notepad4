@@ -6,7 +6,7 @@ Default Text
 	asc				PGP ASCII Armored File
 	doc
 
-	Readme
+	Readme[.*]
 
 C/C++ Source
 	c
@@ -48,7 +48,7 @@ Java Source
 JavaScript
 	js
 	jse				JScript Encoded File
-	jsm
+	jsm				JavaScript Module
 
 JSON Document
 	json
@@ -77,17 +77,18 @@ Ruby Script
 	rb
 	ruby
 	rbw
-	rake			Ruby makefile
+	rake			Ruby Makefile
 	rjs				Ruby JavaScript
 	gemspec 		RubyGems Specification
 	podspec			CocoaPods
 
-	Rakefile		Ruby makefile
+	Rakefile		Ruby Makefile
 	Podfile			CocoaPods
 
 SQL Query
 	sql
 	mysql
+	hsql			Apache Hive
 
 Web Source Code
 	html

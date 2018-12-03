@@ -135,7 +135,7 @@ static KEYWORDLIST Keywords_SQL = {{
 }};
 
 
-EDITLEXER lexSQL = { SCLEX_SQL, NP2LEX_SQL, EDITLEXER_HOLE(L"SQL Query"), L"sql; mysql", &Keywords_SQL,
+EDITLEXER lexSQL = { SCLEX_SQL, NP2LEX_SQL, EDITLEXER_HOLE(L"SQL Query"), L"sql; mysql; hsql", &Keywords_SQL,
 {
 	EDITSTYLE_DEFAULT,
 	{ SCE_SQL_WORD, NP2STYLE_Keyword, EDITSTYLE_HOLE(L"Keyword"), L"bold; fore:#FF8040" },
