@@ -10,7 +10,7 @@
 * [Enhanced auto-completion for words and functions](https://github.com/zufuliu/notepad2/wiki/Auto-Completion-in-Notepad2)
 * [Context-based auto-completion for some words](https://github.com/zufuliu/notepad2/wiki/Auto-Completion-in-Notepad2#context-based-auto-completion)
 * [Enhanced auto indentation](https://github.com/zufuliu/notepad2/wiki/Auto-Completion-in-Notepad2#auto-indent-text)
-* [Auto completion for braces, brackets, quotes](https://github.com/zufuliu/notepad2/wiki/Auto-Completion-in-Notepad2#auto-close-bracesquotes)
+* [Auto completion for braces, brackets and quotes](https://github.com/zufuliu/notepad2/wiki/Auto-Completion-in-Notepad2#auto-insert-text)
 * Syntax highlighting and code folding for:
 	* Plain Text
 	* ActionScript
