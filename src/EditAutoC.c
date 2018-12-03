@@ -475,18 +475,19 @@ INT AutoC_AddSpecWord(struct WordList *pWList, int iCurrentStyle, int ch, int ch
 
 void EditCompleteUpdateConfig(void) {
 	int i = 0;
-	if (autoCompletionConfig.fAutoCompleteFillUpMask & AutoCompleteFillUpEnter) {
+	const int mask = autoCompletionConfig.fAutoCompleteFillUpMask;
+	if (mask & AutoCompleteFillUpEnter) {
 		autoCompletionConfig.szAutoCompleteFillUp[i++] = '\r';
 		autoCompletionConfig.szAutoCompleteFillUp[i++] = '\n';
 	}
-	if (autoCompletionConfig.fAutoCompleteFillUpMask & AutoCompleteFillUpTab) {
+	if (mask & AutoCompleteFillUpTab) {
 		autoCompletionConfig.szAutoCompleteFillUp[i++] = '\t';
 	}
-	if (autoCompletionConfig.fAutoCompleteFillUpMask & AutoCompleteFillUpSpace) {
+	if (mask & AutoCompleteFillUpSpace) {
 		autoCompletionConfig.szAutoCompleteFillUp[i++] = ' ';
 	}
 
-	const BOOL punctuation = autoCompletionConfig.fAutoCompleteFillUpMask & AutoCompleteFillUpPunctuation;
+	const BOOL punctuation = mask & AutoCompleteFillUpPunctuation;
 	int k = 0;
 	for (UINT j = 0; j < COUNTOF(autoCompletionConfig.wszAutoCompleteFillUp); j++) {
 		const WCHAR c = autoCompletionConfig.wszAutoCompleteFillUp[j];
@@ -499,6 +500,12 @@ void EditCompleteUpdateConfig(void) {
 				autoCompletionConfig.szAutoCompleteFillUp[i++] = (char)c;
 			}
 		}
+	}
+
+	if (i == 0) {
+		autoCompletionConfig.fAutoCompleteFillUpMask = AutoCompleteFillUpEnter;
+		autoCompletionConfig.szAutoCompleteFillUp[i++] = '\r';
+		autoCompletionConfig.szAutoCompleteFillUp[i++] = '\n';
 	}
 	autoCompletionConfig.szAutoCompleteFillUp[i] = '\0';
 	autoCompletionConfig.wszAutoCompleteFillUp[k] = L'\0';

@@ -1453,7 +1453,7 @@ BEGIN
     CONTROL         "Double quote (""), when it's used to quote string / bytes.",IDC_AUTO_INSERT_DOUBLE_QUOTE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,238,67,210,10
     CONTROL         "Single quote ('), when it's used to quote string / bytes.",IDC_AUTO_INSERT_SINGLE_QUOTE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,238,79,210,10
     CONTROL         "Backtick (`).",IDC_AUTO_INSERT_BACKTICK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,238,91,80,10
-    CONTROL         "Space after typing comma (,).",IDC_AUTO_INSERT_SPACE_COMMA,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,238,103,120,10
+    CONTROL         "Space after typing comma (,) when appropriate.",IDC_AUTO_INSERT_SPACE_COMMA,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,238,103,180,10
     GROUPBOX        "Characters used to toggle line comment for Assembler source",IDC_STATIC,231,123,218,26
     CONTROL         "Semicolon (;)",IDC_ASM_LINE_COMMENT_SEMICOLON,"Button",BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,238,135,60,10
     CONTROL         "#",IDC_ASM_LINE_COMMENT_SHARP,"Button",BS_AUTORADIOBUTTON,316,135,22,10
