@@ -343,20 +343,21 @@ static void Style_LoadOneEx(PEDITLEXER pLex, IniSection *pIniSection, WCHAR *pIn
 	const UINT iStyleCount = pLex->iStyleCount;
 	LPWSTR szStyleBuf = NP2HeapAlloc(EDITSTYLE_BufferSize(iStyleCount));
 	pLex->szStyleBuf = szStyleBuf;
-	for (UINT i = 0; i < iStyleCount; i++) {
-		pLex->Styles[i].szValue = szStyleBuf + (i * MAX_EDITSTYLE_VALUE_SIZE);
-	}
 	if (!IniSectionParse(pIniSection, pIniSectionBuf)) {
 		for (UINT i = 0; i < iStyleCount; i++) {
-			lstrcpy(pLex->Styles[i].szValue, pLex->Styles[i].pszDefault);
+			LPWSTR szValue = szStyleBuf + (i * MAX_EDITSTYLE_VALUE_SIZE);
+			pLex->Styles[i].szValue = szValue;
+			lstrcpy(szValue, pLex->Styles[i].pszDefault);
 		}
 	} else {
 		for (UINT i = 0; i < iStyleCount; i++) {
+			LPWSTR szValue = szStyleBuf + (i * MAX_EDITSTYLE_VALUE_SIZE);
+			pLex->Styles[i].szValue = szValue;
 			LPCWSTR value = IniSectionGetValueImpl(pIniSection, pLex->Styles[i].pszName, pLex->Styles[i].iNameLen);
 			if (value != NULL) {
-				lstrcpyn(pLex->Styles[i].szValue, value, MAX_EDITSTYLE_VALUE_SIZE);
+				lstrcpyn(szValue, value, MAX_EDITSTYLE_VALUE_SIZE);
 			} else {
-				lstrcpy(pLex->Styles[i].szValue, pLex->Styles[i].pszDefault);
+				lstrcpy(szValue, pLex->Styles[i].pszDefault);
 			}
 		}
 	}
