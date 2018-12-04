@@ -38,9 +38,7 @@ static KEYWORDLIST Keywords_Bash = {{
 , NULL, NULL, NULL, NULL, NULL, NULL, NULL
 }};
 
-
-EDITLEXER lexBash = { SCLEX_BASH, NP2LEX_BASH, EDITLEXER_HOLE(L"Shell Script"), L"sh; csh; zsh; bash; tcsh; m4; in", &Keywords_Bash,
-{
+static EDITSTYLE Styles_Bash[] = {
 	EDITSTYLE_DEFAULT,
 	//{ SCE_SH_ERROR, 63531, EDITSTYLE_HOLE(L"Error"), L"" },
 	{ MULTI_STYLE(SCE_SH_COMMENTLINE, 0, 0, 0), NP2STYLE_Comment, EDITSTYLE_HOLE(L"Comment"), L"fore:#608060" },
@@ -54,7 +52,13 @@ EDITLEXER lexBash = { SCLEX_BASH, NP2LEX_BASH, EDITLEXER_HOLE(L"Shell Script"), 
 	{ SCE_SH_BACKTICKS, NP2STYLE_Backticks, EDITSTYLE_HOLE(L"Backticks"), L"fore:#FF0080" },
 	{ SCE_SH_HERE_DELIM, 63537, EDITSTYLE_HOLE(L"Here-doc (Delimiter)"), L"fore:#A46000; back:#FFFFC0; eolfilled" },
 	{ SCE_SH_HERE_Q, 63538, EDITSTYLE_HOLE(L"Here-doc (Single Quoted, q)"), L"fore:#A46000; back:#FFFFC0; eolfilled" },
-	EDITSTYLE_SENTINEL
-}
+};
+
+EDITLEXER lexBash = {
+	SCLEX_BASH, NP2LEX_BASH,
+	EDITLEXER_HOLE(L"Shell Script", Styles_Bash),
+	L"sh; csh; zsh; bash; tcsh; m4; in",
+	&Keywords_Bash,
+	Styles_Bash
 };
 

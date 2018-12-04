@@ -99,9 +99,7 @@ NULL
 "java&{} resources^{}"
 }};
 
-
-EDITLEXER lexGradle = { SCLEX_CPP, NP2LEX_GRADLE, EDITLEXER_HOLE(L"Gradle Build Script"), L"gradle", &Keywords_Gradle,
-{
+static EDITSTYLE Styles_Gradle[] = {
 	EDITSTYLE_DEFAULT,
 	{ SCE_C_WORD, NP2STYLE_Keyword, EDITSTYLE_HOLE(L"Keyword"), L"fore:#0000FF" },
 	{ SCE_C_WORD2, NP2STYLE_TypeKeyword, EDITSTYLE_HOLE(L"Type Keyword"), L"fore:#0000FF" },
@@ -121,7 +119,13 @@ EDITLEXER lexGradle = { SCLEX_CPP, NP2LEX_GRADLE, EDITLEXER_HOLE(L"Gradle Build 
 	{ SCE_C_LABEL, NP2STYLE_Label, EDITSTYLE_HOLE(L"Label"), L"fore:#000000; back:#FFC040" },
 	{ SCE_C_NUMBER, NP2STYLE_Number, EDITSTYLE_HOLE(L"Number"), L"fore:#FF0000" },
 	{ SCE_C_OPERATOR, NP2STYLE_Operator, EDITSTYLE_HOLE(L"Operator"), L"fore:#B000B0" },
-	EDITSTYLE_SENTINEL
-}
+};
+
+EDITLEXER lexGradle = {
+	SCLEX_CPP, NP2LEX_GRADLE,
+	EDITLEXER_HOLE(L"Gradle Build Script", Styles_Gradle),
+	L"gradle",
+	&Keywords_Gradle,
+	Styles_Gradle
 };
 

@@ -48,9 +48,7 @@ static KEYWORDLIST Keywords_MAK = {{
 , NULL, NULL, NULL, NULL, NULL, NULL, NULL
 }};
 
-
-EDITLEXER lexMake = { SCLEX_MAKEFILE, NP2LEX_MAKE, EDITLEXER_HOLE(L"Makefile"), L"mak; make; mk; dsp; dsw; am; pro; pri; gmk; ninja", &Keywords_MAK,
-{
+static EDITSTYLE Styles_MAK[] = {
 	EDITSTYLE_DEFAULT,
 	{ SCE_MAKE_COMMENT, NP2STYLE_Comment, EDITSTYLE_HOLE(L"Comment"), L"fore:#008000" },
 	{ SCE_MAKE_PREPROCESSOR, NP2STYLE_Preprocessor, EDITSTYLE_HOLE(L"Preprocessor"), L"fore:#FF8000" },
@@ -58,7 +56,13 @@ EDITLEXER lexMake = { SCLEX_MAKEFILE, NP2LEX_MAKE, EDITLEXER_HOLE(L"Makefile"), 
 	{ MULTI_STYLE(SCE_MAKE_VARIABLE, SCE_MAKE_VARIABLE2, SCE_MAKE_VARIABLE3, 0), NP2STYLE_Variable, EDITSTYLE_HOLE(L"Variable"), L"fore:#003CE6" },
 	{ SCE_MAKE_OPERATOR, NP2STYLE_Operator, EDITSTYLE_HOLE(L"Operator"), L"fore:#B000B0" },
 	{ SCE_MAKE_TARGET, NP2STYLE_Target, EDITSTYLE_HOLE(L"Target"), L"fore:#003CE6; back:#FFC000" },
-	EDITSTYLE_SENTINEL
-}
+};
+
+EDITLEXER lexMake = {
+	SCLEX_MAKEFILE, NP2LEX_MAKE,
+	EDITLEXER_HOLE(L"Makefile", Styles_MAK),
+	L"mak; make; mk; dsp; dsw; am; pro; pri; gmk; ninja",
+	&Keywords_MAK,
+	Styles_MAK
 };
 

@@ -9,9 +9,7 @@ NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL
 , NULL, NULL, NULL, NULL, NULL, NULL, NULL
 }};
 
-
-EDITLEXER lexLaTeX = { SCLEX_LATEX, NP2LEX_LATEX, EDITLEXER_HOLE(L"LaTeX File"), L"tex; latex; sty; cls; tpx; bbl; bib; ltx; dtx; ins; toc; info", &Keywords_TEX,
-{
+static EDITSTYLE Styles_TEX[] = {
 	EDITSTYLE_DEFAULT,
 	{ SCE_L_COMMAND, NP2STYLE_Command, EDITSTYLE_HOLE(L"Command"), L"fore:#0000FF" },
 	{ MULTI_STYLE(SCE_L_COMMENT, SCE_L_COMMENT2, 0, 0), NP2STYLE_Comment, EDITSTYLE_HOLE(L"Comment"), L"fore:#608060" },
@@ -27,8 +25,14 @@ EDITLEXER lexLaTeX = { SCLEX_LATEX, NP2LEX_LATEX, EDITLEXER_HOLE(L"LaTeX File"),
 	{ MULTI_STYLE(SCE_L_VERBATIM, SCE_L_VERBATIM2, 0, 0), 63577, EDITSTYLE_HOLE(L"Verbatim Segment"), L"fore:#666666" },
 	{ SCE_L_LISTCODE, 63578, EDITSTYLE_HOLE(L"List Code"), L"fore:#808080" },
 	{ SCE_L_OPERATOR, NP2STYLE_Operator, EDITSTYLE_HOLE(L"Operator"), L"fore:#B000B0" },
-	EDITSTYLE_SENTINEL
-}
+};
+
+EDITLEXER lexLaTeX = {
+	SCLEX_LATEX, NP2LEX_LATEX,
+	EDITLEXER_HOLE(L"LaTeX File", Styles_TEX),
+	L"tex; latex; sty; cls; tpx; bbl; bib; ltx; dtx; ins; toc; info",
+	&Keywords_TEX,
+	Styles_TEX
 };
 
 
@@ -63,9 +67,7 @@ static KEYWORDLIST Keywords_TEXI = {{
 , NULL, NULL, NULL, NULL, NULL, NULL, NULL
 }};
 
-
-EDITLEXER lexTexinfo = { SCLEX_TEXINFO, NP2LEX_TEXINFO, EDITLEXER_HOLE(L"Texinfo File"), L"texi; texinfo; txi", &Keywords_TEXI,
-{
+static EDITSTYLE Styles_TEXI[] = {
 	EDITSTYLE_DEFAULT,
 	{ SCE_L_COMMAND, NP2STYLE_Command, EDITSTYLE_HOLE(L"Command"), L"fore:#0000FF" },
 	{ MULTI_STYLE(SCE_L_COMMENT, SCE_L_COMMENT2, 0, 0), NP2STYLE_Comment, EDITSTYLE_HOLE(L"Comment"), L"fore:#608060" },
@@ -74,7 +76,13 @@ EDITLEXER lexTexinfo = { SCLEX_TEXINFO, NP2LEX_TEXINFO, EDITLEXER_HOLE(L"Texinfo
 	{ MULTI_STYLE(SCE_L_SECTION, SCE_L_SECTION1, SCE_L_SECTION2, 0), 63511, EDITSTYLE_HOLE(L"Section"), L"back:#FF8040; eolfilled" },
 	{ SCE_L_SPECIAL, 63572, EDITSTYLE_HOLE(L"Special Char"), L"fore:#3A6EA5" },
 	{ SCE_L_OPERATOR, NP2STYLE_Operator, EDITSTYLE_HOLE(L"Operator"), L"fore:#B000B0" },
-	EDITSTYLE_SENTINEL
-}
+};
+
+EDITLEXER lexTexinfo = {
+	SCLEX_TEXINFO, NP2LEX_TEXINFO,
+	EDITLEXER_HOLE(L"Texinfo File", Styles_TEXI),
+	L"texi; texinfo; txi",
+	&Keywords_TEXI,
+	Styles_TEXI
 };
 

@@ -68,9 +68,7 @@ NULL
 " synchronized^() catch^() scope^() version^() mixin^() "
 }};
 
-
-EDITLEXER lexD = { SCLEX_CPP, NP2LEX_D, EDITLEXER_HOLE(L"D Source"), L"d; di; dd", &Keywords_D,
-{
+static EDITSTYLE Styles_D[] = {
 	EDITSTYLE_DEFAULT,
 	{ SCE_C_WORD, NP2STYLE_Keyword, EDITSTYLE_HOLE(L"Keyword"), L"fore:#0000FF" },
 	{ SCE_C_WORD2, NP2STYLE_TypeKeyword, EDITSTYLE_HOLE(L"Type Keyword"), L"fore:#0000FF" },
@@ -97,7 +95,13 @@ EDITLEXER lexD = { SCLEX_CPP, NP2LEX_D, EDITLEXER_HOLE(L"D Source"), L"d; di; dd
 	{ SCE_C_OPERATOR, NP2STYLE_Operator, EDITSTYLE_HOLE(L"Operator"), L"fore:#B000B0" },
 	{ SCE_C_ASM_INSTRUCTION, NP2STYLE_Instruction, EDITSTYLE_HOLE(L"Instruction"), L"fore:#0080FF" },
 	{ SCE_C_ASM_REGISTER, NP2STYLE_Register, EDITSTYLE_HOLE(L"Register"), L"fore:#FF8000" },
-	EDITSTYLE_SENTINEL
-}
+};
+
+EDITLEXER lexD = {
+	SCLEX_CPP, NP2LEX_D,
+	EDITLEXER_HOLE(L"D Source", Styles_D),
+	L"d; di; dd",
+	&Keywords_D,
+	Styles_D
 };
 

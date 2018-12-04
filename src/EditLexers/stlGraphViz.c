@@ -36,9 +36,7 @@ NULL
 , NULL, NULL, NULL, NULL, NULL, NULL, NULL
 }};
 
-
-EDITLEXER lexDOT = { SCLEX_GRAPHVIZ, NP2LEX_DOT, EDITLEXER_HOLE(L"GraphViz Dot"), L"dot; gv", &Keywords_DOT,
-{
+static EDITSTYLE Styles_DOT[] = {
 	EDITSTYLE_DEFAULT,
 	{ SCE_C_WORD, NP2STYLE_Keyword, EDITSTYLE_HOLE(L"Keyword"), L"fore:#0000FF" },
 	{ SCE_C_WORD2, NP2STYLE_Attribute, EDITSTYLE_HOLE(L"Attribute"), L"fore:#FF8000" },
@@ -48,7 +46,13 @@ EDITLEXER lexDOT = { SCLEX_GRAPHVIZ, NP2LEX_DOT, EDITLEXER_HOLE(L"GraphViz Dot")
 	{ SCE_C_STRING, NP2STYLE_String, EDITSTYLE_HOLE(L"String"), L"fore:#008000" },
 	{ SCE_C_NUMBER, NP2STYLE_Number, EDITSTYLE_HOLE(L"Number"), L"fore:#FF0000" },
 	{ SCE_C_OPERATOR, NP2STYLE_Operator, EDITSTYLE_HOLE(L"Operator"), L"fore:#B000B0"  },
-	EDITSTYLE_SENTINEL
-}
+};
+
+EDITLEXER lexDOT = {
+	SCLEX_GRAPHVIZ, NP2LEX_DOT,
+	EDITLEXER_HOLE(L"GraphViz Dot", Styles_DOT),
+	L"dot; gv",
+	&Keywords_DOT,
+	Styles_DOT
 };
 

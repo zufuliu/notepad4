@@ -118,9 +118,7 @@ NULL
 , NULL, NULL, NULL, NULL
 }};
 
-
-EDITLEXER lexSmali = { SCLEX_SMALI, NP2LEX_SMALI, EDITLEXER_HOLE(L"Android Smali"), L"smali; ddx", &Keywords_Smail,
-{
+static EDITSTYLE Styles_Smail[] = {
 	EDITSTYLE_DEFAULT,
 	{ SCE_SMALI_WORD, NP2STYLE_Keyword, EDITSTYLE_HOLE(L"Keyword"), L"fore:#0000FF" },
 	{ SCE_SMALI_DIRECTIVE, NP2STYLE_Directive, EDITSTYLE_HOLE(L"Directive"), L"fore:#FF8000" },
@@ -134,7 +132,13 @@ EDITLEXER lexSmali = { SCLEX_SMALI, NP2LEX_SMALI, EDITLEXER_HOLE(L"Android Smali
 	{ MULTI_STYLE(SCE_SMALI_LABEL, SCE_SMALI_LABEL_EOL, 0, 0), NP2STYLE_Label, EDITSTYLE_HOLE(L"Label"), L"fore:#000000; back:#FFC040; eolfilled" },
 	{ SCE_SMALI_NUMBER, NP2STYLE_Number, EDITSTYLE_HOLE(L"Number"), L"fore:#FF0000" },
 	{ SCE_SMALI_OPERATOR, NP2STYLE_Operator, EDITSTYLE_HOLE(L"Operator"), L"fore:#B000B0" },
-	EDITSTYLE_SENTINEL
-}
+};
+
+EDITLEXER lexSmali = {
+	SCLEX_SMALI, NP2LEX_SMALI,
+	EDITLEXER_HOLE(L"Android Smali", Styles_Smail),
+	L"smali; ddx",
+	&Keywords_Smail,
+	Styles_Smail
 };
 

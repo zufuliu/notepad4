@@ -41,9 +41,7 @@ NULL
 "defined() code_page() __has_include() "
 }};
 
-
-EDITLEXER lexRC = { SCLEX_CPP, NP2LEX_RC, EDITLEXER_HOLE(L"Resource Script"), L"rc; rc2; rct; rh; dlg", &Keywords_RC,
-{
+static EDITSTYLE Styles_RC[] = {
 	EDITSTYLE_DEFAULT,
 	{ SCE_C_WORD, NP2STYLE_Keyword, EDITSTYLE_HOLE(L"Keyword"), L"fore:#0000FF" },
 	{ SCE_C_PREPROCESSOR, NP2STYLE_Preprocessor, EDITSTYLE_HOLE(L"Preprocessor"), L"fore:#FF8000" },
@@ -51,7 +49,13 @@ EDITLEXER lexRC = { SCLEX_CPP, NP2LEX_RC, EDITLEXER_HOLE(L"Resource Script"), L"
 	{ MULTI_STYLE(SCE_C_STRING, SCE_C_CHARACTER, SCE_C_STRINGEOL, 0), NP2STYLE_String, EDITSTYLE_HOLE(L"String"), L"fore:#008000" },
 	{ SCE_C_NUMBER, NP2STYLE_Number, EDITSTYLE_HOLE(L"Number"), L"fore:#FF0000" },
 	{ SCE_C_OPERATOR, NP2STYLE_Operator, EDITSTYLE_HOLE(L"Operator"), L"fore:#B000B0" },
-	EDITSTYLE_SENTINEL
-}
+};
+
+EDITLEXER lexRC = {
+	SCLEX_CPP, NP2LEX_RC,
+	EDITLEXER_HOLE(L"Resource Script", Styles_RC),
+	L"rc; rc2; rct; rh; dlg",
+	&Keywords_RC,
+	Styles_RC
 };
 

@@ -45,9 +45,14 @@ NULL
 NULL
 };
 
-EDITLEXER lexCPP= { SCLEX_CPP, NP2LEX_CPP, EDITLEXER_HOLE(L"C/C++ Source"), L"c; cpp; cxx; cc; h; hpp; hxx; hh; inl; pch; mm; m", &Keywords_CPP,
-{
+static EDITSTYLE Styles_CPP[] = {
 	EDITSTYLE_DEFAULT,
-	EDITSTYLE_SENTINEL
-}
+};
+
+EDITLEXER lexCPP= {
+	SCLEX_CPP, NP2LEX_CPP,
+	EDITLEXER_HOLE(L"C/C++ Source"),
+	L"",
+	&Keywords_CPP,
+	Styles_CPP
 };

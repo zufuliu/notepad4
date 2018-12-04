@@ -134,9 +134,7 @@ static KEYWORDLIST Keywords_SQL = {{
 , NULL, NULL, NULL, NULL, NULL, NULL, NULL
 }};
 
-
-EDITLEXER lexSQL = { SCLEX_SQL, NP2LEX_SQL, EDITLEXER_HOLE(L"SQL Query"), L"sql; mysql; hsql", &Keywords_SQL,
-{
+static EDITSTYLE Styles_SQL[] = {
 	EDITSTYLE_DEFAULT,
 	{ SCE_SQL_WORD, NP2STYLE_Keyword, EDITSTYLE_HOLE(L"Keyword"), L"bold; fore:#FF8040" },
 	{ SCE_SQL_WORD2, NP2STYLE_TypeKeyword, EDITSTYLE_HOLE(L"Type Keyword"), L"bold; fore:#1E90FF" },
@@ -150,7 +148,13 @@ EDITLEXER lexSQL = { SCLEX_SQL, NP2LEX_SQL, EDITLEXER_HOLE(L"SQL Query"), L"sql;
 	{ MULTI_STYLE(SCE_SQL_BIT, SCE_SQL_BIT2, 0, 0), NP2STYLE_BitField, EDITSTYLE_HOLE(L"Bit Field"), L"fore:#C08000" },
 	{ SCE_SQL_VARIABLE, NP2STYLE_Variable, EDITSTYLE_HOLE(L"Variable"), L"fore:#CC3300" },
 	{ MULTI_STYLE(SCE_SQL_OPERATOR, SCE_SQL_QOPERATOR, 0, 0), NP2STYLE_Operator, EDITSTYLE_HOLE(L"Operator"), L"fore:#B000B0" },
-	EDITSTYLE_SENTINEL
-}
+};
+
+EDITLEXER lexSQL = {
+	SCLEX_SQL, NP2LEX_SQL,
+	EDITLEXER_HOLE(L"SQL Query", Styles_SQL),
+	L"sql; mysql; hsql",
+	&Keywords_SQL,
+	Styles_SQL
 };
 

@@ -33,9 +33,7 @@ NULL
 , NULL, NULL, NULL, NULL, NULL, NULL, NULL
 }};
 
-
-EDITLEXER lexGo = { SCLEX_CPP, NP2LEX_GO, EDITLEXER_HOLE(L"Go Source"), L"go", &Keywords_Go,
-{
+static EDITSTYLE Styles_Go[] = {
 	EDITSTYLE_DEFAULT,
 	{ SCE_C_WORD, NP2STYLE_Keyword, EDITSTYLE_HOLE(L"Keyword"), L"fore:#0000FF" },
 	{ SCE_C_WORD2, NP2STYLE_TypeKeyword, EDITSTYLE_HOLE(L"Type Keyword"), L"fore:#0000FF" },
@@ -48,7 +46,13 @@ EDITLEXER lexGo = { SCLEX_CPP, NP2LEX_GO, EDITLEXER_HOLE(L"Go Source"), L"go", &
 	{ SCE_C_DSTRINGB, NP2STYLE_Backticks, EDITSTYLE_HOLE(L"Backticks"), L"fore:#F08000" },
 	{ SCE_C_NUMBER, NP2STYLE_Number, EDITSTYLE_HOLE(L"Number"), L"fore:#FF0000" },
 	{ SCE_C_OPERATOR, NP2STYLE_Operator, EDITSTYLE_HOLE(L"Operator"), L"fore:#B000B0" },
-	EDITSTYLE_SENTINEL
-}
+};
+
+EDITLEXER lexGo = {
+	SCLEX_CPP, NP2LEX_GO,
+	EDITLEXER_HOLE(L"Go Source", Styles_Go),
+	L"go",
+	&Keywords_Go,
+	Styles_Go
 };
 

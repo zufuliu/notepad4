@@ -70,9 +70,7 @@ static KEYWORDLIST Keywords_VB = {{
 , NULL, NULL, NULL, NULL, NULL, NULL, NULL
 }};
 
-
-EDITLEXER lexVB = { SCLEX_VB, NP2LEX_VB, EDITLEXER_HOLE(L"Visual Basic"), L"vb; bas; frm; cls; ctl; pag; dsr; dob", &Keywords_VB,
-{
+static EDITSTYLE Styles_VB[] = {
 	EDITSTYLE_DEFAULT,
 	{ MULTI_STYLE(SCE_B_KEYWORD, SCE_B_KEYWORD3, 0, 0), NP2STYLE_Keyword, EDITSTYLE_HOLE(L"Keyword"), L"fore:#0000FF" },
 	{ SCE_B_KEYWORD2, NP2STYLE_TypeKeyword, EDITSTYLE_HOLE(L"Type Keyword"), L"fore:#0000FF" },
@@ -84,7 +82,13 @@ EDITLEXER lexVB = { SCLEX_VB, NP2LEX_VB, EDITLEXER_HOLE(L"Visual Basic"), L"vb; 
 	{ SCE_B_LABEL, NP2STYLE_Label, EDITSTYLE_HOLE(L"Label"), L"fore:#000000; back:#FFC040" },
 	{ MULTI_STYLE(SCE_B_NUMBER, SCE_B_DATE, 0, 0), NP2STYLE_Number, EDITSTYLE_HOLE(L"Number"), L"fore:#FF0000" },
 	{ SCE_B_OPERATOR, NP2STYLE_Operator, EDITSTYLE_HOLE(L"Operator"), L"fore:#B000B0" },
-	EDITSTYLE_SENTINEL
-}
+};
+
+EDITLEXER lexVB = {
+	SCLEX_VB, NP2LEX_VB,
+	EDITLEXER_HOLE(L"Visual Basic", Styles_VB),
+	L"vb; bas; frm; cls; ctl; pag; dsr; dob",
+	&Keywords_VB,
+	Styles_VB
 };
 

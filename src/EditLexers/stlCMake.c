@@ -39,9 +39,7 @@ NULL
 , NULL, NULL, NULL, NULL, NULL, NULL, NULL
 }};
 
-
-EDITLEXER lexCMake = { SCLEX_CMAKE, NP2LEX_CMAKE, EDITLEXER_HOLE(L"CMake Script"), L"cmake; ctest", &Keywords_CMake,
-{
+static EDITSTYLE Styles_CMake[] = {
 	EDITSTYLE_DEFAULT,
 	{ SCE_CMAKE_WORD, NP2STYLE_Keyword, EDITSTYLE_HOLE(L"Keyword"), L"fore:#0000FF" },
 	{ SCE_CMAKE_COMMANDS, NP2STYLE_Command, EDITSTYLE_HOLE(L"Command"), L"fore:#FF8000" },
@@ -52,7 +50,13 @@ EDITLEXER lexCMake = { SCLEX_CMAKE, NP2LEX_CMAKE, EDITLEXER_HOLE(L"CMake Script"
 	{ SCE_CMAKE_OPERATOR, NP2STYLE_Operator, EDITSTYLE_HOLE(L"Operator"), L"fore:#B000B0" },
 	{ SCE_CMAKE_FUNCATION, NP2STYLE_Function, EDITSTYLE_HOLE(L"Function"), L"fore:#808000" },
 	{ SCE_CMAKE_MACRO, NP2STYLE_Macro, EDITSTYLE_HOLE(L"Macro"), L"fore:#808000" },
-	EDITSTYLE_SENTINEL
-}
+};
+
+EDITLEXER lexCMake = {
+	SCLEX_CMAKE, NP2LEX_CMAKE,
+	EDITLEXER_HOLE(L"CMake Script", Styles_CMake),
+	L"cmake; ctest",
+	&Keywords_CMake,
+	Styles_CMake
 };
 

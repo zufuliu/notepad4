@@ -113,9 +113,7 @@ static KEYWORDLIST Keywords_AU3 = {{
 , NULL, NULL, NULL, NULL, NULL, NULL, NULL
 }};
 
-
-EDITLEXER lexAU3 = { SCLEX_AU3, NP2LEX_AU3, EDITLEXER_HOLE(L"AutoIt3 Script"), L"au3", &Keywords_AU3,
-{
+static EDITSTYLE Styles_AU3[] = {
 	EDITSTYLE_DEFAULT,
 	{ SCE_AU3_KEYWORD, NP2STYLE_Keyword, EDITSTYLE_HOLE(L"Keyword"), L"fore:#0000FF" },
 	{ SCE_AU3_FUNCTION, NP2STYLE_Function, EDITSTYLE_HOLE(L"Function"), L"fore:#0000FF" },
@@ -128,7 +126,13 @@ EDITLEXER lexAU3 = { SCLEX_AU3, NP2LEX_AU3, EDITLEXER_HOLE(L"AutoIt3 Script"), L
 	{ SCE_AU3_SENT, 63491, EDITSTYLE_HOLE(L"Send Key"), L"fore:#FF0000" },
 	{ SCE_AU3_PREPROCESSOR, NP2STYLE_Preprocessor, EDITSTYLE_HOLE(L"Preprocessor"), L"fore:#FF8000" },
 	{ SCE_AU3_SPECIAL, 63492, EDITSTYLE_HOLE(L"Special"), L"fore:#FF8000" },
-	EDITSTYLE_SENTINEL
-}
+};
+
+EDITLEXER lexAU3 = {
+	SCLEX_AU3, NP2LEX_AU3,
+	EDITLEXER_HOLE(L"AutoIt3 Script", Styles_AU3),
+	L"au3",
+	&Keywords_AU3,
+	Styles_AU3
 };
 

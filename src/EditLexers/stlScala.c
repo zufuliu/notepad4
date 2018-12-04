@@ -38,9 +38,7 @@ NULL
 "for^() if^() switch^() while^() catch^() else^if^() else^{} "
 }};
 
-
-EDITLEXER lexScala = { SCLEX_CPP, NP2LEX_SCALA, EDITLEXER_HOLE(L"Scala Script"), L"scala", &Keywords_Scala,
-{
+static EDITSTYLE Styles_Scala[] = {
 	EDITSTYLE_DEFAULT,
 	{ SCE_C_WORD, NP2STYLE_Keyword, EDITSTYLE_HOLE(L"Keyword"), L"fore:#0000FF" },
 	{ SCE_C_WORD2, NP2STYLE_TypeKeyword, EDITSTYLE_HOLE(L"Type Keyword"), L"fore:#0000FF" },
@@ -58,7 +56,13 @@ EDITLEXER lexScala = { SCLEX_CPP, NP2LEX_SCALA, EDITLEXER_HOLE(L"Scala Script"),
 	{ MULTI_STYLE(SCE_C_XML_TAG, SCE_C_XML_ASSIGN, 0, 0), NP2STYLE_XMLTag, EDITSTYLE_HOLE(L"XML Tag"), L"fore:#648000" },
 	{ SCE_C_XML_ATTR, NP2STYLE_XMLAttribute, EDITSTYLE_HOLE(L"XML Attribute"), L"fore:#FF0000" },
 	{ SCE_C_XML_VALUE, NP2STYLE_XMLValue, EDITSTYLE_HOLE(L"XML Value"), L"fore:#1A1AA6" },
-	EDITSTYLE_SENTINEL
-}
+};
+
+EDITLEXER lexScala = {
+	SCLEX_CPP, NP2LEX_SCALA,
+	EDITLEXER_HOLE(L"Scala Script", Styles_Scala),
+	L"scala",
+	&Keywords_Scala,
+	Styles_Scala
 };
 

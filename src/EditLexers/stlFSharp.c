@@ -29,9 +29,7 @@ static KEYWORDLIST Keywords_FSharp = {{
 , NULL, NULL, NULL, NULL, NULL, NULL, NULL
 }};
 
-
-EDITLEXER lexFSharp = { SCLEX_FSHARP, NP2LEX_FSHARP, EDITLEXER_HOLE(L"F# Source"), L"fs; fsi; fsx; fsscript; fsl; fsy; ml; mli; sml; nb", &Keywords_FSharp,
-{
+static EDITSTYLE Styles_FSharp[] = {
 	EDITSTYLE_DEFAULT,
 	{ SCE_FSHARP_KEYWORD, NP2STYLE_Keyword, EDITSTYLE_HOLE(L"Keyword"), L"fore:#0000FF" },
 	{ SCE_FSHARP_TYPEKEYWORD, NP2STYLE_TypeKeyword, EDITSTYLE_HOLE(L"Type Keyword"), L"fore:#1E90FF" },
@@ -43,7 +41,13 @@ EDITLEXER lexFSharp = { SCLEX_FSHARP, NP2LEX_FSHARP, EDITLEXER_HOLE(L"F# Source"
 	{ SCE_FSHARP_QUOTATION, NP2STYLE_CodeQuotation, EDITSTYLE_HOLE(L"Code Quotation"), L"fore:#006633; back:#FFF1A8" },
 	{ SCE_FSHARP_NUMBER, NP2STYLE_Number, EDITSTYLE_HOLE(L"Number"), L"fore:#FF0000" },
 	{ SCE_FSHARP_OPERATOR, NP2STYLE_Operator, EDITSTYLE_HOLE(L"Operator"), L"fore:#B000B0" },
-	EDITSTYLE_SENTINEL
-}
+};
+
+EDITLEXER lexFSharp = {
+	SCLEX_FSHARP, NP2LEX_FSHARP,
+	EDITLEXER_HOLE(L"F# Source", Styles_FSharp),
+	L"fs; fsi; fsx; fsscript; fsl; fsy; ml; mli; sml; nb",
+	&Keywords_FSharp,
+	Styles_FSharp
 };
 

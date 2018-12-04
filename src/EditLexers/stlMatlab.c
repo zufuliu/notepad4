@@ -37,9 +37,7 @@ static KEYWORDLIST Keywords_Matlab = {{
 , NULL, NULL, NULL, NULL, NULL, NULL, NULL
 }};
 
-
-EDITLEXER lexMatlab = { SCLEX_MATLAB, NP2LEX_MATLAB, EDITLEXER_HOLE(L"MATLAB Code"), L"m; sce; sci", &Keywords_Matlab,
-{
+static EDITSTYLE Styles_Matlab[] = {
 	EDITSTYLE_DEFAULT,
 	{ SCE_MAT_KEYWORD, NP2STYLE_Keyword, EDITSTYLE_HOLE(L"Keyword"), L"fore:#0000FF" },
 	{ SCE_MAT_ATTRIBUTE, NP2STYLE_Attribute, EDITSTYLE_HOLE(L"Attribte"), L"fore:#FF8000" },
@@ -51,7 +49,13 @@ EDITLEXER lexMatlab = { SCLEX_MATLAB, NP2LEX_MATLAB, EDITLEXER_HOLE(L"MATLAB Cod
 	{ MULTI_STYLE(SCE_MAT_STRING, SCE_MAT_DOUBLEQUOTESTRING, 0, 0), NP2STYLE_String, EDITSTYLE_HOLE(L"String"), L"fore:#008000" },
 	{ MULTI_STYLE(SCE_MAT_NUMBER, SCE_MAT_HEXNUM, 0, 0), NP2STYLE_Number, EDITSTYLE_HOLE(L"Number"), L"fore:#FF0000" },
 	{ SCE_MAT_OPERATOR, NP2STYLE_Operator, EDITSTYLE_HOLE(L"Operator"), L"fore:#B000B0" },
-	EDITSTYLE_SENTINEL
-}
+};
+
+EDITLEXER lexMatlab = {
+	SCLEX_MATLAB, NP2LEX_MATLAB,
+	EDITLEXER_HOLE(L"MATLAB Code", Styles_Matlab),
+	L"m; sce; sci",
+	&Keywords_Matlab,
+	Styles_Matlab
 };
 

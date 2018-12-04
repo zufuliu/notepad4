@@ -20,9 +20,7 @@ NULL, NULL, NULL
 , NULL, NULL, NULL, NULL, NULL, NULL, NULL
 }};
 
-
-EDITLEXER lexXML = { SCLEX_XML, NP2LEX_XML, EDITLEXER_HOLE(L"XML Document"), L"xml; xsl; xslt; xsd; dtd; rss; svg; xul; axl; rdf; xaml; resx; plist; mm; xrc; fbp", &Keywords_XML,
-{
+static EDITSTYLE Styles_XML[] = {
 	EDITSTYLE_DEFAULT,
 	{ MULTI_STYLE(SCE_H_TAG, SCE_H_TAGUNKNOWN, SCE_H_TAGEND, 0), NP2STYLE_XMLTag, EDITSTYLE_HOLE(L"XML Tag"), L"fore:#8B008B" },
 	{ MULTI_STYLE(SCE_H_ATTRIBUTE, SCE_H_ATTRIBUTEUNKNOWN, 0, 0), NP2STYLE_XMLAttribute, EDITSTYLE_HOLE(L"XML Attribute"), L"fore:#FF0000" },
@@ -35,7 +33,13 @@ EDITLEXER lexXML = { SCLEX_XML, NP2LEX_XML, EDITLEXER_HOLE(L"XML Document"), L"x
 	{ MULTI_STYLE(SCE_H_XMLSTART, SCE_H_XMLEND, 0, 0), NP2STYLE_XMLIdentifier, EDITSTYLE_HOLE(L"XML Identifier"), L"bold; fore:#881280" },
 	{ MULTI_STYLE(SCE_H_SGML_DEFAULT, SCE_H_SGML_BLOCK_DEFAULT, SCE_H_SGML_COMMAND, SCE_H_SGML_ENTITY), NP2STYLE_XMLSGML, EDITSTYLE_HOLE(L"SGML"), L"fore:#881280" },
 	{ SCE_H_CDATA, NP2STYLE_XMLCDATA, EDITSTYLE_HOLE(L"CDATA"), L"fore:#646464" },
-	EDITSTYLE_SENTINEL
-}
+};
+
+EDITLEXER lexXML = {
+	SCLEX_XML, NP2LEX_XML,
+	EDITLEXER_HOLE(L"XML Document", Styles_XML),
+	L"xml; xsl; xslt; xsd; dtd; rss; svg; xul; axl; rdf; xaml; resx; plist; mm; xrc; fbp",
+	&Keywords_XML,
+	Styles_XML
 };
 

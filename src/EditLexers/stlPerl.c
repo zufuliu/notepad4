@@ -33,9 +33,7 @@ static KEYWORDLIST Keywords_Perl = {{
 , NULL, NULL, NULL, NULL, NULL, NULL, NULL
 }};
 
-
-EDITLEXER lexPerl = { SCLEX_PERL, NP2LEX_PERL, EDITLEXER_HOLE(L"Perl Script"), L"pl; pm; cgi; pod; plx; stp", &Keywords_Perl,
-{
+static EDITSTYLE Styles_Perl[] = {
 	EDITSTYLE_DEFAULT,
 	{ SCE_PL_COMMENTLINE, NP2STYLE_Comment, EDITSTYLE_HOLE(L"Comment"), L"fore:#608060" },
 	{ SCE_PL_WORD, NP2STYLE_Keyword, EDITSTYLE_HOLE(L"Keyword"), L"bold; fore:#FF8000" },
@@ -68,7 +66,13 @@ EDITLEXER lexPerl = { SCLEX_PERL, NP2LEX_PERL, EDITLEXER_HOLE(L"Perl Script"), L
 	//{ SCE_PL_PUNCTUATION, EDITSTYLE_HOLE(L"Symbols / Punctuation (not used)"), L"" },
 	//{ SCE_PL_PREPROCESSOR, EDITSTYLE_HOLE(L"Preprocessor (not used)"), L"" },
 	//{ SCE_PL_LONGQUOTE, EDITSTYLE_HOLE(L"Long Quote (qq, qr, qw, qx) (not used)"), L"" },
-	EDITSTYLE_SENTINEL
-}
+};
+
+EDITLEXER lexPerl = {
+	SCLEX_PERL, NP2LEX_PERL,
+	EDITLEXER_HOLE(L"Perl Script", Styles_Perl),
+	L"pl; pm; cgi; pod; plx; stp",
+	&Keywords_Perl,
+	Styles_Perl
 };
 
