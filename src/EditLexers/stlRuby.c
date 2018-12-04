@@ -23,9 +23,7 @@ static KEYWORDLIST Keywords_Ruby = {{
 , NULL, NULL, NULL, NULL, NULL, NULL, NULL
 }};
 
-
-EDITLEXER lexRuby = { SCLEX_RUBY, NP2LEX_RUBY, EDITLEXER_HOLE(L"Ruby Script"), L"rb; ruby; rbw; rake; rjs; gemspec; podspec", &Keywords_Ruby,
-{
+static EDITSTYLE Styles_Ruby[] = {
 	EDITSTYLE_DEFAULT,
 	{ SCE_RB_WORD, NP2STYLE_Keyword, EDITSTYLE_HOLE(L"Keyword"), L"bold; fore:#FF8000" },
 	{ SCE_RB_MODULE_NAME, 63471, EDITSTYLE_HOLE(L"Module"), L"bold; fore:#007F7F" },
@@ -42,7 +40,13 @@ EDITLEXER lexRuby = { SCLEX_RUBY, NP2LEX_RUBY, EDITLEXER_HOLE(L"Ruby Script"), L
 	{ SCE_RB_SYMBOL, 63473, EDITSTYLE_HOLE(L"Symbol"), L"bold; fore:#FF4F0F" },
 	{ MULTI_STYLE(SCE_RB_CLASS_VAR, SCE_RB_INSTANCE_VAR, SCE_RB_GLOBAL, 0), NP2STYLE_Variable, EDITSTYLE_HOLE(L"Variable"), L"fore:#003CE6" },
 	{ SCE_RB_DATASECTION, 63475, EDITSTYLE_HOLE(L"Data Section"), L"fore:#600000; back:#FFF0D8; eolfilled" },
-	EDITSTYLE_SENTINEL
-}
+};
+
+EDITLEXER lexRuby = {
+	SCLEX_RUBY, NP2LEX_RUBY,
+	EDITLEXER_HOLE(L"Ruby Script", Styles_Ruby),
+	L"rb; ruby; rbw; rake; rjs; gemspec; podspec",
+	&Keywords_Ruby,
+	Styles_Ruby
 };
 

@@ -42,9 +42,7 @@ NULL
 "def^() "
 }};
 
-
-EDITLEXER lexGroovy = { SCLEX_CPP, NP2LEX_GROOVY, EDITLEXER_HOLE(L"Groovy Script"), L"groovy; gvy; gy; gsh; gpp; grunit", &Keywords_Groovy,
-{
+static EDITSTYLE Styles_Groovy[] = {
 	EDITSTYLE_DEFAULT,
 	{ SCE_C_WORD, NP2STYLE_Keyword, EDITSTYLE_HOLE(L"Keyword"), L"fore:#0000FF" },
 	{ SCE_C_WORD2, NP2STYLE_TypeKeyword, EDITSTYLE_HOLE(L"Type Keyword"), L"fore:#0000FF" },
@@ -63,7 +61,13 @@ EDITLEXER lexGroovy = { SCLEX_CPP, NP2LEX_GROOVY, EDITLEXER_HOLE(L"Groovy Script
 	{ SCE_C_LABEL, NP2STYLE_Label, EDITSTYLE_HOLE(L"Label"), L"fore:#000000; back:#FFC040" },
 	{ SCE_C_NUMBER, NP2STYLE_Number, EDITSTYLE_HOLE(L"Number"), L"fore:#FF0000" },
 	{ SCE_C_OPERATOR, NP2STYLE_Operator, EDITSTYLE_HOLE(L"Operator"), L"fore:#B000B0" },
-	EDITSTYLE_SENTINEL
-}
+};
+
+EDITLEXER lexGroovy = {
+	SCLEX_CPP, NP2LEX_GROOVY,
+	EDITLEXER_HOLE(L"Groovy Script", Styles_Groovy),
+	L"groovy; gvy; gy; gsh; gpp; grunit",
+	&Keywords_Groovy,
+	Styles_Groovy
 };
 

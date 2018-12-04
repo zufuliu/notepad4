@@ -27,9 +27,7 @@ NULL
 , NULL, NULL, NULL, NULL, NULL, NULL, NULL
 }};
 
-
-EDITLEXER lexJAM = { SCLEX_CPP, NP2LEX_JAM, EDITLEXER_HOLE(L"Jamfile"), L"jam", &Keywords_JAM,
-{
+static EDITSTYLE Styles_JAM[] = {
 	EDITSTYLE_DEFAULT,
 	{ SCE_C_WORD, NP2STYLE_Keyword, EDITSTYLE_HOLE(L"Keyword"), L"fore:#0000FF" },
 	{ SCE_C_CONSTANT, NP2STYLE_BuildinRule, EDITSTYLE_HOLE(L"Build-in Rule"), L"fore:#0080FF" },
@@ -38,7 +36,13 @@ EDITLEXER lexJAM = { SCLEX_CPP, NP2LEX_JAM, EDITLEXER_HOLE(L"Jamfile"), L"jam", 
 	{ SCE_C_NUMBER, NP2STYLE_Number, EDITSTYLE_HOLE(L"Number"), L"fore:#FF0000" },
 	{ SCE_C_VARIABLE2, NP2STYLE_Variable, EDITSTYLE_HOLE(L"Variable"), L"fore:#CC3300" },
 	{ SCE_C_OPERATOR, NP2STYLE_Operator, EDITSTYLE_HOLE(L"Operator"), L"fore:#B000B0" },
-	EDITSTYLE_SENTINEL
-}
+};
+
+EDITLEXER lexJAM = {
+	SCLEX_CPP, NP2LEX_JAM,
+	EDITLEXER_HOLE(L"Jamfile", Styles_JAM),
+	L"jam",
+	&Keywords_JAM,
+	Styles_JAM
 };
 

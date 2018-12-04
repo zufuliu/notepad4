@@ -128,9 +128,7 @@ NULL
 , NULL, NULL, NULL, NULL, NULL, NULL, NULL
 }};
 
-
-EDITLEXER lexHTML = { SCLEX_HTML, NP2LEX_HTML, EDITLEXER_HOLE(L"Web Source Code"), L"html; htm; shtml; xhtml; asp; aspx; jsp; mht; htd; htt; hta; htc; cfm; tpl; jd", &Keywords_HTML,
-{
+static EDITSTYLE Styles_HTML[] = {
 	EDITSTYLE_DEFAULT,
 	{ MULTI_STYLE(SCE_H_TAG, SCE_H_TAGEND, 0, 0), 63161, EDITSTYLE_HOLE(L"HTML Tag"), L"fore:#648000" },
 	{ SCE_H_TAGUNKNOWN, 63162, EDITSTYLE_HOLE(L"HTML Unknown Tag"), L"fore:#C80000" },
@@ -218,7 +216,13 @@ EDITLEXER lexHTML = { SCLEX_HTML, NP2LEX_HTML, EDITLEXER_HOLE(L"Web Source Code"
 	//{ SCE_HPA_DEFNAME, EDITSTYLE_HOLE(L"ASP Phyton Def Name"), L"" },
 	//{ SCE_HPA_OPERATOR, EDITSTYLE_HOLE(L"ASP Phyton Operator"), L"" },
 	//{ SCE_HPA_IDENTIFIER, EDITSTYLE_HOLE(L"ASP Phyton Identifier"), L"" },
-	EDITSTYLE_SENTINEL
-}
+};
+
+EDITLEXER lexHTML = {
+	SCLEX_HTML, NP2LEX_HTML,
+	EDITLEXER_HOLE(L"Web Source Code", Styles_HTML),
+	L"html; htm; shtml; xhtml; asp; aspx; jsp; mht; htd; htt; hta; htc; cfm; tpl; jd",
+	&Keywords_HTML,
+	Styles_HTML
 };
 

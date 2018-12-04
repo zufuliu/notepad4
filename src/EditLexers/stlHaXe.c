@@ -35,9 +35,7 @@ NULL
 "for^() if^() switch^() while^() else^if^() else^{} "
 }};
 
-
-EDITLEXER lexHaXe = { SCLEX_CPP, NP2LEX_HAXE, EDITLEXER_HOLE(L"HaXe Script"), L"hx", &Keywords_HaXe,
-{
+static EDITSTYLE Styles_HaXe[] = {
 	EDITSTYLE_DEFAULT,
 	{ SCE_C_WORD, NP2STYLE_Keyword, EDITSTYLE_HOLE(L"Keyword"), L"fore:#0000FF" },
 	{ SCE_C_WORD2, NP2STYLE_TypeKeyword, EDITSTYLE_HOLE(L"Type Keyword"), L"fore:#1E90FF" },
@@ -55,7 +53,13 @@ EDITLEXER lexHaXe = { SCLEX_CPP, NP2LEX_HAXE, EDITLEXER_HOLE(L"HaXe Script"), L"
 	{ SCE_C_NUMBER, NP2STYLE_Number, EDITSTYLE_HOLE(L"Number"), L"fore:#FF0000" },
 	{ SCE_C_VARIABLE, NP2STYLE_Variable, EDITSTYLE_HOLE(L"Variable"), L"fore:#CC3300" },
 	{ SCE_C_OPERATOR, NP2STYLE_Operator, EDITSTYLE_HOLE(L"Operator"), L"fore:#B000B0" },
-	EDITSTYLE_SENTINEL
-}
+};
+
+EDITLEXER lexHaXe = {
+	SCLEX_CPP, NP2LEX_HAXE,
+	EDITLEXER_HOLE(L"HaXe Script", Styles_HaXe),
+	L"hx",
+	&Keywords_HaXe,
+	Styles_HaXe
 };
 

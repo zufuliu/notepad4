@@ -33,9 +33,7 @@ NULL
 , NULL, NULL, NULL, NULL, NULL, NULL, NULL
 }};
 
-
-EDITLEXER lexJulia = { SCLEX_MATLAB, NP2LEX_JULIA, EDITLEXER_HOLE(L"Julia Script"), L"jl", &Keywords_Julia,
-{
+static EDITSTYLE Styles_Julia[] = {
 	EDITSTYLE_DEFAULT,
 	{ SCE_MAT_KEYWORD, NP2STYLE_Keyword, EDITSTYLE_HOLE(L"Keyword"), L"fore:#0000FF" },
 	{ SCE_MAT_ATTRIBUTE, NP2STYLE_TypeKeyword, EDITSTYLE_HOLE(L"Type Keyword"), L"fore:#0080FF" },
@@ -51,7 +49,13 @@ EDITLEXER lexJulia = { SCLEX_MATLAB, NP2LEX_JULIA, EDITLEXER_HOLE(L"Julia Script
 	{ SCE_MAT_REGEX, NP2STYLE_Regex, EDITSTYLE_HOLE(L"Regex"), L"fore:#006633; back:#FFF1A8" },
 	{ SCE_MAT_VARIABLE, NP2STYLE_Variable, EDITSTYLE_HOLE(L"Variable"), L"fore:#CC3300" },
 	{ SCE_MAT_OPERATOR, NP2STYLE_Operator, EDITSTYLE_HOLE(L"Operator"), L"fore:#B000B0" },
-	EDITSTYLE_SENTINEL
-}
+};
+
+EDITLEXER lexJulia = {
+	SCLEX_MATLAB, NP2LEX_JULIA,
+	EDITLEXER_HOLE(L"Julia Script", Styles_Julia),
+	L"jl",
+	&Keywords_Julia,
+	Styles_Julia
 };
 

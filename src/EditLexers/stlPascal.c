@@ -25,9 +25,7 @@ static KEYWORDLIST Keywords_Pascal = {{
 , NULL, NULL, NULL, NULL, NULL, NULL, NULL
 }};
 
-
-EDITLEXER lexPascal = { SCLEX_PASCAL, NP2LEX_PASCAL, EDITLEXER_HOLE(L"Pascal Source"), L"pas; inc; dpr; dpk; dfm; pp; lfm; lpr; fpd", &Keywords_Pascal,
-{
+static EDITSTYLE Styles_Pascal[] = {
 	EDITSTYLE_DEFAULT,
 	{ SCE_PAS_WORD, NP2STYLE_Keyword, EDITSTYLE_HOLE(L"Keyword"), L"bold; fore:#FF8000" },
 	{ SCE_PAS_TYPE, NP2STYLE_TypeKeyword, EDITSTYLE_HOLE(L"Type Keyword"), L"bold; fore:#1E90FF" },
@@ -39,7 +37,13 @@ EDITLEXER lexPascal = { SCLEX_PASCAL, NP2LEX_PASCAL, EDITLEXER_HOLE(L"Pascal Sou
 	{ MULTI_STYLE(SCE_PAS_NUMBER, SCE_PAS_HEXNUMBER, 0, 0), NP2STYLE_Number, EDITSTYLE_HOLE(L"Number"), L"fore:#FF0000" },
 	{ SCE_PAS_OPERATOR, NP2STYLE_Operator, EDITSTYLE_HOLE(L"Operator"), L"fore:#B000B0" },
 	{ SCE_PAS_ASM, NP2STYLE_InlineAsm, EDITSTYLE_HOLE(L"Inline Asm"), L"#fore:#408080" },
-	EDITSTYLE_SENTINEL
-}
+};
+
+EDITLEXER lexPascal = {
+	SCLEX_PASCAL, NP2LEX_PASCAL,
+	EDITLEXER_HOLE(L"Pascal Source", Styles_Pascal),
+	L"pas; inc; dpr; dpk; dfm; pp; lfm; lpr; fpd",
+	&Keywords_Pascal,
+	Styles_Pascal
 };
 

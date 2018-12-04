@@ -40,9 +40,7 @@ NULL
 , NULL, NULL, NULL, NULL, NULL, NULL, NULL
 }};
 
-
-EDITLEXER lexBatch = { SCLEX_BATCH, NP2LEX_BATCH, EDITLEXER_HOLE(L"Batch File"), L"bat; cmd", &Keywords_Batch,
-{
+static EDITSTYLE Styles_Batch[] = {
 	EDITSTYLE_DEFAULT,
 	{ SCE_BAT_COMMENT, NP2STYLE_Comment, EDITSTYLE_HOLE(L"Comment"), L"fore:#008000" },
 	{ SCE_BAT_WORD, NP2STYLE_Keyword, EDITSTYLE_HOLE(L"Keyword"), L"bold; fore:#FF8000" },
@@ -51,7 +49,13 @@ EDITLEXER lexBatch = { SCLEX_BATCH, NP2LEX_BATCH, EDITLEXER_HOLE(L"Batch File"),
 	{ SCE_BAT_VARIABLE, NP2STYLE_Variable, EDITSTYLE_HOLE(L"Variable"), L"fore:#003CE6; back:#FFF1A8" },
 	{ SCE_BAT_OPERATOR, NP2STYLE_Operator, EDITSTYLE_HOLE(L"Operator"), L"fore:#B000B0" },
 	{ SCE_BAT_LABEL, NP2STYLE_Label, EDITSTYLE_HOLE(L"Label"), L"fore:#C80000; back:#F4F4F4" },
-	EDITSTYLE_SENTINEL
-}
+};
+
+EDITLEXER lexBatch = {
+	SCLEX_BATCH, NP2LEX_BATCH,
+	EDITLEXER_HOLE(L"Batch File", Styles_Batch),
+	L"bat; cmd",
+	&Keywords_Batch,
+	Styles_Batch
 };
 

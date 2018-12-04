@@ -435,9 +435,7 @@ static KEYWORDLIST Keywords_CPP = {{
 "__except^() __alignof() __declspec() __uuidof() "
 }};
 
-
-EDITLEXER lexCPP = { SCLEX_CPP, NP2LEX_CPP, EDITLEXER_HOLE(L"C/C++ Source"), L"c; cpp; cxx; cc; h; hpp; hxx; hh; inl; pch; idl; odl; midl; mm; xpm", &Keywords_CPP,
-{
+static EDITSTYLE Styles_CPP[] = {
 	EDITSTYLE_DEFAULT,
 	{ MULTI_STYLE(SCE_C_WORD, SCE_C_2NDWORD, 0, 0), NP2STYLE_Keyword, EDITSTYLE_HOLE(L"Keyword"), L"fore:#0000FF" },
 	{ SCE_C_WORD2, NP2STYLE_TypeKeyword, EDITSTYLE_HOLE(L"Type Keyword"), L"fore:#0000FF" },
@@ -463,7 +461,13 @@ EDITLEXER lexCPP = { SCLEX_CPP, NP2LEX_CPP, EDITLEXER_HOLE(L"C/C++ Source"), L"c
 	{ SCE_C_OPERATOR, NP2STYLE_Operator, EDITSTYLE_HOLE(L"Operator"), L"fore:#B000B0" },
 	{ SCE_C_ASM_INSTRUCTION, NP2STYLE_Instruction, EDITSTYLE_HOLE(L"Instruction"), L"fore:#0080FF" },
 	{ SCE_C_ASM_REGISTER, NP2STYLE_Register, EDITSTYLE_HOLE(L"Register"), L"fore:#FF8000" },
-	EDITSTYLE_SENTINEL
-}
+};
+
+EDITLEXER lexCPP = {
+	SCLEX_CPP, NP2LEX_CPP,
+	EDITLEXER_HOLE(L"C/C++ Source", Styles_CPP),
+	L"c; cpp; cxx; cc; h; hpp; hxx; hh; inl; pch; idl; odl; midl; mm; xpm",
+	&Keywords_CPP,
+	Styles_CPP
 };
 

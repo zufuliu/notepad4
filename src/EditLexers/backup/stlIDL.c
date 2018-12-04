@@ -24,8 +24,7 @@ static KEYWORDLIST Keywords_IDL = {{
 , NULL
 }};
 
-EDITLEXER lexIDL = { SCLEX_CPP, NP2LEX_IDL, EDITLEXER_HOLE(L"Interface Definition File"), L"idl; odl; midl", &Keywords_IDL,
-{
+static EDITSTYLE Styles_IDL[] = {
 	EDITSTYLE_DEFAULT,
 	{ SCE_C_WORD, NP2STYLE_Keyword, EDITSTYLE_HOLE(L"Keyword"), L"fore:#0000FF" },
 	{ SCE_C_WORD2, NP2STYLE_TypeKeyword, EDITSTYLE_HOLE(L"Type Keyword"), L"fore:#0000FF" },
@@ -40,6 +39,12 @@ EDITLEXER lexIDL = { SCLEX_CPP, NP2LEX_IDL, EDITLEXER_HOLE(L"Interface Definitio
 	{ MULTI_STYLE(SCE_C_STRING, SCE_C_CHARACTER, SCE_C_STRINGEOL, 0), NP2STYLE_String, L"String", L"fore:#008000", L"" },
 	{ SCE_C_NUMBER, NP2STYLE_Number, EDITSTYLE_HOLE(L"Number"), L"fore:#FF0000" },
 	{ SCE_C_OPERATOR, NP2STYLE_Operator, EDITSTYLE_HOLE(L"Operator"), L"fore:#B000B0" },
-	EDITSTYLE_SENTINEL
-}
+};
+
+EDITLEXER lexIDL = {
+	SCLEX_CPP, NP2LEX_IDL,
+	EDITLEXER_HOLE(L"Interface Definition File"),
+	L"idl; odl; midl",
+	&Keywords_IDL,
+	Styles_IDL
 };

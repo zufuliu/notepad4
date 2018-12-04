@@ -37,9 +37,7 @@ NULL
 "for^() if^() switch^() while^() else^if^() else^{} "
 }};
 
-
-EDITLEXER lexAS = { SCLEX_CPP, NP2LEX_AS, EDITLEXER_HOLE(L"ActionScript"), L"as", &Keywords_AS,
-{
+static EDITSTYLE Styles_AS[] = {
 	EDITSTYLE_DEFAULT,
 	{ SCE_C_WORD, NP2STYLE_Keyword, EDITSTYLE_HOLE(L"Keyword"), L"fore:#0000FF" },
 	{ SCE_C_WORD2, NP2STYLE_TypeKeyword, EDITSTYLE_HOLE(L"Type Keyword"), L"fore:#1E90FF" },
@@ -54,7 +52,13 @@ EDITLEXER lexAS = { SCLEX_CPP, NP2LEX_AS, EDITLEXER_HOLE(L"ActionScript"), L"as"
 	{ SCE_C_LABEL, NP2STYLE_Label, EDITSTYLE_HOLE(L"Label"), L"fore:#000000; back:#FFC040" },
 	{ SCE_C_NUMBER, NP2STYLE_Number, EDITSTYLE_HOLE(L"Number"), L"fore:#FF0000" },
 	{ SCE_C_OPERATOR, NP2STYLE_Operator, EDITSTYLE_HOLE(L"Operator"), L"fore:#B000B0" },
-	EDITSTYLE_SENTINEL
-}
+};
+
+EDITLEXER lexAS = {
+	SCLEX_CPP, NP2LEX_AS,
+	EDITLEXER_HOLE(L"ActionScript", Styles_AS),
+	L"as",
+	&Keywords_AS,
+	Styles_AS
 };
 

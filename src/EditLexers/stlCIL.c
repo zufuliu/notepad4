@@ -78,9 +78,7 @@ NULL
 "ctor() "
 }};
 
-
-EDITLEXER lexCIL = { SCLEX_CIL, NP2LEX_CIL, EDITLEXER_HOLE(L".NET IL"), L"il", &Keywords_CIL,
-{
+static EDITSTYLE Styles_CIL[] = {
 	EDITSTYLE_DEFAULT,
 	{ SCE_C_WORD, NP2STYLE_Keyword, EDITSTYLE_HOLE(L"Keyword"), L"fore:#0000FF" },
 	{ SCE_C_WORD2, NP2STYLE_TypeKeyword, EDITSTYLE_HOLE(L"Type Keyword"), L"fore:#0000FF" },
@@ -95,7 +93,13 @@ EDITLEXER lexCIL = { SCLEX_CIL, NP2LEX_CIL, EDITLEXER_HOLE(L".NET IL"), L"il", &
 	{ SCE_C_NUMBER, NP2STYLE_Number, EDITSTYLE_HOLE(L"Number"), L"fore:#FF0000" },
 	{ SCE_C_OPERATOR, NP2STYLE_Operator, EDITSTYLE_HOLE(L"Operator"), L"fore:#B000B0" },
 	//{ SCE_C_ASM_REGISTER, NP2STYLE_Register, EDITSTYLE_HOLE(L"Register"), L"fore:#FF8000" },
-	EDITSTYLE_SENTINEL
-}
+};
+
+EDITLEXER lexCIL = {
+	SCLEX_CIL, NP2LEX_CIL,
+	EDITLEXER_HOLE(L".NET IL", Styles_CIL),
+	L"il",
+	&Keywords_CIL,
+	Styles_CIL
 };
 

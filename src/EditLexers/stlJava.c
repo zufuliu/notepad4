@@ -112,9 +112,7 @@ NULL
 "for^() if^() switch^() while^() catch^() else^if^() else^{} synchronized^() try^() "
 }};
 
-
-EDITLEXER lexJava = { SCLEX_CPP, NP2LEX_JAVA, EDITLEXER_HOLE(L"Java Source"), L"java; jad; aidl; bsh", &Keywords_Java,
-{
+static EDITSTYLE Styles_Java[] = {
 	EDITSTYLE_DEFAULT,
 	{ SCE_C_WORD, NP2STYLE_Keyword, EDITSTYLE_HOLE(L"Keyword"), L"fore:#0000FF" },
 	{ SCE_C_WORD2, NP2STYLE_TypeKeyword, EDITSTYLE_HOLE(L"Type Keyword"), L"fore:#0000FF" },
@@ -133,7 +131,13 @@ EDITLEXER lexJava = { SCLEX_CPP, NP2LEX_JAVA, EDITLEXER_HOLE(L"Java Source"), L"
 	{ SCE_C_LABEL, NP2STYLE_Label, EDITSTYLE_HOLE(L"Label"), L"fore:#000000; back:#FFC040" },
 	{ SCE_C_NUMBER, NP2STYLE_Number, EDITSTYLE_HOLE(L"Number"), L"fore:#FF0000" },
 	{ SCE_C_OPERATOR, NP2STYLE_Operator, EDITSTYLE_HOLE(L"Operator"), L"fore:#B000B0" },
-	EDITSTYLE_SENTINEL
-}
+};
+
+EDITLEXER lexJava = {
+	SCLEX_CPP, NP2LEX_JAVA,
+	EDITLEXER_HOLE(L"Java Source", Styles_Java),
+	L"java; jad; aidl; bsh",
+	&Keywords_Java,
+	Styles_Java
 };
 

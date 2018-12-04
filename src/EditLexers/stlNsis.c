@@ -23,9 +23,7 @@ NULL
 , NULL, NULL, NULL, NULL, NULL, NULL, NULL
 }};
 
-
-EDITLEXER lexNsis = { SCLEX_NSIS, NP2LEX_NSIS, EDITLEXER_HOLE(L"Nsis Setup Script"), L"nsi; nsh", &Keywords_NSIS,
-{
+static EDITSTYLE Styles_NSIS[] = {
 	EDITSTYLE_DEFAULT,
 	{ SCE_C_WORD, NP2STYLE_Keyword, EDITSTYLE_HOLE(L"Keyword"), L"fore:#0000FF" },
 	{ SCE_C_PREPROCESSOR, NP2STYLE_Preprocessor, EDITSTYLE_HOLE(L"Preprocessor"), L"fore:#FF8000" },
@@ -35,7 +33,13 @@ EDITLEXER lexNsis = { SCLEX_NSIS, NP2LEX_NSIS, EDITLEXER_HOLE(L"Nsis Setup Scrip
 	{ MULTI_STYLE(SCE_C_ASM_INSTRUCTION, SCE_C_ASM_REGISTER, SCE_C_COMMENTDOC_TAG, 0), NP2STYLE_Variable, EDITSTYLE_HOLE(L"Variable"), L"fore:#CC3300" },
 	{ SCE_C_OPERATOR, NP2STYLE_Operator, EDITSTYLE_HOLE(L"Operator"), L"fore:#B000B0" },
 	{ SCE_C_LABEL, NP2STYLE_Label, EDITSTYLE_HOLE(L"Label"), L"fore:#000000; back:#FFC040" },
-	EDITSTYLE_SENTINEL
-}
+};
+
+EDITLEXER lexNsis = {
+	SCLEX_NSIS, NP2LEX_NSIS,
+	EDITLEXER_HOLE(L"Nsis Setup Script", Styles_NSIS),
+	L"nsi; nsh",
+	&Keywords_NSIS,
+	Styles_NSIS
 };
 
