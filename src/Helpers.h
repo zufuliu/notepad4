@@ -440,10 +440,16 @@ int ResizeDlg_CalcDeltaY2(HWND hwnd, int dy, int cy, int nCtlId1, int nCtlId2);
 
 HDWP DeferCtlPos(HDWP hdwp, HWND hwndDlg, int nCtlId, int dx, int dy, UINT uFlags);
 void ResizeDlgCtl(HWND hwndDlg, int nCtlId, int dx, int dy);
+
+#define SendWMCommandEx(hwnd, id, extra)	SendMessage(hwnd, WM_COMMAND, MAKEWPARAM((id), (extra)), 0)
+#define SendWMCommand(hwnd, id)				SendWMCommandEx(hwnd, id, 1)
+#define PostWMCommand(hwnd, id)				PostMessage(hwnd, WM_COMMAND, MAKEWPARAM((id), 1), 0)
+
 void MultilineEditSetup(HWND hwndDlg, int nCtlId);
 // EN_CHANGE is not sent when the ES_MULTILINE style is used and the text is sent through WM_SETTEXT.
 // https://docs.microsoft.com/en-us/windows/desktop/Controls/en-change
-#define NotifyEditTextChanged(hwndDlg, nCtlId)	SendMessage(hwndDlg, WM_COMMAND, MAKEWPARAM(nCtlId, EN_CHANGE), 0)
+#define NotifyEditTextChanged(hwndDlg, nCtlId)	SendWMCommandEx(hwndDlg, nCtlId, EN_CHANGE)
+
 void MakeBitmapButton(HWND hwnd, int nCtlId, HINSTANCE hInstance, WORD wBmpId);
 void MakeColorPickButton(HWND hwnd, int nCtlId, HINSTANCE hInstance, COLORREF crColor);
 void DeleteBitmapButton(HWND hwnd, int nCtlId);
@@ -470,6 +476,14 @@ LRESULT SendWMSize(HWND hwnd);
 BOOL IsCmdEnabled(HWND hwnd, UINT uId);
 #define IsButtonChecked(hwnd, uId)	(IsDlgButtonChecked(hwnd, (uId)) == BST_CHECKED)
 INT GetCheckedRadioButton(HWND hwnd, int nIDFirstButton, int nIDLastButton);
+
+NP2_inline void SendWMCommandOrBeep(HWND hwnd, UINT id) {
+	if (IsCmdEnabled(hwnd, id)) {
+		SendWMCommand(hwnd, id);
+	} else {
+		MessageBeep(0);
+	}
+}
 
 #define GetString(id, pb, cb)	LoadString(g_hInstance, id, pb, cb)
 #define StrEnd(pStart)			((pStart) + lstrlen(pStart))

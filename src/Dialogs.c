@@ -581,7 +581,7 @@ static INT_PTR CALLBACK OpenWithDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPA
 
 			case NM_DBLCLK:
 				if (ListView_GetSelectedCount(GetDlgItem(hwnd, IDC_OPENWITHDIR))) {
-					SendMessage(hwnd, WM_COMMAND, MAKELONG(IDOK, 1), 0);
+					SendWMCommand(hwnd, IDOK);
 				}
 				break;
 			}
@@ -756,7 +756,7 @@ static INT_PTR CALLBACK FavoritesDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LP
 
 			case NM_DBLCLK:
 				if (ListView_GetSelectedCount(GetDlgItem(hwnd, IDC_FAVORITESDIR))) {
-					SendMessage(hwnd, WM_COMMAND, MAKELONG(IDOK, 1), 0);
+					SendWMCommand(hwnd, IDOK);
 				}
 				break;
 			}
@@ -1027,7 +1027,7 @@ static INT_PTR CALLBACK FileMRUDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 		ListView_InsertColumn(hwndLV, 0, &lvc);
 
 		// Update view
-		SendMessage(hwnd, WM_COMMAND, MAKELONG(0x00A0, 1), 0);
+		SendWMCommand(hwnd, 0x00A0);
 
 		if (bSaveRecentFiles) {
 			CheckDlgButton(hwnd, IDC_SAVEMRU, BST_CHECKED);
@@ -1086,7 +1086,7 @@ static INT_PTR CALLBACK FileMRUDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 		if (pnmhdr->idFrom == IDC_FILEMRU) {
 			switch (pnmhdr->code) {
 			case NM_DBLCLK:
-				SendMessage(hwnd, WM_COMMAND, MAKELONG(IDOK, 1), 0);
+				SendWMCommand(hwnd, IDOK);
 				break;
 
 			case LVN_GETDISPINFO: {
@@ -1161,7 +1161,7 @@ static INT_PTR CALLBACK FileMRUDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 					MRU_Add(pFileMRU, szCurFile);
 				}
 				MRU_Save(pFileMRU);
-				SendMessage(hwnd, WM_COMMAND, MAKELONG(0x00A0, 1), 0);
+				SendWMCommand(hwnd, 0x00A0);
 			}
 		}
 	}
@@ -1245,7 +1245,7 @@ static INT_PTR CALLBACK FileMRUDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 						//SendDlgItemMessage(hwnd, IDC_FILEMRU, LB_DELETESTRING, iItem, 0);
 						//ListView_DeleteItem(GetDlgItem(hwnd, IDC_FILEMRU), lvi.iItem);
 						// must use IDM_VIEW_REFRESH,  index might change...
-						SendMessage(hwnd, WM_COMMAND, MAKELONG(0x00A0, 1), 0);
+						SendWMCommand(hwnd, 0x00A0);
 
 						//EnableWindow(GetDlgItem(hwnd, IDOK),
 						//	(LB_ERR != SendDlgItemMessage(hwnd, IDC_GOTO, LB_GETCURSEL, 0, 0)));
@@ -1780,7 +1780,7 @@ static INT_PTR CALLBACK SelectEncodingDlgProc(HWND hwnd, UINT umsg, WPARAM wPara
 		if (((LPNMHDR)(lParam))->idFrom == IDC_ENCODINGLIST) {
 			switch (((LPNMHDR)(lParam))->code) {
 			case NM_DBLCLK:
-				SendMessage(hwnd, WM_COMMAND, MAKELONG(IDOK, 1), 0);
+				SendWMCommand(hwnd, IDOK);
 				break;
 
 			case LVN_ITEMCHANGED:

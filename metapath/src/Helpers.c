@@ -1499,15 +1499,15 @@ BOOL History_CanBack(PHISTORY ph) {
 
 void History_UpdateToolbar(PHISTORY ph, HWND hwnd, int cmdBack, int cmdForward) {
 	if (History_CanBack(ph)) {
-		SendMessage(hwnd, TB_ENABLEBUTTON, cmdBack, MAKELONG(1, 0));
+		SendMessage(hwnd, TB_ENABLEBUTTON, cmdBack, MAKELPARAM(1, 0));
 	} else {
-		SendMessage(hwnd, TB_ENABLEBUTTON, cmdBack, MAKELONG(0, 0));
+		SendMessage(hwnd, TB_ENABLEBUTTON, cmdBack, MAKELPARAM(0, 0));
 	}
 
 	if (History_CanForward(ph)) {
-		SendMessage(hwnd, TB_ENABLEBUTTON, cmdForward, MAKELONG(1, 0));
+		SendMessage(hwnd, TB_ENABLEBUTTON, cmdForward, MAKELPARAM(1, 0));
 	} else {
-		SendMessage(hwnd, TB_ENABLEBUTTON, cmdForward, MAKELONG(0, 0));
+		SendMessage(hwnd, TB_ENABLEBUTTON, cmdForward, MAKELPARAM(0, 0));
 	}
 }
 

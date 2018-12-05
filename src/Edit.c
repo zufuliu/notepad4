@@ -4637,11 +4637,11 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 			break;
 
 		case IDACC_FIND:
-			PostMessage(GetParent(hwnd), WM_COMMAND, MAKELONG(IDM_EDIT_FIND, 1), 0);
+			PostWMCommand(hwndMain, IDM_EDIT_FIND);
 			break;
 
 		case IDACC_REPLACE:
-			PostMessage(GetParent(hwnd), WM_COMMAND, MAKELONG(IDM_EDIT_REPLACE, 1), 0);
+			PostWMCommand(hwndMain, IDM_EDIT_REPLACE);
 			break;
 
 		case IDACC_SAVEPOS:
@@ -4654,21 +4654,21 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 			break;
 
 		case IDACC_FINDNEXT:
-			PostMessage(hwnd, WM_COMMAND, MAKELONG(IDOK, 1), 0);
+			PostWMCommand(hwnd, IDOK);
 			break;
 
 		case IDACC_FINDPREV:
-			PostMessage(hwnd, WM_COMMAND, MAKELONG(IDC_FINDPREV, 1), 0);
+			PostWMCommand(hwnd, IDC_FINDPREV);
 			break;
 
 		case IDACC_REPLACENEXT:
 			if (GetDlgItem(hwnd, IDC_REPLACE) != NULL) {
-				PostMessage(hwnd, WM_COMMAND, MAKELONG(IDC_REPLACE, 1), 0);
+				PostWMCommand(hwnd, IDC_REPLACE);
 			}
 			break;
 
 		case IDACC_SAVEFIND: {
-			SendMessage(hwndMain, WM_COMMAND, MAKELONG(IDM_EDIT_SAVEFIND, 1), 0);
+			SendWMCommand(hwndMain, IDM_EDIT_SAVEFIND);
 			LPEDITFINDREPLACE lpefr = (LPEDITFINDREPLACE)GetWindowLongPtr(hwnd, DWLP_USER);
 			SetDlgItemTextA2W(CP_UTF8, hwnd, IDC_FINDTEXT, lpefr->szFindUTF8);
 			CheckDlgButton(hwnd, IDC_FINDREGEXP, BST_UNCHECKED);
@@ -4687,9 +4687,9 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 			switch (pnmhdr->idFrom) {
 			case IDC_TOGGLEFINDREPLACE:
 				if (GetDlgItem(hwnd, IDC_REPLACE)) {
-					PostMessage(GetParent(hwnd), WM_COMMAND, MAKELONG(IDM_EDIT_FIND, 1), 0);
+					PostWMCommand(hwndMain, IDM_EDIT_FIND);
 				} else {
-					PostMessage(GetParent(hwnd), WM_COMMAND, MAKELONG(IDM_EDIT_REPLACE, 1), 0);
+					PostWMCommand(hwndMain, IDM_EDIT_REPLACE);
 				}
 				break;
 
@@ -4723,11 +4723,11 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 				break;
 
 			case IDC_SAVEPOSITION:
-				PostMessage(hwnd, WM_COMMAND, MAKELONG(IDACC_SAVEPOS, 0), 0);
+				PostWMCommand(hwnd, IDACC_SAVEPOS);
 				break;
 
 			case IDC_RESETPOSITION:
-				PostMessage(hwnd, WM_COMMAND, MAKELONG(IDACC_RESETPOS, 0), 0);
+				PostWMCommand(hwnd, IDACC_RESETPOS);
 				break;
 			}
 			break;

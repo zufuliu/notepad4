@@ -3607,7 +3607,7 @@ static INT_PTR CALLBACK Style_SelectLexerDlgProc(HWND hwnd, UINT umsg, WPARAM wP
 		if (((LPNMHDR)(lParam))->idFrom == IDC_STYLELIST) {
 			switch (((LPNMHDR)(lParam))->code) {
 			case NM_DBLCLK:
-				SendMessage(hwnd, WM_COMMAND, MAKELONG(IDOK, 1), 0);
+				SendWMCommand(hwnd, IDOK);
 				break;
 
 			case LVN_ITEMCHANGED:

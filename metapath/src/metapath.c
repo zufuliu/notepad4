@@ -399,7 +399,7 @@ HWND InitInstance(HINSTANCE hInstance, int nCmdShow) {
 
 	// Update Dirlist
 	if (!ListView_GetItemCount(hwndDirList)) {
-		PostMessage(hwndMain, WM_COMMAND, MAKELONG(IDM_VIEW_UPDATE, 1), 0);
+		PostWMCommand(hwndMain, IDM_VIEW_UPDATE);
 	}
 
 	return hwndMain;
@@ -511,7 +511,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 			DirList_GetItem(hwndDirList, -1, &dli);
 
 			FindNextChangeNotification(hChangeHandle);
-			SendMessage(hwnd, WM_COMMAND, MAKELONG(IDM_VIEW_UPDATE, 1), 0);
+			SendWMCommand(hwnd, IDM_VIEW_UPDATE);
 
 			// must use SendMessage() !!
 			if (dli.ntype != DLE_NONE) {
@@ -1009,7 +1009,7 @@ void MsgThemeChanged(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	RECT rc;
 	GetClientRect(hwnd, &rc);
-	SendMessage(hwnd, WM_SIZE, SIZE_RESTORED, MAKELONG(rc.right, rc.bottom));
+	SendMessage(hwnd, WM_SIZE, SIZE_RESTORED, MAKELPARAM(rc.right, rc.bottom));
 
 	StatusSetText(hwndStatus, ID_FILEINFO, chStatus);
 }
@@ -1369,7 +1369,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			SetCurrentDirectory(szPath);
 
 			// Select new file
-			SendMessage(hwnd, WM_COMMAND, MAKELONG(IDM_VIEW_UPDATE, 1), 0);
+			SendWMCommand(hwnd, IDM_VIEW_UPDATE);
 			SHFILEINFO shfi;
 			SHGetFileInfo(szNewFile, 0, &shfi, sizeof(SHFILEINFO), SHGFI_DISPLAYNAME);
 			if (!DirList_SelectItem(hwndDirList, shfi.szDisplayName, szNewFile)) {
@@ -1515,7 +1515,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		// Check if there are any changes in the directory, then update!
 		if (WAIT_OBJECT_0 == WaitForSingleObject(hChangeHandle, 0)) {
 
-			SendMessage(hwnd, WM_COMMAND, MAKELONG(IDM_VIEW_UPDATE, 1), 0);
+			SendWMCommand(hwnd, IDM_VIEW_UPDATE);
 			if (iItem > 0) {
 				iItem--;
 			}
@@ -1587,7 +1587,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		} else {
 			dwFillMask |= DL_FOLDERS;
 		}
-		SendMessage(hwnd, WM_COMMAND, MAKELONG(IDM_VIEW_UPDATE, 1), 0);
+		SendWMCommand(hwnd, IDM_VIEW_UPDATE);
 		ListView_EnsureVisible(hwndDirList, 0, FALSE); // not done by update
 		break;
 
@@ -1597,7 +1597,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		} else {
 			dwFillMask |= DL_NONFOLDERS;
 		}
-		SendMessage(hwnd, WM_COMMAND, MAKELONG(IDM_VIEW_UPDATE, 1), 0);
+		SendWMCommand(hwnd, IDM_VIEW_UPDATE);
 		ListView_EnsureVisible(hwndDirList, 0, FALSE); // not done by update
 		break;
 
@@ -1607,7 +1607,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		} else {
 			dwFillMask |= DL_INCLHIDDEN;
 		}
-		SendMessage(hwnd, WM_COMMAND, MAKELONG(IDM_VIEW_UPDATE, 1), 0);
+		SendWMCommand(hwnd, IDM_VIEW_UPDATE);
 		ListView_EnsureVisible(hwndDirList, 0, FALSE); // not done by update
 		break;
 
@@ -1619,7 +1619,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			dli.ntype = DLE_NONE;
 			DirList_GetItem(hwndDirList, -1, &dli);
 
-			SendMessage(hwnd, WM_COMMAND, MAKELONG(IDM_VIEW_UPDATE, 1), 0);
+			SendWMCommand(hwnd, IDM_VIEW_UPDATE);
 
 			if (dli.ntype != DLE_NONE) {
 				if (!DirList_SelectItem(hwndDirList, dli.szDisplayName, dli.szFileName)) {
@@ -1642,7 +1642,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			dli.ntype = DLE_NONE;
 			DirList_GetItem(hwndDirList, -1, &dli);
 
-			SendMessage(hwnd, WM_COMMAND, MAKELONG(IDM_VIEW_UPDATE, 1), 0);
+			SendWMCommand(hwnd, IDM_VIEW_UPDATE);
 
 			if (dli.ntype != DLE_NONE) {
 				if (!DirList_SelectItem(hwndDirList, dli.szDisplayName, dli.szFileName)) {
@@ -1874,7 +1874,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 							}
 
 							SetCurrentDirectory(szDir);
-							SendMessage(hwndMain, WM_COMMAND, MAKELONG(IDM_VIEW_UPDATE, 1), 0);
+							SendWMCommand(hwndMain, IDM_VIEW_UPDATE);
 							if (!DirList_SelectItem(hwndDirList, NULL, szFullPath)) {
 								ListView_EnsureVisible(hwndDirList, 0, FALSE);
 							}
@@ -1958,7 +1958,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	break;
 
 	case IDT_VIEW_FAVORITES:
-		SendMessage(hwnd, WM_COMMAND, MAKELONG(IDM_VIEW_FAVORITES, 1), 0);
+		SendWMCommand(hwnd, IDM_VIEW_FAVORITES);
 		break;
 
 	case IDT_FILE_NEXT: {
@@ -1990,7 +1990,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			ListView_SetItemState(hwndDirList, i, LVIS_FOCUSED | LVIS_SELECTED, LVIS_FOCUSED | LVIS_SELECTED);
 			ListView_EnsureVisible(hwndDirList, i, FALSE);
 			ListView_Update(hwndDirList, i);
-			SendMessage(hwnd, WM_COMMAND, MAKELONG(IDM_FILE_OPEN, 1), 0);
+			SendWMCommand(hwnd, IDM_FILE_OPEN);
 		} else {
 			MessageBeep(0);
 		}
@@ -2027,7 +2027,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			ListView_SetItemState(hwndDirList, i, LVIS_FOCUSED | LVIS_SELECTED, LVIS_FOCUSED | LVIS_SELECTED);
 			ListView_EnsureVisible(hwndDirList, i, FALSE);
 			ListView_Update(hwndDirList, i);
-			SendMessage(hwnd, WM_COMMAND, MAKELONG(IDM_FILE_OPEN, 1), 0);
+			SendWMCommand(hwnd, IDM_FILE_OPEN);
 		} else {
 			MessageBeep(0);
 		}
@@ -2035,12 +2035,12 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	break;
 
 	case IDT_FILE_RUN:
-		SendMessage(hwnd, WM_COMMAND, MAKELONG(IDM_FILE_RUN, 1), 0);
+		SendWMCommand(hwnd, IDM_FILE_RUN);
 		break;
 
 	case IDT_FILE_QUICKVIEW:
 		if (DirList_IsFileSelected(hwndDirList)) {
-			SendMessage(hwnd, WM_COMMAND, MAKELONG(IDM_FILE_QUICKVIEW, 1), 0);
+			SendWMCommand(hwnd, IDM_FILE_QUICKVIEW);
 		} else {
 			MessageBeep(0);
 		}
@@ -2048,7 +2048,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	case IDT_FILE_SAVEAS:
 		if (DirList_IsFileSelected(hwndDirList)) {
-			SendMessage(hwnd, WM_COMMAND, MAKELONG(IDM_FILE_SAVEAS, 1), 0);
+			SendWMCommand(hwnd, IDM_FILE_SAVEAS);
 		} else {
 			MessageBeep(0);
 		}
@@ -2056,7 +2056,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	case IDT_FILE_COPYMOVE:
 		if (ListView_GetSelectedCount(hwndDirList)) {
-			SendMessage(hwnd, WM_COMMAND, MAKELONG(IDM_FILE_COPYMOVE, 1), 0);
+			SendWMCommand(hwnd, IDM_FILE_COPYMOVE);
 		} else {
 			MessageBeep(0);
 		}
@@ -2066,7 +2066,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		if (ListView_GetSelectedCount(hwndDirList)) {
 			const BOOL fUseRecycleBin2 = fUseRecycleBin;
 			fUseRecycleBin = 1;
-			SendMessage(hwnd, WM_COMMAND, MAKELONG(IDM_FILE_DELETE, 1), 0);
+			SendWMCommand(hwnd, IDM_FILE_DELETE);
 			fUseRecycleBin = fUseRecycleBin2;
 		} else {
 			MessageBeep(0);
@@ -2075,14 +2075,14 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	case IDT_FILE_DELETE2:
 		if (ListView_GetSelectedCount(hwndDirList)) {
-			SendMessage(hwnd, WM_COMMAND, MAKELONG(IDM_FILE_DELETE2, 1), 0);
+			SendWMCommand(hwnd, IDM_FILE_DELETE2);
 		} else {
 			MessageBeep(0);
 		}
 		break;
 
 	case IDT_VIEW_FILTER:
-		SendMessage(hwnd, WM_COMMAND, MAKELONG(IDM_VIEW_FILTER, 1), 0);
+		SendWMCommand(hwnd, IDM_VIEW_FILTER);
 		break;
 	}
 
@@ -2176,11 +2176,11 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		case NM_CLICK:
 			if (bSingleClick && ListView_GetSelectedCount(hwndDirList)) {
 				if (HIBYTE(GetKeyState(VK_MENU))) {
-					SendMessage(hwnd, WM_COMMAND, MAKELONG(IDM_FILE_PROPERTIES, 1), 0);
+					SendWMCommand(hwnd, IDM_FILE_PROPERTIES);
 				} else if (HIBYTE(GetKeyState(VK_SHIFT))) {
-					SendMessage(hwnd, WM_COMMAND, MAKELONG(IDM_FILE_OPENNEW, 1), 0);
+					SendWMCommand(hwnd, IDM_FILE_OPENNEW);
 				} else {
-					SendMessage(hwnd, WM_COMMAND, MAKELONG(IDM_FILE_OPEN, 1), 0);
+					SendWMCommand(hwnd, IDM_FILE_OPEN);
 				}
 			}
 			break;
@@ -2188,11 +2188,11 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		case NM_DBLCLK:
 		case NM_RETURN:
 			if (HIBYTE(GetKeyState(VK_MENU))) {
-				SendMessage(hwnd, WM_COMMAND, MAKELONG(IDM_FILE_PROPERTIES, 1), 0);
+				SendWMCommand(hwnd, IDM_FILE_PROPERTIES);
 			} else if (HIBYTE(GetKeyState(VK_SHIFT))) {
-				SendMessage(hwnd, WM_COMMAND, MAKELONG(IDM_FILE_OPENNEW, 1), 0);
+				SendWMCommand(hwnd, IDM_FILE_OPENNEW);
 			} else {
-				SendMessage(hwnd, WM_COMMAND, MAKELONG(IDM_FILE_OPEN, 1), 0);
+				SendWMCommand(hwnd, IDM_FILE_OPEN);
 			}
 			break;
 		}
@@ -3058,7 +3058,7 @@ BOOL DisplayPath(LPCWSTR lpPath, UINT uIdError) {
 				ErrorMessage(2, uIdError);
 				return FALSE;
 			}
-			PostMessage(hwndMain, WM_COMMAND, MAKELONG(IDM_VIEW_UPDATE, 1), 0);
+			PostWMCommand(hwndMain, IDM_VIEW_UPDATE);
 			ListView_EnsureVisible(hwndDirList, 0, FALSE);
 			return TRUE;
 		}
@@ -3078,7 +3078,7 @@ BOOL DisplayPath(LPCWSTR lpPath, UINT uIdError) {
 				SetCurrentDirectory(szPath);
 			}
 
-			SendMessage(hwndMain, WM_COMMAND, MAKELONG(IDM_VIEW_UPDATE, 1), 0);
+			SendWMCommand(hwndMain, IDM_VIEW_UPDATE);
 
 			if (!DirList_SelectItem(hwndDirList, shfi.szDisplayName, szTmp)) {
 				ListView_EnsureVisible(hwndDirList, 0, FALSE);
@@ -3107,7 +3107,7 @@ BOOL DisplayLnkFile(LPCWSTR pszLnkFile) {
 			SetCurrentDirectory(szTmp);
 
 			// Select new file
-			SendMessage(hwndMain, WM_COMMAND, MAKELONG(IDM_VIEW_UPDATE, 1), 0);
+			SendWMCommand(hwndMain, IDM_VIEW_UPDATE);
 			SHFILEINFO shfi;
 			SHGetFileInfo(pszLnkFile, 0, &shfi, sizeof(SHFILEINFO), SHGFI_DISPLAYNAME);
 			if (!DirList_SelectItem(hwndDirList, shfi.szDisplayName, pszLnkFile)) {
@@ -3133,7 +3133,7 @@ BOOL DisplayLnkFile(LPCWSTR pszLnkFile) {
 				ErrorMessage(2, IDS_ERR_LNK_NOACCESS);
 				return FALSE;
 			}
-			PostMessage(hwndMain, WM_COMMAND, MAKELONG(IDM_VIEW_UPDATE, 1), 0);
+			PostWMCommand(hwndMain, IDM_VIEW_UPDATE);
 			ListView_EnsureVisible(hwndDirList, 0, FALSE);
 			return TRUE;
 		}
@@ -3157,7 +3157,7 @@ BOOL DisplayLnkFile(LPCWSTR pszLnkFile) {
 		lvfi.flags = LVFI_STRING;
 		lvfi.psz   = shfi.szDisplayName;
 
-		SendMessage(hwndMain, WM_COMMAND, MAKELONG(IDM_VIEW_UPDATE, 1), 0);
+		SendWMCommand(hwndMain, IDM_VIEW_UPDATE);
 		const int i = ListView_FindItem(hwndDirList, -1, &lvfi);
 
 		// found item that is currently displayed
@@ -3180,7 +3180,7 @@ BOOL DisplayLnkFile(LPCWSTR pszLnkFile) {
 		SetCurrentDirectory(szTmp);
 
 		// Select new file
-		SendMessage(hwndMain, WM_COMMAND, MAKELONG(IDM_VIEW_UPDATE, 1), 0);
+		SendWMCommand(hwndMain, IDM_VIEW_UPDATE);
 		SHFILEINFO shfi;
 		SHGetFileInfo(pszLnkFile, 0, &shfi, sizeof(SHFILEINFO), SHGFI_DISPLAYNAME);
 		if (!DirList_SelectItem(hwndDirList, shfi.szDisplayName, pszLnkFile)) {

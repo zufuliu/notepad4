@@ -1763,7 +1763,7 @@ sptr_t ScintillaWin::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam
 			if (lParam) {
 				*reinterpret_cast<int *>(lParam) = static_cast<int>(SelectionEnd().Position());
 			}
-			return MAKELONG(SelectionStart().Position(), SelectionEnd().Position());
+			return MAKELRESULT(SelectionStart().Position(), SelectionEnd().Position());
 
 		case EM_EXGETSEL: {
 			if (lParam == 0) {
@@ -2072,14 +2072,14 @@ bool ScintillaWin::ModifyScrollBars(Sci::Line nMax, Sci::Line nPage) {
 
 void ScintillaWin::NotifyChange() noexcept {
 	::SendMessage(::GetParent(MainHWND()), WM_COMMAND,
-		MAKELONG(GetCtrlID(), SCEN_CHANGE),
+		MAKEWPARAM(GetCtrlID(), SCEN_CHANGE),
 		reinterpret_cast<LPARAM>(MainHWND()));
 }
 
 void ScintillaWin::NotifyFocus(bool focus) {
 	if (commandEvents) {
 		::SendMessage(::GetParent(MainHWND()), WM_COMMAND,
-			MAKELONG(GetCtrlID(), focus ? SCEN_SETFOCUS : SCEN_KILLFOCUS),
+			MAKEWPARAM(GetCtrlID(), focus ? SCEN_SETFOCUS : SCEN_KILLFOCUS),
 			reinterpret_cast<LPARAM>(MainHWND()));
 	}
 	Editor::NotifyFocus(focus);
