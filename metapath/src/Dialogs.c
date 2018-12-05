@@ -1388,7 +1388,7 @@ BOOL RenameFileDlg(HWND hwnd) {
 		if (SHFileOperation(&shfos) == 0) { // success, select renamed item
 			SHFILEINFO shfi;
 			// refresh directory view
-			SendMessage(hwnd, WM_COMMAND, MAKELONG(IDM_VIEW_UPDATE, 1), 0);
+			SendWMCommand(hwnd, IDM_VIEW_UPDATE);
 			// get new display name
 			SHGetFileInfo(tchDestination, 0, &shfi, sizeof(SHFILEINFO), SHGFI_DISPLAYNAME);
 			DirList_SelectItem(hwndDirList, shfi.szDisplayName, tchDestination);
@@ -1672,7 +1672,7 @@ INT_PTR CALLBACK OpenWithDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPa
 
 			case NM_DBLCLK:
 				if (ListView_GetSelectedCount(hwndLV)) {
-					SendMessage(hwnd, WM_COMMAND, MAKELONG(IDOK, 1), 0);
+					SendWMCommand(hwnd, IDOK);
 				}
 				break;
 			}

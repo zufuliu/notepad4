@@ -852,21 +852,13 @@ HWND InitInstance(HINSTANCE hInstance, int nCmdShow) {
 
 	// Encoding
 	if (0 != flagSetEncoding) {
-		SendMessage(
-			hwndMain,
-			WM_COMMAND,
-			MAKELONG(IDM_ENCODING_ANSI + flagSetEncoding - 1, 1),
-			0);
+		SendWMCommand(hwndMain, IDM_ENCODING_ANSI + flagSetEncoding - 1);
 		flagSetEncoding = 0;
 	}
 
 	// EOL mode
 	if (0 != flagSetEOLMode) {
-		SendMessage(
-			hwndMain,
-			WM_COMMAND,
-			MAKELONG(IDM_LINEENDINGS_CRLF + flagSetEOLMode - 1, 1),
-			0);
+		SendWMCommand(hwndMain, IDM_LINEENDINGS_CRLF + flagSetEOLMode - 1);
 		flagSetEOLMode = 0;
 	}
 
@@ -1178,21 +1170,13 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 
 					if (0 != params->flagSetEncoding) {
 						flagSetEncoding = params->flagSetEncoding;
-						SendMessage(
-							hwnd,
-							WM_COMMAND,
-							MAKELONG(IDM_ENCODING_ANSI + flagSetEncoding - 1, 1),
-							0);
+						SendWMCommand(hwnd, IDM_ENCODING_ANSI + flagSetEncoding - 1);
 						flagSetEncoding = 0;
 					}
 
 					if (0 != params->flagSetEOLMode) {
 						flagSetEOLMode = params->flagSetEOLMode;
-						SendMessage(
-							hwndMain,
-							WM_COMMAND,
-							MAKELONG(IDM_LINEENDINGS_CRLF + flagSetEOLMode - 1, 1),
-							0);
+						SendWMCommand(hwnd, IDM_LINEENDINGS_CRLF + flagSetEOLMode - 1);
 						flagSetEOLMode = 0;
 					}
 
@@ -1977,7 +1961,7 @@ void MsgThemeChanged(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	UpdateToolbar();
 
 	GetClientRect(hwnd, &rc);
-	SendMessage(hwnd, WM_SIZE, SIZE_RESTORED, MAKELONG(rc.right, rc.bottom));
+	SendMessage(hwnd, WM_SIZE, SIZE_RESTORED, MAKELPARAM(rc.right, rc.bottom));
 	UpdateStatusbar();
 }
 
@@ -2723,7 +2707,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 				if (PathIsDirectory(tchSelItem)) {
 					WCHAR tchFile[MAX_PATH];
 
-					if (OpenFileDlg(hwndMain, tchFile, COUNTOF(tchFile), tchSelItem)) {
+					if (OpenFileDlg(hwnd, tchFile, COUNTOF(tchFile), tchSelItem)) {
 						FileLoad(TRUE, FALSE, FALSE, FALSE, tchFile);
 					}
 				} else {
@@ -2920,7 +2904,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			SendMessage(hwndEdit, SCI_PASTE, 0, 0);
 			const int iNewPos = (int)SendMessage(hwndEdit, SCI_GETCURRENTPOS, 0, 0);
 			SendMessage(hwndEdit, SCI_SETSEL, iPos, iNewPos);
-			SendMessage(hwnd, WM_COMMAND, MAKELONG(IDM_EDIT_CLEARCLIPBOARD, 1), 0);
+			SendWMCommand(hwnd, IDM_EDIT_CLEARCLIPBOARD);
 		} else {
 			const int iPos = (int)SendMessage(hwndEdit, SCI_GETCURRENTPOS, 0, 0);
 			const int iAnchor = (int)SendMessage(hwndEdit, SCI_GETANCHOR, 0, 0);
@@ -3562,7 +3546,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			hDlgFindReplace = EditFindReplaceDlg(hwndEdit, &efrData, FALSE);
 		} else {
 			if (GetDlgItem(hDlgFindReplace, IDC_REPLACE)) {
-				SendMessage(hDlgFindReplace, WM_COMMAND, MAKELONG(IDMSG_SWITCHTOFIND, 1), 0);
+				SendWMCommand(hDlgFindReplace, IDMSG_SWITCHTOFIND);
 				DestroyWindow(hDlgFindReplace);
 				hDlgFindReplace = EditFindReplaceDlg(hwndEdit, &efrData, FALSE);
 			} else {
@@ -3652,9 +3636,9 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 		if (StrIsEmptyA(efrData.szFind)) {
 			if (LOWORD(wParam) != IDM_EDIT_REPLACENEXT) {
-				SendMessage(hwnd, WM_COMMAND, MAKELONG(IDM_EDIT_FIND, 1), 0);
+				SendWMCommand(hwnd, IDM_EDIT_FIND);
 			} else {
-				SendMessage(hwnd, WM_COMMAND, MAKELONG(IDM_EDIT_REPLACE, 1), 0);
+				SendWMCommand(hwnd, IDM_EDIT_REPLACE);
 			}
 		} else {
 			const UINT cpEdit = (UINT)SendMessage(hwndEdit, SCI_GETCODEPAGE, 0, 0);
@@ -3687,7 +3671,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 				if (bReplaceInitialized) {
 					EditReplace(hwndEdit, &efrData);
 				} else {
-					SendMessage(hwnd, WM_COMMAND, MAKELONG(IDM_EDIT_REPLACE, 1), 0);
+					SendWMCommand(hwnd, IDM_EDIT_REPLACE);
 				}
 				break;
 
@@ -3726,7 +3710,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			hDlgFindReplace = EditFindReplaceDlg(hwndEdit, &efrData, TRUE);
 		} else {
 			if (!GetDlgItem(hDlgFindReplace, IDC_REPLACE)) {
-				SendMessage(hDlgFindReplace, WM_COMMAND, MAKELONG(IDMSG_SWITCHTOREPLACE, 1), 0);
+				SendWMCommand(hDlgFindReplace, IDMSG_SWITCHTOREPLACE);
 				DestroyWindow(hDlgFindReplace);
 				hDlgFindReplace = EditFindReplaceDlg(hwndEdit, &efrData, TRUE);
 			} else {
@@ -4533,7 +4517,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 						   (int)SendMessage(hwndEdit, SCI_GETSELECTIONSTART, 0, 0);
 
 		if (cchSelection == 0) {
-			SendMessage(hwnd, WM_COMMAND, MAKELONG(IDM_EDIT_SELECTWORD, 1), 0);
+			SendWMCommand(hwnd, IDM_EDIT_SELECTWORD);
 			cchSelection = (int)SendMessage(hwndEdit, SCI_GETSELECTIONEND, 0, 0) -
 						   (int)SendMessage(hwndEdit, SCI_GETSELECTIONSTART, 0, 0);
 		}
@@ -4583,7 +4567,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case CMD_INCLINELIMIT:
 	case CMD_DECLINELIMIT:
 		if (!bMarkLongLines) {
-			SendMessage(hwnd, WM_COMMAND, MAKELONG(IDM_VIEW_LONGLINEMARKER, 1), 0);
+			SendWMCommand(hwnd, IDM_VIEW_LONGLINEMARKER);
 		} else {
 			if (LOWORD(wParam) == CMD_INCLINELIMIT) {
 				iLongLinesLimit++;
@@ -4686,131 +4670,71 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	case IDT_FILE_NEW:
-		if (IsCmdEnabled(hwnd, IDM_FILE_NEW)) {
-			SendMessage(hwnd, WM_COMMAND, MAKELONG(IDM_FILE_NEW, 1), 0);
-		} else {
-			MessageBeep(0);
-		}
+		SendWMCommandOrBeep(hwnd, IDM_FILE_NEW);
 		break;
 
 	case IDT_FILE_OPEN:
-		if (IsCmdEnabled(hwnd, IDM_FILE_OPEN)) {
-			SendMessage(hwnd, WM_COMMAND, MAKELONG(IDM_FILE_OPEN, 1), 0);
-		} else {
-			MessageBeep(0);
-		}
+		SendWMCommandOrBeep(hwnd, IDM_FILE_OPEN);
 		break;
 
 	case IDT_FILE_BROWSE:
-		if (IsCmdEnabled(hwnd, IDM_FILE_BROWSE)) {
-			SendMessage(hwnd, WM_COMMAND, MAKELONG(IDM_FILE_BROWSE, 1), 0);
-		} else {
-			MessageBeep(0);
-		}
+		SendWMCommandOrBeep(hwnd, IDM_FILE_BROWSE);
 		break;
 
 	case IDT_FILE_SAVE:
-		if (IsCmdEnabled(hwnd, IDM_FILE_SAVE)) {
-			SendMessage(hwnd, WM_COMMAND, MAKELONG(IDM_FILE_SAVE, 1), 0);
-		} else {
-			MessageBeep(0);
-		}
+		SendWMCommandOrBeep(hwnd, IDM_FILE_SAVE);
 		break;
 
 	case IDT_EDIT_UNDO:
-		if (IsCmdEnabled(hwnd, IDM_EDIT_UNDO)) {
-			SendMessage(hwnd, WM_COMMAND, MAKELONG(IDM_EDIT_UNDO, 1), 0);
-		} else {
-			MessageBeep(0);
-		}
+		SendWMCommandOrBeep(hwnd, IDM_EDIT_UNDO);
 		break;
 
 	case IDT_EDIT_REDO:
-		if (IsCmdEnabled(hwnd, IDM_EDIT_REDO)) {
-			SendMessage(hwnd, WM_COMMAND, MAKELONG(IDM_EDIT_REDO, 1), 0);
-		} else {
-			MessageBeep(0);
-		}
+		SendWMCommandOrBeep(hwnd, IDM_EDIT_REDO);
 		break;
 
 	case IDT_EDIT_CUT:
-		if (IsCmdEnabled(hwnd, IDM_EDIT_CUT)) {
-			SendMessage(hwnd, WM_COMMAND, MAKELONG(IDM_EDIT_CUT, 1), 0);
-		} else {
-			MessageBeep(0);
-		}
+		SendWMCommandOrBeep(hwnd, IDM_EDIT_CUT);
 		break;
 
 	case IDT_EDIT_COPY:
 		if (IsCmdEnabled(hwnd, IDM_EDIT_COPY)) {
-			SendMessage(hwnd, WM_COMMAND, MAKELONG(IDM_EDIT_COPY, 1), 0);
+			SendWMCommand(hwnd, IDM_EDIT_COPY);
 		} else {
-			SendMessage(hwnd, WM_COMMAND, MAKELONG(IDM_EDIT_COPYALL, 1), 0);
+			SendWMCommand(hwnd, IDM_EDIT_COPYALL);
 		}
 		break;
 
 	case IDT_EDIT_PASTE:
-		if (IsCmdEnabled(hwnd, IDM_EDIT_PASTE)) {
-			SendMessage(hwnd, WM_COMMAND, MAKELONG(IDM_EDIT_PASTE, 1), 0);
-		} else {
-			MessageBeep(0);
-		}
+		SendWMCommandOrBeep(hwnd, IDM_EDIT_PASTE);
 		break;
 
 	case IDT_EDIT_FIND:
-		if (IsCmdEnabled(hwnd, IDM_EDIT_FIND)) {
-			SendMessage(hwnd, WM_COMMAND, MAKELONG(IDM_EDIT_FIND, 1), 0);
-		} else {
-			MessageBeep(0);
-		}
+		SendWMCommandOrBeep(hwnd, IDM_EDIT_FIND);
 		break;
 
 	case IDT_EDIT_REPLACE:
-		if (IsCmdEnabled(hwnd, IDM_EDIT_REPLACE)) {
-			SendMessage(hwnd, WM_COMMAND, MAKELONG(IDM_EDIT_REPLACE, 1), 0);
-		} else {
-			MessageBeep(0);
-		}
+		SendWMCommandOrBeep(hwnd, IDM_EDIT_REPLACE);
 		break;
 
 	case IDT_VIEW_WORDWRAP:
-		if (IsCmdEnabled(hwnd, IDM_VIEW_WORDWRAP)) {
-			SendMessage(hwnd, WM_COMMAND, MAKELONG(IDM_VIEW_WORDWRAP, 1), 0);
-		} else {
-			MessageBeep(0);
-		}
+		SendWMCommandOrBeep(hwnd, IDM_VIEW_WORDWRAP);
 		break;
 
 	case IDT_VIEW_ZOOMIN:
-		if (IsCmdEnabled(hwnd, IDM_VIEW_ZOOMIN)) {
-			SendMessage(hwnd, WM_COMMAND, MAKELONG(IDM_VIEW_ZOOMIN, 1), 0);
-		} else {
-			MessageBeep(0);
-		}
+		SendWMCommandOrBeep(hwnd, IDM_VIEW_ZOOMIN);
 		break;
 
 	case IDT_VIEW_ZOOMOUT:
-		if (IsCmdEnabled(hwnd, IDM_VIEW_ZOOMOUT)) {
-			SendMessage(hwnd, WM_COMMAND, MAKELONG(IDM_VIEW_ZOOMOUT, 1), 0);
-		} else {
-			MessageBeep(0);
-		}
+		SendWMCommandOrBeep(hwnd, IDM_VIEW_ZOOMOUT);
 		break;
 
 	case IDT_VIEW_SCHEME:
-		if (IsCmdEnabled(hwnd, IDM_VIEW_SCHEME)) {
-			SendMessage(hwnd, WM_COMMAND, MAKELONG(IDM_VIEW_SCHEME, 1), 0);
-		} else {
-			MessageBeep(0);
-		}
+		SendWMCommandOrBeep(hwnd, IDM_VIEW_SCHEME);
 		break;
 
 	case IDT_VIEW_SCHEMECONFIG:
-		if (IsCmdEnabled(hwnd, IDM_VIEW_SCHEMECONFIG)) {
-			SendMessage(hwnd, WM_COMMAND, MAKELONG(IDM_VIEW_SCHEMECONFIG, 1), 0);
-		} else {
-			MessageBeep(0);
-		}
+		SendWMCommandOrBeep(hwnd, IDM_VIEW_SCHEMECONFIG);
 		break;
 
 	case IDT_FILE_EXIT:
@@ -4818,67 +4742,39 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	case IDT_FILE_SAVEAS:
-		if (IsCmdEnabled(hwnd, IDM_FILE_SAVEAS)) {
-			SendMessage(hwnd, WM_COMMAND, MAKELONG(IDM_FILE_SAVEAS, 1), 0);
-		} else {
-			MessageBeep(0);
-		}
+		SendWMCommandOrBeep(hwnd, IDM_FILE_SAVEAS);
 		break;
 
 	case IDT_FILE_SAVECOPY:
-		if (IsCmdEnabled(hwnd, IDM_FILE_SAVECOPY)) {
-			SendMessage(hwnd, WM_COMMAND, MAKELONG(IDM_FILE_SAVECOPY, 1), 0);
-		} else {
-			MessageBeep(0);
-		}
+		SendWMCommandOrBeep(hwnd, IDM_FILE_SAVECOPY);
 		break;
 
 	case IDT_EDIT_CLEAR:
 		if (IsCmdEnabled(hwnd, IDM_EDIT_CLEAR)) {
-			SendMessage(hwnd, WM_COMMAND, MAKELONG(IDM_EDIT_CLEAR, 1), 0);
+			SendWMCommand(hwnd, IDM_EDIT_CLEAR);
 		} else {
 			SendMessage(hwndEdit, SCI_CLEARALL, 0, 0);
 		}
 		break;
 
 	case IDT_FILE_PRINT:
-		if (IsCmdEnabled(hwnd, IDM_FILE_PRINT)) {
-			SendMessage(hwnd, WM_COMMAND, MAKELONG(IDM_FILE_PRINT, 1), 0);
-		} else {
-			MessageBeep(0);
-		}
+		SendWMCommandOrBeep(hwnd, IDM_FILE_PRINT);
 		break;
 
 	case IDT_FILE_OPENFAV:
-		if (IsCmdEnabled(hwnd, IDM_FILE_OPENFAV)) {
-			SendMessage(hwnd, WM_COMMAND, MAKELONG(IDM_FILE_OPENFAV, 1), 0);
-		} else {
-			MessageBeep(0);
-		}
+		SendWMCommandOrBeep(hwnd, IDM_FILE_OPENFAV);
 		break;
 
 	case IDT_FILE_ADDTOFAV:
-		if (IsCmdEnabled(hwnd, IDM_FILE_ADDTOFAV)) {
-			SendMessage(hwnd, WM_COMMAND, MAKELONG(IDM_FILE_ADDTOFAV, 1), 0);
-		} else {
-			MessageBeep(0);
-		}
+		SendWMCommandOrBeep(hwnd, IDM_FILE_ADDTOFAV);
 		break;
 
 	case IDT_VIEW_TOGGLEFOLDS:
-		if (IsCmdEnabled(hwnd, IDM_VIEW_TOGGLEFOLDS)) {
-			SendMessage(hwnd, WM_COMMAND, MAKELONG(IDM_VIEW_TOGGLEFOLDS, 1), 0);
-		} else {
-			MessageBeep(0);
-		}
+		SendWMCommandOrBeep(hwnd, IDM_VIEW_TOGGLEFOLDS);
 		break;
 
 	case IDT_FILE_LAUNCH:
-		if (IsCmdEnabled(hwnd, IDM_FILE_LAUNCH)) {
-			SendMessage(hwnd, WM_COMMAND, MAKELONG(IDM_FILE_LAUNCH, 1), 0);
-		} else {
-			MessageBeep(0);
-		}
+		SendWMCommandOrBeep(hwnd, IDM_FILE_LAUNCH);
 		break;
 
 	}
@@ -5138,7 +5034,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			LPNMMOUSE pnmm = (LPNMMOUSE)lParam;
 			switch (pnmm->dwItemSpec) {
 			case STATUS_CODEPAGE:
-				SendMessage(hwnd, WM_COMMAND, MAKELONG(IDM_ENCODING_SELECT, 1), 0);
+				SendWMCommand(hwnd, IDM_ENCODING_SELECT);
 				return TRUE;
 
 			case STATUS_EOLMODE:
@@ -5153,7 +5049,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 				return TRUE;
 
 			case STATUS_LEXER:
-				SendMessage(hwnd, WM_COMMAND, MAKELONG(IDM_VIEW_SCHEME, 1), 0);
+				SendWMCommand(hwnd, IDM_VIEW_SCHEME);
 				return TRUE;
 
 			case STATUS_OVRMODE:
@@ -6621,8 +6517,8 @@ int CreateIniFileEx(LPCWSTR lpszIniFile) {
 // UpdateToolbar()
 //
 //
-#define EnableTool(id, b)		SendMessage(hwndToolbar, TB_ENABLEBUTTON, id, MAKELONG(((b) ? 1 : 0), 0))
-#define CheckTool(id, b)		SendMessage(hwndToolbar, TB_CHECKBUTTON, id, MAKELONG(b, 0))
+#define EnableTool(id, b)		SendMessage(hwndToolbar, TB_ENABLEBUTTON, id, MAKELPARAM(((b) ? 1 : 0), 0))
+#define CheckTool(id, b)		SendMessage(hwndToolbar, TB_CHECKBUTTON, id, MAKELPARAM(b, 0))
 
 void UpdateToolbar(void) {
 	if (!bShowToolbar) {
@@ -7006,7 +6902,7 @@ BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect, LPCWST
 				EditJumpTo(hwndEdit, -1, 0);
 				SendMessage(hwndEdit, SCI_BEGINUNDOACTION, 0, 0);
 				SendMessage(hwndEdit, SCI_NEWLINE, 0, 0);
-				SendMessage(hwndMain, WM_COMMAND, MAKELONG(IDM_EDIT_INSERT_SHORTDATE, 1), 0);
+				SendWMCommand(hwndMain, IDM_EDIT_INSERT_SHORTDATE);
 				EditJumpTo(hwndEdit, -1, 0);
 				SendMessage(hwndEdit, SCI_NEWLINE, 0, 0);
 				SendMessage(hwndEdit, SCI_ENDUNDOACTION, 0, 0);
