@@ -38,6 +38,10 @@ NP2_inline UINT max_u(UINT x, UINT y) {
 	return (x > y) ? x : y;
 }
 
+NP2_inline long min_l(long x, long y) {
+	return (x < y) ? x : y;
+}
+
 NP2_inline long max_l(long x, long y) {
 	return (x > y) ? x : y;
 }
@@ -442,7 +446,7 @@ HDWP DeferCtlPos(HDWP hdwp, HWND hwndDlg, int nCtlId, int dx, int dy, UINT uFlag
 void ResizeDlgCtl(HWND hwndDlg, int nCtlId, int dx, int dy);
 
 #define SendWMCommandEx(hwnd, id, extra)	SendMessage(hwnd, WM_COMMAND, MAKEWPARAM((id), (extra)), 0)
-#define SendWMCommand(hwnd, id)				SendWMCommandEx(hwnd, id, 1)
+#define SendWMCommand(hwnd, id)				SendWMCommandEx(hwnd, (id), 1)
 #define PostWMCommand(hwnd, id)				PostMessage(hwnd, WM_COMMAND, MAKEWPARAM((id), 1), 0)
 
 void MultilineEditSetup(HWND hwndDlg, int nCtlId);

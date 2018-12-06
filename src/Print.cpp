@@ -420,10 +420,10 @@ static UINT_PTR CALLBACK PageSetupHook(HWND hwnd, UINT uiMsg, WPARAM wParam, LPA
 
 		// Set header options
 		WCHAR tch[512];
-		WCHAR *p1, *p2;
 		GetString(IDS_PRINT_HEADER, tch, COUNTOF(tch));
 		lstrcat(tch, L"|");
-		p1 = tch;
+		LPWSTR p1 = tch;
+		LPWSTR p2;
 		while ((p2 = StrChr(p1, L'|')) != nullptr) {
 			*p2++ = L'\0';
 			if (*p1) {

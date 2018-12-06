@@ -242,7 +242,7 @@ void Encoding_InitDefaults(void) {
 
 	// Try to set the DOS encoding to DOS-437 if the default OEMCP is not DOS-437
 	if (oemcp != 437) {
-		for (unsigned int i = CPI_UTF7 + 1; i < COUNTOF(mEncoding); ++i) {
+		for (int i = CPI_UTF7 + 1; i < (int)COUNTOF(mEncoding); ++i) {
 			if (mEncoding[i].uCodePage == 437 && Encoding_IsValid(i)) {
 				g_DOSEncoding = i;
 				break;
@@ -273,7 +273,7 @@ int Encoding_MapIniSetting(BOOL bLoad, int iSetting) {
 		case 8:
 			return CPI_UTF7;
 		default: {
-			for (unsigned int i = CPI_UTF7 + 1; i < COUNTOF(mEncoding); i++) {
+			for (int i = CPI_UTF7 + 1; i < (int)COUNTOF(mEncoding); i++) {
 				if (mEncoding[i].uCodePage == (UINT)iSetting && Encoding_IsValid(i)) {
 					return i;
 				}
@@ -321,7 +321,7 @@ void Encoding_GetLabel(int iEncoding) {
 			pwsz = wch;
 		}
 		if (g_AllEncodingLabel == NULL) {
-			g_AllEncodingLabel = NP2HeapAlloc(COUNTOF(mEncoding) * MAX_ENCODING_LABEL_SIZE * sizeof(WCHAR));
+			g_AllEncodingLabel = (LPWSTR)NP2HeapAlloc(COUNTOF(mEncoding) * MAX_ENCODING_LABEL_SIZE * sizeof(WCHAR));
 		}
 		mEncoding[iEncoding].wchLabel = g_AllEncodingLabel + iEncoding * MAX_ENCODING_LABEL_SIZE;
 		lstrcpyn(mEncoding[iEncoding].wchLabel, pwsz, MAX_ENCODING_LABEL_SIZE);
@@ -352,7 +352,7 @@ int Encoding_MatchA(char *pchTest) {
 	while (*pchSrc) {
 		if (isalnum((unsigned char)(*pchSrc))) {
 			if (*pchSrc >= 'A' && *pchSrc <= 'Z') {
-				*pchDst++ = *pchSrc + 'a' - 'A';
+				*pchDst++ = (char)(*pchSrc + 'a' - 'A');
 			} else {
 				*pchDst++ = *pchSrc;
 			}
@@ -363,7 +363,7 @@ int Encoding_MatchA(char *pchTest) {
 	*pchDst++ = ',';
 	*pchDst = 0;
 
-	for (unsigned int i = 0; i < COUNTOF(mEncoding); i++) {
+	for (int i = 0; i < (int)COUNTOF(mEncoding); i++) {
 		if (StrStrIA(mEncoding[i].pszParseNames, chTest)) {
 			if (IsValidEncoding(i)) {
 				return i;
@@ -389,8 +389,8 @@ int CmpEncoding(const void *s1, const void *s2) {
 }
 
 void Encoding_AddToListView(HWND hwnd, int idSel, BOOL bRecodeOnly) {
-	PENCODINGENTRY pEE = NP2HeapAlloc(COUNTOF(mEncoding) * sizeof(ENCODINGENTRY));
-	for (unsigned int i = 0; i < COUNTOF(mEncoding); i++) {
+	PENCODINGENTRY pEE = (PENCODINGENTRY)NP2HeapAlloc(COUNTOF(mEncoding) * sizeof(ENCODINGENTRY));
+	for (int i = 0; i < (int)COUNTOF(mEncoding); i++) {
 		pEE[i].id = i;
 		GetString(mEncoding[i].idsName, pEE[i].wch, COUNTOF(pEE[i].wch));
 	}
@@ -403,7 +403,7 @@ void Encoding_AddToListView(HWND hwnd, int idSel, BOOL bRecodeOnly) {
 	lvi.pszText = wchBuf;
 
 	int iSelItem = -1;
-	for (unsigned int i = 0; i < COUNTOF(mEncoding); i++) {
+	for (int i = 0; i < (int)COUNTOF(mEncoding); i++) {
 		const int id = pEE[i].id;
 		if (!bRecodeOnly || (mEncoding[id].uFlags & NCP_RECODE)) {
 			WCHAR *pwsz;
@@ -464,8 +464,8 @@ BOOL Encoding_GetFromListView(HWND hwnd, int *pidEncoding) {
 }
 
 void Encoding_AddToComboboxEx(HWND hwnd, int idSel, BOOL bRecodeOnly) {
-	PENCODINGENTRY pEE = NP2HeapAlloc(COUNTOF(mEncoding) * sizeof(ENCODINGENTRY));
-	for (unsigned int i = 0; i < COUNTOF(mEncoding); i++) {
+	PENCODINGENTRY pEE = (PENCODINGENTRY)NP2HeapAlloc(COUNTOF(mEncoding) * sizeof(ENCODINGENTRY));
+	for (int i = 0; i < (int)COUNTOF(mEncoding); i++) {
 		pEE[i].id = i;
 		GetString(mEncoding[i].idsName, pEE[i].wch, COUNTOF(pEE[i].wch));
 	}
@@ -482,7 +482,7 @@ void Encoding_AddToComboboxEx(HWND hwnd, int idSel, BOOL bRecodeOnly) {
 	cbei.iSelectedImage = 0;
 
 	int iSelItem = -1;
-	for (unsigned int i = 0; i < COUNTOF(mEncoding); i++) {
+	for (int i = 0; i < (int)COUNTOF(mEncoding); i++) {
 		const int id = pEE[i].id;
 		if (!bRecodeOnly || (mEncoding[id].uFlags & NCP_RECODE)) {
 			WCHAR *pwsz;

@@ -173,11 +173,11 @@ public:
 /**
  * Holds an RGB colour with 8 bits for each component.
  */
-constexpr float componentMaximum = 255.0f;
+constexpr float componentMaximum = 255.0F;
 class ColourDesired {
-	int co;
+	unsigned int co;
 public:
-	explicit ColourDesired(int co_ = 0) noexcept : co(co_) {}
+	explicit ColourDesired(unsigned int co_ = 0) noexcept : co(co_) {}
 
 	ColourDesired(unsigned int red, unsigned int green, unsigned int blue) noexcept :
 		co(red | (green << 8) | (blue << 16)) {}
@@ -186,7 +186,7 @@ public:
 		return co == other.co;
 	}
 
-	int AsInteger() const noexcept {
+	unsigned int AsInteger() const noexcept {
 		return co;
 	}
 
@@ -218,7 +218,7 @@ public:
 */
 class ColourAlpha : public ColourDesired {
 public:
-	explicit ColourAlpha(int co_ = 0) noexcept : ColourDesired(co_) {}
+	explicit ColourAlpha(unsigned int co_ = 0) noexcept : ColourDesired(co_) {}
 
 	ColourAlpha(unsigned int red, unsigned int green, unsigned int blue) noexcept :
 		ColourDesired(red | (green << 8) | (blue << 16)) {}

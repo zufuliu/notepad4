@@ -304,7 +304,8 @@ static void FoldVBDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 	bool isExit = false;	// Exit {Function Sub Property}
 	bool isDeclare = false;	// Declare, Delegate {Function Sub}
 	bool isIf = false;		// If ... Then \r\n ... \r\n End If
-	static Sci_Position lineIf = 0, lineThen = 0;
+	static Sci_Position lineIf = 0;
+	static Sci_Position lineThen = 0;
 
 	for (Sci_PositionU i = startPos; i < endPos; i++) {
 		const char chPrev = ch;

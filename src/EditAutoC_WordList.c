@@ -138,13 +138,14 @@ void WordList_AddWord(struct WordList *pWList, LPCSTR pWord, int len) {
 	} else {
 		struct WordNode *iter = root;
 		struct WordNode *path[NP2_TREE_HEIGHT_LIMIT] = {NULL};
-		int top = 0, dir;
+		int top = 0;
+		int dir;
 
 		// find a spot and save the path
 		for (;;) {
 			path[top++] = iter;
 #if NP2_AUTOC_USE_STRING_ORDER
-			dir = iter->order - order;
+			dir = (int)(iter->order - order);
 			if (dir == 0 && (len > NP2_AUTOC_ORDER_LENGTH || iter->len > NP2_AUTOC_ORDER_LENGTH)) {
 				dir = pWList->WL_strcmp(iter->word, pWord);
 			}
@@ -205,7 +206,7 @@ void WordList_AddWord(struct WordList *pWList, LPCSTR pWord, int len) {
 	pWList->pListHead = root;
 	pWList->nWordCount++;
 	pWList->nTotalLen += len + 1;
-	pWList->offset += align_up(len + 1);
+	pWList->offset += (int)align_up(len + 1);
 	if (len > pWList->iMaxLength) {
 		pWList->iMaxLength = len;
 	}
@@ -220,12 +221,12 @@ void WordList_Free(struct WordList *pWList) {
 	}
 }
 
-void WordList_GetList(struct WordList *pWList, char * *pList) {
+void WordList_GetList(struct WordList *pWList, char* *pList) {
 	struct WordNode *root = pWList->pListHead;
 	struct WordNode *path[NP2_TREE_HEIGHT_LIMIT] = {NULL};
 	int top = 0;
-	*pList = NP2HeapAlloc(pWList->nTotalLen + 1);// additional separator
-	char *buf = *pList;
+	char *buf = (char *)NP2HeapAlloc(pWList->nTotalLen + 1);// additional separator
+	*pList = buf;
 
 	while (root || top > 0) {
 		if (root) {
@@ -304,7 +305,7 @@ void WordList_AddListEx(struct WordList *pWList, LPCSTR pList) {
 	int len = 0;
 	BOOL ok = FALSE;
 	do {
-		char *sub = strpbrk(pList, " \t.,();^\n\r");
+		const char *sub = strpbrk(pList, " \t.,();^\n\r");
 		if (sub) {
 			int lenSub = (int)(sub - pList);
 			lenSub = min_i(NP2_AUTOC_MAX_WORD_LENGTH - len, lenSub);

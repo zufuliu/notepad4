@@ -552,7 +552,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 		PCOPYDATASTRUCT pcds = (PCOPYDATASTRUCT)lParam;
 
 		if (pcds->dwData == DATA_METAPATH_PATHARG) {
-			LPWSTR lpsz = NP2HeapAlloc(pcds->cbData);
+			LPWSTR lpsz = (LPWSTR)NP2HeapAlloc(pcds->cbData);
 			CopyMemory(lpsz, pcds->lpData, pcds->cbData);
 
 			DisplayPath(lpsz, IDS_ERR_CMDLINE);
@@ -746,7 +746,7 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	DriveBox_Init(hwndDriveBox);
 	SendMessage(hwndDriveBox, CB_SETEXTENDEDUI, TRUE, 0);
 	// DirList
-	LVCOLUMN lvc = { LVCF_FMT | LVCF_TEXT, LVCFMT_LEFT, 0, L"", -1, 0, 0, 0 };
+	LVCOLUMN lvc = { LVCF_FMT | LVCF_TEXT, LVCFMT_LEFT, 0, NULL, -1, 0, 0, 0 };
 	ListView_SetExtendedListViewStyle(hwndDirList, LVS_EX_DOUBLEBUFFER | LVS_EX_LABELTIP);
 	ListView_InsertColumn(hwndDirList, 0, &lvc);
 	DirList_Init(hwndDirList, NULL);
@@ -825,8 +825,8 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) {
 	if (hbmp != NULL) {
 		bExternalBitmap = TRUE;
 	} else {
-		hbmp = LoadImage(hInstance, MAKEINTRESOURCE(IDR_MAINWND), IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION);
-		hbmpCopy = CopyImage(hbmp, IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION);
+		hbmp = (HBITMAP)LoadImage(hInstance, MAKEINTRESOURCE(IDR_MAINWND), IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION);
+		hbmpCopy = (HBITMAP)CopyImage(hbmp, IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION);
 	}
 
 	BITMAP bmp;
@@ -888,7 +888,7 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) {
 #if NP2_ENABLE_CUSTOMIZE_TOOLBAR_LABELS
 	// Load toolbar labels
 	IniSection section;
-	WCHAR *pIniSectionBuf = NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_TOOLBAR_LABELS);
+	WCHAR *pIniSectionBuf = (WCHAR *)NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_TOOLBAR_LABELS);
 	const int cbIniSection = (int)NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR);
 	IniSection *pIniSection = &section;
 
@@ -952,7 +952,7 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) {
 		rbBand.fStyle |= RBBS_CHILDEDGE;
 	}
 	rbBand.hbmBack = NULL;
-	rbBand.lpText     = L"Toolbar";
+	rbBand.lpText     = (LPWSTR)L"Toolbar";
 	rbBand.hwndChild  = hwndToolbar;
 	rbBand.cxMinChild = (rc.right - rc.left) * COUNTOF(tbbMainWnd);
 	rbBand.cyMinChild = (rc.bottom - rc.top) + 2 * rc.top;
@@ -1798,7 +1798,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 		HGLOBAL hData = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE,
 							sizeof(WCHAR) * (lstrlen(path) + 1));
-		LPWSTR pData = GlobalLock(hData);
+		LPWSTR pData = (LPWSTR)GlobalLock(hData);
 		lstrcpy(pData, path);
 		GlobalUnlock(hData);
 
@@ -2145,7 +2145,8 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 					WCHAR tchsize[64];
 					StrFormatByteSize(isize, tchsize, COUNTOF(tchsize));
 
-					WCHAR tchdate[64], tchtime[64];
+					WCHAR tchdate[64];
+					WCHAR tchtime[64];
 					FILETIME ft;
 					SYSTEMTIME st;
 					FileTimeToLocalFileTime(&fd.ftLastWriteTime, &ft);
@@ -2331,7 +2332,8 @@ BOOL ChangeDirectory(HWND hwnd, LPCWSTR lpszNewDir, BOOL bUpdateHistory) {
 		DriveBox_Fill(hwndDriveBox);
 		DriveBox_SelectDrive(hwndDriveBox, szCurDir);
 
-		WCHAR tch[256], tchnum[64];
+		WCHAR tch[256];
+		WCHAR tchnum[64];
 		wsprintf(tchnum, L"%d", cItems);
 		FormatNumberStr(tchnum);
 		WCHAR fmt[32];
@@ -2357,8 +2359,8 @@ BOOL ChangeDirectory(HWND hwnd, LPCWSTR lpszNewDir, BOOL bUpdateHistory) {
 //
 void LoadSettings(void) {
 	IniSection section;
-	WCHAR *pIniSectionBuf = NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_SETTINGS);
-	const int cbIniSection = (int)NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR);
+	WCHAR *pIniSectionBuf = (WCHAR *)NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_SETTINGS);
+	const int cbIniSection = (int)(NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR));
 	IniSection *pIniSection = &section;
 
 	IniSectionInit(pIniSection, 128);
@@ -2471,7 +2473,10 @@ void LoadSettings(void) {
 
 	if (!flagPosParam) {
 		// ignore window position if /p was specified
-		WCHAR tchPosX[32], tchPosY[32], tchSizeX[32], tchSizeY[32];
+		WCHAR tchPosX[32];
+		WCHAR tchPosY[32];
+		WCHAR tchSizeX[32];
+		WCHAR tchSizeY[32];
 		const int ResX = GetSystemMetrics(SM_CXSCREEN);
 		const int ResY = GetSystemMetrics(SM_CYSCREEN);
 
@@ -2553,7 +2558,7 @@ void SaveSettings(BOOL bSaveSettingsNow) {
 
 	WCHAR wchTmp[MAX_PATH];
 	IniSectionOnSave section;
-	WCHAR *pIniSectionBuf = NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_SETTINGS);
+	WCHAR *pIniSectionBuf = (WCHAR *)NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_SETTINGS);
 	IniSectionOnSave *pIniSection = &section;
 	pIniSection->next = pIniSectionBuf;
 
@@ -2629,7 +2634,10 @@ void SaveSettings(BOOL bSaveSettingsNow) {
 	}
 
 	{
-		WCHAR tchPosX[32], tchPosY[32], tchSizeX[32], tchSizeY[32];
+		WCHAR tchPosX[32];
+		WCHAR tchPosY[32];
+		WCHAR tchSizeX[32];
+		WCHAR tchSizeY[32];
 		const int ResX = GetSystemMetrics(SM_CXSCREEN);
 		const int ResY = GetSystemMetrics(SM_CYSCREEN);
 
@@ -2650,7 +2658,10 @@ void SaveSettings(BOOL bSaveSettingsNow) {
 }
 
 void SaveWindowPosition(void) {
-	WCHAR tchPosX[32], tchPosY[32], tchSizeX[32], tchSizeY[32];
+	WCHAR tchPosX[32];
+	WCHAR tchPosY[32];
+	WCHAR tchSizeX[32];
+	WCHAR tchSizeY[32];
 	const int ResX = GetSystemMetrics(SM_CXSCREEN);
 	const int ResY = GetSystemMetrics(SM_CYSCREEN);
 
@@ -2714,7 +2725,7 @@ int ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2) {
 					NP2HeapFree(lpFilterArg);
 				}
 
-				lpFilterArg = NP2HeapAlloc(sizeof(WCHAR) * (lstrlen(lp1) + 1));
+				lpFilterArg = (LPWSTR)NP2HeapAlloc(sizeof(WCHAR) * (lstrlen(lp1) + 1));
 				lstrcpy(lpFilterArg, lp1);
 				state = 1;
 			}
@@ -2789,8 +2800,8 @@ void ParseCommandLine(void) {
 	// Good old console can also send args separated by Tabs
 	StrTab2Space(lpCmdLine);
 
-	LPWSTR lp1 = NP2HeapAlloc(cmdSize);
-	LPWSTR lp3 = NP2HeapAlloc(cmdSize);
+	LPWSTR lp1 = (LPWSTR)NP2HeapAlloc(cmdSize);
+	LPWSTR lp3 = (LPWSTR)NP2HeapAlloc(cmdSize);
 
 	// Start with 2nd argument
 	if (!(ExtractFirstArgument(lpCmdLine, lp1, lp3) && *lp3)) {
@@ -2799,7 +2810,7 @@ void ParseCommandLine(void) {
 		return;
 	}
 
-	LPWSTR lp2 = NP2HeapAlloc(cmdSize);
+	LPWSTR lp2 = (LPWSTR)NP2HeapAlloc(cmdSize);
 	while (ExtractFirstArgument(lp3, lp1, lp2)) {
 		// options
 		if ((*lp1 == L'/' || *lp1 == L'-') && lp1[1] != 0) {
@@ -2816,7 +2827,7 @@ void ParseCommandLine(void) {
 				GlobalFree(lpPathArg);
 			}
 
-			lpPathArg = GlobalAlloc(GPTR, sizeof(WCHAR) * (MAX_PATH + 2));
+			lpPathArg = (LPWSTR)GlobalAlloc(GPTR, sizeof(WCHAR) * (MAX_PATH + 2));
 			lstrcpyn(lpPathArg, lp3, MAX_PATH);
 			PathFixBackslashes(lpPathArg);
 			StrTrim(lpPathArg, L" \"");
@@ -2836,8 +2847,8 @@ void ParseCommandLine(void) {
 //
 void LoadFlags(void) {
 	IniSection section;
-	WCHAR *pIniSectionBuf = NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_FLAGS);
-	const int cchIniSection = (int)NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR);
+	WCHAR *pIniSectionBuf = (WCHAR *)NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_FLAGS);
+	const int cchIniSection = (int)(NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR));
 	IniSection *pIniSection = &section;
 
 	IniSectionInit(pIniSection, 16);
@@ -3244,7 +3255,7 @@ BOOL ActivatePrevInst(void) {
 				// lpPathArg is at least MAX_PATH+2 bytes
 				WCHAR tchTmp[MAX_PATH];
 
-				ExpandEnvironmentStringsEx(lpPathArg, (DWORD)GlobalSize(lpPathArg) / sizeof(WCHAR));
+				ExpandEnvironmentStringsEx(lpPathArg, (DWORD)(GlobalSize(lpPathArg) / sizeof(WCHAR)));
 
 				if (PathIsRelative(lpPathArg)) {
 					GetCurrentDirectory(COUNTOF(tchTmp), tchTmp);
@@ -3346,7 +3357,7 @@ void ShowNotifyIcon(HWND hwnd, BOOL bAdd) {
 	static HICON hIcon;
 
 	if (!hIcon) {
-		hIcon = LoadImage(g_hInstance, MAKEINTRESOURCE(IDR_MAINWND),
+		hIcon = (HICON)LoadImage(g_hInstance, MAKEINTRESOURCE(IDR_MAINWND),
 						  IMAGE_ICON, 16, 16, LR_DEFAULTCOLOR);
 	}
 
@@ -3396,8 +3407,8 @@ static BOOL CALLBACK EnumWndProc2(HWND hwnd, LPARAM lParam) {
 
 void LoadLaunchSetings(void) {
 	IniSection section;
-	WCHAR *pIniSectionBuf = NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_TARGET_APPLICATION);
-	const int cbIniSection = (int)NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR);
+	WCHAR *pIniSectionBuf = (WCHAR *)NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_TARGET_APPLICATION);
+	const int cbIniSection = (int)(NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR));
 	IniSection *pIniSection = &section;
 
 	IniSectionInit(pIniSection, 16);
@@ -3614,7 +3625,9 @@ void SnapToTarget(HWND hwnd) {
 		BringWindowToTop(hwnd2);
 		SetForegroundWindow(hwnd);
 
-		RECT rcOld, rcNew, rc2;
+		RECT rcOld;
+		RECT rcNew;
+		RECT rc2;
 		int cxScreen = GetSystemMetrics(SM_CXSCREEN);
 		GetWindowRect(hwnd, &rcOld);
 		GetWindowRect(hwnd2, &rc2);

@@ -199,13 +199,13 @@ BOOL EditConvertText(HWND hwnd, UINT cpSource, UINT cpDest, BOOL bSetSavePoint) 
 	} else {
 		// DBCS: length -> WCHAR: sizeof(WCHAR) * (length / 2) -> UTF-8: kMaxMultiByteCount * (length / 2)
 		struct Sci_TextRange tr = { { 0, -1 }, NULL };
-		char *pchText = NP2HeapAlloc((length + 1) * sizeof(WCHAR));
+		char *pchText = (char *)NP2HeapAlloc((length + 1) * sizeof(WCHAR));
 		tr.lpstrText = pchText;
 		SendMessage(hwnd, SCI_GETTEXTRANGE, 0, (LPARAM)&tr);
 
-		WCHAR *pwchText = NP2HeapAlloc((length + 1) * sizeof(WCHAR));
+		WCHAR *pwchText = (WCHAR *)NP2HeapAlloc((length + 1) * sizeof(WCHAR));
 		const int cbwText = MultiByteToWideChar(cpSource, 0, pchText, length, pwchText, length);
-		const int cbText = WideCharToMultiByte(cpDest, 0, pwchText, cbwText, pchText, length * sizeof(WCHAR), NULL, NULL);
+		const int cbText = WideCharToMultiByte(cpDest, 0, pwchText, cbwText, pchText, (int)(length * sizeof(WCHAR)), NULL, NULL);
 
 		SendMessage(hwnd, SCI_CANCEL, 0, 0);
 		SendMessage(hwnd, SCI_SETUNDOCOLLECTION, 0, 0);
@@ -236,15 +236,15 @@ char* EditGetClipboardText(HWND hwnd) {
 	}
 
 	HANDLE hmem = GetClipboardData(CF_UNICODETEXT);
-	WCHAR *pwch = GlobalLock(hmem);
+	WCHAR *pwch = (WCHAR *)GlobalLock(hmem);
 	const int wlen = lstrlen(pwch);
 
 	const UINT cpEdit = (UINT)SendMessage(hwnd, SCI_GETCODEPAGE, 0, 0);
 	const int iEOLMode = (int)SendMessage(hwnd, SCI_GETEOLMODE, 0, 0);
 
-	const int mlen = WideCharToMultiByte(cpEdit, 0, pwch, wlen + 1, NULL, 0, 0, 0) - 1;
-	char *pmch = LocalAlloc(LPTR, mlen + 1);
-	char *ptmp = NP2HeapAlloc(mlen * 4 + 1);
+	const int mlen = WideCharToMultiByte(cpEdit, 0, pwch, wlen + 1, NULL, 0, NULL, NULL) - 1;
+	char *pmch = (char *)LocalAlloc(LPTR, mlen + 1);
+	char *ptmp = (char *)NP2HeapAlloc(mlen * 4 + 1);
 
 	if (pmch && ptmp) {
 		const char *s = pmch;
@@ -274,7 +274,7 @@ char* EditGetClipboardText(HWND hwnd) {
 
 		*d++ = 0;
 		LocalFree(pmch);
-		pmch = LocalAlloc(LPTR, (d - ptmp));
+		pmch = (char *)LocalAlloc(LPTR, (d - ptmp));
 		strcpy(pmch, ptmp);
 		NP2HeapFree(ptmp);
 	}
@@ -306,25 +306,23 @@ BOOL EditCopyAppend(HWND hwnd) {
 		}
 
 		const int iSelCount = (int)SendMessage(hwnd, SCI_GETSELTEXT, 0, 0);
-		pszText = NP2HeapAlloc(iSelCount);
+		pszText = (char *)NP2HeapAlloc(iSelCount);
 		SendMessage(hwnd, SCI_GETSELTEXT, 0, (LPARAM)pszText);
 	} else {
 		const int cchText = (int)SendMessage(hwnd, SCI_GETLENGTH, 0, 0);
-		pszText = NP2HeapAlloc(cchText + 1);
+		pszText = (char *)NP2HeapAlloc(cchText + 1);
 		SendMessage(hwnd, SCI_GETTEXT, NP2HeapSize(pszText), (LPARAM)pszText);
 	}
 
 	const UINT cpEdit = (UINT)SendMessage(hwnd, SCI_GETCODEPAGE, 0, 0);
 	const int cchTextW = MultiByteToWideChar(cpEdit, 0, pszText, -1, NULL, 0);
 
-	WCHAR *pszTextW;
+	WCHAR *pszTextW = NULL;
 	if (cchTextW > 0) {
 		const WCHAR *pszSep = L"\r\n\r\n";
-		pszTextW = NP2HeapAlloc(sizeof(WCHAR) * (CSTRLEN(L"\r\n\r\n") + cchTextW + 1));
+		pszTextW = (WCHAR *)NP2HeapAlloc(sizeof(WCHAR) * (CSTRLEN(L"\r\n\r\n") + cchTextW + 1));
 		lstrcpy(pszTextW, pszSep);
-		MultiByteToWideChar(cpEdit, 0, pszText, -1, StrEnd(pszTextW), (int)NP2HeapSize(pszTextW) / sizeof(WCHAR));
-	} else {
-		pszTextW = L"";
+		MultiByteToWideChar(cpEdit, 0, pszText, -1, StrEnd(pszTextW), (int)(NP2HeapSize(pszTextW) / sizeof(WCHAR)));
 	}
 
 	NP2HeapFree(pszText);
@@ -332,11 +330,11 @@ BOOL EditCopyAppend(HWND hwnd) {
 	BOOL succ = FALSE;
 	if (OpenClipboard(GetParent(hwnd))) {
 		HANDLE hOld = GetClipboardData(CF_UNICODETEXT);
-		WCHAR *pszOld = GlobalLock(hOld);
+		WCHAR *pszOld = (WCHAR *)GlobalLock(hOld);
 
 		HANDLE hNew = GlobalAlloc(GMEM_MOVEABLE | GMEM_ZEROINIT,
 						   sizeof(WCHAR) * (lstrlen(pszOld) + lstrlen(pszTextW) + 1));
-		WCHAR *pszNew = GlobalLock(hNew);
+		WCHAR *pszNew = (WCHAR *)GlobalLock(hNew);
 
 		lstrcpy(pszNew, pszOld);
 		lstrcat(pszNew, pszTextW);
@@ -351,7 +349,7 @@ BOOL EditCopyAppend(HWND hwnd) {
 		succ = TRUE;
 	}
 
-	if (cchTextW > 0) {
+	if (pszTextW != NULL) {
 		NP2HeapFree(pszTextW);
 	}
 	return succ;
@@ -453,7 +451,8 @@ void EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus *status) {
 	const UINT8 * const end = ptr + cbData;
 	do {
 		// skip to line end
-		UINT ch, type = 0;
+		UINT ch;
+		UINT type = 0;
 		while (ptr < end && ((ch = *ptr++) > '\r' || (type = eol_table[ch]) == 0)) {
 			// nop
 		}
@@ -546,7 +545,7 @@ BOOL EditLoadFile(HWND hwnd, LPWSTR pszFile, BOOL bSkipEncodingDetection, EditFi
 		}
 	}
 
-	char *lpData = NP2HeapAlloc(dwFileSize + 16);
+	char *lpData = (char *)NP2HeapAlloc(dwFileSize + 16);
 	DWORD cbData = 0;
 	const BOOL bReadSuccess = ReadFile(hFile, lpData, (DWORD)NP2HeapSize(lpData) - 2, &cbData, NULL);
 	dwLastIOError = GetLastError();
@@ -625,13 +624,13 @@ BOOL EditLoadFile(HWND hwnd, LPWSTR pszFile, BOOL bSkipEncodingDetection, EditFi
 			}
 		}
 
-		char *lpDataUTF8 = NP2HeapAlloc(cbData * kMaxMultiByteCount + 2);
-		cbData = WideCharToMultiByte(CP_UTF8, 0, (bBOM) ? (LPWSTR)lpData + 1 : (LPWSTR)lpData,
-									 (bBOM) ? (cbData) / sizeof(WCHAR) : cbData / sizeof(WCHAR) + 1,
+		char *lpDataUTF8 = (char *)NP2HeapAlloc(cbData * kMaxMultiByteCount + 2);
+		cbData = WideCharToMultiByte(CP_UTF8, 0, (bBOM ? (LPWSTR)lpData + 1 : (LPWSTR)lpData),
+									 (int)(bBOM ? (cbData / sizeof(WCHAR)) : (cbData / sizeof(WCHAR)) + 1),
 									 lpDataUTF8, (int)NP2HeapSize(lpDataUTF8), NULL, NULL);
 		if (cbData == 0) {
-			cbData = WideCharToMultiByte(CP_ACP, 0, (bBOM) ? (LPWSTR)lpData + 1 : (LPWSTR)lpData,
-										 (-1), lpDataUTF8, (int)NP2HeapSize(lpDataUTF8), NULL, NULL);
+			cbData = WideCharToMultiByte(CP_ACP, 0, (bBOM ? (LPWSTR)lpData + 1 : (LPWSTR)lpData),
+										 -1, lpDataUTF8, (int)NP2HeapSize(lpDataUTF8), NULL, NULL);
 			status->bUnicodeErr = TRUE;
 		}
 
@@ -686,13 +685,11 @@ BOOL EditLoadFile(HWND hwnd, LPWSTR pszFile, BOOL bSkipEncodingDetection, EditFi
 			if (((mEncoding[iEncoding].uFlags & NCP_8BIT) && uCodePage != CP_UTF7) ||
 					(uCodePage == CP_UTF7 && IsUTF7(lpData, cbData))) {
 
-				LPWSTR lpDataWide = NP2HeapAlloc(cbData * sizeof(WCHAR) + 16);
-				const int cbDataWide = MultiByteToWideChar(uCodePage, 0, lpData, cbData, lpDataWide,
-												 (int)NP2HeapSize(lpDataWide) / sizeof(WCHAR));
+				LPWSTR lpDataWide = (LPWSTR)NP2HeapAlloc(cbData * sizeof(WCHAR) + 16);
+				const int cbDataWide = MultiByteToWideChar(uCodePage, 0, lpData, cbData, lpDataWide, (int)(NP2HeapSize(lpDataWide) / sizeof(WCHAR)));
 				NP2HeapFree(lpData);
-				lpData = NP2HeapAlloc(cbDataWide * kMaxMultiByteCount + 16);
-				cbData = WideCharToMultiByte(CP_UTF8, 0, lpDataWide, cbDataWide, lpData,
-											 (int)NP2HeapSize(lpData), NULL, NULL);
+				lpData = (char *)NP2HeapAlloc(cbDataWide * kMaxMultiByteCount + 16);
+				cbData = WideCharToMultiByte(CP_UTF8, 0, lpDataWide, cbDataWide, lpData, (int)NP2HeapSize(lpData), NULL, NULL);
 				NP2HeapFree(lpDataWide);
 
 				SendMessage(hwnd, SCI_SETCODEPAGE, SC_CP_UTF8, 0);
@@ -761,7 +758,7 @@ BOOL EditSaveFile(HWND hwnd, LPCWSTR pszFile, BOOL bSaveCopy, EditFileIOStatus *
 	BOOL bWriteSuccess;
 	// get text
 	DWORD cbData = (DWORD)SendMessage(hwnd, SCI_GETLENGTH, 0, 0);
-	char *lpData = NP2HeapAlloc(cbData + 1);
+	char *lpData = (char *)NP2HeapAlloc(cbData + 1);
 	SendMessage(hwnd, SCI_GETTEXT, NP2HeapSize(lpData), (LPARAM)lpData);
 
 	if (cbData == 0) {
@@ -797,9 +794,8 @@ BOOL EditSaveFile(HWND hwnd, LPCWSTR pszFile, BOOL bSaveCopy, EditFileIOStatus *
 		if (uFlags & NCP_UNICODE) {
 			SetEndOfFile(hFile);
 
-			LPWSTR lpDataWide = NP2HeapAlloc(cbData * sizeof(WCHAR) + 16);
-			const int cbDataWide = MultiByteToWideChar(CP_UTF8, 0, lpData, cbData, lpDataWide,
-											 (int)NP2HeapSize(lpDataWide) / sizeof(WCHAR));
+			LPWSTR lpDataWide = (LPWSTR)NP2HeapAlloc(cbData * sizeof(WCHAR) + 16);
+			const int cbDataWide = MultiByteToWideChar(CP_UTF8, 0, lpData, cbData, lpDataWide, (int)(NP2HeapSize(lpDataWide) / sizeof(WCHAR)));
 
 			if (uFlags & NCP_UNICODE_BOM) {
 				if (uFlags & NCP_UNICODE_REVERSE) {
@@ -810,7 +806,7 @@ BOOL EditSaveFile(HWND hwnd, LPCWSTR pszFile, BOOL bSaveCopy, EditFileIOStatus *
 			}
 
 			if (uFlags & NCP_UNICODE_REVERSE) {
-				_swab((char *)lpDataWide, (char *)lpDataWide, cbDataWide * sizeof(WCHAR));
+				_swab((char *)lpDataWide, (char *)lpDataWide, (int)(cbDataWide * sizeof(WCHAR)));
 			}
 
 			bWriteSuccess = WriteFile(hFile, lpDataWide, cbDataWide * sizeof(WCHAR), &dwBytesWritten, NULL);
@@ -830,26 +826,22 @@ BOOL EditSaveFile(HWND hwnd, LPCWSTR pszFile, BOOL bSaveCopy, EditFileIOStatus *
 			BOOL bCancelDataLoss = FALSE;
 			const UINT uCodePage = mEncoding[iEncoding].uCodePage;
 
-			LPWSTR lpDataWide = NP2HeapAlloc(cbData * 2 + 16);
-			const int cbDataWide = MultiByteToWideChar(CP_UTF8, 0, lpData, cbData, lpDataWide,
-												 (int)NP2HeapSize(lpDataWide) / sizeof(WCHAR));
+			LPWSTR lpDataWide = (LPWSTR)NP2HeapAlloc(cbData * 2 + 16);
+			const int cbDataWide = MultiByteToWideChar(CP_UTF8, 0, lpData, cbData, lpDataWide, (int)(NP2HeapSize(lpDataWide) / sizeof(WCHAR)));
 			// Special cases: 42, 50220, 50221, 50222, 50225, 50227, 50229, 54936 GB18030, 57002-11, 65000, 65001
 			if (uCodePage == CP_UTF7 || uCodePage == 54936) {
 				NP2HeapFree(lpData);
-				lpData = NP2HeapAlloc(NP2HeapSize(lpDataWide) * 2);
+				lpData = (char *)NP2HeapAlloc(NP2HeapSize(lpDataWide) * 2);
 			} else {
 				ZeroMemory(lpData, NP2HeapSize(lpData));
 			}
 
 			if (uCodePage == CP_UTF7 || uCodePage == 54936) {
-				cbData = WideCharToMultiByte(uCodePage, 0, lpDataWide, cbDataWide, lpData,
-											 (int)NP2HeapSize(lpData), NULL, NULL);
+				cbData = WideCharToMultiByte(uCodePage, 0, lpDataWide, cbDataWide, lpData, (int)NP2HeapSize(lpData), NULL, NULL);
 			} else {
-				cbData = WideCharToMultiByte(uCodePage, WC_NO_BEST_FIT_CHARS, lpDataWide, cbDataWide, lpData,
-											 (int)NP2HeapSize(lpData), NULL, &bCancelDataLoss);
+				cbData = WideCharToMultiByte(uCodePage, WC_NO_BEST_FIT_CHARS, lpDataWide, cbDataWide, lpData, (int)NP2HeapSize(lpData), NULL, &bCancelDataLoss);
 				if (!bCancelDataLoss) {
-					cbData = WideCharToMultiByte(uCodePage, 0, lpDataWide, cbDataWide, lpData,
-												 (int)NP2HeapSize(lpData), NULL, NULL);
+					cbData = WideCharToMultiByte(uCodePage, 0, lpDataWide, cbDataWide, lpData, (int)NP2HeapSize(lpData), NULL, NULL);
 					bCancelDataLoss = FALSE;
 				}
 			}
@@ -899,14 +891,13 @@ void EditInvertCase(HWND hwnd) {
 	}
 
 	const int iSelCount = (int)SendMessage(hwnd, SCI_GETSELTEXT, 0, 0) - 1;
-	char *pszText = NP2HeapAlloc(iSelCount + 1);
-	LPWSTR pszTextW = NP2HeapAlloc((iSelCount + 1) * sizeof(WCHAR));
+	char *pszText = (char *)NP2HeapAlloc(iSelCount + 1);
+	LPWSTR pszTextW = (LPWSTR)NP2HeapAlloc((iSelCount + 1) * sizeof(WCHAR));
 
 	SendMessage(hwnd, SCI_GETSELTEXT, 0, (LPARAM)pszText);
 
 	const UINT cpEdit = (UINT)SendMessage(hwnd, SCI_GETCODEPAGE, 0, 0);
-	const int cchTextW = MultiByteToWideChar(cpEdit, 0, pszText, iSelCount, pszTextW,
-								   (int)NP2HeapSize(pszTextW) / sizeof(WCHAR));
+	const int cchTextW = MultiByteToWideChar(cpEdit, 0, pszText, iSelCount, pszTextW, (int)(NP2HeapSize(pszTextW) / sizeof(WCHAR)));
 
 	BOOL bChanged = FALSE;
 	for (int i = 0; i < cchTextW; i++) {
@@ -949,21 +940,20 @@ void EditTitleCase(HWND hwnd) {
 	}
 
 	const int iSelCount = (int)SendMessage(hwnd, SCI_GETSELTEXT, 0, 0) - 1;
-	char *pszText = NP2HeapAlloc(iSelCount + 1);
-	LPWSTR pszTextW = NP2HeapAlloc((iSelCount + 1) * sizeof(WCHAR));
+	char *pszText = (char *)NP2HeapAlloc(iSelCount + 1);
+	LPWSTR pszTextW = (LPWSTR)NP2HeapAlloc((iSelCount + 1) * sizeof(WCHAR));
 
 	SendMessage(hwnd, SCI_GETSELTEXT, 0, (LPARAM)pszText);
 	const UINT cpEdit = (UINT)SendMessage(hwnd, SCI_GETCODEPAGE, 0, 0);
-	const int cchTextW = MultiByteToWideChar(cpEdit, 0, pszText, iSelCount, pszTextW,
-								   (int)NP2HeapSize(pszTextW) / sizeof(WCHAR));
+	const int cchTextW = MultiByteToWideChar(cpEdit, 0, pszText, iSelCount, pszTextW, (int)(NP2HeapSize(pszTextW) / sizeof(WCHAR)));
 
 	BOOL bChanged = FALSE;
 	if (IsWin7AndAbove()) {
-		LPWSTR pszMappedW = NP2HeapAlloc(NP2HeapSize(pszTextW));
+		LPWSTR pszMappedW = (LPWSTR)NP2HeapAlloc(NP2HeapSize(pszTextW));
 		if (LCMapString(LOCALE_SYSTEM_DEFAULT,
 						LCMAP_LINGUISTIC_CASING |/*LCMAP_TITLECASE*/0x00000300,
-						pszTextW, cchTextW, pszMappedW, (int)NP2HeapSize(pszMappedW) / sizeof(WCHAR))) {
-			lstrcpyn(pszTextW, pszMappedW, (int)NP2HeapSize(pszTextW) / sizeof(WCHAR));
+						pszTextW, cchTextW, pszMappedW, (int)(NP2HeapSize(pszMappedW) / sizeof(WCHAR)))) {
+			lstrcpyn(pszTextW, pszMappedW, (int)(NP2HeapSize(pszTextW) / sizeof(WCHAR)));
 			bChanged = TRUE;
 		} else {
 			bChanged = FALSE;
@@ -1055,14 +1045,13 @@ void EditSentenceCase(HWND hwnd) {
 	}
 
 	const int iSelCount = (int)SendMessage(hwnd, SCI_GETSELTEXT, 0, 0) - 1;
-	char *pszText = NP2HeapAlloc(iSelCount + 1);
-	LPWSTR pszTextW = NP2HeapAlloc((iSelCount + 1) * sizeof(WCHAR));
+	char *pszText = (char *)NP2HeapAlloc(iSelCount + 1);
+	LPWSTR pszTextW = (LPWSTR)NP2HeapAlloc((iSelCount + 1) * sizeof(WCHAR));
 
 	SendMessage(hwnd, SCI_GETSELTEXT, 0, (LPARAM)pszText);
 
 	const UINT cpEdit = (UINT)SendMessage(hwnd, SCI_GETCODEPAGE, 0, 0);
-	const int cchTextW = MultiByteToWideChar(cpEdit, 0, pszText, iSelCount, pszTextW,
-								   (int)NP2HeapSize(pszTextW) / sizeof(WCHAR));
+	const int cchTextW = MultiByteToWideChar(cpEdit, 0, pszText, iSelCount, pszTextW, (int)(NP2HeapSize(pszTextW) / sizeof(WCHAR)));
 
 	BOOL bNewSentence = TRUE;
 	BOOL bChanged = FALSE;
@@ -1112,7 +1101,7 @@ LPWSTR EditURLEncodeSelection(HWND hwnd, int *pcchEscaped, BOOL bTrim) {
 		return NULL;
 	}
 
-	char *pszText = NP2HeapAlloc(iSelCount);
+	char *pszText = (char *)NP2HeapAlloc(iSelCount);
 	SendMessage(hwnd, SCI_GETSELTEXT, 0, (LPARAM)pszText);
 
 	if (bTrim) {
@@ -1123,12 +1112,12 @@ LPWSTR EditURLEncodeSelection(HWND hwnd, int *pcchEscaped, BOOL bTrim) {
 		return NULL;
 	}
 
-	LPWSTR pszTextW = NP2HeapAlloc(iSelCount * sizeof(WCHAR));
+	LPWSTR pszTextW = (LPWSTR)NP2HeapAlloc(iSelCount * sizeof(WCHAR));
 	const UINT cpEdit = (UINT)SendMessage(hwnd, SCI_GETCODEPAGE, 0, 0);
-	MultiByteToWideChar(cpEdit, 0, pszText, iSelCount, pszTextW, (int)NP2HeapSize(pszTextW) / sizeof(WCHAR));
+	MultiByteToWideChar(cpEdit, 0, pszText, iSelCount, pszTextW, (int)(NP2HeapSize(pszTextW) / sizeof(WCHAR)));
 
 	// https://docs.microsoft.com/en-us/windows/desktop/api/shlwapi/nf-shlwapi-urlescapew
-	LPWSTR pszEscapedW = NP2HeapAlloc(NP2HeapSize(pszTextW) * 3);  // '&', H1, H0
+	LPWSTR pszEscapedW = (LPWSTR)NP2HeapAlloc(NP2HeapSize(pszTextW) * 3);  // '&', H1, H0
 
 	DWORD cchEscapedW = (int)NP2HeapSize(pszEscapedW) / sizeof(WCHAR);
 	UrlEscape(pszTextW, pszEscapedW, &cchEscapedW, URL_ESCAPE_SEGMENT_ONLY);
@@ -1157,9 +1146,8 @@ void EditURLEncode(HWND hwnd) {
 	}
 
 	const UINT cpEdit = (UINT)SendMessage(hwnd, SCI_GETCODEPAGE, 0, 0);
-	char *pszEscaped = NP2HeapAlloc(cchEscapedW * kMaxMultiByteCount);
-	const int cchEscaped = WideCharToMultiByte(cpEdit, 0, pszEscapedW, cchEscapedW, pszEscaped,
-									 (int)NP2HeapSize(pszEscaped), NULL, NULL);
+	char *pszEscaped = (char *)NP2HeapAlloc(cchEscapedW * kMaxMultiByteCount);
+	const int cchEscaped = WideCharToMultiByte(cpEdit, 0, pszEscapedW, cchEscapedW, pszEscaped, (int)NP2HeapSize(pszEscaped), NULL, NULL);
 	if (iCurPos < iAnchorPos) {
 		iAnchorPos = iCurPos + cchEscaped;
 	} else {
@@ -1193,21 +1181,20 @@ void EditURLDecode(HWND hwnd) {
 
 	const int iSelCount = (int)SendMessage(hwnd, SCI_GETSELTEXT, 0, 0);
 
-	char *pszText = NP2HeapAlloc(iSelCount);
-	LPWSTR pszTextW = NP2HeapAlloc(iSelCount * sizeof(WCHAR));
+	char *pszText = (char *)NP2HeapAlloc(iSelCount);
+	LPWSTR pszTextW = (LPWSTR)NP2HeapAlloc(iSelCount * sizeof(WCHAR));
 
 	SendMessage(hwnd, SCI_GETSELTEXT, 0, (LPARAM)pszText);
 	const UINT cpEdit = (UINT)SendMessage(hwnd, SCI_GETCODEPAGE, 0, 0);
-	MultiByteToWideChar(cpEdit, 0, pszText, iSelCount, pszTextW,
-						(int)NP2HeapSize(pszTextW) / sizeof(WCHAR));
+	MultiByteToWideChar(cpEdit, 0, pszText, iSelCount, pszTextW, (int)(NP2HeapSize(pszTextW) / sizeof(WCHAR)));
 
-	char *pszUnescaped = NP2HeapAlloc(NP2HeapSize(pszText) * 3);
-	LPWSTR pszUnescapedW = NP2HeapAlloc(NP2HeapSize(pszTextW) * 3);
+	char *pszUnescaped = (char *)NP2HeapAlloc(NP2HeapSize(pszText) * 3);
+	LPWSTR pszUnescapedW = (LPWSTR)NP2HeapAlloc(NP2HeapSize(pszTextW) * 3);
 
-	DWORD cchUnescapedW = (int)NP2HeapSize(pszUnescapedW) / sizeof(WCHAR);
+	DWORD cchUnescapedW = (DWORD)(NP2HeapSize(pszUnescapedW) / sizeof(WCHAR));
 	UrlUnescape(pszTextW, pszUnescapedW, &cchUnescapedW, 0);
-	DWORD cchUnescaped = WideCharToMultiByte(cpEdit, 0, pszUnescapedW, cchUnescapedW, pszUnescaped,
-									   (int)NP2HeapSize(pszUnescaped), NULL, NULL);
+	const int cchUnescaped = WideCharToMultiByte(cpEdit, 0, pszUnescapedW, cchUnescapedW, pszUnescaped, (int)NP2HeapSize(pszUnescaped), NULL, NULL);
+
 	if (iCurPos < iAnchorPos) {
 		iAnchorPos = iCurPos + cchUnescaped;
 	} else {
@@ -1431,7 +1418,7 @@ void EditChar2Hex(HWND hwnd) {
 	}
 
 	count *= 2 + MAX_ESCAPE_HEX_DIGIT;
-	char *ch = NP2HeapAlloc(count + 1);
+	char *ch = (char *)NP2HeapAlloc(count + 1);
 	WCHAR *wch = (WCHAR *)NP2HeapAlloc((count + 1) * sizeof(WCHAR));
 	SendMessage(hwnd, SCI_GETSELTEXT, 0, (LPARAM)ch);
 
@@ -1478,10 +1465,11 @@ void EditHex2Char(HWND hwnd) {
 	}
 
 	count *= 2 + MAX_ESCAPE_HEX_DIGIT;
-	char *ch = NP2HeapAlloc(count + 1);
+	char *ch = (char *)NP2HeapAlloc(count + 1);
 	WCHAR *wch = (WCHAR *)NP2HeapAlloc((count + 1) * sizeof(WCHAR));
 	const UINT cpEdit = (UINT)SendMessage(hwnd, SCI_GETCODEPAGE, 0, 0);
-	int ci = 0, cch = 0, ucc = 0;
+	int ci = 0;
+	int cch = 0;
 
 	SendMessage(hwnd, SCI_GETSELTEXT, 0, (LPARAM)ch);
 
@@ -1492,7 +1480,7 @@ void EditHex2Char(HWND hwnd) {
 			if (*p == 'x' || *p == 'u') {
 				p++;
 				ci = 0;
-				ucc = 0;
+				int ucc = 0;
 				while (*p && (ucc++ < MAX_ESCAPE_HEX_DIGIT)) {
 					if (*p >= '0' && *p <= '9') {
 						ci = ci * 16 + (*p++ - '0');
@@ -1538,17 +1526,18 @@ void EditShowHex(HWND hwnd) {
 		return;
 	}
 
-	char *ch = NP2HeapAlloc(count + 1);
-	char *cch = NP2HeapAlloc(count * 3 + 3);
-	char *p = ch, *t = cch;
+	char *ch = (char *)NP2HeapAlloc(count + 1);
+	char *cch = (char *)NP2HeapAlloc(count * 3 + 3);
+	char *p = ch;
+	char *t = cch;
 	SendMessage(hwnd, SCI_GETSELTEXT, 0, (LPARAM)ch);
 	*t++ = '[';
 	while (*p) {
-		int c = *p++, v;
+		int c = *p++;
 		if (c < 0) {
 			c += 256;
 		}
-		v = c >> 4;
+		int v = c >> 4;
 		*t++ = (char)((v >= 10) ? v - 10 + 'a' : v + '0');
 		v = c & 0x0f;
 		*t++ = (char)((v >= 10) ? v - 10 + 'a' : v + '0');
@@ -1586,7 +1575,7 @@ static int ConvertNumRadix(char *tch, uint64_t num, int radix) {
 		int index = 2 + 22;
 		int length = 0;
 		while (num) {
-			int bit = num & 7;
+			const int bit = (int)(num & 7);
 			num >>= 3;
 			buf[index--] = (char)('0' + bit);
 			++length;
@@ -1606,9 +1595,10 @@ static int ConvertNumRadix(char *tch, uint64_t num, int radix) {
 	case 2: {
 		char buf[2 + 64 + 8 + 1] = "";
 		int index = 2 + 64 + 8;
-		int length = 0, bit_count = 0;
+		int length = 0;
+		int bit_count = 0;
 		while (num) {
-			const int bit = num & 1;
+			const int bit = (int)(num & 1);
 			num >>= 1;
 			buf[index--] = (char)('0' + bit);
 			++bit_count;
@@ -1646,8 +1636,8 @@ void EditConvertNumRadix(HWND hwnd, int radix) {
 		return;
 	}
 
-	char *ch = NP2HeapAlloc(count + 1);
-	char *tch = NP2HeapAlloc(2 + count * 4 + 8 + 1);
+	char *ch = (char *)NP2HeapAlloc(count + 1);
+	char *tch = (char *)NP2HeapAlloc(2 + count * 4 + 8 + 1);
 	int cch = 0;
 	char *p = ch;
 	uint64_t ci = 0;
@@ -1851,8 +1841,8 @@ void EditTabsToSpaces(HWND hwnd, int nTabWidth, BOOL bOnlyIndentingWS) {
 
 	const int iSelCount = iSelEnd - iSelStart;
 
-	char *pszText = NP2HeapAlloc(iSelCount + 1);
-	LPWSTR pszTextW = NP2HeapAlloc((iSelCount + 1) * sizeof(WCHAR));
+	char *pszText = (char *)NP2HeapAlloc(iSelCount + 1);
+	LPWSTR pszTextW = (LPWSTR)NP2HeapAlloc((iSelCount + 1) * sizeof(WCHAR));
 
 	struct Sci_TextRange tr;
 	tr.chrg.cpMin = iSelStart;
@@ -1861,11 +1851,10 @@ void EditTabsToSpaces(HWND hwnd, int nTabWidth, BOOL bOnlyIndentingWS) {
 	SendMessage(hwnd, SCI_GETTEXTRANGE, 0, (LPARAM)&tr);
 
 	const UINT cpEdit = (UINT)SendMessage(hwnd, SCI_GETCODEPAGE, 0, 0);
-	const int cchTextW = MultiByteToWideChar(cpEdit, 0, pszText, iSelCount, pszTextW,
-								   (int)NP2HeapSize(pszTextW) / sizeof(WCHAR));
+	const int cchTextW = MultiByteToWideChar(cpEdit, 0, pszText, iSelCount, pszTextW, (int)(NP2HeapSize(pszTextW) / sizeof(WCHAR)));
 	NP2HeapFree(pszText);
 
-	LPWSTR pszConvW = NP2HeapAlloc(cchTextW * sizeof(WCHAR) * nTabWidth + 2);
+	LPWSTR pszConvW = (LPWSTR)NP2HeapAlloc(cchTextW * sizeof(WCHAR) * nTabWidth + 2);
 	int cchConvW = 0;
 
 	BOOL bIsLineStart = TRUE;
@@ -1895,10 +1884,9 @@ void EditTabsToSpaces(HWND hwnd, int nTabWidth, BOOL bOnlyIndentingWS) {
 	NP2HeapFree(pszTextW);
 
 	if (bModified) {
-		pszText = NP2HeapAlloc(cchConvW * kMaxMultiByteCount);
+		pszText = (char *)NP2HeapAlloc(cchConvW * kMaxMultiByteCount);
 
-		const int cchConvM = WideCharToMultiByte(cpEdit, 0, pszConvW, cchConvW, pszText,
-									   (int)NP2HeapSize(pszText), NULL, NULL);
+		const int cchConvM = WideCharToMultiByte(cpEdit, 0, pszConvW, cchConvW, pszText, (int)NP2HeapSize(pszText), NULL, NULL);
 
 		if (iAnchorPos > iCurPos) {
 			iCurPos = iSelStart;
@@ -1946,8 +1934,8 @@ void EditSpacesToTabs(HWND hwnd, int nTabWidth, BOOL bOnlyIndentingWS) {
 
 	const int iSelCount = iSelEnd - iSelStart;
 
-	char *pszText = NP2HeapAlloc(iSelCount + 1);
-	LPWSTR pszTextW = NP2HeapAlloc((iSelCount + 1) * sizeof(WCHAR));
+	char *pszText = (char *)NP2HeapAlloc(iSelCount + 1);
+	LPWSTR pszTextW = (LPWSTR)NP2HeapAlloc((iSelCount + 1) * sizeof(WCHAR));
 
 	struct Sci_TextRange tr;
 	tr.chrg.cpMin = iSelStart;
@@ -1957,17 +1945,17 @@ void EditSpacesToTabs(HWND hwnd, int nTabWidth, BOOL bOnlyIndentingWS) {
 
 	const UINT cpEdit = (UINT)SendMessage(hwnd, SCI_GETCODEPAGE, 0, 0);
 
-	const int cchTextW = MultiByteToWideChar(cpEdit, 0, pszText, iSelCount, pszTextW,
-								   (int)NP2HeapSize(pszTextW) / sizeof(WCHAR));
+	const int cchTextW = MultiByteToWideChar(cpEdit, 0, pszText, iSelCount, pszTextW, (int)(NP2HeapSize(pszTextW) / sizeof(WCHAR)));
 	NP2HeapFree(pszText);
 
-	LPWSTR pszConvW = NP2HeapAlloc(cchTextW * sizeof(WCHAR) + 2);
+	LPWSTR pszConvW = (LPWSTR)NP2HeapAlloc(cchTextW * sizeof(WCHAR) + 2);
 	int cchConvW = 0;
 
 	BOOL bIsLineStart = TRUE;
 	BOOL bModified = FALSE;
 	// Contributed by Homam, Thank you very much!
-	int i = 0, j = 0;
+	int i = 0;
+	int j = 0;
 	WCHAR space[256];
 	for (int iTextW = 0; iTextW < cchTextW; iTextW++) {
 		WCHAR w = pszTextW[iTextW];
@@ -2010,9 +1998,8 @@ void EditSpacesToTabs(HWND hwnd, int nTabWidth, BOOL bOnlyIndentingWS) {
 	NP2HeapFree(pszTextW);
 
 	if (bModified || cchConvW != cchTextW) {
-		pszText = NP2HeapAlloc(cchConvW * kMaxMultiByteCount + 1);
-		const int cchConvM = WideCharToMultiByte(cpEdit, 0, pszConvW, cchConvW, pszText,
-									   (int)NP2HeapSize(pszText), NULL, NULL);
+		pszText = (char *)NP2HeapAlloc(cchConvW * kMaxMultiByteCount + 1);
+		const int cchConvM = WideCharToMultiByte(cpEdit, 0, pszConvW, cchConvW, pszText, (int)NP2HeapSize(pszText), NULL, NULL);
 
 		if (iAnchorPos > iCurPos) {
 			iCurPos = iSelStart;
@@ -2080,7 +2067,7 @@ void EditMoveUp(HWND hwnd) {
 
 	if (iLineSrc >= 0) {
 		const int cLine = (int)SendMessage(hwnd, SCI_GETLINE, iLineSrc, 0);
-		char *pLine = NP2HeapAlloc(cLine + 1);
+		char *pLine = (char *)NP2HeapAlloc(cLine + 1);
 		SendMessage(hwnd, SCI_GETLINE, iLineSrc, (LPARAM)pLine);
 
 		const int iLineSrcStart = (int)SendMessage(hwnd, SCI_POSITIONFROMLINE, iLineSrc, 0);
@@ -2205,7 +2192,7 @@ void EditMoveDown(HWND hwnd) {
 		}
 
 		const int cLine = (int)SendMessage(hwnd, SCI_GETLINE, iLineSrc, 0);
-		char *pLine = NP2HeapAlloc(cLine + 3);
+		char *pLine = (char *)NP2HeapAlloc(cLine + 3);
 		SendMessage(hwnd, SCI_GETLINE, iLineSrc, (LPARAM)pLine);
 
 		const int iLineSrcStart = (int)SendMessage(hwnd, SCI_POSITIONFROMLINE, iLineSrc, 0);
@@ -2326,7 +2313,7 @@ void EditModifyLines(HWND hwnd, LPCWSTR pwszPrefix, LPCWSTR pwszAppend) {
 	int iPrefixLine = 0;
 	if (iPrefixLen != 0) {
 		const int size = iPrefixLen * kMaxMultiByteCount + 1;
-		mszPrefix1 = NP2HeapAlloc(size);
+		mszPrefix1 = (char *)NP2HeapAlloc(size);
 		WideCharToMultiByte(cpEdit, 0, pwszPrefix, -1, mszPrefix1, size, NULL, NULL);
 		ConvertWinEditLineEndingsEx(mszPrefix1, iEOLMode, &iPrefixLine);
 	}
@@ -2336,7 +2323,7 @@ void EditModifyLines(HWND hwnd, LPCWSTR pwszPrefix, LPCWSTR pwszAppend) {
 	int iAppendLine = 0;
 	if (iAppendLen != 0) {
 		const int size = iAppendLen * kMaxMultiByteCount + 1;
-		mszAppend1 = NP2HeapAlloc(size);
+		mszAppend1 = (char *)NP2HeapAlloc(size);
 		WideCharToMultiByte(cpEdit, 0, pwszAppend, -1, mszAppend1, size, NULL, NULL);
 		ConvertWinEditLineEndingsEx(mszAppend1, iEOLMode, &iAppendLine);
 	}
@@ -2371,7 +2358,7 @@ void EditModifyLines(HWND hwnd, LPCWSTR pwszPrefix, LPCWSTR pwszAppend) {
 
 	if (iPrefixLen != 0) {
 		char *p = mszPrefix1;
-		mszPrefix2 = NP2HeapAlloc(iPrefixLen * kMaxMultiByteCount + 1);
+		mszPrefix2 = (char *)NP2HeapAlloc(iPrefixLen * kMaxMultiByteCount + 1);
 		while (!bPrefixNum && (p = StrStrA(p, "$(")) != NULL) {
 			if (strncmp(p, "$(I)", CSTRLEN("$(I)")) == 0) {
 				*p = 0;
@@ -2434,7 +2421,7 @@ void EditModifyLines(HWND hwnd, LPCWSTR pwszPrefix, LPCWSTR pwszAppend) {
 
 	if (iAppendLen != 0) {
 		char *p = mszAppend1;
-		mszAppend2 = NP2HeapAlloc(iAppendLen * kMaxMultiByteCount + 1);
+		mszAppend2 = (char *)NP2HeapAlloc(iAppendLen * kMaxMultiByteCount + 1);
 		while (!bAppendNum && (p = StrStrA(p, "$(")) != NULL) {
 			if (strncmp(p, "$(I)", CSTRLEN("$(I)")) == 0) {
 				*p = 0;
@@ -2495,7 +2482,7 @@ void EditModifyLines(HWND hwnd, LPCWSTR pwszPrefix, LPCWSTR pwszAppend) {
 		}
 	}
 
-	char *mszInsert = NP2HeapAlloc(2 * max_i(iPrefixLen, iAppendLen) * kMaxMultiByteCount + 1);
+	char *mszInsert = (char *)NP2HeapAlloc(2 * max_i(iPrefixLen, iAppendLen) * kMaxMultiByteCount + 1);
 	SendMessage(hwnd, SCI_BEGINUNDOACTION, 0, 0);
 	for (int iLine = iLineStart, iLineDest = iLineStart; iLine <= iLineEnd; iLine++, iLineDest++) {
 		if (iPrefixLen != 0) {
@@ -2844,7 +2831,7 @@ void EditEncloseSelection(HWND hwnd, LPCWSTR pwszOpen, LPCWSTR pwszClose) {
 	int len = lstrlen(pwszOpen);
 	if (len != 0) {
 		const int size = kMaxMultiByteCount * len + 1;
-		mszOpen = NP2HeapAlloc(size);
+		mszOpen = (char *)NP2HeapAlloc(size);
 		WideCharToMultiByte(cpEdit, 0, pwszOpen, -1, mszOpen, size, NULL, NULL);
 		ConvertWinEditLineEndings(mszOpen, iEOLMode);
 	}
@@ -2853,7 +2840,7 @@ void EditEncloseSelection(HWND hwnd, LPCWSTR pwszOpen, LPCWSTR pwszClose) {
 	len = lstrlen(pwszClose);
 	if (len != 0) {
 		const int size = kMaxMultiByteCount * len + 1;
-		mszClose = NP2HeapAlloc(size);
+		mszClose = (char *)NP2HeapAlloc(size);
 		WideCharToMultiByte(cpEdit, 0, pwszClose, -1, mszClose, size, NULL, NULL);
 		ConvertWinEditLineEndings(mszClose, iEOLMode);
 	}
@@ -3100,7 +3087,7 @@ void EditPadWithSpaces(HWND hwnd, BOOL bSkipEmpty, BOOL bNoUndoGroup) {
 		}
 	}
 
-	char *pmszPadStr = NP2HeapAlloc((iMaxColumn + 1) * sizeof(char));
+	char *pmszPadStr = (char *)NP2HeapAlloc((iMaxColumn + 1) * sizeof(char));
 	if (pmszPadStr) {
 		FillMemory(pmszPadStr, NP2HeapSize(pmszPadStr), ' ');
 
@@ -3353,8 +3340,8 @@ void EditCompressSpaces(HWND hwnd) {
 		const int iLineStart = (int)SendMessage(hwnd, SCI_LINEFROMPOSITION, iSelStart, 0);
 		const int iLineEnd = (int)SendMessage(hwnd, SCI_LINEFROMPOSITION, iSelEnd, 0);
 		const int cch = (int)SendMessage(hwnd, SCI_GETSELTEXT, 0, 0);
-		pszIn = NP2HeapAlloc(cch);
-		pszOut = NP2HeapAlloc(cch);
+		pszIn = (char *)NP2HeapAlloc(cch);
+		pszOut = (char *)NP2HeapAlloc(cch);
 		SendMessage(hwnd, SCI_GETSELTEXT, 0, (LPARAM)pszIn);
 		bIsLineStart =
 			(iSelStart == SendMessage(hwnd, SCI_POSITIONFROMLINE, iLineStart, 0));
@@ -3362,15 +3349,16 @@ void EditCompressSpaces(HWND hwnd) {
 			(iSelEnd == SendMessage(hwnd, SCI_GETLINEENDPOSITION, iLineEnd, 0));
 	} else {
 		const int cch = iLength + 1;
-		pszIn = NP2HeapAlloc(cch);
-		pszOut = NP2HeapAlloc(cch);
+		pszIn = (char *)NP2HeapAlloc(cch);
+		pszOut = (char *)NP2HeapAlloc(cch);
 		SendMessage(hwnd, SCI_GETTEXT, cch, (LPARAM)pszIn);
 		bIsLineStart = TRUE;
 		bIsLineEnd = TRUE;
 	}
 
 	BOOL bModified = FALSE;
-	char *ci, *co = pszOut;
+	char *ci;
+	char *co = pszOut;
 	for (ci = pszIn; *ci; ci++) {
 		if (*ci == ' ' || *ci == '\t') {
 			if (*ci == '\t') {
@@ -3509,8 +3497,8 @@ void EditWrapToColumn(HWND hwnd, int nColumn/*, int nTabWidth*/) {
 	const int iLine = (int)SendMessage(hwnd, SCI_LINEFROMPOSITION, iSelStart, 0);
 	iSelStart = (int)SendMessage(hwnd, SCI_POSITIONFROMLINE, iLine, 0);
 
-	char *pszText = NP2HeapAlloc(iSelCount + 1 + 2);
-	LPWSTR pszTextW = NP2HeapAlloc((iSelCount + 1 + 2) * sizeof(WCHAR));
+	char *pszText = (char *)NP2HeapAlloc(iSelCount + 1 + 2);
+	LPWSTR pszTextW = (LPWSTR)NP2HeapAlloc((iSelCount + 1 + 2) * sizeof(WCHAR));
 
 	struct Sci_TextRange tr;
 	tr.chrg.cpMin = iSelStart;
@@ -3519,11 +3507,10 @@ void EditWrapToColumn(HWND hwnd, int nColumn/*, int nTabWidth*/) {
 	SendMessage(hwnd, SCI_GETTEXTRANGE, 0, (LPARAM)&tr);
 
 	const UINT cpEdit = (UINT)SendMessage(hwnd, SCI_GETCODEPAGE, 0, 0);
-	const int cchTextW = MultiByteToWideChar(cpEdit, 0, pszText, iSelCount, pszTextW,
-								   (int)NP2HeapSize(pszTextW) / sizeof(WCHAR));
+	const int cchTextW = MultiByteToWideChar(cpEdit, 0, pszText, iSelCount, pszTextW, (int)(NP2HeapSize(pszTextW) / sizeof(WCHAR)));
 	NP2HeapFree(pszText);
 
-	LPWSTR pszConvW = NP2HeapAlloc(cchTextW * sizeof(WCHAR) * 3 + 2);
+	LPWSTR pszConvW = (LPWSTR)NP2HeapAlloc(cchTextW * sizeof(WCHAR) * 3 + 2);
 
 	WCHAR wszEOL[] = L"\r\n";
 	int cchEOL = 2;
@@ -3623,9 +3610,8 @@ void EditWrapToColumn(HWND hwnd, int nColumn/*, int nTabWidth*/) {
 	NP2HeapFree(pszTextW);
 
 	if (bModified) {
-		pszText = NP2HeapAlloc(cchConvW * kMaxMultiByteCount);
-		const int cchConvM = WideCharToMultiByte(cpEdit, 0, pszConvW, cchConvW, pszText,
-									   (int)NP2HeapSize(pszText), NULL, NULL);
+		pszText = (char *)NP2HeapAlloc(cchConvW * kMaxMultiByteCount);
+		const int cchConvM = WideCharToMultiByte(cpEdit, 0, pszConvW, cchConvW, pszText, (int)NP2HeapSize(pszText), NULL, NULL);
 
 		if (iAnchorPos > iCurPos) {
 			iCurPos = iSelStart;
@@ -3673,8 +3659,8 @@ void EditJoinLinesEx(HWND hwnd) {
 	iSelStart = (int)SendMessage(hwnd, SCI_POSITIONFROMLINE, iLine, 0);
 
 	const int iSelCount = iSelEnd - iSelStart;
-	char *pszText = NP2HeapAlloc(iSelCount + 1 + 2);
-	char *pszJoin = NP2HeapAlloc(NP2HeapSize(pszText));
+	char *pszText = (char *)NP2HeapAlloc(iSelCount + 1 + 2);
+	char *pszJoin = (char *)NP2HeapAlloc(NP2HeapSize(pszText));
 
 	struct Sci_TextRange tr;
 	tr.chrg.cpMin = iSelStart;
@@ -3849,12 +3835,12 @@ void EditSortLines(HWND hwnd, int iSortFlags) {
 		EditPadWithSpaces(hwnd, !(iSortFlags & SORT_SHUFFLE), TRUE);
 	}
 
-	SORTLINE *pLines = NP2HeapAlloc(sizeof(SORTLINE) * iLineCount);
+	SORTLINE *pLines = (SORTLINE *)NP2HeapAlloc(sizeof(SORTLINE) * iLineCount);
 	int cchTotal = 0;
 	int ichlMax = 3;
 	for (int i = 0, iLine = iLineStart; iLine <= iLineEnd; i++, iLine++) {
 		const int cchm = (int)SendMessage(hwnd, SCI_GETLINE, iLine, 0);
-		char *pmsz = NP2HeapAlloc(cchm + 1);
+		char *pmsz = (char *)NP2HeapAlloc(cchm + 1);
 		SendMessage(hwnd, SCI_GETLINE, iLine, (LPARAM)pmsz);
 		StrTrimA(pmsz, "\r\n");
 		cchTotal += cchm;
@@ -3862,13 +3848,13 @@ void EditSortLines(HWND hwnd, int iSortFlags) {
 
 		const int cchw = MultiByteToWideChar(cpEdit, 0, pmsz, -1, NULL, 0) - 1;
 		if (cchw > 0) {
-			pLines[i].pwszLine = LocalAlloc(LPTR, sizeof(WCHAR) * (cchw + 1));
-			MultiByteToWideChar(cpEdit, 0, pmsz, -1, pLines[i].pwszLine,
-								(int)LocalSize(pLines[i].pwszLine) / sizeof(WCHAR));
+			pLines[i].pwszLine = (LPWSTR)LocalAlloc(LPTR, sizeof(WCHAR) * (cchw + 1));
+			MultiByteToWideChar(cpEdit, 0, pmsz, -1, pLines[i].pwszLine, (int)(LocalSize(pLines[i].pwszLine) / sizeof(WCHAR)));
 			pLines[i].pwszSortEntry = pLines[i].pwszLine;
 
 			if (iSortFlags & SORT_COLUMN) {
-				UINT col = 0, tabs = iTabWidth;
+				UINT col = 0;
+				UINT tabs = iTabWidth;
 				while (*(pLines[i].pwszSortEntry)) {
 					if (*(pLines[i].pwszSortEntry) == L'\t') {
 						if (col + tabs <= iSortColumn) {
@@ -3918,8 +3904,8 @@ void EditSortLines(HWND hwnd, int iSortFlags) {
 		}
 	}
 
-	char *pmszResult = NP2HeapAlloc(cchTotal + 2 * iLineCount + 1);
-	char *pmszBuf = NP2HeapAlloc(ichlMax + 1);
+	char *pmszResult = (char *)NP2HeapAlloc(cchTotal + 2 * iLineCount + 1);
+	char *pmszBuf = (char *)NP2HeapAlloc(ichlMax + 1);
 	const int cbPmszBuf = (int)NP2HeapSize(pmszBuf);
 	const int cbPmszResult = (int)NP2HeapSize(pmszResult);
 	FNSTRCMP pfnStrCmp = (iSortFlags & SORT_NOCASE) ? StrCmpIW : StrCmpW;
@@ -4130,25 +4116,24 @@ void EditGetExcerpt(HWND hwnd, LPWSTR lpszExcerpt, DWORD cchExcerpt) {
 	DWORD cch = 0;
 	struct Sci_TextRange tr;
 	/*if (iCurPos != iAnchorPos && SC_SEL_RECTANGLE != SendMessage(hwnd, SCI_GETSELECTIONMODE, 0, 0)) {*/
-	tr.chrg.cpMin = (int)SendMessage(hwnd, SCI_GETSELECTIONSTART, 0, 0);
-	tr.chrg.cpMax = min_i((int)SendMessage(hwnd, SCI_GETSELECTIONEND, 0, 0), tr.chrg.cpMin + COUNTOF(tch));
+	tr.chrg.cpMin = (long)SendMessage(hwnd, SCI_GETSELECTIONSTART, 0, 0);
+	tr.chrg.cpMax = min_l((long)SendMessage(hwnd, SCI_GETSELECTIONEND, 0, 0), (long)(tr.chrg.cpMin + COUNTOF(tch)));
 	/*}
 	else {
-		const int iLine = SendMessage(hwnd, SCI_LINEFROMPOSITION, iCurPos, 0);
-		tr.chrg.cpMin = SendMessage(hwnd, SCI_POSITIONFROMLINE, iLine, 0);
-		tr.chrg.cpMax = min_i(SendMessage(hwnd, SCI_GETLINEENDPOSITION, iLine, 0), tr.chrg.cpMin + COUNTOF(tch));
+		const int iLine = (int)SendMessage(hwnd, SCI_LINEFROMPOSITION, iCurPos, 0);
+		tr.chrg.cpMin = (long)SendMessage(hwnd, SCI_POSITIONFROMLINE, iLine, 0);
+		tr.chrg.cpMax = min_l((long)SendMessage(hwnd, SCI_GETLINEENDPOSITION, iLine, 0), (long)(tr.chrg.cpMin + COUNTOF(tch)));
 	}*/
 
-	tr.chrg.cpMax = min_i((int)SendMessage(hwnd, SCI_GETLENGTH, 0, 0), tr.chrg.cpMax);
+	tr.chrg.cpMax = min_l((long)SendMessage(hwnd, SCI_GETLENGTH, 0, 0), tr.chrg.cpMax);
 
-	char *pszText = NP2HeapAlloc((tr.chrg.cpMax - tr.chrg.cpMin) + 2);
-	LPWSTR pszTextW = NP2HeapAlloc(((tr.chrg.cpMax - tr.chrg.cpMin) + 1) * sizeof(WCHAR));
+	char *pszText = (char *)NP2HeapAlloc((tr.chrg.cpMax - tr.chrg.cpMin) + 2);
+	LPWSTR pszTextW = (LPWSTR)NP2HeapAlloc(((tr.chrg.cpMax - tr.chrg.cpMin) + 1) * sizeof(WCHAR));
 
 	tr.lpstrText = pszText;
 	SendMessage(hwnd, SCI_GETTEXTRANGE, 0, (LPARAM)&tr);
 	const UINT cpEdit = (UINT)SendMessage(hwnd, SCI_GETCODEPAGE, 0, 0);
-	MultiByteToWideChar(cpEdit, 0, pszText, tr.chrg.cpMax - tr.chrg.cpMin, pszTextW,
-						(int)NP2HeapSize(pszTextW) / sizeof(WCHAR));
+	MultiByteToWideChar(cpEdit, 0, pszText, tr.chrg.cpMax - tr.chrg.cpMin, pszTextW, (int)(NP2HeapSize(pszTextW) / sizeof(WCHAR)));
 
 	for (WCHAR *p = pszTextW; *p && cch < COUNTOF(tch) - 1; p++) {
 		if (*p == L'\r' || *p == L'\n' || *p == L'\t' || *p == L' ') {
@@ -4275,7 +4260,7 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 							   - (int)SendMessage(lpefr->hwnd, SCI_GETSELECTIONSTART, 0, 0);
 			if (cchSelection <= NP2_FIND_REPLACE_LIMIT) {
 				cchSelection = (int)SendMessage(lpefr->hwnd, SCI_GETSELTEXT, 0, 0);
-				char *lpszSelection = NP2HeapAlloc(cchSelection);
+				char *lpszSelection = (char *)NP2HeapAlloc(cchSelection);
 				SendMessage(lpefr->hwnd, SCI_GETSELTEXT, 0, (LPARAM)lpszSelection);
 
 				// First time you bring up find/replace dialog, copy content from clipboard to find box (but only if nothing is selected in the editor)
@@ -4284,7 +4269,7 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 					const int len = lstrlenA(pClip);
 					if (len > 0 && len <= NP2_FIND_REPLACE_LIMIT) {
 						NP2HeapFree(lpszSelection);
-						lpszSelection = NP2HeapAlloc(len + 2);
+						lpszSelection = (char *)NP2HeapAlloc(len + 2);
 						lstrcpynA(lpszSelection, pClip, NP2_FIND_REPLACE_LIMIT);
 					}
 					LocalFree(pClip);
@@ -4296,7 +4281,7 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 				//if (lpsz) {
 				//	*lpsz = '\0';
 				//}
-				char *lpszEscSel = NP2HeapAlloc((2 * NP2_FIND_REPLACE_LIMIT));
+				char *lpszEscSel = (char *)NP2HeapAlloc((2 * NP2_FIND_REPLACE_LIMIT));
 				lpefr->bTransformBS = AddBackslash(lpszEscSel, lpszSelection);
 
 				SetDlgItemTextA2W(cpEdit, hwnd, IDC_FINDTEXT, lpszEscSel);
@@ -5063,7 +5048,7 @@ void EditMarkAll(HWND hwnd, int iMarkOccurrences, BOOL bMarkOccurrencesMatchCase
 
 	// scintilla/src/Editor.h SelectionText.LengthWithTerminator()
 	iSelCount = (int)SendMessage(hwnd, SCI_GETSELTEXT, 0, 0) - 1;
-	char *pszText = NP2HeapAlloc(iSelCount + 1);
+	char *pszText = (char *)NP2HeapAlloc(iSelCount + 1);
 	SendMessage(hwnd, SCI_GETSELTEXT, 0, (LPARAM)pszText);
 
 	// exit if selection is not a word and Match whole words only is enabled
@@ -5497,7 +5482,7 @@ static INT_PTR CALLBACK EditModifyLinesDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 
 		HFONT hFontNormal = (HFONT)SendDlgItemMessage(hwnd, IDC_MODIFY_LINE_DLN_NP, WM_GETFONT, 0, 0);
 		if (hFontNormal == NULL) {
-			hFontNormal = GetStockObject(DEFAULT_GUI_FONT);
+			hFontNormal = (HFONT)GetStockObject(DEFAULT_GUI_FONT);
 		}
 
 		LOGFONT lf;
@@ -5861,7 +5846,7 @@ static INT_PTR CALLBACK EditInsertTagDlgProc(HWND hwnd, UINT umsg, WPARAM wParam
 				if (len >= 3) {
 					LPWSTR pwsz1 = StrChr(wszOpen.buffer, L'<');
 					if (pwsz1 != NULL) {
-						LPWSTR wchIns = NP2HeapAlloc((len + 5) * sizeof(WCHAR));
+						LPWSTR wchIns = (LPWSTR)NP2HeapAlloc((len + 5) * sizeof(WCHAR));
 						lstrcpy(wchIns, L"</");
 						int	cchIns = 2;
 						const WCHAR *pwCur = pwsz1 + 1;
@@ -5980,7 +5965,7 @@ void EditInsertUnicodeControlCharacter(HWND hwnd, int menu) {
 }
 
 void EditShowUnicodeControlCharacter(HWND hwnd, BOOL bShow) {
-	for (UINT i = 0; i < COUNTOF(kUnicodeControlCharacterTable); i++) {
+	for (UINT i = 0; i < (UINT)COUNTOF(kUnicodeControlCharacterTable); i++) {
 		const UnicodeControlCharacter ucc = kUnicodeControlCharacterTable[i];
 		if (StrIsEmptyA(ucc.representation)) {
 			continue;
@@ -6158,12 +6143,12 @@ void EditSelectionAction(HWND hwnd, int action) {
 		return;
 	}
 
-	LPWSTR lpszCommand = NP2HeapAlloc(sizeof(WCHAR) * (cchEscapedW + COUNTOF(szCmdTemplate) + MAX_PATH + 32));
+	LPWSTR lpszCommand = (LPWSTR)NP2HeapAlloc(sizeof(WCHAR) * (cchEscapedW + COUNTOF(szCmdTemplate) + MAX_PATH + 32));
 	const size_t cbCommand = NP2HeapSize(lpszCommand);
 	wsprintf(lpszCommand, szCmdTemplate, pszEscapedW);
 	ExpandEnvironmentStringsEx(lpszCommand, (DWORD)(cbCommand / sizeof(WCHAR)));
 
-	LPWSTR lpszArgs = NP2HeapAlloc(cbCommand);
+	LPWSTR lpszArgs = (LPWSTR)NP2HeapAlloc(cbCommand);
 	ExtractFirstArgument(lpszCommand, lpszCommand, lpszArgs);
 
 	WCHAR wchDirectory[MAX_PATH] = L"";
@@ -6411,7 +6396,7 @@ BOOL FileVars_Init(LPCSTR lpData, DWORD cbData, LPFILEVARS lpfv) {
 	}
 
 	char tch[512];
-	lstrcpynA(tch, lpData, min_i(cbData + 1, COUNTOF(tch)));
+	lstrcpynA(tch, lpData, min_u(cbData + 1, COUNTOF(tch)));
 	const BOOL utf8Sig = IsUTF8Signature(lpData);
 	BOOL bDisableFileVariables = FALSE;
 

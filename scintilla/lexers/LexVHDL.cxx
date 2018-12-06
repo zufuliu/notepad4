@@ -213,8 +213,10 @@ static void FoldVHDLDoc(Sci_PositionU startPos, Sci_Position length, int /*initS
 		}
 	}
 
-	char ch = 0, chNext;
-	int style = SCE_VHDL_DEFAULT, styleNext;
+	char ch = 0;
+	char chNext;
+	int style = SCE_VHDL_DEFAULT;
+	int styleNext;
 	chNext = styler[startPos];
 	styleNext = styler.StyleAt(startPos);
 
@@ -292,7 +294,8 @@ static void FoldVHDLDoc(Sci_PositionU startPos, Sci_Position length, int /*initS
 						if (strcmp(prevWord, "end") != 0) {
 							// check for instantiated unit by backward searching for the colon.
 							Sci_PositionU pos = lastStart;
-							char chAtPos = 0, styleAtPos;
+							char chAtPos = 0;
+							int styleAtPos;
 							do { // skip white spaces
 								if (!pos)
 									break;

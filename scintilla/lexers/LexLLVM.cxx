@@ -93,7 +93,8 @@ static void ColouriseLLVMDoc(Sci_PositionU startPos, Sci_Position length, int in
 					if (strncmp(buf + 1, "llvm.", 5) == 0) {
 						styler.ColourTo(i - 1, SCE_C_DIRECTIVE);
 					} else {
-						bool is_func = false, is_type = false;
+						bool is_func = false;
+						bool is_type = false;
 						CheckLLVMVarType(i, endPos, styler, is_func, is_type);
 						if (is_func) {
 							state = SCE_C_PREPROCESSOR;

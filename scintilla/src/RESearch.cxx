@@ -443,7 +443,9 @@ const char *RESearch::Compile(const char *pattern, Sci::Position length, bool ca
 
 	int n;
 	char mask;             /* xor mask -CCL/NCL */
-	int c1, c2, prevChar;
+	int c1;
+	int c2;
+	int prevChar;
 
 	if (!pattern || !length) {
 		if (sta)
@@ -679,7 +681,7 @@ const char *RESearch::Compile(const char *pattern, Sci::Position length, bool ca
 					p += incr;
 					if (c >= 0) {
 						*mp++ = CHR;
-						*mp++ = static_cast<unsigned char>(c);
+						*mp++ = static_cast<char>(c);
 					} else {
 						*mp++ = CCL;
 						mask = 0;
@@ -715,7 +717,7 @@ const char *RESearch::Compile(const char *pattern, Sci::Position length, bool ca
 					c = '\\';	// We take it as raw backslash
 				if (caseSensitive || !iswordc(c)) {
 					*mp++ = CHR;
-					*mp++ = c;
+					*mp++ = static_cast<char>(c);
 				} else {
 					*mp++ = CCL;
 					mask = 0;
@@ -852,7 +854,9 @@ static inline int isinset(const char *ap, unsigned char c) noexcept {
 #define CCLSKIP 34	/* [CLO] CCL 32 bytes END */
 
 Sci::Position RESearch::PMatch(const CharacterIndexer &ci, Sci::Position lp, Sci::Position endp, char *ap) {
-	int op, c, n;
+	int op;
+	int c;
+	int n;
 	Sci::Position e;		/* extra pointer for CLO  */
 	Sci::Position bp;		/* beginning of subpat... */
 	Sci::Position ep;		/* ending of subpat...    */

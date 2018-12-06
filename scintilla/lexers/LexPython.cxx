@@ -241,7 +241,7 @@ _label_identifier:
 		case SCE_PY_TRIPLE_FMT_STRING1:
 			if (sc.ch == '\\') {
 				sc.Forward();
-			} else if (sc.Match("\'\'\'")) {
+			} else if (sc.Match(R"(''')")) {
 				sc.Forward(2);
 				sc.ForwardSetState(SCE_PY_DEFAULT);
 			}
@@ -251,7 +251,7 @@ _label_identifier:
 		case SCE_PY_TRIPLE_FMT_STRING2:
 			if (sc.ch == '\\') {
 				sc.Forward();
-			} else if (sc.Match("\"\"\"")) {
+			} else if (sc.Match(R"(""")")) {
 				sc.Forward(2);
 				sc.ForwardSetState(SCE_PY_DEFAULT);
 			}
@@ -262,10 +262,10 @@ _label_identifier:
 		if (sc.state == SCE_PY_DEFAULT) {
 			if (sc.ch == '#') {
 				sc.SetState(SCE_PY_COMMENTLINE);
-			} else if (sc.Match("\'\'\'")) {
+			} else if (sc.Match(R"(''')")) {
 				sc.SetState(SCE_PY_TRIPLE_STRING1);
 				sc.Forward(2);
-			} else if (sc.Match("\"\"\"")) {
+			} else if (sc.Match(R"(""")")) {
 				sc.SetState(SCE_PY_TRIPLE_STRING2);
 				sc.Forward(2);
 			} else if (sc.ch == '\'') {
@@ -298,10 +298,10 @@ _label_identifier:
 					sc.SetState(SCE_PY_IDENTIFIER);
 				} else {
 					sc.Forward(offset);
-					if (sc.Match("\'\'\'")) {
+					if (sc.Match(R"(''')")) {
 						sc.ChangeState(GetPyStringStyle(3, is_raw, is_bytes, is_fmt));
 						sc.Forward(2);
-					} else if (sc.Match("\"\"\"")) {
+					} else if (sc.Match(R"(""")")) {
 						sc.ChangeState(GetPyStringStyle(6, is_raw, is_bytes, is_fmt));
 						sc.Forward(2);
 					} else if (sc.ch == '\'') {

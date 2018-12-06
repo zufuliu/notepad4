@@ -1949,7 +1949,7 @@ Sci::Position Document::FindText(Sci::Position minPos, Sci::Position maxPos, con
 				bool characterMatches = true;
 				for (;;) {
 					const unsigned char leadByte = cb.UCharAt(posIndexDocument);
-					bytes[0] = leadByte;
+					bytes[0] = static_cast<char>(leadByte);
 					int widthChar = 1;
 					if (!UTF8IsAscii(leadByte)) {
 						const int widthCharBytes = UTF8BytesOfLead(leadByte);
@@ -3111,7 +3111,7 @@ const char *BuiltinRegex::SubstituteByPosition(Document *doc, const char *text, 
 	substituted.clear();
 	const DocumentIndexer di(doc, doc->Length());
 	search.GrabMatches(di);
-	for (int j = 0; j < *length; j++) {
+	for (Sci::Position j = 0; j < *length; j++) {
 		if (text[j] == '\\') {
 			if (text[j + 1] >= '0' && text[j + 1] <= '9') {
 				const unsigned int patNum = text[j + 1] - '0';
