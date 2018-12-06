@@ -378,7 +378,6 @@ NP2_inline void EndWaitCursor(void) {
 
 UINT GetDefaultDPI(HWND hwnd);
 UINT GetCurrentDPI(HWND hwnd);
-BOOL PrivateIsAppThemed(void);
 HRESULT PrivateSetCurrentProcessExplicitAppUserModelID(PCWSTR AppID);
 BOOL IsElevated(void);
 

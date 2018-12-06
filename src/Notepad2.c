@@ -25,6 +25,7 @@
 #include <shellapi.h>
 #include <commctrl.h>
 #include <commdlg.h>
+#include <uxtheme.h>
 #include <stdio.h>
 #include <time.h>
 #include <stdint.h>
@@ -274,8 +275,6 @@ static DWORD dwChangeNotifyTime = 0;
 
 static UINT msgTaskbarCreated = 0;
 
-HMODULE		hModUxTheme = NULL;
-
 static WIN32_FIND_DATA fdCurFile;
 static EDITFINDREPLACE efrData;
 UINT	cpLastFind = 0;
@@ -464,9 +463,6 @@ static void CleanUpResources(BOOL initialized) {
 	Edit_ReleaseResources();
 	Scintilla_ReleaseResources();
 
-	if (hModUxTheme) {
-		FreeLibrary(hModUxTheme);
-	}
 	if (initialized) {
 		UnregisterClass(wchWndClass, g_hInstance);
 	}
@@ -578,7 +574,6 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 
 	// see LoadD2D() in PlatWin.cxx
 	kSystemLibraryLoadFlags = (IsWin8AndAbove() || GetProcAddress(GetModuleHandle(TEXT("kernel32.dll")), "SetDefaultDllDirectories")) ? LOAD_LIBRARY_SEARCH_SYSTEM32 : 0;
-	hModUxTheme = LoadLibraryEx(L"uxtheme.dll", NULL, kSystemLibraryLoadFlags);
 
 	Scintilla_RegisterClasses(hInstance);
 
@@ -1547,6 +1542,7 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	// Setup edit control
 	hwndEdit = EditCreate(hwnd);
+	//SciInitThemes(hwndEdit);
 	if (bEditLayoutRTL) {
 		SetWindowLayoutRTL(hwndEdit, TRUE);
 	}
@@ -1630,7 +1626,7 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 						hInstance,
 						NULL);
 
-	if (PrivateIsAppThemed()) {
+	if (IsAppThemed()) {
 		bIsAppThemed = TRUE;
 
 		SetWindowLongPtr(hwndEdit, GWL_EXSTYLE, GetWindowLongPtr(hwndEdit, GWL_EXSTYLE) & ~WS_EX_CLIENTEDGE);
@@ -1712,7 +1708,7 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 //
 //
 void CreateBars(HWND hwnd, HINSTANCE hInstance) {
-	bIsAppThemed = PrivateIsAppThemed();
+	bIsAppThemed = IsAppThemed();
 
 	const DWORD dwToolbarStyle = WS_TOOLBAR;
 	hwndToolbar = CreateWindowEx(0, TOOLBARCLASSNAME, NULL, dwToolbarStyle,
@@ -1919,7 +1915,7 @@ void MsgThemeChanged(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	// reinitialize edit frame
 
-	if (PrivateIsAppThemed()) {
+	if (IsAppThemed()) {
 		bIsAppThemed = TRUE;
 
 		SetWindowLongPtr(hwndEdit, GWL_EXSTYLE, GetWindowLongPtr(hwndEdit, GWL_EXSTYLE) & ~WS_EX_CLIENTEDGE);

@@ -314,23 +314,6 @@ HBITMAP ResizeImageForCurrentDPI(HBITMAP hbmp) {
 
 //=============================================================================
 //
-// PrivateIsAppThemed()
-//
-extern HMODULE hModUxTheme;
-BOOL PrivateIsAppThemed(void) {
-	BOOL bIsAppThemed = FALSE;
-
-	if (hModUxTheme) {
-		FARPROC pfnIsAppThemed = GetProcAddress(hModUxTheme, "IsAppThemed");
-		if (pfnIsAppThemed) {
-			bIsAppThemed = (BOOL)pfnIsAppThemed();
-		}
-	}
-	return bIsAppThemed;
-}
-
-//=============================================================================
-//
 // PrivateSetCurrentProcessExplicitAppUserModelID()
 //
 HRESULT PrivateSetCurrentProcessExplicitAppUserModelID(PCWSTR AppID) {
@@ -386,16 +369,16 @@ BOOL IsElevated(void) {
 //
 //  SetTheme()
 //
-//BOOL SetTheme(HWND hwnd, LPCWSTR lpszTheme) {
-//	if (hModUxTheme) {
-//		FARPROC pfnSetWindowTheme = GetProcAddress(hModUxTheme, "SetWindowTheme");
-//
-//		if (pfnSetWindowTheme) {
-//			return (S_OK == pfnSetWindowTheme(hwnd, lpszTheme, NULL));
-//		}
-//	}
-//	return FALSE;
-//}
+#if 0
+BOOL SetTheme(HWND hwnd, LPCWSTR lpszTheme) {
+	FARPROC pfnSetWindowTheme = GetProcAddress(GetModuleHandle(L"uxtheme.dll"), "SetWindowTheme");
+
+	if (pfnSetWindowTheme) {
+		return (S_OK == pfnSetWindowTheme(hwnd, lpszTheme, NULL));
+	}
+	return FALSE;
+}
+#endif
 
 //=============================================================================
 //
@@ -2081,24 +2064,22 @@ BOOL GetThemedDialogFont(LPWSTR lpFaceName, WORD *wSize) {
 	const int iLogPixelsY = GetDeviceCaps(hDC, LOGPIXELSY);
 	ReleaseDC(NULL, hDC);
 
-	if (hModUxTheme) {
-		if ((BOOL)(GetProcAddress(hModUxTheme, "IsAppThemed"))()) {
-			HTHEME hTheme = (HTHEME)(INT_PTR)(GetProcAddress(hModUxTheme, "OpenThemeData"))(NULL, L"WINDOWSTYLE;WINDOW");
-			if (hTheme) {
-				LOGFONT lf;
-				if (S_OK == (HRESULT)(GetProcAddress(hModUxTheme, "GetThemeSysFont"))(hTheme, /*TMT_MSGBOXFONT*/805, &lf)) {
-					if (lf.lfHeight < 0) {
-						lf.lfHeight = -lf.lfHeight;
-					}
-					*wSize = (WORD)MulDiv(lf.lfHeight, 72, iLogPixelsY);
-					if (*wSize == 0) {
-						*wSize = 8;
-					}
-					lstrcpyn(lpFaceName, lf.lfFaceName, LF_FACESIZE);
-					bSucceed = TRUE;
+	if (IsAppThemed()) {
+		HTHEME hTheme = OpenThemeData(NULL, L"WINDOWSTYLE;WINDOW");
+		if (hTheme) {
+			LOGFONT lf;
+			if (S_OK == GetThemeSysFont(hTheme, /*TMT_MSGBOXFONT*/805, &lf)) {
+				if (lf.lfHeight < 0) {
+					lf.lfHeight = -lf.lfHeight;
 				}
-				(GetProcAddress(hModUxTheme, "CloseThemeData"))(hTheme);
+				*wSize = (WORD)MulDiv(lf.lfHeight, 72, iLogPixelsY);
+				if (*wSize == 0) {
+					*wSize = 8;
+				}
+				lstrcpyn(lpFaceName, lf.lfFaceName, LF_FACESIZE);
+				bSucceed = TRUE;
 			}
+			CloseThemeData(hTheme);
 		}
 	}
 
