@@ -55,6 +55,7 @@
         <Library Value="ole32.a"/>
         <Library Value="oleaut32.a"/>
         <Library Value="uuid.a"/>
+        <Library Value="uxtheme.a"/>
         <Library Value="psapi.a"/>
       </Linker>
       <ResourceCompiler Options="-DRC_INVOKED;-DUNICODE;-D_UNICODE;"/>

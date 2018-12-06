@@ -25,6 +25,7 @@
 #include <shlobj.h>
 #include <shellapi.h>
 #include <commdlg.h>
+#include <uxtheme.h>
 #include <stdio.h>
 #include "Helpers.h"
 #include "Dlapi.h"
@@ -161,7 +162,6 @@ WCHAR	szDDETopic[256] = L"";
 HINSTANCE	g_hInstance;
 HANDLE		g_hDefaultHeap;
 UINT16		g_uWinVer;
-HMODULE		hModUxTheme = NULL;
 
 //=============================================================================
 //
@@ -192,9 +192,6 @@ static void CleanUpResources(BOOL initialized) {
 	}
 	if (tchToolbarBitmapDisabled != NULL) {
 		LocalFree(tchToolbarBitmapDisabled);
-	}
-	if (hModUxTheme) {
-		FreeLibrary(hModUxTheme);
 	}
 	if (initialized) {
 		UnregisterClass(WC_METAPATH, g_hInstance);
@@ -238,9 +235,6 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 
 	// Load Settings
 	LoadSettings();
-
-	const DWORD kSystemLibraryLoadFlags = (IsWin8AndAbove() || GetProcAddress(GetModuleHandle(TEXT("kernel32.dll")), "SetDefaultDllDirectories")) ? LOAD_LIBRARY_SEARCH_SYSTEM32 : 0;
-	hModUxTheme = LoadLibraryEx(L"uxtheme.dll", NULL, kSystemLibraryLoadFlags);
 
 	if (!InitApplication(hInstance)) {
 		CleanUpResources(FALSE);
@@ -720,7 +714,7 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 					  hInstance,
 					  NULL);
 
-	if (IsVistaAndAbove() && PrivateIsAppThemed()) {
+	if (IsVistaAndAbove() && IsAppThemed()) {
 		SetWindowLongPtr(hwndDirList, GWL_EXSTYLE, GetWindowLongPtr(hwndDirList, GWL_EXSTYLE) & ~WS_EX_CLIENTEDGE);
 		SetWindowPos(hwndDirList, NULL, 0, 0, 0, 0, SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE | SWP_FRAMECHANGED);
 	}
@@ -806,7 +800,7 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 //
 //
 void CreateBars(HWND hwnd, HINSTANCE hInstance) {
-	const BOOL bIsAppThemed = PrivateIsAppThemed();
+	const BOOL bIsAppThemed = IsAppThemed();
 
 	const DWORD dwToolbarStyle = WS_TOOLBAR | TBSTYLE_FLAT | CCS_ADJUSTABLE;
 	hwndToolbar = CreateWindowEx(0, TOOLBARCLASSNAME, NULL, dwToolbarStyle,
@@ -977,7 +971,7 @@ void MsgThemeChanged(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	UNREFERENCED_PARAMETER(lParam);
 
 	HINSTANCE hInstance = (HINSTANCE)(INT_PTR)GetWindowLongPtr(hwnd, GWLP_HINSTANCE);
-	const BOOL bIsAppThemed = PrivateIsAppThemed();
+	const BOOL bIsAppThemed = IsAppThemed();
 
 	if (IsVistaAndAbove() && bIsAppThemed) {
 		SetWindowLongPtr(hwndDirList, GWL_EXSTYLE, GetWindowLongPtr(hwndDirList, GWL_EXSTYLE) & ~WS_EX_CLIENTEDGE);

@@ -313,7 +313,6 @@ static inline BOOL IsUTF8Signature(const char *p) {
 }
 
 //void SciInitThemes(HWND hwnd);
-//LRESULT CALLBACK SciThemedWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam);
 
 #define FV_TABWIDTH				1
 #define FV_INDENTWIDTH			2
