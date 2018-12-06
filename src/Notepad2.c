@@ -1690,13 +1690,13 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	DragAcceptFiles(hwnd, TRUE);
 
 	// File MRU
-	pFileMRU = MRU_Create(MRU_KEY_RECENT_FILES, MRU_NOCASE, 32);
+	pFileMRU = MRU_Create(MRU_KEY_RECENT_FILES, MRU_NOCASE, MRU_MAX_RECENT_FILES);
 	MRU_Load(pFileMRU);
 
-	mruFind = MRU_Create(MRU_KEY_RECENT_FIND, (/*IsWindowsNT()*/1) ? MRU_UTF8 : 0, 16);
+	mruFind = MRU_Create(MRU_KEY_RECENT_FIND, MRU_UTF8, MRU_MAX_RECENT_FIND);
 	MRU_Load(mruFind);
 
-	mruReplace = MRU_Create(MRU_KEY_RECENT_REPLACE, (/*IsWindowsNT()*/1) ? MRU_UTF8 : 0, 16);
+	mruReplace = MRU_Create(MRU_KEY_RECENT_REPLACE, MRU_UTF8, MRU_MAX_RECENT_REPLACE);
 	MRU_Load(mruReplace);
 
 	if (hwndEdit == NULL || hwndEditFrame == NULL ||
