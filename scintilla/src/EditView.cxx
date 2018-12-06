@@ -1739,7 +1739,7 @@ static void DrawTranslucentLineState(Surface *surface, const EditModel &model, c
 		}
 	}
 	const int marksOfLine = model.pdoc->GetMark(line);
-	int marksDrawnInText = marksOfLine & vsDraw.maskDrawInText;
+	unsigned int marksDrawnInText = marksOfLine & vsDraw.maskDrawInText;
 	for (int markBit = 0; (markBit < 32) && marksDrawnInText; markBit++) {
 		if (marksDrawnInText & 1) {
 			if (vsDraw.markers[markBit].markType == SC_MARK_BACKGROUND) {
@@ -1752,7 +1752,7 @@ static void DrawTranslucentLineState(Surface *surface, const EditModel &model, c
 		}
 		marksDrawnInText >>= 1;
 	}
-	int marksDrawnInLine = marksOfLine & vsDraw.maskInLine;
+	unsigned int marksDrawnInLine = marksOfLine & vsDraw.maskInLine;
 	for (int markBit = 0; (markBit < 32) && marksDrawnInLine; markBit++) {
 		if (marksDrawnInLine & 1) {
 			SimpleAlphaRectangle(surface, rcLine, vsDraw.markers[markBit].back, vsDraw.markers[markBit].alpha);

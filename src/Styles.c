@@ -341,7 +341,7 @@ void Style_ReleaseResources(void) {
 static void Style_LoadOneEx(PEDITLEXER pLex, IniSection *pIniSection, WCHAR *pIniSectionBuf, int cchIniSection) {
 	LoadIniSection(pLex->pszName, pIniSectionBuf, cchIniSection);
 	const UINT iStyleCount = pLex->iStyleCount;
-	LPWSTR szStyleBuf = NP2HeapAlloc(EDITSTYLE_BufferSize(iStyleCount));
+	LPWSTR szStyleBuf = (LPWSTR)NP2HeapAlloc(EDITSTYLE_BufferSize(iStyleCount));
 	pLex->szStyleBuf = szStyleBuf;
 	if (!IniSectionParse(pIniSection, pIniSectionBuf)) {
 		for (UINT i = 0; i < iStyleCount; i++) {
@@ -370,9 +370,9 @@ static void Style_LoadOneEx(PEDITLEXER pLex, IniSection *pIniSection, WCHAR *pIn
 //
 void Style_Load(void) {
 	IniSection section;
-	g_AllFileExtensions = NP2HeapAlloc(ALL_FILE_EXTENSIONS_BYTE_SIZE);
-	WCHAR *pIniSectionBuf = NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_STYLES);
-	const int cchIniSection = (int)NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR);
+	g_AllFileExtensions = (LPWSTR)NP2HeapAlloc(ALL_FILE_EXTENSIONS_BYTE_SIZE);
+	WCHAR *pIniSectionBuf = (WCHAR *)NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_STYLES);
+	const int cchIniSection = (int)(NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR));
 	IniSection *pIniSection = &section;
 	IniSectionInit(pIniSection, 128);
 
@@ -420,8 +420,8 @@ void Style_Load(void) {
 
 static void Style_LoadOne(PEDITLEXER pLex) {
 	IniSection section;
-	WCHAR *pIniSectionBuf = NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_STYLES);
-	const int cchIniSection = (int)NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR);
+	WCHAR *pIniSectionBuf = (WCHAR *)NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_STYLES);
+	const int cchIniSection = (int)(NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR));
 	IniSection *pIniSection = &section;
 	IniSectionInit(pIniSection, 128);
 	Style_LoadOneEx(pLex, pIniSection, pIniSectionBuf, cchIniSection);
@@ -431,8 +431,8 @@ static void Style_LoadOne(PEDITLEXER pLex) {
 
 static void Style_LoadAll(void) {
 	IniSection section;
-	WCHAR *pIniSectionBuf = NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_STYLES);
-	const int cchIniSection = (int)NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR);
+	WCHAR *pIniSectionBuf = (WCHAR *)NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_STYLES);
+	const int cchIniSection = (int)(NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR));
 	IniSection *pIniSection = &section;
 	IniSectionInit(pIniSection, 128);
 
@@ -476,8 +476,8 @@ static void Style_LoadAll(void) {
 //
 void Style_Save(void) {
 	IniSectionOnSave section;
-	WCHAR *pIniSectionBuf = NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_STYLES);
-	const int cchIniSection = (int)NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR);
+	WCHAR *pIniSectionBuf = (WCHAR *)NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_STYLES);
+	const int cchIniSection = (int)(NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR));
 	IniSectionOnSave *pIniSection = &section;
 	pIniSection->next = pIniSectionBuf;
 
@@ -573,8 +573,8 @@ BOOL Style_Import(HWND hwnd) {
 
 	if (GetOpenFileName(&ofn)) {
 		IniSection section;
-		WCHAR *pIniSectionBuf = NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_STYLES);
-		const int cchIniSection = (int)NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR);
+		WCHAR *pIniSectionBuf = (WCHAR *)NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_STYLES);
+		const int cchIniSection = (int)(NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR));
 		IniSection *pIniSection = &section;
 
 		IniSectionInit(pIniSection, 128);
@@ -644,8 +644,8 @@ BOOL Style_Export(HWND hwnd) {
 	if (GetSaveFileName(&ofn)) {
 		DWORD dwError = ERROR_SUCCESS;
 		IniSectionOnSave section;
-		WCHAR *pIniSectionBuf = NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_STYLES);
-		const int cchIniSection = (int)NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR);
+		WCHAR *pIniSectionBuf = (WCHAR *)NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_STYLES);
+		const int cchIniSection = (int)(NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR));
 		IniSectionOnSave *pIniSection = &section;
 
 		pIniSection->next = pIniSectionBuf;
@@ -897,7 +897,7 @@ void Style_SetLexer(HWND hwnd, PEDITLEXER pLexNew) {
 		if (StrNotEmptyA(pKeywords) && !(currentLexKeywordAttr[i] & KeywordAttr_NoLexer)) {
 			if (currentLexKeywordAttr[i] & KeywordAttr_MakeLower) {
 				const size_t len = strlen(pKeywords);
-				char *lowerKeywords = NP2HeapAlloc(len + 1);
+				char *lowerKeywords = (char *)NP2HeapAlloc(len + 1);
 				char *p = lowerKeywords;
 				CopyMemory(lowerKeywords, pKeywords, len);
 				while (*p) {
@@ -1043,7 +1043,8 @@ void Style_SetLexer(HWND hwnd, PEDITLEXER pLexNew) {
 		};
 
 		const COLORREF clrBack = SciCall_StyleGetBack(STYLE_DEFAULT);
-		COLORREF clrFore, clrFill;
+		COLORREF clrFore;
+		COLORREF clrFill;
 
 		szValue = lexDefault.Styles[Style_FoldingMarker + iIdx].szValue;
 		if (Style_StrGetColor(TRUE, szValue, &iValue)) {
@@ -1073,7 +1074,7 @@ void Style_SetLexer(HWND hwnd, PEDITLEXER pLexNew) {
 		}
 #endif
 
-		for (UINT i = 0; i < COUNTOF(iMarkerIDs); ++i) {
+		for (UINT i = 0; i < (UINT)COUNTOF(iMarkerIDs); ++i) {
 			const int marker = iMarkerIDs[i];
 			SciCall_MarkerSetBack(marker, clrFore);
 			SciCall_MarkerSetFore(marker, clrBack);
@@ -2559,7 +2560,7 @@ BOOL Style_SelectColor(HWND hwnd, BOOL bFore, LPWSTR lpszStyle, int cchStyle) {
 	CHOOSECOLOR cc;
 	ZeroMemory(&cc, sizeof(CHOOSECOLOR));
 
-	int iRGBResult = bFore ? GetSysColor(COLOR_WINDOWTEXT) : GetSysColor(COLOR_WINDOW);
+	int iRGBResult = (int)(bFore ? GetSysColor(COLOR_WINDOWTEXT) : GetSysColor(COLOR_WINDOW));
 	Style_StrGetColor(bFore, lpszStyle, &iRGBResult);
 
 	cc.lStructSize = sizeof(CHOOSECOLOR);
@@ -2841,7 +2842,7 @@ int Style_GetLexerIconId(PEDITLEXER pLex) {
 		pszExtensions = pLex->pszDefExt;
 	}
 
-	WCHAR *pszFile = NP2HeapAlloc(sizeof(WCHAR) * (lstrlen(pszExtensions) + CSTRLEN(L"*.txt") + 16));
+	WCHAR *pszFile = (WCHAR *)NP2HeapAlloc(sizeof(WCHAR) * (lstrlen(pszExtensions) + CSTRLEN(L"*.txt") + 16));
 	lstrcpy(pszFile, L"*.");
 	lstrcat(pszFile, pszExtensions);
 	WCHAR *p;
@@ -2996,7 +2997,7 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 		// Setup title font
 		HFONT hFontTitle = (HFONT)SendDlgItemMessage(hwnd, IDC_TITLE, WM_GETFONT, 0, 0);
 		if (hFontTitle == NULL) {
-			hFontTitle = GetStockObject(DEFAULT_GUI_FONT);
+			hFontTitle = (HFONT)GetStockObject(DEFAULT_GUI_FONT);
 		}
 		LOGFONT lf;
 		GetObject(hFontTitle, sizeof(LOGFONT), &lf);
@@ -3022,7 +3023,8 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 	return FALSE;
 
 	case WM_SIZE: {
-		int dx, dy;
+		int dx;
+		int dy;
 
 		ResizeDlg_Size(hwnd, lParam, &dx, &dy);
 		const int cy = ResizeDlg_CalcDeltaY2(hwnd, dy, 50, IDC_STYLEEDIT, IDC_STYLEVALUE_DEFAULT);
@@ -3076,7 +3078,7 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 						*StrChr(wch, L'|') = 0;
 					}
 
-					pCurrentStyle = 0;
+					pCurrentStyle = NULL;
 					if ((pCurrentLexer = (PEDITLEXER)lpnmtv->itemNew.lParam) != NULL) {
 						SetDlgItemText(hwnd, IDC_STYLELABEL, wch);
 						EnableWindow(GetDlgItem(hwnd, IDC_STYLEEDIT), TRUE);
@@ -3123,7 +3125,7 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 						*StrChr(wch, L'|') = 0;
 					}
 
-					pCurrentLexer = 0;
+					pCurrentLexer = NULL;
 					if ((pCurrentStyle = (PEDITSTYLE)lpnmtv->itemNew.lParam) != NULL) {
 						SetDlgItemText(hwnd, IDC_STYLELABEL, StrEnd(wch) + 1);
 						EnableWindow(GetDlgItem(hwnd, IDC_STYLEEDIT), TRUE);
@@ -3322,6 +3324,9 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 
 		case IDC_RESETALL:
 			Style_ResetAll();
+#if defined(__cplusplus)
+			[[fallthrough]];
+#endif
 			// fall through
 		case IDC_STYLEDEFAULT:
 			if (pCurrentStyle) {
@@ -3451,7 +3456,7 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 // Style_ConfigDlg()
 //
 void Style_ConfigDlg(HWND hwnd) {
-	LPWSTR extBackup = NP2HeapAlloc(ALL_FILE_EXTENSIONS_BYTE_SIZE);
+	LPWSTR extBackup = (LPWSTR)NP2HeapAlloc(ALL_FILE_EXTENSIONS_BYTE_SIZE);
 	COLORREF colorBackup[MAX_CUSTOM_COLOR_COUNT];
 	LPWSTR styleBackup[NUMLEXERS];
 	BOOL apply = FALSE;
@@ -3466,7 +3471,7 @@ void Style_ConfigDlg(HWND hwnd) {
 	for (UINT iLexer = 0; iLexer < NUMLEXERS; iLexer++) {
 		PEDITLEXER pLex = pLexArray[iLexer];
 		const UINT iStyleBufSize = EDITSTYLE_BufferSize(pLex->iStyleCount);
-		LPWSTR szStyleBuf = NP2HeapAlloc(iStyleBufSize);
+		LPWSTR szStyleBuf = (LPWSTR)NP2HeapAlloc(iStyleBufSize);
 		CopyMemory(szStyleBuf, pLex->szStyleBuf, iStyleBufSize);
 		styleBackup[iLexer] = szStyleBuf;
 	}
@@ -3528,7 +3533,7 @@ static INT_PTR CALLBACK Style_SelectLexerDlgProc(HWND hwnd, UINT umsg, WPARAM wP
 
 	switch (umsg) {
 	case WM_INITDIALOG: {
-		LVCOLUMN lvc = { LVCF_FMT | LVCF_TEXT, LVCFMT_LEFT, 0, L"", -1, 0, 0, 0 };
+		LVCOLUMN lvc = { LVCF_FMT | LVCF_TEXT, LVCFMT_LEFT, 0, NULL, -1, 0, 0, 0 };
 		ResizeDlg_Init(hwnd, cxStyleSelectDlg, cyStyleSelectDlg, IDC_RESIZEGRIP3);
 
 		HWND hwndLV = GetDlgItem(hwnd, IDC_STYLELIST);
@@ -3583,7 +3588,8 @@ static INT_PTR CALLBACK Style_SelectLexerDlgProc(HWND hwnd, UINT umsg, WPARAM wP
 		return FALSE;
 
 	case WM_SIZE: {
-		int dx, dy;
+		int dx;
+		int dy;
 
 		ResizeDlg_Size(hwnd, lParam, &dx, &dy);
 		HDWP hdwp = BeginDeferWindowPos(6);

@@ -114,7 +114,9 @@ static int GlobScan(StyleContext &sc) noexcept {
 
 static void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
 	const WordList &keywords = *keywordLists[0];
-	WordList cmdDelimiter, bashStruct, bashStruct_in;
+	WordList cmdDelimiter;
+	WordList bashStruct;
+	WordList bashStruct_in;
 	cmdDelimiter.Set("| || |& & && ; ;; ( ) { }");
 	bashStruct.Set("if elif fi while until else then do done esac eval");
 	bashStruct_in.Set("for case select");

@@ -31,7 +31,8 @@ static void ColouriseTexiDoc(Sci_PositionU startPos, Sci_Position length, int in
 	//const WordList &keywords4 = *keywordLists[3];// command with arg
 
 	int state = initStyle;
-	int ch = 0, chNext = styler[startPos];
+	int ch = 0;
+	int chNext = styler[startPos];
 	styler.StartAt(startPos);
 	styler.StartSegment(startPos);
 	Sci_PositionU endPos = startPos + length;

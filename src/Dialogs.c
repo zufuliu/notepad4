@@ -63,13 +63,13 @@ int MsgBox(int iType, UINT uIdMsg, ...) {
 	if (uIdMsg == IDS_ERR_LOADFILE || uIdMsg == IDS_ERR_SAVEFILE ||
 			uIdMsg == IDS_CREATEINI_FAIL || uIdMsg == IDS_WRITEINI_FAIL ||
 			uIdMsg == IDS_EXPORT_FAIL) {
-		LPVOID lpMsgBuf;
+		LPWSTR lpMsgBuf;
 		FormatMessage(
 			FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
 			NULL,
 			dwLastIOError,
 			MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-			(LPWSTR)&lpMsgBuf,
+			(LPWSTR)(&lpMsgBuf),
 			0,
 			NULL);
 		StrTrim(lpMsgBuf, L" \a\b\f\n\r\t\v");
@@ -249,7 +249,7 @@ INT_PTR CALLBACK AboutDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam
 
 		HFONT hFontTitle = (HFONT)SendDlgItemMessage(hwnd, IDC_VERSION, WM_GETFONT, 0, 0);
 		if (hFontTitle == NULL) {
-			hFontTitle = GetStockObject(DEFAULT_GUI_FONT);
+			hFontTitle = (HFONT)GetStockObject(DEFAULT_GUI_FONT);
 		}
 
 		LOGFONT lf;
@@ -510,8 +510,6 @@ static INT_PTR CALLBACK OpenWithDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPA
 	switch (umsg) {
 	case WM_INITDIALOG: {
 		SetWindowLongPtr(hwnd, DWLP_USER, lParam);
-
-		LVCOLUMN lvc = { LVCF_FMT | LVCF_TEXT,  LVCFMT_LEFT,  0,  L"",  -1,  0,  0,  0 };
 		ResizeDlg_Init(hwnd, cxOpenWithDlg, cyOpenWithDlg, IDC_RESIZEGRIP3);
 
 		HWND hwndLV = GetDlgItem(hwnd, IDC_OPENWITHDIR);
@@ -519,6 +517,7 @@ static INT_PTR CALLBACK OpenWithDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPA
 		//SetExplorerTheme(hwndLV);
 		ListView_SetExtendedListViewStyle(hwndLV, /*LVS_EX_FULLROWSELECT|*/LVS_EX_DOUBLEBUFFER | LVS_EX_LABELTIP);
 
+		LVCOLUMN lvc = { LVCF_FMT | LVCF_TEXT,  LVCFMT_LEFT,  0,  NULL,  -1,  0,  0,  0 };
 		ListView_InsertColumn(hwndLV, 0, &lvc);
 		DirList_Init(hwndLV, NULL);
 		DirList_Fill(hwndLV, tchOpenWithDir, DL_ALLOBJECTS, NULL, FALSE, flagNoFadeHidden, DS_NAME, FALSE);
@@ -538,7 +537,8 @@ static INT_PTR CALLBACK OpenWithDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPA
 		return FALSE;
 
 	case WM_SIZE: {
-		int dx, dy;
+		int dx;
+		int dy;
 
 		ResizeDlg_Size(hwnd, lParam, &dx, &dy);
 
@@ -685,15 +685,13 @@ static INT_PTR CALLBACK FavoritesDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LP
 	switch (umsg) {
 	case WM_INITDIALOG: {
 		SetWindowLongPtr(hwnd, DWLP_USER, lParam);
-
-		LVCOLUMN lvc = { LVCF_FMT | LVCF_TEXT,  LVCFMT_LEFT,  0,  L"",  -1,  0,  0,  0 };
-
 		ResizeDlg_Init(hwnd, cxFavoritesDlg, cyFavoritesDlg, IDC_RESIZEGRIP3);
 
 		HWND hwndLV = GetDlgItem(hwnd, IDC_FAVORITESDIR);
 		InitWindowCommon(hwndLV);
 		//SetExplorerTheme(hwndLV);
 		ListView_SetExtendedListViewStyle(hwndLV, /*LVS_EX_FULLROWSELECT|*/LVS_EX_DOUBLEBUFFER | LVS_EX_LABELTIP);
+		LVCOLUMN lvc = { LVCF_FMT | LVCF_TEXT,  LVCFMT_LEFT,  0,  NULL,  -1,  0,  0,  0 };
 		ListView_InsertColumn(hwndLV, 0, &lvc);
 		DirList_Init(hwndLV, NULL);
 		DirList_Fill(hwndLV, tchFavoritesDir, DL_ALLOBJECTS, NULL, FALSE, flagNoFadeHidden, DS_NAME, FALSE);
@@ -713,7 +711,8 @@ static INT_PTR CALLBACK FavoritesDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LP
 		return FALSE;
 
 	case WM_SIZE: {
-		int dx, dy;
+		int dx;
+		int dy;
 
 		ResizeDlg_Size(hwnd, lParam, &dx, &dy);
 
@@ -1001,11 +1000,10 @@ static INT_PTR CALLBACK FileMRUDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 	case WM_INITDIALOG: {
 		SetWindowLongPtr(hwnd, DWLP_USER, lParam);
 
-		LVCOLUMN lvc = { LVCF_FMT | LVCF_TEXT,  LVCFMT_LEFT,  0,  L"",  -1,  0,  0,  0 };
 		HWND hwndLV = GetDlgItem(hwnd, IDC_FILEMRU);
 		InitWindowCommon(hwndLV);
 
-		LPICONTHREADINFO lpit = (LPVOID)GlobalAlloc(GPTR, sizeof(ICONTHREADINFO));
+		LPICONTHREADINFO lpit = (LPICONTHREADINFO)GlobalAlloc(GPTR, sizeof(ICONTHREADINFO));
 		SetProp(hwnd, L"it", (HANDLE)lpit);
 		lpit->hwnd = hwndLV;
 		lpit->hExitThread = CreateEvent(NULL, TRUE, FALSE, NULL);
@@ -1024,10 +1022,11 @@ static INT_PTR CALLBACK FileMRUDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 
 		//SetExplorerTheme(hwndLV);
 		ListView_SetExtendedListViewStyle(hwndLV, /*LVS_EX_FULLROWSELECT|*/LVS_EX_DOUBLEBUFFER | LVS_EX_LABELTIP);
+		LVCOLUMN lvc = { LVCF_FMT | LVCF_TEXT,  LVCFMT_LEFT,  0,  NULL,  -1,  0,  0,  0 };
 		ListView_InsertColumn(hwndLV, 0, &lvc);
 
 		// Update view
-		SendWMCommand(hwnd, 0x00A0);
+		SendWMCommand(hwnd, IDC_FILEMRU_UPDATE_VIEW);
 
 		if (bSaveRecentFiles) {
 			CheckDlgButton(hwnd, IDC_SAVEMRU, BST_CHECKED);
@@ -1038,7 +1037,7 @@ static INT_PTR CALLBACK FileMRUDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 	return TRUE;
 
 	case WM_DESTROY: {
-		LPICONTHREADINFO lpit = (LPVOID)GetProp(hwnd, L"it");
+		LPICONTHREADINFO lpit = (LPICONTHREADINFO)GetProp(hwnd, L"it");
 		SetEvent(lpit->hExitThread);
 		while (WaitForSingleObject(lpit->hTerminatedThread, 0) != WAIT_OBJECT_0) {
 			MSG msg;
@@ -1061,7 +1060,8 @@ static INT_PTR CALLBACK FileMRUDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 	return FALSE;
 
 	case WM_SIZE: {
-		int dx, dy;
+		int dx;
+		int dy;
 
 		ResizeDlg_Size(hwnd, lParam, &dx, &dy);
 
@@ -1161,7 +1161,7 @@ static INT_PTR CALLBACK FileMRUDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 					MRU_Add(pFileMRU, szCurFile);
 				}
 				MRU_Save(pFileMRU);
-				SendWMCommand(hwnd, 0x00A0);
+				SendWMCommand(hwnd, IDC_FILEMRU_UPDATE_VIEW);
 			}
 		}
 	}
@@ -1169,8 +1169,8 @@ static INT_PTR CALLBACK FileMRUDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 
 	case WM_COMMAND:
 		switch (LOWORD(wParam)) {
-		case 0x00A0: {
-			LPICONTHREADINFO lpit = (LPVOID)GetProp(hwnd, L"it");
+		case IDC_FILEMRU_UPDATE_VIEW: {
+			LPICONTHREADINFO lpit = (LPICONTHREADINFO)GetProp(hwnd, L"it");
 
 			SetEvent(lpit->hExitThread);
 			while (WaitForSingleObject(lpit->hTerminatedThread, 0) != WAIT_OBJECT_0) {
@@ -1245,7 +1245,7 @@ static INT_PTR CALLBACK FileMRUDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 						//SendDlgItemMessage(hwnd, IDC_FILEMRU, LB_DELETESTRING, iItem, 0);
 						//ListView_DeleteItem(GetDlgItem(hwnd, IDC_FILEMRU), lvi.iItem);
 						// must use IDM_VIEW_REFRESH,  index might change...
-						SendWMCommand(hwnd, 0x00A0);
+						SendWMCommand(hwnd, IDC_FILEMRU_UPDATE_VIEW);
 
 						//EnableWindow(GetDlgItem(hwnd, IDOK),
 						//	(LB_ERR != SendDlgItemMessage(hwnd, IDC_GOTO, LB_GETCURSEL, 0, 0)));
@@ -1404,10 +1404,10 @@ static INT_PTR CALLBACK WordWrapSettingsDlgProc(HWND hwnd, UINT umsg, WPARAM wPa
 	case WM_INITDIALOG: {
 		WCHAR tch[512];
 		for (int i = 0; i < 4; i++) {
-			WCHAR *p1,  *p2;
 			GetDlgItemText(hwnd, IDC_WRAP_INDENT_OPTIONS + i, tch, COUNTOF(tch));
 			lstrcat(tch, L"|");
-			p1 = tch;
+			LPWSTR p1 = tch;
+			LPWSTR p2;
 			while ((p2 = StrChr(p1, L'|')) != NULL) {
 				*p2++ = L'\0';
 				if (*p1) {
@@ -1586,7 +1586,8 @@ static INT_PTR CALLBACK TabSettingsDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, 
 	case WM_COMMAND:
 		switch (LOWORD(wParam)) {
 		case IDOK: {
-			BOOL fTranslated1, fTranslated2;
+			BOOL fTranslated1;
+			BOOL fTranslated2;
 
 			const int iNewTabWidth = GetDlgItemInt(hwnd, IDC_TAB_WIDTH, &fTranslated1, FALSE);
 			const int iNewIndentWidth = GetDlgItemInt(hwnd, IDC_INDENT_WIDTH, &fTranslated2, FALSE);
@@ -1644,7 +1645,7 @@ static INT_PTR CALLBACK SelectDefEncodingDlgProc(HWND hwnd, UINT umsg, WPARAM wP
 		SetWindowLongPtr(hwnd, DWLP_USER, lParam);
 		PENCODEDLG pdd = (PENCODEDLG)lParam;
 
-		HBITMAP hbmp = LoadImage(g_hInstance, MAKEINTRESOURCE(IDB_ENCODING), IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION);
+		HBITMAP hbmp = (HBITMAP)LoadImage(g_hInstance, MAKEINTRESOURCE(IDB_ENCODING), IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION);
 		HIMAGELIST himl = ImageList_Create(16, 16, ILC_COLOR32 | ILC_MASK, 0, 0);
 		ImageList_AddMasked(himl, hbmp, CLR_DEFAULT);
 		DeleteObject(hbmp);
@@ -1728,12 +1729,9 @@ static INT_PTR CALLBACK SelectEncodingDlgProc(HWND hwnd, UINT umsg, WPARAM wPara
 	case WM_INITDIALOG: {
 		SetWindowLongPtr(hwnd, DWLP_USER, lParam);
 		PENCODEDLG pdd = (PENCODEDLG)lParam;
-
-		LVCOLUMN lvc = { LVCF_FMT | LVCF_TEXT,  LVCFMT_LEFT,  0,  L"",  -1,  0,  0,  0 };
-
 		ResizeDlg_Init(hwnd, pdd->cxDlg, pdd->cyDlg, IDC_RESIZEGRIP);
 
-		HBITMAP hbmp = LoadImage(g_hInstance, MAKEINTRESOURCE(IDB_ENCODING), IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION);
+		HBITMAP hbmp = (HBITMAP)LoadImage(g_hInstance, MAKEINTRESOURCE(IDB_ENCODING), IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION);
 		HIMAGELIST himl = ImageList_Create(16, 16, ILC_COLOR32 | ILC_MASK, 0, 0);
 		ImageList_AddMasked(himl, hbmp, CLR_DEFAULT);
 		DeleteObject(hbmp);
@@ -1743,6 +1741,7 @@ static INT_PTR CALLBACK SelectEncodingDlgProc(HWND hwnd, UINT umsg, WPARAM wPara
 		InitWindowCommon(hwndLV);
 		//SetExplorerTheme(hwndLV);
 		ListView_SetExtendedListViewStyle(hwndLV, /*LVS_EX_FULLROWSELECT|*/LVS_EX_DOUBLEBUFFER | LVS_EX_LABELTIP);
+		LVCOLUMN lvc = { LVCF_FMT | LVCF_TEXT,  LVCFMT_LEFT,  0,  NULL,  -1,  0,  0,  0 };
 		ListView_InsertColumn(hwndLV, 0, &lvc);
 		Encoding_AddToListView(hwndLV, pdd->idEncoding, pdd->bRecodeOnly);
 		ListView_SetColumnWidth(hwndLV, 0, LVSCW_AUTOSIZE_USEHEADER);
@@ -1758,7 +1757,8 @@ static INT_PTR CALLBACK SelectEncodingDlgProc(HWND hwnd, UINT umsg, WPARAM wPara
 	return FALSE;
 
 	case WM_SIZE: {
-		int dx, dy;
+		int dx;
+		int dy;
 
 		ResizeDlg_Size(hwnd, lParam, &dx, &dy);
 
@@ -2312,7 +2312,7 @@ INT_PTR InfoBox(int iType, LPCWSTR lpstrSetting, int uidMessage, ...) {
 	GetString(uidMessage, wchFormat, COUNTOF(wchFormat));
 
 	INFOBOX ib;
-	ib.lpstrMessage = NP2HeapAlloc(1024 * sizeof(WCHAR));
+	ib.lpstrMessage = (LPWSTR)NP2HeapAlloc(1024 * sizeof(WCHAR));
 
 	va_list va;
 	va_start(va, uidMessage);

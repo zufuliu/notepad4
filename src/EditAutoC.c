@@ -265,7 +265,7 @@ void AutoC_AddDocWord(HWND hwnd, struct WordList *pWList, BOOL bIgnore) {
 
 	LPCSTR const pRoot = pWList->pWordStart;
 	const int iRootLen = pWList->iStartLen;
-	struct Sci_TextToFind ft = {{0, 0}, 0, {0, 0}};
+	struct Sci_TextToFind ft = {{0, 0}, NULL, {0, 0}};
 	struct Sci_TextRange tr = { { 0, -1 }, NULL };
 	const Sci_Position iCurrentPos = SciCall_GetCurrentPos() - iRootLen;
 	const int iDocLen = SciCall_GetLength();
@@ -279,11 +279,12 @@ void AutoC_AddDocWord(HWND hwnd, struct WordList *pWList, BOOL bIgnore) {
 		Sci_Position wordEnd = iPosFind + iRootLen;
 		const int style = SciCall_GetStyleAt(wordEnd - 1);
 		if (iPosFind != iCurrentPos && !IsWordStyleToIgnore(style)) {
-			int chPrev, ch = *pRoot, chNext = SciCall_GetCharAt(wordEnd);
+			int ch = *pRoot;
+			int chNext = SciCall_GetCharAt(wordEnd);
 			Sci_Position wordLength = -iPosFind;
 			BOOL bSubWord = FALSE;
 			while (wordEnd < iDocLen) {
-				chPrev = ch;
+				int chPrev = ch;
 				ch = chNext;
 				chNext = SciCall_GetCharAt(wordEnd + 1);
 				if (!IsDocWordChar(ch) || (ch == ':' && pLexCurrent->iLexer == SCLEX_CPP)) {
@@ -315,7 +316,7 @@ void AutoC_AddDocWord(HWND hwnd, struct WordList *pWList, BOOL bIgnore) {
 				SciCall_GetTextRange(&tr);
 				ch = SciCall_GetCharAt(iPosFind - 1);
 				// word after escape char or format char
-				chPrev = SciCall_GetCharAt(iPosFind - 2);
+				int chPrev = SciCall_GetCharAt(iPosFind - 2);
 				if (chPrev != '\\' && ch == '\\' && IsEscapeChar(*pWord)) {
 					pWord++;
 					--wordLength;
@@ -362,7 +363,7 @@ void AutoC_AddDocWord(HWND hwnd, struct WordList *pWList, BOOL bIgnore) {
 					if (wordLength >= iRootLen) {
 						if (bSubWord && !(ch >= '0' && ch <= '9')) {
 							ch = 0; chNext = *pWord;
-							for (int i = 0; i < wordLength - 1; i++) {
+							for (int i = 0; i < (int)wordLength - 1; i++) {
 								chPrev = ch;
 								ch = chNext;
 								chNext = pWord[i + 1];
@@ -489,7 +490,7 @@ void EditCompleteUpdateConfig(void) {
 
 	const BOOL punctuation = mask & AutoCompleteFillUpPunctuation;
 	int k = 0;
-	for (UINT j = 0; j < COUNTOF(autoCompletionConfig.wszAutoCompleteFillUp); j++) {
+	for (UINT j = 0; j < (UINT)COUNTOF(autoCompletionConfig.wszAutoCompleteFillUp); j++) {
 		const WCHAR c = autoCompletionConfig.wszAutoCompleteFillUp[j];
 		if (c == L'\0') {
 			break;
@@ -522,16 +523,18 @@ void EditCompleteWord(HWND hwnd, BOOL autoInsert) {
 	char *pRoot = NULL;
 	char *pSubRoot = NULL;
 #ifdef NDEBUG
-	int ch = 0, chPrev = 0;
+	int ch = 0;
+	int chPrev = 0;
 #else
-	char ch = 0, chPrev = 0;
+	char ch = 0;
+	char chPrev = 0;
 #endif
 
 	BOOL bIgnore = FALSE; // ignore number
 	autoCompletionConfig.iPreviousItemCount = 0; // recreate list
 
 	const int iDocLen = SciCall_GetLineLength(iLine);
-	char * const pLine = NP2HeapAlloc(iDocLen + 1);
+	char * const pLine = (char *)NP2HeapAlloc(iDocLen + 1);
 	SciCall_GetLine(iLine, pLine);
 	int iRootLen = autoCompletionConfig.iMinWordLength;
 
@@ -594,7 +597,7 @@ void EditCompleteWord(HWND hwnd, BOOL autoInsert) {
 	}
 
 	if (iRootLen) {
-		pRoot = NP2HeapAlloc(iCurrentLinePos - iStartWordPos + iRootLen);
+		pRoot = (char *)NP2HeapAlloc(iCurrentLinePos - iStartWordPos + iRootLen);
 		lstrcpynA(pRoot, pLine + iStartWordPos, (int)(iCurrentLinePos - iStartWordPos + 1));
 		iRootLen = lstrlenA(pRoot);
 		if (!iRootLen) {
@@ -910,7 +913,7 @@ const char *EditKeywordIndent(const char *head, int *indent) {
 
 	while (*head && length < 63 && IsAAlpha(*head)) {
 		word[length] = *head;
-		word_low[length] = (*head) | 0x20;
+		word_low[length] = (char)((*head) | 0x20);
 		++length;
 		++head;
 	}
@@ -1079,7 +1082,7 @@ void EditAutoIndent(HWND hwnd) {
 		if (iPrevLineLength < 2) {
 			return;
 		}
-		char *pLineBuf = NP2HeapAlloc(2 * iPrevLineLength + 1 + iIndentWidth * 2 + 2 + 64);
+		char *pLineBuf = (char *)NP2HeapAlloc(2 * iPrevLineLength + 1 + iIndentWidth * 2 + 2 + 64);
 		if (pLineBuf == NULL) {
 			return;
 		}
@@ -1559,9 +1562,9 @@ void EditInsertScriptShebangLine(HWND hwnd) {
 void EditShowCallTips(HWND hwnd, Sci_Position position) {
 	const int iLine = (int)SendMessage(hwnd, SCI_LINEFROMPOSITION, position, 0);
 	const int iDocLen = SciCall_GetLine(iLine, NULL); // get length
-	char *pLine = NP2HeapAlloc(iDocLen + 1);
+	char *pLine = (char *)NP2HeapAlloc(iDocLen + 1);
 	SciCall_GetLine(iLine, pLine);
-	char *text = NP2HeapAlloc(iDocLen + 1 + 128);
+	char *text = (char *)NP2HeapAlloc(iDocLen + 1 + 128);
 	wsprintfA(text, "ShowCallTips(%d, %d, %d)\n%s", iLine + 1, (int)position, iDocLen, pLine);
 	SendMessage(hwnd, SCI_CALLTIPSHOW, position, (LPARAM)text);
 	NP2HeapFree(pLine);

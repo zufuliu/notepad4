@@ -207,7 +207,7 @@ HBITMAP LoadBitmapFile(LPCWSTR path) {
 		path = szTmp;
 	}
 
-	HBITMAP hbmp = LoadImage(NULL, path, IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION | LR_LOADFROMFILE);
+	HBITMAP hbmp = (HBITMAP)LoadImage(NULL, path, IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION | LR_LOADFROMFILE);
 	return hbmp;
 }
 
@@ -288,7 +288,7 @@ BOOL BitmapMergeAlpha(HBITMAP hbmp, COLORREF crDest) {
 	BITMAP bmp;
 	if (GetObject(hbmp, sizeof(BITMAP), &bmp)) {
 		if (bmp.bmBitsPixel == 32) {
-			RGBQUAD *prgba = bmp.bmBits;
+			RGBQUAD *prgba = (RGBQUAD *)bmp.bmBits;
 
 			for (int y = 0; y < bmp.bmHeight; y++) {
 				for (int x = 0; x < bmp.bmWidth; x++) {
@@ -315,7 +315,7 @@ BOOL BitmapAlphaBlend(HBITMAP hbmp, COLORREF crDest, BYTE alpha) {
 	BITMAP bmp;
 	if (GetObject(hbmp, sizeof(BITMAP), &bmp)) {
 		if (bmp.bmBitsPixel == 32) {
-			RGBQUAD *prgba = bmp.bmBits;
+			RGBQUAD *prgba = (RGBQUAD *)bmp.bmBits;
 
 			for (int y = 0; y < bmp.bmHeight; y++) {
 				for (int x = 0; x < bmp.bmWidth; x++) {
@@ -340,7 +340,7 @@ BOOL BitmapGrayScale(HBITMAP hbmp) {
 	BITMAP bmp;
 	if (GetObject(hbmp, sizeof(BITMAP), &bmp)) {
 		if (bmp.bmBitsPixel == 32) {
-			RGBQUAD *prgba = bmp.bmBits;
+			RGBQUAD *prgba = (RGBQUAD *)bmp.bmBits;
 
 			for (int y = 0; y < bmp.bmHeight; y++) {
 				for (int x = 0; x < bmp.bmWidth; x++) {
@@ -396,14 +396,14 @@ void CenterDlgInParentEx(HWND hDlg, HWND hParent) {
 	const int xMax = (mi.rcWork.right) - (rcDlg.right - rcDlg.left);
 	const int yMax = (mi.rcWork.bottom) - (rcDlg.bottom - rcDlg.top);
 
-	int x, y;
-
+	int x;
 	if ((rcParent.right - rcParent.left) - (rcDlg.right - rcDlg.left) > 20) {
 		x = rcParent.left + (((rcParent.right - rcParent.left) - (rcDlg.right - rcDlg.left)) / 2);
 	} else {
 		x = rcParent.left + 70;
 	}
 
+	int y;
 	if ((rcParent.bottom - rcParent.top) - (rcDlg.bottom - rcDlg.top) > 20) {
 		y = rcParent.top + (((rcParent.bottom - rcParent.top) - (rcDlg.bottom - rcDlg.top)) / 2);
 	} else {
@@ -499,7 +499,7 @@ typedef struct _resizeDlg {
 } RESIZEDLG, *PRESIZEDLG;
 
 void ResizeDlg_InitEx(HWND hwnd, int cxFrame, int cyFrame, int nIdGrip, int iDirection) {
-	RESIZEDLG *pm = NP2HeapAlloc(sizeof(RESIZEDLG));
+	RESIZEDLG *pm = (RESIZEDLG *)NP2HeapAlloc(sizeof(RESIZEDLG));
 	pm->direction = iDirection;
 
 	RECT rc;
@@ -543,7 +543,7 @@ void ResizeDlg_InitEx(HWND hwnd, int cxFrame, int cyFrame, int nIdGrip, int iDir
 }
 
 void ResizeDlg_Destroy(HWND hwnd, int *cxFrame, int *cyFrame) {
-	PRESIZEDLG pm = GetProp(hwnd, RESIZEDLG_PROP_KEY);
+	PRESIZEDLG pm = (PRESIZEDLG)GetProp(hwnd, RESIZEDLG_PROP_KEY);
 
 	RECT rc;
 	GetWindowRect(hwnd, &rc);
@@ -559,7 +559,7 @@ void ResizeDlg_Destroy(HWND hwnd, int *cxFrame, int *cyFrame) {
 }
 
 void ResizeDlg_Size(HWND hwnd, LPARAM lParam, int *cx, int *cy) {
-	PRESIZEDLG pm = GetProp(hwnd, RESIZEDLG_PROP_KEY);
+	PRESIZEDLG pm = (PRESIZEDLG)GetProp(hwnd, RESIZEDLG_PROP_KEY);
 	const int cxClient = LOWORD(lParam);
 	const int cyClient = HIWORD(lParam);
 	if (cx) {
@@ -573,7 +573,7 @@ void ResizeDlg_Size(HWND hwnd, LPARAM lParam, int *cx, int *cy) {
 }
 
 void ResizeDlg_GetMinMaxInfo(HWND hwnd, LPARAM lParam) {
-	PRESIZEDLG pm = GetProp(hwnd, RESIZEDLG_PROP_KEY);
+	PRESIZEDLG pm = (PRESIZEDLG)GetProp(hwnd, RESIZEDLG_PROP_KEY);
 
 	LPMINMAXINFO lpmmi = (LPMINMAXINFO)lParam;
 	lpmmi->ptMinTrackSize.x = pm->mmiPtMinX;
@@ -617,7 +617,7 @@ void ResizeDlgCtl(HWND hwndDlg, int nCtlId, int dx, int dy) {
 //
 void MakeBitmapButton(HWND hwnd, int nCtlId, HINSTANCE hInstance, WORD wBmpId) {
 	HWND hwndCtl = GetDlgItem(hwnd, nCtlId);
-	HBITMAP hBmp = LoadImage(hInstance, MAKEINTRESOURCE(wBmpId), IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION);
+	HBITMAP hBmp = (HBITMAP)LoadImage(hInstance, MAKEINTRESOURCE(wBmpId), IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION);
 	BITMAP bmp;
 	GetObject(hBmp, sizeof(BITMAP), &bmp);
 	BUTTON_IMAGELIST bi;
@@ -1290,7 +1290,7 @@ void GetDefaultOpenWithDir(LPWSTR lpOpenWithDir, int cchOpenWithDir) {
 //
 HDROP CreateDropHandle(LPCWSTR lpFileName) {
 	HGLOBAL hDrop = GlobalAlloc(GMEM_ZEROINIT | GMEM_MOVEABLE | GMEM_DDESHARE, sizeof(DROPFILES) + sizeof(WCHAR) * (lstrlen(lpFileName) + 2));
-	LPDROPFILES lpdf = GlobalLock(hDrop);
+	LPDROPFILES lpdf = (LPDROPFILES)GlobalLock(hDrop);
 
 	lpdf->pFiles = sizeof(DROPFILES);
 	lpdf->pt.x   = 0;
@@ -1301,7 +1301,7 @@ HDROP CreateDropHandle(LPCWSTR lpFileName) {
 	lstrcpy((WCHAR *)(lpdf + 1), lpFileName);
 	GlobalUnlock(hDrop);
 
-	return hDrop;
+	return (HDROP)hDrop;
 }
 
 //=============================================================================
@@ -1353,7 +1353,7 @@ BOOL ExecDDECommand(LPCWSTR lpszCmdLine, LPCWSTR lpszDDEMsg, LPCWSTR lpszDDEApp,
 		if (hszService && hszTopic) {
 			HCONV hConv = DdeConnect(idInst, hszService, hszTopic, NULL);
 			if (hConv) {
-				DdeClientTransaction((LPBYTE)lpszURLExec, sizeof(WCHAR) * (lstrlen(lpszURLExec) + 1), hConv, 0, 0, XTYP_EXECUTE, TIMEOUT_ASYNC, NULL);
+				DdeClientTransaction((LPBYTE)lpszURLExec, sizeof(WCHAR) * (lstrlen(lpszURLExec) + 1), hConv, NULL, 0, XTYP_EXECUTE, TIMEOUT_ASYNC, NULL);
 				DdeDisconnect(hConv);
 			} else {
 				bSuccess = FALSE;
@@ -1516,7 +1516,7 @@ void History_UpdateToolbar(PHISTORY ph, HWND hwnd, int cmdBack, int cmdForward) 
 //  MRU functions
 //
 LPMRULIST MRU_Create(LPCWSTR pszRegKey, int iFlags, int iSize) {
-	LPMRULIST pmru = NP2HeapAlloc(sizeof(MRULIST));
+	LPMRULIST pmru = (LPMRULIST)NP2HeapAlloc(sizeof(MRULIST));
 	pmru->szRegKey = pszRegKey;
 	pmru->iFlags = iFlags;
 	pmru->iSize = min_i(iSize, MRU_MAXITEMS);
@@ -1597,8 +1597,8 @@ int MRU_Enum(LPMRULIST pmru, int iIndex, LPWSTR pszItem, int cchItem) {
 
 BOOL MRU_Load(LPMRULIST pmru) {
 	IniSection section;
-	WCHAR *pIniSectionBuf = NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_MRU);
-	const int cbIniSection = (int)NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR);
+	WCHAR *pIniSectionBuf = (WCHAR *)NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_MRU);
+	const int cbIniSection = (int)(NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR));
 	IniSection *pIniSection = &section;
 
 	MRU_Empty(pmru);
@@ -1637,7 +1637,7 @@ BOOL MRU_Save(LPMRULIST pmru) {
 
 	WCHAR tchName[16];
 	IniSectionOnSave section;
-	WCHAR *pIniSectionBuf = NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_MRU);
+	WCHAR *pIniSectionBuf = (WCHAR *)NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_MRU);
 	IniSectionOnSave *pIniSection = &section;
 	pIniSection->next = pIniSectionBuf;
 
@@ -1792,7 +1792,7 @@ DLGTEMPLATE *LoadThemedDialogTemplate(LPCWSTR lpDialogTemplateID, HINSTANCE hIns
 	DLGTEMPLATE *pRsrcMem = (DLGTEMPLATE *)LockResource(hRsrcMem);
 	const UINT dwTemplateSize = (UINT)SizeofResource(hInstance, hRsrc);
 
-	DLGTEMPLATE *pTemplate = dwTemplateSize ? NP2HeapAlloc(dwTemplateSize + LF_FACESIZE * 2) : NULL;
+	DLGTEMPLATE *pTemplate = dwTemplateSize ? (DLGTEMPLATE *)NP2HeapAlloc(dwTemplateSize + LF_FACESIZE * 2) : NULL;
 	if (pTemplate == NULL) {
 		UnlockResource(hRsrcMem);
 		FreeResource(hRsrcMem);
@@ -1819,7 +1819,7 @@ DLGTEMPLATE *LoadThemedDialogTemplate(LPCWSTR lpDialogTemplateID, HINSTANCE hIns
 		pTemplate->style |= DS_SHELLFONT;
 	}
 
-	const int cbNew = cbFontAttr + ((lstrlen(wchFaceName) + 1) * sizeof(WCHAR));
+	const int cbNew = cbFontAttr + (int)((lstrlen(wchFaceName) + 1) * sizeof(WCHAR));
 	const BYTE *pbNew = (BYTE *)wchFaceName;
 
 	BYTE *pb = DialogTemplate_GetFontSizeField(pTemplate);
@@ -1991,7 +1991,8 @@ static VOID GetTrayWndRect(LPRECT lpTrayRect) {
 
 VOID MinimizeWndToTray(HWND hwnd) {
 	if (GetDoAnimateMinimize()) {
-		RECT rcFrom, rcTo;
+		RECT rcFrom;
+		RECT rcTo;
 
 		// Get the rect of the window. It is safe to use the rect of the whole
 		// window - DrawAnimatedRects will only draw the caption
@@ -2014,7 +2015,8 @@ VOID RestoreWndFromTray(HWND hwnd) {
 	if (GetDoAnimateMinimize()) {
 		// Get the rect of the tray and the window. Note that the window rect
 		// is still valid even though the window is hidden
-		RECT rcFrom, rcTo;
+		RECT rcFrom;
+		RECT rcTo;
 		GetTrayWndRect(&rcFrom);
 		GetWindowRect(hwnd, &rcTo);
 

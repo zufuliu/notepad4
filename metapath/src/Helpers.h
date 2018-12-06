@@ -295,7 +295,7 @@ void SetWindowTransparentMode(HWND hwnd, BOOL bTransparentMode, int iOpacityLeve
 void SetWindowLayoutRTL(HWND hwnd, BOOL bRTL);
 
 #define SendWMCommandEx(hwnd, id, extra)	SendMessage(hwnd, WM_COMMAND, MAKEWPARAM((id), (extra)), 0)
-#define SendWMCommand(hwnd, id)				SendWMCommandEx(hwnd, id, 1)
+#define SendWMCommand(hwnd, id)				SendWMCommandEx(hwnd, (id), 1)
 #define PostWMCommand(hwnd, id)				PostMessage(hwnd, WM_COMMAND, MAKEWPARAM((id), 1), 0)
 
 #define StatusSetSimple(hwnd, b)				SendMessage(hwnd, SB_SIMPLE, (b), 0)

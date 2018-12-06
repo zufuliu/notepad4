@@ -450,9 +450,8 @@ public:
 	sql_state_t ForLine(Sci_Position lineNumber) const noexcept {
 		if ((lineNumber > 0) && (sqlStatement.size() > static_cast<size_t>(lineNumber))) {
 			return sqlStatement[lineNumber];
-		} else {
-			return 0;
 		}
+		return 0;
 	}
 
 private:
@@ -524,11 +523,9 @@ static void FoldSqlDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 	}
 
 	int levelNext = levelCurrent;
-	char chNext;
-	int style, styleNext;
-	chNext = styler[startPos];
-	style = initStyle;
-	styleNext = styler.StyleAt(startPos);
+	char chNext = styler[startPos];
+	int style = initStyle;
+	int styleNext = styler.StyleAt(startPos);
 	bool endFound = false;
 	bool isUnfoldingIgnored = false;
 	// this statementFound flag avoids to fold when the statement is on only one line by ignoring ELSE or ELSIF

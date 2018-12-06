@@ -1170,9 +1170,11 @@ Editor::XYScrollPosition Editor::XYScrollToMakeVisible(SelectionRange range, con
 		// It should be possible to scroll the window to show the caret,
 		// but this fails to remove the caret on GTK+
 		if (bSlop) {	// A margin is defined
-			Sci::Line yMoveT, yMoveB;
+			Sci::Line yMoveT;
+			Sci::Line yMoveB;
 			if (bStrict) {
-				Sci::Line yMarginT, yMarginB;
+				Sci::Line yMarginT;
+				Sci::Line yMarginB;
 				if (!(options & xysUseMargin)) {
 					// In drag mode, avoid moves
 					// otherwise, a double click will select several lines.
@@ -1267,9 +1269,11 @@ Editor::XYScrollPosition Editor::XYScrollToMakeVisible(SelectionRange range, con
 		const bool bEven = (caretXPolicy & CARET_EVEN) != 0;
 
 		if (bSlop) {	// A margin is defined
-			int xMoveL, xMoveR;
+			int xMoveL;
+			int xMoveR;
 			if (bStrict) {
-				int xMarginL, xMarginR;
+				int xMarginL;
+				int xMarginR;
 				if (!(options & xysUseMargin)) {
 					// In drag mode, avoid moves unless very near of the margin
 					// otherwise, a simple click will select text.
@@ -4401,7 +4405,8 @@ void Editor::TrimAndSetSelection(Sci::Position currentPos_, Sci::Position anchor
 }
 
 void Editor::LineSelection(Sci::Position lineCurrentPos_, Sci::Position lineAnchorPos_, bool wholeLine) {
-	Sci::Position selCurrentPos, selAnchorPos;
+	Sci::Position selCurrentPos;
+	Sci::Position selAnchorPos;
 	if (wholeLine) {
 		const Sci::Line lineCurrent_ = pdoc->SciLineFromPosition(lineCurrentPos_);
 		const Sci::Line lineAnchor_ = pdoc->SciLineFromPosition(lineAnchorPos_);
@@ -4550,7 +4555,8 @@ void Editor::ButtonDownWithModifiers(Point pt, unsigned int curTime, int modifie
 				charPos = MovePositionOutsideChar(charPos, -1);
 			}
 
-			Sci::Position startWord, endWord;
+			Sci::Position startWord;
+			Sci::Position endWord;
 			if ((sel.MainCaret() >= originalAnchorPos) && !pdoc->IsLineEndPosition(charPos)) {
 				startWord = pdoc->ExtendWordSelect(pdoc->MovePositionOutsideChar(charPos + 1, 1), -1);
 				endWord = pdoc->ExtendWordSelect(charPos, 1);
@@ -5788,7 +5794,7 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 			if (wParam == 0)
 				return 0;
 			char *ptr = CharPtrFromSPtr(lParam);
-			unsigned int iChar = 0;
+			size_t iChar = 0;
 			for (; iChar < wParam - 1; iChar++) {
 				ptr[iChar] = pdoc->CharAt(iChar);
 			}
@@ -5923,7 +5929,7 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 				return selectedText.LengthWithTerminator();
 			} else {
 				char *ptr = CharPtrFromSPtr(lParam);
-				unsigned int iChar = 0;
+				size_t iChar = 0;
 				if (selectedText.Length()) {
 					for (; iChar < selectedText.LengthWithTerminator(); iChar++) {
 						ptr[iChar] = selectedText.Data()[iChar];

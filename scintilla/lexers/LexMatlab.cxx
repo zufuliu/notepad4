@@ -219,7 +219,7 @@ _label_identifier:
 			}
 			break;
 		case SCE_MAT_TRIPLE_STRING2:
-			if (sc.Match("\"\"\"")) {
+			if (sc.Match(R"(""")")) {
 				sc.Forward(2);
 				sc.ForwardSetState(SCE_MAT_DEFAULT);
 			}
@@ -296,7 +296,7 @@ _label_identifier:
 				}
 			} else if (IsMatlabOctave(lexType) && visibleChars == 0 && sc.ch == '!') {
 				sc.SetState(SCE_MAT_COMMAND);
-			} else if (sc.Match("\"\"\"")) {
+			} else if (sc.Match(R"(""")")) {
 				sc.SetState(SCE_MAT_TRIPLE_STRING2);
 				sc.Forward(2);
 			} else if (sc.ch == '\'') { // Octave allows whitespace before transpose operator

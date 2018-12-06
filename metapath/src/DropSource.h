@@ -33,7 +33,7 @@ public:
 
 	/* IDropSource methods */
 	STDMETHODIMP QueryContinueDrag(BOOL fEsc, DWORD grfKeyState) noexcept override;
-	STDMETHODIMP GiveFeedback(DWORD) noexcept override;
+	STDMETHODIMP GiveFeedback(DWORD /*dwEffect*/) noexcept override;
 
 private:
 	ULONG m_refs;

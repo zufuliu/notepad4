@@ -1,6 +1,6 @@
 ---
 # https://clang.llvm.org/extra/clang-tidy/checks/list.html
-Checks: 'clang-diagnostic-*,clang-analyzer-*,-clang-analyzer-security.insecureAPI.strcpy,modernize-*,-modernize-use-using,bugprone-*,performance-*,readability-*,-readability-implicit-bool-conversion,-readability-magic-numbers,misc-*,-misc-non-private-member-variables-in-classes'
+Checks: 'clang-diagnostic-*,clang-analyzer-*,-clang-analyzer-security.insecureAPI.strcpy,modernize-*,-modernize-use-using,-modernize-avoid-c-arrays,bugprone-*,performance-*,readability-*,-readability-implicit-bool-conversion,-readability-magic-numbers,misc-*,-misc-non-private-member-variables-in-classes'
 WarningsAsErrors: ''
 HeaderFilterRegex: '.*'
 AnalyzeTemporaryDtors: false

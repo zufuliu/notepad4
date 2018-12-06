@@ -26,7 +26,8 @@ static constexpr bool IsNsisOp(int ch) noexcept {
 #define MAX_WORD_LENGTH	15
 static void ColouriseNSISDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList, Accessor &styler) {
 	int state = initStyle;
-	int ch = 0, chNext = styler[startPos];
+	int ch = 0;
+	int chNext = styler[startPos];
 	styler.StartAt(startPos);
 	styler.StartSegment(startPos);
 	Sci_PositionU endPos = startPos + length;

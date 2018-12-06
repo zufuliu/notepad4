@@ -91,7 +91,8 @@ static bool keywordIsModifier(const char *word, Sci_Position pos, Accessor &styl
 
 static int ClassifyWordRb(Sci_PositionU start, Sci_PositionU end, const WordList &keywords, Accessor &styler, char *prevWord) {
 	char s[MAX_KEYWORD_LENGTH];
-	Sci_PositionU i, j;
+	Sci_PositionU i;
+	Sci_PositionU j;
 	Sci_PositionU lim = end - start + 1; // num chars to copy
 	if (lim >= MAX_KEYWORD_LENGTH) {
 		lim = MAX_KEYWORD_LENGTH - 1;
@@ -299,8 +300,7 @@ static bool haveTargetMatch(Sci_Position currPos, Sci_Position lengthDoc, Sci_Po
 	if (lengthDoc - currPos < targetEndPos - targetStartPos) {
 		return false;
 	}
-	Sci_Position i, j;
-	for (i = targetStartPos, j = currPos;
+	for (Sci_Position i = targetStartPos, j = currPos;
 		i < targetEndPos && j < lengthDoc;
 		i++, j++) {
 		if (styler[i] != styler[j]) {
@@ -435,7 +435,8 @@ static bool sureThisIsNotHeredoc(Sci_Position lt2StartPos, Accessor &styler) {
 		return definitely_not_a_here_doc;
 	}
 	bool allow_indent;
-	Sci_Position target_start, target_end;
+	Sci_Position target_start;
+	Sci_Position target_end;
 	// From this point on no more styling, since we're looking ahead
 	if (styler[j] == '-') {
 		allow_indent = true;
@@ -1347,7 +1348,10 @@ static bool keywordIsModifier(const char *word, Sci_Position pos, Accessor &styl
 	if (word[0] == 'd' && word[1] == 'o' && !word[2]) {
 		return keywordDoStartsLoop(pos, styler);
 	}
-	char ch, chPrev, chPrev2;
+
+	char ch;
+	char chPrev;
+	char chPrev2;
 	int style = SCE_RB_DEFAULT;
 	Sci_Position lineStart = styler.GetLine(pos);
 	Sci_Position lineStartPosn = styler.LineStart(lineStart);

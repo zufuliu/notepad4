@@ -96,7 +96,8 @@ enum {
 // No version
 NP2SettingsVersion_None = 0,
 /*
-1. ZoomLevel and PrintZoom changed from relative font size in point to absolute percentage.
+1. `ZoomLevel` and `PrintZoom` changed from relative font size in point to absolute percentage.
+2. `HighlightCurrentLine` changed to outline frame of subline, regardless of any previous settings.
 */
 NP2SettingsVersion_V1 = 1,
 NP2SettingsVersion_Current = NP2SettingsVersion_V1,

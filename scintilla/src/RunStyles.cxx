@@ -249,7 +249,7 @@ DISTANCE RunStyles<DISTANCE, STYLE>::Runs() const noexcept {
 
 template <typename DISTANCE, typename STYLE>
 bool RunStyles<DISTANCE, STYLE>::AllSame() const noexcept {
-	for (int run = 1; run < starts->Partitions(); run++) {
+	for (DISTANCE run = 1; run < starts->Partitions(); run++) {
 		if (styles->ValueAt(run) != styles->ValueAt(run - 1))
 			return false;
 	}

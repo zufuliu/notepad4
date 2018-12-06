@@ -55,7 +55,7 @@ BOOL DirList_Init(HWND hwnd, LPCWSTR pszHeader) {
 	UNREFERENCED_PARAMETER(pszHeader);
 
 	// Allocate DirListData Property
-	LPDLDATA lpdl = (LPVOID)GlobalAlloc(GPTR, sizeof(DLDATA));
+	LPDLDATA lpdl = (LPDLDATA)GlobalAlloc(GPTR, sizeof(DLDATA));
 	SetProp(hwnd, pDirListProp, (HANDLE)lpdl);
 
 	// Setup dl
@@ -97,7 +97,7 @@ BOOL DirList_Init(HWND hwnd, LPCWSTR pszHeader) {
 //  Free memory used by dl structure
 //
 BOOL DirList_Destroy(HWND hwnd) {
-	LPDLDATA lpdl = (LPVOID)GetProp(hwnd, pDirListProp);
+	LPDLDATA lpdl = (LPDLDATA)GetProp(hwnd, pDirListProp);
 
 	// Release multithreading objects
 	DirList_TerminateIconThread(hwnd);
@@ -127,7 +127,7 @@ BOOL DirList_Destroy(HWND hwnd) {
 //  Start thread to extract file icons in the background
 //
 BOOL DirList_StartIconThread(HWND hwnd) {
-	LPDLDATA lpdl = (LPVOID)GetProp(hwnd, pDirListProp);
+	LPDLDATA lpdl = (LPDLDATA)GetProp(hwnd, pDirListProp);
 
 	DirList_TerminateIconThread(hwnd);
 
@@ -147,7 +147,7 @@ BOOL DirList_StartIconThread(HWND hwnd) {
 //  Terminate Icon Thread and reset multithreading control structures
 //
 BOOL DirList_TerminateIconThread(HWND hwnd) {
-	LPDLDATA lpdl = (LPVOID)GetProp(hwnd, pDirListProp);
+	LPDLDATA lpdl = (LPDLDATA)GetProp(hwnd, pDirListProp);
 	SetEvent(lpdl->hExitThread);
 
 	//WaitForSingleObject(lpdl->hTerminatedThread, INFINITE);
@@ -172,7 +172,7 @@ BOOL DirList_TerminateIconThread(HWND hwnd) {
 //  Snapshots a directory and displays the items in the listview control
 //
 int DirList_Fill(HWND hwnd, LPCWSTR lpszDir, DWORD grfFlags, LPCWSTR lpszFileSpec, BOOL bExcludeFilter, BOOL bNoFadeHidden, int iSortFlags, BOOL fSortRev) {
-	LPDLDATA lpdl = (LPVOID)GetProp(hwnd, pDirListProp);
+	LPDLDATA lpdl = (LPDLDATA)GetProp(hwnd, pDirListProp);
 	SHFILEINFO shfi;
 
 	// Initialize default icons
@@ -239,7 +239,7 @@ int DirList_Fill(HWND hwnd, LPCWSTR lpszDir, DWORD grfFlags, LPCWSTR lpszFileSpe
 						if (dwAttributes & SFGAO_FILESYSTEM) {
 							// Check if item matches specified filter
 							if (DirList_MatchFilter(lpsf, pidlEntry, &dlf)) {
-								LPLV_ITEMDATA lplvid = CoTaskMemAlloc(sizeof(LV_ITEMDATA));
+								LPLV_ITEMDATA lplvid = (LPLV_ITEMDATA)CoTaskMemAlloc(sizeof(LV_ITEMDATA));
 								lplvid->pidl = pidlEntry;
 								lplvid->lpsf = lpsf;
 								lpsf->lpVtbl->AddRef(lpsf);
@@ -387,7 +387,7 @@ BOOL DirList_GetDispInfo(HWND hwnd, LPARAM lParam, BOOL bNoFadeHidden) {
 	UNREFERENCED_PARAMETER(hwnd);
 	UNREFERENCED_PARAMETER(bNoFadeHidden);
 
-	LV_DISPINFO *lpdi = (LPVOID)lParam;
+	LV_DISPINFO *lpdi = (LV_DISPINFO *)lParam;
 
 	LPLV_ITEMDATA lplvid = (LPLV_ITEMDATA)lpdi->item.lParam;
 
@@ -415,7 +415,7 @@ BOOL DirList_GetDispInfo(HWND hwnd, LPARAM lParam, BOOL bNoFadeHidden) {
 //  from the control
 //
 BOOL DirList_DeleteItem(HWND hwnd, LPARAM lParam) {
-	NM_LISTVIEW *lpnmlv = (LPVOID)lParam;
+	NM_LISTVIEW *lpnmlv = (NM_LISTVIEW *)lParam;
 
 	LV_ITEM lvi;
 	lvi.iItem = lpnmlv->iItem;
@@ -632,7 +632,7 @@ BOOL DirList_PropertyDlg(HWND hwnd, int iItem) {
 extern HANDLE CreateDropSource(void);
 
 void DirList_DoDragDrop(HWND hwnd, LPARAM lParam) {
-	NM_LISTVIEW *pnmlv = (LPVOID)lParam;
+	NM_LISTVIEW *pnmlv = (NM_LISTVIEW *)lParam;
 
 	LV_ITEM lvi;
 	lvi.iItem = pnmlv->iItem;
@@ -662,7 +662,7 @@ void DirList_DoDragDrop(HWND hwnd, LPARAM lParam) {
 //
 BOOL DirList_GetLongPathName(HWND hwnd, LPWSTR lpszLongPath) {
 	WCHAR tch[MAX_PATH];
-	LPDLDATA lpdl = (LPVOID)GetProp(hwnd, pDirListProp);
+	LPDLDATA lpdl = (LPDLDATA)GetProp(hwnd, pDirListProp);
 	if (SHGetPathFromIDList(lpdl->pidl, tch)) {
 		lstrcpy(lpszLongPath, tch);
 		return TRUE;
@@ -868,7 +868,7 @@ int DriveBox_Fill(HWND hwnd) {
 							SHDESCRIPTIONID di;
 							HRESULT hr = SHGetDataFromIDList(lpsf, pidlEntry, SHGDFIL_DESCRIPTIONID, &di, sizeof(SHDESCRIPTIONID));
 							if (hr != NOERROR || (di.dwDescriptionId >= SHDID_COMPUTER_DRIVE35 && di.dwDescriptionId <= SHDID_COMPUTER_OTHER)) {
-								LPDC_ITEMDATA lpdcid = CoTaskMemAlloc(sizeof(DC_ITEMDATA));
+								LPDC_ITEMDATA lpdcid = (LPDC_ITEMDATA)CoTaskMemAlloc(sizeof(DC_ITEMDATA));
 								//lpdcid->pidl = IL_Copy(pidlEntry);
 								lpdcid->pidl = pidlEntry;
 								lpdcid->lpsf = lpsf;
@@ -1033,7 +1033,7 @@ BOOL DriveBox_PropertyDlg(HWND hwnd) {
 //  DriveBox_DeleteItem
 //
 LRESULT DriveBox_DeleteItem(HWND hwnd, LPARAM lParam) {
-	NMCOMBOBOXEX *lpnmcbe = (LPVOID)lParam;
+	NMCOMBOBOXEX *lpnmcbe = (NMCOMBOBOXEX *)lParam;
 	COMBOBOXEXITEM cbei;
 	cbei.iItem = lpnmcbe->ceItem.iItem;
 
@@ -1059,7 +1059,7 @@ LRESULT DriveBox_DeleteItem(HWND hwnd, LPARAM lParam) {
 LRESULT DriveBox_GetDispInfo(HWND hwnd, LPARAM lParam) {
 	UNREFERENCED_PARAMETER(hwnd);
 
-	NMCOMBOBOXEX *lpnmcbe = (LPVOID)lParam;
+	NMCOMBOBOXEX *lpnmcbe = (NMCOMBOBOXEX *)lParam;
 	LPDC_ITEMDATA lpdcid = (LPDC_ITEMDATA)lpnmcbe->ceItem.lParam;
 
 	if (!lpdcid) {
@@ -1114,7 +1114,7 @@ LPITEMIDLIST IL_Create(LPCITEMIDLIST pidl1, UINT cb1, LPCITEMIDLIST pidl2, UINT 
 	}
 
 	// Allocate Memory
-	LPITEMIDLIST pidl = CoTaskMemAlloc(cb1 + cb2);
+	LPITEMIDLIST pidl = (LPITEMIDLIST)CoTaskMemAlloc(cb1 + cb2);
 
 	// Init new ITEMIDLIST
 	if (pidl1) {

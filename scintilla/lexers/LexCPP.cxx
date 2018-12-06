@@ -754,11 +754,11 @@ _label_identifier:
 		case SCE_C_TRIPLEVERBATIM:
 			if (sc.ch == '\\' && IsEscapeChar(sc.chNext)) {
 				sc.Forward();
-			} else if (isTripleSingle && sc.Match("\'\'\'")) {
+			} else if (isTripleSingle && sc.Match(R"(''')")) {
 				isTripleSingle = false;
 				sc.Forward(2);
 				sc.ForwardSetState(SCE_C_DEFAULT);
-			} else if (sc.Match("\"\"\"")) {
+			} else if (sc.Match(R"(""")")) {
 				sc.Forward(2);
 				sc.ForwardSetState(SCE_C_DEFAULT);
 			}
@@ -856,10 +856,10 @@ _label_identifier:
 						|| ((lexType == LEX_D) && sc.Match('r', '\"'))) {
 						sc.SetState(SCE_C_VERBATIM);
 						sc.Forward();
-					} else if (_hasTripleVerbatim(lexType) && sc.Match("\"\"\"")) {
+					} else if (_hasTripleVerbatim(lexType) && sc.Match(R"(""")")) {
 						sc.SetState(SCE_C_TRIPLEVERBATIM);
 						sc.Forward(2);
-					} else if (lexType == LEX_GROOVY && sc.Match("\'\'\'")) {
+					} else if (lexType == LEX_GROOVY && sc.Match(R"(''')")) {
 						sc.SetState(SCE_C_TRIPLEVERBATIM);
 						sc.Forward(2);
 						isTripleSingle = true;

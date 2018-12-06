@@ -75,7 +75,8 @@ static bool isPerlKeyword(Sci_PositionU start, Sci_PositionU end, const WordList
 	// old-style keyword matcher; needed because GetCurrent() needs
 	// current segment to be committed, but we may abandon early...
 	char s[100];
-	Sci_PositionU i, len = end - start;
+	Sci_PositionU i;
+	Sci_PositionU len = end - start;
 	if (len > 30) {
 		len = 30;
 	}
@@ -328,7 +329,8 @@ static const char *const perlWordListDesc[] = {
 
 static int InputSymbolScan(StyleContext &sc) noexcept {
 	// forward scan for matching > on same line; file handles
-	int c, sLen = 0;
+	int c;
+	int sLen = 0;
 	while ((c = sc.GetRelativeCharacter(++sLen)) != 0) {
 		if (c == '\r' || c == '\n') {
 			return 0;
@@ -794,7 +796,9 @@ static void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int in
 				break;
 			}
 			while (!sc.atLineEnd) {		// "EOF" and `EOF` interpolated
-				int c, sLen = 0, endType = 0;
+				int c;
+				int sLen = 0;
+				int endType = 0;
 				while ((c = sc.GetRelativeCharacter(sLen)) != 0) {
 					// scan to break string into segments
 					if (c == '\\') {
@@ -867,7 +871,9 @@ static void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int in
 			} else if (!Quote.Up && !IsASpace(sc.ch)) {
 				Quote.Open(sc.ch);
 			} else {
-				int c, sLen = 0, endType = 0;
+				int c;
+				int sLen = 0;
+				int endType = 0;
 				while ((c = sc.GetRelativeCharacter(sLen)) != 0) {
 					// scan to break string into segments
 					if (IsASpace(c)) {
@@ -902,7 +908,9 @@ static void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int in
 			} else if (!Quote.Up && !IsASpace(sc.ch)) {
 				Quote.Open(sc.ch);
 			} else {
-				int c, sLen = 0, endType = 0;
+				int c;
+				int sLen = 0;
+				int endType = 0;
 				const bool isPattern = (Quote.Rep == 2);
 				while ((c = sc.GetRelativeCharacter(sLen)) != 0) {
 					// scan to break string into segments
@@ -959,7 +967,9 @@ static void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int in
 			if (!Quote.Down && !IsASpace(sc.ch)) {
 				Quote.Open(sc.ch);
 			} else {
-				int c, sLen = 0, endType = 0;
+				int c;
+				int sLen = 0;
+				int endType = 0;
 				while ((c = sc.GetRelativeCharacter(sLen)) != 0) {
 					// scan to break string into segments
 					if (IsASpace(c)) {
