@@ -113,6 +113,9 @@ NP2SettingsVersion_Current = NP2SettingsVersion_V1,
 #define MRU_KEY_RECENT_FILES					L"Recent Files"
 #define MRU_KEY_RECENT_FIND						L"Recent Find"
 #define MRU_KEY_RECENT_REPLACE					L"Recent Replace"
+#define MRU_MAX_RECENT_FILES					32
+#define MRU_MAX_RECENT_FIND						32
+#define MRU_MAX_RECENT_REPLACE					32
 
 #define MAX_INI_SECTION_SIZE_SETTINGS			(8 * 1024)
 #define MAX_INI_SECTION_SIZE_FLAGS				(4 * 1024)

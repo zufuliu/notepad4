@@ -1663,7 +1663,7 @@ BOOL MRU_Save(LPMRULIST pmru) {
 
 void MRU_LoadToCombobox(HWND hwnd, LPCWSTR pszKey) {
 	WCHAR tch[MAX_PATH];
-	LPMRULIST pmru = MRU_Create(pszKey, MRU_NOCASE, 8);
+	LPMRULIST pmru = MRU_Create(pszKey, MRU_NOCASE, MRU_MAX_COPY_MOVE_HISTORY);
 	MRU_Load(pmru);
 	for (int i = 0; i < MRU_GetCount(pmru); i++) {
 		MRU_Enum(pmru, i, tch, COUNTOF(tch));
@@ -1674,7 +1674,7 @@ void MRU_LoadToCombobox(HWND hwnd, LPCWSTR pszKey) {
 
 void MRU_AddOneItem(LPCWSTR pszKey, LPCWSTR pszNewItem) {
 	if (StrNotEmpty(pszNewItem)) {
-		LPMRULIST pmru = MRU_Create(pszKey, MRU_NOCASE, 8);
+		LPMRULIST pmru = MRU_Create(pszKey, MRU_NOCASE, MRU_MAX_COPY_MOVE_HISTORY);
 		MRU_Load(pmru);
 		MRU_Add(pmru, pszNewItem);
 		MRU_Save(pmru);
@@ -1683,7 +1683,7 @@ void MRU_AddOneItem(LPCWSTR pszKey, LPCWSTR pszNewItem) {
 }
 
 void MRU_ClearCombobox(HWND hwnd, LPCWSTR pszKey) {
-	LPMRULIST pmru = MRU_Create(pszKey, MRU_NOCASE, 8);
+	LPMRULIST pmru = MRU_Create(pszKey, MRU_NOCASE, MRU_MAX_COPY_MOVE_HISTORY);
 	MRU_Load(pmru);
 	MRU_Empty(pmru);
 	MRU_Save(pmru);

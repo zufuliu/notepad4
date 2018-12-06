@@ -536,7 +536,7 @@ LRESULT ComboBox_AddStringA2W(UINT uCP, HWND hwnd, LPCSTR lpString);
 UINT CodePageFromCharSet(UINT uCharSet);
 
 //==== MRU Functions ==========================================================
-#define MRU_MAXITEMS	24
+#define MRU_MAXITEMS	32
 #define MRU_NOCASE		1
 #define MRU_UTF8		2
 
