@@ -3884,7 +3884,7 @@ void EditSortLines(HWND hwnd, int iSortFlags) {
 	}
 
 	if (iSortFlags & SORT_DESCENDING) {
-		if ((iSortFlags & SORT_LOGICAL) && IsWinXPAndAbove()) {
+		if ((iSortFlags & SORT_LOGICAL)) {
 			qsort(pLines, iLineCount, sizeof(SORTLINE), CmpLogicalRev);
 		} else {
 			qsort(pLines, iLineCount, sizeof(SORTLINE), CmpStdRev);
@@ -3898,7 +3898,7 @@ void EditSortLines(HWND hwnd, int iSortFlags) {
 			pLines[j] = sLine;
 		}
 	} else {
-		if ((iSortFlags & SORT_LOGICAL) && IsWinXPAndAbove()) {
+		if ((iSortFlags & SORT_LOGICAL)) {
 			qsort(pLines, iLineCount, sizeof(SORTLINE), CmpLogical);
 		} else {
 			qsort(pLines, iLineCount, sizeof(SORTLINE), CmpStd);
@@ -5985,8 +5985,6 @@ void EditShowUnicodeControlCharacter(HWND hwnd, BOOL bShow) {
 //
 //
 static INT_PTR CALLBACK EditSortDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
-	static BOOL bEnableLogicalSort;
-
 	switch (umsg) {
 	case WM_INITDIALOG: {
 		SetWindowLongPtr(hwnd, DWLP_USER, lParam);
@@ -6023,14 +6021,8 @@ static INT_PTR CALLBACK EditSortDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPA
 			CheckDlgButton(hwnd, IDC_SORT_IGNORE_CASE, BST_CHECKED);
 		}
 
-		if (IsWinXPAndAbove()) {
-			if (iSortFlags & SORT_LOGICAL) {
-				CheckDlgButton(hwnd, IDC_SORT_LOGICAL_NUMBER, BST_CHECKED);
-			}
-			bEnableLogicalSort = TRUE;
-		} else {
-			EnableWindow(GetDlgItem(hwnd, IDC_SORT_LOGICAL_NUMBER), FALSE);
-			bEnableLogicalSort = FALSE;
+		if (iSortFlags & SORT_LOGICAL) {
+			CheckDlgButton(hwnd, IDC_SORT_LOGICAL_NUMBER, BST_CHECKED);
 		}
 
 		if (SC_SEL_RECTANGLE != SendMessage(hwndEdit, SCI_GETSELECTIONMODE, 0, 0)) {
@@ -6088,7 +6080,7 @@ static INT_PTR CALLBACK EditSortDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPA
 			EnableWindow(GetDlgItem(hwnd, IDC_SORT_REMOVE_DUP), TRUE);
 			EnableWindow(GetDlgItem(hwnd, IDC_SORT_REMOVE_UNIQUE), TRUE);
 			EnableWindow(GetDlgItem(hwnd, IDC_SORT_IGNORE_CASE), TRUE);
-			EnableWindow(GetDlgItem(hwnd, IDC_SORT_LOGICAL_NUMBER), bEnableLogicalSort);
+			EnableWindow(GetDlgItem(hwnd, IDC_SORT_LOGICAL_NUMBER), TRUE);
 			break;
 
 		case IDC_SORT_SHUFFLE:

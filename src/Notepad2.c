@@ -483,7 +483,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 	g_hDefaultHeap = GetProcessHeap();
 	// https://docs.microsoft.com/en-us/windows/desktop/Memory/low-fragmentation-heap
 #if 0 // default enabled since Vista
-	if (IsWinXPAndAbove()) {
+	{
 		// Enable the low-fragmenation heap (LFH).
 		ULONG HeapInformation = 2;//HEAP_LFH;
 		HeapSetInformation(g_hDefaultHeap, HeapCompatibilityInformation, &HeapInformation, sizeof(HeapInformation));
@@ -500,22 +500,6 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 	SetCurrentDirectory(wchWorkingDirectory);
 
 	SetErrorMode(SEM_FAILCRITICALERRORS | SEM_NOOPENFILEERRORBOX);
-
-	// check if running at least on Windows 2000
-	if (!IsWin2KAndAbove()) {
-		LPVOID lpMsgBuf;
-		FormatMessage(
-			FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-			NULL,
-			ERROR_OLD_WIN_VERSION,
-			MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), // Default language
-			(LPWSTR)&lpMsgBuf,
-			0,
-			NULL);
-		MessageBox(NULL, (LPCWSTR)lpMsgBuf, L"Notepad2", MB_OK | MB_ICONEXCLAMATION);
-		LocalFree(lpMsgBuf);
-		return 0;
-	}
 
 	// Check if running with elevated privileges
 	fIsElevated = IsElevated();
@@ -1734,9 +1718,7 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) {
 	}
 	BITMAP bmp;
 	GetObject(hbmp, sizeof(BITMAP), &bmp);
-	if (!IsWinXPAndAbove()) {
-		BitmapMergeAlpha(hbmp, GetSysColor(COLOR_3DFACE));
-	}
+
 	HIMAGELIST himl = ImageList_Create(bmp.bmWidth / NUMTOOLBITMAPS, bmp.bmHeight, ILC_COLOR32 | ILC_MASK, 0, 0);
 	ImageList_AddMasked(himl, hbmp, CLR_DEFAULT);
 	DeleteObject(hbmp);
@@ -1773,11 +1755,8 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) {
 		BOOL fProcessed = FALSE;
 		if (flagToolbarLook == 1) {
 			fProcessed = BitmapAlphaBlend(hbmpCopy, GetSysColor(COLOR_3DFACE), 0x60);
-		} else if (flagToolbarLook == 2 || (!IsWinXPAndAbove() && flagToolbarLook == 0)) {
+		} else if (flagToolbarLook == 2) {
 			fProcessed = BitmapGrayScale(hbmpCopy);
-		}
-		if (fProcessed && !IsWinXPAndAbove()) {
-			BitmapMergeAlpha(hbmpCopy, GetSysColor(COLOR_3DFACE));
 		}
 		if (fProcessed) {
 			himl = ImageList_Create(bmp.bmWidth / NUMTOOLBITMAPS, bmp.bmHeight, ILC_COLOR32 | ILC_MASK, 0, 0);
@@ -2370,8 +2349,7 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	CheckCmd(hmenu, IDM_VIEW_STICKYWINPOS, bStickyWinPos);
 	CheckCmd(hmenu, IDM_VIEW_ALWAYSONTOP, ((bAlwaysOnTop || flagAlwaysOnTop == 2) && flagAlwaysOnTop != 1));
 	CheckCmd(hmenu, IDM_VIEW_MINTOTRAY, bMinimizeToTray);
-	i = IsWin2KAndAbove(); // bTransparentModeAvailable
-	CheckCmd(hmenu, IDM_VIEW_TRANSPARENT, bTransparentMode && i);
+	CheckCmd(hmenu, IDM_VIEW_TRANSPARENT, bTransparentMode);
 	EnableCmd(hmenu, IDM_VIEW_TRANSPARENT, i);
 
 	// Rendering Technology
@@ -6324,7 +6302,7 @@ void LoadFlags(void) {
 	iValue = IniSectionGetInt(pIniSection, L"FindReplaceOpacityLevel", 75);
 	iFindReplaceOpacityLevel = validate_i(iValue, 0, 100, 75);
 
-	iValue = IniSectionGetInt(pIniSection, L"ToolbarLook", IsWinXPAndAbove() ? 1 : 2);
+	iValue = IniSectionGetInt(pIniSection, L"ToolbarLook", 1);
 	flagToolbarLook = clamp_i(iValue, 0, 2);
 
 	flagSimpleIndentGuides = IniSectionGetBool(pIniSection, L"SimpleIndentGuides", 0);

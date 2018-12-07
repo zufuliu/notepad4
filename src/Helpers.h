@@ -158,13 +158,6 @@ extern WCHAR szIniFile[MAX_PATH];
 // Operating System Version
 // https://docs.microsoft.com/en-us/windows/desktop/SysInfo/operating-system-version
 
-#if 0
-#define IsWin2KAndAbove()	(g_uWinVer >= 0x0500)
-#define IsWinXPAndAbove()	(g_uWinVer >= 0x0501)
-#else
-#define IsWin2KAndAbove()	TRUE
-#define IsWinXPAndAbove()	TRUE
-#endif
 #define IsVistaAndAbove()	(g_uWinVer >= 0x0600)
 #define IsWin7AndAbove()	(g_uWinVer >= 0x0601)
 #define IsWin8AndAbove()	(g_uWinVer >= 0x0602)
