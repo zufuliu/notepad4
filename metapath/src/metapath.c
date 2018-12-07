@@ -161,7 +161,6 @@ WCHAR	szDDETopic[256] = L"";
 
 HINSTANCE	g_hInstance;
 HANDLE		g_hDefaultHeap;
-UINT16		g_uWinVer;
 
 //=============================================================================
 //
@@ -205,9 +204,6 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 
 	// Set global variable g_hInstance
 	g_hInstance = hInstance;
-	// Set the Windows version global variable
-	g_uWinVer = LOWORD(GetVersion());
-	g_uWinVer = MAKEWORD(HIBYTE(g_uWinVer), LOBYTE(g_uWinVer));
 	g_hDefaultHeap = GetProcessHeap();
 
 	SetErrorMode(SEM_FAILCRITICALERRORS | SEM_NOOPENFILEERRORBOX);
@@ -714,7 +710,7 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 					  hInstance,
 					  NULL);
 
-	if (IsVistaAndAbove() && IsAppThemed()) {
+	if (IsAppThemed()) {
 		SetWindowLongPtr(hwndDirList, GWL_EXSTYLE, GetWindowLongPtr(hwndDirList, GWL_EXSTYLE) & ~WS_EX_CLIENTEDGE);
 		SetWindowPos(hwndDirList, NULL, 0, 0, 0, 0, SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE | SWP_FRAMECHANGED);
 	}
@@ -753,9 +749,7 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		ListView_SetExtendedListViewStyleEx(hwndDirList,
 											LVS_EX_FULLROWSELECT,
 											LVS_EX_FULLROWSELECT);
-		if (IsVistaAndAbove()) {
-			SetExplorerTheme(hwndDirList);
-		}
+		SetExplorerTheme(hwndDirList);
 	}
 
 	ListView_SetHoverTime(hwndDirList, 10);
@@ -825,9 +819,6 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) {
 
 	BITMAP bmp;
 	GetObject(hbmp, sizeof(BITMAP), &bmp);
-	if (!IsWinXPAndAbove()) {
-		BitmapMergeAlpha(hbmp, GetSysColor(COLOR_3DFACE));
-	}
 
 	HIMAGELIST himl = ImageList_Create(bmp.bmWidth / NUMTOOLBITMAPS, bmp.bmHeight, ILC_COLOR32 | ILC_MASK, 0, 0);
 	ImageList_AddMasked(himl, hbmp, CLR_DEFAULT);
@@ -863,11 +854,8 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) {
 		BOOL fProcessed = FALSE;
 		if (flagToolbarLook == 1) {
 			fProcessed = BitmapAlphaBlend(hbmpCopy, GetSysColor(COLOR_3DFACE), 0x60);
-		} else if (flagToolbarLook == 2 || (!IsWinXPAndAbove() && flagToolbarLook == 0)) {
+		} else if (flagToolbarLook == 2) {
 			fProcessed = BitmapGrayScale(hbmpCopy);
-		}
-		if (fProcessed && !IsWinXPAndAbove()) {
-			BitmapMergeAlpha(hbmpCopy, GetSysColor(COLOR_3DFACE));
 		}
 		if (fProcessed) {
 			himl = ImageList_Create(bmp.bmWidth / NUMTOOLBITMAPS, bmp.bmHeight, ILC_COLOR32 | ILC_MASK, 0, 0);
@@ -958,7 +946,7 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) {
 	cyReBar = rc.bottom - rc.top;
 
 	cyReBarFrame = bIsAppThemed ? 0 : 2;
-	cyDriveBoxFrame = (bIsAppThemed && IsVistaAndAbove()) ? 0 : 2;
+	cyDriveBoxFrame = bIsAppThemed ? 0 : 2;
 }
 
 //=============================================================================
@@ -973,19 +961,19 @@ void MsgThemeChanged(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	HINSTANCE hInstance = (HINSTANCE)(INT_PTR)GetWindowLongPtr(hwnd, GWLP_HINSTANCE);
 	const BOOL bIsAppThemed = IsAppThemed();
 
-	if (IsVistaAndAbove() && bIsAppThemed) {
+	if (bIsAppThemed) {
 		SetWindowLongPtr(hwndDirList, GWL_EXSTYLE, GetWindowLongPtr(hwndDirList, GWL_EXSTYLE) & ~WS_EX_CLIENTEDGE);
 		SetWindowPos(hwndDirList, NULL, 0, 0, 0, 0, SWP_NOZORDER | SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE);
 		if (bFullRowSelect) {
 			SetExplorerTheme(hwndDirList);
 		} else {
-			SetTheme(hwndDirList, L"Listview");
+			SetListViewTheme(hwndDirList);
 		}
 	} else {
 		SetWindowLongPtr(hwndDirList, GWL_EXSTYLE, WS_EX_CLIENTEDGE | GetWindowLongPtr(hwndDirList, GWL_EXSTYLE));
 		SetWindowPos(hwndDirList, NULL, 0, 0, 0, 0, SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE | SWP_FRAMECHANGED);
 		if (bIsAppThemed) {
-			SetTheme(hwndDirList, L"Listview");
+			SetListViewTheme(hwndDirList);
 		}
 	}
 
@@ -2864,7 +2852,7 @@ void LoadFlags(void) {
 	iValue = IniSectionGetInt(pIniSection, L"OpacityLevel", 75);
 	iOpacityLevel = validate_i(iValue, 0, 100, 75);
 
-	iValue = IniSectionGetInt(pIniSection, L"ToolbarLook", IsWinXPAndAbove() ? 1 : 2);
+	iValue = IniSectionGetInt(pIniSection, L"ToolbarLook", 1);
 	flagToolbarLook = clamp_i(iValue, 0, 2);
 
 	IniSectionFree(pIniSection);

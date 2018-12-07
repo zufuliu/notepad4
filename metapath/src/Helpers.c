@@ -626,11 +626,9 @@ void DeleteBitmapButton(HWND hwnd, int nCtlId) {
 void SetWindowTransparentMode(HWND hwnd, BOOL bTransparentMode, int iOpacityLevel) {
 	const LONG_PTR exStyle = GetWindowLongPtr(hwnd, GWL_EXSTYLE);
 	if (bTransparentMode) {
-		if (IsWin2KAndAbove()) {
-			SetWindowLongPtr(hwnd, GWL_EXSTYLE,  exStyle | WS_EX_LAYERED);
-			const BYTE bAlpha = (BYTE)(iOpacityLevel * 255 / 100);
-			SetLayeredWindowAttributes(hwnd, 0, bAlpha, LWA_ALPHA);
-		}
+		SetWindowLongPtr(hwnd, GWL_EXSTYLE,  exStyle | WS_EX_LAYERED);
+		const BYTE bAlpha = (BYTE)(iOpacityLevel * 255 / 100);
+		SetLayeredWindowAttributes(hwnd, 0, bAlpha, LWA_ALPHA);
 	} else {
 		SetWindowLongPtr(hwnd, GWL_EXSTYLE, exStyle & ~WS_EX_LAYERED);
 	}
@@ -1770,13 +1768,11 @@ DLGTEMPLATE *LoadThemedDialogTemplate(LPCWSTR lpDialogTemplateID, HINSTANCE hIns
 
 	DLGTEMPLATE *pTemplate = dwTemplateSize ? (DLGTEMPLATE *)NP2HeapAlloc(dwTemplateSize + LF_FACESIZE * 2) : NULL;
 	if (pTemplate == NULL) {
-		UnlockResource(hRsrcMem);
 		FreeResource(hRsrcMem);
 		return NULL;
 	}
 
 	CopyMemory((BYTE *)pTemplate, pRsrcMem, (size_t)dwTemplateSize);
-	UnlockResource(hRsrcMem);
 	FreeResource(hRsrcMem);
 
 	WCHAR wchFaceName[LF_FACESIZE];

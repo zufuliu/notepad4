@@ -72,7 +72,6 @@ int ParseCommaList(LPCWSTR str, int result[], int count);
 
 extern HINSTANCE g_hInstance;
 extern HANDLE g_hDefaultHeap;
-extern UINT16 g_uWinVer;
 
 // https://docs.microsoft.com/en-us/windows/desktop/Memory/comparing-memory-allocation-methods
 // https://blogs.msdn.microsoft.com/oldnewthing/20120316-00/?p=8083/
@@ -233,27 +232,15 @@ NP2_inline void EndWaitCursor(void) {
 	DestroyCursor(SetCursor(LoadCursor(NULL, IDC_ARROW)));
 }
 
-#if 0
-#define IsWin2KAndAbove()	(g_uWinVer >= 0x0500)
-#define IsWinXPAndAbove()	(g_uWinVer >= 0x0501)
-#else
-#define IsWin2KAndAbove()	TRUE
-#define IsWinXPAndAbove()	TRUE
-#endif
-#define IsVistaAndAbove()	(g_uWinVer >= 0x0600)
-#define IsWin7AndAbove()	(g_uWinVer >= 0x0601)
-#define IsWin8AndAbove()	(g_uWinVer >= 0x0602)
-
-#ifndef LOAD_LIBRARY_SEARCH_SYSTEM32
-#define LOAD_LIBRARY_SEARCH_SYSTEM32 0x00000800
-#endif
-
 BOOL ExeNameFromWnd(HWND hwnd, LPWSTR szExeName, int cchExeName);
 //BOOL Is32bitExe(LPCWSTR lpszExeName);
 BOOL PrivateIsAppThemed(void);
 BOOL SetTheme(HWND hwnd, LPCWSTR lpszTheme);
 NP2_inline BOOL SetExplorerTheme(HWND hwnd) {
 	return SetTheme(hwnd, L"Explorer");
+}
+NP2_inline BOOL SetListViewTheme(HWND hwnd) {
+	return SetTheme(hwnd, L"Listview");
 }
 
 HBITMAP LoadBitmapFile(LPCWSTR path);

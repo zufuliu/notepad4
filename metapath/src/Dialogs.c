@@ -1079,14 +1079,10 @@ INT_PTR OptionsPropSheet(HWND hwnd, HINSTANCE hInstance) {
 
 		if (bFullRowSelect) {
 			ListView_SetExtendedListViewStyleEx(hwndDirList, LVS_EX_FULLROWSELECT, LVS_EX_FULLROWSELECT);
-			if (IsVistaAndAbove()) {
-				SetTheme(hwndDirList, L"Explorer");
-			}
+			SetExplorerTheme(hwndDirList);
 		} else {
 			ListView_SetExtendedListViewStyleEx(hwndDirList, LVS_EX_FULLROWSELECT, 0);
-			if (IsVistaAndAbove()) {
-				SetTheme(hwndDirList, L"Listview");
-			}
+			SetListViewTheme(hwndDirList);
 		}
 
 		if (!StrEqual(tchFilter, L"*.*") || bNegFilter) {
