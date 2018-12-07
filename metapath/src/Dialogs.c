@@ -351,14 +351,11 @@ INT_PTR CALLBACK GotoDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 			}
 		}
 
-		// since Windows Vista
-		FARPROC fpGetComboBoxInfo = GetProcAddress(GetModuleHandle(L"user32.dll"), "GetComboBoxInfo");
-		if (fpGetComboBoxInfo != NULL) {
-			COMBOBOXINFO cbi;
-			cbi.cbSize = sizeof(COMBOBOXINFO);
-			if (fpGetComboBoxInfo(hwndGoto, &cbi)) {
-				SHAutoComplete(cbi.hwndItem, SHACF_FILESYSTEM);
-			}
+		// from WinUser.h: GetComboBoxInfo() since Windows Vista, but CB_GETCOMBOBOXINFO since Windows XP.
+		COMBOBOXINFO cbi;
+		cbi.cbSize = sizeof(COMBOBOXINFO);
+		if (SendMessage(hwndGoto, CB_GETCOMBOBOXINFO, 0, (LPARAM)(&cbi))) {
+			SHAutoComplete(cbi.hwndItem, SHACF_FILESYSTEM);
 		}
 		CenterDlgInParent(hwnd);
 	}
