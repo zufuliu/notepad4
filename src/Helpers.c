@@ -371,12 +371,8 @@ BOOL IsElevated(void) {
 //
 #if 0
 BOOL SetTheme(HWND hwnd, LPCWSTR lpszTheme) {
-	FARPROC pfnSetWindowTheme = GetProcAddress(GetModuleHandle(L"uxtheme.dll"), "SetWindowTheme");
-
-	if (pfnSetWindowTheme) {
-		return (S_OK == pfnSetWindowTheme(hwnd, lpszTheme, NULL));
-	}
-	return FALSE;
+	const HRESULT hr = SetWindowTheme(hwnd, lpszTheme, NULL);
+	return hr == S_OK;
 }
 #endif
 
