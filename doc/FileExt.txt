@@ -58,6 +58,7 @@ JSON Document
 	jshintrc		JSHint Configuration File
 	eslintrc		ESLint Configuration File
 	jsonld			JSON for Linked Data
+	arcconfig		Phabricator Arcanist
 
 PHP Script
 	php
