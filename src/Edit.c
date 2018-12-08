@@ -5398,7 +5398,6 @@ static INT_PTR CALLBACK EditLineNumDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, 
 			BOOL fTranslated2;
 
 			const int iNewLine = (int)GetDlgItemInt(hwnd, IDC_LINENUM, &fTranslated, FALSE);
-			const int iMaxLine = (int)SendMessage(hwndEdit, SCI_GETLINECOUNT, 0, 0);
 			int iNewCol;
 
 			if (SendDlgItemMessage(hwnd, IDC_COLNUM, WM_GETTEXTLENGTH, 0, 0) > 0) {
@@ -5408,13 +5407,20 @@ static INT_PTR CALLBACK EditLineNumDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, 
 				fTranslated2 = TRUE;
 			}
 
-			if (!fTranslated || !fTranslated2) {
+			if (!fTranslated && !fTranslated2) {
 				PostMessage(hwnd, WM_NEXTDLGCTL,
 							(WPARAM)(GetDlgItem(hwnd, (!fTranslated) ? IDC_LINENUM : IDC_COLNUM)), 1);
 				return TRUE;
 			}
 
-			if (iNewLine > 0 && iNewLine <= iMaxLine && iNewCol > 0) {
+			const int iMaxLine = (int)SendMessage(hwndEdit, SCI_GETLINECOUNT, 0, 0);
+			const int iLength = (int)SendMessage(hwndEdit, SCI_GETLENGTH, 0, 0);
+			// directly goto specific position
+			if (!fTranslated && fTranslated2 && iNewCol > 0 && iNewCol <= iLength) {
+				SendMessage(hwndEdit, SCI_GOTOPOS, iNewCol - 1, 0);
+				SendMessage(hwndEdit, SCI_CHOOSECARETX, 0, 0);
+				EndDialog(hwnd, IDOK);
+			} else if (iNewLine > 0 && iNewLine <= iMaxLine && iNewCol > 0) {
 				//int iNewPos = SendMessage(hwndEdit, SCI_POSITIONFROMLINE, iNewLine - 1, 0);
 				//const int iLineEndPos = SendMessage(hwndEdit, SCI_GETLINEENDPOSITION, iNewLine - 1, 0);
 				//while (iNewCol-1 > SendMessage(hwndEdit, SCI_GETCOLUMN, iNewPos, 0)) {
