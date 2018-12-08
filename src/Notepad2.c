@@ -320,7 +320,7 @@ struct CachedStatusItem {
 HINSTANCE	g_hInstance;
 HANDLE		g_hDefaultHeap;
 HANDLE		g_hScintilla;
-UINT16		g_uWinVer;
+DWORD		g_uWinVer;
 DWORD		kSystemLibraryLoadFlags = 0;
 UINT		g_uCurrentDPI = USER_DEFAULT_SCREEN_DPI;
 UINT		g_uDefaultDPI = USER_DEFAULT_SCREEN_DPI;

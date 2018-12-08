@@ -250,16 +250,20 @@ UINT GetDefaultDPI(HWND hwnd) {
 UINT GetCurrentDPI(HWND hwnd) {
 	UINT dpi = 0;
 	if (IsWin10AndAbove()) {
-		FARPROC pfnGetDpiForWindow = GetProcAddress(GetModuleHandle(L"user32.dll"), "GetDpiForWindow");
+		// since Windows 10, version 1607
+		typedef UINT (WINAPI *GetDpiForWindowSig)(HWND hwnd);
+		GetDpiForWindowSig pfnGetDpiForWindow = (GetDpiForWindowSig)GetProcAddress(GetModuleHandle(L"user32.dll"), "GetDpiForWindow");
 		if (pfnGetDpiForWindow) {
-			dpi = (UINT)pfnGetDpiForWindow(hwnd);
+			dpi = pfnGetDpiForWindow(hwnd);
 		}
 	}
 
 	if (dpi == 0 && IsWin8p1AndAbove()) {
+		// since Windows 8.1
+		typedef HRESULT (WINAPI *GetDpiForMonitorSig)(HMONITOR hmonitor, /*MONITOR_DPI_TYPE*/int dpiType, UINT *dpiX, UINT *dpiY);
 		HMODULE hShcore = LoadLibraryEx(L"shcore.dll", NULL, LOAD_LIBRARY_SEARCH_SYSTEM32);
 		if (hShcore) {
-			FARPROC pfnGetDpiForMonitor = GetProcAddress(hShcore, "GetDpiForMonitor");
+			GetDpiForMonitorSig pfnGetDpiForMonitor = (GetDpiForMonitorSig)GetProcAddress(hShcore, "GetDpiForMonitor");
 			if (pfnGetDpiForMonitor) {
 				HMONITOR hMonitor = MonitorFromWindow(hwnd, MONITOR_DEFAULTTONEAREST);
 				UINT dpiX = 0;
@@ -317,22 +321,23 @@ HBITMAP ResizeImageForCurrentDPI(HBITMAP hbmp) {
 // PrivateSetCurrentProcessExplicitAppUserModelID()
 //
 HRESULT PrivateSetCurrentProcessExplicitAppUserModelID(PCWSTR AppID) {
-	FARPROC pfnSetCurrentProcessExplicitAppUserModelID;
-
+	if (!IsWin7AndAbove()) {
+		return S_OK;
+	}
 	if (StrIsEmpty(AppID)) {
 		return S_OK;
 	}
-
 	if (StrCaseEqual(AppID, L"(default)")) {
 		return S_OK;
 	}
 
 	// since Windows 7
-	pfnSetCurrentProcessExplicitAppUserModelID =
-		GetProcAddress(GetModuleHandle(L"shell32.dll"), "SetCurrentProcessExplicitAppUserModelID");
+	typedef HRESULT (WINAPI *SetCurrentProcessExplicitAppUserModelIDSig)(PCWSTR AppID);
+	SetCurrentProcessExplicitAppUserModelIDSig pfnSetCurrentProcessExplicitAppUserModelID =
+		(SetCurrentProcessExplicitAppUserModelIDSig)GetProcAddress(GetModuleHandle(L"shell32.dll"), "SetCurrentProcessExplicitAppUserModelID");
 
 	if (pfnSetCurrentProcessExplicitAppUserModelID) {
-		return (HRESULT)pfnSetCurrentProcessExplicitAppUserModelID(AppID);
+		return pfnSetCurrentProcessExplicitAppUserModelID(AppID);
 	}
 	return S_OK;
 }
