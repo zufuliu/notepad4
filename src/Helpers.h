@@ -168,13 +168,24 @@ extern WCHAR szIniFile[MAX_PATH];
 #define LOAD_LIBRARY_SEARCH_SYSTEM32 0x00000800
 #endif
 
+#ifndef SEE_MASK_NOZONECHECKS
+#define SEE_MASK_NOZONECHECKS		0x00800000		// NTDDI_VERSION >= NTDDI_WINXPSP1
+#endif
+
+#ifndef LCMAP_TITLECASE
+#define LCMAP_TITLECASE				0x00000300		// WINVER >= _WIN32_WINNT_WIN7
+#endif
+
 // High DPI Reference
 // https://docs.microsoft.com/en-us/windows/desktop/hidpi/high-dpi-reference
 #ifndef WM_DPICHANGED
-#define WM_DPICHANGED	0x02E0
+#define WM_DPICHANGED	0x02E0				// WINVER >= 0x0601
 #endif
 #ifndef USER_DEFAULT_SCREEN_DPI
-#define USER_DEFAULT_SCREEN_DPI		96
+#define USER_DEFAULT_SCREEN_DPI		96		// _WIN32_WINNT >= 0x0600
+#endif
+#ifndef DPI_ENUMS_DECLARED
+#define MDT_EFFECTIVE_DPI	0
 #endif
 
 NP2_inline int RoundToCurrentDPI(int value)	{
