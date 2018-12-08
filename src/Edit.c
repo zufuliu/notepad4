@@ -532,9 +532,11 @@ BOOL EditLoadFile(HWND hwnd, LPWSTR pszFile, BOOL bSkipEncodingDetection, EditFi
 
 	// display real path name
 	if (IsVistaAndAbove()) {
+		// since since Windows Vista
+		typedef DWORD (WINAPI *GetFinalPathNameByHandleSig)(HANDLE hFile, LPWSTR lpszFilePath, DWORD cchFilePath, DWORD dwFlags);
 		WCHAR path[MAX_PATH] = L"";
-		FARPROC pfnGetFinalPathNameByHandle = GetProcAddress(GetModuleHandle(L"kernel32.dll"), "GetFinalPathNameByHandleW");
-		if (pfnGetFinalPathNameByHandle && pfnGetFinalPathNameByHandle(hFile, path, MAX_PATH, /*FILE_NAME_OPENED*/0x8) > 0) {
+		GetFinalPathNameByHandleSig pfnGetFinalPathNameByHandle = (GetFinalPathNameByHandleSig)GetProcAddress(GetModuleHandle(L"kernel32.dll"), "GetFinalPathNameByHandleW");
+		if (pfnGetFinalPathNameByHandle && pfnGetFinalPathNameByHandle(hFile, path, MAX_PATH, FILE_NAME_OPENED)) {
 			if (StrNEqual(path, L"\\\\?\\", CSTRLEN(L"\\\\?\\"))) {
 				WCHAR *p = path + 4;
 				if (StrNEqual(p, L"UNC\\", CSTRLEN(L"UNC\\"))) {
@@ -2958,6 +2960,9 @@ void EditToggleLineComments(HWND hwnd, LPCWSTR pwszComment, BOOL bInsertAtStart)
 			switch (iAction) {
 			case 0:
 				iAction = 2;
+#if defined(__cplusplus)
+			[[fallthrough]];
+#endif
 			// fall through
 			case 2:
 				iCommentPos = iIndentPos;
@@ -2982,6 +2987,9 @@ void EditToggleLineComments(HWND hwnd, LPCWSTR pwszComment, BOOL bInsertAtStart)
 			switch (iAction) {
 			case 0:
 				iAction = 1;
+#if defined(__cplusplus)
+			[[fallthrough]];
+#endif
 			// fall through
 			case 1:
 				iCommentPos = (int)SendMessage(hwnd, SCI_FINDCOLUMN, iLine, iCommentCol);

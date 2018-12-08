@@ -150,7 +150,7 @@ void DLogf(const char *fmt, ...);
 
 extern HINSTANCE g_hInstance;
 extern HANDLE g_hDefaultHeap;
-extern UINT16 g_uWinVer;
+extern DWORD g_uWinVer;
 extern UINT g_uCurrentDPI;
 extern UINT g_uDefaultDPI;
 extern WCHAR szIniFile[MAX_PATH];
