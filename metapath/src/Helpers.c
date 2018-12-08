@@ -23,6 +23,7 @@
 #include <shlobj.h>
 #include <commctrl.h>
 #include <uxtheme.h>
+#include <vssym32.h>
 #include <psapi.h>
 #include <stdio.h>
 #include "Helpers.h"
@@ -1683,7 +1684,7 @@ BOOL GetThemedDialogFont(LPWSTR lpFaceName, WORD *wSize) {
 		HTHEME hTheme = OpenThemeData(NULL, L"WINDOWSTYLE;WINDOW");
 		if (hTheme) {
 			LOGFONT lf;
-			if (S_OK == GetThemeSysFont(hTheme, /*TMT_MSGBOXFONT*/805, &lf)) {
+			if (S_OK == GetThemeSysFont(hTheme, TMT_MSGBOXFONT, &lf)) {
 				if (lf.lfHeight < 0) {
 					lf.lfHeight = -lf.lfHeight;
 				}

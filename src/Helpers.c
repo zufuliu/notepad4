@@ -25,6 +25,7 @@
 #include <shlobj.h>
 #include <commctrl.h>
 #include <uxtheme.h>
+#include <vssym32.h>
 #include <stdio.h>
 #include "Scintilla.h"
 #include "Helpers.h"
@@ -268,7 +269,7 @@ UINT GetCurrentDPI(HWND hwnd) {
 				HMONITOR hMonitor = MonitorFromWindow(hwnd, MONITOR_DEFAULTTONEAREST);
 				UINT dpiX = 0;
 				UINT dpiY = 0;
-				if (pfnGetDpiForMonitor(hMonitor, 0 /* MDT_EFFECTIVE_DPI */, &dpiX, &dpiY) == S_OK) {
+				if (pfnGetDpiForMonitor(hMonitor, MDT_EFFECTIVE_DPI, &dpiX, &dpiY) == S_OK) {
 					dpi = dpiX;
 				}
 			}
@@ -355,12 +356,10 @@ BOOL IsElevated(void) {
 	HANDLE hToken = NULL;
 
 	if (OpenProcessToken(GetCurrentProcess(), TOKEN_QUERY, &hToken)) {
-		struct {
-			DWORD TokenIsElevated;
-		} /*TOKEN_ELEVATION*/te;
+		TOKEN_ELEVATION te;
 		DWORD dwReturnLength = 0;
 
-		if (GetTokenInformation(hToken, /*TokenElevation*/20, &te, sizeof(te), &dwReturnLength)) {
+		if (GetTokenInformation(hToken, TokenElevation, &te, sizeof(te), &dwReturnLength)) {
 			if (dwReturnLength == sizeof(te)) {
 				bIsElevated = te.TokenIsElevated;
 			}
@@ -2067,7 +2066,7 @@ BOOL GetThemedDialogFont(LPWSTR lpFaceName, WORD *wSize) {
 		HTHEME hTheme = OpenThemeData(NULL, L"WINDOWSTYLE;WINDOW");
 		if (hTheme) {
 			LOGFONT lf;
-			if (S_OK == GetThemeSysFont(hTheme, /*TMT_MSGBOXFONT*/805, &lf)) {
+			if (S_OK == GetThemeSysFont(hTheme, TMT_MSGBOXFONT, &lf)) {
 				if (lf.lfHeight < 0) {
 					lf.lfHeight = -lf.lfHeight;
 				}

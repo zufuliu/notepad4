@@ -22,7 +22,10 @@
 #include <shlwapi.h>
 #include <commctrl.h>
 #include <commdlg.h>
+#if 0
 #include <uxtheme.h>
+#include <vssym32.h>
+#endif
 #include <stdio.h>
 #include <limits.h>
 #include <stdint.h>
@@ -954,7 +957,7 @@ void EditTitleCase(HWND hwnd) {
 	if (IsWin7AndAbove()) {
 		LPWSTR pszMappedW = (LPWSTR)NP2HeapAlloc(NP2HeapSize(pszTextW));
 		if (LCMapString(LOCALE_SYSTEM_DEFAULT,
-						LCMAP_LINGUISTIC_CASING |/*LCMAP_TITLECASE*/0x00000300,
+						LCMAP_LINGUISTIC_CASING | LCMAP_TITLECASE,
 						pszTextW, cchTextW, pszMappedW, (int)(NP2HeapSize(pszMappedW) / sizeof(WCHAR)))) {
 			lstrcpyn(pszTextW, pszMappedW, (int)(NP2HeapSize(pszTextW) / sizeof(WCHAR)));
 			bChanged = TRUE;
@@ -6167,7 +6170,7 @@ void EditSelectionAction(HWND hwnd, int action) {
 	SHELLEXECUTEINFO sei;
 	ZeroMemory(&sei, sizeof(SHELLEXECUTEINFO));
 	sei.cbSize = sizeof(SHELLEXECUTEINFO);
-	sei.fMask = /*SEE_MASK_NOZONECHECKS*/0x00800000;
+	sei.fMask = SEE_MASK_NOZONECHECKS;
 	sei.hwnd = NULL;
 	sei.lpVerb = NULL;
 	sei.lpFile = lpszCommand;
@@ -6219,7 +6222,7 @@ void TryBrowseFile(HWND hwnd, LPCWSTR pszFile, BOOL bWarn) {
 	ZeroMemory(&sei, sizeof(SHELLEXECUTEINFO));
 
 	sei.cbSize = sizeof(SHELLEXECUTEINFO);
-	sei.fMask = SEE_MASK_FLAG_NO_UI | /*SEE_MASK_NOZONECHECKS*/0x00800000;
+	sei.fMask = SEE_MASK_FLAG_NO_UI | SEE_MASK_NOZONECHECKS;
 	sei.hwnd = hwnd;
 	sei.lpVerb = NULL;
 	sei.lpFile = tchExeFile;
@@ -6357,7 +6360,7 @@ void EditOpenSelection(HWND hwnd, int type) {
 			SHELLEXECUTEINFO sei;
 			ZeroMemory(&sei, sizeof(SHELLEXECUTEINFO));
 			sei.cbSize = sizeof(SHELLEXECUTEINFO);
-			sei.fMask = /*SEE_MASK_NOZONECHECKS*/0x00800000;
+			sei.fMask = SEE_MASK_NOZONECHECKS;
 			sei.hwnd = hwndMain;
 			sei.lpVerb = NULL;
 			sei.lpFile = szModuleName;
@@ -6719,7 +6722,7 @@ LRESULT CALLBACK SciThemedWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lP
 					BOOL bSuccess = FALSE;
 					RECT rcClient;
 
-					if (GetThemeBackgroundContentRect(hTheme, NULL, /*EP_EDITTEXT*/1, /*ETS_NORMAL*/1, &csp->rgrc[0], &rcClient) == S_OK) {
+					if (GetThemeBackgroundContentRect(hTheme, NULL, EP_EDITTEXT, ETS_NORMAL, &csp->rgrc[0], &rcClient) == S_OK) {
 						InflateRect(&rcClient, -1, -1);
 
 						rcContent.left = rcClient.left - csp->rgrc[0].left;
@@ -6761,32 +6764,22 @@ LRESULT CALLBACK SciThemedWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lP
 
 				ExcludeClipRect(hdc, rcClient.left, rcClient.top, rcClient.right, rcClient.bottom);
 
-				if (IsThemeBackgroundPartiallyTransparent(hTheme, /*EP_EDITTEXT*/1, /*ETS_NORMAL*/1)) {
+				if (IsThemeBackgroundPartiallyTransparent(hTheme, EP_EDITTEXT, ETS_NORMAL)) {
 					DrawThemeParentBackground(hwnd, hdc, &rcBorder);
 				}
 
-				/*
-				ETS_NORMAL = 1
-				ETS_HOT = 2
-				ETS_SELECTED = 3
-				ETS_DISABLED = 4
-				ETS_FOCUSED = 5
-				ETS_READONLY = 6
-				ETS_ASSIST = 7
-				*/
-
 				int nState;
 				if (!IsWindowEnabled(hwnd)) {
-					nState = /*ETS_DISABLED*/4;
+					nState = ETS_DISABLED;
 				} else if (GetFocus() == hwnd) {
-					nState = /*ETS_FOCUSED*/5;
+					nState = ETS_FOCUSED;
 				} else if (SendMessage(hwnd, SCI_GETREADONLY, 0, 0)) {
-					nState = /*ETS_READONLY*/6;
+					nState = ETS_READONLY;
 				} else {
-					nState = /*ETS_NORMAL*/1;
+					nState = ETS_NORMAL;
 				}
 
-				DrawThemeBackground(hTheme, hdc, /*EP_EDITTEXT*/1, nState, &rcBorder, NULL);
+				DrawThemeBackground(hTheme, hdc, EP_EDITTEXT, nState, &rcBorder, NULL);
 				CloseThemeData(hTheme);
 
 				ReleaseDC(hwnd, hdc);

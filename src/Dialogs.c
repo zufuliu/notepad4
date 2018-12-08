@@ -463,7 +463,7 @@ static INT_PTR CALLBACK RunDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 				sei.nShow = SW_SHOWNORMAL;
 
 				if (bQuickExit) {
-					sei.fMask |= /*SEE_MASK_NOZONECHECKS*/0x00800000;
+					sei.fMask |= SEE_MASK_NOZONECHECKS;
 					EndDialog(hwnd, IDOK);
 					ShellExecuteEx(&sei);
 				} else {

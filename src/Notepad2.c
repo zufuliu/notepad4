@@ -485,7 +485,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 #if 0 // default enabled since Vista
 	{
 		// Enable the low-fragmenation heap (LFH).
-		ULONG HeapInformation = 2;//HEAP_LFH;
+		ULONG HeapInformation = /*HEAP_LFH*/2;
 		HeapSetInformation(g_hDefaultHeap, HeapCompatibilityInformation, &HeapInformation, sizeof(HeapInformation));
 		// Enable heap terminate-on-corruption.
 		HeapSetInformation(NULL, HeapEnableTerminationOnCorruption, NULL, 0);
@@ -2535,7 +2535,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		SHELLEXECUTEINFO sei;
 		ZeroMemory(&sei, sizeof(SHELLEXECUTEINFO));
 		sei.cbSize = sizeof(SHELLEXECUTEINFO);
-		sei.fMask = /*SEE_MASK_NOZONECHECKS*/0x00800000;
+		sei.fMask = SEE_MASK_NOZONECHECKS;
 		sei.hwnd = hwnd;
 		sei.lpVerb = NULL;
 		sei.lpFile = szModuleName;
@@ -7620,7 +7620,7 @@ BOOL RelaunchElevated(void) {
 			SHELLEXECUTEINFO sei;
 			ZeroMemory(&sei, sizeof(SHELLEXECUTEINFO));
 			sei.cbSize = sizeof(SHELLEXECUTEINFO);
-			sei.fMask = SEE_MASK_FLAG_NO_UI | /*SEE_MASK_NOASYNC*/0x00000100 | /*SEE_MASK_NOZONECHECKS*/0x00800000;
+			sei.fMask = SEE_MASK_FLAG_NO_UI | SEE_MASK_NOASYNC | SEE_MASK_NOZONECHECKS;
 			sei.hwnd = GetForegroundWindow();
 			sei.lpVerb = L"runas";
 			sei.lpFile = lpArg1;

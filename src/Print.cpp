@@ -320,7 +320,7 @@ extern "C" BOOL EditPrint(HWND hwnd, LPCWSTR pszDocTitle, LPCWSTR pszPageFormat)
 
 			if (iPrintHeader < 3) {
 				ExtTextOut(hdc, frPrint.rc.left + 5, frPrint.rc.top - headerLineHeight / 2,
-						   /*ETO_OPAQUE*/0, &rcw, pszDocTitle,
+						   ETO_OPAQUE, &rcw, pszDocTitle,
 						   lstrlen(pszDocTitle), nullptr);
 			}
 
@@ -331,7 +331,7 @@ extern "C" BOOL EditPrint(HWND hwnd, LPCWSTR pszDocTitle, LPCWSTR pszPageFormat)
 				SelectObject(hdc, fontFooter);
 				GetTextExtentPoint32(hdc, dateString, len, &sizeInfo);
 				ExtTextOut(hdc, frPrint.rc.right - 5 - sizeInfo.cx, frPrint.rc.top - headerLineHeight / 2,
-						   /*ETO_OPAQUE*/0, &rcw, dateString,
+						   ETO_OPAQUE, &rcw, dateString,
 						   len, nullptr);
 			}
 
@@ -366,7 +366,7 @@ extern "C" BOOL EditPrint(HWND hwnd, LPCWSTR pszDocTitle, LPCWSTR pszPageFormat)
 				const int len = lstrlen(pageString);
 				GetTextExtentPoint32(hdc, pageString, len, &sizeFooter);
 				ExtTextOut(hdc, frPrint.rc.right - 5 - sizeFooter.cx, frPrint.rc.bottom + footerLineHeight / 2,
-						   /*ETO_OPAQUE*/0, &rcw, pageString,
+						   ETO_OPAQUE, &rcw, pageString,
 						   len, nullptr);
 
 				SetTextAlign(hdc, ta);
