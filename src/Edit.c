@@ -5447,7 +5447,7 @@ static INT_PTR CALLBACK EditLineNumDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, 
 				fTranslated2 = fTranslated;
 			}
 
-			if (!(fTranslated && fTranslated2)) {
+			if (!(fTranslated || fTranslated2)) {
 				PostMessage(hwnd, WM_NEXTDLGCTL, (WPARAM)(GetDlgItem(hwnd, IDC_LINENUM)), 1);
 				return TRUE;
 			}
