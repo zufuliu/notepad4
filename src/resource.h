@@ -112,6 +112,7 @@
 #define IDC_LINENUM						100
 #define IDC_COLNUM						101
 #define IDC_LINE_RANGE					102
+#define IDC_COLUMN_RANGE				103
 // Open Recent File
 #define IDD_FILEMRU						109
 #define IDC_FILEMRU						100

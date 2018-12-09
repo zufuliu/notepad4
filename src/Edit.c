@@ -5383,6 +5383,7 @@ static INT_PTR CALLBACK EditLineNumDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, 
 		const int iCurLine = (int)SendMessage(hwndEdit, SCI_LINEFROMPOSITION,
 										SendMessage(hwndEdit, SCI_GETCURRENTPOS, 0, 0), 0) + 1;
 		const int iMaxLine = (int)SendMessage(hwndEdit, SCI_GETLINECOUNT, 0, 0);
+		const int iLength = (int)SendMessage(hwndEdit, SCI_GETLENGTH, 0, 0);
 
 		SetDlgItemInt(hwnd, IDC_LINENUM, iCurLine, FALSE);
 		SendDlgItemMessage(hwnd, IDC_LINENUM, EM_LIMITTEXT, 20, 0);
@@ -5397,6 +5398,12 @@ static INT_PTR CALLBACK EditLineNumDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, 
 		GetDlgItemText(hwnd, IDC_LINE_RANGE, tchFmt, COUNTOF(tchFmt));
 		wsprintf(tchLines, tchFmt, tchLn);
 		SetDlgItemText(hwnd, IDC_LINE_RANGE, tchLines);
+
+		wsprintf(tchLn, L"%i", iLength);
+		FormatNumberStr(tchLn);
+		GetDlgItemText(hwnd, IDC_COLUMN_RANGE, tchFmt, COUNTOF(tchFmt));
+		wsprintf(tchLines, tchFmt, tchLn);
+		SetDlgItemText(hwnd, IDC_COLUMN_RANGE, tchLines);
 
 		CenterDlgInParent(hwnd);
 	}
@@ -5415,7 +5422,7 @@ static INT_PTR CALLBACK EditLineNumDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, 
 				iNewCol = GetDlgItemInt(hwnd, IDC_COLNUM, &fTranslated2, FALSE);
 			} else {
 				iNewCol = 1;
-				fTranslated2 = TRUE;
+				fTranslated2 = fTranslated;
 			}
 
 			if (!fTranslated && !fTranslated2) {
