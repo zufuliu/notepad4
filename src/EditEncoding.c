@@ -799,7 +799,7 @@ INT UTF8_mbslen(LPCSTR source, INT byte_length) {
 //
 // FileVars_IsUTF8()
 //
-BOOL FileVars_IsUTF8(LPFILEVARS lpfv) {
+BOOL FileVars_IsUTF8(LPCFILEVARS lpfv) {
 	if (lpfv->mask & FV_ENCODING) {
 		if (_stricmp(lpfv->tchEncoding, "utf-8") == 0 || _stricmp(lpfv->tchEncoding, "utf8") == 0) {
 			return TRUE;
@@ -813,7 +813,7 @@ BOOL FileVars_IsUTF8(LPFILEVARS lpfv) {
 //
 // FileVars_IsNonUTF8()
 //
-BOOL FileVars_IsNonUTF8(LPFILEVARS lpfv) {
+BOOL FileVars_IsNonUTF8(LPCFILEVARS lpfv) {
 	if (lpfv->mask & FV_ENCODING) {
 		if (StrNotEmptyA(lpfv->tchEncoding) &&
 				_stricmp(lpfv->tchEncoding, "utf-8") != 0 && _stricmp(lpfv->tchEncoding, "utf8") != 0) {
@@ -828,7 +828,7 @@ BOOL FileVars_IsNonUTF8(LPFILEVARS lpfv) {
 //
 // FileVars_IsValidEncoding()
 //
-BOOL FileVars_IsValidEncoding(LPFILEVARS lpfv) {
+BOOL FileVars_IsValidEncoding(LPCFILEVARS lpfv) {
 	return (lpfv->mask & FV_ENCODING) && Encoding_IsValid(lpfv->iEncoding);
 }
 
@@ -836,7 +836,7 @@ BOOL FileVars_IsValidEncoding(LPFILEVARS lpfv) {
 //
 // FileVars_GetEncoding()
 //
-int FileVars_GetEncoding(LPFILEVARS lpfv) {
+int FileVars_GetEncoding(LPCFILEVARS lpfv) {
 	if (lpfv->mask & FV_ENCODING) {
 		return lpfv->iEncoding;
 	}

@@ -280,8 +280,6 @@ static EDITFINDREPLACE efrData;
 UINT	cpLastFind = 0;
 BOOL	bReplaceInitialized = FALSE;
 
-extern const NP2ENCODING mEncoding[];
-
 const int iLineEndings[3] = {
 	SC_EOL_CRLF,
 	SC_EOL_LF,
@@ -1856,7 +1854,7 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) {
 //
 void MsgDPIChanged(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	g_uCurrentDPI = HIWORD(wParam);
-	RECT* const rc = (RECT *)lParam;
+	const RECT* const rc = (RECT *)lParam;
 	const Sci_Position pos = SciCall_GetCurrentPos();
 #if 0
 	char buf[128];
@@ -4450,10 +4448,14 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		wcsftime(wchReplace, COUNTOF(wchReplace), wchTemplate, &sst);
 
 		const UINT cpEdit = (UINT)SendMessage(hwndEdit, SCI_GETCODEPAGE, 0, 0);
+#if NP2_USE_DESIGNATED_INITIALIZER
 		EDITFINDREPLACE efrTS = {
-			.fuFlags = SCFIND_REGEXP,
 			.hwnd = hwndEdit,
+			.fuFlags = SCFIND_REGEXP,
 		};
+#else
+		EDITFINDREPLACE efrTS = { "", "", "", "", hwnd, SCFIND_REGEXP };
+#endif
 
 		WideCharToMultiByte(cpEdit, 0, wchFind, -1, efrTS.szFind, COUNTOF(efrTS.szFind), NULL, NULL);
 		WideCharToMultiByte(cpEdit, 0, wchReplace, -1, efrTS.szReplace, COUNTOF(efrTS.szReplace), NULL, NULL);
@@ -5040,12 +5042,13 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	default:
 		switch (pnmh->code) {
 		case TTN_NEEDTEXT: {
-			if (((LPTOOLTIPTEXT)lParam)->uFlags & TTF_IDISHWND) {
+			LPTOOLTIPTEXT pTTT = (LPTOOLTIPTEXT)lParam;
+			if (pTTT->uFlags & TTF_IDISHWND) {
 				//nop;
 			} else {
 				WCHAR tch[256];
 				GetString((UINT)pnmh->idFrom, tch, COUNTOF(tch));
-				lstrcpyn(((LPTOOLTIPTEXT)lParam)->szText, /*StrChr(tch, L'\n')+1*/tch, 80);
+				lstrcpyn(pTTT->szText, /*StrChr(tch, L'\n')+1*/tch, 80);
 			}
 		}
 		break;
@@ -6550,7 +6553,7 @@ void UpdateStatusbar(void) {
 	WCHAR tchLinesSelected[32];
 	WCHAR tchMatchesCount[32];
 
-	Sci_Position iPos =  SciCall_GetCurrentPos();
+	const Sci_Position iPos =  SciCall_GetCurrentPos();
 
 	const int iLn = SciCall_LineFromPosition(iPos) + 1;
 	wsprintf(tchLn, L"%i", iLn);
@@ -6794,10 +6797,15 @@ BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect, LPCWST
 		PathGetLnkPath(szFileName, szFileName, COUNTOF(szFileName));
 	}
 
+#if NP2_USE_DESIGNATED_INITIALIZER
 	EditFileIOStatus status = {
 		.iEncoding = iEncoding,
 		.iEOLMode = iEOLMode,
 	};
+#else
+	EditFileIOStatus status = { iEncoding, iEOLMode };
+#endif
+
 	// Ask to create a new file...
 	if (!bReload && !PathFileExists(szFileName)) {
 		UINT result = IDCANCEL;
@@ -6958,10 +6966,14 @@ BOOL FileSave(BOOL bSaveAlways, BOOL bAsk, BOOL bSaveAs, BOOL bSaveCopy) {
 
 	BOOL fSuccess = FALSE;
 	WCHAR tchFile[MAX_PATH];
+#if NP2_USE_DESIGNATED_INITIALIZER
 	EditFileIOStatus status = {
 		.iEncoding = iEncoding,
 		.iEOLMode = iEOLMode,
 	};
+#else
+	EditFileIOStatus status = { iEncoding, iEOLMode };
+#endif
 
 	// Read only...
 	if (!bSaveAs && !bSaveCopy && !Untitled) {
@@ -7609,7 +7621,7 @@ BOOL RelaunchElevated(void) {
 			GetRelaunchParameters(lpArg2, tchFile, !exit, FALSE);
 			exit = !IsDocumentModified();
 		} else {
-			LPWSTR lpCmdLine = GetCommandLine();
+			const LPCWSTR lpCmdLine = GetCommandLine();
 			const size_t cmdSize = sizeof(WCHAR) * (lstrlen(lpCmdLine) + 1);
 			lpArg1 = (LPWSTR)NP2HeapAlloc(cmdSize);
 			lpArg2 = (LPWSTR)NP2HeapAlloc(cmdSize);

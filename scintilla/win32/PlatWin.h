@@ -8,7 +8,14 @@
 #ifndef PLATWIN_H
 #define PLATWIN_H
 
+// force compile C as CPP
+#define NP2_FORCE_COMPILE_C_AS_CPP	0
+
+#if NP2_FORCE_COMPILE_C_AS_CPP
+extern int GetSystemMetricsEx(int nIndex);
+#else
 extern "C" int GetSystemMetricsEx(int nIndex);
+#endif
 
 namespace Scintilla {
 

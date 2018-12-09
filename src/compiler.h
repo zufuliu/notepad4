@@ -46,4 +46,13 @@
 #define NP2_inline	inline
 #endif
 
+// force compile C as CPP: /TP for MSVC and clang-cl, -x c++ for GCC and clang
+#define NP2_FORCE_COMPILE_C_AS_CPP	0
+
+#if defined(__cplusplus) && !defined(__clang__)
+#define NP2_USE_DESIGNATED_INITIALIZER	0
+#else
+#define NP2_USE_DESIGNATED_INITIALIZER	1
+#endif
+
 #endif // NOTEPAD2_COMPILER_H_

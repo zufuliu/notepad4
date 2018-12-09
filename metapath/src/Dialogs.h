@@ -48,7 +48,7 @@ INT_PTR OptionsPropSheet(HWND hwnd, HINSTANCE hInstance);
 BOOL GetFilterDlg(HWND hwnd);
 BOOL RenameFileDlg(HWND hwnd);
 BOOL CopyMoveDlg(HWND hwnd, UINT *wFunc);
-BOOL OpenWithDlg(HWND hwnd, LPDLITEM lpdliParam);
+BOOL OpenWithDlg(HWND hwnd, LPCDLITEM lpdliParam);
 BOOL NewDirDlg(HWND hwnd, LPWSTR pszNewDir);
 
 INT_PTR CALLBACK FindTargetDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam);

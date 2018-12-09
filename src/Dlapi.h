@@ -31,7 +31,9 @@ extern "C" { // C-Declarations
 typedef struct tagLV_ITEMDATA { // lvid
 	LPITEMIDLIST pidl; // Item Id
 	LPSHELLFOLDER lpsf; // Parent IShellFolder Interface
-} LV_ITEMDATA,  *LPLV_ITEMDATA;
+} LV_ITEMDATA, *LPLV_ITEMDATA;
+
+typedef const LV_ITEMDATA * LPCLV_ITEMDATA;
 
 //==== DlInit() ===============================================================
 BOOL DirList_Init(HWND hwnd, LPCWSTR pszHeader);
@@ -87,7 +89,7 @@ typedef struct tagDLITEM {	// dli
 	WCHAR szFileName[MAX_PATH];
 	WCHAR szDisplayName[MAX_PATH];
 	int ntype;
-} DLITEM,  *LPDLITEM;
+} DLITEM, *LPDLITEM;
 
 int DirList_GetItem(HWND hwnd, int iItem, LPDLITEM lpdli);
 
@@ -112,11 +114,13 @@ typedef struct tagDL_FILTER { //dlf
 	WCHAR tFilterBuf[DL_FILTER_BUFSIZE];
 	LPWSTR pFilter[DL_FILTER_BUFSIZE];
 	BOOL bExcludeFilter;
-} DL_FILTER,  *PDL_FILTER;
+} DL_FILTER, *PDL_FILTER;
+
+typedef const DL_FILTER * LPCDL_FILTER;
 
 void DirList_CreateFilter(PDL_FILTER pdlf, LPCWSTR lpszFileSpec, BOOL bExcludeFilter);
 
-BOOL DirList_MatchFilter(LPSHELLFOLDER lpsf, LPCITEMIDLIST pidl, PDL_FILTER pdlf);
+BOOL DirList_MatchFilter(LPSHELLFOLDER lpsf, LPCITEMIDLIST pidl, LPCDL_FILTER pdlf);
 
 //==== DriveBox ===============================================================
 

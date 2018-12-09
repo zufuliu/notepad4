@@ -71,7 +71,7 @@ NULL
 "to trunc zext sext fptrunc fpext fptoui fptosi uitofp sitofp ptrtoint inttoptr bitcast addrspacecast "	// conversion
 "icmp fcmp phi select call va_arg landingpad "
 
-, NULL, NULL, NULL,  NULL, NULL
+, NULL, NULL, NULL, NULL, NULL
 }};
 
 static EDITSTYLE Styles_LLVM[] = {

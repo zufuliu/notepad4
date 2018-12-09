@@ -285,7 +285,7 @@ struct WordList *WordList_Alloc(LPCSTR pRoot, int iRootLen, BOOL bIgnoreCase) {
 	return pWList;
 }
 
-static inline BOOL WordList_StartsWith(struct WordList *pWList, LPCSTR pWord) {
+static inline BOOL WordList_StartsWith(const struct WordList *pWList, LPCSTR pWord) {
 #if NP2_AUTOC_USE_STRING_ORDER
 	if (pWList->iStartLen > NP2_AUTOC_ORDER_LENGTH) {
 		return pWList->WL_strncmp(pWList->pWordStart, pWord, pWList->iStartLen) == 0;
@@ -301,7 +301,7 @@ static inline BOOL WordList_StartsWith(struct WordList *pWList, LPCSTR pWord) {
 
 void WordList_AddListEx(struct WordList *pWList, LPCSTR pList) {
 	char *word = pWList->wordBuf;
-	int iStartLen = pWList->iStartLen;
+	const int iStartLen = pWList->iStartLen;
 	int len = 0;
 	BOOL ok = FALSE;
 	do {

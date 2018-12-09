@@ -501,7 +501,7 @@ BOOL IsFontAvailable(LPCWSTR lpszFontName) {
 //
 // SetClipData()
 //
-void SetClipData(HWND hwnd, WCHAR *pszData) {
+void SetClipData(HWND hwnd, LPCWSTR pszData) {
 	if (OpenClipboard(hwnd)) {
 		EmptyClipboard();
 		HANDLE hData = GlobalAlloc(GHND, sizeof(WCHAR) * (lstrlen(pszData) + 1));
@@ -617,7 +617,7 @@ void SetWindowTransparentMode(HWND hwnd, BOOL bTransparentMode, int iOpacityLeve
 void SetWindowLayoutRTL(HWND hwnd, BOOL bRTL) {
 	const LONG_PTR exStyle = GetWindowLongPtr(hwnd, GWL_EXSTYLE);
 	if (bRTL) {
-		SetWindowLongPtr(hwnd, GWL_EXSTYLE,  exStyle | WS_EX_LAYOUTRTL);
+		SetWindowLongPtr(hwnd, GWL_EXSTYLE, exStyle | WS_EX_LAYOUTRTL);
 	} else {
 		SetWindowLongPtr(hwnd, GWL_EXSTYLE, exStyle & ~WS_EX_LAYOUTRTL);
 	}
@@ -764,6 +764,8 @@ typedef struct _resizeDlg {
 	int attrs[MAX_RESIZEDLG_ATTR_COUNT];
 } RESIZEDLG, *PRESIZEDLG;
 
+typedef const RESIZEDLG * LPCRESIZEDLG;
+
 void ResizeDlg_InitEx(HWND hwnd, int cxFrame, int cyFrame, int nIdGrip, int iDirection) {
 	RESIZEDLG *pm = (RESIZEDLG *)NP2HeapAlloc(sizeof(RESIZEDLG));
 	pm->direction = iDirection;
@@ -840,7 +842,7 @@ void ResizeDlg_Size(HWND hwnd, LPARAM lParam, int *cx, int *cy) {
 }
 
 void ResizeDlg_GetMinMaxInfo(HWND hwnd, LPARAM lParam) {
-	PRESIZEDLG pm = (PRESIZEDLG)GetProp(hwnd, RESIZEDLG_PROP_KEY);
+	LPCRESIZEDLG pm = (LPCRESIZEDLG)GetProp(hwnd, RESIZEDLG_PROP_KEY);
 
 	LPMINMAXINFO lpmmi = (LPMINMAXINFO)lParam;
 	lpmmi->ptMinTrackSize.x = pm->mmiPtMinX;
@@ -867,7 +869,7 @@ void ResizeDlg_SetAttr(HWND hwnd, int index, int value) {
 
 int ResizeDlg_GetAttr(HWND hwnd, int index) {
 	if (index < MAX_RESIZEDLG_ATTR_COUNT) {
-		PRESIZEDLG pm = (PRESIZEDLG)GetProp(hwnd, RESIZEDLG_PROP_KEY);
+		const LPCRESIZEDLG pm = (LPCRESIZEDLG)GetProp(hwnd, RESIZEDLG_PROP_KEY);
 		return pm->attrs[index];
 	}
 
@@ -898,7 +900,7 @@ int ResizeDlg_CalcDeltaY2(HWND hwnd, int dy, int cy, int nCtlId1, int nCtlId2) {
 		return MulDiv(dy, cy, 100);
 	}
 
-	PRESIZEDLG pm = (PRESIZEDLG)GetProp(hwnd, RESIZEDLG_PROP_KEY);
+	const LPCRESIZEDLG pm = (LPCRESIZEDLG)GetProp(hwnd, RESIZEDLG_PROP_KEY);
 	const int hMin1 = pm->attrs[0];
 	const int hMin2 = pm->attrs[1];
 	const int h1 = GetDlgCtlHeight(hwnd, nCtlId1);
@@ -1217,7 +1219,7 @@ void PathRelativeToApp(LPCWSTR lpszSrc, LPWSTR lpszDest, int cchDest,
 	WCHAR wchWinDir[MAX_PATH];
 	WCHAR wchUserFiles[MAX_PATH];
 	WCHAR wchPath[MAX_PATH];
-	DWORD dwAttrTo = bSrcIsFile ? 0 : FILE_ATTRIBUTE_DIRECTORY;
+	const DWORD dwAttrTo = bSrcIsFile ? 0 : FILE_ATTRIBUTE_DIRECTORY;
 
 	GetModuleFileName(NULL, wchAppPath, COUNTOF(wchAppPath));
 	PathRemoveFileSpec(wchAppPath);
@@ -1855,7 +1857,7 @@ UINT GetDlgItemTextA2W(UINT uCP, HWND hDlg, int nIDDlgItem, LPSTR lpString, int 
 	return uRet;
 }
 
-UINT SetDlgItemTextA2W(UINT uCP, HWND hDlg, int nIDDlgItem, LPSTR lpString) {
+UINT SetDlgItemTextA2W(UINT uCP, HWND hDlg, int nIDDlgItem, LPCSTR lpString) {
 	WCHAR wsz[1024] = L"";
 	MultiByteToWideChar(uCP, 0, lpString, -1, wsz, COUNTOF(wsz));
 	return SetDlgItemText(hDlg, nIDDlgItem, wsz);
@@ -1903,7 +1905,7 @@ BOOL MRU_Destroy(LPMRULIST pmru) {
 	return TRUE;
 }
 
-int MRU_Compare(LPMRULIST pmru, LPCWSTR psz1, LPCWSTR psz2) {
+int MRU_Compare(LPCMRULIST pmru, LPCWSTR psz1, LPCWSTR psz2) {
 	return (pmru->iFlags & MRU_NOCASE) ? StrCmpI(psz1, psz2) : StrCmp(psz1, psz2);
 }
 
@@ -1979,7 +1981,7 @@ BOOL MRU_Delete(LPMRULIST pmru, int iIndex) {
 	return TRUE;
 }
 
-BOOL MRU_DeleteFileFromStore(LPMRULIST pmru, LPCWSTR pszFile) {
+BOOL MRU_DeleteFileFromStore(LPCMRULIST pmru, LPCWSTR pszFile) {
 	int i = 0;
 	WCHAR wchItem[MAX_PATH];
 
@@ -2010,7 +2012,7 @@ BOOL MRU_Empty(LPMRULIST pmru) {
 	return TRUE;
 }
 
-int MRU_Enum(LPMRULIST pmru, int iIndex, LPWSTR pszItem, int cchItem) {
+int MRU_Enum(LPCMRULIST pmru, int iIndex, LPWSTR pszItem, int cchItem) {
 	if (pszItem == NULL || cchItem == 0) {
 		int i = 0;
 		while (i < pmru->iSize && pmru->pszItems[i]) {
@@ -2060,7 +2062,7 @@ BOOL MRU_Load(LPMRULIST pmru) {
 	return TRUE;
 }
 
-BOOL MRU_Save(LPMRULIST pmru) {
+BOOL MRU_Save(LPCMRULIST pmru) {
 	if (MRU_GetCount(pmru) == 0) {
 		IniClearSection(pmru->szRegKey);
 		return TRUE;
@@ -2092,7 +2094,7 @@ BOOL MRU_Save(LPMRULIST pmru) {
 	return TRUE;
 }
 
-BOOL MRU_MergeSave(LPMRULIST pmru, BOOL bAddFiles, BOOL bRelativePath, BOOL bUnexpandMyDocs) {
+BOOL MRU_MergeSave(LPCMRULIST pmru, BOOL bAddFiles, BOOL bRelativePath, BOOL bUnexpandMyDocs) {
 	LPMRULIST pmruBase = MRU_Create(pmru->szRegKey, pmru->iFlags, pmru->iSize);
 	MRU_Load(pmruBase);
 
@@ -2212,7 +2214,7 @@ DLGTEMPLATE *LoadThemedDialogTemplate(LPCWSTR lpDialogTemplateID, HINSTANCE hIns
 	}
 
 	HGLOBAL hRsrcMem = LoadResource(hInstance, hRsrc);
-	DLGTEMPLATE *pRsrcMem = (DLGTEMPLATE *)LockResource(hRsrcMem);
+	const DLGTEMPLATE *pRsrcMem = (DLGTEMPLATE *)LockResource(hRsrcMem);
 	const UINT dwTemplateSize = (UINT)SizeofResource(hInstance, hRsrc);
 
 	DLGTEMPLATE *pTemplate = dwTemplateSize ? (DLGTEMPLATE *)NP2HeapAlloc(dwTemplateSize + LF_FACESIZE * 2) : NULL;
@@ -2314,7 +2316,7 @@ static inline int GetHexDigit(char ch) {
  * Convert C style \a, \b, \f, \n, \r, \t, \v, \xhh and \uhhhh into their indicated characters.
  */
 unsigned int UnSlash(char *s, UINT cpEdit) {
-	char *sStart = s;
+	const char *sStart = s;
 	char *o = s;
 
 	while (*s) {

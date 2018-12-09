@@ -1009,9 +1009,9 @@ void MsgSize(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	}
 
 	RECT rc;
-	int x = 0;
+	const int x = 0;
 	int y = 0;
-	int cx = LOWORD(lParam);
+	const int cx = LOWORD(lParam);
 	int cy = HIWORD(lParam);
 
 	if (bShowToolbar) {
@@ -2102,7 +2102,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			break;
 
 		case LVN_ITEMCHANGED: {
-			NM_LISTVIEW *pnmlv = (NM_LISTVIEW *)lParam;
+			const NM_LISTVIEW *pnmlv = (NM_LISTVIEW *)lParam;
 
 			if ((pnmlv->uNewState & (LVIS_SELECTED | LVIS_FOCUSED)) !=
 					(pnmlv->uOldState & (LVIS_SELECTED | LVIS_FOCUSED))) {
@@ -2227,13 +2227,13 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	default:
 		switch (pnmh->code) {
 		case TTN_NEEDTEXT: {
-			if (((LPTOOLTIPTEXT)lParam)->uFlags & TTF_IDISHWND) {
-				PathCompactPathEx(((LPTOOLTIPTEXT)lParam)->szText, szCurDir,
-								  COUNTOF(((LPTOOLTIPTEXT)lParam)->szText), 0);
+			LPTOOLTIPTEXT pTTT = (LPTOOLTIPTEXT)lParam;
+			if (pTTT->uFlags & TTF_IDISHWND) {
+				PathCompactPathEx(pTTT->szText, szCurDir, COUNTOF(pTTT->szText), 0);
 			} else {
 				WCHAR tch[256];
 				GetString((UINT)pnmh->idFrom, tch, COUNTOF(tch));
-				lstrcpyn(((LPTOOLTIPTEXT)lParam)->szText, tch, 80);
+				lstrcpyn(pTTT->szText, tch, 80);
 			}
 		}
 		break;
@@ -2796,7 +2796,7 @@ void ParseCommandLine(void) {
 	while (ExtractFirstArgument(lp3, lp1, lp2)) {
 		// options
 		if ((*lp1 == L'/' || *lp1 == L'-') && lp1[1] != 0) {
-			int state = ParseCommandLineOption(lp1, lp2);
+			const int state = ParseCommandLineOption(lp1, lp2);
 			if (state == 1) {
 				lstrcpy(lp3, lp2);
 				continue;
@@ -3610,7 +3610,7 @@ void SnapToTarget(HWND hwnd) {
 		RECT rcOld;
 		RECT rcNew;
 		RECT rc2;
-		int cxScreen = GetSystemMetrics(SM_CXSCREEN);
+		const int cxScreen = GetSystemMetrics(SM_CXSCREEN);
 		GetWindowRect(hwnd, &rcOld);
 		GetWindowRect(hwnd2, &rc2);
 

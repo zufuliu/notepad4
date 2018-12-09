@@ -61,6 +61,8 @@ typedef struct _editlexer {
 	EDITSTYLE * const Styles;
 } EDITLEXER, *PEDITLEXER;
 
+typedef const EDITLEXER *LPCEDITLEXER;
+
 #define EDITLEXER_HOLE(name, style)	{ FALSE, COUNTOF(style), CSTRLEN(name), (name), NULL, NULL }
 
 // NP2LEX_, rid for EDITLEXER

@@ -65,8 +65,8 @@ void	Style_SetLexerFromID(HWND hwnd, int id);
 int		Style_GetEditLexerId(int lexer);
 
 int		Style_GetDocTypeLanguage(void);
-void	Style_UpdateLexerKeywords(PEDITLEXER pLexNew);
-void	Style_UpdateLexerKeywordAttr(PEDITLEXER pLexNew);
+void	Style_UpdateLexerKeywords(LPCEDITLEXER pLexNew);
+void	Style_UpdateLexerKeywordAttr(LPCEDITLEXER pLexNew);
 #if NP2_GET_LEXER_STYLE_NAME_FROM_RES
 LPCWSTR Style_GetCurrentLexerDisplayName(LPWSTR lpszName, int cchName);
 #endif
@@ -94,7 +94,7 @@ BOOL	Style_SelectFont(HWND hwnd, LPWSTR lpszStyle, int cchStyle, BOOL bDefaultSt
 BOOL	Style_SelectColor(HWND hwnd, BOOL bFore, LPWSTR lpszStyle, int cchStyle);
 void	Style_SetStyles(HWND hwnd, int iStyle, LPCWSTR lpszStyle);
 
-int 	Style_GetLexerIconId(PEDITLEXER pLex);
+int 	Style_GetLexerIconId(LPCEDITLEXER pLex);
 void	Style_ConfigDlg(HWND hwnd);
 void	Style_SelectLexerDlg(HWND hwnd);
 

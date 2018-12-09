@@ -284,7 +284,7 @@ void AutoC_AddDocWord(HWND hwnd, struct WordList *pWList, BOOL bIgnore) {
 			Sci_Position wordLength = -iPosFind;
 			BOOL bSubWord = FALSE;
 			while (wordEnd < iDocLen) {
-				int chPrev = ch;
+				const int chPrev = ch;
 				ch = chNext;
 				chNext = SciCall_GetCharAt(wordEnd + 1);
 				if (!IsDocWordChar(ch) || (ch == ':' && pLexCurrent->iLexer == SCLEX_CPP)) {
@@ -517,7 +517,7 @@ void EditCompleteWord(HWND hwnd, BOOL autoInsert) {
 	const int iCurrentStyle = SciCall_GetStyleAt(iCurrentPos);
 	const int iLine = SciCall_LineFromPosition(iCurrentPos);
 	const Sci_Position iLineStartPos = SciCall_PositionFromLine(iLine);
-	Sci_Position iCurrentLinePos = iCurrentPos - iLineStartPos;
+	const Sci_Position iCurrentLinePos = iCurrentPos - iLineStartPos;
 	Sci_Position iStartWordPos = iCurrentLinePos;
 
 	char *pRoot = NULL;
@@ -1123,7 +1123,7 @@ void EditAutoIndent(HWND hwnd) {
 		for (pPos = pLineBuf; *pPos; pPos++) {
 			if (*pPos != ' ' && *pPos != '\t') {
 				if (!indent && IsWordStart(*pPos)) { // indent on keywords
-					int style = SciCall_GetStyleAt(SciCall_PositionFromLine(iCurLine - 1) + iIndentLen);
+					const int style = SciCall_GetStyleAt(SciCall_PositionFromLine(iCurLine - 1) + iIndentLen);
 					if (IsIndentKeywordStyle(style)) {
 						endPart = EditKeywordIndent(pPos, &indent);
 					}

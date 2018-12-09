@@ -24,19 +24,36 @@
 #include <commctrl.h>
 #include <commdlg.h>
 #include "Scintilla.h"
+#include "compiler.h"
+#if !NP2_FORCE_COMPILE_C_AS_CPP
 extern "C" {
+#endif
+
 #include "Helpers.h"
 #include "Dialogs.h"
 #include "Notepad2.h"
+
+#if !NP2_FORCE_COMPILE_C_AS_CPP
 }
+#endif
 #include "resource.h"
 
 // Global settings...
+#if NP2_FORCE_COMPILE_C_AS_CPP
+extern int iPrintHeader;
+extern int iPrintFooter;
+extern int iPrintColor;
+extern int iPrintZoom;
+extern RECT pageSetupMargin;
+extern HWND hwndStatus;
+#else
 extern "C" int iPrintHeader;
 extern "C" int iPrintFooter;
 extern "C" int iPrintColor;
 extern "C" int iPrintZoom;
 extern "C" RECT pageSetupMargin;
+extern "C" HWND hwndStatus;
+#endif
 
 // Stored objects...
 static HGLOBAL hDevMode {};
@@ -48,8 +65,6 @@ static void EditPrintInit() noexcept;
 //
 // EditPrint() - Code from SciTE
 //
-extern "C" HWND hwndStatus;
-
 void StatusUpdatePrintPage(int iPageNum) noexcept {
 	WCHAR tch[32];
 	WCHAR fmt[32];

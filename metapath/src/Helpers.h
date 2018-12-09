@@ -359,16 +359,18 @@ BOOL ExecDDECommand(LPCWSTR lpszCmdLine, LPCWSTR lpszDDEMsg, LPCWSTR lpszDDEApp,
 typedef struct tagHISTORY {
 	WCHAR *psz[HISTORY_ITEMS]; // Strings
 	int  iCurItem;            // Current Item
-} HISTORY, *PHISTORY;
+} HISTORY, *PHISTORY, *LPHISTORY;
+
+typedef const HISTORY *LCPHISTORY;
 
 BOOL History_Init(PHISTORY ph);
 BOOL History_Uninit(PHISTORY ph);
 BOOL History_Add(PHISTORY ph, LPCWSTR pszNew);
 BOOL History_Forward(PHISTORY ph, LPWSTR pszItem, int cItem);
 BOOL History_Back(PHISTORY ph, LPWSTR pszItem, int cItem);
-BOOL History_CanForward(PHISTORY ph);
-BOOL History_CanBack(PHISTORY ph);
-void History_UpdateToolbar(PHISTORY ph, HWND hwnd, int cmdBack, int cmdForward);
+BOOL History_CanForward(LCPHISTORY ph);
+BOOL History_CanBack(LCPHISTORY ph);
+void History_UpdateToolbar(LCPHISTORY ph, HWND hwnd, int cmdBack, int cmdForward);
 
 //==== MRU Functions ==========================================================
 #define MRU_MAXITEMS 24
@@ -386,17 +388,19 @@ typedef struct _mrulist {
 	LPWSTR pszItems[MRU_MAXITEMS];
 } MRULIST, *PMRULIST, *LPMRULIST;
 
+typedef const MRULIST *LPCMRULIST;
+
 LPMRULIST MRU_Create(LPCWSTR pszRegKey, int iFlags, int iSize);
 BOOL MRU_Destroy(LPMRULIST pmru);
 BOOL MRU_Add(LPMRULIST pmru, LPCWSTR pszNew);
 BOOL MRU_Delete(LPMRULIST pmru, int iIndex);
 BOOL MRU_Empty(LPMRULIST pmru);
-int MRU_Enum(LPMRULIST pmru, int iIndex, LPWSTR pszItem, int cchItem);
-NP2_inline int MRU_GetCount(LPMRULIST pmru) {
+int MRU_Enum(LPCMRULIST pmru, int iIndex, LPWSTR pszItem, int cchItem);
+NP2_inline int MRU_GetCount(LPCMRULIST pmru) {
 	return MRU_Enum(pmru, 0, NULL, 0);
 }
 BOOL MRU_Load(LPMRULIST pmru);
-BOOL MRU_Save(LPMRULIST pmru);
+BOOL MRU_Save(LPCMRULIST pmru);
 void MRU_LoadToCombobox(HWND hwnd, LPCWSTR pszKey);
 void MRU_AddOneItem(LPCWSTR pszKey, LPCWSTR pszNewItem);
 void MRU_ClearCombobox(HWND hwnd, LPCWSTR pszKey);
