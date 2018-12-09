@@ -2267,6 +2267,7 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	EnableCmd(hmenu, BME_EDIT_BOOKMARKNEXT, i);
 	EnableCmd(hmenu, BME_EDIT_BOOKMARKTOGGLE, i);
 	EnableCmd(hmenu, BME_EDIT_BOOKMARKCLEAR, i);
+	EnableCmd(hmenu, IDM_EDIT_GOTOLINE, nonEmpty);
 	EnableCmd(hmenu, IDM_EDIT_DELETELINELEFT, i);
 	EnableCmd(hmenu, IDM_EDIT_DELETELINERIGHT, i);
 	EnableCmd(hmenu, CMD_CTRLBACK, i);
