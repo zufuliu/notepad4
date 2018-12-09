@@ -88,7 +88,7 @@ bool LoadD2D() noexcept {
 		typedef HRESULT(WINAPI *DWriteCFSig)(DWRITE_FACTORY_TYPE factoryType, REFIID iid,
 			IUnknown **factory);
 
-		hDLLD2D = ::LoadLibraryEx(TEXT("D2D1.DLL"), nullptr, kSystemLibraryLoadFlags);
+		hDLLD2D = ::LoadLibraryEx(L"D2D1.DLL", nullptr, kSystemLibraryLoadFlags);
 		if (hDLLD2D) {
 			D2D1CFSig fnD2DCF = reinterpret_cast<D2D1CFSig>(::GetProcAddress(hDLLD2D, "D2D1CreateFactory"));
 			if (fnD2DCF) {
@@ -99,7 +99,7 @@ bool LoadD2D() noexcept {
 					reinterpret_cast<IUnknown**>(&pD2DFactory));
 			}
 		}
-		hDLLDWrite = ::LoadLibraryEx(TEXT("DWRITE.DLL"), nullptr, kSystemLibraryLoadFlags);
+		hDLLDWrite = ::LoadLibraryEx(L"DWRITE.DLL", nullptr, kSystemLibraryLoadFlags);
 		if (hDLLDWrite) {
 			DWriteCFSig fnDWCF = reinterpret_cast<DWriteCFSig>(::GetProcAddress(hDLLDWrite, "DWriteCreateFactory"));
 			if (fnDWCF) {
@@ -723,7 +723,7 @@ void SurfaceGDI::FillRectangle(PRectangle rc, ColourDesired back) noexcept {
 	// There is no need to allocate a brush either.
 	const RECT rcw = RectFromPRectangle(rc);
 	::SetBkColor(hdc, back.AsInteger());
-	::ExtTextOut(hdc, rcw.left, rcw.top, ETO_OPAQUE, &rcw, TEXT(""), 0, nullptr);
+	::ExtTextOut(hdc, rcw.left, rcw.top, ETO_OPAQUE, &rcw, L"", 0, nullptr);
 }
 
 void SurfaceGDI::FillRectangle(PRectangle rc, Surface &surfacePattern) noexcept {
@@ -2446,7 +2446,7 @@ public:
 	}
 };
 
-static const TCHAR *ListBoxX_ClassName = TEXT("ListBoxX");
+static const TCHAR *ListBoxX_ClassName = L"ListBoxX";
 
 ListBox::ListBox() noexcept = default;
 
@@ -2553,7 +2553,7 @@ void ListBoxX::Create(Window &parent_, int ctrlID_, Point location_, int lineHei
 	HINSTANCE hinstanceParent = GetWindowInstance(hwndParent);
 	// Window created as popup so not clipped within parent client area
 	wid = ::CreateWindowEx(
-		WS_EX_WINDOWEDGE, ListBoxX_ClassName, TEXT(""),
+		WS_EX_WINDOWEDGE, ListBoxX_ClassName, L"",
 		WS_POPUP | WS_THICKFRAME,
 		100, 100, 150, 80, hwndParent,
 		nullptr,
@@ -3139,7 +3139,7 @@ LRESULT ListBoxX::WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam
 		// Note that LBS_NOINTEGRALHEIGHT is specified to fix cosmetic issue when resizing the list
 		// but has useful side effect of speeding up list population significantly
 		lb = ::CreateWindowEx(
-			0, TEXT("listbox"), TEXT(""),
+			0, L"listbox", L"",
 			WS_CHILD | WS_VSCROLL | WS_VISIBLE |
 			LBS_OWNERDRAWFIXED | LBS_NODATA | LBS_NOINTEGRALHEIGHT,
 			0, 0, 150, 80, hWnd,

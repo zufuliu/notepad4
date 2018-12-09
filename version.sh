@@ -58,11 +58,11 @@ else
 
 fi
 
-ver_full="_T(\"r$ver ($hash)$ver_full\")"
+ver_full="TEXT(\"r$ver ($hash)$ver_full\")"
 
 version_info+="#define VERSION_MINOR `date +%y`"$'\n'
 version_info+="#define VERSION_BUILD `date +%m`"$'\n'
-version_info+="#define VERSION_HASH _T(\"$hash\")"$'\n'
+version_info+="#define VERSION_HASH TEXT(\"$hash\")"$'\n'
 version_info+="#define VERSION_REV $ver"$'\n'
 version_info+="#define VERSION_REV_FULL $ver_full"
 

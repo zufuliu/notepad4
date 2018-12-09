@@ -149,7 +149,7 @@ using namespace Scintilla;
 
 namespace {
 
-const TCHAR *callClassName = TEXT("CallTip");
+const TCHAR *callClassName = L"CallTip";
 
 inline void *PointerFromWindow(HWND hWnd) noexcept {
 	return reinterpret_cast<void *>(::GetWindowLongPtr(hWnd, 0));
@@ -526,22 +526,22 @@ ScintillaWin::ScintillaWin(HWND hwnd) {
 	// There does not seem to be a real standard for indicating that the clipboard
 	// contains a rectangular selection, so copy Developer Studio and Borland Delphi.
 	cfColumnSelect = static_cast<CLIPFORMAT>(
-		::RegisterClipboardFormat(TEXT("MSDEVColumnSelect")));
+		::RegisterClipboardFormat(L"MSDEVColumnSelect"));
 	cfBorlandIDEBlockType = static_cast<CLIPFORMAT>(
-		::RegisterClipboardFormat(TEXT("Borland IDE Block Type")));
+		::RegisterClipboardFormat(L"Borland IDE Block Type"));
 
 	// Likewise for line-copy (copies a full line when no text is selected)
 	cfLineSelect = static_cast<CLIPFORMAT>(
-		::RegisterClipboardFormat(TEXT("MSDEVLineSelect")));
+		::RegisterClipboardFormat(L"MSDEVLineSelect"));
 	cfVSLineTag = static_cast<CLIPFORMAT>(
-		::RegisterClipboardFormat(TEXT("VisualStudioEditorOperationsLineCutCopyClipboardTag")));
+		::RegisterClipboardFormat(L"VisualStudioEditorOperationsLineCutCopyClipboardTag"));
 
 #if EnableDrop_VisualStudioProjectItem
-	cfVSStgProjectItem = static_cast<CLIPFORMAT>(::RegisterClipboardFormat(TEXT("CF_VSSTGPROJECTITEMS")));
-	cfVSRefProjectItem = static_cast<CLIPFORMAT>(::RegisterClipboardFormat(TEXT("CF_VSREFPROJECTITEMS")));
+	cfVSStgProjectItem = static_cast<CLIPFORMAT>(::RegisterClipboardFormat(L"CF_VSSTGPROJECTITEMS"));
+	cfVSRefProjectItem = static_cast<CLIPFORMAT>(::RegisterClipboardFormat(L"CF_VSREFPROJECTITEMS"));
 #endif
 #if Enable_ChromiumWebCustomMIMEDataFormat
-	cfChromiumCustomMIME = static_cast<CLIPFORMAT>(::RegisterClipboardFormat(TEXT("Chromium Web Custom MIME Data Format")));
+	cfChromiumCustomMIME = static_cast<CLIPFORMAT>(::RegisterClipboardFormat(L"Chromium Web Custom MIME Data Format"));
 #endif
 
 	dropFormat.push_back(CF_HDROP);
@@ -589,7 +589,7 @@ void ScintillaWin::Init() {
 
 	// Find SetCoalescableTimer which is only available from Windows 8+
 	SetCoalescableTimerFn = reinterpret_cast<SetCoalescableTimerSig>(
-		::GetProcAddress(::GetModuleHandle(TEXT("user32.dll")), "SetCoalescableTimer"));
+		::GetProcAddress(::GetModuleHandle(L"user32.dll"), "SetCoalescableTimer"));
 
 	vs.indicators[SC_INDICATOR_UNKNOWN] = Indicator(INDIC_HIDDEN, ColourDesired(0, 0, 0xff));
 	vs.indicators[SC_INDICATOR_INPUT] = Indicator(INDIC_DOTS, ColourDesired(0, 0, 0xff));
@@ -2412,7 +2412,7 @@ void ScintillaWin::Paste() {
 
 void ScintillaWin::CreateCallTipWindow(PRectangle) noexcept {
 	if (!ct.wCallTip.Created()) {
-		HWND wnd = ::CreateWindow(callClassName, TEXT("ACallTip"),
+		HWND wnd = ::CreateWindow(callClassName, L"ACallTip",
 			WS_POPUP, 100, 100, 150, 20,
 			MainHWND(), nullptr,
 			GetWindowInstance(MainHWND()),
