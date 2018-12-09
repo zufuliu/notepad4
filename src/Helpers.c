@@ -2540,9 +2540,9 @@ static VOID GetTrayWndRect(LPRECT lpTrayRect) {
 	// TrayNotifyWnd. This provides us a window rect to minimize to. Note, however,
 	// that this is not guaranteed to work on future versions of the shell. If we
 	// use this method, make sure we have a backup!
-	HWND hShellTrayWnd = FindWindowEx(NULL, NULL, TEXT("Shell_TrayWnd"), NULL);
+	HWND hShellTrayWnd = FindWindowEx(NULL, NULL, L"Shell_TrayWnd", NULL);
 	if (hShellTrayWnd) {
-		HWND hTrayNotifyWnd = FindWindowEx(hShellTrayWnd, NULL, TEXT("TrayNotifyWnd"), NULL);
+		HWND hTrayNotifyWnd = FindWindowEx(hShellTrayWnd, NULL, L"TrayNotifyWnd", NULL);
 		if (hTrayNotifyWnd) {
 			GetWindowRect(hTrayNotifyWnd, lpTrayRect);
 			return;
@@ -2595,7 +2595,7 @@ static VOID GetTrayWndRect(LPRECT lpTrayRect) {
 	// Note that if the 3rd party shell supports the same configuraion as
 	// explorer (the icons hosted in NotifyTrayWnd, which is a child window of
 	// Shell_TrayWnd), we would already have caught it above
-	hShellTrayWnd = FindWindowEx(NULL, NULL, TEXT("Shell_TrayWnd"), NULL);
+	hShellTrayWnd = FindWindowEx(NULL, NULL, L"Shell_TrayWnd", NULL);
 	if (hShellTrayWnd) {
 		GetWindowRect(hShellTrayWnd, lpTrayRect);
 		if (lpTrayRect->right - lpTrayRect->left > DEFAULT_RECT_WIDTH) {

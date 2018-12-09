@@ -23,15 +23,7 @@
 
 #include "VersionRev.h"
 
-#ifndef _T
-#if !defined(ISPP_INVOKED) && (defined(UNICODE) || defined(_UNICODE))
-#define _T(text)	L##text
-#else
-#define _T(text)	text
-#endif
-#endif
-
-#define DO_STRINGIFY(x)		_T(#x)
+#define DO_STRINGIFY(x)		TEXT(#x)
 #define STRINGIFY(x)		DO_STRINGIFY(x)
 
 #define VERSION_MAJOR		4
