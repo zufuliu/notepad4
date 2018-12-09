@@ -76,13 +76,9 @@ STDMETHODIMP CDropSource::GiveFeedback(DWORD /*dwEffect*/) noexcept {
 	return DRAGDROP_S_USEDEFAULTCURSORS;
 }
 
-extern "C" {
-
 // GCC warns -Wlto-type-mismatch for LPDROPSOURCE.
-HANDLE CreateDropSource(void) {
+extern "C" HANDLE CreateDropSource(void) {
 	return (new CDropSource);
-}
-
 }
 
 // End of DropSource.cpp

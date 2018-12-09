@@ -30,6 +30,8 @@ typedef struct tagLV_ITEMDATA { // lvid
 	LPSHELLFOLDER lpsf; // Parent IShellFolder Interface
 } LV_ITEMDATA, *LPLV_ITEMDATA;
 
+typedef const LV_ITEMDATA *LPCLV_ITEMDATA;
+
 BOOL DirList_Init(HWND hwnd, LPCWSTR pszHeader);
 BOOL DirList_Destroy(HWND hwnd);
 BOOL DirList_StartIconThread(HWND hwnd);
@@ -69,6 +71,8 @@ typedef struct tagDLITEM { // dli
 	int ntype;
 } DLITEM, *LPDLITEM;
 
+typedef const DLITEM *LPCDLITEM;
+
 int DirList_GetItem(HWND hwnd, int iItem, LPDLITEM lpdli);
 int DirList_GetItemEx(HWND hwnd, int iItem, LPWIN32_FIND_DATA pfd);
 BOOL DirList_PropertyDlg(HWND hwnd, int iItem);
@@ -83,10 +87,12 @@ typedef struct tagDL_FILTER { //dlf
 	WCHAR tFilterBuf[DL_FILTER_BUFSIZE];
 	LPWSTR pFilter[DL_FILTER_BUFSIZE];
 	BOOL bExcludeFilter;
-} DL_FILTER, *PDL_FILTER;
+} DL_FILTER, *PDL_FILTER, *LPDL_FILTER;
+
+typedef const DL_FILTER *LPCDL_FILTER;
 
 void DirList_CreateFilter(PDL_FILTER pdlf, LPCWSTR lpszFileSpec, BOOL bExcludeFilter);
-BOOL DirList_MatchFilter(LPSHELLFOLDER lpsf, LPCITEMIDLIST pidl, PDL_FILTER pdlf);
+BOOL DirList_MatchFilter(LPSHELLFOLDER lpsf, LPCITEMIDLIST pidl, LPCDL_FILTER pdlf);
 
 BOOL DriveBox_Init(HWND hwnd);
 int  DriveBox_Fill(HWND hwnd);

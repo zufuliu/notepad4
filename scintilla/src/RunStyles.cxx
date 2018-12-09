@@ -300,7 +300,7 @@ void RunStyles<DISTANCE, STYLE>::Check() const {
 	if (styles->ValueAt(styles->Length() - 1) != 0) {
 		throw std::runtime_error("RunStyles: Unused style at end changed.");
 	}
-	for (int j = 1; j < styles->Length() - 1; j++) {
+	for (ptrdiff_t j = 1; j < styles->Length() - 1; j++) {
 		if (styles->ValueAt(j) == styles->ValueAt(j - 1)) {
 			throw std::runtime_error("RunStyles: Style of a partition same as previous.");
 		}

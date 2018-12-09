@@ -34,17 +34,17 @@ typedef struct _editfindreplace {
 	char	szReplace[512];
 	char	szFindUTF8[3 * 512];
 	char	szReplaceUTF8[3 * 512];
+	HWND	hwnd;
 	UINT	fuFlags;
 	BOOL	bTransformBS;
-	BOOL	bObsolete /* was bFindUp */;
+	//BOOL	bFindUp;
 	BOOL	bFindClose;
 	BOOL	bReplaceClose;
 	BOOL	bNoFindWrap;
-	HWND	hwnd;
 	BOOL	bWildcardSearch;
-	//HANDLE hMRUFind;
-	//HANDLE hMRUReplace;
-} EDITFINDREPLACE, *LPEDITFINDREPLACE, *LPCEDITFINDREPLACE;
+} EDITFINDREPLACE, *LPEDITFINDREPLACE;
+
+typedef const EDITFINDREPLACE * LPCEDITFINDREPLACE;
 
 #define IDMSG_SWITCHTOFIND		300
 #define IDMSG_SWITCHTOREPLACE	301
@@ -109,6 +109,7 @@ BOOL	EditSetNewEncoding(HWND hwnd, int iCurrentEncoding,
 char*	EditGetClipboardText(HWND hwnd); // LocalFree()
 BOOL	EditCopyAppend(HWND hwnd);
 
+extern const int iLineEndings[3];
 struct EditFileIOStatus;
 void 	EditDetectEOLMode(LPCSTR lpData, DWORD cbData, struct EditFileIOStatus *status);
 BOOL	EditLoadFile(HWND hwnd, LPWSTR pszFile, BOOL bSkipEncodingDetection, struct EditFileIOStatus *status);
@@ -159,12 +160,12 @@ void	EditGetExcerpt(HWND hwnd, LPWSTR lpszExcerpt, DWORD cchExcerpt);
 
 void	EditSelectWord(HWND hwnd);
 void	EditSelectLine(HWND hwnd);
-HWND	EditFindReplaceDlg(HWND hwnd, LPCEDITFINDREPLACE lpefr, BOOL bReplace);
-BOOL	EditFindNext(HWND hwnd, LPCEDITFINDREPLACE lpefr, BOOL fExtendSelection);
-BOOL	EditFindPrev(HWND hwnd, LPCEDITFINDREPLACE lpefr, BOOL fExtendSelection);
-BOOL	EditReplace(HWND hwnd, LPCEDITFINDREPLACE lpefr);
-BOOL	EditReplaceAll(HWND hwnd, LPCEDITFINDREPLACE lpefr, BOOL bShowInfo);
-BOOL	EditReplaceAllInSelection(HWND hwnd, LPCEDITFINDREPLACE lpefr, BOOL bShowInfo);
+HWND	EditFindReplaceDlg(HWND hwnd, LPEDITFINDREPLACE lpefr, BOOL bReplace);
+BOOL	EditFindNext(HWND hwnd, LPEDITFINDREPLACE lpefr, BOOL fExtendSelection);
+BOOL	EditFindPrev(HWND hwnd, LPEDITFINDREPLACE lpefr, BOOL fExtendSelection);
+BOOL	EditReplace(HWND hwnd, LPEDITFINDREPLACE lpefr);
+BOOL	EditReplaceAll(HWND hwnd, LPEDITFINDREPLACE lpefr, BOOL bShowInfo);
+BOOL	EditReplaceAllInSelection(HWND hwnd, LPEDITFINDREPLACE lpefr, BOOL bShowInfo);
 BOOL	EditLineNumDlg(HWND hwnd);
 void	EditModifyLinesDlg(HWND hwnd);
 void	EditEncloseSelectionDlg(HWND hwnd);
@@ -178,9 +179,16 @@ void	TryBrowseFile(HWND hwnd, LPCWSTR pszFile, BOOL bWarn);
 void	EditOpenSelection(HWND hwnd, int type);
 
 // in Print.cpp
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 BOOL	EditPrint(HWND hwnd, LPCWSTR pszDocTitle, LPCWSTR pszPageFormat);
 void	EditPrintSetup(HWND hwnd);
-void	EditPrintInit(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 void	EditMarkAll(HWND hwnd, int iMarkOccurrences,
 					BOOL bMarkOccurrencesMatchCase, BOOL bMarkOccurrencesMatchWords);
@@ -288,6 +296,7 @@ static inline BOOL IsDBCSCodePage(UINT page) {
 }
 
 // in EditEncoding.c
+extern NP2ENCODING mEncoding[];
 void	Encoding_ReleaseResources(void);
 void	Encoding_InitDefaults(void);
 int 	Encoding_MapIniSetting(BOOL bLoad, int iSetting);
@@ -307,7 +316,7 @@ INT		UTF8_mbslen(LPCSTR source, INT byte_length);
 INT		UTF8_mbslen_bytes(LPCSTR utf8_string);
 
 static inline BOOL IsUTF8Signature(const char *p) {
-	UINT value = (*((UNALIGNED UINT*)p)) & 0xFFFFFF;
+	const UINT value = (*((UNALIGNED UINT*)p)) & 0xFFFFFF;
 	// 0xEF, 0xBB, 0xBF in little endian
 	return value == 0xBFBBEF;
 }
@@ -336,15 +345,17 @@ typedef struct _filevars {
 	char	tchMode[32];
 } FILEVARS, *LPFILEVARS;
 
+typedef const FILEVARS * LPCFILEVARS;
+
 BOOL	FileVars_Init(LPCSTR lpData, DWORD cbData, LPFILEVARS lpfv);
-BOOL	FileVars_Apply(HWND hwnd, LPFILEVARS lpfv);
+BOOL	FileVars_Apply(HWND hwnd, LPCFILEVARS lpfv);
 BOOL	FileVars_ParseInt(LPCSTR pszData, LPCSTR pszName, int *piValue);
 BOOL	FileVars_ParseStr(LPCSTR pszData, LPCSTR pszName, char *pszValue, int cchValue);
 // in EditEncoding.c
-BOOL	FileVars_IsUTF8(LPFILEVARS lpfv);
-BOOL	FileVars_IsNonUTF8(LPFILEVARS lpfv);
-BOOL	FileVars_IsValidEncoding(LPFILEVARS lpfv);
-int 	FileVars_GetEncoding(LPFILEVARS lpfv);
+BOOL	FileVars_IsUTF8(LPCFILEVARS lpfv);
+BOOL	FileVars_IsNonUTF8(LPCFILEVARS lpfv);
+BOOL	FileVars_IsValidEncoding(LPCFILEVARS lpfv);
+int 	FileVars_GetEncoding(LPCFILEVARS lpfv);
 
 #endif //NOTEPAD2_EDIT_H_
 

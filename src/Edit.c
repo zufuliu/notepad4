@@ -50,7 +50,6 @@ extern int cxFindReplaceDlg;
 
 extern int iDefaultEncoding;
 extern int iDefaultEOLMode;
-extern const int iLineEndings[3];
 extern BOOL bFixLineEndings;
 extern BOOL bAutoStripBlanks;
 
@@ -67,7 +66,6 @@ extern int iSrcEncoding;
 extern int iWeakSrcEncoding;
 
 extern int g_DOSEncoding;
-extern const NP2ENCODING mEncoding[];
 
 extern LPMRULIST mruFind;
 extern LPMRULIST mruReplace;
@@ -240,7 +238,7 @@ char* EditGetClipboardText(HWND hwnd) {
 	}
 
 	HANDLE hmem = GetClipboardData(CF_UNICODETEXT);
-	WCHAR *pwch = (WCHAR *)GlobalLock(hmem);
+	LPCWSTR pwch = (LPCWSTR)GlobalLock(hmem);
 	const int wlen = lstrlen(pwch);
 
 	const UINT cpEdit = (UINT)SendMessage(hwnd, SCI_GETCODEPAGE, 0, 0);
@@ -334,7 +332,7 @@ BOOL EditCopyAppend(HWND hwnd) {
 	BOOL succ = FALSE;
 	if (OpenClipboard(GetParent(hwnd))) {
 		HANDLE hOld = GetClipboardData(CF_UNICODETEXT);
-		WCHAR *pszOld = (WCHAR *)GlobalLock(hOld);
+		LPCWSTR pszOld = (LPCWSTR)GlobalLock(hOld);
 
 		HANDLE hNew = GlobalAlloc(GMEM_MOVEABLE | GMEM_ZEROINIT,
 						   sizeof(WCHAR) * (lstrlen(pszOld) + lstrlen(pszTextW) + 1));
@@ -1232,9 +1230,13 @@ void EditEscapeCChars(HWND hwnd) {
 		return;
 	}
 
+#if NP2_USE_DESIGNATED_INITIALIZER
 	EDITFINDREPLACE efr = {
 		.hwnd = hwnd,
 	};
+#else
+	EDITFINDREPLACE efr = { "", "", "", "", hwnd };
+#endif
 
 	SendMessage(hwnd, SCI_BEGINUNDOACTION, 0, 0);
 
@@ -1266,9 +1268,13 @@ void EditUnescapeCChars(HWND hwnd) {
 		return;
 	}
 
+#if NP2_USE_DESIGNATED_INITIALIZER
 	EDITFINDREPLACE efr = {
 		.hwnd = hwnd,
 	};
+#else
+	EDITFINDREPLACE efr = { "", "", "", "", hwnd };
+#endif
 
 	SendMessage(hwnd, SCI_BEGINUNDOACTION, 0, 0);
 
@@ -1309,9 +1315,13 @@ void EditEscapeXHTMLChars(HWND hwnd) {
 		return;
 	}
 
+#if NP2_USE_DESIGNATED_INITIALIZER
 	EDITFINDREPLACE efr = {
 		.hwnd = hwnd,
 	};
+#else
+	EDITFINDREPLACE efr = { "", "", "", "", hwnd };
+#endif
 
 	SendMessage(hwnd, SCI_BEGINUNDOACTION, 0, 0);
 
@@ -1361,9 +1371,13 @@ void EditUnescapeXHTMLChars(HWND hwnd) {
 		return;
 	}
 
+#if NP2_USE_DESIGNATED_INITIALIZER
 	EDITFINDREPLACE efr = {
 		.hwnd = hwnd,
 	};
+#else
+	EDITFINDREPLACE efr = { "", "", "", "", hwnd };
+#endif
 
 	SendMessage(hwnd, SCI_BEGINUNDOACTION, 0, 0);
 
@@ -1964,7 +1978,7 @@ void EditSpacesToTabs(HWND hwnd, int nTabWidth, BOOL bOnlyIndentingWS) {
 	int j = 0;
 	WCHAR space[256];
 	for (int iTextW = 0; iTextW < cchTextW; iTextW++) {
-		WCHAR w = pszTextW[iTextW];
+		const WCHAR w = pszTextW[iTextW];
 		if ((w == L' ' || w == L'\t') && (!bOnlyIndentingWS ||  bIsLineStart)) {
 			space[j++] = w;
 			if (j == nTabWidth - i % nTabWidth || w == L'\t') {
@@ -2915,7 +2929,7 @@ void EditToggleLineComments(HWND hwnd, LPCWSTR pwszComment, BOOL bInsertAtStart)
 	WideCharToMultiByte(cpEdit, 0, pwszComment, -1, mszComment, COUNTOF(mszComment), NULL, NULL);
 
 	const int cchComment = lstrlenA(mszComment);
-	int iLineStart = (int)SendMessage(hwnd, SCI_LINEFROMPOSITION, iSelStart, 0);
+	const int iLineStart = (int)SendMessage(hwnd, SCI_LINEFROMPOSITION, iSelStart, 0);
 	int iLineEnd = (int)SendMessage(hwnd, SCI_LINEFROMPOSITION, iSelEnd, 0);
 
 	if (iSelEnd <= SendMessage(hwnd, SCI_POSITIONFROMLINE, iLineEnd, 0)) {
@@ -3079,8 +3093,8 @@ void EditPadWithSpaces(HWND hwnd, BOOL bSkipEmpty, BOOL bNoUndoGroup) {
 			iMaxColumn = max_i(iMaxColumn, (int)SendMessage(hwnd, SCI_GETCOLUMN, iPos, 0));
 		}
 	} else {
-		int iCurPos = (int)SendMessage(hwnd, SCI_GETCURRENTPOS, 0, 0);
-		int iAnchorPos = (int)SendMessage(hwnd, SCI_GETANCHOR, 0, 0);
+		const int iCurPos = (int)SendMessage(hwnd, SCI_GETCURRENTPOS, 0, 0);
+		const int iAnchorPos = (int)SendMessage(hwnd, SCI_GETANCHOR, 0, 0);
 
 		iRcCurLine = (int)SendMessage(hwnd, SCI_LINEFROMPOSITION, iCurPos, 0);
 		iRcAnchorLine = (int)SendMessage(hwnd, SCI_LINEFROMPOSITION, iAnchorPos, 0);
@@ -3255,11 +3269,15 @@ void EditStripTrailingBlanks(HWND hwnd, BOOL bIgnoreSelection) {
 	// Check if there is any selection... simply use a regular expression replace!
 	if (!bIgnoreSelection && !EditIsEmptySelection()) {
 		if (SC_SEL_RECTANGLE != SendMessage(hwnd, SCI_GETSELECTIONMODE, 0, 0)) {
+#if NP2_USE_DESIGNATED_INITIALIZER
 			EDITFINDREPLACE efrTrim = {
 				.szFind = "[ \t]+$",
-				.fuFlags = SCFIND_REGEXP,
 				.hwnd = hwnd,
+				.fuFlags = SCFIND_REGEXP,
 			};
+#else
+			EDITFINDREPLACE efrTrim = { "[ \t]+$", "", "", "", hwnd, SCFIND_REGEXP };
+#endif
 			if (EditReplaceAllInSelection(hwnd, &efrTrim, FALSE)) {
 				return;
 			}
@@ -3295,11 +3313,15 @@ void EditStripLeadingBlanks(HWND hwnd, BOOL bIgnoreSelection) {
 	// Check if there is any selection... simply use a regular expression replace!
 	if (!bIgnoreSelection && !EditIsEmptySelection()) {
 		if (SC_SEL_RECTANGLE != SendMessage(hwnd, SCI_GETSELECTIONMODE, 0, 0)) {
+#if NP2_USE_DESIGNATED_INITIALIZER
 			EDITFINDREPLACE efrTrim = {
 				.szFind = "^[ \t]+",
-				.fuFlags = SCFIND_REGEXP,
 				.hwnd = hwnd,
+				.fuFlags = SCFIND_REGEXP,
 			};
+#else
+			EDITFINDREPLACE efrTrim = { "^[ \t]+", "", "", "", hwnd, SCFIND_REGEXP };
+#endif
 			if (EditReplaceAllInSelection(hwnd, &efrTrim, FALSE)) {
 				return;
 			}
@@ -3759,7 +3781,7 @@ typedef struct _SORTLINE {
 typedef int (__stdcall *FNSTRCMP)(LPCWSTR, LPCWSTR);
 
 int CmpStd(const void *s1, const void *s2) {
-	int cmp = StrCmp(((SORTLINE *)s1)->pwszSortEntry, ((SORTLINE *)s2)->pwszSortEntry);
+	const int cmp = StrCmp(((SORTLINE *)s1)->pwszSortEntry, ((SORTLINE *)s2)->pwszSortEntry);
 	return (cmp) ? cmp : StrCmp(((SORTLINE *)s1)->pwszLine, ((SORTLINE *)s2)->pwszLine);
 }
 
@@ -4666,7 +4688,7 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 
 		case IDACC_SAVEFIND: {
 			SendWMCommand(hwndMain, IDM_EDIT_SAVEFIND);
-			LPEDITFINDREPLACE lpefr = (LPEDITFINDREPLACE)GetWindowLongPtr(hwnd, DWLP_USER);
+			LPCEDITFINDREPLACE lpefr = (LPCEDITFINDREPLACE)GetWindowLongPtr(hwnd, DWLP_USER);
 			SetDlgItemTextA2W(CP_UTF8, hwnd, IDC_FINDTEXT, lpefr->szFindUTF8);
 			CheckDlgButton(hwnd, IDC_FINDREGEXP, BST_UNCHECKED);
 			CheckDlgButton(hwnd, IDC_FINDTRANSFORMBS, BST_UNCHECKED);
@@ -4744,7 +4766,7 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 //
 // EditFindReplaceDlg()
 //
-HWND EditFindReplaceDlg(HWND hwnd, LPCEDITFINDREPLACE lpefr, BOOL bReplace) {
+HWND EditFindReplaceDlg(HWND hwnd, LPEDITFINDREPLACE lpefr, BOOL bReplace) {
 	lpefr->hwnd = hwnd;
 	HWND hDlg = CreateThemedDialogParam(g_hInstance,
 								   (bReplace) ? MAKEINTRESOURCE(IDD_REPLACE) : MAKEINTRESOURCE(IDD_FIND),
@@ -4757,7 +4779,7 @@ HWND EditFindReplaceDlg(HWND hwnd, LPCEDITFINDREPLACE lpefr, BOOL bReplace) {
 }
 
 // Wildcard search uses the regexp engine to perform a simple search with * ? as wildcards instead of more advanced and user-unfriendly regexp syntax
-void EscapeWildcards(char *szFind2, LPCEDITFINDREPLACE lpefr) {
+void EscapeWildcards(char *szFind2, LPEDITFINDREPLACE lpefr) {
 	char szWildcardEscaped[NP2_FIND_REPLACE_LIMIT];
 	int iSource = 0;
 	int iDest = 0;
@@ -4765,7 +4787,7 @@ void EscapeWildcards(char *szFind2, LPCEDITFINDREPLACE lpefr) {
 	lpefr->fuFlags |= SCFIND_REGEXP;
 
 	while (szFind2[iSource]) {
-		char c = szFind2[iSource];
+		const char c = szFind2[iSource];
 		if (c == '*') {
 			szWildcardEscaped[iDest++] = '.';
 			szWildcardEscaped[iDest] = '*';
@@ -4788,7 +4810,7 @@ void EscapeWildcards(char *szFind2, LPCEDITFINDREPLACE lpefr) {
 //
 // EditFindNext()
 //
-BOOL EditFindNext(HWND hwnd, LPCEDITFINDREPLACE lpefr, BOOL fExtendSelection) {
+BOOL EditFindNext(HWND hwnd, LPEDITFINDREPLACE lpefr, BOOL fExtendSelection) {
 	if (StrIsEmptyA(lpefr->szFind)) {
 		return /*EditFindReplaceDlg(hwnd, lpefr, FALSE)*/FALSE;
 	}
@@ -4851,7 +4873,7 @@ BOOL EditFindNext(HWND hwnd, LPCEDITFINDREPLACE lpefr, BOOL fExtendSelection) {
 //
 // EditFindPrev()
 //
-BOOL EditFindPrev(HWND hwnd, LPCEDITFINDREPLACE lpefr, BOOL fExtendSelection) {
+BOOL EditFindPrev(HWND hwnd, LPEDITFINDREPLACE lpefr, BOOL fExtendSelection) {
 	if (StrIsEmptyA(lpefr->szFind)) {
 		return /*EditFindReplaceDlg(hwnd, lpefr, FALSE)*/FALSE;
 	}
@@ -4915,7 +4937,7 @@ BOOL EditFindPrev(HWND hwnd, LPCEDITFINDREPLACE lpefr, BOOL fExtendSelection) {
 //
 // EditReplace()
 //
-BOOL EditReplace(HWND hwnd, LPCEDITFINDREPLACE lpefr) {
+BOOL EditReplace(HWND hwnd, LPEDITFINDREPLACE lpefr) {
 	if (StrIsEmptyA(lpefr->szFind)) {
 		return /*EditFindReplaceDlg(hwnd, lpefr, TRUE)*/FALSE;
 	}
@@ -5110,7 +5132,7 @@ void EditMarkAll(HWND hwnd, int iMarkOccurrences, BOOL bMarkOccurrencesMatchCase
 //
 // EditReplaceAll()
 //
-BOOL EditReplaceAll(HWND hwnd, LPCEDITFINDREPLACE lpefr, BOOL bShowInfo) {
+BOOL EditReplaceAll(HWND hwnd, LPEDITFINDREPLACE lpefr, BOOL bShowInfo) {
 	if (StrIsEmptyA(lpefr->szFind)) {
 		return /*EditFindReplaceDlg(hwnd, lpefr, TRUE)*/FALSE;
 	}
@@ -5230,7 +5252,7 @@ BOOL EditReplaceAll(HWND hwnd, LPCEDITFINDREPLACE lpefr, BOOL bShowInfo) {
 //
 // EditReplaceAllInSelection()
 //
-BOOL EditReplaceAllInSelection(HWND hwnd, LPCEDITFINDREPLACE lpefr, BOOL bShowInfo) {
+BOOL EditReplaceAllInSelection(HWND hwnd, LPEDITFINDREPLACE lpefr, BOOL bShowInfo) {
 	if (StrIsEmptyA(lpefr->szFind)) {
 		return /*EditFindReplaceDlg(hwnd, lpefr, TRUE)*/FALSE;
 	}
@@ -5425,19 +5447,22 @@ static INT_PTR CALLBACK EditLineNumDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, 
 				fTranslated2 = fTranslated;
 			}
 
-			if (!fTranslated && !fTranslated2) {
-				PostMessage(hwnd, WM_NEXTDLGCTL,
-							(WPARAM)(GetDlgItem(hwnd, (!fTranslated) ? IDC_LINENUM : IDC_COLNUM)), 1);
+			if (!(fTranslated && fTranslated2)) {
+				PostMessage(hwnd, WM_NEXTDLGCTL, (WPARAM)(GetDlgItem(hwnd, IDC_LINENUM)), 1);
 				return TRUE;
 			}
 
 			const int iMaxLine = (int)SendMessage(hwndEdit, SCI_GETLINECOUNT, 0, 0);
 			const int iLength = (int)SendMessage(hwndEdit, SCI_GETLENGTH, 0, 0);
 			// directly goto specific position
-			if (!fTranslated && fTranslated2 && iNewCol > 0 && iNewCol <= iLength) {
-				SendMessage(hwndEdit, SCI_GOTOPOS, iNewCol - 1, 0);
-				SendMessage(hwndEdit, SCI_CHOOSECARETX, 0, 0);
-				EndDialog(hwnd, IDOK);
+			if (fTranslated2 && !fTranslated) {
+				if (iNewCol > 0 && iNewCol <= iLength) {
+					SendMessage(hwndEdit, SCI_GOTOPOS, iNewCol - 1, 0);
+					SendMessage(hwndEdit, SCI_CHOOSECARETX, 0, 0);
+					EndDialog(hwnd, IDOK);
+				} else {
+					PostMessage(hwnd, WM_NEXTDLGCTL, (WPARAM)(GetDlgItem(hwnd, IDC_COLNUM)), 1);
+				}
 			} else if (iNewLine > 0 && iNewLine <= iMaxLine && iNewCol > 0) {
 				//int iNewPos = SendMessage(hwndEdit, SCI_POSITIONFROMLINE, iNewLine - 1, 0);
 				//const int iLineEndPos = SendMessage(hwndEdit, SCI_GETLINEENDPOSITION, iNewLine - 1, 0);
@@ -5453,8 +5478,7 @@ static INT_PTR CALLBACK EditLineNumDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, 
 				EditJumpTo(hwndEdit, iNewLine, iNewCol);
 				EndDialog(hwnd, IDOK);
 			} else {
-				PostMessage(hwnd, WM_NEXTDLGCTL,
-							(WPARAM)(GetDlgItem(hwnd, (!(iNewLine > 0 && iNewLine <= iMaxLine)) ? IDC_LINENUM : IDC_COLNUM)), 1);
+				PostMessage(hwnd, WM_NEXTDLGCTL, (WPARAM)(GetDlgItem(hwnd, ((iNewCol > 0) ? IDC_LINENUM : IDC_COLNUM))), 1);
 			}
 		}
 		break;
@@ -5475,7 +5499,7 @@ static INT_PTR CALLBACK EditLineNumDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, 
 // EditLinenumDlg()
 //
 BOOL EditLineNumDlg(HWND hwnd) {
-	const INT_PTR iResult = ThemedDialogBoxParam(g_hInstance,  MAKEINTRESOURCE(IDD_LINENUM), GetParent(hwnd), EditLineNumDlgProc, (LPARAM)hwnd);
+	const INT_PTR iResult = ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_LINENUM), GetParent(hwnd), EditLineNumDlgProc, (LPARAM)hwnd);
 	return iResult == IDOK;
 }
 
@@ -5869,7 +5893,7 @@ static INT_PTR CALLBACK EditInsertTagDlgProc(HWND hwnd, UINT umsg, WPARAM wParam
 				DString_GetDlgItemText(&wszOpen, hwnd, IDC_MODIFY_LINE_PREFIX);
 				const int len = lstrlen(wszOpen.buffer);
 				if (len >= 3) {
-					LPWSTR pwsz1 = StrChr(wszOpen.buffer, L'<');
+					LPCWSTR pwsz1 = StrChr(wszOpen.buffer, L'<');
 					if (pwsz1 != NULL) {
 						LPWSTR wchIns = (LPWSTR)NP2HeapAlloc((len + 5) * sizeof(WCHAR));
 						lstrcpy(wchIns, L"</");
@@ -6549,7 +6573,7 @@ extern int iLongLinesLimit;
 extern int iLongLinesLimitG;
 extern int iWrapCol;
 
-BOOL FileVars_Apply(HWND hwnd, LPFILEVARS lpfv) {
+BOOL FileVars_Apply(HWND hwnd, LPCFILEVARS lpfv) {
 	if (lpfv->mask & FV_TABWIDTH) {
 		iTabWidth = lpfv->iTabWidth;
 	} else {

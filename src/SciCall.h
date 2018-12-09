@@ -33,6 +33,9 @@ NP2_inline void InitScintillaHandle(HWND hwnd) {
 //  SciCall()
 //
 //
+#if defined(__cplusplus)
+extern "C"
+#endif
 LRESULT WINAPI Scintilla_DirectFunction(HANDLE handle, UINT msg, WPARAM wParam, LPARAM lParam);
 #define SciCall0(m)			Scintilla_DirectFunction(g_hScintilla, (m), 0, 0)
 #define SciCall1(m, w)		Scintilla_DirectFunction(g_hScintilla, (m), (w), 0)

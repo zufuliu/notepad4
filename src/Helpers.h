@@ -398,7 +398,7 @@ BOOL BitmapGrayScale(HBITMAP hbmp);
 BOOL VerifyContrast(COLORREF cr1, COLORREF cr2);
 BOOL IsFontAvailable(LPCWSTR lpszFontName);
 
-void SetClipData(HWND hwnd, WCHAR *pszData);
+void SetClipData(HWND hwnd, LPCWSTR pszData);
 BOOL SetWindowTitle(HWND hwnd, UINT uIDAppName, BOOL bIsElevated, UINT uIDUntitled,
 					LPCWSTR lpszFile, int iFormat, BOOL bModified,
 					UINT uIDReadOnly, BOOL bReadOnly, LPCWSTR lpszExcerpt);
@@ -537,7 +537,7 @@ void	FormatNumberStr(LPWSTR lpNumberStr);
 BOOL	SetDlgItemIntEx(HWND hwnd, int nIdItem, UINT uValue);
 
 UINT	GetDlgItemTextA2W(UINT uCP, HWND hDlg, int nIDDlgItem, LPSTR lpString, int nMaxCount);
-UINT	SetDlgItemTextA2W(UINT uCP, HWND hDlg, int nIDDlgItem, LPSTR lpString);
+UINT	SetDlgItemTextA2W(UINT uCP, HWND hDlg, int nIDDlgItem, LPCSTR lpString);
 LRESULT ComboBox_AddStringA2W(UINT uCP, HWND hwnd, LPCSTR lpString);
 
 UINT CodePageFromCharSet(UINT uCharSet);
@@ -555,26 +555,28 @@ typedef struct _mrulist {
 	int		iFlags;
 	int		iSize;
 	LPWSTR pszItems[MRU_MAXITEMS];
-} MRULIST,  *PMRULIST,  *LPMRULIST;
+} MRULIST, *PMRULIST, *LPMRULIST;
+
+typedef const MRULIST * LPCMRULIST;
 
 LPMRULIST MRU_Create(LPCWSTR pszRegKey, int iFlags, int iSize);
 BOOL	MRU_Destroy(LPMRULIST pmru);
 BOOL	MRU_Add(LPMRULIST pmru, LPCWSTR pszNew);
 BOOL	MRU_AddFile(LPMRULIST pmru, LPCWSTR pszFile, BOOL bRelativePath, BOOL bUnexpandMyDocs);
 BOOL	MRU_Delete(LPMRULIST pmru, int iIndex);
-BOOL	MRU_DeleteFileFromStore(LPMRULIST pmru, LPCWSTR pszFile);
+BOOL	MRU_DeleteFileFromStore(LPCMRULIST pmru, LPCWSTR pszFile);
 BOOL	MRU_Empty(LPMRULIST pmru);
-int 	MRU_Enum(LPMRULIST pmru, int iIndex, LPWSTR pszItem, int cchItem);
-NP2_inline int MRU_GetCount(LPMRULIST pmru) {
+int 	MRU_Enum(LPCMRULIST pmru, int iIndex, LPWSTR pszItem, int cchItem);
+NP2_inline int MRU_GetCount(LPCMRULIST pmru) {
 	return MRU_Enum(pmru, 0, NULL, 0);
 }
 BOOL	MRU_Load(LPMRULIST pmru);
-BOOL	MRU_Save(LPMRULIST pmru);
-BOOL	MRU_MergeSave(LPMRULIST pmru, BOOL bAddFiles, BOOL bRelativePath, BOOL bUnexpandMyDocs);
+BOOL	MRU_Save(LPCMRULIST pmru);
+BOOL	MRU_MergeSave(LPCMRULIST pmru, BOOL bAddFiles, BOOL bRelativePath, BOOL bUnexpandMyDocs);
 
 //==== Themed Dialogs =========================================================
 #ifndef DLGTEMPLATEEX
-#pragma pack(push,  1)
+#pragma pack(push, 1)
 typedef struct {
 	WORD	dlgVer;
 	WORD	signature;

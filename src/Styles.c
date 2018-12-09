@@ -520,7 +520,7 @@ void Style_Save(void) {
 		ZeroMemory(pIniSectionBuf, cchIniSection);
 		pIniSection->next = pIniSectionBuf;
 		for (UINT iLexer = 0; iLexer < NUMLEXERS; iLexer++) {
-			PEDITLEXER pLex = pLexArray[iLexer];
+			const LPCEDITLEXER pLex = pLexArray[iLexer];
 			IniSectionSetStringEx(pIniSection, pLex->pszName, pLex->szExtensions, pLex->pszDefExt);
 		}
 		SaveIniSection(INI_SECTION_NAME_FILE_EXTENSIONS, pIniSectionBuf);
@@ -650,7 +650,7 @@ BOOL Style_Export(HWND hwnd) {
 
 		pIniSection->next = pIniSectionBuf;
 		for (UINT iLexer = 0; iLexer < NUMLEXERS; iLexer++) {
-			PEDITLEXER pLex = pLexArray[iLexer];
+			const LPCEDITLEXER pLex = pLexArray[iLexer];
 			IniSectionSetString(pIniSection, pLex->pszName, pLex->szExtensions);
 		}
 		if (!WritePrivateProfileSection(INI_SECTION_NAME_FILE_EXTENSIONS, pIniSectionBuf, szFile)) {
@@ -658,7 +658,7 @@ BOOL Style_Export(HWND hwnd) {
 		}
 
 		for (UINT iLexer = 0; iLexer < NUMLEXERS; iLexer++) {
-			PEDITLEXER pLex = pLexArray[iLexer];
+			const LPCEDITLEXER pLex = pLexArray[iLexer];
 			ZeroMemory(pIniSectionBuf, cchIniSection);
 			pIniSection->next = pIniSectionBuf;
 			const UINT iStyleCount = pLex->iStyleCount;
@@ -711,7 +711,7 @@ void Style_UpdateCaret(HWND hwnd) {
 	SendMessage(hwnd, SCI_SETCARETPERIOD, iValue, 0);
 }
 
-void Style_UpdateLexerKeywordAttr(PEDITLEXER pLexNew) {
+void Style_UpdateLexerKeywordAttr(LPCEDITLEXER pLexNew) {
 	UINT8 *attr = currentLexKeywordAttr;
 	memset(currentLexKeywordAttr, 0, sizeof(currentLexKeywordAttr));
 
@@ -1345,7 +1345,7 @@ int Style_GetDocTypeLanguage(void) {
 		return 0;
 	}
 
-	char *pb = p;
+	const char * const pb = p;
 	//if (!_strnicmp(p, "html", 4))
 	//	return IDM_LANG_WEB;
 	if (!strncmp(p, "schema", 6)) {
@@ -1771,7 +1771,7 @@ extern FILEVARS fvCurFile;
 
 static PEDITLEXER Style_GetLexerFromFile(HWND hwnd, LPCWSTR lpszFile, BOOL bCGIGuess, LPWSTR *pszExt, BOOL *pDotFile) {
 	LPWSTR lpszExt = PathFindExtension(lpszFile);
-	LPWSTR lpszName = PathFindFileName(lpszFile);
+	const LPCWSTR lpszName = PathFindFileName(lpszFile);
 	BOOL bFound = FALSE;
 	PEDITLEXER pLexNew = NULL;
 
@@ -2004,7 +2004,7 @@ BOOL Style_CanOpenFile(LPCWSTR lpszFile) {
 	const int lang = np2LexLangIndex;
 	BOOL bDotFile = FALSE;
 	LPWSTR lpszExt = NULL;
-	PEDITLEXER pLexNew = Style_GetLexerFromFile(NULL, lpszFile, FALSE, &lpszExt, &bDotFile);
+	const LPCEDITLEXER pLexNew = Style_GetLexerFromFile(NULL, lpszFile, FALSE, &lpszExt, &bDotFile);
 	np2LexLangIndex = lang;
 	return pLexNew != NULL || StrIsEmpty(lpszExt) || bDotFile || StrCaseEqual(lpszExt, L"cgi") || StrCaseEqual(lpszExt, L"fcgi");
 }
@@ -2834,7 +2834,7 @@ static void Style_SetParsed(HWND hwnd, const struct DetailStyle *style, int iSty
 //
 // Style_GetLexerIconId()
 //
-int Style_GetLexerIconId(PEDITLEXER pLex) {
+int Style_GetLexerIconId(LPCEDITLEXER pLex) {
 	LPCWSTR pszExtensions;
 	if (StrNotEmpty(pLex->szExtensions)) {
 		pszExtensions = pLex->szExtensions;
@@ -3190,8 +3190,8 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 		if (fDragging && pCurrentStyle) {
 			HTREEITEM htiTarget;
 			TVHITTESTINFO tvht;
-			LONG xCur = GET_X_LPARAM(lParam);
-			LONG yCur = GET_Y_LPARAM(lParam);
+			const LONG xCur = GET_X_LPARAM(lParam);
+			const LONG yCur = GET_Y_LPARAM(lParam);
 
 			//ImageList_DragMove(xCur, yCur);
 			//ImageList_DragShowNolock(FALSE);
@@ -3469,14 +3469,14 @@ void Style_ConfigDlg(HWND hwnd) {
 	CopyMemory(extBackup, g_AllFileExtensions, ALL_FILE_EXTENSIONS_BYTE_SIZE);
 	CopyMemory(colorBackup, customColor, MAX_CUSTOM_COLOR_COUNT * sizeof(COLORREF));
 	for (UINT iLexer = 0; iLexer < NUMLEXERS; iLexer++) {
-		PEDITLEXER pLex = pLexArray[iLexer];
+		const LPCEDITLEXER pLex = pLexArray[iLexer];
 		const UINT iStyleBufSize = EDITSTYLE_BufferSize(pLex->iStyleCount);
 		LPWSTR szStyleBuf = (LPWSTR)NP2HeapAlloc(iStyleBufSize);
 		CopyMemory(szStyleBuf, pLex->szStyleBuf, iStyleBufSize);
 		styleBackup[iLexer] = szStyleBuf;
 	}
 
-	if (IDCANCEL == ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_STYLECONFIG), GetParent(hwnd),  Style_ConfigDlgProc, 0)) {
+	if (IDCANCEL == ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_STYLECONFIG), GetParent(hwnd), Style_ConfigDlgProc, 0)) {
 		// Restore Styles
 		CopyMemory(g_AllFileExtensions, extBackup, ALL_FILE_EXTENSIONS_BYTE_SIZE);
 		CopyMemory(customColor, colorBackup, MAX_CUSTOM_COLOR_COUNT * sizeof(COLORREF));

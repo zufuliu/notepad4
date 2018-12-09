@@ -477,6 +477,8 @@ typedef struct _resizeDlg {
 	int mmiPtMaxY;	// only X direction
 } RESIZEDLG, *PRESIZEDLG;
 
+typedef const RESIZEDLG *LPCRESIZEDLG;
+
 void ResizeDlg_InitEx(HWND hwnd, int cxFrame, int cyFrame, int nIdGrip, int iDirection) {
 	RESIZEDLG *pm = (RESIZEDLG *)NP2HeapAlloc(sizeof(RESIZEDLG));
 	pm->direction = iDirection;
@@ -552,7 +554,7 @@ void ResizeDlg_Size(HWND hwnd, LPARAM lParam, int *cx, int *cy) {
 }
 
 void ResizeDlg_GetMinMaxInfo(HWND hwnd, LPARAM lParam) {
-	PRESIZEDLG pm = (PRESIZEDLG)GetProp(hwnd, RESIZEDLG_PROP_KEY);
+	const LPCRESIZEDLG pm = (LPCRESIZEDLG)GetProp(hwnd, RESIZEDLG_PROP_KEY);
 
 	LPMINMAXINFO lpmmi = (LPMINMAXINFO)lParam;
 	lpmmi->ptMinTrackSize.x = pm->mmiPtMinX;
@@ -627,7 +629,7 @@ void DeleteBitmapButton(HWND hwnd, int nCtlId) {
 void SetWindowTransparentMode(HWND hwnd, BOOL bTransparentMode, int iOpacityLevel) {
 	const LONG_PTR exStyle = GetWindowLongPtr(hwnd, GWL_EXSTYLE);
 	if (bTransparentMode) {
-		SetWindowLongPtr(hwnd, GWL_EXSTYLE,  exStyle | WS_EX_LAYERED);
+		SetWindowLongPtr(hwnd, GWL_EXSTYLE, exStyle | WS_EX_LAYERED);
 		const BYTE bAlpha = (BYTE)(iOpacityLevel * 255 / 100);
 		SetLayeredWindowAttributes(hwnd, 0, bAlpha, LWA_ALPHA);
 	} else {
@@ -638,7 +640,7 @@ void SetWindowTransparentMode(HWND hwnd, BOOL bTransparentMode, int iOpacityLeve
 void SetWindowLayoutRTL(HWND hwnd, BOOL bRTL) {
 	const LONG_PTR exStyle = GetWindowLongPtr(hwnd, GWL_EXSTYLE);
 	if (bRTL) {
-		SetWindowLongPtr(hwnd, GWL_EXSTYLE,  exStyle | WS_EX_LAYOUTRTL);
+		SetWindowLongPtr(hwnd, GWL_EXSTYLE, exStyle | WS_EX_LAYOUTRTL);
 	} else {
 		SetWindowLongPtr(hwnd, GWL_EXSTYLE, exStyle & ~WS_EX_LAYOUTRTL);
 	}
@@ -732,7 +734,7 @@ void PathRelativeToApp(LPCWSTR lpszSrc, LPWSTR lpszDest, int cchDest, BOOL bSrcI
 	WCHAR wchWinDir[MAX_PATH];
 	WCHAR wchUserFiles[MAX_PATH];
 	WCHAR wchPath[MAX_PATH];
-	DWORD dwAttrTo = bSrcIsFile ? 0 : FILE_ATTRIBUTE_DIRECTORY;
+	const DWORD dwAttrTo = bSrcIsFile ? 0 : FILE_ATTRIBUTE_DIRECTORY;
 
 	GetModuleFileName(NULL, wchAppPath, COUNTOF(wchAppPath));
 	PathRemoveFileSpec(wchAppPath);
@@ -1488,7 +1490,7 @@ BOOL History_Back(PHISTORY ph, LPWSTR pszItem, int cItem) {
 	return FALSE;
 }
 
-BOOL History_CanForward(PHISTORY ph) {
+BOOL History_CanForward(LCPHISTORY ph) {
 	if (!ph) {
 		return FALSE;
 	}
@@ -1502,7 +1504,7 @@ BOOL History_CanForward(PHISTORY ph) {
 	return FALSE;
 }
 
-BOOL History_CanBack(PHISTORY ph) {
+BOOL History_CanBack(LCPHISTORY ph) {
 	if (!ph) {
 		return FALSE;
 	}
@@ -1516,7 +1518,7 @@ BOOL History_CanBack(PHISTORY ph) {
 	return FALSE;
 }
 
-void History_UpdateToolbar(PHISTORY ph, HWND hwnd, int cmdBack, int cmdForward) {
+void History_UpdateToolbar(LCPHISTORY ph, HWND hwnd, int cmdBack, int cmdForward) {
 	if (History_CanBack(ph)) {
 		SendMessage(hwnd, TB_ENABLEBUTTON, cmdBack, MAKELPARAM(1, 0));
 	} else {
@@ -1554,7 +1556,7 @@ BOOL MRU_Destroy(LPMRULIST pmru) {
 	return 1;
 }
 
-int MRU_Compare(LPMRULIST pmru, LPCWSTR psz1, LPCWSTR psz2) {
+int MRU_Compare(LPCMRULIST pmru, LPCWSTR psz1, LPCWSTR psz2) {
 	return (pmru->iFlags & MRU_NOCASE) ? StrCmpI(psz1, psz2) : StrCmp(psz1, psz2);
 }
 
@@ -1598,7 +1600,7 @@ BOOL MRU_Empty(LPMRULIST pmru) {
 	return TRUE;
 }
 
-int MRU_Enum(LPMRULIST pmru, int iIndex, LPWSTR pszItem, int cchItem) {
+int MRU_Enum(LPCMRULIST pmru, int iIndex, LPWSTR pszItem, int cchItem) {
 	if (pszItem == NULL || cchItem == 0) {
 		int i = 0;
 		while (i < pmru->iSize && pmru->pszItems[i]) {
@@ -1648,7 +1650,7 @@ BOOL MRU_Load(LPMRULIST pmru) {
 	return TRUE;
 }
 
-BOOL MRU_Save(LPMRULIST pmru) {
+BOOL MRU_Save(LPCMRULIST pmru) {
 	if (MRU_GetCount(pmru) == 0) {
 		IniClearSection(pmru->szRegKey);
 		return TRUE;
@@ -1806,7 +1808,7 @@ DLGTEMPLATE *LoadThemedDialogTemplate(LPCWSTR lpDialogTemplateID, HINSTANCE hIns
 	}
 
 	HGLOBAL hRsrcMem = LoadResource(hInstance, hRsrc);
-	DLGTEMPLATE *pRsrcMem = (DLGTEMPLATE *)LockResource(hRsrcMem);
+	const DLGTEMPLATE *pRsrcMem = (DLGTEMPLATE *)LockResource(hRsrcMem);
 	const UINT dwTemplateSize = (UINT)SizeofResource(hInstance, hRsrc);
 
 	DLGTEMPLATE *pTemplate = dwTemplateSize ? (DLGTEMPLATE *)NP2HeapAlloc(dwTemplateSize + LF_FACESIZE * 2) : NULL;

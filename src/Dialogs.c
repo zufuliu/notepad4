@@ -517,7 +517,7 @@ static INT_PTR CALLBACK OpenWithDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPA
 		//SetExplorerTheme(hwndLV);
 		ListView_SetExtendedListViewStyle(hwndLV, /*LVS_EX_FULLROWSELECT|*/LVS_EX_DOUBLEBUFFER | LVS_EX_LABELTIP);
 
-		LVCOLUMN lvc = { LVCF_FMT | LVCF_TEXT,  LVCFMT_LEFT,  0,  NULL,  -1,  0,  0,  0 };
+		LVCOLUMN lvc = { LVCF_FMT | LVCF_TEXT, LVCFMT_LEFT, 0, NULL, -1, 0, 0, 0 };
 		ListView_InsertColumn(hwndLV, 0, &lvc);
 		DirList_Init(hwndLV, NULL);
 		DirList_Fill(hwndLV, tchOpenWithDir, DL_ALLOBJECTS, NULL, FALSE, flagNoFadeHidden, DS_NAME, FALSE);
@@ -574,7 +574,7 @@ static INT_PTR CALLBACK OpenWithDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPA
 				break;
 
 			case LVN_ITEMCHANGED: {
-				NM_LISTVIEW *pnmlv = (NM_LISTVIEW *)lParam;
+				const NM_LISTVIEW *pnmlv = (NM_LISTVIEW *)lParam;
 				EnableWindow(GetDlgItem(hwnd, IDOK), (pnmlv->uNewState & LVIS_SELECTED));
 			}
 			break;
@@ -691,7 +691,7 @@ static INT_PTR CALLBACK FavoritesDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LP
 		InitWindowCommon(hwndLV);
 		//SetExplorerTheme(hwndLV);
 		ListView_SetExtendedListViewStyle(hwndLV, /*LVS_EX_FULLROWSELECT|*/LVS_EX_DOUBLEBUFFER | LVS_EX_LABELTIP);
-		LVCOLUMN lvc = { LVCF_FMT | LVCF_TEXT,  LVCFMT_LEFT,  0,  NULL,  -1,  0,  0,  0 };
+		LVCOLUMN lvc = { LVCF_FMT | LVCF_TEXT, LVCFMT_LEFT, 0, NULL, -1, 0, 0, 0 };
 		ListView_InsertColumn(hwndLV, 0, &lvc);
 		DirList_Init(hwndLV, NULL);
 		DirList_Fill(hwndLV, tchFavoritesDir, DL_ALLOBJECTS, NULL, FALSE, flagNoFadeHidden, DS_NAME, FALSE);
@@ -748,7 +748,7 @@ static INT_PTR CALLBACK FavoritesDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LP
 				break;
 
 			case LVN_ITEMCHANGED: {
-				NM_LISTVIEW *pnmlv = (NM_LISTVIEW *)lParam;
+				const NM_LISTVIEW *pnmlv = (NM_LISTVIEW *)lParam;
 				EnableWindow(GetDlgItem(hwnd, IDOK), (pnmlv->uNewState & LVIS_SELECTED));
 			}
 			break;
@@ -829,7 +829,7 @@ static INT_PTR CALLBACK AddToFavDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPA
 		SetWindowLongPtr(hwnd, DWLP_USER, lParam);
 		ResizeDlg_InitX(hwnd, cxAddFavoritesDlg, IDC_RESIZEGRIP);
 
-		LPWSTR pszName = (LPWSTR)lParam;
+		const LPCWSTR pszName = (LPCWSTR)lParam;
 		SendDlgItemMessage(hwnd, IDC_FAVORITESFILE, EM_LIMITTEXT, MAX_PATH - 1, 0);
 		SetDlgItemText(hwnd, IDC_FAVORITESFILE, pszName);
 
@@ -863,12 +863,12 @@ static INT_PTR CALLBACK AddToFavDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPA
 	case WM_COMMAND:
 		switch (LOWORD(wParam)) {
 		case IDC_FAVORITESFILE:
-			EnableWindow(GetDlgItem(hwnd, IDOK),  GetWindowTextLength(GetDlgItem(hwnd, IDC_FAVORITESFILE)));
+			EnableWindow(GetDlgItem(hwnd, IDOK), GetWindowTextLength(GetDlgItem(hwnd, IDC_FAVORITESFILE)));
 			break;
 
 		case IDOK: {
 			LPWSTR pszName = (LPWSTR)GetWindowLongPtr(hwnd, DWLP_USER);
-			GetDlgItemText(hwnd, IDC_FAVORITESFILE, pszName,  MAX_PATH - 1);
+			GetDlgItemText(hwnd, IDC_FAVORITESFILE, pszName, MAX_PATH - 1);
 			EndDialog(hwnd, IDOK);
 		}
 		break;
@@ -920,7 +920,7 @@ typedef struct tagIconThreadInfo {
 	HANDLE hExitThread;			// Flag is set when Icon Thread should terminate
 	HANDLE hTerminatedThread;	// Flag is set when Icon Thread has terminated
 	HANDLE hFileMRUIconThread;
-} ICONTHREADINFO,  *LPICONTHREADINFO;
+} ICONTHREADINFO, *LPICONTHREADINFO;
 
 static DWORD WINAPI FileMRUIconThread(LPVOID lpParam) {
 	WCHAR tch[MAX_PATH] = L"";
@@ -1022,7 +1022,7 @@ static INT_PTR CALLBACK FileMRUDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 
 		//SetExplorerTheme(hwndLV);
 		ListView_SetExtendedListViewStyle(hwndLV, /*LVS_EX_FULLROWSELECT|*/LVS_EX_DOUBLEBUFFER | LVS_EX_LABELTIP);
-		LVCOLUMN lvc = { LVCF_FMT | LVCF_TEXT,  LVCFMT_LEFT,  0,  NULL,  -1,  0,  0,  0 };
+		LVCOLUMN lvc = { LVCF_FMT | LVCF_TEXT, LVCFMT_LEFT, 0, NULL, -1, 0, 0, 0 };
 		ListView_InsertColumn(hwndLV, 0, &lvc);
 
 		// Update view
@@ -1244,7 +1244,7 @@ static INT_PTR CALLBACK FileMRUDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 
 						//SendDlgItemMessage(hwnd, IDC_FILEMRU, LB_DELETESTRING, iItem, 0);
 						//ListView_DeleteItem(GetDlgItem(hwnd, IDC_FILEMRU), lvi.iItem);
-						// must use IDM_VIEW_REFRESH,  index might change...
+						// must use IDM_VIEW_REFRESH, index might change...
 						SendWMCommand(hwnd, IDC_FILEMRU_UPDATE_VIEW);
 
 						//EnableWindow(GetDlgItem(hwnd, IDOK),
@@ -1325,7 +1325,7 @@ static INT_PTR CALLBACK ChangeNotifyDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 // ChangeNotifyDlg()
 //
 BOOL ChangeNotifyDlg(HWND hwnd) {
-	const INT_PTR iResult = ThemedDialogBoxParam(g_hInstance,  MAKEINTRESOURCE(IDD_CHANGENOTIFY), hwnd, ChangeNotifyDlgProc, 0);
+	const INT_PTR iResult = ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_CHANGENOTIFY), hwnd, ChangeNotifyDlgProc, 0);
 	return iResult == IDOK;
 }
 
@@ -1637,13 +1637,15 @@ typedef struct encodedlg {
 	int  idEncoding;
 	int  cxDlg;
 	int  cyDlg;
-} ENCODEDLG,  *PENCODEDLG;
+} ENCODEDLG, *PENCODEDLG;
+
+typedef const ENCODEDLG *LPCENCODEDLG;
 
 static INT_PTR CALLBACK SelectDefEncodingDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
 	switch (umsg) {
 	case WM_INITDIALOG: {
 		SetWindowLongPtr(hwnd, DWLP_USER, lParam);
-		PENCODEDLG pdd = (PENCODEDLG)lParam;
+		const LPCENCODEDLG pdd = (LPCENCODEDLG)lParam;
 
 		HBITMAP hbmp = (HBITMAP)LoadImage(g_hInstance, MAKEINTRESOURCE(IDB_ENCODING), IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION);
 		HIMAGELIST himl = ImageList_Create(16, 16, ILC_COLOR32 | ILC_MASK, 0, 0);
@@ -1728,7 +1730,7 @@ static INT_PTR CALLBACK SelectEncodingDlgProc(HWND hwnd, UINT umsg, WPARAM wPara
 	switch (umsg) {
 	case WM_INITDIALOG: {
 		SetWindowLongPtr(hwnd, DWLP_USER, lParam);
-		PENCODEDLG pdd = (PENCODEDLG)lParam;
+		const LPCENCODEDLG pdd = (LPCENCODEDLG)lParam;
 		ResizeDlg_Init(hwnd, pdd->cxDlg, pdd->cyDlg, IDC_RESIZEGRIP);
 
 		HBITMAP hbmp = (HBITMAP)LoadImage(g_hInstance, MAKEINTRESOURCE(IDB_ENCODING), IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION);
@@ -1741,7 +1743,7 @@ static INT_PTR CALLBACK SelectEncodingDlgProc(HWND hwnd, UINT umsg, WPARAM wPara
 		InitWindowCommon(hwndLV);
 		//SetExplorerTheme(hwndLV);
 		ListView_SetExtendedListViewStyle(hwndLV, /*LVS_EX_FULLROWSELECT|*/LVS_EX_DOUBLEBUFFER | LVS_EX_LABELTIP);
-		LVCOLUMN lvc = { LVCF_FMT | LVCF_TEXT,  LVCFMT_LEFT,  0,  NULL,  -1,  0,  0,  0 };
+		LVCOLUMN lvc = { LVCF_FMT | LVCF_TEXT, LVCFMT_LEFT, 0, NULL, -1, 0, 0, 0 };
 		ListView_InsertColumn(hwndLV, 0, &lvc);
 		Encoding_AddToListView(hwndLV, pdd->idEncoding, pdd->bRecodeOnly);
 		ListView_SetColumnWidth(hwndLV, 0, LVSCW_AUTOSIZE_USEHEADER);
@@ -1900,7 +1902,7 @@ static INT_PTR CALLBACK SelectDefLineEndingDlgProc(HWND hwnd, UINT umsg, WPARAM 
 		}
 
 		if (bAutoStripBlanks) {
-			CheckDlgButton(hwnd, IDC_AUTOSTRIPBLANKS,  BST_CHECKED);
+			CheckDlgButton(hwnd, IDC_AUTOSTRIPBLANKS, BST_CHECKED);
 		}
 
 		CenterDlgInParent(hwnd);
@@ -1941,7 +1943,7 @@ static INT_PTR CALLBACK WarnLineEndingDlgProc(HWND hwnd, UINT umsg, WPARAM wPara
 	switch (umsg) {
 	case WM_INITDIALOG: {
 		SetWindowLongPtr(hwnd, DWLP_USER, lParam);
-		EditFileIOStatus *status = (EditFileIOStatus *)lParam;
+		const EditFileIOStatus * const status = (EditFileIOStatus *)lParam;
 		int iEOLMode = status->iEOLMode;
 		iEOLMode = (iEOLMode == SC_EOL_CRLF) ? 0 : (iEOLMode == SC_EOL_LF) ? 1 : 2;
 
@@ -2251,11 +2253,13 @@ typedef struct _infobox {
 	BOOL   bDisableCheckBox;
 } INFOBOX, *LPINFOBOX;
 
+typedef const INFOBOX * LPCINFOBOX;
+
 static INT_PTR CALLBACK InfoBoxDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
 	switch (umsg) {
 	case WM_INITDIALOG: {
 		SetWindowLongPtr(hwnd, DWLP_USER, lParam);
-		LPINFOBOX lpib = (LPINFOBOX)lParam;
+		const LPCINFOBOX lpib = (LPCINFOBOX)lParam;
 
 		SendDlgItemMessage(hwnd, IDC_INFOBOXICON, STM_SETICON, (WPARAM)LoadIcon(NULL, IDI_EXCLAMATION), 0);
 		SetDlgItemText(hwnd, IDC_INFOBOXTEXT, lpib->lpstrMessage);

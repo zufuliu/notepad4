@@ -57,6 +57,12 @@
 #define LOAD_LIBRARY_SEARCH_SYSTEM32 0x00000800
 #endif
 
+#if NP2_FORCE_COMPILE_C_AS_CPP
+extern DWORD kSystemLibraryLoadFlags;
+#else
+extern "C" DWORD kSystemLibraryLoadFlags;
+#endif
+
 namespace Scintilla {
 
 UINT CodePageFromCharSet(DWORD characterSet, UINT documentCodePage) noexcept;
@@ -69,8 +75,6 @@ IDWriteRenderingParams *customClearTypeRenderingParams = nullptr;
 
 static HMODULE hDLLD2D {};
 static HMODULE hDLLDWrite {};
-
-extern "C" DWORD kSystemLibraryLoadFlags;
 
 bool LoadD2D() noexcept {
 	static bool triedLoadingD2D = false;

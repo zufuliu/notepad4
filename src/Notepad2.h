@@ -40,7 +40,7 @@ typedef struct np2params {
 	int		flagSetEOLMode;
 	int		flagTitleExcerpt;
 	WCHAR wchData;
-} NP2PARAMS,  *LPNP2PARAMS;
+} NP2PARAMS, *LPNP2PARAMS;
 
 //==== Toolbar Style ==========================================================
 #define WS_TOOLBAR (WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS |				\

@@ -45,6 +45,8 @@ typedef struct tagDLDATA { // dl
 	HANDLE hIconThread;
 } DLDATA, *LPDLDATA;
 
+typedef const DLDATA * LPCDLDATA;
+
 //==== Property Name ==========================================================
 static const WCHAR *pDirListProp = L"DirListData";
 
@@ -509,7 +511,7 @@ BOOL DirList_GetDispInfo(HWND hwnd, LPARAM lParam, BOOL bNoFadeHidden) {
 // from the control
 //
 BOOL DirList_DeleteItem(HWND hwnd, LPARAM lParam) {
-	NM_LISTVIEW *lpnmlv = (NM_LISTVIEW *)lParam;
+	const NM_LISTVIEW *lpnmlv = (NM_LISTVIEW *)lParam;
 
 	LV_ITEM lvi;
 	lvi.iItem = lpnmlv->iItem;
@@ -539,8 +541,8 @@ BOOL DirList_DeleteItem(HWND hwnd, LPARAM lParam) {
 // Compares two list items
 //
 int CALLBACK DirList_CompareProcFw(LPARAM lp1, LPARAM lp2, LPARAM lFlags) {
-	LPLV_ITEMDATA lplvid1 = (LPLV_ITEMDATA)lp1;
-	LPLV_ITEMDATA lplvid2 = (LPLV_ITEMDATA)lp2;
+	const LPCLV_ITEMDATA lplvid1 = (LPCLV_ITEMDATA)lp1;
+	const LPCLV_ITEMDATA lplvid2 = (LPCLV_ITEMDATA)lp2;
 
 #if defined(__cplusplus)
 	HRESULT hr = lplvid1->lpsf->CompareIDs(lFlags, lplvid1->pidl, lplvid2->pidl);
@@ -564,8 +566,8 @@ int CALLBACK DirList_CompareProcFw(LPARAM lp1, LPARAM lp2, LPARAM lFlags) {
 }
 
 int CALLBACK DirList_CompareProcRw(LPARAM lp1, LPARAM lp2, LPARAM lFlags) {
-	LPLV_ITEMDATA lplvid1 = (LPLV_ITEMDATA)lp1;
-	LPLV_ITEMDATA lplvid2 = (LPLV_ITEMDATA)lp2;
+	const LPCLV_ITEMDATA lplvid1 = (LPCLV_ITEMDATA)lp1;
+	const LPCLV_ITEMDATA lplvid2 = (LPCLV_ITEMDATA)lp2;
 
 #if defined(__cplusplus)
 	HRESULT hr = lplvid1->lpsf->CompareIDs(lFlags, lplvid1->pidl, lplvid2->pidl);
@@ -769,7 +771,7 @@ BOOL DirList_PropertyDlg(HWND hwnd, int iItem) {
 //
 BOOL DirList_GetLongPathName(HWND hwnd, LPWSTR lpszLongPath) {
 	WCHAR tch[MAX_PATH];
-	LPDLDATA lpdl = (LPDLDATA)GetProp(hwnd, pDirListProp);
+	const LPCDLDATA lpdl = (LPCDLDATA)GetProp(hwnd, pDirListProp);
 	if (SHGetPathFromIDList(lpdl->pidl, tch)) {
 		lstrcpy(lpszLongPath, tch);
 		return TRUE;
@@ -854,7 +856,7 @@ void DirList_CreateFilter(PDL_FILTER pdlf, LPCWSTR lpszFileSpec, BOOL bExcludeFi
 //
 // Check if a specified item matches a given filter
 //
-BOOL DirList_MatchFilter(LPSHELLFOLDER lpsf, LPCITEMIDLIST pidl, PDL_FILTER pdlf) {
+BOOL DirList_MatchFilter(LPSHELLFOLDER lpsf, LPCITEMIDLIST pidl, LPCDL_FILTER pdlf) {
 	// Immediately return true if lpszFileSpec is *.* or NULL
 	if (pdlf->nCount == 0 && !pdlf->bExcludeFilter) {
 		return TRUE;
@@ -899,6 +901,8 @@ typedef struct tagDC_ITEMDATA {
 	LPITEMIDLIST pidl;
 	LPSHELLFOLDER lpsf;
 } DC_ITEMDATA, *LPDC_ITEMDATA;
+
+typedef const DC_ITEMDATA * LPCDC_ITEMDATA;
 
 //=============================================================================
 //
@@ -975,7 +979,7 @@ int DriveBox_Fill(HWND hwnd) {
 									cbei2.iItem = 0;
 
 									while ((SendMessage(hwnd, CBEM_GETITEM, 0, (LPARAM)&cbei2))) {
-										LPDC_ITEMDATA lpdcid2 = (LPDC_ITEMDATA)cbei2.lParam;
+										const LPCDC_ITEMDATA lpdcid2 = (LPCDC_ITEMDATA)cbei2.lParam;
 										hr = lpdcid->lpsf->CompareIDs(0, lpdcid->pidl, lpdcid2->pidl);
 										if ((short)HRESULT_CODE(hr) < 0) {
 											break;
@@ -1209,7 +1213,7 @@ BOOL DriveBox_PropertyDlg(HWND hwnd) {
 // DriveBox_DeleteItem
 //
 LRESULT DriveBox_DeleteItem(HWND hwnd, LPARAM lParam) {
-	NMCOMBOBOXEX *lpnmcbe = (NMCOMBOBOXEX *)lParam;
+	const NMCOMBOBOXEX *lpnmcbe = (NMCOMBOBOXEX *)lParam;
 	COMBOBOXEXITEM cbei;
 	cbei.iItem = lpnmcbe->ceItem.iItem;
 

@@ -1269,6 +1269,8 @@ typedef struct tagFILEOPDLGDATA {
 	UINT wFunc;
 } FILEOPDLGDATA, *LPFILEOPDLGDATA;
 
+typedef const FILEOPDLGDATA * LPCFILEOPDLGDATA;
+
 extern int cxRenameFileDlg;
 //=============================================================================
 //
@@ -1280,7 +1282,7 @@ INT_PTR CALLBACK RenameFileDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 	case WM_INITDIALOG: {
 		SetWindowLongPtr(hwnd, DWLP_USER, lParam);
 		ResizeDlg_InitX(hwnd, cxRenameFileDlg, IDC_RESIZEGRIP2);
-		LPFILEOPDLGDATA lpfod = (LPFILEOPDLGDATA)lParam;
+		const LPCFILEOPDLGDATA lpfod = (LPCFILEOPDLGDATA)lParam;
 
 		SetDlgItemText(hwnd, IDC_OLDNAME, lpfod->szSource);
 		SetDlgItemText(hwnd, IDC_NEWNAME, lpfod->szSource);
@@ -1408,7 +1410,7 @@ INT_PTR CALLBACK CopyMoveDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPa
 		ResizeDlg_InitX(hwnd, cxCopyMoveDlg, IDC_RESIZEGRIP5);
 		MakeBitmapButton(hwnd, IDC_BROWSEDESTINATION, g_hInstance, IDB_OPEN);
 
-		LPFILEOPDLGDATA lpfod = (LPFILEOPDLGDATA)lParam;
+		const LPCFILEOPDLGDATA lpfod = (LPCFILEOPDLGDATA)lParam;
 		HWND hwndDest = GetDlgItem(hwnd, IDC_DESTINATION);
 		MRU_LoadToCombobox(hwndDest, MRU_KEY_COPY_MOVE_HISTORY);
 		SendMessage(hwndDest, CB_SETCURSEL, 0, 0);
@@ -1659,7 +1661,7 @@ INT_PTR CALLBACK OpenWithDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPa
 				break;
 
 			case LVN_ITEMCHANGED: {
-				NM_LISTVIEW *pnmlv = (NM_LISTVIEW *)lParam;
+				const NM_LISTVIEW *pnmlv = (NM_LISTVIEW *)lParam;
 				EnableWindow(GetDlgItem(hwnd, IDOK), (pnmlv->uNewState & LVIS_SELECTED));
 			}
 			break;
@@ -1717,7 +1719,7 @@ INT_PTR CALLBACK OpenWithDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPa
 //  OpenWithDlg()
 //
 //
-BOOL OpenWithDlg(HWND hwnd, LPDLITEM lpdliParam) {
+BOOL OpenWithDlg(HWND hwnd, LPCDLITEM lpdliParam) {
 	DLITEM dliOpenWith;
 	dliOpenWith.mask = DLI_FILENAME;
 
@@ -1848,7 +1850,7 @@ INT_PTR CALLBACK NewDirDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPara
 BOOL NewDirDlg(HWND hwnd, LPWSTR pszNewDir) {
 	FILEOPDLGDATA fod;
 
-	if (IDOK == ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_NEWDIR),  hwnd, NewDirDlgProc, (LPARAM)&fod)) {
+	if (IDOK == ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_NEWDIR), hwnd, NewDirDlgProc, (LPARAM)&fod)) {
 		lstrcpy(pszNewDir, fod.szDestination);
 		return TRUE;
 	}

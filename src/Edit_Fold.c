@@ -87,7 +87,7 @@ void FoldToggleAll(FOLD_ACTION action) {
 	const int lineCount = SciCall_GetLineCount();
 
 	for (int line = 0; line < lineCount; ++line) {
-		int level = SciCall_GetFoldLevel(line);
+		const int level = SciCall_GetFoldLevel(line);
 		if (level & SC_FOLDLEVELHEADERFLAG) {
 			FoldToggleNode(line, &action, &fToggled);
 		}
@@ -155,7 +155,7 @@ void FoldToggleLevel(int lev, FOLD_ACTION action) {
 void FoldToggleCurrent(FOLD_ACTION action) {
 	BOOL fToggled = FALSE;
 	int line = SciCall_LineFromPosition(SciCall_GetCurrentPos());
-	int level = SciCall_GetFoldLevel(line);
+	const int level = SciCall_GetFoldLevel(line);
 
 	if (!(level & SC_FOLDLEVELHEADERFLAG)) {
 		line = SciCall_GetFoldParent(line);
@@ -248,7 +248,7 @@ void FoldPerformAction(int ln, int mode, FOLD_ACTION action) {
 
 		for (; ln < lnTotal; ++ln) {
 			int lv = SciCall_GetFoldLevel(ln);
-			BOOL fHeader = (lv & SC_FOLDLEVELHEADERFLAG) != 0;
+			const BOOL fHeader = (lv & SC_FOLDLEVELHEADERFLAG) != 0;
 			lv &= SC_FOLDLEVELNUMBERMASK;
 
 			if (lv < lvStop || (lv == lvStop && fHeader && ln != lnNode)) {
