@@ -166,6 +166,10 @@ BEGIN
             MENUITEM "Copy &Add\tCtrl+E",           IDM_EDIT_COPYADD
             MENUITEM "Copy As &RTF",                IDM_EDIT_COPYRTF
             MENUITEM SEPARATOR
+            MENUITEM "Copy As Binary",              IDM_EDIT_COPY_BINARY
+            MENUITEM "Cut As Binary",               IDM_EDIT_CUT_BINARY
+            MENUITEM "Paste As Binary",             IDM_EDIT_PASTE_BINARY
+            MENUITEM SEPARATOR
             MENUITEM "&Window Position\tCtrl+Shift+K",  CMD_COPYWINPOS
         END
         MENUITEM SEPARATOR

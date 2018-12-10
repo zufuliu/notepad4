@@ -331,6 +331,7 @@ class ScintillaWin :
 	CLIPFORMAT cfBorlandIDEBlockType;
 	CLIPFORMAT cfLineSelect;
 	CLIPFORMAT cfVSLineTag;
+	CLIPFORMAT cfNPPTextLen;
 
 #if EnableDrop_VisualStudioProjectItem
 	CLIPFORMAT cfVSStgProjectItem;
@@ -435,10 +436,10 @@ class ScintillaWin :
 	void NotifyURIDropped(const char *list) noexcept;
 	CaseFolder *CaseFolderForEncoding() override;
 	std::string CaseMapString(const std::string &s, int caseMapping) override;
-	void Copy() override;
+	void Copy(bool asBinary) override;
 	void CopyAllowLine() override;
 	bool CanPaste() override;
-	void Paste() override;
+	void Paste(bool asBinary) override;
 	void CreateCallTipWindow(PRectangle rc) noexcept override;
 	void ClaimSelection() noexcept override;
 
@@ -539,6 +540,8 @@ ScintillaWin::ScintillaWin(HWND hwnd) {
 		::RegisterClipboardFormat(L"MSDEVLineSelect"));
 	cfVSLineTag = static_cast<CLIPFORMAT>(
 		::RegisterClipboardFormat(L"VisualStudioEditorOperationsLineCutCopyClipboardTag"));
+
+	cfNPPTextLen = static_cast<CLIPFORMAT>(::RegisterClipboardFormat(L"Notepad++ Binary Text Length"));
 
 #if EnableDrop_VisualStudioProjectItem
 	cfVSStgProjectItem = static_cast<CLIPFORMAT>(::RegisterClipboardFormat(L"CF_VSSTGPROJECTITEMS"));
@@ -2246,10 +2249,11 @@ std::string ScintillaWin::CaseMapString(const std::string &s, int caseMapping) {
 	return sConverted;
 }
 
-void ScintillaWin::Copy() {
+void ScintillaWin::Copy(bool asBinary) {
 	//Platform::DebugPrintf("Copy\n");
 	if (!sel.Empty()) {
 		SelectionText selectedText;
+		selectedText.asBinary = asBinary;
 		CopySelectionRange(&selectedText);
 		CopyToClipboard(selectedText);
 	}
@@ -2335,7 +2339,7 @@ bool OpenClipboardRetry(HWND hwnd) noexcept {
 
 }
 
-void ScintillaWin::Paste() {
+void ScintillaWin::Paste(bool asBinary) {
 	if (!::OpenClipboardRetry(MainHWND())) {
 		return;
 	}
@@ -2355,6 +2359,35 @@ void ScintillaWin::Paste() {
 		}
 	}
 	const PasteShape pasteShape = isRectangular ? pasteRectangular : (isLine ? pasteLine : pasteStream);
+
+	if (asBinary && ::IsClipboardFormatAvailable(CF_TEXT)) {
+		unsigned long len = 0;
+		if (::IsClipboardFormatAvailable(cfNPPTextLen)) {
+			GlobalMemory memNPPTextLen(::GetClipboardData(cfNPPTextLen));
+			if (memNPPTextLen) {
+				if (memNPPTextLen.Size() == sizeof(unsigned long)) {
+					len = static_cast<unsigned long *>(memNPPTextLen.ptr)[0];
+				}
+				memNPPTextLen.Unlock();
+			}
+		}
+		if (len != 0) {
+			GlobalMemory memSelection(::GetClipboardData(CF_TEXT));
+			if (memSelection) {
+				const char *ptr = static_cast<const char *>(memSelection.ptr);
+				if (ptr && memSelection.Size() == len + 1) {
+					InsertPaste(ptr, len);
+					asBinary = false;
+				}
+				memSelection.Unlock();
+			}
+		}
+		if (!asBinary) {
+			::CloseClipboard();
+			Redraw();
+			return;
+		}
+	}
 
 	// Always use CF_UNICODETEXT if available
 	GlobalMemory memUSelection(::GetClipboardData(CF_UNICODETEXT));
@@ -2830,25 +2863,27 @@ void ScintillaWin::CopyToClipboard(const SelectionText &selectedText) {
 
 	GlobalMemory uniText;
 
-	// Default Scintilla behaviour in Unicode mode
-	if (IsUnicodeMode()) {
-		const std::string_view sv(selectedText.Data(), selectedText.LengthWithTerminator());
-		const size_t uchars = UTF16Length(sv);
-		uniText.Allocate(2 * uchars);
-		if (uniText) {
-			UTF16FromUTF8(sv, static_cast<wchar_t *>(uniText.ptr), uchars);
-		}
-	} else {
-		// Not Unicode mode
-		// Convert to Unicode using the current Scintilla code page
-		const UINT cpSrc = CodePageFromCharSet(
-			selectedText.characterSet, selectedText.codePage);
-		const std::string_view svSelected(selectedText.Data(), selectedText.LengthWithTerminator());
-		const int uLen = WideCharLenFromMultiByte(cpSrc, svSelected);
-		uniText.Allocate(2 * uLen);
-		if (uniText) {
-			WideCharFromMultiByte(cpSrc, svSelected,
-				static_cast<wchar_t *>(uniText.ptr), uLen);
+	if (!selectedText.asBinary) {
+		// Default Scintilla behaviour in Unicode mode
+		if (IsUnicodeMode()) {
+			const std::string_view sv(selectedText.Data(), selectedText.LengthWithTerminator());
+			const size_t uchars = UTF16Length(sv);
+			uniText.Allocate(2 * uchars);
+			if (uniText) {
+				UTF16FromUTF8(sv, static_cast<wchar_t *>(uniText.ptr), uchars);
+			}
+		} else {
+			// Not Unicode mode
+			// Convert to Unicode using the current Scintilla code page
+			const UINT cpSrc = CodePageFromCharSet(
+				selectedText.characterSet, selectedText.codePage);
+			const std::string_view svSelected(selectedText.Data(), selectedText.LengthWithTerminator());
+			const int uLen = WideCharLenFromMultiByte(cpSrc, svSelected);
+			uniText.Allocate(2 * uLen);
+			if (uniText) {
+				WideCharFromMultiByte(cpSrc, svSelected,
+					static_cast<wchar_t *>(uniText.ptr), uLen);
+			}
 		}
 	}
 
@@ -2878,6 +2913,15 @@ void ScintillaWin::CopyToClipboard(const SelectionText &selectedText) {
 	if (selectedText.lineCopy) {
 		::SetClipboardData(cfLineSelect, nullptr);
 		::SetClipboardData(cfVSLineTag, nullptr);
+	}
+
+	if (selectedText.asBinary) {
+		GlobalMemory nppTextLen;
+		nppTextLen.Allocate(sizeof(unsigned long));
+		if (nppTextLen) {
+			static_cast<unsigned long *>(nppTextLen.ptr)[0] = static_cast<unsigned long>(selectedText.Length());
+			nppTextLen.SetClip(cfNPPTextLen);
+		}
 	}
 
 	::CloseClipboard();

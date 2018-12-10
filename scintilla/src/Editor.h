@@ -69,6 +69,7 @@ class SelectionText {
 public:
 	bool rectangular;
 	bool lineCopy;
+	bool asBinary = false;
 	int codePage;
 	int characterSet;
 	SelectionText() noexcept : rectangular(false), lineCopy(false), codePage(0), characterSet(0) {}
@@ -85,10 +86,13 @@ public:
 		characterSet = characterSet_;
 		rectangular = rectangular_;
 		lineCopy = lineCopy_;
-		FixSelectionForClipboard();
+		if (!asBinary) {
+			FixSelectionForClipboard();
+		}
 	}
 	void Copy(const SelectionText &other) {
 		Copy(other.s, other.codePage, other.characterSet, other.rectangular, other.lineCopy);
+		asBinary = other.asBinary;
 	}
 	const char *Data() const noexcept {
 		return s.c_str();
@@ -415,12 +419,12 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	void ClearSelection(bool retainMultipleSelections = false);
 	void ClearAll();
 	void ClearDocumentStyle();
-	virtual void Cut();
+	virtual void Cut(bool asBinary);
 	void PasteRectangular(SelectionPosition pos, const char *ptr, Sci::Position len);
-	virtual void Copy() = 0;
+	virtual void Copy(bool asBinary) = 0;
 	virtual void CopyAllowLine();
 	virtual bool CanPaste();
-	virtual void Paste() = 0;
+	virtual void Paste(bool asBinary) = 0;
 	void Clear();
 	virtual void SelectAll();
 	virtual void Undo();
