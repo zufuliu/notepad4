@@ -2143,10 +2143,10 @@ void Editor::CopyAllowLine() {
 	CopyToClipboard(selectedText);
 }
 
-void Editor::Cut() {
+void Editor::Cut(bool asBinary) {
 	pdoc->CheckReadOnly();
 	if (!pdoc->IsReadOnly() && !SelectionContainsProtected()) {
-		Copy();
+		Copy(asBinary);
 		ClearSelection();
 	}
 }
@@ -3881,7 +3881,7 @@ int Editor::KeyCommand(unsigned int iMessage) {
 		const Sci::Position start = pdoc->LineStart(lineStart);
 		const Sci::Position end = pdoc->LineStart(lineEnd + 1);
 		SetSelection(start, end);
-		Cut();
+		Cut(false);
 		SetLastXChosen();
 	}
 	break;
@@ -5817,12 +5817,12 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 		return pdoc->Length();
 
 	case SCI_CUT:
-		Cut();
+		Cut(wParam != 0);
 		SetLastXChosen();
 		break;
 
 	case SCI_COPY:
-		Copy();
+		Copy(wParam != 0);
 		break;
 
 	case SCI_COPYALLOWLINE:
@@ -5850,7 +5850,7 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 		break;
 
 	case SCI_PASTE:
-		Paste();
+		Paste(wParam != 0);
 		if ((caretSticky == SC_CARETSTICKY_OFF) || (caretSticky == SC_CARETSTICKY_WHITESPACE)) {
 			SetLastXChosen();
 		}
