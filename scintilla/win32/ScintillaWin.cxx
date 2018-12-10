@@ -369,6 +369,10 @@ class ScintillaWin :
 	HWND MainHWND() const noexcept;
 #if DebugDragAndDropDataFormat
 	void EnumDataSourceFormat(const char *tag, LPDATAOBJECT pIDataSource);
+	void EnumAllClipboardFormat(const char *tag);
+#else
+	#define EnumDataSourceFormat(tag, pIDataSource)
+	#define EnumAllClipboardFormat(tag)
 #endif
 
 	static sptr_t DirectFunction(
@@ -2336,6 +2340,7 @@ void ScintillaWin::Paste() {
 		return;
 	}
 	UndoGroup ug(pdoc);
+	//EnumAllClipboardFormat("Paste");
 	const bool isLine = SelectionEmpty() &&
 		(::IsClipboardFormatAvailable(cfLineSelect) || ::IsClipboardFormatAvailable(cfVSLineTag));
 	ClearSelection(multiPasteMode == SC_MULTIPASTE_EACH);
@@ -3081,7 +3086,7 @@ const char* GetStorageMediumType(DWORD tymed) noexcept {
 	}
 }
 
-const char* GetSourceFormatName(CLIPFORMAT fmt, char name[], int cchName) noexcept {
+const char* GetSourceFormatName(UINT fmt, char name[], int cchName) noexcept {
 	const int len = GetClipboardFormatNameA(fmt, name, cchName);
 	if (len <= 0) {
 		switch (fmt) {
@@ -3093,6 +3098,8 @@ const char* GetSourceFormatName(CLIPFORMAT fmt, char name[], int cchName) noexce
 			return "CF_HDROP";
 		case CF_LOCALE:
 			return "CF_LOCALE";
+		case CF_OEMTEXT:
+			return "CF_OEMTEXT";
 		default:
 			return "Unknown";
 		}
@@ -3130,8 +3137,21 @@ void ScintillaWin::EnumDataSourceFormat(const char *tag, LPDATAOBJECT pIDataSour
 	}
 }
 
-#else
-#define EnumDataSourceFormat(tag, pIDataSource)
+// https://docs.microsoft.com/en-us/windows/desktop/api/winuser/nf-winuser-enumclipboardformats
+void ScintillaWin::EnumAllClipboardFormat(const char *tag) {
+	UINT fmt = 0;
+	unsigned int i = 0;
+	char name[1024];
+	char buf[2048];
+	while ((fmt = ::EnumClipboardFormats(fmt)) != 0) {
+		const char *fmtName = GetSourceFormatName(fmt, name, sizeof(name));
+		const int len = sprintf(buf, "%s: fmt[%u]=%u, 0x%04X; name=%s\n",
+			tag, i, fmt, fmt, fmtName);
+		AddCharUTF(buf, len);
+		i++;
+	}
+}
+
 #endif
 
 /// Implement IDropTarget
