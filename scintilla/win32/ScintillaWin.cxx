@@ -179,6 +179,18 @@ inline bool KeyboardIsKeyDown(int key) noexcept {
 	return (::GetKeyState(key) & 0x80000000) != 0;
 }
 
+inline CLIPFORMAT GetClipboardFormat(LPCWSTR name) noexcept {
+	return static_cast<CLIPFORMAT>(::RegisterClipboardFormat(name));
+}
+
+inline void LazyGetClipboardFormat(UINT &fmt, LPCWSTR name) noexcept {
+	if (fmt == 0) {
+		fmt = ::RegisterClipboardFormat(name);
+	}
+}
+
+#define CFSTR_NPPTEXTLEN		L"Notepad++ Binary Text Length"
+
 }
 
 class ScintillaWin; 	// Forward declaration for COM interface subobjects
@@ -328,10 +340,10 @@ class ScintillaWin :
 	bool hasOKText;
 
 	CLIPFORMAT cfColumnSelect;
-	CLIPFORMAT cfBorlandIDEBlockType;
-	CLIPFORMAT cfLineSelect;
-	CLIPFORMAT cfVSLineTag;
-	CLIPFORMAT cfNPPTextLen;
+	UINT cfBorlandIDEBlockType;
+	UINT cfLineSelect;
+	UINT cfVSLineTag;
+	UINT cfNPPTextLen = 0;
 
 #if EnableDrop_VisualStudioProjectItem
 	CLIPFORMAT cfVSStgProjectItem;
@@ -494,7 +506,7 @@ public:
 	friend class DropSource;
 	friend class DataObject;
 	friend class DropTarget;
-	bool DragIsRectangularOK(CLIPFORMAT fmt) const noexcept {
+	bool DragIsRectangularOK(UINT fmt) const noexcept {
 		return drag.rectangular && (fmt == cfColumnSelect);
 	}
 
@@ -530,25 +542,19 @@ ScintillaWin::ScintillaWin(HWND hwnd) {
 
 	// There does not seem to be a real standard for indicating that the clipboard
 	// contains a rectangular selection, so copy Developer Studio and Borland Delphi.
-	cfColumnSelect = static_cast<CLIPFORMAT>(
-		::RegisterClipboardFormat(L"MSDEVColumnSelect"));
-	cfBorlandIDEBlockType = static_cast<CLIPFORMAT>(
-		::RegisterClipboardFormat(L"Borland IDE Block Type"));
+	cfColumnSelect = GetClipboardFormat(L"MSDEVColumnSelect");
+	cfBorlandIDEBlockType = ::RegisterClipboardFormat(L"Borland IDE Block Type");
 
 	// Likewise for line-copy (copies a full line when no text is selected)
-	cfLineSelect = static_cast<CLIPFORMAT>(
-		::RegisterClipboardFormat(L"MSDEVLineSelect"));
-	cfVSLineTag = static_cast<CLIPFORMAT>(
-		::RegisterClipboardFormat(L"VisualStudioEditorOperationsLineCutCopyClipboardTag"));
-
-	cfNPPTextLen = static_cast<CLIPFORMAT>(::RegisterClipboardFormat(L"Notepad++ Binary Text Length"));
+	cfLineSelect = ::RegisterClipboardFormat(L"MSDEVLineSelect");
+	cfVSLineTag = ::RegisterClipboardFormat(L"VisualStudioEditorOperationsLineCutCopyClipboardTag");
 
 #if EnableDrop_VisualStudioProjectItem
-	cfVSStgProjectItem = static_cast<CLIPFORMAT>(::RegisterClipboardFormat(L"CF_VSSTGPROJECTITEMS"));
-	cfVSRefProjectItem = static_cast<CLIPFORMAT>(::RegisterClipboardFormat(L"CF_VSREFPROJECTITEMS"));
+	cfVSStgProjectItem = GetClipboardFormat(L"CF_VSSTGPROJECTITEMS");
+	cfVSRefProjectItem = GetClipboardFormat(L"CF_VSREFPROJECTITEMS");
 #endif
 #if Enable_ChromiumWebCustomMIMEDataFormat
-	cfChromiumCustomMIME = static_cast<CLIPFORMAT>(::RegisterClipboardFormat(L"Chromium Web Custom MIME Data Format"));
+	cfChromiumCustomMIME = GetClipboardFormat(L"Chromium Web Custom MIME Data Format");
 #endif
 
 	dropFormat.push_back(CF_HDROP);
@@ -2362,6 +2368,7 @@ void ScintillaWin::Paste(bool asBinary) {
 
 	if (asBinary && ::IsClipboardFormatAvailable(CF_TEXT)) {
 		unsigned long len = 0;
+		LazyGetClipboardFormat(cfNPPTextLen, CFSTR_NPPTEXTLEN);
 		if (::IsClipboardFormatAvailable(cfNPPTextLen)) {
 			GlobalMemory memNPPTextLen(::GetClipboardData(cfNPPTextLen));
 			if (memNPPTextLen) {
@@ -2919,6 +2926,7 @@ void ScintillaWin::CopyToClipboard(const SelectionText &selectedText) {
 		GlobalMemory nppTextLen;
 		nppTextLen.Allocate(sizeof(unsigned long));
 		if (nppTextLen) {
+			LazyGetClipboardFormat(cfNPPTextLen, CFSTR_NPPTEXTLEN);
 			static_cast<unsigned long *>(nppTextLen.ptr)[0] = static_cast<unsigned long>(selectedText.Length());
 			nppTextLen.SetClip(cfNPPTextLen);
 		}
