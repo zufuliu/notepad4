@@ -87,7 +87,7 @@ public:
 		characterSet = characterSet_;
 		rectangular = rectangular_;
 		lineCopy = lineCopy_;
-		if (!asBinary) {
+		if (!asBinary && !s.empty()) {
 			FixSelectionForClipboard();
 		}
 	}
@@ -107,7 +107,12 @@ private:
 	void FixSelectionForClipboard() {
 		// To avoid truncating the contents of the clipboard when pasted where the
 		// clipboard contains NUL characters, replace NUL characters by spaces.
-		std::replace(s.begin(), s.end(), '\0', ' ');
+		char *first = static_cast<char *>(::memchr(s.data(), 0, s.length()));
+		if (first != nullptr) {
+			*first++ = ' ';
+			const ptrdiff_t diff = first - s.data();
+			std::replace(s.begin() + diff, s.end(), '\0', ' ');
+		}
 	}
 };
 
