@@ -2933,6 +2933,10 @@ void ScintillaWin::CopyToClipboard(const SelectionText &selectedText) {
 	}
 
 	::CloseClipboard();
+
+	// TODO: notify data loss
+	//if (!selectedText.asBinary && ) {
+	//}
 }
 
 void ScintillaWin::ScrollMessage(WPARAM wParam) {
