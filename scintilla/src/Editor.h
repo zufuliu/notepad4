@@ -77,6 +77,7 @@ public:
 		s.clear();
 		rectangular = false;
 		lineCopy = false;
+		asBinary = false;
 		codePage = 0;
 		characterSet = 0;
 	}
@@ -89,10 +90,6 @@ public:
 		if (!asBinary) {
 			FixSelectionForClipboard();
 		}
-	}
-	void Copy(const SelectionText &other) {
-		Copy(other.s, other.codePage, other.characterSet, other.rectangular, other.lineCopy);
-		asBinary = other.asBinary;
 	}
 	const char *Data() const noexcept {
 		return s.c_str();
