@@ -64,6 +64,7 @@ PHP Script
 	php
 	phpt			PHP Test Script
 	phtml			PHP Web Page
+	php_cs			PHP-CS-Fixer
 	eyecode			eyeOS
 
 Python Script
