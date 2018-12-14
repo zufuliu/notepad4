@@ -25,7 +25,7 @@ static KEYWORDLIST Keywords_Ruby = {{
 
 static EDITSTYLE Styles_Ruby[] = {
 	EDITSTYLE_DEFAULT,
-	{ SCE_RB_WORD, NP2STYLE_Keyword, EDITSTYLE_HOLE(L"Keyword"), L"bold; fore:#FF8000" },
+	{ MULTI_STYLE(SCE_RB_WORD, SCE_RB_WORD_DEMOTED, 0, 0), NP2STYLE_Keyword, EDITSTYLE_HOLE(L"Keyword"), L"bold; fore:#FF8000" },
 	{ SCE_RB_MODULE_NAME, 63471, EDITSTYLE_HOLE(L"Module"), L"bold; fore:#007F7F" },
 	{ SCE_RB_CLASSNAME, NP2STYLE_Class, EDITSTYLE_HOLE(L"Class"), L"bold; fore:#007F7F" },
 	{ SCE_RB_DEFNAME, NP2STYLE_FunctionDef, EDITSTYLE_HOLE(L"Function Define"), L"fore:#0080C0" },
@@ -39,6 +39,15 @@ static EDITSTYLE Styles_Ruby[] = {
 	{ SCE_RB_REGEX, NP2STYLE_Regex, EDITSTYLE_HOLE(L"Regex"), L"fore:#000000; back:#A0FFA0" },
 	{ SCE_RB_SYMBOL, 63473, EDITSTYLE_HOLE(L"Symbol"), L"bold; fore:#FF4F0F" },
 	{ MULTI_STYLE(SCE_RB_CLASS_VAR, SCE_RB_INSTANCE_VAR, SCE_RB_GLOBAL, 0), NP2STYLE_Variable, EDITSTYLE_HOLE(L"Variable"), L"fore:#003CE6" },
+	{ SCE_RB_HERE_DELIM, 63408, EDITSTYLE_HOLE(L"Here-doc (Delimiter)"), L"fore:#648000" },
+	{ SCE_RB_HERE_Q, 63409, EDITSTYLE_HOLE(L"Here-doc (Single Quoted, q)"), L"fore:#648000" },
+	{ SCE_RB_HERE_QQ, 63410, EDITSTYLE_HOLE(L"Here-doc (Double Quoted, qq)"), L"fore:#648000" },
+	{ SCE_RB_HERE_QX, 63411, EDITSTYLE_HOLE(L"Here-doc (Backticks, qx)"), L"fore:#E24000; back:#FFF1A8" },
+	{ SCE_RB_STRING_Q, 63412, EDITSTYLE_HOLE(L"Single Quoted String (Generic, q)"), L"fore:#008000" },
+	{ SCE_RB_STRING_QQ, 63413, EDITSTYLE_HOLE(L"Double Quoted String (qq)"), L"fore:#008000" },
+	{ SCE_RB_STRING_QX, 63414, EDITSTYLE_HOLE(L"Backticks (qx)"), L"fore:#E24000; back:#FFF1A8" },
+	{ SCE_RB_STRING_QR, 63415, EDITSTYLE_HOLE(L"Regex (qr)"), L"fore:#006633; back:#FFF1A8" },
+	{ SCE_RB_STRING_QW, 63416, EDITSTYLE_HOLE(L"Array (qw)"), L"fore:#003CE6" },
 	{ SCE_RB_DATASECTION, 63475, EDITSTYLE_HOLE(L"Data Section"), L"fore:#600000; back:#FFF0D8; eolfilled" },
 };
 
