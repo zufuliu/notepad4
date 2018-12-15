@@ -165,6 +165,7 @@
 * Experimental support for RTL layout (GDI) and bidirectional (Direct2D), useful for Arabic and Hebrew
 * Support using fractional font size
 * Support Inline IME
+* Support full screen mode
 * Extra support for drag and drop file from Visual Studio, Android Studio, IntelliJ IDEA, etc.
 * Cut, copy and paste binary content.
 * Other various major or minor changes and tweaks

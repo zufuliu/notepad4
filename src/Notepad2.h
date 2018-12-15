@@ -155,6 +155,14 @@ void UpdateStatusBarWidth(void);
 void UpdateToolbar(void);
 void UpdateFoldMarginWidth(void);
 void UpdateLineNumberWidth(void);
+
+enum {
+	FullScreenMode_OnStartup = 1,
+	FullScreenMode_HideCaption = 2,
+	FullScreenMode_HideMenu = 4,
+
+	FullScreenMode_Default = FullScreenMode_HideCaption,
+};
 void ToggleFullScreenMode(void);
 
 typedef struct EditFileIOStatus {
