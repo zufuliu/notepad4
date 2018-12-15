@@ -190,10 +190,7 @@ int		iBidirectional;
 static BOOL bShowToolbar;
 static BOOL bShowStatusbar;
 static BOOL bInFullScreenMode;
-static BOOL bFullScreenOnStartup;
-static BOOL bFullScreenHideMenu;
-static BOOL bFullScreenHideToolbar;
-static BOOL bFullScreenHideStatusbar;
+static int iFullScreenMode;
 
 typedef struct _wi {
 	int x;
@@ -428,6 +425,21 @@ static int	flagDisplayHelp			= 0;
 
 static inline BOOL IsDocumentModified(void) {
 	return bModified || iEncoding != iOriginalEncoding;
+}
+
+static inline BOOL IsTopMost(void) {
+	return (bAlwaysOnTop || flagAlwaysOnTop == 2) && flagAlwaysOnTop != 1;
+}
+
+static inline void ToggleFullScreenModeConfig(int config) {
+	if (iFullScreenMode & config) {
+		iFullScreenMode &= ~config;
+	} else {
+		iFullScreenMode |= config;
+	}
+	if (bInFullScreenMode && config != FullScreenMode_OnStartup) {
+		ToggleFullScreenMode();
+	}
 }
 
 //==============================================================================
@@ -730,7 +742,7 @@ HWND InitInstance(HINSTANCE hInstance, int nCmdShow) {
 		nCmdShow = SW_SHOWMAXIMIZED;
 	}
 
-	if ((bAlwaysOnTop || flagAlwaysOnTop == 2) && flagAlwaysOnTop != 1) {
+	if (IsTopMost()) {
 		SetWindowPos(hwndMain, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
 	}
 
@@ -922,6 +934,10 @@ static inline void NP2RestoreWind(HWND hwnd) {
 
 static inline void NP2ExitWind(HWND hwnd) {
 	if (FileSave(FALSE, TRUE, FALSE, FALSE)) {
+		if (bInFullScreenMode) {
+			bInFullScreenMode = FALSE;
+			ToggleFullScreenMode();
+		}
 		DestroyWindow(hwnd);
 	}
 }
@@ -1075,6 +1091,25 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 	case WM_SIZE:
 		MsgSize(hwnd, wParam, lParam);
 		break;
+
+	case WM_GETMINMAXINFO:
+		if (bInFullScreenMode) {
+			HMONITOR hMonitor = MonitorFromWindow(hwndMain, MONITOR_DEFAULTTONEAREST);
+			MONITORINFO mi;
+			mi.cbSize = sizeof(mi);
+			GetMonitorInfo(hMonitor, &mi);
+
+			const int w = mi.rcMonitor.right - mi.rcMonitor.left;
+			const int h = mi.rcMonitor.bottom - mi.rcMonitor.top;
+
+			LPMINMAXINFO pmmi = (LPMINMAXINFO)lParam;
+			pmmi->ptMaxSize.x = w + 2 * GetSystemMetricsEx(SM_CXSIZEFRAME);
+			pmmi->ptMaxSize.y = h + GetSystemMetricsEx(SM_CYCAPTION) + GetSystemMetricsEx(SM_CYMENU) + 2 * GetSystemMetricsEx(SM_CYSIZEFRAME);
+			pmmi->ptMaxTrackSize.x = pmmi->ptMaxSize.x;
+			pmmi->ptMaxTrackSize.y = pmmi->ptMaxSize.y;
+			return 0;
+		}
+		return DefWindowProc(hwnd, umsg, wParam, lParam);
 
 	case WM_SETFOCUS:
 		SetFocus(hwndEdit);
@@ -1683,7 +1718,8 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	MRU_Load(mruReplace);
 
 	if (bInFullScreenMode) {
-		ToggleFullScreenMode();
+		bInFullScreenMode = FALSE;
+		PostWMCommand(hwnd, IDM_VIEW_TOGGLE_FULLSCREEN);
 	}
 	return 0;
 }
@@ -2314,10 +2350,9 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	EnableCmd(hmenu, IDM_VIEW_CUSTOMIZETB, bShowToolbar);
 	CheckCmd(hmenu, IDM_VIEW_STATUSBAR, bShowStatusbar);
 
-	CheckCmd(hmenu, IDM_VIEW_FULLSCREEN_ON_START, bFullScreenOnStartup);
-	CheckCmd(hmenu, IDM_VIEW_FULLSCREEN_HIDE_MENU, bFullScreenHideMenu);
-	CheckCmd(hmenu, IDM_VIEW_FULLSCREEN_HIDE_TOOL, bFullScreenHideToolbar);
-	CheckCmd(hmenu, IDM_VIEW_FULLSCREEN_HIDE_STATUS, bFullScreenHideStatusbar);
+	CheckCmd(hmenu, IDM_VIEW_FULLSCREEN_ON_START, iFullScreenMode & FullScreenMode_OnStartup);
+	CheckCmd(hmenu, IDM_VIEW_FULLSCREEN_HIDE_TITLE, iFullScreenMode & FullScreenMode_HideCaption);
+	CheckCmd(hmenu, IDM_VIEW_FULLSCREEN_HIDE_MENU, iFullScreenMode & FullScreenMode_HideMenu);
 
 	i = IDM_VIEW_HIGHLIGHTCURRENTLINE_NONE + iHighlightCurrentLine;
 	CheckMenuRadioItem(hmenu, IDM_VIEW_HIGHLIGHTCURRENTLINE_NONE, IDM_VIEW_HIGHLIGHTCURRENTLINE_FRAME, i, MF_BYCOMMAND);
@@ -2326,7 +2361,7 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	CheckCmd(hmenu, IDM_VIEW_REUSEWINDOW, bReuseWindow);
 	CheckCmd(hmenu, IDM_VIEW_SINGLEFILEINSTANCE, bSingleFileInstance);
 	CheckCmd(hmenu, IDM_VIEW_STICKYWINPOS, bStickyWinPos);
-	CheckCmd(hmenu, IDM_VIEW_ALWAYSONTOP, ((bAlwaysOnTop || flagAlwaysOnTop == 2) && flagAlwaysOnTop != 1));
+	CheckCmd(hmenu, IDM_VIEW_ALWAYSONTOP, IsTopMost());
 	CheckCmd(hmenu, IDM_VIEW_MINTOTRAY, bMinimizeToTray);
 	CheckCmd(hmenu, IDM_VIEW_TRANSPARENT, bTransparentMode);
 	EnableCmd(hmenu, IDM_VIEW_TRANSPARENT, i);
@@ -3998,10 +4033,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	case IDM_VIEW_ALWAYSONTOP:
-		if (bInFullScreenMode) {
-			return 0;
-		}
-		if ((bAlwaysOnTop || flagAlwaysOnTop == 2) && flagAlwaysOnTop != 1) {
+		if (IsTopMost()) {
 			bAlwaysOnTop = 0;
 			flagAlwaysOnTop = 0;
 			SetWindowPos(hwnd, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
@@ -4191,28 +4223,15 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	case IDM_VIEW_FULLSCREEN_ON_START:
-		bFullScreenOnStartup = !bFullScreenOnStartup;
+		ToggleFullScreenModeConfig(FullScreenMode_OnStartup);
+		break;
+
+	case IDM_VIEW_FULLSCREEN_HIDE_TITLE:
+		ToggleFullScreenModeConfig(FullScreenMode_HideCaption);
 		break;
 
 	case IDM_VIEW_FULLSCREEN_HIDE_MENU:
-		bFullScreenHideMenu = !bFullScreenHideMenu;
-		if (bInFullScreenMode) {
-			ToggleFullScreenMode();
-		}
-		break;
-
-	case IDM_VIEW_FULLSCREEN_HIDE_TOOL:
-		bFullScreenHideToolbar = !bFullScreenHideToolbar;
-		if (bInFullScreenMode) {
-			ToggleFullScreenMode();
-		}
-		break;
-
-	case IDM_VIEW_FULLSCREEN_HIDE_STATUS:
-		bFullScreenHideStatusbar = !bFullScreenHideStatusbar;
-		if (bInFullScreenMode) {
-			ToggleFullScreenMode();
-		}
+		ToggleFullScreenModeConfig(FullScreenMode_HideMenu);
 		break;
 
 	case CMD_ESCAPE:
@@ -5285,11 +5304,9 @@ void LoadSettings(void) {
 	bShowToolbar = IniSectionGetBool(pIniSection, L"ShowToolbar", 1);
 	bShowStatusbar = IniSectionGetBool(pIniSection, L"ShowStatusbar", 1);
 
-	bFullScreenOnStartup = IniSectionGetBool(pIniSection, L"FullScreenOnStartup", 0);
-	bInFullScreenMode = bFullScreenOnStartup;
-	bFullScreenHideMenu = IniSectionGetBool(pIniSection, L"FullScreenHideMenu", 0);
-	bFullScreenHideToolbar = IniSectionGetBool(pIniSection, L"FullScreenHideToolbar", 0);
-	bFullScreenHideStatusbar = IniSectionGetBool(pIniSection, L"FullScreenHideStatusbar", 0);
+	iValue = IniSectionGetInt(pIniSection, L"FullScreenMode", FullScreenMode_Default);
+	iFullScreenMode = iValue;
+	bInFullScreenMode = iValue & FullScreenMode_OnStartup;
 
 	cxRunDlg = IniSectionGetInt(pIniSection, L"RunDlgSizeX", 0);
 	cxEncodingDlg = IniSectionGetInt(pIniSection, L"EncodingDlgSizeX", 0);
@@ -5520,10 +5537,7 @@ void SaveSettings(BOOL bSaveSettingsNow) {
 	IniSectionSetStringEx(pIniSection, L"ToolbarButtons", tchToolbarButtons, DefaultToolbarButtons);
 	IniSectionSetBoolEx(pIniSection, L"ShowToolbar", bShowToolbar, 1);
 	IniSectionSetBoolEx(pIniSection, L"ShowStatusbar", bShowStatusbar, 1);
-	IniSectionSetBoolEx(pIniSection, L"FullScreenOnStartup", bFullScreenOnStartup, 0);
-	IniSectionSetBoolEx(pIniSection, L"FullScreenHideMenu", bFullScreenHideMenu, 0);
-	IniSectionSetBoolEx(pIniSection, L"FullScreenHideToolbar", bFullScreenHideToolbar, 0);
-	IniSectionSetBoolEx(pIniSection, L"FullScreenHideStatusbar", bFullScreenHideStatusbar, 0);
+	IniSectionSetIntEx(pIniSection, L"FullScreenMode", iFullScreenMode, FullScreenMode_Default);
 	IniSectionSetInt(pIniSection, L"RunDlgSizeX", cxRunDlg);
 	IniSectionSetInt(pIniSection, L"EncodingDlgSizeX", cxEncodingDlg);
 	IniSectionSetInt(pIniSection, L"EncodingDlgSizeY", cyEncodingDlg);
@@ -6657,10 +6671,75 @@ void UpdateLineNumberWidth(void) {
 	}
 }
 
+// based on SciTEWin::FullScreenToggle()
 void ToggleFullScreenMode(void) {
+	static BOOL bSaved;
+	static WINDOWPLACEMENT wndpl;
+	static RECT rcWorkArea;
+	static LONG_PTR exStyle;
+
+	HWND wTaskBar = FindWindow(L"Shell_TrayWnd", L"");
+	HWND wStartButton = FindWindow(L"Button", NULL);
+
 	if (bInFullScreenMode) {
+		if (!bSaved) {
+			bSaved = TRUE;
+			SystemParametersInfo(SPI_GETWORKAREA, 0, &rcWorkArea, 0);
+			wndpl.length = sizeof(WINDOWPLACEMENT);
+			GetWindowPlacement(hwndMain, &wndpl);
+			exStyle = GetWindowLongPtr(hwndEdit, GWL_EXSTYLE);
+		}
+
+		HMONITOR hMonitor = MonitorFromWindow(hwndMain, MONITOR_DEFAULTTONEAREST);
+		MONITORINFO mi;
+		mi.cbSize = sizeof(mi);
+		GetMonitorInfo(hMonitor, &mi);
+
+		const int x = mi.rcMonitor.left;
+		const int y = mi.rcMonitor.top;
+		const int w = mi.rcMonitor.right - x;
+		const int h = mi.rcMonitor.bottom - y;
+		const int cx = GetSystemMetricsEx(SM_CXSIZEFRAME);
+		const int cy = GetSystemMetricsEx(SM_CYSIZEFRAME);
+
+		int top = cy;
+		if (iFullScreenMode & (FullScreenMode_HideCaption | FullScreenMode_HideMenu)) {
+			top += GetSystemMetricsEx(SM_CYCAPTION);
+		}
+		if (iFullScreenMode & FullScreenMode_HideMenu) {
+			top += GetSystemMetricsEx(SM_CYMENU);
+		}
+
+		SystemParametersInfo(SPI_SETWORKAREA, 0, NULL, SPIF_SENDCHANGE);
+
+		if (wStartButton) {
+			ShowWindow(wStartButton, SW_HIDE);
+		}
+		ShowWindow(wTaskBar, SW_HIDE);
+
+		SetWindowLongPtr(hwndEdit, GWL_EXSTYLE, 0);
+		SetWindowPos(hwndMain, (IsTopMost() ? HWND_TOPMOST : HWND_TOP), x - cx, y - top, x + w + 2 * cx , y + h + top + cy, 0);
 	} else {
+		bSaved = FALSE;
+		ShowWindow(wTaskBar, SW_SHOW);
+		if (wStartButton) {
+			ShowWindow(wStartButton, SW_SHOW);
+		}
+		SetWindowLongPtr(hwndEdit, GWL_EXSTYLE, exStyle);
+		if (!IsTopMost()) {
+			SetWindowPos(hwndMain, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
+		}
+		if (wndpl.length) {
+			SystemParametersInfo(SPI_SETWORKAREA, 0, &rcWorkArea, 0);
+			if (wndpl.showCmd == SW_SHOWMAXIMIZED) {
+				ShowWindow(hwndMain, SW_RESTORE);
+				ShowWindow(hwndMain, SW_SHOWMAXIMIZED);
+			} else {
+				SetWindowPlacement(hwndMain, &wndpl);
+			}
+		}
 	}
+	SetForegroundWindow(hwndMain);
 }
 
 //=============================================================================
