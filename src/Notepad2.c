@@ -205,7 +205,7 @@ typedef struct _wi {
 
 static WININFO wi;
 static BOOL bStickyWinPos;
-BOOL	bIsAppThemed;
+//BOOL	bIsAppThemed;
 
 static int cyReBar;
 static int cyReBarFrame;
@@ -1510,6 +1510,33 @@ void SetWrapVisualFlags(void) {
 	}
 }
 
+static void EditFrameOnThemeChanged() {
+	if (IsAppThemed()) {
+		SetWindowLongPtr(hwndEdit, GWL_EXSTYLE, GetWindowLongPtr(hwndEdit, GWL_EXSTYLE) & ~WS_EX_CLIENTEDGE);
+		SetWindowPos(hwndEdit, NULL, 0, 0, 0, 0, SWP_NOZORDER | SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE);
+
+		if (IsVistaAndAbove()) {
+			cxEditFrame = 0;
+			cyEditFrame = 0;
+		} else {
+			RECT rc;
+			RECT rc2;
+			SetWindowPos(hwndEditFrame, NULL, 0, 0, 0, 0, SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE | SWP_FRAMECHANGED);
+			GetClientRect(hwndEditFrame, &rc);
+			GetWindowRect(hwndEditFrame, &rc2);
+
+			cxEditFrame = ((rc2.right - rc2.left) - (rc.right - rc.left)) / 2;
+			cyEditFrame = ((rc2.bottom - rc2.top) - (rc.bottom - rc.top)) / 2;
+		}
+	} else {
+		SetWindowLongPtr(hwndEdit, GWL_EXSTYLE, WS_EX_CLIENTEDGE | GetWindowLongPtr(hwndEdit, GWL_EXSTYLE));
+		SetWindowPos(hwndEdit, NULL, 0, 0, 0, 0, SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE | SWP_FRAMECHANGED);
+
+		cxEditFrame = 0;
+		cyEditFrame = 0;
+	}
+}
+
 //=============================================================================
 //
 // MsgCreate() - Handles WM_CREATE
@@ -1608,30 +1635,7 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 						hInstance,
 						NULL);
 
-	if (IsAppThemed()) {
-		bIsAppThemed = TRUE;
-
-		SetWindowLongPtr(hwndEdit, GWL_EXSTYLE, GetWindowLongPtr(hwndEdit, GWL_EXSTYLE) & ~WS_EX_CLIENTEDGE);
-		SetWindowPos(hwndEdit, NULL, 0, 0, 0, 0, SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE | SWP_FRAMECHANGED);
-
-		if (IsVistaAndAbove()) {
-			cxEditFrame = 0;
-			cyEditFrame = 0;
-		} else {
-			RECT rc;
-			RECT rc2;
-			GetClientRect(hwndEditFrame, &rc);
-			GetWindowRect(hwndEditFrame, &rc2);
-
-			cxEditFrame = ((rc2.right - rc2.left) - (rc.right - rc.left)) / 2;
-			cyEditFrame = ((rc2.bottom - rc2.top) - (rc.bottom - rc.top)) / 2;
-		}
-	} else {
-		bIsAppThemed = FALSE;
-
-		cxEditFrame = 0;
-		cyEditFrame = 0;
-	}
+	EditFrameOnThemeChanged();
 
 	// Create Toolbar and Statusbar
 	CreateBars(hwnd, hInstance);
@@ -1690,7 +1694,7 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 //
 //
 void CreateBars(HWND hwnd, HINSTANCE hInstance) {
-	bIsAppThemed = IsAppThemed();
+	const BOOL bIsAppThemed = IsAppThemed();
 
 	const DWORD dwToolbarStyle = WS_TOOLBAR;
 	hwndToolbar = CreateWindowEx(0, TOOLBARCLASSNAME, NULL, dwToolbarStyle,
@@ -1887,38 +1891,10 @@ void MsgThemeChanged(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	UNREFERENCED_PARAMETER(wParam);
 	UNREFERENCED_PARAMETER(lParam);
 
-	RECT rc;
 	HINSTANCE hInstance = (HINSTANCE)(INT_PTR)GetWindowLongPtr(hwnd, GWLP_HINSTANCE);
 
 	// reinitialize edit frame
-
-	if (IsAppThemed()) {
-		bIsAppThemed = TRUE;
-
-		SetWindowLongPtr(hwndEdit, GWL_EXSTYLE, GetWindowLongPtr(hwndEdit, GWL_EXSTYLE) & ~WS_EX_CLIENTEDGE);
-		SetWindowPos(hwndEdit, NULL, 0, 0, 0, 0, SWP_NOZORDER | SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE);
-
-		if (IsVistaAndAbove()) {
-			cxEditFrame = 0;
-			cyEditFrame = 0;
-		} else {
-			RECT rc2;
-			SetWindowPos(hwndEditFrame, NULL, 0, 0, 0, 0, SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE | SWP_FRAMECHANGED);
-			GetClientRect(hwndEditFrame, &rc);
-			GetWindowRect(hwndEditFrame, &rc2);
-
-			cxEditFrame = ((rc2.right - rc2.left) - (rc.right - rc.left)) / 2;
-			cyEditFrame = ((rc2.bottom - rc2.top) - (rc.bottom - rc.top)) / 2;
-		}
-	} else {
-		bIsAppThemed = FALSE;
-
-		SetWindowLongPtr(hwndEdit, GWL_EXSTYLE, WS_EX_CLIENTEDGE | GetWindowLongPtr(hwndEdit, GWL_EXSTYLE));
-		SetWindowPos(hwndEdit, NULL, 0, 0, 0, 0, SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE | SWP_FRAMECHANGED);
-
-		cxEditFrame = 0;
-		cyEditFrame = 0;
-	}
+	EditFrameOnThemeChanged();
 
 	// recreate toolbar and statusbar
 	Toolbar_GetButtons(hwndToolbar, TOOLBAR_COMMAND_BASE, tchToolbarButtons, COUNTOF(tchToolbarButtons));
@@ -1929,6 +1905,7 @@ void MsgThemeChanged(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	CreateBars(hwnd, hInstance);
 	UpdateToolbar();
 
+	RECT rc;
 	GetClientRect(hwnd, &rc);
 	SendMessage(hwnd, WM_SIZE, SIZE_RESTORED, MAKELPARAM(rc.right, rc.bottom));
 	UpdateStatusbar();
