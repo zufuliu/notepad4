@@ -203,7 +203,7 @@ extern "C" BOOL EditPrint(HWND hwnd, LPCWSTR pszDocTitle, LPCWSTR pszPageFormat)
 	DPtoLP(hdc, (LPPOINT) &ptPage, 1);
 
 	TEXTMETRIC tm;
-	int headerLineHeight = MulDiv(8, ptDpi.y, 72);
+	int headerLineHeight = MulDiv(10, ptDpi.y, 72);
 	HFONT fontHeader = CreateFont(headerLineHeight,
 							0, 0, 0,
 							FW_BOLD,
@@ -220,7 +220,7 @@ extern "C" BOOL EditPrint(HWND hwnd, LPCWSTR pszDocTitle, LPCWSTR pszPageFormat)
 		headerLineHeight = 0;
 	}
 
-	int footerLineHeight = MulDiv(7, ptDpi.y, 72);
+	int footerLineHeight = MulDiv(10, ptDpi.y, 72);
 	HFONT fontFooter = CreateFont(footerLineHeight,
 							0, 0, 0,
 							FW_NORMAL,
