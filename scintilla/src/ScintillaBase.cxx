@@ -536,33 +536,14 @@ public:
 	LexState &operator=(LexState &&) = delete;
 	~LexState() override;
 	void SetLexer(uptr_t wParam);
-	void SetLexerLanguage(const char *languageName);
-	const char *DescribeWordListSets() noexcept;
 	void SetWordList(int n, const char *wl);
 	const char *GetName() const noexcept;
-	void *PrivateCall(int operation, void *pointer) noexcept;
-	const char *PropertyNames() noexcept;
-	int PropertyType(const char *name) noexcept;
-	const char *DescribeProperty(const char *name) noexcept;
 	void PropSet(const char *key, const char *val);
 	const char *PropGet(const char *key) const;
 	int PropGetInt(const char *key, int defaultValue = 0) const;
 	int PropGetExpanded(const char *key, char *result) const;
 
 	int LineEndTypesSupported() const noexcept override;
-	int AllocateSubStyles(int styleBase, int numberStyles) noexcept;
-	int SubStylesStart(int styleBase) noexcept;
-	int SubStylesLength(int styleBase) noexcept;
-	int StyleFromSubStyle(int subStyle) noexcept;
-	int PrimaryStyleFromStyle(int style) noexcept;
-	void FreeSubStyles() noexcept;
-	void SetIdentifiers(int style, const char *identifiers) noexcept;
-	int DistanceToSecondaryStyles() noexcept;
-	const char *GetSubStyleBases() noexcept;
-	int NamedStyles() noexcept;
-	const char *NameOfStyle(int style) noexcept;
-	const char *TagsOfStyle(int style) noexcept;
-	const char *DescriptionOfStyle(int style) noexcept;
 };
 
 }
@@ -616,23 +597,6 @@ void LexState::SetLexer(uptr_t wParam) {
 	}
 }
 
-void LexState::SetLexerLanguage(const char *languageName) {
-	const LexerModule *lex = Catalogue::Find(languageName);
-	if (!lex)
-		lex = Catalogue::Find(SCLEX_NULL);
-	if (lex)
-		lexLanguage = lex->GetLanguage();
-	SetLexerModule(lex);
-}
-
-const char *LexState::DescribeWordListSets() noexcept {
-	if (instance) {
-		return instance->DescribeWordListSets();
-	} else {
-		return nullptr;
-	}
-}
-
 void LexState::SetWordList(int n, const char *wl) {
 	if (instance) {
 		const Sci_Position firstModification = instance->WordListSet(n, wl);
@@ -644,38 +608,6 @@ void LexState::SetWordList(int n, const char *wl) {
 
 const char *LexState::GetName() const noexcept {
 	return lexCurrent ? lexCurrent->languageName : "";
-}
-
-void *LexState::PrivateCall(int operation, void *pointer) noexcept {
-	if (pdoc && instance) {
-		return instance->PrivateCall(operation, pointer);
-	} else {
-		return nullptr;
-	}
-}
-
-const char *LexState::PropertyNames() noexcept {
-	if (instance) {
-		return instance->PropertyNames();
-	} else {
-		return nullptr;
-	}
-}
-
-int LexState::PropertyType(const char *name) noexcept {
-	if (instance) {
-		return instance->PropertyType(name);
-	} else {
-		return SC_TYPE_BOOLEAN;
-	}
-}
-
-const char *LexState::DescribeProperty(const char *name) noexcept {
-	if (instance) {
-		return instance->DescribeProperty(name);
-	} else {
-		return nullptr;
-	}
 }
 
 void LexState::PropSet(const char *key, const char *val) {
@@ -705,100 +637,6 @@ int LexState::LineEndTypesSupported() const noexcept {
 		return instance->LineEndTypesSupported();
 	}
 	return 0;
-}
-
-int LexState::AllocateSubStyles(int styleBase, int numberStyles) noexcept {
-	if (instance) {
-		return instance->AllocateSubStyles(styleBase, numberStyles);
-	}
-	return -1;
-}
-
-int LexState::SubStylesStart(int styleBase) noexcept {
-	if (instance) {
-		return instance->SubStylesStart(styleBase);
-	}
-	return -1;
-}
-
-int LexState::SubStylesLength(int styleBase) noexcept {
-	if (instance) {
-		return instance->SubStylesLength(styleBase);
-	}
-	return 0;
-}
-
-int LexState::StyleFromSubStyle(int subStyle) noexcept {
-	if (instance) {
-		return instance->StyleFromSubStyle(subStyle);
-	}
-	return 0;
-}
-
-int LexState::PrimaryStyleFromStyle(int style) noexcept {
-	if (instance) {
-		return instance->PrimaryStyleFromStyle(style);
-	}
-	return 0;
-}
-
-void LexState::FreeSubStyles() noexcept {
-	if (instance) {
-		instance->FreeSubStyles();
-	}
-}
-
-void LexState::SetIdentifiers(int style, const char *identifiers) noexcept {
-	if (instance) {
-		instance->SetIdentifiers(style, identifiers);
-		pdoc->ModifiedAt(0);
-	}
-}
-
-int LexState::DistanceToSecondaryStyles() noexcept {
-	if (instance) {
-		return instance->DistanceToSecondaryStyles();
-	}
-	return 0;
-}
-
-const char *LexState::GetSubStyleBases() noexcept {
-	if (instance) {
-		return instance->GetSubStyleBases();
-	}
-	return "";
-}
-
-int LexState::NamedStyles() noexcept {
-	if (instance) {
-		return instance->NamedStyles();
-	} else {
-		return -1;
-	}
-}
-
-const char *LexState::NameOfStyle(int style) noexcept {
-	if (instance) {
-		return instance->NameOfStyle(style);
-	} else {
-		return nullptr;
-	}
-}
-
-const char *LexState::TagsOfStyle(int style) noexcept {
-	if (instance) {
-		return instance->TagsOfStyle(style);
-	} else {
-		return nullptr;
-	}
-}
-
-const char *LexState::DescriptionOfStyle(int style) noexcept {
-	if (instance) {
-		return instance->DescriptionOfStyle(style);
-	} else {
-		return nullptr;
-	}
 }
 
 #endif
@@ -1055,83 +893,13 @@ sptr_t ScintillaBase::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lPara
 		DocumentLexState()->SetWordList(static_cast<int>(wParam), ConstCharPtrFromSPtr(lParam));
 		break;
 
-	case SCI_SETLEXERLANGUAGE:
-		DocumentLexState()->SetLexerLanguage(ConstCharPtrFromSPtr(lParam));
-		break;
-
-	case SCI_GETLEXERLANGUAGE:
-		return StringResult(lParam, DocumentLexState()->GetName());
-
-	case SCI_PRIVATELEXERCALL:
-		return reinterpret_cast<sptr_t>(
-			DocumentLexState()->PrivateCall(static_cast<int>(wParam), reinterpret_cast<void *>(lParam)));
-
 #ifdef INCLUDE_DEPRECATED_FEATURES
 	case SCI_GETSTYLEBITSNEEDED:
 		return 8;
 #endif
 
-	case SCI_PROPERTYNAMES:
-		return StringResult(lParam, DocumentLexState()->PropertyNames());
-
-	case SCI_PROPERTYTYPE:
-		return DocumentLexState()->PropertyType(ConstCharPtrFromUPtr(wParam));
-
-	case SCI_DESCRIBEPROPERTY:
-		return StringResult(lParam,
-			DocumentLexState()->DescribeProperty(ConstCharPtrFromUPtr(wParam)));
-
-	case SCI_DESCRIBEKEYWORDSETS:
-		return StringResult(lParam, DocumentLexState()->DescribeWordListSets());
-
 	case SCI_GETLINEENDTYPESSUPPORTED:
 		return DocumentLexState()->LineEndTypesSupported();
-
-	case SCI_ALLOCATESUBSTYLES:
-		return DocumentLexState()->AllocateSubStyles(static_cast<int>(wParam), static_cast<int>(lParam));
-
-	case SCI_GETSUBSTYLESSTART:
-		return DocumentLexState()->SubStylesStart(static_cast<int>(wParam));
-
-	case SCI_GETSUBSTYLESLENGTH:
-		return DocumentLexState()->SubStylesLength(static_cast<int>(wParam));
-
-	case SCI_GETSTYLEFROMSUBSTYLE:
-		return DocumentLexState()->StyleFromSubStyle(static_cast<int>(wParam));
-
-	case SCI_GETPRIMARYSTYLEFROMSTYLE:
-		return DocumentLexState()->PrimaryStyleFromStyle(static_cast<int>(wParam));
-
-	case SCI_FREESUBSTYLES:
-		DocumentLexState()->FreeSubStyles();
-		break;
-
-	case SCI_SETIDENTIFIERS:
-		DocumentLexState()->SetIdentifiers(static_cast<int>(wParam),
-			ConstCharPtrFromSPtr(lParam));
-		break;
-
-	case SCI_DISTANCETOSECONDARYSTYLES:
-		return DocumentLexState()->DistanceToSecondaryStyles();
-
-	case SCI_GETSUBSTYLEBASES:
-		return StringResult(lParam, DocumentLexState()->GetSubStyleBases());
-
-	case SCI_GETNAMEDSTYLES:
-		return DocumentLexState()->NamedStyles();
-
-	case SCI_NAMEOFSTYLE:
-		return StringResult(lParam, DocumentLexState()->
-			NameOfStyle(static_cast<int>(wParam)));
-
-	case SCI_TAGSOFSTYLE:
-		return StringResult(lParam, DocumentLexState()->
-			TagsOfStyle(static_cast<int>(wParam)));
-
-	case SCI_DESCRIPTIONOFSTYLE:
-		return StringResult(lParam, DocumentLexState()->
-			DescriptionOfStyle(static_cast<int>(wParam)));
-
 #endif
 
 	default:

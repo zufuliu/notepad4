@@ -36,18 +36,6 @@ const LexerModule *Catalogue::Find(int language) noexcept {
 	return nullptr;
 }
 
-const LexerModule *Catalogue::Find(const char *languageName) noexcept {
-	Scintilla_LinkLexers();
-	if (languageName) {
-		for (const auto *lm : lexerCatalogue) {
-			if (lm->languageName && (0 == strcmp(lm->languageName, languageName))) {
-				return lm;
-			}
-		}
-	}
-	return nullptr;
-}
-
 void Catalogue::AddLexerModule(LexerModule *plm) {
 	if (plm->GetLanguage() == SCLEX_AUTOMATIC) {
 		plm->language = nextLanguage;
