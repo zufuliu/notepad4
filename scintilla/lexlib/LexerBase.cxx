@@ -22,8 +22,6 @@
 
 using namespace Scintilla;
 
-static const char styleSubable[] = { 0 };
-
 LexerBase::LexerBase() {
 	for (int wl = 0; wl < numWordLists; wl++) {
 		keyWordLists[wl] = new WordList;
@@ -47,18 +45,6 @@ int SCI_METHOD LexerBase::Version() const noexcept {
 	return lvRelease4;
 }
 
-const char * SCI_METHOD LexerBase::PropertyNames() const noexcept {
-	return "";
-}
-
-int SCI_METHOD LexerBase::PropertyType(const char *) const noexcept {
-	return SC_TYPE_BOOLEAN;
-}
-
-const char * SCI_METHOD LexerBase::DescribeProperty(const char *) const noexcept {
-	return "";
-}
-
 Sci_Position SCI_METHOD LexerBase::PropertySet(const char *key, const char *val) {
 	const char *valOld = props.Get(key);
 	if (strcmp(val, valOld) != 0) {
@@ -67,10 +53,6 @@ Sci_Position SCI_METHOD LexerBase::PropertySet(const char *key, const char *val)
 	} else {
 		return -1;
 	}
-}
-
-const char * SCI_METHOD LexerBase::DescribeWordListSets() const noexcept {
-	return "";
 }
 
 Sci_Position SCI_METHOD LexerBase::WordListSet(int n, const char *wl) {
@@ -85,60 +67,6 @@ Sci_Position SCI_METHOD LexerBase::WordListSet(int n, const char *wl) {
 	return -1;
 }
 
-void * SCI_METHOD LexerBase::PrivateCall(int, void *) noexcept {
-	return nullptr;
-}
-
 int SCI_METHOD LexerBase::LineEndTypesSupported() const noexcept {
 	return SC_LINE_END_TYPE_DEFAULT;
-}
-
-int SCI_METHOD LexerBase::AllocateSubStyles(int, int) noexcept {
-	return -1;
-}
-
-int SCI_METHOD LexerBase::SubStylesStart(int) const noexcept {
-	return -1;
-}
-
-int SCI_METHOD LexerBase::SubStylesLength(int) const noexcept {
-	return 0;
-}
-
-int SCI_METHOD LexerBase::StyleFromSubStyle(int subStyle) const noexcept {
-	return subStyle;
-}
-
-int SCI_METHOD LexerBase::PrimaryStyleFromStyle(int style) const noexcept {
-	return style;
-}
-
-void SCI_METHOD LexerBase::FreeSubStyles() noexcept {
-}
-
-void SCI_METHOD LexerBase::SetIdentifiers(int, const char *) noexcept {
-}
-
-int SCI_METHOD LexerBase::DistanceToSecondaryStyles() const noexcept {
-	return 0;
-}
-
-const char * SCI_METHOD LexerBase::GetSubStyleBases() const noexcept {
-	return styleSubable;
-}
-
-int SCI_METHOD LexerBase::NamedStyles() const noexcept {
-	return -1;
-}
-
-const char * SCI_METHOD LexerBase::NameOfStyle(int) const noexcept {
-	return "";
-}
-
-const char * SCI_METHOD LexerBase::TagsOfStyle(int) const noexcept {
-	return "";
-}
-
-const char * SCI_METHOD LexerBase::DescriptionOfStyle(int) const noexcept {
-	return "";
 }
