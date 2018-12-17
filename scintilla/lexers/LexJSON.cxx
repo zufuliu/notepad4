@@ -77,6 +77,16 @@ static void ColouriseJSONDoc(Sci_PositionU startPos, Sci_Position length, int in
 				buf[wordLen] = 0;
 				if (strcmp(buf, "true") == 0 || strcmp(buf, "false") == 0 || strcmp(buf, "null") == 0) {
 					styler.ColourTo(i - 1, SCE_C_WORD);
+				} else if (ch == ':' || IsASpace(ch)) {
+					bool isProp = ch == ':' || chNext == ':';
+					if (!isProp) {
+						Sci_PositionU pos = i + 1;
+						while (IsASpace(styler.SafeGetCharAt(pos++)));
+						isProp = styler[pos - 1] == ':';
+					}
+					if (isProp) {
+						styler.ColourTo(i - 1, SCE_C_LABEL);
+					}
 				}
 				state = SCE_C_DEFAULT;
 				wordLen = 0;
