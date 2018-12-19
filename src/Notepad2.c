@@ -612,7 +612,8 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 //
 //
 BOOL InitApplication(HINSTANCE hInstance) {
-	WNDCLASS wc;
+	WNDCLASSEX wc;
+	wc.cbSize        = sizeof(WNDCLASSEX);
 	wc.style		 = CS_BYTEALIGNWINDOW | CS_DBLCLKS;
 	wc.lpfnWndProc	 = (WNDPROC)MainWndProc;
 	wc.cbClsExtra	 = 0;
@@ -623,8 +624,9 @@ BOOL InitApplication(HINSTANCE hInstance) {
 	wc.hbrBackground = (HBRUSH)(COLOR_3DFACE + 1);
 	wc.lpszMenuName	 = MAKEINTRESOURCE(IDR_MAINWND);
 	wc.lpszClassName = wchWndClass;
+	wc.hIconSm       = NULL;
 
-	return RegisterClass(&wc);
+	return RegisterClassEx(&wc);
 }
 
 //=============================================================================
