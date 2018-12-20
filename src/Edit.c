@@ -5443,8 +5443,7 @@ static INT_PTR CALLBACK EditLineNumDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, 
 			// Extract line number from the text entered
 			// For example: "5410:" will result in 5410
 			GetDlgItemText(hwnd, IDC_LINENUM, tchLn, COUNTOF(tchLn));
-			swscanf_s(tchLn, L"%d", &iNewLine);
-			fTranslated = (iNewLine != 0);
+			fTranslated = CRTStrToInt(tchLn, &iNewLine);
 
 			if (SendDlgItemMessage(hwnd, IDC_COLNUM, WM_GETTEXTLENGTH, 0, 0) > 0) {
 				iNewCol = GetDlgItemInt(hwnd, IDC_COLNUM, &fTranslated2, FALSE);
