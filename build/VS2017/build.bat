@@ -61,6 +61,10 @@ IF "%~2" == "" (
   IF /I "%~2" == "/x64"  SET "ARCH=x64" & GOTO CHECKTHIRDARG
   IF /I "%~2" == "-x64"  SET "ARCH=x64" & GOTO CHECKTHIRDARG
   IF /I "%~2" == "--x64" SET "ARCH=x64" & GOTO CHECKTHIRDARG
+  IF /I "%~2" == "arm64"   SET "ARCH=arm64" & GOTO CHECKTHIRDARG
+  IF /I "%~2" == "/arm64"  SET "ARCH=arm64" & GOTO CHECKTHIRDARG
+  IF /I "%~2" == "-arm64"  SET "ARCH=arm64" & GOTO CHECKTHIRDARG
+  IF /I "%~2" == "--arm64" SET "ARCH=arm64" & GOTO CHECKTHIRDARG
   IF /I "%~2" == "all"   SET "ARCH=all" & GOTO CHECKTHIRDARG
   IF /I "%~2" == "/all"  SET "ARCH=all" & GOTO CHECKTHIRDARG
   IF /I "%~2" == "-all"  SET "ARCH=all" & GOTO CHECKTHIRDARG
@@ -102,12 +106,19 @@ IF "%~3" == "" (
 CALL :SubVSPath
 IF NOT EXIST "%VS_PATH%" CALL :SUBMSG "ERROR" "Visual Studio 2017 NOT FOUND, please check VS_PATH environment variable!"
 
+IF "%processor_architecture%"=="AMD64" (
+	SET "HOST_ARCH=amd64"
+) else (
+	SET "HOST_ARCH=x86"
+)
+
 IF /I "%ARCH%" == "x64" GOTO x64
 IF /I "%ARCH%" == "x86" GOTO x86
+IF /I "%ARCH%" == "arm64" GOTO arm64
 
 
 :x86
-CALL "%VS_PATH%\Common7\Tools\vsdevcmd" -no_logo -arch=x86
+CALL "%VS_PATH%\Common7\Tools\vsdevcmd" -no_logo -arch=x86 -host_arch=%HOST_ARCH%
 
 IF /I "%CONFIG%" == "all" (CALL :SUBMSVC %BUILDTYPE% Debug Win32 && CALL :SUBMSVC %BUILDTYPE% Release Win32) ELSE (CALL :SUBMSVC %BUILDTYPE% %CONFIG% Win32)
 
@@ -115,9 +126,17 @@ IF /I "%ARCH%" == "x86" GOTO END
 
 
 :x64
-CALL "%VS_PATH%\Common7\Tools\vsdevcmd" -no_logo -arch=amd64
+CALL "%VS_PATH%\Common7\Tools\vsdevcmd" -no_logo -arch=amd64 -host_arch=%HOST_ARCH%
 
 IF /I "%CONFIG%" == "all" (CALL :SUBMSVC %BUILDTYPE% Debug x64 && CALL :SUBMSVC %BUILDTYPE% Release x64) ELSE (CALL :SUBMSVC %BUILDTYPE% %CONFIG% x64)
+
+IF /I "%ARCH%" == "x64" GOTO END
+
+
+:arm64
+CALL "%VS_PATH%\Common7\Tools\vsdevcmd" -no_logo -arch=arm64 -host_arch=%HOST_ARCH%
+
+IF /I "%CONFIG%" == "all" (CALL :SUBMSVC %BUILDTYPE% Debug ARM64 && CALL :SUBMSVC %BUILDTYPE% Release ARM64) ELSE (CALL :SUBMSVC %BUILDTYPE% %CONFIG% ARM64)
 
 
 :END
@@ -128,7 +147,7 @@ EXIT /B
 
 :SubVSPath
 @rem Check the building environment
-FOR /f "delims=" %%A IN ('"%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe" -property installationPath -latest -requires Microsoft.Component.MSBuild Microsoft.VisualStudio.Component.VC.ATLMFC Microsoft.VisualStudio.Component.VC.Tools.x86.x64') DO SET "VS_PATH=%%A"
+FOR /f "delims=" %%A IN ('"%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe" -property installationPath -latest -requires Microsoft.Component.MSBuild Microsoft.VisualStudio.Component.VC.Tools.x86.x64') DO SET "VS_PATH=%%A"
 EXIT /B
 
 
