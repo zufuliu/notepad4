@@ -738,7 +738,11 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	DriveBox_Init(hwndDriveBox);
 	SendMessage(hwndDriveBox, CB_SETEXTENDEDUI, TRUE, 0);
 	// DirList
-	LVCOLUMN lvc = { LVCF_FMT | LVCF_TEXT, LVCFMT_LEFT, 0, NULL, -1, 0, 0, 0 };
+	LVCOLUMN lvc = { LVCF_FMT | LVCF_TEXT, LVCFMT_LEFT, 0, NULL, -1, 0, 0, 0
+#if (NTDDI_VERSION >= NTDDI_VISTA)
+			, 0, 0, 0
+#endif
+	};
 	ListView_SetExtendedListViewStyle(hwndDirList, LVS_EX_DOUBLEBUFFER | LVS_EX_LABELTIP);
 	ListView_InsertColumn(hwndDirList, 0, &lvc);
 	DirList_Init(hwndDirList, NULL);

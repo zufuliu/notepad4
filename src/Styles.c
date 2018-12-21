@@ -3533,7 +3533,11 @@ static INT_PTR CALLBACK Style_SelectLexerDlgProc(HWND hwnd, UINT umsg, WPARAM wP
 
 	switch (umsg) {
 	case WM_INITDIALOG: {
-		LVCOLUMN lvc = { LVCF_FMT | LVCF_TEXT, LVCFMT_LEFT, 0, NULL, -1, 0, 0, 0 };
+		LVCOLUMN lvc = { LVCF_FMT | LVCF_TEXT, LVCFMT_LEFT, 0, NULL, -1, 0, 0, 0
+#if (NTDDI_VERSION >= NTDDI_VISTA)
+			, 0, 0, 0
+#endif
+		};
 		ResizeDlg_Init(hwnd, cxStyleSelectDlg, cyStyleSelectDlg, IDC_RESIZEGRIP3);
 
 		HWND hwndLV = GetDlgItem(hwnd, IDC_STYLELIST);
