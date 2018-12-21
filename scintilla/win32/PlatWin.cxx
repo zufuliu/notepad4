@@ -57,10 +57,14 @@
 #define LOAD_LIBRARY_SEARCH_SYSTEM32 0x00000800
 #endif
 
+#if _WIN32_WINNT < 0x0602 /*_WIN32_WINNT_WIN8 */
 #if NP2_FORCE_COMPILE_C_AS_CPP
 extern DWORD kSystemLibraryLoadFlags;
 #else
 extern "C" DWORD kSystemLibraryLoadFlags;
+#endif
+#else
+#define kSystemLibraryLoadFlags		LOAD_LIBRARY_SEARCH_SYSTEM32
 #endif
 
 namespace Scintilla {

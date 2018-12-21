@@ -315,8 +315,12 @@ struct CachedStatusItem {
 HINSTANCE	g_hInstance;
 HANDLE		g_hDefaultHeap;
 HANDLE		g_hScintilla;
+#if _WIN32_WINNT < _WIN32_WINNT_WIN10
 DWORD		g_uWinVer;
+#endif
+#if _WIN32_WINNT < _WIN32_WINNT_WIN8
 DWORD		kSystemLibraryLoadFlags = 0;
+#endif
 UINT		g_uCurrentDPI = USER_DEFAULT_SCREEN_DPI;
 UINT		g_uDefaultDPI = USER_DEFAULT_SCREEN_DPI;
 static WCHAR g_wchAppUserModelID[38] = L"";
@@ -486,9 +490,11 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 	// Set global variable g_hInstance
 	g_hInstance = hInstance;
 
+#if _WIN32_WINNT < _WIN32_WINNT_WIN10
 	// Set the Windows version global variable
 	g_uWinVer = LOWORD(GetVersion());
 	g_uWinVer = MAKEWORD(HIBYTE(g_uWinVer), LOBYTE(g_uWinVer));
+#endif
 
 	g_hDefaultHeap = GetProcessHeap();
 	// https://docs.microsoft.com/en-us/windows/desktop/Memory/low-fragmentation-heap
@@ -566,8 +572,10 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 
 	msgTaskbarCreated = RegisterWindowMessage(L"TaskbarCreated");
 
+#if _WIN32_WINNT < _WIN32_WINNT_WIN8
 	// see LoadD2D() in PlatWin.cxx
 	kSystemLibraryLoadFlags = (IsWin8AndAbove() || GetProcAddress(GetModuleHandle(L"kernel32.dll"), "SetDefaultDllDirectories")) ? LOAD_LIBRARY_SEARCH_SYSTEM32 : 0;
+#endif
 
 	Scintilla_RegisterClasses(hInstance);
 
