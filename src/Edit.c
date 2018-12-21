@@ -536,7 +536,11 @@ BOOL EditLoadFile(HWND hwnd, LPWSTR pszFile, BOOL bSkipEncodingDetection, EditFi
 		// since since Windows Vista
 		typedef DWORD (WINAPI *GetFinalPathNameByHandleSig)(HANDLE hFile, LPWSTR lpszFilePath, DWORD cchFilePath, DWORD dwFlags);
 		WCHAR path[MAX_PATH] = L"";
+#if _WIN32_WINNT >= _WIN32_WINNT_VISTA
+		GetFinalPathNameByHandleSig pfnGetFinalPathNameByHandle = GetFinalPathNameByHandleW;
+#else
 		GetFinalPathNameByHandleSig pfnGetFinalPathNameByHandle = (GetFinalPathNameByHandleSig)GetProcAddress(GetModuleHandle(L"kernel32.dll"), "GetFinalPathNameByHandleW");
+#endif
 		if (pfnGetFinalPathNameByHandle && pfnGetFinalPathNameByHandle(hFile, path, MAX_PATH, FILE_NAME_OPENED)) {
 			if (StrNEqual(path, L"\\\\?\\", CSTRLEN(L"\\\\?\\"))) {
 				WCHAR *p = path + 4;

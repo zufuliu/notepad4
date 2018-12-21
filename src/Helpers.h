@@ -150,7 +150,9 @@ void DLogf(const char *fmt, ...);
 
 extern HINSTANCE g_hInstance;
 extern HANDLE g_hDefaultHeap;
+#if _WIN32_WINNT < _WIN32_WINNT_WIN10
 extern DWORD g_uWinVer;
+#endif
 extern UINT g_uCurrentDPI;
 extern UINT g_uDefaultDPI;
 extern WCHAR szIniFile[MAX_PATH];
@@ -158,12 +160,31 @@ extern WCHAR szIniFile[MAX_PATH];
 // Operating System Version
 // https://docs.microsoft.com/en-us/windows/desktop/SysInfo/operating-system-version
 
-#define IsVistaAndAbove()	(g_uWinVer >= 0x0600)
-#define IsWin7AndAbove()	(g_uWinVer >= 0x0601)
-#define IsWin8AndAbove()	(g_uWinVer >= 0x0602)
-#define IsWin8p1AndAbove()	(g_uWinVer >= 0x0603)
-#define IsWin10AndAbove()	(g_uWinVer >= 0x0A00)
-
+#if _WIN32_WINNT >= _WIN32_WINNT_VISTA
+#define IsVistaAndAbove()	TRUE
+#else
+#define IsVistaAndAbove()	(g_uWinVer >= _WIN32_WINNT_VISTA)
+#endif
+#if _WIN32_WINNT >= _WIN32_WINNT_WIN7
+#define IsWin7AndAbove()	TRUE
+#else
+#define IsWin7AndAbove()	(g_uWinVer >= _WIN32_WINNT_WIN7)
+#endif
+#if _WIN32_WINNT >= _WIN32_WINNT_WIN8
+#define IsWin8AndAbove()	TRUE
+#else
+#define IsWin8AndAbove()	(g_uWinVer >= _WIN32_WINNT_WIN8)
+#endif
+#if _WIN32_WINNT >= _WIN32_WINNT_WINBLUE
+#define IsWin8p1AndAbove()	TRUE
+#else
+#define IsWin8p1AndAbove()	(g_uWinVer >= _WIN32_WINNT_WINBLUE)
+#endif
+#if _WIN32_WINNT >= _WIN32_WINNT_WIN10
+#define IsWin10AndAbove()	TRUE
+#else
+#define IsWin10AndAbove()	(g_uWinVer >= _WIN32_WINNT_WIN10)
+#endif
 #ifndef LOAD_LIBRARY_SEARCH_SYSTEM32
 #define LOAD_LIBRARY_SEARCH_SYSTEM32 0x00000800
 #endif
