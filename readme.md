@@ -173,6 +173,7 @@
 ## Supported Operating Systems:
 * Windows XP, Vista, 7, 8, 8.1 and 10, both 32-bit and 64-bit
 * Windows Server 2003, 2008, 2012 and 2016, both 32-bit and 64-bit
+* Windows 10 on ARM64
 * Unix-like Operating Systems (Linux, macOS, BSD, etc.) using [Wine](https://www.winehq.org/)
 * [ReactOS](https://www.reactos.org/)
 
