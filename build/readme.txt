@@ -5,9 +5,8 @@ echo | clang -dM -E -
 echo | clang-cl -Xclang -dM -E -
 echo | gcc -dM -E -
 
-/wd4200 /wd4201 /wd4204
+/wd4201 /wd4204
 Disabled warnings:
-	C4200: nonstandard extension used: zero-sized array in struct/union.
 	C4201: nonstandard extension used: nameless struct/union.
 	C4204: nonstandard extension used: non-constant aggregate initializer.
 
