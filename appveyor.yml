@@ -1,0 +1,84 @@
+version: 4.18.12.{build}
+
+image:
+  - Visual Studio 2017
+
+configuration:
+  - Debug
+  - Release
+
+platform:
+  - x64
+  - Win32
+  - ARM64
+
+test: off
+
+deploy: off
+
+matrix:
+  fast_finish: true
+
+for:
+  - # x64 Debug
+    matrix:
+      only:
+        - configuration: Debug
+        - platform: x64
+
+    build_script:
+      - cmd: CALL "build\VS2017\build.bat" Build x64 Debug
+
+  - # Win32 Debug
+    matrix:
+      only:
+        - configuration: Debug
+        - platform: Win32
+
+    build_script:
+      - cmd: CALL "build\VS2017\build.bat" Build x86 Debug
+
+  - # ARM64 Debug
+    matrix:
+      only:
+        - configuration: Debug
+        - platform: ARM64
+
+    build_script:
+      - cmd: CALL "build\VS2017\build.bat" Build arm64 Debug
+
+  - # x64 Release
+    matrix:
+      only:
+        - configuration: Release
+        - platform: x64
+
+    build_script:
+      - cmd: CALL "build\VS2017\build.bat" Build x64 Release
+
+    artifacts:
+      - path: build\bin\Release\x64\*.exe
+
+  - # Win32 Release
+    matrix:
+      only:
+        - configuration: Release
+        - platform: Win32
+
+    build_script:
+      - cmd: CALL "build\VS2017\build.bat" Build x86 Release
+
+    artifacts:
+      - path: build\bin\Release\Win32\*.exe
+
+  - # ARM64 Release
+    matrix:
+      only:
+        - configuration: Release
+        - platform: ARM64
+
+    build_script:
+      - cmd: CALL "build\VS2017\build.bat" Build arm64 Release
+
+    artifacts:
+      - path: build\bin\Release\ARM64\*.exe
