@@ -90,6 +90,14 @@ IF "%~3" == "" (
   IF /I "%~3" == "/Release"  SET "CONFIG=Release" & GOTO START
   IF /I "%~3" == "-Release"  SET "CONFIG=Release" & GOTO START
   IF /I "%~3" == "--Release" SET "CONFIG=Release" & GOTO START
+  IF /I "%~3" == "LLVMDebug"     SET "CONFIG=LLVMDebug"   & GOTO START
+  IF /I "%~3" == "/LLVMDebug"    SET "CONFIG=LLVMDebug"   & GOTO START
+  IF /I "%~3" == "-LLVMDebug"    SET "CONFIG=LLVMDebug"   & GOTO START
+  IF /I "%~3" == "--LLVMDebug"   SET "CONFIG=LLVMDebug"   & GOTO START
+  IF /I "%~3" == "LLVMRelease"   SET "CONFIG=LLVMRelease" & GOTO START
+  IF /I "%~3" == "/LLVMRelease"  SET "CONFIG=LLVMRelease" & GOTO START
+  IF /I "%~3" == "-LLVMRelease"  SET "CONFIG=LLVMRelease" & GOTO START
+  IF /I "%~3" == "--LLVMRelease" SET "CONFIG=LLVMRelease" & GOTO START
   IF /I "%~3" == "all"       SET "CONFIG=all"     & GOTO START
   IF /I "%~3" == "/all"      SET "CONFIG=all"     & GOTO START
   IF /I "%~3" == "-all"      SET "CONFIG=all"     & GOTO START
