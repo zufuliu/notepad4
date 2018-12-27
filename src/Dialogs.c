@@ -169,6 +169,9 @@ void OpenHelpLink(HWND hwnd, int cmd) {
 	case IDM_HELP_LATEST_RELEASE:
 		link = HELP_LINK_LATEST_RELEASE;
 		break;
+	case IDM_HELP_LATEST_BUILD:
+		link = HELP_LINK_LATEST_BUILD;
+		break;
 	case IDM_HELP_REPORT_ISSUE:
 		link = HELP_LINK_REPORT_ISSUE;
 		break;

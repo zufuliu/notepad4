@@ -604,6 +604,7 @@ BEGIN
     BEGIN
         MENUITEM "Project Home",                IDM_HELP_PROJECT_HOME
         MENUITEM "Latest Release",              IDM_HELP_LATEST_RELEASE
+        MENUITEM "Latest Build",                IDM_HELP_LATEST_BUILD
         MENUITEM "Report Issue",                IDM_HELP_REPORT_ISSUE
         MENUITEM "Feature Request",             IDM_HELP_FEATURE_REQUEST
         MENUITEM SEPARATOR
