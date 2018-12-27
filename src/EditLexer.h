@@ -1,7 +1,7 @@
 #ifndef NOTEPAD2_EDITLEXER_H_
 #define NOTEPAD2_EDITLEXER_H_
 
-#include <windows.h>
+#include <stdlib.h>
 #include "Scintilla.h"
 #include "SciLexer.h"
 #include "compiler.h"
@@ -17,6 +17,9 @@
 #define NP2_GET_LEXER_STYLE_NAME_FROM_RES	0
 #define MAX_EDITLEXER_NAME_SIZE		128
 #define MAX_EDITSTYLE_NAME_SIZE		128
+
+typedef wchar_t * LPWSTR;
+typedef const wchar_t * LPCWSTR;
 
 typedef struct _editstyle {
 	const int iStyle;
@@ -49,8 +52,8 @@ typedef struct _editlexer {
 	const int iLexer;
 	const int rid;
 	struct {
-		BOOL bStyleChanged;
-		const UINT iStyleCount;
+		int bStyleChanged;
+		const unsigned int iStyleCount;
 		const int iNameLen;
 		LPCWSTR const pszName;
 		LPWSTR szExtensions;
@@ -63,7 +66,7 @@ typedef struct _editlexer {
 
 typedef const EDITLEXER *LPCEDITLEXER;
 
-#define EDITLEXER_HOLE(name, style)	{ FALSE, COUNTOF(style), CSTRLEN(name), (name), NULL, NULL }
+#define EDITLEXER_HOLE(name, style)	{ 0, COUNTOF(style), CSTRLEN(name), (name), NULL, NULL }
 
 // NP2LEX_, rid for EDITLEXER
 #define NP2LEX_DEFAULT	63000	// SCLEX_NULL		Default Text
