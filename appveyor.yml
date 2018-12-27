@@ -29,10 +29,6 @@ matrix:
       # Clang 8 failed for Release, Clang 7 failed for both
       # configuration: Release
 
-init:
-  - cmd: git clone -q --branch=master https://github.com/zufuliu/llvm-utils.git c:\projects\llvm-utils
-  - cmd: CALL "c:\projects\llvm-utils\VS2017\install.bat" 1
-
 before_build:
   - cmd: CALL update_rev.bat
 
@@ -55,6 +51,7 @@ for:
           compiler: Clang
 
     build_script:
+      - cmd: CALL "build\install_llvm.bat" 1
       - cmd: CALL "build\VS2017\build.bat" Build x64 LLVMDebug 1
 
   - # MSVC Win32 Debug
@@ -75,6 +72,7 @@ for:
           compiler: Clang
 
     build_script:
+      - cmd: CALL "build\install_llvm.bat" 1
       - cmd: CALL "build\VS2017\build.bat" Build Win32 LLVMDebug 1
 
   - # MSVC ARM64 Debug
@@ -110,6 +108,7 @@ for:
           compiler: Clang
 
     build_script:
+      - cmd: CALL "build\install_llvm.bat" 1
       - cmd: CALL "build\VS2017\build.bat" Build x64 LLVMRelease 1
       - cmd: CALL "build\make_zip.bat" Clang x64 Release 1
 
@@ -140,6 +139,7 @@ for:
           compiler: Clang
 
     build_script:
+      - cmd: CALL "build\install_llvm.bat" 1
       - cmd: CALL "build\VS2017\build.bat" Build Win32 LLVMRelease 1
       - cmd: CALL "build\make_zip.bat" Clang Win32 Release 1
 
