@@ -3,11 +3,9 @@
 > *Notepad2* is a modified version (fork) of [Notepad2-mod](https://xhmikosr.github.io/notepad2-mod/). *metapath* is a bug-fixed version of original [metapath](http://www.flos-freeware.ch/archive.html).
 
 ## Binaries
-[![Build status](https://ci.appveyor.com/api/projects/status/blja8glxtm8b9bvp?svg=true)](https://ci.appveyor.com/project/zufuliu/notepad2)
+Latest release: [![Latest release](https://img.shields.io/github/release/zufuliu/notepad2.svg)](https://github.com/zufuliu/notepad2/releases).
 
-[Download latest release](https://github.com/zufuliu/notepad2/releases).
-
-[Download latest build](https://ci.appveyor.com/project/zufuliu/notepad2) (Find Artifacts in Release Configuration for each Platform).
+Latest build: [![Build status](https://img.shields.io/appveyor/ci/zufuliu/notepad2/master.svg)](https://ci.appveyor.com/project/zufuliu/notepad2) (Find artifacts in Release configuration for each platform).
 
 Or build from source, see the [Wiki](https://github.com/zufuliu/notepad2/wiki/Build-Notepad2).
 
