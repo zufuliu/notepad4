@@ -2,6 +2,8 @@
 bin
 build/VS*/.vs
 build/bin
+build/temp*
+build/*.zip
 build/CodeLite/*.mk
 build/CodeLite/*.txt
 build/CodeLite/Makefile
