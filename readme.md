@@ -7,7 +7,7 @@
 
 [Download latest release](https://github.com/zufuliu/notepad2/releases).
 
-[Download latest build](https://ci.appveyor.com/project/zufuliu/notepad2) (Find Artifacts in Release Configuration).
+[Download latest build](https://ci.appveyor.com/project/zufuliu/notepad2) (Find Artifacts in Release Configuration for each Platform).
 
 Or build from source, see the [Wiki](https://github.com/zufuliu/notepad2/wiki/Build-Notepad2).
 
