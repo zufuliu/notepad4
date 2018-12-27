@@ -7,13 +7,7 @@
 
 [Download latest release](https://github.com/zufuliu/notepad2/releases).
 
-Download latest build:
-
-| Platform | Visual Studio 2017 | GCC 8 | Clang 8 |
-| --- | --- | --- | --- |
-| x64 |[MSVC x64](https://ci.appveyor.com/project/zufuliu/notepad2/build/job/6vb7lyrb8cymvbe5/artifacts) |
-| Win32 |[MSVC Win32](https://ci.appveyor.com/project/zufuliu/notepad2/build/job/du9b76du5cict544/artifacts) |
-| ARM64 | [MSVC ARM64](https://ci.appveyor.com/project/zufuliu/notepad2/build/job/oivntyy651w492t3/artifacts) | N/A | N/A |
+[Download latest build](https://ci.appveyor.com/project/zufuliu/notepad2) (Find Artifacts in Release Configuration).
 
 Or build from source, see the [Wiki](https://github.com/zufuliu/notepad2/wiki/Build-Notepad2).
 
