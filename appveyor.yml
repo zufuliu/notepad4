@@ -23,23 +23,71 @@ before_build:
   - cmd: CALL update_rev.bat
 
 for:
-  - # MSVC Debug
+  - # x64 Debug
     matrix:
       only:
         - configuration: Debug
+          platform: x64
 
     build_script:
-      - cmd: CALL "build\VS2017\build.bat" Build %PLATFORM% Debug
+      - cmd: CALL "build\VS2017\build.bat" Build x64 Debug
 
-  - # MSVC Release
+  - # Win32 Debug
+    matrix:
+      only:
+        - configuration: Debug
+          platform: Win32
+
+    build_script:
+      - cmd: CALL "build\VS2017\build.bat" Build Win32 Debug
+
+  - # ARM64 Debug
+    matrix:
+      only:
+        - configuration: Debug
+          platform: ARM64
+
+    build_script:
+      - cmd: CALL "build\VS2017\build.bat" Build ARM64 Debug
+
+  - # x64 Release
     matrix:
       only:
         - configuration: Release
+          platform: x64
 
     build_script:
-      - cmd: CALL "build\VS2017\build.bat" Build %PLATFORM% Release
-      - cmd: CALL "build\make_zip.bat" MSVC %PLATFORM% Release
+      - cmd: CALL "build\VS2017\build.bat" Build x64 Release
+      - cmd: CALL "build\make_zip.bat" MSVC x64 Release
 
     artifacts:
-      - path: 'build\Notepad2*.zip'
-        name: Notepad2
+      - path: 'build\Notepad2_x64*.zip'
+        name: Notepad2_x64
+
+  - # Win32 Release
+    matrix:
+      only:
+        - configuration: Release
+          platform: Win32
+
+    build_script:
+      - cmd: CALL "build\VS2017\build.bat" Build Win32 Release
+      - cmd: CALL "build\make_zip.bat" MSVC Win32 Release
+
+    artifacts:
+      - path: 'build\Notepad2_Win32*.zip'
+        name: Notepad2_Win32
+
+  - # ARM64 Release
+    matrix:
+      only:
+        - configuration: Release
+          platform: ARM64
+
+    build_script:
+      - cmd: CALL "build\VS2017\build.bat" Build ARM64 Release
+      - cmd: CALL "build\make_zip.bat" MSVC ARM64 Release
+
+    artifacts:
+      - path: 'build\Notepad2_ARM64*.zip'
+        name: Notepad2_ARM64
