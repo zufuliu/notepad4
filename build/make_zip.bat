@@ -241,8 +241,8 @@ ECHO. & ECHO ______________________________
 ECHO [%~1] %~2
 ECHO ______________________________ & ECHO.
 IF /I "%~1" == "ERROR" (
-  PAUSE
-  EXIT
+  IF "%~4" == "" PAUSE
+  EXIT /B
 ) ELSE (
   EXIT /B
 )

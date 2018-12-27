@@ -27,6 +27,6 @@ ECHO.
 ECHO SET "MSYS=C:\MSYS64"
 ECHO. & ECHO.
 ECHO Press any key to exit...
-PAUSE >NUL
+IF "%~4" == "" PAUSE
 ENDLOCAL
 EXIT /B
