@@ -1,4 +1,4 @@
-version: 4.18.12.{build}
+version: '4.19.x.{build}'
 
 image:
   - Visual Studio 2017
@@ -19,12 +19,15 @@ deploy: off
 matrix:
   fast_finish: true
 
+before_build:
+  - cmd: CALL update_rev.bat
+
 for:
   - # x64 Debug
     matrix:
       only:
         - configuration: Debug
-        - platform: x64
+          platform: x64
 
     build_script:
       - cmd: CALL "build\VS2017\build.bat" Build x64 Debug
@@ -33,7 +36,7 @@ for:
     matrix:
       only:
         - configuration: Debug
-        - platform: Win32
+          platform: Win32
 
     build_script:
       - cmd: CALL "build\VS2017\build.bat" Build x86 Debug
@@ -42,7 +45,7 @@ for:
     matrix:
       only:
         - configuration: Debug
-        - platform: ARM64
+          platform: ARM64
 
     build_script:
       - cmd: CALL "build\VS2017\build.bat" Build arm64 Debug
@@ -51,34 +54,40 @@ for:
     matrix:
       only:
         - configuration: Release
-        - platform: x64
+          platform: x64
 
     build_script:
       - cmd: CALL "build\VS2017\build.bat" Build x64 Release
+      - cmd: CALL "build\make_zip.bat" MSVC x64 Release
 
     artifacts:
-      - path: build\bin\Release\x64\*.exe
+      - path: 'build\Notepad2_x64*.zip'
+        name: Notepad2_x64
 
   - # Win32 Release
     matrix:
       only:
         - configuration: Release
-        - platform: Win32
+          platform: Win32
 
     build_script:
       - cmd: CALL "build\VS2017\build.bat" Build x86 Release
+      - cmd: CALL "build\make_zip.bat" MSVC x86 Release
 
     artifacts:
-      - path: build\bin\Release\Win32\*.exe
+      - path: 'build\Notepad2_Win32*.zip'
+        name: Notepad2_Win32
 
   - # ARM64 Release
     matrix:
       only:
         - configuration: Release
-        - platform: ARM64
+          platform: ARM64
 
     build_script:
       - cmd: CALL "build\VS2017\build.bat" Build arm64 Release
+      - cmd: CALL "build\make_zip.bat" MSVC arm64 Release
 
     artifacts:
-      - path: build\bin\Release\ARM64\*.exe
+      - path: 'build\Notepad2_ARM64*.zip'
+        name: Notepad2_ARM64
