@@ -60,10 +60,6 @@ for:
       - cmd: CALL "build\VS2017\build.bat" Build x64 Release
       - cmd: CALL "build\make_zip.bat" MSVC x64 Release
 
-    artifacts:
-      - path: 'build\Notepad2_x64*.zip'
-        name: Notepad2_x64
-
   - # Win32 Release
     matrix:
       only:
@@ -73,10 +69,6 @@ for:
     build_script:
       - cmd: CALL "build\VS2017\build.bat" Build x86 Release
       - cmd: CALL "build\make_zip.bat" MSVC x86 Release
-
-    artifacts:
-      - path: 'build\Notepad2_Win32*.zip'
-        name: Notepad2_Win32
 
   - # ARM64 Release
     matrix:
@@ -88,6 +80,12 @@ for:
       - cmd: CALL "build\VS2017\build.bat" Build arm64 Release
       - cmd: CALL "build\make_zip.bat" MSVC arm64 Release
 
-    artifacts:
-      - path: 'build\Notepad2_ARM64*.zip'
-        name: Notepad2_ARM64
+artifacts:
+  - path: 'build\Notepad2_x64*.zip'
+    name: Notepad2_x64
+
+  - path: 'build\Notepad2_Win32*.zip'
+    name: Notepad2_Win32
+
+  - path: 'build\Notepad2_ARM64*.zip'
+    name: Notepad2_ARM64
