@@ -1,6 +1,8 @@
 @ECHO OFF
 SETLOCAL
 
+SET "EXIST_ON_ERROR=%~1"
+
 PUSHD %~dp0
 
 IF EXIST "build.user.bat" (CALL "build.user.bat")
@@ -27,6 +29,6 @@ ECHO.
 ECHO SET "MSYS=C:\MSYS64"
 ECHO. & ECHO.
 ECHO Press any key to exit...
-IF "%~4" == "" PAUSE
+IF "%EXIST_ON_ERROR%" == "" PAUSE
 ENDLOCAL
 EXIT /B

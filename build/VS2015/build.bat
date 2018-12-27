@@ -16,6 +16,8 @@
 SETLOCAL ENABLEEXTENSIONS
 CD /D %~dp0
 
+SET "EXIST_ON_ERROR=%~4"
+
 @rem Check the building environment
 IF NOT DEFINED VS140COMNTOOLS CALL :SUBMSG "ERROR" "Visual Studio 2015 wasn't found!"
 
@@ -162,7 +164,7 @@ ECHO. & ECHO ______________________________
 ECHO [%~1] %~2
 ECHO ______________________________ & ECHO.
 IF /I "%~1" == "ERROR" (
-  IF "%~4" == "" PAUSE
+  IF "%EXIST_ON_ERROR%" == "" PAUSE
   EXIT /B
 ) ELSE (
   EXIT /B
