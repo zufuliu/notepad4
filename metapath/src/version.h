@@ -42,7 +42,7 @@
 #define VERSION_NEWPAGE_DISPLAY		L"https://github.com/zufuliu/notepad2"
 
 #if defined(__clang__)
-#define VERSION_BUILD_TOOL			L"Clang " __clang_version__
+#define VERSION_BUILD_TOOL			L"Clang " STRINGIFY(__clang_major__) L"." STRINGIFY(__clang_minor__) L"." STRINGIFY(__clang_patchlevel__)
 #elif defined(__GNUC__)
 #define VERSION_BUILD_TOOL			L"GCC " STRINGIFY(__GNUC__) L"." STRINGIFY(__GNUC_MINOR__) L"." STRINGIFY(__GNUC_PATCHLEVEL__)
 #elif defined(_MSC_VER)
