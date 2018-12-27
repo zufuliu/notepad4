@@ -2,6 +2,23 @@
 
 > *Notepad2* is a modified version (fork) of [Notepad2-mod](https://xhmikosr.github.io/notepad2-mod/). *metapath* is a bug-fixed version of original [metapath](http://www.flos-freeware.ch/archive.html).
 
+## Binaries
+[![Build status](https://ci.appveyor.com/api/projects/status/blja8glxtm8b9bvp?svg=true)](https://ci.appveyor.com/project/zufuliu/notepad2)
+
+[Download latest release](https://github.com/zufuliu/notepad2/releases).
+
+Download latest build:
+
+| Platform | Visual Studio 2017 | GCC 8 | Clang 8 |
+| --- | --- | --- | --- |
+| x64 |[MSVC x64](https://ci.appveyor.com/project/zufuliu/notepad2/build/job/6vb7lyrb8cymvbe5/artifacts) |
+| Win32 |[MSVC Win32](https://ci.appveyor.com/project/zufuliu/notepad2/build/job/du9b76du5cict544/artifacts) |
+| ARM64 | [MSVC ARM64](https://ci.appveyor.com/project/zufuliu/notepad2/build/job/oivntyy651w492t3/artifacts) | N/A | N/A |
+
+Or build from source, see the [Wiki](https://github.com/zufuliu/notepad2/wiki/Build-Notepad2).
+
+## [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots)
+
 ## Changes compared to the official [Notepad2](http://www.flos-freeware.ch/notepad2.html) or [Notepad2-mod](https://xhmikosr.github.io/notepad2-mod/):
 
 * Code folding
@@ -176,10 +193,6 @@
 * Windows 10 on ARM64
 * Unix-like Operating Systems (Linux, macOS, BSD, etc.) using [Wine](https://www.winehq.org/)
 * [ReactOS](https://www.reactos.org/)
-
-## [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots)
-
-## [Download](https://github.com/zufuliu/notepad2/releases)
 
 ## Notes:
 * The default *Win32* build require [SSE2](https://en.wikipedia.org/wiki/SSE2) (Pentium 4), which can be turned off if you [build Notepad2 and metapath](https://github.com/zufuliu/notepad2/wiki/Build-Notepad2) yourself.
