@@ -26,7 +26,8 @@
 #define DO_STRINGIFY(x)		TEXT(#x)
 #define STRINGIFY(x)		DO_STRINGIFY(x)
 
-#define VERSION_MAJOR		4
+//! indent with space to ensure make_zip.bat works
+#define VERSION_MAJOR 4
 
 #define MY_APPNAME					L"metapath"
 #define VERSION_FILEVERSION_NUM		VERSION_MAJOR,VERSION_MINOR,VERSION_BUILD,VERSION_REV

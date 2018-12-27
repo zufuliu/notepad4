@@ -171,7 +171,7 @@ EXIT /B
 :SHOWHELP
 TITLE %~nx0 %1
 ECHO. & ECHO.
-ECHO Usage: %~nx0 [Clean^|Build^|Rebuild] [x86^|x64^|all] [Debug^|Release^|all]
+ECHO Usage: %~nx0 [Clean^|Build^|Rebuild] [x86^|x64^|arm64^|all] [Debug^|Release^|LLVMDebug^|LLVMRelease^|all]
 ECHO.
 ECHO Notes: You can also prefix the commands with "-", "--" or "/".
 ECHO        The arguments are not case sensitive.
