@@ -1,5 +1,6 @@
 @ECHO OFF
 @rem used on AppVeyor
 
-git clone -q --depth=1 --branch=master https://github.com/zufuliu/llvm-utils.git c:\projects\llvm-utils
-CALL "c:\projects\llvm-utils\VS2017\install.bat" %1
+curl -Ls -o "llvm-utils-master.zip" "https://github.com/zufuliu/llvm-utils/archive/master.zip"
+7z x -y "llvm-utils-master.zip" >NUL
+CALL "llvm-utils-master\VS2017\install.bat" %1
