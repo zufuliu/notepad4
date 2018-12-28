@@ -1431,7 +1431,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 						styler.ColourTo(i + 1, SCE_H_TAGUNKNOWN);
 					} else {
 						styler.ColourTo(i - 1, StateToPrint);
-						styler.ColourTo(i + 1, SCE_H_TAGEND);
+						styler.ColourTo(i + 1, SCE_H_TAG); // SCE_H_TAGEND
 					}
 					i++;
 					ch = chNext;
