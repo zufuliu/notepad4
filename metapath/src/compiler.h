@@ -23,19 +23,6 @@
 #define CSTRLEN(s)	(_countof(s) - 1)
 #endif
 
-/*
-#if defined(__GNUC__) || defined(__clang__)
-#define GCC_NO_WARNING_MISSING_BRACES_BEGIN \
-	_Pragma("GCC diagnostic push")			\
-	_Pragma("GCC diagnostic ignored \"-Wmissing-braces\"")
-#define GCC_NO_WARNING_MISSING_BRACES_END	\
-	_Pragma("GCC diagnostic pop")
-#else
-#define GCC_NO_WARNING_MISSING_BRACES_BEGIN
-#define GCC_NO_WARNING_MISSING_BRACES_END
-#endif
-*/
-
 #if defined(__GNUC__) && !defined(__cplusplus)
 #if defined(__NO_INLINE__)
 #define NP2_inline	static inline

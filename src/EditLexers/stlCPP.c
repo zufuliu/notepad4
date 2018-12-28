@@ -18,7 +18,7 @@ static KEYWORDLIST Keywords_CPP = {{
 "and and_eq bitand bitor compl not not_eq or or_eq xor xor_eq "
 "concept "
 // MSVC
-"__alignof __asm __assume __based __cdecl __declspec __event __except __fastcall __finally __forceinline __identifier __inline __interface __leave __raise __stdcall __clrcall __super __thiscall __try __unaligned __uuidof __hook __unhook __noop __vectorcall "
+"__alignof __asm __assume __based __cdecl __declspec __event __except __fastcall __finally __forceinline __identifier __inline __interface __leave __raise __stdcall __clrcall __super __thiscall __try __unaligned __uuidof __hook __unhook __noop __vectorcall __pragma "
 // GCC
 "typeof __typeof__ __alignof__ __label__ __asm__ __thread __attribute__ __volatile__ __restrict__ __restrict __inline__ __extension__ "
 "__nonnull __nullable __covariant __kindof nullable nonnull "
@@ -432,7 +432,7 @@ static KEYWORDLIST Keywords_CPP = {{
 "static_cast<> const_cast<> dynamic_cast<> reinterpret_cast<> "
 "_Alignas() _Alignof() _Generic() _Static_assert() "
 "__attribute__() __typeof__() __alignof__() "
-"__except^() __alignof() __declspec() __uuidof() "
+"__except^() __alignof() __declspec() __uuidof() __pragma() "
 }};
 
 static EDITSTYLE Styles_CPP[] = {

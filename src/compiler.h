@@ -23,18 +23,21 @@
 #define CSTRLEN(s)	(_countof(s) - 1)
 #endif
 
-/*
+// https://docs.microsoft.com/en-us/cpp/preprocessor/pragma-directives-and-the-pragma-keyword
 #if defined(__GNUC__) || defined(__clang__)
-#define GCC_NO_WARNING_MISSING_BRACES_BEGIN \
-	_Pragma("GCC diagnostic push")			\
-	_Pragma("GCC diagnostic ignored \"-Wmissing-braces\"")
-#define GCC_NO_WARNING_MISSING_BRACES_END	\
-	_Pragma("GCC diagnostic pop")
+#define NP2_COMPILER_WARNING_PUSH	_Pragma("GCC diagnostic push")
+#define NP2_COMPILER_WARNING_POP	_Pragma("GCC diagnostic pop")
 #else
-#define GCC_NO_WARNING_MISSING_BRACES_BEGIN
-#define GCC_NO_WARNING_MISSING_BRACES_END
+#define NP2_COMPILER_WARNING_PUSH	__pragma(warning(push))
+#define NP2_COMPILER_WARNING_POP	__pragma(warning(pop))
 #endif
-*/
+
+// C4996：was declared deprecated
+#if defined(__GNUC__) || defined(__clang__)
+#define NP2_IGNORE_WARNING_DEPRECATED_DECLARATIONS	_Pragma("GCC diagnostic ignored \"-Wdeprecated-declarations\"")
+#else
+#define NP2_IGNORE_WARNING_DEPRECATED_DECLARATIONS	__pragma(warning(suppress: 4996))
+#endif
 
 #if defined(__GNUC__) && !defined(__cplusplus)
 #if defined(__NO_INLINE__) // O0

@@ -492,7 +492,10 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 
 #if _WIN32_WINNT < _WIN32_WINNT_WIN10
 	// Set the Windows version global variable
+	NP2_COMPILER_WARNING_PUSH
+	NP2_IGNORE_WARNING_DEPRECATED_DECLARATIONS
 	g_uWinVer = LOWORD(GetVersion());
+	NP2_COMPILER_WARNING_POP
 	g_uWinVer = MAKEWORD(HIBYTE(g_uWinVer), LOBYTE(g_uWinVer));
 #endif
 
