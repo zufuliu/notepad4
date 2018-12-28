@@ -17,6 +17,8 @@ environment:
     - compiler: MSVC
     - compiler: Clang
 
+shallow_clone: true
+
 test: off
 
 deploy: off
@@ -26,7 +28,7 @@ matrix:
   exclude:
     - platform: ARM64
       compiler: Clang
-      # Clang 8 failed for Release, Clang 7 failed for both
+      # Clang 8 crashed for Release build, Clang 7 crashed for both
       # configuration: Release
 
 before_build:
