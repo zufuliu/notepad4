@@ -36,7 +36,7 @@
 #if defined(__GNUC__) || defined(__clang__)
 #define NP2_IGNORE_WARNING_DEPRECATED_DECLARATIONS	_Pragma("GCC diagnostic ignored \"-Wdeprecated-declarations\"")
 #else
-#define NP2_IGNORE_WARNING_DEPRECATED_DECLARATIONS	__pragma(warning(suppress: 4996))
+#define NP2_IGNORE_WARNING_DEPRECATED_DECLARATIONS	__pragma(warning(disable: 4996))
 #endif
 
 #if defined(__GNUC__) && !defined(__cplusplus)
