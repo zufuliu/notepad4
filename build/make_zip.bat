@@ -16,7 +16,7 @@
 SETLOCAL ENABLEEXTENSIONS
 CD /D %~dp0
 
-SET "EXIST_ON_ERROR=%~4"
+SET "EXIT_ON_ERROR=%~4"
 
 @rem Check for the help switches
 IF /I "%~1" == "help"   GOTO SHOWHELP
@@ -242,7 +242,7 @@ ECHO. & ECHO ______________________________
 ECHO [%~1] %~2
 ECHO ______________________________ & ECHO.
 IF /I "%~1" == "ERROR" (
-  IF "%EXIST_ON_ERROR%" == "" PAUSE
+  IF "%EXIT_ON_ERROR%" == "" PAUSE
   EXIT /B
 ) ELSE (
   EXIT /B
