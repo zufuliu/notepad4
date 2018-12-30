@@ -1,6 +1,6 @@
 @ECHO OFF
 @rem used on AppVeyor
 
-curl -Ls -o "llvm-utils-master.zip" "https://github.com/zufuliu/llvm-utils/archive/master.zip"
-7z x -y "llvm-utils-master.zip" >NUL
-CALL "llvm-utils-master\VS2017\install.bat" %1
+curl -Ls -o "LLVM_VS2017.zip" "https://github.com/zufuliu/llvm-utils/releases/download/v18.12/LLVM_VS2017.zip"
+7z x -y "LLVM_VS2017.zip" >NUL
+CALL "LLVM_VS2017\install.bat" %1
