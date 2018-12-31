@@ -117,6 +117,9 @@ IF "%~3" == "" (
 
 
 :START
+SET NEED_ARM64=0
+IF /I "%ARCH%" == "all" SET NEED_ARM64=1
+IF /I "%ARCH%" == "arm64" SET NEED_ARM64=1
 CALL :SubVSPath
 IF NOT EXIST "%VS_PATH%" CALL :SUBMSG "ERROR" "Visual Studio 2017 NOT FOUND, please check VS_PATH environment variable!"
 
@@ -161,7 +164,10 @@ EXIT /B
 
 :SubVSPath
 @rem Check the building environment
-FOR /f "delims=" %%A IN ('"%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe" -property installationPath -latest -requires Microsoft.Component.MSBuild Microsoft.VisualStudio.Component.VC.Tools.x86.x64') DO SET "VS_PATH=%%A"
+SET VSWHERE=%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe
+SET "VS_COMPONENT=Microsoft.Component.MSBuild Microsoft.VisualStudio.Component.VC.Tools.x86.x64"
+IF "%NEED_ARM64%" == "1" SET "VS_COMPONENT=%VS_COMPONENT% Microsoft.VisualStudio.Component.VC.Tools.ARM64"
+FOR /f "delims=" %%A IN ('"%VSWHERE%" -property installationPath -prerelease -version ^[15.0^,17.0^) -requires %VS_COMPONENT%') DO SET "VS_PATH=%%A"
 EXIT /B
 
 
