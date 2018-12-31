@@ -690,8 +690,50 @@ end:
 	NP2HeapFree(pWList);
 }
 
+static BOOL CanAutoCloseSingleQuote(int chPrev, int iCurrentStyle) {
+	const int iLexer = pLexCurrent->iLexer;
+	if (chPrev == '\\'		// character
+		|| chPrev > 0x7F	// someone's
+		|| (iLexer == SCLEX_CPP && iCurrentStyle == SCE_C_NUMBER)
+		|| (iLexer == SCLEX_LISP && iCurrentStyle == SCE_C_OPERATOR)
+		|| (iLexer == SCLEX_MATLAB && iCurrentStyle == SCE_MAT_OPERATOR) // transpose operator
+		|| (iLexer == SCLEX_PERL && iCurrentStyle == SCE_PL_OPERATOR && chPrev == '&') // SCE_PL_IDENTIFIER
+		|| ((iLexer == SCLEX_VB || iLexer == SCLEX_VBSCRIPT) && (iCurrentStyle == SCE_B_DEFAULT))
+		|| (iLexer == SCLEX_VERILOG && (iCurrentStyle == SCE_V_NUMBER || iCurrentStyle == SCE_V_DEFAULT))
+		|| (iLexer == SCLEX_TEXINFO && iCurrentStyle == SCE_L_DEFAULT && chPrev == '@') // SCE_L_SPECIAL
+	) {
+		return FALSE;
+	}
+
+	// someone's
+	if (isalnum(chPrev)) {
+		// character prefix
+		if (pLexCurrent->rid == NP2LEX_CPP || pLexCurrent->rid == NP2LEX_RC || iLexer == SCLEX_PYTHON || iLexer == SCLEX_SQL) {
+			const int lower = chPrev | 0x20;
+			const int chPrev2 = SciCall_GetCharAt(SciCall_GetCurrentPos() - 3);
+			const BOOL bSubWord = chPrev2 > 0x7F || isalnum(chPrev2);
+
+			switch (iLexer) {
+			case SCLEX_CPP:
+				return (lower == 'u' || chPrev == 'L') && !bSubWord;
+
+			case SCLEX_PYTHON: {
+				const int lower2 = chPrev2 | 0x20;
+				return (lower == 'r' || lower == 'u' || lower == 'b' || lower == 'f') && (!bSubWord || (lower != lower2 && (lower2 == 'r' || lower2 == 'u' || lower2 == 'b' || lower2 == 'f')));
+			}
+
+			case SCLEX_SQL:
+				return (lower == 'q' || lower == 'x' || lower == 'b') && !bSubWord;
+			}
+		}
+		return FALSE;
+	}
+
+	return TRUE;
+}
+
 void EditAutoCloseBraceQuote(HWND hwnd, int ch) {
-	Sci_Position iCurPos = SciCall_GetCurrentPos();
+	const Sci_Position iCurPos = SciCall_GetCurrentPos();
 	const int chPrev = SciCall_GetCharAt(iCurPos - 2);
 	const int chNext = SciCall_GetCharAt(iCurPos);
 	const int iCurrentStyle = SciCall_GetStyleAt(iCurPos - 2);
@@ -739,14 +781,7 @@ void EditAutoCloseBraceQuote(HWND hwnd, int ch) {
 		}
 		break;
 	case '\'':
-		if ((mask & AutoInsertSingleQuote) && chPrev != '\\' && !(pLexCurrent->iLexer == SCLEX_NULL	// someone's
-								|| pLexCurrent->iLexer == SCLEX_HTML || pLexCurrent->iLexer == SCLEX_XML
-								|| pLexCurrent->iLexer == SCLEX_VB			// line comment
-								|| pLexCurrent->iLexer == SCLEX_VBSCRIPT	// line comment
-								|| pLexCurrent->iLexer == SCLEX_VERILOG		// inside number
-								|| pLexCurrent->iLexer == SCLEX_LISP 		// operator
-								|| (pLexCurrent->iLexer == SCLEX_CPP && iCurrentStyle == SCE_C_NUMBER)
-							   )) {
+		if ((mask & AutoInsertSingleQuote) && CanAutoCloseSingleQuote(chPrev, iCurrentStyle)) {
 			tchIns[0] = '\'';
 		}
 		break;
@@ -775,10 +810,8 @@ void EditAutoCloseBraceQuote(HWND hwnd, int ch) {
 	if (tchIns[0]) {
 		SendMessage(hwnd, SCI_BEGINUNDOACTION, 0, 0);
 		SendMessage(hwnd, SCI_REPLACESEL, 0, (LPARAM)tchIns);
-		if (ch == ',') {
-			iCurPos++;
-		}
-		SendMessage(hwnd, SCI_SETSEL, iCurPos, iCurPos);
+		const Sci_Position iCurrentPos = (ch == ',') ? iCurPos + 1 : iCurPos;
+		SendMessage(hwnd, SCI_SETSEL, iCurrentPos, iCurrentPos);
 		SendMessage(hwnd, SCI_ENDUNDOACTION, 0, 0);
 	}
 }
