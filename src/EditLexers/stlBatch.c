@@ -10,6 +10,7 @@ static KEYWORDLIST Keywords_Batch = {{
 "and or equ neq lss leq gtr geq "
 //"change com con country ctty forfiles icacls kill loadhigh lpt msiexe robocopy sclist timeout "
 "mklink "
+"find findstr "
 
 , // 1 system cmd
 NULL
@@ -17,7 +18,7 @@ NULL
 "chcp diskcomp diskcopy format graftabl help loadfix mode more tree "
 */
 /* // exe
-"at arp attrib bootcfg cacls chkdsk chkntfs cipher cleanmgr cmd comp compact convert defrag diskpart doskey driverquery expand fc find findstr fsutil ftp gpresult gpupdate ipconfig label logman logoff mem msg nbtstat net netstat netsh nslookup openfiles pathping perfmon powercfg print recover reg regedit regsvr32 replace route runas rundll32 sc schtasks sfc shutdown sort subst systeminfo taskkill tasklist tracert typeperf wmic xcopy "
+"at arp attrib bootcfg cacls chkdsk chkntfs cipher cleanmgr cmd comp compact convert defrag diskpart doskey driverquery expand fc fsutil ftp gpresult gpupdate ipconfig label logman logoff mem msg nbtstat net netstat netsh nslookup openfiles pathping perfmon powercfg print recover reg regedit regsvr32 replace route runas rundll32 sc schtasks sfc shutdown sort subst systeminfo taskkill tasklist tracert typeperf wmic xcopy "
 */
 /* // unknown
 "bcdedit choice cmdkey "
@@ -34,6 +35,7 @@ NULL
 "AND OR EQU NEQ LSS LEQ GTR GEQ "
 //"CHANGE COM CON COUNTRY CTTY FORFILES ICACLS KILL LOADHIGH LPT MSIEXE ROBOCOPY SCLIST TIMEOUT "
 "MKLINK "
+"FIND FINDSTR "
 
 , NULL , NULL
 
