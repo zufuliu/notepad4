@@ -226,7 +226,7 @@ EXIT /B
 :SHOWHELP
 TITLE %~nx0 %1
 ECHO. & ECHO.
-ECHO Usage:  %~nx0 [MSVC|GCC|Clang|LLVM] [Release^|Debug^] [Win32^|x64^|ARM64^|all]
+ECHO Usage:  %~nx0 [MSVC^|GCC^|Clang^|LLVM] [Release^|Debug] [Win32^|x64^|ARM64^|all]
 ECHO.
 ECHO Notes:  You can also prefix the commands with "-", "--" or "/".
 ECHO         The arguments are not case sensitive.
