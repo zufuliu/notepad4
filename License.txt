@@ -3,8 +3,8 @@ License for metapath, Notepad2 and Notepad2-mod
 http://www.flos-freeware.ch
 https://xhmikosr.github.io/notepad2-mod/
 
-metapath Copyright © 1996-2018 Florian Balmer et al.
-Notepad2 Copyright © 2004-2018 Florian Balmer et al.
+metapath Copyright © 1996-2019 Florian Balmer et al.
+Notepad2 Copyright © 2004-2019 Florian Balmer et al.
 Notepad2-mod Copyright © 2010-2017 All contributors.
 All rights reserved.
 
@@ -42,7 +42,7 @@ License for Scintilla and SciTE
 
 https://www.scintilla.org/
 
-Copyright 1998-2018 by Neil Hodgson <neilh@scintilla.org>
+Copyright 1998-2019 by Neil Hodgson <neilh@scintilla.org>
 
 All Rights Reserved
 
@@ -104,5 +104,5 @@ License for "Andersson trees"
 
 http://www.eternallyconfuzzled.com/tuts/datastructures/jsw_tut_andersson.aspx
 
-Copyright 2018 Eternally Confuzzled
+Copyright 2019 Eternally Confuzzled
 
