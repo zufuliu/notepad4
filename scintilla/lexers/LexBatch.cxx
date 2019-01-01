@@ -42,18 +42,8 @@ bool GetBatEscapeLen(int state, int& length, int ch, int chNext, int chNext2) no
 	if (ch == '^') {
 		if (chNext == '^') {
 			length = (chNext2 == '!') ? 2 : 1;
-		} else if (chNext == '&' || chNext == '|' || chNext == '<' || chNext == '>') {
+		} else if (chNext < 0x7F && ispunct(chNext)) {
 			length = 1;
-		}
-		// FOR /F "subject"
-		else if (chNext == ',' || chNext == ';' || chNext == '=' || chNext == '(' || chNext == ')') {
-			length = 1;
-		} else if (state == SCE_BAT_STRINGDQ || state == SCE_BAT_STRINGSQ || state == SCE_BAT_STRINGBT) {
-			if (chNext == '\'' && state != SCE_BAT_STRINGBT) {
-				length = 1;
-			} else if (chNext == '`' && state == SCE_BAT_STRINGBT) {
-				length = 1;
-			}
 		}
 	} else if (ch == '%') {
 		if (chNext == '%' && !(chNext2 == '~' || IsAlphaNumeric(chNext2))) {
@@ -213,7 +203,7 @@ _label_string:
 				}
 				if (!multiline) {
 					nestedState.clear();
-					sc.ForwardSetState(SCE_BAT_DEFAULT);
+					sc.SetState(SCE_BAT_DEFAULT);
 				}
 			} else if ((sc.state == SCE_BAT_STRINGDQ && sc.ch == '\"')
 				|| (sc.state == SCE_BAT_STRINGSQ && sc.ch == '\'')
