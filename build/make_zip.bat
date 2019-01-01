@@ -58,22 +58,22 @@ IF "%~1" == "" (
 IF "%~2" == "" (
   SET "ARCH=all"
 ) ELSE (
-  IF /I "%~2" == "x86"   SET "ARCH=x86" & GOTO CHECKTHIRDARG
-  IF /I "%~2" == "/x86"  SET "ARCH=x86" & GOTO CHECKTHIRDARG
-  IF /I "%~2" == "-x86"  SET "ARCH=x86" & GOTO CHECKTHIRDARG
-  IF /I "%~2" == "--x86" SET "ARCH=x86" & GOTO CHECKTHIRDARG
-  IF /I "%~2" == "Win32"   SET "ARCH=x86" & GOTO CHECKTHIRDARG
-  IF /I "%~2" == "/Win32"  SET "ARCH=x86" & GOTO CHECKTHIRDARG
-  IF /I "%~2" == "-Win32"  SET "ARCH=x86" & GOTO CHECKTHIRDARG
-  IF /I "%~2" == "--Win32" SET "ARCH=x86" & GOTO CHECKTHIRDARG
+  IF /I "%~2" == "x86"   SET "ARCH=Win32" & GOTO CHECKTHIRDARG
+  IF /I "%~2" == "/x86"  SET "ARCH=Win32" & GOTO CHECKTHIRDARG
+  IF /I "%~2" == "-x86"  SET "ARCH=Win32" & GOTO CHECKTHIRDARG
+  IF /I "%~2" == "--x86" SET "ARCH=Win32" & GOTO CHECKTHIRDARG
+  IF /I "%~2" == "Win32"   SET "ARCH=Win32" & GOTO CHECKTHIRDARG
+  IF /I "%~2" == "/Win32"  SET "ARCH=Win32" & GOTO CHECKTHIRDARG
+  IF /I "%~2" == "-Win32"  SET "ARCH=Win32" & GOTO CHECKTHIRDARG
+  IF /I "%~2" == "--Win32" SET "ARCH=Win32" & GOTO CHECKTHIRDARG
   IF /I "%~2" == "x64"   SET "ARCH=x64" & GOTO CHECKTHIRDARG
   IF /I "%~2" == "/x64"  SET "ARCH=x64" & GOTO CHECKTHIRDARG
   IF /I "%~2" == "-x64"  SET "ARCH=x64" & GOTO CHECKTHIRDARG
   IF /I "%~2" == "--x64" SET "ARCH=x64" & GOTO CHECKTHIRDARG
-  IF /I "%~2" == "arm64"   SET "ARCH=arm64" & GOTO CHECKTHIRDARG
-  IF /I "%~2" == "/arm64"  SET "ARCH=arm64" & GOTO CHECKTHIRDARG
-  IF /I "%~2" == "-arm64"  SET "ARCH=arm64" & GOTO CHECKTHIRDARG
-  IF /I "%~2" == "--arm64" SET "ARCH=arm64" & GOTO CHECKTHIRDARG
+  IF /I "%~2" == "ARM64"   SET "ARCH=ARM64" & GOTO CHECKTHIRDARG
+  IF /I "%~2" == "/ARM64"  SET "ARCH=ARM64" & GOTO CHECKTHIRDARG
+  IF /I "%~2" == "-ARM64"  SET "ARCH=ARM64" & GOTO CHECKTHIRDARG
+  IF /I "%~2" == "--ARM64" SET "ARCH=ARM64" & GOTO CHECKTHIRDARG
   IF /I "%~2" == "all"   SET "ARCH=all" & GOTO CHECKTHIRDARG
   IF /I "%~2" == "/all"  SET "ARCH=all" & GOTO CHECKTHIRDARG
   IF /I "%~2" == "-all"  SET "ARCH=all" & GOTO CHECKTHIRDARG
@@ -121,18 +121,18 @@ SET INPUTDIR_Win32=bin\%CONFIG%\Win32
 SET INPUTDIR_ARM64=bin\%CONFIG%\ARM64
 
 IF /I "%ARCH%" == "x64" GOTO MSVC_x64
-IF /I "%ARCH%" == "x86" GOTO MSVC_x86
-IF /I "%ARCH%" == "arm64" GOTO MSVC_arm64
+IF /I "%ARCH%" == "Win32" GOTO MSVC_Win32
+IF /I "%ARCH%" == "ARM64" GOTO MSVC_ARM64
 
 :MSVC_x64
 IF EXIST "%INPUTDIR_x64%" CALL :SubZipFiles %INPUTDIR_x64% x64
 IF /I "%ARCH%" == "x64" GOTO END_MSVC
 
-:MSVC_x86
+:MSVC_Win32
 IF EXIST "%INPUTDIR_Win32%" CALL :SubZipFiles %INPUTDIR_Win32% Win32
-IF /I "%ARCH%" == "x86" GOTO END_MSVC
+IF /I "%ARCH%" == "Win32" GOTO END_MSVC
 
-:MSVC_arm64
+:MSVC_ARM64
 IF EXIST "%INPUTDIR_ARM64%" (
   IF /I "%COMPILER%" == "MSVC" CALL :SubZipFiles %INPUTDIR_ARM64% ARM64
 )
@@ -149,13 +149,13 @@ SET INPUTDIR_x64=bin\%CONFIG%_x64
 SET INPUTDIR_Win32=bin\%CONFIG%_Win32
 
 IF /I "%ARCH%" == "x64" GOTO GCC_x64
-IF /I "%ARCH%" == "x86" GOTO GCC_x86
+IF /I "%ARCH%" == "Win32" GOTO GCC_Win32
 
 :GCC_x64
 IF EXIST "%INPUTDIR_x64%" CALL :SubZipFiles %INPUTDIR_x64% x64
 IF /I "%ARCH%" == "x64" GOTO END_GCC
 
-:GCC_x86
+:GCC_Win32
 IF EXIST "%INPUTDIR_Win32%" CALL :SubZipFiles %INPUTDIR_Win32% Win32
 
 :END_GCC
@@ -226,7 +226,7 @@ EXIT /B
 :SHOWHELP
 TITLE %~nx0 %1
 ECHO. & ECHO.
-ECHO Usage:  %~nx0 [MSVC|GCC|Clang|LLVM] [Release^|Debug^] [x64^|x86^|arm64^|all]
+ECHO Usage:  %~nx0 [MSVC|GCC|Clang|LLVM] [Release^|Debug^] [Win32^|x64^|ARM64^|all]
 ECHO.
 ECHO Notes:  You can also prefix the commands with "-", "--" or "/".
 ECHO         The arguments are not case sensitive.

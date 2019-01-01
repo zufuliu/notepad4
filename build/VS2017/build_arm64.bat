@@ -1,2 +1,2 @@
-@call build.bat Build arm64 Release
+@call build.bat Build ARM64 Release
 pause
