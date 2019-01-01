@@ -64,6 +64,7 @@
 #define NP2STYLE_PredefinedVariable	63349
 #define NP2STYLE_DocCommentTagHTML	63350
 #define NP2STYLE_ReservedWord		63351
+#define NP2STYLE_EscapeSequence		63352
 //63401-63440 Perl
 //63441-63450 Tcl
 //63451-63460 Lua

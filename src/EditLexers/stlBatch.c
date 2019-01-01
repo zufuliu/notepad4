@@ -51,6 +51,7 @@ static EDITSTYLE Styles_Batch[] = {
 	{ SCE_BAT_STRINGDQ, 63413, EDITSTYLE_HOLE(L"Double Quoted String"), L"fore:#008080" },
 	{ SCE_BAT_STRINGSQ, 63412, EDITSTYLE_HOLE(L"Single Quoted String"), L"fore:#C08000" },
 	{ SCE_BAT_STRINGBT, NP2STYLE_Backticks, EDITSTYLE_HOLE(L"Backticks"), L"fore:#F08000" },
+	{ SCE_BAT_ESCAPE, NP2STYLE_EscapeSequence, EDITSTYLE_HOLE(L"Escape Sequence"), L"fore:#FF0000" },
 	{ SCE_BAT_VARIABLE, NP2STYLE_Variable, EDITSTYLE_HOLE(L"Variable"), L"fore:#003CE6; back:#FFF1A8" },
 	{ SCE_BAT_OPERATOR, NP2STYLE_Operator, EDITSTYLE_HOLE(L"Operator"), L"fore:#B000B0" },
 	{ SCE_BAT_LABEL, NP2STYLE_Label, EDITSTYLE_HOLE(L"Label"), L"fore:#C80000; back:#F4F4F4" },

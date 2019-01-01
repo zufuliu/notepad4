@@ -4,6 +4,8 @@
 #include <cassert>
 #include <cctype>
 
+#include <vector>
+
 #include "ILexer.h"
 #include "Scintilla.h"
 #include "SciLexer.h"
@@ -17,18 +19,58 @@
 
 using namespace Scintilla;
 
+namespace {
+
 // / \ : * ? < > " |
-static constexpr bool IsBatSpec(int ch) noexcept {
+constexpr bool IsBatSpec(int ch) noexcept {
 	return ch == ':' || ch == '?' || ch == '%' || ch == '\'' || ch == '\"' || ch == '`';
 }
-static constexpr bool IsBatOp(int ch) noexcept {
-	return ch == '(' || ch == ')' || ch == '=' || ch == '@' || ch == '|' || ch == '<' || ch == '>' || ch == ';' || ch == '*' || ch == '&';
+constexpr bool IsBatOp(int ch, bool inEcho) noexcept {
+	return ch == '&' || ch == '|' || ch == '<' || ch == '>' || ch == '(' || ch == ')'
+		|| (!inEcho && (ch == '=' || ch == '@' || ch == ';' || ch == '*'));
 }
-static inline bool IsWordStart(int ch) noexcept {
-	return (ch >= 0x80) || (isgraph(ch) && !(IsBatOp(ch) || IsBatSpec(ch) || ch == '.'));
+inline bool IsWordStart(int ch) noexcept {
+	return (ch >= 0x80) || (isgraph(ch) && !(IsBatOp(ch, false) || IsBatSpec(ch) || ch == '.'));
 }
-static inline bool IsWordChar(int ch) noexcept {
-	return (ch >= 0x80) || (isgraph(ch) && !(IsBatOp(ch) || IsBatSpec(ch)));
+inline bool IsWordChar(int ch) noexcept {
+	return (ch >= 0x80) || (isgraph(ch) && !(IsBatOp(ch, false) || IsBatSpec(ch)));
+}
+
+// Escape Characters https://www.robvanderwoude.com/escapechars.php
+bool GetBatEscapeLen(int state, int& length, int ch, int chNext, int chNext2) noexcept {
+	length = 0;
+	if (ch == '^') {
+		if (chNext == '^') {
+			length = (chNext2 == '!') ? 2 : 1;
+		} else if (chNext == '&' || chNext == '|' || chNext == '<' || chNext == '>') {
+			length = 1;
+		}
+		// FOR /F "subject"
+		else if (chNext == ',' || chNext == ';' || chNext == '=' || chNext == '(' || chNext == ')') {
+			length = 1;
+		} else if (state == SCE_BAT_STRINGDQ || state == SCE_BAT_STRINGSQ || state == SCE_BAT_STRINGBT) {
+			if (chNext == '\'' && state != SCE_BAT_STRINGBT) {
+				length = 1;
+			} else if (chNext == '`' && state == SCE_BAT_STRINGBT) {
+				length = 1;
+			}
+		}
+	} else if (ch == '%') {
+		if (chNext == '%' && !(chNext2 == '~' || IsAlphaNumeric(chNext2))) {
+			length = 1;
+		}
+	} else if (ch == '"') {
+		// Inside the search pattern of FIND
+		if (chNext == '"' && (state == SCE_BAT_STRINGDQ || state == SCE_BAT_STRINGSQ || state == SCE_BAT_STRINGBT)) {
+			length = 1;
+		}
+	} else if (ch == '\\') {
+		// Inside the regex pattern of FINDSTR
+	}
+
+	return length != 0;
+}
+
 }
 
 /*static const char *const batchWordListDesc[] = {
@@ -45,9 +87,10 @@ static void ColouriseBatchDoc(Sci_PositionU startPos, Sci_Position length, int i
 	bool inEcho = false;
 	bool isGoto = false;
 	bool isCall = false;
-	int varStyle = SCE_BAT_DEFAULT;
+	int escapeLen = 0;
 
 	StyleContext sc(startPos, length, initStyle, styler);
+	std::vector<int> nestedState;
 
 	for (; sc.More(); sc.Forward()) {
 		if (sc.atLineStart) {
@@ -65,12 +108,15 @@ static void ColouriseBatchDoc(Sci_PositionU startPos, Sci_Position length, int i
 			break;
 		case SCE_BAT_IDENTIFIER:
 _label_identifier:
-			if (!IsWordChar(sc.ch)) {
+			if ((sc.ch == '%' || sc.ch == '^') && GetBatEscapeLen(sc.state, escapeLen, sc.ch, sc.chNext, sc.GetRelative(2))) {
+				sc.SetState(SCE_BAT_ESCAPE);
+				sc.Forward(escapeLen);
+			} else if (!IsWordChar(sc.ch)) {
 				char s[256];
 				sc.GetCurrentLowered(s, sizeof(s));
-				if (strcmp(s, "rem") == 0)
+				if (strcmp(s, "rem") == 0) {
 					sc.ChangeState(SCE_BAT_COMMENT);
-				else {
+				} else {
 					if (!inEcho && keywords.InList(s)) { // not in echo ?
 						sc.ChangeState(SCE_BAT_WORD);
 						inEcho = strcmp(s, "echo") == 0;
@@ -79,8 +125,9 @@ _label_identifier:
 					} else if (!inEcho && visibleChars == static_cast<int>(strlen(s))) {
 						if (visibleChars == 1 && sc.ch == ':' && sc.chNext == '\\') {
 							sc.Forward(2);
-							while (IsWordChar(sc.ch) || sc.ch == '\\')
+							while (IsWordChar(sc.ch) || sc.ch == '\\') {
 								sc.Forward();
+							}
 						}
 						sc.ChangeState(SCE_BAT_COMMAND);
 					} else if (isGoto) {
@@ -98,78 +145,154 @@ _label_identifier:
 			}
 			break;
 		case SCE_BAT_LABEL:
-			if (sc.ch == ':')
+			if (sc.ch == ':') {
 				sc.ForwardSetState(SCE_BAT_DEFAULT);
-			else if (!(iswordstart(sc.ch) || sc.ch == '-'))
+			} else if (!(iswordstart(sc.ch) || sc.ch == '-')) {
 				sc.SetState(SCE_BAT_DEFAULT);
+			}
 			break;
-		case SCE_BAT_VARIABLE:
-		{
+		case SCE_BAT_VARIABLE: {
 			bool end_var = false;
 			if (quatedVar) {
 				if (sc.ch == '%') {
+					if (sc.chNext == '%') {
+						sc.Forward();
+					}
 					end_var = true;
-					sc.ForwardSetState(varStyle);
+					sc.Forward();
 				}
 			} else {
 				if (sc.ch == '*') {
 					end_var = true;
-					sc.ForwardSetState(varStyle);
+					sc.Forward();
 				} else if (numVar) {
 					if (!IsADigit(sc.ch)) {
 						end_var = true;
-						sc.SetState(varStyle);
 					}
 				} else if (!(iswordstart(sc.ch) || sc.ch == '-')) {
 					end_var = true;
-					sc.SetState(varStyle);
 				}
 			}
-			if (end_var && varStyle != SCE_BAT_DEFAULT) {
-				goto _label_var_string;
+			if (end_var) {
+				if (nestedState.empty()) {
+					sc.SetState(SCE_BAT_DEFAULT);
+				} else {
+					sc.SetState(nestedState.back());
+					nestedState.pop_back();
+					goto _label_string;
+				}
 			}
 		} break;
 		case SCE_BAT_STRINGDQ:
 		case SCE_BAT_STRINGSQ:
 		case SCE_BAT_STRINGBT:
-_label_var_string:
-			if (sc.ch == '%') {
-				varStyle = sc.state;
+_label_string:
+			if (GetBatEscapeLen(sc.state, escapeLen, sc.ch, sc.chNext, sc.GetRelative(2))) {
+				nestedState.push_back(sc.state);
+				sc.SetState(SCE_BAT_ESCAPE);
+				sc.Forward(escapeLen);
+			} else if (sc.ch == '%') {
+				nestedState.push_back(sc.state);
 				goto _label_variable;
-			} else if (sc.atLineEnd || (sc.state == SCE_BAT_STRINGDQ && sc.ch == '\"')
+			} else if (sc.atLineEnd) {
+				bool multiline = false;
+				if (sc.state == SCE_BAT_STRINGSQ || sc.state == SCE_BAT_STRINGBT) {
+					const Sci_Position start = styler.LineStart(sc.currentLine);
+					Sci_Position pos = sc.currentPos;
+					Sci_Position offset = 0;
+					while (pos >= start + 2 && IsASpace(styler.SafeGetCharAt(pos))) {
+						--pos;
+						--offset;
+					}
+
+					const int chNext = sc.GetRelative(offset);
+					if ((chNext == '|' || chNext == '&')) {
+						const int ch = sc.GetRelative(offset - 1);
+						multiline = ch == '^';
+					}
+				}
+				if (!multiline) {
+					nestedState.clear();
+					sc.ForwardSetState(SCE_BAT_DEFAULT);
+				}
+			} else if ((sc.state == SCE_BAT_STRINGDQ && sc.ch == '\"')
 				|| (sc.state == SCE_BAT_STRINGSQ && sc.ch == '\'')
 				|| (sc.state == SCE_BAT_STRINGBT && sc.ch == '`')) {
-				sc.ForwardSetState(SCE_BAT_DEFAULT);
+				if (nestedState.empty()) {
+					sc.ForwardSetState(SCE_BAT_DEFAULT);
+				} else {
+					sc.ForwardSetState(nestedState.back());
+					nestedState.pop_back();
+					goto _label_string;
+				}
+			} else if (sc.ch == '\"') {
+				nestedState.push_back(sc.state);
+				sc.SetState(SCE_BAT_STRINGDQ);
+				sc.Forward();
+				goto _label_string;
+			} else if (!inEcho && sc.ch == '\'') {
+				nestedState.push_back(sc.state);
+				sc.SetState(SCE_BAT_STRINGSQ);
+				sc.Forward();
+				goto _label_string;
+			} else if (sc.ch == '`') {
+				nestedState.push_back(sc.state);
+				sc.SetState(SCE_BAT_STRINGBT);
+				sc.Forward();
+				goto _label_string;
+			}
+			break;
+		case SCE_BAT_ESCAPE:
+			if (GetBatEscapeLen(sc.state, escapeLen, sc.ch, sc.chNext, sc.GetRelative(2))) {
+				sc.Forward(escapeLen);
+			} else {
+				if (nestedState.empty()) {
+					sc.SetState(SCE_BAT_DEFAULT);
+				} else {
+					sc.SetState(nestedState.back());
+					nestedState.pop_back();
+					goto _label_string;
+				}
 			}
 			break;
 		}
 
 		if (sc.state == SCE_BAT_DEFAULT) {
-			varStyle = SCE_BAT_DEFAULT;
 			if (sc.Match(':', ':')) {
 				sc.SetState(SCE_BAT_COMMENT);
-			} else if ((visibleChars == 0 || isGoto || isCall) && sc.ch == ':' && IsWordStart(sc.chNext) && sc.chNext != '\\') {
+			} else if ((visibleChars == 0 || isGoto || isCall) && sc.ch == ':' && iswordstart(sc.chNext) && sc.chNext != '\\') {
 				sc.SetState(SCE_BAT_LABEL);
-				if (isGoto)
+				if (isGoto) {
 					isGoto = false;
-				if (isCall)
+				}
+				if (isCall) {
 					isCall = false;
+				}
+			} else if (GetBatEscapeLen(sc.state, escapeLen, sc.ch, sc.chNext, sc.GetRelative(2))) {
+				sc.SetState(SCE_BAT_ESCAPE);
+				sc.Forward(escapeLen);
 			} else if (sc.ch == '\"') {
+				nestedState.clear();
 				sc.SetState(SCE_BAT_STRINGDQ);
 			} else if (!inEcho && sc.ch == '\'') {
+				nestedState.clear();
 				sc.SetState(SCE_BAT_STRINGSQ);
 			} else if (sc.ch == '`') {
+				nestedState.clear();
 				sc.SetState(SCE_BAT_STRINGBT);
 			} else if (sc.ch == '%') {
 _label_variable:
 				sc.SetState(SCE_BAT_VARIABLE);
 				if (sc.chNext == '*' || sc.chNext == '~' || sc.chNext == '%') {
 					quatedVar = false;
-					if (sc.chNext == '%')
+					if (sc.chNext == '%') {
 						sc.Forward();
+					}
 					if (sc.chNext == '~') {
 						sc.Forward();
-						while (sc.More() && !(IsADigit(sc.ch) || isspacechar(sc.ch))) sc.Forward();
+						while (sc.More() && !(IsADigit(sc.ch) || isspacechar(sc.ch))) {
+							sc.Forward();
+						}
 						numVar = true;
 					}
 				} else if (IsADigit(sc.chNext)) {
@@ -182,10 +305,11 @@ _label_variable:
 				sc.SetState(SCE_BAT_COMMENT);
 			} else if (IsWordStart(sc.ch)) { // all file name
 				sc.SetState(SCE_BAT_IDENTIFIER);
-			} else if (IsBatOp(sc.ch)) {
+			} else if (IsBatOp(sc.ch, inEcho)) {
 				sc.SetState(SCE_BAT_OPERATOR);
-				if (inEcho && sc.ch == ')')
+				if (inEcho && sc.ch == ')') {
 					inEcho = false;
+				}
 				if (sc.ch == '|' || sc.ch == '&') { // pipe
 					if (sc.ch == sc.chNext) {	// cmd1 || cmd2, cmd1 && cmd2
 						sc.Forward();
@@ -214,8 +338,9 @@ _label_variable:
 		}
 	}
 
-	if (sc.state == SCE_BAT_IDENTIFIER)
+	if (sc.state == SCE_BAT_IDENTIFIER) {
 		goto _label_identifier;
+	}
 
 	sc.Complete();
 }
