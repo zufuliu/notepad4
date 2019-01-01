@@ -1,2 +1,2 @@
-@call build.bat Build x86 Release
+@call build.bat Build Win32 Release
 pause

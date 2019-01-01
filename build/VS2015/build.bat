@@ -59,10 +59,14 @@ IF "%~1" == "" (
 IF "%~2" == "" (
   SET "ARCH=all"
 ) ELSE (
-  IF /I "%~2" == "x86"   SET "ARCH=x86" & GOTO CHECKTHIRDARG
-  IF /I "%~2" == "/x86"  SET "ARCH=x86" & GOTO CHECKTHIRDARG
-  IF /I "%~2" == "-x86"  SET "ARCH=x86" & GOTO CHECKTHIRDARG
-  IF /I "%~2" == "--x86" SET "ARCH=x86" & GOTO CHECKTHIRDARG
+  IF /I "%~2" == "x86"   SET "ARCH=Win32" & GOTO CHECKTHIRDARG
+  IF /I "%~2" == "/x86"  SET "ARCH=Win32" & GOTO CHECKTHIRDARG
+  IF /I "%~2" == "-x86"  SET "ARCH=Win32" & GOTO CHECKTHIRDARG
+  IF /I "%~2" == "--x86" SET "ARCH=Win32" & GOTO CHECKTHIRDARG
+  IF /I "%~2" == "Win32"   SET "ARCH=Win32" & GOTO CHECKTHIRDARG
+  IF /I "%~2" == "/Win32"  SET "ARCH=Win32" & GOTO CHECKTHIRDARG
+  IF /I "%~2" == "-Win32"  SET "ARCH=Win32" & GOTO CHECKTHIRDARG
+  IF /I "%~2" == "--Win32" SET "ARCH=Win32" & GOTO CHECKTHIRDARG
   IF /I "%~2" == "x64"   SET "ARCH=x64" & GOTO CHECKTHIRDARG
   IF /I "%~2" == "/x64"  SET "ARCH=x64" & GOTO CHECKTHIRDARG
   IF /I "%~2" == "-x64"  SET "ARCH=x64" & GOTO CHECKTHIRDARG
@@ -106,15 +110,15 @@ IF "%~3" == "" (
 
 :START
 IF /I "%ARCH%" == "x64" GOTO x64
-IF /I "%ARCH%" == "x86" GOTO x86
+IF /I "%ARCH%" == "Win32" GOTO Win32
 
 
-:x86
+:Win32
 CALL "%VS140COMNTOOLS%..\..\VC\vcvarsall.bat" x86
 
 IF /I "%CONFIG%" == "all" (CALL :SUBMSVC %BUILDTYPE% Debug Win32 && CALL :SUBMSVC %BUILDTYPE% Release Win32) ELSE (CALL :SUBMSVC %BUILDTYPE% %CONFIG% Win32)
 
-IF /I "%ARCH%" == "x86" GOTO END
+IF /I "%ARCH%" == "Win32" GOTO END
 
 
 :x64
@@ -141,7 +145,7 @@ EXIT /B
 :SHOWHELP
 TITLE %~nx0 %1
 ECHO. & ECHO.
-ECHO Usage: %~nx0 [Clean^|Build^|Rebuild] [x86^|x64^|all] [Debug^|Release^|all]
+ECHO Usage: %~nx0 [Clean^|Build^|Rebuild] [Win32^|x64^|all] [Debug^|Release^|all]
 ECHO.
 ECHO Notes: You can also prefix the commands with "-", "--" or "/".
 ECHO        The arguments are not case sensitive.
@@ -151,9 +155,9 @@ ECHO.
 ECHO If you skip the second argument the default one will be used.
 ECHO The same goes for the third argument. Examples:
 ECHO "%~nx0 rebuild" is the same as "%~nx0 rebuild all release"
-ECHO "%~nx0 rebuild x86" is the same as "%~nx0 rebuild x86 release"
+ECHO "%~nx0 rebuild Win32" is the same as "%~nx0 rebuild Win32 release"
 ECHO.
-ECHO WARNING: "%~nx0 x86" or "%~nx0 debug" won't work.
+ECHO WARNING: "%~nx0 Win32" or "%~nx0 debug" won't work.
 ECHO.
 ENDLOCAL
 EXIT /B
