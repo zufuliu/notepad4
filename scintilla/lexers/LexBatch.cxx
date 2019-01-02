@@ -35,7 +35,9 @@ inline bool IsWordStart(int ch) noexcept {
 inline bool IsWordChar(int ch) noexcept {
 	return (ch >= 0x80) || (isgraph(ch) && !(IsBatOp(ch, false) || IsBatSpec(ch)));
 }
-
+constexpr bool IsBatVariable(int ch) noexcept {
+	return iswordchar(ch) || ch == '-' || ch == ':' || ch == '=' || ch == '$';
+}
 // Escape Characters https://www.robvanderwoude.com/escapechars.php
 bool GetBatEscapeLen(int state, int& length, int ch, int chNext, int chNext2) noexcept {
 	length = 0;
@@ -46,7 +48,7 @@ bool GetBatEscapeLen(int state, int& length, int ch, int chNext, int chNext2) no
 			length = 1;
 		}
 	} else if (ch == '%') {
-		if (chNext == '%' && !(chNext2 == '~' || IsAlphaNumeric(chNext2))) {
+		if (chNext == '%' && !(chNext2 == '~' || chNext2 == '=' || IsAlphaNumeric(chNext2))) {
 			length = 1;
 		}
 	} else if (ch == '"') {
@@ -71,8 +73,9 @@ bool GetBatEscapeLen(int state, int& length, int ch, int chNext, int chNext2) no
 
 static void ColouriseBatchDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
 	const WordList &keywords = *keywordLists[0];
-	bool quatedVar = false;
-	bool numVar = false;
+	bool quatedVar = false;		// %var%
+	bool markVar = false;		// !var!		SetLocal EnableDelayedExpansion
+	bool numVar = false;		// %1, %~1
 	int visibleChars = 0;
 	bool inEcho = false;
 	bool isGoto = false;
@@ -85,6 +88,7 @@ static void ColouriseBatchDoc(Sci_PositionU startPos, Sci_Position length, int i
 	for (; sc.More(); sc.Forward()) {
 		if (sc.atLineStart) {
 			quatedVar = false;
+			markVar = false;
 			numVar = false;
 			inEcho = false;
 			isGoto = false;
@@ -151,6 +155,11 @@ _label_identifier:
 					end_var = true;
 					sc.Forward();
 				}
+			} else if (markVar) {
+				if (sc.ch == '!') {
+					end_var = true;
+					sc.Forward();
+				}
 			} else {
 				if (sc.ch == '*') {
 					end_var = true;
@@ -159,7 +168,7 @@ _label_identifier:
 					if (!IsADigit(sc.ch)) {
 						end_var = true;
 					}
-				} else if (!(iswordstart(sc.ch) || sc.ch == '-')) {
+				} else if (!IsBatVariable(sc.ch)) {
 					end_var = true;
 				}
 				if (sc.ch == '%' && sc.chNext == '%') {
@@ -168,6 +177,9 @@ _label_identifier:
 						sc.Forward(2);
 					}
 				}
+			}
+			if (!end_var && isspacechar(sc.ch)) {
+				end_var = true;
 			}
 			if (end_var) {
 				if (nestedState.empty()) {
@@ -190,6 +202,12 @@ _label_string:
 			} else if (sc.ch == '%') {
 				nestedState.push_back(sc.state);
 				goto _label_variable;
+			} else if (sc.ch == '!' && (iswordstart(sc.chNext) || sc.chNext == '=')) {
+				nestedState.push_back(sc.state);
+				quatedVar = false;
+				markVar = true;
+				numVar = false;
+				sc.SetState(SCE_BAT_VARIABLE);
 			} else if (sc.atLineEnd) {
 				bool multiline = false;
 				if (sc.state == SCE_BAT_STRINGSQ || sc.state == SCE_BAT_STRINGBT) {
@@ -279,24 +297,32 @@ _label_string:
 			} else if (sc.ch == '%') {
 _label_variable:
 				quatedVar = false;
+				markVar = false;
 				numVar = false;
 				sc.SetState(SCE_BAT_VARIABLE);
-				if (sc.chNext == '*' || sc.chNext == '~' || sc.chNext == '%') {
+				if (sc.chNext == '*' || sc.chNext == '~' || (!markVar && sc.chNext == '%')) {
 					if (sc.chNext == '%') {
 						sc.Forward();
 					}
 					if (sc.chNext == '~') {
 						sc.Forward();
-						while (sc.More() && !(IsADigit(sc.ch) || isspacechar(sc.ch))) {
-							sc.Forward();
+						numVar = sc.chNext != '$';
+						if (numVar) {
+							while (sc.More() && !(IsADigit(sc.ch) || isspacechar(sc.ch))) {
+								sc.Forward();
+							}
 						}
-						numVar = true;
 					}
 				} else if (IsADigit(sc.chNext)) {
 					numVar = true;
 				} else {
 					quatedVar = true;
 				}
+			} else if (sc.ch == '!' && (iswordstart(sc.chNext) || sc.chNext == '=')) {
+				quatedVar = false;
+				markVar = true;
+				numVar = false;
+				sc.SetState(SCE_BAT_VARIABLE);
 			} else if (sc.ch == '@' && sc.MatchIgnoreCase("@rem")) {
 				sc.SetState(SCE_BAT_COMMENT);
 			} else if (IsWordStart(sc.ch)) { // all file name
