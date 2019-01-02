@@ -27,7 +27,7 @@ constexpr bool IsBatSpec(int ch) noexcept {
 }
 constexpr bool IsBatOp(int ch, bool inEcho) noexcept {
 	return ch == '&' || ch == '|' || ch == '<' || ch == '>' || ch == '(' || ch == ')'
-		|| (!inEcho && (ch == '=' || ch == '@' || ch == ';' || ch == '*'));
+		|| (!inEcho && (ch == '=' || ch == '@' || ch == ';' || ch == '*' || ch == ','));
 }
 inline bool IsWordStart(int ch) noexcept {
 	return (ch >= 0x80) || (isgraph(ch) && !(IsBatOp(ch, false) || IsBatSpec(ch) || ch == '.'));
@@ -162,6 +162,12 @@ _label_identifier:
 				} else if (!(iswordstart(sc.ch) || sc.ch == '-')) {
 					end_var = true;
 				}
+				if (sc.ch == '%' && sc.chNext == '%') {
+					const int chNext2 = sc.GetRelative(2);
+					if (!(chNext2 == '~' || IsAlphaNumeric(chNext2))) {
+						sc.Forward(2);
+					}
+				}
 			}
 			if (end_var) {
 				if (nestedState.empty()) {
@@ -272,9 +278,10 @@ _label_string:
 				sc.SetState(SCE_BAT_STRINGBT);
 			} else if (sc.ch == '%') {
 _label_variable:
+				quatedVar = false;
+				numVar = false;
 				sc.SetState(SCE_BAT_VARIABLE);
 				if (sc.chNext == '*' || sc.chNext == '~' || sc.chNext == '%') {
-					quatedVar = false;
 					if (sc.chNext == '%') {
 						sc.Forward();
 					}
@@ -286,7 +293,6 @@ _label_variable:
 						numVar = true;
 					}
 				} else if (IsADigit(sc.chNext)) {
-					quatedVar = false;
 					numVar = true;
 				} else {
 					quatedVar = true;
