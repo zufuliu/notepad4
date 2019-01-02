@@ -7,7 +7,7 @@
 static KEYWORDLIST Keywords_Batch = {{
 "defined do not else for goto if in "
 "assoc break call cd chdir cls color copy date del dir echo echo. endlocal erase exist exit ftype md mkdir move path pause popd prompt pushd rd rem ren rename rmdir set setlocal shift sort start time title tree type ver verify vol "
-"errorlevel nul disableextensions enableextensions enabledelayedexpansion "
+"errorlevel nul disableextensions enableextensions enabledelayedexpansion disabledelayedexpansion "
 "and or equ neq lss leq gtr geq "
 //"change com con country ctty forfiles icacls kill loadhigh lpt msiexe robocopy sclist timeout "
 "mklink "
@@ -24,15 +24,19 @@ NULL
 /* // unknown
 "bcdedit choice cmdkey "
 */
-, // 2
-"dp0"
+, // 2 Built-in Variables
+"dp0 __APPDIR__ __AppDir__ __CD__ CMDCMDLINE CmdCmdLine CMDEXTVERSION CmdExtVersion HIGHESTNUMANODENUMBER HighestNumaNodeNumber RANDOM Random random "
 
-, NULL, NULL, NULL
+, // 3 Options
+"eol skip delims tokens usebackq " // FOR
+
+, NULL, NULL
 
 , // 6 Upper Case
 "DEFINED DO NOT ELSE FOR GOTO IF IN "
 "ASSOC BREAK CALL CD CHDIR CLS COLOR COPY DATE DEL DIR ECHO ECHO. ENDLOCAL ERASE EXIST EXIT FTYPE MD MKDIR MOVE PATH PAUSE POPD PROMPT PUSHD RD REM REN RENAME RMDIR SET SETLOCAL SHIFT SORT START TIME TITLE TREE TYPE VER VERIFY VOL "
-"ERRORLEVEL NUL DISABLEEXTENSIONS ENABLEEXTENSIONS ENABLEDELAYEDEXPANSION "
+"ERRORLEVEL NUL DISABLEEXTENSIONS ENABLEEXTENSIONS ENABLEDELAYEDEXPANSION DISABLEDELAYEDEXPANSION "
+"ErrorLevel EndLocal SetLocal DisableExtensions EnableExtensions EnableDelayedExpansion DisableDelayedExpansion "
 "AND OR EQU NEQ LSS LEQ GTR GEQ "
 //"CHANGE COM CON COUNTRY CTTY FORFILES ICACLS KILL LOADHIGH LPT MSIEXE ROBOCOPY SCLIST TIMEOUT "
 "MKLINK "
