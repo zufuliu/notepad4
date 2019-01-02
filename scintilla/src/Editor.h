@@ -87,7 +87,7 @@ public:
 		characterSet = characterSet_;
 		rectangular = rectangular_;
 		lineCopy = lineCopy_;
-		if (!asBinary && !s.empty()) {
+		if (!asBinary) {
 			FixSelectionForClipboard();
 		}
 	}
