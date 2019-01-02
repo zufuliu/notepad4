@@ -300,7 +300,7 @@ _label_variable:
 				markVar = false;
 				numVar = false;
 				sc.SetState(SCE_BAT_VARIABLE);
-				if (sc.chNext == '*' || sc.chNext == '~' || (!markVar && sc.chNext == '%')) {
+				if (sc.chNext == '*' || sc.chNext == '~' || sc.chNext == '%') {
 					if (sc.chNext == '%') {
 						sc.Forward();
 					}
