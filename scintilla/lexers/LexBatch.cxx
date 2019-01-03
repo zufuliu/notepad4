@@ -73,6 +73,10 @@ bool GetBatEscapeLen(int state, int& length, int ch, int chNext, int chNext2) no
 	return length != 0;
 }
 
+constexpr int LevelNumber(int level) noexcept {
+	return (level & SC_FOLDLEVELNUMBERMASK) - SC_FOLDLEVELBASE;
+}
+
 }
 
 /*static const char *const batchWordListDesc[] = {
@@ -94,6 +98,13 @@ static void ColouriseBatchDoc(Sci_PositionU startPos, Sci_Position length, int i
 
 	StyleContext sc(startPos, length, initStyle, styler);
 	std::vector<int> nestedState;
+
+	int levelCurrent = SC_FOLDLEVELBASE;
+	if (sc.currentLine > 0) {
+		levelCurrent = styler.LevelAt(sc.currentLine - 1) >> 16;
+	}
+	int levelNext = levelCurrent;
+	int parenCount = 0;
 
 	while (sc.More()) {
 		if (sc.atLineStart) {
@@ -123,9 +134,12 @@ _label_identifier:
 				} else {
 					if (!inEcho && keywords.InList(s)) { // not in echo ?
 						sc.ChangeState(SCE_BAT_WORD);
-						inEcho = strcmp(s, "echo") == 0;
+						inEcho = strcmp(s, "echo") == 0 || strcmp(s, "title") == 0 || strcmp(s, "prompt") == 0;
 						isGoto = strcmp(s, "goto") == 0;
 						isCall = strcmp(s, "call") == 0;
+						if (inEcho) {
+							parenCount = levelNext;
+						}
 					} else if (!inEcho && visibleChars == static_cast<int>(strlen(s))) {
 						if (visibleChars == 1 && sc.ch == ':' && sc.chNext == '\\') {
 							sc.Forward(2);
@@ -327,11 +341,18 @@ _label_variable:
 				sc.SetState(SCE_BAT_COMMENT);
 			} else if (IsWordStart(sc.ch)) { // all file name
 				sc.SetState(SCE_BAT_IDENTIFIER);
+			} else if (sc.ch == '(' || sc.ch == ')') {
+				if (!inEcho || LevelNumber(parenCount) > 0) {
+					sc.SetState(SCE_BAT_OPERATOR);
+					if (sc.ch == '(') {
+						levelNext++;
+					} else if (sc.ch == ')') {
+						levelNext--;
+						inEcho = false;
+					}
+				}
 			} else if (IsBatOp(sc.ch, inEcho)) {
 				sc.SetState(SCE_BAT_OPERATOR);
-				if (inEcho && sc.ch == ')') {
-					inEcho = false;
-				}
 				if (sc.ch == '|' || sc.ch == '&') { // pipe
 					if (sc.ch == sc.chNext) {	// cmd1 || cmd2, cmd1 && cmd2
 						sc.Forward();
@@ -354,6 +375,15 @@ _label_variable:
 
 		if (sc.atLineEnd) {
 			visibleChars = 0;
+			const int levelUse = levelCurrent;
+			int lev = levelUse | levelNext << 16;
+			if (levelUse < levelNext) {
+				lev |= SC_FOLDLEVELHEADERFLAG;
+			}
+			if (lev != styler.LevelAt(sc.currentLine)) {
+				styler.SetLevel(sc.currentLine, lev);
+			}
+			levelCurrent = levelNext;
 		}
 		if (!isspacechar(sc.ch)) {
 			visibleChars++;

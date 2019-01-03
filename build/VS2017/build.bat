@@ -123,9 +123,9 @@ IF /I "%ARCH%" == "ARM64" SET NEED_ARM64=1
 CALL :SubVSPath
 IF NOT EXIST "%VS_PATH%" CALL :SUBMSG "ERROR" "Visual Studio 2017 NOT FOUND, please check VS_PATH environment variable!"
 
-IF "%processor_architecture%"=="AMD64" (
+IF /I "%processor_architecture%"=="AMD64" (
 	SET "HOST_ARCH=amd64"
-) else (
+) ELSE (
 	SET "HOST_ARCH=x86"
 )
 
