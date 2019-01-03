@@ -692,8 +692,7 @@ end:
 
 static BOOL CanAutoCloseSingleQuote(int chPrev, int iCurrentStyle) {
 	const int iLexer = pLexCurrent->iLexer;
-	if (chPrev == '\\'		// character
-		|| chPrev > 0x7F	// someone's
+	if (chPrev > 0x7F	// someone's
 		|| (iLexer == SCLEX_CPP && iCurrentStyle == SCE_C_NUMBER)
 		|| (iLexer == SCLEX_LISP && iCurrentStyle == SCE_C_OPERATOR)
 		|| (iLexer == SCLEX_MATLAB && iCurrentStyle == SCE_MAT_OPERATOR) // transpose operator
@@ -705,7 +704,7 @@ static BOOL CanAutoCloseSingleQuote(int chPrev, int iCurrentStyle) {
 		return FALSE;
 	}
 
-	// someone's
+	// someone's, don't
 	if (isalnum(chPrev)) {
 		// character prefix
 		if (pLexCurrent->rid == NP2LEX_CPP || pLexCurrent->rid == NP2LEX_RC || iLexer == SCLEX_PYTHON || iLexer == SCLEX_SQL) {
@@ -749,6 +748,11 @@ void EditAutoCloseBraceQuote(HWND hwnd, int ch) {
 		}
 	}
 
+	// escape sequence
+	if (ch != ',' && (chPrev == '\\' || (pLexCurrent->iLexer == SCLEX_BATCH && chPrev == '^'))) {
+		return;
+	}
+
 	const int mask = autoCompletionConfig.fAutoInsertMask;
 	char tchIns[2] = "";
 	switch (ch) {
@@ -776,7 +780,7 @@ void EditAutoCloseBraceQuote(HWND hwnd, int ch) {
 		}
 		break;
 	case '\"':
-		if ((mask & AutoInsertDoubleQuote) && chPrev != '\\') {
+		if ((mask & AutoInsertDoubleQuote)) {
 			tchIns[0] = '\"';
 		}
 		break;
