@@ -6267,7 +6267,7 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 		break;
 
 	case SCI_GETCHARAT:
-		return pdoc->CharAt(wParam);
+		return static_cast<unsigned char>(pdoc->CharAt(wParam));
 
 	case SCI_SETCURRENTPOS:
 		if (sel.IsRectangular()) {
