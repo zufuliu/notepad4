@@ -48,8 +48,8 @@ StyleContext::StyleContext(Sci_PositionU startPos, Sci_PositionU length,
 	state(initStyle & chMask), // Mask off all bits which aren't in the chMask.
 	chPrev(0),
 	ch(0),
-	width(0),
 	chNext(0),
+	width(0),
 	widthNext(1) {
 	if (styler.Encoding() != enc8bit) {
 		multiByteAccess = styler.MultiByteAccess();
