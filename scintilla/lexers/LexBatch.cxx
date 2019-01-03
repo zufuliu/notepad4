@@ -38,6 +38,16 @@ inline bool IsWordChar(int ch) noexcept {
 constexpr bool IsBatVariable(int ch) noexcept {
 	return iswordchar(ch) || ch == '-' || ch == ':' || ch == '=' || ch == '$';
 }
+constexpr bool IsBatVariableNext(int chNext) noexcept {
+	return chNext == '~' || chNext == '=' || chNext == '*' || iswordstart(chNext);
+}
+constexpr bool IsMarkVariableNext(int chNext) noexcept {
+	return chNext == '=' || iswordstart(chNext);
+}
+// someone's, don't
+inline bool IsSingleQuotedString(int ch, int chPrev, int chNext) noexcept {
+	return ch == '\'' && !((chPrev > 0x7F || isalnum(chPrev)) && (chNext == 's' || chNext == 't' || chNext == 'S' || chNext == 'T'));
+}
 // Escape Characters https://www.robvanderwoude.com/escapechars.php
 bool GetBatEscapeLen(int state, int& length, int ch, int chNext, int chNext2) noexcept {
 	length = 0;
@@ -48,7 +58,7 @@ bool GetBatEscapeLen(int state, int& length, int ch, int chNext, int chNext2) no
 			length = 1;
 		}
 	} else if (ch == '%') {
-		if (chNext == '%' && !(chNext2 == '~' || chNext2 == '=' || IsAlphaNumeric(chNext2))) {
+		if (chNext == '%' && !IsBatVariableNext(chNext2)) {
 			length = 1;
 		}
 	} else if (ch == '"') {
@@ -85,7 +95,7 @@ static void ColouriseBatchDoc(Sci_PositionU startPos, Sci_Position length, int i
 	StyleContext sc(startPos, length, initStyle, styler);
 	std::vector<int> nestedState;
 
-	for (; sc.More(); sc.Forward()) {
+	while (sc.More()) {
 		if (sc.atLineStart) {
 			quatedVar = false;
 			markVar = false;
@@ -149,7 +159,7 @@ _label_identifier:
 			bool end_var = false;
 			if (quatedVar) {
 				if (sc.ch == '%') {
-					if (sc.chNext == '%') {
+					if (sc.chNext == '%' && !IsBatVariableNext(sc.GetRelative(2))) {
 						sc.Forward();
 					}
 					end_var = true;
@@ -171,11 +181,8 @@ _label_identifier:
 				} else if (!IsBatVariable(sc.ch)) {
 					end_var = true;
 				}
-				if (sc.ch == '%' && sc.chNext == '%') {
-					const int chNext2 = sc.GetRelative(2);
-					if (!(chNext2 == '~' || IsAlphaNumeric(chNext2))) {
-						sc.Forward(2);
-					}
+				if (sc.ch == '%' && sc.chNext == '%' && !IsBatVariableNext(sc.GetRelative(2))) {
+					sc.Forward(2);
 				}
 			}
 			if (!end_var && isspacechar(sc.ch)) {
@@ -187,14 +194,13 @@ _label_identifier:
 				} else {
 					sc.SetState(nestedState.back());
 					nestedState.pop_back();
-					goto _label_string;
+					continue;
 				}
 			}
 		} break;
 		case SCE_BAT_STRINGDQ:
 		case SCE_BAT_STRINGSQ:
 		case SCE_BAT_STRINGBT:
-_label_string:
 			if (GetBatEscapeLen(sc.state, escapeLen, sc.ch, sc.chNext, sc.GetRelative(2))) {
 				nestedState.push_back(sc.state);
 				sc.SetState(SCE_BAT_ESCAPE);
@@ -202,7 +208,7 @@ _label_string:
 			} else if (sc.ch == '%') {
 				nestedState.push_back(sc.state);
 				goto _label_variable;
-			} else if (sc.ch == '!' && (iswordstart(sc.chNext) || sc.chNext == '=')) {
+			} else if (sc.ch == '!' && IsMarkVariableNext(sc.chNext)) {
 				nestedState.push_back(sc.state);
 				quatedVar = false;
 				markVar = true;
@@ -237,23 +243,17 @@ _label_string:
 				} else {
 					sc.ForwardSetState(nestedState.back());
 					nestedState.pop_back();
-					goto _label_string;
+					continue;
 				}
 			} else if (sc.ch == '\"') {
 				nestedState.push_back(sc.state);
 				sc.SetState(SCE_BAT_STRINGDQ);
-				sc.Forward();
-				goto _label_string;
-			} else if (!inEcho && sc.ch == '\'') {
+			} else if (IsSingleQuotedString(sc.ch, sc.chPrev, sc.chNext)) {
 				nestedState.push_back(sc.state);
 				sc.SetState(SCE_BAT_STRINGSQ);
-				sc.Forward();
-				goto _label_string;
 			} else if (sc.ch == '`') {
 				nestedState.push_back(sc.state);
 				sc.SetState(SCE_BAT_STRINGBT);
-				sc.Forward();
-				goto _label_string;
 			}
 			break;
 		case SCE_BAT_ESCAPE:
@@ -265,7 +265,7 @@ _label_string:
 				} else {
 					sc.SetState(nestedState.back());
 					nestedState.pop_back();
-					goto _label_string;
+					continue;
 				}
 			}
 			break;
@@ -288,7 +288,7 @@ _label_string:
 			} else if (sc.ch == '\"') {
 				nestedState.clear();
 				sc.SetState(SCE_BAT_STRINGDQ);
-			} else if (!inEcho && sc.ch == '\'') {
+			} else if (IsSingleQuotedString(sc.ch, sc.chPrev, sc.chNext)) {
 				nestedState.clear();
 				sc.SetState(SCE_BAT_STRINGSQ);
 			} else if (sc.ch == '`') {
@@ -318,7 +318,7 @@ _label_variable:
 				} else {
 					quatedVar = true;
 				}
-			} else if (sc.ch == '!' && (iswordstart(sc.chNext) || sc.chNext == '=')) {
+			} else if (sc.ch == '!' && IsMarkVariableNext(sc.chNext)) {
 				quatedVar = false;
 				markVar = true;
 				numVar = false;
@@ -358,6 +358,7 @@ _label_variable:
 		if (!isspacechar(sc.ch)) {
 			visibleChars++;
 		}
+		sc.Forward();
 	}
 
 	if (sc.state == SCE_BAT_IDENTIFIER) {

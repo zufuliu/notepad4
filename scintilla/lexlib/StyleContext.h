@@ -39,8 +39,8 @@ public:
 	int state;
 	int chPrev;
 	int ch;
-	Sci_Position width;
 	int chNext;
+	Sci_Position width;
 	Sci_Position widthNext;
 
 	StyleContext(Sci_PositionU startPos, Sci_PositionU length,
