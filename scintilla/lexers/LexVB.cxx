@@ -87,7 +87,6 @@ static void ColouriseVBDoc(Sci_PositionU startPos, Sci_Position length, int init
 		if (sc.state == SCE_B_OPERATOR) {
 			sc.SetState(SCE_B_DEFAULT);
 		} else if (sc.state == SCE_B_IDENTIFIER) {
-_label_identifier:
 			if (!(iswordstart(sc.ch))) {
 				// In Basic (except VBScript), a variable name or a function name
 				// can end with a special character indicating the type of the value
@@ -220,9 +219,6 @@ _label_identifier:
 			visibleChars++;
 		}
 	}
-
-	if (sc.state == SCE_B_IDENTIFIER)
-		goto _label_identifier;
 
 	sc.Complete();
 }

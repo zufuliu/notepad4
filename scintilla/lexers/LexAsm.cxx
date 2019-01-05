@@ -101,7 +101,6 @@ static void ColouriseAsmDoc(Sci_PositionU startPos, Sci_Position length, int ini
 				sc.SetState(SCE_ASM_DEFAULT);
 			}
 		} else if (sc.state == SCE_ASM_IDENTIFIER) {
-_label_identifier:
 			if (!IsAsmWordChar(sc.ch)) {
 				char s[128];
 				sc.GetCurrentLowered(s, sizeof(s));
@@ -309,9 +308,6 @@ _label_identifier:
 		}
 
 	}
-
-	if (sc.state == SCE_ASM_IDENTIFIER)
-		goto _label_identifier;
 
 	sc.Complete();
 }

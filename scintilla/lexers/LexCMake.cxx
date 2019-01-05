@@ -39,14 +39,13 @@ static void ColouriseCmakeDoc(Sci_PositionU startPos, Sci_Position length, int i
 	int userDefType = 0;
 	StyleContext sc(startPos, length, initStyle, styler);
 
-	for (; sc.More(); sc.Forward()) {
+	while (sc.More()) {
 		// Determine if the current state should terminate.
 		switch (sc.state) {
 		case SCE_CMAKE_OPERATOR:
 			sc.SetState(SCE_CMAKE_DEFAULT);
 			break;
 		case SCE_CMAKE_IDENTIFIER:
-_label_identifier:
 			if (!iswordstart(sc.ch)) {
 				char s[128];
 				sc.GetCurrentLowered(s, sizeof(s) - 3);
@@ -76,7 +75,6 @@ _label_identifier:
 		case SCE_CMAKE_STRINGDQ:
 		case SCE_CMAKE_STRINGSQ:
 		case SCE_CMAKE_STRINGBT:
-_label_var_string:
 			if (sc.ch == '\\' && (sc.chNext == '\\' || sc.chNext == '\"' || sc.chNext == '\'')) {
 				sc.Forward();
 			} else if (sc.Match('$', '{')) {
@@ -98,7 +96,7 @@ _label_var_string:
 				if (nvarLevel == 0) {
 					sc.ForwardSetState(varStyle);
 					if (varStyle != SCE_CMAKE_DEFAULT) {
-						goto _label_var_string;
+						continue;
 					}
 				}
 			} else if (sc.Match('$', '{')) {
@@ -135,10 +133,9 @@ _label_var_string:
 					userDefType = 0;
 			}
 		}
-	}
 
-	if (sc.state == SCE_CMAKE_IDENTIFIER)
-		goto _label_identifier;
+		sc.Forward();
+	}
 
 	sc.Complete();
 }

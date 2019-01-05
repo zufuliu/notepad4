@@ -77,6 +77,31 @@ constexpr int LevelNumber(int level) noexcept {
 	return (level & SC_FOLDLEVELNUMBERMASK) - SC_FOLDLEVELBASE;
 }
 
+void DetectBatVariable(StyleContext &sc, bool &quotedVar, bool &markVar, bool &numVar) noexcept {
+	quotedVar = false;
+	markVar = false;
+	numVar = false;
+	sc.SetState(SCE_BAT_VARIABLE);
+	if (sc.chNext == '*' || sc.chNext == '~' || sc.chNext == '%') {
+		if (sc.chNext == '%') {
+			sc.Forward();
+		}
+		if (sc.chNext == '~') {
+			sc.Forward();
+			numVar = sc.chNext != '$';
+			if (numVar) {
+				while (sc.More() && !(IsADigit(sc.ch) || isspacechar(sc.ch))) {
+					sc.Forward();
+				}
+			}
+		}
+	} else if (IsADigit(sc.chNext)) {
+		numVar = true;
+	} else {
+		quotedVar = true;
+	}
+}
+
 }
 
 /*static const char *const batchWordListDesc[] = {
@@ -87,7 +112,7 @@ constexpr int LevelNumber(int level) noexcept {
 
 static void ColouriseBatchDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
 	const WordList &keywords = *keywordLists[0];
-	bool quatedVar = false;		// %var%
+	bool quotedVar = false;		// %var%
 	bool markVar = false;		// !var!		SetLocal EnableDelayedExpansion
 	bool numVar = false;		// %1, %~1
 	int visibleChars = 0;
@@ -108,7 +133,7 @@ static void ColouriseBatchDoc(Sci_PositionU startPos, Sci_Position length, int i
 
 	while (sc.More()) {
 		if (sc.atLineStart) {
-			quatedVar = false;
+			quotedVar = false;
 			markVar = false;
 			numVar = false;
 			inEcho = false;
@@ -122,7 +147,6 @@ static void ColouriseBatchDoc(Sci_PositionU startPos, Sci_Position length, int i
 			sc.SetState(SCE_BAT_DEFAULT);
 			break;
 		case SCE_BAT_IDENTIFIER:
-_label_identifier:
 			if ((sc.ch == '%' || sc.ch == '^') && GetBatEscapeLen(sc.state, escapeLen, sc.ch, sc.chNext, sc.GetRelative(2))) {
 				sc.SetState(SCE_BAT_ESCAPE);
 				sc.Forward(escapeLen);
@@ -171,7 +195,7 @@ _label_identifier:
 			break;
 		case SCE_BAT_VARIABLE: {
 			bool end_var = false;
-			if (quatedVar) {
+			if (quotedVar) {
 				if (sc.ch == '%') {
 					if (sc.chNext == '%' && !IsBatVariableNext(sc.GetRelative(2))) {
 						sc.Forward();
@@ -221,10 +245,10 @@ _label_identifier:
 				sc.Forward(escapeLen);
 			} else if (sc.ch == '%') {
 				nestedState.push_back(sc.state);
-				goto _label_variable;
+				DetectBatVariable(sc, quotedVar, markVar, numVar);
 			} else if (sc.ch == '!' && IsMarkVariableNext(sc.chNext)) {
 				nestedState.push_back(sc.state);
-				quatedVar = false;
+				quotedVar = false;
 				markVar = true;
 				numVar = false;
 				sc.SetState(SCE_BAT_VARIABLE);
@@ -309,31 +333,9 @@ _label_identifier:
 				nestedState.clear();
 				sc.SetState(SCE_BAT_STRINGBT);
 			} else if (sc.ch == '%') {
-_label_variable:
-				quatedVar = false;
-				markVar = false;
-				numVar = false;
-				sc.SetState(SCE_BAT_VARIABLE);
-				if (sc.chNext == '*' || sc.chNext == '~' || sc.chNext == '%') {
-					if (sc.chNext == '%') {
-						sc.Forward();
-					}
-					if (sc.chNext == '~') {
-						sc.Forward();
-						numVar = sc.chNext != '$';
-						if (numVar) {
-							while (sc.More() && !(IsADigit(sc.ch) || isspacechar(sc.ch))) {
-								sc.Forward();
-							}
-						}
-					}
-				} else if (IsADigit(sc.chNext)) {
-					numVar = true;
-				} else {
-					quatedVar = true;
-				}
+				DetectBatVariable(sc, quotedVar, markVar, numVar);
 			} else if (sc.ch == '!' && IsMarkVariableNext(sc.chNext)) {
-				quatedVar = false;
+				quotedVar = false;
 				markVar = true;
 				numVar = false;
 				sc.SetState(SCE_BAT_VARIABLE);
@@ -389,10 +391,6 @@ _label_variable:
 			visibleChars++;
 		}
 		sc.Forward();
-	}
-
-	if (sc.state == SCE_BAT_IDENTIFIER) {
-		goto _label_identifier;
 	}
 
 	sc.Complete();

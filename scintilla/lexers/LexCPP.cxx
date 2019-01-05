@@ -257,7 +257,6 @@ static void ColouriseCppDoc(Sci_PositionU startPos, Sci_Position length, int ini
 			break;
 
 		case SCE_C_IDENTIFIER:
-_label_identifier:
 			if (!(iswordstart(sc.ch) || (sc.ch == '-' && (lexType == LEX_JAM)))) {
 				char s[256] = { 0 };
 				if (lexType == LEX_PHP)
@@ -1100,9 +1099,6 @@ _label_identifier:
 		}
 		continuationLine = false;
 	}
-
-	if (sc.state == SCE_C_IDENTIFIER)
-		goto _label_identifier;
 
 	sc.Complete();
 }

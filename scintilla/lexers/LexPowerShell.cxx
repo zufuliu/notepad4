@@ -80,7 +80,6 @@ static void ColourisePowerShellDoc(Sci_PositionU startPos, Sci_Position length, 
 			}
 			break;
 		case SCE_POWERSHELL_IDENTIFIER:
-_label_identifier:
 			if (!IsPSWordChar(sc.ch)) {
 				char s[128];
 				sc.GetCurrentLowered(s, sizeof(s));
@@ -122,9 +121,6 @@ _label_identifier:
 			}
 		}
 	}
-
-	if (sc.state == SCE_POWERSHELL_IDENTIFIER)
-		goto _label_identifier;
 
 	sc.Complete();
 }

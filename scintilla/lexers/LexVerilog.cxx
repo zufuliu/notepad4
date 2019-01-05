@@ -76,7 +76,6 @@ static void ColouriseVerilogDoc(Sci_PositionU startPos, Sci_Position length, int
 				sc.SetState(SCE_V_DEFAULT);
 			}
 		} else if (sc.state == SCE_V_IDENTIFIER) {
-_label_identifier:
 			if (!IsVWordChar(sc.ch) || (sc.ch == '.')) {
 				char s[128];
 				sc.GetCurrent(s, sizeof(s));
@@ -146,9 +145,6 @@ _label_identifier:
 			}
 		}
 	}
-
-	if (sc.state == SCE_V_IDENTIFIER)
-		goto _label_identifier;
 
 	sc.Complete();
 }
