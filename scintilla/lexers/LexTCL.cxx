@@ -264,6 +264,14 @@ static void ColouriseTCLDoc(Sci_PositionU startPos, Sci_Position length, int, Le
 				sc.ForwardSetState(SCE_TCL_DEFAULT);
 				visibleChars = true; // necessary if a " is the first and only character on a line
 				continue;
+			} else if (sc.ch == '$' && IsAWordStart(sc.chNext)) {
+				sc.SetState(SCE_TCL_SUBSTITUTION);
+				sc.Forward();
+				while (sc.More() && IsAWordChar(sc.ch)) {
+					sc.Forward();
+				}
+				sc.SetState(SCE_TCL_IN_QUOTE);
+				continue;
 			} else if (sc.ch == '[' || sc.ch == ']' || sc.ch == '$') {
 				sc.SetState(SCE_TCL_OPERATOR);
 				expected = sc.ch == '[';
