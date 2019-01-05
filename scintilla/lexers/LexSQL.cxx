@@ -107,7 +107,6 @@ static void ColouriseSqlDoc(Sci_PositionU startPos, Sci_Position length, int ini
 			}
 			break;
 		case SCE_SQL_IDENTIFIER:
-_label_identifier:
 			if (!IsSqlWordChar(sc.ch, sqlAllowDottedWord)) {
 				const int nextState = SCE_SQL_DEFAULT;
 				char s[128];
@@ -265,9 +264,6 @@ _label_identifier:
 			}
 		}
 	}
-
-	if (sc.state == SCE_SQL_IDENTIFIER)
-		goto _label_identifier;
 
 	sc.Complete();
 }

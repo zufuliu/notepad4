@@ -162,7 +162,6 @@ static void ColourisePyDoc(Sci_PositionU startPos, Sci_Position length, int init
 			}
 			break;
 		case SCE_PY_IDENTIFIER:
-_label_identifier:
 			if (!iswordstart(sc.ch)) {
 				char s[128];
 				sc.GetCurrent(s, sizeof(s));
@@ -340,9 +339,6 @@ _label_identifier:
 		}
 		continuationLine = false;
 	}
-
-	if (sc.state == SCE_PY_IDENTIFIER)
-		goto _label_identifier;
 
 	sc.Complete();
 }

@@ -105,7 +105,6 @@ static void ColouriseFortranDoc(Sci_PositionU startPos, Sci_Position length, int
 			if (sc.ch == '.')
 				sc.ForwardSetState(SCE_F_DEFAULT);
 		} else if (sc.state == SCE_F_IDENTIFIER) {
-_label_identifier:
 			if (!IsFWordChar(sc.ch)) {
 				char s[128];
 				sc.GetCurrentLowered(s, sizeof(s));
@@ -162,9 +161,6 @@ _label_identifier:
 		}
 
 	}
-
-	if (sc.state == SCE_F_IDENTIFIER)
-		goto _label_identifier;
 
 	sc.Complete();
 }
