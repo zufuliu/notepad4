@@ -141,7 +141,7 @@ BEGIN
     POPUP "+"
     BEGIN
         MENUITEM "Show &Toolbar",               IDM_VIEW_TOOLBAR
-        MENUITEM "&Costomize Toolbar...",       IDM_VIEW_CUSTOMIZETB
+        MENUITEM "&Customize Toolbar...",       IDM_VIEW_CUSTOMIZETB
         MENUITEM "Show &Statusbar",             IDM_VIEW_STATUSBAR
     END
     POPUP "+"
