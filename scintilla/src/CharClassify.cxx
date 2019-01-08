@@ -9,6 +9,7 @@
 #include <cctype>
 
 #include <stdexcept>
+#include <algorithm>
 
 #include "CharClassify.h"
 
@@ -20,16 +21,19 @@ CharClassify::CharClassify() noexcept : charClass{} {
 
 void CharClassify::SetDefaultCharClasses(bool includeWordClass) noexcept {
 	// Initialize all char classes to default values
-	for (int ch = 0; ch < 256; ch++) {
+	for (int ch = 0; ch < 128; ch++) {
 		if (ch == '\r' || ch == '\n')
 			charClass[ch] = ccNewLine;
 		else if (ch < 0x20 || ch == ' ')
 			charClass[ch] = ccSpace;
-		else if (includeWordClass && (ch >= 0x80 || isalnum(ch) || ch == '_'))
+		else if (includeWordClass && (isalnum(ch) || ch == '_'))
 			charClass[ch] = ccWord;
 		else
 			charClass[ch] = ccPunctuation;
 	}
+
+	const unsigned char w = static_cast<unsigned char>(includeWordClass ? ccWord : ccPunctuation);
+	std::fill_n(charClass + 128, 128, w);
 }
 
 void CharClassify::SetCharClasses(const unsigned char *chars, cc newCharClass) noexcept {
