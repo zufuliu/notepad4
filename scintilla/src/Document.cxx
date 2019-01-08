@@ -3034,9 +3034,7 @@ Sci::Position BuiltinRegex::FindText(Document *doc, Sci::Position minPos, Sci::P
 
 	const RESearchRange resr(doc, minPos, maxPos);
 
-	const bool posix = (flags & SCFIND_POSIX) != 0;
-
-	const char *errmsg = search.Compile(s, *length, caseSensitive, posix);
+	const char *errmsg = search.Compile(s, *length, caseSensitive, flags);
 	if (errmsg) {
 		return -1;
 	}
