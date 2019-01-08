@@ -214,6 +214,8 @@
 
 using namespace Scintilla;
 
+#define SCFIND_POSIX 0x00400000
+
 #define OKP     1
 #define NOP     0
 
@@ -256,6 +258,9 @@ RESearch::RESearch(const CharClassify *charClassTable) {
 	charClass = charClassTable;
 	sta = NOP;                  /* status of lastpat */
 	bol = 0;
+	previousPattern = nullptr;
+	previousLength = 0;
+	previousFlags = 0;
 	const unsigned char nul = 0;
 	std::fill(bittab, std::end(bittab), nul);
 	std::fill(tagstk, std::end(tagstk), 0);
@@ -432,7 +437,27 @@ int RESearch::GetBackslashExpression(
 	return result;
 }
 
-const char *RESearch::Compile(const char *pattern, Sci::Position length, bool caseSensitive, bool posix) noexcept {
+const char *RESearch::Compile(const char *pattern, Sci::Position length, bool caseSensitive, int flags) noexcept {
+	if (sta == OKP && (pattern == nullptr || length == 0
+		|| (pattern == previousPattern
+			&& length == previousLength
+			&& flags == previousFlags
+			&& memcmp(pattern, previousPattern, length) == 0)
+	)) {
+		return nullptr;
+	}
+
+	const bool posix = (flags & SCFIND_POSIX) != 0;
+	const char * const errmsg = DoCompile(pattern, length, caseSensitive, posix);
+	if (errmsg == nullptr) {
+		previousPattern = pattern;
+		previousLength = length;
+		previousFlags = flags;
+	}
+	return errmsg;
+}
+
+const char *RESearch::DoCompile(const char *pattern, Sci::Position length, bool caseSensitive, bool posix) noexcept {
 	char *mp = nfa;          /* nfa pointer       */
 	char *lp;              /* saved pointer     */
 	char *sp = nfa;          /* another one       */
@@ -447,7 +472,7 @@ const char *RESearch::Compile(const char *pattern, Sci::Position length, bool ca
 	int c2;
 	int prevChar;
 
-	if (!pattern || !length) {
+	if (pattern == nullptr || length == 0) {
 		if (sta)
 			return nullptr;
 		else
