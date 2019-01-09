@@ -272,6 +272,13 @@ RESearch::~RESearch() {
 	Clear();
 }
 
+void RESearch::ClearCache() noexcept {
+	sta = NOP;
+	previousPattern = nullptr;
+	previousLength = 0;
+	previousFlags = 0;
+}
+
 void RESearch::Clear() noexcept {
 	for (int i = 0; i < MAXTAG; i++) {
 		pat[i].clear();

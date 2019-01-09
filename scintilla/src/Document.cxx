@@ -2073,10 +2073,16 @@ Sci::Line Document::LinesTotal() const noexcept {
 
 void Document::SetDefaultCharClasses(bool includeWordClass) noexcept {
 	charClass.SetDefaultCharClasses(includeWordClass);
+	if (regex) {
+		regex->ClearCache();
+	}
 }
 
 void Document::SetCharClasses(const unsigned char *chars, CharClassify::cc newCharClass) noexcept {
     charClass.SetCharClasses(chars, newCharClass);
+	if (regex) {
+		regex->ClearCache();
+	}
 }
 
 int Document::GetCharsOfClass(CharClassify::cc characterClass, unsigned char *buffer) const noexcept {
@@ -2563,6 +2569,10 @@ public:
 		Sci::Position *length) override;
 
 	const char *SubstituteByPosition(Document *doc, const char *text, Sci::Position *length) override;
+
+	void ClearCache() noexcept override {
+		search.ClearCache();
+	}
 
 private:
 	RESearch search;
