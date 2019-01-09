@@ -437,12 +437,12 @@ int RESearch::GetBackslashExpression(
 	return result;
 }
 
-const char *RESearch::Compile(const char *pattern, Sci::Position length, bool caseSensitive, int flags) noexcept {
+const char *RESearch::Compile(const char *pattern, Sci::Position length, bool caseSensitive, int flags) {
 	if (sta == OKP && (pattern == nullptr || length == 0
 		|| (pattern == previousPattern
 			&& length == previousLength
 			&& flags == previousFlags
-			&& memcmp(pattern, previousPattern, length) == 0)
+			&& memcmp(pattern, cachedPattern.data(), length) == 0)
 	)) {
 		return nullptr;
 	}
@@ -453,6 +453,7 @@ const char *RESearch::Compile(const char *pattern, Sci::Position length, bool ca
 		previousPattern = pattern;
 		previousLength = length;
 		previousFlags = flags;
+		cachedPattern.assign(pattern, length);
 	}
 	return errmsg;
 }
