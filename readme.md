@@ -1,11 +1,12 @@
 # Notepad2 and metapath
 
 > *Notepad2* is a modified version (fork) of [Notepad2-mod](https://xhmikosr.github.io/notepad2-mod/). *metapath* is a bug-fixed version of original [metapath](http://www.flos-freeware.ch/archive.html).
+[![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)
 
 ## Binaries
-Latest release: [![Latest release](https://img.shields.io/github/release/zufuliu/notepad2.svg)](https://github.com/zufuliu/notepad2/releases).
+Latest release: [![Latest release](https://img.shields.io/github/release/zufuliu/notepad2.svg)](https://github.com/zufuliu/notepad2/releases)
 
-Latest build: [![Build status](https://ci.appveyor.com/api/projects/status/github/zufuliu/notepad2?branch=master&svg=true)](https://ci.appveyor.com/project/zufuliu/notepad2) (Find artifacts in Release configuration for each platform).
+Latest build: [![Build status](https://ci.appveyor.com/api/projects/status/github/zufuliu/notepad2?branch=master&svg=true)](https://ci.appveyor.com/project/zufuliu/notepad2) (Find artifacts in Release configuration for each platform.)
 
 Or build from source, see the [Wiki](https://github.com/zufuliu/notepad2/wiki/Build-Notepad2).
 
@@ -209,5 +210,3 @@ Or build from source, see the [Wiki](https://github.com/zufuliu/notepad2/wiki/Bu
 ### Related projects based on (original) Notepad2 and/or Notepad2-mod:
 * [Notepad3](https://github.com/rizonesoft/Notepad3)
 * [Notepad2e](https://github.com/ProgerXP/Notepad2e)
-
-## [License](../master/License.txt)
