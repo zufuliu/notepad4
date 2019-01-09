@@ -33,7 +33,7 @@ public:
 	~RESearch();
 	void Clear() noexcept;
 	void GrabMatches(const CharacterIndexer &ci);
-	const char *Compile(const char *pattern, Sci::Position length, bool caseSensitive, int flags) noexcept;
+	const char *Compile(const char *pattern, Sci::Position length, bool caseSensitive, int flags);
 	int Execute(const CharacterIndexer &ci, Sci::Position lp, Sci::Position endp);
 
 	enum {
@@ -68,6 +68,7 @@ private:
 	const char *previousPattern;
 	Sci::Position previousLength;
 	int previousFlags;
+	std::string cachedPattern;
 
 	unsigned char bittab[BITBLK]; /* bit table for CCL pre-set bits */
 	const CharClassify *charClass;
