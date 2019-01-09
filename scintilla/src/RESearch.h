@@ -32,6 +32,7 @@ public:
 	// No dynamic allocation so default copy constructor and assignment operator are OK.
 	~RESearch();
 	void Clear() noexcept;
+	void ClearCache() noexcept;
 	void GrabMatches(const CharacterIndexer &ci);
 	const char *Compile(const char *pattern, Sci::Position length, bool caseSensitive, int flags);
 	int Execute(const CharacterIndexer &ci, Sci::Position lp, Sci::Position endp);
