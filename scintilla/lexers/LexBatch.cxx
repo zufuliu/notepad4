@@ -46,7 +46,7 @@ constexpr bool IsMarkVariableNext(int chNext) noexcept {
 }
 // someone's, don't
 inline bool IsSingleQuotedString(int ch, int chPrev, int chNext) noexcept {
-	return ch == '\'' && !((chPrev > 0x7F || isalnum(chPrev)) && (chNext == 's' || chNext == 't' || chNext == 'S' || chNext == 'T'));
+	return ch == '\'' && !((chPrev >= 0x80 || isalnum(chPrev)) && (chNext == 's' || chNext == 't' || chNext == 'S' || chNext == 'T'));
 }
 // Escape Characters https://www.robvanderwoude.com/escapechars.php
 bool GetBatEscapeLen(int state, int& length, int ch, int chNext, int chNext2) noexcept {
@@ -54,7 +54,7 @@ bool GetBatEscapeLen(int state, int& length, int ch, int chNext, int chNext2) no
 	if (ch == '^') {
 		if (chNext == '^') {
 			length = (chNext2 == '!') ? 2 : 1;
-		} else if (chNext < 0x7F && ispunct(chNext)) {
+		} else if (chNext < 0x80 && ispunct(chNext)) {
 			length = 1;
 		}
 	} else if (ch == '%') {

@@ -495,7 +495,7 @@ void EditCompleteUpdateConfig(void) {
 		if (c == L'\0') {
 			break;
 		}
-		if (c < 0x7f && ispunct((unsigned char)c)) {
+		if (c < 0x80 && ispunct((unsigned char)c)) {
 			autoCompletionConfig.wszAutoCompleteFillUp[k++] = c;
 			if (punctuation) {
 				autoCompletionConfig.szAutoCompleteFillUp[i++] = (char)c;
@@ -692,7 +692,7 @@ end:
 
 static BOOL CanAutoCloseSingleQuote(int chPrev, int iCurrentStyle) {
 	const int iLexer = pLexCurrent->iLexer;
-	if (chPrev > 0x7F	// someone's
+	if (chPrev >= 0x80	// someone's
 		|| (iLexer == SCLEX_CPP && iCurrentStyle == SCE_C_NUMBER)
 		|| (iLexer == SCLEX_LISP && iCurrentStyle == SCE_C_OPERATOR)
 		|| (iLexer == SCLEX_MATLAB && iCurrentStyle == SCE_MAT_OPERATOR) // transpose operator
@@ -710,7 +710,7 @@ static BOOL CanAutoCloseSingleQuote(int chPrev, int iCurrentStyle) {
 		if (pLexCurrent->rid == NP2LEX_CPP || pLexCurrent->rid == NP2LEX_RC || iLexer == SCLEX_PYTHON || iLexer == SCLEX_SQL) {
 			const int lower = chPrev | 0x20;
 			const int chPrev2 = SciCall_GetCharAt(SciCall_GetCurrentPos() - 3);
-			const BOOL bSubWord = chPrev2 > 0x7F || isalnum(chPrev2);
+			const BOOL bSubWord = chPrev2 >= 0x80 || isalnum(chPrev2);
 
 			switch (iLexer) {
 			case SCLEX_CPP:

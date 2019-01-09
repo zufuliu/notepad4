@@ -53,10 +53,6 @@ inline bool UTF8IsTrailByte(unsigned char ch) noexcept {
 	return (UTF8ClassifyTable[ch] & UTF8ClassifyMaskTrailByte) != 0;
 }
 
-constexpr bool UTF8IsAscii(unsigned char ch) noexcept {
-	return (ch & 0x80) == 0;
-}
-
 constexpr bool UTF8IsAscii(unsigned int ch) noexcept {
 	return ch < 0x80;
 }

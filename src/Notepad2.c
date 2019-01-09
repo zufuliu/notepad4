@@ -3503,12 +3503,12 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		int iBrace2 = -1;
 		int iPos = (int)SendMessage(hwndEdit, SCI_GETCURRENTPOS, 0, 0);
 		int ch = (int)SendMessage(hwndEdit, SCI_GETCHARAT, iPos, 0);
-		if (ch < 0x7F && strchr("()[]{}<>", ch)) {
+		if (ch < 0x80 && strchr("()[]{}<>", ch)) {
 			iBrace2 = (int)SendMessage(hwndEdit, SCI_BRACEMATCH, iPos, 0);
 		} else { // Try one before
 			iPos = (int)SendMessage(hwndEdit, SCI_POSITIONBEFORE, iPos, 0);
 			ch = (int)SendMessage(hwndEdit, SCI_GETCHARAT, iPos, 0);
-			if (ch < 0x7F && strchr("()[]{}<>", ch)) {
+			if (ch < 0x80 && strchr("()[]{}<>", ch)) {
 				iBrace2 = (int)SendMessage(hwndEdit, SCI_BRACEMATCH, iPos, 0);
 			}
 		}
@@ -3522,12 +3522,12 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		int iBrace2 = -1;
 		int iPos = (int)SendMessage(hwndEdit, SCI_GETCURRENTPOS, 0, 0);
 		int ch = (int)SendMessage(hwndEdit, SCI_GETCHARAT, iPos, 0);
-		if (ch < 0x7F && strchr("()[]{}<>", ch)) {
+		if (ch < 0x80 && strchr("()[]{}<>", ch)) {
 			iBrace2 = (int)SendMessage(hwndEdit, SCI_BRACEMATCH, iPos, 0);
 		} else { // Try one before
 			iPos = (int)SendMessage(hwndEdit, SCI_POSITIONBEFORE, iPos, 0);
 			ch = (int)SendMessage(hwndEdit, SCI_GETCHARAT, iPos, 0);
-			if (ch < 0x7F && strchr("()[]{}<>", ch)) {
+			if (ch < 0x80 && strchr("()[]{}<>", ch)) {
 				iBrace2 = (int)SendMessage(hwndEdit, SCI_BRACEMATCH, iPos, 0);
 			}
 		}
@@ -4815,7 +4815,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 					int iPos = (int)SendMessage(hwndEdit, SCI_GETCURRENTPOS, 0, 0);
 					int ch = (int)SendMessage(hwndEdit, SCI_GETCHARAT, iPos, 0);
-					if (ch < 0x7F && strchr("()[]{}<>", ch)) {
+					if (ch < 0x80 && strchr("()[]{}<>", ch)) {
 						const int iBrace2 = (int)SendMessage(hwndEdit, SCI_BRACEMATCH, iPos, 0);
 						if (iBrace2 != -1) {
 							const int col1 = (int)SendMessage(hwndEdit, SCI_GETCOLUMN, iPos, 0);
@@ -4829,7 +4829,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 					} else { // Try one before
 						iPos = (int)SendMessage(hwndEdit, SCI_POSITIONBEFORE, iPos, 0);
 						ch = (int)SendMessage(hwndEdit, SCI_GETCHARAT, iPos, 0);
-						if (ch < 0x7F && strchr("()[]{}<>", ch)) {
+						if (ch < 0x80 && strchr("()[]{}<>", ch)) {
 							const int iBrace2 = (int)SendMessage(hwndEdit, SCI_BRACEMATCH, iPos, 0);
 							if (iBrace2 != -1) {
 								const int col1 = (int)SendMessage(hwndEdit, SCI_GETCOLUMN, iPos, 0);
