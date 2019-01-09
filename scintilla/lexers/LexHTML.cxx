@@ -423,7 +423,7 @@ bool issgmlwordchar(int ch) noexcept {
 }
 
 bool IsPhpWordStart(int ch) noexcept {
-	return (IsASCII(ch) && (isalpha(ch) || (ch == '_'))) || (ch >= 0x7f);
+	return (IsASCII(ch) && (isalpha(ch) || (ch == '_'))) || (ch >= 0x80);
 }
 
 bool IsPhpWordChar(int ch) noexcept {
