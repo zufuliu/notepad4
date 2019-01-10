@@ -14,7 +14,8 @@ WordCategory = [
     'Mn', 'Mc', 'Me', # Mark
 ]
 
-# https://en.wikipedia.org/wiki/List_of_Unicode_characters
+# https://en.wikipedia.org/wiki/Unicode_block
+# https://en.wikipedia.org/wiki/Plane_(Unicode)#Basic_Multilingual_Plane
 # https://en.wikipedia.org/wiki/CJK_Unified_Ideographs
 # https://en.wikipedia.org/wiki/Katakana
 # https://en.wikipedia.org/wiki/Hangul
@@ -45,6 +46,7 @@ CJKBlockList = [
     (0x30A0, 0x30FF), # U+30A0–U+30FF Katakana
     (0x3190, 0x319F), # U+3190-U+319F Kanbun
     (0x31F0, 0x31FF), # U+31F0–U+31FF Katakana Phonetic Extensions
+    (0xFF65, 0xFF9F), # U+FF65-U+FF9F Halfwidth Katakana
     (0x1B000, 0x1B0FF), # U+1B000–U+1B0FF Kana Supplement
     (0x1B100, 0x1B12F), # U+1B100-U+1B12F Kana Extended-A
     # Korean
@@ -53,6 +55,7 @@ CJKBlockList = [
     (0x3130, 0x318F), # U+3130–U+318F Hangul Compatibility Jamo
     (0xA960, 0xA97F), # U+A960–U+A97F Hangul Jamo Extended-A
     (0xD7B0, 0xD7FF), # U+D7B0–U+D7FF Hangul Jamo Extended-B
+    (0xFFA0, 0xFFDC), # U+FFA0-U+FFDC Halfwidth Compatibility Jamo
     # Yi
     (0xA000, 0xA48F), # U+A000-U+A48F Yi Syllables
     (0xA490, 0xA4CF), # U+A490-U+A4CF Yi Radicals
@@ -65,25 +68,15 @@ def findCategories(filename):
     print(values)
     return [v[2:] for v in values]
 
-def isCJKLetter(category, uch):
+def isCJKLetter(category, ch):
     if category not in WordCategory:
         return False
 
-    ch = ord(uch)
     for block in CJKBlockList:
         if ch >= block[0] and ch <= block[1]:
             return True
 
-    name = ''
-    try:
-        name = unicodedata.name(uch).upper()
-    except:
-        pass
-    return 'CJK' in name \
-        or 'HIRAGANA' in name \
-        or 'KATAKANA' in name \
-        or 'HANGUL' in name \
-        or 'KANA' in name \
+    return False
 
 def updateCharacterCategory(filename):
     values = ["// Created with Python %s,  Unicode %s" % (
@@ -93,7 +86,7 @@ def updateCharacterCategory(filename):
     for ch in range(sys.maxunicode):
         uch = chr(ch)
         current = unicodedata.category(uch)
-        if isCJKLetter(current, uch):
+        if isCJKLetter(current, ch):
             current = 'CJK'
         if current != category:
             value = startRange * 32 + categories.index(category)
@@ -102,9 +95,9 @@ def updateCharacterCategory(filename):
             startRange = ch
     value = startRange * 32 + categories.index(category)
     values.append("%d," % value)
+    print('catRanges:', len(values))
 
     Regenerate(filename, "//", values)
 
 categories = findCategories("../lexlib/CharacterCategory.h")
-
 updateCharacterCategory("../lexlib/CharacterCategory.cxx")
