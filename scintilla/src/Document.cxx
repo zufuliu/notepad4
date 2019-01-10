@@ -1688,9 +1688,15 @@ CharClassify::cc Document::WordCharacterClass(unsigned int ch) const noexcept {
 Sci::Position Document::ExtendWordSelect(Sci::Position pos, int delta, bool onlyWordCharacters) const noexcept {
 	CharClassify::cc ccStart = CharClassify::ccWord;
 	if (delta < 0) {
-		if (!onlyWordCharacters) {
+		if (pos > 0) {
 			const CharacterExtracted ce = CharacterBefore(pos);
-			ccStart = WordCharacterClass(ce.character);
+			const CharClassify::cc ceStart = WordCharacterClass(ce.character);
+			if (!onlyWordCharacters || ceStart == ccStart || ceStart == CharClassify::ccCJKWord) {
+				ccStart = ceStart;
+				pos -= ce.widthBytes;
+			} else {
+				return MovePositionOutsideChar(pos, delta, true);
+			}
 		}
 		while (pos > 0) {
 			const CharacterExtracted ce = CharacterBefore(pos);
@@ -1699,9 +1705,15 @@ Sci::Position Document::ExtendWordSelect(Sci::Position pos, int delta, bool only
 			pos -= ce.widthBytes;
 		}
 	} else {
-		if (!onlyWordCharacters && pos < Length()) {
+		if (pos < Length()) {
 			const CharacterExtracted ce = CharacterAfter(pos);
-			ccStart = WordCharacterClass(ce.character);
+			const CharClassify::cc ceStart = WordCharacterClass(ce.character);
+			if (!onlyWordCharacters || ceStart == ccStart || ceStart == CharClassify::ccCJKWord) {
+				ccStart = ceStart;
+				pos += ce.widthBytes;
+			} else {
+				return MovePositionOutsideChar(pos, delta, true);
+			}
 		}
 		while (pos < Length()) {
 			const CharacterExtracted ce = CharacterAfter(pos);
