@@ -202,6 +202,7 @@
 
 #include <cstddef>
 #include <cstdlib>
+#include <cstring>
 
 #include <stdexcept>
 #include <string>
