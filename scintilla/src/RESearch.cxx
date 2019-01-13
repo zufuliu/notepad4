@@ -233,6 +233,12 @@ using namespace Scintilla;
 #define CLQ     12 /* 0 to 1 closure */
 #define LCLO    13 /* lazy closure */
 
+// experimental
+#define EXP_MATCH_WORD_START	14
+#define EXP_MATCH_WORD_END		15
+#define EXP_MATCH_TO_WORD_END		16
+#define EXP_MATCH_TO_WORD_END_OPT	17
+
 #define END     0
 
 /*
@@ -642,6 +648,11 @@ const char *RESearch::DoCompile(const char *pattern, Sci::Position length, bool 
 				break;
 			}
 
+			if (*p == '?' && *lp == EXP_MATCH_TO_WORD_END) {
+				*lp = EXP_MATCH_TO_WORD_END_OPT;
+				break;
+			}
+
 			if (*p == '+') {
 				for (sp = mp; lp < sp; lp++) {
 					*mp++ = *lp;
@@ -671,6 +682,17 @@ const char *RESearch::DoCompile(const char *pattern, Sci::Position length, bool 
 				if (*sp == BOW)
 					return badpat("Null pattern inside \\<\\>");
 				*mp++ = EOW;
+				break;
+			case 'h':
+				*mp++ = EXP_MATCH_WORD_START;
+				break;
+			case 'H':
+				if (*sp == EXP_MATCH_WORD_START)
+					return badpat("Null pattern inside \\h\\H");
+				*mp++ = EXP_MATCH_WORD_END;
+				break;
+			case 'i':
+				*mp++ = EXP_MATCH_TO_WORD_END;
 				break;
 			case '1':
 			case '2':
@@ -828,10 +850,11 @@ int RESearch::Execute(const CharacterIndexer &ci, Sci::Position lp, Sci::Positio
 		// fall through
 	default:			/* regular matching all the way. */
 		while (lp < endp) {
-			ep = PMatch(ci, lp, endp, ap);
+			Sci::Position offset = 1;
+			ep = PMatch(ci, lp, endp, ap, 1, &offset);
 			if (ep != NOTFOUND)
 				break;
-			lp++;
+			lp += offset;
 		}
 		break;
 	case END:			/* munged automaton. fail always */
@@ -888,7 +911,7 @@ static inline int isinset(const char *ap, unsigned char c) noexcept {
 #define CHRSKIP 3	/* [CLO] CHR chr END      */
 #define CCLSKIP 34	/* [CLO] CCL 32 bytes END */
 
-Sci::Position RESearch::PMatch(const CharacterIndexer &ci, Sci::Position lp, Sci::Position endp, char *ap) {
+Sci::Position RESearch::PMatch(const CharacterIndexer &ci, Sci::Position lp, Sci::Position endp, char *ap, int moveDir, Sci::Position *offset) {
 	int op;
 	int c;
 	int n;
@@ -938,6 +961,36 @@ Sci::Position RESearch::PMatch(const CharacterIndexer &ci, Sci::Position lp, Sci
 			if (lp == bol || !iswordc(ci.CharAt(lp - 1)) || iswordc(ci.CharAt(lp)))
 				return NOTFOUND;
 			break;
+		case EXP_MATCH_WORD_START:
+			if (!ci.IsWordStartAt(lp)) {
+				if (offset) {
+					e = ci.MovePositionOutsideChar(lp, moveDir);
+					*offset = (e == lp) ? ci.NextPosition(lp, moveDir) - lp : e - lp;
+				}
+				return NOTFOUND;
+			}
+			break;
+		case EXP_MATCH_WORD_END:
+			if (lp == bol || !ci.IsWordEndAt(lp)) {
+				if (offset) {
+					e = ci.MovePositionOutsideChar(lp, moveDir);
+					*offset = (e == lp) ? ci.NextPosition(lp, moveDir) - lp : e - lp;
+				}
+				return NOTFOUND;
+			}
+			break;
+		case EXP_MATCH_TO_WORD_END:
+		case EXP_MATCH_TO_WORD_END_OPT: {
+			e = ci.ExtendWordSelect(lp, moveDir);
+			const bool find = ci.IsWordEndAt(e);
+			if (offset) {
+				*offset = (e == lp) ? ci.NextPosition(lp, moveDir) - lp : e - lp;
+			}
+			if ((e == lp && op != EXP_MATCH_TO_WORD_END_OPT) || !find) {
+				return NOTFOUND;
+			}
+			lp = e;
+		} break;
 		case REF:
 			n = *ap++;
 			bp = bopat[n];
@@ -992,13 +1045,14 @@ Sci::Position RESearch::PMatch(const CharacterIndexer &ci, Sci::Position lp, Sci
 			e = NOTFOUND;
 			while (llp >= are) {
 				Sci::Position q;
-				if ((q = PMatch(ci, llp, endp, ap)) != NOTFOUND) {
+				Sci::Position qoff = -1;
+				if ((q = PMatch(ci, llp, endp, ap, -1, &qoff)) != NOTFOUND) {
 					e = q;
 					lp = llp;
 					if (op != LCLO) return e;
 				}
 				if (*ap == END) return e;
-				--llp;
+				llp += qoff;
 			}
 			if (*ap == EOT)
 				PMatch(ci, lp, endp, ap);
