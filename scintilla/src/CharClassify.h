@@ -19,6 +19,7 @@ public:
 	};
 	void SetDefaultCharClasses(bool includeWordClass) noexcept;
 	void SetCharClasses(const unsigned char *chars, cc newCharClass) noexcept;
+	void SetCharClassesEx(const unsigned char *chars, int length) noexcept;
 	int GetCharsOfClass(cc characterClass, unsigned char *buffer) const noexcept;
 	cc GetClass(unsigned char ch) const noexcept {
 		return static_cast<cc>(charClass[ch]);

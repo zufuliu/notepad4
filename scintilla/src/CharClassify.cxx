@@ -46,6 +46,23 @@ void CharClassify::SetCharClasses(const unsigned char *chars, cc newCharClass) n
 	}
 }
 
+void CharClassify::SetCharClassesEx(const unsigned char *chars, int length) noexcept {
+	if (chars == nullptr || length <= 0) {
+		const unsigned char w = ccWord;
+		std::fill_n(charClass + 128, 128, w);
+	} else if (length == 16) {
+		for (int i = 0; i < 128; i++) {
+			const unsigned char w = 1 + ((chars[i >> 3] >> (i & 7)) & 1);
+			charClass[i + 128] = w;
+		}
+	} else if (length == 32) {
+		for (int i = 0; i < 128; i++) {
+			const unsigned char w = (chars[i >> 2] >> (2 * (i & 3))) & 3;
+			charClass[i + 128] = w;
+		}
+	}
+}
+
 int CharClassify::GetCharsOfClass(cc characterClass, unsigned char *buffer) const noexcept {
 	// Get characters belonging to the given char class; return the number
 	// of characters (if the buffer is NULL, don't write to it).

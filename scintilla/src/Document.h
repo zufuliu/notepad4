@@ -492,6 +492,7 @@ public:
 
 	void SetDefaultCharClasses(bool includeWordClass) noexcept;
 	void SetCharClasses(const unsigned char *chars, CharClassify::cc newCharClass) noexcept;
+	void SetCharClassesEx(const unsigned char *chars, int length) noexcept;
 	int GetCharsOfClass(CharClassify::cc characterClass, unsigned char *buffer) const noexcept;
 	void SCI_METHOD StartStyling(Sci_Position position) noexcept override;
 	bool SCI_METHOD SetStyleFor(Sci_Position length, unsigned char style) override;

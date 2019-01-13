@@ -2091,7 +2091,14 @@ void Document::SetDefaultCharClasses(bool includeWordClass) noexcept {
 }
 
 void Document::SetCharClasses(const unsigned char *chars, CharClassify::cc newCharClass) noexcept {
-    charClass.SetCharClasses(chars, newCharClass);
+	charClass.SetCharClasses(chars, newCharClass);
+	if (regex) {
+		regex->ClearCache();
+	}
+}
+
+void Document::SetCharClassesEx(const unsigned char *chars, int length) noexcept {
+	charClass.SetCharClassesEx(chars, length);
 	if (regex) {
 		regex->ClearCache();
 	}

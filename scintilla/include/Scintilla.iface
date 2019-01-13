@@ -624,6 +624,9 @@ set void SetCaretPeriod=2076(int periodMilliseconds,)
 # First sets defaults like SetCharsDefault.
 set void SetWordChars=2077(, string characters)
 
+# call CharClassify::SetCharClassesEx()
+set void SetCharClassesEx=2065(int length, string characters)
+
 # Get the set of characters making up words for when moving or selecting by word.
 # Returns the number of characters
 get int GetWordChars=2646(, stringresult characters)

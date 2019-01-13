@@ -6242,6 +6242,10 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 		}
 		break;
 
+	case SCI_SETCHARCLASSESEX:
+		pdoc->SetCharClassesEx(ConstUCharPtrFromSPtr(lParam), static_cast<int>(wParam));
+		break;
+
 	case SCI_GETWHITESPACECHARS:
 		return pdoc->GetCharsOfClass(CharClassify::ccSpace, UCharPtrFromSPtr(lParam));
 
