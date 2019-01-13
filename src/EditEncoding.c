@@ -224,7 +224,7 @@ static const UINT8 ANSICharClassifyTable[] = {
 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0x2A, 0xC0, 0xAA, 0xAA, 0xAA, 0xEA, 0xAA, 0xAA, 0xFA, 0x00,
 };
 
-static const UINT8* GetANSICharClassifyTable(int cp, int *length) {
+static const UINT8* GetANSICharClassifyTable(UINT cp, int *length) {
 	switch (cp) {
 	case 1250: // Central European (Windows-1250)
 		*length = 32;

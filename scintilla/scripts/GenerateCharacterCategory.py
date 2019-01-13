@@ -238,7 +238,7 @@ def buildANSICharClassifyTable(filename):
 				fd.write(', '.join('0x%02X' % ch for ch in data[16:]) + ',\n')
 		fd.write("};\n\n")
 
-		fd.write("static const UINT8* GetANSICharClassifyTable(int cp, int *length) {\n")
+		fd.write("static const UINT8* GetANSICharClassifyTable(UINT cp, int *length) {\n")
 		fd.write("\tswitch (cp) {\n")
 		for item in result.values():
 			for page in item['codepage']:
