@@ -4850,32 +4850,48 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			break;
 
 		case SCN_CHARADDED: {
-			if (scn->ch > 0x7F) {
+			const int ch = scn->ch;
+			if (ch < 0x80) {
+				// Auto indent
+				if (ch == '\r' || ch == '\n') {
+					// in CRLF mode handle LF only...
+					if (autoCompletionConfig.bIndentText && ((SC_EOL_CRLF == iEOLMode && ch != '\n') || SC_EOL_CRLF != iEOLMode)) {
+						EditAutoIndent(hwndEdit);
+					}
+					return 0;
+				}
+				// Auto close tags
+				if (ch == '>') {
+					if (autoCompletionConfig.bCloseTags || autoCompletionConfig.bCompleteWord) {
+						EditAutoCloseXMLTag(hwndEdit);
+					}
+					return 0;
+				}
+				// Auto close braces/quotes
+				if (strchr("([{<\"\'`,", ch)) {
+					if (autoCompletionConfig.fAutoInsertMask) {
+						EditAutoCloseBraceQuote(hwndEdit, ch);
+					}
+					return 0;
+				}
+			}
+
+			// auto complete word
+			if (!autoCompletionConfig.bCompleteWord
+				// ignore IME input
+				|| (scn->modifiers && (ch >= 0x80 || autoCompletionConfig.bEnglistIMEModeOnly))
+				|| !IsAutoCompletionWordCharacter(ch)
+			) {
 				return 0;
 			}
-			// Auto indent
-			if (autoCompletionConfig.bIndentText && (scn->ch == '\r' || scn->ch == '\n')) {
-				// in CRLF mode handle LF only...
-				if ((SC_EOL_CRLF == iEOLMode && scn->ch != '\n') || SC_EOL_CRLF != iEOLMode) {
-					EditAutoIndent(hwndEdit);
-				}
-			}
-			// Auto close tags
-			else if ((autoCompletionConfig.bCloseTags || autoCompletionConfig.bCompleteWord) && scn->ch == '>') {
-				EditAutoCloseXMLTag(hwndEdit);
-			}
-			// Auto close braces/quotes
-			else if (autoCompletionConfig.fAutoInsertMask && strchr("([{<\"\'`,", scn->ch)) {
-				EditAutoCloseBraceQuote(hwndEdit, scn->ch);
-			} else if (autoCompletionConfig.bCompleteWord/* && !SendMessage(hwndEdit, SCI_AUTOCACTIVE, 0, 0)*/) {
+			if (SendMessage(hwndEdit, SCI_AUTOCACTIVE, 0, 0)) {
 				// many items in auto-completion list (> autoCompletionConfig.iVisibleItemCount), recreate it
-				if (!SendMessage(hwndEdit, SCI_AUTOCACTIVE, 0, 0) || autoCompletionConfig.iPreviousItemCount > autoCompletionConfig.iVisibleItemCount) {
-					if (autoCompletionConfig.bEnglistIMEModeOnly && scn->modifiers) { // ignore IME input
-						return 0;
-					}
-					EditCompleteWord(hwndEdit, FALSE);
+				if (autoCompletionConfig.iPreviousItemCount < autoCompletionConfig.iVisibleItemCount) {
+					return 0;
 				}
+				SendMessage(hwnd, SCI_AUTOCCANCEL, 0, 0);
 			}
+			EditCompleteWord(hwndEdit, FALSE);
 		}
 		break;
 

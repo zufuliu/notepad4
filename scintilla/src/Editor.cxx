@@ -6269,6 +6269,12 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 	case SCI_GETCHARAT:
 		return static_cast<unsigned char>(pdoc->CharAt(wParam));
 
+	case SCI_GETCHARACTERANDWIDTH:
+		return pdoc->GetCharacterAndWidth(wParam, reinterpret_cast<Sci_Position *>(lParam));
+
+	case SCI_ISAUTOCOMPLETIONWORDCHARACTER:
+		return pdoc->IsAutoCompletionWordCharacter(static_cast<unsigned int>(wParam));
+
 	case SCI_SETCURRENTPOS:
 		if (sel.IsRectangular()) {
 			sel.Rectangular().caret.SetPosition(wParam);

@@ -57,6 +57,8 @@ typedef sptr_t (*SciFnDirect)(sptr_t ptr, unsigned int iMessage, uptr_t wParam, 
 #define SCI_CLEARDOCUMENTSTYLE 2005
 #define SCI_GETLENGTH 2006
 #define SCI_GETCHARAT 2007
+#define SCI_GETCHARACTERANDWIDTH 2038
+#define SCI_ISAUTOCOMPLETIONWORDCHARACTER 2039
 #define SCI_GETCURRENTPOS 2008
 #define SCI_GETANCHOR 2009
 #define SCI_GETSTYLEAT 2010

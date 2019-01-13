@@ -546,6 +546,10 @@ public:
 	}
 	Sci::Position BraceMatch(Sci::Position position, Sci::Position maxReStyle) noexcept;
 
+	bool IsAutoCompletionWordCharacter(unsigned int ch) const noexcept {
+		return WordCharacterClass(ch) == CharClassify::ccWord;
+	}
+
 private:
 	void NotifyModifyAttempt() noexcept;
 	void NotifySavePoint(bool atSavePoint) noexcept;

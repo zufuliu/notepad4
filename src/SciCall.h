@@ -70,6 +70,14 @@ NP2_inline Sci_Position SciCall_GetCurrentPos(void) {
 	return (Sci_Position)SciCall0(SCI_GETCURRENTPOS);
 }
 
+NP2_inline Sci_Position SciCall_PositionBefore(Sci_Position position) {
+	return (Sci_Position)SciCall1(SCI_POSITIONBEFORE, position);
+}
+
+NP2_inline Sci_Position SciCall_PositionAfter(Sci_Position position) {
+	return (Sci_Position)SciCall1(SCI_POSITIONAFTER, position);
+}
+
 NP2_inline int SciCall_GetColumn(Sci_Position position) {
 	return (int)SciCall1(SCI_GETCOLUMN, position);
 }
@@ -84,6 +92,26 @@ NP2_inline Sci_Position SciCall_PositionFromLine(int line) {
 
 NP2_inline int SciCall_GetCharAt(Sci_Position position) {
 	return (int)SciCall1(SCI_GETCHARAT, position);
+}
+
+NP2_inline int SciCall_GetCharacterAndWidth(Sci_Position position, Sci_Position *width) {
+	return (int)SciCall2(SCI_GETCHARACTERANDWIDTH, position, (LPARAM)width);
+}
+
+NP2_inline int SciCall_GetCharacterAt(Sci_Position position) {
+	return (int)SciCall1(SCI_GETCHARACTERANDWIDTH, position);
+}
+
+NP2_inline BOOL SciCall_IsAutoCompletionWordCharacter(int ch) {
+	return (BOOL)SciCall1(SCI_ISAUTOCOMPLETIONWORDCHARACTER, ch);
+}
+
+NP2_inline Sci_Position SciCall_WordStartPosition(Sci_Position position, BOOL onlyWordCharacters) {
+	return (Sci_Position)SciCall2(SCI_WORDSTARTPOSITION, position, onlyWordCharacters);
+}
+
+NP2_inline Sci_Position SciCall_WordEndPosition(Sci_Position position, BOOL onlyWordCharacters) {
+	return (Sci_Position)SciCall2(SCI_WORDENDPOSITION, position, onlyWordCharacters);
 }
 
 NP2_inline int SciCall_GetLineLength(int line) {
