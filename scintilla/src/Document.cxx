@@ -2651,9 +2651,29 @@ public:
 
 	char CharAt(Sci::Position index) const noexcept override {
 		if (index < 0 || index >= end)
-			return 0;
+			return '\0';
 		else
 			return pdoc->CharAt(index);
+	}
+
+	bool IsWordStartAt(Sci::Position pos) const noexcept override {
+		return pdoc->IsWordStartAt(pos);
+	}
+
+	bool IsWordEndAt(Sci::Position pos) const noexcept override {
+		return pdoc->IsWordEndAt(pos);
+	}
+
+	Sci::Position MovePositionOutsideChar(Sci::Position pos, Sci::Position moveDir) const noexcept override {
+		return pdoc->MovePositionOutsideChar(pos, moveDir, true);
+	}
+
+	Sci::Position NextPosition(Sci::Position pos, int moveDir) const noexcept override {
+		return pdoc->NextPosition(pos, moveDir);
+	}
+
+	Sci::Position ExtendWordSelect(Sci::Position pos, int delta) const noexcept override {
+		return pdoc->ExtendWordSelect(pos, delta, true);
 	}
 };
 
