@@ -199,7 +199,7 @@ Or build from source, see the [Wiki](https://github.com/zufuliu/notepad2/wiki/Bu
 * Aleksandar Lekov
 * Bruno Barbieri
 * Homam
-* Everyone else on [GitHub](https://github.com/zufuliu/notepad2/graphs/contributors)
+* Everyone else on [GitHub](https://github.com/zufuliu/notepad2/graphs/contributors) and on Notepad2-mod's [Contributor List](https://github.com/XhmikosR/notepad2-mod/graphs/contributors)
 
 ## More information:
 * [Official Notepad2 website](http://www.flos-freeware.ch/notepad2.html)
