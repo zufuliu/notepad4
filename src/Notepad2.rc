@@ -1737,7 +1737,7 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_BACKSLASHHELP       "Backslash Transformations\n\n\\a\tAlert (BEL, ASCII 7)\n\\b\tBackspace (BS, ASCII 8)\n\\f\tFormfeed (FF, ASCII 12)\n\\n\tNewline (LF, ASCII 10)\n\\r\tCarriage return (CR, ASCII 13)\n\\t\tHorizontal Tab (HT, ASCII 9)\n\\v\tVertical Tab (VT, ASCII 11)\n\\ooo\tOctal Value\n\\u####\tHexadecimal Value\n\\xhh\tHexadecimal Value\n\\\\\tBackslash"
+    IDS_BACKSLASHHELP       "Backslash Transformations\n\n\\a\tAlert (BEL, ASCII 7)\n\\b\tBackspace (BS, ASCII 8)\n\\e\tEscape (ESC, ASCII 27 / 1B)\n\\f\tFormfeed (FF, ASCII 12 / 0C)\n\\n\tNewline (LF, ASCII 10 / 0A)\n\\r\tCarriage return (CR, ASCII 13 / 0D)\n\\t\tHorizontal Tab (HT, ASCII 9)\n\\v\tVertical Tab (VT, ASCII 11 / 0B)\n\\ooo\tOctal Value\n\\u####\tHexadecimal Value\n\\xhh\tHexadecimal Value\n\\\\\tBackslash"
     IDS_REGEXPHELP          "RegExp Syntax (Single Lines Only)\n\n.\tAny character\n^\tStart of a line\n$\tEnd of a line\n\\<\tStart of a word\n\\>\tEnd of a word\n[...]\tA set of chars ([abc]) or a range ([a-z])\n[^...]\tChars NOT in the set or range\n\\d\tAny decimal digit\n\\D\tAny non-digit char\n\\s\tAny whitespace char\n\\S\tNot a whitespace char\n\\w\tAny ""word"" char\n\\W\tAny ""non-word"" char\n\\x\tEscape character with otherwise special meaning\n\\xHH\tChar with hex code HH\n?\tMatches preceding 0 or 1 times\n*\tMatches preceding 0 or more times\n+\tMatches preceding 1 or more times\n*? or +?\tNon greedy matching of quantifiers ""?"" and ""+""\n(\tStart of a region\n)\tEnd of a region\n\\n\tRefers to a region when replacing (n is 1-9)\n"
     IDS_WILDCARDHELP        "Wildcard Search\n\n*\tMatches zero or more characters.\n?\tMatches exactly one character. "
 END

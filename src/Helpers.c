@@ -2330,6 +2330,8 @@ unsigned int UnSlash(char *s, UINT cpEdit) {
 				*o = '\a';
 			} else if (*s == 'b') {
 				*o = '\b';
+			} else if (*s == 'e') {
+				*o = '\x1B';
 			} else if (*s == 'f') {
 				*o = '\f';
 			} else if (*s == 'n') {
@@ -2473,6 +2475,11 @@ BOOL AddBackslash(char *pszOut, const char *pszInput) {
 		case '\b':
 			*lpszEsc++ = '\\';
 			*lpszEsc++ = 'a';
+			hasEscapeChar = TRUE;
+			break;
+		case '\x1B':
+			*lpszEsc++ = '\\';
+			*lpszEsc++ = 'e';
 			hasEscapeChar = TRUE;
 			break;
 		default:
