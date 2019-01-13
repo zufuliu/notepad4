@@ -228,6 +228,9 @@ BOOL EditSetNewEncoding(HWND hwnd, int iCurrentEncoding, int iNewEncoding, BOOL 
 	return FALSE;
 }
 
+void EditOnCodePageChanged(HWND hwnd, UINT oldCodePage) {
+}
+
 //=============================================================================
 //
 // Encoding Helper Functions

@@ -2490,6 +2490,13 @@ void Editor::NotifyNeedShown(Sci::Position pos, Sci::Position len) noexcept {
 	NotifyParent(scn);
 }
 
+void Editor::NotifyCodePageChanged(int oldCodePage) noexcept {
+	SCNotification scn = {};
+	scn.nmhdr.code = SCN_CODEPAGECHANGED;
+	scn.ch = oldCodePage;
+	NotifyParent(scn);
+}
+
 void Editor::NotifyDwelling(Point pt, bool state) {
 	SCNotification scn = {};
 	scn.nmhdr.code = state ? SCN_DWELLSTART : SCN_DWELLEND;
@@ -6800,12 +6807,14 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 
 	case SCI_SETCODEPAGE:
 		if (ValidCodePage(static_cast<int>(wParam))) {
+			const int oldCodePage = pdoc->dbcsCodePage;
 			if (pdoc->SetDBCSCodePage(static_cast<int>(wParam))) {
 				pcs->Clear();
 				pcs->InsertLines(0, pdoc->LinesTotal() - 1);
 				SetAnnotationHeights(0, pdoc->LinesTotal());
 				InvalidateStyleRedraw();
 				SetRepresentations();
+				NotifyCodePageChanged(oldCodePage);
 			}
 		}
 		break;

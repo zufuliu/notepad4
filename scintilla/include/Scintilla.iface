@@ -2885,6 +2885,7 @@ evt void Modified=2008(int position, int modificationType, string text, int leng
 evt void MacroRecord=2009(int message, int wParam, int lParam)
 evt void MarginClick=2010(int modifiers, int position, int margin)
 evt void NeedShown=2011(int position, int length)
+evt void CodePageChanged=2012(int oldCodePage)
 evt void Painted=2013(void)
 evt void UserListSelection=2014(int listType, string text, int position, int ch, CompletionMethods listCompletionMethod)
 evt void URIDropped=2015(string text)
