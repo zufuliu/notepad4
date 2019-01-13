@@ -1082,6 +1082,7 @@ typedef sptr_t (*SciFnDirect)(sptr_t ptr, unsigned int iMessage, uptr_t wParam, 
 #define SCN_MACRORECORD 2009
 #define SCN_MARGINCLICK 2010
 #define SCN_NEEDSHOWN 2011
+#define SCN_CODEPAGECHANGED 2012
 #define SCN_PAINTED 2013
 #define SCN_USERLISTSELECTION 2014
 #define SCN_URIDROPPED 2015

@@ -103,8 +103,6 @@ void	Edit_ReleaseResources(void);
 HWND	EditCreate(HWND hwndParent);
 void	EditSetNewText(HWND hwnd, LPCSTR lpstrText, DWORD cbText);
 BOOL	EditConvertText(HWND hwnd, UINT cpSource, UINT cpDest, BOOL bSetSavePoint);
-BOOL	EditSetNewEncoding(HWND hwnd, int iCurrentEncoding,
-						   int iNewEncoding, BOOL bNoUI, BOOL bSetSavePoint);
 
 char*	EditGetClipboardText(HWND hwnd); // LocalFree()
 BOOL	EditCopyAppend(HWND hwnd);
@@ -300,6 +298,8 @@ static inline BOOL IsDBCSCodePage(UINT page) {
 // in EditEncoding.c
 extern NP2ENCODING mEncoding[];
 void	Encoding_ReleaseResources(void);
+BOOL	EditSetNewEncoding(HWND hwnd, int iCurrentEncoding, int iNewEncoding, BOOL bNoUI, BOOL bSetSavePoint);
+void	EditOnCodePageChanged(HWND hwnd, UINT oldCodePage);
 void	Encoding_InitDefaults(void);
 int 	Encoding_MapIniSetting(BOOL bLoad, int iSetting);
 void	Encoding_GetLabel(int iEncoding);

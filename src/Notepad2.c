@@ -4969,8 +4969,11 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			if (MultiByteToWideChar(CP_UTF8, 0, scn->text, -1, szBuf, COUNTOF(szBuf)) > 0) {
 				OnDropOneFile(hwnd, szBuf);
 			}
-		}
-		break;
+		} break;
+
+		case SCN_CODEPAGECHANGED:
+			EditOnCodePageChanged(hwndEdit, scn->ch);
+			break;
 		}
 		break;
 

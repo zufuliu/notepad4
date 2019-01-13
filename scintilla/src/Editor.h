@@ -456,6 +456,7 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	bool NotifyMarginClick(Point pt, int modifiers);
 	bool NotifyMarginRightClick(Point pt, int modifiers);
 	void NotifyNeedShown(Sci::Position pos, Sci::Position len) noexcept;
+	void NotifyCodePageChanged(int oldCodePage) noexcept;
 	void NotifyDwelling(Point pt, bool state);
 	void NotifyZoom() noexcept;
 
