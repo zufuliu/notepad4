@@ -276,6 +276,7 @@ typedef sptr_t (*SciFnDirect)(sptr_t ptr, unsigned int iMessage, uptr_t wParam, 
 #define SCI_GETCARETPERIOD 2075
 #define SCI_SETCARETPERIOD 2076
 #define SCI_SETWORDCHARS 2077
+#define SCI_SETCHARCLASSESEX 2065
 #define SCI_GETWORDCHARS 2646
 #define SCI_BEGINUNDOACTION 2078
 #define SCI_ENDUNDOACTION 2079
