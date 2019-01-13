@@ -251,6 +251,8 @@ typedef struct EditAutoCompletionConfig {
 
 // in EditAutoC.c
 void	EditCompleteUpdateConfig(void);
+BOOL	IsDocWordChar(int ch);
+BOOL	IsAutoCompletionWordCharacter(int ch);
 void	EditCompleteWord(HWND hwnd, BOOL autoInsert);
 void	EditAutoCloseBraceQuote(HWND hwnd, int ch);
 void	EditAutoCloseXMLTag(HWND hwnd);

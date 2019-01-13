@@ -52,6 +52,7 @@ struct WordList {
 
 #if NP2_AUTOC_USE_STRING_ORDER
 #define NP2_AUTOC_ORDER_LENGTH	4
+#define NP2_AUTOC_MAX_ORDER_LENGTH	4
 
 UINT WordList_Order(const void *pWord, unsigned int len) {
 	unsigned int high = *((const unsigned int *)pWord);
@@ -64,7 +65,7 @@ UINT WordList_Order(const void *pWord, unsigned int len) {
 
 UINT WordList_OrderCase(const void *pWord, unsigned int len) {
 	unsigned int high = *((const unsigned int *)pWord);
-	high |= 0x20202020; /// TODO: fix this
+	high |= 0x20202020; /// TODO: fix tolower()
 	if (len < NP2_AUTOC_ORDER_LENGTH) {
 		high &= ((1U << len * 8) - 1);
 	}
@@ -121,7 +122,7 @@ static inline void WordList_AddBuffer(struct WordList *pWList) {
 void WordList_AddWord(struct WordList *pWList, LPCSTR pWord, int len) {
 	struct WordNode *root = pWList->pListHead;
 #if NP2_AUTOC_USE_STRING_ORDER
-	const UINT order = (pWList->iStartLen > NP2_AUTOC_ORDER_LENGTH) ? 0 : pWList->WL_OrderFunc(pWord, len);
+	const UINT order = (pWList->iStartLen > NP2_AUTOC_MAX_ORDER_LENGTH) ? 0 : pWList->WL_OrderFunc(pWord, len);
 #endif
 	if (root == NULL) {
 		struct WordNode *node;
@@ -137,7 +138,7 @@ void WordList_AddWord(struct WordList *pWList, LPCSTR pWord, int len) {
 		root = node;
 	} else {
 		struct WordNode *iter = root;
-		struct WordNode *path[NP2_TREE_HEIGHT_LIMIT] = {NULL};
+		struct WordNode *path[NP2_TREE_HEIGHT_LIMIT] = { NULL };
 		int top = 0;
 		int dir;
 
@@ -223,7 +224,7 @@ void WordList_Free(struct WordList *pWList) {
 
 void WordList_GetList(struct WordList *pWList, char* *pList) {
 	struct WordNode *root = pWList->pListHead;
-	struct WordNode *path[NP2_TREE_HEIGHT_LIMIT] = {NULL};
+	struct WordNode *path[NP2_TREE_HEIGHT_LIMIT] = { NULL };
 	int top = 0;
 	char *buf = (char *)NP2HeapAlloc(pWList->nTotalLen + 1);// additional separator
 	*pList = buf;
@@ -244,7 +245,6 @@ void WordList_GetList(struct WordList *pWList, char* *pList) {
 	if (buf && buf != *pList) {
 		*(--buf) = 0;
 	}
-	WordList_Free(pWList);
 }
 
 struct WordList *WordList_Alloc(LPCSTR pRoot, int iRootLen, BOOL bIgnoreCase) {
@@ -283,6 +283,15 @@ struct WordList *WordList_Alloc(LPCSTR pRoot, int iRootLen, BOOL bIgnoreCase) {
 	pWList->nodeCacheList[0] = pWList->nodeCache;
 
 	return pWList;
+}
+
+static inline void WordList_UpdateRoot(struct WordList *pWList, LPCSTR pRoot, int iRootLen) {
+	pWList->pWordStart = pRoot;
+	pWList->iStartLen = iRootLen;
+	pWList->iMaxLength = (pWList->nWordCount == 0) ? iRootLen : max_i(iRootLen, pWList->iMaxLength);
+#if NP2_AUTOC_USE_STRING_ORDER
+	pWList->orderStart = pWList->WL_OrderFunc(pRoot, iRootLen);
+#endif
 }
 
 static inline BOOL WordList_StartsWith(const struct WordList *pWList, LPCSTR pWord) {
