@@ -6,11 +6,12 @@
 // The License.txt file describes the conditions under which this software may be distributed.
 
 #include <cstdlib>
-#include <cctype>
+#include <cassert>
 
 #include <stdexcept>
 #include <algorithm>
 
+#include "CharacterSet.h"
 #include "CharClassify.h"
 
 using namespace Scintilla;
@@ -26,7 +27,7 @@ void CharClassify::SetDefaultCharClasses(bool includeWordClass) noexcept {
 			charClass[ch] = ccNewLine;
 		else if (ch < 0x20 || ch == ' ')
 			charClass[ch] = ccSpace;
-		else if (includeWordClass && (isalnum(ch) || ch == '_'))
+		else if (includeWordClass && (IsAlphaNumeric(ch) || ch == '_'))
 			charClass[ch] = ccWord;
 		else
 			charClass[ch] = ccPunctuation;
