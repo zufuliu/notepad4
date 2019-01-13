@@ -7,9 +7,7 @@
 
 #include <cstdlib>
 #include <cassert>
-
-#include <stdexcept>
-#include <algorithm>
+#include <cstring>
 
 #include "CharacterSet.h"
 #include "CharClassify.h"
@@ -33,15 +31,16 @@ void CharClassify::SetDefaultCharClasses(bool includeWordClass) noexcept {
 			charClass[ch] = ccPunctuation;
 	}
 
-	const unsigned char w = static_cast<unsigned char>(includeWordClass ? ccWord : ccPunctuation);
-	std::fill_n(charClass + 128, 128, w);
+	const int w = includeWordClass ? ccWord : ccPunctuation;
+	memset(charClass + 128, w, 128);
 }
 
 void CharClassify::SetCharClasses(const unsigned char *chars, cc newCharClass) noexcept {
 	// Apply the newCharClass to the specifed chars
 	if (chars) {
+		const unsigned char w = static_cast<unsigned char>(newCharClass);
 		while (*chars) {
-			charClass[*chars] = static_cast<unsigned char>(newCharClass);
+			charClass[*chars] = w;
 			chars++;
 		}
 	}
@@ -49,8 +48,7 @@ void CharClassify::SetCharClasses(const unsigned char *chars, cc newCharClass) n
 
 void CharClassify::SetCharClassesEx(const unsigned char *chars, int length) noexcept {
 	if (chars == nullptr || length <= 0) {
-		const unsigned char w = ccWord;
-		std::fill_n(charClass + 128, 128, w);
+		memset(charClass + 128, ccWord, 128);
 	} else if (length == 16) {
 		for (int i = 0; i < 128; i++) {
 			const unsigned char w = 1 + ((chars[i >> 3] >> (i & 7)) & 1);
