@@ -323,6 +323,7 @@ static inline unsigned char escapeValue(unsigned char ch) noexcept {
 	case 'r':	return '\r';
 	case 't':	return '\t';
 	case 'v':	return '\v';
+	case 'e':	return '\x1B';
 	}
 	return 0;
 }
@@ -382,6 +383,7 @@ int RESearch::GetBackslashExpression(
 	case 'r':
 	case 't':
 	case 'v':
+	case 'e':
 		result = escapeValue(bsc);
 		break;
 	case 'x':
