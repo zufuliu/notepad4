@@ -78,6 +78,7 @@ HISTORY	mHistory;
 WCHAR	szIniFile[MAX_PATH] = L"";
 WCHAR	szIniFile2[MAX_PATH] = L"";
 BOOL	bSaveSettings;
+static BOOL bHasQuickview = FALSE;
 WCHAR	szQuickview[MAX_PATH];
 WCHAR	szQuickviewParams[MAX_PATH];
 WCHAR	tchFavoritesDir[MAX_PATH];
@@ -1083,7 +1084,7 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	DirList_GetItem(hwndDirList, -1, &dli);
 
 	EnableCmd(hmenu, IDM_FILE_LAUNCH, (i && dli.ntype == DLE_FILE));
-	EnableCmd(hmenu, IDM_FILE_QUICKVIEW, (i && dli.ntype == DLE_FILE));
+	EnableCmd(hmenu, IDM_FILE_QUICKVIEW, (i && dli.ntype == DLE_FILE) && bHasQuickview);
 	EnableCmd(hmenu, IDM_FILE_OPENWITH, i);
 	EnableCmd(hmenu, IDM_FILE_CREATELINK, i);
 	EnableCmd(hmenu, IDM_FILE_SAVEAS, (i && dli.ntype == DLE_FILE));
@@ -1736,6 +1737,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		if (back != bWindowLayoutRTL) {
 			SetWindowLayoutRTL(hwndDirList, bWindowLayoutRTL);
 		}
+		bHasQuickview = GetFileAttributes(szQuickview) != INVALID_FILE_ATTRIBUTES;
 	}
 	break;
 
@@ -2393,6 +2395,7 @@ void LoadSettings(void) {
 		PathAbsoluteFromApp(strValue, szQuickview, COUNTOF(szQuickview), TRUE);
 	}
 
+	bHasQuickview = GetFileAttributes(szQuickview) != INVALID_FILE_ATTRIBUTES;
 	IniSectionGetString(pIniSection, L"QuikviewParams", L"",
 						szQuickviewParams, COUNTOF(szQuickviewParams));
 
