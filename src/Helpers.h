@@ -389,6 +389,10 @@ NP2_inline void DString_GetDlgItemText(DString *s, HWND hwndDlg, int nCtlId) {
 	DString_GetWindowText(s, GetDlgItem(hwndDlg, nCtlId));
 }
 
+NP2_inline BOOL KeyboardIsKeyDown(int key) {
+	return (GetKeyState(key) & 0x8000) != 0;
+}
+
 extern HWND hwndEdit;
 NP2_inline void BeginWaitCursor(void) {
 	SendMessage(hwndEdit, SCI_SETCURSOR, (WPARAM)SC_CURSORWAIT, 0);

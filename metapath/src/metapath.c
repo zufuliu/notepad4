@@ -2166,9 +2166,9 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 		case NM_CLICK:
 			if (bSingleClick && ListView_GetSelectedCount(hwndDirList)) {
-				if (HIBYTE(GetKeyState(VK_MENU))) {
+				if (KeyboardIsKeyDown(VK_MENU)) {
 					SendWMCommand(hwnd, IDM_FILE_PROPERTIES);
-				} else if (HIBYTE(GetKeyState(VK_SHIFT))) {
+				} else if (KeyboardIsKeyDown(VK_SHIFT)) {
 					SendWMCommand(hwnd, IDM_FILE_OPENNEW);
 				} else {
 					SendWMCommand(hwnd, IDM_FILE_OPEN);
@@ -2178,9 +2178,9 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 		case NM_DBLCLK:
 		case NM_RETURN:
-			if (HIBYTE(GetKeyState(VK_MENU))) {
+			if (KeyboardIsKeyDown(VK_MENU)) {
 				SendWMCommand(hwnd, IDM_FILE_PROPERTIES);
-			} else if (HIBYTE(GetKeyState(VK_SHIFT))) {
+			} else if (KeyboardIsKeyDown(VK_SHIFT)) {
 				SendWMCommand(hwnd, IDM_FILE_OPENNEW);
 			} else {
 				SendWMCommand(hwnd, IDM_FILE_OPEN);

@@ -2459,7 +2459,7 @@ BOOL Style_SelectFont(HWND hwnd, LPWSTR lpszStyle, int cchStyle, BOOL bDefaultSt
 	cf.lpLogFont = &lf;
 	cf.Flags = CF_INITTOLOGFONTSTRUCT /*| CF_NOSCRIPTSEL*/ | CF_SCREENFONTS | CF_EFFECTS;
 
-	if (HIBYTE(GetKeyState(VK_SHIFT))) {
+	if (KeyboardIsKeyDown(VK_SHIFT)) {
 		cf.Flags |= CF_FIXEDPITCHONLY;
 	}
 
