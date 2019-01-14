@@ -6227,24 +6227,21 @@ void EditSelectionAction(HWND hwnd, int action) {
 
 void TryBrowseFile(HWND hwnd, LPCWSTR pszFile, BOOL bWarn) {
 	WCHAR tchParam[MAX_PATH + 4] = L"";
-	WCHAR tchExeFile[MAX_PATH + 4];
+	WCHAR tchExeFile[MAX_PATH + 4] = L"";
 	WCHAR tchTemp[MAX_PATH + 4];
 
-	if (!IniGetString(INI_SECTION_NAME_FLAGS, L"filebrowser.exe", L"", tchTemp, COUNTOF(tchTemp))) {
-		if (!SearchPath(NULL, L"metapath.exe", NULL, COUNTOF(tchExeFile), tchExeFile, NULL)) {
-			GetModuleFileName(NULL, tchExeFile, COUNTOF(tchExeFile));
-			PathRemoveFileSpec(tchExeFile);
-			PathAppend(tchExeFile, L"metapath.exe");
-		}
-	} else {
+	if (IniGetString(INI_SECTION_NAME_FLAGS, L"filebrowser.exe", L"", tchTemp, COUNTOF(tchTemp))) {
 		ExtractFirstArgument(tchTemp, tchExeFile, tchParam);
-		if (PathIsRelative(tchExeFile)) {
-			if (!SearchPath(NULL, tchExeFile, NULL, COUNTOF(tchTemp), tchTemp, NULL)) {
-				GetModuleFileName(NULL, tchTemp, COUNTOF(tchTemp));
-				PathRemoveFileSpec(tchTemp);
-				PathAppend(tchTemp, tchExeFile);
-				lstrcpy(tchExeFile, tchTemp);
-			}
+	}
+	if (StrIsEmpty(tchExeFile)) {
+		lstrcpy(tchExeFile, L"metapath.exe");
+	}
+	if (PathIsRelative(tchExeFile)) {
+		GetModuleFileName(NULL, tchTemp, COUNTOF(tchTemp));
+		PathRemoveFileSpec(tchTemp);
+		PathAppend(tchTemp, tchExeFile);
+		if (PathFileExists(tchTemp)) {
+			lstrcpy(tchExeFile, tchTemp);
 		}
 	}
 
