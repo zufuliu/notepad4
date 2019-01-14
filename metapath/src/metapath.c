@@ -3487,13 +3487,6 @@ void LaunchTarget(LPCWSTR lpFileName, BOOL bOpenNew) {
 			lstrcpy(szTmp, szTargetApplication);
 			WCHAR szFile[MAX_PATH];
 			PathAbsoluteFromApp(szTmp, szFile, COUNTOF(szFile), TRUE);
-			if (!PathFileExists(szFile)) {
-				if (!SearchPath(NULL, szTmp, NULL, COUNTOF(szFile), szFile, NULL)) {
-					GetModuleFileName(NULL, szFile, COUNTOF(szFile));
-					PathRemoveFileSpec(szFile);
-					PathAppend(szFile, szTmp);
-				}
-			}
 
 			SHELLEXECUTEINFO sei;
 			ZeroMemory(&sei, sizeof(SHELLEXECUTEINFO));
@@ -3543,18 +3536,7 @@ void LaunchTarget(LPCWSTR lpFileName, BOOL bOpenNew) {
 		ExpandEnvironmentStringsEx(szTmp, COUNTOF(szTmp));
 
 		WCHAR szFile[MAX_PATH];
-		if (PathIsRelative(szTmp)) {
-			PathAbsoluteFromApp(szTmp, szFile, COUNTOF(szFile), TRUE);
-			if (!PathFileExists(szFile)) {
-				if (!SearchPath(NULL, szTmp, NULL, COUNTOF(szFile), szFile, NULL)) {
-					GetModuleFileName(NULL, szFile, COUNTOF(szFile));
-					PathRemoveFileSpec(szFile);
-					PathAppend(szFile, szTmp);
-				}
-			}
-		} else {
-			lstrcpy(szFile, szTmp);
-		}
+		PathAbsoluteFromApp(szTmp, szFile, COUNTOF(szFile), TRUE);
 
 		SHELLEXECUTEINFO sei;
 		ZeroMemory(&sei, sizeof(SHELLEXECUTEINFO));
