@@ -224,6 +224,10 @@ NP2_inline void IniSectionSetBoolEx(IniSectionOnSave *section, LPCWSTR key, BOOL
 	}
 }
 
+NP2_inline BOOL KeyboardIsKeyDown(int key) {
+	return (GetKeyState(key) & 0x8000) != 0;
+}
+
 NP2_inline void BeginWaitCursor(void) {
 	DestroyCursor(SetCursor(LoadCursor(NULL, IDC_WAIT)));
 }
