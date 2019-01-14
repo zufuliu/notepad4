@@ -6876,12 +6876,6 @@ BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect, LPCWST
 	if (PathIsRelative(tch)) {
 		lstrcpyn(szFileName, g_wchWorkingDirectory, COUNTOF(szFileName));
 		PathAppend(szFileName, tch);
-		if (!PathFileExists(szFileName)) {
-			WCHAR wchFullPath[MAX_PATH];
-			if (SearchPath(NULL, tch, NULL, COUNTOF(wchFullPath), wchFullPath, NULL)) {
-				lstrcpy(szFileName, wchFullPath);
-			}
-		}
 	} else {
 		lstrcpy(szFileName, tch);
 	}
@@ -7326,17 +7320,7 @@ BOOL ActivatePrevInst(void) {
 		if (PathIsRelative(lpFileArg)) {
 			lstrcpyn(tchTmp, g_wchWorkingDirectory, COUNTOF(tchTmp));
 			PathAppend(tchTmp, lpFileArg);
-			if (PathFileExists(tchTmp)) {
-				lstrcpy(lpFileArg, tchTmp);
-			} else {
-				if (SearchPath(NULL, lpFileArg, NULL, COUNTOF(tchTmp), tchTmp, NULL)) {
-					lstrcpy(lpFileArg, tchTmp);
-				} else {
-					lstrcpyn(tchTmp, g_wchWorkingDirectory, COUNTOF(tchTmp));
-					PathAppend(tchTmp, lpFileArg);
-					lstrcpy(lpFileArg, tchTmp);
-				}
-			}
+			lstrcpy(lpFileArg, tchTmp);
 		} else if (SearchPath(NULL, lpFileArg, NULL, COUNTOF(tchTmp), tchTmp, NULL)) {
 			lstrcpy(lpFileArg, tchTmp);
 		}
