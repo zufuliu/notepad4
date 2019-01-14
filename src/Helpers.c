@@ -295,8 +295,15 @@ int GetSystemMetricsEx(int nIndex) {
 
 HBITMAP LoadBitmapFile(LPCWSTR path) {
 	WCHAR szTmp[MAX_PATH];
-	if (SearchPath(NULL, path, NULL, COUNTOF(szTmp), szTmp, NULL)) {
+	if (PathIsRelative(path)) {
+		GetModuleFileName(NULL, szTmp, COUNTOF(szTmp));
+		PathRemoveFileSpec(szTmp);
+		PathAppend(szTmp, path);
 		path = szTmp;
+	}
+
+	if (!PathFileExists(path)) {
+		return NULL;
 	}
 
 	HBITMAP hbmp = (HBITMAP)LoadImage(NULL, path, IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION | LR_LOADFROMFILE);
