@@ -3041,7 +3041,7 @@ BOOL DisplayPath(LPCWSTR lpPath, UINT uIdError) {
 	ExpandEnvironmentStringsEx(szTmp, COUNTOF(szTmp));
 
 	WCHAR szPath[MAX_PATH];
-	if (!SearchPathEx(NULL, szTmp, NULL, COUNTOF(szPath), szPath, NULL)) {
+	if (!SearchPathEx(szTmp, COUNTOF(szPath), szPath)) {
 		lstrcpy(szPath, szTmp);
 	}
 
@@ -3120,7 +3120,7 @@ BOOL DisplayLnkFile(LPCWSTR pszLnkFile) {
 	ExpandEnvironmentStringsEx(szTmp, COUNTOF(szTmp));
 
 	WCHAR szPath[MAX_PATH];
-	if (!SearchPathEx(NULL, szTmp, NULL, COUNTOF(szPath), szPath, NULL)) {
+	if (!SearchPathEx(szTmp, COUNTOF(szPath), szPath)) {
 		lstrcpy(szPath, szTmp);
 	}
 
