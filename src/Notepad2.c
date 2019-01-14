@@ -7307,17 +7307,12 @@ BOOL ActivatePrevInst(void) {
 	}
 
 	if (flagSingleFileInstance && lpFileArg) {
-		// Search working directory from second instance, first!
-		// lpFileArg is at least MAX_PATH+2 bytes
-		WCHAR tchTmp[MAX_PATH];
-
 		ExpandEnvironmentStringsEx(lpFileArg, (DWORD)(NP2HeapSize(lpFileArg) / sizeof(WCHAR)));
 
 		if (PathIsRelative(lpFileArg)) {
+			WCHAR tchTmp[MAX_PATH];
 			lstrcpyn(tchTmp, g_wchWorkingDirectory, COUNTOF(tchTmp));
 			PathAppend(tchTmp, lpFileArg);
-			lstrcpy(lpFileArg, tchTmp);
-		} else if (SearchPath(NULL, lpFileArg, NULL, COUNTOF(tchTmp), tchTmp, NULL)) {
 			lstrcpy(lpFileArg, tchTmp);
 		}
 
@@ -7413,23 +7408,12 @@ BOOL ActivatePrevInst(void) {
 			SetForegroundWindow(hwnd);
 
 			if (lpFileArg) {
-				// Search working directory from second instance, first!
-				// lpFileArg is at least MAX_PATH+2 bytes
-				WCHAR tchTmp[MAX_PATH];
-
 				ExpandEnvironmentStringsEx(lpFileArg, (DWORD)(NP2HeapSize(lpFileArg) / sizeof(WCHAR)));
 
 				if (PathIsRelative(lpFileArg)) {
+					WCHAR tchTmp[MAX_PATH];
 					lstrcpyn(tchTmp, g_wchWorkingDirectory, COUNTOF(tchTmp));
 					PathAppend(tchTmp, lpFileArg);
-					if (PathFileExists(tchTmp)) {
-						lstrcpy(lpFileArg, tchTmp);
-					} else {
-						if (SearchPath(NULL, lpFileArg, NULL, COUNTOF(tchTmp), tchTmp, NULL)) {
-							lstrcpy(lpFileArg, tchTmp);
-						}
-					}
-				} else if (SearchPath(NULL, lpFileArg, NULL, COUNTOF(tchTmp), tchTmp, NULL)) {
 					lstrcpy(lpFileArg, tchTmp);
 				}
 
