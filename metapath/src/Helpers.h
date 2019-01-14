@@ -346,8 +346,7 @@ void StrTab2Space(LPWSTR lpsz);
 void PathFixBackslashes(LPWSTR lpsz);
 void ExpandEnvironmentStringsEx(LPWSTR lpSrc, DWORD dwSrc);
 void PathCanonicalizeEx(LPWSTR lpSrc);
-DWORD SearchPathEx(LPCWSTR lpPath, LPCWSTR lpFileName, LPCWSTR lpExtension,
-				   DWORD nBufferLength, LPWSTR lpBuffer, LPWSTR *lpFilePart);
+BOOL SearchPathEx(LPCWSTR lpFileName, DWORD nBufferLength, LPWSTR lpBuffer);
 void FormatNumberStr(LPWSTR lpNumberStr);
 
 void GetDefaultFavoritesDir(LPWSTR lpFavDir, int cchFavDir);
