@@ -1737,7 +1737,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		if (back != bWindowLayoutRTL) {
 			SetWindowLayoutRTL(hwndDirList, bWindowLayoutRTL);
 		}
-		bHasQuickview = GetFileAttributes(szQuickview) != INVALID_FILE_ATTRIBUTES;
+		bHasQuickview = PathFileExists(szQuickview);
 	}
 	break;
 
@@ -2395,7 +2395,7 @@ void LoadSettings(void) {
 		PathAbsoluteFromApp(strValue, szQuickview, COUNTOF(szQuickview), TRUE);
 	}
 
-	bHasQuickview = GetFileAttributes(szQuickview) != INVALID_FILE_ATTRIBUTES;
+	bHasQuickview = PathFileExists(szQuickview);
 	IniSectionGetString(pIniSection, L"QuikviewParams", L"",
 						szQuickviewParams, COUNTOF(szQuickviewParams));
 
