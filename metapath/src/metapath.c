@@ -3238,23 +3238,12 @@ BOOL ActivatePrevInst(void) {
 			SetForegroundWindow(hwnd);
 
 			if (lpPathArg) {
-				// Search working directory from second instance, first!
-				// lpPathArg is at least MAX_PATH+2 bytes
-				WCHAR tchTmp[MAX_PATH];
-
 				ExpandEnvironmentStringsEx(lpPathArg, (DWORD)(GlobalSize(lpPathArg) / sizeof(WCHAR)));
 
 				if (PathIsRelative(lpPathArg)) {
+					WCHAR tchTmp[MAX_PATH];
 					GetCurrentDirectory(COUNTOF(tchTmp), tchTmp);
 					PathAppend(tchTmp, lpPathArg);
-					if (PathFileExists(tchTmp)) {
-						lstrcpy(lpPathArg, tchTmp);
-					} else {
-						if (SearchPath(NULL, lpPathArg, NULL, COUNTOF(tchTmp), tchTmp, NULL)) {
-							lstrcpy(lpPathArg, tchTmp);
-						}
-					}
-				} else if (SearchPath(NULL, lpPathArg, NULL, COUNTOF(tchTmp), tchTmp, NULL)) {
 					lstrcpy(lpPathArg, tchTmp);
 				}
 
