@@ -6280,6 +6280,49 @@ void TryBrowseFile(HWND hwnd, LPCWSTR pszFile, BOOL bWarn) {
 	}
 }
 
+char* EditGetStringArounCaret(HWND hwnd, LPCSTR delimiters) {
+	const int iCurrentPos = (int)SendMessage(hwnd, SCI_GETCURRENTPOS, 0, 0);
+	const int iLine = (int)SendMessage(hwnd, SCI_LINEFROMPOSITION, iCurrentPos, 0);
+	int iLineStart = (int)SendMessage(hwnd, SCI_POSITIONFROMLINE, iLine, 0);
+	int iLineEnd = (int)SendMessage(hwnd, SCI_GETLINEENDPOSITION, iLine, 0);
+	if (iLineStart == iLineEnd) {
+		// empty line
+		return NULL;
+	}
+
+	// string terminated by space or quotes
+	struct Sci_TextToFind ft = { { iCurrentPos, 0 }, delimiters, { 0, 0 } };
+	const int findFlag = SCFIND_REGEXP | SCFIND_POSIX;
+
+	// forward
+	if (iCurrentPos < iLineEnd) {
+		ft.chrg.cpMax = iLineEnd;
+		const int iPos = (int)SendMessage(hwnd, SCI_FINDTEXT, findFlag, (LPARAM)&ft);
+		if (iPos >= 0) {
+			iLineEnd = (int)SendMessage(hwnd, SCI_POSITIONBEFORE, ft.chrgText.cpMax ,0);
+		}
+	}
+
+	// backword
+	if (iCurrentPos > iLineStart) {
+		ft.chrg.cpMax = iLineStart;
+		const int iPos = (int)SendMessage(hwnd, SCI_FINDTEXT, findFlag, (LPARAM)&ft);
+		if (iPos >= 0) {
+			iLineStart = (int)SendMessage(hwnd, SCI_POSITIONAFTER, ft.chrgText.cpMin ,0);
+		}
+	}
+
+	if (iLineStart >= iLineEnd) {
+		return NULL;
+	}
+
+	char *mszSelection = (char *)NP2HeapAlloc(iLineEnd - iLineStart + 1);
+	struct Sci_TextRange tr = { { iLineStart, iLineEnd }, mszSelection };
+	SendMessage(hwnd, SCI_GETTEXTRANGE, 0, (LPARAM)&tr);
+
+	return mszSelection;
+}
+
 extern BOOL bOpenFolderWithMetapath;
 
 void EditOpenSelection(HWND hwnd, int type) {
@@ -6293,46 +6336,16 @@ void EditOpenSelection(HWND hwnd, int type) {
 			*lpsz = '\0';
 		}
 	} else {
-		// get string around caret
-		const int iCurrentPos = (int)SendMessage(hwnd, SCI_GETCURRENTPOS, 0, 0);
-		const int iLine = (int)SendMessage(hwnd, SCI_LINEFROMPOSITION, iCurrentPos, 0);
-		cchSelection = (int)SendMessage(hwnd, SCI_GETLINE, iLine, 0);
-		if (cchSelection == 0) {
-			return;
-		}
-
-		const int iLineStart = (int)SendMessage(hwnd, SCI_POSITIONFROMLINE, iLine, 0);
-		mszSelection = (char *)NP2HeapAlloc(cchSelection);
-		SendMessage(hwnd, SCI_GETLINE, iLine, (LPARAM)mszSelection);
-
-		const int iPos = iCurrentPos - iLineStart;
-		char *lpsz = strpbrk(mszSelection + iPos, " \r\n\t");
-		if (lpsz) {
-			*lpsz = '\0';
-		}
-		lpsz = mszSelection + iPos;
-		while (lpsz >= mszSelection) {
-			if (*lpsz == ' ' || *lpsz == '\t') {
-				*lpsz++ = '\0';
-				break;
-			}
-			--lpsz;
-		}
-
-		cchSelection = lstrlenA(lpsz);
-		if (cchSelection == 0) {
-			NP2HeapFree(mszSelection);
-			return;
-		}
-
-		if (lpsz > mszSelection) {
-			strcpy(mszSelection, lpsz);
-		}
+		mszSelection = EditGetStringArounCaret(hwnd, "[\\s'`\"<>|*,;]");
 	}
 
+	if (mszSelection == NULL) {
+		return;
+	}
 	/* remove quotes, spaces and some invalid filename characters (except '/', '\' and '?') */
-	StrTrimA(mszSelection, " \t\r\n\"<>|:*");
-	if (StrNotEmptyA(mszSelection)) {
+	StrTrimA(mszSelection, " \t\r\n'`\"<>|:*,;");
+	cchSelection = lstrlenA(mszSelection);
+	if (cchSelection != 0) {
 		LPWSTR wszSelection = (LPWSTR)NP2HeapAlloc((max_i(MAX_PATH, cchSelection) + 32) * sizeof(WCHAR));
 		LPWSTR link = wszSelection + 16;
 
