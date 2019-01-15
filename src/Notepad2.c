@@ -6380,9 +6380,16 @@ int CheckIniFile(LPWSTR lpszFile, LPCWSTR lpszModule) {
 			lstrcpy(lpszFile, tchBuild);
 			return 1;
 		}
-		// Application Data or My Documents
-		if (S_OK == SHGetFolderPath(NULL, CSIDL_APPDATA, NULL, SHGFP_TYPE_CURRENT, tchBuild)
-			|| S_OK == SHGetFolderPath(NULL, CSIDL_PERSONAL, NULL, SHGFP_TYPE_CURRENT, tchBuild)) {
+		// Application Data
+		if (S_OK == SHGetFolderPath(NULL, CSIDL_APPDATA, NULL, SHGFP_TYPE_CURRENT, tchBuild)) {
+			PathAppend(tchBuild, tchFileExpanded);
+			if (PathFileExists(tchBuild)) {
+				lstrcpy(lpszFile, tchBuild);
+				return 1;
+			}
+		}
+		// Home
+		if (S_OK == SHGetFolderPath(NULL, CSIDL_PROFILE, NULL, SHGFP_TYPE_CURRENT, tchBuild)) {
 			PathAppend(tchBuild, tchFileExpanded);
 			if (PathFileExists(tchBuild)) {
 				lstrcpy(lpszFile, tchBuild);
