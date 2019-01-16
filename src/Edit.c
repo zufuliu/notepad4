@@ -6280,7 +6280,7 @@ void TryBrowseFile(HWND hwnd, LPCWSTR pszFile, BOOL bWarn) {
 	}
 }
 
-char* EditGetStringArounCaret(HWND hwnd, LPCSTR delimiters) {
+char* EditGetStringAroundCaret(HWND hwnd, LPCSTR delimiters) {
 	const int iCurrentPos = (int)SendMessage(hwnd, SCI_GETCURRENTPOS, 0, 0);
 	const int iLine = (int)SendMessage(hwnd, SCI_LINEFROMPOSITION, iCurrentPos, 0);
 	int iLineStart = (int)SendMessage(hwnd, SCI_POSITIONFROMLINE, iLine, 0);
@@ -6290,7 +6290,6 @@ char* EditGetStringArounCaret(HWND hwnd, LPCSTR delimiters) {
 		return NULL;
 	}
 
-	// string terminated by space or quotes
 	struct Sci_TextToFind ft = { { iCurrentPos, 0 }, delimiters, { 0, 0 } };
 	const int findFlag = SCFIND_REGEXP | SCFIND_POSIX;
 
@@ -6336,7 +6335,8 @@ void EditOpenSelection(HWND hwnd, int type) {
 			*lpsz = '\0';
 		}
 	} else {
-		mszSelection = EditGetStringArounCaret(hwnd, "[\\s'`\"<>|*,;]");
+		// string terminated by space or quotes
+		mszSelection = EditGetStringAroundCaret(hwnd, "[\\s'`\"<>|*,;]");
 	}
 
 	if (mszSelection == NULL) {
