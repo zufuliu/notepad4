@@ -409,9 +409,10 @@ static int	iOpacityLevel			= 75;
 int			iFindReplaceOpacityLevel= 75;
 static int	flagToolbarLook			= 0;
 int			flagSimpleIndentGuides	= 0;
-int 		fNoHTMLGuess			= 0;
-int 		fNoCGIGuess				= 0;
-int			fNoFileVariables		= 0;
+BOOL 		fNoHTMLGuess			= 0;
+BOOL 		fNoCGIGuess				= 0;
+BOOL 		fNoAutoDetection		= 0;
+BOOL		fNoFileVariables		= 0;
 static int	flagPosParam			= 0;
 static int	flagDefaultPos			= 0;
 static int	flagNewFromClipboard	= 0;
@@ -6341,6 +6342,8 @@ void LoadFlags(void) {
 
 	flagSimpleIndentGuides = IniSectionGetBool(pIniSection, L"SimpleIndentGuides", 0);
 	fNoHTMLGuess = IniSectionGetBool(pIniSection, L"NoHTMLGuess", 0);
+	fNoCGIGuess = IniSectionGetBool(pIniSection, L"NoCGIGuess", 0);
+	fNoAutoDetection = IniSectionGetBool(pIniSection, L"NoAutoDetection", 0);
 	fNoFileVariables = IniSectionGetBool(pIniSection, L"NoFileVariables", 0);
 
 	if (StrIsEmpty(g_wchAppUserModelID)) {
