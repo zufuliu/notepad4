@@ -1512,6 +1512,66 @@ PEDITLEXER Style_DetectObjCAndMatlab(void) {
 	return NULL;
 }
 
+PEDITLEXER Style_AutoDetect(PEDITLEXER pLexNew, BOOL bDotFile) {
+	char tchText[4096] = ""; // maybe contains header comments
+	SendMessage(hwndEdit, SCI_GETTEXT, COUNTOF(tchText) - 2, (LPARAM)tchText);
+
+	char *p = tchText;
+	const BOOL shebang = *p == '#' && p[1] == '!';
+	int cppCount = 0;
+	int sharpCount = 0;
+	BOOL maybeIni = FALSE;
+
+	while (*p) {
+		if (*p == '[') {
+			maybeIni = TRUE;
+		} else {
+			while (IsASpace(*p)) {
+				++p;
+			}
+		}
+		switch (*p) {
+		case '#': // C/C++ preprocessor, comment
+			if (!(p == tchText && shebang)) {
+				++p;
+				while (*p == ' ' || *p == '\t') {
+					++p;
+				}
+				if (MatchCPPKeyword(p, 2)) {
+					++cppCount;
+				} else {
+					++sharpCount;
+				}
+			}
+			break;
+		case '/': // C/C++ style comment
+			++p;
+			if (*p == '/' || *p == '*') {
+				return &lexCPP;
+			}
+			break;
+		}
+		// skip to next line
+		while (*p && !(*p == '\r' || *p == '\n')) {
+			++p;
+		}
+	}
+
+	if (cppCount > sharpCount && !(shebang || bDotFile)) {
+		return &lexCPP;
+	}
+	if (sharpCount) {
+		return shebang ? &lexBash : &lexCONF;
+	}
+	if (maybeIni) {
+		return &lexINI;
+	}
+	if (bDotFile) {
+		return &lexCONF;
+	}
+	return pLexNew;
+}
+
 //=============================================================================
 //
 // Style_GetCurrentLexerName()
@@ -1765,8 +1825,9 @@ PEDITLEXER Style_MatchLexer(LPCWSTR lpszMatch, BOOL bCheckNames) {
 // find lexer from file name
 // Style_SetLexerFromFile()
 //
-extern int fNoHTMLGuess;
-extern int fNoCGIGuess;
+extern BOOL fNoHTMLGuess;
+extern BOOL fNoCGIGuess;
+extern BOOL fNoAutoDetection;
 extern FILEVARS fvCurFile;
 
 static PEDITLEXER Style_GetLexerFromFile(HWND hwnd, LPCWSTR lpszFile, BOOL bCGIGuess, LPWSTR *pszExt, BOOL *pDotFile) {
@@ -1977,8 +2038,13 @@ void Style_SetLexerFromFile(HWND hwnd, LPCWSTR lpszFile) {
 		pLexNew = &lexANSI;
 		bFound = TRUE;
 	}
-	if (!bFound && bDotFile) {
-		pLexNew = &lexCONF;
+
+	if (!bFound && (!fNoAutoDetection || bDotFile)) {
+		if (!fNoAutoDetection) {
+			pLexNew = Style_AutoDetect(pLexNew, bDotFile);
+		} else {
+			pLexNew = &lexCONF;
+		}
 	}
 
 	// Apply the new lexer
