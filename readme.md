@@ -141,7 +141,7 @@ Or build from source, see the [Wiki](https://github.com/zufuliu/notepad2/wiki/Bu
 	* ANSI Art
 	* Many Others
 * API list for:
-	* C Standard Library
+	* C Standard Library, up to C11.
 	* C++ STL
 	* MFC Classes
 	* Cocoa Classes
