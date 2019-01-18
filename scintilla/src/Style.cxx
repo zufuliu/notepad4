@@ -24,7 +24,7 @@ FontAlias::FontAlias(const FontAlias &other) noexcept : Font() {
 }
 
 FontAlias::~FontAlias() {
-	SetID(nullptr);
+	SetID(FontID{});
 	// ~Font will not release the actual font resource since it is now 0
 }
 
@@ -33,7 +33,7 @@ void FontAlias::MakeAlias(const Font &fontOrigin) noexcept {
 }
 
 void FontAlias::ClearFont() noexcept {
-	SetID(nullptr);
+	SetID(FontID{});
 }
 
 bool FontSpecification::operator==(const FontSpecification &other) const noexcept {
