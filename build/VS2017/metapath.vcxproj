@@ -267,7 +267,7 @@
       <WarningLevel>Level4</WarningLevel>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <LanguageStandard>stdcpplatest</LanguageStandard>
-      <AdditionalOptions>/source-charset:utf-8 -Wextra -Wshadow -Wimplicit-fallthrough -Wcomma %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/source-charset:utf-8 -Wextra -Wshadow -Wimplicit-fallthrough -Wcomma -Wformat=2 %(AdditionalOptions)</AdditionalOptions>
       <DiagnosticsFormat>Caret</DiagnosticsFormat>
     </ClCompile>
     <Link>
@@ -335,7 +335,7 @@
       <WarningLevel>Level4</WarningLevel>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <LanguageStandard>stdcpplatest</LanguageStandard>
-      <AdditionalOptions>/source-charset:utf-8 -Wextra -Wshadow -Wimplicit-fallthrough -Wcomma %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/source-charset:utf-8 -Wextra -Wshadow -Wimplicit-fallthrough -Wcomma -Wformat=2 %(AdditionalOptions)</AdditionalOptions>
       <DiagnosticsFormat>Caret</DiagnosticsFormat>
     </ClCompile>
     <Link>
@@ -357,7 +357,7 @@
       <WarningLevel>Level4</WarningLevel>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <LanguageStandard>stdcpplatest</LanguageStandard>
-      <AdditionalOptions>/source-charset:utf-8 -Wextra -Wshadow -Wimplicit-fallthrough -Wcomma %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/source-charset:utf-8 -Wextra -Wshadow -Wimplicit-fallthrough -Wcomma -Wformat=2 %(AdditionalOptions)</AdditionalOptions>
       <DiagnosticsFormat>Caret</DiagnosticsFormat>
     </ClCompile>
     <Link>
@@ -420,7 +420,7 @@
       <OmitFramePointers>true</OmitFramePointers>
       <BufferSecurityCheck>false</BufferSecurityCheck>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
-      <AdditionalOptions>/source-charset:utf-8 /GA -Wextra -Wshadow -Wimplicit-fallthrough -Wcomma %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/source-charset:utf-8 /GA -Wextra -Wshadow -Wimplicit-fallthrough -Wcomma -Wformat=2 %(AdditionalOptions)</AdditionalOptions>
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <DiagnosticsFormat>Caret</DiagnosticsFormat>
@@ -523,7 +523,7 @@
       <OmitFramePointers>true</OmitFramePointers>
       <BufferSecurityCheck>false</BufferSecurityCheck>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
-      <AdditionalOptions>/source-charset:utf-8 /GA -Wextra -Wshadow -Wimplicit-fallthrough -Wcomma %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/source-charset:utf-8 /GA -Wextra -Wshadow -Wimplicit-fallthrough -Wcomma -Wformat=2 %(AdditionalOptions)</AdditionalOptions>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <DiagnosticsFormat>Caret</DiagnosticsFormat>
     </ClCompile>
@@ -555,7 +555,7 @@
       <OmitFramePointers>true</OmitFramePointers>
       <BufferSecurityCheck>false</BufferSecurityCheck>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
-      <AdditionalOptions>/source-charset:utf-8 /GA -Wextra -Wshadow -Wimplicit-fallthrough -Wcomma %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/source-charset:utf-8 /GA -Wextra -Wshadow -Wimplicit-fallthrough -Wcomma -Wformat=2 %(AdditionalOptions)</AdditionalOptions>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <DiagnosticsFormat>Caret</DiagnosticsFormat>
     </ClCompile>
