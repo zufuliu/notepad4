@@ -21,6 +21,7 @@ static KEYWORDLIST Keywords_CPP = {{
 "__alignof __asm __assume __based __cdecl __declspec __event __except __fastcall __finally __forceinline __identifier __inline __interface __leave __raise __stdcall __clrcall __super __thiscall __try __unaligned __uuidof __hook __unhook __noop __vectorcall __pragma "
 // GCC
 "typeof __typeof__ __alignof__ __label__ __asm__ __thread __attribute__ __volatile__ __restrict__ __restrict __inline__ __extension__ "
+// clang Objective-C/C++
 "__nonnull __nullable __covariant __kindof nullable nonnull "
 // Keil
 "sfr sfr16 interrupt "
@@ -32,26 +33,47 @@ static KEYWORDLIST Keywords_CPP = {{
 , // 1 Type Keyword
 "__auto_type auto char double float int long short signed unsigned void "
 "bool char16_t char32_t wchar_t nullptr_t nothrow_t "
-"_Bool complex _Complex _Imaginary "
+"_Bool complex _Complex _Imaginary imaginary "
 "__w64 __wchar_t __int8 __int16 __int32 __int64 __m128 __m128d __m128i __m256 __m256d __m256i __m64 __int3264 __ptr32 __ptr64 __sptr __uptr "
 "__int128 __float80 __float128 __fp16 __complex__ __real__ __imag__ __complex128 _Decimal32 _Decimal64 _Decimal128 decimal32 decimal64 decimal128 "
 "int128 qfloat "
 
+// errno.h
+"errno_t "
+// fenv.h
+"fenv_t fexcept_t "
+// inttypes.h
+"imaxdiv_t "
+// math.h
+"float_t double_t "
+// setjmp.h
+"jmp_buf sigjmp_buf "
+// signal.h
+"sig_atomic_t sigset_t pid_t "
+// stdarg.h
+"va_list "
+// stdatomic.h
+"atomic_flag atomic_bool atomic_char atomic_schar atomic_uchar atomic_short atomic_ushort atomic_int atomic_uint atomic_long atomic_ulong atomic_llong atomic_ullong atomic_char16_t atomic_char32_t atomic_wchar_t atomic_intptr_t atomic_uintptr_t atomic_size_t atomic_ptrdiff_t atomic_intmax_t atomic_uintmax_t "
 // stddef.h
 "size_t rsize_t ptrdiff_t max_align_t "
 // stdint.h
 "int8_t int16_t int32_t int64_t uint8_t uint16_t uint32_t uint64_t "
 "intptr_t uintptr_t intmax_t uintmax_t "
-"va_list ssize_t " " errno_t "
-"fenv_t fexcept_t "  "locale_t " "float_t double_t " "jmp_buf sigjmp_buf " "sig_atomic_t sigset_t pid_t "
-"fpos_t off_t "
-"FILE "
+"ssize_t "
+"locale_t "
+// stdio.h
+"FILE fpos_t off_t "
 // stdlib.h
 "div_t ldiv_t lldiv_t "
+// threads.h
+"cnd_t thrd_t tss_t mtx_t tss_dtor_t thrd_start_t once_flag "
 // time.h
 "clock_t time_t "
-// wchar.h				wctype.h
-"wint_t mbstate_t "		"wctrans_t wctype_t "
+// wchar.h
+"wint_t mbstate_t "
+// wctype.h
+"wctrans_t wctype_t "
+// std::byte
 "byte "
 
 , // 2 Preprocessor
@@ -76,6 +98,11 @@ static KEYWORDLIST Keywords_CPP = {{
 "carries_dependency fallthrough nodiscard maybe_unused likely unlikely no_unique_address expects ensures assert optimize_for_synchronized "
 
 , // 5 Class
+// locale.h
+"lconv "
+// time.h
+"timespec "
+
 // STL class
 "basic_string string wstring u16string u32string "
 "vector deque list map multimap multiset queue priority_queue set stack initializer_list forward_list gslice gslice_array "
@@ -140,6 +167,12 @@ static KEYWORDLIST Keywords_CPP = {{
 "NSCopying "
 
 , // 7 Enumeration
+// stdatomic.h
+"memory_order "
+"memory_order_relaxed memory_order_consume memory_order_acquire memory_order_release memory_order_acq_rel memory_order_seq_cst "
+// threads.h
+"mtx_plain mtx_recursive mtx_timed "
+"thrd_timedout thrd_success thrd_busy thrd_error thrd_nomem "
 // ios_base
 "fmtflags iostate openmode seekdir "
 
@@ -153,46 +186,59 @@ static KEYWORDLIST Keywords_CPP = {{
 
 // assert.h
 "_DEBUG NDEBUG assert() "
+// complex.h
+"CX_LIMITED_RANGE "
+"_Complex_I _Imaginary_I CMPLX() CMPLXF() CMPLXL() "
+// ctype.h
+"_tolower() _toupper() "
 // errno.h
 "EDOM EILSEQ ERANGE "
-// signal.h
-"SIG_DFL SIG_ERR SIG_IGN SIG_SGE SIG_ACK "
-"SIGABRT SIGFPE SIGILL SIGINT SIGSEGV SIGTERM SIGBREAK "
-// stdarg.h
-"va_arg() va_copy() va_end() va_start() "
-// stdlib.h
-"MAX_PATH EXIT_FAILURE EXIT_SUCCESS RAND_MAX MB_CUR_MAX "
-// stddef.h
-"offsetof() "
+// fenv.h
+"FENV_ACCESS "
+"FE_INVALID FE_DENORMAL FE_DIVBYZERO FE_OVERFLOW FE_UNDERFLOW FE_INEXACT FE_ALL_EXCEPT "
+"FE_TONEAREST FE_DOWNWARD FE_UPWARD FE_TOWARDZERO " "FE_DFL_ENV FE_PC64_ENV FE_PC53_ENV "
+// float.h
+"DECIMAL_DIG FLT_DECIMAL_DIG DBL_DECIMAL_DIG LDBL_DECIMAL_DIG "
+// inttypes.h
+"PRId64 PRIi64 PRIu64 PRIx64 PRIX64 SCNd64 SCNi64 SCNo64 SCNu64 SCNx64 "
 // limits.h
 "CHAR_BIT MB_LEN_MAX PATH_MAX SCHAR_MIN SCHAR_MAX UCHAR_MAX CHAR_MIN CHAR_MAX SHRT_MIN SHRT_MAX USHRT_MAX "
 "INT_MIN INT_MAX UINT_MAX LONG_MIN LONG_MAX ULONG_MAX LLONG_MIN LLONG_MAX ULLONG_MAX _I64_MIN _I64_MAX _UI64_MAX "
-// stdint.h
-"INT8_MIN INT8_MAX UINT8_MAX INT16_MIN INT16_MAX UINT16_MAX INT32_MIN INT32_MAX UINT32_MAX INT64_MIN INT64_MAX UINT64_MAX "
-"SIZE_MAX RSIZE_MAX WINT_MIN WiNT_MAX "
-"INT64_C() UINT64_C() INTMAX_C() UINTMAX_C() "
-// stdio.h
-"_IOFBF _IOLBF _IONBF BUFSIZ FOPEN_MAX FILENAME_MAX TMP_MAX L_tmpnam P_tmpdir SEEK_SET SEEK_CUR SEEK_END "
-// ctype.h
-"_tolower() _toupper() "
-// wchar.h
-"WCHAR_MAX WCHAR_MIN "
-// time.h
-"CLOCKS_PER_SEC TIME_UTC "
 // locale.h
 "LC_ALL LC_COLLATE LC_CTYPE LC_MONETARY LC_NUMERIC LC_TIME LC_MESSAGES "
 // math.h
+"FP_CONTRACT "
 "M_E M_LOG2E M_LOG10E M_LN2 M_LN10 M_PI M_PI_2 M_PI_4 M_1_PI M_2_PI M_2_SQRTPI M_SQRT2 M_SQRT1_2 "
 "MAXFLOAT HUGE_VAL HUGE_VALF HUGE_VALL INFINITY NAN "
 "FP_INFINITE FP_NAN FP_NORMAL FP_SUBNORMAL FP_ZERO " "FP_FAST_FMA FP_FAST_FMAF FP_FAST_FMAL "
 "FP_ILOGB0 FP_ILOGBNAN " "MATH_ERRNO MATH_ERREXCEPT math_errhandling "
 "fpclassify() isfinite() isinf() isnan() isnormal() signbit() "
 "isgreater() isgreaterequal() isless() islessequal() islessgreater() isunordered() "
-// complex.h
-"_Complex_I _Imaginary_I CMPLX() CMPLXF() CMPLXL() "
-// fenv.h
-"FE_INVALID FE_DENORMAL FE_DIVBYZERO FE_OVERFLOW FE_UNDERFLOW FE_INEXACT FE_ALL_EXCEPT "
-"FE_TONEAREST FE_DOWNWARD FE_UPWARD FE_TOWARDZERO " "FE_DFL_ENV FE_PC64_ENV FE_PC53_ENV "
+// signal.h
+"SIG_DFL SIG_ERR SIG_IGN SIG_SGE SIG_ACK "
+"SIGABRT SIGFPE SIGILL SIGINT SIGSEGV SIGTERM SIGBREAK "
+// stdarg.h
+"va_arg() va_copy() va_end() va_start() "
+// stdatomic.h
+"ATOMIC_BOOL_LOCK_FREE ATOMIC_CHAR_LOCK_FREE ATOMIC_CHAR16_T_LOCK_FREE ATOMIC_CHAR32_T_LOCK_FREE ATOMIC_WCHAR_T_LOCK_FREE ATOMIC_SHORT_LOCK_FREE ATOMIC_INT_LOCK_FREE ATOMIC_LONG_LOCK_FREE ATOMIC_LLONG_LOCK_FREE ATOMIC_POINTER_LOCK_FREE "
+"ATOMIC_FLAG_INIT ATOMIC_VAR_INIT() "
+// stddef.h
+"offsetof() "
+// stdint.h
+"INT8_MIN INT8_MAX UINT8_MAX INT16_MIN INT16_MAX UINT16_MAX INT32_MIN INT32_MAX UINT32_MAX INT64_MIN INT64_MAX UINT64_MAX "
+"INTPTR_MIN INTPTR_MAX UINTPTR_MAX INTMAX_MIN INTMAX_MAX UINTMAX_MAX PTRDIFF_MIN PTRDIFF_MAX "
+"SIG_ATOMIC_MIN SIG_ATOMIC_MAX SIZE_MAX RSIZE_MAX WINT_MIN WINT_MAX "
+"INT64_C() UINT64_C() INTMAX_C() UINTMAX_C() "
+// stdio.h
+"_IOFBF _IOLBF _IONBF BUFSIZ FOPEN_MAX FILENAME_MAX TMP_MAX L_tmpnam P_tmpdir SEEK_SET SEEK_CUR SEEK_END "
+// stdlib.h
+"MAX_PATH EXIT_FAILURE EXIT_SUCCESS RAND_MAX MB_CUR_MAX "
+// threads.h
+"ONCE_FLAG_INIT TSS_DTOR_ITERATIONS "
+// time.h
+"CLOCKS_PER_SEC TIME_UTC "
+// wchar.h
+"WCHAR_MAX WCHAR_MIN "
 
 // Win32/MFC
 "_WIN32 WIN32 WINVER _WIN32_WINNT _WIN32_IE _WIN64 _UNICODE UNICODE "
@@ -349,32 +395,59 @@ static KEYWORDLIST Keywords_CPP = {{
 "rip st tr3 tr4 tr5 tr6 tr7 eiz "
 
 , // 13 C Function
+// complex.h
+"cacos() casin() catan() ccos() csin() ctan() cacosh() casinh() catanh() ccosh() csinh() ctanh() "
+"cexp() clog() cabs() cpow() csqrt() carg() cimag() creal() conj() cproj() "
+// ctype.h
+"isalnum() isalpha() isblank() iscntrl() isdigit() isgraph() islower() isprint() ispunct() isspace() isupper() isxdigit() "
+"tolower() toupper() "
+// fenv.h
+"feclearexcept() fegetexceptflag() feraiseexcept() fesetexceptflag() fetestexcept() fegetround() fesetround() "
+"fegetenv() feholdexcept() fesetenv() feupdateenv() "
+// inttypes.h
+"imaxabs() imaxdiv() strtoimax() strtoumax() wcstoimax() wcstoumax() "
 // locale.h
 "setlocale() localeconv() "
+// math.h
+"acos() asin() atan() atan2() cos() sin() tan() acosh() asinh() atanh() cosh() sinh() tanh() "
+"exp() exp2() expm1() frexp() ilogb() ldexp() log() log10() log1p() log2() logb() modf() scalbn() scalbln() "
+"cbrt() fabs() hypot() pow() sqrt() erf() erfc() lgamma() tgamma() "
+"ceil() floor() nearbyint() rint() lint() llint() round() lround() llround() trunc() "
+"fmod() remainder() remquo() copysign() nan() nextafter() nexttoward() fdim() fmax() fmin() fma() "
 // setjmp.h
 "_longjmp() longjmp() siglongjmp() _setjmp() setjmp() sigsetjmp() "
 // signal.h
 "signal() raise() "
-// stdlib.h
-"atof() atoi() atol() atoll() strtod() strtof() strtold() strtol() strtoll() strtoul() strtoull() "
-"rand() srand() " "qsort() bsearch() " "abs() labs() llabs() div() ldiv() lldiv() "
-"aligned_alloc() calloc() free() malloc() realloc() "
-"abort() atexit() at_quick_exit() exit() _Exit() getenv() quick_exit() system() "
-"mblen() mbtowc() wctomb() mbstowcs() wcstombs() "
+// stdatomic.h
+"atomic_init() kill_dependency() atomic_thread_fence() atomic_signal_fence() atomic_is_lock_free() "
+"atomic_store() atomic_store_explicit() atomic_load() atomic_load_explicit() atomic_exchange() atomic_exchange_explicit() "
+"atomic_compare_exchange_strong() atomic_compare_exchange_strong_explicit() atomic_compare_exchange_weak() atomic_compare_exchange_weak_explicit() "
+"atomic_fetch_add() atomic_fetch_add_explicit() atomic_fetch_sub() atomic_fetch_sub_explicit() atomic_fetch_or() atomic_fetch_or_explicit() atomic_fetch_xor() atomic_fetch_xor_explicit() atomic_fetch_and() atomic_fetch_and_explicit() "
+"atomic_flag_test_and_set() atomic_flag_test_and_set_explicit() atomic_flag_clear() atomic_flag_clear_explicit() "
 // stdio.h
 "remove() rename() tmpfile() tmpnam() " "fopen() freopen() fflush() fclose() setbuf() setvbuf() "
 "fprintf() fscanf() printf() scanf() snprintf() sprintf() sscanf() vfprintf() vfscanf() vsnprintf() vsprintf() vsscanf() vprintf() vscanf() "
 "fgetc() fgets() getc() getchar() putc() putchar() puts() fputc() fputs() ungetc() " "fread() fwrite() "
 "fgetpos() fseek() fsetpos() ftell() rewind() " "clearerr() feof() ferror() perror() "
-// time.h
-"clock() difftime() mktime() time() timespec_get() " "asctime() ctime() gmtime() localtime() strftime() "
+// stdlib.h
+"atof() atoi() atol() atoll() strtod() strtof() strtold() strtol() strtoll() strtoul() strtoull() "
+"rand() srand() " "aligned_alloc() calloc() free() malloc() realloc() "
+"abort() atexit() at_quick_exit() exit() _Exit() getenv() quick_exit() system() "
+"qsort() bsearch() " "abs() labs() llabs() div() ldiv() lldiv() "
+"mblen() mbtowc() wctomb() mbstowcs() wcstombs() "
 // string.h
 "memcpy() memmove() memcmp() memchr() memset() "
 "strcpy() strncpy() strcat() strncat() strcmp() strcoll() strncmp() strxfrm() "
 "strchr() strcspn() strpbrk() strrchr() strspn() strstr() strtok() " "strerror() strlen() "
-// ctype.h
-"isalnum() isalpha() isblank() iscntrl() isdigit() isgraph() islower() isprint() ispunct() isspace() isupper() isxdigit() "
-"tolower() toupper() "
+// threads.h
+"call_once() cnd_broadcast() cnd_destroy() cnd_init() cnd_signal() cnd_timedwait() cnd_wait() "
+"mtx_destroy() mtx_init() mtx_lock() mtx_timedlock() mtx_trylock() mtx_unlock() "
+"thrd_create() thrd_current() thrd_detach() thrd_equal() thrd_exit() thrd_join() thrd_sleep() thrd_yield() "
+"tss_create() tss_delete() tss_get() tss_set() "
+// time.h
+"clock() difftime() mktime() time() timespec_get() " "asctime() ctime() gmtime() localtime() strftime() "
+// uchar.h
+"mbrtoc16() c16rtomb() mbrtoc32() c32rtomb() "
 // wchar.h
 "fwprintf() fwscanf() swprintf() swscanf() vfwprintf() vfwscanf() vswprintf() vswscanf() vwprintf() vwscanf() wprintf() wscanf() "
 "fgetwc() fgetws() fputwc() fputws() fwide() getwc() getwchar() putwc() putwchar() ungetwc() "
@@ -386,18 +459,6 @@ static KEYWORDLIST Keywords_CPP = {{
 // wctype.h
 "iswalnum() iswalpha() iswblank() iswcntrl() iswdigit() iswgraph() iswlower() iswprint() iswpunct() iswspace() iswupper() iswxdigit() "
 "iswctype() wctype() towlower() towupper() towctrans() wctrans() "
-// math.h
-"acos() asin() atan() atan2() cos() sin() tan() acosh() asinh() atanh() cosh() sinh() tanh() "
-"exp() exp2() expm1() frexp() ldexp() ilogb() log() log10() log1p() log2() logb() modf() scalbn() scalbln() "
-"cbrt() hypot() pow() sqrt() erf() erfc() lgamma() tgamma() "
-"ceil() floor() round() trunc() nearbyint() rint() lint() llint() lround() llround() "
-"fmod() remainder() remquo() copysign() nan() nextafter() nexttoward() fdim() fmax() fmin() fma() "
-// complex.h
-"cacos() casin() catan() ccos() csin() ctan() cacosh() casinh() catanh() ccosh() csinh() ctanh() "
-"cexp() clog() cabs() cpow() csqrt() carg() cimag() creal() conj() cproj() "
-// fenv.h
-"feclearexcept() fegetexceptflag() feraiseexcept() fesetexceptflag() fetestexcept() fegetround() fesetround() "
-"fegetenv() feholdexcept() fesetenv() feupdateenv() "
 
 , // 14 C++ Function
 // algorithm
