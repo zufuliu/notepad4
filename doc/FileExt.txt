@@ -19,7 +19,7 @@ C/C++ Source
 	hh				C++ Header File
 	inl				C++ Inline File
 	pch				Precompiled Header File
-		idl			interface definition language
+		idl			Interface Definition Language
 		odl			Object Definition Language
 		midl		Microsoft Interface Definition Language
 	m				Objective C Source File
