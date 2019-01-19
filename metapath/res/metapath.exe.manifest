@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <assembly xmlns="urn:schemas-microsoft-com:asm.v1" manifestVersion="1.0">
-	<assemblyIdentity name="metapath" processorArchitecture="*" version="4.19.01.1722" type="win32"/>
+	<assemblyIdentity name="metapath" processorArchitecture="*" version="4.19.01.1786" type="win32"/>
 	<description>metapath</description>
 	<dependency>
 		<dependentAssembly>
