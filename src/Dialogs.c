@@ -36,7 +36,7 @@
 extern HWND		hwndMain;
 extern DWORD	dwLastIOError;
 extern BOOL		bSkipUnicodeDetection;
-extern BOOL		bLoadASCIIasUTF8;
+extern BOOL		bLoadANSIasUTF8;
 extern BOOL		bLoadNFOasOEM;
 extern int		fNoFileVariables;
 extern BOOL		bNoEncodingTags;
@@ -1676,8 +1676,8 @@ static INT_PTR CALLBACK SelectDefEncodingDlgProc(HWND hwnd, UINT umsg, WPARAM wP
 			CheckDlgButton(hwnd, IDC_NOUNICODEDETECTION, BST_CHECKED);
 		}
 
-		if (bLoadASCIIasUTF8) {
-			CheckDlgButton(hwnd, IDC_ASCIIASUTF8, BST_CHECKED);
+		if (bLoadANSIasUTF8) {
+			CheckDlgButton(hwnd, IDC_ANSIASUTF8, BST_CHECKED);
 		}
 
 		if (bLoadNFOasOEM) {
@@ -1698,7 +1698,7 @@ static INT_PTR CALLBACK SelectDefEncodingDlgProc(HWND hwnd, UINT umsg, WPARAM wP
 			PENCODEDLG pdd = (PENCODEDLG)GetWindowLongPtr(hwnd, DWLP_USER);
 			if (Encoding_GetFromComboboxEx(GetDlgItem(hwnd, IDC_ENCODINGLIST), &pdd->idEncoding)) {
 				bSkipUnicodeDetection = IsButtonChecked(hwnd, IDC_NOUNICODEDETECTION);
-				bLoadASCIIasUTF8 = IsButtonChecked(hwnd, IDC_ASCIIASUTF8);
+				bLoadANSIasUTF8 = IsButtonChecked(hwnd, IDC_ANSIASUTF8);
 				bLoadNFOasOEM = IsButtonChecked(hwnd, IDC_NFOASOEM);
 				bNoEncodingTags = IsButtonChecked(hwnd, IDC_ENCODINGFROMFILEVARS);
 				EndDialog(hwnd, IDOK);

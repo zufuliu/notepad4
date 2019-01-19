@@ -60,7 +60,7 @@ extern BOOL bInlineIMEUseBlockCaret;
 // Default Codepage and Character Set
 extern int iDefaultCodePage;
 //extern int iDefaultCharSet;
-extern BOOL bLoadASCIIasUTF8;
+extern BOOL bLoadANSIasUTF8;
 extern BOOL bLoadNFOasOEM;
 extern int iSrcEncoding;
 extern int iWeakSrcEncoding;
@@ -593,7 +593,7 @@ BOOL EditLoadFile(HWND hwnd, LPWSTR pszFile, BOOL bSkipEncodingDetection, EditFi
 		status->iEOLMode = iLineEndings[iDefaultEOLMode];
 
 		if (iSrcEncoding == -1) {
-			if (bLoadASCIIasUTF8 && !bPreferOEM) {
+			if (bLoadANSIasUTF8 && !bPreferOEM) {
 				iEncoding = CPI_UTF8;
 			} else {
 				iEncoding = _iDefaultEncoding;
@@ -654,7 +654,7 @@ BOOL EditLoadFile(HWND hwnd, LPWSTR pszFile, BOOL bSkipEncodingDetection, EditFi
 				&& ((utf8Sig
 					 || FileVars_IsUTF8(&fvCurFile)
 					 || (iSrcEncoding == CPI_UTF8 || iSrcEncoding == CPI_UTF8SIGN)
-					 || (!bPreferOEM && bLoadASCIIasUTF8) // from menu "Reload As... UTF-8"
+					 || (!bPreferOEM && bLoadANSIasUTF8) // from menu "Reload As... UTF-8"
 					 || IsUTF8(lpData, cbData)
 					)
 				   )

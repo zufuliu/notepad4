@@ -51,7 +51,7 @@ static EDITSTYLE Styles_CPP[] = {
 
 EDITLEXER lexCPP= {
 	SCLEX_CPP, NP2LEX_CPP,
-	EDITLEXER_HOLE(L"C/C++ Source"),
+	EDITLEXER_HOLE(L"C/C++ Source", Styles_CPP),
 	L"",
 	&Keywords_CPP,
 	Styles_CPP
