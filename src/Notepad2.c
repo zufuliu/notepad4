@@ -155,7 +155,7 @@ static BOOL bViewWhiteSpace;
 static BOOL bViewEOLs;
 int		iDefaultEncoding;
 BOOL	bSkipUnicodeDetection;
-BOOL	bLoadASCIIasUTF8;
+BOOL	bLoadANSIasUTF8;
 BOOL	bLoadNFOasOEM;
 BOOL	bNoEncodingTags;
 int		iSrcEncoding = -1;
@@ -2117,7 +2117,7 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	int i = StrNotEmpty(szCurFile);
 	EnableCmd(hmenu, IDM_FILE_REVERT, i);
-	EnableCmd(hmenu, CMD_RELOADASCIIASUTF8, i);
+	EnableCmd(hmenu, CMD_RELOADANSIASUTF8, i);
 	EnableCmd(hmenu, CMD_RELOADANSI, i);
 	EnableCmd(hmenu, CMD_RELOADOEM, i);
 	EnableCmd(hmenu, CMD_RELOADNOFILEVARS, i);
@@ -4354,12 +4354,12 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	}
 	break;
 
-	case CMD_RELOADASCIIASUTF8: {
+	case CMD_RELOADANSIASUTF8: {
 		if (StrNotEmpty(szCurFile)) {
-			const BOOL _bLoadASCIIasUTF8 = bLoadASCIIasUTF8;
-			bLoadASCIIasUTF8 = TRUE;
+			const BOOL back = bLoadANSIasUTF8;
+			bLoadANSIasUTF8 = TRUE;
 			FileLoad(FALSE, FALSE, TRUE, FALSE, szCurFile);
-			bLoadASCIIasUTF8 = _bLoadASCIIasUTF8;
+			bLoadANSIasUTF8 = back;
 		}
 	}
 	break;
@@ -5244,7 +5244,7 @@ void LoadSettings(void) {
 	iDefaultEncoding = iValue;
 
 	bSkipUnicodeDetection = IniSectionGetBool(pIniSection, L"SkipUnicodeDetection", 1);
-	bLoadASCIIasUTF8 = IniSectionGetBool(pIniSection, L"LoadASCIIasUTF8", 0);
+	bLoadANSIasUTF8 = IniSectionGetBool(pIniSection, L"LoadANSIasUTF8", 0);
 	bLoadNFOasOEM = IniSectionGetBool(pIniSection, L"LoadNFOasOEM", 1);
 	bNoEncodingTags = IniSectionGetBool(pIniSection, L"NoEncodingTags", 0);
 
@@ -5533,7 +5533,7 @@ void SaveSettings(BOOL bSaveSettingsNow) {
 	IniSectionSetBoolEx(pIniSection, L"ViewEOLs", bViewEOLs, 0);
 	IniSectionSetIntEx(pIniSection, L"DefaultEncoding", Encoding_MapIniSetting(FALSE, iDefaultEncoding), Encoding_MapIniSetting(FALSE, CPI_UTF8));
 	IniSectionSetBoolEx(pIniSection, L"SkipUnicodeDetection", bSkipUnicodeDetection, 1);
-	IniSectionSetBoolEx(pIniSection, L"LoadASCIIasUTF8", bLoadASCIIasUTF8, 0);
+	IniSectionSetBoolEx(pIniSection, L"LoadANSIasUTF8", bLoadANSIasUTF8, 0);
 	IniSectionSetBoolEx(pIniSection, L"LoadNFOasOEM", bLoadNFOasOEM, 1);
 	IniSectionSetBoolEx(pIniSection, L"NoEncodingTags", bNoEncodingTags, 0);
 	IniSectionSetIntEx(pIniSection, L"DefaultEOLMode", iDefaultEOLMode, 0);

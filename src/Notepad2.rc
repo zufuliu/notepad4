@@ -85,7 +85,7 @@ BEGIN
         MENUITEM "Re&fresh\tF5",                IDM_FILE_REVERT
         POPUP "&Reload"
         BEGIN
-            MENUITEM "As UFT-&8\tShift+F8",         CMD_RELOADASCIIASUTF8
+            MENUITEM "As UFT-&8\tShift+F8",         CMD_RELOADANSIASUTF8
             MENUITEM "As &ANSI\tCtrl+Shift+A",      CMD_RELOADANSI
             MENUITEM "As &OEM\tCtrl+Shift+O",       CMD_RELOADOEM
             MENUITEM "&No FileVars\tAlt+F8",        CMD_RELOADNOFILEVARS
@@ -819,7 +819,7 @@ BEGIN
     VK_F8,          IDM_ENCODING_RECODE,    VIRTKEY, NOINVERT
     VK_F8,          IDM_EDIT_INSERT_ENCODING, VIRTKEY, CONTROL, NOINVERT
     VK_F8,          CMD_RELOADNOFILEVARS,   VIRTKEY, ALT, NOINVERT
-    VK_F8,          CMD_RELOADASCIIASUTF8,  VIRTKEY, SHIFT, NOINVERT
+    VK_F8,          CMD_RELOADANSIASUTF8,  VIRTKEY, SHIFT, NOINVERT
     VK_F9,          IDM_ENCODING_SELECT,    VIRTKEY, NOINVERT
     VK_F9,          IDM_EDIT_INSERT_FILENAME, VIRTKEY, CONTROL, NOINVERT
     VK_F9,          IDM_FILE_MANAGEFAV,     VIRTKEY, ALT, NOINVERT
@@ -1006,9 +1006,9 @@ BEGIN
     CONTROL         "",IDC_ENCODINGLIST,"ComboBoxEx32",CBS_DROPDOWNLIST | WS_CLIPSIBLINGS | WS_VSCROLL | WS_TABSTOP,7,20,195,128
     CONTROL         "Skip automatic &Unicode detection.",IDC_NOUNICODEDETECTION,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,43,145,10
-    CONTROL         "Open 7-bit &ASCII files in UTF-8 mode.",IDC_ASCIIASUTF8,
+    CONTROL         "Open &ANSI (unknown encoding) files in UTF-8 mode.",IDC_ANSIASUTF8,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,53,195,10
-    CONTROL         "Open 8-bit *.&nfo/diz files in DOS-437 mode.",IDC_NFOASOEM,
+    CONTROL         "Open ANSI Art (*.&nfo, *.diz) files in DOS-437 mode.",IDC_NFOASOEM,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,63,195,10
     CONTROL         "Don't parse encoding &tags.",IDC_ENCODINGFROMFILEVARS,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,73,144,10
