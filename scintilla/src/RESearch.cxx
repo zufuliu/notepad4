@@ -966,7 +966,8 @@ Sci::Position RESearch::PMatch(const CharacterIndexer &ci, Sci::Position lp, Sci
 			if (!ci.IsWordStartAt(lp)) {
 				if (offset) {
 					e = ci.MovePositionOutsideChar(lp, moveDir);
-					*offset = (e == lp) ? ci.NextPosition(lp, moveDir) - lp : e - lp;
+					e = (e == lp) ? ci.NextPosition(lp, moveDir) - lp : e - lp;
+					*offset = (e == 0) ? moveDir : e;
 				}
 				return NOTFOUND;
 			}
@@ -975,7 +976,8 @@ Sci::Position RESearch::PMatch(const CharacterIndexer &ci, Sci::Position lp, Sci
 			if (lp == bol || !ci.IsWordEndAt(lp)) {
 				if (offset) {
 					e = ci.MovePositionOutsideChar(lp, moveDir);
-					*offset = (e == lp) ? ci.NextPosition(lp, moveDir) - lp : e - lp;
+					e = (e == lp) ? ci.NextPosition(lp, moveDir) - lp : e - lp;
+					*offset = (e == 0) ? moveDir : e;
 				}
 				return NOTFOUND;
 			}
@@ -983,11 +985,11 @@ Sci::Position RESearch::PMatch(const CharacterIndexer &ci, Sci::Position lp, Sci
 		case EXP_MATCH_TO_WORD_END:
 		case EXP_MATCH_TO_WORD_END_OPT: {
 			e = ci.ExtendWordSelect(lp, moveDir);
-			const bool find = ci.IsWordEndAt(e);
-			if (offset) {
-				*offset = (e == lp) ? ci.NextPosition(lp, moveDir) - lp : e - lp;
-			}
-			if ((e == lp && op != EXP_MATCH_TO_WORD_END_OPT) || !find) {
+			if ((e == lp && op != EXP_MATCH_TO_WORD_END_OPT) || !ci.IsWordEndAt(e)) {
+				if (offset) {
+					e = (e == lp) ? ci.NextPosition(lp, moveDir) - lp : e - lp;
+					*offset = (e == 0) ? moveDir : e;
+				}
 				return NOTFOUND;
 			}
 			lp = e;
