@@ -7,6 +7,7 @@
 import codecs, os, platform, sys, unicodedata
 from collections import OrderedDict
 from enum import IntEnum
+import math
 from FileGenerator import Regenerate
 
 class CharClassify(IntEnum):
@@ -159,7 +160,7 @@ def updateCharacterCategory(filename):
 			startRange = ch
 	value = startRange * 32 + categories.index(category)
 	values.append("%d," % value)
-	print('catRanges:', len(values))
+	print('catRanges:', len(values), 4*len(values)/1024, math.ceil(math.log2(len(values))))
 
 	Regenerate(filename, "//", values)
 
@@ -226,33 +227,160 @@ def buildANSICharClassifyTable(filename):
 		else:
 			result[s]['codepage'].append((codepage, comment))
 
-	with open(filename, 'w', newline='\n') as fd:
-		fd.write("// scintilla/scripts/GenerateCharacterCategory.py\n")
-		fd.write("static const UINT8 ANSICharClassifyTable[] = {\n")
-		for item in result.values():
-			for page in item['codepage']:
-				fd.write('// ' + page[1] + '\n')
-			data = item['data']
-			fd.write(', '.join('0x%02X' % ch for ch in data[:16]) + ',\n')
-			if len(data) > 16:
-				fd.write(', '.join('0x%02X' % ch for ch in data[16:]) + ',\n')
-		fd.write("};\n\n")
+	output = ["// Created with Python %s,  Unicode %s" % (
+		platform.python_version(), unicodedata.unidata_version)]
 
-		fd.write("static const UINT8* GetANSICharClassifyTable(UINT cp, int *length) {\n")
-		fd.write("\tswitch (cp) {\n")
-		for item in result.values():
-			for page in item['codepage']:
-				fd.write("\tcase %d: // %s\n" % (page[0], page[1]))
-			fd.write("\t\t*length = %d;\n" % len(item['data']))
-			fd.write("\t\treturn ANSICharClassifyTable + %d;\n" % item['offset'])
-		fd.write("\tdefault:\n")
-		fd.write("\t\t*length = 0;\n")
-		fd.write("\t\treturn NULL;\n")
-		fd.write("\t}\n")
-		fd.write("}\n")
+	output.append("static const UINT8 ANSICharClassifyTable[] = {")
+	for item in result.values():
+		for page in item['codepage']:
+			output.append('// ' + page[1])
+		data = item['data']
+		output.append(', '.join('0x%02X' % ch for ch in data[:16]) + ',')
+		if len(data) > 16:
+			output.append(', '.join('0x%02X' % ch for ch in data[16:]) + ',')
+	output.append("};\n")
+
+	output.append("static const UINT8* GetANSICharClassifyTable(UINT cp, int *length) {")
+	output.append("\tswitch (cp) {")
+	for item in result.values():
+		for page in item['codepage']:
+			output.append("\tcase %d: // %s" % (page[0], page[1]))
+		output.append("\t\t*length = %d;" % len(item['data']))
+		output.append("\t\treturn ANSICharClassifyTable + %d;" % item['offset'])
+	output.append("\tdefault:")
+	output.append("\t\t*length = 0;")
+	output.append("\t\treturn NULL;")
+	output.append("\t}")
+	output.append("}")
 
 	print('ANSICharClassifyTable:', len(result), len(encodingList))
+	Regenerate(filename, "//", output)
+
+# splitbins() is taken from Python source
+# https://github.com/python/cpython/blob/master/Tools/unicode/makeunicodedata.py
+
+def getsize(data):
+	# return smallest possible integer size for the given array
+	maxdata = max(data)
+	if maxdata < 16:
+		# allow maximum shift 8 bits for small value
+		return 1/2
+	if maxdata < 256:
+		return 1
+	elif maxdata < 65536:
+		return 2
+	else:
+		return 4
+
+def splitbins(t):
+	"""t -> (t1, t2, shift).  Split a table to save space.
+
+	t is a sequence of ints.  This function can be useful to save space if
+	many of the ints are the same.	t1 and t2 are lists of ints, and shift
+	is an int, chosen to minimize the combined size of t1 and t2 (in C
+	code), and where for each i in range(len(t)),
+		t[i] == t2[(t1[i >> shift] << shift) + (i & mask)]
+	where mask is a bitmask isolating the last "shift" bits.
+	"""
+
+	# the most we can shift n and still have something left
+	maxshift = math.floor(math.log2(len(t)))
+
+	total = sys.maxsize	 # smallest total size so far
+	t = tuple(t)	# so slices can be dict keys
+	for shift in range(maxshift + 1):
+		t1 = []
+		t2 = []
+		size = 2**shift
+		bincache = {}
+		for i in range(0, len(t), size):
+			part = t[i:i+size]
+			index = bincache.get(part)
+			if index is None:
+				index = len(t2)
+				bincache[part] = index
+				t2.extend(part)
+			t1.append(index >> shift)
+		# determine memory size
+		b = len(t1)*getsize(t1) + len(t2)*getsize(t2)
+		if b < total:
+			best = t1, t2, shift
+			total = b
+	return best
+
+def updateCharClassifyTable(filename):
+	maxUnicode = sys.maxunicode + 1
+	CharClassifyTable = [0] * maxUnicode
+	for ch in range(maxUnicode):
+		uch = chr(ch)
+		category = unicodedata.category(uch)
+		value = ClassifyMap[category]
+		if isCJKLetter(category, ch):
+			value = CharClassify.ccCJKWord
+		CharClassifyTable[ch] = int(value)
+
+	indexA, indexB, shiftA = splitbins(CharClassifyTable)
+	print('CharClassify 1:', len(indexA), max(indexA), len(indexB), shiftA)
+	indexC, indexD, shiftC = splitbins(indexB)
+	print('CharClassify 2:', len(indexC), max(indexC), len(indexD), shiftC)
+
+	sizeA = getsize(indexA)
+	sizeC = getsize(indexC);
+	total = len(indexA)*sizeA + len(indexC)*sizeC + len(indexD)
+	print('CharClassify total size:', total/1024)
+
+	maskA = (1 << shiftA) - 1
+	maskC = (1 << shiftC) - 1
+	for ch in range(maxUnicode):
+		i = (indexA[ch >> shiftA] << shiftA) + (ch & maskA)
+		i = (indexC[i >> shiftC] << shiftC) + (i & maskC)
+		value = indexD[i]
+		expect = CharClassifyTable[ch]
+		if value != expect:
+			print('CharClassify verify fail: %04X, expect: %d, got: %d' % (ch, expect, value))
+			return
+
+	output = ["// Created with Python %s,  Unicode %s" % (
+		platform.python_version(), unicodedata.unidata_version)]
+	if sizeA == sizeC == 1:
+		output.append("""namespace {
+constexpr unsigned int maxUnicode = 0x10ffff;
+
+const unsigned char CharClassifyTable[] = {
+""")
+		output.append(', '.join(str(i) for i in indexA) + ',')
+		output.append(', '.join(str(i) for i in indexC) + ',')
+		output.append(', '.join(str(i) for i in indexD) + ',')
+		output.append("""};
+
+}""")
+
+		args = {
+			'shiftA': shiftA,
+			'maskA': maskA,
+			'offsetC': len(indexA),
+			'shiftC': shiftC,
+			'maskC': maskC,
+			'offsetD': len(indexA) + len(indexC)
+		}
+		output.append("""
+CharClassify::cc CharClassify::ClassifyCharacter(unsigned int ch) noexcept {{
+	if (ch > maxUnicode) {{
+		// Cn
+		return ccSpace;
+	}}
+
+	ch = (CharClassifyTable[ch >> {shiftA}] << {shiftA}) + (ch & {maskA});
+	ch = (CharClassifyTable[{offsetC} + (ch >> {shiftC})] << {shiftC}) + (ch & {maskC});
+	return static_cast<cc>(CharClassifyTable[{offsetD} + ch]);
+}}""".format(**args))
+	else:
+		print('CharClassify unknown bin size')
+		return
+
+	Regenerate(filename, "//", output)
 
 if __name__ == '__main__':
-	buildANSICharClassifyTable('ANSICharClassifyTable.c')
-	updateCharacterCategory("../lexlib/CharacterCategory.cxx")
+	buildANSICharClassifyTable('../../src/EditEncoding.c')
+	updateCharClassifyTable("../src/CharClassify.cxx")
+	#updateCharacterCategory("../lexlib/CharacterCategory.cxx")

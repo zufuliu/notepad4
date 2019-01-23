@@ -28,6 +28,8 @@ public:
 		return static_cast<cc>(charClass[ch]) == ccWord;
 	}
 
+	static cc ClassifyCharacter(unsigned int ch) noexcept;
+
 private:
 	enum {
 		maxChar = 256

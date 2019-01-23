@@ -32,7 +32,6 @@
 #include "Scintilla.h"
 
 #include "CharacterSet.h"
-#include "CharacterCategory.h"
 #include "Position.h"
 #include "SplitVector.h"
 #include "Partitioning.h"
@@ -1620,59 +1619,7 @@ bool Document::IsASCIIWordByte(unsigned char ch) const noexcept {
 CharClassify::cc Document::WordCharacterClass(unsigned int ch) const noexcept {
 	if (dbcsCodePage && (!UTF8IsAscii(ch))) {
 		if (SC_CP_UTF8 == dbcsCodePage) {
-			// Use hard coded Unicode class
-			const CharacterCategory cc = CategoriseCharacter(ch);
-			switch (cc) {
-
-				// Separator, Line/Paragraph
-			case ccZl:
-			case ccZp:
-				return CharClassify::ccNewLine;
-
-				// Separator, Space
-			case ccZs:
-				// Other
-			case ccCc:
-			case ccCf:
-			case ccCs:
-			case ccCo:
-			case ccCn:
-				return CharClassify::ccSpace;
-
-				// Letter
-			case ccLu:
-			case ccLl:
-			case ccLt:
-			case ccLm:
-			case ccLo:
-				// Number
-			case ccNd:
-			case ccNl:
-			case ccNo:
-				// Mark - includes combining diacritics
-			case ccMn:
-			case ccMc:
-			case ccMe:
-				return CharClassify::ccWord;
-
-				// Punctuation
-			case ccPc:
-			case ccPd:
-			case ccPs:
-			case ccPe:
-			case ccPi:
-			case ccPf:
-			case ccPo:
-				// Symbol
-			case ccSm:
-			case ccSc:
-			case ccSk:
-			case ccSo:
-				return CharClassify::ccPunctuation;
-
-			case ccCJK:
-				return CharClassify::ccCJKWord;
-			}
+			return CharClassify::ClassifyCharacter(ch);
 		} else {
 			// Asian DBCS
 			return CharClassify::ccCJKWord;
