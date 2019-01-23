@@ -54,8 +54,6 @@
     <VirtualDirectory Name="lexlib">
       <File Name="../../scintilla/lexlib/Accessor.cxx"/>
       <File Name="../../scintilla/lexlib/Accessor.h"/>
-      <File Name="../../scintilla/lexlib/CharacterCategory.cxx"/>
-      <File Name="../../scintilla/lexlib/CharacterCategory.h"/>
       <File Name="../../scintilla/lexlib/CharacterSet.cxx"/>
       <File Name="../../scintilla/lexlib/CharacterSet.h"/>
       <File Name="../../scintilla/lexlib/HereDoc.cxx"/>

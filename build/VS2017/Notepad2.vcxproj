@@ -597,7 +597,6 @@
     <ClCompile Include="..\..\scintilla\lexers\LexTexinfo.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexVim.cxx" />
     <ClCompile Include="..\..\scintilla\lexlib\Accessor.cxx" />
-    <ClCompile Include="..\..\scintilla\lexlib\CharacterCategory.cxx" />
     <ClCompile Include="..\..\scintilla\lexlib\CharacterSet.cxx" />
     <ClCompile Include="..\..\scintilla\lexlib\HereDoc.cxx" />
     <ClCompile Include="..\..\scintilla\lexlib\LexAccessor.cxx" />
@@ -738,7 +737,6 @@
     <ClInclude Include="..\..\scintilla\include\Scintilla.h" />
     <ClInclude Include="..\..\scintilla\include\Sci_Position.h" />
     <ClInclude Include="..\..\scintilla\lexlib\Accessor.h" />
-    <ClInclude Include="..\..\scintilla\lexlib\CharacterCategory.h" />
     <ClInclude Include="..\..\scintilla\lexlib\CharacterSet.h" />
     <ClInclude Include="..\..\scintilla\lexlib\HereDoc.h" />
     <ClInclude Include="..\..\scintilla\lexlib\LexAccessor.h" />

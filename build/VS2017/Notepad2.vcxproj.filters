@@ -39,9 +39,6 @@
     <ClCompile Include="..\..\scintilla\lexlib\Accessor.cxx">
       <Filter>Scintilla\lexlib</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\scintilla\lexlib\CharacterCategory.cxx">
-      <Filter>Scintilla\lexlib</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\scintilla\lexlib\CharacterSet.cxx">
       <Filter>Scintilla\lexlib</Filter>
     </ClCompile>
@@ -477,9 +474,6 @@
       <Filter>Scintilla\include</Filter>
     </ClInclude>
     <ClInclude Include="..\..\scintilla\lexlib\Accessor.h">
-      <Filter>Scintilla\lexlib</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\scintilla\lexlib\CharacterCategory.h">
       <Filter>Scintilla\lexlib</Filter>
     </ClInclude>
     <ClInclude Include="..\..\scintilla\lexlib\CharacterSet.h">
