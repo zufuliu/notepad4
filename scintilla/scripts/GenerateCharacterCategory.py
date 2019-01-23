@@ -346,8 +346,7 @@ def updateCharClassifyTable(filename):
 		output.append("""namespace {
 constexpr unsigned int maxUnicode = 0x10ffff;
 
-const unsigned char CharClassifyTable[] = {
-""")
+const unsigned char CharClassifyTable[] = {""")
 		output.append(', '.join(str(i) for i in indexA) + ',')
 		output.append(', '.join(str(i) for i in indexC) + ',')
 		output.append(', '.join(str(i) for i in indexD) + ',')
