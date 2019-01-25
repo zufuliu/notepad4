@@ -151,8 +151,6 @@ def updateCharacterCategory(filename):
 	for ch in range(sys.maxunicode):
 		uch = chr(ch)
 		current = unicodedata.category(uch)
-		if isCJKLetter(current, ch):
-			current = 'CJK'
 		if current != category:
 			value = startRange * 32 + categories.index(category)
 			values.append("%d," % value)
@@ -256,15 +254,12 @@ def buildANSICharClassifyTable(filename):
 	print('ANSICharClassifyTable:', len(result), len(encodingList))
 	Regenerate(filename, "//", output)
 
-# splitbins() is taken from Python source
+# splitbins() is based on Python source
 # https://github.com/python/cpython/blob/master/Tools/unicode/makeunicodedata.py
 
 def getsize(data):
 	# return smallest possible integer size for the given array
 	maxdata = max(data)
-	if maxdata < 16:
-		# allow maximum shift 8 bits for small value
-		return 1/2
 	if maxdata < 256:
 		return 1
 	elif maxdata < 65536:
@@ -272,7 +267,7 @@ def getsize(data):
 	else:
 		return 4
 
-def splitbins(t):
+def splitbins(t, second=False):
 	"""t -> (t1, t2, shift).  Split a table to save space.
 
 	t is a sequence of ints.  This function can be useful to save space if
@@ -302,84 +297,163 @@ def splitbins(t):
 				t2.extend(part)
 			t1.append(index >> shift)
 		# determine memory size
-		b = len(t1)*getsize(t1) + len(t2)*getsize(t2)
+		b = len(t1)*getsize(t1)
+		if second:
+			t3, t4, shift2 = splitbins(t2, False)
+			b += len(t3)*getsize(t3) + len(t4)*getsize(t4)
+		else:
+			b += len(t2)*getsize(t2)
 		if b < total:
-			best = t1, t2, shift
+			if second:
+				best = t1, t3, t4, shift, shift2
+			else:
+				best = t1, t2, shift
 			total = b
 	return best
 
-def updateCharClassifyTable(filename):
-	maxUnicode = sys.maxunicode + 1
-	CharClassifyTable = [0] * maxUnicode
-	for ch in range(maxUnicode):
-		uch = chr(ch)
-		category = unicodedata.category(uch)
-		value = ClassifyMap[category]
-		if isCJKLetter(category, ch):
-			value = CharClassify.ccCJKWord
-		CharClassifyTable[ch] = int(value)
-
-	indexA, indexB, shiftA = splitbins(CharClassifyTable)
-	print('CharClassify 1:', len(indexA), max(indexA), len(indexB), shiftA)
-	indexC, indexD, shiftC = splitbins(indexB)
-	print('CharClassify 2:', len(indexC), max(indexC), len(indexD), shiftC)
+def compressIndexTable(head, indexTable, args):
+	indexA, indexC, indexD, shiftA, shiftC = splitbins(indexTable, True)
+	print(f'{head}:', len(indexA), max(indexA), len(indexC), max(indexC), len(indexD), shiftA, shiftC)
 
 	sizeA = getsize(indexA)
 	sizeC = getsize(indexC);
 	total = len(indexA)*sizeA + len(indexC)*sizeC + len(indexD)
-	print('CharClassify total size:', total/1024)
+	print(f'{head} total size:', total/1024)
 
 	maskA = (1 << shiftA) - 1
 	maskC = (1 << shiftC) - 1
-	for ch in range(maxUnicode):
+	table, function = '', ''
+	for ch in range(len(indexTable)):
 		i = (indexA[ch >> shiftA] << shiftA) + (ch & maskA)
 		i = (indexC[i >> shiftC] << shiftC) + (i & maskC)
 		value = indexD[i]
-		expect = CharClassifyTable[ch]
+		expect = indexTable[ch]
 		if value != expect:
-			print('CharClassify verify fail: %04X, expect: %d, got: %d' % (ch, expect, value))
-			return
+			print(f'{head} verify fail:', '%04X, expect: %d, got: %d' % (head, ch, expect, value))
+			return table, function
 
-	output = ["// Created with Python %s,  Unicode %s" % (
-		platform.python_version(), unicodedata.unidata_version)]
+	# one table
 	if sizeA == sizeC == 1:
-		output.append("""namespace {
-constexpr unsigned int maxUnicode = 0x10ffff;
-
-const unsigned char CharClassifyTable[] = {""")
+		output = []
+		output.append("const unsigned char %s[] = {" % args['table'])
 		output.append(', '.join(str(i) for i in indexA) + ',')
 		output.append(', '.join(str(i) for i in indexC) + ',')
 		output.append(', '.join(str(i) for i in indexD) + ',')
-		output.append("""};
+		output.append("};")
+		table = '\n'.join(output)
 
-}""")
-
-		args = {
+		args.update({
 			'shiftA': shiftA,
 			'maskA': maskA,
 			'offsetC': len(indexA),
 			'shiftC': shiftC,
 			'maskC': maskC,
 			'offsetD': len(indexA) + len(indexC)
-		}
-		output.append("""
-CharClassify::cc CharClassify::ClassifyCharacter(unsigned int ch) noexcept {{
-	if (ch > maxUnicode) {{
+		})
+		function = """{function}
+
+	ch = ({table}[ch >> {shiftA}] << {shiftA}) + (ch & {maskA});
+	ch = ({table}[{offsetC} + (ch >> {shiftC})] << {shiftC}) + (ch & {maskC});
+	return static_cast<{returnType}>({table}[{offsetD} + ch]);
+}}""".format(**args)
+	# two tables
+	elif sizeA == 1:
+		assert sizeC == 2
+		output = []
+		output.append("const unsigned char %s1[] = {" % args['table'])
+		output.append(', '.join(str(i) for i in indexA) + ',')
+		output.append(', '.join(str(i) for i in indexD) + ',')
+		output.append("};")
+		output.append("const unsigned short %s2[] = {" % args['table'])
+		output.append(', '.join(str(i) for i in indexC) + ',')
+		output.append("};")
+		table = '\n'.join(output)
+
+		args.update({
+			'shiftA': shiftA,
+			'maskA': maskA,
+			'shiftC': shiftC,
+			'maskC': maskC,
+			'offsetD': len(indexA)
+		})
+		function = """{function}
+
+	ch = ({table}1[ch >> {shiftA}] << {shiftA}) + (ch & {maskA});
+	ch = ({table}2[(ch >> {shiftC})] << {shiftC}) + (ch & {maskC});
+	return static_cast<{returnType}>({table}1[{offsetD} + ch]);
+}}""".format(**args)
+	else:
+		print(f'{head} unknown bin size')
+	return table, function
+
+def updateCharClassifyTable(filename):
+	maxUnicode = sys.maxunicode + 1
+	indexTable = [0] * maxUnicode
+	for ch in range(maxUnicode):
+		uch = chr(ch)
+		category = unicodedata.category(uch)
+		value = ClassifyMap[category]
+		if isCJKLetter(category, ch):
+			value = CharClassify.ccCJKWord
+		indexTable[ch] = int(value)
+
+	output = ["""// Created with Python %s,  Unicode %s
+namespace {
+constexpr unsigned int maxUnicode = 0x10ffff;
+""" % (platform.python_version(), unicodedata.unidata_version)]
+
+	args = {
+		'table': 'CharClassifyTable',
+		'function': """CharClassify::cc CharClassify::ClassifyCharacter(unsigned int ch) noexcept {
+	if (ch > maxUnicode) {
 		// Cn
 		return ccSpace;
-	}}
+	}""",
+		'returnType': 'cc'
+	}
 
-	ch = (CharClassifyTable[ch >> {shiftA}] << {shiftA}) + (ch & {maskA});
-	ch = (CharClassifyTable[{offsetC} + (ch >> {shiftC})] << {shiftC}) + (ch & {maskC});
-	return static_cast<cc>(CharClassifyTable[{offsetD} + ch]);
-}}""".format(**args))
-	else:
-		print('CharClassify unknown bin size')
-		return
+	table, function = compressIndexTable('CharClassify Unicode', indexTable, args)
+	output.append(table)
+	output.append('')
+	output.append("}\n") # namespace
+	output.append(function)
+
+	Regenerate(filename, "//", output)
+
+def updateCharacterCategoryTable(filename):
+	categories = findCategories("../lexlib/CharacterCategory.h")
+
+	maxUnicode = sys.maxunicode + 1
+	indexTable = [0] * maxUnicode
+	for ch in range(maxUnicode):
+		uch = chr(ch)
+		category = unicodedata.category(uch)
+		value = categories.index(category)
+		indexTable[ch] = value
+
+	output = ["// Created with Python %s,  Unicode %s" % (
+		platform.python_version(), unicodedata.unidata_version)]
+
+	args = {
+		'table': 'CharacterCategoryTable',
+		'function': """CharacterCategory CategoriseCharacter(unsigned int ch) noexcept {
+	if (ch > maxUnicode) {
+		// Cn
+		return ccCn;
+	}""",
+		'returnType': 'CharacterCategory'
+	}
+
+	table, function = compressIndexTable('CharacterCategoryTable', indexTable, args)
+	output.append(table)
+	output.append('')
+	output.append("}\n") # namespace
+	output.append(function)
 
 	Regenerate(filename, "//", output)
 
 if __name__ == '__main__':
 	buildANSICharClassifyTable('../../src/EditEncoding.c')
 	updateCharClassifyTable("../src/CharClassify.cxx")
+	#updateCharacterCategoryTable("../lexlib/CharacterCategory.cxx")
 	#updateCharacterCategory("../lexlib/CharacterCategory.cxx")
