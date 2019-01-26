@@ -43,7 +43,7 @@
 #include "Platform.h"
 #include "XPM.h"
 #include "UniConversion.h"
-#include "DBCS.h"
+#include "CharClassify.h"
 #include "FontQuality.h"
 
 #include "PlatWin.h"
@@ -2115,12 +2115,12 @@ void SurfaceD2D::MeasureWidths(const Font &font_, std::string_view text, XYPOSIT
 		}
 
 	} else {
-
+		const DBCSCharClassify *dbcs = DBCSCharClassify::Get(codePageText);
 		// May be one or two bytes per position
 		int ui = 0;
 		for (size_t i = 0; i < text.length() && ui < tbuf.tlen;) {
 			positions[i] = poses.buffer[ui];
-			if (DBCSIsLeadByte(codePageText, text[i])) {
+			if (dbcs->IsLeadByte(text[i])) {
 				positions[i + 1] = poses.buffer[ui];
 				i += 2;
 			} else {

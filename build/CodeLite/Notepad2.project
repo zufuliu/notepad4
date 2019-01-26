@@ -90,8 +90,6 @@
       <File Name="../../scintilla/src/CharClassify.h"/>
       <File Name="../../scintilla/src/ContractionState.cxx"/>
       <File Name="../../scintilla/src/ContractionState.h"/>
-      <File Name="../../scintilla/src/DBCS.cxx"/>
-      <File Name="../../scintilla/src/DBCS.h"/>
       <File Name="../../scintilla/src/Decoration.cxx"/>
       <File Name="../../scintilla/src/Decoration.h"/>
       <File Name="../../scintilla/src/Document.cxx"/>

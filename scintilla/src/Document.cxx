@@ -45,7 +45,6 @@
 #include "RESearch.h"
 #include "UniConversion.h"
 #include "ElapsedPeriod.h"
-#include "DBCS.h"
 
 using namespace Scintilla;
 
@@ -116,6 +115,7 @@ Document::Document(int options) :
 	eolMode = SC_EOL_LF;
 #endif
 	dbcsCodePage = SC_CP_UTF8;
+	dbcsCharClass = nullptr;
 	lineEndBitSet = SC_LINE_END_TYPE_DEFAULT;
 	endStyled = 0;
 	styleClock = 0;
@@ -218,6 +218,7 @@ bool Document::SetDBCSCodePage(int dbcsCodePage_) {
 		SetCaseFolder(nullptr);
 		cb.SetLineEndTypes(lineEndBitSet & LineEndTypesSupported());
 		cb.SetUTF8Substance(SC_CP_UTF8 == dbcsCodePage);
+		dbcsCharClass = DBCSCharClassify::Get(dbcsCodePage_);
 		ModifiedAt(0);	// Need to restyle whole document
 		return true;
 	} else {
@@ -619,7 +620,7 @@ int Document::LenChar(Sci::Position pos) noexcept {
 		else
 			return widthCharBytes;
 	} else if (dbcsCodePage) {
-		return IsDBCSLeadByte(cb.CharAt(pos)) ? 2 : 1;
+		return IsDBCSLeadByteNoExcept(cb.CharAt(pos)) ? 2 : 1;
 	} else {
 		return 1;
 	}
@@ -700,13 +701,13 @@ Sci::Position Document::MovePositionOutsideChar(Sci::Position pos, Sci::Position
 
 			// Step back until a non-lead-byte is found.
 			Sci::Position posCheck = pos;
-			while ((posCheck > posStartLine) && IsDBCSLeadByte(cb.CharAt(posCheck - 1))) {
+			while ((posCheck > posStartLine) && IsDBCSLeadByteNoExcept(cb.CharAt(posCheck - 1))) {
 				posCheck--;
 			}
 
 			// Check from known start of character.
 			while (posCheck < pos) {
-				const int mbsize = IsDBCSLeadByte(cb.CharAt(posCheck)) ? 2 : 1;
+				const int mbsize = IsDBCSLeadByteNoExcept(cb.CharAt(posCheck)) ? 2 : 1;
 				if (posCheck + mbsize == pos) {
 					return pos;
 				} else if (posCheck + mbsize > pos) {
@@ -772,7 +773,7 @@ Sci::Position Document::NextPosition(Sci::Position pos, int moveDir) const noexc
 			}
 		} else {
 			if (moveDir > 0) {
-				const int mbsize = IsDBCSLeadByte(cb.CharAt(pos)) ? 2 : 1;
+				const int mbsize = IsDBCSLeadByteNoExcept(cb.CharAt(pos)) ? 2 : 1;
 				pos += mbsize;
 				if (pos > cb.Length())
 					pos = cb.Length();
@@ -786,13 +787,13 @@ Sci::Position Document::NextPosition(Sci::Position pos, int moveDir) const noexc
 				// https://msdn.microsoft.com/en-us/library/cc194790.aspx
 				if ((pos - 1) <= posStartLine) {
 					return pos - 1;
-				} else if (IsDBCSLeadByte(cb.CharAt(pos - 1))) {
+				} else if (IsDBCSLeadByteNoExcept(cb.CharAt(pos - 1))) {
 					// Must actually be trail byte
 					return pos - 2;
 				} else {
 					// Otherwise, step back until a non-lead-byte is found.
 					Sci::Position posTemp = pos - 1;
-					while (posStartLine <= --posTemp && IsDBCSLeadByte(cb.CharAt(posTemp))) {
+					while (posStartLine <= --posTemp && IsDBCSLeadByteNoExcept(cb.CharAt(posTemp))) {
 					}
 					// Now posTemp+1 must point to the beginning of a character,
 					// so figure out whether we went back an even or an odd
@@ -842,7 +843,7 @@ Document::CharacterExtracted Document::CharacterAfter(Sci::Position position) co
 			return CharacterExtracted(UnicodeFromUTF8(charBytes), utf8status & UTF8MaskWidth);
 		}
 	} else {
-		if (IsDBCSLeadByte(leadByte) && ((position + 1) < Length())) {
+		if (IsDBCSLeadByteNoExcept(leadByte) && ((position + 1) < Length())) {
 			return CharacterExtracted::DBCS(leadByte, cb.UCharAt(position + 1));
 		} else {
 			return CharacterExtracted(leadByte, 1);
@@ -958,7 +959,7 @@ int SCI_METHOD Document::GetCharacterAndWidth(Sci_Position position, Sci_Positio
 				}
 			}
 		} else {
-			if (IsDBCSLeadByte(leadByte)) {
+			if (IsDBCSLeadByteNoExcept(leadByte)) {
 				bytesInCharacter = 2;
 				character = (leadByte << 8) | cb.UCharAt(position + 1);
 			} else {
@@ -980,22 +981,26 @@ int SCI_METHOD Document::CodePage() const noexcept {
 
 bool SCI_METHOD Document::IsDBCSLeadByte(char ch) const noexcept {
 	// Used by lexers so must match IDocument method exactly
-	return DBCSIsLeadByte(dbcsCodePage, ch);
+	return dbcsCharClass && dbcsCharClass->IsLeadByte(ch);
+}
+
+bool Document::IsDBCSLeadByteNoExcept(char ch) const noexcept {
+	return dbcsCharClass->IsLeadByte(ch);
 }
 
 bool Document::IsDBCSLeadByteInvalid(char ch) const noexcept {
-	return DBCSIsLeadByteInvalid(dbcsCodePage, ch);
+	return dbcsCharClass->IsLeadByteInvalid(ch);
 }
 
 bool Document::IsDBCSTrailByteInvalid(char ch) const noexcept {
-	return DBCSIsTrailByteInvalid(dbcsCodePage, ch);
+	return dbcsCharClass->IsTrailByteInvalid(ch);
 }
 
 int Document::DBCSDrawBytes(std::string_view text) const noexcept {
 	if (text.length() <= 1) {
 		return static_cast<int>(text.length());
 	}
-	if (IsDBCSLeadByte(text[0])) {
+	if (IsDBCSLeadByteNoExcept(text[0])) {
 		return IsDBCSTrailByteInvalid(text[1]) ? 1 : 2;
 	} else {
 		return 1;
@@ -1038,7 +1043,7 @@ int Document::SafeSegment(const char *text, int length, int lengthSegment) const
 		if (dbcsCodePage == SC_CP_UTF8) {
 			j += UTF8BytesOfLead(ch);
 		} else if (dbcsCodePage) {
-			j += IsDBCSLeadByte(ch) ? 2 : 1;
+			j += IsDBCSLeadByteNoExcept(ch) ? 2 : 1;
 		} else {
 			j++;
 		}
@@ -1960,7 +1965,7 @@ Sci::Position Document::FindText(Sci::Position minPos, Sci::Position maxPos, con
 					(indexSearch < lenSearch)) {
 					char bytes[maxBytesCharacter + 1];
 					bytes[0] = cb.CharAt(pos + indexDocument);
-					const Sci::Position widthChar = IsDBCSLeadByte(bytes[0]) ? 2 : 1;
+					const Sci::Position widthChar = IsDBCSLeadByteNoExcept(bytes[0]) ? 2 : 1;
 					if (widthChar == 2)
 						bytes[1] = cb.CharAt(pos + indexDocument + 1);
 					if ((pos + indexDocument + widthChar) > limitPos)

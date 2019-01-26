@@ -37,6 +37,29 @@ private:
 	unsigned char charClass[maxChar];    // not type cc to save space
 };
 
+class DBCSCharClassify {
+public:
+	static const DBCSCharClassify* Get(int codePage);
+
+	bool IsLeadByte(char ch) const noexcept {
+		return leadByte[static_cast<unsigned char>(ch)];
+	}
+	bool IsLeadByteInvalid(char ch) const noexcept {
+		return invalidLeadByte[static_cast<unsigned char>(ch)];
+	}
+	bool IsTrailByteInvalid(char ch) const noexcept {
+		return invalidTrailByte[static_cast<unsigned char>(ch)];
+	}
+
+private:
+	DBCSCharClassify(int codePage_) noexcept;
+
+	int codePage;
+	bool leadByte[256];
+	bool invalidLeadByte[256];
+	bool invalidTrailByte[256];
+};
+
 }
 
 #endif
