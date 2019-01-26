@@ -1626,8 +1626,7 @@ CharClassify::cc Document::WordCharacterClass(unsigned int ch) const noexcept {
 		if (SC_CP_UTF8 == dbcsCodePage) {
 			return CharClassify::ClassifyCharacter(ch);
 		} else {
-			// Asian DBCS
-			return CharClassify::ccCJKWord;
+			return dbcsCharClass->ClassifyCharacter(ch);
 		}
 	}
 	return charClass.GetClass(static_cast<unsigned char>(ch));

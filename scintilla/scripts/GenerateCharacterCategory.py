@@ -20,6 +20,14 @@ class CharClassify(IntEnum):
 	OnlyWord = 1 << ccWord
 	OnlyWordPunctuation = (1 << ccWord) | (1 << ccPunctuation)
 
+CharClassifyOrder = [CharClassify.ccCJKWord, CharClassify.ccWord, CharClassify.ccPunctuation, CharClassify.ccNewLine]
+def prefCharClassify(values):
+	for value in CharClassifyOrder:
+		if value in values:
+			return value
+	# Cn
+	return CharClassify.ccSpace
+
 # https://en.wikipedia.org/wiki/Unicode_character_property
 # Document::WordCharacterClass()
 CharClassifyMap = {
@@ -74,6 +82,13 @@ for key, items in CharClassifyMap.items():
 	for category in items:
 		ClassifyMap[category] = key
 
+
+# https://en.wikipedia.org/wiki/Private_Use_Areas
+# Category: Other, private use (Co)
+def isPrivateChar(c):
+	return (c >= 0xE000 and c <= 0xF8FF) \
+		or (c >= 0xF0000 and c <= 0xFFFFD) \
+		or (c >= 0x100000 and c <= 0x10FFFD)
 
 # https://en.wikipedia.org/wiki/Unicode_block
 # https://en.wikipedia.org/wiki/Plane_(Unicode)#Basic_Multilingual_Plane
@@ -452,8 +467,78 @@ def updateCharacterCategoryTable(filename):
 
 	Regenerate(filename, "//", output)
 
+
+def getDBCSCharClassify(uch, byteCount):
+	if uch[1] == byteCount and len(uch[0]) == 1:
+		category = unicodedata.category(uch[0])
+		ch = ord(uch[0])
+		# treat PUA in DBCS as word instead of punctuation or space
+		if isCJKLetter(category, ch) or (category == 'Co' and isPrivateChar(ch)):
+			return int(CharClassify.ccCJKWord)
+	else:
+		# undefined, treat as Cn, Not assigned
+		category = 'Cn'
+	cc = ClassifyMap[category]
+	return int(cc)
+
+def makeDBCSCharClassifyTable(output, encodingList):
+	maxDBCSCharacter = 0xffff + 1
+	result = {}
+	for cp in encodingList:
+		decode = codecs.getdecoder(cp)
+		for ch in range(256):
+			uch = decode(bytes([ch]), 'ignore')
+			cc = getDBCSCharClassify(uch, 1)
+			if ch in result:
+				result[ch].append(cc)
+			else:
+				result[ch] = [cc]
+
+		for ch in range(256, maxDBCSCharacter):
+			uch = decode(bytes([ch >> 8, ch & 0xff]), 'ignore')
+			cc = getDBCSCharClassify(uch, 2)
+			if ch in result:
+				result[ch].append(cc)
+			else:
+				result[ch] = [cc]
+
+	indexTable = [0] * maxDBCSCharacter
+	for ch in range(maxDBCSCharacter):
+		indexTable[ch] = int(prefCharClassify(result[ch]))
+
+	suffix = '_' + encodingList[0].upper()
+	args = {
+		'table': 'CharClassifyTable' + suffix,
+		'function': """CharClassify::cc ClassifyCharacter%s(unsigned int ch) noexcept {
+	if (ch > maxDBCSCharacter) {
+		// Cn
+		return CharClassify::ccSpace;
+	}""" % suffix,
+		'returnType': 'CharClassify::cc'
+	}
+
+	table, function = compressIndexTable('CharClassify' + suffix, indexTable, args)
+	output.append(table)
+	output.append('')
+	output.append(function)
+	output.append('')
+
+def updateDBCSCharClassifyTable(filename):
+	output = ["// Created with Python %s,  Unicode %s" % (
+		platform.python_version(), unicodedata.unidata_version)]
+
+	makeDBCSCharClassifyTable(output, ['cp932', 'shift_jis', 'shift_jis_2004', 'shift_jisx0213'])
+	makeDBCSCharClassifyTable(output, ['cp936', 'gbk'])
+	makeDBCSCharClassifyTable(output, ['cp949']) # UHC
+	makeDBCSCharClassifyTable(output, ['cp950', 'big5', 'big5hkscs'])
+	makeDBCSCharClassifyTable(output, ['cp1361']) # Johab
+
+	output.pop()
+	Regenerate(filename, "//dbcs", output)
+
 if __name__ == '__main__':
 	buildANSICharClassifyTable('../../src/EditEncoding.c')
 	updateCharClassifyTable("../src/CharClassify.cxx")
+	updateDBCSCharClassifyTable("../src/CharClassify.cxx")
 	#updateCharacterCategoryTable("../lexlib/CharacterCategory.cxx")
 	#updateCharacterCategory("../lexlib/CharacterCategory.cxx")

@@ -51,10 +51,17 @@ public:
 		return invalidTrailByte[static_cast<unsigned char>(ch)];
 	}
 
+	CharClassify::cc ClassifyCharacter(unsigned int ch) const noexcept {
+		return classifyCharacter(ch);
+	}
+
 private:
 	DBCSCharClassify(int codePage_) noexcept;
 
+	typedef CharClassify::cc (*ClassifyCharacterSig)(unsigned int ch) noexcept;
+
 	int codePage;
+	ClassifyCharacterSig classifyCharacter;
 	bool leadByte[256];
 	bool invalidLeadByte[256];
 	bool invalidTrailByte[256];
