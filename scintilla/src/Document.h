@@ -255,6 +255,7 @@ private:
 	bool matchesValid;
 	std::unique_ptr<RegexSearchBase> regex;
 	std::unique_ptr<LexInterface> pli;
+	const DBCSCharClassify *dbcsCharClass;
 
 public:
 
@@ -334,6 +335,7 @@ public:
 	int SCI_METHOD GetCharacterAndWidth(Sci_Position position, Sci_Position *pWidth) const noexcept override;
 	int SCI_METHOD CodePage() const noexcept override;
 	bool SCI_METHOD IsDBCSLeadByte(char ch) const noexcept override;
+	bool IsDBCSLeadByteNoExcept(char ch) const noexcept;
 	bool IsDBCSLeadByteInvalid(char ch) const noexcept;
 	bool IsDBCSTrailByteInvalid(char ch) const noexcept;
 	int DBCSDrawBytes(std::string_view text) const noexcept;

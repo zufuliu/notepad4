@@ -453,9 +453,6 @@
     <ClCompile Include="..\..\scintilla\win32\HanjaDic.cxx">
       <Filter>Scintilla\win32</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\scintilla\src\DBCS.cxx">
-      <Filter>Scintilla\src</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\scintilla\include\ILexer.h">
@@ -654,9 +651,6 @@
       <Filter>Scintilla\src</Filter>
     </ClInclude>
     <ClInclude Include="..\..\scintilla\src\UniqueString.h">
-      <Filter>Scintilla\src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\scintilla\src\DBCS.h">
       <Filter>Scintilla\src</Filter>
     </ClInclude>
   </ItemGroup>
