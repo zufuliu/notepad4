@@ -177,22 +177,27 @@ def updateCharacterCategory(filename):
 
 	Regenerate(filename, "//", values)
 
-def getCharClassify(ch):
-	if not ch:
+def getCharClassify(decode, ch):
+	try:
+		uch = decode(bytes([ch]))
+	except UnicodeDecodeError:
+		uch = ('', 0)
+
+	if uch[1] == 1 and len(uch[0]) == 1:
+		category = unicodedata.category(uch[0])
+	else:
 		# undefined, treat as Cn, Not assigned
 		category = 'Cn'
-	else:
-		category = unicodedata.category(ch)
+
 	cc = ClassifyMap[category]
-	return cc
+	return int(cc)
 
 def buildCharClassify(cp):
 	decode = codecs.getdecoder(cp)
 	result = {}
 	mask = 0
 	for ch in range(128, 256):
-		uch = decode(bytes([ch]), 'ignore')
-		cc = int(getCharClassify(uch[0]))
+		cc = getCharClassify(decode, ch)
 		mask |= 1 << cc
 		result[ch] = cc
 
@@ -467,36 +472,37 @@ def updateCharacterCategoryTable(filename):
 
 	Regenerate(filename, "//", output)
 
+def getDBCSCharClassify(decode, ch, isReservedOrUDC=None):
+	buf = bytes([ch]) if ch < 256 else bytes([ch >> 8, ch & 0xff])
+	try:
+		uch = decode(buf)
+	except UnicodeDecodeError:
+		uch = ('', 0)
 
-def getDBCSCharClassify(uch, byteCount):
-	if uch[1] == byteCount and len(uch[0]) == 1:
+	if uch[1] == len(buf) and len(uch[0]) == 1:
 		category = unicodedata.category(uch[0])
 		ch = ord(uch[0])
 		# treat PUA in DBCS as word instead of punctuation or space
 		if isCJKLetter(category, ch) or (category == 'Co' and isPrivateChar(ch)):
 			return int(CharClassify.ccCJKWord)
 	else:
+		# treat reserved or user-defined characters as word
+		if isReservedOrUDC and isReservedOrUDC(ch, buf):
+			return int(CharClassify.ccCJKWord)
 		# undefined, treat as Cn, Not assigned
 		category = 'Cn'
+
 	cc = ClassifyMap[category]
 	return int(cc)
 
-def makeDBCSCharClassifyTable(output, encodingList):
+def makeDBCSCharClassifyTable(output, encodingList, isReservedOrUDC=None):
 	maxDBCSCharacter = 0xffff + 1
 	result = {}
+
 	for cp in encodingList:
 		decode = codecs.getdecoder(cp)
-		for ch in range(256):
-			uch = decode(bytes([ch]), 'ignore')
-			cc = getDBCSCharClassify(uch, 1)
-			if ch in result:
-				result[ch].append(cc)
-			else:
-				result[ch] = [cc]
-
-		for ch in range(256, maxDBCSCharacter):
-			uch = decode(bytes([ch >> 8, ch & 0xff]), 'ignore')
-			cc = getDBCSCharClassify(uch, 2)
+		for ch in range(maxDBCSCharacter):
+			cc = getDBCSCharClassify(decode, ch, isReservedOrUDC)
 			if ch in result:
 				result[ch].append(cc)
 			else:
@@ -523,14 +529,37 @@ def makeDBCSCharClassifyTable(output, encodingList):
 	output.append(function)
 	output.append('')
 
+# https://en.wikipedia.org/wiki/GBK_(character_encoding)
+def isReservedOrUDC_GBK(ch, buf):
+	if len(buf) != 2:
+		return False
+
+	ch1 = buf[0]
+	ch2 = buf[1]
+	# user-defined 1 and 2
+	if ((ch1 >= 0xAA and ch1 <= 0xAF) or (ch1 >= 0xF8 and ch1 <= 0xFE)) \
+		and (ch2 >= 0xA1 and ch2 <= 0xFE):
+		return True
+	# user-defined 3
+	if (ch1 >= 0xA1 and ch1 <= 0xA7) and (ch2 >= 0x40 and ch2 <= 0xA0 and ch2 != 0x7F):
+		return True
+	return False
+
+# https://en.wikipedia.org/wiki/Big5
+def isReservedOrUDC_Big5(ch, buf):
+	for block in [(0x8140, 0xA0FE), (0xA3C0, 0xA3FE), (0xC6A1, 0xC8FE), (0xF9D6, 0xFEFE)]:
+		if ch >= block[0] or ch <= block[1]:
+			return True
+	return False
+
 def updateDBCSCharClassifyTable(filename):
 	output = ["// Created with Python %s,  Unicode %s" % (
 		platform.python_version(), unicodedata.unidata_version)]
 
 	makeDBCSCharClassifyTable(output, ['cp932', 'shift_jis', 'shift_jis_2004', 'shift_jisx0213'])
-	makeDBCSCharClassifyTable(output, ['cp936', 'gbk'])
+	makeDBCSCharClassifyTable(output, ['cp936', 'gbk'], isReservedOrUDC_GBK)
 	makeDBCSCharClassifyTable(output, ['cp949']) # UHC
-	makeDBCSCharClassifyTable(output, ['cp950', 'big5', 'big5hkscs'])
+	makeDBCSCharClassifyTable(output, ['cp950', 'big5', 'big5hkscs'], isReservedOrUDC_Big5)
 	makeDBCSCharClassifyTable(output, ['cp1361']) # Johab
 
 	output.pop()
