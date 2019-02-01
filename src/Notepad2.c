@@ -6659,29 +6659,23 @@ void UpdateStatusbar(void) {
 
 	StatusSetText(hwndStatus, STATUS_DOCPOS, tchDocPos);
 	const UINT updateMask = cachedStatusItem.updateMask;
-	BOOL updated = FALSE;
 	if (updateMask & STATUS_BAR_UPDATE_MASK_LEXER) {
 		StatusSetText(hwndStatus, STATUS_LEXER, cachedStatusItem.pszLexerName);
-		updated = TRUE;
 	}
 	if (updateMask & STATUS_BAR_UPDATE_MASK_CODEPAGE) {
 		StatusSetText(hwndStatus, STATUS_CODEPAGE, mEncoding[iEncoding].wchLabel);
-		updated = TRUE;
 	}
 	if (updateMask & STATUS_BAR_UPDATE_MASK_EOLMODE) {
 		StatusSetText(hwndStatus, STATUS_EOLMODE, cachedStatusItem.pszEOLMode);
-		updated = TRUE;
 	}
 	if (updateMask & STATUS_BAR_UPDATE_MASK_OVRMODE) {
 		StatusSetText(hwndStatus, STATUS_OVRMODE, cachedStatusItem.pszOvrMode);
-		updated = TRUE;
 	}
 	StatusSetText(hwndStatus, STATUS_DOCSIZE, tchDocSize);
 	if (updateMask & STATUS_BAR_UPDATE_MASK_DOCZOOM) {
 		StatusSetText(hwndStatus, STATUS_DOCZOOM, cachedStatusItem.tchZoom);
-		updated = TRUE;
 	}
-	if (updated) {
+	if (updateMask != 0) {
 		cachedStatusItem.updateMask = 0;
 	}
 }
