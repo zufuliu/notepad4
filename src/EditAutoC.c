@@ -672,8 +672,9 @@ void EditCompleteWord(HWND hwnd, BOOL autoInsert) {
 	do {
 		Sci_Position before = iStartWordPos;
 		iStartWordPos = SciCall_WordStartPosition(before, TRUE);
+		const BOOL nonWord = iStartWordPos == before;
 		before = SciCall_PositionBefore(iStartWordPos);
-		if (iStartWordPos == before) {
+		if (nonWord) {
 			// non-word
 			if (before + 1 != iStartWordPos) {
 				break;
