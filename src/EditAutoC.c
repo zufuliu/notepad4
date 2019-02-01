@@ -672,8 +672,9 @@ void EditCompleteWord(HWND hwnd, BOOL autoInsert) {
 	do {
 		Sci_Position before = iStartWordPos;
 		iStartWordPos = SciCall_WordStartPosition(before, TRUE);
-		if (iStartWordPos == before) { // non-word
-			before = SciCall_PositionBefore(iStartWordPos);
+		before = SciCall_PositionBefore(iStartWordPos);
+		if (iStartWordPos == before) {
+			// non-word
 			if (before + 1 != iStartWordPos) {
 				break;
 			}
@@ -684,6 +685,12 @@ void EditCompleteWord(HWND hwnd, BOOL autoInsert) {
 			}
 
 			iStartWordPos = before;
+		} else {
+			const Sci_Position iPos = SciCall_WordEndPosition(before, TRUE);
+			if (iPos == iStartWordPos) {
+				// after CJK word
+				break;
+			}
 		}
 	} while (iStartWordPos > iLineStartPos);
 	if (iStartWordPos == iCurrentPos) {
