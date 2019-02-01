@@ -4797,16 +4797,6 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			if (scn->updated & ~(SC_UPDATE_V_SCROLL | SC_UPDATE_H_SCROLL)) {
 				UpdateToolbar();
 
-				// Invalidate invalid selections
-				// TODO: Remove check for invalid selections once fixed in Scintilla
-				if (SendMessage(hwndEdit, SCI_GETSELECTIONS, 0, 0) > 1 &&
-						SendMessage(hwndEdit, SCI_GETSELECTIONMODE, 0, 0) != SC_SEL_RECTANGLE) {
-					const int iCurPos = (int)SendMessage(hwndEdit, SCI_GETCURRENTPOS, 0, 0);
-					SendMessage(hwndEdit, WM_CANCELMODE, 0, 0);
-					SendMessage(hwndEdit, SCI_CLEARSELECTIONS, 0, 0);
-					SendMessage(hwndEdit, SCI_SETSELECTION, iCurPos, iCurPos);
-				}
-
 				if (scn->updated & (SC_UPDATE_SELECTION)) {
 					// mark occurrences of text currently selected
 					EditMarkAll(hwndEdit, iMarkOccurrences, bMarkOccurrencesMatchCase, bMarkOccurrencesMatchWords);
