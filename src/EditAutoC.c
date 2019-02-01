@@ -452,14 +452,12 @@ void AutoC_AddDocWord(struct WordList *pWList, BOOL bIgnoreCase, char prefix) {
 						const int chPrev = (before + 2 == iPosFind) ? SciCall_GetCharAt(before) : 0;
 						if (chPrev != '\\' && IsEscapeChar(*pWord)) {
 							pWord++;
-							iPosFind++;
 							--wordLength;
 							bChanged = TRUE;
 						}
 					} else if (ch == '%') { // word after format char
 						if (IsStringFormatChar(*pWord, SciCall_GetStyleAt(before))) {
 							pWord++;
-							iPosFind++;
 							--wordLength;
 							bChanged = TRUE;
 						}
@@ -467,14 +465,12 @@ void AutoC_AddDocWord(struct WordList *pWList, BOOL bIgnoreCase, char prefix) {
 				}
 				if (prefix && prefix == *pWord) {
 					pWord++;
-					iPosFind++;
 					--wordLength;
 					bChanged = TRUE;
 				}
 
 				//if (pLexCurrent->rid == NP2LEX_PHP && wordLength >= 2 && *pWord == '$' && pWord[1] == '$') {
 				//	pWord++;
-				//	iPosFind++;
 				//	--wordLength;
 				//	bChanged = TRUE;
 				//}
