@@ -293,13 +293,15 @@ extern int iCaretBlinkPeriod;
 static BOOL fIsElevated = FALSE;
 static WCHAR wchWndClass[16] = WC_NOTEPAD2;
 
+#define STATUS_BAR_UPDATE_MASK_LEXER	1
+#define STATUS_BAR_UPDATE_MASK_CODEPAGE	2
+#define STATUS_BAR_UPDATE_MASK_EOLMODE	4
+#define STATUS_BAR_UPDATE_MASK_OVRMODE	8
+#define STATUS_BAR_UPDATE_MASK_DOCZOOM	16
 // rarely changed statusbar items
 struct CachedStatusItem {
-	BOOL lexerNameChanged;	// STATUS_LEXER
-	BOOL encodingChanged;	// STATUS_CODEPAGE
-	BOOL eolModeChanged;	// STATUS_EOLMODE
-	BOOL ovrModeChanged;	// STATUS_OVRMODE
-	BOOL zoomChanged;		// STATUS_DOCZOOM
+	UINT updateMask;
+	BOOL overType;
 
 	LPCWSTR pszLexerName;
 	LPCWSTR pszEOLMode;
@@ -444,6 +446,15 @@ static inline void ToggleFullScreenModeConfig(int config) {
 	}
 	if (bInFullScreenMode && config != FullScreenMode_OnStartup) {
 		ToggleFullScreenMode();
+	}
+}
+
+static inline void UpdateStatusBarCache_OVRMode(BOOL force) {
+	const BOOL overType = (BOOL)SendMessage(hwndEdit, SCI_GETOVERTYPE, 0, 0);
+	if (force || overType != cachedStatusItem.overType) {
+		cachedStatusItem.overType = overType;
+		cachedStatusItem.pszOvrMode = overType ? L"OVR" : L"INS";
+		cachedStatusItem.updateMask |= STATUS_BAR_UPDATE_MASK_OVRMODE;
 	}
 }
 
@@ -927,7 +938,7 @@ HWND InitInstance(HINSTANCE hInstance, int nCmdShow) {
 		UpdateStatusBarCache(STATUS_CODEPAGE);
 		UpdateStatusBarCache(STATUS_EOLMODE);
 	}
-	UpdateStatusBarCache(STATUS_OVRMODE);
+	UpdateStatusBarCache_OVRMode(TRUE);
 	UpdateStatusBarCache(STATUS_DOCZOOM);
 	UpdateToolbar();
 
@@ -2027,29 +2038,24 @@ void UpdateStatusBarCache(int item) {
 #else
 		cachedStatusItem.pszLexerName = Style_GetCurrentLexerName();
 #endif
-		cachedStatusItem.lexerNameChanged = TRUE;
+		cachedStatusItem.updateMask |= STATUS_BAR_UPDATE_MASK_LEXER;
 		UpdateStatusBarWidth();
 		break;
 
 	case STATUS_CODEPAGE:
 		Encoding_GetLabel(iEncoding);
-		cachedStatusItem.encodingChanged = TRUE;
+		cachedStatusItem.updateMask |= STATUS_BAR_UPDATE_MASK_CODEPAGE;
 		UpdateStatusBarWidth();
 		break;
 
 	case STATUS_EOLMODE:
 		cachedStatusItem.pszEOLMode = (iEOLMode == SC_EOL_LF) ? L"LF" : ((iEOLMode == SC_EOL_CR) ? L"CR" : L"CR+LF");
-		cachedStatusItem.eolModeChanged = TRUE;
-		break;
-
-	case STATUS_OVRMODE:
-		cachedStatusItem.pszOvrMode = SendMessage(hwndEdit, SCI_GETOVERTYPE, 0, 0) ? L"OVR" : L"INS";
-		cachedStatusItem.ovrModeChanged = TRUE;
+		cachedStatusItem.updateMask |= STATUS_BAR_UPDATE_MASK_EOLMODE;
 		break;
 
 	case STATUS_DOCZOOM:
 		wsprintf(cachedStatusItem.tchZoom, L"%i%%", iZoomLevel);
-		cachedStatusItem.zoomChanged = TRUE;
+		cachedStatusItem.updateMask |= STATUS_BAR_UPDATE_MASK_DOCZOOM;
 		break;
 	}
 }
@@ -4801,8 +4807,11 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 					SendMessage(hwndEdit, SCI_SETSELECTION, iCurPos, iCurPos);
 				}
 
-				// mark occurrences of text currently selected
-				EditMarkAll(hwndEdit, iMarkOccurrences, bMarkOccurrencesMatchCase, bMarkOccurrencesMatchWords);
+				if (scn->updated & (SC_UPDATE_SELECTION)) {
+					// mark occurrences of text currently selected
+					EditMarkAll(hwndEdit, iMarkOccurrences, bMarkOccurrencesMatchCase, bMarkOccurrencesMatchWords);
+					UpdateStatusBarCache_OVRMode(FALSE);
+				}
 				UpdateStatusbar();
 
 				// Brace Match
@@ -5064,7 +5073,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 			case STATUS_OVRMODE:
 				SendMessage(hwndEdit, SCI_EDITTOGGLEOVERTYPE, 0, 0);
-				UpdateStatusBarCache(STATUS_OVRMODE);
+				UpdateStatusBarCache_OVRMode(TRUE);
 				return TRUE;
 
 			default:
@@ -6659,26 +6668,31 @@ void UpdateStatusbar(void) {
 	StrFormatByteSize(iBytes, tchDocSize, COUNTOF(tchDocSize));
 
 	StatusSetText(hwndStatus, STATUS_DOCPOS, tchDocPos);
-	if (cachedStatusItem.lexerNameChanged) {
+	const UINT updateMask = cachedStatusItem.updateMask;
+	BOOL updated = FALSE;
+	if (updateMask & STATUS_BAR_UPDATE_MASK_LEXER) {
 		StatusSetText(hwndStatus, STATUS_LEXER, cachedStatusItem.pszLexerName);
-		cachedStatusItem.lexerNameChanged = FALSE;
+		updated = TRUE;
 	}
-	if (cachedStatusItem.encodingChanged) {
+	if (updateMask & STATUS_BAR_UPDATE_MASK_CODEPAGE) {
 		StatusSetText(hwndStatus, STATUS_CODEPAGE, mEncoding[iEncoding].wchLabel);
-		cachedStatusItem.encodingChanged = FALSE;
+		updated = TRUE;
 	}
-	if (cachedStatusItem.eolModeChanged) {
+	if (updateMask & STATUS_BAR_UPDATE_MASK_EOLMODE) {
 		StatusSetText(hwndStatus, STATUS_EOLMODE, cachedStatusItem.pszEOLMode);
-		cachedStatusItem.eolModeChanged = FALSE;
+		updated = TRUE;
 	}
-	if (cachedStatusItem.ovrModeChanged) {
+	if (updateMask & STATUS_BAR_UPDATE_MASK_OVRMODE) {
 		StatusSetText(hwndStatus, STATUS_OVRMODE, cachedStatusItem.pszOvrMode);
-		cachedStatusItem.ovrModeChanged = FALSE;
+		updated = TRUE;
 	}
 	StatusSetText(hwndStatus, STATUS_DOCSIZE, tchDocSize);
-	if (cachedStatusItem.zoomChanged) {
+	if (updateMask & STATUS_BAR_UPDATE_MASK_DOCZOOM) {
 		StatusSetText(hwndStatus, STATUS_DOCZOOM, cachedStatusItem.tchZoom);
-		cachedStatusItem.zoomChanged = FALSE;
+		updated = TRUE;
+	}
+	if (updated) {
+		cachedStatusItem.updateMask = 0;
 	}
 }
 
