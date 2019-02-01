@@ -40,16 +40,26 @@
 #define VERSION_EMAIL_DISPLAY		L"florian.balmer@gmail.com"
 #define VERSION_NEWPAGE_DISPLAY		L"https://github.com/zufuliu/notepad2"
 
+#define VERSION_BUILD_INFO_FORMAT	L"Compiled on " __DATE__ L" with %s %d.%d.%d."
 #if defined(__clang__)
-#define VERSION_BUILD_TOOL			L"Clang " STRINGIFY(__clang_major__) L"." STRINGIFY(__clang_minor__) L"." STRINGIFY(__clang_patchlevel__)
+#define VERSION_BUILD_TOOL_NAME		L"Clang"
+#define VERSION_BUILD_TOOL_MAJOR	__clang_major__
+#define VERSION_BUILD_TOOL_MINOR	__clang_minor__
+#define VERSION_BUILD_TOOL_PATCH	__clang_patchlevel__
 #elif defined(__GNUC__)
-#define VERSION_BUILD_TOOL			L"GCC " STRINGIFY(__GNUC__) L"." STRINGIFY(__GNUC_MINOR__) L"." STRINGIFY(__GNUC_PATCHLEVEL__)
+#define VERSION_BUILD_TOOL_NAME		L"GCC"
+#define VERSION_BUILD_TOOL_MAJOR	__GNUC__
+#define VERSION_BUILD_TOOL_MINOR	__GNUC_MINOR__
+#define VERSION_BUILD_TOOL_PATCH	__GNUC_PATCHLEVEL__
 #elif defined(_MSC_VER)
-#define VERSION_BUILD_TOOL			L"MSVC " STRINGIFY(_MSC_FULL_VER)
-#else
-#define VERSION_BUILD_TOOL			L"Unknown Tool"
+#define VERSION_BUILD_TOOL_NAME		L"MSVC"
+#define VERSION_BUILD_TOOL_MAJOR	(_MSC_VER / 100) // 2-digit
+#define VERSION_BUILD_TOOL_MINOR	(_MSC_VER % 100) // 2-digit
+#define VERSION_BUILD_TOOL_PATCH	(_MSC_FULL_VER % 100000) // 5-digit
+#define VERSION_BUILD_TOOL_BUILD	_MSC_BUILD // 2?-digit
+#undef VERSION_BUILD_INFO_FORMAT
+#define VERSION_BUILD_INFO_FORMAT	L"Compiled on " __DATE__ L" with %s %d.%02d.%05d.%d."
 #endif
-#define VERSION_BUILD_INFO			L"Compiled on " __DATE__ L" with " VERSION_BUILD_TOOL L"."
 
 #if defined(_WIN64)
 #define VERSION_FILEVERSION_LONG	L"metapath (64-bit) " STRINGIFY(VERSION_MAJOR) L"." \
