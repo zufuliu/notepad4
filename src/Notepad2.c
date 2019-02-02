@@ -4120,6 +4120,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		SendMessage(hwndEdit, SCI_SETFONTQUALITY, iFontQuality, 0);
 		break;
 
+	case IDM_VIEW_CARET_STYLE_BLOCK_BOTH:
 	case IDM_VIEW_CARET_STYLE_BLOCK:
 	case IDM_VIEW_CARET_STYLE_WIDTH1:
 	case IDM_VIEW_CARET_STYLE_WIDTH2:
@@ -5310,7 +5311,7 @@ void LoadSettings(void) {
 	iFontQuality = clamp_i(iValue, SC_EFF_QUALITY_DEFAULT, SC_EFF_QUALITY_LCD_OPTIMIZED);
 
 	iValue = IniSectionGetInt(pIniSection, L"CaretStyle", 1);
-	iCaretStyle = clamp_i(iValue, 0, 3);
+	iCaretStyle = clamp_i(iValue, -1, 3);
 	iCaretBlinkPeriod = IniSectionGetInt(pIniSection, L"CaretBlinkPeriod", -1);
 
 	// Korean IME use inline mode (and block caret in inline mode) by default

@@ -1422,7 +1422,7 @@ void EditView::DrawCarets(Surface *surface, const EditModel &model, const ViewSt
 	for (size_t r = 0; (r < model.sel.Count()) || drawDrag; r++) {
 		const bool mainCaret = r == model.sel.Main();
 		SelectionPosition posCaret = (drawDrag ? model.posDrag : model.sel.Range(r).caret);
-		if (vsDraw.caretStyle == CARETSTYLE_BLOCK && !drawDrag && posCaret > model.sel.Range(r).anchor) {
+		if ((vsDraw.caretStyle == CARETSTYLE_BLOCK || vsDraw.caretStyle == CARETSTYLE_BLOCK_ALWAYS) && !drawDrag && posCaret > model.sel.Range(r).anchor) {
 			if (posCaret.VirtualSpace() > 0)
 				posCaret.SetVirtualSpace(posCaret.VirtualSpace() - 1);
 			else
@@ -1481,12 +1481,12 @@ void EditView::DrawCarets(Surface *surface, const EditModel &model, const ViewSt
 					/* Dragging text, use a line caret */
 					rcCaret.left = round(xposCaret - caretWidthOffset);
 					rcCaret.right = rcCaret.left + vsDraw.caretWidth;
-				} else if (model.inOverstrike && drawOverstrikeCaret) {
+				} else if ((model.inOverstrike && vsDraw.caretStyle != CARETSTYLE_BLOCK_ALWAYS) && drawOverstrikeCaret) {
 					/* Overstrike (insert mode), use a modified bar caret */
 					rcCaret.top = rcCaret.bottom - 2;
 					rcCaret.left = xposCaret + 1;
 					rcCaret.right = rcCaret.left + widthOverstrikeCaret - 1;
-				} else if ((vsDraw.caretStyle == CARETSTYLE_BLOCK) || imeCaretBlockOverride) {
+				} else if ((vsDraw.caretStyle == CARETSTYLE_BLOCK || vsDraw.caretStyle == CARETSTYLE_BLOCK_ALWAYS) || imeCaretBlockOverride) {
 					/* Block caret */
 					rcCaret.left = xposCaret;
 					if (!caretAtEOL && !caretAtEOF && (ll->chars[offset] != '\t') && !(IsControlCharacter(ll->chars[offset]))) {

@@ -841,6 +841,7 @@ typedef sptr_t (*SciFnDirect)(sptr_t ptr, unsigned int iMessage, uptr_t wParam, 
 #define CARETSTYLE_INVISIBLE 0
 #define CARETSTYLE_LINE 1
 #define CARETSTYLE_BLOCK 2
+#define CARETSTYLE_BLOCK_ALWAYS 3
 #define SCI_SETCARETSTYLE 2512
 #define SCI_GETCARETSTYLE 2513
 #define SCI_SETINDICATORCURRENT 2500
