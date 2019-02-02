@@ -50,6 +50,13 @@ defined
 #pragma
 _Pragma()
 
+// Visual C++ Predefined Macros
+// https://docs.microsoft.com/en-us/cpp/preprocessor/predefined-macros
+// GCC Predefined Macros
+// https://gcc.gnu.org/onlinedocs/cpp/Predefined-Macros.html
+// echo | clang -dM -E -
+// echo | gcc -dM -E -
+
 #include <assert.h>
 {	// Diagnostics
 	NDEBUG

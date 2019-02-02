@@ -180,9 +180,13 @@ static KEYWORDLIST Keywords_CPP = {{
 "__cplusplus __cplusplus_cli __assembler __midl "
 "__FILE__ __FUNCTION__ __LINE__ __DATE__ __TIME__ __TIMESTAMP__ __func__ __VA_ARGS__ "
 "__STDC__ __STDC_HOSTED__ __STDC_VERSION__ __STDC_IEC_559__ __STDC_IEC_559_COMPLEX__ __STDC_ISO_10646__ "
-"__i386__ __x86_64__ __LP64__ __amd64 __ia64 _MSC_VER __MSVCRT__ __MINGW32__ __CYGWIN__ "
-"__GNUC__ __GNUG__ __GNUC_MINOR__ __GNU_MINOR__ __OBJC__ __ASSEMBLER__ __GFORTRAN__ __COUNTER__ __STRICT_ANSI__  __PRETTY_FUNCTION__ __STDC_DEC_FP__ "
-"__APPLE__ __clang__ __llvm__ __GLIBC__ __linux__ "
+" __COUNTER__ __STRICT_ANSI__  __PRETTY_FUNCTION__ __STDC_DEC_FP__ "
+"_MSC_VER _MSC_FULL_VER "
+"__GNUC__ __GNUG__ __GNUC_MINOR__ __GNUC_PATCHLEVEL__ __OBJC__ __ASSEMBLER__ __GFORTRAN__ "
+"__clang__ __clang_major__ __clang_minor__ __clang_patchlevel__ __llvm__ "
+"__i386__ __x86_64__ __LP64__ __amd64 __ia64 __arm__ __aarch64__ "
+"__MSVCRT__ __MINGW32__ __MINGW64__ __CYGWIN__ "
+"__APPLE__ __linux__ __GLIBC__ "
 
 // assert.h
 "_DEBUG NDEBUG assert() "
