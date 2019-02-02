@@ -1,5 +1,5 @@
 ================================================================================
-Notepad2, metapath and Notepad2-mod is under the BSD 3-Clause License
+Notepad2, metapath and Notepad2-mod is licensed under the BSD 3-Clause License
 ================================================================================
 
 http://www.flos-freeware.ch
