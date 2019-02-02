@@ -24,7 +24,7 @@
 #endif
 
 #if defined(__GNUC__) && !defined(__cplusplus)
-#if defined(__NO_INLINE__)
+#if defined(__NO_INLINE__) // O0
 #define NP2_inline	static inline
 #else
 #define NP2_inline	extern inline __attribute__((__gnu_inline__))
