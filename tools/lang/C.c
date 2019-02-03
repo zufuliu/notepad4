@@ -56,6 +56,8 @@ _Pragma()
 // https://gcc.gnu.org/onlinedocs/cpp/Predefined-Macros.html
 // echo | clang -dM -E -
 // echo | gcc -dM -E -
+// https://software.intel.com/en-us/cpp-compiler-developer-guide-and-reference-additional-predefined-macros
+// https://sourceforge.net/p/predef/wiki/Compilers/
 
 #include <assert.h>
 {	// Diagnostics

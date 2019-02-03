@@ -18,8 +18,10 @@
 #define MAX_EDITLEXER_NAME_SIZE		128
 #define MAX_EDITSTYLE_NAME_SIZE		128
 
+#ifndef _INC_WINDOWS
 typedef wchar_t * LPWSTR;
 typedef const wchar_t * LPCWSTR;
+#endif
 
 typedef struct _editstyle {
 	const int iStyle;
