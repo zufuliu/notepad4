@@ -3330,9 +3330,9 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		// Local
 		GetLocalTime(&lt);
 		if (LOWORD(wParam) == IDM_EDIT_INSERT_LOC_DATE) {
-			sprintf(mszBuf, "%04u-%02u-%02u", lt.wYear, lt.wMonth, lt.wDay);
+			sprintf(mszBuf, "%04d-%02d-%02d", lt.wYear, lt.wMonth, lt.wDay);
 		} else {
-			sprintf(mszBuf, "%04u-%02u-%02u %02u:%02u:%02u", lt.wYear, lt.wMonth, lt.wDay, lt.wHour, lt.wMinute, lt.wSecond);
+			sprintf(mszBuf, "%04d-%02d-%02d %02d:%02d:%02d", lt.wYear, lt.wMonth, lt.wDay, lt.wHour, lt.wMinute, lt.wSecond);
 		}
 		SendMessage(hwndEdit, SCI_REPLACESEL, 0, (LPARAM)mszBuf);
 	}
@@ -3343,7 +3343,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		char mszBuf[38];
 		// UTC
 		GetSystemTime(&lt);
-		sprintf(mszBuf, "%04u-%02u-%02uT%02u:%02u:%02uZ", lt.wYear, lt.wMonth, lt.wDay, lt.wHour, lt.wMinute, lt.wSecond);
+		sprintf(mszBuf, "%04d-%02d-%02dT%02d:%02d:%02dZ", lt.wYear, lt.wMonth, lt.wDay, lt.wHour, lt.wMinute, lt.wSecond);
 		SendMessage(hwndEdit, SCI_REPLACESEL, 0, (LPARAM)mszBuf);
 	}
 	break;
