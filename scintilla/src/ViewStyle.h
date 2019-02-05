@@ -215,6 +215,10 @@ public:
 
 	bool WhiteSpaceVisible(bool inIndent) const noexcept;
 
+	enum class CaretShape { invisible, line, block, bar };
+	bool IsBlockCaretStyle() const noexcept;
+	CaretShape CaretShapeForMode(bool inOverstrike) const noexcept;
+
 	bool ZoomIn() noexcept;
 	bool ZoomOut() noexcept;
 

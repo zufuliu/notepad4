@@ -255,7 +255,8 @@ static UINT fStylesModified = STYLESMODIFIED_NONE;
 static BOOL fWarnedNoIniFile = FALSE;
 static int	iBaseFontSize = 11*SC_FONT_SIZE_MULTIPLIER; // 11 pt in lexDefault
 int		iFontQuality = SC_EFF_QUALITY_LCD_OPTIMIZED;
-int		iCaretStyle = 1; // width 1, 0 for block, -1 for always block
+int		iCaretStyle = 1; // width 1, 0 for block
+int		iOvrCaretStyle = 0; // 0 for bar, 1 for block
 int		iCaretBlinkPeriod = -1; // system default, 0 for noblink
 static int	iDefaultLexer;
 static BOOL bAutoSelect;
@@ -700,10 +701,10 @@ void Style_OnDPIChanged(HWND hwnd) {
 
 void Style_UpdateCaret(HWND hwnd) {
 	// caret style and width
-	if (iCaretStyle <= 0) {
-		SendMessage(hwnd, SCI_SETCARETSTYLE, ((iCaretStyle == 0) ? CARETSTYLE_BLOCK : CARETSTYLE_BLOCK_ALWAYS), 0);
-	} else {
-		SendMessage(hwnd, SCI_SETCARETSTYLE, CARETSTYLE_LINE, 0);
+	const int style = (iCaretStyle ? CARETSTYLE_LINE : CARETSTYLE_BLOCK)
+		| (iOvrCaretStyle ? CARETSTYLE_OVERSTRIKE_BLOCK : CARETSTYLE_OVERSTRIKE_BAR);
+	SendMessage(hwnd, SCI_SETCARETSTYLE, style, 0);
+	if (iCaretStyle != 0) {
 		SendMessage(hwnd, SCI_SETCARETWIDTH, iCaretStyle, 0);
 	}
 

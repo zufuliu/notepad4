@@ -372,9 +372,9 @@ BEGIN
         END
         POPUP "Caret Style"
         BEGIN
-            MENUITEM "Block (Both Mode)",           IDM_VIEW_CARET_STYLE_BLOCK_BOTH
-            MENUITEM "Block (INS Mode)",            IDM_VIEW_CARET_STYLE_BLOCK
+            MENUITEM "Block (OVR Mode)",            IDM_VIEW_CARET_STYLE_BLOCK_OVR
             MENUITEM SEPARATOR
+            MENUITEM "Block (INS Mode)",            IDM_VIEW_CARET_STYLE_BLOCK
             MENUITEM "Width 1",                     IDM_VIEW_CARET_STYLE_WIDTH1
             MENUITEM "Width 2",                     IDM_VIEW_CARET_STYLE_WIDTH2
             MENUITEM "Width 3",                     IDM_VIEW_CARET_STYLE_WIDTH3
