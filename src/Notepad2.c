@@ -288,6 +288,7 @@ static int iAlignMode	= 0;
 int		iMatchesCount	= 0;
 extern int iFontQuality;
 extern int iCaretStyle;
+extern int iOvrCaretStyle;
 extern int iCaretBlinkPeriod;
 
 static BOOL fIsElevated = FALSE;
@@ -2328,6 +2329,7 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	CheckCmd(hmenu, IDM_VIEW_WORDWRAP, fWordWrap);
 	i = IDM_VIEW_FONTQUALITY_DEFAULT + iFontQuality;
 	CheckMenuRadioItem(hmenu, IDM_VIEW_FONTQUALITY_DEFAULT, IDM_VIEW_FONTQUALITY_CLEARTYPE, i, MF_BYCOMMAND);
+	CheckCmd(hmenu, IDM_VIEW_CARET_STYLE_BLOCK_OVR, iOvrCaretStyle);
 	i = IDM_VIEW_CARET_STYLE_BLOCK + iCaretStyle;
 	CheckMenuRadioItem(hmenu, IDM_VIEW_CARET_STYLE_BLOCK, IDM_VIEW_CARET_STYLE_WIDTH3, i, MF_BYCOMMAND);
 	CheckCmd(hmenu, IDM_VIEW_CARET_STYLE_NOBLINK, iCaretBlinkPeriod == 0);
@@ -4120,7 +4122,10 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		SendMessage(hwndEdit, SCI_SETFONTQUALITY, iFontQuality, 0);
 		break;
 
-	case IDM_VIEW_CARET_STYLE_BLOCK_BOTH:
+	case IDM_VIEW_CARET_STYLE_BLOCK_OVR:
+		iOvrCaretStyle = !iOvrCaretStyle;
+		Style_UpdateCaret(hwndEdit);
+		break;
 	case IDM_VIEW_CARET_STYLE_BLOCK:
 	case IDM_VIEW_CARET_STYLE_WIDTH1:
 	case IDM_VIEW_CARET_STYLE_WIDTH2:
@@ -5311,7 +5316,8 @@ void LoadSettings(void) {
 	iFontQuality = clamp_i(iValue, SC_EFF_QUALITY_DEFAULT, SC_EFF_QUALITY_LCD_OPTIMIZED);
 
 	iValue = IniSectionGetInt(pIniSection, L"CaretStyle", 1);
-	iCaretStyle = clamp_i(iValue, -1, 3);
+	iOvrCaretStyle = clamp_i(iValue / 10, 0, 1);
+	iCaretStyle = clamp_i(iValue % 10, 0, 3);
 	iCaretBlinkPeriod = IniSectionGetInt(pIniSection, L"CaretBlinkPeriod", -1);
 
 	// Korean IME use inline mode (and block caret in inline mode) by default
@@ -5563,7 +5569,7 @@ void SaveSettings(BOOL bSaveSettingsNow) {
 	IniSectionSetIntEx(pIniSection, L"RenderingTechnology", iRenderingTechnology, (IsVistaAndAbove()? SC_TECHNOLOGY_DIRECTWRITE : SC_TECHNOLOGY_DEFAULT));
 	IniSectionSetIntEx(pIniSection, L"Bidirectional", iBidirectional, SC_BIDIRECTIONAL_DISABLED);
 	IniSectionSetIntEx(pIniSection, L"FontQuality", iFontQuality, SC_EFF_QUALITY_LCD_OPTIMIZED);
-	IniSectionSetIntEx(pIniSection, L"CaretStyle", iCaretStyle, 1);
+	IniSectionSetIntEx(pIniSection, L"CaretStyle", iCaretStyle + iOvrCaretStyle*10, 1);
 	IniSectionSetIntEx(pIniSection, L"CaretBlinkPeriod", iCaretBlinkPeriod, -1);
 	IniSectionSetBool(pIniSection, L"UseInlineIME", bUseInlineIME); // keep result of auto detection
 	IniSectionSetBoolEx(pIniSection, L"InlineIMEUseBlockCaret", bInlineIMEUseBlockCaret, 0);
