@@ -2106,28 +2106,28 @@ void SurfaceD2D::MeasureWidths(const Font &font_, std::string_view text, XYPOSIT
 		while (i < text.length()) {
 			positions[i++] = lastPos;
 		}
-	} else if (codePageText == 0) {
-
-		// One char per position
-		PLATFORM_ASSERT(text.length() == static_cast<size_t>(tbuf.tlen));
-		for (int kk = 0; kk < tbuf.tlen; kk++) {
-			positions[kk] = poses.buffer[kk];
-		}
-
 	} else {
 		const DBCSCharClassify *dbcs = DBCSCharClassify::Get(codePageText);
-		// May be one or two bytes per position
-		int ui = 0;
-		for (size_t i = 0; i < text.length() && ui < tbuf.tlen;) {
-			positions[i] = poses.buffer[ui];
-			if (dbcs->IsLeadByte(text[i])) {
-				positions[i + 1] = poses.buffer[ui];
-				i += 2;
-			} else {
-				i++;
-			}
+		if (dbcs) {
+			// May be one or two bytes per position
+			int ui = 0;
+			for (size_t i = 0; i < text.length() && ui < tbuf.tlen;) {
+				positions[i] = poses.buffer[ui];
+				if (dbcs->IsLeadByte(text[i])) {
+					positions[i + 1] = poses.buffer[ui];
+					i += 2;
+				} else {
+					i++;
+				}
 
-			ui++;
+				ui++;
+			}
+		} else {
+			// One char per position
+			PLATFORM_ASSERT(text.length() == static_cast<size_t>(tbuf.tlen));
+			for (int kk = 0; kk < tbuf.tlen; kk++) {
+				positions[kk] = poses.buffer[kk];
+			}
 		}
 	}
 }
