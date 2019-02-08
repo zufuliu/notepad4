@@ -279,15 +279,16 @@ extern INT	iHighlightCurrentLine;
 #define STYLE_MASK_FONT_SIZE	(1 << 1)
 #define STYLE_MASK_FORE_COLOR	(1 << 2)
 #define STYLE_MASK_BACK_COLOR	(1 << 3)
-#define STYLE_MASK_UPPER_LOWER	(1 << 4)
-#define STYLE_MASK_CHARSET		(1 << 5)
+#define STYLE_MASK_FONT_WEIGHT	(1 << 4)
+#define STYLE_MASK_UPPER_LOWER	(1 << 5)
+#define STYLE_MASK_CHARSET		(1 << 6)
 
 struct DetailStyle {
 	UINT mask;
 	int fontSize;
 	int foreColor;
 	int backColor;
-	BOOL bold;
+	int weight;
 	BOOL italic;
 	BOOL underline;
 	BOOL strike;
@@ -2407,26 +2408,58 @@ BOOL Style_StrGetRawSize(LPCWSTR lpszStyle, int *i) {
 	return FALSE;
 }
 
-//=============================================================================
-//
-// Style_StrGetSizeStr()
-//
-BOOL Style_StrGetSizeStr(LPCWSTR lpszStyle, LPWSTR lpszSize, int cchSize) {
+BOOL Style_StrGetFontWeight(LPCWSTR lpszStyle, int *i) {
 	WCHAR *p;
 
-	if ((p = StrStr(lpszStyle, L"size:")) != NULL) {
-		p += CSTRLEN(L"size:");
+	if ((p = StrStr(lpszStyle, L"weight:")) != NULL) {
+		p += CSTRLEN(L"weight:");
+		return CRTStrToInt(p, i) && (*i >= FW_DONTCARE);
+	}
+	return FALSE;
+}
+
+//=============================================================================
+//
+// Style_StrGetValueStr()
+//
+BOOL Style_StrGetValueStr(LPCWSTR lpszStyle, LPCWSTR key, int keyLen, LPWSTR lpszValue, int cchValue) {
+	WCHAR *p;
+
+	if ((p = StrStr(lpszStyle, key)) != NULL) {
+		p += keyLen;
 		while (*p == L' ') {
 			++p;
 		}
-		lstrcpyn(lpszSize, p, cchSize);
-		if ((p = StrChr(lpszSize, L';')) != NULL) {
+		lstrcpyn(lpszValue, p, cchValue);
+		if ((p = StrChr(lpszValue, L';')) != NULL) {
 			*p = L'\0';
 		}
-		TrimString(lpszSize);
+		TrimString(lpszValue);
 		return TRUE;
 	}
 	return FALSE;
+}
+
+void Style_StrCopyValueStr(LPWSTR szNewStyle, LPCWSTR lpszStyle, LPCWSTR key, int keyLen, LPWSTR lpszValue, int cchValue) {
+	if (Style_StrGetValueStr(lpszStyle, key, keyLen, lpszValue, cchValue)) {
+		if (StrNotEmpty(szNewStyle)) {
+			lstrcat(szNewStyle, L"; ");
+		}
+		lstrcat(szNewStyle, key);
+		lstrcat(szNewStyle, lpszValue);
+	}
+}
+
+static inline void Style_StrCopyCharSetStr(LPWSTR szNewStyle, LPCWSTR lpszStyle, LPWSTR lpszValue, int cchValue) {
+	Style_StrCopyValueStr(szNewStyle, lpszStyle, L"charset:", CSTRLEN(L"charset:"), lpszValue, cchValue);
+}
+
+static inline void Style_StrCopySizeStr(LPWSTR szNewStyle, LPCWSTR lpszStyle, LPWSTR lpszValue, int cchValue) {
+	Style_StrCopyValueStr(szNewStyle, lpszStyle, L"size:", CSTRLEN(L"size:"), lpszValue, cchValue);
+}
+
+static inline void Style_StrCopyWeightStr(LPWSTR szNewStyle, LPCWSTR lpszStyle, LPWSTR lpszValue, int cchValue) {
+	Style_StrCopyValueStr(szNewStyle, lpszStyle, L"weight:", CSTRLEN(L"weight:"), lpszValue, cchValue);
 }
 
 //=============================================================================
@@ -2521,7 +2554,10 @@ BOOL Style_SelectFont(HWND hwnd, LPWSTR lpszStyle, int cchStyle, BOOL bDefaultSt
 		lf.lfHeight = -MulDiv(iValue, GetDeviceCaps(hdc, LOGPIXELSY), 72*SC_FONT_SIZE_MULTIPLIER);
 		ReleaseDC(hwnd, hdc);
 	}
-	lf.lfWeight = (StrStr(lpszStyle, L"bold")) ? FW_BOLD : FW_NORMAL;
+	if (!Style_StrGetFontWeight(lpszStyle, &iValue)) {
+		iValue = FW_NORMAL;
+	}
+	lf.lfWeight = iValue;
 	lf.lfItalic = StrStr(lpszStyle, L"italic") != NULL;
 	lf.lfStrikeOut = StrStr(lpszStyle, L"strike") != NULL;
 
@@ -2561,8 +2597,10 @@ BOOL Style_SelectFont(HWND hwnd, LPWSTR lpszStyle, int cchStyle, BOOL bDefaultSt
 		tch[2] = 0;
 		lstrcat(szNewStyle, tch);
 	}
-	if (cf.nFontType & BOLD_FONTTYPE) {
-		lstrcat(szNewStyle, L"; bold");
+	if (lf.lfWeight != FW_NORMAL) {
+		lstrcat(szNewStyle, L"; weight:");
+		wsprintf(tch, L"%i", (int)lf.lfWeight);
+		lstrcat(szNewStyle, tch);
 	}
 	if (cf.nFontType & ITALIC_FONTTYPE) {
 		lstrcat(szNewStyle, L"; italic");
@@ -2657,27 +2695,11 @@ BOOL Style_SelectColor(HWND hwnd, BOOL bFore, LPWSTR lpszStyle, int cchStyle) {
 		lstrcat(szNewStyle, L"font:");
 		lstrcat(szNewStyle, tch);
 	}
-	if (Style_StrGetCharSet(lpszStyle, &iValue)) {
-		if (StrNotEmpty(szNewStyle)) {
-			lstrcat(szNewStyle, L"; ");
-		}
-		wsprintf(tch, L"charset:%i", iValue);
-		lstrcat(szNewStyle, tch);
-	}
-	if (Style_StrGetSizeStr(lpszStyle, tch, COUNTOF(tch))) {
-		if (StrNotEmpty(szNewStyle)) {
-			lstrcat(szNewStyle, L"; ");
-		}
-		lstrcat(szNewStyle, L"size:");
-		lstrcat(szNewStyle, tch);
-	}
 
-	if (StrStr(lpszStyle, L"bold")) {
-		if (StrNotEmpty(szNewStyle)) {
-			lstrcat(szNewStyle, L"; ");
-		}
-		lstrcat(szNewStyle, L"bold");
-	}
+	Style_StrCopyCharSetStr(szNewStyle, lpszStyle, tch, COUNTOF(tch));
+	Style_StrCopySizeStr(szNewStyle, lpszStyle, tch, COUNTOF(tch));
+	Style_StrCopyWeightStr(szNewStyle, lpszStyle, tch, COUNTOF(tch));
+
 	if (StrStr(lpszStyle, L"italic")) {
 		if (StrNotEmpty(szNewStyle)) {
 			lstrcat(szNewStyle, L"; ");
@@ -2781,8 +2803,11 @@ void Style_SetStyles(HWND hwnd, int iStyle, LPCWSTR lpszStyle) {
 		SendMessage(hwnd, SCI_STYLESETBACK, iStyle, iValue);
 	}
 
-	// Bold
-	SendMessage(hwnd, SCI_STYLESETBOLD, iStyle, (StrStr(lpszStyle, L"bold") != NULL));
+	// Weight
+	if (Style_StrGetFontWeight(lpszStyle, &iValue)) {
+		SendMessage(hwnd, SCI_STYLESETWEIGHT, iStyle, iValue);
+	}
+
 	// Italic
 	SendMessage(hwnd, SCI_STYLESETITALIC, iStyle, (StrStr(lpszStyle, L"italic") != NULL));
 	// Underline
@@ -2831,8 +2856,12 @@ static void Style_Parse(struct DetailStyle *style, LPCWSTR lpszStyle) {
 		mask |= STYLE_MASK_BACK_COLOR;
 	}
 
-	// Bold
-	style->bold = StrStr(lpszStyle, L"bold") != NULL;
+	// Weight
+	if (Style_StrGetFontWeight(lpszStyle, &iValue)) {
+		style->weight = iValue;
+		mask |= STYLE_MASK_FONT_WEIGHT;
+	}
+
 	// Italic
 	style->italic = StrStr(lpszStyle, L"italic") != NULL;
 	// Underline
@@ -2880,8 +2909,11 @@ static void Style_SetParsed(HWND hwnd, const struct DetailStyle *style, int iSty
 		SendMessage(hwnd, SCI_STYLESETBACK, iStyle, style->backColor);
 	}
 
-	// Bold
-	SendMessage(hwnd, SCI_STYLESETBOLD, iStyle, style->bold);
+	// Weight
+	if (mask & STYLE_MASK_FONT_WEIGHT) {
+		SendMessage(hwnd, SCI_STYLESETWEIGHT, iStyle, style->weight);
+	}
+
 	// Italic
 	SendMessage(hwnd, SCI_STYLESETITALIC, iStyle, style->italic);
 	// Underline
