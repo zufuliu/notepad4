@@ -2559,6 +2559,7 @@ BOOL Style_SelectFont(HWND hwnd, LPWSTR lpszStyle, int cchStyle, BOOL bDefaultSt
 	}
 	lf.lfWeight = iValue;
 	lf.lfItalic = StrStr(lpszStyle, L"italic") != NULL;
+	lf.lfUnderline = StrStr(lpszStyle, L"underline") != NULL;
 	lf.lfStrikeOut = StrStr(lpszStyle, L"strike") != NULL;
 
 	// Init cf
