@@ -2809,13 +2809,21 @@ void Style_SetStyles(HWND hwnd, int iStyle, LPCWSTR lpszStyle) {
 	}
 
 	// Italic
-	SendMessage(hwnd, SCI_STYLESETITALIC, iStyle, (StrStr(lpszStyle, L"italic") != NULL));
+	if (StrStr(lpszStyle, L"italic") != NULL) {
+		SendMessage(hwnd, SCI_STYLESETITALIC, iStyle, TRUE);
+	}
 	// Underline
-	SendMessage(hwnd, SCI_STYLESETUNDERLINE, iStyle, (StrStr(lpszStyle, L"underline") != NULL));
+	if (StrStr(lpszStyle, L"underline") != NULL) {
+		SendMessage(hwnd, SCI_STYLESETUNDERLINE, iStyle, TRUE);
+	}
 	// Strike
-	SendMessage(hwnd, SCI_STYLESETSTRIKE, iStyle, (StrStr(lpszStyle, L"strike") != NULL));
+	if (StrStr(lpszStyle, L"strike") != NULL) {
+		SendMessage(hwnd, SCI_STYLESETSTRIKE, iStyle, TRUE);
+	}
 	// EOL Filled
-	SendMessage(hwnd, SCI_STYLESETEOLFILLED, iStyle, (StrStr(lpszStyle, L"eolfilled") != NULL));
+	if (StrStr(lpszStyle, L"eolfilled") != NULL) {
+		SendMessage(hwnd, SCI_STYLESETEOLFILLED, iStyle, TRUE);
+	}
 
 	// Case
 	if (Style_StrGetCase(lpszStyle, &iValue)) {
@@ -2915,13 +2923,21 @@ static void Style_SetParsed(HWND hwnd, const struct DetailStyle *style, int iSty
 	}
 
 	// Italic
-	SendMessage(hwnd, SCI_STYLESETITALIC, iStyle, style->italic);
+	if (style->italic) {
+		SendMessage(hwnd, SCI_STYLESETITALIC, iStyle, TRUE);
+	}
 	// Underline
-	SendMessage(hwnd, SCI_STYLESETUNDERLINE, iStyle, style->underline);
+	if (style->underline) {
+		SendMessage(hwnd, SCI_STYLESETUNDERLINE, iStyle, TRUE);
+	}
 	// Strike
-	SendMessage(hwnd, SCI_STYLESETSTRIKE, iStyle, style->strike);
+	if (style->strike) {
+		SendMessage(hwnd, SCI_STYLESETSTRIKE, iStyle, TRUE);
+	}
 	// EOL Filled
-	SendMessage(hwnd, SCI_STYLESETEOLFILLED, iStyle, style->eolFilled);
+	if (style->eolFilled) {
+		SendMessage(hwnd, SCI_STYLESETEOLFILLED, iStyle, TRUE);
+	}
 
 	// Case
 	if (mask & STYLE_MASK_UPPER_LOWER) {
