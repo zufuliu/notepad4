@@ -2415,6 +2415,10 @@ BOOL Style_StrGetFontWeight(LPCWSTR lpszStyle, int *i) {
 		p += CSTRLEN(L"weight:");
 		return CRTStrToInt(p, i) && (*i >= FW_DONTCARE);
 	}
+	if ((p = StrStr(lpszStyle, L"bold")) != NULL) {
+		*i = FW_BOLD;
+		return TRUE;
+	}
 	return FALSE;
 }
 
@@ -2599,9 +2603,13 @@ BOOL Style_SelectFont(HWND hwnd, LPWSTR lpszStyle, int cchStyle, BOOL bDefaultSt
 		lstrcat(szNewStyle, tch);
 	}
 	if (lf.lfWeight != FW_NORMAL) {
-		lstrcat(szNewStyle, L"; weight:");
-		wsprintf(tch, L"%i", (int)lf.lfWeight);
-		lstrcat(szNewStyle, tch);
+		if (lf.lfWeight == FW_BOLD) {
+			lstrcat(szNewStyle, L"; bold");
+		} else {
+			lstrcat(szNewStyle, L"; weight:");
+			wsprintf(tch, L"%i", (int)lf.lfWeight);
+			lstrcat(szNewStyle, tch);
+		}
 	}
 	if (cf.nFontType & ITALIC_FONTTYPE) {
 		lstrcat(szNewStyle, L"; italic");
@@ -2701,6 +2709,12 @@ BOOL Style_SelectColor(HWND hwnd, BOOL bFore, LPWSTR lpszStyle, int cchStyle) {
 	Style_StrCopySizeStr(szNewStyle, lpszStyle, tch, COUNTOF(tch));
 	Style_StrCopyWeightStr(szNewStyle, lpszStyle, tch, COUNTOF(tch));
 
+	if (StrStr(lpszStyle, L"bold")) {
+		if (StrNotEmpty(szNewStyle)) {
+			lstrcat(szNewStyle, L"; ");
+		}
+		lstrcat(szNewStyle, L"bold");
+	}
 	if (StrStr(lpszStyle, L"italic")) {
 		if (StrNotEmpty(szNewStyle)) {
 			lstrcat(szNewStyle, L"; ");
