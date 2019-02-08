@@ -942,9 +942,13 @@ void Style_SetLexer(HWND hwnd, PEDITLEXER pLexNew) {
 	if (!Style_StrGetColor(FALSE, szValue, &iValue)) {
 		SendMessage(hwnd, SCI_STYLESETBACK, STYLE_DEFAULT, GetSysColor(COLOR_WINDOW));
 	}
-	//! end Style_Default
-
+	if (rid != NP2LEX_DEFAULT) {
+		// lexer default (base style), i.e.: EDITSTYLE_DEFAULT
+		Style_SetStyles(hwnd, STYLE_DEFAULT, pLexNew->Styles[0].szValue);
+	}
+	// set all styles to have the same attributes as STYLE_DEFAULT.
 	SendMessage(hwnd, SCI_STYLECLEARALL, 0, 0);
+	//! end Style_Default
 
 	Style_SetDefaultStyle(hwnd, Style_LineNumber + iIdx);
 	Style_SetDefaultStyle(hwnd, Style_MatchBrace + iIdx);
@@ -1091,7 +1095,8 @@ void Style_SetLexer(HWND hwnd, PEDITLEXER pLexNew) {
 	if (rid != NP2LEX_DEFAULT) {
 		struct DetailStyle style;
 		const UINT iStyleCount = pLexNew->iStyleCount;
-		for (UINT i = 0; i < iStyleCount; i++) {
+		// first style is the default style.
+		for (UINT i = 1; i < iStyleCount; i++) {
 			int iStyle = pLexNew->Styles[i].iStyle;
 			szValue = pLexNew->Styles[i].szValue;
 			if (iStyle > 0xFF) {
