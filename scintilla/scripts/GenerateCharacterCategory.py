@@ -340,8 +340,9 @@ def compressIndexTable(head, indexTable, args):
 	print(f'{head}:', len(indexA), max(indexA), len(indexC), max(indexC), len(indexD), shiftA, shiftC)
 
 	sizeA = getsize(indexA)
-	sizeC = getsize(indexC);
-	total = len(indexA)*sizeA + len(indexC)*sizeC + len(indexD)
+	sizeC = getsize(indexC)
+	sizeD = getsize(indexD)
+	total = len(indexA)*sizeA + len(indexC)*sizeC + len(indexD)*sizeD
 	print(f'{head} total size:', total/1024)
 
 	maskA = (1 << shiftA) - 1
@@ -353,13 +354,18 @@ def compressIndexTable(head, indexTable, args):
 		value = indexD[i]
 		expect = indexTable[ch]
 		if value != expect:
-			print(f'{head} verify fail:', '%04X, expect: %d, got: %d' % (head, ch, expect, value))
+			print(f'{head} verify fail:', '%04X, expect: %d, got: %d' % (ch, expect, value))
 			return table, function
 
+	typemap = {
+		1: 'unsigned char',
+		2: 'unsigned short',
+	}
+	prefix = args['table']
 	# one table
-	if sizeA == sizeC == 1:
+	if sizeA == sizeC == sizeD:
 		output = []
-		output.append("const unsigned char %s[] = {" % args['table'])
+		output.append("const %s %s[] = {" % (typemap[sizeA], prefix))
 		output.append(', '.join(str(i) for i in indexA) + ',')
 		output.append(', '.join(str(i) for i in indexC) + ',')
 		output.append(', '.join(str(i) for i in indexD) + ',')
@@ -380,15 +386,16 @@ def compressIndexTable(head, indexTable, args):
 	ch = ({table}[{offsetC} + (ch >> {shiftC})] << {shiftC}) + (ch & {maskC});
 	return static_cast<{returnType}>({table}[{offsetD} + ch]);
 }}""".format(**args)
-	# two tables
-	elif sizeA == 1:
-		assert sizeC == 2
+	# three tables
+	else:
 		output = []
-		output.append("const unsigned char %s1[] = {" % args['table'])
+		output.append("const %s %s1[] = {" % (typemap[sizeA], prefix))
 		output.append(', '.join(str(i) for i in indexA) + ',')
-		output.append(', '.join(str(i) for i in indexD) + ',')
 		output.append("};")
-		output.append("const unsigned short %s2[] = {" % args['table'])
+		output.append("const %s %s2[] = {" % (typemap[sizeC], prefix))
+		output.append(', '.join(str(i) for i in indexC) + ',')
+		output.append("};")
+		output.append("const %s %s[] = {" % (typemap[sizeD], prefix))
 		output.append(', '.join(str(i) for i in indexC) + ',')
 		output.append("};")
 		table = '\n'.join(output)
@@ -398,16 +405,13 @@ def compressIndexTable(head, indexTable, args):
 			'maskA': maskA,
 			'shiftC': shiftC,
 			'maskC': maskC,
-			'offsetD': len(indexA)
 		})
 		function = """{function}
 
 	ch = ({table}1[ch >> {shiftA}] << {shiftA}) + (ch & {maskA});
 	ch = ({table}2[(ch >> {shiftC})] << {shiftC}) + (ch & {maskC});
-	return static_cast<{returnType}>({table}1[{offsetD} + ch]);
+	return static_cast<{returnType}>({table}[ch]);
 }}""".format(**args)
-	else:
-		print(f'{head} unknown bin size')
 	return table, function
 
 def updateCharClassifyTable(filename):
