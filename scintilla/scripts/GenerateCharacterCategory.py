@@ -349,8 +349,8 @@ def compressIndexTable(head, indexTable, args):
 	maskC = (1 << shiftC) - 1
 	table, function = '', ''
 	for ch in range(len(indexTable)):
-		i = (indexA[ch >> shiftA] << shiftA) + (ch & maskA)
-		i = (indexC[i >> shiftC] << shiftC) + (i & maskC)
+		i = (indexA[ch >> shiftA] << shiftA) | (ch & maskA)
+		i = (indexC[i >> shiftC] << shiftC) | (i & maskC)
 		value = indexD[i]
 		expect = indexTable[ch]
 		if value != expect:
@@ -382,8 +382,8 @@ def compressIndexTable(head, indexTable, args):
 		})
 		function = """{function}
 
-	ch = ({table}[ch >> {shiftA}] << {shiftA}) + (ch & {maskA});
-	ch = ({table}[{offsetC} + (ch >> {shiftC})] << {shiftC}) + (ch & {maskC});
+	ch = ({table}[ch >> {shiftA}] << {shiftA}) | (ch & {maskA});
+	ch = ({table}[{offsetC} + (ch >> {shiftC})] << {shiftC}) | (ch & {maskC});
 	return static_cast<{returnType}>({table}[{offsetD} + ch]);
 }}""".format(**args)
 	# three tables
@@ -408,8 +408,8 @@ def compressIndexTable(head, indexTable, args):
 		})
 		function = """{function}
 
-	ch = ({table}1[ch >> {shiftA}] << {shiftA}) + (ch & {maskA});
-	ch = ({table}2[(ch >> {shiftC})] << {shiftC}) + (ch & {maskC});
+	ch = ({table}1[ch >> {shiftA}] << {shiftA}) | (ch & {maskA});
+	ch = ({table}2[(ch >> {shiftC})] << {shiftC}) | (ch & {maskC});
 	return static_cast<{returnType}>({table}[ch]);
 }}""".format(**args)
 	return table, function
