@@ -9,6 +9,7 @@ from collections import OrderedDict
 from enum import IntEnum
 import math
 from FileGenerator import Regenerate
+from splitbins import *
 
 class CharClassify(IntEnum):
 	ccSpace = 0
@@ -274,70 +275,9 @@ def buildANSICharClassifyTable(filename):
 	print('ANSICharClassifyTable:', len(result), len(encodingList))
 	Regenerate(filename, "//", output)
 
-# splitbins() is based on Python source
-# https://github.com/python/cpython/blob/master/Tools/unicode/makeunicodedata.py
-# Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010,
-# 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019 Python Software Foundation;
-# All Rights Reserved
-# see https://www.python.org/psf/license/ for license details.
-
-def getsize(data):
-	# return smallest possible integer size for the given array
-	maxdata = max(data)
-	if maxdata < 256:
-		return 1
-	elif maxdata < 65536:
-		return 2
-	else:
-		return 4
-
-def splitbins(t, second=False):
-	"""t -> (t1, t2, shift).  Split a table to save space.
-
-	t is a sequence of ints.  This function can be useful to save space if
-	many of the ints are the same.	t1 and t2 are lists of ints, and shift
-	is an int, chosen to minimize the combined size of t1 and t2 (in C
-	code), and where for each i in range(len(t)),
-		t[i] == t2[(t1[i >> shift] << shift) + (i & mask)]
-	where mask is a bitmask isolating the last "shift" bits.
-	"""
-
-	# the most we can shift n and still have something left
-	maxshift = math.floor(math.log2(len(t)))
-
-	total = sys.maxsize	 # smallest total size so far
-	t = tuple(t)	# so slices can be dict keys
-	for shift in range(maxshift + 1):
-		t1 = []
-		t2 = []
-		size = 2**shift
-		bincache = {}
-		for i in range(0, len(t), size):
-			part = t[i:i+size]
-			index = bincache.get(part)
-			if index is None:
-				index = len(t2)
-				bincache[part] = index
-				t2.extend(part)
-			t1.append(index >> shift)
-		# determine memory size
-		b = len(t1)*getsize(t1)
-		if second:
-			t3, t4, shift2 = splitbins(t2, False)
-			b += len(t3)*getsize(t3) + len(t4)*getsize(t4)
-		else:
-			b += len(t2)*getsize(t2)
-		if b < total:
-			if second:
-				best = t1, t3, t4, shift, shift2
-			else:
-				best = t1, t2, shift
-			total = b
-	return best
-
 def compressIndexTable(head, indexTable, args):
 	indexA, indexC, indexD, shiftA, shiftC = splitbins(indexTable, True)
-	print(f'{head}:', len(indexA), max(indexA), len(indexC), max(indexC), len(indexD), shiftA, shiftC)
+	print(f'{head}:', (len(indexA), max(indexA)), (len(indexC), max(indexC)), len(indexD), (shiftA, shiftC))
 
 	sizeA = getsize(indexA)
 	sizeC = getsize(indexC)
@@ -347,15 +287,21 @@ def compressIndexTable(head, indexTable, args):
 
 	maskA = (1 << shiftA) - 1
 	maskC = (1 << shiftC) - 1
-	table, function = '', ''
+	shiftA2 = shiftA
+	shiftC2 = shiftC
+
+	if True:
+		shiftA2 = preshift(indexA, shiftA)
+		shiftC2 = preshift(indexC, shiftC)
+
 	for ch in range(len(indexTable)):
-		i = (indexA[ch >> shiftA] << shiftA) | (ch & maskA)
-		i = (indexC[i >> shiftC] << shiftC) | (i & maskC)
+		i = (indexA[ch >> shiftA] << shiftA2) | (ch & maskA)
+		i = (indexC[i >> shiftC] << shiftC2) | (i & maskC)
 		value = indexD[i]
 		expect = indexTable[ch]
 		if value != expect:
 			print(f'{head} verify fail:', '%04X, expect: %d, got: %d' % (ch, expect, value))
-			return table, function
+			return None
 
 	typemap = {
 		1: 'unsigned char',
@@ -374,16 +320,18 @@ def compressIndexTable(head, indexTable, args):
 
 		args.update({
 			'shiftA': shiftA,
+			'shiftA2': shiftA2,
 			'maskA': maskA,
 			'offsetC': len(indexA),
 			'shiftC': shiftC,
+			'shiftC2': shiftC2,
 			'maskC': maskC,
 			'offsetD': len(indexA) + len(indexC)
 		})
 		function = """{function}
 
-	ch = ({table}[ch >> {shiftA}] << {shiftA}) | (ch & {maskA});
-	ch = ({table}[{offsetC} + (ch >> {shiftC})] << {shiftC}) | (ch & {maskC});
+	ch = ({table}[ch >> {shiftA}] << {shiftA2}) | (ch & {maskA});
+	ch = ({table}[{offsetC} + (ch >> {shiftC})] << {shiftC2}) | (ch & {maskC});
 	return static_cast<{returnType}>({table}[{offsetD} + ch]);
 }}""".format(**args)
 	# three tables
@@ -402,14 +350,16 @@ def compressIndexTable(head, indexTable, args):
 
 		args.update({
 			'shiftA': shiftA,
+			'shiftA2': shiftA2,
 			'maskA': maskA,
 			'shiftC': shiftC,
+			'shiftC2': shiftC2,
 			'maskC': maskC,
 		})
 		function = """{function}
 
-	ch = ({table}1[ch >> {shiftA}] << {shiftA}) | (ch & {maskA});
-	ch = ({table}2[(ch >> {shiftC})] << {shiftC}) | (ch & {maskC});
+	ch = ({table}1[ch >> {shiftA}] << {shiftA2}) | (ch & {maskA});
+	ch = ({table}2[(ch >> {shiftC})] << {shiftC2}) | (ch & {maskC});
 	return static_cast<{returnType}>({table}[ch]);
 }}""".format(**args)
 	return table, function
