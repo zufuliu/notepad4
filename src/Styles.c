@@ -2341,7 +2341,7 @@ BOOL Style_GetOpenDlgFilterStr(LPWSTR lpszFilter, int cchFilter) {
 // Style_StrGetFont()
 //
 BOOL Style_StrGetFont(LPCWSTR lpszStyle, LPWSTR lpszFont, int cchFont) {
-	WCHAR *p;
+	LPWSTR p;
 
 	if ((p = StrStr(lpszStyle, L"font:")) != NULL) {
 		p += CSTRLEN(L"font:");
@@ -2367,7 +2367,7 @@ BOOL Style_StrGetFont(LPCWSTR lpszStyle, LPWSTR lpszFont, int cchFont) {
 // Style_StrGetCharSet()
 //
 BOOL Style_StrGetCharSet(LPCWSTR lpszStyle, int *i) {
-	WCHAR *p;
+	LPCWSTR p;
 
 	if ((p = StrStr(lpszStyle, L"charset:")) != NULL) {
 		p += CSTRLEN(L"charset:");
@@ -2381,7 +2381,7 @@ BOOL Style_StrGetCharSet(LPCWSTR lpszStyle, int *i) {
 // Style_StrGetSize()
 //
 BOOL Style_StrGetFontSize(LPCWSTR lpszStyle, int *i) {
-	WCHAR *p;
+	LPCWSTR p;
 
 	if ((p = StrStr(lpszStyle, L"size:")) != NULL) {
 		p += CSTRLEN(L"size:");
@@ -2399,7 +2399,7 @@ BOOL Style_StrGetFontSize(LPCWSTR lpszStyle, int *i) {
 }
 
 BOOL Style_StrGetRawSize(LPCWSTR lpszStyle, int *i) {
-	WCHAR *p;
+	LPCWSTR p;
 
 	if ((p = StrStr(lpszStyle, L"size:")) != NULL) {
 		p += CSTRLEN(L"size:");
@@ -2409,16 +2409,17 @@ BOOL Style_StrGetRawSize(LPCWSTR lpszStyle, int *i) {
 }
 
 BOOL Style_StrGetFontWeight(LPCWSTR lpszStyle, int *i) {
-	WCHAR *p;
+	LPCWSTR p;
 
-	if ((p = StrStr(lpszStyle, L"weight:")) != NULL) {
-		p += CSTRLEN(L"weight:");
-		return CRTStrToInt(p, i) && (*i >= FW_DONTCARE);
-	}
 	if ((p = StrStr(lpszStyle, L"bold")) != NULL) {
 		*i = FW_BOLD;
 		return TRUE;
 	}
+	if ((p = StrStr(lpszStyle, L"weight:")) != NULL) {
+		p += CSTRLEN(L"weight:");
+		return CRTStrToInt(p, i) && (*i >= FW_DONTCARE);
+	}
+
 	return FALSE;
 }
 
@@ -2427,7 +2428,7 @@ BOOL Style_StrGetFontWeight(LPCWSTR lpszStyle, int *i) {
 // Style_StrGetValueStr()
 //
 BOOL Style_StrGetValueStr(LPCWSTR lpszStyle, LPCWSTR key, int keyLen, LPWSTR lpszValue, int cchValue) {
-	WCHAR *p;
+	LPWSTR p;
 
 	if ((p = StrStr(lpszStyle, key)) != NULL) {
 		p += keyLen;
@@ -2471,7 +2472,7 @@ static inline void Style_StrCopyWeightStr(LPWSTR szNewStyle, LPCWSTR lpszStyle, 
 // Style_StrGetColor()
 //
 BOOL Style_StrGetColor(BOOL bFore, LPCWSTR lpszStyle, int *rgb) {
-	WCHAR *p;
+	LPCWSTR p;
 
 	if ((p = StrStr(lpszStyle, (bFore ? L"fore:" : L"back:"))) != NULL) {
 		p += CSTRLEN("fore:");
@@ -2491,7 +2492,7 @@ BOOL Style_StrGetColor(BOOL bFore, LPCWSTR lpszStyle, int *rgb) {
 // Style_StrGetCase()
 //
 BOOL Style_StrGetCase(LPCWSTR lpszStyle, int *i) {
-	WCHAR *p;
+	LPCWSTR p;
 
 	if ((p = StrStr(lpszStyle, L"case:")) != NULL) {
 		p += CSTRLEN(L"case:");
@@ -2517,7 +2518,7 @@ BOOL Style_StrGetCase(LPCWSTR lpszStyle, int *i) {
 // Style_StrGetAlpha()
 //
 BOOL Style_StrGetAlpha(LPCWSTR lpszStyle, int *i) {
-	WCHAR *p;
+	LPCWSTR p;
 
 	if ((p = StrStr(lpszStyle, L"alpha:")) != NULL) {
 		p += CSTRLEN(L"alpha:");
