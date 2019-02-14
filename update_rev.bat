@@ -12,7 +12,7 @@ SET PATH=%MSYS%\bin;%PATH%
 FOR %%G IN (bash.exe) DO (SET FOUND=%%~$PATH:G)
 IF NOT DEFINED FOUND GOTO MissingVar
 
-bash.exe ./version.sh 1
+bash.exe ./version.sh %2
 
 
 :END
