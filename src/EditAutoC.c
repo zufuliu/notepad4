@@ -755,7 +755,7 @@ void EditCompleteWord(HWND hwnd, BOOL autoInsert) {
 				while (before >= iLineStartPos && IsASpaceOrTab(SciCall_GetCharAt(before))) {
 					--before;
 				}
-				if (before != iLineStartPos) {
+				if (before >= iLineStartPos) {
 					chPrev = '\0';
 				}
 			}
