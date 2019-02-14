@@ -2148,7 +2148,7 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	//EnableCmd(hmenu, IDM_LINEENDINGS_LF, !bReadOnly);
 	//EnableCmd(hmenu, IDM_LINEENDINGS_CR, !bReadOnly);
 
-	EnableCmd(hmenu, IDM_ENCODING_RECODE, i);
+	EnableCmd(hmenu, IDM_RECODE_SELECT, i);
 
 	if (mEncoding[iEncoding].uFlags & NCP_UNICODE_REVERSE) {
 		i = IDM_ENCODING_UNICODEREV;
@@ -2813,7 +2813,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	}
 	break;
 
-	case IDM_ENCODING_RECODE: {
+	case IDM_RECODE_SELECT: {
 		if (StrNotEmpty(szCurFile)) {
 			int iNewEncoding;
 			switch (iEncoding) {
