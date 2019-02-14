@@ -82,14 +82,16 @@ BEGIN
         MENUITEM "Save &Copy...\tCtrl+F6",      IDM_FILE_SAVECOPY
         MENUITEM SEPARATOR
         MENUITEM "&Read Only",                  IDM_FILE_READONLY
-        MENUITEM "Re&fresh\tF5",                IDM_FILE_REVERT
-        POPUP "&Reload"
+        MENUITEM "Re&vert\tF5",                 IDM_FILE_REVERT
+        POPUP "Reloa&d"
         BEGIN
             MENUITEM "As UFT-&8\tShift+F8",         CMD_RELOADANSIASUTF8
             MENUITEM "As &ANSI\tCtrl+Shift+A",      CMD_RELOADANSI
             MENUITEM "As &OEM\tCtrl+Shift+O",       CMD_RELOADOEM
             MENUITEM "&No FileVars\tAlt+F8",        CMD_RELOADNOFILEVARS
             MENUITEM "&Default\tCtrl+Alt+F",        CMD_RECODEDEFAULT
+            MENUITEM SEPARATOR
+            MENUITEM "&With Encoding...\tF8",       IDM_RECODE_SELECT
         END
         POPUP "&Launch"
         BEGIN
@@ -113,8 +115,6 @@ BEGIN
             MENUITEM "UTF-16 &BE BOM",              IDM_ENCODING_UNICODEREV
             MENUITEM "&More...\tF9",                IDM_ENCODING_SELECT
             MENUITEM SEPARATOR
-            MENUITEM "&Recode...\tF8",              IDM_ENCODING_RECODE
-            MENUITEM SEPARATOR
             MENUITEM "&Default...",                 IDM_ENCODING_SETDEFAULT
         END
         POPUP "Line Endin&gs"
@@ -132,7 +132,7 @@ BEGIN
         MENUITEM "Propert&ies...",              IDM_FILE_PROPERTIES
         MENUITEM "Create &Desktop Link",        IDM_FILE_CREATELINK
         MENUITEM SEPARATOR
-        MENUITEM "Browse...\tCtrl+M",           IDM_FILE_BROWSE
+        MENUITEM "&Browse...\tCtrl+M",          IDM_FILE_BROWSE
         POPUP "&Favorites"
         BEGIN
             MENUITEM "&Open Favorites...\tAlt+I",   IDM_FILE_OPENFAV
@@ -817,7 +817,7 @@ BEGIN
     VK_F6,          IDM_FILE_SAVECOPY,      VIRTKEY, CONTROL, NOINVERT
     VK_F7,          IDM_VIEW_SAVESETTINGSNOW, VIRTKEY, NOINVERT
     VK_F7,          CMD_OPENINIFILE,        VIRTKEY, CONTROL, NOINVERT
-    VK_F8,          IDM_ENCODING_RECODE,    VIRTKEY, NOINVERT
+    VK_F8,          IDM_RECODE_SELECT,    VIRTKEY, NOINVERT
     VK_F8,          IDM_EDIT_INSERT_ENCODING, VIRTKEY, CONTROL, NOINVERT
     VK_F8,          CMD_RELOADNOFILEVARS,   VIRTKEY, ALT, NOINVERT
     VK_F8,          CMD_RELOADANSIASUTF8,  VIRTKEY, SHIFT, NOINVERT
