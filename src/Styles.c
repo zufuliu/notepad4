@@ -571,7 +571,7 @@ BOOL Style_Import(HWND hwnd) {
 	ofn.lpstrDefExt	= L"ini";
 	ofn.nMaxFile	= COUNTOF(szFile);
 	ofn.Flags		= OFN_FILEMUSTEXIST | OFN_HIDEREADONLY | OFN_NOCHANGEDIR | OFN_DONTADDTORECENT
-					  | OFN_PATHMUSTEXIST | OFN_SHAREAWARE /*| OFN_NODEREFERENCELINKS*/;
+					  | OFN_PATHMUSTEXIST | OFN_SHAREAWARE /*| OFN_NODEREFERENCELINKS*/ | OFN_NOVALIDATE;
 
 	if (GetOpenFileName(&ofn)) {
 		IniSection section;
@@ -837,9 +837,9 @@ static inline void Style_SetDefaultStyle(HWND hwnd, int index) {
 static inline BOOL Style_StrGetAttributeEx(LPCWSTR lpszStyle, LPCWSTR key, int keyLen) {
 	LPCWSTR p = StrStr(lpszStyle, key);
 	if (p != NULL) {
-		const WCHAR ch1 = (p == lpszStyle) ? L'\0' : p[-1];
+		const WCHAR ch1 = (p == lpszStyle) ? L' ' : p[-1];
 		const WCHAR ch2 = p[keyLen];
-		return (ch1 == L'\0' || ch1 == L' ' || ch1 == L';') && (ch2 == L'\0' || ch2 == L' ' || ch2 == L';');
+		return (ch1 == L' ' || ch1 == L';') && (ch2 == L'\0' || ch2 == L' ' || ch2 == L';');
 	}
 	return FALSE;
 }

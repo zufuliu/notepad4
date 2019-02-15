@@ -7202,7 +7202,7 @@ BOOL OpenFileDlg(HWND hwnd, LPWSTR lpstrFile, int cchFile, LPCWSTR lpstrInitialD
 	ofn.nMaxFile = COUNTOF(szFile);
 	ofn.Flags = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY | /* OFN_NOCHANGEDIR |*/
 				OFN_DONTADDTORECENT | OFN_PATHMUSTEXIST |
-				OFN_SHAREAWARE /*| OFN_NODEREFERENCELINKS*/;
+				OFN_SHAREAWARE /*| OFN_NODEREFERENCELINKS*/ | OFN_NOVALIDATE;
 	ofn.lpstrDefExt = StrNotEmpty(tchDefaultExtension) ? tchDefaultExtension : NULL;
 
 	const BOOL success = GetOpenFileName(&ofn);
