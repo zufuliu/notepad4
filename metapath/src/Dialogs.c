@@ -240,7 +240,7 @@ INT_PTR CALLBACK RunDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) 
 			ofn.nMaxFile = COUNTOF(szFile);
 			ofn.lpstrTitle = szTitle;
 			ofn.Flags = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY | OFN_NOCHANGEDIR | OFN_DONTADDTORECENT
-						| OFN_PATHMUSTEXIST | OFN_SHAREAWARE | OFN_NODEREFERENCELINKS;
+						| OFN_PATHMUSTEXIST | OFN_SHAREAWARE | OFN_NODEREFERENCELINKS | OFN_NOVALIDATE;
 
 			if (GetOpenFileName(&ofn)) {
 				QuotateFilenameStr(szFile);
@@ -937,7 +937,7 @@ static INT_PTR CALLBACK ProgPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM
 			ofn.nMaxFile = COUNTOF(szFile);
 			ofn.lpstrTitle = szTitle;
 			ofn.Flags = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY | OFN_NOCHANGEDIR | OFN_DONTADDTORECENT
-						| OFN_PATHMUSTEXIST | OFN_SHAREAWARE | OFN_NODEREFERENCELINKS;
+						| OFN_PATHMUSTEXIST | OFN_SHAREAWARE | OFN_NODEREFERENCELINKS | OFN_NOVALIDATE;
 
 			if (GetOpenFileName(&ofn)) {
 				lstrcpyn(tchBuf, szFile, COUNTOF(tchBuf));
@@ -2178,7 +2178,7 @@ INT_PTR CALLBACK FindTargetDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 			ofn.nMaxFile    = COUNTOF(szFile);
 			ofn.lpstrTitle  = szTitle;
 			ofn.Flags       = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY | OFN_NOCHANGEDIR |
-							  OFN_PATHMUSTEXIST | OFN_SHAREAWARE | OFN_NODEREFERENCELINKS;
+							  OFN_PATHMUSTEXIST | OFN_SHAREAWARE | OFN_NODEREFERENCELINKS | OFN_NOVALIDATE;
 
 			// execute file open dlg
 			if (GetOpenFileName(&ofn)) {
