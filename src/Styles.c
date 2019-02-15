@@ -834,6 +834,23 @@ static inline void Style_SetDefaultStyle(HWND hwnd, int index) {
 	Style_SetStyles(hwnd, lexDefault.Styles[index].iStyle, lexDefault.Styles[index].szValue);
 }
 
+static inline BOOL Style_StrGetAttributeEx(LPCWSTR lpszStyle, LPCWSTR key, int keyLen) {
+	LPCWSTR p = StrStr(lpszStyle, key);
+	if (p != NULL) {
+		const WCHAR ch1 = (p == lpszStyle) ? L'\0' : p[-1];
+		const WCHAR ch2 = p[keyLen];
+		return (ch1 == L'\0' || ch1 == L' ' || ch1 == L';') && (ch2 == L'\0' || ch2 == L' ' || ch2 == L';');
+	}
+	return FALSE;
+}
+
+#define Style_StrGetAttribute(lpszStyle, name)	Style_StrGetAttributeEx((lpszStyle), (name), CSTRLEN(name))
+#define Style_StrGetBold(lpszStyle)				Style_StrGetAttribute((lpszStyle), L"bold")
+#define Style_StrGetItalic(lpszStyle)			Style_StrGetAttribute((lpszStyle), L"italic")
+#define Style_StrGetUnderline(lpszStyle)		Style_StrGetAttribute((lpszStyle), L"underline")
+#define Style_StrGetStrike(lpszStyle)			Style_StrGetAttribute((lpszStyle), L"strike")
+#define Style_StrGetEOLFilled(lpszStyle)		Style_StrGetAttribute((lpszStyle), L"eolfilled")
+
 //=============================================================================
 // set current lexer
 // Style_SetLexer()
@@ -981,7 +998,7 @@ void Style_SetLexer(HWND hwnd, PEDITLEXER pLexNew) {
 	SendMessage(hwnd, SCI_SETSELALPHA, iValue, 0);
 	SendMessage(hwnd, SCI_SETADDITIONALSELALPHA, iValue, 0);
 
-	SendMessage(hwnd, SCI_SETSELEOLFILLED, (StrStr(szValue, L"eolfilled") != NULL), 0);
+	SendMessage(hwnd, SCI_SETSELEOLFILLED, Style_StrGetEOLFilled(szValue), 0);
 	//! end Style_Selection
 
 	//! begin Style_Whitespace
@@ -2411,7 +2428,7 @@ BOOL Style_StrGetRawSize(LPCWSTR lpszStyle, int *i) {
 BOOL Style_StrGetFontWeight(LPCWSTR lpszStyle, int *i) {
 	LPCWSTR p;
 
-	if ((p = StrStr(lpszStyle, L"bold")) != NULL) {
+	if (Style_StrGetBold(lpszStyle)) {
 		*i = FW_BOLD;
 		return TRUE;
 	}
@@ -2563,9 +2580,9 @@ BOOL Style_SelectFont(HWND hwnd, LPWSTR lpszStyle, int cchStyle, BOOL bDefaultSt
 		iValue = FW_NORMAL;
 	}
 	lf.lfWeight = iValue;
-	lf.lfItalic = StrStr(lpszStyle, L"italic") != NULL;
-	lf.lfUnderline = StrStr(lpszStyle, L"underline") != NULL;
-	lf.lfStrikeOut = StrStr(lpszStyle, L"strike") != NULL;
+	lf.lfItalic = Style_StrGetItalic(lpszStyle) ? TRUE : FALSE;
+	lf.lfUnderline = Style_StrGetUnderline(lpszStyle) ? TRUE : FALSE;
+	lf.lfStrikeOut = Style_StrGetStrike(lpszStyle) ? TRUE : FALSE;
 
 	// Init cf
 	cf.lStructSize = sizeof(CHOOSEFONT);
@@ -2616,11 +2633,11 @@ BOOL Style_SelectFont(HWND hwnd, LPWSTR lpszStyle, int cchStyle, BOOL bDefaultSt
 		lstrcat(szNewStyle, L"; italic");
 	}
 
-	if (lf.lfUnderline /*StrStr(lpszStyle, L"underline")*/) {
+	if (lf.lfUnderline) {
 		lstrcat(szNewStyle, L"; underline");
 	}
 
-	if (lf.lfStrikeOut /*StrStr(lpszStyle, L"strike")*/) {
+	if (lf.lfStrikeOut) {
 		lstrcat(szNewStyle, L"; strike");
 	}
 
@@ -2640,7 +2657,7 @@ BOOL Style_SelectFont(HWND hwnd, LPWSTR lpszStyle, int cchStyle, BOOL bDefaultSt
 		lstrcat(szNewStyle, tch);
 	}
 
-	if (StrStr(lpszStyle, L"eolfilled")) {
+	if (Style_StrGetEOLFilled(lpszStyle)) {
 		lstrcat(szNewStyle, L"; eolfilled");
 	}
 
@@ -2710,25 +2727,25 @@ BOOL Style_SelectColor(HWND hwnd, BOOL bFore, LPWSTR lpszStyle, int cchStyle) {
 	Style_StrCopySizeStr(szNewStyle, lpszStyle, tch, COUNTOF(tch));
 	Style_StrCopyWeightStr(szNewStyle, lpszStyle, tch, COUNTOF(tch));
 
-	if (StrStr(lpszStyle, L"bold")) {
+	if (Style_StrGetBold(lpszStyle)) {
 		if (StrNotEmpty(szNewStyle)) {
 			lstrcat(szNewStyle, L"; ");
 		}
 		lstrcat(szNewStyle, L"bold");
 	}
-	if (StrStr(lpszStyle, L"italic")) {
+	if (Style_StrGetItalic(lpszStyle)) {
 		if (StrNotEmpty(szNewStyle)) {
 			lstrcat(szNewStyle, L"; ");
 		}
 		lstrcat(szNewStyle, L"italic");
 	}
-	if (StrStr(lpszStyle, L"underline")) {
+	if (Style_StrGetUnderline(lpszStyle)) {
 		if (StrNotEmpty(szNewStyle)) {
 			lstrcat(szNewStyle, L"; ");
 		}
 		lstrcat(szNewStyle, L"underline");
 	}
-	if (StrStr(lpszStyle, L"strike")) {
+	if (Style_StrGetStrike(lpszStyle)) {
 		if (StrNotEmpty(szNewStyle)) {
 			lstrcat(szNewStyle, L"; ");
 		}
@@ -2769,7 +2786,7 @@ BOOL Style_SelectColor(HWND hwnd, BOOL bFore, LPWSTR lpszStyle, int cchStyle) {
 		lstrcat(szNewStyle, tch);
 	}
 
-	if (StrStr(lpszStyle, L"eolfilled")) {
+	if (Style_StrGetEOLFilled(lpszStyle)) {
 		lstrcat(szNewStyle, L"; eolfilled");
 	}
 
@@ -2825,19 +2842,19 @@ void Style_SetStyles(HWND hwnd, int iStyle, LPCWSTR lpszStyle) {
 	}
 
 	// Italic
-	if (StrStr(lpszStyle, L"italic") != NULL) {
+	if (Style_StrGetItalic(lpszStyle)) {
 		SendMessage(hwnd, SCI_STYLESETITALIC, iStyle, TRUE);
 	}
 	// Underline
-	if (StrStr(lpszStyle, L"underline") != NULL) {
+	if (Style_StrGetUnderline(lpszStyle)) {
 		SendMessage(hwnd, SCI_STYLESETUNDERLINE, iStyle, TRUE);
 	}
 	// Strike
-	if (StrStr(lpszStyle, L"strike") != NULL) {
+	if (Style_StrGetStrike(lpszStyle)) {
 		SendMessage(hwnd, SCI_STYLESETSTRIKE, iStyle, TRUE);
 	}
 	// EOL Filled
-	if (StrStr(lpszStyle, L"eolfilled") != NULL) {
+	if (Style_StrGetEOLFilled(lpszStyle)) {
 		SendMessage(hwnd, SCI_STYLESETEOLFILLED, iStyle, TRUE);
 	}
 
@@ -2887,13 +2904,13 @@ static void Style_Parse(struct DetailStyle *style, LPCWSTR lpszStyle) {
 	}
 
 	// Italic
-	style->italic = StrStr(lpszStyle, L"italic") != NULL;
+	style->italic = Style_StrGetItalic(lpszStyle);
 	// Underline
-	style->underline = StrStr(lpszStyle, L"underline") != NULL;
+	style->underline = Style_StrGetUnderline(lpszStyle);
 	// Strike
-	style->strike = StrStr(lpszStyle, L"strike") != NULL;
+	style->strike = Style_StrGetStrike(lpszStyle);
 	// EOL Filled
-	style->eolFilled = StrStr(lpszStyle, L"eolfilled") != NULL;
+	style->eolFilled = Style_StrGetEOLFilled(lpszStyle);
 
 	// Case
 	if (Style_StrGetCase(lpszStyle, &iValue)) {
@@ -3273,10 +3290,10 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 						//EnableWindow(GetDlgItem(hwnd, IDC_STYLEITALIC), TRUE);
 						//EnableWindow(GetDlgItem(hwnd, IDC_STYLEUNDERLINE), TRUE);
 						//EnableWindow(GetDlgItem(hwnd, IDC_STYLEEOLFILLED), TRUE);
-						//CheckDlgButton(hwnd, IDC_STYLEBOLD, Style_StrGetAttribute(pCurrentStyle->szValue, L"bold") ? BST_CHECKED : BST_UNCHECKED));
-						//CheckDlgButton(hwnd, IDC_STYLEITALIC, Style_StrGetAttribute(pCurrentStyle->szValue, L"italic") ? BST_CHECKED : BST_UNCHECKED);
-						//CheckDlgButton(hwnd, IDC_STYLEUNDERLINE, Style_StrGetAttribute(pCurrentStyle->szValue, L"underline") ? BST_CHECKED : BST_UNCHECKED);
-						//CheckDlgButton(hwnd, IDC_STYLEEOLFILLED, Style_StrGetAttribute(pCurrentStyle->szValue, L"eolfilled") ? BST_CHECKED : BST_UNCHECKED);
+						//CheckDlgButton(hwnd, IDC_STYLEBOLD, Style_StrGetBold(pCurrentStyle->szValue) ? BST_CHECKED : BST_UNCHECKED));
+						//CheckDlgButton(hwnd, IDC_STYLEITALIC, Style_StrGetItalic(pCurrentStyle->szValue) ? BST_CHECKED : BST_UNCHECKED);
+						//CheckDlgButton(hwnd, IDC_STYLEUNDERLINE, Style_StrGetUnderline(pCurrentStyle->szValue) ? BST_CHECKED : BST_UNCHECKED);
+						//CheckDlgButton(hwnd, IDC_STYLEEOLFILLED, Style_StrGetEOLFilled(pCurrentStyle->szValue) ? BST_CHECKED : BST_UNCHECKED);
 						SetDlgItemText(hwnd, IDC_STYLEEDIT, pCurrentStyle->szValue);
 						SetDlgItemText(hwnd, IDC_STYLEVALUE_DEFAULT, pCurrentStyle->pszDefault);
 					} else {
@@ -3369,10 +3386,10 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 				if (pCurrentStyle) {
 					lstrcpy(pCurrentStyle->szValue, tchCopy);
 					SetDlgItemText(hwnd, IDC_STYLEEDIT, tchCopy);
-					//CheckDlgButton(hwnd, IDC_STYLEBOLD, Style_StrGetAttribute(tchCopy, L"bold") ? BST_CHECKED : BST_UNCHECKED);
-					//CheckDlgButton(hwnd, IDC_STYLEITALIC, Style_StrGetAttribute(tchCopy, L"italic") ? BST_CHECKED : BST_UNCHECKED);
-					//CheckDlgButton(hwnd, IDC_STYLEUNDERLINE, Style_StrGetAttribute(tchCopy, L"underline") ? BST_CHECKED : BST_UNCHECKED);
-					//CheckDlgButton(hwnd, IDC_STYLEEOLFILLED, Style_StrGetAttribute(tchCopy, L"eolfilled") ? BST_CHECKED : BST_UNCHECKED);
+					//CheckDlgButton(hwnd, IDC_STYLEBOLD, Style_StrGetBold(tchCopy) ? BST_CHECKED : BST_UNCHECKED);
+					//CheckDlgButton(hwnd, IDC_STYLEITALIC, Style_StrGetItalic(tchCopy) ? BST_CHECKED : BST_UNCHECKED);
+					//CheckDlgButton(hwnd, IDC_STYLEUNDERLINE, Style_StrGetUnderline(tchCopy) ? BST_CHECKED : BST_UNCHECKED);
+					//CheckDlgButton(hwnd, IDC_STYLEEOLFILLED, Style_StrGetEOLFilled(tchCopy) ? BST_CHECKED : BST_UNCHECKED);
 				}
 			}
 			ReleaseCapture();
@@ -3419,10 +3436,10 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 									 StrEqual(pCurrentStyle->pszName, L"Default Style") ||
 									 StrEqual(pCurrentStyle->pszName, L"2nd Default Style"))) {
 					SetDlgItemText(hwnd, IDC_STYLEEDIT, tch);
-					//CheckDlgButton(hwnd, IDC_STYLEBOLD, (Style_StrGetAttribute(tch, L"bold") ? BST_CHECKED : BST_UNCHECKED));
-					//CheckDlgButton(hwnd, IDC_STYLEITALIC, (Style_StrGetAttribute(tch, L"italic") ? BST_CHECKED : BST_UNCHECKED));
-					//CheckDlgButton(hwnd, IDC_STYLEUNDERLINE, (Style_StrGetAttribute(tch, L"underline") ? BST_CHECKED : BST_UNCHECKED));
-					//CheckDlgButton(hwnd, IDC_STYLEEOLFILLED, (Style_StrGetAttribute(tch, L"eolfilled") ? BST_CHECKED : BST_UNCHECKED));
+					//CheckDlgButton(hwnd, IDC_STYLEBOLD, (Style_StrGetBold(tch) ? BST_CHECKED : BST_UNCHECKED));
+					//CheckDlgButton(hwnd, IDC_STYLEITALIC, (Style_StrGetItalic(tch) ? BST_CHECKED : BST_UNCHECKED));
+					//CheckDlgButton(hwnd, IDC_STYLEUNDERLINE, (Style_StrGetUnderline(tch) ? BST_CHECKED : BST_UNCHECKED));
+					//CheckDlgButton(hwnd, IDC_STYLEEOLFILLED, (Style_StrGetEOLFilled(tch) ? BST_CHECKED : BST_UNCHECKED));
 				}
 			}
 			PostMessage(hwnd, WM_NEXTDLGCTL, (WPARAM)(GetDlgItem(hwnd, IDC_STYLEEDIT)), 1);
@@ -3434,10 +3451,10 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 				GetDlgItemText(hwnd, IDC_STYLEEDIT, tch, COUNTOF(tch));
 				if (Style_SelectColor(hwnd, TRUE, tch, COUNTOF(tch))) {
 					SetDlgItemText(hwnd, IDC_STYLEEDIT, tch);
-					//CheckDlgButton(hwnd, IDC_STYLEBOLD, (Style_StrGetAttribute(tch, L"bold") ? BST_CHECKED : BST_UNCHECKED));
-					//CheckDlgButton(hwnd, IDC_STYLEITALIC, (Style_StrGetAttribute(tch, L"italic") ? BST_CHECKED : BST_UNCHECKED));
-					//CheckDlgButton(hwnd, IDC_STYLEUNDERLINE, (Style_StrGetAttribute(tch, L"underline") ? BST_CHECKED : BST_UNCHECKED));
-					//CheckDlgButton(hwnd, IDC_STYLEEOLFILLED, (Style_StrGetAttribute(tch, L"eolfilled") ? BST_CHECKED : BST_UNCHECKED));
+					//CheckDlgButton(hwnd, IDC_STYLEBOLD, (Style_StrGetBold(tch) ? BST_CHECKED : BST_UNCHECKED));
+					//CheckDlgButton(hwnd, IDC_STYLEITALIC, (Style_StrGetItalic(tch) ? BST_CHECKED : BST_UNCHECKED));
+					//CheckDlgButton(hwnd, IDC_STYLEUNDERLINE, (Style_StrGetUnderline(tch) ? BST_CHECKED : BST_UNCHECKED));
+					//CheckDlgButton(hwnd, IDC_STYLEEOLFILLED, (Style_StrGetEOLFilled(tch) ? BST_CHECKED : BST_UNCHECKED));
 				}
 			}
 			PostMessage(hwnd, WM_NEXTDLGCTL, (WPARAM)(GetDlgItem(hwnd, IDC_STYLEEDIT)), 1);
@@ -3449,10 +3466,10 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 				GetDlgItemText(hwnd, IDC_STYLEEDIT, tch, COUNTOF(tch));
 				if (Style_SelectColor(hwnd, FALSE, tch, COUNTOF(tch))) {
 					SetDlgItemText(hwnd, IDC_STYLEEDIT, tch);
-					//CheckDlgButton(hwnd, IDC_STYLEBOLD, (Style_StrGetAttribute(tch, L"bold") ? BST_CHECKED : BST_UNCHECKED));
-					//CheckDlgButton(hwnd, IDC_STYLEITALIC, (Style_StrGetAttribute(tch, L"italic") ? BST_CHECKED : BST_UNCHECKED));
-					//CheckDlgButton(hwnd, IDC_STYLEUNDERLINE, (Style_StrGetAttribute(tch, L"underline") ? BST_CHECKED : BST_UNCHECKED));
-					//CheckDlgButton(hwnd, IDC_STYLEEOLFILLED, (Style_StrGetAttribute(tch, L"eolfilled") ? BST_CHECKED : BST_UNCHECKED));
+					//CheckDlgButton(hwnd, IDC_STYLEBOLD, (Style_StrGetBold(tch) ? BST_CHECKED : BST_UNCHECKED));
+					//CheckDlgButton(hwnd, IDC_STYLEITALIC, (Style_StrGetItalic(tch) ? BST_CHECKED : BST_UNCHECKED));
+					//CheckDlgButton(hwnd, IDC_STYLEUNDERLINE, (Style_StrGetUnderline(tch) ? BST_CHECKED : BST_UNCHECKED));
+					//CheckDlgButton(hwnd, IDC_STYLEEOLFILLED, (Style_StrGetEOLFilled(tch) ? BST_CHECKED : BST_UNCHECKED));
 				}
 			}
 			PostMessage(hwnd, WM_NEXTDLGCTL, (WPARAM)(GetDlgItem(hwnd, IDC_STYLEEDIT)), 1);
@@ -3468,10 +3485,10 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 			if (pCurrentStyle) {
 				lstrcpy(pCurrentStyle->szValue, pCurrentStyle->pszDefault);
 				SetDlgItemText(hwnd, IDC_STYLEEDIT, pCurrentStyle->szValue);
-				//CheckDlgButton(hwnd, IDC_STYLEBOLD, (Style_StrGetAttribute(pCurrentStyle->szValue, L"bold") ? BST_CHECKED : BST_UNCHECKED));
-				//CheckDlgButton(hwnd, IDC_STYLEITALIC, (Style_StrGetAttribute(pCurrentStyle->szValue, L"italic") ? BST_CHECKED : BST_UNCHECKED));
-				//CheckDlgButton(hwnd, IDC_STYLEUNDERLINE, (Style_StrGetAttribute(pCurrentStyle->szValue, L"underline") ? BST_CHECKED : BST_UNCHECKED));
-				//CheckDlgButton(hwnd, IDC_STYLEEOLFILLED, (Style_StrGetAttribute(pCurrentStyle->szValue, L"eolfilled") ? BST_CHECKED : BST_UNCHECKED));
+				//CheckDlgButton(hwnd, IDC_STYLEBOLD, (Style_StrGetBold(pCurrentStyle->szValue) ? BST_CHECKED : BST_UNCHECKED));
+				//CheckDlgButton(hwnd, IDC_STYLEITALIC, (Style_StrGetItalic(pCurrentStyle->szValue) ? BST_CHECKED : BST_UNCHECKED));
+				//CheckDlgButton(hwnd, IDC_STYLEUNDERLINE, (Style_StrGetUnderline(pCurrentStyle->szValue) ? BST_CHECKED : BST_UNCHECKED));
+				//CheckDlgButton(hwnd, IDC_STYLEEOLFILLED, (Style_StrGetEOLFilled(pCurrentStyle->szValue) ? BST_CHECKED : BST_UNCHECKED));
 			} else if (pCurrentLexer) {
 				lstrcpy(pCurrentLexer->szExtensions, pCurrentLexer->pszDefExt);
 				SetDlgItemText(hwnd, IDC_STYLEEDIT, pCurrentLexer->szExtensions);
