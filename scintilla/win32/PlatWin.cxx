@@ -286,12 +286,17 @@ int HashFont(const FontParameters &fp) noexcept {
 		fp.faceName[0];
 }
 
-void GetFontFamilyName(const LOGFONTW &lf, const FontParameters &fp, WCHAR wszFace[], int faceSize) {
-	if (fp.weight != FW_NORMAL && fp.weight != FW_BOLD && gdiInterop) {
+void GetDWriteFontMetrics(const LOGFONTW &lf, const FontParameters &fp, WCHAR wszFace[], int faceSize,
+	DWRITE_FONT_WEIGHT &weight, DWRITE_FONT_STYLE &style, DWRITE_FONT_STRETCH &stretch) {
+	if (gdiInterop) {
 		bool success = false;
 		IDWriteFont *font = nullptr;
 		HRESULT hr = gdiInterop->CreateFontFromLOGFONT(&lf, &font);
 		if (SUCCEEDED(hr)) {
+			weight = font->GetWeight();
+			style = font->GetStyle();
+			stretch = font->GetStretch();
+
 			IDWriteFontFamily *family = nullptr;
 			hr = font->GetFontFamily(&family);
 			if (SUCCEEDED(hr)) {
@@ -368,13 +373,13 @@ FontCached::FontCached(const FontParameters &fp) :
 		IDWriteTextFormat *pTextFormat = nullptr;
 		const int faceSize = 200;
 		WCHAR wszFace[faceSize] = L"";
-		GetFontFamilyName(lf, fp, wszFace, faceSize);
 		const FLOAT fHeight = fp.size;
-		const DWRITE_FONT_STYLE style = fp.italic ? DWRITE_FONT_STYLE_ITALIC : DWRITE_FONT_STYLE_NORMAL;
+		DWRITE_FONT_WEIGHT weight = static_cast<DWRITE_FONT_WEIGHT>(fp.weight);
+		DWRITE_FONT_STYLE style = fp.italic ? DWRITE_FONT_STYLE_ITALIC : DWRITE_FONT_STYLE_NORMAL;
+		DWRITE_FONT_STRETCH stretch = DWRITE_FONT_STRETCH_NORMAL;
+		GetDWriteFontMetrics(lf, fp, wszFace, faceSize, weight, style, stretch);
 		HRESULT hr = pIDWriteFactory->CreateTextFormat(wszFace, nullptr,
-			static_cast<DWRITE_FONT_WEIGHT>(fp.weight),
-			style,
-			DWRITE_FONT_STRETCH_NORMAL, fHeight, L"", &pTextFormat);
+			weight, style, stretch, fHeight, L"", &pTextFormat);
 		if (SUCCEEDED(hr)) {
 			pTextFormat->SetWordWrapping(DWRITE_WORD_WRAPPING_NO_WRAP);
 
