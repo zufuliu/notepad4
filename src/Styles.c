@@ -2425,6 +2425,10 @@ BOOL Style_StrGetRawSize(LPCWSTR lpszStyle, int *i) {
 	return FALSE;
 }
 
+// https://docs.microsoft.com/en-us/windows/desktop/api/wingdi/ns-wingdi-taglogfontw
+// https://docs.microsoft.com/en-us/windows/desktop/api/dwrite/ne-dwrite-dwrite_font_weight
+#define MIN_FONT_WEIGHT		0
+#define MAX_FONT_WEIGHT		1000
 BOOL Style_StrGetFontWeight(LPCWSTR lpszStyle, int *i) {
 	LPCWSTR p;
 
@@ -2434,7 +2438,7 @@ BOOL Style_StrGetFontWeight(LPCWSTR lpszStyle, int *i) {
 	}
 	if ((p = StrStr(lpszStyle, L"weight:")) != NULL) {
 		p += CSTRLEN(L"weight:");
-		return CRTStrToInt(p, i) && (*i >= FW_DONTCARE);
+		return CRTStrToInt(p, i) && (*i > MIN_FONT_WEIGHT && *i < MAX_FONT_WEIGHT);
 	}
 
 	return FALSE;
