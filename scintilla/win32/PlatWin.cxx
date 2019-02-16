@@ -75,6 +75,7 @@ IDWriteFactory *pIDWriteFactory = nullptr;
 ID2D1Factory *pD2DFactory = nullptr;
 IDWriteRenderingParams *defaultRenderingParams = nullptr;
 IDWriteRenderingParams *customClearTypeRenderingParams = nullptr;
+IDWriteGdiInterop *gdiInterop = nullptr;
 
 static HMODULE hDLLD2D {};
 static HMODULE hDLLDWrite {};
@@ -128,6 +129,8 @@ bool LoadD2D() noexcept {
 						defaultRenderingParams->GetPixelGeometry(), defaultRenderingParams->GetRenderingMode(), &customClearTypeRenderingParams);
 				}
 			}
+
+			pIDWriteFactory->GetGdiInterop(&gdiInterop);
 		}
 
 	}
@@ -138,6 +141,7 @@ bool LoadD2D() noexcept {
 
 struct FormatAndMetrics {
 	int technology;
+	const LOGFONTW *plf;
 	HFONT hfont;
 #if defined(USE_D2D)
 	IDWriteTextFormat *pTextFormat;
@@ -147,20 +151,21 @@ struct FormatAndMetrics {
 	FLOAT yAscent;
 	FLOAT yDescent;
 	FLOAT yInternalLeading;
-	FormatAndMetrics(HFONT hfont_, int extraFontFlag_, int characterSet_) noexcept :
-		technology(SCWIN_TECH_GDI), hfont(hfont_),
+	FormatAndMetrics(const LOGFONTW *plf_, HFONT hfont_, int extraFontFlag_, int characterSet_) noexcept :
+		technology(SCWIN_TECH_GDI), plf(plf_), hfont(hfont_),
 #if defined(USE_D2D)
 		pTextFormat(nullptr),
 #endif
 		extraFontFlag(extraFontFlag_), characterSet(characterSet_), yAscent(2), yDescent(1), yInternalLeading(0) {}
 #if defined(USE_D2D)
-	FormatAndMetrics(IDWriteTextFormat *pTextFormat_,
+	FormatAndMetrics(const LOGFONTW *plf_, IDWriteTextFormat *pTextFormat_,
 		int extraFontFlag_,
 		int characterSet_,
 		FLOAT yAscent_,
 		FLOAT yDescent_,
 		FLOAT yInternalLeading_) noexcept :
 		technology(SCWIN_TECH_DIRECTWRITE),
+		plf(plf_),
 		hfont{},
 		pTextFormat(pTextFormat_),
 		extraFontFlag(extraFontFlag_),
@@ -192,27 +197,7 @@ struct FormatAndMetrics {
 };
 
 HFONT FormatAndMetrics::HFont() const noexcept {
-	LOGFONTW lf = {};
-#if defined(USE_D2D)
-	if (technology == SCWIN_TECH_GDI) {
-		if (0 == ::GetObjectW(hfont, sizeof(lf), &lf)) {
-			return nullptr;
-		}
-	} else {
-		const HRESULT hr = pTextFormat->GetFontFamilyName(lf.lfFaceName, LF_FACESIZE);
-		if (!SUCCEEDED(hr)) {
-			return nullptr;
-		}
-		lf.lfWeight = pTextFormat->GetFontWeight();
-		lf.lfItalic = pTextFormat->GetFontStyle() == DWRITE_FONT_STYLE_ITALIC;
-		lf.lfHeight = -static_cast<int>(pTextFormat->GetFontSize());
-	}
-#else
-	if (0 == ::GetObjectW(hfont, sizeof(lf), &lf)) {
-		return nullptr;
-	}
-#endif
-	return ::CreateFontIndirectW(&lf);
+	return ::CreateFontIndirectW(plf);
 }
 
 #ifndef CLEARTYPE_QUALITY
@@ -301,6 +286,52 @@ int HashFont(const FontParameters &fp) noexcept {
 		fp.faceName[0];
 }
 
+void GetFontFamilyName(const LOGFONTW &lf, const FontParameters &fp, WCHAR wszFace[], int faceSize) {
+	if (fp.weight != FW_NORMAL && fp.weight != FW_BOLD && gdiInterop) {
+		bool success = false;
+		IDWriteFont *font = nullptr;
+		HRESULT hr = gdiInterop->CreateFontFromLOGFONT(&lf, &font);
+		if (SUCCEEDED(hr)) {
+			IDWriteFontFamily *family = nullptr;
+			hr = font->GetFontFamily(&family);
+			if (SUCCEEDED(hr)) {
+				IDWriteLocalizedStrings *names = nullptr;
+				hr = family->GetFamilyNames(&names);
+				if (SUCCEEDED(hr)) {
+					UINT32 index = 0;
+					BOOL exists = false;
+					names->FindLocaleName(L"en-us", &index, &exists);
+					if (!exists) {
+						index = 0;
+					}
+
+					UINT32 length = 0;
+					names->GetStringLength(index, &length);
+
+					std::vector<WCHAR> name(length + 1);
+					names->GetString(index, name.data(), length + 1);
+
+					lstrcpyn(wszFace, name.data(), faceSize);
+					success = *wszFace != L'\0';
+				}
+				if (names) {
+					names->Release();
+				}
+			}
+			if (family) {
+				family->Release();
+			}
+		}
+		if (font) {
+			font->Release();
+		}
+		if (success) {
+			return;
+		}
+	}
+	UTF16FromUTF8(fp.faceName, wszFace, faceSize);
+}
+
 }
 
 class FontCached : Font {
@@ -331,13 +362,13 @@ FontCached::FontCached(const FontParameters &fp) :
 	fid = nullptr;
 	if (technology == SCWIN_TECH_GDI) {
 		HFONT hfont = ::CreateFontIndirectW(&lf);
-		fid = new FormatAndMetrics(hfont, fp.extraFontFlag, fp.characterSet);
+		fid = new FormatAndMetrics(&lf, hfont, fp.extraFontFlag, fp.characterSet);
 	} else {
 #if defined(USE_D2D)
 		IDWriteTextFormat *pTextFormat = nullptr;
 		const int faceSize = 200;
 		WCHAR wszFace[faceSize] = L"";
-		UTF16FromUTF8(fp.faceName, wszFace, faceSize);
+		GetFontFamilyName(lf, fp, wszFace, faceSize);
 		const FLOAT fHeight = fp.size;
 		const DWRITE_FONT_STYLE style = fp.italic ? DWRITE_FONT_STYLE_ITALIC : DWRITE_FONT_STYLE_NORMAL;
 		HRESULT hr = pIDWriteFactory->CreateTextFormat(wszFace, nullptr,
@@ -371,7 +402,7 @@ FontCached::FontCached(const FontParameters &fp) :
 				pTextLayout->Release();
 				pTextFormat->SetLineSpacing(DWRITE_LINE_SPACING_METHOD_UNIFORM, lineMetrics[0].height, lineMetrics[0].baseline);
 			}
-			fid = new FormatAndMetrics(pTextFormat, fp.extraFontFlag, fp.characterSet, yAscent, yDescent, yInternalLeading);
+			fid = new FormatAndMetrics(&lf, pTextFormat, fp.extraFontFlag, fp.characterSet, yAscent, yDescent, yInternalLeading);
 		}
 #endif
 	}
@@ -3430,6 +3461,10 @@ void Platform_Finalise(bool fromDllMain) noexcept {
 		if (customClearTypeRenderingParams) {
 			customClearTypeRenderingParams->Release();
 			customClearTypeRenderingParams = nullptr;
+		}
+		if (gdiInterop) {
+			gdiInterop->Release();
+			gdiInterop = nullptr;
 		}
 		if (pIDWriteFactory) {
 			pIDWriteFactory->Release();
