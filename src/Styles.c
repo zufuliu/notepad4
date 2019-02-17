@@ -325,8 +325,42 @@ enum DefaultStyleIndex {
 	Style_MaxDefaultStyle,	// 2nd global default style.
 };
 
+// style UI controls on Customize Schemes dialog
+enum {
+	StyleControl_None = 0,
+	StyleControl_Font = 1,
+	StyleControl_Fore = 2,
+	StyleControl_Back = 4,
+	StyleControl_EOLFilled = 8,
+	StyleControl_All = StyleControl_Font | StyleControl_Fore | StyleControl_Back | StyleControl_EOLFilled,
+};
+
 static inline int GetDefaultStyleStartIndex(void) {
 	return bUse2ndDefaultStyle ? Style_MaxDefaultStyle : Style_Default;
+}
+
+static inline UINT GetDefaultStyleControlMask(int index) {
+	if (index >= Style_MaxDefaultStyle) {
+		index -= Style_MaxDefaultStyle;
+	}
+	switch (index) {
+	case Style_ControlCharacter:
+		return StyleControl_Font;
+	case Style_IndentationGuide:
+	case Style_Whitespace:
+	case Style_CurrentLine:
+	case Style_LongLineMarker:
+	case Style_FoldingMarker:
+		return StyleControl_Fore | StyleControl_Back;
+	case Style_Selection:
+		return StyleControl_Fore | StyleControl_Back | StyleControl_EOLFilled;
+	case Style_Caret:
+		return StyleControl_Fore;
+	case Style_ExtraLineSpacing:
+		return StyleControl_None;
+	default:
+		return StyleControl_All;
+	}
 }
 
 static inline int FindDefaultFontIndex(void) {
@@ -3117,6 +3151,7 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 	static HWND hwndTV;
 	static BOOL fDragging;
 	static BOOL fLexerSelected;
+	static int iCurrentStyleIndex;
 	static PEDITLEXER pCurrentLexer;
 	static PEDITSTYLE pCurrentStyle;
 	//static HBRUSH hbrFore;
@@ -3129,6 +3164,7 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 		hwndTV = GetDlgItem(hwnd, IDC_STYLELIST);
 		fDragging = FALSE;
 		fLexerSelected = FALSE;
+		iCurrentStyleIndex = -1;
 
 		SHFILEINFO shfi;
 		TreeView_SetImageList(hwndTV,
@@ -3238,6 +3274,8 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 
 				HTREEITEM hParent = TreeView_GetParent(hwndTV, lpnmtv->itemNew.hItem);
 				fLexerSelected = hParent == NULL;
+				iCurrentStyleIndex = -1;
+				UINT enableMask = StyleControl_None;
 				// a lexer has been selected
 				if (hParent == NULL) {
 					WCHAR wch[MAX_EDITLEXER_EXT_SIZE];
@@ -3252,37 +3290,9 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 					if (pCurrentLexer != NULL) {
 						SetDlgItemText(hwnd, IDC_STYLELABEL, wch);
 						EnableWindow(GetDlgItem(hwnd, IDC_STYLEEDIT), TRUE);
-						EnableWindow(GetDlgItem(hwnd, IDC_STYLEFONT), FALSE);
-						EnableWindow(GetDlgItem(hwnd, IDC_STYLEFORE), FALSE);
-						EnableWindow(GetDlgItem(hwnd, IDC_STYLEBACK), FALSE);
 						EnableWindow(GetDlgItem(hwnd, IDC_STYLEDEFAULT), TRUE);
-						//EnableWindow(GetDlgItem(hwnd, IDC_STYLEBOLD), FALSE);
-						//EnableWindow(GetDlgItem(hwnd, IDC_STYLEITALIC), FALSE);
-						//EnableWindow(GetDlgItem(hwnd, IDC_STYLEUNDERLINE), FALSE);
-						//EnableWindow(GetDlgItem(hwnd, IDC_STYLEEOLFILLED), FALSE);
-						//CheckDlgButton(hwnd, IDC_STYLEBOLD, BST_UNCHECKED);
-						//CheckDlgButton(hwnd, IDC_STYLEITALIC, BST_UNCHECKED);
-						//CheckDlgButton(hwnd, IDC_STYLEUNDERLINE, BST_UNCHECKED);
-						//CheckDlgButton(hwnd, IDC_STYLEEOLFILLED, BST_UNCHECKED);
 						SetDlgItemText(hwnd, IDC_STYLEEDIT, pCurrentLexer->szExtensions);
 						SetDlgItemText(hwnd, IDC_STYLEVALUE_DEFAULT, pCurrentLexer->pszDefExt);
-					} else {
-						SetDlgItemText(hwnd, IDC_STYLELABEL, L"");
-						EnableWindow(GetDlgItem(hwnd, IDC_STYLEEDIT), FALSE);
-						EnableWindow(GetDlgItem(hwnd, IDC_STYLEFONT), FALSE);
-						EnableWindow(GetDlgItem(hwnd, IDC_STYLEFORE), FALSE);
-						EnableWindow(GetDlgItem(hwnd, IDC_STYLEBACK), FALSE);
-						EnableWindow(GetDlgItem(hwnd, IDC_STYLEDEFAULT), FALSE);
-						//EnableWindow(GetDlgItem(hwnd, IDC_STYLEBOLD), FALSE);
-						//EnableWindow(GetDlgItem(hwnd, IDC_STYLEITALIC), FALSE);
-						//EnableWindow(GetDlgItem(hwnd, IDC_STYLEUNDERLINE), FALSE);
-						//EnableWindow(GetDlgItem(hwnd, IDC_STYLEEOLFILLED), FALSE);
-						//CheckDlgButton(hwnd, IDC_STYLEBOLD, BST_UNCHECKED);
-						//CheckDlgButton(hwnd, IDC_STYLEITALIC, BST_UNCHECKED);
-						//CheckDlgButton(hwnd, IDC_STYLEUNDERLINE, BST_UNCHECKED);
-						//CheckDlgButton(hwnd, IDC_STYLEEOLFILLED, BST_UNCHECKED);
-						SetDlgItemText(hwnd, IDC_STYLEEDIT, L"");
-						SetDlgItemText(hwnd, IDC_STYLEVALUE_DEFAULT, L"");
 					}
 				}
 
@@ -3306,40 +3316,56 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 					pCurrentStyle = (PEDITSTYLE)lpnmtv->itemNew.lParam;
 					if (pCurrentStyle != NULL) {
 						SetDlgItemText(hwnd, IDC_STYLELABEL, StrEnd(wch) + 1);
-						EnableWindow(GetDlgItem(hwnd, IDC_STYLEEDIT), TRUE);
-						EnableWindow(GetDlgItem(hwnd, IDC_STYLEFONT), TRUE);
-						EnableWindow(GetDlgItem(hwnd, IDC_STYLEFORE), TRUE);
 						EnableWindow(GetDlgItem(hwnd, IDC_STYLEBACK), TRUE);
 						EnableWindow(GetDlgItem(hwnd, IDC_STYLEDEFAULT), TRUE);
-						//EnableWindow(GetDlgItem(hwnd, IDC_STYLEBOLD), TRUE);
-						//EnableWindow(GetDlgItem(hwnd, IDC_STYLEITALIC), TRUE);
-						//EnableWindow(GetDlgItem(hwnd, IDC_STYLEUNDERLINE), TRUE);
-						//EnableWindow(GetDlgItem(hwnd, IDC_STYLEEOLFILLED), TRUE);
-						//CheckDlgButton(hwnd, IDC_STYLEBOLD, Style_StrGetBold(pCurrentStyle->szValue) ? BST_CHECKED : BST_UNCHECKED));
-						//CheckDlgButton(hwnd, IDC_STYLEITALIC, Style_StrGetItalic(pCurrentStyle->szValue) ? BST_CHECKED : BST_UNCHECKED);
-						//CheckDlgButton(hwnd, IDC_STYLEUNDERLINE, Style_StrGetUnderline(pCurrentStyle->szValue) ? BST_CHECKED : BST_UNCHECKED);
-						//CheckDlgButton(hwnd, IDC_STYLEEOLFILLED, Style_StrGetEOLFilled(pCurrentStyle->szValue) ? BST_CHECKED : BST_UNCHECKED);
 						SetDlgItemText(hwnd, IDC_STYLEEDIT, pCurrentStyle->szValue);
 						SetDlgItemText(hwnd, IDC_STYLEVALUE_DEFAULT, pCurrentStyle->pszDefault);
-					} else {
-						SetDlgItemText(hwnd, IDC_STYLELABEL, L"");
-						EnableWindow(GetDlgItem(hwnd, IDC_STYLEEDIT), FALSE);
-						EnableWindow(GetDlgItem(hwnd, IDC_STYLEFONT), FALSE);
-						EnableWindow(GetDlgItem(hwnd, IDC_STYLEFORE), FALSE);
-						EnableWindow(GetDlgItem(hwnd, IDC_STYLEBACK), FALSE);
-						EnableWindow(GetDlgItem(hwnd, IDC_STYLEDEFAULT), FALSE);
-						//EnableWindow(GetDlgItem(hwnd, IDC_STYLEBOLD), FALSE);
-						//EnableWindow(GetDlgItem(hwnd, IDC_STYLEITALIC), FALSE);
-						//EnableWindow(GetDlgItem(hwnd, IDC_STYLEUNDERLINE), FALSE);
-						//EnableWindow(GetDlgItem(hwnd, IDC_STYLEEOLFILLED), FALSE);
-						//CheckDlgButton(hwnd, IDC_STYLEBOLD, BST_UNCHECKED);
-						//CheckDlgButton(hwnd, IDC_STYLEITALIC, BST_UNCHECKED);
-						//CheckDlgButton(hwnd, IDC_STYLEUNDERLINE, BST_UNCHECKED);
-						//CheckDlgButton(hwnd, IDC_STYLEEOLFILLED, BST_UNCHECKED);
-						SetDlgItemText(hwnd, IDC_STYLEEDIT, L"");
-						SetDlgItemText(hwnd, IDC_STYLEVALUE_DEFAULT, L"");
+
+						for (UINT i = 0; i < pCurrentLexer->iStyleCount; i++) {
+							if (pCurrentStyle == &pCurrentLexer->Styles[i]) {
+								iCurrentStyleIndex = i;
+								break;
+							}
+						}
+						enableMask = (pCurrentLexer->rid == NP2LEX_DEFAULT) ? GetDefaultStyleControlMask(iCurrentStyleIndex) : StyleControl_All;
 					}
 				}
+
+				if ((fLexerSelected && pCurrentLexer == NULL) || (!fLexerSelected && pCurrentStyle == NULL)) {
+					SetDlgItemText(hwnd, IDC_STYLELABEL, L"");
+					EnableWindow(GetDlgItem(hwnd, IDC_STYLEEDIT), FALSE);
+					EnableWindow(GetDlgItem(hwnd, IDC_STYLEDEFAULT), FALSE);
+					SetDlgItemText(hwnd, IDC_STYLEEDIT, L"");
+					SetDlgItemText(hwnd, IDC_STYLEVALUE_DEFAULT, L"");
+				}
+
+				EnableWindow(GetDlgItem(hwnd, IDC_STYLEFONT), (enableMask & StyleControl_Font) != 0);
+				//if (enableMask & StyleControl_Font) {
+				//	EnableWindow(GetDlgItem(hwnd, IDC_STYLEFONT), TRUE);
+				//	EnableWindow(GetDlgItem(hwnd, IDC_STYLEBOLD), TRUE);
+				//	EnableWindow(GetDlgItem(hwnd, IDC_STYLEITALIC), TRUE);
+				//	EnableWindow(GetDlgItem(hwnd, IDC_STYLEUNDERLINE), TRUE);
+				//	CheckDlgButton(hwnd, IDC_STYLEBOLD, Style_StrGetBold(pCurrentStyle->szValue) ? BST_CHECKED : BST_UNCHECKED));
+				//	CheckDlgButton(hwnd, IDC_STYLEITALIC, Style_StrGetItalic(pCurrentStyle->szValue) ? BST_CHECKED : BST_UNCHECKED);
+				//	CheckDlgButton(hwnd, IDC_STYLEUNDERLINE, Style_StrGetUnderline(pCurrentStyle->szValue) ? BST_CHECKED : BST_UNCHECKED);
+				//} else {
+				//	EnableWindow(GetDlgItem(hwnd, IDC_STYLEFONT), FALSE);
+				//	EnableWindow(GetDlgItem(hwnd, IDC_STYLEBOLD), FALSE);
+				//	EnableWindow(GetDlgItem(hwnd, IDC_STYLEITALIC), FALSE);
+				//	EnableWindow(GetDlgItem(hwnd, IDC_STYLEUNDERLINE), FALSE);
+				//	CheckDlgButton(hwnd, IDC_STYLEBOLD, BST_UNCHECKED);
+				//	CheckDlgButton(hwnd, IDC_STYLEITALIC, BST_UNCHECKED);
+				//	CheckDlgButton(hwnd, IDC_STYLEUNDERLINE, BST_UNCHECKED);
+				//}
+				EnableWindow(GetDlgItem(hwnd, IDC_STYLEFORE), (enableMask & StyleControl_Fore) != 0);
+				EnableWindow(GetDlgItem(hwnd, IDC_STYLEBACK), (enableMask & StyleControl_Back) != 0);
+				//if (enableMask & StyleControl_EOLFilled) {
+				//	EnableWindow(GetDlgItem(hwnd, IDC_STYLEEOLFILLED), TRUE);
+				//	CheckDlgButton(hwnd, IDC_STYLEEOLFILLED, Style_StrGetEOLFilled(pCurrentStyle->szValue) ? BST_CHECKED : BST_UNCHECKED);
+				//} else {
+				//	EnableWindow(GetDlgItem(hwnd, IDC_STYLEEOLFILLED), FALSE);
+				//	CheckDlgButton(hwnd, IDC_STYLEEOLFILLED, BST_UNCHECKED);
+				//}
 			}
 			break;
 
@@ -3457,8 +3483,8 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 			if (pCurrentStyle) {
 				WCHAR tch[MAX_LEXER_STYLE_EDIT_SIZE];
 				GetDlgItemText(hwnd, IDC_STYLEEDIT, tch, COUNTOF(tch));
-				const BOOL bDefaultStyle = pCurrentLexer->rid == NP2LEX_DEFAULT &&
-					(pCurrentStyle == &pCurrentLexer->Styles[Style_Default] || pCurrentStyle == &pCurrentLexer->Styles[Style_MaxDefaultStyle]);
+				const BOOL bDefaultStyle = (pCurrentLexer->rid == NP2LEX_DEFAULT) &&
+					(iCurrentStyleIndex == Style_Default || iCurrentStyleIndex == Style_MaxDefaultStyle);
 
 				if (Style_SelectFont(hwnd, tch, COUNTOF(tch), bDefaultStyle)) {
 					SetDlgItemText(hwnd, IDC_STYLEEDIT, tch);
