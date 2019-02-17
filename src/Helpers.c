@@ -489,7 +489,7 @@ BOOL VerifyContrast(COLORREF cr1, COLORREF cr2) {
 // IsFontAvailable()
 // Test if a certain font is installed on the system
 //
-int CALLBACK EnumFontsProc(CONST LOGFONT *plf, CONST TEXTMETRIC *ptm, DWORD fontType, LPARAM lParam) {
+static int CALLBACK EnumFontFamExProc(CONST LOGFONT *plf, CONST TEXTMETRIC *ptm, DWORD fontType, LPARAM lParam) {
 	UNREFERENCED_PARAMETER(plf);
 	UNREFERENCED_PARAMETER(ptm);
 	UNREFERENCED_PARAMETER(fontType);
@@ -501,8 +501,13 @@ int CALLBACK EnumFontsProc(CONST LOGFONT *plf, CONST TEXTMETRIC *ptm, DWORD font
 BOOL IsFontAvailable(LPCWSTR lpszFontName) {
 	BOOL fFound = FALSE;
 
+	LOGFONT lf;
+	ZeroMemory(&lf, sizeof(lf));
+	lstrcpyn(lf.lfFaceName, lpszFontName, LF_FACESIZE);
+	lf.lfCharSet = DEFAULT_CHARSET;
+
 	HDC hDC = GetDC(NULL);
-	EnumFonts(hDC, lpszFontName, EnumFontsProc, (LPARAM)&fFound);
+	EnumFontFamiliesEx(hDC, &lf, EnumFontFamExProc, (LPARAM)&fFound, 0);
 	ReleaseDC(NULL, hDC);
 
 	return fFound;
