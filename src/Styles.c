@@ -299,22 +299,30 @@ struct DetailStyle {
 	char fontFace[LF_FACESIZE * kMaxMultiByteCount];
 };
 
+/*
+style in other lexers is inherited from it's lexer default (first) style and global default style.
+	This also means other "Default" styles in lexHTML don't work as expected.
+	Maybe it's better to remove them instead of confusing users.
+
+font quality, caret style, caret width, caret blink period are moved to "Settings" section,
+see above variables and the "View" menu.
+*/
 //! keep same order as lexDefault
 enum DefaultStyleIndex {
-	Style_Default,
-	Style_LineNumber,
-	Style_MatchBrace,
-	Style_MatchBraceError,
-	Style_ControlCharacter,
-	Style_IndentationGuide,
-	Style_Selection,
-	Style_Whitespace,
-	Style_CurrentLine,
-	Style_Caret,
-	Style_LongLineMarker,
-	Style_ExtraLineSpacing,
-	Style_FoldingMarker,
-	Style_MaxDefaultStyle,
+	Style_Default,			// global default style.
+	Style_LineNumber,		// inherited style.
+	Style_MatchBrace,		// inherited style.
+	Style_MatchBraceError,	// inherited style.
+	Style_ControlCharacter,	// inherited style. font attributes (white on black)
+	Style_IndentationGuide,	// inherited style. `fore`, `back`
+	Style_Selection,		// standalone style. `fore`, `back`, `alpha`, `eolfilled`
+	Style_Whitespace,		// standalone style. `fore`, `back`, `size`: dot size
+	Style_CurrentLine,		// standalone style. frame (`fore`, `size`, `alpha`), background (`back`, `alpha`)
+	Style_Caret,			// standalone style. `fore`: caret color
+	Style_LongLineMarker,	// standalone style. `fore`: edge line color, `back`: edge background color
+	Style_ExtraLineSpacing,	// standalone style. descent = `size`/2, ascent = `size` - descent
+	Style_FoldingMarker,	// standalone style. `fore`: folder line color, `back`: folder box fill color
+	Style_MaxDefaultStyle,	// 2nd global default style.
 };
 
 static inline int GetDefaultStyleStartIndex(void) {
