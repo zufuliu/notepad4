@@ -3130,7 +3130,7 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 		HTREEITEM currentLex = NULL;
 		for (UINT iLexer = 0; iLexer < NUMLEXERS; iLexer++) {
 			PEDITLEXER pLex = pLexArray[iLexer];
-			if (!found && StrEqual(pLex->pszName, pLexCurrent->pszName)) {
+			if (!found && pLex->rid == pLexCurrent->rid) {
 				found = TRUE;
 				currentLex = Style_AddLexerToTreeView(hwndTV, pLex);
 			} else {
@@ -3712,26 +3712,23 @@ static INT_PTR CALLBACK Style_SelectLexerDlgProc(HWND hwnd, UINT umsg, WPARAM wP
 		ListView_InsertColumn(hwndLV, 0, &lvc);
 
 		// Add lexers
+		int iCurrent = -1;
 		for (UINT iLexer = 0; iLexer < NUMLEXERS; iLexer++) {
-			Style_AddLexerToListView(hwndLV, pLexArray[iLexer]);
+			PEDITLEXER pLex = pLexArray[iLexer];
+			Style_AddLexerToListView(hwndLV, pLex);
+			if (iCurrent < 0 && pLex->rid == pLexCurrent->rid) {
+				iCurrent = iLexer;
+			}
 		}
 
 		ListView_SetColumnWidth(hwndLV, 0, LVSCW_AUTOSIZE_USEHEADER);
 
 		// Select current lexer
-		const int lvItems = ListView_GetItemCount(hwndLV);
-		LVITEM lvi;
-		lvi.mask = LVIF_PARAM;
-		for (int i = 0; i < lvItems; i++) {
-			lvi.iItem = i;
-			ListView_GetItem(hwndLV, &lvi);
-			if (StrEqual(((PEDITLEXER)lvi.lParam)->pszName, pLexCurrent->pszName)) {
-				ListView_SetItemState(hwndLV, i, LVIS_FOCUSED | LVIS_SELECTED, LVIS_FOCUSED | LVIS_SELECTED);
-				ListView_EnsureVisible(hwndLV, i, FALSE);
-				if (iDefaultLexer == i) {
-					CheckDlgButton(hwnd, IDC_DEFAULTSCHEME, BST_CHECKED);
-				}
-			}
+		iCurrent = max_i(0, iCurrent);
+		ListView_SetItemState(hwndLV, iCurrent, LVIS_FOCUSED | LVIS_SELECTED, LVIS_FOCUSED | LVIS_SELECTED);
+		ListView_EnsureVisible(hwndLV, iCurrent, FALSE);
+		if (iDefaultLexer == iCurrent) {
+			CheckDlgButton(hwnd, IDC_DEFAULTSCHEME, BST_CHECKED);
 		}
 
 		iInternalDefault = iDefaultLexer;
