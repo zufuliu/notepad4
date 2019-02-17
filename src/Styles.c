@@ -3108,6 +3108,7 @@ void Style_AddLexerToListView(HWND hwnd, PEDITLEXER pLex) {
 static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
 	static HWND hwndTV;
 	static BOOL fDragging;
+	static BOOL fLexerSelected;
 	static PEDITLEXER pCurrentLexer;
 	static PEDITSTYLE pCurrentStyle;
 	//static HBRUSH hbrFore;
@@ -3119,6 +3120,7 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 
 		hwndTV = GetDlgItem(hwnd, IDC_STYLELIST);
 		fDragging = FALSE;
+		fLexerSelected = FALSE;
 
 		SHFILEINFO shfi;
 		TreeView_SetImageList(hwndTV,
@@ -3220,14 +3222,16 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 			case TVN_SELCHANGED: {
 				if (pCurrentStyle) {
 					GetDlgItemText(hwnd, IDC_STYLEEDIT, pCurrentStyle->szValue, MAX_EDITSTYLE_VALUE_SIZE);
-				} else if (pCurrentLexer) {
+				} else if (fLexerSelected && pCurrentLexer) {
 					if (!GetDlgItemText(hwnd, IDC_STYLEEDIT, pCurrentLexer->szExtensions, MAX_EDITLEXER_EXT_SIZE)) {
 						lstrcpy(pCurrentLexer->szExtensions, pCurrentLexer->pszDefExt);
 					}
 				}
 
+				HTREEITEM hParent = TreeView_GetParent(hwndTV, lpnmtv->itemNew.hItem);
+				fLexerSelected = hParent == NULL;
 				// a lexer has been selected
-				if (!TreeView_GetParent(hwndTV, lpnmtv->itemNew.hItem)) {
+				if (hParent == NULL) {
 					WCHAR wch[MAX_EDITLEXER_EXT_SIZE];
 
 					GetDlgItemText(hwnd, IDC_STYLELABELS, wch, COUNTOF(wch));
@@ -3235,8 +3239,9 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 						*StrChr(wch, L'|') = 0;
 					}
 
+					pCurrentLexer = (PEDITLEXER)lpnmtv->itemNew.lParam;
 					pCurrentStyle = NULL;
-					if ((pCurrentLexer = (PEDITLEXER)lpnmtv->itemNew.lParam) != NULL) {
+					if (pCurrentLexer != NULL) {
 						SetDlgItemText(hwnd, IDC_STYLELABEL, wch);
 						EnableWindow(GetDlgItem(hwnd, IDC_STYLEEDIT), TRUE);
 						EnableWindow(GetDlgItem(hwnd, IDC_STYLEFONT), FALSE);
@@ -3282,8 +3287,16 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 						*StrChr(wch, L'|') = 0;
 					}
 
-					pCurrentLexer = NULL;
-					if ((pCurrentStyle = (PEDITSTYLE)lpnmtv->itemNew.lParam) != NULL) {
+					// TVS_SINGLEEXPAND: CTRL key.
+					TVITEM item;
+					ZeroMemory(&item, sizeof(item));
+					item.mask = TVIF_PARAM;
+					item.hItem = hParent;
+					TreeView_GetItem(hwndTV, &item);
+					pCurrentLexer = (PEDITLEXER)item.lParam;
+
+					pCurrentStyle = (PEDITSTYLE)lpnmtv->itemNew.lParam;
+					if (pCurrentStyle != NULL) {
 						SetDlgItemText(hwnd, IDC_STYLELABEL, StrEnd(wch) + 1);
 						EnableWindow(GetDlgItem(hwnd, IDC_STYLEEDIT), TRUE);
 						EnableWindow(GetDlgItem(hwnd, IDC_STYLEFONT), TRUE);
@@ -3436,9 +3449,10 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 			if (pCurrentStyle) {
 				WCHAR tch[MAX_LEXER_STYLE_EDIT_SIZE];
 				GetDlgItemText(hwnd, IDC_STYLEEDIT, tch, COUNTOF(tch));
-				if (Style_SelectFont(hwnd, tch, COUNTOF(tch),
-									 StrEqual(pCurrentStyle->pszName, L"Default Style") ||
-									 StrEqual(pCurrentStyle->pszName, L"2nd Default Style"))) {
+				const BOOL bDefaultStyle = pCurrentLexer->rid == NP2LEX_DEFAULT &&
+					(pCurrentStyle == &pCurrentLexer->Styles[Style_Default] || pCurrentStyle == &pCurrentLexer->Styles[Style_MaxDefaultStyle]);
+
+				if (Style_SelectFont(hwnd, tch, COUNTOF(tch), bDefaultStyle)) {
 					SetDlgItemText(hwnd, IDC_STYLEEDIT, tch);
 					//CheckDlgButton(hwnd, IDC_STYLEBOLD, (Style_StrGetBold(tch) ? BST_CHECKED : BST_UNCHECKED));
 					//CheckDlgButton(hwnd, IDC_STYLEITALIC, (Style_StrGetItalic(tch) ? BST_CHECKED : BST_UNCHECKED));
@@ -3493,7 +3507,7 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 				//CheckDlgButton(hwnd, IDC_STYLEITALIC, (Style_StrGetItalic(pCurrentStyle->szValue) ? BST_CHECKED : BST_UNCHECKED));
 				//CheckDlgButton(hwnd, IDC_STYLEUNDERLINE, (Style_StrGetUnderline(pCurrentStyle->szValue) ? BST_CHECKED : BST_UNCHECKED));
 				//CheckDlgButton(hwnd, IDC_STYLEEOLFILLED, (Style_StrGetEOLFilled(pCurrentStyle->szValue) ? BST_CHECKED : BST_UNCHECKED));
-			} else if (pCurrentLexer) {
+			} else if (fLexerSelected && pCurrentLexer) {
 				lstrcpy(pCurrentLexer->szExtensions, pCurrentLexer->pszDefExt);
 				SetDlgItemText(hwnd, IDC_STYLEEDIT, pCurrentLexer->szExtensions);
 			}
@@ -3559,7 +3573,7 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 		case IDOK: {
 			if (pCurrentStyle) {
 				GetDlgItemText(hwnd, IDC_STYLEEDIT, pCurrentStyle->szValue, MAX_EDITSTYLE_VALUE_SIZE);
-			} else if (pCurrentLexer) {
+			} else if (fLexerSelected && pCurrentLexer) {
 				if (!GetDlgItemText(hwnd, IDC_STYLEEDIT, pCurrentLexer->szExtensions, MAX_EDITLEXER_EXT_SIZE)) {
 					lstrcpy(pCurrentLexer->szExtensions, pCurrentLexer->pszDefExt);
 				}
@@ -3570,7 +3584,7 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 				if (Style_Import(hwnd)) {
 					if (pCurrentStyle) {
 						SetDlgItemText(hwnd, IDC_STYLEEDIT, pCurrentStyle->szValue);
-					} else if (pCurrentLexer) {
+					} else if (fLexerSelected && pCurrentLexer) {
 						SetDlgItemText(hwnd, IDC_STYLEEDIT, pCurrentLexer->szExtensions);
 					}
 
