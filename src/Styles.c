@@ -3464,25 +3464,12 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 			break;
 
 		case IDC_STYLEFORE:
-			if (pCurrentStyle) {
-				WCHAR tch[MAX_LEXER_STYLE_EDIT_SIZE];
-				GetDlgItemText(hwnd, IDC_STYLEEDIT, tch, COUNTOF(tch));
-				if (Style_SelectColor(hwnd, TRUE, tch, COUNTOF(tch))) {
-					SetDlgItemText(hwnd, IDC_STYLEEDIT, tch);
-					//CheckDlgButton(hwnd, IDC_STYLEBOLD, (Style_StrGetBold(tch) ? BST_CHECKED : BST_UNCHECKED));
-					//CheckDlgButton(hwnd, IDC_STYLEITALIC, (Style_StrGetItalic(tch) ? BST_CHECKED : BST_UNCHECKED));
-					//CheckDlgButton(hwnd, IDC_STYLEUNDERLINE, (Style_StrGetUnderline(tch) ? BST_CHECKED : BST_UNCHECKED));
-					//CheckDlgButton(hwnd, IDC_STYLEEOLFILLED, (Style_StrGetEOLFilled(tch) ? BST_CHECKED : BST_UNCHECKED));
-				}
-			}
-			PostMessage(hwnd, WM_NEXTDLGCTL, (WPARAM)(GetDlgItem(hwnd, IDC_STYLEEDIT)), 1);
-			break;
-
 		case IDC_STYLEBACK:
 			if (pCurrentStyle) {
 				WCHAR tch[MAX_LEXER_STYLE_EDIT_SIZE];
 				GetDlgItemText(hwnd, IDC_STYLEEDIT, tch, COUNTOF(tch));
-				if (Style_SelectColor(hwnd, FALSE, tch, COUNTOF(tch))) {
+				const BOOL fore = LOWORD(wParam) == IDC_STYLEFORE;
+				if (Style_SelectColor(hwnd, fore, tch, COUNTOF(tch))) {
 					SetDlgItemText(hwnd, IDC_STYLEEDIT, tch);
 					//CheckDlgButton(hwnd, IDC_STYLEBOLD, (Style_StrGetBold(tch) ? BST_CHECKED : BST_UNCHECKED));
 					//CheckDlgButton(hwnd, IDC_STYLEITALIC, (Style_StrGetItalic(tch) ? BST_CHECKED : BST_UNCHECKED));
