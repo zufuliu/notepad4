@@ -301,7 +301,7 @@ struct DetailStyle {
 
 /*
 style in other lexers is inherited from it's lexer default (first) style and global default style.
-	This also means other "Default" styles in lexHTML don't work as expected.
+	This also means other "Default" styles in lexHTML don't work as expected (bug by b7e7585f869897276e27a3b83b5b91a7196ca4da).
 	Maybe it's better to remove them instead of confusing users.
 
 font quality, caret style, caret width, caret blink period are moved to "Settings" section,
@@ -310,7 +310,7 @@ see above variables and the "View" menu.
 //! keep same order as lexDefault
 enum DefaultStyleIndex {
 	Style_Default,			// global default style.
-	Style_LineNumber,		// inherited style.
+	Style_LineNumber,		// inherited style, except for background color (default to COLOR_3DFACE).
 	Style_MatchBrace,		// inherited style.
 	Style_MatchBraceError,	// inherited style.
 	Style_ControlCharacter,	// inherited style. font attributes (white on black)
