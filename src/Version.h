@@ -76,14 +76,23 @@
 #endif
 
 #if defined(_WIN64)
-#define VERSION_FILEVERSION_LONG	L"Notepad2 (64-bit) " STRINGIFY(VERSION_MAJOR) L"." \
+	#if defined(__aarch64__) || defined(_ARM64_)
+		#define VERSION_FILEVERSION_ARCH	L" (arm64) "
+	#elif defined(__ia64__) || defined(_IA64_)
+		#define VERSION_FILEVERSION_ARCH	L" (ia64) "
+	#else
+		#define VERSION_FILEVERSION_ARCH	L" (64-bit) "
+	#endif
+#else
+	#if defined(__arm__) || defined(_ARM_)
+		#define VERSION_FILEVERSION_ARCH	L" (arm32) "
+	#else
+		#define VERSION_FILEVERSION_ARCH	L" (32-bit) "
+	#endif
+#endif
+#define VERSION_FILEVERSION_LONG	MY_APPNAME VERSION_FILEVERSION_ARCH STRINGIFY(VERSION_MAJOR) L"." \
 									STRINGIFY(VERSION_MINOR) L"." STRINGIFY(VERSION_BUILD)  \
 									L" " VERSION_REV_FULL
-#else
-#define VERSION_FILEVERSION_LONG	L"Notepad2 " STRINGIFY(VERSION_MAJOR) L"."         \
-									STRINGIFY(VERSION_MINOR) L"." STRINGIFY(VERSION_BUILD) \
-									L" " VERSION_REV_FULL
-#endif
 
 #endif // NOTEPAD2_VERSION_H
 
