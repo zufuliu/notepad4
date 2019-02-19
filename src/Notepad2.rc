@@ -362,7 +362,8 @@ BEGIN
     END
     POPUP "&View"
     BEGIN
-        MENUITEM "&Default Font...\tAlt+F12",   IDM_VIEW_FONT
+        MENUITEM "&Default Code Font...\tAlt+F12",   IDM_VIEW_DEFAULT_CODE_FONT
+        MENUITEM "&Default Text Font...",            IDM_VIEW_DEFAULT_TEXT_FONT
         POPUP "Font &Quality"
         BEGIN
             MENUITEM "&Default",                    IDM_VIEW_FONTQUALITY_DEFAULT
@@ -447,6 +448,11 @@ BEGIN
         MENUITEM "&Syntax Scheme...\tF12",          IDM_VIEW_SCHEME
         MENUITEM "&2nd Default Scheme\tShift+F12",  IDM_VIEW_USE2NDDEFAULT
         MENUITEM "&Customize Schemes...\tCtrl+F12", IDM_VIEW_SCHEMECONFIG
+        POPUP "&Use Monospaced Font"
+        BEGIN
+            MENUITEM "&Code",                       IDM_VIEW_USEMONOFONT_CODE
+            MENUITEM "Plain &Text",                 IDM_VIEW_USEMONOFONT_PLAINTEXT
+        END
         MENUITEM SEPARATOR
         MENUITEM "Default &Text",                   IDM_LANG_DEFAULT
         POPUP "CSS Style Sheet"
@@ -793,7 +799,7 @@ BEGIN
     VK_F11,         IDM_VIEW_STATUSBAR,     VIRTKEY, SHIFT, NOINVERT
     VK_F12,         IDM_VIEW_SCHEME,        VIRTKEY, NOINVERT
     VK_F12,         IDM_VIEW_SCHEMECONFIG,  VIRTKEY, CONTROL, NOINVERT
-    VK_F12,         IDM_VIEW_FONT,          VIRTKEY, ALT, NOINVERT
+    VK_F12,         IDM_VIEW_DEFAULT_CODE_FONT, VIRTKEY, ALT, NOINVERT
     VK_F12,         IDM_VIEW_USE2NDDEFAULT, VIRTKEY, SHIFT, NOINVERT
     VK_F2,          IDM_EDIT_SELTONEXT,     VIRTKEY, CONTROL, ALT, NOINVERT
     VK_F2,          IDM_EDIT_SELTOPREV,     VIRTKEY, SHIFT, CONTROL, ALT, NOINVERT
