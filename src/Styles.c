@@ -2490,7 +2490,7 @@ BOOL Style_StrGetFontWeight(LPCWSTR lpszStyle, int *i) {
 //
 // Style_StrGetValueStr()
 //
-BOOL Style_StrGetValueStr(LPCWSTR lpszStyle, LPCWSTR key, int keyLen, LPWSTR lpszValue, int cchValue) {
+static BOOL Style_StrGetValueStr(LPCWSTR lpszStyle, LPCWSTR key, int keyLen, LPWSTR lpszValue, int cchValue) {
 	LPWSTR p;
 
 	if ((p = StrStr(lpszStyle, key)) != NULL) {
@@ -2508,9 +2508,9 @@ BOOL Style_StrGetValueStr(LPCWSTR lpszStyle, LPCWSTR key, int keyLen, LPWSTR lps
 	return FALSE;
 }
 
-void Style_StrCopyValueStr(LPWSTR szNewStyle, LPCWSTR lpszStyle, LPCWSTR key, int keyLen, LPWSTR lpszValue, int cchValue) {
+static void Style_StrCopyValueStrEx(LPWSTR szNewStyle, LPCWSTR lpszStyle, LPCWSTR key, int keyLen, LPWSTR lpszValue, int cchValue) {
 	if (Style_StrGetValueStr(lpszStyle, key, keyLen, lpszValue, cchValue)) {
-		if (StrNotEmpty(szNewStyle)) {
+		if (*szNewStyle) {
 			lstrcat(szNewStyle, L"; ");
 		}
 		lstrcat(szNewStyle, key);
@@ -2518,17 +2518,31 @@ void Style_StrCopyValueStr(LPWSTR szNewStyle, LPCWSTR lpszStyle, LPCWSTR key, in
 	}
 }
 
-static inline void Style_StrCopyCharSetStr(LPWSTR szNewStyle, LPCWSTR lpszStyle, LPWSTR lpszValue, int cchValue) {
-	Style_StrCopyValueStr(szNewStyle, lpszStyle, L"charset:", CSTRLEN(L"charset:"), lpszValue, cchValue);
+static void Style_StrCopyAttributeEx(LPWSTR szNewStyle, LPCWSTR lpszStyle, LPCWSTR key, int keyLen) {
+	if (Style_StrGetAttributeEx(lpszStyle, key, keyLen)) {
+		if (*szNewStyle) {
+			lstrcat(szNewStyle, L"; ");
+		}
+		lstrcat(szNewStyle, key);
+	}
 }
 
-static inline void Style_StrCopySizeStr(LPWSTR szNewStyle, LPCWSTR lpszStyle, LPWSTR lpszValue, int cchValue) {
-	Style_StrCopyValueStr(szNewStyle, lpszStyle, L"size:", CSTRLEN(L"size:"), lpszValue, cchValue);
-}
+#define Style_StrCopyValueStr(szNewStyle, lpszStyle, name, tch)	Style_StrCopyValueStrEx((szNewStyle), (lpszStyle), (name), CSTRLEN(name), (tch), COUNTOF(tch))
+#define Style_StrCopyFont(szNewStyle, lpszStyle, tch)		Style_StrCopyValueStr((szNewStyle), (lpszStyle), L"font", (tch));
+#define Style_StrCopyChatset(szNewStyle, lpszStyle, tch)	Style_StrCopyValueStr((szNewStyle), (lpszStyle), L"charset", (tch));
+#define Style_StrCopySize(szNewStyle, lpszStyle, tch)		Style_StrCopyValueStr((szNewStyle), (lpszStyle), L"size", (tch));
+#define Style_StrCopyWeight(szNewStyle, lpszStyle, tch)		Style_StrCopyValueStr((szNewStyle), (lpszStyle), L"weight", (tch));
+#define Style_StrCopyCase(szNewStyle, lpszStyle, tch)		Style_StrCopyValueStr((szNewStyle), (lpszStyle), L"case", (tch));
+#define Style_StrCopyFore(szNewStyle, lpszStyle, tch)		Style_StrCopyValueStr((szNewStyle), (lpszStyle), L"fore", (tch));
+#define Style_StrCopyBack(szNewStyle, lpszStyle, tch)		Style_StrCopyValueStr((szNewStyle), (lpszStyle), L"back", (tch));
+#define Style_StrCopyAlpha(szNewStyle, lpszStyle, tch)		Style_StrCopyValueStr((szNewStyle), (lpszStyle), L"alpha", (tch));
 
-static inline void Style_StrCopyWeightStr(LPWSTR szNewStyle, LPCWSTR lpszStyle, LPWSTR lpszValue, int cchValue) {
-	Style_StrCopyValueStr(szNewStyle, lpszStyle, L"weight:", CSTRLEN(L"weight:"), lpszValue, cchValue);
-}
+#define Style_StrCopyAttribute(szNewStyle, lpszStyle, name)	Style_StrCopyAttributeEx((szNewStyle), (lpszStyle), (name), CSTRLEN(name))
+#define Style_StrCopyBold(szNewStyle, lpszStyle)			Style_StrCopyAttribute((szNewStyle), (lpszStyle), L"bold")
+#define Style_StrCopyItalic(szNewStyle, lpszStyle)			Style_StrCopyAttribute((szNewStyle), (lpszStyle), L"italic")
+#define Style_StrCopyUnderline(szNewStyle, lpszStyle)		Style_StrCopyAttribute((szNewStyle), (lpszStyle), L"underline")
+#define Style_StrCopyStrike(szNewStyle, lpszStyle)			Style_StrCopyAttribute((szNewStyle), (lpszStyle), L"strike")
+#define Style_StrCopyEOLFilled(szNewStyle, lpszStyle)		Style_StrCopyAttribute((szNewStyle), (lpszStyle), L"eolfilled")
 
 //=============================================================================
 //
@@ -2601,7 +2615,7 @@ BOOL Style_SelectFont(HWND hwnd, LPWSTR lpszStyle, int cchStyle, BOOL bDefaultSt
 	CHOOSEFONT cf;
 	LOGFONT lf;
 	int iValue;
-	WCHAR tch[32]; // LF_FACESIZE
+	WCHAR tch[LF_FACESIZE];
 
 	ZeroMemory(&cf, sizeof(CHOOSEFONT));
 	ZeroMemory(&lf, sizeof(LOGFONT));
@@ -2645,7 +2659,7 @@ BOOL Style_SelectFont(HWND hwnd, LPWSTR lpszStyle, int cchStyle, BOOL bDefaultSt
 	}
 
 	// Map back to lpszStyle
-	WCHAR szNewStyle[512];
+	WCHAR szNewStyle[MAX_LEXER_STYLE_EDIT_SIZE];
 	lstrcpy(szNewStyle, L"font:");
 	lstrcat(szNewStyle, lf.lfFaceName);
 	if (bDefaultStyle &&
@@ -2687,36 +2701,11 @@ BOOL Style_SelectFont(HWND hwnd, LPWSTR lpszStyle, int cchStyle, BOOL bDefaultSt
 		lstrcat(szNewStyle, L"; strike");
 	}
 
-	// save colors, ignore colors selected by user
-	if (Style_StrGetColor(TRUE, lpszStyle, &iValue)) {
-		wsprintf(tch, L"; fore:#%02X%02X%02X",
-				 (int)GetRValue(iValue),
-				 (int)GetGValue(iValue),
-				 (int)GetBValue(iValue));
-		lstrcat(szNewStyle, tch);
-	}
-	if (Style_StrGetColor(FALSE, lpszStyle, &iValue)) {
-		wsprintf(tch, L"; back:#%02X%02X%02X",
-				 (int)GetRValue(iValue),
-				 (int)GetGValue(iValue),
-				 (int)GetBValue(iValue));
-		lstrcat(szNewStyle, tch);
-	}
-
-	if (Style_StrGetEOLFilled(lpszStyle)) {
-		lstrcat(szNewStyle, L"; eolfilled");
-	}
-
-	if (Style_StrGetCase(lpszStyle, &iValue)) {
-		lstrcat(szNewStyle, L"; case:");
-		lstrcat(szNewStyle, (iValue == SC_CASE_UPPER) ? L"u" : L"");
-	}
-
-	if (Style_StrGetAlpha(lpszStyle, &iValue)) {
-		lstrcat(szNewStyle, L"; alpha:");
-		wsprintf(tch, L"%i", iValue);
-		lstrcat(szNewStyle, tch);
-	}
+	Style_StrCopyCase(szNewStyle, lpszStyle, tch);
+	Style_StrCopyFore(szNewStyle, lpszStyle, tch);
+	Style_StrCopyBack(szNewStyle, lpszStyle, tch);
+	Style_StrCopyAlpha(szNewStyle, lpszStyle, tch);
+	Style_StrCopyEOLFilled(szNewStyle, lpszStyle);
 
 	lstrcpyn(lpszStyle, szNewStyle, cchStyle);
 	return TRUE;
@@ -2759,44 +2748,20 @@ BOOL Style_SelectColor(HWND hwnd, BOOL bFore, LPWSTR lpszStyle, int cchStyle) {
 	iRGBResult = cc.rgbResult;
 
 	// Rebuild style string
-	WCHAR szNewStyle[512];
-	int iValue;
-	WCHAR tch[32]; // LF_FACESIZE
+	WCHAR szNewStyle[MAX_LEXER_STYLE_EDIT_SIZE];
+	WCHAR tch[LF_FACESIZE];
 
 	lstrcpy(szNewStyle, L"");
-	if (Style_StrGetFont(lpszStyle, tch, COUNTOF(tch))) {
-		lstrcat(szNewStyle, L"font:");
-		lstrcat(szNewStyle, tch);
-	}
+	Style_StrCopyFont(szNewStyle, lpszStyle, tch);
+	Style_StrCopyChatset(szNewStyle, lpszStyle, tch);
+	Style_StrCopySize(szNewStyle, lpszStyle, tch);
+	Style_StrCopyWeight(szNewStyle, lpszStyle, tch);
 
-	Style_StrCopyCharSetStr(szNewStyle, lpszStyle, tch, COUNTOF(tch));
-	Style_StrCopySizeStr(szNewStyle, lpszStyle, tch, COUNTOF(tch));
-	Style_StrCopyWeightStr(szNewStyle, lpszStyle, tch, COUNTOF(tch));
-
-	if (Style_StrGetBold(lpszStyle)) {
-		if (StrNotEmpty(szNewStyle)) {
-			lstrcat(szNewStyle, L"; ");
-		}
-		lstrcat(szNewStyle, L"bold");
-	}
-	if (Style_StrGetItalic(lpszStyle)) {
-		if (StrNotEmpty(szNewStyle)) {
-			lstrcat(szNewStyle, L"; ");
-		}
-		lstrcat(szNewStyle, L"italic");
-	}
-	if (Style_StrGetUnderline(lpszStyle)) {
-		if (StrNotEmpty(szNewStyle)) {
-			lstrcat(szNewStyle, L"; ");
-		}
-		lstrcat(szNewStyle, L"underline");
-	}
-	if (Style_StrGetStrike(lpszStyle)) {
-		if (StrNotEmpty(szNewStyle)) {
-			lstrcat(szNewStyle, L"; ");
-		}
-		lstrcat(szNewStyle, L"strike");
-	}
+	Style_StrCopyBold(szNewStyle, lpszStyle);
+	Style_StrCopyItalic(szNewStyle, lpszStyle);
+	Style_StrCopyUnderline(szNewStyle, lpszStyle);
+	Style_StrCopyStrike(szNewStyle, lpszStyle);
+	Style_StrCopyCase(szNewStyle, lpszStyle, tch);
 
 	if (bFore) {
 		if (StrNotEmpty(szNewStyle)) {
@@ -2807,23 +2772,11 @@ BOOL Style_SelectColor(HWND hwnd, BOOL bFore, LPWSTR lpszStyle, int cchStyle) {
 				 (int)GetGValue(iRGBResult),
 				 (int)GetBValue(iRGBResult));
 		lstrcat(szNewStyle, tch);
-		if (Style_StrGetColor(FALSE, lpszStyle, &iValue)) 	{
-			wsprintf(tch, L"; back:#%02X%02X%02X",
-					 (int)GetRValue(iValue),
-					 (int)GetGValue(iValue),
-					 (int)GetBValue(iValue));
-			lstrcat(szNewStyle, tch);
-		}
+		Style_StrCopyBack(szNewStyle, lpszStyle, tch);
 	} else {
+		Style_StrCopyFore(szNewStyle, lpszStyle, tch);
 		if (StrNotEmpty(szNewStyle)) {
 			lstrcat(szNewStyle, L"; ");
-		}
-		if (Style_StrGetColor(TRUE, lpszStyle, &iValue)) {
-			wsprintf(tch, L"fore:#%02X%02X%02X; ",
-					 (int)GetRValue(iValue),
-					 (int)GetGValue(iValue),
-					 (int)GetBValue(iValue));
-			lstrcat(szNewStyle, tch);
 		}
 		wsprintf(tch, L"back:#%02X%02X%02X",
 				 (int)GetRValue(iRGBResult),
@@ -2832,20 +2785,8 @@ BOOL Style_SelectColor(HWND hwnd, BOOL bFore, LPWSTR lpszStyle, int cchStyle) {
 		lstrcat(szNewStyle, tch);
 	}
 
-	if (Style_StrGetEOLFilled(lpszStyle)) {
-		lstrcat(szNewStyle, L"; eolfilled");
-	}
-
-	if (Style_StrGetCase(lpszStyle, &iValue)) {
-		lstrcat(szNewStyle, L"; case:");
-		lstrcat(szNewStyle, (iValue == SC_CASE_UPPER) ? L"u" : L"");
-	}
-
-	if (Style_StrGetAlpha(lpszStyle, &iValue)) {
-		lstrcat(szNewStyle, L"; alpha:");
-		wsprintf(tch, L"%i", iValue);
-		lstrcat(szNewStyle, tch);
-	}
+	Style_StrCopyAlpha(szNewStyle, lpszStyle, tch);
+	Style_StrCopyEOLFilled(szNewStyle, lpszStyle);
 
 	lstrcpyn(lpszStyle, szNewStyle, cchStyle);
 	return TRUE;
