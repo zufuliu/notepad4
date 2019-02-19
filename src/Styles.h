@@ -41,9 +41,17 @@
 #define EditLexer_HTML		1
 #define EditLexer_XML		2
 
+enum UseUseMonospacedFont {
+	UseUseMonospacedFont_Code = 1,
+	UseUseMonospacedFont_PlainText = 2,
+
+	UseUseMonospacedFont_Default = UseUseMonospacedFont_Code,
+};
+
 extern PEDITLEXER pLexCurrent;
 extern int np2LexLangIndex;
 extern BOOL bUse2ndDefaultStyle;
+extern int fUseMonospacedFont;
 extern BOOL bCurrentLexerHasLineComment;
 extern BOOL bCurrentLexerHasBlockComment;
 extern UINT8 currentLexKeywordAttr[NUMKEYWORD];
@@ -72,15 +80,16 @@ LPCWSTR Style_GetCurrentLexerName(void);
 void	Style_SetLexerByLangIndex(HWND hwnd, int lang);
 void	Style_UpdateSchemeMenu(HMENU hmenu);
 
-void	Style_SetDefaultFont(HWND hwnd);
+void	Style_SetDefaultFont(HWND hwnd, BOOL bCode);
 void	Style_SetIndentGuides(HWND hwnd, BOOL bShow);
 void	Style_UpdateCaret(HWND hwnd);
 void	Style_SetLongLineColors(HWND hwnd);
 void	Style_HighlightCurrentLine(HWND hwnd);
 void	Style_ToggleUse2ndDefault(HWND hwnd);
+void	Style_ToggleUseMonospacedFont(HWND hwnd, int menu);
 BOOL	Style_GetOpenDlgFilterStr(LPWSTR lpszFilter, int cchFilter);
 
-BOOL	Style_StrGetFont(LPCWSTR lpszStyle, LPWSTR lpszFont, int cchFont);
+BOOL	Style_StrGetFontEx(LPCWSTR lpszStyle, LPWSTR lpszFont, int cchFont, BOOL bDefaultStyle);
 BOOL	Style_StrGetCharSet(LPCWSTR lpszStyle, int *i);
 BOOL	Style_StrGetFontSize(LPCWSTR lpszStyle, int *i);
 BOOL	Style_StrGetRawSize(LPCWSTR lpszStyle, int *i);

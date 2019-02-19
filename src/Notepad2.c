@@ -2325,6 +2325,8 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	CheckCmd(hmenu, IDM_VIEW_FOLDING, bShowCodeFolding);
 
 	CheckCmd(hmenu, IDM_VIEW_USE2NDDEFAULT, bUse2ndDefaultStyle);
+	CheckCmd(hmenu, IDM_VIEW_USEMONOFONT_CODE, fUseMonospacedFont & UseUseMonospacedFont_Code);
+	CheckCmd(hmenu, IDM_VIEW_USEMONOFONT_PLAINTEXT, fUseMonospacedFont & UseUseMonospacedFont_PlainText);
 
 	CheckCmd(hmenu, IDM_VIEW_WORDWRAP, fWordWrap);
 	i = IDM_VIEW_FONTQUALITY_DEFAULT + iFontQuality;
@@ -3742,12 +3744,18 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		Style_ToggleUse2ndDefault(hwndEdit);
 		break;
 
+	case IDM_VIEW_USEMONOFONT_CODE:
+	case IDM_VIEW_USEMONOFONT_PLAINTEXT:
+		Style_ToggleUseMonospacedFont(hwndEdit, LOWORD(wParam));
+		break;
+
 	case IDM_VIEW_SCHEMECONFIG:
 		Style_ConfigDlg(hwndEdit);
 		break;
 
-	case IDM_VIEW_FONT:
-		Style_SetDefaultFont(hwndEdit);
+	case IDM_VIEW_DEFAULT_CODE_FONT:
+	case IDM_VIEW_DEFAULT_TEXT_FONT:
+		Style_SetDefaultFont(hwndEdit, LOWORD(wParam) == IDM_VIEW_DEFAULT_CODE_FONT);
 		break;
 
 	case IDM_VIEW_WORDWRAP:

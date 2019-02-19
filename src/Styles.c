@@ -193,18 +193,44 @@ static const PEDITLEXER pLexArray[NUMLEXERS] = {
 	&lexANSI
 };
 
-#define	NUM_MONO_FONT	6
-static LPCWSTR const SysMonoFontName[NUM_MONO_FONT + 1] = {
+struct LocaleFontInfo {
+	UINT codePage;
+	LANGID primary;
+	LPCWSTR fontName;
+	LPCWSTR localeFontName;
+};
+
+static LPCWSTR const commonMonoFontName[] = {
 	L"DejaVu Sans Mono",
 	//L"Bitstream Vera Sans Mono",
-	L"Consolas",
-	L"Source Code Pro",
-	L"Monaco",
-	L"Inconsolata",
-	L"Lucida Console",
-	L"Courier New",
+	L"Consolas",			// Vista and above
+	//L"Source Code Pro",
+	//L"Liberation Mono",
+	//L"Droid Sans Mono",
+	//L"Menlo",
+	//L"Monaco",
+	//L"Inconsolata",		// alternative to Consolas
 };
-static int np2MonoFontIndex = NUM_MONO_FONT; // Courier New
+
+static const struct LocaleFontInfo systemLocaleFontInfo[] = {
+	// Japanese
+	{ 932, LANG_JAPANESE, L"Meiryo", L"メイリオ" },
+	// Simplified Chinese
+	{ 936, LANG_CHINESE_SIMPLIFIED, L"Microsoft Yahei", L"微软雅黑" },
+	// Korean
+	{ 949, LANG_KOREAN, L"Malgun Gothic", L"맑은 고딕" },
+	// Traditional Chinese
+	{ 950, LANG_CHINESE_TRADITIONAL, L"Microsoft JhengHei", L"微軟正黑體" },
+	// Korean
+	{ 1361, LANG_KOREAN, L"Malgun Gothic", L"맑은 고딕" },
+};
+
+// system available default monospaced font and proportional font
+static WCHAR systemMonoFontName[LF_FACESIZE];
+static WCHAR systemTextFontName[LF_FACESIZE];
+// global default (from "Default Text") monospaced font and proportional font
+static WCHAR defaultMonoFontName[LF_FACESIZE];
+static WCHAR defaultTextFontName[LF_FACESIZE];
 
 // Currently used lexer
 PEDITLEXER pLexCurrent = &lexDefault;
@@ -249,6 +275,7 @@ static BOOL bCustomColorLoaded = FALSE;
 static int iLexerLoadedCount = 0;
 
 BOOL	bUse2ndDefaultStyle;
+int		fUseMonospacedFont;
 BOOL	bCurrentLexerHasLineComment;
 BOOL	bCurrentLexerHasBlockComment;
 static UINT fStylesModified = STYLESMODIFIED_NONE;
@@ -309,7 +336,8 @@ see above variables and the "View" menu.
 */
 //! keep same order as lexDefault
 enum DefaultStyleIndex {
-	Style_Default,			// global default style.
+	Style_Default,			// global default code style.
+	Style_PlainText,		// global default plain text style.
 	Style_LineNumber,		// inherited style, except for background color (default to COLOR_3DFACE).
 	Style_MatchBrace,		// inherited style.
 	Style_MatchBraceError,	// inherited style.
@@ -322,7 +350,7 @@ enum DefaultStyleIndex {
 	Style_LongLineMarker,	// standalone style. `fore`: edge line color, `back`: edge background color
 	Style_ExtraLineSpacing,	// standalone style. descent = `size`/2, ascent = `size` - descent
 	Style_FoldingMarker,	// standalone style. `fore`: folder line color, `back`: folder box fill color
-	Style_MaxDefaultStyle,	// 2nd global default style.
+	Style_MaxDefaultStyle,	// 2nd global default code style.
 };
 
 // style UI controls on Customize Schemes dialog
@@ -337,6 +365,13 @@ enum {
 
 static inline int GetDefaultStyleStartIndex(void) {
 	return bUse2ndDefaultStyle ? Style_MaxDefaultStyle : Style_Default;
+}
+
+static inline int GetGlobalBaseStyleIndex(int rid) {
+	if (rid == NP2LEX_DEFAULT) {
+		return (fUseMonospacedFont & UseUseMonospacedFont_PlainText) ? Style_Default : Style_PlainText;
+	}
+	return (fUseMonospacedFont & UseUseMonospacedFont_Code) ? Style_Default : Style_PlainText;
 }
 
 static inline UINT GetDefaultStyleControlMask(int index) {
@@ -363,13 +398,42 @@ static inline UINT GetDefaultStyleControlMask(int index) {
 	}
 }
 
-static inline int FindDefaultFontIndex(void) {
-	for (int i = 0; i < NUM_MONO_FONT; i++) {
-		if (IsFontAvailable(SysMonoFontName[i])) {
-			return i;
+static inline void FindSystemDefaultMonoFont(void) {
+	for (UINT i = 0; i < (UINT)COUNTOF(commonMonoFontName); i++) {
+		LPCWSTR fontName = commonMonoFontName[i];
+		if (IsFontAvailable(fontName)) {
+			lstrcpy(systemMonoFontName, fontName);
+			return;
 		}
 	}
-	return NUM_MONO_FONT;
+	lstrcpy(systemMonoFontName, L"Courier New");
+}
+
+static inline void FindSystemDefaultTextFont(void) {
+	const UINT acp = GetACP();
+	const LANGID lang = GetUserDefaultUILanguage();
+	const LANGID primary = PRIMARYLANGID(lang);
+
+	for (UINT i = 0; i < (UINT)COUNTOF(systemLocaleFontInfo); i++) {
+		const struct LocaleFontInfo info = systemLocaleFontInfo[i];
+		if ((info.codePage == acp) && IsFontAvailable(info.fontName)) {
+			// use locale font name
+			if (info.primary == primary && info.fontName != info.localeFontName && IsFontAvailable(info.localeFontName)) {
+				lstrcpy(systemTextFontName, info.localeFontName);
+			} else {
+				lstrcpy(systemTextFontName, info.fontName);
+			}
+			return;
+		}
+	}
+
+	// other languages
+	if (IsFontAvailable(L"Tahoma")) {
+		lstrcpy(systemTextFontName, L"Tahoma");
+	} else {
+		// default font in Scintilla
+		lstrcpy(systemTextFontName, L"Verdana");
+	}
 }
 
 void Style_ReleaseResources(void) {
@@ -425,6 +489,7 @@ void Style_Load(void) {
 
 	// 2nd default
 	bUse2ndDefaultStyle = IniSectionGetBool(pIniSection, L"Use2ndDefaultStyle", 0);
+	fUseMonospacedFont = IniSectionGetInt(pIniSection, L"UseMonospacedFont", UseUseMonospacedFont_Default);
 
 	// default scheme
 	const int iValue = IniSectionGetInt(pIniSection, L"DefaultScheme", 0);
@@ -456,7 +521,9 @@ void Style_Load(void) {
 	if (iDefaultLexer != 0) {
 		Style_LoadOneEx(pLexArray[iDefaultLexer], pIniSection, pIniSectionBuf, cchIniSection);
 	}
-	np2MonoFontIndex = FindDefaultFontIndex();
+
+	FindSystemDefaultMonoFont();
+	FindSystemDefaultTextFont();
 
 	IniSectionFree(pIniSection);
 	NP2HeapFree(pIniSectionBuf);
@@ -543,8 +610,9 @@ void Style_Save(void) {
 		pIniSection->next = pIniSectionBuf;
 	}
 
-	// auto select
+	// 2nd default
 	IniSectionSetBoolEx(pIniSection, L"Use2ndDefaultStyle", bUse2ndDefaultStyle, 0);
+	IniSectionSetIntEx(pIniSection, L"UseMonospacedFont", fUseMonospacedFont, UseUseMonospacedFont_Default);
 
 	// default scheme
 	IniSectionSetIntEx(pIniSection, L"DefaultScheme", iDefaultLexer, 0);
@@ -989,7 +1057,10 @@ void Style_SetLexer(HWND hwnd, PEDITLEXER pLexNew) {
 	SendMessage(hwnd, SCI_STYLESETCHARACTERSET, STYLE_DEFAULT, DEFAULT_CHARSET);
 
 	//! begin Style_Default
-	LPCWSTR szValue = lexDefault.Styles[Style_Default + iIdx].szValue;
+	Style_StrGetFontEx(lexDefault.Styles[Style_Default + iIdx].szValue, defaultMonoFontName, COUNTOF(defaultMonoFontName), TRUE);
+	Style_StrGetFontEx(lexDefault.Styles[Style_PlainText + iIdx].szValue,  defaultTextFontName, COUNTOF(defaultTextFontName), TRUE);
+	iValue = GetGlobalBaseStyleIndex(rid);
+	LPCWSTR szValue = lexDefault.Styles[iValue + iIdx].szValue;
 	Style_StrGetFontSize(szValue, &iBaseFontSize);
 	Style_SetStyles(hwnd, STYLE_DEFAULT, szValue);
 
@@ -2309,6 +2380,25 @@ void Style_ToggleUse2ndDefault(HWND hwnd) {
 	Style_SetLexer(hwnd, pLexCurrent);
 }
 
+void Style_ToggleUseMonospacedFont(HWND hwnd, int menu) {
+	int mask = 0;
+	switch (menu) {
+	case IDM_VIEW_USEMONOFONT_CODE:
+		mask = UseUseMonospacedFont_Code;
+		break;
+	case IDM_VIEW_USEMONOFONT_PLAINTEXT:
+		mask = UseUseMonospacedFont_PlainText;
+		break;
+	}
+
+	if (fUseMonospacedFont & mask) {
+		fUseMonospacedFont &= ~mask;
+	} else {
+		fUseMonospacedFont |= mask;
+	}
+	Style_SetLexer(hwnd, pLexCurrent);
+}
+
 //=============================================================================
 //
 // Style_SetLongLineColors()
@@ -2399,7 +2489,7 @@ BOOL Style_GetOpenDlgFilterStr(LPWSTR lpszFilter, int cchFilter) {
 //
 // Style_StrGetFont()
 //
-BOOL Style_StrGetFont(LPCWSTR lpszStyle, LPWSTR lpszFont, int cchFont) {
+BOOL Style_StrGetFontEx(LPCWSTR lpszStyle, LPWSTR lpszFont, int cchFont, BOOL bDefaultStyle) {
 	LPWSTR p;
 
 	if ((p = StrStr(lpszStyle, L"font:")) != NULL) {
@@ -2413,12 +2503,26 @@ BOOL Style_StrGetFont(LPCWSTR lpszStyle, LPWSTR lpszFont, int cchFont) {
 		}
 		TrimString(lpszFont);
 
-		if (StrCaseEqual(lpszFont, L"Default") || !IsFontAvailable(lpszFont)) {
-			lstrcpyn(lpszFont, SysMonoFontName[np2MonoFontIndex], cchFont);
+		if (bDefaultStyle) {
+			if (StrEqual(lpszFont, L"$(Text)")) {
+				lstrcpyn(lpszFont, systemTextFontName, cchFont);
+			} else if (StrCaseEqual(lpszFont, L"$(Mono)") || !IsFontAvailable(lpszFont)) {
+				lstrcpyn(lpszFont, systemMonoFontName, cchFont);
+			}
+		} else {
+			if (StrEqual(lpszFont, L"$(Text)")) {
+				lstrcpyn(lpszFont, defaultTextFontName, cchFont);
+			} else if (StrCaseEqual(lpszFont, L"$(Mono)") || !IsFontAvailable(lpszFont)) {
+				lstrcpyn(lpszFont, defaultMonoFontName, cchFont);
+			}
 		}
 		return TRUE;
 	}
 	return FALSE;
+}
+
+static inline BOOL Style_StrGetFont(LPCWSTR lpszStyle, LPWSTR lpszFont, int cchFont) {
+	return Style_StrGetFontEx(lpszStyle, lpszFont, cchFont, FALSE);
 }
 
 //=============================================================================
@@ -2621,7 +2725,7 @@ BOOL Style_SelectFont(HWND hwnd, LPWSTR lpszStyle, int cchStyle, BOOL bDefaultSt
 	ZeroMemory(&lf, sizeof(LOGFONT));
 
 	// Map lpszStyle to LOGFONT
-	if (Style_StrGetFont(lpszStyle, tch, COUNTOF(tch))) {
+	if (Style_StrGetFontEx(lpszStyle, tch, COUNTOF(tch), bDefaultStyle)) {
 		lstrcpyn(lf.lfFaceName, tch, COUNTOF(lf.lfFaceName));
 	}
 	if (Style_StrGetCharSet(lpszStyle, &iValue)) {
@@ -2715,9 +2819,10 @@ BOOL Style_SelectFont(HWND hwnd, LPWSTR lpszStyle, int cchStyle, BOOL bDefaultSt
 //
 // Style_SetDefaultFont()
 //
-void Style_SetDefaultFont(HWND hwnd) {
-	const int iIdx = GetDefaultStyleStartIndex();
-	if (Style_SelectFont(hwnd, lexDefault.Styles[Style_Default + iIdx].szValue, MAX_EDITSTYLE_VALUE_SIZE, TRUE)) {
+void Style_SetDefaultFont(HWND hwnd, BOOL bCode) {
+	int iIdx = GetDefaultStyleStartIndex();
+	iIdx += bCode ? Style_Default : Style_PlainText;
+	if (Style_SelectFont(hwnd, lexDefault.Styles[iIdx].szValue, MAX_EDITSTYLE_VALUE_SIZE, TRUE)) {
 		fStylesModified |= STYLESMODIFIED_SOME_STYLE;
 		lexDefault.bStyleChanged = TRUE;
 		Style_SetLexer(hwnd, pLexCurrent);
