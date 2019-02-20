@@ -1626,7 +1626,7 @@ static void DrawEdgeLine(Surface *surface, const ViewStyle &vsDraw, const LineLa
 	Range lineRange, int xStart) {
 	if (vsDraw.edgeState == EDGE_LINE) {
 		PRectangle rcSegment = rcLine;
-		const int edgeX = static_cast<int>(vsDraw.theEdge.column * vsDraw.spaceWidth);
+		const int edgeX = static_cast<int>(vsDraw.theEdge.column * vsDraw.aveCharWidth);
 		rcSegment.left = static_cast<XYPOSITION>(edgeX + xStart);
 		if ((ll->wrapIndent != 0) && (lineRange.start != 0))
 			rcSegment.left -= ll->wrapIndent;
@@ -1636,7 +1636,7 @@ static void DrawEdgeLine(Surface *surface, const ViewStyle &vsDraw, const LineLa
 		for (size_t edge = 0; edge < vsDraw.theMultiEdge.size(); edge++) {
 			if (vsDraw.theMultiEdge[edge].column >= 0) {
 				PRectangle rcSegment = rcLine;
-				const int edgeX = static_cast<int>(vsDraw.theMultiEdge[edge].column * vsDraw.spaceWidth);
+				const int edgeX = static_cast<int>(vsDraw.theMultiEdge[edge].column * vsDraw.aveCharWidth);
 				rcSegment.left = static_cast<XYPOSITION>(edgeX + xStart);
 				if ((ll->wrapIndent != 0) && (lineRange.start != 0))
 					rcSegment.left -= ll->wrapIndent;
@@ -2289,14 +2289,14 @@ void EditView::PaintText(Surface *surfaceWindow, const EditModel &model, PRectan
 		if (rcBeyondEOF.top < rcBeyondEOF.bottom) {
 			surfaceWindow->FillRectangle(rcBeyondEOF, vsDraw.styles[STYLE_DEFAULT].back);
 			if (vsDraw.edgeState == EDGE_LINE) {
-				const int edgeX = static_cast<int>(vsDraw.theEdge.column * vsDraw.spaceWidth);
+				const int edgeX = static_cast<int>(vsDraw.theEdge.column * vsDraw.aveCharWidth);
 				rcBeyondEOF.left = static_cast<XYPOSITION>(edgeX + xStart);
 				rcBeyondEOF.right = rcBeyondEOF.left + 1;
 				surfaceWindow->FillRectangle(rcBeyondEOF, vsDraw.theEdge.colour);
 			} else if (vsDraw.edgeState == EDGE_MULTILINE) {
 				for (size_t edge = 0; edge < vsDraw.theMultiEdge.size(); edge++) {
 					if (vsDraw.theMultiEdge[edge].column >= 0) {
-						const int edgeX = static_cast<int>(vsDraw.theMultiEdge[edge].column * vsDraw.spaceWidth);
+						const int edgeX = static_cast<int>(vsDraw.theMultiEdge[edge].column * vsDraw.aveCharWidth);
 						rcBeyondEOF.left = static_cast<XYPOSITION>(edgeX + xStart);
 						rcBeyondEOF.right = rcBeyondEOF.left + 1;
 						surfaceWindow->FillRectangle(rcBeyondEOF, vsDraw.theMultiEdge[edge].colour);
