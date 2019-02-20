@@ -391,9 +391,11 @@ static inline void FindSystemDefaultTextFont(void) {
 		NONCLIENTMETRICS ncm;
 		ZeroMemory(&ncm, sizeof(ncm));
 		ncm.cbSize = sizeof(ncm);
+#if (WINVER >= 0x0600)
 		//if (!IsVistaAndAbove()) {
 		//	ncm.cbSize -= sizeof(int); // iPaddedBorderWidth
 		//}
+#endif
 		if (SystemParametersInfo(SPI_GETNONCLIENTMETRICS, ncm.cbSize, &ncm, 0)) {
 			lstrcpyn(systemTextFontName, ncm.lfMessageFont.lfFaceName, COUNTOF(systemTextFontName));
 			return;
