@@ -2123,6 +2123,7 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	HMENU hmenu = (HMENU)wParam;
 
 	int i = StrNotEmpty(szCurFile);
+	EnableCmd(hmenu, IDM_FILE_SAVE, IsDocumentModified());
 	EnableCmd(hmenu, IDM_FILE_REVERT, i);
 	EnableCmd(hmenu, CMD_RELOADANSIASUTF8, i);
 	EnableCmd(hmenu, CMD_RELOADANSI, i);
@@ -6560,6 +6561,7 @@ void UpdateToolbar(void) {
 
 	EnableTool(IDT_FILE_ADDTOFAV, StrNotEmpty(szCurFile));
 
+	EnableTool(IDT_FILE_SAVE, IsDocumentModified());
 	EnableTool(IDT_EDIT_UNDO, SendMessage(hwndEdit, SCI_CANUNDO, 0, 0) /*&& !bReadOnly*/);
 	EnableTool(IDT_EDIT_REDO, SendMessage(hwndEdit, SCI_CANREDO, 0, 0) /*&& !bReadOnly*/);
 
