@@ -357,7 +357,7 @@ void ViewStyle::Refresh(Surface &surface, int tabInChars) {
 
 	aveCharWidth = styles[STYLE_DEFAULT].aveCharWidth;
 	spaceWidth = styles[STYLE_DEFAULT].spaceWidth;
-	tabWidth = spaceWidth * tabInChars;
+	tabWidth = aveCharWidth * tabInChars;
 
 	controlCharWidth = 0.0;
 	if (controlCharSymbol >= 32) {
