@@ -193,36 +193,13 @@ static const PEDITLEXER pLexArray[NUMLEXERS] = {
 	&lexANSI
 };
 
-struct LocaleFontInfo {
-	UINT codePage;
-	LANGID primary;
-	LPCWSTR fontName;
-	LPCWSTR localeFontName;
-};
-
 static LPCWSTR const commonMonoFontName[] = {
 	L"DejaVu Sans Mono",
-	//L"Bitstream Vera Sans Mono",
 	L"Consolas",			// Vista and above
 	//L"Source Code Pro",
 	//L"Liberation Mono",
 	//L"Droid Sans Mono",
-	//L"Menlo",
-	//L"Monaco",
 	//L"Inconsolata",		// alternative to Consolas
-};
-
-static const struct LocaleFontInfo systemLocaleFontInfo[] = {
-	// Japanese
-	{ 932, LANG_JAPANESE, L"Meiryo", L"メイリオ" },
-	// Simplified Chinese
-	{ 936, LANG_CHINESE_SIMPLIFIED, L"Microsoft Yahei", L"微软雅黑" },
-	// Korean
-	{ 949, LANG_KOREAN, L"Malgun Gothic", L"맑은 고딕" },
-	// Traditional Chinese
-	{ 950, LANG_CHINESE_TRADITIONAL, L"Microsoft JhengHei", L"微軟正黑體" },
-	// Korean
-	{ 1361, LANG_KOREAN, L"Malgun Gothic", L"맑은 고딕" },
 };
 
 // system available default monospaced font and proportional font
@@ -410,19 +387,15 @@ static inline void FindSystemDefaultMonoFont(void) {
 }
 
 static inline void FindSystemDefaultTextFont(void) {
-	const UINT acp = GetACP();
-	const LANGID lang = GetUserDefaultUILanguage();
-	const LANGID primary = PRIMARYLANGID(lang);
-
-	for (UINT i = 0; i < (UINT)COUNTOF(systemLocaleFontInfo); i++) {
-		const struct LocaleFontInfo info = systemLocaleFontInfo[i];
-		if ((info.codePage == acp) && IsFontAvailable(info.fontName)) {
-			// use locale font name
-			if (info.primary == primary && info.fontName != info.localeFontName && IsFontAvailable(info.localeFontName)) {
-				lstrcpy(systemTextFontName, info.localeFontName);
-			} else {
-				lstrcpy(systemTextFontName, info.fontName);
-			}
+	if (IsVistaAndAbove()) {
+		NONCLIENTMETRICS ncm;
+		ZeroMemory(&ncm, sizeof(ncm));
+		ncm.cbSize = sizeof(ncm);
+		//if (!IsVistaAndAbove()) {
+		//	ncm.cbSize -= sizeof(int); // iPaddedBorderWidth
+		//}
+		if (SystemParametersInfo(SPI_GETNONCLIENTMETRICS, ncm.cbSize, &ncm, 0)) {
+			lstrcpyn(systemTextFontName, ncm.lfMessageFont.lfFaceName, COUNTOF(systemTextFontName));
 			return;
 		}
 	}
