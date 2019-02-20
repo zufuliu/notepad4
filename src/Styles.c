@@ -193,15 +193,6 @@ static const PEDITLEXER pLexArray[NUMLEXERS] = {
 	&lexANSI
 };
 
-static LPCWSTR const commonMonoFontName[] = {
-	L"DejaVu Sans Mono",
-	L"Consolas",			// Vista and above
-	//L"Source Code Pro",
-	//L"Liberation Mono",
-	//L"Droid Sans Mono",
-	//L"Inconsolata",		// alternative to Consolas
-};
-
 // system available default monospaced font and proportional font
 static WCHAR systemMonoFontName[LF_FACESIZE];
 static WCHAR systemTextFontName[LF_FACESIZE];
@@ -376,6 +367,15 @@ static inline UINT GetDefaultStyleControlMask(int index) {
 }
 
 static inline void FindSystemDefaultMonoFont(void) {
+	LPCWSTR const commonMonoFontName[] = {
+		L"DejaVu Sans Mono",
+		L"Consolas",			// Vista and above
+		//L"Source Code Pro",
+		//L"Liberation Mono",
+		//L"Droid Sans Mono",
+		//L"Inconsolata",		// alternative to Consolas
+	};
+
 	for (UINT i = 0; i < (UINT)COUNTOF(commonMonoFontName); i++) {
 		LPCWSTR fontName = commonMonoFontName[i];
 		if (IsFontAvailable(fontName)) {
