@@ -151,8 +151,8 @@ BEGIN
         MENUITEM "Cu&t\tCtrl+X",                IDM_EDIT_CUT
         MENUITEM "&Copy\tCtrl+C",               IDM_EDIT_COPY
         MENUITEM "&Paste\tCtrl+V",              IDM_EDIT_PASTE
+        MENUITEM "Delete\tDel",                 IDM_EDIT_DELETE
         MENUITEM "&Select All\tCtrl+A",         IDM_EDIT_SELECTALL
-        MENUITEM "Clear\tDel",                  IDM_EDIT_CLEAR
         MENUITEM "S&wap\tCtrl+K",               IDM_EDIT_SWAP
         MENUITEM SEPARATOR
         MENUITEM "Clear Clipboar&d",            IDM_EDIT_CLEARCLIPBOARD
@@ -632,7 +632,7 @@ BEGIN
         MENUITEM "Cu&t",                        IDM_EDIT_CUT
         MENUITEM "&Copy",                       IDM_EDIT_COPY
         MENUITEM "&Paste",                      IDM_EDIT_PASTE
-        MENUITEM "Cl&ear",                      IDM_EDIT_CLEAR
+        MENUITEM "&Delete",                     IDM_EDIT_DELETE
         MENUITEM SEPARATOR
         MENUITEM "&Select All",                 IDM_EDIT_SELECTALL
         MENUITEM SEPARATOR
@@ -1777,7 +1777,7 @@ BEGIN
     IDT_FILE_EXIT           "Exit"
     IDT_FILE_SAVEAS         "Save As"
     IDT_FILE_SAVECOPY       "Save Copy"
-    IDT_EDIT_CLEAR          "Clear"
+    IDT_EDIT_DELETE         "Delete"
     IDT_FILE_PRINT          "Print"
     IDT_FILE_OPENFAV        "Favorites"
     IDT_FILE_ADDTOFAV       "Add to Favorites"

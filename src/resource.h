@@ -426,7 +426,7 @@
 #define IDM_EDIT_COPYADD				40305	// Ctrl+E
 #define IDM_EDIT_PASTE					40306	// Ctrl+V
 #define IDM_EDIT_SWAP					40307	// Ctrl+K
-#define IDM_EDIT_CLEAR					40308	// Del
+#define IDM_EDIT_DELETE					40308	// Del
 #define IDM_EDIT_CLEARCLIPBOARD			40309
 #define IDM_EDIT_SELECTALL				40310	// Ctrl+A
 #define IDM_EDIT_SELECTWORD				40311	// Ctrl+Space
@@ -707,7 +707,7 @@
 #define IDT_FILE_EXIT					40716
 #define IDT_FILE_SAVEAS					40717
 #define IDT_FILE_SAVECOPY				40718
-#define IDT_EDIT_CLEAR					40719
+#define IDT_EDIT_DELETE					40719
 #define IDT_FILE_PRINT					40720
 #define IDT_FILE_OPENFAV				40721
 #define IDT_FILE_ADDTOFAV				40722
