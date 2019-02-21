@@ -8,8 +8,8 @@ NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL
 }};
 
 static EDITSTYLE Styles_Default[] = {
-	{ STYLE_DEFAULT, 63100, EDITSTYLE_HOLE(L"Default Style"), L"font:$(Mono); size:11" },
-	{ STYLE_DEFAULT, 63600, EDITSTYLE_HOLE(L"Plain Text"), L"font:$(Text); size:11" },
+	{ STYLE_DEFAULT, 63100, EDITSTYLE_HOLE(L"Default Code Style"), L"font:$(Code); size:11" },
+	{ STYLE_DEFAULT, 63600, EDITSTYLE_HOLE(L"Default Text Style"), L"font:$(Text); size:11" },
 	{ STYLE_LINENUMBER, 63101, EDITSTYLE_HOLE(L"Margin and Line Number"), L"size:-2; fore:#2B91AF" },
 	{ STYLE_BRACELIGHT, 63102, EDITSTYLE_HOLE(L"Matching Brace"), L"size:+1; bold; fore:#FF0000" },
 	{ STYLE_BRACEBAD, 63103, EDITSTYLE_HOLE(L"Matching Brace Error"), L"size:+1; bold; fore:#000080" },
@@ -23,8 +23,8 @@ static EDITSTYLE Styles_Default[] = {
 	{ SCI_SETEXTRAASCENT + SCI_SETEXTRADESCENT, 63111, EDITSTYLE_HOLE(L"Extra Line Spacing"), L"size:2" },
 	{ 0, 63124, EDITSTYLE_HOLE(L"Folding Marker"), L"fore:#8080FF; back:#ADD8E6" },
 
-	{ STYLE_DEFAULT, 63112, EDITSTYLE_HOLE(L"2nd Default Style"), L"font:$(Mono); size:11" },
-	{ STYLE_DEFAULT, 63601, EDITSTYLE_HOLE(L"2nd Plain Text"), L"font:$(Text); size:11" },
+	{ STYLE_DEFAULT, 63112, EDITSTYLE_HOLE(L"2nd Default Code Style"), L"font:$(Code); size:11" },
+	{ STYLE_DEFAULT, 63601, EDITSTYLE_HOLE(L"2nd Default Text Style"), L"font:$(Text); size:11" },
 	{ STYLE_LINENUMBER, 63113, EDITSTYLE_HOLE(L"2nd Margin and Line Number"), L"font:Tahoma; size:-2; fore:#2B91AF" },
 	{ STYLE_BRACELIGHT, 63114, EDITSTYLE_HOLE(L"2nd Matching Brace"), L"bold; fore:#FF0000" },
 	{ STYLE_BRACEBAD, 63115, EDITSTYLE_HOLE(L"2nd Matching Brace Error"), L"bold; fore:#000080" },

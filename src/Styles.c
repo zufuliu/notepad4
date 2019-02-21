@@ -194,10 +194,10 @@ static const PEDITLEXER pLexArray[NUMLEXERS] = {
 };
 
 // system available default monospaced font and proportional font
-static WCHAR systemMonoFontName[LF_FACESIZE];
+static WCHAR systemCodeFontName[LF_FACESIZE];
 static WCHAR systemTextFontName[LF_FACESIZE];
 // global default (from "Default Text") monospaced font and proportional font
-static WCHAR defaultMonoFontName[LF_FACESIZE];
+static WCHAR defaultCodeFontName[LF_FACESIZE];
 static WCHAR defaultTextFontName[LF_FACESIZE];
 
 // Currently used lexer
@@ -243,7 +243,7 @@ static BOOL bCustomColorLoaded = FALSE;
 static int iLexerLoadedCount = 0;
 
 BOOL	bUse2ndDefaultStyle;
-int		fUseMonospacedFont;
+int		fUseDefaultCodeStyle;
 BOOL	bCurrentLexerHasLineComment;
 BOOL	bCurrentLexerHasBlockComment;
 static UINT fStylesModified = STYLESMODIFIED_NONE;
@@ -304,8 +304,8 @@ see above variables and the "View" menu.
 */
 //! keep same order as lexDefault
 enum DefaultStyleIndex {
-	Style_Default,			// global default code style.
-	Style_PlainText,		// global default plain text style.
+	Style_DefaultCode,			// global default code style.
+	Style_DefaultText,		// global default text style.
 	Style_LineNumber,		// inherited style, except for background color (default to COLOR_3DFACE).
 	Style_MatchBrace,		// inherited style.
 	Style_MatchBraceError,	// inherited style.
@@ -332,14 +332,21 @@ enum {
 };
 
 static inline int GetDefaultStyleStartIndex(void) {
-	return bUse2ndDefaultStyle ? Style_MaxDefaultStyle : Style_Default;
+	return bUse2ndDefaultStyle ? Style_MaxDefaultStyle : Style_DefaultCode;
 }
 
 static inline int GetGlobalBaseStyleIndex(int rid) {
 	if (rid == NP2LEX_DEFAULT) {
-		return (fUseMonospacedFont & UseUseMonospacedFont_PlainText) ? Style_Default : Style_PlainText;
+		return (fUseDefaultCodeStyle & UseDefaultCodeStyle_PlainText) ? Style_DefaultCode : Style_DefaultText;
 	}
-	return (fUseMonospacedFont & UseUseMonospacedFont_Code) ? Style_Default : Style_PlainText;
+	return (fUseDefaultCodeStyle & UseDefaultCodeStyle_CodeFile) ? Style_DefaultCode : Style_DefaultText;
+}
+
+static inline BOOL IsGlobalBaseStyleIndex(int index) {
+	return index == Style_DefaultCode
+		|| index == Style_DefaultText
+		|| index == Style_DefaultCode + Style_MaxDefaultStyle
+		|| index == Style_DefaultText + Style_MaxDefaultStyle;
 }
 
 static inline UINT GetDefaultStyleControlMask(int index) {
@@ -366,8 +373,8 @@ static inline UINT GetDefaultStyleControlMask(int index) {
 	}
 }
 
-static inline void FindSystemDefaultMonoFont(void) {
-	LPCWSTR const commonMonoFontName[] = {
+static inline void FindSystemDefaultCodeFont(void) {
+	LPCWSTR const commonCodeFontName[] = {
 		L"DejaVu Sans Mono",
 		L"Consolas",			// Vista and above
 		//L"Source Code Pro",
@@ -376,14 +383,14 @@ static inline void FindSystemDefaultMonoFont(void) {
 		//L"Inconsolata",		// alternative to Consolas
 	};
 
-	for (UINT i = 0; i < (UINT)COUNTOF(commonMonoFontName); i++) {
-		LPCWSTR fontName = commonMonoFontName[i];
+	for (UINT i = 0; i < (UINT)COUNTOF(commonCodeFontName); i++) {
+		LPCWSTR fontName = commonCodeFontName[i];
 		if (IsFontAvailable(fontName)) {
-			lstrcpy(systemMonoFontName, fontName);
+			lstrcpy(systemCodeFontName, fontName);
 			return;
 		}
 	}
-	lstrcpy(systemMonoFontName, L"Courier New");
+	lstrcpy(systemCodeFontName, L"Courier New");
 }
 
 static inline void FindSystemDefaultTextFont(void) {
@@ -464,7 +471,7 @@ void Style_Load(void) {
 
 	// 2nd default
 	bUse2ndDefaultStyle = IniSectionGetBool(pIniSection, L"Use2ndDefaultStyle", 0);
-	fUseMonospacedFont = IniSectionGetInt(pIniSection, L"UseMonospacedFont", UseUseMonospacedFont_Default);
+	fUseDefaultCodeStyle = IniSectionGetInt(pIniSection, L"UseDefaultCodeStyle", UseDefaultCodeStyle_Default);
 
 	// default scheme
 	const int iValue = IniSectionGetInt(pIniSection, L"DefaultScheme", 0);
@@ -497,7 +504,7 @@ void Style_Load(void) {
 		Style_LoadOneEx(pLexArray[iDefaultLexer], pIniSection, pIniSectionBuf, cchIniSection);
 	}
 
-	FindSystemDefaultMonoFont();
+	FindSystemDefaultCodeFont();
 	FindSystemDefaultTextFont();
 
 	IniSectionFree(pIniSection);
@@ -587,7 +594,7 @@ void Style_Save(void) {
 
 	// 2nd default
 	IniSectionSetBoolEx(pIniSection, L"Use2ndDefaultStyle", bUse2ndDefaultStyle, 0);
-	IniSectionSetIntEx(pIniSection, L"UseMonospacedFont", fUseMonospacedFont, UseUseMonospacedFont_Default);
+	IniSectionSetIntEx(pIniSection, L"UseDefaultCodeStyle", fUseDefaultCodeStyle, UseDefaultCodeStyle_Default);
 
 	// default scheme
 	IniSectionSetIntEx(pIniSection, L"DefaultScheme", iDefaultLexer, 0);
@@ -1032,8 +1039,8 @@ void Style_SetLexer(HWND hwnd, PEDITLEXER pLexNew) {
 	SendMessage(hwnd, SCI_STYLESETCHARACTERSET, STYLE_DEFAULT, DEFAULT_CHARSET);
 
 	//! begin Style_Default
-	Style_StrGetFontEx(lexDefault.Styles[Style_Default + iIdx].szValue, defaultMonoFontName, COUNTOF(defaultMonoFontName), TRUE);
-	Style_StrGetFontEx(lexDefault.Styles[Style_PlainText + iIdx].szValue,  defaultTextFontName, COUNTOF(defaultTextFontName), TRUE);
+	Style_StrGetFontEx(lexDefault.Styles[Style_DefaultCode + iIdx].szValue, defaultCodeFontName, COUNTOF(defaultCodeFontName), TRUE);
+	Style_StrGetFontEx(lexDefault.Styles[Style_DefaultText + iIdx].szValue, defaultTextFontName, COUNTOF(defaultTextFontName), TRUE);
 	iValue = GetGlobalBaseStyleIndex(rid);
 	LPCWSTR szValue = lexDefault.Styles[iValue + iIdx].szValue;
 	Style_StrGetFontSize(szValue, &iBaseFontSize);
@@ -2350,26 +2357,26 @@ int Style_GetEditLexerId(int lexer) {
 //
 // Style_ToggleUse2ndDefault()
 //
-void Style_ToggleUse2ndDefault(HWND hwnd) {
+void Style_ToggleUse2ndDefaultStyle(HWND hwnd) {
 	bUse2ndDefaultStyle = !bUse2ndDefaultStyle;
 	Style_SetLexer(hwnd, pLexCurrent);
 }
 
-void Style_ToggleUseMonospacedFont(HWND hwnd, int menu) {
+void Style_ToggleUseDefaultCodeStyle(HWND hwnd, int menu) {
 	int mask = 0;
 	switch (menu) {
-	case IDM_VIEW_USEMONOFONT_CODE:
-		mask = UseUseMonospacedFont_Code;
+	case IDM_VIEW_USECODESTYLE_CODEFILE:
+		mask = UseDefaultCodeStyle_CodeFile;
 		break;
-	case IDM_VIEW_USEMONOFONT_PLAINTEXT:
-		mask = UseUseMonospacedFont_PlainText;
+	case IDM_VIEW_USECODESTYLE_PLAINTEXT:
+		mask = UseDefaultCodeStyle_PlainText;
 		break;
 	}
 
-	if (fUseMonospacedFont & mask) {
-		fUseMonospacedFont &= ~mask;
+	if (fUseDefaultCodeStyle & mask) {
+		fUseDefaultCodeStyle &= ~mask;
 	} else {
-		fUseMonospacedFont |= mask;
+		fUseDefaultCodeStyle |= mask;
 	}
 	Style_SetLexer(hwnd, pLexCurrent);
 }
@@ -2481,14 +2488,14 @@ BOOL Style_StrGetFontEx(LPCWSTR lpszStyle, LPWSTR lpszFont, int cchFont, BOOL bD
 		if (bDefaultStyle) {
 			if (StrEqual(lpszFont, L"$(Text)")) {
 				lstrcpyn(lpszFont, systemTextFontName, cchFont);
-			} else if (StrCaseEqual(lpszFont, L"$(Mono)") || !IsFontAvailable(lpszFont)) {
-				lstrcpyn(lpszFont, systemMonoFontName, cchFont);
+			} else if (StrCaseEqual(lpszFont, L"$(Code)") || !IsFontAvailable(lpszFont)) {
+				lstrcpyn(lpszFont, systemCodeFontName, cchFont);
 			}
 		} else {
 			if (StrEqual(lpszFont, L"$(Text)")) {
 				lstrcpyn(lpszFont, defaultTextFontName, cchFont);
-			} else if (StrCaseEqual(lpszFont, L"$(Mono)") || !IsFontAvailable(lpszFont)) {
-				lstrcpyn(lpszFont, defaultMonoFontName, cchFont);
+			} else if (StrCaseEqual(lpszFont, L"$(Code)") || !IsFontAvailable(lpszFont)) {
+				lstrcpyn(lpszFont, defaultCodeFontName, cchFont);
 			}
 		}
 		return TRUE;
@@ -2796,7 +2803,7 @@ BOOL Style_SelectFont(HWND hwnd, LPWSTR lpszStyle, int cchStyle, BOOL bDefaultSt
 //
 void Style_SetDefaultFont(HWND hwnd, BOOL bCode) {
 	int iIdx = GetDefaultStyleStartIndex();
-	iIdx += bCode ? Style_Default : Style_PlainText;
+	iIdx += bCode ? Style_DefaultCode : Style_DefaultText;
 	if (Style_SelectFont(hwnd, lexDefault.Styles[iIdx].szValue, MAX_EDITSTYLE_VALUE_SIZE, TRUE)) {
 		fStylesModified |= STYLESMODIFIED_SOME_STYLE;
 		lexDefault.bStyleChanged = TRUE;
@@ -3504,8 +3511,7 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 			if (pCurrentStyle) {
 				WCHAR tch[MAX_LEXER_STYLE_EDIT_SIZE];
 				GetDlgItemText(hwnd, IDC_STYLEEDIT, tch, COUNTOF(tch));
-				const BOOL bDefaultStyle = (pCurrentLexer->rid == NP2LEX_DEFAULT) &&
-					(iCurrentStyleIndex == Style_Default || iCurrentStyleIndex == Style_MaxDefaultStyle);
+				const BOOL bDefaultStyle = (pCurrentLexer->rid == NP2LEX_DEFAULT) && IsGlobalBaseStyleIndex(iCurrentStyleIndex);
 
 				if (Style_SelectFont(hwnd, tch, COUNTOF(tch), bDefaultStyle)) {
 					SetDlgItemText(hwnd, IDC_STYLEEDIT, tch);
