@@ -67,7 +67,7 @@ HWND	hDlgFindReplace = NULL;
 #define MARGIN_FOLD_INDEX	2	// folding index
 
 #define TOOLBAR_COMMAND_BASE	IDT_FILE_NEW
-#define DefaultToolbarButtons	L"22 3 0 1 2 0 4 18 19 0 5 6 0 7 20 8 9 0 10 11 0 12 0 24 0 13 14 0 15 16 17 0"
+#define DefaultToolbarButtons	L"22 3 0 1 2 0 4 18 19 0 5 6 0 7 8 9 20 0 10 11 0 12 0 24 0 13 14 0 15 16 17 0"
 static TBBUTTON tbbMainWnd[] = {
 	{0, 	0, 					0, 				 TBSTYLE_SEP, {0}, 0, 0},
 	{0, 	IDT_FILE_NEW, 		TBSTATE_ENABLED, TBSTYLE_BUTTON, {0}, 0, 0},
@@ -89,7 +89,7 @@ static TBBUTTON tbbMainWnd[] = {
 	{16, 	IDT_FILE_EXIT, 		TBSTATE_ENABLED, TBSTYLE_BUTTON, {0}, 0, 0},
 	{17, 	IDT_FILE_SAVEAS, 	TBSTATE_ENABLED, TBSTYLE_BUTTON, {0}, 0, 0},
 	{18, 	IDT_FILE_SAVECOPY, 	TBSTATE_ENABLED, TBSTYLE_BUTTON, {0}, 0, 0},
-	{19, 	IDT_EDIT_CLEAR, 	TBSTATE_ENABLED, TBSTYLE_BUTTON, {0}, 0, 0},
+	{19, 	IDT_EDIT_DELETE, 	TBSTATE_ENABLED, TBSTYLE_BUTTON, {0}, 0, 0},
 	{20, 	IDT_FILE_PRINT, 	TBSTATE_ENABLED, TBSTYLE_BUTTON, {0}, 0, 0},
 	{21, 	IDT_FILE_OPENFAV, 	TBSTATE_ENABLED, TBSTYLE_BUTTON, {0}, 0, 0},
 	{22, 	IDT_FILE_ADDTOFAV, 	TBSTATE_ENABLED, TBSTYLE_BUTTON, {0}, 0, 0},
@@ -2186,7 +2186,7 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	EnableCmd(hmenu, IDM_EDIT_REDO, SendMessage(hwndEdit, SCI_CANREDO, 0, 0) /*&& !bReadOnly*/);
 
 	i  = !EditIsEmptySelection();
-	const int i2 = (int)SendMessage(hwndEdit, SCI_CANPASTE, 0, 0);
+	const BOOL canPaste = (BOOL)SendMessage(hwndEdit, SCI_CANPASTE, 0, 0);
 	const BOOL nonEmpty = SendMessage(hwndEdit, SCI_GETLENGTH, 0, 0) != 0;
 
 	EnableCmd(hmenu, IDM_EDIT_CUT, i /*&& !bReadOnly*/);
@@ -2196,10 +2196,10 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	EnableCmd(hmenu, IDM_EDIT_COPYALL, nonEmpty /*&& !bReadOnly*/);
 	EnableCmd(hmenu, IDM_EDIT_SELECTALL, nonEmpty);
 	EnableCmd(hmenu, IDM_EDIT_COPYADD, i /*&& !bReadOnly*/);
-	EnableCmd(hmenu, IDM_EDIT_PASTE, i2 /*&& !bReadOnly*/);
-	EnableCmd(hmenu, IDM_EDIT_PASTE_BINARY, i2 /*&& !bReadOnly*/);
-	EnableCmd(hmenu, IDM_EDIT_SWAP, i || i2 /*&& !bReadOnly*/);
-	EnableCmd(hmenu, IDM_EDIT_CLEAR, i /*&& !bReadOnly*/);
+	EnableCmd(hmenu, IDM_EDIT_PASTE, canPaste /*&& !bReadOnly*/);
+	EnableCmd(hmenu, IDM_EDIT_PASTE_BINARY, canPaste /*&& !bReadOnly*/);
+	EnableCmd(hmenu, IDM_EDIT_SWAP, i || canPaste /*&& !bReadOnly*/);
+	EnableCmd(hmenu, IDM_EDIT_DELETE, nonEmpty /*&& !bReadOnly*/);
 	EnableCmd(hmenu, IDM_EDIT_COPYRTF, i /*&& !bReadOnly*/);
 
 	OpenClipboard(hwnd);
@@ -2943,7 +2943,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		}
 		break;
 
-	case IDM_EDIT_CLEAR:
+	case IDM_EDIT_DELETE:
 		SendMessage(hwndEdit, SCI_CLEAR, 0, 0);
 		break;
 
@@ -4766,12 +4766,8 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		SendWMCommandOrBeep(hwnd, IDM_FILE_SAVECOPY);
 		break;
 
-	case IDT_EDIT_CLEAR:
-		if (IsCmdEnabled(hwnd, IDM_EDIT_CLEAR)) {
-			SendWMCommand(hwnd, IDM_EDIT_CLEAR);
-		} else {
-			SendMessage(hwndEdit, SCI_CLEARALL, 0, 0);
-		}
+	case IDT_EDIT_DELETE:
+		SendWMCommandOrBeep(hwnd, IDM_EDIT_DELETE);
 		break;
 
 	case IDT_FILE_PRINT:
@@ -6580,7 +6576,7 @@ void UpdateToolbar(void) {
 	//EnableTool(IDT_EDIT_FINDNEXT, i);
 	//EnableTool(IDT_EDIT_FINDPREV, i && StrNotEmptyA(efrData.szFind));
 	EnableTool(IDT_EDIT_REPLACE, i /*&& !bReadOnly*/);
-	EnableTool(IDT_EDIT_CLEAR, i /*&& !bReadOnly*/);
+	EnableTool(IDT_EDIT_DELETE, i /*&& !bReadOnly*/);
 
 	EnableTool(IDT_VIEW_TOGGLEFOLDS, i && bShowCodeFolding);
 	EnableTool(IDT_FILE_LAUNCH, i);
