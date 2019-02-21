@@ -1476,6 +1476,11 @@ void UpdateWindowTitle(void) {
 				IDS_READONLY, bReadOnly, szTitleExcerpt);
 }
 
+static inline void UpdateDocumentModificationStatus(void) {
+	UpdateWindowTitle();
+	UpdateToolbar();
+}
+
 void UpdateSelectionMarginWidth(void) {
 	// fixed width to put arrow cursor.
 	const int width = bShowSelectionMargin ? (GetSystemMetrics(SM_CXCURSOR) / 2) : 0;
@@ -4960,7 +4965,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 		case SCN_SAVEPOINTREACHED:
 			bModified = FALSE;
-			UpdateWindowTitle();
+			UpdateDocumentModificationStatus();
 			break;
 
 		case SCN_MARGINCLICK:
@@ -4976,7 +4981,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 		case SCN_SAVEPOINTLEFT:
 			bModified = TRUE;
-			UpdateWindowTitle();
+			UpdateDocumentModificationStatus();
 			break;
 
 		case SCN_URIDROPPED: {
@@ -6873,7 +6878,7 @@ BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect, LPCWST
 		SendMessage(hwndEdit, SCI_SETCODEPAGE, (iDefaultEncoding == CPI_DEFAULT) ? iDefaultCodePage : SC_CP_UTF8, 0);
 		UpdateStatusBarCache(STATUS_CODEPAGE);
 		UpdateStatusBarCache(STATUS_EOLMODE);
-		UpdateWindowTitle();
+		UpdateDocumentModificationStatus();
 
 		// Terminate file watching
 		if (bResetFileWatching) {
@@ -7012,7 +7017,7 @@ BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect, LPCWST
 #endif
 
 		UpdateStatusbar();
-		UpdateWindowTitle();
+		UpdateDocumentModificationStatus();
 		// Show warning: Unicode file loaded as ANSI
 		if (status.bUnicodeErr) {
 			MsgBox(MBWARN, IDS_ERR_UNICODE);
@@ -7151,7 +7156,7 @@ BOOL FileSave(BOOL bSaveAlways, BOOL bAsk, BOOL bSaveAs, BOOL bSaveCopy) {
 			if (flagRelaunchElevated == 2 && bSaveAs && iPathNameFormat == 0) {
 				iPathNameFormat = 1;
 			}
-			UpdateWindowTitle();
+			UpdateDocumentModificationStatus();
 
 			// Install watching of the current file
 			if (bSaveAs && bResetFileWatching) {
