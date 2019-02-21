@@ -185,6 +185,7 @@ extern WCHAR szIniFile[MAX_PATH];
 #else
 #define IsWin10AndAbove()	(g_uWinVer >= _WIN32_WINNT_WIN10)
 #endif
+
 #ifndef LOAD_LIBRARY_SEARCH_SYSTEM32
 #define LOAD_LIBRARY_SEARCH_SYSTEM32 0x00000800
 #endif
