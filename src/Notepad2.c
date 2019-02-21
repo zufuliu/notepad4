@@ -2200,6 +2200,7 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	EnableCmd(hmenu, IDM_EDIT_PASTE_BINARY, canPaste /*&& !bReadOnly*/);
 	EnableCmd(hmenu, IDM_EDIT_SWAP, i || canPaste /*&& !bReadOnly*/);
 	EnableCmd(hmenu, IDM_EDIT_DELETE, nonEmpty /*&& !bReadOnly*/);
+	EnableCmd(hmenu, IDM_EDIT_CLEARDOCUMENT, nonEmpty /*&& !bReadOnly*/);
 	EnableCmd(hmenu, IDM_EDIT_COPYRTF, i /*&& !bReadOnly*/);
 
 	OpenClipboard(hwnd);
@@ -2945,6 +2946,10 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	case IDM_EDIT_DELETE:
 		SendMessage(hwndEdit, SCI_CLEAR, 0, 0);
+		break;
+
+	case IDM_EDIT_CLEARDOCUMENT:
+		SendMessage(hwndEdit, SCI_CLEARALL, 0, 0);
 		break;
 
 	case IDM_EDIT_CLEARCLIPBOARD:
