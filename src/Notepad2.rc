@@ -452,7 +452,7 @@ BEGIN
         POPUP "&Use Default Code Style"
         BEGIN
             MENUITEM "&Code File",                  IDM_VIEW_USECODESTYLE_CODEFILE
-            MENUITEM "Plain &Text",                 IDM_VIEW_USECODESTYLE_PLAINTEXT
+            MENUITEM "&Text File",                  IDM_VIEW_USECODESTYLE_TEXTFILE
         END
         MENUITEM SEPARATOR
         MENUITEM "Default &Text",                   IDM_LANG_DEFAULT

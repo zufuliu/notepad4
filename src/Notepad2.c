@@ -2333,7 +2333,7 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	CheckCmd(hmenu, IDM_VIEW_USE2NDDEFAULT, bUse2ndDefaultStyle);
 	CheckCmd(hmenu, IDM_VIEW_USECODESTYLE_CODEFILE, fUseDefaultCodeStyle & UseDefaultCodeStyle_CodeFile);
-	CheckCmd(hmenu, IDM_VIEW_USECODESTYLE_PLAINTEXT, fUseDefaultCodeStyle & UseDefaultCodeStyle_PlainText);
+	CheckCmd(hmenu, IDM_VIEW_USECODESTYLE_TEXTFILE, fUseDefaultCodeStyle & UseDefaultCodeStyle_TextFile);
 
 	CheckCmd(hmenu, IDM_VIEW_WORDWRAP, fWordWrap);
 	i = IDM_VIEW_FONTQUALITY_DEFAULT + iFontQuality;
@@ -3756,7 +3756,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	case IDM_VIEW_USECODESTYLE_CODEFILE:
-	case IDM_VIEW_USECODESTYLE_PLAINTEXT:
+	case IDM_VIEW_USECODESTYLE_TEXTFILE:
 		Style_ToggleUseDefaultCodeStyle(hwndEdit, LOWORD(wParam));
 		break;
 

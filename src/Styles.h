@@ -43,7 +43,7 @@
 
 enum UseDefaultCodeStyle {
 	UseDefaultCodeStyle_CodeFile = 1,
-	UseDefaultCodeStyle_PlainText = 2,
+	UseDefaultCodeStyle_TextFile = 2,
 
 	UseDefaultCodeStyle_Default = UseDefaultCodeStyle_CodeFile,
 };
