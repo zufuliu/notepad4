@@ -392,9 +392,9 @@ static inline void FindSystemDefaultTextFont(void) {
 		ZeroMemory(&ncm, sizeof(ncm));
 		ncm.cbSize = sizeof(ncm);
 #if (WINVER >= 0x0600)
-		//if (!IsVistaAndAbove()) {
-		//	ncm.cbSize -= sizeof(int); // iPaddedBorderWidth
-		//}
+		if (!IsVistaAndAbove()) {
+			ncm.cbSize -= sizeof(ncm.iPaddedBorderWidth);
+		}
 #endif
 		if (SystemParametersInfo(SPI_GETNONCLIENTMETRICS, ncm.cbSize, &ncm, 0)) {
 			lstrcpyn(systemTextFontName, ncm.lfMessageFont.lfFaceName, COUNTOF(systemTextFontName));
@@ -402,7 +402,7 @@ static inline void FindSystemDefaultTextFont(void) {
 		}
 	}
 
-	// other languages
+	// other systems
 	if (IsFontAvailable(L"Tahoma")) {
 		lstrcpy(systemTextFontName, L"Tahoma");
 	} else {
