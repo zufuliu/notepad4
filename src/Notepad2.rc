@@ -155,6 +155,7 @@ BEGIN
         MENUITEM "&Select All\tCtrl+A",         IDM_EDIT_SELECTALL
         MENUITEM "S&wap\tCtrl+K",               IDM_EDIT_SWAP
         MENUITEM SEPARATOR
+        MENUITEM "Clear Document",              IDM_EDIT_CLEARDOCUMENT
         MENUITEM "Clear Clipboar&d",            IDM_EDIT_CLEARCLIPBOARD
         POPUP "Copy to Clipboard"
         BEGIN
@@ -313,7 +314,6 @@ BEGIN
             MENUITEM "Delete Word Left\tCtrl+Back",         CMD_CTRLBACK
             MENUITEM "Delete Word Right\tCtrl+Del",         CMD_CTRLDEL
             MENUITEM SEPARATOR
-            MENUITEM "Clear Whole Document",        IDM_EDIT_CLEARDOCUMENT
             MENUITEM "Update Timestamps\tShift+F5", CMD_TIMESTAMPS
         END
         POPUP "&Action on Selection"

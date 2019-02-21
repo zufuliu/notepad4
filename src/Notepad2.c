@@ -6573,10 +6573,10 @@ void UpdateToolbar(void) {
 
 	int i = !EditIsEmptySelection();
 	EnableTool(IDT_EDIT_CUT, i /*&& !bReadOnly*/);
-	i = (int)SendMessage(hwndEdit, SCI_GETLENGTH, 0, 0);
 	EnableTool(IDT_EDIT_COPY, i);
 	EnableTool(IDT_EDIT_PASTE, SendMessage(hwndEdit, SCI_CANPASTE, 0, 0) /*&& !bReadOnly*/);
 
+	i = (int)SendMessage(hwndEdit, SCI_GETLENGTH, 0, 0);
 	EnableTool(IDT_EDIT_FIND, i);
 	//EnableTool(IDT_EDIT_FINDNEXT, i);
 	//EnableTool(IDT_EDIT_FINDPREV, i && StrNotEmptyA(efrData.szFind));
