@@ -41,17 +41,17 @@
 #define EditLexer_HTML		1
 #define EditLexer_XML		2
 
-enum UseUseMonospacedFont {
-	UseUseMonospacedFont_Code = 1,
-	UseUseMonospacedFont_PlainText = 2,
+enum UseDefaultCodeStyle {
+	UseDefaultCodeStyle_CodeFile = 1,
+	UseDefaultCodeStyle_PlainText = 2,
 
-	UseUseMonospacedFont_Default = UseUseMonospacedFont_Code,
+	UseDefaultCodeStyle_Default = UseDefaultCodeStyle_CodeFile,
 };
 
 extern PEDITLEXER pLexCurrent;
 extern int np2LexLangIndex;
 extern BOOL bUse2ndDefaultStyle;
-extern int fUseMonospacedFont;
+extern int fUseDefaultCodeStyle;
 extern BOOL bCurrentLexerHasLineComment;
 extern BOOL bCurrentLexerHasBlockComment;
 extern UINT8 currentLexKeywordAttr[NUMKEYWORD];
@@ -85,8 +85,8 @@ void	Style_SetIndentGuides(HWND hwnd, BOOL bShow);
 void	Style_UpdateCaret(HWND hwnd);
 void	Style_SetLongLineColors(HWND hwnd);
 void	Style_HighlightCurrentLine(HWND hwnd);
-void	Style_ToggleUse2ndDefault(HWND hwnd);
-void	Style_ToggleUseMonospacedFont(HWND hwnd, int menu);
+void	Style_ToggleUse2ndDefaultStyle(HWND hwnd);
+void	Style_ToggleUseDefaultCodeStyle(HWND hwnd, int menu);
 BOOL	Style_GetOpenDlgFilterStr(LPWSTR lpszFilter, int cchFilter);
 
 BOOL	Style_StrGetFontEx(LPCWSTR lpszStyle, LPWSTR lpszFont, int cchFont, BOOL bDefaultStyle);
