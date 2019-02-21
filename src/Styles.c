@@ -337,7 +337,7 @@ static inline int GetDefaultStyleStartIndex(void) {
 
 static inline int GetGlobalBaseStyleIndex(int rid) {
 	if (rid == NP2LEX_DEFAULT) {
-		return (fUseDefaultCodeStyle & UseDefaultCodeStyle_PlainText) ? Style_DefaultCode : Style_DefaultText;
+		return (fUseDefaultCodeStyle & UseDefaultCodeStyle_TextFile) ? Style_DefaultCode : Style_DefaultText;
 	}
 	return (fUseDefaultCodeStyle & UseDefaultCodeStyle_CodeFile) ? Style_DefaultCode : Style_DefaultText;
 }
@@ -2368,8 +2368,8 @@ void Style_ToggleUseDefaultCodeStyle(HWND hwnd, int menu) {
 	case IDM_VIEW_USECODESTYLE_CODEFILE:
 		mask = UseDefaultCodeStyle_CodeFile;
 		break;
-	case IDM_VIEW_USECODESTYLE_PLAINTEXT:
-		mask = UseDefaultCodeStyle_PlainText;
+	case IDM_VIEW_USECODESTYLE_TEXTFILE:
+		mask = UseDefaultCodeStyle_TextFile;
 		break;
 	}
 
