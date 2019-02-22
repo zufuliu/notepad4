@@ -49,6 +49,7 @@ JavaScript
 	js
 	jse				JScript Encoded File
 	jsm				JavaScript Module
+	mjs				ECMAScript Module
 	qs				Qt Installer Framework Script
 
 JSON Document
