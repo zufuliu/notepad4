@@ -29,6 +29,7 @@ static KEYWORDLIST Keywords_CIL = {{
 "ansi any array auto autochar blob blob_object bool bstr bytearray byvalstr "
 "carray cf char clsid currency custom date decimal error filetime fixed float float32 "
 "float64 handler hresult idispatch int int16 int32 int64 int8 iunknown lcid lpstr "
+"uint uint16 uint32 uint64 uint8 "
 "lptstr lpstruct lpvoid lpwstr native object objectref record refany "
 "safearray storage stored_object stream streamed_object string syschar "
 "sysstring tbstr typedref unicode unsigned valuetype vararg variant vector wchar "
