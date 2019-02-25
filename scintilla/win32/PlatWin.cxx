@@ -263,7 +263,7 @@ inline FormatAndMetrics *FamFromFontID(void *fid) noexcept {
 	return static_cast<FormatAndMetrics *>(fid);
 }
 
-inline BYTE Win32MapFontQuality(int extraFontFlag) noexcept {
+constexpr BYTE Win32MapFontQuality(int extraFontFlag) noexcept {
 	switch (extraFontFlag & SC_EFF_QUALITY_MASK) {
 
 	case SC_EFF_QUALITY_NON_ANTIALIASED:
@@ -281,7 +281,7 @@ inline BYTE Win32MapFontQuality(int extraFontFlag) noexcept {
 }
 
 #if defined(USE_D2D)
-inline D2D1_TEXT_ANTIALIAS_MODE DWriteMapFontQuality(int extraFontFlag) noexcept {
+constexpr D2D1_TEXT_ANTIALIAS_MODE DWriteMapFontQuality(int extraFontFlag) noexcept {
 	switch (extraFontFlag & SC_EFF_QUALITY_MASK) {
 
 	case SC_EFF_QUALITY_NON_ANTIALIASED:
@@ -308,22 +308,6 @@ void SetLogFont(LOGFONTW &lf, const char *faceName, int characterSet, float size
 	lf.lfCharSet = static_cast<BYTE>(characterSet);
 	lf.lfQuality = Win32MapFontQuality(extraFontFlag);
 	UTF16FromUTF8(faceName, lf.lfFaceName, LF_FACESIZE);
-}
-
-/**
- * Create a hash from the parameters for a font to allow easy checking for identity.
- * If one font is the same as another, its hash will be the same, but if the hash is the
- * same then they may still be different.
- */
-int HashFont(const FontParameters &fp) noexcept {
-	return
-		static_cast<int>(fp.size) ^
-		(fp.characterSet << 10) ^
-		((fp.extraFontFlag & SC_EFF_QUALITY_MASK) << 9) ^
-		((fp.weight / 100) << 12) ^
-		(fp.italic ? 0x20000000 : 0) ^
-		(fp.technology << 15) ^
-		fp.faceName[0];
 }
 
 void GetDWriteFontMetrics(const LOGFONTW &lf, const FontParameters &fp, WCHAR wszFace[], int faceSize,
@@ -377,35 +361,11 @@ void GetDWriteFontMetrics(const LOGFONTW &lf, const FontParameters &fp, WCHAR ws
 	UTF16FromUTF8(fp.faceName, wszFace, faceSize);
 }
 
-}
-
-class FontCached : Font {
-	FontCached *next;
-	int usage;
-	float size;
+FontID CreateFontFromParameters(const FontParameters &fp) {
 	LOGFONTW lf;
-	int technology;
-	int hash;
-	explicit FontCached(const FontParameters &fp);
-	bool SameAs(const FontParameters &fp) const;
-	void Release() noexcept override;
-
-	static FontCached *first;
-public:
-	~FontCached() override = default;
-	static FontID FindOrCreate(const FontParameters &fp);
-	static void ReleaseId(FontID fid_) noexcept;
-};
-
-FontCached *FontCached::first = nullptr;
-
-FontCached::FontCached(const FontParameters &fp) :
-	next(nullptr), usage(0), size(1.0), hash(0) {
 	SetLogFont(lf, fp.faceName, fp.characterSet, fp.size, fp.weight, fp.italic, fp.extraFontFlag);
-	technology = fp.technology;
-	hash = HashFont(fp);
-	fid = nullptr;
-	if (technology == SCWIN_TECH_GDI) {
+	FontID fid = nullptr;
+	if (fp.technology == SCWIN_TECH_GDI) {
 		HFONT hfont = ::CreateFontIndirectW(&lf);
 		fid = new FormatAndMetrics(&lf, hfont, fp.extraFontFlag, fp.characterSet);
 	} else {
@@ -451,67 +411,9 @@ FontCached::FontCached(const FontParameters &fp) :
 		}
 #endif
 	}
-	usage = 1;
+	return fid;
 }
 
-bool FontCached::SameAs(const FontParameters &fp) const {
-	if (
-		(size == fp.size) &&
-		(lf.lfWeight == fp.weight) &&
-		(lf.lfItalic == (fp.italic ? 1 : 0)) &&
-		(lf.lfCharSet == fp.characterSet) &&
-		(lf.lfQuality == Win32MapFontQuality(fp.extraFontFlag)) &&
-		(technology == fp.technology)) {
-		wchar_t wszFace[LF_FACESIZE] = L"";
-		UTF16FromUTF8(fp.faceName, wszFace, LF_FACESIZE);
-		return 0 == wcscmp(lf.lfFaceName, wszFace);
-	}
-	return false;
-}
-
-void FontCached::Release() noexcept {
-	delete FamFromFontID(fid);
-	fid = nullptr;
-}
-
-FontID FontCached::FindOrCreate(const FontParameters &fp) {
-	FontID ret {};
-	::EnterCriticalSection(&crPlatformLock);
-	const int hashFind = HashFont(fp);
-	for (FontCached *cur = first; cur; cur = cur->next) {
-		if ((cur->hash == hashFind) &&
-			cur->SameAs(fp)) {
-			cur->usage++;
-			ret = cur->fid;
-		}
-	}
-	if (!ret) {
-		FontCached *fc = new FontCached(fp);
-		fc->next = first;
-		first = fc;
-		ret = fc->fid;
-	}
-	::LeaveCriticalSection(&crPlatformLock);
-	return ret;
-}
-
-void FontCached::ReleaseId(FontID fid_) noexcept {
-	::EnterCriticalSection(&crPlatformLock);
-	FontCached **pcur = &first;
-	for (FontCached *cur = first; cur; cur = cur->next) {
-		if (cur->fid == fid_) {
-			cur->usage--;
-			if (cur->usage == 0) {
-				*pcur = cur->next;
-				cur->Release();
-				cur->next = nullptr;
-				delete cur;
-			}
-			break;
-		}
-		pcur = &cur->next;
-	}
-	::LeaveCriticalSection(&crPlatformLock);
 }
 
 Font::Font() noexcept : fid{} {
@@ -519,17 +421,15 @@ Font::Font() noexcept : fid{} {
 
 Font::~Font() = default;
 
-#define FONTS_CACHED
-
 void Font::Create(const FontParameters &fp) {
 	Release();
 	if (fp.faceName)
-		fid = FontCached::FindOrCreate(fp);
+		fid = CreateFontFromParameters(fp);
 }
 
 void Font::Release() noexcept {
 	if (fid)
-		FontCached::ReleaseId(fid);
+		delete FamFromFontID(fid);
 	fid = nullptr;
 }
 
@@ -609,7 +509,7 @@ public:
 	SurfaceGDI &operator=(const SurfaceGDI &) = delete;
 	SurfaceGDI &operator=(SurfaceGDI &&) = delete;
 
-	~SurfaceGDI() override;
+	~SurfaceGDI() noexcept override;
 
 	void Init(WindowID wid) noexcept override;
 	void Init(SurfaceID sid, WindowID wid) noexcept override;
@@ -656,7 +556,7 @@ public:
 	void SetBidiR2L(bool bidiR2L_) noexcept override;
 };
 
-SurfaceGDI::~SurfaceGDI() {
+SurfaceGDI::~SurfaceGDI() noexcept {
 	Clear();
 }
 
@@ -1178,7 +1078,7 @@ public:
 	SurfaceD2D(SurfaceD2D &&) = delete;
 	SurfaceD2D &operator=(const SurfaceD2D &) = delete;
 	SurfaceD2D &operator=(SurfaceD2D &&) = delete;
-	~SurfaceD2D() override;
+	~SurfaceD2D() noexcept override;
 
 	void SetScale() noexcept;
 	void Init(WindowID wid) noexcept override;
@@ -1254,7 +1154,7 @@ SurfaceD2D::SurfaceD2D() noexcept :
 	dpiScaleY = 1.0;
 }
 
-SurfaceD2D::~SurfaceD2D() {
+SurfaceD2D::~SurfaceD2D() noexcept {
 	Clear();
 }
 
