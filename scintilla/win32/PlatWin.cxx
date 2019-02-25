@@ -181,7 +181,7 @@ bool LoadD2D() noexcept {
 
 struct FormatAndMetrics {
 	int technology;
-	const LOGFONTW *plf;
+	LOGFONTW lf;
 	HFONT hfont;
 #if defined(USE_D2D)
 	IDWriteTextFormat *pTextFormat;
@@ -191,21 +191,21 @@ struct FormatAndMetrics {
 	FLOAT yAscent;
 	FLOAT yDescent;
 	FLOAT yInternalLeading;
-	FormatAndMetrics(const LOGFONTW *plf_, HFONT hfont_, int extraFontFlag_, int characterSet_) noexcept :
-		technology(SCWIN_TECH_GDI), plf(plf_), hfont(hfont_),
+	FormatAndMetrics(const LOGFONTW &lf_, HFONT hfont_, int extraFontFlag_, int characterSet_) noexcept :
+		technology(SCWIN_TECH_GDI), lf(lf_), hfont(hfont_),
 #if defined(USE_D2D)
 		pTextFormat(nullptr),
 #endif
 		extraFontFlag(extraFontFlag_), characterSet(characterSet_), yAscent(2), yDescent(1), yInternalLeading(0) {}
 #if defined(USE_D2D)
-	FormatAndMetrics(const LOGFONTW *plf_, IDWriteTextFormat *pTextFormat_,
+	FormatAndMetrics(const LOGFONTW &lf_, IDWriteTextFormat *pTextFormat_,
 		int extraFontFlag_,
 		int characterSet_,
 		FLOAT yAscent_,
 		FLOAT yDescent_,
 		FLOAT yInternalLeading_) noexcept :
 		technology(SCWIN_TECH_DIRECTWRITE),
-		plf(plf_),
+		lf(lf_),
 		hfont{},
 		pTextFormat(pTextFormat_),
 		extraFontFlag(extraFontFlag_),
@@ -237,7 +237,7 @@ struct FormatAndMetrics {
 };
 
 HFONT FormatAndMetrics::HFont() const noexcept {
-	return ::CreateFontIndirectW(plf);
+	return ::CreateFontIndirectW(&lf);
 }
 
 #ifndef CLEARTYPE_QUALITY
@@ -367,7 +367,7 @@ FontID CreateFontFromParameters(const FontParameters &fp) {
 	FontID fid = nullptr;
 	if (fp.technology == SCWIN_TECH_GDI) {
 		HFONT hfont = ::CreateFontIndirectW(&lf);
-		fid = new FormatAndMetrics(&lf, hfont, fp.extraFontFlag, fp.characterSet);
+		fid = new FormatAndMetrics(lf, hfont, fp.extraFontFlag, fp.characterSet);
 	} else {
 #if defined(USE_D2D)
 		IDWriteTextFormat *pTextFormat = nullptr;
@@ -407,7 +407,7 @@ FontID CreateFontFromParameters(const FontParameters &fp) {
 				pTextLayout->Release();
 				pTextFormat->SetLineSpacing(DWRITE_LINE_SPACING_METHOD_UNIFORM, lineMetrics[0].height, lineMetrics[0].baseline);
 			}
-			fid = new FormatAndMetrics(&lf, pTextFormat, fp.extraFontFlag, fp.characterSet, yAscent, yDescent, yInternalLeading);
+			fid = new FormatAndMetrics(lf, pTextFormat, fp.extraFontFlag, fp.characterSet, yAscent, yDescent, yInternalLeading);
 		}
 #endif
 	}
