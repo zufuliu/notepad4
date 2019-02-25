@@ -70,7 +70,7 @@ def find_free_access_key(menu, path):
 		unique = set(ch.upper() for ch in line if is_access_key(ch))
 		required |= unique
 		for ch in unique:
-			if not ch in used_key:
+			if ch not in used_key:
 				if ch in all_key:
 					all_key[ch].append(line)
 				else:

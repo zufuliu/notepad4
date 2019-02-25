@@ -173,7 +173,8 @@ Or build from source, see the [Wiki](https://github.com/zufuliu/notepad2/wiki/Bu
 * Support [adding Notepad2 to Windows explorer context menu](https://github.com/zufuliu/notepad2/wiki/Open-with-Notepad2)
 * Per-Monitor DPI-Aware, improved high DPI display
 * Support rendering using Direct2D DirectWrite, and switch between GDI and Direct2D
-* Support color font (Windows 8.1 and above) in Direct2D mode, useful to display Emoji and others
+* Support font ligature with font like [FiraCode](https://github.com/tonsky/FiraCode) in Direct2D mode
+* Support color font (Windows 8.1 and above) in Direct2D mode, useful to display color [Emoji](http://unicode.org/emoji/charts/full-emoji-list.html) 😊 and others
 * Experimental support for RTL layout (GDI) and bidirectional (Direct2D), useful for Arabic and Hebrew
 * Support using fractional font size
 * Support Inline IME
