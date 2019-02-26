@@ -953,7 +953,6 @@ void ResizeDlgCtl(HWND hwndDlg, int nCtlId, int dx, int dy) {
 // https://docs.microsoft.com/en-us/windows/desktop/Controls/subclassing-overview
 // https://support.microsoft.com/en-us/help/102589/how-to-use-the-enter-key-from-edit-controls-in-a-dialog-box
 // Ctrl+A: https://stackoverflow.com/questions/10127054/select-all-text-in-edit-contol-by-clicking-ctrla
-#if 1
 static LRESULT CALLBACK MultilineEditProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData) {
 	UNREFERENCED_PARAMETER(uIdSubclass);
 	UNREFERENCED_PARAMETER(dwRefData);
@@ -987,42 +986,6 @@ static LRESULT CALLBACK MultilineEditProc(HWND hwnd, UINT umsg, WPARAM wParam, L
 void MultilineEditSetup(HWND hwndDlg, int nCtlId) {
 	SetWindowSubclass(GetDlgItem(hwndDlg, nCtlId), MultilineEditProc, 0, 0);
 }
-#else
-static LRESULT CALLBACK MultilineEditProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
-	switch (umsg) {
-	case WM_GETDLGCODE:
-		if (GetWindowLong(hwnd, GWL_STYLE) & ES_WANTRETURN) {
-			return DLGC_WANTALLKEYS | DLGC_HASSETSEL;
-		}
-		break;
-
-	case WM_CHAR:
-		if (wParam == 1) { // Ctrl+A
-			SendMessage(hwnd, EM_SETSEL, 0, -1);
-			return TRUE;
-		}
-		break;
-
-	case WM_SETTEXT: {
-		WNDPROC oldWndProc = (WNDPROC)GetProp(hwnd, L"OldWndProc");
-		const LRESULT result = CallWindowProc(oldWndProc, hwnd, umsg, wParam, lParam);
-		if (result) {
-			NotifyEditTextChanged(GetParent(hwnd), GetDlgCtrlID(hwnd));
-		}
-		return result;
-	}
-	}
-
-	WNDPROC oldWndProc = (WNDPROC)GetProp(hwnd, L"OldWndProc");
-	return CallWindowProc(oldWndProc, hwnd, umsg, wParam, lParam);
-}
-
-void MultilineEditSetup(HWND hwndDlg, int nCtlId) {
-	HWND hwndCtl = GetDlgItem(hwndDlg, nCtlId);
-	WNDPROC oldWndProc = (WNDPROC)SetWindowLongPtr(hwndCtl, GWLP_WNDPROC, (LONG_PTR)MultilineEditProc);
-	SetProp(hwndCtl, L"OldWndProc", (HANDLE)oldWndProc);
-}
-#endif
 
 //=============================================================================
 //
