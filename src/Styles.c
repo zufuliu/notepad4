@@ -409,13 +409,8 @@ static inline void FindSystemDefaultTextFont(void) {
 		}
 	}
 
-	// other systems
-	if (IsFontAvailable(L"Tahoma")) {
-		lstrcpy(systemTextFontName, L"Tahoma");
-	} else {
-		// default font in Scintilla
-		lstrcpy(systemTextFontName, L"Verdana");
-	}
+	// Windows 2000, XP, 2003
+	lstrcpy(systemTextFontName, L"Tahoma");
 }
 
 void Style_ReleaseResources(void) {
