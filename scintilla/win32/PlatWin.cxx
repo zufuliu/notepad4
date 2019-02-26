@@ -2470,7 +2470,7 @@ class ListBoxX : public ListBox {
 	LRESULT NcHitTest(WPARAM, LPARAM) const noexcept;
 	void CentreItem(int n);
 	void Paint(HDC) noexcept;
-	static LRESULT PASCAL ControlWndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam);
+	static LRESULT PASCAL ControlWndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
 
 	static const Point ItemInset;	// Padding around whole item
 	static const Point TextInset;	// Padding around text
@@ -3050,7 +3050,7 @@ void ListBoxX::Paint(HDC hDC) noexcept {
 	::DeleteObject(hBitmap);
 }
 
-LRESULT PASCAL ListBoxX::ControlWndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam) {
+LRESULT PASCAL ListBoxX::ControlWndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam, UINT_PTR /*uIdSubclass*/, DWORD_PTR /*dwRefData*/) {
 	try {
 		ListBoxX *lbx = static_cast<ListBoxX *>(PointerFromWindow(::GetParent(hWnd)));
 		switch (iMessage) {
@@ -3099,16 +3099,9 @@ LRESULT PASCAL ListBoxX::ControlWndProc(HWND hWnd, UINT iMessage, WPARAM wParam,
 			// disable the scroll wheel button click action
 			return 0;
 		}
-
-		WNDPROC prevWndProc = reinterpret_cast<WNDPROC>(GetWindowLongPtr(hWnd, GWLP_USERDATA));
-		if (prevWndProc) {
-			return ::CallWindowProc(prevWndProc, hWnd, iMessage, wParam, lParam);
-		} else {
-			return ::DefWindowProc(hWnd, iMessage, wParam, lParam);
-		}
 	} catch (...) {
 	}
-	return ::DefWindowProc(hWnd, iMessage, wParam, lParam);
+	return ::DefSubclassProc(hWnd, iMessage, wParam, lParam);
 }
 
 LRESULT ListBoxX::WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam) {
@@ -3125,8 +3118,7 @@ LRESULT ListBoxX::WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam
 			reinterpret_cast<HMENU>(static_cast<ptrdiff_t>(ctrlID)),
 			hinstanceParent,
 			nullptr);
-		WNDPROC prevWndProc = SubclassWindow(lb, ControlWndProc);
-		::SetWindowLongPtr(lb, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(prevWndProc));
+		::SetWindowSubclass(lb, ControlWndProc, 0, 0);
 	}
 	break;
 
