@@ -16,7 +16,7 @@ static KEYWORDLIST Keywords_CPP = {{
 "override final "
 "_Pragma defined __has_include __has_include_next __has_attribute __has_cpp_attribute "
 "and and_eq bitand bitor compl not not_eq or or_eq xor xor_eq "
-"concept requires audit axiom  "
+"concept requires audit axiom "
 // MSVC
 "__alignof __asm __assume __based __cdecl __declspec __event __except __fastcall __finally __forceinline __identifier __inline __interface __leave __raise __stdcall __clrcall __super __thiscall __try __unaligned __uuidof __hook __unhook __noop __vectorcall __pragma "
 // GCC
@@ -121,7 +121,7 @@ static KEYWORDLIST Keywords_CPP = {{
 
 "type_info bad_cast bad_typeid "
 "type_index bad_alloc "
-"exception bad_exception nested_exception  "
+"exception bad_exception nested_exception "
 "shared_ptr weak_ptr enable_shared_from_this bad_weak_ptr "
 "default_delete unique_ptr "
 
@@ -130,7 +130,7 @@ static KEYWORDLIST Keywords_CPP = {{
 "pointer_traits allocator_traits allocator uses_allocator scoped_allocator_adaptor "
 "array_allocator bitmap_allocator "
 
-"rebind iterator_traits  "
+"rebind iterator_traits "
 
 "function unary_function binary_function "
 
@@ -152,7 +152,7 @@ static KEYWORDLIST Keywords_CPP = {{
 // Mac/iOS
 "NSObject NSValue NSNumber NSString NSMutableString NSData NSMutableData NSArray NSMutableArray NSSet NSMutableSet NSDictionary NSMutableDictionary NSNull NSDecimalNumber NSCoder "
 "NSThread NSTimer NSLock NSRecursiveLock NSConditionLock NSOperation NSOperationQueue NSAutoreleasePool NSEnumerator "
-"NSURL NSURLConnection NSURLRequest NSURLResponse NSStream NSInputStream NSOutputStream  "
+"NSURL NSURLConnection NSURLRequest NSURLResponse NSStream NSInputStream NSOutputStream "
 "NSError NSException NSBundle NSIndexSet NSCharacterSet NSFileManager NSIndexPath NSDate NSLocale NSNotification NSNotificationCenter NSUUID "
 "UIApplication UIDevice UIWindow UIScreen UIView UIViewController UIColor UIFont UIImage UIImageView UILabel UIButton UIScrollView UITableView UITableViewCell UISwitch UISlider UISegmentedControl UITextField UIGestureRecognizer UITouch UIEvent UITapGestureRecognizer UISwipeGestureRecognizer UIWebView UINavigationBar UINavigationItem UIBarButtonItem UITextView UIAlertView UISearchBar "
 
@@ -180,7 +180,7 @@ static KEYWORDLIST Keywords_CPP = {{
 "__cplusplus __cplusplus_cli __assembler __midl "
 "__FILE__ __FUNCTION__ __LINE__ __DATE__ __TIME__ __TIMESTAMP__ __func__ __VA_ARGS__ "
 "__STDC__ __STDC_HOSTED__ __STDC_VERSION__ __STDC_IEC_559__ __STDC_IEC_559_COMPLEX__ __STDC_ISO_10646__ "
-" __COUNTER__ __STRICT_ANSI__  __PRETTY_FUNCTION__ __STDC_DEC_FP__ "
+" __COUNTER__ __STRICT_ANSI__ __PRETTY_FUNCTION__ __STDC_DEC_FP__ "
 "_MSC_VER _MSC_FULL_VER "
 "__GNUC__ __GNUG__ __GNUC_MINOR__ __GNUC_PATCHLEVEL__ __OBJC__ __ASSEMBLER__ __GFORTRAN__ "
 "__clang__ __clang_major__ __clang_minor__ __clang_patchlevel__ __llvm__ "
@@ -293,10 +293,10 @@ static KEYWORDLIST Keywords_CPP = {{
 "jfieldID jmethodID JNIEnv JavaVM "
 // Python
 "Py_ssize_t Py_complex Py_buffer PyCFunction "
-"PyObject PyVarObject PyTypeObject  "
+"PyObject PyVarObject PyTypeObject "
 "PyMethodDef PyModuleDef "
 // pthread
-"pthread_t pthread_attr_t pthread_mutex_t pthread_cond_t  "
+"pthread_t pthread_attr_t pthread_mutex_t pthread_cond_t "
 // Mac/iOS
 "NSInteger NSUInteger NSTimeInterval NSZone NSRange "
 "CGFloat CGRect CGSize CGPoint dispatch_queue_t unichar "
@@ -312,7 +312,7 @@ static KEYWORDLIST Keywords_CPP = {{
 "jnc jne jng jnge jnl jnle jno jnp jns jnz jo jp jpe jpo js jz jmp lahf lar lds les "
 "lfs lgs lss lea leave lgdt lidt lldt lmsw lock lods lodsb lodsw lodsd lodsq loop "
 "loope loopne loopnz loopz lsl ltr mov movbe movs movsb movsw movsd movsq movsx "
-"movsxd movzx mul neg nop not or out outs outsb outsw outsd  pause pop popa popad "
+"movsxd movzx mul neg nop not or out outs outsb outsw outsd pause pop popa popad "
 "popf popfd popfq push pusha pushad pushf pushfd rcl rcr rol ror rdmsr rdpmc rdtsc "
 "rdtscp rep repe repz repne repnz ret retf rsm sahf sal sar shl shr sbb scas scasb "
 "scasw scasd seta setae setb setbe setc sete setg setge setl setle setna setnae "
@@ -381,7 +381,7 @@ static KEYWORDLIST Keywords_CPP = {{
 // AMD XOP/FMA4
 
 , // 12 Assembler Register
-"eax ebx ecx edx esi edi esp ebp  "
+"eax ebx ecx edx esi edi esp ebp "
 "ax ah al bx bh bl cx ch cl dx dh dl "
 "si di sp bp cs ds ss es fs gs eflags eip "
 "st0 st1 st2 st3 st4 st5 st6 st7 "

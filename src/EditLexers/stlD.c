@@ -8,7 +8,7 @@ static KEYWORDLIST Keywords_D = {{
 "do else export false finally for foreach foreach_reverse goto if import invariant "
 "is macro mixin new null package pragma private protected public ref return super "
 "switch template this throw true try typedef typeid typeof version volatile while "
-"with  __thread __traits abstract auto const deprecated extern final immutable "
+"with __thread __traits abstract auto const deprecated extern final immutable "
 "nothrow override pure __gshared scope shared static synchronized "
 "in out inout lazy "
 "class enum interface module struct union unittest "
@@ -44,7 +44,7 @@ NULL
 
 , // 9 2nd Keyword
 "even naked near far word dword qword ptr "
-"da db dd de df di dl dq  ds dt dw"
+"da db dd de df di dl dq ds dt dw"
 
 , // 10 2nd Type Keyword
 NULL

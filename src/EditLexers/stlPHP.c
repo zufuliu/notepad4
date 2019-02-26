@@ -33,7 +33,7 @@ NULL
 "Reflection ReflectionException ReflectionClass ReflectionZendExtension ReflectionExtension ReflectionFunction ReflectionFunctionAbstract ReflectionMethod ReflectionObject ReflectionParameter ReflectionProperty "
 // SPL
 "SplFileInfo SplFileObject SplTempFileObject ArrayObject SplDoublyLinkedList SplStack SplQueue SplHeap SplMaxHeap SplMinHeap SplPriorityQueue SplFixedArray SplObjectStorage "
-"IteratorIterator FilterIterator RegexIterator DirectoryIterator FilesystemIterator CallbackFilterIterator ArrayIterator CachingIterator  "
+"IteratorIterator FilterIterator RegexIterator DirectoryIterator FilesystemIterator CallbackFilterIterator ArrayIterator CachingIterator "
 "RecursiveIteratorIterator RecursiveFilterIterator RecursiveRegexIterator RecursiveDirectoryIterator RecursiveCallbackFilterIterator RecursiveArrayIterator RecursiveCachingIterator "
 "AppendIterator EmptyIterator GlobIterator InfiniteIterator LimitIterator MultipleIterator NoRewindIterator ParentIterator RecursiveTreeIterator "
 "RuntimeException LogicException BadFunctionCallException BadMethodCallException DomainException InvalidArgumentException LengthException OutOfBoundsException OutOfRangeException OverflowException RangeException UnderflowException UnexpectedValueException "
@@ -56,7 +56,7 @@ NULL
 
 , // 8 Constant
 // Core Predefined Constants
-"PHP_VERSION PHP_MAJOR_VERSION  PHP_MINOR_VERSION  PHP_RELEASE_VERSION  PHP_VERSION_ID  PHP_EXTRA_VERSION PHP_ZTS  PHP_DEBUG  PHP_MAXPATHLEN  PHP_OS PHP_SAPI PHP_EOL PHP_INT_MAX  PHP_INT_SIZE  DEFAULT_INCLUDE_PATH PEAR_INSTALL_DIR PEAR_EXTENSION_DIR PHP_EXTENSION_DIR PHP_PREFIX PHP_BINDIR PHP_BINARY PHP_MANDIR PHP_LIBDIR PHP_DATADIR PHP_SYSCONFDIR PHP_LOCALSTATEDIR PHP_CONFIG_FILE_PATH PHP_CONFIG_FILE_SCAN_DIR PHP_SHLIB_SUFFIX "
+"PHP_VERSION PHP_MAJOR_VERSION PHP_MINOR_VERSION PHP_RELEASE_VERSION PHP_VERSION_ID PHP_EXTRA_VERSION PHP_ZTS PHP_DEBUG PHP_MAXPATHLEN PHP_OS PHP_SAPI PHP_EOL PHP_INT_MAX PHP_INT_SIZE DEFAULT_INCLUDE_PATH PEAR_INSTALL_DIR PEAR_EXTENSION_DIR PHP_EXTENSION_DIR PHP_PREFIX PHP_BINDIR PHP_BINARY PHP_MANDIR PHP_LIBDIR PHP_DATADIR PHP_SYSCONFDIR PHP_LOCALSTATEDIR PHP_CONFIG_FILE_PATH PHP_CONFIG_FILE_SCAN_DIR PHP_SHLIB_SUFFIX "
 // Error Handling
 "E_ERROR E_WARNING E_PARSE E_NOTICE E_CORE_ERROR E_CORE_WARNING E_COMPILE_ERROR E_COMPILE_WARNING E_USER_ERROR E_USER_WARNING E_USER_NOTICE E_STRICT E_RECOVERABLE_ERROR E_DEPRECATED E_USER_DEPRECATED E_ALL "
 // Output Control
@@ -188,7 +188,7 @@ NULL
 // php_user_filter
 "filtername params "
 // MySQLi
-"affected_rows client_info client_version connect_errno connect_error errno error_list field_count client_version host_info protocol_version server_info info insert_id warning_count  "
+"affected_rows client_info client_version connect_errno connect_error errno error_list field_count client_version host_info protocol_version server_info info insert_id warning_count "
 "num_rows param_count sqlstate " "current_field lengths " "embedded reconnect report_mode "
 
 , // 11 Method
@@ -235,7 +235,7 @@ NULL
 , // 15 Code Snippet
 "for^() if^() switch^() while^() elseif^() else^{} foreach^() catch^() "
 "declare() define() defined() die() echo() empty() eval() exit() isset() list() unset() require() require_once() __halt_compiler() "
-"__autoload() __call() __callStatic() __clone() __construct() __destruct() __get() __invoke()  __isset() __set() __set_state() __sleep() __toString() __unset() __wakeup() "
+"__autoload() __call() __callStatic() __clone() __construct() __destruct() __get() __invoke() __isset() __set() __set_state() __sleep() __toString() __unset() __wakeup() "
 }};
 
 static EDITSTYLE Styles_PHP[] = {

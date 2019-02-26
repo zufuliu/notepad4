@@ -17,7 +17,7 @@ static KEYWORDLIST Keywords_Gradle = {{
 NULL
 
 , // 3 Annotation
-"Managed Model  "
+"Managed Model "
 
 , // 4 Attribute
 // Task types

@@ -16,7 +16,7 @@ static KEYWORDLIST Keywords_ASM = {{
 "jnc jne jng jnge jnl jnle jno jnp jns jnz jo jp jpe jpo js jz jmp lahf lar lds les "
 "lfs lgs lss lea leave lgdt lidt lldt lmsw lock lods lodsb lodsw lodsd lodsq loop "
 "loope loopne loopnz loopz lsl ltr mov movbe movs movsb movsw movsd movsq movsx "
-"movsxd movzx mul neg nop not npad or out outs outsb outsw outsd  pause pop popa popad "
+"movsxd movzx mul neg nop not npad or out outs outsb outsw outsd pause pop popa popad "
 "popf popfd popfq push pusha pushad pushf pushfd rcl rcr rol ror rdmsr rdpmc rdtsc "
 "rdtscp rep repe repz repne repnz ret retf rsm sahf sal sar shl shr sbb scas scasb "
 "scasw scasd seta setae setb setbe setc sete setg setge setl setle setna setnae "
@@ -47,7 +47,7 @@ static KEYWORDLIST Keywords_ASM = {{
 "faddl fstpt flds "
 
 , // 2 Register
-"eax ebx ecx edx esi edi esp ebp  "
+"eax ebx ecx edx esi edi esp ebp "
 "ax ah al bx bh bl cx ch cl dx dh dl "
 "si di sp bp cs ds ss es fs gs eflags eip "
 "st0 st1 st2 st3 st4 st5 st6 st7 "
