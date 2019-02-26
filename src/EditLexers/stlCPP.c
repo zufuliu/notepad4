@@ -9,14 +9,14 @@ static KEYWORDLIST Keywords_CPP = {{
 "switch typedef union volatile while "
 "_Alignas _Alignof _Atomic _Generic _Noreturn _Static_assert _Thread_local "
 
-"alignas alignof asm catch class constexpr const_cast decltype delete dynamic_cast "
+"alignas alignof asm catch class consteval constexpr const_cast decltype delete dynamic_cast "
 "explicit export false friend mutable namespace new noexcept noreturn nullptr operator "
 "private protected public reinterpret_cast static_assert static_cast template "
 "this thread_local throw true try typeid typename using virtual "
 "override final "
-"_Pragma defined __has_include __has_include_next __has_attribute "
+"_Pragma defined __has_include __has_include_next __has_attribute __has_cpp_attribute "
 "and and_eq bitand bitor compl not not_eq or or_eq xor xor_eq "
-"concept "
+"concept requires audit axiom  "
 // MSVC
 "__alignof __asm __assume __based __cdecl __declspec __event __except __fastcall __finally __forceinline __identifier __inline __interface __leave __raise __stdcall __clrcall __super __thiscall __try __unaligned __uuidof __hook __unhook __noop __vectorcall __pragma "
 // GCC
@@ -32,7 +32,7 @@ static KEYWORDLIST Keywords_CPP = {{
 
 , // 1 Type Keyword
 "__auto_type auto char double float int long short signed unsigned void "
-"bool char16_t char32_t wchar_t nullptr_t nothrow_t "
+"bool char8_t char16_t char32_t wchar_t nullptr_t nothrow_t "
 "_Bool complex _Complex _Imaginary imaginary "
 "__w64 __wchar_t __int8 __int16 __int32 __int64 __m128 __m128d __m128i __m256 __m256d __m256i __m64 __int3264 __ptr32 __ptr64 __sptr __uptr "
 "__int128 __float80 __float128 __fp16 __complex__ __real__ __imag__ __complex128 _Decimal32 _Decimal64 _Decimal128 decimal32 decimal64 decimal128 "
@@ -95,7 +95,7 @@ static KEYWORDLIST Keywords_CPP = {{
 "cdecl stdcall __cdecl__ __stdcall__ __deprecated__ __dllexport__ __dllimport__ __naked__ __noinline__ __noreturn__ __nothrow__ __selectany__ "
 "may_alias __may_alias__ visibility __visibility__"
 // C++11, 14, 17, 20
-"carries_dependency fallthrough nodiscard maybe_unused likely unlikely no_unique_address expects ensures assert optimize_for_synchronized "
+"assert carries_dependency fallthrough ensures expects maybe_unused likely unlikely no_unique_address nodiscard optimize_for_synchronized "
 
 , // 5 Class
 // locale.h
