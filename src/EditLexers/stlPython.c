@@ -19,7 +19,7 @@ static KEYWORDLIST Keywords_Python = {{
 "type object unicode buffer file xrange slice "
 
 , // 2 Built-in Constant
-"self None True False NotImplemented Ellipsis __debug__ __main__ __builtin__ __future__  "
+"self None True False NotImplemented Ellipsis __debug__ __main__ __builtin__ __future__ "
 
 , // 3 @Decorator
 "classmethod staticmethod cached_method abstractmethod property contextmanager "
@@ -37,8 +37,8 @@ static KEYWORDLIST Keywords_Python = {{
 "apply() buffer() coerce() intern() "
 
 , // 5 Attribute
-"__doc__ __name__ __qualname__ __module__ __defaults__ __code__ __globals__  "
-"__dict__ __closure__ __annotations__ __kwdefaults__ __self__ __func__  "
+"__doc__ __name__ __qualname__ __module__ __defaults__ __code__ __globals__ "
+"__dict__ __closure__ __annotations__ __kwdefaults__ __self__ __func__ "
 "__class__ __bases__ __metaclass__ __subclasses__ __loader__ __package__ "
 "__path__ __file__ __all__ __version__ __slots__ "
 // other
@@ -128,7 +128,7 @@ static KEYWORDLIST Keywords_Python = {{
 // random
 "seed() getstate() setstate() getrandbits() randrange() randint() choice() choices() shuffle() sample() random() uniform() triangular() betavariate() expovariate() gammavariate() gauss() lognormvariate() normalvariate() vonmisesvariate() paretovariate() weibullvariate() "
 // decimal
-"getcontext() setcontext() localcontext() " "adjusted() as_tuple() as_integer_ratio() canonical() compare() compare_signal() compare_total() compare_total_mag() conjugate() copy_abs() copy_negate() copy_sign() rom_float() fma() is_canonical() is_finite() is_infinite() is_nan() is_normal() is_qnan() is_signed() is_snan() is_subnormal() is_zero() ln() logb() logical_and() logical_invert() logical_or() logical_xor() max_mag()  min_mag() next_minus() next_plus() next_toward() normalize() number_class() quantize() radix() remainder_near() rotate() same_quantum() scaleb() shift() to_eng_string() to_integral() to_integral_exact() to_integral_value() " "clear_flags() clear_traps() copy_decimal() create_decimal() create_decimal_from_float() Etiny() Etop() add() divide() divide_int() minus() multiply() plus() power() remainder() "
+"getcontext() setcontext() localcontext() " "adjusted() as_tuple() as_integer_ratio() canonical() compare() compare_signal() compare_total() compare_total_mag() conjugate() copy_abs() copy_negate() copy_sign() rom_float() fma() is_canonical() is_finite() is_infinite() is_nan() is_normal() is_qnan() is_signed() is_snan() is_subnormal() is_zero() ln() logb() logical_and() logical_invert() logical_or() logical_xor() max_mag() min_mag() next_minus() next_plus() next_toward() normalize() number_class() quantize() radix() remainder_near() rotate() same_quantum() scaleb() shift() to_eng_string() to_integral() to_integral_exact() to_integral_value() " "clear_flags() clear_traps() copy_decimal() create_decimal() create_decimal_from_float() Etiny() Etop() add() divide() divide_int() minus() multiply() plus() power() remainder() "
 // sys
 "_clear_type_cache() _current_frames() _debugmallocstats() excepthook() exc_info() getallocatedblocks() getcheckinterval() getdefaultencoding() getdlopenflags() getfilesystemencoding() getrefcount() getrecursionlimit() getsizeof() getswitchinterval() _getframe() getprofile() gettrace() getwindowsversion() setcheckinterval() setdlopenflags() setprofile() setrecursionlimit() setswitchinterval() settrace() settscdump() "
 // os
@@ -164,7 +164,7 @@ static KEYWORDLIST Keywords_Python = {{
 // array
 "append() buffer_info() byteswap() count() extend() frombytes() fromfile() fromlist() fromstring() fromunicode() index() insert() pop() remove() reverse() tobytes() tofile() tolist() tostring() tounicode() "
 // copy
-"copy()  deepcopy() "
+"copy() deepcopy() "
 // itertools
 "accumulate() chain() from_iterable() combinations() combinations_with_replacement() compress() count() cycle() dropwhile() filterfalse() groupby() islice() islice() permutations() product() repeat() starmap() takewhile() tee() zip_longest() "
 // operator
@@ -317,7 +317,7 @@ static EDITSTYLE Styles_Python[] = {
 	{ SCE_PY_OPERATOR, NP2STYLE_Operator, EDITSTYLE_HOLE(L"Operator"), L"fore:#B000B0" },
 };
 
-EDITLEXER lexPython  = {
+EDITLEXER lexPython = {
 	SCLEX_PYTHON, NP2LEX_PYTHON,
 	EDITLEXER_HOLE(L"Python Script", Styles_Python),
 	L"py; pyw; pyx; boo; empy; cobra",

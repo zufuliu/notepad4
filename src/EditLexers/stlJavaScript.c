@@ -112,7 +112,7 @@ NULL
 "atEnd() item() moveFirst() moveNext() "
 "get() set() subarray() "
 // VBArray
-"dimensions() getItem() lbound() toArray()  ubound() "
+"dimensions() getItem() lbound() toArray() ubound() "
 // DataView
 "getInt8() getUint8() getInt16() getUint16() getInt32() getUint32() getFloat32() getFloat64() setInt8() setUint8() setInt16() setUint16() setInt32() setUint32() setFloat32() setFloat64() "
 // RegExp

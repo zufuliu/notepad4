@@ -18,7 +18,7 @@ static KEYWORDLIST Keywords_Bash = {{
 "ar asa awk banner basename bash bc bdiff break bunzip2 bzip2 cal calendar cat "
 "cc cd chmod cksum clear cmp col comm compress continue cp cpio crypt csplit ctags cut date "
 "dc dd declare deroff dev df diff diff3 dircmp dirname ed egrep "
-"env exit expand export expr fc fgrep file find fmt fold  "
+"env exit expand export expr fc fgrep file find fmt fold "
 "getconf getopt getopts grep gres hash head help history iconv id integer "
 "jobs join kill local lc let line ln logname look ls m4 mail mailx make man mkdir more mt mv "
 "newgrp nl nm nohup ntps od pack paste patch pathchk pax pcat perl pg pr print printf ps pwd "
