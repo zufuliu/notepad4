@@ -1077,7 +1077,7 @@ void Style_SetLexer(HWND hwnd, PEDITLEXER pLexNew) {
 	}
 	// always set background color
 	if (!Style_StrGetColor(FALSE, szValue, &iValue)) {
-		iValue = RGB(0xC0, 0xC0, 0xC0);
+		iValue = GetSysColor(COLOR_HIGHLIGHT);
 	}
 	SendMessage(hwnd, SCI_SETSELBACK, TRUE, iValue);
 	SendMessage(hwnd, SCI_SETADDITIONALSELBACK, iValue, 0);
