@@ -59,7 +59,7 @@ static EDITSTYLE Styles_Batch[] = {
 	{ SCE_BAT_ESCAPE, NP2STYLE_EscapeSequence, EDITSTYLE_HOLE(L"Escape Sequence"), L"fore:#FF0000" },
 	{ SCE_BAT_VARIABLE, NP2STYLE_Variable, EDITSTYLE_HOLE(L"Variable"), L"fore:#003CE6; back:#FFF1A8" },
 	{ SCE_BAT_OPERATOR, NP2STYLE_Operator, EDITSTYLE_HOLE(L"Operator"), L"fore:#B000B0" },
-	{ MULTI_STYLE(SCE_BAT_LABEL, SCE_BAT_LABEL_LINE, 0, 0), NP2STYLE_Label, EDITSTYLE_HOLE(L"Label"), L"fore:#C80000; back:#F4F4F4" },
+	{ MULTI_STYLE(SCE_BAT_LABEL, SCE_BAT_LABEL_LINE, 0, 0), NP2STYLE_Label, EDITSTYLE_HOLE(L"Label"), L"fore:#C80000; back:#F4F4F4; eolfilled" },
 };
 
 EDITLEXER lexBatch = {
