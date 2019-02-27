@@ -193,6 +193,11 @@ static void ColouriseBatchDoc(Sci_PositionU startPos, Sci_Position length, int i
 				sc.SetState(SCE_BAT_DEFAULT);
 			}
 			break;
+		case SCE_BAT_LABEL_LINE:
+			if (sc.atLineStart) {
+				sc.SetState(SCE_BAT_DEFAULT);
+			}
+			break;
 		case SCE_BAT_VARIABLE: {
 			bool end_var = false;
 			if (quotedVar) {
@@ -313,7 +318,7 @@ static void ColouriseBatchDoc(Sci_PositionU startPos, Sci_Position length, int i
 			if (sc.Match(':', ':')) {
 				sc.SetState(SCE_BAT_COMMENT);
 			} else if ((visibleChars == 0 || isGoto || isCall) && sc.ch == ':' && iswordstart(sc.chNext) && sc.chNext != '\\') {
-				sc.SetState(SCE_BAT_LABEL);
+				sc.SetState((visibleChars == 0) ? SCE_BAT_LABEL_LINE : SCE_BAT_LABEL);
 				if (isGoto) {
 					isGoto = false;
 				}
