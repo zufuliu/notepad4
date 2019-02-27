@@ -321,6 +321,12 @@ enum DefaultStyleIndex {
 	Style_MaxDefaultStyle,	// 2nd global default code style.
 };
 
+// folding marker
+#define FoldingMarkerLineColorDefault	RGB(0x80, 0x80, 0xFF)
+#define FoldingMarkerFillColorDefault	RGB(0x80, 0x80, 0x80)
+#define FoldingMarkerLineColorDark		RGB(0xAD, 0xD8, 0xE6)
+#define FoldingMarkerFillColorDark		RGB(0x60, 0x60, 0x60)
+
 // style UI controls on Customize Schemes dialog
 enum {
 	StyleControl_None = 0,
@@ -1163,12 +1169,12 @@ void Style_SetLexer(HWND hwnd, PEDITLEXER pLexNew) {
 		if (Style_StrGetColor(TRUE, szValue, &iValue)) {
 			clrFore = iValue;
 		} else {
-			clrFore = iIdx ? RGB(0x80, 0x80, 0xFF) : RGB(0x80, 0x80, 0x80);
+			clrFore = iIdx ? FoldingMarkerLineColorDefault : FoldingMarkerLineColorDark;
 		}
 		if (Style_StrGetColor(FALSE, szValue, &iValue)) {
 			clrFill = iValue;
 		} else {
-			clrFill = iIdx ? RGB(0xAD, 0xD8, 0xE6) : RGB(0xD3, 0xD3, 0xD3);
+			clrFill = iIdx ? FoldingMarkerFillColorDefault : FoldingMarkerLineColorDark;
 		}
 
 		SciCall_SetFoldMarginColour(TRUE, clrBack);

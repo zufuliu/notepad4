@@ -449,7 +449,7 @@ BEGIN
 	BEGIN
 		MENUITEM "&Syntax Scheme...\tF12",			IDM_VIEW_SCHEME
 		MENUITEM "&Customize Schemes...\tCtrl+F12",	IDM_VIEW_SCHEMECONFIG
-		MENUITEM "&2nd Default Scheme\tShift+F12",	IDM_VIEW_USE2NDDEFAULT
+		MENUITEM "Dark Mode (&2nd Scheme)\tShift+F12",	IDM_VIEW_USE2NDDEFAULT
 		POPUP "&Use Default Code Style"
 		BEGIN
 			MENUITEM "&Code File",					IDM_VIEW_USECODESTYLE_CODEFILE
