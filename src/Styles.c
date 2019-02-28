@@ -3305,6 +3305,7 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 				fLexerSelected = hParent == NULL;
 				iCurrentStyleIndex = -1;
 				UINT enableMask = StyleControl_None;
+				BOOL changed = FALSE;
 				// a lexer has been selected
 				if (hParent == NULL) {
 					WCHAR wch[MAX_EDITLEXER_EXT_SIZE];
@@ -3334,6 +3335,7 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 						*StrChr(wch, L'|') = 0;
 					}
 
+					changed = pCurrentStyle == NULL;
 					// TVS_SINGLEEXPAND: CTRL key.
 					TVITEM item;
 					ZeroMemory(&item, sizeof(item));
@@ -3395,6 +3397,9 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 				//	EnableWindow(GetDlgItem(hwnd, IDC_STYLEEOLFILLED), FALSE);
 				//	CheckDlgButton(hwnd, IDC_STYLEEOLFILLED, BST_UNCHECKED);
 				//}
+				if (changed && pCurrentStyle != NULL) {
+					NotifyEditTextChanged(hwnd, IDC_STYLEEDIT);
+				}
 			}
 			break;
 
