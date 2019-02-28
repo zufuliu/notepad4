@@ -56,6 +56,7 @@ public:
 
 	bool hideSelection;
 	bool drawOverstrikeCaret; // used by the curses platform
+	bool drawHorizontalFoldLines;
 
 	/** In bufferedDraw mode, graphics operations are drawn to a pixmap and then copied to
 	* the screen. This avoids flashing but is about 30% slower. */
@@ -102,6 +103,7 @@ public:
 
 	bool SetTwoPhaseDraw(bool twoPhaseDraw) noexcept;
 	bool SetPhasesDraw(int phases) noexcept;
+	bool SetShowFoldingLine(bool show) noexcept;
 	bool LinesOverlap() const noexcept;
 
 	void ClearAllTabstops() noexcept;
