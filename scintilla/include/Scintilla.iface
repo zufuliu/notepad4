@@ -239,6 +239,8 @@ get bool GetBufferedDraw=2034(,)
 # before drawing it to the screen to avoid flicker.
 set void SetBufferedDraw=2035(bool buffered,)
 
+set void SetShowFoldingLine=2088(bool show,)
+
 # Change the visible size of a tab to be a multiple of the width of a space character.
 set void SetTabWidth=2036(int tabWidth,)
 

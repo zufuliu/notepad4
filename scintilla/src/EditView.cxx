@@ -178,6 +178,7 @@ EditView::EditView() {
 	tabWidthMinimumPixels = 2; // needed for calculating tab stops for fractional proportional fonts
 	hideSelection = false;
 	drawOverstrikeCaret = true;
+	drawHorizontalFoldLines = false;
 	bufferedDraw = true;
 	phasesDraw = phasesTwo;
 	lineWidthMaxSeen = 0;
@@ -203,6 +204,12 @@ bool EditView::SetPhasesDraw(int phases) noexcept {
 	const PhasesDraw phasesDrawNew = static_cast<PhasesDraw>(phases);
 	const bool redraw = phasesDraw != phasesDrawNew;
 	phasesDraw = phasesDrawNew;
+	return redraw;
+}
+
+bool EditView::SetShowFoldingLine(bool show) noexcept {
+	const bool redraw = show != drawHorizontalFoldLines;
+	drawHorizontalFoldLines = show;
 	return redraw;
 }
 
@@ -2180,7 +2187,7 @@ void EditView::PaintText(Surface *surfaceWindow, const EditModel &model, PRectan
 				phases.push_back(static_cast<DrawPhase>(phase));
 			}
 		} else {
-			phases.push_back(drawAll);
+			phases.push_back(drawHorizontalFoldLines ? drawAll : static_cast<DrawPhase>(drawAll & ~drawFoldLines));
 		}
 		for (const DrawPhase &phase : phases) {
 			int ypos = 0;

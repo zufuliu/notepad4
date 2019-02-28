@@ -98,6 +98,7 @@ typedef sptr_t (*SciFnDirect)(sptr_t ptr, unsigned int iMessage, uptr_t wParam, 
 #define SCI_SETSTYLING 2033
 #define SCI_GETBUFFEREDDRAW 2034
 #define SCI_SETBUFFEREDDRAW 2035
+#define SCI_SETSHOWFOLDINGLINE 2088
 #define SCI_SETTABWIDTH 2036
 #define SCI_GETTABWIDTH 2121
 #define SCI_CLEARTABSTOPS 2675

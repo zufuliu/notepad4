@@ -147,6 +147,7 @@ static BOOL bMarkOccurrencesMatchCase;
 static BOOL bMarkOccurrencesMatchWords;
 struct EditAutoCompletionConfig autoCompletionConfig;
 static BOOL bShowCodeFolding;
+static BOOL bShowFoldingLine;
 #if NP2_ENABLE_SHOW_CALL_TIPS
 static BOOL bShowCallTips = FALSE;
 static int iCallTipsWaitTime = 500; // 500 ms
@@ -1681,6 +1682,7 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 #endif
 	// highlight for current folding block
 	SciCall_MarkerEnableHighlight(TRUE);
+	SendMessage(hwndEdit, SCI_SETSHOWFOLDINGLINE, bShowFoldingLine, 0);
 #if NP2_ENABLE_SHOW_CALL_TIPS
 	// CallTips
 	SetCallTipsWaitTime();
@@ -2329,7 +2331,8 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	//EnableCmd(hmenu, IDM_VIEW_FOLD_LEVEL8, i && bShowCodeFolding);
 	//EnableCmd(hmenu, IDM_VIEW_FOLD_LEVEL9, i && bShowCodeFolding);
 	//EnableCmd(hmenu, IDM_VIEW_FOLD_LEVEL10, i && bShowCodeFolding);
-	CheckCmd(hmenu, IDM_VIEW_FOLDING, bShowCodeFolding);
+	CheckCmd(hmenu, IDM_VIEW_SHOW_FOLDING, bShowCodeFolding);
+	CheckCmd(hmenu, IDM_VIEW_SHOW_FOLDING_LINE, bShowFoldingLine);
 
 	CheckCmd(hmenu, IDM_VIEW_USE2NDDEFAULT, bUse2ndDefaultStyle);
 	CheckCmd(hmenu, IDM_VIEW_USECODESTYLE_CODEFILE, fUseDefaultCodeStyle & UseDefaultCodeStyle_CodeFile);
@@ -3902,13 +3905,18 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		UpdateStatusbar();
 		break;
 
-	case IDM_VIEW_FOLDING:
+	case IDM_VIEW_SHOW_FOLDING:
 		bShowCodeFolding = !bShowCodeFolding;
 		UpdateFoldMarginWidth();
 		UpdateToolbar();
 		if (!bShowCodeFolding) {
 			FoldToggleAll(FOLD_ACTION_EXPAND);
 		}
+		break;
+
+	case IDM_VIEW_SHOW_FOLDING_LINE:
+		bShowFoldingLine = !bShowFoldingLine;
+		SendMessage(hwndEdit, SCI_SETSHOWFOLDINGLINE, bShowFoldingLine, 0);
 		break;
 
 	case IDM_VIEW_TOGGLEFOLDS:
@@ -5245,7 +5253,10 @@ void LoadSettings(void) {
 
 	bShowSelectionMargin = IniSectionGetBool(pIniSection, L"ShowSelectionMargin", 0);
 	bShowLineNumbers = IniSectionGetBool(pIniSection, L"ShowLineNumbers", 1);
-	bShowCodeFolding = IniSectionGetBool(pIniSection, L"ShowCodeFolding", 1);
+	iValue = IniSectionGetInt(pIniSection, L"ShowCodeFolding", 1);
+	//iValue = (iSettingsVersion < NP2SettingsVersion_V1)? (iValue | 2) : iValue;
+	bShowCodeFolding = iValue & 1;
+	bShowFoldingLine = (iValue >> 1) & 1;
 
 	iValue = IniSectionGetInt(pIniSection, L"MarkOccurrences", 3);
 	iMarkOccurrences = clamp_i(iValue, 0, 3);
@@ -5546,7 +5557,7 @@ void SaveSettings(BOOL bSaveSettingsNow) {
 	IniSectionSetIntEx(pIniSection, L"LongLineMode", iLongLineMode, EDGE_LINE);
 	IniSectionSetBoolEx(pIniSection, L"ShowSelectionMargin", bShowSelectionMargin, 0);
 	IniSectionSetBoolEx(pIniSection, L"ShowLineNumbers", bShowLineNumbers, 1);
-	IniSectionSetBoolEx(pIniSection, L"ShowCodeFolding", bShowCodeFolding, 1);
+	IniSectionSetIntEx(pIniSection, L"ShowCodeFolding", bShowCodeFolding | (bShowFoldingLine << 1), 1);
 	IniSectionSetIntEx(pIniSection, L"MarkOccurrences", iMarkOccurrences, 3);
 	IniSectionSetBoolEx(pIniSection, L"MarkOccurrencesMatchCase", bMarkOccurrencesMatchCase, 1);
 	IniSectionSetBoolEx(pIniSection, L"MarkOccurrencesMatchWholeWords", bMarkOccurrencesMatchWords, 0);
