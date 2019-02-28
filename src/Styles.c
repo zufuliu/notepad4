@@ -253,6 +253,8 @@ int		iFontQuality = SC_EFF_QUALITY_LCD_OPTIMIZED;
 int		iCaretStyle = 1; // width 1, 0 for block
 int		iOvrCaretStyle = 0; // 0 for bar, 1 for block
 int		iCaretBlinkPeriod = -1; // system default, 0 for noblink
+int 	iMarkOccurrencesColor;
+int 	iMarkOccurrencesAlpha;
 static int	iDefaultLexer;
 static BOOL bAutoSelect;
 static int	cxStyleSelectDlg;
@@ -318,6 +320,7 @@ enum DefaultStyleIndex {
 	Style_LongLineMarker,	// standalone style. `fore`: edge line color, `back`: edge background color
 	Style_ExtraLineSpacing,	// standalone style. descent = `size`/2, ascent = `size` - descent
 	Style_FoldingMarker,	// standalone style. `fore`: folder line color, `back`: folder box fill color
+	Style_MarkOccurrences,	// standalone style. `fore`, `alpha`
 	Style_MaxDefaultStyle,	// 2nd global default code style.
 };
 
@@ -371,6 +374,7 @@ static inline UINT GetDefaultStyleControlMask(int index) {
 	case Style_Selection:
 		return StyleControl_Fore | StyleControl_Back | StyleControl_EOLFilled;
 	case Style_Caret:
+	case Style_MarkOccurrences:
 		return StyleControl_Fore;
 	case Style_ExtraLineSpacing:
 		return StyleControl_None;
@@ -1204,6 +1208,15 @@ void Style_SetLexer(HWND hwnd, PEDITLEXER pLexNew) {
 
 	if (SendMessage(hwnd, SCI_GETINDENTATIONGUIDES, 0, 0) != SC_IV_NONE) {
 		Style_SetIndentGuides(hwnd, TRUE);
+	}
+
+	// Mark Occurrence
+	szValue = lexDefault.Styles[Style_Caret + iIdx].szValue;
+	if (!Style_StrGetColor(TRUE, szValue, &iMarkOccurrencesColor)) {
+		iMarkOccurrencesColor = GetSysColor(COLOR_HIGHLIGHT);
+	}
+	if (!Style_StrGetAlpha(szValue, &iMarkOccurrencesAlpha)) {
+		iMarkOccurrencesAlpha = 100;
 	}
 
 	if (rid != NP2LEX_DEFAULT) {

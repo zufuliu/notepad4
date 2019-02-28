@@ -22,6 +22,7 @@ static EDITSTYLE Styles_Default[] = {
 	{ SCI_SETEDGECOLOUR, 63110, EDITSTYLE_HOLE(L"Long Line Marker"), L"fore:#FFC000" },
 	{ SCI_SETEXTRAASCENT + SCI_SETEXTRADESCENT, 63111, EDITSTYLE_HOLE(L"Extra Line Spacing"), L"size:2" },
 	{ 0, 63124, EDITSTYLE_HOLE(L"Folding Marker"), L"fore:#8080FF; back:#ADD8E6" },
+	{ 0, 63602, EDITSTYLE_HOLE(L"Mark Occurrences"), L"alpha:100" },
 
 	{ STYLE_DEFAULT, 63112, EDITSTYLE_HOLE(L"2nd Default Code Style"), L"font:$(Code); size:11; fore:#D4D4D4; back:#1E1E1E" },
 	{ STYLE_DEFAULT, 63601, EDITSTYLE_HOLE(L"2nd Default Text Style"), L"font:$(Text); size:11; fore:#D4D4D4; back:#1E1E1E" },
@@ -37,6 +38,7 @@ static EDITSTYLE Styles_Default[] = {
 	{ SCI_SETEDGECOLOUR, 63122, EDITSTYLE_HOLE(L"2nd Long Line Marker"), L"fore:#605F63" },
 	{ SCI_SETEXTRAASCENT + SCI_SETEXTRADESCENT, 63123, EDITSTYLE_HOLE(L"2nd Extra Line Spacing"), L"size:2" },
 	{ 0, 63125, EDITSTYLE_HOLE(L"2nd Folding Marker"), L"fore:#808080; back:#606060" },
+	{ 0, 63603, EDITSTYLE_HOLE(L"2nd Mark Occurrences"), L"alpha:100" },
 };
 
 EDITLEXER lexDefault = {

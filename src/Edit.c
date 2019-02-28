@@ -5058,6 +5058,8 @@ BOOL EditReplace(HWND hwnd, LPEDITFINDREPLACE lpefr) {
 //
 
 extern int iMatchesCount;
+extern int iMarkOccurrencesColor;
+extern int iMarkOccurrencesAlpha;
 
 void EditMarkAll(HWND hwnd, int iMarkOccurrences, BOOL bMarkOccurrencesMatchCase, BOOL bMarkOccurrencesMatchWords) {
 	iMatchesCount = 0;
@@ -5074,7 +5076,7 @@ void EditMarkAll(HWND hwnd, int iMarkOccurrences, BOOL bMarkOccurrencesMatchCase
 	int iSelCount = iSelEnd - iSelStart;
 
 	// clear existing indicator
-	SendMessage(hwnd, SCI_SETINDICATORCURRENT, 1, 0);
+	SendMessage(hwnd, SCI_SETINDICATORCURRENT, MarkOccurrencesIndicatorNumber, 0);
 	SendMessage(hwnd, SCI_INDICATORCLEARRANGE, 0, iTextLen);
 
 	// if nothing selected or multiple lines are selected exit
@@ -5112,10 +5114,10 @@ void EditMarkAll(HWND hwnd, int iMarkOccurrences, BOOL bMarkOccurrencesMatchCase
 	ttf.lpstrText = pszText;
 
 	// set style
-	const COLORREF fore = 0xff << ((iMarkOccurrences - 1) << 3);
-	SendMessage(hwnd, SCI_INDICSETALPHA, 1, 100);
-	SendMessage(hwnd, SCI_INDICSETFORE, 1, fore);
-	SendMessage(hwnd, SCI_INDICSETSTYLE, 1, INDIC_ROUNDBOX);
+	const COLORREF fore = (iMarkOccurrences == 4) ? iMarkOccurrencesColor : (0xff << ((iMarkOccurrences - 1) << 3));
+	SendMessage(hwnd, SCI_INDICSETALPHA, MarkOccurrencesIndicatorNumber, iMarkOccurrencesAlpha);
+	SendMessage(hwnd, SCI_INDICSETFORE, MarkOccurrencesIndicatorNumber, fore);
+	SendMessage(hwnd, SCI_INDICSETSTYLE, MarkOccurrencesIndicatorNumber, INDIC_ROUNDBOX);
 
 	const int findFlag = (bMarkOccurrencesMatchCase ? SCFIND_MATCHCASE : 0) | (bMarkOccurrencesMatchWords ? SCFIND_WHOLEWORD : 0);
 	int iPos;

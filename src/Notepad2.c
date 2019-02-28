@@ -2352,21 +2352,8 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	CheckCmd(hmenu, IDM_VIEW_MARGIN, bShowSelectionMargin);
 	EnableCmd(hmenu, IDM_EDIT_COMPLETEWORD, i);
 
-	switch (iMarkOccurrences) {
-	case 0:
-		i = IDM_VIEW_MARKOCCURRENCES_OFF;
-		break;
-	case 3:
-		i = IDM_VIEW_MARKOCCURRENCES_BLUE;
-		break;
-	case 2:
-		i = IDM_VIEW_MARKOCCURRENCES_GREEN;
-		break;
-	case 1:
-		i = IDM_VIEW_MARKOCCURRENCES_RED;
-		break;
-	}
-	CheckMenuRadioItem(hmenu, IDM_VIEW_MARKOCCURRENCES_OFF, IDM_VIEW_MARKOCCURRENCES_RED, i, MF_BYCOMMAND);
+	i = IDM_VIEW_MARKOCCURRENCES_OFF + iMarkOccurrences;
+	CheckMenuRadioItem(hmenu, IDM_VIEW_MARKOCCURRENCES_OFF, IDM_VIEW_MARKOCCURRENCES_CUSTOM, i, MF_BYCOMMAND);
 	CheckCmd(hmenu, IDM_VIEW_MARKOCCURRENCES_CASE, bMarkOccurrencesMatchCase);
 	CheckCmd(hmenu, IDM_VIEW_MARKOCCURRENCES_WORD, bMarkOccurrencesMatchWords);
 	EnableCmd(hmenu, IDM_VIEW_MARKOCCURRENCES_CASE, iMarkOccurrences != 0);
@@ -3872,24 +3859,15 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case IDM_VIEW_MARKOCCURRENCES_OFF:
 		iMarkOccurrences = 0;
 		// clear all marks
-		SendMessage(hwndEdit, SCI_SETINDICATORCURRENT, 1, 0);
+		SendMessage(hwndEdit, SCI_SETINDICATORCURRENT, MarkOccurrencesIndicatorNumber, 0);
 		SendMessage(hwndEdit, SCI_INDICATORCLEARRANGE, 0, SendMessage(hwndEdit, SCI_GETLENGTH, 0, 0));
 		break;
 
 	case IDM_VIEW_MARKOCCURRENCES_RED:
-		iMarkOccurrences = 1;
-		EditMarkAll(hwndEdit, iMarkOccurrences, bMarkOccurrencesMatchCase, bMarkOccurrencesMatchWords);
-		UpdateStatusbar();
-		break;
-
 	case IDM_VIEW_MARKOCCURRENCES_GREEN:
-		iMarkOccurrences = 2;
-		EditMarkAll(hwndEdit, iMarkOccurrences, bMarkOccurrencesMatchCase, bMarkOccurrencesMatchWords);
-		UpdateStatusbar();
-		break;
-
 	case IDM_VIEW_MARKOCCURRENCES_BLUE:
-		iMarkOccurrences = 3;
+	case IDM_VIEW_MARKOCCURRENCES_CUSTOM:
+		iMarkOccurrences = LOWORD(wParam) - IDM_VIEW_MARKOCCURRENCES_OFF;
 		EditMarkAll(hwndEdit, iMarkOccurrences, bMarkOccurrencesMatchCase, bMarkOccurrencesMatchWords);
 		UpdateStatusbar();
 		break;
@@ -5254,12 +5232,11 @@ void LoadSettings(void) {
 	bShowSelectionMargin = IniSectionGetBool(pIniSection, L"ShowSelectionMargin", 0);
 	bShowLineNumbers = IniSectionGetBool(pIniSection, L"ShowLineNumbers", 1);
 	iValue = IniSectionGetInt(pIniSection, L"ShowCodeFolding", 1);
-	//iValue = (iSettingsVersion < NP2SettingsVersion_V1)? (iValue | 2) : iValue;
 	bShowCodeFolding = iValue & 1;
 	bShowFoldingLine = (iValue >> 1) & 1;
 
 	iValue = IniSectionGetInt(pIniSection, L"MarkOccurrences", 3);
-	iMarkOccurrences = clamp_i(iValue, 0, 3);
+	iMarkOccurrences = clamp_i(iValue, 0, 4);
 	bMarkOccurrencesMatchCase = IniSectionGetBool(pIniSection, L"MarkOccurrencesMatchCase", 1);
 	bMarkOccurrencesMatchWords = IniSectionGetBool(pIniSection, L"MarkOccurrencesMatchWholeWords", 0);
 
