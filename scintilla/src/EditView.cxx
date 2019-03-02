@@ -178,7 +178,6 @@ EditView::EditView() {
 	tabWidthMinimumPixels = 2; // needed for calculating tab stops for fractional proportional fonts
 	hideSelection = false;
 	drawOverstrikeCaret = true;
-	drawHorizontalFoldLines = false;
 	bufferedDraw = true;
 	phasesDraw = phasesTwo;
 	lineWidthMaxSeen = 0;
@@ -204,12 +203,6 @@ bool EditView::SetPhasesDraw(int phases) noexcept {
 	const PhasesDraw phasesDrawNew = static_cast<PhasesDraw>(phases);
 	const bool redraw = phasesDraw != phasesDrawNew;
 	phasesDraw = phasesDrawNew;
-	return redraw;
-}
-
-bool EditView::SetShowFoldingLine(bool show) noexcept {
-	const bool redraw = show != drawHorizontalFoldLines;
-	drawHorizontalFoldLines = show;
 	return redraw;
 }
 
@@ -2178,17 +2171,24 @@ void EditView::PaintText(Surface *surfaceWindow, const EditModel &model, PRectan
 #endif
 		const bool bracesIgnoreStyle = ((vsDraw.braceHighlightIndicatorSet && (model.bracesMatchStyle == STYLE_BRACELIGHT)) ||
 			(vsDraw.braceBadLightIndicatorSet && (model.bracesMatchStyle == STYLE_BRACEBAD)));
+		const bool needDrawFoldLines = (model.foldFlags & (SC_FOLDFLAG_LINEBEFORE_EXPANDED | SC_FOLDFLAG_LINEBEFORE_CONTRACTED
+			| SC_FOLDFLAG_LINEAFTER_EXPANDED | SC_FOLDFLAG_LINEAFTER_CONTRACTED)) != 0;
 
 		Sci::Line lineDocPrevious = -1;	// Used to avoid laying out one document line multiple times
 		AutoLineLayout ll(llc, nullptr);
 		std::vector<DrawPhase> phases;
 		if ((phasesDraw == phasesMultiple) && !bufferedDraw) {
-			for (int phase = drawBack; phase <= drawCarets; phase = phase * 2) {
+			for (int phase = drawBack; phase < drawFoldLines; phase = phase * 2) {
 				phases.push_back(static_cast<DrawPhase>(phase));
 			}
+			if (needDrawFoldLines) {
+				phases.push_back(drawFoldLines);
+			}
+			phases.push_back(drawCarets);
 		} else {
-			phases.push_back(drawHorizontalFoldLines ? drawAll : static_cast<DrawPhase>(drawAll & ~drawFoldLines));
+			phases.push_back(needDrawFoldLines ? drawAll : static_cast<DrawPhase>(drawAll & ~drawFoldLines));
 		}
+
 		for (const DrawPhase &phase : phases) {
 			int ypos = 0;
 			if (!bufferedDraw)

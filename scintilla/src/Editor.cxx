@@ -6510,12 +6510,6 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 	case SCI_GETBUFFEREDDRAW:
 		return view.bufferedDraw;
 
-	case SCI_SETSHOWFOLDINGLINE:
-		if (view.SetShowFoldingLine(wParam != 0)) {
-			InvalidateStyleRedraw();
-		}
-		break;
-
 #ifdef INCLUDE_DEPRECATED_FEATURES
 	case SCI_GETTWOPHASEDRAW:
 		return view.phasesDraw == EditView::phasesTwo;
