@@ -1675,14 +1675,13 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	SciCall_MarkerDefine(SC_MARKNUM_FOLDEROPENMID, SC_MARK_BOXMINUSCONNECTED);
 	SciCall_MarkerDefine(SC_MARKNUM_FOLDERMIDTAIL, SC_MARK_TCORNER);
 #if !NP2_DEBUG_FOLD_LEVEL
-	// Draw below if not expanded
-	SciCall_SetFoldFlags(SC_FOLDFLAG_LINEAFTER_CONTRACTED);
+	// Draw folding line below when collapsed
+	SciCall_SetFoldFlags(bShowFoldingLine ? SC_FOLDFLAG_LINEAFTER_CONTRACTED : 0);
 #else
 	SciCall_SetFoldFlags(SC_FOLDFLAG_LEVELNUMBERS);
 #endif
 	// highlight for current folding block
 	SciCall_MarkerEnableHighlight(TRUE);
-	SendMessage(hwndEdit, SCI_SETSHOWFOLDINGLINE, bShowFoldingLine, 0);
 #if NP2_ENABLE_SHOW_CALL_TIPS
 	// CallTips
 	SetCallTipsWaitTime();
@@ -3894,7 +3893,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	case IDM_VIEW_SHOW_FOLDING_LINE:
 		bShowFoldingLine = !bShowFoldingLine;
-		SendMessage(hwndEdit, SCI_SETSHOWFOLDINGLINE, bShowFoldingLine, 0);
+		SciCall_SetFoldFlags(bShowFoldingLine ? SC_FOLDFLAG_LINEAFTER_CONTRACTED : 0);
 		break;
 
 	case IDM_VIEW_TOGGLEFOLDS:
