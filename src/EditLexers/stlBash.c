@@ -12,6 +12,8 @@ static KEYWORDLIST Keywords_Bash = {{
 // build-in
 "alias true false yes no if then fi elif else for function functions in return while "
 " case esac eval ex exec do done du echo EOF "
+// Directory Stack Builtins
+"dirs popd, pushd "
 // C Shell
 "end endif foreach switch default breaksw endsw repeat "
 // common
