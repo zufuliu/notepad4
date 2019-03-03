@@ -88,7 +88,7 @@
 #define INI_SECTION_NAME_METAPATH			L"metapath"
 #define INI_SECTION_NAME_SETTINGS			L"Settings"
 #define INI_SECTION_NAME_FLAGS				L"Settings2"
-#define INI_SECTION_NAME_WINDOW_POSITION	L"Window"
+#define INI_SECTION_NAME_WINDOW_POSITION	L"Window Position"
 #define INI_SECTION_NAME_TOOLBAR_LABELS		L"Toolbar Labels"
 #define INI_SECTION_NAME_TOOLBAR_IMAGES		L"Toolbar Images"
 #define INI_SECTION_NAME_FILTERS			L"Filters"
@@ -112,6 +112,7 @@ void ShowNotifyIcon(HWND hwnd, BOOL bAdd);
 BOOL ChangeDirectory(HWND hwnd, LPCWSTR lpszNewDir, BOOL bUpdateHistory);
 void LoadSettings(void);
 void SaveSettings(BOOL bSaveSettingsNow);
+void SaveWindowPosition(BOOL bSaveSettingsNow, WCHAR *pIniSectionBuf);
 void ParseCommandLine(void);
 void LoadFlags(void);
 void LoadLaunchSetings(void);

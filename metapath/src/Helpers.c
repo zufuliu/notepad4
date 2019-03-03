@@ -30,6 +30,22 @@
 #include "Dlapi.h"
 #include "resource.h"
 
+void IniClearAllSectionEx(LPCWSTR lpszPrefix, LPCWSTR lpszIniFile, BOOL bDelete) {
+	WCHAR sections[1024] = L"";
+	GetPrivateProfileSectionNames(sections, COUNTOF(sections), lpszIniFile);
+
+	LPCWSTR p = sections;
+	LPCWSTR value = bDelete ? NULL : L"";
+	const int len = lstrlen(lpszPrefix);
+
+	while (*p) {
+		if (StrNCaseEqual(p, lpszPrefix, len)) {
+			WritePrivateProfileSection(p, value, lpszIniFile);
+		}
+		p = StrEnd(p) + 1;
+	}
+}
+
 //=============================================================================
 //
 //  Manipulation of (cached) ini file sections
@@ -1626,13 +1642,13 @@ int MRU_Enum(LPCMRULIST pmru, int iIndex, LPWSTR pszItem, int cchItem) {
 BOOL MRU_Load(LPMRULIST pmru) {
 	IniSection section;
 	WCHAR *pIniSectionBuf = (WCHAR *)NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_MRU);
-	const int cbIniSection = (int)(NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR));
+	const int cchIniSection = (int)(NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR));
 	IniSection *pIniSection = &section;
 
 	MRU_Empty(pmru);
 	IniSectionInit(pIniSection, MRU_MAXITEMS);
 
-	LoadIniSection(pmru->szRegKey, pIniSectionBuf, cbIniSection);
+	LoadIniSection(pmru->szRegKey, pIniSectionBuf, cchIniSection);
 	IniSectionParseArray(pIniSection, pIniSectionBuf);
 	const int count = pIniSection->count;
 	const int size = pmru->iSize;

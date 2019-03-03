@@ -878,11 +878,11 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) {
 	// Load toolbar labels
 	IniSection section;
 	WCHAR *pIniSectionBuf = (WCHAR *)NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_TOOLBAR_LABELS);
-	const int cbIniSection = (int)NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR);
+	const int cchIniSection = (int)NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR);
 	IniSection *pIniSection = &section;
 
 	IniSectionInit(pIniSection, COUNTOF(tbbMainWnd));
-	LoadIniSection(INI_SECTION_NAME_TOOLBAR_LABELS, pIniSectionBuf, cbIniSection);
+	LoadIniSection(INI_SECTION_NAME_TOOLBAR_LABELS, pIniSectionBuf, cchIniSection);
 	IniSectionParseArray(pIniSection, pIniSectionBuf);
 	const int count = pIniSection->count;
 
@@ -2342,6 +2342,12 @@ BOOL ChangeDirectory(HWND hwnd, LPCWSTR lpszNewDir, BOOL bUpdateHistory) {
 	return TRUE;
 }
 
+static inline void GetWindowPositionSectionName(WCHAR sectionName[96]) {
+	const int ResX = GetSystemMetrics(SM_CXSCREEN);
+	const int ResY = GetSystemMetrics(SM_CYSCREEN);
+	wsprintf(sectionName, L"%s %ix%i", INI_SECTION_NAME_WINDOW_POSITION, ResX, ResY);
+}
+
 //=============================================================================
 //
 //  LoadSettings()
@@ -2350,11 +2356,11 @@ BOOL ChangeDirectory(HWND hwnd, LPCWSTR lpszNewDir, BOOL bUpdateHistory) {
 void LoadSettings(void) {
 	IniSection section;
 	WCHAR *pIniSectionBuf = (WCHAR *)NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_SETTINGS);
-	const int cbIniSection = (int)(NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR));
+	const int cchIniSection = (int)(NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR));
 	IniSection *pIniSection = &section;
 
 	IniSectionInit(pIniSection, 128);
-	LoadIniSection(INI_SECTION_NAME_SETTINGS, pIniSectionBuf, cbIniSection);
+	LoadIniSection(INI_SECTION_NAME_SETTINGS, pIniSectionBuf, cchIniSection);
 	IniSectionParse(pIniSection, pIniSectionBuf);
 
 	bSaveSettings = IniSectionGetBool(pIniSection, L"SaveSettings", 1);
@@ -2451,58 +2457,50 @@ void LoadSettings(void) {
 	bShowStatusbar = IniSectionGetBool(pIniSection, L"ShowStatusbar", 1);
 	bShowDriveBox = IniSectionGetBool(pIniSection, L"ShowDriveBox", 1);
 
-	cxRunDlg = IniSectionGetInt(pIniSection, L"RunDlgSizeX", 0);
-	cxGotoDlg = IniSectionGetInt(pIniSection, L"GotoDlgSizeX", 0);
-	cxFileFilterDlg = IniSectionGetInt(pIniSection, L"FileFilterDlgX", 0);
-	cxRenameFileDlg = IniSectionGetInt(pIniSection, L"RenameFileDlgX", 0);
-	cxNewDirectoryDlg = IniSectionGetInt(pIniSection, L"NewDirectoryDlgX", 0);
-	cxOpenWithDlg = IniSectionGetInt(pIniSection, L"OpenWithDlgSizeX", 0);
-	cyOpenWithDlg = IniSectionGetInt(pIniSection, L"OpenWithDlgSizeY", 0);
-	cxCopyMoveDlg = IniSectionGetInt(pIniSection, L"CopyMoveDlgSizeX", 0);
-	cxTargetApplicationDlg = IniSectionGetInt(pIniSection, L"TargetApplicationDlgSizeX", 0);
-	cxFindWindowDlg = IniSectionGetInt(pIniSection, L"FindWindowDlgSizeX", 0);
-
-	if (!flagPosParam) {
-		// ignore window position if /p was specified
-		WCHAR tchPosX[32];
-		WCHAR tchPosY[32];
-		WCHAR tchSizeX[32];
-		WCHAR tchSizeY[32];
-		const int ResX = GetSystemMetrics(SM_CXSCREEN);
-		const int ResY = GetSystemMetrics(SM_CYSCREEN);
-
-		const int len = wsprintf(tchPosX, L"%ix%i ", ResX, ResY);
-		lstrcpy(tchPosY, tchPosX);
-		lstrcpy(tchSizeX, tchPosX);
-		lstrcpy(tchSizeY, tchPosX);
-		lstrcpy(tchPosX + len, L"PosX");
-		lstrcpy(tchPosY + len, L"PosY");
-		lstrcpy(tchSizeX + len, L"SizeX");
-		lstrcpy(tchSizeY + len, L"SizeY");
-
-		LoadIniSection(INI_SECTION_NAME_WINDOW_POSITION, pIniSectionBuf, cbIniSection);
+	// toolbar image
+	{
+		LoadIniSection(INI_SECTION_NAME_TOOLBAR_IMAGES, pIniSectionBuf, cchIniSection);
 		IniSectionParse(pIniSection, pIniSectionBuf);
 
-		wi.x = IniSectionGetIntEx(pIniSection, tchPosX, CW_USEDEFAULT);
-		wi.y = IniSectionGetIntEx(pIniSection, tchPosY, CW_USEDEFAULT);
-		wi.cx = IniSectionGetIntEx(pIniSection, tchSizeX, CW_USEDEFAULT);
-		wi.cy = IniSectionGetIntEx(pIniSection, tchSizeY, CW_USEDEFAULT);
+		strValue = IniSectionGetValue(pIniSection, L"BitmapDefault");
+		if (StrNotEmpty(strValue)) {
+			tchToolbarBitmap = StrDup(strValue);
+		}
+		strValue = IniSectionGetValue(pIniSection, L"BitmapHot");
+		if (StrNotEmpty(strValue)) {
+			tchToolbarBitmapHot = StrDup(strValue);
+		}
+		strValue = IniSectionGetValue(pIniSection, L"BitmapDisabled");
+		if (StrNotEmpty(strValue)) {
+			tchToolbarBitmapDisabled = StrDup(strValue);
+		}
 	}
 
-	LoadIniSection(INI_SECTION_NAME_TOOLBAR_IMAGES, pIniSectionBuf, cbIniSection);
-	IniSectionParse(pIniSection, pIniSectionBuf);
+	// window position section
+	{
+		WCHAR sectionName[96];
+		GetWindowPositionSectionName(sectionName);
+		LoadIniSection(sectionName, pIniSectionBuf, cchIniSection);
+		IniSectionParse(pIniSection, pIniSectionBuf);
 
-	strValue = IniSectionGetValue(pIniSection, L"BitmapDefault");
-	if (StrNotEmpty(strValue)) {
-		tchToolbarBitmap = StrDup(strValue);
-	}
-	strValue = IniSectionGetValue(pIniSection, L"BitmapHot");
-	if (StrNotEmpty(strValue)) {
-		tchToolbarBitmapHot = StrDup(strValue);
-	}
-	strValue = IniSectionGetValue(pIniSection, L"BitmapDisabled");
-	if (StrNotEmpty(strValue)) {
-		tchToolbarBitmapDisabled = StrDup(strValue);
+		// ignore window position if /p was specified
+		if (!flagPosParam) {
+			wi.x	= IniSectionGetInt(pIniSection, L"WindowPosX", CW_USEDEFAULT);
+			wi.y	= IniSectionGetInt(pIniSection, L"WindowPosY", CW_USEDEFAULT);
+			wi.cx	= IniSectionGetInt(pIniSection, L"WindowSizeX", CW_USEDEFAULT);
+			wi.cy	= IniSectionGetInt(pIniSection, L"WindowSizeY", CW_USEDEFAULT);
+		}
+
+		cxRunDlg = IniSectionGetInt(pIniSection, L"RunDlgSizeX", 0);
+		cxGotoDlg = IniSectionGetInt(pIniSection, L"GotoDlgSizeX", 0);
+		cxFileFilterDlg = IniSectionGetInt(pIniSection, L"FileFilterDlgX", 0);
+		cxRenameFileDlg = IniSectionGetInt(pIniSection, L"RenameFileDlgX", 0);
+		cxNewDirectoryDlg = IniSectionGetInt(pIniSection, L"NewDirectoryDlgX", 0);
+		cxOpenWithDlg = IniSectionGetInt(pIniSection, L"OpenWithDlgSizeX", 0);
+		cyOpenWithDlg = IniSectionGetInt(pIniSection, L"OpenWithDlgSizeY", 0);
+		cxCopyMoveDlg = IniSectionGetInt(pIniSection, L"CopyMoveDlgSizeX", 0);
+		cxTargetApplicationDlg = IniSectionGetInt(pIniSection, L"TargetApplicationDlgSizeX", 0);
+		cxFindWindowDlg = IniSectionGetInt(pIniSection, L"FindWindowDlgSizeX", 0);
 	}
 
 	IniSectionFree(pIniSection);
@@ -2593,24 +2591,23 @@ void SaveSettings(BOOL bSaveSettingsNow) {
 	IniSectionSetBoolEx(pIniSection, L"ShowToolbar", bShowToolbar, 1);
 	IniSectionSetBoolEx(pIniSection, L"ShowStatusbar", bShowStatusbar, 1);
 	IniSectionSetBoolEx(pIniSection, L"ShowDriveBox", bShowDriveBox, 1);
-	IniSectionSetInt(pIniSection, L"RunDlgSizeX", cxRunDlg);
-	IniSectionSetInt(pIniSection, L"GotoDlgSizeX", cxGotoDlg);
-	IniSectionSetInt(pIniSection, L"FileFilterDlgX", cxFileFilterDlg);
-	IniSectionSetInt(pIniSection, L"RenameFileDlgX", cxRenameFileDlg);
-	IniSectionSetInt(pIniSection, L"NewDirectoryDlgX", cxNewDirectoryDlg);
-	IniSectionSetInt(pIniSection, L"OpenWithDlgSizeX", cxOpenWithDlg);
-	IniSectionSetInt(pIniSection, L"OpenWithDlgSizeY", cyOpenWithDlg);
-	IniSectionSetInt(pIniSection, L"CopyMoveDlgSizeX", cxCopyMoveDlg);
-	IniSectionSetInt(pIniSection, L"TargetApplicationDlgSizeX", cxTargetApplicationDlg);
-	IniSectionSetInt(pIniSection, L"FindWindowDlgSizeX", cxFindWindowDlg);
 
 	SaveIniSection(INI_SECTION_NAME_SETTINGS, pIniSectionBuf);
-	NP2HeapFree(pIniSectionBuf);
+	SaveWindowPosition(bSaveSettingsNow, pIniSectionBuf);
+}
 
-	/*
-	  SaveSettingsNow(): query Window Dimensions
-	*/
+void SaveWindowPosition(BOOL bSaveSettingsNow, WCHAR *pIniSectionBuf) {
+	IniSectionOnSave section;
+	if (pIniSectionBuf == NULL) {
+		pIniSectionBuf = (WCHAR *)NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_SETTINGS);
+	}
+	IniSectionOnSave *pIniSection = &section;
+	pIniSection->next = pIniSectionBuf;
 
+	WCHAR sectionName[96];
+	GetWindowPositionSectionName(sectionName);
+
+	//  SaveSettingsNow(): query Window Dimensions
 	if (bSaveSettingsNow) {
 		WINDOWPLACEMENT wndpl;
 
@@ -2624,51 +2621,24 @@ void SaveSettings(BOOL bSaveSettingsNow) {
 		wi.cy = wndpl.rcNormalPosition.bottom - wndpl.rcNormalPosition.top;
 	}
 
-	{
-		WCHAR tchPosX[32];
-		WCHAR tchPosY[32];
-		WCHAR tchSizeX[32];
-		WCHAR tchSizeY[32];
-		const int ResX = GetSystemMetrics(SM_CXSCREEN);
-		const int ResY = GetSystemMetrics(SM_CYSCREEN);
+	IniSectionSetInt(pIniSection, L"WindowPosX", wi.x);
+	IniSectionSetInt(pIniSection, L"WindowPosY", wi.y);
+	IniSectionSetInt(pIniSection, L"WindowSizeX", wi.cx);
+	IniSectionSetInt(pIniSection, L"WindowSizeY", wi.cy);
 
-		const int len = wsprintf(tchPosX, L"%ix%i ", ResX, ResY);
-		lstrcpy(tchPosY, tchPosX);
-		lstrcpy(tchSizeX, tchPosX);
-		lstrcpy(tchSizeY, tchPosX);
-		lstrcpy(tchPosX + len, L"PosX");
-		lstrcpy(tchPosY + len, L"PosY");
-		lstrcpy(tchSizeX + len, L"SizeX");
-		lstrcpy(tchSizeY + len, L"SizeY");
+	IniSectionSetIntEx(pIniSection, L"RunDlgSizeX", cxRunDlg, 0);
+	IniSectionSetIntEx(pIniSection, L"GotoDlgSizeX", cxGotoDlg, 0);
+	IniSectionSetIntEx(pIniSection, L"FileFilterDlgX", cxFileFilterDlg, 0);
+	IniSectionSetIntEx(pIniSection, L"RenameFileDlgX", cxRenameFileDlg, 0);
+	IniSectionSetIntEx(pIniSection, L"NewDirectoryDlgX", cxNewDirectoryDlg, 0);
+	IniSectionSetIntEx(pIniSection, L"OpenWithDlgSizeX", cxOpenWithDlg, 0);
+	IniSectionSetIntEx(pIniSection, L"OpenWithDlgSizeY", cyOpenWithDlg, 0);
+	IniSectionSetIntEx(pIniSection, L"CopyMoveDlgSizeX", cxCopyMoveDlg, 0);
+	IniSectionSetIntEx(pIniSection, L"TargetApplicationDlgSizeX", cxTargetApplicationDlg, 0);
+	IniSectionSetIntEx(pIniSection, L"FindWindowDlgSizeX", cxFindWindowDlg, 0);
 
-		IniSetInt(INI_SECTION_NAME_WINDOW_POSITION, tchPosX, wi.x);
-		IniSetInt(INI_SECTION_NAME_WINDOW_POSITION, tchPosY, wi.y);
-		IniSetInt(INI_SECTION_NAME_WINDOW_POSITION, tchSizeX, wi.cx);
-		IniSetInt(INI_SECTION_NAME_WINDOW_POSITION, tchSizeY, wi.cy);
-	}
-}
-
-void SaveWindowPosition(void) {
-	WCHAR tchPosX[32];
-	WCHAR tchPosY[32];
-	WCHAR tchSizeX[32];
-	WCHAR tchSizeY[32];
-	const int ResX = GetSystemMetrics(SM_CXSCREEN);
-	const int ResY = GetSystemMetrics(SM_CYSCREEN);
-
-	const int len = wsprintf(tchPosX, L"%ix%i ", ResX, ResY);
-	lstrcpy(tchPosY, tchPosX);
-	lstrcpy(tchSizeX, tchPosX);
-	lstrcpy(tchSizeY, tchPosX);
-	lstrcpy(tchPosX + len, L"PosX");
-	lstrcpy(tchPosY + len, L"PosY");
-	lstrcpy(tchSizeX + len, L"SizeX");
-	lstrcpy(tchSizeY + len, L"SizeY");
-
-	IniSetInt(INI_SECTION_NAME_WINDOW_POSITION, tchPosX, wi.x);
-	IniSetInt(INI_SECTION_NAME_WINDOW_POSITION, tchPosY, wi.y);
-	IniSetInt(INI_SECTION_NAME_WINDOW_POSITION, tchSizeX, wi.cx);
-	IniSetInt(INI_SECTION_NAME_WINDOW_POSITION, tchSizeY, wi.cy);
+	SaveIniSection(sectionName, pIniSectionBuf);
+	NP2HeapFree(pIniSectionBuf);
 }
 
 //=============================================================================
@@ -3391,11 +3361,11 @@ static BOOL CALLBACK EnumWndProc2(HWND hwnd, LPARAM lParam) {
 void LoadLaunchSetings(void) {
 	IniSection section;
 	WCHAR *pIniSectionBuf = (WCHAR *)NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_TARGET_APPLICATION);
-	const int cbIniSection = (int)(NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR));
+	const int cchIniSection = (int)(NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR));
 	IniSection *pIniSection = &section;
 
 	IniSectionInit(pIniSection, 16);
-	LoadIniSection(INI_SECTION_NAME_TARGET_APPLICATION, pIniSectionBuf, cbIniSection);
+	LoadIniSection(INI_SECTION_NAME_TARGET_APPLICATION, pIniSectionBuf, cchIniSection);
 	IniSectionParse(pIniSection, pIniSectionBuf);
 
 	iUseTargetApplication = IniSectionGetInt(pIniSection, L"UseTargetApplication", 0xFB);
