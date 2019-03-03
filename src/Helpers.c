@@ -50,9 +50,7 @@ void DLogf(const char *fmt, ...) {
 #endif
 
 void IniClearSectionEx(LPCWSTR lpSection, LPCWSTR lpszIniFile, BOOL bDelete) {
-	if (StrIsEmpty(lpszIniFile) || PathIsRelative(lpszIniFile)) {
-		// NULL => Win.ini
-		// relative => Windows/lpszIniFile
+	if (StrIsEmpty(lpszIniFile)) {
 		return;
 	}
 
@@ -60,9 +58,7 @@ void IniClearSectionEx(LPCWSTR lpSection, LPCWSTR lpszIniFile, BOOL bDelete) {
 }
 
 void IniClearAllSectionEx(LPCWSTR lpszPrefix, LPCWSTR lpszIniFile, BOOL bDelete) {
-	if (StrIsEmpty(lpszIniFile) || PathIsRelative(lpszIniFile)) {
-		// NULL => Win.ini
-		// relative => Windows/lpszIniFile
+	if (StrIsEmpty(lpszIniFile)) {
 		return;
 	}
 
@@ -2040,6 +2036,10 @@ int MRU_Enum(LPCMRULIST pmru, int iIndex, LPWSTR pszItem, int cchItem) {
 }
 
 BOOL MRU_Load(LPMRULIST pmru) {
+	if (StrIsEmpty(szIniFile)) {
+		return TRUE;
+	}
+
 	IniSection section;
 	WCHAR *pIniSectionBuf = (WCHAR *)NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_MRU);
 	const int cchIniSection = (int)(NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR));
@@ -2074,6 +2074,9 @@ BOOL MRU_Load(LPMRULIST pmru) {
 }
 
 BOOL MRU_Save(LPCMRULIST pmru) {
+	if (StrIsEmpty(szIniFile)) {
+		return TRUE;
+	}
 	if (MRU_GetCount(pmru) == 0) {
 		IniClearSection(pmru->szRegKey);
 		return TRUE;
