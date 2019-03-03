@@ -5069,7 +5069,6 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 			case STATUS_OVRMODE:
 				SendMessage(hwndEdit, SCI_EDITTOGGLEOVERTYPE, 0, 0);
-				UpdateStatusBarCache_OVRMode(TRUE);
 				return TRUE;
 
 			default:
