@@ -618,7 +618,7 @@ static INT_PTR CALLBACK GeneralPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LPA
 		case NM_RETURN:
 			switch (((LPNMHDR)lParam)->idFrom) {
 			case IDC_CLEARWINPOS:
-				IniClearSection(INI_SECTION_NAME_WINDOW_POSITION);
+				IniDeleteAllSection(INI_SECTION_NAME_WINDOW_POSITION);
 				break;
 			}
 			break;
@@ -1157,11 +1157,11 @@ INT_PTR CALLBACK GetFilterDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lP
 
 			IniSection section;
 			WCHAR *pIniSectionBuf = (WCHAR *)NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_FILTERS);
-			const int cbIniSection = (int)(NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR));
+			const int cchIniSection = (int)(NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR));
 			IniSection *pIniSection = &section;
 			IniSectionInit(pIniSection, 128);
 
-			LoadIniSection(INI_SECTION_NAME_FILTERS, pIniSectionBuf, cbIniSection);
+			LoadIniSection(INI_SECTION_NAME_FILTERS, pIniSectionBuf, cchIniSection);
 			IniSectionParseArray(pIniSection, pIniSectionBuf);
 
 			DWORD dwIndex = 0;

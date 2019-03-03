@@ -49,6 +49,22 @@ void DLogf(const char *fmt, ...) {
 }
 #endif
 
+void IniClearAllSectionEx(LPCWSTR lpszPrefix, LPCWSTR lpszIniFile, BOOL bDelete) {
+	WCHAR sections[1024] = L"";
+	GetPrivateProfileSectionNames(sections, COUNTOF(sections), lpszIniFile);
+
+	LPCWSTR p = sections;
+	LPCWSTR value = bDelete ? NULL : L"";
+	const int len = lstrlen(lpszPrefix);
+
+	while (*p) {
+		if (StrNCaseEqual(p, lpszPrefix, len)) {
+			WritePrivateProfileSection(p, value, lpszIniFile);
+		}
+		p = StrEnd(p) + 1;
+	}
+}
+
 //=============================================================================
 //
 // Manipulation of (cached) ini file sections

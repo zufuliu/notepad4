@@ -106,7 +106,7 @@ NP2SettingsVersion_Current = NP2SettingsVersion_V1,
 #define INI_SECTION_NAME_NOTEPAD2				L"Notepad2"
 #define INI_SECTION_NAME_SETTINGS				L"Settings"
 #define INI_SECTION_NAME_FLAGS					L"Settings2"
-#define INI_SECTION_NAME_WINDOW_POSITION		L"Window"
+#define INI_SECTION_NAME_WINDOW_POSITION		L"Window Position"
 #define INI_SECTION_NAME_TOOLBAR_LABELS			L"Toolbar Labels"
 #define INI_SECTION_NAME_TOOLBAR_IMAGES			L"Toolbar Images"
 #define INI_SECTION_NAME_SUPPRESSED_MESSAGES	L"Suppressed Messages"
@@ -138,7 +138,7 @@ void CALLBACK PasteBoardTimer(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTi
 
 void LoadSettings(void);
 void SaveSettings(BOOL bSaveSettingsNow);
-void SaveWindowPosition(void);
+void SaveWindowPosition(BOOL bSaveSettingsNow, WCHAR *pIniSectionBuf);
 void ParseCommandLine(void);
 void LoadFlags(void);
 int  CheckIniFile(LPWSTR lpszFile, LPCWSTR lpszModule);

@@ -257,10 +257,10 @@ int 	iMarkOccurrencesColor;
 int 	iMarkOccurrencesAlpha;
 static int	iDefaultLexer;
 static BOOL bAutoSelect;
-static int	cxStyleSelectDlg;
-static int	cyStyleSelectDlg;
-static int	cyStyleCustomizeDlg;
-static int	cxStyleCustomizeDlg;
+int		cxStyleSelectDlg;
+int		cyStyleSelectDlg;
+int		cyStyleCustomizeDlg;
+int		cxStyleCustomizeDlg;
 
 #define ALL_FILE_EXTENSIONS_BYTE_SIZE	((NUMLEXERS * MAX_EDITLEXER_EXT_SIZE) * sizeof(WCHAR))
 static LPWSTR g_AllFileExtensions = NULL;
@@ -485,12 +485,6 @@ void Style_Load(void) {
 	// auto select
 	bAutoSelect = IniSectionGetBool(pIniSection, L"AutoSelect", 1);
 
-	// scheme select dlg dimensions
-	cxStyleSelectDlg = IniSectionGetInt(pIniSection, L"SelectDlgSizeX", 0);
-	cyStyleSelectDlg = IniSectionGetInt(pIniSection, L"SelectDlgSizeY", 0);
-	cyStyleCustomizeDlg = IniSectionGetInt(pIniSection, L"CustomizeDlgSizeY", 0);
-	cxStyleCustomizeDlg = IniSectionGetInt(pIniSection, L"CustomizeDlgSizeX", 0);
-
 	LoadIniSection(INI_SECTION_NAME_FILE_EXTENSIONS, pIniSectionBuf, cchIniSection);
 	IniSectionParse(pIniSection, pIniSectionBuf);
 	for (UINT iLexer = 0; iLexer < NUMLEXERS; iLexer++) {
@@ -606,12 +600,6 @@ void Style_Save(void) {
 
 	// auto select
 	IniSectionSetBoolEx(pIniSection, L"AutoSelect", bAutoSelect, 1);
-
-	// scheme select dlg dimensions
-	IniSectionSetInt(pIniSection, L"SelectDlgSizeX", cxStyleSelectDlg);
-	IniSectionSetInt(pIniSection, L"SelectDlgSizeY", cyStyleSelectDlg);
-	IniSectionSetInt(pIniSection, L"CustomizeDlgSizeY", cyStyleCustomizeDlg);
-	IniSectionSetInt(pIniSection, L"CustomizeDlgSizeX", cxStyleCustomizeDlg);
 
 	SaveIniSection(INI_SECTION_NAME_STYLES, pIniSectionBuf);
 
