@@ -3812,6 +3812,7 @@ int Editor::KeyCommand(unsigned int iMessage) {
 		inOverstrike = !inOverstrike;
 		ContainerNeedsUpdate(SC_UPDATE_SELECTION);
 		ShowCaretAtCurrentPosition();
+		SetIdle(true);
 		break;
 	case SCI_CANCEL:            	// Cancel any modes - handled in subclass
 		// Also unselect text
@@ -4966,6 +4967,8 @@ void Editor::ButtonUpWithModifiers(Point pt, unsigned int curTime, int modifiers
 }
 
 bool Editor::Idle() {
+	NotifyUpdateUI();
+
 	bool needWrap = Wrapping() && wrapPending.NeedsWrap();
 
 	if (needWrap) {
@@ -7793,6 +7796,7 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 			inOverstrike = wParam != 0;
 			ContainerNeedsUpdate(SC_UPDATE_SELECTION);
 			ShowCaretAtCurrentPosition();
+			SetIdle(true);
 		}
 		break;
 
