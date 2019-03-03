@@ -2606,6 +2606,8 @@ void SaveWindowPosition(BOOL bSaveSettingsNow, WCHAR *pIniSectionBuf) {
 	IniSectionOnSave section;
 	if (pIniSectionBuf == NULL) {
 		pIniSectionBuf = (WCHAR *)NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_SETTINGS);
+	} else {
+		ZeroMemory(pIniSectionBuf, NP2HeapSize(pIniSectionBuf));
 	}
 	IniSectionOnSave *pIniSection = &section;
 	pIniSection->next = pIniSectionBuf;
