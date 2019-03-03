@@ -5096,10 +5096,16 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	return 0;
 }
 
-static inline void GetWindowPositionSectionName(WCHAR sectionName[96]) {
-	const int ResX = GetSystemMetrics(SM_CXSCREEN);
-	const int ResY = GetSystemMetrics(SM_CYSCREEN);
-	wsprintf(sectionName, L"%s %ix%i", INI_SECTION_NAME_WINDOW_POSITION, ResX, ResY);
+static void GetWindowPositionSectionName(WCHAR sectionName[96]) {
+	HMONITOR hMonitor = MonitorFromWindow(hwndMain, MONITOR_DEFAULTTONEAREST);
+	MONITORINFO mi;
+	mi.cbSize = sizeof(mi);
+	GetMonitorInfo(hMonitor, &mi);
+
+	const int cxScreen = mi.rcMonitor.right - mi.rcMonitor.left;
+	const int cyScreen = mi.rcMonitor.bottom - mi.rcMonitor.top;
+
+	wsprintf(sectionName, L"%s %ix%i", INI_SECTION_NAME_WINDOW_POSITION, cxScreen, cyScreen);
 }
 
 //=============================================================================

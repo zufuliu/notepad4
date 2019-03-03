@@ -2342,10 +2342,16 @@ BOOL ChangeDirectory(HWND hwnd, LPCWSTR lpszNewDir, BOOL bUpdateHistory) {
 	return TRUE;
 }
 
-static inline void GetWindowPositionSectionName(WCHAR sectionName[96]) {
-	const int ResX = GetSystemMetrics(SM_CXSCREEN);
-	const int ResY = GetSystemMetrics(SM_CYSCREEN);
-	wsprintf(sectionName, L"%s %ix%i", INI_SECTION_NAME_WINDOW_POSITION, ResX, ResY);
+static void GetWindowPositionSectionName(WCHAR sectionName[96]) {
+	HMONITOR hMonitor = MonitorFromWindow(hwndMain, MONITOR_DEFAULTTONEAREST);
+	MONITORINFO mi;
+	mi.cbSize = sizeof(mi);
+	GetMonitorInfo(hMonitor, &mi);
+
+	const int cxScreen = mi.rcMonitor.right - mi.rcMonitor.left;
+	const int cyScreen = mi.rcMonitor.bottom - mi.rcMonitor.top;
+
+	wsprintf(sectionName, L"%s %ix%i", INI_SECTION_NAME_WINDOW_POSITION, cxScreen, cyScreen);
 }
 
 //=============================================================================
@@ -3561,11 +3567,17 @@ void SnapToTarget(HWND hwnd) {
 		SetForegroundWindow(hwnd);
 
 		RECT rcOld;
-		RECT rcNew;
 		RECT rc2;
-		const int cxScreen = GetSystemMetrics(SM_CXSCREEN);
 		GetWindowRect(hwnd, &rcOld);
 		GetWindowRect(hwnd2, &rc2);
+
+		HMONITOR hMonitor = MonitorFromRect(&rc2, MONITOR_DEFAULTTONEAREST);
+		MONITORINFO mi;
+		mi.cbSize = sizeof(mi);
+		GetMonitorInfo(hMonitor, &mi);
+
+		const int cxScreen = mi.rcMonitor.right - mi.rcMonitor.left;
+		RECT rcNew;
 
 		if (rc2.left > cxScreen - rc2.right) {
 			rcNew.left = rc2.left - (rcOld.right - rcOld.left);
