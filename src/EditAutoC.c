@@ -1351,7 +1351,7 @@ void EditAutoIndent(HWND hwnd) {
 					}
 				}
 				if (indent) {
-					memset(pPos, 0, iPrevLineLength - iIndentLen);
+					ZeroMemory(pPos, iPrevLineLength - iIndentLen);
 				}
 				*pPos = '\0';
 				break;

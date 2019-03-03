@@ -3022,10 +3022,10 @@ void EditToggleLineComments(HWND hwnd, LPCWSTR pwszComment, BOOL bInsertAtStart)
 					int count = iCommentCol;
 					if (!bTabsAsSpaces && iTabWidth > 0) {
 						ch = iCommentCol / iTabWidth;
-						memset(tchComment, '\t', ch);
+						FillMemory(tchComment, ch, '\t');
 						count -= ch * iTabWidth;
 					}
-					memset(tchComment + ch, ' ', count);
+					FillMemory(tchComment + ch, count, ' ');
 					strcat(tchComment, mszComment);
 					SendMessage(hwnd, SCI_INSERTTEXT, iCommentPos, (LPARAM)tchComment);
 				}

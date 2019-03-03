@@ -569,7 +569,7 @@ static void Style_LoadAll(void) {
 void Style_Save(void) {
 	IniSectionOnSave section;
 	WCHAR *pIniSectionBuf = (WCHAR *)NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_STYLES);
-	const int cchIniSection = (int)(NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR));
+	const SIZE_T cbIniSection = NP2HeapSize(pIniSectionBuf);
 	IniSectionOnSave *pIniSection = &section;
 	pIniSection->next = pIniSectionBuf;
 
@@ -587,7 +587,7 @@ void Style_Save(void) {
 		}
 
 		SaveIniSection(INI_SECTION_NAME_CUSTOM_COLORS, pIniSectionBuf);
-		ZeroMemory(pIniSectionBuf, cchIniSection);
+		ZeroMemory(pIniSectionBuf, cbIniSection);
 		pIniSection->next = pIniSectionBuf;
 	}
 
@@ -604,7 +604,7 @@ void Style_Save(void) {
 	SaveIniSection(INI_SECTION_NAME_STYLES, pIniSectionBuf);
 
 	if (fStylesModified & STYLESMODIFIED_FILE_EXT) {
-		ZeroMemory(pIniSectionBuf, cchIniSection);
+		ZeroMemory(pIniSectionBuf, cbIniSection);
 		pIniSection->next = pIniSectionBuf;
 		for (UINT iLexer = 0; iLexer < NUMLEXERS; iLexer++) {
 			const LPCEDITLEXER pLex = pLexArray[iLexer];
@@ -620,7 +620,7 @@ void Style_Save(void) {
 				continue;
 			}
 
-			ZeroMemory(pIniSectionBuf, cchIniSection);
+			ZeroMemory(pIniSectionBuf, cbIniSection);
 			pIniSection->next = pIniSectionBuf;
 			const UINT iStyleCount = pLex->iStyleCount;
 			for (UINT i = 0; i < iStyleCount; i++) {
@@ -799,8 +799,8 @@ void Style_UpdateCaret(HWND hwnd) {
 }
 
 void Style_UpdateLexerKeywordAttr(LPCEDITLEXER pLexNew) {
+	ZeroMemory(currentLexKeywordAttr, sizeof(currentLexKeywordAttr));
 	UINT8 *attr = currentLexKeywordAttr;
-	memset(currentLexKeywordAttr, 0, sizeof(currentLexKeywordAttr));
 
 	// Code Snippet
 	attr[NUMKEYWORD - 1] = KeywordAttr_NoLexer;
