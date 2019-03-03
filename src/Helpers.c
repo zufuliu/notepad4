@@ -49,7 +49,23 @@ void DLogf(const char *fmt, ...) {
 }
 #endif
 
+void IniClearSectionEx(LPCWSTR lpSection, LPCWSTR lpszIniFile, BOOL bDelete) {
+	if (StrIsEmpty(lpszIniFile) || PathIsRelative(lpszIniFile)) {
+		// NULL => Win.ini
+		// relative => Windows/lpszIniFile
+		return;
+	}
+
+	WritePrivateProfileSection(lpSection, (bDelete ? NULL : L""), lpszIniFile);
+}
+
 void IniClearAllSectionEx(LPCWSTR lpszPrefix, LPCWSTR lpszIniFile, BOOL bDelete) {
+	if (StrIsEmpty(lpszIniFile) || PathIsRelative(lpszIniFile)) {
+		// NULL => Win.ini
+		// relative => Windows/lpszIniFile
+		return;
+	}
+
 	WCHAR sections[1024] = L"";
 	GetPrivateProfileSectionNames(sections, COUNTOF(sections), lpszIniFile);
 
