@@ -58,11 +58,13 @@
 
 using namespace Scintilla;
 
+namespace {
+
 /*
 	return whether this modification represents an operation that
 	may reasonably be deferred (not done now OR [possibly] at all)
 */
-static inline bool CanDeferToLastStep(const DocModification &mh) noexcept {
+constexpr bool CanDeferToLastStep(const DocModification &mh) noexcept {
 	if (mh.modificationType & (SC_MOD_BEFOREINSERT | SC_MOD_BEFOREDELETE))
 		return true;	// CAN skip
 	if (!(mh.modificationType & (SC_PERFORMED_UNDO | SC_PERFORMED_REDO)))
@@ -72,7 +74,7 @@ static inline bool CanDeferToLastStep(const DocModification &mh) noexcept {
 	return false;		// PRESUMABLY must do
 }
 
-static inline bool CanEliminate(const DocModification &mh) noexcept {
+constexpr bool CanEliminate(const DocModification &mh) noexcept {
 	return
 		(mh.modificationType & (SC_MOD_BEFOREINSERT | SC_MOD_BEFOREDELETE)) != 0;
 }
@@ -81,12 +83,14 @@ static inline bool CanEliminate(const DocModification &mh) noexcept {
 	return whether this modification represents the FINAL step
 	in a [possibly lengthy] multi-step Undo/Redo sequence
 */
-static inline bool IsLastStep(const DocModification &mh) noexcept {
+constexpr bool IsLastStep(const DocModification &mh) noexcept {
 	return
 		(mh.modificationType & (SC_PERFORMED_UNDO | SC_PERFORMED_REDO)) != 0
 		&& (mh.modificationType & SC_MULTISTEPUNDOREDO) != 0
 		&& (mh.modificationType & SC_LASTSTEPINUNDOREDO) != 0
 		&& (mh.modificationType & SC_MULTILINEUNDOREDO) != 0;
+}
+
 }
 
 Timer::Timer() noexcept :
@@ -95,7 +99,7 @@ Timer::Timer() noexcept :
 Idler::Idler() noexcept :
 		state(false), idlerID(nullptr) {}
 
-static inline bool IsAllSpacesOrTabs(const char *s, unsigned int len) noexcept {
+static constexpr bool IsAllSpacesOrTabs(const char *s, unsigned int len) noexcept {
 	for (unsigned int i = 0; i < len; i++) {
 		// This is safe because IsSpaceOrTab() will return false for null terminators
 		if (!IsSpaceOrTab(s[i]))
@@ -2539,8 +2543,10 @@ void Editor::CheckModificationForWrap(DocModification mh) {
 	}
 }
 
+namespace {
+
 // Move a position so it is still after the same character as before the insertion.
-static inline Sci::Position MovePositionForInsertion(Sci::Position position, Sci::Position startInsertion, Sci::Position length) noexcept {
+constexpr Sci::Position MovePositionForInsertion(Sci::Position position, Sci::Position startInsertion, Sci::Position length) noexcept {
 	if (position > startInsertion) {
 		return position + length;
 	}
@@ -2549,7 +2555,7 @@ static inline Sci::Position MovePositionForInsertion(Sci::Position position, Sci
 
 // Move a position so it is still after the same character as before the deletion if that
 // character is still present else after the previous surviving character.
-static inline Sci::Position MovePositionForDeletion(Sci::Position position, Sci::Position startDeletion, Sci::Position length) noexcept {
+constexpr Sci::Position MovePositionForDeletion(Sci::Position position, Sci::Position startDeletion, Sci::Position length) noexcept {
 	if (position > startDeletion) {
 		const Sci::Position endDeletion = startDeletion + length;
 		if (position > endDeletion) {
@@ -2560,6 +2566,8 @@ static inline Sci::Position MovePositionForDeletion(Sci::Position position, Sci:
 	} else {
 		return position;
 	}
+}
+
 }
 
 void Editor::NotifyModified(Document *, DocModification mh, void *) {
@@ -3251,7 +3259,7 @@ constexpr short LowShortFromWParam(uptr_t x) noexcept {
 	return static_cast<short>(x & 0xffff);
 }
 
-unsigned int WithExtends(unsigned int iMessage) noexcept {
+constexpr unsigned int WithExtends(unsigned int iMessage) noexcept {
 	switch (iMessage) {
 	case SCI_CHARLEFT: return SCI_CHARLEFTEXTEND;
 	case SCI_CHARRIGHT: return SCI_CHARRIGHTEXTEND;
@@ -3278,7 +3286,7 @@ unsigned int WithExtends(unsigned int iMessage) noexcept {
 	}
 }
 
-int NaturalDirection(unsigned int iMessage) noexcept {
+constexpr int NaturalDirection(unsigned int iMessage) noexcept {
 	switch (iMessage) {
 	case SCI_CHARLEFT:
 	case SCI_CHARLEFTEXTEND:
@@ -3309,7 +3317,7 @@ int NaturalDirection(unsigned int iMessage) noexcept {
 	}
 }
 
-bool IsRectExtend(unsigned int iMessage, bool isRectMoveExtends) noexcept {
+constexpr bool IsRectExtend(unsigned int iMessage, bool isRectMoveExtends) noexcept {
 	switch (iMessage) {
 	case SCI_CHARLEFTRECTEXTEND:
 	case SCI_CHARRIGHTRECTEXTEND:
@@ -4036,7 +4044,6 @@ public:
 	CaseFolderASCII() noexcept {
 		StandardASCII();
 	}
-	~CaseFolderASCII() override = default;
 };
 
 
