@@ -139,6 +139,7 @@ void CALLBACK PasteBoardTimer(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTi
 void LoadSettings(void);
 void SaveSettings(BOOL bSaveSettingsNow);
 void SaveWindowPosition(BOOL bSaveSettingsNow, WCHAR *pIniSectionBuf);
+void ClearWindowPositionHistory(void);
 void ParseCommandLine(void);
 void LoadFlags(void);
 int  CheckIniFile(LPWSTR lpszFile, LPCWSTR lpszModule);

@@ -2649,6 +2649,21 @@ void SaveWindowPosition(BOOL bSaveSettingsNow, WCHAR *pIniSectionBuf) {
 	NP2HeapFree(pIniSectionBuf);
 }
 
+void ClearWindowPositionHistory(void) {
+	cxRunDlg = 0;
+	cxGotoDlg = 0;
+	cxFileFilterDlg = 0;
+	cxRenameFileDlg = 0;
+	cxNewDirectoryDlg = 0;
+	cxOpenWithDlg = 0;
+	cyOpenWithDlg = 0;
+	cxCopyMoveDlg = 0;
+	cxTargetApplicationDlg = 0;
+	cxFindWindowDlg = 0;
+
+	IniDeleteAllSection(INI_SECTION_NAME_WINDOW_POSITION);
+}
+
 //=============================================================================
 //
 //  ParseCommandLine()
