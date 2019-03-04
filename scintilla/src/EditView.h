@@ -171,7 +171,7 @@ public:
 	AutoLineLayout(AutoLineLayout &&) = delete;
 	AutoLineLayout &operator=(const AutoLineLayout &) = delete;
 	AutoLineLayout &operator=(AutoLineLayout &&) = delete;
-	~AutoLineLayout() {
+	~AutoLineLayout() noexcept {
 		llc.Dispose(ll);
 		ll = nullptr;
 	}

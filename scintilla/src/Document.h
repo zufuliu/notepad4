@@ -172,7 +172,7 @@ constexpr int LevelNumber(int level) noexcept {
 
 class LexInterface {
 protected:
-	Document * pdoc;
+	Document *pdoc;
 	ILexer4 *instance;
 	bool performingStyle;	///< Prevent reentrance
 public:
@@ -563,6 +563,11 @@ class UndoGroup {
 	Document *pdoc;
 	bool groupNeeded;
 public:
+	// Deleted so UndoGroup objects can not be copied.
+	UndoGroup(const UndoGroup &) = delete;
+	UndoGroup(UndoGroup &&) = delete;
+	void operator=(const UndoGroup &) = delete;
+	UndoGroup &operator=(UndoGroup &&) = delete;
 	UndoGroup(Document *pdoc_, bool groupNeeded_ = true) :
 		pdoc(pdoc_), groupNeeded(groupNeeded_) {
 		if (groupNeeded) {
