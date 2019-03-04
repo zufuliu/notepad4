@@ -577,7 +577,6 @@ static INT_PTR CALLBACK GeneralPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LPA
 			}
 		} else {
 			EnableWindow(GetDlgItem(hwnd, IDC_SAVESETTINGS), FALSE);
-			EnableWindow(GetDlgItem(hwnd, IDC_CLEARWINPOS), FALSE);
 		}
 
 		if (bWindowLayoutRTL) {

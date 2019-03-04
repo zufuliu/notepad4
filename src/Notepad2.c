@@ -2445,7 +2445,6 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	EnableCmd(hmenu, IDM_VIEW_REUSEWINDOW, i);
 	EnableCmd(hmenu, IDM_VIEW_STICKYWINPOS, i);
-	EnableCmd(hmenu, IDM_VIEW_CLEARWINPOS, i);
 	EnableCmd(hmenu, IDM_VIEW_SINGLEFILEINSTANCE, i);
 	EnableCmd(hmenu, IDM_VIEW_NOSAVERECENT, i);
 	EnableCmd(hmenu, IDM_VIEW_NOSAVEFINDREPL, i);
