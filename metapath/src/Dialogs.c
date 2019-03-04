@@ -619,7 +619,7 @@ static INT_PTR CALLBACK GeneralPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LPA
 		case NM_RETURN:
 			switch (((LPNMHDR)lParam)->idFrom) {
 			case IDC_CLEARWINPOS:
-				IniDeleteAllSection(INI_SECTION_NAME_WINDOW_POSITION);
+				ClearWindowPositionHistory();
 				break;
 			}
 			break;

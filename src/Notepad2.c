@@ -234,8 +234,8 @@ int		cxFindReplaceDlg;
 
 extern int cxStyleSelectDlg;
 extern int cyStyleSelectDlg;
-extern int cyStyleCustomizeDlg;
 extern int cxStyleCustomizeDlg;
+extern int cyStyleCustomizeDlg;
 
 static LPWSTR lpFileList[32];
 static int cFileList = 0;
@@ -4040,7 +4040,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	case IDM_VIEW_CLEARWINPOS:
-		IniDeleteAllSection(INI_SECTION_NAME_WINDOW_POSITION);
+		ClearWindowPositionHistory();
 		break;
 
 	case IDM_VIEW_REUSEWINDOW:
@@ -5436,8 +5436,8 @@ void LoadSettings(void) {
 
 		cxStyleSelectDlg = IniSectionGetInt(pIniSection, L"StyleSelectDlgSizeX", 0);
 		cyStyleSelectDlg = IniSectionGetInt(pIniSection, L"StyleSelectDlgSizeY", 0);
-		cyStyleCustomizeDlg = IniSectionGetInt(pIniSection, L"StyleCustomizeDlgSizeY", 0);
 		cxStyleCustomizeDlg = IniSectionGetInt(pIniSection, L"StyleCustomizeDlgSizeX", 0);
+		cyStyleCustomizeDlg = IniSectionGetInt(pIniSection, L"StyleCustomizeDlgSizeY", 0);
 	}
 
 	IniSectionFree(pIniSection);
@@ -5664,11 +5664,45 @@ void SaveWindowPosition(BOOL bSaveSettingsNow, WCHAR *pIniSectionBuf) {
 
 	IniSectionSetIntEx(pIniSection, L"StyleSelectDlgSizeX", cxStyleSelectDlg, 0);
 	IniSectionSetIntEx(pIniSection, L"StyleSelectDlgSizeY", cyStyleSelectDlg, 0);
-	IniSectionSetIntEx(pIniSection, L"StyleCustomizeDlgSizeY", cyStyleCustomizeDlg, 0);
 	IniSectionSetIntEx(pIniSection, L"StyleCustomizeDlgSizeX", cxStyleCustomizeDlg, 0);
+	IniSectionSetIntEx(pIniSection, L"StyleCustomizeDlgSizeY", cyStyleCustomizeDlg, 0);
 
 	SaveIniSection(sectionName, pIniSectionBuf);
 	NP2HeapFree(pIniSectionBuf);
+}
+
+void ClearWindowPositionHistory(void) {
+	cxRunDlg = 0;
+	cxEncodingDlg = 0;
+	cyEncodingDlg = 0;
+	cxRecodeDlg = 0;
+	cyRecodeDlg = 0;
+
+	cxFileMRUDlg = 0;
+	cyFileMRUDlg = 0;
+	cxOpenWithDlg = 0;
+	cyOpenWithDlg = 0;
+	cxFavoritesDlg = 0;
+	cyFavoritesDlg = 0;
+	cxAddFavoritesDlg = 0;
+
+	cxModifyLinesDlg = 0;
+	cyModifyLinesDlg = 0;
+	cxEncloseSelectionDlg = 0;
+	cyEncloseSelectionDlg = 0;
+	cxInsertTagDlg = 0;
+	cyInsertTagDlg = 0;
+
+	xFindReplaceDlg = 0;
+	yFindReplaceDlg = 0;
+	cxFindReplaceDlg = 0;
+
+	cxStyleSelectDlg = 0;
+	cyStyleSelectDlg = 0;
+	cxStyleCustomizeDlg = 0;
+	cyStyleCustomizeDlg = 0;
+
+	IniDeleteAllSection(INI_SECTION_NAME_WINDOW_POSITION);
 }
 
 //=============================================================================

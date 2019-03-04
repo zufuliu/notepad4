@@ -259,8 +259,8 @@ static int	iDefaultLexer;
 static BOOL bAutoSelect;
 int		cxStyleSelectDlg;
 int		cyStyleSelectDlg;
-int		cyStyleCustomizeDlg;
 int		cxStyleCustomizeDlg;
+int		cyStyleCustomizeDlg;
 
 #define ALL_FILE_EXTENSIONS_BYTE_SIZE	((NUMLEXERS * MAX_EDITLEXER_EXT_SIZE) * sizeof(WCHAR))
 static LPWSTR g_AllFileExtensions = NULL;
