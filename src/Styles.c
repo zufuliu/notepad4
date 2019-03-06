@@ -2366,12 +2366,16 @@ void Style_ToggleUse2ndDefaultStyle(HWND hwnd) {
 
 void Style_ToggleUseDefaultCodeStyle(HWND hwnd, int menu) {
 	int mask = 0;
+	BOOL changed = FALSE;
+	const int rid = pLexCurrent->rid;
 	switch (menu) {
 	case IDM_VIEW_USECODESTYLE_CODEFILE:
 		mask = UseDefaultCodeStyle_CodeFile;
+		changed = rid != NP2LEX_DEFAULT;
 		break;
 	case IDM_VIEW_USECODESTYLE_TEXTFILE:
 		mask = UseDefaultCodeStyle_TextFile;
+		changed = rid == NP2LEX_DEFAULT;
 		break;
 	}
 
@@ -2380,7 +2384,9 @@ void Style_ToggleUseDefaultCodeStyle(HWND hwnd, int menu) {
 	} else {
 		fUseDefaultCodeStyle |= mask;
 	}
-	Style_SetLexer(hwnd, pLexCurrent);
+	if (changed) {
+		Style_SetLexer(hwnd, pLexCurrent);
+	}
 }
 
 //=============================================================================
@@ -3714,7 +3720,6 @@ void Style_ConfigDlg(HWND hwnd) {
 			CopyMemory(pLex->szStyleBuf, styleBackup[iLexer], EDITSTYLE_BufferSize(pLex->iStyleCount));
 		}
 	} else {
-		apply = TRUE;
 		if (!(fStylesModified & STYLESMODIFIED_FILE_EXT)) {
 			if (memcmp(extBackup, g_AllFileExtensions, ALL_FILE_EXTENSIONS_BYTE_SIZE) != 0) {
 				fStylesModified |= STYLESMODIFIED_FILE_EXT;
@@ -3736,6 +3741,8 @@ void Style_ConfigDlg(HWND hwnd) {
 			}
 			fStylesModified |= (count == 0) ? STYLESMODIFIED_NONE : ((count == NUMLEXERS) ? STYLESMODIFIED_ALL_STYLE : STYLESMODIFIED_SOME_STYLE);
 		}
+
+		apply = pLexCurrent->bStyleChanged || lexDefault.bStyleChanged;
 		if ((fStylesModified & STYLESMODIFIED_WARN_MASK) && StrIsEmpty(szIniFile) && !fWarnedNoIniFile) {
 			MsgBox(MBWARN, IDS_SETTINGSNOTSAVED);
 			fWarnedNoIniFile = TRUE;
