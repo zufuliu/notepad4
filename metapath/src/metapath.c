@@ -45,7 +45,6 @@ HWND	hwndStatus;
 static HWND	hwndToolbar;
 static HWND hwndReBar;
 
-#define NUMTOOLBITMAPS  15
 #define TBFILTERBMP 13
 
 #define TOOLBAR_COMMAND_BASE	IDT_HISTORY_BACK
@@ -827,7 +826,7 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) {
 	BITMAP bmp;
 	GetObject(hbmp, sizeof(BITMAP), &bmp);
 
-	HIMAGELIST himl = ImageList_Create(bmp.bmWidth / NUMTOOLBITMAPS, bmp.bmHeight, ILC_COLOR32 | ILC_MASK, 0, 0);
+	HIMAGELIST himl = ImageList_Create(bmp.bmHeight, bmp.bmHeight, ILC_COLOR32 | ILC_MASK, 0, 0);
 	ImageList_AddMasked(himl, hbmp, CLR_DEFAULT);
 	DeleteObject(hbmp);
 	SendMessage(hwndToolbar, TB_SETIMAGELIST, 0, (LPARAM)himl);
@@ -837,7 +836,7 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) {
 		hbmp = LoadBitmapFile(tchToolbarBitmapHot);
 		if (hbmp != NULL) {
 			GetObject(hbmp, sizeof(BITMAP), &bmp);
-			himl = ImageList_Create(bmp.bmWidth / NUMTOOLBITMAPS, bmp.bmHeight, ILC_COLOR32 | ILC_MASK, 0, 0);
+			himl = ImageList_Create(bmp.bmHeight, bmp.bmHeight, ILC_COLOR32 | ILC_MASK, 0, 0);
 			ImageList_AddMasked(himl, hbmp, CLR_DEFAULT);
 			DeleteObject(hbmp);
 			SendMessage(hwndToolbar, TB_SETHOTIMAGELIST, 0, (LPARAM)himl);
@@ -849,7 +848,7 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) {
 		hbmp = LoadBitmapFile(tchToolbarBitmapDisabled);
 		if (hbmp != NULL) {
 			GetObject(hbmp, sizeof(BITMAP), &bmp);
-			himl = ImageList_Create(bmp.bmWidth / NUMTOOLBITMAPS, bmp.bmHeight, ILC_COLOR32 | ILC_MASK, 0, 0);
+			himl = ImageList_Create(bmp.bmHeight, bmp.bmHeight, ILC_COLOR32 | ILC_MASK, 0, 0);
 			ImageList_AddMasked(himl, hbmp, CLR_DEFAULT);
 			DeleteObject(hbmp);
 			SendMessage(hwndToolbar, TB_SETDISABLEDIMAGELIST, 0, (LPARAM)himl);
@@ -865,7 +864,7 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) {
 			fProcessed = BitmapGrayScale(hbmpCopy);
 		}
 		if (fProcessed) {
-			himl = ImageList_Create(bmp.bmWidth / NUMTOOLBITMAPS, bmp.bmHeight, ILC_COLOR32 | ILC_MASK, 0, 0);
+			himl = ImageList_Create(bmp.bmHeight, bmp.bmHeight, ILC_COLOR32 | ILC_MASK, 0, 0);
 			ImageList_AddMasked(himl, hbmpCopy, CLR_DEFAULT);
 			SendMessage(hwndToolbar, TB_SETDISABLEDIMAGELIST, 0, (LPARAM)himl);
 		}
