@@ -61,7 +61,6 @@ HWND	hwndMain;
 static HWND hwndNextCBChain = NULL;
 HWND	hDlgFindReplace = NULL;
 
-#define NUMTOOLBITMAPS		25
 #define MARGIN_LINE_NUMBER	0	// line number
 #define MARGIN_SELECTION	1	// selection margin
 #define MARGIN_FOLD_INDEX	2	// folding index
@@ -1794,7 +1793,7 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) {
 	BITMAP bmp;
 	GetObject(hbmp, sizeof(BITMAP), &bmp);
 
-	HIMAGELIST himl = ImageList_Create(bmp.bmWidth / NUMTOOLBITMAPS, bmp.bmHeight, ILC_COLOR32 | ILC_MASK, 0, 0);
+	HIMAGELIST himl = ImageList_Create(bmp.bmHeight, bmp.bmHeight, ILC_COLOR32 | ILC_MASK, 0, 0);
 	ImageList_AddMasked(himl, hbmp, CLR_DEFAULT);
 	DeleteObject(hbmp);
 	SendMessage(hwndToolbar, TB_SETIMAGELIST, 0, (LPARAM)himl);
@@ -1805,7 +1804,7 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) {
 		if (hbmp != NULL) {
 			hbmp = ResizeImageForCurrentDPI(hbmp);
 			GetObject(hbmp, sizeof(BITMAP), &bmp);
-			himl = ImageList_Create(bmp.bmWidth / NUMTOOLBITMAPS, bmp.bmHeight, ILC_COLOR32 | ILC_MASK, 0, 0);
+			himl = ImageList_Create(bmp.bmHeight, bmp.bmHeight, ILC_COLOR32 | ILC_MASK, 0, 0);
 			ImageList_AddMasked(himl, hbmp, CLR_DEFAULT);
 			DeleteObject(hbmp);
 			SendMessage(hwndToolbar, TB_SETHOTIMAGELIST, 0, (LPARAM)himl);
@@ -1818,7 +1817,7 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) {
 		if (hbmp != NULL) {
 			hbmp = ResizeImageForCurrentDPI(hbmp);
 			GetObject(hbmp, sizeof(BITMAP), &bmp);
-			himl = ImageList_Create(bmp.bmWidth / NUMTOOLBITMAPS, bmp.bmHeight, ILC_COLOR32 | ILC_MASK, 0, 0);
+			himl = ImageList_Create(bmp.bmHeight, bmp.bmHeight, ILC_COLOR32 | ILC_MASK, 0, 0);
 			ImageList_AddMasked(himl, hbmp, CLR_DEFAULT);
 			DeleteObject(hbmp);
 			SendMessage(hwndToolbar, TB_SETDISABLEDIMAGELIST, 0, (LPARAM)himl);
@@ -1834,7 +1833,7 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) {
 			fProcessed = BitmapGrayScale(hbmpCopy);
 		}
 		if (fProcessed) {
-			himl = ImageList_Create(bmp.bmWidth / NUMTOOLBITMAPS, bmp.bmHeight, ILC_COLOR32 | ILC_MASK, 0, 0);
+			himl = ImageList_Create(bmp.bmHeight, bmp.bmHeight, ILC_COLOR32 | ILC_MASK, 0, 0);
 			ImageList_AddMasked(himl, hbmpCopy, CLR_DEFAULT);
 			SendMessage(hwndToolbar, TB_SETDISABLEDIMAGELIST, 0, (LPARAM)himl);
 		}
