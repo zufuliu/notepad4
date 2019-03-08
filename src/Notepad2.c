@@ -201,7 +201,6 @@ typedef struct _wi {
 } WININFO;
 
 static WININFO wi;
-static BOOL bStickyWinPos;
 //BOOL	bIsAppThemed;
 
 static int cyReBar;
@@ -2384,7 +2383,6 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	CheckCmd(hmenu, IDM_VIEW_REUSEWINDOW, bReuseWindow);
 	CheckCmd(hmenu, IDM_VIEW_SINGLEFILEINSTANCE, bSingleFileInstance);
-	CheckCmd(hmenu, IDM_VIEW_STICKYWINPOS, bStickyWinPos);
 	CheckCmd(hmenu, IDM_VIEW_ALWAYSONTOP, IsTopMost());
 	CheckCmd(hmenu, IDM_VIEW_MINTOTRAY, bMinimizeToTray);
 	CheckCmd(hmenu, IDM_VIEW_TRANSPARENT, bTransparentMode);
@@ -2443,7 +2441,6 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	EnableCmd(hmenu, CMD_OPENINIFILE, i);
 
 	EnableCmd(hmenu, IDM_VIEW_REUSEWINDOW, i);
-	EnableCmd(hmenu, IDM_VIEW_STICKYWINPOS, i);
 	EnableCmd(hmenu, IDM_VIEW_SINGLEFILEINSTANCE, i);
 	EnableCmd(hmenu, IDM_VIEW_NOSAVERECENT, i);
 	EnableCmd(hmenu, IDM_VIEW_NOSAVEFINDREPL, i);
@@ -4028,15 +4025,6 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		SendWMSize(hwnd);
 		break;
 
-	case IDM_VIEW_STICKYWINPOS:
-		bStickyWinPos = !bStickyWinPos;
-		IniSetBool(INI_SECTION_NAME_FLAGS, L"StickyWindowPosition", bStickyWinPos);
-		if (bStickyWinPos) {
-			SaveWindowPosition(FALSE, NULL);
-			InfoBox(0, L"MsgStickyWinPos", IDS_STICKYWINPOS);
-		}
-		break;
-
 	case IDM_VIEW_CLEARWINPOS:
 		ClearWindowPositionHistory();
 		break;
@@ -5399,7 +5387,7 @@ void LoadSettings(void) {
 		IniSectionParse(pIniSection, pIniSectionBuf);
 
 		// ignore window position if /p was specified
-		if (!flagPosParam /*|| bStickyWinPos*/) {
+		if (!flagPosParam) {
 			wi.x	= IniSectionGetInt(pIniSection, L"WindowPosX", CW_USEDEFAULT);
 			wi.y	= IniSectionGetInt(pIniSection, L"WindowPosY", CW_USEDEFAULT);
 			wi.cx	= IniSectionGetInt(pIniSection, L"WindowSizeX", CW_USEDEFAULT);
@@ -5614,8 +5602,8 @@ void SaveWindowPosition(BOOL bSaveSettingsNow, WCHAR *pIniSectionBuf) {
 	WCHAR sectionName[96];
 	GetWindowPositionSectionName(sectionName);
 
-	// SaveSettingsNow(): query Window Dimensions
-	if (bSaveSettingsNow || bStickyWinPos) {
+	// query window dimensions when window is not minimized
+	if (bSaveSettingsNow && !IsIconic(hwndMain)) {
 		WINDOWPLACEMENT wndpl;
 		wndpl.length = sizeof(WINDOWPLACEMENT);
 		GetWindowPlacement(hwndMain, &wndpl);
@@ -5627,13 +5615,11 @@ void SaveWindowPosition(BOOL bSaveSettingsNow, WCHAR *pIniSectionBuf) {
 		wi.max = (IsZoomed(hwndMain) || (wndpl.flags & WPF_RESTORETOMAXIMIZED));
 	}
 
-	if (bStickyWinPos) {
-		IniSectionSetInt(pIniSection, L"WindowPosX", wi.x);
-		IniSectionSetInt(pIniSection, L"WindowPosY", wi.y);
-		IniSectionSetInt(pIniSection, L"WindowSizeX", wi.cx);
-		IniSectionSetInt(pIniSection, L"WindowSizeY", wi.cy);
-		IniSectionSetBoolEx(pIniSection, L"WindowMaximized", wi.max, 0);
-	}
+	IniSectionSetInt(pIniSection, L"WindowPosX", wi.x);
+	IniSectionSetInt(pIniSection, L"WindowPosY", wi.y);
+	IniSectionSetInt(pIniSection, L"WindowSizeX", wi.cx);
+	IniSectionSetInt(pIniSection, L"WindowSizeY", wi.cy);
+	IniSectionSetBoolEx(pIniSection, L"WindowMaximized", wi.max, 0);
 
 	IniSectionSetIntEx(pIniSection, L"RunDlgSizeX", cxRunDlg, 0);
 	IniSectionSetIntEx(pIniSection, L"EncodingDlgSizeX", cxEncodingDlg, 0);
@@ -6348,7 +6334,6 @@ void LoadFlags(void) {
 
 	bSingleFileInstance = IniSectionGetBool(pIniSection, L"SingleFileInstance", 1);
 	bReuseWindow = IniSectionGetBool(pIniSection, L"ReuseWindow", 0);
-	bStickyWinPos = IniSectionGetBool(pIniSection, L"StickyWindowPosition", 0);
 
 	if (!flagReuseWindow && !flagNoReuseWindow) {
 		flagNoReuseWindow = !bReuseWindow;

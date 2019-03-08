@@ -575,7 +575,6 @@ BEGIN
 			MENUITEM "Minimi&ze to Tray",			IDM_VIEW_MINTOTRAY
 			MENUITEM SEPARATOR
 			MENUITEM "&Reuse Window",				IDM_VIEW_REUSEWINDOW
-			MENUITEM "Sticky Window &Position",		IDM_VIEW_STICKYWINPOS
 			MENUITEM "Clear Position &History",		IDM_VIEW_CLEARWINPOS
 		END
 		POPUP "Window Title Displa&y"
@@ -1842,7 +1841,6 @@ BEGIN
     IDS_READONLY_SAVE       """%s"" is read only. Save to a different file?"
     IDS_FILECHANGENOTIFY    "The current file has been modified by an external program. Reload?"
     IDS_FILECHANGENOTIFY2   "The current file has been deleted. Save now?"
-    IDS_STICKYWINPOS        "Sticky Window Position is enabled. Any new Notepad2 windows will use the current window placement settings."
     IDS_SAVEDSETTINGS       "The current program settings have been saved."
     IDS_CREATEINI_FAIL      "Error creating configuration file."
     IDS_WRITEINI_FAIL       "Error writing settings to configuration file."
