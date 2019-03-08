@@ -2614,11 +2614,9 @@ void SaveWindowPosition(BOOL bSaveSettingsNow, WCHAR *pIniSectionBuf) {
 	WCHAR sectionName[96];
 	GetWindowPositionSectionName(sectionName);
 
-	//  SaveSettingsNow(): query Window Dimensions
-	if (bSaveSettingsNow) {
+	// query window dimensions when window is not minimized
+	if (bSaveSettingsNow && !IsIconic(hwndMain)) {
 		WINDOWPLACEMENT wndpl;
-
-		// GetWindowPlacement
 		wndpl.length = sizeof(WINDOWPLACEMENT);
 		GetWindowPlacement(hwndMain, &wndpl);
 
