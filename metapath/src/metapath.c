@@ -2455,7 +2455,7 @@ void LoadSettings(void) {
 	if (StrIsEmpty(strValue)) {
 		CopyMemory(tchToolbarButtons, DefaultToolbarButtons, sizeof(DefaultToolbarButtons));
 	} else {
-		lstrcpyn(tchToolbarButtons, strValue, COUNTOF(DefaultToolbarButtons));
+		lstrcpyn(tchToolbarButtons, strValue, COUNTOF(tchToolbarButtons));
 	}
 
 	bShowToolbar = IniSectionGetBool(pIniSection, L"ShowToolbar", 1);
