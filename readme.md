@@ -192,7 +192,7 @@ Or build from source, see the [Wiki](https://github.com/zufuliu/notepad2/wiki/Bu
 
 ## Notes:
 * The default *Win32* build require [SSE2](https://en.wikipedia.org/wiki/SSE2) (Pentium 4), which can be turned off if you [build Notepad2 and metapath](https://github.com/zufuliu/notepad2/wiki/Build-Notepad2) yourself.
-* If you find any bugs or have any suggestions feel free to **write proposals/issues** and/or **provide patches/pull requests**.
+* If you find any bugs or have any suggestions feel free to **write proposals/issues** or **provide patches/pull requests**.
 
 ## Contributors:
 * [XhmikosR](https://xhmikosr.github.io/notepad2-mod/)
@@ -210,6 +210,6 @@ Or build from source, see the [Wiki](https://github.com/zufuliu/notepad2/wiki/Bu
 * [Build Notepad2 and metapath](https://github.com/zufuliu/notepad2/wiki/Build-Notepad2)
 * [Notepad2 Wiki](https://github.com/zufuliu/notepad2/wiki)
 
-### Related projects based on (original) Notepad2 and/or Notepad2-mod:
+### Other projects based on original Notepad2 or Notepad2-mod:
 * [Notepad3](https://github.com/rizonesoft/Notepad3)
 * [Notepad2e](https://github.com/ProgerXP/Notepad2e)
