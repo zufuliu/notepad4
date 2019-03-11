@@ -526,10 +526,10 @@ void EditView::LayoutLine(const EditModel &model, Sci::Line line, Surface *surfa
 				wrapAddIndent = vstyle.wrapVisualStartIndent * vstyle.aveCharWidth;
 				break;
 			case SC_WRAPINDENT_INDENT:
-				wrapAddIndent = model.pdoc->IndentSize() * vstyle.spaceWidth;
+				wrapAddIndent = model.pdoc->IndentSize() * vstyle.aveCharWidth;
 				break;
 			case SC_WRAPINDENT_DEEPINDENT:
-				wrapAddIndent = model.pdoc->IndentSize() * 2 * vstyle.spaceWidth;
+				wrapAddIndent = model.pdoc->IndentSize() * 2 * vstyle.aveCharWidth;
 				break;
 			}
 			ll->wrapIndent = wrapAddIndent;
@@ -1770,7 +1770,7 @@ void EditView::DrawForeground(Surface *surface, const EditModel &model, const Vi
 	bool inIndentation = subLine == 0;	// Do not handle indentation except on first subline.
 
 	const XYACCUMULATOR subLineStart = ll->positions[lineRange.start];
-	const XYPOSITION indentWidth = model.pdoc->IndentSize() * vsDraw.spaceWidth;
+	const XYPOSITION indentWidth = model.pdoc->IndentSize() * vsDraw.aveCharWidth;
 
 	// Does not take margin into account but not significant
 	const int xStartVisible = static_cast<int>(subLineStart) - xStart;
@@ -2004,7 +2004,7 @@ void EditView::DrawIndentGuidesOverEmpty(Surface *surface, const EditModel &mode
 		}
 
 		for (int indentPos = model.pdoc->IndentSize(); indentPos < indentSpace; indentPos += model.pdoc->IndentSize()) {
-			const XYPOSITION xIndent = floor(indentPos * vsDraw.spaceWidth);
+			const XYPOSITION xIndent = floor(indentPos * vsDraw.aveCharWidth);
 			if (xIndent < xStartText) {
 				DrawIndentGuide(surface, lineVisible, vsDraw.lineHeight, xIndent + xStart, rcLine,
 					(ll->xHighlightGuide == xIndent));
@@ -2230,7 +2230,7 @@ void EditView::PaintText(Surface *surfaceWindow, const EditModel &model, PRectan
 
 					// Highlight the current braces if any
 					ll->SetBracesHighlight(rangeLine, model.braces, static_cast<char>(model.bracesMatchStyle),
-						static_cast<int>(model.highlightGuideColumn * vsDraw.spaceWidth), bracesIgnoreStyle);
+						static_cast<int>(model.highlightGuideColumn * vsDraw.aveCharWidth), bracesIgnoreStyle);
 
 					if (leftTextOverlap && (bufferedDraw || ((phasesDraw < phasesMultiple) && (phase & drawBack)))) {
 						// Clear the left margin
