@@ -28,8 +28,7 @@ matrix:
   exclude:
     - platform: ARM64
       compiler: Clang
-      # Clang 8 and 9 crashed for Release build, Clang 7 crashed for both.
-      # configuration: Release
+      # require Clang released in March 2019 or later.
 
 # No reversion when shallow clone is enabled.
 #before_build:
