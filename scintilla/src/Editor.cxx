@@ -2678,12 +2678,16 @@ void Editor::NotifyModified(Document *, DocModification mh, void *) {
 			}
 
 			if (paintState == notPainting && !CanDeferToLastStep(mh)) {
-				QueueIdleWork(WorkNeeded::workStyle, pdoc->Length());
+				if (SynchronousStylingToVisible()) {
+					QueueIdleWork(WorkNeeded::workStyle, pdoc->Length());
+				}
 				Redraw();
 			}
 		} else {
 			if (paintState == notPainting && mh.length && !CanEliminate(mh)) {
-				QueueIdleWork(WorkNeeded::workStyle, mh.position + mh.length);
+				if (SynchronousStylingToVisible()) {
+					QueueIdleWork(WorkNeeded::workStyle, mh.position + mh.length);
+				}
 				InvalidateRange(mh.position, mh.position + mh.length);
 			}
 		}
@@ -5085,7 +5089,7 @@ void Editor::StyleToPositionInView(Sci::Position pos) {
 }
 
 Sci::Position Editor::PositionAfterMaxStyling(Sci::Position posMax, bool scrolling) const noexcept {
-	if ((idleStyling == SC_IDLESTYLING_NONE) || (idleStyling == SC_IDLESTYLING_AFTERVISIBLE)) {
+	if (SynchronousStylingToVisible()) {
 		// Both states do not limit styling
 		return posMax;
 	}
