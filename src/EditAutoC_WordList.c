@@ -117,7 +117,7 @@ static inline void WordList_AddBuffer(struct WordList *pWList) {
 	char *buffer = (char *)NP2HeapAlloc(pWList->capacity);
 	char *align = (char *)align_ptr(buffer);
 	pWList->bufferList[pWList->bufferCount] = buffer;
-	pWList->buffer = align;
+	pWList->buffer = buffer;
 	pWList->bufferCount++;
 	pWList->offset = (int)(align - buffer);
 }
