@@ -2372,7 +2372,7 @@ void LoadSettings(void) {
 	bSingleClick = IniSectionGetBool(pIniSection, L"SingleClick", 1);
 	bTrackSelect = IniSectionGetBool(pIniSection, L"TrackSelect", 1);
 	bFullRowSelect = IniSectionGetBool(pIniSection, L"FullRowSelect", 0);
-	fUseRecycleBin = IniSectionGetBool(pIniSection, L"UseRecycleBin", 0);
+	fUseRecycleBin = IniSectionGetBool(pIniSection, L"UseRecycleBin", 1);
 	fNoConfirmDelete = IniSectionGetBool(pIniSection, L"NoConfirmDelete", 0);
 	bClearReadOnly = IniSectionGetBool(pIniSection, L"ClearReadOnly", 1);
 	bRenameOnCollision = IniSectionGetBool(pIniSection, L"RenameOnCollision", 0);
@@ -2560,7 +2560,7 @@ void SaveSettings(BOOL bSaveSettingsNow) {
 	IniSectionSetBoolEx(pIniSection, L"SingleClick", bSingleClick, 1);
 	IniSectionSetBoolEx(pIniSection, L"TrackSelect", bTrackSelect, 1);
 	IniSectionSetBoolEx(pIniSection, L"FullRowSelect", bFullRowSelect, 0);
-	IniSectionSetBoolEx(pIniSection, L"UseRecycleBin", fUseRecycleBin, 0);
+	IniSectionSetBoolEx(pIniSection, L"UseRecycleBin", fUseRecycleBin, 1);
 	IniSectionSetBoolEx(pIniSection, L"NoConfirmDelete", fNoConfirmDelete, 0);
 	IniSectionSetBoolEx(pIniSection, L"ClearReadOnly", bClearReadOnly, 1);
 	IniSectionSetBoolEx(pIniSection, L"RenameOnCollision", bRenameOnCollision, 0);
