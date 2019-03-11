@@ -45,7 +45,8 @@ HWND	hwndStatus;
 static HWND	hwndToolbar;
 static HWND hwndReBar;
 
-#define TBFILTERBMP 13
+#define TB_DEL_FILTER_BMP 13
+#define TB_ADD_FILTER_BMP 14
 
 #define TOOLBAR_COMMAND_BASE	IDT_HISTORY_BACK
 #define DefaultToolbarButtons	L"1 2 3 4 5 0 8"
@@ -53,8 +54,8 @@ static TBBUTTON tbbMainWnd[] = {
 	{0, 0, 0, TBSTYLE_SEP, {0}, 0, 0},
 	{0, IDT_HISTORY_BACK, TBSTATE_ENABLED, TBSTYLE_BUTTON, {0}, 0, 0},
 	{1, IDT_HISTORY_FORWARD, TBSTATE_ENABLED, TBSTYLE_BUTTON, {0}, 0, 0},
-	{2, IDT_UPDIR, TBSTATE_ENABLED, TBSTYLE_BUTTON, {0}, 0, 0},
-	{3, IDT_ROOT, TBSTATE_ENABLED, TBSTYLE_BUTTON, {0}, 0, 0},
+	{2, IDT_UP_DIR, TBSTATE_ENABLED, TBSTYLE_BUTTON, {0}, 0, 0},
+	{3, IDT_ROOT_DIR, TBSTATE_ENABLED, TBSTYLE_BUTTON, {0}, 0, 0},
 	{4, IDT_VIEW_FAVORITES, TBSTATE_ENABLED, TBSTYLE_BUTTON, {0}, 0, 0},
 	{5, IDT_FILE_PREV, TBSTATE_ENABLED, TBSTYLE_BUTTON, {0}, 0, 0},
 	{6, IDT_FILE_NEXT, TBSTATE_ENABLED, TBSTYLE_BUTTON, {0}, 0, 0},
@@ -62,9 +63,10 @@ static TBBUTTON tbbMainWnd[] = {
 	{8, IDT_FILE_QUICKVIEW, TBSTATE_ENABLED, TBSTYLE_BUTTON, {0}, 0, 0},
 	{9, IDT_FILE_SAVEAS, TBSTATE_ENABLED, TBSTYLE_BUTTON, {0}, 0, 0},
 	{10, IDT_FILE_COPYMOVE, TBSTATE_ENABLED, TBSTYLE_BUTTON, {0}, 0, 0},
-	{11, IDT_FILE_DELETE, TBSTATE_ENABLED, TBSTYLE_BUTTON, {0}, 0, 0},
-	{12, IDT_FILE_DELETE2, TBSTATE_ENABLED, TBSTYLE_BUTTON, {0}, 0, 0},
+	{11, IDT_FILE_DELETE_RECYCLE, TBSTATE_ENABLED, TBSTYLE_BUTTON, {0}, 0, 0},
+	{12, IDT_FILE_DELETE_PERM, TBSTATE_ENABLED, TBSTYLE_BUTTON, {0}, 0, 0},
 	{13, IDT_VIEW_FILTER, TBSTATE_ENABLED, TBSTYLE_BUTTON, {0}, 0, 0},
+	// TB_ADD_FILTER_BMP and TB_DEL_FILTER_BMP both used for IDT_VIEW_FILTER
 };
 
 static HWND hwndDriveBox;
@@ -176,6 +178,10 @@ int			flagNoFadeHidden	= 0;
 static int	iOpacityLevel		= 75;
 static int	flagToolbarLook		= 0;
 static int	flagPosParam		= 0;
+
+static inline BOOL HasFilter(void) {
+	return !StrEqual(tchFilter, L"*.*") || bNegFilter;
+}
 
 //=============================================================================
 //
@@ -456,7 +462,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 	case WM_SYSCOLORCHANGE: {
 		const LRESULT lret = DefWindowProc(hwnd, umsg, wParam, lParam);
 
-		if (!StrEqual(tchFilter, L"*.*") || bNegFilter) {
+		if (HasFilter()) {
 			ListView_SetTextColor(hwndDirList, (bDefColorFilter) ? GetSysColor(COLOR_WINDOWTEXT) : colorFilter);
 			ListView_RedrawItems(hwndDirList, 0, ListView_GetItemCount(hwndDirList) - 1);
 		} else {
@@ -1098,7 +1104,7 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	CheckCmd(hmenu, IDM_VIEW_FILES, (dwFillMask & DL_NONFOLDERS));
 	CheckCmd(hmenu, IDM_VIEW_HIDDEN, (dwFillMask & DL_INCLHIDDEN));
 
-	EnableCmd(hmenu, IDM_VIEW_FILTERALL, (!StrEqual(tchFilter, L"*.*") || bNegFilter));
+	EnableCmd(hmenu, IDM_VIEW_FILTERALL, HasFilter());
 
 	CheckCmd(hmenu, IDM_VIEW_TOOLBAR, bShowToolbar);
 	EnableCmd(hmenu, IDM_VIEW_CUSTOMIZETB, bShowToolbar);
@@ -1615,12 +1621,11 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 				}
 			}
 		}
-		Toolbar_SetButtonImage(hwndToolbar, IDT_VIEW_FILTER,
-							   (!StrEqual(tchFilter, L"*.*") || bNegFilter) ? TBFILTERBMP : TBFILTERBMP + 1);
+		Toolbar_SetButtonImage(hwndToolbar, IDT_VIEW_FILTER, HasFilter() ? TB_DEL_FILTER_BMP : TB_ADD_FILTER_BMP);
 		break;
 
 	case IDM_VIEW_FILTERALL:
-		if (!StrEqual(tchFilter, L"*.*") || bNegFilter) {
+		if (HasFilter()) {
 			lstrcpy(tchFilter, L"*.*");
 			bNegFilter = FALSE;
 
@@ -1638,7 +1643,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 				}
 			}
 		}
-		Toolbar_SetButtonImage(hwndToolbar, IDT_VIEW_FILTER, TBFILTERBMP + 1);
+		Toolbar_SetButtonImage(hwndToolbar, IDT_VIEW_FILTER, TB_ADD_FILTER_BMP);
 		break;
 
 	case IDM_VIEW_UPDATE:
@@ -1924,7 +1929,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		History_UpdateToolbar(&mHistory, hwndToolbar, IDT_HISTORY_BACK, IDT_HISTORY_FORWARD);
 		break;
 
-	case IDT_UPDIR: {
+	case IDT_UP_DIR: {
 		if (!PathIsRoot(szCurDir)) {
 			if (!ChangeDirectory(hwnd, L"..", 1)) {
 				ErrorMessage(2, IDS_ERR_CD);
@@ -1935,7 +1940,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	}
 	break;
 
-	case IDT_ROOT: {
+	case IDT_ROOT_DIR: {
 		if (!PathIsRoot(szCurDir)) {
 			if (!ChangeDirectory(hwnd, L"\\", 1)) {
 				ErrorMessage(2, IDS_ERR_CD);
@@ -2051,7 +2056,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		}
 		break;
 
-	case IDT_FILE_DELETE:
+	case IDT_FILE_DELETE_RECYCLE:
 		if (ListView_GetSelectedCount(hwndDirList)) {
 			const BOOL fUseRecycleBin2 = fUseRecycleBin;
 			fUseRecycleBin = 1;
@@ -2062,7 +2067,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		}
 		break;
 
-	case IDT_FILE_DELETE2:
+	case IDT_FILE_DELETE_PERM:
 		if (ListView_GetSelectedCount(hwndDirList)) {
 			SendWMCommand(hwnd, IDM_FILE_DELETE2);
 		} else {
@@ -2155,7 +2160,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 					WCHAR fmt[32];
 					wsprintf(tchnum, L"%i", ListView_GetItemCount(hwndDirList));
 					FormatNumberStr(tchnum);
-					FormatString(tch, fmt, (!StrEqual(tchFilter, L"*.*") || bNegFilter) ? IDS_NUMFILES2 : IDS_NUMFILES, tchnum);
+					FormatString(tch, fmt, HasFilter() ? IDS_NUMFILES_FILTER : IDS_NUMFILES, tchnum);
 				}
 
 				StatusSetText(hwndStatus, ID_FILEINFO, tch);
@@ -2203,10 +2208,8 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case IDC_TOOLBAR:
 		switch (pnmh->code) {
 		case TBN_ENDADJUST:
-			History_UpdateToolbar(&mHistory, hwndToolbar,
-								  IDT_HISTORY_BACK, IDT_HISTORY_FORWARD);
-			Toolbar_SetButtonImage(hwndToolbar, IDT_VIEW_FILTER,
-								   (!StrEqual(tchFilter, L"*.*") || bNegFilter) ? TBFILTERBMP : TBFILTERBMP + 1);
+			History_UpdateToolbar(&mHistory, hwndToolbar, IDT_HISTORY_BACK, IDT_HISTORY_FORWARD);
+			Toolbar_SetButtonImage(hwndToolbar, IDT_VIEW_FILTER, HasFilter() ? TB_DEL_FILTER_BMP : TB_ADD_FILTER_BMP);
 			break;
 
 		case TBN_QUERYDELETE:
@@ -2281,12 +2284,12 @@ BOOL ChangeDirectory(HWND hwnd, LPCWSTR lpszNewDir, BOOL bUpdateHistory) {
 		GetCurrentDirectory(COUNTOF(szCurDir), szCurDir);
 		SetWindowPathTitle(hwnd, szCurDir);
 
-		if (!StrEqual(tchFilter, L"*.*") || bNegFilter) {
+		if (HasFilter()) {
 			ListView_SetTextColor(hwndDirList, (bDefColorFilter) ? GetSysColor(COLOR_WINDOWTEXT) : colorFilter);
-			Toolbar_SetButtonImage(hwndToolbar, IDT_VIEW_FILTER, TBFILTERBMP);
+			Toolbar_SetButtonImage(hwndToolbar, IDT_VIEW_FILTER, TB_DEL_FILTER_BMP);
 		} else {
 			ListView_SetTextColor(hwndDirList, (bDefColorNoFilter) ? GetSysColor(COLOR_WINDOWTEXT) : colorNoFilter);
-			Toolbar_SetButtonImage(hwndToolbar, IDT_VIEW_FILTER, TBFILTERBMP + 1);
+			Toolbar_SetButtonImage(hwndToolbar, IDT_VIEW_FILTER, TB_ADD_FILTER_BMP);
 		}
 
 		const int cItems = DirList_Fill(hwndDirList, szCurDir, dwFillMask, tchFilter, bNegFilter, flagNoFadeHidden, nSortFlags, fSortRev);
@@ -2326,14 +2329,13 @@ BOOL ChangeDirectory(HWND hwnd, LPCWSTR lpszNewDir, BOOL bUpdateHistory) {
 		wsprintf(tchnum, L"%d", cItems);
 		FormatNumberStr(tchnum);
 		WCHAR fmt[32];
-		FormatString(tch, fmt, (!StrEqual(tchFilter, L"*.*") || bNegFilter) ? IDS_NUMFILES2 : IDS_NUMFILES, tchnum);
+		FormatString(tch, fmt, HasFilter() ? IDS_NUMFILES_FILTER : IDS_NUMFILES, tchnum);
 		StatusSetText(hwndStatus, ID_FILEINFO, tch);
 
 		// Update History
 		if (bUpdateHistory) {
 			History_Add(&mHistory, szCurDir);
-			History_UpdateToolbar(&mHistory, hwndToolbar,
-								  IDT_HISTORY_BACK, IDT_HISTORY_FORWARD);
+			History_UpdateToolbar(&mHistory, hwndToolbar, IDT_HISTORY_BACK, IDT_HISTORY_FORWARD);
 		}
 	}
 	EndWaitCursor();
