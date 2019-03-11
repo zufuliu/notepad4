@@ -5968,7 +5968,7 @@ int ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2, BOOL *bIsNotepadReplacement) 
 			lstrcpyn(g_wchAppUserModelID, opt, COUNTOF(g_wchAppUserModelID));
 			StrTrim(g_wchAppUserModelID, L"\" ");
 			if (StrIsEmpty(g_wchAppUserModelID)) {
-				lstrcpy(g_wchAppUserModelID, L"(default)");
+				lstrcpy(g_wchAppUserModelID, WC_NOTEPAD2);
 			}
 			state = 1;
 		}
@@ -6385,7 +6385,7 @@ void LoadFlags(void) {
 		if (StrNotEmpty(strValue)) {
 			lstrcpyn(g_wchAppUserModelID, strValue, COUNTOF(g_wchAppUserModelID));
 		} else {
-			lstrcpy(g_wchAppUserModelID, L"(default)");
+			lstrcpy(g_wchAppUserModelID, WC_NOTEPAD2);
 		}
 	}
 
