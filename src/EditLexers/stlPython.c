@@ -23,6 +23,7 @@ static KEYWORDLIST Keywords_Python = {{
 
 , // 3 @Decorator
 "classmethod staticmethod cached_method abstractmethod property contextmanager "
+"setter " // @property.setter
 
 , // 4 Built-in Function
 "__import__() abs() all() any() ascii() bin() bool() breakpoint() bytearray() bytes() callable() chr() classmethod() "
