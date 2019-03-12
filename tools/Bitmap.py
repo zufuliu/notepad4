@@ -128,10 +128,15 @@ class Bitmap(object):
 			self.infoHeader.height = height
 
 	def read(self, fd):
+		start = fd.tell()
 		self.fileHeader.read(fd)
 		self.infoHeader.read(fd)
 
-		fd.seek(self.fileHeader.offset)
+		curret = fd.tell()
+		# enable reading from stream
+		offset = self.fileHeader.offset - (curret - start)
+		if offset != 0:
+			fd.seek(offset, os.SEEK_CUR)
 		# TODO: sizeImage maybe zero
 		self.data = fd.read()
 		self.decode()
@@ -195,8 +200,8 @@ class Bitmap(object):
 		height = self.height
 
 		buf = []
-		for y in range(height):
-			row = self.rows[height - y - 1]
+		for y in range(height - 1, -1, -1):
+			row = self.rows[y]
 			for x in range(width):
 				red, green, blue, alpha = row[x]
 				buf.append(blue)
@@ -234,8 +239,8 @@ class Bitmap(object):
 		padding = math.ceil(24*width/32)*4 - width*3
 		paddingBytes = [0] * padding
 		buf = []
-		for y in range(height):
-			row = self.rows[height - y - 1]
+		for y in range(height - 1, -1, -1):
+			row = self.rows[y]
 			for x in range(width):
 				red, green, blue, alpha = row[x]
 				buf.append(blue)
@@ -402,7 +407,7 @@ class Bitmap(object):
 		else:
 			used = []
 			total = 0
-			for w in used:
+			for w in dims:
 				total += w
 				if total > width:
 					total -= w
@@ -440,7 +445,8 @@ class Bitmap(object):
 		rows = out_bmp.rows
 		rows.clear()
 		for bmp in bmps:
-			rows.extend(bmp.rows)
+			for row in bmp.rows:
+				rows.append(row[:])
 
 		return out_bmp
 
@@ -454,7 +460,7 @@ class Bitmap(object):
 		else:
 			used = []
 			total = 0
-			for h in used:
+			for h in dims:
 				total += h
 				if total > height:
 					total -= h
@@ -470,7 +476,26 @@ class Bitmap(object):
 		for h in dims:
 			bmp = Bitmap(width, h)
 			bmp.rows.clear()
-			bmp.rows.extend(self.rows[total:total + h])
+			for row in self.rows[total:total + h]:
+				bmp.rows.append(row[:])
 			total += h
 			bmps.append(bmp)
 		return bmps
+
+	def flipHorizontal(self):
+		width, height = self.size
+		bmp = Bitmap(width, height)
+		bmp.rows.clear()
+		for row in self.rows:
+			copy = row[:]
+			copy.reverse()
+			bmp.rows.append(copy)
+		return bmp
+
+	def flipVertical(self):
+		width, height = self.size
+		bmp = Bitmap(width, height)
+		bmp.rows.clear()
+		for row in reversed(self.rows):
+			bmp.rows.append(row[:])
+		return bmp
