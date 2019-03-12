@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 #-*- coding: UTF-8 -*-
 import os.path
+import re
 from Bitmap import Bitmap
 
 def save_bitmap(bmp, path):
@@ -40,25 +41,30 @@ def convert_image(path, out_path=None):
 	#bmp.resolutionY = 96
 	save_bitmap(bmp, out_path)
 
-def concat_horizontal(paths, out_path):
-	print('concat horizontal:', ', '.join(paths), '=>', out_path)
+
+def concat_images(horizontal, paths, out_path):
+	if horizontal:
+		print('concat horizontal:', ', '.join(paths), '=>', out_path)
+	else:
+		print('concat vertical:', ', '.join(paths), '=>', out_path)
+
 	bmps = []
 	for path in paths:
 		bmp = Bitmap.fromFileEx(path)
 		bmps.append(bmp)
 
-	bmp = Bitmap.concatHorizontal(bmps)
+	if horizontal:
+		bmp = Bitmap.concatHorizontal(bmps)
+	else:
+		bmp = Bitmap.concatVertical(bmps)
 	save_bitmap(bmp, out_path)
+
+def concat_horizontal(paths, out_path):
+	concat_images(True, paths, out_path)
 
 def concat_vertical(paths, out_path):
-	print('concat vertical:', ', '.join(paths), '=>', out_path)
-	bmps = []
-	for path in paths:
-		bmp = Bitmap.fromFileEx(path)
-		bmps.append(bmp)
+	concat_images(False, paths, out_path)
 
-	bmp = Bitmap.concatVertical(bmps)
-	save_bitmap(bmp, out_path)
 
 def save_bitmap_list(bmps, out_path, ext):
 	if not os.path.exists(out_path):
@@ -67,25 +73,73 @@ def save_bitmap_list(bmps, out_path, ext):
 		path = os.path.join(out_path, f'{index}{ext}')
 		save_bitmap(bmp, path)
 
-def split_horizontal(path, dims=None, out_path=None):
-	name, ext = os.path.splitext(path)
+def _parse_split_dims(item):
+	items = item.split()
+	dims = []
+	for item in items:
+		m = re.match(r'(\d+)(x(\d+))?', item)
+		if m:
+			g = m.groups()
+			size = int(g[0])
+			count = g[2]
+			if count:
+				dims.extend([size] * int(count))
+			else:
+				dims.append(size)
+		else:
+			break
+	return dims
+
+def split_image(horizontal, path, dims=None, out_path=None, ext=None):
+	name, old_ext = os.path.splitext(path)
 	if not out_path:
 		out_path = name + '-split'
+	if not ext:
+		ext = old_ext
 
-	print('split horizontal:', path, '=>', out_path)
+	if isinstance(dims, str):
+		dims = _parse_split_dims(dims)
+	if horizontal:
+		print('split horizontal:', path, dims, '=>', out_path)
+	else:
+		print('split vertical:', path, dims, '=>', out_path)
+
 	bmp = Bitmap.fromFileEx(path)
-	bmps = bmp.splitHorizontal(dims)
+	if horizontal:
+		bmps = bmp.splitHorizontal(dims)
+	else:
+		bmps = bmp.splitVertical(dims)
 	save_bitmap_list(bmps, out_path, ext)
 
-def split_vertical(path, dims=None, out_path=None):
-	name, ext = os.path.splitext(path)
+def split_horizontal(path, dims=None, out_path=None, ext=None):
+	split_image(True, path, dims, out_path, ext)
+
+def split_vertical(path, dims=None, out_path=None, ext=None):
+	split_image(False, path, dims, out_path, ext)
+
+
+def flip_image(horizontal, path, out_path=None):
 	if not out_path:
-		out_path = name + '-split'
+		name, ext = os.path.splitext(path)
+		out_path = name + '-flip' + ext
+	if horizontal:
+		print('flip horizontal:', path, '=>', out_path)
+	else:
+		print('flip vertical:', path, '=>', out_path)
 
-	print('split vertical:', path, '=>', out_path)
 	bmp = Bitmap.fromFileEx(path)
-	bmps = bmp.splitVertical(dims)
-	save_bitmap_list(bmps, out_path, ext)
+	if horizontal:
+		bmp = bmp.flipHorizontal()
+	else:
+		bmp = bmp.flipVertical()
+	save_bitmap(bmp, out_path)
+
+def flip_horizontal(path, out_path=None):
+	flip_image(True, path, out_path)
+
+def flip_vertical(path, out_path=None):
+	flip_image(False, path, out_path)
+
 
 def make_matepath_toolbar_bitmap():
 	concat_horizontal([
@@ -107,4 +161,4 @@ def make_matepath_toolbar_bitmap():
 	], 'Toolbar.bmp')
 
 #make_matepath_toolbar_bitmap()
-#split_horizontal('Toolbar.bmp')
+#split_horizontal('Toolbar.bmp', '16x40')
