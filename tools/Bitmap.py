@@ -93,6 +93,10 @@ class BitmapInfoHeader(object):
 		fd.write(struct.pack('<II', self.colorUsed, self.colorImportant))
 
 	@property
+	def size(self):
+		return (self.width, self.height)
+
+	@property
 	def resolutionX(self):
 		return round(self._resolutionX * _InchesPerMetre)
 
@@ -107,6 +111,15 @@ class BitmapInfoHeader(object):
 	@resolutionY.setter
 	def resolutionY(self, value):
 		self._resolutionY = round(value / _InchesPerMetre)
+
+	@property
+	def resolution(self):
+		return (self.resolutionX, self.resolutionY)
+
+	@resolution.setter
+	def resolution(self, value):
+		self.resolutionX = value[0]
+		self.resolutionY = value[1]
 
 	def __str__(self):
 		return f'''BitmapInfoHeader {{
@@ -186,8 +199,7 @@ class Bitmap(object):
 		self.fileHeader.size = size + BitmapFileHeader.StructureSize + BitmapInfoHeader.StructureSize
 
 	def _decode_32bit(self):
-		width = self.width
-		height = self.height
+		width, height = self.size
 		self.rows.clear()
 
 		offset = 0
@@ -206,8 +218,7 @@ class Bitmap(object):
 		self.rows.extend(reversed(rows))
 
 	def _encode_32bit(self):
-		width = self.width
-		height = self.height
+		width, height = self.size
 
 		buf = []
 		for y in range(height - 1, -1, -1):
@@ -221,8 +232,7 @@ class Bitmap(object):
 		self._set_data(buf)
 
 	def _decode_24bit(self):
-		width = self.width
-		height = self.height
+		width, height = self.size
 		self.rows.clear()
 
 		offset = 0
@@ -243,8 +253,7 @@ class Bitmap(object):
 		self.rows.extend(reversed(rows))
 
 	def _encode_24bit(self):
-		width = self.width
-		height = self.height
+		width, height = self.size
 
 		padding = math.ceil(24*width/32)*4 - width*3
 		paddingBytes = [0] * padding
@@ -270,7 +279,7 @@ class Bitmap(object):
 
 	@property
 	def size(self):
-		return (self.infoHeader.width, self.infoHeader.height)
+		return self.infoHeader.size
 
 	@property
 	def resolutionX(self):
@@ -287,6 +296,14 @@ class Bitmap(object):
 	@resolutionX.setter
 	def resolutionY(self, value):
 		self.infoHeader.resolutionY = value
+
+	@property
+	def resolution(self):
+		return self.infoHeader.resolution
+
+	@resolution.setter
+	def resolution(self, value):
+		self.infoHeader.resolution = value
 
 	@property
 	def bitsPerPixel(self):
