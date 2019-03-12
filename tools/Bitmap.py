@@ -59,7 +59,7 @@ class CompressionMethod(IntEnum):
 		try:
 			return CompressionMethod(value).name
 		except ValueError:
-			return 'Unknown'
+			return f'Unknown-{value}'
 
 class BitmapInfoHeader(object):
 	StructureSize = 40

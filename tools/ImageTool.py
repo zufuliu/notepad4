@@ -141,7 +141,7 @@ def flip_vertical(path, out_path=None):
 	flip_image(False, path, out_path)
 
 
-def make_matepath_toolbar_bitmap():
+def make_matapath_toolbar_bitmap():
 	concat_horizontal([
 		'images/Previous_16x.png',				# IDT_HISTORY_BACK
 		'images/Next_16x.png',					# IDT_HISTORY_FORWARD
@@ -160,5 +160,5 @@ def make_matepath_toolbar_bitmap():
 		'images/AddFilter_16x.png',				# IDT_VIEW_FILTER TB_ADD_FILTER_BMP
 	], 'Toolbar.bmp')
 
-#make_matepath_toolbar_bitmap()
+#make_matapath_toolbar_bitmap()
 #split_horizontal('Toolbar.bmp', '16x40')
