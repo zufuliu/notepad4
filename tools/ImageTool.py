@@ -37,8 +37,7 @@ def convert_image(path, out_path=None):
 
 	print('convert image:', path, '=>', out_path)
 	bmp = Bitmap.fromFileEx(path)
-	#bmp.resolutionX = 96
-	#bmp.resolutionY = 96
+	#bmp.resolution = (96, 96)
 	save_bitmap(bmp, out_path)
 
 
