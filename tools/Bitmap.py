@@ -3,10 +3,13 @@ import sys
 import os
 import struct
 import math
+from enum import IntEnum
 from PIL import Image
 
+__all__ = ['Bitmap']
+
 # https://en.wikipedia.org/wiki/BMP_file_format
-class BitmapHeader(object):
+class BitmapFileHeader(object):
 	StructureSize = 14
 
 	def __init__(self):
@@ -30,7 +33,7 @@ class BitmapHeader(object):
 		fd.write(struct.pack('<I', self.offset))
 
 	def __str__(self):
-		return f'''BitmapHeader {{
+		return f'''BitmapFileHeader {{
 	size: {self.size :08X} {self.size}
 	reserved: {self.reserved1 :04X} {self.reserved2 :04X}
 	offset: {self.offset :08X} {self.offset}
@@ -39,20 +42,27 @@ class BitmapHeader(object):
 _InchesPerMetre = 0.0254
 _TransparentColor = (0, 0, 0, 0)
 
+class CompressionMethod(IntEnum):
+	BI_RGB = 0
+	BI_RLE8 = 1
+	BI_RLE4 = 2
+	BI_BITFIELDS = 3
+	BI_JPEG = 4
+	BI_PNG = 5
+	BI_ALPHABITFIELDS = 6
+	BI_CMYK = 11
+	BI_CMYKRLE8 = 12
+	BI_CMYKRLE4 = 13
+
+	@staticmethod
+	def getName(value):
+		try:
+			return CompressionMethod(value).name
+		except ValueError:
+			return 'Unknown'
+
 class BitmapInfoHeader(object):
 	StructureSize = 40
-	CompressionMethodMap = {
-		0: 'BI_RGB',
-		1: 'BI_RLE8',
-		2: 'BI_RLE4',
-		3: 'BI_BITFIELDS',
-		4: 'BI_JPEG',
-		5: 'BI_PNG',
-		6: 'BI_ALPHABITFIELDS',
-		11: 'BI_CMYK',
-		12: 'BI_CMYKRLE8',
-		13: 'BI_CMYKRLE4'
-	}
 
 	def __init__(self):
 		self.width = 0
@@ -104,17 +114,17 @@ class BitmapInfoHeader(object):
 	height: {self.height :08X} {self.height}
 	planes: {self.planes :04X} {self.planes}
 	bitsPerPixel: {self.bitsPerPixel :04X} {self.bitsPerPixel}
-	compression: {self.compression :08X} {self.compression} {BitmapInfoHeader.CompressionMethodMap[self.compression]}
+	compression: {self.compression :08X} {self.compression} {CompressionMethod.getName(self.compression)}
 	sizeImage: {self.sizeImage :08X} {self.sizeImage}
-	resolutionX: {self.resolutionX :08X} {self._resolutionX} {self.resolutionX} DPI
-	resolutionY: {self.resolutionY :08X} {self._resolutionY} {self.resolutionY} DPI
+	resolutionX: {self._resolutionX :08X} {self._resolutionX} {self.resolutionX} DPI
+	resolutionY: {self._resolutionY :08X} {self._resolutionY} {self.resolutionY} DPI
 	colorUsed: {self.colorUsed :08X} {self.colorUsed}
 	colorImportant: {self.colorImportant :08X} {self.colorImportant}
 }}'''
 
 class Bitmap(object):
 	def __init__(self, width=None, height=None, bitsPerPixel=32):
-		self.fileHeader = BitmapHeader()
+		self.fileHeader = BitmapFileHeader()
 		self.infoHeader = BitmapInfoHeader()
 		self.rows = [] # RGBA tuple
 		self.data = None
@@ -173,7 +183,7 @@ class Bitmap(object):
 		self.data = bytes(buf)
 		size = len(buf)
 		self.infoHeader.sizeImage = size
-		self.fileHeader.size = size + BitmapHeader.StructureSize + BitmapInfoHeader.StructureSize
+		self.fileHeader.size = size + BitmapFileHeader.StructureSize + BitmapInfoHeader.StructureSize
 
 	def _decode_32bit(self):
 		width = self.width
