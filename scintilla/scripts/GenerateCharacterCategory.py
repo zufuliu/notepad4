@@ -20,6 +20,7 @@ class CharClassify(IntEnum):
 
 	OnlyWord = 1 << ccWord
 	OnlyWordPunctuation = (1 << ccWord) | (1 << ccPunctuation)
+	RLEValueBit = 3
 
 CharClassifyOrder = [CharClassify.ccCJKWord, CharClassify.ccWord, CharClassify.ccPunctuation, CharClassify.ccNewLine]
 def prefCharClassify(values):
@@ -364,10 +365,48 @@ def compressIndexTable(head, indexTable, args):
 }}""".format(**args)
 	return table, function
 
+def runLengthEncode(head, indexTable, valueBit, totalBit=16):
+	assert max(indexTable) < 2**valueBit
+	maxLength = 2**(totalBit - valueBit) - 1
+
+	values = []
+	prevValue = indexTable[0]
+	prevIndex = 0;
+	for index, value in enumerate(indexTable):
+		if value != prevValue:
+			values.append((prevValue, index - prevIndex))
+			prevValue = value
+			prevIndex = index
+	values.append((prevValue, len(indexTable) - prevIndex))
+
+	output = []
+	for value, count in values:
+		if count > maxLength:
+			output.extend([(maxLength << valueBit) | value] * (count // maxLength))
+			count = count % maxLength
+			if count == 0:
+				continue
+		output.append((count << valueBit) | value)
+
+	total = getsize(output)*len(output)/1024
+	print(f'{head} RLE size: {len(output)} {total}')
+
+	result = []
+	mask = 2**valueBit - 1
+	for ch in output:
+		value = ch & mask
+		count = ch >> valueBit
+		result.extend([value] * count)
+
+	assert result == indexTable
+	return output
+
 def updateCharClassifyTable(filename):
-	maxUnicode = sys.maxunicode + 1
-	indexTable = [0] * maxUnicode
-	for ch in range(maxUnicode):
+	BMPCharacterCharacterCount = 0xffff + 1
+	UnicodeCharacterCount = sys.maxunicode + 1
+
+	indexTable = [0] * UnicodeCharacterCount
+	for ch in range(UnicodeCharacterCount):
 		uch = chr(ch)
 		category = unicodedata.category(uch)
 		value = ClassifyMap[category]
@@ -375,6 +414,7 @@ def updateCharClassifyTable(filename):
 			value = CharClassify.ccCJKWord
 		indexTable[ch] = int(value)
 
+	runLengthEncode('CharClassify Unicode BMP', indexTable[:BMPCharacterCharacterCount], int(CharClassify.RLEValueBit))
 	output = ["""// Created with Python %s,  Unicode %s
 namespace {
 constexpr unsigned int maxUnicode = 0x10ffff;
@@ -454,23 +494,26 @@ def getDBCSCharClassify(decode, ch, isReservedOrUDC=None):
 	return int(cc)
 
 def makeDBCSCharClassifyTable(output, encodingList, isReservedOrUDC=None):
-	maxDBCSCharacter = 0xffff + 1
+	DBCSCharacterCount = 0xffff + 1
 	result = {}
 
 	for cp in encodingList:
 		decode = codecs.getdecoder(cp)
-		for ch in range(maxDBCSCharacter):
+		for ch in range(DBCSCharacterCount):
 			cc = getDBCSCharClassify(decode, ch, isReservedOrUDC)
 			if ch in result:
 				result[ch].append(cc)
 			else:
 				result[ch] = [cc]
 
-	indexTable = [0] * maxDBCSCharacter
-	for ch in range(maxDBCSCharacter):
+	indexTable = [0] * DBCSCharacterCount
+	for ch in range(DBCSCharacterCount):
 		indexTable[ch] = int(prefCharClassify(result[ch]))
 
 	suffix = '_' + encodingList[0].upper()
+	head = 'CharClassify' + suffix
+	runLengthEncode(head, indexTable, int(CharClassify.RLEValueBit))
+
 	args = {
 		'table': 'CharClassifyTable' + suffix,
 		'function': """CharClassify::cc ClassifyCharacter%s(unsigned int ch) noexcept {
@@ -481,7 +524,7 @@ def makeDBCSCharClassifyTable(output, encodingList, isReservedOrUDC=None):
 		'returnType': 'CharClassify::cc'
 	}
 
-	table, function = compressIndexTable('CharClassify' + suffix, indexTable, args)
+	table, function = compressIndexTable(head, indexTable, args)
 	output.append(table)
 	output.append('')
 	output.append(function)
