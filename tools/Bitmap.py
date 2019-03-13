@@ -82,6 +82,8 @@ class BitmapInfoHeader(object):
 		self.planes, self.bitsPerPixel = struct.unpack('<HH', fd.read(2*2))
 		assert self.planes == 1
 		self.compression, self.sizeImage = struct.unpack('<II', fd.read(4*2))
+		assert self.compression == CompressionMethod.BI_RGB
+		assert self.sizeImage == 0 or self.sizeImage == self.height*self.rowSize
 		self._resolutionX, self._resolutionY = struct.unpack('<II', fd.read(4*2))
 		self.colorUsed, self.colorImportant = struct.unpack('<II', fd.read(4*2))
 
@@ -120,6 +122,10 @@ class BitmapInfoHeader(object):
 	def resolution(self, value):
 		self.resolutionX = value[0]
 		self.resolutionY = value[1]
+
+	@property
+	def rowSize(self):
+		return math.ceil(self.bitsPerPixel*self.width/32)*4
 
 	def __str__(self):
 		return f'''BitmapInfoHeader {{
@@ -160,8 +166,10 @@ class Bitmap(object):
 		offset = self.fileHeader.offset - (curret - start)
 		if offset != 0:
 			fd.seek(offset, os.SEEK_CUR)
-		# TODO: sizeImage maybe zero
-		self.data = fd.read()
+		# infoHeader.sizeImage maybe zero
+		sizeImage = self.height * self.rowSize
+		self.data = fd.read(sizeImage)
+		assert len(self.data) == sizeImage
 		self.decode()
 
 	def write(self, fd):
@@ -193,8 +201,9 @@ class Bitmap(object):
 			print(f'Warning: encode not implemented for {bitsPerPixel} bit bitmap', file=sys.stderr)
 
 	def _set_data(self, buf):
-		self.data = bytes(buf)
 		size = len(buf)
+		assert size == self.height*self.rowSize
+		self.data = bytes(buf)
 		self.infoHeader.sizeImage = size
 		self.fileHeader.size = size + BitmapFileHeader.StructureSize + BitmapInfoHeader.StructureSize
 
@@ -237,7 +246,7 @@ class Bitmap(object):
 
 		offset = 0
 		buf = self.data
-		padding = math.ceil(24*width/32)*4 - width*3
+		padding = self.rowSize - width*3
 		rows = []
 		for y in range(height):
 			row = []
@@ -255,7 +264,7 @@ class Bitmap(object):
 	def _encode_24bit(self):
 		width, height = self.size
 
-		padding = math.ceil(24*width/32)*4 - width*3
+		padding = self.rowSize - width*3
 		paddingBytes = [0] * padding
 		buf = []
 		for y in range(height - 1, -1, -1):
@@ -280,6 +289,10 @@ class Bitmap(object):
 	@property
 	def size(self):
 		return self.infoHeader.size
+
+	@property
+	def rowSize(self):
+		return self.infoHeader.rowSize
 
 	@property
 	def resolutionX(self):
