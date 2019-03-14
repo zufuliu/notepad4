@@ -306,7 +306,7 @@ see above variables and the "View" menu.
 */
 //! keep same order as lexDefault
 enum DefaultStyleIndex {
-	Style_DefaultCode,			// global default code style.
+	Style_DefaultCode,		// global default code style.
 	Style_DefaultText,		// global default text style.
 	Style_LineNumber,		// inherited style, except for background color (default to COLOR_3DFACE).
 	Style_MatchBrace,		// inherited style.
