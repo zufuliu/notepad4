@@ -159,5 +159,35 @@ def make_matapath_toolbar_bitmap():
 		'images/AddFilter_16x.png',				# IDT_VIEW_FILTER TB_ADD_FILTER_BMP
 	], 'Toolbar.bmp')
 
+def make_notepad2_toolbar_bitmap():
+	concat_horizontal([
+		'images/.png',			# IDT_FILE_NEW
+		'images/.png',			# IDT_FILE_OPEN
+		'images/.png',			# IDT_FILE_BROWSE
+		'images/.png',			# IDT_FILE_SAVE
+		'images/.png',			# IDT_EDIT_UNDO
+		'images/.png',			# IDT_EDIT_REDO
+		'images/.png',			# IDT_EDIT_CUT
+		'images/.png',			# IDT_EDIT_COPY
+		'images/.png',			# IDT_EDIT_PASTE
+		'images/.png',			# IDT_EDIT_FIND
+		'images/.png',			# IDT_EDIT_REPLACE
+		'images/.png',			# IDT_VIEW_WORDWRAP
+		'images/.png',			# IDT_VIEW_ZOOMIN
+		'images/.png',			# IDT_VIEW_ZOOMOUT
+		'images/.png',			# IDT_VIEW_SCHEME
+		'images/.png',			# IDT_VIEW_SCHEMECONFIG
+		'images/.png',			# IDT_FILE_EXIT
+		'images/.png',			# IDT_FILE_SAVEAS
+		'images/.png',			# IDT_FILE_SAVECOPY
+		'images/.png',			# IDT_EDIT_DELETE
+		'images/.png',			# IDT_FILE_PRINT
+		'images/.png',			# IDT_FILE_OPENFAV
+		'images/.png',			# IDT_FILE_ADDTOFAV
+		'images/.png',			# IDT_VIEW_TOGGLEFOLDS
+		'images/.png',			# IDT_FILE_LAUNCH
+	], 'Toolbar.bmp')
+
 #make_matapath_toolbar_bitmap()
+#make_notepad2_toolbar_bitmap()
 #split_horizontal('Toolbar.bmp', '16x40')
