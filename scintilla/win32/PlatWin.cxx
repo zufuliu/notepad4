@@ -41,6 +41,7 @@
 #endif
 
 #include "Platform.h"
+#include "Scintilla.h"
 #include "XPM.h"
 #include "UniConversion.h"
 #include "CharClassify.h"
@@ -310,6 +311,32 @@ void SetLogFont(LOGFONTW &lf, const char *faceName, int characterSet, float size
 	UTF16FromUTF8(faceName, lf.lfFaceName, LF_FACESIZE);
 }
 
+#if defined(USE_D2D)
+// CJKV Han ideographs https://sourceforge.net/p/scintilla/bugs/2027/
+constexpr LPCWSTR MapCharacterSetToLocaleName(int characterSet) noexcept {
+	switch (characterSet) {
+	case SC_CHARSET_CHINESEBIG5:
+		return L"zh-Hant";
+
+	case SC_CHARSET_GB2312:
+		return L"zh-Hans";
+
+	case SC_CHARSET_SHIFTJIS:
+		return L"ja";
+
+	case SC_CHARSET_HANGUL:
+	case SC_CHARSET_JOHAB:
+		return L"ko";
+
+	case SC_CHARSET_VIETNAMESE:
+		return L"vi";
+
+	default:
+		// current user default locale
+		return L"";
+	}
+}
+
 void GetDWriteFontMetrics(const LOGFONTW &lf, const FontParameters &fp, WCHAR wszFace[], int faceSize,
 	DWRITE_FONT_WEIGHT &weight, DWRITE_FONT_STYLE &style, DWRITE_FONT_STRETCH &stretch) {
 	if (gdiInterop) {
@@ -360,6 +387,7 @@ void GetDWriteFontMetrics(const LOGFONTW &lf, const FontParameters &fp, WCHAR ws
 	}
 	UTF16FromUTF8(fp.faceName, wszFace, faceSize);
 }
+#endif
 
 FontID CreateFontFromParameters(const FontParameters &fp) {
 	LOGFONTW lf;
@@ -374,12 +402,13 @@ FontID CreateFontFromParameters(const FontParameters &fp) {
 		const int faceSize = 200;
 		WCHAR wszFace[faceSize] = L"";
 		const FLOAT fHeight = fp.size;
+		LPCWSTR localeName = MapCharacterSetToLocaleName(fp.characterSet);
 		DWRITE_FONT_WEIGHT weight = static_cast<DWRITE_FONT_WEIGHT>(fp.weight);
 		DWRITE_FONT_STYLE style = fp.italic ? DWRITE_FONT_STYLE_ITALIC : DWRITE_FONT_STYLE_NORMAL;
 		DWRITE_FONT_STRETCH stretch = DWRITE_FONT_STRETCH_NORMAL;
 		GetDWriteFontMetrics(lf, fp, wszFace, faceSize, weight, style, stretch);
 		HRESULT hr = pIDWriteFactory->CreateTextFormat(wszFace, nullptr,
-			weight, style, stretch, fHeight, L"", &pTextFormat);
+			weight, style, stretch, fHeight, localeName, &pTextFormat);
 		if (SUCCEEDED(hr)) {
 			pTextFormat->SetWordWrapping(DWRITE_WORD_WRAPPING_NO_WRAP);
 
@@ -1734,11 +1763,11 @@ void ScreenLineLayout::FillTextLayoutFormats(const IScreenLine *screenLine, IDWr
 		textLayout->SetFontWeight(pfm->pTextFormat->GetFontWeight(), textRange);
 		textLayout->SetFontStyle(pfm->pTextFormat->GetFontStyle(), textRange);
 
-		const unsigned int localNameSize = pfm->pTextFormat->GetLocaleNameLength();
-		std::vector<WCHAR> localName(localNameSize + 1);
+		const unsigned int localeNameSize = pfm->pTextFormat->GetLocaleNameLength();
+		std::vector<WCHAR> localeName(localeNameSize + 1);
 
-		pfm->pTextFormat->GetLocaleName(localName.data(), localNameSize);
-		textLayout->SetLocaleName(localName.data(), textRange);
+		pfm->pTextFormat->GetLocaleName(localeName.data(), localeNameSize);
+		textLayout->SetLocaleName(localeName.data(), textRange);
 
 		textLayout->SetFontStretch(pfm->pTextFormat->GetFontStretch(), textRange);
 
