@@ -312,7 +312,8 @@ void SetLogFont(LOGFONTW &lf, const char *faceName, int characterSet, float size
 }
 
 #if defined(USE_D2D)
-// CJKV Han ideographs https://sourceforge.net/p/scintilla/bugs/2027/
+// language dependent glyphs https://sourceforge.net/p/scintilla/bugs/2027/
+// https://en.wikipedia.org/wiki/Han_unification
 constexpr LPCWSTR MapCharacterSetToLocaleName(int characterSet) noexcept {
 	switch (characterSet) {
 	case SC_CHARSET_CHINESEBIG5:
