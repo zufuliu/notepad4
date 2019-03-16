@@ -2622,14 +2622,14 @@ static void Style_StrCopyAttributeEx(LPWSTR szNewStyle, LPCWSTR lpszStyle, LPCWS
 }
 
 #define Style_StrCopyValueStr(szNewStyle, lpszStyle, name, tch)	Style_StrCopyValueStrEx((szNewStyle), (lpszStyle), (name), CSTRLEN(name), (tch), COUNTOF(tch))
-#define Style_StrCopyFont(szNewStyle, lpszStyle, tch)		Style_StrCopyValueStr((szNewStyle), (lpszStyle), L"font", (tch));
-#define Style_StrCopyChatset(szNewStyle, lpszStyle, tch)	Style_StrCopyValueStr((szNewStyle), (lpszStyle), L"charset", (tch));
-#define Style_StrCopySize(szNewStyle, lpszStyle, tch)		Style_StrCopyValueStr((szNewStyle), (lpszStyle), L"size", (tch));
-#define Style_StrCopyWeight(szNewStyle, lpszStyle, tch)		Style_StrCopyValueStr((szNewStyle), (lpszStyle), L"weight", (tch));
-#define Style_StrCopyCase(szNewStyle, lpszStyle, tch)		Style_StrCopyValueStr((szNewStyle), (lpszStyle), L"case", (tch));
-#define Style_StrCopyFore(szNewStyle, lpszStyle, tch)		Style_StrCopyValueStr((szNewStyle), (lpszStyle), L"fore", (tch));
-#define Style_StrCopyBack(szNewStyle, lpszStyle, tch)		Style_StrCopyValueStr((szNewStyle), (lpszStyle), L"back", (tch));
-#define Style_StrCopyAlpha(szNewStyle, lpszStyle, tch)		Style_StrCopyValueStr((szNewStyle), (lpszStyle), L"alpha", (tch));
+#define Style_StrCopyFont(szNewStyle, lpszStyle, tch)		Style_StrCopyValueStr((szNewStyle), (lpszStyle), L"font:", (tch));
+#define Style_StrCopyChatset(szNewStyle, lpszStyle, tch)	Style_StrCopyValueStr((szNewStyle), (lpszStyle), L"charset:", (tch));
+#define Style_StrCopySize(szNewStyle, lpszStyle, tch)		Style_StrCopyValueStr((szNewStyle), (lpszStyle), L"size:", (tch));
+#define Style_StrCopyWeight(szNewStyle, lpszStyle, tch)		Style_StrCopyValueStr((szNewStyle), (lpszStyle), L"weight:", (tch));
+#define Style_StrCopyCase(szNewStyle, lpszStyle, tch)		Style_StrCopyValueStr((szNewStyle), (lpszStyle), L"case:", (tch));
+#define Style_StrCopyFore(szNewStyle, lpszStyle, tch)		Style_StrCopyValueStr((szNewStyle), (lpszStyle), L"fore:", (tch));
+#define Style_StrCopyBack(szNewStyle, lpszStyle, tch)		Style_StrCopyValueStr((szNewStyle), (lpszStyle), L"back:", (tch));
+#define Style_StrCopyAlpha(szNewStyle, lpszStyle, tch)		Style_StrCopyValueStr((szNewStyle), (lpszStyle), L"alpha:", (tch));
 
 #define Style_StrCopyAttribute(szNewStyle, lpszStyle, name)	Style_StrCopyAttributeEx((szNewStyle), (lpszStyle), (name), CSTRLEN(name))
 #define Style_StrCopyBold(szNewStyle, lpszStyle)			Style_StrCopyAttribute((szNewStyle), (lpszStyle), L"bold")
