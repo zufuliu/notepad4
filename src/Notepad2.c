@@ -2336,7 +2336,7 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	CheckCmd(hmenu, IDM_VIEW_SHOW_FOLDING, bShowCodeFolding);
 	CheckCmd(hmenu, IDM_VIEW_SHOW_FOLDING_LINE, bShowFoldingLine);
 
-	CheckCmd(hmenu, IDM_VIEW_USE2NDDEFAULT, bUse2ndDefaultStyle);
+	CheckCmd(hmenu, IDM_VIEW_USE2NDGLOBALSTYLE, bUse2ndGlobalStyle);
 	CheckCmd(hmenu, IDM_VIEW_USECODESTYLE_CODEFILE, fUseDefaultCodeStyle & UseDefaultCodeStyle_CodeFile);
 	CheckCmd(hmenu, IDM_VIEW_USECODESTYLE_TEXTFILE, fUseDefaultCodeStyle & UseDefaultCodeStyle_TextFile);
 
@@ -3740,8 +3740,8 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		Style_SelectLexerDlg(hwndEdit);
 		break;
 
-	case IDM_VIEW_USE2NDDEFAULT:
-		Style_ToggleUse2ndDefaultStyle(hwndEdit);
+	case IDM_VIEW_USE2NDGLOBALSTYLE:
+		Style_ToggleUse2ndGlobalStyle(hwndEdit);
 		break;
 
 	case IDM_VIEW_USECODESTYLE_CODEFILE:
@@ -4374,7 +4374,8 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	}
 	break;
 
-	case IDM_LANG_DEFAULT:
+	case IDM_LANG_TEXTFILE:
+	case IDM_LANG_2NDTEXTFILE:
 	case IDM_LANG_APACHE:
 	case IDM_LANG_WEB:
 	case IDM_LANG_PHP:
@@ -7661,7 +7662,7 @@ void GetRelaunchParameters(LPWSTR szParameters, LPCWSTR lpszFile, BOOL newWind, 
 
 		// scheme
 		switch (pLexCurrent->rid) {
-		case NP2LEX_DEFAULT:
+		case NP2LEX_TEXTFILE:
 			lstrcat(szParameters, L" -d");
 			break;
 
