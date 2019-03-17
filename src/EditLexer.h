@@ -21,6 +21,7 @@
 #ifndef _INC_WINDOWS
 typedef wchar_t * LPWSTR;
 typedef const wchar_t * LPCWSTR;
+typedef unsigned char BYTE;
 #endif
 
 typedef struct _editstyle {
@@ -54,7 +55,9 @@ typedef struct _editlexer {
 	const int iLexer;
 	const int rid;
 	struct {
-		int bStyleChanged;
+		BYTE bStyleChanged;
+		BYTE bUseDefaultCodeStyle;
+		const BYTE bUseDefaultCodeStyle_Default;
 		const unsigned int iStyleCount;
 		const int iNameLen;
 		LPCWSTR const pszName;
@@ -68,7 +71,8 @@ typedef struct _editlexer {
 
 typedef const EDITLEXER *LPCEDITLEXER;
 
-#define EDITLEXER_HOLE(name, style)	{ 0, COUNTOF(style), CSTRLEN(name), (name), NULL, NULL }
+#define EDITLEXER_HOLE(name, style)	{ 0, 1, 1, COUNTOF(style), CSTRLEN(name), (name), NULL, NULL }
+#define EDITLEXER_TEXT(name, style)	{ 0, 0, 0, COUNTOF(style), CSTRLEN(name), (name), NULL, NULL }
 
 // NP2LEX_, rid for EDITLEXER
 #define NP2LEX_TEXTFILE	63000	// SCLEX_NULL		Text File
