@@ -4,7 +4,7 @@
 //#include "EditStyle.h"
 // MULTI_STYLE
 // NP2STYLE_
-//63101-63125 Default Text
+//63101-63125 Global Styles
 #define NP2STYLE_Default			63126
 #define NP2STYLE_Comment			63127
 #define NP2STYLE_Keyword			63128

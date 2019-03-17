@@ -1,7 +1,7 @@
 // Style number							case sensitive
 style number must < 32 or > 40
 
-63000	Default Text		63101-63125		no
+63000	Global Styles		63101-63125		no
 63001	C/C++ Source Code	63321-63400		yes
 63002	Java Source Code					yes
 63003	C# Source Code						yes

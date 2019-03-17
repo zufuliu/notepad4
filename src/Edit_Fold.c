@@ -29,7 +29,8 @@ static void EditFoldStack_Push(struct EditFoldStack *foldStack, int level) {
 
 UINT Style_GetDefaultFoldState(int *maxLevel) {
 	switch (pLexCurrent->rid) {
-	case NP2LEX_DEFAULT:
+	case NP2LEX_TEXTFILE:
+	case NP2LEX_2NDTEXTFILE:
 	case NP2LEX_ANSI:
 		*maxLevel = 2;
 		return (1 << 1) | (1 << 2);
