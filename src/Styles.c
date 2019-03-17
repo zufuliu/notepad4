@@ -252,7 +252,6 @@ static COLORREF customColor[MAX_CUSTOM_COLOR_COUNT];
 static BOOL bCustomColorLoaded = FALSE;
 
 BOOL	bUse2ndGlobalStyle;
-int		fUseDefaultCodeStyle;
 BOOL	bCurrentLexerHasLineComment;
 BOOL	bCurrentLexerHasBlockComment;
 static UINT fStylesModified = STYLESMODIFIED_NONE;
@@ -348,13 +347,6 @@ enum {
 	StyleControl_All = StyleControl_Font | StyleControl_Fore | StyleControl_Back | StyleControl_EOLFilled,
 };
 
-static inline int GetGlobalBaseStyleIndex(int rid) {
-	if (rid == NP2LEX_TEXTFILE) {
-		return (fUseDefaultCodeStyle & UseDefaultCodeStyle_TextFile) ? Style_DefaultCode : Style_DefaultText;
-	}
-	return (fUseDefaultCodeStyle & UseDefaultCodeStyle_CodeFile) ? Style_DefaultCode : Style_DefaultText;
-}
-
 static inline BOOL IsGlobalBaseStyleIndex(int index) {
 	return index == Style_DefaultCode || index == Style_DefaultText;
 }
@@ -437,12 +429,14 @@ static void Style_LoadOneEx(PEDITLEXER pLex, IniSection *pIniSection, WCHAR *pIn
 	LPWSTR szStyleBuf = (LPWSTR)NP2HeapAlloc(EDITSTYLE_BufferSize(iStyleCount));
 	pLex->szStyleBuf = szStyleBuf;
 	if (!IniSectionParse(pIniSection, pIniSectionBuf)) {
+		pLex->bUseDefaultCodeStyle = pLex->bUseDefaultCodeStyle_Default;
 		for (UINT i = 0; i < iStyleCount; i++) {
 			LPWSTR szValue = szStyleBuf + (i * MAX_EDITSTYLE_VALUE_SIZE);
 			pLex->Styles[i].szValue = szValue;
 			lstrcpy(szValue, pLex->Styles[i].pszDefault);
 		}
 	} else {
+		pLex->bUseDefaultCodeStyle = (BYTE)IniSectionGetBool(pIniSection, L"UseDefaultCodeStyle", pLex->bUseDefaultCodeStyle_Default);
 		for (UINT i = 0; i < iStyleCount; i++) {
 			LPWSTR szValue = szStyleBuf + (i * MAX_EDITSTYLE_VALUE_SIZE);
 			pLex->Styles[i].szValue = szValue;
@@ -473,7 +467,6 @@ void Style_Load(void) {
 
 	// 2nd default
 	bUse2ndGlobalStyle = IniSectionGetBool(pIniSection, L"Use2ndGlobalStyle", 0);
-	fUseDefaultCodeStyle = IniSectionGetInt(pIniSection, L"UseDefaultCodeStyle", UseDefaultCodeStyle_Default);
 	pLexGlobal = bUse2ndGlobalStyle ? &lex2ndGlobal : &lexGlobal;
 
 	// default scheme
@@ -588,7 +581,6 @@ void Style_Save(void) {
 
 	// 2nd default
 	IniSectionSetBoolEx(pIniSection, L"Use2ndGlobalStyle", bUse2ndGlobalStyle, 0);
-	IniSectionSetIntEx(pIniSection, L"UseDefaultCodeStyle", fUseDefaultCodeStyle, UseDefaultCodeStyle_Default);
 
 	// default scheme
 	IniSectionSetIntEx(pIniSection, L"DefaultScheme", iDefaultLexer, 0);
@@ -617,6 +609,7 @@ void Style_Save(void) {
 
 			ZeroMemory(pIniSectionBuf, cbIniSection);
 			pIniSection->next = pIniSectionBuf;
+			IniSectionSetBoolEx(pIniSection, L"UseDefaultCodeStyle", pLex->bUseDefaultCodeStyle, pLex->bUseDefaultCodeStyle_Default);
 			const UINT iStyleCount = pLex->iStyleCount;
 			for (UINT i = 0; i < iStyleCount; i++) {
 				IniSectionSetStringEx(pIniSection, pLex->Styles[i].pszName, pLex->Styles[i].szValue, pLex->Styles[i].pszDefault);
@@ -681,6 +674,7 @@ BOOL Style_Import(HWND hwnd) {
 				if (!IniSectionParse(pIniSection, pIniSectionBuf)) {
 					continue;
 				}
+				pLex->bUseDefaultCodeStyle = (BYTE)IniSectionGetBool(pIniSection, L"UseDefaultCodeStyle", pLex->bUseDefaultCodeStyle_Default);
 				const UINT iStyleCount = pLex->iStyleCount;
 				for (UINT i = 0; i < iStyleCount; i++) {
 					LPCWSTR value = IniSectionGetValueImpl(pIniSection, pLex->Styles[i].pszName, pLex->Styles[i].iNameLen);
@@ -743,6 +737,7 @@ BOOL Style_Export(HWND hwnd) {
 			const LPCEDITLEXER pLex = pLexArray[iLexer];
 			ZeroMemory(pIniSectionBuf, cchIniSection);
 			pIniSection->next = pIniSectionBuf;
+			IniSectionSetBool(pIniSection, L"UseDefaultCodeStyle", pLex->bUseDefaultCodeStyle);
 			const UINT iStyleCount = pLex->iStyleCount;
 			for (UINT i = 0; i < iStyleCount; i++) {
 				IniSectionSetString(pIniSection, pLex->Styles[i].pszName, pLex->Styles[i].szValue);
@@ -769,6 +764,7 @@ static void Style_ResetAll(void) {
 			lstrcpy(pLex->szExtensions, pLex->pszDefExt);
 		}
 		pLex->bStyleChanged = TRUE;
+		pLex->bUseDefaultCodeStyle = pLex->bUseDefaultCodeStyle_Default;
 		const UINT iStyleCount = pLex->iStyleCount;
 		for (UINT i = 0; i < iStyleCount; i++) {
 			lstrcpy(pLex->Styles[i].szValue, pLex->Styles[i].pszDefault);
@@ -1033,7 +1029,8 @@ void Style_SetLexer(HWND hwnd, PEDITLEXER pLexNew) {
 	//! begin Style_Default
 	Style_StrGetFontEx(pLexGlobal->Styles[Style_DefaultCode].szValue, defaultCodeFontName, COUNTOF(defaultCodeFontName), TRUE);
 	Style_StrGetFontEx(pLexGlobal->Styles[Style_DefaultText].szValue, defaultTextFontName, COUNTOF(defaultTextFontName), TRUE);
-	iValue = GetGlobalBaseStyleIndex(rid);
+
+	iValue = pLexNew->bUseDefaultCodeStyle ? Style_DefaultCode : Style_DefaultText;
 	LPCWSTR szValue = pLexGlobal->Styles[iValue].szValue;
 	Style_StrGetFontSize(szValue, &iBaseFontSize);
 	Style_SetStyles(hwnd, STYLE_DEFAULT, szValue);
@@ -2368,29 +2365,11 @@ void Style_ToggleUse2ndGlobalStyle(HWND hwnd) {
 	Style_SetLexer(hwnd, pLexCurrent);
 }
 
-void Style_ToggleUseDefaultCodeStyle(HWND hwnd, int menu) {
-	int mask = 0;
-	BOOL changed = FALSE;
-	const int rid = pLexCurrent->rid;
-	switch (menu) {
-	case IDM_VIEW_USECODESTYLE_CODEFILE:
-		mask = UseDefaultCodeStyle_CodeFile;
-		changed = rid != NP2LEX_TEXTFILE;
-		break;
-	case IDM_VIEW_USECODESTYLE_TEXTFILE:
-		mask = UseDefaultCodeStyle_TextFile;
-		changed = rid == NP2LEX_TEXTFILE;
-		break;
-	}
-
-	if (fUseDefaultCodeStyle & mask) {
-		fUseDefaultCodeStyle &= ~mask;
-	} else {
-		fUseDefaultCodeStyle |= mask;
-	}
-	if (changed) {
-		Style_SetLexer(hwnd, pLexCurrent);
-	}
+void Style_ToggleUseDefaultCodeStyle(HWND hwnd) {
+	pLexCurrent->bStyleChanged = TRUE;
+	pLexCurrent->bUseDefaultCodeStyle = !pLexCurrent->bUseDefaultCodeStyle;
+	fStylesModified |= STYLESMODIFIED_SOME_STYLE;
+	Style_SetLexer(hwnd, pLexCurrent);
 }
 
 //=============================================================================

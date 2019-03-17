@@ -69,7 +69,7 @@ static EDITSTYLE Styles_2ndText[] =  {
 
 EDITLEXER lexTextFile = {
 	SCLEX_NULL, NP2LEX_TEXTFILE,
-	EDITLEXER_HOLE(L"Text File", Styles_Text),
+	EDITLEXER_TEXT(L"Text File", Styles_Text),
 	L"txt; text; wtx; doc",
 	&Keywords_NULL,
 	Styles_Text

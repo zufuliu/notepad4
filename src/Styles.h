@@ -41,13 +41,6 @@
 #define EditLexer_HTML		1
 #define EditLexer_XML		2
 
-enum UseDefaultCodeStyle {
-	UseDefaultCodeStyle_CodeFile = 1,
-	UseDefaultCodeStyle_TextFile = 2,
-
-	UseDefaultCodeStyle_Default = UseDefaultCodeStyle_CodeFile,
-};
-
 extern PEDITLEXER pLexCurrent;
 extern int np2LexLangIndex;
 extern BOOL bUse2ndGlobalStyle;
@@ -86,7 +79,7 @@ void	Style_UpdateCaret(HWND hwnd);
 void	Style_SetLongLineColors(HWND hwnd);
 void	Style_HighlightCurrentLine(HWND hwnd);
 void	Style_ToggleUse2ndGlobalStyle(HWND hwnd);
-void	Style_ToggleUseDefaultCodeStyle(HWND hwnd, int menu);
+void	Style_ToggleUseDefaultCodeStyle(HWND hwnd);
 BOOL	Style_GetOpenDlgFilterStr(LPWSTR lpszFilter, int cchFilter);
 
 BOOL	Style_StrGetFontEx(LPCWSTR lpszStyle, LPWSTR lpszFont, int cchFont, BOOL bDefaultStyle);
