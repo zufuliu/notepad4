@@ -115,6 +115,7 @@ extern EDITLEXER lexVB;
 
 extern EDITLEXER lexANSI;
 
+// the two global lexers at the end of the array not visible in "Select Scheme" list, doesn't participate in file extension match
 #define ALL_LEXER_COUNT		(NUMLEXERS + 2)
 // This array holds all the lexers...
 static const PEDITLEXER pLexArray[ALL_LEXER_COUNT] = {
@@ -197,7 +198,6 @@ static const PEDITLEXER pLexArray[ALL_LEXER_COUNT] = {
 
 	&lexANSI,
 
-	// global styles not visible in "Select Scheme" list, doesn't participate in file extension match
 	&lexGlobal,
 	&lex2ndGlobal,
 };

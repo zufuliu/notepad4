@@ -46,16 +46,16 @@ static EDITSTYLE Styles_2ndGlobal[] = {
 EDITLEXER lexGlobal = {
 	SCLEX_NULL, NP2LEX_GLOBAL,
 	EDITLEXER_HOLE(L"Global Styles", Styles_Global),
-	L"",
-	&Keywords_NULL,
+	NULL,
+	NULL,
 	Styles_Global
 };
 
 EDITLEXER lex2ndGlobal = {
 	SCLEX_NULL, NP2LEX_2NDGLOBAL,
 	EDITLEXER_HOLE(L"2nd Global Styles", Styles_2ndGlobal),
-	L"",
-	&Keywords_NULL,
+	NULL,
+	NULL,
 	Styles_2ndGlobal
 };
 
