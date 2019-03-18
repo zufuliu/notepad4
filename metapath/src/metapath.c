@@ -1139,7 +1139,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			WCHAR tch[64];
 
 			if (DriveBox_GetSelDrive(hwndDriveBox, tch, COUNTOF(tch), TRUE) && !PathIsSameRoot(szCurDir, tch)) {
-				if (!ChangeDirectory(hwnd, tch, 1)) {
+				if (!ChangeDirectory(hwnd, tch, TRUE)) {
 					ErrorMessage(2, IDS_ERR_CD);
 					DriveBox_SelectDrive(hwndDriveBox, szCurDir);
 				}
@@ -1156,7 +1156,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 		switch (dli.ntype) {
 		case DLE_DIR:
-			if (!ChangeDirectory(hwnd, dli.szFileName, 1)) {
+			if (!ChangeDirectory(hwnd, dli.szFileName, TRUE)) {
 				ErrorMessage(2, IDS_ERR_CD);
 			}
 			break;
@@ -1165,7 +1165,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			BeginWaitCursor();
 
 			if (!PathIsLnkFile(dli.szFileName)) {
-				LaunchTarget(dli.szFileName, 0);
+				LaunchTarget(dli.szFileName, FALSE);
 			} else {
 				// PathIsLinkFile()
 				WCHAR tch[MAX_PATH];
@@ -1177,7 +1177,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 						DisplayLnkFile(dli.szFileName);
 					} else {
 						// Made sure link points to a file
-						LaunchTarget(tch, 0);
+						LaunchTarget(tch, FALSE);
 					}
 				} else {
 					DisplayLnkFile(dli.szFileName);
@@ -1200,7 +1200,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			BeginWaitCursor();
 
 			if (!PathIsLnkFile(dli.szFileName)) {
-				LaunchTarget(dli.szFileName, 1);
+				LaunchTarget(dli.szFileName, TRUE);
 			} else {
 				// PathIsLinkFile()
 				WCHAR tch[MAX_PATH];
@@ -1212,7 +1212,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 						DisplayLnkFile(dli.szFileName);
 					} else {
 						// Made sure link points to a file
-						LaunchTarget(tch, 1);
+						LaunchTarget(tch, TRUE);
 					}
 				} else {
 					DisplayLnkFile(dli.szFileName);
@@ -1542,7 +1542,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		WCHAR tch[MAX_PATH];
 
 		if (GetDirectory(hwnd, IDS_GETDIRECTORY, tch, NULL)) {
-			if (!ChangeDirectory(hwnd, tch, 1)) {
+			if (!ChangeDirectory(hwnd, tch, TRUE)) {
 				ErrorMessage(2, IDS_ERR_CD);
 			}
 		}
@@ -1647,7 +1647,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	case IDM_VIEW_UPDATE:
-		ChangeDirectory(hwnd, NULL, 1);
+		ChangeDirectory(hwnd, NULL, TRUE);
 		break;
 
 	case IDM_VIEW_FAVORITES:
@@ -1907,7 +1907,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		if (History_CanBack(&mHistory)) {
 			WCHAR tch[MAX_PATH];
 			History_Back(&mHistory, tch, COUNTOF(tch));
-			if (!ChangeDirectory(hwnd, tch, 0)) {
+			if (!ChangeDirectory(hwnd, tch, FALSE)) {
 				ErrorMessage(2, IDS_ERR_CD);
 			}
 		} else {
@@ -1920,7 +1920,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		if (History_CanForward(&mHistory)) {
 			WCHAR tch[MAX_PATH];
 			History_Forward(&mHistory, tch, COUNTOF(tch));
-			if (!ChangeDirectory(hwnd, tch, 0)) {
+			if (!ChangeDirectory(hwnd, tch, FALSE)) {
 				ErrorMessage(2, IDS_ERR_CD);
 			}
 		} else {
@@ -1931,7 +1931,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	case IDT_UP_DIR: {
 		if (!PathIsRoot(szCurDir)) {
-			if (!ChangeDirectory(hwnd, L"..", 1)) {
+			if (!ChangeDirectory(hwnd, L"..", TRUE)) {
 				ErrorMessage(2, IDS_ERR_CD);
 			}
 		} else {
@@ -1942,7 +1942,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	case IDT_ROOT_DIR: {
 		if (!PathIsRoot(szCurDir)) {
-			if (!ChangeDirectory(hwnd, L"\\", 1)) {
+			if (!ChangeDirectory(hwnd, L"\\", TRUE)) {
 				ErrorMessage(2, IDS_ERR_CD);
 			}
 		} else {
@@ -2865,7 +2865,7 @@ void LoadFlags(void) {
 //  FindIniFile()
 //
 //
-int CheckIniFile(LPWSTR lpszFile, LPCWSTR lpszModule) {
+BOOL CheckIniFile(LPWSTR lpszFile, LPCWSTR lpszModule) {
 	WCHAR tchFileExpanded[MAX_PATH];
 	ExpandEnvironmentStrings(lpszFile, tchFileExpanded, COUNTOF(tchFileExpanded));
 
@@ -2876,14 +2876,14 @@ int CheckIniFile(LPWSTR lpszFile, LPCWSTR lpszModule) {
 		lstrcpy(PathFindFileName(tchBuild), tchFileExpanded);
 		if (PathFileExists(tchBuild)) {
 			lstrcpy(lpszFile, tchBuild);
-			return 1;
+			return TRUE;
 		}
 		// Application Data
 		if (S_OK == SHGetFolderPath(NULL, CSIDL_APPDATA, NULL, SHGFP_TYPE_CURRENT, tchBuild)) {
 			PathAppend(tchBuild, tchFileExpanded);
 			if (PathFileExists(tchBuild)) {
 				lstrcpy(lpszFile, tchBuild);
-				return 1;
+				return TRUE;
 			}
 		}
 		// Home
@@ -2891,18 +2891,18 @@ int CheckIniFile(LPWSTR lpszFile, LPCWSTR lpszModule) {
 			PathAppend(tchBuild, tchFileExpanded);
 			if (PathFileExists(tchBuild)) {
 				lstrcpy(lpszFile, tchBuild);
-				return 1;
+				return TRUE;
 			}
 		}
 	} else if (PathFileExists(tchFileExpanded)) {
 		lstrcpy(lpszFile, tchFileExpanded);
-		return 1;
+		return TRUE;
 	}
 
-	return 0;
+	return FALSE;
 }
 
-int CheckIniFileRedirect(LPWSTR lpszFile, LPCWSTR lpszModule) {
+BOOL CheckIniFileRedirect(LPWSTR lpszFile, LPCWSTR lpszModule) {
 	WCHAR tch[MAX_PATH];
 	if (GetPrivateProfileString(INI_SECTION_NAME_METAPATH, L"metapath.ini", L"", tch, COUNTOF(tch), lpszFile)) {
 		if (CheckIniFile(tch, lpszModule)) {
@@ -2917,12 +2917,12 @@ int CheckIniFileRedirect(LPWSTR lpszFile, LPCWSTR lpszModule) {
 				lstrcpy(lpszFile, tchFileExpanded);
 			}
 		}
-		return 1;
+		return TRUE;
 	}
-	return 0;
+	return FALSE;
 }
 
-int FindIniFile(void) {
+BOOL FindIniFile(void) {
 	WCHAR tchTest[MAX_PATH];
 	WCHAR tchModule[MAX_PATH];
 	GetModuleFileName(NULL, tchModule, COUNTOF(tchModule));
@@ -2940,12 +2940,12 @@ int FindIniFile(void) {
 				lstrcpy(szIniFile, tchTest);
 			}
 		}
-		return 1;
+		return TRUE;
 	}
 
 	lstrcpy(tchTest, PathFindFileName(tchModule));
 	PathRenameExtension(tchTest, L".ini");
-	int bFound = CheckIniFile(tchTest, tchModule);
+	BOOL bFound = CheckIniFile(tchTest, tchModule);
 
 	if (!bFound) {
 		lstrcpy(tchTest, L"metapath.ini");
@@ -2963,10 +2963,10 @@ int FindIniFile(void) {
 		PathRenameExtension(szIniFile, L".ini");
 	}
 
-	return 1;
+	return TRUE;
 }
 
-int TestIniFile(void) {
+BOOL TestIniFile(void) {
 	if (StrEqual(szIniFile, L"*?")) {
 		lstrcpy(szIniFile2, L"");
 		lstrcpy(szIniFile, L"");
@@ -2990,16 +2990,16 @@ int TestIniFile(void) {
 	if (!PathFileExists(szIniFile) || PathIsDirectory(szIniFile)) {
 		lstrcpy(szIniFile2, szIniFile);
 		lstrcpy(szIniFile, L"");
-		return 0;
+		return FALSE;
 	}
-	return 1;
+	return TRUE;
 }
 
-int CreateIniFile(void) {
+BOOL CreateIniFile(void) {
 	return CreateIniFileEx(szIniFile);
 }
 
-int CreateIniFileEx(LPCWSTR lpszIniFile) {
+BOOL CreateIniFileEx(LPCWSTR lpszIniFile) {
 	if (StrNotEmpty(lpszIniFile)) {
 		WCHAR *pwchTail;
 
@@ -3018,11 +3018,11 @@ int CreateIniFileEx(LPCWSTR lpszIniFile) {
 				WriteFile(hFile, (LPCVOID)L"\xFEFF[metapath]\r\n", 26, &dw, NULL);
 			}
 			CloseHandle(hFile);
-			return 1;
+			return TRUE;
 		}
 	}
 
-	return 0;
+	return FALSE;
 }
 
 //=============================================================================
