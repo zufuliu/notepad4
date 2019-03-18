@@ -64,11 +64,11 @@ FontRealised::~FontRealised() {
 	font.Release();
 }
 
-void FontRealised::Realise(Surface &surface, int zoomLevel, int technology, const FontSpecification &fs) {
+void FontRealised::Realise(Surface &surface, int zoomLevel, int technology, const FontSpecification &fs, const char *localeName) {
 	PLATFORM_ASSERT(fs.fontName);
 	sizeZoomed = GetFontSizeZoomed(fs.size, zoomLevel);
 	const float deviceHeight = static_cast<float>(surface.DeviceHeightFont(sizeZoomed));
-	const FontParameters fp(fs.fontName, deviceHeight / SC_FONT_SIZE_MULTIPLIER, fs.weight, fs.italic, fs.extraFontFlag, technology, fs.characterSet);
+	const FontParameters fp(fs.fontName, deviceHeight / SC_FONT_SIZE_MULTIPLIER, fs.weight, fs.italic, fs.extraFontFlag, technology, fs.characterSet, localeName);
 	font.Create(fp);
 
 	ascent = static_cast<unsigned int>(surface.Ascent(font));
@@ -169,6 +169,8 @@ ViewStyle::ViewStyle(const ViewStyle &source) : markers(MARKER_MAX + 1), indicat
 	wrapVisualFlagsLocation = source.wrapVisualFlagsLocation;
 	wrapVisualStartIndent = source.wrapVisualStartIndent;
 	wrapIndentMode = source.wrapIndentMode;
+
+	localeName = source.localeName;
 }
 
 ViewStyle::~ViewStyle() {
@@ -301,6 +303,8 @@ void ViewStyle::Init(size_t stylesSize_) {
 	wrapVisualFlagsLocation = 0;
 	wrapVisualStartIndent = 0;
 	wrapIndentMode = SC_WRAPINDENT_FIXED;
+
+	localeName = defaultLocaleName;
 }
 
 void ViewStyle::Refresh(Surface &surface, int tabInChars) {
@@ -322,7 +326,7 @@ void ViewStyle::Refresh(Surface &surface, int tabInChars) {
 
 	// Ask platform to allocate each unique font.
 	for (auto &font : fonts) {
-		font.second->Realise(surface, zoomLevel, technology, font.first);
+		font.second->Realise(surface, zoomLevel, technology, font.first, localeName.c_str());
 	}
 
 	// Set the platform font handle and measurements for each style.
@@ -413,6 +417,10 @@ void ViewStyle::ClearStyles() {
 
 void ViewStyle::SetStyleFontName(int styleIndex, const char *name) {
 	styles[styleIndex].fontName = fontNames.Save(name);
+}
+
+void ViewStyle::SetFontLocaleName(const char *name) {
+	localeName = name;
 }
 
 bool ViewStyle::ProtectionActive() const noexcept {

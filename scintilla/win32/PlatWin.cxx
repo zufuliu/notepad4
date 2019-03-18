@@ -312,32 +312,6 @@ void SetLogFont(LOGFONTW &lf, const char *faceName, int characterSet, float size
 }
 
 #if defined(USE_D2D)
-// language dependent glyphs https://sourceforge.net/p/scintilla/bugs/2027/
-// https://en.wikipedia.org/wiki/Han_unification
-constexpr LPCWSTR MapCharacterSetToLocaleName(int characterSet) noexcept {
-	switch (characterSet) {
-	case SC_CHARSET_CHINESEBIG5:
-		return L"zh-Hant";
-
-	case SC_CHARSET_GB2312:
-		return L"zh-Hans";
-
-	case SC_CHARSET_SHIFTJIS:
-		return L"ja";
-
-	case SC_CHARSET_HANGUL:
-	case SC_CHARSET_JOHAB:
-		return L"ko";
-
-	case SC_CHARSET_VIETNAMESE:
-		return L"vi";
-
-	default:
-		// current user default locale
-		return L"";
-	}
-}
-
 void GetDWriteFontMetrics(const LOGFONTW &lf, const FontParameters &fp, WCHAR wszFace[], int faceSize,
 	DWRITE_FONT_WEIGHT &weight, DWRITE_FONT_STYLE &style, DWRITE_FONT_STRETCH &stretch) {
 	if (gdiInterop) {
@@ -403,13 +377,15 @@ FontID CreateFontFromParameters(const FontParameters &fp) {
 		const int faceSize = 200;
 		WCHAR wszFace[faceSize] = L"";
 		const FLOAT fHeight = fp.size;
-		LPCWSTR localeName = MapCharacterSetToLocaleName(fp.characterSet);
 		DWRITE_FONT_WEIGHT weight = static_cast<DWRITE_FONT_WEIGHT>(fp.weight);
 		DWRITE_FONT_STYLE style = fp.italic ? DWRITE_FONT_STYLE_ITALIC : DWRITE_FONT_STYLE_NORMAL;
 		DWRITE_FONT_STRETCH stretch = DWRITE_FONT_STRETCH_NORMAL;
 		GetDWriteFontMetrics(lf, fp, wszFace, faceSize, weight, style, stretch);
+		const int localeSize = 200;
+		WCHAR wszLocale[localeSize] = L"";
+		UTF16FromUTF8(fp.localeName, wszLocale, std::size(wszLocale));
 		HRESULT hr = pIDWriteFactory->CreateTextFormat(wszFace, nullptr,
-			weight, style, stretch, fHeight, localeName, &pTextFormat);
+			weight, style, stretch, fHeight, wszLocale, &pTextFormat);
 		if (SUCCEEDED(hr)) {
 			pTextFormat->SetWordWrapping(DWRITE_WORD_WRAPPING_NO_WRAP);
 

@@ -264,6 +264,8 @@ public:
  * Font management.
  */
 
+constexpr const char *defaultLocaleName = ""; // "en-us";
+
 struct FontParameters {
 	const char *faceName;
 	float size;
@@ -272,6 +274,7 @@ struct FontParameters {
 	int extraFontFlag;
 	int technology;
 	int characterSet;
+	const char *localeName;
 
 	FontParameters(
 		const char *faceName_,
@@ -280,7 +283,8 @@ struct FontParameters {
 		bool italic_ = false,
 		int extraFontFlag_ = 0,
 		int technology_ = 0,
-		int characterSet_ = 0) noexcept :
+		int characterSet_=0,
+		const char *localeName_=defaultLocaleName) noexcept :
 
 		faceName(faceName_),
 		size(size_),
@@ -288,7 +292,8 @@ struct FontParameters {
 		italic(italic_),
 		extraFontFlag(extraFontFlag_),
 		technology(technology_),
-		characterSet(characterSet_) {}
+		characterSet(characterSet_),
+		localeName(localeName_) {}
 
 };
 
