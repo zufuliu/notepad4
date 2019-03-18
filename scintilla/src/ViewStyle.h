@@ -50,7 +50,7 @@ public:
 	FontRealised &operator=(const FontRealised &) = delete;
 	FontRealised &operator=(FontRealised &&) = delete;
 	virtual ~FontRealised();
-	void Realise(Surface &surface, int zoomLevel, int technology, const FontSpecification &fs);
+	void Realise(Surface &surface, int zoomLevel, int technology, const FontSpecification &fs, const char *localeName);
 };
 
 enum IndentView {ivNone, ivReal, ivLookForward, ivLookBoth};
@@ -179,6 +179,8 @@ public:
 	int wrapVisualStartIndent;
 	int wrapIndentMode; // SC_WRAPINDENT_FIXED, _SAME, _INDENT
 
+	std::string localeName;
+
 	ViewStyle();
 	ViewStyle(const ViewStyle &source);
 	ViewStyle(ViewStyle &&) = delete;
@@ -195,6 +197,7 @@ public:
 	void ResetDefaultStyle();
 	void ClearStyles();
 	void SetStyleFontName(int styleIndex, const char *name);
+	void SetFontLocaleName(const char *name);
 	bool ProtectionActive() const noexcept;
 	int ExternalMarginWidth() const noexcept;
 	int MarginFromLocation(Point pt) const;

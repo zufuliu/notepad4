@@ -7119,6 +7119,15 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 		InvalidateStyleRedraw();
 		break;
 
+	case SCI_SETFONTLOCALE:
+		if (lParam != 0) {
+			vs.SetFontLocaleName(CharPtrFromSPtr(lParam));
+		}
+		break;
+
+	case SCI_GETFONTLOCALE:
+		return StringResult(lParam, vs.localeName.c_str());
+
 #ifdef INCLUDE_DEPRECATED_FEATURES
 	case SCI_SETSTYLEBITS:
 		vs.EnsureStyle(0xff);

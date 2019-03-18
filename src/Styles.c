@@ -288,6 +288,10 @@ extern INT	iHighlightCurrentLine;
 #define STYLE_MASK_UPPER_LOWER	(1 << 5)
 #define STYLE_MASK_CHARSET		(1 << 6)
 
+#ifndef LOCALE_NAME_MAX_LENGTH
+#define LOCALE_NAME_MAX_LENGTH	85
+#endif
+
 struct DetailStyle {
 	UINT mask;
 	int fontSize;
@@ -1037,6 +1041,25 @@ void Style_SetLexer(HWND hwnd, PEDITLEXER pLexNew) {
 
 	// Auto-select codepage according to charset
 	//Style_SetACPfromCharSet(hwnd);
+
+	// used in Direct2D for language dependent glyphs
+	if (IsVistaAndAbove()) {
+		// current user default locale (empty) to override "en-US" in Scintilla.
+		WCHAR localeWide[LOCALE_NAME_MAX_LENGTH] = L"";
+		char localeName[LOCALE_NAME_MAX_LENGTH] = "";
+#if 0
+		if (!Style_StrGetLocale(szValue, localeWide, COUNTOF(localeWide))) {
+			 //GetUserDefaultLocaleName(localeWide, COUNTOF(localeWide));
+			 GetLocaleInfo(0 /*LOCALE_NAME_USER_DEFAULT*/, 0x0000005c /*LOCALE_SNAME*/, localeWide, COUNTOF(localeWide));
+		}
+		WideCharToMultiByte(CP_UTF8, 0, localeWide, -1, localeName, COUNTOF(localeName), NULL, NULL);
+#else
+		if (Style_StrGetLocale(szValue, localeWide, COUNTOF(localeWide))) {
+			WideCharToMultiByte(CP_UTF8, 0, localeWide, -1, localeName, COUNTOF(localeName), NULL, NULL);
+		}
+#endif
+		SendMessage(hwnd, SCI_SETFONTLOCALE, 0, (LPARAM)localeName);
+	}
 
 	if (!Style_StrGetColor(TRUE, szValue, &iValue)) {
 		SendMessage(hwnd, SCI_STYLESETFORE, STYLE_DEFAULT, GetSysColor(COLOR_WINDOWTEXT));
@@ -2602,9 +2625,14 @@ static void Style_StrCopyAttributeEx(LPWSTR szNewStyle, LPCWSTR lpszStyle, LPCWS
 	}
 }
 
+BOOL Style_StrGetLocale(LPCWSTR lpszStyle, LPWSTR lpszLocale, int cchLocale) {
+	return Style_StrGetValueStr(lpszStyle, L"locale:", CSTRLEN(L"locale:"), lpszLocale, cchLocale);
+}
+
 #define Style_StrCopyValueStr(szNewStyle, lpszStyle, name, tch)	Style_StrCopyValueStrEx((szNewStyle), (lpszStyle), (name), CSTRLEN(name), (tch), COUNTOF(tch))
 #define Style_StrCopyFont(szNewStyle, lpszStyle, tch)		Style_StrCopyValueStr((szNewStyle), (lpszStyle), L"font:", (tch));
 #define Style_StrCopyChatset(szNewStyle, lpszStyle, tch)	Style_StrCopyValueStr((szNewStyle), (lpszStyle), L"charset:", (tch));
+#define Style_StrCopyLocale(szNewStyle, lpszStyle, tch)		Style_StrCopyValueStr((szNewStyle), (lpszStyle), L"locale:", (tch));
 #define Style_StrCopySize(szNewStyle, lpszStyle, tch)		Style_StrCopyValueStr((szNewStyle), (lpszStyle), L"size:", (tch));
 #define Style_StrCopyWeight(szNewStyle, lpszStyle, tch)		Style_StrCopyValueStr((szNewStyle), (lpszStyle), L"weight:", (tch));
 #define Style_StrCopyCase(szNewStyle, lpszStyle, tch)		Style_StrCopyValueStr((szNewStyle), (lpszStyle), L"case:", (tch));
@@ -2745,6 +2773,7 @@ BOOL Style_SelectFont(HWND hwnd, LPWSTR lpszStyle, int cchStyle, BOOL bDefaultSt
 		wsprintf(tch, L"%u", lf.lfCharSet);
 		lstrcat(szNewStyle, tch);
 	}
+	Style_StrCopyLocale(szNewStyle, lpszStyle, tch);
 	lstrcat(szNewStyle, L"; size:");
 	wsprintf(tch, L"%i", cf.iPointSize / 10);
 	lstrcat(szNewStyle, tch);
@@ -2829,6 +2858,7 @@ BOOL Style_SelectColor(HWND hwnd, BOOL bFore, LPWSTR lpszStyle, int cchStyle) {
 	lstrcpy(szNewStyle, L"");
 	Style_StrCopyFont(szNewStyle, lpszStyle, tch);
 	Style_StrCopyChatset(szNewStyle, lpszStyle, tch);
+	Style_StrCopyLocale(szNewStyle, lpszStyle, tch);
 	Style_StrCopySize(szNewStyle, lpszStyle, tch);
 	Style_StrCopyWeight(szNewStyle, lpszStyle, tch);
 
