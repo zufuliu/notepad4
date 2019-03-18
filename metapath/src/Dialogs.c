@@ -554,6 +554,7 @@ extern WCHAR tchFavoritesDir[MAX_PATH];
 extern BOOL bClearReadOnly;
 extern BOOL bRenameOnCollision;
 extern BOOL bSingleClick;
+extern BOOL bOpenFileInSameWindow;
 extern BOOL bTrackSelect;
 extern BOOL bFullRowSelect;
 extern BOOL bFocusEdit;
@@ -579,8 +580,8 @@ static INT_PTR CALLBACK GeneralPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LPA
 			EnableWindow(GetDlgItem(hwnd, IDC_SAVESETTINGS), FALSE);
 		}
 
-		if (bWindowLayoutRTL) {
-			CheckDlgButton(hwnd, IDC_RTL_LAYOUT, BST_CHECKED);
+		if (bOpenFileInSameWindow) {
+			CheckDlgButton(hwnd, IDC_OPENFILE_SAME_WINDOW, BST_CHECKED);
 		}
 
 		if (bSingleClick) {
@@ -628,7 +629,7 @@ static INT_PTR CALLBACK GeneralPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LPA
 				bSaveSettings = IsButtonChecked(hwnd, IDC_SAVESETTINGS);
 			}
 
-			bWindowLayoutRTL = IsButtonChecked(hwnd, IDC_RTL_LAYOUT);
+			bOpenFileInSameWindow = IsButtonChecked(hwnd, IDC_OPENFILE_SAME_WINDOW);
 			bSingleClick = IsButtonChecked(hwnd, IDC_SINGLECLICK);
 			bTrackSelect = IsButtonChecked(hwnd, IDC_TRACKSELECT);
 			bFullRowSelect = IsButtonChecked(hwnd, IDC_FULLROWSELECT);
@@ -653,6 +654,10 @@ static INT_PTR CALLBACK GeneralPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LPA
 static INT_PTR CALLBACK AdvancedPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
 	switch (umsg) {
 	case WM_INITDIALOG:
+		if (bWindowLayoutRTL) {
+			CheckDlgButton(hwnd, IDC_RTL_LAYOUT, BST_CHECKED);
+		}
+
 		if (bClearReadOnly) {
 			CheckDlgButton(hwnd, IDC_CLEARREADONLY, BST_CHECKED);
 		}
@@ -719,6 +724,7 @@ static INT_PTR CALLBACK AdvancedPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LP
 	case WM_NOTIFY:
 		switch (((LPNMHDR)lParam)->code) {
 		case PSN_APPLY:
+			bWindowLayoutRTL = IsButtonChecked(hwnd, IDC_RTL_LAYOUT);
 			bClearReadOnly = IsButtonChecked(hwnd, IDC_CLEARREADONLY);
 			bRenameOnCollision = IsButtonChecked(hwnd, IDC_RENAMEONCOLLISION);
 			fUseRecycleBin = IsButtonChecked(hwnd, IDC_USERECYCLEBIN);

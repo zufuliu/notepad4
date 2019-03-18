@@ -91,6 +91,9 @@ static LPWSTR tchToolbarBitmapDisabled = NULL;
 BOOL	bClearReadOnly;
 BOOL	bRenameOnCollision;
 BOOL	bSingleClick;
+BOOL	bOpenFileInSameWindow;
+static int iDefaultOpenMenu;
+static int iShiftOpenMenu;
 BOOL	bTrackSelect;
 BOOL	bFullRowSelect;
 int		iStartupDir;
@@ -568,7 +571,8 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 		}
 
 		HMENU hmenu = LoadMenu(g_hInstance, MAKEINTRESOURCE(IDR_MAINWND));
-		SetMenuDefaultItem(GetSubMenu(hmenu, IDP_POPUP_SUBMENU_PATH), IDM_FILE_OPEN, FALSE);
+		SetMenuDefaultItem(GetSubMenu(hmenu, IDP_POPUP_SUBMENU_PATH), IDM_FILE_OPENSAME, FALSE);
+		SetMenuDefaultItem(GetSubMenu(hmenu, IDP_POPUP_SUBMENU_PATH), IDM_FILE_OPENNEW, FALSE);
 
 		int imenu = 0;
 		switch (nID) {
@@ -598,7 +602,9 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 		TrackPopupMenuEx(GetSubMenu(hmenu, imenu),
 						 TPM_LEFTBUTTON | TPM_RIGHTBUTTON,
 						 pt.x + 1, pt.y + 1, hwnd, NULL);
-
+		if (imenu == IDP_POPUP_SUBMENU_PATH) {
+			SetMenuDefaultItem(GetSubMenu(hmenu, IDP_POPUP_SUBMENU_PATH), iDefaultOpenMenu, TRUE);
+		}
 		DestroyMenu(hmenu);
 	}
 	break;
@@ -1150,7 +1156,8 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		}
 		break;
 
-	case IDM_FILE_OPEN: {
+	case IDM_FILE_OPENSAME:
+	case IDM_FILE_OPENNEW: {
 		DLITEM dli = { DLI_ALL, L"", L"", DLE_NONE };
 		DirList_GetItem(hwndDirList, -1, &dli);
 
@@ -1163,9 +1170,9 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 		case DLE_FILE:
 			BeginWaitCursor();
-
+			const BOOL bOpenNew = LOWORD(wParam) == IDM_FILE_OPENNEW;
 			if (!PathIsLnkFile(dli.szFileName)) {
-				LaunchTarget(dli.szFileName, FALSE);
+				LaunchTarget(dli.szFileName, bOpenNew);
 			} else {
 				// PathIsLinkFile()
 				WCHAR tch[MAX_PATH];
@@ -1177,7 +1184,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 						DisplayLnkFile(dli.szFileName);
 					} else {
 						// Made sure link points to a file
-						LaunchTarget(tch, FALSE);
+						LaunchTarget(tch, bOpenNew);
 					}
 				} else {
 					DisplayLnkFile(dli.szFileName);
@@ -1186,42 +1193,6 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 			EndWaitCursor();
 			break;
-		}
-	}
-	break;
-
-	case IDM_FILE_OPENNEW: {
-		DLITEM dli;
-		dli.mask = DLI_ALL;
-
-		DirList_GetItem(hwndDirList, -1, &dli);
-
-		if (dli.ntype == DLE_FILE) {
-			BeginWaitCursor();
-
-			if (!PathIsLnkFile(dli.szFileName)) {
-				LaunchTarget(dli.szFileName, TRUE);
-			} else {
-				// PathIsLinkFile()
-				WCHAR tch[MAX_PATH];
-
-				if (PathGetLnkPath(dli.szFileName, tch, COUNTOF(tch))) {
-					ExpandEnvironmentStringsEx(tch, COUNTOF(tch));
-					const DWORD dwAttr = GetFileAttributes(tch);
-					if ((dwAttr == INVALID_FILE_ATTRIBUTES) || (dwAttr & FILE_ATTRIBUTE_DIRECTORY)) {
-						DisplayLnkFile(dli.szFileName);
-					} else {
-						// Made sure link points to a file
-						LaunchTarget(tch, TRUE);
-					}
-				} else {
-					DisplayLnkFile(dli.szFileName);
-				}
-			}
-
-			EndWaitCursor();
-		} else {
-			MessageBeep(0);
 		}
 	}
 	break;
@@ -1742,6 +1713,8 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			SetWindowLayoutRTL(hwndDirList, bWindowLayoutRTL);
 		}
 		bHasQuickview = PathFileExists(szQuickview);
+		iDefaultOpenMenu = bOpenFileInSameWindow ? IDM_FILE_OPENSAME : IDM_FILE_OPENNEW;
+		iShiftOpenMenu = bOpenFileInSameWindow ? IDM_FILE_OPENNEW : IDM_FILE_OPENSAME;
 	}
 	break;
 
@@ -1984,7 +1957,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			ListView_SetItemState(hwndDirList, i, LVIS_FOCUSED | LVIS_SELECTED, LVIS_FOCUSED | LVIS_SELECTED);
 			ListView_EnsureVisible(hwndDirList, i, FALSE);
 			ListView_Update(hwndDirList, i);
-			SendWMCommand(hwnd, IDM_FILE_OPEN);
+			SendWMCommand(hwnd, iDefaultOpenMenu);
 		} else {
 			MessageBeep(0);
 		}
@@ -2021,7 +1994,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			ListView_SetItemState(hwndDirList, i, LVIS_FOCUSED | LVIS_SELECTED, LVIS_FOCUSED | LVIS_SELECTED);
 			ListView_EnsureVisible(hwndDirList, i, FALSE);
 			ListView_Update(hwndDirList, i);
-			SendWMCommand(hwnd, IDM_FILE_OPEN);
+			SendWMCommand(hwnd, iDefaultOpenMenu);
 		} else {
 			MessageBeep(0);
 		}
@@ -2173,9 +2146,9 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 				if (KeyboardIsKeyDown(VK_MENU)) {
 					SendWMCommand(hwnd, IDM_FILE_PROPERTIES);
 				} else if (KeyboardIsKeyDown(VK_SHIFT)) {
-					SendWMCommand(hwnd, IDM_FILE_OPENNEW);
+					SendWMCommand(hwnd, iShiftOpenMenu);
 				} else {
-					SendWMCommand(hwnd, IDM_FILE_OPEN);
+					SendWMCommand(hwnd, iDefaultOpenMenu);
 				}
 			}
 			break;
@@ -2185,9 +2158,9 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			if (KeyboardIsKeyDown(VK_MENU)) {
 				SendWMCommand(hwnd, IDM_FILE_PROPERTIES);
 			} else if (KeyboardIsKeyDown(VK_SHIFT)) {
-				SendWMCommand(hwnd, IDM_FILE_OPENNEW);
+				SendWMCommand(hwnd, iShiftOpenMenu);
 			} else {
-				SendWMCommand(hwnd, IDM_FILE_OPEN);
+				SendWMCommand(hwnd, iDefaultOpenMenu);
 			}
 			break;
 		}
@@ -2372,6 +2345,10 @@ void LoadSettings(void) {
 
 	bSaveSettings = IniSectionGetBool(pIniSection, L"SaveSettings", 1);
 	bSingleClick = IniSectionGetBool(pIniSection, L"SingleClick", 1);
+	bOpenFileInSameWindow = IniSectionGetBool(pIniSection, L"OpenFileInSameWindow", 0);
+	iDefaultOpenMenu = bOpenFileInSameWindow ? IDM_FILE_OPENSAME : IDM_FILE_OPENNEW;
+	iShiftOpenMenu = bOpenFileInSameWindow ? IDM_FILE_OPENNEW : IDM_FILE_OPENSAME;
+
 	bTrackSelect = IniSectionGetBool(pIniSection, L"TrackSelect", 1);
 	bFullRowSelect = IniSectionGetBool(pIniSection, L"FullRowSelect", 0);
 	fUseRecycleBin = IniSectionGetBool(pIniSection, L"UseRecycleBin", 1);
@@ -2560,6 +2537,7 @@ void SaveSettings(BOOL bSaveSettingsNow) {
 
 	IniSectionSetBool(pIniSection, L"SaveSettings", bSaveSettings);
 	IniSectionSetBoolEx(pIniSection, L"SingleClick", bSingleClick, 1);
+	IniSectionSetBoolEx(pIniSection, L"OpenFileInSameWindow", bOpenFileInSameWindow, 0);
 	IniSectionSetBoolEx(pIniSection, L"TrackSelect", bTrackSelect, 1);
 	IniSectionSetBoolEx(pIniSection, L"FullRowSelect", bFullRowSelect, 0);
 	IniSectionSetBoolEx(pIniSection, L"UseRecycleBin", fUseRecycleBin, 1);

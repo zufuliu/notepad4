@@ -77,7 +77,7 @@ IDR_MAINWND MENU
 BEGIN
 	POPUP "+"
 	BEGIN
-		MENUITEM "&Open (Same)",				IDM_FILE_OPEN
+		MENUITEM "&Open (Same)",				IDM_FILE_OPENSAME
 		MENUITEM "Open (N&ew)",					IDM_FILE_OPENNEW
 		MENUITEM "&Run...",						IDM_FILE_RUN
 		MENUITEM "&Launch",						IDM_FILE_LAUNCH
@@ -371,8 +371,8 @@ BEGIN
     ICON            IDI_OPTIONS,IDC_STATIC,10,10,20,20
     LTEXT           "Specify general program settings for metapath.",
                     IDC_STATIC,40,15,200,8
-    CONTROL         "Use &RTL Layout.",
-                    IDC_RTL_LAYOUT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,34,190,10
+    CONTROL         "Open file in same target application window.",
+                    IDC_OPENFILE_SAME_WINDOW,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,34,190,10
     CONTROL         "&Allow only single mouse-click to open objects.",
                     IDC_SINGLECLICK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,46,190,10
     CONTROL         "&Enable track selection.",IDC_TRACKSELECT,"Button",
@@ -401,6 +401,8 @@ CAPTION "Advanced"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
     ICON            IDI_OPTIONS2,IDC_STATIC,10,10,20,20
+    CONTROL         "Use &RTL Layout.",
+                    IDC_RTL_LAYOUT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,34,190,10
     LTEXT           "Specify advanced program settings for metapath.",
                     IDC_STATIC,40,15,200,8
     CONTROL         "&Use startup directory:",IDC_STARTUPDIR,"Button",
