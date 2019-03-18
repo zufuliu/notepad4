@@ -81,7 +81,8 @@
 #define IDC_REUSEWINDOW					106
 #define IDC_SAVESETTINGS				107
 #define IDC_CLEARWINPOS					108
-#define IDC_RTL_LAYOUT					109
+#define IDC_OPENFILE_SAME_WINDOW		109
+
 // Advanced
 #define IDPP_ADVANCED					111
 #define IDC_STARTUPDIR					100
@@ -94,6 +95,7 @@
 #define IDC_ESCFUNCTION					107
 #define IDC_ESCMIN						108
 #define IDC_ESCEXIT						109
+#define IDC_RTL_LAYOUT					110
 // Items
 #define IDPP_ITEMS						112
 #define IDC_COLOR_DEF1					100
@@ -148,7 +150,7 @@
 #define IDS_CREATELINK					11010
 #define IDS_SAVESETTINGS				11011
 
-#define IDM_FILE_OPEN					40001
+#define IDM_FILE_OPENSAME				40001
 #define IDM_FILE_OPENNEW				40002
 #define IDM_FILE_RUN					40003
 #define IDM_FILE_LAUNCH					40004
