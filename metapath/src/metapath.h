@@ -117,12 +117,13 @@ void ClearWindowPositionHistory(void);
 void ParseCommandLine(void);
 void LoadFlags(void);
 void LoadLaunchSetings(void);
-int CheckIniFile(LPWSTR lpszFile, LPCWSTR lpszModule);
-int CheckIniFileRedirect(LPWSTR lpszFile, LPCWSTR lpszModule);
-int FindIniFile(void);
-int TestIniFile(void);
-int CreateIniFile(void);
-int CreateIniFileEx(LPCWSTR lpszIniFile);
+
+BOOL CheckIniFile(LPWSTR lpszFile, LPCWSTR lpszModule);
+BOOL CheckIniFileRedirect(LPWSTR lpszFile, LPCWSTR lpszModule);
+BOOL FindIniFile(void);
+BOOL TestIniFile(void);
+BOOL CreateIniFile(void);
+BOOL CreateIniFileEx(LPCWSTR lpszIniFile);
 
 BOOL DisplayPath(LPCWSTR lpPath, UINT uIdError);
 BOOL DisplayLnkFile(LPCWSTR pszLnkFile);

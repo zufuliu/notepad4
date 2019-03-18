@@ -6403,7 +6403,7 @@ void LoadFlags(void) {
 // FindIniFile()
 //
 //
-int CheckIniFile(LPWSTR lpszFile, LPCWSTR lpszModule) {
+BOOL CheckIniFile(LPWSTR lpszFile, LPCWSTR lpszModule) {
 	WCHAR tchFileExpanded[MAX_PATH];
 	ExpandEnvironmentStrings(lpszFile, tchFileExpanded, COUNTOF(tchFileExpanded));
 
@@ -6414,14 +6414,14 @@ int CheckIniFile(LPWSTR lpszFile, LPCWSTR lpszModule) {
 		lstrcpy(PathFindFileName(tchBuild), tchFileExpanded);
 		if (PathFileExists(tchBuild)) {
 			lstrcpy(lpszFile, tchBuild);
-			return 1;
+			return TRUE;
 		}
 		// Application Data
 		if (S_OK == SHGetFolderPath(NULL, CSIDL_APPDATA, NULL, SHGFP_TYPE_CURRENT, tchBuild)) {
 			PathAppend(tchBuild, tchFileExpanded);
 			if (PathFileExists(tchBuild)) {
 				lstrcpy(lpszFile, tchBuild);
-				return 1;
+				return TRUE;
 			}
 		}
 		// Home
@@ -6429,18 +6429,18 @@ int CheckIniFile(LPWSTR lpszFile, LPCWSTR lpszModule) {
 			PathAppend(tchBuild, tchFileExpanded);
 			if (PathFileExists(tchBuild)) {
 				lstrcpy(lpszFile, tchBuild);
-				return 1;
+				return TRUE;
 			}
 		}
 	} else if (PathFileExists(tchFileExpanded)) {
 		lstrcpy(lpszFile, tchFileExpanded);
-		return 1;
+		return TRUE;
 	}
 
-	return 0;
+	return FALSE;
 }
 
-int CheckIniFileRedirect(LPWSTR lpszFile, LPCWSTR lpszModule) {
+BOOL CheckIniFileRedirect(LPWSTR lpszFile, LPCWSTR lpszModule) {
 	WCHAR tch[MAX_PATH];
 	if (GetPrivateProfileString(INI_SECTION_NAME_NOTEPAD2, L"Notepad2.ini", L"", tch, COUNTOF(tch), lpszFile)) {
 		if (CheckIniFile(tch, lpszModule)) {
@@ -6455,19 +6455,19 @@ int CheckIniFileRedirect(LPWSTR lpszFile, LPCWSTR lpszModule) {
 				lstrcpy(lpszFile, tchFileExpanded);
 			}
 		}
-		return 1;
+		return TRUE;
 	}
-	return 0;
+	return FALSE;
 }
 
-int FindIniFile(void) {
+BOOL FindIniFile(void) {
 	WCHAR tchTest[MAX_PATH];
 	WCHAR tchModule[MAX_PATH];
 	GetModuleFileName(NULL, tchModule, COUNTOF(tchModule));
 
 	if (StrNotEmpty(szIniFile)) {
 		if (StrEqual(szIniFile, L"*?")) {
-			return 0;
+			return FALSE;
 		}
 		if (!CheckIniFile(szIniFile, tchModule)) {
 			ExpandEnvironmentStringsEx(szIniFile, COUNTOF(szIniFile));
@@ -6478,12 +6478,12 @@ int FindIniFile(void) {
 				lstrcpy(szIniFile, tchTest);
 			}
 		}
-		return 1;
+		return TRUE;
 	}
 
 	lstrcpy(tchTest, PathFindFileName(tchModule));
 	PathRenameExtension(tchTest, L".ini");
-	int bFound = CheckIniFile(tchTest, tchModule);
+	BOOL bFound = CheckIniFile(tchTest, tchModule);
 
 	if (!bFound) {
 		lstrcpy(tchTest, L"Notepad2.ini");
@@ -6501,14 +6501,14 @@ int FindIniFile(void) {
 		PathRenameExtension(szIniFile, L".ini");
 	}
 
-	return 1;
+	return TRUE;
 }
 
-int TestIniFile(void) {
+BOOL TestIniFile(void) {
 	if (StrEqual(szIniFile, L"*?")) {
 		lstrcpy(szIniFile2, L"");
 		lstrcpy(szIniFile, L"");
-		return 0;
+		return FALSE;
 	}
 
 	if (PathIsDirectory(szIniFile) || *CharPrev(szIniFile, StrEnd(szIniFile)) == L'\\') {
@@ -6528,17 +6528,17 @@ int TestIniFile(void) {
 	if (!PathFileExists(szIniFile) || PathIsDirectory(szIniFile)) {
 		lstrcpy(szIniFile2, szIniFile);
 		lstrcpy(szIniFile, L"");
-		return 0;
+		return FALSE;
 	}
 
-	return 1;
+	return TRUE;
 }
 
-int CreateIniFile(void) {
+BOOL CreateIniFile(void) {
 	return CreateIniFileEx(szIniFile);
 }
 
-int CreateIniFileEx(LPCWSTR lpszIniFile) {
+BOOL CreateIniFileEx(LPCWSTR lpszIniFile) {
 	if (StrNotEmpty(lpszIniFile)) {
 		WCHAR *pwchTail;
 
@@ -6558,10 +6558,10 @@ int CreateIniFileEx(LPCWSTR lpszIniFile) {
 				WriteFile(hFile, (LPCVOID)L"\xFEFF[Notepad2]\r\n", 26, &dw, NULL);
 			}
 			CloseHandle(hFile);
-			return 1;
+			return TRUE;
 		}
 	}
-	return 0;
+	return FALSE;
 }
 
 //=============================================================================
