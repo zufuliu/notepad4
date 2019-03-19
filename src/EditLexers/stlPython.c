@@ -22,8 +22,9 @@ static KEYWORDLIST Keywords_Python = {{
 "self None True False NotImplemented Ellipsis __debug__ __main__ __builtin__ __future__ "
 
 , // 3 @Decorator
-"classmethod staticmethod cached_method abstractmethod property contextmanager "
-"setter " // @property.setter
+"classmethod staticmethod cached_method abstractmethod contextmanager "
+"property setter deleter " "dataclass dataclass() "
+"overload no_type_check no_type_check_decorator " // typing
 
 , // 4 Built-in Function
 "__import__() abs() all() any() ascii() bin() bool() breakpoint() bytearray() bytes() callable() chr() classmethod() "
@@ -75,7 +76,7 @@ static KEYWORDLIST Keywords_Python = {{
 // collections
 "ChainMap Counter deque defaultdict OrderedDict UserDict UserList UserString "
 "struct_time " "date time datetime timedelta tzinfo timezone "
-"array " "Enum IntEnum " "catch_warnings "
+"array " "Enum IntEnum IntFlag " "catch_warnings "
 "JSONDecoder JSONEncoder " "UUID "
 // urllib
 "URLError HTTPError OpenerDirector BaseHandler HTTPCookieProcessor HTTPPasswordMgr "
