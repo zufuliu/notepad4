@@ -542,6 +542,9 @@ bool ViewStyle::SetWrapState(int wrapState_) noexcept {
 	case SC_WRAP_WHITESPACE:
 		wrapStateWanted = eWrapWhitespace;
 		break;
+	case SC_WRAP_AUTO:
+		wrapStateWanted = eWrapAuto;
+		break;		
 	default:
 		wrapStateWanted = eWrapNone;
 		break;
