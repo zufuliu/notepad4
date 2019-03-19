@@ -5156,7 +5156,7 @@ void LoadSettings(void) {
 	fWordWrapG = fWordWrap;
 
 	iValue = IniSectionGetInt(pIniSection, L"WordWrapMode", SC_WRAP_WORD);
-	iWordWrapMode = clamp_i(iValue, SC_WRAP_WORD, SC_WRAP_WHITESPACE);
+	iWordWrapMode = clamp_i(iValue, SC_WRAP_WORD, SC_WRAP_AUTO);
 
 	iValue = IniSectionGetInt(pIniSection, L"WordWrapIndent", EditWrapIndentDefaultValue);
 	iWordWrapIndent = clamp_i(iValue, EditWrapIndentNone, EditWrapIndentMaxValue);

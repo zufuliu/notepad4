@@ -582,6 +582,24 @@ void EditView::LayoutLine(const EditModel &model, Sci::Line line, Surface *surfa
 							- posLineStart;
 						p = model.pdoc->MovePositionOutsideChar(p + 1 + posLineStart, 1) - posLineStart;
 						continue;
+					} else if (vstyle.wrapState == eWrapAuto) {
+						// style boundary and space
+						if ((ll->styles[p] != ll->styles[p - 1]) || (IsSpaceOrTab(ll->chars[p - 1]) && !IsSpaceOrTab(ll->chars[p]))) {
+							lastGoodBreak = p;
+						} else {
+							// word boundary
+							// TODO: Unicode Line Breaking Algorithm http://www.unicode.org/reports/tr14/
+							const Sci::Position pos = model.pdoc->MovePositionOutsideChar(p + posLineStart, -1);
+							const Document::CharacterExtracted cePrev = model.pdoc->CharacterBefore(pos);
+							const Document::CharacterExtracted cePos = model.pdoc->CharacterAfter(pos);
+							const CharClassify::cc ccPrev = model.pdoc->WordCharacterClass(cePrev.character);
+							const CharClassify::cc ccPos = model.pdoc->WordCharacterClass(cePos.character);
+							if (ccPrev != ccPos || ccPrev == CharClassify::ccCJKWord) {
+								lastGoodBreak = pos - posLineStart;
+							}
+							p = pos + cePos.widthBytes - posLineStart;
+							continue;
+						}
 					} else if ((vstyle.wrapState == eWrapWord) && (ll->styles[p] != ll->styles[p - 1])) {
 						lastGoodBreak = p;
 					} else if (IsSpaceOrTab(ll->chars[p - 1]) && !IsSpaceOrTab(ll->chars[p])) {

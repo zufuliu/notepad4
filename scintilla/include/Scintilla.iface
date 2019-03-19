@@ -1349,6 +1349,7 @@ val SC_WRAP_NONE=0
 val SC_WRAP_WORD=1
 val SC_WRAP_CHAR=2
 val SC_WRAP_WHITESPACE=3
+val SC_WRAP_AUTO=4
 
 # Sets whether text is word wrapped.
 set void SetWrapMode=2268(int wrapMode,)
