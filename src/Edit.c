@@ -2383,7 +2383,7 @@ void EditModifyLines(HWND hwnd, LPCWSTR pwszPrefix, LPCWSTR pwszAppend) {
 	if (iPrefixLen != 0) {
 		char *p = mszPrefix1;
 		mszPrefix2 = (char *)NP2HeapAlloc(iPrefixLen * kMaxMultiByteCount + 1);
-		while (!bPrefixNum && (p = StrStrA(p, "$(")) != NULL) {
+		while (!bPrefixNum && (p = strstr(p, "$(")) != NULL) {
 			if (strncmp(p, "$(I)", CSTRLEN("$(I)")) == 0) {
 				*p = 0;
 				strcpy(mszPrefix2, p + CSTRLEN("$(I)"));
@@ -2446,7 +2446,7 @@ void EditModifyLines(HWND hwnd, LPCWSTR pwszPrefix, LPCWSTR pwszAppend) {
 	if (iAppendLen != 0) {
 		char *p = mszAppend1;
 		mszAppend2 = (char *)NP2HeapAlloc(iAppendLen * kMaxMultiByteCount + 1);
-		while (!bAppendNum && (p = StrStrA(p, "$(")) != NULL) {
+		while (!bAppendNum && (p = strstr(p, "$(")) != NULL) {
 			if (strncmp(p, "$(I)", CSTRLEN("$(I)")) == 0) {
 				*p = 0;
 				strcpy(mszAppend2, p + CSTRLEN("$(I)"));
@@ -6652,7 +6652,7 @@ BOOL FileVars_Apply(HWND hwnd, LPCFILEVARS lpfv) {
 BOOL FileVars_ParseInt(LPCSTR pszData, LPCSTR pszName, int *piValue) {
 	LPCSTR pvStart = pszData;
 
-	while ((pvStart = StrStrA(pvStart, pszName)) != NULL) {
+	while ((pvStart = strstr(pvStart, pszName)) != NULL) {
 		const unsigned char chPrev = (pvStart > pszData) ? *(pvStart - 1) : 0;
 		if (!isalpha(chPrev) && chPrev != '-' && chPrev != '_') {
 			pvStart += lstrlenA(pszName);
@@ -6700,7 +6700,7 @@ BOOL FileVars_ParseInt(LPCSTR pszData, LPCSTR pszName, int *piValue) {
 BOOL FileVars_ParseStr(LPCSTR pszData, LPCSTR pszName, char *pszValue, int cchValue) {
 	LPCSTR pvStart = pszData;
 
-	while ((pvStart = StrStrA(pvStart, pszName)) != NULL) {
+	while ((pvStart = strstr(pvStart, pszName)) != NULL) {
 		const unsigned char chPrev = (pvStart > pszData) ? *(pvStart - 1) : 0;
 		if (!isalpha(chPrev) && chPrev != '-' && chPrev != '_') {
 			pvStart += lstrlenA(pszName);

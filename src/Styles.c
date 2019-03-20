@@ -1139,7 +1139,7 @@ void Style_SetLexer(HWND hwnd, PEDITLEXER pLexNew) {
 		iValue = GetSysColor(COLOR_WINDOWTEXT);
 	}
 	if (!VerifyContrast(iValue, (COLORREF)SendMessage(hwnd, SCI_STYLEGETBACK, 0, 0))) {
-		iValue = (int)SendMessage(hwnd, SCI_STYLEGETFORE, 0, 0);
+		iValue = (int)SendMessage(hwnd, SCI_STYLEGETFORE, STYLE_DEFAULT, 0);
 	}
 	SendMessage(hwnd, SCI_SETCARETFORE, iValue, 0);
 	SendMessage(hwnd, SCI_SETADDITIONALCARETFORE, iValue, 0);
@@ -1394,7 +1394,7 @@ int Style_GetDocTypeLanguage(void) {
 	SendMessage(hwndEdit, SCI_GETTEXT, COUNTOF(tchText) - 1, (LPARAM)tchText);
 
 	// check DOCTYPE
-	if ((p = StrStrA(tchText, "!DOCTYPE")) != NULL) {
+	if ((p = strstr(tchText, "!DOCTYPE")) != NULL) {
 		p += 9;
 		while (*p == ' ' || *p == '=' || *p == '\"') {
 			p++;
@@ -1430,11 +1430,11 @@ int Style_GetDocTypeLanguage(void) {
 		}
 	}
 
-	if (StrStrA(tchText, "<?php")) {
+	if (strstr(tchText, "<?php")) {
 		return IDM_LANG_PHP;
 	}
 	// check Language
-	if ((p = StrStrA(tchText, "<%@")) != NULL && (p = StrStrIA(p + 3, "Language")) != NULL) {
+	if ((p = strstr(tchText, "<%@")) != NULL && (p = StrStrIA(p + 3, "Language")) != NULL) {
 		p += 9;
 		while (*p == ' ' || *p == '=' || *p == '\"') {
 			p++;
@@ -1464,7 +1464,7 @@ int Style_GetDocTypeLanguage(void) {
 		}
 		if (!strncmp(p, "<!--", 4)) {
 			p += 4;
-			if ((p = StrStrA(p, "-->")) != NULL) {
+			if ((p = strstr(p, "-->")) != NULL) {
 				p += 3;
 			} else {
 				return 0;
@@ -1505,7 +1505,7 @@ int Style_GetDocTypeLanguage(void) {
 	}
 	//if (!strncmp(p, "project", 7)) {
 	//	p += 7;
-	//	if (StrStrA(p, "maven") && StrStrA(p, "POM"))
+	//	if (strstr(p, "maven") && strstr(p, "POM"))
 	//		return IDM_LANG_MAVEN_POM;
 	//	return IDM_LANG_ANT_BUILD;
 	//}
@@ -1558,9 +1558,9 @@ int Style_GetDocTypeLanguage(void) {
 	//	return IDM_LANG_ANDROID_MANIFEST;
 	//if (!strncmp(p, "svg", 3))
 	//	return IDM_LANG_SVG;
-	if (((p = StrStrA(pb, "Layout")) != NULL && StrStrA(p + 6, "xmlns:android")) ||
-			((p = StrStrA(pb, "View")) != NULL && StrStrA(p + 4, "xmlns:android")) ||
-			((p = StrStrA(pb, "menu")) != NULL && StrStrA(p + 4, "xmlns:android"))) {
+	if (((p = strstr(pb, "Layout")) != NULL && strstr(p + 6, "xmlns:android")) ||
+			((p = strstr(pb, "View")) != NULL && strstr(p + 4, "xmlns:android")) ||
+			((p = strstr(pb, "menu")) != NULL && strstr(p + 4, "xmlns:android"))) {
 		return IDM_LANG_ANDROID_LAYOUT;
 	}
 
@@ -1588,7 +1588,7 @@ BOOL MatchCPPKeyword(char *p, int index) {
 	}
 	word[len++] = ' ';
 	word[len++] = 0;
-	p = StrStrA(lexCPP.pKeyWords->pszKeyWords[index], word);
+	p = strstr(lexCPP.pKeyWords->pszKeyWords[index], word);
 	return p != NULL;
 }
 
