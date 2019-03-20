@@ -285,7 +285,7 @@ static inline BOOL IsStringFormatChar(int ch, int style) {
 }
 
 static inline BOOL NeedSpaceAfterKeyword(const char *word, Sci_Position length) {
-	const char *p = StrStrA(
+	const char *p = strstr(
 		" if for try using while elseif switch foreach synchronized "
 		, word);
 	return p != NULL && p[-1] == ' ' && p[length] == ' ';
