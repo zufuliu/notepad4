@@ -255,6 +255,13 @@ inline void SetWindowPointer(HWND hWnd, void *ptr) noexcept {
 	::SetWindowLongPtr(hWnd, 0, reinterpret_cast<LONG_PTR>(ptr));
 }
 
+std::wstring WStringFromUTF8(std::string_view sv) {
+	const size_t uchars = UTF16Length(sv);
+	std::wstring retVal(uchars, 0);
+	UTF16FromUTF8(sv, static_cast<wchar_t *>(retVal.data()), uchars);
+	return retVal;
+}
+
 CRITICAL_SECTION crPlatformLock;
 HINSTANCE hinstPlatformRes {};
 
@@ -312,10 +319,10 @@ void SetLogFont(LOGFONTW &lf, const char *faceName, int characterSet, float size
 }
 
 #if defined(USE_D2D)
-void GetDWriteFontMetrics(const LOGFONTW &lf, const FontParameters &fp, WCHAR wszFace[], int faceSize,
+bool GetDWriteFontMetrics(const LOGFONTW &lf, std::wstring &wsFace,
 	DWRITE_FONT_WEIGHT &weight, DWRITE_FONT_STYLE &style, DWRITE_FONT_STRETCH &stretch) {
+	bool success = false;
 	if (gdiInterop) {
-		bool success = false;
 		IDWriteFont *font = nullptr;
 		HRESULT hr = gdiInterop->CreateFontFromLOGFONT(&lf, &font);
 		if (SUCCEEDED(hr)) {
@@ -339,11 +346,10 @@ void GetDWriteFontMetrics(const LOGFONTW &lf, const FontParameters &fp, WCHAR ws
 					UINT32 length = 0;
 					names->GetStringLength(index, &length);
 
-					std::vector<WCHAR> name(length + 1);
-					names->GetString(index, name.data(), length + 1);
+					wsFace.resize(length + 1);
+					names->GetString(index, wsFace.data(), length + 1);
 
-					lstrcpyn(wszFace, name.data(), faceSize);
-					success = *wszFace != L'\0';
+					success = wsFace[0] != L'\0';
 				}
 				if (names) {
 					names->Release();
@@ -356,11 +362,8 @@ void GetDWriteFontMetrics(const LOGFONTW &lf, const FontParameters &fp, WCHAR ws
 		if (font) {
 			font->Release();
 		}
-		if (success) {
-			return;
-		}
 	}
-	UTF16FromUTF8(fp.faceName, wszFace, faceSize);
+	return success;
 }
 #endif
 
@@ -374,18 +377,17 @@ FontID CreateFontFromParameters(const FontParameters &fp) {
 	} else {
 #if defined(USE_D2D)
 		IDWriteTextFormat *pTextFormat = nullptr;
-		const int faceSize = 200;
-		WCHAR wszFace[faceSize] = L"";
+ 		std::wstring wsFace;
 		const FLOAT fHeight = fp.size;
 		DWRITE_FONT_WEIGHT weight = static_cast<DWRITE_FONT_WEIGHT>(fp.weight);
 		DWRITE_FONT_STYLE style = fp.italic ? DWRITE_FONT_STYLE_ITALIC : DWRITE_FONT_STYLE_NORMAL;
 		DWRITE_FONT_STRETCH stretch = DWRITE_FONT_STRETCH_NORMAL;
-		GetDWriteFontMetrics(lf, fp, wszFace, faceSize, weight, style, stretch);
-		const int localeSize = 200;
-		WCHAR wszLocale[localeSize] = L"";
-		UTF16FromUTF8(fp.localeName, wszLocale, std::size(wszLocale));
-		HRESULT hr = pIDWriteFactory->CreateTextFormat(wszFace, nullptr,
-			weight, style, stretch, fHeight, wszLocale, &pTextFormat);
+		if (!GetDWriteFontMetrics(lf, wsFace, weight, style, stretch)) {
+			wsFace = WStringFromUTF8(fp.faceName);
+		}
+		const std::wstring wsLocale = WStringFromUTF8(fp.localeName);
+		HRESULT hr = pIDWriteFactory->CreateTextFormat(wsFace.c_str(), nullptr,
+			weight, style, stretch, fHeight, wsLocale.c_str(), &pTextFormat);
 		if (SUCCEEDED(hr)) {
 			pTextFormat->SetWordWrapping(DWRITE_WORD_WRAPPING_NO_WRAP);
 
