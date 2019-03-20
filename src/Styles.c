@@ -292,6 +292,12 @@ extern INT	iHighlightCurrentLine;
 #define LOCALE_NAME_MAX_LENGTH	85
 #endif
 
+#if LF_FACESIZE > LOCALE_NAME_MAX_LENGTH
+#define MAX_STYLE_VALUE_LENGTH	LF_FACESIZE
+#else
+#define MAX_STYLE_VALUE_LENGTH	LOCALE_NAME_MAX_LENGTH
+#endif
+
 struct DetailStyle {
 	UINT mask;
 	int fontSize;
@@ -2718,7 +2724,7 @@ BOOL Style_SelectFont(HWND hwnd, LPWSTR lpszStyle, int cchStyle, BOOL bDefaultSt
 	CHOOSEFONT cf;
 	LOGFONT lf;
 	int iValue;
-	WCHAR tch[LF_FACESIZE];
+	WCHAR tch[MAX_STYLE_VALUE_LENGTH];
 
 	ZeroMemory(&cf, sizeof(CHOOSEFONT));
 	ZeroMemory(&lf, sizeof(LOGFONT));
@@ -2853,7 +2859,7 @@ BOOL Style_SelectColor(HWND hwnd, BOOL bFore, LPWSTR lpszStyle, int cchStyle) {
 
 	// Rebuild style string
 	WCHAR szNewStyle[MAX_LEXER_STYLE_EDIT_SIZE];
-	WCHAR tch[LF_FACESIZE];
+	WCHAR tch[MAX_STYLE_VALUE_LENGTH];
 
 	lstrcpy(szNewStyle, L"");
 	Style_StrCopyFont(szNewStyle, lpszStyle, tch);
