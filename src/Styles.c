@@ -252,6 +252,7 @@ static COLORREF customColor[MAX_CUSTOM_COLOR_COUNT];
 static BOOL bCustomColorLoaded = FALSE;
 
 BOOL	bUse2ndGlobalStyle;
+int		np2StyleTheme;
 BOOL	bCurrentLexerHasLineComment;
 BOOL	bCurrentLexerHasBlockComment;
 static UINT fStylesModified = STYLESMODIFIED_NONE;
@@ -480,8 +481,11 @@ void Style_Load(void) {
 	pLexGlobal = bUse2ndGlobalStyle ? &lex2ndGlobal : &lexGlobal;
 
 	// default scheme
-	const int iValue = IniSectionGetInt(pIniSection, L"DefaultScheme", 0);
+	int iValue = IniSectionGetInt(pIniSection, L"DefaultScheme", 0);
 	iDefaultLexer = clamp_i(iValue, 0, NUMLEXERS - 1);
+
+	iValue = IniSectionGetInt(pIniSection, L"StyleTheme", StyleTheme_Default);
+	np2StyleTheme = clamp_i(iValue, StyleTheme_Default, StyleTheme_Max);
 
 	// auto select
 	bAutoSelect = IniSectionGetBool(pIniSection, L"AutoSelect", 1);
@@ -594,6 +598,7 @@ void Style_Save(void) {
 
 	// default scheme
 	IniSectionSetIntEx(pIniSection, L"DefaultScheme", iDefaultLexer, 0);
+	IniSectionSetIntEx(pIniSection, L"StyleTheme", np2StyleTheme, StyleTheme_Default);
 
 	// auto select
 	IniSectionSetBoolEx(pIniSection, L"AutoSelect", bAutoSelect, 1);
@@ -785,6 +790,11 @@ static void Style_ResetAll(void) {
 }
 
 void Style_OnDPIChanged(HWND hwnd) {
+	Style_SetLexer(hwnd, pLexCurrent);
+}
+
+void Style_OnStyleThemeChanged(HWND hwnd, int theme) {
+	np2StyleTheme = theme;
 	Style_SetLexer(hwnd, pLexCurrent);
 }
 

@@ -1982,6 +1982,10 @@ void MsgThemeChanged(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	UpdateStatusbar();
 }
 
+static void OnStyleThemeChanged(int theme) {
+	Style_OnStyleThemeChanged(hwndEdit, theme);
+}
+
 //=============================================================================
 //
 // MsgSize() - Handles WM_SIZE
@@ -2338,6 +2342,8 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	CheckCmd(hmenu, IDM_VIEW_USE2NDGLOBALSTYLE, bUse2ndGlobalStyle);
 	CheckCmd(hmenu, IDM_VIEW_USEDEFAULT_CODESTYLE, pLexCurrent->bUseDefaultCodeStyle);
+	i = IDM_VIEW_STYLE_THEME_DEFAULT + np2StyleTheme;
+	CheckMenuRadioItem(hmenu, IDM_VIEW_STYLE_THEME_DEFAULT, IDM_VIEW_STYLE_THEME_DARK, i, MF_BYCOMMAND);
 
 	CheckCmd(hmenu, IDM_VIEW_WORDWRAP, fWordWrap);
 	i = IDM_VIEW_FONTQUALITY_DEFAULT + iFontQuality;
@@ -3745,6 +3751,11 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	case IDM_VIEW_USEDEFAULT_CODESTYLE:
 		Style_ToggleUseDefaultCodeStyle(hwndEdit);
+		break;
+
+	case IDM_VIEW_STYLE_THEME_DEFAULT:
+	case IDM_VIEW_STYLE_THEME_DARK:
+		OnStyleThemeChanged(LOWORD(wParam) - IDM_VIEW_STYLE_THEME_DEFAULT);
 		break;
 
 	case IDM_VIEW_SCHEMECONFIG:
