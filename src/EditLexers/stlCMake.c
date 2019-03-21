@@ -2,6 +2,7 @@
 #include "EditStyle.h"
 
 // https://cmake.org/documentation/
+// https://cmake.org/cmake/help/latest/manual/cmake-language.7.html
 
 static KEYWORDLIST Keywords_CMake = {{
 "break() else() elseif() return() continue() "
@@ -43,8 +44,9 @@ static EDITSTYLE Styles_CMake[] = {
 	EDITSTYLE_DEFAULT,
 	{ SCE_CMAKE_WORD, NP2STYLE_Keyword, EDITSTYLE_HOLE(L"Keyword"), L"fore:#0000FF" },
 	{ SCE_CMAKE_COMMANDS, NP2STYLE_Command, EDITSTYLE_HOLE(L"Command"), L"fore:#FF8000" },
-	{ SCE_CMAKE_COMMENT, NP2STYLE_Comment, EDITSTYLE_HOLE(L"Comment"), L"fore:#608060" },
+	{ MULTI_STYLE(SCE_CMAKE_COMMENT, SCE_CMAKE_BLOCK_COMMENT, 0, 0), NP2STYLE_Comment, EDITSTYLE_HOLE(L"Comment"), L"fore:#608060" },
 	{ MULTI_STYLE(SCE_CMAKE_STRINGDQ, SCE_CMAKE_STRINGSQ, SCE_CMAKE_STRINGBT, 0), NP2STYLE_String, EDITSTYLE_HOLE(L"String"), L"fore:#008080" },
+	{ SCE_CMAKE_BRACKET_ARGUMENT, 63361, EDITSTYLE_HOLE(L"Bracket Argument"), L"fore:#648000" },
 	//{ SCE_CMAKE_NUMBER, NP2STYLE_Number, EDITSTYLE_HOLE(L"Number"), L"fore:#FF0000" },
 	{ SCE_CMAKE_VARIABLE, NP2STYLE_Variable, EDITSTYLE_HOLE(L"Variable"), L"fore:#CC3300" },
 	{ SCE_CMAKE_OPERATOR, NP2STYLE_Operator, EDITSTYLE_HOLE(L"Operator"), L"fore:#B000B0" },

@@ -907,7 +907,6 @@ static inline BOOL DidLexerHasBlockComment(int iLexer, int rid) {
 	return !(iLexer == SCLEX_NULL
 		|| iLexer == SCLEX_BASH
 		|| iLexer == SCLEX_BATCH
-		|| iLexer == SCLEX_CMAKE
 		|| iLexer == SCLEX_CONF
 		|| iLexer == SCLEX_DIFF
 		|| iLexer == SCLEX_LLVM
