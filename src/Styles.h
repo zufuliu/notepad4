@@ -44,7 +44,7 @@
 extern PEDITLEXER pLexCurrent;
 extern int np2LexLangIndex;
 extern BOOL bUse2ndGlobalStyle;
-extern int fUseDefaultCodeStyle;
+extern int np2StyleTheme;
 extern BOOL bCurrentLexerHasLineComment;
 extern BOOL bCurrentLexerHasBlockComment;
 extern UINT8 currentLexKeywordAttr[NUMKEYWORD];
@@ -56,6 +56,7 @@ BOOL	Style_Import(HWND hwnd);
 BOOL	Style_Export(HWND hwnd);
 
 void	Style_OnDPIChanged(HWND hwnd);
+void	Style_OnStyleThemeChanged(HWND hwnd, int theme);
 void	Style_SetLexer(HWND hwnd, PEDITLEXER pLexNew);
 void	Style_SetLexerFromFile(HWND hwnd, LPCWSTR lpszFile);
 void	Style_SetLexerFromName(HWND hwnd, LPCWSTR lpszFile, LPCWSTR lpszName);

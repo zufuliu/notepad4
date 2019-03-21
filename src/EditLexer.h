@@ -18,6 +18,12 @@
 #define MAX_EDITLEXER_NAME_SIZE		128
 #define MAX_EDITSTYLE_NAME_SIZE		128
 
+enum {
+	StyleTheme_Default = 0,
+	StyleTheme_Dark = 1,
+	StyleTheme_Max = StyleTheme_Dark,
+};
+
 #ifndef _INC_WINDOWS
 typedef wchar_t * LPWSTR;
 typedef const wchar_t * LPCWSTR;
@@ -55,6 +61,7 @@ typedef struct _editlexer {
 	const int iLexer;
 	const int rid;
 	struct {
+		BYTE bStyleTheme;
 		BYTE bStyleChanged;
 		BYTE bUseDefaultCodeStyle;
 		const BYTE bUseDefaultCodeStyle_Default;
@@ -71,8 +78,8 @@ typedef struct _editlexer {
 
 typedef const EDITLEXER *LPCEDITLEXER;
 
-#define EDITLEXER_HOLE(name, style)	{ 0, 1, 1, COUNTOF(style), CSTRLEN(name), (name), NULL, NULL }
-#define EDITLEXER_TEXT(name, style)	{ 0, 0, 0, COUNTOF(style), CSTRLEN(name), (name), NULL, NULL }
+#define EDITLEXER_HOLE(name, style)	{ StyleTheme_Default, 0, 1, 1, COUNTOF(style), CSTRLEN(name), (name), NULL, NULL }
+#define EDITLEXER_TEXT(name, style)	{ StyleTheme_Default, 0, 0, 0, COUNTOF(style), CSTRLEN(name), (name), NULL, NULL }
 
 // NP2LEX_, rid for EDITLEXER
 #define NP2LEX_TEXTFILE	63000	// SCLEX_NULL		Text File

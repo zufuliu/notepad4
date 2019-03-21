@@ -456,6 +456,11 @@ BEGIN
 		MENUITEM "&Customize Schemes...\tCtrl+F12",	IDM_VIEW_SCHEMECONFIG
 		MENUITEM "Use &2nd Global Styles\tShift+F12",IDM_VIEW_USE2NDGLOBALSTYLE
 		MENUITEM "&Use Default Code Style",			IDM_VIEW_USEDEFAULT_CODESTYLE
+		POPUP "St&yle Theme"
+		BEGIN
+			MENUITEM "&Default",					IDM_VIEW_STYLE_THEME_DEFAULT
+			MENUITEM "Dar&k",						IDM_VIEW_STYLE_THEME_DARK
+		END
 		MENUITEM SEPARATOR
 		POPUP "&Text File"
 		BEGIN
@@ -491,7 +496,7 @@ BEGIN
 			MENUITEM "&C Shell",					IDM_LANG_CSHELL
 			MENUITEM "&M4 Macro",					IDM_LANG_M4
 		END
-		// "S&QL Dialect"
+		//POPUP "S&QL Dialect"
 		POPUP "&XML Document"
 		BEGIN
 			MENUITEM "&XML Document",				IDM_LANG_XML
