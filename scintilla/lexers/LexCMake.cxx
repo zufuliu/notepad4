@@ -30,14 +30,43 @@ static constexpr bool IsCmakeOperator(int ch) noexcept {
 	return ch == '(' || ch == ')' || ch == '=' || ch == ':' || ch == ';';
 }
 
+static bool IsBracketArgument(Accessor &styler, Sci_PositionU pos, bool start, int &bracketNumber) noexcept {
+	int offset = 0;
+	++pos; // bracket
+	while (styler.SafeGetCharAt(pos) == '=') {
+		++offset;
+		++pos;
+	}
+
+	const char ch = styler.SafeGetCharAt(pos);
+	if (start) {
+		if (ch == '[') {
+			bracketNumber = offset;
+			return true;
+		}
+	} else {
+		if (ch == ']' && offset == bracketNumber) {
+			return true;
+		}
+	}
+	return false;
+}
+
 static void ColouriseCmakeDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
 	const WordList &keywords = *keywordLists[0];
 	const WordList &keywords2 = *keywordLists[1];
 
 	int varStyle = SCE_CMAKE_DEFAULT;
-	static int nvarLevel = 0; // nested variable ${${}}
+	int nvarLevel = 0; // nested variable ${${}}
+	int bracketNumber = 0;
 	int userDefType = 0;
 	StyleContext sc(startPos, length, initStyle, styler);
+
+	if (sc.currentLine > 0) {
+		const int lineState = styler.GetLineState(sc.currentLine - 1);
+		nvarLevel = lineState & 0xffff;
+		bracketNumber = lineState >> 16;
+	}
 
 	while (sc.More()) {
 		// Determine if the current state should terminate.
@@ -72,9 +101,15 @@ static void ColouriseCmakeDoc(Sci_PositionU startPos, Sci_Position length, int i
 				sc.SetState(SCE_CMAKE_DEFAULT);
 			}
 			break;
+		case SCE_CMAKE_BLOCK_COMMENT:
+			if (sc.chPrev == ']' && sc.ch == ']') {
+				sc.ForwardSetState(SCE_CMAKE_DEFAULT);
+			}
+			break;
 		case SCE_CMAKE_STRINGDQ:
 		case SCE_CMAKE_STRINGSQ:
 		case SCE_CMAKE_STRINGBT:
+		case SCE_CMAKE_BRACKET_ARGUMENT:
 			if (sc.ch == '\\' && (sc.chNext == '\\' || sc.chNext == '\"' || sc.chNext == '\'')) {
 				sc.Forward();
 			} else if (sc.Match('$', '{')) {
@@ -87,6 +122,12 @@ static void ColouriseCmakeDoc(Sci_PositionU startPos, Sci_Position length, int i
 				|| (sc.state == SCE_CMAKE_STRINGBT && sc.ch == '`')
 				) {
 				sc.ForwardSetState(SCE_CMAKE_DEFAULT);
+			} else if (sc.state == SCE_CMAKE_BRACKET_ARGUMENT && sc.ch == ']') {
+				if (IsBracketArgument(styler, sc.currentPos, false, bracketNumber)) {
+					sc.Forward(1 + bracketNumber);
+					sc.ForwardSetState(SCE_CMAKE_DEFAULT);
+					bracketNumber = 0;
+				}
 			}
 			break;
 		case SCE_CMAKE_VARIABLE:
@@ -110,7 +151,17 @@ static void ColouriseCmakeDoc(Sci_PositionU startPos, Sci_Position length, int i
 		if (sc.state == SCE_CMAKE_DEFAULT) {
 			varStyle = SCE_CMAKE_DEFAULT;
 			if (sc.ch == '#') {
-				sc.SetState(SCE_CMAKE_COMMENT);
+				if (sc.chNext == '[' && sc.GetRelative(2) == '[') {
+					sc.SetState(SCE_CMAKE_BLOCK_COMMENT);
+					sc.Forward(2);
+				} else {
+					sc.SetState(SCE_CMAKE_COMMENT);
+				}
+			} else if (sc.ch == '[') {
+				if (IsBracketArgument(styler, sc.currentPos, true, bracketNumber)) {
+					sc.SetState(SCE_CMAKE_BRACKET_ARGUMENT);
+					sc.Forward(2 + bracketNumber);
+				}
 			} else if (sc.ch == '/' && sc.chNext == '/') { // CMakeCache.txt
 				sc.SetState(SCE_CMAKE_COMMENT);
 			} else if (sc.ch == '\\' && (sc.chNext == '\"' || sc.chNext == '\'')) {
@@ -134,6 +185,9 @@ static void ColouriseCmakeDoc(Sci_PositionU startPos, Sci_Position length, int i
 			}
 		}
 
+		if (sc.atLineEnd) {
+			styler.SetLineState(sc.currentLine, (bracketNumber << 16) | nvarLevel);
+		}
 		sc.Forward();
 	}
 
@@ -142,6 +196,10 @@ static void ColouriseCmakeDoc(Sci_PositionU startPos, Sci_Position length, int i
 
 #define IsCommentLine(line)		IsLexCommentLine(line, styler, SCE_CMAKE_COMMENT)
 #define CMakeMatch(str)			LexMatchIgnoreCase(i, styler, str)
+
+static constexpr bool IsStreamCommentStyle(int style) noexcept {
+	return style == SCE_CMAKE_BLOCK_COMMENT || style == SCE_CMAKE_BRACKET_ARGUMENT;
+}
 
 static void FoldCmakeDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList, Accessor &styler) {
 	if (styler.GetPropertyInt("fold") == 0)
@@ -174,6 +232,13 @@ static void FoldCmakeDoc(Sci_PositionU startPos, Sci_Position length, int initSt
 				levelNext++;
 			else if (IsCommentLine(lineCurrent - 1) && !IsCommentLine(lineCurrent + 1))
 				levelNext--;
+		}
+		if (foldComment && IsStreamCommentStyle(style)) {
+			if (!IsStreamCommentStyle(stylePrev)) {
+				levelNext++;
+			} else if (!IsStreamCommentStyle(styleNext) && !atEOL) {
+				levelNext--;
+			}
 		}
 
 		if (style == SCE_CMAKE_OPERATOR) {

@@ -1617,6 +1617,10 @@ void EditToggleCommentBlock(HWND hwnd) {
 		EditEncloseSelectionNewLine(hwnd, L"#cs", L"#ce");
 		break;
 
+	case SCLEX_CMAKE:
+		EditEncloseSelection(hwnd, L"#[[", L"]]");
+		break;
+
 	case SCLEX_CPP:
 		switch (pLexCurrent->rid) {
 		case NP2LEX_AWK:
