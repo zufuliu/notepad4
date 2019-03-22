@@ -94,15 +94,27 @@ static void ColouriseJSONDoc(Sci_PositionU startPos, Sci_Position length, int in
 				buf[wordLen++] = static_cast<char>(ch);
 			}
 			break;
-		case SCE_C_STRING:
+		case SCE_C_STRINGEOL:
 			if (atLineStart) {
 				styler.ColourTo(i - 1, state);
 				state = SCE_C_DEFAULT;
+			}
+			break;
+		case SCE_C_STRING:
+		case SCE_C_CHARACTER:
+			if (atEOL) {
+				int chPrev = styler.SafeGetCharAt(i - 1);
+				if (ch == '\n' && chPrev == '\r') {
+					chPrev = styler.SafeGetCharAt(i - 2);
+				}
+				if (chPrev != '\\') {
+					state = SCE_C_STRINGEOL;
+				}
 			} else if (ch == '\\' && (chNext == '\\' || chNext == '\"')) {
 				i++;
 				ch = chNext;
 				chNext = styler.SafeGetCharAt(i + 1);
-			} else if (ch == '\"') {
+			} else if ((state == SCE_C_STRING && ch == '\"') || (state == SCE_C_CHARACTER && ch == '\'')) {
 				Sci_PositionU pos = i + 1;
 				while (IsASpace(styler.SafeGetCharAt(pos++)));
 				if (styler[pos - 1] == ':') {
@@ -145,6 +157,9 @@ static void ColouriseJSONDoc(Sci_PositionU startPos, Sci_Position length, int in
 			} else if (ch == '\"') {
 				styler.ColourTo(i - 1, state);
 				state = SCE_C_STRING;
+			} else if (ch == '\'') {
+				styler.ColourTo(i - 1, state);
+				state = SCE_C_CHARACTER;
 			} else if (IsADigit(ch) || (ch == '.' && IsADigit(chNext))) {
 				styler.ColourTo(i - 1, state);
 				state = SCE_C_NUMBER;
