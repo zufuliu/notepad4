@@ -137,7 +137,7 @@ public:
 	};
 	selTypes selType;
 
-	Selection();
+	Selection() noexcept;
 	~Selection();
 	bool IsRectangular() const noexcept;
 	Sci::Position MainCaret() const;

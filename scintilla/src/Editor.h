@@ -273,7 +273,7 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	bool convertPastes;
 
 	Editor();
-	~Editor() override;
+	// ~Editor() in public section
 	virtual void Initialise() noexcept = 0;
 	virtual void Finalise() noexcept;
 
@@ -630,6 +630,8 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	static sptr_t BytesResult(sptr_t lParam, const unsigned char *val, size_t len) noexcept;
 
 public:
+	~Editor() override;
+
 	// Deleted so Editor objects can not be copied.
 	Editor(const Editor &) = delete;
 	Editor(Editor &&) = delete;
