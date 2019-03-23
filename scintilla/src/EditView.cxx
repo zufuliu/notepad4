@@ -1280,8 +1280,9 @@ void EditView::DrawFoldDisplayText(Surface *surface, const EditModel &model, con
 		if (model.foldDisplayTextStyle == SC_FOLDDISPLAYTEXT_BOXED) {
 			surface->PenColour(textFore);
 			PRectangle rcBox = rcSegment;
-			rcBox.left = round(rcSegment.left);
-			rcBox.right = round(rcSegment.right);
+			rcBox.top += 1;
+			rcBox.left = floor(rcSegment.left);
+			rcBox.right = ceil(rcSegment.right);
 			const IntegerRectangle ircBox(rcBox);
 			surface->MoveTo(ircBox.left, ircBox.top);
 			surface->LineTo(ircBox.left, ircBox.bottom);
