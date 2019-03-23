@@ -271,8 +271,9 @@ const char* GetFoldDisplayEllipsis(UINT cpEdit, UINT acp) {
 		return "...";
 	case 936: // GBK
 	case 949: // UHC
-	case 950: // Big5
 		return "\xA1\xA4\xA1\xA4\xA1\xA4";
+	case 950: // Big5
+		return "\xA1\x50\xA1\x50\xA1\x50";
 	case 1361: // Johab
 		return "\xD9\x34\xD9\x34\xD9\x34";
 	}
