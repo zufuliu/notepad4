@@ -22,6 +22,7 @@ static EDITSTYLE Styles_Global[] = {
 	{ SCI_SETEDGECOLOUR, 63110, EDITSTYLE_HOLE(L"Long Line Marker"), L"fore:#FFC000" },
 	{ SCI_SETEXTRAASCENT + SCI_SETEXTRADESCENT, 63111, EDITSTYLE_HOLE(L"Extra Line Spacing"), L"size:2" },
 	{ 0, 63112, EDITSTYLE_HOLE(L"Folding Marker"), L"fore:#8080FF; back:#ADD8E6" },
+	{ STYLE_FOLDDISPLAYTEXT, 63114, EDITSTYLE_HOLE(L"Fold Ellipsis"), L"font:$(Code); size:-2; bold; fore:#808080" },
 	{ 0, 63113, EDITSTYLE_HOLE(L"Mark Occurrences"), L"alpha:100" },
 };
 
@@ -40,6 +41,7 @@ static EDITSTYLE Styles_2ndGlobal[] = {
 	{ SCI_SETEDGECOLOUR, 63110, EDITSTYLE_HOLE(L"Long Line Marker"), L"fore:#605F63" },
 	{ SCI_SETEXTRAASCENT + SCI_SETEXTRADESCENT, 63111, EDITSTYLE_HOLE(L"Extra Line Spacing"), L"size:2" },
 	{ 0, 63112, EDITSTYLE_HOLE(L"Folding Marker"), L"fore:#808080; back:#606060" },
+	{ STYLE_FOLDDISPLAYTEXT, 63114, EDITSTYLE_HOLE(L"Fold Ellipsis"), L"font:$(Code); size:-2; bold; fore:#606060" },
 	{ 0, 63113, EDITSTYLE_HOLE(L"Mark Occurrences"), L"alpha:100" },
 };
 

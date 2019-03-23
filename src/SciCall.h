@@ -287,6 +287,18 @@ NP2_inline void SciCall_ToggleFold(int line) {
 	SciCall1(SCI_TOGGLEFOLD, line);
 }
 
+NP2_inline void SciCall_ToggleFoldShowText(int line, const char *text) {
+	SciCall2(SCI_TOGGLEFOLDSHOWTEXT, line, (LPARAM)text);
+}
+
+NP2_inline void EditSetDefaultFoldDisplayText(const char *text) {
+	SciCall2(SCI_TOGGLEFOLDSHOWTEXT, (WPARAM)(-1), (LPARAM)text);
+}
+
+NP2_inline void SciCall_FoldDisplayTextSetStyle(int style) {
+	SciCall1(SCI_FOLDDISPLAYTEXTSETSTYLE, style);
+}
+
 NP2_inline void SciCall_EnsureVisible(int line) {
 	SciCall1(SCI_ENSUREVISIBLE, line);
 }

@@ -423,6 +423,7 @@ BEGIN
 		BEGIN
 			MENUITEM "Show Code &Folding\tCtrl+Shift+Alt+F",IDM_VIEW_SHOW_FOLDING
 			MENUITEM "Show Folding &Line",			IDM_VIEW_SHOW_FOLDING_LINE
+			MENUITEM "Show Fold &Ellipsis",			IDM_VIEW_FOLD_DISPALY_TEXT
 		END
 		POPUP "&Toggle Folds"
 		BEGIN
