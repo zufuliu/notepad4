@@ -51,7 +51,7 @@ protected:
 #endif
 
 	ScintillaBase() noexcept;
-	~ScintillaBase() override;
+	// ~ScintillaBase() in public section
 	void Initialise() noexcept override {}
 	void Finalise() noexcept override;
 
@@ -84,6 +84,8 @@ protected:
 	void NotifyLexerChanged(Document *doc, void *userData) override;
 
 public:
+	~ScintillaBase() override;
+
 	// Deleted so ScintillaBase objects can not be copied.
 	ScintillaBase(const ScintillaBase &) = delete;
 	ScintillaBase(ScintillaBase &&) = delete;

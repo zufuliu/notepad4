@@ -131,7 +131,7 @@ Used by VSCode, Atom etc.
 // Two idle messages SC_WIN_IDLE and SC_WORK_IDLE.
 
 // SC_WIN_IDLE is low priority so should occur after the next WM_PAINT
-// It is for lengthy actions like wrapping and background styling 
+// It is for lengthy actions like wrapping and background styling
 constexpr UINT SC_WIN_IDLE = 5001;
 // SC_WORK_IDLE is high priority and should occur before the next WM_PAINT
 // It is for shorter actions like restyling the text just inserted
@@ -378,7 +378,7 @@ class ScintillaWin :
 #endif
 
 	explicit ScintillaWin(HWND hwnd);
-	~ScintillaWin() override;
+	// ~ScintillaWin() in public section
 
 	void Init();
 	void Finalise() noexcept override;
@@ -485,6 +485,8 @@ class ScintillaWin :
 	sptr_t GetText(uptr_t wParam, sptr_t lParam);
 
 public:
+	~ScintillaWin() override;
+
 	// Deleted so ScintillaWin objects can not be copied.
 	ScintillaWin(const ScintillaWin &) = delete;
 	ScintillaWin(ScintillaWin &&) = delete;
@@ -731,8 +733,9 @@ HWND ScintillaWin::MainHWND() const noexcept {
 }
 
 bool ScintillaWin::DragThreshold(Point ptStart, Point ptNow) noexcept {
-	const int xMove = static_cast<int>(std::abs(ptStart.x - ptNow.x));
-	const int yMove = static_cast<int>(std::abs(ptStart.y - ptNow.y));
+	const Point ptDifference = ptStart - ptNow;
+	const XYPOSITION xMove = std::trunc(std::abs(ptDifference.x));
+	const XYPOSITION yMove = std::trunc(std::abs(ptDifference.y));
 	return (xMove > GetSystemMetricsEx(SM_CXDRAG)) ||
 		(yMove > GetSystemMetricsEx(SM_CYDRAG));
 }
@@ -959,7 +962,7 @@ sptr_t ScintillaWin::WndPaint() {
 	// Redirect assertions to debug output and save current state
 	const bool assertsPopup = Platform::ShowAssertionPopUps(false);
 	paintState = painting;
-	PAINTSTRUCT ps;
+	PAINTSTRUCT ps = {};
 
 	// Removed since this interferes with reporting other assertions as it occurs repeatedly
 	//PLATFORM_ASSERT(hRgnUpdate == nullptr);
@@ -1546,7 +1549,7 @@ sptr_t ScintillaWin::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam
 
 			// Windows might send WM_MOUSEMOVE even though the mouse has not been moved:
 			// https://blogs.msdn.com/b/oldnewthing/archive/2003/10/01/55108.aspx
-			if (ptMouseLast.x != pt.x || ptMouseLast.y != pt.y) {
+			if (ptMouseLast != pt) {
 				SetTrackMouseLeaveEvent(true);
 				ButtonMoveWithModifiers(pt, ::GetMessageTime(), MouseModifiers(wParam));
 			}
@@ -2178,7 +2181,7 @@ public:
 				return 1;
 			}
 
-			unsigned int lenFlat = 0;
+			size_t lenFlat = 0;
 			for (size_t mixIndex = 0; mixIndex < nUtf16Mixed; mixIndex++) {
 				if ((lenFlat + 20) > utf16Folded.size())
 					utf16Folded.resize(lenFlat + 60);
@@ -2452,9 +2455,8 @@ void ScintillaWin::Paste(bool asBinary) {
 				if (IsUnicodeMode()) {
 					std::vector<wchar_t> uptr(len + 1);
 
-					const int ilen = static_cast<int>(len);
 					const size_t ulen = WideCharFromMultiByte(CP_ACP,
-						std::string_view(ptr, ilen), uptr.data(), ilen + 1);
+						std::string_view(ptr, len), uptr.data(), len + 1);
 
 					const std::wstring_view wsv(uptr.data(), ulen);
 					const size_t mlen = UTF8Length(wsv);
@@ -2903,7 +2905,7 @@ void ScintillaWin::CopyToClipboard(const SelectionText &selectedText) {
 			const UINT cpSrc = CodePageFromCharSet(
 				selectedText.characterSet, selectedText.codePage);
 			const std::string_view svSelected(selectedText.Data(), selectedText.LengthWithTerminator());
-			const int uLen = WideCharLenFromMultiByte(cpSrc, svSelected);
+			const size_t uLen = WideCharLenFromMultiByte(cpSrc, svSelected);
 			uniText.Allocate(2 * uLen);
 			if (uniText) {
 				WideCharFromMultiByte(cpSrc, svSelected,

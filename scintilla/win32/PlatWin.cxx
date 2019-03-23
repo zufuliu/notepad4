@@ -255,13 +255,6 @@ inline void SetWindowPointer(HWND hWnd, void *ptr) noexcept {
 	::SetWindowLongPtr(hWnd, 0, reinterpret_cast<LONG_PTR>(ptr));
 }
 
-std::wstring WStringFromUTF8(std::string_view sv) {
-	const size_t uchars = UTF16Length(sv);
-	std::wstring retVal(uchars, 0);
-	UTF16FromUTF8(sv, static_cast<wchar_t *>(retVal.data()), uchars);
-	return retVal;
-}
-
 CRITICAL_SECTION crPlatformLock;
 HINSTANCE hinstPlatformRes {};
 
@@ -2872,9 +2865,7 @@ void ListBoxX::ResizeToCursor() {
 	PRectangle rc = GetPosition();
 	POINT ptw;
 	::GetCursorPos(&ptw);
-	Point pt = Point::FromInts(ptw.x, ptw.y);
-	pt.x += dragOffset.x;
-	pt.y += dragOffset.y;
+	const Point pt = Point::FromInts(ptw.x, ptw.y) + dragOffset;
 
 	switch (resizeHit) {
 	case HTLEFT:
