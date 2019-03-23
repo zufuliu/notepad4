@@ -181,11 +181,12 @@ SET "TEMP_ZIP_DIR=temp_zip_dir"
 IF EXIST "%TEMP_ZIP_DIR%"     RD /S /Q "%TEMP_ZIP_DIR%"
 IF NOT EXIST "%TEMP_ZIP_DIR%" MD "%TEMP_ZIP_DIR%"
 
-FOR %%A IN ( "..\License.txt"  "%1\Notepad2.exe"  "%1\metapath.exe" "..\doc\Notepad2.ini"  "..\doc\Notepad2.reg" "..\metapath\doc\metapath.ini"
+FOR %%A IN ( "..\License.txt"  "%1\Notepad2.exe"  "%1\metapath.exe" "..\doc\Notepad2.ini" "..\doc\Notepad2.reg" "..\metapath\doc\metapath.ini"
 ) DO COPY /Y /B /V "%%A" "%TEMP_ZIP_DIR%\"
+COPY /Y /B /V "..\doc\Notepad2 DarkTheme.ini" "%TEMP_ZIP_DIR%\"
 
 PUSHD "%TEMP_ZIP_DIR%"
-"%SEVENZIP%" a -tzip -mx=9 "../%ZIP_NAME%.zip" "License.txt" "Notepad2.exe" "metapath.exe" "Notepad2.ini" "Notepad2.reg" "metapath.ini" >NUL
+"%SEVENZIP%" a -tzip -mx=9 "../%ZIP_NAME%.zip" "License.txt" "Notepad2.exe" "metapath.exe" "Notepad2.ini" "Notepad2 DarkTheme.ini" "Notepad2.reg" "metapath.ini" >NUL
 POPD
 
 IF %ERRORLEVEL% NEQ 0 CALL :SUBMSG "ERROR" "Compilation failed!"
