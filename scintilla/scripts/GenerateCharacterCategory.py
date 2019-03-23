@@ -11,6 +11,10 @@ import math
 from FileGenerator import Regenerate
 from splitbins import *
 
+UnicodeCharacterCount = sys.maxunicode + 1
+BMPCharacterCharacterCount = 0xffff + 1
+DBCSCharacterCount = 0xffff + 1
+
 class CharClassify(IntEnum):
 	ccSpace = 0
 	ccNewLine = 1
@@ -143,7 +147,7 @@ CJKBlockList = [
 ]
 
 def findCategories(filename):
-	with codecs.open(filename, "r", "UTF-8") as infile:
+	with open(filename, "r", "UTF-8") as infile:
 		lines = [x.strip() for x in infile.readlines() if "\tcc" in x]
 	values = "".join(lines).replace(" ","").split(",")
 	print(values)
@@ -166,19 +170,111 @@ def updateCharacterCategory(filename):
 
 	startRange = 0
 	category = unicodedata.category(chr(startRange))
+	table = []
 	for ch in range(sys.maxunicode):
 		uch = chr(ch)
 		current = unicodedata.category(uch)
 		if current != category:
 			value = startRange * 32 + categories.index(category)
-			values.append("%d," % value)
+			table.append(value)
 			category = current
 			startRange = ch
 	value = startRange * 32 + categories.index(category)
-	values.append("%d," % value)
+	table.append(value)
+
+	# the sentinel value is used to simplify CharacterMap::Optimize()
+	category = 'Cn'
+	value = (sys.maxunicode + 1)*32 + categories.index(category)
+	table.append(value)
 
 	print('catRanges:', len(values), 4*len(values)/1024, math.ceil(math.log2(len(values))))
+	values.extend(["%d," % value for value in table])
 	Regenerate(filename, "//", values)
+
+def bytesToHex(b):
+	return ''.join('\\x%02X' % ch for ch in b)
+
+def buildFoldDisplayEllipsis():
+	# Interpunct / middle dot, https://en.wikipedia.org/wiki/Interpunct
+	defaultText = '\u00B7' * 3
+	fallbackText = '.' * 3
+
+	# DBCS
+	encodingList = [
+		('cp932', 932, 'Shift_JIS'),
+		('cp936', 936, 'GBK'),
+		('cp949', 949, 'UHC'),
+		('cp949', 950, 'Big5'),
+		('cp1361', 1361, 'Johab'),
+	]
+
+	result = OrderedDict()
+	for encoding, codepage, comment in encodingList:
+		try:
+			value = defaultText.encode(encoding)
+			value = bytesToHex(value)
+		except UnicodeEncodeError:
+			value = fallbackText
+
+		values = result.setdefault(value, [])
+		values.append((codepage, comment))
+
+	utf8Text = defaultText.encode('utf-8');
+	utf8Text = bytesToHex(utf8Text)
+
+	output = []
+	output.append("const char* GetFoldDisplayEllipsis(UINT cpEdit, UINT acp) {")
+	output.append("\tswitch (cpEdit) {")
+	output.append("\tcase SC_CP_UTF8:")
+	output.append('\t\treturn "%s";' % utf8Text)
+	for key, values in result.items():
+		for codepage, comment in values:
+			output.append("\tcase %d: // %s" % (codepage, comment))
+		output.append('\t\treturn "%s";' % key)
+	output.append("\t}")
+
+	encodingList = [
+		('cp1250', 1250, 'Central European (Windows-1250)'),
+		('cp1251', 1251, 'Cyrillic (Windows-1251)'),
+		('cp1252', 1252, 'Western European (Windows-1252)'),
+		('cp1253', 1253, 'Greek (Windows-1253)'),
+		('cp1254', 1254, 'Turkish (Windows-1254)'),
+		('cp1255', 1255, 'Hebrew (Windows-1255)'),
+		('cp1256', 1256, 'Arabic (Windows-1256)'),
+		('cp1257', 1257, 'Baltic (Windows-1257)'),
+		('cp1258', 1258, 'Vietnamese (Windows-1258)'),
+		('cp874', 874, 'Thai (Windows-874)'),
+	]
+
+	result = OrderedDict()
+	fallback = []
+	for encoding, codepage, comment in encodingList:
+		try:
+			value = defaultText.encode(encoding)
+			value = bytesToHex(value)
+		except UnicodeEncodeError:
+			fallback.append((codepage, comment))
+			continue
+
+		values = result.setdefault(value, [])
+		values.append((codepage, comment))
+
+	fallback.append(('default', ''))
+	result[fallbackText] = fallback
+
+	output.append("\t// SBCS")
+	output.append("\tswitch (acp) {")
+	for key, values in result.items():
+		for codepage, comment in values:
+			if codepage == 'default':
+				output.append("\tdefault:")
+			else:
+				output.append("\tcase %d: // %s" % (codepage, comment))
+		output.append('\t\treturn "%s";' % key)
+	output.append("\t}")
+	output.append("}")
+
+	return output
 
 def getCharClassify(decode, ch):
 	try:
@@ -259,7 +355,8 @@ def buildANSICharClassifyTable(filename):
 		output.append(', '.join('0x%02X' % ch for ch in data[:16]) + ',')
 		if len(data) > 16:
 			output.append(', '.join('0x%02X' % ch for ch in data[16:]) + ',')
-	output.append("};\n")
+	output.append("};")
+	output.append("")
 
 	output.append("static const UINT8* GetANSICharClassifyTable(UINT cp, int *length) {")
 	output.append("\tswitch (cp) {")
@@ -273,6 +370,10 @@ def buildANSICharClassifyTable(filename):
 	output.append("\t\treturn NULL;")
 	output.append("\t}")
 	output.append("}")
+
+	output.append("")
+	ellipsis = buildFoldDisplayEllipsis()
+	output.extend(ellipsis)
 
 	print('ANSICharClassifyTable:', len(result), len(encodingList))
 	Regenerate(filename, "//", output)
@@ -404,9 +505,6 @@ def runLengthEncode(head, indexTable, valueBit, totalBit=16):
 	return output
 
 def updateCharClassifyTable(filename, headfile):
-	UnicodeCharacterCount = sys.maxunicode + 1
-	BMPCharacterCharacterCount = 0xffff + 1
-
 	indexTable = [0] * UnicodeCharacterCount
 	for ch in range(UnicodeCharacterCount):
 		uch = chr(ch)
@@ -456,9 +554,8 @@ def updateCharClassifyTable(filename, headfile):
 def updateCharacterCategoryTable(filename):
 	categories = findCategories("../lexlib/CharacterCategory.h")
 
-	maxUnicode = sys.maxunicode + 1
-	indexTable = [0] * maxUnicode
-	for ch in range(maxUnicode):
+	indexTable = [0] * UnicodeCharacterCount
+	for ch in range(UnicodeCharacterCount):
 		uch = chr(ch)
 		category = unicodedata.category(uch)
 		value = categories.index(category)
@@ -509,7 +606,6 @@ def getDBCSCharClassify(decode, ch, isReservedOrUDC=None):
 	return int(cc)
 
 def makeDBCSCharClassifyTable(output, encodingList, isReservedOrUDC=None):
-	DBCSCharacterCount = 0xffff + 1
 	result = {}
 
 	for cp in encodingList:

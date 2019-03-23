@@ -27,6 +27,8 @@
 
 using namespace Scintilla;
 
+#define EnablePerLineFoldDisplayText	0
+
 namespace {
 
 template <typename LINE>
@@ -35,8 +37,11 @@ class ContractionState final : public IContractionState {
 	std::unique_ptr<RunStyles<LINE, char>> visible;
 	std::unique_ptr<RunStyles<LINE, char>> expanded;
 	std::unique_ptr<RunStyles<LINE, int>> heights;
+#if EnablePerLineFoldDisplayText
 	std::unique_ptr<SparseVector<UniqueString>> foldDisplayTexts;
+#endif
 	std::unique_ptr<Partitioning<LINE>> displayLines;
+	UniqueString defaultFoldDisplayText;
 	LINE linesInDocument;
 
 	void EnsureData();
@@ -97,6 +102,7 @@ ContractionState<LINE>::ContractionState() noexcept : linesInDocument(1) {
 template <typename LINE>
 ContractionState<LINE>::~ContractionState() {
 	Clear();
+	defaultFoldDisplayText.reset();
 }
 
 template <typename LINE>
@@ -105,7 +111,9 @@ void ContractionState<LINE>::EnsureData() {
 		visible = std::make_unique<RunStyles<LINE, char>>();
 		expanded = std::make_unique<RunStyles<LINE, char>>();
 		heights = std::make_unique<RunStyles<LINE, int>>();
+#if EnablePerLineFoldDisplayText
 		foldDisplayTexts = std::make_unique<SparseVector<UniqueString>>();
+#endif
 		displayLines = std::make_unique<Partitioning<LINE>>(4);
 		InsertLines(0, linesInDocument);
 	}
@@ -123,8 +131,10 @@ void ContractionState<LINE>::InsertLine(Sci::Line lineDoc) {
 		expanded->SetValueAt(lineDocCast, 1);
 		heights->InsertSpace(lineDocCast, 1);
 		heights->SetValueAt(lineDocCast, 1);
+#if EnablePerLineFoldDisplayText
 		foldDisplayTexts->InsertSpace(lineDocCast, 1);
 		foldDisplayTexts->SetValueAt(lineDocCast, nullptr);
+#endif
 		const Sci::Line lineDisplay = DisplayFromDoc(lineDoc);
 		displayLines->InsertPartition(lineDocCast, static_cast<LINE>(lineDisplay));
 		displayLines->InsertText(lineDocCast, 1);
@@ -144,7 +154,9 @@ void ContractionState<LINE>::DeleteLine(Sci::Line lineDoc) {
 		visible->DeleteRange(lineDocCast, 1);
 		expanded->DeleteRange(lineDocCast, 1);
 		heights->DeleteRange(lineDocCast, 1);
+#if EnablePerLineFoldDisplayText
 		foldDisplayTexts->DeletePosition(lineDocCast);
+#endif
 	}
 }
 
@@ -153,7 +165,9 @@ void ContractionState<LINE>::Clear() noexcept {
 	visible.reset();
 	expanded.reset();
 	heights.reset();
+#if EnablePerLineFoldDisplayText
 	foldDisplayTexts.reset();
+#endif
 	displayLines.reset();
 	linesInDocument = 1;
 }
@@ -271,11 +285,19 @@ bool ContractionState<LINE>::HiddenLines() const noexcept {
 	}
 }
 
+#if EnablePerLineFoldDisplayText
 template <typename LINE>
 const char *ContractionState<LINE>::GetFoldDisplayText(Sci::Line lineDoc) const noexcept {
 	Check();
-	return foldDisplayTexts->ValueAt(lineDoc).get();
+	const char *text = foldDisplayTexts->ValueAt(lineDoc).get();
+	return text ? text : defaultFoldDisplayText.get();
 }
+#else
+template <typename LINE>
+const char *ContractionState<LINE>::GetFoldDisplayText(Sci::Line /*lineDoc*/) const noexcept {
+	return defaultFoldDisplayText.get();
+}
+#endif
 
 template <typename LINE>
 bool ContractionState<LINE>::GetFoldDisplayTextShown(Sci::Line lineDoc) const noexcept {
@@ -284,6 +306,16 @@ bool ContractionState<LINE>::GetFoldDisplayTextShown(Sci::Line lineDoc) const no
 
 template <typename LINE>
 bool ContractionState<LINE>::SetFoldDisplayText(Sci::Line lineDoc, const char *text) {
+	if (lineDoc < 0) {
+		const char *foldText = defaultFoldDisplayText.get();
+		if (!foldText || !text || 0 != strcmp(text, foldText)) {
+			defaultFoldDisplayText = UniqueStringCopy(text);
+			return true;
+		}
+		return false;
+	}
+
+#if EnablePerLineFoldDisplayText
 	EnsureData();
 	const char *foldText = foldDisplayTexts->ValueAt(lineDoc).get();
 	if (!foldText || !text || 0 != strcmp(text, foldText)) {
@@ -295,6 +327,9 @@ bool ContractionState<LINE>::SetFoldDisplayText(Sci::Line lineDoc, const char *t
 		Check();
 		return false;
 	}
+#else
+	return false;
+#endif
 }
 
 template <typename LINE>

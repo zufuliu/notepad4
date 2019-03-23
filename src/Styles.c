@@ -339,6 +339,7 @@ enum DefaultStyleIndex {
 	Style_LongLineMarker,	// standalone style. `fore`: edge line color, `back`: edge background color
 	Style_ExtraLineSpacing,	// standalone style. descent = `size`/2, ascent = `size` - descent
 	Style_FoldingMarker,	// standalone style. `fore`: folder line color, `back`: folder box fill color
+	Style_FoldDispalyText,	// inherited style.
 	Style_MarkOccurrences,	// standalone style. `fore`, `alpha`
 };
 
@@ -1224,6 +1225,8 @@ void Style_SetLexer(HWND hwnd, PEDITLEXER pLexNew) {
 		}
 		SciCall_MarkerSetFore(SC_MARKNUM_FOLDER, clrFill);
 		SciCall_MarkerSetFore(SC_MARKNUM_FOLDEREND, clrFill);
+
+		Style_SetDefaultStyle(hwnd, Style_FoldDispalyText);
 	} // end set folding style
 
 	if (SendMessage(hwnd, SCI_GETINDENTATIONGUIDES, 0, 0) != SC_IV_NONE) {
