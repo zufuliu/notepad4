@@ -268,7 +268,7 @@ const char* GetFoldDisplayEllipsis(UINT cpEdit, UINT acp) {
 	case SC_CP_UTF8:
 		return "\xC2\xB7\xC2\xB7\xC2\xB7";
 	case 932: // Shift_JIS
-		return "...";
+		return "\xA5\xA5\xA5";
 	case 936: // GBK
 	case 949: // UHC
 		return "\xA1\xA4\xA1\xA4\xA1\xA4";
