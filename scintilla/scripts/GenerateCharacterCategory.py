@@ -204,7 +204,7 @@ def buildFoldDisplayEllipsis():
 		('cp932', 932, 'Shift_JIS'),
 		('cp936', 936, 'GBK'),
 		('cp949', 949, 'UHC'),
-		('cp949', 950, 'Big5'),
+		('cp950', 950, 'Big5'),
 		('cp1361', 1361, 'Johab'),
 	]
 
