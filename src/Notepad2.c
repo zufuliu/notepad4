@@ -5478,11 +5478,9 @@ void LoadSettings(void) {
 //
 //
 void SaveSettings(BOOL bSaveSettingsNow) {
-	if (StrIsEmpty(szIniFile)) {
+	if (!CreateIniFile()) {
 		return;
 	}
-
-	CreateIniFile();
 
 	if (!bSaveSettings && !bSaveSettingsNow) {
 		IniSetBool(INI_SECTION_NAME_SETTINGS, L"SaveSettings", bSaveSettings);
@@ -6463,9 +6461,9 @@ BOOL CheckIniFile(LPWSTR lpszFile, LPCWSTR lpszModule) {
 	return FALSE;
 }
 
-BOOL CheckIniFileRedirect(LPWSTR lpszFile, LPCWSTR lpszModule) {
+BOOL CheckIniFileRedirect(LPWSTR lpszFile, LPCWSTR lpszModule, LPCWSTR redirectKey) {
 	WCHAR tch[MAX_PATH];
-	if (GetPrivateProfileString(INI_SECTION_NAME_NOTEPAD2, L"Notepad2.ini", L"", tch, COUNTOF(tch), lpszFile)) {
+	if (GetPrivateProfileString(INI_SECTION_NAME_NOTEPAD2, redirectKey, L"", tch, COUNTOF(tch), lpszFile)) {
 		if (CheckIniFile(tch, lpszModule)) {
 			lstrcpy(lpszFile, tch);
 		} else {
@@ -6515,8 +6513,8 @@ BOOL FindIniFile(void) {
 
 	if (bFound) {
 		// allow two redirections: administrator -> user -> custom
-		if (CheckIniFileRedirect(tchTest, tchModule)) {
-			CheckIniFileRedirect(tchTest, tchModule);
+		if (CheckIniFileRedirect(tchTest, tchModule, L"Notepad2.ini")) {
+			CheckIniFileRedirect(tchTest, tchModule, L"Notepad2.ini");
 		}
 		lstrcpy(szIniFile, tchTest);
 	} else {
@@ -6555,6 +6553,47 @@ BOOL TestIniFile(void) {
 	}
 
 	return TRUE;
+}
+
+void FindExtraIniFile(LPWSTR lpszIniFile, LPCWSTR defaultName, LPCWSTR redirectKey) {
+	WCHAR tchTest[MAX_PATH];
+	WCHAR tchModule[MAX_PATH];
+	GetModuleFileName(NULL, tchModule, COUNTOF(tchModule));
+	// replace exe name with default ini file name
+	PathRemoveFileSpec(tchModule);
+	PathAppend(tchModule, defaultName);
+
+	if (StrNotEmpty(lpszIniFile)) {
+		if (!CheckIniFile(lpszIniFile, tchModule)) {
+			ExpandEnvironmentStringsEx(lpszIniFile, MAX_PATH);
+			if (PathIsRelative(lpszIniFile)) {
+				lstrcpy(tchTest, tchModule);
+				PathRemoveFileSpec(tchTest);
+				PathAppend(tchTest, lpszIniFile);
+				lstrcpy(lpszIniFile, tchTest);
+			}
+		}
+		return;
+	}
+
+	lstrcpy(tchTest, tchModule);
+	BOOL bFound = CheckIniFile(tchTest, tchModule);
+
+	if (!bFound) {
+		lstrcpy(tchTest, defaultName);
+		bFound = CheckIniFile(tchTest, tchModule);
+	}
+
+	if (bFound) {
+		// allow two redirections: administrator -> user -> custom
+		if (CheckIniFileRedirect(tchTest, tchModule, redirectKey)) {
+			CheckIniFileRedirect(tchTest, tchModule, redirectKey);
+		}
+		lstrcpy(lpszIniFile, tchTest);
+	} else {
+		lstrcpy(lpszIniFile, tchModule);
+		PathRenameExtension(lpszIniFile, L".ini");
+	}
 }
 
 BOOL CreateIniFile(void) {

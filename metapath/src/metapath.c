@@ -2515,11 +2515,9 @@ void LoadSettings(void) {
 //
 //
 void SaveSettings(BOOL bSaveSettingsNow) {
-	if (StrIsEmpty(szIniFile)) {
+	if (!CreateIniFile()) {
 		return;
 	}
-
-	CreateIniFile();
 
 	if (!bSaveSettings && !bSaveSettingsNow) {
 		if (iStartupDir == 1) {

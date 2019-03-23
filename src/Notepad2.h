@@ -144,11 +144,12 @@ void ParseCommandLine(void);
 void LoadFlags(void);
 
 BOOL CheckIniFile(LPWSTR lpszFile, LPCWSTR lpszModule);
-BOOL CheckIniFileRedirect(LPWSTR lpszFile, LPCWSTR lpszModule);
+BOOL CheckIniFileRedirect(LPWSTR lpszFile, LPCWSTR lpszModule, LPCWSTR redirectKey);
 BOOL FindIniFile(void);
 BOOL TestIniFile(void);
 BOOL CreateIniFile(void);
 BOOL CreateIniFileEx(LPCWSTR lpszIniFile);
+void FindExtraIniFile(LPWSTR lpszIniFile, LPCWSTR defaultName, LPCWSTR redirectKey);
 
 void UpdateWindowTitle(void);
 void UpdateStatusbar(void);
