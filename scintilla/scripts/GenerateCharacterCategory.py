@@ -195,9 +195,10 @@ def bytesToHex(b):
 	return ''.join('\\x%02X' % ch for ch in b)
 
 def buildFoldDisplayEllipsis():
-	# Interpunct / middle dot, https://en.wikipedia.org/wiki/Interpunct
-	defaultText = '\u00B7' * 3
-	fallbackText = '.' * 3
+	# Interpunct https://en.wikipedia.org/wiki/Interpunct
+	defaultText = '\u00B7' * 3	# U+00B7 Middle Dot
+	fallbackText = '.' * 3		# U+002E Full Stop
+	fallbackJIS = '\uFF65' * 3	# U+FF65 Halfwidth Katakana Middle Dot
 
 	# DBCS
 	encodingList = [
@@ -214,7 +215,11 @@ def buildFoldDisplayEllipsis():
 			value = defaultText.encode(encoding)
 			value = bytesToHex(value)
 		except UnicodeEncodeError:
-			value = fallbackText
+			if codepage == 932:
+				value = fallbackJIS.encode(encoding)
+				value = bytesToHex(value)
+			else:
+				value = fallbackText
 
 		values = result.setdefault(value, [])
 		values.append((codepage, comment))
