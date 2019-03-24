@@ -3169,9 +3169,11 @@ int Style_GetLexerIconId(LPCEDITLEXER pLex) {
 
 	WCHAR *pszFile = (WCHAR *)NP2HeapAlloc(sizeof(WCHAR) * (lstrlen(pszExtensions) + CSTRLEN(L"*.txt") + 16));
 	lstrcpy(pszFile, L"*.");
-	lstrcat(pszFile, pszExtensions);
-	WCHAR *p;
-	if ((p = StrChr(pszFile, L';')) != NULL) {
+	if (StrNotEmpty(pszExtensions)) {
+		lstrcat(pszFile, pszExtensions);
+	}
+	WCHAR *p = StrChr(pszFile, L';');
+	if (p != NULL) {
 		*p = L'\0';
 	}
 
