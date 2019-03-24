@@ -1220,6 +1220,7 @@ void EditView::DrawFoldDisplayText(Surface *surface, const EditModel &model, con
 	PRectangle rcSegment = rcLine;
 	const std::string_view foldDisplayText = model.pcs->GetFoldDisplayText(line);
 	FontAlias fontText = vsDraw.styles[STYLE_FOLDDISPLAYTEXT].font;
+	constexpr int margin = 2;
 	const int widthFoldDisplayText = static_cast<int>(surface->WidthText(fontText, foldDisplayText));
 
 	int eolInSelection = 0;
@@ -1234,10 +1235,9 @@ void EditView::DrawFoldDisplayText(Surface *surface, const EditModel &model, con
 	const XYPOSITION virtualSpace = model.sel.VirtualSpaceFor(
 		model.pdoc->LineEnd(line)) * spaceWidth;
 	rcSegment.left = xStart + static_cast<XYPOSITION>(ll->positions[ll->numCharsInLine] - subLineStart) + virtualSpace + vsDraw.aveCharWidth;
-	rcSegment.right = rcSegment.left + static_cast<XYPOSITION>(widthFoldDisplayText);
+	rcSegment.right = rcSegment.left + static_cast<XYPOSITION>(widthFoldDisplayText) + margin*2;
 
 	const ColourOptional background = vsDraw.Background(model.pdoc->GetMark(line), model.caret.active, ll->containsCaret);
-	FontAlias textFont = vsDraw.styles[STYLE_FOLDDISPLAYTEXT].font;
 	ColourDesired textFore = vsDraw.styles[STYLE_FOLDDISPLAYTEXT].fore;
 	if (eolInSelection && (vsDraw.selColours.fore.isSet)) {
 		textFore = (eolInSelection == 1) ? vsDraw.selColours.fore : vsDraw.selAdditionalForeground;
@@ -1252,25 +1252,31 @@ void EditView::DrawFoldDisplayText(Surface *surface, const EditModel &model, con
 		}
 	}
 
-	if (phase & drawBack) {
-		surface->FillRectangle(rcSegment, textBack);
+	PRectangle rcBox = rcSegment;
+	rcBox.top += 1 + vsDraw.extraAscent/2;
+	rcBox.bottom -= vsDraw.extraDescent/2;
+	rcBox.left = round(rcBox.left);
+	rcBox.right = round(rcBox.right);
 
+	if (phase & drawBack) {
 		// Fill Remainder of the line
 		PRectangle rcRemainder = rcSegment;
-		rcRemainder.left = rcRemainder.right;
 		if (rcRemainder.left < rcLine.left)
 			rcRemainder.left = rcLine.left;
 		rcRemainder.right = rcLine.right;
 		FillLineRemainder(surface, model, vsDraw, ll, line, rcRemainder, subLine);
+
+		surface->FillRectangle(rcBox, textBack);
 	}
 
 	if (phase & drawText) {
+		rcSegment.left += margin;
 		if (phasesDraw != phasesOne) {
-			surface->DrawTextTransparent(rcSegment, textFont,
+			surface->DrawTextTransparent(rcSegment, fontText,
 				rcSegment.top + vsDraw.maxAscent, foldDisplayText,
 				textFore);
 		} else {
-			surface->DrawTextNoClip(rcSegment, textFont,
+			surface->DrawTextNoClip(rcSegment, fontText,
 				rcSegment.top + vsDraw.maxAscent, foldDisplayText,
 				textFore, textBack);
 		}
@@ -1279,10 +1285,6 @@ void EditView::DrawFoldDisplayText(Surface *surface, const EditModel &model, con
 	if (phase & drawIndicatorsFore) {
 		if (model.foldDisplayTextStyle == SC_FOLDDISPLAYTEXT_BOXED) {
 			surface->PenColour(textFore);
-			PRectangle rcBox = rcSegment;
-			rcBox.top += 1;
-			rcBox.left = floor(rcSegment.left);
-			rcBox.right = ceil(rcSegment.right);
 			const IntegerRectangle ircBox(rcBox);
 			surface->MoveTo(ircBox.left, ircBox.top);
 			surface->LineTo(ircBox.left, ircBox.bottom);
@@ -1297,7 +1299,7 @@ void EditView::DrawFoldDisplayText(Surface *surface, const EditModel &model, con
 
 	if (phase & drawSelectionTranslucent) {
 		if (eolInSelection && vsDraw.selColours.back.isSet && (line < model.pdoc->LinesTotal() - 1) && alpha != SC_ALPHA_NOALPHA) {
-			SimpleAlphaRectangle(surface, rcSegment, SelectionBackground(vsDraw, eolInSelection == 1, model.primarySelection), alpha);
+			SimpleAlphaRectangle(surface, rcBox, SelectionBackground(vsDraw, eolInSelection == 1, model.primarySelection), alpha);
 		}
 	}
 }

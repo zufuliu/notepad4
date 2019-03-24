@@ -31,10 +31,9 @@ CharacterSet::CharacterSet(setBase base, const char *initialSet, int size_, bool
 
 void CharacterSet::AddString(const char *setToAdd) noexcept {
 	for (const char *cp = setToAdd; *cp; cp++) {
-		int val = static_cast<unsigned char>(*cp);
-		assert(val >= 0);
-		assert(val < size);
-		bset[val] = true;
+		const unsigned char uch = *cp;
+		assert(uch < size);
+		bset[uch] = true;
 	}
 }
 
