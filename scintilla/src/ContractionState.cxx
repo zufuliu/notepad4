@@ -307,12 +307,8 @@ bool ContractionState<LINE>::GetFoldDisplayTextShown(Sci::Line lineDoc) const no
 template <typename LINE>
 bool ContractionState<LINE>::SetFoldDisplayText(Sci::Line lineDoc, const char *text) {
 	if (lineDoc < 0) {
-		const char *foldText = defaultFoldDisplayText.get();
-		if (!foldText || !text || 0 != strcmp(text, foldText)) {
-			defaultFoldDisplayText = UniqueStringCopy(text);
-			return true;
-		}
-		return false;
+		defaultFoldDisplayText = UniqueStringCopy(text);
+		return true;
 	}
 
 #if EnablePerLineFoldDisplayText

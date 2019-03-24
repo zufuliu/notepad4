@@ -44,6 +44,11 @@ public:
 		if (val < 0) return false;
 		return (val < size) ? bset[val] : valueAfter;
 	}
+	bool Contains(char ch) const noexcept {
+		// Overload char as char may be signed
+		const unsigned char uch = ch;
+		return Contains(uch);
+	}
 };
 
 // Functions for classifying characters
