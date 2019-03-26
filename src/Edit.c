@@ -5062,13 +5062,8 @@ extern int iMatchesCount;
 extern int iMarkOccurrencesColor;
 extern int iMarkOccurrencesAlpha;
 
-void EditMarkAll(HWND hwnd, int iMarkOccurrences, BOOL bMarkOccurrencesMatchCase, BOOL bMarkOccurrencesMatchWords) {
+void EditMarkAll(HWND hwnd, BOOL bMarkOccurrencesMatchCase, BOOL bMarkOccurrencesMatchWords) {
 	iMatchesCount = 0;
-	// feature is off
-	if (!iMarkOccurrences) {
-		return;
-	}
-
 	const int iTextLen = (int)SendMessage(hwnd, SCI_GETLENGTH, 0, 0);
 
 	// get current selection
@@ -5115,9 +5110,8 @@ void EditMarkAll(HWND hwnd, int iMarkOccurrences, BOOL bMarkOccurrencesMatchCase
 	ttf.lpstrText = pszText;
 
 	// set style
-	const COLORREF fore = (iMarkOccurrences == 4) ? iMarkOccurrencesColor : (0xff << ((iMarkOccurrences - 1) << 3));
 	SendMessage(hwnd, SCI_INDICSETALPHA, MarkOccurrencesIndicatorNumber, iMarkOccurrencesAlpha);
-	SendMessage(hwnd, SCI_INDICSETFORE, MarkOccurrencesIndicatorNumber, fore);
+	SendMessage(hwnd, SCI_INDICSETFORE, MarkOccurrencesIndicatorNumber, iMarkOccurrencesColor);
 	SendMessage(hwnd, SCI_INDICSETSTYLE, MarkOccurrencesIndicatorNumber, INDIC_ROUNDBOX);
 
 	const int findFlag = (bMarkOccurrencesMatchCase ? SCFIND_MATCHCASE : 0) | (bMarkOccurrencesMatchWords ? SCFIND_WHOLEWORD : 0);

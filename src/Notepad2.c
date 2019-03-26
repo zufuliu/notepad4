@@ -141,7 +141,7 @@ int		iLongLineMode;
 int		iWrapCol = 0;
 static BOOL bShowSelectionMargin;
 static BOOL bShowLineNumbers;
-static int iMarkOccurrences;
+static BOOL bMarkOccurrences;
 static BOOL bMarkOccurrencesMatchCase;
 static BOOL bMarkOccurrencesMatchWords;
 struct EditAutoCompletionConfig autoCompletionConfig;
@@ -2365,12 +2365,11 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	CheckCmd(hmenu, IDM_VIEW_MARGIN, bShowSelectionMargin);
 	EnableCmd(hmenu, IDM_EDIT_COMPLETEWORD, i);
 
-	i = IDM_VIEW_MARKOCCURRENCES_OFF + iMarkOccurrences;
-	CheckMenuRadioItem(hmenu, IDM_VIEW_MARKOCCURRENCES_OFF, IDM_VIEW_MARKOCCURRENCES_CUSTOM, i, MF_BYCOMMAND);
+	CheckCmd(hmenu, IDM_VIEW_MARKOCCURRENCES_OFF, !bMarkOccurrences);
 	CheckCmd(hmenu, IDM_VIEW_MARKOCCURRENCES_CASE, bMarkOccurrencesMatchCase);
 	CheckCmd(hmenu, IDM_VIEW_MARKOCCURRENCES_WORD, bMarkOccurrencesMatchWords);
-	EnableCmd(hmenu, IDM_VIEW_MARKOCCURRENCES_CASE, iMarkOccurrences != 0);
-	EnableCmd(hmenu, IDM_VIEW_MARKOCCURRENCES_WORD, iMarkOccurrences != 0);
+	EnableCmd(hmenu, IDM_VIEW_MARKOCCURRENCES_CASE, bMarkOccurrences);
+	EnableCmd(hmenu, IDM_VIEW_MARKOCCURRENCES_WORD, bMarkOccurrences);
 
 	CheckCmd(hmenu, IDM_VIEW_SHOWWHITESPACE, bViewWhiteSpace);
 	CheckCmd(hmenu, IDM_VIEW_SHOWEOLS, bViewEOLs);
@@ -3871,29 +3870,27 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	case IDM_VIEW_MARKOCCURRENCES_OFF:
-		iMarkOccurrences = 0;
-		// clear all marks
-		SendMessage(hwndEdit, SCI_SETINDICATORCURRENT, MarkOccurrencesIndicatorNumber, 0);
-		SendMessage(hwndEdit, SCI_INDICATORCLEARRANGE, 0, SendMessage(hwndEdit, SCI_GETLENGTH, 0, 0));
-		break;
-
-	case IDM_VIEW_MARKOCCURRENCES_RED:
-	case IDM_VIEW_MARKOCCURRENCES_GREEN:
-	case IDM_VIEW_MARKOCCURRENCES_BLUE:
-	case IDM_VIEW_MARKOCCURRENCES_CUSTOM:
-		iMarkOccurrences = LOWORD(wParam) - IDM_VIEW_MARKOCCURRENCES_OFF;
-		EditMarkAll(hwndEdit, iMarkOccurrences, bMarkOccurrencesMatchCase, bMarkOccurrencesMatchWords);
+		bMarkOccurrences = !bMarkOccurrences;
+		if (bMarkOccurrences) {
+			EditMarkAll(hwndEdit, bMarkOccurrencesMatchCase, bMarkOccurrencesMatchWords);
+		} else {
+			iMatchesCount = 0;
+			// clear all marks
+			SendMessage(hwndEdit, SCI_SETINDICATORCURRENT, MarkOccurrencesIndicatorNumber, 0);
+			SendMessage(hwndEdit, SCI_INDICATORCLEARRANGE, 0, SendMessage(hwndEdit, SCI_GETLENGTH, 0, 0));
+		}
 		UpdateStatusbar();
 		break;
 
 	case IDM_VIEW_MARKOCCURRENCES_CASE:
 		bMarkOccurrencesMatchCase = !bMarkOccurrencesMatchCase;
-		EditMarkAll(hwndEdit, iMarkOccurrences, bMarkOccurrencesMatchCase, bMarkOccurrencesMatchWords);
+		EditMarkAll(hwndEdit, bMarkOccurrencesMatchCase, bMarkOccurrencesMatchWords);
+		UpdateStatusbar();
 		break;
 
 	case IDM_VIEW_MARKOCCURRENCES_WORD:
 		bMarkOccurrencesMatchWords = !bMarkOccurrencesMatchWords;
-		EditMarkAll(hwndEdit, iMarkOccurrences, bMarkOccurrencesMatchCase, bMarkOccurrencesMatchWords);
+		EditMarkAll(hwndEdit, bMarkOccurrencesMatchCase, bMarkOccurrencesMatchWords);
 		UpdateStatusbar();
 		break;
 
@@ -4807,7 +4804,9 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 				if (scn->updated & (SC_UPDATE_SELECTION)) {
 					// mark occurrences of text currently selected
-					EditMarkAll(hwndEdit, iMarkOccurrences, bMarkOccurrencesMatchCase, bMarkOccurrencesMatchWords);
+					if (bMarkOccurrences) {
+						EditMarkAll(hwndEdit, bMarkOccurrencesMatchCase, bMarkOccurrencesMatchWords);
+					}
 					UpdateStatusBarCache_OVRMode(FALSE);
 				}
 				UpdateStatusbar();
@@ -5266,8 +5265,7 @@ void LoadSettings(void) {
 	bShowFoldingLine = (iValue >> 1) & 1;
 	bFoldDisplayText = (iValue >> 2) & 1;
 
-	iValue = IniSectionGetInt(pIniSection, L"MarkOccurrences", 3);
-	iMarkOccurrences = clamp_i(iValue, 0, 4);
+	bMarkOccurrences = IniSectionGetBool(pIniSection, L"MarkOccurrences", 1);
 	bMarkOccurrencesMatchCase = IniSectionGetBool(pIniSection, L"MarkOccurrencesMatchCase", 1);
 	bMarkOccurrencesMatchWords = IniSectionGetBool(pIniSection, L"MarkOccurrencesMatchWholeWords", 0);
 
@@ -5555,7 +5553,7 @@ void SaveSettings(BOOL bSaveSettingsNow) {
 	IniSectionSetBoolEx(pIniSection, L"ShowSelectionMargin", bShowSelectionMargin, 0);
 	IniSectionSetBoolEx(pIniSection, L"ShowLineNumbers", bShowLineNumbers, 1);
 	IniSectionSetIntEx(pIniSection, L"ShowCodeFolding", bShowCodeFolding | (bShowFoldingLine << 1) | (bFoldDisplayText << 2), ShowCodeFolding_Default);
-	IniSectionSetIntEx(pIniSection, L"MarkOccurrences", iMarkOccurrences, 3);
+	IniSectionSetBoolEx(pIniSection, L"MarkOccurrences", bMarkOccurrences, 1);
 	IniSectionSetBoolEx(pIniSection, L"MarkOccurrencesMatchCase", bMarkOccurrencesMatchCase, 1);
 	IniSectionSetBoolEx(pIniSection, L"MarkOccurrencesMatchWholeWords", bMarkOccurrencesMatchWords, 0);
 	IniSectionSetBoolEx(pIniSection, L"ViewWhiteSpace", bViewWhiteSpace, 0);
