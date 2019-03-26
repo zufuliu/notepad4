@@ -1008,6 +1008,24 @@ static inline BOOL Style_StrGetAttributeEx(LPCWSTR lpszStyle, LPCWSTR key, int k
 #define Style_StrGetStrike(lpszStyle)			Style_StrGetAttribute((lpszStyle), L"strike")
 #define Style_StrGetEOLFilled(lpszStyle)		Style_StrGetAttribute((lpszStyle), L"eolfilled")
 
+void Style_SetupDefaultColor(HWND hwnd) {
+	PEDITLEXER pLexNew = pLexArray[iDefaultLexer];
+	int iValue = pLexNew->bUseDefaultCodeStyle ? Style_DefaultCode : Style_DefaultText;
+	LPCWSTR szValue = pLexGlobal->Styles[iValue].szValue;
+	if (!Style_StrGetColor(TRUE, szValue, &iValue)) {
+		if (!Style_StrGetColor(TRUE, pLexNew->Styles[0].szValue, &iValue)) {
+			iValue = GetSysColor(COLOR_WINDOWTEXT);
+		}
+	}
+	SendMessage(hwnd, SCI_STYLESETFORE, STYLE_DEFAULT, iValue);
+	if (!Style_StrGetColor(FALSE, szValue, &iValue)) {
+		if (!Style_StrGetColor(FALSE, pLexNew->Styles[0].szValue, &iValue)) {
+			iValue = GetSysColor(COLOR_WINDOW);
+		}
+	}
+	SendMessage(hwnd, SCI_STYLESETBACK, STYLE_DEFAULT, iValue);
+}
+
 //=============================================================================
 // set current lexer
 // Style_SetLexer()

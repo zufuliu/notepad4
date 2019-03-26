@@ -57,6 +57,7 @@ BOOL	Style_Export(HWND hwnd);
 
 void	Style_OnDPIChanged(HWND hwnd);
 void	Style_OnStyleThemeChanged(HWND hwnd, int theme);
+void	Style_SetupDefaultColor(HWND hwnd);
 void	Style_SetLexer(HWND hwnd, PEDITLEXER pLexNew);
 void	Style_SetLexerFromFile(HWND hwnd, LPCWSTR lpszFile);
 void	Style_SetLexerFromName(HWND hwnd, LPCWSTR lpszFile, LPCWSTR lpszName);
