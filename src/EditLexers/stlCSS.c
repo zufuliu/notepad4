@@ -76,7 +76,7 @@ static EDITSTYLE Styles_CSS[] = {
 	{ SCE_CSS_VALUE, 63309, EDITSTYLE_HOLE(L"Value"), L"fore:#3A6EA5" },
 	{ SCE_CSS_OPERATOR, NP2STYLE_Operator, EDITSTYLE_HOLE(L"Operator"), L"fore:#B000B0" },
 	{ SCE_CSS_IMPORTANT, 63310, EDITSTYLE_HOLE(L"Important"), L"bold; fore:#C80000" },
-	{ SCE_CSS_DIRECTIVE, NP2STYLE_Directive, EDITSTYLE_HOLE(L"Directive"), L"bold; fore:#000000; back:#FFF1A8" },
+	{ SCE_CSS_DIRECTIVE, NP2STYLE_Directive, EDITSTYLE_HOLE(L"Directive"), L"bold; back:#FFF1A8" },
 	{ SCE_CSS_MEDIA, 63382, EDITSTYLE_HOLE(L"Media"), L"bold; fore:#0A246A" },
 	{ SCE_CSS_VARIABLE, NP2STYLE_Variable, EDITSTYLE_HOLE(L"Variable"), L"bold; fore:#FF4000" },
 	{ SCE_CSS_UNKNOWN_PSEUDOCLASS, 63305, EDITSTYLE_HOLE(L"Unknown Pseudo Class"), L"fore:#C80000; back:#FFFF80" },

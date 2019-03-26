@@ -90,7 +90,7 @@ static EDITSTYLE Styles_D[] = {
 	{ SCE_C_DSTRINGX, NP2STYLE_HexString, EDITSTYLE_HOLE(L"Hex String"), L"fore:#FF0080" },
 	{ SCE_C_DSTRINGQ, NP2STYLE_DelimitedString, EDITSTYLE_HOLE(L"Delimited String"), L"fore:#E24000" },
 	{ SCE_C_DSTRINGT, NP2STYLE_TokenString, EDITSTYLE_HOLE(L"Token String"), L"fore:#A46000" },
-	{ SCE_C_LABEL, NP2STYLE_Label, EDITSTYLE_HOLE(L"Label"), L"fore:#000000; back:#FFC040" },
+	{ SCE_C_LABEL, NP2STYLE_Label, EDITSTYLE_HOLE(L"Label"), L"back:#FFC040" },
 	{ SCE_C_NUMBER, NP2STYLE_Number, EDITSTYLE_HOLE(L"Number"), L"fore:#FF0000" },
 	{ SCE_C_OPERATOR, NP2STYLE_Operator, EDITSTYLE_HOLE(L"Operator"), L"fore:#B000B0" },
 	{ SCE_C_ASM_INSTRUCTION, NP2STYLE_Instruction, EDITSTYLE_HOLE(L"Instruction"), L"fore:#0080FF" },

@@ -170,7 +170,7 @@ static EDITSTYLE Styles_ASM[] = {
 	{ SCE_ASM_DIRECTIVE, NP2STYLE_Directive, EDITSTYLE_HOLE(L"Directive"), L"fore:#0000FF" },
 	{ SCE_ASM_DIRECTIVEOPERAND, 63554, EDITSTYLE_HOLE(L"Directive Operand"), L"fore:#0000FF" },
 	{ SCE_ASM_REGISTER, NP2STYLE_Register, EDITSTYLE_HOLE(L"Register"), L"fore:#FF8000" },
-	{ SCE_ASM_LABEL, NP2STYLE_Label, EDITSTYLE_HOLE(L"Label"), L"fore:#000000; back:#FFC040" },
+	{ SCE_ASM_LABEL, NP2STYLE_Label, EDITSTYLE_HOLE(L"Label"), L"back:#FFC040" },
 };
 
 EDITLEXER lexASM = {

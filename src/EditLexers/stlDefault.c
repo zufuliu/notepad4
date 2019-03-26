@@ -106,7 +106,7 @@ static EDITSTYLE Styles_CONF[] = {
 	{ SCE_CONF_COMMENT, NP2STYLE_Comment, EDITSTYLE_HOLE(L"Comment"), L"fore:#008000" },
 	{ SCE_CONF_STRING, NP2STYLE_String, EDITSTYLE_HOLE(L"String"), L"fore:#B000B0" },
 	{ MULTI_STYLE(SCE_CONF_NUMBER, SCE_CONF_HEXNUM, 0, 0), NP2STYLE_Number, EDITSTYLE_HOLE(L"Number"), L"fore:#FF4000" },
-	{ SCE_CONF_SECTION, 63511, EDITSTYLE_HOLE(L"Section"), L"bold; fore:#000000; back:#FFC040; eolfilled" },
+	{ SCE_CONF_SECTION, 63511, EDITSTYLE_HOLE(L"Section"), L"bold; back:#FFC040; eolfilled" },
 	//{ SCE_CONF_IP, 63521, EDITSTYLE_HOLE(L"IP Address"), L"bold; fore:#FF4000" },
 	//{ SCE_CONF_IDENTIFIER, EDITSTYLE_HOLE(L"Identifier"), L"" },
 	{ SCE_CONF_OPERATOR, NP2STYLE_Operator, EDITSTYLE_HOLE(L"Operator"), L"fore:#B000B0" },
@@ -125,7 +125,7 @@ EDITLEXER lexCONF = {
 static EDITSTYLE Styles_INI[] = {
 	EDITSTYLE_DEFAULT,
 	{ SCE_PROPS_COMMENT, NP2STYLE_Comment, EDITSTYLE_HOLE(L"Comment"), L"fore:#008000" },
-	{ SCE_PROPS_SECTION, 63511, EDITSTYLE_HOLE(L"Section"), L"bold; fore:#000000; back:#FFC040; eolfilled" },
+	{ SCE_PROPS_SECTION, 63511, EDITSTYLE_HOLE(L"Section"), L"bold; back:#FFC040; eolfilled" },
 	{ SCE_PROPS_ASSIGNMENT, 63512, EDITSTYLE_HOLE(L"Assignment"), L"fore:#FF0000" },
 	{ SCE_PROPS_DEFVAL, 63513, EDITSTYLE_HOLE(L"Default Value"), L"fore:#FF0000" },
 };
