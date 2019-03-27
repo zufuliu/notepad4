@@ -5493,7 +5493,7 @@ void SaveSettings(BOOL bSaveSettingsNow) {
 	pIniSection->next = pIniSectionBuf;
 
 	IniSectionSetInt(pIniSection, L"SettingsVersion", NP2SettingsVersion_Current);
-	IniSectionSetBool(pIniSection, L"SaveSettings", bSaveSettings);
+	IniSectionSetBoolEx(pIniSection, L"SaveSettings", bSaveSettings, 1);
 	IniSectionSetBoolEx(pIniSection, L"SaveRecentFiles", bSaveRecentFiles, 0);
 	IniSectionSetBoolEx(pIniSection, L"SaveFindReplace", bSaveFindReplace, 0);
 

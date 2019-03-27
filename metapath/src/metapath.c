@@ -2533,7 +2533,7 @@ void SaveSettings(BOOL bSaveSettingsNow) {
 	IniSectionOnSave *pIniSection = &section;
 	pIniSection->next = pIniSectionBuf;
 
-	IniSectionSetBool(pIniSection, L"SaveSettings", bSaveSettings);
+	IniSectionSetBoolEx(pIniSection, L"SaveSettings", bSaveSettings, 1);
 	IniSectionSetBoolEx(pIniSection, L"SingleClick", bSingleClick, 1);
 	IniSectionSetBoolEx(pIniSection, L"OpenFileInSameWindow", bOpenFileInSameWindow, 0);
 	IniSectionSetBoolEx(pIniSection, L"TrackSelect", bTrackSelect, 1);
