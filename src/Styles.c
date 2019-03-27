@@ -1823,6 +1823,9 @@ LPCWSTR Style_GetCurrentLexerName(void) {
 		return pLexCurrent->pszName;
 	}
 	switch (np2LexLangIndex) {
+	case IDM_LANG_TEXTFILE:
+	case IDM_LANG_2NDTEXTFILE:
+		return pLexCurrent->pszName;
 	case IDM_LANG_WEB:
 		return L"Web Source Code";
 	case IDM_LANG_PHP:
@@ -2426,14 +2429,14 @@ void Style_UpdateSchemeMenu(HMENU hmenu) {
 		}
 		np2LexLangIndex = lang;
 	}
+	if (lang == IDM_LANG_TEXTFILE || lang == NP2LEX_2NDTEXTFILE) {
+		np2LexLangIndex = 0;
+	}
 	for (int i = IDM_LANG_TEXTFILE; i < IDM_LANG_NULL; i++) {
 		CheckCmd(hmenu, i, FALSE);
 	}
 	if (lang >= IDM_LANG_TEXTFILE) {
 		CheckCmd(hmenu, lang, TRUE);
-	}
-	if (lang == IDM_LANG_TEXTFILE || lang == NP2LEX_2NDTEXTFILE) {
-		np2LexLangIndex = 0;
 	}
 }
 
