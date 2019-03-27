@@ -1180,12 +1180,13 @@ void ScintillaWin::AddWString(const std::wstring &wcs) {
 		return;
 
 	const int codePage = CodePageOfDocument();
+	const bool treatAsDBCS = IsDBCSCodePage(codePage);
 	for (size_t i = 0; i < wcs.size(); ) {
 		const size_t ucWidth = UTF16CharLength(wcs[i]);
 		const std::wstring uniChar(wcs, i, ucWidth);
 		std::string docChar = StringEncode(uniChar, codePage);
 
-		AddCharUTF(docChar.c_str(), static_cast<unsigned int>(docChar.size()));
+		AddCharUTF(docChar.c_str(), static_cast<unsigned int>(docChar.size()), treatAsDBCS);
 		i += ucWidth;
 	}
 }
@@ -1230,12 +1231,13 @@ sptr_t ScintillaWin::HandleCompositionInline(uptr_t, sptr_t lParam) {
 		recordingMacro = false;
 		charAddedSource = SC_CHARADDED_TENTATIVE;
 		const int codePage = CodePageOfDocument();
+		const bool treatAsDBCS = IsDBCSCodePage(codePage);
 		for (size_t i = 0; i < wcs.size(); ) {
 			const size_t ucWidth = UTF16CharLength(wcs[i]);
 			const std::wstring uniChar(wcs, i, ucWidth);
 			std::string docChar = StringEncode(uniChar, codePage);
 
-			AddCharUTF(docChar.c_str(), static_cast<unsigned int>(docChar.size()));
+			AddCharUTF(docChar.c_str(), static_cast<unsigned int>(docChar.size()), treatAsDBCS);
 
 			DrawImeIndicator(imeIndicator[i], static_cast<unsigned int>(docChar.size()));
 			i += ucWidth;
