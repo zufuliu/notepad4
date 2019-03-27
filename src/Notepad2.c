@@ -1657,6 +1657,7 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	// Long Lines
 	if (bMarkLongLines) {
 		SendMessage(hwndEdit, SCI_SETEDGEMODE, (iLongLineMode == EDGE_LINE) ? EDGE_LINE : EDGE_BACKGROUND, 0);
+		Style_SetLongLineColors(hwndEdit);
 	} else {
 		SendMessage(hwndEdit, SCI_SETEDGEMODE, EDGE_NONE, 0);
 	}

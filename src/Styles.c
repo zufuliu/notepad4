@@ -1008,7 +1008,7 @@ static inline BOOL Style_StrGetAttributeEx(LPCWSTR lpszStyle, LPCWSTR key, int k
 #define Style_StrGetStrike(lpszStyle)			Style_StrGetAttribute((lpszStyle), L"strike")
 #define Style_StrGetEOLFilled(lpszStyle)		Style_StrGetAttribute((lpszStyle), L"eolfilled")
 
-void Style_SetupDefaultColor(HWND hwnd) {
+void Style_InitDefaultColor(HWND hwnd) {
 	PEDITLEXER pLexNew = pLexArray[iDefaultLexer];
 	int iValue = pLexNew->bUseDefaultCodeStyle ? Style_DefaultCode : Style_DefaultText;
 	LPCWSTR szValue = pLexGlobal->Styles[iValue].szValue;
