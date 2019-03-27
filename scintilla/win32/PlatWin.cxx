@@ -2443,6 +2443,9 @@ class ListBoxX : public ListBox {
 	int desiredVisibleRows;
 	unsigned int maxItemCharacters;
 	unsigned int aveCharWidth;
+	COLORREF colorText;
+	COLORREF colorBackground;
+	HBRUSH hbrBackground;
 	Window *parent;
 	int ctrlID;
 	IListBoxDelegate *delegate;
@@ -2480,6 +2483,7 @@ class ListBoxX : public ListBox {
 public:
 	ListBoxX() noexcept : lineHeight(10), fontCopy{}, technology(0), lb{}, unicodeMode(false),
 		desiredVisibleRows(9), maxItemCharacters(0), aveCharWidth(8),
+		colorText(0), colorBackground(0), hbrBackground{},
 		parent(nullptr), ctrlID(0),
 		delegate(nullptr),
 		widestItem(nullptr), maxCharWidth(1), resizeHit(0), wheelDelta(0) {}
@@ -2488,8 +2492,13 @@ public:
 			::DeleteObject(fontCopy);
 			fontCopy = nullptr;
 		}
+		if (hbrBackground) {
+			::DeleteObject(hbrBackground);
+			hbrBackground = nullptr;
+		}
 	}
 	void SetFont(const Font &font) noexcept override;
+	void SetColor(ColourDesired fore, ColourDesired back) noexcept override;
 	void Create(Window &parent_, int ctrlID_, Point location_, int lineHeight_, bool unicodeMode_, int technology_) noexcept override;
 	void SetAverageCharWidth(int width) noexcept override;
 	void SetVisibleRows(int rows) noexcept override;
@@ -2555,6 +2564,16 @@ void ListBoxX::SetFont(const Font &font) noexcept {
 		fontCopy = pfm->HFont();
 		::SendMessage(lb, WM_SETFONT, reinterpret_cast<WPARAM>(fontCopy), 0);
 	}
+}
+
+void ListBoxX::SetColor(ColourDesired fore, ColourDesired back) noexcept {
+	if (hbrBackground) {
+		::DeleteObject(hbrBackground);
+		hbrBackground = nullptr;
+	}
+	colorText = fore.AsInteger();
+	colorBackground = back.AsInteger();
+	hbrBackground = ::CreateSolidBrush(colorBackground);
 }
 
 void ListBoxX::SetAverageCharWidth(int width) noexcept {
@@ -2687,14 +2706,14 @@ void ListBoxX::Draw(const DRAWITEMSTRUCT *pDrawItem) {
 			RECT rcImage = pDrawItem->rcItem;
 			rcImage.right = rcBox.left;
 			// The image is not highlighted
-			::FillRect(pDrawItem->hDC, &rcImage, reinterpret_cast<HBRUSH>(COLOR_WINDOW + 1));
+			::FillRect(pDrawItem->hDC, &rcImage, hbrBackground);
 			::FillRect(pDrawItem->hDC, &rcBox, reinterpret_cast<HBRUSH>(COLOR_HIGHLIGHT + 1));
 			::SetBkColor(pDrawItem->hDC, ::GetSysColor(COLOR_HIGHLIGHT));
 			::SetTextColor(pDrawItem->hDC, ::GetSysColor(COLOR_HIGHLIGHTTEXT));
 		} else {
-			::FillRect(pDrawItem->hDC, &pDrawItem->rcItem, reinterpret_cast<HBRUSH>(COLOR_WINDOW + 1));
-			::SetBkColor(pDrawItem->hDC, ::GetSysColor(COLOR_WINDOW));
-			::SetTextColor(pDrawItem->hDC, ::GetSysColor(COLOR_WINDOWTEXT));
+			::FillRect(pDrawItem->hDC, &pDrawItem->rcItem, hbrBackground);
+			::SetBkColor(pDrawItem->hDC, colorBackground);
+			::SetTextColor(pDrawItem->hDC, colorText);
 		}
 
 		const ListItemData item = lti.Get(pDrawItem->itemID);
@@ -3038,7 +3057,7 @@ void ListBoxX::Paint(HDC hDC) noexcept {
 	// unpainted area when at the end of a non-integrally sized list with a
 	// vertical scroll bar
 	const RECT rc = { 0, 0, extent.x, extent.y };
-	::FillRect(bitmapDC, &rc, reinterpret_cast<HBRUSH>(COLOR_WINDOW + 1));
+	::FillRect(bitmapDC, &rc, hbrBackground);
 	// Paint the entire client area and vertical scrollbar
 	::SendMessage(lb, WM_PRINT, reinterpret_cast<WPARAM>(bitmapDC), PRF_CLIENT | PRF_NONCLIENT);
 	::BitBlt(hDC, 0, 0, extent.x, extent.y, bitmapDC, 0, 0, SRCCOPY);
