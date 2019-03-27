@@ -490,6 +490,7 @@ public:
 	static ListBox *Allocate();
 
 	void SetFont(const Font &font) noexcept override = 0;
+	virtual void SetColor(ColourDesired fore, ColourDesired back) noexcept = 0;
 	virtual void Create(Window &parent, int ctrlID, Point location, int lineHeight_, bool unicodeMode_, int technology_) noexcept = 0;
 	virtual void SetAverageCharWidth(int width) noexcept = 0;
 	virtual void SetVisibleRows(int rows) noexcept = 0;
