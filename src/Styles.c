@@ -558,7 +558,7 @@ static void Style_LoadOne(PEDITLEXER pLex) {
 	NP2HeapFree(pIniSectionBuf);
 }
 
-static void Style_LoadAll(void) {
+static void Style_LoadAll(BOOL bFore) {
 	IniSection section;
 	WCHAR *pIniSectionBuf = (WCHAR *)NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_STYLES);
 	const int cchIniSection = (int)(NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR));
@@ -567,7 +567,7 @@ static void Style_LoadAll(void) {
 
 	// Custom colors
 	const int value = (np2StyleTheme << 1) | 1;
-	if (iCustomColorLoaded != value) {
+	if (bFore || iCustomColorLoaded != value) {
 		iCustomColorLoaded = value;
 		CopyMemory(customColor, defaultCustomColor, MAX_CUSTOM_COLOR_COUNT * sizeof(COLORREF));
 
@@ -590,7 +590,7 @@ static void Style_LoadAll(void) {
 
 	for (UINT iLexer = 0; iLexer < ALL_LEXER_COUNT; iLexer++) {
 		PEDITLEXER pLex = pLexArray[iLexer];
-		if (!IsStyleLoaded(pLex)) {
+		if (bFore || !IsStyleLoaded(pLex)) {
 			Style_LoadOneEx(pLex, pIniSection, pIniSectionBuf, cchIniSection);
 		}
 	}
@@ -822,8 +822,10 @@ BOOL Style_Export(HWND hwnd) {
 	return FALSE;
 }
 
-static void Style_ResetAll(void) {
-	CopyMemory(customColor, defaultCustomColor, MAX_CUSTOM_COLOR_COUNT * sizeof(COLORREF));
+static void Style_ResetAll(BOOL resetColor) {
+	if (resetColor) {
+		CopyMemory(customColor, defaultCustomColor, MAX_CUSTOM_COLOR_COUNT * sizeof(COLORREF));
+	}
 	for (UINT iLexer = 0; iLexer < ALL_LEXER_COUNT; iLexer++) {
 		PEDITLEXER pLex = pLexArray[iLexer];
 		if (pLex->szExtensions) {
@@ -831,9 +833,11 @@ static void Style_ResetAll(void) {
 		}
 		pLex->bStyleChanged = TRUE;
 		pLex->bUseDefaultCodeStyle = pLex->bUseDefaultCodeStyle_Default;
-		const UINT iStyleCount = pLex->iStyleCount;
-		for (UINT i = 0; i < iStyleCount; i++) {
-			lstrcpy(pLex->Styles[i].szValue, pLex->Styles[i].pszDefault);
+		if (resetColor) {
+			const UINT iStyleCount = pLex->iStyleCount;
+			for (UINT i = 0; i < iStyleCount; i++) {
+				lstrcpy(pLex->Styles[i].szValue, pLex->Styles[i].pszDefault);
+			}
 		}
 	}
 
@@ -3299,13 +3303,21 @@ struct StyleConfigDlgParam {
 	LPWSTR styleBackup[ALL_LEXER_COUNT];
 };
 
-static void StyleConfigDlgParam_RestoreAll(const struct StyleConfigDlgParam *param) {
-	CopyMemory(g_AllFileExtensions, param->extBackup, ALL_FILE_EXTENSIONS_BYTE_SIZE);
-	CopyMemory(customColor, param->colorBackup, MAX_CUSTOM_COLOR_COUNT * sizeof(COLORREF));
-	for (UINT iLexer = 0; iLexer < ALL_LEXER_COUNT; iLexer++) {
-		PEDITLEXER pLex = pLexArray[iLexer];
-		CopyMemory(pLex->szStyleBuf, param->styleBackup[iLexer], EDITSTYLE_BufferSize(pLex->iStyleCount));
+static void Style_ResetStyle(PEDITLEXER pLex, PEDITSTYLE pStyle) {
+	if (np2StyleTheme != StyleTheme_Default) {
+		// reload style from external file
+		LPCWSTR themePath = GetStyleThemeFilePath();
+		WCHAR wch[MAX_EDITSTYLE_VALUE_SIZE] = L"";
+		// use "NULL" to distinguish between empty style value like: Keyword=
+		GetPrivateProfileString(pLex->pszName, pStyle->pszName, L"NULL", wch, COUNTOF(wch), themePath);
+		if (!StrEqual(wch, L"NULL")) {
+			lstrcpy(pStyle->szValue, wch);
+			return;
+		}
 	}
+
+	// reset style to built-in default
+	lstrcpy(pStyle->szValue, pStyle->pszDefault);
 }
 
 //=============================================================================
@@ -3696,19 +3708,21 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 			break;
 
 		case IDC_RESETALL:
-			if (np2StyleTheme == StyleTheme_Default) {
-				Style_ResetAll();
-			} else {
-				struct StyleConfigDlgParam *param = (struct StyleConfigDlgParam *)GetWindowLongPtr(hwnd, DWLP_USER);
-				StyleConfigDlgParam_RestoreAll(param);
-			}
-#if defined(__cplusplus)
-			[[fallthrough]];
-#endif
-			// fall through
 		case IDC_STYLEDEFAULT:
+			if (LOWORD(wParam) == IDC_RESETALL) {
+				if (np2StyleTheme == StyleTheme_Default) {
+					// reset styles, extensions to built-in default
+					Style_ResetAll(TRUE);
+				} else {
+					// reload styles from external file
+					Style_LoadAll(TRUE);
+					// reset file extensions to built-in default
+					Style_ResetAll(FALSE);
+				}
+			} else if (pCurrentStyle) {
+				Style_ResetStyle(pCurrentLexer, pCurrentStyle);
+			}
 			if (pCurrentStyle) {
-				lstrcpy(pCurrentStyle->szValue, pCurrentStyle->pszDefault);
 				SetDlgItemText(hwnd, IDC_STYLEEDIT, pCurrentStyle->szValue);
 				//CheckDlgButton(hwnd, IDC_STYLEBOLD, (Style_StrGetBold(pCurrentStyle->szValue) ? BST_CHECKED : BST_UNCHECKED));
 				//CheckDlgButton(hwnd, IDC_STYLEITALIC, (Style_StrGetItalic(pCurrentStyle->szValue) ? BST_CHECKED : BST_UNCHECKED));
@@ -3837,7 +3851,7 @@ void Style_ConfigDlg(HWND hwnd) {
 	struct StyleConfigDlgParam param;
 	BOOL apply = FALSE;
 
-	Style_LoadAll();
+	Style_LoadAll(FALSE);
 	// Backup Styles
 	param.hFontTitle = NULL;
 	LPWSTR extBackup = (LPWSTR)NP2HeapAlloc(ALL_FILE_EXTENSIONS_BYTE_SIZE);
@@ -3854,7 +3868,12 @@ void Style_ConfigDlg(HWND hwnd) {
 
 	if (IDCANCEL == ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_STYLECONFIG), GetParent(hwnd), Style_ConfigDlgProc, (LPARAM)(&param))) {
 		// Restore Styles
-		StyleConfigDlgParam_RestoreAll(&param);
+		CopyMemory(g_AllFileExtensions, param.extBackup, ALL_FILE_EXTENSIONS_BYTE_SIZE);
+		CopyMemory(customColor, param.colorBackup, MAX_CUSTOM_COLOR_COUNT * sizeof(COLORREF));
+		for (UINT iLexer = 0; iLexer < ALL_LEXER_COUNT; iLexer++) {
+			PEDITLEXER pLex = pLexArray[iLexer];
+			CopyMemory(pLex->szStyleBuf, param.styleBackup[iLexer], EDITSTYLE_BufferSize(pLex->iStyleCount));
+		}
 	} else {
 		if (!(fStylesModified & STYLESMODIFIED_FILE_EXT)) {
 			if (memcmp(param.extBackup, g_AllFileExtensions, ALL_FILE_EXTENSIONS_BYTE_SIZE) != 0) {
