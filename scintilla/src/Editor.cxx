@@ -1906,6 +1906,9 @@ void Editor::FilterSelections() {
 
 // AddCharUTF inserts an array of bytes which may or may not be in UTF-8.
 void Editor::AddCharUTF(const char *s, unsigned int len, bool treatAsDBCS) {
+	if (len == 0) {
+		return;
+	}
 	FilterSelections();
 	{
 		UndoGroup ug(pdoc, (sel.Count() > 1) || !sel.Empty() || inOverstrike);
@@ -1978,11 +1981,12 @@ void Editor::AddCharUTF(const char *s, unsigned int len, bool treatAsDBCS) {
 
 	// We don't handle inline IME tentative characters
 	if (charAddedSource != SC_CHARADDED_TENTATIVE) {
+		int ch = static_cast<unsigned char>(s[0]);
 		if (treatAsDBCS) {
-			NotifyChar((static_cast<unsigned char>(s[0]) << 8) |
-				static_cast<unsigned char>(s[1]));
-		} else if (len > 0) {
-			int ch = static_cast<unsigned char>(s[0]);
+			if (len > 1) {
+				ch = (ch << 8) | static_cast<unsigned char>(s[1]);
+			}
+		} else {
 			if ((ch < 0xC0) || (1 == len)) {
 				// Handles UTF-8 characters between 0x01 and 0x7F and single byte
 				// characters when not in UTF-8 mode.
@@ -1993,8 +1997,8 @@ void Editor::AddCharUTF(const char *s, unsigned int len, bool treatAsDBCS) {
 				UTF32FromUTF8(std::string_view(s, len), utf32, std::size(utf32));
 				ch = utf32[0];
 			}
-			NotifyChar(ch);
 		}
+		NotifyChar(ch);
 	}
 
 	if (recordingMacro) {
