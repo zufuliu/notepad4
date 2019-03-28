@@ -33,7 +33,8 @@ protected:
 	};
 
 	enum {
-		maxLenInputIME = 200
+		// 2 wchar_t, each has max 4 bytes
+		maxInputIMECharacterBytes = 16
 	};
 
 	int displayPopupMenu;
