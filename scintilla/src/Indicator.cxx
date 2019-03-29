@@ -25,8 +25,8 @@ using namespace Scintilla;
 
 static inline PRectangle PixelGridAlign(PRectangle rc) noexcept {
 	// Move left and right side to nearest pixel to avoid blurry visuals
-	return PRectangle(round(rc.left), floor(rc.top),
-		round(rc.right), floor(rc.bottom));
+	return PRectangle(std::round(rc.left), std::floor(rc.top),
+		std::round(rc.right), std::floor(rc.bottom));
 }
 
 void Indicator::Draw(Surface *surface, PRectangle rc, PRectangle rcLine, PRectangle rcCharacter, DrawState drawState, int value) const {
@@ -203,10 +203,10 @@ void Indicator::Draw(Surface *surface, PRectangle rc, PRectangle rcLine, PRectan
 		surface->FillRectangle(rcComposition, sacDraw.fore);
 	} else if (sacDraw.style == INDIC_POINT || sacDraw.style == INDIC_POINTCHARACTER) {
 		if (rcCharacter.Width() >= 0.1) {
-			const XYPOSITION pixelHeight = floor(rc.Height() - 1.0f);	// 1 pixel onto next line if multiphase
+			const XYPOSITION pixelHeight = std::floor(rc.Height() - 1.0f);	// 1 pixel onto next line if multiphase
 			const XYPOSITION x = (sacDraw.style == INDIC_POINT) ? (rcCharacter.left) : ((rcCharacter.right + rcCharacter.left) / 2);
-			const XYPOSITION ix = round(x);
-			const XYPOSITION iy = floor(rc.top + 1.0f);
+			const XYPOSITION ix = std::round(x);
+			const XYPOSITION iy = std::floor(rc.top + 1.0f);
 			Point pts[] = {
 				Point(ix - pixelHeight, iy + pixelHeight),	// Left
 				Point(ix + pixelHeight, iy + pixelHeight),	// Right
