@@ -1,7 +1,7 @@
 #include "EditLexer.h"
 #include "EditStyle.h"
 
-// http://nsis.sourceforge.net/Main%5FPage
+// https://nsis.sourceforge.io/Main_Page
 
 static KEYWORDLIST Keywords_NSIS = {{
 "Function FunctionEnd Section SectionEnd SectionGroup SectionGroupEnd PageEx PageExEnd Goto Var "
