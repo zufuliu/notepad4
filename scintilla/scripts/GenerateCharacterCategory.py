@@ -163,6 +163,17 @@ def isCJKLetter(category, ch):
 
 	return False
 
+def dumpArray(items, step, fmt='%d'):
+	lines = []
+	if step:
+		for i in range(0, len(items), step):
+			line = ", ".join(fmt % value for value in items[i:i+step]) + ","
+			lines.append(line)
+	else:
+		line = ", ".join(fmt % value for value in items)
+		lines.append(line)
+	return lines
+
 def updateCharacterCategory(filename):
 	categories = findCategories("../lexlib/CharacterCategory.h")
 	values = ["// Created with Python %s,  Unicode %s" % (
@@ -189,6 +200,7 @@ def updateCharacterCategory(filename):
 
 	print('catRanges:', len(values), 4*len(values)/1024, math.ceil(math.log2(len(values))))
 	values.extend(["%d," % value for value in table])
+
 	Regenerate(filename, "//", values)
 
 def bytesToHex(b):
@@ -357,9 +369,7 @@ def buildANSICharClassifyTable(filename):
 		for page in item['codepage']:
 			output.append('// ' + page[1])
 		data = item['data']
-		output.append(', '.join('0x%02X' % ch for ch in data[:16]) + ',')
-		if len(data) > 16:
-			output.append(', '.join('0x%02X' % ch for ch in data[16:]) + ',')
+		output.extend(dumpArray(data, 16, '0x%02X'))
 	output.append("};")
 	output.append("")
 
@@ -421,9 +431,12 @@ def compressIndexTable(head, indexTable, args):
 		output = []
 		name = args.get('table_var', prefix)
 		output.append("const %s %s[] = {" % (typemap[sizeA], name))
-		output.append(', '.join(str(i) for i in indexA) + ',')
-		output.append(', '.join(str(i) for i in indexC) + ',')
-		output.append(', '.join(str(i) for i in indexD) + ',')
+		output.append("// %s1" % prefix)
+		output.extend(dumpArray(indexA, 20))
+		output.append("// %s2" % prefix)
+		output.extend(dumpArray(indexC, 20))
+		output.append("// %s" % prefix)
+		output.extend(dumpArray(indexD, 20))
 		output.append("};")
 		table = '\n'.join(output)
 
@@ -447,13 +460,13 @@ def compressIndexTable(head, indexTable, args):
 	else:
 		output = []
 		output.append("const %s %s1[] = {" % (typemap[sizeA], prefix))
-		output.append(', '.join(str(i) for i in indexA) + ',')
+		output.extend(dumpArray(indexA, 20))
 		output.append("};")
 		output.append("const %s %s2[] = {" % (typemap[sizeC], prefix))
-		output.append(', '.join(str(i) for i in indexC) + ',')
+		output.extend(dumpArray(indexC, 20))
 		output.append("};")
 		output.append("const %s %s[] = {" % (typemap[sizeD], prefix))
-		output.append(', '.join(str(i) for i in indexC) + ',')
+		output.extend(dumpArray(indexD, 20))
 		output.append("};")
 		table = '\n'.join(output)
 
@@ -525,7 +538,7 @@ def updateCharClassifyTable(filename, headfile):
 
 	data = runLengthEncode('CharClassify Unicode BMP', indexTable[:BMPCharacterCharacterCount], int(CharClassify.RLEValueBit))
 	output.append(f'const unsigned short CharClassifyRLE_BMP[] = {{')
-	output.append(', '.join(map(str, data)))
+	output.extend(dumpArray(data, 20))
 	output.append("};")
 	output.append("")
 	output.append("}") # namespace
@@ -549,7 +562,6 @@ def updateCharClassifyTable(filename, headfile):
 	for line in table.splitlines():
 		output.append(line)
 
-	lines = function.splitlines()
 	for line in function.splitlines():
 		head_output.append('\t' + line)
 
@@ -632,7 +644,7 @@ def makeDBCSCharClassifyTable(output, encodingList, isReservedOrUDC=None):
 	if True:
 		data = runLengthEncode(head, indexTable, int(CharClassify.RLEValueBit))
 		output.append(f'const unsigned short CharClassifyRLE{suffix}[] = {{')
-		output.append(', '.join(map(str, data)))
+		output.extend(dumpArray(data, 20))
 		output.append("};")
 		output.append("")
 
