@@ -2,10 +2,11 @@
 #include "EditStyle.h"
 
 // https://www.python.org/
-// http://ironpython.net/
+// https://ironpython.net/
 // http://cobra-language.com/
 // http://boo-lang.org/
-// http://www.jython.org/
+// https://www.jython.org/
+// https://cython.org/
 
 static KEYWORDLIST Keywords_Python = {{
 "async await " // python 3.7
@@ -322,7 +323,7 @@ static EDITSTYLE Styles_Python[] = {
 EDITLEXER lexPython = {
 	SCLEX_PYTHON, NP2LEX_PYTHON,
 	EDITLEXER_HOLE(L"Python Script", Styles_Python),
-	L"py; pyw; pyx; boo; empy; cobra",
+	L"py; pyw; pyx; pxd; pxi; boo; empy; cobra",
 	&Keywords_Python,
 	Styles_Python
 };

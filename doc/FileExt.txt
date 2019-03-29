@@ -72,7 +72,9 @@ PHP Script
 Python Script
 	py
 	pyw
-	pyx				Cython
+	pyx				Cython Implementation File
+	pxd				Cython Definition File
+	pxi				Cython Include File
 	boo				Boo
 	empy			EmPy
 	cobra			Cobra
