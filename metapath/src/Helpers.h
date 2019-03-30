@@ -72,6 +72,38 @@ int ParseCommaList(LPCWSTR str, int result[], int count);
 
 extern HINSTANCE g_hInstance;
 extern HANDLE g_hDefaultHeap;
+#if _WIN32_WINNT < _WIN32_WINNT_WIN10
+extern DWORD g_uWinVer;
+#endif
+
+// Operating System Version
+// https://docs.microsoft.com/en-us/windows/desktop/SysInfo/operating-system-version
+
+#if _WIN32_WINNT >= _WIN32_WINNT_VISTA
+#define IsVistaAndAbove()	TRUE
+#else
+#define IsVistaAndAbove()	(g_uWinVer >= _WIN32_WINNT_VISTA)
+#endif
+#if _WIN32_WINNT >= _WIN32_WINNT_WIN7
+#define IsWin7AndAbove()	TRUE
+#else
+#define IsWin7AndAbove()	(g_uWinVer >= _WIN32_WINNT_WIN7)
+#endif
+#if _WIN32_WINNT >= _WIN32_WINNT_WIN8
+#define IsWin8AndAbove()	TRUE
+#else
+#define IsWin8AndAbove()	(g_uWinVer >= _WIN32_WINNT_WIN8)
+#endif
+#if _WIN32_WINNT >= _WIN32_WINNT_WINBLUE
+#define IsWin8p1AndAbove()	TRUE
+#else
+#define IsWin8p1AndAbove()	(g_uWinVer >= _WIN32_WINNT_WINBLUE)
+#endif
+#if _WIN32_WINNT >= _WIN32_WINNT_WIN10
+#define IsWin10AndAbove()	TRUE
+#else
+#define IsWin10AndAbove()	(g_uWinVer >= _WIN32_WINNT_WIN10)
+#endif
 
 // https://docs.microsoft.com/en-us/windows/desktop/Memory/comparing-memory-allocation-methods
 // https://blogs.msdn.microsoft.com/oldnewthing/20120316-00/?p=8083/

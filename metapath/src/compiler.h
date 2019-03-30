@@ -23,6 +23,22 @@
 #define CSTRLEN(s)	(_countof(s) - 1)
 #endif
 
+// https://docs.microsoft.com/en-us/cpp/preprocessor/pragma-directives-and-the-pragma-keyword
+#if defined(__GNUC__) || defined(__clang__)
+#define NP2_COMPILER_WARNING_PUSH	_Pragma("GCC diagnostic push")
+#define NP2_COMPILER_WARNING_POP	_Pragma("GCC diagnostic pop")
+#else
+#define NP2_COMPILER_WARNING_PUSH	__pragma(warning(push))
+#define NP2_COMPILER_WARNING_POP	__pragma(warning(pop))
+#endif
+
+// C4996：was declared deprecated
+#if defined(__GNUC__) || defined(__clang__)
+#define NP2_IGNORE_WARNING_DEPRECATED_DECLARATIONS	_Pragma("GCC diagnostic ignored \"-Wdeprecated-declarations\"")
+#else
+#define NP2_IGNORE_WARNING_DEPRECATED_DECLARATIONS	__pragma(warning(disable: 4996))
+#endif
+
 #if defined(__GNUC__) && !defined(__cplusplus)
 #if defined(__NO_INLINE__) // O0
 #define NP2_inline	static inline
@@ -31,6 +47,23 @@
 #endif
 #else
 #define NP2_inline	inline
+#endif
+
+// sdkddkver.h
+#ifndef _WIN32_WINNT_VISTA
+#define _WIN32_WINNT_VISTA					0x0600
+#endif
+#ifndef _WIN32_WINNT_WIN7
+#define _WIN32_WINNT_WIN7					0x0601
+#endif
+#ifndef _WIN32_WINNT_WIN8
+#define _WIN32_WINNT_WIN8					0x0602
+#endif
+#ifndef _WIN32_WINNT_WINBLUE
+#define _WIN32_WINNT_WINBLUE				0x0603
+#endif
+#ifndef _WIN32_WINNT_WIN10
+#define _WIN32_WINNT_WIN10					0x0A00
 #endif
 
 #endif // NOTEPAD2_COMPILER_H_

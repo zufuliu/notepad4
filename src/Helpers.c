@@ -2156,7 +2156,7 @@ BOOL GetThemedDialogFont(LPWSTR lpFaceName, WORD *wSize) {
 					lf.lfHeight = -lf.lfHeight;
 				}
 				*wSize = (WORD)MulDiv(lf.lfHeight, 72, iLogPixelsY);
-				if (*wSize == 0) {
+				if (*wSize < 8) {
 					*wSize = 8;
 				}
 				lstrcpyn(lpFaceName, lf.lfFaceName, LF_FACESIZE);
@@ -2166,19 +2166,32 @@ BOOL GetThemedDialogFont(LPWSTR lpFaceName, WORD *wSize) {
 		}
 	}
 
-	/*
 	if (!bSucceed) {
 		NONCLIENTMETRICS ncm;
+		ZeroMemory(&ncm, sizeof(ncm));
 		ncm.cbSize = sizeof(NONCLIENTMETRICS);
-		SystemParametersInfo(SPI_GETNONCLIENTMETRICS, sizeof(NONCLIENTMETRICS), &ncm, 0);
-		if (ncm.lfMessageFont.lfHeight < 0)
-			ncm.lfMessageFont.lfHeight = -ncm.lfMessageFont.lfHeight;
-		*wSize = (WORD)MulDiv(ncm.lfMessageFont.lfHeight, 72, iLogPixelsY);
-		if (*wSize == 0)
-			*wSize = 8;
-		lstrcpyn(lpFaceName, ncm.lfMessageFont.lfFaceName, LF_FACESIZE);
-	}*/
+#if (WINVER >= _WIN32_WINNT_VISTA)
+		if (!IsVistaAndAbove()) {
+			ncm.cbSize -= sizeof(ncm.iPaddedBorderWidth);
+		}
+#endif
+		if (SystemParametersInfo(SPI_GETNONCLIENTMETRICS, sizeof(NONCLIENTMETRICS), &ncm, 0)) {
+			if (ncm.lfMessageFont.lfHeight < 0) {
+				ncm.lfMessageFont.lfHeight = -ncm.lfMessageFont.lfHeight;
+			}
+			*wSize = (WORD)MulDiv(ncm.lfMessageFont.lfHeight, 72, iLogPixelsY);
+			if (*wSize < 8) {
+				*wSize = 8;
+			}
+			lstrcpyn(lpFaceName, ncm.lfMessageFont.lfFaceName, LF_FACESIZE);
+			bSucceed = TRUE;
+		}
+	}
 
+	if (bSucceed && !IsVistaAndAbove()) {
+		// Windows 2000, XP, 2003
+		lstrcpy(lpFaceName, L"Tahoma");
+	}
 	return bSucceed;
 }
 

@@ -166,6 +166,9 @@ WCHAR	szDDETopic[256] = L"";
 
 HINSTANCE	g_hInstance;
 HANDLE		g_hDefaultHeap;
+#if _WIN32_WINNT < _WIN32_WINNT_WIN10
+DWORD		g_uWinVer;
+#endif
 
 //=============================================================================
 //
@@ -213,8 +216,16 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 
 	// Set global variable g_hInstance
 	g_hInstance = hInstance;
-	g_hDefaultHeap = GetProcessHeap();
+#if _WIN32_WINNT < _WIN32_WINNT_WIN10
+	// Set the Windows version global variable
+	NP2_COMPILER_WARNING_PUSH
+	NP2_IGNORE_WARNING_DEPRECATED_DECLARATIONS
+	g_uWinVer = LOWORD(GetVersion());
+	NP2_COMPILER_WARNING_POP
+	g_uWinVer = MAKEWORD(HIBYTE(g_uWinVer), LOBYTE(g_uWinVer));
+#endif
 
+	g_hDefaultHeap = GetProcessHeap();
 	SetErrorMode(SEM_FAILCRITICALERRORS | SEM_NOOPENFILEERRORBOX);
 	// Command Line, Ini File and Flags
 	ParseCommandLine();

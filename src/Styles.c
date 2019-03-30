@@ -412,7 +412,7 @@ static inline void FindSystemDefaultTextFont(void) {
 		NONCLIENTMETRICS ncm;
 		ZeroMemory(&ncm, sizeof(ncm));
 		ncm.cbSize = sizeof(ncm);
-#if (WINVER >= 0x0600)
+#if (WINVER >= _WIN32_WINNT_VISTA)
 		if (!IsVistaAndAbove()) {
 			ncm.cbSize -= sizeof(ncm.iPaddedBorderWidth);
 		}
