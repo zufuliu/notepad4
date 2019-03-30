@@ -147,13 +147,13 @@ def make_matapath_toolbar_bitmap():
 		'images/Upload_16x.png',				# IDT_UP_DIR
 		'images/OneLevelUp_16x.png',			# IDT_ROOT_DIR
 		'images/Favorite_16x.png',				# IDT_VIEW_FAVORITES
-		'images/NextDocument_16x.png',			# IDT_FILE_PREV
+		'images/PreviousDocument_16x.png',		# IDT_FILE_PREV
 		'images/NextDocument_16x.png',			# IDT_FILE_NEXT
 		'images/Run_16x.png',					# IDT_FILE_RUN
 		'images/PrintPreview_16x.png',			# IDT_FILE_QUICKVIEW
 		'images/Save_16x.png',					# IDT_FILE_SAVEAS
 		'images/CopyItem_16x.png',				# IDT_FILE_COPYMOVE
-		'images/RestoreFromRecycleBin_16x.png',	# IDT_FILE_DELETE_RECYCLE
+		'images/RecycleBin_16x.png',			# IDT_FILE_DELETE_RECYCLE
 		'images/RedCrossMark_16x.png',			# IDT_FILE_DELETE_PERM
 		'images/DeleteFilter_16x.png',			# IDT_VIEW_FILTER TB_DEL_FILTER_BMP
 		'images/AddFilter_16x.png',				# IDT_VIEW_FILTER TB_ADD_FILTER_BMP
@@ -188,6 +188,6 @@ def make_notepad2_toolbar_bitmap():
 		'images/.png',			# IDT_FILE_LAUNCH
 	], 'Toolbar.bmp')
 
-#make_matapath_toolbar_bitmap()
+make_matapath_toolbar_bitmap()
 #make_notepad2_toolbar_bitmap()
 #split_horizontal('Toolbar.bmp', '16x40')
