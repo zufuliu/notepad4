@@ -1,0 +1,6 @@
+<svg version="1.1" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+<style type="text/css">.icon-canvas-transparent{opacity:0;fill:#F6F6F6;} .icon-vs-action-blue{fill:#00539C;} .icon-vs-bg{fill:#424242;} .icon-vs-out{fill:#F6F6F6;}</style>
+<path id="canvas" class="icon-canvas-transparent" d="m16 16h-16v-16h16v16z"/>
+<path id="outline" class="icon-vs-out" d="m14 3v3h-0.992l-1.125 9h-7.766l-1.117-9h-1v-2 0-1h3v-1h6v1z" fill="#f6f6f6"/>
+<path id="iconBg" class="icon-vs-bg" d="m13 4v1h-10v-1h3v-1h4v1zm-1 2-1 8h-6l-1-8zm-1 1h-6l0.5 3h5z" fill="#424242"/>
+</svg>
