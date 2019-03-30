@@ -55,6 +55,7 @@ void	Style_Save(void);
 BOOL	Style_Import(HWND hwnd);
 BOOL	Style_Export(HWND hwnd);
 
+void	Style_DetectBaseFontSize(HWND hwnd);
 void	Style_OnDPIChanged(HWND hwnd);
 void	Style_OnStyleThemeChanged(HWND hwnd, int theme);
 void	Style_InitDefaultColor(HWND hwnd);
