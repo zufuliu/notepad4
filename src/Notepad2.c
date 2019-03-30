@@ -1620,6 +1620,7 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	HINSTANCE hInstance = ((LPCREATESTRUCT)lParam)->hInstance;
 	g_uCurrentDPI = GetCurrentDPI(hwnd);
 	g_uDefaultDPI = GetDefaultDPI(hwnd);
+	Style_DetectBaseFontSize(hwnd);
 
 	// Setup edit control
 	hwndEdit = EditCreate(hwnd);
@@ -1943,6 +1944,7 @@ void MsgDPIChanged(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	SendMessage(hwndEdit, SCI_INSERTTEXT, 0, (LPARAM)buf);
 #endif
 
+	Style_DetectBaseFontSize(hwnd);
 	Style_OnDPIChanged(hwndEdit);
 	UpdateSelectionMarginWidth();
 	SciCall_GotoPos(pos);

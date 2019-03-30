@@ -259,7 +259,7 @@ BOOL	bCurrentLexerHasLineComment;
 BOOL	bCurrentLexerHasBlockComment;
 static UINT fStylesModified = STYLESMODIFIED_NONE;
 static BOOL fWarnedNoIniFile = FALSE;
-static int	iBaseFontSize = 11*SC_FONT_SIZE_MULTIPLIER; // 11 pt in lexDefault
+static int	iBaseFontSize = 11*SC_FONT_SIZE_MULTIPLIER; // 11 pt
 int		iFontQuality = SC_EFF_QUALITY_LCD_OPTIMIZED;
 int		iCaretStyle = 1; // width 1, 0 for block
 int		iOvrCaretStyle = 0; // 0 for bar, 1 for block
@@ -425,6 +425,47 @@ static inline void FindSystemDefaultTextFont(void) {
 
 	// Windows 2000, XP, 2003
 	lstrcpy(systemTextFontName, L"Tahoma");
+}
+
+void Style_DetectBaseFontSize(HWND hwnd) {
+	HMONITOR hMonitor = MonitorFromWindow(hwnd, MONITOR_DEFAULTTONEAREST);
+	MONITORINFO mi;
+	mi.cbSize = sizeof(mi);
+	GetMonitorInfo(hMonitor, &mi);
+
+	const int cxScreen = mi.rcMonitor.right - mi.rcMonitor.left;
+	const int cyScreen = mi.rcMonitor.bottom - mi.rcMonitor.top;
+
+	int size = 11*SC_FONT_SIZE_MULTIPLIER; // 11 pt
+	// https://en.wikipedia.org/wiki/Display_resolution
+	if (cxScreen < 1920 && cyScreen < 1080) {
+		// SVGA		800 x 600
+		// XGA		1024 x 768
+		// WXGA		1280 x 720, 1280 x 800
+		// SXGA		1280 x 1024
+		// HD		1360 x 768, 1366 x 768
+		// WXGA+	1440 x 900
+		// Other	1536 x 864
+		// HD+		1600 x 900
+		// WSXGA+	1680 x 1050
+		size = 10*SC_FONT_SIZE_MULTIPLIER + SC_FONT_SIZE_MULTIPLIER/2; // 10.5 pt
+	}
+#if 0
+	else if (cxScreen < 2560 && cyScreen < 1440) {
+		// FHD		1920 x 1080
+		// WUXGA	1920 x 1200
+		// QWXGA	2040 x 1152
+		// Other	2560 x 1080
+	} else if (cxScreen < 3840 && cyScreen < 2160) {
+		// QHD		2560 x 1440
+		// Other	3440 x 1440
+	} else if (cxScreen >= 3840 && cyScreen >= 2160) {
+		// 4K UHD	3840 x 2160
+	} else {
+		// Other
+	}
+#endif
+	iBaseFontSize = size;
 }
 
 void Style_ReleaseResources(void) {
@@ -1133,7 +1174,11 @@ void Style_SetLexer(HWND hwnd, PEDITLEXER pLexNew) {
 
 	iValue = pLexNew->bUseDefaultCodeStyle ? Style_DefaultCode : Style_DefaultText;
 	LPCWSTR szValue = pLexGlobal->Styles[iValue].szValue;
-	Style_StrGetFontSize(szValue, &iBaseFontSize);
+	// base font size
+	if (!Style_StrGetFontSize(szValue, &iBaseFontSize)) {
+		iValue = DefaultToCurrentDPI(iBaseFontSize);
+		SendMessage(hwnd, SCI_STYLESETSIZEFRACTIONAL, STYLE_DEFAULT, iValue);
+	}
 	Style_SetStyles(hwnd, STYLE_DEFAULT, szValue);
 
 	// Auto-select codepage according to charset
@@ -2838,7 +2883,10 @@ BOOL Style_SelectFont(HWND hwnd, LPWSTR lpszStyle, int cchStyle, BOOL bDefaultSt
 	if (Style_StrGetColor(TRUE, lpszStyle, &iValue)) {
 		cf.rgbColors = iValue;
 	}
-	if (Style_StrGetFontSize(lpszStyle, &iValue)) {
+	if (!Style_StrGetFontSize(lpszStyle, &iValue)) {
+		iValue = iBaseFontSize;
+	}
+	{
 		HDC hdc = GetDC(hwnd);
 		cf.iPointSize = iValue / (SC_FONT_SIZE_MULTIPLIER / 10);
 		lf.lfHeight = -MulDiv(iValue, GetDeviceCaps(hdc, LOGPIXELSY), 72*SC_FONT_SIZE_MULTIPLIER);
