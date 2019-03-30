@@ -5179,7 +5179,7 @@ void LoadSettings(void) {
 	fWordWrap = IniSectionGetBool(pIniSection, L"WordWrap", 1);
 	fWordWrapG = fWordWrap;
 
-	iValue = IniSectionGetInt(pIniSection, L"WordWrapMode", SC_WRAP_WORD);
+	iValue = IniSectionGetInt(pIniSection, L"WordWrapMode", SC_WRAP_AUTO);
 	iWordWrapMode = clamp_i(iValue, SC_WRAP_WORD, SC_WRAP_AUTO);
 
 	iValue = IniSectionGetInt(pIniSection, L"WordWrapIndent", EditWrapIndentDefaultValue);
@@ -5269,7 +5269,7 @@ void LoadSettings(void) {
 	bFoldDisplayText = (iValue >> 2) & 1;
 
 	bMarkOccurrences = IniSectionGetBool(pIniSection, L"MarkOccurrences", 1);
-	bMarkOccurrencesMatchCase = IniSectionGetBool(pIniSection, L"MarkOccurrencesMatchCase", 1);
+	bMarkOccurrencesMatchCase = IniSectionGetBool(pIniSection, L"MarkOccurrencesMatchCase", 0);
 	bMarkOccurrencesMatchWords = IniSectionGetBool(pIniSection, L"MarkOccurrencesMatchWholeWords", 0);
 
 	bViewWhiteSpace = IniSectionGetBool(pIniSection, L"ViewWhiteSpace", 0);
@@ -5518,7 +5518,7 @@ void SaveSettings(BOOL bSaveSettingsNow) {
 	IniSectionSetIntEx(pIniSection, L"PathNameFormat", iPathNameFormat, 1);
 
 	IniSectionSetBoolEx(pIniSection, L"WordWrap", fWordWrapG, 1);
-	IniSectionSetIntEx(pIniSection, L"WordWrapMode", iWordWrapMode, SC_WRAP_WORD);
+	IniSectionSetIntEx(pIniSection, L"WordWrapMode", iWordWrapMode, SC_WRAP_AUTO);
 	IniSectionSetIntEx(pIniSection, L"WordWrapIndent", iWordWrapIndent, EditWrapIndentNone);
 	IniSectionSetIntEx(pIniSection, L"WordWrapSymbols", iWordWrapSymbols, EditWrapSymbolDefaultValue);
 	IniSectionSetBoolEx(pIniSection, L"ShowWordWrapSymbols", bShowWordWrapSymbols, 0);
@@ -5557,7 +5557,7 @@ void SaveSettings(BOOL bSaveSettingsNow) {
 	IniSectionSetBoolEx(pIniSection, L"ShowLineNumbers", bShowLineNumbers, 1);
 	IniSectionSetIntEx(pIniSection, L"ShowCodeFolding", bShowCodeFolding | (bShowFoldingLine << 1) | (bFoldDisplayText << 2), ShowCodeFolding_Default);
 	IniSectionSetBoolEx(pIniSection, L"MarkOccurrences", bMarkOccurrences, 1);
-	IniSectionSetBoolEx(pIniSection, L"MarkOccurrencesMatchCase", bMarkOccurrencesMatchCase, 1);
+	IniSectionSetBoolEx(pIniSection, L"MarkOccurrencesMatchCase", bMarkOccurrencesMatchCase, 0);
 	IniSectionSetBoolEx(pIniSection, L"MarkOccurrencesMatchWholeWords", bMarkOccurrencesMatchWords, 0);
 	IniSectionSetBoolEx(pIniSection, L"ViewWhiteSpace", bViewWhiteSpace, 0);
 	IniSectionSetBoolEx(pIniSection, L"ViewEOLs", bViewEOLs, 0);
