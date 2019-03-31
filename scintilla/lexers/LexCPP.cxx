@@ -258,7 +258,7 @@ static void ColouriseCppDoc(Sci_PositionU startPos, Sci_Position length, int ini
 
 		case SCE_C_IDENTIFIER:
 			if (!(iswordstart(sc.ch) || (sc.ch == '-' && (lexType == LEX_JAM)))) {
-				char s[256] = { 0 };
+				char s[256];
 				if (lexType == LEX_PHP)
 					sc.GetCurrentLowered(s, sizeof(s));
 				else
@@ -671,7 +671,7 @@ static void ColouriseCppDoc(Sci_PositionU startPos, Sci_Position length, int ini
 		case SCE_C_VARIABLE:
 			if (!(iswordstart(sc.ch) || (sc.ch == '-' && lexType == LEX_JAM))) {
 				if (lexType == LEX_PHP) {
-					char s[256] = { 0 };
+					char s[256];
 					sc.GetCurrentLowered(s, sizeof(s));
 					if (kwEnumeration.InList(s)) {
 						sc.ChangeState(SCE_C_ENUMERATION);

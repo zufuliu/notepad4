@@ -171,7 +171,7 @@ static void ColouriseAU3Doc(Sci_PositionU startPos, Sci_Position length, int ini
 	ci = 0;
 	//$$$
 	for (; sc.More(); sc.Forward()) {
-		char s[128] = "";
+		char s[128];
 		sc.GetCurrentLowered(s, sizeof(s));
 		// **********************************************
 		// save the total current word for eof processing
@@ -519,7 +519,7 @@ static void ColouriseAU3Doc(Sci_PositionU startPos, Sci_Position length, int ini
 		// Send key string ended
 		if (sc.chPrev == '}' && sc.ch != '}') {
 			// set color to SENDKEY when valid sendkey .. else set back to regular string
-			char sk[128];
+			char sk[128] = "";
 			// split {111 222} and return {111} and check if 222 is valid.
 			// if return code = 1 then invalid 222 so must be string
 			if (GetSendKey(s_save, sk)) {

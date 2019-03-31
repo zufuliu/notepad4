@@ -1,0 +1,7 @@
+<svg version="1.1" viewBox="0 0 9 16" xmlns="http://www.w3.org/2000/svg">
+<style>.icon-canvas-transparent{opacity:0;fill:#f6f6f6} .icon-vs-out{fill:#f6f6f6} .icon-vs-action-green{fill:#388a34}</style>
+<path id="canvas" class="icon-canvas-transparent" d="m16 16h-16v-16h16z" opacity="0"/>
+<g id="iconBg" transform="translate(-4,2)">
+	<path class="icon-vs-action-green" d="m5-1v14l7-7z" fill="#388a34"/>
+</g>
+</svg>
