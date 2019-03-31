@@ -1070,11 +1070,11 @@ void MakeColorPickButton(HWND hwnd, int nCtlId, HINSTANCE hInstance, COLORREF cr
 
 	HBITMAP hBmp = CreateMappedBitmap(hInstance, IDB_PICK, 0, colormap, 2);
 
-	bi.himl = ImageList_Create(10, 10, ILC_COLORDDB | ILC_MASK, 1, 0);
+	bi.himl = ImageList_Create(16, 16, ILC_COLORDDB | ILC_MASK, 1, 0);
 	ImageList_AddMasked(bi.himl, hBmp, RGB(0xFF, 0xFF, 0xFF));
 	DeleteObject(hBmp);
 
-	SetRect(&bi.margin, 0, 0, 4, 0);
+	SetRect(&bi.margin, 0, 0, 2, 0);
 	bi.uAlign = BUTTON_IMAGELIST_ALIGN_RIGHT;
 
 	SendMessage(hwndCtl, BCM_SETIMAGELIST, 0, (LPARAM)&bi);
