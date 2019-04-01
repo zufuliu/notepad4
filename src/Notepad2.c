@@ -335,70 +335,6 @@ UINT		g_uDefaultDPI = USER_DEFAULT_SCREEN_DPI;
 static WCHAR g_wchAppUserModelID[38] = L"";
 static WCHAR g_wchWorkingDirectory[MAX_PATH] = L"";
 
-#define	NP2_BookmarkLineForeColor	(0xff << 8)
-#define NP2_BookmarkLineColorAlpha	40
-
-//Graphics for bookmark indicator
-/* XPM */
-static const char* const bookmark_pixmap[] = {
-	"11 11 44 1",
-	" 	c #EBE9ED",
-	".	c #E5E3E7",
-	"+	c #767C6D",
-	"@	c #2A3120",
-	"#	c #1B2312",
-	"$	c #333B28",
-	"%	c #E3E1E5",
-	"&	c #D8D6DA",
-	"*	c #444D38",
-	"=	c #3F5C19",
-	"-	c #63AD00",
-	";	c #73C900",
-	">	c #64AF00",
-	", 	c #3D5718",
-	"'	c #3E4634",
-	")	c #7B8172",
-	"!	c #42601A",
-	"~	c #74CB00",
-	"{	c #71C600",
-	"]	c #3A5317",
-	"^	c #707668",
-	"/	c #3F4931",
-	"(	c #262C1D",
-	"_	c #2F3A1E",
-	":	c #72C700",
-	"<	c #74CA00",
-	"[	c #0E1109",
-	"}	c #3C462F",
-	"|	c #62AC00",
-	"1	c #21271A",
-	"2	c #7A8071",
-	"3	c #405D19",
-	"4	c #3D5A18",
-	"5	c #D9D7DB",
-	"6	c #4E5841",
-	"7	c #72C800",
-	"8	c #63AC00",
-	"9	c #3F5B19",
-	"0	c #3D4533",
-	"a	c #DFDDE0",
-	"b	c #353E29",
-	"c	c #29331B",
-	"d	c #7B8272",
-	"e	c #DDDBDF",
-	"           ",
-	"  .+@#$+%  ",
-	" &*=-;>, '  ",
-	")!~~~~{]^ ",
-	" /-~~~~~>(",
-	" _:~~~~~<[ ",
-	" }|~~~~~|1 ",
-	" 23~~~~;4+ ",
-	" 56=|7890  ",
-	"  a2bc}de  ",
-	"           "
-};
-
 //=============================================================================
 //
 // Flags
@@ -1489,7 +1425,8 @@ static inline void UpdateDocumentModificationStatus(void) {
 
 void UpdateSelectionMarginWidth(void) {
 	// fixed width to put arrow cursor.
-	const int width = bShowSelectionMargin ? (GetSystemMetrics(SM_CXCURSOR) / 2) : 0;
+	// 16px for bookmark indicator.
+	const int width = bShowSelectionMargin ? max_i(GetSystemMetrics(SM_CXCURSOR) / 2, 16) : 0;
 	SciCall_SetMarginWidth(MARGIN_SELECTION, width);
 }
 
@@ -3585,10 +3522,9 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		const int iPos = (int)SendMessage(hwndEdit, SCI_GETCURRENTPOS, 0, 0);
 		const int iLine = (int)SendMessage(hwndEdit, SCI_LINEFROMPOSITION, iPos, 0);
 
-		const int bitmask = 1;
-		int iNextLine = (int)SendMessage(hwndEdit, SCI_MARKERNEXT, iLine + 1, bitmask);
+		int iNextLine = (int)SendMessage(hwndEdit, SCI_MARKERNEXT, iLine + 1, IndicatorBitmask_Bookmark);
 		if (iNextLine == -1) {
-			iNextLine = (int)SendMessage(hwndEdit, SCI_MARKERNEXT, 0, bitmask);
+			iNextLine = (int)SendMessage(hwndEdit, SCI_MARKERNEXT, 0, IndicatorBitmask_Bookmark);
 		}
 
 		if (iNextLine != -1) {
@@ -3605,11 +3541,10 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		const int iPos = (int)SendMessage(hwndEdit, SCI_GETCURRENTPOS, 0, 0);
 		const int iLine = (int)SendMessage(hwndEdit, SCI_LINEFROMPOSITION, iPos, 0);
 
-		const int bitmask = 1;
-		int iNextLine = (int)SendMessage(hwndEdit, SCI_MARKERPREVIOUS, iLine - 1, bitmask);
+		int iNextLine = (int)SendMessage(hwndEdit, SCI_MARKERPREVIOUS, iLine - 1, IndicatorBitmask_Bookmark);
 		if (iNextLine == -1) {
 			const int nLines = (int)SendMessage(hwndEdit, SCI_GETLINECOUNT, 0, 0);
-			iNextLine = (int)SendMessage(hwndEdit, SCI_MARKERPREVIOUS, nLines, bitmask);
+			iNextLine = (int)SendMessage(hwndEdit, SCI_MARKERPREVIOUS, nLines, IndicatorBitmask_Bookmark);
 		}
 
 		if (iNextLine != -1) {
@@ -3627,20 +3562,13 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		const int iLine = (int)SendMessage(hwndEdit, SCI_LINEFROMPOSITION, iPos, 0);
 
 		const int bitmask = (int)SendMessage(hwndEdit, SCI_MARKERGET, iLine, 0);
-		if (bitmask & 1) {
+		if (bitmask & IndicatorBitmask_Bookmark) {
 			// unset
-			SendMessage(hwndEdit, SCI_MARKERDELETE, iLine, 0);
+			SendMessage(hwndEdit, SCI_MARKERDELETE, iLine, IndicatorNumber_Bookmark);
 		} else {
-			if (bShowSelectionMargin) {
-				SendMessage(hwndEdit, SCI_MARKERDEFINEPIXMAP, 0, (LPARAM)bookmark_pixmap);
-			} else {
-				SendMessage(hwndEdit, SCI_MARKERSETBACK, 0, NP2_BookmarkLineForeColor);
-				SendMessage(hwndEdit, SCI_MARKERSETALPHA, 0, NP2_BookmarkLineColorAlpha);
-				SendMessage(hwndEdit, SCI_MARKERDEFINE, 0, SC_MARK_BACKGROUND);
-			}
-
+			Style_SetBookmarkIndicator(hwndEdit, bShowSelectionMargin);
 			// set
-			SendMessage(hwndEdit, SCI_MARKERADD, iLine, 0);
+			SendMessage(hwndEdit, SCI_MARKERADD, iLine, IndicatorNumber_Bookmark);
 		}
 	}
 	break;
@@ -3852,15 +3780,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case IDM_VIEW_MARGIN:
 		bShowSelectionMargin = !bShowSelectionMargin;
 		UpdateSelectionMarginWidth();
-
-		//Depending on if the margin is visible or not, choose different bookmark indication
-		if (bShowSelectionMargin) {
-			SendMessage(hwndEdit, SCI_MARKERDEFINEPIXMAP, 0, (LPARAM)bookmark_pixmap);
-		} else {
-			SendMessage(hwndEdit, SCI_MARKERSETBACK, 0, NP2_BookmarkLineForeColor);
-			SendMessage(hwndEdit, SCI_MARKERSETALPHA, 0, NP2_BookmarkLineColorAlpha);
-			SendMessage(hwndEdit, SCI_MARKERDEFINE, 0, SC_MARK_BACKGROUND);
-		}
+		Style_SetBookmarkIndicator(hwndEdit, bShowSelectionMargin);
 		break;
 
 	case IDM_VIEW_AUTOCOMPLETEWORDS:
@@ -3879,7 +3799,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		} else {
 			iMatchesCount = 0;
 			// clear all marks
-			SendMessage(hwndEdit, SCI_SETINDICATORCURRENT, MarkOccurrencesIndicatorNumber, 0);
+			SendMessage(hwndEdit, SCI_SETINDICATORCURRENT, IndicatorNumber_MarkOccurrences, 0);
 			SendMessage(hwndEdit, SCI_INDICATORCLEARRANGE, 0, SendMessage(hwndEdit, SCI_GETLENGTH, 0, 0));
 		}
 		UpdateStatusbar();
