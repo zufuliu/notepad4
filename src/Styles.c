@@ -266,6 +266,8 @@ int		iOvrCaretStyle = 0; // 0 for bar, 1 for block
 int		iCaretBlinkPeriod = -1; // system default, 0 for noblink
 int 	iMarkOccurrencesColor;
 int 	iMarkOccurrencesAlpha;
+static int iBookmarkLineColor;
+static int iBookmarkLineAlpha;
 static int	iDefaultLexer;
 static BOOL bAutoSelect;
 int		cxStyleSelectDlg;
@@ -344,6 +346,7 @@ enum DefaultStyleIndex {
 	Style_FoldingMarker,	// standalone style. `fore`: folder line color, `back`: folder box fill color
 	Style_FoldDispalyText,	// inherited style.
 	Style_MarkOccurrences,	// standalone style. `fore`, `alpha`
+	Style_BookmarkLine,		// standalone style. `back`, `alpha`
 };
 
 // folding marker
@@ -357,6 +360,35 @@ enum DefaultStyleIndex {
 #define SC_INDICATOR_TARGET		(INDIC_IME + 1)
 #define SC_INDICATOR_CONVERTED	(INDIC_IME + 2)
 #define SC_INDICATOR_UNKNOWN	INDIC_IME_MAX
+
+#define MarkOccurrencesDefaultAlpha	100
+#define	BookmarkLineDefaultColor	RGB(0, 0xff, 0)
+#define BookmarkLineDefaultAlpha	40
+
+// XPM Graphics for bookmark indicator
+/* GIMP export Bookmark2_16x.png with Alpha threshold 127 */
+static const char* const bookmark_pixmap[] = {
+"16 16 3 1",
+" 	c None",
+".	c #408040",
+"+	c #3F803F",
+"                ",
+"  ............  ",
+"  ............  ",
+"  ............  ",
+"  ............  ",
+"  ............  ",
+"  ............  ",
+"  ............  ",
+"  ............  ",
+"  ............  ",
+"  .....  .....  ",
+"  ....    ....  ",
+"  ...      ...  ",
+"  ..        ..  ",
+"  +          +  ",
+"                "
+};
 
 // style UI controls on Customize Schemes dialog
 enum {
@@ -388,6 +420,8 @@ static inline UINT GetDefaultStyleControlMask(int index) {
 	case Style_IMEIndicator:
 	case Style_MarkOccurrences:
 		return StyleControl_Fore;
+	case Style_BookmarkLine:
+		return StyleControl_Back;
 	case Style_ExtraLineSpacing:
 		return StyleControl_None;
 	default:
@@ -1380,7 +1414,15 @@ void Style_SetLexer(HWND hwnd, PEDITLEXER pLexNew) {
 		iMarkOccurrencesColor = GetSysColor(COLOR_HIGHLIGHT);
 	}
 	if (!Style_StrGetAlpha(szValue, &iMarkOccurrencesAlpha)) {
-		iMarkOccurrencesAlpha = 100;
+		iMarkOccurrencesAlpha = MarkOccurrencesDefaultAlpha;
+	}
+	// Bookmark
+	szValue = pLexGlobal->Styles[Style_MarkOccurrences].szValue;
+	if (!Style_StrGetColor(FALSE, szValue, &iBookmarkLineColor)) {
+		iBookmarkLineColor = BookmarkLineDefaultColor;
+	}
+	if (!Style_StrGetAlpha(szValue, &iBookmarkLineAlpha)) {
+		iBookmarkLineAlpha = BookmarkLineDefaultAlpha;
 	}
 
 	{
@@ -2625,6 +2667,16 @@ void Style_SetIndentGuides(HWND hwnd, BOOL bShow) {
 		}
 	}
 	SendMessage(hwnd, SCI_SETINDENTATIONGUIDES, iIndentView, 0);
+}
+
+void Style_SetBookmarkIndicator(HWND hwnd, BOOL bShowSelectionMargin) {
+	if (bShowSelectionMargin) {
+		SendMessage(hwnd, SCI_MARKERDEFINEPIXMAP, IndicatorNumber_Bookmark, (LPARAM)bookmark_pixmap);
+	} else {
+		SendMessage(hwnd, SCI_MARKERSETBACK, IndicatorNumber_Bookmark, iBookmarkLineColor);
+		SendMessage(hwnd, SCI_MARKERSETALPHA, IndicatorNumber_Bookmark, iBookmarkLineAlpha);
+		SendMessage(hwnd, SCI_MARKERDEFINE, IndicatorNumber_Bookmark, SC_MARK_BACKGROUND);
+	}
 }
 
 //=============================================================================

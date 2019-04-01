@@ -78,6 +78,7 @@ void	Style_UpdateSchemeMenu(HMENU hmenu);
 
 void	Style_SetDefaultFont(HWND hwnd, BOOL bCode);
 void	Style_SetIndentGuides(HWND hwnd, BOOL bShow);
+void	Style_SetBookmarkIndicator(HWND hwnd, BOOL bShowSelectionMargin);
 void	Style_UpdateCaret(HWND hwnd);
 void	Style_SetLongLineColors(HWND hwnd);
 void	Style_HighlightCurrentLine(HWND hwnd);

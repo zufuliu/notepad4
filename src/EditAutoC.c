@@ -1292,9 +1292,9 @@ void EditAutoIndent(HWND hwnd) {
 							  (int)SendMessage(hwnd, SCI_POSITIONFROMLINE, iCurLine - 1, 0);
 		if (iPrevLineLength == 0) {
 			const int bitmask = (int)SendMessage(hwnd, SCI_MARKERGET, iCurLine - 1, 0);
-			if (bitmask & 1) {
-				SendMessage(hwnd, SCI_MARKERDELETE, iCurLine - 1, 0);
-				SendMessage(hwnd, SCI_MARKERADD, iCurLine, 0);
+			if (bitmask & IndicatorBitmask_Bookmark) {
+				SendMessage(hwnd, SCI_MARKERDELETE, iCurLine - 1, IndicatorNumber_Bookmark);
+				SendMessage(hwnd, SCI_MARKERADD, iCurLine, IndicatorNumber_Bookmark);
 			}
 		}
 	}

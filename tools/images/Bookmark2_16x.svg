@@ -1,0 +1,5 @@
+<svg version="1.1" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+<style type="text/css">.icon-canvas-transparent{opacity:0;fill:#F6F6F6;} .icon-vs-out{fill:#F6F6F6;} .icon-vs-bg{fill:#408040;}</style>
+<path id="canvas" class="icon-canvas-transparent" d="m16 16h-16v-16h16v16z"/>
+<path id="iconBg" class="icon-vs-bg" d="m14 15-6-5-6 5v-14h12z"/>
+</svg>

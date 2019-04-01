@@ -5072,7 +5072,7 @@ void EditMarkAll(HWND hwnd, BOOL bMarkOccurrencesMatchCase, BOOL bMarkOccurrence
 	int iSelCount = iSelEnd - iSelStart;
 
 	// clear existing indicator
-	SendMessage(hwnd, SCI_SETINDICATORCURRENT, MarkOccurrencesIndicatorNumber, 0);
+	SendMessage(hwnd, SCI_SETINDICATORCURRENT, IndicatorNumber_MarkOccurrences, 0);
 	SendMessage(hwnd, SCI_INDICATORCLEARRANGE, 0, iTextLen);
 
 	// if nothing selected or multiple lines are selected exit
@@ -5110,9 +5110,9 @@ void EditMarkAll(HWND hwnd, BOOL bMarkOccurrencesMatchCase, BOOL bMarkOccurrence
 	ttf.lpstrText = pszText;
 
 	// set style
-	SendMessage(hwnd, SCI_INDICSETALPHA, MarkOccurrencesIndicatorNumber, iMarkOccurrencesAlpha);
-	SendMessage(hwnd, SCI_INDICSETFORE, MarkOccurrencesIndicatorNumber, iMarkOccurrencesColor);
-	SendMessage(hwnd, SCI_INDICSETSTYLE, MarkOccurrencesIndicatorNumber, INDIC_ROUNDBOX);
+	SendMessage(hwnd, SCI_INDICSETALPHA, IndicatorNumber_MarkOccurrences, iMarkOccurrencesAlpha);
+	SendMessage(hwnd, SCI_INDICSETFORE, IndicatorNumber_MarkOccurrences, iMarkOccurrencesColor);
+	SendMessage(hwnd, SCI_INDICSETSTYLE, IndicatorNumber_MarkOccurrences, INDIC_ROUNDBOX);
 
 	const int findFlag = (bMarkOccurrencesMatchCase ? SCFIND_MATCHCASE : 0) | (bMarkOccurrencesMatchWords ? SCFIND_WHOLEWORD : 0);
 	int iPos;

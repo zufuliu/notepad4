@@ -188,7 +188,13 @@ void	EditPrintSetup(HWND hwnd);
 }
 #endif
 
-#define MarkOccurrencesIndicatorNumber	1 // INDIC_DIAGONAL
+enum {
+	IndicatorNumber_Bookmark = 0,
+	IndicatorNumber_MarkOccurrences = 1,
+
+	IndicatorBitmask_Bookmark  = 1 << IndicatorNumber_Bookmark,
+};
+
 void	EditMarkAll(HWND hwnd, BOOL bMarkOccurrencesMatchCase, BOOL bMarkOccurrencesMatchWords);
 
 // auto completion fill-up characters
