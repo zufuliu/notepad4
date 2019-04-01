@@ -338,6 +338,7 @@ enum DefaultStyleIndex {
 	Style_Whitespace,		// standalone style. `fore`, `back`, `size`: dot size
 	Style_CurrentLine,		// standalone style. frame (`fore`, `size`, `alpha`), background (`back`, `alpha`)
 	Style_Caret,			// standalone style. `fore`: caret color
+	Style_IMEIndicator,		// standalone style. `fore`: IME indicator color
 	Style_LongLineMarker,	// standalone style. `fore`: edge line color, `back`: edge background color
 	Style_ExtraLineSpacing,	// standalone style. descent = `size`/2, ascent = `size` - descent
 	Style_FoldingMarker,	// standalone style. `fore`: folder line color, `back`: folder box fill color
@@ -350,6 +351,12 @@ enum DefaultStyleIndex {
 #define FoldingMarkerFillColorDefault	RGB(0xAD, 0xD8, 0xE6)
 #define FoldingMarkerLineColorDark		RGB(0x80, 0x80, 0x80)
 #define FoldingMarkerFillColorDark		RGB(0x60, 0x60, 0x60)
+
+// from ScintillaWin.cxx
+#define SC_INDICATOR_INPUT		INDIC_IME
+#define SC_INDICATOR_TARGET		(INDIC_IME + 1)
+#define SC_INDICATOR_CONVERTED	(INDIC_IME + 2)
+#define SC_INDICATOR_UNKNOWN	INDIC_IME_MAX
 
 // style UI controls on Customize Schemes dialog
 enum {
@@ -378,6 +385,7 @@ static inline UINT GetDefaultStyleControlMask(int index) {
 	case Style_Selection:
 		return StyleControl_Fore | StyleControl_Back | StyleControl_EOLFilled;
 	case Style_Caret:
+	case Style_IMEIndicator:
 	case Style_MarkOccurrences:
 		return StyleControl_Fore;
 	case Style_ExtraLineSpacing:
@@ -1279,9 +1287,16 @@ void Style_SetLexer(HWND hwnd, PEDITLEXER pLexNew) {
 	}
 	SendMessage(hwnd, SCI_SETCARETFORE, iValue, 0);
 	SendMessage(hwnd, SCI_SETADDITIONALCARETFORE, iValue, 0);
+	// IME indicator
+	szValue = pLexGlobal->Styles[Style_IMEIndicator].szValue;
+	if (Style_StrGetColor(TRUE, szValue, &iValue)) {
+		SendMessage(hwnd, SCI_INDICSETFORE, SC_INDICATOR_INPUT, iValue);
+		SendMessage(hwnd, SCI_INDICSETFORE, SC_INDICATOR_TARGET, iValue);
+		SendMessage(hwnd, SCI_INDICSETFORE, SC_INDICATOR_CONVERTED, iValue);
+		SendMessage(hwnd, SCI_INDICSETFORE, SC_INDICATOR_UNKNOWN, iValue);
+	}
 
 	Style_SetLongLineColors(hwnd);
-
 	// Extra Line Spacing
 	if (rid != NP2LEX_ANSI && Style_StrGetRawSize(pLexGlobal->Styles[Style_ExtraLineSpacing].szValue, &iValue)) {
 		int iAscent = 0;
