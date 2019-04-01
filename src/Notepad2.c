@@ -3216,7 +3216,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 				const Sci_Position iCurrentLinePos = iCurrentPos - SciCall_PositionFromLine(iCurLine);
 				if (iCurLine < 2 && iCurrentLinePos == 0) {
 					char cmsz[128];
-					wsprintfA(cmsz, "#-*- coding: %s -*-", msz);
+					sprintf(cmsz, "#-*- coding: %s -*-", msz);
 					SendMessage(hwndEdit, SCI_REPLACESEL, 0, (LPARAM)cmsz);
 					done = TRUE;
 				}
@@ -6708,7 +6708,7 @@ void UpdateLineNumberWidth(void) {
 		char tchLines[32];
 
 		const int iLines = SciCall_GetLineCount();
-		wsprintfA(tchLines, "_%i_", iLines);
+		sprintf(tchLines, "_%i_", iLines);
 
 		const int iLineMarginWidthNow = SciCall_GetMarginWidth(MARGIN_LINE_NUMBER);
 		const int iLineMarginWidthFit = SciCall_TextWidth(STYLE_LINENUMBER, tchLines);

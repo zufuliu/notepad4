@@ -25,7 +25,7 @@ static EDITSTYLE Styles_Global[] = {
 	{ 0, 63112, EDITSTYLE_HOLE(L"Folding Marker"), L"fore:#8080FF; back:#ADD8E6" },
 	{ STYLE_FOLDDISPLAYTEXT, 63116, EDITSTYLE_HOLE(L"Fold Ellipsis"), L"font:$(Code); size:-2; bold; fore:#808080" },
 	{ 0, 63113, EDITSTYLE_HOLE(L"Mark Occurrences"), L"alpha:100" },
-	{ 0, 63118, EDITSTYLE_HOLE(L"Bookmark"), L"back:#00FF00; alpha:40" },
+	{ 0, 63118, EDITSTYLE_HOLE(L"Bookmark"), L"fore:#408040; back:#00FF00; alpha:40" },
 };
 
 static EDITSTYLE Styles_2ndGlobal[] = {
@@ -46,7 +46,7 @@ static EDITSTYLE Styles_2ndGlobal[] = {
 	{ 0, 63112, EDITSTYLE_HOLE(L"Folding Marker"), L"fore:#808080; back:#606060" },
 	{ STYLE_FOLDDISPLAYTEXT, 63116, EDITSTYLE_HOLE(L"Fold Ellipsis"), L"font:$(Code); size:-2; bold; fore:#606060" },
 	{ 0, 63113, EDITSTYLE_HOLE(L"Mark Occurrences"), L"alpha:100" },
-	{ 0, 63118, EDITSTYLE_HOLE(L"Bookmark"), L"back:#00FF00; alpha:40" },
+	{ 0, 63118, EDITSTYLE_HOLE(L"Bookmark"), L"fore:#408040; back:#00FF00; alpha:40" },
 };
 
 EDITLEXER lexGlobal = {
