@@ -5,6 +5,7 @@
 #include <commctrl.h>
 #include <commdlg.h>
 #include <limits.h>
+#include <stdio.h>
 #include "Edit.h"
 #include "Styles.h"
 #include "Helpers.h"
@@ -1791,7 +1792,7 @@ void EditShowCallTips(HWND hwnd, Sci_Position position) {
 	char *pLine = (char *)NP2HeapAlloc(iDocLen + 1);
 	SciCall_GetLine(iLine, pLine);
 	char *text = (char *)NP2HeapAlloc(iDocLen + 1 + 128);
-	wsprintfA(text, "ShowCallTips(%d, %d, %d)\n%s", iLine + 1, (int)position, iDocLen, pLine);
+	sprintf(text, "ShowCallTips(%d, %d, %d)\n%s", iLine + 1, (int)position, iDocLen, pLine);
 	SendMessage(hwnd, SCI_CALLTIPSHOW, position, (LPARAM)text);
 	NP2HeapFree(pLine);
 	NP2HeapFree(text);

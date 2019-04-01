@@ -266,6 +266,7 @@ int		iOvrCaretStyle = 0; // 0 for bar, 1 for block
 int		iCaretBlinkPeriod = -1; // system default, 0 for noblink
 int 	iMarkOccurrencesColor;
 int 	iMarkOccurrencesAlpha;
+static int iBookmarkImageColor;
 static int iBookmarkLineColor;
 static int iBookmarkLineAlpha;
 static int	iDefaultLexer;
@@ -346,7 +347,7 @@ enum DefaultStyleIndex {
 	Style_FoldingMarker,	// standalone style. `fore`: folder line color, `back`: folder box fill color
 	Style_FoldDispalyText,	// inherited style.
 	Style_MarkOccurrences,	// standalone style. `fore`, `alpha`
-	Style_BookmarkLine,		// standalone style. `back`, `alpha`
+	Style_Bookmark,			// standalone style. `fore`, `back`, `alpha`
 };
 
 // folding marker
@@ -362,16 +363,22 @@ enum DefaultStyleIndex {
 #define SC_INDICATOR_UNKNOWN	INDIC_IME_MAX
 
 #define MarkOccurrencesDefaultAlpha	100
+
+#define	BookmarkImageDefaultColor	RGB(0x40, 0x80, 0x40)
 #define	BookmarkLineDefaultColor	RGB(0, 0xff, 0)
 #define BookmarkLineDefaultAlpha	40
 
+#define BookmarkUsingPixmapImage		1
+#if BookmarkUsingPixmapImage
 // XPM Graphics for bookmark indicator
 /* GIMP export Bookmark2_16x.png with Alpha threshold 127 */
+static char bookmark_pixmap_color[16];
+#define bookmark_pixmap_color_fmt	".	c #%06X"
 static const char* const bookmark_pixmap[] = {
-"16 16 3 1",
+"16 16 2 1",
 " 	c None",
-".	c #408040",
-"+	c #3F803F",
+//".	c #408040",
+bookmark_pixmap_color,
 "                ",
 "  ............  ",
 "  ............  ",
@@ -386,9 +393,10 @@ static const char* const bookmark_pixmap[] = {
 "  ....    ....  ",
 "  ...      ...  ",
 "  ..        ..  ",
-"  +          +  ",
+"  .          .  ",
 "                "
 };
+#endif
 
 // style UI controls on Customize Schemes dialog
 enum {
@@ -413,6 +421,7 @@ static inline UINT GetDefaultStyleControlMask(int index) {
 	case Style_CurrentLine:
 	case Style_LongLineMarker:
 	case Style_FoldingMarker:
+	case Style_Bookmark:
 		return StyleControl_Fore | StyleControl_Back;
 	case Style_Selection:
 		return StyleControl_Fore | StyleControl_Back | StyleControl_EOLFilled;
@@ -420,8 +429,6 @@ static inline UINT GetDefaultStyleControlMask(int index) {
 	case Style_IMEIndicator:
 	case Style_MarkOccurrences:
 		return StyleControl_Fore;
-	case Style_BookmarkLine:
-		return StyleControl_Back;
 	case Style_ExtraLineSpacing:
 		return StyleControl_None;
 	default:
@@ -1417,7 +1424,10 @@ void Style_SetLexer(HWND hwnd, PEDITLEXER pLexNew) {
 		iMarkOccurrencesAlpha = MarkOccurrencesDefaultAlpha;
 	}
 	// Bookmark
-	szValue = pLexGlobal->Styles[Style_MarkOccurrences].szValue;
+	szValue = pLexGlobal->Styles[Style_Bookmark].szValue;
+	if (!Style_StrGetColor(TRUE, szValue, &iBookmarkImageColor)) {
+		iBookmarkImageColor = BookmarkImageDefaultColor;
+	}
 	if (!Style_StrGetColor(FALSE, szValue, &iBookmarkLineColor)) {
 		iBookmarkLineColor = BookmarkLineDefaultColor;
 	}
@@ -2671,7 +2681,15 @@ void Style_SetIndentGuides(HWND hwnd, BOOL bShow) {
 
 void Style_SetBookmarkIndicator(HWND hwnd, BOOL bShowSelectionMargin) {
 	if (bShowSelectionMargin) {
+#if BookmarkUsingPixmapImage
+		sprintf(bookmark_pixmap_color, bookmark_pixmap_color_fmt, iBookmarkImageColor);
 		SendMessage(hwnd, SCI_MARKERDEFINEPIXMAP, IndicatorNumber_Bookmark, (LPARAM)bookmark_pixmap);
+#else
+		SendMessage(hwnd, SCI_MARKERSETBACK, IndicatorNumber_Bookmark, iBookmarkImageColor);
+		// to avoid border
+		SendMessage(hwnd, SCI_MARKERSETFORE, IndicatorNumber_Bookmark, iBookmarkImageColor);
+		SendMessage(hwnd, SCI_MARKERDEFINE, IndicatorNumber_Bookmark, SC_MARK_BOOKMARK);
+#endif
 	} else {
 		SendMessage(hwnd, SCI_MARKERSETBACK, IndicatorNumber_Bookmark, iBookmarkLineColor);
 		SendMessage(hwnd, SCI_MARKERSETALPHA, IndicatorNumber_Bookmark, iBookmarkLineAlpha);
