@@ -19,10 +19,11 @@ static EDITSTYLE Styles_Global[] = {
 	{ SCI_SETWHITESPACEFORE + SCI_SETWHITESPACEBACK + SCI_SETWHITESPACESIZE, 63107, EDITSTYLE_HOLE(L"Whitespace"), L"size:1; fore:#FF4000" },
 	{ SCI_SETCARETLINEBACK, 63108, EDITSTYLE_HOLE(L"Current Line"), L"size:2; fore:#C2C0C3; back:#FFFF00; alpha:90" },
 	{ SCI_SETCARETFORE + SCI_SETCARETWIDTH, 63109, EDITSTYLE_HOLE(L"Caret"), L"" },
+	{ 0, 63117, EDITSTYLE_HOLE(L"IME Indicator"), L"fore:#108010" },
 	{ SCI_SETEDGECOLOUR, 63110, EDITSTYLE_HOLE(L"Long Line Marker"), L"fore:#FFC000" },
 	{ SCI_SETEXTRAASCENT + SCI_SETEXTRADESCENT, 63111, EDITSTYLE_HOLE(L"Extra Line Spacing"), L"size:2" },
 	{ 0, 63112, EDITSTYLE_HOLE(L"Folding Marker"), L"fore:#8080FF; back:#ADD8E6" },
-	{ STYLE_FOLDDISPLAYTEXT, 63114, EDITSTYLE_HOLE(L"Fold Ellipsis"), L"font:$(Code); size:-2; bold; fore:#808080" },
+	{ STYLE_FOLDDISPLAYTEXT, 63116, EDITSTYLE_HOLE(L"Fold Ellipsis"), L"font:$(Code); size:-2; bold; fore:#808080" },
 	{ 0, 63113, EDITSTYLE_HOLE(L"Mark Occurrences"), L"alpha:100" },
 };
 
@@ -38,10 +39,11 @@ static EDITSTYLE Styles_2ndGlobal[] = {
 	{ SCI_SETWHITESPACEFORE + SCI_SETWHITESPACEBACK + SCI_SETWHITESPACESIZE, 63107, EDITSTYLE_HOLE(L"Whitespace"), L"size:1; fore:#FF4000" },
 	{ SCI_SETCARETLINEBACK, 63108, EDITSTYLE_HOLE(L"Current Line"), L"size:2; fore:#C2C0C3; back:#FFFF00; alpha:25" },
 	{ SCI_SETCARETFORE + SCI_SETCARETWIDTH, 63109, EDITSTYLE_HOLE(L"Caret"), L"fore:#FFFFFF" },
+	{ 0, 63117, EDITSTYLE_HOLE(L"IME Indicator"), L"fore:#108010" },
 	{ SCI_SETEDGECOLOUR, 63110, EDITSTYLE_HOLE(L"Long Line Marker"), L"fore:#605F63" },
 	{ SCI_SETEXTRAASCENT + SCI_SETEXTRADESCENT, 63111, EDITSTYLE_HOLE(L"Extra Line Spacing"), L"size:2" },
 	{ 0, 63112, EDITSTYLE_HOLE(L"Folding Marker"), L"fore:#808080; back:#606060" },
-	{ STYLE_FOLDDISPLAYTEXT, 63114, EDITSTYLE_HOLE(L"Fold Ellipsis"), L"font:$(Code); size:-2; bold; fore:#606060" },
+	{ STYLE_FOLDDISPLAYTEXT, 63116, EDITSTYLE_HOLE(L"Fold Ellipsis"), L"font:$(Code); size:-2; bold; fore:#606060" },
 	{ 0, 63113, EDITSTYLE_HOLE(L"Mark Occurrences"), L"alpha:100" },
 };
 
