@@ -3795,25 +3795,22 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case IDM_VIEW_MARKOCCURRENCES_OFF:
 		bMarkOccurrences = !bMarkOccurrences;
 		if (bMarkOccurrences) {
-			EditMarkAll(hwndEdit, bMarkOccurrencesMatchCase, bMarkOccurrencesMatchWords);
+			EditMarkAll(hwndEdit, FALSE, bMarkOccurrencesMatchCase, bMarkOccurrencesMatchWords);
 		} else {
-			iMatchesCount = 0;
-			// clear all marks
-			SendMessage(hwndEdit, SCI_SETINDICATORCURRENT, IndicatorNumber_MarkOccurrences, 0);
-			SendMessage(hwndEdit, SCI_INDICATORCLEARRANGE, 0, SendMessage(hwndEdit, SCI_GETLENGTH, 0, 0));
+			EditMarkAll_Clear(hwndEdit);
 		}
 		UpdateStatusbar();
 		break;
 
 	case IDM_VIEW_MARKOCCURRENCES_CASE:
 		bMarkOccurrencesMatchCase = !bMarkOccurrencesMatchCase;
-		EditMarkAll(hwndEdit, bMarkOccurrencesMatchCase, bMarkOccurrencesMatchWords);
+		EditMarkAll(hwndEdit, FALSE, bMarkOccurrencesMatchCase, bMarkOccurrencesMatchWords);
 		UpdateStatusbar();
 		break;
 
 	case IDM_VIEW_MARKOCCURRENCES_WORD:
 		bMarkOccurrencesMatchWords = !bMarkOccurrencesMatchWords;
-		EditMarkAll(hwndEdit, bMarkOccurrencesMatchCase, bMarkOccurrencesMatchWords);
+		EditMarkAll(hwndEdit, FALSE, bMarkOccurrencesMatchCase, bMarkOccurrencesMatchWords);
 		UpdateStatusbar();
 		break;
 
@@ -4728,7 +4725,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 				if (scn->updated & (SC_UPDATE_SELECTION)) {
 					// mark occurrences of text currently selected
 					if (bMarkOccurrences) {
-						EditMarkAll(hwndEdit, bMarkOccurrencesMatchCase, bMarkOccurrencesMatchWords);
+						EditMarkAll(hwndEdit, (scn->updated & SC_UPDATE_CONTENT) != 0, bMarkOccurrencesMatchCase, bMarkOccurrencesMatchWords);
 					}
 					UpdateStatusBarCache_OVRMode(FALSE);
 				}
