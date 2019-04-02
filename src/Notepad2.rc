@@ -406,7 +406,7 @@ BEGIN
 		END
 		MENUITEM SEPARATOR
 		MENUITEM "Line &Numbers\tCtrl+Shift+N",		IDM_VIEW_LINENUMBERS
-		MENUITEM "Selection &Margin\tCtrl+Shift+M",	IDM_VIEW_MARGIN
+		MENUITEM "Bookmark/Selection &Margin\tCtrl+Shift+M",	IDM_VIEW_MARGIN
 		POPUP "Mar&k Occurrences"
 		BEGIN
 			MENUITEM "&Off",						IDM_VIEW_MARKOCCURRENCES_OFF

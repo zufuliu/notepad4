@@ -269,6 +269,7 @@ int 	iMarkOccurrencesAlpha;
 static int iBookmarkImageColor;
 static int iBookmarkLineColor;
 static int iBookmarkLineAlpha;
+static BOOL bBookmarkColorUpdated;
 static int	iDefaultLexer;
 static BOOL bAutoSelect;
 int		cxStyleSelectDlg;
@@ -1424,6 +1425,7 @@ void Style_SetLexer(HWND hwnd, PEDITLEXER pLexNew) {
 		iMarkOccurrencesAlpha = MarkOccurrencesDefaultAlpha;
 	}
 	// Bookmark
+	bBookmarkColorUpdated = TRUE;
 	szValue = pLexGlobal->Styles[Style_Bookmark].szValue;
 	if (!Style_StrGetColor(TRUE, szValue, &iBookmarkImageColor)) {
 		iBookmarkImageColor = BookmarkImageDefaultColor;
@@ -2679,22 +2681,34 @@ void Style_SetIndentGuides(HWND hwnd, BOOL bShow) {
 	SendMessage(hwnd, SCI_SETINDENTATIONGUIDES, iIndentView, 0);
 }
 
-void Style_SetBookmarkIndicator(HWND hwnd, BOOL bShowSelectionMargin) {
+void Style_SetBookmark(HWND hwnd, BOOL bShowSelectionMargin) {
+	if (!bBookmarkColorUpdated) {
+#if BookmarkUsingPixmapImage
+		const int marker = bShowSelectionMargin ? SC_MARK_PIXMAP : SC_MARK_BACKGROUND;
+#else
+		const int marker = bShowSelectionMargin ? SC_MARK_BOOKMARK : SC_MARK_BACKGROUND;
+#endif
+		const int markType = (int)SendMessage(hwnd, SCI_MARKERSYMBOLDEFINED, MarkerNumber_Bookmark, 0);
+		if (marker == markType) {
+			return;
+		}
+	}
 	if (bShowSelectionMargin) {
 #if BookmarkUsingPixmapImage
 		sprintf(bookmark_pixmap_color, bookmark_pixmap_color_fmt, iBookmarkImageColor);
-		SendMessage(hwnd, SCI_MARKERDEFINEPIXMAP, IndicatorNumber_Bookmark, (LPARAM)bookmark_pixmap);
+		SendMessage(hwnd, SCI_MARKERDEFINEPIXMAP, MarkerNumber_Bookmark, (LPARAM)bookmark_pixmap);
 #else
-		SendMessage(hwnd, SCI_MARKERSETBACK, IndicatorNumber_Bookmark, iBookmarkImageColor);
+		SendMessage(hwnd, SCI_MARKERSETBACK, MarkerNumber_Bookmark, iBookmarkImageColor);
 		// to avoid border
-		SendMessage(hwnd, SCI_MARKERSETFORE, IndicatorNumber_Bookmark, iBookmarkImageColor);
-		SendMessage(hwnd, SCI_MARKERDEFINE, IndicatorNumber_Bookmark, SC_MARK_BOOKMARK);
+		SendMessage(hwnd, SCI_MARKERSETFORE, MarkerNumber_Bookmark, iBookmarkImageColor);
+		SendMessage(hwnd, SCI_MARKERDEFINE, MarkerNumber_Bookmark, SC_MARK_BOOKMARK);
 #endif
 	} else {
-		SendMessage(hwnd, SCI_MARKERSETBACK, IndicatorNumber_Bookmark, iBookmarkLineColor);
-		SendMessage(hwnd, SCI_MARKERSETALPHA, IndicatorNumber_Bookmark, iBookmarkLineAlpha);
-		SendMessage(hwnd, SCI_MARKERDEFINE, IndicatorNumber_Bookmark, SC_MARK_BACKGROUND);
+		SendMessage(hwnd, SCI_MARKERSETBACK, MarkerNumber_Bookmark, iBookmarkLineColor);
+		SendMessage(hwnd, SCI_MARKERSETALPHA, MarkerNumber_Bookmark, iBookmarkLineAlpha);
+		SendMessage(hwnd, SCI_MARKERDEFINE, MarkerNumber_Bookmark, SC_MARK_BACKGROUND);
 	}
+	bBookmarkColorUpdated = FALSE;
 }
 
 //=============================================================================
