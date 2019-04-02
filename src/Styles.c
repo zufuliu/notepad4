@@ -266,9 +266,6 @@ int		iOvrCaretStyle = 0; // 0 for bar, 1 for block
 int		iCaretBlinkPeriod = -1; // system default, 0 for noblink
 int 	iMarkOccurrencesColor;
 int 	iMarkOccurrencesAlpha;
-static int iBookmarkImageColor;
-static int iBookmarkLineColor;
-static int iBookmarkLineAlpha;
 static BOOL bBookmarkColorUpdated;
 static int	iDefaultLexer;
 static BOOL bAutoSelect;
@@ -2692,9 +2689,8 @@ void Style_SetBookmark(HWND hwnd) {
 
 	LPCWSTR szValue = pLexGlobal->Styles[Style_Bookmark].szValue;
 	if (bShowSelectionMargin) {
-		if (!Style_StrGetColor(TRUE, szValue, &iBookmarkImageColor)) {
-			iBookmarkImageColor = BookmarkImageDefaultColor;
-		}
+		int iBookmarkImageColor = BookmarkImageDefaultColor;
+		Style_StrGetColor(TRUE, szValue, &iBookmarkImageColor);
 #if BookmarkUsingPixmapImage
 		sprintf(bookmark_pixmap_color, bookmark_pixmap_color_fmt, iBookmarkImageColor);
 		SendMessage(hwnd, SCI_MARKERDEFINEPIXMAP, MarkerNumber_Bookmark, (LPARAM)bookmark_pixmap);
@@ -2705,12 +2701,10 @@ void Style_SetBookmark(HWND hwnd) {
 		SendMessage(hwnd, SCI_MARKERDEFINE, MarkerNumber_Bookmark, SC_MARK_BOOKMARK);
 #endif
 	} else {
-		if (!Style_StrGetColor(FALSE, szValue, &iBookmarkLineColor)) {
-			iBookmarkLineColor = BookmarkLineDefaultColor;
-		}
-		if (!Style_StrGetAlpha(szValue, &iBookmarkLineAlpha)) {
-			iBookmarkLineAlpha = BookmarkLineDefaultAlpha;
-		}
+		int iBookmarkLineColor = BookmarkLineDefaultColor;
+		int iBookmarkLineAlpha = BookmarkLineDefaultAlpha;
+		Style_StrGetColor(FALSE, szValue, &iBookmarkLineColor);
+		Style_StrGetAlpha(szValue, &iBookmarkLineAlpha);
 		SendMessage(hwnd, SCI_MARKERSETBACK, MarkerNumber_Bookmark, iBookmarkLineColor);
 		SendMessage(hwnd, SCI_MARKERSETALPHA, MarkerNumber_Bookmark, iBookmarkLineAlpha);
 		SendMessage(hwnd, SCI_MARKERDEFINE, MarkerNumber_Bookmark, SC_MARK_BACKGROUND);
