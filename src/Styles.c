@@ -286,6 +286,7 @@ extern int	g_DOSEncoding;
 extern int	iDefaultCodePage;
 extern int	iDefaultCharSet;
 extern INT	iHighlightCurrentLine;
+extern BOOL	bShowSelectionMargin;
 
 #define STYLE_MASK_FONT_FACE	(1 << 0)
 #define STYLE_MASK_FONT_SIZE	(1 << 1)
@@ -1330,6 +1331,10 @@ void Style_SetLexer(HWND hwnd, PEDITLEXER pLexNew) {
 	SendMessage(hwnd, SCI_SETCARETFORE, iValue, 0);
 	SendMessage(hwnd, SCI_SETADDITIONALCARETFORE, iValue, 0);
 	// IME indicator
+	SendMessage(hwnd, SCI_INDICSETSTYLE, SC_INDICATOR_INPUT, INDIC_COMPOSITIONTHIN);
+	SendMessage(hwnd, SCI_INDICSETSTYLE, SC_INDICATOR_TARGET, INDIC_COMPOSITIONTHICK);
+	SendMessage(hwnd, SCI_INDICSETSTYLE, SC_INDICATOR_CONVERTED, INDIC_COMPOSITIONTHIN);
+	SendMessage(hwnd, SCI_INDICSETSTYLE, SC_INDICATOR_UNKNOWN, INDIC_COMPOSITIONTHIN);
 	szValue = pLexGlobal->Styles[Style_IMEIndicator].szValue;
 	if (Style_StrGetColor(TRUE, szValue, &iValue)) {
 		SendMessage(hwnd, SCI_INDICSETFORE, SC_INDICATOR_INPUT, iValue);
@@ -2659,7 +2664,6 @@ void Style_HighlightCurrentLine(HWND hwnd) {
 // Style_SetIndentGuides()
 //
 extern int flagSimpleIndentGuides;
-extern BOOL bShowSelectionMargin;
 
 void Style_SetIndentGuides(HWND hwnd, BOOL bShow) {
 	int iIndentView = SC_IV_NONE;
