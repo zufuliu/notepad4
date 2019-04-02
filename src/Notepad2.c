@@ -139,7 +139,7 @@ int		iLongLinesLimit;
 int		iLongLinesLimitG;
 int		iLongLineMode;
 int		iWrapCol = 0;
-static BOOL bShowSelectionMargin;
+BOOL	bShowSelectionMargin;
 static BOOL bShowLineNumbers;
 static BOOL bMarkOccurrences;
 static BOOL bMarkOccurrencesMatchCase;
@@ -3566,7 +3566,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			// unset
 			SendMessage(hwndEdit, SCI_MARKERDELETE, iLine, MarkerNumber_Bookmark);
 		} else {
-			Style_SetBookmark(hwndEdit, bShowSelectionMargin);
+			Style_SetBookmark(hwndEdit);
 			// set
 			SendMessage(hwndEdit, SCI_MARKERADD, iLine, MarkerNumber_Bookmark);
 		}
@@ -3780,7 +3780,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case IDM_VIEW_MARGIN:
 		bShowSelectionMargin = !bShowSelectionMargin;
 		UpdateSelectionMarginWidth();
-		Style_SetBookmark(hwndEdit, bShowSelectionMargin);
+		Style_SetBookmark(hwndEdit);
 		break;
 
 	case IDM_VIEW_AUTOCOMPLETEWORDS:
