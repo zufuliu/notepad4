@@ -189,10 +189,10 @@ void	EditPrintSetup(HWND hwnd);
 #endif
 
 enum {
-	IndicatorNumber_Bookmark = 0,
+	MarkerNumber_Bookmark = 0,
 	IndicatorNumber_MarkOccurrences = 1,
 
-	IndicatorBitmask_Bookmark  = 1 << IndicatorNumber_Bookmark,
+	MarkerBitmask_Bookmark  = 1 << MarkerNumber_Bookmark,
 };
 
 void	EditMarkAll(HWND hwnd, BOOL bMarkOccurrencesMatchCase, BOOL bMarkOccurrencesMatchWords);

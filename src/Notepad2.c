@@ -62,7 +62,7 @@ static HWND hwndNextCBChain = NULL;
 HWND	hDlgFindReplace = NULL;
 
 #define MARGIN_LINE_NUMBER	0	// line number
-#define MARGIN_SELECTION	1	// selection margin
+#define MARGIN_SELECTION	1	// bookmark and selection margin
 #define MARGIN_FOLD_INDEX	2	// folding index
 
 #define TOOLBAR_COMMAND_BASE	IDT_FILE_NEW
@@ -3522,9 +3522,9 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		const int iPos = (int)SendMessage(hwndEdit, SCI_GETCURRENTPOS, 0, 0);
 		const int iLine = (int)SendMessage(hwndEdit, SCI_LINEFROMPOSITION, iPos, 0);
 
-		int iNextLine = (int)SendMessage(hwndEdit, SCI_MARKERNEXT, iLine + 1, IndicatorBitmask_Bookmark);
+		int iNextLine = (int)SendMessage(hwndEdit, SCI_MARKERNEXT, iLine + 1, MarkerBitmask_Bookmark);
 		if (iNextLine == -1) {
-			iNextLine = (int)SendMessage(hwndEdit, SCI_MARKERNEXT, 0, IndicatorBitmask_Bookmark);
+			iNextLine = (int)SendMessage(hwndEdit, SCI_MARKERNEXT, 0, MarkerBitmask_Bookmark);
 		}
 
 		if (iNextLine != -1) {
@@ -3541,10 +3541,10 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		const int iPos = (int)SendMessage(hwndEdit, SCI_GETCURRENTPOS, 0, 0);
 		const int iLine = (int)SendMessage(hwndEdit, SCI_LINEFROMPOSITION, iPos, 0);
 
-		int iNextLine = (int)SendMessage(hwndEdit, SCI_MARKERPREVIOUS, iLine - 1, IndicatorBitmask_Bookmark);
+		int iNextLine = (int)SendMessage(hwndEdit, SCI_MARKERPREVIOUS, iLine - 1, MarkerBitmask_Bookmark);
 		if (iNextLine == -1) {
 			const int nLines = (int)SendMessage(hwndEdit, SCI_GETLINECOUNT, 0, 0);
-			iNextLine = (int)SendMessage(hwndEdit, SCI_MARKERPREVIOUS, nLines, IndicatorBitmask_Bookmark);
+			iNextLine = (int)SendMessage(hwndEdit, SCI_MARKERPREVIOUS, nLines, MarkerBitmask_Bookmark);
 		}
 
 		if (iNextLine != -1) {
@@ -3562,13 +3562,13 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		const int iLine = (int)SendMessage(hwndEdit, SCI_LINEFROMPOSITION, iPos, 0);
 
 		const int bitmask = (int)SendMessage(hwndEdit, SCI_MARKERGET, iLine, 0);
-		if (bitmask & IndicatorBitmask_Bookmark) {
+		if (bitmask & MarkerBitmask_Bookmark) {
 			// unset
-			SendMessage(hwndEdit, SCI_MARKERDELETE, iLine, IndicatorNumber_Bookmark);
+			SendMessage(hwndEdit, SCI_MARKERDELETE, iLine, MarkerNumber_Bookmark);
 		} else {
-			Style_SetBookmarkIndicator(hwndEdit, bShowSelectionMargin);
+			Style_SetBookmark(hwndEdit, bShowSelectionMargin);
 			// set
-			SendMessage(hwndEdit, SCI_MARKERADD, iLine, IndicatorNumber_Bookmark);
+			SendMessage(hwndEdit, SCI_MARKERADD, iLine, MarkerNumber_Bookmark);
 		}
 	}
 	break;
@@ -3780,7 +3780,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case IDM_VIEW_MARGIN:
 		bShowSelectionMargin = !bShowSelectionMargin;
 		UpdateSelectionMarginWidth();
-		Style_SetBookmarkIndicator(hwndEdit, bShowSelectionMargin);
+		Style_SetBookmark(hwndEdit, bShowSelectionMargin);
 		break;
 
 	case IDM_VIEW_AUTOCOMPLETEWORDS:
