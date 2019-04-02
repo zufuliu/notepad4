@@ -371,7 +371,7 @@ enum DefaultStyleIndex {
 
 #define BookmarkUsingPixmapImage		1
 #if BookmarkUsingPixmapImage
-// XPM Graphics for bookmark indicator
+// XPM Graphics for bookmark on selection margin.
 /* GIMP export Bookmark2_16x.png with Alpha threshold 127 */
 static char bookmark_pixmap_color[16];
 #define bookmark_pixmap_color_fmt	".	c #%06X"
@@ -2691,27 +2691,26 @@ void Style_SetBookmark(HWND hwnd) {
 	}
 
 	LPCWSTR szValue = pLexGlobal->Styles[Style_Bookmark].szValue;
-	if (!Style_StrGetColor(TRUE, szValue, &iBookmarkImageColor)) {
-		iBookmarkImageColor = BookmarkImageDefaultColor;
-	}
-	if (!Style_StrGetColor(FALSE, szValue, &iBookmarkLineColor)) {
-		iBookmarkLineColor = BookmarkLineDefaultColor;
-	}
-	if (!Style_StrGetAlpha(szValue, &iBookmarkLineAlpha)) {
-		iBookmarkLineAlpha = BookmarkLineDefaultAlpha;
-	}
-
 	if (bShowSelectionMargin) {
+		if (!Style_StrGetColor(TRUE, szValue, &iBookmarkImageColor)) {
+			iBookmarkImageColor = BookmarkImageDefaultColor;
+		}
 #if BookmarkUsingPixmapImage
 		sprintf(bookmark_pixmap_color, bookmark_pixmap_color_fmt, iBookmarkImageColor);
 		SendMessage(hwnd, SCI_MARKERDEFINEPIXMAP, MarkerNumber_Bookmark, (LPARAM)bookmark_pixmap);
 #else
 		SendMessage(hwnd, SCI_MARKERSETBACK, MarkerNumber_Bookmark, iBookmarkImageColor);
-		// to avoid border
+		// set same color to avoid drawing border.
 		SendMessage(hwnd, SCI_MARKERSETFORE, MarkerNumber_Bookmark, iBookmarkImageColor);
 		SendMessage(hwnd, SCI_MARKERDEFINE, MarkerNumber_Bookmark, SC_MARK_BOOKMARK);
 #endif
 	} else {
+		if (!Style_StrGetColor(FALSE, szValue, &iBookmarkLineColor)) {
+			iBookmarkLineColor = BookmarkLineDefaultColor;
+		}
+		if (!Style_StrGetAlpha(szValue, &iBookmarkLineAlpha)) {
+			iBookmarkLineAlpha = BookmarkLineDefaultAlpha;
+		}
 		SendMessage(hwnd, SCI_MARKERSETBACK, MarkerNumber_Bookmark, iBookmarkLineColor);
 		SendMessage(hwnd, SCI_MARKERSETALPHA, MarkerNumber_Bookmark, iBookmarkLineAlpha);
 		SendMessage(hwnd, SCI_MARKERDEFINE, MarkerNumber_Bookmark, SC_MARK_BACKGROUND);
