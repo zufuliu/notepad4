@@ -76,11 +76,20 @@ static DString wchAppendSelection;
 static DString wchPrefixLines;
 static DString wchAppendLines;
 
+static struct EditMarkAllStatus {
+	int findFlag;
+	int iSelCount;
+	LPSTR pszText;
+} editMarkAllStatus;
+
 void Edit_ReleaseResources(void) {
 	DString_Free(&wchPrefixSelection);
 	DString_Free(&wchAppendSelection);
 	DString_Free(&wchPrefixLines);
 	DString_Free(&wchAppendLines);
+	if (editMarkAllStatus.pszText) {
+		NP2HeapFree(editMarkAllStatus.pszText);
+	}
 }
 
 //=============================================================================
@@ -5062,8 +5071,21 @@ extern int iMatchesCount;
 extern int iMarkOccurrencesColor;
 extern int iMarkOccurrencesAlpha;
 
-void EditMarkAll(HWND hwnd, BOOL bMarkOccurrencesMatchCase, BOOL bMarkOccurrencesMatchWords) {
+void EditMarkAll_Clear(HWND hwnd) {
 	iMatchesCount = 0;
+	// clear existing indicator
+	SendMessage(hwnd, SCI_SETINDICATORCURRENT, IndicatorNumber_MarkOccurrences, 0);
+	SendMessage(hwnd, SCI_INDICATORCLEARRANGE, 0, SendMessage(hwnd, SCI_GETLENGTH, 0, 0));
+
+	if (editMarkAllStatus.pszText) {
+		NP2HeapFree(editMarkAllStatus.pszText);
+	}
+	editMarkAllStatus.findFlag = 0;
+	editMarkAllStatus.iSelCount= 0;
+	editMarkAllStatus.pszText = NULL;
+}
+
+void EditMarkAll(HWND hwnd, BOOL bChanged, BOOL bMarkOccurrencesMatchCase, BOOL bMarkOccurrencesMatchWords) {
 	const int iTextLen = (int)SendMessage(hwnd, SCI_GETLENGTH, 0, 0);
 
 	// get current selection
@@ -5071,14 +5093,11 @@ void EditMarkAll(HWND hwnd, BOOL bMarkOccurrencesMatchCase, BOOL bMarkOccurrence
 	const int iSelEnd = (int)SendMessage(hwnd, SCI_GETSELECTIONEND, 0, 0);
 	int iSelCount = iSelEnd - iSelStart;
 
-	// clear existing indicator
-	SendMessage(hwnd, SCI_SETINDICATORCURRENT, IndicatorNumber_MarkOccurrences, 0);
-	SendMessage(hwnd, SCI_INDICATORCLEARRANGE, 0, iTextLen);
-
 	// if nothing selected or multiple lines are selected exit
 	if (iSelCount == 0 ||
 			(int)SendMessage(hwnd, SCI_LINEFROMPOSITION, iSelStart, 0) !=
 			(int)SendMessage(hwnd, SCI_LINEFROMPOSITION, iSelEnd, 0)) {
+		EditMarkAll_Clear(hwnd);
 		return;
 	}
 
@@ -5098,8 +5117,17 @@ void EditMarkAll(HWND hwnd, BOOL bMarkOccurrencesMatchCase, BOOL bMarkOccurrence
 				++iSelStart;
 			} else if (!(ch >= 0x80 || IsDocWordChar(ch))) {
 				NP2HeapFree(pszText);
+				EditMarkAll_Clear(hwnd);
 				return;
 			}
+		}
+	}
+
+	const int findFlag = (bMarkOccurrencesMatchCase ? SCFIND_MATCHCASE : 0) | (bMarkOccurrencesMatchWords ? SCFIND_WHOLEWORD : 0);
+	if (!bChanged && findFlag == editMarkAllStatus.findFlag && editMarkAllStatus.iSelCount == iSelCount) {
+		const int result = bMarkOccurrencesMatchCase ? strcmp(pszText, editMarkAllStatus.pszText) : _stricmp(pszText, editMarkAllStatus.pszText);
+		if (result == 0) {
+			return;
 		}
 	}
 
@@ -5109,12 +5137,12 @@ void EditMarkAll(HWND hwnd, BOOL bMarkOccurrencesMatchCase, BOOL bMarkOccurrence
 	ttf.chrg.cpMax = iTextLen;
 	ttf.lpstrText = pszText;
 
+	EditMarkAll_Clear(hwnd);
 	// set style
 	SendMessage(hwnd, SCI_INDICSETALPHA, IndicatorNumber_MarkOccurrences, iMarkOccurrencesAlpha);
 	SendMessage(hwnd, SCI_INDICSETFORE, IndicatorNumber_MarkOccurrences, iMarkOccurrencesColor);
 	SendMessage(hwnd, SCI_INDICSETSTYLE, IndicatorNumber_MarkOccurrences, INDIC_ROUNDBOX);
 
-	const int findFlag = (bMarkOccurrencesMatchCase ? SCFIND_MATCHCASE : 0) | (bMarkOccurrencesMatchWords ? SCFIND_WHOLEWORD : 0);
 	int iPos;
 	while ((iPos = (int)SendMessage(hwnd, SCI_FINDTEXT, findFlag, (LPARAM)&ttf)) != -1) {
 		// mark this match
@@ -5126,7 +5154,13 @@ void EditMarkAll(HWND hwnd, BOOL bMarkOccurrencesMatchCase, BOOL bMarkOccurrence
 		}
 	}
 
-	NP2HeapFree(pszText);
+	if (iMatchesCount > 1) {
+		editMarkAllStatus.findFlag = findFlag;
+		editMarkAllStatus.iSelCount = iSelCount;
+		editMarkAllStatus.pszText = pszText;
+	} else {
+		NP2HeapFree(pszText);
+	}
 }
 
 //=============================================================================
