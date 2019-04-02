@@ -1424,17 +1424,12 @@ void Style_SetLexer(HWND hwnd, PEDITLEXER pLexNew) {
 	if (!Style_StrGetAlpha(szValue, &iMarkOccurrencesAlpha)) {
 		iMarkOccurrencesAlpha = MarkOccurrencesDefaultAlpha;
 	}
+
 	// Bookmark
 	bBookmarkColorUpdated = TRUE;
-	szValue = pLexGlobal->Styles[Style_Bookmark].szValue;
-	if (!Style_StrGetColor(TRUE, szValue, &iBookmarkImageColor)) {
-		iBookmarkImageColor = BookmarkImageDefaultColor;
-	}
-	if (!Style_StrGetColor(FALSE, szValue, &iBookmarkLineColor)) {
-		iBookmarkLineColor = BookmarkLineDefaultColor;
-	}
-	if (!Style_StrGetAlpha(szValue, &iBookmarkLineAlpha)) {
-		iBookmarkLineAlpha = BookmarkLineDefaultAlpha;
+	// SC_MARK_CIRCLE is the default marker type.
+	if (SendMessage(hwnd, SCI_MARKERSYMBOLDEFINED, MarkerNumber_Bookmark, 0) != SC_MARK_CIRCLE) {
+		Style_SetBookmark(hwnd);
 	}
 
 	{
@@ -2664,6 +2659,7 @@ void Style_HighlightCurrentLine(HWND hwnd) {
 // Style_SetIndentGuides()
 //
 extern int flagSimpleIndentGuides;
+extern BOOL bShowSelectionMargin;
 
 void Style_SetIndentGuides(HWND hwnd, BOOL bShow) {
 	int iIndentView = SC_IV_NONE;
@@ -2681,7 +2677,7 @@ void Style_SetIndentGuides(HWND hwnd, BOOL bShow) {
 	SendMessage(hwnd, SCI_SETINDENTATIONGUIDES, iIndentView, 0);
 }
 
-void Style_SetBookmark(HWND hwnd, BOOL bShowSelectionMargin) {
+void Style_SetBookmark(HWND hwnd) {
 	if (!bBookmarkColorUpdated) {
 #if BookmarkUsingPixmapImage
 		const int marker = bShowSelectionMargin ? SC_MARK_PIXMAP : SC_MARK_BACKGROUND;
@@ -2693,6 +2689,18 @@ void Style_SetBookmark(HWND hwnd, BOOL bShowSelectionMargin) {
 			return;
 		}
 	}
+
+	LPCWSTR szValue = pLexGlobal->Styles[Style_Bookmark].szValue;
+	if (!Style_StrGetColor(TRUE, szValue, &iBookmarkImageColor)) {
+		iBookmarkImageColor = BookmarkImageDefaultColor;
+	}
+	if (!Style_StrGetColor(FALSE, szValue, &iBookmarkLineColor)) {
+		iBookmarkLineColor = BookmarkLineDefaultColor;
+	}
+	if (!Style_StrGetAlpha(szValue, &iBookmarkLineAlpha)) {
+		iBookmarkLineAlpha = BookmarkLineDefaultAlpha;
+	}
+
 	if (bShowSelectionMargin) {
 #if BookmarkUsingPixmapImage
 		sprintf(bookmark_pixmap_color, bookmark_pixmap_color_fmt, iBookmarkImageColor);
