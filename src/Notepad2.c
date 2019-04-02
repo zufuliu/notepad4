@@ -3574,7 +3574,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	break;
 
 	case BME_EDIT_BOOKMARKCLEAR:
-		SendMessage(hwndEdit, SCI_MARKERDELETEALL, (WPARAM)(-1), 0);
+		SendMessage(hwndEdit, SCI_MARKERDELETEALL, MarkerNumber_Bookmark, 0);
 		break;
 
 	case IDM_EDIT_FINDNEXT:
