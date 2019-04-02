@@ -195,8 +195,8 @@ enum {
 	MarkerBitmask_Bookmark  = 1 << MarkerNumber_Bookmark,
 };
 
-void	EditMarkAll_Clear(HWND hwnd);
-void	EditMarkAll(HWND hwnd, BOOL bChanged, BOOL bMarkOccurrencesMatchCase, BOOL bMarkOccurrencesMatchWords);
+void	EditMarkAll_Clear(void);
+void	EditMarkAll(BOOL bChanged, BOOL bMarkOccurrencesMatchCase, BOOL bMarkOccurrencesMatchWords);
 
 // auto completion fill-up characters
 #define MAX_AUTO_COMPLETION_FILLUP_LENGTH	32		// Only 32 ASCII punctuation

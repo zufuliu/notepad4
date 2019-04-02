@@ -46,8 +46,12 @@ LRESULT WINAPI Scintilla_DirectFunction(HANDLE handle, UINT msg, WPARAM wParam, 
 //  Selection and information
 //
 //
-NP2_inline int SciCall_GetLength(void) {
-	return (int)SciCall0(SCI_GETLENGTH);
+NP2_inline UINT SciCall_GetCodePage(void) {
+	return (UINT)SciCall0(SCI_GETCODEPAGE);
+}
+
+NP2_inline Sci_Position SciCall_GetLength(void) {
+	return (Sci_Position)SciCall0(SCI_GETLENGTH);
 }
 
 NP2_inline int SciCall_GetLineCount(void) {
@@ -146,6 +150,12 @@ NP2_inline Sci_Position SciCall_GetSelectionEnd(void) {
 	return (Sci_Position)SciCall0(SCI_GETSELECTIONEND);
 }
 
+NP2_inline int EditGetSelectedLineCount(void) {
+	const int iLineStart = SciCall_LineFromPosition(SciCall_GetSelectionStart());
+	const int iLineEnd = SciCall_LineFromPosition(SciCall_GetSelectionEnd());
+	return iLineEnd - iLineStart + 1;
+}
+
 NP2_inline int SciCall_GetSelectionMode(void) {
 	return (int)SciCall0(SCI_GETSELECTIONMODE);
 }
@@ -162,11 +172,27 @@ NP2_inline int SciCall_GetTextRange(struct Sci_TextRange *tr) {
 	return (int)SciCall2(SCI_GETTEXTRANGE, 0, (LPARAM)tr);
 }
 
+NP2_inline BOOL SciCall_CanUndo(void) {
+	return (BOOL)SciCall0(SCI_CANUNDO);
+}
+
+NP2_inline BOOL SciCall_CanRedo(void) {
+	return (BOOL)SciCall0(SCI_CANREDO);
+}
+
+NP2_inline BOOL SciCall_CanPaste(void) {
+	return (BOOL)SciCall0(SCI_CANPASTE);
+}
+
 //=============================================================================
 //
-//  Scrolling and automatic scrolling
+//  Caret
 //
 //
+NP2_inline BOOL SciCall_GetOvertype(void) {
+	return (BOOL)SciCall0(SCI_GETOVERTYPE);
+}
+
 NP2_inline void SciCall_ScrollCaret(void) {
 	SciCall0(SCI_SCROLLCARET);
 }
@@ -252,6 +278,23 @@ NP2_inline void SciCall_MarkerSetBack(int markerNumber, COLORREF back) {
 
 NP2_inline void SciCall_MarkerEnableHighlight(BOOL enabled) {
 	SciCall1(SCI_MARKERENABLEHIGHLIGHT, enabled);
+}
+
+//=============================================================================
+//
+//  Indicators
+//
+//
+NP2_inline void SciCall_SetIndicatorCurrent(int indicator) {
+	SciCall1(SCI_SETINDICATORCURRENT, indicator);
+}
+
+NP2_inline void SciCall_IndicatorClearRange(Sci_Position start, Sci_Position length) {
+	SciCall2(SCI_INDICATORCLEARRANGE, start, length);
+}
+
+NP2_inline void SciCall_IndicatorFillRange(Sci_Position start, Sci_Position length) {
+	SciCall2(SCI_INDICATORFILLRANGE, start, length);
 }
 
 //=============================================================================
