@@ -5068,14 +5068,12 @@ BOOL EditReplace(HWND hwnd, LPEDITFINDREPLACE lpefr) {
 //
 
 extern int iMatchesCount;
-extern int iMarkOccurrencesColor;
-extern int iMarkOccurrencesAlpha;
 
-void EditMarkAll_Clear(HWND hwnd) {
+void EditMarkAll_Clear(void) {
 	iMatchesCount = 0;
 	// clear existing indicator
-	SendMessage(hwnd, SCI_SETINDICATORCURRENT, IndicatorNumber_MarkOccurrences, 0);
-	SendMessage(hwnd, SCI_INDICATORCLEARRANGE, 0, SendMessage(hwnd, SCI_GETLENGTH, 0, 0));
+	SciCall_SetIndicatorCurrent(IndicatorNumber_MarkOccurrences);
+	SciCall_IndicatorClearRange(0, SciCall_GetLength());
 
 	if (editMarkAllStatus.pszText) {
 		NP2HeapFree(editMarkAllStatus.pszText);
@@ -5085,30 +5083,26 @@ void EditMarkAll_Clear(HWND hwnd) {
 	editMarkAllStatus.pszText = NULL;
 }
 
-void EditMarkAll(HWND hwnd, BOOL bChanged, BOOL bMarkOccurrencesMatchCase, BOOL bMarkOccurrencesMatchWords) {
-	const int iTextLen = (int)SendMessage(hwnd, SCI_GETLENGTH, 0, 0);
-
+void EditMarkAll(BOOL bChanged, BOOL bMarkOccurrencesMatchCase, BOOL bMarkOccurrencesMatchWords) {
 	// get current selection
-	int iSelStart = (int)SendMessage(hwnd, SCI_GETSELECTIONSTART, 0, 0);
-	const int iSelEnd = (int)SendMessage(hwnd, SCI_GETSELECTIONEND, 0, 0);
-	int iSelCount = iSelEnd - iSelStart;
+	Sci_Position iSelStart = SciCall_GetSelectionStart();
+	const Sci_Position iSelEnd = SciCall_GetSelectionEnd();
+	int iSelCount = (int)(iSelEnd - iSelStart);
 
 	// if nothing selected or multiple lines are selected exit
-	if (iSelCount == 0 ||
-			(int)SendMessage(hwnd, SCI_LINEFROMPOSITION, iSelStart, 0) !=
-			(int)SendMessage(hwnd, SCI_LINEFROMPOSITION, iSelEnd, 0)) {
-		EditMarkAll_Clear(hwnd);
+	if (iSelCount == 0 || SciCall_LineFromPosition(iSelStart) != SciCall_LineFromPosition(iSelEnd)) {
+		EditMarkAll_Clear();
 		return;
 	}
 
 	// scintilla/src/Editor.h SelectionText.LengthWithTerminator()
-	iSelCount = (int)SendMessage(hwnd, SCI_GETSELTEXT, 0, 0) - 1;
+	iSelCount = SciCall_GetSelTextLength() - 1;
 	char *pszText = (char *)NP2HeapAlloc(iSelCount + 1);
-	SendMessage(hwnd, SCI_GETSELTEXT, 0, (LPARAM)pszText);
+	SciCall_GetSelText(pszText);
 
 	// exit if selection is not a word and Match whole words only is enabled
 	if (bMarkOccurrencesMatchWords) {
-		const UINT cpEdit = (UINT)SendMessage(hwnd, SCI_GETCODEPAGE, 0, 0);
+		const UINT cpEdit = SciCall_GetCodePage();
 		const BOOL dbcs = !(cpEdit == CP_UTF8 || cpEdit == 0);
 		// CharClassify::SetDefaultCharClasses()
 		for (iSelStart = 0; iSelStart < iSelCount; ++iSelStart) {
@@ -5117,7 +5111,7 @@ void EditMarkAll(HWND hwnd, BOOL bChanged, BOOL bMarkOccurrencesMatchCase, BOOL 
 				++iSelStart;
 			} else if (!(ch >= 0x80 || IsDocWordChar(ch))) {
 				NP2HeapFree(pszText);
-				EditMarkAll_Clear(hwnd);
+				EditMarkAll_Clear();
 				return;
 			}
 		}
@@ -5125,8 +5119,8 @@ void EditMarkAll(HWND hwnd, BOOL bChanged, BOOL bMarkOccurrencesMatchCase, BOOL 
 
 	const int findFlag = (bMarkOccurrencesMatchCase ? SCFIND_MATCHCASE : 0) | (bMarkOccurrencesMatchWords ? SCFIND_WHOLEWORD : 0);
 	if (!bChanged && findFlag == editMarkAllStatus.findFlag && editMarkAllStatus.iSelCount == iSelCount) {
-		const int result = bMarkOccurrencesMatchCase ? strcmp(pszText, editMarkAllStatus.pszText) : _stricmp(pszText, editMarkAllStatus.pszText);
-		if (result == 0) {
+		// _stricmp() is not safe for DBCS string.
+		if (memcmp(pszText, editMarkAllStatus.pszText, iSelCount) == 0) {
 			return;
 		}
 	}
@@ -5134,20 +5128,16 @@ void EditMarkAll(HWND hwnd, BOOL bChanged, BOOL bMarkOccurrencesMatchCase, BOOL 
 	struct Sci_TextToFind ttf;
 	ZeroMemory(&ttf, sizeof(ttf));
 	ttf.chrg.cpMin = 0;
-	ttf.chrg.cpMax = iTextLen;
+	ttf.chrg.cpMax = (Sci_PositionCR)SciCall_GetLength();
 	ttf.lpstrText = pszText;
 
-	EditMarkAll_Clear(hwnd);
-	// set style
-	SendMessage(hwnd, SCI_INDICSETALPHA, IndicatorNumber_MarkOccurrences, iMarkOccurrencesAlpha);
-	SendMessage(hwnd, SCI_INDICSETFORE, IndicatorNumber_MarkOccurrences, iMarkOccurrencesColor);
-	SendMessage(hwnd, SCI_INDICSETSTYLE, IndicatorNumber_MarkOccurrences, INDIC_ROUNDBOX);
+	EditMarkAll_Clear();
 
-	int iPos;
-	while ((iPos = (int)SendMessage(hwnd, SCI_FINDTEXT, findFlag, (LPARAM)&ttf)) != -1) {
+	Sci_Position iPos;
+	while ((iPos = SciCall_FindText(findFlag, &ttf)) != -1) {
 		// mark this match
 		++iMatchesCount;
-		SendMessage(hwnd, SCI_INDICATORFILLRANGE, iPos, iSelCount);
+		SciCall_IndicatorFillRange(iPos, iSelCount);
 		ttf.chrg.cpMin = ttf.chrgText.cpMin + iSelCount;
 		if (ttf.chrg.cpMin == ttf.chrg.cpMax) {
 			break;

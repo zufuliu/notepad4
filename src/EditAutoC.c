@@ -354,7 +354,7 @@ void AutoC_AddDocWord(struct WordList *pWList, BOOL bIgnoreCase, char prefix) {
 	struct Sci_TextToFind ft = { { 0, 0 }, NULL, { 0, 0 } };
 	struct Sci_TextRange tr = { { 0, 0 }, NULL };
 	const Sci_Position iCurrentPos = SciCall_GetCurrentPos() - iRootLen - (prefix ? 1 : 0);
-	const int iDocLen = SciCall_GetLength();
+	const Sci_Position iDocLen = SciCall_GetLength();
 	const int findFlag = SCFIND_REGEXP | SCFIND_POSIX | (bIgnoreCase ? 0 : SCFIND_MATCHCASE);
 
 	// optimization for small string
@@ -388,7 +388,7 @@ void AutoC_AddDocWord(struct WordList *pWList, BOOL bIgnoreCase, char prefix) {
 	}
 
 	ft.lpstrText = pFind;
-	ft.chrg.cpMax = iDocLen;
+	ft.chrg.cpMax = (Sci_PositionCR)iDocLen;
 	Sci_Position iPosFind = SciCall_FindText(findFlag, &ft);
 
 	while (iPosFind >= 0 && iPosFind < iDocLen) {

@@ -264,8 +264,6 @@ int		iFontQuality = SC_EFF_QUALITY_LCD_OPTIMIZED;
 int		iCaretStyle = 1; // width 1, 0 for block
 int		iOvrCaretStyle = 0; // 0 for bar, 1 for block
 int		iCaretBlinkPeriod = -1; // system default, 0 for noblink
-int 	iMarkOccurrencesColor;
-int 	iMarkOccurrencesAlpha;
 static BOOL bBookmarkColorUpdated;
 static int	iDefaultLexer;
 static BOOL bAutoSelect;
@@ -1416,12 +1414,15 @@ void Style_SetLexer(HWND hwnd, PEDITLEXER pLexNew) {
 
 	// Mark Occurrence
 	szValue = pLexGlobal->Styles[Style_MarkOccurrences].szValue;
-	if (!Style_StrGetColor(TRUE, szValue, &iMarkOccurrencesColor)) {
-		iMarkOccurrencesColor = GetSysColor(COLOR_HIGHLIGHT);
+	if (!Style_StrGetColor(TRUE, szValue, &iValue)) {
+		iValue = GetSysColor(COLOR_HIGHLIGHT);
 	}
-	if (!Style_StrGetAlpha(szValue, &iMarkOccurrencesAlpha)) {
-		iMarkOccurrencesAlpha = MarkOccurrencesDefaultAlpha;
+	SendMessage(hwnd, SCI_INDICSETFORE, IndicatorNumber_MarkOccurrences, iValue);
+	if (!Style_StrGetAlpha(szValue, &iValue)) {
+		iValue = MarkOccurrencesDefaultAlpha;
 	}
+	SendMessage(hwnd, SCI_INDICSETALPHA, IndicatorNumber_MarkOccurrences, iValue);
+	SendMessage(hwnd, SCI_INDICSETSTYLE, IndicatorNumber_MarkOccurrences, INDIC_ROUNDBOX);
 
 	// Bookmark
 	bBookmarkColorUpdated = TRUE;

@@ -393,7 +393,7 @@ static inline void ToggleFullScreenModeConfig(int config) {
 }
 
 static inline void UpdateStatusBarCache_OVRMode(BOOL force) {
-	const BOOL overType = (BOOL)SendMessage(hwndEdit, SCI_GETOVERTYPE, 0, 0);
+	const BOOL overType = SciCall_GetOvertype();
 	if (force || overType != cachedStatusItem.overType) {
 		cachedStatusItem.overType = overType;
 		cachedStatusItem.pszOvrMode = overType ? L"OVR" : L"INS";
@@ -2025,7 +2025,7 @@ void UpdateStatusBarWidth(void) {
 	RECT rc;
 	GetClientRect(hwndMain, &rc);
 	const int cx = rc.right - rc.left;
-	const int iBytes = SciCall_GetLength();
+	const Sci_Position iBytes = SciCall_GetLength();
 
 	aWidth[1] = StatusCalcPaneWidth(hwndStatus, cachedStatusItem.pszLexerName) + 4;
 	aWidth[2] = StatusCalcPaneWidth(hwndStatus, mEncoding[iEncoding].wchLabel) + 4;
@@ -2135,12 +2135,12 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	EnableCmd(hmenu, IDM_FILE_RECENT, (MRU_GetCount(pFileMRU) > 0));
 
-	EnableCmd(hmenu, IDM_EDIT_UNDO, SendMessage(hwndEdit, SCI_CANUNDO, 0, 0) /*&& !bReadOnly*/);
-	EnableCmd(hmenu, IDM_EDIT_REDO, SendMessage(hwndEdit, SCI_CANREDO, 0, 0) /*&& !bReadOnly*/);
+	EnableCmd(hmenu, IDM_EDIT_UNDO, SciCall_CanUndo() /*&& !bReadOnly*/);
+	EnableCmd(hmenu, IDM_EDIT_REDO, SciCall_CanRedo() /*&& !bReadOnly*/);
 
 	i  = !EditIsEmptySelection();
-	const BOOL canPaste = (BOOL)SendMessage(hwndEdit, SCI_CANPASTE, 0, 0);
-	const BOOL nonEmpty = SendMessage(hwndEdit, SCI_GETLENGTH, 0, 0) != 0;
+	const BOOL canPaste = SciCall_CanPaste();
+	const BOOL nonEmpty = SciCall_GetLength() != 0;
 
 	EnableCmd(hmenu, IDM_EDIT_CUT, i /*&& !bReadOnly*/);
 	EnableCmd(hmenu, IDM_EDIT_CUT_BINARY, i /*&& !bReadOnly*/);
@@ -2188,11 +2188,7 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	//EnableCmd(hmenu, IDM_EDIT_MERGEBLANKLINES, !bReadOnly);
 	//EnableCmd(hmenu, IDM_EDIT_REMOVEBLANKLINES, !bReadOnly);
 
-	EnableCmd(hmenu, IDM_EDIT_SORTLINES,
-			  SendMessage(hwndEdit, SCI_LINEFROMPOSITION,
-						  (WPARAM)SendMessage(hwndEdit, SCI_GETSELECTIONEND, 0, 0), 0) -
-			  SendMessage(hwndEdit, SCI_LINEFROMPOSITION,
-						  (WPARAM)SendMessage(hwndEdit, SCI_GETSELECTIONSTART, 0, 0), 0) >= 1);
+	EnableCmd(hmenu, IDM_EDIT_SORTLINES, EditGetSelectedLineCount() > 1);
 
 	EnableCmd(hmenu, IDM_EDIT_COLUMNWRAP, i /*&& IsWindowsNT()*/);
 	EnableCmd(hmenu, IDM_EDIT_SPLITLINES, i /*&& !bReadOnly*/);
@@ -3795,22 +3791,22 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case IDM_VIEW_MARKOCCURRENCES_OFF:
 		bMarkOccurrences = !bMarkOccurrences;
 		if (bMarkOccurrences) {
-			EditMarkAll(hwndEdit, FALSE, bMarkOccurrencesMatchCase, bMarkOccurrencesMatchWords);
+			EditMarkAll(FALSE, bMarkOccurrencesMatchCase, bMarkOccurrencesMatchWords);
 		} else {
-			EditMarkAll_Clear(hwndEdit);
+			EditMarkAll_Clear();
 		}
 		UpdateStatusbar();
 		break;
 
 	case IDM_VIEW_MARKOCCURRENCES_CASE:
 		bMarkOccurrencesMatchCase = !bMarkOccurrencesMatchCase;
-		EditMarkAll(hwndEdit, FALSE, bMarkOccurrencesMatchCase, bMarkOccurrencesMatchWords);
+		EditMarkAll(FALSE, bMarkOccurrencesMatchCase, bMarkOccurrencesMatchWords);
 		UpdateStatusbar();
 		break;
 
 	case IDM_VIEW_MARKOCCURRENCES_WORD:
 		bMarkOccurrencesMatchWords = !bMarkOccurrencesMatchWords;
-		EditMarkAll(hwndEdit, FALSE, bMarkOccurrencesMatchCase, bMarkOccurrencesMatchWords);
+		EditMarkAll(FALSE, bMarkOccurrencesMatchCase, bMarkOccurrencesMatchWords);
 		UpdateStatusbar();
 		break;
 
@@ -4725,7 +4721,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 				if (scn->updated & (SC_UPDATE_SELECTION)) {
 					// mark occurrences of text currently selected
 					if (bMarkOccurrences) {
-						EditMarkAll(hwndEdit, (scn->updated & SC_UPDATE_CONTENT) != 0, bMarkOccurrencesMatchCase, bMarkOccurrencesMatchWords);
+						EditMarkAll((scn->updated & SC_UPDATE_CONTENT), bMarkOccurrencesMatchCase, bMarkOccurrencesMatchWords);
 					}
 					UpdateStatusBarCache_OVRMode(FALSE);
 				}
@@ -6560,15 +6556,15 @@ void UpdateToolbar(void) {
 	EnableTool(IDT_FILE_ADDTOFAV, StrNotEmpty(szCurFile));
 
 	EnableTool(IDT_FILE_SAVE, IsDocumentModified());
-	EnableTool(IDT_EDIT_UNDO, SendMessage(hwndEdit, SCI_CANUNDO, 0, 0) /*&& !bReadOnly*/);
-	EnableTool(IDT_EDIT_REDO, SendMessage(hwndEdit, SCI_CANREDO, 0, 0) /*&& !bReadOnly*/);
+	EnableTool(IDT_EDIT_UNDO, SciCall_CanUndo() /*&& !bReadOnly*/);
+	EnableTool(IDT_EDIT_REDO, SciCall_CanRedo() /*&& !bReadOnly*/);
 
 	int i = !EditIsEmptySelection();
 	EnableTool(IDT_EDIT_CUT, i /*&& !bReadOnly*/);
 	EnableTool(IDT_EDIT_COPY, i);
-	EnableTool(IDT_EDIT_PASTE, SendMessage(hwndEdit, SCI_CANPASTE, 0, 0) /*&& !bReadOnly*/);
+	EnableTool(IDT_EDIT_PASTE, SciCall_CanPaste() /*&& !bReadOnly*/);
 
-	i = (int)SendMessage(hwndEdit, SCI_GETLENGTH, 0, 0);
+	i = SciCall_GetLength() != 0;
 	EnableTool(IDT_EDIT_FIND, i);
 	//EnableTool(IDT_EDIT_FINDNEXT, i);
 	//EnableTool(IDT_EDIT_FINDPREV, i && StrNotEmptyA(efrData.szFind));
@@ -6669,7 +6665,7 @@ void UpdateStatusbar(void) {
 	wsprintf(tchDocPos, cachedStatusItem.tchDocPosFmt, tchLn, tchLines,
 				 tchCol, tchCols, tchCh, tchChs, tchSelCh, tchSel, tchLinesSelected, tchMatchesCount);
 
-	const int iBytes = SciCall_GetLength();
+	const int iBytes = (int)SciCall_GetLength();
 	StrFormatByteSize(iBytes, tchDocSize, COUNTOF(tchDocSize));
 
 	StatusSetText(hwndStatus, STATUS_DOCPOS, tchDocPos);
