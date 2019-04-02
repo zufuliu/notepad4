@@ -1331,10 +1331,6 @@ void Style_SetLexer(HWND hwnd, PEDITLEXER pLexNew) {
 	SendMessage(hwnd, SCI_SETCARETFORE, iValue, 0);
 	SendMessage(hwnd, SCI_SETADDITIONALCARETFORE, iValue, 0);
 	// IME indicator
-	SendMessage(hwnd, SCI_INDICSETSTYLE, SC_INDICATOR_INPUT, INDIC_COMPOSITIONTHIN);
-	SendMessage(hwnd, SCI_INDICSETSTYLE, SC_INDICATOR_TARGET, INDIC_COMPOSITIONTHICK);
-	SendMessage(hwnd, SCI_INDICSETSTYLE, SC_INDICATOR_CONVERTED, INDIC_COMPOSITIONTHIN);
-	SendMessage(hwnd, SCI_INDICSETSTYLE, SC_INDICATOR_UNKNOWN, INDIC_COMPOSITIONTHIN);
 	szValue = pLexGlobal->Styles[Style_IMEIndicator].szValue;
 	if (Style_StrGetColor(TRUE, szValue, &iValue)) {
 		SendMessage(hwnd, SCI_INDICSETFORE, SC_INDICATOR_INPUT, iValue);
