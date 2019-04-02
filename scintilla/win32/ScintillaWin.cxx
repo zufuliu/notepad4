@@ -619,7 +619,7 @@ void ScintillaWin::Init() {
 		::GetProcAddress(::GetModuleHandle(L"user32.dll"), "SetCoalescableTimer"));
 
 	vs.indicators[SC_INDICATOR_UNKNOWN] = Indicator(INDIC_HIDDEN, ColourDesired(0, 0, 0xff));
-	vs.indicators[SC_INDICATOR_INPUT] = Indicator(INDIC_DOTS, ColourDesired(0, 0, 0xff));
+	vs.indicators[SC_INDICATOR_INPUT] = Indicator(INDIC_COMPOSITIONTHIN, ColourDesired(0, 0, 0xff));
 	vs.indicators[SC_INDICATOR_CONVERTED] = Indicator(INDIC_COMPOSITIONTHICK, ColourDesired(0, 0, 0xff));
 	vs.indicators[SC_INDICATOR_TARGET] = Indicator(INDIC_STRAIGHTBOX, ColourDesired(0, 0, 0xff));
 }
@@ -1151,6 +1151,7 @@ void ScintillaWin::ToggleHanja() {
 
 namespace {
 
+// https://docs.microsoft.com/en-us/windows/desktop/Intl/composition-string
 std::vector<int> MapImeIndicators(const std::vector<BYTE> &inputStyle) {
 	std::vector<int> imeIndicator(inputStyle.size(), SC_INDICATOR_UNKNOWN);
 	for (size_t i = 0; i < inputStyle.size(); i++) {
