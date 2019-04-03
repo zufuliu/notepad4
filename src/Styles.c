@@ -655,10 +655,11 @@ static void Style_LoadAll(BOOL bFore) {
 	// Custom colors
 	const int value = (np2StyleTheme << 1) | 1;
 	if (bFore || iCustomColorLoaded != value) {
+		LPCWSTR themePath = GetStyleThemeFilePath();
 		iCustomColorLoaded = value;
 		CopyMemory(customColor, defaultCustomColor, MAX_CUSTOM_COLOR_COUNT * sizeof(COLORREF));
 
-		LoadIniSection(INI_SECTION_NAME_CUSTOM_COLORS, pIniSectionBuf, cchIniSection);
+		GetPrivateProfileSection(INI_SECTION_NAME_CUSTOM_COLORS, pIniSectionBuf, cchIniSection, themePath);
 		IniSectionParseArray(pIniSection, pIniSectionBuf);
 
 		const int count = min_i(pIniSection->count, MAX_CUSTOM_COLOR_COUNT);
