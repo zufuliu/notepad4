@@ -5070,6 +5070,10 @@ BOOL EditReplace(HWND hwnd, LPEDITFINDREPLACE lpefr) {
 extern int iMatchesCount;
 
 void EditMarkAll_Clear(void) {
+	if (iMatchesCount == 0) {
+		return;
+	}
+
 	iMatchesCount = 0;
 	// clear existing indicator
 	SciCall_SetIndicatorCurrent(IndicatorNumber_MarkOccurrences);
@@ -5132,6 +5136,7 @@ void EditMarkAll(BOOL bChanged, BOOL bMarkOccurrencesMatchCase, BOOL bMarkOccurr
 	ttf.lpstrText = pszText;
 
 	EditMarkAll_Clear();
+	SciCall_SetIndicatorCurrent(IndicatorNumber_MarkOccurrences);
 
 	Sci_Position iPos;
 	while ((iPos = SciCall_FindText(findFlag, &ttf)) != -1) {
