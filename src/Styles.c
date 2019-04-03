@@ -2697,7 +2697,7 @@ void Style_SetBookmark(HWND hwnd) {
 		SendMessage(hwnd, SCI_MARKERDEFINEPIXMAP, MarkerNumber_Bookmark, (LPARAM)bookmark_pixmap);
 #else
 		SendMessage(hwnd, SCI_MARKERSETBACK, MarkerNumber_Bookmark, iBookmarkImageColor);
-		// set same color to avoid drawing border.
+		// set same color to avoid showing edge.
 		SendMessage(hwnd, SCI_MARKERSETFORE, MarkerNumber_Bookmark, iBookmarkImageColor);
 		SendMessage(hwnd, SCI_MARKERDEFINE, MarkerNumber_Bookmark, SC_MARK_BOOKMARK);
 #endif
