@@ -1426,7 +1426,7 @@ static inline void UpdateDocumentModificationStatus(void) {
 void UpdateSelectionMarginWidth(void) {
 	// fixed width to put arrow cursor.
 	// 16px for bookmark indicator.
-	const int width = bShowSelectionMargin ? max_i(GetSystemMetrics(SM_CXCURSOR) / 2, 16) : 0;
+	const int width = bShowSelectionMargin ? max_i(GetSystemMetricsEx(SM_CXCURSOR) / 2, 16) : 0;
 	SciCall_SetMarginWidth(MARGIN_SELECTION, width);
 }
 
@@ -1603,8 +1603,6 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	// Margins
 	UpdateSelectionMarginWidth();
-
-	// Margins
 	SciCall_SetMarginType(MARGIN_FOLD_INDEX, SC_MARGIN_SYMBOL);
 	SciCall_SetMarginMask(MARGIN_FOLD_INDEX, SC_MASK_FOLDERS);
 	SciCall_SetMarginSensitive(MARGIN_FOLD_INDEX, TRUE);
@@ -1880,22 +1878,21 @@ void MsgDPIChanged(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	sprintf(buf, "WM_DPICHANGED: dpi=%u, %u\n", g_uCurrentDPI, g_uDefaultDPI);
 	SendMessage(hwndEdit, SCI_INSERTTEXT, 0, (LPARAM)buf);
 #endif
-
-	Style_DetectBaseFontSize(hwnd);
-	Style_OnDPIChanged(hwndEdit);
-	UpdateSelectionMarginWidth();
-	SciCall_GotoPos(pos);
-
 	// recreate toolbar and statusbar
 	Toolbar_GetButtons(hwndToolbar, TOOLBAR_COMMAND_BASE, tchToolbarButtons, COUNTOF(tchToolbarButtons));
-
 	DestroyWindow(hwndToolbar);
 	DestroyWindow(hwndReBar);
 	DestroyWindow(hwndStatus);
 	CreateBars(hwnd, g_hInstance);
-	UpdateToolbar();
 	SetWindowPos(hwnd, NULL, rc->left, rc->top, rc->right - rc->left, rc->bottom - rc->top, SWP_NOZORDER | SWP_NOACTIVATE);
-	UpdateStatusbar();
+
+	cachedStatusItem.updateMask = UINT_MAX;
+	Style_DetectBaseFontSize(hwnd);
+	UpdateSelectionMarginWidth();
+	UpdateStatusBarWidth();
+	Style_OnDPIChanged(hwndEdit);
+	SciCall_GotoPos(pos);
+	UpdateToolbar();
 }
 
 //=============================================================================
