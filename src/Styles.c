@@ -365,7 +365,7 @@ enum DefaultStyleIndex {
 #define	BookmarkLineDefaultColor	RGB(0, 0xff, 0)
 #define BookmarkLineDefaultAlpha	40
 
-#define BookmarkUsingPixmapImage		1
+#define BookmarkUsingPixmapImage		0
 #if BookmarkUsingPixmapImage
 // XPM Graphics for bookmark on selection margin.
 /* GIMP export Bookmark2_16x.png with Alpha threshold 127 */
