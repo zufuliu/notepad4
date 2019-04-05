@@ -165,7 +165,7 @@ EXIT /B
 :SubVSPath
 @rem Check the building environment
 @rem VSINSTALLDIR is set by vsdevcmd_start.bat
-IF EXIST "%VSINSTALLDIR%\Common7\IDE\VC\VCTargets\Platforms\%ARCH%\PlatformToolsets\v141" (
+IF EXIST "%VSINSTALLDIR%\Common7\IDE\VC\VCTargets\Platforms\%ARCH%\PlatformToolsets" (
 	SET "VS_PATH=%VSINSTALLDIR%"
 	EXIT /B
 )
