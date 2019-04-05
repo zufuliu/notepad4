@@ -356,7 +356,7 @@ void EditOnCodePageChanged(HWND hwnd, UINT oldCodePage) {
 	}
 
 	const char *text = GetFoldDisplayEllipsis(cpEdit, acp);
-	EditSetDefaultFoldDisplayText(text);
+	SciCall_SetDefaultFoldDisplayText(text);
 }
 
 //=============================================================================

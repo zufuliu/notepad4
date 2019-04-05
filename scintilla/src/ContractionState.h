@@ -10,6 +10,8 @@
 
 namespace Scintilla {
 
+#define EnablePerLineFoldDisplayText	0
+
 /**
 */
 class IContractionState {
@@ -31,9 +33,10 @@ public:
 	virtual bool SetVisible(Sci::Line lineDocStart, Sci::Line lineDocEnd, bool isVisible) = 0;
 	virtual bool HiddenLines() const noexcept = 0;
 
+#if EnablePerLineFoldDisplayText
 	virtual const char *GetFoldDisplayText(Sci::Line lineDoc) const noexcept = 0;
-	virtual bool GetFoldDisplayTextShown(Sci::Line lineDoc) const noexcept = 0;
 	virtual bool SetFoldDisplayText(Sci::Line lineDoc, const char *text) = 0;
+#endif
 
 	virtual bool GetExpanded(Sci::Line lineDoc) const noexcept = 0;
 	virtual bool SetExpanded(Sci::Line lineDoc, bool isExpanded) = 0;

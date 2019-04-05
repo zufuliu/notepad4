@@ -7244,7 +7244,9 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 		break;
 
 	case SCI_TOGGLEFOLDSHOWTEXT:
+#if EnablePerLineFoldDisplayText
 		pcs->SetFoldDisplayText(wParam, CharPtrFromSPtr(lParam));
+#endif
 		FoldLine(wParam, SC_FOLDACTION_TOGGLE);
 		break;
 
@@ -7252,6 +7254,17 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 		foldDisplayTextStyle = static_cast<int>(wParam);
 		Redraw();
 		break;
+
+	case SCI_FOLDDISPLAYTEXTGETSTYLE:
+		return foldDisplayTextStyle;
+
+	case SCI_SETDEFAULTFOLDDISPLAYTEXT:
+		SetDefaultFoldDisplayText(CharPtrFromSPtr(lParam));
+		Redraw();
+		break;
+
+	case SCI_GETDEFAULTFOLDDISPLAYTEXT:
+		return StringResult(lParam, GetDefaultFoldDisplayText());
 
 	case SCI_TOGGLEFOLD:
 		FoldLine(wParam, SC_FOLDACTION_TOGGLE);

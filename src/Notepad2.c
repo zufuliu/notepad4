@@ -1624,7 +1624,7 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 #endif
 	SciCall_FoldDisplayTextSetStyle((bFoldDisplayText ? SC_FOLDDISPLAYTEXT_BOXED : SC_FOLDDISPLAYTEXT_HIDDEN));
 	const char *text = GetFoldDisplayEllipsis(SC_CP_UTF8, 0); // internal default encoding
-	EditSetDefaultFoldDisplayText(text);
+	SciCall_SetDefaultFoldDisplayText(text);
 	// highlight for current folding block
 	SciCall_MarkerEnableHighlight(TRUE);
 #if NP2_ENABLE_SHOW_CALL_TIPS

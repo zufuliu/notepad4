@@ -88,3 +88,24 @@ bool EditModel::BidirectionalEnabled() const noexcept {
 bool EditModel::BidirectionalR2L() const noexcept {
 	return bidirectional == Bidirectional::bidiR2L;
 }
+
+void EditModel::SetDefaultFoldDisplayText(const char *text) {
+	defaultFoldDisplayText = IsNullOrEmpty(text) ? UniqueString() : UniqueStringCopy(text);
+}
+
+const char *EditModel::GetDefaultFoldDisplayText() const noexcept {
+	return defaultFoldDisplayText.get();
+}
+
+const char *EditModel::GetFoldDisplayText(Sci::Line lineDoc) const noexcept {
+	if (foldDisplayTextStyle == SC_FOLDDISPLAYTEXT_HIDDEN || pcs->GetExpanded(lineDoc)) {
+		return nullptr;
+	}
+
+#if EnablePerLineFoldDisplayText
+	const char *text = pcs->GetFoldDisplayText(lineDoc);
+	return text ? text : defaultFoldDisplayText.get();
+#else
+	return defaultFoldDisplayText.get();
+#endif
+}

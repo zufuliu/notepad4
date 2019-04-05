@@ -11,6 +11,11 @@
 
 namespace Scintilla {
 
+constexpr bool IsNullOrEmpty(const char *text) noexcept {
+	return text == nullptr || *text == '\0';
+}
+
+
 using UniqueString = std::unique_ptr<const char[]>;
 
 /// Equivalent to strdup but produces a std::unique_ptr<const char[]> allocation to go
