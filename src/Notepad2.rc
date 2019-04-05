@@ -112,8 +112,8 @@ BEGIN
 			MENUITEM "&ANSI",						IDM_ENCODING_ANSI
 			MENUITEM "UTF-&8",						IDM_ENCODING_UTF8
 			MENUITEM "UTF-8 B&OM",					IDM_ENCODING_UTF8SIGN
-			MENUITEM "UTF-16 &LE BOM",				IDM_ENCODING_UNICODE
-			MENUITEM "UTF-16 &BE BOM",				IDM_ENCODING_UNICODEREV
+			MENUITEM "UTF-16&LE BOM",				IDM_ENCODING_UNICODE
+			MENUITEM "UTF-16&BE BOM",				IDM_ENCODING_UNICODEREV
 			MENUITEM "&More...\tF9",				IDM_ENCODING_SELECT
 			MENUITEM SEPARATOR
 			MENUITEM "&Default...",					IDM_ENCODING_SETDEFAULT
@@ -1860,10 +1860,10 @@ STRINGTABLE
 BEGIN
     61000                   "A0;ANSI;ANSI"
     61001                   "A1;OEM;OEM"
-    61002                   "A2;Unicode (UTF-16 LE BOM);UTF-16 LE BOM"
-    61003                   "A3;Unicode (UTF-16 BE BOM);UTF-16 BE BOM"
-    61004                   "A4;Unicode (UTF-16 LE);UTF-16 LE"
-    61005                   "A5;Unicode (UTF-16 BE);UTF-16 BE"
+    61002                   "A2;Unicode (UTF-16LE BOM);UTF-16LE BOM"
+    61003                   "A3;Unicode (UTF-16BE BOM);UTF-16BE BOM"
+    61004                   "A4;Unicode (UTF-16LE);UTF-16LE"
+    61005                   "A5;Unicode (UTF-16BE);UTF-16BE"
     61006                   "A6;UTF-8;UTF-8"
     61007                   "A7;UTF-8 BOM;UTF-8 BOM"
     61008                   "A8;UTF-7;UTF-7"
