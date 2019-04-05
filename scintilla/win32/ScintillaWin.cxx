@@ -1315,12 +1315,15 @@ unsigned int SciMessageFromEM(unsigned int iMessage) noexcept {
 namespace Scintilla {
 
 UINT CodePageFromCharSet(DWORD characterSet, UINT documentCodePage) noexcept {
+	// UTF-8 and DBCS ANSI code pages
 	if (documentCodePage) {
 		return documentCodePage;
 	}
+	// SBCS code pages: zero / CP_ACP
 	switch (characterSet) {
 	case SC_CHARSET_ANSI: return 1252;
-	case SC_CHARSET_DEFAULT: return documentCodePage ? documentCodePage : 1252;
+	//case SC_CHARSET_DEFAULT: return documentCodePage ? documentCodePage : 1252;
+	case SC_CHARSET_DEFAULT: return documentCodePage;
 	case SC_CHARSET_BALTIC: return 1257;
 	case SC_CHARSET_CHINESEBIG5: return 950;
 	case SC_CHARSET_EASTEUROPE: return 1250;
