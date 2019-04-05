@@ -334,8 +334,8 @@ NP2_inline void SciCall_ToggleFoldShowText(int line, const char *text) {
 	SciCall2(SCI_TOGGLEFOLDSHOWTEXT, line, (LPARAM)text);
 }
 
-NP2_inline void EditSetDefaultFoldDisplayText(const char *text) {
-	SciCall2(SCI_TOGGLEFOLDSHOWTEXT, (WPARAM)(-1), (LPARAM)text);
+NP2_inline void SciCall_SetDefaultFoldDisplayText(const char *text) {
+	SciCall2(SCI_SETDEFAULTFOLDDISPLAYTEXT, 0, (LPARAM)text);
 }
 
 NP2_inline void SciCall_FoldDisplayTextSetStyle(int style) {

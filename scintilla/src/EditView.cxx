@@ -1066,7 +1066,7 @@ void EditView::DrawEOL(Surface *surface, const EditModel &model, const ViewStyle
 		rcSegment.left = rcLine.left;
 	rcSegment.right = rcLine.right;
 
-	const bool fillRemainder = !lastSubLine || model.foldDisplayTextStyle == SC_FOLDDISPLAYTEXT_HIDDEN || !model.pcs->GetFoldDisplayTextShown(line);
+	const bool fillRemainder = !lastSubLine || !model.GetFoldDisplayText(line);
 	if (fillRemainder) {
 		// Fill the remainder of the line
 		FillLineRemainder(surface, model, vsDraw, ll, line, rcSegment, subLine);
@@ -1214,11 +1214,12 @@ void EditView::DrawFoldDisplayText(Surface *surface, const EditModel &model, con
 	if (!lastSubLine)
 		return;
 
-	if ((model.foldDisplayTextStyle == SC_FOLDDISPLAYTEXT_HIDDEN) || !model.pcs->GetFoldDisplayTextShown(line))
+	const char *text = model.GetFoldDisplayText(line);
+	if (!text)
 		return;
 
 	PRectangle rcSegment = rcLine;
-	const std::string_view foldDisplayText = model.pcs->GetFoldDisplayText(line);
+	const std::string_view foldDisplayText(text);
 	FontAlias fontText = vsDraw.styles[STYLE_FOLDDISPLAYTEXT].font;
 	constexpr int margin = 2;
 	const int widthFoldDisplayText = static_cast<int>(surface->WidthText(fontText, foldDisplayText));

@@ -27,8 +27,6 @@
 
 using namespace Scintilla;
 
-#define EnablePerLineFoldDisplayText	0
-
 namespace {
 
 template <typename LINE>
@@ -41,7 +39,6 @@ class ContractionState final : public IContractionState {
 	std::unique_ptr<SparseVector<UniqueString>> foldDisplayTexts;
 #endif
 	std::unique_ptr<Partitioning<LINE>> displayLines;
-	UniqueString defaultFoldDisplayText;
 	LINE linesInDocument;
 
 	void EnsureData();
@@ -79,9 +76,10 @@ public:
 	bool SetVisible(Sci::Line lineDocStart, Sci::Line lineDocEnd, bool isVisible) override;
 	bool HiddenLines() const noexcept override;
 
+#if EnablePerLineFoldDisplayText
 	const char *GetFoldDisplayText(Sci::Line lineDoc) const noexcept override;
-	bool GetFoldDisplayTextShown(Sci::Line lineDoc) const noexcept override;
 	bool SetFoldDisplayText(Sci::Line lineDoc, const char *text) override;
+#endif
 
 	bool GetExpanded(Sci::Line lineDoc) const noexcept override;
 	bool SetExpanded(Sci::Line lineDoc, bool isExpanded) override;
@@ -102,7 +100,6 @@ ContractionState<LINE>::ContractionState() noexcept : linesInDocument(1) {
 template <typename LINE>
 ContractionState<LINE>::~ContractionState() {
 	Clear();
-	defaultFoldDisplayText.reset();
 }
 
 template <typename LINE>
@@ -289,33 +286,15 @@ bool ContractionState<LINE>::HiddenLines() const noexcept {
 template <typename LINE>
 const char *ContractionState<LINE>::GetFoldDisplayText(Sci::Line lineDoc) const noexcept {
 	Check();
-	const char *text = foldDisplayTexts->ValueAt(lineDoc).get();
-	return text ? text : defaultFoldDisplayText.get();
-}
-#else
-template <typename LINE>
-const char *ContractionState<LINE>::GetFoldDisplayText(Sci::Line /*lineDoc*/) const noexcept {
-	return defaultFoldDisplayText.get();
-}
-#endif
-
-template <typename LINE>
-bool ContractionState<LINE>::GetFoldDisplayTextShown(Sci::Line lineDoc) const noexcept {
-	return !GetExpanded(lineDoc) && GetFoldDisplayText(lineDoc);
+	return foldDisplayTexts->ValueAt(lineDoc).get();
 }
 
 template <typename LINE>
 bool ContractionState<LINE>::SetFoldDisplayText(Sci::Line lineDoc, const char *text) {
-	if (lineDoc < 0) {
-		defaultFoldDisplayText = UniqueStringCopy(text);
-		return true;
-	}
-
-#if EnablePerLineFoldDisplayText
 	EnsureData();
 	const char *foldText = foldDisplayTexts->ValueAt(lineDoc).get();
 	if (!foldText || !text || 0 != strcmp(text, foldText)) {
-		UniqueString uns = UniqueStringCopy(text);
+		UniqueString uns = IsNullOrEmpty(text) ? UniqueString() : UniqueStringCopy(text);
 		foldDisplayTexts->SetValueAt(lineDoc, std::move(uns));
 		Check();
 		return true;
@@ -323,10 +302,8 @@ bool ContractionState<LINE>::SetFoldDisplayText(Sci::Line lineDoc, const char *t
 		Check();
 		return false;
 	}
-#else
-	return false;
-#endif
 }
+#endif
 
 template <typename LINE>
 bool ContractionState<LINE>::GetExpanded(Sci::Line lineDoc) const noexcept {
