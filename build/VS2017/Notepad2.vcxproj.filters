@@ -132,6 +132,9 @@
     <ClCompile Include="..\..\scintilla\src\UniConversion.cxx">
       <Filter>Scintilla\src</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\scintilla\src\UniqueString.cxx">
+      <Filter>Scintilla\src</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\scintilla\src\ViewStyle.cxx">
       <Filter>Scintilla\src</Filter>
     </ClCompile>
