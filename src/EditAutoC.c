@@ -873,7 +873,7 @@ static BOOL CanAutoCloseSingleQuote(int chPrev, int iCurrentStyle) {
 		|| (iLexer == SCLEX_LISP && iCurrentStyle == SCE_C_OPERATOR)
 		|| (iLexer == SCLEX_MATLAB && iCurrentStyle == SCE_MAT_OPERATOR) // transpose operator
 		|| (iLexer == SCLEX_PERL && iCurrentStyle == SCE_PL_OPERATOR && chPrev == '&') // SCE_PL_IDENTIFIER
-		|| ((iLexer == SCLEX_VB || iLexer == SCLEX_VBSCRIPT) && (iCurrentStyle == SCE_B_DEFAULT))
+		|| ((iLexer == SCLEX_VB || iLexer == SCLEX_VBSCRIPT) && (iCurrentStyle == SCE_B_DEFAULT || iCurrentStyle == SCE_B_COMMENT))
 		|| (iLexer == SCLEX_VERILOG && (iCurrentStyle == SCE_V_NUMBER || iCurrentStyle == SCE_V_DEFAULT))
 		|| (iLexer == SCLEX_TEXINFO && iCurrentStyle == SCE_L_DEFAULT && chPrev == '@') // SCE_L_SPECIAL
 	) {
