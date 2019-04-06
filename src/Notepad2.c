@@ -1425,7 +1425,7 @@ static inline void UpdateDocumentModificationStatus(void) {
 
 void UpdateSelectionMarginWidth(void) {
 	// fixed width to put arrow cursor.
-	// 16px for bookmark indicator.
+	// 16px for bookmark symbol.
 	const int width = bShowSelectionMargin ? max_i(GetSystemMetricsEx(SM_CXCURSOR) / 2, 16) : 0;
 	SciCall_SetMarginWidth(MARGIN_SELECTION, width);
 }
