@@ -639,6 +639,7 @@
     <ClCompile Include="..\..\scintilla\src\Selection.cxx" />
     <ClCompile Include="..\..\scintilla\src\Style.cxx" />
     <ClCompile Include="..\..\scintilla\src\UniConversion.cxx" />
+    <ClCompile Include="..\..\scintilla\src\UniqueString.cxx" />
     <ClCompile Include="..\..\scintilla\src\ViewStyle.cxx" />
     <ClCompile Include="..\..\scintilla\src\XPM.cxx" />
     <ClCompile Include="..\..\scintilla\win32\HanjaDic.cxx" />

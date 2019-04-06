@@ -131,6 +131,7 @@
       <File Name="../../scintilla/src/Style.h"/>
       <File Name="../../scintilla/src/UniConversion.cxx"/>
       <File Name="../../scintilla/src/UniConversion.h"/>
+      <File Name="../../scintilla/src/UniqueString.cxx"/>
       <File Name="../../scintilla/src/UniqueString.h"/>
       <File Name="../../scintilla/src/ViewStyle.cxx"/>
       <File Name="../../scintilla/src/ViewStyle.h"/>
