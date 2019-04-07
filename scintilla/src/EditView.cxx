@@ -598,6 +598,10 @@ void EditView::LayoutLine(const EditModel &model, Sci::Line line, Surface *surfa
 								lastGoodBreak = pos - posLineStart;
 							}
 							p = pos + cePos.widthBytes - posLineStart;
+							// model.pdoc->IsCrLf(pos)
+							if (cePos.character == '\r' && model.pdoc->CharAt(pos + 1) == '\n') {
+								p += 1;
+							}
 							continue;
 						}
 					} else if ((vstyle.wrapState == eWrapWord) && (ll->styles[p] != ll->styles[p - 1])) {
