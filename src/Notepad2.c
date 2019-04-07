@@ -4108,42 +4108,9 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		bSaveSettings = !bSaveSettings;
 		break;
 
-	case IDM_VIEW_SAVESETTINGSNOW: {
-		BOOL bCreateFailure = FALSE;
-
-		if (StrIsEmpty(szIniFile)) {
-			if (StrNotEmpty(szIniFile2)) {
-				if (CreateIniFileEx(szIniFile2)) {
-					lstrcpy(szIniFile, szIniFile2);
-					lstrcpy(szIniFile2, L"");
-				} else {
-					bCreateFailure = TRUE;
-				}
-			} else {
-				break;
-			}
-		}
-
-		if (!bCreateFailure) {
-			if (WritePrivateProfileString(INI_SECTION_NAME_SETTINGS, L"WriteTest", L"ok", szIniFile)) {
-				BeginWaitCursor();
-				StatusSetTextID(hwndStatus, STATUS_HELP, IDS_SAVINGSETTINGS);
-				StatusSetSimple(hwndStatus, TRUE);
-				InvalidateRect(hwndStatus, NULL, TRUE);
-				UpdateWindow(hwndStatus);
-				SaveSettings(TRUE);
-				StatusSetSimple(hwndStatus, FALSE);
-				EndWaitCursor();
-				MsgBox(MBINFO, IDS_SAVEDSETTINGS);
-			} else {
-				dwLastIOError = GetLastError();
-				MsgBox(MBWARN, IDS_WRITEINI_FAIL);
-			}
-		} else {
-			MsgBox(MBWARN, IDS_CREATEINI_FAIL);
-		}
-	}
-	break;
+	case IDM_VIEW_SAVESETTINGSNOW:
+		SaveSettingsNow(FALSE, FALSE);
+		break;
 
 	case IDM_HELP_ABOUT:
 		ThemedDialogBox(g_hInstance, MAKEINTRESOURCE(IDD_ABOUT), hwnd, AboutDlgProc);
@@ -5384,6 +5351,54 @@ void LoadSettings(void) {
 
 	// Scintilla Styles
 	Style_Load();
+}
+
+void SaveSettingsNow(BOOL bOnlySaveStyle, BOOL bQuiet) {
+	BOOL bCreateFailure = FALSE;
+
+	if (StrIsEmpty(szIniFile)) {
+		if (StrNotEmpty(szIniFile2)) {
+			if (CreateIniFileEx(szIniFile2)) {
+				lstrcpy(szIniFile, szIniFile2);
+				lstrcpy(szIniFile2, L"");
+			} else {
+				bCreateFailure = TRUE;
+			}
+		} else {
+			return;
+		}
+	}
+
+	if (!bCreateFailure) {
+		LPCWSTR section = bOnlySaveStyle ? INI_SECTION_NAME_STYLES : INI_SECTION_NAME_SETTINGS;
+		if (WritePrivateProfileString(section, L"WriteTest", L"ok", szIniFile)) {
+			BeginWaitCursor();
+			StatusSetTextID(hwndStatus, STATUS_HELP, IDS_SAVINGSETTINGS);
+			StatusSetSimple(hwndStatus, TRUE);
+			InvalidateRect(hwndStatus, NULL, TRUE);
+			UpdateWindow(hwndStatus);
+			if (CreateIniFile()) {
+				if (bOnlySaveStyle) {
+					Style_Save();
+				} else {
+					SaveSettings(TRUE);
+				}
+			} else {
+				bCreateFailure = TRUE;
+			}
+			StatusSetSimple(hwndStatus, FALSE);
+			EndWaitCursor();
+			if (!bCreateFailure && !bQuiet) {
+				MsgBox(MBINFO, IDS_SAVEDSETTINGS);
+			}
+		} else {
+			dwLastIOError = GetLastError();
+			MsgBox(MBWARN, IDS_WRITEINI_FAIL);
+		}
+	}
+	if (bCreateFailure) {
+		MsgBox(MBWARN, IDS_CREATEINI_FAIL);
+	}
 }
 
 //=============================================================================

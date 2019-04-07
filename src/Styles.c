@@ -944,7 +944,7 @@ void Style_OnStyleThemeChanged(HWND hwnd, int theme) {
 	}
 
 	if (fStylesModified) {
-		Style_Save();
+		SaveSettingsNow(TRUE, TRUE);
 	}
 	np2StyleTheme = theme;
 	Style_SetLexer(hwnd, pLexCurrent);

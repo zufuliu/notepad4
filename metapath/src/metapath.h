@@ -111,6 +111,7 @@ void ShowNotifyIcon(HWND hwnd, BOOL bAdd);
 
 BOOL ChangeDirectory(HWND hwnd, LPCWSTR lpszNewDir, BOOL bUpdateHistory);
 void LoadSettings(void);
+void SaveSettingsNow(void);
 void SaveSettings(BOOL bSaveSettingsNow);
 void SaveWindowPosition(BOOL bSaveSettingsNow, WCHAR *pIniSectionBuf);
 void ClearWindowPositionHistory(void);

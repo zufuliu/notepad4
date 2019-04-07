@@ -1682,36 +1682,9 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		SendWMSize(hwnd);
 		break;
 
-	case IDM_VIEW_SAVESETTINGS: {
-		BOOL bCreateFailure = FALSE;
-
-		if (StrIsEmpty(szIniFile)) {
-			if (StrNotEmpty(szIniFile2)) {
-				if (CreateIniFileEx(szIniFile2)) {
-					lstrcpy(szIniFile, szIniFile2);
-					lstrcpy(szIniFile2, L"");
-				} else {
-					bCreateFailure = TRUE;
-				}
-			} else {
-				break;
-			}
-		}
-
-		if (!bCreateFailure) {
-			if (WritePrivateProfileString(INI_SECTION_NAME_SETTINGS, L"WriteTest", L"ok", szIniFile)) {
-				BeginWaitCursor();
-				SaveSettings(TRUE);
-				EndWaitCursor();
-				ErrorMessage(0, IDS_SAVESETTINGS);
-			} else {
-				ErrorMessage(2, IDS_ERR_INIWRITE);
-			}
-		} else {
-			ErrorMessage(2, IDS_ERR_INICREATE);
-		}
-	}
-	break;
+	case IDM_VIEW_SAVESETTINGS:
+		SaveSettingsNow();
+		break;
 
 	case IDM_VIEW_FINDTARGET:
 		ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_FINDTARGET), hwnd, FindTargetDlgProc, 0);
@@ -2518,6 +2491,43 @@ void LoadSettings(void) {
 	colorCustom[14] = GetSysColor(COLOR_3DFACE);
 	colorCustom[7] = GetSysColor(COLOR_3DFACE);
 	colorCustom[15] = GetSysColor(COLOR_3DFACE);
+}
+
+void SaveSettingsNow(void) {
+	BOOL bCreateFailure = FALSE;
+
+	if (StrIsEmpty(szIniFile)) {
+		if (StrNotEmpty(szIniFile2)) {
+			if (CreateIniFileEx(szIniFile2)) {
+				lstrcpy(szIniFile, szIniFile2);
+				lstrcpy(szIniFile2, L"");
+			} else {
+				bCreateFailure = TRUE;
+			}
+		} else {
+			return;
+		}
+	}
+
+	if (!bCreateFailure) {
+		if (WritePrivateProfileString(INI_SECTION_NAME_SETTINGS, L"WriteTest", L"ok", szIniFile)) {
+			BeginWaitCursor();
+			if (CreateIniFile()) {
+				SaveSettings(TRUE);
+			} else {
+				bCreateFailure = TRUE;
+			}
+			EndWaitCursor();
+			if (!bCreateFailure) {
+				ErrorMessage(0, IDS_SAVESETTINGS);
+			}
+		} else {
+			ErrorMessage(2, IDS_ERR_INIWRITE);
+		}
+	}
+	if (bCreateFailure) {
+		ErrorMessage(2, IDS_ERR_INICREATE);
+	}
 }
 
 //=============================================================================
