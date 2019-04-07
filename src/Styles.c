@@ -2681,7 +2681,7 @@ void Style_SetBookmark(HWND hwnd) {
 #if BookmarkUsingPixmapImage
 		const int marker = bShowSelectionMargin ? SC_MARK_PIXMAP : SC_MARK_BACKGROUND;
 #else
-		const int marker = bShowSelectionMargin ? SC_MARK_VERTICAL_BOOKMARK : SC_MARK_BACKGROUND;
+		const int marker = bShowSelectionMargin ? SC_MARK_VERTICALBOOKMARK : SC_MARK_BACKGROUND;
 #endif
 		const int markType = (int)SendMessage(hwnd, SCI_MARKERSYMBOLDEFINED, MarkerNumber_Bookmark, 0);
 		if (marker == markType) {
@@ -2700,7 +2700,7 @@ void Style_SetBookmark(HWND hwnd) {
 		SendMessage(hwnd, SCI_MARKERSETBACK, MarkerNumber_Bookmark, iBookmarkImageColor);
 		// set same color to avoid showing edge.
 		SendMessage(hwnd, SCI_MARKERSETFORE, MarkerNumber_Bookmark, iBookmarkImageColor);
-		SendMessage(hwnd, SCI_MARKERDEFINE, MarkerNumber_Bookmark, SC_MARK_VERTICAL_BOOKMARK);
+		SendMessage(hwnd, SCI_MARKERDEFINE, MarkerNumber_Bookmark, SC_MARK_VERTICALBOOKMARK);
 #endif
 	} else {
 		int iBookmarkLineColor = BookmarkLineDefaultColor;

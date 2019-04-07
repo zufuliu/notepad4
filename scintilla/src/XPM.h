@@ -25,10 +25,10 @@ class XPM {
 public:
 	explicit XPM(const char *textForm);
 	explicit XPM(const char *const *linesForm);
-	XPM(const XPM &) = delete;
-	XPM(XPM &&) = delete;
-	XPM &operator=(const XPM &) = delete;
-	XPM &operator=(XPM &&) = delete;
+	XPM(const XPM &) = default;
+	XPM(XPM &&) = default;
+	XPM &operator=(const XPM &) = default;
+	XPM &operator=(XPM &&) = default;
 	~XPM();
 	void Init(const char *textForm);
 	void Init(const char *const *linesForm);
@@ -56,11 +56,10 @@ class RGBAImage {
 public:
 	RGBAImage(int width_, int height_, float scale_, const unsigned char *pixels_);
 	explicit RGBAImage(const XPM &xpm);
-	// Deleted so RGBAImage objects can not be copied.
-	RGBAImage(const RGBAImage &) = delete;
-	RGBAImage(RGBAImage &&) = delete;
-	RGBAImage &operator=(const RGBAImage &) = delete;
-	RGBAImage &operator=(RGBAImage &&) = delete;
+	RGBAImage(const RGBAImage &) = default;
+	RGBAImage(RGBAImage &&) = default;
+	RGBAImage &operator=(const RGBAImage &) = default;
+	RGBAImage &operator=(RGBAImage &&) = default;
 	virtual ~RGBAImage();
 	constexpr int GetHeight() const noexcept {
 		return height;
