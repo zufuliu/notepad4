@@ -553,6 +553,9 @@ void EditView::LayoutLine(const EditModel &model, Sci::Line line, Surface *surfa
 			Sci::Position lastLineStart = 0;
 			XYACCUMULATOR startOffset = 0;
 			Sci::Position p = 0;
+			// cache decode result
+			Document::CharacterExtracted cePrev(0, 0);
+			CharClassify::cc ccPrev = CharClassify::ccSpace;
 			while (p < ll->numCharsInLine) {
 				if ((ll->positions[p + 1] - startOffset) >= width) {
 					if (lastGoodBreak == lastLineStart) {
@@ -574,6 +577,7 @@ void EditView::LayoutLine(const EditModel &model, Sci::Line line, Surface *surfa
 					// take into account the space for start wrap mark and indent
 					startOffset -= ll->wrapIndent;
 					p = lastGoodBreak + 1;
+					cePrev.widthBytes = 0;
 					continue;
 				}
 				if (p > 0) {
@@ -586,13 +590,17 @@ void EditView::LayoutLine(const EditModel &model, Sci::Line line, Surface *surfa
 						// style boundary and space
 						if ((ll->styles[p] != ll->styles[p - 1]) || (IsSpaceOrTab(ll->chars[p - 1]) && !IsSpaceOrTab(ll->chars[p]))) {
 							lastGoodBreak = p;
+							cePrev.widthBytes = 0;
 						} else {
 							// word boundary
 							// TODO: Unicode Line Breaking Algorithm http://www.unicode.org/reports/tr14/
-							const Sci::Position pos = model.pdoc->MovePositionOutsideChar(p + posLineStart, -1);
-							const Document::CharacterExtracted cePrev = model.pdoc->CharacterBefore(pos);
+							Sci::Position pos = p + posLineStart;
+							if (cePrev.widthBytes == 0) {
+								pos = model.pdoc->MovePositionOutsideChar(pos, -1);
+								cePrev = model.pdoc->CharacterBefore(pos);
+								ccPrev = model.pdoc->WordCharacterClass(cePrev.character);
+							}
 							const Document::CharacterExtracted cePos = model.pdoc->CharacterAfter(pos);
-							const CharClassify::cc ccPrev = model.pdoc->WordCharacterClass(cePrev.character);
 							const CharClassify::cc ccPos = model.pdoc->WordCharacterClass(cePos.character);
 							if (ccPrev != ccPos || ccPrev == CharClassify::ccCJKWord) {
 								lastGoodBreak = pos - posLineStart;
@@ -602,6 +610,8 @@ void EditView::LayoutLine(const EditModel &model, Sci::Line line, Surface *surfa
 							if (cePos.character == '\r' && model.pdoc->CharAt(pos + 1) == '\n') {
 								p += 1;
 							}
+							cePrev = cePos;
+							ccPrev = ccPos;
 							continue;
 						}
 					} else if ((vstyle.wrapState == eWrapWord) && (ll->styles[p] != ll->styles[p - 1])) {
