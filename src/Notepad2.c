@@ -1925,6 +1925,9 @@ void MsgThemeChanged(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 }
 
 static void OnStyleThemeChanged(int theme) {
+	if (theme == np2StyleTheme) {
+		return;
+	}
 	Style_OnStyleThemeChanged(hwndEdit, theme);
 }
 
