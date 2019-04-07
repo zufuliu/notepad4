@@ -137,6 +137,7 @@ void CALLBACK WatchTimerProc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTim
 void CALLBACK PasteBoardTimer(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime);
 
 void LoadSettings(void);
+void SaveSettingsNow(BOOL bOnlySaveStyle, BOOL bQuiet);
 void SaveSettings(BOOL bSaveSettingsNow);
 void SaveWindowPosition(BOOL bSaveSettingsNow, WCHAR *pIniSectionBuf);
 void ClearWindowPositionHistory(void);
