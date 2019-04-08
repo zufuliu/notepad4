@@ -33,31 +33,6 @@ MarginStyle::MarginStyle(int style_, int width_, int mask_) noexcept :
 	style(style_), width(width_), mask(mask_), sensitive(false), cursor(SC_CURSORREVERSEARROW) {
 }
 
-// A list of the fontnames - avoids wasting space in each style
-FontNames::FontNames() noexcept = default;
-
-FontNames::~FontNames() {
-	Clear();
-}
-
-void FontNames::Clear() noexcept {
-	names.clear();
-}
-
-const char *FontNames::Save(const char *name) {
-	if (!name)
-		return nullptr;
-
-	for (const auto &nm : names) {
-		if (strcmp(nm.get(), name) == 0) {
-			return nm.get();
-		}
-	}
-
-	names.push_back(UniqueStringCopy(name));
-	return names.back().get();
-}
-
 FontRealised::FontRealised() noexcept = default;
 
 FontRealised::~FontRealised() {
