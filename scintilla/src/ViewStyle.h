@@ -25,21 +25,6 @@ public:
 
 /**
  */
-class FontNames {
-private:
-	std::vector<UniqueString> names;
-public:
-	FontNames() noexcept;
-	// FontNames objects can not be copied.
-	FontNames(const FontNames &) = delete;
-	FontNames(FontNames &&) = delete;
-	FontNames &operator=(const FontNames &) = delete;
-	FontNames &operator=(FontNames &&) = delete;
-	~FontNames();
-	void Clear() noexcept;
-	const char *Save(const char *name);
-};
-
 class FontRealised : public FontMeasurements {
 public:
 	Font font;
@@ -93,7 +78,7 @@ struct EdgeProperties {
 /**
  */
 class ViewStyle {
-	FontNames fontNames;
+	UniqueStringSet fontNames;
 	FontMap fonts;
 public:
 	std::vector<Style> styles;
