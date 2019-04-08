@@ -948,10 +948,9 @@ void ScintillaWin::AddCharUTF16(wchar_t const *wcs, unsigned int wclen) {
 		AddCharUTF(inBufferCP, static_cast<unsigned int>(len));
 	} else {
 		const UINT codePage = CodePageOfDocument();
-		const bool treatAsDBCS = IsDBCSCodePage(codePage);
-		const int size = MultiByteFromWideChar(codePage, std::wstring_view(wcs, wclen), inBufferCP, sizeof(inBufferCP) - 1);
+		const int size = MultiByteFromWideChar(codePage, wsv, inBufferCP, sizeof(inBufferCP) - 1);
 		inBufferCP[size] = '\0';
-		AddCharUTF(inBufferCP, size, treatAsDBCS);
+		AddCharUTF(inBufferCP, size);
 	}
 }
 
@@ -1181,7 +1180,6 @@ void ScintillaWin::AddWString(const std::wstring &wcs) {
 		return;
 
 	const UINT codePage = CodePageOfDocument();
-	const bool treatAsDBCS = IsDBCSCodePage(codePage);
 	wchar_t bufw[3];
 	char inBufferCP[maxInputIMECharacterBytes];
 	for (size_t i = 0; i < wcs.size(); ) {
@@ -1194,7 +1192,7 @@ void ScintillaWin::AddWString(const std::wstring &wcs) {
 
 		const int size = MultiByteFromWideChar(codePage, std::wstring_view(bufw, ucWidth), inBufferCP, sizeof(inBufferCP) - 1);
 		inBufferCP[size] = '\0';
-		AddCharUTF(inBufferCP, size, treatAsDBCS);
+		AddCharUTF(inBufferCP, size);
 		i += ucWidth;
 	}
 }
@@ -1239,7 +1237,6 @@ sptr_t ScintillaWin::HandleCompositionInline(uptr_t, sptr_t lParam) {
 		recordingMacro = false;
 		charAddedSource = SC_CHARADDED_TENTATIVE;
 		const UINT codePage = CodePageOfDocument();
-		const bool treatAsDBCS = IsDBCSCodePage(codePage);
 		wchar_t bufw[3];
 		char inBufferCP[maxInputIMECharacterBytes];
 		for (size_t i = 0; i < wcs.size(); ) {
@@ -1252,7 +1249,7 @@ sptr_t ScintillaWin::HandleCompositionInline(uptr_t, sptr_t lParam) {
 
 			const int size = MultiByteFromWideChar(codePage, std::wstring_view(bufw, ucWidth), inBufferCP, sizeof(inBufferCP) - 1);
 			inBufferCP[size] = '\0';
-			AddCharUTF(inBufferCP, size, treatAsDBCS);
+			AddCharUTF(inBufferCP, size);
 
 			DrawImeIndicator(imeIndicator[i], size);
 			i += ucWidth;

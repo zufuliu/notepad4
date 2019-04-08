@@ -1905,7 +1905,7 @@ void Editor::FilterSelections() {
 }
 
 // AddCharUTF inserts an array of bytes which may or may not be in UTF-8.
-void Editor::AddCharUTF(const char *s, unsigned int len, bool treatAsDBCS) {
+void Editor::AddCharUTF(const char *s, unsigned int len) {
 	if (len == 0) {
 		return;
 	}
@@ -1982,8 +1982,9 @@ void Editor::AddCharUTF(const char *s, unsigned int len, bool treatAsDBCS) {
 	// We don't handle inline IME tentative characters
 	if (charAddedSource != SC_CHARADDED_TENTATIVE) {
 		int ch = static_cast<unsigned char>(s[0]);
-		if (treatAsDBCS) {
+		if (pdoc->dbcsCodePage != SC_CP_UTF8) {
 			if (len > 1) {
+				// DBCS code page or DBCS font character set.
 				ch = (ch << 8) | static_cast<unsigned char>(s[1]);
 			}
 		} else {

@@ -77,17 +77,17 @@ void ScintillaBase::Finalise() noexcept {
 	popup.Destroy();
 }
 
-void ScintillaBase::AddCharUTF(const char *s, unsigned int len, bool treatAsDBCS) {
+void ScintillaBase::AddCharUTF(const char *s, unsigned int len) {
 	const bool isFillUp = ac.Active() && ac.IsFillUpChar(*s);
 	if (!isFillUp) {
-		Editor::AddCharUTF(s, len, treatAsDBCS);
+		Editor::AddCharUTF(s, len);
 	}
 	if (ac.Active()) {
 		AutoCompleteCharacterAdded(s[0]);
 		// For fill ups add the character after the autocompletion has
 		// triggered so containers see the key so can display a calltip.
 		if (isFillUp) {
-			Editor::AddCharUTF(s, len, treatAsDBCS);
+			Editor::AddCharUTF(s, len);
 		}
 	}
 }
