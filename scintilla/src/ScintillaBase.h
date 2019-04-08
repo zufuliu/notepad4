@@ -56,7 +56,7 @@ protected:
 	void Initialise() noexcept override {}
 	void Finalise() noexcept override;
 
-	void AddCharUTF(const char *s, unsigned int len, bool treatAsDBCS = false) override;
+	void AddCharUTF(const char *s, unsigned int len) override;
 	void Command(int cmdId);
 	void CancelModes() noexcept override;
 	int KeyCommand(unsigned int iMessage) override;
