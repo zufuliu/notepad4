@@ -1199,7 +1199,7 @@ BEGIN
     LTEXT           "No wrap|Wrap text between words|Wrap text between any characters|Wrap text on whitespace|Automatic word wrap",IDC_WRAP_MODE_OPTIONS,0,0,187,8,NOT WS_VISIBLE
     GROUPBOX        "For wrapped line",IDC_STATIC,7,74,235,38
     CONTROL         "Only select subline when selecting line from left margin.",IDC_WRAP_SELECT_SUBLINE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,84,220,10
-    CONTROL         "Only highligh subline when highlighting current line.",IDC_WRAP_HIGHLIGHT_SUBLINE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,96,220,10
+    CONTROL         "Only highlight subline when highlighting current line.",IDC_WRAP_HIGHLIGHT_SUBLINE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,96,220,10
 END
 
 IDD_PAGESETUP DIALOGEX 5, 5, 356, 260

@@ -130,7 +130,7 @@ BEGIN
 		MENUITEM "Save Sett&ings",				IDM_VIEW_SAVESETTINGS
 		MENUITEM "Set&up Target...",			IDM_VIEW_FINDTARGET
 		MENUITEM "O&ptions...",					IDM_VIEW_OPTIONS
-		MENUITEM "&About metapath",				IDM_VIEW_ABOUT
+		MENUITEM "&About metapath...",			IDM_VIEW_ABOUT
 	END
 	POPUP "+"
 	BEGIN
