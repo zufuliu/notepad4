@@ -2839,6 +2839,7 @@ val SC_UPDATE_CONTENT=0x1
 val SC_UPDATE_SELECTION=0x2
 val SC_UPDATE_V_SCROLL=0x4
 val SC_UPDATE_H_SCROLL=0x8
+val NP2_CUSTOM_UPDATE=0x100
 
 # For compatibility, these go through the COMMAND notification rather than NOTIFY
 # and should have had exactly the same values as the EN_* constants.
