@@ -101,9 +101,10 @@ def isPrivateChar(c):
 # https://en.wikipedia.org/wiki/CJK_Unified_Ideographs
 # https://en.wikipedia.org/wiki/Katakana
 # https://en.wikipedia.org/wiki/Hangul
+# Chapter 18 East Asia in Unicode Standard 12.0
 CJKBlockList = [
-	(0x4E00, 0x9FFF), # U+4E00..U+9FFF CJK Unified Ideographs
 	(0x3400, 0x4DBF), # U+3400..U+4DBF CJK Unified Ideographs Extension A
+	(0x4E00, 0x9FFF), # U+4E00..U+9FFF CJK Unified Ideographs
 	(0xF900, 0xFAFF), # U+F900..U+FAFF CJK Compatibility Ideographs
 	# surrogate pair
 	(0x20000, 0x2A6DF), # U+20000..U+2A6DF CJK Unified Ideographs Extension B
@@ -117,13 +118,13 @@ CJKBlockList = [
 	(0x2F00, 0x2FDF), # U+2F00..U+2FDF Kangxi Radicals
 	(0x2FF0, 0x2FFF), # U+2FF0..U+2FFF Ideographic Description Characters
 	(0x3000, 0x303F), # U+3000..U+303F CJK Symbols and Punctuation
-	#(0x3100, 0x312F), # U+3100..U+312F Bopomofo
-	#(0x31A0, 0x31BF), # U+31A0..U+31BF Bopomofo Extended
+	(0x3100, 0x312F), # U+3100..U+312F Bopomofo
+	(0x31A0, 0x31BF), # U+31A0..U+31BF Bopomofo Extended
 	(0x31C0, 0x31EF), # U+31C0..U+31EF CJK Strokes
 	(0x3200, 0x32FF), # U+3200..U+32FF Enclosed CJK Letters and Months
 	(0x3300, 0x33FF), # U+3300..U+33FF CJK Compatibility
 	(0xFE30, 0xFE4F), # U+FE30..U+FE4F CJK Compatibility Forms
-	#(0xFF5F, 0xFFEF), # U+FF5F..U+FFEF Halfwidth and Fullwidth Forms (none ASCII)
+	(0xFF5F, 0xFFEF), # U+FF5F..U+FFEF Halfwidth and Fullwidth Forms (without fullwidth ASCII)
 	# Japanese
 	(0x3040, 0x309F), # U+3040..U+309F Hiragana
 	(0x30A0, 0x30FF), # U+30A0..U+30FF Katakana
@@ -134,10 +135,10 @@ CJKBlockList = [
 	(0x1B100, 0x1B12F), # U+1B100..U+1B12F Kana Extended-A
 	(0x1B130, 0x1B16F), # U+1B130..U+1B16F Small Kana Extension
 	# Korean
-	(0xAC00, 0xD7AF), # U+AC00..U+D7AF Hangul Syllables
 	(0x1100, 0x11FF), # U+1100..U+11FF Hangul Jamo
 	(0x3130, 0x318F), # U+3130..U+318F Hangul Compatibility Jamo
 	(0xA960, 0xA97F), # U+A960..U+A97F Hangul Jamo Extended-A
+	(0xAC00, 0xD7AF), # U+AC00..U+D7AF Hangul Syllables
 	(0xD7B0, 0xD7FF), # U+D7B0..U+D7FF Hangul Jamo Extended-B
 	(0xFFA0, 0xFFDC), # U+FFA0..U+FFDC Halfwidth Compatibility Jamo
 	# Other Chinese characters
@@ -147,6 +148,7 @@ CJKBlockList = [
 	(0x17000, 0x187FF), # U+17000..U+187FF Tangut
 	(0x18800, 0x18AFF), # U+18800..U+18AFF Tangut Components
 	(0x1B170, 0x1B2FF), # U+1B170..U+1B2FF Nushu
+	(0x1F200, 0x1F2FF), # U+1F200..U+1F2FF Enclosed Ideographic Supplement
 ]
 
 def findCategories(filename):
