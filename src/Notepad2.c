@@ -3898,7 +3898,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			scn.nmhdr.hwndFrom = hwndEdit;
 			scn.nmhdr.idFrom = IDC_EDIT;
 			scn.nmhdr.code = SCN_UPDATEUI;
-			scn.updated = SC_UPDATE_CONTENT;
+			scn.updated = NP2_CUSTOM_UPDATE;
 			SendMessage(hwnd, WM_NOTIFY, IDC_EDIT, (LPARAM)&scn);
 		} else {
 			SendMessage(hwndEdit, SCI_BRACEHIGHLIGHT, (WPARAM)(-1), -1);
@@ -4691,6 +4691,10 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 						EditMarkAll((scn->updated & SC_UPDATE_CONTENT), bMarkOccurrencesMatchCase, bMarkOccurrencesMatchWords);
 					}
 					UpdateStatusBarCache_OVRMode(FALSE);
+				} else if (scn->updated & (SC_UPDATE_CONTENT)) {
+					if (iMatchesCount) {
+						EditMarkAll_Clear();
+					}
 				}
 				UpdateStatusbar();
 
