@@ -141,7 +141,7 @@ CJKBlockList = [
 	(0xAC00, 0xD7AF), # U+AC00..U+D7AF Hangul Syllables
 	(0xD7B0, 0xD7FF), # U+D7B0..U+D7FF Hangul Jamo Extended-B
 	(0xFFA0, 0xFFDC), # U+FFA0..U+FFDC Halfwidth Compatibility Jamo
-	# Other Chinese characters
+	# Other
 	(0xA000, 0xA48F), # U+A000..U+A48F Yi Syllables
 	(0xA490, 0xA4CF), # U+A490..U+A4CF Yi Radicals
 	(0x16FE0, 0x16FFF), # U+16FE0..U+16FFF Ideographic Symbols and Punctuation
