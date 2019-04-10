@@ -32,11 +32,6 @@ protected:
 		idcmdSelectAll = 16
 	};
 
-	enum {
-		// 2 wchar_t, each has max 4 bytes
-		maxInputIMECharacterBytes = 16
-	};
-
 	int displayPopupMenu;
 	Menu popup;
 	AutoComplete ac;
