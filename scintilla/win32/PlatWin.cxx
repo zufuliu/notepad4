@@ -67,14 +67,6 @@
 #define _WIN32_WINNT_WIN10					0x0A00
 #endif
 
-#if _WIN32_WINNT < _WIN32_WINNT_WIN10
-#if NP2_FORCE_COMPILE_C_AS_CPP
-extern DWORD g_uWinVer;
-#else
-extern "C" DWORD g_uWinVer;
-#endif
-#endif
-
 #if _WIN32_WINNT < _WIN32_WINNT_WIN8
 #if NP2_FORCE_COMPILE_C_AS_CPP
 extern DWORD kSystemLibraryLoadFlags;
@@ -95,22 +87,10 @@ ID2D1Factory *pD2DFactory = nullptr;
 IDWriteRenderingParams *defaultRenderingParams = nullptr;
 IDWriteRenderingParams *customClearTypeRenderingParams = nullptr;
 IDWriteGdiInterop *gdiInterop = nullptr;
+D2D1_DRAW_TEXT_OPTIONS d2dDrawTextOptions = D2D1_DRAW_TEXT_OPTIONS_NONE;
 
 static HMODULE hDLLD2D {};
 static HMODULE hDLLDWrite {};
-
-#if (_WIN32_WINNT < _WIN32_WINNT_WINBLUE) || defined(__MINGW32__)
-// not available in Win7 SDK and MinGW-w64 before 2019-02-12 (commit c034d5886ec81a9db27f79817b77b8ab14af3db9).
-#define D2D1DrawTextOptionsEnableColorFont 	static_cast<D2D1_DRAW_TEXT_OPTIONS>(0x00000004)
-#else
-#define D2D1DrawTextOptionsEnableColorFont	D2D1_DRAW_TEXT_OPTIONS_ENABLE_COLOR_FONT
-#endif
-
-#if _WIN32_WINNT < _WIN32_WINNT_WINBLUE
-static D2D1_DRAW_TEXT_OPTIONS kD2D1DrawTextOptions = D2D1_DRAW_TEXT_OPTIONS_NONE;
-#else
-#define kD2D1DrawTextOptions	D2D1DrawTextOptionsEnableColorFont
-#endif
 
 bool LoadD2D() noexcept {
 	static bool triedLoadingD2D = false;
@@ -139,9 +119,20 @@ bool LoadD2D() noexcept {
 		if (hDLLDWrite) {
 			DWriteCFSig fnDWCF = reinterpret_cast<DWriteCFSig>(::GetProcAddress(hDLLDWrite, "DWriteCreateFactory"));
 			if (fnDWCF) {
-				fnDWCF(DWRITE_FACTORY_TYPE_SHARED,
-					__uuidof(IDWriteFactory),
+				const GUID IID_IDWriteFactory2 = // 0439fc60-ca44-4994-8dee-3a9af7b732ec
+				{ 0x0439fc60, 0xca44, 0x4994, { 0x8d, 0xee, 0x3a, 0x9a, 0xf7, 0xb7, 0x32, 0xec } };
+
+				const HRESULT hr = fnDWCF(DWRITE_FACTORY_TYPE_SHARED,
+					IID_IDWriteFactory2,
 					reinterpret_cast<IUnknown**>(&pIDWriteFactory));
+				if (SUCCEEDED(hr)) {
+					// D2D1_DRAW_TEXT_OPTIONS_ENABLE_COLOR_FONT
+					d2dDrawTextOptions = static_cast<D2D1_DRAW_TEXT_OPTIONS>(0x00000004);
+				} else {
+					fnDWCF(DWRITE_FACTORY_TYPE_SHARED,
+						__uuidof(IDWriteFactory),
+						reinterpret_cast<IUnknown**>(&pIDWriteFactory));
+				}
 			}
 		}
 
@@ -162,11 +153,6 @@ bool LoadD2D() noexcept {
 				}
 			}
 
-#if (_WIN32_WINNT < _WIN32_WINNT_WINBLUE)
-			if (g_uWinVer >= _WIN32_WINNT_WINBLUE) {
-				kD2D1DrawTextOptions = D2D1DrawTextOptionsEnableColorFont;
-			}
-#endif
 			hr = pIDWriteFactory->GetGdiInterop(&gdiInterop);
 			if (!SUCCEEDED(hr) && gdiInterop) {
 				gdiInterop->Release();
@@ -1968,7 +1954,7 @@ void SurfaceD2D::DrawTextCommon(PRectangle rc, const Font &font_, XYPOSITION yba
 			rc.Width(), rc.Height(), &pTextLayout);
 		if (SUCCEEDED(hr)) {
 			D2D1_POINT_2F origin = { rc.left, ybase - yAscent };
-			pRenderTarget->DrawTextLayout(origin, pTextLayout, pBrush, kD2D1DrawTextOptions);
+			pRenderTarget->DrawTextLayout(origin, pTextLayout, pBrush, d2dDrawTextOptions);
 			pTextLayout->Release();
 		}
 
