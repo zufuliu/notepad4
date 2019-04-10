@@ -359,6 +359,7 @@ enum DefaultStyleIndex {
 #define SC_INDICATOR_CONVERTED	(INDIC_IME + 2)
 #define SC_INDICATOR_UNKNOWN	INDIC_IME_MAX
 
+#define IMEIndicatorDefaultColor	RGB(0x10, 0x80, 0x10)
 #define MarkOccurrencesDefaultAlpha	100
 
 #define	BookmarkImageDefaultColor	RGB(0x40, 0x80, 0x40)
@@ -1328,12 +1329,12 @@ void Style_SetLexer(HWND hwnd, PEDITLEXER pLexNew) {
 	SendMessage(hwnd, SCI_SETADDITIONALCARETFORE, iValue, 0);
 	// IME indicator
 	szValue = pLexGlobal->Styles[Style_IMEIndicator].szValue;
-	if (Style_StrGetColor(TRUE, szValue, &iValue)) {
-		SendMessage(hwnd, SCI_INDICSETFORE, SC_INDICATOR_INPUT, iValue);
-		SendMessage(hwnd, SCI_INDICSETFORE, SC_INDICATOR_TARGET, iValue);
-		SendMessage(hwnd, SCI_INDICSETFORE, SC_INDICATOR_CONVERTED, iValue);
-		SendMessage(hwnd, SCI_INDICSETFORE, SC_INDICATOR_UNKNOWN, iValue);
-	}
+	iValue = IMEIndicatorDefaultColor;
+	Style_StrGetColor(TRUE, szValue, &iValue);
+	SendMessage(hwnd, SCI_INDICSETFORE, SC_INDICATOR_INPUT, iValue);
+	SendMessage(hwnd, SCI_INDICSETFORE, SC_INDICATOR_TARGET, iValue);
+	SendMessage(hwnd, SCI_INDICSETFORE, SC_INDICATOR_CONVERTED, iValue);
+	SendMessage(hwnd, SCI_INDICSETFORE, SC_INDICATOR_UNKNOWN, iValue);
 
 	Style_SetLongLineColors(hwnd);
 	// Extra Line Spacing
