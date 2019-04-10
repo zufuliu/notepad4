@@ -1312,7 +1312,7 @@ void Style_SetLexer(HWND hwnd, PEDITLEXER pLexNew) {
 	// whitespace dot size
 	iValue = 1;
 	Style_StrGetRawSize(szValue, &iValue);
-	iValue = max_i(0, RoundToCurrentDPI(iValue));
+	iValue = max_i(1, RoundToCurrentDPI(iValue));
 	SendMessage(hwnd, SCI_SETWHITESPACESIZE, iValue, 0);
 	//! end Style_Whitespace
 
@@ -1329,8 +1329,9 @@ void Style_SetLexer(HWND hwnd, PEDITLEXER pLexNew) {
 	SendMessage(hwnd, SCI_SETADDITIONALCARETFORE, iValue, 0);
 	// IME indicator
 	szValue = pLexGlobal->Styles[Style_IMEIndicator].szValue;
-	iValue = IMEIndicatorDefaultColor;
-	Style_StrGetColor(TRUE, szValue, &iValue);
+	if (!Style_StrGetColor(TRUE, szValue, &iValue)) {
+		iValue = IMEIndicatorDefaultColor;
+	}
 	SendMessage(hwnd, SCI_INDICSETFORE, SC_INDICATOR_INPUT, iValue);
 	SendMessage(hwnd, SCI_INDICSETFORE, SC_INDICATOR_TARGET, iValue);
 	SendMessage(hwnd, SCI_INDICSETFORE, SC_INDICATOR_CONVERTED, iValue);
@@ -2692,8 +2693,10 @@ void Style_SetBookmark(HWND hwnd) {
 
 	LPCWSTR szValue = pLexGlobal->Styles[Style_Bookmark].szValue;
 	if (bShowSelectionMargin) {
-		int iBookmarkImageColor = BookmarkImageDefaultColor;
-		Style_StrGetColor(TRUE, szValue, &iBookmarkImageColor);
+		int iBookmarkImageColor;
+		if (!Style_StrGetColor(TRUE, szValue, &iBookmarkImageColor)) {
+			iBookmarkImageColor = BookmarkImageDefaultColor;
+		}
 #if BookmarkUsingPixmapImage
 		sprintf(bookmark_pixmap_color, bookmark_pixmap_color_fmt, iBookmarkImageColor);
 		SendMessage(hwnd, SCI_MARKERDEFINEPIXMAP, MarkerNumber_Bookmark, (LPARAM)bookmark_pixmap);
@@ -2704,10 +2707,14 @@ void Style_SetBookmark(HWND hwnd) {
 		SendMessage(hwnd, SCI_MARKERDEFINE, MarkerNumber_Bookmark, SC_MARK_VERTICALBOOKMARK);
 #endif
 	} else {
-		int iBookmarkLineColor = BookmarkLineDefaultColor;
-		int iBookmarkLineAlpha = BookmarkLineDefaultAlpha;
-		Style_StrGetColor(FALSE, szValue, &iBookmarkLineColor);
-		Style_StrGetAlpha(szValue, &iBookmarkLineAlpha);
+		int iBookmarkLineColor;
+		int iBookmarkLineAlpha;
+		if (!Style_StrGetColor(FALSE, szValue, &iBookmarkLineColor)) {
+			iBookmarkLineColor = BookmarkLineDefaultColor;
+		}
+		if (!Style_StrGetAlpha(szValue, &iBookmarkLineAlpha)) {
+			iBookmarkLineAlpha = BookmarkLineDefaultAlpha;
+		}
 		SendMessage(hwnd, SCI_MARKERSETBACK, MarkerNumber_Bookmark, iBookmarkLineColor);
 		SendMessage(hwnd, SCI_MARKERSETALPHA, MarkerNumber_Bookmark, iBookmarkLineAlpha);
 		SendMessage(hwnd, SCI_MARKERDEFINE, MarkerNumber_Bookmark, SC_MARK_BACKGROUND);
@@ -3092,8 +3099,10 @@ BOOL Style_SelectColor(HWND hwnd, BOOL bFore, LPWSTR lpszStyle, int cchStyle) {
 	CHOOSECOLOR cc;
 	ZeroMemory(&cc, sizeof(CHOOSECOLOR));
 
-	int iRGBResult = (int)(bFore ? GetSysColor(COLOR_WINDOWTEXT) : GetSysColor(COLOR_WINDOW));
-	Style_StrGetColor(bFore, lpszStyle, &iRGBResult);
+	int iRGBResult; 
+	if (!Style_StrGetColor(bFore, lpszStyle, &iRGBResult)) {
+		iRGBResult = (int)(bFore ? GetSysColor(COLOR_WINDOWTEXT) : GetSysColor(COLOR_WINDOW));
+	}
 
 	cc.lStructSize = sizeof(CHOOSECOLOR);
 	cc.hwndOwner = hwnd;
