@@ -1248,7 +1248,7 @@ void SurfaceD2D::SetFont(const Font &font_) noexcept {
 	yDescent = pfm->yDescent;
 	yInternalLeading = pfm->yInternalLeading;
 	codePageText = codePage;
-	if (pfm->characterSet) {
+	if (!unicodeMode && pfm->characterSet) {
 		codePageText = Scintilla::CodePageFromCharSet(pfm->characterSet, codePage);
 	}
 	if (pRenderTarget) {

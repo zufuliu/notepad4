@@ -856,31 +856,31 @@ inline int WideCharLenFromMultiByte(UINT codePage, std::string_view sv) noexcept
 	return WideCharFromMultiByte(codePage, sv, nullptr, 0);
 }
 
-std::string StringEncode(const std::wstring &s, int codePage) {
-	const int cchMulti = s.length() ? MultiByteLenFromWideChar(codePage, s) : 0;
+std::string StringEncode(const std::wstring_view wsv, int codePage) {
+	const int cchMulti = wsv.length() ? MultiByteLenFromWideChar(codePage, wsv) : 0;
 	std::string sMulti(cchMulti, 0);
 	if (cchMulti) {
-		MultiByteFromWideChar(codePage, s, sMulti.data(), cchMulti);
+		MultiByteFromWideChar(codePage, wsv, sMulti.data(), cchMulti);
 	}
 	return sMulti;
 }
 
-std::wstring StringDecode(const std::string &s, int codePage) {
-	const int cchWide = s.length() ? WideCharLenFromMultiByte(codePage, s) : 0;
+std::wstring StringDecode(const std::string_view sv, int codePage) {
+	const int cchWide = sv.length() ? WideCharLenFromMultiByte(codePage, sv) : 0;
 	std::wstring sWide(cchWide, 0);
 	if (cchWide) {
-		WideCharFromMultiByte(codePage, s, sWide.data(), cchWide);
+		WideCharFromMultiByte(codePage, sv, sWide.data(), cchWide);
 	}
 	return sWide;
 }
 
-std::wstring StringMapCase(const std::wstring &ws, DWORD mapFlags) {
+std::wstring StringMapCase(const std::wstring_view wsv, DWORD mapFlags) {
 	const int charsConverted = ::LCMapStringW(LOCALE_SYSTEM_DEFAULT, mapFlags,
-		ws.c_str(), static_cast<int>(ws.length()), nullptr, 0);
+		wsv.data(), static_cast<int>(wsv.length()), nullptr, 0);
 	std::wstring wsConverted(charsConverted, 0);
 	if (charsConverted) {
 		::LCMapStringW(LOCALE_SYSTEM_DEFAULT, mapFlags,
-			ws.c_str(), static_cast<int>(ws.length()), wsConverted.data(), charsConverted);
+			wsv.data(), static_cast<int>(wsv.length()), wsConverted.data(), charsConverted);
 	}
 	return wsConverted;
 }

@@ -584,7 +584,7 @@ class CaseConverter : public ICaseConverter {
 		}
 		CharacterConversion(int character_, std::string_view conversion_) noexcept : character(character_) {
 			assert(conversion_.length() <= maxConversionLength);
-			std::copy(std::begin(conversion_), std::end(conversion_), conversion.conversion);
+			conversion_.copy(conversion.conversion, conversion_.length());
 		}
 		bool operator<(const CharacterConversion &other) const noexcept {
 			return character < other.character;
