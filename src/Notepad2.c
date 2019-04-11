@@ -4693,7 +4693,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 					UpdateStatusBarCache_OVRMode(FALSE);
 				} else if (scn->updated & (SC_UPDATE_CONTENT)) {
 					if (iMatchesCount) {
-						EditMarkAll_Clear();
+						EditMarkAll(TRUE, bMarkOccurrencesMatchCase, bMarkOccurrencesMatchWords);
 					}
 				}
 				UpdateStatusbar();
