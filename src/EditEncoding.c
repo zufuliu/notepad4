@@ -675,8 +675,8 @@ BOOL IsUnicode(const char *pBuffer, DWORD cb, LPBOOL lpbBOM, LPBOOL lpbReverse) 
 
 	int i = 0xFFFF;
 	const BOOL bIsTextUnicode = bSkipUnicodeDetection ? FALSE : IsTextUnicode(pBuffer, cb, &i);
-	const BOOL bHasBOM = (pBuffer[0] == '\xFE' && pBuffer[1] == '\xFF');
-	const BOOL bHasRBOM = (pBuffer[0] == '\xFF' && pBuffer[1] == '\xFE');
+	const BOOL bHasBOM = (pBuffer[0] == '\xFF' && pBuffer[1] == '\xFE');
+	const BOOL bHasRBOM = (pBuffer[0] == '\xFE' && pBuffer[1] == '\xFF');
 
 	if (i == 0xFFFF) { // i doesn't seem to have been modified ...
 		i = 0;
