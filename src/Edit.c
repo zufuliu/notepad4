@@ -621,10 +621,10 @@ BOOL EditLoadFile(HWND hwnd, LPWSTR pszFile, BOOL bSkipEncodingDetection, EditFi
 			   (iSrcEncoding == CPI_UNICODE || iSrcEncoding == CPI_UNICODEBE || !utf8Sig)) {
 
 		if (iSrcEncoding == CPI_UNICODE) {
-			bBOM = (*((UNALIGNED PWCHAR)lpData) == 0xFEFF);
+			bBOM = (lpData[0] == '\xFE' && lpData[1] == '\xFF');
 			bReverse = FALSE;
 		} else if (iSrcEncoding == CPI_UNICODEBE) {
-			bBOM = (*((UNALIGNED PWCHAR)lpData) == 0xFFFE);
+			bBOM = (lpData[0] == '\xFF' && lpData[1] == '\xFE');
 		}
 
 		if (iSrcEncoding == CPI_UNICODEBE || bReverse) {

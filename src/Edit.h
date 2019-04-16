@@ -326,9 +326,7 @@ INT		UTF8_mbslen(LPCSTR source, INT byte_length);
 INT		UTF8_mbslen_bytes(LPCSTR utf8_string);
 
 static inline BOOL IsUTF8Signature(const char *p) {
-	const UINT value = (*((UNALIGNED UINT*)p)) & 0xFFFFFF;
-	// 0xEF, 0xBB, 0xBF in little endian
-	return value == 0xBFBBEF;
+	return p[0] == '\xEF' && p[1] == '\xBB' && p[2] == '\xBF';
 }
 
 //void SciInitThemes(HWND hwnd);
