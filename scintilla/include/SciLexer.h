@@ -114,6 +114,7 @@
 #define SCE_C_REGEX 20
 #define SCE_C_VERBATIM 21
 #define SCE_C_STRINGRAW 22
+#define SCE_C_ESCAPECHAR 23
 #define SCE_C_CLASS 30
 #define SCE_C_STRUCT 31
 #define SCE_C_UNION 40
