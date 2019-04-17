@@ -8,27 +8,40 @@ static KEYWORDLIST Keywords_CMake = {{
 "break() else() elseif() return() continue() "
 "foreach() function() if() macro() while() endforeach() endfunction() endif() endmacro() endwhile() "
 , // 1 Command
-"add_compile_options() "
-"add_custom_command() add_custom_target() add_definitions() add_dependencies() add_executable() "
-"add_library() add_subdirectory() add_test() aux_source_directory() build_command() "
-"cmake_host_system_information() cmake_minimum_required() cmake_parse_arguments() "
-"cmake_policy() configure_file() create_test_sourcelist() define_property() enable_language() "
-"enable_testing() execute_process() export() file() find_file() find_library() find_package() "
-"find_path() find_program() fltk_wrap_ui() get_cmake_property() get_directory_property() "
-"get_filename_component() get_property() get_source_file_property() get_target_property() "
-"get_test_property() include() include_directories() include_external_msproject() "
-"include_regular_expression() install() link_directories() link_libraries() list() load_cache() "
-"mark_as_advanced() math() message() option() project() qt_wrap_cpp() qt_wrap_ui() remove_definitions() "
-"separate_arguments() set() set_directory_properties() set_property() set_source_files_properties() "
-"set_target_properties() set_tests_properties() site_name() source_group() string() "
-"target_compile_definitions() target_compile_features() target_compile_options() "
-"target_include_directories() target_link_libraries() target_sources() "
-"try_compile() try_run() unset() variable_watch()"
-
+// Scripting Commands
+"cmake_host_system_information() cmake_minimum_required() cmake_parse_arguments() cmake_policy() "
+"configure_file() execute_process() file() "
+"find_file() find_library() find_package() find_path() find_program() "
+"get_cmake_property() get_directory_property() get_filename_component() get_property() "
+"include() include_guard() list() mark_as_advanced() math() message() option() "
+"separate_arguments() set() set_directory_properties() "
+"set_property() site_name() string() unset() variable_watch() "
+// Project Commands
+"add_compile_definitions() add_compile_options() add_custom_command() "
+"add_custom_target() add_definitions() add_dependencies() add_executable() add_library() "
+"add_link_options() add_subdirectory() add_test() aux_source_directory() "
+"build_command() create_test_sourcelist() define_property() "
+"enable_language() enable_testing() export() fltk_wrap_ui() "
+"get_source_file_property() get_target_property() get_test_property() "
+"include_directories() include_external_msproject() include_regular_expression() "
+"install() link_directories() link_libraries() load_cache() "
+"project() remove_definitions() "
+"set_source_files_properties() set_target_properties() set_tests_properties() source_group() "
+"target_compile_definitions() target_compile_features() target_compile_options() target_include_directories() "
+"target_link_directories() target_link_libraries() target_link_options() target_sources() "
+"try_compile() try_run() "
+// CTest Commands
 "ctest_build() ctest_configure() ctest_coverage() ctest_empty_binary_directory() ctest_memcheck() "
 "ctest_read_custom_files() ctest_run_script() ctest_sleep() ctest_start() ctest_submit() "
 "ctest_test() ctest_update() ctest_upload() "
-
+// Deprecated Commands 3.14
+"qt_wrap_cpp() qt_wrap_ui() "
+// Deprecated Commands 3.0
+//"build_name() exec_program() export_library_dependencies() "
+//"install_files() install_programs() install_targets() "
+//"load_command() make_directory() output_required_files() "
+//"remove() subdir_depends() subdirs() use_mangled_mesa() "
+//"utility_source() variable_requires() write_file() "
 , // 1 Variables that Provide Information
 NULL
 , // 2 Variables That Change Behavior
