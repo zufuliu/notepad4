@@ -366,7 +366,7 @@ const unsigned char UTF8ClassifyTable[256] = {
 int UTF8ClassifyMulti(const unsigned char *us, size_t len) noexcept {
 	// For the rules: https://www.cl.cam.ac.uk/~mgk25/unicode.html#utf-8
 	unsigned int mask = UTF8ClassifyTable[us[0]];
-	const size_t byteCount = mask & UTF8ClassifyMaskOctetCount;
+	const unsigned int byteCount = mask & UTF8ClassifyMaskOctetCount;
 	if (byteCount == 1 || byteCount > len) {
 		// Invalid lead byte
 		return UTF8MaskInvalid | 1;
@@ -397,7 +397,7 @@ int UTF8ClassifyMulti(const unsigned char *us, size_t len) noexcept {
 		}
 		break;
 
-	default:
+	case 4:
 		mask = 1 << (mask >> 4);
 		mask |= 1 << (second >> 4);
 		mask |= (UTF8ClassifyTable[us[2]] & UTF8ClassifyMaskTrailByte) << 1;

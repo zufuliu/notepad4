@@ -370,30 +370,34 @@ void EditView::LayoutLine(const EditModel &model, Sci::Line line, Surface *surfa
 			// Check base line layout
 			int styleByte = 0;
 			int numCharsInLine = 0;
-			while (numCharsInLine < lineLength) {
+			char chPrev = '\0';
+			while (numCharsInLine < lineLength && allSame) {
 				const Sci::Position charInDoc = numCharsInLine + posLineStart;
-				const char chDoc = model.pdoc->CharAt(charInDoc);
 				styleByte = model.pdoc->StyleIndexAt(charInDoc);
-				allSame = allSame &&
-					(ll->styles[numCharsInLine] == styleByte);
-				if (vstyle.styles[ll->styles[numCharsInLine]].caseForce == Style::caseMixed)
-					allSame = allSame &&
-					(ll->chars[numCharsInLine] == chDoc);
-				else if (vstyle.styles[ll->styles[numCharsInLine]].caseForce == Style::caseLower)
-					allSame = allSame &&
-					(ll->chars[numCharsInLine] == MakeLowerCase(chDoc));
-				else if (vstyle.styles[ll->styles[numCharsInLine]].caseForce == Style::caseUpper)
-					allSame = allSame &&
-					(ll->chars[numCharsInLine] == MakeUpperCase(chDoc));
+				const int llStyle = ll->styles[numCharsInLine];
+				if (llStyle != styleByte) {
+					allSame = false;
+					break;
+				}
+
+				const char chDoc = model.pdoc->CharAt(charInDoc);
+				const char ch = ll->chars[numCharsInLine];
+				const Style::ecaseForced caseForce = vstyle.styles[llStyle].caseForce;
+				if (caseForce == Style::caseMixed)
+					allSame = ch == chDoc;
+				else if (caseForce == Style::caseLower)
+					allSame = ch == MakeLowerCase(chDoc);
+				else if (caseForce == Style::caseUpper)
+					allSame = ch == MakeUpperCase(chDoc);
 				else { // Style::caseCamel
-					if ((model.pdoc->IsASCIIWordByte(ll->chars[numCharsInLine])) &&
-						((numCharsInLine == 0) || (!model.pdoc->IsASCIIWordByte(ll->chars[numCharsInLine - 1])))) {
-						allSame = allSame && (ll->chars[numCharsInLine] == MakeUpperCase(chDoc));
+					if (model.pdoc->IsASCIIWordByte(ch) && !model.pdoc->IsASCIIWordByte(chPrev)) {
+						allSame = ch == MakeUpperCase(chDoc);
 					} else {
-						allSame = allSame && (ll->chars[numCharsInLine] == MakeLowerCase(chDoc));
+						allSame = ch == MakeLowerCase(chDoc);
 					}
 				}
 				numCharsInLine++;
+				chPrev = ch;
 			}
 			allSame = allSame && (ll->styles[numCharsInLine] == styleByte);	// For eolFilled
 			if (allSame) {
@@ -424,26 +428,26 @@ void EditView::LayoutLine(const EditModel &model, Sci::Line line, Surface *surfa
 		model.pdoc->GetStyleRange(ll->styles.get(), posLineStart, lineLength);
 		const int numCharsBeforeEOL = static_cast<int>(model.pdoc->LineEnd(line) - posLineStart);
 		const int numCharsInLine = (vstyle.viewEOL) ? lineLength : numCharsBeforeEOL;
-		for (Sci::Position styleInLine = 0; styleInLine < numCharsInLine; styleInLine++) {
-			const unsigned char styleByte = ll->styles[styleInLine];
-			ll->styles[styleInLine] = styleByte;
-		}
 		const unsigned char styleByteLast = (lineLength > 0) ? ll->styles[lineLength - 1] : 0;
 		if (vstyle.someStylesForceCase) {
+			char chPrev = '\0';
 			for (int charInLine = 0; charInLine < lineLength; charInLine++) {
 				const char chDoc = ll->chars[charInLine];
-				if (vstyle.styles[ll->styles[charInLine]].caseForce == Style::caseUpper)
+				const int styleByte = ll->styles[charInLine];
+				const Style::ecaseForced caseForce = vstyle.styles[styleByte].caseForce;
+				if (caseForce == Style::caseUpper)
 					ll->chars[charInLine] = MakeUpperCase(chDoc);
-				else if (vstyle.styles[ll->styles[charInLine]].caseForce == Style::caseLower)
+				else if (caseForce == Style::caseLower)
 					ll->chars[charInLine] = MakeLowerCase(chDoc);
-				else if (vstyle.styles[ll->styles[charInLine]].caseForce == Style::caseCamel) {
-					if ((model.pdoc->IsASCIIWordByte(ll->chars[charInLine])) &&
-						((charInLine == 0) || (!model.pdoc->IsASCIIWordByte(ll->chars[charInLine - 1])))) {
+				else if (caseForce == Style::caseCamel) {
+					if (model.pdoc->IsASCIIWordByte(chDoc) && !model.pdoc->IsASCIIWordByte(chPrev)) {
 						ll->chars[charInLine] = MakeUpperCase(chDoc);
 					} else {
 						ll->chars[charInLine] = MakeLowerCase(chDoc);
 					}
 				}
+				// change case doesn't change IsASCIIWordByte()
+				chPrev = chDoc;
 			}
 		}
 		ll->xHighlightGuide = 0;
@@ -581,43 +585,39 @@ void EditView::LayoutLine(const EditModel &model, Sci::Line line, Surface *surfa
 					continue;
 				}
 				if (p > 0) {
-					if (vstyle.wrapState == eWrapChar) {
-						lastGoodBreak = model.pdoc->MovePositionOutsideChar(p + posLineStart, -1)
-							- posLineStart;
-						p = model.pdoc->MovePositionOutsideChar(p + 1 + posLineStart, 1) - posLineStart;
-						continue;
-					} else if (vstyle.wrapState == eWrapAuto) {
-						// style boundary and space
-						if ((ll->styles[p] != ll->styles[p - 1]) || (IsSpaceOrTab(ll->chars[p - 1]) && !IsSpaceOrTab(ll->chars[p]))) {
-							lastGoodBreak = p;
-							cePrev.widthBytes = 0;
-						} else {
-							// word boundary
-							// TODO: Unicode Line Breaking Algorithm http://www.unicode.org/reports/tr14/
-							Sci::Position pos = p + posLineStart;
-							if (cePrev.widthBytes == 0) {
-								pos = model.pdoc->MovePositionOutsideChar(pos, -1);
-								cePrev = model.pdoc->CharacterBefore(pos);
-								ccPrev = model.pdoc->WordCharacterClass(cePrev.character);
-							}
-							const Document::CharacterExtracted cePos = model.pdoc->CharacterAfter(pos);
-							const CharClassify::cc ccPos = model.pdoc->WordCharacterClass(cePos.character);
-							if (ccPrev != ccPos || ccPrev == CharClassify::ccCJKWord) {
-								lastGoodBreak = pos - posLineStart;
-							}
-							p = pos + cePos.widthBytes - posLineStart;
-							// model.pdoc->IsCrLf(pos)
-							if (cePos.character == '\r' && model.pdoc->CharAt(pos + 1) == '\n') {
-								p += 1;
-							}
-							cePrev = cePos;
-							ccPrev = ccPos;
-							continue;
-						}
-					} else if ((vstyle.wrapState == eWrapWord) && (ll->styles[p] != ll->styles[p - 1])) {
+					// style boundary and space
+					if ((vstyle.wrapState != eWrapWhitespace) && (ll->styles[p] != ll->styles[p - 1])) {
 						lastGoodBreak = p;
+						cePrev.widthBytes = 0;
 					} else if (IsSpaceOrTab(ll->chars[p - 1]) && !IsSpaceOrTab(ll->chars[p])) {
 						lastGoodBreak = p;
+						cePrev.widthBytes = 0;
+					} else if (vstyle.wrapState == eWrapAuto) {
+						// word boundary
+						// TODO: Unicode Line Breaking Algorithm http://www.unicode.org/reports/tr14/
+						Sci::Position pos = p + posLineStart;
+						if (cePrev.widthBytes == 0) {
+							pos = model.pdoc->MovePositionOutsideChar(pos, -1);
+							cePrev = model.pdoc->CharacterBefore(pos);
+							ccPrev = model.pdoc->WordCharacterClass(cePrev.character);
+						}
+						const Document::CharacterExtracted cePos = model.pdoc->CharacterAfter(pos);
+						const CharClassify::cc ccPos = model.pdoc->WordCharacterClass(cePos.character);
+						if (ccPrev != ccPos || ccPrev == CharClassify::ccCJKWord) {
+							lastGoodBreak = pos - posLineStart;
+						}
+						p = pos + cePos.widthBytes - posLineStart;
+						// model.pdoc->IsCrLf(pos)
+						if (cePos.character == '\r' && model.pdoc->CharAt(pos + 1) == '\n') {
+							p += 1;
+						}
+						cePrev = cePos;
+						ccPrev = ccPos;
+						continue;
+					} else if (vstyle.wrapState == eWrapChar) {
+						lastGoodBreak = model.pdoc->MovePositionOutsideChar(p + posLineStart, -1) - posLineStart;
+						p = model.pdoc->MovePositionOutsideChar(p + 1 + posLineStart, 1) - posLineStart;
+						continue;
 					}
 				}
 				p++;
