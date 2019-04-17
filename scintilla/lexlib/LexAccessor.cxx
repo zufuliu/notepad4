@@ -20,21 +20,14 @@ LexAccessor::LexAccessor(IDocument *pAccess_) noexcept :
 	encodingType(enc8bit),
 	lenDoc(pAccess->Length()),
 	validLen(0),
-	startSeg(0), startPosStyling(0),
+	startSeg(0),
+	startPosStyling(0),
 	documentVersion(pAccess->Version()) {
 	// Prevent warnings by static analyzers about uninitialized buf and styleBuf.
 	buf[0] = 0;
 	styleBuf[0] = 0;
-	switch (codePage) {
-	case 65001:
-		encodingType = encUnicode;
-		break;
-	case 932:
-	case 936:
-	case 949:
-	case 950:
-	case 1361:
-		encodingType = encDBCS;
+	if (codePage) {
+		encodingType == (codePage == 65001) ? encUnicode : encDBCS;
 	}
 }
 void LexAccessor::Fill(Sci_Position position) noexcept {
