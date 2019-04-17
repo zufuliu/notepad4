@@ -67,9 +67,8 @@ static void ColouriseSqlDoc(Sci_PositionU startPos, Sci_Position length, int ini
 
 	StyleContext sc(startPos, length, initStyle, styler);
 	//int styleBeforeDCKeyword = SCE_SQL_DEFAULT;
-	Sci_Position offset = 0;
 
-	for (; sc.More(); sc.Forward(), offset++) {
+	while (sc.More()) {
 		// Determine if the current state should terminate.
 		switch (sc.state) {
 		case SCE_SQL_OPERATOR:
@@ -164,26 +163,27 @@ static void ColouriseSqlDoc(Sci_PositionU startPos, Sci_Position length, int ini
 			}
 			break;
 		case SCE_SQL_CHARACTER:
-			if (sqlBackslashEscapes && sc.ch == '\\') {
+			if ((sqlBackslashEscapes && sc.ch == '\\') || (sc.ch == '\'' && sc.chNext == '\'')) {
+				// Escape sequence
+				sc.SetState(SCE_SQL_ESCAPECHAR);
 				sc.Forward();
-			} else if (sc.ch == '\'') {
-				if (sc.chNext == '\"') {
-					sc.Forward();
-				} else {
-					sc.ForwardSetState(SCE_SQL_DEFAULT);
-				}
+				sc.ForwardSetState(SCE_SQL_CHARACTER);
+				continue;
+			}
+			if (sc.ch == '\'') {
+				sc.ForwardSetState(SCE_SQL_DEFAULT);
 			}
 			break;
 		case SCE_SQL_STRING:
-			if (sqlBackslashEscapes && sc.ch == '\\') {
+			if ((sqlBackslashEscapes && sc.ch == '\\') || (sc.ch == '\"' && sc.chNext == '\"')) {
 				// Escape sequence
+				sc.SetState(SCE_SQL_ESCAPECHAR);
 				sc.Forward();
-			} else if (sc.ch == '\"') {
-				if (sc.chNext == '\"') {
-					sc.Forward();
-				} else {
-					sc.ForwardSetState(SCE_SQL_DEFAULT);
-				}
+				sc.ForwardSetState(SCE_SQL_STRING);
+				continue;
+			}
+			if (sc.ch == '\"') {
+				sc.ForwardSetState(SCE_SQL_DEFAULT);
 			}
 			break;
 		case SCE_SQL_QOPERATOR:
@@ -263,6 +263,7 @@ static void ColouriseSqlDoc(Sci_PositionU startPos, Sci_Position length, int ini
 				sc.SetState(SCE_SQL_OPERATOR);
 			}
 		}
+		sc.Forward();
 	}
 
 	sc.Complete();
