@@ -12,6 +12,7 @@ Latest build [![Build status](https://ci.appveyor.com/api/projects/status/github
 Or build from source, see the [Wiki](https://github.com/zufuliu/notepad2/wiki/Build-Notepad2).
 
 ## [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots)
+![v4.19.04](https://raw.githubusercontent.com/wiki/zufuliu/notepad2/screenshots/v4.19.04.png)
 
 ## Changes compared to the official [Notepad2](http://www.flos-freeware.ch/notepad2.html) or [Notepad2-mod](https://xhmikosr.github.io/notepad2-mod/):
 
@@ -69,7 +70,7 @@ Or build from source, see the [Wiki](https://github.com/zufuliu/notepad2/wiki/Bu
 	* Java, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#java)
 		* JavaDoc
 	* [JavaScript](../master/tools/lang/JavaScript.js), up to ECMAScript 2018, 9ed.
-	* JSON Document
+	* JSON and JSON5 Document
 	* [Julia Script](https://julialang.org/), up to 1.0. [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#julia)
 	* LaTeX
 	* Lisp Script
