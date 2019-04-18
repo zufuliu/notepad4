@@ -21,11 +21,6 @@ static constexpr bool IsJsonOp(int ch) noexcept {
 	return ch == '{' || ch == '}' || ch == '[' || ch == ']' || ch == ':' || ch == ',' || ch == '+' || ch == '-';
 }
 
-static constexpr bool IsJsonEscape(int ch) noexcept {
-	return ch == '\"' || ch == '\\' || ch == 'n' || ch == 'r' || ch == 't'
-		|| ch == '/' || ch == '\'' || ch == 'b' || ch == 'f' || ch == '0';
-}
-
 #define MAX_WORD_LENGTH	7
 static void ColouriseJSONDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList, Accessor &styler) {
 	const bool fold = styler.GetPropertyInt("fold", 1) != 0;
@@ -114,30 +109,27 @@ static void ColouriseJSONDoc(Sci_PositionU startPos, Sci_Position length, int in
 					state = SCE_C_STRINGEOL;
 				}
 			} else if (ch == '\\') {
-				Sci_PositionU pos = i;
-				if (IsJsonEscape(chNext)) {
-					++pos;
-				} else if (chNext == 'u' || chNext == 'x') {
-					int count = (chNext == 'x') ? 2 : 4;
-					++pos;
-					do {
-						chNext = styler.SafeGetCharAt(pos + 1);
-						if (!IsHexDigit(chNext)) {
-							break;
-						}
-						--count;
-						++pos;
-					} while (count);
-				}
-				if (pos != i) {
+				if (chNext == '\n' || chNext == '\r') {
+					chBefore = ch;
+				} else {
 					styler.ColourTo(i - 1, state);
-					i = pos;
+					++i;
+					if (chNext == 'u' || chNext == 'x') {
+						int count = (chNext == 'u') ? 4 : 2;
+						do {
+							chNext = styler.SafeGetCharAt(i + 1);
+							if (!IsHexDigit(chNext)) {
+								break;
+							}
+							--count;
+							++i;
+						} while (count);
+					}
+
 					ch = chNext;
 					chNext = styler.SafeGetCharAt(i + 1);
 					styler.ColourTo(i, SCE_C_ESCAPECHAR);
 					chBefore = 0;
-				} else {
-					chBefore = ch;
 				}
 			} else if ((state == SCE_C_STRING && ch == '\"') || (state == SCE_C_CHARACTER && ch == '\'')) {
 				Sci_PositionU pos = i + 1;
