@@ -25,10 +25,6 @@ deploy: off
 
 matrix:
   fast_finish: true
-  exclude:
-    - platform: ARM64
-      compiler: Clang
-      # require Clang released in March 2019 or later.
 
 # No reversion when shallow clone is enabled.
 #before_build:
@@ -86,6 +82,17 @@ for:
 
     build_script:
       - cmd: CALL "build\VS2017\build.bat" Build ARM64 Debug 1
+
+  - # Clang ARM64 Debug
+    matrix:
+      only:
+        - configuration: Debug
+          platform: ARM64
+          compiler: Clang
+
+    build_script:
+      - cmd: CALL "build\install_llvm.bat" 1
+      - cmd: CALL "build\VS2017\build.bat" Build ARM64 LLVMDebug 1
 
   - # MSVC x64 Release
     matrix:
@@ -163,3 +170,19 @@ for:
     artifacts:
       - path: 'build\Notepad2*.zip'
         name: Notepad2_ARM64
+
+  - # Clang ARM64 Release
+    matrix:
+      only:
+        - configuration: Release
+          platform: ARM64
+          compiler: Clang
+
+    build_script:
+      - cmd: CALL "build\install_llvm.bat" 1
+      - cmd: CALL "build\VS2017\build.bat" Build ARM64 LLVMRelease 1
+      - cmd: CALL "build\make_zip.bat" Clang ARM64 Release 1
+
+    artifacts:
+      - path: 'build\Notepad2*.zip'
+        name: Notepad2_Clang_ARM64

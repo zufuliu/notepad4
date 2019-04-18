@@ -27,7 +27,7 @@ LexAccessor::LexAccessor(IDocument *pAccess_) noexcept :
 	buf[0] = 0;
 	styleBuf[0] = 0;
 	if (codePage) {
-		encodingType == (codePage == 65001) ? encUnicode : encDBCS;
+		encodingType = (codePage == 65001) ? encUnicode : encDBCS;
 	}
 }
 void LexAccessor::Fill(Sci_Position position) noexcept {
