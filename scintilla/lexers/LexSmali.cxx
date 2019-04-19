@@ -73,7 +73,8 @@ static void ColouriseSmaliDoc(Sci_PositionU startPos, Sci_Position length, int i
 	//const WordList &kwInstruction = *keywordLists[10];
 
 	int state = initStyle;
-	int ch = 0, chNext = styler[startPos];
+	int ch = 0;
+	int chNext = styler[startPos];
 	styler.StartAt(startPos);
 	styler.StartSegment(startPos);
 	Sci_PositionU endPos = startPos + length;

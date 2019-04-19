@@ -139,7 +139,8 @@ static void ColouriseLuaDoc(Sci_PositionU startPos, Sci_Position length, int ini
 					ln++;
 				const Sci_Position ws1 = ln;
 				if (setWordStart.Contains(sc.GetRelative(ln))) {
-					int c, i = 0;
+					int c;
+					int i = 0;
 					char s[128];
 					while (setWord.Contains(c = sc.GetRelative(ln))) {	// get potential label
 						if (i < 127)

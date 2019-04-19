@@ -89,7 +89,8 @@ static int getBashNumberBase(const char *s) noexcept {
 static int GlobScan(StyleContext &sc) noexcept {
 	// forward scan for zsh globs, disambiguate versus bash arrays
 	// complex expressions may still fail, e.g. unbalanced () '' "" etc
-	int c, sLen = 0;
+	int c;
+	int sLen = 0;
 	int pCount = 0;
 	int hash = 0;
 	while ((c = sc.GetRelativeCharacter(++sLen)) != 0) {

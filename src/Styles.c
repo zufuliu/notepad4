@@ -1693,7 +1693,6 @@ int Style_GetDocTypeLanguage(void) {
 		return 0;
 	}
 
-	const char * const pb = p;
 	//if (!_strnicmp(p, "html", 4))
 	//	return IDM_LANG_WEB;
 	if (!strncmp(p, "schema", 6)) {
@@ -1762,6 +1761,7 @@ int Style_GetDocTypeLanguage(void) {
 	//	return IDM_LANG_ANDROID_MANIFEST;
 	//if (!strncmp(p, "svg", 3))
 	//	return IDM_LANG_SVG;
+	char * const pb = p;
 	if (((p = strstr(pb, "Layout")) != NULL && strstr(p + 6, "xmlns:android")) ||
 			((p = strstr(pb, "View")) != NULL && strstr(p + 4, "xmlns:android")) ||
 			((p = strstr(pb, "menu")) != NULL && strstr(p + 4, "xmlns:android"))) {
@@ -1775,7 +1775,7 @@ static inline BOOL IsASpace(int ch) {
 	return (ch == ' ') || ((ch >= 0x09) && (ch <= 0x0d));
 }
 
-BOOL MatchCPPKeyword(char *p, int index) {
+BOOL MatchCPPKeyword(const char *p, int index) {
 	if (*p < 'a' || *p > 'z') {
 		return FALSE;
 	}
@@ -3099,7 +3099,7 @@ BOOL Style_SelectColor(HWND hwnd, BOOL bFore, LPWSTR lpszStyle, int cchStyle) {
 	CHOOSECOLOR cc;
 	ZeroMemory(&cc, sizeof(CHOOSECOLOR));
 
-	int iRGBResult; 
+	int iRGBResult;
 	if (!Style_StrGetColor(bFore, lpszStyle, &iRGBResult)) {
 		iRGBResult = (int)(bFore ? GetSysColor(COLOR_WINDOWTEXT) : GetSysColor(COLOR_WINDOW));
 	}
