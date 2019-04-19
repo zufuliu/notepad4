@@ -1759,7 +1759,7 @@ void EditInsertScriptShebangLine(HWND hwnd) {
 		break;
 
 	case SCLEX_PYTHON:
-		name = "python";
+		name = "python3";
 		break;
 
 	case SCLEX_RUBY:
