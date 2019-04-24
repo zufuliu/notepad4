@@ -7031,7 +7031,10 @@ BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect, LPCWST
 			MsgBox(MBWARN, IDS_ERR_UNICODE);
 		}
 		// Show inconsistent line endings warning
+		// TODO: hide this warning for binary file
 		if (status.bInconsistent && bWarnLineEndings) {
+			// diff/patch file may contains content from files with different line endings.
+			status.bLineEndingsDefaultNo = pLexCurrent->iLexer == SCLEX_DIFF;
 			if (WarnLineEndingDlg(hwndMain, &status)) {
 				const int iNewEOLMode = iLineEndings[status.iEOLMode];
 				ConvertLineEndings(iNewEOLMode);
