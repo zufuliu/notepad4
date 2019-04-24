@@ -17,6 +17,7 @@ static KEYWORDLIST Keywords_CPP = {{
 "_Pragma defined __has_include __has_include_next __has_attribute __has_cpp_attribute "
 "and and_eq bitand bitor compl not not_eq or or_eq xor xor_eq "
 "concept requires audit axiom "
+"import module " "co_await co_return co_yield "
 // MSVC
 "__alignof __asm __assume __based __cdecl __declspec __event __except __fastcall __finally __forceinline __identifier __inline __interface __leave __raise __stdcall __clrcall __super __thiscall __try __unaligned __uuidof __hook __unhook __noop __vectorcall __pragma "
 // GCC
@@ -494,7 +495,7 @@ static KEYWORDLIST Keywords_CPP = {{
 , // 15 Code Snippet
 "_Pragma() defined() comment() __has_include() __has_include_next() __has_attribute() "
 "sizeof() for^() if^() switch^() while^() catch^() else^if^() else^{} "
-"alignas() alignof() delete[] decltype() noexcept() typeid() typeof() static_assert() "
+"alignas() alignof() delete[] decltype() noexcept() typeid() typeof() static_assert() requires() "
 "static_cast<> const_cast<> dynamic_cast<> reinterpret_cast<> "
 "_Alignas() _Alignof() _Generic() _Static_assert() "
 "__attribute__() __typeof__() __alignof__() "
