@@ -76,6 +76,7 @@ NULL
 // Other Attribute
 "and bb face file password ping prompt pubdate public strike tt "
 "xml xmlns "
+"^aria- ^data- "
 
 // Obsolete Attributes
 "align alink allowtransparency archive axis background bgcolor border bottommargin bordercolor cellpadding cellspacing "
