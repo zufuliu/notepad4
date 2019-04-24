@@ -216,6 +216,7 @@ void classifyAttribHTML(Sci_PositionU start, Sci_PositionU end, const WordList &
 	} else {
 		char s[128];
 		GetTextSegment(styler, start, end, s, sizeof(s));
+		// known attribute or HTML5 custom data attribute
 		if (keywords.InList(s) || strncmp(s, "data-", 5) == 0)
 			chAttr = SCE_H_ATTRIBUTE;
 	}
@@ -679,6 +680,8 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 	const CharacterSet setHTMLWord(CharacterSet::setAlphaNum, ".-_:!#", 0x80, true);
 	const CharacterSet setTagContinue(CharacterSet::setAlphaNum, ".-_:!#[", 0x80, true);
 	const CharacterSet setAttributeContinue(CharacterSet::setAlphaNum, ".-_:!#/", 0x80, true);
+	// characters not allowed in unquoted attribute value
+	const CharacterSet setNonAttrValue(CharacterSet::setNone, "\"\'\\`=<> \t\n\v\f\r");
 	// TODO: also handle + and - (except if they're part of ++ or --) and return keywords
 	const CharacterSet setOKBeforeJSRE(CharacterSet::setNone, "([{=,:;!%^&*|?~");
 
@@ -1552,7 +1555,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 			}
 			break;
 		case SCE_H_VALUE:
-			if (!setHTMLWord.Contains(ch)) {
+			if (setNonAttrValue.Contains(ch)) {
 				if (ch == '\"' && chPrev == '=') {
 					// Should really test for being first character
 					state = SCE_H_DOUBLESTRING;
