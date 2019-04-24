@@ -370,34 +370,47 @@ void EditView::LayoutLine(const EditModel &model, Sci::Line line, Surface *surfa
 			// Check base line layout
 			int styleByte = 0;
 			int numCharsInLine = 0;
-			char chPrev = '\0';
-			while (numCharsInLine < lineLength && allSame) {
-				const Sci::Position charInDoc = numCharsInLine + posLineStart;
-				styleByte = model.pdoc->StyleIndexAt(charInDoc);
-				const int llStyle = ll->styles[numCharsInLine];
-				if (llStyle != styleByte) {
-					allSame = false;
-					break;
-				}
-
-				const char chDoc = model.pdoc->CharAt(charInDoc);
-				const char ch = ll->chars[numCharsInLine];
-				const Style::ecaseForced caseForce = vstyle.styles[llStyle].caseForce;
-				if (caseForce == Style::caseMixed)
-					allSame = ch == chDoc;
-				else if (caseForce == Style::caseLower)
-					allSame = ch == MakeLowerCase(chDoc);
-				else if (caseForce == Style::caseUpper)
-					allSame = ch == MakeUpperCase(chDoc);
-				else { // Style::caseCamel
-					if (model.pdoc->IsASCIIWordByte(ch) && !model.pdoc->IsASCIIWordByte(chPrev)) {
-						allSame = ch == MakeUpperCase(chDoc);
-					} else {
-						allSame = ch == MakeLowerCase(chDoc);
+			if (vstyle.someStylesForceCase) {
+				char chPrev = '\0';
+				Sci::Position charInDoc = posLineStart;
+				while (numCharsInLine < lineLength && allSame) {
+					styleByte = model.pdoc->StyleIndexAt(charInDoc);
+					if (ll->styles[numCharsInLine] != styleByte) {
+						allSame = false;
+						break;
 					}
+
+					const char chDoc = model.pdoc->CharAt(charInDoc);
+					const char ch = ll->chars[numCharsInLine];
+					const Style::ecaseForced caseForce = vstyle.styles[styleByte].caseForce;
+					if (caseForce == Style::caseMixed)
+						allSame = ch == chDoc;
+					else if (caseForce == Style::caseLower)
+						allSame = ch == MakeLowerCase(chDoc);
+					else if (caseForce == Style::caseUpper)
+						allSame = ch == MakeUpperCase(chDoc);
+					else { // Style::caseCamel
+						if (model.pdoc->IsASCIIWordByte(ch) && !model.pdoc->IsASCIIWordByte(chPrev)) {
+							allSame = ch == MakeUpperCase(chDoc);
+						} else {
+							allSame = ch == MakeLowerCase(chDoc);
+						}
+					}
+					++numCharsInLine;
+					++charInDoc;
+					chPrev = ch;
 				}
-				numCharsInLine++;
-				chPrev = ch;
+			} else {
+				Sci::Position charInDoc = posLineStart;
+				while (numCharsInLine < lineLength) {
+					styleByte = model.pdoc->StyleIndexAt(charInDoc);
+					if ((ll->styles[numCharsInLine] != styleByte) || (model.pdoc->CharAt(charInDoc) != ll->chars[numCharsInLine])) {
+						allSame = false;
+						break;
+					}
+					++numCharsInLine;
+					++charInDoc;
+				}
 			}
 			allSame = allSame && (ll->styles[numCharsInLine] == styleByte);	// For eolFilled
 			if (allSame) {
