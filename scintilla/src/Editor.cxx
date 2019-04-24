@@ -1988,7 +1988,7 @@ void Editor::AddCharUTF(const char *s, unsigned int len) {
 				ch = (ch << 8) | static_cast<unsigned char>(s[1]);
 			}
 		} else {
-			if ((ch < 0xC0) || (1 == len)) {
+			if ((ch < 0xC2) || (1 == len)) {
 				// Handles UTF-8 characters between 0x01 and 0x7F and single byte
 				// characters when not in UTF-8 mode.
 				// Also treats \0 and naked trail bytes 0x80 to 0xBF as valid

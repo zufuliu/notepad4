@@ -78,7 +78,7 @@ inline int UTF8Classify(std::string_view sv) noexcept {
 // Similar to UTF8Classify but returns a length of 1 for invalid bytes
 // instead of setting the invalid flag
 inline int UTF8DrawBytes(const unsigned char *us, int len) noexcept {
-	if (UTF8IsAscii(us[0])) {
+	if (us[0] < 0xc2) {
 		return 1;
 	}
 

@@ -474,6 +474,7 @@ class SurfaceGDI : public Surface {
 	HPEN penOld{};
 	HBRUSH brush{};
 	HBRUSH brushOld{};
+	FontID fontId{};
 	HFONT font{};
 	HFONT fontOld{};
 	HBITMAP bitmap{};
@@ -565,6 +566,7 @@ void SurfaceGDI::Clear() noexcept {
 		::SelectObject(hdc, fontOld);
 		fontOld = nullptr;
 	}
+	fontId = nullptr;
 	font = nullptr;
 	if (bitmapOld) {
 		::SelectObject(hdc, bitmapOld);
@@ -637,7 +639,8 @@ void SurfaceGDI::BrushColor(ColourDesired back) noexcept {
 }
 
 void SurfaceGDI::SetFont(const Font &font_) noexcept {
-	if (font_.GetID() != font) {
+	if (font_.GetID() != fontId) {
+		fontId = font_.GetID();
 		const FormatAndMetrics *pfm = FamFromFontID(font_.GetID());
 		PLATFORM_ASSERT(pfm->technology == SCWIN_TECH_GDI);
 		if (fontOld) {
@@ -1044,6 +1047,7 @@ class SurfaceD2D : public Surface {
 	bool ownRenderTarget;
 	int clipsActive;
 
+	FontID fontId;
 	IDWriteTextFormat *pTextFormat;
 	FLOAT yAscent;
 	FLOAT yDescent;
@@ -1129,6 +1133,7 @@ SurfaceD2D::SurfaceD2D() noexcept :
 	clipsActive = 0;
 
 	// From selected font
+	fontId = nullptr;
 	pTextFormat = nullptr;
 	yAscent = 2;
 	yDescent = 1;
@@ -1241,6 +1246,10 @@ void SurfaceD2D::D2DPenColour(ColourDesired fore, int alpha) {
 }
 
 void SurfaceD2D::SetFont(const Font &font_) noexcept {
+	if (font_.GetID() == fontId) {
+		return;
+	}
+	fontId = font_.GetID();
 	const FormatAndMetrics *pfm = FamFromFontID(font_.GetID());
 	PLATFORM_ASSERT(pfm->technology == SCWIN_TECH_DIRECTWRITE);
 	pTextFormat = pfm->pTextFormat;
@@ -2040,14 +2049,16 @@ void SurfaceD2D::MeasureWidths(const Font &font_, std::string_view text, XYPOSIT
 	}
 	// A cluster may be more than one WCHAR, such as for "ffi" which is a ligature in the Candara font
 	FLOAT position = 0.0f;
-	size_t ti = 0;
-	for (size_t ci = 0; ci < count; ci++) {
-		for (size_t inCluster = 0; inCluster < clusterMetrics[ci].length; inCluster++) {
-			poses.buffer[ti++] = position + clusterMetrics[ci].width * (inCluster + 1) / clusterMetrics[ci].length;
+	UINT32 ti = 0;
+	for (UINT32 ci = 0; ci < count; ci++) {
+		const FLOAT width = clusterMetrics[ci].width;
+		const UINT16 length = clusterMetrics[ci].length;
+		for (UINT16 inCluster = 0; inCluster < length; inCluster++) {
+			poses.buffer[ti++] = position + width * (inCluster + 1) / length;
 		}
-		position += clusterMetrics[ci].width;
+		position += width;
 	}
-	PLATFORM_ASSERT(ti == static_cast<size_t>(tbuf.tlen));
+	PLATFORM_ASSERT(ti == static_cast<UINT32>(tbuf.tlen));
 	if (unicodeMode) {
 		// Map the widths given for UTF-16 characters back onto the UTF-8 input string
 		int ui = 0;
