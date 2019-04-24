@@ -1995,7 +1995,9 @@ static INT_PTR CALLBACK WarnLineEndingDlgProc(HWND hwnd, UINT umsg, WPARAM wPara
 		if (bWarnLineEndings) {
 			CheckDlgButton(hwnd, IDC_WARNINCONSISTENTEOLS, BST_CHECKED);
 		}
-
+		if (status->bLineEndingsDefaultNo) {
+			SendMessage(hwnd, DM_SETDEFID, IDCANCEL, 0);
+		}
 		CenterDlgInParent(hwnd);
 	}
 	return TRUE;
