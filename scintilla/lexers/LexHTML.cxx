@@ -216,8 +216,7 @@ void classifyAttribHTML(Sci_PositionU start, Sci_PositionU end, const WordList &
 	} else {
 		char s[128];
 		GetTextSegment(styler, start, end, s, sizeof(s));
-		// known attribute or HTML5 custom data attribute
-		if (keywords.InList(s) || strncmp(s, "data-", 5) == 0)
+		if (keywords.InList(s))
 			chAttr = SCE_H_ATTRIBUTE;
 	}
 	if ((chAttr == SCE_H_ATTRIBUTEUNKNOWN) && !keywords)
