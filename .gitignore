@@ -6,6 +6,7 @@ build/temp*
 build/*.zip
 build/CodeLite/*.mk
 build/CodeLite/*.txt
+build/CodeLite/*.json
 build/CodeLite/Makefile
 *.suo
 *.sdf
