@@ -1,24 +1,25 @@
-Notepad2-Mod
+Notepad2-Mod (upstream, 3-clause BSD)
 git clone https://github.com/XhmikosR/notepad2-mod.git
 2017-08-16 30364fb5afb4e653bb6f7f42f1c7122cbe7ddf33
 
-Scintilla
+Scintilla (upstream)
 hg clone http://hg.code.sf.net/p/scintilla/code scintilla
 4.1.5
-2019-04-17 7464:a3a44d37c912
+2019-04-25 7473:5d760343adde
 
-SciTE
+SciTE (upstream)
 hg clone http://hg.code.sf.net/p/scintilla/scite
 4.1.5
-2019-04-17 5184:cda40519857a
+2019-04-23 5187:fb7eeea7f397
 
-Notepad++
+Notepad++ (GPL v2)
 https://github.com/notepad-plus-plus/notepad-plus-plus.git
+Binary Clipboard format ("Notepad++ Binary Text Length")
 
-Notepad3
+Notepad3 (3-clause BSD)
 https://github.com/rizonesoft/Notepad3
 
-Notepad2e
+Notepad2e (3-clause BSD)
 https://github.com/ProgerXP/Notepad2e
 
 init submodule:
