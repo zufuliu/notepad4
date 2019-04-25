@@ -833,11 +833,11 @@ void PositionCache::MeasureWidths(Surface *surface, const ViewStyle &vstyle, uns
 			probe = probe2;
 		}
 	}
+	const FontAlias fontStyle = vstyle.styles[styleNumber].font;
 	if (len > BreakFinder::lengthStartSubdivision) {
 		// Break up into segments
 		unsigned int startSegment = 0;
 		XYPOSITION xStartSegment = 0;
-		const FontAlias fontStyle = vstyle.styles[styleNumber].font;
 		while (startSegment < len) {
 			const unsigned int lenSegment = pdoc->SafeSegment(s + startSegment, len - startSegment, BreakFinder::lengthEachSubdivision);
 			surface->MeasureWidths(fontStyle, std::string_view(s + startSegment, lenSegment), positions + startSegment);
@@ -848,7 +848,6 @@ void PositionCache::MeasureWidths(Surface *surface, const ViewStyle &vstyle, uns
 			startSegment += lenSegment;
 		}
 	} else {
-		const FontAlias fontStyle = vstyle.styles[styleNumber].font;
 		surface->MeasureWidths(fontStyle, std::string_view(s, len), positions);
 	}
 	if (probe < pces.size()) {
