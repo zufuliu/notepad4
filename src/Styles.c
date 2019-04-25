@@ -3459,6 +3459,7 @@ void Style_AddLexerToListView(HWND hwnd, PEDITLEXER pLex) {
 struct StyleConfigDlgParam {
 	HFONT hFontTitle;
 	LPWSTR extBackup;
+	BOOL bApply;
 	COLORREF colorBackup[MAX_CUSTOM_COLOR_COUNT];
 	LPWSTR styleBackup[ALL_LEXER_COUNT];
 };
@@ -3977,9 +3978,11 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 				Style_Export(hwnd);
 				break;
 
-			case IDC_PREVIEW:
+			case IDC_PREVIEW: {
+				struct StyleConfigDlgParam *param = (struct StyleConfigDlgParam *)GetWindowLongPtr(hwnd, DWLP_USER);
+				param->bApply = TRUE;
 				Style_SetLexer(hwndEdit, pLexCurrent);
-				break;
+			} break;
 
 			case IDOK:
 				EndDialog(hwnd, IDOK);
@@ -4009,21 +4012,28 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 //
 void Style_ConfigDlg(HWND hwnd) {
 	struct StyleConfigDlgParam param;
-	BOOL apply = FALSE;
 
 	Style_LoadAll(FALSE);
 	// Backup Styles
 	param.hFontTitle = NULL;
+	param.bApply = FALSE;
 	LPWSTR extBackup = (LPWSTR)NP2HeapAlloc(ALL_FILE_EXTENSIONS_BYTE_SIZE);
 	param.extBackup = extBackup;
 	CopyMemory(extBackup, g_AllFileExtensions, ALL_FILE_EXTENSIONS_BYTE_SIZE);
 	CopyMemory(param.colorBackup, customColor, MAX_CUSTOM_COLOR_COUNT * sizeof(COLORREF));
+	LPCWSTR backupGlobal = NULL;
+	LPCWSTR backupCurrent = NULL;
 	for (UINT iLexer = 0; iLexer < ALL_LEXER_COUNT; iLexer++) {
 		const LPCEDITLEXER pLex = pLexArray[iLexer];
 		const UINT iStyleBufSize = EDITSTYLE_BufferSize(pLex->iStyleCount);
 		LPWSTR szStyleBuf = (LPWSTR)NP2HeapAlloc(iStyleBufSize);
 		CopyMemory(szStyleBuf, pLex->szStyleBuf, iStyleBufSize);
 		param.styleBackup[iLexer] = szStyleBuf;
+		if (pLex == pLexGlobal) {
+			backupGlobal = szStyleBuf;
+		} else if (pLex == pLexCurrent) {
+			backupCurrent = szStyleBuf;
+		}
 	}
 
 	if (IDCANCEL == ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_STYLECONFIG), GetParent(hwnd), Style_ConfigDlgProc, (LPARAM)(&param))) {
@@ -4057,7 +4067,6 @@ void Style_ConfigDlg(HWND hwnd) {
 			fStylesModified |= (count == 0) ? STYLESMODIFIED_NONE : ((count == ALL_LEXER_COUNT) ? STYLESMODIFIED_ALL_STYLE : STYLESMODIFIED_SOME_STYLE);
 		}
 
-		apply = pLexCurrent->bStyleChanged || pLexGlobal->bStyleChanged;
 		if ((fStylesModified & STYLESMODIFIED_WARN_MASK) && !fWarnedNoIniFile) {
 			LPCWSTR themePath = GetStyleThemeFilePath();
 			if (StrIsEmpty(themePath)) {
@@ -4067,6 +4076,12 @@ void Style_ConfigDlg(HWND hwnd) {
 		}
 	}
 
+	if (!param.bApply) {
+		// global default or current styles changed
+		param.bApply = memcmp(backupGlobal, pLexGlobal->szStyleBuf, EDITSTYLE_BufferSize(pLexGlobal->iStyleCount)) != 0
+			|| memcmp(backupCurrent, pLexCurrent->szStyleBuf, EDITSTYLE_BufferSize(pLexCurrent->iStyleCount)) != 0;
+	}
+
 	NP2HeapFree(param.extBackup);
 	for (UINT iLexer = 0; iLexer < ALL_LEXER_COUNT; iLexer++) {
 		NP2HeapFree(param.styleBackup[iLexer]);
@@ -4074,7 +4089,7 @@ void Style_ConfigDlg(HWND hwnd) {
 	DeleteObject(param.hFontTitle);
 
 	// Apply new (or previous) Styles
-	if (apply) {
+	if (param.bApply) {
 		Style_SetLexer(hwnd, pLexCurrent);
 	}
 }
