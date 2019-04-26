@@ -5135,7 +5135,7 @@ void LoadSettings(void) {
 	iIndentWidth = iValue;
 	iIndentWidthG = iValue;
 
-	bMarkLongLines = IniSectionGetBool(pIniSection, L"MarkLongLines", 1);
+	bMarkLongLines = IniSectionGetBool(pIniSection, L"MarkLongLines", 0);
 
 	iValue = IniSectionGetInt(pIniSection, L"LongLinesLimit", 80);
 	iValue = clamp_i(iValue, 0, NP2_LONG_LINE_LIMIT);
@@ -5482,7 +5482,7 @@ void SaveSettings(BOOL bSaveSettingsNow) {
 	IniSectionSetIntEx(pIniSection, L"ZoomLevel", iZoomLevel, 100);
 	IniSectionSetIntEx(pIniSection, L"TabWidth", iTabWidthG, 4);
 	IniSectionSetIntEx(pIniSection, L"IndentWidth", iIndentWidthG, 4);
-	IniSectionSetBoolEx(pIniSection, L"MarkLongLines", bMarkLongLines, 1);
+	IniSectionSetBoolEx(pIniSection, L"MarkLongLines", bMarkLongLines, 0);
 	IniSectionSetIntEx(pIniSection, L"LongLinesLimit", iLongLinesLimitG, 80);
 	IniSectionSetIntEx(pIniSection, L"LongLineMode", iLongLineMode, EDGE_LINE);
 	IniSectionSetBoolEx(pIniSection, L"ShowSelectionMargin", bShowSelectionMargin, 0);
