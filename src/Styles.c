@@ -4067,6 +4067,12 @@ void Style_ConfigDlg(HWND hwnd) {
 			fStylesModified |= (count == 0) ? STYLESMODIFIED_NONE : ((count == ALL_LEXER_COUNT) ? STYLESMODIFIED_ALL_STYLE : STYLESMODIFIED_SOME_STYLE);
 		}
 
+		if (!param.bApply) {
+			// global default or current styles changed
+			// Note: bStyleChanged is retained until styles been saved.
+			param.bApply = memcmp(backupGlobal, pLexGlobal->szStyleBuf, EDITSTYLE_BufferSize(pLexGlobal->iStyleCount)) != 0
+				|| memcmp(backupCurrent, pLexCurrent->szStyleBuf, EDITSTYLE_BufferSize(pLexCurrent->iStyleCount)) != 0;
+		}
 		if ((fStylesModified & STYLESMODIFIED_WARN_MASK) && !fWarnedNoIniFile) {
 			LPCWSTR themePath = GetStyleThemeFilePath();
 			if (StrIsEmpty(themePath)) {
@@ -4074,12 +4080,6 @@ void Style_ConfigDlg(HWND hwnd) {
 				fWarnedNoIniFile = TRUE;
 			}
 		}
-	}
-
-	if (!param.bApply) {
-		// global default or current styles changed
-		param.bApply = memcmp(backupGlobal, pLexGlobal->szStyleBuf, EDITSTYLE_BufferSize(pLexGlobal->iStyleCount)) != 0
-			|| memcmp(backupCurrent, pLexCurrent->szStyleBuf, EDITSTYLE_BufferSize(pLexCurrent->iStyleCount)) != 0;
 	}
 
 	NP2HeapFree(param.extBackup);
