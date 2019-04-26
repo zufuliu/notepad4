@@ -639,15 +639,13 @@ void SurfaceGDI::BrushColor(ColourDesired back) noexcept {
 
 void SurfaceGDI::SetFont(const Font &font_) noexcept {
 	const FormatAndMetrics *pfm = FamFromFontID(font_.GetID());
-	if (pfm->hfont != font) {
-		PLATFORM_ASSERT(pfm->technology == SCWIN_TECH_GDI);
-		if (fontOld) {
-			SelectFont(hdc, pfm->hfont);
-		} else {
-			fontOld = SelectFont(hdc, pfm->hfont);
-		}
-		font = pfm->hfont;
+	PLATFORM_ASSERT(pfm->technology == SCWIN_TECH_GDI);
+	if (fontOld) {
+		SelectFont(hdc, pfm->hfont);
+	} else {
+		fontOld = SelectFont(hdc, pfm->hfont);
 	}
+	font = pfm->hfont;
 }
 
 int SurfaceGDI::LogPixelsY() const noexcept {
@@ -1243,9 +1241,6 @@ void SurfaceD2D::D2DPenColour(ColourDesired fore, int alpha) {
 
 void SurfaceD2D::SetFont(const Font &font_) noexcept {
 	const FormatAndMetrics *pfm = FamFromFontID(font_.GetID());
-	if (pfm->pTextFormat == pTextFormat) {
-		return;
-	}
 	PLATFORM_ASSERT(pfm->technology == SCWIN_TECH_DIRECTWRITE);
 	pTextFormat = pfm->pTextFormat;
 	yAscent = pfm->yAscent;
