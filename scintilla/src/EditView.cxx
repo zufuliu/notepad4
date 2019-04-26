@@ -342,6 +342,34 @@ LineLayout *EditView::RetrieveLineLayout(Sci::Line lineNumber, const EditModel &
 		model.LinesOnScreen() + 1, model.pdoc->LinesTotal());
 }
 
+namespace {
+
+/**
+* Return the chDoc argument with case transformed as indicated by the caseForce argument.
+* chPrevious is needed for camel casing.
+* This only affects ASCII characters and is provided for languages with case-insensitive
+* ASCII keywords where the user wishes to view keywords in a preferred case.
+*/
+constexpr char CaseForce(Style::ecaseForced caseForce, char chDoc, char chPrevious) noexcept {
+	switch (caseForce) {
+	case Style::caseMixed:
+		return chDoc;
+	case Style::caseLower:
+		return MakeLowerCase(chDoc);
+	case Style::caseUpper:
+		return MakeUpperCase(chDoc);
+	case Style::caseCamel:
+	default:	// default should not occur, included to avoid warnings
+		if (IsUpperOrLowerCase(chDoc) && !IsUpperOrLowerCase(chPrevious)) {
+			return MakeUpperCase(chDoc);
+		} else {
+			return MakeLowerCase(chDoc);
+		}
+	}
+}
+
+}
+
 /**
 * Fill in the LineLayout data for the given line.
 * Copy the given @a line and its styles from the document into local arrays.
@@ -371,40 +399,25 @@ void EditView::LayoutLine(const EditModel &model, Sci::Line line, Surface *surfa
 			int styleByte = 0;
 			int numCharsInLine = 0;
 			if (vstyle.someStylesForceCase) {
-				char chPrev = '\0';
+				char chPrevious = '\0';
 				Sci::Position charInDoc = posLineStart;
-				while (numCharsInLine < lineLength && allSame) {
+				while (numCharsInLine < lineLength) {
 					styleByte = model.pdoc->StyleIndexAt(charInDoc);
-					if (ll->styles[numCharsInLine] != styleByte) {
+					const char chDoc = model.pdoc->CharAt(charInDoc);
+					if ((ll->styles[numCharsInLine] != styleByte) || (ll->chars[numCharsInLine] != CaseForce(vstyle.styles[styleByte].caseForce, chDoc, chPrevious))) {
 						allSame = false;
 						break;
 					}
 
-					const char chDoc = model.pdoc->CharAt(charInDoc);
-					const char ch = ll->chars[numCharsInLine];
-					const Style::ecaseForced caseForce = vstyle.styles[styleByte].caseForce;
-					if (caseForce == Style::caseMixed)
-						allSame = ch == chDoc;
-					else if (caseForce == Style::caseLower)
-						allSame = ch == MakeLowerCase(chDoc);
-					else if (caseForce == Style::caseUpper)
-						allSame = ch == MakeUpperCase(chDoc);
-					else { // Style::caseCamel
-						if (model.pdoc->IsASCIIWordByte(ch) && !model.pdoc->IsASCIIWordByte(chPrev)) {
-							allSame = ch == MakeUpperCase(chDoc);
-						} else {
-							allSame = ch == MakeLowerCase(chDoc);
-						}
-					}
 					++numCharsInLine;
 					++charInDoc;
-					chPrev = ch;
+					chPrevious = chDoc;
 				}
 			} else {
 				Sci::Position charInDoc = posLineStart;
 				while (numCharsInLine < lineLength) {
 					styleByte = model.pdoc->StyleIndexAt(charInDoc);
-					if ((ll->styles[numCharsInLine] != styleByte) || (model.pdoc->CharAt(charInDoc) != ll->chars[numCharsInLine])) {
+					if ((ll->styles[numCharsInLine] != styleByte) || (ll->chars[numCharsInLine] != model.pdoc->CharAt(charInDoc))) {
 						allSame = false;
 						break;
 					}
@@ -443,24 +456,12 @@ void EditView::LayoutLine(const EditModel &model, Sci::Line line, Surface *surfa
 		const int numCharsInLine = (vstyle.viewEOL) ? lineLength : numCharsBeforeEOL;
 		const unsigned char styleByteLast = (lineLength > 0) ? ll->styles[lineLength - 1] : 0;
 		if (vstyle.someStylesForceCase) {
-			char chPrev = '\0';
+			char chPrevious = '\0';
 			for (int charInLine = 0; charInLine < lineLength; charInLine++) {
 				const char chDoc = ll->chars[charInLine];
 				const int styleByte = ll->styles[charInLine];
-				const Style::ecaseForced caseForce = vstyle.styles[styleByte].caseForce;
-				if (caseForce == Style::caseUpper)
-					ll->chars[charInLine] = MakeUpperCase(chDoc);
-				else if (caseForce == Style::caseLower)
-					ll->chars[charInLine] = MakeLowerCase(chDoc);
-				else if (caseForce == Style::caseCamel) {
-					if (model.pdoc->IsASCIIWordByte(chDoc) && !model.pdoc->IsASCIIWordByte(chPrev)) {
-						ll->chars[charInLine] = MakeUpperCase(chDoc);
-					} else {
-						ll->chars[charInLine] = MakeLowerCase(chDoc);
-					}
-				}
-				// change case doesn't change IsASCIIWordByte()
-				chPrev = chDoc;
+				ll->chars[charInLine] = CaseForce(vstyle.styles[styleByte].caseForce, chDoc, chPrevious);
+				chPrevious = chDoc;
 			}
 		}
 		ll->xHighlightGuide = 0;

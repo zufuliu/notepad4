@@ -1613,14 +1613,6 @@ Sci::Position Document::ParaDown(Sci::Position pos) const noexcept {
 		return LineEnd(line - 1);
 }
 
-bool Document::IsASCIIWordByte(unsigned char ch) const noexcept {
-	if (IsASCII(ch)) {
-		return charClass.GetClass(ch) == CharClassify::ccWord;
-	} else {
-		return false;
-	}
-}
-
 CharClassify::cc Document::WordCharacterClass(unsigned int ch) const noexcept {
 	if (dbcsCodePage && (!UTF8IsAscii(ch))) {
 		if (SC_CP_UTF8 == dbcsCodePage) {

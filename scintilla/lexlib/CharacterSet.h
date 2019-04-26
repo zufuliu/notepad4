@@ -95,6 +95,10 @@ constexpr bool IsUpperCase(int ch) noexcept {
 	return (ch >= 'A') && (ch <= 'Z');
 }
 
+constexpr bool IsUpperOrLowerCase(int ch) noexcept {
+	return IsUpperCase(ch) || IsLowerCase(ch);
+}
+
 constexpr bool IsAlpha(int ch) noexcept {
 	return 	((ch >= 'a') && (ch <= 'z')) ||
 			((ch >= 'A') && (ch <= 'Z'));

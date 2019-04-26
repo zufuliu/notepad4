@@ -535,7 +535,6 @@ public:
 	bool AddWatcher(DocWatcher *watcher, void *userData);
 	bool RemoveWatcher(DocWatcher *watcher, void *userData);
 
-	bool IsASCIIWordByte(unsigned char ch) const noexcept;
 	CharClassify::cc WordCharacterClass(unsigned int ch) const noexcept;
 	bool IsWordPartSeparator(unsigned int ch) const noexcept;
 	Sci::Position WordPartLeft(Sci::Position pos) const noexcept;
