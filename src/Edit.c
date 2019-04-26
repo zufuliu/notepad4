@@ -1236,7 +1236,7 @@ void EditURLDecode(HWND hwnd) {
 // EditEscapeCChars()
 //
 void EditEscapeCChars(HWND hwnd) {
-	if (EditIsEmptySelection()) {
+	if (SciCall_IsSelectionEmpty()) {
 		return;
 	}
 	if (SC_SEL_RECTANGLE == SendMessage(hwnd, SCI_GETSELECTIONMODE, 0, 0)) {
@@ -1274,7 +1274,7 @@ void EditEscapeCChars(HWND hwnd) {
 // EditUnescapeCChars()
 //
 void EditUnescapeCChars(HWND hwnd) {
-	if (EditIsEmptySelection()) {
+	if (SciCall_IsSelectionEmpty()) {
 		return;
 	}
 	if (SC_SEL_RECTANGLE == SendMessage(hwnd, SCI_GETSELECTIONMODE, 0, 0)) {
@@ -1321,7 +1321,7 @@ void EditUnescapeCChars(HWND hwnd) {
 // EditEscapeXHTMLChars()
 //
 void EditEscapeXHTMLChars(HWND hwnd) {
-	if (EditIsEmptySelection()) {
+	if (SciCall_IsSelectionEmpty()) {
 		return;
 	}
 	if (SC_SEL_RECTANGLE == SendMessage(hwnd, SCI_GETSELECTIONMODE, 0, 0)) {
@@ -1377,7 +1377,7 @@ void EditEscapeXHTMLChars(HWND hwnd) {
 // EditUnescapeXHTMLChars()
 //
 void EditUnescapeXHTMLChars(HWND hwnd) {
-	if (EditIsEmptySelection()) {
+	if (SciCall_IsSelectionEmpty()) {
 		return;
 	}
 	if (SC_SEL_RECTANGLE == SendMessage(hwnd, SCI_GETSELECTIONMODE, 0, 0)) {
@@ -3281,7 +3281,7 @@ void EditStripLastCharacter(HWND hwnd) {
 //
 void EditStripTrailingBlanks(HWND hwnd, BOOL bIgnoreSelection) {
 	// Check if there is any selection... simply use a regular expression replace!
-	if (!bIgnoreSelection && !EditIsEmptySelection()) {
+	if (!bIgnoreSelection && !SciCall_IsSelectionEmpty()) {
 		if (SC_SEL_RECTANGLE != SendMessage(hwnd, SCI_GETSELECTIONMODE, 0, 0)) {
 #if NP2_USE_DESIGNATED_INITIALIZER
 			EDITFINDREPLACE efrTrim = {
@@ -3325,7 +3325,7 @@ void EditStripTrailingBlanks(HWND hwnd, BOOL bIgnoreSelection) {
 //
 void EditStripLeadingBlanks(HWND hwnd, BOOL bIgnoreSelection) {
 	// Check if there is any selection... simply use a regular expression replace!
-	if (!bIgnoreSelection && !EditIsEmptySelection()) {
+	if (!bIgnoreSelection && !SciCall_IsSelectionEmpty()) {
 		if (SC_SEL_RECTANGLE != SendMessage(hwnd, SCI_GETSELECTIONMODE, 0, 0)) {
 #if NP2_USE_DESIGNATED_INITIALIZER
 			EDITFINDREPLACE efrTrim = {

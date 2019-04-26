@@ -2138,7 +2138,7 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	EnableCmd(hmenu, IDM_EDIT_UNDO, SciCall_CanUndo() /*&& !bReadOnly*/);
 	EnableCmd(hmenu, IDM_EDIT_REDO, SciCall_CanRedo() /*&& !bReadOnly*/);
 
-	i  = !EditIsEmptySelection();
+	i  = !SciCall_IsSelectionEmpty();
 	const BOOL canPaste = SciCall_CanPaste();
 	const BOOL nonEmpty = SciCall_GetLength() != 0;
 
@@ -4376,7 +4376,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		WideCharToMultiByte(cpEdit, 0, wchFind, -1, efrTS.szFind, COUNTOF(efrTS.szFind), NULL, NULL);
 		WideCharToMultiByte(cpEdit, 0, wchReplace, -1, efrTS.szReplace, COUNTOF(efrTS.szReplace), NULL, NULL);
 
-		if (!EditIsEmptySelection()) {
+		if (!SciCall_IsSelectionEmpty()) {
 			EditReplaceAllInSelection(hwndEdit, &efrTS, TRUE);
 		} else {
 			EditReplaceAll(hwndEdit, &efrTS, TRUE);
@@ -6578,7 +6578,7 @@ void UpdateToolbar(void) {
 	EnableTool(IDT_EDIT_UNDO, SciCall_CanUndo() /*&& !bReadOnly*/);
 	EnableTool(IDT_EDIT_REDO, SciCall_CanRedo() /*&& !bReadOnly*/);
 
-	int i = !EditIsEmptySelection();
+	int i = !SciCall_IsSelectionEmpty();
 	EnableTool(IDT_EDIT_CUT, i /*&& !bReadOnly*/);
 	EnableTool(IDT_EDIT_COPY, i);
 	EnableTool(IDT_EDIT_PASTE, SciCall_CanPaste() /*&& !bReadOnly*/);
