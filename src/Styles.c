@@ -288,7 +288,7 @@ extern BOOL	bShowSelectionMargin;
 #define STYLE_MASK_FORE_COLOR	(1 << 2)
 #define STYLE_MASK_BACK_COLOR	(1 << 3)
 #define STYLE_MASK_FONT_WEIGHT	(1 << 4)
-#define STYLE_MASK_UPPER_LOWER	(1 << 5)
+#define STYLE_MASK_FORCE_CASE	(1 << 5)
 #define STYLE_MASK_CHARSET		(1 << 6)
 
 #ifndef LOCALE_NAME_MAX_LENGTH
@@ -311,7 +311,7 @@ struct DetailStyle {
 	BOOL underline;
 	BOOL strike;
 	BOOL eolFilled;
-	int upperLower;
+	int forceCase;
 	int charset;
 	WCHAR fontWide[LF_FACESIZE];
 	char fontFace[LF_FACESIZE * kMaxMultiByteCount];
@@ -2948,6 +2948,14 @@ BOOL Style_StrGetCase(LPCWSTR lpszStyle, int *i) {
 		case L'L':
 			*i = SC_CASE_LOWER;
 			return TRUE;
+		case L'c':
+		case L'C':
+			*i = SC_CASE_CAMEL;
+			return TRUE;
+		//case L'm':
+		//case L'M':
+		//	*i = SC_CASE_MIXED; // normal case
+		//	return TRUE;
 		}
 	}
 	return FALSE;
@@ -3271,8 +3279,8 @@ static void Style_Parse(struct DetailStyle *style, LPCWSTR lpszStyle) {
 
 	// Case
 	if (Style_StrGetCase(lpszStyle, &iValue)) {
-		style->upperLower = iValue;
-		mask |= STYLE_MASK_UPPER_LOWER;
+		style->forceCase = iValue;
+		mask |= STYLE_MASK_FORCE_CASE;
 	}
 
 	// Character Set
@@ -3330,8 +3338,8 @@ static void Style_SetParsed(HWND hwnd, const struct DetailStyle *style, int iSty
 	}
 
 	// Case
-	if (mask & STYLE_MASK_UPPER_LOWER) {
-		SendMessage(hwnd, SCI_STYLESETCASE, iStyle, style->upperLower);
+	if (mask & STYLE_MASK_FORCE_CASE) {
+		SendMessage(hwnd, SCI_STYLESETCASE, iStyle, style->forceCase);
 	}
 
 	// Character Set
