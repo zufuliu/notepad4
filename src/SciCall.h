@@ -160,8 +160,8 @@ NP2_inline int SciCall_GetSelectionMode(void) {
 	return (int)SciCall0(SCI_GETSELECTIONMODE);
 }
 
-NP2_inline BOOL EditIsEmptySelection(void) {
-	return SciCall_GetSelectionStart() == SciCall_GetSelectionEnd();
+NP2_inline BOOL SciCall_IsSelectionEmpty(void) {
+	return (BOOL)SciCall0(SCI_GETSELECTIONEMPTY);
 }
 
 NP2_inline Sci_Position SciCall_FindText(int searchFlags, struct Sci_TextToFind *ft) {
