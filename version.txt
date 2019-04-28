@@ -5,12 +5,12 @@ git clone https://github.com/XhmikosR/notepad2-mod.git
 Scintilla (upstream)
 hg clone http://hg.code.sf.net/p/scintilla/code scintilla
 4.1.5
-2019-04-25 7473:5d760343adde
+2019-04-28 7480:1b7760e14391
 
 SciTE (upstream)
 hg clone http://hg.code.sf.net/p/scintilla/scite
 4.1.5
-2019-04-23 5187:fb7eeea7f397
+2019-04-28 5189:69749c2ef5db
 
 Notepad++ (GPL v2)
 https://github.com/notepad-plus-plus/notepad-plus-plus.git
