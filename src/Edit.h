@@ -242,6 +242,7 @@ typedef struct EditAutoCompletionConfig {
 	BOOL bCompleteWord;
 	BOOL bScanWordsInDocument;
 	BOOL bEnglistIMEModeOnly;
+	BOOL bIgnoreCase;
 	int iVisibleItemCount;
 	int iMinWordLength;
 	int iMinNumberLength;

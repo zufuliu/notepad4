@@ -785,8 +785,9 @@ void EditCompleteWord(HWND hwnd, BOOL autoInsert) {
 	SciCall_GetTextRange(&tr);
 	iRootLen = lstrlenA(pRoot);
 
-	BOOL bIgnore = iRootLen != 0 && (pRoot[0] >= '0' && pRoot[0] <= '9');
-	struct WordList *pWList = WordList_Alloc(pRoot, iRootLen, bIgnore);
+	BOOL bIgnore = iRootLen != 0 && (pRoot[0] >= '0' && pRoot[0] <= '9'); // number
+	const BOOL bIgnoreCase = bIgnore || autoCompletionConfig.bIgnoreCase;
+	struct WordList *pWList = WordList_Alloc(pRoot, iRootLen, bIgnoreCase);
 	BOOL bIgnoreDoc = FALSE;
 	char prefix = '\0';
 
@@ -814,11 +815,11 @@ void EditCompleteWord(HWND hwnd, BOOL autoInsert) {
 		}
 		if (bScanWordsInDocument) {
 			if (!bIgnoreDoc || pWList->nWordCount == 0) {
-				AutoC_AddDocWord(pWList, bIgnore, prefix);
+				AutoC_AddDocWord(pWList, bIgnoreCase, prefix);
 			}
 			if (prefix && pWList->nWordCount == 0) {
 				prefix = '\0';
-				AutoC_AddDocWord(pWList, bIgnore, prefix);
+				AutoC_AddDocWord(pWList, bIgnoreCase, prefix);
 			}
 		}
 
