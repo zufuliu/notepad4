@@ -408,7 +408,6 @@ void EditView::LayoutLine(const EditModel &model, Sci::Line line, Surface *surfa
 						allSame = false;
 						break;
 					}
-
 					++numCharsInLine;
 					++charInDoc;
 					chPrevious = chDoc;

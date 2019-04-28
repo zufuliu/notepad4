@@ -474,8 +474,6 @@ class SurfaceGDI : public Surface {
 	HPEN penOld{};
 	HBRUSH brush{};
 	HBRUSH brushOld{};
-	FontID fontId{};
-	HFONT font{};
 	HFONT fontOld{};
 	HBITMAP bitmap{};
 	HBITMAP bitmapOld{};
@@ -566,7 +564,6 @@ void SurfaceGDI::Clear() noexcept {
 		::SelectObject(hdc, fontOld);
 		fontOld = nullptr;
 	}
-	font = nullptr;
 	if (bitmapOld) {
 		::SelectObject(hdc, bitmapOld);
 		::DeleteObject(bitmap);
@@ -645,7 +642,6 @@ void SurfaceGDI::SetFont(const Font &font_) noexcept {
 	} else {
 		fontOld = SelectFont(hdc, pfm->hfont);
 	}
-	font = pfm->hfont;
 }
 
 int SurfaceGDI::LogPixelsY() const noexcept {
@@ -1013,7 +1009,6 @@ void SurfaceGDI::SetClip(PRectangle rc) noexcept {
 void SurfaceGDI::FlushCachedState() noexcept {
 	pen = nullptr;
 	brush = nullptr;
-	font = nullptr;
 }
 
 void SurfaceGDI::SetUnicodeMode(bool unicodeMode_) noexcept {
