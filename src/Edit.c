@@ -5845,8 +5845,8 @@ static INT_PTR CALLBACK EditEncloseSelectionDlgProc(HWND hwnd, UINT umsg, WPARAM
 	case WM_COMMAND:
 		switch (LOWORD(wParam)) {
 		case IDOK: {
-			DString_GetDlgItemText(&wchAppendSelection, hwnd, IDC_MODIFY_LINE_PREFIX);
-			DString_GetDlgItemText(&wchPrefixSelection, hwnd, IDC_MODIFY_LINE_APPEND);
+			DString_GetDlgItemText(&wchPrefixSelection, hwnd, IDC_MODIFY_LINE_PREFIX);
+			DString_GetDlgItemText(&wchAppendSelection, hwnd, IDC_MODIFY_LINE_APPEND);
 
 			EditEncloseSelection(hwndEdit, wchPrefixSelection.buffer, wchAppendSelection.buffer);
 			EndDialog(hwnd, IDOK);
