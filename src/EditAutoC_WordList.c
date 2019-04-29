@@ -50,26 +50,44 @@ struct WordList {
 	int cacheCapacity;
 };
 
+// TODO: replace _stricmp() and _strnicmp() with other functions
+// which correctly case insensitively compares UTF-8 string and ANSI string.
+
 #if NP2_AUTOC_USE_STRING_ORDER
 #define NP2_AUTOC_ORDER_LENGTH	4
 #define NP2_AUTOC_MAX_ORDER_LENGTH	4
 
 UINT WordList_Order(const void *pWord, unsigned int len) {
+#if 0
+	unsigned int high = 0;
+	const unsigned char *ptr = (const unsigned char *)pWord;
+	len = min_u(len, 4);
+	while (len) {
+		high = (high << 8) | *ptr++;
+		--len;
+	}
+#else
 	unsigned int high = *((const unsigned int *)pWord);
 	if (len < NP2_AUTOC_ORDER_LENGTH) {
 		high &= ((1U << len * 8) - 1);
 	}
 	high = bswap32(high);
+#endif
 	return high;
 }
 
 UINT WordList_OrderCase(const void *pWord, unsigned int len) {
-	unsigned int high = *((const unsigned int *)pWord);
-	high |= 0x20202020; /// TODO: fix tolower()
-	if (len < NP2_AUTOC_ORDER_LENGTH) {
-		high &= ((1U << len * 8) - 1);
+	unsigned int high = 0;
+	const unsigned char *ptr = (const unsigned char *)pWord;
+	len = min_u(len, 4);
+	while (len) {
+		unsigned char ch = *ptr++;
+		if (ch >= 'A' && ch <= 'Z') {
+			ch = ch + 'a' - 'A';
+		}
+		high = (high << 8) | ch;
+		--len;
 	}
-	high = bswap32(high);
 	return high;
 }
 #endif
