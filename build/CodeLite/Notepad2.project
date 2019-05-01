@@ -56,8 +56,8 @@
       <File Name="../../scintilla/lexlib/Accessor.h"/>
       <File Name="../../scintilla/lexlib/CharacterSet.cxx"/>
       <File Name="../../scintilla/lexlib/CharacterSet.h"/>
-      <File Name="../../scintilla/lexlib/HereDoc.cxx"/>
-      <File Name="../../scintilla/lexlib/HereDoc.h"/>
+      <File Name="../../scintilla/lexlib/DefaultLexer.cxx"/>
+      <File Name="../../scintilla/lexlib/DefaultLexer.h"/>
       <File Name="../../scintilla/lexlib/LexAccessor.cxx"/>
       <File Name="../../scintilla/lexlib/LexAccessor.h"/>
       <File Name="../../scintilla/lexlib/LexerBase.cxx"/>
@@ -66,10 +66,14 @@
       <File Name="../../scintilla/lexlib/LexerModule.h"/>
       <File Name="../../scintilla/lexlib/LexerSimple.cxx"/>
       <File Name="../../scintilla/lexlib/LexerSimple.h"/>
+      <File Name="../../scintilla/lexlib/OptionSet.h"/>
       <File Name="../../scintilla/lexlib/PropSetSimple.cxx"/>
       <File Name="../../scintilla/lexlib/PropSetSimple.h"/>
+      <File Name="../../scintilla/lexlib/SparseState.h"/>
+      <File Name="../../scintilla/lexlib/StringCopy.h"/>
       <File Name="../../scintilla/lexlib/StyleContext.cxx"/>
       <File Name="../../scintilla/lexlib/StyleContext.h"/>
+      <File Name="../../scintilla/lexlib/SubStyles.h"/>
       <File Name="../../scintilla/lexlib/WordList.cxx"/>
       <File Name="../../scintilla/lexlib/WordList.h"/>
     </VirtualDirectory>

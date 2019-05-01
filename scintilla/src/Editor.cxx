@@ -6287,6 +6287,15 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 		pdoc->SetDefaultCharClasses(true);
 		break;
 
+#if 0
+	case SCI_SETCHARACTERCATEGORYOPTIMIZATION:
+		pdoc->SetCharacterCategoryOptimization(static_cast<int>(wParam));
+		break;
+
+	case SCI_GETCHARACTERCATEGORYOPTIMIZATION:
+		return pdoc->CharacterCategoryOptimization();
+#endif
+
 	case SCI_GETLENGTH:
 		return pdoc->Length();
 

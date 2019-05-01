@@ -54,14 +54,14 @@ public:
 // Functions for classifying characters
 
 constexpr bool IsASpace(int ch) noexcept {
-    return (ch == ' ') || ((ch >= 0x09) && (ch <= 0x0d));
+	return (ch == ' ') || ((ch >= 0x09) && (ch <= 0x0d));
 }
 
 constexpr bool IsASpaceOrTab(int ch) noexcept {
 	return (ch == ' ') || (ch == '\t');
 }
 
-constexpr bool IsADigit(int ch) noexcept  {
+constexpr bool IsADigit(int ch) noexcept {
 	return (ch >= '0') && (ch <= '9');
 }
 
@@ -71,17 +71,15 @@ constexpr bool IsHexDigit(int ch) noexcept {
 		|| (ch >= 'a' && ch <= 'f');
 }
 
-#if 0
 constexpr bool IsADigit(int ch, int base) noexcept {
 	if (base <= 10) {
 		return (ch >= '0') && (ch < '0' + base);
 	} else {
 		return ((ch >= '0') && (ch <= '9')) ||
-		       ((ch >= 'A') && (ch < 'A' + base - 10)) ||
-		       ((ch >= 'a') && (ch < 'a' + base - 10));
+			((ch >= 'A') && (ch < 'A' + base - 10)) ||
+			((ch >= 'a') && (ch < 'a' + base - 10));
 	}
 }
-#endif
 
 constexpr bool IsASCII(int ch) noexcept {
 	return (ch >= 0) && (ch < 0x80);
@@ -101,7 +99,7 @@ constexpr bool IsUpperOrLowerCase(int ch) noexcept {
 
 constexpr bool IsAlpha(int ch) noexcept {
 	return 	((ch >= 'a') && (ch <= 'z')) ||
-			((ch >= 'A') && (ch <= 'Z'));
+		((ch >= 'A') && (ch <= 'Z'));
 }
 
 constexpr bool IsAlphaNumeric(int ch) noexcept {
@@ -116,7 +114,7 @@ constexpr bool IsAlphaNumeric(int ch) noexcept {
  * This is ASCII specific but is safe with chars >= 0x80.
  */
 constexpr bool isspacechar(int ch) noexcept {
-    return (ch == ' ') || ((ch >= 0x09) && (ch <= 0x0d));
+	return (ch == ' ') || ((ch >= 0x09) && (ch <= 0x0d));
 }
 
 constexpr bool iswordchar(int ch) noexcept {
@@ -140,7 +138,8 @@ constexpr bool isoperator(int ch) noexcept {
 	return false;
 }
 
-// Simple case functions for ASCII.
+// Simple case functions for ASCII supersets.
+
 template <typename T>
 constexpr T MakeUpperCase(T ch) noexcept {
 	if (ch < 'a' || ch > 'z')

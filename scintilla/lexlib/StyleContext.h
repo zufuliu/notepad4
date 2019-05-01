@@ -16,9 +16,9 @@ namespace Scintilla {
 // syntactically significant. UTF-8 avoids this as all trail bytes are >= 0x80
 class StyleContext {
 public:
-	LexAccessor & styler;
+	LexAccessor &styler;
 private:
-	IDocument * multiByteAccess;
+	IDocument *multiByteAccess;
 	Sci_PositionU endPos;
 	Sci_PositionU lengthDocument;
 
@@ -27,7 +27,20 @@ private:
 	Sci_PositionU currentPosLastRelative;
 	Sci_Position offsetRelative;
 
-	void GetNextChar() noexcept;
+	void GetNextChar() noexcept {
+		if (multiByteAccess) {
+			chNext = multiByteAccess->GetCharacterAndWidth(currentPos + width, &widthNext);
+		} else {
+			chNext = static_cast<unsigned char>(styler.SafeGetCharAt(currentPos + width));
+			widthNext = 1;
+		}
+		// End of line determined from line end position, allowing CR, LF,
+		// CRLF and Unicode line ends as set by document.
+		if (currentLine < lineDocEnd)
+			atLineEnd = static_cast<Sci_Position>(currentPos) >= (lineStartNext - 1);
+		else // Last line
+			atLineEnd = static_cast<Sci_Position>(currentPos) >= lineStartNext;
+	}
 
 public:
 	Sci_PositionU currentPos;
@@ -44,31 +57,132 @@ public:
 	Sci_Position widthNext;
 
 	StyleContext(Sci_PositionU startPos, Sci_PositionU length,
-		int initStyle, LexAccessor &styler_, unsigned char chMask = '\377') noexcept;
+		int initStyle, LexAccessor &styler_, unsigned char chMask = '\377') noexcept :
+	styler(styler_),
+	multiByteAccess(nullptr),
+	endPos(startPos + length),
+	posRelative(0),
+	currentPosLastRelative(LexAccessor::extremePosition),
+	offsetRelative(0),
+	currentPos(startPos),
+	currentLine(-1),
+	lineStartNext(-1),
+	atLineEnd(false),
+	state(initStyle & chMask), // Mask off all bits which aren't in the chMask.
+	chPrev(0),
+	ch(0),
+	chNext(0),
+	width(0),
+	widthNext(1) {
+		if (styler.Encoding() != enc8bit) {
+			multiByteAccess = styler.MultiByteAccess();
+		}
+		styler.StartAt(startPos/*, chMask*/);
+		styler.StartSegment(startPos);
+		currentLine = styler.GetLine(startPos);
+		lineStartNext = styler.LineStart(currentLine + 1);
+		lengthDocument = static_cast<Sci_PositionU>(styler.Length());
+		if (endPos == lengthDocument)
+			endPos++;
+		lineDocEnd = styler.GetLine(lengthDocument);
+		atLineStart = static_cast<Sci_PositionU>(styler.LineStart(currentLine)) == startPos;
+
+		// Variable width is now 0 so GetNextChar gets the char at currentPos into chNext/widthNext
+		width = 0;
+		GetNextChar();
+		ch = chNext;
+		width = widthNext;
+
+		GetNextChar();
+	}
 	// Deleted so StyleContext objects can not be copied.
 	StyleContext(const StyleContext &) = delete;
 	StyleContext(StyleContext &&) = delete;
 	StyleContext &operator=(const StyleContext &) = delete;
 	StyleContext &operator=(StyleContext &&) = delete;
-	void Complete();
+	void Complete() {
+		styler.ColourTo(currentPos - ((currentPos > lengthDocument) ? 2 : 1), state);
+		styler.Flush();
+	}
 	bool More() const noexcept {
 		return currentPos < endPos;
 	}
-	void Forward() noexcept;
-	void Forward(Sci_Position nb) noexcept;
-	void ForwardBytes(Sci_Position nb) noexcept;
+	void Forward() noexcept {
+		if (currentPos < endPos) {
+			atLineStart = atLineEnd;
+			if (atLineStart) {
+				currentLine++;
+				lineStartNext = styler.LineStart(currentLine + 1);
+			}
+			chPrev = ch;
+			currentPos += width;
+			ch = chNext;
+			width = widthNext;
+			GetNextChar();
+		} else {
+			atLineStart = false;
+			chPrev = ' ';
+			ch = ' ';
+			chNext = ' ';
+			atLineEnd = true;
+		}
+	}
+	void Forward(Sci_Position nb) noexcept {
+		for (Sci_Position i = 0; i < nb; i++) {
+			Forward();
+		}
+	}
+	void ForwardBytes(Sci_Position nb) noexcept {
+		const Sci_PositionU forwardPos = currentPos + nb;
+		while (forwardPos > currentPos) {
+			const Sci_PositionU currentPosStart = currentPos;
+			Forward();
+			if (currentPos == currentPosStart) {
+				// Reached end
+				return;
+			}
+		}
+	}
 	void ChangeState(int state_) noexcept {
 		state = state_;
 	}
-	void SetState(int state_);
-	void ForwardSetState(int state_);
+	void SetState(int state_) {
+		styler.ColourTo(currentPos - ((currentPos > lengthDocument) ? 2 : 1), state);
+		state = state_;
+	}
+	void ForwardSetState(int state_) {
+		Forward();
+		styler.ColourTo(currentPos - ((currentPos > lengthDocument) ? 2 : 1), state);
+		state = state_;
+	}
 	Sci_Position LengthCurrent() const noexcept {
 		return currentPos - styler.GetStartSegment();
 	}
 	int GetRelative(Sci_Position n) const noexcept {
 		return static_cast<unsigned char>(styler.SafeGetCharAt(currentPos + n));
 	}
-	int GetRelativeCharacter(Sci_Position n) noexcept;
+	int GetRelativeCharacter(Sci_Position n) noexcept {
+		if (n == 0)
+			return ch;
+		if (multiByteAccess) {
+			if ((currentPosLastRelative != currentPos) ||
+				((n > 0) && ((offsetRelative < 0) || (n < offsetRelative))) ||
+				((n < 0) && ((offsetRelative > 0) || (n > offsetRelative)))) {
+				posRelative = currentPos;
+				offsetRelative = 0;
+			}
+			const Sci_Position diffRelative = n - offsetRelative;
+			const Sci_Position posNew = multiByteAccess->GetRelativePosition(posRelative, diffRelative);
+			const int chReturn = multiByteAccess->GetCharacterAndWidth(posNew, nullptr);
+			posRelative = posNew;
+			currentPosLastRelative = currentPos;
+			offsetRelative = n;
+			return chReturn;
+		} else {
+			// fast version for single byte encodings
+			return static_cast<unsigned char>(styler.SafeGetCharAt(currentPos + n));
+		}
+	}
 	bool Match(char ch0) const noexcept {
 		return ch == static_cast<unsigned char>(ch0);
 	}
@@ -76,12 +190,22 @@ public:
 		return (ch == static_cast<unsigned char>(ch0)) && (chNext == static_cast<unsigned char>(ch1));
 	}
 	bool Match(const char *s) const noexcept {
-		return LexMatch(currentPos, styler, s);
+		if (ch != static_cast<unsigned char>(*s))
+			return false;
+		s++;
+		if (!*s)
+			return true;
+		if (chNext != static_cast<unsigned char>(*s))
+			return false;
+		s++;
+		for (int n = 2; *s; n++) {
+			if (*s != styler.SafeGetCharAt(currentPos + n))
+				return false;
+			s++;
+		}
+		return true;
 	}
-	bool MatchIgnoreCase(const char *s) const noexcept {
-		return LexMatchIgnoreCase(currentPos, styler, s);
-	}
-	// Non-inline
+	bool MatchIgnoreCase(const char *s) const noexcept;
 	Sci_Position GetCurrent(char *s, Sci_PositionU len) const noexcept {
 		return LexGetRange(styler.GetStartSegment(), currentPos - 1, styler, s, len);
 	}

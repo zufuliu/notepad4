@@ -606,7 +606,7 @@
     <ClCompile Include="..\..\scintilla\lexers\LexVim.cxx" />
     <ClCompile Include="..\..\scintilla\lexlib\Accessor.cxx" />
     <ClCompile Include="..\..\scintilla\lexlib\CharacterSet.cxx" />
-    <ClCompile Include="..\..\scintilla\lexlib\HereDoc.cxx" />
+    <ClCompile Include="..\..\scintilla\lexlib\DefaultLexer.cxx" />
     <ClCompile Include="..\..\scintilla\lexlib\LexAccessor.cxx" />
     <ClCompile Include="..\..\scintilla\lexlib\LexerBase.cxx" />
     <ClCompile Include="..\..\scintilla\lexlib\LexerModule.cxx" />
@@ -746,13 +746,17 @@
     <ClInclude Include="..\..\scintilla\include\Sci_Position.h" />
     <ClInclude Include="..\..\scintilla\lexlib\Accessor.h" />
     <ClInclude Include="..\..\scintilla\lexlib\CharacterSet.h" />
-    <ClInclude Include="..\..\scintilla\lexlib\HereDoc.h" />
+    <ClInclude Include="..\..\scintilla\lexlib\DefaultLexer.h" />
     <ClInclude Include="..\..\scintilla\lexlib\LexAccessor.h" />
     <ClInclude Include="..\..\scintilla\lexlib\LexerBase.h" />
     <ClInclude Include="..\..\scintilla\lexlib\LexerModule.h" />
     <ClInclude Include="..\..\scintilla\lexlib\LexerSimple.h" />
+    <ClInclude Include="..\..\scintilla\lexlib\OptionSet.h" />
     <ClInclude Include="..\..\scintilla\lexlib\PropSetSimple.h" />
+    <ClInclude Include="..\..\scintilla\lexlib\SparseState.h" />
+    <ClInclude Include="..\..\scintilla\lexlib\StringCopy.h" />
     <ClInclude Include="..\..\scintilla\lexlib\StyleContext.h" />
+    <ClInclude Include="..\..\scintilla\lexlib\SubStyles.h" />
     <ClInclude Include="..\..\scintilla\lexlib\WordList.h" />
     <ClInclude Include="..\..\scintilla\src\AutoComplete.h" />
     <ClInclude Include="..\..\scintilla\src\CallTip.h" />

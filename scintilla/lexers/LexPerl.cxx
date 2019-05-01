@@ -24,7 +24,6 @@
 #include "StyleContext.h"
 #include "CharacterSet.h"
 #include "LexerModule.h"
-#include "HereDoc.h"
 
 using namespace Scintilla;
 
@@ -303,6 +302,14 @@ static int actualNumStyle(int numberStyle) noexcept {
 	return SCE_PL_NUMBER;
 }
 
+static constexpr int opposite(int ch) noexcept {
+	if (ch == '(') return ')';
+	if (ch == '[') return ']';
+	if (ch == '{') return '}';
+	if (ch == '<') return '>';
+	return ch;
+}
+
 static bool IsPackageLine(Sci_Position line, LexAccessor &styler) noexcept {
 	const Sci_Position pos = styler.LineStart(line);
 	const int style = styler.StyleAt(pos);
@@ -470,8 +477,51 @@ static void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int in
 	// which characters are being used as quotes, how deeply nested is the
 	// start position and what the termination string is for HERE documents.
 
+	class HereDocCls {	// Class to manage HERE doc sequence
+	public:
+		int State;
+		// 0: '<<' encountered
+		// 1: collect the delimiter
+		// 2: here doc text (lines after the delimiter)
+		int Quote;		// the char after '<<'
+		bool Quoted;		// true if Quote in ('\'','"','`')
+		int DelimiterLength;	// strlen(Delimiter)
+		char Delimiter[HERE_DELIM_MAX];	// the Delimiter
+		HereDocCls() noexcept {
+			State = 0;
+			Quote = 0;
+			Quoted = false;
+			DelimiterLength = 0;
+			Delimiter[0] = '\0';
+		}
+		void Append(int ch) noexcept {
+			Delimiter[DelimiterLength++] = static_cast<char>(ch);
+			Delimiter[DelimiterLength] = '\0';
+		}
+	};
 	HereDocCls HereDoc;		// TODO: FIFO for stacked here-docs
-	QuoteCls Quote; // Class to manage quote pairs
+
+	class QuoteCls {	// Class to manage quote pairs
+	public:
+		int Rep;
+		int Count;
+		int Up, Down;
+		QuoteCls() noexcept {
+			New(1);
+		}
+		void New(int r = 1) noexcept {
+			Rep   = r;
+			Count = 0;
+			Up    = '\0';
+			Down  = '\0';
+		}
+		void Open(int u) noexcept {
+			Count++;
+			Up    = u;
+			Down  = opposite(Up);
+		}
+	};
+	QuoteCls Quote;
 
 	// additional state for number lexing
 	int numState = PERLNUM_DECIMAL;

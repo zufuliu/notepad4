@@ -15,6 +15,7 @@ namespace Scintilla {
 class Catalogue {
 public:
 	static const LexerModule *Find(int language) noexcept;
+	static const LexerModule *Find(const char *languageName) noexcept;
 	static void AddLexerModule(LexerModule *plm);
 };
 

@@ -166,7 +166,6 @@ class AutoLineLayout {
 	LineLayout *ll;
 public:
 	AutoLineLayout(LineLayoutCache &llc_, LineLayout *ll_) noexcept : llc(llc_), ll(ll_) {}
-	// Deleted so AutoLineLayout objects can not be copied.
 	AutoLineLayout(const AutoLineLayout &) = delete;
 	AutoLineLayout(AutoLineLayout &&) = delete;
 	AutoLineLayout &operator=(const AutoLineLayout &) = delete;

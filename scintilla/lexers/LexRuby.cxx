@@ -19,7 +19,6 @@
 #include "StyleContext.h"
 #include "CharacterSet.h"
 #include "LexerModule.h"
-#include "HereDoc.h"
 
 using namespace Scintilla;
 
@@ -170,6 +169,19 @@ static bool lookingAtHereDocDelim(Accessor &styler, Sci_Position pos, Sci_Positi
 	return false;
 }
 
+//XXX Identical to Perl, put in common area
+static constexpr char opposite(char ch) noexcept {
+	if (ch == '(')
+		return ')';
+	if (ch == '[')
+		return ']';
+	if (ch == '{')
+		return '}';
+	if (ch == '<')
+		return '>';
+	return ch;
+}
+
 // Null transitions when we see we've reached the end
 // and need to relex the curr char.
 
@@ -215,6 +227,43 @@ static bool currLineContainsHereDelims(Sci_Position &startPos, Accessor &styler)
 	return true;
 }
 
+// This class is used by the enter and exit methods, so it needs
+// to be hoisted out of the function.
+
+class QuoteCls {
+public:
+	int	 Count;
+	char Up;
+	char Down;
+	QuoteCls() noexcept {
+		New();
+	}
+	void New() noexcept {
+		Count = 0;
+		Up	  = '\0';
+		Down  = '\0';
+	}
+	void Open(char u) noexcept {
+		Count++;
+		Up	  = u;
+		Down  = opposite(Up);
+	}
+	QuoteCls(const QuoteCls &q) noexcept {
+		// copy constructor -- use this for copying in
+		Count = q.Count;
+		Up	  = q.Up;
+		Down  = q.Down;
+	}
+	QuoteCls &operator=(const QuoteCls &q) noexcept { // assignment constructor
+		if (this != &q) {
+			Count = q.Count;
+			Up    = q.Up;
+			Down  = q.Down;
+		}
+		return *this;
+	}
+};
+
 static void enterInnerExpression(int *p_inner_string_types,
 	int *p_inner_expn_brace_counts, QuoteCls *p_inner_quotes, int &inner_string_count,
 	int &state, int &brace_counts, const QuoteCls &curr_quote) noexcept {
@@ -238,7 +287,7 @@ static void exitInnerExpression(const int *p_inner_string_types,
 static bool isEmptyLine(Sci_Position pos, Accessor &styler) noexcept {
 	int spaceFlags = 0;
 	const Sci_Position lineCurrent = styler.GetLine(pos);
-	const int indentCurrent = Accessor::LexIndentAmount(styler, lineCurrent, &spaceFlags, nullptr);
+	const int indentCurrent = styler.IndentAmount(lineCurrent, &spaceFlags, nullptr);
 	return (indentCurrent & SC_FOLDLEVELWHITEFLAG) != 0;
 }
 
@@ -578,7 +627,28 @@ static void ColouriseRbDoc(Sci_PositionU startPos, Sci_Position length, int init
 	const WordList &keywords = *keywordLists[0];
 	const WordList &kwFold = *keywordLists[8];
 
+	class HereDocCls {
+	public:
+		int State;
+		// States
+		// 0: '<<' encountered
+		// 1: collect the delimiter
+		// 1b: text between the end of the delimiter and the EOL
+		// 2: here doc text (lines after the delimiter)
+		char Quote;		// the char after '<<'
+		bool Quoted;		// true if Quote in ('\'','"','`')
+		int DelimiterLength;	// strlen(Delimiter)
+		char Delimiter[256];	// the Delimiter, limit of 256: from Perl
+		bool CanBeIndented;
+		HereDocCls() noexcept {
+			State = 0;
+			DelimiterLength = 0;
+			Delimiter[0] = '\0';
+			CanBeIndented = false;
+		}
+	};
 	HereDocCls HereDoc;
+
 	QuoteCls Quote;
 
 	int numDots = 0;  // For numbers --
@@ -1065,10 +1135,10 @@ static void ColouriseRbDoc(Sci_PositionU startPos, Sci_Position length, int init
 				HereDoc.State = 1;
 				HereDoc.DelimiterLength = 0;
 				if (ch == '-') {
-					HereDoc.Indented = true;
+					HereDoc.Quoted = true;
 					advance_char(i, ch, chNext, chNext2); // pass by ref
 				} else {
-					HereDoc.Indented = false;
+					HereDoc.Quoted = false;
 				}
 				if (isEOLChar(ch)) {
 					// Bail out of doing a here doc if there's no target
@@ -1130,7 +1200,7 @@ static void ColouriseRbDoc(Sci_PositionU startPos, Sci_Position length, int init
 			//
 			// Why: so we can quickly resolve things like <<-" abc"
 
-			if (!HereDoc.Indented) {
+			if (!HereDoc.Quoted) {
 				if (isEOLChar(chPrev)
 					&& isMatch(styler, lengthDoc, i, HereDoc.Delimiter)) {
 					styler.ColourTo(i - 1, state);

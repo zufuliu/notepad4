@@ -20,9 +20,10 @@
 #include "StyleContext.h"
 #include "CharacterSet.h"
 #include "LexerModule.h"
-#include "HereDoc.h"
 
 using namespace Scintilla;
+
+#define HERE_DELIM_MAX			256
 
 // define this if you want 'invalid octals' to be marked as errors
 // usually, this is not a good idea, permissive lexing is better
@@ -53,7 +54,11 @@ using namespace Scintilla;
 #define BASH_DELIM_COMMAND		4
 #define BASH_DELIM_BACKTICK		5
 
-static int translateBashDigit(int ch) noexcept {
+#define BASH_DELIM_STACK_MAX	7
+
+namespace {
+
+inline int translateBashDigit(int ch) noexcept {
 	if (ch >= '0' && ch <= '9') {
 		return ch - '0';
 	} else if (ch >= 'a' && ch <= 'z') {
@@ -68,7 +73,7 @@ static int translateBashDigit(int ch) noexcept {
 	return BASH_BASE_ERROR;
 }
 
-static int getBashNumberBase(const char *s) noexcept {
+int getBashNumberBase(const char *s) noexcept {
 	int i = 0;
 	int base = 0;
 	while (*s) {
@@ -81,12 +86,15 @@ static int getBashNumberBase(const char *s) noexcept {
 	return base;
 }
 
-/*static const char * const bashWordListDesc[] = {
-	"Keywords",
-	0
-};*/
+constexpr int opposite(int ch) noexcept {
+	if (ch == '(') return ')';
+	if (ch == '[') return ']';
+	if (ch == '{') return '}';
+	if (ch == '<') return '>';
+	return ch;
+}
 
-static int GlobScan(StyleContext &sc) noexcept {
+int GlobScan(StyleContext &sc) noexcept {
 	// forward scan for zsh globs, disambiguate versus bash arrays
 	// complex expressions may still fail, e.g. unbalanced () '' "" etc
 	int c;
@@ -113,6 +121,8 @@ static int GlobScan(StyleContext &sc) noexcept {
 	return 0;
 }
 
+}
+
 static void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
 	const WordList &keywords = *keywordLists[0];
 	WordList cmdDelimiter;
@@ -134,8 +144,96 @@ static void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int in
 	const CharacterSet setHereDoc2(CharacterSet::setAlphaNum, "_-+!%*,./:=?@[]^`{}~");
 	const CharacterSet setLeftShift(CharacterSet::setDigits, "$");
 
+	class HereDocCls {	// Class to manage HERE document elements
+	public:
+		int State;		// 0: '<<' encountered
+		// 1: collect the delimiter
+		// 2: here doc text (lines after the delimiter)
+		int Quote;		// the char after '<<'
+		bool Quoted;		// true if Quote in ('\'','"','`')
+		bool Indent;		// indented delimiter (for <<-)
+		int DelimiterLength;	// strlen(Delimiter)
+		char Delimiter[HERE_DELIM_MAX];	// the Delimiter
+		HereDocCls() noexcept {
+			State = 0;
+			Quote = 0;
+			Quoted = false;
+			Indent = 0;
+			DelimiterLength = 0;
+			Delimiter[0] = '\0';
+		}
+		void Append(int ch) noexcept {
+			Delimiter[DelimiterLength++] = static_cast<char>(ch);
+			Delimiter[DelimiterLength] = '\0';
+		}
+	};
 	HereDocCls HereDoc;
+
+	class QuoteCls {	// Class to manage quote pairs (simplified vs LexPerl)
+		public:
+		int Count;
+		int Up, Down;
+		QuoteCls() noexcept  {
+			Count = 0;
+			Up    = '\0';
+			Down  = '\0';
+		}
+		void Open(int u) noexcept {
+			Count++;
+			Up    = u;
+			Down  = opposite(Up);
+		}
+		void Start(int u) noexcept {
+			Count = 0;
+			Open(u);
+		}
+	};
 	QuoteCls Quote;
+
+	class QuoteStackCls {	// Class to manage quote pairs that nest
+		public:
+		int Count;
+		int Up, Down;
+		int Style;
+		int Depth;			// levels pushed
+		int CountStack[BASH_DELIM_STACK_MAX];
+		int UpStack   [BASH_DELIM_STACK_MAX];
+		int StyleStack[BASH_DELIM_STACK_MAX];
+		QuoteStackCls() noexcept {
+			Count = 0;
+			Up    = '\0';
+			Down  = '\0';
+			Style = 0;
+			Depth = 0;
+		}
+		void Start(int u, int s) noexcept {
+			Count = 1;
+			Up    = u;
+			Down  = opposite(Up);
+			Style = s;
+		}
+		void Push(int u, int s) noexcept {
+			if (Depth >= BASH_DELIM_STACK_MAX)
+				return;
+			CountStack[Depth] = Count;
+			UpStack   [Depth] = Up;
+			StyleStack[Depth] = Style;
+			Depth++;
+			Count = 1;
+			Up    = u;
+			Down  = opposite(Up);
+			Style = s;
+		}
+		void Pop(void) noexcept {
+			if (Depth <= 0)
+				return;
+			Depth--;
+			Count = CountStack[Depth];
+			Up    = UpStack   [Depth];
+			Style = StyleStack[Depth];
+			Down  = opposite(Up);
+		}
+	};
 	QuoteStackCls QuoteStack;
 
 	int numBase = 0;
@@ -403,7 +501,7 @@ static void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int in
 				char s[HERE_DELIM_MAX];
 				sc.GetCurrent(s, sizeof(s));
 				if (sc.LengthCurrent() == 0) {  // '' or "" delimiters
-					if ((prefixws == 0 || HereDoc.Indented) &&
+					if ((prefixws == 0 || HereDoc.Indent) &&
 						HereDoc.Quoted && HereDoc.DelimiterLength == 0)
 						sc.SetState(SCE_SH_DEFAULT);
 					break;
@@ -412,7 +510,7 @@ static void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int in
 					s[strlen(s) - 1] = '\0';
 				if (strcmp(HereDoc.Delimiter, s) == 0) {
 					if ((prefixws == 0) ||	// indentation rule
-						(prefixws > 0 && HereDoc.Indented)) {
+						(prefixws > 0 && HereDoc.Indent)) {
 						sc.SetState(SCE_SH_DEFAULT);
 						break;
 					}
@@ -617,10 +715,10 @@ static void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int in
 				sc.SetState(SCE_SH_HERE_DELIM);
 				HereDoc.State = 0;
 				if (sc.GetRelative(2) == '-') {	// <<- indent case
-					HereDoc.Indented = true;
+					HereDoc.Indent = true;
 					sc.Forward();
 				} else {
-					HereDoc.Indented = false;
+					HereDoc.Indent = false;
 				}
 			} else if (sc.ch == '-'	&&	// one-char file test operators
 				setSingleCharOp.Contains(sc.chNext) &&

@@ -17,7 +17,7 @@ struct LexicalClass;
 typedef const WordList * const LexerWordList[];
 
 typedef void (*LexerFunction)(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle,
-                  LexerWordList keywordLists, Accessor &styler);
+	LexerWordList keywordLists, Accessor &styler);
 typedef ILexer4 *(*LexerFactoryFunction)();
 
 /**
@@ -25,28 +25,40 @@ typedef ILexer4 *(*LexerFactoryFunction)();
  * The Catalogue class maintains a list of LexerModules which can be searched to find a
  * module appropriate to a particular language.
  * The ExternalLexerModule subclass holds lexers loaded from DLLs or shared libraries.
-*/
+ */
 class LexerModule {
 protected:
 	int language;
 	LexerFunction fnLexer;
 	LexerFunction fnFolder;
 	LexerFactoryFunction fnFactory;
+	const char *const *wordListDescriptions;
+	const LexicalClass *lexClasses;
+	size_t nClasses;
 
 public:
-	const char* const languageName;
+	const char *const languageName;
 	LexerModule(
 		int language_,
 		LexerFunction fnLexer_,
 		const char *languageName_ = nullptr,
-		LexerFunction fnFolder_ = nullptr) noexcept;
+		LexerFunction fnFolder_ = nullptr,
+		const char *const wordListDescriptions_[] = nullptr,
+		const LexicalClass *lexClasses_ = nullptr,
+		size_t nClasses_ = 0) noexcept;
 	LexerModule(
 		int language_,
 		LexerFactoryFunction fnFactory_,
-		const char *languageName_ = nullptr) noexcept;
+		const char *languageName_ = nullptr,
+		const char *const wordListDescriptions_[] = nullptr) noexcept;
 	virtual ~LexerModule();
-
 	int GetLanguage() const noexcept;
+
+	// -1 is returned if no WordList information is available
+	int GetNumWordLists() const noexcept;
+	const char *GetWordListDescription(int index) const noexcept;
+	const LexicalClass *LexClasses() const noexcept;
+	size_t NamedStyles() const noexcept;
 
 	ILexer4 *Create() const;
 

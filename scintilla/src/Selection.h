@@ -58,7 +58,7 @@ public:
 struct SelectionSegment {
 	SelectionPosition start;
 	SelectionPosition end;
-	SelectionSegment() = default;
+	SelectionSegment() noexcept = default;
 	SelectionSegment(SelectionPosition a, SelectionPosition b) noexcept {
 		if (a < b) {
 			start = a;
@@ -83,7 +83,7 @@ struct SelectionRange {
 	SelectionPosition caret;
 	SelectionPosition anchor;
 
-	SelectionRange() = default;
+	SelectionRange() noexcept = default;
 	explicit SelectionRange(SelectionPosition single) noexcept : caret(single), anchor(single) {}
 	explicit SelectionRange(Sci::Position single) noexcept : caret(single), anchor(single) {}
 	SelectionRange(SelectionPosition caret_, SelectionPosition anchor_) noexcept : caret(caret_), anchor(anchor_) {}
