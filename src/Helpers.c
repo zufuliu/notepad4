@@ -33,9 +33,16 @@
 
 void StopWatch_Show(const StopWatch *watch, LPCWSTR msg) {
 	const double elapsed = StopWatch_Get(watch);
-	WCHAR buf[128];
-	swprintf(buf, COUNTOF(buf), L"%s: %.9f", msg, elapsed);
+	WCHAR buf[256];
+	swprintf(buf, COUNTOF(buf), L"%s: %.6f", msg, elapsed);
 	MessageBox(NULL, buf, L"Notepad2", MB_OK);
+}
+
+void StopWatch_ShowLog(const StopWatch *watch, LPCSTR msg) {
+	const double elapsed = StopWatch_Get(watch);
+	char buf[256];
+	snprintf(buf, COUNTOF(buf), "%s %s: %.6f\n", "Notepad2", msg, elapsed);
+	OutputDebugStringA(buf);
 }
 
 #ifndef NDEBUG
