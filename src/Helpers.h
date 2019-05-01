@@ -139,6 +139,7 @@ NP2_inline double StopWatch_Get(const StopWatch *watch) {
 }
 
 void StopWatch_Show(const StopWatch *watch, LPCWSTR msg);
+void StopWatch_ShowLog(const StopWatch *watch, LPCSTR msg);
 
 #ifdef NDEBUG
 #define DLog(msg)

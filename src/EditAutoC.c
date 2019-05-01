@@ -785,6 +785,11 @@ void EditCompleteWord(HWND hwnd, BOOL autoInsert) {
 	SciCall_GetTextRange(&tr);
 	iRootLen = lstrlenA(pRoot);
 
+#if 0
+	StopWatch watch;
+	StopWatch_Start(watch);
+#endif
+
 	BOOL bIgnore = iRootLen != 0 && (pRoot[0] >= '0' && pRoot[0] <= '9'); // number
 	const BOOL bIgnoreCase = bIgnore || autoCompletionConfig.bIgnoreCase;
 	struct WordList *pWList = WordList_Alloc(pRoot, iRootLen, bIgnoreCase);
@@ -841,6 +846,13 @@ void EditCompleteWord(HWND hwnd, BOOL autoInsert) {
 			}
 		}
 	} while (retry);
+
+#if 0
+	StopWatch_Stop(watch);
+	const double elapsed = StopWatch_Get(&watch);
+	sprintf(pRoot, "Notepad2 AddDocWord(%d, %d): %.6f\n", pWList->nWordCount, pWList->nTotalLen, elapsed);
+	OutputDebugStringA(pRoot);
+#endif
 
 	autoCompletionConfig.iPreviousItemCount = pWList->nWordCount;
 	if (pWList->nWordCount > 0 && !(pWList->nWordCount == 1 && pWList->iMaxLength == iRootLen)) {
