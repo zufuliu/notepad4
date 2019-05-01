@@ -141,11 +141,10 @@ static int ExpandAllInPlace(const PropSetSimple &props, std::string &withVars, i
 int PropSetSimple::GetExpanded(const char *key, char *result) const {
 	std::string val = Get(key);
 	ExpandAllInPlace(*this, val, 100, VarChain(key));
-	const int n = static_cast<int>(val.size());
 	if (result) {
-		memcpy(result, val.c_str(), n + 1);
+		memcpy(result, val.c_str(), val.size() + 1);
 	}
-	return n;	// Not including NUL
+	return static_cast<int>(val.size()); // Not including NUL
 }
 
 int PropSetSimple::GetInt(const char *key, int defaultValue) const {

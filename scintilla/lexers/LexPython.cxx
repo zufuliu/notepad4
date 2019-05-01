@@ -370,10 +370,10 @@ static void FoldPyDoc(Sci_PositionU startPos, Sci_Position length, int, LexerWor
 	// at least one line in all cases)
 	int spaceFlags = 0;
 	Sci_Position lineCurrent = styler.GetLine(startPos);
-	int indentCurrent = Accessor::LexIndentAmount(styler, lineCurrent, &spaceFlags, nullptr);
+	int indentCurrent = styler.IndentAmount(lineCurrent, &spaceFlags, nullptr);
 	while (lineCurrent > 0) {
 		lineCurrent--;
-		indentCurrent = Accessor::LexIndentAmount(styler, lineCurrent, &spaceFlags, nullptr);
+		indentCurrent = styler.IndentAmount(lineCurrent, &spaceFlags, nullptr);
 		if (!(indentCurrent & SC_FOLDLEVELWHITEFLAG) && (!IsCommentLine(lineCurrent)) &&
 			(!IsQuoteLine(lineCurrent, styler)))
 			break;
@@ -399,7 +399,7 @@ static void FoldPyDoc(Sci_PositionU startPos, Sci_Position length, int, LexerWor
 		int quote = false;
 		if (lineNext <= docLines) {
 			// Information about next line is only available if not at end of document
-			indentNext = Accessor::LexIndentAmount(styler, lineNext, &spaceFlags, nullptr);
+			indentNext = styler.IndentAmount(lineNext, &spaceFlags, nullptr);
 			const Sci_Position lookAtPos = (styler.LineStart(lineNext) == styler.Length()) ? styler.Length() - 1 : styler.LineStart(lineNext);
 			const int style = styler.StyleAt(lookAtPos);
 			quote = foldQuotes && IsPyTripleStyle(style);
@@ -437,7 +437,7 @@ static void FoldPyDoc(Sci_PositionU startPos, Sci_Position length, int, LexerWor
 			}
 
 			lineNext++;
-			indentNext = Accessor::LexIndentAmount(styler, lineNext, &spaceFlags, nullptr);
+			indentNext = styler.IndentAmount(lineNext, &spaceFlags, nullptr);
 		}
 
 		const int levelAfterComments = ((lineNext < docLines) ? indentNext & SC_FOLDLEVELNUMBERMASK : minCommentLevel);
@@ -452,7 +452,7 @@ static void FoldPyDoc(Sci_PositionU startPos, Sci_Position length, int, LexerWor
 		int skipLevel = levelAfterComments;
 
 		while (--skipLine > lineCurrent) {
-			const int skipLineIndent = Accessor::LexIndentAmount(styler, skipLine, &spaceFlags, nullptr);
+			const int skipLineIndent = styler.IndentAmount(skipLine, &spaceFlags, nullptr);
 
 			if (foldCompact) {
 				if ((skipLineIndent & SC_FOLDLEVELNUMBERMASK) > levelAfterComments)

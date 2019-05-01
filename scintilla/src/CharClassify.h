@@ -93,7 +93,7 @@ public:
 	}
 
 private:
-	DBCSCharClassify(int codePage_) noexcept;
+	explicit DBCSCharClassify(int codePage_) noexcept;
 
 	int codePage;
 	bool leadByte[256];

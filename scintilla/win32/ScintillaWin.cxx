@@ -461,6 +461,9 @@ class ScintillaWin :
 	bool CanPaste() override;
 	void Paste(bool asBinary) override;
 	void CreateCallTipWindow(PRectangle rc) noexcept override;
+#if SCI_EnablePopupMenu
+	void AddToPopUp(const char *label, int cmd = 0, bool enabled = true) noexcept override;
+#endif
 	void ClaimSelection() noexcept override;
 
 	// DBCS
@@ -1710,7 +1713,28 @@ sptr_t ScintillaWin::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam
 			}
 
 		case WM_CONTEXTMENU:
+#if SCI_EnablePopupMenu
+			{
+				Point pt = PointFromLParam(lParam);
+				POINT rpt = {static_cast<int>(pt.x), static_cast<int>(pt.y)};
+				::ScreenToClient(MainHWND(), &rpt);
+				const Point ptClient = PointFromPOINT(rpt);
+				if (ShouldDisplayPopup(ptClient)) {
+					if ((pt.x == -1) && (pt.y == -1)) {
+						// Caused by keyboard so display menu near caret
+						pt = PointMainCaret();
+						POINT spt = POINTFromPoint(pt);
+						::ClientToScreen(MainHWND(), &spt);
+						pt = PointFromPOINT(spt);
+					}
+					ContextMenu(pt);
+					return 0;
+				}
+			}
+#endif
+			return ::DefWindowProc(MainHWND(), iMessage, wParam, lParam);
 		case WM_INPUTLANGCHANGE:
+			return ::DefWindowProc(MainHWND(), iMessage, wParam, lParam);
 		case WM_INPUTLANGCHANGEREQUEST:
 			return ::DefWindowProc(MainHWND(), iMessage, wParam, lParam);
 
@@ -2472,6 +2496,18 @@ void ScintillaWin::CreateCallTipWindow(PRectangle) noexcept {
 		ct.wDraw = wnd;
 	}
 }
+
+#if SCI_EnablePopupMenu
+void ScintillaWin::AddToPopUp(const char *label, int cmd, bool enabled) noexcept {
+	HMENU hmenuPopup = static_cast<HMENU>(popup.GetID());
+	if (!label[0])
+		::AppendMenuA(hmenuPopup, MF_SEPARATOR, 0, "");
+	else if (enabled)
+		::AppendMenuA(hmenuPopup, MF_STRING, cmd, label);
+	else
+		::AppendMenuA(hmenuPopup, MF_STRING | MF_DISABLED | MF_GRAYED, cmd, label);
+}
+#endif
 
 void ScintillaWin::ClaimSelection() noexcept {
 	// Windows does not have a primary selection

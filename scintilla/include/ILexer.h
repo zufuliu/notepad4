@@ -52,11 +52,29 @@ class ILexer4 {
 public:
 	virtual int SCI_METHOD Version() const noexcept = 0;
 	virtual void SCI_METHOD Release() noexcept = 0;
+	virtual const char * SCI_METHOD PropertyNames() const noexcept = 0;
+	virtual int SCI_METHOD PropertyType(const char *name) const = 0;
+	virtual const char * SCI_METHOD DescribeProperty(const char *name) const = 0;
 	virtual Sci_Position SCI_METHOD PropertySet(const char *key, const char *val) = 0;
+	virtual const char * SCI_METHOD DescribeWordListSets() const noexcept = 0;
 	virtual Sci_Position SCI_METHOD WordListSet(int n, const char *wl) = 0;
 	virtual void SCI_METHOD Lex(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, IDocument *pAccess) = 0;
 	virtual void SCI_METHOD Fold(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, IDocument *pAccess) = 0;
+	virtual void * SCI_METHOD PrivateCall(int operation, void *pointer) = 0;
 	virtual int SCI_METHOD LineEndTypesSupported() const noexcept = 0;
+	virtual int SCI_METHOD AllocateSubStyles(int styleBase, int numberStyles) = 0;
+	virtual int SCI_METHOD SubStylesStart(int styleBase) const noexcept = 0;
+	virtual int SCI_METHOD SubStylesLength(int styleBase) const noexcept = 0;
+	virtual int SCI_METHOD StyleFromSubStyle(int subStyle) const noexcept = 0;
+	virtual int SCI_METHOD PrimaryStyleFromStyle(int style) const noexcept = 0;
+	virtual void SCI_METHOD FreeSubStyles() noexcept = 0;
+	virtual void SCI_METHOD SetIdentifiers(int style, const char *identifiers) = 0;
+	virtual int SCI_METHOD DistanceToSecondaryStyles() const noexcept = 0;
+	virtual const char * SCI_METHOD GetSubStyleBases() const noexcept = 0;
+	virtual int SCI_METHOD NamedStyles() const noexcept = 0;
+	virtual const char * SCI_METHOD NameOfStyle(int style) const noexcept = 0;
+	virtual const char * SCI_METHOD TagsOfStyle(int style) const noexcept = 0;
+	virtual const char * SCI_METHOD DescriptionOfStyle(int style) const noexcept = 0;
 };
 
 }

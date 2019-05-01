@@ -14,91 +14,6 @@
 
 using namespace Scintilla;
 
-LexAccessor::LexAccessor(IDocument *pAccess_) noexcept :
-	pAccess(pAccess_), startPos(extremePosition), endPos(0),
-	codePage(pAccess->CodePage()),
-	encodingType(enc8bit),
-	lenDoc(pAccess->Length()),
-	validLen(0),
-	startSeg(0),
-	startPosStyling(0),
-	documentVersion(pAccess->Version()) {
-	// Prevent warnings by static analyzers about uninitialized buf and styleBuf.
-	buf[0] = 0;
-	styleBuf[0] = 0;
-	if (codePage) {
-		encodingType = (codePage == 65001) ? encUnicode : encDBCS;
-	}
-}
-void LexAccessor::Fill(Sci_Position position) noexcept {
-	startPos = position - slopSize;
-	if (startPos + bufferSize > lenDoc)
-		startPos = lenDoc - bufferSize;
-	if (startPos < 0)
-		startPos = 0;
-	endPos = startPos + bufferSize;
-	if (endPos > lenDoc)
-		endPos = lenDoc;
-
-	pAccess->GetCharRange(buf, startPos, endPos - startPos);
-	buf[endPos - startPos] = '\0';
-}
-char LexAccessor::operator[](Sci_Position position) noexcept {
-	if (position < startPos || position >= endPos) {
-		Fill(position);
-	}
-	return buf[position - startPos];
-}
-char LexAccessor::SafeGetCharAt(Sci_Position position) noexcept {
-	if (position < startPos || position >= endPos) {
-		Fill(position);
-		if (position < startPos || position >= endPos) {
-			// Position is outside range of document
-			return '\0';
-		}
-	}
-	return buf[position - startPos];
-}
-void LexAccessor::Flush() {
-	if (validLen > 0) {
-		pAccess->SetStyles(validLen, styleBuf);
-		startPosStyling += validLen;
-		validLen = 0;
-	}
-}
-void LexAccessor::StartAt(Sci_PositionU start) noexcept {
-	pAccess->StartStyling(start);
-	startPosStyling = start;
-}
-void LexAccessor::ColourTo(Sci_PositionU pos, int chAttr) {
-	// Only perform styling if non empty range
-	if (pos != startSeg - 1) {
-		assert(pos >= startSeg);
-		if (pos < startSeg) {
-			return;
-		}
-
-		if (validLen + (pos - startSeg + 1) >= bufferSize)
-			Flush();
-		const unsigned char attr = static_cast<unsigned char>(chAttr);
-		if (validLen + (pos - startSeg + 1) >= bufferSize) {
-			// Too big for buffer so send directly
-			pAccess->SetStyleFor(pos - startSeg + 1, attr);
-		} else {
-			for (Sci_PositionU i = startSeg; i <= pos; i++) {
-				assert((startPosStyling + validLen) < Length());
-				styleBuf[validLen++] = attr;
-			}
-		}
-	}
-	startSeg = pos + 1;
-}
-void LexAccessor::IndicatorFill(Sci_Position start, Sci_Position end, int indicator, int value) {
-	pAccess->DecorationSetCurrentIndicator(indicator);
-	pAccess->DecorationFillRange(start, value, end - start);
-}
-
-////////////////////////////////////////////////////////////////////////////////
 namespace Scintilla {
 
 bool IsLexAtEOL(Sci_Position pos, LexAccessor &styler) noexcept {
@@ -128,7 +43,7 @@ bool IsLexEmptyLine(LexAccessor &styler, Sci_Position line) noexcept {
 	startPos = LexSkipSpaceTab(startPos, endPos, styler);
 	return startPos == endPos;
 }
-bool IsLexLineStartsWith(Sci_Position line, LexAccessor &styler, const char* word, bool matchCase, int style) noexcept {
+bool IsLexLineStartsWith(Sci_Position line, LexAccessor &styler, const char *word, bool matchCase, int style) noexcept {
 	const Sci_Position pos = LexLineSkipSpaceTab(line, styler);
 	return styler.StyleAt(pos) == style &&
 		(matchCase ? styler.Match(pos, word) : LexMatchIgnoreCase(pos, styler, word));
@@ -140,10 +55,10 @@ bool IsLexCommentLine(Sci_Position line, LexAccessor &styler, int style) noexcep
 	//char ch = styler.SafeGetCharAt(pos);
 	if (stl == 0 && stl != style)
 		return false;
-	while (style > 0 && stl != (style & 0xFF)) {
+	while (style != 0 && stl != (style & 0xFF)) {
 		style >>= 8;
 	}
-	return !!style;
+	return style != 0;
 }
 bool IsBackslashLine(Sci_Position line, LexAccessor &styler) noexcept {
 	const Sci_Position pos = styler.LineStart(line + 1) - 1;
@@ -187,7 +102,7 @@ bool LexMatch(Sci_Position pos, LexAccessor &styler, const char *s) noexcept {
 }
 bool LexMatchIgnoreCase(Sci_Position pos, LexAccessor &styler, const char *s) noexcept {
 	for (Sci_Position i = 0; *s; i++) {
-		if (MakeLowerCase(*s) != MakeLowerCase(styler.SafeGetCharAt(pos + i)))
+		if (*s != MakeLowerCase(styler.SafeGetCharAt(pos + i)))
 			return false;
 		s++;
 	}
@@ -269,11 +184,11 @@ Sci_PositionU LexGetRangeLowered(Sci_Position startPos, LexAccessor &styler, con
 }
 
 char LexGetPrevChar(Sci_Position endPos, LexAccessor &styler) noexcept {
-	while (IsASpaceOrTab(styler.SafeGetCharAt(--endPos))){ }
+	while (IsASpaceOrTab(styler.SafeGetCharAt(--endPos))) {}
 	return styler.SafeGetCharAt(endPos);
 }
 char LexGetNextChar(Sci_Position startPos, LexAccessor &styler) noexcept {
-	while (IsASpaceOrTab(styler.SafeGetCharAt(startPos++))){ }
+	while (IsASpaceOrTab(styler.SafeGetCharAt(startPos++))) {}
 	return styler.SafeGetCharAt(startPos - 1);
 }
 

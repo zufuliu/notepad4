@@ -125,7 +125,7 @@ Document::Document(int options) :
 	insertionSet = false;
 	tabInChars = 8;
 	indentInChars = 0;
-	actualIndentInChars = 4;
+	actualIndentInChars = 8;
 	useTabs = true;
 	tabIndents = true;
 	backspaceUnindents = false;
@@ -2121,7 +2121,6 @@ void Document::StyleToAdjustingLineDuration(Sci::Position pos) {
 	const Sci::Line lineFirst = SciLineFromPosition(GetEndStyled());
 	ElapsedPeriod epStyling;
 	EnsureStyledTo(pos);
-
 	const Sci::Line lineLast = SciLineFromPosition(GetEndStyled());
 	durationStyleOneLine.AddSample(lineLast - lineFirst, epStyling.Duration());
 }
@@ -2460,7 +2459,7 @@ Sci::Position Document::ExtendStyleRange(Sci::Position pos, int delta, bool sing
 	return pos;
 }
 
-static inline char BraceOpposite(char ch) noexcept {
+static constexpr char BraceOpposite(char ch) noexcept {
 	switch (ch) {
 	case '(':
 		return ')';

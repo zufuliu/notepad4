@@ -263,10 +263,10 @@ val SC_CP_UTF8=65001
 set void SetCodePage=2037(int codePage,)
 
 # Set the locale for displaying text.
-set void SetFontLocale=2720(, string localeName)
+set void SetFontLocale=2724(, string localeName)
 
 # Set the locale for displaying text.
-set void GetFontLocale=2721(, stringresult localeName)
+set void GetFontLocale=2725(, stringresult localeName)
 
 enu IMEInteraction=SC_IME_
 val SC_IME_WINDOWED=0
@@ -637,6 +637,12 @@ set void SetCharClassesEx=2065(int length, string characters)
 # Get the set of characters making up words for when moving or selecting by word.
 # Returns the number of characters
 get int GetWordChars=2646(, stringresult characters)
+
+# Set the number of characters to have directly indexed categories
+set void SetCharacterCategoryOptimization=2720(int countCharacters,)
+
+# Get the number of characters to have directly indexed categories
+get int GetCharacterCategoryOptimization=2721(,)
 
 # Start a sequence of actions that is undone and redone as a unit.
 # May be nested.
@@ -2706,10 +2712,10 @@ val KEYWORDSET_MAX=15
 set void SetKeyWords=4005(int keyWordSet, string keyWords)
 
 # Set the lexing language of the document based on string name.
-# set void SetLexerLanguage=4006(, string language)
+set void SetLexerLanguage=4006(, string language)
 
 # Load a lexer library (dll / so).
-# fun void LoadLexerLibrary=4007(, string path)
+fun void LoadLexerLibrary=4007(, string path)
 
 # Retrieve a "property" value previously set with SetProperty.
 # Result is NUL-terminated.
@@ -2727,78 +2733,78 @@ get int GetPropertyInt=4010(string key, int defaultValue)
 # Retrieve the name of the lexer.
 # Return the length of the text.
 # Result is NUL-terminated.
-#get int GetLexerLanguage=4012(, stringresult language)
+get int GetLexerLanguage=4012(, stringresult language)
 
 # For private communication between an application and a known lexer.
-#fun int PrivateLexerCall=4013(int operation, int pointer)
+fun int PrivateLexerCall=4013(int operation, int pointer)
 
 # Retrieve a '\n' separated list of properties understood by the current lexer.
 # Result is NUL-terminated.
-#fun int PropertyNames=4014(, stringresult names)
+fun int PropertyNames=4014(, stringresult names)
 
-#enu TypeProperty=SC_TYPE_
-#val SC_TYPE_BOOLEAN=0
-#val SC_TYPE_INTEGER=1
-#val SC_TYPE_STRING=2
+enu TypeProperty=SC_TYPE_
+val SC_TYPE_BOOLEAN=0
+val SC_TYPE_INTEGER=1
+val SC_TYPE_STRING=2
 
 # Retrieve the type of a property.
-#fun int PropertyType=4015(string name,)
+fun int PropertyType=4015(string name,)
 
 # Describe a property.
 # Result is NUL-terminated.
-#fun int DescribeProperty=4016(string name, stringresult description)
+fun int DescribeProperty=4016(string name, stringresult description)
 
 # Retrieve a '\n' separated list of descriptions of the keyword sets understood by the current lexer.
 # Result is NUL-terminated.
-#fun int DescribeKeyWordSets=4017(, stringresult descriptions)
+fun int DescribeKeyWordSets=4017(, stringresult descriptions)
 
 # Bit set of LineEndType enumertion for which line ends beyond the standard
 # LF, CR, and CRLF are supported by the lexer.
 get int GetLineEndTypesSupported=4018(,)
 
 # Allocate a set of sub styles for a particular base style, returning start of range
-#fun int AllocateSubStyles=4020(int styleBase, int numberStyles)
+fun int AllocateSubStyles=4020(int styleBase, int numberStyles)
 
 # The starting style number for the sub styles associated with a base style
-#get int GetSubStylesStart=4021(int styleBase,)
+get int GetSubStylesStart=4021(int styleBase,)
 
 # The number of sub styles associated with a base style
-#get int GetSubStylesLength=4022(int styleBase,)
+get int GetSubStylesLength=4022(int styleBase,)
 
 # For a sub style, return the base style, else return the argument.
-#get int GetStyleFromSubStyle=4027(int subStyle,)
+get int GetStyleFromSubStyle=4027(int subStyle,)
 
 # For a secondary style, return the primary style, else return the argument.
-#get int GetPrimaryStyleFromStyle=4028(int style,)
+get int GetPrimaryStyleFromStyle=4028(int style,)
 
 # Free allocated sub styles
-#fun void FreeSubStyles=4023(,)
+fun void FreeSubStyles=4023(,)
 
 # Set the identifiers that are shown in a particular style
-#set void SetIdentifiers=4024(int style, string identifiers)
+set void SetIdentifiers=4024(int style, string identifiers)
 
 # Where styles are duplicated by a feature such as active/inactive code
 # return the distance between the two types.
-#get int DistanceToSecondaryStyles=4025(,)
+get int DistanceToSecondaryStyles=4025(,)
 
 # Get the set of base styles that can be extended with sub styles
 # Result is NUL-terminated.
-#get int GetSubStyleBases=4026(, stringresult styles)
+get int GetSubStyleBases=4026(, stringresult styles)
 
 # Retrieve the number of named styles for the lexer.
-#get int GetNamedStyles=4029(,)
+get int GetNamedStyles=4029(,)
 
 # Retrieve the name of a style.
 # Result is NUL-terminated.
-#fun int NameOfStyle=4030(int style, stringresult name)
+fun int NameOfStyle=4030(int style, stringresult name)
 
 # Retrieve a ' ' separated list of style tags like "literal quoted string".
 # Result is NUL-terminated.
-#fun int TagsOfStyle=4031(int style, stringresult tags)
+fun int TagsOfStyle=4031(int style, stringresult tags)
 
 # Retrieve a description of a style.
 # Result is NUL-terminated.
-#fun int DescriptionOfStyle=4032(int style, stringresult description)
+fun int DescriptionOfStyle=4032(int style, stringresult description)
 
 # Notifications
 # Type of modification and the action which caused the modification.

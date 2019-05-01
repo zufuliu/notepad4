@@ -344,7 +344,7 @@ static void ColouriseBatchDoc(Sci_PositionU startPos, Sci_Position length, int i
 				markVar = true;
 				numVar = false;
 				sc.SetState(SCE_BAT_VARIABLE);
-			} else if (sc.ch == '@' && sc.MatchIgnoreCase("@rem")) {
+			} else if (sc.MatchIgnoreCase("@rem")) {
 				sc.SetState(SCE_BAT_COMMENT);
 			} else if (IsWordStart(sc.ch)) { // all file name
 				sc.SetState(SCE_BAT_IDENTIFIER);

@@ -26,8 +26,8 @@ int Accessor::GetPropertyInt(const char *key, int defaultValue) const {
 	return pprops->GetInt(key, defaultValue);
 }
 
-int Accessor::LexIndentAmount(Accessor &styler, Sci_Position line, int *flags, PFNIsCommentLeader pfnIsCommentLeader) noexcept {
-	const Sci_Position end = styler.Length();
+int Accessor::IndentAmount(Sci_Position line, int *flags, PFNIsCommentLeader pfnIsCommentLeader) noexcept {
+	const Sci_Position end = Length();
 	int spaceFlags = 0;
 
 	// Determines the indentation level of the current line and also checks for consistent
@@ -35,14 +35,14 @@ int Accessor::LexIndentAmount(Accessor &styler, Sci_Position line, int *flags, P
 	// Indentation is judged consistent when the indentation whitespace of each line lines
 	// the same or the indentation of one line is a prefix of the other.
 
-	Sci_Position pos = styler.LineStart(line);
-	char ch = styler[pos];
+	Sci_Position pos = LineStart(line);
+	char ch = (*this)[pos];
 	int indent = 0;
 	bool inPrevPrefix = line > 0;
-	Sci_Position posPrev = inPrevPrefix ? styler.LineStart(line - 1) : 0;
+	Sci_Position posPrev = inPrevPrefix ? LineStart(line - 1) : 0;
 	while ((ch == ' ' || ch == '\t') && (pos < end)) {
 		if (inPrevPrefix) {
-			const char chPrev = styler[posPrev++];
+			const char chPrev = (*this)[posPrev++];
 			if (chPrev == ' ' || chPrev == '\t') {
 				if (chPrev != ch)
 					spaceFlags |= wsInconsistent;
@@ -59,14 +59,14 @@ int Accessor::LexIndentAmount(Accessor &styler, Sci_Position line, int *flags, P
 				spaceFlags |= wsSpaceTab;
 			indent = (indent / 4 + 1) * 4;
 		}
-		ch = styler[++pos];
+		ch = (*this)[++pos];
 	}
 
 	*flags = spaceFlags;
 	indent += SC_FOLDLEVELBASE;
 	// if completely empty line or the start of a comment...
-	if ((styler.LineStart(line) == styler.Length()) || (ch == ' ' || ch == '\t' || ch == '\n' || ch == '\r') ||
-		(pfnIsCommentLeader && (*pfnIsCommentLeader)(styler, pos, end - pos)))
+	if ((LineStart(line) == Length()) || (ch == ' ' || ch == '\t' || ch == '\n' || ch == '\r') ||
+		(pfnIsCommentLeader && (*pfnIsCommentLeader)(*this, pos, end - pos)))
 		return indent | SC_FOLDLEVELWHITEFLAG;
 	else
 		return indent;

@@ -10,6 +10,8 @@
 
 namespace Scintilla {
 
+#define SCI_EnablePopupMenu	0
+
 #ifdef SCI_LEXER
 class LexState;
 #endif
@@ -32,8 +34,10 @@ protected:
 		idcmdSelectAll = 16
 	};
 
+#if SCI_EnablePopupMenu
 	int displayPopupMenu;
 	Menu popup;
+#endif
 	AutoComplete ac;
 
 	CallTip ct;
@@ -72,6 +76,12 @@ protected:
 	void CallTipClick() noexcept;
 	void CallTipShow(Point pt, const char *defn);
 	virtual void CreateCallTipWindow(PRectangle rc) noexcept = 0;
+
+#if SCI_EnablePopupMenu
+	virtual void AddToPopUp(const char *label, int cmd = 0, bool enabled = true) noexcept = 0;
+	bool ShouldDisplayPopup(Point ptInWindowCoordinates) const noexcept;
+	void ContextMenu(Point pt) noexcept;
+#endif
 
 	void ButtonDownWithModifiers(Point pt, unsigned int curTime, int modifiers) override;
 	void RightButtonDownWithModifiers(Point pt, unsigned int curTime, int modifiers) override;
