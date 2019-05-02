@@ -86,7 +86,7 @@ static void ColouriseCmakeDoc(Sci_PositionU startPos, Sci_Position length, int i
 						userDefType = 2;
 				} else if (keywords2.InListAbbreviated(s, '(')) {
 					sc.ChangeState(SCE_CMAKE_COMMANDS);
-				} else if (LexGetNextChar(sc.currentPos, styler) == '(') {
+				} else if (sc.GetNextNSChar() == '(') {
 					sc.ChangeState(SCE_CMAKE_FUNCATION);
 				} else if (userDefType) {
 					sc.ChangeState(userDefType == 1 ? SCE_CMAKE_FUNCATION : SCE_CMAKE_MACRO);
@@ -195,7 +195,7 @@ static void ColouriseCmakeDoc(Sci_PositionU startPos, Sci_Position length, int i
 }
 
 #define IsCommentLine(line)		IsLexCommentLine(line, styler, SCE_CMAKE_COMMENT)
-#define CMakeMatch(str)			LexMatchIgnoreCase(i, styler, str)
+#define CMakeMatch(str)			styler.MatchIgnoreCase(i, str)
 
 static constexpr bool IsStreamCommentStyle(int style) noexcept {
 	return style == SCE_CMAKE_BLOCK_COMMENT || style == SCE_CMAKE_BRACKET_ARGUMENT;

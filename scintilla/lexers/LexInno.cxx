@@ -241,7 +241,7 @@ static void ColouriseInnoDoc(Sci_PositionU startPos, Sci_Position length, int, L
 	delete[]buffer;
 }
 
-#define LexMatchIC(pos, str)	LexMatchIgnoreCase(pos, styler, str)
+#define LexMatchIC(pos, str)	styler.MatchIgnoreCase(pos, str)
 #define IsCommentLine(line)		IsLexCommentLine(line, styler, SCE_INNO_COMMENT)
 static constexpr  bool IsStreamCommentStyle(int style) noexcept {
 	return style == SCE_INNO_COMMENT_PASCAL;

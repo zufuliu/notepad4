@@ -274,7 +274,7 @@ static void ColouriseCppDoc(Sci_PositionU startPos, Sci_Position length, int ini
 				const bool hasAttr = (lexType == LEX_CPP || lexType == LEX_OBJC || isObjCSource || lexType == LEX_CS);
 				const bool mayAttr = lastWordWasAttr && (numRBrace > 0 || (lineState & LEX_BLOCK_MASK_DEFINE));
 				const bool mayCSAttr = (lexType == LEX_CS) && numSBrace == 1 && numRBrace == 0;
-				const char nextChar = LexGetNextChar(sc.currentPos, styler);
+				const int nextChar = sc.GetNextNSChar();
 
 				if (lastPPDefineWord) {
 					if (lastPPDefineWord == 2 && strcmp(s, "defined") == 0)
@@ -823,14 +823,14 @@ static void ColouriseCppDoc(Sci_PositionU startPos, Sci_Position length, int ini
 					sc.SetState(SCE_C_VARIABLE);
 				}
 			} else
-				if ((visibleChars == 0) && LexMatch(sc.currentPos + 1, styler, heredoc)) {
+				if ((visibleChars == 0) && styler.Match(sc.currentPos + 1, heredoc)) {
 					sc.Forward(heredoc_len);
 					outerStyle = SCE_C_DEFAULT;
 					sc.ForwardSetState(SCE_C_DEFAULT);
 				}
 			break;
 		case SCE_C_NOWDOC:	// PHP
-			if ((visibleChars == 0) && LexMatch(sc.currentPos + 1, styler, heredoc)) {
+			if ((visibleChars == 0) && styler.Match(sc.currentPos + 1, heredoc)) {
 				sc.Forward(heredoc_len);
 				sc.ForwardSetState(SCE_C_DEFAULT);
 			}
