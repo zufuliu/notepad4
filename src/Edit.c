@@ -5129,25 +5129,24 @@ void EditMarkAll(BOOL bChanged, BOOL bMarkOccurrencesMatchCase, BOOL bMarkOccurr
 		}
 	}
 
-	struct Sci_TextToFind ttf;
-	ZeroMemory(&ttf, sizeof(ttf));
-	ttf.chrg.cpMin = 0;
-	ttf.chrg.cpMax = (Sci_PositionCR)SciCall_GetLength();
-	ttf.lpstrText = pszText;
-
 	EditMarkAll_Clear();
 	SciCall_SetIndicatorCurrent(IndicatorNumber_MarkOccurrences);
 
-	Sci_Position iPos;
-	while ((iPos = SciCall_FindText(findFlag, &ttf)) != -1) {
+	SciCall_SetSearchFlags(findFlag);
+	const Sci_Position iDocLen = SciCall_GetLength();
+
+	Sci_Position iPos = 0;
+	do {
+		SciCall_SetTargetRange(iPos, iDocLen);
+		iPos = SciCall_SearchInTarget(iSelCount, pszText);
+		if (iPos == -1) {
+			break;
+		}
 		// mark this match
 		++iMatchesCount;
 		SciCall_IndicatorFillRange(iPos, iSelCount);
-		ttf.chrg.cpMin = ttf.chrgText.cpMin + iSelCount;
-		if (ttf.chrg.cpMin == ttf.chrg.cpMax) {
-			break;
-		}
-	}
+		iPos += iSelCount;
+	} while (iPos < iDocLen);
 
 	if (iMatchesCount > 1) {
 		editMarkAllStatus.findFlag = findFlag;

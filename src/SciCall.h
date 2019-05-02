@@ -170,6 +170,18 @@ NP2_inline int SciCall_GetTextRange(struct Sci_TextRange *tr) {
 	return (int)SciCall(SCI_GETTEXTRANGE, 0, (LPARAM)tr);
 }
 
+NP2_inline void SciCall_SetTargetRange(Sci_Position start, Sci_Position end) {
+	SciCall(SCI_SETTARGETRANGE, start, end);
+}
+
+NP2_inline void SciCall_SetSearchFlags(int searchFlags) {
+	SciCall(SCI_SETSEARCHFLAGS, searchFlags, 0);
+}
+
+NP2_inline Sci_Position SciCall_SearchInTarget(Sci_Position length, const char *text) {
+	return SciCall(SCI_SEARCHINTARGET, length, (LPARAM)text);
+}
+
 NP2_inline BOOL SciCall_CanUndo(void) {
 	return (BOOL)SciCall(SCI_CANUNDO, 0, 0);
 }
