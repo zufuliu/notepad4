@@ -123,11 +123,11 @@ static void ColouriseFortranDoc(Sci_PositionU startPos, Sci_Position length, int
 		// Determine if a new state should be entered.
 		if (sc.state == SCE_F_DEFAULT) {
 			if (visibleChars == 0 && (sc.ch == 'C' || sc.ch == 'c' || sc.ch == '*' || sc.ch == '!')) {
-				if ((LexMatchIgnoreCase(sc.currentPos + 1, styler, "dec") && sc.GetRelative(4) == '$')
-					|| (LexMatchIgnoreCase(sc.currentPos + 1, styler, "dir") && sc.GetRelative(4) == '$')
-					|| (LexMatchIgnoreCase(sc.currentPos + 1, styler, "gcc") && sc.GetRelative(4) == '$')
-					|| (LexMatchIgnoreCase(sc.currentPos + 1, styler, "$omp") && sc.GetRelative(5) == '$')
-					|| (LexMatchIgnoreCase(sc.currentPos + 1, styler, "ms") && sc.GetRelative(3) == '$')
+				if ((styler.MatchIgnoreCase(sc.currentPos + 1, "dec") && sc.GetRelative(4) == '$')
+					|| (styler.MatchIgnoreCase(sc.currentPos + 1, "dir") && sc.GetRelative(4) == '$')
+					|| (styler.MatchIgnoreCase(sc.currentPos + 1, "gcc") && sc.GetRelative(4) == '$')
+					|| (styler.MatchIgnoreCase(sc.currentPos + 1, "$omp") && sc.GetRelative(5) == '$')
+					|| (styler.MatchIgnoreCase(sc.currentPos + 1, "ms") && sc.GetRelative(3) == '$')
 					) {
 					sc.SetState(SCE_F_PREPROCESSOR);
 				} else if ((sc.ch == 'C' || sc.ch == 'c') && IsAlpha(sc.chNext)) {

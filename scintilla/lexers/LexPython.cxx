@@ -192,7 +192,7 @@ static void ColourisePyDoc(Sci_PositionU startPos, Sci_Position length, int init
 				} else if (keywords_class.InList(s)) {
 					defType = 0;
 					sc.ChangeState(SCE_PY_CLASSNAME);
-				} else if (LexGetNextChar(sc.currentPos, styler) == '(') {
+				} else if (sc.GetNextNSChar() == '(') {
 					sc.ChangeState(SCE_PY_FUNCTION);
 				}
 				sc.SetState(SCE_PY_DEFAULT);

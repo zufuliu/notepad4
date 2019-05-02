@@ -327,7 +327,7 @@ static bool IsEquLine(Sci_Position line, LexAccessor &styler) noexcept {
 	if (styler.StyleAt(pos) == SCE_ASM_DIRECTIVE) {
 		if (styler[pos] == '.')
 			pos++;
-		return LexMatchIgnoreCase(pos, styler, "equ");
+		return styler.MatchIgnoreCase(pos, "equ");
 	}
 	return false;
 }
@@ -340,7 +340,7 @@ static bool IsAsmDefineLine(Sci_Position line, LexAccessor &styler) noexcept {
 	if (stl == SCE_ASM_DIRECTIVE) {
 		if (ch == '.')
 			pos++;
-		return LexMatchIgnoreCase(pos, styler, "include");
+		return styler.MatchIgnoreCase(pos, "include");
 	}
 	if ((ch == '#' || ch == '%') && stl == SCE_ASM_PREPROCESSOR) {
 		pos++;

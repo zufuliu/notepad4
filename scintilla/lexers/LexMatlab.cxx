@@ -162,7 +162,7 @@ static void ColouriseMatlabDoc(Sci_PositionU startPos, Sci_Position length, int 
 					sc.ChangeState(SCE_MAT_FUNCTION1);
 				} else if (function2.InListAbbreviated(s, '(')) {
 					sc.ChangeState(SCE_MAT_FUNCTION2);
-				} else if (LexGetNextChar(sc.currentPos, styler) == '(') {
+				} else if (sc.GetNextNSChar() == '(') {
 					sc.ChangeState(SCE_MAT_FUNCTION);
 				}
 				if (sc.ch == '@') {

@@ -212,6 +212,15 @@ public:
 	Sci_Position GetCurrentLowered(char *s, Sci_PositionU len) const noexcept {
 		return LexGetRangeLowered(styler.GetStartSegment(), currentPos - 1, styler, s, len);
 	}
+	int GetNextNSChar() const noexcept {
+		if (!IsSpaceOrTab(ch)) {
+			return ch;
+		}
+		if (!IsSpaceOrTab(chNext)) {
+			return chNext;
+		}
+		return LexGetNextChar(currentPos + 2, styler);
+	}
 };
 
 }

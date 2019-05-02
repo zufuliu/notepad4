@@ -104,7 +104,7 @@ static void ColouriseVBDoc(Sci_PositionU startPos, Sci_Position length, int init
 				if (skipType) {
 					s[len - 1] = '\0';
 				}
-				if (visibleChars == len && LexGetNextChar(sc.currentPos, styler) == ':') {
+				if (visibleChars == len && sc.GetNextNSChar() == ':') {
 					sc.ChangeState(SCE_B_LABEL);
 					sc.SetState(SCE_B_DEFAULT);
 				} else
@@ -225,12 +225,12 @@ static void ColouriseVBDoc(Sci_PositionU startPos, Sci_Position length, int init
 
 static bool VBLineStartsWith(Sci_Position line, Accessor &styler, const char* word) noexcept {
 	const Sci_Position pos = LexLineSkipSpaceTab(line, styler);
-	return (styler.StyleAt(pos) == SCE_B_KEYWORD) && (LexMatchIgnoreCase(pos, styler, word));
+	return (styler.StyleAt(pos) == SCE_B_KEYWORD) && (styler.MatchIgnoreCase(pos, word));
 }
 static bool VBMatchNextWord(Sci_Position startPos, Sci_Position endPos, Accessor &styler, const char *word) noexcept {
 	const Sci_Position pos = LexSkipSpaceTab(startPos, endPos, styler);
 	return isspacechar(LexCharAt(pos + static_cast<int>(strlen(word))))
-		&& LexMatchIgnoreCase(pos, styler, word);
+		&& styler.MatchIgnoreCase(pos, word);
 }
 static bool IsVBProperty(Sci_Position line, Sci_Position startPos, Accessor &styler) noexcept {
 	const Sci_Position endPos = styler.LineStart(line + 1) - 1;
@@ -246,26 +246,26 @@ static bool IsVBSome(Sci_Position line, int kind, Accessor &styler) noexcept {
 	Sci_Position pos = LexSkipSpaceTab(startPos, endPos, styler);
 	int stl = styler.StyleAt(pos);
 	if (stl == SCE_B_KEYWORD) {
-		if (LexMatchIgnoreCase(pos, styler, "public")) {
+		if (styler.MatchIgnoreCase(pos, "public")) {
 			pos += 6;
-		} else if (LexMatchIgnoreCase(pos, styler, "private")) {
+		} else if (styler.MatchIgnoreCase(pos, "private")) {
 			pos += 7;
-		} else if (LexMatchIgnoreCase(pos, styler, "protected")) {
+		} else if (styler.MatchIgnoreCase(pos, "protected")) {
 			pos += 9;
 			pos = LexSkipSpaceTab(endPos, pos, styler);
 		}
-		if (LexMatchIgnoreCase(pos, styler, "friend"))
+		if (styler.MatchIgnoreCase(pos, "friend"))
 			pos += 6;
 		pos = LexSkipSpaceTab(pos, endPos, styler);
 		stl = styler.StyleAt(pos);
 		if (stl == SCE_B_KEYWORD) {
-			return (kind == 1 && isspacechar(LexCharAt(pos + 4)) && LexMatchIgnoreCase(pos, styler, "type"))
-				|| (kind == 2 && isspacechar(LexCharAt(pos + 5)) && LexMatchIgnoreCase(pos, styler, "const"));
+			return (kind == 1 && isspacechar(LexCharAt(pos + 4)) && styler.MatchIgnoreCase(pos, "type"))
+				|| (kind == 2 && isspacechar(LexCharAt(pos + 5)) && styler.MatchIgnoreCase(pos, "const"));
 		}
 	}
 	return false;
 }
-#define VBMatch(word)			LexMatchIgnoreCase(i, styler, word)
+#define VBMatch(word)			styler.MatchIgnoreCase(i, word)
 #define VBMatchNext(pos, word)	VBMatchNextWord(pos, endPos, styler, word)
 #define IsCommentLine(line)		IsLexCommentLine(line, styler, SCE_B_COMMENT)
 #define IsDimLine(line)			VBLineStartsWith(line, styler, "dim")

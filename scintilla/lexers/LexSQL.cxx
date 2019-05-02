@@ -109,7 +109,7 @@ static void ColouriseSqlDoc(Sci_PositionU startPos, Sci_Position length, int ini
 			if (!IsSqlWordChar(sc.ch, sqlAllowDottedWord)) {
 				const int nextState = SCE_SQL_DEFAULT;
 				char s[128];
-				const char chNext = LexGetNextChar(sc.currentPos, styler);
+				const int chNext = sc.GetNextNSChar();
 				sc.GetCurrentLowered(s, sizeof(s));
 				if (keywords1.InList(s)) {
 					if (chNext == '(' && strcmp(s, "repeat") == 0) {
