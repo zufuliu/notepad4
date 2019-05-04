@@ -222,7 +222,7 @@
     <ClCompile Include="..\..\scintilla\lexers\LexRuby.cxx">
       <Filter>Scintilla\lexers</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\scintilla\lexers\LexRuby.cxx">
+    <ClCompile Include="..\..\scintilla\lexers\LexSQL.cxx">
       <Filter>Scintilla\lexers</Filter>
     </ClCompile>
     <ClCompile Include="..\..\scintilla\lexers\LexTCL.cxx">

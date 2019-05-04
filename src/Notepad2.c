@@ -1305,7 +1305,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 #if NP2_ENABLE_DOT_LOG_FEATURE
 					 else if (SendMessage(hwndEdit, SCI_GETLENGTH, 0, 0) >= 4) {
 						char tch[5] = "";
-						SendMessage(hwndEdit, SCI_GETTEXT, 5, (LPARAM)tch);
+						SendMessage(hwndEdit, SCI_GETTEXT, COUNTOF(tch), (LPARAM)tch);
 						if (StrEqual(tch, ".LOG")) {
 							int iNewTopLine;
 							SendMessage(hwndEdit, SCI_SETSEL, iAnchorPos, iCurPos);
@@ -2445,7 +2445,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 #if NP2_ENABLE_DOT_LOG_FEATURE
 				if (SendMessage(hwndEdit, SCI_GETLENGTH, 0, 0) >= 4) {
 					char tch[5] = "";
-					SendMessage(hwndEdit, SCI_GETTEXT, 5, (LPARAM)tch);
+					SendMessage(hwndEdit, SCI_GETTEXT, COUNTOF(tch), (LPARAM)tch);
 					if (StrEqual(tch, ".LOG")) {
 						SendMessage(hwndEdit, SCI_SETSEL, iAnchorPos, iCurPos);
 						SendMessage(hwndEdit, SCI_ENSUREVISIBLE, iDocTopLine, 0);
@@ -7016,7 +7016,7 @@ BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect, LPCWST
 		// the .LOG feature ...
 		if (SendMessage(hwndEdit, SCI_GETLENGTH, 0, 0) >= 4) {
 			char tchLog[5] = "";
-			SendMessage(hwndEdit, SCI_GETTEXT, 5, (LPARAM)tchLog);
+			SendMessage(hwndEdit, SCI_GETTEXT, COUNTOF(tch), (LPARAM)tchLog);
 			if (StrEqual(tchLog, ".LOG")) {
 				EditJumpTo(hwndEdit, -1, 0);
 				SendMessage(hwndEdit, SCI_BEGINUNDOACTION, 0, 0);
@@ -7067,9 +7067,9 @@ BOOL FileSave(BOOL bSaveAlways, BOOL bAsk, BOOL bSaveAs, BOOL bSaveCopy) {
 		const int cchText = (int)SendMessage(hwndEdit, SCI_GETLENGTH, 0, 0);
 		if (cchText == 0) {
 			bIsEmptyNewFile = TRUE;
-		} else if (cchText < 2047) {
-			char tchText[2048];
-			SendMessage(hwndEdit, SCI_GETTEXT, 2047, (LPARAM)tchText);
+		} else if (cchText < 2048) {
+			char tchText[2048] = "";
+			SendMessage(hwndEdit, SCI_GETTEXT, COUNTOF(tchText), (LPARAM)tchText);
 			StrTrimA(tchText, " \t\n\r");
 			if (StrIsEmptyA(tchText)) {
 				bIsEmptyNewFile = TRUE;

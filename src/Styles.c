@@ -1595,7 +1595,7 @@ PEDITLEXER Style_SniffShebang(char *pchText) {
 int Style_GetDocTypeLanguage(void) {
 	char *p;
 	char tchText[4096] = ""; // maybe contains header comments
-	SendMessage(hwndEdit, SCI_GETTEXT, COUNTOF(tchText) - 1, (LPARAM)tchText);
+	SendMessage(hwndEdit, SCI_GETTEXT, COUNTOF(tchText), (LPARAM)tchText);
 
 	// check DOCTYPE
 	if ((p = strstr(tchText, "!DOCTYPE")) != NULL) {
@@ -1798,7 +1798,7 @@ BOOL MatchCPPKeyword(const char *p, int index) {
 
 PEDITLEXER Style_DetectObjCAndMatlab(void) {
 	char tchText[4096] = ""; // maybe contains header comments
-	SendMessage(hwndEdit, SCI_GETTEXT, COUNTOF(tchText) - 2, (LPARAM)tchText);
+	SendMessage(hwndEdit, SCI_GETTEXT, COUNTOF(tchText), (LPARAM)tchText);
 
 	char *p = tchText;
 	np2LexLangIndex = 0;
@@ -1862,7 +1862,7 @@ PEDITLEXER Style_DetectObjCAndMatlab(void) {
 
 PEDITLEXER Style_AutoDetect(PEDITLEXER pLexNew, BOOL bDotFile) {
 	char tchText[4096] = ""; // maybe contains header comments
-	SendMessage(hwndEdit, SCI_GETTEXT, COUNTOF(tchText) - 2, (LPARAM)tchText);
+	SendMessage(hwndEdit, SCI_GETTEXT, COUNTOF(tchText), (LPARAM)tchText);
 
 	char *p = tchText;
 	const BOOL shebang = *p == '#' && p[1] == '!';
@@ -2199,8 +2199,8 @@ static PEDITLEXER Style_GetLexerFromFile(HWND hwnd, LPCWSTR lpszFile, BOOL bCGIG
 		}
 
 		if (!bFound && bCGIGuess && (StrCaseEqual(lpszExt, L"cgi") || StrCaseEqual(lpszExt, L"fcgi"))) {
-			char tchText[256];
-			SendMessage(hwnd, SCI_GETTEXT, COUNTOF(tchText) - 1, (LPARAM)tchText);
+			char tchText[256] = "";
+			SendMessage(hwnd, SCI_GETTEXT, COUNTOF(tchText), (LPARAM)tchText);
 			StrTrimA(tchText, " \t\n\r");
 			pLexNew = Style_SniffShebang(tchText);
 			bFound = pLexNew != NULL;
@@ -2328,8 +2328,8 @@ void Style_SetLexerFromFile(HWND hwnd, LPCWSTR lpszFile) {
 
 	// xml/html
 	if ((!bFound && bAutoSelect && (!fNoHTMLGuess || !fNoCGIGuess)) || (bFound && pLexNew->rid == NP2LEX_PHP)) {
-		char tchText[256];
-		SendMessage(hwnd, SCI_GETTEXT, COUNTOF(tchText) - 1, (LPARAM)tchText);
+		char tchText[256] = "";
+		SendMessage(hwnd, SCI_GETTEXT, COUNTOF(tchText), (LPARAM)tchText);
 		StrTrimA(tchText, " \t\n\r");
 		if (pLexNew->rid == NP2LEX_PHP) {
 			if (strncmp(tchText, "<?php", 5) != 0) {
@@ -2356,8 +2356,8 @@ void Style_SetLexerFromFile(HWND hwnd, LPCWSTR lpszFile) {
 		MultiByteToWideChar(cpEdit, 0, fvCurFile.tchMode, -1, wchMode, COUNTOF(wchMode));
 
 		if (!fNoCGIGuess && (StrCaseEqual(wchMode, L"cgi") || StrCaseEqual(wchMode, L"fcgi"))) {
-			char tchText[256];
-			SendMessage(hwnd, SCI_GETTEXT, COUNTOF(tchText) - 1, (LPARAM)tchText);
+			char tchText[256] = "";
+			SendMessage(hwnd, SCI_GETTEXT, COUNTOF(tchText), (LPARAM)tchText);
 			StrTrimA(tchText, " \t\n\r");
 			if ((pLexSniffed = Style_SniffShebang(tchText)) != NULL) {
 				if (iEncoding != g_DOSEncoding || pLexSniffed != &lexTextFile
