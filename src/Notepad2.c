@@ -927,6 +927,15 @@ void OnDropOneFile(HWND hwnd, LPCWSTR szBuf) {
 	}
 }
 
+#if NP2_ENABLE_DOT_LOG_FEATURE
+static inline BOOL IsFileStartsWithDotLog(HWND hwnd) {
+	char tch[5] = "";
+	const int len = (int)SendMessage(hwnd, SCI_GETTEXT, COUNTOF(tch), (LPARAM)tch);
+	// upper case
+	return len >= 4 && strncmp(tch, ".LOG", 4) == 0;
+}
+#endif
+
 //=============================================================================
 //
 // MainWndProc()
@@ -1303,17 +1312,13 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 						EditEnsureSelectionVisible(hwndEdit);
 					}
 #if NP2_ENABLE_DOT_LOG_FEATURE
-					 else if (SendMessage(hwndEdit, SCI_GETLENGTH, 0, 0) >= 4) {
-						char tch[5] = "";
-						SendMessage(hwndEdit, SCI_GETTEXT, COUNTOF(tch), (LPARAM)tch);
-						if (StrEqual(tch, ".LOG")) {
-							int iNewTopLine;
-							SendMessage(hwndEdit, SCI_SETSEL, iAnchorPos, iCurPos);
-							SendMessage(hwndEdit, SCI_ENSUREVISIBLE, iDocTopLine, 0);
-							iNewTopLine = (int)SendMessage(hwndEdit, SCI_GETFIRSTVISIBLELINE, 0, 0);
-							SendMessage(hwndEdit, SCI_LINESCROLL, 0, iVisTopLine - iNewTopLine);
-							SendMessage(hwndEdit, SCI_SETXOFFSET, iXOffset, 0);
-						}
+					 else if (IsFileStartsWithDotLog(hwndEdit)) {
+						int iNewTopLine;
+						SendMessage(hwndEdit, SCI_SETSEL, iAnchorPos, iCurPos);
+						SendMessage(hwndEdit, SCI_ENSUREVISIBLE, iDocTopLine, 0);
+						iNewTopLine = (int)SendMessage(hwndEdit, SCI_GETFIRSTVISIBLELINE, 0, 0);
+						SendMessage(hwndEdit, SCI_LINESCROLL, 0, iVisTopLine - iNewTopLine);
+						SendMessage(hwndEdit, SCI_SETXOFFSET, iXOffset, 0);
 					}
 #endif
 				}
@@ -1786,7 +1791,7 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) {
 #if NP2_ENABLE_CUSTOMIZE_TOOLBAR_LABELS
 	// Load toolbar labels
 	IniSection section;
-	WCHAR *pIniSectionBuf = NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_size_tOOLBAR_LABELS);
+	WCHAR *pIniSectionBuf = (WCHAR *)NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_TOOLBAR_LABELS);
 	const int cchIniSection = (int)(NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR));
 	IniSection *pIniSection = &section;
 
@@ -2443,16 +2448,12 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			iWeakSrcEncoding = iEncoding;
 			if (FileLoad(TRUE, FALSE, TRUE, FALSE, szCurFile)) {
 #if NP2_ENABLE_DOT_LOG_FEATURE
-				if (SendMessage(hwndEdit, SCI_GETLENGTH, 0, 0) >= 4) {
-					char tch[5] = "";
-					SendMessage(hwndEdit, SCI_GETTEXT, COUNTOF(tch), (LPARAM)tch);
-					if (StrEqual(tch, ".LOG")) {
-						SendMessage(hwndEdit, SCI_SETSEL, iAnchorPos, iCurPos);
-						SendMessage(hwndEdit, SCI_ENSUREVISIBLE, iDocTopLine, 0);
-						const int iNewTopLine = (int)SendMessage(hwndEdit, SCI_GETFIRSTVISIBLELINE, 0, 0);
-						SendMessage(hwndEdit, SCI_LINESCROLL, 0, iVisTopLine - iNewTopLine);
-						SendMessage(hwndEdit, SCI_SETXOFFSET, iXOffset, 0);
-					}
+				if (IsFileStartsWithDotLog(hwndEdit)) {
+					SendMessage(hwndEdit, SCI_SETSEL, iAnchorPos, iCurPos);
+					SendMessage(hwndEdit, SCI_ENSUREVISIBLE, iDocTopLine, 0);
+					const int iNewTopLine = (int)SendMessage(hwndEdit, SCI_GETFIRSTVISIBLELINE, 0, 0);
+					SendMessage(hwndEdit, SCI_LINESCROLL, 0, iVisTopLine - iNewTopLine);
+					SendMessage(hwndEdit, SCI_SETXOFFSET, iXOffset, 0);
 				}
 #endif
 			}
@@ -7013,21 +7014,16 @@ BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect, LPCWST
 			EditEnsureSelectionVisible(hwndEdit);
 		}
 #if NP2_ENABLE_DOT_LOG_FEATURE
-		// the .LOG feature ...
-		if (SendMessage(hwndEdit, SCI_GETLENGTH, 0, 0) >= 4) {
-			char tchLog[5] = "";
-			SendMessage(hwndEdit, SCI_GETTEXT, COUNTOF(tchLog), (LPARAM)tchLog);
-			if (StrEqual(tchLog, ".LOG")) {
-				EditJumpTo(hwndEdit, -1, 0);
-				SendMessage(hwndEdit, SCI_BEGINUNDOACTION, 0, 0);
-				SendMessage(hwndEdit, SCI_NEWLINE, 0, 0);
-				SendWMCommand(hwndMain, IDM_EDIT_INSERT_SHORTDATE);
-				EditJumpTo(hwndEdit, -1, 0);
-				SendMessage(hwndEdit, SCI_NEWLINE, 0, 0);
-				SendMessage(hwndEdit, SCI_ENDUNDOACTION, 0, 0);
-				EditJumpTo(hwndEdit, -1, 0);
-				EditEnsureSelectionVisible(hwndEdit);
-			}
+		if (IsFileStartsWithDotLog(hwndEdit)) {
+			EditJumpTo(hwndEdit, -1, 0);
+			SendMessage(hwndEdit, SCI_BEGINUNDOACTION, 0, 0);
+			SendMessage(hwndEdit, SCI_NEWLINE, 0, 0);
+			SendWMCommand(hwndMain, IDM_EDIT_INSERT_SHORTDATE);
+			EditJumpTo(hwndEdit, -1, 0);
+			SendMessage(hwndEdit, SCI_NEWLINE, 0, 0);
+			SendMessage(hwndEdit, SCI_ENDUNDOACTION, 0, 0);
+			EditJumpTo(hwndEdit, -1, 0);
+			EditEnsureSelectionVisible(hwndEdit);
 		}
 #endif
 
