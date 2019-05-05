@@ -7016,7 +7016,7 @@ BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect, LPCWST
 		// the .LOG feature ...
 		if (SendMessage(hwndEdit, SCI_GETLENGTH, 0, 0) >= 4) {
 			char tchLog[5] = "";
-			SendMessage(hwndEdit, SCI_GETTEXT, COUNTOF(tch), (LPARAM)tchLog);
+			SendMessage(hwndEdit, SCI_GETTEXT, COUNTOF(tchLog), (LPARAM)tchLog);
 			if (StrEqual(tchLog, ".LOG")) {
 				EditJumpTo(hwndEdit, -1, 0);
 				SendMessage(hwndEdit, SCI_BEGINUNDOACTION, 0, 0);
