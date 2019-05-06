@@ -12,10 +12,6 @@ hg clone http://hg.code.sf.net/p/scintilla/scite
 4.1.5
 2019-05-04 5199:be75a67147c5
 
-Notepad++ (GPL v2)
-https://github.com/notepad-plus-plus/notepad-plus-plus.git
-Binary Clipboard format ("Notepad++ Binary Text Length")
-
 Notepad3 (3-clause BSD)
 https://github.com/rizonesoft/Notepad3
 

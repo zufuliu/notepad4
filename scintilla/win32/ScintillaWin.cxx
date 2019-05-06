@@ -196,8 +196,6 @@ inline void LazyGetClipboardFormat(UINT &fmt, LPCWSTR name) noexcept {
 	}
 }
 
-#define CFSTR_NPPTEXTLEN		L"Notepad++ Binary Text Length"
-
 }
 
 class ScintillaWin; 	// Forward declaration for COM interface subobjects
@@ -350,7 +348,6 @@ class ScintillaWin :
 	UINT cfBorlandIDEBlockType;
 	UINT cfLineSelect;
 	UINT cfVSLineTag;
-	UINT cfNPPTextLen = 0;
 
 #if EnableDrop_VisualStudioProjectItem
 	CLIPFORMAT cfVSStgProjectItem;
@@ -2397,29 +2394,7 @@ void ScintillaWin::Paste(bool asBinary) {
 	}
 	const PasteShape pasteShape = isRectangular ? pasteRectangular : (isLine ? pasteLine : pasteStream);
 
-	if (asBinary && ::IsClipboardFormatAvailable(CF_TEXT)) {
-		unsigned long len = 0;
-		LazyGetClipboardFormat(cfNPPTextLen, CFSTR_NPPTEXTLEN);
-		if (::IsClipboardFormatAvailable(cfNPPTextLen)) {
-			GlobalMemory memNPPTextLen(::GetClipboardData(cfNPPTextLen));
-			if (memNPPTextLen) {
-				if (memNPPTextLen.Size() == sizeof(unsigned long)) {
-					len = static_cast<unsigned long *>(memNPPTextLen.ptr)[0];
-				}
-				memNPPTextLen.Unlock();
-			}
-		}
-		if (len != 0) {
-			GlobalMemory memSelection(::GetClipboardData(CF_TEXT));
-			if (memSelection) {
-				const char *ptr = static_cast<const char *>(memSelection.ptr);
-				if (ptr && memSelection.Size() == len + 1) {
-					InsertPaste(ptr, len);
-					asBinary = false;
-				}
-				memSelection.Unlock();
-			}
-		}
+	if (asBinary /*&& ::IsClipboardFormatAvailable(CF_TEXT)*/) {
 		if (!asBinary) {
 			::CloseClipboard();
 			Redraw();
@@ -2965,13 +2940,6 @@ void ScintillaWin::CopyToClipboard(const SelectionText &selectedText) {
 	}
 
 	if (selectedText.asBinary) {
-		GlobalMemory nppTextLen;
-		nppTextLen.Allocate(sizeof(unsigned long));
-		if (nppTextLen) {
-			LazyGetClipboardFormat(cfNPPTextLen, CFSTR_NPPTEXTLEN);
-			static_cast<unsigned long *>(nppTextLen.ptr)[0] = static_cast<unsigned long>(selectedText.Length());
-			nppTextLen.SetClip(cfNPPTextLen);
-		}
 	}
 
 	::CloseClipboard();

@@ -2148,14 +2148,14 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	const BOOL nonEmpty = SciCall_GetLength() != 0;
 
 	EnableCmd(hmenu, IDM_EDIT_CUT, i /*&& !bReadOnly*/);
-	EnableCmd(hmenu, IDM_EDIT_CUT_BINARY, i /*&& !bReadOnly*/);
+	//EnableCmd(hmenu, IDM_EDIT_CUT_BINARY, i /*&& !bReadOnly*/);
 	EnableCmd(hmenu, IDM_EDIT_COPY, i /*&& !bReadOnly*/);
-	EnableCmd(hmenu, IDM_EDIT_COPY_BINARY, i /*&& !bReadOnly*/);
+	//EnableCmd(hmenu, IDM_EDIT_COPY_BINARY, i /*&& !bReadOnly*/);
 	EnableCmd(hmenu, IDM_EDIT_COPYALL, nonEmpty /*&& !bReadOnly*/);
 	EnableCmd(hmenu, IDM_EDIT_SELECTALL, nonEmpty);
 	EnableCmd(hmenu, IDM_EDIT_COPYADD, i /*&& !bReadOnly*/);
 	EnableCmd(hmenu, IDM_EDIT_PASTE, canPaste /*&& !bReadOnly*/);
-	EnableCmd(hmenu, IDM_EDIT_PASTE_BINARY, canPaste /*&& !bReadOnly*/);
+	//EnableCmd(hmenu, IDM_EDIT_PASTE_BINARY, canPaste /*&& !bReadOnly*/);
 	EnableCmd(hmenu, IDM_EDIT_SWAP, i || canPaste /*&& !bReadOnly*/);
 	EnableCmd(hmenu, IDM_EDIT_DELETE, nonEmpty /*&& !bReadOnly*/);
 	EnableCmd(hmenu, IDM_EDIT_CLEARDOCUMENT, nonEmpty /*&& !bReadOnly*/);
@@ -2817,7 +2817,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	case IDM_EDIT_CUT:
-	case IDM_EDIT_CUT_BINARY:
+	//case IDM_EDIT_CUT_BINARY:
 		if (flagPasteBoard) {
 			bLastCopyFromMe = TRUE;
 		}
@@ -2825,7 +2825,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	case IDM_EDIT_COPY:
-	case IDM_EDIT_COPY_BINARY:
+	//case IDM_EDIT_COPY_BINARY:
 		if (flagPasteBoard) {
 			bLastCopyFromMe = TRUE;
 		}
@@ -2850,7 +2850,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	case IDM_EDIT_PASTE:
-	case IDM_EDIT_PASTE_BINARY:
+	//case IDM_EDIT_PASTE_BINARY:
 		SendMessage(hwndEdit, SCI_PASTE, (LOWORD(wParam) == IDM_EDIT_PASTE_BINARY), 0);
 		break;
 
