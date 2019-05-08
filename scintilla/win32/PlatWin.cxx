@@ -3251,22 +3251,17 @@ LRESULT PASCAL ListBoxX::StaticWndProc(
 namespace {
 
 bool ListBoxX_Register() noexcept {
-	WNDCLASSEX wndclassc;
+	WNDCLASSEX wndclassc {};
 	wndclassc.cbSize = sizeof(wndclassc);
 	// We need CS_HREDRAW and CS_VREDRAW because of the ellipsis that might be drawn for
 	// truncated items in the list and the appearance/disappearance of the vertical scroll bar.
 	// The list repaint is double-buffered to avoid the flicker this would otherwise cause.
 	wndclassc.style = CS_GLOBALCLASS | CS_HREDRAW | CS_VREDRAW;
-	wndclassc.cbClsExtra = 0;
 	wndclassc.cbWndExtra = sizeof(ListBoxX *);
 	wndclassc.hInstance = hinstPlatformRes;
-	wndclassc.hIcon = nullptr;
-	wndclassc.hbrBackground = nullptr;
-	wndclassc.lpszMenuName = nullptr;
 	wndclassc.lpfnWndProc = ListBoxX::StaticWndProc;
 	wndclassc.hCursor = ::LoadCursor(nullptr, IDC_ARROW);
 	wndclassc.lpszClassName = ListBoxX_ClassName;
-	wndclassc.hIconSm = nullptr;
 
 	return ::RegisterClassEx(&wndclassc) != 0;
 }

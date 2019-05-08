@@ -3469,37 +3469,26 @@ bool ScintillaWin::Register(HINSTANCE hInstance_) noexcept {
 
 	// Register the Scintilla class
 	// Register Scintilla as a wide character window
-	WNDCLASSEXW wndclass;
+	WNDCLASSEXW wndclass {};
 	wndclass.cbSize = sizeof(wndclass);
 	wndclass.style = CS_GLOBALCLASS | CS_HREDRAW | CS_VREDRAW;
 	wndclass.lpfnWndProc = ScintillaWin::SWndProc;
-	wndclass.cbClsExtra = 0;
 	wndclass.cbWndExtra = sizeof(ScintillaWin *);
 	wndclass.hInstance = hInstance;
-	wndclass.hIcon = nullptr;
-	wndclass.hCursor = nullptr;
-	wndclass.hbrBackground = nullptr;
-	wndclass.lpszMenuName = nullptr;
 	wndclass.lpszClassName = L"Scintilla";
-	wndclass.hIconSm = nullptr;
 	scintillaClassAtom = ::RegisterClassExW(&wndclass);
 	bool result = 0 != scintillaClassAtom;
 
 	if (result) {
 		// Register the CallTip class
-		WNDCLASSEX wndclassc;
+		WNDCLASSEX wndclassc {};
 		wndclassc.cbSize = sizeof(wndclassc);
 		wndclassc.style = CS_GLOBALCLASS | CS_HREDRAW | CS_VREDRAW;
-		wndclassc.cbClsExtra = 0;
 		wndclassc.cbWndExtra = sizeof(ScintillaWin *);
 		wndclassc.hInstance = hInstance;
-		wndclassc.hIcon = nullptr;
-		wndclassc.hbrBackground = nullptr;
-		wndclassc.lpszMenuName = nullptr;
 		wndclassc.lpfnWndProc = ScintillaWin::CTWndProc;
 		wndclassc.hCursor = ::LoadCursor(nullptr, IDC_ARROW);
 		wndclassc.lpszClassName = callClassName;
-		wndclassc.hIconSm = nullptr;
 
 		callClassAtom = ::RegisterClassEx(&wndclassc);
 		result = 0 != callClassAtom;

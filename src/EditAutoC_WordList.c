@@ -2,12 +2,12 @@
 // scintilla/src/AutoComplete.h AutoComplete::maxItemLen
 #define NP2_AUTOC_MAX_WORD_LENGTH	(1024 - 3 - 1 - 16)	// SP + '(' + ')' + '\0'
 #define NP2_AUTOC_INIT_BUF_SIZE		(4096)
-#define NP2_AUTOC_MAX_BUF_COUNT		16
+#define NP2_AUTOC_MAX_BUF_COUNT		18
 #define NP2_AUTOC_INIT_CACHE_BYTES	(4096)
 #define NP2_AUTOC_MAX_CACHE_COUNT	16
 /*
 word buffer:
-(2**16 - 1)*4096 => 256 MiB
+(2**18 - 1)*4096 => 1 GiB
 
 node cache:
 a = [4096*2**i for i in range(16)] => 256 MiB
