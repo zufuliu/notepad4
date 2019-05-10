@@ -646,7 +646,7 @@ const unsigned char CharClassify::CharClassifyTable[] = {
 
 unsigned char CharClassify::classifyMap[0xffff + 1];
 
-void CharClassify::InitClassifyMap() noexcept {
+void CharClassify::InitUnicodeData() noexcept {
 	ExpandRLE(CharClassifyRLE_BMP, classifyMap);
 #ifndef NDEBUG // Debug test only
 	DBCSCharClassify::Get(932);
