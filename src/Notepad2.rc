@@ -344,10 +344,10 @@ BEGIN
 			//MENUITEM "Select &Word\tCtrl+SP",						IDM_EDIT_SELECTWORD
 			//MENUITEM "Select &Line\tCtrl+Shift+SP",				IDM_EDIT_SELECTLINE
 			MENUITEM SEPARATOR
-			MENUITEM "Select to En&d",								IDM_EDIT_SELTOEND
-			MENUITEM "Select to Be&gin",							IDM_EDIT_SELTOBEGIN
+			MENUITEM "Select to Document Star&t",					IDM_EDIT_SELTODOCSTART
+			MENUITEM "Select to Document En&d",						IDM_EDIT_SELTODOCEND
 			MENUITEM "Select to Ne&xt\tCtrl+Alt+F2",				IDM_EDIT_SELTONEXT
-			MENUITEM "Select to Pre&vious\tCtrl+Alt+Shift+F2",		IDM_EDIT_SELTOPREV
+			MENUITEM "Select to Previou&s\tCtrl+Alt+Shift+F2",		IDM_EDIT_SELTOPREV
 			MENUITEM "&Jump to Selection Start\tAlt+,",				CMD_JUMP2SELSTART
 			MENUITEM "J&ump to Selection End\tAlt+.",				CMD_JUMP2SELEND
 		END

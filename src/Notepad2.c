@@ -2253,8 +2253,8 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	EnableCmd(hmenu, IDM_EDIT_REPLACENEXT, i);
 	//EnableCmd(hmenu, IDM_EDIT_SELECTWORD, i);
 	//EnableCmd(hmenu, IDM_EDIT_SELECTLINE, i);
-	EnableCmd(hmenu, IDM_EDIT_SELTOEND, i);
-	EnableCmd(hmenu, IDM_EDIT_SELTOBEGIN, i);
+	EnableCmd(hmenu, IDM_EDIT_SELTODOCEND, i);
+	EnableCmd(hmenu, IDM_EDIT_SELTODOCSTART, i);
 	EnableCmd(hmenu, IDM_EDIT_SELTONEXT, i && StrNotEmptyA(efrData.szFind));
 	EnableCmd(hmenu, IDM_EDIT_SELTOPREV, i && StrNotEmptyA(efrData.szFind));
 	EnableCmd(hmenu, IDM_EDIT_FINDMATCHINGBRACE, i);
@@ -3636,11 +3636,11 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		}
 		break;
 
-	case IDM_EDIT_SELTOEND:
-	case IDM_EDIT_SELTOBEGIN: {
+	case IDM_EDIT_SELTODOCEND:
+	case IDM_EDIT_SELTODOCSTART: {
 		int selStart;
 		int selEnd;
-		if (LOWORD(wParam) == IDM_EDIT_SELTOEND) {
+		if (LOWORD(wParam) == IDM_EDIT_SELTODOCEND) {
 			selStart = (int)SendMessage(hwndEdit, SCI_GETSELECTIONSTART, 0, 0);
 			selEnd = (int)SendMessage(hwndEdit, SCI_GETLENGTH, 0, 0);
 		} else {
