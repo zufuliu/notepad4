@@ -483,7 +483,7 @@ class SurfaceGDI : public Surface {
 
 	int codePage = 0;
 
-	void BrushColor(ColourDesired back) noexcept;
+	void BrushColour(ColourDesired back) noexcept;
 	void SetFont(const Font &font_) noexcept;
 	void Clear() noexcept;
 
@@ -621,7 +621,7 @@ void SurfaceGDI::PenColour(ColourDesired fore) noexcept {
 	penOld = SelectPen(hdc, pen);
 }
 
-void SurfaceGDI::BrushColor(ColourDesired back) noexcept {
+void SurfaceGDI::BrushColour(ColourDesired back) noexcept {
 	if (brush) {
 		::SelectObject(hdc, brushOld);
 		::DeleteObject(brush);
@@ -662,7 +662,7 @@ void SurfaceGDI::LineTo(int x_, int y_) noexcept {
 
 void SurfaceGDI::Polygon(const Point *pts, size_t npts, ColourDesired fore, ColourDesired back) {
 	PenColour(fore);
-	BrushColor(back);
+	BrushColour(back);
 	std::vector<POINT> outline;
 	outline.reserve(npts);
 	for (size_t i = 0; i < npts; i++) {
@@ -674,7 +674,7 @@ void SurfaceGDI::Polygon(const Point *pts, size_t npts, ColourDesired fore, Colo
 
 void SurfaceGDI::RectangleDraw(PRectangle rc, ColourDesired fore, ColourDesired back) noexcept {
 	PenColour(fore);
-	BrushColor(back);
+	BrushColour(back);
 	const RECT rcw = RectFromPRectangle(rc);
 	::Rectangle(hdc, rcw.left, rcw.top, rcw.right, rcw.bottom);
 }
@@ -700,7 +700,7 @@ void SurfaceGDI::FillRectangle(PRectangle rc, Surface &surfacePattern) noexcept 
 
 void SurfaceGDI::RoundedRectangle(PRectangle rc, ColourDesired fore, ColourDesired back) noexcept {
 	PenColour(fore);
-	BrushColor(back);
+	BrushColour(back);
 	const RECT rcw = RectFromPRectangle(rc);
 	::RoundRect(hdc,
 		rcw.left + 1, rcw.top,
@@ -794,7 +794,7 @@ void SurfaceGDI::AlphaRectangle(PRectangle rc, int cornerSize, ColourDesired fil
 		}
 		::DeleteDC(hMemDC);
 	} else {
-		BrushColor(outline);
+		BrushColour(outline);
 		FrameRect(hdc, &rcw, brush);
 	}
 }
@@ -851,7 +851,7 @@ void SurfaceGDI::DrawRGBAImage(PRectangle rc, int width, int height, const unsig
 
 void SurfaceGDI::Ellipse(PRectangle rc, ColourDesired fore, ColourDesired back) noexcept {
 	PenColour(fore);
-	BrushColor(back);
+	BrushColour(back);
 	const RECT rcw = RectFromPRectangle(rc);
 	::Ellipse(hdc, rcw.left, rcw.top, rcw.right, rcw.bottom);
 }
@@ -2480,7 +2480,7 @@ public:
 		}
 	}
 	void SetFont(const Font &font) noexcept override;
-	void SetColor(ColourDesired fore, ColourDesired back) noexcept override;
+	void SetColour(ColourDesired fore, ColourDesired back) noexcept override;
 	void Create(Window &parent_, int ctrlID_, Point location_, int lineHeight_, bool unicodeMode_, int technology_) noexcept override;
 	void SetAverageCharWidth(int width) noexcept override;
 	void SetVisibleRows(int rows) noexcept override;
@@ -2548,7 +2548,7 @@ void ListBoxX::SetFont(const Font &font) noexcept {
 	}
 }
 
-void ListBoxX::SetColor(ColourDesired fore, ColourDesired back) noexcept {
+void ListBoxX::SetColour(ColourDesired fore, ColourDesired back) noexcept {
 	if (hbrBackground) {
 		::DeleteObject(hbrBackground);
 		hbrBackground = nullptr;

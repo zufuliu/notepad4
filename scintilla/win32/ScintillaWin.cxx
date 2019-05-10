@@ -3705,7 +3705,7 @@ LRESULT PASCAL ScintillaWin::SWndProc(
 int Scintilla_RegisterClasses(void *hInstance) {
 	Platform_Initialise(hInstance);
 	const bool result = ScintillaWin::Register(static_cast<HINSTANCE>(hInstance));
-	CharClassify::InitClassifyMap();
+	CharClassify::InitUnicodeData();
 #ifdef SCI_LEXER
 	Scintilla_LinkLexers();
 #endif
