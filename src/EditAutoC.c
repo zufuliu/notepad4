@@ -285,6 +285,32 @@ static inline BOOL IsStringFormatChar(int ch, int style) {
 	return FALSE;
 }
 
+static inline BOOL IsEscapeCharEx(int ch, int style) {
+	if (!IsEscapeChar(ch)) {
+		return FALSE;
+	}
+	switch (pLexCurrent->iLexer) {
+	case SCLEX_NULL:
+	case SCLEX_BATCH:
+	case SCLEX_CONF:
+	case SCLEX_DIFF:
+	case SCLEX_MAKEFILE:
+	case SCLEX_PROPERTIES:
+		return FALSE;
+
+	case SCLEX_CPP:
+		return !(style == SCE_C_STRINGRAW || style == SCE_C_VERBATIM
+			|| style == SCE_C_COMMENTDOC_TAG
+			|| (pLexCurrent->rid == NP2LEX_JS && style == SCE_C_DSTRINGB));
+
+	case SCLEX_PYTHON:
+		return !(style == SCE_PY_RAW_STRING1 || style == SCE_PY_RAW_STRING2
+			|| style == SCE_PY_RAW_BYTES1 || style == SCE_PY_RAW_BYTES2
+			|| style == SCE_PY_FMT_STRING1 || style == SCE_PY_FMT_STRING2);
+	}
+	return TRUE;
+}
+
 static inline BOOL NeedSpaceAfterKeyword(const char *word, Sci_Position length) {
 	const char *p = strstr(
 		" if for try using while elseif switch foreach synchronized "
@@ -451,7 +477,7 @@ void AutoC_AddDocWord(struct WordList *pWList, BOOL bIgnoreCase, char prefix) {
 					if (ch == '\\') { // word after escape char
 						before = SciCall_PositionBefore(before);
 						const int chPrev = (before + 2 == iPosFind) ? SciCall_GetCharAt(before) : 0;
-						if (chPrev != '\\' && IsEscapeChar(*pWord)) {
+						if (chPrev != '\\' && IsEscapeCharEx(*pWord, SciCall_GetStyleAt(before))) {
 							pWord++;
 							--wordLength;
 							bChanged = TRUE;
@@ -708,7 +734,7 @@ void EditCompleteWord(HWND hwnd, BOOL autoInsert) {
 			if (before2 >= iLineStartPos && before2 + 1 == before) {
 				chPrev2 = SciCall_GetCharAt(before2);
 			}
-			if ((chPrev == '\\' && chPrev2 != '\\' && IsEscapeChar(ch)) // word after escape char
+			if ((chPrev == '\\' && chPrev2 != '\\' && IsEscapeCharEx(ch, SciCall_GetStyleAt(before))) // word after escape char
 				// word after format char
 				|| (chPrev == '%' && IsStringFormatChar(ch, SciCall_GetStyleAt(before)))) {
 				++iStartWordPos;
