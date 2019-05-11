@@ -171,6 +171,18 @@ public:
 		right += xDelta;
 		bottom += yDelta;
 	}
+	constexpr PRectangle Inflate(XYPOSITION xDelta, XYPOSITION yDelta) const noexcept {
+		return PRectangle(left - xDelta, top - yDelta, right + xDelta, bottom + yDelta);
+	}
+	constexpr PRectangle Inflate(int xDelta, int yDelta) const noexcept {
+		return PRectangle(left - xDelta, top - yDelta, right + xDelta, bottom + yDelta);
+	}
+	constexpr PRectangle Deflate(XYPOSITION xDelta, XYPOSITION yDelta) const noexcept {
+		return PRectangle(left + xDelta, top + yDelta, right - xDelta, bottom - yDelta);
+	}
+	constexpr PRectangle Deflate(int xDelta, int yDelta) const noexcept {
+		return PRectangle(left + xDelta, top + yDelta, right - xDelta, bottom - yDelta);
+	}
 	XYPOSITION Width() const noexcept {
 		return right - left;
 	}
