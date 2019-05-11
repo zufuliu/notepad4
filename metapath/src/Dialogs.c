@@ -621,6 +621,10 @@ static INT_PTR CALLBACK GeneralPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LPA
 			case IDC_CLEARWINPOS:
 				ClearWindowPositionHistory();
 				break;
+
+			case IDC_ABOUT:
+				ThemedDialogBox(g_hInstance, MAKEINTRESOURCE(IDD_ABOUT), hwnd, AboutDlgProc);
+				break;
 			}
 			break;
 

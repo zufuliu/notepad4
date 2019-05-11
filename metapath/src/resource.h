@@ -82,6 +82,7 @@
 #define IDC_SAVESETTINGS				107
 #define IDC_CLEARWINPOS					108
 #define IDC_OPENFILE_SAME_WINDOW		109
+#define IDC_ABOUT						110
 
 // Advanced
 #define IDPP_ADVANCED					111

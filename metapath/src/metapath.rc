@@ -130,7 +130,6 @@ BEGIN
 		MENUITEM "Save Sett&ings",				IDM_VIEW_SAVESETTINGS
 		MENUITEM "Set&up Target...",			IDM_VIEW_FINDTARGET
 		MENUITEM "O&ptions...",					IDM_VIEW_OPTIONS
-		MENUITEM "&About metapath...",			IDM_VIEW_ABOUT
 	END
 	POPUP "+"
 	BEGIN
@@ -392,6 +391,7 @@ BEGIN
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,10,161,205,1
     CONTROL         "&Save settings on exit.",IDC_SAVESETTINGS,"Button",
                     BS_AUTOCHECKBOX | WS_TABSTOP,10,170,100,10
+    CONTROL			"<a>About metapath</a>",IDC_ABOUT,"SysLink",WS_TABSTOP,130,170,80,12
 END
 
 IDPP_ADVANCED DIALOGEX 0, 0, 232, 185
