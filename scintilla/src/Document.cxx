@@ -1641,10 +1641,10 @@ Sci::Position Document::ExtendWordSelect(Sci::Position pos, int delta, bool only
 				return MovePositionOutsideChar(pos, delta, true);
 			}
 		}
-		const int style = StyleAt(pos);
+		//const int style = StyleAt(pos);
 		while (pos > 0) {
 			const CharacterExtracted ce = CharacterBefore(pos);
-			if (StyleAt(pos - 1) != style || WordCharacterClass(ce.character) != ccStart)
+			if (/*StyleAt(pos - 1) != style || */WordCharacterClass(ce.character) != ccStart)
 				break;
 			pos -= ce.widthBytes;
 		}
@@ -1659,10 +1659,10 @@ Sci::Position Document::ExtendWordSelect(Sci::Position pos, int delta, bool only
 				return MovePositionOutsideChar(pos, delta, true);
 			}
 		}
-		const int style = StyleAt(pos - 1);
+		//const int style = StyleAt(pos - 1);
 		while (pos < Length()) {
 			const CharacterExtracted ce = CharacterAfter(pos);
-			if (StyleAt(pos) != style || WordCharacterClass(ce.character) != ccStart)
+			if (/*StyleAt(pos) != style || */WordCharacterClass(ce.character) != ccStart)
 				break;
 			pos += ce.widthBytes;
 		}
