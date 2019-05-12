@@ -6989,9 +6989,10 @@ BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect, LPCWST
 		bModified = FALSE;
 		UpdateStatusBarCache(STATUS_CODEPAGE);
 		UpdateStatusBarCache(STATUS_EOLMODE);
+		BOOL bUnknownFile = FALSE;
 		if (!lexerSpecified) { // flagLexerSpecified will be cleared
 			np2LexLangIndex = 0;
-			Style_SetLexerFromFile(hwndEdit, szCurFile);
+			bUnknownFile = !Style_SetLexerFromFile(hwndEdit, szCurFile);
 		}
 		if (!lexerSpecified) {
 			UpdateLineNumberWidth();
@@ -7034,10 +7035,14 @@ BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect, LPCWST
 			MsgBox(MBWARN, IDS_ERR_UNICODE);
 		}
 		// Show inconsistent line endings warning
-		// TODO: hide this warning for binary file
+		// Hide warning for binary file
+		if (bUnknownFile && Style_MaybeBinaryFile(hwndEdit, szCurFile)) {
+			return fSuccess;
+		}
 		if (status.bInconsistent && bWarnLineEndings) {
+			// Set default button to "No" for diff/patch and unknown file.
 			// diff/patch file may contains content from files with different line endings.
-			status.bLineEndingsDefaultNo = pLexCurrent->iLexer == SCLEX_DIFF;
+			status.bLineEndingsDefaultNo = bUnknownFile || pLexCurrent->iLexer == SCLEX_DIFF;
 			if (WarnLineEndingDlg(hwndMain, &status)) {
 				const int iNewEOLMode = iLineEndings[status.iEOLMode];
 				ConvertLineEndings(iNewEOLMode);

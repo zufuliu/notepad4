@@ -1860,7 +1860,7 @@ PEDITLEXER Style_DetectObjCAndMatlab(void) {
 	return NULL;
 }
 
-PEDITLEXER Style_AutoDetect(PEDITLEXER pLexNew, BOOL bDotFile) {
+PEDITLEXER Style_AutoDetect(BOOL bDotFile) {
 	char tchText[4096] = ""; // maybe contains header comments
 	SendMessage(hwndEdit, SCI_GETTEXT, COUNTOF(tchText), (LPARAM)tchText);
 
@@ -1917,7 +1917,7 @@ PEDITLEXER Style_AutoDetect(PEDITLEXER pLexNew, BOOL bDotFile) {
 	if (bDotFile) {
 		return &lexCONF;
 	}
-	return pLexNew;
+	return NULL;
 }
 
 //=============================================================================
@@ -2178,8 +2178,8 @@ extern BOOL fNoCGIGuess;
 extern BOOL fNoAutoDetection;
 extern FILEVARS fvCurFile;
 
-static PEDITLEXER Style_GetLexerFromFile(HWND hwnd, LPCWSTR lpszFile, BOOL bCGIGuess, LPWSTR *pszExt, BOOL *pDotFile) {
-	LPWSTR lpszExt = PathFindExtension(lpszFile);
+static PEDITLEXER Style_GetLexerFromFile(HWND hwnd, LPCWSTR lpszFile, BOOL bCGIGuess, LPCWSTR *pszExt, BOOL *pDotFile) {
+	LPCWSTR lpszExt = PathFindExtension(lpszFile);
 	const LPCWSTR lpszName = PathFindFileName(lpszFile);
 	BOOL bFound = FALSE;
 	PEDITLEXER pLexNew = NULL;
@@ -2311,7 +2311,7 @@ static PEDITLEXER Style_GetLexerFromFile(HWND hwnd, LPCWSTR lpszFile, BOOL bCGIG
 	return pLexNew;
 }
 
-void Style_SetLexerFromFile(HWND hwnd, LPCWSTR lpszFile) {
+BOOL Style_SetLexerFromFile(HWND hwnd, LPCWSTR lpszFile) {
 	BOOL bFound = TRUE;
 	BOOL bDotFile = FALSE;
 	LPWSTR lpszExt = NULL;
@@ -2389,14 +2389,19 @@ void Style_SetLexerFromFile(HWND hwnd, LPCWSTR lpszFile) {
 
 	if (!bFound && (!fNoAutoDetection || bDotFile)) {
 		if (!fNoAutoDetection) {
-			pLexNew = Style_AutoDetect(pLexNew, bDotFile);
+			if ((pLexSniffed = Style_AutoDetect(bDotFile)) != NULL) {
+				pLexNew = pLexSniffed;
+				bFound = TRUE;
+			}
 		} else {
 			pLexNew = &lexCONF;
+			bFound = TRUE;
 		}
 	}
 
 	// Apply the new lexer
 	Style_SetLexer(hwnd, pLexNew);
+	return bFound;
 }
 
 //=============================================================================
@@ -2421,6 +2426,56 @@ BOOL Style_CanOpenFile(LPCWSTR lpszFile) {
 	const LPCEDITLEXER pLexNew = Style_GetLexerFromFile(NULL, lpszFile, FALSE, &lpszExt, &bDotFile);
 	np2LexLangIndex = lang;
 	return pLexNew != NULL || StrIsEmpty(lpszExt) || bDotFile || StrCaseEqual(lpszExt, L"cgi") || StrCaseEqual(lpszExt, L"fcgi");
+}
+
+BOOL Style_MaybeBinaryFile(HWND hwnd, LPCWSTR lpszFile) {
+#if 1
+	UNREFERENCED_PARAMETER(hwnd);
+	UNREFERENCED_PARAMETER(lpszFile);
+#else
+	unsigned char buf[5] = {0}; // magic
+	SendMessage(hwnd, SCI_GETTEXT, COUNTOF(buf), (LPARAM)buf);
+	const UINT magic2 = (buf[0] << 8) | buf[1];
+	if (magic2 == 0x4D5A ||		// PE: MZ
+		magic2 == 0x504B ||		// ZIP: PK
+		magic2 == 0x377A ||		// 7z
+		magic2 == 0x424D		// BMP: BM
+		) {
+		return TRUE;
+	}
+
+	const UINT magic = (magic2 << 16) | (buf[2] << 8) | buf[3];
+	if (magic == 0x89504E47 ||	// PNG
+		magic == 0x47494638 ||	// GIF: GIF89a
+		magic == 0x25504446 ||	// PDF
+		magic == 0xCAFEBABE		// Java class
+		) {
+		return TRUE;
+	}
+
+	LPCWSTR lpszExt = PathFindExtension(lpszFile);
+	if (StrNotEmpty(lpszExt)) {
+		++lpszExt;
+		const int len = lstrlen(lpszExt);
+		if (len < 3 || len > 4) {
+			return FALSE;
+		}
+		LPCWSTR lpszMatch = StrStrI(
+			L" cur"
+			L" ico"
+			L" jpeg"
+			L" jpg"
+			L" lib"
+			L" obj"
+			L" pdb"
+			L" ", lpszExt);
+		// full match
+		if (lpszMatch != NULL && lpszMatch[-1] == L' ' && lpszMatch[len] == L' ') {
+			return TRUE;
+		}
+	}
+#endif
+	return FALSE;
 }
 
 void Style_SetLexerByLangIndex(HWND hwnd, int lang) {
