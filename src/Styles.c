@@ -2314,7 +2314,7 @@ static PEDITLEXER Style_GetLexerFromFile(HWND hwnd, LPCWSTR lpszFile, BOOL bCGIG
 BOOL Style_SetLexerFromFile(HWND hwnd, LPCWSTR lpszFile) {
 	BOOL bFound = TRUE;
 	BOOL bDotFile = FALSE;
-	LPWSTR lpszExt = NULL;
+	LPCWSTR lpszExt = NULL;
 	PEDITLEXER pLexNew = NULL;
 	PEDITLEXER pLexSniffed;
 
@@ -2422,7 +2422,7 @@ void Style_SetLexerFromName(HWND hwnd, LPCWSTR lpszFile, LPCWSTR lpszName) {
 BOOL Style_CanOpenFile(LPCWSTR lpszFile) {
 	const int lang = np2LexLangIndex;
 	BOOL bDotFile = FALSE;
-	LPWSTR lpszExt = NULL;
+	LPCWSTR lpszExt = NULL;
 	const LPCEDITLEXER pLexNew = Style_GetLexerFromFile(NULL, lpszFile, FALSE, &lpszExt, &bDotFile);
 	np2LexLangIndex = lang;
 	return pLexNew != NULL || StrIsEmpty(lpszExt) || bDotFile || StrCaseEqual(lpszExt, L"cgi") || StrCaseEqual(lpszExt, L"fcgi");
