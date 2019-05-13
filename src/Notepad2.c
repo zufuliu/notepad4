@@ -7035,11 +7035,13 @@ BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect, LPCWST
 			MsgBox(MBWARN, IDS_ERR_UNICODE);
 		}
 		// Show inconsistent line endings warning
-		// Hide warning for binary file
-		if (bUnknownFile && Style_MaybeBinaryFile(hwndEdit, szCurFile)) {
-			return fSuccess;
-		}
 		if (status.bInconsistent && bWarnLineEndings) {
+			// file with unknown lexer and unknown encoding
+			bUnknownFile = bUnknownFile && (iEncoding == CPI_DEFAULT);
+			// Hide warning for binary file
+			if (bUnknownFile && Style_MaybeBinaryFile(hwndEdit, szCurFile)) {
+				return fSuccess;
+			}
 			// Set default button to "No" for diff/patch and unknown file.
 			// diff/patch file may contains content from files with different line endings.
 			status.bLineEndingsDefaultNo = bUnknownFile || pLexCurrent->iLexer == SCLEX_DIFF;
