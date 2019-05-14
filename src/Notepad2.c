@@ -401,13 +401,6 @@ static inline void UpdateStatusBarCache_OVRMode(BOOL force) {
 	}
 }
 
-//==============================================================================
-//
-// Folding Functions
-//
-//
-#include "Edit_Fold.c"
-
 //=============================================================================
 //
 // WinMain()
@@ -4858,8 +4851,10 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			break;
 
 		case SCN_KEY:
-			// Also see the corresponding patch in scintilla\src\Editor.cxx
-			FoldAltArrow(scn->ch, scn->modifiers);
+			// Also see the corresponding patch??? in scintilla\src\Editor.cxx
+			if (bShowCodeFolding) {
+				FoldAltArrow(scn->ch, scn->modifiers);
+			}
 			break;
 
 		case SCN_SAVEPOINTLEFT:

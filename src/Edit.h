@@ -366,6 +366,20 @@ BOOL	FileVars_IsNonUTF8(LPCFILEVARS lpfv);
 BOOL	FileVars_IsValidEncoding(LPCFILEVARS lpfv);
 int 	FileVars_GetEncoding(LPCFILEVARS lpfv);
 
+typedef enum {
+	FOLD_ACTION_FOLD	= 0, // SC_FOLDACTION_CONTRACT
+	FOLD_ACTION_EXPAND	= 1, // SC_FOLDACTION_EXPAND
+	FOLD_ACTION_SNIFF	= 2, // SC_FOLDACTION_TOGGLE
+} FOLD_ACTION;
+
+void FoldToggleAll(FOLD_ACTION action);
+void FoldToggleLevel(int lev, FOLD_ACTION action);
+void FoldToggleCurrent(FOLD_ACTION action);
+void FoldToggleCurrentLevel(FOLD_ACTION action);
+void FoldToggleDefault(FOLD_ACTION action);
+void FoldClick(int ln, int mode);
+void FoldAltArrow(int key, int mode);
+
 #endif //NOTEPAD2_EDIT_H_
 
 // End of Edit.h
