@@ -2994,15 +2994,15 @@ LRESULT ListBoxX::NcHitTest(WPARAM wParam, LPARAM lParam) const noexcept {
 #endif
 		const int xPos = GET_X_LPARAM(lParam);
 		const int yPos = GET_Y_LPARAM(lParam);
-		if (yPos <= rcInner.top) {
-			hit = HTTOP;
-		} else if (xPos <= rcInner.left) {
-			hit = HTLEFT;
-		} else if (xPos >= rcInner.right) {
-			hit = HTRIGHT;
-		} else if (yPos >= rcInner.bottom) {
-			hit = HTBOTTOM;
-		}
+		/*
+		13 | 12 | 14         4 | 3 | 5
+		10 |    | 11    =>   1 | 0 | 2
+		16 | 15 | 17         7 | 6 | 8
+		*/
+		const int x = (xPos <= rcInner.left) ? 1 : ((xPos >= rcInner.right) ? 2 : 0);
+		const int y = (yPos <= rcInner.top) ? 3 : ((yPos >= rcInner.bottom) ? 6 : 0);
+		const int h = x + y;
+		hit = h ? (10 + h - 1) : HTERROR;
 	}
 #endif
 
