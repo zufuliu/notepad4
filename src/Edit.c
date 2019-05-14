@@ -7019,7 +7019,7 @@ void FoldToggleLevel(int lev, FOLD_ACTION action) {
 	}
 }
 
-void FoldToggleCurrent(FOLD_ACTION action) {
+void FoldToggleCurrentBlock(FOLD_ACTION action) {
 	BOOL fToggled = FALSE;
 	int line = SciCall_LineFromPosition(SciCall_GetCurrentPos());
 	const int level = SciCall_GetFoldLevel(line);
