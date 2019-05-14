@@ -190,11 +190,13 @@ inline CLIPFORMAT GetClipboardFormat(LPCWSTR name) noexcept {
 	return static_cast<CLIPFORMAT>(::RegisterClipboardFormat(name));
 }
 
+#if 0
 inline void LazyGetClipboardFormat(UINT &fmt, LPCWSTR name) noexcept {
 	if (fmt == 0) {
 		fmt = ::RegisterClipboardFormat(name);
 	}
 }
+#endif
 
 }
 

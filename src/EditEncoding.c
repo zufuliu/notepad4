@@ -765,6 +765,10 @@ BOOL IsUTF8(const char *pTest, DWORD nLength) {
 }
 #endif
 
+#if NP2_USE_SSE2
+#include <emmintrin.h>
+#endif
+
 // Copyright (c) 2008-2010 Bjoern Hoehrmann <bjoern@hoehrmann.de>
 // See https://bjoern.hoehrmann.de/utf-8/decoder/dfa/ for details.
 
@@ -804,6 +808,35 @@ BOOL IsUTF8(const char *pTest, DWORD nLength) {
 	const unsigned char * const end = pt + nLength;
 
 	UINT state = UTF8_ACCEPT;
+
+#if NP2_USE_SSE2
+	{
+		const unsigned char *ptr = (const unsigned char *)align_ptr(pt);
+		while (pt < ptr) {
+			state = utf8_dfa[256 + state + utf8_dfa[*pt]];
+			if (state == UTF8_REJECT) {
+				return FALSE;
+			}
+			++pt;
+		}
+		while (pt + 16 < end) {
+			__m128i chunk = _mm_load_si128((__m128i *)pt);
+			if (_mm_movemask_epi8(chunk)) {
+				ptr = pt + 16;
+				while (pt < ptr) {
+					state = utf8_dfa[256 + state + utf8_dfa[*pt]];
+					if (state == UTF8_REJECT) {
+						return FALSE;
+					}
+					++pt;
+				}
+			} else {
+				pt += 16;
+			}
+		}
+	}
+#endif
+
 	while (pt < end) {
 		state = utf8_dfa[256 + state + utf8_dfa[*pt]];
 		if (state == UTF8_REJECT) {
@@ -823,6 +856,25 @@ BOOL IsUTF8(const char *pTest, DWORD nLength) {
 BOOL IsUTF7(const char *pTest, DWORD nLength) {
 	const unsigned char *pt = (const unsigned char *)pTest;
 	const unsigned char * const end = pt + nLength;
+
+#if NP2_USE_SSE2
+	{
+		const unsigned char *ptr = (const unsigned char *)align_ptr(pt);
+		while (pt < ptr && (*pt & 0x80) == 0) {
+			++pt;
+		}
+		if (pt != ptr) {
+			return FALSE;
+		}
+		while (pt + 16 < end) {
+			__m128i chunk = _mm_load_si128((__m128i *)pt);
+			if (_mm_movemask_epi8(chunk)) {
+				return FALSE;
+			}
+			pt += 16;
+		}
+	}
+#endif
 
 	while (pt < end && (*pt & 0x80) == 0) {
 		++pt;
