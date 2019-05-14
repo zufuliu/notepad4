@@ -617,7 +617,7 @@ void SurfaceGDI::PenColour(ColourDesired fore) noexcept {
 		pen = nullptr;
 		penOld = nullptr;
 	}
-	pen = ::CreatePen(0, 1, fore.AsInteger());
+	pen = ::CreatePen(PS_SOLID, 1, fore.AsInteger());
 	penOld = SelectPen(hdc, pen);
 }
 
@@ -2410,6 +2410,8 @@ public:
 
 static const TCHAR *ListBoxX_ClassName = L"ListBoxX";
 #define LISTBOXX_USE_THICKFRAME		0
+#define LISTBOXX_USE_BORDER			1
+#define LISTBOXX_USE_FAKE_FRAME		0
 
 ListBox::ListBox() noexcept = default;
 
@@ -2508,6 +2510,9 @@ public:
 const Point ListBoxX::ItemInset(0, 0);
 const Point ListBoxX::TextInset(2, 0);
 const Point ListBoxX::ImageInset(1, 0);
+#if LISTBOXX_USE_FAKE_FRAME
+constexpr int ListBoxXFakeFrameSize = 4;
+#endif
 
 ListBox *ListBox::Allocate() {
 	ListBoxX *lb = new ListBoxX();
@@ -2528,8 +2533,10 @@ void ListBoxX::Create(Window &parent_, int ctrlID_, Point location_, int lineHei
 		WS_EX_WINDOWEDGE, ListBoxX_ClassName, L"",
 #if LISTBOXX_USE_THICKFRAME
 		WS_POPUP | WS_THICKFRAME,
-#else
+#elif LISTBOXX_USE_BORDER
 		WS_POPUP | WS_BORDER,
+#else
+		WS_POPUP,
 #endif
 		100, 100, 150, 80, hwndParent,
 		nullptr,
@@ -2828,10 +2835,15 @@ void ListBoxX::AdjustWindowRect(PRectangle *rc) noexcept {
 	RECT rcw = RectFromPRectangle(*rc);
 #if LISTBOXX_USE_THICKFRAME
 	::AdjustWindowRectEx(&rcw, WS_THICKFRAME, false, WS_EX_WINDOWEDGE);
-#else
+#elif LISTBOXX_USE_BORDER
 	::AdjustWindowRectEx(&rcw, WS_BORDER, false, WS_EX_WINDOWEDGE);
+#else
+	::AdjustWindowRectEx(&rcw, 0, false, WS_EX_WINDOWEDGE);
 #endif
 	*rc = PRectangle::FromInts(rcw.left, rcw.top, rcw.right, rcw.bottom);
+#if LISTBOXX_USE_FAKE_FRAME
+	*rc = rc->Inflate(ListBoxXFakeFrameSize, ListBoxXFakeFrameSize);
+#endif
 }
 
 int ListBoxX::ItemHeight() const {
@@ -2973,9 +2985,13 @@ LRESULT ListBoxX::NcHitTest(WPARAM wParam, LPARAM lParam) const noexcept {
 			hit += HTBOTTOM - HTTOP;
 		}
 	}
-#if !LISTBOXX_USE_THICKFRAME
-	else if (hit == HTBORDER) {
+#if LISTBOXX_USE_BORDER || LISTBOXX_USE_FAKE_FRAME
+	else if (hit < HTSIZEFIRST || hit > HTSIZELAST) {
+#if LISTBOXX_USE_BORDER
 		const PRectangle rcInner = rc.Deflate(GetSystemMetricsEx(SM_CXBORDER), GetSystemMetricsEx(SM_CYBORDER));
+#else
+		const PRectangle rcInner = rc.Deflate(ListBoxXFakeFrameSize, ListBoxXFakeFrameSize);
+#endif
 		const int xPos = GET_X_LPARAM(lParam);
 		const int yPos = GET_Y_LPARAM(lParam);
 		if (yPos <= rcInner.top) {
@@ -3199,6 +3215,56 @@ LRESULT ListBoxX::WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam
 
 	case WM_MOUSEACTIVATE:
 		return MA_NOACTIVATE;
+
+#if LISTBOXX_USE_FAKE_FRAME
+	case WM_NCPAINT: {
+		HDC hDC = ::GetWindowDC(hWnd);
+		RECT rect;
+		::GetClientRect(hWnd, &rect);
+
+		// outer frame
+		rect.right += 2*ListBoxXFakeFrameSize;
+		rect.bottom += 2*ListBoxXFakeFrameSize;
+		const int width = rect.right - rect.left;
+		const int height = rect.bottom - rect.top;
+
+		// inner border
+		RECT client = rect;
+		::InflateRect(&client, -ListBoxXFakeFrameSize + 1, -ListBoxXFakeFrameSize + 1);
+
+		HDC hMemDC = CreateCompatibleDC(hDC);
+		const BITMAPINFO bpih = { {sizeof(BITMAPINFOHEADER), width, height, 1, 32, BI_RGB, 0, 0, 0, 0, 0},
+			{{0, 0, 0, 0}} };
+		HBITMAP hbmMem = CreateDIBSection(hMemDC, &bpih, DIB_RGB_COLORS, nullptr, nullptr, 0);
+
+		if (hbmMem) {
+			HBITMAP hbmOld = SelectBitmap(hMemDC, hbmMem);
+			BLENDFUNCTION merge = { AC_SRC_OVER, 0, 0, AC_SRC_ALPHA };
+
+			GdiAlphaBlend(hDC, rect.left, rect.top, width, height, hMemDC, 0, 0, width, height, merge);
+
+			SelectBitmap(hMemDC, hbmOld);
+			::DeleteObject(hbmMem);
+		}
+		::DeleteDC(hMemDC);
+
+		//HPEN hPen = ::CreatePen(PS_SOLID, 1, ::GetSysColor(COLOR_WINDOWFRAME));
+		HPEN hPen = ::CreatePen(PS_SOLID, 1, RGB(255, 0, 0));
+		HPEN hPenOld = SelectPen(hDC, hPen);
+		::Rectangle(hDC, client.left, client.top, client.right, client.bottom);
+		::SelectObject(hDC, hPenOld);
+		::DeleteObject(hPen);
+
+		::ReleaseDC(hWnd, hDC);
+		return 0;
+	}
+
+	case WM_NCCALCSIZE: {
+		LPRECT rect = reinterpret_cast<LPRECT>(lParam);
+		::InflateRect(rect, -ListBoxXFakeFrameSize, -ListBoxXFakeFrameSize);
+		return 0;
+	}
+#endif
 
 	case WM_NCHITTEST:
 		return NcHitTest(wParam, lParam);
