@@ -2165,7 +2165,6 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	EnableCmd(hmenu, IDM_EDIT_CLEARCLIPBOARD, CountClipboardFormats());
 	CloseClipboard();
 
-	EnableCmd(hmenu, IDM_VIEW_FOLD_CURRENT, nonEmpty);
 	EnableCmd(hmenu, CMD_OPEN_PATH_OR_LINK, nonEmpty);
 	EnableCmd(hmenu, CMD_OPEN_CONTAINING_FOLDER, nonEmpty);
 	EnableCmd(hmenu, CMD_ONLINE_SEARCH_GOOGLE, i);
@@ -2272,7 +2271,9 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	EnableCmd(hmenu, CMD_CTRLDEL, i);
 	EnableCmd(hmenu, CMD_TIMESTAMPS, i);
 	//EnableCmd(hmenu, IDM_VIEW_TOGGLEFOLDS, i && bShowCodeFolding);
+	//EnableCmd(hmenu, IDM_VIEW_FOLD_CURRENT, i && bShowCodeFolding);
 	//EnableCmd(hmenu, IDM_VIEW_FOLD_ALL, i && bShowCodeFolding);
+	//EnableCmd(hmenu, IDM_VIEW_FOLD_CURRENT_LEVEL, i && bShowCodeFolding);
 	//EnableCmd(hmenu, IDM_VIEW_FOLD_LEVEL1, i && bShowCodeFolding);
 	//EnableCmd(hmenu, IDM_VIEW_FOLD_LEVEL2, i && bShowCodeFolding);
 	//EnableCmd(hmenu, IDM_VIEW_FOLD_LEVEL3, i && bShowCodeFolding);
@@ -3853,6 +3854,12 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		}
 		break;
 
+	case IDM_VIEW_FOLD_CURRENT_LEVEL:
+		if (bShowCodeFolding) {
+			FoldToggleCurrentLevel(FOLD_ACTION_SNIFF);
+		}
+		break;
+
 	case IDM_VIEW_FOLD_LEVEL1:
 	case IDM_VIEW_FOLD_LEVEL2:
 	case IDM_VIEW_FOLD_LEVEL3:
@@ -4658,10 +4665,6 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	case IDT_FILE_ADDTOFAV:
 		SendWMCommandOrBeep(hwnd, IDM_FILE_ADDTOFAV);
-		break;
-
-	case IDT_VIEW_TOGGLEFOLDS:
-		SendWMCommandOrBeep(hwnd, IDM_VIEW_TOGGLEFOLDS);
 		break;
 
 	case IDT_FILE_LAUNCH:
