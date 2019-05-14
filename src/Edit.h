@@ -374,7 +374,7 @@ typedef enum {
 
 void FoldToggleAll(FOLD_ACTION action);
 void FoldToggleLevel(int lev, FOLD_ACTION action);
-void FoldToggleCurrent(FOLD_ACTION action);
+void FoldToggleCurrentBlock(FOLD_ACTION action);
 void FoldToggleCurrentLevel(FOLD_ACTION action);
 void FoldToggleDefault(FOLD_ACTION action);
 void FoldClick(int ln, int mode);

@@ -2263,8 +2263,8 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	EnableCmd(hmenu, CMD_CTRLBACK, i);
 	EnableCmd(hmenu, CMD_CTRLDEL, i);
 	EnableCmd(hmenu, CMD_TIMESTAMPS, i);
-	//EnableCmd(hmenu, IDM_VIEW_TOGGLEFOLDS, i && bShowCodeFolding);
-	//EnableCmd(hmenu, IDM_VIEW_FOLD_CURRENT, i && bShowCodeFolding);
+	//EnableCmd(hmenu, IDM_VIEW_FOLD_DEFAULT, i && bShowCodeFolding);
+	//EnableCmd(hmenu, IDM_VIEW_FOLD_CURRENT_BLOCK, i && bShowCodeFolding);
 	//EnableCmd(hmenu, IDM_VIEW_FOLD_ALL, i && bShowCodeFolding);
 	//EnableCmd(hmenu, IDM_VIEW_FOLD_CURRENT_LEVEL, i && bShowCodeFolding);
 	//EnableCmd(hmenu, IDM_VIEW_FOLD_LEVEL1, i && bShowCodeFolding);
@@ -3829,7 +3829,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		SciCall_FoldDisplayTextSetStyle((bFoldDisplayText ? SC_FOLDDISPLAYTEXT_BOXED : SC_FOLDDISPLAYTEXT_HIDDEN));
 		break;
 
-	case IDM_VIEW_TOGGLEFOLDS:
+	case IDM_VIEW_FOLD_DEFAULT:
 		if (bShowCodeFolding) {
 			FoldToggleDefault(FOLD_ACTION_SNIFF);
 		}
@@ -3841,9 +3841,9 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		}
 		break;
 
-	case IDM_VIEW_FOLD_CURRENT:
+	case IDM_VIEW_FOLD_CURRENT_BLOCK:
 		if (bShowCodeFolding) {
-			FoldToggleCurrent(FOLD_ACTION_SNIFF);
+			FoldToggleCurrentBlock(FOLD_ACTION_SNIFF);
 		}
 		break;
 
