@@ -12,7 +12,7 @@ typedef enum {
 #define FOLD_CHILDREN SCMOD_CTRL
 #define FOLD_SIBLINGS SCMOD_SHIFT
 
-#define MAX_EDIT_TOGGLE_FOLD_LEVEL		10
+#define MAX_EDIT_TOGGLE_FOLD_LEVEL		31
 struct EditFoldStack {
 	int level_count; // 1-based level number at current header line
 	int level_stack[MAX_EDIT_TOGGLE_FOLD_LEVEL];
@@ -27,8 +27,8 @@ static void EditFoldStack_Push(struct EditFoldStack *foldStack, int level) {
 	++foldStack->level_count;
 }
 
-UINT Style_GetDefaultFoldState(int *maxLevel) {
-	switch (pLexCurrent->rid) {
+UINT Style_GetDefaultFoldState(int rid, int *maxLevel) {
+	switch (rid) {
 	case NP2LEX_TEXTFILE:
 	case NP2LEX_2NDTEXTFILE:
 	case NP2LEX_ANSI:
@@ -60,6 +60,11 @@ UINT Style_GetDefaultFoldState(int *maxLevel) {
 		*maxLevel = 1;
 		return (1 << 0) | (1 << 1);
 	}
+}
+
+static inline BOOL IsFoldIndentationBased(int iLexer) {
+	return iLexer == SCLEX_PYTHON
+		|| iLexer == SCLEX_NULL;
 }
 
 void FoldToggleNode(int line, FOLD_ACTION *pAction, BOOL *fToggled) {
@@ -108,9 +113,7 @@ void FoldToggleLevel(int lev, FOLD_ACTION action) {
 	const int lineCount = SciCall_GetLineCount();
 	int line = 0;
 
-	switch (pLexCurrent->iLexer) {
-	case SCLEX_PYTHON:
-	case SCLEX_NULL: {
+	if (IsFoldIndentationBased(pLexCurrent->iLexer)) {
 		struct EditFoldStack foldStack = { 0, { 0 }};
 		++lev;
 		while (line < lineCount) {
@@ -125,10 +128,7 @@ void FoldToggleLevel(int lev, FOLD_ACTION action) {
 			}
 			++line;
 		}
-	}
-	break;
-
-	default:
+	} else {
 		lev += SC_FOLDLEVELBASE;
 		while (line < lineCount) {
 			int level = SciCall_GetFoldLevel(line);
@@ -141,7 +141,6 @@ void FoldToggleLevel(int lev, FOLD_ACTION action) {
 			}
 			++line;
 		}
-		break;
 	}
 
 	if (fToggled) {
@@ -175,16 +174,53 @@ void FoldToggleCurrent(FOLD_ACTION action) {
 	}
 }
 
+void FoldToggleCurrentLevel(FOLD_ACTION action) {
+	int line = SciCall_LineFromPosition(SciCall_GetCurrentPos());
+	int level = SciCall_GetFoldLevel(line);
+
+	if (!(level & SC_FOLDLEVELHEADERFLAG)) {
+		line = SciCall_GetFoldParent(line);
+		if (line < 0) {
+			return;
+		}
+		level = SciCall_GetFoldLevel(line);
+	}
+
+	level &= SC_FOLDLEVELNUMBERMASK;
+	level -= SC_FOLDLEVELBASE;
+
+	if (level != 0 && IsFoldIndentationBased(pLexCurrent->iLexer)) {
+		level = 0;
+		while (line > 0) {
+			--line;
+			if (!(SciCall_GetFoldLevel(line) & SC_FOLDLEVELHEADERFLAG)) {
+				line = SciCall_GetFoldParent(line);
+				if (line < 0) {
+					break;
+				}
+			}
+			++level;
+		}
+#if 1
+		if (level > MAX_EDIT_TOGGLE_FOLD_LEVEL - 1) {
+			return;
+		}
+#else
+		level = min_i(level, MAX_EDIT_TOGGLE_FOLD_LEVEL - 1);
+#endif
+	}
+
+	FoldToggleLevel(level, action);
+}
+
 void FoldToggleDefault(FOLD_ACTION action) {
 	BOOL fToggled = FALSE;
 	int maxLevel = 0;
-	const UINT state = Style_GetDefaultFoldState(&maxLevel);
+	const UINT state = Style_GetDefaultFoldState(pLexCurrent->rid, &maxLevel);
 	const int lineCount = SciCall_GetLineCount();
 	int line = 0;
 
-	switch (pLexCurrent->iLexer) {
-	case SCLEX_PYTHON:
-	case SCLEX_NULL: {
+	if (IsFoldIndentationBased(pLexCurrent->iLexer)) {
 		struct EditFoldStack foldStack = { 0, { 0 }};
 		while (line < lineCount) {
 			int level = SciCall_GetFoldLevel(line);
@@ -201,10 +237,7 @@ void FoldToggleDefault(FOLD_ACTION action) {
 			}
 			++line;
 		}
-	}
-	break;
-
-	default:
+	} else {
 		while (line < lineCount) {
 			int level = SciCall_GetFoldLevel(line);
 			if (level & SC_FOLDLEVELHEADERFLAG) {
@@ -219,7 +252,6 @@ void FoldToggleDefault(FOLD_ACTION action) {
 			}
 			++line;
 		}
-		break;
 	}
 
 	if (fToggled) {
