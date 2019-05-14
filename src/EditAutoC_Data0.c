@@ -552,7 +552,8 @@ void Style_UpdateLexerKeywords(LPCEDITLEXER pLexNew) {
 	//case IDM_LANG_WEB_NET:
 	//	return;
 	//case IDM_LANG_RESX:
-	//	np2_LexKeyword = &kwXmlSchema;		return;
+	//	np2_LexKeyword = &kwXmlSchema;
+	//	return;
 	//case IDM_LANG_XAML:
 	//	return;
 
