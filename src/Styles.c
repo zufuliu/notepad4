@@ -2452,6 +2452,7 @@ BOOL Style_MaybeBinaryFile(HWND hwnd, LPCWSTR lpszFile) {
 		magic == 0x52617221 ||	// RAR: Rar!
 		magic == 0x7F454C46	||	// ELF: 0x7F+ELF
 		magic == 0x213C6172 ||	// .lib, .a: !<arch>\n
+		magic == 0xFD377A58 ||	// xz: 0xFD+7zXZ
 		magic == 0xCAFEBABE		// Java class
 		) {
 		return TRUE;
@@ -2461,19 +2462,29 @@ BOOL Style_MaybeBinaryFile(HWND hwnd, LPCWSTR lpszFile) {
 	if (StrNotEmpty(lpszExt)) {
 		++lpszExt;
 		const int len = lstrlen(lpszExt);
-		if (len < 3 || len > 4) {
+		if (len < 3 || len > 5) {
 			return FALSE;
 		}
+		// full match
+		WCHAR wch[8] = L"";
+		wch[0] = L' ';
+		lstrcpy(wch + 1, lpszExt);
+		wch[len + 1] = L' ';
 		LPCWSTR lpszMatch = StrStrI(
 			L" cur"
 			L" ico"
+
 			L" obj"
 			L" pdb"
-			L" ", lpszExt);
-		// full match
-		if (lpszMatch != NULL && lpszMatch[-1] == L' ' && lpszMatch[len] == L' ') {
-			return TRUE;
-		}
+			L" bin"
+			L" pak"
+
+			L" dmg"
+			L" img"
+			L" iso"
+			L" tar"
+			L" ", wch);
+		return lpszMatch != NULL;
 	}
 #endif
 	return FALSE;
