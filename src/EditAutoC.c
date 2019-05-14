@@ -30,20 +30,6 @@ x64: sum(i//40 for i in a) => 6710776 nodes
 x86: sum(i//24 for i in a) => 11184632 nodes
 */
 
-// required for SSE2
-#define DefaultAlignment		16
-static inline unsigned int align_up(unsigned int value) {
-	return (value + DefaultAlignment - 1) & (~(DefaultAlignment - 1));
-}
-
-static inline void* align_ptr(void *ptr) {
-	return (void *)(((uintptr_t)(ptr) + DefaultAlignment - 1) & (~(DefaultAlignment - 1)));
-}
-
-static inline unsigned int bswap32(unsigned int x) {
-	return (x << 24) | ((x << 8) & 0xff0000) | ((x >> 8) & 0xff00) | (x >> 24);
-}
-
 struct WordNode;
 struct WordList {
 	char wordBuf[1024];
@@ -860,7 +846,7 @@ void AutoC_AddDocWord(struct WordList *pWList, BOOL bIgnoreCase, char prefix) {
 
 			Sci_Position wordLength = wordEnd - iPosFind;
 			if (wordLength >= iRootLen) {
-				char *pWord = pWList->wordBuf + DefaultAlignment;
+				char *pWord = pWList->wordBuf + NP2DefaultPointerAlignment;
 				BOOL bChanged = FALSE;
 				tr.lpstrText = pWord;
 				tr.chrg.cpMin = (Sci_PositionCR)iPosFind;

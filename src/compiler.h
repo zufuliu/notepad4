@@ -58,6 +58,12 @@
 #define NP2_USE_DESIGNATED_INITIALIZER	1
 #endif
 
+#if defined(__aarch64__) || defined(_ARM64_) || defined(__arm__) || defined(_ARM_)
+#define NP2_USE_SSE2	0
+#else
+#define NP2_USE_SSE2	1
+#endif
+
 // sdkddkver.h
 #ifndef _WIN32_WINNT_VISTA
 #define _WIN32_WINNT_VISTA					0x0600
