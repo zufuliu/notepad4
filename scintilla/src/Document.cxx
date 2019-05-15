@@ -1775,7 +1775,7 @@ bool Document::IsWordStartAt(Sci::Position pos) const noexcept {
 		const CharacterExtracted cePrev = CharacterBefore(pos);
 		const CharClassify::cc ccPrev = WordCharacterClass(cePrev.character);
 		return (ccPos == CharClassify::ccWord || ccPos == CharClassify::ccPunctuation || ccPos == CharClassify::ccCJKWord) &&
-			(ccPos != ccPrev || StyleAt(pos - 1) != StyleAt(pos));
+			(ccPos != ccPrev/* || StyleAt(pos - 1) != StyleAt(pos)*/);
 	}
 	return true;
 }
@@ -1793,7 +1793,7 @@ bool Document::IsWordEndAt(Sci::Position pos) const noexcept {
 		const CharacterExtracted cePrev = CharacterBefore(pos);
 		const CharClassify::cc ccPrev = WordCharacterClass(cePrev.character);
 		return (ccPrev == CharClassify::ccWord || ccPrev == CharClassify::ccPunctuation || ccPrev == CharClassify::ccCJKWord) &&
-			(ccPrev != ccPos || StyleAt(pos - 1) != StyleAt(pos));
+			(ccPrev != ccPos/* || StyleAt(pos - 1) != StyleAt(pos)*/);
 	}
 	return true;
 }
