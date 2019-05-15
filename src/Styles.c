@@ -26,10 +26,10 @@
 #include <commdlg.h>
 #include <stdio.h>
 #include <math.h>
+#include "Helpers.h"
 #include "Notepad2.h"
 #include "Edit.h"
 #include "Styles.h"
-#include "Helpers.h"
 #include "Dialogs.h"
 #include "SciCall.h"
 #include "resource.h"
@@ -215,7 +215,7 @@ static WCHAR darkStyleThemeFilePath[MAX_PATH];
 static PEDITLEXER pLexGlobal = &lexGlobal;
 PEDITLEXER pLexCurrent = &lexTextFile;
 int np2LexLangIndex = 0;
-UINT8 currentLexKeywordAttr[NUMKEYWORD] = {0};
+uint8_t currentLexKeywordAttr[NUMKEYWORD] = {0};
 
 #define STYLESMODIFIED_NONE			0
 #define STYLESMODIFIED_SOME_STYLE	1
@@ -966,7 +966,7 @@ void Style_UpdateCaret(HWND hwnd) {
 
 void Style_UpdateLexerKeywordAttr(LPCEDITLEXER pLexNew) {
 	ZeroMemory(currentLexKeywordAttr, sizeof(currentLexKeywordAttr));
-	UINT8 *attr = currentLexKeywordAttr;
+	uint8_t *attr = currentLexKeywordAttr;
 
 	// Code Snippet
 	attr[NUMKEYWORD - 1] = KeywordAttr_NoLexer;

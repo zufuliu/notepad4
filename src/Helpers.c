@@ -27,7 +27,6 @@
 #include <uxtheme.h>
 #include <vssym32.h>
 #include <stdio.h>
-#include "Scintilla.h"
 #include "Helpers.h"
 #include "resource.h"
 

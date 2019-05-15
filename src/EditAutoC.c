@@ -6,9 +6,9 @@
 #include <commdlg.h>
 #include <limits.h>
 #include <stdio.h>
+#include "Helpers.h"
 #include "Edit.h"
 #include "Styles.h"
-#include "Helpers.h"
 #include "SciCall.h"
 #include "resource.h"
 #include "EditAutoC_Data0.c"

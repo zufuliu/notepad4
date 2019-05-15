@@ -24,10 +24,9 @@
 #include <shellapi.h>
 #include <commctrl.h>
 #include <commdlg.h>
-#include "Scintilla.h"
+#include "Helpers.h"
 #include "Notepad2.h"
 #include "Edit.h"
-#include "Helpers.h"
 #include "Dlapi.h"
 #include "Dialogs.h"
 #include "resource.h"

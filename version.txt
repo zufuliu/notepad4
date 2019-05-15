@@ -10,7 +10,7 @@ hg clone http://hg.code.sf.net/p/scintilla/code scintilla
 SciTE (upstream)
 hg clone http://hg.code.sf.net/p/scintilla/scite
 4.1.5
-2019-05-14 5208:053cb1d3d635
+2019-05-15 5210:03a71dd7df3a
 
 Notepad3 (3-clause BSD)
 https://github.com/rizonesoft/Notepad3
