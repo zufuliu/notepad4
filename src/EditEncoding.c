@@ -841,9 +841,11 @@ BOOL IsUTF8(const char *pTest, DWORD nLength) {
 			}
 		}
 #elif defined(_WIN64)
-		while (pt + 8 < end) {
-			const uint64_t *temp = (const uint64_t *)pt;
+		const uint64_t *temp = (const uint64_t *)pt;
+		const uint64_t * const temp_end = (const uint64_t *)end;
+		while (temp < temp_end) {
 			if (*temp & UINT64_C(0x8080808080808080)) {
+				pt = (const uint8_t *)temp;
 				ptr = pt + 8;
 				while (pt < ptr) {
 					state = utf8_dfa[256 + state + utf8_dfa[*pt]];
@@ -852,14 +854,16 @@ BOOL IsUTF8(const char *pTest, DWORD nLength) {
 					}
 					++pt;
 				}
-			} else {
-				pt += 8;
 			}
+			++temp;
 		}
+		pt = (const uint8_t *)temp;
 #else
-		while (pt + 4 < end) {
-			const uint32_t *temp = (const uint32_t *)pt;
+		const uint32_t *temp = (const uint32_t *)pt;
+		const uint32_t * const temp_end = (const uint32_t *)end;
+		while (temp < temp_end) {
 			if (*temp & 0x80808080U) {
+				pt = (const uint8_t *)temp;
 				ptr = pt + 4;
 				while (pt < ptr) {
 					state = utf8_dfa[256 + state + utf8_dfa[*pt]];
@@ -868,10 +872,10 @@ BOOL IsUTF8(const char *pTest, DWORD nLength) {
 					}
 					++pt;
 				}
-			} else {
-				pt += 4;
 			}
+			++temp;
 		}
+		pt = (const uint8_t *)temp;
 #endif
 	}
 
@@ -918,21 +922,25 @@ BOOL IsUTF7(const char *pTest, DWORD nLength) {
 			pt += 16;
 		}
 #elif defined(_WIN64)
-		while (pt + 8 < end) {
-			const uint64_t *temp = (const uint64_t *)pt;
+		const uint64_t *temp = (const uint64_t *)pt;
+		const uint64_t * const temp_end = (const uint64_t *)end;
+		while (temp < temp_end) {
 			if (*temp & UINT64_C(0x8080808080808080)) {
 				return FALSE;
 			}
-			pt += 8;
+			++temp;
 		}
+		pt = (const uint8_t *)temp;
 #else
-		while (pt + 4 < end) {
-			const uint32_t *temp = (const uint32_t *)pt;
+		const uint32_t *temp = (const uint32_t *)pt;
+		const uint32_t * const temp_end = (const uint32_t *)end;
+		while (temp < temp_end) {
 			if (*temp & 0x80808080U) {
 				return FALSE;
 			}
-			pt += 4;
+			++temp;
 		}
+		pt = (const uint8_t *)temp;
 #endif
 	}
 
