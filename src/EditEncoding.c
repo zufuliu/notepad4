@@ -811,7 +811,7 @@ BOOL IsUTF8(const char *pTest, DWORD nLength) {
 
 	{
 #if NP2_USE_SSE2
-		const uint8_t *ptr = (const uint8_t *)align_ptr(pt);
+		const uint8_t *ptr = (const uint8_t *)align_ptr_ex(pt, sizeof(__m128i));
 #elif defined(_WIN64)
 		const uint8_t *ptr = (const uint8_t *)align_ptr_ex(pt, sizeof(uint64_t));
 #else
@@ -825,10 +825,10 @@ BOOL IsUTF8(const char *pTest, DWORD nLength) {
 			++pt;
 		}
 #if NP2_USE_SSE2
-		while (pt + 16 < end) {
+		while (pt + sizeof(__m128i) < end) {
 			__m128i chunk = _mm_load_si128((__m128i *)pt);
 			if (_mm_movemask_epi8(chunk)) {
-				ptr = pt + 16;
+				ptr = pt + sizeof(__m128i);
 				while (pt < ptr) {
 					state = utf8_dfa[256 + state + utf8_dfa[*pt]];
 					if (state == UTF8_REJECT) {
@@ -837,7 +837,7 @@ BOOL IsUTF8(const char *pTest, DWORD nLength) {
 					++pt;
 				}
 			} else {
-				pt += 16;
+				pt += sizeof(__m128i);
 			}
 		}
 #elif defined(_WIN64)
@@ -846,7 +846,7 @@ BOOL IsUTF8(const char *pTest, DWORD nLength) {
 		while (temp < temp_end) {
 			if (*temp & UINT64_C(0x8080808080808080)) {
 				pt = (const uint8_t *)temp;
-				ptr = pt + 8;
+				ptr = pt + sizeof(uint64_t);
 				while (pt < ptr) {
 					state = utf8_dfa[256 + state + utf8_dfa[*pt]];
 					if (state == UTF8_REJECT) {
@@ -864,7 +864,7 @@ BOOL IsUTF8(const char *pTest, DWORD nLength) {
 		while (temp < temp_end) {
 			if (*temp & 0x80808080U) {
 				pt = (const uint8_t *)temp;
-				ptr = pt + 4;
+				ptr = pt + sizeof(uint32_t);
 				while (pt < ptr) {
 					state = utf8_dfa[256 + state + utf8_dfa[*pt]];
 					if (state == UTF8_REJECT) {
@@ -901,7 +901,7 @@ BOOL IsUTF7(const char *pTest, DWORD nLength) {
 
 	{
 #if NP2_USE_SSE2
-		const uint8_t *ptr = (const uint8_t *)align_ptr(pt);
+		const uint8_t *ptr = (const uint8_t *)align_ptr_ex(pt, sizeof(__m128i));
 #elif defined(_WIN64)
 		const uint8_t *ptr = (const uint8_t *)align_ptr_ex(pt, sizeof(uint64_t));
 #else
@@ -914,12 +914,12 @@ BOOL IsUTF7(const char *pTest, DWORD nLength) {
 			return FALSE;
 		}
 #if NP2_USE_SSE2
-		while (pt + 16 < end) {
+		while (pt + sizeof(__m128i) < end) {
 			__m128i chunk = _mm_load_si128((__m128i *)pt);
 			if (_mm_movemask_epi8(chunk)) {
 				return FALSE;
 			}
-			pt += 16;
+			pt += sizeof(__m128i);
 		}
 #elif defined(_WIN64)
 		const uint64_t *temp = (const uint64_t *)pt;
