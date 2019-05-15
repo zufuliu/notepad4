@@ -6878,6 +6878,7 @@ static void FoldToggleNode(int line, FOLD_ACTION *pAction, BOOL *fToggled) {
 	if (action ^ fExpanded) {
 		SciCall_ToggleFold(line);
 		if (*fToggled == FALSE || *pAction == FOLD_ACTION_SNIFF) {
+			// empty INI section not changed after toggle (issue #48).
 			const BOOL after = SciCall_GetFoldExpanded(line);
 			if (fExpanded != after) {
 				*fToggled = TRUE;
