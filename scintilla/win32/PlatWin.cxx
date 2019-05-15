@@ -2987,6 +2987,7 @@ LRESULT ListBoxX::NcHitTest(WPARAM wParam, LPARAM lParam) const noexcept {
 	}
 #if LISTBOXX_USE_BORDER || LISTBOXX_USE_FAKE_FRAME
 	else if (hit < HTSIZEFIRST || hit > HTSIZELAST) {
+		const int cx = GetSystemMetricsEx(SM_CXVSCROLL);
 #if LISTBOXX_USE_BORDER
 		const PRectangle rcInner = rc.Deflate(GetSystemMetricsEx(SM_CXBORDER), GetSystemMetricsEx(SM_CYBORDER));
 #else
@@ -2999,10 +3000,17 @@ LRESULT ListBoxX::NcHitTest(WPARAM wParam, LPARAM lParam) const noexcept {
 		10 |    | 11    =>   1 | 0 | 2
 		16 | 15 | 17         7 | 6 | 8
 		*/
-		const int x = (xPos <= rcInner.left) ? 1 : ((xPos >= rcInner.right) ? 2 : 0);
-		const int y = (yPos <= rcInner.top) ? 3 : ((yPos >= rcInner.bottom) ? 6 : 0);
+		const int x = (xPos <= rcInner.left) ? 1 : ((xPos >= rcInner.right - cx) ? 2 : 0);
+		int y = (yPos <= rcInner.top) ? 3 : ((yPos >= rcInner.bottom) ? 6 : 0);
+		if (y == 0 && x == 2) {
+			if (location.y < rc.top) {
+				y = (yPos >= rcInner.bottom - cx) ? 6 : 0;
+			} else {
+				y = (yPos <= rcInner.top + cx) ? 3 : 0;
+			}
+		}
 		const int h = x + y;
-		hit = h ? (10 + h - 1) : HTERROR;
+		hit = h ? (9 + h) : HTERROR;
 	}
 #endif
 
