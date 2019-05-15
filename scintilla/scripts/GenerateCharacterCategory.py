@@ -369,7 +369,7 @@ def buildANSICharClassifyTable(filename):
 	output = ["// Created with Python %s,  Unicode %s" % (
 		platform.python_version(), unicodedata.unidata_version)]
 
-	output.append("static const UINT8 ANSICharClassifyTable[] = {")
+	output.append("static const uint8_t ANSICharClassifyTable[] = {")
 	for item in result.values():
 		for page in item['codepage']:
 			output.append('// ' + page[1])
@@ -378,7 +378,7 @@ def buildANSICharClassifyTable(filename):
 	output.append("};")
 	output.append("")
 
-	output.append("static const UINT8* GetANSICharClassifyTable(UINT cp, int *length) {")
+	output.append("static const uint8_t* GetANSICharClassifyTable(UINT cp, int *length) {")
 	output.append("\tswitch (cp) {")
 	for item in result.values():
 		for page in item['codepage']:

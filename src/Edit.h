@@ -21,7 +21,7 @@
 #ifndef NOTEPAD2_EDIT_H_
 #define NOTEPAD2_EDIT_H_
 
-#include "Sci_Position.h"
+#include "Scintilla.h"
 
 // WideCharToMultiByte, UTF8 encoding of U+0800 to U+FFFF
 #define kMaxMultiByteCount	3
@@ -98,6 +98,18 @@ enum {
 	EditWrapSymbolMaxValue = EditWrapSymbolBeforeMaxValue + 10 * EditWrapSymbolAfterMaxValue,
 	EditWrapSymbolDefaultValue = EditWrapSymbolBeforeNearBorder,
 };
+
+extern HWND hwndEdit;
+NP2_inline void BeginWaitCursor(void) {
+	SendMessage(hwndEdit, SCI_SETCURSOR, (WPARAM)SC_CURSORWAIT, 0);
+}
+
+NP2_inline void EndWaitCursor(void) {
+	POINT pt;
+	SendMessage(hwndEdit, SCI_SETCURSOR, (WPARAM)SC_CURSORNORMAL, 0);
+	GetCursorPos(&pt);
+	SetCursorPos(pt.x, pt.y);
+}
 
 void	Edit_ReleaseResources(void);
 HWND	EditCreate(HWND hwndParent);

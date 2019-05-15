@@ -32,6 +32,7 @@ extern "C" {
 #include "Helpers.h"
 #include "Dialogs.h"
 #include "Notepad2.h"
+#include "Edit.h"
 
 #if !NP2_FORCE_COMPILE_C_AS_CPP
 }

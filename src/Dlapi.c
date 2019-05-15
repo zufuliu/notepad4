@@ -22,8 +22,6 @@
 #include <shlwapi.h>
 #include <shlobj.h>
 #include <commctrl.h>
-#include "Scintilla.h"
-#include "Notepad2.h"
 #include "Helpers.h"
 #include "Dlapi.h"
 

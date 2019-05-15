@@ -28,12 +28,11 @@
 #include <uxtheme.h>
 #include <stdio.h>
 #include <time.h>
-#include <stdint.h>
 #include <inttypes.h>
+#include "Helpers.h"
 #include "Notepad2.h"
 #include "Edit.h"
 #include "Styles.h"
-#include "Helpers.h"
 #include "Dialogs.h"
 #include "SciCall.h"
 #include "resource.h"

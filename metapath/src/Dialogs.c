@@ -25,8 +25,8 @@
 #include <shlobj.h>
 #include <shellapi.h>
 #include <commdlg.h>
-#include "metapath.h"
 #include "Helpers.h"
+#include "metapath.h"
 #include "Dlapi.h"
 #include "Dialogs.h"
 #include "resource.h"
