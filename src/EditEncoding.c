@@ -4,6 +4,7 @@
 #include <shlwapi.h>
 #include <commctrl.h>
 #include <commdlg.h>
+#include <stdint.h>
 #include "Notepad2.h"
 #include "Edit.h"
 #include "Styles.h"
@@ -809,7 +810,6 @@ BOOL IsUTF8(const char *pTest, DWORD nLength) {
 
 	UINT state = UTF8_ACCEPT;
 
-#if NP2_USE_SSE2
 	{
 		const unsigned char *ptr = (const unsigned char *)align_ptr(pt);
 		while (pt < ptr) {
@@ -819,6 +819,7 @@ BOOL IsUTF8(const char *pTest, DWORD nLength) {
 			}
 			++pt;
 		}
+#if NP2_USE_SSE2
 		while (pt + 16 < end) {
 			__m128i chunk = _mm_load_si128((__m128i *)pt);
 			if (_mm_movemask_epi8(chunk)) {
@@ -834,8 +835,40 @@ BOOL IsUTF8(const char *pTest, DWORD nLength) {
 				pt += 16;
 			}
 		}
-	}
+#elif defined(_WIN64)
+		while (pt + 8 < end) {
+			const uint64_t *temp = (const uint64_t *)pt;
+			if (*temp & UINT64_C(0x8080808080808080)) {
+				ptr = pt + 8;
+				while (pt < ptr) {
+					state = utf8_dfa[256 + state + utf8_dfa[*pt]];
+					if (state == UTF8_REJECT) {
+						return FALSE;
+					}
+					++pt;
+				}
+			} else {
+				pt += 8;
+			}
+		}
+#else
+		while (pt + 4 < end) {
+			const uint32_t *temp = (const uint32_t *)pt;
+			if (*temp & 0x80808080U) {
+				ptr = pt + 4;
+				while (pt < ptr) {
+					state = utf8_dfa[256 + state + utf8_dfa[*pt]];
+					if (state == UTF8_REJECT) {
+						return FALSE;
+					}
+					++pt;
+				}
+			} else {
+				pt += 4;
+			}
+		}
 #endif
+	}
 
 	while (pt < end) {
 		state = utf8_dfa[256 + state + utf8_dfa[*pt]];
@@ -857,7 +890,6 @@ BOOL IsUTF7(const char *pTest, DWORD nLength) {
 	const unsigned char *pt = (const unsigned char *)pTest;
 	const unsigned char * const end = pt + nLength;
 
-#if NP2_USE_SSE2
 	{
 		const unsigned char *ptr = (const unsigned char *)align_ptr(pt);
 		while (pt < ptr && (*pt & 0x80) == 0) {
@@ -866,6 +898,7 @@ BOOL IsUTF7(const char *pTest, DWORD nLength) {
 		if (pt != ptr) {
 			return FALSE;
 		}
+#if NP2_USE_SSE2
 		while (pt + 16 < end) {
 			__m128i chunk = _mm_load_si128((__m128i *)pt);
 			if (_mm_movemask_epi8(chunk)) {
@@ -873,8 +906,24 @@ BOOL IsUTF7(const char *pTest, DWORD nLength) {
 			}
 			pt += 16;
 		}
-	}
+#elif defined(_WIN64)
+		while (pt + 8 < end) {
+			const uint64_t *temp = (const uint64_t *)pt;
+			if (*temp & UINT64_C(0x8080808080808080)) {
+				return FALSE;
+			}
+			pt += 8;
+		}
+#else
+		while (pt + 4 < end) {
+			const uint32_t *temp = (const uint32_t *)pt;
+			if (*temp & 0x80808080U) {
+				return FALSE;
+			}
+			pt += 4;
+		}
 #endif
+	}
 
 	while (pt < end && (*pt & 0x80) == 0) {
 		++pt;
