@@ -6813,7 +6813,7 @@ LRESULT CALLBACK SciThemedWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lP
 #define FOLD_CHILDREN SCMOD_CTRL
 #define FOLD_SIBLINGS SCMOD_SHIFT
 
-#define MAX_EDIT_TOGGLE_FOLD_LEVEL		31
+#define MAX_EDIT_TOGGLE_FOLD_LEVEL		63
 struct EditFoldStack {
 	int level_count; // 1-based level number at current header line
 	int level_stack[MAX_EDIT_TOGGLE_FOLD_LEVEL];
