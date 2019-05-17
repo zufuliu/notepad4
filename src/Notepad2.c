@@ -726,6 +726,8 @@ HWND InitInstance(HINSTANCE hInstance, int nCmdShow) {
 		iSrcEncoding = Encoding_Match(lpEncodingArg);
 	}
 
+	UpdateStatusBarCache_OVRMode(TRUE);
+	UpdateStatusBarCache(STATUS_DOCZOOM);
 	BOOL bOpened = FALSE;
 	BOOL bFileLoadCalled = FALSE;
 	// Pathname parameter
@@ -770,6 +772,10 @@ HWND InitInstance(HINSTANCE hInstance, int nCmdShow) {
 
 	if (!bFileLoadCalled) {
 		bOpened = FileLoad(TRUE, TRUE, FALSE, FALSE, L"");
+	}
+	if (!bOpened) {
+		UpdateStatusBarCache(STATUS_CODEPAGE);
+		UpdateStatusBarCache(STATUS_EOLMODE);
 	}
 
 	// reset
@@ -869,12 +875,6 @@ HWND InitInstance(HINSTANCE hInstance, int nCmdShow) {
 		SetNotifyIconTitle(hwndMain);
 	}
 
-	if (!bOpened) {
-		UpdateStatusBarCache(STATUS_CODEPAGE);
-		UpdateStatusBarCache(STATUS_EOLMODE);
-	}
-	UpdateStatusBarCache_OVRMode(TRUE);
-	UpdateStatusBarCache(STATUS_DOCZOOM);
 	UpdateToolbar();
 
 	return hwndMain;
