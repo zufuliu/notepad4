@@ -1117,6 +1117,14 @@ void Style_InitDefaultColor(HWND hwnd) {
 		}
 	}
 	SendMessage(hwnd, SCI_STYLESETBACK, STYLE_DEFAULT, iValue);
+
+	szValue = pLexGlobal->Styles[Style_LineNumber].szValue;
+	if (Style_StrGetColor(TRUE, szValue, &iValue)) {
+		SendMessage(hwnd, SCI_STYLESETFORE, STYLE_LINENUMBER, iValue);
+	}
+	if (Style_StrGetColor(FALSE, szValue, &iValue)) {
+		SendMessage(hwnd, SCI_STYLESETBACK, STYLE_LINENUMBER, iValue);
+	}
 }
 
 //=============================================================================
