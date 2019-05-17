@@ -2449,24 +2449,24 @@ BOOL Style_MaybeBinaryFile(HWND hwnd, LPCWSTR lpszFile) {
 	unsigned char buf[5] = {0}; // magic
 	SendMessage(hwnd, SCI_GETTEXT, COUNTOF(buf), (LPARAM)buf);
 	const UINT magic2 = (buf[0] << 8) | buf[1];
-	if (magic2 == 0x4D5A ||		// PE: MZ
-		magic2 == 0x504B ||		// ZIP: PK
-		magic2 == 0x377A ||		// 7z: 7z
-		magic2 == 0x424D ||		// BMP: BM
-		magic2 == 0xFFD8		// JPEG
+	if (magic2 == 0x4D5AU ||	// PE: MZ
+		magic2 == 0x504BU ||	// ZIP: PK
+		magic2 == 0x377AU ||	// 7z: 7z
+		magic2 == 0x424DU ||	// BMP: BM
+		magic2 == 0xFFD8U		// JPEG
 		) {
 		return TRUE;
 	}
 
 	const UINT magic = (magic2 << 16) | (buf[2] << 8) | buf[3];
-	if (magic == 0x89504E47 ||	// PNG: 0x89+PNG
-		magic == 0x47494638 ||	// GIF: GIF89a
-		magic == 0x25504446 ||	// PDF: %PDF-{version}
-		magic == 0x52617221 ||	// RAR: Rar!
-		magic == 0x7F454C46	||	// ELF: 0x7F+ELF
-		magic == 0x213C6172 ||	// .lib, .a: !<arch>\n
-		magic == 0xFD377A58 ||	// xz: 0xFD+7zXZ
-		magic == 0xCAFEBABE		// Java class
+	if (magic == 0x89504E47U ||	// PNG: 0x89+PNG
+		magic == 0x47494638U ||	// GIF: GIF89a
+		magic == 0x25504446U ||	// PDF: %PDF-{version}
+		magic == 0x52617221U ||	// RAR: Rar!
+		magic == 0x7F454C46U ||	// ELF: 0x7F+ELF
+		magic == 0x213C6172U ||	// .lib, .a: !<arch>\n
+		magic == 0xFD377A58U ||	// xz: 0xFD+7zXZ
+		magic == 0xCAFEBABEU	// Java class
 		) {
 		return TRUE;
 	}
