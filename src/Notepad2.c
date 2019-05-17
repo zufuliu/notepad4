@@ -331,7 +331,7 @@ DWORD		kSystemLibraryLoadFlags = 0;
 #endif
 UINT		g_uCurrentDPI = USER_DEFAULT_SCREEN_DPI;
 UINT		g_uDefaultDPI = USER_DEFAULT_SCREEN_DPI;
-static WCHAR g_wchAppUserModelID[38] = L"";
+static WCHAR g_wchAppUserModelID[64] = L"";
 static WCHAR g_wchWorkingDirectory[MAX_PATH] = L"";
 
 //=============================================================================
@@ -5926,7 +5926,7 @@ int ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2, BOOL *bIsNotepadReplacement) 
 			lstrcpyn(g_wchAppUserModelID, opt, COUNTOF(g_wchAppUserModelID));
 			StrTrim(g_wchAppUserModelID, L"\" ");
 			if (StrIsEmpty(g_wchAppUserModelID)) {
-				lstrcpy(g_wchAppUserModelID, WC_NOTEPAD2);
+				lstrcpy(g_wchAppUserModelID, MY_APPUSERMODELID);
 			}
 			state = 1;
 		}
@@ -6343,7 +6343,7 @@ void LoadFlags(void) {
 		if (StrNotEmpty(strValue)) {
 			lstrcpyn(g_wchAppUserModelID, strValue, COUNTOF(g_wchAppUserModelID));
 		} else {
-			lstrcpy(g_wchAppUserModelID, WC_NOTEPAD2);
+			lstrcpy(g_wchAppUserModelID, MY_APPUSERMODELID);
 		}
 	}
 

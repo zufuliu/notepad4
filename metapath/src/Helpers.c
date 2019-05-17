@@ -249,6 +249,36 @@ HBITMAP LoadBitmapFile(LPCWSTR path) {
 
 //=============================================================================
 //
+// PrivateSetCurrentProcessExplicitAppUserModelID()
+//
+HRESULT PrivateSetCurrentProcessExplicitAppUserModelID(PCWSTR AppID) {
+	if (!IsWin7AndAbove()) {
+		return S_OK;
+	}
+	if (StrIsEmpty(AppID)) {
+		return S_OK;
+	}
+	if (StrCaseEqual(AppID, L"(default)")) {
+		return S_OK;
+	}
+
+	// since Windows 7
+	typedef HRESULT (WINAPI *SetCurrentProcessExplicitAppUserModelIDSig)(PCWSTR AppID);
+	SetCurrentProcessExplicitAppUserModelIDSig pfnSetCurrentProcessExplicitAppUserModelID =
+#if _WIN32_WINNT >= _WIN32_WINNT_WIN7
+		SetCurrentProcessExplicitAppUserModelID;
+#else
+		(SetCurrentProcessExplicitAppUserModelIDSig)GetProcAddress(GetModuleHandle(L"shell32.dll"), "SetCurrentProcessExplicitAppUserModelID");
+#endif
+
+	if (pfnSetCurrentProcessExplicitAppUserModelID) {
+		return pfnSetCurrentProcessExplicitAppUserModelID(AppID);
+	}
+	return S_OK;
+}
+
+//=============================================================================
+//
 //  ExeNameFromWnd()
 //
 BOOL ExeNameFromWnd(HWND hwnd, LPWSTR szExeName, int cchExeName) {

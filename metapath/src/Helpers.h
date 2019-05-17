@@ -272,9 +272,9 @@ NP2_inline void EndWaitCursor(void) {
 	DestroyCursor(SetCursor(LoadCursor(NULL, IDC_ARROW)));
 }
 
+HRESULT PrivateSetCurrentProcessExplicitAppUserModelID(PCWSTR AppID);
 BOOL ExeNameFromWnd(HWND hwnd, LPWSTR szExeName, int cchExeName);
 //BOOL Is32bitExe(LPCWSTR lpszExeName);
-BOOL PrivateIsAppThemed(void);
 BOOL SetTheme(HWND hwnd, LPCWSTR lpszTheme);
 NP2_inline BOOL SetExplorerTheme(HWND hwnd) {
 	return SetTheme(hwnd, L"Explorer");

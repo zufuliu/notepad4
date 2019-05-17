@@ -23,6 +23,7 @@
 
 //==== Main Window ============================================================
 #define WC_NOTEPAD2 L"Notepad2"
+#define MY_APPUSERMODELID	L"Notepad2 Text Editor"
 
 //==== Data Type for WM_COPYDATA ==============================================
 #define DATA_NOTEPAD2_PARAMS 0xFB10
