@@ -58,7 +58,7 @@ BOOL	Style_Export(HWND hwnd);
 void	Style_DetectBaseFontSize(HWND hwnd);
 void	Style_OnDPIChanged(HWND hwnd);
 void	Style_OnStyleThemeChanged(HWND hwnd, int theme);
-void	Style_InitDefaultColor(HWND hwnd);
+void	Style_InitDefaultColor(void);
 void	Style_SetLexer(HWND hwnd, PEDITLEXER pLexNew);
 BOOL	Style_SetLexerFromFile(HWND hwnd, LPCWSTR lpszFile);
 void	Style_SetLexerFromName(HWND hwnd, LPCWSTR lpszFile, LPCWSTR lpszName);

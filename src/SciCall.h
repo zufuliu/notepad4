@@ -220,12 +220,24 @@ NP2_inline void SciCall_SetYCaretPolicy(int caretPolicy, int caretSlop) {
 //  Style definition
 //
 //
+NP2_inline void SciCall_StyleClearAll(void) {
+	SciCall(SCI_STYLECLEARALL, 0, 0);
+}
+
 NP2_inline int SciCall_GetStyleAt(Sci_Position position) {
 	return (int)SciCall(SCI_GETSTYLEAT, position, 0);
 }
 
+NP2_inline void SciCall_StyleSetFore(int style, COLORREF fore) {
+	SciCall(SCI_STYLESETFORE, style, fore);
+}
+
 NP2_inline COLORREF SciCall_StyleGetFore(int style) {
 	return (COLORREF)SciCall(SCI_STYLEGETFORE, style, 0);
+}
+
+NP2_inline void SciCall_StyleSetBack(int style, COLORREF back) {
+	SciCall(SCI_STYLESETBACK, style, back);
 }
 
 NP2_inline COLORREF SciCall_StyleGetBack(int style) {

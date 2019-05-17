@@ -107,7 +107,7 @@ HWND EditCreate(HWND hwndParent) {
 						  NULL);
 
 	InitScintillaHandle(hwnd);
-	Style_InitDefaultColor(hwnd);
+	Style_InitDefaultColor();
 	SendMessage(hwnd, SCI_SETBUFFEREDDRAW, (iRenderingTechnology == SC_TECHNOLOGY_DEFAULT), 0);
 	SendMessage(hwnd, SCI_SETTECHNOLOGY, iRenderingTechnology, 0);
 	SendMessage(hwnd, SCI_SETBIDIRECTIONAL, iBidirectional, 0);

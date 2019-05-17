@@ -1101,7 +1101,8 @@ static inline BOOL Style_StrGetAttributeEx(LPCWSTR lpszStyle, LPCWSTR key, int k
 #define Style_StrGetStrike(lpszStyle)			Style_StrGetAttribute((lpszStyle), L"strike")
 #define Style_StrGetEOLFilled(lpszStyle)		Style_StrGetAttribute((lpszStyle), L"eolfilled")
 
-void Style_InitDefaultColor(HWND hwnd) {
+// set default colors to avoid showing white (COLOR_WINDOW) window while loading big file.
+void Style_InitDefaultColor(void) {
 	PEDITLEXER pLexNew = pLexArray[iDefaultLexer];
 	int iValue = pLexNew->bUseDefaultCodeStyle ? Style_DefaultCode : Style_DefaultText;
 	LPCWSTR szValue = pLexGlobal->Styles[iValue].szValue;
@@ -1110,20 +1111,24 @@ void Style_InitDefaultColor(HWND hwnd) {
 			iValue = GetSysColor(COLOR_WINDOWTEXT);
 		}
 	}
-	SendMessage(hwnd, SCI_STYLESETFORE, STYLE_DEFAULT, iValue);
+	SciCall_StyleSetFore(STYLE_DEFAULT, iValue);
 	if (!Style_StrGetColor(FALSE, szValue, &iValue)) {
 		if (!Style_StrGetColor(FALSE, pLexNew->Styles[0].szValue, &iValue)) {
 			iValue = GetSysColor(COLOR_WINDOW);
 		}
 	}
-	SendMessage(hwnd, SCI_STYLESETBACK, STYLE_DEFAULT, iValue);
+	SciCall_StyleSetBack(STYLE_DEFAULT, iValue);
+	//SciCall_StyleClearAll();
+
+	SciCall_SetFoldMarginColour(TRUE, iValue);
+	SciCall_SetFoldMarginHiColour(TRUE, iValue);
 
 	szValue = pLexGlobal->Styles[Style_LineNumber].szValue;
 	if (Style_StrGetColor(TRUE, szValue, &iValue)) {
-		SendMessage(hwnd, SCI_STYLESETFORE, STYLE_LINENUMBER, iValue);
+		SciCall_StyleSetFore(STYLE_LINENUMBER, iValue);
 	}
 	if (Style_StrGetColor(FALSE, szValue, &iValue)) {
-		SendMessage(hwnd, SCI_STYLESETBACK, STYLE_LINENUMBER, iValue);
+		SciCall_StyleSetBack(STYLE_LINENUMBER, iValue);
 	}
 }
 
