@@ -169,6 +169,7 @@ HANDLE		g_hDefaultHeap;
 #if _WIN32_WINNT < _WIN32_WINNT_WIN10
 DWORD		g_uWinVer;
 #endif
+static WCHAR g_wchAppUserModelID[64] = L"";
 
 //=============================================================================
 //
@@ -238,6 +239,9 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 	if (ActivatePrevInst()) {
 		return 0;
 	}
+
+	// set AppUserModelID
+	PrivateSetCurrentProcessExplicitAppUserModelID(g_wchAppUserModelID);
 
 	// Init OLE and Common Controls
 	OleInitialize(NULL);
@@ -2852,6 +2856,15 @@ void LoadFlags(void) {
 
 	iValue = IniSectionGetInt(pIniSection, L"ToolbarLook", 1);
 	flagToolbarLook = clamp_i(iValue, 0, 2);
+
+	if (StrIsEmpty(g_wchAppUserModelID)) {
+		LPCWSTR strValue = IniSectionGetValue(pIniSection, L"ShellAppUserModelID");
+		if (StrNotEmpty(strValue)) {
+			lstrcpyn(g_wchAppUserModelID, strValue, COUNTOF(g_wchAppUserModelID));
+		} else {
+			lstrcpy(g_wchAppUserModelID, MY_APPUSERMODELID);
+		}
+	}
 
 	IniSectionFree(pIniSection);
 	NP2HeapFree(pIniSectionBuf);

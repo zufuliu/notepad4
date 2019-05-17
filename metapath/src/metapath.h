@@ -23,6 +23,7 @@
 
 //==== Main Window ============================================================
 #define WC_METAPATH L"metapath"
+#define MY_APPUSERMODELID	L"metapath File Browser"
 
 #define WS_METAPATH ((WS_OVERLAPPEDWINDOW ^ \
 					  (WS_MINIMIZEBOX | WS_MAXIMIZEBOX)) | \
