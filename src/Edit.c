@@ -116,7 +116,7 @@ void EditSetNewText(HWND hwnd, LPCSTR lpstrText, DWORD cbText) {
 	}
 
 	SendMessage(hwnd, SCI_SETUNDOCOLLECTION, 1, 0);
-	SendMessage(hwnd, EM_EMPTYUNDOBUFFER, 0, 0);
+	SendMessage(hwnd, SCI_EMPTYUNDOBUFFER, 0, 0);
 	SendMessage(hwnd, SCI_SETSAVEPOINT, 0, 0);
 	SendMessage(hwnd, SCI_GOTOPOS, 0, 0);
 	SendMessage(hwnd, SCI_CHOOSECARETX, 0, 0);
@@ -142,7 +142,7 @@ BOOL EditConvertText(HWND hwnd, UINT cpSource, UINT cpDest, BOOL bSetSavePoint) 
 		SendMessage(hwnd, SCI_MARKERDELETEALL, (WPARAM)(-1), 0);
 		SendMessage(hwnd, SCI_SETCODEPAGE, cpDest, 0);
 		SendMessage(hwnd, SCI_SETUNDOCOLLECTION, 1, 0);
-		SendMessage(hwnd, EM_EMPTYUNDOBUFFER, 0, 0);
+		SendMessage(hwnd, SCI_EMPTYUNDOBUFFER, 0, 0);
 		SendMessage(hwnd, SCI_GOTOPOS, 0, 0);
 		SendMessage(hwnd, SCI_CHOOSECARETX, 0, 0);
 
