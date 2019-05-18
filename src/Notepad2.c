@@ -184,10 +184,10 @@ static BOOL bTransparentMode;
 BOOL	bFindReplaceTransparentMode;
 static BOOL bEditLayoutRTL;
 BOOL	bWindowLayoutRTL;
-int		iRenderingTechnology;
-BOOL	bUseInlineIME;
-BOOL	bInlineIMEUseBlockCaret;
-int		iBidirectional;
+static int iRenderingTechnology;
+static BOOL bUseInlineIME;
+static BOOL bInlineIMEUseBlockCaret;
+static int iBidirectional;
 static BOOL bShowToolbar;
 static BOOL bShowStatusbar;
 static BOOL bInFullScreenMode;
@@ -710,9 +710,6 @@ HWND InitInstance(HINSTANCE hInstance, int nCmdShow) {
 		SetWindowTransparentMode(hwndMain, TRUE, iOpacityLevel);
 	}
 
-	// Current file information -- moved in front of ShowWindow()
-	//FileLoad(TRUE, TRUE, FALSE, FALSE, L"");
-	//
 	if (!flagStartAsTrayIcon) {
 		ShowWindow(hwndMain, nCmdShow);
 		UpdateWindow(hwndMain);
@@ -1545,58 +1542,94 @@ static void EditFrameOnThemeChanged() {
 
 //=============================================================================
 //
-// MsgCreate() - Handles WM_CREATE
+// EditCreate()
 //
-//
-LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) {
-	UNREFERENCED_PARAMETER(wParam);
+HWND EditCreate(HWND hwndParent) {
+	HWND hwnd = CreateWindowEx(WS_EX_CLIENTEDGE,
+						  L"Scintilla",
+						  NULL,
+						  WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS,
+						  0, 0, 0, 0,
+						  hwndParent,
+						  (HMENU)IDC_EDIT,
+						  g_hInstance,
+						  NULL);
 
-	HINSTANCE hInstance = ((LPCREATESTRUCT)lParam)->hInstance;
-	g_uCurrentDPI = GetCurrentDPI(hwnd);
-	g_uDefaultDPI = GetDefaultDPI(hwnd);
-	Style_DetectBaseFontSize(hwnd);
+	InitScintillaHandle(hwnd);
+	Style_InitDefaultColor();
+	SendMessage(hwnd, SCI_SETBUFFEREDDRAW, (iRenderingTechnology == SC_TECHNOLOGY_DEFAULT), 0);
+	SendMessage(hwnd, SCI_SETTECHNOLOGY, iRenderingTechnology, 0);
+	SendMessage(hwnd, SCI_SETBIDIRECTIONAL, iBidirectional, 0);
+	SendMessage(hwnd, SCI_SETIMEINTERACTION, bUseInlineIME, 0);
+	SendMessage(hwnd, SCI_SETINLINEIMEUSEBLOCKCARET, bInlineIMEUseBlockCaret, 0);
+	SendMessage(hwnd, SCI_SETPASTECONVERTENDINGS, 1, 0);
+	SendMessage(hwnd, SCI_SETMODEVENTMASK, /*SC_MODEVENTMASKALL*/SC_MOD_INSERTTEXT | SC_MOD_DELETETEXT, 0);
+	SendMessage(hwnd, SCI_SETCOMMANDEVENTS, FALSE, 0);
+	SendMessage(hwnd, SCI_USEPOPUP, FALSE, 0);
+	SendMessage(hwnd, SCI_SETSCROLLWIDTH, 2048, 0);
+	SendMessage(hwnd, SCI_SETSCROLLWIDTHTRACKING, TRUE, 0);
+	SendMessage(hwnd, SCI_SETENDATLASTLINE, TRUE, 0);
+	SendMessage(hwnd, SCI_SETCARETSTICKY, SC_CARETSTICKY_OFF, 0);
+	SendMessage(hwnd, SCI_SETXCARETPOLICY, CARET_SLOP | CARET_EVEN, 50);
+	SendMessage(hwnd, SCI_SETYCARETPOLICY, CARET_EVEN, 0);
+	SendMessage(hwnd, SCI_SETMULTIPLESELECTION, FALSE, 0);
+	SendMessage(hwnd, SCI_SETADDITIONALSELECTIONTYPING, FALSE, 0);
+	SendMessage(hwnd, SCI_SETVIRTUALSPACEOPTIONS, SCVS_NONE, 0);
+	SendMessage(hwnd, SCI_SETADDITIONALCARETSBLINK, FALSE, 0);
+	SendMessage(hwnd, SCI_SETADDITIONALCARETSVISIBLE, FALSE, 0);
+	// style both before and after the visible text in the background
+	SendMessage(hwnd, SCI_SETIDLESTYLING, SC_IDLESTYLING_ALL, 0);
+	// cache layout for visible lines
+	SendMessage(hwnd, SCI_SETLAYOUTCACHE, SC_CACHE_PAGE, 0);
 
-	// Setup edit control
-	hwndEdit = EditCreate(hwnd);
-	//SciInitThemes(hwndEdit);
+	SendMessage(hwnd, SCI_ASSIGNCMDKEY, (SCK_NEXT + (SCMOD_CTRL << 16)), SCI_PARADOWN);
+	SendMessage(hwnd, SCI_ASSIGNCMDKEY, (SCK_PRIOR + (SCMOD_CTRL << 16)), SCI_PARAUP);
+	SendMessage(hwnd, SCI_ASSIGNCMDKEY, (SCK_NEXT + ((SCMOD_CTRL | SCMOD_SHIFT) << 16)), SCI_PARADOWNEXTEND);
+	SendMessage(hwnd, SCI_ASSIGNCMDKEY, (SCK_PRIOR + ((SCMOD_CTRL | SCMOD_SHIFT) << 16)), SCI_PARAUPEXTEND);
+	SendMessage(hwnd, SCI_ASSIGNCMDKEY, (SCK_HOME + (0 << 16)), SCI_VCHOMEWRAP);
+	SendMessage(hwnd, SCI_ASSIGNCMDKEY, (SCK_END + (0 << 16)), SCI_LINEENDWRAP);
+	SendMessage(hwnd, SCI_ASSIGNCMDKEY, (SCK_HOME + (SCMOD_SHIFT << 16)), SCI_VCHOMEWRAPEXTEND);
+	SendMessage(hwnd, SCI_ASSIGNCMDKEY, (SCK_END + (SCMOD_SHIFT << 16)), SCI_LINEENDWRAPEXTEND);
+
+	//SciInitThemes(hwnd);
 	if (bEditLayoutRTL) {
-		SetWindowLayoutRTL(hwndEdit, TRUE);
+		SetWindowLayoutRTL(hwnd, TRUE);
 	}
 
-	iRenderingTechnology = (int)SendMessage(hwndEdit, SCI_GETTECHNOLOGY, 0, 0);
-	iBidirectional = (int)SendMessage(hwndEdit, SCI_GETBIDIRECTIONAL, 0, 0);
+	iRenderingTechnology = (int)SendMessage(hwnd, SCI_GETTECHNOLOGY, 0, 0);
+	iBidirectional = (int)SendMessage(hwnd, SCI_GETBIDIRECTIONAL, 0, 0);
 
-	SendMessage(hwndEdit, SCI_SETZOOM, iZoomLevel, 0);
+	SendMessage(hwnd, SCI_SETZOOM, iZoomLevel, 0);
 	// Tabs
-	SendMessage(hwndEdit, SCI_SETUSETABS, !bTabsAsSpaces, 0);
-	SendMessage(hwndEdit, SCI_SETTABINDENTS, bTabIndents, 0);
-	SendMessage(hwndEdit, SCI_SETBACKSPACEUNINDENTS, bBackspaceUnindents, 0);
-	SendMessage(hwndEdit, SCI_SETTABWIDTH, iTabWidth, 0);
-	SendMessage(hwndEdit, SCI_SETINDENT, iIndentWidth, 0);
+	SendMessage(hwnd, SCI_SETUSETABS, !bTabsAsSpaces, 0);
+	SendMessage(hwnd, SCI_SETTABINDENTS, bTabIndents, 0);
+	SendMessage(hwnd, SCI_SETBACKSPACEUNINDENTS, bBackspaceUnindents, 0);
+	SendMessage(hwnd, SCI_SETTABWIDTH, iTabWidth, 0);
+	SendMessage(hwnd, SCI_SETINDENT, iIndentWidth, 0);
 
 	// Indent Guides
-	Style_SetIndentGuides(hwndEdit, bShowIndentGuides);
+	Style_SetIndentGuides(hwnd, bShowIndentGuides);
 
 	// Word wrap
-	SendMessage(hwndEdit, SCI_SETWRAPMODE, (fWordWrap? iWordWrapMode : SC_WRAP_NONE), 0);
+	SendMessage(hwnd, SCI_SETWRAPMODE, (fWordWrap? iWordWrapMode : SC_WRAP_NONE), 0);
 	SetWrapIndentMode();
 	SetWrapVisualFlags();
 
 	if (bShowUnicodeControlCharacter) {
-		EditShowUnicodeControlCharacter(hwndEdit, TRUE);
+		EditShowUnicodeControlCharacter(hwnd, TRUE);
 	}
 
 	// current line
-	SendMessage(hwndEdit, SCI_SETCARETLINEVISIBLEALWAYS, TRUE, 0);
+	SendMessage(hwnd, SCI_SETCARETLINEVISIBLEALWAYS, TRUE, 0);
 
 	// Long Lines
 	if (bMarkLongLines) {
-		SendMessage(hwndEdit, SCI_SETEDGEMODE, (iLongLineMode == EDGE_LINE) ? EDGE_LINE : EDGE_BACKGROUND, 0);
-		Style_SetLongLineColors(hwndEdit);
+		SendMessage(hwnd, SCI_SETEDGEMODE, (iLongLineMode == EDGE_LINE) ? EDGE_LINE : EDGE_BACKGROUND, 0);
+		Style_SetLongLineColors(hwnd);
 	} else {
-		SendMessage(hwndEdit, SCI_SETEDGEMODE, EDGE_NONE, 0);
+		SendMessage(hwnd, SCI_SETEDGEMODE, EDGE_NONE, 0);
 	}
-	SendMessage(hwndEdit, SCI_SETEDGECOLUMN, iLongLinesLimit, 0);
+	SendMessage(hwnd, SCI_SETEDGECOLUMN, iLongLinesLimit, 0);
 
 	// Margins
 	UpdateSelectionMarginWidth();
@@ -1604,7 +1637,7 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	SciCall_SetMarginMask(MARGIN_FOLD_INDEX, SC_MASK_FOLDERS);
 	SciCall_SetMarginSensitive(MARGIN_FOLD_INDEX, TRUE);
 	// only select sub line of wrapped line
-	SendMessage(hwndEdit, SCI_SETMARGINOPTIONS, (bWordWrapSelectSubLine ? SC_MARGINOPTION_SUBLINESELECT : SC_MARGINOPTION_NONE), 0);
+	SendMessage(hwnd, SCI_SETMARGINOPTIONS, (bWordWrapSelectSubLine ? SC_MARGINOPTION_SUBLINESELECT : SC_MARGINOPTION_NONE), 0);
 	// Code folding, Box tree
 	SciCall_MarkerDefine(SC_MARKNUM_FOLDEROPEN, SC_MARK_BOXMINUS);
 	SciCall_MarkerDefine(SC_MARKNUM_FOLDER, SC_MARK_BOXPLUS);
@@ -1630,8 +1663,27 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 #endif
 
 	// Nonprinting characters
-	SendMessage(hwndEdit, SCI_SETVIEWWS, (bViewWhiteSpace) ? SCWS_VISIBLEALWAYS : SCWS_INVISIBLE, 0);
-	SendMessage(hwndEdit, SCI_SETVIEWEOL, bViewEOLs, 0);
+	SendMessage(hwnd, SCI_SETVIEWWS, (bViewWhiteSpace) ? SCWS_VISIBLEALWAYS : SCWS_INVISIBLE, 0);
+	SendMessage(hwnd, SCI_SETVIEWEOL, bViewEOLs, 0);
+
+	return hwnd;
+}
+
+//=============================================================================
+//
+// MsgCreate() - Handles WM_CREATE
+//
+//
+LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) {
+	UNREFERENCED_PARAMETER(wParam);
+
+	HINSTANCE hInstance = ((LPCREATESTRUCT)lParam)->hInstance;
+	g_uCurrentDPI = GetCurrentDPI(hwnd);
+	g_uDefaultDPI = GetDefaultDPI(hwnd);
+	Style_DetectBaseFontSize(hwnd);
+
+	// Setup edit control
+	hwndEdit = EditCreate(hwnd);
 
 	hwndEditFrame = CreateWindowEx(
 						WS_EX_CLIENTEDGE,

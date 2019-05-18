@@ -52,10 +52,6 @@ extern int iDefaultEOLMode;
 extern BOOL bFixLineEndings;
 extern BOOL bAutoStripBlanks;
 
-extern int iRenderingTechnology;
-extern int iBidirectional;
-extern BOOL bUseInlineIME;
-extern BOOL bInlineIMEUseBlockCaret;
 // Default Codepage and Character Set
 extern int iDefaultCodePage;
 //extern int iDefaultCharSet;
@@ -89,60 +85,6 @@ void Edit_ReleaseResources(void) {
 	if (editMarkAllStatus.pszText) {
 		NP2HeapFree(editMarkAllStatus.pszText);
 	}
-}
-
-//=============================================================================
-//
-// EditCreate()
-//
-HWND EditCreate(HWND hwndParent) {
-	HWND hwnd = CreateWindowEx(WS_EX_CLIENTEDGE,
-						  L"Scintilla",
-						  NULL,
-						  WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS,
-						  0, 0, 0, 0,
-						  hwndParent,
-						  (HMENU)IDC_EDIT,
-						  g_hInstance,
-						  NULL);
-
-	InitScintillaHandle(hwnd);
-	Style_InitDefaultColor();
-	SendMessage(hwnd, SCI_SETBUFFEREDDRAW, (iRenderingTechnology == SC_TECHNOLOGY_DEFAULT), 0);
-	SendMessage(hwnd, SCI_SETTECHNOLOGY, iRenderingTechnology, 0);
-	SendMessage(hwnd, SCI_SETBIDIRECTIONAL, iBidirectional, 0);
-	SendMessage(hwnd, SCI_SETIMEINTERACTION, bUseInlineIME, 0);
-	SendMessage(hwnd, SCI_SETINLINEIMEUSEBLOCKCARET, bInlineIMEUseBlockCaret, 0);
-	SendMessage(hwnd, SCI_SETPASTECONVERTENDINGS, 1, 0);
-	SendMessage(hwnd, SCI_SETMODEVENTMASK, /*SC_MODEVENTMASKALL*/SC_MOD_INSERTTEXT | SC_MOD_DELETETEXT, 0);
-	SendMessage(hwnd, SCI_SETCOMMANDEVENTS, FALSE, 0);
-	SendMessage(hwnd, SCI_USEPOPUP, FALSE, 0);
-	SendMessage(hwnd, SCI_SETSCROLLWIDTH, 2048, 0);
-	SendMessage(hwnd, SCI_SETSCROLLWIDTHTRACKING, TRUE, 0);
-	SendMessage(hwnd, SCI_SETENDATLASTLINE, TRUE, 0);
-	SendMessage(hwnd, SCI_SETCARETSTICKY, SC_CARETSTICKY_OFF, 0);
-	SendMessage(hwnd, SCI_SETXCARETPOLICY, CARET_SLOP | CARET_EVEN, 50);
-	SendMessage(hwnd, SCI_SETYCARETPOLICY, CARET_EVEN, 0);
-	SendMessage(hwnd, SCI_SETMULTIPLESELECTION, FALSE, 0);
-	SendMessage(hwnd, SCI_SETADDITIONALSELECTIONTYPING, FALSE, 0);
-	SendMessage(hwnd, SCI_SETVIRTUALSPACEOPTIONS, SCVS_NONE, 0);
-	SendMessage(hwnd, SCI_SETADDITIONALCARETSBLINK, FALSE, 0);
-	SendMessage(hwnd, SCI_SETADDITIONALCARETSVISIBLE, FALSE, 0);
-	// style both before and after the visible text in the background
-	SendMessage(hwnd, SCI_SETIDLESTYLING, SC_IDLESTYLING_ALL, 0);
-	// cache layout for visible lines
-	SendMessage(hwnd, SCI_SETLAYOUTCACHE, SC_CACHE_PAGE, 0);
-
-	SendMessage(hwnd, SCI_ASSIGNCMDKEY, (SCK_NEXT + (SCMOD_CTRL << 16)), SCI_PARADOWN);
-	SendMessage(hwnd, SCI_ASSIGNCMDKEY, (SCK_PRIOR + (SCMOD_CTRL << 16)), SCI_PARAUP);
-	SendMessage(hwnd, SCI_ASSIGNCMDKEY, (SCK_NEXT + ((SCMOD_CTRL | SCMOD_SHIFT) << 16)), SCI_PARADOWNEXTEND);
-	SendMessage(hwnd, SCI_ASSIGNCMDKEY, (SCK_PRIOR + ((SCMOD_CTRL | SCMOD_SHIFT) << 16)), SCI_PARAUPEXTEND);
-	SendMessage(hwnd, SCI_ASSIGNCMDKEY, (SCK_HOME + (0 << 16)), SCI_VCHOMEWRAP);
-	SendMessage(hwnd, SCI_ASSIGNCMDKEY, (SCK_END + (0 << 16)), SCI_LINEENDWRAP);
-	SendMessage(hwnd, SCI_ASSIGNCMDKEY, (SCK_HOME + (SCMOD_SHIFT << 16)), SCI_VCHOMEWRAPEXTEND);
-	SendMessage(hwnd, SCI_ASSIGNCMDKEY, (SCK_END + (SCMOD_SHIFT << 16)), SCI_LINEENDWRAPEXTEND);
-
-	return hwnd;
 }
 
 //=============================================================================
