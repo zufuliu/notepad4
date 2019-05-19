@@ -23,6 +23,16 @@
 
 #include "Scintilla.h"
 
+typedef Sci_Position Sci_Line;
+
+NP2_inline Sci_Position min_pos(Sci_Position x, Sci_Position y) {
+	return (x < y) ? x : y;
+}
+
+NP2_inline Sci_Position max_pos(Sci_Position x, Sci_Position y) {
+	return (x > y) ? x : y;
+}
+
 // WideCharToMultiByte, UTF8 encoding of U+0800 to U+FFFF
 #define kMaxMultiByteCount	3
 
@@ -161,10 +171,10 @@ void	EditWrapToColumn(HWND hwnd, int nColumn/*, int nTabWidth*/);
 void	EditJoinLinesEx(HWND hwnd);
 void	EditSortLines(HWND hwnd, int iSortFlags);
 
-void	EditJumpTo(HWND hwnd, int iNewLine, int iNewCol);
-void	EditSelectEx(HWND hwnd, int iAnchorPos, int iCurrentPos);
-void	EditFixPositions(HWND hwnd);
-void	EditEnsureSelectionVisible(HWND hwnd);
+void	EditJumpTo(Sci_Line iNewLine, Sci_Position iNewCol);
+void	EditSelectEx(Sci_Position iAnchorPos, Sci_Position iCurrentPos);
+void	EditFixPositions();
+void	EditEnsureSelectionVisible(void);
 void	EditEnsureConsistentLineEndings(HWND hwnd);
 void	EditGetExcerpt(HWND hwnd, LPWSTR lpszExcerpt, DWORD cchExcerpt);
 
@@ -389,7 +399,7 @@ void FoldToggleLevel(int lev, FOLD_ACTION action);
 void FoldToggleCurrentBlock(FOLD_ACTION action);
 void FoldToggleCurrentLevel(FOLD_ACTION action);
 void FoldToggleDefault(FOLD_ACTION action);
-void FoldClick(int ln, int mode);
+void FoldClick(Sci_Line ln, int mode);
 void FoldAltArrow(int key, int mode);
 
 #endif //NOTEPAD2_EDIT_H_

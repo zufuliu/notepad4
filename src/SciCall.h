@@ -10,6 +10,8 @@
 * The use of these inline wrapper functions with declared types will ensure
 * that we get the benefit of the compiler's type checking.
 *
+* Actual type for `int` based on SciTE's ScintillaCall.h.
+*
 *
 ******************************************************************************/
 
@@ -44,6 +46,10 @@ LRESULT WINAPI Scintilla_DirectFunction(HANDLE handle, UINT msg, WPARAM wParam, 
 //  Selection and information
 //
 //
+NP2_inline void SciCall_SetCodePage(UINT codePage) {
+	SciCall(SCI_SETCODEPAGE, codePage, 0);
+}
+
 NP2_inline UINT SciCall_GetCodePage(void) {
 	return (UINT)SciCall(SCI_GETCODEPAGE, 0, 0);
 }
@@ -52,24 +58,44 @@ NP2_inline Sci_Position SciCall_GetLength(void) {
 	return (Sci_Position)SciCall(SCI_GETLENGTH, 0, 0);
 }
 
-NP2_inline int SciCall_GetLineCount(void) {
-	return (int)SciCall(SCI_GETLINECOUNT, 0, 0);
+NP2_inline Sci_Line SciCall_GetLineCount(void) {
+	return (Sci_Line)SciCall(SCI_GETLINECOUNT, 0, 0);
 }
 
 NP2_inline void SciCall_SetSel(Sci_Position anchor, Sci_Position caret) {
 	SciCall(SCI_SETSEL, anchor, caret);
 }
 
+NP2_inline void SciCall_DocumentStart(void) {
+	SciCall(SCI_DOCUMENTSTART, 0, 0);
+}
+
+NP2_inline void SciCall_DocumentEnd(void) {
+	SciCall(SCI_DOCUMENTEND, 0, 0);
+}
+
 NP2_inline void SciCall_GotoPos(Sci_Position caret) {
 	SciCall(SCI_GOTOPOS, caret, 0);
 }
 
-NP2_inline void SciCall_GotoLine(int line) {
+NP2_inline void SciCall_GotoLine(Sci_Line line) {
 	SciCall(SCI_GOTOLINE, line, 0);
+}
+
+NP2_inline void SciCall_SetCurrentPos(Sci_Position caret) {
+	SciCall(SCI_SETCURRENTPOS, caret, 0);
 }
 
 NP2_inline Sci_Position SciCall_GetCurrentPos(void) {
 	return (Sci_Position)SciCall(SCI_GETCURRENTPOS, 0, 0);
+}
+
+NP2_inline void SciCall_SetAnchor(Sci_Position anchor) {
+	SciCall(SCI_SETANCHOR, anchor, 0);
+}
+
+NP2_inline Sci_Position SciCall_GetAnchor(void) {
+	return (Sci_Position)SciCall(SCI_GETANCHOR, 0, 0);
 }
 
 NP2_inline Sci_Position SciCall_PositionBefore(Sci_Position position) {
@@ -80,15 +106,15 @@ NP2_inline Sci_Position SciCall_PositionAfter(Sci_Position position) {
 	return (Sci_Position)SciCall(SCI_POSITIONAFTER, position, 0);
 }
 
-NP2_inline int SciCall_GetColumn(Sci_Position position) {
-	return (int)SciCall(SCI_GETCOLUMN, position, 0);
+NP2_inline Sci_Position SciCall_GetColumn(Sci_Position position) {
+	return (Sci_Position)SciCall(SCI_GETCOLUMN, position, 0);
 }
 
-NP2_inline int SciCall_LineFromPosition(Sci_Position position) {
-	return (int)SciCall(SCI_LINEFROMPOSITION, position, 0);
+NP2_inline Sci_Line SciCall_LineFromPosition(Sci_Position position) {
+	return (Sci_Line)SciCall(SCI_LINEFROMPOSITION, position, 0);
 }
 
-NP2_inline Sci_Position SciCall_PositionFromLine(int line) {
+NP2_inline Sci_Position SciCall_PositionFromLine(Sci_Line line) {
 	return (Sci_Position)SciCall(SCI_POSITIONFROMLINE, line, 0);
 }
 
@@ -116,28 +142,28 @@ NP2_inline Sci_Position SciCall_WordEndPosition(Sci_Position position, BOOL only
 	return (Sci_Position)SciCall(SCI_WORDENDPOSITION, position, onlyWordCharacters);
 }
 
-NP2_inline int SciCall_GetLineLength(int line) {
-	return (int)SciCall(SCI_GETLINE, line, 0);
-}
-
-NP2_inline Sci_Position SciCall_GetLineEndPosition(int line) {
+NP2_inline Sci_Position SciCall_GetLineEndPosition(Sci_Line line) {
 	return (Sci_Position)SciCall(SCI_GETLINEENDPOSITION, line, 0);
 }
 
-NP2_inline int SciCall_GetLine(int line, char *buffer) {
-	return (int)SciCall(SCI_GETLINE, line, (LPARAM)buffer);
+NP2_inline Sci_Position SciCall_GetLineLength(Sci_Line line) {
+	return (Sci_Position)SciCall(SCI_GETLINE, line, 0);
 }
 
-NP2_inline int SciCall_GetSelTextLength(void) {
-	return (int)SciCall(SCI_GETSELTEXT, 0, 0);
+NP2_inline Sci_Position SciCall_GetLine(Sci_Line line, char *buffer) {
+	return (Sci_Position)SciCall(SCI_GETLINE, line, (LPARAM)buffer);
 }
 
-NP2_inline int SciCall_GetSelText(char *buffer) {
-	return (int)SciCall(SCI_GETSELTEXT, 0, (LPARAM)buffer);
+NP2_inline Sci_Position SciCall_GetSelTextLength(void) {
+	return (Sci_Position)SciCall(SCI_GETSELTEXT, 0, 0);
 }
 
-NP2_inline int SciCall_CountCharacters(Sci_Position start, Sci_Position end) {
-	return (int)SciCall(SCI_COUNTCHARACTERS, start, end);
+NP2_inline Sci_Position SciCall_GetSelText(char *buffer) {
+	return (Sci_Position)SciCall(SCI_GETSELTEXT, 0, (LPARAM)buffer);
+}
+
+NP2_inline Sci_Position SciCall_CountCharacters(Sci_Position start, Sci_Position end) {
+	return (Sci_Position)SciCall(SCI_COUNTCHARACTERS, start, end);
 }
 
 NP2_inline Sci_Position SciCall_GetSelectionStart(void) {
@@ -148,9 +174,9 @@ NP2_inline Sci_Position SciCall_GetSelectionEnd(void) {
 	return (Sci_Position)SciCall(SCI_GETSELECTIONEND, 0, 0);
 }
 
-NP2_inline int EditGetSelectedLineCount(void) {
-	const int iLineStart = SciCall_LineFromPosition(SciCall_GetSelectionStart());
-	const int iLineEnd = SciCall_LineFromPosition(SciCall_GetSelectionEnd());
+NP2_inline Sci_Line EditGetSelectedLineCount(void) {
+	const Sci_Line iLineStart = SciCall_LineFromPosition(SciCall_GetSelectionStart());
+	const Sci_Line iLineEnd = SciCall_LineFromPosition(SciCall_GetSelectionEnd());
 	return iLineEnd - iLineStart + 1;
 }
 
@@ -166,8 +192,8 @@ NP2_inline Sci_Position SciCall_FindText(int searchFlags, struct Sci_TextToFind 
 	return (Sci_Position)SciCall(SCI_FINDTEXT, searchFlags, (LPARAM)ft);
 }
 
-NP2_inline int SciCall_GetTextRange(struct Sci_TextRange *tr) {
-	return (int)SciCall(SCI_GETTEXTRANGE, 0, (LPARAM)tr);
+NP2_inline Sci_Position SciCall_GetTextRange(struct Sci_TextRange *tr) {
+	return (Sci_Position)SciCall(SCI_GETTEXTRANGE, 0, (LPARAM)tr);
 }
 
 NP2_inline void SciCall_SetTargetRange(Sci_Position start, Sci_Position end) {
@@ -203,8 +229,16 @@ NP2_inline BOOL SciCall_GetOvertype(void) {
 	return (BOOL)SciCall(SCI_GETOVERTYPE, 0, 0);
 }
 
+NP2_inline void SciCall_SetCaretStyle(int caretStyle) {
+	SciCall(SCI_SETCARETSTYLE, caretStyle, 0);
+}
+
 NP2_inline void SciCall_ScrollCaret(void) {
 	SciCall(SCI_SCROLLCARET, 0, 0);
+}
+
+NP2_inline void SciCall_ChooseCaretX(void) {
+	SciCall(SCI_CHOOSECARETX, 0, 0);
 }
 
 NP2_inline void SciCall_SetXCaretPolicy(int caretPolicy, int caretSlop) {
@@ -324,35 +358,35 @@ NP2_inline void SciCall_IndicatorFillRange(Sci_Position start, Sci_Position leng
 //  Folding
 //
 //
-NP2_inline BOOL SciCall_GetLineVisible(int line) {
+NP2_inline BOOL SciCall_GetLineVisible(Sci_Line line) {
 	return (BOOL)SciCall(SCI_GETLINEVISIBLE, line, 0);
 }
 
-NP2_inline int SciCall_GetFoldLevel(int line) {
+NP2_inline int SciCall_GetFoldLevel(Sci_Line line) {
 	return (int)SciCall(SCI_GETFOLDLEVEL, line, 0);
 }
 
-NP2_inline void SciCall_SetFoldFlags(int flags) {
+NP2_inline void SciCall_SetFoldFlags(Sci_Line flags) {
 	SciCall(SCI_SETFOLDFLAGS, flags, 0);
 }
 
-NP2_inline int SciCall_GetLastChild(int line) {
-	return (int)SciCall(SCI_GETLASTCHILD, line, -1);
+NP2_inline Sci_Line SciCall_GetLastChild(Sci_Line line) {
+	return (Sci_Line)SciCall(SCI_GETLASTCHILD, line, -1);
 }
 
-NP2_inline int SciCall_GetFoldParent(int line) {
-	return (int)SciCall(SCI_GETFOLDPARENT, line, 0);
+NP2_inline Sci_Line SciCall_GetFoldParent(Sci_Line line) {
+	return (Sci_Line)SciCall(SCI_GETFOLDPARENT, line, 0);
 }
 
-NP2_inline BOOL SciCall_GetFoldExpanded(int line) {
+NP2_inline BOOL SciCall_GetFoldExpanded(Sci_Line line) {
 	return (BOOL)SciCall(SCI_GETFOLDEXPANDED, line, 0);
 }
 
-NP2_inline void SciCall_ToggleFold(int line) {
+NP2_inline void SciCall_ToggleFold(Sci_Line line) {
 	SciCall(SCI_TOGGLEFOLD, line, 0);
 }
 
-NP2_inline void SciCall_ToggleFoldShowText(int line, const char *text) {
+NP2_inline void SciCall_ToggleFoldShowText(Sci_Line line, const char *text) {
 	SciCall(SCI_TOGGLEFOLDSHOWTEXT, line, (LPARAM)text);
 }
 
@@ -364,7 +398,7 @@ NP2_inline void SciCall_FoldDisplayTextSetStyle(int style) {
 	SciCall(SCI_FOLDDISPLAYTEXTSETSTYLE, style, 0);
 }
 
-NP2_inline void SciCall_EnsureVisible(int line) {
+NP2_inline void SciCall_EnsureVisible(Sci_Line line) {
 	SciCall(SCI_ENSUREVISIBLE, line, 0);
 }
 
@@ -373,8 +407,24 @@ NP2_inline void SciCall_EnsureVisible(int line) {
 //  Lexer
 //
 //
+NP2_inline void SciCall_SetLexer(int lexer) {
+	SciCall(SCI_SETLEXER, lexer, 0);
+}
+
+NP2_inline void SciCall_Colourise(Sci_Position start, Sci_Position end) {
+	SciCall(SCI_COLOURISE, start, end);
+}
+
+NP2_inline Sci_Position SciCall_GetEndStyled(void) {
+	return (Sci_Position)SciCall(SCI_GETENDSTYLED, 0, 0);
+}
+
 NP2_inline void SciCall_SetProperty(const char *key, const char *value) {
 	SciCall(SCI_SETPROPERTY, (WPARAM)key, (LPARAM)value);
+}
+
+NP2_inline void SciCall_SetKeywords(int keyWordSet, const char *keywords) {
+	SciCall(SCI_SETKEYWORDS, keyWordSet, (LPARAM)keywords);
 }
 
 #endif // NOTEPAD2_SCICALL_H_

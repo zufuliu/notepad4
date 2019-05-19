@@ -1154,7 +1154,7 @@ void Style_SetLexer(HWND hwnd, PEDITLEXER pLexNew) {
 
 	// Lexer
 	const int iLexer = pLexNew->iLexer;
-	SendMessage(hwnd, SCI_SETLEXER, iLexer, 0);
+	SciCall_SetLexer(iLexer);
 	int rid = pLexNew->rid;
 	if (rid == NP2LEX_MATLAB) {
 		if (np2LexLangIndex == IDM_LANG_OCTAVE) {
@@ -1209,13 +1209,13 @@ void Style_SetLexer(HWND hwnd, PEDITLEXER pLexNew) {
 					}
 					++p;
 				}
-				SendMessage(hwnd, SCI_SETKEYWORDS, i, (LPARAM)lowerKeywords);
+				SciCall_SetKeywords(i, lowerKeywords);
 				NP2HeapFree(lowerKeywords);
 			} else {
-				SendMessage(hwnd, SCI_SETKEYWORDS, i, (LPARAM)pKeywords);
+				SciCall_SetKeywords(i, pKeywords);
 			}
 		} else {
-			SendMessage(hwnd, SCI_SETKEYWORDS, i, (LPARAM)"");
+			SciCall_SetKeywords(i, "");
 		}
 	}
 
@@ -1265,15 +1265,15 @@ void Style_SetLexer(HWND hwnd, PEDITLEXER pLexNew) {
 	}
 
 	if (!Style_StrGetColor(TRUE, szValue, &iValue)) {
-		SendMessage(hwnd, SCI_STYLESETFORE, STYLE_DEFAULT, GetSysColor(COLOR_WINDOWTEXT));
+		SciCall_StyleSetFore(STYLE_DEFAULT, GetSysColor(COLOR_WINDOWTEXT));
 	}
 	if (!Style_StrGetColor(FALSE, szValue, &iValue)) {
-		SendMessage(hwnd, SCI_STYLESETBACK, STYLE_DEFAULT, GetSysColor(COLOR_WINDOW));
+		SciCall_StyleSetBack(STYLE_DEFAULT, GetSysColor(COLOR_WINDOW));
 	}
 	// lexer default (base style), i.e.: EDITSTYLE_DEFAULT
 	Style_SetStyles(hwnd, STYLE_DEFAULT, pLexNew->Styles[0].szValue);
 	// set all styles to have the same attributes as STYLE_DEFAULT.
-	SendMessage(hwnd, SCI_STYLECLEARALL, 0, 0);
+	SciCall_StyleClearAll();
 	//! end Style_Default
 
 	Style_SetDefaultStyle(hwnd, Style_LineNumber);
@@ -1466,7 +1466,7 @@ void Style_SetLexer(HWND hwnd, PEDITLEXER pLexNew) {
 		}
 	}
 
-	SendMessage(hwnd, SCI_COLOURISE, 0, - 1);
+	SciCall_Colourise(0, - 1);
 
 	// Save current lexer
 	pLexCurrent = pLexNew;
@@ -2365,7 +2365,7 @@ BOOL Style_SetLexerFromFile(HWND hwnd, LPCWSTR lpszFile) {
 	// file mode
 	if (!bFound && (fvCurFile.mask & FV_MODE) && fvCurFile.tchMode[0]) {
 		WCHAR wchMode[32];
-		const UINT cpEdit = (UINT)SendMessage(hwnd, SCI_GETCODEPAGE, 0, 0);
+		const UINT cpEdit = SciCall_GetCodePage();
 		MultiByteToWideChar(cpEdit, 0, fvCurFile.tchMode, -1, wchMode, COUNTOF(wchMode));
 
 		if (!fNoCGIGuess && (StrCaseEqual(wchMode, L"cgi") || StrCaseEqual(wchMode, L"fcgi"))) {
@@ -3273,12 +3273,12 @@ void Style_SetStyles(HWND hwnd, int iStyle, LPCWSTR lpszStyle) {
 
 	// Fore
 	if (Style_StrGetColor(TRUE, lpszStyle, &iValue)) {
-		SendMessage(hwnd, SCI_STYLESETFORE, iStyle, iValue);
+		SciCall_StyleSetFore(iStyle, iValue);
 	}
 
 	// Back
 	if (Style_StrGetColor(FALSE, lpszStyle, &iValue)) {
-		SendMessage(hwnd, SCI_STYLESETBACK, iStyle, iValue);
+		SciCall_StyleSetBack(iStyle, iValue);
 	}
 
 	// Weight
@@ -3387,12 +3387,12 @@ static void Style_SetParsed(HWND hwnd, const struct DetailStyle *style, int iSty
 
 	// Fore
 	if (mask & STYLE_MASK_FORE_COLOR) {
-		SendMessage(hwnd, SCI_STYLESETFORE, iStyle, style->foreColor);
+		SciCall_StyleSetFore(iStyle, style->foreColor);
 	}
 
 	// Back
 	if (mask & STYLE_MASK_BACK_COLOR) {
-		SendMessage(hwnd, SCI_STYLESETBACK, iStyle, style->backColor);
+		SciCall_StyleSetBack(iStyle, style->backColor);
 	}
 
 	// Weight
