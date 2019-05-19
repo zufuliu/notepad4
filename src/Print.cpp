@@ -33,6 +33,7 @@ extern "C" {
 #include "Dialogs.h"
 #include "Notepad2.h"
 #include "Edit.h"
+#include "SciCall.h"
 
 #if !NP2_FORCE_COMPILE_C_AS_CPP
 }
@@ -81,7 +82,7 @@ void StatusUpdatePrintPage(int iPageNum) noexcept {
 
 extern "C" BOOL EditPrint(HWND hwnd, LPCWSTR pszDocTitle, LPCWSTR pszPageFormat) {
 	// Don't print empty documents
-	if (SendMessage(hwnd, SCI_GETLENGTH, 0, 0) == 0) {
+	if (SciCall_GetLength() == 0) {
 		MsgBox(MBWARN, IDS_PRINT_EMPTY);
 		return TRUE;
 	}
@@ -101,8 +102,8 @@ extern "C" BOOL EditPrint(HWND hwnd, LPCWSTR pszDocTitle, LPCWSTR pszPageFormat)
 	pdlg.hDevMode = hDevMode;
 	pdlg.hDevNames = hDevNames;
 
-	const int startPos = (int)SendMessage(hwnd, SCI_GETSELECTIONSTART, 0, 0);;
-	const int endPos = (int)SendMessage(hwnd, SCI_GETSELECTIONEND, 0, 0);
+	const Sci_Position startPos = SciCall_GetSelectionStart();
+	const Sci_Position endPos = SciCall_GetSelectionEnd();
 
 	if (startPos == endPos) {
 		pdlg.Flags |= PD_NOSELECTION;
@@ -270,9 +271,9 @@ extern "C" BOOL EditPrint(HWND hwnd, LPCWSTR pszDocTitle, LPCWSTR pszPageFormat)
 	// Set print zoom...
 	SendMessage(hwnd, SCI_SETPRINTMAGNIFICATION, iPrintZoom, 0);
 
-	LONG lengthDoc = (LONG)SendMessage(hwnd, SCI_GETLENGTH, 0, 0);
-	const LONG lengthDocMax = lengthDoc;
-	LONG lengthPrinted = 0;
+	Sci_Position lengthDoc = SciCall_GetLength();
+	const Sci_Position lengthDocMax = lengthDoc;
+	Sci_Position lengthPrinted = 0;
 
 	// Requested to print selection
 	if (pdlg.Flags & PD_SELECTION) {
@@ -362,8 +363,8 @@ extern "C" BOOL EditPrint(HWND hwnd, LPCWSTR pszDocTitle, LPCWSTR pszPageFormat)
 			}
 		}
 
-		frPrint.chrg.cpMin = lengthPrinted;
-		frPrint.chrg.cpMax = lengthDoc;
+		frPrint.chrg.cpMin = (Sci_PositionCR)lengthPrinted;
+		frPrint.chrg.cpMax = (Sci_PositionCR)lengthDoc;
 
 		lengthPrinted = (LONG)SendMessage(hwnd, SCI_FORMATRANGE, printPage, (LPARAM)&frPrint);
 
