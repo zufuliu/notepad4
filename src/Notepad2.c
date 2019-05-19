@@ -741,8 +741,8 @@ HWND InitInstance(HINSTANCE hInstance, int nCmdShow) {
 			if ((bOpened = FileLoad(FALSE, FALSE, FALSE, FALSE, lpFileArg)) != FALSE) {
 				bFileLoadCalled = TRUE;
 				if (flagJumpTo) { // Jump to position
-					EditJumpTo(hwndEdit, iInitialLine, iInitialColumn);
-					EditEnsureSelectionVisible(hwndEdit);
+					EditJumpTo(iInitialLine, iInitialColumn);
+					EditEnsureSelectionVisible();
 				}
 			}
 		}
@@ -786,7 +786,7 @@ HWND InitInstance(HINSTANCE hInstance, int nCmdShow) {
 		if (SendMessage(hwndEdit, SCI_CANPASTE, 0, 0)) {
 			const BOOL back = autoCompletionConfig.bIndentText;
 			autoCompletionConfig.bIndentText = FALSE;
-			EditJumpTo(hwndEdit, -1, 0);
+			SciCall_DocumentEnd();
 			SendMessage(hwndEdit, SCI_BEGINUNDOACTION, 0, 0);
 			if (SendMessage(hwndEdit, SCI_GETLENGTH, 0, 0) > 0) {
 				SendMessage(hwndEdit, SCI_NEWLINE, 0, 0);
@@ -796,9 +796,9 @@ HWND InitInstance(HINSTANCE hInstance, int nCmdShow) {
 			SendMessage(hwndEdit, SCI_ENDUNDOACTION, 0, 0);
 			autoCompletionConfig.bIndentText = back;
 			if (flagJumpTo) {
-				EditJumpTo(hwndEdit, iInitialLine, iInitialColumn);
+				EditJumpTo(iInitialLine, iInitialColumn);
 			}
-			EditEnsureSelectionVisible(hwndEdit);
+			EditEnsureSelectionVisible();
 		}
 	}
 
@@ -816,8 +816,8 @@ HWND InitInstance(HINSTANCE hInstance, int nCmdShow) {
 
 	// Match Text
 	if (flagMatchText && lpMatchArg) {
-		if (StrNotEmpty(lpMatchArg) && SendMessage(hwndEdit, SCI_GETLENGTH, 0, 0)) {
-			const UINT cpEdit = (UINT)SendMessage(hwndEdit, SCI_GETCODEPAGE, 0, 0);
+		if (StrNotEmpty(lpMatchArg) && SciCall_GetLength()) {
+			const UINT cpEdit = SciCall_GetCodePage();
 			WideCharToMultiByte(cpEdit, 0, lpMatchArg, -1, efrData.szFind, COUNTOF(efrData.szFind), NULL, NULL);
 			WideCharToMultiByte(CP_UTF8, 0, lpMatchArg, -1, efrData.szFindUTF8, COUNTOF(efrData.szFindUTF8), NULL, NULL);
 			cpLastFind = cpEdit;
@@ -830,16 +830,16 @@ HWND InitInstance(HINSTANCE hInstance, int nCmdShow) {
 
 			if (flagMatchText & 2) {
 				if (!flagJumpTo) {
-					EditJumpTo(hwndEdit, -1, 0);
+					SciCall_DocumentEnd();
 				}
 				EditFindPrev(hwndEdit, &efrData, FALSE);
-				EditEnsureSelectionVisible(hwndEdit);
+				EditEnsureSelectionVisible();
 			} else {
 				if (!flagJumpTo) {
-					SendMessage(hwndEdit, SCI_DOCUMENTSTART, 0, 0);
+					SciCall_DocumentStart();
 				}
 				EditFindNext(hwndEdit, &efrData, FALSE);
-				EditEnsureSelectionVisible(hwndEdit);
+				EditEnsureSelectionVisible();
 			}
 		}
 		LocalFree(lpMatchArg);
@@ -1181,8 +1181,8 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 				if (params->iInitialLine == 0) {
 					params->iInitialLine = 1;
 				}
-				EditJumpTo(hwndEdit, params->iInitialLine, params->iInitialColumn);
-				EditEnsureSelectionVisible(hwndEdit);
+				EditJumpTo(params->iInitialLine, params->iInitialColumn);
+				EditEnsureSelectionVisible();
 			}
 
 			flagLexerSpecified = 0;
@@ -1297,8 +1297,8 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 				if (FileLoad(TRUE, FALSE, TRUE, FALSE, szCurFile)) {
 
 					if (bIsTail && iFileWatchingMode == 2) {
-						EditJumpTo(hwndEdit, -1, 0);
-						EditEnsureSelectionVisible(hwndEdit);
+						SciCall_DocumentEnd();
+						EditEnsureSelectionVisible();
 					}
 #if NP2_ENABLE_DOT_LOG_FEATURE
 					 else if (IsFileStartsWithDotLog(hwndEdit)) {
@@ -2453,7 +2453,7 @@ static void ConvertLineEndings(int iNewEOLMode) {
 	iEOLMode = iNewEOLMode;
 	SendMessage(hwndEdit, SCI_SETEOLMODE, iNewEOLMode, 0);
 	SendMessage(hwndEdit, SCI_CONVERTEOLS, iNewEOLMode, 0);
-	EditFixPositions(hwndEdit);
+	EditFixPositions();
 	UpdateStatusBarCache(STATUS_EOLMODE);
 	UpdateToolbar();
 	UpdateStatusbar();
@@ -3255,7 +3255,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			}
 			if (pLexCurrent->iLexer == SCLEX_PYTHON) {
 				const Sci_Position iCurrentPos = SciCall_GetCurrentPos();
-				const int iCurLine = SciCall_LineFromPosition(iCurrentPos);
+				const Sci_Line iCurLine = SciCall_LineFromPosition(iCurrentPos);
 				const Sci_Position iCurrentLinePos = iCurrentPos - SciCall_PositionFromLine(iCurLine);
 				if (iCurLine < 2 && iCurrentLinePos == 0) {
 					char cmsz[128];
@@ -3265,10 +3265,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 				}
 			}
 			if (!done) {
-				//int iSelStart;
-				//iSelStart = SendMessage(hwndEdit, SCI_GETSELECTIONSTART, 0, 0);
 				SendMessage(hwndEdit, SCI_REPLACESEL, 0, (LPARAM)msz);
-				//SendMessage(hwndEdit, SCI_SETANCHOR, iSelStart, 0);
 			}
 		}
 	}
@@ -3311,7 +3308,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			wsprintf(tchDateTime, L"%s %s", tchTime, tchDate);
 		}
 
-		const UINT cpEdit = (UINT)SendMessage(hwndEdit, SCI_GETCODEPAGE, 0, 0);
+		const UINT cpEdit = SciCall_GetCodePage();
 		char mszBuf[256 * kMaxMultiByteCount];
 		WideCharToMultiByte(cpEdit, 0, tchDateTime, -1, mszBuf, COUNTOF(mszBuf), NULL, NULL);
 		//const int iSelStart = SendMessage(hwndEdit, SCI_GETSELECTIONSTART, 0, 0);
@@ -3408,7 +3405,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		} else {
 			//int iSelStart;
 			char mszBuf[MAX_PATH * kMaxMultiByteCount];
-			const UINT cpEdit = (UINT)SendMessage(hwndEdit, SCI_GETCODEPAGE, 0, 0);
+			const UINT cpEdit = SciCall_GetCodePage();
 			WideCharToMultiByte(cpEdit, 0, pszInsert, -1, mszBuf, COUNTOF(mszBuf), NULL, NULL);
 			//iSelStart = SendMessage(hwndEdit, SCI_GETSELECTIONSTART, 0, 0);
 			SendMessage(hwndEdit, SCI_REPLACESEL, 0, (LPARAM)mszBuf);
@@ -3636,7 +3633,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 				SendWMCommand(hwnd, IDM_EDIT_REPLACE);
 			}
 		} else {
-			const UINT cpEdit = (UINT)SendMessage(hwndEdit, SCI_GETCODEPAGE, 0, 0);
+			const UINT cpEdit = SciCall_GetCodePage();
 			if (cpLastFind != cpEdit) {
 				if (cpEdit != SC_CP_UTF8) {
 					WCHAR wch[NP2_FIND_REPLACE_LIMIT];
@@ -4420,7 +4417,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		WCHAR wchReplace[256];
 		wcsftime(wchReplace, COUNTOF(wchReplace), wchTemplate, &sst);
 
-		const UINT cpEdit = (UINT)SendMessage(hwndEdit, SCI_GETCODEPAGE, 0, 0);
+		const UINT cpEdit = SciCall_GetCodePage();
 #if NP2_USE_DESIGNATED_INITIALIZER
 		EDITFINDREPLACE efrTS = {
 			.hwnd = hwndEdit,
@@ -4480,7 +4477,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 				*lpsz = '\0';
 			}
 
-			cpLastFind = (UINT)SendMessage(hwndEdit, SCI_GETCODEPAGE, 0, 0);
+			cpLastFind = SciCall_GetCodePage();
 			strcpy(efrData.szFind, mszSelection);
 
 			if (cpLastFind != SC_CP_UTF8) {
@@ -4753,36 +4750,36 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 				// Brace Match
 				if (bMatchBraces) {
-					int iEndStyled = (int)SendMessage(hwndEdit, SCI_GETENDSTYLED, 0, 0);
-					if (iEndStyled < (int)SendMessage(hwndEdit, SCI_GETLENGTH, 0, 0)) {
-						const int iLine = (int)SendMessage(hwndEdit, SCI_LINEFROMPOSITION, iEndStyled, 0);
-						iEndStyled = (int)SendMessage(hwndEdit, SCI_POSITIONFROMLINE, iLine, 0);
-						SendMessage(hwndEdit, SCI_COLOURISE, iEndStyled, -1);
+					Sci_Position iEndStyled = SciCall_GetEndStyled();
+					if (iEndStyled < SciCall_GetLength()) {
+						const Sci_Line iLine = SciCall_LineFromPosition(iEndStyled);
+						iEndStyled = SciCall_PositionFromLine(iLine);
+						SciCall_Colourise(iEndStyled, -1);
 					}
 
-					int iPos = (int)SendMessage(hwndEdit, SCI_GETCURRENTPOS, 0, 0);
-					int ch = (int)SendMessage(hwndEdit, SCI_GETCHARAT, iPos, 0);
+					Sci_Position iPos = SciCall_GetCurrentPos();
+					int ch = SciCall_GetCharAt(iPos);
 					if (ch < 0x80 && strchr("()[]{}<>", ch)) {
 						const int iBrace2 = (int)SendMessage(hwndEdit, SCI_BRACEMATCH, iPos, 0);
 						if (iBrace2 != -1) {
-							const int col1 = (int)SendMessage(hwndEdit, SCI_GETCOLUMN, iPos, 0);
-							const int col2 = (int)SendMessage(hwndEdit, SCI_GETCOLUMN, iBrace2, 0);
+							const Sci_Position col1 = SciCall_GetColumn(iPos);
+							const Sci_Position col2 = SciCall_GetColumn(iBrace2);
 							SendMessage(hwndEdit, SCI_BRACEHIGHLIGHT, iPos, iBrace2);
-							SendMessage(hwndEdit, SCI_SETHIGHLIGHTGUIDE, min_i(col1, col2), 0);
+							SendMessage(hwndEdit, SCI_SETHIGHLIGHTGUIDE, min_pos(col1, col2), 0);
 						} else {
 							SendMessage(hwndEdit, SCI_BRACEBADLIGHT, iPos, 0);
 							SendMessage(hwndEdit, SCI_SETHIGHLIGHTGUIDE, 0, 0);
 						}
 					} else { // Try one before
-						iPos = (int)SendMessage(hwndEdit, SCI_POSITIONBEFORE, iPos, 0);
-						ch = (int)SendMessage(hwndEdit, SCI_GETCHARAT, iPos, 0);
+						iPos = SciCall_PositionBefore(iPos);
+						ch = SciCall_GetCharAt(iPos);
 						if (ch < 0x80 && strchr("()[]{}<>", ch)) {
 							const int iBrace2 = (int)SendMessage(hwndEdit, SCI_BRACEMATCH, iPos, 0);
 							if (iBrace2 != -1) {
-								const int col1 = (int)SendMessage(hwndEdit, SCI_GETCOLUMN, iPos, 0);
-								const int col2 = (int)SendMessage(hwndEdit, SCI_GETCOLUMN, iBrace2, 0);
+								const Sci_Position col1 = SciCall_GetColumn(iPos);
+								const Sci_Position col2 = SciCall_GetColumn(iBrace2);
 								SendMessage(hwndEdit, SCI_BRACEHIGHLIGHT, iPos, iBrace2);
-								SendMessage(hwndEdit, SCI_SETHIGHLIGHTGUIDE, min_i(col1, col2), 0);
+								SendMessage(hwndEdit, SCI_SETHIGHLIGHTGUIDE, min_pos(col1, col2), 0);
 							} else {
 								SendMessage(hwndEdit, SCI_BRACEBADLIGHT, iPos, 0);
 								SendMessage(hwndEdit, SCI_SETHIGHLIGHTGUIDE, 0, 0);
@@ -6678,29 +6675,29 @@ void UpdateStatusbar(void) {
 
 	const Sci_Position iPos =  SciCall_GetCurrentPos();
 
-	const int iLn = SciCall_LineFromPosition(iPos) + 1;
-	wsprintf(tchLn, L"%i", iLn);
+	const Sci_Line iLn = SciCall_LineFromPosition(iPos) + 1;
+	wsprintf(tchLn, L"%i", (int)iLn);
 	FormatNumberStr(tchLn);
 
-	const int iLines = SciCall_GetLineCount();
-	wsprintf(tchLines, L"%i", iLines);
+	const Sci_Line iLines = SciCall_GetLineCount();
+	wsprintf(tchLines, L"%i", (int)iLines);
 	FormatNumberStr(tchLines);
 
-	int iCol = SciCall_GetColumn(iPos) + 1;
-	wsprintf(tchCol, L"%i", iCol);
+	Sci_Position iCol = SciCall_GetColumn(iPos) + 1;
+	wsprintf(tchCol, L"%i", (int)iCol);
 	FormatNumberStr(tchCol);
 
 	const Sci_Position iLineStart = SciCall_PositionFromLine(iLn - 1);
 	const Sci_Position iLineEnd = SciCall_GetLineEndPosition(iLn - 1);
 	iCol = SciCall_CountCharacters(iLineStart, iPos) + 1;
-	const int iLineChar = SciCall_CountCharacters(iLineStart, iLineEnd);
-	wsprintf(tchCh, L"%i", iCol);
-	wsprintf(tchChs, L"%i", iLineChar);
+	const Sci_Position iLineChar = SciCall_CountCharacters(iLineStart, iLineEnd);
+	wsprintf(tchCh, L"%i", (int)iCol);
+	wsprintf(tchChs, L"%i", (int)iLineChar);
 	FormatNumberStr(tchCh);
 	FormatNumberStr(tchChs);
 
 	iCol = SciCall_GetColumn(iLineEnd);
-	wsprintf(tchCols, L"%i", iCol);
+	wsprintf(tchCols, L"%i", (int)iCol);
 	FormatNumberStr(tchCols);
 
 	const Sci_Position iSelStart = SciCall_GetSelectionStart();
@@ -6709,11 +6706,11 @@ void UpdateStatusbar(void) {
 		lstrcpy(tchSel, L"0");
 		lstrcpy(tchSelCh, L"0");
 	} else if (SC_SEL_RECTANGLE != SciCall_GetSelectionMode()) {
-		int iSel = SciCall_GetSelText(NULL) - 1;
-		wsprintf(tchSel, L"%i", iSel);
+		Sci_Position iSel = SciCall_GetSelText(NULL) - 1;
+		wsprintf(tchSel, L"%i", (int)iSel);
 		FormatNumberStr(tchSel);
 		iSel = SciCall_CountCharacters(iSelStart, iSelEnd);
-		wsprintf(tchSelCh, L"%i", iSel);
+		wsprintf(tchSelCh, L"%i", (int)iSel);
 		FormatNumberStr(tchSelCh);
 	} else {
 		lstrcpy(tchSel, L"--");
@@ -6725,16 +6722,16 @@ void UpdateStatusbar(void) {
 		lstrcpy(tchLinesSelected, L"0");
 		lstrcpy(tchMatchesCount, L"0");
 	} else {
-		const int iStartLine = SciCall_LineFromPosition(iSelStart);
-		const int iEndLine = SciCall_LineFromPosition(iSelEnd);
+		const Sci_Line iStartLine = SciCall_LineFromPosition(iSelStart);
+		const Sci_Line iEndLine = SciCall_LineFromPosition(iSelEnd);
 		const Sci_Position iStartOfLinePos = SciCall_PositionFromLine(iEndLine);
-		int iLinesSelected = iEndLine - iStartLine;
+		Sci_Line iLinesSelected = iEndLine - iStartLine;
 		if (iSelStart != iSelEnd && iStartOfLinePos != iSelEnd) {
 			iLinesSelected += 1;
 		}
-		wsprintf(tchLinesSelected, L"%i", iLinesSelected);
+		wsprintf(tchLinesSelected, L"%i", (int)iLinesSelected);
 		FormatNumberStr(tchLinesSelected);
-		wsprintf(tchMatchesCount, L"%i", iMatchesCount);
+		wsprintf(tchMatchesCount, L"%i", (int)iMatchesCount);
 		FormatNumberStr(tchMatchesCount);
 	}
 
@@ -6776,8 +6773,8 @@ void UpdateLineNumberWidth(void) {
 	if (bShowLineNumbers) {
 		char tchLines[32];
 
-		const int iLines = SciCall_GetLineCount();
-		sprintf(tchLines, "_%i_", iLines);
+		const Sci_Line iLines = SciCall_GetLineCount();
+		sprintf(tchLines, "_%i_", (int)iLines);
 
 		const int iLineMarginWidthNow = SciCall_GetMarginWidth(MARGIN_LINE_NUMBER);
 		const int iLineMarginWidthFit = SciCall_TextWidth(STYLE_LINENUMBER, tchLines);
@@ -6902,8 +6899,8 @@ BOOL FileIO(BOOL fLoad, LPWSTR pszFile, BOOL bFlag, EditFileIOStatus *status) {
 BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect, LPCWSTR lpszFile) {
 	WCHAR tch[MAX_PATH] = L"";
 	BOOL fSuccess = FALSE;
-	int line = 0;
-	int col = 0;
+	Sci_Line line = 0;
+	Sci_Position col = 0;
 	int keepTitleExcerpt = fKeepTitleExcerpt;
 	int lexerSpecified = flagLexerSpecified;
 
@@ -7060,20 +7057,20 @@ BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect, LPCWST
 		InstallFileWatching(szCurFile);
 
 		if (line > 1 || col > 1) {
-			EditJumpTo(hwndEdit, line, col);
-			EditEnsureSelectionVisible(hwndEdit);
+			EditJumpTo(line, col);
+			EditEnsureSelectionVisible();
 		}
 #if NP2_ENABLE_DOT_LOG_FEATURE
 		if (IsFileStartsWithDotLog(hwndEdit)) {
-			EditJumpTo(hwndEdit, -1, 0);
+			SciCall_DocumentEnd();
 			SendMessage(hwndEdit, SCI_BEGINUNDOACTION, 0, 0);
 			SendMessage(hwndEdit, SCI_NEWLINE, 0, 0);
 			SendWMCommand(hwndMain, IDM_EDIT_INSERT_SHORTDATE);
-			EditJumpTo(hwndEdit, -1, 0);
+			SciCall_DocumentEnd();
 			SendMessage(hwndEdit, SCI_NEWLINE, 0, 0);
 			SendMessage(hwndEdit, SCI_ENDUNDOACTION, 0, 0);
-			EditJumpTo(hwndEdit, -1, 0);
-			EditEnsureSelectionVisible(hwndEdit);
+			SciCall_DocumentEnd();
+			EditEnsureSelectionVisible();
 		}
 #endif
 
@@ -7739,9 +7736,9 @@ void GetRelaunchParameters(LPWSTR szParameters, LPCWSTR lpszFile, BOOL newWind, 
 		// position
 		const Sci_Position pos = SciCall_GetCurrentPos();
 		if (pos > 0) {
-			x = SciCall_LineFromPosition(pos) + 1;
-			y = SciCall_GetColumn(pos) + 1;
-			wsprintf(tch, L" -g %i,%i", x, y);
+			const Sci_Line line = SciCall_LineFromPosition(pos) + 1;
+			const Sci_Position col = SciCall_GetColumn(pos) + 1;
+			wsprintf(tch, L" -g %i,%i", (int)line, (int)col);
 			lstrcat(szParameters, tch);
 		}
 
@@ -8048,7 +8045,7 @@ void CALLBACK PasteBoardTimer(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTi
 		if (SendMessage(hwndEdit, SCI_CANPASTE, 0, 0)) {
 			const BOOL back = autoCompletionConfig.bIndentText;
 			autoCompletionConfig.bIndentText = FALSE;
-			EditJumpTo(hwndEdit, -1, 0);
+			SciCall_DocumentEnd();
 			SendMessage(hwndEdit, SCI_BEGINUNDOACTION, 0, 0);
 			if (SendMessage(hwndEdit, SCI_GETLENGTH, 0, 0) > 0) {
 				SendMessage(hwndEdit, SCI_NEWLINE, 0, 0);
@@ -8056,7 +8053,7 @@ void CALLBACK PasteBoardTimer(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTi
 			SendMessage(hwndEdit, SCI_PASTE, 0, 0);
 			SendMessage(hwndEdit, SCI_NEWLINE, 0, 0);
 			SendMessage(hwndEdit, SCI_ENDUNDOACTION, 0, 0);
-			EditEnsureSelectionVisible(hwndEdit);
+			EditEnsureSelectionVisible();
 			autoCompletionConfig.bIndentText = back;
 		}
 

@@ -335,7 +335,7 @@ BOOL EditSetNewEncoding(HWND hwnd, int iCurrentEncoding, int iNewEncoding, BOOL 
 }
 
 void EditOnCodePageChanged(HWND hwnd, UINT oldCodePage) {
-	const UINT cpEdit = (UINT)SendMessage(hwnd, SCI_GETCODEPAGE, 0, 0);
+	const UINT cpEdit = SciCall_GetCodePage();
 	const UINT acp = GetACP();
 	if (oldCodePage == SC_CP_UTF8) {
 		if (cpEdit == 0) {

@@ -1068,7 +1068,7 @@ void EditCompleteUpdateConfig(void) {
 void EditCompleteWord(HWND hwnd, BOOL autoInsert) {
 	const Sci_Position iCurrentPos = SciCall_GetCurrentPos();
 	const int iCurrentStyle = SciCall_GetStyleAt(iCurrentPos);
-	const int iLine = SciCall_LineFromPosition(iCurrentPos);
+	const Sci_Line iLine = SciCall_LineFromPosition(iCurrentPos);
 	const Sci_Position iLineStartPos = SciCall_PositionFromLine(iLine);
 
 	autoCompletionConfig.iPreviousItemCount = 0; // recreate list
@@ -1433,31 +1433,31 @@ static inline BOOL IsHtmlVoidTag(const char *word, int length) {
 void EditAutoCloseXMLTag(HWND hwnd) {
 	char tchBuf[512];
 	const Sci_Position iCurPos = SciCall_GetCurrentPos();
-	int iHelper = (int)(iCurPos - (COUNTOF(tchBuf) - 1));
-	const int iStartPos = max_i(0, iHelper);
+	const Sci_Position iStartPos = max_pos(0, iCurPos - (COUNTOF(tchBuf) - 1));
 	const Sci_Position iSize = iCurPos - iStartPos;
+	BOOL shouldAutoClose = iSize >= 3;
 	BOOL autoClosed = FALSE;
 
-	if (pLexCurrent->iLexer == SCLEX_CPP) {
+	if (shouldAutoClose && pLexCurrent->iLexer == SCLEX_CPP) {
 		int iCurrentStyle = SciCall_GetStyleAt(iCurPos);
 		if (iCurrentStyle == SCE_C_OPERATOR || iCurrentStyle == SCE_C_DEFAULT) {
-			iHelper = FALSE;
+			shouldAutoClose = FALSE;
 		} else {
-			const int iLine = SciCall_LineFromPosition(iCurPos);
+			const Sci_Line iLine = SciCall_LineFromPosition(iCurPos);
 			Sci_Position iCurrentLinePos = SciCall_PositionFromLine(iLine);
 			while (iCurrentLinePos < iCurPos && IsASpaceOrTab(SciCall_GetCharAt(iCurrentLinePos))) {
 				iCurrentLinePos++;
 			}
 			iCurrentStyle = SciCall_GetStyleAt(iCurrentLinePos);
 			if (SciCall_GetCharAt(iCurrentLinePos) == '#' && iCurrentStyle == SCE_C_PREPROCESSOR) {
-				iHelper = FALSE;
+				shouldAutoClose = FALSE;
 			}
 		}
 	}
 
-	if (iSize >= 3 && iHelper) {
+	if (shouldAutoClose) {
 		struct Sci_TextRange tr;
-		tr.chrg.cpMin = iStartPos;
+		tr.chrg.cpMin = (Sci_PositionCR)iStartPos;
 		tr.chrg.cpMax = (Sci_PositionCR)iCurPos;
 		tr.lpstrText = tchBuf;
 		SendMessage(hwnd, SCI_GETTEXTRANGE, 0, (LPARAM)&tr);
@@ -1483,12 +1483,12 @@ void EditAutoCloseXMLTag(HWND hwnd) {
 			tchIns[cchIns++] = '>';
 			tchIns[cchIns] = '\0';
 
-			iHelper = cchIns > 3;
-			if (iHelper && pLexCurrent->iLexer == SCLEX_HTML) {
+			shouldAutoClose = cchIns > 3;
+			if (shouldAutoClose && pLexCurrent->iLexer == SCLEX_HTML) {
 				tchIns[cchIns - 1] = '\0';
-				iHelper = !IsHtmlVoidTag(tchIns + 2, cchIns - 3);
+				shouldAutoClose = !IsHtmlVoidTag(tchIns + 2, cchIns - 3);
 			}
-			if (iHelper) {
+			if (shouldAutoClose) {
 				tchIns[cchIns - 1] = '>';
 				autoClosed = TRUE;
 				SendMessage(hwnd, SCI_BEGINUNDOACTION, 0, 0);
@@ -2008,7 +2008,7 @@ void EditEncloseSelectionNewLine(HWND hwnd, LPCWSTR pwszOpen, LPCWSTR pwszClose)
 	LPCWSTR lineEnd = (iEOLMode == SC_EOL_LF) ? L"\n" : ((iEOLMode == SC_EOL_CR) ? L"\r" : L"\r\n");
 
 	Sci_Position pos = SciCall_GetSelectionStart();
-	int line = SciCall_LineFromPosition(pos);
+	Sci_Line line = SciCall_LineFromPosition(pos);
 	if (pos != SciCall_PositionFromLine(line)) {
 		lstrcat(start, lineEnd);
 	}
@@ -2212,12 +2212,12 @@ void EditInsertScriptShebangLine(HWND hwnd) {
 }
 
 void EditShowCallTips(HWND hwnd, Sci_Position position) {
-	const int iLine = (int)SendMessage(hwnd, SCI_LINEFROMPOSITION, position, 0);
-	const int iDocLen = SciCall_GetLine(iLine, NULL); // get length
+	const Sci_Line iLine = SciCall_LineFromPosition(position);
+	const Sci_Position iDocLen = SciCall_GetLineLength(iLine);
 	char *pLine = (char *)NP2HeapAlloc(iDocLen + 1);
 	SciCall_GetLine(iLine, pLine);
 	char *text = (char *)NP2HeapAlloc(iDocLen + 1 + 128);
-	sprintf(text, "ShowCallTips(%d, %d, %d)\n%s", iLine + 1, (int)position, iDocLen, pLine);
+	sprintf(text, "ShowCallTips(%d, %d, %d)\n%s", (int)(iLine + 1), (int)position, (int)iDocLen, pLine);
 	SendMessage(hwnd, SCI_CALLTIPSHOW, position, (LPARAM)text);
 	NP2HeapFree(pLine);
 	NP2HeapFree(text);
