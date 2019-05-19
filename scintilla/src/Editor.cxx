@@ -5910,15 +5910,15 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 				pdoc->LineStart(wParam);
 			const Sci::Position lineEnd =
 				pdoc->LineStart(wParam + 1);
+			// not NULL terminated
+			const Sci::Position len = lineEnd - lineStart;
 			if (lParam == 0) {
-				return lineEnd - lineStart;
+				return len;
 			}
 			char *ptr = CharPtrFromSPtr(lParam);
-			Sci::Position iPlace = 0;
-			for (Sci::Position iChar = lineStart; iChar < lineEnd; iChar++) {
-				ptr[iPlace++] = pdoc->CharAt(iChar);
-			}
-			return iPlace;
+			pdoc->GetCharRange(ptr, lineStart, len);
+			ptr[len] = '\0';
+			return len;
 		}
 
 	case SCI_GETLINECOUNT:
@@ -5952,14 +5952,9 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 				return selectedText.LengthWithTerminator();
 			} else {
 				char *ptr = CharPtrFromSPtr(lParam);
-				size_t iChar = 0;
-				if (selectedText.Length()) {
-					for (; iChar < selectedText.LengthWithTerminator(); iChar++) {
-						ptr[iChar] = selectedText.Data()[iChar];
-					}
-				} else {
-					ptr[0] = '\0';
-				}
+				const size_t iChar = selectedText.Length();
+				memcpy(ptr, selectedText.Data(), iChar);
+				ptr[iChar] = '\0';
 				return iChar;
 			}
 		}
@@ -6475,11 +6470,9 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 			}
 			PLATFORM_ASSERT(wParam > 0);
 			char *ptr = CharPtrFromSPtr(lParam);
-			unsigned int iPlace = 0;
-			for (Sci::Position iChar = lineStart; iChar < lineEnd && iPlace < wParam - 1; iChar++) {
-				ptr[iPlace++] = pdoc->CharAt(iChar);
-			}
-			ptr[iPlace] = '\0';
+			const Sci::Position len = std::min<uptr_t>(lineEnd - lineStart, wParam - 1);
+			pdoc->GetCharRange(ptr, lineStart, len);
+			ptr[len] = '\0';
 			return sel.MainCaret() - lineStart;
 		}
 
