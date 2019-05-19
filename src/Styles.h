@@ -79,10 +79,10 @@ void	Style_UpdateSchemeMenu(HMENU hmenu);
 
 void	Style_SetDefaultFont(HWND hwnd, BOOL bCode);
 void	Style_SetIndentGuides(HWND hwnd, BOOL bShow);
-void	Style_SetBookmark(HWND hwnd);
-void	Style_UpdateCaret(HWND hwnd);
+void	Style_SetBookmark(void);
+void	Style_UpdateCaret(void);
 void	Style_SetLongLineColors(HWND hwnd);
-void	Style_HighlightCurrentLine(HWND hwnd);
+void	Style_HighlightCurrentLine(void);
 void	Style_ToggleUse2ndGlobalStyle(HWND hwnd);
 void	Style_ToggleUseDefaultCodeStyle(HWND hwnd);
 BOOL	Style_GetOpenDlgFilterStr(LPWSTR lpszFilter, int cchFilter);
@@ -98,7 +98,7 @@ BOOL	Style_StrGetCase(LPCWSTR lpszStyle, int *i);
 BOOL	Style_StrGetAlpha(LPCWSTR lpszStyle, int *i);
 BOOL	Style_SelectFont(HWND hwnd, LPWSTR lpszStyle, int cchStyle, BOOL bDefaultStyle);
 BOOL	Style_SelectColor(HWND hwnd, BOOL bFore, LPWSTR lpszStyle, int cchStyle);
-void	Style_SetStyles(HWND hwnd, int iStyle, LPCWSTR lpszStyle);
+void	Style_SetStyles(int iStyle, LPCWSTR lpszStyle);
 
 int 	Style_GetLexerIconId(LPCEDITLEXER pLex);
 void	Style_ConfigDlg(HWND hwnd);

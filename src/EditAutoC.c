@@ -1840,9 +1840,9 @@ void EditAutoIndent(HWND hwnd) {
 			}
 			SendMessage(hwnd, SCI_ENDUNDOACTION, 0, 0);
 
-			//const int iPrevLineStartPos = (int)SendMessage(hwnd, SCI_POSITIONFROMLINE, iCurLine - 1, 0);
-			//const int iPrevLineEndPos = (int)SendMessage(hwnd, SCI_GETLINEENDPOSITION, iCurLine - 1, 0);
-			//const int iPrevLineIndentPos = (int)SendMessage(hwnd, SCI_GETLINEINDENTPOSITION, iCurLine - 1, 0);
+			//const Sci_Position iPrevLineStartPos = SciCall_PositionFromLine(iCurLine - 1);
+			//const Sci_Position iPrevLineEndPos = SciCall_GetLineEndPosition(iCurLine - 1);
+			//const Sci_Position iPrevLineIndentPos = SciCall_GetLineIndentPosition(iCurLine - 1);
 
 			//if (iPrevLineEndPos == iPrevLineIndentPos) {
 			//	SendMessage(hwnd, SCI_BEGINUNDOACTION, 0, 0);
@@ -1854,11 +1854,11 @@ void EditAutoIndent(HWND hwnd) {
 		}
 
 		NP2HeapFree(pLineBuf);
-		//const int int iIndent = (int)SendMessage(hwnd, SCI_GETLINEINDENTATION, iCurLine, 0);
-		//SendMessage(hwnd, SCI_SETLINEINDENTATION, iCurLine, iIndentBefore);
-		//iIndentLen = /*- iIndent +*/ SendMessage(hwnd, SCI_GETLINEINDENTATION, iCurLine, 0);
+		//const int iIndent = SciCall_GetLineIndentation(iCurLine);
+		//SciCall_SetLineIndentation(iCurLine, iIndentBefore);
+		//iIndentLen = SciCall_GetLineIndentation(iCurLine);
 		//if (iIndentLen > 0)
-		//	SendMessage(hwnd, SCI_SETSEL, iAnchorPos + iIndentLen, iCurPos + iIndentLen);
+		//	SciCall_SetSel(iAnchorPos + iIndentLen, iCurPos + iIndentLen);
 	}
 }
 

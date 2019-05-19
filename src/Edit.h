@@ -178,8 +178,8 @@ void	EditEnsureSelectionVisible(void);
 void	EditEnsureConsistentLineEndings(HWND hwnd);
 void	EditGetExcerpt(HWND hwnd, LPWSTR lpszExcerpt, DWORD cchExcerpt);
 
-void	EditSelectWord(HWND hwnd);
-void	EditSelectLine(HWND hwnd);
+void	EditSelectWord(void);
+void	EditSelectLine(void);
 HWND	EditFindReplaceDlg(HWND hwnd, LPEDITFINDREPLACE lpefr, BOOL bReplace);
 BOOL	EditFindNext(HWND hwnd, LPEDITFINDREPLACE lpefr, BOOL fExtendSelection);
 BOOL	EditFindPrev(HWND hwnd, LPEDITFINDREPLACE lpefr, BOOL fExtendSelection);

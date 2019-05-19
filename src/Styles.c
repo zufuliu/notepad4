@@ -951,17 +951,17 @@ void Style_OnStyleThemeChanged(HWND hwnd, int theme) {
 	Style_SetLexer(hwnd, pLexCurrent);
 }
 
-void Style_UpdateCaret(HWND hwnd) {
+void Style_UpdateCaret(void) {
 	// caret style and width
 	const int style = (iCaretStyle ? CARETSTYLE_LINE : CARETSTYLE_BLOCK)
 		| (iOvrCaretStyle ? CARETSTYLE_OVERSTRIKE_BLOCK : CARETSTYLE_OVERSTRIKE_BAR);
-	SendMessage(hwnd, SCI_SETCARETSTYLE, style, 0);
+	SciCall_SetCaretStyle(style);
 	if (iCaretStyle != 0) {
-		SendMessage(hwnd, SCI_SETCARETWIDTH, iCaretStyle, 0);
+		SciCall_SetCaretWidth(iCaretStyle);
 	}
 
 	const int iValue = (iCaretBlinkPeriod < 0)? (int)GetCaretBlinkTime() : iCaretBlinkPeriod;
-	SendMessage(hwnd, SCI_SETCARETPERIOD, iValue, 0);
+	SciCall_SetCaretPeriod(iValue);
 }
 
 void Style_UpdateLexerKeywordAttr(LPCEDITLEXER pLexNew) {
@@ -1079,9 +1079,9 @@ static inline BOOL DidLexerHasBlockComment(int iLexer, int rid) {
 }
 
 static void Style_Parse(struct DetailStyle *style, LPCWSTR lpszStyle);
-static void Style_SetParsed(HWND hwnd, const struct DetailStyle *style, int iStyle);
-static inline void Style_SetDefaultStyle(HWND hwnd, int index) {
-	Style_SetStyles(hwnd, pLexGlobal->Styles[index].iStyle, pLexGlobal->Styles[index].szValue);
+static void Style_SetParsed(const struct DetailStyle *style, int iStyle);
+static inline void Style_SetDefaultStyle(int index) {
+	Style_SetStyles(pLexGlobal->Styles[index].iStyle, pLexGlobal->Styles[index].szValue);
 }
 
 static inline BOOL Style_StrGetAttributeEx(LPCWSTR lpszStyle, LPCWSTR key, int keyLen) {
@@ -1220,14 +1220,14 @@ void Style_SetLexer(HWND hwnd, PEDITLEXER pLexNew) {
 	}
 
 	// Font quality setup
-	SendMessage(hwnd, SCI_SETFONTQUALITY, iFontQuality, 0);
+	SciCall_SetFontQuality(iFontQuality);
 
 	// Clear
 	SendMessage(hwnd, SCI_CLEARDOCUMENTSTYLE, 0, 0);
 
 	// Default Values are always set
-	SendMessage(hwnd, SCI_STYLERESETDEFAULT, 0, 0);
-	SendMessage(hwnd, SCI_STYLESETCHARACTERSET, STYLE_DEFAULT, DEFAULT_CHARSET);
+	SciCall_StyleResetDefault();
+	SciCall_StyleSetCharacterSet(STYLE_DEFAULT, DEFAULT_CHARSET);
 
 	//! begin Style_Default
 	Style_StrGetFontEx(pLexGlobal->Styles[Style_DefaultCode].szValue, defaultCodeFontName, COUNTOF(defaultCodeFontName), TRUE);
@@ -1238,9 +1238,9 @@ void Style_SetLexer(HWND hwnd, PEDITLEXER pLexNew) {
 	// base font size
 	if (!Style_StrGetFontSize(szValue, &iBaseFontSize)) {
 		iValue = DefaultToCurrentDPI(iBaseFontSize);
-		SendMessage(hwnd, SCI_STYLESETSIZEFRACTIONAL, STYLE_DEFAULT, iValue);
+		SciCall_StyleSetSizeFractional(STYLE_DEFAULT, iValue);
 	}
-	Style_SetStyles(hwnd, STYLE_DEFAULT, szValue);
+	Style_SetStyles(STYLE_DEFAULT, szValue);
 
 	// Auto-select codepage according to charset
 	//Style_SetACPfromCharSet(hwnd);
@@ -1261,7 +1261,7 @@ void Style_SetLexer(HWND hwnd, PEDITLEXER pLexNew) {
 			WideCharToMultiByte(CP_UTF8, 0, localeWide, -1, localeName, COUNTOF(localeName), NULL, NULL);
 		}
 #endif
-		SendMessage(hwnd, SCI_SETFONTLOCALE, 0, (LPARAM)localeName);
+		SciCall_SetFontLocale(localeName);
 	}
 
 	if (!Style_StrGetColor(TRUE, szValue, &iValue)) {
@@ -1271,42 +1271,42 @@ void Style_SetLexer(HWND hwnd, PEDITLEXER pLexNew) {
 		SciCall_StyleSetBack(STYLE_DEFAULT, GetSysColor(COLOR_WINDOW));
 	}
 	// lexer default (base style), i.e.: EDITSTYLE_DEFAULT
-	Style_SetStyles(hwnd, STYLE_DEFAULT, pLexNew->Styles[0].szValue);
+	Style_SetStyles(STYLE_DEFAULT, pLexNew->Styles[0].szValue);
 	// set all styles to have the same attributes as STYLE_DEFAULT.
 	SciCall_StyleClearAll();
 	//! end Style_Default
 
-	Style_SetDefaultStyle(hwnd, Style_LineNumber);
-	Style_SetDefaultStyle(hwnd, Style_MatchBrace);
-	Style_SetDefaultStyle(hwnd, Style_MatchBraceError);
+	Style_SetDefaultStyle(Style_LineNumber);
+	Style_SetDefaultStyle(Style_MatchBrace);
+	Style_SetDefaultStyle(Style_MatchBraceError);
 	if (rid != NP2LEX_ANSI) {
-		Style_SetDefaultStyle(hwnd, Style_ControlCharacter);
+		Style_SetDefaultStyle(Style_ControlCharacter);
 	}
-	Style_SetDefaultStyle(hwnd, Style_IndentationGuide);
+	Style_SetDefaultStyle(Style_IndentationGuide);
 
 	//! begin Style_Selection
 	szValue = pLexGlobal->Styles[Style_Selection].szValue;
 	if (Style_StrGetColor(TRUE, szValue, &iValue)) {
-		SendMessage(hwnd, SCI_SETSELFORE, TRUE, iValue);
-		SendMessage(hwnd, SCI_SETADDITIONALSELFORE, iValue, 0);
+		SciCall_SetSelFore(TRUE, iValue);
+		SciCall_SetAdditionalSelFore(iValue);
 	} else {
-		SendMessage(hwnd, SCI_SETSELFORE, FALSE, 0);
-		SendMessage(hwnd, SCI_SETADDITIONALSELFORE, 0, 0);
+		SciCall_SetSelFore(FALSE, 0);
+		SciCall_SetAdditionalSelFore(0);
 	}
 	// always set background color
 	if (!Style_StrGetColor(FALSE, szValue, &iValue)) {
 		iValue = GetSysColor(COLOR_HIGHLIGHT);
 	}
-	SendMessage(hwnd, SCI_SETSELBACK, TRUE, iValue);
-	SendMessage(hwnd, SCI_SETADDITIONALSELBACK, iValue, 0);
+	SciCall_SetSelBack(TRUE, iValue);
+	SciCall_SetAdditionalSelBack(iValue);
 
 	if (!Style_StrGetAlpha(szValue, &iValue)) {
 		iValue = SC_ALPHA_NOALPHA;
 	}
-	SendMessage(hwnd, SCI_SETSELALPHA, iValue, 0);
-	SendMessage(hwnd, SCI_SETADDITIONALSELALPHA, iValue, 0);
+	SciCall_SetSelAlpha(iValue);
+	SciCall_SetAdditionalSelAlpha(iValue);
 
-	SendMessage(hwnd, SCI_SETSELEOLFILLED, Style_StrGetEOLFilled(szValue), 0);
+	SciCall_SetSelEOLFilled(Style_StrGetEOLFilled(szValue));
 	//! end Style_Selection
 
 	//! begin Style_Whitespace
@@ -1329,26 +1329,26 @@ void Style_SetLexer(HWND hwnd, PEDITLEXER pLexNew) {
 	SendMessage(hwnd, SCI_SETWHITESPACESIZE, iValue, 0);
 	//! end Style_Whitespace
 
-	Style_HighlightCurrentLine(hwnd);
-	Style_UpdateCaret(hwnd);
+	Style_HighlightCurrentLine();
+	Style_UpdateCaret();
 	// caret fore
 	if (!Style_StrGetColor(TRUE, pLexGlobal->Styles[Style_Caret].szValue, &iValue)) {
 		iValue = GetSysColor(COLOR_WINDOWTEXT);
 	}
-	if (!VerifyContrast(iValue, (COLORREF)SendMessage(hwnd, SCI_STYLEGETBACK, 0, 0))) {
-		iValue = (int)SendMessage(hwnd, SCI_STYLEGETFORE, STYLE_DEFAULT, 0);
+	if (!VerifyContrast(iValue, SciCall_StyleGetBack(STYLE_DEFAULT))) {
+		iValue = SciCall_StyleGetFore(STYLE_DEFAULT);
 	}
-	SendMessage(hwnd, SCI_SETCARETFORE, iValue, 0);
-	SendMessage(hwnd, SCI_SETADDITIONALCARETFORE, iValue, 0);
+	SciCall_SetCaretFore(iValue);
+	SciCall_SetAdditionalCaretFore(iValue);
 	// IME indicator
 	szValue = pLexGlobal->Styles[Style_IMEIndicator].szValue;
 	if (!Style_StrGetColor(TRUE, szValue, &iValue)) {
 		iValue = IMEIndicatorDefaultColor;
 	}
-	SendMessage(hwnd, SCI_INDICSETFORE, SC_INDICATOR_INPUT, iValue);
-	SendMessage(hwnd, SCI_INDICSETFORE, SC_INDICATOR_TARGET, iValue);
-	SendMessage(hwnd, SCI_INDICSETFORE, SC_INDICATOR_CONVERTED, iValue);
-	SendMessage(hwnd, SCI_INDICSETFORE, SC_INDICATOR_UNKNOWN, iValue);
+	SciCall_IndicSetFore(SC_INDICATOR_INPUT, iValue);
+	SciCall_IndicSetFore(SC_INDICATOR_TARGET, iValue);
+	SciCall_IndicSetFore(SC_INDICATOR_CONVERTED, iValue);
+	SciCall_IndicSetFore(SC_INDICATOR_UNKNOWN, iValue);
 
 	Style_SetLongLineColors(hwnd);
 	// Extra Line Spacing
@@ -1421,7 +1421,7 @@ void Style_SetLexer(HWND hwnd, PEDITLEXER pLexNew) {
 		SciCall_MarkerSetFore(SC_MARKNUM_FOLDER, clrFill);
 		SciCall_MarkerSetFore(SC_MARKNUM_FOLDEREND, clrFill);
 
-		Style_SetDefaultStyle(hwnd, Style_FoldDispalyText);
+		Style_SetDefaultStyle(Style_FoldDispalyText);
 	} // end set folding style
 
 	if (SendMessage(hwnd, SCI_GETINDENTATIONGUIDES, 0, 0) != SC_IV_NONE) {
@@ -1433,18 +1433,18 @@ void Style_SetLexer(HWND hwnd, PEDITLEXER pLexNew) {
 	if (!Style_StrGetColor(TRUE, szValue, &iValue)) {
 		iValue = GetSysColor(COLOR_HIGHLIGHT);
 	}
-	SendMessage(hwnd, SCI_INDICSETFORE, IndicatorNumber_MarkOccurrences, iValue);
+	SciCall_IndicSetFore(IndicatorNumber_MarkOccurrences, iValue);
 	if (!Style_StrGetAlpha(szValue, &iValue)) {
 		iValue = MarkOccurrencesDefaultAlpha;
 	}
-	SendMessage(hwnd, SCI_INDICSETALPHA, IndicatorNumber_MarkOccurrences, iValue);
-	SendMessage(hwnd, SCI_INDICSETSTYLE, IndicatorNumber_MarkOccurrences, INDIC_ROUNDBOX);
+	SciCall_IndicSetAlpha(IndicatorNumber_MarkOccurrences, iValue);
+	SciCall_IndicSetStyle(IndicatorNumber_MarkOccurrences, INDIC_ROUNDBOX);
 
 	// Bookmark
 	bBookmarkColorUpdated = TRUE;
 	// SC_MARK_CIRCLE is the default marker type.
-	if (SendMessage(hwnd, SCI_MARKERSYMBOLDEFINED, MarkerNumber_Bookmark, 0) != SC_MARK_CIRCLE) {
-		Style_SetBookmark(hwnd);
+	if (SciCall_MarkerSymbolDefined(MarkerNumber_Bookmark) != SC_MARK_CIRCLE) {
+		Style_SetBookmark();
 	}
 
 	{
@@ -1457,11 +1457,11 @@ void Style_SetLexer(HWND hwnd, PEDITLEXER pLexNew) {
 			if (iStyle > 0xFF) {
 				Style_Parse(&style, szValue);
 				do {
-					Style_SetParsed(hwnd, &style, iStyle & 0xFF);
+					Style_SetParsed(&style, iStyle & 0xFF);
 					iStyle >>= 8;
 				} while (iStyle);
 			} else {
-				Style_SetStyles(hwnd, iStyle, szValue);
+				Style_SetStyles(iStyle, szValue);
 			}
 		}
 	}
@@ -2711,8 +2711,8 @@ void Style_SetLongLineColors(HWND hwnd) {
 //
 // Style_HighlightCurrentLine()
 //
-void Style_HighlightCurrentLine(HWND hwnd) {
-	SendMessage(hwnd, SCI_SETCARETLINEVISIBLE, FALSE, 0);
+void Style_HighlightCurrentLine(void) {
+	SciCall_SetCaretLineVisible(FALSE);
 	if (iHighlightCurrentLine != 0) {
 		LPCWSTR szValue = pLexGlobal->Styles[Style_CurrentLine].szValue;
 		const BOOL backColor = iHighlightCurrentLine == 1;
@@ -2724,14 +2724,14 @@ void Style_HighlightCurrentLine(HWND hwnd) {
 				size = max_i(1, RoundToCurrentDPI(size));
 			}
 
-			SendMessage(hwnd, SCI_SETCARETLINEFRAME, size, 0);
-			SendMessage(hwnd, SCI_SETCARETLINEBACK, iValue, 0);
+			SciCall_SetCaretLineFrame(size);
+			SciCall_SetCaretLineBack(iValue);
 
 			if (!Style_StrGetAlpha(szValue, &iValue)) {
 				iValue = SC_ALPHA_NOALPHA;
 			}
-			SendMessage(hwnd, SCI_SETCARETLINEBACKALPHA, iValue, 0);
-			SendMessage(hwnd, SCI_SETCARETLINEVISIBLE, TRUE, 0);
+			SciCall_SetCaretLineBackAlpha(iValue);
+			SciCall_SetCaretLineVisible(TRUE);
 		}
 	}
 }
@@ -2758,14 +2758,14 @@ void Style_SetIndentGuides(HWND hwnd, BOOL bShow) {
 	SendMessage(hwnd, SCI_SETINDENTATIONGUIDES, iIndentView, 0);
 }
 
-void Style_SetBookmark(HWND hwnd) {
+void Style_SetBookmark(void) {
 	if (!bBookmarkColorUpdated) {
 #if BookmarkUsingPixmapImage
 		const int marker = bShowSelectionMargin ? SC_MARK_PIXMAP : SC_MARK_BACKGROUND;
 #else
 		const int marker = bShowSelectionMargin ? SC_MARK_VERTICALBOOKMARK : SC_MARK_BACKGROUND;
 #endif
-		const int markType = (int)SendMessage(hwnd, SCI_MARKERSYMBOLDEFINED, MarkerNumber_Bookmark, 0);
+		const int markType = SciCall_MarkerSymbolDefined(MarkerNumber_Bookmark);
 		if (marker == markType) {
 			return;
 		}
@@ -2779,12 +2779,12 @@ void Style_SetBookmark(HWND hwnd) {
 		}
 #if BookmarkUsingPixmapImage
 		sprintf(bookmark_pixmap_color, bookmark_pixmap_color_fmt, iBookmarkImageColor);
-		SendMessage(hwnd, SCI_MARKERDEFINEPIXMAP, MarkerNumber_Bookmark, (LPARAM)bookmark_pixmap);
+		SciCall_MarkerDefinePixmap(MarkerNumber_Bookmark, bookmark_pixmap);
 #else
-		SendMessage(hwnd, SCI_MARKERSETBACK, MarkerNumber_Bookmark, iBookmarkImageColor);
+		SciCall_MarkerSetBack(MarkerNumber_Bookmark, iBookmarkImageColor);
 		// set same color to avoid showing edge.
-		SendMessage(hwnd, SCI_MARKERSETFORE, MarkerNumber_Bookmark, iBookmarkImageColor);
-		SendMessage(hwnd, SCI_MARKERDEFINE, MarkerNumber_Bookmark, SC_MARK_VERTICALBOOKMARK);
+		SciCall_MarkerSetFore(MarkerNumber_Bookmark, iBookmarkImageColor);
+		SciCall_MarkerDefine(MarkerNumber_Bookmark, SC_MARK_VERTICALBOOKMARK);
 #endif
 	} else {
 		int iBookmarkLineColor;
@@ -2795,9 +2795,9 @@ void Style_SetBookmark(HWND hwnd) {
 		if (!Style_StrGetAlpha(szValue, &iBookmarkLineAlpha)) {
 			iBookmarkLineAlpha = BookmarkLineDefaultAlpha;
 		}
-		SendMessage(hwnd, SCI_MARKERSETBACK, MarkerNumber_Bookmark, iBookmarkLineColor);
-		SendMessage(hwnd, SCI_MARKERSETALPHA, MarkerNumber_Bookmark, iBookmarkLineAlpha);
-		SendMessage(hwnd, SCI_MARKERDEFINE, MarkerNumber_Bookmark, SC_MARK_BACKGROUND);
+		SciCall_MarkerSetBack(MarkerNumber_Bookmark, iBookmarkLineColor);
+		SciCall_MarkerSetAlpha(MarkerNumber_Bookmark, iBookmarkLineAlpha);
+		SciCall_MarkerDefine(MarkerNumber_Bookmark, SC_MARK_BACKGROUND);
 	}
 	bBookmarkColorUpdated = FALSE;
 }
@@ -3254,7 +3254,7 @@ BOOL Style_SelectColor(HWND hwnd, BOOL bFore, LPWSTR lpszStyle, int cchStyle) {
 //
 // Style_SetStyles()
 //
-void Style_SetStyles(HWND hwnd, int iStyle, LPCWSTR lpszStyle) {
+void Style_SetStyles(int iStyle, LPCWSTR lpszStyle) {
 	WCHAR tch[LF_FACESIZE];
 	int iValue;
 
@@ -3262,13 +3262,13 @@ void Style_SetStyles(HWND hwnd, int iStyle, LPCWSTR lpszStyle) {
 	if (Style_StrGetFont(lpszStyle, tch, COUNTOF(tch))) {
 		char mch[LF_FACESIZE * kMaxMultiByteCount];
 		WideCharToMultiByte(CP_UTF8, 0, tch, -1, mch, COUNTOF(mch), NULL, NULL);
-		SendMessage(hwnd, SCI_STYLESETFONT, iStyle, (LPARAM)mch);
+		SciCall_StyleSetFont(iStyle, mch);
 	}
 
 	// Size
 	if (Style_StrGetFontSize(lpszStyle, &iValue)) {
 		iValue = DefaultToCurrentDPI(iValue);
-		SendMessage(hwnd, SCI_STYLESETSIZEFRACTIONAL, iStyle, iValue);
+		SciCall_StyleSetSizeFractional(iStyle, iValue);
 	}
 
 	// Fore
@@ -3283,34 +3283,34 @@ void Style_SetStyles(HWND hwnd, int iStyle, LPCWSTR lpszStyle) {
 
 	// Weight
 	if (Style_StrGetFontWeight(lpszStyle, &iValue)) {
-		SendMessage(hwnd, SCI_STYLESETWEIGHT, iStyle, iValue);
+		SciCall_StyleSetWeight(iStyle, iValue);
 	}
 
 	// Italic
 	if (Style_StrGetItalic(lpszStyle)) {
-		SendMessage(hwnd, SCI_STYLESETITALIC, iStyle, TRUE);
+		SciCall_StyleSetItalic(iStyle, TRUE);
 	}
 	// Underline
 	if (Style_StrGetUnderline(lpszStyle)) {
-		SendMessage(hwnd, SCI_STYLESETUNDERLINE, iStyle, TRUE);
+		SciCall_StyleSetUnderline(iStyle, TRUE);
 	}
 	// Strike
 	if (Style_StrGetStrike(lpszStyle)) {
-		SendMessage(hwnd, SCI_STYLESETSTRIKE, iStyle, TRUE);
+		SciCall_StyleSetStrike(iStyle, TRUE);
 	}
 	// EOL Filled
 	if (Style_StrGetEOLFilled(lpszStyle)) {
-		SendMessage(hwnd, SCI_STYLESETEOLFILLED, iStyle, TRUE);
+		SciCall_StyleSetEOLFilled(iStyle, TRUE);
 	}
 
 	// Case
 	if (Style_StrGetCase(lpszStyle, &iValue)) {
-		SendMessage(hwnd, SCI_STYLESETCASE, iStyle, iValue);
+		SciCall_StyleSetCase(iStyle, iValue);
 	}
 
 	// Character Set
 	if (Style_StrGetCharSet(lpszStyle, &iValue)) {
-		SendMessage(hwnd, SCI_STYLESETCHARACTERSET, iStyle, iValue);
+		SciCall_StyleSetCharacterSet(iStyle, iValue);
 	}
 }
 
@@ -3372,17 +3372,17 @@ static void Style_Parse(struct DetailStyle *style, LPCWSTR lpszStyle) {
 	style->mask = mask;
 }
 
-static void Style_SetParsed(HWND hwnd, const struct DetailStyle *style, int iStyle) {
+static void Style_SetParsed(const struct DetailStyle *style, int iStyle) {
 	const UINT mask = style->mask;
 
 	// Font
 	if (mask & STYLE_MASK_FONT_FACE) {
-		SendMessage(hwnd, SCI_STYLESETFONT, iStyle, (LPARAM)style->fontFace);
+		SciCall_StyleSetFont(iStyle, style->fontFace);
 	}
 
 	// Size
 	if (mask & STYLE_MASK_FONT_SIZE) {
-		SendMessage(hwnd, SCI_STYLESETSIZEFRACTIONAL, iStyle, style->fontSize);
+		SciCall_StyleSetSizeFractional(iStyle, style->fontSize);
 	}
 
 	// Fore
@@ -3397,34 +3397,34 @@ static void Style_SetParsed(HWND hwnd, const struct DetailStyle *style, int iSty
 
 	// Weight
 	if (mask & STYLE_MASK_FONT_WEIGHT) {
-		SendMessage(hwnd, SCI_STYLESETWEIGHT, iStyle, style->weight);
+		SciCall_StyleSetWeight(iStyle, style->weight);
 	}
 
 	// Italic
 	if (style->italic) {
-		SendMessage(hwnd, SCI_STYLESETITALIC, iStyle, TRUE);
+		SciCall_StyleSetItalic(iStyle, TRUE);
 	}
 	// Underline
 	if (style->underline) {
-		SendMessage(hwnd, SCI_STYLESETUNDERLINE, iStyle, TRUE);
+		SciCall_StyleSetUnderline(iStyle, TRUE);
 	}
 	// Strike
 	if (style->strike) {
-		SendMessage(hwnd, SCI_STYLESETSTRIKE, iStyle, TRUE);
+		SciCall_StyleSetStrike(iStyle, TRUE);
 	}
 	// EOL Filled
 	if (style->eolFilled) {
-		SendMessage(hwnd, SCI_STYLESETEOLFILLED, iStyle, TRUE);
+		SciCall_StyleSetEOLFilled(iStyle, TRUE);
 	}
 
 	// Case
 	if (mask & STYLE_MASK_FORCE_CASE) {
-		SendMessage(hwnd, SCI_STYLESETCASE, iStyle, style->forceCase);
+		SciCall_StyleSetCase(iStyle, style->forceCase);
 	}
 
 	// Character Set
 	if (mask & STYLE_MASK_CHARSET) {
-		SendMessage(hwnd, SCI_STYLESETCHARACTERSET, iStyle, style->charset);
+		SciCall_StyleSetCharacterSet(iStyle, style->charset);
 	}
 }
 

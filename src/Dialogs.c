@@ -29,6 +29,7 @@
 #include "Edit.h"
 #include "Dlapi.h"
 #include "Dialogs.h"
+#include "SciCall.h"
 #include "resource.h"
 #include "Version.h"
 
@@ -2064,7 +2065,7 @@ BOOL GetZoomLevelComboBoxValue(HWND hwnd, int nCtrId, int *zoomLevel) {
 static INT_PTR CALLBACK ZoomLevelDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
 	switch (umsg) {
 	case WM_INITDIALOG: {
-		const int zoomLevel = (int)SendMessage(hwndEdit, SCI_GETZOOM, 0, 0);
+		const int zoomLevel = SciCall_GetZoom();
 		InitZoomLevelComboBox(hwnd, IDC_ZOOMLEVEL, zoomLevel);
 		if (lParam) {
 			SetToRightBottom(hwnd);
@@ -2080,7 +2081,7 @@ static INT_PTR CALLBACK ZoomLevelDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LP
 		case IDYES: {
 			int zoomLevel;
 			if (GetZoomLevelComboBoxValue(hwnd, IDC_ZOOMLEVEL, &zoomLevel)) {
-				SendMessage(hwndEdit, SCI_SETZOOM, zoomLevel, 0);
+				SciCall_SetZoom(zoomLevel);
 			}
 			if (LOWORD(wParam) == IDOK) {
 				EndDialog(hwnd, IDOK);
