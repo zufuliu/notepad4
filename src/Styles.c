@@ -2448,11 +2448,12 @@ BOOL Style_MaybeBinaryFile(LPCWSTR lpszFile) {
 	unsigned char buf[5] = {0}; // magic
 	SciCall_GetText(COUNTOF(buf), buf);
 	const UINT magic2 = (buf[0] << 8) | buf[1];
-	if (magic2 == 0x4D5AU ||	// PE: MZ
-		magic2 == 0x504BU ||	// ZIP: PK
+	if (magic2 == 0x4D5AU ||	// PE (exe, dll, etc.): MZ
+		magic2 == 0x504BU ||	// ZIP (zip, jar, docx, apk, etc.): PK
 		magic2 == 0x377AU ||	// 7z: 7z
+		magic2 == 0x1F8BU ||	// gzip (gz, gzip, svgz, etc.)
 		magic2 == 0x424DU ||	// BMP: BM
-		magic2 == 0xFFD8U		// JPEG
+		magic2 == 0xFFD8U		// JPEG (jpg, jpeg, etc.)
 		) {
 		return TRUE;
 	}
@@ -2483,15 +2484,15 @@ BOOL Style_MaybeBinaryFile(LPCWSTR lpszFile) {
 		lstrcpy(wch + 1, lpszExt);
 		wch[len + 1] = L' ';
 		LPCWSTR lpszMatch = StrStrI(
-			L" cur"
-			L" ico"
+			L" cur"		// Cursor
+			L" ico"		// Icon
 
 			L" obj"
 			L" pdb"
 			L" bin"
-			L" pak"
+			L" pak"		// Chrome
 
-			L" dmg"
+			L" dmg"		// macOS
 			L" img"
 			L" iso"
 			L" tar"
