@@ -643,9 +643,9 @@ void TransformBackslashes(char *pszInput, BOOL bRegEx, UINT cpEdit);
 BOOL AddBackslash(char *pszOut, const char *pszInput);
 
 //==== MinimizeToTray Functions - see comments in Helpers.c ===================
-BOOL GetDoAnimateMinimize(VOID);
-VOID MinimizeWndToTray(HWND hwnd);
-VOID RestoreWndFromTray(HWND hwnd);
+BOOL GetDoAnimateMinimize(void);
+void MinimizeWndToTray(HWND hwnd);
+void RestoreWndFromTray(HWND hwnd);
 
 #endif // NOTEPAD2_HELPERS_H_
 

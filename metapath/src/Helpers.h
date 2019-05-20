@@ -469,9 +469,9 @@ DLGTEMPLATE *LoadThemedDialogTemplate(LPCWSTR lpDialogTemplateID, HINSTANCE hIns
 INT_PTR ThemedDialogBoxParam(HINSTANCE hInstance, LPCWSTR lpTemplate, HWND hWndParent, DLGPROC lpDialogFunc, LPARAM dwInitParam);
 
 //==== MinimizeToTray Functions - see comments in Helpers.c ===================
-BOOL GetDoAnimateMinimize(VOID);
-VOID MinimizeWndToTray(HWND hwnd);
-VOID RestoreWndFromTray(HWND hwnd);
+BOOL GetDoAnimateMinimize(void);
+void MinimizeWndToTray(HWND hwnd);
+void RestoreWndFromTray(HWND hwnd);
 
 #endif // METAPATH_HELPERS_H_
 

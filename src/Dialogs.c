@@ -24,12 +24,12 @@
 #include <shellapi.h>
 #include <commctrl.h>
 #include <commdlg.h>
+#include "SciCall.h"
 #include "Helpers.h"
 #include "Notepad2.h"
 #include "Edit.h"
 #include "Dlapi.h"
 #include "Dialogs.h"
-#include "SciCall.h"
 #include "resource.h"
 #include "Version.h"
 

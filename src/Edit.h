@@ -21,18 +21,6 @@
 #ifndef NOTEPAD2_EDIT_H_
 #define NOTEPAD2_EDIT_H_
 
-#include "Scintilla.h"
-
-typedef Sci_Position Sci_Line;
-
-NP2_inline Sci_Position min_pos(Sci_Position x, Sci_Position y) {
-	return (x < y) ? x : y;
-}
-
-NP2_inline Sci_Position max_pos(Sci_Position x, Sci_Position y) {
-	return (x > y) ? x : y;
-}
-
 // WideCharToMultiByte, UTF8 encoding of U+0800 to U+FFFF
 #define kMaxMultiByteCount	3
 
@@ -110,16 +98,6 @@ enum {
 };
 
 extern HWND hwndEdit;
-NP2_inline void BeginWaitCursor(void) {
-	SendMessage(hwndEdit, SCI_SETCURSOR, (WPARAM)SC_CURSORWAIT, 0);
-}
-
-NP2_inline void EndWaitCursor(void) {
-	POINT pt;
-	SendMessage(hwndEdit, SCI_SETCURSOR, (WPARAM)SC_CURSORNORMAL, 0);
-	GetCursorPos(&pt);
-	SetCursorPos(pt.x, pt.y);
-}
 
 void	Edit_ReleaseResources(void);
 HWND	EditCreate(HWND hwndParent);
@@ -173,9 +151,9 @@ void	EditSortLines(HWND hwnd, int iSortFlags);
 
 void	EditJumpTo(Sci_Line iNewLine, Sci_Position iNewCol);
 void	EditSelectEx(Sci_Position iAnchorPos, Sci_Position iCurrentPos);
-void	EditFixPositions();
+void	EditFixPositions(void);
 void	EditEnsureSelectionVisible(void);
-void	EditEnsureConsistentLineEndings(HWND hwnd);
+void	EditEnsureConsistentLineEndings(void);
 void	EditGetExcerpt(HWND hwnd, LPWSTR lpszExcerpt, DWORD cchExcerpt);
 
 void	EditSelectWord(void);
@@ -190,7 +168,7 @@ BOOL	EditLineNumDlg(HWND hwnd);
 void	EditModifyLinesDlg(HWND hwnd);
 void	EditEncloseSelectionDlg(HWND hwnd);
 void	EditInsertTagDlg(HWND hwnd);
-void	EditInsertUnicodeControlCharacter(HWND hwnd, int menu);
+void	EditInsertUnicodeControlCharacter(int menu);
 void	EditShowUnicodeControlCharacter(HWND hwnd, BOOL bShow);
 BOOL	EditSortDlg(HWND hwnd, int *piSortFlags);
 BOOL	EditAlignDlg(HWND hwnd, int *piAlignMode);
@@ -282,12 +260,12 @@ void	EditCompleteUpdateConfig(void);
 BOOL	IsDocWordChar(int ch);
 BOOL	IsAutoCompletionWordCharacter(int ch);
 void	EditCompleteWord(HWND hwnd, BOOL autoInsert);
-void	EditAutoCloseBraceQuote(HWND hwnd, int ch);
+void	EditAutoCloseBraceQuote(int ch);
 void	EditAutoCloseXMLTag(HWND hwnd);
 void	EditAutoIndent(HWND hwnd);
 void	EditToggleCommentLine(HWND hwnd);
 void	EditToggleCommentBlock(HWND hwnd);
-void	EditInsertScriptShebangLine(HWND hwnd);
+void	EditInsertScriptShebangLine(void);
 void	EditShowCallTips(HWND hwnd, Sci_Position position);
 
 #define NCP_DEFAULT					1
@@ -379,7 +357,7 @@ typedef struct _filevars {
 typedef const FILEVARS * LPCFILEVARS;
 
 BOOL	FileVars_Init(LPCSTR lpData, DWORD cbData, LPFILEVARS lpfv);
-BOOL	FileVars_Apply(HWND hwnd, LPCFILEVARS lpfv);
+BOOL	FileVars_Apply(LPCFILEVARS lpfv);
 BOOL	FileVars_ParseInt(LPCSTR pszData, LPCSTR pszName, int *piValue);
 BOOL	FileVars_ParseStr(LPCSTR pszData, LPCSTR pszName, char *pszValue, int cchValue);
 // in EditEncoding.c

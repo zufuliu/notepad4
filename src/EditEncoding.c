@@ -4,12 +4,12 @@
 #include <shlwapi.h>
 #include <commctrl.h>
 #include <commdlg.h>
+#include "SciCall.h"
 #include "Helpers.h"
 #include "Notepad2.h"
 #include "Edit.h"
 #include "Styles.h"
 #include "Dialogs.h"
-#include "SciCall.h"
 #include "resource.h"
 
 extern BOOL bSkipUnicodeDetection;
