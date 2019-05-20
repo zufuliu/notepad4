@@ -2656,7 +2656,7 @@ static VOID GetTrayWndRect(LPRECT lpTrayRect) {
 }
 
 // Check to see if the animation has been disabled
-/*static */BOOL GetDoAnimateMinimize(VOID) {
+/*static */BOOL GetDoAnimateMinimize(void) {
 	ANIMATIONINFO ai;
 
 	ai.cbSize = sizeof(ai);
@@ -2665,7 +2665,7 @@ static VOID GetTrayWndRect(LPRECT lpTrayRect) {
 	return ai.iMinAnimate != 0;
 }
 
-VOID MinimizeWndToTray(HWND hwnd) {
+void MinimizeWndToTray(HWND hwnd) {
 	if (GetDoAnimateMinimize()) {
 		RECT rcFrom;
 		RECT rcTo;
@@ -2687,7 +2687,7 @@ VOID MinimizeWndToTray(HWND hwnd) {
 	ShowWindow(hwnd, SW_HIDE);
 }
 
-VOID RestoreWndFromTray(HWND hwnd) {
+void RestoreWndFromTray(HWND hwnd) {
 	if (GetDoAnimateMinimize()) {
 		// Get the rect of the tray and the window. Note that the window rect
 		// is still valid even though the window is hidden

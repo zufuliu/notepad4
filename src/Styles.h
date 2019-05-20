@@ -56,15 +56,15 @@ BOOL	Style_Import(HWND hwnd);
 BOOL	Style_Export(HWND hwnd);
 
 void	Style_DetectBaseFontSize(HWND hwnd);
-void	Style_OnDPIChanged(HWND hwnd);
-void	Style_OnStyleThemeChanged(HWND hwnd, int theme);
+void	Style_OnDPIChanged(void);
+void	Style_OnStyleThemeChanged(int theme);
 void	Style_InitDefaultColor(void);
-void	Style_SetLexer(HWND hwnd, PEDITLEXER pLexNew);
-BOOL	Style_SetLexerFromFile(HWND hwnd, LPCWSTR lpszFile);
-void	Style_SetLexerFromName(HWND hwnd, LPCWSTR lpszFile, LPCWSTR lpszName);
-BOOL	Style_MaybeBinaryFile(HWND hwnd, LPCWSTR lpszFile);
+void	Style_SetLexer(PEDITLEXER pLexNew);
+BOOL	Style_SetLexerFromFile(LPCWSTR lpszFile);
+void	Style_SetLexerFromName(LPCWSTR lpszFile, LPCWSTR lpszName);
+BOOL	Style_MaybeBinaryFile(LPCWSTR lpszFile);
 BOOL	Style_CanOpenFile(LPCWSTR lpszFile);
-void	Style_SetLexerFromID(HWND hwnd, int id);
+void	Style_SetLexerFromID(int id);
 int		Style_GetEditLexerId(int lexer);
 
 int		Style_GetDocTypeLanguage(void);
@@ -74,17 +74,17 @@ void	Style_UpdateLexerKeywordAttr(LPCEDITLEXER pLexNew);
 LPCWSTR Style_GetCurrentLexerDisplayName(LPWSTR lpszName, int cchName);
 #endif
 LPCWSTR Style_GetCurrentLexerName(void);
-void	Style_SetLexerByLangIndex(HWND hwnd, int lang);
+void	Style_SetLexerByLangIndex(int lang);
 void	Style_UpdateSchemeMenu(HMENU hmenu);
 
 void	Style_SetDefaultFont(HWND hwnd, BOOL bCode);
-void	Style_SetIndentGuides(HWND hwnd, BOOL bShow);
+void	Style_SetIndentGuides(BOOL bShow);
 void	Style_SetBookmark(void);
 void	Style_UpdateCaret(void);
-void	Style_SetLongLineColors(HWND hwnd);
+void	Style_SetLongLineColors(void);
 void	Style_HighlightCurrentLine(void);
-void	Style_ToggleUse2ndGlobalStyle(HWND hwnd);
-void	Style_ToggleUseDefaultCodeStyle(HWND hwnd);
+void	Style_ToggleUse2ndGlobalStyle(void);
+void	Style_ToggleUseDefaultCodeStyle(void);
 BOOL	Style_GetOpenDlgFilterStr(LPWSTR lpszFilter, int cchFilter);
 
 BOOL	Style_StrGetFontEx(LPCWSTR lpszStyle, LPWSTR lpszFont, int cchFont, BOOL bDefaultStyle);

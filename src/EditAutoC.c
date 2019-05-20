@@ -6,10 +6,10 @@
 #include <commdlg.h>
 #include <limits.h>
 #include <stdio.h>
+#include "SciCall.h"
 #include "Helpers.h"
 #include "Edit.h"
 #include "Styles.h"
-#include "SciCall.h"
 #include "resource.h"
 #include "EditAutoC_Data0.c"
 
@@ -1332,7 +1332,7 @@ static BOOL CanAutoCloseSingleQuote(int chPrev, int iCurrentStyle) {
 	return TRUE;
 }
 
-void EditAutoCloseBraceQuote(HWND hwnd, int ch) {
+void EditAutoCloseBraceQuote(int ch) {
 	const Sci_Position iCurPos = SciCall_GetCurrentPos();
 	const int chPrev = SciCall_GetCharAt(iCurPos - 2);
 	const int chNext = SciCall_GetCharAt(iCurPos);
@@ -1413,11 +1413,11 @@ void EditAutoCloseBraceQuote(HWND hwnd, int ch) {
 		break;
 	}
 	if (tchIns[0]) {
-		SendMessage(hwnd, SCI_BEGINUNDOACTION, 0, 0);
-		SendMessage(hwnd, SCI_REPLACESEL, 0, (LPARAM)tchIns);
+		SciCall_BeginUndoAction();
+		SciCall_ReplaceSel(tchIns);
 		const Sci_Position iCurrentPos = (ch == ',') ? iCurPos + 1 : iCurPos;
-		SendMessage(hwnd, SCI_SETSEL, iCurrentPos, iCurrentPos);
-		SendMessage(hwnd, SCI_ENDUNDOACTION, 0, 0);
+		SciCall_SetSel(iCurrentPos, iCurrentPos);
+		SciCall_EndUndoAction();
 	}
 }
 
@@ -1460,7 +1460,7 @@ void EditAutoCloseXMLTag(HWND hwnd) {
 		tr.chrg.cpMin = (Sci_PositionCR)iStartPos;
 		tr.chrg.cpMax = (Sci_PositionCR)iCurPos;
 		tr.lpstrText = tchBuf;
-		SendMessage(hwnd, SCI_GETTEXTRANGE, 0, (LPARAM)&tr);
+		SciCall_GetTextRange(&tr);
 
 		if (tchBuf[iSize - 2] != '/') {
 			char tchIns[516] = "</";
@@ -1491,10 +1491,10 @@ void EditAutoCloseXMLTag(HWND hwnd) {
 			if (shouldAutoClose) {
 				tchIns[cchIns - 1] = '>';
 				autoClosed = TRUE;
-				SendMessage(hwnd, SCI_BEGINUNDOACTION, 0, 0);
-				SendMessage(hwnd, SCI_REPLACESEL, 0, (LPARAM)tchIns);
-				SendMessage(hwnd, SCI_SETSEL, iCurPos, iCurPos);
-				SendMessage(hwnd, SCI_ENDUNDOACTION, 0, 0);
+				SciCall_BeginUndoAction();
+				SciCall_ReplaceSel(tchIns);
+				SciCall_SetSel(iCurPos, iCurPos);
+				SciCall_EndUndoAction();
 			}
 		}
 	}
@@ -1735,7 +1735,7 @@ void EditAutoIndent(HWND hwnd) {
 			return;
 		}
 
-		const int iEOLMode = (int)SendMessage(hwnd, SCI_GETEOLMODE, 0, 0);
+		const int iEOLMode = SciCall_GetEOLMode();
 		int indent = 0;
 		int	iIndentLen = 0;
 		int commentStyle = 0;
@@ -1828,28 +1828,28 @@ void EditAutoIndent(HWND hwnd) {
 		}
 
 		if (*pLineBuf) {
-			SendMessage(hwnd, SCI_BEGINUNDOACTION, 0, 0);
-			SendMessage(hwnd, SCI_ADDTEXT, strlen(pLineBuf), (LPARAM)pLineBuf);
+			SciCall_BeginUndoAction();
+			SciCall_AddText(strlen(pLineBuf), pLineBuf);
 			if (indent) {
 				if (indent == 1) {// remove new line
 					iCurPos = iIndentPos + ((iEOLMode == SC_EOL_CRLF) ? 2 : 1);
-					SendMessage(hwnd, SCI_SETSEL, iIndentPos, iCurPos);
-					SendMessage(hwnd, SCI_REPLACESEL, 0, (LPARAM)"");
+					SciCall_SetSel(iIndentPos, iCurPos);
+					SciCall_ReplaceSel("");
 				}
-				SendMessage(hwndEdit, SCI_SETSEL, iIndentPos, iIndentPos);
+				SciCall_SetSel(iIndentPos, iIndentPos);
 			}
-			SendMessage(hwnd, SCI_ENDUNDOACTION, 0, 0);
+			SciCall_EndUndoAction();
 
 			//const Sci_Position iPrevLineStartPos = SciCall_PositionFromLine(iCurLine - 1);
 			//const Sci_Position iPrevLineEndPos = SciCall_GetLineEndPosition(iCurLine - 1);
 			//const Sci_Position iPrevLineIndentPos = SciCall_GetLineIndentPosition(iCurLine - 1);
 
 			//if (iPrevLineEndPos == iPrevLineIndentPos) {
-			//	SendMessage(hwnd, SCI_BEGINUNDOACTION, 0, 0);
+			//	SciCall_BeginUndoAction();
 			//	SendMessage(hwnd, SCI_SETTARGETSTART, iPrevLineStartPos, 0);
 			//	SendMessage(hwnd, SCI_SETTARGETEND, iPrevLineEndPos, 0);
 			//	SendMessage(hwnd, SCI_REPLACETARGET, 0, (LPARAM)"");
-			//	SendMessage(hwnd, SCI_ENDUNDOACTION, 0, 0);
+			//	SciCall_EndUndoAction();
 			//}
 		}
 
@@ -2004,7 +2004,7 @@ void EditToggleCommentLine(HWND hwnd) {
 void EditEncloseSelectionNewLine(HWND hwnd, LPCWSTR pwszOpen, LPCWSTR pwszClose) {
 	WCHAR start[64] = L"";
 	WCHAR end[64] = L"";
-	const int iEOLMode = (int)SendMessage(hwnd, SCI_GETEOLMODE, 0, 0);
+	const int iEOLMode = SciCall_GetEOLMode();
 	LPCWSTR lineEnd = (iEOLMode == SC_EOL_LF) ? L"\n" : ((iEOLMode == SC_EOL_CR) ? L"\r" : L"\r\n");
 
 	Sci_Position pos = SciCall_GetSelectionStart();
@@ -2126,7 +2126,7 @@ void EditToggleCommentBlock(HWND hwnd) {
 }
 
 // see Style_SniffShebang() in Styles.c
-void EditInsertScriptShebangLine(HWND hwnd) {
+void EditInsertScriptShebangLine(void) {
 	const char *prefix = "#!/usr/bin/env ";
 	const char *name = NULL;
 
@@ -2204,11 +2204,11 @@ void EditInsertScriptShebangLine(HWND hwnd) {
 
 	const Sci_Position iCurrentPos = SciCall_GetCurrentPos();
 	if (iCurrentPos == 0 && (name != NULL || pLexCurrent->iLexer == SCLEX_BASH)) {
-		const int iEOLMode = (int)SendMessage(hwnd, SCI_GETEOLMODE, 0, 0);
+		const int iEOLMode = SciCall_GetEOLMode();
 		LPCSTR lineEnd = (iEOLMode == SC_EOL_LF) ? "\n" : ((iEOLMode == SC_EOL_CR) ? "\r" : "\r\n");
 		strcat(line, lineEnd);
 	}
-	SendMessage(hwnd, SCI_REPLACESEL, 0, (LPARAM)line);
+	SciCall_ReplaceSel(line);
 }
 
 void EditShowCallTips(HWND hwnd, Sci_Position position) {

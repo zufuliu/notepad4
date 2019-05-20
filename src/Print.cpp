@@ -23,8 +23,7 @@
 #include <shlwapi.h>
 #include <commctrl.h>
 #include <commdlg.h>
-#include "Scintilla.h"
-#include "compiler.h"
+#include "SciCall.h"
 #if !NP2_FORCE_COMPILE_C_AS_CPP
 extern "C" {
 #endif
@@ -32,8 +31,6 @@ extern "C" {
 #include "Helpers.h"
 #include "Dialogs.h"
 #include "Notepad2.h"
-#include "Edit.h"
-#include "SciCall.h"
 
 #if !NP2_FORCE_COMPILE_C_AS_CPP
 }
@@ -266,10 +263,10 @@ extern "C" BOOL EditPrint(HWND hwnd, LPCWSTR pszDocTitle, LPCWSTR pszPageFormat)
 	}
 
 	// Set print color mode
-	SendMessage(hwnd, SCI_SETPRINTCOLOURMODE, iPrintColor, 0);
+	SciCall_SetPrintColourMode(iPrintColor);
 
 	// Set print zoom...
-	SendMessage(hwnd, SCI_SETPRINTMAGNIFICATION, iPrintZoom, 0);
+	SciCall_SetPrintMagnification(iPrintZoom);
 
 	Sci_Position lengthDoc = SciCall_GetLength();
 	const Sci_Position lengthDocMax = lengthDoc;
@@ -366,7 +363,7 @@ extern "C" BOOL EditPrint(HWND hwnd, LPCWSTR pszDocTitle, LPCWSTR pszPageFormat)
 		frPrint.chrg.cpMin = (Sci_PositionCR)lengthPrinted;
 		frPrint.chrg.cpMax = (Sci_PositionCR)lengthDoc;
 
-		lengthPrinted = (LONG)SendMessage(hwnd, SCI_FORMATRANGE, printPage, (LPARAM)&frPrint);
+		lengthPrinted = SciCall_FormatRange(printPage, &frPrint);
 
 		if (printPage) {
 			SetTextColor(hdc, RGB(0, 0, 0));
@@ -405,7 +402,7 @@ extern "C" BOOL EditPrint(HWND hwnd, LPCWSTR pszDocTitle, LPCWSTR pszPageFormat)
 		}
 	}
 
-	SendMessage(hwnd, SCI_FORMATRANGE, FALSE, 0);
+	SciCall_FormatRange(FALSE, nullptr);
 
 	EndDoc(hdc);
 	DeleteDC(hdc);
