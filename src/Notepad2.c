@@ -41,8 +41,8 @@
 #define NP2_DEBUG_FOLD_LEVEL	0
 // enable the .LOG feature
 #define NP2_ENABLE_DOT_LOG_FEATURE	0
-// enable call tips (currently not yet implemented)
-#define NP2_ENABLE_SHOW_CALL_TIPS	0
+// enable CallTips (currently not yet implemented)
+#define NP2_ENABLE_SHOW_CALLTIPS	0
 // enable customize toolbar labels
 #define NP2_ENABLE_CUSTOMIZE_TOOLBAR_LABELS		0
 
@@ -148,8 +148,8 @@ struct EditAutoCompletionConfig autoCompletionConfig;
 static BOOL bShowCodeFolding;
 static BOOL bShowFoldingLine;
 static BOOL bFoldDisplayText;
-#if NP2_ENABLE_SHOW_CALL_TIPS
-static BOOL bShowCallTips = FALSE;
+#if NP2_ENABLE_SHOW_CALLTIPS
+static BOOL bShowCallTips = TRUE;
 static int iCallTipsWaitTime = 500; // 500 ms
 #endif
 static BOOL bViewWhiteSpace;
@@ -1439,11 +1439,6 @@ void UpdateFoldMarginWidth(void) {
 	}
 }
 
-#if NP2_ENABLE_SHOW_CALL_TIPS
-#define SetCallTipsWaitTime() \
-	SendMessage(hwndEdit, SCI_SETMOUSEDWELLTIME, bShowCallTips? iCallTipsWaitTime : SC_TIME_FOREVER, 0);
-#endif
-
 void SetWrapStartIndent(void) {
 	int indent = 0;
 	switch (iWordWrapIndent) {
@@ -1666,9 +1661,11 @@ HWND EditCreate(HWND hwndParent) {
 	SciCall_SetDefaultFoldDisplayText(text);
 	// highlight for current folding block
 	SciCall_MarkerEnableHighlight(TRUE);
-#if NP2_ENABLE_SHOW_CALL_TIPS
+
 	// CallTips
-	SetCallTipsWaitTime();
+	SciCall_CallTipUseStyle(iTabWidth);
+#if NP2_ENABLE_SHOW_CALLTIPS
+	SciCall_SetMouseDwellTime(bShowCallTips? iCallTipsWaitTime : SC_TIME_FOREVER);
 #endif
 
 	// Nonprinting characters
@@ -2371,7 +2368,7 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	CheckCmd(hmenu, IDM_VIEW_SHOWEOLS, bViewEOLs);
 	CheckCmd(hmenu, IDM_VIEW_WORDWRAPSYMBOLS, bShowWordWrapSymbols);
 	CheckCmd(hmenu, IDM_VIEW_UNICODE_CONTROL_CHAR, bShowUnicodeControlCharacter);
-#if NP2_ENABLE_SHOW_CALL_TIPS
+#if NP2_ENABLE_SHOW_CALLTIPS
 	CheckCmd(hmenu, IDM_VIEW_SHOWCALLTIPS, bShowCallTips);
 #endif
 	CheckCmd(hmenu, IDM_VIEW_MATCHBRACES, bMatchBraces);
@@ -3805,6 +3802,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			iTabWidth = clamp_i(iTabWidth, 1, 256);
 			iIndentWidth = clamp_i(iIndentWidth, 0, 256);
 			SciCall_SetTabWidth(iTabWidth);
+			SciCall_CallTipUseStyle(iTabWidth);
 			SciCall_SetIndent(iIndentWidth);
 			bTabsAsSpacesG = bTabsAsSpaces;
 			bTabIndentsG = bTabIndents;
@@ -3946,10 +3944,10 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		InvalidateStyleRedraw();
 		break;
 
-#if NP2_ENABLE_SHOW_CALL_TIPS
+#if NP2_ENABLE_SHOW_CALLTIPS
 	case IDM_VIEW_SHOWCALLTIPS:
 		bShowCallTips = !bShowCallTips;
-		SetCallTipsWaitTime();
+		SciCall_SetMouseDwellTime(bShowCallTips? iCallTipsWaitTime : SC_TIME_FOREVER);
 		break;
 #endif
 
@@ -4211,6 +4209,8 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		if (SendMessage(hwndEdit, SCI_AUTOCACTIVE, 0, 0)) {
 			//close the AutoComplete box
 			SendMessage(hwndEdit, SCI_AUTOCCANCEL, 0, 0);
+		} else if (SciCall_CallTipActive()) {
+			SciCall_CallTipCancel();
 		} else if (bInFullScreenMode) {
 			bInFullScreenMode = FALSE;
 			ToggleFullScreenMode();
@@ -4856,7 +4856,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			if (braces != NULL && *braces == ch) {
 				*braces = L'\0'; // unsafe
 			}
-			const Sci_Position iNewPos = scn->position + ((braces == NULL) ? ((Sci_Position)strlen(text)) : (braces - text + 1));
+			const Sci_Position iNewPos = scn->position + ((braces == NULL) ? strlen(text) : (braces - text + 1));
 
 			SciCall_BeginUndoAction();
 			SciCall_SetSel(scn->position, iCurPos);
@@ -4871,18 +4871,21 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			EditCompleteWord(hwndEdit, FALSE);
 			break;
 
-#if NP2_ENABLE_SHOW_CALL_TIPS
-		// CallTips
+#if NP2_ENABLE_SHOW_CALLTIPS
 		case SCN_DWELLSTART:
 			if (bShowCallTips && scn->position >= 0) {
-				EditShowCallTips(hwndEdit, scn->position);
+				EditShowCallTips(scn->position);
 			}
 			break;
 
 		case SCN_DWELLEND:
-			SendMessage(hwndEdit, SCI_CALLTIPCANCEL, 0, 0);
+			SciCall_CallTipCancel();
 			break;
 #endif
+
+		case SCN_CALLTIPCLICK:
+			SciCall_CallTipCancel();
+			break;
 
 		case SCN_MODIFIED:
 			if (scn->linesAdded) {
@@ -5167,8 +5170,8 @@ void LoadSettings(void) {
 	}
 	EditCompleteUpdateConfig();
 
-#if NP2_ENABLE_SHOW_CALL_TIPS
-	bShowCallTips = IniSectionGetBool(pIniSection, L"ShowCallTips", 0);
+#if NP2_ENABLE_SHOW_CALLTIPS
+	bShowCallTips = IniSectionGetBool(pIniSection, L"ShowCallTips", TRUE);
 	iValue = IniSectionGetInt(pIniSection, L"CallTipsWaitTime", 500);
 	iCallTipsWaitTime = max_i(iValue, 100);
 #endif
@@ -5533,8 +5536,8 @@ void SaveSettings(BOOL bSaveSettingsNow) {
 	IniSectionSetIntEx(pIniSection, L"AutoInsertMask", autoCompletionConfig.fAutoInsertMask, AutoInsertDefaultMask);
 	IniSectionSetIntEx(pIniSection, L"AsmLineCommentChar", autoCompletionConfig.iAsmLineCommentChar, AsmLineCommentCharSemicolon);
 	IniSectionSetStringEx(pIniSection, L"AutoCFillUpPunctuation", autoCompletionConfig.wszAutoCompleteFillUp, AUTO_COMPLETION_FILLUP_DEFAULT);
-#if NP2_ENABLE_SHOW_CALL_TIPS
-	IniSectionSetBoolEx(pIniSection, L"ShowCallTips", bShowCallTips, 1);
+#if NP2_ENABLE_SHOW_CALLTIPS
+	IniSectionSetBoolEx(pIniSection, L"ShowCallTips", bShowCallTips, TRUE);
 	IniSectionSetIntEx(pIniSection, L"CallTipsWaitTime", iCallTipsWaitTime, 500);
 #endif
 	IniSectionSetBoolEx(pIniSection, L"TabsAsSpaces", bTabsAsSpacesG, 0);
