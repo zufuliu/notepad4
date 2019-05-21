@@ -789,6 +789,12 @@ NP2_inline void SciCall_SetPrintColourMode(int mode) {
 	SciCall(SCI_SETPRINTCOLOURMODE, mode, 0);
 }
 
+// Direct access
+
+NP2_inline const char* SciCall_GetRangePointer(Sci_Position start, Sci_Position lengthRange) {
+	return (const char *)SciCall(SCI_GETRANGEPOINTER, start, lengthRange);
+}
+
 // Folding
 
 NP2_inline BOOL SciCall_GetLineVisible(Sci_Line line) {

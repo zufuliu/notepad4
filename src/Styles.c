@@ -1610,7 +1610,7 @@ PEDITLEXER Style_SniffShebang(char *pchText) {
 // Style_GetDocTypeLanguage()
 //
 int Style_GetDocTypeLanguage(void) {
-	char *p;
+	const char *p;
 	char tchText[4096] = ""; // maybe contains header comments
 	SciCall_GetText(COUNTOF(tchText), tchText);
 
@@ -1778,7 +1778,7 @@ int Style_GetDocTypeLanguage(void) {
 	//	return IDM_LANG_ANDROID_MANIFEST;
 	//if (!strncmp(p, "svg", 3))
 	//	return IDM_LANG_SVG;
-	char * const pb = p;
+	const char * const pb = p;
 	if (((p = strstr(pb, "Layout")) != NULL && strstr(p + 6, "xmlns:android")) ||
 			((p = strstr(pb, "View")) != NULL && strstr(p + 4, "xmlns:android")) ||
 			((p = strstr(pb, "menu")) != NULL && strstr(p + 4, "xmlns:android"))) {
@@ -1817,7 +1817,7 @@ PEDITLEXER Style_DetectObjCAndMatlab(void) {
 	char tchText[4096] = ""; // maybe contains header comments
 	SciCall_GetText(COUNTOF(tchText), tchText);
 
-	char *p = tchText;
+	const char *p = tchText;
 	np2LexLangIndex = 0;
 	while (*p) {
 		while (IsASpace(*p)) {
@@ -1881,7 +1881,7 @@ PEDITLEXER Style_AutoDetect(BOOL bDotFile) {
 	char tchText[4096] = ""; // maybe contains header comments
 	SciCall_GetText(COUNTOF(tchText), tchText);
 
-	char *p = tchText;
+	const char *p = tchText;
 	const BOOL shebang = *p == '#' && p[1] == '!';
 	int cppCount = 0;
 	int sharpCount = 0;
@@ -2448,8 +2448,30 @@ BOOL Style_CanOpenFile(LPCWSTR lpszFile) {
 BOOL Style_MaybeBinaryFile(LPCWSTR lpszFile) {
 #if 1
 	UNREFERENCED_PARAMETER(lpszFile);
+	/* Test C0 Control Character
+	These character is not reused in most text encoding, and doesn't appears in normal text file.
+	Most binary file has reserved fields (most are NULL) or small values in it's header.
+	Treat the file as binary when we find two adjacent C0 control characters
+	(very common in file header) or some (currently set to 8) C0 control characters. */
+	// see tools/GenerateTable.py for this mask.
+	const UINT C0Mask = 0x0FFFC1FFU;
+	Sci_Position max_len = min_pos(1023, SciCall_GetLength() - 1);
+	const uint8_t *ptr = (const uint8_t *)SciCall_GetRangePointer(0, max_len + 1);
+	UINT count = 0;
+	while (max_len > 0) {
+		uint8_t ch = *ptr++;
+		if (ch < 32 && (C0Mask & (1U << ch))) {
+			++count;
+			ch = *ptr++;
+			if ((count >= 8) || (ch < 32 && (C0Mask & (1U << ch)))) {
+				return TRUE;
+			}
+			--max_len;
+		}
+		--max_len;
+	}
 #else
-	unsigned char buf[5] = {0}; // magic
+	uint8_t buf[5] = {0}; // file magic
 	SciCall_GetText(COUNTOF(buf), buf);
 	const UINT magic2 = (buf[0] << 8) | buf[1];
 	if (magic2 == 0x4D5AU ||	// PE (exe, dll, etc.): MZ
