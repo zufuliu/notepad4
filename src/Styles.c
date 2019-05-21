@@ -2455,10 +2455,12 @@ BOOL Style_MaybeBinaryFile(LPCWSTR lpszFile) {
 	(very common in file header) or some (currently set to 8) C0 control characters. */
 	// see tools/GenerateTable.py for this mask.
 	const UINT C0Mask = 0x0FFFC1FFU;
-	Sci_Position max_len = min_pos(1023, SciCall_GetLength() - 1);
-	const uint8_t *ptr = (const uint8_t *)SciCall_GetRangePointer(0, max_len + 1);
+	const Sci_Position headerLen = min_pos(1023, SciCall_GetLength() - 1);
+	const uint8_t *ptr = (const uint8_t *)SciCall_GetRangePointer(0, headerLen + 1);
+	const uint8_t * const end  = ptr + headerLen;
 	UINT count = 0;
-	while (max_len > 0) {
+
+	while (ptr < end) {
 		uint8_t ch = *ptr++;
 		if (ch < 32 && (C0Mask & (1U << ch))) {
 			++count;
@@ -2466,9 +2468,7 @@ BOOL Style_MaybeBinaryFile(LPCWSTR lpszFile) {
 			if ((count >= 8) || (ch < 32 && (C0Mask & (1U << ch)))) {
 				return TRUE;
 			}
-			--max_len;
 		}
-		--max_len;
 	}
 #else
 	uint8_t buf[5] = {0}; // file magic
