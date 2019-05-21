@@ -252,6 +252,7 @@ WCHAR	szCurFile[MAX_PATH + 40];
 FILEVARS	fvCurFile;
 static BOOL bModified;
 static BOOL bReadOnly = FALSE;
+BOOL bLockedForEditing = FALSE; // save call to SciCall_GetReadOnly()
 static int iOriginalEncoding;
 static int iEOLMode;
 
@@ -1411,7 +1412,9 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 void UpdateWindowTitle(void) {
 	SetWindowTitle(hwndMain, uidsAppTitle, fIsElevated, IDS_UNTITLED, szCurFile,
 				iPathNameFormat, IsDocumentModified(),
-				IDS_READONLY, bReadOnly, szTitleExcerpt);
+				IDS_READONLY, bReadOnly,
+				IDS_LOCKED, bLockedForEditing,
+				szTitleExcerpt);
 }
 
 static inline void UpdateDocumentModificationStatus(void) {
@@ -2152,6 +2155,7 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	EnableCmd(hmenu, IDM_FILE_OPEN_CONTAINING_FOLDER, i);
 	EnableCmd(hmenu, IDM_FILE_READONLY, i);
 	CheckCmd(hmenu, IDM_FILE_READONLY, bReadOnly);
+	CheckCmd(hmenu, IDM_FILE_LOCK_EDITING, bLockedForEditing);
 
 	//EnableCmd(hmenu, IDM_ENCODING_UNICODEREV, !bReadOnly);
 	//EnableCmd(hmenu, IDM_ENCODING_UNICODE, !bReadOnly);
@@ -2525,9 +2529,6 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	case IDM_FILE_READONLY:
-		//bReadOnly = !bReadOnly;
-		//SciCall_SetReadOnly(bReadOnly);
-		//UpdateToolbar();
 		if (StrNotEmpty(szCurFile)) {
 			DWORD dwFileAttributes = GetFileAttributes(szCurFile);
 			if (dwFileAttributes != INVALID_FILE_ATTRIBUTES) {
@@ -2547,6 +2548,12 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			bReadOnly = (dwFileAttributes != INVALID_FILE_ATTRIBUTES) && (dwFileAttributes & FILE_ATTRIBUTE_READONLY);
 			UpdateWindowTitle();
 		}
+		break;
+
+	case IDM_FILE_LOCK_EDITING:
+		bLockedForEditing = !bLockedForEditing;
+		SciCall_SetReadOnly(bLockedForEditing);
+		UpdateWindowTitle();
 		break;
 
 	case IDM_FILE_BROWSE:
@@ -7053,7 +7060,6 @@ BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect, LPCWST
 		if (!lexerSpecified) {
 			UpdateLineNumberWidth();
 		}
-		//bReadOnly = FALSE;
 		SciCall_SetEOLMode(iEOLMode);
 		MRU_AddFile(pFileMRU, szFileName, flagRelativeFileMRU, flagPortableMyDocs);
 		if (flagUseSystemMRU == 2) {
@@ -7066,23 +7072,27 @@ BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect, LPCWST
 		}
 		InstallFileWatching(szCurFile);
 
-		if (line > 1 || col > 1) {
-			EditJumpTo(line, col);
-			EditEnsureSelectionVisible();
-		}
+		// check for binary file (file with unknown encoding: ANSI)
+		const BOOL binary = (iEncoding == CPI_DEFAULT) && Style_MaybeBinaryFile(szCurFile);
+		if (!binary) {
+			if (line > 1 || col > 1) {
+				EditJumpTo(line, col);
+				EditEnsureSelectionVisible();
+			}
 #if NP2_ENABLE_DOT_LOG_FEATURE
-		if (IsFileStartsWithDotLog()) {
-			SciCall_DocumentEnd();
-			SciCall_BeginUndoAction();
-			SendMessage(hwndEdit, SCI_NEWLINE, 0, 0);
-			SendWMCommand(hwndMain, IDM_EDIT_INSERT_SHORTDATE);
-			SciCall_DocumentEnd();
-			SendMessage(hwndEdit, SCI_NEWLINE, 0, 0);
-			SciCall_EndUndoAction();
-			SciCall_DocumentEnd();
-			EditEnsureSelectionVisible();
-		}
+			if (IsFileStartsWithDotLog()) {
+				SciCall_DocumentEnd();
+				SciCall_BeginUndoAction();
+				SendMessage(hwndEdit, SCI_NEWLINE, 0, 0);
+				SendWMCommand(hwndMain, IDM_EDIT_INSERT_SHORTDATE);
+				SciCall_DocumentEnd();
+				SendMessage(hwndEdit, SCI_NEWLINE, 0, 0);
+				SciCall_EndUndoAction();
+				SciCall_DocumentEnd();
+				EditEnsureSelectionVisible();
+			}
 #endif
+		}
 
 		UpdateStatusbar();
 		UpdateDocumentModificationStatus();
@@ -7090,14 +7100,17 @@ BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect, LPCWST
 		if (status.bUnicodeErr) {
 			MsgBox(MBWARN, IDS_ERR_UNICODE);
 		}
+		// lock binary file for editing
+		if (binary) {
+			bLockedForEditing = TRUE;
+			SciCall_SetReadOnly(TRUE);
+			UpdateWindowTitle();
+			return fSuccess;
+		}
 		// Show inconsistent line endings warning
 		if (status.bInconsistent && bWarnLineEndings) {
 			// file with unknown lexer and unknown encoding
 			bUnknownFile = bUnknownFile && (iEncoding == CPI_DEFAULT);
-			// Hide warning for binary file
-			if (bUnknownFile && Style_MaybeBinaryFile(szCurFile)) {
-				return fSuccess;
-			}
 			// Set default button to "No" for diff/patch and unknown file.
 			// diff/patch file may contains content from files with different line endings.
 			status.bLineEndingsDefaultNo = bUnknownFile || pLexCurrent->iLexer == SCLEX_DIFF;
