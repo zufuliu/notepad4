@@ -1031,7 +1031,7 @@ sptr_t ScintillaBase::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lPara
 		break;
 
 	case SCI_CALLTIPUSESTYLE:
-		ct.SetTabSize(static_cast<int>(wParam));
+		ct.SetTabSize(static_cast<int>(wParam * vs.aveCharWidth));
 		InvalidateStyleRedraw();
 		break;
 
