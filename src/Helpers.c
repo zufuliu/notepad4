@@ -571,7 +571,9 @@ BOOL bFreezeAppTitle = FALSE;
 
 BOOL SetWindowTitle(HWND hwnd, UINT uIDAppName, BOOL bIsElevated, UINT uIDUntitled,
 					LPCWSTR lpszFile, int iFormat, BOOL bModified,
-					UINT uIDReadOnly, BOOL bReadOnly, LPCWSTR lpszExcerpt) {
+					UINT uIDReadOnly, BOOL bReadOnly,
+					UINT uIDLocked, BOOL bLocked,
+					LPCWSTR lpszExcerpt) {
 
 	static WCHAR szCachedFile[MAX_PATH] = L"";
 	static WCHAR szCachedDisplayName[MAX_PATH] = L"";
@@ -636,6 +638,12 @@ BOOL SetWindowTitle(HWND hwnd, UINT uIDAppName, BOOL bIsElevated, UINT uIDUntitl
 		GetString(uIDReadOnly, szReadOnly, COUNTOF(szReadOnly));
 		lstrcat(szTitle, L" ");
 		lstrcat(szTitle, szReadOnly);
+	}
+	if (bLocked) {
+		WCHAR szLocked[32];
+		GetString(uIDLocked, szLocked, COUNTOF(szLocked));
+		lstrcat(szTitle, L" ");
+		lstrcat(szTitle, szLocked);
 	}
 
 	lstrcat(szTitle, pszSep);

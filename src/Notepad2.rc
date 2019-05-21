@@ -79,9 +79,10 @@ BEGIN
 		MENUITEM "&Open...\tCtrl+O",				IDM_FILE_OPEN
 		MENUITEM "&Save\tCtrl+S",					IDM_FILE_SAVE
 		MENUITEM "Save &As...\tF6",					IDM_FILE_SAVEAS
-		MENUITEM "Save &Copy...\tCtrl+F6",			IDM_FILE_SAVECOPY
+		MENUITEM "Save Cop&y...\tCtrl+F6",			IDM_FILE_SAVECOPY
 		MENUITEM SEPARATOR
 		MENUITEM "&Read Only",						IDM_FILE_READONLY
+		MENUITEM "Lo&ck For Editing",				IDM_FILE_LOCK_EDITING
 		MENUITEM "Re&vert\tF5",						IDM_FILE_REVERT
 		POPUP "Reloa&d"
 		BEGIN
@@ -1748,6 +1749,7 @@ BEGIN
     IDS_UNTITLED            "Untitled"
     IDS_TITLEEXCERPT        """%s"""
     IDS_READONLY            "(Read Only)"
+	IDS_LOCKED				"(Locked For Editing)"
     IDS_DOCPOS              "Ln %s / %s  Col %s / %s  Ch %s / %s  Sel %s / %s  SelLn %s  Fnd %s"
     IDS_LOADFILE            "Loading ""%s""..."
     IDS_SAVEFILE            "Saving ""%s""..."

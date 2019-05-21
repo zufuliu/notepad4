@@ -92,15 +92,14 @@ void Edit_ReleaseResources(void) {
 // EditSetNewText()
 //
 extern BOOL bFreezeAppTitle;
+extern BOOL bLockedForEditing;
 extern FILEVARS fvCurFile;
 
 void EditSetNewText(HWND hwnd, LPCSTR lpstrText, DWORD cbText) {
 	bFreezeAppTitle = TRUE;
+	bLockedForEditing = FALSE;
 
-	if (SciCall_GetReadOnly()) {
-		SciCall_SetReadOnly(FALSE);
-	}
-
+	SciCall_SetReadOnly(FALSE);
 	SendMessage(hwnd, SCI_CANCEL, 0, 0);
 	SciCall_SetUndoCollection(FALSE);
 	SciCall_EmptyUndoBuffer();

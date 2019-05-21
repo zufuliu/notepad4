@@ -440,7 +440,9 @@ BOOL IsFontAvailable(LPCWSTR lpszFontName);
 void SetClipData(HWND hwnd, LPCWSTR pszData);
 BOOL SetWindowTitle(HWND hwnd, UINT uIDAppName, BOOL bIsElevated, UINT uIDUntitled,
 					LPCWSTR lpszFile, int iFormat, BOOL bModified,
-					UINT uIDReadOnly, BOOL bReadOnly, LPCWSTR lpszExcerpt);
+					UINT uIDReadOnly, BOOL bReadOnly,
+					UINT uIDLocked, BOOL bLocked,
+					LPCWSTR lpszExcerpt);
 void SetWindowTransparentMode(HWND hwnd, BOOL bTransparentMode, int iOpacityLevel);
 void SetWindowLayoutRTL(HWND hwnd, BOOL bRTL);
 
