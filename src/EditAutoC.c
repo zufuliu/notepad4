@@ -2211,14 +2211,14 @@ void EditInsertScriptShebangLine(void) {
 	SciCall_ReplaceSel(line);
 }
 
-void EditShowCallTips(HWND hwnd, Sci_Position position) {
+void EditShowCallTips(Sci_Position position) {
 	const Sci_Line iLine = SciCall_LineFromPosition(position);
 	const Sci_Position iDocLen = SciCall_GetLineLength(iLine);
 	char *pLine = (char *)NP2HeapAlloc(iDocLen + 1);
 	SciCall_GetLine(iLine, pLine);
 	char *text = (char *)NP2HeapAlloc(iDocLen + 1 + 128);
-	sprintf(text, "ShowCallTips(%d, %d, %d)\n%s", (int)(iLine + 1), (int)position, (int)iDocLen, pLine);
-	SendMessage(hwnd, SCI_CALLTIPSHOW, position, (LPARAM)text);
+	sprintf(text, "\nShowCallTips(%d, %d, %d)\n\002%s", (int)(iLine + 1), (int)position, (int)iDocLen, pLine);
+	SciCall_CallTipShow(position, text);
 	NP2HeapFree(pLine);
 	NP2HeapFree(text);
 }

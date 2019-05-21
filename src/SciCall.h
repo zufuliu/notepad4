@@ -755,6 +755,26 @@ NP2_inline void SciCall_IndicatorFillRange(Sci_Position start, Sci_Position leng
 	SciCall(SCI_INDICATORFILLRANGE, start, length);
 }
 
+// Autocompletion
+
+// Call tips
+
+NP2_inline void SciCall_CallTipShow(Sci_Position pos, const char *definition) {
+	SciCall(SCI_CALLTIPSHOW, pos, (LPARAM)definition);
+}
+
+NP2_inline void SciCall_CallTipCancel(void) {
+	SciCall(SCI_CALLTIPCANCEL, 0, 0);
+}
+
+NP2_inline BOOL SciCall_CallTipActive(void) {
+	return (BOOL)SciCall(SCI_CALLTIPACTIVE, 0, 0);
+}
+
+NP2_inline void SciCall_CallTipUseStyle(int tabSize) {
+	SciCall(SCI_CALLTIPUSESTYLE, tabSize, 0);
+}
+
 // Printing
 
 NP2_inline Sci_Position SciCall_FormatRange(BOOL draw, struct Sci_RangeToFormat *fr) {
@@ -901,6 +921,12 @@ NP2_inline void SciCall_SetProperty(const char *key, const char *value) {
 
 NP2_inline void SciCall_SetKeywords(int keywordSet, const char *keywords) {
 	SciCall(SCI_SETKEYWORDS, keywordSet, (LPARAM)keywords);
+}
+
+// Notifications
+
+NP2_inline void SciCall_SetMouseDwellTime(int periodMilliseconds) {
+	SciCall(SCI_SETMOUSEDWELLTIME, periodMilliseconds, 0);
 }
 
 #endif // NOTEPAD2_SCICALL_H_

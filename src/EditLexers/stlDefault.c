@@ -26,6 +26,7 @@ static EDITSTYLE Styles_Global[] = {
 	{ STYLE_FOLDDISPLAYTEXT, 63116, EDITSTYLE_HOLE(L"Fold Ellipsis"), L"font:$(Code); size:-2; bold; fore:#808080" },
 	{ 0, 63113, EDITSTYLE_HOLE(L"Mark Occurrences"), L"alpha:100" },
 	{ 0, 63118, EDITSTYLE_HOLE(L"Bookmark"), L"fore:#408040; back:#00FF00; alpha:40" },
+	{ STYLE_CALLTIP, 63119, EDITSTYLE_HOLE(L"CallTips"), L"" },
 };
 
 static EDITSTYLE Styles_2ndGlobal[] = {
@@ -47,6 +48,7 @@ static EDITSTYLE Styles_2ndGlobal[] = {
 	{ STYLE_FOLDDISPLAYTEXT, 63116, EDITSTYLE_HOLE(L"Fold Ellipsis"), L"font:$(Code); size:-2; bold; fore:#606060" },
 	{ 0, 63113, EDITSTYLE_HOLE(L"Mark Occurrences"), L"alpha:100" },
 	{ 0, 63118, EDITSTYLE_HOLE(L"Bookmark"), L"fore:#408040; back:#00FF00; alpha:40" },
+	{ STYLE_CALLTIP, 63119, EDITSTYLE_HOLE(L"CallTips"), L"" },
 };
 
 EDITLEXER lexGlobal = {

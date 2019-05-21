@@ -6482,6 +6482,7 @@ BOOL FileVars_Apply(LPCFILEVARS lpfv) {
 		iTabWidth = iTabWidthG;
 	}
 	SciCall_SetTabWidth(iTabWidth);
+	SciCall_CallTipUseStyle(iTabWidth);
 
 	if (lpfv->mask & FV_INDENTWIDTH) {
 		iIndentWidth = lpfv->iIndentWidth;

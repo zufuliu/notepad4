@@ -393,7 +393,7 @@ BEGIN
 		MENUITEM "Show Line &Endings\tCtrl+Shift+9",		IDM_VIEW_SHOWEOLS
 		MENUITEM "Show Wrap S&ymbols\tCtrl+Shift+0",		IDM_VIEW_WORDWRAPSYMBOLS
 		MENUITEM "Un&icode Control Character",				IDM_VIEW_UNICODE_CONTROL_CHAR
-		//MENUITEM "S&how Call Tips",						IDM_VIEW_SHOWCALLTIPS
+		//MENUITEM "S&how CallTips",						IDM_VIEW_SHOWCALLTIPS
 		MENUITEM SEPARATOR
 		MENUITEM "&Visual Brace Matching\tCtrl+Shift+V",	IDM_VIEW_MATCHBRACES
 		POPUP "Highlight C&urrent Line"

@@ -345,6 +345,7 @@ enum DefaultStyleIndex {
 	Style_FoldDispalyText,	// inherited style.
 	Style_MarkOccurrences,	// standalone style. `fore`, `alpha`
 	Style_Bookmark,			// standalone style. `fore`, `back`, `alpha`
+	Style_CallTip,			// inherited style.
 };
 
 // folding marker
@@ -1423,6 +1424,9 @@ void Style_SetLexer(PEDITLEXER pLexNew) {
 
 		Style_SetDefaultStyle(Style_FoldDispalyText);
 	} // end set folding style
+
+	// CallTips
+	Style_SetDefaultStyle(Style_CallTip);
 
 	if (SciCall_GetIndentationGuides() != SC_IV_NONE) {
 		Style_SetIndentGuides(TRUE);

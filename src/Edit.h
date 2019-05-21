@@ -266,7 +266,7 @@ void	EditAutoIndent(HWND hwnd);
 void	EditToggleCommentLine(HWND hwnd);
 void	EditToggleCommentBlock(HWND hwnd);
 void	EditInsertScriptShebangLine(void);
-void	EditShowCallTips(HWND hwnd, Sci_Position position);
+void	EditShowCallTips(Sci_Position position);
 
 #define NCP_DEFAULT					1
 #define NCP_UTF8					2
