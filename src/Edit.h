@@ -101,7 +101,12 @@ extern HWND hwndEdit;
 
 void	Edit_ReleaseResources(void);
 HWND	EditCreate(HWND hwndParent);
-void	EditSetNewText(HWND hwnd, LPCSTR lpstrText, DWORD cbText);
+void	EditSetNewText(LPCSTR lpstrText, DWORD cbText);
+
+static inline void EditSetEmptyText(void) {
+	EditSetNewText("", 0);
+}
+
 BOOL	EditConvertText(HWND hwnd, UINT cpSource, UINT cpDest, BOOL bSetSavePoint);
 
 char*	EditGetClipboardText(HWND hwnd); // LocalFree()
@@ -110,7 +115,7 @@ BOOL	EditCopyAppend(HWND hwnd);
 extern const int iLineEndings[3];
 struct EditFileIOStatus;
 void 	EditDetectEOLMode(LPCSTR lpData, DWORD cbData, struct EditFileIOStatus *status);
-BOOL	EditLoadFile(HWND hwnd, LPWSTR pszFile, BOOL bSkipEncodingDetection, struct EditFileIOStatus *status);
+BOOL	EditLoadFile(LPWSTR pszFile, BOOL bSkipEncodingDetection, struct EditFileIOStatus *status);
 BOOL	EditSaveFile(HWND hwnd, LPCWSTR pszFile, BOOL bSaveCopy, struct EditFileIOStatus *status);
 
 void	EditInvertCase(HWND hwnd);
@@ -169,7 +174,7 @@ void	EditModifyLinesDlg(HWND hwnd);
 void	EditEncloseSelectionDlg(HWND hwnd);
 void	EditInsertTagDlg(HWND hwnd);
 void	EditInsertUnicodeControlCharacter(int menu);
-void	EditShowUnicodeControlCharacter(HWND hwnd, BOOL bShow);
+void	EditShowUnicodeControlCharacter(BOOL bShow);
 BOOL	EditSortDlg(HWND hwnd, int *piSortFlags);
 BOOL	EditAlignDlg(HWND hwnd, int *piAlignMode);
 void	EditSelectionAction(HWND hwnd, int action);
@@ -259,10 +264,10 @@ typedef struct EditAutoCompletionConfig {
 void	EditCompleteUpdateConfig(void);
 BOOL	IsDocWordChar(int ch);
 BOOL	IsAutoCompletionWordCharacter(int ch);
-void	EditCompleteWord(HWND hwnd, BOOL autoInsert);
+void	EditCompleteWord(BOOL autoInsert);
 void	EditAutoCloseBraceQuote(int ch);
-void	EditAutoCloseXMLTag(HWND hwnd);
-void	EditAutoIndent(HWND hwnd);
+void	EditAutoCloseXMLTag(void);
+void	EditAutoIndent(void);
 void	EditToggleCommentLine(HWND hwnd);
 void	EditToggleCommentBlock(HWND hwnd);
 void	EditInsertScriptShebangLine(void);
@@ -307,7 +312,7 @@ static inline BOOL IsDBCSCodePage(UINT page) {
 extern NP2ENCODING mEncoding[];
 void	Encoding_ReleaseResources(void);
 BOOL	EditSetNewEncoding(HWND hwnd, int iCurrentEncoding, int iNewEncoding, BOOL bNoUI, BOOL bSetSavePoint);
-void	EditOnCodePageChanged(HWND hwnd, UINT oldCodePage);
+void	EditOnCodePageChanged(UINT oldCodePage);
 const char* GetFoldDisplayEllipsis(UINT cpEdit, UINT acp);
 void	Encoding_InitDefaults(void);
 int 	Encoding_MapIniSetting(BOOL bLoad, int iSetting);
@@ -323,8 +328,8 @@ BOOL	Encoding_GetFromComboboxEx(HWND hwnd, int *pidEncoding);
 BOOL	IsUnicode(const char *pBuffer, DWORD cb, LPBOOL lpbBOM, LPBOOL lpbReverse);
 BOOL	IsUTF8(const char *pTest, DWORD nLength);
 BOOL	IsUTF7(const char *pTest, DWORD nLength);
-INT		UTF8_mbslen(LPCSTR source, INT byte_length);
-INT		UTF8_mbslen_bytes(LPCSTR utf8_string);
+//INT		UTF8_mbslen(LPCSTR source, INT byte_length);
+//INT		UTF8_mbslen_bytes(LPCSTR utf8_string);
 
 static inline BOOL IsUTF8Signature(const char *p) {
 	return p[0] == '\xEF' && p[1] == '\xBB' && p[2] == '\xBF';

@@ -1470,7 +1470,7 @@ void Style_SetLexer(PEDITLEXER pLexNew) {
 		}
 	}
 
-	SciCall_Colourise(0, - 1);
+	SciCall_ColouriseAll();
 
 	// Save current lexer
 	pLexCurrent = pLexNew;
@@ -2453,6 +2453,7 @@ BOOL Style_MaybeBinaryFile(LPCWSTR lpszFile) {
 	Most binary file has reserved fields (most are NULL) or small values in it's header.
 	Treat the file as binary when we find two adjacent C0 control characters
 	(very common in file header) or some (currently set to 8) C0 control characters. */
+
 	// see tools/GenerateTable.py for this mask.
 	const UINT C0Mask = 0x0FFFC1FFU;
 	const Sci_Position headerLen = min_pos(1023, SciCall_GetLength() - 1);

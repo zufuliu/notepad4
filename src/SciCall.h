@@ -104,6 +104,14 @@ NP2_inline int SciCall_GetStyleAt(Sci_Position position) {
 	return (int)SciCall(SCI_GETSTYLEAT, position, 0);
 }
 
+NP2_inline int SciCall_GetCharacterAndWidth(Sci_Position position, Sci_Position *width) {
+	return (int)SciCall(SCI_GETCHARACTERANDWIDTH, position, (LPARAM)width);
+}
+
+NP2_inline int SciCall_GetCharacterAt(Sci_Position position) {
+	return (int)SciCall(SCI_GETCHARACTERANDWIDTH, position, 0);
+}
+
 // Searching and replacing
 
 // Overtype
@@ -242,26 +250,6 @@ NP2_inline Sci_Position SciCall_PositionFromLine(Sci_Line line) {
 	return SciCall(SCI_POSITIONFROMLINE, line, 0);
 }
 
-NP2_inline int SciCall_GetCharacterAndWidth(Sci_Position position, Sci_Position *width) {
-	return (int)SciCall(SCI_GETCHARACTERANDWIDTH, position, (LPARAM)width);
-}
-
-NP2_inline int SciCall_GetCharacterAt(Sci_Position position) {
-	return (int)SciCall(SCI_GETCHARACTERANDWIDTH, position, 0);
-}
-
-NP2_inline BOOL SciCall_IsAutoCompletionWordCharacter(int ch) {
-	return (BOOL)SciCall(SCI_ISAUTOCOMPLETIONWORDCHARACTER, ch, 0);
-}
-
-NP2_inline Sci_Position SciCall_WordStartPosition(Sci_Position position, BOOL onlyWordCharacters) {
-	return SciCall(SCI_WORDSTARTPOSITION, position, onlyWordCharacters);
-}
-
-NP2_inline Sci_Position SciCall_WordEndPosition(Sci_Position position, BOOL onlyWordCharacters) {
-	return SciCall(SCI_WORDENDPOSITION, position, onlyWordCharacters);
-}
-
 NP2_inline Sci_Position SciCall_GetLineEndPosition(Sci_Line line) {
 	return SciCall(SCI_GETLINEENDPOSITION, line, 0);
 }
@@ -301,7 +289,7 @@ NP2_inline int SciCall_GetSelectionMode(void) {
 }
 
 NP2_inline BOOL SciCall_IsRectangleSelection(void) {
-	return SciCall(SCI_GETSELECTIONMODE, 0, 0) == SC_SEL_RECTANGLE;
+	return SciCall_GetSelectionMode() == SC_SEL_RECTANGLE;
 }
 
 NP2_inline BOOL SciCall_IsSelectionEmpty(void) {
@@ -322,6 +310,56 @@ NP2_inline void SciCall_SetSearchFlags(int searchFlags) {
 
 NP2_inline Sci_Position SciCall_SearchInTarget(Sci_Position length, const char *text) {
 	return SciCall(SCI_SEARCHINTARGET, length, (LPARAM)text);
+}
+
+NP2_inline int SciCall_TextWidth(int style, const char *text) {
+	return (int)SciCall(SCI_TEXTWIDTH, style, (LPARAM)text);
+}
+
+NP2_inline void SciCall_ChooseCaretX(void) {
+	SciCall(SCI_CHOOSECARETX, 0, 0);
+}
+
+// Scrolling and automatic scrolling
+
+NP2_inline Sci_Line SciCall_GetFirstVisibleLine(void) {
+	return SciCall(SCI_GETFIRSTVISIBLELINE, 0, 0);
+}
+
+NP2_inline void SciCall_SetXOffset(int xOffset) {
+	SciCall(SCI_SETXOFFSET, xOffset, 0);
+}
+
+NP2_inline int SciCall_GetXOffset(void) {
+	return (int)SciCall(SCI_GETXOFFSET, 0, 0);
+}
+
+NP2_inline void SciCall_LineScroll(Sci_Position columns, Sci_Line lines) {
+	SciCall(SCI_LINESCROLL, columns, lines);
+}
+
+NP2_inline void SciCall_ScrollCaret(void) {
+	SciCall(SCI_SCROLLCARET, 0, 0);
+}
+
+NP2_inline void SciCall_SetXCaretPolicy(int caretPolicy, int caretSlop) {
+	SciCall(SCI_SETXCARETPOLICY, caretPolicy, caretSlop);
+}
+
+NP2_inline void SciCall_SetYCaretPolicy(int caretPolicy, int caretSlop) {
+	SciCall(SCI_SETYCARETPOLICY, caretPolicy, caretSlop);
+}
+
+NP2_inline void SciCall_SetScrollWidth(int pixelWidth) {
+	SciCall(SCI_SETSCROLLWIDTH, pixelWidth, 0);
+}
+
+NP2_inline void SciCall_SetScrollWidthTracking(BOOL tracking) {
+	SciCall(SCI_SETSCROLLWIDTHTRACKING, tracking, 0);
+}
+
+NP2_inline void SciCall_SetEndAtLastLine(BOOL endAtLastLine) {
+	SciCall(SCI_SETENDATLASTLINE, endAtLastLine, 0);
 }
 
 // White space
@@ -405,22 +443,6 @@ NP2_inline void SciCall_SetCaretLineFrame(int width) {
 	SciCall(SCI_SETCARETLINEFRAME, width, 0);
 }
 
-NP2_inline void SciCall_ScrollCaret(void) {
-	SciCall(SCI_SCROLLCARET, 0, 0);
-}
-
-NP2_inline void SciCall_ChooseCaretX(void) {
-	SciCall(SCI_CHOOSECARETX, 0, 0);
-}
-
-NP2_inline void SciCall_SetXCaretPolicy(int caretPolicy, int caretSlop) {
-	SciCall(SCI_SETXCARETPOLICY, caretPolicy, caretSlop);
-}
-
-NP2_inline void SciCall_SetYCaretPolicy(int caretPolicy, int caretSlop) {
-	SciCall(SCI_SETYCARETPOLICY, caretPolicy, caretSlop);
-}
-
 NP2_inline void SciCall_SetCaretSticky(int useCaretStickyBehaviour) {
 	SciCall(SCI_SETCARETSTICKY, useCaretStickyBehaviour, 0);
 }
@@ -497,6 +519,20 @@ NP2_inline void SciCall_SetViewEOL(BOOL visible) {
 	SciCall(SCI_SETVIEWEOL, visible, 0);
 }
 
+// Words
+
+NP2_inline Sci_Position SciCall_WordStartPosition(Sci_Position position, BOOL onlyWordCharacters) {
+	return SciCall(SCI_WORDSTARTPOSITION, position, onlyWordCharacters);
+}
+
+NP2_inline Sci_Position SciCall_WordEndPosition(Sci_Position position, BOOL onlyWordCharacters) {
+	return SciCall(SCI_WORDENDPOSITION, position, onlyWordCharacters);
+}
+
+NP2_inline void SciCall_SetCharClassesEx(int length, const unsigned char *characters) {
+	SciCall(SCI_SETCHARCLASSESEX, length, (LPARAM)characters);
+}
+
 // Styling
 
 NP2_inline Sci_Position SciCall_GetEndStyled(void) {
@@ -569,6 +605,16 @@ NP2_inline void SciCall_StyleSetCase(int style, int caseVisible) {
 	SciCall(SCI_STYLESETCASE, style, caseVisible);
 }
 
+// Character representations
+
+NP2_inline void SciCall_SetRepresentation(const char *encodedCharacter, const char *representation) {
+	SciCall(SCI_SETREPRESENTATION, (WPARAM)encodedCharacter, (LPARAM)representation);
+}
+
+NP2_inline void SciCall_ClearRepresentation(const char *encodedCharacter) {
+	SciCall(SCI_CLEARREPRESENTATION, (WPARAM)encodedCharacter, 0);
+}
+
 // Margins
 
 NP2_inline void SciCall_SetMarginType(int margin, int marginType) {
@@ -581,10 +627,6 @@ NP2_inline void SciCall_SetMarginWidth(int margin, int pixelWidth) {
 
 NP2_inline int SciCall_GetMarginWidth(int margin) {
 	return (int)SciCall(SCI_GETMARGINWIDTHN, margin, 0);
-}
-
-NP2_inline int SciCall_TextWidth(int style, const char *text) {
-	return (int)SciCall(SCI_TEXTWIDTH, style, (LPARAM)text);
 }
 
 NP2_inline void SciCall_SetMarginMask(int margin, int mask) {
@@ -653,6 +695,20 @@ NP2_inline void SciCall_SetInlineIMEUseBlockCaret(BOOL useBlockCaret) {
 	SciCall(SCI_SETINLINEIMEUSEBLOCKCARET, useBlockCaret, 0);
 }
 
+// Brace highlighting
+
+NP2_inline void SciCall_BraceHighlight(Sci_Position posA, Sci_Position posB) {
+	SciCall(SCI_BRACEHIGHLIGHT, posA, posB);
+}
+
+NP2_inline void SciCall_BraceBadLight(Sci_Position pos) {
+	SciCall(SCI_BRACEBADLIGHT, pos, 0);
+}
+
+NP2_inline Sci_Position SciCall_BraceMatch(Sci_Position pos, int maxReStyle) {
+	return SciCall(SCI_BRACEMATCH, pos, maxReStyle);
+}
+
 // Tabs and Indentation Guides
 
 NP2_inline void SciCall_SetTabWidth(int tabWidth) {
@@ -679,12 +735,12 @@ NP2_inline void SciCall_SetBackSpaceUnIndents(BOOL bsUnIndents) {
 	SciCall(SCI_SETBACKSPACEUNINDENTS, bsUnIndents, 0);
 }
 
-NP2_inline void SciCall_SetLineIndentation(Sci_Line line, int indentation) {
+NP2_inline void SciCall_SetLineIndentation(Sci_Line line, Sci_Position indentation) {
 	SciCall(SCI_SETLINEINDENTATION, line, indentation);
 }
 
-NP2_inline int SciCall_GetLineIndentation(Sci_Line line) {
-	return (int)SciCall(SCI_GETLINEINDENTATION, line, 0);
+NP2_inline Sci_Position SciCall_GetLineIndentation(Sci_Line line) {
+	return SciCall(SCI_GETLINEINDENTATION, line, 0);
 }
 
 NP2_inline Sci_Position SciCall_GetLineIndentPosition(Sci_Line line) {
@@ -697,6 +753,10 @@ NP2_inline void SciCall_SetIndentationGuides(int indentView) {
 
 NP2_inline int SciCall_GetIndentationGuides(void) {
 	return (int)SciCall(SCI_GETINDENTATIONGUIDES, 0, 0);
+}
+
+NP2_inline void SciCall_SetHighlightGuide(Sci_Position column) {
+	SciCall(SCI_SETHIGHLIGHTGUIDE, column, 0);
 }
 
 // Markers
@@ -729,6 +789,34 @@ NP2_inline void SciCall_MarkerEnableHighlight(BOOL enabled) {
 	SciCall(SCI_MARKERENABLEHIGHLIGHT, enabled, 0);
 }
 
+NP2_inline int SciCall_MarkerAdd(Sci_Line line, int markerNumber) {
+	return (int)SciCall(SCI_MARKERADD, line, markerNumber);
+}
+
+NP2_inline void SciCall_MarkerDelete(Sci_Line line, int markerNumber) {
+	SciCall(SCI_MARKERDELETE, line, markerNumber);
+}
+
+NP2_inline void SciCall_MarkerDeleteAll(int markerNumber) {
+	SciCall(SCI_MARKERDELETEALL, markerNumber, 0);
+}
+
+NP2_inline void SciCall_ClearMarker(void) {
+	SciCall_MarkerDeleteAll(-1);
+}
+
+NP2_inline int SciCall_MarkerGet(Sci_Line line) {
+	return (int)SciCall(SCI_MARKERGET, line, 0);
+}
+
+NP2_inline Sci_Line SciCall_MarkerNext(Sci_Line line, int markerMask) {
+	return SciCall(SCI_MARKERNEXT, line, markerMask);
+}
+
+NP2_inline Sci_Line SciCall_MarkerPrevious(Sci_Line line, int markerMask) {
+	return SciCall(SCI_MARKERPREVIOUS, line, markerMask);
+}
+
 // Indicators
 
 NP2_inline void SciCall_IndicSetStyle(int indicator, int indicatorStyle) {
@@ -757,6 +845,58 @@ NP2_inline void SciCall_IndicatorFillRange(Sci_Position start, Sci_Position leng
 
 // Autocompletion
 
+NP2_inline void SciCall_AutoCShow(Sci_Position lengthEntered, const char *itemList) {
+	SciCall(SCI_AUTOCSHOW, lengthEntered, (LPARAM)itemList);
+}
+
+NP2_inline void SciCall_AutoCCancel(void) {
+	SciCall(SCI_AUTOCCANCEL, 0, 0);
+}
+
+NP2_inline BOOL SciCall_AutoCActive(void) {
+	return (BOOL)SciCall(SCI_AUTOCACTIVE, 0, 0);
+}
+
+NP2_inline void SciCall_AutoCSetSeparator(char separatorCharacter) {
+	SciCall(SCI_AUTOCSETSEPARATOR, separatorCharacter, 0);
+}
+
+NP2_inline void SciCall_AutoCSetFillUps(const char *characterSet) {
+	SciCall(SCI_AUTOCSETFILLUPS, 0, (LPARAM)characterSet);
+}
+
+NP2_inline void SciCall_AutoCSetChooseSingle(BOOL chooseSingle) {
+	SciCall(SCI_AUTOCSETCHOOSESINGLE, chooseSingle, 0);
+}
+
+NP2_inline void SciCall_AutoCSetIgnoreCase(BOOL ignoreCase) {
+	SciCall(SCI_AUTOCSETIGNORECASE, ignoreCase, 0);
+}
+
+NP2_inline void SciCall_AutoCSetCaseInsensitiveBehaviour(int behaviour) {
+	SciCall(SCI_AUTOCSETCASEINSENSITIVEBEHAVIOUR, behaviour, 0);
+}
+
+NP2_inline void SciCall_AutoCSetOrder(int ordere) {
+	SciCall(SCI_AUTOCSETORDER, ordere, 0);
+}
+
+NP2_inline void SciCall_AutoCSetDropRestOfWord(BOOL dropRestOfWord) {
+	SciCall(SCI_AUTOCSETDROPRESTOFWORD, dropRestOfWord, 0);
+}
+
+NP2_inline void SciCall_AutoCSetMaxHeight(int rowCount) {
+	SciCall(SCI_AUTOCSETMAXHEIGHT, rowCount, 0);
+}
+
+NP2_inline void SciCall_AutoCSetMaxWidth(int characterCount) {
+	SciCall(SCI_AUTOCSETMAXWIDTH, characterCount, 0);
+}
+
+NP2_inline BOOL SciCall_IsAutoCompletionWordCharacter(int ch) {
+	return (BOOL)SciCall(SCI_ISAUTOCOMPLETIONWORDCHARACTER, ch, 0);
+}
+
 // Call tips
 
 NP2_inline void SciCall_CallTipShow(Sci_Position pos, const char *definition) {
@@ -773,6 +913,32 @@ NP2_inline BOOL SciCall_CallTipActive(void) {
 
 NP2_inline void SciCall_CallTipUseStyle(int tabSize) {
 	SciCall(SCI_CALLTIPUSESTYLE, tabSize, 0);
+}
+
+// Keyboard commands
+
+NP2_inline void SciCall_Cancel(void) {
+	SciCall(SCI_CANCEL, 0, 0);
+}
+
+NP2_inline void SciCall_EditToggleOvertype(void) {
+	SciCall(SCI_EDITTOGGLEOVERTYPE, 0, 0);
+}
+
+NP2_inline void SciCall_NewLine(void) {
+	SciCall(SCI_NEWLINE, 0, 0);
+}
+
+// Key bindings
+
+NP2_inline void SciCall_AssignCmdKey(int keyDefinition, int sciCommand) {
+	SciCall(SCI_ASSIGNCMDKEY, keyDefinition, sciCommand);
+}
+
+// Popup edit menu
+
+NP2_inline void SciCall_UsePopUp(int popUpMode) {
+	SciCall(SCI_USEPOPUP, popUpMode, 0);
 }
 
 // Printing
@@ -796,6 +962,10 @@ NP2_inline const char* SciCall_GetRangePointer(Sci_Position start, Sci_Position 
 }
 
 // Folding
+
+NP2_inline Sci_Line SciCall_DocLineFromVisible(Sci_Line displayLine) {
+	return SciCall(SCI_DOCLINEFROMVISIBLE, displayLine, 0);
+}
 
 NP2_inline BOOL SciCall_GetLineVisible(Sci_Line line) {
 	return (BOOL)SciCall(SCI_GETLINEVISIBLE, line, 0);
@@ -921,6 +1091,14 @@ NP2_inline void SciCall_Colourise(Sci_Position start, Sci_Position end) {
 	SciCall(SCI_COLOURISE, start, end);
 }
 
+NP2_inline void SciCall_ColouriseToEnd(Sci_Position start) {
+	SciCall_Colourise(start, -1);
+}
+
+NP2_inline void SciCall_ColouriseAll(void) {
+	SciCall_Colourise(0, -1);
+}
+
 NP2_inline void SciCall_SetProperty(const char *key, const char *value) {
 	SciCall(SCI_SETPROPERTY, (WPARAM)key, (LPARAM)value);
 }
@@ -930,6 +1108,14 @@ NP2_inline void SciCall_SetKeywords(int keywordSet, const char *keywords) {
 }
 
 // Notifications
+
+NP2_inline void SciCall_SetModEventMask(int eventMask) {
+	SciCall(SCI_SETMODEVENTMASK, eventMask, 0);
+}
+
+NP2_inline void SciCall_SetCommandEvents(BOOL commandEvents) {
+	SciCall(SCI_SETCOMMANDEVENTS, commandEvents, 0);
+}
 
 NP2_inline void SciCall_SetMouseDwellTime(int periodMilliseconds) {
 	SciCall(SCI_SETMOUSEDWELLTIME, periodMilliseconds, 0);
