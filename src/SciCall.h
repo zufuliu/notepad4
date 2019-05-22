@@ -158,6 +158,10 @@ NP2_inline Sci_Position SciCall_FindText(int searchFlags, struct Sci_TextToFind 
 	return SciCall(SCI_FINDTEXT, searchFlags, (LPARAM)ft);
 }
 
+NP2_inline Sci_Position SciCall_ReplaceTargetEx(BOOL regex, Sci_Position length, const char *text) {
+	return SciCall(regex ? SCI_REPLACETARGETRE : SCI_REPLACETARGET, length, (LPARAM)text);
+}
+
 // Overtype
 
 NP2_inline BOOL SciCall_GetOvertype(void) {
