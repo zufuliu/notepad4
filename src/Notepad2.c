@@ -7071,7 +7071,11 @@ BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect, LPCWST
 
 		// check for binary file (file with unknown encoding: ANSI)
 		const BOOL binary = (iEncoding == CPI_DEFAULT) && Style_MaybeBinaryFile(szCurFile);
-		if (!binary) {
+		// lock binary file for editing
+		if (binary) {
+			bLockedForEditing = TRUE;
+			SciCall_SetReadOnly(TRUE);
+		} else {
 			if (line > 1 || col > 1) {
 				EditJumpTo(line, col);
 				EditEnsureSelectionVisible();
@@ -7097,11 +7101,8 @@ BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect, LPCWST
 		if (status.bUnicodeErr) {
 			MsgBox(MBWARN, IDS_ERR_UNICODE);
 		}
-		// lock binary file for editing
+		// notify binary file been locked for editing
 		if (binary) {
-			bLockedForEditing = TRUE;
-			SciCall_SetReadOnly(TRUE);
-			UpdateWindowTitle();
 			return fSuccess;
 		}
 		// Show inconsistent line endings warning
