@@ -838,13 +838,13 @@ HWND InitInstance(HINSTANCE hInstance, int nCmdShow) {
 				if (!flagJumpTo) {
 					SciCall_DocumentEnd();
 				}
-				EditFindPrev(hwndEdit, &efrData, FALSE);
+				EditFindPrev(&efrData, FALSE);
 				EditEnsureSelectionVisible();
 			} else {
 				if (!flagJumpTo) {
 					SciCall_DocumentStart();
 				}
-				EditFindNext(hwndEdit, &efrData, FALSE);
+				EditFindNext(&efrData, FALSE);
 				EditEnsureSelectionVisible();
 			}
 		}
@@ -3056,13 +3056,13 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	case IDM_EDIT_STRIP1STCHAR:
 		BeginWaitCursor();
-		EditStripFirstCharacter(hwndEdit);
+		EditStripFirstCharacter();
 		EndWaitCursor();
 		break;
 
 	case IDM_EDIT_STRIPLASTCHAR:
 		BeginWaitCursor();
-		EditStripLastCharacter(hwndEdit);
+		EditStripLastCharacter();
 		EndWaitCursor();
 		break;
 
@@ -3659,11 +3659,11 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			cpLastFind = cpEdit;
 			switch (LOWORD(wParam)) {
 			case IDM_EDIT_FINDNEXT:
-				EditFindNext(hwndEdit, &efrData, FALSE);
+				EditFindNext(&efrData, FALSE);
 				break;
 
 			case IDM_EDIT_FINDPREV:
-				EditFindPrev(hwndEdit, &efrData, FALSE);
+				EditFindPrev(&efrData, FALSE);
 				break;
 
 			case IDM_EDIT_REPLACENEXT:
@@ -3675,11 +3675,11 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 				break;
 
 			case IDM_EDIT_SELTONEXT:
-				EditFindNext(hwndEdit, &efrData, TRUE);
+				EditFindNext(&efrData, TRUE);
 				break;
 
 			case IDM_EDIT_SELTOPREV:
-				EditFindPrev(hwndEdit, &efrData, TRUE);
+				EditFindPrev(&efrData, TRUE);
 				break;
 			}
 		}
@@ -4126,7 +4126,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	case IDM_VIEW_SHOWEXCERPT:
-		EditGetExcerpt(hwndEdit, szTitleExcerpt, COUNTOF(szTitleExcerpt));
+		EditGetExcerpt(szTitleExcerpt, COUNTOF(szTitleExcerpt));
 		UpdateWindowTitle();
 		break;
 
@@ -4501,11 +4501,11 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 				break;
 
 			case CMD_FINDNEXTSEL:
-				EditFindNext(hwndEdit, &efrData, FALSE);
+				EditFindNext(&efrData, FALSE);
 				break;
 
 			case CMD_FINDPREVSEL:
-				EditFindPrev(hwndEdit, &efrData, FALSE);
+				EditFindPrev(&efrData, FALSE);
 				break;
 			}
 		}
