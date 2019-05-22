@@ -1065,7 +1065,7 @@ void EditCompleteUpdateConfig(void) {
 	autoCompletionConfig.wszAutoCompleteFillUp[k] = L'\0';
 }
 
-void EditCompleteWord(HWND hwnd, BOOL autoInsert) {
+void EditCompleteWord(BOOL autoInsert) {
 	const Sci_Position iCurrentPos = SciCall_GetCurrentPos();
 	const int iCurrentStyle = SciCall_GetStyleAt(iCurrentPos);
 	const Sci_Line iLine = SciCall_LineFromPosition(iCurrentPos);
@@ -1268,19 +1268,18 @@ void EditCompleteWord(HWND hwnd, BOOL autoInsert) {
 		char *pList = NULL;
 		WordList_GetList(pWList, &pList);
 		//DLog(pList);
-		SendMessage(hwnd, SCI_AUTOCSETORDER, SC_ORDER_PRESORTED, 0); // pre-sorted
-		SendMessage(hwnd, SCI_AUTOCSETIGNORECASE, bIgnoreCase, 0); // case sensitivity
+		SciCall_AutoCSetOrder(SC_ORDER_PRESORTED); // pre-sorted
+		SciCall_AutoCSetIgnoreCase(bIgnoreCase); // case sensitivity
 		//if (bIgnoreCase) {
-		//	SendMessage(hwnd, SCI_AUTOCSETCASEINSENSITIVEBEHAVIOUR, SC_CASEINSENSITIVEBEHAVIOUR_IGNORECASE, 0);
+		//	SciCall_AutoCSetCaseInsensitiveBehaviour(SC_CASEINSENSITIVEBEHAVIOUR_IGNORECASE);
 		//}
-		SendMessage(hwnd, SCI_AUTOCSETSEPARATOR, '\n', 0);
-		SendMessage(hwnd, SCI_AUTOCSETFILLUPS, 0, (LPARAM)autoCompletionConfig.szAutoCompleteFillUp);
-		SendMessage(hwnd, SCI_AUTOCSETCHOOSESINGLE, FALSE, 0);
-		//SendMessage(hwnd, SCI_AUTOCSETDROPRESTOFWORD, TRUE, 0); // delete orginal text: pRoot
-		SendMessage(hwnd, SCI_AUTOCSETMAXWIDTH, (pWList->iMaxLength << 1), 0); // width columns, default auto
-		SendMessage(hwnd, SCI_AUTOCSETMAXHEIGHT, min_i(pWList->nWordCount, autoCompletionConfig.iVisibleItemCount), 0); // height rows, default 5
-		SendMessage(hwnd, SCI_AUTOCSETCHOOSESINGLE, autoInsert, 0);
-		SendMessage(hwnd, SCI_AUTOCSHOW, pWList->iStartLen, (LPARAM)(pList));
+		SciCall_AutoCSetSeparator('\n');
+		SciCall_AutoCSetFillUps(autoCompletionConfig.szAutoCompleteFillUp);
+		//SciCall_AutoCSetDropRestOfWord(TRUE); // delete orginal text: pRoot
+		SciCall_AutoCSetMaxWidth(pWList->iMaxLength << 1); // width columns, default auto
+		SciCall_AutoCSetMaxHeight(min_i(pWList->nWordCount, autoCompletionConfig.iVisibleItemCount)); // height rows, default 5
+		SciCall_AutoCSetChooseSingle(autoInsert);
+		SciCall_AutoCShow(pWList->iStartLen, pList);
 		NP2HeapFree(pList);
 	}
 
@@ -1430,7 +1429,7 @@ static inline BOOL IsHtmlVoidTag(const char *word, int length) {
 	return p != NULL && p[-1] == ' ' && p[length] == ' ';
 }
 
-void EditAutoCloseXMLTag(HWND hwnd) {
+void EditAutoCloseXMLTag(void) {
 	char tchBuf[512];
 	const Sci_Position iCurPos = SciCall_GetCurrentPos();
 	const Sci_Position iStartPos = max_pos(0, iCurPos - (COUNTOF(tchBuf) - 1));
@@ -1501,7 +1500,7 @@ void EditAutoCloseXMLTag(HWND hwnd) {
 	if (!autoClosed && autoCompletionConfig.bCompleteWord) {
 		const Sci_Position iPos = SciCall_GetCurrentPos();
 		if (SciCall_GetCharAt(iPos - 2) == '-') {
-			EditCompleteWord(hwnd, FALSE); // obj->field, obj->method
+			EditCompleteWord(FALSE); // obj->field, obj->method
 		}
 	}
 }
@@ -1705,28 +1704,27 @@ extern BOOL	bTabIndents;
 extern int	iTabWidth;
 extern int	iIndentWidth;
 
-void EditAutoIndent(HWND hwnd) {
-	int iCurPos = (int)SendMessage(hwnd, SCI_GETCURRENTPOS, 0, 0);
-	//const int iAnchorPos = (int)SendMessage(hwnd, SCI_GETANCHOR, 0, 0);
-	const int iCurLine = (int)SendMessage(hwnd, SCI_LINEFROMPOSITION, iCurPos, 0);
-	//const int iLineLength = (int)SendMessage(hwnd, SCI_LINELENGTH, iCurLine, 0);
-	//const int iIndentBefore = (int)SendMessage(hwnd, SCI_GETLINEINDENTATION, iCurLine - 1, 0);
+void EditAutoIndent(void) {
+	Sci_Position iCurPos = SciCall_GetCurrentPos();
+	//const Sci_Position iAnchorPos = SciCall_GetAnchor();
+	const Sci_Line iCurLine = SciCall_LineFromPosition(iCurPos);
+	//const Sci_Position iLineLength = SciCall_GetLineLength(iCurLine);
+	//const Sci_Position iIndentBefore = SciCall_GetLineIndentation(iCurLine - 1);
 
 	// Move bookmark along with line if inserting lines (pressing return at beginning of line) because Scintilla does not do this for us
 	if (iCurLine > 0) {
-		const int iPrevLineLength = (int)SendMessage(hwnd, SCI_GETLINEENDPOSITION, iCurLine - 1, 0) -
-							  (int)SendMessage(hwnd, SCI_POSITIONFROMLINE, iCurLine - 1, 0);
+		const Sci_Position iPrevLineLength = SciCall_GetLineEndPosition(iCurLine - 1) - SciCall_PositionFromLine(iCurLine - 1);
 		if (iPrevLineLength == 0) {
-			const int bitmask = (int)SendMessage(hwnd, SCI_MARKERGET, iCurLine - 1, 0);
+			const int bitmask = SciCall_MarkerGet(iCurLine - 1);
 			if (bitmask & MarkerBitmask_Bookmark) {
-				SendMessage(hwnd, SCI_MARKERDELETE, iCurLine - 1, MarkerNumber_Bookmark);
-				SendMessage(hwnd, SCI_MARKERADD, iCurLine, MarkerNumber_Bookmark);
+				SciCall_MarkerDelete(iCurLine - 1, MarkerNumber_Bookmark);
+				SciCall_MarkerAdd(iCurLine, MarkerNumber_Bookmark);
 			}
 		}
 	}
 
 	if (iCurLine > 0/* && iLineLength <= 2*/) {
-		const int iPrevLineLength = (int)SendMessage(hwnd, SCI_LINELENGTH, iCurLine - 1, 0);
+		const Sci_Position iPrevLineLength = SciCall_GetLineLength(iCurLine - 1);
 		if (iPrevLineLength < 2) {
 			return;
 		}
@@ -1737,7 +1735,7 @@ void EditAutoIndent(HWND hwnd) {
 
 		const int iEOLMode = SciCall_GetEOLMode();
 		int indent = 0;
-		int	iIndentLen = 0;
+		Sci_Position iIndentLen = 0;
 		int commentStyle = 0;
 		SciCall_GetLine(iCurLine - 1, pLineBuf);
 		pLineBuf[iPrevLineLength] = '\0';
@@ -1785,7 +1783,7 @@ void EditAutoIndent(HWND hwnd) {
 			iIndentLen += 1;
 		}
 
-		int iIndentPos = iCurPos;
+		Sci_Position iIndentPos = iCurPos;
 		if (indent) {
 			int pad = iIndentWidth;
 			iIndentPos += iIndentLen;
@@ -1816,11 +1814,11 @@ void EditAutoIndent(HWND hwnd) {
 				*pPos++ = '\n';
 			}
 			if (indent == 2) {
-				lstrcpynA(pPos, pLineBuf, iIndentLen + 1);
+				strncpy(pPos, pLineBuf, iIndentLen + 1);
 				pPos += iIndentLen;
 				if (endPart) {
-					iIndentLen = lstrlenA(endPart);
-					lstrcpynA(pPos, endPart, iIndentLen + 1);
+					iIndentLen = strlen(endPart);
+					strncpy(pPos, endPart, iIndentLen + 1);
 					pPos += iIndentLen;
 				}
 			}
@@ -1854,7 +1852,7 @@ void EditAutoIndent(HWND hwnd) {
 		}
 
 		NP2HeapFree(pLineBuf);
-		//const int iIndent = SciCall_GetLineIndentation(iCurLine);
+		//const Sci_Position iIndent = SciCall_GetLineIndentation(iCurLine);
 		//SciCall_SetLineIndentation(iCurLine, iIndentBefore);
 		//iIndentLen = SciCall_GetLineIndentation(iCurLine);
 		//if (iIndentLen > 0)

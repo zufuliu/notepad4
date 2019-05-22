@@ -95,18 +95,18 @@ extern BOOL bFreezeAppTitle;
 extern BOOL bLockedForEditing;
 extern FILEVARS fvCurFile;
 
-void EditSetNewText(HWND hwnd, LPCSTR lpstrText, DWORD cbText) {
+void EditSetNewText(LPCSTR lpstrText, DWORD cbText) {
 	bFreezeAppTitle = TRUE;
 	bLockedForEditing = FALSE;
 
 	SciCall_SetReadOnly(FALSE);
-	SendMessage(hwnd, SCI_CANCEL, 0, 0);
+	SciCall_Cancel();
 	SciCall_SetUndoCollection(FALSE);
 	SciCall_EmptyUndoBuffer();
 	SciCall_ClearAll();
-	SendMessage(hwnd, SCI_MARKERDELETEALL, (WPARAM)(-1), 0);
-	SendMessage(hwnd, SCI_SETSCROLLWIDTH, 2048, 0);
-	SendMessage(hwnd, SCI_SETXOFFSET, 0, 0);
+	SciCall_ClearMarker();
+	SciCall_SetScrollWidth(2048);
+	SciCall_SetXOffset(0);
 
 	FileVars_Apply(&fvCurFile);
 
@@ -134,11 +134,11 @@ BOOL EditConvertText(HWND hwnd, UINT cpSource, UINT cpDest, BOOL bSetSavePoint) 
 
 	const int length = (int)SendMessage(hwnd, SCI_GETLENGTH, 0, 0);
 	if (length == 0) {
-		SendMessage(hwnd, SCI_CANCEL, 0, 0);
+		SciCall_Cancel();
 		SciCall_SetUndoCollection(FALSE);
 		SciCall_EmptyUndoBuffer();
 		SciCall_ClearAll();
-		SendMessage(hwnd, SCI_MARKERDELETEALL, (WPARAM)(-1), 0);
+		SciCall_ClearMarker();
 		SciCall_SetCodePage(cpDest);
 		SciCall_SetUndoCollection(TRUE);
 		SciCall_EmptyUndoBuffer();
@@ -159,11 +159,11 @@ BOOL EditConvertText(HWND hwnd, UINT cpSource, UINT cpDest, BOOL bSetSavePoint) 
 		const int cbwText = MultiByteToWideChar(cpSource, 0, pchText, length, pwchText, length);
 		const int cbText = WideCharToMultiByte(cpDest, 0, pwchText, cbwText, pchText, (int)(length * sizeof(WCHAR)), NULL, NULL);
 
-		SendMessage(hwnd, SCI_CANCEL, 0, 0);
+		SciCall_Cancel();
 		SciCall_SetUndoCollection(FALSE);
 		SciCall_EmptyUndoBuffer();
 		SciCall_ClearAll();
-		SendMessage(hwnd, SCI_MARKERDELETEALL, (WPARAM)(-1), 0);
+		SciCall_ClearMarker();
 		SciCall_SetCodePage(cpDest);
 		SciCall_AddText(cbText, pchText);
 		SciCall_EmptyUndoBuffer();
@@ -387,7 +387,7 @@ void EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus *status) {
 // EditLoadFile()
 //
 extern DWORD dwFileLoadWarningMB;
-BOOL EditLoadFile(HWND hwnd, LPWSTR pszFile, BOOL bSkipEncodingDetection, EditFileIOStatus *status) {
+BOOL EditLoadFile(LPWSTR pszFile, BOOL bSkipEncodingDetection, EditFileIOStatus *status) {
 	HANDLE hFile = CreateFile(pszFile,
 					   GENERIC_READ,
 					   FILE_SHARE_READ | FILE_SHARE_WRITE,
@@ -488,7 +488,7 @@ BOOL EditLoadFile(HWND hwnd, LPWSTR pszFile, BOOL bSkipEncodingDetection, EditFi
 		}
 
 		SciCall_SetCodePage((mEncoding[iEncoding].uFlags & NCP_DEFAULT) ? iDefaultCodePage : SC_CP_UTF8);
-		EditSetNewText(hwnd, "", 0);
+		EditSetEmptyText();
 		SciCall_SetEOLMode(status->iEOLMode);
 	} else if (!bSkipEncodingDetection &&
 			   (iSrcEncoding == -1 || iSrcEncoding == CPI_UNICODE || iSrcEncoding == CPI_UNICODEBE) &&
@@ -529,7 +529,7 @@ BOOL EditLoadFile(HWND hwnd, LPWSTR pszFile, BOOL bSkipEncodingDetection, EditFi
 
 		SciCall_SetCodePage(SC_CP_UTF8);
 		FileVars_Init(lpDataUTF8, cbData - 1, &fvCurFile);
-		EditSetNewText(hwnd, lpDataUTF8, cbData - 1);
+		EditSetNewText(lpDataUTF8, cbData - 1);
 		EditDetectEOLMode(lpDataUTF8, cbData - 1, status);
 		NP2HeapFree(lpDataUTF8);
 	} else {
@@ -546,11 +546,11 @@ BOOL EditLoadFile(HWND hwnd, LPWSTR pszFile, BOOL bSkipEncodingDetection, EditFi
 				&& !(FileVars_IsNonUTF8(&fvCurFile) && (iSrcEncoding != CPI_UTF8 && iSrcEncoding != CPI_UTF8SIGN))) {
 			SciCall_SetCodePage(SC_CP_UTF8);
 			if (utf8Sig) {
-				EditSetNewText(hwnd, lpData + 3, cbData - 3);
+				EditSetNewText(lpData + 3, cbData - 3);
 				iEncoding = CPI_UTF8SIGN;
 				EditDetectEOLMode(lpData + 3, cbData - 3, status);
 			} else {
-				EditSetNewText(hwnd, lpData, cbData);
+				EditSetNewText(lpData, cbData);
 				iEncoding = CPI_UTF8;
 				EditDetectEOLMode(lpData, cbData, status);
 			}
@@ -586,11 +586,11 @@ BOOL EditLoadFile(HWND hwnd, LPWSTR pszFile, BOOL bSkipEncodingDetection, EditFi
 				NP2HeapFree(lpDataWide);
 
 				SciCall_SetCodePage(SC_CP_UTF8);
-				EditSetNewText(hwnd, lpData, cbData);
+				EditSetNewText(lpData, cbData);
 				EditDetectEOLMode(lpData, cbData, status);
 			} else {
 				SciCall_SetCodePage(iDefaultCodePage);
-				EditSetNewText(hwnd, lpData, cbData);
+				EditSetNewText(lpData, cbData);
 				iEncoding = CPI_DEFAULT;
 				EditDetectEOLMode(lpData, cbData, status);
 			}
@@ -5904,16 +5904,16 @@ void EditInsertUnicodeControlCharacter(int menu) {
 	SciCall_ReplaceSel(ucc.uccUTF8);
 }
 
-void EditShowUnicodeControlCharacter(HWND hwnd, BOOL bShow) {
+void EditShowUnicodeControlCharacter(BOOL bShow) {
 	for (UINT i = 0; i < (UINT)COUNTOF(kUnicodeControlCharacterTable); i++) {
 		const UnicodeControlCharacter ucc = kUnicodeControlCharacterTable[i];
 		if (StrIsEmptyA(ucc.representation)) {
 			continue;
 		}
 		if (bShow) {
-			SendMessage(hwnd, SCI_SETREPRESENTATION, (WPARAM)ucc.uccUTF8, (LPARAM)ucc.representation);
+			SciCall_SetRepresentation(ucc.uccUTF8, ucc.representation);
 		} else {
-			SendMessage(hwnd, SCI_CLEARREPRESENTATION, (WPARAM)ucc.uccUTF8, 0);
+			SciCall_ClearRepresentation(ucc.uccUTF8);
 		}
 	}
 }

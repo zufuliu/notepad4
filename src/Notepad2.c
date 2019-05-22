@@ -794,11 +794,11 @@ HWND InitInstance(HINSTANCE hInstance, int nCmdShow) {
 			autoCompletionConfig.bIndentText = FALSE;
 			SciCall_DocumentEnd();
 			SciCall_BeginUndoAction();
-			if (SendMessage(hwndEdit, SCI_GETLENGTH, 0, 0) > 0) {
-				SendMessage(hwndEdit, SCI_NEWLINE, 0, 0);
+			if (SciCall_GetLength() > 0) {
+				SciCall_NewLine();
 			}
 			SciCall_Paste(FALSE);
-			SendMessage(hwndEdit, SCI_NEWLINE, 0, 0);
+			SciCall_NewLine();
 			SciCall_EndUndoAction();
 			autoCompletionConfig.bIndentText = back;
 			if (flagJumpTo) {
@@ -925,7 +925,7 @@ void OnDropOneFile(HWND hwnd, LPCWSTR szBuf) {
 #if NP2_ENABLE_DOT_LOG_FEATURE
 static inline BOOL IsFileStartsWithDotLog(void) {
 	char tch[5] = "";
-	const int len = SciCall_GetText(COUNTOF(tch), tch);
+	const Sci_Position len = SciCall_GetText(COUNTOF(tch), tch);
 	// upper case
 	return len >= 4 && strncmp(tch, ".LOG", 4) == 0;
 }
@@ -1287,14 +1287,14 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 
 		if (PathFileExists(szCurFile)) {
 			if ((iFileWatchingMode == 2 && !IsDocumentModified()) || MsgBox(MBYESNO, IDS_FILECHANGENOTIFY) == IDYES) {
-				const int iCurPos = (int)SendMessage(hwndEdit, SCI_GETCURRENTPOS, 0, 0);
-				const int iAnchorPos = (int)SendMessage(hwndEdit, SCI_GETANCHOR, 0, 0);
+				const Sci_Position iCurPos = SciCall_GetCurrentPos();
+				const Sci_Position iAnchorPos = SciCall_GetAnchor();
 #if NP2_ENABLE_DOT_LOG_FEATURE
-				const int iVisTopLine = (int)SendMessage(hwndEdit, SCI_GETFIRSTVISIBLELINE, 0, 0);
-				const int iDocTopLine = (int)SendMessage(hwndEdit, SCI_DOCLINEFROMVISIBLE, iVisTopLine, 0);
-				const int iXOffset = (int)SendMessage(hwndEdit, SCI_GETXOFFSET, 0, 0);
+				const Sci_Line iVisTopLine = SciCall_GetFirstVisibleLine();
+				const Sci_Line iDocTopLine = SciCall_DocLineFromVisible(iVisTopLine);
+				const int iXOffset = SciCall_GetXOffset();
 #endif
-				const BOOL bIsTail = (iCurPos == iAnchorPos) && (iCurPos == SendMessage(hwndEdit, SCI_GETLENGTH, 0, 0));
+				const BOOL bIsTail = (iCurPos == iAnchorPos) && (iCurPos == SciCall_GetLength());
 
 				iWeakSrcEncoding = iEncoding;
 				if (FileLoad(TRUE, FALSE, TRUE, FALSE, szCurFile)) {
@@ -1305,12 +1305,11 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 					}
 #if NP2_ENABLE_DOT_LOG_FEATURE
 					 else if (IsFileStartsWithDotLog()) {
-						int iNewTopLine;
 						SciCall_SetSel(iAnchorPos, iCurPos);
 						SciCall_EnsureVisible(iDocTopLine);
-						iNewTopLine = (int)SendMessage(hwndEdit, SCI_GETFIRSTVISIBLELINE, 0, 0);
-						SendMessage(hwndEdit, SCI_LINESCROLL, 0, iVisTopLine - iNewTopLine);
-						SendMessage(hwndEdit, SCI_SETXOFFSET, iXOffset, 0);
+						const Sci_Line iNewTopLine = SciCall_GetFirstVisibleLine();
+						SciCall_LineScroll(0, iVisTopLine - iNewTopLine);
+						SciCall_SetXOffset(iXOffset);
 					}
 #endif
 				}
@@ -1570,12 +1569,12 @@ HWND EditCreate(HWND hwndParent) {
 	SciCall_SetIMEInteraction(bUseInlineIME);
 	SciCall_SetInlineIMEUseBlockCaret(bInlineIMEUseBlockCaret);
 	SciCall_SetPasteConvertEndings(TRUE);
-	SendMessage(hwnd, SCI_SETMODEVENTMASK, /*SC_MODEVENTMASKALL*/SC_MOD_INSERTTEXT | SC_MOD_DELETETEXT, 0);
-	SendMessage(hwnd, SCI_SETCOMMANDEVENTS, FALSE, 0);
-	SendMessage(hwnd, SCI_USEPOPUP, FALSE, 0);
-	SendMessage(hwnd, SCI_SETSCROLLWIDTH, 2048, 0);
-	SendMessage(hwnd, SCI_SETSCROLLWIDTHTRACKING, TRUE, 0);
-	SendMessage(hwnd, SCI_SETENDATLASTLINE, TRUE, 0);
+	SciCall_SetModEventMask(/*SC_MODEVENTMASKALL*/SC_MOD_INSERTTEXT | SC_MOD_DELETETEXT);
+	SciCall_SetCommandEvents(FALSE);
+	SciCall_UsePopUp(SC_POPUP_NEVER);
+	SciCall_SetScrollWidth(2048);
+	SciCall_SetScrollWidthTracking(TRUE);
+	SciCall_SetEndAtLastLine(TRUE);
 	SciCall_SetCaretSticky(SC_CARETSTICKY_OFF);
 	SciCall_SetXCaretPolicy(CARET_SLOP | CARET_EVEN, 50);
 	SciCall_SetYCaretPolicy(CARET_EVEN, 0);
@@ -1589,14 +1588,14 @@ HWND EditCreate(HWND hwndParent) {
 	// cache layout for visible lines
 	SciCall_SetLayoutCache(SC_CACHE_PAGE);
 
-	SendMessage(hwnd, SCI_ASSIGNCMDKEY, (SCK_NEXT + (SCMOD_CTRL << 16)), SCI_PARADOWN);
-	SendMessage(hwnd, SCI_ASSIGNCMDKEY, (SCK_PRIOR + (SCMOD_CTRL << 16)), SCI_PARAUP);
-	SendMessage(hwnd, SCI_ASSIGNCMDKEY, (SCK_NEXT + ((SCMOD_CTRL | SCMOD_SHIFT) << 16)), SCI_PARADOWNEXTEND);
-	SendMessage(hwnd, SCI_ASSIGNCMDKEY, (SCK_PRIOR + ((SCMOD_CTRL | SCMOD_SHIFT) << 16)), SCI_PARAUPEXTEND);
-	SendMessage(hwnd, SCI_ASSIGNCMDKEY, (SCK_HOME + (0 << 16)), SCI_VCHOMEWRAP);
-	SendMessage(hwnd, SCI_ASSIGNCMDKEY, (SCK_END + (0 << 16)), SCI_LINEENDWRAP);
-	SendMessage(hwnd, SCI_ASSIGNCMDKEY, (SCK_HOME + (SCMOD_SHIFT << 16)), SCI_VCHOMEWRAPEXTEND);
-	SendMessage(hwnd, SCI_ASSIGNCMDKEY, (SCK_END + (SCMOD_SHIFT << 16)), SCI_LINEENDWRAPEXTEND);
+	SciCall_AssignCmdKey((SCK_NEXT + (SCMOD_CTRL << 16)), SCI_PARADOWN);
+	SciCall_AssignCmdKey((SCK_PRIOR + (SCMOD_CTRL << 16)), SCI_PARAUP);
+	SciCall_AssignCmdKey((SCK_NEXT + ((SCMOD_CTRL | SCMOD_SHIFT) << 16)), SCI_PARADOWNEXTEND);
+	SciCall_AssignCmdKey((SCK_PRIOR + ((SCMOD_CTRL | SCMOD_SHIFT) << 16)), SCI_PARAUPEXTEND);
+	SciCall_AssignCmdKey((SCK_HOME + (0 << 16)), SCI_VCHOMEWRAP);
+	SciCall_AssignCmdKey((SCK_END + (0 << 16)), SCI_LINEENDWRAP);
+	SciCall_AssignCmdKey((SCK_HOME + (SCMOD_SHIFT << 16)), SCI_VCHOMEWRAPEXTEND);
+	SciCall_AssignCmdKey((SCK_END + (SCMOD_SHIFT << 16)), SCI_LINEENDWRAPEXTEND);
 
 	//SciInitThemes(hwnd);
 	if (bEditLayoutRTL) {
@@ -1623,7 +1622,7 @@ HWND EditCreate(HWND hwndParent) {
 	SetWrapVisualFlags();
 
 	if (bShowUnicodeControlCharacter) {
-		EditShowUnicodeControlCharacter(hwnd, TRUE);
+		EditShowUnicodeControlCharacter(TRUE);
 	}
 
 	// current line
@@ -2494,11 +2493,11 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			}
 
 #if NP2_ENABLE_DOT_LOG_FEATURE
-			const int iCurPos = (int)SendMessage(hwndEdit, SCI_GETCURRENTPOS, 0, 0);
-			const int iAnchorPos = (int)SendMessage(hwndEdit, SCI_GETANCHOR, 0, 0);
-			const int iVisTopLine = (int)SendMessage(hwndEdit, SCI_GETFIRSTVISIBLELINE, 0, 0);
-			const int iDocTopLine = (int)SendMessage(hwndEdit, SCI_DOCLINEFROMVISIBLE, iVisTopLine, 0);
-			const int iXOffset = (int)SendMessage(hwndEdit, SCI_GETXOFFSET, 0, 0);
+			const Sci_Position iCurPos = SciCall_GetCurrentPos();
+			const Sci_Position iAnchorPos = SciCall_GetAnchor();
+			const Sci_Line iVisTopLine = SciCall_GetFirstVisibleLine();
+			const Sci_Line iDocTopLine = SciCall_DocLineFromVisible(iVisTopLine);
+			const int iXOffset = SciCall_GetXOffset();
 #endif
 			iWeakSrcEncoding = iEncoding;
 			if (FileLoad(TRUE, FALSE, TRUE, FALSE, szCurFile)) {
@@ -2506,9 +2505,9 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 				if (IsFileStartsWithDotLog()) {
 					SciCall_SetSel(iAnchorPos, iCurPos);
 					SciCall_EnsureVisible(iDocTopLine);
-					const int iNewTopLine = (int)SendMessage(hwndEdit, SCI_GETFIRSTVISIBLELINE, 0, 0);
-					SendMessage(hwndEdit, SCI_LINESCROLL, 0, iVisTopLine - iNewTopLine);
-					SendMessage(hwndEdit, SCI_SETXOFFSET, iXOffset, 0);
+					const Sci_Line iNewTopLine = SciCall_GetFirstVisibleLine();
+					SciCall_LineScroll(0, iVisTopLine - iNewTopLine);
+					SciCall_SetXOffset(iXOffset);
 				}
 #endif
 			}
@@ -2799,7 +2798,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		}
 
 		if (EditSetNewEncoding(hwndEdit, iEncoding, iNewEncoding, (flagSetEncoding), StrIsEmpty(szCurFile))) {
-			if (SendMessage(hwndEdit, SCI_GETLENGTH, 0, 0) == 0) {
+			if (SciCall_GetLength() == 0) {
 				iEncoding = iNewEncoding;
 				iOriginalEncoding = iNewEncoding;
 			} else {
@@ -3518,12 +3517,12 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		Sci_Position iPos = SciCall_GetCurrentPos();
 		int ch = SciCall_GetCharAt(iPos);
 		if (ch < 0x80 && strchr("()[]{}<>", ch)) {
-			iBrace2 = (Sci_Position)SendMessage(hwndEdit, SCI_BRACEMATCH, iPos, 0);
+			iBrace2 = SciCall_BraceMatch(iPos, 0);
 		} else { // Try one before
 			iPos = SciCall_PositionBefore(iPos);
 			ch = SciCall_GetCharAt(iPos);
 			if (ch < 0x80 && strchr("()[]{}<>", ch)) {
-				iBrace2 = (Sci_Position)SendMessage(hwndEdit, SCI_BRACEMATCH, iPos, 0);
+				iBrace2 = SciCall_BraceMatch(iPos, 0);
 			}
 		}
 		if (iBrace2 != -1) {
@@ -3537,12 +3536,12 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		Sci_Position iPos = SciCall_GetCurrentPos();
 		int ch = SciCall_GetCharAt(iPos);
 		if (ch < 0x80 && strchr("()[]{}<>", ch)) {
-			iBrace2 = (Sci_Position)SendMessage(hwndEdit, SCI_BRACEMATCH, iPos, 0);
+			iBrace2 = SciCall_BraceMatch(iPos, 0);
 		} else { // Try one before
 			iPos = SciCall_PositionBefore(iPos);
 			ch = SciCall_GetCharAt(iPos);
 			if (ch < 0x80 && strchr("()[]{}<>", ch)) {
-				iBrace2 = (Sci_Position)SendMessage(hwndEdit, SCI_BRACEMATCH, iPos, 0);
+				iBrace2 = SciCall_BraceMatch(iPos, 0);
 			}
 		}
 		if (iBrace2 != -1) {
@@ -3572,12 +3571,12 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	// Main Bookmark Functions
 	case BME_EDIT_BOOKMARKNEXT: {
-		const int iPos = (int)SendMessage(hwndEdit, SCI_GETCURRENTPOS, 0, 0);
-		const int iLine = (int)SendMessage(hwndEdit, SCI_LINEFROMPOSITION, iPos, 0);
+		const Sci_Position iPos = SciCall_GetCurrentPos();
+		const Sci_Line iLine = SciCall_LineFromPosition(iPos);
 
-		int iNextLine = (int)SendMessage(hwndEdit, SCI_MARKERNEXT, iLine + 1, MarkerBitmask_Bookmark);
+		Sci_Line iNextLine = SciCall_MarkerNext(iLine + 1, MarkerBitmask_Bookmark);
 		if (iNextLine == -1) {
-			iNextLine = (int)SendMessage(hwndEdit, SCI_MARKERNEXT, 0, MarkerBitmask_Bookmark);
+			iNextLine = SciCall_MarkerNext(0, MarkerBitmask_Bookmark);
 		}
 
 		if (iNextLine != -1) {
@@ -3591,13 +3590,13 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	break;
 
 	case BME_EDIT_BOOKMARKPREV: {
-		const int iPos = (int)SendMessage(hwndEdit, SCI_GETCURRENTPOS, 0, 0);
-		const int iLine = (int)SendMessage(hwndEdit, SCI_LINEFROMPOSITION, iPos, 0);
+		const Sci_Position iPos = SciCall_GetCurrentPos();
+		const Sci_Line iLine = SciCall_LineFromPosition(iPos);
 
-		int iNextLine = (int)SendMessage(hwndEdit, SCI_MARKERPREVIOUS, iLine - 1, MarkerBitmask_Bookmark);
+		Sci_Line iNextLine = SciCall_MarkerPrevious(iLine - 1, MarkerBitmask_Bookmark);
 		if (iNextLine == -1) {
-			const int nLines = (int)SendMessage(hwndEdit, SCI_GETLINECOUNT, 0, 0);
-			iNextLine = (int)SendMessage(hwndEdit, SCI_MARKERPREVIOUS, nLines, MarkerBitmask_Bookmark);
+			const Sci_Line nLines = SciCall_GetLineCount();
+			iNextLine = SciCall_MarkerPrevious(nLines, MarkerBitmask_Bookmark);
 		}
 
 		if (iNextLine != -1) {
@@ -3611,23 +3610,23 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	break;
 
 	case BME_EDIT_BOOKMARKTOGGLE: {
-		const int iPos = (int)SendMessage(hwndEdit, SCI_GETCURRENTPOS, 0, 0);
-		const int iLine = (int)SendMessage(hwndEdit, SCI_LINEFROMPOSITION, iPos, 0);
+		const Sci_Position iPos = SciCall_GetCurrentPos();
+		const Sci_Line iLine = SciCall_LineFromPosition(iPos);
 
-		const int bitmask = (int)SendMessage(hwndEdit, SCI_MARKERGET, iLine, 0);
+		const int bitmask = SciCall_MarkerGet(iLine);
 		if (bitmask & MarkerBitmask_Bookmark) {
 			// unset
-			SendMessage(hwndEdit, SCI_MARKERDELETE, iLine, MarkerNumber_Bookmark);
+			SciCall_MarkerDelete(iLine, MarkerNumber_Bookmark);
 		} else {
 			Style_SetBookmark();
 			// set
-			SendMessage(hwndEdit, SCI_MARKERADD, iLine, MarkerNumber_Bookmark);
+			SciCall_MarkerAdd(iLine, MarkerNumber_Bookmark);
 		}
 	}
 	break;
 
 	case BME_EDIT_BOOKMARKCLEAR:
-		SendMessage(hwndEdit, SCI_MARKERDELETEALL, MarkerNumber_Bookmark, 0);
+		SciCall_MarkerDeleteAll(MarkerNumber_Bookmark);
 		break;
 
 	case IDM_EDIT_FINDNEXT:
@@ -3635,7 +3634,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case IDM_EDIT_REPLACENEXT:
 	case IDM_EDIT_SELTONEXT:
 	case IDM_EDIT_SELTOPREV:
-		if (SendMessage(hwndEdit, SCI_GETLENGTH, 0, 0) == 0) {
+		if (SciCall_GetLength() == 0) {
 			break;
 		}
 
@@ -3708,7 +3707,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	break;
 
 	case IDM_EDIT_COMPLETEWORD:
-		EditCompleteWord(hwndEdit, TRUE);
+		EditCompleteWord(TRUE);
 		break;
 
 	case IDM_EDIT_REPLACE:
@@ -3841,7 +3840,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		if (AutoCompletionSettingsDlg(hwnd)) {
 			if (!autoCompletionConfig.bCompleteWord) {
 				// close the autocompletion list
-				SendMessage(hwndEdit, SCI_AUTOCCANCEL, 0, 0);
+				SciCall_AutoCCancel();
 			}
 		}
 		break;
@@ -3947,7 +3946,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	case IDM_VIEW_UNICODE_CONTROL_CHAR:
 		bShowUnicodeControlCharacter = !bShowUnicodeControlCharacter;
-		EditShowUnicodeControlCharacter(hwndEdit, bShowUnicodeControlCharacter);
+		EditShowUnicodeControlCharacter(bShowUnicodeControlCharacter);
 		InvalidateStyleRedraw();
 		break;
 
@@ -3968,7 +3967,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			scn.updated = NP2_CUSTOM_UPDATE;
 			SendMessage(hwnd, WM_NOTIFY, IDC_EDIT, (LPARAM)&scn);
 		} else {
-			SendMessage(hwndEdit, SCI_BRACEHIGHLIGHT, (WPARAM)(-1), -1);
+			SciCall_BraceHighlight(-1, -1);
 		}
 		break;
 
@@ -4213,9 +4212,9 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	case CMD_ESCAPE:
-		if (SendMessage(hwndEdit, SCI_AUTOCACTIVE, 0, 0)) {
+		if (SciCall_AutoCActive()) {
 			//close the AutoComplete box
-			SendMessage(hwndEdit, SCI_AUTOCCANCEL, 0, 0);
+			SciCall_AutoCCancel();
 		} else if (SciCall_CallTipActive()) {
 			SciCall_CallTipCancel();
 		} else if (bInFullScreenMode) {
@@ -4235,7 +4234,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	// Newline with toggled auto indent setting
 	case CMD_CTRLENTER:
 		autoCompletionConfig.bIndentText = !autoCompletionConfig.bIndentText;
-		SendMessage(hwndEdit, SCI_NEWLINE, 0, 0);
+		SciCall_NewLine();
 		autoCompletionConfig.bIndentText = !autoCompletionConfig.bIndentText;
 		break;
 
@@ -4768,39 +4767,39 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 					if (iEndStyled < SciCall_GetLength()) {
 						const Sci_Line iLine = SciCall_LineFromPosition(iEndStyled);
 						iEndStyled = SciCall_PositionFromLine(iLine);
-						SciCall_Colourise(iEndStyled, -1);
+						SciCall_ColouriseToEnd(iEndStyled);
 					}
 
 					Sci_Position iPos = SciCall_GetCurrentPos();
 					int ch = SciCall_GetCharAt(iPos);
 					if (ch < 0x80 && strchr("()[]{}<>", ch)) {
-						const int iBrace2 = (int)SendMessage(hwndEdit, SCI_BRACEMATCH, iPos, 0);
+						const Sci_Position iBrace2 = SciCall_BraceMatch(iPos, 0);
 						if (iBrace2 != -1) {
 							const Sci_Position col1 = SciCall_GetColumn(iPos);
 							const Sci_Position col2 = SciCall_GetColumn(iBrace2);
-							SendMessage(hwndEdit, SCI_BRACEHIGHLIGHT, iPos, iBrace2);
-							SendMessage(hwndEdit, SCI_SETHIGHLIGHTGUIDE, min_pos(col1, col2), 0);
+							SciCall_BraceHighlight(iPos, iBrace2);
+							SciCall_SetHighlightGuide(min_pos(col1, col2));
 						} else {
-							SendMessage(hwndEdit, SCI_BRACEBADLIGHT, iPos, 0);
-							SendMessage(hwndEdit, SCI_SETHIGHLIGHTGUIDE, 0, 0);
+							SciCall_BraceBadLight(iPos);
+							SciCall_SetHighlightGuide(0);
 						}
 					} else { // Try one before
 						iPos = SciCall_PositionBefore(iPos);
 						ch = SciCall_GetCharAt(iPos);
 						if (ch < 0x80 && strchr("()[]{}<>", ch)) {
-							const int iBrace2 = (int)SendMessage(hwndEdit, SCI_BRACEMATCH, iPos, 0);
+							const Sci_Position iBrace2 = SciCall_BraceMatch(iPos, 0);
 							if (iBrace2 != -1) {
 								const Sci_Position col1 = SciCall_GetColumn(iPos);
 								const Sci_Position col2 = SciCall_GetColumn(iBrace2);
-								SendMessage(hwndEdit, SCI_BRACEHIGHLIGHT, iPos, iBrace2);
-								SendMessage(hwndEdit, SCI_SETHIGHLIGHTGUIDE, min_pos(col1, col2), 0);
+								SciCall_BraceHighlight(iPos, iBrace2);
+								SciCall_SetHighlightGuide(min_pos(col1, col2));
 							} else {
-								SendMessage(hwndEdit, SCI_BRACEBADLIGHT, iPos, 0);
-								SendMessage(hwndEdit, SCI_SETHIGHLIGHTGUIDE, 0, 0);
+								SciCall_BraceBadLight(iPos);
+								SciCall_SetHighlightGuide(0);
 							}
 						} else {
-							SendMessage(hwndEdit, SCI_BRACEHIGHLIGHT, (WPARAM)(-1), -1);
-							SendMessage(hwndEdit, SCI_SETHIGHLIGHTGUIDE, 0, 0);
+							SciCall_BraceHighlight(-1, -1);
+							SciCall_SetHighlightGuide(0);
 						}
 					}
 				}
@@ -4814,14 +4813,14 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 				if (ch == '\r' || ch == '\n') {
 					// in CRLF mode handle LF only...
 					if (autoCompletionConfig.bIndentText && ((SC_EOL_CRLF == iEOLMode && ch != '\n') || SC_EOL_CRLF != iEOLMode)) {
-						EditAutoIndent(hwndEdit);
+						EditAutoIndent();
 					}
 					return 0;
 				}
 				// Auto close tags
 				if (ch == '>') {
 					if (autoCompletionConfig.bCloseTags || autoCompletionConfig.bCompleteWord) {
-						EditAutoCloseXMLTag(hwndEdit);
+						EditAutoCloseXMLTag();
 					}
 					return 0;
 				}
@@ -4842,14 +4841,14 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			) {
 				return 0;
 			}
-			if (SendMessage(hwndEdit, SCI_AUTOCACTIVE, 0, 0)) {
+			if (SciCall_AutoCActive()) {
 				// many items in auto-completion list (> autoCompletionConfig.iVisibleItemCount), recreate it
 				if (autoCompletionConfig.iPreviousItemCount < autoCompletionConfig.iVisibleItemCount) {
 					return 0;
 				}
-				SendMessage(hwnd, SCI_AUTOCCANCEL, 0, 0);
+				SciCall_AutoCCancel();
 			}
-			EditCompleteWord(hwndEdit, FALSE);
+			EditCompleteWord(FALSE);
 		}
 		break;
 
@@ -4870,12 +4869,12 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			SciCall_ReplaceSel(text);
 			SciCall_SetSel(iNewPos, iNewPos);
 			SciCall_EndUndoAction();
-			SendMessage(hwndEdit, SCI_AUTOCCANCEL, 0, 0);
+			SciCall_AutoCCancel();
 		}
 		break;
 
 		case SCN_AUTOCCHARDELETED:
-			EditCompleteWord(hwndEdit, FALSE);
+			EditCompleteWord(FALSE);
 			break;
 
 #if NP2_ENABLE_SHOW_CALLTIPS
@@ -4935,7 +4934,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		} break;
 
 		case SCN_CODEPAGECHANGED:
-			EditOnCodePageChanged(hwndEdit, scn->ch);
+			EditOnCodePageChanged(scn->modifiers);
 			break;
 		}
 		break;
@@ -5025,7 +5024,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 				return TRUE;
 
 			case STATUS_OVRMODE:
-				SendMessage(hwndEdit, SCI_EDITTOGGLEOVERTYPE, 0, 0);
+				SciCall_EditToggleOvertype();
 				return TRUE;
 
 			default:
@@ -6898,7 +6897,7 @@ BOOL FileIO(BOOL fLoad, LPWSTR pszFile, BOOL bFlag, EditFileIOStatus *status) {
 	InvalidateRect(hwndStatus, NULL, TRUE);
 	UpdateWindow(hwndStatus);
 
-	const BOOL fSuccess = fLoad ? EditLoadFile(hwndEdit, pszFile, bFlag, status) : EditSaveFile(hwndEdit, pszFile, bFlag, status);
+	const BOOL fSuccess = fLoad ? EditLoadFile(pszFile, bFlag, status) : EditSaveFile(hwndEdit, pszFile, bFlag, status);
 	const DWORD dwFileAttributes = GetFileAttributes(pszFile);
 	bReadOnly = (dwFileAttributes != INVALID_FILE_ATTRIBUTES) && (dwFileAttributes & FILE_ATTRIBUTE_READONLY);
 
@@ -6946,7 +6945,7 @@ BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect, LPCWST
 			lstrcpy(szTitleExcerpt, L"");
 		}
 		FileVars_Init(NULL, 0, &fvCurFile);
-		EditSetNewText(hwndEdit, "", 0);
+		EditSetEmptyText();
 		Style_SetLexer(NULL);
 		bModified = FALSE;
 		bReadOnly = FALSE;
@@ -7013,7 +7012,7 @@ BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect, LPCWST
 				fSuccess = TRUE;
 				CloseHandle(hFile);
 				FileVars_Init(NULL, 0, &fvCurFile);
-				EditSetNewText(hwndEdit, "", 0);
+				EditSetEmptyText();
 				Style_SetLexer(NULL);
 				iEOLMode = iLineEndings[iDefaultEOLMode];
 				SciCall_SetEOLMode(iLineEndings[iDefaultEOLMode]);
@@ -7083,10 +7082,10 @@ BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect, LPCWST
 			if (IsFileStartsWithDotLog()) {
 				SciCall_DocumentEnd();
 				SciCall_BeginUndoAction();
-				SendMessage(hwndEdit, SCI_NEWLINE, 0, 0);
+				SciCall_NewLine();
 				SendWMCommand(hwndMain, IDM_EDIT_INSERT_SHORTDATE);
 				SciCall_DocumentEnd();
-				SendMessage(hwndEdit, SCI_NEWLINE, 0, 0);
+				SciCall_NewLine();
 				SciCall_EndUndoAction();
 				SciCall_DocumentEnd();
 				EditEnsureSelectionVisible();
@@ -8070,11 +8069,11 @@ void CALLBACK PasteBoardTimer(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTi
 			autoCompletionConfig.bIndentText = FALSE;
 			SciCall_DocumentEnd();
 			SciCall_BeginUndoAction();
-			if (SendMessage(hwndEdit, SCI_GETLENGTH, 0, 0) > 0) {
-				SendMessage(hwndEdit, SCI_NEWLINE, 0, 0);
+			if (SciCall_GetLength() > 0) {
+				SciCall_NewLine();
 			}
 			SciCall_Paste(FALSE);
-			SendMessage(hwndEdit, SCI_NEWLINE, 0, 0);
+			SciCall_NewLine();
 			SciCall_EndUndoAction();
 			EditEnsureSelectionVisible();
 			autoCompletionConfig.bIndentText = back;

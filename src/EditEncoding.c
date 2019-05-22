@@ -333,7 +333,7 @@ BOOL EditSetNewEncoding(HWND hwnd, int iCurrentEncoding, int iNewEncoding, BOOL 
 	return FALSE;
 }
 
-void EditOnCodePageChanged(HWND hwnd, UINT oldCodePage) {
+void EditOnCodePageChanged(UINT oldCodePage) {
 	const UINT cpEdit = SciCall_GetCodePage();
 	const UINT acp = GetACP();
 	if (oldCodePage == SC_CP_UTF8) {
@@ -341,14 +341,14 @@ void EditOnCodePageChanged(HWND hwnd, UINT oldCodePage) {
 			// UTF-8 to SBCS
 			int length = 0;
 			const uint8_t *buf = GetANSICharClassifyTable(acp, &length);
-			SendMessage(hwnd, SCI_SETCHARCLASSESEX, length, (LPARAM)buf);
+			SciCall_SetCharClassesEx(length, buf);
 		} else {
 			// UTF-8 to DBCS
 		}
 	} else {
 		if (oldCodePage == 0) {
 			// SBCS to UTF-8
-			SendMessage(hwnd, SCI_SETCHARCLASSESEX, 0, 0);
+			SciCall_SetCharClassesEx(0, NULL);
 		} else {
 			// DBCS to UTF-8
 		}
