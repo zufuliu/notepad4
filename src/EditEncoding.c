@@ -306,7 +306,7 @@ void Encoding_ReleaseResources(void) {
 //
 // EditSetNewEncoding()
 //
-BOOL EditSetNewEncoding(HWND hwnd, int iCurrentEncoding, int iNewEncoding, BOOL bNoUI, BOOL bSetSavePoint) {
+BOOL EditSetNewEncoding(int iCurrentEncoding, int iNewEncoding, BOOL bNoUI, BOOL bSetSavePoint) {
 	if (iCurrentEncoding != iNewEncoding) {
 		if (iCurrentEncoding != CPI_DEFAULT && iNewEncoding != CPI_DEFAULT) {
 			return TRUE;
@@ -319,12 +319,12 @@ BOOL EditSetNewEncoding(HWND hwnd, int iCurrentEncoding, int iNewEncoding, BOOL 
 			const BOOL bIsEmptyUndoHistory = !(SciCall_CanUndo() || SciCall_CanRedo());
 
 			if (bNoUI || bIsEmptyUndoHistory || InfoBox(MBYESNO, L"MsgConv2", IDS_ASK_ENCODING2) == IDYES) {
-				EditConvertText(hwnd, cpSrc, cpDest, bSetSavePoint);
+				EditConvertText(cpSrc, cpDest, bSetSavePoint);
 				return TRUE;
 			}
 		} else if (bNoUI || InfoBox(MBYESNO, L"MsgConv1", IDS_ASK_ENCODING) == IDYES) {
 			BeginWaitCursor();
-			EditConvertText(hwnd, cpSrc, cpDest, FALSE);
+			EditConvertText(cpSrc, cpDest, FALSE);
 			EndWaitCursor();
 			return TRUE;
 		}

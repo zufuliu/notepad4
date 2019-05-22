@@ -107,7 +107,7 @@ static inline void EditSetEmptyText(void) {
 	EditSetNewText("", 0);
 }
 
-BOOL	EditConvertText(HWND hwnd, UINT cpSource, UINT cpDest, BOOL bSetSavePoint);
+BOOL	EditConvertText(UINT cpSource, UINT cpDest, BOOL bSetSavePoint);
 
 char*	EditGetClipboardText(HWND hwnd); // LocalFree()
 BOOL	EditCopyAppend(HWND hwnd);
@@ -311,7 +311,7 @@ static inline BOOL IsDBCSCodePage(UINT page) {
 // in EditEncoding.c
 extern NP2ENCODING mEncoding[];
 void	Encoding_ReleaseResources(void);
-BOOL	EditSetNewEncoding(HWND hwnd, int iCurrentEncoding, int iNewEncoding, BOOL bNoUI, BOOL bSetSavePoint);
+BOOL	EditSetNewEncoding(int iCurrentEncoding, int iNewEncoding, BOOL bNoUI, BOOL bSetSavePoint);
 void	EditOnCodePageChanged(UINT oldCodePage);
 const char* GetFoldDisplayEllipsis(UINT cpEdit, UINT acp);
 void	Encoding_InitDefaults(void);
