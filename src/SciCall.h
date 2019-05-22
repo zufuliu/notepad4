@@ -114,6 +114,50 @@ NP2_inline int SciCall_GetCharacterAt(Sci_Position position) {
 
 // Searching and replacing
 
+NP2_inline void SciCall_SetTargetStart(Sci_Position start) {
+	SciCall(SCI_SETTARGETSTART, start, 0);
+}
+
+NP2_inline Sci_Position SciCall_GetTargetStart(void) {
+	return SciCall(SCI_GETTARGETSTART, 0, 0);
+}
+
+NP2_inline void SciCall_SetTargetEnd(Sci_Position end) {
+	SciCall(SCI_SETTARGETEND, end, 0);
+}
+
+NP2_inline Sci_Position SciCall_GetTargetEnd(void) {
+	return SciCall(SCI_GETTARGETEND, 0, 0);
+}
+
+NP2_inline void SciCall_SetTargetRange(Sci_Position start, Sci_Position end) {
+	SciCall(SCI_SETTARGETRANGE, start, end);
+}
+
+NP2_inline void SciCall_TargetFromSelection(void) {
+	SciCall(SCI_TARGETFROMSELECTION, 0, 0);
+}
+
+NP2_inline void SciCall_SetSearchFlags(int searchFlags) {
+	SciCall(SCI_SETSEARCHFLAGS, searchFlags, 0);
+}
+
+NP2_inline Sci_Position SciCall_SearchInTarget(Sci_Position length, const char *text) {
+	return SciCall(SCI_SEARCHINTARGET, length, (LPARAM)text);
+}
+
+NP2_inline Sci_Position SciCall_ReplaceTarget(Sci_Position length, const char *text) {
+	return SciCall(SCI_REPLACETARGET, length, (LPARAM)text);
+}
+
+NP2_inline Sci_Position SciCall_ReplaceTargetRE(Sci_Position length, const char *text) {
+	return SciCall(SCI_REPLACETARGETRE, length, (LPARAM)text);
+}
+
+NP2_inline Sci_Position SciCall_FindText(int searchFlags, struct Sci_TextToFind *ft) {
+	return SciCall(SCI_FINDTEXT, searchFlags, (LPARAM)ft);
+}
+
 // Overtype
 
 NP2_inline BOOL SciCall_GetOvertype(void) {
@@ -198,14 +242,6 @@ NP2_inline void SciCall_SetSel(Sci_Position anchor, Sci_Position caret) {
 	SciCall(SCI_SETSEL, anchor, caret);
 }
 
-NP2_inline void SciCall_DocumentStart(void) {
-	SciCall(SCI_DOCUMENTSTART, 0, 0);
-}
-
-NP2_inline void SciCall_DocumentEnd(void) {
-	SciCall(SCI_DOCUMENTEND, 0, 0);
-}
-
 NP2_inline void SciCall_GotoPos(Sci_Position caret) {
 	SciCall(SCI_GOTOPOS, caret, 0);
 }
@@ -230,16 +266,24 @@ NP2_inline Sci_Position SciCall_GetAnchor(void) {
 	return SciCall(SCI_GETANCHOR, 0, 0);
 }
 
-NP2_inline Sci_Position SciCall_PositionBefore(Sci_Position position) {
-	return SciCall(SCI_POSITIONBEFORE, position, 0);
+NP2_inline void SciCall_SetSelectionStart(Sci_Position anchor) {
+	SciCall(SCI_SETSELECTIONSTART, anchor, 0);
 }
 
-NP2_inline Sci_Position SciCall_PositionAfter(Sci_Position position) {
-	return SciCall(SCI_POSITIONAFTER, position, 0);
+NP2_inline Sci_Position SciCall_GetSelectionStart(void) {
+	return SciCall(SCI_GETSELECTIONSTART, 0, 0);
 }
 
-NP2_inline Sci_Position SciCall_GetColumn(Sci_Position position) {
-	return SciCall(SCI_GETCOLUMN, position, 0);
+NP2_inline void SciCall_SetSelectionEnd(Sci_Position caret) {
+	SciCall(SCI_SETSELECTIONEND, caret, 0);
+}
+
+NP2_inline Sci_Position SciCall_GetSelectionEnd(void) {
+	return SciCall(SCI_GETSELECTIONEND, 0, 0);
+}
+
+NP2_inline void SciCall_SelectAll(void) {
+	SciCall(SCI_SELECTALL, 0, 0);
 }
 
 NP2_inline Sci_Line SciCall_LineFromPosition(Sci_Position position) {
@@ -266,16 +310,56 @@ NP2_inline Sci_Position SciCall_GetSelText(char *buffer) {
 	return SciCall(SCI_GETSELTEXT, 0, (LPARAM)buffer);
 }
 
-NP2_inline Sci_Position SciCall_CountCharacters(Sci_Position start, Sci_Position end) {
-	return SciCall(SCI_COUNTCHARACTERS, start, end);
+NP2_inline BOOL SciCall_IsRectangleSelection(void) {
+	return (BOOL)SciCall(SCI_SELECTIONISRECTANGLE, 0, 0);
 }
 
-NP2_inline Sci_Position SciCall_GetSelectionStart(void) {
-	return SciCall(SCI_GETSELECTIONSTART, 0, 0);
+NP2_inline int SciCall_GetSelectionMode(void) {
+	return (int)SciCall(SCI_GETSELECTIONMODE, 0, 0);
 }
 
-NP2_inline Sci_Position SciCall_GetSelectionEnd(void) {
-	return SciCall(SCI_GETSELECTIONEND, 0, 0);
+NP2_inline Sci_Position SciCall_GetLineSelStartPosition(Sci_Line line) {
+	return SciCall(SCI_GETLINESELSTARTPOSITION, line, 0);
+}
+
+NP2_inline Sci_Position SciCall_GetLineSelEndPosition(Sci_Line line) {
+	return SciCall(SCI_GETLINESELENDPOSITION, line, 0);
+}
+
+NP2_inline Sci_Position SciCall_PositionBefore(Sci_Position position) {
+	return SciCall(SCI_POSITIONBEFORE, position, 0);
+}
+
+NP2_inline Sci_Position SciCall_PositionAfter(Sci_Position position) {
+	return SciCall(SCI_POSITIONAFTER, position, 0);
+}
+
+NP2_inline int SciCall_TextWidth(int style, const char *text) {
+	return (int)SciCall(SCI_TEXTWIDTH, style, (LPARAM)text);
+}
+
+NP2_inline Sci_Position SciCall_GetColumn(Sci_Position position) {
+	return SciCall(SCI_GETCOLUMN, position, 0);
+}
+
+NP2_inline Sci_Position SciCall_FindColumn(Sci_Line line, Sci_Position column) {
+	return SciCall(SCI_FINDCOLUMN, line, column);
+}
+
+NP2_inline Sci_Position SciCall_PositionFromPoint(int x, int y) {
+	return SciCall(SCI_POSITIONFROMPOINT, x, y);
+}
+
+NP2_inline int SciCall_PointXFromPosition(Sci_Position pos) {
+	return (int)SciCall(SCI_POINTXFROMPOSITION, 0, pos);
+}
+
+NP2_inline int SciCall_PointYFromPosition(Sci_Position pos) {
+	return (int)SciCall(SCI_POINTYFROMPOSITION, 0, pos);
+}
+
+NP2_inline void SciCall_ChooseCaretX(void) {
+	SciCall(SCI_CHOOSECARETX, 0, 0);
 }
 
 NP2_inline Sci_Line EditGetSelectedLineCount(void) {
@@ -284,40 +368,56 @@ NP2_inline Sci_Line EditGetSelectedLineCount(void) {
 	return iLineEnd - iLineStart + 1;
 }
 
-NP2_inline int SciCall_GetSelectionMode(void) {
-	return (int)SciCall(SCI_GETSELECTIONMODE, 0, 0);
+// By character or UTF-16 code unit
+
+NP2_inline Sci_Position SciCall_CountCharacters(Sci_Position start, Sci_Position end) {
+	return SciCall(SCI_COUNTCHARACTERS, start, end);
 }
 
-NP2_inline BOOL SciCall_IsRectangleSelection(void) {
-	return SciCall_GetSelectionMode() == SC_SEL_RECTANGLE;
+// Multiple Selection and Virtual Space
+
+NP2_inline void SciCall_SetMultipleSelection(BOOL multipleSelection) {
+	SciCall(SCI_SETMULTIPLESELECTION, multipleSelection, 0);
+}
+
+NP2_inline void SciCall_SetAdditionalSelectionTyping(BOOL additionalSelectionTyping) {
+	SciCall(SCI_SETADDITIONALSELECTIONTYPING, additionalSelectionTyping, 0);
+}
+
+NP2_inline void SciCall_SetVirtualSpaceOptions(int virtualSpaceOptions) {
+	SciCall(SCI_SETVIRTUALSPACEOPTIONS, virtualSpaceOptions, 0);
 }
 
 NP2_inline BOOL SciCall_IsSelectionEmpty(void) {
 	return (BOOL)SciCall(SCI_GETSELECTIONEMPTY, 0, 0);
 }
 
-NP2_inline Sci_Position SciCall_FindText(int searchFlags, struct Sci_TextToFind *ft) {
-	return SciCall(SCI_FINDTEXT, searchFlags, (LPARAM)ft);
+NP2_inline void SciCall_ClearSelections(void) {
+	SciCall(SCI_CLEARSELECTIONS, 0, 0);
 }
 
-NP2_inline void SciCall_SetTargetRange(Sci_Position start, Sci_Position end) {
-	SciCall(SCI_SETTARGETRANGE, start, end);
+NP2_inline void SciCall_SetAdditionalSelAlpha(int alpha) {
+	SciCall(SCI_SETADDITIONALSELALPHA, alpha, 0);
 }
 
-NP2_inline void SciCall_SetSearchFlags(int searchFlags) {
-	SciCall(SCI_SETSEARCHFLAGS, searchFlags, 0);
+NP2_inline void SciCall_SetAdditionalSelFore(COLORREF fore) {
+	SciCall(SCI_SETADDITIONALSELFORE, fore, 0);
 }
 
-NP2_inline Sci_Position SciCall_SearchInTarget(Sci_Position length, const char *text) {
-	return SciCall(SCI_SEARCHINTARGET, length, (LPARAM)text);
+NP2_inline void SciCall_SetAdditionalSelBack(COLORREF back) {
+	SciCall(SCI_SETADDITIONALSELBACK, back, 0);
 }
 
-NP2_inline int SciCall_TextWidth(int style, const char *text) {
-	return (int)SciCall(SCI_TEXTWIDTH, style, (LPARAM)text);
+NP2_inline void SciCall_SetAdditionalCaretFore(COLORREF fore) {
+	SciCall(SCI_SETADDITIONALCARETFORE, fore, 0);
 }
 
-NP2_inline void SciCall_ChooseCaretX(void) {
-	SciCall(SCI_CHOOSECARETX, 0, 0);
+NP2_inline void SciCall_SetAdditionalCaretsBlink(BOOL additionalCaretsBlink) {
+	SciCall(SCI_SETADDITIONALCARETSBLINK, additionalCaretsBlink, 0);
+}
+
+NP2_inline void SciCall_SetAdditionalCaretsVisible(BOOL additionalCaretsVisible) {
+	SciCall(SCI_SETADDITIONALCARETSVISIBLE, additionalCaretsVisible, 0);
 }
 
 // Scrolling and automatic scrolling
@@ -403,102 +503,6 @@ NP2_inline void EndWaitCursor(void) {
 	SciCall_SetCursor(SC_CURSORNORMAL);
 	GetCursorPos(&pt);
 	SetCursorPos(pt.x, pt.y);
-}
-
-// Caret
-
-NP2_inline void SciCall_SetCaretFore(COLORREF fore) {
-	SciCall(SCI_SETCARETFORE, fore, 0);
-}
-
-NP2_inline void SciCall_SetCaretStyle(int caretStyle) {
-	SciCall(SCI_SETCARETSTYLE, caretStyle, 0);
-}
-
-NP2_inline void SciCall_SetCaretWidth(int pixelWidth) {
-	SciCall(SCI_SETCARETWIDTH, pixelWidth, 0);
-}
-
-NP2_inline void SciCall_SetCaretPeriod(int periodMilliseconds) {
-	SciCall(SCI_SETCARETPERIOD, periodMilliseconds, 0);
-}
-
-NP2_inline void SciCall_SetCaretLineVisible(BOOL show) {
-	SciCall(SCI_SETCARETLINEVISIBLE, show, 0);
-}
-
-NP2_inline void SciCall_SetCaretLineVisibleAlways(BOOL alwaysVisible) {
-	SciCall(SCI_SETCARETLINEVISIBLEALWAYS, alwaysVisible, 0);
-}
-
-NP2_inline void SciCall_SetCaretLineBack(COLORREF back) {
-	SciCall(SCI_SETCARETLINEBACK, back, 0);
-}
-
-NP2_inline void SciCall_SetCaretLineBackAlpha(int alpha) {
-	SciCall(SCI_SETCARETLINEBACKALPHA, alpha, 0);
-}
-
-NP2_inline void SciCall_SetCaretLineFrame(int width) {
-	SciCall(SCI_SETCARETLINEFRAME, width, 0);
-}
-
-NP2_inline void SciCall_SetCaretSticky(int useCaretStickyBehaviour) {
-	SciCall(SCI_SETCARETSTICKY, useCaretStickyBehaviour, 0);
-}
-
-// Selection
-
-NP2_inline void SciCall_SetSelFore(BOOL useSetting, COLORREF fore) {
-	SciCall(SCI_SETSELFORE, useSetting, fore);
-}
-
-NP2_inline void SciCall_SetSelBack(BOOL useSetting, COLORREF back) {
-	SciCall(SCI_SETSELBACK, useSetting, back);
-}
-
-NP2_inline void SciCall_SetSelAlpha(int alpha) {
-	SciCall(SCI_SETSELALPHA, alpha, 0);
-}
-
-NP2_inline void SciCall_SetSelEOLFilled(BOOL filled) {
-	SciCall(SCI_SETSELEOLFILLED, filled, 0);
-}
-
-NP2_inline void SciCall_SetMultipleSelection(BOOL multipleSelection) {
-	SciCall(SCI_SETMULTIPLESELECTION, multipleSelection, 0);
-}
-
-NP2_inline void SciCall_SetAdditionalSelectionTyping(BOOL additionalSelectionTyping) {
-	SciCall(SCI_SETADDITIONALSELECTIONTYPING, additionalSelectionTyping, 0);
-}
-
-NP2_inline void SciCall_SetVirtualSpaceOptions(int virtualSpaceOptions) {
-	SciCall(SCI_SETVIRTUALSPACEOPTIONS, virtualSpaceOptions, 0);
-}
-
-NP2_inline void SciCall_SetAdditionalSelFore(COLORREF fore) {
-	SciCall(SCI_SETADDITIONALSELFORE, fore, 0);
-}
-
-NP2_inline void SciCall_SetAdditionalSelBack(COLORREF back) {
-	SciCall(SCI_SETADDITIONALSELBACK, back, 0);
-}
-
-NP2_inline void SciCall_SetAdditionalSelAlpha(int alpha) {
-	SciCall(SCI_SETADDITIONALSELALPHA, alpha, 0);
-}
-
-NP2_inline void SciCall_SetAdditionalCaretFore(COLORREF fore) {
-	SciCall(SCI_SETADDITIONALCARETFORE, fore, 0);
-}
-
-NP2_inline void SciCall_SetAdditionalCaretsBlink(BOOL additionalCaretsBlink) {
-	SciCall(SCI_SETADDITIONALCARETSBLINK, additionalCaretsBlink, 0);
-}
-
-NP2_inline void SciCall_SetAdditionalCaretsVisible(BOOL additionalCaretsVisible) {
-	SciCall(SCI_SETADDITIONALCARETSVISIBLE, additionalCaretsVisible, 0);
 }
 
 // Line endings
@@ -603,6 +607,64 @@ NP2_inline void SciCall_StyleSetCharacterSet(int style, int characterSet) {
 
 NP2_inline void SciCall_StyleSetCase(int style, int caseVisible) {
 	SciCall(SCI_STYLESETCASE, style, caseVisible);
+}
+
+// Caret, selection, and hotspot styles
+
+NP2_inline void SciCall_SetSelFore(BOOL useSetting, COLORREF fore) {
+	SciCall(SCI_SETSELFORE, useSetting, fore);
+}
+
+NP2_inline void SciCall_SetSelBack(BOOL useSetting, COLORREF back) {
+	SciCall(SCI_SETSELBACK, useSetting, back);
+}
+
+NP2_inline void SciCall_SetSelAlpha(int alpha) {
+	SciCall(SCI_SETSELALPHA, alpha, 0);
+}
+
+NP2_inline void SciCall_SetSelEOLFilled(BOOL filled) {
+	SciCall(SCI_SETSELEOLFILLED, filled, 0);
+}
+
+NP2_inline void SciCall_SetCaretFore(COLORREF fore) {
+	SciCall(SCI_SETCARETFORE, fore, 0);
+}
+
+NP2_inline void SciCall_SetCaretLineVisible(BOOL show) {
+	SciCall(SCI_SETCARETLINEVISIBLE, show, 0);
+}
+
+NP2_inline void SciCall_SetCaretLineBack(COLORREF back) {
+	SciCall(SCI_SETCARETLINEBACK, back, 0);
+}
+
+NP2_inline void SciCall_SetCaretLineBackAlpha(int alpha) {
+	SciCall(SCI_SETCARETLINEBACKALPHA, alpha, 0);
+}
+
+NP2_inline void SciCall_SetCaretLineFrame(int width) {
+	SciCall(SCI_SETCARETLINEFRAME, width, 0);
+}
+
+NP2_inline void SciCall_SetCaretLineVisibleAlways(BOOL alwaysVisible) {
+	SciCall(SCI_SETCARETLINEVISIBLEALWAYS, alwaysVisible, 0);
+}
+
+NP2_inline void SciCall_SetCaretPeriod(int periodMilliseconds) {
+	SciCall(SCI_SETCARETPERIOD, periodMilliseconds, 0);
+}
+
+NP2_inline void SciCall_SetCaretStyle(int caretStyle) {
+	SciCall(SCI_SETCARETSTYLE, caretStyle, 0);
+}
+
+NP2_inline void SciCall_SetCaretWidth(int pixelWidth) {
+	SciCall(SCI_SETCARETWIDTH, pixelWidth, 0);
+}
+
+NP2_inline void SciCall_SetCaretSticky(int useCaretStickyBehaviour) {
+	SciCall(SCI_SETCARETSTICKY, useCaretStickyBehaviour, 0);
 }
 
 // Character representations
@@ -917,6 +979,66 @@ NP2_inline void SciCall_CallTipUseStyle(int tabSize) {
 
 // Keyboard commands
 
+NP2_inline void SciCall_VCHome(void) {
+	SciCall(SCI_VCHOME, 0, 0);
+}
+
+NP2_inline void SciCall_DocumentStart(void) {
+	SciCall(SCI_DOCUMENTSTART, 0, 0);
+}
+
+NP2_inline void SciCall_DocumentEnd(void) {
+	SciCall(SCI_DOCUMENTEND, 0, 0);
+}
+
+NP2_inline void SciCall_DeleteBack(void) {
+	SciCall(SCI_DELETEBACK, 0, 0);
+}
+
+NP2_inline void SciCall_DelWordLeft(void) {
+	SciCall(SCI_DELWORDLEFT, 0, 0);
+}
+
+NP2_inline void SciCall_DelWordRight(void) {
+	SciCall(SCI_DELWORDRIGHT, 0, 0);
+}
+
+NP2_inline void SciCall_DelLineLeft(void) {
+	SciCall(SCI_DELLINELEFT, 0, 0);
+}
+
+NP2_inline void SciCall_DelLineRight(void) {
+	SciCall(SCI_DELLINERIGHT, 0, 0);
+}
+
+NP2_inline void SciCall_LineDelete(void) {
+	SciCall(SCI_LINEDELETE, 0, 0);
+}
+
+NP2_inline void SciCall_LineCut(void) {
+	SciCall(SCI_LINECUT, 0, 0);
+}
+
+NP2_inline void SciCall_LineCopy(void) {
+	SciCall(SCI_LINECOPY, 0, 0);
+}
+
+NP2_inline void SciCall_LineTranspose(void) {
+	SciCall(SCI_LINETRANSPOSE, 0, 0);
+}
+
+NP2_inline void SciCall_LineDuplicate(void) {
+	SciCall(SCI_LINEDUPLICATE, 0, 0);
+}
+
+NP2_inline void SciCall_LowerCase(void) {
+	SciCall(SCI_LOWERCASE, 0, 0);
+}
+
+NP2_inline void SciCall_UpperCase(void) {
+	SciCall(SCI_UPPERCASE, 0, 0);
+}
+
 NP2_inline void SciCall_Cancel(void) {
 	SciCall(SCI_CANCEL, 0, 0);
 }
@@ -927,6 +1049,18 @@ NP2_inline void SciCall_EditToggleOvertype(void) {
 
 NP2_inline void SciCall_NewLine(void) {
 	SciCall(SCI_NEWLINE, 0, 0);
+}
+
+NP2_inline void SciCall_Tab(void) {
+	SciCall(SCI_TAB, 0, 0);
+}
+
+NP2_inline void SciCall_BackTab(void) {
+	SciCall(SCI_BACKTAB, 0, 0);
+}
+
+NP2_inline void SciCall_SelectionDuplicate(void) {
+	SciCall(SCI_SELECTIONDUPLICATE, 0, 0);
 }
 
 // Key bindings
@@ -1027,6 +1161,10 @@ NP2_inline void SciCall_SetWrapVisualFlagsLocation(int wrapVisualFlagsLocation) 
 
 NP2_inline void SciCall_SetWrapIndentMode(int wrapIndentMode) {
 	SciCall(SCI_SETWRAPINDENTMODE, wrapIndentMode, 0);
+}
+
+NP2_inline int SciCall_GetWrapIndentMode(void) {
+	return (int)SciCall(SCI_GETWRAPINDENTMODE, 0, 0);
 }
 
 NP2_inline void SciCall_SetWrapStartIndent(int indent) {

@@ -1844,9 +1844,8 @@ void EditAutoIndent(void) {
 
 			//if (iPrevLineEndPos == iPrevLineIndentPos) {
 			//	SciCall_BeginUndoAction();
-			//	SendMessage(hwnd, SCI_SETTARGETSTART, iPrevLineStartPos, 0);
-			//	SendMessage(hwnd, SCI_SETTARGETEND, iPrevLineEndPos, 0);
-			//	SendMessage(hwnd, SCI_REPLACETARGET, 0, (LPARAM)"");
+			//	SciCall_SetTargetRange(iPrevLineStartPos, iPrevLineEndPos);
+			//	SciCall_ReplaceTarget(0, "");
 			//	SciCall_EndUndoAction();
 			//}
 		}

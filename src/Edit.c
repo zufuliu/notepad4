@@ -127,12 +127,12 @@ void EditSetNewText(LPCSTR lpstrText, DWORD cbText) {
 //
 // EditConvertText()
 //
-BOOL EditConvertText(HWND hwnd, UINT cpSource, UINT cpDest, BOOL bSetSavePoint) {
+BOOL EditConvertText(UINT cpSource, UINT cpDest, BOOL bSetSavePoint) {
 	if (cpSource == cpDest) {
 		return TRUE;
 	}
 
-	const int length = (int)SendMessage(hwnd, SCI_GETLENGTH, 0, 0);
+	const Sci_Position length = SciCall_GetLength();
 	if (length == 0) {
 		SciCall_Cancel();
 		SciCall_SetUndoCollection(FALSE);
@@ -156,8 +156,8 @@ BOOL EditConvertText(HWND hwnd, UINT cpSource, UINT cpDest, BOOL bSetSavePoint) 
 		SciCall_GetTextRange(&tr);
 
 		WCHAR *pwchText = (WCHAR *)NP2HeapAlloc((length + 1) * sizeof(WCHAR));
-		const int cbwText = MultiByteToWideChar(cpSource, 0, pchText, length, pwchText, length);
-		const int cbText = WideCharToMultiByte(cpDest, 0, pwchText, cbwText, pchText, (int)(length * sizeof(WCHAR)), NULL, NULL);
+		const int cbwText = MultiByteToWideChar(cpSource, 0, pchText, (int)length, pwchText, (int)(NP2HeapSize(pwchText) / sizeof(WCHAR)));
+		const int cbText = WideCharToMultiByte(cpDest, 0, pwchText, cbwText, pchText, (int)(NP2HeapSize(pchText)), NULL, NULL);
 
 		SciCall_Cancel();
 		SciCall_SetUndoCollection(FALSE);
@@ -247,19 +247,16 @@ BOOL EditCopyAppend(HWND hwnd) {
 		return TRUE;
 	}
 
-	const int iCurPos = (int)SendMessage(hwnd, SCI_GETCURRENTPOS, 0, 0);
-	const int iAnchorPos = (int)SendMessage(hwnd, SCI_GETANCHOR, 0, 0);
 	char *pszText;
-
-	if (iCurPos != iAnchorPos) {
+	if (!SciCall_IsSelectionEmpty()) {
 		if (SciCall_IsRectangleSelection()) {
 			MsgBox(MBWARN, IDS_SELRECT);
 			return FALSE;
 		}
 
-		const int iSelCount = (int)SendMessage(hwnd, SCI_GETSELTEXT, 0, 0);
+		const Sci_Position iSelCount = SciCall_GetSelTextLength();
 		pszText = (char *)NP2HeapAlloc(iSelCount);
-		SendMessage(hwnd, SCI_GETSELTEXT, 0, (LPARAM)pszText);
+		SciCall_GetSelText(pszText);
 	} else {
 		const Sci_Position cchText = SciCall_GetLength();
 		pszText = (char *)NP2HeapAlloc(cchText + 1);
@@ -3175,20 +3172,19 @@ void EditStripTrailingBlanks(HWND hwnd, BOOL bIgnoreSelection) {
 
 	// Code from SciTE...
 	SciCall_BeginUndoAction();
-	const int maxLines = (int)SendMessage(hwnd, SCI_GETLINECOUNT, 0, 0);
-	for (int line = 0; line < maxLines; line++) {
-		const int lineStart = (int)SendMessage(hwnd, SCI_POSITIONFROMLINE, line, 0);
-		const int lineEnd = (int)SendMessage(hwnd, SCI_GETLINEENDPOSITION, line, 0);
-		int i = lineEnd - 1;
+	const Sci_Line maxLines = SciCall_GetLineCount();
+	for (Sci_Line line = 0; line < maxLines; line++) {
+		const Sci_Position lineStart = SciCall_PositionFromLine(line);
+		const Sci_Position lineEnd = SciCall_GetLineEndPosition(line);
+		Sci_Position i = lineEnd - 1;
 		int ch = SciCall_GetCharAt(i);
 		while ((i >= lineStart) && (ch == ' ' || ch == '\t')) {
 			i--;
 			ch = SciCall_GetCharAt(i);
 		}
 		if (i < (lineEnd - 1)) {
-			SendMessage(hwnd, SCI_SETTARGETSTART, i + 1, 0);
-			SendMessage(hwnd, SCI_SETTARGETEND, lineEnd, 0);
-			SendMessage(hwnd, SCI_REPLACETARGET, 0, (LPARAM)"");
+			SciCall_SetTargetRange(i + 1, lineEnd);
+			SciCall_ReplaceTarget(0, "");
 		}
 	}
 	SciCall_EndUndoAction();
@@ -3219,20 +3215,19 @@ void EditStripLeadingBlanks(HWND hwnd, BOOL bIgnoreSelection) {
 
 	// Code from SciTE...
 	SciCall_BeginUndoAction();
-	const int maxLines = (int)SendMessage(hwnd, SCI_GETLINECOUNT, 0, 0);
-	for (int line = 0; line < maxLines; line++) {
-		const int lineStart = (int)SendMessage(hwnd, SCI_POSITIONFROMLINE, line, 0);
-		const int lineEnd = (int)SendMessage(hwnd, SCI_GETLINEENDPOSITION, line, 0);
-		int i = lineStart;
+	const Sci_Line maxLines = SciCall_GetLineCount();
+	for (Sci_Line line = 0; line < maxLines; line++) {
+		const Sci_Position lineStart = SciCall_PositionFromLine(line);
+		const Sci_Position lineEnd = SciCall_GetLineEndPosition(line);
+		Sci_Position i = lineStart;
 		int ch = SciCall_GetCharAt(i);
 		while ((i <= lineEnd - 1) && (ch == ' ' || ch == '\t')) {
 			i++;
 			ch = SciCall_GetCharAt(i);
 		}
 		if (i > lineStart) {
-			SendMessage(hwnd, SCI_SETTARGETSTART, lineStart, 0);
-			SendMessage(hwnd, SCI_SETTARGETEND, i, 0);
-			SendMessage(hwnd, SCI_REPLACETARGET, 0, (LPARAM)"");
+			SciCall_SetTargetRange(lineStart, i);
+			SciCall_ReplaceTarget(0, "");
 		}
 	}
 	SciCall_EndUndoAction();
@@ -5167,21 +5162,19 @@ BOOL EditReplaceAllInSelection(HWND hwnd, LPEDITFINDREPLACE lpefr, BOOL bShowInf
 		EscapeWildcards(szFind2, lpefr);
 	}
 
-	int iReplaceMsg = (lpefr->fuFlags & SCFIND_REGEXP) ? SCI_REPLACETARGETRE : SCI_REPLACETARGET;
-	const BOOL bRegexStartOfLine = (lpefr->fuFlags & SCFIND_REGEXP) && (szFind2[0] == '^');
-	const BOOL bRegexStartOrEndOfLine =
-		(lpefr->fuFlags & SCFIND_REGEXP) &&
-		((!strcmp(szFind2, "$") || !strcmp(szFind2, "^") || !strcmp(szFind2, "^$")));
+	BOOL bReplaceRE = (lpefr->fuFlags & SCFIND_REGEXP);
+	const BOOL bRegexStartOfLine = bReplaceRE && (szFind2[0] == '^');
+	const BOOL bRegexStartOrEndOfLine = bReplaceRE && ((!strcmp(szFind2, "$") || !strcmp(szFind2, "^") || !strcmp(szFind2, "^$")));
 
 	char *pszReplace2;
 	if (strcmp(lpefr->szReplace, "^c") == 0) {
-		iReplaceMsg = SCI_REPLACETARGET;
+		bReplaceRE = FALSE;
 		pszReplace2 = EditGetClipboardText(hwnd);
 	} else {
 		//strcpy(szReplace2, lpefr->szReplace);
 		pszReplace2 = StrDupA(lpefr->szReplace);
 		if (lpefr->bTransformBS) {
-			TransformBackslashes(pszReplace2, (lpefr->fuFlags & SCFIND_REGEXP), cpEdit);
+			TransformBackslashes(pszReplace2, bReplaceRE, cpEdit);
 		}
 	}
 
@@ -5191,18 +5184,17 @@ BOOL EditReplaceAllInSelection(HWND hwnd, LPEDITFINDREPLACE lpefr, BOOL bShowInf
 
 	struct Sci_TextToFind ttf;
 	ZeroMemory(&ttf, sizeof(ttf));
-	ttf.chrg.cpMin = (int)SendMessage(hwnd, SCI_GETSELECTIONSTART, 0, 0);
-	ttf.chrg.cpMax = (int)SendMessage(hwnd, SCI_GETLENGTH, 0, 0);
+	ttf.chrg.cpMin = (Sci_PositionCR)SciCall_GetSelectionStart();
+	ttf.chrg.cpMax = (Sci_PositionCR)SciCall_GetLength();
 	ttf.lpstrText = szFind2;
 
 	int iCount = 0;
 	BOOL fCancel = FALSE;
-	while ((int)SendMessage(hwnd, SCI_FINDTEXT, lpefr->fuFlags, (LPARAM)&ttf) != -1 && !fCancel) {
-		if (ttf.chrgText.cpMin >= SendMessage(hwnd, SCI_GETSELECTIONSTART, 0, 0) &&
-			ttf.chrgText.cpMax <= SendMessage(hwnd, SCI_GETSELECTIONEND, 0, 0)) {
+	while (!fCancel && SciCall_FindText(lpefr->fuFlags, &ttf) != -1) {
+		if (ttf.chrgText.cpMin >= SciCall_GetSelectionStart() && ttf.chrgText.cpMax <= SciCall_GetSelectionEnd()) {
 
 			if (ttf.chrg.cpMin == 0 && iCount == 0 && bRegexStartOrEndOfLine) {
-				if (0 == SendMessage(hwnd, SCI_GETLINEENDPOSITION, 0, 0)) {
+				if (0 == SciCall_GetLineEndPosition(0)) {
 					ttf.chrgText.cpMin = 0;
 					ttf.chrgText.cpMax = 0;
 				}
@@ -5212,30 +5204,29 @@ BOOL EditReplaceAllInSelection(HWND hwnd, LPEDITFINDREPLACE lpefr, BOOL bShowInf
 				SciCall_BeginUndoAction();
 			}
 
-			SendMessage(hwnd, SCI_SETTARGETSTART, ttf.chrgText.cpMin, 0);
-			SendMessage(hwnd, SCI_SETTARGETEND, ttf.chrgText.cpMax, 0);
-			const int iReplacedLen = (int)SendMessage(hwnd, iReplaceMsg, (WPARAM)(-1), (LPARAM)pszReplace2);
+			SciCall_SetTargetRange(ttf.chrgText.cpMin, ttf.chrgText.cpMax);
+			const Sci_Position iReplacedLen = bReplaceRE ? SciCall_ReplaceTargetRE(-1, pszReplace2) : SciCall_ReplaceTarget(-1, pszReplace2);
 
-			ttf.chrg.cpMin = ttf.chrgText.cpMin + iReplacedLen;
-			ttf.chrg.cpMax = (int)SendMessage(hwnd, SCI_GETLENGTH, 0, 0);
+			ttf.chrg.cpMin = (Sci_PositionCR)(ttf.chrgText.cpMin + iReplacedLen);
+			ttf.chrg.cpMax = (Sci_PositionCR)SciCall_GetLength();
 
 			if (ttf.chrg.cpMin == ttf.chrg.cpMax) {
 				fCancel = TRUE;
 			}
 
-			//const int ch = SciCall_GetCharAt(SendMessage(hwnd, SCI_GETTARGETEND, 0, 0));
+			//const int ch = SciCall_GetCharAt(SciCall_GetTargetEnd());
 			if (/*ch == '\r' || ch == '\n' || iReplacedLen == 0 || */
 				ttf.chrgText.cpMin == ttf.chrgText.cpMax &&
 				!(bRegexStartOrEndOfLine && iReplacedLen > 0)) {
-				ttf.chrg.cpMin = (int)SendMessage(hwnd, SCI_POSITIONAFTER, ttf.chrg.cpMin, 0);
+				ttf.chrg.cpMin = (Sci_PositionCR)SciCall_PositionAfter(ttf.chrg.cpMin);
 			}
 
 			if (bRegexStartOfLine) {
-				const int iLine = (int)SendMessage(hwnd, SCI_LINEFROMPOSITION, ttf.chrg.cpMin, 0);
-				const int ilPos = (int)SendMessage(hwnd, SCI_POSITIONFROMLINE, iLine, 0);
+				const Sci_Line iLine = SciCall_LineFromPosition(ttf.chrg.cpMin);
+				const Sci_Position ilPos = SciCall_PositionFromLine(iLine);
 
 				if (ilPos == ttf.chrg.cpMin) {
-					ttf.chrg.cpMin = (int)SendMessage(hwnd, SCI_POSITIONFROMLINE, iLine + 1, 0);
+					ttf.chrg.cpMin = (Sci_PositionCR)SciCall_PositionFromLine(iLine + 1);
 				}
 				if (ttf.chrg.cpMin == ttf.chrg.cpMax) {
 					break;
@@ -5247,15 +5238,15 @@ BOOL EditReplaceAllInSelection(HWND hwnd, LPEDITFINDREPLACE lpefr, BOOL bShowInf
 	}
 
 	if (iCount) {
-		if (SendMessage(hwnd, SCI_GETSELECTIONEND, 0, 0) <
-				SendMessage(hwnd, SCI_GETTARGETEND, 0, 0)) {
-			int iAnchorPos = (int)SendMessage(hwnd, SCI_GETANCHOR, 0, 0);
-			int iCurrentPos = (int)SendMessage(hwnd, SCI_GETCURRENTPOS, 0, 0);
+		const Sci_Position iPos = SciCall_GetTargetEnd();
+		if (SciCall_GetSelectionEnd() <	iPos) {
+			Sci_Position iAnchorPos = SciCall_GetAnchor();
+			Sci_Position iCurrentPos = SciCall_GetCurrentPos();
 
 			if (iAnchorPos > iCurrentPos) {
-				iAnchorPos = (int)SendMessage(hwnd, SCI_GETTARGETEND, 0, 0);
+				iAnchorPos = iPos;
 			} else {
-				iCurrentPos = (int)SendMessage(hwnd, SCI_GETTARGETEND, 0, 0);
+				iCurrentPos = iPos;
 			}
 
 			EditSelectEx(iAnchorPos, iCurrentPos);
