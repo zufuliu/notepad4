@@ -35,10 +35,16 @@ static constexpr bool IsTypeCharacter(int ch) noexcept {
 	return ch == '%' || ch == '&' || ch == '@' || ch == '!' || ch == '#' || ch == '$';
 }
 
+static constexpr bool IsVBNumberPrefix(int ch) noexcept {
+	return ch == 'h' || ch == 'H'	// Hexadecimal
+		|| ch == 'o' || ch == 'O'	// Octal
+		|| ch == 'b' || ch == 'B';	// Binary
+}
+
 static constexpr bool IsVBNumber(int ch, int chPrev) noexcept {
-	return IsHexDigit(ch)
+	return IsHexDigit(ch)|| ch == '_'
 		|| (ch == '.' && chPrev != '.')
-		|| ((ch == '+' || ch == '_') && (chPrev == 'E' || chPrev == 'e'))
+		|| ((ch == '+' || ch == '-') && (chPrev == 'E' || chPrev == 'e'))
 		|| ((ch == 'S' || ch == 'I' || ch == 'L' || ch == 's' || ch == 'i' || ch == 'l')
 			&& (IsADigit(chPrev) || chPrev == 'U' || chPrev == 'u'))
 		|| ((ch == 'R' || ch == 'r' || ch == '%' || ch == '@' || ch == '!' || ch == '#')
@@ -198,10 +204,7 @@ static void ColouriseVBDoc(Sci_PositionU startPos, Sci_Position length, int init
 					sc.SetState(SCE_B_IDENTIFIER);
 				else
 					sc.SetState(SCE_B_FILENUMBER);
-			} else if (sc.ch == '&' && (sc.chNext == 'h' || sc.chNext == 'H')) { // Hexadecimal number
-				sc.SetState(SCE_B_NUMBER);
-				sc.Forward();
-			} else if (sc.ch == '&' && (sc.chNext == 'o' || sc.chNext == 'O')) { // Octal number
+			} else if (sc.ch == '&' && IsVBNumberPrefix(sc.chNext)) {
 				sc.SetState(SCE_B_NUMBER);
 				sc.Forward();
 			} else if (IsADigit(sc.ch) || (sc.ch == '.' && IsADigit(sc.chNext))) {
