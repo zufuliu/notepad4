@@ -927,6 +927,10 @@ NP2_inline void SciCall_AutoCSetSeparator(char separatorCharacter) {
 	SciCall(SCI_AUTOCSETSEPARATOR, separatorCharacter, 0);
 }
 
+NP2_inline void SciCall_AutoCSetCancelAtStart(BOOL cancel) {
+	SciCall(SCI_AUTOCSETCANCELATSTART, cancel, 0);
+}
+
 NP2_inline void SciCall_AutoCSetFillUps(const char *characterSet) {
 	SciCall(SCI_AUTOCSETFILLUPS, 0, (LPARAM)characterSet);
 }

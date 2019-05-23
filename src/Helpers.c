@@ -41,19 +41,17 @@ void StopWatch_ShowLog(const StopWatch *watch, LPCSTR msg) {
 	const double elapsed = StopWatch_Get(watch);
 	char buf[256];
 	snprintf(buf, COUNTOF(buf), "%s %s: %.6f\n", "Notepad2", msg, elapsed);
-	OutputDebugStringA(buf);
+	DebugPrint(buf);
 }
 
-#ifndef NDEBUG
-void DLogf(const char *fmt, ...) {
+void DebugPrintf(const char *fmt, ...) {
 	char buf[1024] = "";
 	va_list va;
 	va_start(va, fmt);
 	wvsprintfA(buf, fmt, va);
 	va_end(va);
-	OutputDebugStringA(buf);
+	DebugPrint(buf);
 }
-#endif
 
 void IniClearSectionEx(LPCWSTR lpSection, LPCWSTR lpszIniFile, BOOL bDelete) {
 	if (StrIsEmpty(lpszIniFile)) {
