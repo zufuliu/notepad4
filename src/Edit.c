@@ -150,10 +150,8 @@ BOOL EditConvertText(UINT cpSource, UINT cpDest, BOOL bSetSavePoint) {
 		}
 	} else {
 		// DBCS: length -> WCHAR: sizeof(WCHAR) * (length / 2) -> UTF-8: kMaxMultiByteCount * (length / 2)
-		struct Sci_TextRange tr = { { 0, -1 }, NULL };
 		char *pchText = (char *)NP2HeapAlloc((length + 1) * sizeof(WCHAR));
-		tr.lpstrText = pchText;
-		SciCall_GetTextRange(&tr);
+		SciCall_GetText(NP2HeapSize(pchText), pchText);
 
 		WCHAR *pwchText = (WCHAR *)NP2HeapAlloc((length + 1) * sizeof(WCHAR));
 		const int cbwText = MultiByteToWideChar(cpSource, 0, pchText, (int)length, pwchText, (int)(NP2HeapSize(pwchText) / sizeof(WCHAR)));
@@ -1746,7 +1744,6 @@ void EditTabsToSpaces(int nTabWidth, BOOL bOnlyIndentingWS) {
 	iSelStart = SciCall_PositionFromLine(iLine);
 
 	const Sci_Position iSelCount = iSelEnd - iSelStart;
-
 	char *pszText = (char *)NP2HeapAlloc(iSelCount + 1);
 	LPWSTR pszTextW = (LPWSTR)NP2HeapAlloc((iSelCount + 1) * sizeof(WCHAR));
 
@@ -1838,7 +1835,6 @@ void EditSpacesToTabs(int nTabWidth, BOOL bOnlyIndentingWS) {
 	iSelStart = SciCall_PositionFromLine(iLine);
 
 	const Sci_Position iSelCount = iSelEnd - iSelStart;
-
 	char *pszText = (char *)NP2HeapAlloc(iSelCount + 1);
 	LPWSTR pszTextW = (LPWSTR)NP2HeapAlloc((iSelCount + 1) * sizeof(WCHAR));
 
@@ -2922,34 +2918,34 @@ void EditToggleLineComments(LPCWSTR pwszComment, BOOL bInsertAtStart) {
 //
 // EditPadWithSpaces()
 //
-void EditPadWithSpaces(HWND hwnd, BOOL bSkipEmpty, BOOL bNoUndoGroup) {
-	int iMaxColumn = 0;
+void EditPadWithSpaces(BOOL bSkipEmpty, BOOL bNoUndoGroup) {
+	Sci_Position iMaxColumn = 0;
 	BOOL bReducedSelection = FALSE;
 
-	int iSelStart = 0;
-	int iSelEnd = 0;
+	Sci_Position iSelStart = 0;
+	Sci_Position iSelEnd = 0;
 
-	int iLineStart = 0;
-	int iLineEnd = 0;
+	Sci_Line iLineStart = 0;
+	Sci_Line iLineEnd = 0;
 
-	int iRcCurLine = 0;
-	int iRcAnchorLine = 0;
-	int iRcCurCol = 0;
-	int iRcAnchorCol = 0;
+	Sci_Line iRcCurLine = 0;
+	Sci_Line iRcAnchorLine = 0;
+	Sci_Position iRcCurCol = 0;
+	Sci_Position iRcAnchorCol = 0;
 
 	const BOOL bIsRectangular = SciCall_IsRectangleSelection();
 	if (!bIsRectangular ) {
-		iSelStart = (int)SendMessage(hwnd, SCI_GETSELECTIONSTART, 0, 0);
-		iSelEnd = (int)SendMessage(hwnd, SCI_GETSELECTIONEND, 0, 0);
+		iSelStart = SciCall_GetSelectionStart();
+		iSelEnd = SciCall_GetSelectionEnd();
 
-		iLineStart = (int)SendMessage(hwnd, SCI_LINEFROMPOSITION, iSelStart, 0);
-		iLineEnd = (int)SendMessage(hwnd, SCI_LINEFROMPOSITION, iSelEnd, 0);
+		iLineStart = SciCall_LineFromPosition(iSelStart);
+		iLineEnd = SciCall_LineFromPosition(iSelEnd);
 
 		if (iLineStart == iLineEnd) {
 			iLineStart = 0;
-			iLineEnd = (int)SendMessage(hwnd, SCI_GETLINECOUNT, 0, 0) - 1;
+			iLineEnd = SciCall_GetLineCount() - 1;
 		} else {
-			if (iSelEnd <= SendMessage(hwnd, SCI_POSITIONFROMLINE, iLineEnd, 0)) {
+			if (iSelEnd <= SciCall_PositionFromLine(iLineEnd)) {
 				if (iLineEnd - iLineStart >= 1) {
 					iLineEnd--;
 					bReducedSelection = TRUE;
@@ -2957,27 +2953,27 @@ void EditPadWithSpaces(HWND hwnd, BOOL bSkipEmpty, BOOL bNoUndoGroup) {
 			}
 		}
 
-		for (int iLine = iLineStart; iLine <= iLineEnd; iLine++) {
-			const int iPos = (int)SendMessage(hwnd, SCI_GETLINEENDPOSITION, iLine, 0);
-			iMaxColumn = max_i(iMaxColumn, (int)SendMessage(hwnd, SCI_GETCOLUMN, iPos, 0));
+		for (Sci_Line iLine = iLineStart; iLine <= iLineEnd; iLine++) {
+			const Sci_Position iPos = SciCall_GetLineEndPosition(iLine);
+			iMaxColumn = max_pos(iMaxColumn, SciCall_GetColumn(iPos));
 		}
 	} else {
-		const int iCurPos = (int)SendMessage(hwnd, SCI_GETCURRENTPOS, 0, 0);
-		const int iAnchorPos = (int)SendMessage(hwnd, SCI_GETANCHOR, 0, 0);
+		const Sci_Position iCurPos = SciCall_GetCurrentPos();
+		const Sci_Position iAnchorPos = SciCall_GetAnchor();
 
-		iRcCurLine = (int)SendMessage(hwnd, SCI_LINEFROMPOSITION, iCurPos, 0);
-		iRcAnchorLine = (int)SendMessage(hwnd, SCI_LINEFROMPOSITION, iAnchorPos, 0);
+		iRcCurLine = SciCall_LineFromPosition(iCurPos);
+		iRcAnchorLine = SciCall_LineFromPosition(iAnchorPos);
 
-		iRcCurCol = (int)SendMessage(hwnd, SCI_GETCOLUMN, iCurPos, 0);
-		iRcAnchorCol = (int)SendMessage(hwnd, SCI_GETCOLUMN, iAnchorPos, 0);
+		iRcCurCol = SciCall_GetColumn(iCurPos);
+		iRcAnchorCol = SciCall_GetColumn(iAnchorPos);
 
 		iLineStart = 0;
-		iLineEnd = (int)SendMessage(hwnd, SCI_GETLINECOUNT, 0, 0) - 1;
+		iLineEnd = SciCall_GetLineCount() - 1;
 
-		for (int iLine = iLineStart; iLine <= iLineEnd; iLine++) {
-			const int iPos = (int)SendMessage(hwnd, SCI_GETLINESELENDPOSITION, iLine, 0);
+		for (Sci_Line iLine = iLineStart; iLine <= iLineEnd; iLine++) {
+			const Sci_Position iPos = SciCall_GetLineSelEndPosition(iLine);
 			if (iPos != INVALID_POSITION) {
-				iMaxColumn = max_i(iMaxColumn, (int)SendMessage(hwnd, SCI_GETCOLUMN, iPos, 0));
+				iMaxColumn = max_pos(iMaxColumn, SciCall_GetColumn(iPos));
 			}
 		}
 	}
@@ -2990,26 +2986,25 @@ void EditPadWithSpaces(HWND hwnd, BOOL bSkipEmpty, BOOL bNoUndoGroup) {
 			SciCall_BeginUndoAction();
 		}
 
-		for (int iLine = iLineStart; iLine <= iLineEnd; iLine++) {
-			const int iLineSelEndPos = (int)SendMessage(hwnd, SCI_GETLINESELENDPOSITION, iLine, 0);
+		for (Sci_Line iLine = iLineStart; iLine <= iLineEnd; iLine++) {
+			const Sci_Position iLineSelEndPos = SciCall_GetLineSelEndPosition(iLine);
 			if (bIsRectangular && INVALID_POSITION == iLineSelEndPos) {
 				continue;
 			}
 
-			const int iPos = (int)SendMessage(hwnd, SCI_GETLINEENDPOSITION, iLine, 0);
+			const Sci_Position iPos = SciCall_GetLineEndPosition(iLine);
 			if (bIsRectangular && iPos > iLineSelEndPos) {
 				continue;
 			}
 
-			if (bSkipEmpty && (int)SendMessage(hwnd, SCI_POSITIONFROMLINE, iLine, 0) >= iPos) {
+			if (bSkipEmpty && SciCall_PositionFromLine(iLine) >= iPos) {
 				continue;
 			}
 
-			const int iPadLen = iMaxColumn - (int)SendMessage(hwnd, SCI_GETCOLUMN, iPos, 0);
+			const Sci_Position iPadLen = iMaxColumn - SciCall_GetColumn(iPos);
 
-			SendMessage(hwnd, SCI_SETTARGETSTART, iPos, 0);
-			SendMessage(hwnd, SCI_SETTARGETEND, iPos, 0);
-			SendMessage(hwnd, SCI_REPLACETARGET, iPadLen, (LPARAM)pmszPadStr);
+			SciCall_SetTargetRange(iPos, iPos);
+			SciCall_ReplaceTarget(iPadLen, pmszPadStr);
 		}
 
 		NP2HeapFree(pmszPadStr);
@@ -3019,34 +3014,32 @@ void EditPadWithSpaces(HWND hwnd, BOOL bSkipEmpty, BOOL bNoUndoGroup) {
 		}
 	}
 
-	if (!bIsRectangular &&
-			SendMessage(hwnd, SCI_LINEFROMPOSITION, iSelStart, 0) !=
-			SendMessage(hwnd, SCI_LINEFROMPOSITION, iSelEnd, 0)) {
-		int iCurPos = (int)SendMessage(hwnd, SCI_GETCURRENTPOS, 0, 0);
-		int iAnchorPos = (int)SendMessage(hwnd, SCI_GETANCHOR, 0, 0);
+	if (!bIsRectangular && SciCall_LineFromPosition(iSelStart) != SciCall_LineFromPosition(iSelEnd)) {
+		Sci_Position iCurPos = SciCall_GetCurrentPos();
+		Sci_Position iAnchorPos = SciCall_GetAnchor();
 
 		if (iCurPos < iAnchorPos) {
-			iCurPos = (int)SendMessage(hwnd, SCI_POSITIONFROMLINE, iLineStart, 0);
+			iCurPos = SciCall_PositionFromLine(iLineStart);
 			if (!bReducedSelection) {
-				iAnchorPos = (int)SendMessage(hwnd, SCI_GETLINEENDPOSITION, iLineEnd, 0);
+				iAnchorPos = SciCall_GetLineEndPosition(iLineEnd);
 			} else {
-				iAnchorPos = (int)SendMessage(hwnd, SCI_POSITIONFROMLINE, iLineEnd + 1, 0);
+				iAnchorPos = SciCall_PositionFromLine(iLineEnd + 1);
 			}
 		} else {
-			iAnchorPos = (int)SendMessage(hwnd, SCI_POSITIONFROMLINE, iLineStart, 0);
+			iAnchorPos = SciCall_PositionFromLine(iLineStart);
 			if (!bReducedSelection) {
-				iCurPos = (int)SendMessage(hwnd, SCI_GETLINEENDPOSITION, iLineEnd, 0);
+				iCurPos = SciCall_GetLineEndPosition(iLineEnd);
 			} else {
-				iCurPos = (int)SendMessage(hwnd, SCI_POSITIONFROMLINE, iLineEnd + 1, 0);
+				iCurPos = SciCall_PositionFromLine(iLineEnd + 1);
 			}
 		}
 		SciCall_SetSel(iAnchorPos, iCurPos);
 	} else if (bIsRectangular) {
-		const int iCurPos = (int)SendMessage(hwnd, SCI_FINDCOLUMN, iRcCurLine, iRcCurCol);
-		const int iAnchorPos = (int)SendMessage(hwnd, SCI_FINDCOLUMN, iRcAnchorLine, iRcAnchorCol);
+		const Sci_Position iCurPos = SciCall_FindColumn(iRcCurLine, iRcCurCol);
+		const Sci_Position iAnchorPos = SciCall_FindColumn(iRcAnchorLine, iRcAnchorCol);
 
-		SendMessage(hwnd, SCI_SETRECTANGULARSELECTIONCARET, iCurPos, 0);
-		SendMessage(hwnd, SCI_SETRECTANGULARSELECTIONANCHOR, iAnchorPos, 0);
+		SciCall_SetRectangularSelectionCaret(iCurPos);
+		SciCall_SetRectangularSelectionAnchor(iAnchorPos);
 	}
 }
 
@@ -3218,17 +3211,16 @@ void EditStripLeadingBlanks(HWND hwnd, BOOL bIgnoreSelection) {
 //
 // EditCompressSpaces()
 //
-void EditCompressSpaces(HWND hwnd) {
+void EditCompressSpaces(void) {
 	if (SciCall_IsRectangleSelection()) {
 		MsgBox(MBWARN, IDS_SELRECT);
 		return;
 	}
 
-	const int iSelStart = (int)SendMessage(hwnd, SCI_GETSELECTIONSTART, 0, 0);
-	const int iSelEnd = (int)SendMessage(hwnd, SCI_GETSELECTIONEND, 0, 0);
-	int iCurPos = (int)SendMessage(hwnd, SCI_GETCURRENTPOS, 0, 0);
-	int iAnchorPos = (int)SendMessage(hwnd, SCI_GETANCHOR, 0, 0);
-	const int iLength = (int)SendMessage(hwnd, SCI_GETLENGTH, 0, 0);
+	const Sci_Position iSelStart = SciCall_GetSelectionStart();
+	const Sci_Position iSelEnd = SciCall_GetSelectionEnd();
+	Sci_Position iCurPos = SciCall_GetCurrentPos();
+	Sci_Position iAnchorPos = SciCall_GetAnchor();
 
 	char *pszIn;
 	char *pszOut;
@@ -3236,18 +3228,16 @@ void EditCompressSpaces(HWND hwnd) {
 	BOOL bIsLineEnd;
 
 	if (iSelStart != iSelEnd) {
-		const int iLineStart = (int)SendMessage(hwnd, SCI_LINEFROMPOSITION, iSelStart, 0);
-		const int iLineEnd = (int)SendMessage(hwnd, SCI_LINEFROMPOSITION, iSelEnd, 0);
-		const int cch = (int)SendMessage(hwnd, SCI_GETSELTEXT, 0, 0);
+		const Sci_Line iLineStart = SciCall_LineFromPosition(iSelStart);
+		const Sci_Line iLineEnd = SciCall_LineFromPosition(iSelEnd);
+		const Sci_Position cch = SciCall_GetSelTextLength();
 		pszIn = (char *)NP2HeapAlloc(cch);
 		pszOut = (char *)NP2HeapAlloc(cch);
-		SendMessage(hwnd, SCI_GETSELTEXT, 0, (LPARAM)pszIn);
-		bIsLineStart =
-			(iSelStart == SendMessage(hwnd, SCI_POSITIONFROMLINE, iLineStart, 0));
-		bIsLineEnd =
-			(iSelEnd == SendMessage(hwnd, SCI_GETLINEENDPOSITION, iLineEnd, 0));
+		SciCall_GetSelText(pszIn);
+		bIsLineStart = (iSelStart == SciCall_PositionFromLine(iLineStart));
+		bIsLineEnd = (iSelEnd == SciCall_GetLineEndPosition(iLineEnd));
 	} else {
-		const int cch = iLength + 1;
+		const Sci_Position cch = SciCall_GetLength() + 1;
 		pszIn = (char *)NP2HeapAlloc(cch);
 		pszOut = (char *)NP2HeapAlloc(cch);
 		SciCall_GetText(cch, pszIn);
@@ -3288,22 +3278,20 @@ void EditCompressSpaces(HWND hwnd) {
 
 	if (bModified) {
 		if (iSelStart != iSelEnd) {
-			SendMessage(hwnd, SCI_TARGETFROMSELECTION, 0, 0);
+			SciCall_TargetFromSelection();
 		} else {
-			SendMessage(hwnd, SCI_SETTARGETSTART, 0, 0);
-			SendMessage(hwnd, SCI_SETTARGETEND, iLength, 0);
+			SciCall_TargetWholeDocument();
 		}
 		SciCall_BeginUndoAction();
-		SendMessage(hwnd, SCI_REPLACETARGET, (WPARAM)(-1), (LPARAM)pszOut);
+		SciCall_ReplaceTarget(-1, pszOut);
 		if (iCurPos > iAnchorPos) {
-			iCurPos = (int)SendMessage(hwnd, SCI_GETTARGETEND, 0, 0);
-			iAnchorPos = (int)SendMessage(hwnd, SCI_GETTARGETSTART, 0, 0);
-			SciCall_SetSel(iAnchorPos, iCurPos);
+			iCurPos = SciCall_GetTargetEnd();
+			iAnchorPos = SciCall_GetTargetStart();
 		} else if (iCurPos < iAnchorPos) {
-			iCurPos = (int)SendMessage(hwnd, SCI_GETTARGETSTART, 0, 0);
-			iAnchorPos = (int)SendMessage(hwnd, SCI_GETTARGETEND, 0, 0);
-			SciCall_SetSel(iAnchorPos, iCurPos);
+			iCurPos = SciCall_GetTargetStart();
+			iAnchorPos = SciCall_GetTargetEnd();
 		}
+		SciCall_SetSel(iAnchorPos, iCurPos);
 		SciCall_EndUndoAction();
 	}
 
@@ -3315,39 +3303,36 @@ void EditCompressSpaces(HWND hwnd) {
 //
 // EditRemoveBlankLines()
 //
-void EditRemoveBlankLines(HWND hwnd, BOOL bMerge) {
+void EditRemoveBlankLines(BOOL bMerge) {
 	if (SciCall_IsRectangleSelection()) {
 		MsgBox(MBWARN, IDS_SELRECT);
 		return;
 	}
 
-	int iSelStart = (int)SendMessage(hwnd, SCI_GETSELECTIONSTART, 0, 0);
-	int iSelEnd = (int)SendMessage(hwnd, SCI_GETSELECTIONEND, 0, 0);
+	Sci_Position iSelStart = SciCall_GetSelectionStart();
+	Sci_Position iSelEnd = SciCall_GetSelectionEnd();
 
 	if (iSelStart == iSelEnd) {
 		iSelStart = 0;
-		iSelEnd = (int)SendMessage(hwnd, SCI_GETLENGTH, 0, 0);
+		iSelEnd = SciCall_GetLength();
 	}
 
-	int iLineStart = (int)SendMessage(hwnd, SCI_LINEFROMPOSITION, iSelStart, 0);
-	int iLineEnd = (int)SendMessage(hwnd, SCI_LINEFROMPOSITION, iSelEnd, 0);
+	Sci_Line iLineStart = SciCall_LineFromPosition(iSelStart);
+	Sci_Line iLineEnd = SciCall_LineFromPosition(iSelEnd);
 
-	if (iSelStart > SendMessage(hwnd, SCI_POSITIONFROMLINE, iLineStart, 0)) {
+	if (iSelStart > SciCall_PositionFromLine(iLineStart)) {
 		iLineStart++;
 	}
 
-	if (iSelEnd <= SendMessage(hwnd, SCI_POSITIONFROMLINE, iLineEnd, 0) &&
-			iLineEnd != SendMessage(hwnd, SCI_GETLINECOUNT, 0, 0) - 1) {
+	if (iSelEnd <= SciCall_PositionFromLine(iLineEnd) && iLineEnd != SciCall_GetLineCount() - 1) {
 		iLineEnd--;
 	}
 
 	SciCall_BeginUndoAction();
 
-	for (int iLine = iLineStart; iLine <= iLineEnd;) {
-		int nBlanks = 0;
-		while (iLine + nBlanks <= iLineEnd &&
-				SendMessage(hwnd, SCI_POSITIONFROMLINE, iLine + nBlanks, 0) ==
-				SendMessage(hwnd, SCI_GETLINEENDPOSITION, iLine + nBlanks, 0)) {
+	for (Sci_Line iLine = iLineStart; iLine <= iLineEnd;) {
+		Sci_Line nBlanks = 0;
+		while (iLine + nBlanks <= iLineEnd && SciCall_PositionFromLine(iLine + nBlanks) == SciCall_GetLineEndPosition(iLine + nBlanks)) {
 			nBlanks++;
 		}
 
@@ -3358,11 +3343,10 @@ void EditRemoveBlankLines(HWND hwnd, BOOL bMerge) {
 				nBlanks--;
 			}
 
-			const int iTargetStart = (int)SendMessage(hwnd, SCI_POSITIONFROMLINE, iLine, 0);
-			const int iTargetEnd = (int)SendMessage(hwnd, SCI_POSITIONFROMLINE, iLine + nBlanks, 0);
+			const Sci_Position iTargetStart = SciCall_PositionFromLine(iLine);
+			const Sci_Position iTargetEnd = SciCall_PositionFromLine(iLine + nBlanks);
 
-			SendMessage(hwnd, SCI_SETTARGETSTART, iTargetStart, 0);
-			SendMessage(hwnd, SCI_SETTARGETEND, iTargetEnd, 0);
+			SciCall_SetTargetRange(iTargetStart, iTargetEnd);
 			SciCall_ReplaceTarget(0, "");
 
 			if (bMerge) {
@@ -3378,9 +3362,9 @@ void EditRemoveBlankLines(HWND hwnd, BOOL bMerge) {
 //
 // EditWrapToColumn()
 //
-void EditWrapToColumn(HWND hwnd, int nColumn/*, int nTabWidth*/) {
-	int iCurPos = (int)SendMessage(hwnd, SCI_GETCURRENTPOS, 0, 0);
-	int iAnchorPos = (int)SendMessage(hwnd, SCI_GETANCHOR, 0, 0);
+void EditWrapToColumn(int nColumn/*, int nTabWidth*/) {
+	Sci_Position iCurPos = SciCall_GetCurrentPos();
+	Sci_Position iAnchorPos = SciCall_GetAnchor();
 	if (iCurPos == iAnchorPos) {
 		return;
 	}
@@ -3389,24 +3373,24 @@ void EditWrapToColumn(HWND hwnd, int nColumn/*, int nTabWidth*/) {
 		return;
 	}
 
-	int iSelStart = (int)SendMessage(hwnd, SCI_GETSELECTIONSTART, 0, 0);
-	const int iSelEnd = (int)SendMessage(hwnd, SCI_GETSELECTIONEND, 0, 0);
-	const int iSelCount = iSelEnd - iSelStart;
+	Sci_Position iSelStart = SciCall_GetSelectionStart();
+	const Sci_Position iSelEnd = SciCall_GetSelectionEnd();
 
-	const int iLine = (int)SendMessage(hwnd, SCI_LINEFROMPOSITION, iSelStart, 0);
-	iSelStart = (int)SendMessage(hwnd, SCI_POSITIONFROMLINE, iLine, 0);
+	const Sci_Line iLine = SciCall_LineFromPosition(iSelStart);
+	iSelStart = SciCall_PositionFromLine(iLine);
 
+	const Sci_Position iSelCount = iSelEnd - iSelStart;
 	char *pszText = (char *)NP2HeapAlloc(iSelCount + 1 + 2);
 	LPWSTR pszTextW = (LPWSTR)NP2HeapAlloc((iSelCount + 1 + 2) * sizeof(WCHAR));
 
 	struct Sci_TextRange tr;
-	tr.chrg.cpMin = iSelStart;
-	tr.chrg.cpMax = iSelEnd;
+	tr.chrg.cpMin = (Sci_PositionCR)iSelStart;
+	tr.chrg.cpMax = (Sci_PositionCR)iSelEnd;
 	tr.lpstrText = pszText;
 	SciCall_GetTextRange(&tr);;
 
 	const UINT cpEdit = SciCall_GetCodePage();
-	const int cchTextW = MultiByteToWideChar(cpEdit, 0, pszText, iSelCount, pszTextW, (int)(NP2HeapSize(pszTextW) / sizeof(WCHAR)));
+	const int cchTextW = MultiByteToWideChar(cpEdit, 0, pszText, (int)iSelCount, pszTextW, (int)(NP2HeapSize(pszTextW) / sizeof(WCHAR)));
 	NP2HeapFree(pszText);
 
 	LPWSTR pszConvW = (LPWSTR)NP2HeapAlloc(cchTextW * sizeof(WCHAR) * 3 + 2);
@@ -3522,9 +3506,8 @@ void EditWrapToColumn(HWND hwnd, int nColumn/*, int nTabWidth*/) {
 
 		SciCall_BeginUndoAction();
 
-		SendMessage(hwnd, SCI_SETTARGETSTART, iSelStart, 0);
-		SendMessage(hwnd, SCI_SETTARGETEND, iSelEnd, 0);
-		SendMessage(hwnd, SCI_REPLACETARGET, cchConvM, (LPARAM)pszText);
+		SciCall_SetTargetRange(iSelStart, iSelEnd);
+		SciCall_ReplaceTarget(cchConvM, pszText);
 		//SciCall_Clear();
 		//SciCall_AddText(cchConvW, pszText);
 		SciCall_SetSel(iAnchorPos, iCurPos);
@@ -3541,9 +3524,9 @@ void EditWrapToColumn(HWND hwnd, int nColumn/*, int nTabWidth*/) {
 //
 // EditJoinLinesEx()
 //
-void EditJoinLinesEx(HWND hwnd) {
-	int iCurPos = (int)SendMessage(hwnd, SCI_GETCURRENTPOS, 0, 0);
-	int iAnchorPos = (int)SendMessage(hwnd, SCI_GETANCHOR, 0, 0);
+void EditJoinLinesEx(void) {
+	Sci_Position iCurPos = SciCall_GetCurrentPos();
+	Sci_Position iAnchorPos = SciCall_GetAnchor();
 	if (iCurPos == iAnchorPos) {
 		return;
 	}
@@ -3552,18 +3535,18 @@ void EditJoinLinesEx(HWND hwnd) {
 		return;
 	}
 
-	int iSelStart = (int)SendMessage(hwnd, SCI_GETSELECTIONSTART, 0, 0);
-	const int iSelEnd = (int)SendMessage(hwnd, SCI_GETSELECTIONEND, 0, 0);
-	const int iLine = (int)SendMessage(hwnd, SCI_LINEFROMPOSITION, iSelStart, 0);
-	iSelStart = (int)SendMessage(hwnd, SCI_POSITIONFROMLINE, iLine, 0);
+	Sci_Position iSelStart = SciCall_GetSelectionStart();
+	const Sci_Position iSelEnd = SciCall_GetSelectionEnd();
+	const Sci_Line iLine = SciCall_LineFromPosition(iSelStart);
+	iSelStart = SciCall_PositionFromLine(iLine);
 
-	const int iSelCount = iSelEnd - iSelStart;
+	const Sci_Position iSelCount = iSelEnd - iSelStart;
 	char *pszText = (char *)NP2HeapAlloc(iSelCount + 1 + 2);
 	char *pszJoin = (char *)NP2HeapAlloc(NP2HeapSize(pszText));
 
 	struct Sci_TextRange tr;
-	tr.chrg.cpMin = iSelStart;
-	tr.chrg.cpMax = iSelEnd;
+	tr.chrg.cpMin = (Sci_PositionCR)iSelStart;
+	tr.chrg.cpMax = (Sci_PositionCR)iSelEnd;
 	tr.lpstrText = pszText;
 	SciCall_GetTextRange(&tr);;
 
@@ -3577,9 +3560,9 @@ void EditJoinLinesEx(HWND hwnd) {
 		szEOL[0] = '\n';
 	}
 
-	int cchJoin = 0;
+	Sci_Position cchJoin = 0;
 	BOOL bModified = FALSE;
-	for (int i = 0; i < iSelCount; i++) {
+	for (Sci_Position i = 0; i < iSelCount; i++) {
 		if (pszText[i] == '\r' || pszText[i] == '\n') {
 			if (pszText[i] == '\r' && pszText[i + 1] == '\n') {
 				i++;
@@ -3623,9 +3606,8 @@ void EditJoinLinesEx(HWND hwnd) {
 
 		SciCall_BeginUndoAction();
 
-		SendMessage(hwnd, SCI_SETTARGETSTART, iSelStart, 0);
-		SendMessage(hwnd, SCI_SETTARGETEND, iSelEnd, 0);
-		SendMessage(hwnd, SCI_REPLACETARGET, cchJoin, (LPARAM)pszJoin);
+		SciCall_SetTargetRange(iSelStart, iSelEnd);
+		SciCall_ReplaceTarget(cchJoin, pszJoin);
 		SciCall_SetSel(iAnchorPos, iCurPos);
 
 		SciCall_EndUndoAction();
@@ -3669,52 +3651,52 @@ int CmpLogicalRev(const void *s1, const void *s2) {
 	return CmpLogical(s2, s1);
 }
 
-void EditSortLines(HWND hwnd, int iSortFlags) {
-	int iCurPos = (int)SendMessage(hwnd, SCI_GETCURRENTPOS, 0, 0);
-	int iAnchorPos = (int)SendMessage(hwnd, SCI_GETANCHOR, 0, 0);
+void EditSortLines(int iSortFlags) {
+	Sci_Position iCurPos = SciCall_GetCurrentPos();
+	Sci_Position iAnchorPos = SciCall_GetAnchor();
 	if (iCurPos == iAnchorPos) {
 		return;
 	}
 
-	int iRcCurLine = 0;
-	int iRcAnchorLine = 0;
-	int iRcCurCol = 0;
-	int iRcAnchorCol = 0;
+	Sci_Line iRcCurLine = 0;
+	Sci_Line iRcAnchorLine = 0;
+	Sci_Position iRcCurCol = 0;
+	Sci_Position iRcAnchorCol = 0;
 
-	int iSelStart = 0;
-	int iLineStart;
-	int iLineEnd;
-	UINT iSortColumn;
+	Sci_Position iSelStart = 0;
+	Sci_Line iLineStart;
+	Sci_Line iLineEnd;
+	Sci_Position iSortColumn;
 
 	const BOOL bIsRectangular = SciCall_IsRectangleSelection();
 	if (bIsRectangular) {
-		iRcCurLine = (int)SendMessage(hwnd, SCI_LINEFROMPOSITION, iCurPos, 0);
-		iRcAnchorLine = (int)SendMessage(hwnd, SCI_LINEFROMPOSITION, iAnchorPos, 0);
+		iRcCurLine = SciCall_LineFromPosition(iCurPos);
+		iRcAnchorLine = SciCall_LineFromPosition(iAnchorPos);
 
-		iRcCurCol = (int)SendMessage(hwnd, SCI_GETCOLUMN, iCurPos, 0);
-		iRcAnchorCol = (int)SendMessage(hwnd, SCI_GETCOLUMN, iAnchorPos, 0);
+		iRcCurCol = SciCall_GetColumn(iCurPos);
+		iRcAnchorCol = SciCall_GetColumn(iAnchorPos);
 
-		iLineStart = min_i(iRcCurLine, iRcAnchorLine);
-		iLineEnd = max_i(iRcCurLine, iRcAnchorLine);
-		iSortColumn = min_i(iRcCurCol, iRcAnchorCol);
+		iLineStart = min_pos(iRcCurLine, iRcAnchorLine);
+		iLineEnd = max_pos(iRcCurLine, iRcAnchorLine);
+		iSortColumn = min_pos(iRcCurCol, iRcAnchorCol);
 	} else {
-		iSelStart = (int)SendMessage(hwnd, SCI_GETSELECTIONSTART, 0, 0);
-		const int iSelEnd = (int)SendMessage(hwnd, SCI_GETSELECTIONEND, 0, 0);
+		iSelStart = SciCall_GetSelectionStart();
+		const Sci_Position iSelEnd = SciCall_GetSelectionEnd();
 
-		const int iLine = (int)SendMessage(hwnd, SCI_LINEFROMPOSITION, iSelStart, 0);
-		iSelStart = (int)SendMessage(hwnd, SCI_POSITIONFROMLINE, iLine, 0);
+		const Sci_Line iLine = SciCall_LineFromPosition(iSelStart);
+		iSelStart = SciCall_PositionFromLine(iLine);
 
-		iLineStart = (int)SendMessage(hwnd, SCI_LINEFROMPOSITION, iSelStart, 0);
-		iLineEnd = (int)SendMessage(hwnd, SCI_LINEFROMPOSITION, iSelEnd, 0);
+		iLineStart = SciCall_LineFromPosition(iSelStart);
+		iLineEnd = SciCall_LineFromPosition(iSelEnd);
 
-		if (iSelEnd <= SendMessage(hwnd, SCI_POSITIONFROMLINE, iLineEnd, 0)) {
+		if (iSelEnd <= SciCall_PositionFromLine(iLineEnd)) {
 			iLineEnd--;
 		}
 
-		iSortColumn = (UINT)SendMessage(hwnd, SCI_GETCOLUMN, SendMessage(hwnd, SCI_GETCURRENTPOS, 0, 0), 0);
+		iSortColumn = SciCall_GetColumn(iCurPos);
 	}
 
-	const int iLineCount = iLineEnd - iLineStart + 1;
+	const Sci_Line iLineCount = iLineEnd - iLineStart + 1;
 	if (iLineCount < 2) {
 		return;
 	}
@@ -3731,19 +3713,19 @@ void EditSortLines(HWND hwnd, int iSortFlags) {
 
 	SciCall_BeginUndoAction();
 	if (bIsRectangular) {
-		EditPadWithSpaces(hwnd, !(iSortFlags & SORT_SHUFFLE), TRUE);
+		EditPadWithSpaces(!(iSortFlags & SORT_SHUFFLE), TRUE);
 	}
 
 	SORTLINE *pLines = (SORTLINE *)NP2HeapAlloc(sizeof(SORTLINE) * iLineCount);
-	int cchTotal = 0;
-	int ichlMax = 3;
-	for (int i = 0, iLine = iLineStart; iLine <= iLineEnd; i++, iLine++) {
-		const int cchm = (int)SendMessage(hwnd, SCI_GETLINE, iLine, 0);
+	Sci_Position cchTotal = 0;
+	Sci_Position ichlMax = 3;
+	for (Sci_Line i = 0, iLine = iLineStart; iLine <= iLineEnd; i++, iLine++) {
+		const Sci_Position cchm = SciCall_GetLineLength(iLine);
 		char *pmsz = (char *)NP2HeapAlloc(cchm + 1);
 		SciCall_GetLine(iLine, pmsz);
 		StrTrimA(pmsz, "\r\n");
 		cchTotal += cchm;
-		ichlMax = max_i(ichlMax, cchm);
+		ichlMax = max_pos(ichlMax, cchm);
 
 		const int cchw = MultiByteToWideChar(cpEdit, 0, pmsz, -1, NULL, 0) - 1;
 		if (cchw > 0) {
@@ -3789,8 +3771,8 @@ void EditSortLines(HWND hwnd, int iSortFlags) {
 		}
 	} else if (iSortFlags & SORT_SHUFFLE) {
 		srand((UINT)GetTickCount());
-		for (int i = iLineCount - 1; i > 0; i--) {
-			const int j = rand() % i;
+		for (Sci_Line i = iLineCount - 1; i > 0; i--) {
+			const Sci_Line j = rand() % i;
 			const SORTLINE sLine = pLines[i];
 			pLines[i] = pLines[j];
 			pLines[j] = sLine;
@@ -3810,7 +3792,7 @@ void EditSortLines(HWND hwnd, int iSortFlags) {
 	FNSTRCMP pfnStrCmp = (iSortFlags & SORT_NOCASE) ? StrCmpIW : StrCmpW;
 
 	BOOL bLastDup = FALSE;
-	for (int i = 0; i < iLineCount; i++) {
+	for (Sci_Line i = 0; i < iLineCount; i++) {
 		if (pLines[i].pwszLine && ((iSortFlags & SORT_SHUFFLE) || StrNotEmpty(pLines[i].pwszLine))) {
 			BOOL bDropLine = FALSE;
 			if (!(iSortFlags & SORT_SHUFFLE)) {
@@ -3839,7 +3821,7 @@ void EditSortLines(HWND hwnd, int iSortFlags) {
 	}
 
 	NP2HeapFree(pmszBuf);
-	for (int i = 0; i < iLineCount; i++) {
+	for (Sci_Line i = 0; i < iLineCount; i++) {
 		if (pLines[i].pwszLine) {
 			LocalFree(pLines[i].pwszLine);
 		}
@@ -3849,16 +3831,15 @@ void EditSortLines(HWND hwnd, int iSortFlags) {
 	if (!bIsRectangular) {
 		if (iAnchorPos > iCurPos) {
 			iCurPos = iSelStart;
-			iAnchorPos = iSelStart + lstrlenA(pmszResult);
+			iAnchorPos = iSelStart + strlen(pmszResult);
 		} else {
 			iAnchorPos = iSelStart;
-			iCurPos = iSelStart + lstrlenA(pmszResult);
+			iCurPos = iSelStart + strlen(pmszResult);
 		}
 	}
 
-	SendMessage(hwnd, SCI_SETTARGETSTART, SendMessage(hwnd, SCI_POSITIONFROMLINE, iLineStart, 0), 0);
-	SendMessage(hwnd, SCI_SETTARGETEND, SendMessage(hwnd, SCI_POSITIONFROMLINE, iLineEnd + 1, 0), 0);
-	SendMessage(hwnd, SCI_REPLACETARGET, strlen(pmszResult), (LPARAM)pmszResult);
+	SciCall_SetTargetRange(SciCall_PositionFromLine(iLineStart), SciCall_PositionFromLine(iLineEnd + 1));
+	SciCall_ReplaceTarget(strlen(pmszResult), pmszResult);
 	SciCall_EndUndoAction();
 
 	NP2HeapFree(pmszResult);
@@ -3866,25 +3847,21 @@ void EditSortLines(HWND hwnd, int iSortFlags) {
 	if (!bIsRectangular) {
 		SciCall_SetSel(iAnchorPos, iCurPos);
 	} else {
-		const int iTargetStart = (int)SendMessage(hwnd, SCI_GETTARGETSTART, 0, 0);
-		int iTargetEnd = (int)SendMessage(hwnd, SCI_GETTARGETEND, 0, 0);
-		SendMessage(hwnd, SCI_CLEARSELECTIONS, 0, 0);
+		const Sci_Position iTargetStart = SciCall_GetTargetStart();
+		Sci_Position iTargetEnd = SciCall_GetTargetEnd();
+		SciCall_ClearSelections();
 		if (iTargetStart != iTargetEnd) {
 			iTargetEnd -= lstrlenA(mszEOL);
 			if (iRcAnchorLine > iRcCurLine) {
-				iCurPos = (int)SendMessage(hwnd, SCI_FINDCOLUMN,
-										   SendMessage(hwnd, SCI_LINEFROMPOSITION, iTargetStart, 0), iRcCurCol);
-				iAnchorPos = (int)SendMessage(hwnd, SCI_FINDCOLUMN,
-											  SendMessage(hwnd, SCI_LINEFROMPOSITION, iTargetEnd, 0), iRcAnchorCol);
+				iCurPos = SciCall_FindColumn(SciCall_LineFromPosition(iTargetStart), iRcCurCol);
+				iAnchorPos = SciCall_FindColumn(SciCall_LineFromPosition(iTargetEnd), iRcAnchorCol);
 			} else {
-				iCurPos = (int)SendMessage(hwnd, SCI_FINDCOLUMN,
-										   SendMessage(hwnd, SCI_LINEFROMPOSITION, iTargetEnd, 0), iRcCurCol);
-				iAnchorPos = (int)SendMessage(hwnd, SCI_FINDCOLUMN,
-											  SendMessage(hwnd, SCI_LINEFROMPOSITION, iTargetStart, 0), iRcAnchorCol);
+				iCurPos = SciCall_FindColumn(SciCall_LineFromPosition(iTargetEnd), iRcCurCol);
+				iAnchorPos = SciCall_FindColumn(SciCall_LineFromPosition(iTargetStart), iRcAnchorCol);
 			}
 			if (iCurPos != iAnchorPos) {
-				SendMessage(hwnd, SCI_SETRECTANGULARSELECTIONCARET, iCurPos, 0);
-				SendMessage(hwnd, SCI_SETRECTANGULARSELECTIONANCHOR, iAnchorPos, 0);
+				SciCall_SetRectangularSelectionCaret(iCurPos);
+				SciCall_SetRectangularSelectionAnchor(iAnchorPos);
 			} else {
 				SciCall_SetSel(iTargetStart, iTargetStart);
 			}
