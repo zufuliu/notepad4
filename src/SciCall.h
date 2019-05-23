@@ -138,6 +138,10 @@ NP2_inline void SciCall_TargetFromSelection(void) {
 	SciCall(SCI_TARGETFROMSELECTION, 0, 0);
 }
 
+NP2_inline void SciCall_TargetWholeDocument(void) {
+	SciCall(SCI_TARGETWHOLEDOCUMENT, 0, 0);
+}
+
 NP2_inline void SciCall_SetSearchFlags(int searchFlags) {
 	SciCall(SCI_SETSEARCHFLAGS, searchFlags, 0);
 }
@@ -398,6 +402,14 @@ NP2_inline BOOL SciCall_IsSelectionEmpty(void) {
 
 NP2_inline void SciCall_ClearSelections(void) {
 	SciCall(SCI_CLEARSELECTIONS, 0, 0);
+}
+
+NP2_inline void SciCall_SetRectangularSelectionCaret(Sci_Position caret) {
+	SciCall(SCI_SETRECTANGULARSELECTIONCARET, caret, 0);
+}
+
+NP2_inline void SciCall_SetRectangularSelectionAnchor(Sci_Position anchor) {
+	SciCall(SCI_SETRECTANGULARSELECTIONANCHOR, anchor, 0);
 }
 
 NP2_inline void SciCall_SetAdditionalSelAlpha(int alpha) {

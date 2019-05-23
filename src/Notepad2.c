@@ -3050,7 +3050,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	case IDM_EDIT_PADWITHSPACES:
 		BeginWaitCursor();
-		EditPadWithSpaces(hwndEdit, FALSE, FALSE);
+		EditPadWithSpaces(FALSE, FALSE);
 		EndWaitCursor();
 		break;
 
@@ -3080,19 +3080,19 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	case IDM_EDIT_COMPRESSWS:
 		BeginWaitCursor();
-		EditCompressSpaces(hwndEdit);
+		EditCompressSpaces();
 		EndWaitCursor();
 		break;
 
 	case IDM_EDIT_MERGEBLANKLINES:
 		BeginWaitCursor();
-		EditRemoveBlankLines(hwndEdit, TRUE);
+		EditRemoveBlankLines(TRUE);
 		EndWaitCursor();
 		break;
 
 	case IDM_EDIT_REMOVEBLANKLINES:
 		BeginWaitCursor();
-		EditRemoveBlankLines(hwndEdit, FALSE);
+		EditRemoveBlankLines(FALSE);
 		EndWaitCursor();
 		break;
 
@@ -3115,7 +3115,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			StatusSetSimple(hwndStatus, TRUE);
 			InvalidateRect(hwndStatus, NULL, TRUE);
 			UpdateWindow(hwndStatus);
-			EditSortLines(hwndEdit, iSortOptions);
+			EditSortLines(iSortOptions);
 			StatusSetSimple(hwndStatus, FALSE);
 			EndWaitCursor();
 		}
@@ -3129,7 +3129,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		if (ColumnWrapDlg(hwnd, &iWrapCol)) {
 			iWrapCol = clamp_i(iWrapCol, 1, 512);
 			BeginWaitCursor();
-			EditWrapToColumn(hwndEdit, iWrapCol);
+			EditWrapToColumn(iWrapCol);
 			EndWaitCursor();
 		}
 	}
@@ -3146,13 +3146,13 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		BeginWaitCursor();
 		SciCall_TargetFromSelection();
 		SciCall_LinesJoin();
-		EditJoinLinesEx(hwndEdit);
+		EditJoinLinesEx();
 		EndWaitCursor();
 		break;
 
 	case IDM_EDIT_JOINLINESEX:
 		BeginWaitCursor();
-		EditJoinLinesEx(hwndEdit);
+		EditJoinLinesEx();
 		EndWaitCursor();
 		break;
 
