@@ -259,12 +259,17 @@ typedef struct EditAutoCompletionConfig {
 	WCHAR wszAutoCompleteFillUp[MAX_AUTO_COMPLETION_FILLUP_LENGTH];
 } EditAutoCompletionConfig;
 
+enum {
+	AutoCompleteCondition_Normal = 0,
+	AutoCompleteCondition_OnCharAdded = 1,
+	AutoCompleteCondition_OnCharDeleted = 2,
+};
 
 // in EditAutoC.c
 void	EditCompleteUpdateConfig(void);
 BOOL	IsDocWordChar(int ch);
 BOOL	IsAutoCompletionWordCharacter(int ch);
-void	EditCompleteWord(BOOL autoInsert);
+void	EditCompleteWord(int iCondition, BOOL autoInsert);
 void	EditAutoCloseBraceQuote(int ch);
 void	EditAutoCloseXMLTag(void);
 void	EditAutoIndent(void);

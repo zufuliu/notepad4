@@ -1065,13 +1065,11 @@ void EditCompleteUpdateConfig(void) {
 	autoCompletionConfig.wszAutoCompleteFillUp[k] = L'\0';
 }
 
-void EditCompleteWord(BOOL autoInsert) {
+static BOOL EditCompleteWordCore(int iCondition, BOOL autoInsert) {
 	const Sci_Position iCurrentPos = SciCall_GetCurrentPos();
 	const int iCurrentStyle = SciCall_GetStyleAt(iCurrentPos);
 	const Sci_Line iLine = SciCall_LineFromPosition(iCurrentPos);
 	const Sci_Position iLineStartPos = SciCall_PositionFromLine(iLine);
-
-	autoCompletionConfig.iPreviousItemCount = 0; // recreate list
 
 	// word before current position
 	Sci_Position iStartWordPos = iCurrentPos;
@@ -1101,7 +1099,7 @@ void EditCompleteWord(BOOL autoInsert) {
 		}
 	} while (iStartWordPos > iLineStartPos);
 	if (iStartWordPos == iCurrentPos) {
-		return;
+		return FALSE;
 	}
 
 	// beginning of word
@@ -1130,7 +1128,7 @@ void EditCompleteWord(BOOL autoInsert) {
 	int iRootLen = autoCompletionConfig.iMinWordLength;
 	if (ch >= '0' && ch <= '9') {
 		if (autoCompletionConfig.iMinNumberLength <= 0) { // ignore number
-			return;
+			return FALSE;
 		}
 
 		iRootLen = autoCompletionConfig.iMinNumberLength;
@@ -1144,7 +1142,7 @@ void EditCompleteWord(BOOL autoInsert) {
 	}
 
 	if (iCurrentPos - iStartWordPos < iRootLen) {
-		return;
+		return FALSE;
 	}
 
 	// preprocessor like: # space preprocessor
@@ -1259,15 +1257,20 @@ void EditCompleteWord(BOOL autoInsert) {
 #if 0
 	StopWatch_Stop(watch);
 	const double elapsed = StopWatch_Get(&watch);
-	sprintf(pRoot, "Notepad2 AddDocWord(%d, %d): %.6f\n", pWList->nWordCount, pWList->nTotalLen, elapsed);
-	OutputDebugStringA(pRoot);
+	DebugPrintf("Notepad2 AddDocWord(%d, %d): %.6f\n", pWList->nWordCount, pWList->nTotalLen, elapsed);
 #endif
 
-	autoCompletionConfig.iPreviousItemCount = pWList->nWordCount;
-	if (pWList->nWordCount > 0 && !(pWList->nWordCount == 1 && pWList->iMaxLength == iRootLen)) {
+	const BOOL bShow = pWList->nWordCount > 0 && !(pWList->nWordCount == 1 && pWList->iMaxLength == iRootLen);
+	const BOOL bUpdated = (autoCompletionConfig.iPreviousItemCount == 0)
+		// deleted some words. leave some words that no longer matches current input at the top.
+		|| (iCondition == AutoCompleteCondition_OnCharAdded && autoCompletionConfig.iPreviousItemCount - pWList->nWordCount > autoCompletionConfig.iVisibleItemCount)
+		// added some words. TODO: check top matched items before updating, if top items not changed, delay the update.
+		|| (iCondition == AutoCompleteCondition_OnCharDeleted && autoCompletionConfig.iPreviousItemCount < pWList->nWordCount);
+
+	if (bShow && bUpdated) {
+		autoCompletionConfig.iPreviousItemCount = pWList->nWordCount;
 		char *pList = NULL;
 		WordList_GetList(pWList, &pList);
-		//DLog(pList);
 		SciCall_AutoCSetOrder(SC_ORDER_PRESORTED); // pre-sorted
 		SciCall_AutoCSetIgnoreCase(bIgnoreCase); // case sensitivity
 		//if (bIgnoreCase) {
@@ -1277,7 +1280,8 @@ void EditCompleteWord(BOOL autoInsert) {
 		SciCall_AutoCSetFillUps(autoCompletionConfig.szAutoCompleteFillUp);
 		//SciCall_AutoCSetDropRestOfWord(TRUE); // delete orginal text: pRoot
 		SciCall_AutoCSetMaxWidth(pWList->iMaxLength << 1); // width columns, default auto
-		SciCall_AutoCSetMaxHeight(min_i(pWList->nWordCount, autoCompletionConfig.iVisibleItemCount)); // height rows, default 5
+		SciCall_AutoCSetMaxHeight(min_i(pWList->nWordCount, autoCompletionConfig.iVisibleItemCount)); // visible rows
+		SciCall_AutoCSetCancelAtStart(FALSE); // don't cancel the list when deleting character
 		SciCall_AutoCSetChooseSingle(autoInsert);
 		SciCall_AutoCShow(pWList->iStartLen, pList);
 		NP2HeapFree(pList);
@@ -1288,6 +1292,28 @@ void EditCompleteWord(BOOL autoInsert) {
 	}
 	WordList_Free(pWList);
 	NP2HeapFree(pWList);
+	return bShow;
+}
+
+void EditCompleteWord(int iCondition, BOOL autoInsert) {
+	if (iCondition == AutoCompleteCondition_OnCharAdded) {
+		if (autoCompletionConfig.iPreviousItemCount <= 2*autoCompletionConfig.iVisibleItemCount) {
+			return;
+		}
+		// too many words in auto-completion list, recreate it.
+	}
+
+	if (iCondition == AutoCompleteCondition_Normal) {
+		autoCompletionConfig.iPreviousItemCount = 0; // recreate list
+	}
+
+	BOOL bShow = EditCompleteWordCore(iCondition, autoInsert);
+	if (!bShow) {
+		autoCompletionConfig.iPreviousItemCount = 0;
+		if (iCondition != AutoCompleteCondition_Normal) {
+			SciCall_AutoCCancel();
+		}
+	}
 }
 
 static BOOL CanAutoCloseSingleQuote(int chPrev, int iCurrentStyle) {
@@ -1500,7 +1526,7 @@ void EditAutoCloseXMLTag(void) {
 	if (!autoClosed && autoCompletionConfig.bCompleteWord) {
 		const Sci_Position iPos = SciCall_GetCurrentPos();
 		if (SciCall_GetCharAt(iPos - 2) == '-') {
-			EditCompleteWord(FALSE); // obj->field, obj->method
+			EditCompleteWord(AutoCompleteCondition_Normal, FALSE); // obj->field, obj->method
 		}
 	}
 }

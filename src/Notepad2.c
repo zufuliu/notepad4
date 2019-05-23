@@ -3702,7 +3702,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	break;
 
 	case IDM_EDIT_COMPLETEWORD:
-		EditCompleteWord(TRUE);
+		EditCompleteWord(AutoCompleteCondition_Normal, TRUE);
 		break;
 
 	case IDM_EDIT_REPLACE:
@@ -3834,7 +3834,6 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case IDM_VIEW_AUTOCOMPLETION_SETTINGS:
 		if (AutoCompletionSettingsDlg(hwnd)) {
 			if (!autoCompletionConfig.bCompleteWord) {
-				// close the autocompletion list
 				SciCall_AutoCCancel();
 			}
 		}
@@ -3842,6 +3841,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	case IDM_VIEW_AUTOCOMPLETION_IGNORECASE:
 		autoCompletionConfig.bIgnoreCase = !autoCompletionConfig.bIgnoreCase;
+		SciCall_AutoCCancel();
 		break;
 
 	case IDM_VIEW_MARKOCCURRENCES_OFF:
@@ -4208,7 +4208,6 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	case CMD_ESCAPE:
 		if (SciCall_AutoCActive()) {
-			//close the AutoComplete box
 			SciCall_AutoCCancel();
 		} else if (SciCall_CallTipActive()) {
 			SciCall_CallTipCancel();
@@ -4839,14 +4838,9 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			) {
 				return 0;
 			}
-			if (SciCall_AutoCActive()) {
-				// many items in auto-completion list (> autoCompletionConfig.iVisibleItemCount), recreate it
-				if (autoCompletionConfig.iPreviousItemCount < autoCompletionConfig.iVisibleItemCount) {
-					return 0;
-				}
-				SciCall_AutoCCancel();
-			}
-			EditCompleteWord(FALSE);
+
+			const int iCondition = SciCall_AutoCActive() ? AutoCompleteCondition_OnCharAdded : AutoCompleteCondition_Normal;
+			EditCompleteWord(iCondition, FALSE);
 		}
 		break;
 
@@ -4872,7 +4866,12 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 		case SCN_AUTOCCHARDELETED:
-			EditCompleteWord(FALSE);
+			EditCompleteWord(AutoCompleteCondition_OnCharDeleted, FALSE);
+			break;
+
+		case SCN_AUTOCCOMPLETED:
+		case SCN_AUTOCCANCELLED:
+			autoCompletionConfig.iPreviousItemCount = 0;
 			break;
 
 #if NP2_ENABLE_SHOW_CALLTIPS
@@ -4883,6 +4882,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			break;
 
 		case SCN_DWELLEND:
+			// if calltip source changed
 			SciCall_CallTipCancel();
 			break;
 #endif

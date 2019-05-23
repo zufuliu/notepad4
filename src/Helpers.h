@@ -161,13 +161,8 @@ NP2_inline double StopWatch_Get(const StopWatch *watch) {
 void StopWatch_Show(const StopWatch *watch, LPCWSTR msg);
 void StopWatch_ShowLog(const StopWatch *watch, LPCSTR msg);
 
-#ifdef NDEBUG
-#define DLog(msg)
-#define DLogf(fmt, ...)
-#else
-#define DLog(msg)	OutputDebugStringA(msg)
-void DLogf(const char *fmt, ...);
-#endif
+#define DebugPrint(msg)	OutputDebugStringA(msg)
+void DebugPrintf(const char *fmt, ...);
 
 extern HINSTANCE g_hInstance;
 extern HANDLE g_hDefaultHeap;
