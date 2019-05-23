@@ -134,15 +134,15 @@ void	EditShowHex(HWND hwnd);
 void	EditConvertNumRadix(HWND hwnd, int radix);
 void	EditModifyNumber(HWND hwnd, BOOL bIncrease);
 
-void	EditTabsToSpaces(HWND hwnd, int nTabWidth, BOOL bOnlyIndentingWS);
-void	EditSpacesToTabs(HWND hwnd, int nTabWidth, BOOL bOnlyIndentingWS);
+void	EditTabsToSpaces(int nTabWidth, BOOL bOnlyIndentingWS);
+void	EditSpacesToTabs(int nTabWidth, BOOL bOnlyIndentingWS);
 
-void	EditMoveUp(HWND hwnd);
-void	EditMoveDown(HWND hwnd);
+void	EditMoveUp(void);
+void	EditMoveDown(void);
 void	EditModifyLines(HWND hwnd, LPCWSTR pwszPrefix, LPCWSTR pwszAppend);
 void	EditAlignText(HWND hwnd, int nMode);
-void	EditEncloseSelection(HWND hwnd, LPCWSTR pwszOpen, LPCWSTR pwszClose);
-void	EditToggleLineComments(HWND hwnd, LPCWSTR pwszComment, BOOL bInsertAtStart);
+void	EditEncloseSelection(LPCWSTR pwszOpen, LPCWSTR pwszClose);
+void	EditToggleLineComments(LPCWSTR pwszComment, BOOL bInsertAtStart);
 void	EditPadWithSpaces(HWND hwnd, BOOL bSkipEmpty, BOOL bNoUndoGroup);
 void	EditStripFirstCharacter(void);
 void	EditStripLastCharacter(void);
@@ -273,8 +273,8 @@ void	EditCompleteWord(int iCondition, BOOL autoInsert);
 void	EditAutoCloseBraceQuote(int ch);
 void	EditAutoCloseXMLTag(void);
 void	EditAutoIndent(void);
-void	EditToggleCommentLine(HWND hwnd);
-void	EditToggleCommentBlock(HWND hwnd);
+void	EditToggleCommentLine(void);
+void	EditToggleCommentBlock(void);
 void	EditInsertScriptShebangLine(void);
 void	EditShowCallTips(Sci_Position position);
 

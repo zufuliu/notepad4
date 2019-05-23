@@ -709,11 +709,10 @@ static inline BOOL NeedSpaceAfterKeyword(const char *word, Sci_Position length) 
 #define HTML_TEXT_BLOCK_PHP		5
 #define HTML_TEXT_BLOCK_CSS		6
 
-static int GetCurrentHtmlTextBlock(HWND hwnd) {
-	UNREFERENCED_PARAMETER(hwnd);
-
+static int GetCurrentHtmlTextBlock(void) {
 	const Sci_Position iCurrentPos = SciCall_GetCurrentPos();
 	const int iCurrentStyle = SciCall_GetStyleAt(iCurrentPos);
+
 	if (iCurrentStyle == SCE_H_CDATA) {
 		return HTML_TEXT_BLOCK_CDATA;
 	}
@@ -1885,7 +1884,7 @@ void EditAutoIndent(void) {
 	}
 }
 
-void EditToggleCommentLine(HWND hwnd) {
+void EditToggleCommentLine(void) {
 	switch (pLexCurrent->iLexer) {
 	case SCLEX_ASM: {
 		LPCWSTR ch;
@@ -1904,7 +1903,7 @@ void EditToggleCommentLine(HWND hwnd) {
 			ch = L"@ ";
 			break;
 		}
-		EditToggleLineComments(hwnd, ch, FALSE);
+		EditToggleLineComments(ch, FALSE);
 	} break;
 
 	case SCLEX_AU3:
@@ -1912,15 +1911,15 @@ void EditToggleCommentLine(HWND hwnd) {
 	case SCLEX_LISP:
 	case SCLEX_LLVM:
 	case SCLEX_PROPERTIES:
-		EditToggleLineComments(hwnd, L";", FALSE);
+		EditToggleLineComments(L";", FALSE);
 		break;
 
 	case SCLEX_BASH:
-		EditToggleLineComments(hwnd, ((np2LexLangIndex == IDM_LANG_M4)? L"dnl " : L"#"), FALSE);
+		EditToggleLineComments(((np2LexLangIndex == IDM_LANG_M4)? L"dnl " : L"#"), FALSE);
 		break;
 
 	case SCLEX_BATCH:
-		EditToggleLineComments(hwnd, L"@rem ", TRUE);
+		EditToggleLineComments(L"@rem ", TRUE);
 		break;
 
 	case SCLEX_CIL:
@@ -1930,7 +1929,7 @@ void EditToggleCommentLine(HWND hwnd) {
 	case SCLEX_JSON:
 	case SCLEX_PASCAL:
 	case SCLEX_VERILOG:
-		EditToggleLineComments(hwnd, L"//", FALSE);
+		EditToggleLineComments(L"//", FALSE);
 		break;
 
 	case SCLEX_CMAKE:
@@ -1938,53 +1937,53 @@ void EditToggleCommentLine(HWND hwnd) {
 	case SCLEX_PERL:
 	case SCLEX_POWERSHELL:
 	case SCLEX_TCL:
-		EditToggleLineComments(hwnd, L"#", FALSE);
+		EditToggleLineComments(L"#", FALSE);
 		break;
 
 	case SCLEX_CPP:
 		switch (pLexCurrent->rid) {
 		case NP2LEX_AWK:
 		case NP2LEX_JAM:
-			EditToggleLineComments(hwnd, L"#", FALSE);
+			EditToggleLineComments(L"#", FALSE);
 			break;
 		default:
-			EditToggleLineComments(hwnd, L"//", FALSE);
+			EditToggleLineComments(L"//", FALSE);
 			break;
 		}
 		break;
 
 	case SCLEX_FORTRAN:
-		EditToggleLineComments(hwnd, L"!", FALSE);
+		EditToggleLineComments(L"!", FALSE);
 		break;
 
 	case SCLEX_HTML:
 	case SCLEX_XML: {
-		const int block = GetCurrentHtmlTextBlock(hwnd);
+		const int block = GetCurrentHtmlTextBlock();
 		switch (block) {
 		case HTML_TEXT_BLOCK_VBS:
-			EditToggleLineComments(hwnd, L"'", FALSE);
+			EditToggleLineComments(L"'", FALSE);
 			break;
 
 		case HTML_TEXT_BLOCK_PYTHON:
-			EditToggleLineComments(hwnd, L"#", FALSE);
+			EditToggleLineComments(L"#", FALSE);
 			break;
 
 		case HTML_TEXT_BLOCK_CDATA:
 		case HTML_TEXT_BLOCK_JS:
 		case HTML_TEXT_BLOCK_PHP:
 		case HTML_TEXT_BLOCK_CSS:
-			EditToggleLineComments(hwnd, L"//", FALSE);
+			EditToggleLineComments(L"//", FALSE);
 			break;
 		}
 	} break;
 
 	case SCLEX_LATEX:
-		EditToggleLineComments(hwnd, L"%", FALSE);
+		EditToggleLineComments(L"%", FALSE);
 		break;
 
 	case SCLEX_LUA:
 	case SCLEX_VHDL:
-		EditToggleLineComments(hwnd, L"--", FALSE);
+		EditToggleLineComments(L"--", FALSE);
 		break;
 
 	case SCLEX_MAKEFILE:
@@ -1992,39 +1991,39 @@ void EditToggleCommentLine(HWND hwnd) {
 	case SCLEX_PYTHON:
 	case SCLEX_RUBY:
 	case SCLEX_SMALI:
-		EditToggleLineComments(hwnd, L"#", FALSE);
+		EditToggleLineComments(L"#", FALSE);
 		break;
 
 	case SCLEX_MATLAB:
 		if (pLexCurrent->rid == NP2LEX_JULIA) {
-			EditToggleLineComments(hwnd, L"#", FALSE);
+			EditToggleLineComments(L"#", FALSE);
 		} else if (pLexCurrent->rid == NP2LEX_SCILAB || np2LexLangIndex == IDM_LANG_SCILAB) {
-			EditToggleLineComments(hwnd, L"//", FALSE);
+			EditToggleLineComments(L"//", FALSE);
 		} else {
-			EditToggleLineComments(hwnd, L"%", FALSE);
+			EditToggleLineComments(L"%", FALSE);
 		}
 		break;
 
 	case SCLEX_SQL:
-		EditToggleLineComments(hwnd, L"-- ", FALSE); // extra space
+		EditToggleLineComments(L"-- ", FALSE); // extra space
 		break;
 
 	case SCLEX_TEXINFO:
-		EditToggleLineComments(hwnd, L"@c ", FALSE);
+		EditToggleLineComments(L"@c ", FALSE);
 		break;
 
 	case SCLEX_VB:
 	case SCLEX_VBSCRIPT:
-		EditToggleLineComments(hwnd, L"'", FALSE);
+		EditToggleLineComments(L"'", FALSE);
 		break;
 
 	case SCLEX_VIM:
-		EditToggleLineComments(hwnd, L"\"", FALSE);
+		EditToggleLineComments(L"\"", FALSE);
 		break;
 	}
 }
 
-void EditEncloseSelectionNewLine(HWND hwnd, LPCWSTR pwszOpen, LPCWSTR pwszClose) {
+void EditEncloseSelectionNewLine(LPCWSTR pwszOpen, LPCWSTR pwszClose) {
 	WCHAR start[64] = L"";
 	WCHAR end[64] = L"";
 	const int iEOLMode = SciCall_GetEOLMode();
@@ -2045,10 +2044,10 @@ void EditEncloseSelectionNewLine(HWND hwnd, LPCWSTR pwszOpen, LPCWSTR pwszClose)
 	}
 	lstrcat(end, pwszClose);
 	lstrcat(end, lineEnd);
-	EditEncloseSelection(hwnd, start, end);
+	EditEncloseSelection(start, end);
 }
 
-void EditToggleCommentBlock(HWND hwnd) {
+void EditToggleCommentBlock(void) {
 	switch (pLexCurrent->iLexer) {
 	case SCLEX_ASM:
 	case SCLEX_CIL:
@@ -2059,15 +2058,15 @@ void EditToggleCommentBlock(HWND hwnd) {
 	case SCLEX_SQL:
 	case SCLEX_VERILOG:
 	case SCLEX_VHDL:
-		EditEncloseSelection(hwnd, L"/*", L"*/");
+		EditEncloseSelection(L"/*", L"*/");
 		break;
 
 	case SCLEX_AU3:
-		EditEncloseSelectionNewLine(hwnd, L"#cs", L"#ce");
+		EditEncloseSelectionNewLine(L"#cs", L"#ce");
 		break;
 
 	case SCLEX_CMAKE:
-		EditEncloseSelection(hwnd, L"#[[", L"]]");
+		EditEncloseSelection(L"#[[", L"]]");
 		break;
 
 	case SCLEX_CPP:
@@ -2077,25 +2076,25 @@ void EditToggleCommentBlock(HWND hwnd) {
 			break;
 
 		default:
-			EditEncloseSelection(hwnd, L"/*", L"*/");
+			EditEncloseSelection(L"/*", L"*/");
 			break;
 		}
 		break;
 
 	case SCLEX_FORTRAN:
-		EditEncloseSelectionNewLine(hwnd, L"#if 0", L"#endif");
+		EditEncloseSelectionNewLine(L"#if 0", L"#endif");
 		break;
 
 	case SCLEX_FSHARP:
-		EditEncloseSelection(hwnd, L"(*", L"*)");
+		EditEncloseSelection(L"(*", L"*)");
 		break;
 
 	case SCLEX_HTML:
 	case SCLEX_XML: {
-		const int block = GetCurrentHtmlTextBlock(hwnd);
+		const int block = GetCurrentHtmlTextBlock();
 		switch (block) {
 		case HTML_TEXT_BLOCK_TAG:
-			EditEncloseSelection(hwnd, L"<!--", L"-->");
+			EditEncloseSelection(L"<!--", L"-->");
 			break;
 
 		case HTML_TEXT_BLOCK_VBS:
@@ -2106,44 +2105,44 @@ void EditToggleCommentBlock(HWND hwnd) {
 		case HTML_TEXT_BLOCK_JS:
 		case HTML_TEXT_BLOCK_PHP:
 		case HTML_TEXT_BLOCK_CSS:
-			EditEncloseSelection(hwnd, L"/*", L"*/");
+			EditEncloseSelection(L"/*", L"*/");
 			break;
 		}
 	} break;
 
 	case SCLEX_INNOSETUP:
 	case SCLEX_PASCAL:
-		EditEncloseSelection(hwnd, L"{", L"}");
+		EditEncloseSelection(L"{", L"}");
 		break;
 
 	case SCLEX_LATEX:
-		EditEncloseSelectionNewLine(hwnd, L"\\begin{comment}", L"\\end{comment}");
+		EditEncloseSelectionNewLine(L"\\begin{comment}", L"\\end{comment}");
 		break;
 
 	case SCLEX_LISP:
-		EditEncloseSelection(hwnd, L"#|", L"|#");
+		EditEncloseSelection(L"#|", L"|#");
 		break;
 
 	case SCLEX_LUA:
-		EditEncloseSelection(hwnd, L"--[[", L"--]]");
+		EditEncloseSelection(L"--[[", L"--]]");
 		break;
 
 	case SCLEX_MATLAB:
 		if (pLexCurrent->rid == NP2LEX_JULIA) {
-			EditEncloseSelectionNewLine(hwnd, L"#=", L"=#");
+			EditEncloseSelectionNewLine(L"#=", L"=#");
 		} else if (pLexCurrent->rid == NP2LEX_SCILAB || np2LexLangIndex == IDM_LANG_SCILAB) {
-			EditEncloseSelection(hwnd, L"/*", L"*/");
+			EditEncloseSelection(L"/*", L"*/");
 		} else {
-			EditEncloseSelectionNewLine(hwnd, L"%{", L"%}");
+			EditEncloseSelectionNewLine(L"%{", L"%}");
 		}
 		break;
 
 	case SCLEX_POWERSHELL:
-		EditEncloseSelection(hwnd, L"<#", L"#>");
+		EditEncloseSelection(L"<#", L"#>");
 		break;
 
 	case SCLEX_TCL:
-		EditEncloseSelectionNewLine(hwnd, L"if (0) {", L"}");
+		EditEncloseSelectionNewLine(L"if (0) {", L"}");
 		break;
 	}
 }

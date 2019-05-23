@@ -2970,11 +2970,11 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	case IDM_EDIT_MOVELINEUP:
-		EditMoveUp(hwndEdit);
+		EditMoveUp();
 		break;
 
 	case IDM_EDIT_MOVELINEDOWN:
-		EditMoveDown(hwndEdit);
+		EditMoveDown();
 		break;
 
 	case IDM_EDIT_LINETRANSPOSE:
@@ -3188,25 +3188,25 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	case IDM_EDIT_CONVERTTABS:
 		BeginWaitCursor();
-		EditTabsToSpaces(hwndEdit, iTabWidth, FALSE);
+		EditTabsToSpaces(iTabWidth, FALSE);
 		EndWaitCursor();
 		break;
 
 	case IDM_EDIT_CONVERTSPACES:
 		BeginWaitCursor();
-		EditSpacesToTabs(hwndEdit, iTabWidth, FALSE);
+		EditSpacesToTabs(iTabWidth, FALSE);
 		EndWaitCursor();
 		break;
 
 	case IDM_EDIT_CONVERTTABS2:
 		BeginWaitCursor();
-		EditTabsToSpaces(hwndEdit, iTabWidth, TRUE);
+		EditTabsToSpaces(iTabWidth, TRUE);
 		EndWaitCursor();
 		break;
 
 	case IDM_EDIT_CONVERTSPACES2:
 		BeginWaitCursor();
-		EditSpacesToTabs(hwndEdit, iTabWidth, TRUE);
+		EditSpacesToTabs(iTabWidth, TRUE);
 		EndWaitCursor();
 		break;
 
@@ -3422,11 +3422,11 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	break;
 
 	case IDM_EDIT_LINECOMMENT:
-		EditToggleCommentLine(hwndEdit);
+		EditToggleCommentLine();
 		break;
 
 	case IDM_EDIT_STREAMCOMMENT:
-		EditToggleCommentBlock(hwndEdit);
+		EditToggleCommentBlock();
 		break;
 
 	case IDM_EDIT_URLENCODE:
@@ -4529,31 +4529,31 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	case CMD_EMBRACKETR:	// Ctrl+4
-		EditEncloseSelection(hwndEdit, L"(", L")");
+		EditEncloseSelection(L"(", L")");
 		break;
 	case CMD_EMBRACKETC:	// Ctrl+5
-		EditEncloseSelection(hwndEdit, L"{", L"}");
+		EditEncloseSelection(L"{", L"}");
 		break;
 	case CMD_EMBRACKETA:	// Ctrl+6
-		EditEncloseSelection(hwndEdit, L"<", L">");
+		EditEncloseSelection(L"<", L">");
 		break;
 	case CMD_EMBRACKETS:	// Ctrl+7
-		EditEncloseSelection(hwndEdit, L"[", L"]");
+		EditEncloseSelection(L"[", L"]");
 		break;
 	case CMD_STRINGIFYS:	// Ctrl+1
-		EditEncloseSelection(hwndEdit, L"'", L"'");
+		EditEncloseSelection(L"'", L"'");
 		break;
 	case CMD_STRINGIFYD:	// Ctrl+2
-		EditEncloseSelection(hwndEdit, L"\"", L"\"");
+		EditEncloseSelection(L"\"", L"\"");
 		break;
 	case CMD_STRINGIFYT2:	// Ctrl+3
-		EditEncloseSelection(hwndEdit, L"\"\"\"", L"\"\"\"");
+		EditEncloseSelection(L"\"\"\"", L"\"\"\"");
 		break;
 	case CMD_STRINGIFYT1:	// Ctrl+9
-		EditEncloseSelection(hwndEdit, L"'''", L"'''");
+		EditEncloseSelection(L"'''", L"'''");
 		break;
 	case CMD_STRINGIFYB:	// Ctrl+8
-		EditEncloseSelection(hwndEdit, L"`", L"`");
+		EditEncloseSelection(L"`", L"`");
 		break;
 
 	case CMD_INCREASENUM:	// Ctrl++
