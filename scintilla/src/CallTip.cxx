@@ -36,6 +36,7 @@ CallTip::CallTip() noexcept {
 	rectDown = PRectangle(0, 0, 0, 0);
 	lineHeight = 1;
 	offsetMain = 0;
+	offsetText = 0;
 	startHighlight = 0;
 	endHighlight = 0;
 	tabSize = 0;
@@ -46,6 +47,8 @@ CallTip::CallTip() noexcept {
 	widthArrow = 14;
 	borderHeight = 2; // Extra line for border and an empty line at top and bottom.
 	verticalOffset = 1;
+	innerMarginX = 2;
+	innerMarginY = 2;
 
 #ifdef __APPLE__
 	// proper apple colours for the default
@@ -79,9 +82,9 @@ bool CallTip::IsTabCharacter(char ch) const noexcept{
 
 int CallTip::NextTabPos(int x) const noexcept {
 	if (tabSize > 0) {              // paranoia... not called unless this is true
-		x -= insetX;                // position relative to text
+		x -= offsetText;                // position relative to text
 		x = (x + tabSize) / tabSize;  // tab "number"
-		return tabSize * x + insetX;  // position of next tab
+		return tabSize * x + offsetText;  // position of next tab
 	} else {
 		return x + 1;                 // arbitrary
 	}
@@ -173,7 +176,7 @@ int CallTip::PaintContents(Surface *surfaceWindow, bool draw) {
 	const PRectangle rcClientPos = wCallTip.GetClientPosition();
 	const PRectangle rcClientSize(0.0f, 0.0f, rcClientPos.right - rcClientPos.left,
 		rcClientPos.bottom - rcClientPos.top);
-	PRectangle rcClient(1.0f, 1.0f, rcClientSize.right - 1, rcClientSize.bottom - 1);
+	PRectangle rcClient(1.0f + innerMarginX, 1.0f + innerMarginY, rcClientSize.right - 1 - innerMarginX, rcClientSize.bottom - 1 - innerMarginY);
 
 	// To make a nice small call tip window, it is only sized to fit most normal characters without accents
 	const int ascent = static_cast<int>(std::lround(surfaceWindow->Ascent(font) - surfaceWindow->InternalLeading(font)));
@@ -203,7 +206,7 @@ int CallTip::PaintContents(Surface *surfaceWindow, bool draw) {
 		thisEndHighlight -= chunkOffset;
 		rcClient.top = static_cast<XYPOSITION>(ytext - ascent - 1);
 
-		int x = insetX;     // start each line at this inset
+		int x = offsetText;     // start each line at this inset
 
 		DrawChunk(surfaceWindow, x, chunkVal, 0, thisStartHighlight,
 			ytext, rcClient, false, draw);
@@ -231,6 +234,7 @@ void CallTip::PaintCT(Surface *surfaceWindow) {
 	surfaceWindow->FillRectangle(rcClient, colourBG);
 
 	offsetMain = insetX;    // initial alignment assuming no arrows
+	offsetText = insetX + innerMarginX;
 	PaintContents(surfaceWindow, true);
 
 #ifndef __APPLE__
@@ -282,13 +286,14 @@ PRectangle CallTip::CallTipStart(Sci::Position pos, Point pt, int textHeight, co
 	rectUp = PRectangle(0, 0, 0, 0);
 	rectDown = PRectangle(0, 0, 0, 0);
 	offsetMain = insetX;            // changed to right edge of any arrows
-	const int width = PaintContents(surfaceMeasure.get(), false) + insetX;
+	offsetText = insetX + innerMarginX;
+	const int width = PaintContents(surfaceMeasure.get(), false) + insetX + innerMarginX;
 	lineHeight = static_cast<int>(std::lround(surfaceMeasure->Height(font)));
 
 	// The returned
 	// rectangle is aligned to the right edge of the last arrow encountered in
 	// the tip text, else to the tip text left edge.
-	const int height = lineHeight * numLines - static_cast<int>(surfaceMeasure->InternalLeading(font)) + borderHeight * 2;
+	const int height = lineHeight * numLines - static_cast<int>(surfaceMeasure->InternalLeading(font)) + borderHeight * 2 + innerMarginY*2;
 	if (above) {
 		return PRectangle(pt.x - offsetMain, pt.y - verticalOffset - height, pt.x + width - offsetMain, pt.y - verticalOffset);
 	} else {
