@@ -21,6 +21,7 @@ class CallTip {
 	PRectangle rectDown;    // rectangle of last down arrow in the tip
 	int lineHeight;         // vertical line spacing
 	int offsetMain;         // The alignment point of the call tip
+	int offsetText;
 	int tabSize;            // Tab size in pixels, <=0 no TAB expand
 	bool useStyleCallTip;   // if true, STYLE_CALLTIP should be used
 	bool above;		// if true, display calltip above text
@@ -49,6 +50,8 @@ public:
 	int widthArrow;
 	int borderHeight;
 	int verticalOffset; // pixel offset up or down of the calltip with respect to the line
+	int innerMarginX;
+	int innerMarginY;
 
 	CallTip() noexcept;
 	// Deleted so CallTip objects can not be copied.
