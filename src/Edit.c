@@ -3724,8 +3724,8 @@ void EditSortLines(int iSortFlags) {
 			pLines[i].pwszSortEntry = pLines[i].pwszLine;
 
 			if (iSortFlags & SORT_COLUMN) {
-				UINT col = 0;
-				UINT tabs = iTabWidth;
+				Sci_Position col = 0;
+				Sci_Position tabs = iTabWidth;
 				while (*(pLines[i].pwszSortEntry)) {
 					if (*(pLines[i].pwszSortEntry) == L'\t') {
 						if (col + tabs <= iSortColumn) {
@@ -3893,7 +3893,7 @@ void EditJumpTo(Sci_Line iNewLine, Sci_Position iNewCol) {
 		}
 
 		iNewPos = min_pos(iNewPos, iLineEndPos);
-		EditSelectEx(-1, iNewPos); // SCI_GOTOPOS(pos) is equivalent to SCI_SETSEL(-1, pos)
+		EditSelectEx(-1, iNewPos); // SciCall_GotoPos(pos) is equivalent to SciCall_SetSel(-1, pos)
 		SciCall_ChooseCaretX();
 	}
 }
@@ -3907,7 +3907,7 @@ void EditSelectEx(Sci_Position iAnchorPos, Sci_Position iCurrentPos) {
 	const Sci_Line iAnchorLine = SciCall_LineFromPosition(iAnchorPos);
 
 	// Ensure that the first and last lines of a selection are always unfolded
-	// This needs to be done *before* the SCI_SETSEL message
+	// This needs to be done *before* the SciCall_SetSel() message
 	SciCall_EnsureVisible(iAnchorLine);
 	if (iAnchorLine != iNewLine) {
 		SciCall_EnsureVisible(iNewLine);
@@ -4104,7 +4104,7 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 
 				// First time you bring up find/replace dialog, copy content from clipboard to find box (but only if nothing is selected in the editor)
 				if (StrIsEmptyA(lpszSelection) && bFirstTime) {
-					char *pClip = EditGetClipboardText(hwndEdit);
+					char *pClip = EditGetClipboardText(lpefr->hwnd);
 					const int len = lstrlenA(pClip);
 					if (len > 0 && len <= NP2_FIND_REPLACE_LIMIT) {
 						NP2HeapFree(lpszSelection);

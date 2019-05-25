@@ -54,7 +54,7 @@
 HWND	hwndStatus;
 static HWND hwndToolbar;
 static HWND hwndReBar;
-HWND	hwndEdit;
+static HWND hwndEdit;
 static HWND hwndEditFrame;
 HWND	hwndMain;
 static HWND hwndNextCBChain = NULL;
@@ -1692,6 +1692,7 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	// Setup edit control
 	hwndEdit = EditCreate(hwnd);
+	efrData.hwnd = hwndEdit;
 
 	hwndEditFrame = CreateWindowEx(
 						WS_EX_CLIENTEDGE,
