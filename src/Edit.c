@@ -87,6 +87,11 @@ void Edit_ReleaseResources(void) {
 	}
 }
 
+static inline void NotifyRectangleSelection(void) {
+	//MsgBox(MBWARN, IDS_SELRECT);
+	ShowNotificationMessage(SC_NOTIFICATIONPOSITION_CENTER, IDS_SELRECT);
+}
+
 //=============================================================================
 //
 // EditSetNewText()
@@ -248,7 +253,7 @@ BOOL EditCopyAppend(HWND hwnd) {
 	char *pszText;
 	if (!SciCall_IsSelectionEmpty()) {
 		if (SciCall_IsRectangleSelection()) {
-			MsgBox(MBWARN, IDS_SELRECT);
+			NotifyRectangleSelection();
 			return FALSE;
 		}
 
@@ -774,7 +779,7 @@ void EditInvertCase(HWND hwnd) {
 		return;
 	}
 	if (SciCall_IsRectangleSelection()) {
-		MsgBox(MBWARN, IDS_SELRECT);
+		NotifyRectangleSelection();
 		return;
 	}
 
@@ -823,7 +828,7 @@ void EditTitleCase(HWND hwnd) {
 		return;
 	}
 	if (SciCall_IsRectangleSelection()) {
-		MsgBox(MBWARN, IDS_SELRECT);
+		NotifyRectangleSelection();
 		return;
 	}
 
@@ -928,7 +933,7 @@ void EditSentenceCase(HWND hwnd) {
 		return;
 	}
 	if (SciCall_IsRectangleSelection()) {
-		MsgBox(MBWARN, IDS_SELRECT);
+		NotifyRectangleSelection();
 		return;
 	}
 
@@ -1023,7 +1028,7 @@ void EditURLEncode(HWND hwnd) {
 		return;
 	}
 	if (SciCall_IsRectangleSelection()) {
-		MsgBox(MBWARN, IDS_SELRECT);
+		NotifyRectangleSelection();
 		return;
 	}
 
@@ -1063,7 +1068,7 @@ void EditURLDecode(HWND hwnd) {
 		return;
 	}
 	if (SciCall_IsRectangleSelection()) {
-		MsgBox(MBWARN, IDS_SELRECT);
+		NotifyRectangleSelection();
 		return;
 	}
 
@@ -1110,7 +1115,7 @@ void EditEscapeCChars(HWND hwnd) {
 		return;
 	}
 	if (SciCall_IsRectangleSelection()) {
-		MsgBox(MBWARN, IDS_SELRECT);
+		NotifyRectangleSelection();
 		return;
 	}
 
@@ -1148,7 +1153,7 @@ void EditUnescapeCChars(HWND hwnd) {
 		return;
 	}
 	if (SciCall_IsRectangleSelection()) {
-		MsgBox(MBWARN, IDS_SELRECT);
+		NotifyRectangleSelection();
 		return;
 	}
 
@@ -1195,7 +1200,7 @@ void EditEscapeXHTMLChars(HWND hwnd) {
 		return;
 	}
 	if (SciCall_IsRectangleSelection()) {
-		MsgBox(MBWARN, IDS_SELRECT);
+		NotifyRectangleSelection();
 		return;
 	}
 
@@ -1251,7 +1256,7 @@ void EditUnescapeXHTMLChars(HWND hwnd) {
 		return;
 	}
 	if (SciCall_IsRectangleSelection()) {
-		MsgBox(MBWARN, IDS_SELRECT);
+		NotifyRectangleSelection();
 		return;
 	}
 
@@ -1317,7 +1322,7 @@ void EditChar2Hex(HWND hwnd) {
 		return;
 	}
 	if (SciCall_IsRectangleSelection()) {
-		MsgBox(MBWARN, IDS_SELRECT);
+		NotifyRectangleSelection();
 		return;
 	}
 
@@ -1364,7 +1369,7 @@ void EditHex2Char(HWND hwnd) {
 		return;
 	}
 	if (SciCall_IsRectangleSelection()) {
-		MsgBox(MBWARN, IDS_SELRECT);
+		NotifyRectangleSelection();
 		return;
 	}
 
@@ -1426,7 +1431,7 @@ void EditShowHex(HWND hwnd) {
 		return;
 	}
 	if (SciCall_IsRectangleSelection()) {
-		MsgBox(MBWARN, IDS_SELRECT);
+		NotifyRectangleSelection();
 		return;
 	}
 
@@ -1536,7 +1541,7 @@ void EditConvertNumRadix(HWND hwnd, int radix) {
 		return;
 	}
 	if (SciCall_IsRectangleSelection()) {
-		MsgBox(MBWARN, IDS_SELRECT);
+		NotifyRectangleSelection();
 		return;
 	}
 
@@ -1660,7 +1665,7 @@ void EditModifyNumber(HWND hwnd, BOOL bIncrease) {
 		return;
 	}
 	if (SciCall_IsRectangleSelection()) {
-		MsgBox(MBWARN, IDS_SELRECT);
+		NotifyRectangleSelection();
 		return;
 	}
 
@@ -1733,7 +1738,7 @@ void EditTabsToSpaces(int nTabWidth, BOOL bOnlyIndentingWS) {
 		return;
 	}
 	if (SciCall_IsRectangleSelection()) {
-		MsgBox(MBWARN, IDS_SELRECT);
+		NotifyRectangleSelection();
 		return;
 	}
 
@@ -1824,7 +1829,7 @@ void EditSpacesToTabs(int nTabWidth, BOOL bOnlyIndentingWS) {
 		return;
 	}
 	if (SciCall_IsRectangleSelection()) {
-		MsgBox(MBWARN, IDS_SELRECT);
+		NotifyRectangleSelection();
 		return;
 	}
 
@@ -1953,7 +1958,7 @@ void EditMoveUp(void) {
 	}
 
 	if (SciCall_IsRectangleSelection()) {
-		MsgBox(MBWARN, IDS_SELRECT);
+		NotifyRectangleSelection();
 		return;
 	}
 
@@ -2046,7 +2051,7 @@ void EditMoveDown(void) {
 	}
 
 	if (SciCall_IsRectangleSelection()) {
-		MsgBox(MBWARN, IDS_SELRECT);
+		NotifyRectangleSelection();
 		return;
 	}
 
@@ -2184,7 +2189,7 @@ static inline void ConvertWinEditLineEndings(char *s, int iEOLMode) {
 //
 void EditModifyLines(HWND hwnd, LPCWSTR pwszPrefix, LPCWSTR pwszAppend) {
 	if (SciCall_IsRectangleSelection()) {
-		MsgBox(MBWARN, IDS_SELRECT);
+		NotifyRectangleSelection();
 		return;
 	}
 	if (StrIsEmpty(pwszPrefix) && StrIsEmpty(pwszAppend)) {
@@ -2463,7 +2468,7 @@ void EditModifyLines(HWND hwnd, LPCWSTR pwszPrefix, LPCWSTR pwszAppend) {
 //
 void EditAlignText(HWND hwnd, int nMode) {
 	if (SciCall_IsRectangleSelection()) {
-		MsgBox(MBWARN, IDS_SELRECT);
+		NotifyRectangleSelection();
 		return;
 	}
 
@@ -2701,7 +2706,7 @@ void EditAlignText(HWND hwnd, int nMode) {
 //
 void EditEncloseSelection(LPCWSTR pwszOpen, LPCWSTR pwszClose) {
 	if (SciCall_IsRectangleSelection()) {
-		MsgBox(MBWARN, IDS_SELRECT);
+		NotifyRectangleSelection();
 		return;
 	}
 	if (StrIsEmpty(pwszOpen) && StrIsEmpty(pwszClose)) {
@@ -2780,7 +2785,7 @@ void EditEncloseSelection(LPCWSTR pwszOpen, LPCWSTR pwszClose) {
 //
 void EditToggleLineComments(LPCWSTR pwszComment, BOOL bInsertAtStart) {
 	if (SciCall_IsRectangleSelection()) {
-		MsgBox(MBWARN, IDS_SELRECT);
+		NotifyRectangleSelection();
 		return;
 	}
 
@@ -3049,7 +3054,7 @@ void EditPadWithSpaces(BOOL bSkipEmpty, BOOL bNoUndoGroup) {
 //
 void EditStripFirstCharacter(void) {
 	if (SciCall_IsRectangleSelection()) {
-		MsgBox(MBWARN, IDS_SELRECT);
+		NotifyRectangleSelection();
 		return;
 	}
 
@@ -3087,7 +3092,7 @@ void EditStripFirstCharacter(void) {
 //
 void EditStripLastCharacter(void) {
 	if (SciCall_IsRectangleSelection()) {
-		MsgBox(MBWARN, IDS_SELRECT);
+		NotifyRectangleSelection();
 		return;
 	}
 
@@ -3213,7 +3218,7 @@ void EditStripLeadingBlanks(HWND hwnd, BOOL bIgnoreSelection) {
 //
 void EditCompressSpaces(void) {
 	if (SciCall_IsRectangleSelection()) {
-		MsgBox(MBWARN, IDS_SELRECT);
+		NotifyRectangleSelection();
 		return;
 	}
 
@@ -3305,7 +3310,7 @@ void EditCompressSpaces(void) {
 //
 void EditRemoveBlankLines(BOOL bMerge) {
 	if (SciCall_IsRectangleSelection()) {
-		MsgBox(MBWARN, IDS_SELRECT);
+		NotifyRectangleSelection();
 		return;
 	}
 
@@ -3369,7 +3374,7 @@ void EditWrapToColumn(int nColumn/*, int nTabWidth*/) {
 		return;
 	}
 	if (SciCall_IsRectangleSelection()) {
-		MsgBox(MBWARN, IDS_SELRECT);
+		NotifyRectangleSelection();
 		return;
 	}
 
@@ -3531,7 +3536,7 @@ void EditJoinLinesEx(void) {
 		return;
 	}
 	if (SciCall_IsRectangleSelection()) {
-		MsgBox(MBWARN, IDS_SELRECT);
+		NotifyRectangleSelection();
 		return;
 	}
 
@@ -4529,14 +4534,17 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 			// Display help messages in the find/replace windows
 			case IDC_BACKSLASHHELP:
 				MsgBox(MBINFO, IDS_BACKSLASHHELP);
+				//ShowNotificationMessage(SC_NOTIFICATIONPOSITION_CENTER, IDS_BACKSLASHHELP);
 				break;
 
 			case IDC_REGEXPHELP:
-				MsgBox(MBINFO, IDS_REGEXPHELP);
+				MsgBox(MBINFO, IDC_REGEXPHELP);
+				//ShowNotificationMessage(SC_NOTIFICATIONPOSITION_CENTER, IDS_REGEXPHELP);
 				break;
 
 			case IDC_WILDCARDHELP:
-				MsgBox(MBINFO, IDS_WILDCARDHELP);
+				MsgBox(MBINFO, IDC_WILDCARDHELP);
+				//ShowNotificationMessage(SC_NOTIFICATIONPOSITION_CENTER, IDS_WILDCARDHELP);
 				break;
 
 			case IDC_CLEAR_FIND:
@@ -5080,7 +5088,7 @@ BOOL EditReplaceAllInSelection(HWND hwnd, LPEDITFINDREPLACE lpefr, BOOL bShowInf
 		return /*EditFindReplaceDlg(hwnd, lpefr, TRUE)*/FALSE;
 	}
 	if (SciCall_IsRectangleSelection()) {
-		MsgBox(MBWARN, IDS_SELRECT);
+		NotifyRectangleSelection();
 		return FALSE;
 	}
 
