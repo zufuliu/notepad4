@@ -47,8 +47,8 @@ CallTip::CallTip() noexcept {
 	widthArrow = 14;
 	borderHeight = 2; // Extra line for border and an empty line at top and bottom.
 	verticalOffset = 1;
-	innerMarginX = 2;
-	innerMarginY = 2;
+	innerMarginX = 12;
+	innerMarginY = 10;
 
 #ifdef __APPLE__
 	// proper apple colours for the default
@@ -246,6 +246,7 @@ void CallTip::PaintCT(Surface *surfaceWindow) {
 	surfaceWindow->LineTo(ircClientSize.right - 1, ircClientSize.bottom - 1);
 	surfaceWindow->LineTo(ircClientSize.right - 1, 0);
 	surfaceWindow->PenColour(colourLight);
+	surfaceWindow->MoveTo(ircClientSize.right - 2, 0);
 	surfaceWindow->LineTo(0, 0);
 	surfaceWindow->LineTo(0, ircClientSize.bottom - 1);
 #endif

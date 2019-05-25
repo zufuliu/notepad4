@@ -2237,8 +2237,9 @@ void EditShowCallTips(Sci_Position position) {
 	const Sci_Position iDocLen = SciCall_GetLineLength(iLine);
 	char *pLine = (char *)NP2HeapAlloc(iDocLen + 1);
 	SciCall_GetLine(iLine, pLine);
+	StrTrimA(pLine, " \t\r\n");
 	char *text = (char *)NP2HeapAlloc(iDocLen + 1 + 128);
-	sprintf(text, "\nShowCallTips(%d, %d, %d)\n\002%s", (int)(iLine + 1), (int)position, (int)iDocLen, pLine);
+	sprintf(text, "ShowCallTips(%d, %d, %d)\n\n\002%s", (int)(iLine + 1), (int)position, (int)iDocLen, pLine);
 	SciCall_CallTipShow(position, text);
 	NP2HeapFree(pLine);
 	NP2HeapFree(text);
