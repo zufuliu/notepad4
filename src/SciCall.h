@@ -114,16 +114,8 @@ NP2_inline int SciCall_GetCharacterAt(Sci_Position position) {
 
 // Searching and replacing
 
-NP2_inline void SciCall_SetTargetStart(Sci_Position start) {
-	SciCall(SCI_SETTARGETSTART, start, 0);
-}
-
 NP2_inline Sci_Position SciCall_GetTargetStart(void) {
 	return SciCall(SCI_GETTARGETSTART, 0, 0);
-}
-
-NP2_inline void SciCall_SetTargetEnd(Sci_Position end) {
-	SciCall(SCI_SETTARGETEND, end, 0);
 }
 
 NP2_inline Sci_Position SciCall_GetTargetEnd(void) {

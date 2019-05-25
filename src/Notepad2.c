@@ -3109,7 +3109,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case IDM_EDIT_ALIGN:
 		if (EditAlignDlg(hwnd, &iAlignMode)) {
 			BeginWaitCursor();
-			EditAlignText(hwndEdit, iAlignMode);
+			EditAlignText(iAlignMode);
 			EndWaitCursor();
 		}
 		break;
@@ -3176,19 +3176,19 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	case IDM_EDIT_INVERTCASE:
 		BeginWaitCursor();
-		EditInvertCase(hwndEdit);
+		EditInvertCase();
 		EndWaitCursor();
 		break;
 
 	case IDM_EDIT_TITLECASE:
 		BeginWaitCursor();
-		EditTitleCase(hwndEdit);
+		EditTitleCase();
 		EndWaitCursor();
 		break;
 
 	case IDM_EDIT_SENTENCECASE:
 		BeginWaitCursor();
-		EditSentenceCase(hwndEdit);
+		EditSentenceCase();
 		EndWaitCursor();
 		break;
 
@@ -3437,13 +3437,13 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	case IDM_EDIT_URLENCODE:
 		BeginWaitCursor();
-		EditURLEncode(hwndEdit);
+		EditURLEncode();
 		EndWaitCursor();
 		break;
 
 	case IDM_EDIT_URLDECODE:
 		BeginWaitCursor();
-		EditURLDecode(hwndEdit);
+		EditURLDecode();
 		EndWaitCursor();
 		break;
 
@@ -3473,43 +3473,43 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	case IDM_EDIT_CHAR2HEX:
 		BeginWaitCursor();
-		EditChar2Hex(hwndEdit);
+		EditChar2Hex();
 		EndWaitCursor();
 		break;
 
 	case IDM_EDIT_HEX2CHAR:
 		BeginWaitCursor();
-		EditHex2Char(hwndEdit);
+		EditHex2Char();
 		EndWaitCursor();
 		break;
 
 	case IDM_EDIT_SHOW_HEX:
 		BeginWaitCursor();
-		EditShowHex(hwndEdit);
+		EditShowHex();
 		EndWaitCursor();
 		break;
 
 	case IDM_EDIT_NUM2HEX:
 		BeginWaitCursor();
-		EditConvertNumRadix(hwndEdit, 16);
+		EditConvertNumRadix(16);
 		EndWaitCursor();
 		break;
 
 	case IDM_EDIT_NUM2DEC:
 		BeginWaitCursor();
-		EditConvertNumRadix(hwndEdit, 10);
+		EditConvertNumRadix(10);
 		EndWaitCursor();
 		break;
 
 	case IDM_EDIT_NUM2BIN:
 		BeginWaitCursor();
-		EditConvertNumRadix(hwndEdit, 2);
+		EditConvertNumRadix(2);
 		EndWaitCursor();
 		break;
 
 	case IDM_EDIT_NUM2OCT:
 		BeginWaitCursor();
-		EditConvertNumRadix(hwndEdit, 8);
+		EditConvertNumRadix(8);
 		EndWaitCursor();
 		break;
 
@@ -4452,10 +4452,10 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	break;
 
 	case CMD_OPEN_PATH_OR_LINK:
-		EditOpenSelection(hwndEdit, 0);
+		EditOpenSelection(0);
 		break;
 	case CMD_OPEN_CONTAINING_FOLDER:
-		EditOpenSelection(hwndEdit, 4);
+		EditOpenSelection(4);
 		break;
 
 	case CMD_ONLINE_SEARCH_GOOGLE:
@@ -4463,7 +4463,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case CMD_ONLINE_SEARCH_WIKI:
 	case CMD_CUSTOM_ACTION1:
 	case CMD_CUSTOM_ACTION2:
-		EditSelectionAction(hwndEdit, LOWORD(wParam));
+		EditSelectionAction(LOWORD(wParam));
 		break;
 
 	case CMD_FINDNEXTSEL:
@@ -4563,11 +4563,11 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	case CMD_INCREASENUM:	// Ctrl++
-		EditModifyNumber(hwndEdit, TRUE);
+		EditModifyNumber(TRUE);
 		break;
 
 	case CMD_DECREASENUM:	// Ctrl+-
-		EditModifyNumber(hwndEdit, FALSE);
+		EditModifyNumber(FALSE);
 		break;
 
 	case CMD_JUMP2SELSTART:	// Ctrl+'

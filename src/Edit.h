@@ -118,29 +118,29 @@ void 	EditDetectEOLMode(LPCSTR lpData, DWORD cbData, struct EditFileIOStatus *st
 BOOL	EditLoadFile(LPWSTR pszFile, BOOL bSkipEncodingDetection, struct EditFileIOStatus *status);
 BOOL	EditSaveFile(HWND hwnd, LPCWSTR pszFile, BOOL bSaveCopy, struct EditFileIOStatus *status);
 
-void	EditInvertCase(HWND hwnd);
-void	EditTitleCase(HWND hwnd);
-void	EditSentenceCase(HWND hwnd);
+void	EditInvertCase(void);
+void	EditTitleCase(void);
+void	EditSentenceCase(void);
 
-void	EditURLEncode(HWND hwnd);
-void	EditURLDecode(HWND hwnd);
+void	EditURLEncode(void);
+void	EditURLDecode(void);
 void	EditEscapeCChars(HWND hwnd);
 void	EditUnescapeCChars(HWND hwnd);
 void	EditEscapeXHTMLChars(HWND hwnd);
 void	EditUnescapeXHTMLChars(HWND hwnd);
-void	EditChar2Hex(HWND hwnd);
-void	EditHex2Char(HWND hwnd);
-void	EditShowHex(HWND hwnd);
-void	EditConvertNumRadix(HWND hwnd, int radix);
-void	EditModifyNumber(HWND hwnd, BOOL bIncrease);
+void	EditChar2Hex(void);
+void	EditHex2Char(void);
+void	EditShowHex(void);
+void	EditConvertNumRadix(int radix);
+void	EditModifyNumber(BOOL bIncrease);
 
 void	EditTabsToSpaces(int nTabWidth, BOOL bOnlyIndentingWS);
 void	EditSpacesToTabs(int nTabWidth, BOOL bOnlyIndentingWS);
 
 void	EditMoveUp(void);
 void	EditMoveDown(void);
-void	EditModifyLines(HWND hwnd, LPCWSTR pwszPrefix, LPCWSTR pwszAppend);
-void	EditAlignText(HWND hwnd, int nMode);
+void	EditModifyLines(LPCWSTR pwszPrefix, LPCWSTR pwszAppend);
+void	EditAlignText(int nMode);
 void	EditEncloseSelection(LPCWSTR pwszOpen, LPCWSTR pwszClose);
 void	EditToggleLineComments(LPCWSTR pwszComment, BOOL bInsertAtStart);
 void	EditPadWithSpaces(BOOL bSkipEmpty, BOOL bNoUndoGroup);
@@ -177,9 +177,9 @@ void	EditInsertUnicodeControlCharacter(int menu);
 void	EditShowUnicodeControlCharacter(BOOL bShow);
 BOOL	EditSortDlg(HWND hwnd, int *piSortFlags);
 BOOL	EditAlignDlg(HWND hwnd, int *piAlignMode);
-void	EditSelectionAction(HWND hwnd, int action);
+void	EditSelectionAction(int action);
 void	TryBrowseFile(HWND hwnd, LPCWSTR pszFile, BOOL bWarn);
-void	EditOpenSelection(HWND hwnd, int type);
+void	EditOpenSelection(int type);
 
 // in Print.cpp
 #ifdef __cplusplus
