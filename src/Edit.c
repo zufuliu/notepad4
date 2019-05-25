@@ -4538,12 +4538,12 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 				break;
 
 			case IDC_REGEXPHELP:
-				MsgBox(MBINFO, IDC_REGEXPHELP);
+				MsgBox(MBINFO, IDS_REGEXPHELP);
 				//ShowNotificationMessage(SC_NOTIFICATIONPOSITION_CENTER, IDS_REGEXPHELP);
 				break;
 
 			case IDC_WILDCARDHELP:
-				MsgBox(MBINFO, IDC_WILDCARDHELP);
+				MsgBox(MBINFO, IDS_WILDCARDHELP);
 				//ShowNotificationMessage(SC_NOTIFICATIONPOSITION_CENTER, IDS_WILDCARDHELP);
 				break;
 
