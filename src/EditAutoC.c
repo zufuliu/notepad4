@@ -1842,7 +1842,7 @@ void EditAutoIndent(void) {
 				pPos += iIndentLen;
 				if (endPart) {
 					iIndentLen = strlen(endPart);
-					strncpy(pPos, endPart, iIndentLen + 1);
+					strcat(pPos, endPart);
 					pPos += iIndentLen;
 				}
 			}

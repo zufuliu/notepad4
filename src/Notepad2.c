@@ -4861,7 +4861,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			if (braces != NULL && *braces == ch) {
 				*braces = L'\0'; // unsafe
 			}
-			const Sci_Position iNewPos = scn->position + ((braces == NULL) ? strlen(text) : (braces - text + 1));
+			const Sci_Position iNewPos = scn->position + ((braces == NULL) ? (Sci_Position)strlen(text) : (braces - text + 1));
 
 			SciCall_BeginUndoAction();
 			SciCall_SetSel(scn->position, iCurPos);

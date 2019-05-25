@@ -9,6 +9,7 @@
 #include <cstdlib>
 #include <cassert>
 #include <cstring>
+#include <cmath>
 
 #include <stdexcept>
 #include <string>
@@ -512,6 +513,9 @@ void ScintillaBase::CallTipShow(Point pt, NotificationPosition notifyPos, const 
 			rc.bottom = rc.top + height;
 			rc.left = (rcClient.left + rcClient.right - width)/2;
 			rc.right = rc.left + width;
+			break;
+
+		default:
 			break;
 		}
 	}
