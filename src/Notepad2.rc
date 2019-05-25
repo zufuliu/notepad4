@@ -1821,6 +1821,7 @@ BEGIN
     IDS_ASK_ENCODING2       "You are about to change the encoding of an empty file from ANSI to non-ANSI. Note that this will clear the undo history, as it can't be synchronized with the new encoding. Continue?"
     IDS_ERR_ENCODINGNA      "Code page conversion tables for the selected encoding are not available on your system."
     IDS_ERR_UNICODE         "Error converting this Unicode file.\nData will be lost if the file is saved!"
+	IDS_BINARY_FILE_LOCKED	"This is most likely not a text file, so it is locked for editing\nto prevent accidental editing cause file corruption."
 END
 
 STRINGTABLE

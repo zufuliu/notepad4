@@ -2334,7 +2334,7 @@ static INT_PTR CALLBACK InfoBoxDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 // InfoBox()
 //
 //
-INT_PTR InfoBox(int iType, LPCWSTR lpstrSetting, int uidMessage, ...) {
+INT_PTR InfoBox(int iType, LPCWSTR lpstrSetting, UINT uidMessage, ...) {
 	const int iMode = IniGetInt(INI_SECTION_NAME_SUPPRESSED_MESSAGES, lpstrSetting, 0);
 	if (StrNotEmpty(lpstrSetting) && iMode == 1) {
 		return (iType == MBYESNO) ? IDYES : IDOK;
