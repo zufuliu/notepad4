@@ -1203,6 +1203,14 @@ set void CallTipUseStyle=2212(int tabSize,)
 # Set position of calltip, above or below text.
 set void CallTipSetPosition=2213(bool above,)
 
+# notification position
+enu NotificationPosition=SC_NOTIFICATIONPOSITION
+val SC_NOTIFICATIONPOSITION_BOTTOMRIGHT=0
+val SC_NOTIFICATIONPOSITION_CENTER=1
+
+# show notification
+fun void ShowNotification=2088(int notifyPos, string definition)
+
 # Find the display line of a document line taking hidden lines into account.
 fun int VisibleFromDocLine=2220(int docLine,)
 
