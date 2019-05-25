@@ -997,6 +997,10 @@ NP2_inline void SciCall_CallTipUseStyle(int tabSize) {
 	SciCall(SCI_CALLTIPUSESTYLE, tabSize, 0);
 }
 
+NP2_inline void SciCall_ShowNotification(int notifyPos, const char *definition) {
+	SciCall(SCI_SHOWNOTIFICATION, notifyPos, (LPARAM)definition);
+}
+
 // Keyboard commands
 
 NP2_inline void SciCall_VCHome(void) {

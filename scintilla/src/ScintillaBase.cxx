@@ -453,7 +453,7 @@ int ScintillaBase::AutoCompleteGetCurrentText(char *buffer) const {
 	return 0;
 }
 
-void ScintillaBase::CallTipShow(Point pt, const char *defn) {
+void ScintillaBase::CallTipShow(Point pt, NotificationPosition notifyPos, const char *defn) {
 	ac.Cancel();
 	// If container knows about STYLE_CALLTIP then use it in place of the
 	// STYLE_DEFAULT for the face name, size and character set. Also use it
@@ -461,6 +461,13 @@ void ScintillaBase::CallTipShow(Point pt, const char *defn) {
 	const int ctStyle = ct.UseStyleCallTip() ? STYLE_CALLTIP : STYLE_DEFAULT;
 	if (ct.UseStyleCallTip()) {
 		ct.SetForeBack(vs.styles[STYLE_CALLTIP].fore, vs.styles[STYLE_CALLTIP].back);
+	}
+	if (notifyPos == NotificationPosition::None) {
+		ct.innerMarginX = 12;
+		ct.innerMarginY = 10;
+	} else {
+		ct.innerMarginX = std::max(24, vs.lineHeight);
+		ct.innerMarginY = std::max(20, vs.lineHeight);
 	}
 	if (wMargin.Created()) {
 		pt = pt + GetVisibleOriginInMain();
@@ -488,6 +495,25 @@ void ScintillaBase::CallTipShow(Point pt, const char *defn) {
 	if (rc.top < rcClient.top && rc.Height() < rcClient.Height()) {
 		rc.top += offset;
 		rc.bottom += offset;
+	}
+	if (notifyPos != NotificationPosition::None) {
+		const XYPOSITION height = rc.Height();
+		const XYPOSITION width = rc.Width();
+		switch (notifyPos) {
+		case NotificationPosition::BottomRight:
+			rc.bottom = rcClient.bottom - 4;
+			rc.top = rc.bottom - height;
+			rc.right = rcClient.right - 4;
+			rc.left = rc.right - width;
+			break;
+
+		case NotificationPosition::Center:
+			rc.top = (rcClient.top + rcClient.bottom - height)/2;
+			rc.bottom = rc.top + height;
+			rc.left = (rcClient.left + rcClient.right - width)/2;
+			rc.right = rc.left + width;
+			break;
+		}
 	}
 	// Now display the window.
 	CreateCallTipWindow(rc);
@@ -991,7 +1017,12 @@ sptr_t ScintillaBase::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lPara
 		return ac.GetTypesep();
 
 	case SCI_CALLTIPSHOW:
-		CallTipShow(LocationFromPosition(wParam),
+		CallTipShow(LocationFromPosition(wParam), NotificationPosition::None,
+			ConstCharPtrFromSPtr(lParam));
+		break;
+
+	case SCI_SHOWNOTIFICATION:
+		CallTipShow(LocationFromPosition(0), static_cast<NotificationPosition>(wParam + 1),
 			ConstCharPtrFromSPtr(lParam));
 		break;
 

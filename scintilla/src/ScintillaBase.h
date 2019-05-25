@@ -34,6 +34,12 @@ protected:
 		idcmdSelectAll = 16
 	};
 
+	enum class NotificationPosition {
+		None,
+		BottomRight,
+		Center,
+	};
+
 #if SCI_EnablePopupMenu
 	int displayPopupMenu;
 	Menu popup;
@@ -74,7 +80,7 @@ protected:
 	void ListNotify(ListBoxEvent *plbe) override;
 
 	void CallTipClick() noexcept;
-	void CallTipShow(Point pt, const char *defn);
+	void CallTipShow(Point pt, NotificationPosition notifyPos, const char *defn);
 	virtual void CreateCallTipWindow(PRectangle rc) noexcept = 0;
 
 #if SCI_EnablePopupMenu
