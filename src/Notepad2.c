@@ -2121,6 +2121,12 @@ BOOL IsIMEInNativeMode(void) {
 void MsgNotifyZoom(void) {
 	iZoomLevel = SciCall_GetZoom();
 
+#if 0
+	char buf[64];
+	sprintf(buf, "Zoom: %d%%", iZoomLevel);
+	ShowNotificationA(SC_NOTIFICATIONPOSITION_CENTER, buf);
+#endif
+
 	UpdateStatusBarCache(STATUS_DOCZOOM);
 	UpdateLineNumberWidth();
 	UpdateFoldMarginWidth();
@@ -7103,6 +7109,7 @@ BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect, LPCWST
 		}
 		// notify binary file been locked for editing
 		if (binary) {
+			ShowNotificationMessage(SC_NOTIFICATIONPOSITION_BOTTOMRIGHT, IDS_BINARY_FILE_LOCKED);
 			return fSuccess;
 		}
 		// Show inconsistent line endings warning
@@ -7936,6 +7943,33 @@ void SetNotifyIconTitle(HWND hwnd) {
 	lstrcat(nid.szTip, tchTitle);
 
 	Shell_NotifyIcon(NIM_MODIFY, &nid);
+}
+
+void ShowNotificationA(int notifyPos, LPCSTR lpszText) {
+	SciCall_ShowNotification(notifyPos, lpszText);
+}
+
+void ShowNotificationW(int notifyPos, LPCWSTR lpszText) {
+	const int cpEdit = SciCall_GetCodePage();
+	const int wchLen = lstrlen(lpszText);
+	const int cchLen = wchLen*kMaxMultiByteCount + 1;
+	char *cchText = (char *)NP2HeapAlloc(cchLen);
+	WideCharToMultiByte(cpEdit, 0, lpszText, -1, cchText, cchLen, NULL, NULL);
+	ShowNotificationA(notifyPos, cchText);
+	NP2HeapFree(cchText);
+}
+
+void ShowNotificationMessage(int notifyPos, UINT uidMessage, ...)  {
+	WCHAR wchFormat[1024] = L"";
+	WCHAR wchMessage[2048] = L"";
+	GetString(uidMessage, wchFormat, COUNTOF(wchFormat));
+
+	va_list va;
+	va_start(va, uidMessage);
+	wvsprintf(wchMessage, wchFormat, va);
+	va_end(va);
+
+	ShowNotificationW(notifyPos, wchMessage);
 }
 
 //=============================================================================

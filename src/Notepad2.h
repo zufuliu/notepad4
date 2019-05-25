@@ -133,6 +133,11 @@ BOOL RelaunchElevated(void);
 void SnapToDefaultPos(HWND hwnd);
 void ShowNotifyIcon(HWND hwnd, BOOL bAdd);
 void SetNotifyIconTitle(HWND hwnd);
+
+void ShowNotificationA(int notifyPos, LPCSTR lpszText);
+void ShowNotificationW(int notifyPos, LPCWSTR lpszText);
+void ShowNotificationMessage(int notifyPos, UINT uidMessage, ...);
+
 void InstallFileWatching(LPCWSTR lpszFile);
 void CALLBACK WatchTimerProc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime);
 void CALLBACK PasteBoardTimer(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime);
