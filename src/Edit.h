@@ -97,8 +97,6 @@ enum {
 	EditWrapSymbolDefaultValue = EditWrapSymbolBeforeNearBorder,
 };
 
-extern HWND hwndEdit;
-
 void	Edit_ReleaseResources(void);
 HWND	EditCreate(HWND hwndParent);
 void	EditSetNewText(LPCSTR lpstrText, DWORD cbText);
