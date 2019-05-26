@@ -675,7 +675,7 @@ void ScintillaWin::EnsureRenderTarget(HDC hdc) {
 			if (SUCCEEDED(hr)) {
 				pRenderTarget = pDCRT;
 			} else {
-				Platform::DebugPrintf("Failed CreateDCRenderTarget 0x%x\n", hr);
+				//Platform::DebugPrintf("Failed CreateDCRenderTarget 0x%x\n", hr);
 				pRenderTarget = nullptr;
 			}
 
@@ -691,7 +691,7 @@ void ScintillaWin::EnsureRenderTarget(HDC hdc) {
 			if (SUCCEEDED(hr)) {
 				pRenderTarget = pHwndRenderTarget;
 			} else {
-				Platform::DebugPrintf("Failed CreateHwndRenderTarget 0x%x\n", hr);
+				//Platform::DebugPrintf("Failed CreateHwndRenderTarget 0x%x\n", hr);
 				pRenderTarget = nullptr;
 			}
 		}
@@ -714,7 +714,7 @@ void ScintillaWin::EnsureRenderTarget(HDC hdc) {
 		GetClientRect(MainHWND(), &rcWindow);
 		const HRESULT hr = static_cast<ID2D1DCRenderTarget*>(pRenderTarget)->BindDC(hdc, &rcWindow);
 		if (FAILED(hr)) {
-			Platform::DebugPrintf("BindDC failed 0x%x\n", hr);
+			//Platform::DebugPrintf("BindDC failed 0x%x\n", hr);
 			DropRenderTarget();
 		}
 	}

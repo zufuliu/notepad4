@@ -1340,10 +1340,10 @@ void EditChar2Hex(void) {
 		count = MultiByteToWideChar(cpEdit, 0, ch, -1, wch, (int)(count + 1)) - 1; // '\0'
 		for (Sci_Position i = 0, j = 0; i < count; i++) {
 			if (wch[i] <= 0xFF) {
-				wsprintfA(ch + j, "\\x%02X", wch[i] & 0xFF); // \xhh
+				sprintf(ch + j, "\\x%02X", wch[i] & 0xFF); // \xhh
 				j += 4;
 			} else {
-				wsprintfA(ch + j, "\\%c%04X", uesc, wch[i]); // \uhhhh \xhhhh
+				sprintf(ch + j, "\\%c%04X", uesc, wch[i]); // \uhhhh \xhhhh
 				j += 6;
 			}
 		}
@@ -1686,8 +1686,7 @@ void EditModifyNumber(BOOL bIncrease) {
 			iNumber--;
 		}
 
-		const int iWidth = lstrlenA(chNumber) - ((radix == 16) ? 2 : 0);
-		char chFormat[32] = "";
+		const int iWidth = (int)strlen(chNumber) - ((radix == 16) ? 2 : 0);
 		if (radix == 16) {
 			const int len = iWidth + 1;
 			BOOL bUppercase = FALSE;
@@ -1701,14 +1700,13 @@ void EditModifyNumber(BOOL bIncrease) {
 				}
 			}
 			if (bUppercase) {
-				wsprintfA(chFormat, "%%#0%iX", iWidth);
+				sprintf(chNumber, "%#0*X", iWidth, iNumber);
 			} else {
-				wsprintfA(chFormat, "%%#0%ix", iWidth);
+				sprintf(chNumber, "%#0*x", iWidth, iNumber);
 			}
 		} else {
-			wsprintfA(chFormat, "%%0%ii", iWidth);
+			sprintf(chNumber, "%0*i", iWidth, iNumber);
 		}
-		wsprintfA(chNumber, chFormat, iNumber);
 		SciCall_ReplaceSel(chNumber);
 		SciCall_SetSel(iSelStart, iSelStart + strlen(chNumber));
 	}
@@ -2233,16 +2231,16 @@ void EditModifyLines(LPCWSTR pwszPrefix, LPCWSTR pwszAppend) {
 		}
 	}
 
-	const char *pszPrefixNumPad = "";
+	BOOL bPrefixNumPadZero = FALSE;
 	char *mszPrefix2 = NULL;
 	Sci_Position iPrefixNum = 0;
-	Sci_Position iPrefixNumWidth = 1;
+	int iPrefixNumWidth = 1;
 	BOOL bPrefixNum = FALSE;
 
-	const char *pszAppendNumPad = "";
+	BOOL bAppendNumPadZero = FALSE;
 	char *mszAppend2 = NULL;
 	Sci_Position iAppendNum = 0;
-	Sci_Position iAppendNumWidth = 1;
+	int iAppendNumWidth = 1;
 	BOOL bAppendNum = FALSE;
 
 	if (iPrefixLen != 0) {
@@ -2257,7 +2255,7 @@ void EditModifyLines(LPCWSTR pwszPrefix, LPCWSTR pwszAppend) {
 				for (Sci_Position i = iLineEnd - iLineStart; i >= 10; i = i / 10) {
 					iPrefixNumWidth++;
 				}
-				pszPrefixNumPad = "";
+				bPrefixNumPadZero = FALSE;
 			} else if (strncmp(p, "$(0I)", CSTRLEN("$(0I)")) == 0) {
 				*p = 0;
 				strcpy(mszPrefix2, p + CSTRLEN("$(0I)"));
@@ -2266,7 +2264,7 @@ void EditModifyLines(LPCWSTR pwszPrefix, LPCWSTR pwszAppend) {
 				for (Sci_Position i = iLineEnd - iLineStart; i >= 10; i = i / 10) {
 					iPrefixNumWidth++;
 				}
-				pszPrefixNumPad = "0";
+				bPrefixNumPadZero = TRUE;
 			} else if (strncmp(p, "$(N)", CSTRLEN("$(N)")) == 0) {
 				*p = 0;
 				strcpy(mszPrefix2, p + CSTRLEN("$(N)"));
@@ -2275,7 +2273,7 @@ void EditModifyLines(LPCWSTR pwszPrefix, LPCWSTR pwszAppend) {
 				for (Sci_Position i = iLineEnd - iLineStart + 1; i >= 10; i = i / 10) {
 					iPrefixNumWidth++;
 				}
-				pszPrefixNumPad = "";
+				bPrefixNumPadZero = FALSE;
 			} else if (strncmp(p, "$(0N)", CSTRLEN("$(0N)")) == 0) {
 				*p = 0;
 				strcpy(mszPrefix2, p + CSTRLEN("$(0N)"));
@@ -2284,7 +2282,7 @@ void EditModifyLines(LPCWSTR pwszPrefix, LPCWSTR pwszAppend) {
 				for (Sci_Position i = iLineEnd - iLineStart + 1; i >= 10; i = i / 10) {
 					iPrefixNumWidth++;
 				}
-				pszPrefixNumPad = "0";
+				bPrefixNumPadZero = TRUE;
 			} else if (strncmp(p, "$(L)", CSTRLEN("$(L)")) == 0) {
 				*p = 0;
 				strcpy(mszPrefix2, p + CSTRLEN("$(L)"));
@@ -2293,7 +2291,7 @@ void EditModifyLines(LPCWSTR pwszPrefix, LPCWSTR pwszAppend) {
 				for (Sci_Position i = iLineEnd + 1; i >= 10; i = i / 10) {
 					iPrefixNumWidth++;
 				}
-				pszPrefixNumPad = "";
+				bPrefixNumPadZero = FALSE;
 			} else if (strncmp(p, "$(0L)", CSTRLEN("$(0L)")) == 0) {
 				*p = 0;
 				strcpy(mszPrefix2, p + CSTRLEN("$(0L)"));
@@ -2302,7 +2300,7 @@ void EditModifyLines(LPCWSTR pwszPrefix, LPCWSTR pwszAppend) {
 				for (Sci_Position i = iLineEnd + 1; i >= 10; i = i / 10) {
 					iPrefixNumWidth++;
 				}
-				pszPrefixNumPad = "0";
+				bPrefixNumPadZero = TRUE;
 			}
 			p += CSTRLEN("$(");
 		}
@@ -2320,7 +2318,7 @@ void EditModifyLines(LPCWSTR pwszPrefix, LPCWSTR pwszAppend) {
 				for (Sci_Position i = iLineEnd - iLineStart; i >= 10; i = i / 10) {
 					iAppendNumWidth++;
 				}
-				pszAppendNumPad = "";
+				bAppendNumPadZero = FALSE;
 			} else if (strncmp(p, "$(0I)", CSTRLEN("$(0I)")) == 0) {
 				*p = 0;
 				strcpy(mszAppend2, p + CSTRLEN("$(0I)"));
@@ -2329,7 +2327,7 @@ void EditModifyLines(LPCWSTR pwszPrefix, LPCWSTR pwszAppend) {
 				for (Sci_Position i = iLineEnd - iLineStart; i >= 10; i = i / 10) {
 					iAppendNumWidth++;
 				}
-				pszAppendNumPad = "0";
+				bAppendNumPadZero = TRUE;
 			} else if (strncmp(p, "$(N)", CSTRLEN("$(N)")) == 0) {
 				*p = 0;
 				strcpy(mszAppend2, p + CSTRLEN("$(N)"));
@@ -2338,7 +2336,7 @@ void EditModifyLines(LPCWSTR pwszPrefix, LPCWSTR pwszAppend) {
 				for (Sci_Position i = iLineEnd - iLineStart + 1; i >= 10; i = i / 10) {
 					iAppendNumWidth++;
 				}
-				pszAppendNumPad = "";
+				bAppendNumPadZero = FALSE;
 			} else if (strncmp(p, "$(0N)", CSTRLEN("$(0N)")) == 0) {
 				*p = 0;
 				strcpy(mszAppend2, p + CSTRLEN("$(0N)"));
@@ -2347,7 +2345,7 @@ void EditModifyLines(LPCWSTR pwszPrefix, LPCWSTR pwszAppend) {
 				for (Sci_Position i = iLineEnd - iLineStart + 1; i >= 10; i = i / 10) {
 					iAppendNumWidth++;
 				}
-				pszAppendNumPad = "0";
+				bAppendNumPadZero = TRUE;
 			} else if (strncmp(p, "$(L)", CSTRLEN("$(L)")) == 0) {
 				*p = 0;
 				strcpy(mszAppend2, p + CSTRLEN("$(L)"));
@@ -2356,7 +2354,7 @@ void EditModifyLines(LPCWSTR pwszPrefix, LPCWSTR pwszAppend) {
 				for (Sci_Position i = iLineEnd + 1; i >= 10; i = i / 10) {
 					iAppendNumWidth++;
 				}
-				pszAppendNumPad = "";
+				bAppendNumPadZero = FALSE;
 			} else if (strncmp(p, "$(0L)", CSTRLEN("$(0L)")) == 0) {
 				*p = 0;
 				strcpy(mszAppend2, p + CSTRLEN("$(0L)"));
@@ -2365,7 +2363,7 @@ void EditModifyLines(LPCWSTR pwszPrefix, LPCWSTR pwszAppend) {
 				for (Sci_Position i = iLineEnd + 1; i >= 10; i = i / 10) {
 					iAppendNumWidth++;
 				}
-				pszAppendNumPad = "0";
+				bAppendNumPadZero = TRUE;
 			}
 			p += CSTRLEN("$(");
 		}
@@ -2378,10 +2376,12 @@ void EditModifyLines(LPCWSTR pwszPrefix, LPCWSTR pwszAppend) {
 			strcpy(mszInsert, mszPrefix1);
 
 			if (bPrefixNum) {
-				char tchFmt[64];
 				char tchNum[64];
-				wsprintfA(tchFmt, "%%%s%ii", pszPrefixNumPad, iPrefixNumWidth);
-				wsprintfA(tchNum, tchFmt, iPrefixNum);
+				if (bPrefixNumPadZero) {
+					sprintf(tchNum, "%0*i", iPrefixNumWidth, (int)iPrefixNum);
+				} else {
+					sprintf(tchNum, "%*i", iPrefixNumWidth, (int)iPrefixNum);
+				}
 				strcat(mszInsert, tchNum);
 				strcat(mszInsert, mszPrefix2);
 				iPrefixNum++;
@@ -2397,10 +2397,12 @@ void EditModifyLines(LPCWSTR pwszPrefix, LPCWSTR pwszAppend) {
 			strcpy(mszInsert, mszAppend1);
 
 			if (bAppendNum) {
-				char tchFmt[64];
 				char tchNum[64];
-				wsprintfA(tchFmt, "%%%s%ii", pszAppendNumPad, iAppendNumWidth);
-				wsprintfA(tchNum, tchFmt, iAppendNum);
+				if (bAppendNumPadZero) {
+					sprintf(tchNum, "%0*i", iAppendNumWidth, (int)iAppendNum);
+				} else {
+					sprintf(tchNum, "%*i", iAppendNumWidth, (int)iAppendNum);
+				}
 				strcat(mszInsert, tchNum);
 				strcat(mszInsert, mszAppend2);
 				iAppendNum++;
@@ -2724,7 +2726,7 @@ void EditEncloseSelection(LPCWSTR pwszOpen, LPCWSTR pwszClose) {
 	}
 
 	SciCall_BeginUndoAction();
-	len = lstrlenA(mszOpen);
+	len = (int)strlen(mszOpen);
 
 	if (StrNotEmptyA(mszOpen)) {
 		SciCall_SetTargetRange(iSelStart, iSelStart);
@@ -2784,7 +2786,7 @@ void EditToggleLineComments(LPCWSTR pwszComment, BOOL bInsertAtStart) {
 	const UINT cpEdit = SciCall_GetCodePage();
 	WideCharToMultiByte(cpEdit, 0, pwszComment, -1, mszComment, COUNTOF(mszComment), NULL, NULL);
 
-	const int cchComment = lstrlenA(mszComment);
+	const int cchComment = (int)strlen(mszComment);
 	const Sci_Line iLineStart = SciCall_LineFromPosition(iSelStart);
 	Sci_Line iLineEnd = SciCall_LineFromPosition(iSelEnd);
 
@@ -3804,8 +3806,8 @@ void EditSortLines(int iSortFlags) {
 
 			if (!bDropLine) {
 				WideCharToMultiByte(cpEdit, 0, pLines[i].pwszLine, -1, pmszBuf, cbPmszBuf, NULL, NULL);
-				StrCatBuffA(pmszResult, pmszBuf, cbPmszResult);
-				StrCatBuffA(pmszResult, mszEOL, cbPmszResult);
+				strncat(pmszResult, pmszBuf, cbPmszResult);
+				strncat(pmszResult, mszEOL, cbPmszResult);
 			}
 		}
 	}
@@ -3841,7 +3843,7 @@ void EditSortLines(int iSortFlags) {
 		Sci_Position iTargetEnd = SciCall_GetTargetEnd();
 		SciCall_ClearSelections();
 		if (iTargetStart != iTargetEnd) {
-			iTargetEnd -= lstrlenA(mszEOL);
+			iTargetEnd -= strlen(mszEOL);
 			if (iRcAnchorLine > iRcCurLine) {
 				iCurPos = SciCall_FindColumn(SciCall_LineFromPosition(iTargetStart), iRcCurCol);
 				iAnchorPos = SciCall_FindColumn(SciCall_LineFromPosition(iTargetEnd), iRcAnchorCol);
@@ -4105,11 +4107,11 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 				// First time you bring up find/replace dialog, copy content from clipboard to find box (but only if nothing is selected in the editor)
 				if (StrIsEmptyA(lpszSelection) && bFirstTime) {
 					char *pClip = EditGetClipboardText(lpefr->hwnd);
-					const int len = lstrlenA(pClip);
+					const size_t len = strlen(pClip);
 					if (len > 0 && len <= NP2_FIND_REPLACE_LIMIT) {
 						NP2HeapFree(lpszSelection);
 						lpszSelection = (char *)NP2HeapAlloc(len + 2);
-						lstrcpynA(lpszSelection, pClip, NP2_FIND_REPLACE_LIMIT);
+						strcpy(lpszSelection, pClip);
 					}
 					LocalFree(pClip);
 				}
@@ -4611,7 +4613,7 @@ void EscapeWildcards(char *szFind2, LPEDITFINDREPLACE lpefr) {
 		iDest++;
 	}
 	szWildcardEscaped[iDest] = 0;
-	lstrcpynA(szFind2, szWildcardEscaped, COUNTOF(szWildcardEscaped));
+	strncpy(szFind2, szWildcardEscaped, COUNTOF(szWildcardEscaped));
 }
 
 //=============================================================================
@@ -4624,7 +4626,7 @@ BOOL EditFindNext(LPEDITFINDREPLACE lpefr, BOOL fExtendSelection) {
 	}
 
 	char szFind2[NP2_FIND_REPLACE_LIMIT];
-	lstrcpynA(szFind2, lpefr->szFind, COUNTOF(szFind2));
+	strncpy(szFind2, lpefr->szFind, COUNTOF(szFind2));
 	if (lpefr->bTransformBS) {
 		const UINT cpEdit = SciCall_GetCodePage();
 		TransformBackslashes(szFind2, (lpefr->fuFlags & SCFIND_REGEXP), cpEdit);
@@ -4687,7 +4689,7 @@ BOOL EditFindPrev(LPEDITFINDREPLACE lpefr, BOOL fExtendSelection) {
 	}
 
 	char szFind2[NP2_FIND_REPLACE_LIMIT];
-	lstrcpynA(szFind2, lpefr->szFind, COUNTOF(szFind2));
+	strncpy(szFind2, lpefr->szFind, COUNTOF(szFind2));
 	if (lpefr->bTransformBS) {
 		const UINT cpEdit = SciCall_GetCodePage();
 		TransformBackslashes(szFind2, (lpefr->fuFlags & SCFIND_REGEXP), cpEdit);
@@ -4753,7 +4755,7 @@ BOOL EditReplace(HWND hwnd, LPEDITFINDREPLACE lpefr) {
 	BOOL bReplaceRE = (lpefr->fuFlags & SCFIND_REGEXP);
 	const UINT cpEdit = SciCall_GetCodePage();
 	char szFind2[NP2_FIND_REPLACE_LIMIT];
-	lstrcpynA(szFind2, lpefr->szFind, COUNTOF(szFind2));
+	strncpy(szFind2, lpefr->szFind, COUNTOF(szFind2));
 	if (lpefr->bTransformBS) {
 		TransformBackslashes(szFind2, bReplaceRE, cpEdit);
 	}
@@ -4963,7 +4965,7 @@ BOOL EditReplaceAll(HWND hwnd, LPEDITFINDREPLACE lpefr, BOOL bShowInfo) {
 	BOOL bReplaceRE = (lpefr->fuFlags & SCFIND_REGEXP);
 	const UINT cpEdit = SciCall_GetCodePage();
 	char szFind2[NP2_FIND_REPLACE_LIMIT];
-	lstrcpynA(szFind2, lpefr->szFind, COUNTOF(szFind2));
+	strncpy(szFind2, lpefr->szFind, COUNTOF(szFind2));
 	if (lpefr->bTransformBS) {
 		TransformBackslashes(szFind2, bReplaceRE, cpEdit);
 	}
@@ -5084,7 +5086,7 @@ BOOL EditReplaceAllInSelection(HWND hwnd, LPEDITFINDREPLACE lpefr, BOOL bShowInf
 	BOOL bReplaceRE = (lpefr->fuFlags & SCFIND_REGEXP);
 	const UINT cpEdit = SciCall_GetCodePage();
 	char szFind2[NP2_FIND_REPLACE_LIMIT];
-	lstrcpynA(szFind2, lpefr->szFind, COUNTOF(szFind2));
+	strncpy(szFind2, lpefr->szFind, COUNTOF(szFind2));
 	if (lpefr->bTransformBS) {
 		TransformBackslashes(szFind2, bReplaceRE, cpEdit);
 	}
@@ -6264,7 +6266,7 @@ BOOL FileVars_Init(LPCSTR lpData, DWORD cbData, LPFILEVARS lpfv) {
 	}
 
 	char tch[512];
-	lstrcpynA(tch, lpData, min_u(cbData + 1, COUNTOF(tch)));
+	strncpy(tch, lpData, min_u(cbData + 1, COUNTOF(tch)));
 	const BOOL utf8Sig = IsUTF8Signature(lpData);
 	BOOL bDisableFileVariables = FALSE;
 
@@ -6324,7 +6326,7 @@ BOOL FileVars_Init(LPCSTR lpData, DWORD cbData, LPFILEVARS lpfv) {
 	}
 
 	if (lpfv->mask == 0 && cbData > COUNTOF(tch)) {
-		lstrcpynA(tch, lpData + cbData - COUNTOF(tch) + 1, COUNTOF(tch));
+		strncpy(tch, lpData + cbData - COUNTOF(tch) + 1, COUNTOF(tch));
 		if (!fNoFileVariables) {
 			int i;
 			if (FileVars_ParseInt(tch, "enable-local-variables", &i) && (!i)) {
@@ -6462,7 +6464,7 @@ BOOL FileVars_ParseInt(LPCSTR pszData, LPCSTR pszName, int *piValue) {
 	while ((pvStart = strstr(pvStart, pszName)) != NULL) {
 		const unsigned char chPrev = (pvStart > pszData) ? *(pvStart - 1) : 0;
 		if (!isalpha(chPrev) && chPrev != '-' && chPrev != '_') {
-			pvStart += lstrlenA(pszName);
+			pvStart += strlen(pszName);
 			while (*pvStart == ' ') {
 				pvStart++;
 			}
@@ -6470,7 +6472,7 @@ BOOL FileVars_ParseInt(LPCSTR pszData, LPCSTR pszName, int *piValue) {
 				break;
 			}
 		} else {
-			pvStart += lstrlenA(pszName);
+			pvStart += strlen(pszName);
 		}
 	}
 
@@ -6510,7 +6512,7 @@ BOOL FileVars_ParseStr(LPCSTR pszData, LPCSTR pszName, char *pszValue, int cchVa
 	while ((pvStart = strstr(pvStart, pszName)) != NULL) {
 		const unsigned char chPrev = (pvStart > pszData) ? *(pvStart - 1) : 0;
 		if (!isalpha(chPrev) && chPrev != '-' && chPrev != '_') {
-			pvStart += lstrlenA(pszName);
+			pvStart += strlen(pszName);
 			while (*pvStart == ' ') {
 				pvStart++;
 			}
@@ -6518,7 +6520,7 @@ BOOL FileVars_ParseStr(LPCSTR pszData, LPCSTR pszName, char *pszValue, int cchVa
 				break;
 			}
 		} else {
-			pvStart += lstrlenA(pszName);
+			pvStart += strlen(pszName);
 		}
 	}
 
@@ -6533,7 +6535,7 @@ BOOL FileVars_ParseStr(LPCSTR pszData, LPCSTR pszName, char *pszValue, int cchVa
 		}
 
 		char tch[32];
-		lstrcpynA(tch, pvStart, COUNTOF(tch));
+		strncpy(tch, pvStart, COUNTOF(tch));
 
 		char *pvEnd = tch;
 		while (*pvEnd && (isalnum((unsigned char)(*pvEnd)) || strchr("+-/_", *pvEnd) || (bQuoted && *pvEnd == ' '))) {
@@ -6542,7 +6544,7 @@ BOOL FileVars_ParseStr(LPCSTR pszData, LPCSTR pszName, char *pszValue, int cchVa
 		*pvEnd = '\0';
 		StrTrimA(tch, " \t:=\"'");
 
-		lstrcpynA(pszValue, tch, cchValue);
+		strncpy(pszValue, tch, cchValue);
 		return TRUE;
 	}
 

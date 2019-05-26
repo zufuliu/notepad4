@@ -166,7 +166,11 @@ void StopWatch_Show(const StopWatch *watch, LPCWSTR msg);
 void StopWatch_ShowLog(const StopWatch *watch, LPCSTR msg);
 
 #define DebugPrint(msg)	OutputDebugStringA(msg)
-void DebugPrintf(const char *fmt, ...);
+void DebugPrintf(const char *fmt, ...)
+#if defined(__GNUC__) || defined(__clang__)
+__attribute__((format(printf, 1, 2)))
+#endif
+;
 
 extern HINSTANCE g_hInstance;
 extern HANDLE g_hDefaultHeap;

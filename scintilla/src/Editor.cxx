@@ -2865,7 +2865,7 @@ void Editor::NotifyMacroRecord(unsigned int iMessage, uptr_t wParam, sptr_t lPar
 		// with char insert messages.
 	case SCI_NEWLINE:
 	default:
-		//		printf("Filtered out %ld of macro recording\n", iMessage);
+		//Platform::DebugPrintf("Filtered out %ld of macro recording\n", iMessage);
 		return;
 	}
 
