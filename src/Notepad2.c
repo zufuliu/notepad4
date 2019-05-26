@@ -3262,7 +3262,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		if (*mEncoding[iEncoding].pszParseNames) {
 			char msz[64];
 			BOOL done = FALSE;
-			lstrcpynA(msz, mEncoding[iEncoding].pszParseNames, COUNTOF(msz));
+			strncpy(msz, mEncoding[iEncoding].pszParseNames, COUNTOF(msz));
 			char *p;
 			if ((p = strchr(msz, ',')) != NULL) {
 				*p = '\0';
