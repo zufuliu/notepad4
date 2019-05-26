@@ -109,7 +109,11 @@ NP2_inline BOOL StrNCaseEqual(LPCWSTR s1, LPCWSTR s2, int cch) {
 // str MUST NOT be NULL, can be empty
 NP2_inline BOOL StrToFloat(LPCWSTR str, float *value) {
 	LPWSTR end;
+#if defined(__USE_MINGW_STRTOX)
+	*value = __mingw_wcstof(str, &end);
+#else
 	*value = wcstof(str, &end);
+#endif
 	return str != end;
 }
 
