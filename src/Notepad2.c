@@ -2926,12 +2926,15 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			SciCall_SetSel(iPos, iNewPos);
 			SendWMCommand(hwnd, IDM_EDIT_CLEARCLIPBOARD);
 		} else {
-			const Sci_Position iPos = SciCall_GetCurrentPos();
-			const Sci_Position iAnchor = SciCall_GetAnchor();
 			char *pClip = EditGetClipboardText(hwndEdit);
+			if (pClip == NULL) {
+				break;
+			}
 			if (flagPasteBoard) {
 				bLastCopyFromMe = TRUE;
 			}
+			const Sci_Position iPos = SciCall_GetCurrentPos();
+			const Sci_Position iAnchor = SciCall_GetAnchor();
 			SciCall_BeginUndoAction();
 			SciCall_Cut(FALSE);
 			SciCall_ReplaceSel(pClip);

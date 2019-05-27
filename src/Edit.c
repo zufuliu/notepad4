@@ -4107,13 +4107,15 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 				// First time you bring up find/replace dialog, copy content from clipboard to find box (but only if nothing is selected in the editor)
 				if (StrIsEmptyA(lpszSelection) && bFirstTime) {
 					char *pClip = EditGetClipboardText(lpefr->hwnd);
-					const size_t len = strlen(pClip);
-					if (len > 0 && len <= NP2_FIND_REPLACE_LIMIT) {
-						NP2HeapFree(lpszSelection);
-						lpszSelection = (char *)NP2HeapAlloc(len + 2);
-						strcpy(lpszSelection, pClip);
+					if (pClip != NULL) {
+						const size_t len = strlen(pClip);
+						if (len > 0 && len <= NP2_FIND_REPLACE_LIMIT) {
+							NP2HeapFree(lpszSelection);
+							lpszSelection = (char *)NP2HeapAlloc(len + 2);
+							strcpy(lpszSelection, pClip);
+						}
+						LocalFree(pClip);
 					}
-					LocalFree(pClip);
 				}
 				bFirstTime = FALSE;
 
@@ -4781,7 +4783,7 @@ BOOL EditReplace(HWND hwnd, LPEDITFINDREPLACE lpefr) {
 		}
 	}
 
-	if (!pszReplace2) {
+	if (pszReplace2 == NULL) {
 		pszReplace2 = StrDupA("");
 	}
 
@@ -4994,7 +4996,7 @@ BOOL EditReplaceAll(HWND hwnd, LPEDITFINDREPLACE lpefr, BOOL bShowInfo) {
 		}
 	}
 
-	if (!pszReplace2) {
+	if (pszReplace2 == NULL) {
 		pszReplace2 = StrDupA("");
 	}
 
@@ -5115,7 +5117,7 @@ BOOL EditReplaceAllInSelection(HWND hwnd, LPEDITFINDREPLACE lpefr, BOOL bShowInf
 		}
 	}
 
-	if (!pszReplace2) {
+	if (pszReplace2 == NULL) {
 		pszReplace2 = StrDupA("");
 	}
 
