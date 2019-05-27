@@ -48,7 +48,7 @@ void DebugPrintf(const char *fmt, ...) {
 	char buf[1024] = "";
 	va_list va;
 	va_start(va, fmt);
-	wvsprintfA(buf, fmt, va);
+	vsprintf(buf, fmt, va);
 	va_end(va);
 	DebugPrint(buf);
 }
