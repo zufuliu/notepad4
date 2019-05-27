@@ -43,7 +43,7 @@
 #if defined(__NO_INLINE__) // O0
 #define NP2_inline	static inline
 #else
-#define NP2_inline	extern inline __attribute__((__gnu_inline__))
+#define NP2_inline	extern inline __attribute__((__gnu_inline__, __artificial__))
 #endif
 #else
 #define NP2_inline	inline
