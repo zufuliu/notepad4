@@ -63,6 +63,8 @@ HWND	hDlgFindReplace = NULL;
 #define MARGIN_LINE_NUMBER	0	// line number
 #define MARGIN_SELECTION	1	// bookmark and selection margin
 #define MARGIN_FOLD_INDEX	2	// folding index
+// tab width for notification text
+#define TAB_WIDTH_NOTIFICATION		8
 
 #define TOOLBAR_COMMAND_BASE	IDT_FILE_NEW
 #define DefaultToolbarButtons	L"22 3 0 1 2 0 4 18 19 0 5 6 0 7 8 9 20 0 10 11 0 12 0 24 0 13 14 0 15 16 17 0"
@@ -1665,7 +1667,7 @@ HWND EditCreate(HWND hwndParent) {
 	SciCall_MarkerEnableHighlight(TRUE);
 
 	// CallTips
-	SciCall_CallTipUseStyle(iTabWidth);
+	SciCall_CallTipUseStyle(TAB_WIDTH_NOTIFICATION);
 #if NP2_ENABLE_SHOW_CALLTIPS
 	SciCall_SetMouseDwellTime(bShowCallTips? iCallTipsWaitTime : SC_TIME_FOREVER);
 #endif
@@ -3813,7 +3815,6 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			iTabWidth = clamp_i(iTabWidth, 1, 256);
 			iIndentWidth = clamp_i(iIndentWidth, 0, 256);
 			SciCall_SetTabWidth(iTabWidth);
-			SciCall_CallTipUseStyle(iTabWidth);
 			SciCall_SetIndent(iIndentWidth);
 			bTabsAsSpacesG = bTabsAsSpaces;
 			bTabIndentsG = bTabIndents;
@@ -7950,6 +7951,7 @@ void SetNotifyIconTitle(HWND hwnd) {
 }
 
 void ShowNotificationA(int notifyPos, LPCSTR lpszText) {
+	SciCall_CallTipUseStyle(TAB_WIDTH_NOTIFICATION);
 	SciCall_ShowNotification(notifyPos, lpszText);
 }
 

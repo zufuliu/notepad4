@@ -2240,6 +2240,7 @@ void EditShowCallTips(Sci_Position position) {
 	StrTrimA(pLine, " \t\r\n");
 	char *text = (char *)NP2HeapAlloc(iDocLen + 1 + 128);
 	sprintf(text, "ShowCallTips(%d, %d, %d)\n\n\002%s", (int)(iLine + 1), (int)position, (int)iDocLen, pLine);
+	SciCall_CallTipUseStyle(iTabWidth);
 	SciCall_CallTipShow(position, text);
 	NP2HeapFree(pLine);
 	NP2HeapFree(text);
