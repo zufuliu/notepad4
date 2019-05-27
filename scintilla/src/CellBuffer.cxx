@@ -556,8 +556,8 @@ void CellBuffer::GetCharRange(char *buffer, Sci::Position position, Sci::Positio
 	if (position < 0)
 		return;
 	if ((position + lengthRetrieve) > substance.Length()) {
-		Platform::DebugPrintf("Bad GetCharRange %d for %d of %d\n", position,
-			lengthRetrieve, substance.Length());
+		//Platform::DebugPrintf("Bad GetCharRange %d for %d of %d\n", position,
+		//	lengthRetrieve, substance.Length());
 		return;
 	}
 	substance.GetRange(buffer, position, lengthRetrieve);
@@ -577,8 +577,8 @@ void CellBuffer::GetStyleRange(unsigned char *buffer, Sci::Position position, Sc
 		return;
 	}
 	if ((position + lengthRetrieve) > style.Length()) {
-		Platform::DebugPrintf("Bad GetStyleRange %d for %d of %d\n", position,
-			lengthRetrieve, style.Length());
+		//Platform::DebugPrintf("Bad GetStyleRange %d for %d of %d\n", position,
+		//	lengthRetrieve, style.Length());
 		return;
 	}
 	style.GetRange(reinterpret_cast<char *>(buffer), position, lengthRetrieve);

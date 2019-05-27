@@ -109,7 +109,11 @@ NP2_inline BOOL StrNCaseEqual(LPCWSTR s1, LPCWSTR s2, int cch) {
 // str MUST NOT be NULL, can be empty
 NP2_inline BOOL StrToFloat(LPCWSTR str, float *value) {
 	LPWSTR end;
+#if defined(__USE_MINGW_STRTOX)
+	*value = __mingw_wcstof(str, &end);
+#else
 	*value = wcstof(str, &end);
+#endif
 	return str != end;
 }
 
@@ -162,7 +166,11 @@ void StopWatch_Show(const StopWatch *watch, LPCWSTR msg);
 void StopWatch_ShowLog(const StopWatch *watch, LPCSTR msg);
 
 #define DebugPrint(msg)	OutputDebugStringA(msg)
-void DebugPrintf(const char *fmt, ...);
+void DebugPrintf(const char *fmt, ...)
+#if defined(__GNUC__) || defined(__clang__)
+__attribute__((format(printf, 1, 2)))
+#endif
+;
 
 extern HINSTANCE g_hInstance;
 extern HANDLE g_hDefaultHeap;

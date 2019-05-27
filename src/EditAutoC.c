@@ -372,7 +372,7 @@ void WordList_AddListEx(struct WordList *pWList, LPCSTR pList) {
 			}
 			pList = ++sub;
 		} else {
-			int lenSub = lstrlenA(pList);
+			int lenSub = (int)strlen(pList);
 			lenSub = min_i(NP2_AUTOC_MAX_WORD_LENGTH - len, lenSub);
 			if (len) {
 				memcpy(word + len, pList, lenSub);
@@ -1188,7 +1188,7 @@ static BOOL EditCompleteWordCore(int iCondition, BOOL autoInsert) {
 	tr.chrg.cpMin = (Sci_PositionCR)iStartWordPos;
 	tr.chrg.cpMax = (Sci_PositionCR)iCurrentPos;
 	SciCall_GetTextRange(&tr);
-	iRootLen = lstrlenA(pRoot);
+	iRootLen = (int)strlen(pRoot);
 
 #if 0
 	StopWatch watch;
@@ -1241,7 +1241,7 @@ static BOOL EditCompleteWordCore(int iCondition, BOOL autoInsert) {
 					pSubRoot++;
 				}
 				if (*pSubRoot) {
-					iRootLen = lstrlenA(pSubRoot);
+					iRootLen = (int)strlen(pSubRoot);
 					WordList_UpdateRoot(pWList, pSubRoot, iRootLen);
 					retry = TRUE;
 					bIgnore = FALSE;
