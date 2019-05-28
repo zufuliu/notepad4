@@ -99,10 +99,10 @@ Timer::Timer() noexcept :
 Idler::Idler() noexcept :
 		state(false), idlerID(nullptr) {}
 
-static constexpr bool IsAllSpacesOrTabs(const char *s, unsigned int len) noexcept {
-	for (unsigned int i = 0; i < len; i++) {
+static constexpr bool IsAllSpacesOrTabs(std::string_view sv) noexcept {
+	for (char ch : sv) {
 		// This is safe because IsSpaceOrTab() will return false for null terminators
-		if (!IsSpaceOrTab(s[i]))
+		if (!IsSpaceOrTab(ch))
 			return false;
 	}
 	return true;
@@ -1894,7 +1894,7 @@ void Editor::AddChar(char ch) {
 	char s[2];
 	s[0] = ch;
 	s[1] = '\0';
-	AddCharUTF(s, 1);
+	AddCharUTF(std::string_view(s, 1));
 }
 
 void Editor::FilterSelections() {
@@ -1905,8 +1905,8 @@ void Editor::FilterSelections() {
 }
 
 // AddCharUTF inserts an array of bytes which may or may not be in UTF-8.
-void Editor::AddCharUTF(const char *s, unsigned int len) {
-	if (len == 0) {
+void Editor::AddCharUTF(std::string_view sv) {
+	if (sv.empty()) {
 		return;
 	}
 	FilterSelections();
@@ -1946,7 +1946,7 @@ void Editor::AddCharUTF(const char *s, unsigned int len) {
 					}
 				}
 				positionInsert = RealizeVirtualSpace(positionInsert, currentSel->caret.VirtualSpace());
-				const Sci::Position lengthInserted = pdoc->InsertString(positionInsert, s, len);
+				const Sci::Position lengthInserted = pdoc->InsertString(positionInsert, sv.data(), sv.length());
 				if (lengthInserted > 0) {
 					currentSel->caret.SetPosition(positionInsert + lengthInserted);
 					currentSel->anchor.SetPosition(positionInsert + lengthInserted);
@@ -1975,27 +1975,27 @@ void Editor::AddCharUTF(const char *s, unsigned int len) {
 	// Avoid blinking during rapid typing:
 	ShowCaretAtCurrentPosition();
 	if ((caretSticky == SC_CARETSTICKY_OFF) ||
-		((caretSticky == SC_CARETSTICKY_WHITESPACE) && !IsAllSpacesOrTabs(s, len))) {
+		((caretSticky == SC_CARETSTICKY_WHITESPACE) && !IsAllSpacesOrTabs(sv))) {
 		SetLastXChosen();
 	}
 
 	// We don't handle inline IME tentative characters
 	if (charAddedSource != SC_CHARADDED_TENTATIVE) {
-		int ch = static_cast<unsigned char>(s[0]);
+		int ch = static_cast<unsigned char>(sv[0]);
 		if (pdoc->dbcsCodePage != SC_CP_UTF8) {
-			if (len > 1) {
+			if (sv.length() > 1) {
 				// DBCS code page or DBCS font character set.
-				ch = (ch << 8) | static_cast<unsigned char>(s[1]);
+				ch = (ch << 8) | static_cast<unsigned char>(sv[1]);
 			}
 		} else {
-			if ((ch < 0xC2) || (1 == len)) {
+			if ((ch < 0xC2) || (1 == sv.length())) {
 				// Handles UTF-8 characters between 0x01 and 0x7F and single byte
 				// characters when not in UTF-8 mode.
 				// Also treats \0 and naked trail bytes 0x80 to 0xBF as valid
 				// characters representing themselves.
 			} else {
 				unsigned int utf32[1] = { 0 };
-				UTF32FromUTF8(std::string_view(s, len), utf32, std::size(utf32));
+				UTF32FromUTF8(sv, utf32, std::size(utf32));
 				ch = utf32[0];
 			}
 		}
@@ -2003,7 +2003,7 @@ void Editor::AddCharUTF(const char *s, unsigned int len) {
 	}
 
 	if (recordingMacro) {
-		NotifyMacroRecord(SCI_REPLACESEL, 0, reinterpret_cast<sptr_t>(s));
+		NotifyMacroRecord(SCI_REPLACESEL, 0, reinterpret_cast<sptr_t>(sv.data()));
 	}
 }
 

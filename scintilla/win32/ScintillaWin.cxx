@@ -1169,7 +1169,7 @@ void ScintillaWin::AddWString(std::wstring_view wsv) {
 
 		const int size = MultiByteFromWideChar(codePage, wsv.substr(i, ucWidth), inBufferCP, sizeof(inBufferCP) - 1);
 		inBufferCP[size] = '\0';
-		AddCharUTF(inBufferCP, size);
+		AddCharUTF(std::string_view(inBufferCP, size));
 		i += ucWidth;
 	}
 }
@@ -1220,7 +1220,7 @@ sptr_t ScintillaWin::HandleCompositionInline(uptr_t, sptr_t lParam) {
 			const size_t ucWidth = UTF16CharLength(wsv[i]);
 			const int size = MultiByteFromWideChar(codePage, wsv.substr(i, ucWidth), inBufferCP, sizeof(inBufferCP) - 1);
 			inBufferCP[size] = '\0';
-			AddCharUTF(inBufferCP, size);
+			AddCharUTF(std::string_view(inBufferCP, size));
 
 			DrawImeIndicator(imeIndicator[i], size);
 			i += ucWidth;
@@ -3196,7 +3196,7 @@ void ScintillaWin::EnumDataSourceFormat(const char *tag, LPDATAOBJECT pIDataSour
 				const char *fmtName = GetSourceFormatName(fmt, name, sizeof(name));
 				const int len = sprintf(buf, "%s: fmt[%lu]=%u, 0x%04X; tymed=%lu, %s; name=%s\n",
 					tag, i, fmt, fmt, tymed, typeName, fmtName);
-				AddCharUTF(buf, len);
+				AddCharUTF(std::string_view(buf, len));
 			}
 		}
 	}
@@ -3215,7 +3215,7 @@ void ScintillaWin::EnumAllClipboardFormat(const char *tag) {
 		const char *fmtName = GetSourceFormatName(fmt, name, sizeof(name));
 		const int len = sprintf(buf, "%s: fmt[%u]=%u, 0x%04X; name=%s\n",
 			tag, i, fmt, fmt, fmtName);
-		AddCharUTF(buf, len);
+		AddCharUTF(std::string_view(buf, len));
 		i++;
 	}
 }
