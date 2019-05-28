@@ -424,7 +424,7 @@ class ScintillaWin :
 	void SelectionToHangul();
 	void EscapeHanja();
 	void ToggleHanja();
-	void AddWString(std::wstring_view wsv);
+	void AddWString(std::wstring_view wsv, CharAddedSource charAddedSource = CharAddedSource::charAddedNormal);
 
 	UINT CodePageOfDocument() const;
 	bool ValidCodePage(int codePage) const noexcept override;
@@ -999,9 +999,7 @@ sptr_t ScintillaWin::HandleCompositionWindowed(uptr_t wParam, sptr_t lParam) {
 	if (lParam & GCS_RESULTSTR) {
 		IMContext imc(MainHWND());
 		if (imc.hIMC) {
-			charAddedSource = SC_CHARADDED_IME;
-			AddWString(imc.GetCompositionString(GCS_RESULTSTR));
-			charAddedSource = SC_CHARADDED_NORMAL;
+			AddWString(imc.GetCompositionString(GCS_RESULTSTR), CharAddedSource::charAddedIME);
 
 			// Set new position after converted
 			const Point pos = PointMainCaret();
@@ -1158,7 +1156,7 @@ std::vector<int> MapImeIndicators(const std::vector<BYTE> &inputStyle) {
 
 }
 
-void ScintillaWin::AddWString(std::wstring_view wsv) {
+void ScintillaWin::AddWString(std::wstring_view wsv, CharAddedSource charAddedSource) {
 	if (wsv.empty())
 		return;
 
@@ -1169,7 +1167,7 @@ void ScintillaWin::AddWString(std::wstring_view wsv) {
 
 		const int size = MultiByteFromWideChar(codePage, wsv.substr(i, ucWidth), inBufferCP, sizeof(inBufferCP) - 1);
 		inBufferCP[size] = '\0';
-		AddCharUTF(std::string_view(inBufferCP, size));
+		AddCharUTF(std::string_view(inBufferCP, size), charAddedSource);
 		i += ucWidth;
 	}
 }
@@ -1212,7 +1210,6 @@ sptr_t ScintillaWin::HandleCompositionInline(uptr_t, sptr_t lParam) {
 
 		const bool tmpRecordingMacro = recordingMacro;
 		recordingMacro = false;
-		charAddedSource = SC_CHARADDED_TENTATIVE;
 		const UINT codePage = CodePageOfDocument();
 		char inBufferCP[16];
 		const std::wstring_view wsv = wcs;
@@ -1220,12 +1217,11 @@ sptr_t ScintillaWin::HandleCompositionInline(uptr_t, sptr_t lParam) {
 			const size_t ucWidth = UTF16CharLength(wsv[i]);
 			const int size = MultiByteFromWideChar(codePage, wsv.substr(i, ucWidth), inBufferCP, sizeof(inBufferCP) - 1);
 			inBufferCP[size] = '\0';
-			AddCharUTF(std::string_view(inBufferCP, size));
+			AddCharUTF(std::string_view(inBufferCP, size), CharAddedSource::charAddedTentative);
 
 			DrawImeIndicator(imeIndicator[i], size);
 			i += ucWidth;
 		}
-		charAddedSource = SC_CHARADDED_NORMAL;
 		recordingMacro = tmpRecordingMacro;
 
 		// Move IME caret from current last position to imeCaretPos.
@@ -1238,9 +1234,7 @@ sptr_t ScintillaWin::HandleCompositionInline(uptr_t, sptr_t lParam) {
 			view.imeCaretBlockOverride = true;
 		}
 	} else if (lParam & GCS_RESULTSTR) {
-		charAddedSource = SC_CHARADDED_IME;
-		AddWString(imc.GetCompositionString(GCS_RESULTSTR));
-		charAddedSource = SC_CHARADDED_NORMAL;
+		AddWString(imc.GetCompositionString(GCS_RESULTSTR), CharAddedSource::charAddedIME);
 	}
 	EnsureCaretVisible();
 	SetCandidateWindowPos();

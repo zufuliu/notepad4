@@ -1069,9 +1069,6 @@ typedef sptr_t (*SciFnDirect)(sptr_t ptr, unsigned int iMessage, uptr_t wParam, 
 #define SC_MOD_INSERTCHECK 0x100000
 #define SC_MOD_CHANGETABSTOPS 0x200000
 #define SC_MODEVENTMASKALL 0x3FFFFF
-#define SC_CHARADDED_NORMAL 0
-#define SC_CHARADDED_TENTATIVE 1
-#define SC_CHARADDED_IME 2
 #define SC_UPDATE_CONTENT 0x1
 #define SC_UPDATE_SELECTION 0x2
 #define SC_UPDATE_V_SCROLL 0x4
@@ -1111,6 +1108,9 @@ typedef sptr_t (*SciFnDirect)(sptr_t ptr, unsigned int iMessage, uptr_t wParam, 
 #define SC_AC_TAB 3
 #define SC_AC_NEWLINE 4
 #define SC_AC_COMMAND 5
+#define SC_CHARADDEDSOURCE_NORMAL 0
+#define SC_CHARADDEDSOURCE_TENTATIVE 1
+#define SC_CHARADDEDSOURCE_IME 2
 #define SCN_STYLENEEDED 2000
 #define SCN_CHARADDED 2001
 #define SCN_SAVEPOINTREACHED 2002
@@ -1254,7 +1254,8 @@ struct SCNotification {
 	int updated;	/* SCN_UPDATEUI */
 	int listCompletionMethod;
 	/* SCN_AUTOCSELECTION, SCN_AUTOCCOMPLETED, SCN_USERLISTSELECTION, */
-	int oldCodePage;	/* SCN_CODEPAGECHANGED */
+	int charAddedSource;	/* SCN_CHARADDED */
+	int oldCodePage;		/* SCN_CODEPAGECHANGED */
 };
 
 #ifdef INCLUDE_DEPRECATED_FEATURES
