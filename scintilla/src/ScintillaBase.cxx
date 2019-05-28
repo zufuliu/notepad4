@@ -82,17 +82,17 @@ void ScintillaBase::Finalise() noexcept {
 #endif
 }
 
-void ScintillaBase::AddCharUTF(const char *s, unsigned int len) {
-	const bool isFillUp = ac.Active() && ac.IsFillUpChar(*s);
+void ScintillaBase::AddCharUTF(std::string_view sv) {
+	const bool isFillUp = ac.Active() && ac.IsFillUpChar(sv[0]);
 	if (!isFillUp) {
-		Editor::AddCharUTF(s, len);
+		Editor::AddCharUTF(sv);
 	}
 	if (ac.Active()) {
-		AutoCompleteCharacterAdded(s[0]);
+		AutoCompleteCharacterAdded(sv[0]);
 		// For fill ups add the character after the autocompletion has
 		// triggered so containers see the key so can display a calltip.
 		if (isFillUp) {
-			Editor::AddCharUTF(s, len);
+			Editor::AddCharUTF(sv);
 		}
 	}
 }
