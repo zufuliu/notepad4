@@ -62,7 +62,6 @@ EditModel::EditModel() : braces{} {
 	highlightGuideColumn = 0;
 	primarySelection = true;
 	imeInteraction = imeWindowed;
-	charAddedSource = SC_CHARADDED_NORMAL;
 	inlineIMEUseBlockCaret = false;
 	bidirectional = Bidirectional::bidiDisabled;
 	foldFlags = 0;

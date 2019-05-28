@@ -61,7 +61,7 @@ protected:
 	void Initialise() noexcept override {}
 	void Finalise() noexcept override;
 
-	void AddCharUTF(std::string_view sv) override;
+	void AddCharUTF(std::string_view sv, CharAddedSource charAddedSource = CharAddedSource::charAddedNormal) override;
 	void Command(int cmdId);
 	void CancelModes() noexcept override;
 	int KeyCommand(unsigned int iMessage) override;

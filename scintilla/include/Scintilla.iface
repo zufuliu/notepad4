@@ -2843,11 +2843,6 @@ val SC_MOD_INSERTCHECK=0x100000
 val SC_MOD_CHANGETABSTOPS=0x200000
 val SC_MODEVENTMASKALL=0x3FFFFF
 
-# modifiers for SCN_CHARADDED: normal input, inline IME tentative, IME full composited
-val SC_CHARADDED_NORMAL=0
-val SC_CHARADDED_TENTATIVE=1
-val SC_CHARADDED_IME=2
-
 enu Update=SC_UPDATE_
 val SC_UPDATE_CONTENT=0x1
 val SC_UPDATE_SELECTION=0x2
@@ -2903,6 +2898,12 @@ val SC_AC_DOUBLECLICK=2
 val SC_AC_TAB=3
 val SC_AC_NEWLINE=4
 val SC_AC_COMMAND=5
+
+# charAddedSource for SCN_CHARADDED: normal input, inline IME tentative, IME full composited
+enu CharAddedSource=SC_CHARADDEDSOURCE_
+val SC_CHARADDEDSOURCE_NORMAL=0
+val SC_CHARADDEDSOURCE_TENTATIVE=1
+val SC_CHARADDEDSOURCE_IME=2
 
 ################################################
 # For SciLexer.h
