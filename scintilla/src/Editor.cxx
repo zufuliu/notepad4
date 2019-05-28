@@ -2500,7 +2500,7 @@ void Editor::NotifyNeedShown(Sci::Position pos, Sci::Position len) noexcept {
 void Editor::NotifyCodePageChanged(int oldCodePage) noexcept {
 	SCNotification scn = {};
 	scn.nmhdr.code = SCN_CODEPAGECHANGED;
-	scn.modifiers = oldCodePage;
+	scn.oldCodePage = oldCodePage;
 	NotifyParent(scn);
 }
 

@@ -4943,7 +4943,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		} break;
 
 		case SCN_CODEPAGECHANGED:
-			EditOnCodePageChanged(scn->modifiers);
+			EditOnCodePageChanged(scn->oldCodePage);
 			break;
 		}
 		break;

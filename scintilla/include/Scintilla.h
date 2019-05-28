@@ -1254,6 +1254,7 @@ struct SCNotification {
 	int updated;	/* SCN_UPDATEUI */
 	int listCompletionMethod;
 	/* SCN_AUTOCSELECTION, SCN_AUTOCCOMPLETED, SCN_USERLISTSELECTION, */
+	int oldCodePage;	/* SCN_CODEPAGECHANGED */
 };
 
 #ifdef INCLUDE_DEPRECATED_FEATURES
