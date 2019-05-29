@@ -2493,7 +2493,7 @@ Sci::Position EditView::FormatRange(bool draw, const Sci_RangeToFormat *pfr, Sur
 		model.pdoc->SciLineFromPosition(pfr->chrg.cpMax);
 	if (linePrintLast > linePrintMax)
 		linePrintLast = linePrintMax;
-	//Platform::DebugPrintf("Formatting lines=[%0d,%0d,%0d] top=%0d bottom=%0d line=%0d %0d\n",
+	//Platform::DebugPrintf("Formatting lines=[%0d,%0d,%0d] top=%0d bottom=%0d line=%0d %.0f\n",
 	//      linePrintStart, linePrintLast, linePrintMax, pfr->rc.top, pfr->rc.bottom, vsPrint.lineHeight,
 	//      surfaceMeasure->Height(vsPrint.styles[STYLE_LINENUMBER].font));
 	Sci::Position endPosPrint = model.pdoc->Length();

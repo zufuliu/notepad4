@@ -570,7 +570,7 @@ public:
 	static void DebugDisplay(const char *s) noexcept;
 	static void DebugPrintf(const char *format, ...) noexcept
 #if defined(__GNUC__) || defined(__clang__)
-__attribute__((format(printf, 1, 2)))
+	__attribute__((format(printf, 1, 2)))
 #endif
 	;
 	static bool ShowAssertionPopUps(bool assertionPopUps_) noexcept;
