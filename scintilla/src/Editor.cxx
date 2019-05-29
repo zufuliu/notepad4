@@ -1894,7 +1894,7 @@ void Editor::AddChar(char ch) {
 	char s[2];
 	s[0] = ch;
 	s[1] = '\0';
-	AddCharUTF(std::string_view(s, 1));
+	InsertCharacter(std::string_view(s, 1));
 }
 
 void Editor::FilterSelections() {
@@ -1904,8 +1904,8 @@ void Editor::FilterSelections() {
 	}
 }
 
-// AddCharUTF inserts an array of bytes which may or may not be in UTF-8.
-void Editor::AddCharUTF(std::string_view sv, CharAddedSource charAddedSource) {
+// InsertCharacter inserts a character encoded in document code page.
+void Editor::InsertCharacter(std::string_view sv, CharacterSource charSource) {
 	if (sv.empty()) {
 		return;
 	}
@@ -1980,7 +1980,7 @@ void Editor::AddCharUTF(std::string_view sv, CharAddedSource charAddedSource) {
 	}
 
 	// We don't handle inline IME tentative characters
-	if (charAddedSource != CharAddedSource::charAddedTentative) {
+	if (charSource != CharacterSource::charSourceTentative) {
 		int ch = static_cast<unsigned char>(sv[0]);
 		if (pdoc->dbcsCodePage != SC_CP_UTF8) {
 			if (sv.length() > 1) {
@@ -1999,11 +1999,12 @@ void Editor::AddCharUTF(std::string_view sv, CharAddedSource charAddedSource) {
 				ch = utf32[0];
 			}
 		}
-		NotifyChar(ch, charAddedSource);
+		NotifyChar(ch, charSource);
 	}
 
 	if (recordingMacro) {
-		NotifyMacroRecord(SCI_REPLACESEL, 0, reinterpret_cast<sptr_t>(sv.data()));
+		std::string copy(sv); // ensure NUL-terminated
+		NotifyMacroRecord(SCI_REPLACESEL, 0, reinterpret_cast<sptr_t>(copy.data()));
 	}
 }
 
@@ -2348,11 +2349,11 @@ void Editor::NotifyErrorOccurred(Document *, void *, int status) noexcept {
 	errorStatus = status;
 }
 
-void Editor::NotifyChar(int ch, CharAddedSource charAddedSource) noexcept {
+void Editor::NotifyChar(int ch, CharacterSource charSource) noexcept {
 	SCNotification scn = {};
 	scn.nmhdr.code = SCN_CHARADDED;
 	scn.ch = ch;
-	scn.charAddedSource = static_cast<int>(charAddedSource);
+	scn.characterSource = static_cast<int>(charSource);
 	NotifyParent(scn);
 }
 

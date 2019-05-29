@@ -2899,11 +2899,11 @@ val SC_AC_TAB=3
 val SC_AC_NEWLINE=4
 val SC_AC_COMMAND=5
 
-# charAddedSource for SCN_CHARADDED: normal input, inline IME tentative, IME full composited
-enu CharAddedSource=SC_CHARADDEDSOURCE_
-val SC_CHARADDEDSOURCE_NORMAL=0
-val SC_CHARADDEDSOURCE_TENTATIVE=1
-val SC_CHARADDEDSOURCE_IME=2
+# characterSource for SCN_CHARADDED: normal input, inline IME tentative, IME full composited
+enu CharacterSource=SC_CHARACTERSOURCE_
+val SC_CHARACTERSOURCE_NORMAL=0
+val SC_CHARACTERSOURCE_TENTATIVE=1
+val SC_CHARACTERSOURCE_IME=2
 
 ################################################
 # For SciLexer.h
@@ -2912,7 +2912,7 @@ val SC_CHARADDEDSOURCE_IME=2
 # Events
 
 evt void StyleNeeded=2000(int position)
-evt void CharAdded=2001(int ch)
+evt void CharAdded=2001(int ch, int characterSource)
 evt void SavePointReached=2002(void)
 evt void SavePointLeft=2003(void)
 evt void ModifyAttemptRO=2004(void)
