@@ -424,7 +424,7 @@ class ScintillaWin :
 	void SelectionToHangul();
 	void EscapeHanja();
 	void ToggleHanja();
-	void AddWString(std::wstring_view wsv, CharAddedSource charAddedSource = CharAddedSource::charAddedNormal);
+	void AddWString(std::wstring_view wsv, CharacterSource charSource = CharacterSource::charSourceNormal);
 
 	UINT CodePageOfDocument() const;
 	bool ValidCodePage(int codePage) const noexcept override;
@@ -999,7 +999,7 @@ sptr_t ScintillaWin::HandleCompositionWindowed(uptr_t wParam, sptr_t lParam) {
 	if (lParam & GCS_RESULTSTR) {
 		IMContext imc(MainHWND());
 		if (imc.hIMC) {
-			AddWString(imc.GetCompositionString(GCS_RESULTSTR), CharAddedSource::charAddedIME);
+			AddWString(imc.GetCompositionString(GCS_RESULTSTR), CharacterSource::charSourceIME);
 
 			// Set new position after converted
 			const Point pos = PointMainCaret();
@@ -1032,7 +1032,7 @@ void ScintillaWin::MoveImeCarets(Sci::Position offset) {
 void ScintillaWin::DrawImeIndicator(int indicator, int len) {
 	// Emulate the visual style of IME characters with indicators.
 	// Draw an indicator on the character before caret by the character bytes of len
-	// so it should be called after addCharUTF().
+	// so it should be called after InsertCharacter().
 	// It does not affect caret positions.
 	if (indicator < 8 || indicator > INDIC_MAX) {
 		return;
@@ -1156,7 +1156,7 @@ std::vector<int> MapImeIndicators(const std::vector<BYTE> &inputStyle) {
 
 }
 
-void ScintillaWin::AddWString(std::wstring_view wsv, CharAddedSource charAddedSource) {
+void ScintillaWin::AddWString(std::wstring_view wsv, CharacterSource charSource) {
 	if (wsv.empty())
 		return;
 
@@ -1167,7 +1167,7 @@ void ScintillaWin::AddWString(std::wstring_view wsv, CharAddedSource charAddedSo
 
 		const int size = MultiByteFromWideChar(codePage, wsv.substr(i, ucWidth), inBufferCP, sizeof(inBufferCP) - 1);
 		inBufferCP[size] = '\0';
-		AddCharUTF(std::string_view(inBufferCP, size), charAddedSource);
+		InsertCharacter(std::string_view(inBufferCP, size), charSource);
 		i += ucWidth;
 	}
 }
@@ -1217,7 +1217,7 @@ sptr_t ScintillaWin::HandleCompositionInline(uptr_t, sptr_t lParam) {
 			const size_t ucWidth = UTF16CharLength(wsv[i]);
 			const int size = MultiByteFromWideChar(codePage, wsv.substr(i, ucWidth), inBufferCP, sizeof(inBufferCP) - 1);
 			inBufferCP[size] = '\0';
-			AddCharUTF(std::string_view(inBufferCP, size), CharAddedSource::charAddedTentative);
+			InsertCharacter(std::string_view(inBufferCP, size), CharacterSource::charSourceTentative);
 
 			DrawImeIndicator(imeIndicator[i], size);
 			i += ucWidth;
@@ -1234,7 +1234,7 @@ sptr_t ScintillaWin::HandleCompositionInline(uptr_t, sptr_t lParam) {
 			view.imeCaretBlockOverride = true;
 		}
 	} else if (lParam & GCS_RESULTSTR) {
-		AddWString(imc.GetCompositionString(GCS_RESULTSTR), CharAddedSource::charAddedIME);
+		AddWString(imc.GetCompositionString(GCS_RESULTSTR), CharacterSource::charSourceIME);
 	}
 	EnsureCaretVisible();
 	SetCandidateWindowPos();
@@ -3190,7 +3190,7 @@ void ScintillaWin::EnumDataSourceFormat(const char *tag, LPDATAOBJECT pIDataSour
 				const char *fmtName = GetSourceFormatName(fmt, name, sizeof(name));
 				const int len = sprintf(buf, "%s: fmt[%lu]=%u, 0x%04X; tymed=%lu, %s; name=%s\n",
 					tag, i, fmt, fmt, tymed, typeName, fmtName);
-				AddCharUTF(std::string_view(buf, len));
+				InsertCharacter(std::string_view(buf, len));
 			}
 		}
 	}
@@ -3209,7 +3209,7 @@ void ScintillaWin::EnumAllClipboardFormat(const char *tag) {
 		const char *fmtName = GetSourceFormatName(fmt, name, sizeof(name));
 		const int len = sprintf(buf, "%s: fmt[%u]=%u, 0x%04X; name=%s\n",
 			tag, i, fmt, fmt, fmtName);
-		AddCharUTF(std::string_view(buf, len));
+		InsertCharacter(std::string_view(buf, len));
 		i++;
 	}
 }

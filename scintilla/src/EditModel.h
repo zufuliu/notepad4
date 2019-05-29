@@ -39,10 +39,10 @@ public:
 	enum IMEInteraction {
 		imeWindowed, imeInline
 	} imeInteraction;
-	enum class CharAddedSource {
-		charAddedNormal,
-		charAddedTentative,
-		charAddedIME,
+	enum class CharacterSource {
+		charSourceNormal,
+		charSourceTentative,
+		charSourceIME,
 	};
 	bool inlineIMEUseBlockCaret;
 	enum class Bidirectional {
