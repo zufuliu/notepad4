@@ -1869,7 +1869,7 @@ Sci::Position Document::FindText(Sci::Position minPos, Sci::Position maxPos, con
 		// Compute actual search ranges needed
 		const Sci::Position lengthFind = *length;
 
-		//Platform::DebugPrintf("Find %d %d %s %d\n", startPos, endPos, ft->lpstrText, lengthFind);
+		//Platform::DebugPrintf("Find %d %d %s %d\n", startPos, endPos, search, lengthFind);
 		const Sci::Position limitPos = std::max(startPos, endPos);
 		Sci::Position pos = startPos;
 		if (!forward) {

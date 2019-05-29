@@ -341,7 +341,7 @@ PRectangle Editor::GetTextRectangle() const noexcept {
 Sci::Line Editor::LinesOnScreen() const noexcept {
 	const PRectangle rcClient = GetClientRectangle();
 	const int htClient = static_cast<int>(rcClient.bottom - rcClient.top);
-	//Platform::DebugPrintf("lines on screen = %d\n", htClient / lineHeight + 1);
+	//Platform::DebugPrintf("lines on screen = %d\n", htClient / vs.lineHeight + 1);
 	return htClient / vs.lineHeight;
 }
 
@@ -355,7 +355,7 @@ Sci::Line Editor::LinesToScroll() const noexcept {
 
 Sci::Line Editor::MaxScrollPos() const noexcept {
 	//Platform::DebugPrintf("Lines %d screen = %d maxScroll = %d\n",
-	//LinesTotal(), LinesOnScreen(), LinesTotal() - LinesOnScreen() + 1);
+	//pdoc->LinesTotal(), LinesOnScreen(), pdoc->LinesTotal() - LinesOnScreen() + 1);
 	Sci::Line retVal = pcs->LinesDisplayed();
 	if (endAtLastLine) {
 		retVal -= LinesOnScreen();
@@ -433,7 +433,7 @@ SelectionPosition Editor::SPositionFromLineX(Sci::Line lineDoc, int x) {
 	RefreshStyleData();
 	if (lineDoc >= pdoc->LinesTotal())
 		return SelectionPosition(pdoc->Length());
-	//Platform::DebugPrintf("Position of (%d,%d) line = %d top=%d\n", pt.x, pt.y, line, topLine);
+	//Platform::DebugPrintf("Position of (%d) line = %d top=%d\n", x, lineDoc, topLine);
 	AutoSurface surface(this);
 	return view.SPositionFromLineX(surface, *this, lineDoc, x, vs);
 }
@@ -466,7 +466,7 @@ bool Editor::AbandonPaint() noexcept {
 }
 
 void Editor::RedrawRect(PRectangle rc) noexcept {
-	//Platform::DebugPrintf("Redraw %0d,%0d - %0d,%0d\n", rc.left, rc.top, rc.right, rc.bottom);
+	//Platform::DebugPrintf("Redraw %.0f,%.0f - %.0f,%.0f\n", rc.left, rc.top, rc.right, rc.bottom);
 
 	// Clip the redraw rectangle into the client area
 	const PRectangle rcClient = GetClientRectangle();
@@ -1722,7 +1722,7 @@ void Editor::RefreshPixMaps(Surface *surfaceWindow) {
 }
 
 void Editor::Paint(Surface *surfaceWindow, PRectangle rcArea) {
-	//Platform::DebugPrintf("Paint:%1d (%3d,%3d) ... (%3d,%3d)\n",
+	//Platform::DebugPrintf("Paint:%1d (%.0f,%.0f) ... (%.0f,%.0f)\n",
 	//	paintingAllText, rcArea.left, rcArea.top, rcArea.right, rcArea.bottom);
 	AllocateGraphics();
 
@@ -1736,7 +1736,7 @@ void Editor::Paint(Surface *surfaceWindow, PRectangle rcArea) {
 	StyleAreaBounded(rcArea, false);
 
 	const PRectangle rcClient = GetClientRectangle();
-	//Platform::DebugPrintf("Client: (%3d,%3d) ... (%3d,%3d)   %d\n",
+	//Platform::DebugPrintf("Client: (%.0f,%.0f) ... (%.0f,%.0f)\n",
 	//	rcClient.left, rcClient.top, rcClient.right, rcClient.bottom);
 
 	if (NotifyUpdateUI()) {
@@ -2865,7 +2865,7 @@ void Editor::NotifyMacroRecord(unsigned int iMessage, uptr_t wParam, sptr_t lPar
 		// with char insert messages.
 	case SCI_NEWLINE:
 	default:
-		//Platform::DebugPrintf("Filtered out %ld of macro recording\n", iMessage);
+		//Platform::DebugPrintf("Filtered out %u of macro recording\n", iMessage);
 		return;
 	}
 
@@ -4512,7 +4512,7 @@ static constexpr bool AllowVirtualSpace(int virtualSpaceOptions, bool rectangula
 
 void Editor::ButtonDownWithModifiers(Point pt, unsigned int curTime, int modifiers) {
 	SetHoverIndicatorPoint(pt);
-	//Platform::DebugPrintf("ButtonDown %d %d = %d alt=%d %d\n", curTime, lastClickTime, curTime - lastClickTime, alt, inDragDrop);
+	//Platform::DebugPrintf("ButtonDown %d %d = %d modifiers=%d %d\n", curTime, lastClickTime, curTime - lastClickTime, modifiers, inDragDrop);
 	ptMouseLast = pt;
 	const bool ctrl = (modifiers & SCI_CTRL) != 0;
 	const bool shift = (modifiers & SCI_SHIFT) != 0;
@@ -4792,7 +4792,7 @@ void Editor::ButtonMoveWithModifiers(Point pt, unsigned int, int modifiers) {
 	if ((dwellDelay < SC_TIME_FOREVER) && rcClient.Contains(pt)) {
 		FineTickerStart(tickDwell, dwellDelay, dwellDelay / 10);
 	}
-	//Platform::DebugPrintf("Move %d %d\n", pt.x, pt.y);
+	//Platform::DebugPrintf("Move %.0f %.0f\n", pt.x, pt.y);
 	if (HaveMouseCapture()) {
 
 		// Slow down autoscrolling/selection
@@ -5247,7 +5247,7 @@ void Editor::SetAnnotationHeights(Sci::Line start, Sci::Line end) {
 }
 
 void Editor::SetDocPointer(Document *document) {
-	//Platform::DebugPrintf("** %x setdoc to %x\n", pdoc, document);
+	//Platform::DebugPrintf("** %p setdoc to %p\n", pdoc, document);
 	pdoc->RemoveWatcher(this, nullptr);
 	pdoc->Release();
 	if (document == nullptr) {
@@ -5805,7 +5805,7 @@ sptr_t Editor::BytesResult(sptr_t lParam, const unsigned char *val, size_t len) 
 }
 
 sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
-	//Platform::DebugPrintf("S start wnd proc %d %d %d\n", iMessage, wParam, lParam);
+	//Platform::DebugPrintf("S start wnd proc %u %d %d\n", iMessage, wParam, lParam);
 
 	// Optional macro recording hook
 	if (recordingMacro)
