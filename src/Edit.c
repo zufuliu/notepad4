@@ -6324,7 +6324,7 @@ BOOL FileVars_Init(LPCSTR lpData, DWORD cbData, LPFILEVARS lpfv) {
 	}
 
 	if (lpfv->mask == 0 && cbData > COUNTOF(tch)) {
-		strncpy(tch, lpData + cbData - COUNTOF(tch) + 1, COUNTOF(tch));
+		strncpy(tch, lpData + cbData - COUNTOF(tch) + 1, COUNTOF(tch) - 1);
 		if (!fNoFileVariables) {
 			int i;
 			if (FileVars_ParseInt(tch, "enable-local-variables", &i) && (!i)) {
@@ -6530,7 +6530,7 @@ BOOL FileVars_ParseStr(LPCSTR pszData, LPCSTR pszName, char *pszValue, int cchVa
 		}
 
 		char tch[32];
-		strncpy(tch, pvStart, COUNTOF(tch));
+		strncpy(tch, pvStart, COUNTOF(tch) - 1);
 
 		char *pvEnd = tch;
 		while (*pvEnd && (isalnum((unsigned char)(*pvEnd)) || strchr("+-/_", *pvEnd) || (bQuoted && *pvEnd == ' '))) {
