@@ -2724,9 +2724,10 @@ void EditEncloseSelection(LPCWSTR pwszOpen, LPCWSTR pwszClose) {
 	}
 
 	SciCall_BeginUndoAction();
-	len = (mszOpen == NULL) ? 0 : (int)strlen(mszOpen);
+	len = 0;
 
 	if (StrNotEmptyA(mszOpen)) {
+		len = (int)strlen(mszOpen);
 		SciCall_SetTargetRange(iSelStart, iSelStart);
 		SciCall_ReplaceTarget(len, mszOpen);
 	}

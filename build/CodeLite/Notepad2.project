@@ -358,13 +358,13 @@
       </Completion>
     </Configuration>
     <Configuration Name="Release_Win32" CompilerType="MinGW ( gcc )" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
-      <Compiler Options="-msse2;-mfpmath=sse;-O2;-ffast-math;-fno-rtti;-fomit-frame-pointer;-flto;-fuse-linker-plugin" C_Options="-msse2;-mfpmath=sse;-O2;-ffast-math;-fomit-frame-pointer;-flto;-fuse-linker-plugin" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
+      <Compiler Options="-msse2;-mfpmath=sse;-O2;-ffast-math;-fno-rtti;-fomit-frame-pointer" C_Options="-msse2;-mfpmath=sse;-O2;-ffast-math;-fomit-frame-pointer" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
         <Preprocessor Value="NDEBUG"/>
         <Preprocessor Value="WIN32"/>
         <Preprocessor Value="_WIN32_WINNT=0x0501"/>
         <Preprocessor Value="WINVER=0x0501"/>
       </Compiler>
-      <Linker Options="-s;-O2;-static;-Wl,--gc-sections;-msse2;-mfpmath=sse;-ffast-math;-fno-rtti;-fomit-frame-pointer;-flto;-fuse-linker-plugin" Required="yes"/>
+      <Linker Options="-s;-O2;-static;-Wl,--gc-sections;-msse2;-mfpmath=sse;-ffast-math;-fno-rtti;-fomit-frame-pointer" Required="yes"/>
       <ResourceCompiler Options="-DWIN32" Required="no"/>
       <General OutputFile="$(WorkspacePath)/../bin/$(ConfigurationName)/$(ProjectName).exe" IntermediateDirectory="$(WorkspacePath)/../bin/$(ConfigurationName)/obj/$(ProjectName)" Command="./$(ProjectName)" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(WorkspacePath)/../bin/$(ConfigurationName)" PauseExecWhenProcTerminates="no" IsGUIProgram="yes" IsEnabled="yes"/>
       <BuildSystem Name="Default"/>
@@ -400,13 +400,13 @@
       </Completion>
     </Configuration>
     <Configuration Name="Release_x64" CompilerType="MinGW ( gcc )" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
-      <Compiler Options="-O2;-fno-rtti;-ffast-math;-fomit-frame-pointer;-flto;-fuse-linker-plugin" C_Options="-O2;-ffast-math;-fomit-frame-pointer;-flto;-fuse-linker-plugin" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
+      <Compiler Options="-O2;-fno-rtti;-ffast-math;-fomit-frame-pointer" C_Options="-O2;-ffast-math;-fomit-frame-pointer" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
         <Preprocessor Value="NDEBUG"/>
         <Preprocessor Value="_WIN64"/>
         <Preprocessor Value="_WIN32_WINNT=0x0502"/>
         <Preprocessor Value="WINVER=0x0502"/>
       </Compiler>
-      <Linker Options="-s;-O2;-static;-Wl,--gc-sections;-ffast-math;-fno-rtti;-fomit-frame-pointer;-flto;-fuse-linker-plugin" Required="yes"/>
+      <Linker Options="-s;-O2;-static;-Wl,--gc-sections;-ffast-math;-fno-rtti;-fomit-frame-pointer" Required="yes"/>
       <ResourceCompiler Options="-D_WIN64" Required="no"/>
       <General OutputFile="$(WorkspacePath)/../bin/$(ConfigurationName)/$(ProjectName).exe" IntermediateDirectory="$(WorkspacePath)/../bin/$(ConfigurationName)/obj/$(ProjectName)" Command="./$(ProjectName)" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(WorkspacePath)/../bin/$(ConfigurationName)" PauseExecWhenProcTerminates="no" IsGUIProgram="yes" IsEnabled="yes"/>
       <BuildSystem Name="Default"/>
