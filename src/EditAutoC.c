@@ -1592,7 +1592,7 @@ const char *EditKeywordIndent(const char *head, int *indent) {
 				endPart = "endif";
 			} else if (!strcmp(word, "switch")) {
 				*indent = 2;
-				endPart = "endif";
+				endPart = "endsw";
 			} else if (!strcmp(word, "foreach") || !strcmp(word, "while")) {
 				*indent = 2;
 				endPart = "end";
@@ -1780,11 +1780,11 @@ void EditAutoIndent(void) {
 				commentStyle = 1;
 			}
 		}
+
 		iIndentLen = 0;
 		ch = SciCall_GetCharAt(SciCall_PositionFromLine(iCurLine));
-		if (indent == 2 && !(ch == '}' || ch == ']' || ch == ')')) {
-			indent = 1;
-		} else if (!indent && (ch == '}' || ch == ']' || ch == ')')) {
+		const BOOL closeBraces = (ch == '}' || ch == ']' || ch == ')');
+		if ((indent == 2 && !closeBraces) || (indent == 0 && closeBraces)) {
 			indent = 1;
 		}
 

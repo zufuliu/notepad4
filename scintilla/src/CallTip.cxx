@@ -176,7 +176,7 @@ int CallTip::PaintContents(Surface *surfaceWindow, bool draw) {
 	const PRectangle rcClientPos = wCallTip.GetClientPosition();
 	const PRectangle rcClientSize(0.0f, 0.0f, rcClientPos.right - rcClientPos.left,
 		rcClientPos.bottom - rcClientPos.top);
-	PRectangle rcClient(1.0f + innerMarginX, 1.0f + innerMarginY, rcClientSize.right - 1 - innerMarginX, rcClientSize.bottom - 1 - innerMarginY);
+	PRectangle rcClient = rcClientSize.Deflate(1 + innerMarginX, 1 + innerMarginY);
 
 	// To make a nice small call tip window, it is only sized to fit most normal characters without accents
 	const int ascent = static_cast<int>(std::lround(surfaceWindow->Ascent(font) - surfaceWindow->InternalLeading(font)));

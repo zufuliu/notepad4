@@ -642,6 +642,8 @@ static void ColouriseRbDoc(Sci_PositionU startPos, Sci_Position length, int init
 		bool CanBeIndented;
 		HereDocCls() noexcept {
 			State = 0;
+			Quote = '\0';
+			Quoted = false;
 			DelimiterLength = 0;
 			Delimiter[0] = '\0';
 			CanBeIndented = false;

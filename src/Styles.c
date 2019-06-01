@@ -2389,10 +2389,8 @@ BOOL Style_SetLexerFromFile(LPCWSTR lpszFile) {
 		// file mode name/extension
 		if (!bFound) {
 			PEDITLEXER pLexMode;
-			if ((pLexMode = Style_MatchLexer(wchMode, FALSE)) != NULL) {
-				pLexNew = pLexMode;
-				bFound = TRUE;
-			} else if ((pLexMode = Style_MatchLexer(wchMode, TRUE)) != NULL) {
+			if ((pLexMode = Style_MatchLexer(wchMode, FALSE)) != NULL ||
+				(pLexMode = Style_MatchLexer(wchMode, TRUE)) != NULL) {
 				pLexNew = pLexMode;
 				bFound = TRUE;
 			}
@@ -2427,9 +2425,8 @@ BOOL Style_SetLexerFromFile(LPCWSTR lpszFile) {
 //
 void Style_SetLexerFromName(LPCWSTR lpszFile, LPCWSTR lpszName) {
 	PEDITLEXER pLexNew;
-	if ((pLexNew = Style_MatchLexer(lpszName, FALSE)) != NULL) {
-		Style_SetLexer(pLexNew);
-	} else if ((pLexNew = Style_MatchLexer(lpszName, TRUE)) != NULL) {
+	if ((pLexNew = Style_MatchLexer(lpszName, FALSE)) != NULL ||
+		(pLexNew = Style_MatchLexer(lpszName, TRUE)) != NULL) {
 		Style_SetLexer(pLexNew);
 	} else {
 		Style_SetLexerFromFile(lpszFile);
