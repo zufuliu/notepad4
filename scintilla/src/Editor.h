@@ -158,7 +158,7 @@ struct WrapPending {
 class Editor : public EditModel, public DocWatcher {
 protected:	// ScintillaBase subclass needs access to much of Editor
 
-	/** On GTK+, Scintilla is a container widget holding two scroll bars
+	/** On GTK, Scintilla is a container widget holding two scroll bars
 	 * whereas on Windows there is just one window with both scroll bars turned on. */
 	Window wMain;	///< The Scintilla parent window
 	Window wMargin;	///< May be separate when using a scroll view for wMain
