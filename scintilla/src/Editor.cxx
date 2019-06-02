@@ -1171,7 +1171,7 @@ Editor::XYScrollPosition Editor::XYScrollToMakeVisible(SelectionRange range, con
 		const bool bEven = (caretYPolicy & CARET_EVEN) != 0;
 
 		// It should be possible to scroll the window to show the caret,
-		// but this fails to remove the caret on GTK+
+		// but this fails to remove the caret on GTK
 		if (bSlop) {	// A margin is defined
 			Sci::Line yMoveT;
 			Sci::Line yMoveB;
@@ -1668,7 +1668,7 @@ void Editor::PaintSelMargin(Surface *surfaceWindow, PRectangle rc) {
 	RefreshStyleData();
 	RefreshPixMaps(surfaceWindow);
 
-	// On GTK+ with Ubuntu overlay scroll bars, the surface may have been finished
+	// On GTK with Ubuntu overlay scroll bars, the surface may have been finished
 	// at this point. The Initialised call checks for this case and sets the status
 	// to be bad which avoids crashes in following calls.
 	if (!surfaceWindow->Initialised()) {
@@ -1829,7 +1829,7 @@ int Editor::TextWidth(int style, const char *text) {
 	}
 }
 
-// Empty method is overridden on GTK+ to show / hide scrollbars
+// Empty method is overridden on GTK to show / hide scrollbars
 void Editor::ReconfigureScrollBars() noexcept {}
 
 void Editor::SetScrollBars() {
