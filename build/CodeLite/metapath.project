@@ -39,11 +39,11 @@
   </VirtualDirectory>
   <Settings Type="Executable">
     <GlobalSettings>
-      <Compiler Options="-std=gnu++17;-mthreads;-municode;-Wall;-Wextra;-Wshadow;-Wimplicit-fallthrough;-Wformat=2" C_Options="-std=gnu11;-mthreads;-municode;-Wall;-Wextra;-Wshadow;-Wimplicit-fallthrough;-Wformat=2" Assembler="">
+      <Compiler Options="-std=gnu++17;-municode;-Wall;-Wextra;-Wshadow;-Wimplicit-fallthrough;-Wformat=2" C_Options="-std=gnu11;-municode;-Wall;-Wextra;-Wshadow;-Wimplicit-fallthrough;-Wformat=2" Assembler="">
         <Preprocessor Value="UNICODE"/>
         <Preprocessor Value="_UNICODE"/>
       </Compiler>
-      <Linker Options="-mwindows;-mthreads;-municode">
+      <Linker Options="-mwindows;-municode">
         <Library Value="kernel32.a"/>
         <Library Value="user32.a"/>
         <Library Value="gdi32.a"/>
