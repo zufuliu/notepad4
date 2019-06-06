@@ -171,12 +171,12 @@ def updateUnicodeLineBreak(filename):
 	}
 	with open('linebreak.log', 'w', encoding='utf-8', newline='\n') as fd:
 		for ch, value in enumerate(indexTable[:128]):
-			name = ''
 			uch = chr(ch)
 			prop = kUnicodeLineBreak[ch]
 			lb = LineBreakMap[prop]
 			if not uch.isalnum():
 				category = unicodedata.category(uch)
+				name = ''
 				try:
 					name = unicodedata.name(uch)
 				except ValueError:
