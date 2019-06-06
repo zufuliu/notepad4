@@ -6298,7 +6298,7 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 		break;
 
 	case SCI_GETCHARAT:
-		return static_cast<unsigned char>(pdoc->CharAt(wParam));
+		return pdoc->UCharAt(wParam);
 
 	case SCI_GETCHARACTERANDWIDTH:
 		return pdoc->GetCharacterAndWidth(wParam, reinterpret_cast<Sci_Position *>(lParam));
