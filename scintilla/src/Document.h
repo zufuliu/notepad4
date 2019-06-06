@@ -429,6 +429,9 @@ public:
 	char CharAt(Sci::Position position) const noexcept {
 		return cb.CharAt(position);
 	}
+	unsigned char UCharAt(Sci::Position position) const noexcept {
+		return cb.UCharAt(position);
+	}
 	void SCI_METHOD GetCharRange(char *buffer, Sci_Position position, Sci_Position lengthRetrieve) const noexcept override {
 		cb.GetCharRange(buffer, position, lengthRetrieve);
 	}
