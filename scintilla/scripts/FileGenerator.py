@@ -17,6 +17,21 @@ import codecs, os, re, string, sys
 
 lineEnd = "\r\n" if sys.platform == "win32" else "\n"
 
+def DetectLineEnd(content):
+    if not content:
+        return lineEnd
+    length = len(content)
+    index = 0
+    while index < length:
+        ch = content[index]
+        index += 1
+        if ch == '\r':
+            if indent < length and content[index] == '\n':
+                return "\r\n"
+        elif ch == '\n':
+            return "\n"
+    return lineEnd
+
 def UpdateFile(filename, updated):
     """ If the file contents are different to updated then copy updated into the
     file else leave alone so Mercurial and make don't treat it as modified. """
@@ -26,6 +41,10 @@ def UpdateFile(filename, updated):
             original = infile.read()
         if updated == original:
             # Same as before so don't write
+            return
+        fileLineEnd = DetectLineEnd(original)
+        updated = updated.replace("\r\n", "\n").replace("\n", fileLineEnd)
+        if updated == original:
             return
         os.unlink(filename)
     except IOError: # File is not there yet
