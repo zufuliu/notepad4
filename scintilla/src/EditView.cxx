@@ -616,7 +616,7 @@ void EditView::LayoutLine(const EditModel &model, Sci::Line line, Surface *surfa
 						}
 						const Document::CharacterExtracted cePos = model.pdoc->CharacterAfter(pos);
 						const CharClassify::cc ccPos = model.pdoc->WordCharacterClass(cePos.character);
-						if (ccPrev != ccPos || ccPrev == CharClassify::ccCJKWord) {
+						if (ccPrev != ccPos || ccPrev == CharClassify::ccCJKWord || ccPos == CharClassify::ccCJKWord) {
 							lastGoodBreak = pos - posLineStart;
 						}
 						p = pos + cePos.widthBytes - posLineStart;
