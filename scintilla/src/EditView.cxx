@@ -616,6 +616,7 @@ void EditView::LayoutLine(const EditModel &model, Sci::Line line, Surface *surfa
 			CharClassify::cc ccPrev = CharClassify::ccSpace;
 			WrapBreak wbPrev = WrapBreak::None;
 			const bool isUtf8 = SC_CP_UTF8 == model.pdoc->dbcsCodePage;
+			const WrapMode wrapState = vstyle.wrapState;
 			while (p < ll->numCharsInLine) {
 				if ((ll->positions[p + 1] - startOffset) >= width) {
 					if (lastGoodBreak == lastLineStart) {
@@ -640,15 +641,22 @@ void EditView::LayoutLine(const EditModel &model, Sci::Line line, Surface *surfa
 					validateCache = true;
 					continue;
 				}
-				if (p > 0) {
+				if (p <= 0) {
+					p++;
+					continue;
+				}
+				switch (wrapState) {
+				case eWrapAuto:
 					// style boundary and space
-					if ((vstyle.wrapState != eWrapWhitespace) && (ll->styles[p] != ll->styles[p - 1])) {
+					if (ll->styles[p] != ll->styles[p - 1]) {
 						lastGoodBreak = p;
 						validateCache = true;
-					} else if (IsSpaceOrTab(ll->chars[p - 1]) && !IsSpaceOrTab(ll->chars[p])) {
-						lastGoodBreak = p;
-						validateCache = true;
-					} else if (vstyle.wrapState == eWrapAuto) {
+					} else if (IsSpaceOrTab(ll->chars[p - 1])) {
+						if (!IsSpaceOrTab(ll->chars[p])) {
+							lastGoodBreak = p;
+							validateCache = true;
+						}
+					} else {
 						// word boundary
 						// TODO: Unicode Line Breaking Algorithm http://www.unicode.org/reports/tr14/
 						Sci::Position pos = p + posLineStart;
@@ -680,7 +688,19 @@ void EditView::LayoutLine(const EditModel &model, Sci::Line line, Surface *surfa
 						wbPrev = wbPos;
 						validateCache = false;
 						continue;
-					} else if (vstyle.wrapState == eWrapWord) {
+					}
+					break;
+
+				case eWrapWord:
+					if (ll->styles[p] != ll->styles[p - 1]) {
+						lastGoodBreak = p;
+						validateCache = true;
+					} else if (IsSpaceOrTab(ll->chars[p - 1])) {
+						if (!IsSpaceOrTab(ll->chars[p])) {
+							lastGoodBreak = p;
+							validateCache = true;
+						}
+					} else {
 						Sci::Position pos = p + posLineStart;
 						if (validateCache) {
 							pos = model.pdoc->MovePositionOutsideChar(pos, -1);
@@ -699,11 +719,27 @@ void EditView::LayoutLine(const EditModel &model, Sci::Line line, Surface *surfa
 						wbPrev = wbPos;
 						validateCache = false;
 						continue;
-					} else if (vstyle.wrapState == eWrapChar) {
+					}
+					break;
+
+				case eWrapWhitespace:
+					if (IsSpaceOrTab(ll->chars[p - 1]) && !IsSpaceOrTab(ll->chars[p])) {
+						lastGoodBreak = p;
+					}
+					break;
+
+				case eWrapChar:
+					if ((ll->styles[p] != ll->styles[p - 1]) || IsSpaceOrTab(ll->chars[p - 1])) {
+						lastGoodBreak = p;
+					} else {
 						lastGoodBreak = model.pdoc->MovePositionOutsideChar(p + posLineStart, -1) - posLineStart;
 						p = model.pdoc->MovePositionOutsideChar(p + 1 + posLineStart, 1) - posLineStart;
 						continue;
 					}
+					break;
+
+				default:
+					break;
 				}
 				p++;
 			}
