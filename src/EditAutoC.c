@@ -1784,7 +1784,7 @@ void EditAutoIndent(void) {
 		iIndentLen = 0;
 		ch = SciCall_GetCharAt(SciCall_PositionFromLine(iCurLine));
 		const BOOL closeBraces = (ch == '}' || ch == ']' || ch == ')');
-		if ((indent == 2 && !closeBraces) || (indent == 0 && closeBraces)) {
+		if (indent == 2 && !closeBraces) {
 			indent = 1;
 		}
 
@@ -1831,18 +1831,24 @@ void EditAutoIndent(void) {
 					*pPos++ = (char)ch;
 				}
 			}
-			if (iEOLMode == SC_EOL_CRLF || iEOLMode == SC_EOL_CR) {
-				*pPos++ = '\r';
-			}
-			if (iEOLMode == SC_EOL_CRLF || iEOLMode == SC_EOL_LF) {
-				*pPos++ = '\n';
-			}
 			if (indent == 2) {
+				switch (iEOLMode) {
+				case SC_EOL_CRLF:
+					*pPos++ = '\r';
+					*pPos++ = '\n';
+					break;
+				case SC_EOL_LF:
+					*pPos++ = '\n';
+					break;
+				case SC_EOL_CR:
+					*pPos++ = '\r';
+					break;
+				}
 				strncpy(pPos, pLineBuf, iIndentLen + 1);
 				pPos += iIndentLen;
 				if (endPart) {
 					iIndentLen = strlen(endPart);
-					strcat(pPos, endPart);
+					memcpy(pPos, endPart, iIndentLen);
 					pPos += iIndentLen;
 				}
 			}
@@ -1853,11 +1859,6 @@ void EditAutoIndent(void) {
 			SciCall_BeginUndoAction();
 			SciCall_AddText(strlen(pLineBuf), pLineBuf);
 			if (indent) {
-				if (indent == 1) {// remove new line
-					iCurPos = iIndentPos + ((iEOLMode == SC_EOL_CRLF) ? 2 : 1);
-					SciCall_SetSel(iIndentPos, iCurPos);
-					SciCall_ReplaceSel("");
-				}
 				SciCall_SetSel(iIndentPos, iIndentPos);
 			}
 			SciCall_EndUndoAction();
