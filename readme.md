@@ -12,7 +12,7 @@ Latest build [![Build status](https://ci.appveyor.com/api/projects/status/github
 Or build from source, see the [Wiki](https://github.com/zufuliu/notepad2/wiki/Build-Notepad2).
 
 ## [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots)
-![v4.19.04](https://raw.githubusercontent.com/wiki/zufuliu/notepad2/screenshots/v4.19.04.png)
+![v4.19.04](https://raw.githubusercontent.com/wiki/zufuliu/notepad2/screenshots/v4.19.06.png)
 
 ## Changes compared to the official [Notepad2](http://www.flos-freeware.ch/notepad2.html) or [Notepad2-mod](https://xhmikosr.github.io/notepad2-mod/):
 
