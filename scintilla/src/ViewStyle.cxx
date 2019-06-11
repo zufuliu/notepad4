@@ -559,12 +559,12 @@ bool ViewStyle::IsBlockCaretStyle() const noexcept {
 }
 
 ViewStyle::CaretShape ViewStyle::CaretShapeForMode(bool inOverstrike, bool drawDrag, bool drawOverstrikeCaret, bool imeCaretBlockOverride) const noexcept {
+	if (caretStyle == CARETSTYLE_INVISIBLE) {
+		return CaretShape::invisible;
+	}
 	if (drawDrag) {
 		// Dragging text, use a line caret
 		return CaretShape::line;
-	}
-	if (caretStyle == CARETSTYLE_INVISIBLE) {
-		return CaretShape::invisible;
 	}
 	if (inOverstrike) {
 		if (caretStyle & CARETSTYLE_OVERSTRIKE_BLOCK) {
