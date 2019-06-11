@@ -1572,15 +1572,19 @@ void EditView::DrawCarets(Surface *surface, const EditModel &model, const ViewSt
 	Sci::Line lineDoc, int xStart, PRectangle rcLine, int subLine) const {
 	// When drag is active it is the only caret drawn
 	const bool drawDrag = model.posDrag.IsValid();
-	if ((hideSelection || !ll->containsCaret) && !drawDrag)
+	if ((hideSelection || !ll->containsCaret) && !drawDrag) {
 		return;
+	}
+	const ViewStyle::CaretShape caretShape = vsDraw.CaretShapeForMode(model.inOverstrike, drawDrag, drawOverstrikeCaret, imeCaretBlockOverride);
+	if (caretShape == ViewStyle::CaretShape::invisible) {
+		return;
+	}
 	const Sci::Position posLineStart = model.pdoc->LineStart(lineDoc);
 	// For each selection draw
 	for (size_t r = 0; (r < model.sel.Count()) || drawDrag; r++) {
 		const bool mainCaret = r == model.sel.Main();
 		SelectionPosition posCaret = (drawDrag ? model.posDrag : model.sel.Range(r).caret);
-		const ViewStyle::CaretShape caretShape = drawDrag ? ViewStyle::CaretShape::line : vsDraw.CaretShapeForMode(model.inOverstrike);
-		if (((caretShape == ViewStyle::CaretShape::block) || imeCaretBlockOverride) && !drawDrag && posCaret > model.sel.Range(r).anchor) {
+		if ((caretShape == ViewStyle::CaretShape::block) && posCaret > model.sel.Range(r).anchor) {
 			if (posCaret.VirtualSpace() > 0)
 				posCaret.SetVirtualSpace(posCaret.VirtualSpace() - 1);
 			else
@@ -1610,7 +1614,7 @@ void EditView::DrawCarets(Surface *surface, const EditModel &model, const ViewSt
 			}
 			const bool caretBlinkState = (model.caret.active && model.caret.on) || (!additionalCaretsBlink && !mainCaret);
 			const bool caretVisibleState = additionalCaretsVisible || mainCaret;
-			if ((xposCaret >= 0) && (vsDraw.caretWidth > 0) && (vsDraw.caretStyle != CARETSTYLE_INVISIBLE) &&
+			if ((xposCaret >= 0) && (vsDraw.caretWidth > 0) &&
 				(drawDrag || (caretBlinkState && caretVisibleState))) {
 				bool caretAtEOF = false;
 				bool caretAtEOL = false;
@@ -1635,16 +1639,12 @@ void EditView::DrawCarets(Surface *surface, const EditModel &model, const ViewSt
 				if (xposCaret > 0)
 					caretWidthOffset = 0.51f;	// Move back so overlaps both character cells.
 				xposCaret += xStart;
-				if (drawDrag) {
-					/* Dragging text, use a line caret */
-					rcCaret.left = std::round(xposCaret - caretWidthOffset);
-					rcCaret.right = rcCaret.left + vsDraw.caretWidth;
-				} else if ((caretShape == ViewStyle::CaretShape::bar) && drawOverstrikeCaret) {
-					/* Overstrike (insert mode), use a modified bar caret */
+				if (caretShape == ViewStyle::CaretShape::bar) {
+					/* Modified bar caret */
 					rcCaret.top = rcCaret.bottom - 2;
 					rcCaret.left = xposCaret + 1;
 					rcCaret.right = rcCaret.left + widthOverstrikeCaret - 1;
-				} else if ((caretShape == ViewStyle::CaretShape::block) || imeCaretBlockOverride) {
+				} else if (caretShape == ViewStyle::CaretShape::block) {
 					/* Block caret */
 					rcCaret.left = xposCaret;
 					if (!caretAtEOL && !caretAtEOF && (ll->chars[offset] != '\t') && !(IsControlCharacter(ll->chars[offset]))) {
