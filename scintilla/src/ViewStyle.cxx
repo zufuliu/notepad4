@@ -558,11 +558,23 @@ bool ViewStyle::IsBlockCaretStyle() const noexcept {
 	return (caretStyle == CARETSTYLE_BLOCK) || (caretStyle & CARETSTYLE_OVERSTRIKE_BLOCK) != 0;
 }
 
-ViewStyle::CaretShape ViewStyle::CaretShapeForMode(bool inOverstrike) const noexcept {
-	if (inOverstrike) {
-		return (caretStyle & CARETSTYLE_OVERSTRIKE_BLOCK) ? CaretShape::block : CaretShape::bar;
+ViewStyle::CaretShape ViewStyle::CaretShapeForMode(bool inOverstrike, bool drawDrag, bool drawOverstrikeCaret, bool imeCaretBlockOverride) const noexcept {
+	if (drawDrag) {
+		// Dragging text, use a line caret
+		return CaretShape::line;
 	}
-
+	if (caretStyle == CARETSTYLE_INVISIBLE) {
+		return CaretShape::invisible;
+	}
+	if (inOverstrike) {
+		if (caretStyle & CARETSTYLE_OVERSTRIKE_BLOCK) {
+			return CaretShape::block;
+		}
+		return drawOverstrikeCaret ? CaretShape::bar : CaretShape::line;
+	}
+	if (imeCaretBlockOverride) {
+		return CaretShape::block;
+	}
 	const int caret = caretStyle & CARETSTYLE_INS_MASK;
 	return (caret <= CARETSTYLE_BLOCK) ? static_cast<CaretShape>(caret) : CaretShape::line;
 }
