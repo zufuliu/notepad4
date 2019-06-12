@@ -1572,7 +1572,7 @@ void EditView::DrawCarets(Surface *surface, const EditModel &model, const ViewSt
 	Sci::Line lineDoc, int xStart, PRectangle rcLine, int subLine) const {
 	// When drag is active it is the only caret drawn
 	const bool drawDrag = model.posDrag.IsValid();
-	if ((hideSelection || !ll->containsCaret) && !drawDrag) {
+	if ((hideSelection || (model.sel.Count() == 1 && !ll->containsCaret)) && !drawDrag) {
 		return;
 	}
 	const ViewStyle::CaretShape caretShape = vsDraw.CaretShapeForMode(model.inOverstrike, drawDrag, drawOverstrikeCaret, imeCaretBlockOverride);
