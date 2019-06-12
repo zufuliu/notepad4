@@ -570,7 +570,9 @@ ViewStyle::CaretShape ViewStyle::CaretShapeForMode(bool inOverstrike, bool drawD
 		if (caretStyle & CARETSTYLE_OVERSTRIKE_BLOCK) {
 			return CaretShape::block;
 		}
-		return drawOverstrikeCaret ? CaretShape::bar : CaretShape::line;
+		if (drawOverstrikeCaret) {
+			return CaretShape::bar;
+		}
 	}
 	if (imeCaretBlockOverride) {
 		return CaretShape::block;
