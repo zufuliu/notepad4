@@ -1085,12 +1085,29 @@ static inline void Style_SetDefaultStyle(int index) {
 	Style_SetStyles(pLexGlobal->Styles[index].iStyle, pLexGlobal->Styles[index].szValue);
 }
 
-static inline BOOL Style_StrGetAttributeEx(LPCWSTR lpszStyle, LPCWSTR key, int keyLen) {
+// parse a style attribute separated by ';'
+// e.g.: 'bold', 'bold;', '; bold' and '; bold;'
+static BOOL Style_StrGetAttributeEx(LPCWSTR lpszStyle, LPCWSTR key, int keyLen) {
 	LPCWSTR p = StrStr(lpszStyle, key);
-	if (p != NULL) {
-		const WCHAR ch1 = (p == lpszStyle) ? L' ' : p[-1];
-		const WCHAR ch2 = p[keyLen];
-		return (ch1 == L' ' || ch1 == L';') && (ch2 == L'\0' || ch2 == L' ' || ch2 == L';');
+	while (p != NULL) {
+		WCHAR chPrev = (p == lpszStyle) ? L';' : p[-1];
+		if (chPrev == L' ') {
+			LPCWSTR t = p - 2;
+			while (t > lpszStyle && *t == L' ') {
+				--t;
+			}
+			chPrev = (t <= lpszStyle) ? L';' : t[-1];
+		}
+		p += keyLen;
+		if (chPrev == L';') {
+			while (*p == L' ') {
+				++p;
+			}
+			if (*p == L'\0' || *p == L';') {
+				return TRUE;
+			}
+		}
+		p = StrStr(p, key);
 	}
 	return FALSE;
 }
