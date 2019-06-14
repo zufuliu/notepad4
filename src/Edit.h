@@ -283,7 +283,7 @@ void	EditShowCallTips(Sci_Position position);
 #define NCP_UNICODE_REVERSE			16
 #define NCP_UNICODE_BOM				32
 #define NCP_8BIT					64
-#define NCP_INTERNAL				(NCP_DEFAULT|NCP_UTF8|NCP_UTF8_SIGN|NCP_UNICODE|NCP_UNICODE_REVERSE|NCP_UNICODE_BOM)
+#define NCP_INTERNAL				(NCP_DEFAULT | NCP_UTF8 | NCP_UTF8_SIGN | NCP_UNICODE | NCP_UNICODE_REVERSE | NCP_UNICODE_BOM)
 #define NCP_RECODE					128
 #define CPI_NONE					(-1)
 #define CPI_DEFAULT					0
@@ -309,6 +309,22 @@ typedef struct _np2encoding {
 // 932 Shift-JIS, 936 GBK, 949 UHC, 950 Big5, 1361 Johab
 static inline BOOL IsDBCSCodePage(UINT page) {
 	return page == 932 || page == 936 || page == 949 || page == 950 || page == 1361;
+}
+
+// dwFlags must be 0 for MultiByteToWideChar() and WideCharToMultiByte()
+static inline BOOL IsZeroFlagsCodePage(UINT page) {
+	return page == CP_UTF8
+		|| page == CP_UTF7
+		|| page == 54936	// GB18030
+		|| page == 50220	// ISO-2022-JP
+		|| page == 50221	// CS ISO-2022-JP
+		|| page == 50222	// ISO-2022-JP SO/SI
+		|| page == 50225	// ISO-2022-KR
+		|| page == 50227	// ISO-2022-CN Simplified
+		|| page == 50229	// ISO-2022-CN Traditional
+		//|| (page >= 57002 && page <= 57011) // ISCII
+		//|| page == 42		// Symbol
+		;
 }
 
 // in EditEncoding.c
