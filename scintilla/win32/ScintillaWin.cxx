@@ -426,7 +426,7 @@ class ScintillaWin :
 	void ToggleHanja();
 	void AddWString(std::wstring_view wsv, CharacterSource charSource = CharacterSource::charSourceNormal);
 
-	UINT CodePageOfDocument() const;
+	UINT CodePageOfDocument() const noexcept;
 	bool ValidCodePage(int codePage) const noexcept override;
 	sptr_t DefWndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) noexcept override;
 	void IdleWork() override;
@@ -482,8 +482,8 @@ class ScintillaWin :
 	int SetScrollInfo(int nBar, LPCSCROLLINFO lpsi, BOOL bRedraw) const noexcept;
 	bool GetScrollInfo(int nBar, LPSCROLLINFO lpsi) const noexcept;
 	void ChangeScrollPos(int barType, Sci::Position pos);
-	sptr_t GetTextLength();
-	sptr_t GetText(uptr_t wParam, sptr_t lParam);
+	sptr_t GetTextLength() const noexcept;
+	sptr_t GetText(uptr_t wParam, sptr_t lParam) const;
 
 public:
 	~ScintillaWin() override;
@@ -1312,38 +1312,36 @@ UINT CodePageFromCharSet(DWORD characterSet, UINT documentCodePage) noexcept {
 
 }
 
-UINT ScintillaWin::CodePageOfDocument() const {
+UINT ScintillaWin::CodePageOfDocument() const noexcept {
 	return CodePageFromCharSet(vs.styles[STYLE_DEFAULT].characterSet, pdoc->dbcsCodePage);
 }
 
-sptr_t ScintillaWin::GetTextLength() {
-	if (pdoc->Length() == 0)
-		return 0;
-	std::string docBytes(pdoc->Length(), '\0');
-	pdoc->GetCharRange(docBytes.data(), 0, pdoc->Length());
-	if (IsUnicodeMode()) {
-		return UTF16Length(std::string_view(docBytes));
-	} else {
-		return WideCharLenFromMultiByte(CodePageOfDocument(), docBytes);
-	}
+sptr_t ScintillaWin::GetTextLength() const noexcept {
+	return pdoc->CountUTF16(0, pdoc->Length());
 }
 
-sptr_t ScintillaWin::GetText(uptr_t wParam, sptr_t lParam) {
+sptr_t ScintillaWin::GetText(uptr_t wParam, sptr_t lParam) const {
+	if (lParam == 0) {
+		return pdoc->CountUTF16(0, pdoc->Length());
+	}
+	if (wParam == 0) {
+		return 0;
+	}
 	wchar_t *ptr = static_cast<wchar_t *>(PtrFromSPtr(lParam));
 	if (pdoc->Length() == 0) {
 		*ptr = L'\0';
 		return 0;
 	}
-	std::string docBytes(pdoc->Length(), '\0');
-	pdoc->GetCharRange(docBytes.data(), 0, pdoc->Length());
+	const Sci::Position lengthWanted = wParam - 1;
+	Sci::Position sizeRequestedRange = pdoc->GetRelativePositionUTF16(0, lengthWanted);
+	if (sizeRequestedRange < 0) {
+		// Requested more text than there is in the document.
+		sizeRequestedRange = pdoc->CountUTF16(0, pdoc->Length());
+	}
+	std::string docBytes(sizeRequestedRange, '\0');
+	pdoc->GetCharRange(&docBytes[0], 0, sizeRequestedRange);
 	if (IsUnicodeMode()) {
-		const std::string_view sv(docBytes);
-		const size_t lengthUTF16 = UTF16Length(sv);
-		if (lParam == 0)
-			return lengthUTF16;
-		if (wParam == 0)
-			return 0;
-		size_t uLen = UTF16FromUTF8(sv, ptr, wParam - 1);
+		const size_t uLen = UTF16FromUTF8(docBytes, ptr, lengthWanted);
 		ptr[uLen] = L'\0';
 		return uLen;
 	} else {
@@ -1351,8 +1349,8 @@ sptr_t ScintillaWin::GetText(uptr_t wParam, sptr_t lParam) {
 		// Convert to Unicode using the current Scintilla code page
 		const UINT cpSrc = CodePageOfDocument();
 		int lengthUTF16 = WideCharLenFromMultiByte(cpSrc, docBytes);
-		if (lengthUTF16 >= static_cast<int>(wParam))
-			lengthUTF16 = static_cast<int>(wParam) - 1;
+		if (lengthUTF16 > lengthWanted)
+			lengthUTF16 = static_cast<int>(lengthWanted);
 		WideCharFromMultiByte(cpSrc, docBytes, ptr, lengthUTF16);
 		ptr[lengthUTF16] = L'\0';
 		return lengthUTF16;
