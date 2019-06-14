@@ -716,18 +716,19 @@ BOOL EditSaveFile(HWND hwnd, LPCWSTR pszFile, BOOL bSaveCopy, EditFileIOStatus *
 		} else if (uFlags & NCP_8BIT) {
 			BOOL bCancelDataLoss = FALSE;
 			const UINT uCodePage = mEncoding[iEncoding].uCodePage;
+			const BOOL zeroFlags = IsZeroFlagsCodePage(uCodePage);
 
 			LPWSTR lpDataWide = (LPWSTR)NP2HeapAlloc(cbData * 2 + 16);
 			const int cbDataWide = MultiByteToWideChar(CP_UTF8, 0, lpData, cbData, lpDataWide, (int)(NP2HeapSize(lpDataWide) / sizeof(WCHAR)));
-			// Special cases: 42, 50220, 50221, 50222, 50225, 50227, 50229, 54936 GB18030, 57002-11, 65000, 65001
-			if (uCodePage == CP_UTF7 || uCodePage == 54936) {
+
+			if (zeroFlags) {
 				NP2HeapFree(lpData);
 				lpData = (char *)NP2HeapAlloc(NP2HeapSize(lpDataWide) * 2);
 			} else {
 				ZeroMemory(lpData, NP2HeapSize(lpData));
 			}
 
-			if (uCodePage == CP_UTF7 || uCodePage == 54936) {
+			if (zeroFlags) {
 				cbData = WideCharToMultiByte(uCodePage, 0, lpDataWide, cbDataWide, lpData, (int)NP2HeapSize(lpData), NULL, NULL);
 			} else {
 				cbData = WideCharToMultiByte(uCodePage, WC_NO_BEST_FIT_CHARS, lpDataWide, cbDataWide, lpData, (int)NP2HeapSize(lpData), NULL, &bCancelDataLoss);
