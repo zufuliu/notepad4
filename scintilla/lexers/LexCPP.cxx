@@ -53,7 +53,7 @@ static constexpr bool _hasRegex(int lex) noexcept { // Javascript /regex/
 	return lex == LEX_JS || lex == LEX_GROOVY || lex == LEX_AS || lex == LEX_HX || lex == LEX_AWK;
 }
 static constexpr bool _hasTripleVerbatim(int lex) noexcept {
-	return lex == LEX_GROOVY || lex == LEX_SCALA;
+	return lex == LEX_JAVA || lex == LEX_GROOVY || lex == LEX_SCALA;
 }
 static constexpr bool _sharpComment(int lex) noexcept {
 	return lex == LEX_AWK || lex == LEX_JAM;
