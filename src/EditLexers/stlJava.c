@@ -7,7 +7,7 @@ static KEYWORDLIST Keywords_Java = {{
 "@interface abstract assert break case catch class const continue default do else "
 "enum extends final finally for goto if implements import instanceof interface "
 "native new package private protected public return static strictfp super switch "
-"synchronized this throw throws transient try var volatile while "
+"synchronized this throw throws transient try var volatile while yield "
 "false true null parcelable "
 
 , // 1 Type Keyword
@@ -128,6 +128,7 @@ static EDITSTYLE Styles_Java[] = {
 	{ SCE_C_COMMENTDOC_TAG_XML, NP2STYLE_DocCommentTagHTML, EDITSTYLE_HOLE(L"Doc Comment HTML Tag"), L"fore:#808080" },
 	{ MULTI_STYLE(SCE_C_COMMENTDOC, SCE_C_COMMENTLINEDOC, 0, 0), NP2STYLE_DocComment, EDITSTYLE_HOLE(L"Doc Comment"), L"fore:#408040" },
 	{ MULTI_STYLE(SCE_C_STRING, SCE_C_CHARACTER, SCE_C_STRINGEOL, 0), NP2STYLE_String, EDITSTYLE_HOLE(L"String"), L"fore:#008000" },
+	{ SCE_C_TRIPLEVERBATIM, NP2STYLE_TripleString, EDITSTYLE_HOLE(L"Triple Quoted String"), L"fore:#F08000" },
 	{ SCE_C_LABEL, NP2STYLE_Label, EDITSTYLE_HOLE(L"Label"), L"back:#FFC040" },
 	{ SCE_C_NUMBER, NP2STYLE_Number, EDITSTYLE_HOLE(L"Number"), L"fore:#FF0000" },
 	{ SCE_C_OPERATOR, NP2STYLE_Operator, EDITSTYLE_HOLE(L"Operator"), L"fore:#B000B0" },
