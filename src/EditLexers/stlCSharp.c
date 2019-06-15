@@ -4,6 +4,7 @@
 // https://en.wikipedia.org/wiki/C_Sharp_%28programming_language%29
 // https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/
 // https://wiki.gnome.org/Projects/Vala
+// https://github.com/dotnet/csharplang
 
 static KEYWORDLIST Keywords_CSharp = {{
 "abstract as base break case catch checked class const continue default delegate do else enum event explicit "

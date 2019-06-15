@@ -7,6 +7,7 @@
 // http://boo-lang.org/
 // https://www.jython.org/
 // https://cython.org/
+// https://wiki.gnome.org/Projects/Genie
 
 static KEYWORDLIST Keywords_Python = {{
 "async await " // python 3.7
@@ -323,7 +324,7 @@ static EDITSTYLE Styles_Python[] = {
 EDITLEXER lexPython = {
 	SCLEX_PYTHON, NP2LEX_PYTHON,
 	EDITLEXER_HOLE(L"Python Script", Styles_Python),
-	L"py; pyw; pyx; pxd; pxi; boo; empy; cobra",
+	L"py; pyw; pyx; pxd; pxi; boo; empy; cobra; gs",
 	&Keywords_Python,
 	Styles_Python
 };

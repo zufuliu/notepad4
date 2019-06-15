@@ -78,6 +78,7 @@ Python Script
 	boo				Boo
 	empy			EmPy
 	cobra			Cobra
+	gs				GNOME Genie
 
 Ruby Script
 	rb
