@@ -1499,8 +1499,12 @@ void Style_SetLexer(PEDITLEXER pLexNew) {
 	UpdateStatusbar();
 }
 
+static inline BOOL IsASpace(int ch) {
+	return (ch == ' ') || ((ch >= 0x09) && (ch <= 0x0d));
+}
+
 //=============================================================================
-// find lexer from script interpreter
+// find lexer from script interpreter, which must be first line of the file.
 // Style_SniffShebang()
 //
 PEDITLEXER Style_SniffShebang(char *pchText) {
@@ -1512,7 +1516,7 @@ PEDITLEXER Style_SniffShebang(char *pchText) {
 			pch++;
 		}
 		name = pch;
-		while (*pch && *pch != ' ' && *pch != '\t' && *pch != '\r' && *pch != '\n') {
+		while (*pch && !IsASpace(*pch)) {
 			len = *pch == '\\' || *pch == '/';
 			pch++;
 			name = len ? pch : name;
@@ -1522,7 +1526,7 @@ PEDITLEXER Style_SniffShebang(char *pchText) {
 				pch++;
 			}
 			name = pch;
-			while (*pch && *pch != ' ' && *pch != '\t' && *pch != '\r' && *pch != '\n') {
+			while (*pch && !IsASpace(*pch)) {
 				len = *pch == '\\' || *pch == '/';
 				pch++;
 				name = len ? pch : name;
@@ -1632,13 +1636,14 @@ int Style_GetDocTypeLanguage(void) {
 	SciCall_GetText(COUNTOF(tchText), tchText);
 
 	// check DOCTYPE
-	if ((p = strstr(tchText, "!DOCTYPE")) != NULL) {
+	if ((p = StrStrIA(tchText, "<!DOCTYPE")) != NULL) {
 		p += 9;
-		while (*p == ' ' || *p == '=' || *p == '\"') {
-			p++;
+		while (IsASpace(*p)) {
+			++p;
 		}
-		//if (!_strnicmp(p, "html", 4))
-		//	return IDM_LANG_WEB;
+		if (!_strnicmp(p, "html", 4)) {
+			return IDM_LANG_WEB;
+		}
 		if (!strncmp(p, "struts", 6) || !strncmp(p, "xwork", 5) || !strncmp(p, "validators", 10)) {
 			return IDM_LANG_STRUTS;
 		}
@@ -1652,8 +1657,9 @@ int Style_GetDocTypeLanguage(void) {
 			}
 			return IDM_LANG_HIB_CFG;
 		}
-		//if (!strncmp(p, "plist", 5))
+		//if (!strncmp(p, "plist", 5)) {
 		//	return IDM_LANG_PROPERTY_LIST;
+		//}
 		if (!strncmp(p, "schema", 6)) {
 			return IDM_LANG_XSD;
 		}
@@ -1803,10 +1809,6 @@ int Style_GetDocTypeLanguage(void) {
 	}
 
 	return 0;
-}
-
-static inline BOOL IsASpace(int ch) {
-	return (ch == ' ') || ((ch >= 0x09) && (ch <= 0x0d));
 }
 
 BOOL MatchCPPKeyword(const char *p, int index) {
@@ -2012,7 +2014,7 @@ LPCWSTR Style_GetCurrentLexerName(void) {
 	case IDM_LANG_PMD_RULESET:
 		return L"PMD Ruleset";
 	case IDM_LANG_CHECKSTYLE:
-		return L"Checkstyle";
+		return L"CheckStyle";
 
 	case IDM_LANG_APACHE:
 		return L"Apache Config";
@@ -2235,7 +2237,6 @@ static PEDITLEXER Style_GetLexerFromFile(LPCWSTR lpszFile, BOOL bCGIGuess, LPCWS
 		if (!bFound && bCGIGuess && (StrCaseEqual(lpszExt, L"cgi") || StrCaseEqual(lpszExt, L"fcgi"))) {
 			char tchText[256] = "";
 			SciCall_GetText(COUNTOF(tchText), tchText);
-			StrTrimA(tchText, " \t\n\r");
 			pLexNew = Style_SniffShebang(tchText);
 			bFound = pLexNew != NULL;
 		}
@@ -2265,6 +2266,8 @@ static PEDITLEXER Style_GetLexerFromFile(LPCWSTR lpszFile, BOOL bCGIGuess, LPCWS
 				np2LexLangIndex = IDM_LANG_IVY_SETTINGS;
 			} else if (StrCaseEqual(lpszName, L"pmd.xml")) {
 				np2LexLangIndex = IDM_LANG_PMD_RULESET;
+			} else {
+				np2LexLangIndex = Style_GetDocTypeLanguage();
 			}
 		}
 
@@ -2361,23 +2364,48 @@ BOOL Style_SetLexerFromFile(LPCWSTR lpszFile) {
 	}
 
 	// xml/html
-	if ((!bFound && bAutoSelect && (!fNoHTMLGuess || !fNoCGIGuess)) || (bFound && pLexNew->rid == NP2LEX_PHP)) {
+	if ((!bFound && bAutoSelect) || (bFound && (pLexNew->rid == NP2LEX_PHP || pLexNew->rid == NP2LEX_CONF))) {
 		char tchText[256] = "";
 		SciCall_GetText(COUNTOF(tchText), tchText);
-		StrTrimA(tchText, " \t\n\r");
-		if (pLexNew->rid == NP2LEX_PHP) {
-			if (strncmp(tchText, "<?php", 5) != 0) {
-				pLexNew = &lexHTML;
-			}
-		} else if (!fNoHTMLGuess && tchText[0] == '<') {
-			if (StrStrIA(tchText, "<html")) {
-				pLexNew = &lexHTML;
-			} else {
-				pLexNew = &lexXML;
-			}
-			np2LexLangIndex = Style_GetDocTypeLanguage();
+		const char *p = tchText;
+		while (IsASpace(*p)) {
+			++p;
+		}
+		const BOOL bPHP = strncmp(p, "<?php", 5) == 0;
+		if ((pLexNew->rid == NP2LEX_PHP) ^ bPHP) {
+			pLexNew = &lexHTML;
+			np2LexLangIndex = IDM_LANG_PHP;
 			bFound = TRUE;
-		} else if (!fNoCGIGuess && (pLexSniffed = Style_SniffShebang(tchText)) != NULL) {
+		} else if (*p == '<') {
+			if (strncmp(p, "<?xml", 5) == 0) {
+				// some conf/cfg file is xml
+				pLexNew = &lexXML;
+			} else if (!bFound) {
+				if (_strnicmp(p, "<!DOCTYPE", 9) == 0) {
+					p += 9;
+					while (IsASpace(*p)) {
+						++p;
+					}
+				}
+				if (_strnicmp(p, "<html", 5) == 0) {
+					pLexNew = &lexHTML;
+				} else if (!fNoHTMLGuess) {
+					if (StrStrIA(p, "<html")) {
+						pLexNew = &lexHTML;
+					} else {
+						pLexNew = &lexXML;
+					}
+				}
+			}
+			if (pLexNew->rid == NP2LEX_HTML || pLexNew->rid == NP2LEX_XML) {
+				bFound = TRUE;
+				np2LexLangIndex = Style_GetDocTypeLanguage();
+				if (pLexNew->rid == NP2LEX_XML && np2LexLangIndex == IDM_LANG_WEB) {
+					// xhtml: <?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html>
+					pLexNew = &lexHTML;
+				}
+			}
+		} else if ((p == tchText) && !fNoCGIGuess && (pLexSniffed = Style_SniffShebang(tchText)) != NULL) {
 			pLexNew = pLexSniffed;
 			bFound = TRUE;
 		}
@@ -2392,7 +2420,6 @@ BOOL Style_SetLexerFromFile(LPCWSTR lpszFile) {
 		if (!fNoCGIGuess && (StrCaseEqual(wchMode, L"cgi") || StrCaseEqual(wchMode, L"fcgi"))) {
 			char tchText[256] = "";
 			SciCall_GetText(COUNTOF(tchText), tchText);
-			StrTrimA(tchText, " \t\n\r");
 			if ((pLexSniffed = Style_SniffShebang(tchText)) != NULL) {
 				if (iEncoding != g_DOSEncoding || pLexSniffed != &lexTextFile
 						|| !(StrCaseEqual(lpszExt, L"nfo") || StrCaseEqual(lpszExt, L"diz"))) {

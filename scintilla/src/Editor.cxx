@@ -100,7 +100,7 @@ Idler::Idler() noexcept :
 		state(false), idlerID(nullptr) {}
 
 static constexpr bool IsAllSpacesOrTabs(std::string_view sv) noexcept {
-	for (char ch : sv) {
+	for (const char ch : sv) {
 		// This is safe because IsSpaceOrTab() will return false for null terminators
 		if (!IsSpaceOrTab(ch))
 			return false;
