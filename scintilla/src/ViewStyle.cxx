@@ -558,10 +558,17 @@ bool ViewStyle::IsBlockCaretStyle() const noexcept {
 	return ((caretStyle & CARETSTYLE_INS_MASK) == CARETSTYLE_BLOCK) || (caretStyle & CARETSTYLE_OVERSTRIKE_BLOCK) != 0;
 }
 
+bool ViewStyle::IsCaretVisible() const noexcept {
+	return caretWidth > 0 && caretStyle != CARETSTYLE_INVISIBLE;
+}
+
+bool ViewStyle::DrawCaretInsideSelection(bool inOverstrike, bool imeCaretBlockOverride) const noexcept {
+	return ((caretStyle & CARETSTYLE_INS_MASK) == CARETSTYLE_BLOCK) || 
+		(inOverstrike && (caretStyle & CARETSTYLE_OVERSTRIKE_BLOCK) != 0) || 
+		imeCaretBlockOverride;
+}
+
 ViewStyle::CaretShape ViewStyle::CaretShapeForMode(bool inOverstrike, bool drawDrag, bool drawOverstrikeCaret, bool imeCaretBlockOverride) const noexcept {
-	if (caretStyle == CARETSTYLE_INVISIBLE) {
-		return CaretShape::invisible;
-	}
 	if (drawDrag) {
 		// Dragging text, use a line caret
 		return CaretShape::line;
