@@ -297,6 +297,7 @@ int		iMatchesCount	= 0;
 extern int iFontQuality;
 extern int iCaretStyle;
 extern int iOvrCaretStyle;
+extern BOOL bBlockCaretOutSelection;
 extern int iCaretBlinkPeriod;
 
 static BOOL fIsElevated = FALSE;
@@ -2362,6 +2363,7 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	i = IDM_VIEW_CARET_STYLE_BLOCK + iCaretStyle;
 	CheckMenuRadioItem(hmenu, IDM_VIEW_CARET_STYLE_BLOCK, IDM_VIEW_CARET_STYLE_WIDTH3, i, MF_BYCOMMAND);
 	CheckCmd(hmenu, IDM_VIEW_CARET_STYLE_NOBLINK, iCaretBlinkPeriod == 0);
+	CheckCmd(hmenu, IDM_VIEW_CARET_STYLE_SELECTION, !bBlockCaretOutSelection);
 	CheckCmd(hmenu, IDM_VIEW_LONGLINEMARKER, bMarkLongLines);
 	CheckCmd(hmenu, IDM_VIEW_TABSASSPACES, bTabsAsSpaces);
 	CheckCmd(hmenu, IDM_VIEW_SHOWINDENTGUIDES, bShowIndentGuides);
@@ -4115,6 +4117,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		iOvrCaretStyle = !iOvrCaretStyle;
 		Style_UpdateCaret();
 		break;
+
 	case IDM_VIEW_CARET_STYLE_BLOCK:
 	case IDM_VIEW_CARET_STYLE_WIDTH1:
 	case IDM_VIEW_CARET_STYLE_WIDTH2:
@@ -4125,6 +4128,11 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	case IDM_VIEW_CARET_STYLE_NOBLINK:
 		iCaretBlinkPeriod = (iCaretBlinkPeriod == 0)? -1 : 0;
+		Style_UpdateCaret();
+		break;
+
+	case IDM_VIEW_CARET_STYLE_SELECTION:
+		bBlockCaretOutSelection = !bBlockCaretOutSelection;
 		Style_UpdateCaret();
 		break;
 
@@ -5313,6 +5321,8 @@ void LoadSettings(void) {
 	iFontQuality = clamp_i(iValue, SC_EFF_QUALITY_DEFAULT, SC_EFF_QUALITY_LCD_OPTIMIZED);
 
 	iValue = IniSectionGetInt(pIniSection, L"CaretStyle", 1);
+	bBlockCaretOutSelection = clamp_i(iValue / 100, 0, 1);
+	iValue %= 100;
 	iOvrCaretStyle = clamp_i(iValue / 10, 0, 1);
 	iCaretStyle = clamp_i(iValue % 10, 0, 3);
 	iCaretBlinkPeriod = IniSectionGetInt(pIniSection, L"CaretBlinkPeriod", -1);
@@ -5604,7 +5614,7 @@ void SaveSettings(BOOL bSaveSettingsNow) {
 	IniSectionSetIntEx(pIniSection, L"RenderingTechnology", iRenderingTechnology, (IsVistaAndAbove()? SC_TECHNOLOGY_DIRECTWRITE : SC_TECHNOLOGY_DEFAULT));
 	IniSectionSetIntEx(pIniSection, L"Bidirectional", iBidirectional, SC_BIDIRECTIONAL_DISABLED);
 	IniSectionSetIntEx(pIniSection, L"FontQuality", iFontQuality, SC_EFF_QUALITY_LCD_OPTIMIZED);
-	IniSectionSetIntEx(pIniSection, L"CaretStyle", iCaretStyle + iOvrCaretStyle*10, 1);
+	IniSectionSetIntEx(pIniSection, L"CaretStyle", iCaretStyle + iOvrCaretStyle*10 + bBlockCaretOutSelection*100, 1);
 	IniSectionSetIntEx(pIniSection, L"CaretBlinkPeriod", iCaretBlinkPeriod, -1);
 	IniSectionSetBool(pIniSection, L"UseInlineIME", bUseInlineIME); // keep result of auto detection
 	IniSectionSetBoolEx(pIniSection, L"InlineIMEUseBlockCaret", bInlineIMEUseBlockCaret, 0);

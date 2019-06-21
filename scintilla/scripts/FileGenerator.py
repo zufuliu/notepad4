@@ -26,7 +26,7 @@ def DetectLineEnd(content):
         ch = content[index]
         index += 1
         if ch == '\r':
-            if indent < length and content[index] == '\n':
+            if index < length and content[index] == '\n':
                 return "\r\n"
         elif ch == '\n':
             return "\n"
