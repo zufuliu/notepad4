@@ -263,6 +263,7 @@ static int	iBaseFontSize = 11*SC_FONT_SIZE_MULTIPLIER; // 11 pt
 int		iFontQuality = SC_EFF_QUALITY_LCD_OPTIMIZED;
 int		iCaretStyle = 1; // width 1, 0 for block
 int		iOvrCaretStyle = 0; // 0 for bar, 1 for block
+BOOL bBlockCaretOutSelection = 0;
 int		iCaretBlinkPeriod = -1; // system default, 0 for noblink
 static BOOL bBookmarkColorUpdated;
 static int	iDefaultLexer;
@@ -955,7 +956,8 @@ void Style_OnStyleThemeChanged(int theme) {
 void Style_UpdateCaret(void) {
 	// caret style and width
 	const int style = (iCaretStyle ? CARETSTYLE_LINE : CARETSTYLE_BLOCK)
-		| (iOvrCaretStyle ? CARETSTYLE_OVERSTRIKE_BLOCK : CARETSTYLE_OVERSTRIKE_BAR);
+		| (iOvrCaretStyle ? CARETSTYLE_OVERSTRIKE_BLOCK : CARETSTYLE_OVERSTRIKE_BAR)
+		| (bBlockCaretOutSelection ? CARETSTYLE_BLOCK_MAY_TRAIL_RANGE : 0);
 	SciCall_SetCaretStyle(style);
 	if (iCaretStyle != 0) {
 		SciCall_SetCaretWidth(iCaretStyle);
