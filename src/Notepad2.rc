@@ -257,14 +257,19 @@ BEGIN
 			MENUITEM "New &GUID",							IDM_EDIT_INSERT_GUID
 			POPUP "Unicode &Control Character"
 			BEGIN
-				MENUITEM "LRM\t&Left-to-right mark",				IDM_INSERT_UNICODE_LRM
-				MENUITEM "RLM\t&Right-to-left mark",				IDM_INSERT_UNICODE_RLM
+				MENUITEM "WJ\t&Word joiner",						IDM_INSERT_UNICODE_WJ
 				MENUITEM "ZWJ\tZero width &joiner",					IDM_INSERT_UNICODE_ZWJ
 				MENUITEM "ZWNJ\tZero width &non-joiner",			IDM_INSERT_UNICODE_ZWNJ
+				MENUITEM "LRM\t&Left-to-right mark",				IDM_INSERT_UNICODE_LRM
+				MENUITEM "RLM\t&Right-to-left mark",				IDM_INSERT_UNICODE_RLM
 				MENUITEM "LRE\tStart of left-to-right &embedding",	IDM_INSERT_UNICODE_LRE
 				MENUITEM "RLE\tStart of right-to-left e&mbedding",	IDM_INSERT_UNICODE_RLE
 				MENUITEM "LRO\tStart of left-to-right &override",	IDM_INSERT_UNICODE_LRO
 				MENUITEM "RLO\tStart of right-to-left o&verride",	IDM_INSERT_UNICODE_RLO
+				MENUITEM "LRI\tLeft-to-&right isolate",				IDM_INSERT_UNICODE_LRI
+				MENUITEM "RLI\tRight-to-&left isolate",				IDM_INSERT_UNICODE_RLI
+				MENUITEM "FSI\t&First strong isolate",				IDM_INSERT_UNICODE_FSI
+				MENUITEM "PDI\tPo&p directional isolate",			IDM_INSERT_UNICODE_PDI
 				MENUITEM "PDF\t&Pop directional formatting",		IDM_INSERT_UNICODE_PDF
 				MENUITEM "NADS\tN&ational digit shapes substitution",IDM_INSERT_UNICODE_NADS
 				MENUITEM "NODS\tNominal (European) &digit shapes",	IDM_INSERT_UNICODE_NODS
@@ -276,6 +281,7 @@ BEGIN
 				MENUITEM "US\tUnit Separator (&Segment separator)", IDM_INSERT_UNICODE_US
 				MENUITEM "LS\tL&ine Separator",						IDM_INSERT_UNICODE_LS
 				MENUITEM "PS\tPara&graph Separator",				IDM_INSERT_UNICODE_PS
+				MENUITEM "ZWSP\t&Zero width space",					IDM_INSERT_UNICODE_ZWSP
 			END
 			MENUITEM SEPARATOR
 			MENUITEM "&File Name",								CMD_INSERTFILENAME_NOEXT

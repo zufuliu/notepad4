@@ -5804,6 +5804,7 @@ typedef struct UnicodeControlCharacter {
 } UnicodeControlCharacter;
 
 // https://en.wikipedia.org/wiki/Unicode_control_characters
+// http://www.unicode.org/charts/PDF/U2000.pdf
 // scintilla/scripts/GenerateCharTable.py
 static const UnicodeControlCharacter kUnicodeControlCharacterTable[] = {
 	{ "\xe2\x80\x8e", "LRM" },	// U+200E	LRM		Left-to-right mark
@@ -5826,6 +5827,13 @@ static const UnicodeControlCharacter kUnicodeControlCharacterTable[] = {
 	{ "\x1f", NULL },			// U+001F	US		Unit Separator (Segment separator)
 	{ "\xe2\x80\xa8", NULL },	// U+2028	LS		Line Separator
 	{ "\xe2\x80\xa9", NULL },	// U+2029	PS		Paragraph Separator
+	// Other
+	{ "\xe2\x80\x8b", "ZWSP" },	// U+200B	ZWSP	Zero width space
+	{ "\xe2\x81\xa0", "WJ" },	// U+2060	WJ		Word joiner
+	{ "\xe2\x81\xa6", "LRI" },	// U+2066	LRI		Left-to-right isolate
+	{ "\xe2\x81\xa7", "RLI" },	// U+2067	RLI		Right-to-left isolate
+	{ "\xe2\x81\xa8", "FSI" },	// U+2068	FSI		First strong isolate
+	{ "\xe2\x81\xa9", "PDI" },	// U+2069	PDI		Pop directional isolate
 };
 
 void EditInsertUnicodeControlCharacter(int menu) {
@@ -5838,6 +5846,7 @@ void EditShowUnicodeControlCharacter(BOOL bShow) {
 	for (UINT i = 0; i < (UINT)COUNTOF(kUnicodeControlCharacterTable); i++) {
 		const UnicodeControlCharacter ucc = kUnicodeControlCharacterTable[i];
 		if (StrIsEmptyA(ucc.representation)) {
+			// built-in
 			continue;
 		}
 		if (bShow) {

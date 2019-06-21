@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import unicodedata
 
 def GenerateUTF8Table():
 	def BytesFromLead(leadByte):
@@ -78,6 +79,12 @@ def GenerateUTF8Table():
 	print('UTF8ClassifyTable:', len(UTF8ClassifyTable))
 	print('\n'.join(UTF8ClassifyTable))
 
+def GetCharName(ch):
+	try:
+		return unicodedata.name(ch).title()
+	except ValueError:
+		return ''
+
 def GenerateUnicodeControlCharacters():
 	ucc_table = [
 		"\u200E", # U+200E	LRM		Left-to-right mark
@@ -99,13 +106,19 @@ def GenerateUnicodeControlCharacters():
 		"\u001F", # U+001F	US		Unit Separator (Segment separator)
 		"\u2028", # U+2028	LS		Line Separator
 		"\u2029", # U+2029	PS		Paragraph Separator
+		"\u200B", # U+200B	ZWSP	Zero width space
+		"\u2060", # U+2060	WJ		Word joiner
+		"\u2066", # U+2066	LRI		Left-to-right isolate
+		"\u2067", # U+2067	RLI		Right-to-left isolate
+		"\u2068", # U+2068	FSI		First strong isolate
+		"\u2069", # U+2069	PDI		Pop directional isolate
 	]
 
 	print('UnicodeControlCharacters:')
 	for ucc in ucc_table:
 		utf8bytes = ucc.encode('utf-8')
 		utf8str = ''.join('\\x%02x' % b for b in utf8bytes)
-		print(utf8str, 'U+%04X' % ord(ucc))
+		print(utf8str, 'U+%04X' % ord(ucc), unicodedata.category(ucc), GetCharName(ucc))
 
 if __name__ == '__main__':
 	GenerateUnicodeControlCharacters();
