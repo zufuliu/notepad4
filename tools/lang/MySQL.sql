@@ -22,6 +22,7 @@ ANALYSE					-- added in 5.6.6 (nonreserved); removed in 8.0.1
 ANALYZE (R)
 AND (R)
 ANY
+ARRAY (R)				-- added in 8.0.17 (reserved)
 AS (R)
 ASC (R)
 ASCII
@@ -133,14 +134,14 @@ DECLARE (R)
 DEFAULT (R)
 DEFAULT_AUTH			-- added in 5.6.4 (nonreserved)
 DEFINER
-DEFINITION				-- added in 8.0.11 (nonreserved)
+DEFINITION				-- added in 8.0.4 (nonreserved)
 DELAYED (R)
 DELAY_KEY_WRITE
 DELETE (R)
 DENSE_RANK (R)			-- added in 8.0.2 (reserved)
 DESC (R)
 DESCRIBE (R)
-DESCRIPTION				-- added in 8.0.11 (nonreserved)
+DESCRIPTION				-- added in 8.0.4 (nonreserved)
 DES_KEY_FILE			-- removed in 8.0.3
 DETERMINISTIC (R)
 DIAGNOSTICS				-- added in 5.6.4 (nonreserved)
@@ -168,6 +169,7 @@ ENCLOSED (R)
 ENCRYPTION				-- added in 5.7.11 (nonreserved)
 END
 ENDS
+ENFORCED				-- added in 8.0.16 (nonreserved)
 ENGINE
 ENGINES
 ENUM
@@ -178,7 +180,7 @@ ESCAPED (R)
 EVENT
 EVENTS
 EVERY
-EXCEPT (M)				-- Added in MariaDB 10.3.0
+EXCEPT (M)				-- added in MariaDB 10.3.0
 EXCHANGE
 EXCLUDE					-- added in 8.0.2 (nonreserved)
 EXECUTE
@@ -226,7 +228,7 @@ GEOMETRY
 GEOMETRYCOLLECTION
 GET (R)					-- added in 5.6.4 (reserved)
 GET_FORMAT
-GET_MASTER_PUBLIC_KEY	-- added in 8.0.11 (nonreserved)
+GET_MASTER_PUBLIC_KEY	-- added in 8.0.4 (reserved); became nonreserved in 8.0.11
 GLOBAL
 GRANT (R)
 GRANTS
@@ -276,7 +278,7 @@ INT3 (R)
 INT4 (R)
 INT8 (R)
 INTEGER (R)
-INTERSECT (M)			-- Added in MariaDB 10.3.0
+INTERSECT (M)			-- added in MariaDB 10.3.0
 INTERVAL (R)
 INTO (R)
 INVOKER
@@ -303,6 +305,7 @@ LAG (R)					-- added in 8.0.2 (reserved)
 LANGUAGE
 LAST
 LAST_VALUE (R)			-- added in 8.0.2 (reserved)
+LATERAL (R)				-- added in 8.0.14 (reserved)
 LEAD (R)				-- added in 8.0.2 (reserved)
 LEADING (R)
 LEAVE (R)
@@ -335,6 +338,7 @@ LOW_PRIORITY (R)
 MASTER
 MASTER_AUTO_POSITION		-- added in 5.6.5 (nonreserved)
 MASTER_BIND (R)				-- added in 5.6.1 (reserved)
+MASTER_COMPRESSION_ALGORITHMS	-- added in 8.0.18 (nonreserved)
 MASTER_CONNECT_RETRY
 MASTER_DELAY
 MASTER_HEARTBEAT_PERIOD		-- became nonreserved in 5.5.8
@@ -343,7 +347,7 @@ MASTER_LOG_FILE
 MASTER_LOG_POS
 MASTER_PASSWORD
 MASTER_PORT
-MASTER_PUBLIC_KEY_PATH		-- added in 8.0.11 (nonreserved)
+MASTER_PUBLIC_KEY_PATH		-- added in 8.0.4 (nonreserved)
 MASTER_RETRY_COUNT			-- added in 5.6.1 (nonreserved)
 MASTER_SERVER_ID
 MASTER_SSL
@@ -357,6 +361,7 @@ MASTER_SSL_KEY
 MASTER_SSL_VERIFY_SERVER_CERT (R)
 MASTER_TLS_VERSION			-- added in 5.7.10 (nonreserved)
 MASTER_USER
+MASTER_ZSTD_COMPRESSION_LEVEL	-- added in 8.0.18 (nonreserved)
 MATCH (R)
 MAXVALUE (R)
 MAX_CONNECTIONS_PER_HOUR
@@ -370,6 +375,7 @@ MEDIUM
 MEDIUMBLOB (R)
 MEDIUMINT (R)
 MEDIUMTEXT (R)
+MEMBER (R)					-- added in 8.0.17 (reserved)
 MEMORY
 MERGE;
 MESSAGE_TEXT
@@ -399,6 +405,7 @@ NCHAR
 NDB
 NDBCLUSTER
 NESTED					-- added in 8.0.4 (nonreserved)
+NETWORK_NAMESPACE		-- added in 8.0.16 (nonreserved)
 NEVER					-- added in 5.7.4 (nonreserved)
 NEW
 NEXT
@@ -421,6 +428,8 @@ NVARCHAR
 OF (R)					-- added in 8.0.1 (reserved)
 OFFSET
 OLD_PASSWORD			-- removed in 5.7.5
+OJ						-- added in 8.0.16 (nonreserved)
+OLD						-- added in 8.0.14 (nonreserved)
 ON (R)
 ONE
 ONE_SHOT				-- became reserved in 5.6.1; removed in 5.6.5
@@ -435,7 +444,7 @@ OPTIONS
 OR (R)
 ORDER (R)
 ORDINALITY				-- added in 8.0.4 (nonreserved)
-ORGANIZATION			-- added in 8.0.11 (nonreserved)
+ORGANIZATION			-- added in 8.0.4 (nonreserved)
 OTHERS					-- added in 8.0.2 (nonreserved)
 OUT (R)
 OUTER (R)
@@ -446,7 +455,7 @@ OWNER
 PACK_KEYS
 PAGE
 PARSER
-PARSE_GCOL_EXPR			-- added in 5.7.6 (reserved); became nonreserved in 5.7.8
+PARSE_GCOL_EXPR			-- added in 5.7.6 (reserved); became nonreserved in 5.7.8; removed in 8.0
 PARTIAL
 PARTITION (R)			-- became reserved in 5.6.2
 PARTITIONING
@@ -454,8 +463,8 @@ PARTITIONS
 PASSWORD
 PATH					-- added in 8.0.4 (nonreserved)
 PERCENT_RANK (R)		-- added in 8.0.2 (reserved)
-PERSIST (R)
-PERSIST_ONLY (R)		-- added in 8.0.2 (reserved)
+PERSIST					-- became nonreserved in 8.0.16
+PERSIST_ONLY			-- added in 8.0.2 (reserved); became nonreserved in 8.0.16
 PHASE
 PLUGIN
 PLUGINS
@@ -527,13 +536,13 @@ RESET
 RESIGNAL (R)
 RESOURCE				-- added in 8.0.3 (nonreserved)
 RESPECT					-- added in 8.0.2 (nonreserved)
-RESTART					-- added in 8.0.11 (nonreserved)
+RESTART					-- added in 8.0.4 (nonreserved)
 RESTORE
 RESTRICT (R)
 RESUME
 RETURN (R)
 RETURNED_SQLSTATE		-- added in 5.6.4 (nonreserved)
-RETURNING (M)			-- Added in MariaDB 10.0.5
+RETURNING (M)			-- added in MariaDB 10.0.5
 RETURNS
 REUSE					-- added in 8.0.3 (nonreserved)
 REVERSE
@@ -558,6 +567,7 @@ SCHEMA (R)
 SCHEMAS (R)
 SCHEMA_NAME
 SECOND
+SECONDARY				-- added in 8.0.16 (nonreserved)
 SECONDARY_ENGINE		-- added in 8.0.13 (nonreserved)
 SECONDARY_LOAD			-- added in 8.0.13 (nonreserved)
 SECONDARY_UNLOAD		-- added in 8.0.13 (nonreserved)
@@ -715,8 +725,8 @@ WEIGHT_STRING
 WHEN (R)
 WHERE (R)
 WHILE (R)
-WINDOW (R)				-- added in 8.0.2 (reserved)
 END WHILE;
+WINDOW (R)				-- added in 8.0.2 (reserved)
 WITH (R)
 WITHOUT					-- added in 5.7.5 (nonreserved)
 WORK
