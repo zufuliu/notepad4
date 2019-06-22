@@ -2816,7 +2816,7 @@ void Style_SetIndentGuides(BOOL bShow) {
 	int iIndentView = SC_IV_NONE;
 	if (bShow) {
 		if (!flagSimpleIndentGuides) {
-			if (pLexCurrent->iLexer == SCLEX_PYTHON) {
+			if (IsFoldIndentationBased(pLexCurrent->iLexer)) {
 				iIndentView = SC_IV_LOOKFORWARD;
 			} else {
 				iIndentView = SC_IV_LOOKBOTH;
