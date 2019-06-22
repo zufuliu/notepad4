@@ -54,13 +54,13 @@ void FontRealised::Realise(Surface &surface, int zoomLevel, int technology, cons
 	spaceWidth = surface.WidthText(font, " ");
 }
 
-ViewStyle::ViewStyle() : markers(MARKER_MAX + 1), indicators(INDIC_MAX + 1) {
+ViewStyle::ViewStyle() : markers(MARKER_MAX + 1), indicators(INDICATOR_MAX + 1) {
 	Init();
 }
 
 // Copy constructor only called when printing copies the screen ViewStyle so it can be
 // modified for printing styles.
-ViewStyle::ViewStyle(const ViewStyle &source) : markers(MARKER_MAX + 1), indicators(INDIC_MAX + 1) {
+ViewStyle::ViewStyle(const ViewStyle &source) : markers(MARKER_MAX + 1), indicators(INDICATOR_MAX + 1) {
 	Init(source.styles.size());
 	styles = source.styles;
 	for (size_t sty = 0; sty < source.styles.size(); sty++) {
@@ -555,7 +555,8 @@ bool ViewStyle::SetWrapIndentMode(int wrapIndentMode_) noexcept {
 }
 
 bool ViewStyle::IsBlockCaretStyle() const noexcept {
-	return ((caretStyle & CARETSTYLE_INS_MASK) == CARETSTYLE_BLOCK) || (caretStyle & CARETSTYLE_OVERSTRIKE_BLOCK) != 0;
+	return ((caretStyle & CARETSTYLE_INS_MASK) == CARETSTYLE_BLOCK) ||
+		(caretStyle & CARETSTYLE_OVERSTRIKE_BLOCK) != 0;
 }
 
 bool ViewStyle::IsCaretVisible() const noexcept {

@@ -307,14 +307,10 @@ typedef sptr_t (*SciFnDirect)(sptr_t ptr, unsigned int iMessage, uptr_t wParam, 
 #define INDIC_POINTCHARACTER 19
 #define INDIC_GRADIENT 20
 #define INDIC_GRADIENTCENTRE 21
-#define INDIC_IME 32
-#define INDIC_IME_MAX 35
-#define INDIC_MAX 35
-#define INDIC_CONTAINER 8
-#define INDIC0_MASK 0x20
-#define INDIC1_MASK 0x40
-#define INDIC2_MASK 0x80
-#define INDICS_MASK 0xE0
+#define INDICATOR_CONTAINER 8
+#define INDICATOR_IME 32
+#define INDICATOR_IME_MAX 35
+#define INDICATOR_MAX 35
 #define SCI_INDICSETSTYLE 2080
 #define SCI_INDICGETSTYLE 2081
 #define SCI_INDICSETFORE 2082
@@ -413,6 +409,7 @@ typedef sptr_t (*SciFnDirect)(sptr_t ptr, unsigned int iMessage, uptr_t wParam, 
 #define SC_PRINT_SCREENCOLOURS 5
 #define SCI_SETPRINTCOLOURMODE 2148
 #define SCI_GETPRINTCOLOURMODE 2149
+#define SCFIND_NONE 0x0
 #define SCFIND_WHOLEWORD 0x2
 #define SCFIND_MATCHCASE 0x4
 #define SCFIND_WORDSTART 0x00100000
@@ -915,6 +912,7 @@ typedef sptr_t (*SciFnDirect)(sptr_t ptr, unsigned int iMessage, uptr_t wParam, 
 #define SCI_ANNOTATIONGETSTYLEOFFSET 2551
 #define SCI_RELEASEALLEXTENDEDSTYLES 2552
 #define SCI_ALLOCATEEXTENDEDSTYLES 2553
+#define UNDO_NONE 0
 #define UNDO_MAY_COALESCE 1
 #define SCI_ADDUNDOACTION 2560
 #define SCI_CHARPOSITIONFROMPOINT 2561
@@ -1047,6 +1045,7 @@ typedef sptr_t (*SciFnDirect)(sptr_t ptr, unsigned int iMessage, uptr_t wParam, 
 #define SCI_NAMEOFSTYLE 4030
 #define SCI_TAGSOFSTYLE 4031
 #define SCI_DESCRIPTIONOFSTYLE 4032
+#define SC_MOD_NONE 0x0
 #define SC_MOD_INSERTTEXT 0x1
 #define SC_MOD_DELETETEXT 0x2
 #define SC_MOD_CHANGESTYLE 0x4

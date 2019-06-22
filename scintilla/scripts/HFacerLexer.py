@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # HFacer.py - regenerate the SciLexer.h file from the SciLexer.iface interface
 # definition file.
 # Implemented 2000 by Neil Hodgson neilh@scintilla.org

@@ -230,7 +230,7 @@ template <typename POS>
 void DecorationList<POS>::DeleteLexerDecorations() {
 	decorationList.erase(std::remove_if(decorationList.begin(), decorationList.end(),
 		[](const std::unique_ptr<Decoration<POS>> &deco) noexcept {
-		return deco->Indicator() < INDIC_CONTAINER;
+		return deco->Indicator() < INDICATOR_CONTAINER;
 	}), decorationList.end());
 	current = nullptr;
 	SetView();
@@ -262,7 +262,7 @@ int DecorationList<POS>::AllOnFor(Sci::Position position) const noexcept {
 	int mask = 0;
 	for (const auto &deco : decorationList) {
 		if (deco->rs.ValueAt(static_cast<POS>(position))) {
-			if (deco->Indicator() < INDIC_IME) {
+			if (deco->Indicator() < INDICATOR_CONTAINER) {
 				mask |= 1 << deco->Indicator();
 			}
 		}

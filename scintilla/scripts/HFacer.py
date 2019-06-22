@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # HFacer.py - regenerate the Scintilla.h file from the Scintilla.iface interface
 # definition file.
 # Implemented 2000 by Neil Hodgson neilh@scintilla.org

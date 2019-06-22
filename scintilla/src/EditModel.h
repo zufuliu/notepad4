@@ -42,7 +42,7 @@ public:
 	enum class CharacterSource {
 		charSourceNormal,
 		charSourceTentative,
-		charSourceIME,
+		charSourceIme,
 	};
 	bool inlineIMEUseBlockCaret;
 	enum class Bidirectional {

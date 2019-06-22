@@ -7411,7 +7411,7 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 		break;
 
 	case SCI_INDICSETSTYLE:
-		if (wParam <= INDIC_MAX) {
+		if (wParam <= INDICATOR_MAX) {
 			vs.indicators[wParam].sacNormal.style = static_cast<int>(lParam);
 			vs.indicators[wParam].sacHover.style = static_cast<int>(lParam);
 			InvalidateStyleRedraw();
@@ -7419,10 +7419,10 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 		break;
 
 	case SCI_INDICGETSTYLE:
-		return (wParam <= INDIC_MAX) ? vs.indicators[wParam].sacNormal.style : 0;
+		return (wParam <= INDICATOR_MAX) ? vs.indicators[wParam].sacNormal.style : 0;
 
 	case SCI_INDICSETFORE:
-		if (wParam <= INDIC_MAX) {
+		if (wParam <= INDICATOR_MAX) {
 			vs.indicators[wParam].sacNormal.fore = ColourDesired(static_cast<int>(lParam));
 			vs.indicators[wParam].sacHover.fore = ColourDesired(static_cast<int>(lParam));
 			InvalidateStyleRedraw();
@@ -7430,67 +7430,67 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 		break;
 
 	case SCI_INDICGETFORE:
-		return (wParam <= INDIC_MAX) ? vs.indicators[wParam].sacNormal.fore.AsInteger() : 0;
+		return (wParam <= INDICATOR_MAX) ? vs.indicators[wParam].sacNormal.fore.AsInteger() : 0;
 
 	case SCI_INDICSETHOVERSTYLE:
-		if (wParam <= INDIC_MAX) {
+		if (wParam <= INDICATOR_MAX) {
 			vs.indicators[wParam].sacHover.style = static_cast<int>(lParam);
 			InvalidateStyleRedraw();
 		}
 		break;
 
 	case SCI_INDICGETHOVERSTYLE:
-		return (wParam <= INDIC_MAX) ? vs.indicators[wParam].sacHover.style : 0;
+		return (wParam <= INDICATOR_MAX) ? vs.indicators[wParam].sacHover.style : 0;
 
 	case SCI_INDICSETHOVERFORE:
-		if (wParam <= INDIC_MAX) {
+		if (wParam <= INDICATOR_MAX) {
 			vs.indicators[wParam].sacHover.fore = ColourDesired(static_cast<int>(lParam));
 			InvalidateStyleRedraw();
 		}
 		break;
 
 	case SCI_INDICGETHOVERFORE:
-		return (wParam <= INDIC_MAX) ? vs.indicators[wParam].sacHover.fore.AsInteger() : 0;
+		return (wParam <= INDICATOR_MAX) ? vs.indicators[wParam].sacHover.fore.AsInteger() : 0;
 
 	case SCI_INDICSETFLAGS:
-		if (wParam <= INDIC_MAX) {
+		if (wParam <= INDICATOR_MAX) {
 			vs.indicators[wParam].SetFlags(static_cast<int>(lParam));
 			InvalidateStyleRedraw();
 		}
 		break;
 
 	case SCI_INDICGETFLAGS:
-		return (wParam <= INDIC_MAX) ? vs.indicators[wParam].Flags() : 0;
+		return (wParam <= INDICATOR_MAX) ? vs.indicators[wParam].Flags() : 0;
 
 	case SCI_INDICSETUNDER:
-		if (wParam <= INDIC_MAX) {
+		if (wParam <= INDICATOR_MAX) {
 			vs.indicators[wParam].under = lParam != 0;
 			InvalidateStyleRedraw();
 		}
 		break;
 
 	case SCI_INDICGETUNDER:
-		return (wParam <= INDIC_MAX) ? vs.indicators[wParam].under : 0;
+		return (wParam <= INDICATOR_MAX) ? vs.indicators[wParam].under : 0;
 
 	case SCI_INDICSETALPHA:
-		if (wParam <= INDIC_MAX && lParam >=0 && lParam <= 255) {
+		if (wParam <= INDICATOR_MAX && lParam >=0 && lParam <= 255) {
 			vs.indicators[wParam].fillAlpha = static_cast<int>(lParam);
 			InvalidateStyleRedraw();
 		}
 		break;
 
 	case SCI_INDICGETALPHA:
-		return (wParam <= INDIC_MAX) ? vs.indicators[wParam].fillAlpha : 0;
+		return (wParam <= INDICATOR_MAX) ? vs.indicators[wParam].fillAlpha : 0;
 
 	case SCI_INDICSETOUTLINEALPHA:
-		if (wParam <= INDIC_MAX && lParam >=0 && lParam <= 255) {
+		if (wParam <= INDICATOR_MAX && lParam >=0 && lParam <= 255) {
 			vs.indicators[wParam].outlineAlpha = static_cast<int>(lParam);
 			InvalidateStyleRedraw();
 		}
 		break;
 
 	case SCI_INDICGETOUTLINEALPHA:
-		return (wParam <= INDIC_MAX) ? vs.indicators[wParam].outlineAlpha : 0;
+		return (wParam <= INDICATOR_MAX) ? vs.indicators[wParam].outlineAlpha : 0;
 
 	case SCI_SETINDICATORCURRENT:
 		pdoc->DecorationSetCurrentIndicator(static_cast<int>(wParam));
@@ -7624,7 +7624,7 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 		break;
 
 	case SCI_BRACEHIGHLIGHTINDICATOR:
-		if (lParam >= 0 && lParam <= INDIC_MAX) {
+		if (lParam >= 0 && lParam <= INDICATOR_MAX) {
 			vs.braceHighlightIndicatorSet = wParam != 0;
 			vs.braceHighlightIndicator = static_cast<int>(lParam);
 		}
@@ -7635,7 +7635,7 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 		break;
 
 	case SCI_BRACEBADLIGHTINDICATOR:
-		if (lParam >= 0 && lParam <= INDIC_MAX) {
+		if (lParam >= 0 && lParam <= INDICATOR_MAX) {
 			vs.braceBadLightIndicatorSet = wParam != 0;
 			vs.braceBadLightIndicator = static_cast<int>(lParam);
 		}
