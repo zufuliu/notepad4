@@ -1052,7 +1052,7 @@ void ScintillaWin::SetCandidateWindowPos() {
 		CandForm.dwIndex = 0;
 		CandForm.dwStyle = CFS_CANDIDATEPOS;
 		CandForm.ptCurrentPos.x = static_cast<LONG>(pos.x);
-		CandForm.ptCurrentPos.y = static_cast<LONG>(pos.y + vs.lineHeight);
+		CandForm.ptCurrentPos.y = static_cast<LONG>(pos.y + vs.lineHeight/4);
 		::ImmSetCandidateWindow(imc.hIMC, &CandForm);
 	}
 }
@@ -1237,7 +1237,9 @@ sptr_t ScintillaWin::HandleCompositionInline(uptr_t, sptr_t lParam) {
 		AddWString(imc.GetCompositionString(GCS_RESULTSTR), CharacterSource::charSourceIme);
 	}
 	EnsureCaretVisible();
-	SetCandidateWindowPos();
+	if (moveCandidateWindowOnTyping) {
+		SetCandidateWindowPos();
+	}
 	ShowCaretAtCurrentPosition();
 	return 0;
 }
@@ -1686,6 +1688,7 @@ sptr_t ScintillaWin::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam
 
 		case WM_IME_STARTCOMPOSITION: 	// dbcs
 			if (imeInteraction == imeInline) {
+				SetCandidateWindowPos();
 				return 0;
 			} else {
 				ImeStartComposition();

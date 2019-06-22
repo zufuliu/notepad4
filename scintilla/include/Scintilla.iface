@@ -291,8 +291,8 @@ get IMEInteraction GetIMEInteraction=2678(,)
 # Choose to display the the IME in a winow or inline.
 set void SetIMEInteraction=2679(IMEInteraction imeInteraction,)
 
-# Is block caret used in inline IME
-get bool GetInlineIMEUseBlockCaret=2638(,)
+# Set inline IME to move candidate window on typing.
+set void SetMoveCandidateWindowOnTyping=2638(bool move,)
 
 # Set inline IME to use block caret
 set void SetInlineIMEUseBlockCaret=2639(bool useBlockCaret,)
