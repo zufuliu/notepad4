@@ -101,7 +101,11 @@ NP2SettingsVersion_None = 0,
 2. `HighlightCurrentLine` changed to outline frame of subline, regardless of any previous settings.
 */
 NP2SettingsVersion_V1 = 1,
-NP2SettingsVersion_Current = NP2SettingsVersion_V1,
+/*
+1. `UseInlineIME` and `InlineIMEUseBlockCaret` changed to `InlineIMEOptions`.
+*/
+NP2SettingsVersion_V2 = 2,
+NP2SettingsVersion_Current = NP2SettingsVersion_V2,
 };
 
 #define INI_SECTION_NAME_NOTEPAD2				L"Notepad2"

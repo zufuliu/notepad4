@@ -189,6 +189,7 @@ BOOL	bWindowLayoutRTL;
 static int iRenderingTechnology;
 static BOOL bUseInlineIME;
 static BOOL bInlineIMEUseBlockCaret;
+static BOOL bMoveCandidateWindowOnTyping;
 static int iBidirectional;
 static BOOL bShowToolbar;
 static BOOL bShowStatusbar;
@@ -1571,6 +1572,7 @@ HWND EditCreate(HWND hwndParent) {
 	SciCall_SetBidirectional(iBidirectional);
 	SciCall_SetIMEInteraction(bUseInlineIME);
 	SciCall_SetInlineIMEUseBlockCaret(bInlineIMEUseBlockCaret);
+	SciCall_SetMoveCandidateWindowOnTyping(bMoveCandidateWindowOnTyping);
 	SciCall_SetPasteConvertEndings(TRUE);
 	SciCall_SetModEventMask(/*SC_MODEVENTMASKALL*/SC_MOD_INSERTTEXT | SC_MOD_DELETETEXT);
 	SciCall_SetCommandEvents(FALSE);
@@ -2425,6 +2427,7 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	CheckCmd(hmenu, IDM_SET_USE_INLINE_IME, bUseInlineIME);
 	CheckCmd(hmenu, IDM_SET_USE_BLOCK_CARET, bInlineIMEUseBlockCaret);
+	CheckCmd(hmenu, IDM_SET_MOVE_CANDIDATE_WINDOW, bMoveCandidateWindowOnTyping);
 
 	CheckCmd(hmenu, IDM_VIEW_NOSAVERECENT, bSaveRecentFiles);
 	CheckCmd(hmenu, IDM_VIEW_NOSAVEFINDREPL, bSaveFindReplace);
@@ -4111,6 +4114,11 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		SciCall_SetInlineIMEUseBlockCaret(bInlineIMEUseBlockCaret);
 		break;
 
+	case IDM_SET_MOVE_CANDIDATE_WINDOW:
+		bMoveCandidateWindowOnTyping = !bMoveCandidateWindowOnTyping;
+		SciCall_SetMoveCandidateWindowOnTyping(bMoveCandidateWindowOnTyping);
+		break;
+
 	case IDM_VIEW_FONTQUALITY_DEFAULT:
 	case IDM_VIEW_FONTQUALITY_NONE:
 	case IDM_VIEW_FONTQUALITY_STANDARD:
@@ -5327,24 +5335,30 @@ void LoadSettings(void) {
 	iFontQuality = clamp_i(iValue, SC_EFF_QUALITY_DEFAULT, SC_EFF_QUALITY_LCD_OPTIMIZED);
 
 	iValue = IniSectionGetInt(pIniSection, L"CaretStyle", 1);
-	bBlockCaretOutSelection = clamp_i(iValue / 100, 0, 1);
+	bBlockCaretOutSelection = (iValue / 100) & 1;
 	iValue %= 100;
-	iOvrCaretStyle = clamp_i(iValue / 10, 0, 1);
+	iOvrCaretStyle = (iValue / 10) & 1;
 	iCaretStyle = clamp_i(iValue % 10, 0, 3);
 	iCaretBlinkPeriod = IniSectionGetInt(pIniSection, L"CaretBlinkPeriod", -1);
 
 	// Korean IME use inline mode (and block caret in inline mode) by default
-	bUseInlineIME = IniSectionGetBool(pIniSection, L"UseInlineIME", -1);
-	bInlineIMEUseBlockCaret = IniSectionGetBool(pIniSection, L"InlineIMEUseBlockCaret", 0);
-	if (bUseInlineIME == -1) { // auto detection once
+	iValue = IniSectionGetInt(pIniSection, L"InlineIMEOptions", -1);
+	if (iValue < 0 || iSettingsVersion < NP2SettingsVersion_V2) {
 		// ScintillaWin::KoreanIME()
 		const int codePage = Scintilla_InputCodePage();
 		if (codePage == 949 || codePage == 1361) {
 			bUseInlineIME = TRUE;
 			bInlineIMEUseBlockCaret = TRUE;
+			bMoveCandidateWindowOnTyping = TRUE;
 		} else {
 			bUseInlineIME = FALSE;
+			bInlineIMEUseBlockCaret = FALSE;
+			bMoveCandidateWindowOnTyping = FALSE;
 		}
+	} else {
+		bUseInlineIME = iValue & 1;
+		bInlineIMEUseBlockCaret = (iValue >> 1) & 1;
+		bMoveCandidateWindowOnTyping = (iValue >> 2) & 1;
 	}
 
 	strValue = IniSectionGetValue(pIniSection, L"ToolbarButtons");
@@ -5622,8 +5636,8 @@ void SaveSettings(BOOL bSaveSettingsNow) {
 	IniSectionSetIntEx(pIniSection, L"FontQuality", iFontQuality, SC_EFF_QUALITY_LCD_OPTIMIZED);
 	IniSectionSetIntEx(pIniSection, L"CaretStyle", iCaretStyle + iOvrCaretStyle*10 + bBlockCaretOutSelection*100, 1);
 	IniSectionSetIntEx(pIniSection, L"CaretBlinkPeriod", iCaretBlinkPeriod, -1);
-	IniSectionSetBool(pIniSection, L"UseInlineIME", bUseInlineIME); // keep result of auto detection
-	IniSectionSetBoolEx(pIniSection, L"InlineIMEUseBlockCaret", bInlineIMEUseBlockCaret, 0);
+	// save auto detection result.
+	IniSectionSetInt(pIniSection, L"InlineIMEOptions", (bUseInlineIME | (bInlineIMEUseBlockCaret << 1) | (bMoveCandidateWindowOnTyping << 2)));
 	Toolbar_GetButtons(hwndToolbar, TOOLBAR_COMMAND_BASE, tchToolbarButtons, COUNTOF(tchToolbarButtons));
 	IniSectionSetStringEx(pIniSection, L"ToolbarButtons", tchToolbarButtons, DefaultToolbarButtons);
 	IniSectionSetBoolEx(pIniSection, L"ShowToolbar", bShowToolbar, 1);

@@ -63,6 +63,7 @@ EditModel::EditModel() : braces{} {
 	primarySelection = true;
 	imeInteraction = imeWindowed;
 	inlineIMEUseBlockCaret = false;
+	moveCandidateWindowOnTyping = false;
 	bidirectional = Bidirectional::bidiDisabled;
 	foldFlags = 0;
 	foldDisplayTextStyle = SC_FOLDDISPLAYTEXT_HIDDEN;

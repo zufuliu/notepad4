@@ -45,6 +45,7 @@ public:
 		charSourceIme,
 	};
 	bool inlineIMEUseBlockCaret;
+	bool moveCandidateWindowOnTyping;
 	enum class Bidirectional {
 		bidiDisabled, bidiL2R, bidiR2L
 	} bidirectional;

@@ -6855,8 +6855,9 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 		inlineIMEUseBlockCaret = wParam != 0;
 		break;
 
-	case SCI_GETINLINEIMEUSEBLOCKCARET:
-		return inlineIMEUseBlockCaret;
+	case SCI_SETMOVECANDIDATEWINDOWONTYPING:
+		moveCandidateWindowOnTyping = wParam != 0;
+		break;
 
 	case SCI_SETBIDIRECTIONAL:
 		// SCI_SETBIDIRECTIONAL is implemented on platform subclasses if they support bidirectional text.
