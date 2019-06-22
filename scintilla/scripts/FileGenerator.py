@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # FileGenerator.py - implemented 2013 by Neil Hodgson neilh@scintilla.org
 # Released to the public domain.
 

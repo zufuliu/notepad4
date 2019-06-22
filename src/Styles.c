@@ -356,10 +356,10 @@ enum DefaultStyleIndex {
 #define FoldingMarkerFillColorDark		RGB(0x60, 0x60, 0x60)
 
 // from ScintillaWin.cxx
-#define SC_INDICATOR_INPUT		INDIC_IME
-#define SC_INDICATOR_TARGET		(INDIC_IME + 1)
-#define SC_INDICATOR_CONVERTED	(INDIC_IME + 2)
-#define SC_INDICATOR_UNKNOWN	INDIC_IME_MAX
+#define SC_INDICATOR_INPUT		INDICATOR_IME
+#define SC_INDICATOR_TARGET		(INDICATOR_IME + 1)
+#define SC_INDICATOR_CONVERTED	(INDICATOR_IME + 2)
+#define SC_INDICATOR_UNKNOWN	INDICATOR_IME_MAX
 
 #define IMEIndicatorDefaultColor	RGB(0x10, 0x80, 0x10)
 #define MarkOccurrencesDefaultAlpha	100
