@@ -49,11 +49,6 @@ extern BOOL bCurrentLexerHasLineComment;
 extern BOOL bCurrentLexerHasBlockComment;
 extern uint8_t currentLexKeywordAttr[NUMKEYWORD];
 
-static inline BOOL IsFoldIndentationBased(int iLexer) {
-	return iLexer == SCLEX_PYTHON
-		|| iLexer == SCLEX_NULL;
-}
-
 void	Style_ReleaseResources(void);
 void	Style_Load(void);
 void	Style_Save(void);
