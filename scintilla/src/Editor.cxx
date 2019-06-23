@@ -1894,7 +1894,7 @@ void Editor::AddChar(char ch) {
 	char s[2];
 	s[0] = ch;
 	s[1] = '\0';
-	InsertCharacter(std::string_view(s, 1));
+	InsertCharacter(std::string_view(s, 1), CharacterSource::normal);
 }
 
 void Editor::FilterSelections() {
@@ -1980,7 +1980,7 @@ void Editor::InsertCharacter(std::string_view sv, CharacterSource charSource) {
 	}
 
 	// We don't handle inline IME tentative characters
-	if (charSource != CharacterSource::charSourceTentative) {
+	if (charSource != CharacterSource::tentative) {
 		int ch = static_cast<unsigned char>(sv[0]);
 		if (pdoc->dbcsCodePage != SC_CP_UTF8) {
 			if (sv.length() > 1) {
@@ -3107,7 +3107,7 @@ void Editor::NewLine() {
 	for (size_t i = 0; i < countInsertions; i++) {
 		const char *eol = StringFromEOLMode(pdoc->eolMode);
 		while (*eol) {
-			NotifyChar(*eol);
+			NotifyChar(*eol, CharacterSource::normal);
 			if (recordingMacro) {
 				char txt[2];
 				txt[0] = *eol;

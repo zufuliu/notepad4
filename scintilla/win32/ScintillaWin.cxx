@@ -424,7 +424,7 @@ class ScintillaWin :
 	void SelectionToHangul();
 	void EscapeHanja();
 	void ToggleHanja();
-	void AddWString(std::wstring_view wsv, CharacterSource charSource = CharacterSource::charSourceNormal);
+	void AddWString(std::wstring_view wsv, CharacterSource charSource);
 
 	UINT CodePageOfDocument() const noexcept;
 	bool ValidCodePage(int codePage) const noexcept override;
@@ -999,7 +999,7 @@ sptr_t ScintillaWin::HandleCompositionWindowed(uptr_t wParam, sptr_t lParam) {
 	if (lParam & GCS_RESULTSTR) {
 		IMContext imc(MainHWND());
 		if (imc.hIMC) {
-			AddWString(imc.GetCompositionString(GCS_RESULTSTR), CharacterSource::charSourceIme);
+			AddWString(imc.GetCompositionString(GCS_RESULTSTR), CharacterSource::ime);
 
 			// Set new position after converted
 			const Point pos = PointMainCaret();
@@ -1217,7 +1217,7 @@ sptr_t ScintillaWin::HandleCompositionInline(uptr_t, sptr_t lParam) {
 			const size_t ucWidth = UTF16CharLength(wsv[i]);
 			const int size = MultiByteFromWideChar(codePage, wsv.substr(i, ucWidth), inBufferCP, sizeof(inBufferCP) - 1);
 			inBufferCP[size] = '\0';
-			InsertCharacter(std::string_view(inBufferCP, size), CharacterSource::charSourceTentative);
+			InsertCharacter(std::string_view(inBufferCP, size), CharacterSource::tentative);
 
 			DrawImeIndicator(imeIndicator[i], size);
 			i += ucWidth;
@@ -1234,7 +1234,7 @@ sptr_t ScintillaWin::HandleCompositionInline(uptr_t, sptr_t lParam) {
 			view.imeCaretBlockOverride = true;
 		}
 	} else if (lParam & GCS_RESULTSTR) {
-		AddWString(imc.GetCompositionString(GCS_RESULTSTR), CharacterSource::charSourceIme);
+		AddWString(imc.GetCompositionString(GCS_RESULTSTR), CharacterSource::ime);
 	}
 	EnsureCaretVisible();
 	if (moveCandidateWindowOnTyping) {
@@ -1599,7 +1599,7 @@ sptr_t ScintillaWin::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam
 					lastHighSurrogateChar = 0;
 					wclen = 2;
 				}
-				AddWString(std::wstring_view(wcs, wclen));
+				AddWString(std::wstring_view(wcs, wclen), CharacterSource::normal);
 			}
 			return 0;
 
@@ -1611,7 +1611,7 @@ sptr_t ScintillaWin::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam
 			} else {
 				wchar_t wcs[3] = { 0 };
 				const unsigned int wclen = UTF16FromUTF32Character(static_cast<unsigned int>(wParam), wcs);
-				AddWString(std::wstring_view(wcs, wclen));
+				AddWString(std::wstring_view(wcs, wclen), CharacterSource::normal);
 				return FALSE;
 			}
 
@@ -3191,7 +3191,7 @@ void ScintillaWin::EnumDataSourceFormat(const char *tag, LPDATAOBJECT pIDataSour
 				const char *fmtName = GetSourceFormatName(fmt, name, sizeof(name));
 				const int len = sprintf(buf, "%s: fmt[%lu]=%u, 0x%04X; tymed=%lu, %s; name=%s\n",
 					tag, i, fmt, fmt, tymed, typeName, fmtName);
-				InsertCharacter(std::string_view(buf, len));
+				InsertCharacter(std::string_view(buf, len), CharacterSource::normal);
 			}
 		}
 	}
@@ -3210,7 +3210,7 @@ void ScintillaWin::EnumAllClipboardFormat(const char *tag) {
 		const char *fmtName = GetSourceFormatName(fmt, name, sizeof(name));
 		const int len = sprintf(buf, "%s: fmt[%u]=%u, 0x%04X; name=%s\n",
 			tag, i, fmt, fmt, fmtName);
-		InsertCharacter(std::string_view(buf, len));
+		InsertCharacter(std::string_view(buf, len), CharacterSource::normal);
 		i++;
 	}
 }
