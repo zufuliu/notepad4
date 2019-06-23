@@ -5343,7 +5343,7 @@ void LoadSettings(void) {
 
 	// Korean IME use inline mode (and block caret in inline mode) by default
 	iValue = IniSectionGetInt(pIniSection, L"InlineIMEOptions", -1);
-	if (iValue < 0 || iSettingsVersion < NP2SettingsVersion_V2) {
+	if (iValue < 0) {
 		// ScintillaWin::KoreanIME()
 		const int codePage = Scintilla_InputCodePage();
 		if (codePage == 949 || codePage == 1361) {
