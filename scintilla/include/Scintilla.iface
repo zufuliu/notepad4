@@ -291,8 +291,8 @@ get IMEInteraction GetIMEInteraction=2678(,)
 # Choose to display the the IME in a winow or inline.
 set void SetIMEInteraction=2679(IMEInteraction imeInteraction,)
 
-# Set inline IME to move candidate window on typing.
-set void SetMoveCandidateWindowOnTyping=2638(bool move,)
+# Set inline IME to move candidate window to current caret position on typing.
+set void SetMoveCandidateWindowOnTyping=2638(bool moveOnTyping,)
 
 # Set inline IME to use block caret
 set void SetInlineIMEUseBlockCaret=2639(bool useBlockCaret,)

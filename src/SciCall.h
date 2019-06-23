@@ -765,8 +765,8 @@ NP2_inline void SciCall_SetInlineIMEUseBlockCaret(BOOL useBlockCaret) {
 	SciCall(SCI_SETINLINEIMEUSEBLOCKCARET, useBlockCaret, 0);
 }
 
-NP2_inline void SciCall_SetMoveCandidateWindowOnTyping(BOOL move) {
-	SciCall(SCI_SETMOVECANDIDATEWINDOWONTYPING, move, 0);
+NP2_inline void SciCall_SetMoveCandidateWindowOnTyping(BOOL moveOnTyping) {
+	SciCall(SCI_SETMOVECANDIDATEWINDOWONTYPING, moveOnTyping, 0);
 }
 
 // Brace highlighting

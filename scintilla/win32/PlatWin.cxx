@@ -3412,7 +3412,7 @@ unsigned int Platform::DoubleClickTime() noexcept {
 	return ::GetDoubleClickTime();
 }
 
-//#define TRACE
+#define TRACE
 
 #ifdef TRACE
 void Platform::DebugDisplay(const char *s) noexcept {
