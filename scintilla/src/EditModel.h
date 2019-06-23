@@ -39,11 +39,6 @@ public:
 	enum IMEInteraction {
 		imeWindowed, imeInline
 	} imeInteraction;
-	enum class CharacterSource {
-		charSourceNormal,
-		charSourceTentative,
-		charSourceIme,
-	};
 	bool inlineIMEUseBlockCaret;
 	bool moveCandidateWindowOnTyping;
 	enum class Bidirectional {

@@ -411,7 +411,10 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	Sci::Position RealizeVirtualSpace(Sci::Position position, Sci::Position virtualSpace);
 	SelectionPosition RealizeVirtualSpace(SelectionPosition position);
 	void AddChar(char ch);
-	virtual void InsertCharacter(std::string_view sv, CharacterSource charSource = CharacterSource::charSourceNormal);
+	enum class CharacterSource {
+		normal, tentative, ime,
+	};
+	virtual void InsertCharacter(std::string_view sv, CharacterSource charSource);
 	void ClearBeforeTentativeStart();
 	void InsertPaste(const char *text, Sci::Position len);
 	enum PasteShape {
@@ -443,7 +446,7 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	}
 	virtual void NotifyParent(SCNotification scn) noexcept = 0;
 	virtual void NotifyStyleToNeeded(Sci::Position endStyleNeeded);
-	void NotifyChar(int ch, CharacterSource charSource = CharacterSource::charSourceNormal) noexcept;
+	void NotifyChar(int ch, CharacterSource charSource) noexcept;
 	void NotifySavePoint(bool isSavePoint) noexcept;
 	void NotifyModifyAttempt() noexcept;
 	virtual void NotifyDoubleClick(Point pt, int modifiers);

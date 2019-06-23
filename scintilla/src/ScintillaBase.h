@@ -61,7 +61,7 @@ protected:
 	void Initialise() noexcept override {}
 	void Finalise() noexcept override;
 
-	void InsertCharacter(std::string_view sv, CharacterSource charSource = CharacterSource::charSourceNormal) override;
+	void InsertCharacter(std::string_view sv, CharacterSource charSource) override;
 	void Command(int cmdId);
 	void CancelModes() noexcept override;
 	int KeyCommand(unsigned int iMessage) override;
