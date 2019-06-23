@@ -1081,6 +1081,11 @@ static inline BOOL DidLexerHasBlockComment(int iLexer, int rid) {
 	);
 }
 
+static inline BOOL IsPythonLikeFolding(int iLexer) {
+	return iLexer == SCLEX_PYTHON
+		|| iLexer == SCLEX_NULL;
+}
+
 static void Style_Parse(struct DetailStyle *style, LPCWSTR lpszStyle);
 static void Style_SetParsed(const struct DetailStyle *style, int iStyle);
 static inline void Style_SetDefaultStyle(int index) {
@@ -2816,7 +2821,7 @@ void Style_SetIndentGuides(BOOL bShow) {
 	int iIndentView = SC_IV_NONE;
 	if (bShow) {
 		if (!flagSimpleIndentGuides) {
-			if (IsFoldIndentationBased(pLexCurrent->iLexer)) {
+			if (IsPythonLikeFolding(pLexCurrent->iLexer)) {
 				iIndentView = SC_IV_LOOKFORWARD;
 			} else {
 				iIndentView = SC_IV_LOOKBOTH;

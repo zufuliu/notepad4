@@ -6686,6 +6686,11 @@ static void EditFoldStack_Push(struct EditFoldStack *foldStack, int level) {
 	++foldStack->level_count;
 }
 
+static inline BOOL IsFoldIndentationBased(int iLexer) {
+	return iLexer == SCLEX_PYTHON
+		|| iLexer == SCLEX_NULL;
+}
+
 static UINT Style_GetDefaultFoldState(int rid, int *maxLevel) {
 	switch (rid) {
 	case NP2LEX_TEXTFILE:
