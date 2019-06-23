@@ -1000,6 +1000,7 @@ sptr_t ScintillaWin::HandleCompositionWindowed(uptr_t wParam, sptr_t lParam) {
 		IMContext imc(MainHWND());
 		if (imc.hIMC) {
 			AddWString(imc.GetCompositionString(GCS_RESULTSTR), CharacterSource::ime);
+			Platform::DebugPrintf("window InsertCharacter ime\n");
 
 			// Set new position after converted
 			const Point pos = PointMainCaret();
@@ -1217,6 +1218,7 @@ sptr_t ScintillaWin::HandleCompositionInline(uptr_t, sptr_t lParam) {
 			const size_t ucWidth = UTF16CharLength(wsv[i]);
 			const int size = MultiByteFromWideChar(codePage, wsv.substr(i, ucWidth), inBufferCP, sizeof(inBufferCP) - 1);
 			inBufferCP[size] = '\0';
+			Platform::DebugPrintf("inline InsertCharacter tentative\n");
 			InsertCharacter(std::string_view(inBufferCP, size), CharacterSource::tentative);
 
 			DrawImeIndicator(imeIndicator[i], size);
@@ -1234,6 +1236,7 @@ sptr_t ScintillaWin::HandleCompositionInline(uptr_t, sptr_t lParam) {
 			view.imeCaretBlockOverride = true;
 		}
 	} else if (lParam & GCS_RESULTSTR) {
+		Platform::DebugPrintf("inline InsertCharacter ime\n");
 		AddWString(imc.GetCompositionString(GCS_RESULTSTR), CharacterSource::ime);
 	}
 	EnsureCaretVisible();
@@ -1687,6 +1690,7 @@ sptr_t ScintillaWin::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam
 			break;
 
 		case WM_IME_STARTCOMPOSITION: 	// dbcs
+			Platform::DebugPrintf("WM_IME_STARTCOMPOSITION\n");
 			if (imeInteraction == imeInline) {
 				SetCandidateWindowPos();
 				return 0;
@@ -1696,10 +1700,12 @@ sptr_t ScintillaWin::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam
 			}
 
 		case WM_IME_ENDCOMPOSITION: 	// dbcs
+			Platform::DebugPrintf("WM_IME_ENDCOMPOSITION\n");
 			ImeEndComposition();
 			return ::DefWindowProc(MainHWND(), iMessage, wParam, lParam);
 
 		case WM_IME_COMPOSITION:
+			Platform::DebugPrintf("WM_IME_COMPOSITION\n");
 			if (imeInteraction == imeInline) {
 				return HandleCompositionInline(wParam, lParam);
 			} else {
