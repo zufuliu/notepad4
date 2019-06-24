@@ -443,10 +443,16 @@ static void CleanUpResources(BOOL initialized) {
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nShowCmd) {
 	UNREFERENCED_PARAMETER(hPrevInstance);
 	UNREFERENCED_PARAMETER(lpCmdLine);
+#if 0 // used for clang ubsan
+	if (AttachConsole(ATTACH_PARENT_PROCESS)) {
+		freopen("CONOUT$", "w", stdout);
+		freopen("CONOUT$", "w", stderr);
+		fprintf(stdout, "%s:%d %s\n", __FILE__, __LINE__, __FUNCTION__);
+	}
+#endif
 
 	// Set global variable g_hInstance
 	g_hInstance = hInstance;
-
 #if _WIN32_WINNT < _WIN32_WINNT_WIN10
 	// Set the Windows version global variable
 	NP2_COMPILER_WARNING_PUSH

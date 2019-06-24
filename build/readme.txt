@@ -5,6 +5,9 @@ echo | clang -dM -E -
 echo | clang-cl -Xclang -dM -E -
 echo | gcc -dM -E -
 
+https://clang.llvm.org/docs/UndefinedBehaviorSanitizer.html
+-fsanitize=undefined
+
 /wd4201 /wd4204
 Disabled warnings:
 	C4201: nonstandard extension used: nameless struct/union.
