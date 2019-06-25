@@ -280,8 +280,9 @@ int classifyTagHTML(Sci_PositionU start, Sci_PositionU end,
 		customElement = false;
 	} else if (customElement && IsLowerCase(s[0]) && strchr(s, '-') != nullptr) {
 		// HTML custom element name: starts with an ASCII lower alpha and contains hyphen.
-		chAttr = SCE_H_TAG;
-		customElement = true;
+		withSpace[i] = ' ';
+		customElement = strstr(" annotation-xml color-profile font-face font-face-src font-face-uri font-face-format font-face-name missing-glyph ", withSpace) == nullptr;
+		chAttr = customElement ? SCE_H_TAG : SCE_H_TAGUNKNOWN;
 	}
 	styler.ColourTo(end, chAttr);
 	if (chAttr == SCE_H_TAG && !customElement) {
