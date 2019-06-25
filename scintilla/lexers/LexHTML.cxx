@@ -270,7 +270,7 @@ int classifyTagHTML(Sci_PositionU start, Sci_PositionU end,
 	char chAttr = SCE_H_TAGUNKNOWN;
 	if (s[0] == '!') {
 		chAttr = SCE_H_SGML_DEFAULT;
-	} else if (!keywords || keywords.InList(s)) {
+	} else if (!keywords || keywords.InList(s) || (!isXml && strchr(s, '-'))) {
 		chAttr = SCE_H_TAG;
 	}
 	styler.ColourTo(end, chAttr);
