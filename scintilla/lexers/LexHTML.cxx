@@ -232,18 +232,23 @@ int classifyTagHTML(Sci_PositionU start, Sci_PositionU end,
 	const char *s = withSpace + 1;
 	// Copy after the '<'
 	Sci_PositionU i = 1;
+	// check valid HTML custom element name: don't contains upper case ASCII alphas.
+	bool customElement = !isXml;
 	if (caseSensitive) {
-		for (Sci_PositionU cPos = start; cPos <= end && i < 30; cPos++) {
+		for (Sci_PositionU cPos = start; cPos <= end && i < sizeof(withSpace) - 2; cPos++) {
 			const char ch = styler[cPos];
 			if ((ch != '<') && (ch != '/')) {
 				withSpace[i++] = ch;
+				customElement = customElement && !IsUpperCase(ch);
 			}
 		}
 	} else {
-		for (Sci_PositionU cPos = start; cPos <= end && i < 30; cPos++) {
+		for (Sci_PositionU cPos = start; cPos <= end && i < sizeof(withSpace) - 2; cPos++) {
 			const char ch = styler[cPos];
 			if ((ch != '<') && (ch != '/')) {
-				withSpace[i++] = MakeLowerCase(ch);
+				const char chTmp = MakeLowerCase(ch);
+				withSpace[i++] = chTmp;
+				customElement = customElement && (ch == chTmp);
 			}
 		}
 	}
@@ -270,11 +275,16 @@ int classifyTagHTML(Sci_PositionU start, Sci_PositionU end,
 	char chAttr = SCE_H_TAGUNKNOWN;
 	if (s[0] == '!') {
 		chAttr = SCE_H_SGML_DEFAULT;
-	} else if (!keywords || keywords.InList(s) || (!isXml && strchr(s, '-'))) {
+	} else if (!keywords || keywords.InList(s)) {
 		chAttr = SCE_H_TAG;
+		customElement = false;
+	} else if (customElement && IsLowerCase(s[0]) && strchr(s, '-') != nullptr) {
+		// HTML custom element name: starts with an ASCII lower alpha and contains hyphen.
+		chAttr = SCE_H_TAG;
+		customElement = true;
 	}
 	styler.ColourTo(end, chAttr);
-	if (chAttr == SCE_H_TAG) {
+	if (chAttr == SCE_H_TAG && !customElement) {
 		if (allowScripts && 0 == strcmp(s, "script")) {
 			// check to see if this is a self-closing tag by sniffing ahead
 			bool isSelfClose = false;
