@@ -228,7 +228,7 @@ void classifyAttribHTML(Sci_PositionU start, Sci_PositionU end, const WordList &
 int classifyTagHTML(Sci_PositionU start, Sci_PositionU end,
 	const WordList &keywords, Accessor &styler, bool &tagDontFold,
 	bool caseSensitive, bool isXml, bool allowScripts) {
-	char withSpace[30 + 2] = " ";
+	char withSpace[126 + 2] = " ";
 	const char *s = withSpace + 1;
 	// Copy after the '<'
 	Sci_PositionU i = 1;
