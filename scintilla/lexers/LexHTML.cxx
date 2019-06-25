@@ -77,7 +77,7 @@ script_type segIsScriptingIndicator(Accessor &styler, Sci_PositionU start, Sci_P
 	if (strstr(s, "xml")) {
 		const char *xml = strstr(s, "xml");
 		for (const char *t = s; t < xml; t++) {
-			if (!isspacechar(*t)) {
+			if (!IsASpace(*t)) {
 				return prevValue;
 			}
 		}
@@ -89,7 +89,7 @@ script_type segIsScriptingIndicator(Accessor &styler, Sci_PositionU start, Sci_P
 
 int PrintScriptingIndicatorOffset(Accessor &styler, Sci_PositionU start, Sci_PositionU end) noexcept {
 	int iResult = 0;
-	char s[128];
+	char s[8];
 	GetTextSegment(styler, start, end, s, sizeof(s));
 	if (0 == strncmp(s, "php", 3)) {
 		iResult = 3;
@@ -229,7 +229,7 @@ int classifyTagHTML(Sci_PositionU start, Sci_PositionU end,
 	const WordList &keywords, Accessor &styler, bool &tagDontFold,
 	bool caseSensitive, bool isXml, bool allowScripts) {
 	char withSpace[126 + 2] = " ";
-	const char *s = withSpace + 1;
+	const char *tag = withSpace + 1;
 	// Copy after the '<'
 	Sci_PositionU i = 1;
 	// check valid HTML custom element name: don't contains upper case ASCII alphas.
@@ -273,12 +273,12 @@ int classifyTagHTML(Sci_PositionU start, Sci_PositionU end,
 
 	// No keywords -> all are known
 	char chAttr = SCE_H_TAGUNKNOWN;
-	if (s[0] == '!') {
+	if (tag[0] == '!') {
 		chAttr = SCE_H_SGML_DEFAULT;
-	} else if (!keywords || keywords.InList(s)) {
+	} else if (!keywords || keywords.InList(tag)) {
 		chAttr = SCE_H_TAG;
 		customElement = false;
-	} else if (customElement && IsLowerCase(s[0]) && strchr(s, '-') != nullptr) {
+	} else if (customElement && IsLowerCase(tag[0]) && strchr(tag, '-') != nullptr) {
 		// HTML custom element name: starts with an ASCII lower alpha and contains hyphen.
 		withSpace[i] = ' ';
 		customElement = strstr(" annotation-xml color-profile font-face font-face-src font-face-uri font-face-format font-face-name missing-glyph ", withSpace) == nullptr;
@@ -286,7 +286,7 @@ int classifyTagHTML(Sci_PositionU start, Sci_PositionU end,
 	}
 	styler.ColourTo(end, chAttr);
 	if (chAttr == SCE_H_TAG && !customElement) {
-		if (allowScripts && 0 == strcmp(s, "script")) {
+		if (allowScripts && 0 == strcmp(tag, "script")) {
 			// check to see if this is a self-closing tag by sniffing ahead
 			bool isSelfClose = false;
 			for (Sci_PositionU cPos = end; cPos <= end + 200; cPos++) {
@@ -302,7 +302,7 @@ int classifyTagHTML(Sci_PositionU start, Sci_PositionU end,
 			// do not enter a script state if the tag self-closed
 			if (!isSelfClose)
 				chAttr = SCE_H_SCRIPT;
-		} else if (!isXml && 0 == strcmp(s, "comment")) {
+		} else if (!isXml && 0 == strcmp(tag, "comment")) {
 			chAttr = SCE_H_COMMENT;
 		}
 	}
@@ -311,9 +311,9 @@ int classifyTagHTML(Sci_PositionU start, Sci_PositionU end,
 
 void classifyWordHTJS(Sci_PositionU start, Sci_PositionU end,
 	const WordList &keywords, Accessor &styler, script_mode inScriptType) {
-	char s[30 + 1];
+	char s[127 + 1];
 	Sci_PositionU i = 0;
-	for (; i < end - start + 1 && i < 30; i++) {
+	for (; i < end - start + 1 && i < sizeof(s) - 1; i++) {
 		s[i] = styler[start + i];
 	}
 	s[i] = '\0';
@@ -351,9 +351,9 @@ int classifyWordHTVB(Sci_PositionU start, Sci_PositionU end, const WordList &key
 
 void classifyWordHTPy(Sci_PositionU start, Sci_PositionU end, const WordList &keywords, Accessor &styler, char *prevWord, script_mode inScriptType, bool isMako) {
 	const bool wordIsNumber = IsADigit(styler[start]);
-	char s[30 + 1];
+	char s[127 + 1];
 	Sci_PositionU i = 0;
-	for (; i < end - start + 1 && i < 30; i++) {
+	for (; i < end - start + 1 && i < sizeof(s) - 1; i++) {
 		s[i] = styler[start + i];
 	}
 	s[i] = '\0';
@@ -389,9 +389,9 @@ void classifyWordHTPHP(Sci_PositionU start, Sci_PositionU end, const WordList &k
 }
 
 bool isWordHSGML(Sci_PositionU start, Sci_PositionU end, const WordList &keywords, Accessor &styler) noexcept {
-	char s[30 + 1];
+	char s[63 + 1];
 	Sci_PositionU i = 0;
-	for (; i < end - start + 1 && i < 30; i++) {
+	for (; i < end - start + 1 && i < sizeof(s) - 1; i++) {
 		s[i] = styler[start + i];
 	}
 	s[i] = '\0';
@@ -399,9 +399,9 @@ bool isWordHSGML(Sci_PositionU start, Sci_PositionU end, const WordList &keyword
 }
 
 bool isWordCdata(Sci_PositionU start, Sci_PositionU end, Accessor &styler) noexcept {
-	char s[30 + 1];
+	char s[8 + 1];
 	Sci_PositionU i = 0;
-	for (; i < end - start + 1 && i < 30; i++) {
+	for (; i < end - start + 1 && i < sizeof(s) - 1; i++) {
 		s[i] = styler[start + i];
 	}
 	s[i] = '\0';
@@ -723,7 +723,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 	for (Sci_Position i = startPos; i < lengthDoc; i++) {
 		const int chPrev2 = chPrev;
 		chPrev = ch;
-		if (!isspacechar(ch) && state != SCE_HJ_COMMENT &&
+		if (!IsASpace(ch) && state != SCE_HJ_COMMENT &&
 			state != SCE_HJ_COMMENTLINE && state != SCE_HJ_COMMENTDOC)
 			chPrevNonWhite = ch;
 		ch = static_cast<unsigned char>(styler[i]);
@@ -737,9 +737,9 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 			continue;
 		}
 
-		if ((!isspacechar(ch) || !foldCompact) && fold)
+		if ((!IsASpace(ch) || !foldCompact) && fold)
 			visibleChars++;
-		if (!isspacechar(ch))
+		if (!IsASpace(ch))
 			lineStartVisibleChars++;
 
 		// decide what is the current state to print (depending of the script tag)
@@ -953,9 +953,9 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 			else if (ch == '$')
 				strcpy(makoBlockType, "{");
 			else if (chNext == '/')
-				GetNextWord(styler, i+3, makoBlockType, sizeof(makoBlockType));
+				GetNextWord(styler, i + 3, makoBlockType, sizeof(makoBlockType));
 			else
-				GetNextWord(styler, i+2, makoBlockType, sizeof(makoBlockType));
+				GetNextWord(styler, i + 2, makoBlockType, sizeof(makoBlockType));
 			styler.ColourTo(i - 1, StateToPrint);
 			beforePreProc = state;
 			if (inScriptType == eNonHtmlScript)
@@ -2100,7 +2100,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 				state = SCE_HPHP_VARIABLE;
 			} else if (isoperator(ch) || ch == '@' || ch == '$') {
 				state = SCE_HPHP_OPERATOR;
-			} else if ((state == SCE_HPHP_OPERATOR) && (isspacechar(ch))) {
+			} else if ((state == SCE_HPHP_OPERATOR) && (IsASpace(ch))) {
 				state = SCE_HPHP_DEFAULT;
 			}
 			break;
