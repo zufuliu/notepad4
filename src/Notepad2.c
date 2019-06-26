@@ -5793,13 +5793,15 @@ int ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2, BOOL *bIsNotepadReplacement) 
 	if (*opt == L'-') {
 		++opt;
 	}
-	if (*opt == 0) {
+	if (*opt == L'\0') {
 		return 0;
 	}
 
 	int state = 0;
-	if (opt[1] == 0) {
-		switch (*CharUpper(opt)) {
+	const int ch = ToUpperA(*opt);
+
+	if (opt[1] == L'\0') {
+		switch (ch) {
 		case L'A':
 			flagSetEncoding = IDM_ENCODING_ANSI - IDM_ENCODING_ANSI + 1;
 			state = 1;
@@ -5961,34 +5963,35 @@ int ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2, BOOL *bIsNotepadReplacement) 
 			state = 3;
 			break;
 		}
-	} else if (opt[2] == 0) {
-		switch (*CharUpper(opt)) {
+	} else if (opt[2] == L'\0') {
+		const int chNext = ToUpperA(opt[1]);
+		switch (ch) {
 		case L'C':
-			if (opt[1] == L'R') {
+			if (chNext == L'R') {
 				flagSetEOLMode = IDM_LINEENDINGS_CR - IDM_LINEENDINGS_CRLF + 1;
 				state = 1;
 			}
 			break;
 
 		case L'F':
-			if (opt[1] == L'0' || *CharUpper(opt + 1) == L'O') {
+			if (chNext == L'0' || chNext == L'O') {
 				lstrcpy(szIniFile, L"*?");
 				state = 1;
 			}
 			break;
 
 		case L'L':
-			if (opt[1] == L'F') {
+			if (chNext == L'F') {
 				flagSetEOLMode = IDM_LINEENDINGS_LF - IDM_LINEENDINGS_CRLF + 1;
 				state = 1;
-			} else if (opt[1] == L'0' || opt[1] == L'-' || *CharUpper(opt + 1) == L'O') {
+			} else if (chNext == L'0' || chNext == L'-' || chNext == L'O') {
 				flagChangeNotify = 1;
 				state = 1;
 			}
 			break;
 
 		case L'N':
-			if (*CharUpper(opt + 1) == L'S') {
+			if (chNext == L'S') {
 				flagReuseWindow = 0;
 				flagNoReuseWindow = 1;
 				flagSingleFileInstance = 1;
@@ -5997,14 +6000,14 @@ int ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2, BOOL *bIsNotepadReplacement) 
 			break;
 
 		case L'O':
-			if (opt[1] == L'0' || opt[1] == L'-' || *CharUpper(opt + 1) == L'O') {
+			if (chNext == L'0' || chNext == L'-' || chNext == L'O') {
 				flagAlwaysOnTop = 1;
 				state = 1;
 			}
 			break;
 
 		case L'R':
-			if (*CharUpper(opt + 1) == L'S') {
+			if (chNext == L'S') {
 				flagReuseWindow = 1;
 				flagNoReuseWindow = 0;
 				flagSingleFileInstance = 1;
@@ -6025,7 +6028,7 @@ int ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2, BOOL *bIsNotepadReplacement) 
 	}
 
 	state = 0;
-	switch (*CharUpper(opt)) {
+	switch (ch) {
 	case L'A':
 		if (StrCaseEqual(opt, L"ANSI")) {
 			flagSetEncoding = IDM_ENCODING_ANSI - IDM_ENCODING_ANSI + 1;
@@ -6043,12 +6046,12 @@ int ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2, BOOL *bIsNotepadReplacement) 
 		break;
 
 	case L'C':
-		if (opt[1] == L'R') {
+		if (opt[1] == L'R' || opt[1] == L'r') {
 			opt += 2;
 			if (*opt == L'-') {
 				++opt;
 			}
-			if (*opt == L'L' && opt[1] == L'F' && opt[2] == 0) {
+			if (opt[2] == L'\0' && (*opt == L'L' || *opt == L'l') && (opt[1] == L'F' || opt[1] == L'f')) {
 				flagSetEOLMode = IDM_LINEENDINGS_CRLF - IDM_LINEENDINGS_CRLF + 1;
 				state = 1;
 			}
@@ -6065,7 +6068,7 @@ int ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2, BOOL *bIsNotepadReplacement) 
 			BOOL bTransBS = FALSE;
 
 			++opt;
-			switch (*CharUpper(opt)) {
+			switch (ToUpperA(*opt)) {
 			case L'R':
 				bRegex = TRUE;
 				++opt;
@@ -6081,7 +6084,7 @@ int ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2, BOOL *bIsNotepadReplacement) 
 				bFindUp = TRUE;
 				++opt;
 			}
-			if (*opt != 0) {
+			if (*opt != L'\0') {
 				break;
 			}
 
@@ -6112,7 +6115,7 @@ int ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2, BOOL *bIsNotepadReplacement) 
 
 	case L'P': {
 		if (*bIsNotepadReplacement) {
-			if (*CharUpper(opt + 1) == L'T') {
+			if (opt[1] == L'T' || opt[1] == L't') {
 				ExtractFirstArgument(lp2, lp1, lp2);
 			}
 			state = 1;
@@ -6128,10 +6131,10 @@ int ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2, BOOL *bIsNotepadReplacement) 
 			++opt;
 		}
 
-		switch (*CharUpper(opt)) {
+		switch (ToUpperA(*opt)) {
 		case L'0':
 		case L'O':
-			if (opt[1] == 0) {
+			if (opt[1] == L'\0') {
 				flagPosParam = 1;
 				flagDefaultPos = 1;
 				state = 1;
@@ -6140,9 +6143,9 @@ int ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2, BOOL *bIsNotepadReplacement) 
 
 		case L'D':
 		case L'S':
-			if (opt[1] == 0 || (opt[2] == 0 && *CharUpper(opt + 1) == L'L')) {
+			if (opt[1] == L'\0' || (opt[2] == L'\0' && (opt[1] == L'L' || opt[1] == L'l'))) {
 				flagPosParam = 1;
-				flagDefaultPos = (opt[1] == 0)? 2 : 3;;
+				flagDefaultPos = (opt[1] == L'\0')? 2 : 3;;
 				state = 1;
 			}
 			break;
@@ -6153,12 +6156,12 @@ int ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2, BOOL *bIsNotepadReplacement) 
 		case L'T':
 		case L'B':
 		case L'M': {
-			WCHAR *p = opt;
+			LPCWSTR p = opt;
 			flagPosParam = 1;
 			flagDefaultPos = 0;
 			state = 1;
 			while (*p && state == 1) {
-				switch (*CharUpper(p)) {
+				switch (ToUpperA(*p)) {
 				case L'F':
 					flagDefaultPos &= ~(4 | 8 | 16 | 32);
 					flagDefaultPos |= 64;
@@ -6234,7 +6237,7 @@ int ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2, BOOL *bIsNotepadReplacement) 
 		// Shell integration
 		if (StrNCaseEqual(opt, L"sysmru=", CSTRLEN(L"sysmru="))) {
 			opt += CSTRLEN(L"sysmru=");
-			if (opt[1] == 0) {
+			if (opt[1] == L'\0') {
 				switch (*opt) {
 				case L'0':
 					flagUseSystemMRU = 1;
@@ -6261,7 +6264,7 @@ int ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2, BOOL *bIsNotepadReplacement) 
 				if (*opt == '-') {
 					++opt;
 				}
-				if (*opt == 0) {
+				if (*opt == L'\0') {
 					flagSetEncoding = IDM_ENCODING_UTF8 - IDM_ENCODING_ANSI + 1;
 					state = 1;
 				} else if (StrCaseEqual(opt, L"BOM") || StrCaseEqual(opt, L"SIG") || StrCaseEqual(opt, L"SIGNATURE")) {
