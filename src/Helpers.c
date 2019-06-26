@@ -1685,13 +1685,29 @@ BOOL ExtractFirstArgument(LPCWSTR lpArgs, LPWSTR lpArg1, LPWSTR lpArg2) {
 		return FALSE;
 	}
 
-	if (*lpArg1 == L'\"') {
+	LPWSTR psz = lpArg1;
+	WCHAR ch = *psz;
+	if (ch == L'\"') {
 		*lpArg1 = L' ';
 		TrimString(lpArg1);
 		bQuoted = TRUE;
+	} else if (ch == L'-' || ch == L'/') {
+		// fix -appid="string with space"
+		++psz;
+		if (ch == L'-' && *psz == L'-') {
+			++psz;
+		}
+		while ((ch = *psz) != L'\0' && ch != L' ') {
+			++psz;
+			if (ch == L'=' && *psz == L'\"') {
+				bQuoted = TRUE;
+				++psz;
+				break;
+			}
+		}
 	}
 
-	LPWSTR psz = StrChr(lpArg1, (bQuoted ? L'\"' : L' '));
+	psz = StrChr(psz, (bQuoted ? L'\"' : L' '));
 	if (psz) {
 		*psz = L'\0';
 		if (lpArg2) {
