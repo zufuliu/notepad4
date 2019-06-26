@@ -90,6 +90,14 @@ NP2_inline BOOL StrNotEmpty(LPCWSTR s) {
 	return s != NULL && *s != L'\0';
 }
 
+NP2_inline int ToUpperA(int ch) {
+	return (ch >= 'a' && ch <= 'z') ? (ch - 'a' + 'A') : ch;
+}
+
+NP2_inline int ToLowerA(int ch) {
+	return (ch >= 'A' && ch <= 'Z') ? (ch - 'A' + 'a') : ch;
+}
+
 NP2_inline BOOL StrEqual(LPCWSTR s1, LPCWSTR s2) {
 	return wcscmp(s1, s2) == 0;
 }

@@ -2677,18 +2677,20 @@ void ClearWindowPositionHistory(void) {
 //
 //
 int ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2) {
-	int state = 0;
 	LPWSTR opt = lp1 + 1;
 	// only accept /opt, -opt, --opt
 	if (*opt == L'-') {
 		++opt;
 	}
-	if (*opt == 0) {
+	if (*opt == L'\0') {
 		return 0;
 	}
 
-	if (opt[1] == 0) {
-		switch (*CharUpper(opt)) {
+	int state = 0;
+	const int ch = ToUpperA(*opt);
+
+	if (opt[1] == L'\0') {
+		switch (ch) {
 		case L'F':
 			state = 2;
 			if (ExtractFirstArgument(lp2, lp1, lp2)) {
@@ -2752,17 +2754,18 @@ int ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2) {
 		default:
 			break;
 		}
-	} else if (opt[2] == 0) {
-		switch (*CharUpper(opt)) {
+	} else if (opt[2] == L'\0') {
+		const int chNext = ToUpperA(opt[1]);
+		switch (ch) {
 		case L'F':
-			if (opt[1] == L'0' || *CharUpper(opt + 1) == L'O') {
+			if (chNext == L'0' || chNext == L'O') {
 				lstrcpy(szIniFile, L"*?");
 				state = 1;
 			}
 			break;
 
 		case L'P':
-			switch (*CharUpper(opt + 1)) {
+			switch (chNext) {
 			case L'D':
 			case L'S':
 				flagPosParam = 1;
@@ -2804,7 +2807,7 @@ void ParseCommandLine(void) {
 	LPWSTR lp2 = (LPWSTR)NP2HeapAlloc(cmdSize);
 	while (ExtractFirstArgument(lp3, lp1, lp2)) {
 		// options
-		if ((*lp1 == L'/' || *lp1 == L'-') && lp1[1] != 0) {
+		if (*lp1 == L'/' || *lp1 == L'-') {
 			const int state = ParseCommandLineOption(lp1, lp2);
 			if (state == 1) {
 				lstrcpy(lp3, lp2);
