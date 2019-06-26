@@ -607,10 +607,8 @@ bool Document::IsCrLf(Sci::Position pos) const noexcept {
 }
 
 int Document::LenChar(Sci::Position pos) noexcept {
-	if (pos < 0) {
+	if (pos < 0 || pos >= Length()) {
 		return 1;
-	} else if (pos >= Length()) {
-		return 0;
 	} else if (IsCrLf(pos)) {
 		return 2;
 	}

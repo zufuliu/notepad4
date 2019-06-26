@@ -1693,9 +1693,6 @@ BOOL ExtractFirstArgument(LPCWSTR lpArgs, LPWSTR lpArg1, LPWSTR lpArg2) {
 	} else if (ch == L'-' || ch == L'/') {
 		// fix -appid="string with space"
 		++psz;
-		if (ch == L'-' && *psz == L'-') {
-			++psz;
-		}
 		while ((ch = *psz) != L'\0' && ch != L' ') {
 			++psz;
 			if (ch == L'=' && *psz == L'\"') {
