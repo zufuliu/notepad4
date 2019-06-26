@@ -1149,15 +1149,14 @@ BOOL ExtractFirstArgument(LPCWSTR lpArgs, LPWSTR lpArg1, LPWSTR lpArg2) {
 	}
 
 	TrimString(lpArg1);
-	if (!*lpArg1) {
+	if (*lpArg1 == L'\0') {
 		return FALSE;
 	}
 
 	LPWSTR psz = lpArg1;
 	WCHAR ch = *psz;
 	if (ch == L'\"') {
-		*lpArg1 = L' ';
-		TrimString(lpArg1);
+		*psz++ = L' ';
 		bQuoted = TRUE;
 	} else if (ch == L'-' || ch == L'/') {
 		// fix -appid="string with space"
@@ -1180,14 +1179,11 @@ BOOL ExtractFirstArgument(LPCWSTR lpArgs, LPWSTR lpArg1, LPWSTR lpArg2) {
 		*psz = L'\0';
 		if (lpArg2) {
 			lstrcpy(lpArg2, psz + 1);
+			TrimString(lpArg2);
 		}
 	}
 
 	TrimString(lpArg1);
-
-	if (lpArg2) {
-		TrimString(lpArg2);
-	}
 
 	return TRUE;
 }
