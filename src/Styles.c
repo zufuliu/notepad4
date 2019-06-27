@@ -957,7 +957,7 @@ void Style_UpdateCaret(void) {
 	// caret style and width
 	const int style = (iCaretStyle ? CARETSTYLE_LINE : CARETSTYLE_BLOCK)
 		| (iOvrCaretStyle ? CARETSTYLE_OVERSTRIKE_BLOCK : CARETSTYLE_OVERSTRIKE_BAR)
-		| (bBlockCaretOutSelection ? CARETSTYLE_BLOCK_MAY_TRAIL_RANGE : 0);
+		| (bBlockCaretOutSelection ? CARETSTYLE_BLOCK_AFTER : 0);
 	SciCall_SetCaretStyle(style);
 	if (iCaretStyle != 0) {
 		SciCall_SetCaretWidth(iCaretStyle);

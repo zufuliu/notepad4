@@ -7378,7 +7378,7 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 		return vs.caretcolour.AsInteger();
 
 	case SCI_SETCARETSTYLE:
-		if (wParam <= (CARETSTYLE_BLOCK | CARETSTYLE_OVERSTRIKE_BLOCK | CARETSTYLE_BLOCK_MAY_TRAIL_RANGE))
+		if (wParam <= (CARETSTYLE_BLOCK | CARETSTYLE_OVERSTRIKE_BLOCK | CARETSTYLE_BLOCK_AFTER))
 			vs.caretStyle = static_cast<int>(wParam);
 		else
 			/* Default to the line caret */
