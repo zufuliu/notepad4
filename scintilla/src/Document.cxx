@@ -1048,18 +1048,18 @@ int Document::SafeSegment(const char *text, int length, int lengthSegment) const
 			if (IsSpaceOrTab(text[j - 1]) && !IsSpaceOrTab(text[j])) {
 				lastSpaceBreak = j;
 			}
-			if (ch < 'A') {
+		}
+
+		lastEncodingAllowedBreak = j;
+		if (!dbcsCodePage || UTF8IsAscii(ch)) {
+			if (j > 0 && charClass.GetClass(ch) == CharClassify::ccPunctuation) {
 				lastPunctuationBreak = j;
 			}
-		}
-		lastEncodingAllowedBreak = j;
-
-		if (dbcsCodePage == SC_CP_UTF8) {
-			j += UTF8BytesOfLead(ch);
-		} else if (dbcsCodePage) {
-			j += IsDBCSLeadByteNoExcept(ch) ? 2 : 1;
-		} else {
 			j++;
+		} else if (dbcsCodePage == SC_CP_UTF8) {
+			j += UTF8BytesOfLead(ch);
+		} else {
+			j += IsDBCSLeadByteNoExcept(ch) ? 2 : 1;
 		}
 	}
 	if (lastSpaceBreak >= 0) {
