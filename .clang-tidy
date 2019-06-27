@@ -1,6 +1,26 @@
 ---
+# https://clang.llvm.org/extra/clang-tidy/index.html
 # https://clang.llvm.org/extra/clang-tidy/checks/list.html
-Checks: 'clang-diagnostic-*,clang-analyzer-*,modernize-*,bugprone-*,performance-*,readability-*,misc-*,-clang-analyzer-security.insecureAPI.strcpy,-clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling,-modernize-use-using,-modernize-use-nodiscard,-modernize-use-trailing-return-type,-modernize-avoid-c-arrays,-readability-implicit-bool-conversion,-readability-magic-numbers,-misc-non-private-member-variables-in-classes'
+Checks: >
+    clang-diagnostic-*,
+    clang-analyzer-*,
+    bugprone-*,
+    cert-*,
+    modernize-*,
+    performance-*,
+    readability-*,
+    misc-*,
+    -clang-analyzer-security.insecureAPI.strcpy,
+    -clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling,
+    -modernize-avoid-c-arrays,
+    -modernize-redundant-void-arg,
+    -modernize-use-nodiscard,
+    -modernize-use-trailing-return-type,
+    -modernize-use-using,
+    -readability-implicit-bool-conversion,
+    -readability-magic-numbers,
+    -misc-non-private-member-variables-in-classes,
+
 WarningsAsErrors: ''
 HeaderFilterRegex: '.*'
 AnalyzeTemporaryDtors: false
