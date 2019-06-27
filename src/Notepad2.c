@@ -6293,6 +6293,13 @@ void ParseCommandLine(void) {
 		return;
 	}
 
+#if 0
+	FILE *fp = fopen("args-dump.txt", "wb");
+	fwrite("\xFF\xFE", 1, 2, fp);
+	fwrite(lpCmdLine, 1, cmdSize - 2, fp);
+	fclose(fp);
+#endif
+
 	// Good old console can also send args separated by Tabs
 	StrTab2Space(lpCmdLine);
 
