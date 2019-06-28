@@ -4872,7 +4872,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			// auto complete word
 			if (!autoCompletionConfig.bCompleteWord
 				// ignore IME input
-				|| (scn->characterSource != SC_CHARACTERSOURCE_NORMAL && (ch >= 0x80 || autoCompletionConfig.bEnglistIMEModeOnly))
+				|| (scn->characterSource != SC_CHARACTERSOURCE_DIRECT_INPUT && (ch >= 0x80 || autoCompletionConfig.bEnglistIMEModeOnly))
 				|| !IsAutoCompletionWordCharacter(ch)
 			) {
 				return 0;

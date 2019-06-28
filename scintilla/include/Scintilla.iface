@@ -3092,12 +3092,12 @@ ali SC_AC_DOUBLECLICK=DOUBLE_CLICK
 
 # characterSource for SCN_CHARADDED
 enu CharacterSource=SC_CHARACTERSOURCE_
-# Normal input
-val SC_CHARACTERSOURCE_NORMAL=0
-# IME (inline mode) tentative characters.
-val SC_CHARACTERSOURCE_TENTATIVE=1
+# Direct input
+val SC_CHARACTERSOURCE_DIRECT_INPUT=0
+# IME (inline mode) or dead key tentative input characters.
+val SC_CHARACTERSOURCE_TENTATIVE_INPUT=1
 # IME (either inline or windowed mode) full composited string.
-val SC_CHARACTERSOURCE_IME=2
+val SC_CHARACTERSOURCE_IME_RESULT=2
 
 ################################################
 # For SciLexer.h

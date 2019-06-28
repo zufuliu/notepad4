@@ -999,8 +999,7 @@ sptr_t ScintillaWin::HandleCompositionWindowed(uptr_t wParam, sptr_t lParam) {
 	if (lParam & GCS_RESULTSTR) {
 		IMContext imc(MainHWND());
 		if (imc.hIMC) {
-			AddWString(imc.GetCompositionString(GCS_RESULTSTR), CharacterSource::ime);
-			Platform::DebugPrintf("window InsertCharacter ime\n");
+			AddWString(imc.GetCompositionString(GCS_RESULTSTR), CharacterSource::imeResult);
 
 			// Set new position after converted
 			const Point pos = PointMainCaret();
@@ -1209,8 +1208,6 @@ sptr_t ScintillaWin::HandleCompositionInline(uptr_t, sptr_t lParam) {
 
 		std::vector<int> imeIndicator = MapImeIndicators(imc.GetImeAttributes());
 
-		const bool tmpRecordingMacro = recordingMacro;
-		recordingMacro = false;
 		const UINT codePage = CodePageOfDocument();
 		char inBufferCP[16];
 		const std::wstring_view wsv = wcs;
@@ -1218,13 +1215,11 @@ sptr_t ScintillaWin::HandleCompositionInline(uptr_t, sptr_t lParam) {
 			const size_t ucWidth = UTF16CharLength(wsv[i]);
 			const int size = MultiByteFromWideChar(codePage, wsv.substr(i, ucWidth), inBufferCP, sizeof(inBufferCP) - 1);
 			inBufferCP[size] = '\0';
-			Platform::DebugPrintf("inline InsertCharacter tentative\n");
-			InsertCharacter(std::string_view(inBufferCP, size), CharacterSource::tentative);
+			InsertCharacter(std::string_view(inBufferCP, size), CharacterSource::tentativeInput);
 
 			DrawImeIndicator(imeIndicator[i], size);
 			i += ucWidth;
 		}
-		recordingMacro = tmpRecordingMacro;
 
 		// Move IME caret from current last position to imeCaretPos.
 		const int imeEndToImeCaretU16 = imc.GetImeCaretPos() - static_cast<unsigned int>(wcs.size());
@@ -1236,8 +1231,7 @@ sptr_t ScintillaWin::HandleCompositionInline(uptr_t, sptr_t lParam) {
 			view.imeCaretBlockOverride = true;
 		}
 	} else if (lParam & GCS_RESULTSTR) {
-		Platform::DebugPrintf("inline InsertCharacter ime\n");
-		AddWString(imc.GetCompositionString(GCS_RESULTSTR), CharacterSource::ime);
+		AddWString(imc.GetCompositionString(GCS_RESULTSTR), CharacterSource::imeResult);
 	}
 	EnsureCaretVisible();
 	if (moveCandidateWindowOnTyping) {
@@ -1602,7 +1596,7 @@ sptr_t ScintillaWin::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam
 					lastHighSurrogateChar = 0;
 					wclen = 2;
 				}
-				AddWString(std::wstring_view(wcs, wclen), CharacterSource::normal);
+				AddWString(std::wstring_view(wcs, wclen), CharacterSource::directInput);
 			}
 			return 0;
 
@@ -1614,7 +1608,7 @@ sptr_t ScintillaWin::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam
 			} else {
 				wchar_t wcs[3] = { 0 };
 				const unsigned int wclen = UTF16FromUTF32Character(static_cast<unsigned int>(wParam), wcs);
-				AddWString(std::wstring_view(wcs, wclen), CharacterSource::normal);
+				AddWString(std::wstring_view(wcs, wclen), CharacterSource::directInput);
 				return FALSE;
 			}
 
@@ -1690,7 +1684,6 @@ sptr_t ScintillaWin::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam
 			break;
 
 		case WM_IME_STARTCOMPOSITION: 	// dbcs
-			Platform::DebugPrintf("WM_IME_STARTCOMPOSITION\n");
 			if (imeInteraction == imeInline) {
 				SetCandidateWindowPos();
 				return 0;
@@ -1700,12 +1693,10 @@ sptr_t ScintillaWin::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam
 			}
 
 		case WM_IME_ENDCOMPOSITION: 	// dbcs
-			Platform::DebugPrintf("WM_IME_ENDCOMPOSITION\n");
 			ImeEndComposition();
 			return ::DefWindowProc(MainHWND(), iMessage, wParam, lParam);
 
 		case WM_IME_COMPOSITION:
-			Platform::DebugPrintf("WM_IME_COMPOSITION\n");
 			if (imeInteraction == imeInline) {
 				return HandleCompositionInline(wParam, lParam);
 			} else {
@@ -2697,7 +2688,7 @@ DataObject::DataObject() noexcept {
 
 /// Implement IUnknown
 STDMETHODIMP DropTarget::QueryInterface(REFIID riid, PVOID *ppv) noexcept {
-	Platform::DebugPrintf("DT QI %p\n", this);
+	//Platform::DebugPrintf("DT QI %p\n", this);
 	return sci->QueryInterface(riid, ppv);
 }
 STDMETHODIMP_(ULONG)DropTarget::AddRef() noexcept {
@@ -3197,7 +3188,7 @@ void ScintillaWin::EnumDataSourceFormat(const char *tag, LPDATAOBJECT pIDataSour
 				const char *fmtName = GetSourceFormatName(fmt, name, sizeof(name));
 				const int len = sprintf(buf, "%s: fmt[%lu]=%u, 0x%04X; tymed=%lu, %s; name=%s\n",
 					tag, i, fmt, fmt, tymed, typeName, fmtName);
-				InsertCharacter(std::string_view(buf, len), CharacterSource::normal);
+				InsertCharacter(std::string_view(buf, len), CharacterSource::directInput);
 			}
 		}
 	}
@@ -3216,7 +3207,7 @@ void ScintillaWin::EnumAllClipboardFormat(const char *tag) {
 		const char *fmtName = GetSourceFormatName(fmt, name, sizeof(name));
 		const int len = sprintf(buf, "%s: fmt[%u]=%u, 0x%04X; name=%s\n",
 			tag, i, fmt, fmt, fmtName);
-		InsertCharacter(std::string_view(buf, len), CharacterSource::normal);
+		InsertCharacter(std::string_view(buf, len), CharacterSource::directInput);
 		i++;
 	}
 }
