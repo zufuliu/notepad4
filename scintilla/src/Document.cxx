@@ -606,7 +606,7 @@ bool Document::IsCrLf(Sci::Position pos) const noexcept {
 	return (cb.CharAt(pos) == '\r') && (cb.CharAt(pos + 1) == '\n');
 }
 
-int Document::LenChar(Sci::Position pos) noexcept {
+int Document::LenChar(Sci::Position pos, bool *invalid) noexcept {
 	if (pos < 0 || pos >= Length()) {
 		return 1;
 	} else if (IsCrLf(pos)) {
@@ -627,6 +627,9 @@ int Document::LenChar(Sci::Position pos) noexcept {
 		const int utf8status = UTF8ClassifyMulti(charBytes, widthCharBytes);
 		if (utf8status & UTF8MaskInvalid) {
 			// Treat as invalid and use up just one byte
+			if (invalid) {
+				*invalid = true;
+			}
 			return 1;
 		} else {
 			return utf8status & UTF8MaskWidth;
@@ -635,6 +638,9 @@ int Document::LenChar(Sci::Position pos) noexcept {
 		if (IsDBCSLeadByteNoExcept(leadByte) && ((pos + 1) < Length())) {
 			return 2;
 		} else {
+			if (invalid) {
+				*invalid = true;
+			}
 			return 1;
 		}
 	}

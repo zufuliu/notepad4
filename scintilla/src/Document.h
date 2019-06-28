@@ -323,7 +323,7 @@ public:
 		return cb.ContainsLineEnd(s, length);
 	}
 	bool IsCrLf(Sci::Position pos) const noexcept;
-	int LenChar(Sci::Position pos) noexcept;
+	int LenChar(Sci::Position pos, bool *invalid = nullptr) noexcept;
 	bool InGoodUTF8(Sci::Position pos, Sci::Position &start, Sci::Position &end) const noexcept;
 	Sci::Position MovePositionOutsideChar(Sci::Position pos, Sci::Position moveDir, bool checkLineEnd = true) const noexcept;
 	Sci::Position NextPosition(Sci::Position pos, int moveDir) const noexcept;
