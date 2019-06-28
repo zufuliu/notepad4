@@ -415,9 +415,7 @@ class ScintillaWin :
 
 	sptr_t HandleCompositionWindowed(uptr_t wParam, sptr_t lParam);
 	sptr_t HandleCompositionInline(uptr_t wParam, sptr_t lParam);
-#if 0
 	static bool KoreanIME() noexcept;
-#endif
 	void MoveImeCarets(Sci::Position offset);
 	void DrawImeIndicator(int indicator, int len);
 	void SetCandidateWindowPos();
@@ -1013,12 +1011,10 @@ sptr_t ScintillaWin::HandleCompositionWindowed(uptr_t wParam, sptr_t lParam) {
 	return ::DefWindowProc(MainHWND(), WM_IME_COMPOSITION, wParam, lParam);
 }
 
-#if 0
 bool ScintillaWin::KoreanIME() noexcept {
 	const int codePage = InputCodePage();
 	return codePage == 949 || codePage == 1361;
 }
-#endif
 
 void ScintillaWin::MoveImeCarets(Sci::Position offset) {
 	// Move carets relatively by bytes.
@@ -1048,11 +1044,12 @@ void ScintillaWin::SetCandidateWindowPos() {
 	IMContext imc(MainHWND());
 	if (imc.hIMC) {
 		const Point pos = PointMainCaret();
+		const int offset = std::max(4, KoreanIME() ? vs.lineHeight : vs.lineHeight/4);
 		CANDIDATEFORM CandForm;
 		CandForm.dwIndex = 0;
 		CandForm.dwStyle = CFS_CANDIDATEPOS;
 		CandForm.ptCurrentPos.x = static_cast<LONG>(pos.x);
-		CandForm.ptCurrentPos.y = static_cast<LONG>(pos.y + vs.lineHeight/4);
+		CandForm.ptCurrentPos.y = static_cast<LONG>(pos.y + offset);
 		::ImmSetCandidateWindow(imc.hIMC, &CandForm);
 	}
 }
