@@ -1685,8 +1685,8 @@ sptr_t ScintillaWin::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam
 			break;
 
 		case WM_IME_STARTCOMPOSITION: 	// dbcs
+			SetCandidateWindowPos();
 			if (imeInteraction == imeInline) {
-				SetCandidateWindowPos();
 				return 0;
 			} else {
 				ImeStartComposition();
