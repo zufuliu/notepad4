@@ -411,7 +411,7 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	Sci::Position RealizeVirtualSpace(Sci::Position position, Sci::Position virtualSpace);
 	SelectionPosition RealizeVirtualSpace(SelectionPosition position);
 	enum class CharacterSource {
-		normal, tentative, ime,
+		directInput, tentativeInput, imeResult,
 	};
 	void AddChar(char ch);
 	virtual void InsertCharacter(std::string_view sv, CharacterSource charSource);

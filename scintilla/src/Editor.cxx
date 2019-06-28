@@ -1894,7 +1894,7 @@ void Editor::AddChar(char ch) {
 	char s[2];
 	s[0] = ch;
 	s[1] = '\0';
-	InsertCharacter(std::string_view(s, 1), CharacterSource::normal);
+	InsertCharacter(std::string_view(s, 1), CharacterSource::directInput);
 }
 
 void Editor::FilterSelections() {
@@ -1979,8 +1979,8 @@ void Editor::InsertCharacter(std::string_view sv, CharacterSource charSource) {
 		SetLastXChosen();
 	}
 
-	// We don't handle inline IME tentative characters
-	if (charSource != CharacterSource::tentative) {
+	// We don't handle inline IME tentative input characters
+	if (charSource != CharacterSource::tentativeInput) {
 		int ch = static_cast<unsigned char>(sv[0]);
 		if (pdoc->dbcsCodePage != SC_CP_UTF8) {
 			if (sv.length() > 1) {
@@ -2002,7 +2002,7 @@ void Editor::InsertCharacter(std::string_view sv, CharacterSource charSource) {
 		NotifyChar(ch, charSource);
 	}
 
-	if (recordingMacro) {
+	if (recordingMacro && charSource != CharacterSource::tentativeInput) {
 		std::string copy(sv); // ensure NUL-terminated
 		NotifyMacroRecord(SCI_REPLACESEL, 0, reinterpret_cast<sptr_t>(copy.data()));
 	}
@@ -3107,7 +3107,7 @@ void Editor::NewLine() {
 	for (size_t i = 0; i < countInsertions; i++) {
 		const char *eol = StringFromEOLMode(pdoc->eolMode);
 		while (*eol) {
-			NotifyChar(*eol, CharacterSource::normal);
+			NotifyChar(*eol, CharacterSource::directInput);
 			if (recordingMacro) {
 				char txt[2];
 				txt[0] = *eol;
