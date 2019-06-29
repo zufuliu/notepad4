@@ -9,7 +9,7 @@ static KEYWORDLIST Keywords_HTML = {{
 "form h1 h2 h3 h4 h5 h6 head header hgroup hr html i iframe img input ins kbd "
 "keygen label legend li link main map mark meta meter nav noscript object ol "
 "optgroup option output p param picture pre progress q rb rp rt rtc ruby s samp script section "
-"select small source span strong style sub summary sup table tbody td template textarea "
+"select slot small source span strong style sub summary sup table tbody td template textarea "
 "tfoot th thead time title tr track u ul var video wbr "
 "math svg "
 
@@ -61,15 +61,15 @@ NULL
 
 , // 6 Attribute
 // Attribute
-"abbr accept accept-charset accesskey action allowfullscreen allowpaymentrequest alt async autocomplete autofocus autoplay "
+"abbr accept accept-charset accesskey action allow allowfullscreen allowpaymentrequest alt async autocapitalize autocomplete autofocus autoplay "
 "border challenge charset checked cite class cols colspan command content "
-"contenteditable contextmenu controls coords crossorigin data datetime default "
-"defer dir dirname disabled download draggable dropzone enctype for form formaction "
-"formenctype formmethod formnovalidate formtarget headers height hidden high href hreflang "
-"http-equiv icon id ismap itemid itemprop itemref itemscope itemtype "
+"contenteditable contextmenu controls coords crossorigin data datetime decoding default "
+"defer dir dirname disabled download draggable dropzone enctype enterkeyhint for form formaction "
+"formenctype formmethod formnovalidate formtarget headers height hidden inputmode high href hreflang "
+"http-equiv icon id integrity is ismap itemid itemprop itemref itemscope itemtype "
 "keytype kind label lang list longdesc loop low nonce minlength manifest max "
-"maxlength media mediagroup method min multiple muted name novalidate open "
-"optimum pattern placeholder poster preload radiogroup readonly referrerpolicy rel required "
+"maxlength media mediagroup method min multiple muted name nomodule novalidate open "
+"optimum pattern placeholder playsinline poster preload radiogroup readonly referrerpolicy rel required "
 "rev reversed rows rowspan sandbox sizes spellcheck scope scoped seamless selected shape size span "
 "src srcdoc srclang srcset start step style tabindex target title translate type "
 "typemustmatch usemap value width wrap "
@@ -77,7 +77,7 @@ NULL
 // Other Attribute
 "and bb face file password ping prompt pubdate public strike tt "
 "xml xmlns "
-"^aria- ^data- "
+"role ^aria- ^data- "
 
 // Obsolete Attributes
 "align alink allowtransparency archive axis background bgcolor border bottommargin bordercolor cellpadding cellspacing "
@@ -93,33 +93,40 @@ NULL
 "onaddtrack onabort onafterprint onauxclick onbeforeprint onbeforeunload onblur oncancel oncanplay oncanplaythrough onchange onclick onclose "
 "oncontextmenu oncopy oncuechange oncut ondblclick ondrag ondragend ondragenter ondragexit ondragleave "
 "ondragover ondragstart ondrop ondurationchange onemptied onended onerror onenter onexit "
-"onformchange onforminput onmessage onpopstate onreadystatechange onredo onresize onundo "
-"onfocus onhashchange oninput oninvalid onkeydown onkeypress onkeyup onlanguagechange onload onloadeddata "
+"onformchange onforminput onmessage onmessageerror onpopstate onreadystatechange onredo onresize onundo "
+"onfocus onformdata onhashchange oninput oninvalid onkeydown onkeypress onkeyup onlanguagechange onload onloadeddata "
 "onloadedmetadata onloadend onloadstart onmousedown onmouseenter onmouseleave onmousemove onmouseout onmouseover "
 "onmouseup onmousewheel onwheel onoffline ononline onpagehide onpageshow onpause onplay onplaying onprogress onpaste onratechange onrejectionhandled onremovetrack onreset "
-"onscroll onseeked onseeking onselect onshow onstalled onstorage onsubmit onsuspend "
+"onscroll onsecuritypolicyviolation onseeked onseeking onselect onshow onstalled onstorage onsubmit onsuspend "
 "ontimeupdate ontoggle onvolumechange onunhandledrejection onunload onwaiting "
 
 , // 7 Value
+// metadata names
+"application-name author description generator keywords referrer theme-color "
 // Link types
-"alternate author bookmark external help icon license next nofollow noopener noreferrer prev search stylesheet tag "
+"alternate canonical author bookmark dns-prefetch external help icon modulepreload license next nofollow noopener noreferrer opener "
+"pingback preconnect prefetch preload prerender prev search stylesheet tag "
 "about blob data http https mailto sms urn tel "
 "_blank _self _parent _top "
 // referrerpolicy, crossorigin
+"never always origin-when-crossorigin "
 "no-referrer no-referrer-when-downgrade unsafe-url origin-when-cross-origin " "anonymous use-credentials "
 // http-equiv
 "content-language content-type default-style refresh set-cookie content-security-policy "
 // ol
 "decimal lower-alpha upper-alpha lower-roman upper-roman "
 // media preload, kind
-"none metadata auto " "subtitles captions descriptions chapters metadata "
+"metadata auto " "subtitles captions descriptions chapters metadata "
 // area shape
 "circle circ default poly polygon rect rectangle "
 // input type
-"hidden text search tel url email password date month week time datetime-local number range color checkbox radio file submit image reset button "
-
+"hidden text search url email password date month week time datetime-local number range color checkbox radio file submit image reset button "
+// inputmode
+"numeric "
+// autocapitalize
+"sentences words characters "
 // Other Value, dir
-"on off true false yes no " "ltr rtl auto "
+"auto none on off true false yes no " "ltr rtl auto "
 "application/x-www-form-urlencoded multipart/form-data text/plain GET POST "
 "text/javascript module text/xml text/css application/octet-stream application/xml audio video image "
 "allow-forms allow-popups allow-same-origin allow-scripts allow-top-navigation "

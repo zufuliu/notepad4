@@ -1,6 +1,6 @@
 <!--
 HTML 5.2 https://www.w3.org/TR/html5/ 2017-12-14
-https://whatwg.org/
+https://whatwg.org/ 2019-06-28
 https://www.w3.org/TR/html5-diff/
 https://www.w3.org/TR/html4/
 https://www.w3.org/TR/xhtml2/
@@ -10,12 +10,17 @@ https://www.w3.org/TR/xhtml2/
 <html
 	accesskey
 	class
+	autocapitalize="off none on sentences words characters"
 	contenteditable
 	dir="ltr rtl auto"
 	draggable
+	enterkeyhint="enter done go next previous search send"
 	hidden
+	inputmode="none text tel url email numeric decimal search"
 	id
+	is
 	lang="en"
+	nonce
 	spellcheck
 	style
 	tabindex
@@ -26,19 +31,21 @@ https://www.w3.org/TR/xhtml2/
 		<!-- https://www.w3.org/TR/html5/document-metadata.html -->
 		<base href target>
 		<!-- Link types https://www.w3.org/TR/html5/links.html
-		alternate author bookmark external help icon license next nofollow noopener noreferrer prev search stylesheet tag
+		alternate canonical author bookmark dns-prefetch external help icon modulepreload license next nofollow noopener noreferrer opener
+		pingback preconnect prefetch preload prerender prev search stylesheet tag
 		-->
 		<link href
 			crossorigin="anonymous use-credentials"
 			rel="alternate author help icon license next prev search stylesheet"
-			rev media nonce hreflang  type="text/plain text/css"
+			rev media hreflang  type="text/plain text/css"
 			referrerpolicy="no-referrer no-referrer-when-downgrade unsafe-url origin-when-cross-origin" sizes>
 		<!-- Standard metadata names https://www.w3.org/TR/html5/document-metadata.html#standard-metadata-names
 		application-name author description generator keywords
 		referrer[never default always origin-when-crossorigin]
+		theme-color
 		-->
-		<meta name http-equiv="content-language content-type default-style refresh set-cookie content-security-policy" content charset="utf-8">
-		<style media nonce type="text/css"></style>
+		<meta name http-equiv="content-language content-type default-style refresh set-cookie x-ua-compatible content-security-policy" content charset="utf-8">
+		<style media type="text/css"></style>
 		<title>HTML5</title>
 	</head>
 	<!-- event handler content attributes https://www.w3.org/TR/html5/dom.html#global-attributes -->
@@ -52,7 +59,10 @@ https://www.w3.org/TR/xhtml2/
 		onchange
 		onclick
 		onclose
+		oncontextmenu
+		oncopy
 		oncuechange
+		oncut
 		ondblclick
 		ondrag
 		ondragend
@@ -67,6 +77,7 @@ https://www.w3.org/TR/xhtml2/
 		onended
 		onerror*
 		onfocus*
+		onformdata
 		oninput
 		oninvalid
 		onkeydown
@@ -85,6 +96,7 @@ https://www.w3.org/TR/xhtml2/
 		onmouseover
 		onmouseup
 		onwheel
+		onpaste
 		onpause
 		onplay
 		onplaying
@@ -93,6 +105,7 @@ https://www.w3.org/TR/xhtml2/
 		onreset
 		onresize*
 		onscroll*
+		onsecuritypolicyviolation
 		onseeked
 		onseeking
 		onselect
@@ -111,6 +124,7 @@ https://www.w3.org/TR/xhtml2/
 		onhashchange
 		onlanguagechange
 		onmessage
+		onmessageerror
 		onoffline
 		ononline
 		onpagehide
@@ -120,31 +134,31 @@ https://www.w3.org/TR/xhtml2/
 		onstorage
 		onunhandledrejection
 		onunload
-		oncut
-		oncopy
-		onpaste
 	>
 		<!-- Sections https://www.w3.org/TR/html5/sections.html -->
 		<article></article>
 		<section></section>
 		<nav></nav>
 		<aside></aside>
-		<h1></h1>
-		<h2></h2>
-		<h3></h3>
-		<h4></h4>
-		<h5></h5>
-		<h6></h6>
+		<hgroup>
+			<h1></h1>
+			<h2></h2>
+			<h3></h3>
+			<h4></h4>
+			<h5></h5>
+			<h6></h6>
+		</hgroup>
 		<header></header>
 		<footer></footer>
+		<address></address>
 		<!-- Grouping content https://www.w3.org/TR/html5/grouping-content.html -->
 		<p></p>
-		<address></address>
 		<hr>
 		<pre></pre>
 		<blockquote cite></blockquote>
 		<ol reversed start type="decimal lower-alpha upper-alpha lower-roman upper-roman"></ol>
 		<ul></ul>
+		<menu></menu>
 		<li value></li>
 		<dl></dl>
 		<dt></dt>
@@ -155,7 +169,7 @@ https://www.w3.org/TR/xhtml2/
 		<div></div>
 		<!-- Text-level semantics https://www.w3.org/TR/html5/textlevel-semantics.html -->
 		<a href="about:, blob:, data:, http:, https:, mailto:, sms:, urn:, tel:"
-		target="_blank _self _parent _top" download
+		target="_blank _self _parent _top" download ping
 		rel="alternate author bookmark external help license next nofollow noopener noreferrer prev search tag"
 		rev hreflang type referrerpolicy></a>
 		<em></em>
@@ -194,12 +208,12 @@ https://www.w3.org/TR/xhtml2/
 		<!-- Embedded content https://www.w3.org/TR/html5/semantics-embedded-content.html -->
 		<picture></picture>
 		<source src type srcset sizes media>
-		<img alt src srcset sizes crossorigin usemap ismap width height referrerpolicy longdesc>
-		<iframe src srcdoc name sandbox allowfullscreen allowpaymentrequest width height referrerpolicy></iframe>
+		<img alt src srcset sizes crossorigin usemap ismap width height referrerpolicy decoding>
+		<iframe src srcdoc name sandbox allow allowfullscreen allowpaymentrequest width height referrerpolicy></iframe>
 		<embed src type width height>
-		<object data type typemustmatch name form width height></object>
+		<object data type typemustmatch name usemap form width height></object>
 		<param name value>
-		<video src crossorigin poster preload="none metadata auto" autoplay loop muted controls width height></video>
+		<video src crossorigin poster preload="none metadata auto" autoplay playsinline loop muted controls width height></video>
 		<audio src crossorigin preload autoplay loop muted controls></audio>
 		<track kind="subtitles captions descriptions chapters metadata" src srclang label default
 
@@ -209,7 +223,7 @@ https://www.w3.org/TR/xhtml2/
 		onexit
 		>
 		<map name></map>
-		<area alt coords download href hreflang rel shape="circle circ default poly polygon rect rectangle" target type referrerpolicy>
+		<area alt coords href download hreflang ping rel shape="circle circ default poly polygon rect rectangle" target type referrerpolicy>
 		<!-- Tabular data https://www.w3.org/TR/html5/tabular-data.html -->
 		<table border>
 			<caption></caption>
@@ -226,10 +240,11 @@ https://www.w3.org/TR/xhtml2/
 		</table>
 		<!-- Forms https://www.w3.org/TR/html5/sec-forms.html -->
 		<form accept-charset action autocomplete
-			enctype="application/x-www-form-urlencoded multipart/form-data text/plain" method name novalidate target>
+			enctype="application/x-www-form-urlencoded multipart/form-data text/plain" method name novalidate target rel>
 			<label for></label>
 			<input accept="audio/* video/* image/*"
-				alt autocomplete autofocus checked dirname disabled form formaction formenctype formmethod formnovalidate formtarget height list max maxlength min minlength multiple name pattern placeholder readonly required size src step
+				alt autocomplete autofocus checked dirname disabled form formaction formenctype formmethod formnovalidate formtarget
+				height list max maxlength min minlength multiple name pattern placeholder readonly required size src step
 				type="hidden text search tel url email password date month week time datetime-local number range color checkbox radio file submit image reset button"
 				value width>
 			<button autofocus disabled form formaction formenctype formmethod formnovalidate formtarget name type="submit reset button" value></button>
@@ -243,7 +258,9 @@ https://www.w3.org/TR/xhtml2/
 			<output for form name></output>
 			<progress value max></progress>
 			<meter value min max low high optimum></meter>
-			<fieldset disabled form name><legend></legend></fieldset>
+			<fieldset disabled form name>
+				<legend></legend>
+			</fieldset>
 		</form>
 		<!-- Interactive elements https://www.w3.org/TR/html5/interactive-elements.html -->
 		<details open></details>
@@ -251,9 +268,10 @@ https://www.w3.org/TR/xhtml2/
 		<dialog open></dialog>
 		<!-- Scripting https://www.w3.org/TR/html5/semantics-scripting.html -->
 		<script src type="text/javascript text/ecmascript text/jscript text/livescript module text/plain text/xml application/octet-stream application/xml"
-			charset async defer crossorigin nonce></script>
+			charset nomodule async defer crossorigin integrity referrerpolicy></script>
 		<noscript></noscript>
 		<template></template>
+		<slot name></slot>
 		<canvas width height></canvas>
 		<!-- Microdata https://html.spec.whatwg.org/multipage/microdata.html#microdata -->
 		<div itemid itemprop itemref itemscope itemtype></div>
