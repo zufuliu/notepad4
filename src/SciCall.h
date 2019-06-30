@@ -761,14 +761,6 @@ NP2_inline void SciCall_SetIMEInteraction(int imeInteraction) {
 	SciCall(SCI_SETIMEINTERACTION, imeInteraction, 0);
 }
 
-NP2_inline void SciCall_SetInlineIMEUseBlockCaret(BOOL useBlockCaret) {
-	SciCall(SCI_SETINLINEIMEUSEBLOCKCARET, useBlockCaret, 0);
-}
-
-NP2_inline void SciCall_SetMoveCandidateWindowOnTyping(BOOL moveOnTyping) {
-	SciCall(SCI_SETMOVECANDIDATEWINDOWONTYPING, moveOnTyping, 0);
-}
-
 // Brace highlighting
 
 NP2_inline void SciCall_BraceHighlight(Sci_Position posA, Sci_Position posB) {

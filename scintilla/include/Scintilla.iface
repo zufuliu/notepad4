@@ -291,12 +291,6 @@ get IMEInteraction GetIMEInteraction=2678(,)
 # Choose to display the the IME in a winow or inline.
 set void SetIMEInteraction=2679(IMEInteraction imeInteraction,)
 
-# Set inline IME to move candidate window to current caret position on typing.
-set void SetMoveCandidateWindowOnTyping=2638(bool moveOnTyping,)
-
-# Set inline IME to use block caret
-set void SetInlineIMEUseBlockCaret=2639(bool useBlockCaret,)
-
 enu MarkerSymbol=SC_MARK_
 val MARKER_MAX=31
 val SC_MARK_CIRCLE=0
@@ -3092,7 +3086,7 @@ ali SC_AC_DOUBLECLICK=DOUBLE_CLICK
 
 # characterSource for SCN_CHARADDED
 enu CharacterSource=SC_CHARACTERSOURCE_
-# Direct input
+# Direct input characters.
 val SC_CHARACTERSOURCE_DIRECT_INPUT=0
 # IME (inline mode) or dead key tentative input characters.
 val SC_CHARACTERSOURCE_TENTATIVE_INPUT=1

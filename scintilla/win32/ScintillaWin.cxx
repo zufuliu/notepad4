@@ -290,6 +290,23 @@ public:
 
 namespace {
 
+// Some IME code based on Chromium's IMM32Manager class, not from official Scintilla.
+// https://github.com/chromium/chromium/blob/master/ui/base/ime/win/imm32_manager.cc
+
+// See IMM32Manager::SetInputLanguage()
+LANGID InputLanguage() noexcept {
+	LANGID inputLang;
+	WCHAR keyboard_layout[KL_NAMELENGTH];
+	if (::GetKeyboardLayoutNameW(keyboard_layout)) {
+		inputLang =  static_cast<LANGID>(wcstol(&keyboard_layout[KL_NAMELENGTH >> 1], nullptr, 16));
+	} else {
+		HKL inputLocale = ::GetKeyboardLayout(0);
+		inputLang = LOWORD(inputLocale);
+	}
+	//Platform::DebugPrintf("InputLanguage(): %04X\n", inputLang);
+	return inputLang;
+}
+
 class IMContext {
 	HWND hwnd;
 public:
@@ -371,6 +388,9 @@ class ScintillaWin :
 	static ATOM scintillaClassAtom;
 	static ATOM callClassAtom;
 
+	// The current input Language ID.
+	LANGID inputLang;
+
 #if defined(USE_D2D)
 	ID2D1RenderTarget *pRenderTarget;
 	bool renderTargetValid;
@@ -415,9 +435,12 @@ class ScintillaWin :
 
 	sptr_t HandleCompositionWindowed(uptr_t wParam, sptr_t lParam);
 	sptr_t HandleCompositionInline(uptr_t wParam, sptr_t lParam);
-#if 0
-	static bool KoreanIME() noexcept;
-#endif
+
+	// Korean IME always use inline mode, and block caret in inline mode.
+	bool KoreanIME() const noexcept {
+		return PRIMARYLANGID(inputLang) == LANG_KOREAN;
+	}
+
 	void MoveImeCarets(Sci::Position offset);
 	void DrawImeIndicator(int indicator, int len);
 	void SetCandidateWindowPos();
@@ -592,6 +615,7 @@ ScintillaWin::ScintillaWin(HWND hwnd) {
 	sysCaretBitmap = nullptr;
 	sysCaretWidth = 0;
 	sysCaretHeight = 0;
+	inputLang = InputLanguage();
 
 	styleIdleInQueue = false;
 
@@ -770,17 +794,6 @@ int ScintillaWin::MouseModifiers(uptr_t wParam) noexcept {
 }
 
 namespace {
-
-int InputCodePage() noexcept {
-	HKL inputLocale = ::GetKeyboardLayout(0);
-	const LANGID inputLang = LOWORD(inputLocale);
-	WCHAR sCodePage[10];
-	const int res = ::GetLocaleInfo(MAKELCID(inputLang, SORT_DEFAULT),
-		LOCALE_IDEFAULTANSICODEPAGE, sCodePage, sizeof(sCodePage) / sizeof(WCHAR));
-	if (!res)
-		return 0;
-	return static_cast<int>(wcstol(sCodePage, nullptr, 10));
-}
 
 /** Map the key codes to their equivalent SCK_ form. */
 int KeyTranslate(int keyIn) noexcept {
@@ -1013,13 +1026,6 @@ sptr_t ScintillaWin::HandleCompositionWindowed(uptr_t wParam, sptr_t lParam) {
 	return ::DefWindowProc(MainHWND(), WM_IME_COMPOSITION, wParam, lParam);
 }
 
-#if 0
-bool ScintillaWin::KoreanIME() noexcept {
-	const int codePage = InputCodePage();
-	return codePage == 949 || codePage == 1361;
-}
-#endif
-
 void ScintillaWin::MoveImeCarets(Sci::Position offset) {
 	// Move carets relatively by bytes.
 	for (size_t r = 0; r < sel.Count(); r++) {
@@ -1044,17 +1050,26 @@ void ScintillaWin::DrawImeIndicator(int indicator, int len) {
 	}
 }
 
+// TODO: IMM32Manager::MoveImeWindow()
 void ScintillaWin::SetCandidateWindowPos() {
 	IMContext imc(MainHWND());
 	if (imc.hIMC) {
 		const Point pos = PointMainCaret();
-		const int offset = 4;
-		CANDIDATEFORM CandForm;
-		CandForm.dwIndex = 0;
-		CandForm.dwStyle = CFS_CANDIDATEPOS;
-		CandForm.ptCurrentPos.x = static_cast<LONG>(pos.x);
-		CandForm.ptCurrentPos.y = static_cast<LONG>(pos.y + offset);
-		::ImmSetCandidateWindow(imc.hIMC, &CandForm);
+		const LONG x = static_cast<LONG>(pos.x);
+		LONG y = static_cast<LONG>(pos.y);
+
+		if (inputLang == MAKELANGID(LANG_CHINESE, SUBLANG_CHINESE_SIMPLIFIED)) {
+			y += 4;
+		} else {
+			y += vs.lineHeight;
+		}
+
+		CANDIDATEFORM candidatePos = { 0, CFS_CANDIDATEPOS, x, y, { 0, 0, 0, 0 } };
+		::ImmSetCandidateWindow(imc.hIMC, &candidatePos);
+
+		//if (PRIMARYLANGID(inputLang) == LANG_CHINESE || PRIMARYLANGID(inputLang) == LANG_JAPANESE) {
+		//	UpdateSystemCaret();
+		//}
 	}
 }
 
@@ -1228,16 +1243,17 @@ sptr_t ScintillaWin::HandleCompositionInline(uptr_t, sptr_t lParam) {
 
 		MoveImeCarets(-CurrentPosition() + imeCaretPosDoc);
 
-		if (inlineIMEUseBlockCaret) {
+		if (KoreanIME()) {
 			view.imeCaretBlockOverride = true;
 		}
 	} else if (lParam & GCS_RESULTSTR) {
 		AddWString(imc.GetCompositionString(GCS_RESULTSTR), CharacterSource::imeResult);
+		if (inputLang != MAKELANGID(LANG_CHINESE, SUBLANG_CHINESE_SIMPLIFIED)) {
+			// Don't move candidate window for Chinese Pinyin IME.
+			SetCandidateWindowPos();
+		}
 	}
 	EnsureCaretVisible();
-	if (moveCandidateWindowOnTyping) {
-		SetCandidateWindowPos();
-	}
 	ShowCaretAtCurrentPosition();
 	return 0;
 }
@@ -1685,8 +1701,8 @@ sptr_t ScintillaWin::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam
 			break;
 
 		case WM_IME_STARTCOMPOSITION: 	// dbcs
-			SetCandidateWindowPos();
-			if (imeInteraction == imeInline) {
+			if (KoreanIME() || imeInteraction == imeInline) {
+				SetCandidateWindowPos();
 				return 0;
 			} else {
 				ImeStartComposition();
@@ -1698,7 +1714,7 @@ sptr_t ScintillaWin::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam
 			return ::DefWindowProc(MainHWND(), iMessage, wParam, lParam);
 
 		case WM_IME_COMPOSITION:
-			if (imeInteraction == imeInline) {
+			if (KoreanIME() || imeInteraction == imeInline) {
 				return HandleCompositionInline(wParam, lParam);
 			} else {
 				return HandleCompositionWindowed(wParam, lParam);
@@ -1726,6 +1742,7 @@ sptr_t ScintillaWin::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam
 #endif
 			return ::DefWindowProc(MainHWND(), iMessage, wParam, lParam);
 		case WM_INPUTLANGCHANGE:
+			inputLang = InputLanguage();
 			return ::DefWindowProc(MainHWND(), iMessage, wParam, lParam);
 		case WM_INPUTLANGCHANGEREQUEST:
 			return ::DefWindowProc(MainHWND(), iMessage, wParam, lParam);
@@ -1738,7 +1755,7 @@ sptr_t ScintillaWin::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam
 			return 0;
 
 		case WM_IME_SETCONTEXT:
-			if (imeInteraction == imeInline) {
+			if (KoreanIME() || imeInteraction == imeInline) {
 				if (wParam) {
 					LPARAM NoImeWin = lParam;
 					NoImeWin = NoImeWin & (~ISC_SHOWUICOMPOSITIONWINDOW);
@@ -3720,8 +3737,4 @@ int ResourcesRelease(bool fromDllMain) noexcept {
 // This function is externally visible so it can be called from container when building statically.
 int Scintilla_ReleaseResources(void) {
 	return Scintilla::ResourcesRelease(false);
-}
-
-int Scintilla_InputCodePage(void) {
-	return InputCodePage();
 }
