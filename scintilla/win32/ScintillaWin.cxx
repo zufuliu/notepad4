@@ -1055,20 +1055,20 @@ void ScintillaWin::SetCandidateWindowPos() {
 	IMContext imc(MainHWND());
 	if (imc.hIMC) {
 		const Point pos = PointMainCaret();
-		const LONG x = static_cast<LONG>(pos.x);
-		LONG y = static_cast<LONG>(pos.y);
+		const int x = static_cast<int>(pos.x);
+		int y = static_cast<int>(pos.y);
 
 		if (inputLang == MAKELANGID(LANG_CHINESE, SUBLANG_CHINESE_SIMPLIFIED)) {
 			y += 4;
 		} else {
-			y += vs.lineHeight;
+			y += vs.lineHeight; // sysCaretHeight;
 		}
 
 		CANDIDATEFORM candidatePos = { 0, CFS_CANDIDATEPOS, x, y, { 0, 0, 0, 0 } };
 		::ImmSetCandidateWindow(imc.hIMC, &candidatePos);
 
 		//if (PRIMARYLANGID(inputLang) == LANG_CHINESE || PRIMARYLANGID(inputLang) == LANG_JAPANESE) {
-		//	UpdateSystemCaret();
+		//	::SetCaretPos(x, y);
 		//}
 	}
 }
@@ -1243,17 +1243,18 @@ sptr_t ScintillaWin::HandleCompositionInline(uptr_t, sptr_t lParam) {
 
 		MoveImeCarets(-CurrentPosition() + imeCaretPosDoc);
 
-		if (KoreanIME()) {
-			view.imeCaretBlockOverride = true;
-		}
+		view.imeCaretBlockOverride = KoreanIME();
 	} else if (lParam & GCS_RESULTSTR) {
 		AddWString(imc.GetCompositionString(GCS_RESULTSTR), CharacterSource::imeResult);
+	}
+	EnsureCaretVisible();
+	if (lParam & GCS_RESULTSTR) {
+		// Why we need to move candidate window after composition?
 		if (inputLang != MAKELANGID(LANG_CHINESE, SUBLANG_CHINESE_SIMPLIFIED)) {
 			// Don't move candidate window for Chinese Pinyin IME.
 			SetCandidateWindowPos();
 		}
 	}
-	EnsureCaretVisible();
 	ShowCaretAtCurrentPosition();
 	return 0;
 }
