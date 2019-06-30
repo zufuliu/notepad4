@@ -19,7 +19,6 @@ extern "C" {
 /* Return false on failure: */
 int Scintilla_RegisterClasses(void *hInstance);
 int Scintilla_ReleaseResources(void);
-int Scintilla_InputCodePage(void);
 #endif
 int Scintilla_LinkLexers(void);
 
@@ -111,8 +110,6 @@ typedef sptr_t (*SciFnDirect)(sptr_t ptr, unsigned int iMessage, uptr_t wParam, 
 #define SC_IME_INLINE 1
 #define SCI_GETIMEINTERACTION 2678
 #define SCI_SETIMEINTERACTION 2679
-#define SCI_SETMOVECANDIDATEWINDOWONTYPING 2638
-#define SCI_SETINLINEIMEUSEBLOCKCARET 2639
 #define MARKER_MAX 31
 #define SC_MARK_CIRCLE 0
 #define SC_MARK_ROUNDRECT 1
