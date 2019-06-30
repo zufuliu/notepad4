@@ -17,10 +17,10 @@ public:
 	int style;
 	ColourDesired back;
 	int width;
-	int mask;
+	unsigned int mask;
 	bool sensitive;
 	int cursor;
-	MarginStyle(int style_ = SC_MARGIN_SYMBOL, int width_ = 0, int mask_ = 0) noexcept;
+	MarginStyle(int style_ = SC_MARGIN_SYMBOL, int width_ = 0, unsigned int mask_ = 0) noexcept;
 };
 
 /**

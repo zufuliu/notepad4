@@ -7011,7 +7011,7 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 
 	case SCI_SETMARGINMASKN:
 		if (ValidMargin(wParam)) {
-			vs.ms[wParam].mask = static_cast<int>(lParam);
+			vs.ms[wParam].mask = static_cast<unsigned int>(lParam);
 			InvalidateStyleRedraw();
 		}
 		break;

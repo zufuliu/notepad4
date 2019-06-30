@@ -29,7 +29,7 @@
 
 using namespace Scintilla;
 
-MarginStyle::MarginStyle(int style_, int width_, int mask_) noexcept :
+MarginStyle::MarginStyle(int style_, int width_, unsigned int mask_) noexcept :
 	style(style_), width(width_), mask(mask_), sensitive(false), cursor(SC_CURSORREVERSEARROW) {
 }
 
