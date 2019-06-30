@@ -269,7 +269,7 @@ void MarginView::PaintMargin(Surface *surface, Sci::Line topLine, PRectangle rc,
 				const bool firstSubLine = visibleLine == firstVisibleLine;
 				const bool lastSubLine = visibleLine == lastVisibleLine;
 
-				int marks = model.pdoc->GetMark(lineDoc);
+				unsigned int marks = model.pdoc->GetMark(lineDoc);
 				if (!firstSubLine)
 					marks = 0;
 
@@ -286,7 +286,7 @@ void MarginView::PaintMargin(Surface *surface, Sci::Line topLine, PRectangle rc,
 							if (levelNum < levelNextNum) {
 								if (model.pcs->GetExpanded(lineDoc)) {
 									if (levelNum == SC_FOLDLEVELBASE)
-										marks |= 1 << SC_MARKNUM_FOLDEROPEN;
+										marks |= 1U << SC_MARKNUM_FOLDEROPEN;
 									else
 										marks |= 1 << folderOpenMid;
 								} else {
