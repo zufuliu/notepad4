@@ -1811,8 +1811,8 @@ static void DrawEdgeLine(Surface *surface, const ViewStyle &vsDraw, const LineLa
 // Draw underline mark as part of background if not transparent
 static void DrawMarkUnderline(Surface *surface, const EditModel &model, const ViewStyle &vsDraw,
 	Sci::Line line, PRectangle rcLine) {
-	int marks = model.pdoc->GetMark(line);
-	for (int markBit = 0; (markBit < 32) && marks; markBit++) {
+	MarkerMask marks = model.pdoc->GetMark(line);
+	for (int markBit = 0; (markBit < MarkerBitCount) && marks; markBit++) {
 		if ((marks & 1) && (vsDraw.markers[markBit].markType == SC_MARK_UNDERLINE) &&
 			(vsDraw.markers[markBit].alpha == SC_ALPHA_NOALPHA)) {
 			PRectangle rcUnderline = rcLine;
@@ -1901,7 +1901,7 @@ static void DrawTranslucentLineState(Surface *surface, const EditModel &model, c
 	}
 	const MarkerMask marksOfLine = model.pdoc->GetMark(line);
 	MarkerMask marksDrawnInText = marksOfLine & vsDraw.maskDrawInText;
-	for (int markBit = 0; (markBit < 32) && marksDrawnInText; markBit++) {
+	for (int markBit = 0; (markBit < MarkerBitCount) && marksDrawnInText; markBit++) {
 		if (marksDrawnInText & 1) {
 			if (vsDraw.markers[markBit].markType == SC_MARK_BACKGROUND) {
 				SimpleAlphaRectangle(surface, rcLine, vsDraw.markers[markBit].back, vsDraw.markers[markBit].alpha);
@@ -1914,7 +1914,7 @@ static void DrawTranslucentLineState(Surface *surface, const EditModel &model, c
 		marksDrawnInText >>= 1;
 	}
 	MarkerMask marksDrawnInLine = marksOfLine & vsDraw.maskInLine;
-	for (int markBit = 0; (markBit < 32) && marksDrawnInLine; markBit++) {
+	for (int markBit = 0; (markBit < MarkerBitCount) && marksDrawnInLine; markBit++) {
 		if (marksDrawnInLine & 1) {
 			SimpleAlphaRectangle(surface, rcLine, vsDraw.markers[markBit].back, vsDraw.markers[markBit].alpha);
 		}

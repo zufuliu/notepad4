@@ -269,7 +269,7 @@ void MarginView::PaintMargin(Surface *surface, Sci::Line topLine, PRectangle rc,
 				const bool firstSubLine = visibleLine == firstVisibleLine;
 				const bool lastSubLine = visibleLine == lastVisibleLine;
 
-				unsigned int marks = model.pdoc->GetMark(lineDoc);
+				MarkerMask marks = model.pdoc->GetMark(lineDoc);
 				if (!firstSubLine)
 					marks = 0;
 
@@ -431,7 +431,7 @@ void MarginView::PaintMargin(Surface *surface, Sci::Line topLine, PRectangle rc,
 				}
 
 				if (marks) {
-					for (int markBit = 0; (markBit < 32) && marks; markBit++) {
+					for (int markBit = 0; (markBit < MarkerBitCount) && marks; markBit++) {
 						if (marks & 1) {
 							LineMarker::typeOfFold tFold = LineMarker::undefined;
 							if ((vs.ms[margin].mask & SC_MASK_FOLDERS) && highlightDelimiter.IsFoldBlockHighlighted(lineDoc)) {

@@ -165,7 +165,7 @@ void ViewStyle::CalculateMarginWidthAndMask() {
 		maskDefinedMarkers |= m.mask;
 	}
 	maskDrawInText = 0;
-	for (int markBit = 0; markBit < 32; markBit++) {
+	for (int markBit = 0; markBit < MarkerBitCount; markBit++) {
 		const MarkerMask maskBit = 1U << markBit;
 		switch (markers[markBit].markType) {
 		case SC_MARK_EMPTY:
@@ -453,7 +453,7 @@ bool ViewStyle::IsLineFrameOpaque(bool caretActive, bool lineContainsCaret) cons
 // display itself (as long as it's not an SC_MARK_EMPTY marker).  These are checked in order
 // with the earlier taking precedence.  When multiple markers cause background override,
 // the colour for the highest numbered one is used.
-ColourOptional ViewStyle::Background(int marksOfLine, bool caretActive, bool lineContainsCaret) const {
+ColourOptional ViewStyle::Background(MarkerMask marksOfLine, bool caretActive, bool lineContainsCaret) const {
 	ColourOptional background;
 	if (!caretLineFrame && (caretActive || alwaysShowCaretLineBackground) && showCaretLineBackground &&
 		(caretLineAlpha == SC_ALPHA_NOALPHA) && lineContainsCaret) {
@@ -461,7 +461,7 @@ ColourOptional ViewStyle::Background(int marksOfLine, bool caretActive, bool lin
 	}
 	if (!background.isSet && marksOfLine) {
 		MarkerMask marks = marksOfLine;
-		for (int markBit = 0; (markBit < 32) && marks; markBit++) {
+		for (int markBit = 0; (markBit < MarkerBitCount) && marks; markBit++) {
 			if ((marks & 1) && (markers[markBit].markType == SC_MARK_BACKGROUND) &&
 				(markers[markBit].alpha == SC_ALPHA_NOALPHA)) {
 				background = ColourOptional(markers[markBit].back, true);
@@ -472,7 +472,7 @@ ColourOptional ViewStyle::Background(int marksOfLine, bool caretActive, bool lin
 	if (!background.isSet && maskInLine) {
 		MarkerMask marksMasked = marksOfLine & maskInLine;
 		if (marksMasked) {
-			for (int markBit = 0; (markBit < 32) && marksMasked; markBit++) {
+			for (int markBit = 0; (markBit < MarkerBitCount) && marksMasked; markBit++) {
 				if ((marksMasked & 1) &&
 					(markers[markBit].alpha == SC_ALPHA_NOALPHA)) {
 					background = ColourOptional(markers[markBit].back, true);

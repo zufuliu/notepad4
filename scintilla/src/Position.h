@@ -19,14 +19,16 @@ namespace Sci {
 typedef ptrdiff_t Position;
 typedef ptrdiff_t Line;
 
-const Position invalidPosition = -1;
+constexpr Position invalidPosition = -1;
 
 }
 
 namespace Scintilla {
 
 // Bit set of marker numbers.
-typedef unsigned int MarkerMask;
+using MarkerMask = unsigned int;
+
+constexpr int MarkerBitCount = sizeof(MarkerMask) * 8;
 
 }
 
