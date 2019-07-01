@@ -444,8 +444,8 @@ public:
 	void GetStyleRange(unsigned char *buffer, Sci::Position position, Sci::Position lengthRetrieve) const {
 		cb.GetStyleRange(buffer, position, lengthRetrieve);
 	}
-	int GetMark(Sci::Line line) const noexcept;
-	Sci::Line MarkerNext(Sci::Line lineStart, int mask) const noexcept;
+	MarkerMask GetMark(Sci::Line line) const noexcept;
+	Sci::Line MarkerNext(Sci::Line lineStart, MarkerMask mask) const noexcept;
 	int AddMark(Sci::Line line, int markerNum);
 	void AddMarkSet(Sci::Line line, int valueSet);
 	void DeleteMark(Sci::Line line, int markerNum);

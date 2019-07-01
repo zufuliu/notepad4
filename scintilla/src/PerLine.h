@@ -35,7 +35,7 @@ public:
 	void operator=(MarkerHandleSet &&) = delete;
 	~MarkerHandleSet();
 	bool Empty() const noexcept;
-	int MarkValue() const noexcept;	///< Bit set of marker numbers.
+	MarkerMask MarkValue() const noexcept;	///< Bit set of marker numbers.
 	bool Contains(int handle) const noexcept;
 	bool InsertHandle(int handle, int markerNum);
 	void RemoveHandle(int handle);
@@ -59,8 +59,8 @@ public:
 	void InsertLine(Sci::Line line) override;
 	void RemoveLine(Sci::Line line) override;
 
-	int MarkValue(Sci::Line line) noexcept;
-	Sci::Line MarkerNext(Sci::Line lineStart, int mask) const noexcept;
+	MarkerMask MarkValue(Sci::Line line) noexcept;
+	Sci::Line MarkerNext(Sci::Line lineStart, MarkerMask mask) const noexcept;
 	int AddMark(Sci::Line line, int markerNum, Sci::Line lines);
 	void MergeMarkers(Sci::Line line);
 	bool DeleteMark(Sci::Line line, int markerNum, bool all);

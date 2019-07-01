@@ -1739,7 +1739,7 @@ void EditAutoIndent(void) {
 	if (iCurLine > 0) {
 		const Sci_Position iPrevLineLength = SciCall_GetLineEndPosition(iCurLine - 1) - SciCall_PositionFromLine(iCurLine - 1);
 		if (iPrevLineLength == 0) {
-			const int bitmask = SciCall_MarkerGet(iCurLine - 1);
+			const Sci_MarkerMask bitmask = SciCall_MarkerGet(iCurLine - 1);
 			if (bitmask & MarkerBitmask_Bookmark) {
 				SciCall_MarkerDelete(iCurLine - 1, MarkerNumber_Bookmark);
 				SciCall_MarkerAdd(iCurLine, MarkerNumber_Bookmark);

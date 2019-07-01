@@ -17,10 +17,10 @@ public:
 	int style;
 	ColourDesired back;
 	int width;
-	unsigned int mask;
+	MarkerMask mask;
 	bool sensitive;
 	int cursor;
-	MarginStyle(int style_ = SC_MARGIN_SYMBOL, int width_ = 0, unsigned int mask_ = 0) noexcept;
+	MarginStyle(int style_ = SC_MARGIN_SYMBOL, int width_ = 0, MarkerMask mask_ = 0) noexcept;
 };
 
 /**
@@ -116,8 +116,8 @@ public:
 	/// Margins are ordered: Line Numbers, Selection Margin, Spacing Margin
 	int leftMarginWidth;	///< Spacing margin on left of text
 	int rightMarginWidth;	///< Spacing margin on right of text
-	unsigned int maskInLine;	///< Mask for markers to be put into text because there is nowhere for them to go in margin
-	unsigned int maskDrawInText;///< Mask for markers that always draw in text
+	MarkerMask maskInLine;	///< Mask for markers to be put into text because there is nowhere for them to go in margin
+	MarkerMask maskDrawInText;///< Mask for markers that always draw in text
 	std::vector<MarginStyle> ms;
 	int fixedColumnWidth;	///< Total width of margins
 	bool marginInside;	///< true: margin included in text view, false: separate views

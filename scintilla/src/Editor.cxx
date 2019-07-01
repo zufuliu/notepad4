@@ -6939,7 +6939,7 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 		return pdoc->GetMark(wParam);
 
 	case SCI_MARKERNEXT:
-		return pdoc->MarkerNext(wParam, static_cast<int>(lParam));
+		return pdoc->MarkerNext(wParam, static_cast<MarkerMask>(lParam));
 
 	case SCI_MARKERPREVIOUS: {
 			for (Sci::Line iLine = wParam; iLine >= 0; iLine--) {
@@ -7011,7 +7011,7 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 
 	case SCI_SETMARGINMASKN:
 		if (ValidMargin(wParam)) {
-			vs.ms[wParam].mask = static_cast<unsigned int>(lParam);
+			vs.ms[wParam].mask = static_cast<MarkerMask>(lParam);
 			InvalidateStyleRedraw();
 		}
 		break;

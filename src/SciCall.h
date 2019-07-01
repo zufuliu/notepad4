@@ -37,6 +37,7 @@ LRESULT WINAPI Scintilla_DirectFunction(HANDLE handle, UINT msg, WPARAM wParam, 
 #define SciCall(m, w, l)	Scintilla_DirectFunction(g_hScintilla, (m), (w), (l))
 
 typedef Sci_Position Sci_Line;
+typedef unsigned int Sci_MarkerMask;
 
 NP2_inline Sci_Position min_pos(Sci_Position x, Sci_Position y) {
 	return (x < y) ? x : y;
@@ -871,15 +872,15 @@ NP2_inline void SciCall_ClearMarker(void) {
 	SciCall_MarkerDeleteAll(-1);
 }
 
-NP2_inline int SciCall_MarkerGet(Sci_Line line) {
-	return (int)SciCall(SCI_MARKERGET, line, 0);
+NP2_inline Sci_MarkerMask SciCall_MarkerGet(Sci_Line line) {
+	return (Sci_MarkerMask)SciCall(SCI_MARKERGET, line, 0);
 }
 
-NP2_inline Sci_Line SciCall_MarkerNext(Sci_Line line, int markerMask) {
+NP2_inline Sci_Line SciCall_MarkerNext(Sci_Line line, Sci_MarkerMask markerMask) {
 	return SciCall(SCI_MARKERNEXT, line, markerMask);
 }
 
-NP2_inline Sci_Line SciCall_MarkerPrevious(Sci_Line line, int markerMask) {
+NP2_inline Sci_Line SciCall_MarkerPrevious(Sci_Line line, Sci_MarkerMask markerMask) {
 	return SciCall(SCI_MARKERPREVIOUS, line, markerMask);
 }
 
