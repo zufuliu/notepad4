@@ -635,11 +635,12 @@ int Document::LenChar(Sci::Position pos, bool *invalid) noexcept {
 			return utf8status & UTF8MaskWidth;
 		}
 	} else {
-		if (IsDBCSLeadByteNoExcept(leadByte) && ((pos + 1) < Length())) {
+		const bool lead = IsDBCSLeadByteNoExcept(leadByte);
+		if (lead && ((pos + 1) < Length())) {
 			return 2;
 		} else {
 			if (invalid) {
-				*invalid = true;
+				*invalid = lead;
 			}
 			return 1;
 		}
