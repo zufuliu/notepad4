@@ -288,12 +288,12 @@ void MarginView::PaintMargin(Surface *surface, Sci::Line topLine, PRectangle rc,
 									if (levelNum == SC_FOLDLEVELBASE)
 										marks |= 1U << SC_MARKNUM_FOLDEROPEN;
 									else
-										marks |= 1 << folderOpenMid;
+										marks |= 1U << folderOpenMid;
 								} else {
 									if (levelNum == SC_FOLDLEVELBASE)
 										marks |= 1 << SC_MARKNUM_FOLDER;
 									else
-										marks |= 1 << folderEnd;
+										marks |= 1U << folderEnd;
 								}
 							} else if (levelNum > SC_FOLDLEVELBASE) {
 								marks |= 1 << SC_MARKNUM_FOLDERSUB;
