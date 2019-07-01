@@ -53,8 +53,10 @@ class Face:
 		currentCategory = ""
 		currentComment = []
 		currentCommentFinished = 0
-		file = open(name)
-		for line in file.readlines():
+		maxInt = (1 << 31) - 1
+		lineno = 0
+		for line in open(name).readlines():
+			lineno += 1
 			line = sanitiseLine(line)
 			if line:
 				if line[0] == "#":
@@ -70,7 +72,7 @@ class Face:
 						try:
 							retType, name, value, param1, param2 = decodeFunction(featureVal)
 						except ValueError:
-							print("Failed to decode %s" % line)
+							print("Failed to decode line %d: %s" % (lineno, line))
 							raise
 						p1 = decodeParam(param1)
 						p2 = decodeParam(param2)
@@ -83,7 +85,7 @@ class Face:
 							"Category": currentCategory, "Comment": currentComment
 						}
 						if value in self.values:
-							raise Exception("Duplicate value " + value + " " + name)
+							raise Exception("Duplicate value " + value + " " + name + " on line:" + str(lineno))
 						self.values[value] = 1
 						self.order.append(name)
 						currentComment = []
@@ -96,7 +98,7 @@ class Face:
 							"Category": currentCategory, "Comment": currentComment
 						}
 						if value in self.events:
-							raise Exception("Duplicate event " + value + " " + name)
+							raise Exception("Duplicate event " + value + " " + name + " on line:" + str(lineno))
 						self.events[value] = 1
 						self.order.append(name)
 					elif featureType == "cat":
@@ -105,9 +107,13 @@ class Face:
 						try:
 							name, value = featureVal.split("=", 1)
 							if value[0] == '-':
+								# add parenthesis for negative value
 								value = '(' + value + ')'
+							elif int(value, 0) > maxInt:
+								# unsigned value
+								value = value + 'U'
 						except ValueError:
-							print("Failure %s" % featureVal)
+							print("Failure line %d: %s" % (lineno, featureVal))
 							raise Exception()
 						self.features[name] = {
 							"FeatureType": featureType,

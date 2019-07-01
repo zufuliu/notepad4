@@ -374,7 +374,7 @@ ali SC_MARKNUM_FOLDERSUB=FOLDER_SUB
 ali SC_MARKNUM_FOLDEROPEN=FOLDER_OPEN
 
 # SC_MASK_FOLDERS doesn't go in an enumeration as larger than max 32-bit positive integer
-val SC_MASK_FOLDERS=0xFE000000U
+val SC_MASK_FOLDERS=0xFE000000
 
 # Set the symbol used for a particular marker number.
 fun void MarkerDefine=2040(int markerNumber, MarkerSymbol markerSymbol)
