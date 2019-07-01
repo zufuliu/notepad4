@@ -190,7 +190,7 @@ public:
 	void CalcLargestMarkerHeight() noexcept;
 	int GetFrameWidth() const noexcept;
 	bool IsLineFrameOpaque(bool caretActive, bool lineContainsCaret) const noexcept;
-	ColourOptional Background(int marksOfLine, bool caretActive, bool lineContainsCaret) const;
+	ColourOptional Background(MarkerMask marksOfLine, bool caretActive, bool lineContainsCaret) const;
 	bool SelectionBackgroundDrawn() const noexcept;
 	bool WhitespaceBackgroundDrawn() const noexcept;
 	ColourDesired WrapColour() const;
