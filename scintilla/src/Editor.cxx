@@ -6924,7 +6924,7 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 		}
 	case SCI_MARKERADDSET:
 		if (lParam != 0)
-			pdoc->AddMarkSet(wParam, static_cast<int>(lParam));
+			pdoc->AddMarkSet(wParam, static_cast<MarkerMask>(lParam));
 		break;
 
 	case SCI_MARKERDELETE:

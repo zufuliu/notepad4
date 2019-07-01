@@ -327,7 +327,7 @@ int Document::AddMark(Sci::Line line, int markerNum) {
 	}
 }
 
-void Document::AddMarkSet(Sci::Line line, int valueSet) {
+void Document::AddMarkSet(Sci::Line line, MarkerMask valueSet) {
 	if (line < 0 || line > LinesTotal()) {
 		return;
 	}
