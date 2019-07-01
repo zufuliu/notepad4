@@ -23,4 +23,11 @@ const Position invalidPosition = -1;
 
 }
 
+namespace Scintilla {
+
+// Bit set of marker numbers.
+typedef unsigned int MarkerMask;
+
+}
+
 #endif

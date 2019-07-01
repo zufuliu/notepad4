@@ -308,11 +308,11 @@ void Document::TentativeUndo() {
 	}
 }
 
-int Document::GetMark(Sci::Line line) const noexcept {
+MarkerMask Document::GetMark(Sci::Line line) const noexcept {
 	return Markers()->MarkValue(line);
 }
 
-Sci::Line Document::MarkerNext(Sci::Line lineStart, int mask) const noexcept {
+Sci::Line Document::MarkerNext(Sci::Line lineStart, MarkerMask mask) const noexcept {
 	return Markers()->MarkerNext(lineStart, mask);
 }
 
@@ -331,7 +331,7 @@ void Document::AddMarkSet(Sci::Line line, int valueSet) {
 	if (line < 0 || line > LinesTotal()) {
 		return;
 	}
-	unsigned int m = valueSet;
+	MarkerMask m = valueSet;
 	for (int i = 0; m; i++, m >>= 1) {
 		if (m & 1)
 			Markers()->AddMark(line, i, LinesTotal());

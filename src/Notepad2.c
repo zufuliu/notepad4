@@ -3631,7 +3631,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		const Sci_Position iPos = SciCall_GetCurrentPos();
 		const Sci_Line iLine = SciCall_LineFromPosition(iPos);
 
-		const int bitmask = SciCall_MarkerGet(iLine);
+		const Sci_MarkerMask bitmask = SciCall_MarkerGet(iLine);
 		if (bitmask & MarkerBitmask_Bookmark) {
 			// unset
 			SciCall_MarkerDelete(iLine, MarkerNumber_Bookmark);

@@ -37,10 +37,10 @@ bool MarkerHandleSet::Empty() const noexcept {
 	return mhList.empty();
 }
 
-int MarkerHandleSet::MarkValue() const noexcept {
-	unsigned int m = 0;
+MarkerMask MarkerHandleSet::MarkValue() const noexcept {
+	MarkerMask m = 0;
 	for (const MarkerHandleNumber &mhn : mhList) {
-		m |= (1 << mhn.number);
+		m |= (1U << mhn.number);
 	}
 	return m;
 }
@@ -125,14 +125,14 @@ void LineMarkers::MergeMarkers(Sci::Line line) {
 	}
 }
 
-int LineMarkers::MarkValue(Sci::Line line) noexcept {
+MarkerMask LineMarkers::MarkValue(Sci::Line line) noexcept {
 	if (markers.Length() && (line >= 0) && (line < markers.Length()) && markers[line])
 		return markers[line]->MarkValue();
 	else
 		return 0;
 }
 
-Sci::Line LineMarkers::MarkerNext(Sci::Line lineStart, int mask) const noexcept {
+Sci::Line LineMarkers::MarkerNext(Sci::Line lineStart, MarkerMask mask) const noexcept {
 	if (lineStart < 0)
 		lineStart = 0;
 	const Sci::Line length = markers.Length();

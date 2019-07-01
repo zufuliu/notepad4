@@ -1064,7 +1064,7 @@ void ScintillaWin::SetCandidateWindowPos() {
 			y += vs.lineHeight; // sysCaretHeight;
 		}
 
-		CANDIDATEFORM candidatePos = { 0, CFS_CANDIDATEPOS, x, y, { 0, 0, 0, 0 } };
+		CANDIDATEFORM candidatePos = { 0, CFS_CANDIDATEPOS, { x, y }, { 0, 0, 0, 0 } };
 		::ImmSetCandidateWindow(imc.hIMC, &candidatePos);
 
 		//if (PRIMARYLANGID(inputLang) == LANG_CHINESE || PRIMARYLANGID(inputLang) == LANG_JAPANESE) {

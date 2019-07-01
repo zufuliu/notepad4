@@ -29,7 +29,7 @@
 
 using namespace Scintilla;
 
-MarginStyle::MarginStyle(int style_, int width_, unsigned int mask_) noexcept :
+MarginStyle::MarginStyle(int style_, int width_, MarkerMask mask_) noexcept :
 	style(style_), width(width_), mask(mask_), sensitive(false), cursor(SC_CURSORREVERSEARROW) {
 }
 
@@ -157,7 +157,7 @@ ViewStyle::~ViewStyle() {
 void ViewStyle::CalculateMarginWidthAndMask() {
 	fixedColumnWidth = marginInside ? leftMarginWidth : 0;
 	maskInLine = 0xffffffffU;
-	unsigned int maskDefinedMarkers = 0;
+	MarkerMask maskDefinedMarkers = 0;
 	for (const MarginStyle &m : ms) {
 		fixedColumnWidth += m.width;
 		if (m.width > 0)
@@ -166,7 +166,7 @@ void ViewStyle::CalculateMarginWidthAndMask() {
 	}
 	maskDrawInText = 0;
 	for (int markBit = 0; markBit < 32; markBit++) {
-		const unsigned int maskBit = 1U << markBit;
+		const MarkerMask maskBit = 1U << markBit;
 		switch (markers[markBit].markType) {
 		case SC_MARK_EMPTY:
 			maskInLine &= ~maskBit;
@@ -460,7 +460,7 @@ ColourOptional ViewStyle::Background(int marksOfLine, bool caretActive, bool lin
 		background = ColourOptional(caretLineBackground, true);
 	}
 	if (!background.isSet && marksOfLine) {
-		unsigned int marks = marksOfLine;
+		MarkerMask marks = marksOfLine;
 		for (int markBit = 0; (markBit < 32) && marks; markBit++) {
 			if ((marks & 1) && (markers[markBit].markType == SC_MARK_BACKGROUND) &&
 				(markers[markBit].alpha == SC_ALPHA_NOALPHA)) {
@@ -470,7 +470,7 @@ ColourOptional ViewStyle::Background(int marksOfLine, bool caretActive, bool lin
 		}
 	}
 	if (!background.isSet && maskInLine) {
-		unsigned int marksMasked = marksOfLine & maskInLine;
+		MarkerMask marksMasked = marksOfLine & maskInLine;
 		if (marksMasked) {
 			for (int markBit = 0; (markBit < 32) && marksMasked; markBit++) {
 				if ((marksMasked & 1) &&
