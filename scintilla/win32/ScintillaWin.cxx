@@ -290,7 +290,7 @@ public:
 
 namespace {
 
-// Some IME code based on Chromium's IMM32Manager class, they are not official Scintilla.
+// InputLanguage() is based on Chromium's IMM32Manager class, they are not official Scintilla.
 // https://github.com/chromium/chromium/blob/master/ui/base/ime/win/imm32_manager.cc
 
 // See IMM32Manager::SetInputLanguage()

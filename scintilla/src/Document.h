@@ -447,7 +447,7 @@ public:
 	MarkerMask GetMark(Sci::Line line) const noexcept;
 	Sci::Line MarkerNext(Sci::Line lineStart, MarkerMask mask) const noexcept;
 	int AddMark(Sci::Line line, int markerNum);
-	void AddMarkSet(Sci::Line line, int valueSet);
+	void AddMarkSet(Sci::Line line, MarkerMask valueSet);
 	void DeleteMark(Sci::Line line, int markerNum);
 	void DeleteMarkFromHandle(int markerHandle);
 	void DeleteAllMarks(int markerNum);
