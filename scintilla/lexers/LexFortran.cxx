@@ -130,7 +130,7 @@ static void ColouriseFortranDoc(Sci_PositionU startPos, Sci_Position length, int
 					|| (styler.MatchIgnoreCase(sc.currentPos + 1, "ms") && sc.GetRelative(3) == '$')
 					) {
 					sc.SetState(SCE_F_PREPROCESSOR);
-				} else if ((sc.ch == 'C' || sc.ch == 'c') && IsAlpha(sc.chNext)) {
+				} else if ((sc.ch == 'C' || sc.ch == 'c') && !isspacechar(sc.chNext)) {
 					sc.SetState(SCE_F_IDENTIFIER);
 				} else {
 					sc.SetState(SCE_F_COMMENT);
