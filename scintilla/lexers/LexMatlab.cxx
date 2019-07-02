@@ -264,6 +264,10 @@ static void ColouriseMatlabDoc(Sci_PositionU startPos, Sci_Position length, int 
 			} else if (sc.Match("raw\"")) {
 				sc.SetState(SCE_MAT_RAW_STRING2);
 				sc.Forward(3);
+				if (sc.Match(R"(""")")) {
+					sc.ChangeState(SCE_MAT_TRIPLE_STRING2);
+					sc.Forward(2);
+				}
 			} else if (IsBlockCommentStart(lexType, sc, visibleChars)) {
 				if (IsMatlabOctave(lexType)) {
 					++commentLevel;
