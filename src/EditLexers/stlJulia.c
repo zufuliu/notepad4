@@ -5,7 +5,7 @@
 // https://julialang.org/
 
 static KEYWORDLIST Keywords_Julia = {{
-"abstract begin bitstype break catch continue const do else elseif end export for function global if in import "
+"abstract begin bitstype break catch continue const do else elseif end export finally for function global if in import "
 "let local macro module mutable primitive quote return struct try type typealias using where while "
 "true false nothing missing ans Inf NaN Inf32 NaN32 Inf16 NaN16"
 
@@ -16,7 +16,7 @@ static KEYWORDLIST Keywords_Julia = {{
 "Array Vector Matrix AbstractArray AbstractVector AbstractMatrix StridedArray StridedMatrix SparseMatrixCSC "
 "BitArray BitVector BitMatrix SubArray StridedVector StridedVecOrMat Set IntSet Dict Associative Tuple NTuple "
 "Buffer Union BigFloat BigInt FileOffset WeakRef Regex IOStream AsyncStream AbstractKind BitsKind UnionKind "
-"Module Nothing None TypeName TypeVar "
+"Module Nothing None TypeName TypeVar Vararg "
 
 , // 2
 NULL
@@ -24,8 +24,8 @@ NULL
 , // 3 Basic Function
 "int8 uint8 int16 uint16 int32 uint32 int64 uint64 int128 uint128 int uint float32 float64 bool char "
 "float integer signed unsigned complex complex64 complex128 cstring string "
-"include is isa() throw() typeof() new error() show() print() "
-"ccall() box() unbox() "
+"include is isa() throw() rethrow() typeof() new error() show() print() "
+"ccall() box() unbox() yield() "
 "sizeof() convert() length() size() numel() ndims() isequal() isempty() assign() "
 
 , NULL, NULL, NULL, NULL, NULL
