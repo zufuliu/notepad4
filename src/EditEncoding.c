@@ -518,7 +518,7 @@ typedef struct _ee {
 	WCHAR wch[256];
 } ENCODINGENTRY, *PENCODINGENTRY;
 
-int CmpEncoding(const void *s1, const void *s2) {
+static int __cdecl CmpEncoding(const void *s1, const void *s2) {
 	return StrCmp(((PENCODINGENTRY)s1)->wch, ((PENCODINGENTRY)s2)->wch);
 }
 

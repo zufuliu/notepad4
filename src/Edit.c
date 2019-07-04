@@ -3619,16 +3619,16 @@ typedef struct _SORTLINE {
 
 typedef int (__stdcall *FNSTRCMP)(LPCWSTR, LPCWSTR);
 
-int CmpStd(const void *s1, const void *s2) {
+static int __cdecl CmpStd(const void *s1, const void *s2) {
 	const int cmp = StrCmp(((SORTLINE *)s1)->pwszSortEntry, ((SORTLINE *)s2)->pwszSortEntry);
 	return (cmp) ? cmp : StrCmp(((SORTLINE *)s1)->pwszLine, ((SORTLINE *)s2)->pwszLine);
 }
 
-int CmpStdRev(const void *s1, const void *s2) {
+static int __cdecl CmpStdRev(const void *s1, const void *s2) {
 	return CmpStd(s2, s1);
 }
 
-int CmpLogical(const void *s1, const void *s2) {
+static int __cdecl CmpLogical(const void *s1, const void *s2) {
 	int cmp = (int)StrCmpLogicalW(((SORTLINE *)s1)->pwszSortEntry, ((SORTLINE *)s2)->pwszSortEntry);
 	if (cmp == 0) {
 		cmp = (int)StrCmpLogicalW(((SORTLINE *)s1)->pwszLine, ((SORTLINE *)s2)->pwszLine);
@@ -3639,7 +3639,7 @@ int CmpLogical(const void *s1, const void *s2) {
 	return (cmp) ? cmp : StrCmp(((SORTLINE *)s1)->pwszLine, ((SORTLINE *)s2)->pwszLine);
 }
 
-int CmpLogicalRev(const void *s1, const void *s2) {
+static int __cdecl CmpLogicalRev(const void *s1, const void *s2) {
 	return CmpLogical(s2, s1);
 }
 

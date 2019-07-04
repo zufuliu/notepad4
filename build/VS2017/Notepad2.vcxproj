@@ -478,6 +478,7 @@
       <DiagnosticsFormat>Caret</DiagnosticsFormat>
       <EnablePREfast>false</EnablePREfast>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <CallingConvention>VectorCall</CallingConvention>
     </ClCompile>
     <Link>
       <AdditionalDependencies>comctl32.lib;shlwapi.lib;imm32.lib;uxtheme.lib;%(AdditionalDependencies)</AdditionalDependencies>
