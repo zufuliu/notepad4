@@ -390,6 +390,8 @@ class ScintillaWin :
 
 	// The current input Language ID.
 	LANGID inputLang;
+	// some IME not send WM_IME_STARTCOMPOSITION, but WM_IME_COMPOSITION with GCS_COMPSTR.
+	bool gotImeStartComposition;
 
 #if defined(USE_D2D)
 	ID2D1RenderTarget *pRenderTarget;
@@ -616,6 +618,7 @@ ScintillaWin::ScintillaWin(HWND hwnd) {
 	sysCaretWidth = 0;
 	sysCaretHeight = 0;
 	inputLang = InputLanguage();
+	gotImeStartComposition = false;
 
 	styleIdleInQueue = false;
 
@@ -1248,7 +1251,11 @@ sptr_t ScintillaWin::HandleCompositionInline(uptr_t, sptr_t lParam) {
 		AddWString(imc.GetCompositionString(GCS_RESULTSTR), CharacterSource::imeResult);
 	}
 	EnsureCaretVisible();
-	if (lParam & GCS_RESULTSTR) {
+	if (!gotImeStartComposition) {
+		gotImeStartComposition = true;
+		SetCandidateWindowPos();
+	} else if (lParam & GCS_RESULTSTR) {
+		gotImeStartComposition = false; // end composition
 		// Why we need to move candidate window after composition?
 		if (inputLang != MAKELANGID(LANG_CHINESE, SUBLANG_CHINESE_SIMPLIFIED)) {
 			// Don't move candidate window for Chinese Pinyin IME.
@@ -1703,6 +1710,7 @@ sptr_t ScintillaWin::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam
 
 		case WM_IME_STARTCOMPOSITION: 	// dbcs
 			if (KoreanIME() || imeInteraction == imeInline) {
+				gotImeStartComposition = true;
 				SetCandidateWindowPos();
 				return 0;
 			} else {
@@ -1712,6 +1720,7 @@ sptr_t ScintillaWin::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam
 
 		case WM_IME_ENDCOMPOSITION: 	// dbcs
 			ImeEndComposition();
+			gotImeStartComposition = false;
 			return ::DefWindowProc(MainHWND(), iMessage, wParam, lParam);
 
 		case WM_IME_COMPOSITION:
