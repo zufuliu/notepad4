@@ -33,8 +33,8 @@ x86: sum(i//24 for i in a) => 11184632 nodes
 struct WordNode;
 struct WordList {
 	char wordBuf[1024];
-	int (*WL_strcmp)(LPCSTR, LPCSTR);
-	int (*WL_strncmp)(LPCSTR, LPCSTR, size_t);
+	int (__cdecl *WL_strcmp)(LPCSTR, LPCSTR);
+	int (__cdecl *WL_strncmp)(LPCSTR, LPCSTR, size_t);
 #if NP2_AUTOC_USE_STRING_ORDER
 	UINT (*WL_OrderFunc)(const void *, unsigned int);
 #endif
