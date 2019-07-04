@@ -293,7 +293,7 @@ namespace {
 // InputLanguage() is based on Chromium's IMM32Manager class, they are not official Scintilla.
 // https://github.com/chromium/chromium/blob/master/ui/base/ime/win/imm32_manager.cc
 
-// See IMM32Manager::SetInputLanguage()
+// See Chromium's IMM32Manager::SetInputLanguage()
 LANGID InputLanguage() noexcept {
 	LANGID inputLang;
 	WCHAR keyboard_layout[KL_NAMELENGTH];
@@ -1053,7 +1053,7 @@ void ScintillaWin::DrawImeIndicator(int indicator, int len) {
 	}
 }
 
-// TODO: IMM32Manager::MoveImeWindow()
+// TODO: Chromium's IMM32Manager::MoveImeWindow()
 void ScintillaWin::SetCandidateWindowPos() {
 	IMContext imc(MainHWND());
 	if (imc.hIMC) {
@@ -1252,7 +1252,9 @@ sptr_t ScintillaWin::HandleCompositionInline(uptr_t, sptr_t lParam) {
 	}
 	EnsureCaretVisible();
 	if (!gotImeStartComposition) {
-		gotImeStartComposition = true;
+		// See Chromium's InputMethodWinImm32::OnImeEndComposition()
+		// MS Korean IME on hitting Space key: (1) WM_IME_ENDCOMPOSITION (2) WM_IME_COMPOSITION with GCS_RESULTSTR
+		gotImeStartComposition = (lParam & GCS_RESULTSTR) == 0;
 		SetCandidateWindowPos();
 	} else if (lParam & GCS_RESULTSTR) {
 		gotImeStartComposition = false; // end composition
