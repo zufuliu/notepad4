@@ -418,9 +418,9 @@ class ScintillaWin :
 
 	static sptr_t DirectFunction(
 		sptr_t ptr, UINT iMessage, uptr_t wParam, sptr_t lParam);
-	static LRESULT PASCAL SWndProc(
+	static LRESULT CALLBACK SWndProc(
 		HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam);
-	static LRESULT PASCAL CTWndProc(
+	static LRESULT CALLBACK CTWndProc(
 		HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam);
 
 	enum {
@@ -3579,7 +3579,7 @@ BOOL ScintillaWin::DestroySystemCaret() noexcept {
 	return retval;
 }
 
-LRESULT PASCAL ScintillaWin::CTWndProc(
+LRESULT CALLBACK ScintillaWin::CTWndProc(
 	HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam) {
 	// Find C++ object associated with window.
 	ScintillaWin *sciThis = static_cast<ScintillaWin *>(PointerFromWindow(hWnd));
@@ -3686,12 +3686,12 @@ sptr_t ScintillaWin::DirectFunction(
 }
 
 extern "C"
-sptr_t __stdcall Scintilla_DirectFunction(
+sptr_t SCI_METHOD Scintilla_DirectFunction(
 	ScintillaWin *sci, UINT iMessage, uptr_t wParam, sptr_t lParam) {
 	return sci->WndProc(iMessage, wParam, lParam);
 }
 
-LRESULT PASCAL ScintillaWin::SWndProc(
+LRESULT CALLBACK ScintillaWin::SWndProc(
 	HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam) {
 	//Platform::DebugPrintf("S W:%x M:%x WP:%x L:%x\n", hWnd, iMessage, wParam, lParam);
 

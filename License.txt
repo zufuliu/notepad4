@@ -43,6 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 License for Scintilla and SciTE
 
 https://www.scintilla.org/
+https://www.scintilla.org/License.txt
 
 Copyright 1998-2019 by Neil Hodgson <neilh@scintilla.org>
 
@@ -114,6 +115,7 @@ Copyright 2019 Eternally Confuzzled
 Some IME code based on Chromium's IMM32Manager class.
 
 https://github.com/chromium/chromium/tree/master/ui/base/ime/win
+https://github.com/chromium/chromium/blob/master/LICENSE
 
 // Copyright 2015 The Chromium Authors. All rights reserved.
 //
