@@ -4827,6 +4827,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			break;
 
 		case SCN_CHARADDED: {
+			// tentative input characters already ignored in Editor::InsertCharacter()
 			const int ch = scn->ch;
 			if (ch < 0x80) {
 				// Auto indent
