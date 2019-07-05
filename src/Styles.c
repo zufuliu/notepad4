@@ -1103,7 +1103,7 @@ static BOOL Style_StrGetAttributeEx(LPCWSTR lpszStyle, LPCWSTR key, int keyLen) 
 			while (t > lpszStyle && *t == L' ') {
 				--t;
 			}
-			chPrev = (t <= lpszStyle) ? L';' : t[-1];
+			chPrev = (t <= lpszStyle) ? L';' : *t;
 		}
 		p += keyLen;
 		if (chPrev == L';') {
