@@ -290,16 +290,23 @@ public:
 
 namespace {
 
-// InputLanguage() is based on Chromium's IMM32Manager class, they are not official Scintilla.
+// InputLanguage() and SetCandidateWindowPos() are based on Chromium's IMM32Manager class.
 // https://github.com/chromium/chromium/blob/master/ui/base/ime/win/imm32_manager.cc
 
 // See Chromium's IMM32Manager::SetInputLanguage()
 LANGID InputLanguage() noexcept {
+	// Retrieve the current input language from the system's keyboard layout.
+	// Using GetKeyboardLayoutName instead of GetKeyboardLayout, because
+	// the language from GetKeyboardLayout is the language under where the
+	// keyboard layout is installed. And the language from GetKeyboardLayoutName
+	// indicates the language of the keyboard layout itself.
+	// See crbug.com/344834.
 	LANGID inputLang;
 	WCHAR keyboard_layout[KL_NAMELENGTH];
 	if (::GetKeyboardLayoutNameW(keyboard_layout)) {
 		inputLang =  static_cast<LANGID>(wcstol(&keyboard_layout[KL_NAMELENGTH >> 1], nullptr, 16));
 	} else {
+		/// TODO: Fallback to en-US?
 		HKL inputLocale = ::GetKeyboardLayout(0);
 		inputLang = LOWORD(inputLocale);
 	}
@@ -391,6 +398,7 @@ class ScintillaWin :
 	// The current input Language ID.
 	LANGID inputLang;
 	// some IME not send WM_IME_STARTCOMPOSITION, but WM_IME_COMPOSITION with GCS_COMPSTR.
+	// ensure candidate window near caret when compositing starts.
 	bool gotImeStartComposition;
 
 #if defined(USE_D2D)
@@ -1053,7 +1061,7 @@ void ScintillaWin::DrawImeIndicator(int indicator, int len) {
 	}
 }
 
-// TODO: Chromium's IMM32Manager::MoveImeWindow()
+// See Chromium's IMM32Manager::MoveImeWindow()
 void ScintillaWin::SetCandidateWindowPos() {
 	IMContext imc(MainHWND());
 	if (imc.hIMC) {
@@ -1061,18 +1069,47 @@ void ScintillaWin::SetCandidateWindowPos() {
 		const int x = static_cast<int>(pos.x);
 		int y = static_cast<int>(pos.y);
 
-		if (inputLang == MAKELANGID(LANG_CHINESE, SUBLANG_CHINESE_SIMPLIFIED)) {
-			y += 4;
-		} else {
-			y += vs.lineHeight; // sysCaretHeight;
+		if (PRIMARYLANGID(inputLang) == LANG_CHINESE) {
+			// As written in a comment in IMM32Manager::CreateImeWindow(),
+			// Chinese IMEs ignore function calls to ::ImmSetCandidateWindow()
+			// when a user disables TSF (Text Service Framework) and CUAS (Cicero
+			// Unaware Application Support).
+			// On the other hand, when a user enables TSF and CUAS, Chinese IMEs
+			// ignore the position of the current system caret and uses the
+			// parameters given to ::ImmSetCandidateWindow() with its 'dwStyle'
+			// parameter CFS_CANDIDATEPOS.
+			// Therefore, we do not only call ::ImmSetCandidateWindow() but also
+			// set the positions of the temporary system caret if it exists.
+			CANDIDATEFORM candidatePos = { 0, CFS_CANDIDATEPOS, { x, y }, { 0, 0, 0, 0 } };
+			::ImmSetCandidateWindow(imc.hIMC, &candidatePos);
+			::SetCaretPos(x, y);
+		} else if (PRIMARYLANGID(inputLang) == LANG_JAPANESE) {
+			// When a user disables TSF (Text Service Framework) and CUAS (Cicero
+			// Unaware Application Support), Chinese IMEs somehow ignore function calls
+			// to ::ImmSetCandidateWindow(), i.e. they do not move their candidate
+			// window to the position given as its parameters, and use the position
+			// of the current system caret instead, i.e. it uses ::GetCaretPos() to
+			// retrieve the position of their IME candidate window.
+			// Therefore, we create a temporary system caret for Chinese IMEs and use
+			// it during this input context.
+			// Since some third-party Japanese IME also uses ::GetCaretPos() to determine
+			// their window position, we also create a caret for Japanese IMEs.
+			::SetCaretPos(x, y + sysCaretHeight);
 		}
 
-		CANDIDATEFORM candidatePos = { 0, CFS_CANDIDATEPOS, { x, y }, { 0, 0, 0, 0 } };
-		::ImmSetCandidateWindow(imc.hIMC, &candidatePos);
+		// Chinese IMEs and Japanese IMEs require the upper-left corner of
+		// the caret to move the position of their candidate windows.
+		// On the other hand, Korean IMEs require the lower-left corner of the
+		// caret to move their candidate windows.
+		constexpr int kCaretMargin = 4;
+		y += kCaretMargin;
 
-		//if (PRIMARYLANGID(inputLang) == LANG_CHINESE || PRIMARYLANGID(inputLang) == LANG_JAPANESE) {
-		//	::SetCaretPos(x, y);
-		//}
+		// Japanese IMEs and Korean IMEs also use the rectangle given to
+		// ::ImmSetCandidateWindow() with its 'dwStyle' parameter CFS_EXCLUDE
+		// to move their candidate windows when a user disables TSF and CUAS.
+		// Therefore, we also set this parameter here.
+		CANDIDATEFORM excludeRect = { 0, CFS_EXCLUDE, { x, y },  { x, y, x + sysCaretWidth, y + sysCaretHeight }};
+		::ImmSetCandidateWindow(imc.hIMC, &excludeRect);
 	}
 }
 
@@ -1250,19 +1287,19 @@ sptr_t ScintillaWin::HandleCompositionInline(uptr_t, sptr_t lParam) {
 	} else if (lParam & GCS_RESULTSTR) {
 		AddWString(imc.GetCompositionString(GCS_RESULTSTR), CharacterSource::imeResult);
 	}
+
 	EnsureCaretVisible();
-	if (!gotImeStartComposition) {
-		// See Chromium's InputMethodWinImm32::OnImeEndComposition()
+	// don't move candidate window during compositing.
+	if (!gotImeStartComposition || (lParam & GCS_RESULTSTR) != 0) {
+		// See Chromium's InputMethodWinImm32::OnImeComposition() and InputMethodWinImm32::OnImeEndComposition()
+		//
+		// Japanese IMEs send a message containing both GCS_RESULTSTR and
+		// GCS_COMPSTR, which means an ongoing composition has been finished
+		// by the start of another composition.
+		//
 		// MS Korean IME on hitting Space key: (1) WM_IME_ENDCOMPOSITION (2) WM_IME_COMPOSITION with GCS_RESULTSTR
 		gotImeStartComposition = (lParam & GCS_RESULTSTR) == 0;
 		SetCandidateWindowPos();
-	} else if (lParam & GCS_RESULTSTR) {
-		gotImeStartComposition = false; // end composition
-		// Why we need to move candidate window after composition?
-		if (inputLang != MAKELANGID(LANG_CHINESE, SUBLANG_CHINESE_SIMPLIFIED)) {
-			// Don't move candidate window for Chinese Pinyin IME.
-			SetCandidateWindowPos();
-		}
 	}
 	ShowCaretAtCurrentPosition();
 	return 0;
@@ -1722,7 +1759,6 @@ sptr_t ScintillaWin::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam
 
 		case WM_IME_ENDCOMPOSITION: 	// dbcs
 			ImeEndComposition();
-			gotImeStartComposition = false;
 			return ::DefWindowProc(MainHWND(), iMessage, wParam, lParam);
 
 		case WM_IME_COMPOSITION:
@@ -2813,6 +2849,7 @@ void ScintillaWin::ImeStartComposition() {
 
 /** Called when IME Window closed. */
 void ScintillaWin::ImeEndComposition() {
+	gotImeStartComposition = false;
 	ShowCaretAtCurrentPosition();
 }
 
