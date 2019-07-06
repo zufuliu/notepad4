@@ -33,7 +33,7 @@ public:
 	void Init(const char *textForm);
 	void Init(const char *const *linesForm);
 	/// Decompose image into runs and use FillRectangle for each run
-	void Draw(Surface *surface, PRectangle rc);
+	void SCICALL Draw(Surface *surface, PRectangle rc);
 	constexpr int GetHeight() const noexcept {
 		return height;
 	}
