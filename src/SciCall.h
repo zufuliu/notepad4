@@ -786,6 +786,10 @@ NP2_inline int SciCall_GetTabWidth(void) {
 	return (int)SciCall(SCI_GETTABWIDTH, 0, 0);
 }
 
+NP2_inline void SciCall_SetTabMinimumWidth(int pixels) {
+	SciCall(SCI_SETTABMINIMUMWIDTH, pixels, 0);
+}
+
 NP2_inline void SciCall_SetUseTabs(BOOL useTabs) {
 	SciCall(SCI_SETUSETABS, useTabs, 0);
 }

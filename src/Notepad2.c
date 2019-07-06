@@ -2135,6 +2135,10 @@ void MsgNotifyZoom(void) {
 	ShowNotificationA(SC_NOTIFICATIONPOSITION_CENTER, buf);
 #endif
 
+	// See https://sourceforge.net/p/scintilla/bugs/2118/
+	// set minimum visual tab width to 1 when font size smaller than 3.5pt.
+	SciCall_SetTabMinimumWidth((iZoomLevel < 40)? 1 : 2);
+
 	UpdateStatusBarCache(STATUS_DOCZOOM);
 	UpdateLineNumberWidth();
 	UpdateFoldMarginWidth();
