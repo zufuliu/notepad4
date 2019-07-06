@@ -45,8 +45,8 @@ public:
 
 	void SetXPM(const char *textForm);
 	void SetXPM(const char *const *linesForm);
-	void SetRGBAImage(Point sizeRGBAImage, float scale, const unsigned char *pixelsRGBAImage);
-	void Draw(Surface *surface, PRectangle rcWhole, const Font &fontForCharacter, typeOfFold tFold, int marginStyle) const;
+	void SCICALL SetRGBAImage(Point sizeRGBAImage, float scale, const unsigned char *pixelsRGBAImage);
+	void SCICALL Draw(Surface *surface, PRectangle rcWhole, const Font &fontForCharacter, typeOfFold tFold, int marginStyle) const;
 };
 
 }

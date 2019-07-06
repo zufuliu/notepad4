@@ -506,27 +506,27 @@ public:
 	void PenColour(ColourDesired fore) noexcept override;
 	int LogPixelsY() const noexcept override;
 	int DeviceHeightFont(int points) const noexcept override;
-	void MoveTo(int x_, int y_) noexcept override;
-	void LineTo(int x_, int y_) noexcept override;
-	void Polygon(const Point *pts, size_t npts, ColourDesired fore, ColourDesired back) override;
-	void RectangleDraw(PRectangle rc, ColourDesired fore, ColourDesired back) noexcept override;
-	void FillRectangle(PRectangle rc, ColourDesired back) noexcept override;
-	void FillRectangle(PRectangle rc, Surface &surfacePattern) noexcept override;
-	void RoundedRectangle(PRectangle rc, ColourDesired fore, ColourDesired back) noexcept override;
-	void AlphaRectangle(PRectangle rc, int cornerSize, ColourDesired fill, int alphaFill,
+	void SCICALL MoveTo(int x_, int y_) noexcept override;
+	void SCICALL LineTo(int x_, int y_) noexcept override;
+	void SCICALL Polygon(const Point *pts, size_t npts, ColourDesired fore, ColourDesired back) override;
+	void SCICALL RectangleDraw(PRectangle rc, ColourDesired fore, ColourDesired back) noexcept override;
+	void SCICALL FillRectangle(PRectangle rc, ColourDesired back) noexcept override;
+	void SCICALL FillRectangle(PRectangle rc, Surface &surfacePattern) noexcept override;
+	void SCICALL RoundedRectangle(PRectangle rc, ColourDesired fore, ColourDesired back) noexcept override;
+	void SCICALL AlphaRectangle(PRectangle rc, int cornerSize, ColourDesired fill, int alphaFill,
 		ColourDesired outline, int alphaOutline, int flags) noexcept override;
-	void GradientRectangle(PRectangle rc, const std::vector<ColourStop> &stops, GradientOptions options) override;
-	void DrawRGBAImage(PRectangle rc, int width, int height, const unsigned char *pixelsImage) noexcept override;
-	void Ellipse(PRectangle rc, ColourDesired fore, ColourDesired back) noexcept override;
-	void Copy(PRectangle rc, Point from, Surface &surfaceSource) noexcept override;
+	void SCICALL GradientRectangle(PRectangle rc, const std::vector<ColourStop> &stops, GradientOptions options) override;
+	void SCICALL DrawRGBAImage(PRectangle rc, int width, int height, const unsigned char *pixelsImage) noexcept override;
+	void SCICALL Ellipse(PRectangle rc, ColourDesired fore, ColourDesired back) noexcept override;
+	void SCICALL Copy(PRectangle rc, Point from, Surface &surfaceSource) noexcept override;
 
 	std::unique_ptr<IScreenLineLayout> Layout(const IScreenLine *screenLine) noexcept override;
 
-	void DrawTextCommon(PRectangle rc, const Font &font_, XYPOSITION ybase, std::string_view text, UINT fuOptions);
-	void DrawTextNoClip(PRectangle rc, const Font &font_, XYPOSITION ybase, std::string_view text, ColourDesired fore, ColourDesired back) override;
-	void DrawTextClipped(PRectangle rc, const Font &font_, XYPOSITION ybase, std::string_view text, ColourDesired fore, ColourDesired back) override;
-	void DrawTextTransparent(PRectangle rc, const Font &font_, XYPOSITION ybase, std::string_view text, ColourDesired fore) override;
-	void MeasureWidths(const Font &font_, std::string_view text, XYPOSITION *positions) override;
+	void SCICALL DrawTextCommon(PRectangle rc, const Font &font_, XYPOSITION ybase, std::string_view text, UINT fuOptions);
+	void SCICALL DrawTextNoClip(PRectangle rc, const Font &font_, XYPOSITION ybase, std::string_view text, ColourDesired fore, ColourDesired back) override;
+	void SCICALL DrawTextClipped(PRectangle rc, const Font &font_, XYPOSITION ybase, std::string_view text, ColourDesired fore, ColourDesired back) override;
+	void SCICALL DrawTextTransparent(PRectangle rc, const Font &font_, XYPOSITION ybase, std::string_view text, ColourDesired fore) override;
+	void SCICALL MeasureWidths(const Font &font_, std::string_view text, XYPOSITION *positions) override;
 	XYPOSITION WidthText(const Font &font_, std::string_view text) override;
 	XYPOSITION Ascent(const Font &font_) noexcept override;
 	XYPOSITION Descent(const Font &font_) noexcept override;
@@ -534,7 +534,7 @@ public:
 	XYPOSITION Height(const Font &font_) noexcept override;
 	XYPOSITION AverageCharWidth(const Font &font_) noexcept override;
 
-	void SetClip(PRectangle rc) noexcept override;
+	void SCICALL SetClip(PRectangle rc) noexcept override;
 	void FlushCachedState() noexcept override;
 
 	void SetUnicodeMode(bool unicodeMode_) noexcept override;
@@ -1075,27 +1075,27 @@ public:
 	void D2DPenColour(ColourDesired fore, int alpha = 255);
 	int LogPixelsY() const noexcept override;
 	int DeviceHeightFont(int points) const noexcept override;
-	void MoveTo(int x_, int y_) noexcept override;
-	void LineTo(int x_, int y_) noexcept override;
-	void Polygon(const Point *pts, size_t npts, ColourDesired fore, ColourDesired back) override;
-	void RectangleDraw(PRectangle rc, ColourDesired fore, ColourDesired back) override;
-	void FillRectangle(PRectangle rc, ColourDesired back) override;
-	void FillRectangle(PRectangle rc, Surface &surfacePattern) override;
-	void RoundedRectangle(PRectangle rc, ColourDesired fore, ColourDesired back) override;
-	void AlphaRectangle(PRectangle rc, int cornerSize, ColourDesired fill, int alphaFill,
+	void SCICALL MoveTo(int x_, int y_) noexcept override;
+	void SCICALL LineTo(int x_, int y_) noexcept override;
+	void SCICALL Polygon(const Point *pts, size_t npts, ColourDesired fore, ColourDesired back) override;
+	void SCICALL RectangleDraw(PRectangle rc, ColourDesired fore, ColourDesired back) override;
+	void SCICALL FillRectangle(PRectangle rc, ColourDesired back) override;
+	void SCICALL FillRectangle(PRectangle rc, Surface &surfacePattern) override;
+	void SCICALL RoundedRectangle(PRectangle rc, ColourDesired fore, ColourDesired back) override;
+	void SCICALL AlphaRectangle(PRectangle rc, int cornerSize, ColourDesired fill, int alphaFill,
 		ColourDesired outline, int alphaOutline, int flags) override;
-	void GradientRectangle(PRectangle rc, const std::vector<ColourStop> &stops, GradientOptions options) override;
-	void DrawRGBAImage(PRectangle rc, int width, int height, const unsigned char *pixelsImage) override;
-	void Ellipse(PRectangle rc, ColourDesired fore, ColourDesired back) override;
-	void Copy(PRectangle rc, Point from, Surface &surfaceSource) override;
+	void SCICALL GradientRectangle(PRectangle rc, const std::vector<ColourStop> &stops, GradientOptions options) override;
+	void SCICALL DrawRGBAImage(PRectangle rc, int width, int height, const unsigned char *pixelsImage) override;
+	void SCICALL Ellipse(PRectangle rc, ColourDesired fore, ColourDesired back) override;
+	void SCICALL Copy(PRectangle rc, Point from, Surface &surfaceSource) override;
 
 	std::unique_ptr<IScreenLineLayout> Layout(const IScreenLine *screenLine) override;
 
-	void DrawTextCommon(PRectangle rc, const Font &font_, XYPOSITION ybase, std::string_view text, UINT fuOptions);
-	void DrawTextNoClip(PRectangle rc, const Font &font_, XYPOSITION ybase, std::string_view text, ColourDesired fore, ColourDesired back) override;
-	void DrawTextClipped(PRectangle rc, const Font &font_, XYPOSITION ybase, std::string_view text, ColourDesired fore, ColourDesired back) override;
-	void DrawTextTransparent(PRectangle rc, const Font &font_, XYPOSITION ybase, std::string_view text, ColourDesired fore) override;
-	void MeasureWidths(const Font &font_, std::string_view text, XYPOSITION *positions) override;
+	void SCICALL DrawTextCommon(PRectangle rc, const Font &font_, XYPOSITION ybase, std::string_view text, UINT fuOptions);
+	void SCICALL DrawTextNoClip(PRectangle rc, const Font &font_, XYPOSITION ybase, std::string_view text, ColourDesired fore, ColourDesired back) override;
+	void SCICALL DrawTextClipped(PRectangle rc, const Font &font_, XYPOSITION ybase, std::string_view text, ColourDesired fore, ColourDesired back) override;
+	void SCICALL DrawTextTransparent(PRectangle rc, const Font &font_, XYPOSITION ybase, std::string_view text, ColourDesired fore) override;
+	void SCICALL MeasureWidths(const Font &font_, std::string_view text, XYPOSITION *positions) override;
 	XYPOSITION WidthText(const Font &font_, std::string_view text) override;
 	XYPOSITION Ascent(const Font &font_) noexcept override;
 	XYPOSITION Descent(const Font &font_) noexcept override;
@@ -1103,7 +1103,7 @@ public:
 	XYPOSITION Height(const Font &font_) noexcept override;
 	XYPOSITION AverageCharWidth(const Font &font_) override;
 
-	void SetClip(PRectangle rc) noexcept override;
+	void SCICALL SetClip(PRectangle rc) noexcept override;
 	void FlushCachedState() noexcept override;
 
 	void SetUnicodeMode(bool unicodeMode_) noexcept override;
@@ -2459,7 +2459,7 @@ class ListBoxX : public ListBox {
 	LRESULT NcHitTest(WPARAM, LPARAM) const noexcept;
 	void CentreItem(int n);
 	void Paint(HDC) noexcept;
-	static LRESULT PASCAL ControlWndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
+	static LRESULT CALLBACK ControlWndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
 
 	static const Point ItemInset;	// Padding around whole item
 	static const Point TextInset;	// Padding around text
@@ -2484,7 +2484,7 @@ public:
 	}
 	void SetFont(const Font &font) noexcept override;
 	void SetColour(ColourDesired fore, ColourDesired back) noexcept override;
-	void Create(Window &parent_, int ctrlID_, Point location_, int lineHeight_, bool unicodeMode_, int technology_) noexcept override;
+	void SCICALL Create(Window &parent_, int ctrlID_, Point location_, int lineHeight_, bool unicodeMode_, int technology_) noexcept override;
 	void SetAverageCharWidth(int width) noexcept override;
 	void SetVisibleRows(int rows) noexcept override;
 	int GetVisibleRows() const noexcept override;
@@ -2504,7 +2504,7 @@ public:
 	void SetList(const char *list, char separator, char typesep) override;
 	void Draw(const DRAWITEMSTRUCT *pDrawItem);
 	LRESULT WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam);
-	static LRESULT PASCAL StaticWndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam);
+	static LRESULT CALLBACK StaticWndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam);
 };
 
 const Point ListBoxX::ItemInset(0, 0);
@@ -3099,7 +3099,7 @@ void ListBoxX::Paint(HDC hDC) noexcept {
 	::DeleteObject(hBitmap);
 }
 
-LRESULT PASCAL ListBoxX::ControlWndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam, UINT_PTR /*uIdSubclass*/, DWORD_PTR /*dwRefData*/) {
+LRESULT CALLBACK ListBoxX::ControlWndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam, UINT_PTR /*uIdSubclass*/, DWORD_PTR /*dwRefData*/) {
 	try {
 		ListBoxX *lbx = static_cast<ListBoxX *>(PointerFromWindow(::GetParent(hWnd)));
 		switch (iMessage) {
@@ -3332,7 +3332,7 @@ LRESULT ListBoxX::WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam
 	return 0;
 }
 
-LRESULT PASCAL ListBoxX::StaticWndProc(
+LRESULT CALLBACK ListBoxX::StaticWndProc(
 	HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam) {
 	if (iMessage == WM_CREATE) {
 		CREATESTRUCT *pCreate = reinterpret_cast<CREATESTRUCT *>(lParam);

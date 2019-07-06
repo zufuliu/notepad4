@@ -50,7 +50,7 @@ public:
 	bool Active() const noexcept;
 
 	/// Display the auto completion list positioned to be near a character position
-	void Start(Window &parent, int ctrlID, Sci::Position position, Point location,
+	void SCICALL Start(Window &parent, int ctrlID, Sci::Position position, Point location,
 		Sci::Position startLen_, int lineHeight, bool unicodeMode, int technology) noexcept;
 
 	/// The stop chars are characters which, when typed, cause the auto completion list to disappear

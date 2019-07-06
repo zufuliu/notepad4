@@ -185,7 +185,7 @@ public:
 	void SetFontLocaleName(const char *name);
 	bool ProtectionActive() const noexcept;
 	int ExternalMarginWidth() const noexcept;
-	int MarginFromLocation(Point pt) const;
+	int SCICALL MarginFromLocation(Point pt) const;
 	bool ValidStyle(size_t styleIndex) const noexcept;
 	void CalcLargestMarkerHeight() noexcept;
 	int GetFrameWidth() const noexcept;

@@ -113,8 +113,8 @@ public:
 	void SetBracesHighlight(Range rangeLine, const Sci::Position braces[],
 		char bracesMatchStyle, int xHighlight, bool ignoreStyle);
 	void RestoreBracesHighlight(Range rangeLine, const Sci::Position braces[], bool ignoreStyle);
-	int FindBefore(XYPOSITION x, Range range) const;
-	int FindPositionFromX(XYPOSITION x, Range range, bool charPosition) const;
+	int SCICALL FindBefore(XYPOSITION x, Range range) const;
+	int SCICALL FindPositionFromX(XYPOSITION x, Range range, bool charPosition) const;
 	Point PointFromPosition(int posInLine, int lineHeight, PointEnd pe) const;
 	int EndLineStyle() const;
 };
