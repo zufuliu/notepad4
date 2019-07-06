@@ -258,6 +258,12 @@ set void SetTabWidth=2036(int tabWidth,)
 # Retrieve the visible size of a tab.
 get int GetTabWidth=2121(,)
 
+# Set the minimum visual width of a tab.
+set void SetTabMinimumWidth=2724(int pixels,)
+
+# Get the minimum visual width of a tab.
+get int GetTabMinimumWidth=2725(,)
+
 # Clear explicit tabstops on a line.
 fun void ClearTabStops=2675(line line,)
 
@@ -276,10 +282,10 @@ val SC_CP_UTF8=65001
 set void SetCodePage=2037(int codePage,)
 
 # Set the locale for displaying text.
-set void SetFontLocale=2724(, string localeName)
+set void SetFontLocale=2638(, string localeName)
 
 # Get the locale for displaying text.
-get int GetFontLocale=2725(, stringresult localeName)
+get int GetFontLocale=2639(, stringresult localeName)
 
 enu IMEInteraction=SC_IME_
 val SC_IME_WINDOWED=0
