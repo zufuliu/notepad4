@@ -19,11 +19,17 @@ static KEYWORDLIST Keywords_CPP = {{
 "concept requires audit axiom "
 "import module " "co_await co_return co_yield "
 // MSVC
-"__alignof __asm __assume __based __cdecl __declspec __event __except __fastcall __finally __forceinline __identifier __inline __interface __leave __raise __stdcall __clrcall __super __thiscall __try __unaligned __uuidof __hook __unhook __noop __vectorcall __pragma "
+"__alignof __asm __assume __based __cdecl __clrcall __declspec __event __except __fastcall __finally __forceinline __hook "
+"__identifier __if_exists __if_not_exists __inline __interface __leave __multiple_inheritance __noop __pragma __raise __restrict "
+"__single_inheritance __stdcall __super __thiscall __try __unaligned __unhook __uuidof __vectorcall __virtual_inheritance "
+// COM
+"interface "
 // GCC
-"typeof __typeof__ __alignof__ __label__ __asm__ __thread __attribute__ __volatile__ __restrict__ __restrict __inline__ __extension__ "
+"typeof __typeof__ __alignof__ __label__ __asm__ __thread __attribute__ __volatile__ __restrict__ __inline__ __extension__ "
 // clang Objective-C/C++
 "__nonnull __nullable __covariant __kindof nullable nonnull "
+// Intel
+"__regcall "
 // Keil
 "sfr sfr16 interrupt "
 
