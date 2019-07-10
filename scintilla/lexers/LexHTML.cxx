@@ -232,14 +232,11 @@ int classifyTagHTML(Sci_PositionU start, Sci_PositionU end,
 	const char *tag = withSpace + 1;
 	// Copy after the '<'
 	Sci_PositionU i = 1;
-	// check valid HTML custom element name: don't contains upper case ASCII alphas.
-	bool customElement = !isXml;
 	if (caseSensitive) {
 		for (Sci_PositionU cPos = start; cPos <= end && i < sizeof(withSpace) - 2; cPos++) {
 			const char ch = styler[cPos];
 			if ((ch != '<') && (ch != '/')) {
 				withSpace[i++] = ch;
-				customElement = customElement && !IsUpperCase(ch);
 			}
 		}
 	} else {
@@ -248,7 +245,6 @@ int classifyTagHTML(Sci_PositionU start, Sci_PositionU end,
 			if ((ch != '<') && (ch != '/')) {
 				const char chTmp = MakeLowerCase(ch);
 				withSpace[i++] = chTmp;
-				customElement = customElement && (ch == chTmp);
 			}
 		}
 	}
@@ -273,12 +269,12 @@ int classifyTagHTML(Sci_PositionU start, Sci_PositionU end,
 
 	// No keywords -> all are known
 	char chAttr = SCE_H_TAGUNKNOWN;
+	bool customElement = false;
 	if (tag[0] == '!') {
 		chAttr = SCE_H_SGML_DEFAULT;
 	} else if (!keywords || keywords.InList(tag)) {
 		chAttr = SCE_H_TAG;
-		customElement = false;
-	} else if (customElement && IsLowerCase(tag[0]) && strchr(tag, '-') != nullptr) {
+	} else if (!isXml && IsLowerCase(tag[0]) && strchr(tag, '-') != nullptr) {
 		// HTML custom element name: starts with an ASCII lower alpha and contains hyphen.
 		withSpace[i] = ' ';
 		customElement = strstr(" annotation-xml color-profile font-face font-face-src font-face-uri font-face-format font-face-name missing-glyph ", withSpace) == nullptr;
