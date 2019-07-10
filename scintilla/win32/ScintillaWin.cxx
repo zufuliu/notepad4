@@ -3253,7 +3253,7 @@ void ScintillaWin::EnumDataSourceFormat(const char *tag, LPDATAOBJECT pIDataSour
 				const char *fmtName = GetSourceFormatName(fmt, name, sizeof(name));
 				const int len = sprintf(buf, "%s: fmt[%lu]=%u, 0x%04X; tymed=%lu, %s; name=%s\n",
 					tag, i, fmt, fmt, tymed, typeName, fmtName);
-				InsertCharacter(std::string_view(buf, len), CharacterSource::directInput);
+				InsertCharacter(std::string_view(buf, len), CharacterSource::tentativeInput);
 			}
 		}
 	}
@@ -3272,7 +3272,7 @@ void ScintillaWin::EnumAllClipboardFormat(const char *tag) {
 		const char *fmtName = GetSourceFormatName(fmt, name, sizeof(name));
 		const int len = sprintf(buf, "%s: fmt[%u]=%u, 0x%04X; name=%s\n",
 			tag, i, fmt, fmt, fmtName);
-		InsertCharacter(std::string_view(buf, len), CharacterSource::directInput);
+		InsertCharacter(std::string_view(buf, len), CharacterSource::tentativeInput);
 		i++;
 	}
 }
