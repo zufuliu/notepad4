@@ -397,9 +397,6 @@ class ScintillaWin :
 
 	// The current input Language ID.
 	LANGID inputLang;
-	// some IME not send WM_IME_STARTCOMPOSITION, but WM_IME_COMPOSITION with GCS_COMPSTR.
-	// ensure candidate window near caret when compositing starts.
-	bool gotImeStartComposition;
 
 #if defined(USE_D2D)
 	ID2D1RenderTarget *pRenderTarget;
@@ -626,7 +623,6 @@ ScintillaWin::ScintillaWin(HWND hwnd) {
 	sysCaretWidth = 0;
 	sysCaretHeight = 0;
 	inputLang = InputLanguage();
-	gotImeStartComposition = false;
 
 	styleIdleInQueue = false;
 
@@ -1101,8 +1097,13 @@ void ScintillaWin::SetCandidateWindowPos() {
 		// the caret to move the position of their candidate windows.
 		// On the other hand, Korean IMEs require the lower-left corner of the
 		// caret to move their candidate windows.
-		constexpr int kCaretMargin = 4;
-		y += kCaretMargin;
+		constexpr int kCaretMargin = 1;
+		if (KoreanIME()) {
+			y += kCaretMargin;
+		}
+
+		// set candidate window under IME indicators.
+		y += vs.lineOverlap;
 
 		// Japanese IMEs and Korean IMEs also use the rectangle given to
 		// ::ImmSetCandidateWindow() with its 'dwStyle' parameter CFS_EXCLUDE
@@ -1251,6 +1252,16 @@ sptr_t ScintillaWin::HandleCompositionInline(uptr_t, sptr_t lParam) {
 
 	view.imeCaretBlockOverride = false;
 
+	// See Chromium's InputMethodWinImm32::OnImeComposition()
+	//
+	// Japanese IMEs send a message containing both GCS_RESULTSTR and
+	// GCS_COMPSTR, which means an ongoing composition has been finished
+	// by the start of another composition.
+	if (lParam & GCS_RESULTSTR) {
+		AddWString(imc.GetCompositionString(GCS_RESULTSTR), CharacterSource::imeResult);
+		initialCompose = true;
+	}
+
 	if (lParam & GCS_COMPSTR) {
 		const std::wstring wcs = imc.GetCompositionString(GCS_COMPSTR);
 		if (wcs.empty()) {
@@ -1258,8 +1269,12 @@ sptr_t ScintillaWin::HandleCompositionInline(uptr_t, sptr_t lParam) {
 			return 0;
 		}
 
-		if (initialCompose)
+		if (initialCompose) {
 			ClearBeforeTentativeStart();
+			// first position of preeditstring.
+			// don't move candidate window during compositing.
+			SetCandidateWindowPos();
+		}
 		pdoc->TentativeStart(); // TentativeActive from now on.
 
 		std::vector<int> imeIndicator = MapImeIndicators(imc.GetImeAttributes());
@@ -1284,23 +1299,9 @@ sptr_t ScintillaWin::HandleCompositionInline(uptr_t, sptr_t lParam) {
 		MoveImeCarets(-CurrentPosition() + imeCaretPosDoc);
 
 		view.imeCaretBlockOverride = KoreanIME();
-	} else if (lParam & GCS_RESULTSTR) {
-		AddWString(imc.GetCompositionString(GCS_RESULTSTR), CharacterSource::imeResult);
 	}
 
 	EnsureCaretVisible();
-	// don't move candidate window during compositing.
-	if (!gotImeStartComposition || (lParam & GCS_RESULTSTR) != 0) {
-		// See Chromium's InputMethodWinImm32::OnImeComposition() and InputMethodWinImm32::OnImeEndComposition()
-		//
-		// Japanese IMEs send a message containing both GCS_RESULTSTR and
-		// GCS_COMPSTR, which means an ongoing composition has been finished
-		// by the start of another composition.
-		//
-		// MS Korean IME on hitting Space key: (1) WM_IME_ENDCOMPOSITION (2) WM_IME_COMPOSITION with GCS_RESULTSTR
-		gotImeStartComposition = (lParam & GCS_RESULTSTR) == 0;
-		SetCandidateWindowPos();
-	}
 	ShowCaretAtCurrentPosition();
 	return 0;
 }
@@ -1749,8 +1750,6 @@ sptr_t ScintillaWin::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam
 
 		case WM_IME_STARTCOMPOSITION: 	// dbcs
 			if (KoreanIME() || imeInteraction == imeInline) {
-				gotImeStartComposition = true;
-				SetCandidateWindowPos();
 				return 0;
 			} else {
 				ImeStartComposition();
@@ -2849,7 +2848,6 @@ void ScintillaWin::ImeStartComposition() {
 
 /** Called when IME Window closed. */
 void ScintillaWin::ImeEndComposition() {
-	gotImeStartComposition = false;
 	ShowCaretAtCurrentPosition();
 }
 
