@@ -1292,11 +1292,12 @@ sptr_t ScintillaWin::HandleCompositionInline(uptr_t, sptr_t lParam) {
 			i += ucWidth;
 		}
 
-		// Move IME caret from current last position to imeCaretPos.
-		const int imeEndToImeCaretU16 = imc.GetImeCaretPos() - static_cast<unsigned int>(wcs.size());
-		const Sci::Position imeCaretPosDoc = pdoc->GetRelativePositionUTF16(CurrentPosition(), imeEndToImeCaretU16);
-
-		MoveImeCarets(-CurrentPosition() + imeCaretPosDoc);
+		if (lParam & CS_NOMOVECARET) {
+			// Move back IME caret from current last position to imeCaretPos.
+			const int imeEndToImeCaretU16 = imc.GetImeCaretPos() - static_cast<unsigned int>(wcs.size());
+			const Sci::Position imeCaretPosDoc = pdoc->GetRelativePositionUTF16(CurrentPosition(), imeEndToImeCaretU16);
+			MoveImeCarets(-CurrentPosition() + imeCaretPosDoc);
+		}
 
 		view.imeCaretBlockOverride = KoreanIME();
 	}
