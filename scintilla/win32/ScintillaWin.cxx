@@ -330,12 +330,12 @@ public:
 			::ImmReleaseContext(hwnd, hIMC);
 	}
 
-	unsigned int GetImeCaretPos() noexcept {
+	LONG GetImeCaretPos() noexcept {
 		return ImmGetCompositionStringW(hIMC, GCS_CURSORPOS, nullptr, 0);
 	}
 
 	std::vector<BYTE> GetImeAttributes() {
-		const int attrLen = ::ImmGetCompositionStringW(hIMC, GCS_COMPATTR, nullptr, 0);
+		const LONG attrLen = ::ImmGetCompositionStringW(hIMC, GCS_COMPATTR, nullptr, 0);
 		std::vector<BYTE> attr(attrLen, 0);
 		::ImmGetCompositionStringW(hIMC, GCS_COMPATTR, attr.data(), static_cast<DWORD>(attr.size()));
 		return attr;
@@ -343,7 +343,7 @@ public:
 
 	std::wstring GetCompositionString(DWORD dwIndex) {
 		const LONG byteLen = ::ImmGetCompositionStringW(hIMC, dwIndex, nullptr, 0);
-		std::wstring wcs(byteLen / 2, 0);
+		std::wstring wcs(byteLen / sizeof(wchar_t), 0);
 		::ImmGetCompositionStringW(hIMC, dwIndex, wcs.data(), byteLen);
 		return wcs;
 	}
@@ -1065,7 +1065,8 @@ void ScintillaWin::SetCandidateWindowPos() {
 		const int x = static_cast<int>(pos.x);
 		int y = static_cast<int>(pos.y);
 
-		if (PRIMARYLANGID(inputLang) == LANG_CHINESE) {
+		switch (PRIMARYLANGID(inputLang)) {
+		case LANG_CHINESE: {
 			// As written in a comment in IMM32Manager::CreateImeWindow(),
 			// Chinese IMEs ignore function calls to ::ImmSetCandidateWindow()
 			// when a user disables TSF (Text Service Framework) and CUAS (Cicero
@@ -1079,7 +1080,10 @@ void ScintillaWin::SetCandidateWindowPos() {
 			CANDIDATEFORM candidatePos = { 0, CFS_CANDIDATEPOS, { x, y }, { 0, 0, 0, 0 } };
 			::ImmSetCandidateWindow(imc.hIMC, &candidatePos);
 			::SetCaretPos(x, y);
-		} else if (PRIMARYLANGID(inputLang) == LANG_JAPANESE) {
+		}
+		break;
+
+		case LANG_JAPANESE: {
 			// When a user disables TSF (Text Service Framework) and CUAS (Cicero
 			// Unaware Application Support), Chinese IMEs somehow ignore function calls
 			// to ::ImmSetCandidateWindow(), i.e. they do not move their candidate
@@ -1092,14 +1096,17 @@ void ScintillaWin::SetCandidateWindowPos() {
 			// their window position, we also create a caret for Japanese IMEs.
 			::SetCaretPos(x, y + sysCaretHeight);
 		}
+		break;
 
-		// Chinese IMEs and Japanese IMEs require the upper-left corner of
-		// the caret to move the position of their candidate windows.
-		// On the other hand, Korean IMEs require the lower-left corner of the
-		// caret to move their candidate windows.
-		constexpr int kCaretMargin = 1;
-		if (KoreanIME()) {
+		case LANG_KOREAN: {
+			// Chinese IMEs and Japanese IMEs require the upper-left corner of
+			// the caret to move the position of their candidate windows.
+			// On the other hand, Korean IMEs require the lower-left corner of the
+			// caret to move their candidate windows.
+			constexpr int kCaretMargin = 1;
 			y += kCaretMargin;
+		}
+		break;
 		}
 
 		// set candidate window under IME indicators.
@@ -1294,7 +1301,7 @@ sptr_t ScintillaWin::HandleCompositionInline(uptr_t, sptr_t lParam) {
 
 		if (lParam & CS_NOMOVECARET) {
 			// Move back IME caret from current last position to imeCaretPos.
-			const int imeEndToImeCaretU16 = imc.GetImeCaretPos() - static_cast<unsigned int>(wcs.size());
+			const LONG imeEndToImeCaretU16 = imc.GetImeCaretPos() - static_cast<LONG>(wcs.size());
 			const Sci::Position imeCaretPosDoc = pdoc->GetRelativePositionUTF16(CurrentPosition(), imeEndToImeCaretU16);
 			MoveImeCarets(-CurrentPosition() + imeCaretPosDoc);
 		}
