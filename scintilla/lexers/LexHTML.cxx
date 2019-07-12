@@ -225,6 +225,18 @@ void classifyAttribHTML(Sci_PositionU start, Sci_PositionU end, const WordList &
 	styler.ColourTo(end, chAttr);
 }
 
+// https://html.spec.whatwg.org/multipage/custom-elements.html#custom-elements-core-concepts
+bool isHTMLCustomElement(const char *tag, size_t length) noexcept {
+	// HTML custom element name: starts with an ASCII lower alpha and contains hyphen.
+	if (length < 2 || !IsLowerCase(tag[0])) {
+		return false;
+	}
+	if (strchr(tag, '-') == nullptr) {
+		return false;
+	}
+	return true;
+}
+
 int classifyTagHTML(Sci_PositionU start, Sci_PositionU end,
 	const WordList &keywords, Accessor &styler, bool &tagDontFold,
 	bool caseSensitive, bool isXml, bool allowScripts) {
@@ -274,11 +286,9 @@ int classifyTagHTML(Sci_PositionU start, Sci_PositionU end,
 		chAttr = SCE_H_SGML_DEFAULT;
 	} else if (!keywords || keywords.InList(tag)) {
 		chAttr = SCE_H_TAG;
-	} else if (!isXml && IsLowerCase(tag[0]) && strchr(tag, '-') != nullptr) {
-		// HTML custom element name: starts with an ASCII lower alpha and contains hyphen.
-		withSpace[i] = ' ';
-		customElement = strstr(" annotation-xml color-profile font-face font-face-src font-face-uri font-face-format font-face-name missing-glyph ", withSpace) == nullptr;
-		chAttr = customElement ? SCE_H_TAG : SCE_H_TAGUNKNOWN;
+	} else if (!isXml && isHTMLCustomElement(tag, i - 1)) {
+		customElement = true;
+		chAttr = SCE_H_TAG;
 	}
 	styler.ColourTo(end, chAttr);
 	if (chAttr == SCE_H_TAG && !customElement) {
@@ -684,7 +694,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 	const bool isDjango = styler.GetPropertyInt("lexer.html.django", 0) != 0;
 
 	const CharacterSet setHTMLWord(CharacterSet::setAlphaNum, ".-_:!#", 0x80, true);
-	const CharacterSet setTagContinue(CharacterSet::setAlphaNum, ".-_:!#[", 0x80, true);
+	const CharacterSet setTagContinue(CharacterSet::setAlphaNum, ".-_:!#[]", 0x80, true);
 	const CharacterSet setAttributeContinue(CharacterSet::setAlphaNum, ".-_:!#/", 0x80, true);
 	// characters not allowed in unquoted attribute value
 	const CharacterSet setNonAttrValue(CharacterSet::setNone, "\"\'\\`=<> \t\n\v\f\r");
