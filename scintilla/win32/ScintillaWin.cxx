@@ -622,7 +622,7 @@ ScintillaWin::ScintillaWin(HWND hwnd) {
 	sysCaretBitmap = nullptr;
 	sysCaretWidth = 0;
 	sysCaretHeight = 0;
-	inputLang = InputLanguage();
+	inputLang = MAKELANGID(LANG_ENGLISH, SUBLANG_ENGLISH_US);
 
 	styleIdleInQueue = false;
 
@@ -1802,11 +1802,12 @@ sptr_t ScintillaWin::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam
 			return 0;
 
 		case WM_IME_SETCONTEXT:
-			if (KoreanIME() || imeInteraction == imeInline) {
-				if (wParam) {
-					LPARAM NoImeWin = lParam;
-					NoImeWin = NoImeWin & (~ISC_SHOWUICOMPOSITIONWINDOW);
-					return ::DefWindowProc(MainHWND(), iMessage, wParam, NoImeWin);
+			if (wParam) { // window is activated
+				inputLang = InputLanguage();
+
+				if (KoreanIME() || imeInteraction == imeInline) {
+					// hide IME's composition window.
+					lParam &= ~ISC_SHOWUICOMPOSITIONWINDOW;
 				}
 			}
 			return ::DefWindowProc(MainHWND(), iMessage, wParam, lParam);
