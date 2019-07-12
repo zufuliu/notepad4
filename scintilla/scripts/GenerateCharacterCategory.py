@@ -101,7 +101,8 @@ def isPrivateChar(c):
 # https://en.wikipedia.org/wiki/CJK_Unified_Ideographs
 # https://en.wikipedia.org/wiki/Katakana
 # https://en.wikipedia.org/wiki/Hangul
-# Chapter 18 East Asia in Unicode Standard 12.0
+# Chapter 18 East Asia http://www.unicode.org/versions/Unicode12.0.0/ch18.pdf
+# Unicode Han Database (Unihan) https://unicode.org/reports/tr38/#BlockListing
 CJKBlockList = [
 	(0x3400, 0x4DBF), # U+3400..U+4DBF CJK Unified Ideographs Extension A
 	(0x4E00, 0x9FFF), # U+4E00..U+9FFF CJK Unified Ideographs
