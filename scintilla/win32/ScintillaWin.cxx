@@ -1308,20 +1308,24 @@ sptr_t ScintillaWin::HandleCompositionInline(uptr_t, sptr_t lParam) {
 			i += ucWidth;
 		}
 
-		// Retrieve the selection range information. If CS_NOMOVECARET is specified,
-		// that means the cursor should not be moved, then we just place the caret at
-		// the beginning of the composition string. Otherwise we should honour the
-		// GCS_CURSORPOS value if it's available.
-		Sci::Position imeEndToImeCaretU16 = -static_cast<Sci::Position>(wcs.size());
-		if (!(lParam & CS_NOMOVECARET) && (lParam & GCS_CURSORPOS)) {
-			imeEndToImeCaretU16 += imc.GetImeCaretPos();
-		}
-		// Don't move the caret when input string is only a target string.
-		if (imeEndToImeCaretU16 != 0 && !onlyTarget) {
-			// Move back IME caret from current last position to imeCaretPos.
-			const Sci::Position currentPos = CurrentPosition();
-			const Sci::Position imeCaretPosDoc = pdoc->GetRelativePositionUTF16(currentPos, imeEndToImeCaretU16);
-			MoveImeCarets(-currentPos + imeCaretPosDoc);
+		// Japanese IME after pressing Tab replaces input string with first candidate item (target string);
+		// when selecting other candidate item, previous item will be replaced with current one.
+		// Don't move the caret when current added string is only a target string.
+		if (!onlyTarget) {
+			// Retrieve the selection range information. If CS_NOMOVECARET is specified,
+			// that means the cursor should not be moved, then we just place the caret at
+			// the beginning of the composition string. Otherwise we should honour the
+			// GCS_CURSORPOS value if it's available.
+			Sci::Position imeEndToImeCaretU16 = -static_cast<Sci::Position>(wcs.size());
+			if (!(lParam & CS_NOMOVECARET) && (lParam & GCS_CURSORPOS)) {
+				imeEndToImeCaretU16 += imc.GetImeCaretPos();
+			}
+			if (imeEndToImeCaretU16 != 0 && !onlyTarget) {
+				// Move back IME caret from current last position to imeCaretPos.
+				const Sci::Position currentPos = CurrentPosition();
+				const Sci::Position imeCaretPosDoc = pdoc->GetRelativePositionUTF16(currentPos, imeEndToImeCaretU16);
+				MoveImeCarets(-currentPos + imeCaretPosDoc);
+			}
 		}
 
 		view.imeCaretBlockOverride = KoreanIME();
