@@ -1310,7 +1310,8 @@ sptr_t ScintillaWin::HandleCompositionInline(uptr_t, sptr_t lParam) {
 
 		// Japanese IME after pressing Tab replaces input string with first candidate item (target string);
 		// when selecting other candidate item, previous item will be replaced with current one.
-		// Don't move the caret when current added string is only a target string.
+		// After candidate item been added, it's looks like been full selected, it's better to keep caret
+		// at end of "selection" (end of input) instead of jump to beginning of input / "selection".
 		if (!onlyTarget) {
 			// Retrieve the selection range information. If CS_NOMOVECARET is specified,
 			// that means the cursor should not be moved, then we just place the caret at
