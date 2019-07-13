@@ -623,7 +623,7 @@ ScintillaWin::ScintillaWin(HWND hwnd) {
 	sysCaretBitmap = nullptr;
 	sysCaretWidth = 0;
 	sysCaretHeight = 0;
-	inputLang = MAKELANGID(LANG_ENGLISH, SUBLANG_ENGLISH_US);
+	inputLang = LANG_USER_DEFAULT;
 
 	styleIdleInQueue = false;
 
@@ -1300,11 +1300,19 @@ sptr_t ScintillaWin::HandleCompositionInline(uptr_t, sptr_t lParam) {
 			i += ucWidth;
 		}
 
-		if (lParam & CS_NOMOVECARET) {
+		// Retrieve the selection range information. If CS_NOMOVECARET is specified,
+		// that means the cursor should not be moved, then we just place the caret at
+		// the beginning of the composition string. Otherwise we should honour the
+		// GCS_CURSORPOS value if it's available.
+		Sci::Position imeEndToImeCaretU16 = -static_cast<Sci::Position>(wcs.size());
+		if (!(lParam & CS_NOMOVECARET) && (lParam & GCS_CURSORPOS)) {
+			imeEndToImeCaretU16 += imc.GetImeCaretPos();
+		}
+		if (imeEndToImeCaretU16) {
 			// Move back IME caret from current last position to imeCaretPos.
-			const LONG imeEndToImeCaretU16 = imc.GetImeCaretPos() - static_cast<LONG>(wcs.size());
-			const Sci::Position imeCaretPosDoc = pdoc->GetRelativePositionUTF16(CurrentPosition(), imeEndToImeCaretU16);
-			MoveImeCarets(-CurrentPosition() + imeCaretPosDoc);
+			const Sci::Position currentPos = CurrentPosition();
+			const Sci::Position imeCaretPosDoc = pdoc->GetRelativePositionUTF16(currentPos, imeEndToImeCaretU16);
+			MoveImeCarets(-currentPos + imeCaretPosDoc);
 		}
 
 		view.imeCaretBlockOverride = KoreanIME();
