@@ -1198,12 +1198,16 @@ void ScintillaWin::ToggleHanja() {
 namespace {
 
 // https://docs.microsoft.com/en-us/windows/desktop/Intl/composition-string
-std::vector<int> MapImeIndicators(const std::vector<BYTE> &inputStyle) {
-	std::vector<int> imeIndicator(inputStyle.size(), SC_INDICATOR_UNKNOWN);
-	for (size_t i = 0; i < inputStyle.size(); i++) {
-		switch (static_cast<int>(inputStyle.at(i))) {
+std::vector<int> MapImeIndicators(const std::vector<BYTE> &inputStyle, bool &onlyTarget) {
+	const size_t attrLen = inputStyle.size();
+	std::vector<int> imeIndicator(attrLen, SC_INDICATOR_UNKNOWN);
+	onlyTarget = attrLen != 0;
+
+	for (size_t i = 0; i < attrLen; i++) {
+		switch (inputStyle.at(i)) {
 		case ATTR_INPUT:
 			imeIndicator[i] = SC_INDICATOR_INPUT;
+			onlyTarget = false;
 			break;
 		case ATTR_TARGET_NOTCONVERTED:
 		case ATTR_TARGET_CONVERTED:
@@ -1211,9 +1215,11 @@ std::vector<int> MapImeIndicators(const std::vector<BYTE> &inputStyle) {
 			break;
 		case ATTR_CONVERTED:
 			imeIndicator[i] = SC_INDICATOR_CONVERTED;
+			onlyTarget = false;
 			break;
 		default:
 			imeIndicator[i] = SC_INDICATOR_UNKNOWN;
+			onlyTarget = false;
 			break;
 		}
 	}
@@ -1286,7 +1292,8 @@ sptr_t ScintillaWin::HandleCompositionInline(uptr_t, sptr_t lParam) {
 		}
 		pdoc->TentativeStart(); // TentativeActive from now on.
 
-		std::vector<int> imeIndicator = MapImeIndicators(imc.GetImeAttributes());
+		bool onlyTarget = false;
+		std::vector<int> imeIndicator = MapImeIndicators(imc.GetImeAttributes(), onlyTarget);
 
 		const UINT codePage = CodePageOfDocument();
 		char inBufferCP[16];
@@ -1309,7 +1316,8 @@ sptr_t ScintillaWin::HandleCompositionInline(uptr_t, sptr_t lParam) {
 		if (!(lParam & CS_NOMOVECARET) && (lParam & GCS_CURSORPOS)) {
 			imeEndToImeCaretU16 += imc.GetImeCaretPos();
 		}
-		if (imeEndToImeCaretU16) {
+		// Don't move the caret when input string is only a target string.
+		if (imeEndToImeCaretU16 != 0 && !onlyTarget) {
 			// Move back IME caret from current last position to imeCaretPos.
 			const Sci::Position currentPos = CurrentPosition();
 			const Sci::Position imeCaretPosDoc = pdoc->GetRelativePositionUTF16(currentPos, imeEndToImeCaretU16);
