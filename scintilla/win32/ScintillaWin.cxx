@@ -1111,13 +1111,14 @@ void ScintillaWin::SetCandidateWindowPos() {
 		}
 
 		// set candidate window under IME indicators.
-		y += vs.lineOverlap;
+		// required for Google Chinese IME on Win7.
+		const int y2 = y + std::max(4, vs.lineHeight/4);
 
 		// Japanese IMEs and Korean IMEs also use the rectangle given to
 		// ::ImmSetCandidateWindow() with its 'dwStyle' parameter CFS_EXCLUDE
 		// to move their candidate windows when a user disables TSF and CUAS.
 		// Therefore, we also set this parameter here.
-		CANDIDATEFORM excludeRect = { 0, CFS_EXCLUDE, { x, y },  { x, y, x + sysCaretWidth, y + sysCaretHeight }};
+		CANDIDATEFORM excludeRect = { 0, CFS_EXCLUDE, { x, y2 },  { x, y, x + sysCaretWidth, y + sysCaretHeight }};
 		::ImmSetCandidateWindow(imc.hIMC, &excludeRect);
 	}
 }
