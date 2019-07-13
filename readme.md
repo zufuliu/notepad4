@@ -211,6 +211,7 @@ Or build from source, see the [Wiki](https://github.com/zufuliu/notepad2/wiki/Bu
 * [Build Notepad2 and metapath](https://github.com/zufuliu/notepad2/wiki/Build-Notepad2)
 * [Notepad2 Wiki](https://github.com/zufuliu/notepad2/wiki)
 
-### Other projects based on original Notepad2 or Notepad2-mod:
+### Other projects based on (original) Notepad2 or Notepad2-mod:
 * [Notepad3](https://github.com/rizonesoft/Notepad3)
 * [Notepad2e](https://github.com/ProgerXP/Notepad2e)
+* [Notepad2 Korean Vision](https://teus.me/category/IT/Notepad2)
