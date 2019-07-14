@@ -1,5 +1,6 @@
 Build Notepad2 and metapath
 	https://github.com/zufuliu/notepad2/wiki/Build-Notepad2
+	https://github.com/zufuliu/notepad2/wiki/Localization
 
 echo | clang -dM -E -
 echo | clang-cl -Xclang -dM -E -
