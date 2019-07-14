@@ -3109,7 +3109,7 @@ BOOL Style_StrGetCase(LPCWSTR lpszStyle, int *i) {
 			return TRUE;
 		//case L'm':
 		//case L'M':
-		//	*i = SC_CASE_MIXED; // normal case
+		//	*i = SC_CASE_MIXED; // default normal case
 		//	return TRUE;
 		}
 	}
@@ -3662,10 +3662,9 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 	case WM_INITDIALOG: {
 		ResizeDlg_InitY2(hwnd, cxStyleCustomizeDlg, cyStyleCustomizeDlg, IDC_RESIZEGRIP3, IDC_STYLEEDIT, IDC_STYLEVALUE_DEFAULT);
 
-		WCHAR szTitle[512];
-		GetWindowText(hwnd, szTitle, COUNTOF(szTitle));
-		lstrcat(szTitle, L" - ");
-		lstrcat(szTitle, GetStyleThemeTitle());
+		WCHAR szTitle[256];
+		const UINT idsTitle = (np2StyleTheme == StyleTheme_Dark) ? IDS_CONFIG_THEME_TITLE_DARK : IDS_CONFIG_THEME_TITLE_DEFAULT;
+		GetString(idsTitle, szTitle, COUNTOF(szTitle));
 		SetWindowText(hwnd, szTitle);
 
 		hwndTV = GetDlgItem(hwnd, IDC_STYLELIST);

@@ -2028,9 +2028,11 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_EOLMODENAME_CRLF    "Windows (CR+LF)"
-    IDS_EOLMODENAME_LF      "Unix/macOS (LF)"
-    IDS_EOLMODENAME_CR      "Classic Mac OS (CR)"
+	IDS_EOLMODENAME_CRLF			"Windows (CR+LF)"
+	IDS_EOLMODENAME_LF				"Unix/macOS (LF)"
+	IDS_EOLMODENAME_CR				"Classic Mac OS (CR)"
+	IDS_CONFIG_THEME_TITLE_DEFAULT	"Customize Schemes - Default Theme"
+	IDS_CONFIG_THEME_TITLE_DARK		"Customize Schemes - Dark Theme"
 END
 
 
