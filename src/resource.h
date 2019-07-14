@@ -785,6 +785,7 @@
 // Encoding 61000
 #define IDS_SELRECT_CURRENT_ENCODING	61200
 #define IDS_SELRECT_RELOAD_ENCODING		61201
+#define IDS_SELRECT_DEFAULT_ENCODING	61202
 // Lexer and Style 63000
 
 // Next default values for new objects

@@ -2023,6 +2023,7 @@ BEGIN
 
 	IDS_SELRECT_CURRENT_ENCODING	"Select current file &encoding:"
 	IDS_SELRECT_RELOAD_ENCODING		"Select source &encoding to reload file:"
+	IDS_SELRECT_DEFAULT_ENCODING	"Select default &encoding for new file:"
 END
 
 STRINGTABLE

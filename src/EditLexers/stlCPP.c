@@ -110,43 +110,132 @@ static KEYWORDLIST Keywords_CPP = {{
 // time.h
 "timespec "
 
-// STL class
-"basic_string string wstring u16string u32string "
-"vector deque list map multimap multiset queue priority_queue set stack initializer_list forward_list gslice gslice_array "
-"unordered_map unordered_set array valarray tuple tuple_element tuple_size bitset hash pair indirect_array mask_array slice slice_array unordered_multimap unordered_multiset rb_tree bool_set dynamic_bitset "
-
-"char_traits ios_base basic_ios "
-"basic_streambuf basic_istream basic_ostream basic_iostream "
-"basic_stringbuf basic_istringstream basic_ostringstream basic_stringstream "
-"basic_filebuf basic_ifstream basic_ofstream basic_fstream "
-"ios streambuf istream ostream iostream stringbuf istringstream ostringstream stringstream filebuf ifstream ofstream fstream "
-"wios wstreambuf wistream wostream wiostream wstringbuf wistringstream wostringstream wstringstream wfilebuf wifstream wofstream wfstream "
-
-"input_iterator_tag output_iterator_tag forward_iterator_tag bidirectional_iterator_tag random_access_iterator_tag "
-"iterator reverse_iterator back_insert_iterator front_insert_iterator insert_iterator move_iterator raw_storage_iterator "
-"istream_iterator ostream_iterator istreambuf_iterator ostreambuf_iterator "
-
+// C++ STL class
+// <limits>
+"numeric_limits "
+// <new>
+"bad_alloc bad_array_new_length "
+// <typeinfo>
 "type_info bad_cast bad_typeid "
-"type_index bad_alloc "
+// <exception>
 "exception bad_exception nested_exception "
-"shared_ptr weak_ptr enable_shared_from_this bad_weak_ptr "
-"default_delete unique_ptr "
+// <initializer_list>
+"initializer_list "
+"iterator const_iterator "
+// <stdexcept>
+"logic_error domain_error invalid_argument length_error out_of_range "
+"runtime_error range_error overflow_error underflow_error "
+// <system_error>
+"error_category error_code error_condition system_error "
+// <utility>
+"to_chars_result from_chars_result integer_sequence pair tuple_size tuple_element "
+// <tuple>
+"tuple "
+// <optional>
+"optional nullopt_t bad_optional_access "
+// <variant>
+"variant variant_size variant_alternative monostate bad_variant_access "
+// <any>
+"any bad_any_cast "
+// <bitset>
+"bitset "
+// <memory>
+"pointer_traits uses_allocator allocator_traits allocator default_delete unique_ptr "
+"bad_weak_ptr shared_ptr weak_ptr owner_less enable_shared_from_this "
+// <memory_resource>
+"memory_resource polymorphic_allocator pool_options synchronized_pool_resource unsynchronized_pool_resource monotonic_buffer_resource "
+// <scoped_allocator>
+"scoped_allocator_adaptor "
+// <functional>
+"reference_wrapper is_bind_expression is_placeholder function bad_function_call "
+"default_searcher boyer_moore_searcher boyer_moore_horspool_searcher "
+// <type_traits>
+"integral_constant bool_constant true_type false_type "
+// <ratio>
+// <chrono>
+"time_point system_clock steady_clock high_resolution_clock "
+// <typeindex>
+"type_index "
+// <execution>
+"is_execution_policy sequenced_policy parallel_policy parallel_unsequenced_policy "
+// <string>
+"char_traits basic_string string u16string u32string wstring "
+// <string_view>
+"basic_string_view string_view u16string_view u32string_view wstring_view "
+// <locale> <codecvt>
+"locale facet ctype_base codecvt_base codecvt codecvt_byname "
+"num_get num_put numpunct numpunct_byname "
+"time_base time_get time_put time_put_byname "
+"money_base money_get money_put moneypunct moneypunct_byname "
+"messages_base messages_byname "
+// <array> <deque> <forward_list> <list> <vector>
+"array deque forward_list list vector "
+// <map> <set>
+"map multimap set multiset "
+// <unordered_map> <unordered_set>
+"hash unordered_map unordered_multimap unordered_set unordered_multiset "
+// <queue> <stack>
+"queue priority_queue stack "
+// <iterator>
+"iterator_traits input_iterator_tag output_iterator_tag forward_iterator_tag bidirectional_iterator_tag random_access_iterator_tag "
+"reverse_iterator back_insert_iterator front_insert_iterator insert_iterator move_iterator "
+"istream_iterator ostream_iterator istreambuf_iterator ostreambuf_iterator "
+// <random>
+"linear_congruential_engine mersenne_twister_engine subtract_with_carry_engine discard_block_engine independent_bits_engine shuffle_order_engine random_device seed_seq "
+"uniform_int_distribution uniform_real_distribution bernoulli_distribution binomial_distribution geometric_distribution negative_binomial_distribution poisson_distribution exponential_distribution gamma_distribution weibull_distribution extreme_value_distribution normal_distribution lognormal_distribution chi_squared_distribution cauchy_distribution fisher_f_distribution student_t_distribution discrete_distribution piecewise_constant_distribution piecewise_linear_distribution "
+// <valarray>
+"valarray slice slice_array gslice gslice_array mask_array indirect_array "
+// <ios>
+"streamoff streamsize streampos wstreampos "
+"ios_base basic_ios ios wios "
+// <streambuf>
+"basic_streambuf streambuf wstreambuf "
+// <istream>
+"basic_istream istream wistream "
+// <ostream>
+"basic_ostream ostream wostream "
+// <iostream>
+"basic_iostream iostream wiostream "
+// <sstream>
+"basic_stringbuf stringbuf wstringbuf basic_istringstream istringstream wistringstream basic_ostringstream ostringstream wostringstream basic_stringstream stringstream wstringstream "
+// <fstream>
+"basic_filebuf filebuf wfilebuf basic_ifstream ifstream wifstream basic_ofstream ofstream wofstream basic_fstream fstream wfstream "
+// <filesystem>
+// <regex>
+"regex_error regex_traits basic_regex regex wregex "
+"sub_match csub_match wcsub_match ssub_match wssub_match "
+"match_results cmatch wcmatch smatch wsmatch "
+"regex_iterator cregex_iterator wcregex_iterator sregex_iterator wsregex_iterator "
+"regex_token_iterator cregex_token_iterator wcregex_token_iterator sregex_token_iterator wsregex_token_iterator "
+// <atomic>
+"atomic "
+// <thread>
+"thread "
+// <mutex> <shared_mutex>
+"mutex recursive_mutex timed_mutex recursive_timed_mutex shared_mutex shared_timed_mutex "
+"lock_guard scoped_lock unique_lock shared_lock "
+// <condition_variable>
+"condition_variable condition_variable_any "
+// <future>
+"promise future shared_future packaged_task "
 
-"numeric_limits integral_constant "
+// common typedef
+" const_reverse_iterator "
+"traits_type allocator_type iterator_category container_type element_type deleter_type weak_type "
+"string_type iter_type "
+"key_type mapped_type key_compare node_type insert_return_type value_compare "
+"hasher key_equal local_iterator const_local_iterator "
+"istream_type ostream_type streambuf_type "
 
-"pointer_traits allocator_traits allocator uses_allocator scoped_allocator_adaptor "
-"array_allocator bitmap_allocator "
-
-"rebind iterator_traits "
-
-"function unary_function binary_function "
-
-"iterator_type value_type allocator_type size_type difference_type reference const_reference pointer pointer const_pointer iterator const_iterator reverse_iterator const_reverse_iterator traits_type iterator_category container_type "
 
 // old class
+"rb_tree bool_set dynamic_bitset "
+"raw_storage_iterator "
+"array_allocator bitmap_allocator "
+"rebind unary_function binary_function "
+"iterator_type "
 "hash_map hash_multimap hash_set hash_multiset hashtable auto_ptr auto_ptr_ref "
 "strstreambuf istrstream ostrstream strstream binder1st binder2nd "
-
 
 // MFC
 "CString CStringArray CStringList CArray CList CMap CTypedPtrArray CTypedPtrList CTypedPtrMap CTypeLibCacheMap CSimpleList CByteArray CWordArray CDWordArray CUIntArray CPtrArray CObArray CPtrList CObList CMapWordToPtr CMapPtrToWord CMapPtrToPtr CMapWordToOb CMapStringToPtr CMapStringToOb CMapStringToString CTypedSimpleList "
@@ -163,9 +252,6 @@ static KEYWORDLIST Keywords_CPP = {{
 "NSError NSException NSBundle NSIndexSet NSCharacterSet NSFileManager NSIndexPath NSDate NSLocale NSNotification NSNotificationCenter NSUUID "
 "UIApplication UIDevice UIWindow UIScreen UIView UIViewController UIColor UIFont UIImage UIImageView UILabel UIButton UIScrollView UITableView UITableViewCell UISwitch UISlider UISegmentedControl UITextField UIGestureRecognizer UITouch UIEvent UITapGestureRecognizer UISwipeGestureRecognizer UIWebView UINavigationBar UINavigationItem UIBarButtonItem UITextView UIAlertView UISearchBar "
 
-// third lib
-"ASIHTTPRequest "
-
 , // 6 Interface
 // Win32/MFC
 "IUnknown IStream "
@@ -180,12 +266,22 @@ static KEYWORDLIST Keywords_CPP = {{
 // threads.h
 "mtx_plain mtx_recursive mtx_timed "
 "thrd_timedout thrd_success thrd_busy thrd_error thrd_nomem "
+
+// <limits>
+"float_round_style float_denorm_style "
+// <utility>
+"chars_format "
+// <memory>
+"pointer_safety "
+// <locale> <codecvt>
+"dateorder "
+
 // ios_base
 "fmtflags iostate openmode seekdir "
 
 , // 8 Constant
 "__cplusplus __cplusplus_cli __assembler __midl "
-"__FILE__ __FUNCTION__ __LINE__ __DATE__ __TIME__ __TIMESTAMP__ __func__ __VA_ARGS__ "
+"__FILE__ __FUNCTION__ __LINE__ __DATE__ __TIME__ __TIMESTAMP__ __func__ __VA_ARGS__ __VA_OPT__ "
 "__STDC__ __STDC_HOSTED__ __STDC_VERSION__ __STDC_IEC_559__ __STDC_IEC_559_COMPLEX__ __STDC_ISO_10646__ "
 " __COUNTER__ __STRICT_ANSI__ __PRETTY_FUNCTION__ __STDC_DEC_FP__ "
 "_MSC_VER _MSC_FULL_VER "
@@ -272,6 +368,19 @@ static KEYWORDLIST Keywords_CPP = {{
 "__unsafe_unretained __strong __weak __bridge __bridge_transfer __bridge_retained __block __autoreleasing "
 
 , // 10 2nd Type Keyword
+// <new>
+"new_handler align_val_t "
+// <exception>
+"terminate_handler exception_ptr "
+// <initializer_list>
+"value_type reference const_reference size_type "
+// <memory>
+"pointer const_pointer void_pointer const_void_pointer element_type difference_type "
+// <functional>
+"result_type "
+// <string>
+"char_type int_type off_type pos_type state_type "
+
 // Win32
 "VOID PVOID LPVOID LPCVOID BOOL PBOOL LPBOOL BOOLEAN PBOOLEAN BYTE PBYTE LPBYTE WORD PWORD LPWORD ATOM DWORD PDWORD LPDWORD "
 "UCHAR PUCHAR SHORT PSHORT USHORT PUSHORT INT PINT LPINT UINT PUINT LONG PLONG LPLONG ULONG PULONG FLOAT PFLOAT "
@@ -473,27 +582,132 @@ static KEYWORDLIST Keywords_CPP = {{
 "iswctype() wctype() towlower() towupper() towctrans() wctrans() "
 
 , // 14 C++ Function
+// <limits>
+"min() max() epsilon() round_error() infinity() quiet_NaN() signaling_NaN() denorm_min() " // numeric_limits
+// <new>
+"get_new_handler() set_new_handler() launder() "
+// <typeinfo>
+"before() hash_code() name() " // type_info
+// <exception>
+"what() " // exception
+"rethrow_nested() nested_ptr() " // nested_exception
+"get_terminate() set_terminate() terminate() "
+"uncaught_exceptions() current_exception() rethrow_exception() make_exception_ptr() throw_with_nested() rethrow_if_nested() "
+// <initializer_list>
+"size() begin() end() " // initializer_list
+// <system_error>
+"default_error_condition() equivalent() message() " // error_category
+"generic_category() system_category() make_error_code() make_error_condition() "
+"assign() clear() value() " // error_code
+"code() " // system_error
+// <utility>
+"swap() exchange() forward() move() move_if_noexcept() as_const() declval() to_chars() from_chars() "
+"make_pair() get() " // pair
+// <tuple>
+"make_tuple() forward_as_tuple() tie() tuple_cat() apply() make_from_tuple() "
+// <optional>
+"emplace() has_value() value_or() reset() " // optional
+"make_optional() "
+// <variant>
+"valueless_by_exception() index() " // variant
+"holds_alternative() get_if() visit() "
+// <any>
+"type() " // any
+"make_any() any_cast() "
+// <bitset>
+"flip() count() test() all() any() none() "
+// <memory>
+"pointer_to() " // pointer_traits
+"get_pointer_safety() align() "
+"allocate() deallocate() construct() destroy() max_size() " // allocator_traits
+"addressof() destroy_at() destroy() destroy_n() "
+"get_deleter() release() " // unique_ptr
+"make_unique() "
+"use_count() owner_before() " // shared_ptr
+"make_shared() allocate_shared() static_pointer_cast() dynamic_pointer_cast() const_pointer_cast() reinterpret_pointer_cast() "
+"expired() lock() " // weak_ptr
+"shared_from_this() weak_from_this() "
+// <memory_resource>
+"is_equal() " // memory_resource
+"resource() " // polymorphic_allocator
+"new_delete_resource() null_memory_resource() set_default_resource() get_default_resource() "
+"upstream_resource() options() " // synchronized_pool_resource
+// <scoped_allocator>
+"inner_allocator() outer_allocator() "
+// <functional>
+"invoke() ref() cref() not_fn() bind() mem_fn() "
+"target_type() target() " // function
+// <chrono>
+"zero() duration_cast() time_point_cast() "
+"now() to_time_t() from_time_t() " // system_clock
+// <string>
+"eq() lt() compare() length() find() copy() not_eof() to_char_type() to_int_type() eq_int_type() eof() " // char_traits
+"getline() stoi() stol() stoul() stoll() stoull() stof() stod() stold() to_string() to_wstring() "
+"rbegin() rend() cbegin() cend() crbegin() crend() " // basic_string iterator
+"resize() capacity() reserve() shrink_to_fit() clear() empty() at() front() back() append() assign() insert() erase() pop_back() replace() c_str() data() rfind() find_first_of() find_last_of() find_first_not_of() find_last_not_of() substr() " // basic_string
+// <string_view>
+"remove_prefix() remove_suffix() "
+// <locale> <codecvt>
+"global() classic() " // locale
+"use_facet() has_facet() "
+"is() scan_is() scan_not() widen() narrow() " // ctype
+"out() unshift() in() encoding() always_noconv() max_length() " // codecvt
+"put() " // num_put
+"decimal_point() thousands_sep() grouping() truename() falsename() " // numpunct
+"transform() " // collate
+"date_order() get_time() get_date() get_weekday() get_monthname() get_year() "
+"curr_symbol() positive_sign() negative_sign() frac_digits() pos_format() neg_format() " // moneypunct
+"open() close() " // messages
+// <array> <deque> <forward_list> <list> <vector>
+"fill() " // array
+"get_allocator() emplace_front() emplace_back() push_front() push_back() pop_front() " // deque
+"before_begin() cbefore_begin() emplace_after() insert_after() erase_after() splice_after() remove() remove_if() unique() merge() sort() reverse() " // forward_list
+"splice() " // list
+// <map> <set>
+"emplace_hint() extract() try_emplace() insert_or_assign() lower_bound() upper_bound() equal_range() " // map
+// <unordered_map> <unordered_set>
+"hash_function() key_eq() bucket_count() max_bucket_count() bucket_size() bucket() load_factor() max_load_factor() rehash() " // unordered_map
+// <queue> <stack>
+"push() pop() top() "
+// <iterator>
+"advance() distance() next() prev() "
+"make_reverse_iterator() back_inserter() front_inserter() inserter() make_move_iterator() "
+// <algorithm>
+"all_of() any_of() none_of() for_each() for_each_n() find_if() find_if_not() find_end() adjacent_find() "
+"count_if() mismatch() equal() is_permutation() search() search_n() "
+"copy_n() copy_if() copy_backward() move_backward() swap_ranges() iter_swap() replace_if() replace_copy() replace_copy_if() fill_n() "
+"generate() generate_n() remove_copy() remove_copy_if() unique_copy() reverse_copy() rotate() rotate_copy() sample() shuffle() "
+"is_partitioned() partition() stable_partition() partition_copy() partition_point() " // partitions
+"stable_sort() partial_sort() partial_sort_copy() is_sorted() is_sorted_until() nth_element() " // sorting and related operations
+"binary_search() merge() inplace_merge() includes() "
+"set_union() set_intersection() set_difference() set_symmetric_difference() "
+"push_heap() pop_heap() make_heap() sort_heap() is_heap() is_heap_until() "
+"minmax() min_element() max_element() minmax_element() clamp() lexicographical_compare() next_permutation() prev_permutation() "
+// <complex>
+"real() imag() arg() norm() proj() polar() "
+// <random>
+"base() " // linear_congruential_engine
+"entropy() " // random_device
+"param() " // seed_seq
+"generate_canonical() "
+"mean() "// poisson_distribution
+"lambda() " // exponential_distribution
+"alpha() beta() " // gamma_distribution
+"stddev() " // normal_distribution
+"probabilities() " // discrete_distribution
+"intervals() densities() " // piecewise_constant_distribution
+// <valarray>
+"shift() cshift() start() " // valarray
+"stride() " // slice
+// <numeric>
+"accumulate() reduce() inner_product() transform_reduce() partial_sum() exclusive_scan() inclusive_scan() transform_exclusive_scan() transform_inclusive_scan() adjacent_difference() iota() gcd() lcm() "
+// <cmath>
+"assoc_laguerre() assoc_legendre() comp_ellint_1() comp_ellint_2() comp_ellint_3() cyl_bessel_i() cyl_bessel_j() cyl_bessel_k() cyl_neumann() ellint_1() ellint_2() ellint_3() expint() hermite() laguerre() legendre() riemann_zeta() sph_bessel() sph_legendre() sph_neumann() "
+
 // algorithm
-"forward() move() move_if_noexcept() move_backward() addressof() swap() get() " // move
-"distance() advance() next() prev() base() back_inserter() front_inserter() inserter() "
-"adjacent_find() all_of() any_of() binary_search() copy() copy_backward() copy_if() copy_n() count() count_if() equal() equal_range() fill() fill_n() find() find_end() find_first_of() find_if() find_if_not() for_each() generate() generate_n() includes() inplace_merge() is_heap() is_heap_until() is_partitioned() is_permutation() is_sorted() is_sorted_until() iter_swap() lexicographical_compare() lower_bound() make_heap() max() max_element() merge() min() min_element() minmax() minmax_element() mismatch() next_permutation() none_of() nth_element() partial_sort() partial_sort_copy() partition() partition_copy() partition_point() pop_heap() prev_permutation() push_heap() random_shuffle() remove() remove_copy() remove_copy_if() remove_if() replace() replace_copy() replace_copy_if() replace_if() reverse() reverse_copy() rotate() rotate_copy() search() search_n() set_difference() set_intersection() set_symmetric_difference() set_union() shuffle() sort() sort_heap() stable_partition() stable_sort() swap_ranges() transform() unique() unique_copy() upper_bound() "
+"random_shuffle() "
 // heap
 "get_temporary_buffer() return_temporary_buffer() "
-// pair
-"make_pair() "
-// basic_string
-"to_string() to_wstring() getline() stoi() stol() stoul() stoll() stoull() stof() stod() stold() "
-
-// vector
-"get_allocator() assign() begin() end() rbegin() rend() cbegin() cend() crbegin() crend() size() max_size() resize() shrink_to_fit() capacity() empty() reserve() at() front() back() data() push_back() pop_back() emplace() insert() erase() clear() "
-// basic_string
-"length() append() c_str() rfind() find_first_of() find_last_of() find_first_not_of() find_last_not_of() substr() compare() "
-// list
-"push_front() pop_front() emplace_front() emplace_back() splice() "
-// stack
-"push() pop() top() "
-// forward_list
-"before_begin() cbefore_begin() emplace_after() insert_after() erase_after() splice_after() "
 
 // Mac/iOS
 "NSLog() "
@@ -506,6 +720,27 @@ static KEYWORDLIST Keywords_CPP = {{
 "_Alignas() _Alignof() _Generic() _Static_assert() "
 "__attribute__() __typeof__() __alignof__() "
 "__except^() __alignof() __declspec() __uuidof() __pragma() "
+
+// C++
+"pmr"
+"nothrow " // <new>
+"fmt " // <utility>
+"scientific fixed hex general " // chars_format
+"first second " // pair
+"ignore " // <tuple>
+"nullopt " // <optional>
+"variant_npos " // <variant>
+// <ratio>
+"ratio "
+// <chrono>
+"chrono duration rep period clock "
+// <string>
+"npos "
+// <locale> <codecvt>
+"id category collate messages "
+// <random>
+"minstd_rand0 minstd_rand mt19937 mt19937_64 ranlux24_base ranlux48_base ranlux24 ranlux48 knuth_b default_random_engine "
+
 }};
 
 static EDITSTYLE Styles_CPP[] = {
