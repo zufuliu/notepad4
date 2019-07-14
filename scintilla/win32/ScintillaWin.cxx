@@ -1286,8 +1286,7 @@ sptr_t ScintillaWin::HandleCompositionInline(uptr_t, sptr_t lParam) {
 
 		if (initialCompose) {
 			ClearBeforeTentativeStart();
-			// first position of preeditstring.
-			// don't move candidate window during compositing.
+			// set candidate window left aligned to beginning of preedit string.
 			SetCandidateWindowPos();
 		}
 		pdoc->TentativeStart(); // TentativeActive from now on.
@@ -1321,7 +1320,7 @@ sptr_t ScintillaWin::HandleCompositionInline(uptr_t, sptr_t lParam) {
 			if (!(lParam & CS_NOMOVECARET) && (lParam & GCS_CURSORPOS)) {
 				imeEndToImeCaretU16 += imc.GetImeCaretPos();
 			}
-			if (imeEndToImeCaretU16 != 0 && !onlyTarget) {
+			if (imeEndToImeCaretU16 != 0) {
 				// Move back IME caret from current last position to imeCaretPos.
 				const Sci::Position currentPos = CurrentPosition();
 				const Sci::Position imeCaretPosDoc = pdoc->GetRelativePositionUTF16(currentPos, imeEndToImeCaretU16);
