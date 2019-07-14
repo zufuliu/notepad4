@@ -1658,6 +1658,7 @@ typedef struct encodedlg {
 	int  idEncoding;
 	int  cxDlg;
 	int  cyDlg;
+	UINT uidLabel;
 } ENCODEDLG, *PENCODEDLG;
 
 typedef const ENCODEDLG *LPCENCODEDLG;
@@ -1753,6 +1754,10 @@ static INT_PTR CALLBACK SelectEncodingDlgProc(HWND hwnd, UINT umsg, WPARAM wPara
 		SetWindowLongPtr(hwnd, DWLP_USER, lParam);
 		const LPCENCODEDLG pdd = (LPCENCODEDLG)lParam;
 		ResizeDlg_Init(hwnd, pdd->cxDlg, pdd->cyDlg, IDC_RESIZEGRIP);
+
+		WCHAR wch[256];
+		GetString(pdd->uidLabel, wch, COUNTOF(wch));
+		SetDlgItemText(hwnd, IDC_ENCODING_LABEL, wch);
 
 		HBITMAP hbmp = (HBITMAP)LoadImage(g_hInstance, MAKEINTRESOURCE(IDB_ENCODING), IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION);
 		HIMAGELIST himl = ImageList_Create(16, 16, ILC_COLOR32 | ILC_MASK, 0, 0);
@@ -1851,45 +1856,19 @@ static INT_PTR CALLBACK SelectEncodingDlgProc(HWND hwnd, UINT umsg, WPARAM wPara
 extern int cxEncodingDlg;
 extern int cyEncodingDlg;
 
-BOOL SelectEncodingDlg(HWND hwnd, int *pidREncoding) {
+BOOL SelectEncodingDlg(HWND hwnd, int *pidREncoding, UINT uidLabel) {
 	ENCODEDLG dd;
 
-	dd.bRecodeOnly = FALSE;
+	dd.bRecodeOnly = (uidLabel == IDS_SELRECT_RELOAD_ENCODING);
 	dd.idEncoding = *pidREncoding;
 	dd.cxDlg = cxEncodingDlg;
 	dd.cyDlg = cyEncodingDlg;
+	dd.uidLabel = uidLabel;
 
 	const INT_PTR iResult = ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_ENCODING), hwnd, SelectEncodingDlgProc, (LPARAM)&dd);
 
 	cxEncodingDlg = dd.cxDlg;
 	cyEncodingDlg = dd.cyDlg;
-
-	if (iResult == IDOK) {
-		*pidREncoding = dd.idEncoding;
-		return TRUE;
-	}
-	return FALSE;
-}
-
-//=============================================================================
-//
-// RecodeDlg()
-//
-extern int cxRecodeDlg;
-extern int cyRecodeDlg;
-
-BOOL RecodeDlg(HWND hwnd, int *pidREncoding) {
-	ENCODEDLG dd;
-
-	dd.bRecodeOnly = TRUE;
-	dd.idEncoding = *pidREncoding;
-	dd.cxDlg = cxRecodeDlg;
-	dd.cyDlg = cyRecodeDlg;
-
-	const INT_PTR iResult = ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_RECODE), hwnd, SelectEncodingDlgProc, (LPARAM)&dd);
-
-	cxRecodeDlg = dd.cxDlg;
-	cyRecodeDlg = dd.cyDlg;
 
 	if (iResult == IDOK) {
 		*pidREncoding = dd.idEncoding;

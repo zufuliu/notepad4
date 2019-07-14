@@ -56,8 +56,7 @@ BOOL	WordWrapSettingsDlg(HWND hwnd, int *iNumber);
 BOOL	LongLineSettingsDlg(HWND hwnd, int *iNumber);
 BOOL	TabSettingsDlg(HWND hwnd);
 BOOL	SelectDefEncodingDlg(HWND hwnd, int *pidREncoding);
-BOOL	SelectEncodingDlg(HWND hwnd, int *pidREncoding);
-BOOL	RecodeDlg(HWND hwnd, int *pidREncoding);
+BOOL	SelectEncodingDlg(HWND hwnd, int *pidREncoding, UINT uidLabel);
 BOOL	SelectDefLineEndingDlg(HWND hwnd, int *iOption);
 
 struct EditFileIOStatus;

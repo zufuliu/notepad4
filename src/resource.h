@@ -94,8 +94,7 @@
 #define IDC_ENCODINGFROMFILEVARS		104
 // Encoding
 #define IDD_ENCODING					104
-// Recode
-#define IDD_RECODE						105
+#define IDC_ENCODING_LABEL				102
 // Line Endings
 #define IDD_DEFEOLMODE					106
 #define IDC_EOLMODELIST					100
@@ -783,6 +782,10 @@
 #define IDS_EOLMODENAME_CRLF			62000
 #define IDS_EOLMODENAME_LF				62001
 #define IDS_EOLMODENAME_CR				62002
+// Encoding 61000
+#define IDS_SELRECT_CURRENT_ENCODING	61200
+#define IDS_SELRECT_RELOAD_ENCODING		61201
+// Lexer and Style 63000
 
 // Next default values for new objects
 //
