@@ -213,8 +213,6 @@ static int cyEditFrame;
 int		cxRunDlg;
 int		cxEncodingDlg;
 int		cyEncodingDlg;
-int		cxRecodeDlg;
-int		cyRecodeDlg;
 int		cxFileMRUDlg;
 int		cyFileMRUDlg;
 int		cxOpenWithDlg;
@@ -5692,8 +5690,6 @@ void ClearWindowPositionHistory(void) {
 	cxRunDlg = 0;
 	cxEncodingDlg = 0;
 	cyEncodingDlg = 0;
-	cxRecodeDlg = 0;
-	cyRecodeDlg = 0;
 
 	cxFileMRUDlg = 0;
 	cyFileMRUDlg = 0;
