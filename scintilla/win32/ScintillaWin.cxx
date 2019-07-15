@@ -290,7 +290,7 @@ public:
 
 namespace {
 
-// InputLanguage() and SetCandidateWindowPos() are based on Chromium's IMM32Manager class.
+// InputLanguage() and SetCandidateWindowPos() are based on Chromium's IMM32Manager and InputMethodWinImm32.
 // https://github.com/chromium/chromium/blob/master/ui/base/ime/win/imm32_manager.cc
 // See License.txt or https://github.com/chromium/chromium/blob/master/LICENSE for license details.
 
@@ -1095,7 +1095,7 @@ void ScintillaWin::SetCandidateWindowPos() {
 			// it during this input context.
 			// Since some third-party Japanese IME also uses ::GetCaretPos() to determine
 			// their window position, we also create a caret for Japanese IMEs.
-			::SetCaretPos(x, y + sysCaretHeight);
+			::SetCaretPos(x, y);
 		}
 		break;
 
@@ -1198,31 +1198,34 @@ void ScintillaWin::ToggleHanja() {
 namespace {
 
 // https://docs.microsoft.com/en-us/windows/desktop/Intl/composition-string
-std::vector<int> MapImeIndicators(const std::vector<BYTE> &inputStyle, bool &onlyTarget) {
+std::vector<int> MapImeIndicators(const std::vector<BYTE> &inputStyle, int &indicatorMask) {
 	const size_t attrLen = inputStyle.size();
 	std::vector<int> imeIndicator(attrLen, SC_INDICATOR_UNKNOWN);
-	onlyTarget = attrLen != 0;
+	int mask = 0;
 
 	for (size_t i = 0; i < attrLen; i++) {
 		switch (inputStyle.at(i)) {
 		case ATTR_INPUT:
 			imeIndicator[i] = SC_INDICATOR_INPUT;
-			onlyTarget = false;
+			mask |= 1 << (SC_INDICATOR_INPUT - INDICATOR_IME);
 			break;
 		case ATTR_TARGET_NOTCONVERTED:
 		case ATTR_TARGET_CONVERTED:
 			imeIndicator[i] = SC_INDICATOR_TARGET;
+			mask |= 1 << (SC_INDICATOR_TARGET - INDICATOR_IME);
 			break;
 		case ATTR_CONVERTED:
 			imeIndicator[i] = SC_INDICATOR_CONVERTED;
-			onlyTarget = false;
+			mask |= 1 << (SC_INDICATOR_CONVERTED - INDICATOR_IME);
 			break;
 		default:
 			imeIndicator[i] = SC_INDICATOR_UNKNOWN;
-			onlyTarget = false;
+			mask |= 1 << (SC_INDICATOR_UNKNOWN - INDICATOR_IME);
 			break;
 		}
 	}
+
+	indicatorMask = mask;
 	return imeIndicator;
 }
 
@@ -1248,14 +1251,6 @@ sptr_t ScintillaWin::HandleCompositionInline(uptr_t, sptr_t lParam) {
 	// Copy & paste by johnsonj with a lot of helps of Neil.
 	// Great thanks for my foreruners, jiniya and BLUEnLIVE.
 
-	IMContext imc(MainHWND());
-	if (!imc.hIMC)
-		return 0;
-	if (pdoc->IsReadOnly() || SelectionContainsProtected()) {
-		::ImmNotifyIME(imc.hIMC, NI_COMPOSITIONSTR, CPS_CANCEL, 0);
-		return 0;
-	}
-
 	bool initialCompose = false;
 	if (pdoc->TentativeActive()) {
 		pdoc->TentativeUndo();
@@ -1266,6 +1261,14 @@ sptr_t ScintillaWin::HandleCompositionInline(uptr_t, sptr_t lParam) {
 	}
 
 	view.imeCaretBlockOverride = false;
+
+	IMContext imc(MainHWND());
+	if (!imc.hIMC)
+		return 0;
+	if (pdoc->IsReadOnly() || SelectionContainsProtected()) {
+		::ImmNotifyIME(imc.hIMC, NI_COMPOSITIONSTR, CPS_CANCEL, 0);
+		return 0;
+	}
 
 	// See Chromium's InputMethodWinImm32::OnImeComposition()
 	//
@@ -1286,17 +1289,19 @@ sptr_t ScintillaWin::HandleCompositionInline(uptr_t, sptr_t lParam) {
 
 		if (initialCompose) {
 			ClearBeforeTentativeStart();
-			// set candidate window left aligned to beginning of preedit string.
-			SetCandidateWindowPos();
 		}
+
+		// set candidate window left aligned to beginning of preedit string.
+		SetCandidateWindowPos();
 		pdoc->TentativeStart(); // TentativeActive from now on.
 
-		bool onlyTarget = false;
-		std::vector<int> imeIndicator = MapImeIndicators(imc.GetImeAttributes(), onlyTarget);
+		int indicatorMask = 0;
+		std::vector<int> imeIndicator = MapImeIndicators(imc.GetImeAttributes(), indicatorMask);
 
 		const UINT codePage = CodePageOfDocument();
 		char inBufferCP[16];
 		const std::wstring_view wsv = wcs;
+
 		for (size_t i = 0; i < wsv.size(); ) {
 			const size_t ucWidth = UTF16CharLength(wsv[i]);
 			const int size = MultiByteFromWideChar(codePage, wsv.substr(i, ucWidth), inBufferCP, sizeof(inBufferCP) - 1);
@@ -1311,7 +1316,8 @@ sptr_t ScintillaWin::HandleCompositionInline(uptr_t, sptr_t lParam) {
 		// when selecting other candidate item, previous item will be replaced with current one.
 		// After candidate item been added, it's looks like been full selected, it's better to keep caret
 		// at end of "selection" (end of input) instead of jump to beginning of input / "selection".
-		if (!onlyTarget) {
+		constexpr int targetMask = 1 << (SC_INDICATOR_TARGET - INDICATOR_IME);
+		if (indicatorMask != targetMask) {
 			// Retrieve the selection range information. If CS_NOMOVECARET is specified,
 			// that means the cursor should not be moved, then we just place the caret at
 			// the beginning of the composition string. Otherwise we should honour the
@@ -1325,6 +1331,10 @@ sptr_t ScintillaWin::HandleCompositionInline(uptr_t, sptr_t lParam) {
 				const Sci::Position currentPos = CurrentPosition();
 				const Sci::Position imeCaretPosDoc = pdoc->GetRelativePositionUTF16(currentPos, imeEndToImeCaretU16);
 				MoveImeCarets(-currentPos + imeCaretPosDoc);
+				if (indicatorMask & targetMask) {
+					// set candidate window left aligned to beginning of target string.
+					SetCandidateWindowPos();
+				}
 			}
 		}
 
@@ -2110,6 +2120,11 @@ void ScintillaWin::NotifyCaretMove() noexcept {
 
 void ScintillaWin::UpdateSystemCaret() {
 	if (hasFocus) {
+		if (pdoc->TentativeActive()) {
+			// ongoing inline mode IME composition.
+			// fix candidate window for Google Japanese IME moved on typing on Win7.
+			return;
+		}
 		if (HasCaretSizeChanged()) {
 			DestroySystemCaret();
 			CreateSystemCaret();
@@ -2877,8 +2892,13 @@ void ScintillaWin::ImeStartComposition() {
 	}
 }
 
-/** Called when IME Window closed. */
+/** Called when IME Window closed.
+* TODO: see Chromium's InputMethodWinImm32::OnImeEndComposition().
+*/
 void ScintillaWin::ImeEndComposition() {
+	// clear composition state.
+	view.imeCaretBlockOverride = false;
+	pdoc->TentativeUndo();
 	ShowCaretAtCurrentPosition();
 }
 
