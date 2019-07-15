@@ -1024,23 +1024,24 @@ BEGIN
     SCROLLBAR       IDC_RESIZEGRIP3,7,189,10,10
 END
 
-IDD_DEFENCODING DIALOGEX 0, 0, 209, 110
+IDD_DEFENCODING DIALOGEX 0, 0, 209, 119
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Encoding"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    LTEXT           "&Default encoding:",IDC_STATIC,7,7,58,8
-    CONTROL         "",IDC_ENCODINGLIST,"ComboBoxEx32",CBS_DROPDOWNLIST | WS_CLIPSIBLINGS | WS_VSCROLL | WS_TABSTOP,7,20,195,128
+    LTEXT           "&Default encoding:",IDC_STATIC,7,7,195,8
+    EDITTEXT        IDC_ENCODING_LABEL,7,20,195,14,ES_READONLY | ES_AUTOHSCROLL | WS_TABSTOP
+    CONTROL         "<a>Click here to select default encoding.</a>",IDC_ENCODING_LINK,"SysLink",WS_TABSTOP,7,38,195,10
     CONTROL         "Skip automatic &Unicode detection.",IDC_NOUNICODEDETECTION,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,43,145,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,52,195,10
     CONTROL         "Open &ANSI (unknown encoding) files in UTF-8 mode.",IDC_ANSIASUTF8,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,53,195,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,62,195,10
     CONTROL         "Open ANSI Art (*.&nfo, *.diz) files in DOS-437 mode.",IDC_NFOASOEM,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,63,195,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,72,195,10
     CONTROL         "Don't parse encoding &tags.",IDC_ENCODINGFROMFILEVARS,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,73,144,10
-    DEFPUSHBUTTON   "OK",IDOK,96,89,50,14
-    PUSHBUTTON      "Cancel",IDCANCEL,152,89,50,14
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,82,195,10
+    DEFPUSHBUTTON   "OK",IDOK,96,98,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,152,98,50,14
 END
 
 IDD_DEFEOLMODE DIALOGEX 0, 0, 196, 80

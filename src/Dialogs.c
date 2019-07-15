@@ -1669,17 +1669,10 @@ static INT_PTR CALLBACK SelectDefEncodingDlgProc(HWND hwnd, UINT umsg, WPARAM wP
 	switch (umsg) {
 	case WM_INITDIALOG: {
 		SetWindowLongPtr(hwnd, DWLP_USER, lParam);
-		const LPCENCODEDLG pdd = (LPCENCODEDLG)lParam;
 
-		HBITMAP hbmp = (HBITMAP)LoadImage(g_hInstance, MAKEINTRESOURCE(IDB_ENCODING), IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION);
-		HIMAGELIST himl = ImageList_Create(16, 16, ILC_COLOR32 | ILC_MASK, 0, 0);
-		ImageList_AddMasked(himl, hbmp, CLR_DEFAULT);
-		DeleteObject(hbmp);
-
-		HWND hwndLV = GetDlgItem(hwnd, IDC_ENCODINGLIST);
-		SendMessage(hwndLV, CBEM_SETIMAGELIST, 0, (LPARAM)himl);
-		SendMessage(hwndLV, CB_SETEXTENDEDUI, TRUE, 0);
-		Encoding_AddToComboboxEx(hwndLV, pdd->idEncoding, 0);
+		const int iEncoding = *((int *)lParam);
+		Encoding_GetLabel(iEncoding);
+		SetDlgItemText(hwnd, IDC_ENCODING_LABEL, mEncoding[iEncoding].wchLabel);
 
 		if (bSkipUnicodeDetection) {
 			CheckDlgButton(hwnd, IDC_NOUNICODEDETECTION, BST_CHECKED);
@@ -1701,19 +1694,28 @@ static INT_PTR CALLBACK SelectDefEncodingDlgProc(HWND hwnd, UINT umsg, WPARAM wP
 	}
 	return TRUE;
 
+	case WM_NOTIFY: {
+		LPNMHDR pnmhdr = (LPNMHDR)lParam;
+		switch (pnmhdr->code) {
+		case NM_CLICK:
+		case NM_RETURN:
+			if (pnmhdr->idFrom == IDC_ENCODING_LINK) {
+				int *pidREncoding = (int *)GetWindowLongPtr(hwnd, DWLP_USER);
+				SelectEncodingDlg(hwndMain, pidREncoding, IDS_SELRECT_DEFAULT_ENCODING);
+			}
+			break;
+		}
+	}
+	break;
+
 	case WM_COMMAND:
 		switch (LOWORD(wParam)) {
 		case IDOK: {
-			PENCODEDLG pdd = (PENCODEDLG)GetWindowLongPtr(hwnd, DWLP_USER);
-			if (Encoding_GetFromComboboxEx(GetDlgItem(hwnd, IDC_ENCODINGLIST), &pdd->idEncoding)) {
-				bSkipUnicodeDetection = IsButtonChecked(hwnd, IDC_NOUNICODEDETECTION);
-				bLoadANSIasUTF8 = IsButtonChecked(hwnd, IDC_ANSIASUTF8);
-				bLoadNFOasOEM = IsButtonChecked(hwnd, IDC_NFOASOEM);
-				bNoEncodingTags = IsButtonChecked(hwnd, IDC_ENCODINGFROMFILEVARS);
-				EndDialog(hwnd, IDOK);
-			} else {
-				PostMessage(hwnd, WM_NEXTDLGCTL, (WPARAM)(GetDlgItem(hwnd, IDC_ENCODINGLIST)), 1);
-			}
+			bSkipUnicodeDetection = IsButtonChecked(hwnd, IDC_NOUNICODEDETECTION);
+			bLoadANSIasUTF8 = IsButtonChecked(hwnd, IDC_ANSIASUTF8);
+			bLoadNFOasOEM = IsButtonChecked(hwnd, IDC_NFOASOEM);
+			bNoEncodingTags = IsButtonChecked(hwnd, IDC_ENCODINGFROMFILEVARS);
+			EndDialog(hwnd, IDOK);
 		}
 		break;
 
@@ -1731,18 +1733,8 @@ static INT_PTR CALLBACK SelectDefEncodingDlgProc(HWND hwnd, UINT umsg, WPARAM wP
 // SelectDefEncodingDlg()
 //
 BOOL SelectDefEncodingDlg(HWND hwnd, int *pidREncoding) {
-	ENCODEDLG dd;
-
-	dd.bRecodeOnly = FALSE;
-	dd.idEncoding = *pidREncoding;
-
-	const INT_PTR iResult = ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_DEFENCODING), hwnd, SelectDefEncodingDlgProc, (LPARAM)&dd);
-
-	if (iResult == IDOK) {
-		*pidREncoding = dd.idEncoding;
-		return TRUE;
-	}
-	return FALSE;
+	const INT_PTR iResult = ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_DEFENCODING), hwnd, SelectDefEncodingDlgProc, (LPARAM)(pidREncoding));
+	return iResult == IDOK;
 }
 
 //=============================================================================
