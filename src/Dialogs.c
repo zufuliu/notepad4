@@ -1859,7 +1859,7 @@ BOOL SelectEncodingDlg(HWND hwnd, int *pidREncoding, UINT uidLabel) {
 	dd.cyDlg = cyEncodingDlg;
 	dd.uidLabel = uidLabel;
 
-	const INT_PTR iResult = ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_ENCODING), hwnd, SelectEncodingDlgProc, (LPARAM)&dd);
+	const INT_PTR iResult = ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_SELECT_ENCODING), hwnd, SelectEncodingDlgProc, (LPARAM)&dd);
 
 	cxEncodingDlg = dd.cxDlg;
 	cyEncodingDlg = dd.cyDlg;
