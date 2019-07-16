@@ -1239,8 +1239,6 @@ void Style_SetLexer(PEDITLEXER pLexNew) {
 			} else {
 				SciCall_SetKeywords(i, pKeywords);
 			}
-		} else {
-			SciCall_SetKeywords(i, "");
 		}
 	}
 

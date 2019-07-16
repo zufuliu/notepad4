@@ -20,7 +20,7 @@ using namespace Scintilla;
  * Creates an array that points into each word in the string and puts \0 terminators
  * after each word.
  */
-static char **ArrayFromWordList(char *wordlist, int *len, bool onlyLineEnds = false) {
+static char **ArrayFromWordList(char *wordlist, size_t slen, int *len, bool onlyLineEnds = false) {
 	int prev = '\n';
 	int words = 0;
 	// For rapid determination of whether a character is a separator, build
@@ -40,7 +40,6 @@ static char **ArrayFromWordList(char *wordlist, int *len, bool onlyLineEnds = fa
 	}
 	char **keywords = new char *[words + 1];
 	int wordsStore = 0;
-	const size_t slen = strlen(wordlist);
 	if (words) {
 		prev = '\0';
 		for (size_t k = 0; k < slen; k++) {
@@ -104,7 +103,7 @@ void WordList::Set(const char *s) {
 	const size_t lenS = strlen(s) + 1;
 	list = new char[lenS];
 	memcpy(list, s, lenS);
-	words = ArrayFromWordList(list, &len, onlyLineEnds);
+	words = ArrayFromWordList(list, lenS - 1, &len, onlyLineEnds);
 	std::sort(words, words + len, [](const char *a, const char *b) noexcept {
 		return strcmp(a, b) < 0;
 	});
@@ -113,6 +112,23 @@ void WordList::Set(const char *s) {
 		unsigned char indexChar = words[l][0];
 		starts[indexChar] = l;
 	}
+}
+
+void WordList::Reset(WordList &other) noexcept {
+	if (this == &other) {
+		return;
+	}
+
+	Clear();
+	words = other.words;
+	list = other.list;
+	len = other.len;
+	onlyLineEnds = other.onlyLineEnds;
+	memcpy(starts, other.starts, sizeof(starts));
+	// mark other as released.
+	other.words = nullptr;
+	other.list = nullptr;
+	other.len = 0;
 }
 
 /** Check whether a string is in the list.

@@ -27,6 +27,7 @@ public:
 	int Length() const noexcept;
 	void Clear() noexcept;
 	void Set(const char *s);
+	void Reset(WordList &other) noexcept;
 	bool InList(const char *s) const noexcept;
 	bool InListAbbreviated(const char *s, char marker) const noexcept;
 	bool InListAbridged(const char *s, char marker) const noexcept;
