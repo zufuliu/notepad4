@@ -11,9 +11,9 @@
 static KEYWORDLIST Keywords_Bash = {{
 // build-in
 "alias true false yes no if then fi elif else for function functions in return while "
-" case esac eval ex exec do done du echo EOF "
+"case esac eval ex exec do done du echo EOF "
 // Directory Stack Builtins
-"dirs popd, pushd "
+"dirs popd pushd "
 // C Shell
 "end endif foreach switch default breaksw endsw repeat "
 // common
@@ -29,7 +29,9 @@ static KEYWORDLIST Keywords_Bash = {{
 "trap tsort tty type typeset ulimit umask unalias uname uncompress unexpand uniq unpack "
 "unset until uudecode uuencode vi vim vpax wait wc whence which who wpaste wstart xargs "
 "zcat chgrp chown chroot dir dircolors factor groups hostid install link md5sum mkfifo mknod "
-"nice pinky printenv ptx readlink seq sha1sum shred stat su tac unlink users vdir whoami yes dnl"
+"nice pinky printenv ptx readlink seq sha1sum shred stat su tac unlink users vdir whoami yes "
+// M4
+"dnl "
 
 , // 1
 "$PATH $MANPATH $INFOPATH $USER $TMP $TEMP $PRINTER $HOSTNAME $PS1 $SHELL "
