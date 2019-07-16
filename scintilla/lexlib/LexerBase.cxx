@@ -79,7 +79,7 @@ Sci_Position SCI_METHOD LexerBase::WordListSet(int n, const char *wl) {
 		WordList wlNew;
 		wlNew.Set(wl);
 		if (*keyWordLists[n] != wlNew) {
-			keyWordLists[n]->Set(wl);
+			keyWordLists[n]->Reset(wlNew);
 			return 0;
 		}
 	}
