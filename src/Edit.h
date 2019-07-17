@@ -339,10 +339,14 @@ void	Encoding_GetLabel(int iEncoding);
 int 	Encoding_Match(LPCWSTR pwszTest);
 int 	Encoding_MatchA(char *pchTest);
 BOOL	Encoding_IsValid(int iTestEncoding);
+void	Encoding_AddToTreeView(HWND hwnd, int idSel, BOOL bRecodeOnly);
+BOOL	Encoding_GetFromTreeView(HWND hwnd, int *pidEncoding, BOOL bQuiet);
+#if 0
 void	Encoding_AddToListView(HWND hwnd, int idSel, BOOL bRecodeOnly);
 BOOL	Encoding_GetFromListView(HWND hwnd, int *pidEncoding);
 void	Encoding_AddToComboboxEx(HWND hwnd, int idSel, BOOL bRecodeOnly);
 BOOL	Encoding_GetFromComboboxEx(HWND hwnd, int *pidEncoding);
+#endif
 
 BOOL	IsUnicode(const char *pBuffer, DWORD cb, LPBOOL lpbBOM, LPBOOL lpbReverse);
 BOOL	IsUTF8(const char *pTest, DWORD nLength);

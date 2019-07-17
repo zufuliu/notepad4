@@ -1757,20 +1757,16 @@ static INT_PTR CALLBACK SelectEncodingDlgProc(HWND hwnd, UINT umsg, WPARAM wPara
 		HIMAGELIST himl = ImageList_Create(16, 16, ILC_COLOR32 | ILC_MASK, 0, 0);
 		ImageList_AddMasked(himl, hbmp, CLR_DEFAULT);
 		DeleteObject(hbmp);
-		ListView_SetImageList(GetDlgItem(hwnd, IDC_ENCODINGLIST), himl, LVSIL_SMALL);
 
-		HWND hwndLV = GetDlgItem(hwnd, IDC_ENCODINGLIST);
-		InitWindowCommon(hwndLV);
-		//SetExplorerTheme(hwndLV);
-		ListView_SetExtendedListViewStyle(hwndLV, /*LVS_EX_FULLROWSELECT|*/LVS_EX_DOUBLEBUFFER | LVS_EX_LABELTIP);
-		LVCOLUMN lvc = { LVCF_FMT | LVCF_TEXT, LVCFMT_LEFT, 0, NULL, -1, 0, 0, 0
-#if (NTDDI_VERSION >= NTDDI_VISTA)
-			, 0, 0, 0
-#endif
-		};
-		ListView_InsertColumn(hwndLV, 0, &lvc);
-		Encoding_AddToListView(hwndLV, pdd->idEncoding, pdd->bRecodeOnly);
-		ListView_SetColumnWidth(hwndLV, 0, LVSCW_AUTOSIZE_USEHEADER);
+		// folder icon
+		SHFILEINFO shfi;
+		SHGetFileInfo(L"Icon", FILE_ATTRIBUTE_DIRECTORY, &shfi, sizeof(SHFILEINFO), SHGFI_ICON | SHGFI_SMALLICON | SHGFI_USEFILEATTRIBUTES);
+		ImageList_AddIcon(himl, shfi.hIcon);
+
+		HWND hwndTV = GetDlgItem(hwnd, IDC_ENCODINGLIST);
+		InitWindowCommon(hwndTV);
+		TreeView_SetImageList(hwndTV, himl, TVSIL_NORMAL);
+		Encoding_AddToTreeView(hwndTV, pdd->idEncoding, pdd->bRecodeOnly);
 
 		CenterDlgInParent(hwnd);
 	}
@@ -1794,7 +1790,6 @@ static INT_PTR CALLBACK SelectEncodingDlgProc(HWND hwnd, UINT umsg, WPARAM wPara
 		hdwp = DeferCtlPos(hdwp, hwnd, IDCANCEL, dx, dy, SWP_NOSIZE);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDC_ENCODINGLIST, dx, dy, SWP_NOMOVE);
 		EndDeferWindowPos(hdwp);
-		ListView_SetColumnWidth(GetDlgItem(hwnd, IDC_ENCODINGLIST), 0, LVSCW_AUTOSIZE_USEHEADER);
 	}
 	return TRUE;
 
@@ -1803,16 +1798,29 @@ static INT_PTR CALLBACK SelectEncodingDlgProc(HWND hwnd, UINT umsg, WPARAM wPara
 		return TRUE;
 
 	case WM_NOTIFY: {
-		if (((LPNMHDR)(lParam))->idFrom == IDC_ENCODINGLIST) {
-			switch (((LPNMHDR)(lParam))->code) {
-			case NM_DBLCLK:
-				SendWMCommand(hwnd, IDOK);
-				break;
+		LPNMHDR lpnmh = (LPNMHDR)lParam;
+		if (lpnmh->idFrom == IDC_ENCODINGLIST) {
+			switch (lpnmh->code) {
+			case NM_DBLCLK: {
+				int temp = -1;
+				if (Encoding_GetFromTreeView(GetDlgItem(hwnd, IDC_ENCODINGLIST), &temp, TRUE)) {
+					SendWMCommand(hwnd, IDOK);
+				}
+			}
+			break;
 
-			case LVN_ITEMCHANGED:
-			case LVN_DELETEITEM: {
-				const int i = ListView_GetNextItem(GetDlgItem(hwnd, IDC_ENCODINGLIST), -1, LVNI_ALL | LVNI_SELECTED);
-				EnableWindow(GetDlgItem(hwnd, IDOK), i != -1);
+			case TVN_SELCHANGED: {
+				HWND hwndTV = GetDlgItem(hwnd, IDC_ENCODINGLIST);
+				LPNMTREEVIEW lpnmtv = (LPNMTREEVIEW)lParam;
+				TVITEM item;
+				ZeroMemory(&item, sizeof(item));
+				item.mask = TVIF_PARAM;
+				item.hItem = lpnmtv->itemNew.hItem;
+				TreeView_GetItem(hwndTV, &item);
+				EnableWindow(GetDlgItem(hwnd, IDOK), item.lParam != 0);
+				if (item.lParam == 0) {
+					TreeView_Expand(hwndTV, lpnmtv->itemNew.hItem, TVE_EXPAND);
+				}
 			}
 			break;
 			}
@@ -1823,11 +1831,12 @@ static INT_PTR CALLBACK SelectEncodingDlgProc(HWND hwnd, UINT umsg, WPARAM wPara
 	case WM_COMMAND:
 		switch (LOWORD(wParam)) {
 		case IDOK: {
+			HWND hwndTV = GetDlgItem(hwnd, IDC_ENCODINGLIST);
 			PENCODEDLG pdd = (PENCODEDLG)GetWindowLongPtr(hwnd, DWLP_USER);
-			if (Encoding_GetFromListView(GetDlgItem(hwnd, IDC_ENCODINGLIST), &pdd->idEncoding)) {
+			if (Encoding_GetFromTreeView(hwndTV, &pdd->idEncoding, FALSE)) {
 				EndDialog(hwnd, IDOK);
 			} else {
-				PostMessage(hwnd, WM_NEXTDLGCTL, (WPARAM)GetDlgItem(hwnd, IDC_ENCODINGLIST), 1);
+				PostMessage(hwnd, WM_NEXTDLGCTL, (WPARAM)hwndTV, 1);
 			}
 		}
 		break;

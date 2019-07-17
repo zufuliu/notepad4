@@ -535,10 +535,6 @@ static inline LPCWSTR GetStyleThemeFilePath(void) {
 	return (np2StyleTheme == StyleTheme_Dark) ? darkStyleThemeFilePath : szIniFile;
 }
 
-static inline LPCWSTR GetStyleThemeTitle(void) {
-	return (np2StyleTheme == StyleTheme_Dark) ? L"Dark Theme" : L"Default Theme";
-}
-
 static inline void FindDarkThemeFile(void) {
 	FindExtraIniFile(darkStyleThemeFilePath, L"Notepad2 DarkTheme.ini", L"DarkTheme.ini");
 }
