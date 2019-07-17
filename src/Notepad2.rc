@@ -1989,7 +1989,7 @@ BEGIN
 	61081					"OEM Cyrillic (Primarily Russian);OEM Cyrillic"			// Cyrillic
 	61082					"Mac (Japanese);Mac (Japanese)"							// Japanese
 	61083					"ISO-2022 (JIS-Allow 1 byte Kana);CS ISO-2022-JP"		// Japanese
-	61084					"ISO-2022 (JIS-Allow 1 byte Kana - SO/SI - SO/SI);ISO-2022-JP SI/SO"	// Japanese
+	61084					"ISO-2022 (JIS-Allow 1 byte Kana - SO/SI);ISO-2022-JP SI/SO"	// Japanese
 	61085					"Mac (Korean);Mac (Korean)"								// Korean
 	61086					"ISO-2022 Korean;ISO-2022-KR"							// Korean
 	61087					"Simplified Chinese (Mac);Mac (GB 2312)"				// Chinese

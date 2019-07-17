@@ -727,6 +727,7 @@ void Encoding_AddToTreeView(HWND hwnd, int idSel, BOOL bRecodeOnly) {
 	tvis.hInsertAfter = TVI_LAST;
 	tvis.item.mask = TVIF_TEXT | TVIF_IMAGE | TVIF_SELECTEDIMAGE | TVIF_PARAM;
 	HTREEITEM hSelNode = NULL;
+	HTREEITEM hSelParent = NULL;
 
 	// Notepad2.c
 	extern int iEncoding;
@@ -788,6 +789,7 @@ void Encoding_AddToTreeView(HWND hwnd, int idSel, BOOL bRecodeOnly) {
 				HTREEITEM hTreeNode = (HTREEITEM)TreeView_InsertItem(hwnd, &tvis);
 				if (idSel == id) {
 					hSelNode = hTreeNode;
+					hSelParent = hParent;
 					expand = TRUE;
 				} else if (!expand && (id == iDefaultCodePage || id == iEncoding || acp == mEncoding[id].uCodePage)) {
 					// group contains default code, current code page, ANSI code page.
@@ -801,6 +803,9 @@ void Encoding_AddToTreeView(HWND hwnd, int idSel, BOOL bRecodeOnly) {
 	}
 
 	TreeView_Select(hwnd, hSelNode, TVGN_CARET);
+	if (hSelParent != NULL) {
+		TreeView_EnsureVisible(hwnd, hSelParent);
+	}
 	NP2HeapFree(pEE);
 }
 
