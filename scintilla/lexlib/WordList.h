@@ -24,10 +24,13 @@ public:
 	~WordList();
 	operator bool() const noexcept;
 	bool operator!=(const WordList &other) const noexcept;
+	bool operator==(const WordList &other) const noexcept {
+		return !(*this != other);
+	}
 	int Length() const noexcept;
 	void Clear() noexcept;
 	void Set(const char *s);
-	void Reset(WordList &other) noexcept;
+	bool Reset(const char *s);
 	bool InList(const char *s) const noexcept;
 	bool InListAbbreviated(const char *s, char marker) const noexcept;
 	bool InListAbridged(const char *s, char marker) const noexcept;

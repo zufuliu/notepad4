@@ -1319,10 +1319,10 @@ sptr_t ScintillaWin::HandleCompositionInline(uptr_t, sptr_t lParam) {
 		// Japanese IME after pressing Tab replaces input string with first candidate item (target string);
 		// when selecting other candidate item, previous item will be replaced with current one.
 		// After candidate item been added, it's looks like been full selected, it's better to keep caret
-		// at end of "selection" (end of input) instead of jump to beginning of input / "selection".
+		// at end of "selection" (end of input) instead of jump to beginning of input ("selection").
 		constexpr int targetMask = 1 << (SC_INDICATOR_TARGET - INDICATOR_IME);
 		if (indicatorMask != targetMask) {
-			// Retrieve the selection range information. If CS_NOMOVECARET is specified,
+			// From Chromium: Retrieve the selection range information. If CS_NOMOVECARET is specified,
 			// that means the cursor should not be moved, then we just place the caret at
 			// the beginning of the composition string. Otherwise we should honour the
 			// GCS_CURSORPOS value if it's available.
@@ -2127,7 +2127,7 @@ void ScintillaWin::NotifyCaretMove() noexcept {
 void ScintillaWin::UpdateSystemCaret() {
 	if (hasFocus) {
 		if (pdoc->TentativeActive()) {
-			// ongoing inline mode IME composition.
+			// ongoing inline mode IME composition, don't inform IME of system caret position.
 			// fix candidate window for Google Japanese IME moved on typing on Win7.
 			return;
 		}
@@ -2902,7 +2902,7 @@ void ScintillaWin::ImeStartComposition() {
 * TODO: see Chromium's InputMethodWinImm32::OnImeEndComposition().
 */
 void ScintillaWin::ImeEndComposition() {
-	// clear composition state.
+	// clear IME composition state.
 	view.imeCaretBlockOverride = false;
 	pdoc->TentativeUndo();
 	ShowCaretAtCurrentPosition();
