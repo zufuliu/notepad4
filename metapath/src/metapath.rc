@@ -354,8 +354,8 @@ BEGIN
     PUSHBUTTON      "",IDC_BROWSEDESTINATION,210,48,13,13
     CONTROL         "<a>Clear Recent History</a>",IDC_EMPTY_MRU,"SysLink",WS_TABSTOP,154,37,70,10
     LTEXT           "Action:",IDC_STATIC,7,72,24,8
-    CONTROL         "&Copy",IDC_FUNCCOPY,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,35,71,33,10
-    CONTROL         "&Move",IDC_FUNCMOVE,"Button",BS_AUTORADIOBUTTON,68,71,33,10
+    AUTORADIOBUTTON "&Copy",IDC_FUNCCOPY,35,71,33,10,WS_GROUP | WS_TABSTOP
+    AUTORADIOBUTTON "&Move",IDC_FUNCMOVE,68,71,33,10,WS_TABSTOP
     DEFPUSHBUTTON   "OK",IDOK,117,74,50,14,WS_DISABLED
     PUSHBUTTON      "Cancel",IDCANCEL,173,74,50,14
     SCROLLBAR       IDC_RESIZEGRIP5,7,78,10,10
@@ -407,10 +407,8 @@ BEGIN
                     IDC_STATIC,40,15,200,8
     CONTROL         "&Use startup directory:",IDC_STARTUPDIR,"Button",
                     BS_AUTOCHECKBOX | WS_GROUP | WS_TABSTOP,10,46,104,10
-    CONTROL         "Most &recently used.",IDC_GOTOMRU,"Button",
-                    BS_AUTORADIOBUTTON,114,46,90,10
-    CONTROL         """&Favorites"" folder.",IDC_GOTOFAV,"Button",
-                    BS_AUTORADIOBUTTON,114,58,90,10
+    AUTORADIOBUTTON "Most &recently used.",IDC_GOTOMRU,114,46,90,10,WS_GROUP | WS_TABSTOP
+    AUTORADIOBUTTON """&Favorites"" folder.",IDC_GOTOFAV,114,58,90,10,WS_TABSTOP
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,10,76,205,1
     CONTROL         "&Clear read-only attribute of saved files.",
                     IDC_CLEARREADONLY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,85,172,10
@@ -423,10 +421,8 @@ BEGIN
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,10,139,205,1
     CONTROL         "Enable ""&Esc"" key to...",IDC_ESCFUNCTION,"Button",
                     BS_AUTOCHECKBOX | WS_GROUP | WS_TABSTOP,10,148,104,10
-    CONTROL         "Minimize &window.",IDC_ESCMIN,"Button",
-                    BS_AUTORADIOBUTTON,114,148,74,10
-    CONTROL         "E&xit metapath.",IDC_ESCEXIT,"Button",
-                    BS_AUTORADIOBUTTON,114,160,66,10
+    AUTORADIOBUTTON "Minimize &window.",IDC_ESCMIN,114,148,74,10,WS_GROUP | WS_TABSTOP
+    AUTORADIOBUTTON "E&xit metapath.",IDC_ESCEXIT,114,160,66,10,WS_TABSTOP
 END
 
 IDPP_ITEMS DIALOGEX 0, 0, 232, 185
@@ -439,17 +435,13 @@ BEGIN
     LTEXT           "Appearance of items in directory list.",IDC_STATIC,40,15,160,8
     GROUPBOX        "Colors",IDC_STATIC,10,41,205,134
     LTEXT           "Use this text color when NO FILTER is SET:",IDC_STATIC,20,54,170,8
-    CONTROL         "Default &windows color.",IDC_COLOR_DEF1,"Button",
-                    BS_AUTORADIOBUTTON | WS_TABSTOP,20,68,96,10
-    CONTROL         "Custom &color:",IDC_COLOR_CUST1,"Button",
-                    BS_AUTORADIOBUTTON,20,82,60,10
+    AUTORADIOBUTTON "Default &windows color.",IDC_COLOR_DEF1,20,68,96,10,WS_GROUP | WS_TABSTOP
+    AUTORADIOBUTTON "Custom &color:",IDC_COLOR_CUST1,20,82,60,10,WS_TABSTOP
     EDITTEXT        IDC_COLOR_SAMP1,85,80,30,14,ES_AUTOHSCROLL | WS_DISABLED
     PUSHBUTTON      "Pick Color...",IDC_COLOR_PICK1,120,80,60,14
     LTEXT           "Use this text color when a FILTER is ACTIVE:",IDC_STATIC,20,105,180,8
-    CONTROL         "D&efault windows color.",IDC_COLOR_DEF2,"Button",
-                    BS_AUTORADIOBUTTON | WS_TABSTOP,20,120,95,10
-    CONTROL         "C&ustom color:",IDC_COLOR_CUST2,"Button",
-                    BS_AUTORADIOBUTTON,20,133,60,10
+    AUTORADIOBUTTON "D&efault windows color.",IDC_COLOR_DEF2,20,120,95,10,WS_GROUP | WS_TABSTOP
+    AUTORADIOBUTTON "C&ustom color:",IDC_COLOR_CUST2,20,133,60,10,WS_TABSTOP
     EDITTEXT        IDC_COLOR_SAMP2,86,130,30,14,ES_AUTOHSCROLL | WS_DISABLED
     PUSHBUTTON      "Pick Color...",IDC_COLOR_PICK2,120,130,60,14
 END
@@ -476,20 +468,14 @@ STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION |
 CAPTION "Target Application"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    CONTROL         "Don't use any specific target application, simply launch the selected file.",
-                    IDC_LAUNCH,"Button",BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,7,7,260,10
-    CONTROL         "Use the following target application:",IDC_TARGET,
-                    "Button",BS_AUTORADIOBUTTON | WS_TABSTOP,7,21,160,10
-    LTEXT           "Specify the action if the target applicatoin is already running:",
-                    IDC_STATIC,7,64,260,8
+    AUTORADIOBUTTON "Don't use any specific target application, simply launch the selected file.",IDC_LAUNCH,7,7,260,10,WS_GROUP | WS_TABSTOP
+    AUTORADIOBUTTON "Use the following target application:",IDC_TARGET,7,21,160,10,WS_TABSTOP
+    LTEXT           "Specify the action if the target applicatoin is already running:",IDC_STATIC,7,64,260,8
     EDITTEXT        IDC_TARGETPATH,20,35,226,14,ES_AUTOHSCROLL
     PUSHBUTTON      "",IDC_BROWSE,251,35,14,14,BS_BITMAP
-    CONTROL         "None, run target application each time a file is opened.",
-                    IDC_ALWAYSRUN,"Button",BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,7,78,240,10
-    CONTROL         "Send a file open message to target application window:",
-                    IDC_SENDDROPMSG,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,7,92,194,10
-    CONTROL         "Execute the following DDE command:",IDC_USEDDE,"Button",
-                    BS_AUTORADIOBUTTON | WS_TABSTOP,7,106,160,10
+    AUTORADIOBUTTON "None, run target application each time a file is opened.",IDC_ALWAYSRUN,7,78,240,10,WS_GROUP | WS_TABSTOP
+    AUTORADIOBUTTON "Send a file open message to target application window:",IDC_SENDDROPMSG,7,92,194,10,WS_TABSTOP
+    AUTORADIOBUTTON "Execute the following DDE command:",IDC_USEDDE,7,106,160,10,WS_TABSTOP
     PUSHBUTTON      "Find Window...",IDC_FINDWIN,204,91,60,14
     LTEXT           "Message:",IDC_STATIC,19,124,42,8,SS_RIGHT
     LTEXT           "Application:",IDC_STATIC,19,145,42,8,SS_RIGHT
@@ -511,8 +497,7 @@ BEGIN
     ICON            IDI_CROSS1,IDC_CROSSCURSOR,7,7,21,20,SS_CENTERIMAGE
     LTEXT           "Drag the crosshair over the window you would like to select as the new target, or press Esc to cancel.",
                     IDC_FINDWINDESC,35,7,168,22
-    EDITTEXT        IDC_WINTITLE,7,35,196,14,ES_AUTOHSCROLL | ES_READONLY |
-                    NOT WS_TABSTOP
+    EDITTEXT        IDC_WINTITLE,7,35,196,14,ES_AUTOHSCROLL | ES_READONLY | NOT WS_TABSTOP
     LTEXT           "Window Class",IDC_WINCLASS,7,60,45,8,NOT WS_VISIBLE
     LTEXT           "Window Module",IDC_WINMODULE,7,70,51,8,NOT WS_VISIBLE
     DEFPUSHBUTTON   "OK",IDOK,97,64,50,14,WS_DISABLED
