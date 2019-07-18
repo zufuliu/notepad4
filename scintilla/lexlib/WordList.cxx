@@ -21,7 +21,7 @@ using namespace Scintilla;
  * after each word.
  */
 static char **ArrayFromWordList(char *wordlist, size_t slen, int *len, bool onlyLineEnds = false) {
-	int prev = '\n';
+	int prev = true;
 	int words = 0;
 	// For rapid determination of whether a character is a separator, build
 	// a look up table.
@@ -32,30 +32,41 @@ static char **ArrayFromWordList(char *wordlist, size_t slen, int *len, bool only
 		wordSeparator[static_cast<unsigned int>(' ')] = true;
 		wordSeparator[static_cast<unsigned int>('\t')] = true;
 	}
-	for (int j = 0; wordlist[j]; j++) {
-		const int curr = static_cast<unsigned char>(wordlist[j]);
-		if (!wordSeparator[curr] && wordSeparator[prev])
+
+	char * const end = wordlist + slen;
+	char *s = wordlist;
+	while (s < end) {
+		const unsigned char ch = *s++;
+		const bool curr = wordSeparator[ch];
+		if (!curr && prev) {
 			words++;
+		}
 		prev = curr;
 	}
+
 	char **keywords = new char *[words + 1];
 	int wordsStore = 0;
 	if (words) {
 		prev = '\0';
-		for (size_t k = 0; k < slen; k++) {
-			if (!wordSeparator[static_cast<unsigned char>(wordlist[k])]) {
+		s = wordlist;
+		while (s < end) {
+			unsigned char ch = *s;
+			if (!wordSeparator[ch]) {
 				if (!prev) {
-					keywords[wordsStore] = wordlist + k;
+					keywords[wordsStore] = s;
 					wordsStore++;
 				}
 			} else {
-				wordlist[k] = '\0';
+				*s = '\0';
+				ch = '\0';
 			}
-			prev = wordlist[k];
+			prev = ch;
+			++s;
 		}
 	}
+
 	assert(wordsStore < (words + 1));
-	keywords[wordsStore] = wordlist + slen;
+	keywords[wordsStore] = end;
 	*len = wordsStore;
 	return keywords;
 }
@@ -114,9 +125,12 @@ void WordList::Set(const char *s) {
 	}
 }
 
-void WordList::Reset(WordList &other) noexcept {
-	if (this == &other) {
-		return;
+bool WordList::Reset(const char *s) {
+#if 0
+	WordList other;
+	other.Set(s);
+	if (*this == other) {
+		return false;
 	}
 
 	Clear();
@@ -129,6 +143,10 @@ void WordList::Reset(WordList &other) noexcept {
 	other.words = nullptr;
 	other.list = nullptr;
 	other.len = 0;
+#else
+	Set(s);
+#endif
+	return true;
 }
 
 /** Check whether a string is in the list.
