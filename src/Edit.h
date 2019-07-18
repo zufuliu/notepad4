@@ -285,6 +285,7 @@ void	EditShowCallTips(Sci_Position position);
 #define NCP_8BIT					64
 #define NCP_INTERNAL				(NCP_DEFAULT | NCP_UTF8 | NCP_UTF8_SIGN | NCP_UNICODE | NCP_UNICODE_REVERSE | NCP_UNICODE_BOM)
 #define NCP_RECODE					128
+#define NCP_7BIT					256		// encoded in ASCII with escapes: UTF-7, ISO-2022, HZ-GB-2312
 #define CPI_NONE					(-1)
 #define CPI_DEFAULT					0
 #define CPI_OEM						1
