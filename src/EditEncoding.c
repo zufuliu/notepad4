@@ -769,8 +769,7 @@ void Encoding_AddToTreeView(HWND hwnd, int idSel, BOOL bRecodeOnly) {
 
 	for (UINT i = 0; i < COUNTOF(sEncodingGroupList); i++) {
 		const NP2EncodingGroup *group = &sEncodingGroupList[pEE[i].id];
-		ZeroMemory(&tvis, sizeof(TVINSERTSTRUCT));
-		tvis.item.mask = TVIF_TEXT | TVIF_IMAGE | TVIF_SELECTEDIMAGE | TVIF_PARAM;
+		tvis.hParent = NULL;
 		tvis.item.pszText = pEE[i].wch;
 		tvis.item.iImage = 2; // folder
 		tvis.item.iSelectedImage = 2;
