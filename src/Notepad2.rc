@@ -1904,6 +1904,7 @@ BEGIN
     IDS_WIKI_SEARCH_URL     "https://en.wikipedia.org/wiki/Special:Search?search=%s"
 END
 
+// encoding name string format: 'long descriptive name on Select Encoding dialog' + ';' + 'short name on statusbar'
 STRINGTABLE
 BEGIN
     61000                   "ANSI;ANSI"
@@ -1971,7 +1972,7 @@ BEGIN
     61063                   "Vietnamese (Windows-1258);Windows-1258"				// Southeast Asia
     61064                   "OEM Latin-1 (DOS-850);DOS-850"							// Western European
     61065                   "Latin-1 (ISO 8859-1);ISO 8859-1"						// Western European
-    61066                   "Mac Roman;Mac (Western)"								// Western European
+    61066                   "Mac Roman;Mac Roman"									// Western European
     61067                   "Latin-1 (Windows-1252);Windows-1252"					// Western European
 	61068					"US-Canada (IBM037);EBCDIC (US-Canada)"					// EBCDIC
 	61069					"US-Canada + Euro Symbol (IBM1140);EBCDIC (US-Canada Euro)"	// EBCDIC
@@ -1992,11 +1993,12 @@ BEGIN
 	61084					"ISO 2022 (allow 1 byte Kana - SO/SI);ISO-2022-JP SI/SO"// Japanese
 	61085					"Mac Korean;Mac Korean"									// Korean
 	61086					"ISO 2022 Korean;ISO-2022-KR"							// Korean
-	61087					"Simplified Chinese (Mac);Mac (GB 2312)"				// Chinese
+	61087					"Simplified Chinese (Mac);Mac GB-2312"					// Chinese
 	61088					"Simplified Chinese (HZ-GB2312);HZ-GB2312"				// Chinese
 	61089					"Simplified Chinese (ISO 2022);ISO-2022-CN(S)"			// Chinese
-	61090					"Traditional Chinese (Mac);Mac (Big5)"					// Chinese
+	61090					"Traditional Chinese (Mac);Mac Big5"					// Chinese
 	61091					"Traditional Chinese (ISO 2022);ISO-2022-CN(T)"			// Chinese
+	61092					"Traditional Chinese (CNS);CNS"							// Chinese
 
 	IDS_SELRECT_CURRENT_ENCODING	"Select current file &encoding:"
 	IDS_SELRECT_RELOAD_ENCODING		"Select source &encoding to reload file:"
