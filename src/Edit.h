@@ -302,7 +302,7 @@ typedef struct _np2encoding {
 	const UINT uFlags;
 	/*const*/UINT uCodePage;
 	const char * const pszParseNames;
-	const int idsName;
+	const UINT idsName;
 	LPWSTR wchLabel;
 } NP2ENCODING;
 
