@@ -171,7 +171,7 @@ NP2ENCODING mEncoding[] = {
 	{ NCP_8BIT | NCP_RECODE, 50225, "iso-2022-kr,iso2022kr,csiso2022kr,", 61086, NULL },// Korean (ISO-2022-KR)
 	{ NCP_8BIT | NCP_RECODE, 50227, "x-cp50227,xcp50227,", 61089, NULL },// Chinese Simplified (ISO-2022)
 	{ NCP_8BIT | NCP_RECODE, 50229, "iso-2022-cn,iso2022cn,", 61091, NULL },// Chinese Traditional (ISO-2022)
-	//{ NCP_8BIT | NCP_RECODE, 20000, "x-Chinese-CNS,xchinesecns,", 00000, NULL },// Chinese Traditional (CNS);  CNS Taiwan
+	{ NCP_8BIT | NCP_RECODE, 20000, "x-Chinese-CNS,xchinesecns,", 61092, NULL },// Chinese Traditional (CNS);  CNS Taiwan
 	//{ NCP_8BIT | NCP_RECODE, 20001, "x-cp20001,x-cp20001,", 00000, NULL },// TCA Taiwan
 	//{ NCP_8BIT | NCP_RECODE, 20002, "x-Chinese-Eten,xchineseeten,", 00000, NULL },// Chinese Traditional (Eten); Eten Taiwan
 	//{ NCP_8BIT | NCP_RECODE, 20003, "x-cp20003,x-cp20003,", 00000, NULL },// IBM5550 Taiwan
@@ -254,13 +254,14 @@ static NP2EncodingGroup sEncodingGroupList[] = {
 		// Simplified Chinese
 		936,		// GBK
 		54936,		// GB18030
-		50227,		// ISO-2022-CN
 		10008,		// Mac (GB 2312)
+		50227,		// ISO-2022-CN
 		52936,		// HZ-GB2312
 		// Traditional Chinese
 		950,		// Big5
-		50229,		// ISO-2022-CN
+		20000,		// CNS
 		10002,		// Mac (Big5)
+		50229,		// ISO-2022-CN
 	}},
 	{ FALSE, IDS_ENCODINGGROUP_CYRILLIC, { // Cyrillic
 		1251,		// Windows-1251
@@ -288,18 +289,18 @@ static NP2EncodingGroup sEncodingGroupList[] = {
 	}},
 	{ FALSE, IDS_ENCODINGGROUP_JAPANESE, { // Japanese
 		932,		// Shift-JIS
+		20932,		// EUC-JP
+		10001,		// Mac (Japanese)
 		50220,		// ISO-2022-JP
 		50221,		// CS ISO-2022-JP
 		50222,		// ISO-2022-JP SI/SO
-		20932,		// EUC-JP
-		10001,		// Mac (Japanese)
 	}},
 	{ FALSE, IDS_ENCODINGGROUP_KOREAN, { // Korean
 		949,		// UHC
 		1361,		// Johab
-		50225,		// ISO-2022-KR
-		10003,		// Mac (Korean)
 		51949,		// EUC-KR
+		10003,		// Mac (Korean)
+		50225,		// ISO-2022-KR
 	}},
 	{ FALSE, IDS_ENCODINGGROUP_SOUTHEURO, { // South European
 		// Southern European
