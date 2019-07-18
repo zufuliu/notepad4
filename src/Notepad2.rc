@@ -1916,87 +1916,87 @@ BEGIN
     61007                   "UTF-8 with BOM;UTF-8 BOM"
     61008                   "UTF-7;UTF-7"
     61009                   "Transparent ASMO (DOS-720);DOS-720"					// Arabic
-    61010                   "ISO 8859-6, Visual Order;ISO 8859-6"					// Arabic
-    61011                   "ISO 8859-6-I, Logical Order;ISO 8859-6-I"				// Arabic
+    61010                   "ISO 8859-6 (Visual Order);ISO 8859-6"					// Arabic
+    61011                   "ISO 8859-6-I (Logical Order);ISO 8859-6-I"				// Arabic
     61012                   "Windows-1256;Windows-1256"								// Arabic
     61013                   "OEM Baltic (DOS-775);DOS-775"							// Baltic Northern European
-    61014                   "Baltic, Latin-4, ISO 8859-4;ISO 8859-4"				// Baltic Northern European
-    61015                   "ANSI Baltic, Windows-1257;Windows-1257"				// Baltic Northern European
+    61014                   "Baltic (Latin-4, ISO 8859-4);ISO 8859-4"				// Baltic Northern European
+    61015                   "ANSI Baltic (Windows-1257);Windows-1257"				// Baltic Northern European
     61016                   "OEM Latin-2 (DOS-852);DOS-852"							// Central European
-    61017                   "Latin-2, ISO 8859-2;ISO 8859-2"						// Central European
-    61018                   "Mac Latin-2;Mac (Central)"								// Central European
-    61019                   "Latin-2, Windows-1250;Windows-1250"					// Central European
+    61017                   "Latin-2 (ISO 8859-2);ISO 8859-2"						// Central European
+    61018                   "Mac Latin-2;Mac Latin-2"								// Central European
+    61019                   "Latin-2 (Windows-1250);Windows-1250"					// Central European
     61020                   "Simplified Chinese (GBK, GB2312);GBK"					// Chinese
     61021                   "Simplified Chinese (GB18030);GB18030"					// Chinese
     61022                   "Traditional Chinese (Big5, Big5-HKSCS);Big5"			// Chinese
-    61024                   "Mac (Croatian);Mac (Croatian)"							// Southeast European
+    61024                   "Mac Croatian;Mac Croatian"								// Southeast European
     61025                   "OEM Russian (DOS-866);DOS-866"							// Cyrillic
     61026                   "ISO 8859-5;ISO 8859-5"									// Cyrillic
-    61027                   "Russian, KOI8-R;KOI8-R"								// Cyrillic
-    61028                   "Ukrainian, KOI8-U;KOI8-U"								// Cyrillic
-    61029                   "Mac (Cyrillic);Mac (Cyrillic)"							// Cyrillic
+    61027                   "Russian (KOI8-R);KOI8-R"								// Cyrillic
+    61028                   "Ukrainian (KOI8-U);KOI8-U"								// Cyrillic
+    61029                   "Mac Cyrillic;Mac Cyrillic"								// Cyrillic
     61030                   "Windows-1251;Windows-1251"								// Cyrillic
-    61031                   "Estonian, Baltic Rim, Latin-7, ISO 8859-13;ISO 8859-13"	// Northern European
+    61031                   "Estonian (Baltic Rim, Latin-7, ISO 8859-13);ISO 8859-13"	// Northern European
     61032                   "OEM French Canadian (DOS-863);DOS-863"					// Western European
     61033                   "OEM Greek (DOS-737);DOS-737"							// Greek
     61034                   "ISO 8859-7;ISO 8859-7"									// Greek
-    61035                   "Mac (Greek);Mac (Greek)"								// Greek
+    61035                   "Mac Greek;Mac Greek"									// Greek
     61036                   "Windows-1253;Windows-1253"								// Greek
     61037                   "OEM Modern Greek (DOS-869);DOS-869"					// Greek
     61038                   "OEM Hebrew (DOS-862);DOS-862"							// Hebrew
-    61039                   "ISO 8859-8-I, Logical Order;ISO 8859-8-I"				// Hebrew
-    61040                   "ISO 8859-8, Visual Order;ISO 8859-8"					// Hebrew
-    61041                   "Mac (Hebrew);Mac (Hebrew)"								// Hebrew
+    61039                   "ISO 8859-8-I (Logical Order);ISO 8859-8-I"				// Hebrew
+    61040                   "ISO 8859-8 (Visual Order);ISO 8859-8"					// Hebrew
+    61041                   "Mac Hebrew;Mac Hebrew"									// Hebrew
     61042                   "Windows-1255;Windows-1255"								// Hebrew
     61043                   "OEM Icelandic (DOS-861);DOS-861"						// Northern European
-    61044                   "Mac (Icelandic);Mac (Icelandic)"						// Northern European
-    61045                   "ISO-2022 (JIS);ISO-2022-JP"							// Japanese
+    61044                   "Mac Icelandic;Mac Icelandic"							// Northern European
+    61045                   "ISO 2022 (no halfwidth Katakana);ISO-2022-JP"			// Japanese
     61046                   "Shift-JIS;Shift-JIS"									// Japanese
     61047                   "Johab;Johab"											// Korean
     61048                   "Unified Hangul Code;UHC"								// Korean
-    61049                   "Latin-3, ISO 8859-3;ISO 8859-3"						// South European
-    61050                   "Latin-9, ISO 8859-15;ISO 8859-15"						// Western European
-    61051                   "Nordic, Latin-6, ISO 8859-10;ISO 8859-10"				// Northern European
-    61052                   "EUC-JP;EUC-JP"											// Japanese
-    61053                   "EUC-KR;EUC-KR"											// Korean
-    61054                   "South-Eastern European (Latin-10, ISO 8859-16);ISO 8859-16"	// Southeast European
-    61055                   "Celtic, Latin-8, ISO 8859-14;ISO 8859-14"				// Western European
-    61056                   "Mac (Thai);Mac (Thai)"									// Southeast Asia
+    61049                   "Southern European (Latin-3, ISO 8859-3);ISO 8859-3"	// Southern European
+    61050                   "Latin-9 (ISO 8859-15);ISO 8859-15"						// Western European
+    61051                   "Nordic (Latin-6, ISO 8859-10);ISO 8859-10"				// Northern European
+    61052                   "EUC Japanese;EUC-JP"									// Japanese
+    61053                   "EUC Korean;EUC-KR"										// Korean
+    61054                   "South-Eastern European (Latin-10, ISO 8859-16);ISO 8859-16"	// South-Eastern European
+    61055                   "Celtic (Latin-8, ISO 8859-14);ISO 8859-14"				// Western European
+    61056                   "Mac Thai;Mac Thai"										// Southeast Asia
     61057                   "Thai (TIS-620, Windows-874, ISO 8859-11);TIS-620"		// Southeast Asia
     61058                   "OEM Turkish (DOS-857);DOS-857"							// Turkish
-    61059                   "Latin-5, ISO 8859-9;ISO 8859-9"						// Turkish
-    61060                   "Mac (Turkish);Mac (Turkish)"							// Turkish
+    61059                   "Latin-5 (ISO 8859-9);ISO 8859-9"						// Turkish
+    61060                   "Mac Turkish;Mac Turkish"								// Turkish
     61061                   "Windows-1254;Windows-1254"								// Turkish
-    61062                   "Mac (Ukrainian);Mac (Ukrainian)"						// Cyrillic
+    61062                   "Mac Ukrainian;Mac Ukrainian"							// Cyrillic
     61063                   "Vietnamese (Windows-1258);Windows-1258"				// Southeast Asia
     61064                   "OEM Latin-1 (DOS-850);DOS-850"							// Western European
-    61065                   "Latin-1, ISO 8859-1;ISO 8859-1"						// Western European
+    61065                   "Latin-1 (ISO 8859-1);ISO 8859-1"						// Western European
     61066                   "Mac Roman;Mac (Western)"								// Western European
-    61067                   "Latin-1, Windows-1252;Windows-1252"					// Western European
-	61068					"US-Canada;EBCDIC (US-Canada)"							// EBCDIC
-	61069					"US-Canada + Euro Symbol;EBCDIC (US-Canada Euro)"		// EBCDIC
-	61070					"International;EBCDIC (Intl.)"							// EBCDIC
-	61071					"Latin-2;EBCDIC (Latin-2)"								// EBCDIC
-	61072					"Greek Modern;EBCDIC (Greek)"							// EBCDIC
-	61073					"Turkish, Latin-5;EBCDIC (Latin-5)"						// EBCDIC
+    61067                   "Latin-1 (Windows-1252);Windows-1252"					// Western European
+	61068					"US-Canada (IBM037);EBCDIC (US-Canada)"					// EBCDIC
+	61069					"US-Canada + Euro Symbol (IBM1140);EBCDIC (US-Canada Euro)"	// EBCDIC
+	61070					"International (IBM500);EBCDIC (Intl.)"					// EBCDIC
+	61071					"Latin-2 (IBM870);EBCDIC (Latin-2)"						// EBCDIC
+	61072					"Greek Modern (CP875);EBCDIC (Greek)"					// EBCDIC
+	61073					"Turkish (Latin-5) (IBM1026);EBCDIC (Latin-5)"			// EBCDIC
 	61074					"OEM United States (DOS-437);DOS-437"					// Western European
     61075                   "OEM Latin-1 + Euro Symbol (DOS-858);DOS-858"			// Western European
 	61076					"OEM Portuguese (DOS-860);DOS-860"						// Western European
-	61077					"Mac (Arabic);Mac (Arabic)"								// Arabic
+	61077					"Mac Arabic;Mac Arabic"									// Arabic
 	61078					"OEM Arabic (DOS-864);OEM Arabic"						// Arabic
-	61079					"Mac (Romanian);Mac (Romanian)"							// South European
+	61079					"Mac Romanian;Mac Romanian"								// South European
 	61080					"OEM Nordic (DOS-865);DOS-865"							// Northern European
-	61081					"OEM Cyrillic (Primarily Russian);OEM Cyrillic"			// Cyrillic
-	61082					"Mac (Japanese);Mac (Japanese)"							// Japanese
-	61083					"ISO-2022 (JIS-Allow 1 byte Kana);CS ISO-2022-JP"		// Japanese
-	61084					"ISO-2022 (JIS-Allow 1 byte Kana - SO/SI);ISO-2022-JP SI/SO"	// Japanese
-	61085					"Mac (Korean);Mac (Korean)"								// Korean
-	61086					"ISO-2022 Korean;ISO-2022-KR"							// Korean
+	61081					"OEM Cyrillic (primarily Russian) (IBM855);OEM Cyrillic"// Cyrillic
+	61082					"Mac Japanese;Mac Japanese"								// Japanese
+	61083					"ISO 2022 (allow 1 byte Kana);CS ISO-2022-JP"			// Japanese
+	61084					"ISO 2022 (allow 1 byte Kana - SO/SI);ISO-2022-JP SI/SO"// Japanese
+	61085					"Mac Korean;Mac Korean"									// Korean
+	61086					"ISO 2022 Korean;ISO-2022-KR"							// Korean
 	61087					"Simplified Chinese (Mac);Mac (GB 2312)"				// Chinese
 	61088					"Simplified Chinese (HZ-GB2312);HZ-GB2312"				// Chinese
-	61089					"Simplified Chinese (ISO-2022);ISO-2022-CN(S)"			// Chinese
+	61089					"Simplified Chinese (ISO 2022);ISO-2022-CN(S)"			// Chinese
 	61090					"Traditional Chinese (Mac);Mac (Big5)"					// Chinese
-	61091					"Traditional Chinese (ISO-2022);ISO-2022-CN(T)"			// Chinese
+	61091					"Traditional Chinese (ISO 2022);ISO-2022-CN(T)"			// Chinese
 
 	IDS_SELRECT_CURRENT_ENCODING	"Select current file &encoding:"
 	IDS_SELRECT_RELOAD_ENCODING		"Select source &encoding to reload file:"
@@ -2004,15 +2004,15 @@ BEGIN
 	IDS_ENCODINGGROUP_UNICODE		"Unicode"
 	IDS_ENCODINGGROUP_WESTERNEURO	"Western European"
 	IDS_ENCODINGGROUP_ARABIC		"Arabic"
-	IDS_ENCODINGGROUP_NORTHERNEURO	"Baltic, Northern European"
-	IDS_ENCODINGGROUP_CENTRALEURO	"Central European"
+	IDS_ENCODINGGROUP_NORTHERNEURO	"Baltic and Northern European"
+	IDS_ENCODINGGROUP_CENTRALEURO	"Central and Eastern European"
 	IDS_ENCODINGGROUP_CHINESE		"Chinese"
 	IDS_ENCODINGGROUP_CYRILLIC		"Cyrillic"
 	IDS_ENCODINGGROUP_GREEK			"Greek"
 	IDS_ENCODINGGROUP_HEBREW		"Hebrew"
 	IDS_ENCODINGGROUP_JAPANESE		"Japanese"
 	IDS_ENCODINGGROUP_KOREAN		"Korean"
-	IDS_ENCODINGGROUP_SOUTHEURO		"South, Southeast European"
+	IDS_ENCODINGGROUP_SOUTHEURO		"South European"
 	IDS_ENCODINGGROUP_SOUTASIA		"Southeast Asia"
 	IDS_ENCODINGGROUP_TURKISH		"Turkish"
 	IDS_ENCODINGGROUP_EBCDIC		"IBM EBCDIC"

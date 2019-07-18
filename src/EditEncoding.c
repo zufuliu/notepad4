@@ -215,9 +215,9 @@ static NP2EncodingGroup sEncodingGroupList[] = {
 	}},
 	{ FALSE, IDS_ENCODINGGROUP_WESTERNEURO, { // Western European
 		1252,		// Windows-1252
-		28591,		// ISO 8859-1
-		28605,		// Latin-9 ISO 8859-15
-		28604,		// Celtic ISO 8859-14
+		28591,		// Latin-1, ISO 8859-1
+		28605,		// Latin-9, ISO 8859-15
+		28604,		// Celtic Latin-8, ISO 8859-14
 		437,		// OEM United States
 		850,		// OEM Latin-1
 		858,		// OEM Latin-1 + Euro
@@ -237,21 +237,22 @@ static NP2EncodingGroup sEncodingGroupList[] = {
 	}},
 	{ FALSE, IDS_ENCODINGGROUP_NORTHERNEURO, { // Baltic, Northern European
 		1257,		// Baltic Windows-1257
-		28594,		// Baltic ISO 8859-4
-		28603,		// Estonian ISO 8859-13
-		28600,		// Nordic ISO 8859-10
+		28594,		// Baltic Latin-4, ISO 8859-4
+		28603,		// Estonian Latin-7, ISO 8859-13
+		28600,		// Nordic Latin-6, ISO 8859-10
 		775,		// OEM Baltic
 		861,		// OEM Icelandic
 		865,		// OEM Nordic
 		10079,		// Mac (Icelandic)
 	}},
-	{ FALSE, IDS_ENCODINGGROUP_CENTRALEURO, { // Central European
+	{ FALSE, IDS_ENCODINGGROUP_CENTRALEURO, { // Central and Eastern European
 		1250,		// Windows-1250
 		28592,		// ISO 8859-2
 		852,		// OEM Latin-2
 		10029,		// Mac Latin-2
 	}},
 	{ FALSE, IDS_ENCODINGGROUP_CHINESE, { // Chinese
+		// Simplified Chinese
 		936,		// GBK
 		54936,		// GB18030
 		50227,		// ISO-2022-CN
@@ -273,61 +274,61 @@ static NP2EncodingGroup sEncodingGroupList[] = {
 		10017,		// Mac (Ukrainian)
 	}},
 	{ FALSE, IDS_ENCODINGGROUP_GREEK, { // Greek
-		1253,	// Windows-1253
-		28597,	// ISO 8859-7
-		737,	// OEM Greek
-		869,	// OEM Modern Greek
-		10006,	// Mac (Greek)
+		1253,		// Windows-1253
+		28597,		// ISO 8859-7
+		737,		// OEM Greek
+		869,		// OEM Modern Greek
+		10006,		// Mac (Greek)
 	}},
 	{ FALSE, IDS_ENCODINGGROUP_HEBREW, { // Hebrew
-		1255,	// Windows-1255
-		28598,	// ISO 8859-8 Visual
-		38598,	// ISO 8859-8-I Logical
-		862,	// OEM Hebrew
-		10005,	// Mac (Hebrew)
+		1255,		// Windows-1255
+		28598,		// ISO 8859-8 Visual
+		38598,		// ISO 8859-8-I Logical
+		862,		// OEM Hebrew
+		10005,		// Mac (Hebrew)
 	}},
 	{ FALSE, IDS_ENCODINGGROUP_JAPANESE, { // Japanese
-		932,	// Shift-JIS
-		50220,	// ISO-2022-JP
-		50221,	// CS ISO-2022-JP
-		50222,	// ISO-2022-JP SI/SO
-		20932,	// EUC-JP
-		10001,	// Mac (Japanese)
+		932,		// Shift-JIS
+		50220,		// ISO-2022-JP
+		50221,		// CS ISO-2022-JP
+		50222,		// ISO-2022-JP SI/SO
+		20932,		// EUC-JP
+		10001,		// Mac (Japanese)
 	}},
 	{ FALSE, IDS_ENCODINGGROUP_KOREAN, { // Korean
-		949,	// UHC
-		1361,	// Johab
-		50225,	// ISO-2022-KR
-		10003,	// Mac (Korean)
-		51949,	// EUC-KR
+		949,		// UHC
+		1361,		// Johab
+		50225,		// ISO-2022-KR
+		10003,		// Mac (Korean)
+		51949,		// EUC-KR
 	}},
 	{ FALSE, IDS_ENCODINGGROUP_SOUTHEURO, { // South European
-		28593,	// Latin-3 ISO 8859-3
-		10010,	// Mac (Romanian)
+		28593,		// Latin-3, ISO 8859-3
+		10010,		// Mac (Romanian)
 		// Southeast European
-		28606,	// Latin-10 ISO 8859-16
-		10082,	// Mac (Croatian)
+		28606,		// Latin-10, ISO 8859-16
+		10082,		// Mac (Croatian)
 	}},
 	{ FALSE, IDS_ENCODINGGROUP_SOUTASIA, { // Southeast Asia
-		874,	// Thai TIS-620
-		10021,	// Mac (Thai)
-		1258,	// Vietnamese Windows-1258
+		874,		// Thai TIS-620, ISO 8859-11
+		10021,		// Mac (Thai)
+		1258,		// Vietnamese Windows-1258
 	}},
 	{ FALSE, IDS_ENCODINGGROUP_TURKISH, { // Turkish
-		1254,	// Windows-1254
-		28599,	// Latin-5 ISO 8859-9
-		857,	// OEM Turkish
-		10081,	// Mac (Turkish)
+		1254,		// Windows-1254
+		28599,		// Latin-5, ISO 8859-9
+		857,		// OEM Turkish
+		10081,		// Mac (Turkish)
 	}},
 
 	// last group
 	{ FALSE, IDS_ENCODINGGROUP_EBCDIC, { // IBM EBCDIC
-		37,		// US-Canada
-		1140,	// US-Canada + Euro
-		500,	// International
-		870,	// Latin-2
-		875,	// Greek Modern
-		1026,	// Turkish, Latin-5
+		37,			// US-Canada
+		1140,		// US-Canada + Euro
+		500,		// International
+		870,		// Latin-2
+		875,		// Greek Modern
+		1026,		// Turkish, Latin-5
 	}},
 };
 
