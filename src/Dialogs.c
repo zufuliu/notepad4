@@ -1701,7 +1701,10 @@ static INT_PTR CALLBACK SelectDefEncodingDlgProc(HWND hwnd, UINT umsg, WPARAM wP
 		case NM_RETURN:
 			if (pnmhdr->idFrom == IDC_ENCODING_LINK) {
 				int *pidREncoding = (int *)GetWindowLongPtr(hwnd, DWLP_USER);
-				SelectEncodingDlg(hwndMain, pidREncoding, IDS_SELRECT_DEFAULT_ENCODING);
+				if (SelectEncodingDlg(hwndMain, pidREncoding, IDS_SELRECT_DEFAULT_ENCODING)) {
+					Encoding_GetLabel(*pidREncoding);
+					SetDlgItemText(hwnd, IDC_ENCODING_LABEL, mEncoding[*pidREncoding].wchLabel);
+				}
 			}
 			break;
 		}
