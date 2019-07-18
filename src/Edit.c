@@ -573,9 +573,7 @@ BOOL EditLoadFile(LPWSTR pszFile, BOOL bSkipEncodingDetection, EditFileIOStatus 
 			}
 
 			const UINT uCodePage = mEncoding[iEncoding].uCodePage;
-			if (((mEncoding[iEncoding].uFlags & NCP_8BIT) && uCodePage != CP_UTF7) ||
-					(uCodePage == CP_UTF7 && IsUTF7(lpData, cbData))) {
-
+			if ((mEncoding[iEncoding].uFlags & NCP_8BIT) || ((mEncoding[iEncoding].uFlags & NCP_7BIT) && IsUTF7(lpData, cbData))) {
 				LPWSTR lpDataWide = (LPWSTR)NP2HeapAlloc(cbData * sizeof(WCHAR) + 16);
 				const int cbDataWide = MultiByteToWideChar(uCodePage, 0, lpData, cbData, lpDataWide, (int)(NP2HeapSize(lpDataWide) / sizeof(WCHAR)));
 				NP2HeapFree(lpData);
@@ -713,7 +711,7 @@ BOOL EditSaveFile(HWND hwnd, LPCWSTR pszFile, BOOL bSaveCopy, EditFileIOStatus *
 
 			bWriteSuccess = WriteFile(hFile, lpData, cbData, &dwBytesWritten, NULL);
 			dwLastIOError = GetLastError();
-		} else if (uFlags & NCP_8BIT) {
+		} else if (uFlags & (NCP_8BIT | NCP_7BIT)) {
 			BOOL bCancelDataLoss = FALSE;
 			const UINT uCodePage = mEncoding[iEncoding].uCodePage;
 			const BOOL zeroFlags = IsZeroFlagsCodePage(uCodePage);

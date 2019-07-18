@@ -30,6 +30,7 @@ typedef struct NP2EncodingGroup {
 } NP2EncodingGroup;
 
 // https://docs.microsoft.com/en-us/windows/desktop/Intl/code-page-identifiers
+// https://www.iana.org/assignments/character-sets/character-sets.xhtml
 // https://en.wikipedia.org/wiki/Windows_code_page
 // https://en.wikipedia.org/wiki/ISO/IEC_8859
 // https://encoding.spec.whatwg.org/
@@ -44,7 +45,7 @@ NP2ENCODING mEncoding[] = {
 	{ NCP_UNICODE | NCP_UNICODE_REVERSE | NCP_RECODE, 0, "UTF-16BE,UTF16BE,UnicodeBE,", 61005, NULL },
 	{ NCP_UTF8 | NCP_RECODE, 0, "UTF-8,UTF8,", 61006, NULL },
 	{ NCP_UTF8 | NCP_UTF8_SIGN, 0, "UTF-8,UTF8,", 61007, NULL },
-	{ NCP_8BIT | NCP_RECODE, CP_UTF7, "UTF-7,UTF7,", 61008, NULL },
+	{ NCP_7BIT | NCP_RECODE, CP_UTF7, "UTF-7,UTF7,", 61008, NULL },
 	//{ NCP_8BIT | NCP_RECODE, 708, ",ASMO-708,ASMO-708,", 0, NULL },// Arabic (ASMO 708); ISO 8859-6
 	//{ NCP_8BIT | NCP_RECODE, 709, ",ASMO-709,ASMO-709,", 0, NULL },// Arabic (ASMO-449+, BCON V4)
 	//{ NCP_8BIT | NCP_RECODE, 710, ",ASMO-710,ASMO-710,", 0, NULL },// Arabic - Transparent Arabic
@@ -155,22 +156,22 @@ NP2ENCODING mEncoding[] = {
 	//{ NCP_8BIT | NCP_RECODE, 50936, "x-EBCDIC-SimplifiedChinese,xebcdicsimplifiedchinese,", 00000, NULL },// IBM EBCDIC (Chinese Simplified)
 	//{ NCP_8BIT | NCP_RECODE, 50937, "x-EBCDIC-TraditionalChinese,xebcdictraditionalchinese,", 00000, NULL },// IBM EBCDIC (US-Canada and Traditional Chinese)
 	//{ NCP_8BIT | NCP_RECODE, 50939, "x-EBCDIC-JapaneseAndJapaneseLatin,xebcdicjapaneseandjapaneselatin,", 00000, NULL },// IBM EBCDIC (Japanese (Latin) Extended and Japanese)
-	//{ NCP_8BIT | NCP_RECODE, 20105, "x-IA5,xia5,", 00000, NULL },// IA5 (IRV International Alphabet No. 5, 7-bit); Western European (IA5)
-	//{ NCP_8BIT | NCP_RECODE, 20106, "x-IA5-German,xia5german,", 00000, NULL },// German (IA5) (7-bit)
-	//{ NCP_8BIT | NCP_RECODE, 20107, "x-IA5-Swedish,xia5swedish,", 00000, NULL },// Swedish (IA5) (7-bit)
-	//{ NCP_8BIT | NCP_RECODE, 20108, "x-IA5-Norwegian,xia5norwegian,", 00000, NULL },// Norwegian (IA5) (7-bit)
+	//{ NCP_7BIT | NCP_RECODE, 20105, "x-IA5,xia5,", 00000, NULL },// IA5 (IRV International Alphabet No. 5, 7-bit); Western European (IA5)
+	//{ NCP_7BIT | NCP_RECODE, 20106, "x-IA5-German,xia5german,", 00000, NULL },// German (IA5) (7-bit)
+	//{ NCP_7BIT | NCP_RECODE, 20107, "x-IA5-Swedish,xia5swedish,", 00000, NULL },// Swedish (IA5) (7-bit)
+	//{ NCP_7BIT | NCP_RECODE, 20108, "x-IA5-Norwegian,xia5norwegian,", 00000, NULL },// Norwegian (IA5) (7-bit)
 	//{ NCP_8BIT | NCP_RECODE, 20936, "X-CP20936,XCP20936,", 00000, NULL },// Simplified Chinese (GB2312); Chinese Simplified (GB2312-80)
 	//{ NCP_8BIT | NCP_RECODE, 20949, "x-cp20949,x-cp20949,", 00000, NULL },// Korean Wansung
-	{ NCP_8BIT | NCP_RECODE, 52936, "HZ-GB-2312,HZGB2312,hz,", 61088, NULL },// HZ-GB2312 Simplified Chinese; Chinese Simplified (HZ)
+	{ NCP_7BIT | NCP_RECODE, 52936, "HZ-GB-2312,HZGB2312,hz,", 61088, NULL },// HZ-GB2312 Simplified Chinese; Chinese Simplified (HZ)
 	{ NCP_8BIT | NCP_RECODE, 54936, "GB18030,GB18030,", 61021, NULL },// Chinese GB18030
 	{ NCP_8BIT | NCP_RECODE, 1361, "johab,johab,", 61047, NULL },// Korean (Johab)
 	{ NCP_8BIT | NCP_RECODE, 20932, "euc-jp,euc-jp,", 61052, NULL },// Japanese (JIS X 0208-1990 & 0212-1990)
-	{ NCP_8BIT | NCP_RECODE, 50220, "iso-2022-jp,iso2022jp,", 61045, NULL },// ISO 2022 Japanese with no halfwidth Katakana; Japanese (JIS)
-	{ NCP_8BIT | NCP_RECODE, 50221, "csISO2022JP,csiso2022jp,", 61083, NULL },// ISO 2022 Japanese with halfwidth Katakana; Japanese (JIS-Allow 1 byte Kana)
-	{ NCP_8BIT | NCP_RECODE, 50222, "_iso-2022-jp$SIO,iso2022jpSIO,", 61084, NULL },// ISO 2022 Japanese JIS X 0201-1989; Japanese (JIS-Allow 1 byte Kana - SO/SI)
-	{ NCP_8BIT | NCP_RECODE, 50225, "iso-2022-kr,iso2022kr,csiso2022kr,", 61086, NULL },// Korean (ISO-2022-KR)
-	{ NCP_8BIT | NCP_RECODE, 50227, "x-cp50227,xcp50227,", 61089, NULL },// Chinese Simplified (ISO-2022)
-	{ NCP_8BIT | NCP_RECODE, 50229, "iso-2022-cn,iso2022cn,", 61091, NULL },// Chinese Traditional (ISO-2022)
+	{ NCP_7BIT | NCP_RECODE, 50220, "iso-2022-jp,iso2022jp,", 61045, NULL },// ISO 2022 Japanese with no halfwidth Katakana; Japanese (JIS)
+	{ NCP_7BIT | NCP_RECODE, 50221, "csISO2022JP,csiso2022jp,", 61083, NULL },// ISO 2022 Japanese with halfwidth Katakana; Japanese (JIS-Allow 1 byte Kana)
+	{ NCP_7BIT | NCP_RECODE, 50222, "_iso-2022-jp$SIO,iso2022jpSIO,", 61084, NULL },// ISO 2022 Japanese JIS X 0201-1989; Japanese (JIS-Allow 1 byte Kana - SO/SI)
+	{ NCP_7BIT | NCP_RECODE, 50225, "iso-2022-kr,iso2022kr,csiso2022kr,", 61086, NULL },// Korean (ISO-2022-KR)
+	{ NCP_7BIT | NCP_RECODE, 50227, "x-cp50227,xcp50227,", 61089, NULL },// Chinese Simplified (ISO-2022)
+	{ NCP_7BIT | NCP_RECODE, 50229, "iso-2022-cn,iso2022cn,", 61091, NULL },// Chinese Traditional (ISO-2022)
 	{ NCP_8BIT | NCP_RECODE, 20000, "x-Chinese-CNS,xchinesecns,", 61092, NULL },// Chinese Traditional (CNS);  CNS Taiwan
 	//{ NCP_8BIT | NCP_RECODE, 20001, "x-cp20001,x-cp20001,", 00000, NULL },// TCA Taiwan
 	//{ NCP_8BIT | NCP_RECODE, 20002, "x-Chinese-Eten,xchineseeten,", 00000, NULL },// Chinese Traditional (Eten); Eten Taiwan
@@ -178,7 +179,7 @@ NP2ENCODING mEncoding[] = {
 	//{ NCP_8BIT | NCP_RECODE, 20004, "x-cp20004,x-cp20004,", 00000, NULL },// TeleText Taiwan
 	//{ NCP_8BIT | NCP_RECODE, 20005, "x-cp20004,x-cp20005,", 00000, NULL },// Wang Taiwan
 	//{ NCP_8BIT | NCP_RECODE, 20005, "x-cp20004,x-cp20005,", 00000, NULL },// Wang Taiwan
-	//{ NCP_8BIT | NCP_RECODE, 20127, "us-ascii,us-ascii,", 00000, NULL },// US-ASCII (7-bit)
+	//{ NCP_7BIT | NCP_RECODE, 20127, "us-ascii,us-ascii,", 00000, NULL },// US-ASCII (7-bit)
 	//{ NCP_8BIT | NCP_RECODE, 20261, "x-cp20261,x-cp20261,", 00000, NULL },// T.61
 	//{ NCP_8BIT | NCP_RECODE, 20269, "x-cp20269,x-cp20269,", 00000, NULL },// ISO 6937 Non-Spacing Accent
 	/*	20932 used by native API and 51932 used by .NET
