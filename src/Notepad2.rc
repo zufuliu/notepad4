@@ -940,14 +940,14 @@ FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
     LTEXT           "Search Strin&g:",IDC_STATIC,7,7,67,8
     COMBOBOX        IDC_FINDTEXT,7,17,210,116,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
-    CONTROL         "Match &case",IDC_FINDCASE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,37,73,10
-    CONTROL         "Match &whole word only",IDC_FINDWORD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,49,110,10
-    CONTROL         "Match &beginning of word only",IDC_FINDSTART,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,61,124,10
-    CONTROL         "Regular &expression search",IDC_FINDREGEXP,"Button", BS_AUTOCHECKBOX | WS_TABSTOP,7,73,112,10
-    CONTROL         "&Transform backslashes",IDC_FINDTRANSFORMBS,"Button", BS_AUTOCHECKBOX | WS_TABSTOP,7,85,95,10
-    CONTROL         "&Don't wrap around",IDC_NOWRAP,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,132,37,79,10
-    CONTROL         "C&lose after find",IDC_FINDCLOSE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,132,49,77,10
-    CONTROL         "W&ildcard search",IDC_WILDCARDSEARCH,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,132,61,74,10
+    AUTOCHECKBOX    "Match &case",IDC_FINDCASE,7,37,73,10,WS_TABSTOP
+    AUTOCHECKBOX    "Match &whole word only",IDC_FINDWORD,7,49,110,10,WS_TABSTOP
+    AUTOCHECKBOX    "Match &beginning of word only",IDC_FINDSTART,7,61,124,10,WS_TABSTOP
+    AUTOCHECKBOX    "Regular &expression search",IDC_FINDREGEXP,7,73,112,10,WS_TABSTOP
+    AUTOCHECKBOX    "&Transform backslashes",IDC_FINDTRANSFORMBS,7,85,95,10,WS_TABSTOP
+    AUTOCHECKBOX    "&Don't wrap around",IDC_NOWRAP,132,37,79,10,WS_TABSTOP
+    AUTOCHECKBOX    "C&lose after find",IDC_FINDCLOSE,132,49,77,10,WS_TABSTOP
+    AUTOCHECKBOX    "W&ildcard search",IDC_WILDCARDSEARCH,132,61,74,10,WS_TABSTOP
     DEFPUSHBUTTON   "&Find Next",IDOK,223,7,60,14
     PUSHBUTTON      "Find &Previous",IDC_FINDPREV,223,24,60,14
     PUSHBUTTON      "Close",IDCANCEL,223,41,60,14
@@ -955,7 +955,7 @@ BEGIN
     CONTROL         "<a>(?)</a>",IDC_BACKSLASHHELP,"SysLink",0x0,118,85,14,10
     CONTROL         "<a>(?)</a>",IDC_WILDCARDHELP,"SysLink",0x0,208,61,14,10
     CONTROL         "<a>Clear History</a>",IDC_CLEAR_FIND,"SysLink",WS_TABSTOP,173,7,48,10
-    CONTROL         "Transparent mode on losing focus",IDC_TRANSPARENT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,96,124,10
+    AUTOCHECKBOX    "Transparent mode on losing focus",IDC_TRANSPARENT,7,96,124,10,WS_TABSTOP
     CONTROL         "<a>Goto Replace (Ctrl+H)</a>",IDC_TOGGLEFINDREPLACE, "SysLink",WS_TABSTOP,138,97,80,10
     CONTROL         "<a>Save Position (&O)</a>",IDC_SAVEPOSITION,"SysLink",WS_TABSTOP,223,85,60,10
     CONTROL         "<a>Reset Position (&P)</a>",IDC_RESETPOSITION,"SysLink",WS_TABSTOP,223,96,60,10
@@ -971,14 +971,14 @@ BEGIN
     COMBOBOX        IDC_FINDTEXT,7,17,210,116,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
     LTEXT           "Replace Wit&h:",IDC_STATIC,7,35,64,8
     COMBOBOX        IDC_REPLACETEXT,7,46,209,116,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
-    CONTROL         "Match &case",IDC_FINDCASE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,66,53,10
-    CONTROL         "Match &whole word only",IDC_FINDWORD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,78,105,10
-    CONTROL         "Match &beginning of word only",IDC_FINDSTART,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,90,124,10
-    CONTROL         "Regular &expression search",IDC_FINDREGEXP,"Button", BS_AUTOCHECKBOX | WS_TABSTOP,7,102,112,10
-    CONTROL         "&Transform backslashes",IDC_FINDTRANSFORMBS,"Button", BS_AUTOCHECKBOX | WS_TABSTOP,7,114,97,10
-    CONTROL         "&Don't wrap around",IDC_NOWRAP,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,132,66,79,10
-    CONTROL         "C&lose after replace",IDC_FINDCLOSE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,132,78,90,10
-    CONTROL         "W&ildcard search",IDC_WILDCARDSEARCH,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,132,90,74,10
+    AUTOCHECKBOX    "Match &case",IDC_FINDCASE,7,66,53,10,WS_TABSTOP
+    AUTOCHECKBOX    "Match &whole word only",IDC_FINDWORD,7,78,105,10,WS_TABSTOP
+    AUTOCHECKBOX    "Match &beginning of word only",IDC_FINDSTART,7,90,124,10,WS_TABSTOP
+    AUTOCHECKBOX    "Regular &expression search",IDC_FINDREGEXP,7,102,112,10,WS_TABSTOP
+    AUTOCHECKBOX    "&Transform backslashes",IDC_FINDTRANSFORMBS,7,114,97,10,WS_TABSTOP
+    AUTOCHECKBOX    "&Don't wrap around",IDC_NOWRAP,132,66,79,10,WS_TABSTOP
+    AUTOCHECKBOX    "C&lose after replace",IDC_FINDCLOSE,132,78,90,10,WS_TABSTOP
+    AUTOCHECKBOX    "W&ildcard search",IDC_WILDCARDSEARCH,132,90,74,10,WS_TABSTOP
     DEFPUSHBUTTON   "&Find Next",IDOK,223,7,60,14
     PUSHBUTTON      "Find &Previous",IDC_FINDPREV,223,24,60,14
     PUSHBUTTON      "&Replace",IDC_REPLACE,223,41,60,14
@@ -990,7 +990,7 @@ BEGIN
     CONTROL         "<a>(?)</a>",IDC_WILDCARDHELP,"SysLink",0x0,208,90,14,10
     CONTROL         "<a>Clear History</a>",IDC_CLEAR_FIND,"SysLink",WS_TABSTOP,173,6,48,10
     CONTROL         "<a>Clear History</a>",IDC_CLEAR_REPLACE,"SysLink",WS_TABSTOP,173,35,48,10
-    CONTROL         "Transparent mode on losing focus",IDC_TRANSPARENT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,126,124,10
+    AUTOCHECKBOX    "Transparent mode on losing focus",IDC_TRANSPARENT,7,126,124,10,WS_TABSTOP
     CONTROL         "<a>Goto Find (Ctrl+F)</a>",IDC_TOGGLEFINDREPLACE, "SysLink",WS_TABSTOP,138,127,80,10
     CONTROL         "<a>Save Position (&O)</a>",IDC_SAVEPOSITION,"SysLink",WS_TABSTOP,223,114,60,10
     CONTROL         "<a>Reset Position (&P)</a>",IDC_RESETPOSITION,"SysLink",WS_TABSTOP,223,126,60,10
@@ -1032,14 +1032,10 @@ BEGIN
     LTEXT           "&Default encoding:",IDC_STATIC,7,7,195,8
     EDITTEXT        IDC_ENCODING_LABEL,7,20,195,14,ES_READONLY | ES_AUTOHSCROLL | WS_TABSTOP
     CONTROL         "<a>Click here to select default encoding.</a>",IDC_ENCODING_LINK,"SysLink",WS_TABSTOP,7,38,195,10
-    CONTROL         "Skip automatic &Unicode detection.",IDC_NOUNICODEDETECTION,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,52,195,10
-    CONTROL         "Open &ANSI (unknown encoding) files in UTF-8 mode.",IDC_ANSIASUTF8,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,62,195,10
-    CONTROL         "Open ANSI Art (*.&nfo, *.diz) files in DOS-437 mode.",IDC_NFOASOEM,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,72,195,10
-    CONTROL         "Don't parse encoding &tags.",IDC_ENCODINGFROMFILEVARS,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,82,195,10
+    AUTOCHECKBOX    "Skip automatic &Unicode detection.",IDC_NOUNICODEDETECTION,7,52,195,10,WS_TABSTOP
+    AUTOCHECKBOX    "Open &ANSI (unknown encoding) files in UTF-8 mode.",IDC_ANSIASUTF8,7,62,195,10,WS_TABSTOP
+    AUTOCHECKBOX    "Open ANSI Art (*.&nfo, *.diz) files in DOS-437 mode.",IDC_NFOASOEM,7,72,195,10,WS_TABSTOP
+    AUTOCHECKBOX    "Don't parse encoding &tags.",IDC_ENCODINGFROMFILEVARS,7,82,195,10,WS_TABSTOP
     DEFPUSHBUTTON   "OK",IDOK,96,98,50,14
     PUSHBUTTON      "Cancel",IDCANCEL,152,98,50,14
 END
@@ -1051,12 +1047,9 @@ FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     LTEXT           "&Default line ending mode:",IDC_STATIC,7,7,116,8
     COMBOBOX        IDC_EOLMODELIST,7,20,118,81,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    CONTROL         "Show inconsistent line endings warning on loading.",IDC_WARNINCONSISTENTEOLS,
-                    "Button",BS_AUTOCHECKBOX | BS_VCENTER | WS_TABSTOP,7,40,186,10
-    CONTROL         "&Ensure consistent line endings when saving.",IDC_CONSISTENTEOLS,
-                    "Button",BS_AUTOCHECKBOX | BS_VCENTER | WS_TABSTOP,7,52,182,10
-    CONTROL         "&Strip trailing blanks when saving.",IDC_AUTOSTRIPBLANKS,
-                    "Button",BS_AUTOCHECKBOX | BS_VCENTER | WS_TABSTOP,7,64,173,10
+    AUTOCHECKBOX    "Show inconsistent line endings warning on loading.",IDC_WARNINCONSISTENTEOLS,7,40,186,10,WS_TABSTOP
+    AUTOCHECKBOX    "&Ensure consistent line endings when saving.",IDC_CONSISTENTEOLS,7,52,182,10,WS_TABSTOP
+    AUTOCHECKBOX    "&Strip trailing blanks when saving.",IDC_AUTOSTRIPBLANKS,7,64,173,10,WS_TABSTOP
     DEFPUSHBUTTON   "OK",IDOK,139,7,50,14
     PUSHBUTTON      "Cancel",IDCANCEL,139,24,50,14
 END
@@ -1077,8 +1070,7 @@ BEGIN
     COMBOBOX        IDC_EOLMODELIST,7,64,118,81,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     PUSHBUTTON      "&Yes",IDOK,138,63,50,14
     PUSHBUTTON      "&No",IDCANCEL,138,80,50,14
-    CONTROL         "&Always show this dialog.",IDC_WARNINCONSISTENTEOLS,
-                    "Button",BS_AUTOCHECKBOX | BS_VCENTER | WS_TABSTOP,7,82,118,10
+    AUTOCHECKBOX    "&Always show this dialog.",IDC_WARNINCONSISTENTEOLS,7,82,118,10,WS_TABSTOP
 END
 
 IDD_LINENUM DIALOGEX 0, 0, 166, 70
@@ -1100,7 +1092,7 @@ CAPTION "Open Recent File"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     CONTROL         "",IDC_FILEMRU,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_SHAREIMAGELISTS | LVS_AUTOARRANGE | LVS_NOCOLUMNHEADER | WS_BORDER | WS_TABSTOP,7,7,212,158
-    CONTROL         "&Remember recent files on exit.",IDC_SAVEMRU,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,169,114,10
+    AUTOCHECKBOX    "&Remember recent files on exit.",IDC_SAVEMRU,7,169,114,10,WS_TABSTOP
     CONTROL         "<a>Clear History</a>",IDC_EMPTY_MRU,"SysLink",WS_TABSTOP,172,169,48,10
     DEFPUSHBUTTON   "OK",IDOK,113,183,50,14,WS_DISABLED
     PUSHBUTTON      "Cancel",IDCANCEL,169,183,50,14
@@ -1115,7 +1107,7 @@ BEGIN
     AUTORADIOBUTTON "&None.",IDC_CHANGENOTIFY_NONE,7,7,35,10,WS_GROUP | WS_TABSTOP
     AUTORADIOBUTTON "&Show message.",IDC_CHANGENOTIFY_SHOW_MSG,7,19,71,10,WS_TABSTOP
     AUTORADIOBUTTON "&Auto-reload (unmodified).",IDC_CHANGENOTIFY_AUTO_RELOAD,7,31,114,10,WS_TABSTOP
-    CONTROL         "&Reset if a new file is opened.",IDC_CHANGENOTIFY_RESET_WATCH,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,48,143,10
+    AUTOCHECKBOX    "&Reset if a new file is opened.",IDC_CHANGENOTIFY_RESET_WATCH,7,48,143,10,WS_TABSTOP
     DEFPUSHBUTTON   "OK",IDOK,127,7,50,14
     PUSHBUTTON      "Cancel",IDCANCEL,127,24,50,14
 END
@@ -1126,10 +1118,8 @@ CAPTION "Select Scheme"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     CONTROL         "",IDC_STYLELIST,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_SHAREIMAGELISTS | LVS_AUTOARRANGE | LVS_NOCOLUMNHEADER | WS_BORDER | WS_TABSTOP,7,7,151,162
-    CONTROL         "Set selected scheme as &default.",IDC_DEFAULTSCHEME,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,171,151,10
-    CONTROL         "&Auto-select by filename extension.",IDC_AUTOSELECT,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,182,151,10
+    AUTOCHECKBOX    "Set selected scheme as &default.",IDC_DEFAULTSCHEME,7,171,151,10,WS_TABSTOP
+    AUTOCHECKBOX    "&Auto-select by filename extension.",IDC_AUTOSELECT,7,182,151,10,WS_TABSTOP
     DEFPUSHBUTTON   "OK",IDOK,52,196,50,14,WS_DISABLED
     PUSHBUTTON      "Cancel",IDCANCEL,108,196,50,14
     SCROLLBAR       IDC_RESIZEGRIP3,7,198,10,10
@@ -1176,9 +1166,9 @@ BEGIN
     EDITTEXT        IDC_TAB_WIDTH,78,7,30,14,ES_AUTOHSCROLL
     LTEXT           "&Indentation size:",IDC_STATIC,7,30,69,8
     EDITTEXT        IDC_INDENT_WIDTH,78,27,30,14,ES_AUTOHSCROLL
-    CONTROL         "Insert tabs as &spaces.",IDC_TAB_AS_SPACE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,47,101,10
-    CONTROL         "Tab &key reformats indentation.",IDC_TAB_INDENT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,59,139,10
-    CONTROL         "&Backspace key reformats indentation.",IDC_BACKSPACE_UNINDENT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,71,160,10
+    AUTOCHECKBOX    "Insert tabs as &spaces.",IDC_TAB_AS_SPACE,7,47,101,10,WS_TABSTOP
+    AUTOCHECKBOX    "Tab &key reformats indentation.",IDC_TAB_INDENT,7,59,139,10,WS_TABSTOP
+    AUTOCHECKBOX    "&Backspace key reformats indentation.",IDC_BACKSPACE_UNINDENT,7,71,160,10,WS_TABSTOP
     DEFPUSHBUTTON   "OK",IDOK,117,7,50,14
     PUSHBUTTON      "Cancel",IDCANCEL,117,27,50,14
 END
@@ -1191,7 +1181,7 @@ BEGIN
     LTEXT           "&Limit for long lines:",IDC_STATIC,7,10,85,8
     EDITTEXT        IDC_LONGLINE_LIMIT,91,7,30,14,ES_AUTOHSCROLL
     AUTORADIOBUTTON "Show &edge line.",IDC_LONGLINE_EDGE_LINE,7,27,75,10,WS_GROUP | WS_TABSTOP
-    AUTORADIOBUTTON "Change &background color.",IDC_LONGLINE_BACK_COLOR,,7,38,114,10,WS_TABSTOP
+    AUTORADIOBUTTON "Change &background color.",IDC_LONGLINE_BACK_COLOR,7,38,114,10,WS_TABSTOP
     DEFPUSHBUTTON   "OK",IDOK,127,7,50,14
     PUSHBUTTON      "Cancel",IDCANCEL,127,24,50,14
 END
@@ -1212,8 +1202,8 @@ BEGIN
     LTEXT           "No visual indicators after wrap|Show visual indicators after wrap (near text)|Show visual indicators after wrap (near borders)|Show visual indicators after wrap (in line number margin)",IDC_WRAP_SYMBOL_AFTER_OPTIONS,0,0,402,8,NOT WS_VISIBLE
     LTEXT           "No wrap|Wrap text between words|Wrap text between any characters|Wrap text on whitespace|Automatic word wrap",IDC_WRAP_MODE_OPTIONS,0,0,187,8,NOT WS_VISIBLE
     GROUPBOX        "For wrapped line",IDC_STATIC,7,74,235,38
-    CONTROL         "Only select subline when selecting line from left margin.",IDC_WRAP_SELECT_SUBLINE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,84,220,10
-    CONTROL         "Only highlight subline when highlighting current line.",IDC_WRAP_HIGHLIGHT_SUBLINE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,96,220,10
+    AUTOCHECKBOX    "Only select subline when selecting line from left margin.",IDC_WRAP_SELECT_SUBLINE,14,84,220,10,WS_TABSTOP
+    AUTOCHECKBOX    "Only highlight subline when highlighting current line.",IDC_WRAP_HIGHLIGHT_SUBLINE,14,96,220,10,WS_TABSTOP
 END
 
 IDD_PAGESETUP DIALOGEX 5, 5, 356, 260
@@ -1354,8 +1344,7 @@ BEGIN
     ICON            IDR_MAINWND,IDC_INFOBOXICON,7,7,20,20
     LTEXT           "",IDC_INFOBOXTEXT,35,7,202,42
     DEFPUSHBUTTON   "OK",IDOK,187,53,50,14
-    CONTROL         "&Don't show this message again.",IDC_INFOBOXCHECK,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,55,120,10
+    AUTOCHECKBOX    "&Don't show this message again.",IDC_INFOBOXCHECK,7,55,120,10,WS_TABSTOP
 END
 
 IDD_INFOBOX_YESNO DIALOGEX 0, 0, 244, 74
@@ -1368,8 +1357,7 @@ BEGIN
     LTEXT           "",IDC_INFOBOXTEXT,35,7,202,42
     PUSHBUTTON      "&Yes",IDYES,131,54,50,14
     PUSHBUTTON      "&No",IDNO,187,54,50,14
-    CONTROL         "&Don't show this message again.",IDC_INFOBOXCHECK,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,55,120,10
+    AUTOCHECKBOX    "&Don't show this message again.",IDC_INFOBOXCHECK,7,55,120,10,WS_TABSTOP
 END
 
 IDD_SORT DIALOGEX 0, 0, 184, 140
@@ -1380,12 +1368,12 @@ BEGIN
     AUTORADIOBUTTON "Sort &ascending.",IDC_SORT_ASC,7,7,85,10,WS_GROUP | WS_TABSTOP
     AUTORADIOBUTTON "Sort &descending.",IDC_SORT_DESC,7,19,84,10,WS_TABSTOP
     AUTORADIOBUTTON "Shu&ffle lines.",IDC_SORT_SHUFFLE,7,31,70,10,WS_TABSTOP
-    CONTROL         "&Merge duplicate lines.",IDC_SORT_MERGE_DUP,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,50,100,10
-    CONTROL         "&Remove duplicate lines.",IDC_SORT_REMOVE_DUP,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,62,100,10
-    CONTROL         "Remove &unique lines.",IDC_SORT_REMOVE_UNIQUE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,74,100,10
-    CONTROL         "&Case insensitive.",IDC_SORT_IGNORE_CASE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,92,81,10
-    CONTROL         "Logical &number comparison.",IDC_SORT_LOGICAL_NUMBER,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,104,130,10
-    CONTROL         "Column &sort (rectangular selection).",IDC_SORT_COLUMN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,122,150,10
+    AUTOCHECKBOX    "&Merge duplicate lines.",IDC_SORT_MERGE_DUP,7,50,100,10,WS_TABSTOP
+    AUTOCHECKBOX    "&Remove duplicate lines.",IDC_SORT_REMOVE_DUP,7,62,100,10,WS_TABSTOP
+    AUTOCHECKBOX    "Remove &unique lines.",IDC_SORT_REMOVE_UNIQUE,7,74,100,10,WS_TABSTOP
+    AUTOCHECKBOX    "&Case insensitive.",IDC_SORT_IGNORE_CASE,7,92,81,10,WS_TABSTOP
+    AUTOCHECKBOX    "Logical &number comparison.",IDC_SORT_LOGICAL_NUMBER,7,104,130,10,WS_TABSTOP
+    AUTOCHECKBOX    "Column &sort (rectangular selection).",IDC_SORT_COLUMN,7,122,150,10,WS_TABSTOP
     DEFPUSHBUTTON   "OK",IDOK,127,7,50,14
     PUSHBUTTON      "Cancel",IDCANCEL,127,24,50,14
 END
@@ -1400,8 +1388,7 @@ BEGIN
     LTEXT           "",IDC_INFOBOXTEXT,35,7,202,42
     DEFPUSHBUTTON   "OK",IDOK,131,53,50,14
     PUSHBUTTON      "Cancel",IDCANCEL,187,53,50,14
-    CONTROL         "&Don't show this message again.",IDC_INFOBOXCHECK,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,55,120,10
+    AUTOCHECKBOX    "&Don't show this message again.",IDC_INFOBOXCHECK,7,55,120,10,WS_TABSTOP
 END
 
 IDD_SELECT_ENCODING DIALOGEX 0, 0, 187, 238
@@ -1447,33 +1434,33 @@ STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSM
 CAPTION "Auto Completion Settings"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
-    CONTROL         "Auto indent text.",IDC_AUTO_INDENT_TEXT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,7,120,10
-    CONTROL         "Auto close HTML and XML tags.",IDC_AUTO_CLOSE_TAGS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,19,120,10
+    AUTOCHECKBOX    "Auto indent text.",IDC_AUTO_INDENT_TEXT,7,7,120,10,WS_TABSTOP
+    AUTOCHECKBOX    "Auto close HTML and XML tags.",IDC_AUTO_CLOSE_TAGS,7,19,120,10,WS_TABSTOP
     GROUPBOX        "",IDC_STATIC,7,35,218,82
-    CONTROL         "Auto complete word while typing.",IDC_AUTO_COMPLETE_WORD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,34,122,10
+    AUTOCHECKBOX    "Auto complete word while typing.",IDC_AUTO_COMPLETE_WORD,14,34,122,10,WS_TABSTOP
     LTEXT           "Visible item count in auto completion list:",IDC_STATIC,14,46,148,10,SS_RIGHT
     EDITTEXT        IDC_AUTOC_VISIBLE_ITEM_COUNT,166,44,50,12,WS_TABSTOP
     LTEXT           "Minimum length for word:",IDC_STATIC,14,62,148,10,SS_RIGHT
     EDITTEXT        IDC_AUTOC_MIN_WORD_LENGTH,166,60,50,12,WS_TABSTOP
     LTEXT           "Minimum length for number (without prefix):",IDC_STATIC,14,78,148,10,SS_RIGHT
     EDITTEXT        IDC_AUTOC_MIN_NUMBER_LENGTH,166,76,50,12,WS_TABSTOP
-    CONTROL         "Scan words in current document.",IDC_AUTOC_SCAN_DOCUMENT_WORDS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,92,160,10
-    CONTROL         "Only trigger auto completion in English IME mode.",IDC_AUTOC_ENGLISH_IME_ONLY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,104,180,10
+    AUTOCHECKBOX    "Scan words in current document.",IDC_AUTOC_SCAN_DOCUMENT_WORDS,14,92,160,10,WS_TABSTOP
+    AUTOCHECKBOX    "Only trigger auto completion in English IME mode.",IDC_AUTOC_ENGLISH_IME_ONLY,14,104,180,10,WS_TABSTOP
     GROUPBOX        "Keys used to finish auto completion (use Esc to cancel)",IDC_STATIC,7,123,218,44
-    CONTROL         "Enter",IDC_AUTOC_FILLUP_ENTER,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,135,35,10
-    CONTROL         "Tab",IDC_AUTOC_FILLUP_TAB,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,66,135,35,10
-    CONTROL         "Space",IDC_AUTOC_FILLUP_SPACE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,118,135,35,10
-    CONTROL         "Punctuation:",IDC_AUTOC_FILLUP_PUNCTUATION,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,152,50,10
+    AUTOCHECKBOX    "Enter",IDC_AUTOC_FILLUP_ENTER,14,135,35,10,WS_TABSTOP
+    AUTOCHECKBOX    "Tab",IDC_AUTOC_FILLUP_TAB,66,135,35,10,WS_TABSTOP
+    AUTOCHECKBOX    "Space",IDC_AUTOC_FILLUP_SPACE,118,135,35,10,WS_TABSTOP
+    AUTOCHECKBOX    "Punctuation:",IDC_AUTOC_FILLUP_PUNCTUATION,14,152,50,10,WS_TABSTOP
     EDITTEXT        IDC_AUTOC_FILLUP_PUNCTUATION_LIST,66,150,150,12,WS_TABSTOP
     GROUPBOX        "Auto Insert",IDC_STATIC,231,7,218,110
-    CONTROL         ") after typing (.",IDC_AUTO_INSERT_PARENTHESIS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,238,19,80,10
-    CONTROL         "} after typing {.",IDC_AUTO_INSERT_BRACE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,238,31,80,10
-    CONTROL         "] after typring [, except for Smali, Jasmin and javap.",IDC_AUTO_INSERT_SQUARE_BRACKET,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,238,43,210,10
-    CONTROL         "> after typing <, when <> is used in generics / template.",IDC_AUTO_INSERT_ANGLE_BRACKET,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,238,55,210,10
-    CONTROL         "Double quote (""), when """" is used to quote string / bytes.",IDC_AUTO_INSERT_DOUBLE_QUOTE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,238,67,210,10
-    CONTROL         "Single quote ('), when '' is used to quote string / bytes.",IDC_AUTO_INSERT_SINGLE_QUOTE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,238,79,210,10
-    CONTROL         "Backtick (`).",IDC_AUTO_INSERT_BACKTICK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,238,91,80,10
-    CONTROL         "Space after typing comma (,) when appropriate.",IDC_AUTO_INSERT_SPACE_COMMA,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,238,103,180,10
+    AUTOCHECKBOX    ") after typing (.",IDC_AUTO_INSERT_PARENTHESIS,238,19,80,10,WS_TABSTOP
+    AUTOCHECKBOX    "} after typing {.",IDC_AUTO_INSERT_BRACE,238,31,80,10,WS_TABSTOP
+    AUTOCHECKBOX    "] after typring [, except for Smali, Jasmin and javap.",IDC_AUTO_INSERT_SQUARE_BRACKET,238,43,210,10,WS_TABSTOP
+    AUTOCHECKBOX    "> after typing <, when <> is used in generics / template.",IDC_AUTO_INSERT_ANGLE_BRACKET,238,55,210,10,WS_TABSTOP
+    AUTOCHECKBOX    "Double quote (""), when """" is used to quote string / bytes.",IDC_AUTO_INSERT_DOUBLE_QUOTE,238,67,210,10,WS_TABSTOP
+    AUTOCHECKBOX    "Single quote ('), when '' is used to quote string / bytes.",IDC_AUTO_INSERT_SINGLE_QUOTE,238,79,210,10,WS_TABSTOP
+    AUTOCHECKBOX    "Backtick (`).",IDC_AUTO_INSERT_BACKTICK,238,91,80,10,WS_TABSTOP
+    AUTOCHECKBOX    "Space after typing comma (,) when appropriate.",IDC_AUTO_INSERT_SPACE_COMMA,238,103,180,10,WS_TABSTOP
     GROUPBOX        "Characters used to toggle line comment for Assembler source",IDC_STATIC,231,123,218,26
     AUTORADIOBUTTON "Semicolon (;)",IDC_ASM_LINE_COMMENT_SEMICOLON,238,135,60,10,WS_GROUP | WS_TABSTOP
     AUTORADIOBUTTON "#",IDC_ASM_LINE_COMMENT_SHARP,316,135,22,10,WS_TABSTOP
