@@ -22,12 +22,11 @@ static WCHAR wchANSI[8];
 static WCHAR wchOEM [8];
 static LPWSTR g_AllEncodingLabel = NULL;
 
-#define MAX_ENCODING_IN_GROUP	10 // fixed array to simplify code
 typedef struct NP2EncodingGroup {
-	BOOL bMapped;	// map code page to index in mEncoding array.
-	UINT idsName;	// resource id for group name
+	BOOL bMapped;		// map code page to index in mEncoding array.
+	const UINT idsName;	// resource id for group name
 	// presorted encoding list, code pages before been mapped to index.
-	int encodings[MAX_ENCODING_IN_GROUP];
+	int encodings[10];	// use fixed array to simplify code
 } NP2EncodingGroup;
 
 // https://docs.microsoft.com/en-us/windows/desktop/Intl/code-page-identifiers
@@ -303,6 +302,7 @@ static NP2EncodingGroup sEncodingGroupList[] = {
 		51949,		// EUC-KR
 	}},
 	{ FALSE, IDS_ENCODINGGROUP_SOUTHEURO, { // South European
+		// Southern European
 		28593,		// Latin-3, ISO 8859-3
 		10010,		// Mac (Romanian)
 		// Southeast European
@@ -444,6 +444,15 @@ void Encoding_ReleaseResources(void) {
 	}
 }
 
+static inline BOOL IsValidEncoding(int iEncoding) {
+	if (!(mEncoding[iEncoding].uFlags & NCP_INTERNAL)) {
+		const UINT cp = mEncoding[iEncoding].uCodePage;
+		CPINFO cpi;
+		return IsValidCodePage(cp) && GetCPInfo(cp, &cpi);
+	}
+	return TRUE;
+}
+
 //=============================================================================
 //
 // EditSetNewEncoding()
@@ -515,8 +524,10 @@ void Encoding_InitDefaults(void) {
 	// Try to set the DOS encoding to DOS-437 if the default OEMCP is not DOS-437
 	if (oemcp != 437) {
 		for (int i = CPI_UTF7 + 1; i < (int)COUNTOF(mEncoding); ++i) {
-			if (mEncoding[i].uCodePage == 437 && Encoding_IsValid(i)) {
-				g_DOSEncoding = i;
+			if (mEncoding[i].uCodePage == 437) {
+				if (IsValidCodePage(i)) {
+					g_DOSEncoding = i;
+				}
 				break;
 			}
 		}
@@ -546,7 +557,7 @@ int Encoding_MapIniSetting(BOOL bLoad, int iSetting) {
 			return CPI_UTF7;
 		default: {
 			for (int i = CPI_UTF7 + 1; i < (int)COUNTOF(mEncoding); i++) {
-				if (mEncoding[i].uCodePage == (UINT)iSetting && Encoding_IsValid(i)) {
+				if (mEncoding[i].uCodePage == (UINT)iSetting && IsValidEncoding(i)) {
 					return i;
 				}
 			}
@@ -602,15 +613,6 @@ void Encoding_GetLabel(int iEncoding) {
 		mEncoding[iEncoding].wchLabel = g_AllEncodingLabel + iEncoding * MAX_ENCODING_LABEL_SIZE;
 		lstrcpyn(mEncoding[iEncoding].wchLabel, pwsz, MAX_ENCODING_LABEL_SIZE);
 	}
-}
-
-static inline BOOL IsValidEncoding(int iEncoding) {
-	if (!(mEncoding[iEncoding].uFlags & NCP_INTERNAL)) {
-		const UINT cp = mEncoding[iEncoding].uCodePage;
-		CPINFO cpi;
-		return IsValidCodePage(cp) && GetCPInfo(cp, &cpi);
-	}
-	return TRUE;
 }
 
 int Encoding_Match(LPCWSTR pwszTest) {
@@ -670,7 +672,7 @@ static inline int Encoding_GetIndex(UINT page) {
 			return i;
 		}
 	}
-	return -1;
+	return CPI_NONE;
 }
 
 void Encoding_AddToTreeView(HWND hwnd, int idSel, BOOL bRecodeOnly) {
