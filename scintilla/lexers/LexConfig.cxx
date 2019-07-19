@@ -32,9 +32,7 @@ static void ColouriseConfDoc(Sci_PositionU startPos, Sci_Position length, int in
 	int chNext = styler[startPos];
 	styler.StartAt(startPos);
 	styler.StartSegment(startPos);
-	Sci_PositionU endPos = startPos + length;
-	if (endPos == static_cast<Sci_PositionU>(styler.Length()))
-		++endPos;
+	const Sci_PositionU endPos = startPos + length;
 
 	int visibleChars = 0;
 	bool insideTag = false;
