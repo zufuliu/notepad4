@@ -119,7 +119,7 @@ static void ColouriseSqlDoc(Sci_PositionU startPos, Sci_Position length, int ini
 					}
 				} else if (keywords2.InList(s)) {
 					sc.ChangeState(SCE_SQL_WORD2);
-				} else if (chNext == '(' && kw_user1.InListAbbreviated(s, '(')) {
+				} else if (chNext == '(' && kw_user1.InListPrefixed(s, '(')) {
 					sc.ChangeState(SCE_SQL_USER1);
 				}
 				//} else if (kw_sqlplus.InListAbbreviated(s, '~')) {

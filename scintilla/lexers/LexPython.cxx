@@ -177,7 +177,7 @@ static void ColourisePyDoc(Sci_PositionU startPos, Sci_Position length, int init
 					sc.ChangeState(SCE_PY_WORD2);
 				} else if (keywords_const.InList(s)) {
 					sc.ChangeState(SCE_PY_BUILDIN_CONST);
-				} else if (keywords_func.InListAbbreviated(s, '(')) {
+				} else if (keywords_func.InListPrefixed(s, '(')) {
 					sc.ChangeState(SCE_PY_BUILDIN_FUNC);
 				} else if (keywords_attr.InList(s)) {
 					sc.ChangeState(SCE_PY_ATTR);
