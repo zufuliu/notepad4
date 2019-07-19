@@ -74,7 +74,7 @@ static char **ArrayFromWordList(char *wordlist, size_t slen, int *len, bool only
 WordList::WordList(bool onlyLineEnds_) noexcept :
 	words(nullptr), list(nullptr), len(0), onlyLineEnds(onlyLineEnds_) {
 	// Prevent warnings by static analyzers about uninitialized starts.
-	starts[0] = -1;
+	ranges[0] = {};
 }
 
 WordList::~WordList() {
@@ -86,11 +86,13 @@ WordList::operator bool() const noexcept {
 }
 
 bool WordList::operator!=(const WordList &other) const noexcept {
-	if (len != other.len)
+	if (len != other.len) {
 		return true;
+	}
 	for (int i = 0; i < len; i++) {
-		if (strcmp(words[i], other.words[i]) != 0)
+		if (strcmp(words[i], other.words[i]) != 0) {
 			return true;
+		}
 	}
 	return false;
 }
@@ -118,10 +120,14 @@ void WordList::Set(const char *s) {
 	std::sort(words, words + len, [](const char *a, const char *b) noexcept {
 		return strcmp(a, b) < 0;
 	});
-	std::fill(starts, std::end(starts), -1);
-	for (int l = len - 1; l >= 0; l--) {
-		unsigned char indexChar = words[l][0];
-		starts[indexChar] = l;
+	memset(ranges, 0, sizeof(ranges));
+	for (int i = 0; i < len;) {
+		const unsigned char indexChar = words[i][0];
+		const int start = i++;
+		while (words[i][0] == indexChar) {
+			++i;
+		}
+		ranges[indexChar] = {start, i};
 	}
 }
 
@@ -138,7 +144,7 @@ bool WordList::Reset(const char *s) {
 	list = other.list;
 	len = other.len;
 	onlyLineEnds = other.onlyLineEnds;
-	memcpy(starts, other.starts, sizeof(starts));
+	memcpy(ranges, other.ranges, sizeof(ranges));
 	// mark other as released.
 	other.words = nullptr;
 	other.list = nullptr;
@@ -155,37 +161,130 @@ bool WordList::Reset(const char *s) {
  * so '^GTK_' matches 'GTK_X', 'GTK_MAJOR_VERSION', and 'GTK_'.
  */
 bool WordList::InList(const char *s) const noexcept {
-	if (nullptr == words)
+	if (nullptr == words) {
 		return false;
+	}
 	const unsigned char firstChar = s[0];
-	int j = starts[firstChar];
-	if (j >= 0) {
-		while (words[j][0] == firstChar) {
-			if (s[1] == words[j][1]) {
+	Range r = ranges[firstChar];
+	if (r.end) {
+		int count = r.end - r.start;
+		if (count < 5) {
+			for (int j = r.start; j < r.end; j++) {
 				const char *a = words[j] + 1;
 				const char *b = s + 1;
 				while (*a && *a == *b) {
 					a++;
 					b++;
 				}
-				if (!*a && !*b)
+				if (!*a && !*b) {
 					return true;
+				}
 			}
-			j++;
+		} else {
+			int j = r.start;
+			do {
+				const int step = count/2;
+				const int mid = j + step;
+				const char *a = words[mid] + 1;
+				const char *b = s + 1;
+				while (*a && *a == *b) {
+					a++;
+					b++;
+				}
+				const int diff = static_cast<unsigned char>(*a) - static_cast<unsigned char>(*b);
+				if (diff == 0) {
+					return true;
+				}
+				if (diff < 0) {
+					j = mid + 1;
+					count -= step + 1;
+				} else {
+					count = step;
+				}
+			} while (count > 0);
 		}
 	}
-	j = starts[static_cast<unsigned int>('^')];
-	if (j >= 0) {
-		while (words[j][0] == '^') {
+
+	r = ranges[static_cast<unsigned char>('^')];
+	if (r.end) {
+		for (int j = r.start; j < r.end; j++) {
 			const char *a = words[j] + 1;
 			const char *b = s;
 			while (*a && *a == *b) {
 				a++;
 				b++;
 			}
-			if (!*a)
+			if (!*a) {
 				return true;
-			j++;
+			}
+		}
+	}
+	return false;
+}
+
+/**
+ * similar to InList, but word s can be a prefix of keyword.
+ * mainly used to test whether a function is built-in or not.
+ * e.g. for keyword definition "sin(x)", InListPrefixed("sin", '(') => true
+ * InList(s) == InListPrefixed(s, '\0')
+ */
+bool WordList::InListPrefixed(const char *s, const char marker) const noexcept {
+	if (nullptr == words) {
+		return false;
+	}
+	const unsigned char firstChar = s[0];
+	Range r = ranges[firstChar];
+	if (r.end) {
+		int count = r.end - r.start;
+		if (count < 5) {
+			for (int j = r.start; j < r.end; j++) {
+				const char *a = words[j] + 1;
+				const char *b = s + 1;
+				while (*a && *a == *b) {
+					a++;
+					b++;
+				}
+				if ((!*a || *a == marker) && !*b) {
+					return true;
+				}
+			}
+		} else {
+			int j = r.start;
+			do {
+				const int step = count/2;
+				const int mid = j + step;
+				const char *a = words[mid] + 1;
+				const char *b = s + 1;
+				while (*a && *a == *b) {
+					a++;
+					b++;
+				}
+				const int diff = static_cast<unsigned char>(*a) - static_cast<unsigned char>(*b);
+				if (diff == 0 || diff == static_cast<unsigned char>(marker)) {
+					return true;
+				}
+				if (diff < 0) {
+					j = mid + 1;
+					count -= step + 1;
+				} else {
+					count = step;
+				}
+			} while (count > 0);
+		}
+	}
+
+	r = ranges[static_cast<unsigned char>('^')];
+	if (r.end) {
+		for (int j = r.start; j < r.end; j++) {
+			const char *a = words[j] + 1;
+			const char *b = s;
+			while (*a && *a == *b) {
+				a++;
+				b++;
+			}
+			if (!*a) {
+				return true;
+			}
 		}
 	}
 	return false;
@@ -197,47 +296,46 @@ bool WordList::InList(const char *s) const noexcept {
  * The marker is ~ in this case.
  */
 bool WordList::InListAbbreviated(const char *s, const char marker) const noexcept {
-	if (nullptr == words)
+	if (nullptr == words) {
 		return false;
+	}
 	const unsigned char firstChar = s[0];
-	int j = starts[firstChar];
-	if (j >= 0) {
-		while (words[j][0] == firstChar) {
+	Range r = ranges[firstChar];
+	if (r.end) {
+		for (int j = r.start; j < r.end; j++) {
 			bool isSubword = false;
-			int start = 1;
-			if (words[j][1] == marker) {
+			const char *a = words[j] + 1;
+			const char *b = s + 1;
+			if (*a == marker) {
 				isSubword = true;
-				start++;
+				a++;
 			}
-			if (s[1] == words[j][start]) {
-				const char *a = words[j] + start;
-				const char *b = s + 1;
-				while (*a && *a == *b) {
+			while (*a && *a == *b) {
+				a++;
+				if (*a == marker) {
+					isSubword = true;
 					a++;
-					if (*a == marker) {
-						isSubword = true;
-						a++;
-					}
-					b++;
 				}
-				if ((!*a || isSubword) && !*b)
-					return true;
+				b++;
 			}
-			j++;
+			if ((!*a || isSubword) && !*b) {
+				return true;
+			}
 		}
 	}
-	j = starts[static_cast<unsigned int>('^')];
-	if (j >= 0) {
-		while (words[j][0] == '^') {
+
+	r = ranges[static_cast<unsigned char>('^')];
+	if (r.end) {
+		for (int j = r.start; j < r.end; j++) {
 			const char *a = words[j] + 1;
 			const char *b = s;
 			while (*a && *a == *b) {
 				a++;
 				b++;
 			}
-			if (!*a)
+			if (!*a) {
 				return true;
-			j++;
+			}
 		}
 	}
 	return false;
@@ -251,12 +349,13 @@ bool WordList::InListAbbreviated(const char *s, const char marker) const noexcep
 * No multiple markers check is done and wont work.
 */
 bool WordList::InListAbridged(const char *s, const char marker) const noexcept {
-	if (nullptr == words)
+	if (nullptr == words) {
 		return false;
+	}
 	const unsigned char firstChar = s[0];
-	int j = starts[firstChar];
-	if (j >= 0) {
-		while (words[j][0] == firstChar) {
+	Range r = ranges[firstChar];
+	if (r.end) {
+		for (int j = r.start; j < r.end; j++) {
 			const char *a = words[j];
 			const char *b = s;
 			while (*a && *a == *b) {
@@ -265,27 +364,27 @@ bool WordList::InListAbridged(const char *s, const char marker) const noexcept {
 					a++;
 					const size_t suffixLengthA = strlen(a);
 					const size_t suffixLengthB = strlen(b);
-					if (suffixLengthA >= suffixLengthB)
+					if (suffixLengthA >= suffixLengthB) {
 						break;
+					}
 					b = b + suffixLengthB - suffixLengthA - 1;
 				}
 				b++;
 			}
-			if (!*a && !*b)
+			if (!*a && !*b) {
 				return true;
-			j++;
+			}
 		}
 	}
 
-	j = starts[static_cast<unsigned int>(marker)];
-	if (j >= 0) {
-		while (words[j][0] == marker) {
+	r = ranges[static_cast<unsigned char>(marker)];
+	if (r.end) {
+		for (int j = r.start; j < r.end; j++) {
 			const char *a = words[j] + 1;
 			const char *b = s;
 			const size_t suffixLengthA = strlen(a);
 			const size_t suffixLengthB = strlen(b);
 			if (suffixLengthA > suffixLengthB) {
-				j++;
 				continue;
 			}
 			b = b + suffixLengthB - suffixLengthA;
@@ -294,9 +393,9 @@ bool WordList::InListAbridged(const char *s, const char marker) const noexcept {
 				a++;
 				b++;
 			}
-			if (!*a && !*b)
+			if (!*a && !*b) {
 				return true;
-			j++;
+			}
 		}
 	}
 

@@ -357,7 +357,7 @@ static void ColouriseCppDoc(Sci_PositionU startPos, Sci_Position length, int ini
 				} else if (lexType != LEX_PHP && kwEnumeration.InList(s)) {
 					sc.ChangeState(SCE_C_ENUMERATION);
 				} else if (nextChar == '(') {
-					if (kwConstant.InListAbbreviated(s, '('))
+					if (kwConstant.InListPrefixed(s, '('))
 						sc.ChangeState(SCE_C_MACRO2);
 					else
 						sc.ChangeState(SCE_C_FUNCTION);

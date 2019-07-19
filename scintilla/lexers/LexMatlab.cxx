@@ -159,9 +159,9 @@ static void ColouriseMatlabDoc(Sci_PositionU startPos, Sci_Position length, int 
 					sc.ChangeState(SCE_MAT_ATTRIBUTE);
 				} else if (commands.InList(s)) {
 					sc.ChangeState(SCE_MAT_INTERNALCOMMAND);
-				} else if (function1.InListAbbreviated(s, '(')) {
+				} else if (function1.InListPrefixed(s, '(')) {
 					sc.ChangeState(SCE_MAT_FUNCTION1);
-				} else if (function2.InListAbbreviated(s, '(')) {
+				} else if (function2.InListPrefixed(s, '(')) {
 					sc.ChangeState(SCE_MAT_FUNCTION2);
 				} else {
 					const int chNext = sc.GetNextNSChar();
