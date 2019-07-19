@@ -22,9 +22,7 @@ static void ColouriseMarkdownDoc(Sci_PositionU startPos, Sci_Position length, in
 	int chPrev, ch = 0, chNext = styler[startPos];
 	styler.StartAt(startPos);
 	styler.StartSegment(startPos);
-	Sci_PositionU endPos = startPos + length;
-	if (endPos == (Sci_PositionU)styler.Length())
-		++endPos;
+	const Sci_PositionU endPos = startPos + length;
 
 	Sci_Position lineCurrent = styler.GetLine(startPos);
 	char buf[MAX_WORD_LENGTH + 1] = {0};

@@ -30,9 +30,7 @@ static void ColouriseVimDoc(Sci_PositionU startPos, Sci_Position length, int ini
 	int chNext = styler[startPos];
 	styler.StartAt(startPos);
 	styler.StartSegment(startPos);
-	Sci_PositionU endPos = startPos + length;
-	if (endPos == static_cast<Sci_PositionU>(styler.Length()))
-		++endPos;
+	const Sci_PositionU endPos = startPos + length;
 
 	Sci_Position lineCurrent = styler.GetLine(startPos);
 	int visibleChars = 0;

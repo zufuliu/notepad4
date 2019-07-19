@@ -77,9 +77,7 @@ static void ColouriseSmaliDoc(Sci_PositionU startPos, Sci_Position length, int i
 	int chNext = styler[startPos];
 	styler.StartAt(startPos);
 	styler.StartSegment(startPos);
-	Sci_PositionU endPos = startPos + length;
-	if (endPos == static_cast<Sci_PositionU>(styler.Length()))
-		++endPos;
+	const Sci_PositionU endPos = startPos + length;
 
 	Sci_Position lineCurrent = styler.GetLine(startPos);
 	int curLineState = (lineCurrent > 0) ? styler.GetLineState(lineCurrent - 1) : 0;
