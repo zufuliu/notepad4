@@ -565,8 +565,11 @@ int Encoding_MapIniSetting(BOOL bLoad, int iSetting) {
 			return CPI_UTF7;
 		default: {
 			for (int i = CPI_UTF7 + 1; i < (int)COUNTOF(mEncoding); i++) {
-				if (mEncoding[i].uCodePage == (UINT)iSetting && IsValidEncoding(i)) {
-					return i;
+				if (mEncoding[i].uCodePage == (UINT)iSetting) {
+					if (IsValidEncoding(i)) {
+						return i;
+					}
+					break;
 				}
 			}
 			return CPI_DEFAULT;
