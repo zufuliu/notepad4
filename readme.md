@@ -143,7 +143,7 @@ Or build from source, see the [Wiki](https://github.com/zufuliu/notepad2/wiki/Bu
 	* Many Others
 * API list for:
 	* [C Standard Library](../master/tools/lang/C.c), up to C11.
-	* [C++ STL](../master/tools/lang/CPP.cpp), up to C++17.
+	* [C++ STL](../master/tools/lang/CPP.cpp), up to C++20.
 	* MFC
 	* Cocoa
 	* AutoIt Script
