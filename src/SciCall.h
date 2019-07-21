@@ -385,6 +385,10 @@ NP2_inline void SciCall_SetAdditionalSelectionTyping(BOOL additionalSelectionTyp
 	SciCall(SCI_SETADDITIONALSELECTIONTYPING, additionalSelectionTyping, 0);
 }
 
+NP2_inline void SciCall_SetMultiPaste(int multiPaste) {
+	SciCall(SCI_SETMULTIPASTE, multiPaste, 0);
+}
+
 NP2_inline void SciCall_SetVirtualSpaceOptions(int virtualSpaceOptions) {
 	SciCall(SCI_SETVIRTUALSPACEOPTIONS, virtualSpaceOptions, 0);
 }

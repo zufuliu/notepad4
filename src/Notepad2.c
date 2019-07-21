@@ -1577,17 +1577,17 @@ HWND EditCreate(HWND hwndParent) {
 	SciCall_SetModEventMask(/*SC_MODEVENTMASKALL*/SC_MOD_INSERTTEXT | SC_MOD_DELETETEXT);
 	SciCall_SetCommandEvents(FALSE);
 	SciCall_UsePopUp(SC_POPUP_NEVER);
-	SciCall_SetScrollWidth(2048);
 	SciCall_SetScrollWidthTracking(TRUE);
 	SciCall_SetEndAtLastLine(TRUE);
 	SciCall_SetCaretSticky(SC_CARETSTICKY_OFF);
 	SciCall_SetXCaretPolicy(CARET_SLOP | CARET_EVEN, 50);
 	SciCall_SetYCaretPolicy(CARET_EVEN, 0);
-	SciCall_SetMultipleSelection(FALSE);
-	SciCall_SetAdditionalSelectionTyping(FALSE);
+	SciCall_SetMultipleSelection(TRUE);
+	SciCall_SetAdditionalSelectionTyping(TRUE);
+	SciCall_SetMultiPaste(SC_MULTIPASTE_EACH);
 	SciCall_SetVirtualSpaceOptions(SCVS_NONE);
-	SciCall_SetAdditionalCaretsBlink(FALSE);
-	SciCall_SetAdditionalCaretsVisible(FALSE);
+	SciCall_SetAdditionalCaretsBlink(TRUE);
+	SciCall_SetAdditionalCaretsVisible(TRUE);
 	// style both before and after the visible text in the background
 	SciCall_SetIdleStyling(SC_IDLESTYLING_ALL);
 	// cache layout for visible lines
@@ -1597,8 +1597,8 @@ HWND EditCreate(HWND hwndParent) {
 	SciCall_AssignCmdKey((SCK_PRIOR + (SCMOD_CTRL << 16)), SCI_PARAUP);
 	SciCall_AssignCmdKey((SCK_NEXT + ((SCMOD_CTRL | SCMOD_SHIFT) << 16)), SCI_PARADOWNEXTEND);
 	SciCall_AssignCmdKey((SCK_PRIOR + ((SCMOD_CTRL | SCMOD_SHIFT) << 16)), SCI_PARAUPEXTEND);
-	SciCall_AssignCmdKey((SCK_HOME + (0 << 16)), SCI_VCHOMEWRAP);
-	SciCall_AssignCmdKey((SCK_END + (0 << 16)), SCI_LINEENDWRAP);
+	SciCall_AssignCmdKey((SCK_HOME + (SCMOD_NORM << 16)), SCI_VCHOMEWRAP);
+	SciCall_AssignCmdKey((SCK_END + (SCMOD_NORM << 16)), SCI_LINEENDWRAP);
 	SciCall_AssignCmdKey((SCK_HOME + (SCMOD_SHIFT << 16)), SCI_VCHOMEWRAPEXTEND);
 	SciCall_AssignCmdKey((SCK_END + (SCMOD_SHIFT << 16)), SCI_LINEENDWRAPEXTEND);
 
