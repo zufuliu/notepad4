@@ -159,7 +159,7 @@ static KEYWORDLIST Keywords_CPP = {{
 // <ratio>
 "ratio_add ratio_subtract ratio_multiply ratio_divide "
 // <chrono>
-"time_point system_clock steady_clock high_resolution_clock "
+"time_point system_clock sys_time sys_seconds sys_days utc_clock utc_time utc_seconds tai_clock tai_time tai_seconds gps_clock gps_time gps_seconds file_clock file_time steady_clock high_resolution_clock local_t local_time local_seconds local_days clock_time_conversion weekday_indexed weekday_last month_day month_day_last month_weekday month_weekday_last year_month year_month_day year_month_day_last year_month_weekday year_month_weekday_last time_of_day tzdb_list nonexistent_local_time ambiguous_local_time sys_info local_info time_zone zoned_time zoned_seconds "
 // <typeindex>
 "type_index "
 // <execution>
@@ -208,6 +208,8 @@ static KEYWORDLIST Keywords_CPP = {{
 "basic_stringbuf stringbuf wstringbuf basic_istringstream istringstream wistringstream basic_ostringstream ostringstream wostringstream basic_stringstream stringstream wstringstream "
 // <fstream>
 "basic_filebuf filebuf wfilebuf basic_ifstream ifstream wifstream basic_ofstream ofstream wofstream basic_fstream fstream wfstream "
+// <syncstream>
+"basic_syncbuf syncbuf wsyncbuf basic_osyncstream osyncstream wosyncstream "
 // <filesystem>
 "filesystem_error directory_entry directory_iterator recursive_directory_iterator file_status space_info file_time_type "
 // <regex>
@@ -217,7 +219,7 @@ static KEYWORDLIST Keywords_CPP = {{
 "regex_iterator cregex_iterator wcregex_iterator sregex_iterator wsregex_iterator "
 "regex_token_iterator cregex_token_iterator wcregex_token_iterator sregex_token_iterator wsregex_token_iterator "
 // <atomic>
-"atomic "
+"atomic atomic_ref "
 // <thread>
 "thread "
 // <mutex> <shared_mutex>
@@ -234,7 +236,7 @@ static KEYWORDLIST Keywords_CPP = {{
 "string_type iter_type "
 "key_type mapped_type key_compare node_type insert_return_type value_compare "
 "hasher key_equal local_iterator const_local_iterator "
-"istream_type ostream_type streambuf_type "
+"istream_type ostream_type streambuf_type syncbuf_type "
 
 // old class
 "unary_function binary_function "
@@ -364,7 +366,7 @@ static KEYWORDLIST Keywords_CPP = {{
 "WCHAR_MAX WCHAR_MIN "
 
 // <version>
-"^__cpp_lib_" // 85+
+"^__cpp_lib_ " // 85+
 
 // Win32/MFC
 "_WIN32 WIN32 WINVER _WIN32_WINNT _WIN32_IE _WIN64 _UNICODE UNICODE "
@@ -666,8 +668,10 @@ static KEYWORDLIST Keywords_CPP = {{
 "invoke() ref() cref() not_fn() bind_front() bind() mem_fn() "
 "target_type() target() " // function
 // <chrono>
-"zero() duration_cast() time_point_cast() time_since_epoch() "
-"now() to_time_t() from_time_t() " // system_clock
+"zero() duration_cast() time_point_cast() time_since_epoch() to_stream() from_stream() "
+"now() to_time_t() from_time_t() to_sys() from_sys() to_utc() from_utc() clock_cast() to_duration() make24() make12() "
+"locate_zone() current_zone() get_tzdb() get_tzdb_list() reload_tzdb() remote_version() get_info() to_local() "
+"get_time_zone() get_local_time() get_sys_time() date() parse() "
 // <string>
 "eq() lt() compare() length() find() copy() not_eof() to_char_type() to_int_type() eq_int_type() eof() " // char_traits
 "getline() erase() erase_if() stoi() stol() stoul() stoll() stoull() stof() stod() stold() to_wstring() "
@@ -736,23 +740,23 @@ static KEYWORDLIST Keywords_CPP = {{
 "state() " "flags() setf() unsetf() precision() width() imbue() getloc() xalloc() iword() pword() register_callback() sync_with_stdio() " // ios_base
 "rdstate() setstate() good() fail() bad() exceptions() rdbuf() copyfmt() " // basic_ios
 "flush() tellp() seekp() " // basic_ostream
-"resetiosflags() setiosflags() setbase() setfill() setprecision() setw() put_money() put_time() quoted() "
-"str() is_open() "
+"resetiosflags() setiosflags() setbase() setfill() setprecision() setw() get_money() put_money() put_time() quoted() "
+"str() is_open() emit() get_wrapped() set_emit_on_sync() "
 // <filesystem>
 "concat() make_preferred() remove_filename() replace_filename() replace_extension() native() "
 "root_name() root_directory() root_path() relative_path() parent_path() filename() stem() extension() "
 "has_root_name() has_root_directory() has_root_path() has_relative_path() has_parent_path() has_filename() has_stem() has_extension() "
 "is_absolute() is_relative() lexically_normal() lexically_relative() lexically_proximate() " // path
-"hash_value() u8path() "
+"generic_string() generic_wstring() generic_u8string() generic_u16string() generic_u32string() hash_value() "
 "refresh() exists() is_block_file() is_character_file() is_directory() is_fifo() is_other() is_regular_file() is_socket() is_symlink() "
 "file_size() hard_link_count() last_write_time() status() symlink_status() " // directory_entry
-"disable_recursion_pending() " // recursive_directory_iterator
+"increment() depth() recursion_pending() disable_recursion_pending() " // recursive_directory_iterator
 "type() permissions() " // file_status
 "absolute() canonical() copy_file() copy_symlink() create_directories() create_directory() create_directory_symlink() create_hard_link() create_symlink() current_path() "
 "equivalent() proximate() read_symlink() relative() remove_all() resize_file() space() status_known() temp_directory_path() weakly_canonical() "
 // <regex>
 "translate() translate_nocase() transform_primary() lookup_collatename() lookup_classname() isctype() getloc() "
-"mark_count() position() prefix() suffix() format() "
+"mark_count() ready() position() prefix() suffix() format() "
 "regex_match() regex_search() regex_replace() "
 // <atomic>
 "is_lock_free() store() load() compare_exchange_weak() compare_exchange_strong() "
@@ -801,7 +805,8 @@ static KEYWORDLIST Keywords_CPP = {{
 "ratio num den "
 "seq par par_unseq " // <execution>
 // <chrono>
-"duration rep period clock "
+"duration rep period clock day month year weekday choose leap link tzdb "
+"nanoseconds microseconds milliseconds seconds minutes hours days weeks years months last Sunday Monday Tuesday Wednesday Thursday Friday Saturday January February March April May June July August September October November December "
 "npos " // <string>
 "default_sentinel unreachable_sentinel " //  <iterator>
 // <locale> <codecvt>
@@ -810,7 +815,7 @@ static KEYWORDLIST Keywords_CPP = {{
 "minstd_rand0 minstd_rand mt19937 mt19937_64 ranlux24_base ranlux48_base ranlux24 ranlux48 knuth_b default_random_engine "
 // Input/output library
 "boolalpha noboolalpha showbase noshowbase showpoint noshowpoint showpos noshowpos skipws noskipws uppercase nouppercase unitbuf nounitbuf internal left right dec hex oct fixed scientific hexfloat defaultfloat "
-"cin cout cerr clog wcin wcout wcerr wclog " "endl ends flush "
+"cin cout cerr clog wcin wcout wcerr wclog " "endl ends flush emit_on_flush noemit_on_flush flush_emit "
 // <filesystem>
 "path perms "
 // <regex>

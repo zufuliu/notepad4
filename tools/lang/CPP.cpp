@@ -228,13 +228,77 @@ namespace std { // Coroutines
 }
 
 #include <concepts> // C++20
-namespace std { // Concepts library
+namespace std { // Concepts
+	// language-related concepts
+	template<class T, class U>
+	concept Same;
+	template<class Derived, class Base>
+	concept DerivedFrom;
+	template<class From, class To>
+	concept ConvertibleTo;
+	template<class T, class U>
+	concept CommonReference;
+	template<class T, class U>
+	concept Common;
+	template<class T>
+	concept Integral;
+	template<class T>
+	concept SignedIntegral;
+	template<class T>
+	concept UnsignedIntegral;
+	template<class LHS, class RHS>
+	concept Assignable;
+	template<class T>
+	concept Swappable;
+	template<class T, class U>
+	concept SwappableWith;
+	template<class T>
+	concept Destructible;
+	template<class T, class... Args>
+	concept Constructible;
+	template<class T>
+	concept DefaultConstructible;
+	template<class T>
+	concept MoveConstructible;
+	template<class T>
+	concept CopyConstructible;
+	// comparison concepts
+	template<class B>
+	concept Boolean;
+	template<class T>
+	concept EqualityComparable;
+	template<class T, class U>
+	concept EqualityComparableWith;
+	template<class T>
+	concept StrictTotallyOrdered;
+	template<class T, class U>
+	concept StrictTotallyOrderedWith;
+	// object concepts
+	template<class T>
+	concept Movable;
+	template<class T>
+	concept Copyable;
+	template<class T>
+	concept Semiregular;
+	template<class T>
+	concept Regular;
+	// callable concepts
+	template<class F, class... Args>
+	concept Invocable;
+	template<class F, class... Args>
+	concept RegularInvocable;
+	template<class F, class... Args>
+	concept Predicate;
+	template<class R, class T, class U>
+	concept Relation;
+	template<class R, class T, class U>
+	concept StrictWeakOrder;
 }
 
 #include <exception>
 namespace std { // Exception handling
 	class exception {
-		const char* what() const noexcept;;
+		const char* what() const noexcept;
 	}
 	class bad_exception : public exception {};
 	class nested_exception {
@@ -627,7 +691,7 @@ namespace std { // Memory
 		using const_void_pointer;
 		using propagate_on_container_copy_assignment;
 		using propagate_on_container_move_assignment;
-		using propagate_on_container_swap;;
+		using propagate_on_container_swap;
 		using is_always_equal;
 
 		[[nodiscard]] static pointer allocate(Alloc& a, size_type n);
@@ -1230,76 +1294,236 @@ namespace std { // Primitive numeric conversions
 }
 
 #include <chrono>
-namespace std { // Time utilities
-	namespace chrono {
-		// class template duration
-		template <class Rep, class Period = ratio<1>>
-		class duration {
-			using rep = Rep;
-			using period = typename Period::type;
-			constexpr rep count() const;
-			static constexpr duration zero();
-			static constexpr duration min();
-			static constexpr duration max();
-		};
-		// class template time_point
-		template <class Clock, class Duration = typename Clock::duration>
-		class time_point {
-			using clock = Clock;
-			using duration = Duration;
-			using rep = typename duration::rep;
-			using period = typename duration::period;
-			constexpr duration time_since_epoch() const;
-			static constexpr time_point min();
-			static constexpr time_point max();
-		};
+namespace std::chrono { // Time
+	// class template duration
+	template <class Rep, class Period = ratio<1>>
+	class duration {
+		using rep = Rep;
+		using period = typename Period::type;
+		constexpr rep count() const;
+		static constexpr duration zero();
+		static constexpr duration min();
+		static constexpr duration max();
+	};
+	// class template time_point
+	template <class Clock, class Duration = typename Clock::duration>
+	class time_point {
+		using clock = Clock;
+		using duration = Duration;
+		using rep = typename duration::rep;
+		using period = typename duration::period;
+		constexpr duration time_since_epoch() const;
+		static constexpr time_point min();
+		static constexpr time_point max();
+	};
 
-		// customization traits
-		template <class Rep> struct treat_as_floating_point;
-		template <class Rep> struct duration_values {
-			static constexpr Rep zero();
-			static constexpr Rep min();
-			static constexpr Rep max();
-		};
-		template <class Rep> inline constexpr bool treat_as_floating_point_v = treat_as_floating_point<Rep>::value;
-		// duration_cast
-		template <class ToDuration, class Rep, class Period> constexpr ToDuration duration_cast(const duration<Rep, Period>& d);
-		template <class ToDuration, class Rep, class Period> constexpr ToDuration floor(const duration<Rep, Period>& d);
-		template <class ToDuration, class Rep, class Period> constexpr ToDuration ceil(const duration<Rep, Period>& d);
-		template <class ToDuration, class Rep, class Period> constexpr ToDuration round(const duration<Rep, Period>& d);
-		// convenience typedefs
-		using nanoseconds;
-		using microseconds;
-		using milliseconds;
-		using seconds;
-		using minutes;
-		using hours;
-		// time_point_cast
-		template <class ToDuration, class Clock, class Duration>
-		constexpr time_point<Clock, ToDuration> time_point_cast(const time_point<Clock, Duration>& t);
-		template <class ToDuration, class Clock, class Duration>
-		constexpr time_point<Clock, ToDuration> floor(const time_point<Clock, Duration>& tp);
-		template <class ToDuration, class Clock, class Duration>
-		constexpr time_point<Clock, ToDuration> ceil(const time_point<Clock, Duration>& tp);
-		template <class ToDuration, class Clock, class Duration>
-		constexpr time_point<Clock, ToDuration> round(const time_point<Clock, Duration>& tp);
-		template <class Rep, class Period>
-		constexpr duration<Rep, Period> abs(duration<Rep, Period> d);
-		// clocks
-		class system_clock {
-			using time_point = chrono::time_point<system_clock>;
-			static constexpr bool is_steady ;
-			static time_point now() noexcept;
-			static time_t to_time_t(const time_point& t) noexcept;
-			static time_point from_time_t(time_t t) noexcept;
-		};
-		class steady_clock;
-		class high_resolution_clock;
-	}
-	template <class Rep1, class Period1, class Rep2, class Period2>
-	struct common_type<chrono::duration<Rep1, Period1>, chrono::duration<Rep2, Period2>>;
-	template <class Clock, class Duration1, class Duration2>
-	struct common_type<chrono::time_point<Clock, Duration1>, chrono::time_point<Clock, Duration2>>;
+	// customization traits
+	template <class Rep> struct treat_as_floating_point;
+	template <class Rep> struct duration_values {
+		static constexpr Rep zero();
+		static constexpr Rep min();
+		static constexpr Rep max();
+	};
+	template <class Rep> inline constexpr bool treat_as_floating_point_v = treat_as_floating_point<Rep>::value;
+	template<class T> struct is_clock; // C++20
+	template<class T> inline constexpr bool is_clock_v = is_clock<T>::value;		// duration_cast
+	template <class ToDuration, class Rep, class Period> constexpr ToDuration duration_cast(const duration<Rep, Period>& d);
+	template <class ToDuration, class Rep, class Period> constexpr ToDuration floor(const duration<Rep, Period>& d);
+	template <class ToDuration, class Rep, class Period> constexpr ToDuration ceil(const duration<Rep, Period>& d);
+	template <class ToDuration, class Rep, class Period> constexpr ToDuration round(const duration<Rep, Period>& d);
+	template<class charT, class traits, class Rep, class Period>
+	basic_ostream<charT, traits>& to_stream(basic_ostream<charT, traits>& os, const charT* fmt, const duration<Rep, Period>& d); // C++20
+	template<class charT, class traits, class Rep, class Period, class Alloc = allocator<charT>>
+	basic_istream<charT, traits>& from_stream(basic_istream<charT, traits>& is, const charT* fmt,duration<Rep, Period>& d, basic_string<charT, traits, Alloc>* abbrev = nullptr, minutes* offset = nullptr); // C++20
+	// convenience typedefs
+	using nanoseconds;
+	using microseconds;
+	using milliseconds;
+	using seconds;
+	using minutes;
+	using hours;
+	using days; // C++20
+	using weeks; // C++20
+	using years; // C++20
+	using months; // C++20
+	// time_point_cast
+	template <class ToDuration, class Clock, class Duration>
+	constexpr time_point<Clock, ToDuration> time_point_cast(const time_point<Clock, Duration>& t);
+	template <class ToDuration, class Clock, class Duration>
+	constexpr time_point<Clock, ToDuration> floor(const time_point<Clock, Duration>& tp);
+	template <class ToDuration, class Clock, class Duration>
+	constexpr time_point<Clock, ToDuration> ceil(const time_point<Clock, Duration>& tp);
+	template <class ToDuration, class Clock, class Duration>
+	constexpr time_point<Clock, ToDuration> round(const time_point<Clock, Duration>& tp);
+	template <class Rep, class Period>
+	constexpr duration<Rep, Period> abs(duration<Rep, Period> d);
+	// clocks
+	class system_clock {
+		using time_point = chrono::time_point<system_clock>;
+		static constexpr bool is_steady ;
+		static time_point now() noexcept;
+		static time_t to_time_t(const time_point& t) noexcept;
+		static time_point from_time_t(time_t t) noexcept;
+	};
+	template<class Duration>
+	using sys_time = time_point<system_clock, Duration>; // C++20
+	using sys_seconds = sys_time<seconds>;
+	using sys_days = sys_time<days>;
+	class utc_clock { // C++20
+		template<class Duration>
+		static sys_time<common_type_t<Duration, seconds>> to_sys(const utc_time<Duration>& t);
+		template<class Duration>
+		static utc_time<common_type_t<Duration, seconds>> from_sys(const sys_time<Duration>& t);
+	};
+	template<class Duration>
+	using utc_time = time_point<utc_clock, Duration>;
+	using utc_seconds = utc_time<seconds>;
+	class tai_clock { // C++20
+		template<class Duration>
+		static utc_time<common_type_t<Duration, seconds>> to_utc(const tai_time<Duration>&) noexcept;
+		template<class Duration>
+		static tai_time<common_type_t<Duration, seconds>> from_utc(const utc_time<Duration>&) noexcept;
+	};
+	template<class Duration>
+	using tai_time = time_point<tai_clock, Duration>;
+	using tai_seconds = tai_time<seconds>;
+	class gps_clock; // C++20
+	template<class Duration>
+	using gps_time = time_point<gps_clock, Duration>;
+	using gps_seconds = gps_time<seconds>;
+	using file_clock; // C++20
+	template<class Duration>
+	using file_time = time_point<file_clock, Duration>;
+	class steady_clock;
+	class high_resolution_clock;
+	// local time C++20
+	struct local_t {};
+	template<class Duration>
+	using local_time = time_point<local_t, Duration>;
+	using local_seconds = local_time<seconds>;
+	using local_days = local_time<days>;
+	template<class DestClock, class SourceClock>
+	struct clock_time_conversion;
+	template<class DestClock, class SourceClock, class Duration>
+	auto clock_cast(const time_point<SourceClock, Duration>& t);
+	struct last_spec;
+	class day;
+	class month;
+	class year;
+	class weekday;
+	class weekday_indexed;
+	class weekday_last;
+	class month_day;
+	class month_day_last;
+	class month_weekday;
+	class month_weekday_last;
+	class year_month;
+	class year_month_day;
+	class year_month_day_last;
+	class year_month_weekday;
+	class year_month_weekday_last;
+	template<class Duration> class time_of_day {
+		using precision;
+		constexpr precision to_duration() const noexcept;
+		constexpr void make24() noexcept;
+		constexpr void make12() noexcept;
+	};
+	template<> class time_of_day<hours>;
+	template<> class time_of_day<minutes>;
+	template<> class time_of_day<seconds>;
+	template<class Rep, class Period> class time_of_day<duration<Rep, Period>>;
+	// time zone database
+	struct tzdb {
+		string version;
+		vector<time_zone> zones;
+		vector<link> links;
+		vector<leap> leaps;
+		const time_zone* locate_zone(string_view tz_name) const;
+		const time_zone* current_zone() const;
+	};
+	class tzdb_list {
+		class const_iterator;
+		const tzdb& front() const noexcept;
+		const_iterator erase_after(const_iterator p);
+	};
+	const tzdb& get_tzdb();
+	tzdb_list& get_tzdb_list();
+	const time_zone* locate_zone(string_view tz_name);
+	const time_zone* current_zone();
+	const tzdb& reload_tzdb();
+	string remote_version();
+	class nonexistent_local_time : public runtime_error {};
+	class ambiguous_local_time : public runtime_error {};
+	struct sys_info {
+		sys_seconds begin;
+		sys_seconds end;
+		seconds offset;
+		minutes save;
+		string abbrev;
+	};
+	struct local_info {
+		static constexpr int unique = 0;
+		static constexpr int nonexistent = 1;
+		static constexpr int ambiguous = 2;
+		int result;
+		sys_info first;
+		sys_info second;
+	};
+	enum class choose {earliest, latest};
+	class time_zone {
+		string_view name() const noexcept;
+		template<class Duration> sys_info get_info(const sys_time<Duration>& st) const;
+		template<class Duration>
+		local_info get_info(const local_time<Duration>& tp) const;
+		template<class Duration>
+		sys_time<common_type_t<Duration, seconds>> to_sys(const local_time<Duration>& tp) const;
+		template<class Duration>
+		local_time<common_type_t<Duration, seconds>> to_local(const sys_time<Duration>& tp) const;
+	};
+	template<class T> struct zoned_traits {
+		static const time_zone* default_zone();
+		static const time_zone* locate_zone(string_view name);
+	};
+	template<class Duration, class TimeZonePtr = const time_zone*>
+	class zoned_time {
+		TimeZonePtr get_time_zone() const;
+		local_time<duration> get_local_time() const;
+		sys_time<duration> get_sys_time() const;
+		sys_info get_info() const;
+	};
+	using zoned_seconds = zoned_time<seconds>;
+	class leap {
+		constexpr sys_seconds date() const noexcept;
+	};
+	class link {
+		string_view name() const noexcept;
+		string_view target() const noexcept;
+	};
+	template<class charT, class Streamable>
+	basic_string<charT> format(const charT* fmt, const Streamable& s);
+	template<class charT, class traits, class Alloc, class Parsable>
+	parse(const basic_string<charT, traits, Alloc>& format, Parsable& tp);
+	// calendrical constants
+	inline constexpr last_spec last{};
+	inline constexpr weekday Sunday{0};
+	inline constexpr weekday Monday{1};
+	inline constexpr weekday Tuesday{2};
+	inline constexpr weekday Wednesday{3};
+	inline constexpr weekday Thursday{4};
+	inline constexpr weekday Friday{5};
+	inline constexpr weekday Saturday{6};
+	inline constexpr month January{1};
+	inline constexpr month February{2};
+	inline constexpr month March{3};
+	inline constexpr month April{4};
+	inline constexpr month May{5};
+	inline constexpr month June{6};
+	inline constexpr month July{7};
+	inline constexpr month August{8};
+	inline constexpr month September{9};
+	inline constexpr month October{10};
+	inline constexpr month November{11};
+	inline constexpr month December{12}
 }
 
 #include <typeindex>
@@ -2626,13 +2850,15 @@ namespace std { // Mathematical functions
 #include <iostream>
 #include <sstream>
 #include <fstream>
-namespace std { // Input/output library
+#include <syncstream> // C++20
+namespace std { // Input/output
 	// <iosfwd>
-	template<class charT> class char_traits;
-	template<> class char_traits<char>;
-	template<> class char_traits<char16_t>;
-	template<> class char_traits<char32_t>;
-	template<> class char_traits<wchar_t>;
+	template<class charT> struct char_traits;
+	template<> struct char_traits<char>;
+	template<> struct char_traits<char8_t>;
+	template<> struct char_traits<char16_t>;
+	template<> struct char_traits<char32_t>;
+	template<> struct char_traits<wchar_t>;
 	template<class T> class allocator;
 	template <class charT, class traits = char_traits<charT>>
 	class istreambuf_iterator;
@@ -2648,6 +2874,9 @@ namespace std { // Input/output library
 	};
 	using streampos = fpos<char_traits<char>::state_type>;
 	using wstreampos = fpos<char_traits<wchar_t>::state_type>;
+	using u8streampos = fpos<char_traits<char8_t>::state_type>;
+	using u16streampos = fpos<char_traits<char16_t>::state_type>;
+	using u32streampos = fpos<char_traits<char32_t>::state_type>;
 
 	class ios_base {
 		class failure : public system_error {};
@@ -2753,6 +2982,7 @@ namespace std { // Input/output library
 	using ios = basic_ios<char>;
 	using wios = basic_ios<wchar_t>;
 
+	// manipulators
 	ios_base& boolalpha(ios_base& str);
 	ios_base& noboolalpha(ios_base& str);
 	ios_base& showbase(ios_base& str);
@@ -2767,12 +2997,15 @@ namespace std { // Input/output library
 	ios_base& nouppercase(ios_base& str);
 	ios_base& unitbuf(ios_base& str);
 	ios_base& nounitbuf(ios_base& str);
+	// adjustfield
 	ios_base& internal(ios_base& str);
 	ios_base& left(ios_base& str);
 	ios_base& right(ios_base& str);
+	// basefield
 	ios_base& dec(ios_base& str);
 	ios_base& hex(ios_base& str);
 	ios_base& oct(ios_base& str);
+	// floatfield
 	ios_base& fixed(ios_base& str);
 	ios_base& scientific(ios_base& str);
 	ios_base& hexfloat(ios_base& str);
@@ -2880,12 +3113,19 @@ namespace std { // Input/output library
 	extern wostream wcerr;
 	extern wostream wclog;
 
+	// manipulators
 	template <class charT, class traits>
 	basic_ostream<charT, traits>& endl(basic_ostream<charT, traits>& os);
 	template <class charT, class traits>
 	basic_ostream<charT, traits>& ends(basic_ostream<charT, traits>& os);
 	template <class charT, class traits>
 	basic_ostream<charT, traits>& flush(basic_ostream<charT, traits>& os);
+	template<class charT, class traits>
+	basic_ostream<charT, traits>& emit_on_flush(basic_ostream<charT, traits>& os); // C++20
+	template<class charT, class traits>
+	basic_ostream<charT, traits>& noemit_on_flush(basic_ostream<charT, traits>& os); // C++20
+	template<class charT, class traits>
+	basic_ostream<charT, traits>& flush_emit(basic_ostream<charT, traits>& os); // C++20
 
 	// <iomanip>
 	T1 resetiosflags(ios_base::fmtflags mask);
@@ -2894,7 +3134,9 @@ namespace std { // Input/output library
 	template<charT> T4 setfill(charT c);
 	T5 setprecision(int n);
 	T6 setw(int n);
+	template <class moneyT> T7 get_money(moneyT& mon, bool intl = false);
 	template <class moneyT> T8 put_money(const moneyT& mon, bool intl = false);
+	template <class charT> T9 get_time(struct tm* tmb, const charT* fmt);
 	template <class charT> T10 put_time(const struct tm* tmb, const charT* fmt);
 	template <class charT> T11 quoted(const charT* s, charT delim = charT('"'), charT escape = charT('\\'));
 
@@ -2979,6 +3221,24 @@ namespace std { // Input/output library
 	};
 	using fstream = basic_fstream<char>;
 	using wfstream = basic_fstream<wchar_t>;
+
+	template<class charT, class traits = char_traits<charT>, class Allocator = allocator<charT>>
+	class basic_syncbuf : public basic_streambuf<charT, traits> {
+		bool emit();
+		streambuf_type* get_wrapped() const noexcept;
+		allocator_type get_allocator() const noexcept;
+		void set_emit_on_sync(bool) noexcept;
+	};
+	using syncbuf = basic_syncbuf<char>;
+	using wsyncbuf = basic_syncbuf<wchar_t>;
+	template<class charT, class traits = char_traits<charT>, class Allocator = allocator<charT>>
+	class basic_osyncstream : public basic_ostream<charT, traits> {
+		using allocator_type = Allocator;
+		using streambuf_type = basic_streambuf<charT, traits>;
+		using syncbuf_type = basic_syncbuf<charT, traits, Allocator>;
+	};
+	using osyncstream = basic_osyncstream<char>;
+	using wosyncstream = basic_osyncstream<wchar_t>;
 }
 
 #include <filesystem>
@@ -3004,15 +3264,14 @@ namespace std::filesystem { // File systems
 		path& replace_extension(const path& replacement = path());
 		const string_type& native() const noexcept;
 		const value_type* c_str() const noexcept;
-		operator string_type() const;
 		std::string string() const;
 		std::wstring wstring() const;
-		std::string u8string() const;
+		std::u8string u8string() const;
 		std::u16string u16string() const;
 		std::u32string u32string() const;
 		std::string generic_string() const;
 		std::wstring generic_wstring() const;
-		std::string generic_u8string() const;
+		std::u8string generic_u8string() const;
 		std::u16string generic_u16string() const;
 		std::u32string generic_u32string() const;
 		int compare(const path& p) const noexcept;
@@ -3026,7 +3285,7 @@ namespace std::filesystem { // File systems
 		path stem() const;
 		path extension() const;
 		// query
-		bool empty() const noexcept;
+		[[nodiscard]] bool empty() const noexcept;
 		bool has_root_name() const;
 		bool has_root_directory() const;
 		bool has_root_path() const;
@@ -3044,9 +3303,9 @@ namespace std::filesystem { // File systems
 	};
 	size_t hash_value(const path& p) noexcept;
 	template <class Source>
-	path u8path(const Source& source);
+	path u8path(const Source& source); // C++17
 	template <class InputIterator>
-	path u8path(InputIterator first, InputIterator last);
+	path u8path(InputIterator first, InputIterator last); // C++17
 	class filesystem_error : public system_error {
 		const path& path1() const noexcept;
 		const path& path2() const noexcept;
@@ -3071,8 +3330,13 @@ namespace std::filesystem { // File systems
 		file_status status() const;
 		file_status symlink_status() const;
 	};
-	class directory_iterator {};
+	class directory_iterator {
+		directory_iterator& increment(error_code& ec);
+	};
 	class recursive_directory_iterator {
+		directory_options options() const;
+		int depth() const;
+		bool recursion_pending() const;
 		void pop();
 		void disable_recursion_pending();
 	};
@@ -3143,7 +3407,7 @@ namespace std::filesystem { // File systems
 		follow_directory_symlink,
 		skip_permission_denied,
 	};
-	using file_time_type = chrono::time_point<trivial-clock>;
+	using file_time_type = chrono::time_point<chrono::file_clock>;
 	path absolute(const path& p, const path& base = current_path());
 	path canonical(const path& p, const path& base = current_path());
 	path canonical(const path& p, error_code& ec);
@@ -3263,6 +3527,7 @@ namespace std { // Regular expressions
 		using string_type = typename traits::string_type;
 		using flag_type = regex_constants::syntax_option_type;
 		using locale_type = typename traits::locale_type;
+		basic_regex& assign(const basic_regex& that);
 		unsigned mark_count() const;
 		flag_type flags() const;
 	};
@@ -3281,6 +3546,7 @@ namespace std { // Regular expressions
 	using wssub_match = sub_match<wstring::const_iterator>;
 	template <class BidirectionalIterator, class Allocator = allocator<sub_match<BidirectionalIterator>>>
 	class match_results {
+		bool ready() const;
 		difference_type length(size_type sub = 0) const;
 		difference_type position(size_type sub = 0) const;
 		string_type str(size_type sub = 0) const;
@@ -3328,6 +3594,7 @@ namespace std { // Regular expressions
 
 #include <atomic>
 namespace std { // Atomic operations
+	template<class T> struct atomic_ref {}; // C++20
 	template<class T>
 	struct atomic {
 		static constexpr bool is_always_lock_free;
@@ -3518,7 +3785,7 @@ namespace std { // Futures
 	};
 
 	template <class F, class... Args>
-	future<invoke_result_t<decay_t<F>, decay_t<Args>...>> async(F&& f, Args&&... args);
+	[[nodiscard]] future<invoke_result_t<decay_t<F>, decay_t<Args>...>> async(F&& f, Args&&... args);
 	template <class F, class... Args>
-	future<invoke_result_t<decay_t<F>, decay_t<Args>...>> async(launch policy, F&& f, Args&&... args);
+	[[nodiscard]] future<invoke_result_t<decay_t<F>, decay_t<Args>...>> async(launch policy, F&& f, Args&&... args);
 }
