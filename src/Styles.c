@@ -2500,9 +2500,12 @@ BOOL Style_MaybeBinaryFile(LPCWSTR lpszFile) {
 	const UINT C0Mask = 0x0FFFC1FFU;
 	const Sci_Position headerLen = min_pos(1023, SciCall_GetLength() - 1);
 	const uint8_t *ptr = (const uint8_t *)SciCall_GetRangePointer(0, headerLen + 1);
+	if (ptr == NULL || headerLen <= 0) {
+		return FALSE; // empty file
+	}
+
 	const uint8_t * const end  = ptr + headerLen;
 	UINT count = 0;
-
 	while (ptr < end) {
 		uint8_t ch = *ptr++;
 		if (ch < 32 && (C0Mask & (1U << ch))) {
