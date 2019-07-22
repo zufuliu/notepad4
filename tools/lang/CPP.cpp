@@ -802,6 +802,9 @@ namespace std { // Memory
 	};
 	template<class T>
 	bool atomic_is_lock_free(const shared_ptr<T>* p);
+
+	template <class Y> [[deprecated]] struct auto_ptr_ref {}; // C++03
+	template <class X> [[deprecated]] class auto_ptr {}; // C++03
 }
 
 #include <memory_resource>
@@ -944,7 +947,7 @@ namespace std { // Function objects
 	template <class T> inline constexpr bool is_bind_expression_v = is_bind_expression<T>::value;
 	template <class T> inline constexpr int is_placeholder_v = is_placeholder<T>::value;
 
-	namespace ranges { // C+=20
+	namespace ranges { // C++20
 		// concept-constrained comparisons
 		struct equal_to;
 		struct not_equal_to;
@@ -953,6 +956,21 @@ namespace std { // Function objects
 		struct greater_equal;
 		struct less_equal;
 	}
+
+	// deprecated C++03 function objects and binders
+	template <class Arg, class Result> struct unary_function {}; // C++03
+	template <class Arg1, class Arg2, class Result> struct binary_function {}; // C++03
+	template <class Arg, class Result> class pointer_to_unary_function : public unary_function<Arg, Result> {}; // C++03
+	template <class Arg1, class Arg2, class Result> class pointer_to_binary_function : public binary_function<Arg1,Arg2,Result> {}; // C++03
+	template <class S, class T> class mem_fun_t : public unary_function<T*, S> {}; // C++03
+	template <class S, class T, class A> class mem_fun1_t : public binary_function<T*, A, S> {};  // C++03
+	template <class S, class T> class mem_fun_ref_t : public unary_function<T, S> {};  // C++03
+	template <class S, class T, class A> class mem_fun1_ref_t : public binary_function<T, A, S> {};  // C++03
+	template <class S, class T> class const_mem_fun_t : public unary_function<const T*, S> {};  // C++03
+	template <class S, class T, class A> class const_mem_fun1_t : public binary_function<const T*, A, S> {};  // C++03
+	template <class S, class T, class A> class const_mem_fun1_ref_t : public binary_function<T, A, S> {};  // C++03
+	template <class Fn> class binder1st : public unary_function<typename Fn::second_argument_type, typename Fn::result_type> {};  // C++03
+	template <class Fn> class binder2nd : public unary_function<typename Fn::first_argument_type, typename Fn::result_type> {};  // C++03
 }
 
 #include <type_traits>
@@ -998,7 +1016,7 @@ namespace std { // Metaprogramming and type traits
 	template <class T> struct is_trivial;
 	template <class T> struct is_trivially_copyable;
 	template <class T> struct is_standard_layout;
-	template <class T> struct is_pod; // C++17
+	template <class T> [[deprecated]] struct is_pod; // C++17
 	template <class T> struct is_empty;
 	template <class T> struct is_polymorphic;
 	template <class T> struct is_abstract;
@@ -1161,7 +1179,7 @@ namespace std { // Metaprogramming and type traits
 	template <class T> inline constexpr bool is_trivial_v = is_trivial<T>::value;
 	template <class T> inline constexpr bool is_trivially_copyable_v = is_trivially_copyable<T>::value;
 	template <class T> inline constexpr bool is_standard_layout_v = is_standard_layout<T>::value;
-	template <class T> inline constexpr bool is_pod_v = is_pod<T>::value; // C++17
+	template <class T> [[deprecated]] inline constexpr bool is_pod_v = is_pod<T>::value; // C++17
 	template <class T> inline constexpr bool is_empty_v = is_empty<T>::value;
 	template <class T> inline constexpr bool is_polymorphic_v = is_polymorphic<T>::value;
 	template <class T> inline constexpr bool is_abstract_v = is_abstract<T>::value;
@@ -1799,6 +1817,28 @@ namespace std { // Localization
 	};
 	template <class internT, class externT, class stateT>
 	class codecvt_byname : public codecvt<internT, externT, stateT> {};
+
+	// deprecated C++14 code conversion facets
+	enum codecvt_mode { // C++14
+		consume_header,
+		generate_header,
+		little_endian
+	};
+	template<class Elem, unsigned long Maxcode = 0x10ffff, codecvt_mode Mode = (codecvt_mode)0>
+	class codecvt_utf8 : public codecvt<Elem, char, mbstate_t> {}; // C++14
+	template<class Elem, unsigned long Maxcode = 0x10ffff, codecvt_mode Mode = (codecvt_mode)0>
+	class codecvt_utf16 : public codecvt<Elem, char, mbstate_t> {}; // C++14
+	template<class Elem, unsigned long Maxcode = 0x10ffff, codecvt_mode Mode = (codecvt_mode)0>
+	class codecvt_utf8_utf16 : public codecvt<Elem, char, mbstate_t> {}; // C++14
+	template<class Codecvt, class Elem = wchar_t, class Wide_alloc = allocator<Elem>, class Byte_alloc = allocator<char>>
+	class wstring_convert { // C++14
+		wide_string from_bytes(char byte);
+		byte_string to_bytes(Elem wchar);
+		size_t converted() const noexcept;
+		state_type state() const;
+	};
+	template<class Codecvt, class Elem = wchar_t, class Tr = char_traits<Elem>>
+	class wbuffer_convert; // C++14
 
 	// numeric
 	template <class charT, class InputIterator = istreambuf_iterator<charT>>
@@ -3240,6 +3280,24 @@ namespace std { // Input/output
 	using osyncstream = basic_osyncstream<char>;
 	using wosyncstream = basic_osyncstream<wchar_t>;
 }
+#include <strstream> // C++98
+namespace std { // deprecated char* streams
+	class strstreambuf : public basic_streambuf<char> {
+		void freeze(bool freezefl = true);
+		char* str();
+		int pcount();
+	protected:
+		int_type overflow (int_type c = EOF) override;
+		int_type pbackfail(int_type c = EOF) override;
+		int_type underflow() override;
+		pos_type seekoff(off_type off, ios_base::seekdir way, ios_base::openmode which = ios_base::in | ios_base::out) override;
+		pos_type seekpos(pos_type sp, ios_base::openmode which = ios_base::in | ios_base::out) override;
+		streambuf* setbuf(char* s, streamsize n) override;
+	};
+	class istrstream : public basic_istream<char> {};
+	class ostrstream : public basic_ostream<char> {};
+	class strstream : public basic_iostream<char> {};
+}
 
 #include <filesystem>
 namespace std::filesystem { // File systems
@@ -3303,9 +3361,9 @@ namespace std::filesystem { // File systems
 	};
 	size_t hash_value(const path& p) noexcept;
 	template <class Source>
-	path u8path(const Source& source); // C++17
+	[[deprecated]] path u8path(const Source& source); // C++17
 	template <class InputIterator>
-	path u8path(InputIterator first, InputIterator last); // C++17
+	[[deprecated]] path u8path(InputIterator first, InputIterator last); // C++17
 	class filesystem_error : public system_error {
 		const path& path1() const noexcept;
 		const path& path2() const noexcept;

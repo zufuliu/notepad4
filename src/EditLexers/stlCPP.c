@@ -169,9 +169,9 @@ static KEYWORDLIST Keywords_CPP = {{
 // <string_view>
 "basic_string_view string_view u8string_view u16string_view u32string_view wstring_view "
 // <locale> <codecvt>
-"locale facet ctype_base codecvt_base codecvt codecvt_byname "
+"locale facet ctype ctype_base ctype_byname codecvt_base codecvt codecvt_byname "
 "num_get num_put numpunct numpunct_byname "
-"time_base time_get time_put time_put_byname "
+"collate collate_byname time_base time_get time_get_byname time_put time_put_byname "
 "money_base money_get money_put moneypunct moneypunct_byname "
 "messages_base messages_byname "
 // <array> <deque> <forward_list> <list> <vector>
@@ -239,13 +239,14 @@ static KEYWORDLIST Keywords_CPP = {{
 "istream_type ostream_type streambuf_type syncbuf_type "
 
 // old class
-"unary_function binary_function "
 "rb_tree dynamic_bitset "
 "raw_storage_iterator "
 "array_allocator bitmap_allocator "
 "iterator_type "
-"hash_map hash_multimap hash_set hash_multiset hashtable auto_ptr auto_ptr_ref "
-"strstreambuf istrstream ostrstream strstream binder1st binder2nd "
+"hash_map hash_multimap hash_set hash_multiset hashtable "
+"wstring_convert wbuffer_convert codecvt_utf8 codecvt_utf16 codecvt_utf8_utf16 " // C++14
+"auto_ptr auto_ptr_ref unary_function binary_function binder1st binder2nd " // C++03
+"strstreambuf istrstream ostrstream strstream " // C++98
 
 // MFC
 "CString CStringArray CStringList CArray CList CMap CTypedPtrArray CTypedPtrList CTypedPtrMap CTypeLibCacheMap CSimpleList CByteArray CWordArray CDWordArray CUIntArray CPtrArray CObArray CPtrList CObList CMapWordToPtr CMapPtrToWord CMapPtrToPtr CMapWordToOb CMapStringToPtr CMapStringToOb CMapStringToString CTypedSimpleList "
@@ -285,6 +286,7 @@ static KEYWORDLIST Keywords_CPP = {{
 "pointer_safety "
 // <locale> <codecvt>
 "dateorder "
+"codecvt_mode " // C++14
 // ios_base
 "fmtflags iostate openmode seekdir "
 // <filesystem>
@@ -810,7 +812,7 @@ static KEYWORDLIST Keywords_CPP = {{
 "npos " // <string>
 "default_sentinel unreachable_sentinel " //  <iterator>
 // <locale> <codecvt>
-"id category collate messages "
+"id category messages "
 // <random>
 "minstd_rand0 minstd_rand mt19937 mt19937_64 ranlux24_base ranlux48_base ranlux24 ranlux48 knuth_b default_random_engine "
 // Input/output library
