@@ -59,6 +59,7 @@ static HWND hwndEditFrame;
 HWND	hwndMain;
 static HWND hwndNextCBChain = NULL;
 HWND	hDlgFindReplace = NULL;
+static BOOL bInitDone = FALSE;
 
 #define MARGIN_LINE_NUMBER	0	// line number
 #define MARGIN_SELECTION	1	// bookmark and selection margin
@@ -884,8 +885,8 @@ HWND InitInstance(HINSTANCE hInstance, int nCmdShow) {
 		SetNotifyIconTitle(hwndMain);
 	}
 
-	UpdateToolbar();
-
+	bInitDone = TRUE;
+	UpdateStatusBarWidth();
 	return hwndMain;
 }
 
@@ -1091,10 +1092,6 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 
 	case WM_SETFOCUS:
 		SetFocus(hwndEdit);
-
-		UpdateToolbar();
-		UpdateStatusbar();
-
 		//if (bPendingChangeNotify)
 		//	PostMessage(hwnd, APPM_CHANGENOTIFY, 0, 0);
 		break;
@@ -2083,6 +2080,9 @@ void UpdateStatusBarCache(int item) {
 }
 
 void UpdateStatusBarWidth(void) {
+	if (!bInitDone) {
+		return;
+	}
 	int aWidth[7];
 
 	RECT rc;
@@ -6654,7 +6654,7 @@ BOOL CreateIniFileEx(LPCWSTR lpszIniFile) {
 #define CheckTool(id, b)		SendMessage(hwndToolbar, TB_CHECKBUTTON, id, MAKELPARAM(b, 0))
 
 void UpdateToolbar(void) {
-	if (!bShowToolbar) {
+	if (!bShowToolbar || !bInitDone) {
 		return;
 	}
 
@@ -6688,7 +6688,7 @@ void UpdateToolbar(void) {
 //
 //
 void UpdateStatusbar(void) {
-	if (!bShowStatusbar) {
+	if (!bShowStatusbar || !bInitDone) {
 		return;
 	}
 
