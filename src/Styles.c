@@ -1153,6 +1153,22 @@ void Style_InitDefaultColor(void) {
 	}
 }
 
+LPCWSTR Style_FindStyleValue(PEDITLEXER pLex, int style) {
+	const UINT iStyleCount = pLex->iStyleCount;
+	// first style is the default style.
+	for (UINT i = 1; i < iStyleCount; i++) {
+		int iStyle = pLex->Styles[i].iStyle;
+		LPCWSTR szValue = pLex->Styles[i].szValue;
+		do {
+			if ((iStyle & 0xFF) == style) {
+				return szValue;
+			}
+			iStyle >>= 8;
+		} while (iStyle);
+	}
+	return NULL;
+}
+
 //=============================================================================
 // set current lexer
 // Style_SetLexer()
@@ -1484,6 +1500,25 @@ void Style_SetLexer(PEDITLEXER pLexNew) {
 				} while (iStyle);
 			} else {
 				Style_SetStyles(iStyle, szValue);
+			}
+		}
+		if (iLexer == SCLEX_PERL) {
+			szValue = Style_FindStyleValue(pLexNew, SCE_PL_SCALAR);
+			if (szValue != NULL) {
+				Style_Parse(&style, szValue);
+				const int scalar[] = {
+					SCE_PL_REGEX_VAR,
+					SCE_PL_REGSUBST_VAR,
+					SCE_PL_BACKTICKS_VAR,
+					SCE_PL_HERE_QQ_VAR,
+					SCE_PL_HERE_QX_VAR,
+					SCE_PL_STRING_QQ_VAR,
+					SCE_PL_STRING_QX_VAR,
+					SCE_PL_STRING_QR_VAR,
+				};
+				for (UINT i = 0; i < COUNTOF(scalar); i++) {
+					Style_SetParsed(&style, scalar[i]);
+				}
 			}
 		}
 	}
