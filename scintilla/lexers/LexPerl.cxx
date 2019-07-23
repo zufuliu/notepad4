@@ -1588,6 +1588,13 @@ static void FoldPerlDoc(Sci_PositionU startPos, Sci_Position length, int /*initS
 				levelCurrent--;
 			}
 		}
+		// qw
+		else if (style == SCE_PL_STRING_QW) {
+			if (stylePrevCh != style)
+				levelCurrent++;
+			else if (styleNext != style)
+				levelCurrent--;
+		}
 		// POD folding
 		if (foldPOD && atLineStart) {
 			if (style == SCE_PL_POD) {
