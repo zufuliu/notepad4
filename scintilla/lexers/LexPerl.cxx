@@ -33,6 +33,8 @@ using namespace Scintilla;
 // Following a << you specify a string to terminate the quoted material, and
 // all lines following the current line down to the terminating string are
 // the value of the item.
+// Prefixing the terminating string with a "~" specifies that you want to
+// use "Indented Here-docs" (see below).
 // * The terminating string may be either an identifier (a word), or some
 //   quoted text.
 // * If quoted, the type of quotes you use determines the treatment of the
@@ -44,6 +46,18 @@ using namespace Scintilla;
 //   (This is deprecated, -w warns of this syntax)
 // * The terminating string must appear by itself (unquoted and
 //   with no surrounding whitespace) on the terminating line.
+//
+// Indented Here-docs
+// ------------------
+// The here-doc modifier "~" allows you to indent your here-docs to
+// make the code more readable.
+// The delimiter is used to determine the exact whitespace to remove
+// from the beginning of each line. All lines must have at least the
+// same starting whitespace (except lines only containing a newline)
+// or perl will croak. Tabs and spaces can be mixed, but are matched
+// exactly. One tab will not be equal to 8 spaces!
+// Additional beginning whitespace (beyond what preceded the
+// delimiter) will be preserved.
 
 #define HERE_DELIM_MAX 256		// maximum length of HERE doc delimiter
 
@@ -485,12 +499,14 @@ static void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int in
 		// 2: here doc text (lines after the delimiter)
 		int Quote;		// the char after '<<'
 		bool Quoted;		// true if Quote in ('\'','"','`')
+		bool StripIndent;	// true if '<<~' requested to strip leading whitespace
 		int DelimiterLength;	// strlen(Delimiter)
 		char Delimiter[HERE_DELIM_MAX];	// the Delimiter
 		HereDocCls() noexcept {
 			State = 0;
 			Quote = 0;
 			Quoted = false;
+			StripIndent = false;
 			DelimiterLength = 0;
 			Delimiter[0] = '\0';
 		}
@@ -760,8 +776,14 @@ static void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int in
 				HereDoc.State = 1;	// pre-init HERE doc class
 				HereDoc.Quote = sc.chNext;
 				HereDoc.Quoted = false;
+				HereDoc.StripIndent = false;
 				HereDoc.DelimiterLength = 0;
 				HereDoc.Delimiter[HereDoc.DelimiterLength] = '\0';
+				if (delim_ch == '~') { // was actually '<<~'
+					sc.Forward();
+					HereDoc.StripIndent = true;
+					HereDoc.Quote = delim_ch = sc.chNext;
+				}
 				if (IsASpaceOrTab(delim_ch)) {
 					// skip whitespace; legal only for quoted delimiters
 					Sci_PositionU i = sc.currentPos + 1;
@@ -828,6 +850,11 @@ static void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int in
 		case SCE_PL_HERE_QX:
 			// also implies HereDoc.State == 2
 			sc.Complete();
+			if (HereDoc.StripIndent) {
+				// skip whitespace
+				while (IsASpaceOrTab(sc.ch) && !sc.atLineEnd)
+					sc.Forward();
+			}
 			if (HereDoc.DelimiterLength == 0 || sc.Match(HereDoc.Delimiter)) {
 				const int c = sc.GetRelative(HereDoc.DelimiterLength);
 				if (c == '\r' || c == '\n') {	// peek first, do not consume match
