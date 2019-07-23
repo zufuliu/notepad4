@@ -2,6 +2,8 @@
 #include "EditStyle.h"
 
 // https://www.perl.org/
+// https://perldoc.perl.org/index-language.html
+// http://learn.perl.org/docs/keywords.html
 
 static KEYWORDLIST Keywords_Perl = {{
 "__DATA__ __END__ __FILE__ __LINE__ __PACKAGE__ abs accept alarm and atan2 AUTOLOAD BEGIN "
@@ -63,6 +65,7 @@ static EDITSTYLE Styles_Perl[] = {
 	{ SCE_PL_POD_VERB, 63421, EDITSTYLE_HOLE(L"POD (Verbatim)"), L"fore:#A46000; back:#FFFFC0; eolfilled" },
 	{ SCE_PL_DATASECTION, 63422, EDITSTYLE_HOLE(L"Data Section"), L"fore:#A46000; back:#FFFFC0; eolfilled" },
 	{ SCE_PL_ERROR, 63423, EDITSTYLE_HOLE(L"Parsing Error"), L"fore:#C80000; back:#FFFF80" },
+	// {SCE_PL_XLAT},
 	//{ SCE_PL_PUNCTUATION, EDITSTYLE_HOLE(L"Symbols / Punctuation (not used)"), L"" },
 	//{ SCE_PL_PREPROCESSOR, EDITSTYLE_HOLE(L"Preprocessor (not used)"), L"" },
 	//{ SCE_PL_LONGQUOTE, EDITSTYLE_HOLE(L"Long Quote (qq, qr, qw, qx) (not used)"), L"" },
