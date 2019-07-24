@@ -116,7 +116,9 @@ void EditSetNewText(LPCSTR lpstrText, DWORD cbText) {
 	FileVars_Apply(&fvCurFile);
 
 	if (cbText > 0) {
+		SciCall_SetModEventMask(SC_MOD_NONE);
 		SciCall_AddText(cbText, lpstrText);
+		SciCall_SetModEventMask(SC_MOD_INSERTTEXT | SC_MOD_DELETETEXT);
 	}
 
 	SciCall_SetUndoCollection(TRUE);

@@ -1571,7 +1571,7 @@ HWND EditCreate(HWND hwndParent) {
 	SciCall_SetBidirectional(iBidirectional);
 	SciCall_SetIMEInteraction(bUseInlineIME);
 	SciCall_SetPasteConvertEndings(TRUE);
-	SciCall_SetModEventMask(/*SC_MODEVENTMASKALL*/SC_MOD_INSERTTEXT | SC_MOD_DELETETEXT);
+	SciCall_SetModEventMask(SC_MOD_INSERTTEXT | SC_MOD_DELETETEXT);
 	SciCall_SetCommandEvents(FALSE);
 	SciCall_UsePopUp(SC_POPUP_NEVER);
 	SciCall_SetScrollWidthTracking(TRUE);
@@ -6962,7 +6962,6 @@ BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect, LPCWST
 		}
 		FileVars_Init(NULL, 0, &fvCurFile);
 		EditSetEmptyText();
-		Style_SetLexer(NULL);
 		bModified = FALSE;
 		bReadOnly = FALSE;
 		iEOLMode = iLineEndings[iDefaultEOLMode];
@@ -6970,6 +6969,7 @@ BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect, LPCWST
 		iEncoding = iDefaultEncoding;
 		iOriginalEncoding = iDefaultEncoding;
 		SciCall_SetCodePage((iDefaultEncoding == CPI_DEFAULT) ? iDefaultCodePage : SC_CP_UTF8);
+		Style_SetLexer(NULL);
 		UpdateStatusBarCache(STATUS_CODEPAGE);
 		UpdateStatusBarCache(STATUS_EOLMODE);
 		UpdateDocumentModificationStatus();
@@ -7029,7 +7029,6 @@ BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect, LPCWST
 				CloseHandle(hFile);
 				FileVars_Init(NULL, 0, &fvCurFile);
 				EditSetEmptyText();
-				Style_SetLexer(NULL);
 				iEOLMode = iLineEndings[iDefaultEOLMode];
 				SciCall_SetEOLMode(iLineEndings[iDefaultEOLMode]);
 				if (iSrcEncoding != -1) {
@@ -7040,6 +7039,7 @@ BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect, LPCWST
 					iOriginalEncoding = iDefaultEncoding;
 				}
 				SciCall_SetCodePage((iEncoding == CPI_DEFAULT) ? iDefaultCodePage : SC_CP_UTF8);
+				Style_SetLexer(NULL);
 				bReadOnly = FALSE;
 			}
 		} else if (result == IDCANCEL) {
@@ -7065,17 +7065,16 @@ BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect, LPCWST
 		}
 		iOriginalEncoding = iEncoding;
 		bModified = FALSE;
+		SciCall_SetEOLMode(iEOLMode);
 		UpdateStatusBarCache(STATUS_CODEPAGE);
 		UpdateStatusBarCache(STATUS_EOLMODE);
 		BOOL bUnknownFile = FALSE;
 		if (!lexerSpecified) { // flagLexerSpecified will be cleared
 			np2LexLangIndex = 0;
 			bUnknownFile = !Style_SetLexerFromFile(szCurFile);
-		}
-		if (!lexerSpecified) {
+		} else {
 			UpdateLineNumberWidth();
 		}
-		SciCall_SetEOLMode(iEOLMode);
 		MRU_AddFile(pFileMRU, szFileName, flagRelativeFileMRU, flagPortableMyDocs);
 		if (flagUseSystemMRU == 2) {
 			SHAddToRecentDocs(SHARD_PATHW, szFileName);
