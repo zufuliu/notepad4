@@ -59,7 +59,7 @@ void	Style_DetectBaseFontSize(HWND hwnd);
 void	Style_OnDPIChanged(void);
 void	Style_OnStyleThemeChanged(int theme);
 void	Style_InitDefaultColor(void);
-void	Style_SetLexer(PEDITLEXER pLexNew);
+void	Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged);
 BOOL	Style_SetLexerFromFile(LPCWSTR lpszFile);
 void	Style_SetLexerFromName(LPCWSTR lpszFile, LPCWSTR lpszName);
 BOOL	Style_MaybeBinaryFile(LPCWSTR lpszFile);
