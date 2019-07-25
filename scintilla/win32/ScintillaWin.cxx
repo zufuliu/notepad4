@@ -1978,6 +1978,7 @@ sptr_t ScintillaWin::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam
 #endif
 					technology = technologyNew;
 					// Invalidate all cached information including layout.
+					vs.fontsValid = false;
 					DropGraphics(true);
 					InvalidateStyleRedraw();
 				}
