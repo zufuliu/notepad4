@@ -2707,8 +2707,10 @@ void Style_SetLexerByLangIndex(int lang) {
 		break;
 	}
 	if (pLex != NULL) {
-		const BOOL bChanged = pLex != pLexCurrent || langIndex != np2LexLangIndex;
-		Style_SetLexer(pLex, bChanged);
+		const BOOL bLexerChanged = pLex != pLexCurrent || langIndex != np2LexLangIndex;
+		if (bLexerChanged) {
+			Style_SetLexer(pLex, TRUE);
+		}
 	}
 }
 
@@ -4455,8 +4457,10 @@ void Style_SelectLexerDlg(HWND hwnd) {
 	const PEDITLEXER pLex = pLexCurrent;
 	const int langIndex = np2LexLangIndex;
 	if (IDOK == ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_STYLESELECT), GetParent(hwnd), Style_SelectLexerDlgProc, 0)) {
-		const BOOL bChanged = pLex != pLexCurrent || langIndex != np2LexLangIndex;
-		Style_SetLexer(pLexCurrent, bChanged);
+		const BOOL bLexerChanged = pLex != pLexCurrent || langIndex != np2LexLangIndex;
+		if (bLexerChanged) {
+			Style_SetLexer(pLexCurrent, TRUE);
+		}
 	}
 }
 
