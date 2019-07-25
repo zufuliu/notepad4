@@ -463,10 +463,6 @@ NP2_inline void SciCall_SetYCaretPolicy(int caretPolicy, int caretSlop) {
 	SciCall(SCI_SETYCARETPOLICY, caretPolicy, caretSlop);
 }
 
-NP2_inline void SciCall_SetScrollWidth(int pixelWidth) {
-	SciCall(SCI_SETSCROLLWIDTH, pixelWidth, 0);
-}
-
 NP2_inline void SciCall_SetScrollWidthTracking(BOOL tracking) {
 	SciCall(SCI_SETSCROLLWIDTHTRACKING, tracking, 0);
 }
@@ -558,6 +554,10 @@ NP2_inline Sci_Position SciCall_GetEndStyled(void) {
 
 NP2_inline void SciCall_SetIdleStyling(int idleStyling) {
 	SciCall(SCI_SETIDLESTYLING, idleStyling, 0);
+}
+
+NP2_inline void SciCall_StartStyling(Sci_Position start) {
+	SciCall(SCI_STARTSTYLING, start, 0);
 }
 
 // Style definition
@@ -1248,10 +1248,6 @@ NP2_inline void SciCall_SetLexer(int lexer) {
 
 NP2_inline void SciCall_Colourise(Sci_Position start, Sci_Position end) {
 	SciCall(SCI_COLOURISE, start, end);
-}
-
-NP2_inline void SciCall_ColouriseToEnd(Sci_Position start) {
-	SciCall_Colourise(start, -1);
 }
 
 NP2_inline void SciCall_ColouriseAll(void) {

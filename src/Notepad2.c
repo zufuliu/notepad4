@@ -4785,11 +4785,10 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 				// Brace Match
 				if (bMatchBraces) {
-					Sci_Position iEndStyled = SciCall_GetEndStyled();
-					if (iEndStyled < SciCall_GetLength()) {
-						const Sci_Line iLine = SciCall_LineFromPosition(iEndStyled);
-						iEndStyled = SciCall_PositionFromLine(iLine);
-						SciCall_ColouriseToEnd(iEndStyled);
+					const Sci_Position iEndStyled = SciCall_GetEndStyled();
+					if (iEndStyled == 0) {
+						// wait idle styling.
+						return 0;
 					}
 
 					Sci_Position iPos = SciCall_GetCurrentPos();

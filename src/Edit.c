@@ -110,7 +110,6 @@ void EditSetNewText(LPCSTR lpstrText, DWORD cbText) {
 	SciCall_EmptyUndoBuffer();
 	SciCall_ClearAll();
 	SciCall_ClearMarker();
-	SciCall_SetScrollWidth(2048);
 	SciCall_SetXOffset(0);
 
 	FileVars_Apply(&fvCurFile);
@@ -6750,6 +6749,7 @@ static void FoldToggleNode(Sci_Line line, FOLD_ACTION *pAction, BOOL *fToggled) 
 
 void FoldToggleAll(FOLD_ACTION action) {
 	BOOL fToggled = FALSE;
+	SciCall_ColouriseAll();
 	const Sci_Line lineCount = SciCall_GetLineCount();
 
 	for (Sci_Line line = 0; line < lineCount; ++line) {
@@ -6770,6 +6770,7 @@ void FoldToggleAll(FOLD_ACTION action) {
 
 void FoldToggleLevel(int lev, FOLD_ACTION action) {
 	BOOL fToggled = FALSE;
+	SciCall_ColouriseAll();
 	const Sci_Line lineCount = SciCall_GetLineCount();
 	Sci_Line line = 0;
 
@@ -6835,6 +6836,7 @@ void FoldToggleCurrentBlock(FOLD_ACTION action) {
 }
 
 void FoldToggleCurrentLevel(FOLD_ACTION action) {
+	SciCall_ColouriseAll();
 	Sci_Line line = SciCall_LineFromPosition(SciCall_GetCurrentPos());
 	int level = SciCall_GetFoldLevel(line);
 
@@ -6876,6 +6878,7 @@ void FoldToggleCurrentLevel(FOLD_ACTION action) {
 void FoldToggleDefault(FOLD_ACTION action) {
 	BOOL fToggled = FALSE;
 	int maxLevel = 0;
+	SciCall_ColouriseAll();
 	const UINT state = Style_GetDefaultFoldState(pLexCurrent->rid, &maxLevel);
 	const Sci_Line lineCount = SciCall_GetLineCount();
 	Sci_Line line = 0;
