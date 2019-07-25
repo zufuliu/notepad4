@@ -887,6 +887,10 @@ HWND InitInstance(HINSTANCE hInstance, int nCmdShow) {
 
 	bInitDone = TRUE;
 	UpdateStatusBarWidth();
+	if (SciCall_GetLength() == 0) {
+		UpdateToolbar();
+		UpdateStatusbar();
+	}
 	return hwndMain;
 }
 

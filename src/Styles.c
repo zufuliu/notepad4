@@ -1537,8 +1537,8 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 		bCurrentLexerHasLineComment = DidLexerHasLineComment(iLexer);
 		bCurrentLexerHasBlockComment = DidLexerHasBlockComment(iLexer, rid);
 		UpdateStatusBarCache(STATUS_LEXER);
+		UpdateStatusbar();
 	}
-	UpdateStatusbar();
 	// font might changed
 	UpdateLineNumberWidth();
 	UpdateFoldMarginWidth();
