@@ -259,7 +259,8 @@ BOOL	bCurrentLexerHasLineComment;
 BOOL	bCurrentLexerHasBlockComment;
 static UINT fStylesModified = STYLESMODIFIED_NONE;
 static BOOL fWarnedNoIniFile = FALSE;
-static int	iBaseFontSize = 11*SC_FONT_SIZE_MULTIPLIER; // 11 pt
+static int	defaultBaseFontSize = 11*SC_FONT_SIZE_MULTIPLIER; // 11 pt
+static int iBaseFontSize = 11*SC_FONT_SIZE_MULTIPLIER;
 int		iFontQuality = SC_EFF_QUALITY_LCD_OPTIMIZED;
 int		iCaretStyle = 1; // width 1, 0 for block
 int		iOvrCaretStyle = 0; // 0 for bar, 1 for block
@@ -514,6 +515,7 @@ void Style_DetectBaseFontSize(HWND hwnd) {
 		// Other
 	}
 #endif
+	defaultBaseFontSize = size;
 	iBaseFontSize = size;
 }
 
@@ -1275,6 +1277,7 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 	LPCWSTR szValue = pLexGlobal->Styles[iValue].szValue;
 	// base font size
 	if (!Style_StrGetFontSize(szValue, &iBaseFontSize)) {
+		iBaseFontSize = defaultBaseFontSize;
 		iValue = DefaultToCurrentDPI(iBaseFontSize);
 		SciCall_StyleSetSizeFractional(STYLE_DEFAULT, iValue);
 	}
