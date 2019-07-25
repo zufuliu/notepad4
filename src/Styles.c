@@ -932,7 +932,7 @@ static void Style_ResetAll(BOOL resetColor) {
 }
 
 void Style_OnDPIChanged(void) {
-	Style_SetLexer(pLexCurrent);
+	Style_SetLexer(pLexCurrent, FALSE);
 }
 
 void Style_OnStyleThemeChanged(int theme) {
@@ -946,7 +946,7 @@ void Style_OnStyleThemeChanged(int theme) {
 		SaveSettingsNow(TRUE, TRUE);
 	}
 	np2StyleTheme = theme;
-	Style_SetLexer(pLexCurrent);
+	Style_SetLexer(pLexCurrent, FALSE);
 }
 
 void Style_UpdateCaret(void) {
@@ -1173,7 +1173,7 @@ LPCWSTR Style_FindStyleValue(PEDITLEXER pLex, int style) {
 // set current lexer
 // Style_SetLexer()
 //
-void Style_SetLexer(PEDITLEXER pLexNew) {
+void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 	int iValue;
 	char msg[10];
 
@@ -1191,7 +1191,6 @@ void Style_SetLexer(PEDITLEXER pLexNew) {
 
 	// Lexer
 	const int iLexer = pLexNew->iLexer;
-	SciCall_SetLexer(iLexer);
 	int rid = pLexNew->rid;
 	if (rid == NP2LEX_MATLAB) {
 		if (np2LexLangIndex == IDM_LANG_OCTAVE) {
@@ -1200,65 +1199,69 @@ void Style_SetLexer(PEDITLEXER pLexNew) {
 			rid = NP2LEX_SCILAB;
 		}
 	}
-	_itoa(rid - 63000, msg, 10);
-	SciCall_SetProperty("lexer.lang.type", msg);
 
-	// Code folding
-	SciCall_SetProperty("fold", "1");
-	SciCall_SetProperty("fold.foldsyntaxbased", "1");
-	SciCall_SetProperty("fold.comment", "1");
-	SciCall_SetProperty("fold.preprocessor", "1");
-	SciCall_SetProperty("fold.compact", "0");
+	if (bLexerChanged) {
+		SciCall_SetLexer(iLexer);
+		_itoa(rid - 63000, msg, 10);
+		SciCall_SetProperty("lexer.lang.type", msg);
 
-	switch (rid) {
-	case NP2LEX_HTML:
-	case NP2LEX_XML:
-		SciCall_SetProperty("fold.html", "1");
-		SciCall_SetProperty("fold.hypertext.comment", "1");
-		SciCall_SetProperty("fold.hypertext.heredoc", "1");
-		break;
+		// Code folding
+		SciCall_SetProperty("fold", "1");
+		SciCall_SetProperty("fold.foldsyntaxbased", "1");
+		SciCall_SetProperty("fold.comment", "1");
+		SciCall_SetProperty("fold.preprocessor", "1");
+		SciCall_SetProperty("fold.compact", "0");
 
-	case NP2LEX_CSS:
-		SciCall_SetProperty("lexer.css.scss.language", ((np2LexLangIndex == IDM_LANG_SCSS)? "1" : "0"));
-		SciCall_SetProperty("lexer.css.less.language", ((np2LexLangIndex == IDM_LANG_LESS)? "1" : "0"));
-		SciCall_SetProperty("lexer.css.hss.language", ((np2LexLangIndex == IDM_LANG_HSS)? "1" : "0"));
-		break;
+		switch (rid) {
+		case NP2LEX_HTML:
+		case NP2LEX_XML:
+			SciCall_SetProperty("fold.html", "1");
+			SciCall_SetProperty("fold.hypertext.comment", "1");
+			SciCall_SetProperty("fold.hypertext.heredoc", "1");
+			break;
 
-	case NP2LEX_BASH:
-		SciCall_SetProperty("lexer.bash.csh.language", ((np2LexLangIndex == IDM_LANG_CSHELL)? "1" : "0"));
-		break;
-	}
+		case NP2LEX_CSS:
+			SciCall_SetProperty("lexer.css.scss.language", ((np2LexLangIndex == IDM_LANG_SCSS)? "1" : "0"));
+			SciCall_SetProperty("lexer.css.less.language", ((np2LexLangIndex == IDM_LANG_LESS)? "1" : "0"));
+			SciCall_SetProperty("lexer.css.hss.language", ((np2LexLangIndex == IDM_LANG_HSS)? "1" : "0"));
+			break;
 
-	Style_UpdateLexerKeywords(pLexNew);
-	Style_UpdateLexerKeywordAttr(pLexNew);
-	// Add keyword lists
-	for (int i = 0; i < NUMKEYWORD; i++) {
-		const char *pKeywords = pLexNew->pKeyWords->pszKeyWords[i];
-		if (StrNotEmptyA(pKeywords) && !(currentLexKeywordAttr[i] & KeywordAttr_NoLexer)) {
-			if (currentLexKeywordAttr[i] & KeywordAttr_MakeLower) {
-				const size_t len = strlen(pKeywords);
-				char *lowerKeywords = (char *)NP2HeapAlloc(len + 1);
-				char *p = lowerKeywords;
-				CopyMemory(lowerKeywords, pKeywords, len);
-				while (*p) {
-					if (*p >= 'A' && *p <= 'Z') {
-						*p += 'a' - 'A';
+		case NP2LEX_BASH:
+			SciCall_SetProperty("lexer.bash.csh.language", ((np2LexLangIndex == IDM_LANG_CSHELL)? "1" : "0"));
+			break;
+		}
+
+		Style_UpdateLexerKeywords(pLexNew);
+		Style_UpdateLexerKeywordAttr(pLexNew);
+		// Add keyword lists
+		for (int i = 0; i < NUMKEYWORD; i++) {
+			const char *pKeywords = pLexNew->pKeyWords->pszKeyWords[i];
+			if (StrNotEmptyA(pKeywords) && !(currentLexKeywordAttr[i] & KeywordAttr_NoLexer)) {
+				if (currentLexKeywordAttr[i] & KeywordAttr_MakeLower) {
+					const size_t len = strlen(pKeywords);
+					char *lowerKeywords = (char *)NP2HeapAlloc(len + 1);
+					char *p = lowerKeywords;
+					CopyMemory(lowerKeywords, pKeywords, len);
+					while (*p) {
+						if (*p >= 'A' && *p <= 'Z') {
+							*p += 'a' - 'A';
+						}
+						++p;
 					}
-					++p;
+					SciCall_SetKeywords(i, lowerKeywords);
+					NP2HeapFree(lowerKeywords);
+				} else {
+					SciCall_SetKeywords(i, pKeywords);
 				}
-				SciCall_SetKeywords(i, lowerKeywords);
-				NP2HeapFree(lowerKeywords);
-			} else {
-				SciCall_SetKeywords(i, pKeywords);
 			}
 		}
+
+		// Clear
+		SciCall_ClearDocumentStyle();
 	}
 
 	// Font quality setup
 	SciCall_SetFontQuality(iFontQuality);
-
-	// Clear
-	SciCall_ClearDocumentStyle();
 
 	// Default Values are always set
 	SciCall_StyleResetDefault();
@@ -1523,16 +1526,21 @@ void Style_SetLexer(PEDITLEXER pLexNew) {
 		}
 	}
 
-	SciCall_ColouriseAll();
+	// update style font, color, etc. don't need colorizing (analyzing whole document) again,
+	// thus we not call SciCall_ClearDocumentStyle() in previous block.
+	if (bLexerChanged) {
+		SciCall_ColouriseAll();
 
-	// Save current lexer
-	pLexCurrent = pLexNew;
-	bCurrentLexerHasLineComment = DidLexerHasLineComment(iLexer);
-	bCurrentLexerHasBlockComment = DidLexerHasBlockComment(iLexer, rid);
-	UpdateStatusBarCache(STATUS_LEXER);
+		// Save current lexer
+		pLexCurrent = pLexNew;
+		bCurrentLexerHasLineComment = DidLexerHasLineComment(iLexer);
+		bCurrentLexerHasBlockComment = DidLexerHasBlockComment(iLexer, rid);
+		UpdateStatusBarCache(STATUS_LEXER);
+		UpdateStatusbar();
+	}
+	// font might changed
 	UpdateLineNumberWidth();
 	UpdateFoldMarginWidth();
-	UpdateStatusbar();
 }
 
 static inline BOOL IsASpace(int ch) {
@@ -2495,7 +2503,7 @@ BOOL Style_SetLexerFromFile(LPCWSTR lpszFile) {
 	}
 
 	// Apply the new lexer
-	Style_SetLexer(pLexNew);
+	Style_SetLexer(pLexNew, TRUE);
 	return bFound;
 }
 
@@ -2507,7 +2515,7 @@ void Style_SetLexerFromName(LPCWSTR lpszFile, LPCWSTR lpszName) {
 	PEDITLEXER pLexNew;
 	if ((pLexNew = Style_MatchLexer(lpszName, FALSE)) != NULL ||
 		(pLexNew = Style_MatchLexer(lpszName, TRUE)) != NULL) {
-		Style_SetLexer(pLexNew);
+		Style_SetLexer(pLexNew, TRUE);
 	} else {
 		Style_SetLexerFromFile(lpszFile);
 	}
@@ -2611,21 +2619,23 @@ BOOL Style_MaybeBinaryFile(LPCWSTR lpszFile) {
 }
 
 void Style_SetLexerByLangIndex(int lang) {
+	const int langIndex = np2LexLangIndex;
+	PEDITLEXER pLex = NULL;
 	np2LexLangIndex = lang;
 
 	switch (lang) {
 	case IDM_LANG_TEXTFILE:
 		np2LexLangIndex = 0;
-		Style_SetLexer(&lexTextFile);
+		pLex = &lexTextFile;
 		break;
 
 	case IDM_LANG_2NDTEXTFILE:
 		np2LexLangIndex = 0;
-		Style_SetLexer(&lex2ndTextFile);
+		pLex = &lex2ndTextFile;
 		break;
 
 	case IDM_LANG_APACHE:
-		Style_SetLexer(&lexCONF);
+		pLex = &lexCONF;
 		break;
 
 	case IDM_LANG_WEB:
@@ -2638,7 +2648,7 @@ void Style_SetLexerByLangIndex(int lang) {
 		if (lang == IDM_LANG_WEB) {
 			np2LexLangIndex = Style_GetDocTypeLanguage();
 		}
-		Style_SetLexer(&lexHTML);
+		pLex = &lexHTML;
 		break;
 
 	case IDM_LANG_XML:
@@ -2673,27 +2683,31 @@ void Style_SetLexerByLangIndex(int lang) {
 		if (lang == IDM_LANG_XML) {
 			np2LexLangIndex = Style_GetDocTypeLanguage();
 		}
-		Style_SetLexer(&lexXML);
+		pLex = &lexXML;
 		break;
 
 	case IDM_LANG_BASH:
 	case IDM_LANG_CSHELL:
 	case IDM_LANG_M4:
-		Style_SetLexer(&lexBash);
+		pLex = &lexBash;
 		break;
 
 	case IDM_LANG_MATLAB:
 	case IDM_LANG_OCTAVE:
 	case IDM_LANG_SCILAB:
-		Style_SetLexer(&lexMatlab);
+		pLex = &lexMatlab;
 		break;
 
 	case IDM_LANG_CSS:
 	case IDM_LANG_SCSS:
 	case IDM_LANG_LESS:
 	case IDM_LANG_HSS:
-		Style_SetLexer(&lexCSS);
+		pLex = &lexCSS;
 		break;
+	}
+	if (pLex != NULL) {
+		const BOOL bChanged = pLex != pLexCurrent || langIndex != np2LexLangIndex;
+		Style_SetLexer(pLex, bChanged);
 	}
 }
 
@@ -2749,7 +2763,7 @@ void Style_UpdateSchemeMenu(HMENU hmenu) {
 void Style_SetLexerFromID(int id) {
 	if (id >= 0 && id < NUMLEXERS) {
 		np2LexLangIndex = Style_GetDocTypeLanguage();
-		Style_SetLexer(pLexArray[id]);
+		Style_SetLexer(pLexArray[id], TRUE);
 	}
 }
 
@@ -2788,14 +2802,14 @@ int Style_GetEditLexerId(int lexer) {
 void Style_ToggleUse2ndGlobalStyle(void) {
 	bUse2ndGlobalStyle = !bUse2ndGlobalStyle;
 	pLexGlobal = bUse2ndGlobalStyle ? &lex2ndGlobal : &lexGlobal;
-	Style_SetLexer(pLexCurrent);
+	Style_SetLexer(pLexCurrent, FALSE);
 }
 
 void Style_ToggleUseDefaultCodeStyle(void) {
 	pLexCurrent->bStyleChanged = TRUE;
 	pLexCurrent->bUseDefaultCodeStyle = !pLexCurrent->bUseDefaultCodeStyle;
 	fStylesModified |= STYLESMODIFIED_SOME_STYLE;
-	Style_SetLexer(pLexCurrent);
+	Style_SetLexer(pLexCurrent, FALSE);
 }
 
 //=============================================================================
@@ -3282,7 +3296,7 @@ void Style_SetDefaultFont(HWND hwnd, BOOL bCode) {
 	if (Style_SelectFont(hwnd, pLexGlobal->Styles[iIdx].szValue, MAX_EDITSTYLE_VALUE_SIZE, TRUE)) {
 		fStylesModified |= STYLESMODIFIED_SOME_STYLE;
 		pLexGlobal->bStyleChanged = TRUE;
-		Style_SetLexer(pLexCurrent);
+		Style_SetLexer(pLexCurrent, FALSE);
 	}
 }
 
@@ -4175,7 +4189,7 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 			case IDC_PREVIEW: {
 				struct StyleConfigDlgParam *param = (struct StyleConfigDlgParam *)GetWindowLongPtr(hwnd, DWLP_USER);
 				param->bApply = TRUE;
-				Style_SetLexer(pLexCurrent);
+				Style_SetLexer(pLexCurrent, FALSE);
 			} break;
 
 			case IDOK:
@@ -4284,7 +4298,7 @@ void Style_ConfigDlg(HWND hwnd) {
 
 	// Apply new (or previous) Styles
 	if (param.bApply) {
-		Style_SetLexer(pLexCurrent);
+		Style_SetLexer(pLexCurrent, FALSE);
 	}
 }
 
@@ -4437,8 +4451,11 @@ static INT_PTR CALLBACK Style_SelectLexerDlgProc(HWND hwnd, UINT umsg, WPARAM wP
 // Style_SelectLexerDlg()
 //
 void Style_SelectLexerDlg(HWND hwnd) {
+	const PEDITLEXER pLex = pLexCurrent;
+	const int langIndex = np2LexLangIndex;
 	if (IDOK == ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_STYLESELECT), GetParent(hwnd), Style_SelectLexerDlgProc, 0)) {
-		Style_SetLexer(pLexCurrent);
+		const BOOL bChanged = pLex != pLexCurrent || langIndex != np2LexLangIndex;
+		Style_SetLexer(pLexCurrent, bChanged);
 	}
 }
 

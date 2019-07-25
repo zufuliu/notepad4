@@ -1060,7 +1060,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 
 	// update Scintilla colors
 	case WM_SYSCOLORCHANGE: {
-		Style_SetLexer(pLexCurrent);
+		Style_SetLexer(pLexCurrent, FALSE);
 		return DefWindowProc(hwnd, umsg, wParam, lParam);
 	}
 
@@ -1663,7 +1663,7 @@ HWND EditCreate(HWND hwndParent) {
 	SciCall_FoldDisplayTextSetStyle((bFoldDisplayText ? SC_FOLDDISPLAYTEXT_BOXED : SC_FOLDDISPLAYTEXT_HIDDEN));
 	const char *text = GetFoldDisplayEllipsis(SC_CP_UTF8, 0); // internal default encoding
 	SciCall_SetDefaultFoldDisplayText(text);
-	// highlight for current folding block
+	// highlight current folding block
 	SciCall_MarkerEnableHighlight(TRUE);
 
 	// CallTips
@@ -6969,7 +6969,7 @@ BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect, LPCWST
 		iEncoding = iDefaultEncoding;
 		iOriginalEncoding = iDefaultEncoding;
 		SciCall_SetCodePage((iDefaultEncoding == CPI_DEFAULT) ? iDefaultCodePage : SC_CP_UTF8);
-		Style_SetLexer(NULL);
+		Style_SetLexer(NULL, TRUE);
 		UpdateStatusBarCache(STATUS_CODEPAGE);
 		UpdateStatusBarCache(STATUS_EOLMODE);
 		UpdateDocumentModificationStatus();
@@ -7039,7 +7039,7 @@ BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect, LPCWST
 					iOriginalEncoding = iDefaultEncoding;
 				}
 				SciCall_SetCodePage((iEncoding == CPI_DEFAULT) ? iDefaultCodePage : SC_CP_UTF8);
-				Style_SetLexer(NULL);
+				Style_SetLexer(NULL, TRUE);
 				bReadOnly = FALSE;
 			}
 		} else if (result == IDCANCEL) {
