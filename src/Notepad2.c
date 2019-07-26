@@ -2676,7 +2676,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case IDM_FILE_PRINT: {
 		SHFILEINFO shfi;
 		WCHAR *pszTitle;
-		WCHAR tchUntitled[32];
+		WCHAR tchUntitled[128];
 
 		if (StrNotEmpty(szCurFile)) {
 			SHGetFileInfo2(szCurFile, 0, &shfi, sizeof(SHFILEINFO), SHGFI_DISPLAYNAME);
@@ -2686,10 +2686,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			pszTitle = tchUntitled;
 		}
 
-		WCHAR tchPageFmt[32];
-		GetString(IDS_PRINT_PAGENUM, tchPageFmt, COUNTOF(tchPageFmt));
-
-		if (!EditPrint(hwndEdit, pszTitle, tchPageFmt)) {
+		if (!EditPrint(hwndEdit, pszTitle)) {
 			MsgBox(MBWARN, IDS_PRINT_ERROR, pszTitle);
 		}
 	}

@@ -184,7 +184,7 @@ void	EditOpenSelection(int type);
 extern "C" {
 #endif
 
-BOOL	EditPrint(HWND hwnd, LPCWSTR pszDocTitle, LPCWSTR pszPageFormat);
+BOOL	EditPrint(HWND hwnd, LPCWSTR pszDocTitle);
 void	EditPrintSetup(HWND hwnd);
 
 #ifdef __cplusplus

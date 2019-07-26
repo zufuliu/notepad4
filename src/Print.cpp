@@ -64,20 +64,7 @@ static void EditPrintInit() noexcept;
 //
 // EditPrint() - Code from SciTE
 //
-void StatusUpdatePrintPage(int iPageNum) noexcept {
-	WCHAR tch[32];
-	WCHAR fmt[32];
-
-	FormatString(tch, fmt, IDS_PRINTFILE, iPageNum);
-
-	StatusSetText(hwndStatus, STATUS_HELP, tch);
-	StatusSetSimple(hwndStatus, TRUE);
-
-	InvalidateRect(hwndStatus, nullptr, TRUE);
-	UpdateWindow(hwndStatus);
-}
-
-extern "C" BOOL EditPrint(HWND hwnd, LPCWSTR pszDocTitle, LPCWSTR pszPageFormat) {
+extern "C" BOOL EditPrint(HWND hwnd, LPCWSTR pszDocTitle) {
 	// Don't print empty documents
 	if (SciCall_GetLength() == 0) {
 		MsgBox(MBWARN, IDS_PRINT_EMPTY);
@@ -306,19 +293,33 @@ extern "C" BOOL EditPrint(HWND hwnd, LPCWSTR pszDocTitle, LPCWSTR pszPageFormat)
 	frPrint.rc.bottom	-= footerLineHeight + footerLineHeight / 2;
 
 	// Print each page
-	int pageNum = 1;
+	UINT pageNum = 1;
+	WCHAR tchPageFormat[128];
+	WCHAR tchPageStatus[128];
+	GetString(IDS_PRINT_PAGENUM, tchPageFormat, COUNTOF(tchPageFormat));
+	GetString(IDS_PRINTFILE, tchPageStatus, COUNTOF(tchPageStatus));
 
 	while (lengthPrinted < lengthDoc) {
 		const BOOL printPage = !(pdlg.Flags & PD_PAGENUMS) || (pageNum >= pdlg.nFromPage && pageNum <= pdlg.nToPage);
-		WCHAR pageString[32];
-		wsprintf(pageString, pszPageFormat, pageNum);
+		WCHAR tchNum[32];
+		wsprintf(tchNum, L"%u", pageNum);
+		FormatNumberStr(tchNum);
+		WCHAR pageString[128];
+		wsprintf(pageString, tchPageFormat, tchNum);
 
 		if (printPage) {
 			// Show wait cursor...
 			BeginWaitCursor();
 
 			// Display current page number in Statusbar
-			StatusUpdatePrintPage(pageNum);
+			WCHAR statusString[128];
+			wsprintf(statusString, tchPageStatus, tchNum);
+
+			StatusSetText(hwndStatus, STATUS_HELP, statusString);
+			StatusSetSimple(hwndStatus, TRUE);
+
+			InvalidateRect(hwndStatus, nullptr, TRUE);
+			UpdateWindow(hwndStatus);
 
 			StartPage(hdc);
 
