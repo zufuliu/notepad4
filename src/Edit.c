@@ -4951,6 +4951,17 @@ void EditMarkAll(BOOL bChanged, BOOL bMarkOccurrencesMatchCase, BOOL bMarkOccurr
 	}
 }
 
+static void ShwowReplaceCount(UINT iCount) {
+	if (iCount > 0) {
+		WCHAR tchNum[32];
+		wsprintf(tchNum, L"%u", iCount);
+		FormatNumberStr(tchNum);
+		InfoBox(0, L"MsgReplaceCount", IDS_REPLCOUNT, tchNum);
+	} else {
+		InfoBox(0, L"MsgNotFound", IDS_NOTFOUND);
+	}
+}
+
 //=============================================================================
 //
 // EditReplaceAll()
@@ -5005,7 +5016,7 @@ BOOL EditReplaceAll(HWND hwnd, LPEDITFINDREPLACE lpefr, BOOL bShowInfo) {
 	ttf.chrg.cpMax = (Sci_PositionCR)SciCall_GetLength();
 	ttf.lpstrText = szFind2;
 
-	int iCount = 0;
+	UINT iCount = 0;
 	while (SciCall_FindText(lpefr->fuFlags, &ttf) != -1) {
 		if (iCount == 0 && bRegexStartOrEndOfLine) {
 			if (0 == SciCall_GetLineEndPosition(0)) {
@@ -5056,11 +5067,7 @@ BOOL EditReplaceAll(HWND hwnd, LPEDITFINDREPLACE lpefr, BOOL bShowInfo) {
 	EndWaitCursor();
 
 	if (bShowInfo) {
-		if (iCount > 0) {
-			InfoBox(0, L"MsgReplaceCount", IDS_REPLCOUNT, iCount);
-		} else {
-			InfoBox(0, L"MsgNotFound", IDS_NOTFOUND);
-		}
+		ShwowReplaceCount(iCount);
 	}
 
 	LocalFree(pszReplace2);
@@ -5126,7 +5133,7 @@ BOOL EditReplaceAllInSelection(HWND hwnd, LPEDITFINDREPLACE lpefr, BOOL bShowInf
 	ttf.chrg.cpMax = (Sci_PositionCR)SciCall_GetLength();
 	ttf.lpstrText = szFind2;
 
-	int iCount = 0;
+	UINT iCount = 0;
 	BOOL fCancel = FALSE;
 	while (!fCancel && SciCall_FindText(lpefr->fuFlags, &ttf) != -1) {
 		if (ttf.chrgText.cpMin >= SciCall_GetSelectionStart() && ttf.chrgText.cpMax <= SciCall_GetSelectionEnd()) {
@@ -5197,11 +5204,7 @@ BOOL EditReplaceAllInSelection(HWND hwnd, LPEDITFINDREPLACE lpefr, BOOL bShowInf
 	EndWaitCursor();
 
 	if (bShowInfo) {
-		if (iCount > 0) {
-			InfoBox(0, L"MsgReplaceCount", IDS_REPLCOUNT, iCount);
-		} else {
-			InfoBox(0, L"MsgNotFound", IDS_NOTFOUND);
-		}
+		ShwowReplaceCount(iCount);
 	}
 
 	LocalFree(pszReplace2);

@@ -1813,7 +1813,7 @@ BEGIN
     IDS_FIND_WRAPFW         "Reached the end of the document, restarting search at the beginning."
     IDS_FIND_WRAPRE         "Reached the beginning of the document, restarting search at the end."
     IDS_NOTFOUND            "The specified text was not found."
-    IDS_REPLCOUNT           "%i occurrences of the specified text have been replaced."
+    IDS_REPLCOUNT           "%s occurrences of the specified text have been replaced."
     IDS_ASK_ENCODING        "Switching the file encoding from ANSI to non-ANSI (and vice versa) may replace unsupported text with default characters, and the undo history will be cleared. Continue?"
     IDS_ASK_ENCODING2       "You are about to change the encoding of an empty file from ANSI to non-ANSI. Note that this will clear the undo history, as it can't be synchronized with the new encoding. Continue?"
     IDS_ERR_ENCODINGNA      "Code page conversion tables for the selected encoding are not available on your system."
