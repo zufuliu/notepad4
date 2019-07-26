@@ -6906,9 +6906,9 @@ void ToggleFullScreenMode(void) {
 BOOL FileIO(BOOL fLoad, LPWSTR pszFile, BOOL bFlag, EditFileIOStatus *status) {
 	BeginWaitCursor();
 
-	WCHAR tch[MAX_PATH + 40];
-	WCHAR fmt[64];
-	FormatString(tch, fmt, (fLoad ? IDS_LOADFILE : IDS_SAVEFILE), PathFindFileName(pszFile));
+	WCHAR tch[MAX_PATH + 128];
+	WCHAR fmt[128];
+	FormatString(tch, fmt, (fLoad ? IDS_LOADFILE : IDS_SAVEFILE), pszFile);
 
 	StatusSetText(hwndStatus, STATUS_HELP, tch);
 	StatusSetSimple(hwndStatus, TRUE);
