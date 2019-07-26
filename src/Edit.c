@@ -466,7 +466,9 @@ BOOL EditLoadFile(LPWSTR pszFile, BOOL bSkipEncodingDetection, EditFileIOStatus 
 
 	char *lpData = (char *)NP2HeapAlloc((SIZE_T)(fileSize.QuadPart) + 16);
 	DWORD cbData = 0;
-	const BOOL bReadSuccess = ReadFile(hFile, lpData, (DWORD)NP2HeapSize(lpData) - 2, &cbData, NULL);
+	// prevent unsigned integer overflow.
+	const DWORD readLen = max_u((DWORD)(NP2HeapSize(lpData) - 2), (DWORD)fileSize.QuadPart);
+	const BOOL bReadSuccess = ReadFile(hFile, lpData, readLen, &cbData, NULL);
 	dwLastIOError = GetLastError();
 	CloseHandle(hFile);
 
