@@ -5816,7 +5816,7 @@ int ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2, BOOL *bIsNotepadReplacement) 
 				if (itok != 0) {
 					flagJumpTo = 1;
 					state = 1;
-					iInitialLine = (UINT)cord[0];
+					iInitialLine = (cord[0] == INVALID_POSITION)? INVALID_POSITION : (Sci_Line)((UINT)cord[0]);
 					iInitialColumn = (UINT)cord[1];
 				}
 			}
