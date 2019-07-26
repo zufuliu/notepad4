@@ -518,11 +518,9 @@ BOOL EditLoadFile(LPWSTR pszFile, BOOL bSkipEncodingDetection, EditFileIOStatus 
 		SciCall_SetCodePage((mEncoding[iEncoding].uFlags & NCP_DEFAULT) ? iDefaultCodePage : SC_CP_UTF8);
 		EditSetEmptyText();
 		SciCall_SetEOLMode(status->iEOLMode);
-	} else if (!bSkipEncodingDetection &&
-			   (iSrcEncoding == -1 || iSrcEncoding == CPI_UNICODE || iSrcEncoding == CPI_UNICODEBE) &&
-			   (iSrcEncoding == CPI_UNICODE || iSrcEncoding == CPI_UNICODEBE || IsUnicode(lpData, cbData, &bBOM, &bReverse)) &&
-			   (iSrcEncoding == CPI_UNICODE || iSrcEncoding == CPI_UNICODEBE || !utf8Sig)) {
-
+	} else if ((iSrcEncoding == CPI_UNICODE || iSrcEncoding == CPI_UNICODEBE) // reload as UTF-16
+		|| (!bSkipEncodingDetection && iSrcEncoding == -1 && !utf8Sig && IsUnicode(lpData, cbData, &bBOM, &bReverse))
+		) {
 		if (iSrcEncoding == CPI_UNICODE) {
 			bBOM = (lpData[0] == '\xFF' && lpData[1] == '\xFE');
 			bReverse = FALSE;
@@ -562,16 +560,14 @@ BOOL EditLoadFile(LPWSTR pszFile, BOOL bSkipEncodingDetection, EditFileIOStatus 
 		NP2HeapFree(lpDataUTF8);
 	} else {
 		FileVars_Init(lpData, cbData, &fvCurFile);
-		if (!bSkipEncodingDetection
-				&& (iSrcEncoding == -1 || iSrcEncoding == CPI_UTF8 || iSrcEncoding == CPI_UTF8SIGN)
-				&& ((utf8Sig
-					 || FileVars_IsUTF8(&fvCurFile)
-					 || (iSrcEncoding == CPI_UTF8 || iSrcEncoding == CPI_UTF8SIGN)
-					 || (!bPreferOEM && bLoadANSIasUTF8) // from menu "Reload As... UTF-8"
-					 || IsUTF8(lpData, cbData)
-					)
-				   )
-				&& !(FileVars_IsNonUTF8(&fvCurFile) && (iSrcEncoding != CPI_UTF8 && iSrcEncoding != CPI_UTF8SIGN))) {
+		if ((iSrcEncoding == CPI_UTF8 || iSrcEncoding == CPI_UTF8SIGN) // reload as UTF-8
+			|| (!bSkipEncodingDetection && iSrcEncoding == -1
+			&& (utf8Sig
+				|| (bLoadANSIasUTF8 && !bPreferOEM)
+				|| FileVars_IsUTF8(&fvCurFile)
+				|| IsUTF8(lpData, cbData)
+			))
+		) {
 			SciCall_SetCodePage(SC_CP_UTF8);
 			if (utf8Sig) {
 				EditSetNewText(lpData + 3, cbData - 3);

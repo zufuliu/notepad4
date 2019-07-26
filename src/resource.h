@@ -319,7 +319,7 @@
 #define CMD_RECODEDEFAULT				20006	// Ctrl+Alt+F
 #define CMD_RELOADANSI					20007	// Ctrl+Shift+A
 #define CMD_RELOADOEM					20008	// Ctrl+Shift+O
-#define CMD_RELOADANSIASUTF8			20009	// Shift+F8
+#define CMD_RELOADUTF8					20009	// Shift+F8
 #define CMD_RELOADNOFILEVARS			20010	// Alt+F8
 #define CMD_TIMESTAMPS					20011	// Shift+F5
 #define CMD_ONLINE_SEARCH_GOOGLE		20012

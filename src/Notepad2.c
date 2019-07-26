@@ -2159,7 +2159,7 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	int i = StrNotEmpty(szCurFile);
 	EnableCmd(hmenu, IDM_FILE_SAVE, IsDocumentModified());
 	EnableCmd(hmenu, IDM_FILE_REVERT, i);
-	EnableCmd(hmenu, CMD_RELOADANSIASUTF8, i);
+	EnableCmd(hmenu, CMD_RELOADUTF8, i);
 	EnableCmd(hmenu, CMD_RELOADANSI, i);
 	EnableCmd(hmenu, CMD_RELOADOEM, i);
 	EnableCmd(hmenu, CMD_RELOADNOFILEVARS, i);
@@ -4337,12 +4337,10 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	}
 	break;
 
-	case CMD_RELOADANSIASUTF8: {
+	case CMD_RELOADUTF8: {
 		if (StrNotEmpty(szCurFile)) {
-			const BOOL back = bLoadANSIasUTF8;
-			bLoadANSIasUTF8 = TRUE;
+			iSrcEncoding = CPI_UTF8;
 			FileLoad(FALSE, FALSE, TRUE, FALSE, szCurFile);
-			bLoadANSIasUTF8 = back;
 		}
 	}
 	break;
