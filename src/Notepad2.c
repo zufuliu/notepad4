@@ -179,7 +179,6 @@ int		iFileWatchingMode;
 BOOL	bResetFileWatching;
 static DWORD dwFileCheckInverval;
 static DWORD dwAutoReloadTimeout;
-DWORD	dwFileLoadWarningMB;
 static int iEscFunction;
 static BOOL bAlwaysOnTop;
 static BOOL bMinimizeToTray;
@@ -6400,7 +6399,6 @@ void LoadFlags(void) {
 
 	dwFileCheckInverval = IniSectionGetInt(pIniSection, L"FileCheckInverval", 1000);
 	dwAutoReloadTimeout = IniSectionGetInt(pIniSection, L"AutoReloadTimeout", 1000);
-	dwFileLoadWarningMB = IniSectionGetInt(pIniSection, L"FileLoadWarningMB", 64);
 
 	flagNoFadeHidden = IniSectionGetBool(pIniSection, L"NoFadeHidden", 0);
 

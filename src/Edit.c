@@ -387,7 +387,6 @@ void EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus *status) {
 //
 // EditLoadFile()
 //
-extern DWORD dwFileLoadWarningMB;
 BOOL EditLoadFile(LPWSTR pszFile, BOOL bSkipEncodingDetection, EditFileIOStatus *status) {
 	HANDLE hFile = CreateFile(pszFile,
 					   GENERIC_READ,
@@ -404,17 +403,14 @@ BOOL EditLoadFile(LPWSTR pszFile, BOOL bSkipEncodingDetection, EditFileIOStatus 
 	}
 
 	// calculate buffer limit
-	const DWORD dwFileSize = GetFileSize(hFile, NULL);
-
-	// Check if a warning message should be displayed for large files
-	if (dwFileLoadWarningMB != 0 && dwFileLoadWarningMB * 1024 * 1024 < dwFileSize) {
-		if (InfoBox(MBYESNO, L"MsgFileSizeWarning", IDS_WARNLOADBIGFILE) != IDYES) {
-			CloseHandle(hFile);
-			status->bFileTooBig = TRUE;
-			iSrcEncoding = -1;
-			iWeakSrcEncoding = -1;
-			return FALSE;
-		}
+	LARGE_INTEGER fileSize;
+	fileSize.QuadPart = 0;
+	if (!GetFileSizeEx(hFile, &fileSize)) {
+		dwLastIOError = GetLastError();
+		CloseHandle(hFile);
+		iSrcEncoding = -1;
+		iWeakSrcEncoding = -1;
+		return FALSE;
 	}
 
 	// display real path name
@@ -439,7 +435,36 @@ BOOL EditLoadFile(LPWSTR pszFile, BOOL bSkipEncodingDetection, EditFileIOStatus 
 		}
 	}
 
-	char *lpData = (char *)NP2HeapAlloc(dwFileSize + 16);
+	// Check if a warning message should be displayed for large files
+#if defined(_WIN64)
+	// less than 1/3 available physical memory:
+	//     1. the buffers we allocated below, depends on encoding.
+	//     2. Scintilla's content buffer and style buffer, see CellBuffer class.
+	// large file TODO:
+	// [ ] [> 2 GiB] use SC_DOCUMENTOPTION_TEXT_LARGE somewhere or hard-coded in EditModel::EditModel().
+	// [ ] [> 4 GiB] use SetFilePointerEx() and ReadFile()/WriteFile() to read/write file.
+	// [ ] [> 2 GiB] fix encoding conversion with MultiByteToWideChar() and WideCharToMultiByte().
+	// [ ] [> 4 GiB] fix sprintf(), wsprintf() for Sci_Position and Sci_Line, currently UINT is used.
+	// [x] [> 2 GiB] ensure Sci_PositionCR is same as Sci_Position, see Sci_Position.h
+	const LONGLONG maxFileSize = INT64_C(0x80000000);
+#else
+	// 2 GiB: ptrdiff_t / Sci_Position used in Scintilla
+	const LONGLONG maxFileSize = INT64_C(0x80000000);
+#endif
+	if (fileSize.QuadPart > maxFileSize) {
+		CloseHandle(hFile);
+		status->bFileTooBig = TRUE;
+		iSrcEncoding = -1;
+		iWeakSrcEncoding = -1;
+		WCHAR tchDocSize[32];
+		WCHAR tchMaxSize[32];
+		StrFormatByteSize(fileSize.QuadPart, tchDocSize, COUNTOF(tchDocSize));
+		StrFormatByteSize(maxFileSize, tchMaxSize, COUNTOF(tchMaxSize));
+		MsgBox(MBWARN, IDS_WARNLOADBIGFILE, pszFile, tchDocSize, tchMaxSize);
+		return FALSE;
+	}
+
+	char *lpData = (char *)NP2HeapAlloc((SIZE_T)(fileSize.QuadPart) + 16);
 	DWORD cbData = 0;
 	const BOOL bReadSuccess = ReadFile(hFile, lpData, (DWORD)NP2HeapSize(lpData) - 2, &cbData, NULL);
 	dwLastIOError = GetLastError();
