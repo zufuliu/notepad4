@@ -34,8 +34,8 @@ typedef struct np2params {
 	int		iInitialLexer;
 	int		flagQuietCreate;
 	int		flagJumpTo;
-	int		iInitialLine;
-	int		iInitialColumn;
+	Sci_Line		iInitialLine;
+	Sci_Position	iInitialColumn;
 	int		iSrcEncoding;
 	int		flagSetEncoding;
 	int		flagSetEOLMode;
