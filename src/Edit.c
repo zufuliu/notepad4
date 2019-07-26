@@ -2376,9 +2376,9 @@ void EditModifyLines(LPCWSTR pwszPrefix, LPCWSTR pwszAppend) {
 			if (bPrefixNum) {
 				char tchNum[64];
 				if (bPrefixNumPadZero) {
-					sprintf(tchNum, "%0*i", iPrefixNumWidth, (int)iPrefixNum);
+					sprintf(tchNum, "%0*u", iPrefixNumWidth, (UINT)iPrefixNum);
 				} else {
-					sprintf(tchNum, "%*i", iPrefixNumWidth, (int)iPrefixNum);
+					sprintf(tchNum, "%*u", iPrefixNumWidth, (UINT)iPrefixNum);
 				}
 				strcat(mszInsert, tchNum);
 				strcat(mszInsert, mszPrefix2);
@@ -2397,9 +2397,9 @@ void EditModifyLines(LPCWSTR pwszPrefix, LPCWSTR pwszAppend) {
 			if (bAppendNum) {
 				char tchNum[64];
 				if (bAppendNumPadZero) {
-					sprintf(tchNum, "%0*i", iAppendNumWidth, (int)iAppendNum);
+					sprintf(tchNum, "%0*u", iAppendNumWidth, (UINT)iAppendNum);
 				} else {
-					sprintf(tchNum, "%*i", iAppendNumWidth, (int)iAppendNum);
+					sprintf(tchNum, "%*u", iAppendNumWidth, (UINT)iAppendNum);
 				}
 				strcat(mszInsert, tchNum);
 				strcat(mszInsert, mszAppend2);
@@ -4861,7 +4861,7 @@ BOOL EditReplace(HWND hwnd, LPEDITFINDREPLACE lpefr) {
 // Mark all occurrences of the text currently selected (by Aleksandar Lekov)
 //
 
-extern int iMatchesCount;
+extern UINT iMatchesCount;
 
 void EditMarkAll_Clear(void) {
 	if (iMatchesCount == 0) {
@@ -5222,7 +5222,7 @@ static INT_PTR CALLBACK EditLineNumDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, 
 		const Sci_Line iMaxLine = SciCall_GetLineCount();
 		const Sci_Position iLength = SciCall_GetLength();
 
-		SetDlgItemInt(hwnd, IDC_LINENUM, (int)iCurLine, FALSE);
+		SetDlgItemInt(hwnd, IDC_LINENUM, (UINT)iCurLine, FALSE);
 		SendDlgItemMessage(hwnd, IDC_LINENUM, EM_LIMITTEXT, 20, 0);
 		SendDlgItemMessage(hwnd, IDC_COLNUM, EM_LIMITTEXT, 20, 0);
 
@@ -5230,13 +5230,13 @@ static INT_PTR CALLBACK EditLineNumDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, 
 		WCHAR tchLines[64];
 		WCHAR tchFmt[64];
 
-		wsprintf(tchLn, L"%i", (int)iMaxLine);
+		wsprintf(tchLn, L"%u", (UINT)iMaxLine);
 		FormatNumberStr(tchLn);
 		GetDlgItemText(hwnd, IDC_LINE_RANGE, tchFmt, COUNTOF(tchFmt));
 		wsprintf(tchLines, tchFmt, tchLn);
 		SetDlgItemText(hwnd, IDC_LINE_RANGE, tchLines);
 
-		wsprintf(tchLn, L"%i", (int)iLength);
+		wsprintf(tchLn, L"%u", (UINT)iLength);
 		FormatNumberStr(tchLn);
 		GetDlgItemText(hwnd, IDC_COLUMN_RANGE, tchFmt, COUNTOF(tchFmt));
 		wsprintf(tchLines, tchFmt, tchLn);
@@ -5252,13 +5252,15 @@ static INT_PTR CALLBACK EditLineNumDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, 
 			BOOL fTranslated;
 			BOOL fTranslated2;
 			WCHAR tchLn[32];
-			int iNewLine = 0;
-			int iNewCol;
+			Sci_Line iNewLine = 0;
+			Sci_Position iNewCol;
 
 			// Extract line number from the text entered
 			// For example: "5410:" will result in 5410
 			GetDlgItemText(hwnd, IDC_LINENUM, tchLn, COUNTOF(tchLn));
-			fTranslated = CRTStrToInt(tchLn, &iNewLine);
+			int iLine = 0;
+			fTranslated = CRTStrToInt(tchLn, &iLine);
+			iNewLine = (UINT)iLine;
 
 			if (SendDlgItemMessage(hwnd, IDC_COLNUM, WM_GETTEXTLENGTH, 0, 0) > 0) {
 				iNewCol = GetDlgItemInt(hwnd, IDC_COLNUM, &fTranslated2, FALSE);

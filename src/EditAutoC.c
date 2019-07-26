@@ -93,6 +93,7 @@ UINT WordList_OrderCase(const void *pWord, unsigned int len) {
 	len = min_u(len, 4);
 	while (len) {
 		unsigned char ch = *ptr++;
+		// convert to lower case to match _stricmp() / strcasecmp().
 		if (ch >= 'A' && ch <= 'Z') {
 			ch = ch + 'a' - 'A';
 		}

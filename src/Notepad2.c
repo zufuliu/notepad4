@@ -261,8 +261,8 @@ int		iEncoding;
 int		iDefaultCodePage;
 int		iDefaultCharSet;
 
-static int iInitialLine;
-static int iInitialColumn;
+static Sci_Line iInitialLine;
+static Sci_Position iInitialColumn;
 static int iInitialLexer;
 
 static BOOL bLastCopyFromMe = FALSE;
@@ -291,7 +291,7 @@ const int iLineEndings[3] = {
 
 static int iSortOptions = 0;
 static int iAlignMode	= 0;
-int		iMatchesCount	= 0;
+UINT	iMatchesCount	= 0;
 extern int iFontQuality;
 extern int iCaretStyle;
 extern int iOvrCaretStyle;
@@ -5820,8 +5820,8 @@ int ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2, BOOL *bIsNotepadReplacement) 
 				if (itok != 0) {
 					flagJumpTo = 1;
 					state = 1;
-					iInitialLine = cord[0];
-					iInitialColumn = cord[1];
+					iInitialLine = (UINT)cord[0];
+					iInitialColumn = (UINT)cord[1];
 				}
 			}
 			break;
@@ -6711,28 +6711,28 @@ void UpdateStatusbar(void) {
 	const Sci_Position iPos =  SciCall_GetCurrentPos();
 
 	const Sci_Line iLn = SciCall_LineFromPosition(iPos) + 1;
-	wsprintf(tchLn, L"%i", (int)iLn);
+	wsprintf(tchLn, L"%u", (UINT)iLn);
 	FormatNumberStr(tchLn);
 
 	const Sci_Line iLines = SciCall_GetLineCount();
-	wsprintf(tchLines, L"%i", (int)iLines);
+	wsprintf(tchLines, L"%u", (UINT)iLines);
 	FormatNumberStr(tchLines);
 
 	Sci_Position iCol = SciCall_GetColumn(iPos) + 1;
-	wsprintf(tchCol, L"%i", (int)iCol);
+	wsprintf(tchCol, L"%u", (UINT)iCol);
 	FormatNumberStr(tchCol);
 
 	const Sci_Position iLineStart = SciCall_PositionFromLine(iLn - 1);
 	const Sci_Position iLineEnd = SciCall_GetLineEndPosition(iLn - 1);
 	iCol = SciCall_CountCharacters(iLineStart, iPos) + 1;
 	const Sci_Position iLineChar = SciCall_CountCharacters(iLineStart, iLineEnd);
-	wsprintf(tchCh, L"%i", (int)iCol);
-	wsprintf(tchChs, L"%i", (int)iLineChar);
+	wsprintf(tchCh, L"%u", (UINT)iCol);
+	wsprintf(tchChs, L"%u", (UINT)iLineChar);
 	FormatNumberStr(tchCh);
 	FormatNumberStr(tchChs);
 
 	iCol = SciCall_GetColumn(iLineEnd);
-	wsprintf(tchCols, L"%i", (int)iCol);
+	wsprintf(tchCols, L"%u", (UINT)iCol);
 	FormatNumberStr(tchCols);
 
 	const Sci_Position iSelStart = SciCall_GetSelectionStart();
@@ -6742,10 +6742,10 @@ void UpdateStatusbar(void) {
 		lstrcpy(tchSelCh, L"0");
 	} else if (!SciCall_IsRectangleSelection()) {
 		Sci_Position iSel = SciCall_GetSelTextLength() - 1;
-		wsprintf(tchSel, L"%i", (int)iSel);
+		wsprintf(tchSel, L"%u", (UINT)iSel);
 		FormatNumberStr(tchSel);
 		iSel = SciCall_CountCharacters(iSelStart, iSelEnd);
-		wsprintf(tchSelCh, L"%i", (int)iSel);
+		wsprintf(tchSelCh, L"%u", (UINT)iSel);
 		FormatNumberStr(tchSelCh);
 	} else {
 		lstrcpy(tchSel, L"--");
@@ -6764,16 +6764,16 @@ void UpdateStatusbar(void) {
 		if (iSelStart != iSelEnd && iStartOfLinePos != iSelEnd) {
 			iLinesSelected += 1;
 		}
-		wsprintf(tchLinesSelected, L"%i", (int)iLinesSelected);
+		wsprintf(tchLinesSelected, L"%u", (UINT)iLinesSelected);
 		FormatNumberStr(tchLinesSelected);
-		wsprintf(tchMatchesCount, L"%i", (int)iMatchesCount);
+		wsprintf(tchMatchesCount, L"%u", iMatchesCount);
 		FormatNumberStr(tchMatchesCount);
 	}
 
 	wsprintf(tchDocPos, cachedStatusItem.tchDocPosFmt, tchLn, tchLines,
 				 tchCol, tchCols, tchCh, tchChs, tchSelCh, tchSel, tchLinesSelected, tchMatchesCount);
 
-	const int iBytes = (int)SciCall_GetLength();
+	const Sci_Position iBytes = SciCall_GetLength();
 	StrFormatByteSize(iBytes, tchDocSize, COUNTOF(tchDocSize));
 
 	StatusSetText(hwndStatus, STATUS_DOCPOS, tchDocPos);
@@ -7780,7 +7780,7 @@ void GetRelaunchParameters(LPWSTR szParameters, LPCWSTR lpszFile, BOOL newWind, 
 		if (pos > 0) {
 			const Sci_Line line = SciCall_LineFromPosition(pos) + 1;
 			const Sci_Position col = SciCall_GetColumn(pos) + 1;
-			wsprintf(tch, L" -g %i,%i", (int)line, (int)col);
+			wsprintf(tch, L" -g %u,%u", (UINT)line, (UINT)col);
 			lstrcat(szParameters, tch);
 		}
 
