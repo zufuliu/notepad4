@@ -246,13 +246,13 @@ typedef struct EditAutoCompletionConfig {
 	BOOL bScanWordsInDocument;
 	BOOL bEnglistIMEModeOnly;
 	BOOL bIgnoreCase;
-	int iVisibleItemCount;
+	UINT iVisibleItemCount;
 	int iMinWordLength;
 	int iMinNumberLength;
 	int fAutoCompleteFillUpMask;
 	int fAutoInsertMask;
 	int iAsmLineCommentChar;
-	int iPreviousItemCount;		// status
+	UINT iPreviousItemCount;		// status
 	char szAutoCompleteFillUp[MAX_AUTO_COMPLETION_FILLUP_LENGTH + 4];
 	WCHAR wszAutoCompleteFillUp[MAX_AUTO_COMPLETION_FILLUP_LENGTH];
 } EditAutoCompletionConfig;

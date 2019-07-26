@@ -17,17 +17,17 @@
 // scintilla/src/AutoComplete.h AutoComplete::maxItemLen
 #define NP2_AUTOC_MAX_WORD_LENGTH	(1024 - 3 - 1 - 16)	// SP + '(' + ')' + '\0'
 #define NP2_AUTOC_INIT_BUF_SIZE		(4096)
-#define NP2_AUTOC_MAX_BUF_COUNT		18
+#define NP2_AUTOC_MAX_BUF_COUNT		20
 #define NP2_AUTOC_INIT_CACHE_BYTES	(4096)
-#define NP2_AUTOC_MAX_CACHE_COUNT	16
+#define NP2_AUTOC_MAX_CACHE_COUNT	18
 /*
 word buffer:
-(2**18 - 1)*4096 => 1 GiB
+(2**20 - 1)*4096 => 4 GiB
 
 node cache:
-a = [4096*2**i for i in range(16)] => 256 MiB
-x64: sum(i//40 for i in a) => 6710776 nodes
-x86: sum(i//24 for i in a) => 11184632 nodes
+a = [4096*2**i for i in range(18)] => 1 GiB
+x64: sum(i//40 for i in a) => 26843434 nodes
+x86: sum(i//24 for i in a) => 44739063 nodes
 */
 
 struct WordNode;
@@ -47,8 +47,8 @@ struct WordList {
 	int offset;
 	int capacity;
 
-	int nWordCount;
-	int nTotalLen;
+	UINT nWordCount;
+	UINT nTotalLen;
 	UINT orderStart;
 	int iStartLen;
 	int iMaxLength;
@@ -1256,7 +1256,7 @@ static BOOL EditCompleteWordCore(int iCondition, BOOL autoInsert) {
 #if 0
 	StopWatch_Stop(watch);
 	const double elapsed = StopWatch_Get(&watch);
-	DebugPrintf("Notepad2 AddDocWord(%d, %d): %.6f\n", pWList->nWordCount, pWList->nTotalLen, elapsed);
+	DebugPrintf("Notepad2 AddDocWord(%u, %u): %.6f\n", pWList->nWordCount, pWList->nTotalLen, elapsed);
 #endif
 
 	const BOOL bShow = pWList->nWordCount > 0 && !(pWList->nWordCount == 1 && pWList->iMaxLength == iRootLen);
@@ -1279,7 +1279,7 @@ static BOOL EditCompleteWordCore(int iCondition, BOOL autoInsert) {
 		SciCall_AutoCSetFillUps(autoCompletionConfig.szAutoCompleteFillUp);
 		//SciCall_AutoCSetDropRestOfWord(TRUE); // delete orginal text: pRoot
 		SciCall_AutoCSetMaxWidth(pWList->iMaxLength << 1); // width columns, default auto
-		SciCall_AutoCSetMaxHeight(min_i(pWList->nWordCount, autoCompletionConfig.iVisibleItemCount)); // visible rows
+		SciCall_AutoCSetMaxHeight(min_u(pWList->nWordCount, autoCompletionConfig.iVisibleItemCount)); // visible rows
 		SciCall_AutoCSetCancelAtStart(FALSE); // don't cancel the list when deleting character
 		SciCall_AutoCSetChooseSingle(autoInsert);
 		SciCall_AutoCShow(pWList->iStartLen, pList);
