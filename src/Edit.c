@@ -560,12 +560,12 @@ BOOL EditLoadFile(LPWSTR pszFile, BOOL bSkipEncodingDetection, EditFileIOStatus 
 		NP2HeapFree(lpDataUTF8);
 	} else {
 		FileVars_Init(lpData, cbData, &fvCurFile);
-		if ((iSrcEncoding == CPI_UTF8 || iSrcEncoding == CPI_UTF8SIGN) // reload as UTF-8
-			|| (!bSkipEncodingDetection && iSrcEncoding == -1
-			&& (utf8Sig
-				|| (bLoadANSIasUTF8 && !bPreferOEM)
-				|| FileVars_IsUTF8(&fvCurFile)
-				|| IsUTF8(lpData, cbData)
+		if (iSrcEncoding == -1) {
+			iSrcEncoding = FileVars_GetEncoding(&fvCurFile);
+		}
+		if ((iSrcEncoding == CPI_UTF8 || iSrcEncoding == CPI_UTF8SIGN) // reload as UTF-8 or UTF-8 filevar
+			|| ((iSrcEncoding == -1) && ((bLoadANSIasUTF8 && !bPreferOEM) // load ANSI as UTF-8
+				|| (!bSkipEncodingDetection && (utf8Sig || IsUTF8(lpData, cbData)))
 			))
 		) {
 			SciCall_SetCodePage(SC_CP_UTF8);
@@ -579,19 +579,15 @@ BOOL EditLoadFile(LPWSTR pszFile, BOOL bSkipEncodingDetection, EditFileIOStatus 
 				EditDetectEOLMode(lpData, cbData, status);
 			}
 		} else {
-			if (iSrcEncoding != -1) {
-				iEncoding = iSrcEncoding;
-			} else {
-				iEncoding = FileVars_GetEncoding(&fvCurFile);
-				if (iEncoding == -1) {
-					if (fvCurFile.mask & FV_ENCODING) {
-						iEncoding = CPI_DEFAULT;
+			iEncoding = iSrcEncoding;
+			if (iEncoding == -1) {
+				if (fvCurFile.mask & FV_ENCODING) {
+					iEncoding = CPI_DEFAULT;
+				} else {
+					if ((iWeakSrcEncoding != -1) && (mEncoding[iWeakSrcEncoding].uFlags & NCP_INTERNAL)) {
+						iEncoding = iDefaultEncoding;
 					} else {
-						if ((iWeakSrcEncoding != -1) && (mEncoding[iWeakSrcEncoding].uFlags & NCP_INTERNAL)) {
-							iEncoding = iDefaultEncoding;
-						} else {
-							iEncoding = _iDefaultEncoding;
-						}
+						iEncoding = _iDefaultEncoding;
 					}
 				}
 			}
