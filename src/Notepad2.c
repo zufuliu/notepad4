@@ -884,8 +884,10 @@ HWND InitInstance(HINSTANCE hInstance, int nCmdShow) {
 		SetNotifyIconTitle(hwndMain);
 	}
 
-	bInitDone = TRUE;
-	UpdateStatusBarWidth();
+	if (!bInitDone) {
+		bInitDone = TRUE;
+		UpdateStatusBarWidth();
+	}
 	if (SciCall_GetLength() == 0) {
 		UpdateToolbar();
 		UpdateStatusbar();
@@ -7115,6 +7117,10 @@ BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect, LPCWST
 #endif
 		}
 
+		if (!bInitDone) {
+			bInitDone = TRUE;
+			UpdateStatusBarWidth();
+		}
 		UpdateStatusbar();
 		UpdateDocumentModificationStatus();
 		// Show warning: Unicode file loaded as ANSI
