@@ -272,6 +272,28 @@ int ParseCommaList(LPCWSTR str, int result[], int count) {
 	return index;
 }
 
+int ParseCommaList64(LPCWSTR str, int64_t result[], int count) {
+	if (StrIsEmpty(str)) {
+		return 0;
+	}
+
+	int index = 0;
+	while (index < count) {
+		LPWSTR end;
+		result[index] = _wcstoi64(str, &end, 10);
+		if (str == end) {
+			break;
+		}
+
+		++index;
+		if (*end == L',') {
+			++end;
+		}
+		str = end;
+	}
+	return index;
+}
+
 UINT GetDefaultDPI(HWND hwnd) {
 	HDC hDC = GetDC(hwnd);
 	UINT ppi = GetDeviceCaps(hDC, LOGPIXELSY);
@@ -1867,7 +1889,7 @@ void FormatNumberStr(LPWSTR lpNumberStr) {
 BOOL SetDlgItemIntEx(HWND hwnd, int nIdItem, UINT uValue) {
 	WCHAR szBuf[32];
 
-	wsprintf(szBuf, L"%u", uValue);
+	_ultow(uValue, szBuf, 10);
 	FormatNumberStr(szBuf);
 
 	return SetDlgItemText(hwnd, nIdItem, szBuf);

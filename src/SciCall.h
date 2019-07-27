@@ -47,6 +47,24 @@ NP2_inline Sci_Position max_pos(Sci_Position x, Sci_Position y) {
 	return (x > y) ? x : y;
 }
 
+#if defined(_WIN64)
+NP2_inline void PosToStrW(Sci_Position pos, LPWSTR tch) {
+	_i64tow(pos, tch, 10);
+}
+
+NP2_inline void PosToStrA(Sci_Position pos, LPSTR tch) {
+	_i64toa(pos, tch, 10);
+}
+#else
+NP2_inline void PosToStrW(Sci_Position pos, LPWSTR tch) {
+	_ltow(pos, tch, 10);
+}
+
+NP2_inline void PosToStrA(Sci_Position pos, LPSTR tch) {
+	_ltoa(pos, tch, 10);
+}
+#endif
+
 // Text retrieval and modification
 
 NP2_inline Sci_Position SciCall_GetText(Sci_Position length, char *text) {

@@ -3248,12 +3248,12 @@ BOOL Style_SelectFont(HWND hwnd, LPWSTR lpszStyle, int cchStyle, BOOL bDefaultSt
 			lf.lfCharSet != ANSI_CHARSET &&
 			lf.lfCharSet != iDefaultCharSet) {
 		lstrcat(szNewStyle, L"; charset:");
-		wsprintf(tch, L"%u", lf.lfCharSet);
+		_ltow(lf.lfCharSet, tch, 10);
 		lstrcat(szNewStyle, tch);
 	}
 	Style_StrCopyLocale(szNewStyle, lpszStyle, tch);
 	lstrcat(szNewStyle, L"; size:");
-	wsprintf(tch, L"%i", cf.iPointSize / 10);
+	_ltow(cf.iPointSize / 10, tch, 10);
 	lstrcat(szNewStyle, tch);
 	iValue = cf.iPointSize % 10;
 	if (iValue != 0) {
@@ -3267,7 +3267,7 @@ BOOL Style_SelectFont(HWND hwnd, LPWSTR lpszStyle, int cchStyle, BOOL bDefaultSt
 			lstrcat(szNewStyle, L"; bold");
 		} else {
 			lstrcat(szNewStyle, L"; weight:");
-			wsprintf(tch, L"%i", (int)lf.lfWeight);
+			_ltow(lf.lfWeight, tch, 10);
 			lstrcat(szNewStyle, tch);
 		}
 	}
