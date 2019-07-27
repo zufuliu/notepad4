@@ -290,7 +290,7 @@ const int iLineEndings[3] = {
 
 static int iSortOptions = 0;
 static int iAlignMode	= 0;
-UINT	iMatchesCount	= 0;
+Sci_Position iMatchesCount = 0;
 extern int iFontQuality;
 extern int iCaretStyle;
 extern int iOvrCaretStyle;
@@ -4579,11 +4579,11 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		EditEncloseSelection(L"`", L"`");
 		break;
 
-	case CMD_INCREASENUM:	// Ctrl++
+	case CMD_INCREASENUM:	// Ctrl+Alt++
 		EditModifyNumber(TRUE);
 		break;
 
-	case CMD_DECREASENUM:	// Ctrl+-
+	case CMD_DECREASENUM:	// Ctrl+Alt+-
 		EditModifyNumber(FALSE);
 		break;
 
@@ -5809,13 +5809,18 @@ int ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2, BOOL *bIsNotepadReplacement) 
 		case L'G':
 			state = 2;
 			if (ExtractFirstArgument(lp2, lp1, lp2)) {
+#if defined(_WIN64)
+				int64_t cord[2] = { 0 };
+				const int itok = ParseCommaList64(lp1, cord, COUNTOF(cord));
+#else
 				int cord[2] = { 0 };
 				const int itok = ParseCommaList(lp1, cord, COUNTOF(cord));
+#endif
 				if (itok != 0) {
 					flagJumpTo = 1;
 					state = 1;
-					iInitialLine = (cord[0] == INVALID_POSITION)? INVALID_POSITION : (Sci_Line)((UINT)cord[0]);
-					iInitialColumn = (UINT)cord[1];
+					iInitialLine = cord[0];
+					iInitialColumn = cord[1];
 				}
 			}
 			break;
@@ -6704,28 +6709,28 @@ void UpdateStatusbar(void) {
 	const Sci_Position iPos =  SciCall_GetCurrentPos();
 
 	const Sci_Line iLn = SciCall_LineFromPosition(iPos) + 1;
-	wsprintf(tchLn, L"%u", (UINT)iLn);
+	PosToStrW(iLn, tchLn);
 	FormatNumberStr(tchLn);
 
 	const Sci_Line iLines = SciCall_GetLineCount();
-	wsprintf(tchLines, L"%u", (UINT)iLines);
+	PosToStrW(iLines, tchLines);
 	FormatNumberStr(tchLines);
 
 	Sci_Position iCol = SciCall_GetColumn(iPos) + 1;
-	wsprintf(tchCol, L"%u", (UINT)iCol);
+	PosToStrW(iCol, tchCol);
 	FormatNumberStr(tchCol);
 
 	const Sci_Position iLineStart = SciCall_PositionFromLine(iLn - 1);
 	const Sci_Position iLineEnd = SciCall_GetLineEndPosition(iLn - 1);
 	iCol = SciCall_CountCharacters(iLineStart, iPos) + 1;
 	const Sci_Position iLineChar = SciCall_CountCharacters(iLineStart, iLineEnd);
-	wsprintf(tchCh, L"%u", (UINT)iCol);
-	wsprintf(tchChs, L"%u", (UINT)iLineChar);
+	PosToStrW(iCol, tchCh);
+	PosToStrW(iLineChar, tchChs);
 	FormatNumberStr(tchCh);
 	FormatNumberStr(tchChs);
 
 	iCol = SciCall_GetColumn(iLineEnd);
-	wsprintf(tchCols, L"%u", (UINT)iCol);
+	PosToStrW(iCol, tchCols);
 	FormatNumberStr(tchCols);
 
 	const Sci_Position iSelStart = SciCall_GetSelectionStart();
@@ -6735,10 +6740,10 @@ void UpdateStatusbar(void) {
 		lstrcpy(tchSelCh, L"0");
 	} else if (!SciCall_IsRectangleSelection()) {
 		Sci_Position iSel = SciCall_GetSelTextLength() - 1;
-		wsprintf(tchSel, L"%u", (UINT)iSel);
+		PosToStrW(iSel, tchSel);
 		FormatNumberStr(tchSel);
 		iSel = SciCall_CountCharacters(iSelStart, iSelEnd);
-		wsprintf(tchSelCh, L"%u", (UINT)iSel);
+		PosToStrW(iSel, tchSelCh);
 		FormatNumberStr(tchSelCh);
 	} else {
 		lstrcpy(tchSel, L"--");
@@ -6757,9 +6762,9 @@ void UpdateStatusbar(void) {
 		if (iSelStart != iSelEnd && iStartOfLinePos != iSelEnd) {
 			iLinesSelected += 1;
 		}
-		wsprintf(tchLinesSelected, L"%u", (UINT)iLinesSelected);
+		PosToStrW(iLinesSelected, tchLinesSelected);
 		FormatNumberStr(tchLinesSelected);
-		wsprintf(tchMatchesCount, L"%u", iMatchesCount);
+		PosToStrW(iMatchesCount, tchMatchesCount);
 		FormatNumberStr(tchMatchesCount);
 	}
 
@@ -6802,7 +6807,9 @@ void UpdateLineNumberWidth(void) {
 		char tchLines[32];
 
 		const Sci_Line iLines = SciCall_GetLineCount();
-		sprintf(tchLines, "_%i_", (int)iLines);
+		PosToStrA(iLines, tchLines + 2);
+		tchLines[0] = '_';
+		tchLines[1] = '_';
 
 		const int iLineMarginWidthNow = SciCall_GetMarginWidth(MARGIN_LINE_NUMBER);
 		const int iLineMarginWidthFit = SciCall_TextWidth(STYLE_LINENUMBER, tchLines);
@@ -7773,7 +7780,15 @@ void GetRelaunchParameters(LPWSTR szParameters, LPCWSTR lpszFile, BOOL newWind, 
 		if (pos > 0) {
 			const Sci_Line line = SciCall_LineFromPosition(pos) + 1;
 			const Sci_Position col = SciCall_GetColumn(pos) + 1;
-			wsprintf(tch, L" -g %u,%u", (UINT)line, (UINT)col);
+#if defined(_WIN64)
+			WCHAR tchLn[32];
+			WCHAR tchCol[32];
+			PosToStrW(line, tchLn);
+			PosToStrW(col, tchCol);
+			wsprintf(tch, L" -g %s,%s", tchLn, tchCol);
+#else
+			wsprintf(tch, L" -g %d,%d", (int)line, (int)col);
+#endif
 			lstrcat(szParameters, tch);
 		}
 

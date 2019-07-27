@@ -5,6 +5,7 @@
 #include <commctrl.h>
 #include <commdlg.h>
 #include <limits.h>
+#include <inttypes.h>
 #include <stdio.h>
 #include "SciCall.h"
 #include "Helpers.h"
@@ -2241,7 +2242,11 @@ void EditShowCallTips(Sci_Position position) {
 	SciCall_GetLine(iLine, pLine);
 	StrTrimA(pLine, " \t\r\n");
 	char *text = (char *)NP2HeapAlloc(iDocLen + 1 + 128);
+#if defined(_WIN64)
+	sprintf(text, "ShowCallTips(%" PRId64 ", %" PRId64 ", %" PRId64 ")\n\n\002%s", iLine + 1, position, iDocLen, pLine);
+#else
 	sprintf(text, "ShowCallTips(%d, %d, %d)\n\n\002%s", (int)(iLine + 1), (int)position, (int)iDocLen, pLine);
+#endif
 	SciCall_CallTipUseStyle(iTabWidth);
 	SciCall_CallTipShow(position, text);
 	NP2HeapFree(pLine);

@@ -293,7 +293,7 @@ extern "C" BOOL EditPrint(HWND hwnd, LPCWSTR pszDocTitle) {
 	frPrint.rc.bottom	-= footerLineHeight + footerLineHeight / 2;
 
 	// Print each page
-	UINT pageNum = 1;
+	int pageNum = 1;
 	WCHAR tchPageFormat[128];
 	WCHAR tchPageStatus[128];
 	GetString(IDS_PRINT_PAGENUM, tchPageFormat, COUNTOF(tchPageFormat));
@@ -302,7 +302,7 @@ extern "C" BOOL EditPrint(HWND hwnd, LPCWSTR pszDocTitle) {
 	while (lengthPrinted < lengthDoc) {
 		const BOOL printPage = !(pdlg.Flags & PD_PAGENUMS) || (pageNum >= pdlg.nFromPage && pageNum <= pdlg.nToPage);
 		WCHAR tchNum[32];
-		wsprintf(tchNum, L"%u", pageNum);
+		_ltow(pageNum, tchNum, 10);
 		FormatNumberStr(tchNum);
 		WCHAR pageString[128];
 		wsprintf(pageString, tchPageFormat, tchNum);

@@ -137,7 +137,7 @@ void IniClearAllSectionEx(LPCWSTR lpszPrefix, LPCWSTR lpszIniFile, BOOL bDelete)
 
 NP2_inline void IniSetInt(LPCWSTR lpSection, LPCWSTR lpName, int i) {
 	WCHAR tch[16];
-	wsprintf(tch, L"%i", i);
+	_ltow(i, tch, 10);
 	IniSetString(lpSection, lpName, tch);
 }
 
@@ -242,7 +242,7 @@ void IniSectionSetString(IniSectionOnSave *section, LPCWSTR key, LPCWSTR value);
 
 NP2_inline void IniSectionSetInt(IniSectionOnSave *section, LPCWSTR key, int i) {
 	WCHAR tch[16];
-	wsprintf(tch, L"%i", i);
+	_ltow(i, tch, 10);
 	IniSectionSetString(section, key, tch);
 }
 

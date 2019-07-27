@@ -1970,7 +1970,7 @@ static INT_PTR CALLBACK WarnLineEndingDlgProc(HWND hwnd, UINT umsg, WPARAM wPara
 		WCHAR tchFmt[128];
 		for (int i = 0; i < 3; i++) {
 			WCHAR tchLn[32];
-			wsprintf(tchLn, L"%u", status->linesCount[i]);
+			PosToStrW(status->linesCount[i], tchLn);
 			FormatNumberStr(tchLn);
 			GetDlgItemText(hwnd, IDC_EOL_SUM_CRLF + i, tchFmt, COUNTOF(tchFmt));
 			wsprintf(wch, tchFmt, tchLn);

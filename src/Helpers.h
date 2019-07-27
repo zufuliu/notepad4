@@ -131,6 +131,12 @@ NP2_inline BOOL CRTStrToInt(LPCWSTR str, int *value) {
 	return str != end;
 }
 
+NP2_inline BOOL CRTStrToInt64(LPCWSTR str, int64_t *value) {
+	LPWSTR end;
+	*value = _wcstoi64(str, &end, 10);
+	return str != end;
+}
+
 // str MUST NOT be NULL, can be empty
 NP2_inline BOOL HexStrToInt(LPCWSTR str, int *value) {
 	LPWSTR end;
@@ -139,6 +145,7 @@ NP2_inline BOOL HexStrToInt(LPCWSTR str, int *value) {
 }
 
 int ParseCommaList(LPCWSTR str, int result[], int count);
+int ParseCommaList64(LPCWSTR str, int64_t result[], int count);
 
 typedef struct StopWatch {
 	LARGE_INTEGER freq; // not changed after system boot
@@ -278,7 +285,7 @@ void IniClearAllSectionEx(LPCWSTR lpszPrefix, LPCWSTR lpszIniFile, BOOL bDelete)
 
 NP2_inline void IniSetInt(LPCWSTR lpSection, LPCWSTR lpName, int i) {
 	WCHAR tch[16];
-	wsprintf(tch, L"%i", i);
+	_ltow(i, tch, 10);
 	IniSetString(lpSection, lpName, tch);
 }
 
@@ -384,7 +391,7 @@ void IniSectionSetString(IniSectionOnSave *section, LPCWSTR key, LPCWSTR value);
 
 NP2_inline void IniSectionSetInt(IniSectionOnSave *section, LPCWSTR key, int i) {
 	WCHAR tch[16];
-	wsprintf(tch, L"%i", i);
+	_ltow(i, tch, 10);
 	IniSectionSetString(section, key, tch);
 }
 

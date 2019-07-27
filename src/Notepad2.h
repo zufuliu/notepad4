@@ -185,7 +185,7 @@ typedef struct EditFileIOStatus {
 	// inconsistent line endings
 	BOOL bLineEndingsDefaultNo; // set default button to "No"
 	BOOL bInconsistent;	// load output
-	UINT linesCount[3];	// load output: CR+LF, LF, CR
+	Sci_Line linesCount[3];	// load output: CR+LF, LF, CR
 
 	BOOL bCancelDataLoss;// save output
 } EditFileIOStatus;

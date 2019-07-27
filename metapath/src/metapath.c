@@ -2125,8 +2125,8 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 					wsprintf(tch, L"%s | %s %s | %s", tchsize, tchdate, tchtime, tchattr);
 				} else {
 					WCHAR tchnum[64];
-					WCHAR fmt[32];
-					wsprintf(tchnum, L"%i", ListView_GetItemCount(hwndDirList));
+					WCHAR fmt[64];
+					_ltow(ListView_GetItemCount(hwndDirList), tchnum, 10);
 					FormatNumberStr(tchnum);
 					FormatString(tch, fmt, HasFilter() ? IDS_NUMFILES_FILTER : IDS_NUMFILES, tchnum);
 				}
@@ -2294,9 +2294,9 @@ BOOL ChangeDirectory(HWND hwnd, LPCWSTR lpszNewDir, BOOL bUpdateHistory) {
 
 		WCHAR tch[256];
 		WCHAR tchnum[64];
-		wsprintf(tchnum, L"%d", cItems);
+		_ltow(cItems, tchnum, 10);
 		FormatNumberStr(tchnum);
-		WCHAR fmt[32];
+		WCHAR fmt[64];
 		FormatString(tch, fmt, HasFilter() ? IDS_NUMFILES_FILTER : IDS_NUMFILES, tchnum);
 		StatusSetText(hwndStatus, ID_FILEINFO, tch);
 
