@@ -543,7 +543,8 @@ BOOL EditLoadFile(LPWSTR pszFile, BOOL bSkipEncodingDetection, EditFileIOStatus 
 			}
 		}
 
-		char *lpDataUTF8 = (char *)NP2HeapAlloc(cbData * kMaxMultiByteCount + 2);
+		// cbData/2 => WCHAR, WCHAR*3 => UTF-8
+		char *lpDataUTF8 = (char *)NP2HeapAlloc((cbData + 1)*sizeof(WCHAR));
 		cbData = WideCharToMultiByte(CP_UTF8, 0, (bBOM ? (LPWSTR)lpData + 1 : (LPWSTR)lpData),
 									 (int)(bBOM ? (cbData / sizeof(WCHAR)) : (cbData / sizeof(WCHAR)) + 1),
 									 lpDataUTF8, (int)NP2HeapSize(lpDataUTF8), NULL, NULL);
@@ -736,7 +737,7 @@ BOOL EditSaveFile(HWND hwnd, LPCWSTR pszFile, BOOL bSaveCopy, EditFileIOStatus *
 			const UINT uCodePage = mEncoding[iEncoding].uCodePage;
 			const BOOL zeroFlags = IsZeroFlagsCodePage(uCodePage);
 
-			LPWSTR lpDataWide = (LPWSTR)NP2HeapAlloc(cbData * 2 + 16);
+			LPWSTR lpDataWide = (LPWSTR)NP2HeapAlloc(cbData * sizeof(WCHAR) + 16);
 			const int cbDataWide = MultiByteToWideChar(CP_UTF8, 0, lpData, cbData, lpDataWide, (int)(NP2HeapSize(lpDataWide) / sizeof(WCHAR)));
 
 			if (zeroFlags) {
