@@ -2507,7 +2507,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		FileLoad(FALSE, FALSE, FALSE, FALSE, L"");
 		break;
 
-	case IDM_FILE_REVERT: {
+	case IDM_FILE_REVERT:
 		if (StrNotEmpty(szCurFile)) {
 			if (IsDocumentModified() && MsgBox(MBOKCANCEL, IDS_ASK_REVERT) != IDOK) {
 				return 0;
@@ -2533,8 +2533,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 #endif
 			}
 		}
-	}
-	break;
+		break;
 
 	case IDM_FILE_SAVE:
 		FileSave(TRUE, FALSE, FALSE, FALSE);
@@ -2834,7 +2833,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	}
 	break;
 
-	case IDM_RECODE_SELECT: {
+	case IDM_RECODE_SELECT:
 		if (StrNotEmpty(szCurFile)) {
 			int iNewEncoding;
 			switch (iEncoding) {
@@ -2864,8 +2863,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 				FileLoad(TRUE, FALSE, TRUE, FALSE, szCurFile);
 			}
 		}
-	}
-	break;
+		break;
 
 	case IDM_ENCODING_SETDEFAULT:
 		SelectDefEncodingDlg(hwnd, &iDefaultEncoding);
@@ -4307,7 +4305,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		SciCall_SetTabIndents(bTabIndents);
 		break;
 
-	case CMD_RECODEDEFAULT: {
+	case CMD_RECODEDEFAULT:
 		if (StrNotEmpty(szCurFile)) {
 			if (iDefaultEncoding == CPI_UNICODEBOM) {
 				iSrcEncoding = CPI_UNICODE;
@@ -4320,34 +4318,30 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			}
 			FileLoad(FALSE, FALSE, TRUE, FALSE, szCurFile);
 		}
-	}
-	break;
+		break;
 
-	case CMD_RELOADANSI: {
+	case CMD_RELOADANSI:
 		if (StrNotEmpty(szCurFile)) {
 			iSrcEncoding = CPI_DEFAULT;
 			FileLoad(FALSE, FALSE, TRUE, FALSE, szCurFile);
 		}
-	}
-	break;
+		break;
 
-	case CMD_RELOADOEM: {
+	case CMD_RELOADOEM:
 		if (StrNotEmpty(szCurFile)) {
 			iSrcEncoding = CPI_OEM;
 			FileLoad(FALSE, FALSE, TRUE, FALSE, szCurFile);
 		}
-	}
-	break;
+		break;
 
-	case CMD_RELOADUTF8: {
+	case CMD_RELOADUTF8:
 		if (StrNotEmpty(szCurFile)) {
 			iSrcEncoding = CPI_UTF8;
 			FileLoad(FALSE, FALSE, TRUE, FALSE, szCurFile);
 		}
-	}
-	break;
+		break;
 
-	case CMD_RELOADNOFILEVARS: {
+	case CMD_RELOADNOFILEVARS:
 		if (StrNotEmpty(szCurFile)) {
 			const int _fNoFileVariables = fNoFileVariables;
 			const BOOL _bNoEncodingTags = bNoEncodingTags;
@@ -4357,8 +4351,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			fNoFileVariables = _fNoFileVariables;
 			bNoEncodingTags = _bNoEncodingTags;
 		}
-	}
-	break;
+		break;
 
 	case IDM_LANG_TEXTFILE:
 	case IDM_LANG_2NDTEXTFILE:
