@@ -152,6 +152,8 @@ BOOL EditConvertText(UINT cpSource, UINT cpDest, BOOL bSetSavePoint) {
 		NP2HeapFree(pwchText);
 	}
 
+	bLockedForEditing = FALSE;
+	SciCall_SetReadOnly(FALSE);
 	SciCall_Cancel();
 	SciCall_SetUndoCollection(FALSE);
 	SciCall_EmptyUndoBuffer();
