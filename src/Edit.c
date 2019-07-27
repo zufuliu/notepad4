@@ -139,46 +139,42 @@ BOOL EditConvertText(UINT cpSource, UINT cpDest, BOOL bSetSavePoint) {
 	}
 
 	const Sci_Position length = SciCall_GetLength();
-	if (length == 0) {
-		SciCall_Cancel();
-		SciCall_SetUndoCollection(FALSE);
-		SciCall_EmptyUndoBuffer();
-		SciCall_ClearAll();
-		SciCall_ClearMarker();
-		SciCall_SetCodePage(cpDest);
-		SciCall_SetUndoCollection(TRUE);
-		SciCall_EmptyUndoBuffer();
-		SciCall_GotoPos(0);
-		SciCall_ChooseCaretX();
-
-		if (bSetSavePoint) {
-			SciCall_SetSavePoint();
-		}
-	} else {
+	char *pchText = NULL;
+	int cbText = 0;
+	if (length > 0) {
 		// DBCS: length -> WCHAR: sizeof(WCHAR) * (length / 2) -> UTF-8: kMaxMultiByteCount * (length / 2)
-		char *pchText = (char *)NP2HeapAlloc((length + 1) * sizeof(WCHAR));
+		pchText = (char *)NP2HeapAlloc((length + 1) * sizeof(WCHAR));
 		SciCall_GetText(NP2HeapSize(pchText), pchText);
 
 		WCHAR *pwchText = (WCHAR *)NP2HeapAlloc((length + 1) * sizeof(WCHAR));
 		const int cbwText = MultiByteToWideChar(cpSource, 0, pchText, (int)length, pwchText, (int)(NP2HeapSize(pwchText) / sizeof(WCHAR)));
-		const int cbText = WideCharToMultiByte(cpDest, 0, pwchText, cbwText, pchText, (int)(NP2HeapSize(pchText)), NULL, NULL);
-
-		SciCall_Cancel();
-		SciCall_SetUndoCollection(FALSE);
-		SciCall_EmptyUndoBuffer();
-		SciCall_ClearAll();
-		SciCall_ClearMarker();
-		SciCall_SetCodePage(cpDest);
-		SciCall_AddText(cbText, pchText);
-		SciCall_EmptyUndoBuffer();
-		SciCall_SetUndoCollection(TRUE);
-		SciCall_GotoPos(0);
-		SciCall_ChooseCaretX();
-
-		NP2HeapFree(pchText);
+		cbText = WideCharToMultiByte(cpDest, 0, pwchText, cbwText, pchText, (int)(NP2HeapSize(pchText)), NULL, NULL);
 		NP2HeapFree(pwchText);
 	}
 
+	SciCall_Cancel();
+	SciCall_SetUndoCollection(FALSE);
+	SciCall_EmptyUndoBuffer();
+	SciCall_ClearAll();
+	SciCall_ClearMarker();
+	SciCall_SetCodePage(cpDest);
+
+	if (cbText > 0) {
+		SciCall_SetModEventMask(SC_MOD_NONE);
+		SciCall_AddText(cbText, pchText);
+		SciCall_SetModEventMask(SC_MOD_INSERTTEXT | SC_MOD_DELETETEXT);
+	}
+	if (pchText != NULL) {
+		NP2HeapFree(pchText);
+	}
+
+	SciCall_EmptyUndoBuffer();
+	SciCall_SetUndoCollection(TRUE);
+	SciCall_GotoPos(0);
+	SciCall_ChooseCaretX();
+	if (length == 0 && bSetSavePoint) {
+		SciCall_SetSavePoint();
+	}
 	return TRUE;
 }
 
