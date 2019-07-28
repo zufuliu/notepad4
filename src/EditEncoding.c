@@ -997,7 +997,8 @@ BOOL Encoding_GetFromComboboxEx(HWND hwnd, int *pidEncoding) {
 
 
 BOOL IsUnicode(const char *pBuffer, DWORD cb, LPBOOL lpbBOM, LPBOOL lpbReverse) {
-	if (pBuffer == NULL || cb < 2) {
+	if (pBuffer == NULL || cb < 2 || (cb & 1) != 0) {
+		// reject odd bytes
 		return FALSE;
 	}
 
