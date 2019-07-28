@@ -212,7 +212,7 @@
     <File Name="../../src/EditEncoding.c"/>
     <File Name="../../src/Helpers.c"/>
     <File Name="../../src/Notepad2.c"/>
-    <File Name="../../src/Print.cpp"/>
+    <File Name="../../src/Bridge.cpp"/>
     <File Name="../../src/Styles.c"/>
   </VirtualDirectory>
   <VirtualDirectory Name="Header Files">

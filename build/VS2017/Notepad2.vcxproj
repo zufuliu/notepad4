@@ -691,7 +691,7 @@
     <ClCompile Include="..\..\src\EditLexers\stlVim.c" />
     <ClCompile Include="..\..\src\Helpers.c" />
     <ClCompile Include="..\..\src\Notepad2.c" />
-    <ClCompile Include="..\..\src\Print.cpp" />
+    <ClCompile Include="..\..\src\Bridge.cpp" />
     <ClCompile Include="..\..\src\Styles.c" />
     <ClCompile Include="..\..\src\EditLexers\stlActionScript.c" />
     <ClCompile Include="..\..\src\EditLexers\stlAsm.c" />
