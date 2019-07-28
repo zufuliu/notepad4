@@ -1864,7 +1864,7 @@ END
 STRINGTABLE
 BEGIN
     IDS_ERR_UNICODE2        "Certain characters in the current text are not supported by the selected encoding, and may be replaced by default placeholders when saving. It's recommended to choose another file encoding. Continue?"
-    IDS_WARNLOADBIGFILE     "Loading file: %s\n\nThis file is too large (%s) to open.\nCurrently maximum supported file size is %s."
+    IDS_WARNLOADBIGFILE     "Loading file: %s\n\nThis file is too large (%s, %s bytes) to open.\nCurrently maximum supported file size is %s (%s bytes)."
     //IDS_ERR_DROP            "Only one file can be dropped at the same time!"
     IDS_ASK_SAVE            "Save changes to ""%s""?"
     IDS_ASK_REVERT          "Revert file to last saved state? Your changes will be lost!"
