@@ -2504,8 +2504,7 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 static void ConvertLineEndings(int iNewEOLMode) {
 	iEOLMode = iNewEOLMode;
 	SciCall_SetEOLMode(iNewEOLMode);
-	SciCall_ConvertEOLs(iNewEOLMode);
-	EditFixPositions();
+	EditEnsureConsistentLineEndings();
 	UpdateStatusBarCache(STATUS_EOLMODE);
 	UpdateToolbar();
 	UpdateStatusbar();
