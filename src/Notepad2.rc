@@ -81,8 +81,14 @@ BEGIN
 		MENUITEM "Save &As...\tF6",					IDM_FILE_SAVEAS
 		MENUITEM "Save Cop&y...\tCtrl+F6",			IDM_FILE_SAVECOPY
 		MENUITEM SEPARATOR
-		MENUITEM "&Read Only",						IDM_FILE_READONLY
-		MENUITEM "Lo&ck For Editing",				IDM_FILE_LOCK_EDITING
+		POPUP "File &Mode"
+		BEGIN
+			MENUITEM "&Read Only",					IDM_FILE_READONLY
+			MENUITEM "Lo&ck For Editing",			IDM_FILE_LOCK_EDITING
+#if defined(_WIN64)
+			MENUITEM "&Large File Mode",			IDM_FILE_LARGE_FILE_MODE
+#endif
+		END
 		MENUITEM "Re&vert\tF5",						IDM_FILE_REVERT
 		POPUP "Reloa&d"
 		BEGIN
@@ -92,6 +98,9 @@ BEGIN
 			MENUITEM SEPARATOR
 			MENUITEM "&No File Variables\tAlt+F8",	CMD_RELOADNOFILEVARS
 			MENUITEM "&Default\tCtrl+Alt+F",		CMD_RECODEDEFAULT
+#if defined(_WIN64)
+			MENUITEM "&Large File Mode",			IDM_FILE_LARGE_FILE_MODE_RELOAD
+#endif
 			MENUITEM SEPARATOR
 			MENUITEM "&With Encoding...\tF8",		IDM_RECODE_SELECT
 		END

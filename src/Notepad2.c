@@ -164,6 +164,9 @@ BOOL	bLoadNFOasOEM;
 BOOL	bNoEncodingTags;
 int		iSrcEncoding = -1;
 int		iWeakSrcEncoding = -1;
+#if defined(_WIN64)
+BOOL	bLargeFileMode = FALSE;
+#endif
 int		iDefaultEOLMode;
 BOOL	bWarnLineEndings;
 BOOL	bFixLineEndings;
@@ -1684,6 +1687,19 @@ HWND EditCreate(HWND hwndParent) {
 	return hwnd;
 }
 
+void EditReplaceDocument(HANDLE pdoc) {
+	const UINT cpEdit = SciCall_GetCodePage();
+	SciCall_SetDocPointer(pdoc);
+	SciCall_SetCodePage(cpEdit);
+	SciCall_SetEOLMode(iEOLMode);
+
+	SciCall_SetUseTabs(!bTabsAsSpaces);
+	SciCall_SetTabIndents(bTabIndents);
+	SciCall_SetBackSpaceUnIndents(bBackspaceUnindents);
+	SciCall_SetTabWidth(iTabWidth);
+	SciCall_SetIndent(iIndentWidth);
+}
+
 //=============================================================================
 //
 // MsgCreate() - Handles WM_CREATE
@@ -2166,6 +2182,10 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	EnableCmd(hmenu, CMD_RELOADOEM, i);
 	EnableCmd(hmenu, CMD_RELOADNOFILEVARS, i);
 	EnableCmd(hmenu, CMD_RECODEDEFAULT, i);
+#if defined(_WIN64)
+	EnableCmd(hmenu, IDM_FILE_LARGE_FILE_MODE, !bLargeFileMode);
+	EnableCmd(hmenu, IDM_FILE_LARGE_FILE_MODE_RELOAD, !bLargeFileMode);
+#endif
 	EnableCmd(hmenu, IDM_FILE_LAUNCH, i);
 	EnableCmd(hmenu, IDM_FILE_PROPERTIES, i);
 	EnableCmd(hmenu, IDM_FILE_CREATELINK, i);
@@ -4352,6 +4372,23 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			bNoEncodingTags = _bNoEncodingTags;
 		}
 		break;
+
+#if defined(_WIN64)
+	case IDM_FILE_LARGE_FILE_MODE_RELOAD:
+		if (StrNotEmpty(szCurFile)) {
+			bLargeFileMode = TRUE;
+			iSrcEncoding = iEncoding;
+			FileLoad(FALSE, FALSE, TRUE, FALSE, szCurFile);
+			bLargeFileMode = SciCall_GetDocumentOptions() & SC_DOCUMENTOPTION_TEXT_LARGE;
+		}
+		if (!bLargeFileMode) {
+			EditConvertToLargeMode();
+		}
+		break;
+	case IDM_FILE_LARGE_FILE_MODE:
+		EditConvertToLargeMode();
+		break;
+#endif
 
 	case IDM_LANG_TEXTFILE:
 	case IDM_LANG_2NDTEXTFILE:
