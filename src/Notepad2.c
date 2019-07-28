@@ -1690,6 +1690,8 @@ HWND EditCreate(HWND hwndParent) {
 void EditReplaceDocument(HANDLE pdoc) {
 	const UINT cpEdit = SciCall_GetCodePage();
 	SciCall_SetDocPointer(pdoc);
+	// reduce reference count to 1
+	SciCall_ReleaseDocument(pdoc);
 	SciCall_SetCodePage(cpEdit);
 	SciCall_SetEOLMode(iEOLMode);
 
