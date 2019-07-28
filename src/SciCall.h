@@ -1134,6 +1134,20 @@ NP2_inline const char* SciCall_GetRangePointer(Sci_Position start, Sci_Position 
 	return (const char *)SciCall(SCI_GETRANGEPOINTER, start, lengthRange);
 }
 
+// Multiple views
+
+NP2_inline void SciCall_SetDocPointer(HANDLE doc) {
+	SciCall(SCI_SETDOCPOINTER, 0, (LPARAM)doc);
+}
+
+NP2_inline HANDLE SciCall_CreateDocument(Sci_Position bytes, int documentOptions) {
+	return (HANDLE)SciCall(SCI_CREATEDOCUMENT, bytes, documentOptions);
+}
+
+NP2_inline int SciCall_GetDocumentOptions(void) {
+	return (int)SciCall(SCI_GETDOCUMENTOPTIONS, 0, 0);
+}
+
 // Folding
 
 NP2_inline Sci_Line SciCall_DocLineFromVisible(Sci_Line displayLine) {

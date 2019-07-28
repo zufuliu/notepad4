@@ -106,6 +106,8 @@ static inline void EditSetEmptyText(void) {
 }
 
 BOOL	EditConvertText(UINT cpSource, UINT cpDest, BOOL bSetSavePoint);
+void	EditConvertToLargeMode(void);
+void	EditReplaceDocument(HANDLE pdoc);
 
 char*	EditGetClipboardText(HWND hwnd); // LocalFree()
 BOOL	EditCopyAppend(HWND hwnd);

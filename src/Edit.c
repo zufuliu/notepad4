@@ -98,6 +98,9 @@ static inline void NotifyRectangleSelection(void) {
 //
 extern BOOL bFreezeAppTitle;
 extern BOOL bLockedForEditing;
+#if defined(_WIN64)
+extern BOOL bLargeFileMode;
+#endif
 extern FILEVARS fvCurFile;
 
 void EditSetNewText(LPCSTR lpstrText, DWORD cbText) {
@@ -113,6 +116,17 @@ void EditSetNewText(LPCSTR lpstrText, DWORD cbText) {
 	SciCall_SetXOffset(0);
 
 	FileVars_Apply(&fvCurFile);
+
+#if defined(_WIN64)
+	if (bLargeFileMode) {
+		int options = SciCall_GetDocumentOptions();
+		if (!(options & SC_DOCUMENTOPTION_TEXT_LARGE)) {
+			options |= SC_DOCUMENTOPTION_TEXT_LARGE;
+			HANDLE pdoc = SciCall_CreateDocument(cbText + 1, options);
+			EditReplaceDocument(pdoc);
+		}
+	}
+#endif
 
 	if (cbText > 0) {
 		SciCall_SetModEventMask(SC_MOD_NONE);
@@ -179,6 +193,48 @@ BOOL EditConvertText(UINT cpSource, UINT cpDest, BOOL bSetSavePoint) {
 	}
 	return TRUE;
 }
+
+#if defined(_WIN64)
+void EditConvertToLargeMode(void) {
+	int options = SciCall_GetDocumentOptions();
+	if (options & SC_DOCUMENTOPTION_TEXT_LARGE) {
+		return;
+	}
+
+	options |= SC_DOCUMENTOPTION_TEXT_LARGE;
+	const Sci_Position length = SciCall_GetLength();
+	HANDLE pdoc = SciCall_CreateDocument(length + 1, options);
+	char *pchText = NULL;
+	if (length > 0) {
+		pchText = (char *)NP2HeapAlloc(length + 1);
+		SciCall_GetText(NP2HeapSize(pchText), pchText);
+	}
+
+	bLockedForEditing = FALSE;
+	SciCall_SetReadOnly(FALSE);
+	SciCall_Cancel();
+	SciCall_SetUndoCollection(FALSE);
+	SciCall_EmptyUndoBuffer();
+	SciCall_ClearAll();
+	SciCall_ClearMarker();
+
+	EditReplaceDocument(pdoc);
+	if (length > 0) {
+		SciCall_SetModEventMask(SC_MOD_NONE);
+		SciCall_AddText(length, pchText);
+		SciCall_SetModEventMask(SC_MOD_INSERTTEXT | SC_MOD_DELETETEXT);
+	}
+
+	SciCall_SetUndoCollection(TRUE);
+	SciCall_EmptyUndoBuffer();
+	SciCall_GotoPos(0);
+	SciCall_ChooseCaretX();
+	SciCall_SetSavePoint();
+
+	Style_SetLexer(pLexCurrent, TRUE);
+	bLargeFileMode = TRUE;
+}
+#endif
 
 //=============================================================================
 //
@@ -439,7 +495,7 @@ BOOL EditLoadFile(LPWSTR pszFile, BOOL bSkipEncodingDetection, EditFileIOStatus 
 	//     1. the buffers we allocated below, depends on encoding.
 	//     2. Scintilla's content buffer and style buffer, see CellBuffer class.
 	// large file TODO:
-	// [ ] [> 2 GiB] use SC_DOCUMENTOPTION_TEXT_LARGE somewhere or hard-coded in EditModel::EditModel().
+	// [x] [> 2 GiB] use SC_DOCUMENTOPTION_TEXT_LARGE somewhere or hard-coded in EditModel::EditModel().
 	// [ ] [> 4 GiB] use SetFilePointerEx() and ReadFile()/WriteFile() to read/write file.
 	// [ ] [> 2 GiB] fix encoding conversion with MultiByteToWideChar() and WideCharToMultiByte().
 	// [x] [> 4 GiB] fix sprintf(), wsprintf() for Sci_Position and Sci_Line, currently UINT is used.
