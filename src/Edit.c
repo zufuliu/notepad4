@@ -231,6 +231,9 @@ void EditConvertToLargeMode(void) {
 		SciCall_AddText(length, pchText);
 		SciCall_SetModEventMask(SC_MOD_INSERTTEXT | SC_MOD_DELETETEXT);
 	}
+	if (pchText != NULL) {
+		NP2HeapFree(pchText);
+	}
 
 	SciCall_SetUndoCollection(TRUE);
 	SciCall_EmptyUndoBuffer();
@@ -476,7 +479,7 @@ BOOL EditLoadFile(LPWSTR pszFile, BOOL bSkipEncodingDetection, EditFileIOStatus 
 
 	// display real path name
 	if (IsVistaAndAbove()) {
-		// since since Windows Vista
+		// since Windows Vista
 		typedef DWORD (WINAPI *GetFinalPathNameByHandleSig)(HANDLE hFile, LPWSTR lpszFilePath, DWORD cchFilePath, DWORD dwFlags);
 		WCHAR path[MAX_PATH] = L"";
 #if _WIN32_WINNT >= _WIN32_WINNT_VISTA
