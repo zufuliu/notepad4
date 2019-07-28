@@ -14,12 +14,10 @@ Disabled warnings:
 	C4201: nonstandard extension used: nameless struct/union.
 	C4204: nonstandard extension used: non-constant aggregate initializer.
 
-/wd26429 /wd26446 /wd26451 /wd26454 /wd26472 /wd26481 /wd26482 /wd26485 /wd26486 /wd26489 /wd26494 /wd26495
+/wd26429 /wd26446 /wd26472 /wd26481 /wd26482 /wd26485 /wd26486 /wd26489 /wd26494 /wd26495
 Disabled Code Analysis warnings:
 	C26429: Symbol is never tested for nullness, it can be marked as not_null (f.23).
 	C26446: Prefer to use gsl::at() instead of unchecked subscript operator (bounds.4).
-	C26451: Arithmetic overflow
-	C26454: Arithmetic overflow
 	C26472: Don't use a static_cast for arithmetic conversions.
 	C26481: Don't use pointer arithmetic. Use span instead (bounds.1)
 	C26482: Only index into arrays using constant expressions (bounds.2).
