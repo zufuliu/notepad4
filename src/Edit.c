@@ -4090,7 +4090,25 @@ void EditEnsureSelectionVisible(void) {
 }
 
 void EditEnsureConsistentLineEndings(void) {
-	SciCall_ConvertEOLs(SciCall_GetEOLMode());
+	const int iEOLMode = SciCall_GetEOLMode();
+	if (iEOLMode == SC_EOL_CRLF) {
+#if defined(_WIN64)
+		const int options = SciCall_GetDocumentOptions();
+		if (!(options & SC_DOCUMENTOPTION_TEXT_LARGE)) {
+			const Sci_Position dwLength = SciCall_GetLength() + SciCall_GetLineCount();
+			if (dwLength >= INT_MAX) {
+				return;
+			}
+		}
+#else
+		const DWORD dwLength = (DWORD)SciCall_GetLength() + (DWORD)SciCall_GetLineCount();
+		if (dwLength >= INT_MAX) {
+			return;
+		}
+#endif
+	}
+
+	SciCall_ConvertEOLs(iEOLMode);
 	EditFixPositions();
 }
 
