@@ -71,6 +71,8 @@ static DString wchAppendSelection;
 static DString wchPrefixLines;
 static DString wchAppendLines;
 
+#define MAX_NON_UTF8_SIZE	(UINT_MAX/2 - 16)
+
 static struct EditMarkAllStatus {
 	int findFlag;
 	Sci_Position iSelCount;
@@ -118,12 +120,13 @@ void EditSetNewText(LPCSTR lpstrText, DWORD cbText) {
 	FileVars_Apply(&fvCurFile);
 
 #if defined(_WIN64)
-	if (bLargeFileMode) {
+	if (bLargeFileMode || cbText >= MAX_NON_UTF8_SIZE) {
 		int options = SciCall_GetDocumentOptions();
 		if (!(options & SC_DOCUMENTOPTION_TEXT_LARGE)) {
 			options |= SC_DOCUMENTOPTION_TEXT_LARGE;
 			HANDLE pdoc = SciCall_CreateDocument(cbText + 1, options);
 			EditReplaceDocument(pdoc);
+			bLargeFileMode = TRUE;
 		}
 	}
 #endif
@@ -153,6 +156,10 @@ BOOL EditConvertText(UINT cpSource, UINT cpDest, BOOL bSetSavePoint) {
 	}
 
 	const Sci_Position length = SciCall_GetLength();
+	if (length >= MAX_NON_UTF8_SIZE) {
+		return TRUE;
+	}
+
 	char *pchText = NULL;
 	int cbText = 0;
 	if (length > 0) {
@@ -500,11 +507,24 @@ BOOL EditLoadFile(LPWSTR pszFile, BOOL bSkipEncodingDetection, EditFileIOStatus 
 	// [ ] [> 2 GiB] fix encoding conversion with MultiByteToWideChar() and WideCharToMultiByte().
 	// [x] [> 4 GiB] fix sprintf(), wsprintf() for Sci_Position and Sci_Line, currently UINT is used.
 	// [x] [> 2 GiB] ensure Sci_PositionCR is same as Sci_Position, see Sci_Position.h
-	const LONGLONG maxFileSize = INT64_C(0x80000000);
+	LONGLONG maxFileSize = INT64_C(0x100000000);
 #else
 	// 2 GiB: ptrdiff_t / Sci_Position used in Scintilla
-	const LONGLONG maxFileSize = INT64_C(0x80000000);
+	LONGLONG maxFileSize = INT64_C(0x80000000);
 #endif
+
+	MEMORYSTATUSEX statex;
+	ULONGLONG maxMem = 0;
+	statex.dwLength = sizeof(statex);
+	if (GlobalMemoryStatusEx(&statex)) {
+		maxMem = statex.ullTotalPhys/3U;
+		if (maxMem < (ULONGLONG)maxFileSize) {
+			maxFileSize = (LONGLONG)maxMem;
+		}
+	} else {
+		dwLastIOError = GetLastError();
+	}
+
 	if (fileSize.QuadPart > maxFileSize) {
 		CloseHandle(hFile);
 		status->bFileTooBig = TRUE;
@@ -512,9 +532,15 @@ BOOL EditLoadFile(LPWSTR pszFile, BOOL bSkipEncodingDetection, EditFileIOStatus 
 		iWeakSrcEncoding = -1;
 		WCHAR tchDocSize[32];
 		WCHAR tchMaxSize[32];
+		WCHAR tchDocBytes[32];
+		WCHAR tchMaxBytes[32];
 		StrFormatByteSize(fileSize.QuadPart, tchDocSize, COUNTOF(tchDocSize));
 		StrFormatByteSize(maxFileSize, tchMaxSize, COUNTOF(tchMaxSize));
-		MsgBox(MBWARN, IDS_WARNLOADBIGFILE, pszFile, tchDocSize, tchMaxSize);
+		_i64tow(fileSize.QuadPart, tchDocBytes, 10);
+		_i64tow(maxFileSize, tchMaxBytes, 10);
+		FormatNumberStr(tchDocBytes);
+		FormatNumberStr(tchMaxBytes);
+		MsgBox(MBWARN, IDS_WARNLOADBIGFILE, pszFile, tchDocSize, tchDocBytes, tchMaxSize, tchMaxBytes);
 		return FALSE;
 	}
 
@@ -572,9 +598,9 @@ BOOL EditLoadFile(LPWSTR pszFile, BOOL bSkipEncodingDetection, EditFileIOStatus 
 		SciCall_SetCodePage((mEncoding[iEncoding].uFlags & NCP_DEFAULT) ? iDefaultCodePage : SC_CP_UTF8);
 		EditSetEmptyText();
 		SciCall_SetEOLMode(status->iEOLMode);
-	} else if ((iSrcEncoding == CPI_UNICODE || iSrcEncoding == CPI_UNICODEBE) // reload as UTF-16
+	} else if (cbData < MAX_NON_UTF8_SIZE && ((iSrcEncoding == CPI_UNICODE || iSrcEncoding == CPI_UNICODEBE) // reload as UTF-16
 		|| (!bSkipEncodingDetection && iSrcEncoding == -1 && !utf8Sig && IsUnicode(lpData, cbData, &bBOM, &bReverse))
-		) {
+		)) {
 		if (iSrcEncoding == CPI_UNICODE) {
 			bBOM = (lpData[0] == '\xFF' && lpData[1] == '\xFE');
 			bReverse = FALSE;
@@ -620,7 +646,7 @@ BOOL EditLoadFile(LPWSTR pszFile, BOOL bSkipEncodingDetection, EditFileIOStatus 
 		}
 		if ((iSrcEncoding == CPI_UTF8 || iSrcEncoding == CPI_UTF8SIGN) // reload as UTF-8 or UTF-8 filevar
 			|| ((iSrcEncoding == -1) && ((bLoadANSIasUTF8 && !bPreferOEM) // load ANSI as UTF-8
-				|| (!bSkipEncodingDetection && (utf8Sig || IsUTF8(lpData, cbData)))
+				|| ((!bSkipEncodingDetection || cbData >= MAX_NON_UTF8_SIZE) && (utf8Sig || IsUTF8(lpData, cbData)))
 			))
 		) {
 			SciCall_SetCodePage(SC_CP_UTF8);
@@ -648,7 +674,9 @@ BOOL EditLoadFile(LPWSTR pszFile, BOOL bSkipEncodingDetection, EditFileIOStatus 
 			}
 
 			const UINT uCodePage = mEncoding[iEncoding].uCodePage;
-			if ((mEncoding[iEncoding].uFlags & NCP_8BIT) || ((mEncoding[iEncoding].uFlags & NCP_7BIT) && IsUTF7(lpData, cbData))) {
+			if (cbData < MAX_NON_UTF8_SIZE && ((mEncoding[iEncoding].uFlags & NCP_8BIT)
+				|| ((mEncoding[iEncoding].uFlags & NCP_7BIT) && IsUTF7(lpData, cbData))
+			)) {
 				LPWSTR lpDataWide = (LPWSTR)NP2HeapAlloc(cbData * sizeof(WCHAR) + 16);
 				const int cbDataWide = MultiByteToWideChar(uCodePage, 0, lpData, cbData, lpDataWide, (int)(NP2HeapSize(lpDataWide) / sizeof(WCHAR)));
 				NP2HeapFree(lpData);
@@ -722,16 +750,29 @@ BOOL EditSaveFile(HWND hwnd, LPCWSTR pszFile, BOOL bSaveCopy, EditFileIOStatus *
 	BOOL bWriteSuccess;
 	// get text
 	DWORD cbData = (DWORD)SciCall_GetLength();
-	char *lpData = (char *)NP2HeapAlloc(cbData + 1);
-	SciCall_GetText(NP2HeapSize(lpData), lpData);
+	char *lpData = NULL;
 
 	if (cbData == 0) {
 		bWriteSuccess = SetEndOfFile(hFile);
 		dwLastIOError = GetLastError();
 	} else {
 		DWORD dwBytesWritten;
-		const int iEncoding = status->iEncoding;
-		const UINT uFlags = mEncoding[iEncoding].uFlags;
+		int iEncoding = status->iEncoding;
+		UINT uFlags = mEncoding[iEncoding].uFlags;
+		if (cbData >= MAX_NON_UTF8_SIZE) {
+			// save in UTF-8 or ANSI
+			if (!(uFlags & (NCP_DEFAULT | NCP_UTF8))) {
+				if (uFlags & NCP_UNICODE_BOM) {
+					iEncoding = CPI_UTF8SIGN;
+				} else {
+					iEncoding = CPI_UTF8;
+				}
+				uFlags = mEncoding[iEncoding].uFlags;
+			}
+		}
+
+		lpData = (char *)NP2HeapAlloc(cbData + 1);
+		SciCall_GetText(NP2HeapSize(lpData), lpData);
 		// FIXME: move checks in front of disk file access
 		/*if ((uFlags & NCP_UNICODE) == 0 && (uFlags & NCP_UTF8_SIGN) == 0) {
 				BOOL bEncodingMismatch = TRUE;
@@ -827,9 +868,11 @@ BOOL EditSaveFile(HWND hwnd, LPCWSTR pszFile, BOOL bSaveCopy, EditFileIOStatus *
 		}
 	}
 
-	NP2HeapFree(lpData);
-	CloseHandle(hFile);
+	if (lpData != NULL) {
+		NP2HeapFree(lpData);
+	}
 
+	CloseHandle(hFile);
 	if (bWriteSuccess) {
 		if (!bSaveCopy) {
 			SciCall_SetSavePoint();
