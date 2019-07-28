@@ -258,7 +258,7 @@
     <ClCompile Include="..\..\src\Notepad2.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\Print.cpp">
+    <ClCompile Include="..\..\src\Bridge.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\Styles.c">

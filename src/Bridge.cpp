@@ -3,8 +3,9 @@
 *
 * Notepad2
 *
-* Print.cpp
-*   Scintilla Printing Functionality
+* Bridge.cpp
+*   Functionalities implemented in C++:
+*   1. Printing
 *   Mostly taken from SciTE, (c) Neil Hodgson, https://www.scintilla.org
 *
 * See Readme.txt for more information about this source code.
@@ -567,4 +568,4 @@ static void EditPrintInit() noexcept {
 	}
 }
 
-// End of Print.cpp
+// End of Bridge.cpp
