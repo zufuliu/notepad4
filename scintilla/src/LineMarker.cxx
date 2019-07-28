@@ -181,7 +181,7 @@ void LineMarker::Draw(Surface *surface, PRectangle rcWhole, const Font &fontForC
 			centreY + dimOn2);
 		surface->Ellipse(rcCircle, fore, back);
 	} else if (markType == SC_MARK_ARROW) {
-		Point pts[] = {
+		const Point pts[] = {
 			Point::FromInts(centreX - dimOn4, centreY - dimOn2),
 			Point::FromInts(centreX - dimOn4, centreY + dimOn2),
 			Point::FromInts(centreX + dimOn2 - dimOn4, centreY),
@@ -189,7 +189,7 @@ void LineMarker::Draw(Surface *surface, PRectangle rcWhole, const Font &fontForC
 		surface->Polygon(pts, std::size(pts), fore, back);
 
 	} else if (markType == SC_MARK_ARROWDOWN) {
-		Point pts[] = {
+		const Point pts[] = {
 			Point::FromInts(centreX - dimOn2, centreY - dimOn4),
 			Point::FromInts(centreX + dimOn2, centreY - dimOn4),
 			Point::FromInts(centreX, centreY + dimOn2 - dimOn4),
@@ -197,7 +197,7 @@ void LineMarker::Draw(Surface *surface, PRectangle rcWhole, const Font &fontForC
 		surface->Polygon(pts, std::size(pts), fore, back);
 
 	} else if (markType == SC_MARK_PLUS) {
-		Point pts[] = {
+		const Point pts[] = {
 			Point::FromInts(centreX - armSize, centreY - 1),
 			Point::FromInts(centreX - 1, centreY - 1),
 			Point::FromInts(centreX - 1, centreY - armSize),
@@ -214,7 +214,7 @@ void LineMarker::Draw(Surface *surface, PRectangle rcWhole, const Font &fontForC
 		surface->Polygon(pts, std::size(pts), fore, back);
 
 	} else if (markType == SC_MARK_MINUS) {
-		Point pts[] = {
+		const Point pts[] = {
 			Point::FromInts(centreX - armSize, centreY - 1),
 			Point::FromInts(centreX + armSize, centreY - 1),
 			Point::FromInts(centreX + armSize, centreY + 1),
@@ -405,7 +405,7 @@ void LineMarker::Draw(Surface *surface, PRectangle rcWhole, const Font &fontForC
 			right += 4;
 		}
 	} else if (markType == SC_MARK_SHORTARROW) {
-		Point pts[] = {
+		const Point pts[] = {
 			Point::FromInts(centreX, centreY + dimOn2),
 			Point::FromInts(centreX + dimOn2, centreY),
 			Point::FromInts(centreX, centreY - dimOn2),
@@ -422,7 +422,7 @@ void LineMarker::Draw(Surface *surface, PRectangle rcWhole, const Font &fontForC
 		surface->FillRectangle(rcLeft, back);
 	} else if (markType == SC_MARK_BOOKMARK) {
 		const int halfHeight = minDim / 3;
-		Point pts[] = {
+		const Point pts[] = {
 			Point::FromInts(ircWhole.left, centreY - halfHeight),
 			Point::FromInts(ircWhole.right - 3, centreY - halfHeight),
 			Point::FromInts(ircWhole.right - 3 - halfHeight, centreY),
@@ -432,7 +432,7 @@ void LineMarker::Draw(Surface *surface, PRectangle rcWhole, const Font &fontForC
 		surface->Polygon(pts, std::size(pts), fore, back);
 	} else if (markType == SC_MARK_VERTICALBOOKMARK) {
 		const int halfWidth = minDim / 3;
-		Point pts[] = {
+		const Point pts[] = {
 			Point::FromInts(centreX - halfWidth, centreY - dimOn2),
 			Point::FromInts(centreX + halfWidth, centreY - dimOn2),
 			Point::FromInts(centreX + halfWidth, centreY + dimOn2),
