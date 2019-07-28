@@ -116,7 +116,7 @@ public:
 
 	constexpr explicit Point(XYPOSITION x_ = 0, XYPOSITION y_ = 0) noexcept : x(x_), y(y_) {}
 
-	static Point FromInts(int x_, int y_) noexcept {
+	static constexpr Point FromInts(int x_, int y_) noexcept {
 		return Point(static_cast<XYPOSITION>(x_), static_cast<XYPOSITION>(y_));
 	}
 
@@ -150,7 +150,7 @@ public:
 	constexpr explicit PRectangle(XYPOSITION left_ = 0, XYPOSITION top_ = 0, XYPOSITION right_ = 0, XYPOSITION bottom_ = 0) noexcept :
 		left(left_), top(top_), right(right_), bottom(bottom_) {}
 
-	static PRectangle FromInts(int left_, int top_, int right_, int bottom_) noexcept {
+	static constexpr PRectangle FromInts(int left_, int top_, int right_, int bottom_) noexcept {
 		return PRectangle(static_cast<XYPOSITION>(left_), static_cast<XYPOSITION>(top_),
 			static_cast<XYPOSITION>(right_), static_cast<XYPOSITION>(bottom_));
 	}

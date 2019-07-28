@@ -133,14 +133,14 @@ void CallTip::DrawChunk(Surface *surface, int &x, const char *s,
 					surface->FillRectangle(rcClientInner, colourUnSel);
 
 					if (upArrow) {      // Up arrow
-						Point pts[] = {
+						const Point pts[] = {
 							Point::FromInts(centreX - halfWidth, centreY + quarterWidth),
 							Point::FromInts(centreX + halfWidth, centreY + quarterWidth),
 							Point::FromInts(centreX, centreY - halfWidth + quarterWidth),
 						};
 						surface->Polygon(pts, std::size(pts), colourBG, colourBG);
 					} else {            // Down arrow
-						Point pts[] = {
+						const Point pts[] = {
 							Point::FromInts(centreX - halfWidth, centreY - quarterWidth),
 							Point::FromInts(centreX + halfWidth, centreY - quarterWidth),
 							Point::FromInts(centreX, centreY + halfWidth - quarterWidth),

@@ -1177,7 +1177,6 @@ LPCWSTR Style_FindStyleValue(PEDITLEXER pLex, int style) {
 //
 void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 	int iValue;
-	char msg[10];
 
 	// Select default if NULL is specified
 	if (!pLexNew) {
@@ -1203,6 +1202,7 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 	}
 
 	if (bLexerChanged) {
+		char msg[10];
 		SciCall_SetLexer(iLexer);
 		_itoa(rid - 63000, msg, 10);
 		SciCall_SetProperty("lexer.lang.type", msg);
@@ -4457,7 +4457,7 @@ static INT_PTR CALLBACK Style_SelectLexerDlgProc(HWND hwnd, UINT umsg, WPARAM wP
 // Style_SelectLexerDlg()
 //
 void Style_SelectLexerDlg(HWND hwnd) {
-	const PEDITLEXER pLex = pLexCurrent;
+	const LPCEDITLEXER pLex = pLexCurrent;
 	const int langIndex = np2LexLangIndex;
 	if (IDOK == ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_STYLESELECT), GetParent(hwnd), Style_SelectLexerDlgProc, 0)) {
 		const BOOL bLexerChanged = pLex != pLexCurrent || langIndex != np2LexLangIndex;

@@ -148,8 +148,8 @@ public:
 	int annotationVisible;
 	int annotationStyleOffset;
 	bool braceHighlightIndicatorSet;
-	int braceHighlightIndicator;
 	bool braceBadLightIndicatorSet;
+	int braceHighlightIndicator;
 	int braceBadLightIndicator;
 	int edgeState;
 	EdgeProperties theEdge;

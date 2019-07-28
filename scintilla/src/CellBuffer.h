@@ -153,7 +153,7 @@ public:
 
 	Sci::Position Length() const noexcept;
 	void Allocate(Sci::Position newSize);
-	void SetUTF8Substance(bool utf8Substance_);
+	void SetUTF8Substance(bool utf8Substance_) noexcept;
 	int GetLineEndTypes() const noexcept {
 		return utf8LineEnds;
 	}
