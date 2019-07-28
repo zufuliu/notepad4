@@ -1144,6 +1144,10 @@ NP2_inline HANDLE SciCall_CreateDocument(Sci_Position bytes, int documentOptions
 	return (HANDLE)SciCall(SCI_CREATEDOCUMENT, bytes, documentOptions);
 }
 
+NP2_inline void SciCall_ReleaseDocument(HANDLE doc) {
+	SciCall(SCI_RELEASEDOCUMENT, 0, (LPARAM)doc);
+}
+
 NP2_inline int SciCall_GetDocumentOptions(void) {
 	return (int)SciCall(SCI_GETDOCUMENTOPTIONS, 0, 0);
 }
