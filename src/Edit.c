@@ -159,7 +159,7 @@ BOOL EditConvertText(UINT cpSource, UINT cpDest, BOOL bSetSavePoint) {
 	}
 
 	const Sci_Position length = SciCall_GetLength();
-	if (length >= MAX_NON_UTF8_SIZE) {
+	if (length >= (int)MAX_NON_UTF8_SIZE) {
 		return TRUE;
 	}
 
@@ -431,12 +431,23 @@ void EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus *status) {
 		if (maskCR) {
 			maskCR |= maskLF; // CR alone is rare
 			do {
+				// AVX2: _tzcnt_u32()
+#if defined(__clang__) || defined(__GNUC__)
+				const int trailing = __builtin_ctz(maskCR);
+				maskCR >>= trailing + 1; // __builtin_ffs()
+				ptr += trailing;
+#elif defined(_MSC_VER)
+				DWORD trailing = 0;
+				_BitScanForward(&trailing, maskCR);
+				maskCR >>= trailing + 1;
+				ptr += trailing;
+#else
 				while (!(maskCR & 1)) {
 					maskCR >>= 1;
 					++ptr;
 				}
-
 				maskCR >>= 1;
+#endif
 				const UINT type = eol_table[*ptr++];
 				switch (type) {
 				case 1:
@@ -502,7 +513,11 @@ void EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus *status) {
 #if 0
 	StopWatch_Stop(watch);
 	StopWatch_ShowLog(&watch, "EOL time");
-	printf("%s CR+LF:%I64d, LF: %I64d, CR: %I64d\n", __func__, linesCount[SC_EOL_CRLF], linesCount[SC_EOL_LF], linesCount[SC_EOL_CR]);
+#if defined(_WIN64)
+	printf("%s CR+LF:%" PRId64 ", LF: %" PRId64 ", CR: %" PRId64 "\n", __func__, linesCount[SC_EOL_CRLF], linesCount[SC_EOL_LF], linesCount[SC_EOL_CR]);
+#else
+	printf("%s CR+LF:%d, LF: %d, CR: %d\n", __func__, linesCount[SC_EOL_CRLF], linesCount[SC_EOL_LF], linesCount[SC_EOL_CR]);
+#endif
 #endif
 
 	status->iEOLMode = iEOLMode;
