@@ -11,6 +11,9 @@
 #include "Styles.h"
 #include "Dialogs.h"
 #include "resource.h"
+#if NP2_USE_SSE2
+#include <emmintrin.h>
+#endif
 
 extern BOOL bSkipUnicodeDetection;
 extern int iDefaultCodePage;
@@ -1094,10 +1097,6 @@ BOOL IsUTF8(const char *pTest, DWORD nLength) {
 }
 #endif
 
-#if NP2_USE_SSE2
-#include <emmintrin.h>
-#endif
-
 // Copyright (c) 2008-2010 Bjoern Hoehrmann <bjoern@hoehrmann.de>
 // See https://bjoern.hoehrmann.de/utf-8/decoder/dfa/ for details.
 
@@ -1155,7 +1154,7 @@ BOOL IsUTF8(const char *pTest, DWORD nLength) {
 		}
 #if NP2_USE_SSE2
 		while (pt + sizeof(__m128i) < end) {
-			__m128i chunk = _mm_load_si128((__m128i *)pt);
+			const __m128i chunk = _mm_load_si128((__m128i *)pt);
 			if (_mm_movemask_epi8(chunk)) {
 				ptr = pt + sizeof(__m128i);
 				while (pt < ptr) {
@@ -1218,7 +1217,7 @@ BOOL IsUTF8(const char *pTest, DWORD nLength) {
 
 #if 0
 	StopWatch_Stop(watch);
-	StopWatch_Show(&watch, L"UTF8 time");
+	StopWatch_ShowLog(&watch, "UTF8 time");
 #endif
 
 	return state == UTF8_ACCEPT;
@@ -1244,7 +1243,7 @@ BOOL IsUTF7(const char *pTest, DWORD nLength) {
 		}
 #if NP2_USE_SSE2
 		while (pt + sizeof(__m128i) < end) {
-			__m128i chunk = _mm_load_si128((__m128i *)pt);
+			const __m128i chunk = _mm_load_si128((__m128i *)pt);
 			if (_mm_movemask_epi8(chunk)) {
 				return FALSE;
 			}
