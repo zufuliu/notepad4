@@ -41,7 +41,7 @@ static KEYWORDLIST Keywords_CPP = {{
 "__auto_type auto char double float int long short signed unsigned void "
 "bool char8_t char16_t char32_t wchar_t nullptr_t nothrow_t "
 "_Bool complex _Complex _Imaginary imaginary "
-"__w64 __wchar_t __int8 __int16 __int32 __int64 __m128 __m128d __m128i __m256 __m256d __m256i __m64 __int3264 __ptr32 __ptr64 __sptr __uptr "
+"__w64 __wchar_t __int8 __int16 __int32 __int64 __m64 __m128 __m128d __m128i __m256 __m256d __m256i __m512 __m512d __m512i __mmask8 __mmask16 __mmask32 __mmask64 __int3264 __ptr32 __ptr64 __sptr __uptr "
 "__int128 __float80 __float128 __fp16 __complex__ __real__ __imag__ __complex128 _Decimal32 _Decimal64 _Decimal128 decimal32 decimal64 decimal128 "
 "int128 qfloat "
 
