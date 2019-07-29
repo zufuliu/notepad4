@@ -36,6 +36,9 @@
 #include "Styles.h"
 #include "Dialogs.h"
 #include "resource.h"
+#if NP2_USE_SSE2
+#include <emmintrin.h>
+#endif
 
 extern HWND hwndMain;
 extern DWORD dwLastIOError;
@@ -372,6 +375,22 @@ BOOL EditCopyAppend(HWND hwnd) {
 	return succ;
 }
 
+// https://graphics.stanford.edu/~seander/bithacks.html#CountBitsSetParallel
+// https://docs.microsoft.com/en-us/cpp/intrinsics/popcnt16-popcnt-popcnt64
+// use __popcnt() or _mm_popcnt_u32() require testing __cpuid():
+/*
+* int cpuInfo[4] = {0};
+* __cpuid(cpuInfo, 0x00000001);
+* const BOOL cpuPOPCNT = cpuInfo[2] & (1 << 23);
+*/
+#if !defined(__clang__) && !defined(__GNUC__)
+static inline unsigned int bth_popcount(unsigned int v) {
+	v = v - ((v >> 1) & 0x55555555U);
+	v = (v & 0x33333333U) + ((v >> 2) & 0x33333333U);
+	return (((v + (v >> 4)) & 0x0F0F0F0FU) * 0x01010101U) >> 24;
+}
+#endif
+
 //=============================================================================
 //
 // EditDetectEOLMode()
@@ -393,7 +412,6 @@ void EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus *status) {
 	StopWatch_Start(watch);
 #endif
 
-#if 1
 	// tools/GenerateTable.py
 	static const uint8_t eol_table[16] = {
 		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 2, 0, 0, // 00 - 0F
@@ -401,6 +419,53 @@ void EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus *status) {
 
 	const uint8_t *ptr = (const uint8_t *)lpData;
 	const uint8_t * const end = ptr + cbData;
+
+#if NP2_USE_SSE2
+	const __m128i vectCR = _mm_set1_epi8('\r');
+	const __m128i vectLF = _mm_set1_epi8('\n');
+	while (ptr + sizeof(__m128i) < end) {
+		// unaligned loading: line starts at random position.
+		const __m128i chunk = _mm_loadu_si128((__m128i *)ptr);
+		UINT maskCR = _mm_movemask_epi8(_mm_cmpeq_epi8(chunk, vectCR));
+		const UINT maskLF = _mm_movemask_epi8(_mm_cmpeq_epi8(chunk, vectLF));
+		if (maskCR) {
+			maskCR |= maskLF; // CR alone is rare
+			do {
+				while (!(maskCR & 1)) {
+					maskCR >>= 1;
+					++ptr;
+				}
+
+				maskCR >>= 1;
+				const UINT type = eol_table[*ptr++];
+				switch (type) {
+				case 1:
+					++linesCount[SC_EOL_LF];
+					break;
+				case 2:
+					if (*ptr == '\n') {
+						++ptr;
+						maskCR >>= 1;
+						++linesCount[SC_EOL_CRLF];
+					} else {
+						++linesCount[SC_EOL_CR];
+					}
+					break;
+				}
+			} while (maskCR);
+		} else if (maskLF) {
+#if defined(__clang__) || defined(__GNUC__)
+			linesCount[SC_EOL_LF] += __builtin_popcount(maskLF);
+#else
+			linesCount[SC_EOL_LF] += bth_popcount(maskLF);
+#endif
+			ptr += sizeof(__m128i);
+		} else {
+			ptr += sizeof(__m128i);
+		}
+	}
+#endif // NP2_USE_SSE2
+
 	do {
 		// skip to line end
 		UINT ch;
@@ -422,7 +487,6 @@ void EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus *status) {
 			break;
 		}
 	} while (ptr < end);
-#endif
 
 	const Sci_Line linesMax = max_pos(max_pos(linesCount[0], linesCount[1]), linesCount[2]);
 	if (linesMax != linesCount[iEOLMode]) {
@@ -437,7 +501,8 @@ void EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus *status) {
 
 #if 0
 	StopWatch_Stop(watch);
-	StopWatch_Show(&watch, L"EOL time");
+	StopWatch_ShowLog(&watch, "EOL time");
+	printf("%s CR+LF:%I64d, LF: %I64d, CR: %I64d\n", __func__, linesCount[SC_EOL_CRLF], linesCount[SC_EOL_LF], linesCount[SC_EOL_CR]);
 #endif
 
 	status->iEOLMode = iEOLMode;
