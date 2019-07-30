@@ -36,7 +36,9 @@
 #include "Styles.h"
 #include "Dialogs.h"
 #include "resource.h"
-#if NP2_USE_SSE2
+#if NP2_USE_AVX2
+#include <immintrin.h>
+#elif NP2_USE_SSE2
 #include <emmintrin.h>
 #endif
 
@@ -383,6 +385,7 @@ BOOL EditCopyAppend(HWND hwnd) {
 * __cpuid(cpuInfo, 0x00000001);
 * const BOOL cpuPOPCNT = cpuInfo[2] & (1 << 23);
 */
+// Function Multiversioning https://gcc.gnu.org/wiki/FunctionMultiVersioning
 #if !defined(__clang__) && !defined(__GNUC__)
 static inline unsigned int bth_popcount(unsigned int v) {
 	v = v - ((v >> 1) & 0x55555555U);
@@ -420,33 +423,74 @@ void EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus *status) {
 	const uint8_t *ptr = (const uint8_t *)lpData;
 	const uint8_t * const end = ptr + cbData;
 
-#if NP2_USE_SSE2
+#if NP2_USE_AVX2
+	const __m256i vectCR = _mm256_set1_epi8('\r');
+	const __m256i vectLF = _mm256_set1_epi8('\n');
+	while (ptr + sizeof(__m256i) < end) {
+		// unaligned loading: line starts at random position.
+		const __m256i chunk = _mm256_loadu_si256((__m256i *)ptr);
+		uint32_t maskCR = _mm256_movemask_epi8(_mm256_cmpeq_epi8(chunk, vectCR));
+		const uint32_t maskLF = _mm256_movemask_epi8(_mm256_cmpeq_epi8(chunk, vectLF));
+		if (maskCR) {
+			maskCR |= maskLF; // CR alone is rare
+			do {
+#if defined(__clang__) || defined(__GNUC__)
+				const int trailing = __builtin_ctz(maskCR);
+#else
+				const DWORD trailing = _tzcnt_u32(maskCR);
+#endif
+				maskCR >>= trailing;
+				//! shift 32 bit is undefined behavior: (0x80000000 >> 32) == 0x80000000.
+				maskCR >>= 1;
+				ptr += trailing;
+
+				const UINT type = eol_table[*ptr++];
+				switch (type) {
+				case 1:
+					++linesCount[SC_EOL_LF];
+					break;
+				case 2:
+					if (*ptr == '\n') {
+						++ptr;
+						maskCR >>= 1;
+						++linesCount[SC_EOL_CRLF];
+					} else {
+						++linesCount[SC_EOL_CR];
+					}
+					break;
+				}
+			} while (maskCR);
+		} else if (maskLF) {
+#if defined(__clang__) || defined(__GNUC__)
+			linesCount[SC_EOL_LF] += __builtin_popcount(maskLF);
+#else
+			linesCount[SC_EOL_LF] += _mm_popcnt_u32(maskLF);
+#endif
+			ptr += sizeof(__m256i);
+		} else {
+			ptr += sizeof(__m256i);
+		}
+	}
+#elif NP2_USE_SSE2
 	const __m128i vectCR = _mm_set1_epi8('\r');
 	const __m128i vectLF = _mm_set1_epi8('\n');
 	while (ptr + sizeof(__m128i) < end) {
 		// unaligned loading: line starts at random position.
 		const __m128i chunk = _mm_loadu_si128((__m128i *)ptr);
-		UINT maskCR = _mm_movemask_epi8(_mm_cmpeq_epi8(chunk, vectCR));
-		const UINT maskLF = _mm_movemask_epi8(_mm_cmpeq_epi8(chunk, vectLF));
+		uint32_t maskCR = _mm_movemask_epi8(_mm_cmpeq_epi8(chunk, vectCR));
+		const uint32_t maskLF = _mm_movemask_epi8(_mm_cmpeq_epi8(chunk, vectLF));
 		if (maskCR) {
 			maskCR |= maskLF; // CR alone is rare
 			do {
-				// AVX2: _tzcnt_u32()
 #if defined(__clang__) || defined(__GNUC__)
 				const int trailing = __builtin_ctz(maskCR);
 				maskCR >>= trailing + 1; // __builtin_ffs()
 				ptr += trailing;
-#elif defined(_MSC_VER)
-				DWORD trailing = 0;
+#else
+				DWORD trailing;
 				_BitScanForward(&trailing, maskCR);
 				maskCR >>= trailing + 1;
 				ptr += trailing;
-#else
-				while (!(maskCR & 1)) {
-					maskCR >>= 1;
-					++ptr;
-				}
-				maskCR >>= 1;
 #endif
 				const UINT type = eol_table[*ptr++];
 				switch (type) {
@@ -587,7 +631,7 @@ BOOL EditLoadFile(LPWSTR pszFile, BOOL bSkipEncodingDetection, EditFileIOStatus 
 	// large file TODO:
 	// [x] [> 2 GiB] use SC_DOCUMENTOPTION_TEXT_LARGE somewhere or hard-coded in EditModel::EditModel().
 	// [ ] [> 4 GiB] use SetFilePointerEx() and ReadFile()/WriteFile() to read/write file.
-	// [ ] [> 2 GiB] fix encoding conversion with MultiByteToWideChar() and WideCharToMultiByte().
+	// [-] [> 2 GiB] fix encoding conversion with MultiByteToWideChar() and WideCharToMultiByte().
 	// [x] [> 4 GiB] fix sprintf(), wsprintf() for Sci_Position and Sci_Line, currently UINT is used.
 	// [x] [> 2 GiB] ensure Sci_PositionCR is same as Sci_Position, see Sci_Position.h
 	LONGLONG maxFileSize = INT64_C(0x100000000);
