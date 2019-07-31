@@ -24,8 +24,8 @@ static char **ArrayFromWordList(char *wordlist, size_t slen, int *len, bool only
 	int prev = true;
 	int words = 0;
 	// For rapid determination of whether a character is a separator, build
-	// a look up table.
-	bool wordSeparator[256] = {};	// Initialise all to false.
+	// a look up table, for ASCII only.
+	bool wordSeparator[128] = {};	// Initialise all to false.
 	wordSeparator[static_cast<unsigned int>('\r')] = true;
 	wordSeparator[static_cast<unsigned int>('\n')] = true;
 	if (!onlyLineEnds) {
