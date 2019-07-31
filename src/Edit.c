@@ -565,6 +565,12 @@ void EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus *status) {
 #endif
 #endif
 
+#if defined(_WIN64)
+	if (cbData + linesCount[0] + linesCount[1] + linesCount[2] >= MAX_NON_UTF8_SIZE) {
+		bLargeFileMode = TRUE;
+	}
+#endif
+
 	status->iEOLMode = iEOLMode;
 	status->bInconsistent = ((!!linesCount[0]) + (!!linesCount[1]) + (!!linesCount[2])) > 1;
 	status->linesCount[0] = linesCount[SC_EOL_CRLF];
@@ -762,10 +768,10 @@ BOOL EditLoadFile(LPWSTR pszFile, BOOL bSkipEncodingDetection, EditFileIOStatus 
 			status->bUnicodeErr = TRUE;
 		}
 
-		SciCall_SetCodePage(SC_CP_UTF8);
-		FileVars_Init(lpDataUTF8, cbData - 1, &fvCurFile);
-		EditSetNewText(lpDataUTF8, cbData - 1);
 		EditDetectEOLMode(lpDataUTF8, cbData - 1, status);
+		FileVars_Init(lpDataUTF8, cbData - 1, &fvCurFile);
+		SciCall_SetCodePage(SC_CP_UTF8);
+		EditSetNewText(lpDataUTF8, cbData - 1);
 		NP2HeapFree(lpDataUTF8);
 	} else {
 		FileVars_Init(lpData, cbData, &fvCurFile);
@@ -779,13 +785,13 @@ BOOL EditLoadFile(LPWSTR pszFile, BOOL bSkipEncodingDetection, EditFileIOStatus 
 		) {
 			SciCall_SetCodePage(SC_CP_UTF8);
 			if (utf8Sig) {
+				EditDetectEOLMode(lpData + 3, cbData - 3, status);
 				EditSetNewText(lpData + 3, cbData - 3);
 				iEncoding = CPI_UTF8SIGN;
-				EditDetectEOLMode(lpData + 3, cbData - 3, status);
 			} else {
+				EditDetectEOLMode(lpData, cbData, status);
 				EditSetNewText(lpData, cbData);
 				iEncoding = CPI_UTF8;
-				EditDetectEOLMode(lpData, cbData, status);
 			}
 		} else {
 			iEncoding = iSrcEncoding;
@@ -812,14 +818,14 @@ BOOL EditLoadFile(LPWSTR pszFile, BOOL bSkipEncodingDetection, EditFileIOStatus 
 				cbData = WideCharToMultiByte(CP_UTF8, 0, lpDataWide, cbDataWide, lpData, (int)NP2HeapSize(lpData), NULL, NULL);
 				NP2HeapFree(lpDataWide);
 
+				EditDetectEOLMode(lpData, cbData, status);
 				SciCall_SetCodePage(SC_CP_UTF8);
 				EditSetNewText(lpData, cbData);
-				EditDetectEOLMode(lpData, cbData, status);
 			} else {
+				EditDetectEOLMode(lpData, cbData, status);
 				SciCall_SetCodePage(iDefaultCodePage);
 				EditSetNewText(lpData, cbData);
 				iEncoding = CPI_DEFAULT;
-				EditDetectEOLMode(lpData, cbData, status);
 			}
 		}
 	}
