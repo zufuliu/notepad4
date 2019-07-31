@@ -1184,6 +1184,7 @@ BOOL IsUTF8(const char *pTest, DWORD nLength) {
 			}
 			pt += sizeof(__m256i);
 		}
+		_mm256_zeroupper();
 #elif NP2_USE_SSE2
 		while (pt + sizeof(__m128i) < end) {
 			const __m128i chunk = _mm_load_si128((__m128i *)pt);
@@ -1297,6 +1298,7 @@ BOOL IsUTF7(const char *pTest, DWORD nLength) {
 			}
 			pt += sizeof(__m256i);
 		}
+		_mm256_zeroupper();
 #elif NP2_USE_SSE2
 		while (pt + sizeof(__m128i) < end) {
 			const __m128i chunk = _mm_load_si128((__m128i *)pt);
