@@ -772,6 +772,8 @@ void PositionCache::Clear() noexcept {
 }
 
 #if PositionCacheHashSizeUsePowerOfTwo
+// https://graphics.stanford.edu/~seander/bithacks.html#RoundUpPowerOf2
+// Bit Twiddling Hacks Copyright 1997-2005 Sean Eron Anderson
 static constexpr size_t NextPowerOfTwo(size_t x) noexcept {
 	x--;
 	x |= x >> 1;
