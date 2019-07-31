@@ -472,6 +472,7 @@ void EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus *status) {
 			ptr += sizeof(__m256i);
 		}
 	}
+	_mm256_zeroupper();
 #elif NP2_USE_SSE2
 	const __m128i vectCR = _mm_set1_epi8('\r');
 	const __m128i vectLF = _mm_set1_epi8('\n');
