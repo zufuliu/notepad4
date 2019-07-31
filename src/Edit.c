@@ -377,7 +377,7 @@ BOOL EditCopyAppend(HWND hwnd) {
 	return succ;
 }
 
-// https://graphics.stanford.edu/~seander/bithacks.html#CountBitsSetParallel
+// Function Multiversioning https://gcc.gnu.org/wiki/FunctionMultiVersioning
 // https://docs.microsoft.com/en-us/cpp/intrinsics/popcnt16-popcnt-popcnt64
 // use __popcnt() or _mm_popcnt_u32() require testing __cpuid():
 /*
@@ -385,7 +385,8 @@ BOOL EditCopyAppend(HWND hwnd) {
 * __cpuid(cpuInfo, 0x00000001);
 * const BOOL cpuPOPCNT = cpuInfo[2] & (1 << 23);
 */
-// Function Multiversioning https://gcc.gnu.org/wiki/FunctionMultiVersioning
+// https://graphics.stanford.edu/~seander/bithacks.html#CountBitsSetParallel
+// Bit Twiddling Hacks copyright 1997-2005 Sean Eron Anderson
 #if !defined(__clang__) && !defined(__GNUC__)
 static inline unsigned int bth_popcount(unsigned int v) {
 	v = v - ((v >> 1) & 0x55555555U);
