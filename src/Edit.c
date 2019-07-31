@@ -381,7 +381,7 @@ BOOL EditCopyAppend(HWND hwnd) {
 // https://docs.microsoft.com/en-us/cpp/intrinsics/popcnt16-popcnt-popcnt64
 // use __popcnt() or _mm_popcnt_u32() require testing __cpuid():
 /*
-* int cpuInfo[4] = {0};
+* int cpuInfo[4];
 * __cpuid(cpuInfo, 0x00000001);
 * const BOOL cpuPOPCNT = cpuInfo[2] & (1 << 23);
 */
@@ -634,8 +634,9 @@ BOOL EditLoadFile(LPWSTR pszFile, BOOL bSkipEncodingDetection, EditFileIOStatus 
 	// Check if a warning message should be displayed for large files
 #if defined(_WIN64)
 	// less than 1/3 available physical memory:
-	//     1. the buffers we allocated below, depends on encoding.
-	//     2. Scintilla's content buffer and style buffer, see CellBuffer class.
+	//     1. The buffers we allocated below or when saving file, depends on encoding.
+	//     2. Scintilla's content buffer and style buffer, see CellBuffer class. The style buffer can be disabled by using SCLEX_NULL and SC_DOCUMENTOPTION_STYLES_NONE.
+	//     3. Extra memory when moving gaps on editing, it may requires more than 2/3 physical memory.
 	// large file TODO:
 	// [x] [> 2 GiB] use SC_DOCUMENTOPTION_TEXT_LARGE somewhere or hard-coded in EditModel::EditModel().
 	// [ ] [> 4 GiB] use SetFilePointerEx() and ReadFile()/WriteFile() to read/write file.
