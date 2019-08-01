@@ -391,7 +391,7 @@ class ScintillaWin :
 	// supported drag & drop format
 	std::vector<CLIPFORMAT> dropFormat;
 
-	HRESULT hrOle;
+	//HRESULT hrOle;
 	DropSource ds;
 	DataObject dob;
 	DropTarget dt;
@@ -617,7 +617,7 @@ ScintillaWin::ScintillaWin(HWND hwnd) {
 	dropFormat.push_back(CF_UNICODETEXT);
 	dropFormat.push_back(CF_TEXT);
 
-	hrOle = E_FAIL;
+	//hrOle = E_FAIL;
 	wMain = hwnd;
 
 	dob.sci = this;
@@ -649,7 +649,7 @@ void ScintillaWin::Init() {
 	// Initialize COM.  If the app has already done this it will have
 	// no effect.  If the app hasn't, we really shouldn't ask them to call
 	// it just so this internal feature works.
-	hrOle = ::OleInitialize(nullptr);
+	//hrOle = ::OleInitialize(nullptr);
 
 	// Find SetCoalescableTimer which is only available from Windows 8+
 	SetCoalescableTimerFn = reinterpret_cast<SetCoalescableTimerSig>(
@@ -671,9 +671,9 @@ void ScintillaWin::Finalise() noexcept {
 	DropRenderTarget();
 #endif
 	::RevokeDragDrop(MainHWND());
-	if (SUCCEEDED(hrOle)) {
-		::OleUninitialize();
-	}
+	//if (SUCCEEDED(hrOle)) {
+	//	::OleUninitialize();
+	//}
 }
 
 #if defined(USE_D2D)
