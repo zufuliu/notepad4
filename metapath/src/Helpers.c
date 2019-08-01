@@ -263,18 +263,17 @@ HRESULT PrivateSetCurrentProcessExplicitAppUserModelID(PCWSTR AppID) {
 	}
 
 	// since Windows 7
+#if _WIN32_WINNT >= _WIN32_WINNT_WIN7
+	return SetCurrentProcessExplicitAppUserModelID(AppID);
+#else
 	typedef HRESULT (WINAPI *SetCurrentProcessExplicitAppUserModelIDSig)(PCWSTR AppID);
 	SetCurrentProcessExplicitAppUserModelIDSig pfnSetCurrentProcessExplicitAppUserModelID =
-#if _WIN32_WINNT >= _WIN32_WINNT_WIN7
-		SetCurrentProcessExplicitAppUserModelID;
-#else
 		(SetCurrentProcessExplicitAppUserModelIDSig)GetProcAddress(GetModuleHandle(L"shell32.dll"), "SetCurrentProcessExplicitAppUserModelID");
-#endif
-
 	if (pfnSetCurrentProcessExplicitAppUserModelID) {
 		return pfnSetCurrentProcessExplicitAppUserModelID(AppID);
 	}
 	return S_OK;
+#endif
 }
 
 //=============================================================================

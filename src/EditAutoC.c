@@ -1257,7 +1257,7 @@ static BOOL EditCompleteWordCore(int iCondition, BOOL autoInsert) {
 #if 0
 	StopWatch_Stop(watch);
 	const double elapsed = StopWatch_Get(&watch);
-	DebugPrintf("Notepad2 AddDocWord(%u, %u): %.6f\n", pWList->nWordCount, pWList->nTotalLen, elapsed);
+	printf("Notepad2 AddDocWord(%u, %u): %.6f\n", pWList->nWordCount, pWList->nTotalLen, elapsed);
 #endif
 
 	const BOOL bShow = pWList->nWordCount > 0 && !(pWList->nWordCount == 1 && pWList->iMaxLength == iRootLen);
