@@ -45,8 +45,8 @@ struct WordList {
 	char *bufferList[NP2_AUTOC_MAX_BUF_COUNT];
 	char *buffer;
 	int bufferCount;
-	int offset;
-	int capacity;
+	UINT offset;
+	UINT capacity;
 
 	UINT nWordCount;
 	UINT nTotalLen;
@@ -57,9 +57,9 @@ struct WordList {
 	struct WordNode *nodeCacheList[NP2_AUTOC_MAX_CACHE_COUNT];
 	struct WordNode *nodeCache;
 	int cacheCount;
-	int cacheIndex;
-	int cacheCapacity;
-	int cacheBytes;
+	UINT cacheIndex;
+	UINT cacheCapacity;
+	UINT cacheBytes;
 };
 
 // TODO: replace _stricmp() and _strnicmp() with other functions
@@ -150,7 +150,7 @@ static inline void WordList_AddBuffer(struct WordList *pWList) {
 	pWList->bufferList[pWList->bufferCount] = buffer;
 	pWList->buffer = buffer;
 	pWList->bufferCount++;
-	pWList->offset = (int)(align - buffer);
+	pWList->offset = (UINT)(align - buffer);
 }
 
 static inline void WordList_AddCache(struct WordList *pWList) {
@@ -159,7 +159,7 @@ static inline void WordList_AddCache(struct WordList *pWList) {
 	pWList->nodeCache = node;
 	pWList->cacheCount++;
 	pWList->cacheIndex = 0;
-	pWList->cacheCapacity = pWList->cacheBytes / ((int)sizeof(struct WordNode));
+	pWList->cacheCapacity = pWList->cacheBytes / (sizeof(struct WordNode));
 }
 
 void WordList_AddWord(struct WordList *pWList, LPCSTR pWord, int len) {
@@ -246,7 +246,7 @@ void WordList_AddWord(struct WordList *pWList, LPCSTR pWord, int len) {
 	pWList->pListHead = root;
 	pWList->nWordCount++;
 	pWList->nTotalLen += len + 1;
-	pWList->offset += (int)align_up(len + 1);
+	pWList->offset += align_up(len + 1);
 	if (len > pWList->iMaxLength) {
 		pWList->iMaxLength = len;
 	}
