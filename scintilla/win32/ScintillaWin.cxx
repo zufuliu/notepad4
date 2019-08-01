@@ -104,6 +104,10 @@ Used by VSCode, Atom etc.
 #include "PlatWin.h"
 #include "HanjaDic.h"
 
+#ifndef _WIN32_WINNT_WIN8
+#define _WIN32_WINNT_WIN8					0x0602
+#endif
+
 #ifndef SPI_GETWHEELSCROLLLINES
 #define SPI_GETWHEELSCROLLLINES   104
 #endif
@@ -149,8 +153,10 @@ constexpr UINT SC_WORK_IDLE = 5002;
 #define SCS_SETRECONVERTSTRING 0x00010000
 #endif
 
+#if _WIN32_WINNT < _WIN32_WINNT_WIN8
 typedef UINT_PTR (WINAPI *SetCoalescableTimerSig)(HWND hwnd, UINT_PTR nIDEvent,
 	UINT uElapse, TIMERPROC lpTimerFunc, ULONG uToleranceDelay);
+#endif
 
 using namespace Scintilla;
 
@@ -366,7 +372,9 @@ class ScintillaWin :
 
 	bool capturedMouse;
 	bool trackedMouseLeave;
+#if _WIN32_WINNT < _WIN32_WINNT_WIN8
 	SetCoalescableTimerSig SetCoalescableTimerFn;
+#endif
 
 	unsigned int linesPerScroll;	///< Intellimouse support
 	int wheelDelta; ///< Wheel delta from roll
@@ -579,7 +587,9 @@ ScintillaWin::ScintillaWin(HWND hwnd) {
 
 	capturedMouse = false;
 	trackedMouseLeave = false;
+#if _WIN32_WINNT < _WIN32_WINNT_WIN8
 	SetCoalescableTimerFn = nullptr;
+#endif
 
 	linesPerScroll = 0;
 	wheelDelta = 0;   // Wheel delta from roll
@@ -652,8 +662,10 @@ void ScintillaWin::Init() {
 	//hrOle = ::OleInitialize(nullptr);
 
 	// Find SetCoalescableTimer which is only available from Windows 8+
+#if _WIN32_WINNT < _WIN32_WINNT_WIN8
 	SetCoalescableTimerFn = reinterpret_cast<SetCoalescableTimerSig>(
 		::GetProcAddress(::GetModuleHandle(L"user32.dll"), "SetCoalescableTimer"));
+#endif
 
 	vs.indicators[SC_INDICATOR_UNKNOWN] = Indicator(INDIC_HIDDEN, ColourDesired(0, 0, 0xff));
 	vs.indicators[SC_INDICATOR_INPUT] = Indicator(INDIC_DOTS, ColourDesired(0, 0, 0xff));
@@ -2030,11 +2042,19 @@ bool ScintillaWin::FineTickerRunning(TickReason reason) noexcept {
 
 void ScintillaWin::FineTickerStart(TickReason reason, int millis, int tolerance) noexcept {
 	FineTickerCancel(reason);
+#if _WIN32_WINNT < _WIN32_WINNT_WIN8
 	if (SetCoalescableTimerFn && tolerance) {
 		timers[reason] = SetCoalescableTimerFn(MainHWND(), fineTimerStart + reason, millis, nullptr, tolerance);
 	} else {
 		timers[reason] = ::SetTimer(MainHWND(), fineTimerStart + reason, millis, nullptr);
 	}
+#else
+	if (tolerance) {
+		timers[reason] = SetCoalescableTimer(MainHWND(), fineTimerStart + reason, millis, nullptr, tolerance);
+	} else {
+		timers[reason] = ::SetTimer(MainHWND(), fineTimerStart + reason, millis, nullptr);
+	}
+#endif
 }
 
 void ScintillaWin::FineTickerCancel(TickReason reason) noexcept {

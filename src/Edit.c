@@ -611,15 +611,16 @@ BOOL EditLoadFile(LPWSTR pszFile, BOOL bSkipEncodingDetection, EditFileIOStatus 
 
 	// display real path name
 	if (IsVistaAndAbove()) {
-		// since Windows Vista
-		typedef DWORD (WINAPI *GetFinalPathNameByHandleSig)(HANDLE hFile, LPWSTR lpszFilePath, DWORD cchFilePath, DWORD dwFlags);
 		WCHAR path[MAX_PATH] = L"";
+		// since Windows Vista
 #if _WIN32_WINNT >= _WIN32_WINNT_VISTA
-		GetFinalPathNameByHandleSig pfnGetFinalPathNameByHandle = GetFinalPathNameByHandleW;
+		if (GetFinalPathNameByHandleW(hFile, path, MAX_PATH, FILE_NAME_OPENED))
 #else
+		typedef DWORD (WINAPI *GetFinalPathNameByHandleSig)(HANDLE hFile, LPWSTR lpszFilePath, DWORD cchFilePath, DWORD dwFlags);
 		GetFinalPathNameByHandleSig pfnGetFinalPathNameByHandle = (GetFinalPathNameByHandleSig)GetProcAddress(GetModuleHandle(L"kernel32.dll"), "GetFinalPathNameByHandleW");
+		if (pfnGetFinalPathNameByHandle && pfnGetFinalPathNameByHandle(hFile, path, MAX_PATH, FILE_NAME_OPENED))
 #endif
-		if (pfnGetFinalPathNameByHandle && pfnGetFinalPathNameByHandle(hFile, path, MAX_PATH, FILE_NAME_OPENED)) {
+		{
 			if (StrNEqual(path, L"\\\\?\\", CSTRLEN(L"\\\\?\\"))) {
 				WCHAR *p = path + 4;
 				if (StrNEqual(p, L"UNC\\", CSTRLEN(L"UNC\\"))) {
