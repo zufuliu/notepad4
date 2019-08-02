@@ -107,18 +107,20 @@ struct Sorter {
 
 	Sorter(const AutoComplete *ac_, const char *list_) : ac(ac_), list(list_) {
 		int i = 0;
+		const char separator = ac->GetSeparator();
+		const char typesep = ac->GetTypesep();
 		while (list[i]) {
 			indices.push_back(i); // word start
-			while (list[i] != ac->GetTypesep() && list[i] != ac->GetSeparator() && list[i]) {
+			while (list[i] != typesep && list[i] != separator && list[i]) {
 				++i;
 			}
 			indices.push_back(i); // word end
-			if (list[i] == ac->GetTypesep()) {
-				while (list[i] != ac->GetSeparator() && list[i]) {
+			if (list[i] == typesep) {
+				while (list[i] != separator && list[i]) {
 					++i;
 				}
 			}
-			if (list[i] == ac->GetSeparator()) {
+			if (list[i] == separator) {
 				++i;
 				// preserve trailing separator as blank entry
 				if (!list[i]) {
