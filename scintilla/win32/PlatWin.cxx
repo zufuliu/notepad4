@@ -2402,8 +2402,8 @@ public:
 		data.push_back(lid);
 	}
 
-	char *SetWords(const char *s) {
-		words = std::vector<char>(s, s + strlen(s) + 1);
+	char *SetWords(const char *s, size_t length) {
+		words = std::vector<char>(s, s + length + 1);
 		return words.data();
 	}
 };
@@ -2795,13 +2795,13 @@ void ListBoxX::SetDelegate(IListBoxDelegate *lbDelegate) noexcept {
 	delegate = lbDelegate;
 }
 
-void ListBoxX::SetList(const char *list, char separator, char typesep) {
+void ListBoxX::SetList(const char *list, const char separator, const char typesep) {
 	// Turn off redraw while populating the list - this has a significant effect, even if
 	// the listbox is not visible.
 	SetRedraw(false);
 	Clear();
 	const size_t size = strlen(list);
-	char *words = lti.SetWords(list);
+	char *words = lti.SetWords(list, size);
 	char *startword = words;
 	char *numword = nullptr;
 	for (size_t i = 0; i < size; i++) {
