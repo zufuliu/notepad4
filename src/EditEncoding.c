@@ -1168,13 +1168,14 @@ BOOL IsUTF8(const char *pTest, DWORD nLength) {
 				// skip leading and trailing ASCII
 #if defined(__clang__) || defined(__GNUC__)
 				const int trailing = __builtin_ctz(mask);
-				const int leading = 32 - __builtin_clz(mask);
+				const int leading = __builtin_clz(mask) ^ 31;
 #else
 				const DWORD trailing = _tzcnt_u32(mask);
-				const DWORD leading = 32 - __lzcnt(mask);
+				//! on CPU that not support LZCNT, BSR is executed, which will yield incorrect result.
+				const DWORD leading = __lzcnt(mask) ^ 31;
 #endif
 				const uint8_t *temp = pt + trailing;
-				const uint8_t * const endPtr = pt + leading;
+				const uint8_t * const endPtr = pt + leading + 1;
 				do {
 					state = utf8_dfa[256 + state + utf8_dfa[*temp++]];
 					if (state == UTF8_REJECT) {
@@ -1193,17 +1194,15 @@ BOOL IsUTF8(const char *pTest, DWORD nLength) {
 				// skip leading and trailing ASCII
 #if defined(__clang__) || defined(__GNUC__)
 				const int trailing = __builtin_ctz(mask);
-				const int leading = 32 - __builtin_clz(mask);
-				const uint8_t *temp = pt + trailing;
-				const uint8_t * const endPtr = pt + leading;
+				const int leading = __builtin_clz(mask) ^ 31;
 #else
 				DWORD trailing;
-				DWORD leading;
 				_BitScanForward(&trailing, mask);
+				DWORD leading;
 				_BitScanReverse(&leading, mask);
+#endif
 				const uint8_t *temp = pt + trailing;
 				const uint8_t * const endPtr = pt + leading + 1;
-#endif
 				do {
 					state = utf8_dfa[256 + state + utf8_dfa[*temp++]];
 					if (state == UTF8_REJECT) {
