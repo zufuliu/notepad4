@@ -428,6 +428,7 @@ void EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus *status) {
 		const __m256i chunk = _mm256_loadu_si256((__m256i *)ptr);
 		uint32_t maskCR = _mm256_movemask_epi8(_mm256_cmpeq_epi8(chunk, vectCR));
 		const uint32_t maskLF = _mm256_movemask_epi8(_mm256_cmpeq_epi8(chunk, vectLF));
+		_mm256_zeroupper();
 		const uint8_t *const next = ptr + sizeof(__m256i);
 		if (maskCR) {
 			maskCR |= maskLF; // CR alone is rare
@@ -470,7 +471,6 @@ void EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus *status) {
 			ptr = next;
 		}
 	}
-	_mm256_zeroupper();
 	// end NP2_USE_AVX2
 #elif NP2_USE_SSE2
 	const __m128i vectCR = _mm_set1_epi8('\r');
