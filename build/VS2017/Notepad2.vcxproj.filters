@@ -467,10 +467,16 @@
     <ClInclude Include="..\..\scintilla\include\Platform.h">
       <Filter>Scintilla\include</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\scintilla\include\Sci_Position.h">
+      <Filter>Scintilla\include</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\scintilla\include\SciLexer.h">
       <Filter>Scintilla\include</Filter>
     </ClInclude>
     <ClInclude Include="..\..\scintilla\include\Scintilla.h">
+      <Filter>Scintilla\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\scintilla\include\VectorISA.h">
       <Filter>Scintilla\include</Filter>
     </ClInclude>
     <ClInclude Include="..\..\scintilla\lexlib\Accessor.h">
@@ -652,9 +658,6 @@
     </ClInclude>
     <ClInclude Include="..\..\scintilla\win32\PlatWin.h">
       <Filter>Scintilla\win32</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\scintilla\include\Sci_Position.h">
-      <Filter>Scintilla\include</Filter>
     </ClInclude>
     <ClInclude Include="..\..\scintilla\win32\HanjaDic.h">
       <Filter>Scintilla\win32</Filter>

@@ -5,17 +5,13 @@
 #include <commctrl.h>
 #include <commdlg.h>
 #include "SciCall.h"
+#include "VectorISA.h"
 #include "Helpers.h"
 #include "Notepad2.h"
 #include "Edit.h"
 #include "Styles.h"
 #include "Dialogs.h"
 #include "resource.h"
-#if NP2_USE_AVX2
-#include <immintrin.h>
-#elif NP2_USE_SSE2
-#include <emmintrin.h>
-#endif
 
 extern BOOL bSkipUnicodeDetection;
 extern int iDefaultCodePage;
