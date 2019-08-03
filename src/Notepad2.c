@@ -4816,12 +4816,6 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 				// Brace Match
 				if (bMatchBraces) {
-					const Sci_Position iEndStyled = SciCall_GetEndStyled();
-					if (iEndStyled == 0) {
-						// wait idle styling.
-						return 0;
-					}
-
 					Sci_Position iPos = SciCall_GetCurrentPos();
 					int ch = SciCall_GetCharAt(iPos);
 					if (ch < 0x80 && strchr("()[]{}<>", ch)) {
