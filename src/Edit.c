@@ -134,7 +134,15 @@ void EditSetNewText(LPCSTR lpstrText, DWORD cbText) {
 
 	if (cbText > 0) {
 		SciCall_SetModEventMask(SC_MOD_NONE);
+#if 0
+		StopWatch watch;
+		StopWatch_Start(watch);
+#endif
 		SciCall_AddText(cbText, lpstrText);
+#if 0
+		StopWatch_Stop(watch);
+		StopWatch_ShowLog(&watch, "AddText time");
+#endif
 		SciCall_SetModEventMask(SC_MOD_INSERTTEXT | SC_MOD_DELETETEXT);
 	}
 
