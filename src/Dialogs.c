@@ -2263,6 +2263,7 @@ BOOL AutoCompletionSettingsDlg(HWND hwnd) {
 typedef struct _infobox {
 	LPWSTR lpstrMessage;
 	LPWSTR lpstrSetting;
+	LPCWSTR idiIcon;
 	BOOL   bDisableCheckBox;
 } INFOBOX, *LPINFOBOX;
 
@@ -2274,7 +2275,7 @@ static INT_PTR CALLBACK InfoBoxDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 		SetWindowLongPtr(hwnd, DWLP_USER, lParam);
 		const LPCINFOBOX lpib = (LPCINFOBOX)lParam;
 
-		SendDlgItemMessage(hwnd, IDC_INFOBOXICON, STM_SETICON, (WPARAM)LoadIcon(NULL, IDI_EXCLAMATION), 0);
+		SendDlgItemMessage(hwnd, IDC_INFOBOXICON, STM_SETICON, (WPARAM)LoadIcon(NULL, lpib->idiIcon), 0);
 		SetDlgItemText(hwnd, IDC_INFOBOXTEXT, lpib->lpstrMessage);
 		if (lpib->bDisableCheckBox) {
 			EnableWindow(GetDlgItem(hwnd, IDC_INFOBOXCHECK), FALSE);
@@ -2337,6 +2338,7 @@ INT_PTR InfoBox(int iType, LPCWSTR lpstrSetting, UINT uidMessage, ...) {
 	va_end(va);
 
 	ib.lpstrSetting = (LPWSTR)lpstrSetting;
+	ib.idiIcon = (uidMessage == IDS_REPLCOUNT) ? IDI_INFORMATION : IDI_EXCLAMATION;
 	ib.bDisableCheckBox = StrIsEmpty(szIniFile) || StrIsEmpty(lpstrSetting) || iMode == 2;
 
 	const WORD idDlg = (iType == MBYESNO) ? IDD_INFOBOX_YESNO : ((iType == MBOKCANCEL) ? IDD_INFOBOX_OKCANCEL : IDD_INFOBOX_OK);
