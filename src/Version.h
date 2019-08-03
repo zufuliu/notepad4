@@ -77,15 +77,17 @@
 #endif
 
 #if defined(_WIN64)
-	#if defined(__aarch64__) || defined(_ARM64_)
+	#if defined(__aarch64__) || defined(_ARM64_) || defined(_M_ARM64)
 		#define VERSION_FILEVERSION_ARCH	L" (arm64) "
-	#elif defined(__ia64__) || defined(_IA64_)
+	#elif defined(__ia64__) || defined(_IA64_) || defined(_M_IA64)
 		#define VERSION_FILEVERSION_ARCH	L" (ia64) "
+	#elif defined(__AVX2__)
+		#define VERSION_FILEVERSION_ARCH	L" (avx2) "
 	#else
 		#define VERSION_FILEVERSION_ARCH	L" (64-bit) "
 	#endif
 #else
-	#if defined(__arm__) || defined(_ARM_)
+	#if defined(__arm__) || defined(_ARM_)|| defined(_M_ARM)
 		#define VERSION_FILEVERSION_ARCH	L" (arm32) "
 	#else
 		#define VERSION_FILEVERSION_ARCH	L" (32-bit) "
