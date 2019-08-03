@@ -76,6 +76,7 @@
 
 #endif
 
+// use __vectorcall to pass float/double arguments such as Point and PRectangle.
 #if defined(_WIN64) && defined(NDEBUG)
 	#if defined(_MSC_BUILD)
 		#define SCICALL __vectorcall

@@ -58,19 +58,6 @@
 #define NP2_USE_DESIGNATED_INITIALIZER	1
 #endif
 
-#if defined(__aarch64__) || defined(_ARM64_) || defined(__arm__) || defined(_ARM_)
-#define NP2_USE_SSE2	0
-#define NP2_USE_AVX2	0
-#else
-#define NP2_USE_SSE2	1
-// clang & GCC use -mavx2 -mpopcnt -mlzcnt -mbmi (to enable tzcnt).
-#if defined(_WIN64)
-#define NP2_USE_AVX2	0
-#else
-#define NP2_USE_AVX2	0
-#endif
-#endif
-
 // sdkddkver.h
 #ifndef _WIN32_WINNT_VISTA
 #define _WIN32_WINNT_VISTA					0x0600

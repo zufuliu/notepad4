@@ -746,9 +746,10 @@
     <ClInclude Include="..\..\scintilla\include\ILexer.h" />
     <ClInclude Include="..\..\scintilla\include\ILoader.h" />
     <ClInclude Include="..\..\scintilla\include\Platform.h" />
+    <ClInclude Include="..\..\scintilla\include\Sci_Position.h" />
     <ClInclude Include="..\..\scintilla\include\SciLexer.h" />
     <ClInclude Include="..\..\scintilla\include\Scintilla.h" />
-    <ClInclude Include="..\..\scintilla\include\Sci_Position.h" />
+    <ClInclude Include="..\..\scintilla\include\VectorISA.h" />
     <ClInclude Include="..\..\scintilla\lexlib\Accessor.h" />
     <ClInclude Include="..\..\scintilla\lexlib\CharacterSet.h" />
     <ClInclude Include="..\..\scintilla\lexlib\DefaultLexer.h" />

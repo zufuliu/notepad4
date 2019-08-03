@@ -1,0 +1,34 @@
+#ifndef NOTEPAD2_VECTOR_ISA_H_
+#define NOTEPAD2_VECTOR_ISA_H_
+
+#if defined(__aarch64__) || defined(_ARM64_) || defined(__arm__) || defined(_ARM_)
+	#define NP2_USE_SSE2	0
+	#define NP2_USE_AVX2	0
+#else
+	#ifndef NP2_USE_SSE2
+		#define NP2_USE_SSE2	1
+	#endif
+
+	// Clang & GCC use -mavx2 -mpopcnt -mlzcnt -mbmi (to enable tzcnt).
+	// MSVC optional use /arch:AVX2
+	#if defined(_WIN64) && !defined(NP2_USE_AVX2)
+		#if defined(__AVX2__)
+			#define NP2_USE_AVX2	1
+		#else
+			#define NP2_USE_AVX2	0
+		#endif
+	#else
+		#define NP2_USE_AVX2	0
+	#endif // NP2_USE_AVX2
+
+	#include <intrin.h>
+	// TODO: use __isa_enabled/__isa_available in MSVC build to dynamic pick code path.
+	//#if defined(_MSC_VER) || (defined(__has_include) && __has_include(<isa_availability.h>))
+	//	#include <isa_availability.h>
+	//#else
+	//#endif
+#endif
+
+#endif // NOTEPAD2_VECTOR_ISA_H_
+
+// end of VectorISA.h
