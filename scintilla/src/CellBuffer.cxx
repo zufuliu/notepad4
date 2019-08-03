@@ -20,6 +20,7 @@
 #include <memory>
 
 #include "Platform.h"
+#include "VectorISA.h"
 
 #include "Scintilla.h"
 #include "Position.h"
@@ -919,7 +920,7 @@ void CellBuffer::RecalculateIndexLineStarts(Sci::Line lineFirst, Sci::Line lineL
 	}
 }
 
-void CellBuffer::BasicInsertString(Sci::Position position, const char *s, Sci::Position insertLength) {
+void CellBuffer::BasicInsertString(const Sci::Position position, const char * const s, const Sci::Position insertLength) {
 	if (insertLength == 0)
 		return;
 	PLATFORM_ASSERT(insertLength > 0);
@@ -964,33 +965,158 @@ void CellBuffer::BasicInsertString(Sci::Position position, const char *s, Sci::P
 	if (breakingUTF8LineEnd) {
 		RemoveLine(lineInsert);
 	}
+
 	unsigned char ch = ' ';
-	for (Sci::Position i = 0; i < insertLength; i++) {
-		ch = s[i];
-		if (ch == '\r') {
-			InsertLine(lineInsert, (position + i) + 1, atLineStart);
-			lineInsert++;
-			simpleInsertion = false;
-		} else if (ch == '\n') {
-			if (chPrev == '\r') {
-				// Patch up what was end of line
-				plv->SetLineStart(lineInsert - 1, (position + i) + 1);
-			} else {
-				InsertLine(lineInsert, (position + i) + 1, atLineStart);
-				lineInsert++;
-			}
-			simpleInsertion = false;
-		} else if (utf8LineEnds) {
-			const unsigned char back3[3] = { chBeforePrev, chPrev, ch };
-			if (UTF8IsSeparator(back3) || UTF8IsNEL(back3 + 1)) {
+	if (utf8LineEnds || insertLength < 32) {
+		for (Sci::Position i = 0; i < insertLength; i++) {
+			ch = s[i];
+			if (ch == '\r') {
 				InsertLine(lineInsert, (position + i) + 1, atLineStart);
 				lineInsert++;
 				simpleInsertion = false;
+			} else if (ch == '\n') {
+				if (chPrev == '\r') {
+					// Patch up what was end of line
+					plv->SetLineStart(lineInsert - 1, (position + i) + 1);
+				} else {
+					InsertLine(lineInsert, (position + i) + 1, atLineStart);
+					lineInsert++;
+				}
+				simpleInsertion = false;
+			} else if (utf8LineEnds) {
+				const unsigned char back3[3] = { chBeforePrev, chPrev, ch };
+				if (UTF8IsSeparator(back3) || UTF8IsNEL(back3 + 1)) {
+					InsertLine(lineInsert, (position + i) + 1, atLineStart);
+					lineInsert++;
+					simpleInsertion = false;
+				}
+			}
+			chBeforePrev = chPrev;
+			chPrev = ch;
+		}
+	} else {
+		// see EditDetectEOLMode() in Edit.c
+		const char * const end = s + insertLength;
+		const char *ptr = s;
+#if NP2_USE_AVX2
+		const __m256i vectCR = _mm256_set1_epi8('\r');
+		const __m256i vectLF = _mm256_set1_epi8('\n');
+		while (ptr + sizeof(__m256i) <= end) {
+			const __m256i chunk = _mm256_loadu_si256((__m256i *)ptr);
+			uint32_t mask = _mm256_movemask_epi8(_mm256_cmpeq_epi8(chunk, vectCR))
+				| _mm256_movemask_epi8(_mm256_cmpeq_epi8(chunk, vectLF));
+			_mm256_zeroupper();
+			const char * const next = ptr + sizeof(__m256i);
+			if (mask) {
+				do {
+#if defined(__clang__) || defined(__GNUC__)
+					const int trailing = __builtin_ctz(mask);
+#else
+					const uint32_t trailing = _tzcnt_u32(mask);
+#endif
+					mask >>= trailing;
+					//! shift 32 bit is undefined behavior: (0x80000000 >> 32) == 0x80000000.
+					mask >>= 1;
+					ptr += trailing;
+
+					ch = *ptr++;
+					if (ch == '\r') {
+						InsertLine(lineInsert, (position + ptr - s), atLineStart);
+						lineInsert++;
+						simpleInsertion = false;
+					} else if (ch == '\n')  {
+						if (chPrev == '\r') {
+							// Patch up what was end of line
+							plv->SetLineStart(lineInsert - 1, (position + ptr - s));
+						} else {
+							InsertLine(lineInsert, (position + ptr - s), atLineStart);
+							lineInsert++;
+						}
+						simpleInsertion = false;
+					}
+					chPrev = ch;
+				} while (mask);
+				if (ptr < next) {
+					ch = ' ';
+					chPrev = ' ';
+					ptr = next;
+				}
+			} else {
+				ch = ' ';
+				chPrev = ' ';
+				ptr = next;
 			}
 		}
-		chBeforePrev = chPrev;
-		chPrev = ch;
+		// end NP2_USE_AVX2
+#elif NP2_USE_SSE2
+		const __m128i vectCR = _mm_set1_epi8('\r');
+		const __m128i vectLF = _mm_set1_epi8('\n');
+		while (ptr + sizeof(__m128i) <= end) {
+			const __m128i chunk = _mm_loadu_si128((__m128i *)ptr);
+			uint32_t mask = _mm_movemask_epi8(_mm_cmpeq_epi8(chunk, vectCR))
+				| _mm_movemask_epi8(_mm_cmpeq_epi8(chunk, vectLF));
+			const char * const next = ptr + sizeof(__m128i);
+			if (mask) {
+				do {
+#if defined(__clang__) || defined(__GNUC__)
+					const int trailing = __builtin_ctz(mask);
+#else
+					unsigned long trailing;
+					_BitScanForward(&trailing, mask);
+#endif
+					mask >>= trailing + 1;
+					ptr += trailing;
+
+					ch = *ptr++;
+					if (ch == '\r') {
+						InsertLine(lineInsert, (position + ptr - s), atLineStart);
+						lineInsert++;
+						simpleInsertion = false;
+					} else if (ch == '\n')  {
+						if (chPrev == '\r') {
+							// Patch up what was end of line
+							plv->SetLineStart(lineInsert - 1, (position + ptr - s));
+						} else {
+							InsertLine(lineInsert, (position + ptr - s), atLineStart);
+							lineInsert++;
+						}
+						simpleInsertion = false;
+					}
+					chPrev = ch;
+				} while (mask);
+				if (ptr < next) {
+					ch = ' ';
+					chPrev = ' ';
+					ptr = next;
+				}
+			} else {
+				ch = ' ';
+				chPrev = ' ';
+				ptr = next;
+			}
+		}
+		// end NP2_USE_SSE2
+#endif
+		while (ptr < end) {
+			ch = *ptr++;
+			if (ch == '\r') {
+				InsertLine(lineInsert, (position + ptr - s), atLineStart);
+				lineInsert++;
+				simpleInsertion = false;
+			} else if (ch == '\n')  {
+				if (chPrev == '\r') {
+					// Patch up what was end of line
+					plv->SetLineStart(lineInsert - 1, (position + ptr - s));
+				} else {
+					InsertLine(lineInsert, (position + ptr - s), atLineStart);
+					lineInsert++;
+				}
+				simpleInsertion = false;
+			}
+			chPrev = ch;
+		}
 	}
+
 	// Joining two lines where last insertion is cr and following substance starts with lf
 	if (chAfter == '\n') {
 		if (ch == '\r') {
@@ -1027,7 +1153,7 @@ void CellBuffer::BasicInsertString(Sci::Position position, const char *s, Sci::P
 	}
 }
 
-void CellBuffer::BasicDeleteChars(Sci::Position position, Sci::Position deleteLength) {
+void CellBuffer::BasicDeleteChars(const Sci::Position position, const Sci::Position deleteLength) {
 	if (deleteLength == 0)
 		return;
 
