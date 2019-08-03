@@ -1,10 +1,13 @@
 #ifndef NOTEPAD2_VECTOR_ISA_H_
 #define NOTEPAD2_VECTOR_ISA_H_
 
-#if defined(__aarch64__) || defined(_ARM64_) || defined(__arm__) || defined(_ARM_)
+#if defined(__aarch64__) || defined(_ARM64_) || defined(__arm__) || defined(_ARM_) || defined(_M_ARM64) || defined(_M_ARM)
+	#define NP2_TARGET_ARM	1
 	#define NP2_USE_SSE2	0
 	#define NP2_USE_AVX2	0
+	// TODO: use ARM Neon
 #else
+	#define NP2_TARGET_ARM	0
 	#ifndef NP2_USE_SSE2
 		#define NP2_USE_SSE2	1
 	#endif
@@ -22,7 +25,7 @@
 	#endif // NP2_USE_AVX2
 
 	#include <intrin.h>
-	// TODO: use __isa_enabled/__isa_available in MSVC build to dynamic pick code path.
+	// TODO: use __isa_enabled/__isa_available in MSVC build to dynamic enable AVX2 code.
 	//#if defined(_MSC_VER) || (defined(__has_include) && __has_include(<isa_availability.h>))
 	//	#include <isa_availability.h>
 	//#else

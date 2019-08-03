@@ -967,7 +967,12 @@ void CellBuffer::BasicInsertString(const Sci::Position position, const char * co
 	}
 
 	unsigned char ch = ' ';
-	if (utf8LineEnds || insertLength < 32) {
+#if NP2_TARGET_ARM
+	if (utf8LineEnds)
+#else
+	if (utf8LineEnds || insertLength < 32)
+#endif
+	{
 		for (Sci::Position i = 0; i < insertLength; i++) {
 			ch = s[i];
 			if (ch == '\r') {
