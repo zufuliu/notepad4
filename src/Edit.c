@@ -451,12 +451,12 @@ void EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus *status) {
 				maskCR >>= 1;
 				ptr += trailing;
 
-				const UINT type = eol_table[*ptr++];
-				switch (type) {
-				case 1:
+				const uint8_t ch = *ptr++;
+				switch (ch) {
+				case '\n':
 					++linesCount[SC_EOL_LF];
 					break;
-				case 2:
+				case '\r':
 					if (*ptr == '\n') {
 						++ptr;
 						maskCR >>= 1;
@@ -500,12 +500,13 @@ void EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus *status) {
 #endif
 				maskCR >>= trailing + 1;
 				ptr += trailing;
-				const UINT type = eol_table[*ptr++];
-				switch (type) {
-				case 1:
+
+				const uint8_t ch = *ptr++;
+				switch (ch) {
+				case '\n':
 					++linesCount[SC_EOL_LF];
 					break;
-				case 2:
+				case '\r':
 					if (*ptr == '\n') {
 						++ptr;
 						maskCR >>= 1;
@@ -533,8 +534,8 @@ void EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus *status) {
 
 	do {
 		// skip to line end
-		UINT ch;
-		UINT type = 0;
+		uint8_t ch;
+		uint8_t type = 0;
 		while (ptr < end && ((ch = *ptr++) > '\r' || (type = eol_table[ch]) == 0)) {
 			// nop
 		}
