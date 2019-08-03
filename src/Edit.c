@@ -427,11 +427,12 @@ void EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus *status) {
 #if NP2_USE_AVX2
 	const __m256i vectCR = _mm256_set1_epi8('\r');
 	const __m256i vectLF = _mm256_set1_epi8('\n');
-	while (ptr + sizeof(__m256i) < end) {
+	while (ptr + sizeof(__m256i) <= end) {
 		// unaligned loading: line starts at random position.
 		const __m256i chunk = _mm256_loadu_si256((__m256i *)ptr);
 		uint32_t maskCR = _mm256_movemask_epi8(_mm256_cmpeq_epi8(chunk, vectCR));
 		const uint32_t maskLF = _mm256_movemask_epi8(_mm256_cmpeq_epi8(chunk, vectLF));
+		const uint8_t *const next = ptr + sizeof(__m256i);
 		if (maskCR) {
 			maskCR |= maskLF; // CR alone is rare
 			do {
@@ -461,39 +462,40 @@ void EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus *status) {
 					break;
 				}
 			} while (maskCR);
+			ptr = (ptr < next) ? next : ptr;
 		} else if (maskLF) {
 #if defined(__clang__) || defined(__GNUC__)
 			linesCount[SC_EOL_LF] += __builtin_popcount(maskLF);
 #else
 			linesCount[SC_EOL_LF] += _mm_popcnt_u32(maskLF);
 #endif
-			ptr += sizeof(__m256i);
+			ptr = next;
 		} else {
-			ptr += sizeof(__m256i);
+			ptr = next;
 		}
 	}
 	_mm256_zeroupper();
+	// end NP2_USE_AVX2
 #elif NP2_USE_SSE2
 	const __m128i vectCR = _mm_set1_epi8('\r');
 	const __m128i vectLF = _mm_set1_epi8('\n');
-	while (ptr + sizeof(__m128i) < end) {
+	while (ptr + sizeof(__m128i) <= end) {
 		// unaligned loading: line starts at random position.
 		const __m128i chunk = _mm_loadu_si128((__m128i *)ptr);
 		uint32_t maskCR = _mm_movemask_epi8(_mm_cmpeq_epi8(chunk, vectCR));
 		const uint32_t maskLF = _mm_movemask_epi8(_mm_cmpeq_epi8(chunk, vectLF));
+		const uint8_t *const next = ptr + sizeof(__m128i);
 		if (maskCR) {
 			maskCR |= maskLF; // CR alone is rare
 			do {
 #if defined(__clang__) || defined(__GNUC__)
 				const int trailing = __builtin_ctz(maskCR);
-				maskCR >>= trailing + 1; // __builtin_ffs()
-				ptr += trailing;
 #else
 				DWORD trailing;
 				_BitScanForward(&trailing, maskCR);
+#endif
 				maskCR >>= trailing + 1;
 				ptr += trailing;
-#endif
 				const UINT type = eol_table[*ptr++];
 				switch (type) {
 				case 1:
@@ -510,18 +512,20 @@ void EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus *status) {
 					break;
 				}
 			} while (maskCR);
+			ptr = (ptr < next) ? next : ptr;
 		} else if (maskLF) {
 #if defined(__clang__) || defined(__GNUC__)
 			linesCount[SC_EOL_LF] += __builtin_popcount(maskLF);
 #else
 			linesCount[SC_EOL_LF] += bth_popcount(maskLF);
 #endif
-			ptr += sizeof(__m128i);
+			ptr = next;
 		} else {
-			ptr += sizeof(__m128i);
+			ptr = next;
 		}
 	}
-#endif // NP2_USE_SSE2
+	// end NP2_USE_SSE2
+#endif
 
 	do {
 		// skip to line end

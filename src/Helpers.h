@@ -175,8 +175,7 @@ typedef struct StopWatch {
 
 NP2_inline double StopWatch_Get(const StopWatch *watch) {
 	const LONGLONG diff = watch->end.QuadPart - watch->begin.QuadPart;
-	const double freq = (double)(watch->freq.QuadPart);
-	return (diff * 1000) / freq;
+	return (diff * 1000) / (double)(watch->freq.QuadPart);
 }
 
 void StopWatch_Show(const StopWatch *watch, LPCWSTR msg);

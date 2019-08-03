@@ -1161,7 +1161,7 @@ BOOL IsUTF8(const char *pTest, DWORD nLength) {
 
 	{
 #if NP2_USE_AVX2
-		while (pt + sizeof(__m256i) < end) {
+		while (pt + sizeof(__m256i) <= end) {
 			const __m256i chunk = _mm256_load_si256((__m256i *)pt);
 			const uint32_t mask = _mm256_movemask_epi8(chunk);
 			if (mask) {
@@ -1186,8 +1186,9 @@ BOOL IsUTF8(const char *pTest, DWORD nLength) {
 			pt += sizeof(__m256i);
 		}
 		_mm256_zeroupper();
+		// end NP2_USE_AVX2
 #elif NP2_USE_SSE2
-		while (pt + sizeof(__m128i) < end) {
+		while (pt + sizeof(__m128i) <= end) {
 			const __m128i chunk = _mm_load_si128((__m128i *)pt);
 			const uint32_t mask = _mm_movemask_epi8(chunk);
 			if (mask) {
@@ -1212,6 +1213,7 @@ BOOL IsUTF8(const char *pTest, DWORD nLength) {
 			}
 			pt += sizeof(__m128i);
 		}
+		// end NP2_USE_SSE2
 #elif defined(_WIN64)
 		const uint64_t *temp = (const uint64_t *)pt;
 		const uint64_t * const temp_end = (const uint64_t *)end;
@@ -1229,6 +1231,7 @@ BOOL IsUTF8(const char *pTest, DWORD nLength) {
 			++temp;
 		}
 		pt = (const uint8_t *)temp;
+		// end _WIN64
 #else
 		const uint32_t *temp = (const uint32_t *)pt;
 		const uint32_t * const temp_end = (const uint32_t *)end;
@@ -1246,6 +1249,7 @@ BOOL IsUTF8(const char *pTest, DWORD nLength) {
 			++temp;
 		}
 		pt = (const uint8_t *)temp;
+		// end _WIN32
 #endif
 	}
 
@@ -1290,7 +1294,7 @@ BOOL IsUTF7(const char *pTest, DWORD nLength) {
 
 	{
 #if NP2_USE_AVX2
-		while (pt + sizeof(__m256i) < end) {
+		while (pt + sizeof(__m256i) <= end) {
 			const __m256i chunk = _mm256_load_si256((__m256i *)pt);
 			if (_mm256_movemask_epi8(chunk)) {
 				return FALSE;
@@ -1298,14 +1302,16 @@ BOOL IsUTF7(const char *pTest, DWORD nLength) {
 			pt += sizeof(__m256i);
 		}
 		_mm256_zeroupper();
+		// end NP2_USE_AVX2
 #elif NP2_USE_SSE2
-		while (pt + sizeof(__m128i) < end) {
+		while (pt + sizeof(__m128i) <= end) {
 			const __m128i chunk = _mm_load_si128((__m128i *)pt);
 			if (_mm_movemask_epi8(chunk)) {
 				return FALSE;
 			}
 			pt += sizeof(__m128i);
 		}
+		// end NP2_USE_SSE2
 #elif defined(_WIN64)
 		const uint64_t *temp = (const uint64_t *)pt;
 		const uint64_t * const temp_end = (const uint64_t *)end;
@@ -1316,6 +1322,7 @@ BOOL IsUTF7(const char *pTest, DWORD nLength) {
 			++temp;
 		}
 		pt = (const uint8_t *)temp;
+		// end _WIN64
 #else
 		const uint32_t *temp = (const uint32_t *)pt;
 		const uint32_t * const temp_end = (const uint32_t *)end;
@@ -1326,6 +1333,7 @@ BOOL IsUTF7(const char *pTest, DWORD nLength) {
 			++temp;
 		}
 		pt = (const uint8_t *)temp;
+		// end _WIN32
 #endif
 	}
 
