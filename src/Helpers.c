@@ -235,7 +235,7 @@ void IniSectionSetString(IniSectionOnSave *section, LPCWSTR key, LPCWSTR value) 
 	section->next = p;
 }
 
-void DString_GetWindowText(DString *s, HWND hwnd) {
+int DString_GetWindowText(DString *s, HWND hwnd) {
 	int len = GetWindowTextLength(hwnd);
 	if (len == 0) {
 		if (s->buffer != NULL) {
@@ -250,8 +250,9 @@ void DString_GetWindowText(DString *s, HWND hwnd) {
 				s->capacity = (int)(NP2HeapSize(buffer) / sizeof(WCHAR));
 			}
 		}
-		GetWindowText(hwnd, s->buffer, s->capacity);
+		len = GetWindowText(hwnd, s->buffer, s->capacity);
 	}
+	return len;
 }
 
 int ParseCommaList(LPCWSTR str, int result[], int count) {
@@ -1903,23 +1904,36 @@ BOOL SetDlgItemIntEx(HWND hwnd, int nIdItem, UINT uValue) {
 // A2W: Convert Dialog Item Text form Unicode to UTF-8 and vice versa
 //
 UINT GetDlgItemTextA2W(UINT uCP, HWND hDlg, int nIDDlgItem, LPSTR lpString, int nMaxCount) {
-	WCHAR wsz[1024] = L"";
-	const UINT uRet = GetDlgItemText(hDlg, nIDDlgItem, wsz, COUNTOF(wsz));
+	DString wsz = { NULL, 0 };
+	const int iRet = DString_GetDlgItemText(&wsz, hDlg, nIDDlgItem);
 	ZeroMemory(lpString, nMaxCount);
-	WideCharToMultiByte(uCP, 0, wsz, -1, lpString, nMaxCount - 2, NULL, NULL);
-	return uRet;
+	if (iRet) {
+		WideCharToMultiByte(uCP, 0, wsz.buffer, -1, lpString, nMaxCount - 2, NULL, NULL);
+	}
+	DString_Free(&wsz);
+	return iRet;
 }
 
-UINT SetDlgItemTextA2W(UINT uCP, HWND hDlg, int nIDDlgItem, LPCSTR lpString) {
-	WCHAR wsz[1024] = L"";
-	MultiByteToWideChar(uCP, 0, lpString, -1, wsz, COUNTOF(wsz));
-	return SetDlgItemText(hDlg, nIDDlgItem, wsz);
+void SetDlgItemTextA2W(UINT uCP, HWND hDlg, int nIDDlgItem, LPCSTR lpString) {
+	const int len = lpString ? (int)strlen(lpString) : 0;
+	if (len) {
+		LPWSTR wsz = (LPWSTR)NP2HeapAlloc((len + 1) * sizeof(WCHAR));
+		MultiByteToWideChar(uCP, 0, lpString, -1, wsz, len);
+		SetDlgItemText(hDlg, nIDDlgItem, wsz);
+		NP2HeapFree(wsz);
+	} else {
+		SetDlgItemText(hDlg, nIDDlgItem, L"");
+	}
 }
 
-LRESULT ComboBox_AddStringA2W(UINT uCP, HWND hwnd, LPCSTR lpString) {
-	WCHAR wsz[1024] = L"";
-	MultiByteToWideChar(uCP, 0, lpString, -1, wsz, COUNTOF(wsz));
-	return SendMessage(hwnd, CB_ADDSTRING, 0, (LPARAM)wsz);
+void ComboBox_AddStringA2W(UINT uCP, HWND hwnd, LPCSTR lpString) {
+	const int len = lpString ? (int)strlen(lpString) : 0;
+	if (len) {
+		LPWSTR wsz = (LPWSTR)NP2HeapAlloc((len + 1) * sizeof(WCHAR));
+		MultiByteToWideChar(uCP, 0, lpString, -1, wsz, len);
+		SendMessage(hwnd, CB_ADDSTRING, 0, (LPARAM)wsz);
+		NP2HeapFree(wsz);
+	}
 }
 
 //=============================================================================

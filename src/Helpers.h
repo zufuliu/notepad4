@@ -429,9 +429,9 @@ static inline void DString_Free(DString *s) {
 	}
 }
 
-void DString_GetWindowText(DString *s, HWND hwnd);
-NP2_inline void DString_GetDlgItemText(DString *s, HWND hwndDlg, int nCtlId) {
-	DString_GetWindowText(s, GetDlgItem(hwndDlg, nCtlId));
+int DString_GetWindowText(DString *s, HWND hwnd);
+NP2_inline int DString_GetDlgItemText(DString *s, HWND hwndDlg, int nCtlId) {
+	return DString_GetWindowText(s, GetDlgItem(hwndDlg, nCtlId));
 }
 
 NP2_inline BOOL KeyboardIsKeyDown(int key) {
@@ -597,8 +597,8 @@ void	FormatNumberStr(LPWSTR lpNumberStr);
 BOOL	SetDlgItemIntEx(HWND hwnd, int nIdItem, UINT uValue);
 
 UINT	GetDlgItemTextA2W(UINT uCP, HWND hDlg, int nIDDlgItem, LPSTR lpString, int nMaxCount);
-UINT	SetDlgItemTextA2W(UINT uCP, HWND hDlg, int nIDDlgItem, LPCSTR lpString);
-LRESULT ComboBox_AddStringA2W(UINT uCP, HWND hwnd, LPCSTR lpString);
+void	SetDlgItemTextA2W(UINT uCP, HWND hDlg, int nIDDlgItem, LPCSTR lpString);
+void ComboBox_AddStringA2W(UINT uCP, HWND hwnd, LPCSTR lpString);
 
 UINT CodePageFromCharSet(UINT uCharSet);
 
