@@ -30,6 +30,8 @@
 	//	#include <isa_availability.h>
 	//#else
 	//#endif
+
+	// TODO: Function Multiversioning https://gcc.gnu.org/wiki/FunctionMultiVersioning
 #endif
 
 #endif // NOTEPAD2_VECTOR_ISA_H_
