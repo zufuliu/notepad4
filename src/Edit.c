@@ -381,7 +381,6 @@ BOOL EditCopyAppend(HWND hwnd) {
 	return succ;
 }
 
-// Function Multiversioning https://gcc.gnu.org/wiki/FunctionMultiVersioning
 // https://docs.microsoft.com/en-us/cpp/intrinsics/popcnt16-popcnt-popcnt64
 // use __popcnt() or _mm_popcnt_u32() require testing __cpuid():
 /*

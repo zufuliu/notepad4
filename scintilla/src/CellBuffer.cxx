@@ -18,6 +18,7 @@
 #include <vector>
 #include <algorithm>
 #include <memory>
+//#include <chrono>
 
 #include "Platform.h"
 #include "VectorISA.h"
@@ -28,6 +29,7 @@
 #include "Partitioning.h"
 #include "CellBuffer.h"
 #include "UniConversion.h"
+//#include "ElapsedPeriod.h"
 
 namespace Scintilla {
 
@@ -966,6 +968,7 @@ void CellBuffer::BasicInsertString(const Sci::Position position, const char * co
 		RemoveLine(lineInsert);
 	}
 
+	//ElapsedPeriod period;
 	unsigned char ch = ' ';
 #if NP2_TARGET_ARM
 	if (utf8LineEnds)
@@ -1008,8 +1011,7 @@ void CellBuffer::BasicInsertString(const Sci::Position position, const char * co
 		const __m256i vectLF = _mm256_set1_epi8('\n');
 		while (ptr + sizeof(__m256i) <= end) {
 			const __m256i chunk = _mm256_loadu_si256((__m256i *)ptr);
-			uint32_t mask = _mm256_movemask_epi8(_mm256_cmpeq_epi8(chunk, vectCR))
-				| _mm256_movemask_epi8(_mm256_cmpeq_epi8(chunk, vectLF));
+			uint32_t mask = _mm256_movemask_epi8(_mm256_or_si256(_mm256_cmpeq_epi8(chunk, vectCR), _mm256_cmpeq_epi8(chunk, vectLF)));
 			_mm256_zeroupper();
 			const char * const next = ptr + sizeof(__m256i);
 			if (mask) {
@@ -1122,6 +1124,8 @@ void CellBuffer::BasicInsertString(const Sci::Position position, const char * co
 		}
 	}
 
+	//const double duration = period.Duration()*1e3;
+	//printf("%s avx2=%d, duration=%f\n", __func__, NP2_USE_AVX2, duration);
 	// Joining two lines where last insertion is cr and following substance starts with lf
 	if (chAfter == '\n') {
 		if (ch == '\r') {
