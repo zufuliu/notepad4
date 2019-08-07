@@ -153,9 +153,10 @@ EXIT /B
 
 
 :GCC
-SET INPUTDIR_AVX2=bin\%CONFIG%_AVX2
-SET INPUTDIR_x64=bin\%CONFIG%_x64
-SET INPUTDIR_Win32=bin\%CONFIG%_Win32
+SET "CONFIG=GCC%CONFIG%"
+SET INPUTDIR_AVX2=bin\%CONFIG%\AVX2
+SET INPUTDIR_x64=bin\%CONFIG%\x64
+SET INPUTDIR_Win32=bin\%CONFIG%\Win32
 
 IF /I "%ARCH%" == "AVX2" GOTO GCC_AVX2
 IF /I "%ARCH%" == "x64" GOTO GCC_x64
@@ -241,7 +242,7 @@ EXIT /B
 :SHOWHELP
 TITLE %~nx0 %1
 ECHO. & ECHO.
-ECHO Usage:  %~nx0 [MSVC^|GCC^|Clang^|LLVM] [Release^|Debug] [Win32^|x64^|AVX2^|ARM64^|all]
+ECHO Usage:  %~nx0 [MSVC^|GCC^|Clang^|LLVM] [Win32^|x64^|AVX2^|ARM64^|all] [Release^|Debug]
 ECHO.
 ECHO Notes:  You can also prefix the commands with "-", "--" or "/".
 ECHO         The arguments are not case sensitive.
