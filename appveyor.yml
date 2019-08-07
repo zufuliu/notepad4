@@ -10,6 +10,7 @@ configuration:
 platform:
   - x64
   - Win32
+  - AVX2
   - ARM64
 
 environment:
@@ -94,6 +95,27 @@ for:
       - cmd: CALL "build\install_llvm.bat" 1
       - cmd: CALL "build\VS2017\build.bat" Build ARM64 LLVMDebug 1
 
+  - # MSVC AVX2 Debug
+    matrix:
+      only:
+        - configuration: Debug
+          platform: AVX2
+          compiler: MSVC
+
+    build_script:
+      - cmd: CALL "build\VS2017\build.bat" Build AVX2 Debug 1
+
+  - # Clang AVX2 Debug
+    matrix:
+      only:
+        - configuration: Debug
+          platform: AVX2
+          compiler: Clang
+
+    build_script:
+      - cmd: CALL "build\install_llvm.bat" 1
+      - cmd: CALL "build\VS2017\build.bat" Build AVX2 LLVMDebug 1
+
   - # MSVC x64 Release
     matrix:
       only:
@@ -155,6 +177,37 @@ for:
     artifacts:
       - path: 'build\Notepad2*.zip'
         name: Notepad2_Clang_Win32
+
+  - # MSVC AVX2 Release
+    matrix:
+      only:
+        - configuration: Release
+          platform: AVX2
+          compiler: MSVC
+
+    build_script:
+      - cmd: CALL "build\VS2017\build.bat" Build AVX2 Release 1
+      - cmd: CALL "build\make_zip.bat" MSVC AVX2 Release 1
+
+    artifacts:
+      - path: 'build\Notepad2*.zip'
+        name: Notepad2_AVX2
+
+  - # Clang AVX2 Release
+    matrix:
+      only:
+        - configuration: Release
+          platform: AVX2
+          compiler: Clang
+
+    build_script:
+      - cmd: CALL "build\install_llvm.bat" 1
+      - cmd: CALL "build\VS2017\build.bat" Build AVX2 LLVMRelease 1
+      - cmd: CALL "build\make_zip.bat" Clang AVX2 Release 1
+
+    artifacts:
+      - path: 'build\Notepad2*.zip'
+        name: Notepad2_Clang_AVX2
 
   - # MSVC ARM64 Release
     matrix:

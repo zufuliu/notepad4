@@ -4,7 +4,7 @@
 @rem * Notepad2-mod
 @rem *
 @rem * build_vs2017.bat
-@rem *   Batch file used to build Notepad2 with MSVC2017
+@rem *   Batch file used to build Notepad2 with MSVC 2017, 2019
 @rem *
 @rem * See License.txt for details about distribution and modification.
 @rem *
@@ -67,6 +67,10 @@ IF "%~2" == "" (
   IF /I "%~2" == "/x64"  SET "ARCH=x64" & GOTO CHECKTHIRDARG
   IF /I "%~2" == "-x64"  SET "ARCH=x64" & GOTO CHECKTHIRDARG
   IF /I "%~2" == "--x64" SET "ARCH=x64" & GOTO CHECKTHIRDARG
+  IF /I "%~2" == "AVX2"   SET "ARCH=AVX2" & GOTO CHECKTHIRDARG
+  IF /I "%~2" == "/AVX2"  SET "ARCH=AVX2" & GOTO CHECKTHIRDARG
+  IF /I "%~2" == "-AVX2"  SET "ARCH=AVX2" & GOTO CHECKTHIRDARG
+  IF /I "%~2" == "--AVX2" SET "ARCH=AVX2" & GOTO CHECKTHIRDARG
   IF /I "%~2" == "ARM64"   SET "ARCH=ARM64" & GOTO CHECKTHIRDARG
   IF /I "%~2" == "/ARM64"  SET "ARCH=ARM64" & GOTO CHECKTHIRDARG
   IF /I "%~2" == "-ARM64"  SET "ARCH=ARM64" & GOTO CHECKTHIRDARG
@@ -118,10 +122,14 @@ IF "%~3" == "" (
 
 :START
 SET NEED_ARM64=0
+IF /I "%ARCH%" == "AVX2" (
+	SET "ARCH=x64"
+	IF /I NOT "%CONFIG%" == "all" SET "CONFIG=AVX2%CONFIG%"
+)
 IF /I "%ARCH%" == "all" SET NEED_ARM64=1
 IF /I "%ARCH%" == "ARM64" SET NEED_ARM64=1
 CALL :SubVSPath
-IF NOT EXIST "%VS_PATH%" CALL :SUBMSG "ERROR" "Visual Studio 2017 NOT FOUND, please check VS_PATH environment variable!"
+IF NOT EXIST "%VS_PATH%" CALL :SUBMSG "ERROR" "Visual Studio 2017 or 2019 NOT FOUND, please check VS_PATH environment variable!"
 
 IF /I "%processor_architecture%"=="AMD64" (
 	SET "HOST_ARCH=amd64"
@@ -190,7 +198,7 @@ EXIT /B
 :SHOWHELP
 TITLE %~nx0 %1
 ECHO. & ECHO.
-ECHO Usage: %~nx0 [Clean^|Build^|Rebuild] [Win32^|x64^|ARM64^|all] [Debug^|Release^|LLVMDebug^|LLVMRelease^|all]
+ECHO Usage: %~nx0 [Clean^|Build^|Rebuild] [Win32^|x64^|AVX2^|ARM64^|all] [Debug^|Release^|LLVMDebug^|LLVMRelease^|all]
 ECHO.
 ECHO Notes: You can also prefix the commands with "-", "--" or "/".
 ECHO        The arguments are not case sensitive.
