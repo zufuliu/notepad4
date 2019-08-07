@@ -23,5 +23,15 @@
       <Project Name="Notepad2" ConfigName="Debug_Win32"/>
       <Project Name="metapath" ConfigName="Debug_Win32"/>
     </WorkspaceConfiguration>
+    <WorkspaceConfiguration Name="Release_AVX2" Selected="no">
+      <Environment/>
+      <Project Name="metapath" ConfigName="Release_AVX2"/>
+      <Project Name="Notepad2" ConfigName="Release_AVX2"/>
+    </WorkspaceConfiguration>
+    <WorkspaceConfiguration Name="Debug_AVX2" Selected="no">
+      <Environment/>
+      <Project Name="metapath" ConfigName="Debug_AVX2"/>
+      <Project Name="Notepad2" ConfigName="Debug_AVX2"/>
+    </WorkspaceConfiguration>
   </BuildMatrix>
 </CodeLite_Workspace>
