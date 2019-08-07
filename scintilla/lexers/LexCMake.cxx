@@ -30,6 +30,7 @@ static constexpr bool IsCmakeOperator(int ch) noexcept {
 	return ch == '(' || ch == ')' || ch == '=' || ch == ':' || ch == ';';
 }
 
+// https://cmake.org/cmake/help/v3.15/manual/cmake-language.7.html
 static bool IsBracketArgument(Accessor &styler, Sci_PositionU pos, bool start, int &bracketNumber) noexcept {
 	int offset = 0;
 	++pos; // bracket
@@ -102,8 +103,12 @@ static void ColouriseCmakeDoc(Sci_PositionU startPos, Sci_Position length, int i
 			}
 			break;
 		case SCE_CMAKE_BLOCK_COMMENT:
-			if (sc.chPrev == ']' && sc.ch == ']') {
-				sc.ForwardSetState(SCE_CMAKE_DEFAULT);
+			if (sc.ch == ']') {
+				if (IsBracketArgument(styler, sc.currentPos, false, bracketNumber)) {
+					sc.Forward(1 + bracketNumber);
+					sc.ForwardSetState(SCE_CMAKE_DEFAULT);
+					bracketNumber = 0;
+				}
 			}
 			break;
 		case SCE_CMAKE_STRINGDQ:
@@ -151,9 +156,9 @@ static void ColouriseCmakeDoc(Sci_PositionU startPos, Sci_Position length, int i
 		if (sc.state == SCE_CMAKE_DEFAULT) {
 			varStyle = SCE_CMAKE_DEFAULT;
 			if (sc.ch == '#') {
-				if (sc.chNext == '[' && sc.GetRelative(2) == '[') {
+				if (sc.chNext == '[' && IsBracketArgument(styler, sc.currentPos + 1, true, bracketNumber)) {
 					sc.SetState(SCE_CMAKE_BLOCK_COMMENT);
-					sc.Forward(2);
+					sc.Forward(2 + bracketNumber);
 				} else {
 					sc.SetState(SCE_CMAKE_COMMENT);
 				}
