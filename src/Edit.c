@@ -391,11 +391,19 @@ BOOL EditCopyAppend(HWND hwnd) {
 // https://graphics.stanford.edu/~seander/bithacks.html#CountBitsSetParallel
 // Bit Twiddling Hacks copyright 1997-2005 Sean Eron Anderson
 #if !defined(__clang__) && !defined(__GNUC__)
-static inline unsigned int bth_popcount(unsigned int v) {
+static __forceinline unsigned int bth_popcount(unsigned int v) {
 	v = v - ((v >> 1) & 0x55555555U);
 	v = (v & 0x33333333U) + ((v >> 2) & 0x33333333U);
 	return (((v + (v >> 4)) & 0x0F0F0F0FU) * 0x01010101U) >> 24;
 }
+#endif
+#if defined(__clang__) || defined(__GNUC__)
+#define np2_popcount	__builtin_popcount
+#elif NP2_USE_AVX2
+#define np2_popcount	_mm_popcnt_u32
+#else
+//#define np2_popcount	__popcnt
+#define np2_popcount	bth_popcount
 #endif
 
 //=============================================================================
@@ -425,109 +433,97 @@ void EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus *status) {
 	};
 
 	const uint8_t *ptr = (const uint8_t *)lpData;
+	// TODO: remove implicitly NULL-terminated requirement for *ptr == '\n'
 	const uint8_t * const end = ptr + cbData;
 
 #if NP2_USE_AVX2
+	#define LAST_CR_MASK	(1U << (sizeof(__m256i) - 1))
 	const __m256i vectCR = _mm256_set1_epi8('\r');
 	const __m256i vectLF = _mm256_set1_epi8('\n');
 	while (ptr + sizeof(__m256i) <= end) {
 		// unaligned loading: line starts at random position.
 		const __m256i chunk = _mm256_loadu_si256((__m256i *)ptr);
 		uint32_t maskCR = _mm256_movemask_epi8(_mm256_cmpeq_epi8(chunk, vectCR));
-		const uint32_t maskLF = _mm256_movemask_epi8(_mm256_cmpeq_epi8(chunk, vectLF));
+		uint32_t maskLF = _mm256_movemask_epi8(_mm256_cmpeq_epi8(chunk, vectLF));
 		_mm256_zeroupper();
-		const uint8_t *const next = ptr + sizeof(__m256i);
+		ptr += sizeof(__m256i);
 		if (maskCR) {
-			maskCR |= maskLF; // CR alone is rare
-			do {
-#if defined(__clang__) || defined(__GNUC__)
-				const int trailing = __builtin_ctz(maskCR);
-#else
-				const DWORD trailing = _tzcnt_u32(maskCR);
-#endif
-				maskCR >>= trailing;
-				//! shift 32 bit is undefined behavior: (0x80000000 >> 32) == 0x80000000.
-				maskCR >>= 1;
-				ptr += trailing;
+			// CR+LF across boundary
+			if ((maskCR & LAST_CR_MASK) && *ptr == '\n') {
+				++ptr;
+				maskCR &= LAST_CR_MASK - 1;
+				++linesCount[SC_EOL_CRLF];
+			}
+			// this can be omitted by using maskLF = (maskCR_LF ^ maskCR) | (maskLF & 1), but it seems slower than using if.
+			if (maskLF & 1) { // first LF
+				++linesCount[SC_EOL_LF];
+			}
 
-				const uint8_t ch = *ptr++;
-				switch (ch) {
-				case '\n':
-					++linesCount[SC_EOL_LF];
-					break;
-				case '\r':
-					if (*ptr == '\n') {
-						++ptr;
-						maskCR >>= 1;
-						++linesCount[SC_EOL_CRLF];
-					} else {
-						++linesCount[SC_EOL_CR];
-					}
-					break;
-				}
-			} while (maskCR);
-			ptr = (ptr < next) ? next : ptr;
-		} else if (maskLF) {
-#if defined(__clang__) || defined(__GNUC__)
-			linesCount[SC_EOL_LF] += __builtin_popcount(maskLF);
-#else
-			linesCount[SC_EOL_LF] += _mm_popcnt_u32(maskLF);
-#endif
-			ptr = next;
-		} else {
-			ptr = next;
+			// maskCR and maskLF never have some bit set. after shifting maskLF by 1 bit,
+			// the bits both set in maskCR and maskLF represents CR+LF;
+			// the bits only set in maskCR or maskLF represents individual CR or LF.
+			const uint32_t maskCRLF = maskCR & (maskLF >> 1); // CR+LF
+			const uint32_t maskCR_LF = maskCR ^ (maskLF >> 1);// CR alone or LF alone
+			maskCR = maskCR_LF & maskCR; // CR alone
+			maskLF = maskCR_LF ^ maskCR; // LF alone
+			//maskLF = (maskCR_LF ^ maskCR) | (maskLF & 1); // LF alone plus first LF
+			if (maskCRLF) {
+				linesCount[SC_EOL_CRLF] += np2_popcount(maskCRLF);
+			}
+			if (maskCR) {
+				linesCount[SC_EOL_CR] += np2_popcount(maskCR);
+			}
+		}
+		if (maskLF) {
+			linesCount[SC_EOL_LF] += np2_popcount(maskLF);
 		}
 	}
+
+	#undef LAST_CR_MASK
 	// end NP2_USE_AVX2
 #elif NP2_USE_SSE2
+	#define LAST_CR_MASK	(1U << (sizeof(__m128i) - 1))
 	const __m128i vectCR = _mm_set1_epi8('\r');
 	const __m128i vectLF = _mm_set1_epi8('\n');
 	while (ptr + sizeof(__m128i) <= end) {
 		// unaligned loading: line starts at random position.
 		const __m128i chunk = _mm_loadu_si128((__m128i *)ptr);
 		uint32_t maskCR = _mm_movemask_epi8(_mm_cmpeq_epi8(chunk, vectCR));
-		const uint32_t maskLF = _mm_movemask_epi8(_mm_cmpeq_epi8(chunk, vectLF));
-		const uint8_t *const next = ptr + sizeof(__m128i);
+		uint32_t maskLF = _mm_movemask_epi8(_mm_cmpeq_epi8(chunk, vectLF));
+		ptr += sizeof(__m128i);
 		if (maskCR) {
-			maskCR |= maskLF; // CR alone is rare
-			do {
-#if defined(__clang__) || defined(__GNUC__)
-				const int trailing = __builtin_ctz(maskCR);
-#else
-				DWORD trailing;
-				_BitScanForward(&trailing, maskCR);
-#endif
-				maskCR >>= trailing + 1;
-				ptr += trailing;
+			// CR+LF across boundary
+			if ((maskCR & LAST_CR_MASK) && *ptr == '\n') {
+				++ptr;
+				maskCR &= LAST_CR_MASK - 1;
+				++linesCount[SC_EOL_CRLF];
+			}
+			// this can be omitted by using maskLF = (maskCR_LF ^ maskCR) | (maskLF & 1), but it seems slower than using if.
+			if (maskLF & 1) { // first LF
+				++linesCount[SC_EOL_LF];
+			}
 
-				const uint8_t ch = *ptr++;
-				switch (ch) {
-				case '\n':
-					++linesCount[SC_EOL_LF];
-					break;
-				case '\r':
-					if (*ptr == '\n') {
-						++ptr;
-						maskCR >>= 1;
-						++linesCount[SC_EOL_CRLF];
-					} else {
-						++linesCount[SC_EOL_CR];
-					}
-					break;
-				}
-			} while (maskCR);
-			ptr = (ptr < next) ? next : ptr;
-		} else if (maskLF) {
-#if defined(__clang__) || defined(__GNUC__)
-			linesCount[SC_EOL_LF] += __builtin_popcount(maskLF);
-#else
-			linesCount[SC_EOL_LF] += bth_popcount(maskLF);
-#endif
-			ptr = next;
-		} else {
-			ptr = next;
+			// maskCR and maskLF never have some bit set. after shifting maskLF by 1 bit,
+			// the bits both set in maskCR and maskLF represents CR+LF;
+			// the bits only set in maskCR or maskLF represents individual CR or LF.
+			const uint32_t maskCRLF = maskCR & (maskLF >> 1); // CR+LF
+			const uint32_t maskCR_LF = maskCR ^ (maskLF >> 1);// CR alone or LF alone
+			maskCR = maskCR_LF & maskCR; // CR alone
+			maskLF = maskCR_LF ^ maskCR; // LF alone
+			//maskLF = (maskCR_LF ^ maskCR) | (maskLF & 1); // LF alone plus first LF
+			if (maskCRLF) {
+				linesCount[SC_EOL_CRLF] += np2_popcount(maskCRLF);
+			}
+			if (maskCR) {
+				linesCount[SC_EOL_CR] += np2_popcount(maskCR);
+			}
+		}
+		if (maskLF) {
+			linesCount[SC_EOL_LF] += np2_popcount(maskLF);
 		}
 	}
+
+	#undef LAST_CR_MASK
 	// end NP2_USE_SSE2
 #endif
 
@@ -575,6 +571,7 @@ void EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus *status) {
 #endif
 
 #if defined(_WIN64)
+	// enable conversion between line endings
 	if (cbData + linesCount[0] + linesCount[1] + linesCount[2] >= MAX_NON_UTF8_SIZE) {
 		bLargeFileMode = TRUE;
 	}
