@@ -482,14 +482,18 @@ void EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus *status) {
 	#undef LAST_CR_MASK
 	// end NP2_USE_AVX2
 #elif NP2_USE_SSE2
-	#define LAST_CR_MASK	(1U << (sizeof(__m128i) - 1))
+	#define LAST_CR_MASK	(1U << (2*sizeof(__m128i) - 1))
 	const __m128i vectCR = _mm_set1_epi8('\r');
 	const __m128i vectLF = _mm_set1_epi8('\n');
-	while (ptr + sizeof(__m128i) <= end) {
+	while (ptr + 2*sizeof(__m128i) <= end) {
 		// unaligned loading: line starts at random position.
-		const __m128i chunk = _mm_loadu_si128((__m128i *)ptr);
+		__m128i chunk = _mm_loadu_si128((__m128i *)ptr);
 		uint32_t maskCR = _mm_movemask_epi8(_mm_cmpeq_epi8(chunk, vectCR));
 		uint32_t maskLF = _mm_movemask_epi8(_mm_cmpeq_epi8(chunk, vectLF));
+		ptr += sizeof(__m128i);
+		chunk = _mm_loadu_si128((__m128i *)ptr);
+		maskCR |= _mm_movemask_epi8(_mm_cmpeq_epi8(chunk, vectCR)) << sizeof(__m128i);
+		maskLF |= _mm_movemask_epi8(_mm_cmpeq_epi8(chunk, vectLF)) << sizeof(__m128i);
 		ptr += sizeof(__m128i);
 		if (maskCR) {
 			// CR+LF across boundary
