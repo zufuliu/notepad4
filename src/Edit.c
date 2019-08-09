@@ -450,25 +450,26 @@ void EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus *status) {
 		_mm256_zeroupper();
 		ptr += sizeof(__m256i);
 		if (maskCR) {
-			// CR+LF across boundary
-			if ((maskCR & LAST_CR_MASK) && *ptr == '\n') {
-				++ptr;
+			if (maskCR & LAST_CR_MASK) {
 				maskCR &= LAST_CR_MASK - 1;
-				++lineCountCRLF;
-			}
-			// this can be omitted by using maskLF = (maskCR_LF ^ maskCR) | (maskLF & 1), but it seems slower than using if.
-			if (maskLF & 1) { // first LF
-				++lineCountLF;
+				if (*ptr == '\n') {
+					// CR+LF across boundary
+					++ptr;
+					++lineCountCRLF;
+				} else {
+					// clear highest bit (last CR) to avoid using following code:
+					// maskCR = (maskCR_LF ^ maskLF) | (maskCR & LAST_CR_MASK);
+					++lineCountCR;
+				}
 			}
 
-			// maskCR and maskLF never have some bit set. after shifting maskLF by 1 bit,
+			// maskCR and maskLF never have some bit set. after shifting maskCR by 1 bit,
 			// the bits both set in maskCR and maskLF represents CR+LF;
 			// the bits only set in maskCR or maskLF represents individual CR or LF.
-			const uint32_t maskCRLF = maskCR & (maskLF >> 1); // CR+LF
-			const uint32_t maskCR_LF = maskCR ^ (maskLF >> 1);// CR alone or LF alone
-			maskCR = maskCR_LF & maskCR; // CR alone
-			maskLF = maskCR_LF ^ maskCR; // LF alone
-			//maskLF = (maskCR_LF ^ maskCR) | (maskLF & 1); // LF alone plus first LF
+			const uint32_t maskCRLF = (maskCR << 1) & maskLF; // CR+LF
+			const uint32_t maskCR_LF = (maskCR << 1) ^ maskLF;// CR alone or LF alone
+			maskLF = maskCR_LF & maskLF; // LF alone
+			maskCR = maskCR_LF ^ maskLF; // CR alone
 			if (maskCRLF) {
 				lineCountCRLF += np2_popcount(maskCRLF);
 			}
@@ -498,25 +499,26 @@ void EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus *status) {
 		maskLF |= _mm_movemask_epi8(_mm_cmpeq_epi8(chunk, vectLF)) << sizeof(__m128i);
 		ptr += sizeof(__m128i);
 		if (maskCR) {
-			// CR+LF across boundary
-			if ((maskCR & LAST_CR_MASK) && *ptr == '\n') {
-				++ptr;
+			if (maskCR & LAST_CR_MASK) {
 				maskCR &= LAST_CR_MASK - 1;
-				++lineCountCRLF;
-			}
-			// this can be omitted by using maskLF = (maskCR_LF ^ maskCR) | (maskLF & 1), but it seems slower than using if.
-			if (maskLF & 1) { // first LF
-				++lineCountLF;
+				if (*ptr == '\n') {
+					// CR+LF across boundary
+					++ptr;
+					++lineCountCRLF;
+				} else {
+					// clear highest bit (last CR) to avoid using following code:
+					// maskCR = (maskCR_LF ^ maskLF) | (maskCR & LAST_CR_MASK);
+					++lineCountCR;
+				}
 			}
 
-			// maskCR and maskLF never have some bit set. after shifting maskLF by 1 bit,
+			// maskCR and maskLF never have some bit set. after shifting maskCR by 1 bit,
 			// the bits both set in maskCR and maskLF represents CR+LF;
 			// the bits only set in maskCR or maskLF represents individual CR or LF.
-			const uint32_t maskCRLF = maskCR & (maskLF >> 1); // CR+LF
-			const uint32_t maskCR_LF = maskCR ^ (maskLF >> 1);// CR alone or LF alone
-			maskCR = maskCR_LF & maskCR; // CR alone
-			maskLF = maskCR_LF ^ maskCR; // LF alone
-			//maskLF = (maskCR_LF ^ maskCR) | (maskLF & 1); // LF alone plus first LF
+			const uint32_t maskCRLF = (maskCR << 1) & maskLF; // CR+LF
+			const uint32_t maskCR_LF = (maskCR << 1) ^ maskLF;// CR alone or LF alone
+			maskLF = maskCR_LF & maskLF; // LF alone
+			maskCR = maskCR_LF ^ maskLF; // CR alone
 			if (maskCRLF) {
 				lineCountCRLF += np2_popcount(maskCRLF);
 			}
