@@ -1058,11 +1058,12 @@ void CellBuffer::BasicInsertString(const Sci::Position position, const char * co
 #elif NP2_USE_SSE2
 		const __m128i vectCR = _mm_set1_epi8('\r');
 		const __m128i vectLF = _mm_set1_epi8('\n');
-		while (ptr + sizeof(__m128i) <= end) {
-			const __m128i chunk = _mm_loadu_si128((__m128i *)ptr);
-			uint32_t mask = _mm_movemask_epi8(_mm_cmpeq_epi8(chunk, vectCR))
-				| _mm_movemask_epi8(_mm_cmpeq_epi8(chunk, vectLF));
-			const char * const next = ptr + sizeof(__m128i);
+		while (ptr + 2*sizeof(__m128i) <= end) {
+			__m128i chunk = _mm_loadu_si128((__m128i *)ptr);
+			uint32_t mask = _mm_movemask_epi8(_mm_cmpeq_epi8(chunk, vectCR)) | _mm_movemask_epi8(_mm_cmpeq_epi8(chunk, vectLF));
+			chunk = _mm_loadu_si128((__m128i *)(ptr + sizeof(__m128i)));
+			mask |= (_mm_movemask_epi8(_mm_cmpeq_epi8(chunk, vectCR)) | _mm_movemask_epi8(_mm_cmpeq_epi8(chunk, vectLF))) << sizeof(__m128i);
+			const char * const next = ptr + 2*sizeof(__m128i);
 			if (mask) {
 				do {
 #if defined(__clang__) || defined(__GNUC__)
@@ -1071,7 +1072,9 @@ void CellBuffer::BasicInsertString(const Sci::Position position, const char * co
 					unsigned long trailing;
 					_BitScanForward(&trailing, mask);
 #endif
-					mask >>= trailing + 1;
+					mask >>= trailing;
+					//! shift 32 bit is undefined behavior: (0x80000000 >> 32) == 0x80000000.
+					mask >>= 1;
 					ptr += trailing;
 
 					ch = *ptr++;
