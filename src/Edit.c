@@ -421,7 +421,9 @@ void EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus *status) {
 	/* '\r' and '\n' is not reused (e.g. as trailing byte in DBCS) by any known encoding,
 	it's safe to check whole data byte by byte.*/
 
-	Sci_Line linesCount[3] = { 0, 0, 0 };
+	Sci_Line lineCountCRLF = 0;
+	Sci_Line lineCountCR = 0;
+	Sci_Line lineCountLF = 0;
 #if 0
 	StopWatch watch;
 	StopWatch_Start(watch);
@@ -452,11 +454,11 @@ void EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus *status) {
 			if ((maskCR & LAST_CR_MASK) && *ptr == '\n') {
 				++ptr;
 				maskCR &= LAST_CR_MASK - 1;
-				++linesCount[SC_EOL_CRLF];
+				++lineCountCRLF;
 			}
 			// this can be omitted by using maskLF = (maskCR_LF ^ maskCR) | (maskLF & 1), but it seems slower than using if.
 			if (maskLF & 1) { // first LF
-				++linesCount[SC_EOL_LF];
+				++lineCountLF;
 			}
 
 			// maskCR and maskLF never have some bit set. after shifting maskLF by 1 bit,
@@ -468,14 +470,14 @@ void EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus *status) {
 			maskLF = maskCR_LF ^ maskCR; // LF alone
 			//maskLF = (maskCR_LF ^ maskCR) | (maskLF & 1); // LF alone plus first LF
 			if (maskCRLF) {
-				linesCount[SC_EOL_CRLF] += np2_popcount(maskCRLF);
+				lineCountCRLF += np2_popcount(maskCRLF);
 			}
 			if (maskCR) {
-				linesCount[SC_EOL_CR] += np2_popcount(maskCR);
+				lineCountCR += np2_popcount(maskCR);
 			}
 		}
 		if (maskLF) {
-			linesCount[SC_EOL_LF] += np2_popcount(maskLF);
+			lineCountLF += np2_popcount(maskLF);
 		}
 	}
 
@@ -500,11 +502,11 @@ void EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus *status) {
 			if ((maskCR & LAST_CR_MASK) && *ptr == '\n') {
 				++ptr;
 				maskCR &= LAST_CR_MASK - 1;
-				++linesCount[SC_EOL_CRLF];
+				++lineCountCRLF;
 			}
 			// this can be omitted by using maskLF = (maskCR_LF ^ maskCR) | (maskLF & 1), but it seems slower than using if.
 			if (maskLF & 1) { // first LF
-				++linesCount[SC_EOL_LF];
+				++lineCountLF;
 			}
 
 			// maskCR and maskLF never have some bit set. after shifting maskLF by 1 bit,
@@ -516,14 +518,14 @@ void EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus *status) {
 			maskLF = maskCR_LF ^ maskCR; // LF alone
 			//maskLF = (maskCR_LF ^ maskCR) | (maskLF & 1); // LF alone plus first LF
 			if (maskCRLF) {
-				linesCount[SC_EOL_CRLF] += np2_popcount(maskCRLF);
+				lineCountCRLF += np2_popcount(maskCRLF);
 			}
 			if (maskCR) {
-				linesCount[SC_EOL_CR] += np2_popcount(maskCR);
+				lineCountCR += np2_popcount(maskCR);
 			}
 		}
 		if (maskLF) {
-			linesCount[SC_EOL_LF] += np2_popcount(maskLF);
+			lineCountLF += np2_popcount(maskLF);
 		}
 	}
 
@@ -540,24 +542,26 @@ void EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus *status) {
 		}
 		switch (type) {
 		case 1: //'\n'
-			++linesCount[SC_EOL_LF];
+			++lineCountLF;
 			break;
 		case 2: //'\r'
 			if (*ptr == '\n') {
 				++ptr;
-				++linesCount[SC_EOL_CRLF];
+				++lineCountCRLF;
 			} else {
-				++linesCount[SC_EOL_CR];
+				++lineCountCR;
 			}
 			break;
 		}
 	} while (ptr < end);
 
-	const Sci_Line linesMax = max_pos(max_pos(linesCount[0], linesCount[1]), linesCount[2]);
+	const Sci_Line linesMax = max_pos(max_pos(lineCountCRLF, lineCountCR), lineCountLF);
+	// values must kept in same order as SC_EOL_CRLF, SC_EOL_CR, SC_EOL_LF
+	const Sci_Line linesCount[3] = { lineCountCRLF, lineCountCR, lineCountLF };
 	if (linesMax != linesCount[iEOLMode]) {
-		if (linesMax == linesCount[SC_EOL_CRLF]) {
+		if (linesMax == lineCountCRLF) {
 			iEOLMode = SC_EOL_CRLF;
-		} else if (linesMax == linesCount[SC_EOL_LF]) {
+		} else if (linesMax == lineCountLF) {
 			iEOLMode = SC_EOL_LF;
 		} else {
 			iEOLMode = SC_EOL_CR;
@@ -568,24 +572,24 @@ void EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus *status) {
 	StopWatch_Stop(watch);
 	StopWatch_ShowLog(&watch, "EOL time");
 #if defined(_WIN64)
-	printf("%s CR+LF:%" PRId64 ", LF: %" PRId64 ", CR: %" PRId64 "\n", __func__, linesCount[SC_EOL_CRLF], linesCount[SC_EOL_LF], linesCount[SC_EOL_CR]);
+	printf("%s CR+LF:%" PRId64 ", LF: %" PRId64 ", CR: %" PRId64 "\n", __func__, lineCountCRLF, lineCountLF, lineCountCR);
 #else
-	printf("%s CR+LF:%d, LF: %d, CR: %d\n", __func__, linesCount[SC_EOL_CRLF], linesCount[SC_EOL_LF], linesCount[SC_EOL_CR]);
+	printf("%s CR+LF:%d, LF: %d, CR: %d\n", __func__, lineCountCRLF, lineCountLF, lineCountCR);
 #endif
 #endif
 
 #if defined(_WIN64)
 	// enable conversion between line endings
-	if (cbData + linesCount[0] + linesCount[1] + linesCount[2] >= MAX_NON_UTF8_SIZE) {
+	if (cbData + lineCountCRLF + lineCountCR + lineCountLF >= MAX_NON_UTF8_SIZE) {
 		bLargeFileMode = TRUE;
 	}
 #endif
 
 	status->iEOLMode = iEOLMode;
-	status->bInconsistent = ((!!linesCount[0]) + (!!linesCount[1]) + (!!linesCount[2])) > 1;
-	status->linesCount[0] = linesCount[SC_EOL_CRLF];
-	status->linesCount[1] = linesCount[SC_EOL_LF];
-	status->linesCount[2] = linesCount[SC_EOL_CR];
+	status->bInconsistent = ((!!lineCountCRLF) + (!!lineCountCR) + (!!lineCountLF)) > 1;
+	status->linesCount[0] = lineCountCRLF;
+	status->linesCount[1] = lineCountLF;
+	status->linesCount[2] = lineCountCR;
 }
 
 //=============================================================================
