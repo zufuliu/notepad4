@@ -971,31 +971,60 @@ void CellBuffer::BasicInsertString(const Sci::Position position, const char * co
 	//ElapsedPeriod period;
 	unsigned char ch = ' ';
 	if (utf8LineEnds || insertLength < 32) {
-		for (Sci::Position i = 0; i < insertLength; i++) {
-			ch = s[i];
-			if (ch == '\r') {
-				InsertLine(lineInsert, (position + i) + 1, atLineStart);
+		// s may not NULL-terminated, ensure *ptr == '\n' is valid.
+		const char * const end = s + insertLength - 1;
+		const char *ptr = s;
+
+		if (chPrev == '\r' && *ptr == '\n') {
+			++ptr;
+			// Patch up what was end of line
+			plv->SetLineStart(lineInsert - 1, (position + ptr - s));
+			simpleInsertion = false;
+		}
+
+		while (ptr < end) {
+			ch = *ptr++;
+			switch (ch) {
+			case '\r':
+				if (*ptr == '\n') {
+					++ptr;
+				}
+				[[fallthrough]];
+			case '\n':
+				InsertLine(lineInsert, (position + ptr - s), atLineStart);
 				lineInsert++;
 				simpleInsertion = false;
-			} else if (ch == '\n') {
-				if (chPrev == '\r') {
-					// Patch up what was end of line
-					plv->SetLineStart(lineInsert - 1, (position + i) + 1);
-				} else {
-					InsertLine(lineInsert, (position + i) + 1, atLineStart);
-					lineInsert++;
+				break;
+			default:
+				if (utf8LineEnds) {
+					const unsigned char back3[3] = { chBeforePrev, chPrev, ch };
+					if (UTF8IsSeparator(back3) || UTF8IsNEL(back3 + 1)) {
+						InsertLine(lineInsert, (position + ptr - s), atLineStart);
+						lineInsert++;
+						simpleInsertion = false;
+					}
 				}
+				break;
+			}
+			chBeforePrev = chPrev;
+			chPrev = ch;
+		}
+
+		ch = *end;
+		if (ptr == end) {
+			++ptr;
+			if (ch == '\r' || ch == '\n') {
+				InsertLine(lineInsert, (position + ptr - s), atLineStart);
+				lineInsert++;
 				simpleInsertion = false;
 			} else if (utf8LineEnds) {
 				const unsigned char back3[3] = { chBeforePrev, chPrev, ch };
 				if (UTF8IsSeparator(back3) || UTF8IsNEL(back3 + 1)) {
-					InsertLine(lineInsert, (position + i) + 1, atLineStart);
+					InsertLine(lineInsert, (position + ptr - s), atLineStart);
 					lineInsert++;
 					simpleInsertion = false;
 				}
 			}
-			chBeforePrev = chPrev;
-			chPrev = ch;
 		}
 	} else {
 		// see EditDetectEOLMode() in Edit.c
@@ -1014,7 +1043,6 @@ void CellBuffer::BasicInsertString(const Sci::Position position, const char * co
 			plv->SetLineStart(lineInsert - 1, (position + ptr - s));
 			simpleInsertion = false;
 		}
-		chPrev = ' ';
 
 #if NP2_USE_AVX2
 		#define LAST_CR_MASK	(1U << (sizeof(__m256i) - 1))
