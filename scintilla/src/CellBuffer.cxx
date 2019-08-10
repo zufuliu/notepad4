@@ -1148,12 +1148,18 @@ void CellBuffer::BasicInsertString(const Sci::Position position, const char * co
 			while (ptr < end && ((ch = *ptr++) > '\r' || (type = eol_table[ch]) == 0)) {
 				// nop
 			}
-			if (type == 2 && *ptr == '\n') {
-				++ptr;
+			switch (type) {
+			case 2: // '\r'
+				if (*ptr == '\n') {
+					++ptr;
+				}
+				[[fallthrough]];
+			case 1: // '\n'
+				InsertLine(lineInsert, (position + ptr - s), atLineStart);
+				lineInsert++;
+				simpleInsertion = false;
+				break;
 			}
-			InsertLine(lineInsert, (position + ptr - s), atLineStart);
-			lineInsert++;
-			simpleInsertion = false;
 		}
 
 		ch = *end;
