@@ -493,11 +493,10 @@ void EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus *status) {
 		__m128i chunk = _mm_loadu_si128((__m128i *)ptr);
 		uint32_t maskCR = _mm_movemask_epi8(_mm_cmpeq_epi8(chunk, vectCR));
 		uint32_t maskLF = _mm_movemask_epi8(_mm_cmpeq_epi8(chunk, vectLF));
-		ptr += sizeof(__m128i);
-		chunk = _mm_loadu_si128((__m128i *)ptr);
+		chunk = _mm_loadu_si128((__m128i *)(ptr + sizeof(__m128i)));
 		maskCR |= _mm_movemask_epi8(_mm_cmpeq_epi8(chunk, vectCR)) << sizeof(__m128i);
 		maskLF |= _mm_movemask_epi8(_mm_cmpeq_epi8(chunk, vectLF)) << sizeof(__m128i);
-		ptr += sizeof(__m128i);
+		ptr += 2*sizeof(__m128i);
 		if (maskCR) {
 			if (maskCR & LAST_CR_MASK) {
 				maskCR &= LAST_CR_MASK - 1;

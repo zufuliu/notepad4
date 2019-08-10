@@ -970,12 +970,7 @@ void CellBuffer::BasicInsertString(const Sci::Position position, const char * co
 
 	//ElapsedPeriod period;
 	unsigned char ch = ' ';
-#if NP2_TARGET_ARM
-	if (utf8LineEnds)
-#else
-	if (utf8LineEnds || insertLength < 32)
-#endif
-	{
+	if (utf8LineEnds || insertLength < 32) {
 		for (Sci::Position i = 0; i < insertLength; i++) {
 			ch = s[i];
 			if (ch == '\r') {
@@ -1004,126 +999,171 @@ void CellBuffer::BasicInsertString(const Sci::Position position, const char * co
 		}
 	} else {
 		// see EditDetectEOLMode() in Edit.c
-		const char * const end = s + insertLength;
+		// tools/GenerateTable.py
+		static const uint8_t eol_table[16] = {
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 2, 0, 0, // 00 - 0F
+		};
+
+		// s may not NULL-terminated, ensure *next == '\n' or *ptr == '\n' is valid.
+		const char * const end = s + insertLength - 1;
 		const char *ptr = s;
+
+		if (chPrev == '\r' && *ptr == '\n') {
+			++ptr;
+			// Patch up what was end of line
+			plv->SetLineStart(lineInsert - 1, (position + ptr - s));
+			simpleInsertion = false;
+		}
+		chPrev = ' ';
+
 #if NP2_USE_AVX2
+		#define LAST_CR_MASK	(1U << (sizeof(__m256i) - 1))
 		const __m256i vectCR = _mm256_set1_epi8('\r');
 		const __m256i vectLF = _mm256_set1_epi8('\n');
 		while (ptr + sizeof(__m256i) <= end) {
 			const __m256i chunk = _mm256_loadu_si256((__m256i *)ptr);
-			uint32_t mask = _mm256_movemask_epi8(_mm256_or_si256(_mm256_cmpeq_epi8(chunk, vectCR), _mm256_cmpeq_epi8(chunk, vectLF)));
+			uint32_t maskCR = _mm256_movemask_epi8(_mm256_cmpeq_epi8(chunk, vectCR));
+			uint32_t maskLF = _mm256_movemask_epi8(_mm256_cmpeq_epi8(chunk, vectLF));
 			_mm256_zeroupper();
-			const char * const next = ptr + sizeof(__m256i);
-			if (mask) {
+
+			const char *next = ptr + sizeof(__m256i);
+			bool lastCR = false;
+			if (maskCR) {
+				if (maskCR & LAST_CR_MASK) {
+					maskCR &= LAST_CR_MASK - 1;
+					lastCR = true;
+					if (*next == '\n') {
+						// CR+LF across boundary
+						++next;
+					}
+				}
+
+				// maskCR and maskLF never have some bit set. after shifting maskCR by 1 bit,
+				// the bits both set in maskCR and maskLF represents CR+LF;
+				// the bits only set in maskCR or maskLF represents individual CR or LF.
+				const uint32_t maskCRLF = (maskCR << 1) & maskLF; // CR+LF
+				const uint32_t maskCR_LF = (maskCR << 1) ^ maskLF;// CR alone or LF alone
+				maskLF = maskCR_LF & maskLF; // LF alone
+				//maskCR = maskCR_LF ^ maskLF; // CR alone with one position offset
+				// each set bit now represent end location of CR or LF in each line endings.
+				maskLF |= maskCRLF | ((maskCR_LF ^ maskLF) >> 1);
+			}
+			if (maskLF) {
+				simpleInsertion = false;
+				Sci::Position offset = position + ptr - s;
 				do {
 #if defined(__clang__) || defined(__GNUC__)
-					const int trailing = __builtin_ctz(mask);
+					const int trailing = __builtin_ctz(maskLF);
 #else
-					const uint32_t trailing = _tzcnt_u32(mask);
+					const uint32_t trailing = _tzcnt_u32(maskLF);
 #endif
-					mask >>= trailing;
+					maskLF >>= trailing;
 					//! shift 32 bit is undefined behavior: (0x80000000 >> 32) == 0x80000000.
-					mask >>= 1;
-					ptr += trailing;
-
-					ch = *ptr++;
-					if (ch == '\r') {
-						InsertLine(lineInsert, (position + ptr - s), atLineStart);
-						lineInsert++;
-						simpleInsertion = false;
-					} else if (ch == '\n')  {
-						if (chPrev == '\r') {
-							// Patch up what was end of line
-							plv->SetLineStart(lineInsert - 1, (position + ptr - s));
-						} else {
-							InsertLine(lineInsert, (position + ptr - s), atLineStart);
-							lineInsert++;
-						}
-						simpleInsertion = false;
-					}
-					chPrev = ch;
-				} while (mask);
-				if (ptr < next) {
-					ch = ' ';
-					chPrev = ' ';
-					ptr = next;
-				}
-			} else {
-				ch = ' ';
-				chPrev = ' ';
-				ptr = next;
+					maskLF >>= 1;
+					offset += trailing + 1;
+					InsertLine(lineInsert, offset, atLineStart);
+					lineInsert++;
+				} while (maskLF);
 			}
-		}
-		// end NP2_USE_AVX2
-#elif NP2_USE_SSE2
-		const __m128i vectCR = _mm_set1_epi8('\r');
-		const __m128i vectLF = _mm_set1_epi8('\n');
-		while (ptr + 2*sizeof(__m128i) <= end) {
-			__m128i chunk = _mm_loadu_si128((__m128i *)ptr);
-			uint32_t mask = _mm_movemask_epi8(_mm_cmpeq_epi8(chunk, vectCR)) | _mm_movemask_epi8(_mm_cmpeq_epi8(chunk, vectLF));
-			chunk = _mm_loadu_si128((__m128i *)(ptr + sizeof(__m128i)));
-			mask |= (_mm_movemask_epi8(_mm_cmpeq_epi8(chunk, vectCR)) | _mm_movemask_epi8(_mm_cmpeq_epi8(chunk, vectLF))) << sizeof(__m128i);
-			const char * const next = ptr + 2*sizeof(__m128i);
-			if (mask) {
-				do {
-#if defined(__clang__) || defined(__GNUC__)
-					const int trailing = __builtin_ctz(mask);
-#else
-					unsigned long trailing;
-					_BitScanForward(&trailing, mask);
-#endif
-					mask >>= trailing;
-					//! shift 32 bit is undefined behavior: (0x80000000 >> 32) == 0x80000000.
-					mask >>= 1;
-					ptr += trailing;
 
-					ch = *ptr++;
-					if (ch == '\r') {
-						InsertLine(lineInsert, (position + ptr - s), atLineStart);
-						lineInsert++;
-						simpleInsertion = false;
-					} else if (ch == '\n')  {
-						if (chPrev == '\r') {
-							// Patch up what was end of line
-							plv->SetLineStart(lineInsert - 1, (position + ptr - s));
-						} else {
-							InsertLine(lineInsert, (position + ptr - s), atLineStart);
-							lineInsert++;
-						}
-						simpleInsertion = false;
-					}
-					chPrev = ch;
-				} while (mask);
-				if (ptr < next) {
-					ch = ' ';
-					chPrev = ' ';
-					ptr = next;
-				}
-			} else {
-				ch = ' ';
-				chPrev = ' ';
-				ptr = next;
-			}
-		}
-		// end NP2_USE_SSE2
-#endif
-		while (ptr < end) {
-			ch = *ptr++;
-			if (ch == '\r') {
+			ptr = next;
+			if (lastCR) {
 				InsertLine(lineInsert, (position + ptr - s), atLineStart);
 				lineInsert++;
 				simpleInsertion = false;
-			} else if (ch == '\n')  {
-				if (chPrev == '\r') {
-					// Patch up what was end of line
-					plv->SetLineStart(lineInsert - 1, (position + ptr - s));
-				} else {
-					InsertLine(lineInsert, (position + ptr - s), atLineStart);
-					lineInsert++;
+			}
+		}
+
+		#undef LAST_CR_MASK
+		// end NP2_USE_AVX2
+#elif NP2_USE_SSE2
+		#define LAST_CR_MASK	(1U << (2*sizeof(__m128i) - 1))
+		const __m128i vectCR = _mm_set1_epi8('\r');
+		const __m128i vectLF = _mm_set1_epi8('\n');
+		while (ptr + 2*sizeof(__m128i) <= end) {
+			// unaligned loading: line starts at random position.
+			__m128i chunk = _mm_loadu_si128((__m128i *)ptr);
+			uint32_t maskCR = _mm_movemask_epi8(_mm_cmpeq_epi8(chunk, vectCR));
+			uint32_t maskLF = _mm_movemask_epi8(_mm_cmpeq_epi8(chunk, vectLF));
+			chunk = _mm_loadu_si128((__m128i *)(ptr + sizeof(__m128i)));
+			maskCR |= _mm_movemask_epi8(_mm_cmpeq_epi8(chunk, vectCR)) << sizeof(__m128i);
+			maskLF |= _mm_movemask_epi8(_mm_cmpeq_epi8(chunk, vectLF)) << sizeof(__m128i);
+
+			const char *next = ptr + 2*sizeof(__m128i);
+			bool lastCR = false;
+			if (maskCR) {
+				if (maskCR & LAST_CR_MASK) {
+					maskCR &= LAST_CR_MASK - 1;
+					lastCR = true;
+					if (*next == '\n') {
+						// CR+LF across boundary
+						++next;
+					}
 				}
+
+				// maskCR and maskLF never have some bit set. after shifting maskCR by 1 bit,
+				// the bits both set in maskCR and maskLF represents CR+LF;
+				// the bits only set in maskCR or maskLF represents individual CR or LF.
+				const uint32_t maskCRLF = (maskCR << 1) & maskLF; // CR+LF
+				const uint32_t maskCR_LF = (maskCR << 1) ^ maskLF;// CR alone or LF alone
+				maskLF = maskCR_LF & maskLF; // LF alone
+				//maskCR = maskCR_LF ^ maskLF; // CR alone with one position offset
+				// each set bit now represent end location of CR or LF in each line endings.
+				maskLF |= maskCRLF | ((maskCR_LF ^ maskLF) >> 1);
+			}
+			if (maskLF) {
+				simpleInsertion = false;
+				Sci::Position offset = position + ptr - s;
+				do {
+#if defined(__clang__) || defined(__GNUC__)
+					const int trailing = __builtin_ctz(maskLF);
+#else
+					unsigned long trailing;
+					_BitScanForward(&trailing, maskLF);
+#endif
+					maskLF >>= trailing;
+					//! shift 32 bit is undefined behavior: (0x80000000 >> 32) == 0x80000000.
+					maskLF >>= 1;
+					offset += trailing + 1;
+					InsertLine(lineInsert, offset, atLineStart);
+					lineInsert++;
+				} while (maskLF);
+			}
+
+			ptr = next;
+			if (lastCR) {
+				InsertLine(lineInsert, (position + ptr - s), atLineStart);
+				lineInsert++;
 				simpleInsertion = false;
 			}
-			chPrev = ch;
+		}
+
+		#undef LAST_CR_MASK
+		// end NP2_USE_SSE2
+#endif
+
+		while (ptr < end) {
+			// skip to line end
+			uint8_t type = 0;
+			while (ptr < end && ((ch = *ptr++) > '\r' || (type = eol_table[ch]) == 0)) {
+				// nop
+			}
+			if (type == 2 && *ptr == '\n') {
+				++ptr;
+			}
+			InsertLine(lineInsert, (position + ptr - s), atLineStart);
+			lineInsert++;
+			simpleInsertion = false;
+		}
+
+		ch = *end;
+		if (ptr == end) {
+			++ptr;
+			if (ch == '\r' || ch == '\n') {
+				InsertLine(lineInsert, (position + ptr - s), atLineStart);
+				lineInsert++;
+				simpleInsertion = false;
+			}
 		}
 	}
 
