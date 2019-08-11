@@ -78,6 +78,8 @@ NULL
 "and bb face file password ping prompt pubdate public strike tt "
 "xml xmlns "
 "role ^aria- ^data- "
+// RDFa
+"property vocab resource typeof datatype "
 
 // Obsolete Attributes
 "align alink allowtransparency archive axis background bgcolor border bottommargin bordercolor cellpadding cellspacing "
