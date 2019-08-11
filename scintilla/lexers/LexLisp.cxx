@@ -107,7 +107,7 @@ static void ColouriseLispDoc(Sci_PositionU startPos, Sci_Position length, int in
 		}
 
 		if (state == SCE_C_DEFAULT) {
-			if (ch == '?' && (chNext == '\\' || isgraph(chNext))) {
+			if (((ch == '?' || ch == '#') && chNext == '\\') || (ch == '?' && isgraph(chNext))) {
 				styler.ColourTo(i - 1, state);
 				state = SCE_C_CHARACTER;
 				if (chNext == '\\') {
