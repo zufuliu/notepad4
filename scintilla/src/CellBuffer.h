@@ -15,6 +15,7 @@ class PerLine {
 public:
 	virtual ~PerLine() = default;
 	virtual void Init() = 0;
+	virtual bool IsActive() const noexcept = 0;
 	virtual void InsertLine(Sci::Line line) = 0;
 	virtual void RemoveLine(Sci::Line line) = 0;
 };

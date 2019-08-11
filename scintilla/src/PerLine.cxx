@@ -87,6 +87,10 @@ void LineMarkers::Init() {
 	markers.DeleteAll();
 }
 
+bool LineMarkers::IsActive() const noexcept {
+	return markers.Length() != 0;
+}
+
 void LineMarkers::InsertLine(Sci::Line line) {
 	if (markers.Length()) {
 		markers.Insert(line, nullptr);
@@ -194,6 +198,10 @@ void LineLevels::Init() {
 	levels.DeleteAll();
 }
 
+bool LineLevels::IsActive() const noexcept {
+	return levels.Length() != 0;
+}
+
 void LineLevels::InsertLine(Sci::Line line) {
 	if (levels.Length()) {
 		const int level = (line < levels.Length()) ? levels[line] : SC_FOLDLEVELBASE;
@@ -249,6 +257,10 @@ LineState::~LineState() = default;
 
 void LineState::Init() {
 	lineStates.DeleteAll();
+}
+
+bool LineState::IsActive() const noexcept {
+	return lineStates.Length() != 0;
 }
 
 void LineState::InsertLine(Sci::Line line) {
@@ -315,6 +327,10 @@ LineAnnotation::~LineAnnotation() {
 
 void LineAnnotation::Init() {
 	ClearAll();
+}
+
+bool LineAnnotation::IsActive() const noexcept {
+	return annotations.Length() != 0;
 }
 
 void LineAnnotation::InsertLine(Sci::Line line) {
@@ -437,6 +453,10 @@ LineTabstops::~LineTabstops() {
 
 void LineTabstops::Init() {
 	tabstops.DeleteAll();
+}
+
+bool LineTabstops::IsActive() const noexcept {
+	return tabstops.Length() != 0;
 }
 
 void LineTabstops::InsertLine(Sci::Line line) {
