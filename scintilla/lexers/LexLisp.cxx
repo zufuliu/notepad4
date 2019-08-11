@@ -17,6 +17,8 @@
 
 using namespace Scintilla;
 
+// TODO: https://www.gnu.org/software/emacs/manual/html_node/elisp/Character-Type.html
+
 static constexpr bool IsLispOp(int ch) noexcept {
 	return ch == '(' || ch == ')' || ch == '[' || ch == ']'
 		|| ch == '\'' || ch == '*' || ch == '?' || ch == '.'
@@ -73,11 +75,9 @@ static void ColouriseLispDoc(Sci_PositionU startPos, Sci_Position length, int in
 			}
 			break;
 		case SCE_C_CHARACTER:
-			if (IsASpace(ch) || ch == ')') {
-				styler.ColourTo(i - 1, state);
-				state = SCE_C_DEFAULT;
-			}
-			break;
+			styler.ColourTo(i, state);
+			state = SCE_C_DEFAULT;
+			continue;
 		case SCE_C_STRING:
 			if (ch == '\\' && (chNext == '\\' || chNext == '\"')) {
 				i++;
@@ -107,9 +107,13 @@ static void ColouriseLispDoc(Sci_PositionU startPos, Sci_Position length, int in
 		}
 
 		if (state == SCE_C_DEFAULT) {
-			if (ch == '?' && chNext == '\\') {
+			if (ch == '?' && (chNext == '\\' || isgraph(chNext))) {
 				styler.ColourTo(i - 1, state);
 				state = SCE_C_CHARACTER;
+				if (chNext == '\\') {
+					i++;
+					chNext = styler.SafeGetCharAt(i + 1);
+				}
 			} else if (ch == ';') {
 				styler.ColourTo(i - 1, state);
 				state = SCE_C_COMMENTLINE;
