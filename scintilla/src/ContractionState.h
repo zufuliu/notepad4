@@ -10,7 +10,11 @@
 
 namespace Scintilla {
 
+#ifdef NDEBUG
 #define EnablePerLineFoldDisplayText	0
+#else
+#define EnablePerLineFoldDisplayText	0
+#endif
 
 /**
 */
