@@ -2139,8 +2139,8 @@ void Editor::ClearAll() {
 
 void Editor::ClearDocumentStyle() {
 	pdoc->decorations->DeleteLexerDecorations();
+	pdoc->SetStyleFor(pdoc->GetEndStyled(), 0);
 	pdoc->StartStyling(0);
-	pdoc->SetStyleFor(pdoc->Length(), 0);
 	pcs->ShowAll();
 	SetAnnotationHeights(0, pdoc->LinesTotal());
 	pdoc->ClearLevels();
