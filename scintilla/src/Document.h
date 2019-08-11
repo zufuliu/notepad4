@@ -297,6 +297,7 @@ public:
 
 	// From PerLine
 	void Init() override;
+	bool IsActive() const noexcept override;
 	void InsertLine(Sci::Line line) override;
 	void RemoveLine(Sci::Line line) override;
 

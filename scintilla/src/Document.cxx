@@ -171,6 +171,13 @@ void Document::Init() {
 	}
 }
 
+bool Document::IsActive() const noexcept {
+	return std::any_of(std::begin(perLineData), std::end(perLineData),
+	[](const auto &pl) noexcept {
+		return pl->IsActive();
+	});
+}
+
 void Document::InsertLine(Sci::Line line) {
 	for (const auto &pl : perLineData) {
 		if (pl)
@@ -1141,6 +1148,23 @@ bool Document::DeleteChars(Sci::Position pos, Sci::Position len) {
 	return !cb.IsReadOnly();
 }
 
+namespace {
+
+struct WithoutPerLine {
+	CellBuffer *cb;
+	PerLine *pl;
+	constexpr WithoutPerLine(CellBuffer *cb_, PerLine *pl_) noexcept : cb(cb_), pl(pl_) {}
+	const char *InsertString(Sci::Position position, const char *s, Sci::Position insertLength, bool &startSequence) const {
+		cb->SetPerLine(nullptr);
+		return cb->InsertString(position, s, insertLength, startSequence);
+	}
+	~WithoutPerLine() {
+		cb->SetPerLine(pl);
+	}
+};
+
+}
+
 /**
  * Insert a string with a length.
  */
@@ -1175,7 +1199,13 @@ Sci::Position Document::InsertString(Sci::Position position, const char *s, Sci:
 	const Sci::Line prevLinesTotal = LinesTotal();
 	const bool startSavePoint = cb.IsSavePoint();
 	bool startSequence = false;
-	const char *text = cb.InsertString(position, s, insertLength, startSequence);
+	const char *text = nullptr;
+	if (insertLength > 1000 && !IsActive()) {
+		// avoid calling InsertLine() or RemoveLine()
+		text = WithoutPerLine(&cb, this).InsertString(position, s, insertLength, startSequence);
+	} else {
+		text = cb.InsertString(position, s, insertLength, startSequence);
+	}
 	if (startSavePoint && cb.IsCollectingUndo())
 		NotifySavePoint(!startSavePoint);
 	ModifiedAt(position);
