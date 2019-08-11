@@ -27,7 +27,7 @@ public:
 	virtual Sci_Position SCI_METHOD LineStart(Sci_Position line) const noexcept = 0;
 	virtual int SCI_METHOD GetLevel(Sci_Position line) const noexcept = 0;
 	virtual int SCI_METHOD SetLevel(Sci_Position line, int level) = 0;
-	virtual int SCI_METHOD GetLineState(Sci_Position line) const = 0;
+	virtual int SCI_METHOD GetLineState(Sci_Position line) const noexcept = 0;
 	virtual int SCI_METHOD SetLineState(Sci_Position line, int state) = 0;
 	virtual void SCI_METHOD StartStyling(Sci_Position position) noexcept = 0;
 	virtual bool SCI_METHOD SetStyleFor(Sci_Position length, unsigned char style) = 0;

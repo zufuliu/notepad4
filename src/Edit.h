@@ -99,10 +99,10 @@ enum {
 
 void	Edit_ReleaseResources(void);
 HWND	EditCreate(HWND hwndParent);
-void	EditSetNewText(LPCSTR lpstrText, DWORD cbText);
+void	EditSetNewText(LPCSTR lpstrText, DWORD cbText, Sci_Line lineCount);
 
 static inline void EditSetEmptyText(void) {
-	EditSetNewText("", 0);
+	EditSetNewText("", 0, 1);
 }
 
 BOOL	EditConvertText(UINT cpSource, UINT cpDest, BOOL bSetSavePoint);

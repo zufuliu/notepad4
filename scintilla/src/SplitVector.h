@@ -9,6 +9,15 @@
 #ifndef SPLITVECTOR_H
 #define SPLITVECTOR_H
 
+#ifdef NDEBUG
+#define ENABLE_SHOW_DEBUG_INFO	0
+#else
+#define ENABLE_SHOW_DEBUG_INFO	0
+#endif
+#if ENABLE_SHOW_DEBUG_INFO
+#include <cstdio>
+#endif
+
 namespace Scintilla {
 
 template <typename T>
@@ -92,6 +101,12 @@ public:
 			throw std::runtime_error("SplitVector::ReAllocate: negative size.");
 
 		if (newSize > static_cast<ptrdiff_t>(body.size())) {
+#if ENABLE_SHOW_DEBUG_INFO
+			printf("before %s(%td, %zu) part1Length=%td, gapLength=%td, lengthBody=%td, growSize=%td\n",
+				__func__, newSize, body.size(), part1Length, gapLength, lengthBody, growSize);
+			Platform::DebugPrintf("before %s(%td, %zu) part1Length=%td, gapLength=%td, lengthBody=%td, growSize=%td\n",
+				__func__, newSize, body.size(), part1Length, gapLength, lengthBody, growSize);
+#endif
 			// Move the gap to the end
 			GapTo(lengthBody);
 			gapLength += newSize - static_cast<ptrdiff_t>(body.size());
@@ -100,6 +115,12 @@ public:
 			// calling reserve first.
 			body.reserve(newSize);
 			body.resize(newSize);
+#if ENABLE_SHOW_DEBUG_INFO
+			printf("after %s(%td, %zu) part1Length=%td, gapLength=%td, lengthBody=%td, growSize=%td\n",
+				__func__, newSize, body.size(), part1Length, gapLength, lengthBody, growSize);
+			Platform::DebugPrintf("after %s(%td, %zu) part1Length=%td, gapLength=%td, lengthBody=%td, growSize=%td\n",
+				__func__, newSize, body.size(), part1Length, gapLength, lengthBody, growSize);
+#endif
 		}
 	}
 

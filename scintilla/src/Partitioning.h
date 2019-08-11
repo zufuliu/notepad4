@@ -108,6 +108,10 @@ public:
 		return static_cast<T>(body->Length()) - 1;
 	}
 
+	void ReAllocate(ptrdiff_t newSize) {
+		body->ReAllocate(newSize + 2);
+	}
+
 	void InsertPartition(T partition, T pos) {
 		if (stepPartition < partition) {
 			ApplyStep(partition);

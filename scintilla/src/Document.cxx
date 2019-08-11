@@ -2049,6 +2049,10 @@ Sci::Line Document::LinesTotal() const noexcept {
 	return cb.Lines();
 }
 
+void Document::SetInitLineCount(Sci::Line lineCount) {
+	cb.SetInitLineCount(lineCount);
+}
+
 void Document::SetDefaultCharClasses(bool includeWordClass) noexcept {
 	charClass.SetDefaultCharClasses(includeWordClass);
 	if (regex) {
@@ -2164,7 +2168,7 @@ void Document::SetLexInterface(LexInterface *pLexInterface) noexcept {
 }
 
 int SCI_METHOD Document::SetLineState(Sci_Position line, int state) {
-	const int statePrevious = States()->SetLineState(line, state);
+	const int statePrevious = States()->SetLineState(line, state, LinesTotal());
 	if (state != statePrevious) {
 		const DocModification mh(SC_MOD_CHANGELINESTATE, LineStart(line), 0, 0, nullptr, line);
 		NotifyModified(mh);
@@ -2172,7 +2176,7 @@ int SCI_METHOD Document::SetLineState(Sci_Position line, int state) {
 	return statePrevious;
 }
 
-int SCI_METHOD Document::GetLineState(Sci_Position line) const {
+int SCI_METHOD Document::GetLineState(Sci_Position line) const noexcept {
 	return States()->GetLineState(line);
 }
 
