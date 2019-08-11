@@ -257,6 +257,10 @@ NP2_inline Sci_Line SciCall_GetLineCount(void) {
 	return SciCall(SCI_GETLINECOUNT, 0, 0);
 }
 
+NP2_inline void SciCall_SetInitLineCount(Sci_Line lineCount) {
+	SciCall(SCI_SETINITLINECOUNT, lineCount, 0);
+}
+
 NP2_inline void SciCall_SetSel(Sci_Position anchor, Sci_Position caret) {
 	SciCall(SCI_SETSEL, anchor, caret);
 }

@@ -215,6 +215,7 @@ void LineLevels::RemoveLine(Sci::Line line) {
 }
 
 void LineLevels::ExpandLevels(Sci::Line sizeNew) {
+	levels.ReAllocate(sizeNew + 1);
 	levels.InsertValue(levels.Length(), sizeNew - levels.Length(), SC_FOLDLEVELBASE);
 }
 
@@ -237,7 +238,7 @@ int LineLevels::SetLevel(Sci::Line line, int level, Sci::Line lines) {
 }
 
 int LineLevels::GetLevel(Sci::Line line) const noexcept {
-	if (levels.Length() && (line >= 0) && (line < levels.Length())) {
+	if ((line >= 0) && (line < levels.Length())) {
 		return levels[line];
 	} else {
 		return SC_FOLDLEVELBASE;
@@ -264,17 +265,18 @@ void LineState::RemoveLine(Sci::Line line) {
 	}
 }
 
-int LineState::SetLineState(Sci::Line line, int state) {
+int LineState::SetLineState(Sci::Line line, int state, Sci::Line lines) {
+	lineStates.ReAllocate(lines + 2);
 	lineStates.EnsureLength(line + 1);
 	const int stateOld = lineStates[line];
 	lineStates[line] = state;
 	return stateOld;
 }
 
-int LineState::GetLineState(Sci::Line line) {
-	if (line < 0)
+int LineState::GetLineState(Sci::Line line) const noexcept {
+	if (line < 0 || line >= lineStates.Length()) {
 		return 0;
-	lineStates.EnsureLength(line + 1);
+	}
 	return lineStates[line];
 }
 

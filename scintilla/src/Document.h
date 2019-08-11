@@ -494,6 +494,7 @@ public:
 	void AllocateLineCharacterIndex(int lineCharacterIndex);
 	void ReleaseLineCharacterIndex(int lineCharacterIndex);
 	Sci::Line LinesTotal() const noexcept;
+	void SetInitLineCount(Sci::Line lineCount);
 
 	void SetDefaultCharClasses(bool includeWordClass) noexcept;
 	void SetCharClasses(const unsigned char *chars, CharClassify::cc newCharClass) noexcept;
@@ -518,7 +519,7 @@ public:
 	void SetLexInterface(LexInterface *pLexInterface) noexcept;
 
 	int SCI_METHOD SetLineState(Sci_Position line, int state) override;
-	int SCI_METHOD GetLineState(Sci_Position line) const override;
+	int SCI_METHOD GetLineState(Sci_Position line) const noexcept override;
 	Sci::Line GetMaxLineState() const noexcept;
 	void SCI_METHOD ChangeLexerState(Sci_Position start, Sci_Position end) override;
 

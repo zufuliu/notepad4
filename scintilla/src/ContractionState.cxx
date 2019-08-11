@@ -112,6 +112,7 @@ void ContractionState<LINE>::EnsureData() {
 		foldDisplayTexts = std::make_unique<SparseVector<UniqueString>>();
 #endif
 		displayLines = std::make_unique<Partitioning<LINE>>(4);
+		displayLines->ReAllocate(linesInDocument + 2);
 		InsertLines(0, linesInDocument);
 	}
 }

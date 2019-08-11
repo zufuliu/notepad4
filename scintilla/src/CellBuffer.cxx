@@ -71,6 +71,7 @@ public:
 	virtual void SetLineStart(Sci::Line line, Sci::Position position) noexcept = 0;
 	virtual void RemoveLine(Sci::Line line) = 0;
 	virtual Sci::Line Lines() const noexcept = 0;
+	virtual void SetInitLineCount(Sci::Line lineCount) = 0;
 	virtual Sci::Line LineFromPosition(Sci::Position pos) const noexcept = 0;
 	virtual Sci::Position LineStart(Sci::Line line) const noexcept = 0;
 	virtual void InsertCharacters(Sci::Line line, CountWidths delta) noexcept = 0;
@@ -131,6 +132,9 @@ public:
 	void SetLineWidth(Sci::Line line, Sci::Position width) noexcept {
 		const Sci::Position widthCurrent = LineWidth(line);
 		starts.InsertText(static_cast<POS>(line), static_cast<POS>(width - widthCurrent));
+	}
+	void SetInitLineCount(Sci::Line lineCount) {
+		starts.ReAllocate(lineCount);
 	}
 };
 
@@ -198,6 +202,15 @@ public:
 	}
 	Sci::Line Lines() const noexcept override {
 		return static_cast<Sci::Line>(starts.Partitions());
+	}
+	void SetInitLineCount(Sci::Line lineCount) override {
+		starts.ReAllocate(lineCount);
+		if (startsUTF32.Active()) {
+			startsUTF32.SetInitLineCount(lineCount);
+		}
+		if (startsUTF16.Active()) {
+			startsUTF16.SetInitLineCount(lineCount);
+		}
 	}
 	Sci::Line LineFromPosition(Sci::Position pos) const noexcept override {
 		return static_cast<Sci::Line>(starts.PartitionFromPosition(static_cast<POS>(pos)));
@@ -736,6 +749,10 @@ void CellBuffer::ReleaseLineCharacterIndex(int lineCharacterIndex) {
 
 Sci::Line CellBuffer::Lines() const noexcept {
 	return plv->Lines();
+}
+
+void CellBuffer::SetInitLineCount(Sci::Line lineCount) {
+	plv->SetInitLineCount(lineCount);
 }
 
 Sci::Position CellBuffer::LineStart(Sci::Line line) const noexcept {

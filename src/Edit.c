@@ -106,7 +106,7 @@ extern BOOL bLargeFileMode;
 #endif
 extern FILEVARS fvCurFile;
 
-void EditSetNewText(LPCSTR lpstrText, DWORD cbText) {
+void EditSetNewText(LPCSTR lpstrText, DWORD cbText, Sci_Line lineCount) {
 	bFreezeAppTitle = TRUE;
 	bLockedForEditing = FALSE;
 
@@ -121,7 +121,8 @@ void EditSetNewText(LPCSTR lpstrText, DWORD cbText) {
 	FileVars_Apply(&fvCurFile);
 
 #if defined(_WIN64)
-	if (bLargeFileMode || cbText >= MAX_NON_UTF8_SIZE) {
+	// enable conversion between line endings
+	if (bLargeFileMode || cbText + lineCount >= MAX_NON_UTF8_SIZE) {
 		int options = SciCall_GetDocumentOptions();
 		if (!(options & SC_DOCUMENTOPTION_TEXT_LARGE)) {
 			options |= SC_DOCUMENTOPTION_TEXT_LARGE;
@@ -138,6 +139,7 @@ void EditSetNewText(LPCSTR lpstrText, DWORD cbText) {
 		StopWatch watch;
 		StopWatch_Start(watch);
 #endif
+		SciCall_SetInitLineCount(lineCount);
 		SciCall_AddText(cbText, lpstrText);
 #if 0
 		StopWatch_Stop(watch);
@@ -411,10 +413,7 @@ static __forceinline unsigned int bth_popcount(unsigned int v) {
 // EditDetectEOLMode()
 //
 void EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus *status) {
-	int iEOLMode = iLineEndings[iDefaultEOLMode];
-
 	if (cbData == 0) {
-		status->iEOLMode = iEOLMode;
 		return;
 	}
 
@@ -559,6 +558,7 @@ void EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus *status) {
 	const Sci_Line linesMax = max_pos(max_pos(lineCountCRLF, lineCountCR), lineCountLF);
 	// values must kept in same order as SC_EOL_CRLF, SC_EOL_CR, SC_EOL_LF
 	const Sci_Line linesCount[3] = { lineCountCRLF, lineCountCR, lineCountLF };
+	int iEOLMode = status->iEOLMode;
 	if (linesMax != linesCount[iEOLMode]) {
 		if (linesMax == lineCountCRLF) {
 			iEOLMode = SC_EOL_CRLF;
@@ -579,15 +579,9 @@ void EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus *status) {
 #endif
 #endif
 
-#if defined(_WIN64)
-	// enable conversion between line endings
-	if (cbData + lineCountCRLF + lineCountCR + lineCountLF >= MAX_NON_UTF8_SIZE) {
-		bLargeFileMode = TRUE;
-	}
-#endif
-
 	status->iEOLMode = iEOLMode;
 	status->bInconsistent = ((!!lineCountCRLF) + (!!lineCountCR) + (!!lineCountLF)) > 1;
+	status->totalLineCount = lineCountCRLF + lineCountCR + lineCountLF + 1;
 	status->linesCount[0] = lineCountCRLF;
 	status->linesCount[1] = lineCountLF;
 	status->linesCount[2] = lineCountCR;
@@ -732,9 +726,12 @@ BOOL EditLoadFile(LPWSTR pszFile, BOOL bSkipEncodingDetection, EditFileIOStatus 
 	BOOL bBOM = FALSE;
 	BOOL bReverse = FALSE;
 
+	status->iEOLMode = iLineEndings[iDefaultEOLMode];
+	status->bInconsistent = FALSE;
+	status->totalLineCount = 1;
+
 	if (cbData == 0) {
 		FileVars_Init(NULL, 0, &fvCurFile);
-		status->iEOLMode = iLineEndings[iDefaultEOLMode];
 
 		if (iSrcEncoding == -1) {
 			if (bLoadANSIasUTF8 && !bPreferOEM) {
@@ -788,7 +785,7 @@ BOOL EditLoadFile(LPWSTR pszFile, BOOL bSkipEncodingDetection, EditFileIOStatus 
 		EditDetectEOLMode(lpDataUTF8, cbData - 1, status);
 		FileVars_Init(lpDataUTF8, cbData - 1, &fvCurFile);
 		SciCall_SetCodePage(SC_CP_UTF8);
-		EditSetNewText(lpDataUTF8, cbData - 1);
+		EditSetNewText(lpDataUTF8, cbData - 1, status->totalLineCount);
 		NP2HeapFree(lpDataUTF8);
 	} else {
 		FileVars_Init(lpData, cbData, &fvCurFile);
@@ -803,11 +800,11 @@ BOOL EditLoadFile(LPWSTR pszFile, BOOL bSkipEncodingDetection, EditFileIOStatus 
 			SciCall_SetCodePage(SC_CP_UTF8);
 			if (utf8Sig) {
 				EditDetectEOLMode(lpData + 3, cbData - 3, status);
-				EditSetNewText(lpData + 3, cbData - 3);
+				EditSetNewText(lpData + 3, cbData - 3, status->totalLineCount);
 				iEncoding = CPI_UTF8SIGN;
 			} else {
 				EditDetectEOLMode(lpData, cbData, status);
-				EditSetNewText(lpData, cbData);
+				EditSetNewText(lpData, cbData, status->totalLineCount);
 				iEncoding = CPI_UTF8;
 			}
 		} else {
@@ -837,11 +834,11 @@ BOOL EditLoadFile(LPWSTR pszFile, BOOL bSkipEncodingDetection, EditFileIOStatus 
 
 				EditDetectEOLMode(lpData, cbData, status);
 				SciCall_SetCodePage(SC_CP_UTF8);
-				EditSetNewText(lpData, cbData);
+				EditSetNewText(lpData, cbData, status->totalLineCount);
 			} else {
 				EditDetectEOLMode(lpData, cbData, status);
 				SciCall_SetCodePage(iDefaultCodePage);
-				EditSetNewText(lpData, cbData);
+				EditSetNewText(lpData, cbData, status->totalLineCount);
 				iEncoding = CPI_DEFAULT;
 			}
 		}

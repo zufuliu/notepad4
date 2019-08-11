@@ -141,7 +141,7 @@ public:
 			validLen = 0;
 		}
 	}
-	int GetLineState(Sci_Position line) const {
+	int GetLineState(Sci_Position line) const noexcept {
 		return pAccess->GetLineState(line);
 	}
 	int SetLineState(Sci_Position line, int state) {
