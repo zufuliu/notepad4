@@ -8,12 +8,14 @@
 #include <cstddef>
 #include <cassert>
 #include <cstring>
+//#include <cstdio>
 
 #include <stdexcept>
 #include <string_view>
 #include <vector>
 #include <algorithm>
 #include <memory>
+//#include <chrono>
 
 #include "Platform.h"
 
@@ -24,8 +26,12 @@
 #include "RunStyles.h"
 #include "SparseVector.h"
 #include "ContractionState.h"
+//#include "ElapsedPeriod.h"
 
 using namespace Scintilla;
+
+#define ContractionState_InsertLines_OneByOne	0
+#define ContractionState_DeleteLines_OneByOne	0
 
 namespace {
 
@@ -49,8 +55,12 @@ class ContractionState final : public IContractionState {
 		return visible == nullptr;
 	}
 
+#if ContractionState_InsertLines_OneByOne
 	void InsertLine(Sci::Line lineDoc);
+#endif
+#if ContractionState_DeleteLines_OneByOne
 	void DeleteLine(Sci::Line lineDoc);
+#endif
 
 public:
 	ContractionState() noexcept;
@@ -117,6 +127,7 @@ void ContractionState<LINE>::EnsureData() {
 	}
 }
 
+#if ContractionState_InsertLines_OneByOne
 template <typename LINE>
 void ContractionState<LINE>::InsertLine(Sci::Line lineDoc) {
 	if (OneToOne()) {
@@ -138,7 +149,9 @@ void ContractionState<LINE>::InsertLine(Sci::Line lineDoc) {
 		displayLines->InsertText(lineDocCast, 1);
 	}
 }
+#endif
 
+#if ContractionState_DeleteLines_OneByOne
 template <typename LINE>
 void ContractionState<LINE>::DeleteLine(Sci::Line lineDoc) {
 	if (OneToOne()) {
@@ -157,6 +170,7 @@ void ContractionState<LINE>::DeleteLine(Sci::Line lineDoc) {
 #endif
 	}
 }
+#endif
 
 template <typename LINE>
 void ContractionState<LINE>::Clear() noexcept {
@@ -226,9 +240,38 @@ void ContractionState<LINE>::InsertLines(Sci::Line lineDoc, Sci::Line lineCount)
 	if (OneToOne()) {
 		linesInDocument += static_cast<LINE>(lineCount);
 	} else {
+		//ElapsedPeriod period;
+#if ContractionState_InsertLines_OneByOne
 		for (Sci::Line l = 0; l < lineCount; l++) {
 			InsertLine(lineDoc + l);
 		}
+#else
+		{
+			const LINE lineDocCast = static_cast<LINE>(lineDoc);
+			const LINE insertLength = static_cast<LINE>(lineCount);
+			visible->InsertSpace(lineDocCast, insertLength);
+			visible->FillRange(lineDocCast, 1, insertLength);
+			expanded->InsertSpace(lineDocCast, insertLength);
+			expanded->FillRange(lineDocCast, 1, insertLength);
+			heights->InsertSpace(lineDocCast, insertLength);
+			heights->FillRange(lineDocCast, 1, insertLength);
+#if EnablePerLineFoldDisplayText
+			foldDisplayTexts->InsertSpace(lineDocCast, insertLength);
+#endif
+		}
+		for (Sci::Line l = 0; l < lineCount; l++) {
+			const LINE lineDocCast = static_cast<LINE>(lineDoc + l);
+			const LINE lineDisplay = displayLines->PositionFromPartition(std::min(lineDocCast, displayLines->Partitions()));
+			displayLines->InsertPartition(lineDocCast, lineDisplay);
+			displayLines->InsertText(lineDocCast, 1);
+#if EnablePerLineFoldDisplayText
+			foldDisplayTexts->SetValueAt(lineDocCast, nullptr);
+#endif
+		}
+
+#endif // ContractionState_InsertLines_OneByOne
+		//const double duration = period.Duration()*1e3;
+		//printf("%s(%td, %td) duration: %f\n", __func__, lineDoc, lineCount, duration);
 	}
 	Check();
 }
@@ -238,9 +281,33 @@ void ContractionState<LINE>::DeleteLines(Sci::Line lineDoc, Sci::Line lineCount)
 	if (OneToOne()) {
 		linesInDocument -= static_cast<LINE>(lineCount);
 	} else {
+		//ElapsedPeriod period;
+#if ContractionState_DeleteLines_OneByOne
 		for (Sci::Line l = 0; l < lineCount; l++) {
 			DeleteLine(lineDoc);
 		}
+#else
+		const LINE lineDocCast = static_cast<LINE>(lineDoc);
+		for (Sci::Line l = 0; l < lineCount; l++) {
+			const LINE line = static_cast<LINE>(lineDoc + l);
+			const bool lineVisible = (line >= visible->Length()) ? true : visible->ValueAt(line) == 1;
+			if (lineVisible) {
+				displayLines->InsertText(lineDocCast, -heights->ValueAt(line));
+			}
+			displayLines->RemovePartition(lineDocCast);
+#if EnablePerLineFoldDisplayText
+			foldDisplayTexts->DeletePosition(lineDocCast);
+#endif
+		}
+		{
+			const LINE deleteLength = static_cast<LINE>(lineCount);
+			visible->DeleteRange(lineDocCast, deleteLength);
+			expanded->DeleteRange(lineDocCast, deleteLength);
+			heights->DeleteRange(lineDocCast, deleteLength);
+		}
+#endif // ContractionState_DeleteLines_OneByOne
+		//const double duration = period.Duration()*1e3;
+		//printf("%s(%td, %td) duration: %f\n", __func__, lineDoc, lineCount, duration);
 	}
 	Check();
 }
