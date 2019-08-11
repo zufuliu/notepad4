@@ -283,7 +283,7 @@
       </Compiler>
       <Linker Options="-O0;-mavx2;-mpopcnt;-mlzcnt;-mbmi;-Wl,--major-os-version,6;-Wl,--minor-os-version,1;-Wl,--subsystem,windows:6.01" Required="yes"/>
       <ResourceCompiler Options="-D_DEBUG;-D_WIN64;" Required="no"/>
-      <General OutputFile="$(WorkspacePath)/../bin/GCCDebug/AVX2/$(ProjectName).exe" IntermediateDirectory="$(WorkspacePath)/../bin/GCCDebug/AVX2/obj/$(ProjectName)" Command="./$(ProjectName)" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(WorkspacePath)/../bin/GCCDebug/AVX2" PauseExecWhenProcTerminates="no" IsGUIProgram="yes" IsEnabled="yes"/>
+      <General OutputFile="$(WorkspacePath)/../bin/$(ConfigurationName)/$(ProjectName).exe" IntermediateDirectory="$(WorkspacePath)/../bin/$(ConfigurationName)/obj/$(ProjectName)" Command="./$(ProjectName)" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(WorkspacePath)/../bin/$(ConfigurationName)" PauseExecWhenProcTerminates="no" IsGUIProgram="yes" IsEnabled="yes"/>
       <BuildSystem Name="Default"/>
       <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
         <![CDATA[]]>
@@ -325,7 +325,7 @@
       </Compiler>
       <Linker Options="-O0;-Wl,--major-os-version,5;-Wl,--minor-os-version,1;-Wl,--subsystem,windows:5.01" Required="yes"/>
       <ResourceCompiler Options="-D_DEBUG;-DWIN32" Required="no"/>
-      <General OutputFile="$(WorkspacePath)/../bin/GCCDebug/Win32/$(ProjectName).exe" IntermediateDirectory="$(WorkspacePath)/../bin/GCCDebug/Win32/obj/$(ProjectName)" Command="./$(ProjectName)" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(WorkspacePath)/../bin/GCCDebug/Win32" PauseExecWhenProcTerminates="no" IsGUIProgram="yes" IsEnabled="yes"/>
+      <General OutputFile="$(WorkspacePath)/../bin/$(ConfigurationName)/$(ProjectName).exe" IntermediateDirectory="$(WorkspacePath)/../bin/$(ConfigurationName)/obj/$(ProjectName)" Command="./$(ProjectName)" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(WorkspacePath)/../bin/$(ConfigurationName)" PauseExecWhenProcTerminates="no" IsGUIProgram="yes" IsEnabled="yes"/>
       <BuildSystem Name="Default"/>
       <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
         <![CDATA[]]>
@@ -367,7 +367,7 @@
       </Compiler>
       <Linker Options="-O0;-Wl,--major-os-version,5;-Wl,--minor-os-version,2;-Wl,--subsystem,windows:5.02" Required="yes"/>
       <ResourceCompiler Options="-D_DEBUG;-D_WIN64;" Required="no"/>
-      <General OutputFile="$(WorkspacePath)/../bin/GCCDebug/x64/$(ProjectName).exe" IntermediateDirectory="$(WorkspacePath)/../bin/GCCDebug/x64/obj/$(ProjectName)" Command="./$(ProjectName)" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(WorkspacePath)/../bin/GCCDebug/x64" PauseExecWhenProcTerminates="no" IsGUIProgram="yes" IsEnabled="yes"/>
+      <General OutputFile="$(WorkspacePath)/../bin/$(ConfigurationName)/$(ProjectName).exe" IntermediateDirectory="$(WorkspacePath)/../bin/$(ConfigurationName)/obj/$(ProjectName)" Command="./$(ProjectName)" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(WorkspacePath)/../bin/$(ConfigurationName)" PauseExecWhenProcTerminates="no" IsGUIProgram="yes" IsEnabled="yes"/>
       <BuildSystem Name="Default"/>
       <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
         <![CDATA[]]>
@@ -409,7 +409,7 @@
       </Compiler>
       <Linker Options="-s;-O2;-mavx2;-mpopcnt;-mlzcnt;-mbmi;-static;-Wl,--gc-sections;-ffast-math;-fno-rtti;-fomit-frame-pointer;-Wl,--major-os-version,6;-Wl,--minor-os-version,1;-Wl,--subsystem,windows:6.01" Required="yes"/>
       <ResourceCompiler Options="-D_WIN64" Required="no"/>
-      <General OutputFile="$(WorkspacePath)/../bin/GCCRelease/AVX2/$(ProjectName).exe" IntermediateDirectory="$(WorkspacePath)/../bin/GCCRelease/AVX2/obj/$(ProjectName)" Command="./$(ProjectName)" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(WorkspacePath)/../bin/GCCRelease/AVX2" PauseExecWhenProcTerminates="no" IsGUIProgram="yes" IsEnabled="yes"/>
+      <General OutputFile="$(WorkspacePath)/../bin/$(ConfigurationName)/$(ProjectName).exe" IntermediateDirectory="$(WorkspacePath)/../bin/$(ConfigurationName)/obj/$(ProjectName)" Command="./$(ProjectName)" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(WorkspacePath)/../bin/$(ConfigurationName)" PauseExecWhenProcTerminates="no" IsGUIProgram="yes" IsEnabled="yes"/>
       <BuildSystem Name="Default"/>
       <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
         <![CDATA[]]>
@@ -451,7 +451,7 @@
       </Compiler>
       <Linker Options="-s;-O2;-static;-Wl,--gc-sections;-msse2;-mfpmath=sse;-ffast-math;-fno-rtti;-fomit-frame-pointer;-Wl,--major-os-version,5;-Wl,--minor-os-version,1;-Wl,--subsystem,windows:5.01" Required="yes"/>
       <ResourceCompiler Options="-DWIN32" Required="no"/>
-      <General OutputFile="$(WorkspacePath)/../bin/GCCRelease/Win32/$(ProjectName).exe" IntermediateDirectory="$(WorkspacePath)/../bin/GCCRelease/Win32/obj/$(ProjectName)" Command="./$(ProjectName)" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(WorkspacePath)/../bin/GCCRelease/Win32" PauseExecWhenProcTerminates="no" IsGUIProgram="yes" IsEnabled="yes"/>
+      <General OutputFile="$(WorkspacePath)/../bin/$(ConfigurationName)/$(ProjectName).exe" IntermediateDirectory="$(WorkspacePath)/../bin/$(ConfigurationName)/obj/$(ProjectName)" Command="./$(ProjectName)" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(WorkspacePath)/../bin/$(ConfigurationName)" PauseExecWhenProcTerminates="no" IsGUIProgram="yes" IsEnabled="yes"/>
       <BuildSystem Name="Default"/>
       <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
         <![CDATA[]]>
@@ -493,7 +493,7 @@
       </Compiler>
       <Linker Options="-s;-O2;-static;-Wl,--gc-sections;-ffast-math;-fno-rtti;-fomit-frame-pointer;-Wl,--major-os-version,5;-Wl,--minor-os-version,2;-Wl,--subsystem,windows:5.02" Required="yes"/>
       <ResourceCompiler Options="-D_WIN64" Required="no"/>
-      <General OutputFile="$(WorkspacePath)/../bin/GCCRelease/x64/$(ProjectName).exe" IntermediateDirectory="$(WorkspacePath)/../bin/GCCRelease/x64/obj/$(ProjectName)" Command="./$(ProjectName)" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(WorkspacePath)/../bin/GCCRelease/x64" PauseExecWhenProcTerminates="no" IsGUIProgram="yes" IsEnabled="yes"/>
+      <General OutputFile="$(WorkspacePath)/../bin/$(ConfigurationName)/$(ProjectName).exe" IntermediateDirectory="$(WorkspacePath)/../bin/$(ConfigurationName)/obj/$(ProjectName)" Command="./$(ProjectName)" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(WorkspacePath)/../bin/$(ConfigurationName)" PauseExecWhenProcTerminates="no" IsGUIProgram="yes" IsEnabled="yes"/>
       <BuildSystem Name="Default"/>
       <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
         <![CDATA[]]>
