@@ -434,8 +434,8 @@ void EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus *status) {
 	};
 
 	const uint8_t *ptr = (const uint8_t *)lpData;
-	// TODO: remove implicitly NULL-terminated requirement for *ptr == '\n'
-	const uint8_t * const end = ptr + cbData;
+	// No NULL-terminated requirement for *ptr == '\n'
+	const uint8_t * const end = ptr + cbData - 1;
 
 #if NP2_USE_AVX2
 	#define LAST_CR_MASK	(1U << (sizeof(__m256i) - 1))
@@ -468,7 +468,7 @@ void EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus *status) {
 			const uint32_t maskCRLF = (maskCR << 1) & maskLF; // CR+LF
 			const uint32_t maskCR_LF = (maskCR << 1) ^ maskLF;// CR alone or LF alone
 			maskLF = maskCR_LF & maskLF; // LF alone
-			maskCR = maskCR_LF ^ maskLF; // CR alone
+			maskCR = maskCR_LF ^ maskLF; // CR alone (with one position offset)
 			if (maskCRLF) {
 				lineCountCRLF += np2_popcount(maskCRLF);
 			}
@@ -516,7 +516,7 @@ void EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus *status) {
 			const uint32_t maskCRLF = (maskCR << 1) & maskLF; // CR+LF
 			const uint32_t maskCR_LF = (maskCR << 1) ^ maskLF;// CR alone or LF alone
 			maskLF = maskCR_LF & maskLF; // LF alone
-			maskCR = maskCR_LF ^ maskLF; // CR alone
+			maskCR = maskCR_LF ^ maskLF; // CR alone (with one position offset)
 			if (maskCRLF) {
 				lineCountCRLF += np2_popcount(maskCRLF);
 			}
@@ -554,6 +554,17 @@ void EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus *status) {
 			break;
 		}
 	} while (ptr < end);
+
+	if (ptr == end) {
+		switch (*ptr) {
+		case '\n':
+			++lineCountLF;
+			break;
+		case '\r':
+			++lineCountCR;
+			break;
+		}
+	}
 
 	const Sci_Line linesMax = max_pos(max_pos(lineCountCRLF, lineCountCR), lineCountLF);
 	// values must kept in same order as SC_EOL_CRLF, SC_EOL_CR, SC_EOL_LF

@@ -1089,7 +1089,7 @@ void CellBuffer::BasicInsertString(const Sci::Position position, const char * co
 				const uint32_t maskCRLF = (maskCR << 1) & maskLF; // CR+LF
 				const uint32_t maskCR_LF = (maskCR << 1) ^ maskLF;// CR alone or LF alone
 				maskLF = maskCR_LF & maskLF; // LF alone
-				//maskCR = maskCR_LF ^ maskLF; // CR alone with one position offset
+				//maskCR = maskCR_LF ^ maskLF; // CR alone (with one position offset)
 				// each set bit now represent end location of CR or LF in each line endings.
 				maskLF |= maskCRLF | ((maskCR_LF ^ maskLF) >> 1);
 			}
@@ -1152,7 +1152,7 @@ void CellBuffer::BasicInsertString(const Sci::Position position, const char * co
 				const uint32_t maskCRLF = (maskCR << 1) & maskLF; // CR+LF
 				const uint32_t maskCR_LF = (maskCR << 1) ^ maskLF;// CR alone or LF alone
 				maskLF = maskCR_LF & maskLF; // LF alone
-				//maskCR = maskCR_LF ^ maskLF; // CR alone with one position offset
+				//maskCR = maskCR_LF ^ maskLF; // CR alone (with one position offset)
 				// each set bit now represent end location of CR or LF in each line endings.
 				maskLF |= maskCRLF | ((maskCR_LF ^ maskLF) >> 1);
 			}
