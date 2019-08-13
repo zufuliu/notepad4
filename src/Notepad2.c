@@ -442,7 +442,7 @@ static void CleanUpResources(BOOL initialized) {
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nShowCmd) {
 	UNREFERENCED_PARAMETER(hPrevInstance);
 	UNREFERENCED_PARAMETER(lpCmdLine);
-#if 0 // used for clang ubsan or printing debug message on console.
+#if 0 // used for Clang UBSan or printing debug message on console.
 	if (AttachConsole(ATTACH_PARENT_PROCESS)) {
 		freopen("CONOUT$", "w", stdout);
 		freopen("CONOUT$", "w", stderr);
@@ -608,12 +608,8 @@ BOOL InitApplication(HINSTANCE hInstance) {
 //
 //
 HWND InitInstance(HINSTANCE hInstance, int nCmdShow) {
-	RECT rc = { wi.x, wi.y, wi.x + wi.cx, wi.y + wi.cy };
-
-	HMONITOR hMonitor = MonitorFromRect(&rc, MONITOR_DEFAULTTONEAREST);
-	MONITORINFO mi;
-	mi.cbSize = sizeof(mi);
-	GetMonitorInfo(hMonitor, &mi);
+	const BOOL defaultPos = (wi.x == CW_USEDEFAULT || wi.y == CW_USEDEFAULT ||  wi.cx == CW_USEDEFAULT || wi.cy == CW_USEDEFAULT);
+	RECT rc = { wi.x, wi.y, (defaultPos ? CW_USEDEFAULT : (wi.x + wi.cx)), (defaultPos ? CW_USEDEFAULT : (wi.y + wi.cy)) };
 
 	if (flagDefaultPos == 1) {
 		wi.x = wi.y = wi.cx = wi.cy = CW_USEDEFAULT;
@@ -650,10 +646,7 @@ HWND InitInstance(HINSTANCE hInstance, int nCmdShow) {
 			wi.y += (flagDefaultPos & 32) ? 4 : 8;
 			wi.cy -= (flagDefaultPos & (16 | 32)) ? 12 : 16;
 		}
-	} else if (flagDefaultPos == 2 || flagDefaultPos == 3 ||
-			   wi.x == CW_USEDEFAULT || wi.y == CW_USEDEFAULT ||
-			   wi.cx == CW_USEDEFAULT || wi.cy == CW_USEDEFAULT) {
-
+	} else if (flagDefaultPos == 2 || flagDefaultPos == 3 || defaultPos) {
 		// default window position
 		SystemParametersInfo(SPI_GETWORKAREA, 0, &rc, 0);
 		wi.y = rc.top + 16;
@@ -661,8 +654,12 @@ HWND InitInstance(HINSTANCE hInstance, int nCmdShow) {
 		wi.cx = min_i(rc.right - rc.left - 32, wi.cy);
 		wi.x = (flagDefaultPos == 3) ? rc.left + 16 : rc.right - wi.cx - 16;
 	} else {
-
 		// fit window into working area of current monitor
+		HMONITOR hMonitor = MonitorFromRect(&rc, MONITOR_DEFAULTTONEAREST);
+		MONITORINFO mi;
+		mi.cbSize = sizeof(mi);
+		GetMonitorInfo(hMonitor, &mi);
+
 		wi.x += (mi.rcWork.left - mi.rcMonitor.left);
 		wi.y += (mi.rcWork.top - mi.rcMonitor.top);
 		if (wi.x < mi.rcWork.left) {
