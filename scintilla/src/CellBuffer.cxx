@@ -1131,8 +1131,8 @@ void CellBuffer::BasicInsertString(const Sci::Position position, const char * co
 			uint32_t maskCR = _mm_movemask_epi8(_mm_cmpeq_epi8(chunk, vectCR));
 			uint32_t maskLF = _mm_movemask_epi8(_mm_cmpeq_epi8(chunk, vectLF));
 			chunk = _mm_loadu_si128((__m128i *)(ptr + sizeof(__m128i)));
-			maskCR |= _mm_movemask_epi8(_mm_cmpeq_epi8(chunk, vectCR)) << sizeof(__m128i);
-			maskLF |= _mm_movemask_epi8(_mm_cmpeq_epi8(chunk, vectLF)) << sizeof(__m128i);
+			maskCR |= ((uint32_t)_mm_movemask_epi8(_mm_cmpeq_epi8(chunk, vectCR))) << sizeof(__m128i);
+			maskLF |= ((uint32_t)_mm_movemask_epi8(_mm_cmpeq_epi8(chunk, vectLF))) << sizeof(__m128i);
 
 			const char *next = ptr + 2*sizeof(__m128i);
 			bool lastCR = false;
