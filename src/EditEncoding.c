@@ -1160,7 +1160,6 @@ BOOL IsUTF8(const char *pTest, DWORD nLength) {
 		while (pt + sizeof(__m256i) <= end) {
 			const __m256i chunk = _mm256_load_si256((__m256i *)pt);
 			const uint32_t mask = _mm256_movemask_epi8(chunk);
-			_mm256_zeroupper();
 			if (mask) {
 				// skip leading and trailing ASCII
 #if defined(__clang__) || defined(__GNUC__)
@@ -1293,7 +1292,6 @@ BOOL IsUTF7(const char *pTest, DWORD nLength) {
 		while (pt + sizeof(__m256i) <= end) {
 			const __m256i chunk = _mm256_load_si256((__m256i *)pt);
 			const uint32_t mask = _mm256_movemask_epi8(chunk);
-			_mm256_zeroupper();
 			if (mask) {
 				return FALSE;
 			}
