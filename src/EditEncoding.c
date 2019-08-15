@@ -1148,9 +1148,9 @@ BOOL IsUTF8(const char *pTest, DWORD nLength) {
 		const uint8_t * const ptr = (const uint8_t *)align_ptr_ex(pt, ALIGNMENT);
 		while (pt < ptr) {
 			state = utf8_dfa[256 + state + utf8_dfa[*pt++]];
-			if (state == UTF8_REJECT) {
-				return FALSE;
-			}
+		}
+		if (state == UTF8_REJECT) {
+			return FALSE;
 		}
 #undef ALIGNMENT
 	}
@@ -1174,10 +1174,10 @@ BOOL IsUTF8(const char *pTest, DWORD nLength) {
 				const uint8_t * const endPtr = pt + leading + 1;
 				do {
 					state = utf8_dfa[256 + state + utf8_dfa[*temp++]];
-					if (state == UTF8_REJECT) {
-						return FALSE;
-					}
 				} while (temp < endPtr);
+				if (state == UTF8_REJECT) {
+					return FALSE;
+				}
 			}
 			pt += sizeof(__m256i);
 		}
@@ -1201,10 +1201,10 @@ BOOL IsUTF8(const char *pTest, DWORD nLength) {
 				const uint8_t * const endPtr = pt + leading + 1;
 				do {
 					state = utf8_dfa[256 + state + utf8_dfa[*temp++]];
-					if (state == UTF8_REJECT) {
-						return FALSE;
-					}
 				} while (temp < endPtr);
+				if (state == UTF8_REJECT) {
+					return FALSE;
+				}
 			}
 			pt += sizeof(__m128i);
 		}
@@ -1213,15 +1213,32 @@ BOOL IsUTF8(const char *pTest, DWORD nLength) {
 		const uint64_t *temp = (const uint64_t *)pt;
 		const uint64_t * const temp_end = (const uint64_t *)end;
 		while (temp < temp_end) {
-			if (*temp & UINT64_C(0x8080808080808080)) {
-				pt = (const uint8_t *)temp;
-				const uint8_t * const endPtr = pt + sizeof(uint64_t);
-				do {
-					state = utf8_dfa[256 + state + utf8_dfa[*pt++]];
-					if (state == UTF8_REJECT) {
-						return FALSE;
-					}
-				} while (pt < endPtr);
+			const uint64_t val = *temp;
+			if (val & UINT64_C(0x8080808080808080)) {
+#if 0
+				pt = (const uint8_t *)temp
+				state = utf8_dfa[256 + state + utf8_dfa[pt[0]]];
+				state = utf8_dfa[256 + state + utf8_dfa[pt[1]]];
+				state = utf8_dfa[256 + state + utf8_dfa[pt[2]]];
+				state = utf8_dfa[256 + state + utf8_dfa[pt[3]]];
+				state = utf8_dfa[256 + state + utf8_dfa[pt[4]]];
+				state = utf8_dfa[256 + state + utf8_dfa[pt[5]]];
+				state = utf8_dfa[256 + state + utf8_dfa[pt[6]]];
+				state = utf8_dfa[256 + state + utf8_dfa[pt[7]]];
+#else
+				// same as above
+				state = utf8_dfa[256 + state + utf8_dfa[val & 255]];
+				state = utf8_dfa[256 + state + utf8_dfa[(val >> 8) & 255]];
+				state = utf8_dfa[256 + state + utf8_dfa[(val >> 16) & 255]];
+				state = utf8_dfa[256 + state + utf8_dfa[(val >> 24) & 255]];
+				state = utf8_dfa[256 + state + utf8_dfa[(val >> 32) & 255]];
+				state = utf8_dfa[256 + state + utf8_dfa[(val >> 40) & 255]];
+				state = utf8_dfa[256 + state + utf8_dfa[(val >> 48) & 255]];
+				state = utf8_dfa[256 + state + utf8_dfa[val >> 56]];
+#endif
+				if (state == UTF8_REJECT) {
+					return FALSE;
+				}
 			}
 			++temp;
 		}
@@ -1231,15 +1248,24 @@ BOOL IsUTF8(const char *pTest, DWORD nLength) {
 		const uint32_t *temp = (const uint32_t *)pt;
 		const uint32_t * const temp_end = (const uint32_t *)end;
 		while (temp < temp_end) {
-			if (*temp & 0x80808080U) {
-				pt = (const uint8_t *)temp;
-				const uint8_t * const endPtr = pt + sizeof(uint32_t);
-				do {
-					state = utf8_dfa[256 + state + utf8_dfa[*pt++]];
-					if (state == UTF8_REJECT) {
-						return FALSE;
-					}
-				} while (pt < endPtr);
+			const uint32_t val = *temp;
+			if (val & 0x80808080U) {
+#if 0
+				pt = (const uint8_t *)temp
+				state = utf8_dfa[256 + state + utf8_dfa[pt[0]]];
+				state = utf8_dfa[256 + state + utf8_dfa[pt[1]]];
+				state = utf8_dfa[256 + state + utf8_dfa[pt[2]]];
+				state = utf8_dfa[256 + state + utf8_dfa[pt[3]]];
+#else
+				// same as above
+				state = utf8_dfa[256 + state + utf8_dfa[val & 255]];
+				state = utf8_dfa[256 + state + utf8_dfa[(val >> 8) & 255]];
+				state = utf8_dfa[256 + state + utf8_dfa[(val >> 16) & 255]];
+				state = utf8_dfa[256 + state + utf8_dfa[val >> 24]];
+#endif
+				if (state == UTF8_REJECT) {
+					return FALSE;
+				}
 			}
 			++temp;
 		}
@@ -1250,9 +1276,6 @@ BOOL IsUTF8(const char *pTest, DWORD nLength) {
 
 	while (pt < end) {
 		state = utf8_dfa[256 + state + utf8_dfa[*pt++]];
-		if (state == UTF8_REJECT) {
-			return FALSE;
-		}
 	}
 
 #if 0
