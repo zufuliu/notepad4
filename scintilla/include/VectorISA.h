@@ -1,7 +1,7 @@
 #ifndef NOTEPAD2_VECTOR_ISA_H_
 #define NOTEPAD2_VECTOR_ISA_H_
 
-#if defined(__aarch64__) || defined(_ARM64_) || defined(__arm__) || defined(_ARM_) || defined(_M_ARM64) || defined(_M_ARM)
+#if defined(__aarch64__) || defined(_ARM64_) || defined(_M_ARM64) || defined(__arm__) || defined(_ARM_) || defined(_M_ARM)
 	#define NP2_TARGET_ARM	1
 	#define NP2_USE_SSE2	0
 	#define NP2_USE_AVX2	0
@@ -9,6 +9,7 @@
 #else
 	#define NP2_TARGET_ARM	0
 	#ifndef NP2_USE_SSE2
+		// SSE2 enabled by default
 		#define NP2_USE_SSE2	1
 	#endif
 

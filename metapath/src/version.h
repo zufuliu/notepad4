@@ -84,7 +84,7 @@
 		#define VERSION_FILEVERSION_ARCH	L" (64-bit) "
 	#endif
 #else
-	#if defined(__arm__) || defined(_ARM_)|| defined(_M_ARM)
+	#if defined(__arm__) || defined(_ARM_) || defined(_M_ARM)
 		#define VERSION_FILEVERSION_ARCH	L" (arm32) "
 	#else
 		#define VERSION_FILEVERSION_ARCH	L" (32-bit) "
