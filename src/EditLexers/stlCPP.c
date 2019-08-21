@@ -9,7 +9,7 @@ static KEYWORDLIST Keywords_CPP = {{
 "switch typedef union volatile while "
 "_Alignas _Alignof _Atomic _Generic _Noreturn _Static_assert _Thread_local "
 
-"alignas alignof asm catch class consteval constexpr const_cast decltype delete dynamic_cast "
+"alignas alignof asm catch class consteval constexpr constinit const_cast decltype delete dynamic_cast "
 "explicit export false friend mutable namespace new noexcept noreturn nullptr operator "
 "private protected public reinterpret_cast static_assert static_cast template "
 "this thread_local throw true try typeid typename using virtual "
