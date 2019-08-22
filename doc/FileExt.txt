@@ -75,6 +75,8 @@ Python Script
 	pyx				Cython Implementation File
 	pxd				Cython Definition File
 	pxi				Cython Include File
+	pyi				Stub File (PEP 484), https://www.python.org/dev/peps/pep-0484/#stub-files
+	pth				Path Configuration File, https://docs.python.org/3.9/library/site.html
 	boo				Boo
 	empy			EmPy
 	cobra			Cobra

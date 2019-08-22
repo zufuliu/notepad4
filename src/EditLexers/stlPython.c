@@ -324,7 +324,7 @@ static EDITSTYLE Styles_Python[] = {
 EDITLEXER lexPython = {
 	SCLEX_PYTHON, NP2LEX_PYTHON,
 	EDITLEXER_HOLE(L"Python Script", Styles_Python),
-	L"py; pyw; pyx; pxd; pxi; boo; empy; cobra; gs",
+	L"py; pyw; pyx; pxd; pxi; pyi; pth; boo; empy; cobra; gs",
 	&Keywords_Python,
 	Styles_Python
 };
