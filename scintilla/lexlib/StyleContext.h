@@ -74,7 +74,7 @@ public:
 	chNext(0),
 	width(0),
 	widthNext(1) {
-		// lexer need enable useUnicode when it need detecting Unicode identifier, http://www.unicode.org/reports/tr31/
+		// lexer need enable useUnicode if it wants to detect Unicode identifier (http://www.unicode.org/reports/tr31/)
 		// which requires CharacterCategory from official Scintilla lexlib.
 		if ((useUnicode && styler.Encoding() == encUnicode) || styler.Encoding() == encDBCS) {
 			multiByteAccess = styler.MultiByteAccess();
