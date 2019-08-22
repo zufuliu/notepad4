@@ -57,7 +57,7 @@ public:
 	Sci_Position widthNext;
 
 	StyleContext(Sci_PositionU startPos, Sci_PositionU length,
-		int initStyle, LexAccessor &styler_, unsigned char chMask = '\377') noexcept :
+		int initStyle, LexAccessor &styler_, bool useUnicode = false, unsigned char chMask = '\377') noexcept :
 	styler(styler_),
 	multiByteAccess(nullptr),
 	endPos(startPos + length),
@@ -74,7 +74,9 @@ public:
 	chNext(0),
 	width(0),
 	widthNext(1) {
-		if (styler.Encoding() != enc8bit) {
+		// lexer need enable useUnicode when it need detecting Unicode identifier, http://www.unicode.org/reports/tr31/
+		// which requires CharacterCategory from official Scintilla lexlib.
+		if ((useUnicode && styler.Encoding() == encUnicode) || styler.Encoding() == encDBCS) {
 			multiByteAccess = styler.MultiByteAccess();
 		}
 		styler.StartAt(startPos/*, chMask*/);
