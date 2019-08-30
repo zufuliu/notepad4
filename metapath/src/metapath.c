@@ -2098,10 +2098,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 					DirList_GetItemEx(hwndDirList, -1, &fd);
 
 					if (fd.nFileSizeLow >= MAXDWORD) {
-						HANDLE hFile = FindFirstFile(dli.szFileName, &fd);
-						if (hFile != INVALID_HANDLE_VALUE) {
-							FindClose(hFile);
-						}
+						GetFileAttributesEx(dli.szFileName, GetFileExInfoStandard, &fd);
 					}
 
 					const LONGLONG isize = (((LONGLONG)fd.nFileSizeHigh) << 32) | fd.nFileSizeLow;
