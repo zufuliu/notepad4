@@ -8,6 +8,7 @@ build/CodeLite/*.mk
 build/CodeLite/*.txt
 build/CodeLite/*.json
 build/CodeLite/Makefile
+build/CodeLite/build*
 *.suo
 *.sdf
 *.user
