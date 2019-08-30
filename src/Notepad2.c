@@ -8058,10 +8058,7 @@ void InstallFileWatching(LPCWSTR lpszFile) {
 		PathRemoveFileSpec(tchDirectory);
 
 		// Save data of current file
-		HANDLE hFind = FindFirstFile(szCurFile, &fdCurFile);
-		if (hFind != INVALID_HANDLE_VALUE) {
-			FindClose(hFind);
-		} else {
+		if (!GetFileAttributesEx(szCurFile, GetFileExInfoStandard, &fdCurFile)) {
 			ZeroMemory(&fdCurFile, sizeof(WIN32_FIND_DATA));
 		}
 
@@ -8075,6 +8072,22 @@ void InstallFileWatching(LPCWSTR lpszFile) {
 		bRunningWatch = TRUE;
 		dwChangeNotifyTime = 0;
 	}
+}
+
+static inline BOOL IsCurrentFileChangedOutsideApp(void) {
+	// Check if the file has been changed
+	WIN32_FIND_DATA fdUpdated;
+	if (!GetFileAttributesEx(szCurFile, GetFileExInfoStandard, &fdUpdated)) {
+		// The current file has been removed
+		return TRUE;
+	}
+
+	const BOOL changed = (fdCurFile.nFileSizeLow != fdUpdated.nFileSizeLow)
+			|| (fdCurFile.nFileSizeHigh != fdUpdated.nFileSizeHigh)
+			// CompareFileTime(&fdCurFile.ftLastWriteTime, &fdUpdated.ftLastWriteTime) != 0
+			|| (fdCurFile.ftLastWriteTime.dwLowDateTime != fdUpdated.ftLastWriteTime.dwLowDateTime)
+			|| (fdCurFile.ftLastWriteTime.dwHighDateTime != fdUpdated.ftLastWriteTime.dwHighDateTime);
+	return changed;
 }
 
 //=============================================================================
@@ -8103,25 +8116,14 @@ void CALLBACK WatchTimerProc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTim
 		// Check Change Notification Handle
 		else if (WAIT_OBJECT_0 == WaitForSingleObject(hChangeHandle, 0)) {
 			// Check if the changes affect the current file
-			WIN32_FIND_DATA fdUpdated;
-			HANDLE hFind = FindFirstFile(szCurFile, &fdUpdated);
-			if (INVALID_HANDLE_VALUE != hFind) {
-				FindClose(hFind);
-			} else { // The current file has been removed
-				ZeroMemory(&fdUpdated, sizeof(WIN32_FIND_DATA));
-			}
-
-			// Check if the file has been changed
-			if (CompareFileTime(&fdCurFile.ftLastWriteTime, &fdUpdated.ftLastWriteTime) != 0 ||
-					fdCurFile.nFileSizeLow != fdUpdated.nFileSizeLow ||
-					fdCurFile.nFileSizeHigh != fdUpdated.nFileSizeHigh) {
+			if (IsCurrentFileChangedOutsideApp()) {
 				// Shutdown current watching and give control to main window
 				if (hChangeHandle) {
 					FindCloseChangeNotification(hChangeHandle);
 					hChangeHandle = NULL;
 				}
 				if (iFileWatchingMode == 2) {
-					bRunningWatch = TRUE; /* ! */
+					bRunningWatch = TRUE;
 					dwChangeNotifyTime = GetTickCount();
 				} else {
 					KillTimer(NULL, ID_WATCHTIMER);
