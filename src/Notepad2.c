@@ -5975,6 +5975,9 @@ int ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2, BOOL *bIsNotepadReplacement) 
 			} else if (chNext == L'0' || chNext == L'-' || chNext == L'O') {
 				flagChangeNotify = 1;
 				state = 1;
+			} else if (chNext == L'P') {
+				flagChangeNotify = 3;
+				state = 1;
 			}
 			break;
 
