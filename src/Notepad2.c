@@ -1302,7 +1302,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 				const Sci_Line iDocTopLine = SciCall_DocLineFromVisible(iVisTopLine);
 				const int iXOffset = SciCall_GetXOffset();
 #endif
-				const BOOL bIsTail = (iCurPos == iAnchorPos) && (iCurPos == SciCall_GetLength());
+				const BOOL bIsTail = (iCurPos == iAnchorPos) && (SciCall_LineFromPosition(iCurPos) + 1 == SciCall_GetLineCount());
 
 				iWeakSrcEncoding = iEncoding;
 				if (FileLoad(TRUE, FALSE, TRUE, FALSE, szCurFile)) {
