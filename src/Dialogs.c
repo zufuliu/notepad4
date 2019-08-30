@@ -1312,6 +1312,7 @@ BOOL FileMRUDlg(HWND hwnd, LPWSTR lpstrFile) {
 //
 //
 extern int iFileWatchingMode;
+extern BOOL bFileWatchingKeepAtEnd;
 extern BOOL bResetFileWatching;
 
 static INT_PTR CALLBACK ChangeNotifyDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
@@ -1319,7 +1320,10 @@ static INT_PTR CALLBACK ChangeNotifyDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 
 	switch (umsg) {
 	case WM_INITDIALOG:
-		CheckRadioButton(hwnd, IDC_CHANGENOTIFY_NONE, IDC_CHANGENOTIFY_AUTO_RELOAD, IDC_CHANGENOTIFY_NONE + iFileWatchingMode);
+		CheckRadioButton(hwnd, IDC_CHANGENOTIFY_NONE, IDC_CHANGENOTIFY_POLL_RELOAD, IDC_CHANGENOTIFY_NONE + iFileWatchingMode);
+		if (bFileWatchingKeepAtEnd) {
+			CheckDlgButton(hwnd, IDC_CHANGENOTIFY_KEEP_AT_END, BST_CHECKED);
+		}
 		if (bResetFileWatching) {
 			CheckDlgButton(hwnd, IDC_CHANGENOTIFY_RESET_WATCH, BST_CHECKED);
 		}
@@ -1329,7 +1333,8 @@ static INT_PTR CALLBACK ChangeNotifyDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 	case WM_COMMAND:
 		switch (LOWORD(wParam)) {
 		case IDOK:
-			iFileWatchingMode = GetCheckedRadioButton(hwnd, IDC_CHANGENOTIFY_NONE, IDC_CHANGENOTIFY_AUTO_RELOAD) - IDC_CHANGENOTIFY_NONE;
+			iFileWatchingMode = GetCheckedRadioButton(hwnd, IDC_CHANGENOTIFY_NONE, IDC_CHANGENOTIFY_POLL_RELOAD) - IDC_CHANGENOTIFY_NONE;
+			bFileWatchingKeepAtEnd = IsButtonChecked(hwnd, IDC_CHANGENOTIFY_KEEP_AT_END);
 			bResetFileWatching = IsButtonChecked(hwnd, IDC_CHANGENOTIFY_RESET_WATCH);
 			EndDialog(hwnd, IDOK);
 			break;

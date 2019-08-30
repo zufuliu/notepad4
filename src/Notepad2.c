@@ -179,6 +179,7 @@ RECT	pageSetupMargin;
 static BOOL bSaveBeforeRunningTools;
 BOOL bOpenFolderWithMetapath;
 int		iFileWatchingMode;
+BOOL	bFileWatchingKeepAtEnd;
 BOOL	bResetFileWatching;
 static DWORD dwFileCheckInverval;
 static DWORD dwAutoReloadTimeout;
@@ -765,8 +766,8 @@ HWND InitInstance(HINSTANCE hInstance, int nCmdShow) {
 				iFileWatchingMode = 0;
 				bResetFileWatching = TRUE;
 				InstallFileWatching(szCurFile);
-			} else if (flagChangeNotify == 2) {
-				iFileWatchingMode = 2;
+			} else if (flagChangeNotify == 2 || flagChangeNotify == 3) {
+				iFileWatchingMode = flagChangeNotify;
 				bResetFileWatching = TRUE;
 				InstallFileWatching(szCurFile);
 			}
@@ -1154,8 +1155,8 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 						iFileWatchingMode = 0;
 						bResetFileWatching = TRUE;
 						InstallFileWatching(szCurFile);
-					} else if (params->flagChangeNotify == 2) {
-						iFileWatchingMode = 2;
+					} else if (params->flagChangeNotify == 2 || params->flagChangeNotify == 3) {
+						iFileWatchingMode = params->flagChangeNotify;
 						bResetFileWatching = TRUE;
 						InstallFileWatching(szCurFile);
 					}
@@ -1294,7 +1295,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 		}
 
 		if (PathFileExists(szCurFile)) {
-			if ((iFileWatchingMode == 2 && !IsDocumentModified()) || MsgBox(MBYESNO, IDS_FILECHANGENOTIFY) == IDYES) {
+			if (((iFileWatchingMode == 2 || iFileWatchingMode == 3) && !IsDocumentModified()) || MsgBox(MBYESNO, IDS_FILECHANGENOTIFY) == IDYES) {
 				const Sci_Position iCurPos = SciCall_GetCurrentPos();
 				const Sci_Position iAnchorPos = SciCall_GetAnchor();
 #if NP2_ENABLE_DOT_LOG_FEATURE
@@ -1302,12 +1303,11 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 				const Sci_Line iDocTopLine = SciCall_DocLineFromVisible(iVisTopLine);
 				const int iXOffset = SciCall_GetXOffset();
 #endif
-				const BOOL bIsTail = (iCurPos == iAnchorPos) && (SciCall_LineFromPosition(iCurPos) + 1 == SciCall_GetLineCount());
+				const BOOL bIsTail = bFileWatchingKeepAtEnd || ((iCurPos == iAnchorPos) && (SciCall_LineFromPosition(iCurPos) + 1 == SciCall_GetLineCount()));
 
 				iWeakSrcEncoding = iEncoding;
 				if (FileLoad(TRUE, FALSE, TRUE, FALSE, szCurFile)) {
-
-					if (bIsTail && iFileWatchingMode == 2) {
+					if (bIsTail && (iFileWatchingMode == 2 || iFileWatchingMode == 3)) {
 						SciCall_DocumentEnd();
 						EditEnsureSelectionVisible();
 					}
@@ -5323,8 +5323,8 @@ void LoadSettings(void) {
 	bOpenFolderWithMetapath = IniSectionGetBool(pIniSection, L"OpenFolderWithMetapath", 1);
 
 	iValue = IniSectionGetInt(pIniSection, L"FileWatchingMode", 2);
-	iFileWatchingMode = clamp_i(iValue, 0, 2);
-
+	iFileWatchingMode = clamp_i(iValue, 0, 3);
+	bFileWatchingKeepAtEnd = IniSectionGetBool(pIniSection, L"FileWatchingKeepAtEnd", 0);
 	bResetFileWatching = IniSectionGetBool(pIniSection, L"ResetFileWatching", 0);
 
 	iValue = IniSectionGetInt(pIniSection, L"EscFunction", 0);
@@ -5616,6 +5616,7 @@ void SaveSettings(BOOL bSaveSettingsNow) {
 	IniSectionSetBoolEx(pIniSection, L"SaveBeforeRunningTools", bSaveBeforeRunningTools, 0);
 	IniSectionSetBoolEx(pIniSection, L"OpenFolderWithMetapath", bOpenFolderWithMetapath, 1);
 	IniSectionSetIntEx(pIniSection, L"FileWatchingMode", iFileWatchingMode, 2);
+	IniSectionSetBoolEx(pIniSection, L"FileWatchingKeepAtEnd", bFileWatchingKeepAtEnd, 0);
 	IniSectionSetBoolEx(pIniSection, L"ResetFileWatching", bResetFileWatching, 0);
 	IniSectionSetIntEx(pIniSection, L"EscFunction", iEscFunction, 0);
 	IniSectionSetBoolEx(pIniSection, L"AlwaysOnTop", bAlwaysOnTop, 0);
@@ -8062,7 +8063,7 @@ void InstallFileWatching(LPCWSTR lpszFile) {
 			ZeroMemory(&fdCurFile, sizeof(WIN32_FIND_DATA));
 		}
 
-		hChangeHandle = FindFirstChangeNotification(tchDirectory, FALSE,
+		hChangeHandle = (iFileWatchingMode == 3) ? NULL : FindFirstChangeNotification(tchDirectory, FALSE,
 						FILE_NOTIFY_CHANGE_FILE_NAME	| \
 						FILE_NOTIFY_CHANGE_DIR_NAME		| \
 						FILE_NOTIFY_CHANGE_ATTRIBUTES	| \
@@ -8112,8 +8113,15 @@ void CALLBACK WatchTimerProc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTim
 			dwChangeNotifyTime = 0;
 			SendMessage(hwndMain, APPM_CHANGENOTIFY, 0, 0);
 		}
-
+		// polling, not very efficient but useful for watching continuously updated file
+		else if (iFileWatchingMode == 3) {
+			if (dwChangeNotifyTime == 0 && IsCurrentFileChangedOutsideApp()) {
+				bRunningWatch = TRUE;
+				dwChangeNotifyTime = GetTickCount();
+			}
+		}
 		// Check Change Notification Handle
+		// TODO: notification not fired for continuously updated file
 		else if (WAIT_OBJECT_0 == WaitForSingleObject(hChangeHandle, 0)) {
 			// Check if the changes affect the current file
 			if (IsCurrentFileChangedOutsideApp()) {
