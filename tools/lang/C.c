@@ -50,6 +50,30 @@ defined
 #pragma
 _Pragma()
 
+// Argument substitution
+__VA_ARGS__
+// Predefined macro names
+__DATE__
+__FILE__
+__LINE__
+__STDC__
+__STDC_HOSTED__
+__STDC_VERSION__
+__TIME__
+// Environment macros
+__STDC_ISO_10646__
+__STDC_MB_MIGHT_NEQ_WC__
+__STDC_UTF_16__
+__STDC_UTF_32__
+// Conditional feature macros
+__STDC_ANALYZABLE__
+__STDC_IEC_559__
+__STDC_IEC_559_COMPLEX__
+__STDC_LIB_EXT1__
+__STDC_NO_ATOMICS__
+__STDC_NO_COMPLEX__
+__STDC_NO_THREADS__
+__STDC_NO_VLA__
 // Visual C++ Predefined Macros
 // https://docs.microsoft.com/en-us/cpp/preprocessor/predefined-macros
 // GCC Predefined Macros
