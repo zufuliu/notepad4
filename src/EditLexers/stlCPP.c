@@ -117,10 +117,14 @@ static KEYWORDLIST Keywords_CPP = {{
 "bad_alloc bad_array_new_length "
 // <typeinfo>
 "type_info bad_cast bad_typeid "
+// <source_location>
+"source_location "
 // <contract>
-"contract_violation "
+//"contract_violation "
 // <compare>
-"weak_equality strong_equality partial_ordering weak_ordering strong_ordering common_comparison_category "
+"weak_equality strong_equality partial_ordering weak_ordering strong_ordering common_comparison_category compare_three_way_result compare_three_way "
+// <coroutine>
+"coroutine_traits coroutine_handle noop_coroutine_promise noop_coroutine_handle suspend_never suspend_always "
 // <exception>
 "exception bad_exception nested_exception "
 // <initializer_list>
@@ -151,19 +155,21 @@ static KEYWORDLIST Keywords_CPP = {{
 // <scoped_allocator>
 "scoped_allocator_adaptor "
 // <functional>
-"reference_wrapper is_bind_expression is_placeholder function bad_function_call "
+"reference_wrapper identity is_bind_expression is_placeholder function bad_function_call "
 "default_searcher boyer_moore_searcher boyer_moore_horspool_searcher "
 // <type_traits>
 "integral_constant bool_constant true_type false_type "
-"alignment_of decay enable_if common_type invoke_result "
+"alignment_of decay decay_t enable_if common_type common_type_t invoke_result invoke_result_t "
 // <ratio>
-"ratio_add ratio_subtract ratio_multiply ratio_divide "
+"ratio_add ratio_subtract ratio_multiply ratio_divide ratio_equal ratio_not_equal ratio_less ratio_less_equal ratio_greater ratio_greater_equal "
 // <chrono>
-"time_point system_clock sys_time sys_seconds sys_days utc_clock utc_time utc_seconds tai_clock tai_time tai_seconds gps_clock gps_time gps_seconds file_clock file_time steady_clock high_resolution_clock local_t local_time local_seconds local_days clock_time_conversion weekday_indexed weekday_last month_day month_day_last month_weekday month_weekday_last year_month year_month_day year_month_day_last year_month_weekday year_month_weekday_last time_of_day tzdb_list nonexistent_local_time ambiguous_local_time sys_info local_info time_zone zoned_time zoned_seconds "
+"time_point system_clock sys_time sys_seconds sys_days utc_clock utc_time utc_seconds leap_second_info tai_clock tai_time tai_seconds gps_clock gps_time gps_seconds file_clock file_time steady_clock high_resolution_clock local_t local_time local_seconds local_days clock_time_conversion weekday_indexed weekday_last month_day month_day_last month_weekday month_weekday_last year_month year_month_day year_month_day_last year_month_weekday year_month_weekday_last tzdb_list nonexistent_local_time ambiguous_local_time sys_info local_info time_zone zoned_time zoned_seconds "
 // <typeindex>
 "type_index "
 // <execution>
-"is_execution_policy sequenced_policy parallel_policy parallel_unsequenced_policy "
+"is_execution_policy sequenced_policy parallel_policy parallel_unsequenced_policy unsequenced_policy "
+// <format>
+"format_to_n_result formatter basic_format_parse_context format_parse_context wformat_parse_context basic_format_context format_context wformat_context basic_format_args format_args wformat_args format_error format_args_t "
 // <string>
 "char_traits basic_string string u8string u16string u32string wstring " "u8streampos u16streampos u32streampos "
 // <string_view>
@@ -183,9 +189,11 @@ static KEYWORDLIST Keywords_CPP = {{
 // <queue> <stack> <span>
 "queue priority_queue stack " "span "
 // <iterator>
-"iterator_traits input_iterator_tag output_iterator_tag forward_iterator_tag bidirectional_iterator_tag random_access_iterator_tag contiguous_iterator_tag "
+"incrementable_traits readable_traits iterator_traits input_iterator_tag output_iterator_tag forward_iterator_tag bidirectional_iterator_tag random_access_iterator_tag contiguous_iterator_tag "
 "reverse_iterator back_insert_iterator front_insert_iterator insert_iterator move_iterator common_iterator counted_iterator move_sentinel "
 "istream_iterator ostream_iterator istreambuf_iterator ostreambuf_iterator "
+// <ranges>
+"view_base view_interface subrange dangling empty_view single_view iota_view all_view ref_view filter_view transform_view take_view take_while_view drop_view drop_while_view join_view split_view common_view basic_istream_view elements_view keys_view values_view "
 // <algorithm>
 "copy_result "
 // <random>
@@ -218,22 +226,24 @@ static KEYWORDLIST Keywords_CPP = {{
 "match_results cmatch wcmatch smatch wsmatch "
 "regex_iterator cregex_iterator wcregex_iterator sregex_iterator wsregex_iterator "
 "regex_token_iterator cregex_token_iterator wcregex_token_iterator sregex_token_iterator wsregex_token_iterator "
-// <atomic>
-"atomic atomic_ref "
+// <atomic> <stop_token>
+"atomic atomic_ref " "stop_token stop_source nostopstate_t stop_callback "
 // <thread>
-"thread "
+"thread jthread "
 // <mutex> <shared_mutex>
 "mutex recursive_mutex timed_mutex recursive_timed_mutex shared_mutex shared_timed_mutex "
 "lock_guard scoped_lock unique_lock shared_lock "
 // <condition_variable>
 "condition_variable condition_variable_any "
+// <semaphore> <latch> <barrier>
+"counting_semaphore binary_semaphore latch barrier arrival_token "
 // <future>
 "future_error promise future shared_future packaged_task "
 
 // common typedef
 "const_reverse_iterator "
 "traits_type allocator_type iterator_category container_type element_type deleter_type weak_type "
-"string_type iter_type "
+"string_type iter_type comparison_category "
 "key_type mapped_type key_compare node_type insert_return_type value_compare "
 "hasher key_equal local_iterator const_local_iterator "
 "istream_type ostream_type streambuf_type syncbuf_type "
@@ -293,6 +303,8 @@ static KEYWORDLIST Keywords_CPP = {{
 "file_type perm_options copy_options directory_options "
 // <regex>
 "syntax_option_type match_flag_type error_type "
+// <ranges>
+"subrange_kind "
 // <condition_variable>
 "cv_status "
 // <future>
@@ -392,6 +404,7 @@ static KEYWORDLIST Keywords_CPP = {{
 , // 10 2nd Type Keyword
 // <new>
 "new_handler align_val_t "
+"promise_type " // <coroutine>
 // <exception>
 "terminate_handler exception_ptr "
 // <initializer_list>
@@ -616,10 +629,15 @@ static KEYWORDLIST Keywords_CPP = {{
 "get_new_handler() set_new_handler() launder() "
 // <typeinfo>
 "before() hash_code() name() " // type_info
+// <source_location>
+"current() line() column() file_name() function_name() "
 // <contract>
-"line_number() file_name() function_name() comment() assertion_level() "
+//"line_number() comment() assertion_level() "
 // <compare>
 "is_eq() is_neq() is_lt() is_lteq() is_gt() is_gteq() " "strong_order() weak_order() partial_order() strong_equal() weak_equal() "
+"strong_order() weak_order() partial_order() compare_strong_order_fallback() compare_weak_order_fallback() compare_partial_order_fallback() "
+// <coroutine>
+"address() from_address() done() resume() from_promise() promise() noop_coroutine() await_ready() await_suspend() await_resume() "
 // <exception>
 "what() " // exception
 "rethrow_nested() nested_ptr() " // nested_exception
@@ -670,10 +688,12 @@ static KEYWORDLIST Keywords_CPP = {{
 "invoke() ref() cref() not_fn() bind_front() bind() mem_fn() "
 "target_type() target() " // function
 // <chrono>
-"zero() duration_cast() time_point_cast() time_since_epoch() to_stream() from_stream() "
-"now() to_time_t() from_time_t() to_sys() from_sys() to_utc() from_utc() clock_cast() to_duration() make24() make12() "
+"zero() duration_cast() time_point_cast() time_since_epoch() to_stream() from_stream() get_leap_second_info() "
+"now() to_time_t() from_time_t() to_sys() from_sys() to_utc() from_utc() clock_cast() to_duration() is_am() is_pm() make24() make12() "
 "locate_zone() current_zone() get_tzdb() get_tzdb_list() reload_tzdb() remote_version() get_info() to_local() "
 "get_time_zone() get_local_time() get_sys_time() date() parse() "
+// <format>
+"format() vformat() format_to() vformat_to() format_to_n() formatted_size() advance_to() next_arg_id() check_arg_id() out() visit_format_arg() make_format_args() make_wformat_args() "
 // <string>
 "eq() lt() compare() length() find() copy() not_eof() to_char_type() to_int_type() eq_int_type() eof() " // char_traits
 "getline() erase() erase_if() stoi() stol() stoul() stoll() stoull() stof() stod() stold() to_wstring() "
@@ -685,7 +705,7 @@ static KEYWORDLIST Keywords_CPP = {{
 "global() classic() " // locale
 "use_facet() has_facet() "
 "is() scan_is() scan_not() widen() narrow() " // ctype
-"out() unshift() in() encoding() always_noconv() max_length() " // codecvt
+"unshift() in() encoding() always_noconv() max_length() " // codecvt
 "put() " // num_put
 "decimal_point() thousands_sep() grouping() truename() falsename() " // numpunct
 "transform() " // collate
@@ -693,7 +713,7 @@ static KEYWORDLIST Keywords_CPP = {{
 "curr_symbol() positive_sign() negative_sign() frac_digits() pos_format() neg_format() " // moneypunct
 "open() close() " // messages
 // <array> <deque> <forward_list> <list> <vector>
-"fill() " // array
+"fill() to_array() " // array
 "get_allocator() emplace_front() emplace_back() push_front() pop_front() " // deque
 "before_begin() cbefore_begin() emplace_after() insert_after() erase_after() splice_after() remove() remove_if() unique() merge() sort() reverse() " // forward_list
 "splice() " // list
@@ -707,6 +727,8 @@ static KEYWORDLIST Keywords_CPP = {{
 // <iterator>
 "advance() distance() next() prev() base() iter_move() iter_swap() "
 "make_reverse_iterator() back_inserter() front_inserter() inserter() make_move_iterator() "
+// <ranges>
+"filter() take() take_while() drop() drop_while() split() counted() common() istream_view() elements() keys() values() "
 // <algorithm>
 "all_of() any_of() none_of() for_each() for_each_n() find_if() find_if_not() find_end() adjacent_find() "
 "count_if() mismatch() equal() is_permutation() search() search_n() "
@@ -717,7 +739,7 @@ static KEYWORDLIST Keywords_CPP = {{
 "binary_search() merge() inplace_merge() includes() "
 "set_union() set_intersection() set_difference() set_symmetric_difference() "
 "push_heap() pop_heap() make_heap() sort_heap() is_heap() is_heap_until() "
-"minmax() min_element() max_element() minmax_element() clamp() lexicographical_compare() compare_3way() lexicographical_compare_3way() next_permutation() prev_permutation() "
+"minmax() min_element() max_element() minmax_element() clamp() lexicographical_compare() compare_3way() lexicographical_compare_three_way() next_permutation() prev_permutation() "
 // <complex>
 "real() imag() arg() norm() proj() polar() "
 // <random>
@@ -735,9 +757,10 @@ static KEYWORDLIST Keywords_CPP = {{
 "stride() " // slice
 // <numeric>
 "accumulate() reduce() inner_product() transform_reduce() partial_sum() exclusive_scan() inclusive_scan() transform_exclusive_scan() transform_inclusive_scan() adjacent_difference() iota() gcd() lcm() midpoint() "
-"bit_cast() ispow2() ceil2() floor2() log2p1() "
+// <bit>
+"bit_cast() ispow2() ceil2() floor2() log2p1() rotl() rotr() countl_zero() countl_one() countr_zero() countr_one() popcount() "
 // <cmath>
-"assoc_laguerre() assoc_legendre() comp_ellint_1() comp_ellint_2() comp_ellint_3() cyl_bessel_i() cyl_bessel_j() cyl_bessel_k() cyl_neumann() ellint_1() ellint_2() ellint_3() expint() hermite() laguerre() legendre() riemann_zeta() sph_bessel() sph_legendre() sph_neumann() "
+"lerp() assoc_laguerre() assoc_legendre() comp_ellint_1() comp_ellint_2() comp_ellint_3() cyl_bessel_i() cyl_bessel_j() cyl_bessel_k() cyl_neumann() ellint_1() ellint_2() ellint_3() expint() hermite() laguerre() legendre() riemann_zeta() sph_bessel() sph_legendre() sph_neumann() "
 // Input/output library
 "state() " "flags() setf() unsetf() precision() width() imbue() getloc() xalloc() iword() pword() register_callback() sync_with_stdio() " // ios_base
 "rdstate() setstate() good() fail() bad() exceptions() rdbuf() copyfmt() " // basic_ios
@@ -758,18 +781,22 @@ static KEYWORDLIST Keywords_CPP = {{
 "equivalent() proximate() read_symlink() relative() remove_all() resize_file() space() status_known() temp_directory_path() weakly_canonical() "
 // <regex>
 "translate() translate_nocase() transform_primary() lookup_collatename() lookup_classname() isctype() getloc() "
-"mark_count() ready() position() prefix() suffix() format() "
+"mark_count() ready() position() prefix() suffix() "
 "regex_match() regex_search() regex_replace() "
 // <atomic>
 "is_lock_free() store() load() compare_exchange_weak() compare_exchange_strong() "
 "fetch_add() fetch_sub() fetch_and() fetch_or() fetch_xor() test_and_set() "
+// <stop_token>
+"stop_requested() stop_possible() get_token() request_stop() "
 // <thread>
 "decay_copy() get_id() yield() sleep_until() sleep_for() "
-"joinable() join() detach() native_handle() hardware_concurrency() "
+"joinable() join() detach() native_handle() hardware_concurrency() get_stop_source() get_stop_token() "
 // <mutex>
 "try_lock() unlock() try_lock_for() try_lock_until() lock_shared() try_lock_shared() unlock_shared() try_lock_shared_for() try_lock_shared_until() owns_lock() "
 // <condition_variable>
 "notify_all_at_thread_exit() notify_one() notify_all() wait() wait_until() wait_for() "
+// <semaphore> <latch> <barrier>
+"acquire() try_acquire() try_acquire_for() try_acquire_until() count_down() try_wait() arrive_and_wait() arrive() arrive_and_drop() "
 // <future>
 "future_category() get_future() set_value() set_exception() set_value_at_thread_exit() set_exception_at_thread_exit() "
 "share() valid() make_ready_at_thread_exit() async() "
@@ -792,7 +819,7 @@ static KEYWORDLIST Keywords_CPP = {{
 "__except^() __alignof() __declspec() __uuidof() __pragma() "
 
 // C++
-"pmr ranges execution chrono filesystem this_thread "  // namespace
+"pmr ranges execution chrono numbers filesystem this_thread "  // namespace
 "nothrow " // <new>
 "equivalent nonequivalent equal nonequal less greater unordered " // <compare>
 "fmt " // <utility>
@@ -801,11 +828,13 @@ static KEYWORDLIST Keywords_CPP = {{
 "ignore " // <tuple>
 "nullopt " // <optional>
 "variant_npos " // <variant>
+// <functional>
+"equal_to not_equal_to greater less greater_equal less_equal " // ranges
 // <type_traits>
 "rank extent "
 // <ratio>
 "ratio num den "
-"seq par par_unseq " // <execution>
+"seq par par_unseq unseq " // <execution>
 // <chrono>
 "duration rep period clock day month year weekday choose leap link tzdb "
 "nanoseconds microseconds milliseconds seconds minutes hours days weeks years months last Sunday Monday Tuesday Wednesday Thursday Friday Saturday January February March April May June July August September October November December "
@@ -823,7 +852,7 @@ static KEYWORDLIST Keywords_CPP = {{
 // <regex>
 "regex_constants "
 // <thread> <mutex>
-"defer_lock try_to_lock adopt_lock "
+"defer_lock try_to_lock adopt_lock nostopstate "
 "launch async deferred ready timeout "
 }};
 
