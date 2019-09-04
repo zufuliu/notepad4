@@ -7074,7 +7074,7 @@ BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect, LPCWST
 				bReadOnly = FALSE;
 			}
 		} else if (result == IDCANCEL) {
-			NP2ExitWind(hwndMain);
+			PostWMCommand(hwndMain, IDM_FILE_EXIT);
 			return FALSE;
 		} else {
 			return FALSE;
