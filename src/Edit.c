@@ -3127,10 +3127,8 @@ void EditToggleLineComments(LPCWSTR pwszComment, BOOL bInsertAtStart) {
 			switch (iAction) {
 			case 0:
 				iAction = 2;
-#if defined(__cplusplus)
-			[[fallthrough]];
-#endif
-			// fall through
+				FALLTHROUGH_ATTR;
+				// fall through
 			case 2:
 				iCommentPos = iIndentPos;
 				// a line with [space/tab] comment only
@@ -3153,10 +3151,8 @@ void EditToggleLineComments(LPCWSTR pwszComment, BOOL bInsertAtStart) {
 			switch (iAction) {
 			case 0:
 				iAction = 1;
-#if defined(__cplusplus)
-			[[fallthrough]];
-#endif
-			// fall through
+				FALLTHROUGH_ATTR;
+				// fall through
 			case 1:
 				iCommentPos = SciCall_FindColumn(iLine, iCommentCol);
 				if (!bWhitespaceLine || (iLineStart == iLineEnd)) {

@@ -39,6 +39,16 @@
 #define NP2_IGNORE_WARNING_DEPRECATED_DECLARATIONS	__pragma(warning(disable: 4996))
 #endif
 
+// suppress -Wimplicit-fallthrough in C source
+#if defined(__cplusplus)
+#define FALLTHROUGH_ATTR		[[fallthrough]]
+// TODO: change to Clang 9 once released
+#elif (defined(__GNUC__) && __GNUC__ >= 7) || (defined(__clang__) && __clang_major__ > 9)
+#define FALLTHROUGH_ATTR		__attribute__((fallthrough))
+#else
+#define FALLTHROUGH_ATTR
+#endif
+
 #if defined(__GNUC__) && !defined(__cplusplus)
 #if defined(__NO_INLINE__) // O0
 #define NP2_inline	static inline
