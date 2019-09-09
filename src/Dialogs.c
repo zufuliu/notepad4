@@ -2028,8 +2028,8 @@ void InitZoomLevelComboBox(HWND hwnd, int nCtlId, int zoomLevel) {
 	WCHAR tch[16];
 	int selIndex = -1;
 	const int levelList[] = {
-		25, 50, 75, 100, 125, 150, 175, 200,
-		250, 300, 350, 400, 450, 500,
+		500, 450, 350, 300, 250,
+		200, 175, 150, 125, 100, 75, 50, 25,
 	};
 
 	HWND hwndCtl = GetDlgItem(hwnd, nCtlId);
