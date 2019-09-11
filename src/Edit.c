@@ -194,9 +194,7 @@ BOOL EditConvertText(UINT cpSource, UINT cpDest, BOOL bSetSavePoint) {
 	SciCall_SetCodePage(cpDest);
 
 	if (cbText > 0) {
-		SciCall_SetModEventMask(SC_MOD_NONE);
 		SciCall_AddText(cbText, pchText);
-		SciCall_SetModEventMask(SC_MOD_INSERTTEXT | SC_MOD_DELETETEXT);
 	}
 	if (pchText != NULL) {
 		NP2HeapFree(pchText);
