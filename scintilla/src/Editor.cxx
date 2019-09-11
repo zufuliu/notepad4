@@ -2420,9 +2420,11 @@ bool Editor::NotifyUpdateUI() noexcept {
 }
 
 void Editor::NotifyPainted() noexcept {
+#if 0 // avoid very frequent notification
 	SCNotification scn = {};
 	scn.nmhdr.code = SCN_PAINTED;
 	NotifyParent(scn);
+#endif
 }
 
 void Editor::NotifyIndicatorClick(bool click, Sci::Position position, int modifiers) noexcept {
