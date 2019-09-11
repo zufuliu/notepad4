@@ -26,7 +26,7 @@
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
 #ifdef _WIN32
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
-#pragma code_page(1252)
+#pragma code_page(65001)
 #endif
 
 /////////////////////////////////////////////////////////////////////////////
@@ -1837,10 +1837,10 @@ BEGIN
 	IDS_CMDLINEHELP			"Command Line Help\n\n\
 file\tMust be the last argument, no quoted spaces by default.\n\
 +\tAccept multiple file arguments (with quoted spaces).\n\
--\tAccept single file argument (without quoted spaces).\n\x85\
-\tEncoding (/ansi, /unicode, /unicodele, /unicodebe,\n\x85\
-\t/utf8, /utf8sig, /utf8bom, /utf16, /utf16le, /utf16be).\n\x85\
-\tLine ending mode (/crlf, /lf, /cr).\n\
+-\tAccept single file argument (without quoted spaces).\n\
+…\tEncoding (/ansi, /unicode, /unicodele, /unicodebe,\n\
+…\t/utf8, /utf8sig, /utf8bom, /utf16, /utf16le, /utf16be).\n\
+…\tLine ending mode (/crlf, /lf, /cr).\n\
 /e encoding\tFile source encoding.\n\
 /g line[,column]\tJump to specified position (/g -1 end of file).\n\
 /m text\tMatch specified text (/m- last, /mr regex, /mb backslash).\n\
