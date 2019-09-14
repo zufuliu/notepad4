@@ -32,6 +32,7 @@
 #include "Scintilla.h"
 
 #include "CharacterSet.h"
+//#include "CharacterCategory.h"
 #include "Position.h"
 #include "SplitVector.h"
 #include "Partitioning.h"
@@ -2107,6 +2108,16 @@ void Document::SetCharClassesEx(const unsigned char *chars, int length) noexcept
 int Document::GetCharsOfClass(CharClassify::cc characterClass, unsigned char *buffer) const noexcept {
     return charClass.GetCharsOfClass(characterClass, buffer);
 }
+
+#if 0
+int Document::GetCharsOfClass(CharClassify::cc characterClass, unsigned char *buffer) const {
+	return charClass.GetCharsOfClass(characterClass, buffer);
+}
+
+void Document::SetCharacterCategoryOptimization(int countCharacters) {
+	charMap.Optimize(countCharacters);
+}
+#endif
 
 void SCI_METHOD Document::StartStyling(Sci_Position position) noexcept {
 	endStyled = position;

@@ -153,7 +153,7 @@ CJKBlockList = [
 ]
 
 def findCategories(filename):
-	with open(filename, "r", "UTF-8") as infile:
+	with open(filename, "r", encoding="UTF-8") as infile:
 		lines = [x.strip() for x in infile.readlines() if "\tcc" in x]
 	values = "".join(lines).replace(" ","").split(",")
 	print(values)
@@ -180,11 +180,22 @@ def dumpArray(items, step, fmt='%d'):
 		lines.append(line)
 	return lines
 
-def updateCharacterCategory(filename):
-	categories = findCategories("../lexlib/CharacterCategory.h")
+def updateCharacterCategory(categories):
 	values = ["// Created with Python %s,  Unicode %s" % (
 		platform.python_version(), unicodedata.unidata_version)]
 
+	# catLatin
+	values.append("#if CHARACTERCATEGORY_OPTIMIZE_LATIN1")
+	values.append("const unsigned char catLatin[] = {")
+	table = [categories.index(unicodedata.category(chr(ch))) for ch in range(256)]
+	for i in range(0, len(table), 16):
+		line = ', '.join(str(value) for value in table[i:i+16]) + ','
+		values.append(line)
+	values.append("};")
+	values.append("#endif")
+	values.append("")
+
+	# catRanges
 	startRange = 0
 	category = unicodedata.category(chr(startRange))
 	table = []
@@ -205,9 +216,14 @@ def updateCharacterCategory(filename):
 	table.append(value)
 
 	print('catRanges:', len(values), 4*len(values)/1024, math.ceil(math.log2(len(values))))
+	values.append("#if CHARACTERCATEGORY_USE_BINARY_SEARCH")
+	values.append("const int catRanges[] = {")
 	values.extend(["%d," % value for value in table])
+	values.append("};")
+	values.append("")
+	values.append("#else")
 
-	Regenerate(filename, "//", values)
+	return values
 
 def bytesToHex(b):
 	return ''.join('\\x%02X' % ch for ch in b)
@@ -431,7 +447,10 @@ def compressIndexTable(head, indexTable, args):
 		1: 'unsigned char',
 		2: 'unsigned short',
 	}
+
 	prefix = args['table']
+	with_function = args.get('with_function', True)
+
 	# one table
 	if sizeA == sizeC == sizeD:
 		output = []
@@ -456,21 +475,35 @@ def compressIndexTable(head, indexTable, args):
 			'maskC': maskC,
 			'offsetD': len(indexA) + len(indexC)
 		})
-		function = """{function}
+		if with_function:
+			function = """{function}
 
 	ch = ({table}[ch >> {shiftA}] << {shiftA2}) | (ch & {maskA});
 	ch = ({table}[{offsetC} + (ch >> {shiftC})] << {shiftC2}) | (ch & {maskC});
 	return static_cast<{returnType}>({table}[{offsetD} + ch]);
 }}""".format(**args)
+		else:
+			function = """
+constexpr int {table}Shift11 = {shiftA};
+constexpr int {table}Shift12 = {shiftA2};
+constexpr int {table}Mask1 = {maskA};
+constexpr int {table}Offset1 = {offsetC};
+constexpr int {table}Shift21 = {shiftC};
+constexpr int {table}Shift22 = {shiftC2};
+constexpr int {table}Mask2 = {maskC};
+constexpr int {table}Offset2 = {offsetD};
+""".format(**args)
 	# three tables
 	else:
 		output = []
 		output.append("const %s %s1[] = {" % (typemap[sizeA], prefix))
 		output.extend(dumpArray(indexA, 20))
 		output.append("};")
+		output.append("")
 		output.append("const %s %s2[] = {" % (typemap[sizeC], prefix))
 		output.extend(dumpArray(indexC, 20))
 		output.append("};")
+		output.append("")
 		output.append("const %s %s[] = {" % (typemap[sizeD], prefix))
 		output.extend(dumpArray(indexD, 20))
 		output.append("};")
@@ -484,12 +517,22 @@ def compressIndexTable(head, indexTable, args):
 			'shiftC2': shiftC2,
 			'maskC': maskC,
 		})
-		function = """{function}
+		if with_function:
+			function = """{function}
 
 	ch = ({table}1[ch >> {shiftA}] << {shiftA2}) | (ch & {maskA});
 	ch = ({table}2[(ch >> {shiftC})] << {shiftC2}) | (ch & {maskC});
 	return static_cast<{returnType}>({table}[ch]);
 }}""".format(**args)
+		else:
+			function = """
+constexpr int {table}Shift11 = {shiftA};
+constexpr int {table}Shift12 = {shiftA2};
+constexpr int {table}Mask1 = {maskA};
+constexpr int {table}Shift21 = {shiftC};
+constexpr int {table}Shift22 = {shiftC2};
+constexpr int {table}Mask2 = {maskC};
+""".format(**args)
 	return table, function
 
 def runLengthEncode(head, indexTable, valueBit, totalBit=16):
@@ -565,8 +608,7 @@ def updateCharClassifyTable(filename, headfile):
 	}
 
 	table, function = compressIndexTable('CharClassify Unicode', indexTable, args)
-	for line in table.splitlines():
-		output.append(line)
+	output.extend(table.splitlines())
 
 	for line in function.splitlines():
 		head_output.append('\t' + line)
@@ -576,6 +618,7 @@ def updateCharClassifyTable(filename, headfile):
 
 def updateCharacterCategoryTable(filename):
 	categories = findCategories("../lexlib/CharacterCategory.h")
+	output = updateCharacterCategory(categories)
 
 	indexTable = [0] * UnicodeCharacterCount
 	for ch in range(UnicodeCharacterCount):
@@ -584,24 +627,24 @@ def updateCharacterCategoryTable(filename):
 		value = categories.index(category)
 		indexTable[ch] = value
 
-	output = ["// Created with Python %s,  Unicode %s" % (
-		platform.python_version(), unicodedata.unidata_version)]
-
 	args = {
-		'table': 'CharacterCategoryTable',
-		'function': """CharacterCategory CategoriseCharacter(unsigned int ch) noexcept {
-	if (ch > maxUnicode) {
-		// Cn
-		return ccCn;
-	}""",
-		'returnType': 'CharacterCategory'
+		'table': 'catTable',
+		'with_function': False,
 	}
 
 	table, function = compressIndexTable('CharacterCategoryTable', indexTable, args)
-	output.append(table)
-	output.append('')
-	output.append("}\n") # namespace
-	output.append(function)
+	output.append("")
+	output.extend(table.splitlines())
+	output.extend(function.splitlines())
+
+	data = runLengthEncode('CharacterCategoryTable', indexTable[:BMPCharacterCharacterCount], 5)
+	output.append("")
+	output.append(f'const unsigned short CatTableRLE_BMP[] = {{')
+	output.extend(dumpArray(data, 20))
+	output.append("};")
+
+	output.append("")
+	output.append("#endif")
 
 	Regenerate(filename, "//", output)
 
@@ -666,12 +709,9 @@ def makeDBCSCharClassifyTable(output, encodingList, isReservedOrUDC=None):
 		}
 
 		table, function = compressIndexTable(head, indexTable, args)
-		for line in table.splitlines():
-			output.append(line)
+		output.extend(table.splitlines())
 		output.append('')
-
-		for line in function.splitlines():
-			output.append(line)
+		output.extend(function.splitlines())
 		output.append('')
 
 # https://en.wikipedia.org/wiki/GBK_(character_encoding)
@@ -714,5 +754,4 @@ if __name__ == '__main__':
 	buildANSICharClassifyTable('../../src/EditEncoding.c')
 	updateCharClassifyTable("../src/CharClassify.cxx", "../src/CharClassify.h")
 	updateDBCSCharClassifyTable("../src/CharClassify.cxx")
-	#updateCharacterCategoryTable("../lexlib/CharacterCategory.cxx")
-	#updateCharacterCategory("../lexlib/CharacterCategory.cxx")
+	updateCharacterCategoryTable("../lexlib/CharacterCategory.cxx")

@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 def GenerateEOLTable():
+	# used in EditDetectEOLMode() and CellBuffer::BasicInsertString()
 	table = [0] * 16
 	table[ord('\n')] = 1
 	table[ord('\r')] = 2
@@ -9,6 +10,7 @@ def GenerateEOLTable():
 	print('EOLTable:', line)
 
 def GenerateC0ControlCharacterMask(excludeSeparator):
+	# used in Style_MaybeBinaryFile()
 	bits = ['1'] * 32
 	# whitespace
 	bits[9]  = '0' # 09 '\t'

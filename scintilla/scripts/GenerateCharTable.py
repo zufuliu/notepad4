@@ -2,6 +2,7 @@
 import unicodedata
 
 def GenerateUTF8Table():
+	# for UTF8ClassifyTable in UniConversion.cxx
 	def BytesFromLead(leadByte):
 		# Single byte or invalid
 		if leadByte < 0xC2:
@@ -86,6 +87,7 @@ def GetCharName(ch):
 		return ''
 
 def GenerateUnicodeControlCharacters():
+	# for kUnicodeControlCharacterTable in Edit.c
 	ucc_table = [
 		"\u200E", # U+200E	LRM		Left-to-right mark
 		"\u200F", # U+200F	RLM		Right-to-left mark

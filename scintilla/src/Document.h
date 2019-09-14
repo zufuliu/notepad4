@@ -229,6 +229,9 @@ private:
 	int refCount;
 	CellBuffer cb;
 	CharClassify charClass;
+#if 0
+	CharacterCategoryMap charMap;
+#endif
 	std::unique_ptr<CaseFolder> pcf;
 	Sci::Position endStyled;
 	int styleClock;
@@ -501,6 +504,10 @@ public:
 	void SetCharClasses(const unsigned char *chars, CharClassify::cc newCharClass) noexcept;
 	void SetCharClassesEx(const unsigned char *chars, int length) noexcept;
 	int GetCharsOfClass(CharClassify::cc characterClass, unsigned char *buffer) const noexcept;
+#if 0
+	void SetCharacterCategoryOptimization(int countCharacters);
+	int CharacterCategoryOptimization() const noexcept;
+#endif
 	void SCI_METHOD StartStyling(Sci_Position position) noexcept override;
 	bool SCI_METHOD SetStyleFor(Sci_Position length, unsigned char style) override;
 	bool SCI_METHOD SetStyles(Sci_Position length, const unsigned char *styles) override;
