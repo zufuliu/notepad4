@@ -4966,7 +4966,7 @@ void CharacterCategoryMap::Optimize(int countCharacters) CHARACTERCATEGORY_NOEXC
 		int current = CatTableRLE_BMP[index++];
 		const unsigned char category = current & maskCategory;
 		current >>= 5;
-		int count = std::min(current, characters - count);
+		int count = std::min(current, characters - end);
 		while (count--) {
 			dense[end++] = category;
 		}
