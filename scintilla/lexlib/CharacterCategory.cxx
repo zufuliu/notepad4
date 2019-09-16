@@ -4762,7 +4762,7 @@ constexpr int maskCategory = 0x1F;
 // possibly for 0..0xff for most Western European text or 0..0xfff for most
 // alphabetic languages.
 
-CharacterCategory CategoriseCharacter(int character) CHARACTERCATEGORY_NOEXCEPT {
+CharacterCategory CategoriseCharacter(int character) noexcept {
 	if (character < 0 || character > maxUnicode)
 		return ccCn;
 #if CHARACTERCATEGORY_OPTIMIZE_LATIN1
@@ -4881,7 +4881,7 @@ bool OmitXidContinue(int character) noexcept {
 
 // UAX #31 defines ID_Start as
 // [[:L:][:Nl:][:Other_ID_Start:]--[:Pattern_Syntax:]--[:Pattern_White_Space:]]
-bool IsIdStart(int character) CHARACTERCATEGORY_NOEXCEPT {
+bool IsIdStart(int character) noexcept {
 	if (IsIdPattern(character)) {
 		return false;
 	}
@@ -4896,7 +4896,7 @@ bool IsIdStart(int character) CHARACTERCATEGORY_NOEXCEPT {
 
 // UAX #31 defines ID_Continue as
 // [[:ID_Start:][:Mn:][:Mc:][:Nd:][:Pc:][:Other_ID_Continue:]--[:Pattern_Syntax:]--[:Pattern_White_Space:]]
-bool IsIdContinue(int character) CHARACTERCATEGORY_NOEXCEPT {
+bool IsIdContinue(int character) noexcept {
 	if (IsIdPattern(character)) {
 		return false;
 	}
@@ -4910,7 +4910,7 @@ bool IsIdContinue(int character) CHARACTERCATEGORY_NOEXCEPT {
 }
 
 // XID_Start is ID_Start modified for Normalization Form KC in UAX #31
-bool IsXidStart(int character) CHARACTERCATEGORY_NOEXCEPT {
+bool IsXidStart(int character) noexcept {
 	if (OmitXidStart(character)) {
 		return false;
 	} else {
@@ -4919,7 +4919,7 @@ bool IsXidStart(int character) CHARACTERCATEGORY_NOEXCEPT {
 }
 
 // XID_Continue is ID_Continue modified for Normalization Form KC in UAX #31
-bool IsXidContinue(int character) CHARACTERCATEGORY_NOEXCEPT {
+bool IsXidContinue(int character) noexcept {
 	if (OmitXidContinue(character)) {
 		return false;
 	} else {
@@ -4935,7 +4935,7 @@ int CharacterCategoryMap::Size() const noexcept {
 	return static_cast<int>(dense.size());
 }
 
-void CharacterCategoryMap::Optimize(int countCharacters) CHARACTERCATEGORY_NOEXCEPT {
+void CharacterCategoryMap::Optimize(int countCharacters) {
 #if CHARACTERCATEGORY_USE_BINARY_SEARCH
 	const int characters = std::clamp(countCharacters, 256, maxUnicode + 1);
 	dense.resize(characters);
