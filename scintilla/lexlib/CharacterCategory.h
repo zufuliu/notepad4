@@ -25,26 +25,21 @@ enum CharacterCategory {
 #define CHARACTERCATEGORY_USE_BINARY_SEARCH		0
 // most calls already checked for ASCII, optimization for Latin-1 may not benefit a lot.
 #define CHARACTERCATEGORY_OPTIMIZE_LATIN1		0
-#if CHARACTERCATEGORY_USE_BINARY_SEARCH
-#define CHARACTERCATEGORY_NOEXCEPT			noexcept
-#else
-#define CHARACTERCATEGORY_NOEXCEPT
-#endif
 
-CharacterCategory CategoriseCharacter(int character) CHARACTERCATEGORY_NOEXCEPT;
+CharacterCategory CategoriseCharacter(int character) noexcept;
 
 // Common definitions of allowable characters in identifiers from UAX #31.
-bool IsIdStart(int character) CHARACTERCATEGORY_NOEXCEPT;
-bool IsIdContinue(int character) CHARACTERCATEGORY_NOEXCEPT;
-bool IsXidStart(int character) CHARACTERCATEGORY_NOEXCEPT;
-bool IsXidContinue(int character) CHARACTERCATEGORY_NOEXCEPT;
+bool IsIdStart(int character) noexcept;
+bool IsIdContinue(int character) noexcept;
+bool IsXidStart(int character) noexcept;
+bool IsXidContinue(int character) noexcept;
 
 class CharacterCategoryMap {
 private:
 	std::vector<unsigned char> dense;
 public:
 	CharacterCategoryMap() noexcept;
-	CharacterCategory CategoryFor(int character) const CHARACTERCATEGORY_NOEXCEPT {
+	CharacterCategory CategoryFor(int character) const noexcept {
 		if (static_cast<size_t>(character) < dense.size()) {
 			return static_cast<CharacterCategory>(dense[character]);
 		} else {
