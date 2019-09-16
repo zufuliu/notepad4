@@ -181,7 +181,7 @@ def dumpArray(items, step, fmt='%d'):
 	return lines
 
 def updateCharacterCategory(categories):
-	values = ["// Created with Python %s,  Unicode %s" % (
+	values = ["// Created with Python %s, Unicode %s" % (
 		platform.python_version(), unicodedata.unidata_version)]
 
 	# catLatin
@@ -383,7 +383,7 @@ def buildANSICharClassifyTable(filename):
 		else:
 			result[s]['codepage'].append((codepage, comment))
 
-	output = ["// Created with Python %s,  Unicode %s" % (
+	output = ["// Created with Python %s, Unicode %s" % (
 		platform.python_version(), unicodedata.unidata_version)]
 
 	output.append("static const uint8_t ANSICharClassifyTable[] = {")
@@ -581,7 +581,7 @@ def updateCharClassifyTable(filename, headfile):
 			value = CharClassify.ccCJKWord
 		indexTable[ch] = int(value)
 
-	output = ["// Created with Python %s,  Unicode %s" % (
+	output = ["// Created with Python %s, Unicode %s" % (
 		platform.python_version(), unicodedata.unidata_version)]
 	head_output = output[:]
 
@@ -738,7 +738,7 @@ def isReservedOrUDC_Big5(ch, buf):
 	return False
 
 def updateDBCSCharClassifyTable(filename):
-	output = ["// Created with Python %s,  Unicode %s" % (
+	output = ["// Created with Python %s, Unicode %s" % (
 		platform.python_version(), unicodedata.unidata_version)]
 
 	makeDBCSCharClassifyTable(output, ['cp932', 'shift_jis', 'shift_jis_2004', 'shift_jisx0213'])
