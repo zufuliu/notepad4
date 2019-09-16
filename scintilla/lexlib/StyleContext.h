@@ -75,7 +75,7 @@ public:
 	width(0),
 	widthNext(1) {
 		// lexer need enable useUnicode if it wants to detect Unicode identifier (http://www.unicode.org/reports/tr31/)
-		// which requires CharacterCategory from official Scintilla lexlib.
+		// or operator. e.g. using functions from CharacterCategory.
 		if ((useUnicode && styler.Encoding() == encUnicode) || styler.Encoding() == encDBCS) {
 			multiByteAccess = styler.MultiByteAccess();
 		}

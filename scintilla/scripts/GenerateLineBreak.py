@@ -157,7 +157,7 @@ def updateUnicodeLineBreak(filename):
 	#runLengthEncode('Unicode LineBreak', indexTable[:BMPCharacterCharacterCount], LineBreak.RLEValueBit)
 	#compressIndexTable('Unicode LineBreak', indexTable, args)
 
-	output = ["// Created with Python %s,  Unicode %s" % (
+	output = ["// Created with Python %s, Unicode %s" % (
 		platform.python_version(), kUnicodeLineBreakVersion)]
 	lines = dumpArray(indexTable[:128], 16)
 	output.extend(lines)
