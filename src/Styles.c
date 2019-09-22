@@ -973,6 +973,11 @@ void Style_UpdateLexerKeywordAttr(LPCEDITLEXER pLexNew) {
 	attr[NUMKEYWORD - 1] = KeywordAttr_NoLexer;
 
 	switch (pLexNew->rid) {
+	case NP2LEX_AU3:
+		break;
+	case NP2LEX_BATCH:
+		attr[6] = KeywordAttr_NoLexer;		// Upper Case Keyword
+		break;
 	case NP2LEX_CPP:
 		attr[2] = KeywordAttr_NoAutoComp;	// Preprocessor
 		attr[3] = KeywordAttr_NoAutoComp;	// Directive
@@ -981,19 +986,7 @@ void Style_UpdateLexerKeywordAttr(LPCEDITLEXER pLexNew) {
 		attr[13] = KeywordAttr_NoLexer;		// C Function
 		attr[14] = KeywordAttr_NoLexer;		// C++ Function
 		break;
-	case NP2LEX_JAVA:
-		attr[10] = KeywordAttr_NoLexer;		// Package
-		break;
 	case NP2LEX_CSHARP:
-		attr[2] = KeywordAttr_NoAutoComp;	// Preprocessor
-		break;
-	case NP2LEX_JS:
-		//attr[1] = KeywordAttr_NoAutoComp;	// Reserved Word
-		attr[9] = KeywordAttr_NoLexer;		// Function
-		attr[10] = KeywordAttr_NoLexer;		// Property
-		attr[11] = KeywordAttr_NoLexer;		// Method
-		break;
-	case NP2LEX_RC:
 		attr[2] = KeywordAttr_NoAutoComp;	// Preprocessor
 		break;
 	case NP2LEX_D:
@@ -1002,6 +995,26 @@ void Style_UpdateLexerKeywordAttr(LPCEDITLEXER pLexNew) {
 		attr[12] = KeywordAttr_NoAutoComp;	// Assembler Register
 		break;
 	case NP2LEX_HAXE:
+		attr[2] = KeywordAttr_NoAutoComp;	// Preprocessor
+		break;
+	case NP2LEX_HTML:
+		attr[2] = KeywordAttr_MakeLower;	// VBScript
+		break;
+	case NP2LEX_INNO:
+		break;
+	case NP2LEX_JAVA:
+		attr[10] = KeywordAttr_NoLexer;		// Package
+		break;
+	case NP2LEX_JS:
+		//attr[1] = KeywordAttr_NoAutoComp;	// Reserved Word
+		attr[9] = KeywordAttr_NoLexer;		// Function
+		attr[10] = KeywordAttr_NoLexer;		// Property
+		attr[11] = KeywordAttr_NoLexer;		// Method
+		break;
+	case NP2LEX_NSIS:
+		attr[0] = KeywordAttr_MakeLower;
+		break;
+	case NP2LEX_RC:
 		attr[2] = KeywordAttr_NoAutoComp;	// Preprocessor
 		break;
 	case NP2LEX_VB:
@@ -1013,14 +1026,6 @@ void Style_UpdateLexerKeywordAttr(LPCEDITLEXER pLexNew) {
 		attr[4] = KeywordAttr_MakeLower;
 		attr[5] = KeywordAttr_MakeLower;
 		attr[6] = KeywordAttr_MakeLower;
-		break;
-	case NP2LEX_HTML:
-		attr[2] = KeywordAttr_MakeLower;	// VBScript
-		break;
-	case NP2LEX_SQL:
-		attr[6] = KeywordAttr_NoLexer;		// Upper Case Keyword
-		attr[7] = KeywordAttr_NoLexer;		// Upper Case Type
-		attr[8] = KeywordAttr_NoLexer;		// Upper Case Function
 		break;
 	case NP2LEX_PHP:
 		attr[9] = KeywordAttr_NoLexer;		// Function
@@ -1036,15 +1041,10 @@ void Style_UpdateLexerKeywordAttr(LPCEDITLEXER pLexNew) {
 		attr[11] = KeywordAttr_NoLexer;		// Constant
 		attr[12] = KeywordAttr_NoLexer;		// Attribute
 		break;
-	case NP2LEX_BATCH:
+	case NP2LEX_SQL:
 		attr[6] = KeywordAttr_NoLexer;		// Upper Case Keyword
-		break;
-	case NP2LEX_AU3:
-		break;
-	case NP2LEX_INNO:
-		break;
-	case NP2LEX_NSIS:
-		attr[0] = KeywordAttr_MakeLower;
+		attr[7] = KeywordAttr_NoLexer;		// Upper Case Type
+		attr[8] = KeywordAttr_NoLexer;		// Upper Case Function
 		break;
 	default:
 		break;
