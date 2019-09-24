@@ -94,6 +94,8 @@ Ruby Script
 	Rakefile		Ruby Makefile
 	Podfile			CocoaPods
 
+	cr				Crystal		https://crystal-lang.org/
+
 SQL Query
 	sql
 	mysql
