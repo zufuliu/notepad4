@@ -20,7 +20,7 @@ using namespace Scintilla;
  * Creates an array that points into each word in the string and puts \0 terminators
  * after each word.
  */
-static char **ArrayFromWordList(char *wordlist, size_t slen, int *len, bool onlyLineEnds = false) {
+static char **ArrayFromWordList(char *wordlist, size_t slen, int *len) {
 	int prev = true;
 	int words = 0;
 	// For rapid determination of whether a character is a separator, build
@@ -28,10 +28,8 @@ static char **ArrayFromWordList(char *wordlist, size_t slen, int *len, bool only
 	bool wordSeparator[128] = {};	// Initialise all to false.
 	wordSeparator[static_cast<unsigned int>('\r')] = true;
 	wordSeparator[static_cast<unsigned int>('\n')] = true;
-	if (!onlyLineEnds) {
-		wordSeparator[static_cast<unsigned int>(' ')] = true;
-		wordSeparator[static_cast<unsigned int>('\t')] = true;
-	}
+	wordSeparator[static_cast<unsigned int>(' ')] = true;
+	wordSeparator[static_cast<unsigned int>('\t')] = true;
 
 	char * const end = wordlist + slen;
 	char *s = wordlist;
@@ -71,9 +69,9 @@ static char **ArrayFromWordList(char *wordlist, size_t slen, int *len, bool only
 	return keywords;
 }
 
-WordList::WordList(bool onlyLineEnds_) noexcept :
-	words(nullptr), list(nullptr), len(0), onlyLineEnds(onlyLineEnds_) {
-	// Prevent warnings by static analyzers about uninitialized starts.
+WordList::WordList() noexcept :
+	words(nullptr), list(nullptr), len(0) {
+	// Prevent warnings by static analyzers about uninitialized ranges.
 	ranges[0] = {};
 }
 
@@ -111,15 +109,20 @@ void WordList::Clear() noexcept {
 	len = 0;
 }
 
-void WordList::Set(const char *s) {
+bool WordList::Set(const char *s) {
+	// omitted comparison for Notepad2, we don't care whether the list is same as before or not.
+	// 1. when we call SciCall_SetKeywords(), the document or styles already changed.
+	// 2. the comparison is expensive than rebuild the list, especially for a long list.
+
 	Clear();
 	const size_t lenS = strlen(s) + 1;
 	list = new char[lenS];
 	memcpy(list, s, lenS);
-	words = ArrayFromWordList(list, lenS - 1, &len, onlyLineEnds);
+	words = ArrayFromWordList(list, lenS - 1, &len);
 	std::sort(words, words + len, [](const char *a, const char *b) noexcept {
 		return strcmp(a, b) < 0;
 	});
+
 	memset(ranges, 0, sizeof(ranges));
 	for (int i = 0; i < len;) {
 		const unsigned char indexChar = words[i][0];
@@ -129,29 +132,6 @@ void WordList::Set(const char *s) {
 		}
 		ranges[indexChar] = {start, i};
 	}
-}
-
-bool WordList::Reset(const char *s) {
-#if 0
-	WordList other;
-	other.Set(s);
-	if (*this == other) {
-		return false;
-	}
-
-	Clear();
-	words = other.words;
-	list = other.list;
-	len = other.len;
-	onlyLineEnds = other.onlyLineEnds;
-	memcpy(ranges, other.ranges, sizeof(ranges));
-	// mark other as released.
-	other.words = nullptr;
-	other.list = nullptr;
-	other.len = 0;
-#else
-	Set(s);
-#endif
 	return true;
 }
 

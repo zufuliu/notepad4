@@ -76,7 +76,7 @@ const char * SCI_METHOD LexerBase::DescribeWordListSets() const noexcept {
 
 Sci_Position SCI_METHOD LexerBase::WordListSet(int n, const char *wl) {
 	if (n < numWordLists) {
-		if (keywordLists[n]->Reset(wl)) {
+		if (keywordLists[n]->Set(wl)) {
 			return 0;
 		}
 	}
