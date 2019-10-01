@@ -27,17 +27,17 @@ static const char styleSubable[] = { 0 };
 LexerBase::LexerBase(const LexicalClass *lexClasses_, size_t nClasses_) :
 	lexClasses(lexClasses_), nClasses(nClasses_) {
 	for (int wl = 0; wl < numWordLists; wl++) {
-		keyWordLists[wl] = new WordList;
+		keywordLists[wl] = new WordList;
 	}
-	keyWordLists[numWordLists] = nullptr;
+	keywordLists[numWordLists] = nullptr;
 }
 
 LexerBase::~LexerBase() {
 	for (int wl = 0; wl < numWordLists; wl++) {
-		delete keyWordLists[wl];
-		keyWordLists[wl] = nullptr;
+		delete keywordLists[wl];
+		keywordLists[wl] = nullptr;
 	}
-	keyWordLists[numWordLists] = nullptr;
+	keywordLists[numWordLists] = nullptr;
 }
 
 void SCI_METHOD LexerBase::Release() noexcept {
@@ -76,7 +76,7 @@ const char * SCI_METHOD LexerBase::DescribeWordListSets() const noexcept {
 
 Sci_Position SCI_METHOD LexerBase::WordListSet(int n, const char *wl) {
 	if (n < numWordLists) {
-		if (keyWordLists[n]->Reset(wl)) {
+		if (keywordLists[n]->Reset(wl)) {
 			return 0;
 		}
 	}
