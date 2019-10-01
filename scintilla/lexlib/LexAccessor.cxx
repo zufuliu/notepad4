@@ -92,7 +92,7 @@ bool IsLexCommentLine(Sci_Position line, LexAccessor &styler, int style) noexcep
 
 Sci_Position LexSkipWhiteSpace(Sci_Position startPos, Sci_Position endPos, LexAccessor &styler) noexcept {
 	for (Sci_Position i = startPos; i < endPos; i++) {
-		if (!(isspacechar(styler.SafeGetCharAt(i)))) {
+		if (!(IsWhiteSpace(styler.SafeGetCharAt(i)))) {
 			return i;
 		}
 	}
@@ -101,7 +101,7 @@ Sci_Position LexSkipWhiteSpace(Sci_Position startPos, Sci_Position endPos, LexAc
 
 Sci_Position LexSkipWhiteSpace(Sci_Position startPos, Sci_Position endPos, LexAccessor &styler, bool IsStreamCommentStyle(int)) noexcept {
 	for (Sci_Position i = startPos; i < endPos; i++) {
-		if (!(isspacechar(styler.SafeGetCharAt(i)) || IsStreamCommentStyle(styler.StyleAt(i)))) {
+		if (!(IsWhiteSpace(styler.SafeGetCharAt(i)) || IsStreamCommentStyle(styler.StyleAt(i)))) {
 			return i;
 		}
 	}
@@ -112,7 +112,7 @@ Sci_Position LexSkipWhiteSpace(Sci_Position startPos, Sci_Position endPos, LexAc
 	bool IsStreamCommentStyle(int), const CharacterSet &charSet) noexcept {
 	for (Sci_Position i = startPos; i < endPos; i++) {
 		const char ch = styler.SafeGetCharAt(i);
-		if (!(isspacechar(ch) || charSet.Contains(ch) || IsStreamCommentStyle(styler.StyleAt(i)))) {
+		if (!(IsWhiteSpace(ch) || charSet.Contains(ch) || IsStreamCommentStyle(styler.StyleAt(i)))) {
 			return i;
 		}
 	}
