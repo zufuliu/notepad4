@@ -211,6 +211,10 @@ constexpr bool IsSpaceOrTab(int ch) noexcept {
 	return ch == ' ' || ch == '\t';
 }
 
+constexpr bool IsWhiteSpace(int ch) noexcept {
+	return (ch == ' ') || ((ch >= 0x09) && (ch <= 0x0d));
+}
+
 bool IsLexCommentLine(Sci_Position line, LexAccessor &styler, int style) noexcept;
 
 inline bool IsBackslashLine(Sci_Position line, LexAccessor &styler) noexcept {
@@ -250,7 +254,7 @@ inline char LexGetPrevChar(Sci_Position endPos, LexAccessor &styler) noexcept {
 	do {
 		--endPos;
 		const char ch = styler.SafeGetCharAt(endPos);
-		if (!IsSpaceOrTab(ch)) {
+		if (!IsWhiteSpace(ch)) {
 			return ch;
 		}
 	} while (true);
@@ -259,7 +263,7 @@ inline char LexGetPrevChar(Sci_Position endPos, LexAccessor &styler) noexcept {
 inline char LexGetNextChar(Sci_Position startPos, LexAccessor &styler) noexcept {
 	do {
 		const char ch = styler.SafeGetCharAt(startPos);
-		if (!IsSpaceOrTab(ch)) {
+		if (!IsWhiteSpace(ch)) {
 			return ch;
 		}
 		++startPos;

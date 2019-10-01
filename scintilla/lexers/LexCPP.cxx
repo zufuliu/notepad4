@@ -378,7 +378,7 @@ static void ColouriseCppDoc(Sci_PositionU startPos, Sci_Position length, int ini
 					|| sc.ch == '*' || sc.ch == '&' || sc.ch == ':')) {
 					bool is_class = false;
 					Sci_PositionU pos = sc.currentPos;
-					const int next_char = IsASpace(sc.ch) ? nextChar : sc.ch;
+					const int next_char = nextChar;
 
 					if (sc.ch == ':' && sc.chNext == ':') { // C++, Java, PHP
 						is_class = true;
