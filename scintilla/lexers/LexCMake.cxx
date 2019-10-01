@@ -79,16 +79,21 @@ static void ColouriseCmakeDoc(Sci_PositionU startPos, Sci_Position length, int i
 			if (!iswordstart(sc.ch)) {
 				char s[128];
 				sc.GetCurrentLowered(s, sizeof(s) - 3);
-				if (keywords.InListPrefixed(s, '(')) {
-					sc.ChangeState(SCE_CMAKE_WORD);
-					if (strcmp(s, "function()") == 0 || strcmp(s, "endfunction()") == 0)
-						userDefType = 1;
-					else if (strcmp(s, "macro()") == 0 || strcmp(s, "endmacro()") == 0)
-						userDefType = 2;
-				} else if (keywords2.InListPrefixed(s, '(')) {
-					sc.ChangeState(SCE_CMAKE_COMMANDS);
-				} else if (sc.GetNextNSChar() == '(') {
-					sc.ChangeState(SCE_CMAKE_FUNCATION);
+				const int chNext = sc.GetNextNSChar();
+				if (chNext == '(') {
+					// see Command Invocations: space* identifier space* '(' arguments ')'
+					if (keywords.InListPrefixed(s, '(')) {
+						sc.ChangeState(SCE_CMAKE_WORD);
+						if (strcmp(s, "function()") == 0 || strcmp(s, "endfunction()") == 0) {
+							userDefType = 1;
+						} else if (strcmp(s, "macro()") == 0 || strcmp(s, "endmacro()") == 0) {
+							userDefType = 2;
+						}
+					} else if (keywords2.InListPrefixed(s, '(')) {
+						sc.ChangeState(SCE_CMAKE_COMMANDS);
+					} else {
+						sc.ChangeState(SCE_CMAKE_FUNCATION);
+					}
 				} else if (userDefType) {
 					sc.ChangeState(userDefType == 1 ? SCE_CMAKE_FUNCATION : SCE_CMAKE_MACRO);
 					userDefType = 0;
