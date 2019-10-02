@@ -1,4 +1,6 @@
-// Lexer for MSIL, CIL
+// This file is part of Notepad2.
+// See License.txt for details about distribution and modification.
+//! Lexer for MSIL, CIL
 
 #include <cstring>
 #include <cassert>

@@ -1,4 +1,6 @@
-// Lexer for Python.
+// This file is part of Notepad2.
+// See License.txt for details about distribution and modification.
+//! Lexer for Python.
 
 #include <cstring>
 #include <cassert>
@@ -350,7 +352,7 @@ static inline bool IsQuoteLine(Sci_Position line, const Accessor &styler) noexce
 	return IsPyTripleStyle(style);
 }
 
-
+// based on original folding code
 static void FoldPyDoc(Sci_PositionU startPos, Sci_Position length, int, LexerWordList, Accessor &styler) {
 	if (styler.GetPropertyInt("fold") == 0)
 		return;

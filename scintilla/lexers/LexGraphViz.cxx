@@ -1,4 +1,6 @@
-// Lexer for GraphViz/Dot.
+// This file is part of Notepad2.
+// See License.txt for details about distribution and modification.
+//! Lexer for GraphViz/Dot.
 
 #include <cstring>
 #include <cassert>

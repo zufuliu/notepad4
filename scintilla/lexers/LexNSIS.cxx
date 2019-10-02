@@ -1,4 +1,6 @@
-// Lexer for NSIS.
+// This file is part of Notepad2.
+// See License.txt for details about distribution and modification.
+//! Lexer for NSIS.
 
 #include <cstring>
 #include <cassert>

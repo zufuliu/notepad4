@@ -1,4 +1,6 @@
-// Lexer for PowerShell.
+// This file is part of Notepad2.
+// See License.txt for details about distribution and modification.
+//! Lexer for PowerShell.
 
 #include <cstdlib>
 #include <cassert>

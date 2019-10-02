@@ -1,5 +1,7 @@
-// Lexer for C, C++, C#, Java, Rescouce Script, Asymptote, D, Objective C/C++, PHP
-// JavaScript, JScript, ActionScript, haXe, Groovy, Scala, Jamfile, AWK, IDL/ODL/AIDL
+// This file is part of Notepad2.
+// See License.txt for details about distribution and modification.
+//! Lexer for C, C++, C#, Java, Rescouce Script, Asymptote, D, Objective C/C++, PHP
+//! JavaScript, JScript, ActionScript, haXe, Groovy, Scala, Jamfile, AWK, IDL/ODL/AIDL
 
 #include <cstring>
 #include <cassert>
