@@ -1,4 +1,6 @@
-// Lexer for Assembler, include MASM NASM GAS.
+// This file is part of Notepad2.
+// See License.txt for details about distribution and modification.
+//! Lexer for Assembler, include MASM NASM GAS.
 
 #include <cstring>
 #include <cassert>

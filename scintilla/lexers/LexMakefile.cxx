@@ -1,4 +1,6 @@
-// Lexer for Makefile of gmake, nmake, bmake, qmake
+// This file is part of Notepad2.
+// See License.txt for details about distribution and modification.
+//! Lexer for Makefile of gmake, nmake, bmake, qmake
 
 #include <cstring>
 #include <cassert>

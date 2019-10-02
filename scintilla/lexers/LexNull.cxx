@@ -33,6 +33,7 @@ static void ColouriseNullDoc(Sci_PositionU startPos, Sci_Position length, int, L
 	}
 }
 
+// code folding based on Python
 static void FoldNullDoc(Sci_PositionU startPos, Sci_Position length, int /* initStyle */, LexerWordList, Accessor &styler) {
 	if (styler.GetPropertyInt("fold") == 0)
 		return;

@@ -1,4 +1,6 @@
-// Lexer for LaTeX.
+// This file is part of Notepad2.
+// See License.txt for details about distribution and modification.
+//! Lexer for LaTeX.
 
 #include <cstring>
 #include <cassert>

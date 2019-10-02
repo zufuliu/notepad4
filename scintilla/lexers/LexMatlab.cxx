@@ -1,4 +1,6 @@
-// Lexer for Matlab, Octave, Scilab and Gnuplot (treated as same as Octave).
+// This file is part of Notepad2.
+// See License.txt for details about distribution and modification.
+//! Lexer for Matlab, Octave, Scilab and Gnuplot (treated as same as Octave).
 
 #include <cstring>
 #include <cassert>

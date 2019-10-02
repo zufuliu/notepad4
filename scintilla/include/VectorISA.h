@@ -1,3 +1,6 @@
+// This file is part of Notepad2.
+// See License.txt for details about distribution and modification.
+
 #ifndef NOTEPAD2_VECTOR_ISA_H_
 #define NOTEPAD2_VECTOR_ISA_H_
 

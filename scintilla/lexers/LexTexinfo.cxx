@@ -1,3 +1,7 @@
+// This file is part of Notepad2.
+// See License.txt for details about distribution and modification.
+//! Lexer for GNU Texinfo.
+
 #include <cstring>
 #include <cassert>
 #include <cctype>
