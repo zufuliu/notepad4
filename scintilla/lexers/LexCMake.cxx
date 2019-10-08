@@ -19,15 +19,6 @@
 
 using namespace Scintilla;
 
-/*static const char* const cmakeWordLists[] = {
-	"Control Command",
-	"Command",
-	"Information Variables",
-	"Behavior Variables",
-	"System Variables",
-	0
-}*/
-
 static constexpr bool IsCmakeOperator(int ch) noexcept {
 	return ch == '(' || ch == ')' || ch == '=' || ch == ':' || ch == ';';
 }
@@ -129,6 +120,16 @@ static void ColouriseCmakeDoc(Sci_PositionU startPos, Sci_Position length, int i
 				nvarLevel = 1;
 				sc.SetState(SCE_CMAKE_VARIABLE);
 				sc.Forward();
+			} else if (sc.Match("$ENV{")) {
+				varStyle = sc.state;
+				nvarLevel = 1;
+				sc.SetState(SCE_CMAKE_VARIABLE);
+				sc.Forward(4);
+			} else if (sc.Match("$CACHE{")) {
+				varStyle = sc.state;
+				nvarLevel = 1;
+				sc.SetState(SCE_CMAKE_VARIABLE);
+				sc.Forward(6);
 			} else if ((sc.state == SCE_CMAKE_STRINGDQ && sc.ch == '\"')
 				|| (sc.state == SCE_CMAKE_STRINGSQ && sc.ch == '\'')
 				|| (sc.state == SCE_CMAKE_STRINGBT && sc.ch == '`')
@@ -190,10 +191,19 @@ static void ColouriseCmakeDoc(Sci_PositionU startPos, Sci_Position length, int i
 				nvarLevel = 1;
 				sc.SetState(SCE_CMAKE_VARIABLE);
 				sc.Forward();
+			} else if (sc.Match("$ENV{")) {
+				nvarLevel = 1;
+				sc.SetState(SCE_CMAKE_VARIABLE);
+				sc.Forward(4);
+			} else if (sc.Match("$CACHE{")) {
+				nvarLevel = 1;
+				sc.SetState(SCE_CMAKE_VARIABLE);
+				sc.Forward(6);
 			} else if (IsCmakeOperator(sc.ch)) {
 				sc.SetState(SCE_CMAKE_OPERATOR);
-				if (userDefType && sc.ch == ')')
+				if (userDefType && sc.ch == ')') {
 					userDefType = 0;
+				}
 			}
 		}
 
