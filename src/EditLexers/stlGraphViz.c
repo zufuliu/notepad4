@@ -5,10 +5,10 @@
 // http://blockdiag.com/en/
 
 static KEYWORDLIST Keywords_DOT = {{
-"node edge graph digraph subgraph strict true false"
+"node edge graph digraph subgraph strict true false "
 
 // blockdiag
-"blockdiag group seqdiag actdiag lane nwdiag network rackdiag rack "
+"blockdiag group seqdiag actdiag lane nwdiag network rackdiag rack packetdiag "
 
 , // 1 Type Keyword
 // Node Shape
