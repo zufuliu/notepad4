@@ -3,6 +3,7 @@
 
 // https://graphviz.org/
 // http://blockdiag.com/en/
+// https://graphviz.gitlab.io/_pages/doc/info/lang.html
 
 static KEYWORDLIST Keywords_DOT = {{
 "node edge graph digraph subgraph strict true false "
