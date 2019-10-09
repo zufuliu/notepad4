@@ -57,6 +57,9 @@
 #define LOAD_LIBRARY_SEARCH_SYSTEM32 0x00000800
 #endif
 
+#ifndef _WIN32_WINNT_VISTA
+#define _WIN32_WINNT_VISTA					0x0600
+#endif
 #ifndef _WIN32_WINNT_WIN8
 #define _WIN32_WINNT_WIN8					0x0602
 #endif
@@ -65,6 +68,12 @@
 #endif
 #ifndef _WIN32_WINNT_WIN10
 #define _WIN32_WINNT_WIN10					0x0A00
+#endif
+
+#if _WIN32_WINNT < _WIN32_WINNT_VISTA
+#define USE_SRW_LOCK	0
+#else
+#define USE_SRW_LOCK	1
 #endif
 
 #if _WIN32_WINNT < _WIN32_WINNT_WIN8
@@ -241,7 +250,11 @@ inline void SetWindowPointer(HWND hWnd, void *ptr) noexcept {
 	::SetWindowLongPtr(hWnd, 0, reinterpret_cast<LONG_PTR>(ptr));
 }
 
+#if USE_SRW_LOCK
+SRWLOCK crPlatformLock = SRWLOCK_INIT;
+#else
 CRITICAL_SECTION crPlatformLock;
+#endif
 HINSTANCE hinstPlatformRes {};
 
 HCURSOR reverseArrowCursor {};
@@ -2289,7 +2302,11 @@ HCURSOR GetReverseArrowCursor() noexcept {
 	if (reverseArrowCursor)
 		return reverseArrowCursor;
 
+#if USE_SRW_LOCK
+	::AcquireSRWLockExclusive(&crPlatformLock);
+#else
 	::EnterCriticalSection(&crPlatformLock);
+#endif
 	HCURSOR cursor = reverseArrowCursor;
 	if (!cursor) {
 		cursor = ::LoadCursor(nullptr, IDC_ARROW);
@@ -2312,7 +2329,11 @@ HCURSOR GetReverseArrowCursor() noexcept {
 				::DeleteObject(info.hbmColor);
 		}
 	}
+#if USE_SRW_LOCK
+	::ReleaseSRWLockExclusive(&crPlatformLock);
+#else
 	::LeaveCriticalSection(&crPlatformLock);
+#endif
 	return cursor;
 }
 
@@ -3477,7 +3498,9 @@ void Platform::Assert(const char *, const char *, int) noexcept {
 #endif
 
 void Platform_Initialise(void *hInstance) noexcept {
+#if !USE_SRW_LOCK
 	::InitializeCriticalSection(&crPlatformLock);
+#endif
 	hinstPlatformRes = static_cast<HINSTANCE>(hInstance);
 	ListBoxX_Register();
 }
@@ -3518,7 +3541,9 @@ void Platform_Finalise(bool fromDllMain) noexcept {
 	if (reverseArrowCursor)
 		::DestroyCursor(reverseArrowCursor);
 	ListBoxX_Unregister();
+#if !USE_SRW_LOCK
 	::DeleteCriticalSection(&crPlatformLock);
+#endif
 }
 
 }
