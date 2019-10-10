@@ -125,6 +125,14 @@ constexpr bool iswordstart(int ch) noexcept {
 	return IsAlphaNumeric(ch) || ch == '_';
 }
 
+constexpr bool IsIdentifierChar(int ch) noexcept {
+	return IsAlphaNumeric(ch) || ch == '_';
+}
+
+constexpr bool IsIdentifierStart(int ch) noexcept {
+	return IsAlpha(ch) || ch == '_';
+}
+
 constexpr bool isoperator(int ch) noexcept {
 	if (IsAlphaNumeric(ch))
 		return false;

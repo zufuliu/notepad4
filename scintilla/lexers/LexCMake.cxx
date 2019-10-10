@@ -19,12 +19,14 @@
 
 using namespace Scintilla;
 
-static constexpr bool IsCmakeOperator(int ch) noexcept {
+namespace {
+
+constexpr bool IsCmakeOperator(int ch) noexcept {
 	return ch == '(' || ch == ')' || ch == '=' || ch == ':' || ch == ';';
 }
 
 // https://cmake.org/cmake/help/v3.15/manual/cmake-language.7.html
-static bool IsBracketArgument(Accessor &styler, Sci_PositionU pos, bool start, int &bracketNumber) noexcept {
+bool IsBracketArgument(Accessor &styler, Sci_PositionU pos, bool start, int &bracketNumber) noexcept {
 	int offset = 0;
 	++pos; // bracket
 	while (styler.SafeGetCharAt(pos) == '=') {
@@ -46,7 +48,7 @@ static bool IsBracketArgument(Accessor &styler, Sci_PositionU pos, bool start, i
 	return false;
 }
 
-static void ColouriseCmakeDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
+void ColouriseCmakeDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
 	const WordList &keywords = *keywordLists[0];
 	const WordList &keywords2 = *keywordLists[1];
 
@@ -63,13 +65,12 @@ static void ColouriseCmakeDoc(Sci_PositionU startPos, Sci_Position length, int i
 	}
 
 	while (sc.More()) {
-		// Determine if the current state should terminate.
 		switch (sc.state) {
 		case SCE_CMAKE_OPERATOR:
 			sc.SetState(SCE_CMAKE_DEFAULT);
 			break;
 		case SCE_CMAKE_IDENTIFIER:
-			if (!iswordstart(sc.ch)) {
+			if (!IsIdentifierChar(sc.ch)) {
 				char s[128];
 				sc.GetCurrentLowered(s, sizeof(s) - 3);
 				const int chNext = sc.GetNextNSChar();
@@ -77,9 +78,9 @@ static void ColouriseCmakeDoc(Sci_PositionU startPos, Sci_Position length, int i
 					// see Command Invocations: space* identifier space* '(' arguments ')'
 					if (keywords.InListPrefixed(s, '(')) {
 						sc.ChangeState(SCE_CMAKE_WORD);
-						if (strcmp(s, "function()") == 0 || strcmp(s, "endfunction()") == 0) {
+						if (strcmp(s, "function") == 0 || strcmp(s, "endfunction") == 0) {
 							userDefType = 1;
-						} else if (strcmp(s, "macro()") == 0 || strcmp(s, "endmacro()") == 0) {
+						} else if (strcmp(s, "macro") == 0 || strcmp(s, "endmacro") == 0) {
 							userDefType = 2;
 						}
 					} else if (keywords2.InListPrefixed(s, '(')) {
@@ -175,7 +176,7 @@ static void ColouriseCmakeDoc(Sci_PositionU startPos, Sci_Position length, int i
 					sc.SetState(SCE_CMAKE_BRACKET_ARGUMENT);
 					sc.Forward(2 + bracketNumber);
 				}
-			} else if (sc.ch == '/' && sc.chNext == '/') { // CMakeCache.txt
+			} else if (sc.Match('/', '/')) { // CMakeCache.txt
 				sc.SetState(SCE_CMAKE_COMMENT);
 			} else if (sc.ch == '\\' && (sc.chNext == '\"' || sc.chNext == '\'')) {
 				sc.Forward();
@@ -185,7 +186,7 @@ static void ColouriseCmakeDoc(Sci_PositionU startPos, Sci_Position length, int i
 				sc.SetState(SCE_CMAKE_STRINGSQ);
 			} else if (sc.ch == '`') {
 				sc.SetState(SCE_CMAKE_STRINGBT);
-			} else if (iswordstart(sc.ch)) {
+			} else if (IsIdentifierStart(sc.ch)) {
 				sc.SetState(SCE_CMAKE_IDENTIFIER);
 			} else if (sc.Match('$', '{')) {
 				nvarLevel = 1;
@@ -219,11 +220,11 @@ static void ColouriseCmakeDoc(Sci_PositionU startPos, Sci_Position length, int i
 #define IsCommentLine(line)		IsLexCommentLine(line, styler, SCE_CMAKE_COMMENT)
 #define CMakeMatch(str)			styler.MatchIgnoreCase(i, str)
 
-static constexpr bool IsStreamCommentStyle(int style) noexcept {
+constexpr bool IsStreamCommentStyle(int style) noexcept {
 	return style == SCE_CMAKE_BLOCK_COMMENT || style == SCE_CMAKE_BRACKET_ARGUMENT;
 }
 
-static void FoldCmakeDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList, Accessor &styler) {
+void FoldCmakeDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList, Accessor &styler) {
 	if (styler.GetPropertyInt("fold") == 0)
 		return;
 	const bool foldComment = styler.GetPropertyInt("fold.comment", 1) != 0;
@@ -297,6 +298,8 @@ static void FoldCmakeDoc(Sci_PositionU startPos, Sci_Position length, int initSt
 			//visibleChars = 0;
 		}
 	}
+}
+
 }
 
 LexerModule lmCmake(SCLEX_CMAKE, ColouriseCmakeDoc, "cmake", FoldCmakeDoc);
