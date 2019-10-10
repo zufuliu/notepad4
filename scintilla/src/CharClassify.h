@@ -70,14 +70,14 @@ class DBCSCharClassify {
 public:
 	static const DBCSCharClassify* Get(int codePage);
 
-	bool IsLeadByte(char ch) const noexcept {
-		return leadByte[static_cast<unsigned char>(ch)];
+	bool IsLeadByte(unsigned char ch) const noexcept {
+		return leadByte[ch];
 	}
-	bool IsLeadByteInvalid(char ch) const noexcept {
-		return invalidLeadByte[static_cast<unsigned char>(ch)];
+	bool IsLeadByteInvalid(unsigned char ch) const noexcept {
+		return invalidLeadByte[ch];
 	}
-	bool IsTrailByteInvalid(char ch) const noexcept {
-		return invalidTrailByte[static_cast<unsigned char>(ch)];
+	bool IsTrailByteInvalid(unsigned char ch) const noexcept {
+		return invalidTrailByte[ch];
 	}
 
 	CharClassify::cc ClassifyCharacter(unsigned int ch) const noexcept {

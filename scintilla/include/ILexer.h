@@ -36,7 +36,7 @@ public:
 	virtual void SCI_METHOD DecorationFillRange(Sci_Position position, int value, Sci_Position fillLength) = 0;
 	virtual void SCI_METHOD ChangeLexerState(Sci_Position start, Sci_Position end) = 0;
 	virtual int SCI_METHOD CodePage() const noexcept = 0;
-	virtual bool SCI_METHOD IsDBCSLeadByte(char ch) const noexcept = 0;
+	virtual bool SCI_METHOD IsDBCSLeadByte(unsigned char ch) const noexcept = 0;
 	virtual const char * SCI_METHOD BufferPointer() = 0;
 	virtual int SCI_METHOD GetLineIndentation(Sci_Position line) const noexcept = 0;
 	virtual Sci_Position SCI_METHOD LineEnd(Sci_Position line) const noexcept = 0;

@@ -89,6 +89,7 @@ public:
 		}
 		return buf[position - startPos];
 	}
+	[[deprecated]]
 	char SafeGetCharAt(Sci_Position position, char chDefault) noexcept {
 		if (position < startPos || position >= endPos) {
 			Fill(position);
@@ -99,8 +100,8 @@ public:
 		}
 		return buf[position - startPos];
 	}
-	bool IsLeadByte(char ch) const noexcept {
-		return pAccess->IsDBCSLeadByte(ch);
+	bool IsLeadByte(unsigned char ch) const noexcept {
+		return encodingType == encDBCS && ch > 0x80 && pAccess->IsDBCSLeadByte(ch);
 	}
 	constexpr EncodingType Encoding() const noexcept {
 		return encodingType;

@@ -338,10 +338,10 @@ public:
 	Sci::Position GetRelativePositionUTF16(Sci::Position positionStart, Sci::Position characterOffset) const noexcept;
 	int SCI_METHOD GetCharacterAndWidth(Sci_Position position, Sci_Position *pWidth) const noexcept override;
 	int SCI_METHOD CodePage() const noexcept override;
-	bool SCI_METHOD IsDBCSLeadByte(char ch) const noexcept override;
-	bool IsDBCSLeadByteNoExcept(char ch) const noexcept;
-	bool IsDBCSLeadByteInvalid(char ch) const noexcept;
-	bool IsDBCSTrailByteInvalid(char ch) const noexcept;
+	bool SCI_METHOD IsDBCSLeadByte(unsigned char ch) const noexcept override;
+	bool IsDBCSLeadByteNoExcept(unsigned char ch) const noexcept;
+	bool IsDBCSLeadByteInvalid(unsigned char ch) const noexcept;
+	bool IsDBCSTrailByteInvalid(unsigned char ch) const noexcept;
 	int DBCSDrawBytes(std::string_view text) const noexcept;
 	int SafeSegment(const char *text, int length, int lengthSegment) const noexcept;
 	EncodingFamily CodePageFamily() const noexcept;
