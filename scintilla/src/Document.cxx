@@ -1008,20 +1008,20 @@ int SCI_METHOD Document::CodePage() const noexcept {
 	return dbcsCodePage;
 }
 
-bool SCI_METHOD Document::IsDBCSLeadByte(char ch) const noexcept {
+bool SCI_METHOD Document::IsDBCSLeadByte(unsigned char ch) const noexcept {
 	// Used by lexers so must match IDocument method exactly
 	return dbcsCharClass && dbcsCharClass->IsLeadByte(ch);
 }
 
-bool Document::IsDBCSLeadByteNoExcept(char ch) const noexcept {
+bool Document::IsDBCSLeadByteNoExcept(unsigned char ch) const noexcept {
 	return dbcsCharClass->IsLeadByte(ch);
 }
 
-bool Document::IsDBCSLeadByteInvalid(char ch) const noexcept {
+bool Document::IsDBCSLeadByteInvalid(unsigned char ch) const noexcept {
 	return dbcsCharClass->IsLeadByteInvalid(ch);
 }
 
-bool Document::IsDBCSTrailByteInvalid(char ch) const noexcept {
+bool Document::IsDBCSTrailByteInvalid(unsigned char ch) const noexcept {
 	return dbcsCharClass->IsTrailByteInvalid(ch);
 }
 

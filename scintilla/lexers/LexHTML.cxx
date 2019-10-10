@@ -737,7 +737,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 		const int chNext2 = static_cast<unsigned char>(styler.SafeGetCharAt(i + 2));
 
 		// Handle DBCS codepages
-		if (styler.IsLeadByte(static_cast<char>(ch))) {
+		if (styler.IsLeadByte(static_cast<unsigned char>(ch))) {
 			chPrev = ' ';
 			i += 1;
 			continue;
