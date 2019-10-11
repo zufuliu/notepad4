@@ -40,6 +40,7 @@ static constexpr bool IsANumberChar(int ch) noexcept {
 static void ColouriseTCLDoc(Sci_PositionU startPos, Sci_Position length, int, LexerWordList keywordLists, Accessor &styler) {
 #define  isComment(s) ((s) == SCE_TCL_COMMENT || (s) == SCE_TCL_COMMENTLINE || (s) == SCE_TCL_COMMENT_BOX || (s) == SCE_TCL_BLOCK_COMMENT)
 	const bool foldComment = styler.GetPropertyInt("fold.comment") != 0;
+	const bool foldCompact = styler.GetPropertyInt("fold.compact") != 0;
 	bool commentLevel = false;
 	bool subBrace = false; // substitution begin with a brace ${.....}
 	enum tLineState {
@@ -203,7 +204,7 @@ static void ColouriseTCLDoc(Sci_PositionU startPos, Sci_Position length, int, Le
 				}
 			}
 			int flag = 0;
-			if (!visibleChars)
+			if (!visibleChars && foldCompact)
 				flag = SC_FOLDLEVELWHITEFLAG;
 			if (currentLevel > previousLevel)
 				flag = SC_FOLDLEVELHEADERFLAG;
