@@ -35,8 +35,6 @@ static void ColouriseNullDoc(Sci_PositionU startPos, Sci_Position length, int, L
 
 // code folding based on Python
 static void FoldNullDoc(Sci_PositionU startPos, Sci_Position length, int /* initStyle */, LexerWordList, Accessor &styler) {
-	if (styler.GetPropertyInt("fold") == 0)
-		return;
 	const Sci_Position maxPos = startPos + length;
 	const Sci_Position maxLines = (maxPos == styler.Length()) ? styler.GetLine(maxPos) : styler.GetLine(maxPos - 1);	// Requested last line
 	const Sci_Position docLines = styler.GetLine(styler.Length());	// Available last line

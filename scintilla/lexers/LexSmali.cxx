@@ -333,8 +333,6 @@ static bool IsAnnotationLine(Sci_Position line, Accessor &styler) noexcept {
 }
 
 static void FoldSmaliDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList, Accessor &styler) {
-	if (styler.GetPropertyInt("fold") == 0)
-		return;
 	const bool foldComment = styler.GetPropertyInt("fold.comment") != 0;
 	const bool foldCompact = styler.GetPropertyInt("fold.compact", 1) != 0;
 

@@ -1217,8 +1217,6 @@ static bool IsOpenBraceLine(Sci_Position line, LexAccessor &styler) noexcept {
 }
 
 static void FoldCppDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList, Accessor &styler) {
-	if (styler.GetPropertyInt("fold") == 0)
-		return;
 	const bool foldComment = styler.GetPropertyInt("fold.comment", 1) != 0;
 	const bool foldPreprocessor = styler.GetPropertyInt("fold.preprocessor", 1) != 0;
 	//const bool foldAtElse = styler.GetPropertyInt("fold.at.else", 0) != 0;

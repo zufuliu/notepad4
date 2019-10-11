@@ -569,9 +569,6 @@ static int GetStyleFirstWord(Sci_PositionU szLine, Accessor &styler) noexcept {
 
 //
 static void FoldAU3Doc(Sci_PositionU startPos, Sci_Position length, int, LexerWordList, Accessor &styler) {
-	if (styler.GetPropertyInt("fold") == 0) {
-		return;
-	}
 	const Sci_Position endPos = startPos + length;
 	// get settings from the config files for folding comments and preprocessor lines
 	const bool foldComment = styler.GetPropertyInt("fold.comment") != 0;

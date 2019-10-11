@@ -149,8 +149,6 @@ static void ColouriseLispDoc(Sci_PositionU startPos, Sci_Position length, int in
 #define IsStreamStyle(style)		((style) == SCE_C_STRING)
 #define IsStreamCommantStyle(style)	((style) == SCE_C_COMMENT)
 static void FoldListDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList, Accessor &styler) {
-	if (styler.GetPropertyInt("fold") == 0)
-		return;
 	const bool foldComment = styler.GetPropertyInt("fold.comment") != 0;
 	const bool foldCompact = styler.GetPropertyInt("fold.compact", 1) != 0;
 

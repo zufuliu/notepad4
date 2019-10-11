@@ -276,8 +276,6 @@ static bool IsVBSome(Sci_Position line, int kind, Accessor &styler) noexcept {
 #define IsVB6Type(line)			IsVBSome(line, 1, styler)
 
 static void FoldVBDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList, Accessor &styler) {
-	if (styler.GetPropertyInt("fold") == 0)
-		return;
 	const bool foldComment = styler.GetPropertyInt("fold.comment") != 0;
 	const bool foldPreprocessor = styler.GetPropertyInt("fold.preprocessor") != 0;
 	const bool foldCompact = styler.GetPropertyInt("fold.compact", 1) != 0;
