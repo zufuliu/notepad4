@@ -356,7 +356,6 @@ static bool IsAsmDefineLine(Sci_Position line, LexAccessor &styler) noexcept {
 
 #define MAX_ASM_WORD_LEN	15
 static void FoldAsmDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
-	const bool foldSyntaxBased = styler.GetPropertyInt("fold.syntaxbased", 1) != 0;
 	const bool foldComment = styler.GetPropertyInt("fold.comment", 1) != 0;
 	const bool foldPreprocessor = styler.GetPropertyInt("fold.preprocessor", 1) != 0;
 	const bool foldCompact = styler.GetPropertyInt("fold.compact", 0) != 0;
@@ -412,26 +411,26 @@ static void FoldAsmDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 			levelNext--;
 		}
 
-		if (foldSyntaxBased && atEOL && IsEquLine(lineCurrent, styler)) {
+		if (atEOL && IsEquLine(lineCurrent, styler)) {
 			if (!IsEquLine(lineCurrent - 1, styler) && IsEquLine(lineCurrent + 1, styler))
 				levelNext++;
 			else if (IsEquLine(lineCurrent - 1, styler) && !IsEquLine(lineCurrent + 1, styler))
 				levelNext--;
 		}
-		if (foldSyntaxBased && (style == SCE_ASM_OPERATOR)) {
+		if (style == SCE_ASM_OPERATOR) {
 			if (ch == '{') {
 				levelNext++;
 			} else if (ch == '}') {
 				levelNext--;
 			}
 		}
-		if (foldPreprocessor && (style == SCE_ASM_PREPROCESSOR)) {
+		if (style == SCE_ASM_PREPROCESSOR) {
 			if (styler.Match(i, "#if") || styler.Match(i, "%if"))
 				levelNext++;
 			else if (styler.Match(i, "#end") || styler.Match(i, "%end"))
 				levelNext--;
 		}
-		if (foldSyntaxBased && (style == SCE_ASM_DIRECTIVE)) {
+		if (style == SCE_ASM_DIRECTIVE) {
 			if (wordlen < MAX_ASM_WORD_LEN) {
 				word[wordlen++] = MakeLowerCase(ch);
 			}

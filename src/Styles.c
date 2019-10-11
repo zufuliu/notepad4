@@ -1209,7 +1209,6 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 
 		// Code folding
 		SciCall_SetProperty("fold", "1");
-		SciCall_SetProperty("fold.foldsyntaxbased", "1");
 		SciCall_SetProperty("fold.comment", "1");
 		SciCall_SetProperty("fold.preprocessor", "1");
 		SciCall_SetProperty("fold.compact", "0");
