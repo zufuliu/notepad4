@@ -104,8 +104,6 @@ static void ColourisePropsDoc(Sci_PositionU startPos, Sci_Position length, int, 
 // adaption by ksc, using the "} else {" trick of 1.53
 // 030721
 static void FoldPropsDoc(Sci_PositionU startPos, Sci_Position length, int, LexerWordList, Accessor &styler) {
-	if (styler.GetPropertyInt("fold") == 0)
-		return;
 	const bool foldCompact = styler.GetPropertyInt("fold.compact", 1) != 0;
 	const Sci_PositionU endPos = startPos + length;
 	int visibleChars = 0;

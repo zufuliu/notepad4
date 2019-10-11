@@ -805,8 +805,6 @@ static void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int in
 
 #define MAX_BASH_WORD_LEN	15
 static void FoldBashDoc(Sci_PositionU startPos, Sci_Position length, int, LexerWordList, Accessor &styler) {
-	if (styler.GetPropertyInt("fold") == 0)
-		return;
 	const bool foldComment = styler.GetPropertyInt("fold.comment") != 0;
 	const bool foldCompact = styler.GetPropertyInt("fold.compact", 1) != 0;
 	const bool isCShell = styler.GetPropertyInt("lexer.bash.csh.language") != 0;

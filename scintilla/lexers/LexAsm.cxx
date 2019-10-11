@@ -356,8 +356,6 @@ static bool IsAsmDefineLine(Sci_Position line, LexAccessor &styler) noexcept {
 
 #define MAX_ASM_WORD_LEN	15
 static void FoldAsmDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
-	if (styler.GetPropertyInt("fold") == 0)
-		return;
 	const bool foldSyntaxBased = styler.GetPropertyInt("fold.syntaxbased", 1) != 0;
 	const bool foldComment = styler.GetPropertyInt("fold.comment", 1) != 0;
 	const bool foldPreprocessor = styler.GetPropertyInt("fold.preprocessor", 1) != 0;

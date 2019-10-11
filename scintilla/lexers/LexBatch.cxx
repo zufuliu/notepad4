@@ -382,6 +382,9 @@ static void ColouriseBatchDoc(Sci_PositionU startPos, Sci_Position length, int i
 			}
 		}
 
+		if (!isspacechar(sc.ch)) {
+			visibleChars++;
+		}
 		if (sc.atLineEnd) {
 			visibleChars = 0;
 			const int levelUse = levelCurrent;
@@ -393,9 +396,6 @@ static void ColouriseBatchDoc(Sci_PositionU startPos, Sci_Position length, int i
 				styler.SetLevel(sc.currentLine, lev);
 			}
 			levelCurrent = levelNext;
-		}
-		if (!isspacechar(sc.ch)) {
-			visibleChars++;
 		}
 		sc.Forward();
 	}

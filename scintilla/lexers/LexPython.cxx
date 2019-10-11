@@ -354,8 +354,6 @@ static inline bool IsQuoteLine(Sci_Position line, const Accessor &styler) noexce
 
 // based on original folding code
 static void FoldPyDoc(Sci_PositionU startPos, Sci_Position length, int, LexerWordList, Accessor &styler) {
-	if (styler.GetPropertyInt("fold") == 0)
-		return;
 	const Sci_Position maxPos = startPos + length;
 	const Sci_Position maxLines = (maxPos == styler.Length()) ? styler.GetLine(maxPos) : styler.GetLine(maxPos - 1);	// Requested last line
 	const Sci_Position docLines = styler.GetLine(styler.Length());	// Available last line

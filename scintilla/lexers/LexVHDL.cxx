@@ -140,8 +140,6 @@ static constexpr bool IsStreamCommentStyle(int style) noexcept {
 
 // Folding the code
 static void FoldVHDLDoc(Sci_PositionU startPos, Sci_Position length, int /*initStyle*/, LexerWordList keywordLists, Accessor &styler) {
-	if (styler.GetPropertyInt("fold") == 0)
-		return;
 	const WordList &kwFold = *keywordLists[8];
 
 	const bool foldComment = styler.GetPropertyInt("fold.comment") != 0;

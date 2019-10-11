@@ -198,8 +198,6 @@ static constexpr bool IsStreamCommentStyle(int style) noexcept {
 #define IsOpenLine(line)		IsFSLine(line, "open")
 
 static void FoldFSharpDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList, Accessor &styler) {
-	if (styler.GetPropertyInt("fold") == 0)
-		return;
 	//const int lexType = styler.GetPropertyInt("lexer.lang.type", LEX_FSHARP);
 	const bool foldComment = styler.GetPropertyInt("fold.comment", 1) != 0;
 	const bool foldPreprocessor = styler.GetPropertyInt("fold.preprocessor", 1) != 0;

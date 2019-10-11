@@ -120,8 +120,6 @@ static void ColouriseDiffDoc(Sci_PositionU startPos, Sci_Position length, int, L
 }
 
 static void FoldDiffDoc(Sci_PositionU startPos, Sci_Position length, int, LexerWordList, Accessor &styler) {
-	if (styler.GetPropertyInt("fold") == 0)
-		return;
 	Sci_Position curLine = styler.GetLine(startPos);
 	Sci_Position curLineStart = styler.LineStart(curLine);
 	int prevLevel = curLine > 0 ? styler.LevelAt(curLine - 1) : SC_FOLDLEVELBASE;
