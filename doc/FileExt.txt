@@ -242,6 +242,8 @@ GraphViz Dot
 	dot
 	gv
 
+	diag			blockdiag
+
 Groovy Script
 	groovy
 	gvy

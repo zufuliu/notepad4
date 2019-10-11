@@ -16,14 +16,13 @@ Or build from source, see the [Wiki](https://github.com/zufuliu/notepad2/wiki/Bu
 
 ## Changes compared to the official [Notepad2](http://www.flos-freeware.ch/notepad2.html) or [Notepad2-mod](https://xhmikosr.github.io/notepad2-mod/):
 
-* Code folding
 * Support for bookmarks
 * Option to mark all occurrences of a word or selection, and show matched count
 * [Enhanced auto-completion for words and functions](https://github.com/zufuliu/notepad2/wiki/Auto-Completion-in-Notepad2)
 * [Context-based auto-completion for some words](https://github.com/zufuliu/notepad2/wiki/Auto-Completion-in-Notepad2#context-based-auto-completion)
 * [Enhanced auto indentation](https://github.com/zufuliu/notepad2/wiki/Auto-Completion-in-Notepad2#auto-indent-text)
 * [Auto completion for braces, brackets and quotes](https://github.com/zufuliu/notepad2/wiki/Auto-Completion-in-Notepad2#auto-insert-text)
-* Syntax highlighting and code folding for (see built-in [file extension list](../master/doc/FileExt.txt)):
+* Syntax highlighting, code folding and API list for (see built-in [file extension list](../master/doc/FileExt.txt)):
 	* Plain Text
 	* ActionScript
 	* Assembler, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#assembler)
@@ -36,9 +35,11 @@ Or build from source, see the [Wiki](https://github.com/zufuliu/notepad2/wiki/Bu
 		* GNU AWK
 	* Windows Batch Script, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#batch)
 	* .NET IL
-	* CMake, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#cmake)
+	* CMake, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#cmake), up to 3.15.4
 	* C/C++, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#cc)
 		* Objective-C/C++, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#objective-cc)
+		* [C Standard Library](../master/tools/lang/C.c), up to C11.
+		* [C++ STL](../master/tools/lang/CPP.cpp), up to C++20.
 	* C#, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#c)
 		* C# Doc
 		* Vala
@@ -142,29 +143,6 @@ Or build from source, see the [Wiki](https://github.com/zufuliu/notepad2/wiki/Bu
 		* Android Manifest
 	* ANSI Art
 	* Many Others
-* API list for:
-	* [C Standard Library](../master/tools/lang/C.c), up to C11.
-	* [C++ STL](../master/tools/lang/CPP.cpp), up to C++20.
-	* MFC
-	* Cocoa
-	* AutoIt Script
-	* CMake
-	* C#
-	* Java
-	* [JavaScript](../master/tools/lang/JavaScript.js), up to ECMAScript 2018, 9ed.
-	* Inno Setup
-	* [Julia Script](https://julialang.org/)
-	* Lua Script
-	* Python Script
-	* PHP Script
-	* SQL Query
-		* [MySQL](../master/tools/lang/MySQL.sql), up to MySQL 8.0, MariaDB 10.3.
-		* [SQLite3](../master/tools/lang/SQLite3.sql)
-* Syntax highlighting for function and type for C/C++ family languages
-* Syntax highlighting for annotation for Java like JVM based languages
-* Syntax highlighting for attribute for C# like languages
-* Syntax highlighting for decorator for Python like languages
-* Folding for plain text
 * Toggle fold for specific level, shortcuts: <kbd>Alt</kbd>+<kbd>Number</kbd>
 * Toggle fold for current block without scrolling back to the block start line, shortcut: <kbd>Alt</kbd>+<kbd>C</kbd>, or context menu "Toggle Fold"
 * Insert new GUID and current timestamps
@@ -179,10 +157,9 @@ Or build from source, see the [Wiki](https://github.com/zufuliu/notepad2/wiki/Bu
 * Support color font (Windows 8.1 and above) in Direct2D mode, useful to display color [Emoji](http://unicode.org/emoji/charts/full-emoji-list.html) 😊 and others
 * Experimental support for RTL layout (GDI) and bidirectional (Direct2D), useful for Arabic and Hebrew
 * Support using fractional font size
-* Support Inline IME
+* Support inline mode IME
 * Support full screen mode
 * Extra support for drag and drop file from Visual Studio, Android Studio, IntelliJ IDEA, etc.
-* Cut, copy and paste binary content.
 * Other various major or minor changes and tweaks
 
 ## Supported Operating Systems:
