@@ -1,10 +1,10 @@
 // This file is part of Notepad2.
 // See License.txt for details about distribution and modification.
 //! Lexer for CMake.
+// https://cmake.org/cmake/help/v3.15/manual/cmake-language.7.html
 
 #include <cstring>
 #include <cassert>
-#include <cctype>
 
 #include "ILexer.h"
 #include "Scintilla.h"
@@ -22,10 +22,14 @@ using namespace Scintilla;
 namespace {
 
 constexpr bool IsCmakeOperator(int ch) noexcept {
-	return ch == '(' || ch == ')' || ch == '=' || ch == ':' || ch == ';';
+	return ch == '(' || ch == ')' || ch == '=' || ch == ':' || ch == ';'
+		|| ch == '$' || ch == '<' || ch == '>' || ch == ','; // Generator expressions
 }
 
-// https://cmake.org/cmake/help/v3.15/manual/cmake-language.7.html
+constexpr bool IsCmakeChar(int ch) noexcept {
+	return iswordchar(ch) || ch == '-' || ch == '+';
+}
+
 bool IsBracketArgument(Accessor &styler, Sci_PositionU pos, bool start, int &bracketNumber) noexcept {
 	int offset = 0;
 	++pos; // bracket
@@ -52,16 +56,21 @@ void ColouriseCmakeDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 	const WordList &keywords = *keywordLists[0];
 	const WordList &keywords2 = *keywordLists[1];
 
-	int varStyle = SCE_CMAKE_DEFAULT;
-	int nvarLevel = 0; // nested variable ${${}}
-	int bracketNumber = 0;
-	int userDefType = 0;
-	StyleContext sc(startPos, length, initStyle, styler);
+	int outerStyle = SCE_CMAKE_DEFAULT;
+	int varNestedLevel = 0; // nested variable: ${${}}
+	int generatorExpr = 0; // nested generator expressions: $<$<>>
+	int bracketNumber = 0; // number of '=' in bracket: [[]]
+	int userDefType = SCE_CMAKE_DEFAULT;
+	int chBeforeNumber = 0;
 
+	StyleContext sc(startPos, length, initStyle, styler);
 	if (sc.currentLine > 0) {
 		const int lineState = styler.GetLineState(sc.currentLine - 1);
-		nvarLevel = lineState & 0xffff;
-		bracketNumber = lineState >> 16;
+		outerStyle = lineState & 0xff;
+		bracketNumber = lineState >> 8;
+		if (outerStyle != SCE_CMAKE_DEFAULT) {
+			sc.SetState(outerStyle);
+		}
 	}
 
 	while (sc.More()) {
@@ -69,33 +78,44 @@ void ColouriseCmakeDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 		case SCE_CMAKE_OPERATOR:
 			sc.SetState(SCE_CMAKE_DEFAULT);
 			break;
+		case SCE_CMAKE_NUMBER:
+			if (!(IsADigit(sc.ch) || (sc.ch == '.' && IsADigit(sc.chNext)))) {
+				if (IsCmakeChar(sc.ch) || IsCmakeChar(chBeforeNumber)) {
+					sc.ChangeState(SCE_CMAKE_DEFAULT);
+				}
+				sc.SetState(SCE_CMAKE_DEFAULT);
+			}
+			break;
 		case SCE_CMAKE_IDENTIFIER:
 			if (!IsIdentifierChar(sc.ch)) {
-				char s[128];
-				sc.GetCurrentLowered(s, sizeof(s) - 3);
 				const int chNext = sc.GetNextNSChar();
 				if (chNext == '(') {
+					// command, function and macro are case insensitive
 					// see Command Invocations: space* identifier space* '(' arguments ')'
+					char s[128];
+					sc.GetCurrentLowered(s, sizeof(s));
+					userDefType = SCE_CMAKE_DEFAULT;
 					if (keywords.InListPrefixed(s, '(')) {
 						sc.ChangeState(SCE_CMAKE_WORD);
-						if (strcmp(s, "function") == 0 || strcmp(s, "endfunction") == 0) {
-							userDefType = 1;
-						} else if (strcmp(s, "macro") == 0 || strcmp(s, "endmacro") == 0) {
-							userDefType = 2;
+						if (strcmp(s, "function") == 0) {
+							userDefType = SCE_CMAKE_FUNCATION;
+						} else if (strcmp(s, "macro") == 0) {
+							userDefType = SCE_CMAKE_MACRO;
 						}
 					} else if (keywords2.InListPrefixed(s, '(')) {
 						sc.ChangeState(SCE_CMAKE_COMMANDS);
 					} else {
 						sc.ChangeState(SCE_CMAKE_FUNCATION);
 					}
-				} else if (userDefType) {
-					sc.ChangeState(userDefType == 1 ? SCE_CMAKE_FUNCATION : SCE_CMAKE_MACRO);
-					userDefType = 0;
+				} else if (userDefType != SCE_CMAKE_DEFAULT) {
+					sc.ChangeState(userDefType);
+					userDefType = SCE_CMAKE_DEFAULT;
+				} else {
+					// case sensitive
 				}
 				sc.SetState(SCE_CMAKE_DEFAULT);
 			}
 			break;
-
 		case SCE_CMAKE_COMMENT:
 			if (sc.atLineStart) {
 				sc.SetState(SCE_CMAKE_DEFAULT);
@@ -110,33 +130,52 @@ void ColouriseCmakeDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 				}
 			}
 			break;
-		case SCE_CMAKE_STRINGDQ:
-		case SCE_CMAKE_STRINGSQ:
-		case SCE_CMAKE_STRINGBT:
-		case SCE_CMAKE_BRACKET_ARGUMENT:
-			if (sc.ch == '\\' && (sc.chNext == '\\' || sc.chNext == '\"' || sc.chNext == '\'')) {
-				sc.Forward();
+		case SCE_CMAKE_STRING:
+			if (sc.ch == '\\') {
+				if (sc.chNext == '\n' || sc.chNext == '\r') {
+					sc.SetState(SCE_CMAKE_LINE_CONTINUE);
+					sc.ForwardSetState(SCE_CMAKE_STRING);
+				} else {
+					sc.SetState(SCE_CMAKE_ESCAPE_SEQUENCE);
+					sc.Forward();
+				}
 			} else if (sc.Match('$', '{')) {
-				varStyle = sc.state;
-				nvarLevel = 1;
+				varNestedLevel = 1;
 				sc.SetState(SCE_CMAKE_VARIABLE);
-				sc.Forward();
-			} else if (sc.Match("$ENV{")) {
-				varStyle = sc.state;
-				nvarLevel = 1;
-				sc.SetState(SCE_CMAKE_VARIABLE);
-				sc.Forward(4);
-			} else if (sc.Match("$CACHE{")) {
-				varStyle = sc.state;
-				nvarLevel = 1;
-				sc.SetState(SCE_CMAKE_VARIABLE);
-				sc.Forward(6);
-			} else if ((sc.state == SCE_CMAKE_STRINGDQ && sc.ch == '\"')
-				|| (sc.state == SCE_CMAKE_STRINGSQ && sc.ch == '\'')
-				|| (sc.state == SCE_CMAKE_STRINGBT && sc.ch == '`')
-				) {
+			} else if (sc.Match('$', '<')) {
+				generatorExpr = 1;
+				sc.SetState(SCE_CMAKE_OPERATOR);
+			} else if ((sc.ch == '$' || sc.ch == '@') && IsIdentifierStart(sc.chNext)) {
+				sc.SetState((sc.ch == '$') ? SCE_CMAKE_VARIABLE_DOLLAR : SCE_CMAKE_VARIABLE_AT);
+			} else if (generatorExpr && IsCmakeOperator(sc.ch)) {
+				if (sc.ch == '>') {
+					--generatorExpr;
+				}
+				sc.SetState(SCE_CMAKE_OPERATOR);
+				sc.ForwardSetState(SCE_CMAKE_STRING);
+				continue;
+			} else if (sc.ch == '\"') {
 				sc.ForwardSetState(SCE_CMAKE_DEFAULT);
-			} else if (sc.state == SCE_CMAKE_BRACKET_ARGUMENT && sc.ch == ']' && (sc.chNext == '=' || sc.chNext == ']')) {
+				outerStyle = SCE_CMAKE_DEFAULT;
+			}
+			break;
+		case SCE_CMAKE_ESCAPE_SEQUENCE:
+			if (sc.ch == '\\') {
+				if (sc.chNext == '\n' || sc.chNext == '\r') {
+					sc.SetState(SCE_CMAKE_LINE_CONTINUE);
+					sc.ForwardSetState(outerStyle);
+				} else {
+					sc.Forward();
+				}
+			} else {
+				sc.SetState(outerStyle);
+				if (outerStyle != SCE_CMAKE_DEFAULT) {
+					continue;
+				}
+			}
+			break;
+		case SCE_CMAKE_BRACKET_ARGUMENT:
+			if (sc.ch == ']' && (sc.chNext == '=' || sc.chNext == ']')) {
 				if (IsBracketArgument(styler, sc.currentPos, false, bracketNumber)) {
 					sc.Forward(1 + bracketNumber);
 					sc.ForwardSetState(SCE_CMAKE_DEFAULT);
@@ -146,24 +185,51 @@ void ColouriseCmakeDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 			break;
 		case SCE_CMAKE_VARIABLE:
 			if (sc.ch == '}') {
-				if (nvarLevel > 0)
-					--nvarLevel;
-				if (nvarLevel == 0) {
-					sc.ForwardSetState(varStyle);
-					if (varStyle != SCE_CMAKE_DEFAULT) {
+				--varNestedLevel;
+				if (varNestedLevel == 0) {
+					sc.ForwardSetState(outerStyle);
+					if (outerStyle != SCE_CMAKE_DEFAULT) {
 						continue;
 					}
 				}
 			} else if (sc.Match('$', '{')) {
-				++nvarLevel;
-				sc.Forward();
+				++varNestedLevel;
+			}
+			break;
+		case SCE_CMAKE_VARIABLE_DOLLAR:
+			if (!IsIdentifierChar(sc.ch)) {
+				bool done = false;
+				if (sc.ch == '{') {
+					char s[8];
+					sc.GetCurrent(s, sizeof(s));
+					if (strcmp(s, "$ENV") == 0 || strcmp(s, "$CACHE") == 0) {
+						sc.SetState(SCE_CMAKE_VARIABLE);
+						varNestedLevel = 1;
+						done = true;
+					}
+				}
+				if (!done) {
+					sc.SetState(outerStyle);
+					if (outerStyle != SCE_CMAKE_DEFAULT) {
+						continue;
+					}
+				}
+			}
+			break;
+		case SCE_CMAKE_VARIABLE_AT:
+			if (!IsIdentifierChar(sc.ch)) {
+				if (sc.ch == '@') {
+					sc.Forward();
+				}
+				sc.SetState(outerStyle);
+				if (outerStyle != SCE_CMAKE_DEFAULT) {
+					continue;
+				}
 			}
 			break;
 		}
 
-		// Determine if a new state should be entered.
 		if (sc.state == SCE_CMAKE_DEFAULT) {
-			varStyle = SCE_CMAKE_DEFAULT;
 			if (sc.ch == '#') {
 				if (sc.chNext == '[' && IsBracketArgument(styler, sc.currentPos + 1, true, bracketNumber)) {
 					sc.SetState(SCE_CMAKE_BLOCK_COMMENT);
@@ -178,38 +244,41 @@ void ColouriseCmakeDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 				}
 			} else if (sc.Match('/', '/')) { // CMakeCache.txt
 				sc.SetState(SCE_CMAKE_COMMENT);
-			} else if (sc.ch == '\\' && (sc.chNext == '\"' || sc.chNext == '\'')) {
-				sc.Forward();
 			} else if (sc.ch == '\"') {
-				sc.SetState(SCE_CMAKE_STRINGDQ);
-			} else if (sc.ch == '\'') {
-				sc.SetState(SCE_CMAKE_STRINGSQ);
-			} else if (sc.ch == '`') {
-				sc.SetState(SCE_CMAKE_STRINGBT);
+				outerStyle = SCE_CMAKE_STRING;
+				sc.SetState(SCE_CMAKE_STRING);
+			} else if (sc.Match('$', '{')) {
+				varNestedLevel = 1;
+				outerStyle = generatorExpr ? outerStyle : SCE_CMAKE_DEFAULT;
+				sc.SetState(SCE_CMAKE_VARIABLE);
+			} else if ((sc.ch == '$' || sc.ch == '@') && IsIdentifierStart(sc.chNext)) {
+				outerStyle = generatorExpr ? outerStyle : SCE_CMAKE_DEFAULT;
+				sc.SetState((sc.ch == '$') ? SCE_CMAKE_VARIABLE_DOLLAR : SCE_CMAKE_VARIABLE_AT);
+				sc.Forward();
+			} else if (sc.ch == '\\') {
+				sc.SetState(SCE_CMAKE_ESCAPE_SEQUENCE);
+				sc.Forward();
 			} else if (IsIdentifierStart(sc.ch)) {
 				sc.SetState(SCE_CMAKE_IDENTIFIER);
-			} else if (sc.Match('$', '{')) {
-				nvarLevel = 1;
-				sc.SetState(SCE_CMAKE_VARIABLE);
-				sc.Forward();
-			} else if (sc.Match("$ENV{")) {
-				nvarLevel = 1;
-				sc.SetState(SCE_CMAKE_VARIABLE);
-				sc.Forward(4);
-			} else if (sc.Match("$CACHE{")) {
-				nvarLevel = 1;
-				sc.SetState(SCE_CMAKE_VARIABLE);
-				sc.Forward(6);
+			} else if (IsADigit(sc.ch) || (sc.ch == '-' && IsADigit(sc.chNext))) {
+				sc.SetState(SCE_CMAKE_NUMBER);
+				chBeforeNumber = sc.chPrev;
 			} else if (IsCmakeOperator(sc.ch)) {
 				sc.SetState(SCE_CMAKE_OPERATOR);
-				if (userDefType && sc.ch == ')') {
-					userDefType = 0;
+				if (generatorExpr) {
+					if (sc.Match('$', '<')) {
+						++generatorExpr;
+					} else if (sc.ch == '>') {
+						--generatorExpr;
+						sc.ForwardSetState(generatorExpr ? SCE_CMAKE_DEFAULT : outerStyle);
+						continue;
+					}
 				}
 			}
 		}
 
 		if (sc.atLineEnd) {
-			styler.SetLineState(sc.currentLine, (bracketNumber << 16) | nvarLevel);
+			styler.SetLineState(sc.currentLine, (bracketNumber << 8) | outerStyle);
 		}
 		sc.Forward();
 	}
@@ -219,10 +288,6 @@ void ColouriseCmakeDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 
 #define IsCommentLine(line)		IsLexCommentLine(line, styler, SCE_CMAKE_COMMENT)
 #define CMakeMatch(str)			styler.MatchIgnoreCase(i, str)
-
-constexpr bool IsStreamCommentStyle(int style) noexcept {
-	return style == SCE_CMAKE_BLOCK_COMMENT || style == SCE_CMAKE_BRACKET_ARGUMENT;
-}
 
 void FoldCmakeDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList, Accessor &styler) {
 	const bool foldComment = styler.GetPropertyInt("fold.comment", 1) != 0;
@@ -254,23 +319,19 @@ void FoldCmakeDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, Le
 			else if (IsCommentLine(lineCurrent - 1) && !IsCommentLine(lineCurrent + 1))
 				levelNext--;
 		}
-		if (foldComment && IsStreamCommentStyle(style)) {
-			if (!IsStreamCommentStyle(stylePrev)) {
+		if (style == SCE_CMAKE_BLOCK_COMMENT || style == SCE_CMAKE_BRACKET_ARGUMENT) {
+			if (style != stylePrev) {
 				levelNext++;
-			} else if (!IsStreamCommentStyle(styleNext) && !atEOL) {
+			} else if (style != styleNext) {
 				levelNext--;
 			}
-		}
-
-		if (style == SCE_CMAKE_OPERATOR) {
+		} else if (style == SCE_CMAKE_OPERATOR) {
 			if (ch == '(') {
 				levelNext++;
 			} else if (ch == ')') {
 				levelNext--;
 			}
-		}
-
-		if (style == SCE_CMAKE_WORD && stylePrev != SCE_CMAKE_WORD) {
+		} else if (style == SCE_CMAKE_WORD && stylePrev != SCE_CMAKE_WORD) {
 			if (CMakeMatch("end")) {
 				levelNext--;
 			} else if (CMakeMatch("if") || CMakeMatch("function") || CMakeMatch("macro")
