@@ -909,6 +909,9 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 				i += 2;
 				visibleChars += 2;
 				tagClosing = true;
+				if (isXml) {
+					--levelCurrent;
+				}
 				continue;
 			}
 		}
