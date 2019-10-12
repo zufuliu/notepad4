@@ -1531,8 +1531,13 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 	// update style font, color, etc. don't need colorizing (analyzing whole document) again,
 	// thus we not call SciCall_ClearDocumentStyle() in previous block.
 	if (bLexerChanged) {
+#if 0
+		// profile lexer performance
+		SciCall_ColouriseAll();
+#else
 		// idle styling
 		SciCall_StartStyling(0);
+#endif
 
 		// Save current lexer
 		pLexCurrent = pLexNew;
