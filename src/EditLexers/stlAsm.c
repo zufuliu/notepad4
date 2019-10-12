@@ -131,7 +131,7 @@ static KEYWORDLIST Keywords_ASM = {{
 // VMX
 "invept invvpid vmcall vmclear vmlaunch vmresume vmptrld vmptrst vmread vmwrite vmxoff vmxon "
 // AMD
-"lzcnt prefetch prefetchw skinit vmload vmmcall vmrun vmsave "
+"lzcnt tzcnt prefetch prefetchw skinit vmload vmmcall vmrun vmsave "
 "extrq insertq movntsd movntss "
 // AMD 3DNow!
 "femms pavgusb pf2id pf2iw pfacc pfadd pfcmpeq pfcmpge pfcmpgt "
