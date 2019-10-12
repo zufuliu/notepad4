@@ -88,14 +88,14 @@ public:
 		return CharClassify::ccSpace;
 	}
 
-	int CodePage() const noexcept {
+	constexpr int CodePage() const noexcept {
 		return codePage;
 	}
 
 private:
 	explicit DBCSCharClassify(int codePage_) noexcept;
 
-	int codePage;
+	const int codePage;
 	bool leadByte[256];
 	bool invalidLeadByte[256];
 	bool invalidTrailByte[256];
