@@ -860,6 +860,7 @@
     <ClCompile Include="..\..\scintilla\lexers\LexPowerShell.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexPython.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexRuby.cxx" />
+    <ClCompile Include="..\..\scintilla\lexers\LexRust.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexSQL.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexTCL.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexVB.cxx" />
@@ -917,6 +918,7 @@
     <ClCompile Include="..\..\src\EditLexers\stlPython.c" />
     <ClCompile Include="..\..\src\EditLexers\stlResource.c" />
     <ClCompile Include="..\..\src\EditLexers\stlRuby.c" />
+    <ClCompile Include="..\..\src\EditLexers\stlRust.c" />
     <ClCompile Include="..\..\src\EditLexers\stlScala.c" />
     <ClCompile Include="..\..\src\EditLexers\stlSmali.c" />
     <ClCompile Include="..\..\src\EditLexers\stlSQL.c" />

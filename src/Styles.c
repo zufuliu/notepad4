@@ -100,6 +100,7 @@ extern EDITLEXER lexPerl;
 extern EDITLEXER lexPS1;
 
 extern EDITLEXER lexRC;
+extern EDITLEXER lexRust;
 
 extern EDITLEXER lexScala;
 extern EDITLEXER lexBash;
@@ -183,6 +184,7 @@ static const PEDITLEXER pLexArray[ALL_LEXER_COUNT] = {
 	&lexPS1,
 
 	&lexRC,
+	&lexRust,
 
 	&lexScala,
 	&lexBash,
@@ -1041,6 +1043,13 @@ void Style_UpdateLexerKeywordAttr(LPCEDITLEXER pLexNew) {
 		attr[11] = KeywordAttr_NoLexer;		// Constant
 		attr[12] = KeywordAttr_NoLexer;		// Attribute
 		break;
+	case NP2LEX_RUST:
+		attr[1] = KeywordAttr_NoAutoComp;	// reserved keywords
+		attr[8] = KeywordAttr_NoLexer;		// attribute
+		attr[9] = KeywordAttr_NoLexer;		// macro
+		attr[10] = KeywordAttr_NoLexer;		// module
+		attr[11] = KeywordAttr_NoLexer;		// function
+		break;
 	case NP2LEX_SQL:
 		attr[6] = KeywordAttr_NoLexer;		// Upper Case Keyword
 		attr[7] = KeywordAttr_NoLexer;		// Upper Case Type
@@ -1625,6 +1634,9 @@ PEDITLEXER Style_SniffShebang(char *pchText) {
 			if (!strncmp(name, "ruby", 4)) {
 				return &lexRuby;
 			}
+			//if (!strncmp(name, "rust", 4)) {
+			//	return &lexRust;
+			//}
 			if (!strncmp(name, "gawk", 4) || !strncmp(name, "nawk", 4)) {
 				return &lexAwk;
 			}

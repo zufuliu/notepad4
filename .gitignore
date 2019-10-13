@@ -1,6 +1,6 @@
 .codelite
+.vs
 bin
-build/VS*/.vs
 build/bin
 build/temp*
 build/*.zip
