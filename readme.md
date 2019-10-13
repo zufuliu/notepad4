@@ -193,6 +193,7 @@ Or build from source, see the [Wiki](https://github.com/zufuliu/notepad2/wiki/Bu
 * [Notepad2 Wiki](https://github.com/zufuliu/notepad2/wiki)
 
 ### Other projects based on (original) Notepad2 or Notepad2-mod:
-* [Notepad2 Korean Vision](https://teus.me/category/IT/Notepad2)
+* [한국어 (Korean) Localization](https://teus.me/category/IT/Notepad2)
+* [简体中文 (Simplified Chinese) Localization](https://github.com/yfdyh000/notepad2)
 * [Notepad3](https://github.com/rizonesoft/Notepad3)
 * [Notepad2e](https://github.com/ProgerXP/Notepad2e)
