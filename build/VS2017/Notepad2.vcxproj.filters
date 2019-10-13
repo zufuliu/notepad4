@@ -222,6 +222,9 @@
     <ClCompile Include="..\..\scintilla\lexers\LexRuby.cxx">
       <Filter>Scintilla\lexers</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\scintilla\lexers\LexRust.cxx">
+      <Filter>Scintilla\lexers</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\scintilla\lexers\LexSQL.cxx">
       <Filter>Scintilla\lexers</Filter>
     </ClCompile>
@@ -379,6 +382,9 @@
       <Filter>Source Files\EditLexers</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\EditLexers\stlRuby.c">
+      <Filter>Source Files\EditLexers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\EditLexers\stlRust.c">
       <Filter>Source Files\EditLexers</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\EditLexers\stlScala.c">

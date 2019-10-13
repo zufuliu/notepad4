@@ -586,6 +586,8 @@ static inline BOOL IsOperatorStyle(int style) {
 
 	case SCLEX_RUBY:
 		return style == SCE_RB_OPERATOR;
+	case SCLEX_RUST:
+		return style == SCE_RUST_OPERATOR;
 
 	case SCLEX_SMALI:
 		return style == SCE_SMALI_OPERATOR;
@@ -811,6 +813,10 @@ void AutoC_AddDocWord(struct WordList *pWList, BOOL bIgnoreCase, char prefix) {
 			while (wordEnd < iDocLen) {
 				const int ch = SciCall_GetCharAt(wordEnd);
 				if (!(ch == ':' || ch == '.' || ch == '-')) {
+					if (ch == '!' && pLexCurrent->iLexer == SCLEX_RUST && style == SCE_RUST_MACRO) {
+						// macro: println!()
+						++wordEnd;
+					}
 					break;
 				}
 
@@ -1333,7 +1339,7 @@ static BOOL CanAutoCloseSingleQuote(int chPrev, int iCurrentStyle) {
 	// someone's, don't
 	if (isalnum(chPrev)) {
 		// character prefix
-		if (pLexCurrent->rid == NP2LEX_CPP || pLexCurrent->rid == NP2LEX_RC || iLexer == SCLEX_PYTHON || iLexer == SCLEX_SQL) {
+		if (pLexCurrent->rid == NP2LEX_CPP || pLexCurrent->rid == NP2LEX_RC || iLexer == SCLEX_PYTHON || iLexer == SCLEX_SQL || iLexer == SCLEX_RUST) {
 			const int lower = chPrev | 0x20;
 			const int chPrev2 = SciCall_GetCharAt(SciCall_GetCurrentPos() - 3);
 			const BOOL bSubWord = chPrev2 >= 0x80 || isalnum(chPrev2);
@@ -1349,8 +1355,15 @@ static BOOL CanAutoCloseSingleQuote(int chPrev, int iCurrentStyle) {
 
 			case SCLEX_SQL:
 				return (lower == 'q' || lower == 'x' || lower == 'b') && !bSubWord;
+
+			case SCLEX_RUST:
+				return chPrev == 'b' && !bSubWord; // bytes
 			}
 		}
+		return FALSE;
+	}
+	if (iLexer == SCLEX_RUST) {
+		// lifetime
 		return FALSE;
 	}
 
@@ -1930,6 +1943,7 @@ void EditToggleCommentLine(void) {
 	case SCLEX_GRAPHVIZ:
 	case SCLEX_JSON:
 	case SCLEX_PASCAL:
+	case SCLEX_RUST:
 	case SCLEX_VERILOG:
 		EditToggleLineComments(L"//", FALSE);
 		break;
@@ -2057,6 +2071,7 @@ void EditToggleCommentBlock(void) {
 	case SCLEX_GRAPHVIZ:
 	case SCLEX_JSON:
 	case SCLEX_NSIS:
+	case SCLEX_RUST:
 	case SCLEX_SQL:
 	case SCLEX_VERILOG:
 	case SCLEX_VHDL:
@@ -2214,6 +2229,10 @@ void EditInsertScriptShebangLine(void) {
 	case SCLEX_RUBY:
 		name = "ruby";
 		break;
+
+	//case SCLEX_RUST:
+	//	name = "rust";
+	//	break;
 
 	case SCLEX_TCL:
 		name = "wish";

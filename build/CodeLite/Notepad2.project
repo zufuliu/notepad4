@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<CodeLite_Project Name="Notepad2" Version="10.0.0">
+<CodeLite_Project Name="Notepad2" Version="11000">
   <Description/>
   <Dependencies/>
   <VirtualDirectory Name="Scintilla">
@@ -43,6 +43,7 @@
       <File Name="../../scintilla/lexers/LexPowerShell.cxx"/>
       <File Name="../../scintilla/lexers/LexPython.cxx"/>
       <File Name="../../scintilla/lexers/LexRuby.cxx"/>
+      <File Name="../../scintilla/lexers/LexRust.cxx"/>
       <File Name="../../scintilla/lexers/LexSmali.cxx"/>
       <File Name="../../scintilla/lexers/LexSQL.cxx"/>
       <File Name="../../scintilla/lexers/LexTCL.cxx"/>
@@ -195,6 +196,7 @@
       <File Name="../../src/EditLexers/stlPython.c"/>
       <File Name="../../src/EditLexers/stlResource.c"/>
       <File Name="../../src/EditLexers/stlRuby.c"/>
+      <File Name="../../src/EditLexers/stlRust.c"/>
       <File Name="../../src/EditLexers/stlScala.c"/>
       <File Name="../../src/EditLexers/stlSmali.c"/>
       <File Name="../../src/EditLexers/stlSQL.c"/>

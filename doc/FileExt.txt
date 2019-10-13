@@ -29,6 +29,8 @@ C/C++ Source
 
 	*.h.in
 
+	[ ] rs			Android RenderScript
+
 C# Source
 	cs
 	csx				C# Script
@@ -382,6 +384,8 @@ Resource Script
 	rh
 	dlg
 
+Rust Source
+	rs
 
 Scala Script
 	scala

@@ -57,7 +57,7 @@ Or build from source, see the [Wiki](https://github.com/zufuliu/notepad2/wiki/Bu
 	* F#
 	* Go
 	* Gradle, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#gradle)
-	* GraphViz Dot, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#graphviz)	
+	* GraphViz Dot, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#graphviz)
 		* blockdiag, seqdiag, actdiag and nwdiag
 	* Groovy
 	* Haxe
@@ -103,6 +103,8 @@ Or build from source, see the [Wiki](https://github.com/zufuliu/notepad2/wiki/Bu
 		* PHPDoc
 	* Windows Rescouce Script
 	* Ruby, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#ruby)
+	* Rust
+		* Rust Standard Library (../master/tools/lang/Rust.rs), up to 1.38.
 	* Scala Script
 	* Shell Script
 		* Bash likes (sh, bash, dash, ash, zsh, ksh), [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#shell-script)
