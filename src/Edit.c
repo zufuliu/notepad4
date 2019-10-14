@@ -6875,7 +6875,6 @@ BOOL FileVars_ParseStr(LPCSTR pszData, LPCSTR pszName, char *pszValue, int cchVa
 //
 // SciInitThemes()
 //
-extern BOOL bIsAppThemed;
 static WNDPROC pfnSciWndProc = NULL;
 
 static LRESULT CALLBACK SciThemedWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam);
@@ -6895,7 +6894,7 @@ LRESULT CALLBACK SciThemedWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lP
 	case WM_NCCALCSIZE:
 		if (wParam) {
 			const LRESULT lresult = CallWindowProc(pfnSciWndProc, hwnd, WM_NCCALCSIZE, wParam, lParam);
-			if (bIsAppThemed) {
+			if (IsAppThemed()) {
 				HTHEME hTheme = OpenThemeData(hwnd, L"edit");
 				if (hTheme) {
 					NCCALCSIZE_PARAMS *csp = (NCCALCSIZE_PARAMS *)lParam;
@@ -6926,7 +6925,7 @@ LRESULT CALLBACK SciThemedWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lP
 
 	case WM_NCPAINT: {
 		const LRESULT lresult = CallWindowProc(pfnSciWndProc, hwnd, WM_NCPAINT, wParam, lParam);
-		if (bIsAppThemed) {
+		if (IsAppThemed()) {
 			HTHEME hTheme = OpenThemeData(hwnd, L"edit");
 			if (hTheme) {
 				HDC hdc = GetWindowDC(hwnd);
