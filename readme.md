@@ -104,7 +104,7 @@ Or build from source, see the [Wiki](https://github.com/zufuliu/notepad2/wiki/Bu
 	* Windows Rescouce Script
 	* Ruby, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#ruby)
 	* Rust
-		* Rust Standard Library (../master/tools/lang/Rust.rs), up to 1.38.
+		* [Rust Standard Library](../master/tools/lang/Rust.rs), up to 1.38.
 	* Scala Script
 	* Shell Script
 		* Bash likes (sh, bash, dash, ash, zsh, ksh), [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#shell-script)
