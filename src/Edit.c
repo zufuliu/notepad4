@@ -6072,7 +6072,7 @@ static INT_PTR CALLBACK EditInsertTagDlgProc(HWND hwnd, UINT umsg, WPARAM wParam
 				}
 
 				if (bClear) {
-					SetDlgItemText(hwnd, IDC_MODIFY_LINE_PREFIX, L"");
+					SetDlgItemText(hwnd, IDC_MODIFY_LINE_APPEND, L"");
 				}
 				DString_Free(&wszOpen);
 			}
