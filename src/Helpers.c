@@ -1042,6 +1042,11 @@ static LRESULT CALLBACK MultilineEditProc(HWND hwnd, UINT umsg, WPARAM wParam, L
 			SendMessage(GetParent(hwnd), WM_CLOSE, 0, 0);
 			return TRUE;
 		}
+		if (wParam == VK_TAB && KeyboardIsKeyDown(VK_SHIFT)) {
+			// focus on next control: GetNextDlgTabItem(GetParent(hwnd), hwnd)
+			// TODO: find first control when hwnd is last tab item on this dialog: GetNextDlgTabItem() returns hwnd
+			PostMessage(GetParent(hwnd), WM_NEXTDLGCTL, 0, FALSE);
+		}
 		break;
 
 	case WM_SETTEXT: {
