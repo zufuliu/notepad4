@@ -1037,6 +1037,13 @@ static LRESULT CALLBACK MultilineEditProc(HWND hwnd, UINT umsg, WPARAM wParam, L
 		}
 		break;
 
+	case WM_KEYDOWN:
+		if (wParam == VK_ESCAPE) {
+			SendMessage(GetParent(hwnd), WM_CLOSE, 0, 0);
+			return TRUE;
+		}
+		break;
+
 	case WM_SETTEXT: {
 		const LRESULT result = DefSubclassProc(hwnd, umsg, wParam, lParam);
 		if (result) {
