@@ -1531,10 +1531,172 @@ mod std::net {
 	}
 }
 
-x mod std::num {
+mod std::num {
+	struct NonZeroI8;
+	struct NonZeroI16;
+	struct NonZeroI32;
+	struct NonZeroI64;
+	struct NonZeroI128 {
+		const unsafe fn new_unchecked(n: i128) -> NonZeroI128
+		fn new(n: i128) -> Option<NonZeroI128>
+		const fn get(self) -> i128
+	}
+	struct NonZeroIsize;
+	struct NonZeroU8;
+	struct NonZeroU16;
+	struct NonZeroU32;
+	struct NonZeroU64;
+	struct NonZeroU128;
+	struct NonZeroUsize;
+	struct ParseFloatError;
+	struct ParseIntError;
+	struct TryFromIntError;
+	struct Wrapping<T>;
+	enum FpCategory {
+		Nan,
+		Infinite,
+		Zero,
+		Subnormal,
+		Normal,
+	}
 }
 
-x mod std::ops {
+mod std::ops {
+	struct Range<Idx> {
+		pub start: Idx,
+		pub end: Idx,
+		fn contains<U>(&self, item: &U) -> bool
+	}
+	struct RangeFrom<Idx> {
+		pub start: Idx,
+		fn contains<U>(&self, item: &U) -> bool
+	}
+	struct RangeFull;
+	struct RangeInclusive<Idx> {
+		const fn new(start: Idx, end: Idx) -> RangeInclusive<Idx>
+		const fn start(&self) -> &Idx
+		const fn end(&self) -> &Idx
+		fn into_inner(self) -> (Idx, Idx)
+		fn contains<U>(&self, item: &U) -> bool
+	}
+	struct RangeTo<Idx> {
+		pub end: Idx,
+		fn contains<U>(&self, item: &U) -> bool
+	}
+	struct RangeToInclusive<Idx> {
+		pub end: Idx,
+		fn contains<U>(&self, item: &U) -> bool
+	}
+	enum Bound<T> {
+		Included(T),
+		Excluded(T),
+		Unbounded,
+	}
+	trait Add<Rhs = Self> {
+		type Output;
+		fn add(self, rhs: Rhs) -> Self::Output
+	}
+	trait AddAssign<Rhs = Self> {
+		fn add_assign(&mut self, rhs: Rhs)
+	}
+	trait BitAnd<Rhs = Self> {
+		type Output;
+		fn bitand(self, rhs: Rhs) -> Self::Output
+	}
+	trait BitAndAssign<Rhs = Self> {
+		fn bitand_assign(&mut self, rhs: Rhs)
+	}
+	trait BitOr<Rhs = Self> {
+		type Output;
+		fn bitor(self, rhs: Rhs) -> Self::Output
+	}
+	trait BitOrAssign<Rhs = Self> {
+		fn bitor_assign(&mut self, rhs: Rhs)
+	}
+	trait BitXor<Rhs = Self> {
+		type Output;
+		fn bitxor(self, rhs: Rhs) -> Self::Output
+	}
+	trait BitXorAssign<Rhs = Self> {
+		fn bitxor_assign(&mut self, rhs: Rhs)
+	}
+	trait Deref {
+		type Target: ?Sized;
+		fn deref(&self) -> &Self::Target
+	}
+	trait DerefMut: Deref {
+		fn deref_mut(&mut self) -> &mut Self::Target
+	}
+	trait Div<Rhs = Self> {
+		type Output;
+		fn div(self, rhs: Rhs) -> Self::Output
+	}
+	trait DivAssign<Rhs = Self> {
+		fn div_assign(&mut self, rhs: Rhs)
+	}
+	trait Drop {
+		fn drop(&mut self)
+	}
+	trait Fn<Args>: FnMut<Args>;
+	trait FnMut<Args>: FnOnce<Args>;
+	trait FnOnce<Args> {
+		type Output;
+	}
+	trait Index<Idx> {
+		type Output: ?Sized;
+		fn index(&self, index: Idx) -> &Self::Output
+	}
+	trait IndexMut<Idx>: Index<Idx> {
+		fn index_mut(&mut self, index: Idx) -> &mut Self::Output
+	}
+	trait Mul<Rhs = Self> {
+		type Output;
+		fn mul(self, rhs: Rhs) -> Self::Output
+	}
+	trait MulAssign<Rhs = Self> {
+		fn mul_assign(&mut self, rhs: Rhs)
+	}
+	trait Neg {
+		type Output;
+		fn neg(self) -> Self::Output
+	}
+	trait Not {
+		type Output;
+		fn not(self) -> Self::Output
+	}
+	trait RangeBounds<T> {
+		fn start_bound(&self) -> Bound<&T>
+		fn end_bound(&self) -> Bound<&T>
+		fn contains<U>(&self, item: &U) -> bool
+	}
+	trait Rem<Rhs = Self> {
+		type Output;
+		fn rem(self, rhs: Rhs) -> Self::Output
+	}
+	trait RemAssign<Rhs = Self> {
+		fn rem_assign(&mut self, rhs: Rhs)
+	}
+	trait Shl<Rhs = Self> {
+		type Output;
+		fn shl(self, rhs: Rhs) -> Self::Output
+	}
+	trait ShlAssign<Rhs = Self> {
+		fn shl_assign(&mut self, rhs: Rhs)
+	}
+	trait Shr<Rhs = Self> {
+		type Output;
+		fn shr(self, rhs: Rhs) -> Self::Output
+	}
+	trait ShrAssign<Rhs = Self> {
+		fn shr_assign(&mut self, rhs: Rhs)
+	}
+	trait Sub<Rhs = Self> {
+		type Output;
+		fn sub(self, rhs: Rhs) -> Self::Output
+	}
+	trait SubAssign<Rhs = Self> {
+		fn sub_assign(&mut self, rhs: Rhs);
+	}
 }
 
 mod std::option {
@@ -1593,6 +1755,7 @@ mod std::os::raw {
 	type c_ulonglong = u64;
 	type c_ushort = u16;
 }
+// platform-specific extensions
 
 mod std::panic {
 	struct AssertUnwindSafe<T>;
@@ -1712,9 +1875,9 @@ mod std::prelude {}
 
 mod std::process {
 	struct Child {
-		stdin: Option<ChildStdin>
-		stdout: Option<ChildStdout>
-		stderr: Option<ChildStderr>
+		pub stdin: Option<ChildStdin>
+		pub stdout: Option<ChildStdout>
+		pub stderr: Option<ChildStderr>
 		fn kill(&mut self) -> Result<()>
 		fn id(&self) -> u32
 		fn wait(&mut self) -> Result<ExitStatus>
@@ -1745,9 +1908,9 @@ mod std::process {
 		fn code(&self) -> Option<i32>
 	}
 	struct Output {
-		status: ExitStatus
-		stdout: Vec<u8>
-		stderr: Vec<u8>
+		pub status: ExitStatus
+		pub stdout: Vec<u8>
+		pub stderr: Vec<u8>
 	}
 	struct Stdio {
 		fn piped() -> Stdio
@@ -2213,10 +2376,81 @@ mod std::sync {
 	type TryLockResult<Guard> = Result<Guard, TryLockError<Guard>>;
 }
 
-x mod std::sync::atomic {
+mod std::sync::atomic {
+	struct AtomicBool;
+	struct AtomicI8;
+	struct AtomicI16;
+	struct AtomicI32;
+	struct AtomicI64;
+	struct AtomicIsize {
+		const fn new(v: isize) -> AtomicIsize
+		fn get_mut(&mut self) -> &mut isize
+		fn into_inner(self) -> isize
+		fn load(&self, order: Ordering) -> isize
+		fn store(&self, val: isize, order: Ordering)
+		fn swap(&self, val: isize, order: Ordering) -> isize
+		fn compare_and_swap(&self, current: isize, new: isize, order: Ordering) -> isize
+		fn compare_exchange(&self, current: isize, new: isize, success: Ordering, failure: Ordering) -> Result<isize, isize>
+		fn compare_exchange_weak(&self, current: isize, new: isize, success: Ordering, failure: Ordering) -> Result<isize, isize>
+		fn fetch_add(&self, val: isize, order: Ordering) -> isize
+		fn fetch_sub(&self, val: isize, order: Ordering) -> isize
+		fn fetch_and(&self, val: isize, order: Ordering) -> isize
+		fn fetch_nand(&self, val: isize, order: Ordering) -> isize
+		fn fetch_or(&self, val: isize, order: Ordering) -> isize
+		fn fetch_xor(&self, val: isize, order: Ordering) -> isize
+	}
+	struct AtomicPtr<T>;
+	struct AtomicU8;
+	struct AtomicU16;
+	struct AtomicU32;
+	struct AtomicU64;
+	struct AtomicUsize;
+	enum Ordering {
+		Relaxed,
+		Release,
+		Acquire,
+		AcqRel,
+		SeqCst,
+	}
+	fn compiler_fence(order: Ordering)
+	fn fence(order: Ordering)
+	fn spin_loop_hint()
 }
 
-x mod std::sync::mpsc {
+mod std::sync::mpsc {
+	struct IntoIter<T>;
+	struct Iter<'a, T: 'a>;
+	struct Receiver<T> {
+		fn try_recv(&self) -> Result<T, TryRecvError>
+		fn recv(&self) -> Result<T, RecvError>
+		fn recv_timeout(&self, timeout: Duration) -> Result<T, RecvTimeoutError>
+		fn iter(&self) -> Iter<T>
+		fn try_iter(&self) -> TryIter<T>
+	}
+	struct RecvError;
+	struct SendError<T>;
+	struct Sender<T> {
+		fn send(&self, t: T) -> Result<(), SendError<T>>
+	}
+	struct SyncSender<T> {
+		fn send(&self, t: T) -> Result<(), SendError<T>>
+		fn try_send(&self, t: T) -> Result<(), TrySendError<T>>
+	}
+	struct TryIter<'a, T: 'a>;
+	enum RecvTimeoutError {
+		Timeout,
+		Disconnected,
+	}
+	enum TryRecvError {
+		Empty,
+		Disconnected,
+	}
+	enum TrySendError<T> {
+		Full(T),
+		Disconnected(T),
+	}
+	fn channel<T>() -> (Sender<T>, Receiver<T>)
+	fn sync_channel<T>(bound: usize) -> (SyncSender<T>, Receiver<T>)
 }
 
 mod std::task {
