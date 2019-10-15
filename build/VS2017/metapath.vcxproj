@@ -531,7 +531,7 @@
       <WarningLevel>Level4</WarningLevel>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <LanguageStandard>stdcpplatest</LanguageStandard>
-      <AdditionalOptions>/source-charset:utf-8 -mavx2 -mpopcnt -mlzcnt -mbmi -Wextra -Wshadow -Wimplicit-fallthrough -Wcomma -Wformat=2 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/source-charset:utf-8 -mavx2 -mpopcnt -mbmi -Wextra -Wshadow -Wimplicit-fallthrough -Wcomma -Wformat=2 %(AdditionalOptions)</AdditionalOptions>
       <DiagnosticsFormat>Caret</DiagnosticsFormat>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
     </ClCompile>
@@ -816,7 +816,7 @@
       <OmitFramePointers>true</OmitFramePointers>
       <BufferSecurityCheck>false</BufferSecurityCheck>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
-      <AdditionalOptions>/source-charset:utf-8 /GA -mavx2 -mpopcnt -mlzcnt -mbmi -Wextra -Wshadow -Wimplicit-fallthrough -Wcomma -Wformat=2 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/source-charset:utf-8 /GA -mavx2 -mpopcnt -mbmi -Wextra -Wshadow -Wimplicit-fallthrough -Wcomma -Wformat=2 %(AdditionalOptions)</AdditionalOptions>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <DiagnosticsFormat>Caret</DiagnosticsFormat>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
