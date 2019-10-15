@@ -75,6 +75,10 @@ IF "%~2" == "" (
   IF /I "%~2" == "/ARM64"  SET "ARCH=ARM64" & GOTO CHECKTHIRDARG
   IF /I "%~2" == "-ARM64"  SET "ARCH=ARM64" & GOTO CHECKTHIRDARG
   IF /I "%~2" == "--ARM64" SET "ARCH=ARM64" & GOTO CHECKTHIRDARG
+  IF /I "%~2" == "ARM"   SET "ARCH=ARM" & GOTO CHECKTHIRDARG
+  IF /I "%~2" == "/ARM"  SET "ARCH=ARM" & GOTO CHECKTHIRDARG
+  IF /I "%~2" == "-ARM"  SET "ARCH=ARM" & GOTO CHECKTHIRDARG
+  IF /I "%~2" == "--ARM" SET "ARCH=ARM" & GOTO CHECKTHIRDARG
   IF /I "%~2" == "all"   SET "ARCH=all" & GOTO CHECKTHIRDARG
   IF /I "%~2" == "/all"  SET "ARCH=all" & GOTO CHECKTHIRDARG
   IF /I "%~2" == "-all"  SET "ARCH=all" & GOTO CHECKTHIRDARG
@@ -122,12 +126,15 @@ IF "%~3" == "" (
 
 :START
 SET NEED_ARM64=0
+SET NEED_ARM=0
 IF /I "%ARCH%" == "AVX2" (
 	SET "ARCH=x64"
 	IF /I NOT "%CONFIG%" == "all" SET "CONFIG=AVX2%CONFIG%"
 )
 IF /I "%ARCH%" == "all" SET NEED_ARM64=1
 IF /I "%ARCH%" == "ARM64" SET NEED_ARM64=1
+IF /I "%ARCH%" == "all" SET NEED_ARM=1
+IF /I "%ARCH%" == "ARM" SET NEED_ARM=1
 CALL :SubVSPath
 IF NOT EXIST "%VS_PATH%" CALL :SUBMSG "ERROR" "Visual Studio 2017 or 2019 NOT FOUND, please check VS_PATH environment variable!"
 
@@ -140,28 +147,30 @@ IF /I "%processor_architecture%"=="AMD64" (
 IF /I "%ARCH%" == "x64" GOTO x64
 IF /I "%ARCH%" == "Win32" GOTO Win32
 IF /I "%ARCH%" == "ARM64" GOTO ARM64
+IF /I "%ARCH%" == "ARM" GOTO ARM
 
 
 :Win32
 CALL "%VS_PATH%\Common7\Tools\vsdevcmd" -no_logo -arch=x86 -host_arch=%HOST_ARCH%
-
 IF /I "%CONFIG%" == "all" (CALL :SUBMSVC %BUILDTYPE% Debug Win32 && CALL :SUBMSVC %BUILDTYPE% Release Win32) ELSE (CALL :SUBMSVC %BUILDTYPE% %CONFIG% Win32)
-
 IF /I "%ARCH%" == "Win32" GOTO END
 
 
 :x64
 CALL "%VS_PATH%\Common7\Tools\vsdevcmd" -no_logo -arch=amd64 -host_arch=%HOST_ARCH%
-
 IF /I "%CONFIG%" == "all" (CALL :SUBMSVC %BUILDTYPE% Debug x64 && CALL :SUBMSVC %BUILDTYPE% Release x64) ELSE (CALL :SUBMSVC %BUILDTYPE% %CONFIG% x64)
-
 IF /I "%ARCH%" == "x64" GOTO END
 
 
 :ARM64
 CALL "%VS_PATH%\Common7\Tools\vsdevcmd" -no_logo -arch=arm64 -host_arch=%HOST_ARCH%
-
 IF /I "%CONFIG%" == "all" (CALL :SUBMSVC %BUILDTYPE% Debug ARM64 && CALL :SUBMSVC %BUILDTYPE% Release ARM64) ELSE (CALL :SUBMSVC %BUILDTYPE% %CONFIG% ARM64)
+IF /I "%ARCH%" == "ARM64" GOTO END
+
+
+:ARM
+CALL "%VS_PATH%\Common7\Tools\vsdevcmd" -no_logo -arch=arm -host_arch=%HOST_ARCH%
+IF /I "%CONFIG%" == "all" (CALL :SUBMSVC %BUILDTYPE% Debug ARM && CALL :SUBMSVC %BUILDTYPE% Release ARM) ELSE (CALL :SUBMSVC %BUILDTYPE% %CONFIG% ARM)
 
 
 :END
@@ -181,6 +190,7 @@ IF EXIST "%VSINSTALLDIR%\Common7\IDE\VC\VCTargets\Platforms\%ARCH%\PlatformTools
 SET VSWHERE=%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe
 SET "VS_COMPONENT=Microsoft.Component.MSBuild Microsoft.VisualStudio.Component.VC.Tools.x86.x64"
 IF "%NEED_ARM64%" == 1 SET "VS_COMPONENT=%VS_COMPONENT% Microsoft.VisualStudio.Component.VC.Tools.ARM64"
+IF "%NEED_ARM%" == 1 SET "VS_COMPONENT=%VS_COMPONENT% Microsoft.VisualStudio.Component.VC.Tools.ARM"
 FOR /f "delims=" %%A IN ('"%VSWHERE%" -property installationPath -prerelease -version [15.0^,17.0^) -requires %VS_COMPONENT%') DO SET "VS_PATH=%%A"
 IF EXIST "%VS_PATH%" SET "VSINSTALLDIR=%VS_PATH%\"
 EXIT /B
@@ -198,7 +208,7 @@ EXIT /B
 :SHOWHELP
 TITLE %~nx0 %1
 ECHO. & ECHO.
-ECHO Usage: %~nx0 [Clean^|Build^|Rebuild] [Win32^|x64^|AVX2^|ARM64^|all] [Debug^|Release^|LLVMDebug^|LLVMRelease^|all]
+ECHO Usage: %~nx0 [Clean^|Build^|Rebuild] [Win32^|x64^|AVX2^|ARM64^|ARM^|all] [Debug^|Release^|LLVMDebug^|LLVMRelease^|all]
 ECHO.
 ECHO Notes: You can also prefix the commands with "-", "--" or "/".
 ECHO        The arguments are not case sensitive.

@@ -78,6 +78,10 @@ IF "%~2" == "" (
   IF /I "%~2" == "/ARM64"  SET "ARCH=ARM64" & GOTO CHECKTHIRDARG
   IF /I "%~2" == "-ARM64"  SET "ARCH=ARM64" & GOTO CHECKTHIRDARG
   IF /I "%~2" == "--ARM64" SET "ARCH=ARM64" & GOTO CHECKTHIRDARG
+  IF /I "%~2" == "ARM"   SET "ARCH=ARM" & GOTO CHECKTHIRDARG
+  IF /I "%~2" == "/ARM"  SET "ARCH=ARM" & GOTO CHECKTHIRDARG
+  IF /I "%~2" == "-ARM"  SET "ARCH=ARM" & GOTO CHECKTHIRDARG
+  IF /I "%~2" == "--ARM" SET "ARCH=ARM" & GOTO CHECKTHIRDARG
   IF /I "%~2" == "all"   SET "ARCH=all" & GOTO CHECKTHIRDARG
   IF /I "%~2" == "/all"  SET "ARCH=all" & GOTO CHECKTHIRDARG
   IF /I "%~2" == "-all"  SET "ARCH=all" & GOTO CHECKTHIRDARG
@@ -124,11 +128,13 @@ SET INPUTDIR_AVX2=bin\%CONFIG%\AVX2
 SET INPUTDIR_x64=bin\%CONFIG%\x64
 SET INPUTDIR_Win32=bin\%CONFIG%\Win32
 SET INPUTDIR_ARM64=bin\%CONFIG%\ARM64
+SET INPUTDIR_ARM=bin\%CONFIG%\ARM
 
 IF /I "%ARCH%" == "AVX2" GOTO MSVC_AVX2
 IF /I "%ARCH%" == "x64" GOTO MSVC_x64
 IF /I "%ARCH%" == "Win32" GOTO MSVC_Win32
 IF /I "%ARCH%" == "ARM64" GOTO MSVC_ARM64
+IF /I "%ARCH%" == "ARM" GOTO MSVC_ARM
 
 :MSVC_AVX2
 IF EXIST "%INPUTDIR_AVX2%" CALL :SubZipFiles %INPUTDIR_AVX2% AVX2
@@ -144,6 +150,9 @@ IF /I "%ARCH%" == "Win32" GOTO END_MSVC
 
 :MSVC_ARM64
 IF EXIST "%INPUTDIR_ARM64%" CALL :SubZipFiles %INPUTDIR_ARM64% ARM64
+
+:MSVC_ARM
+IF EXIST "%INPUTDIR_ARM%" CALL :SubZipFiles %INPUTDIR_ARM% ARM
 
 :END_MSVC
 TITLE Make ZIP For %COMPILER% %ARCH% %CONFIG% Finished!
@@ -241,7 +250,7 @@ EXIT /B
 :SHOWHELP
 TITLE %~nx0 %1
 ECHO. & ECHO.
-ECHO Usage:  %~nx0 [MSVC^|GCC^|Clang^|LLVM] [Win32^|x64^|AVX2^|ARM64^|all] [Release^|Debug]
+ECHO Usage:  %~nx0 [MSVC^|GCC^|Clang^|LLVM] [Win32^|x64^|AVX2^|ARM64^|ARM^|all] [Release^|Debug]
 ECHO.
 ECHO Notes:  You can also prefix the commands with "-", "--" or "/".
 ECHO         The arguments are not case sensitive.
