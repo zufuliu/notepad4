@@ -64,7 +64,6 @@ static void ColouriseVimDoc(Sci_PositionU startPos, Sci_Position length, int ini
 					styler.ColourTo(i - 1, SCE_C_WORD);
 				}
 				state = SCE_C_DEFAULT;
-				wordLen = 0;
 			} else if (wordLen < MAX_WORD_LENGTH) {
 				buf[wordLen++] = static_cast<char>(ch);
 			}
@@ -108,7 +107,8 @@ static void ColouriseVimDoc(Sci_PositionU startPos, Sci_Position length, int ini
 			} else if (iswordstart(ch)) {
 				styler.ColourTo(i - 1, state);
 				state = SCE_C_IDENTIFIER;
-				buf[wordLen++] = static_cast<char>(ch);
+				buf[0] = static_cast<char>(ch);
+				wordLen = 1;
 			} else if (IsVimOp(ch)) {
 				styler.ColourTo(i - 1, state);
 				state = SCE_C_OPERATOR;
