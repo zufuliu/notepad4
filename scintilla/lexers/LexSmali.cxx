@@ -124,7 +124,7 @@ static void ColouriseSmaliDoc(Sci_PositionU startPos, Sci_Position length, int i
 			break;
 		case SCE_SMALI_DIRECTIVE:
 			if (!IsSmaliWordChar(ch)) {
-				buf[wordLen] = 0;
+				buf[wordLen] = '\0';
 				if (buf[0] == '.') {
 					if (strcmp(buf + 1,"end") == 0 || strcmp(buf + 1,"restart") == 0 || strcmp(buf + 1,"limit") == 0) {
 						nextWordType = kWordType_Directive;
@@ -143,7 +143,6 @@ static void ColouriseSmaliDoc(Sci_PositionU startPos, Sci_Position length, int i
 				}
 				styler.ColourTo(i - 1, state);
 				state = SCE_L_DEFAULT;
-				wordLen = 0;
 			} else if (wordLen < MAX_WORD_LENGTH) {
 				buf[wordLen++] = static_cast<char>(ch);
 			}
@@ -173,7 +172,7 @@ static void ColouriseSmaliDoc(Sci_PositionU startPos, Sci_Position length, int i
 			break;
 		case SCE_SMALI_IDENTIFIER:
 			if (!IsSmaliWordChar(ch)) {
-				buf[wordLen] = 0;
+				buf[wordLen] = '\0';
 				if (nextWordType == kWordType_Directive) {
 					nextWordType = 0;
 					styler.ColourTo(i - 1, SCE_SMALI_DIRECTIVE);
@@ -210,7 +209,6 @@ static void ColouriseSmaliDoc(Sci_PositionU startPos, Sci_Position length, int i
 					}
 					state = SCE_SMALI_DEFAULT;
 				}
-				wordLen = 0;
 			} else if (wordLen < MAX_WORD_LENGTH) {
 				buf[wordLen++] = static_cast<char>(ch);
 			}
@@ -259,7 +257,8 @@ static void ColouriseSmaliDoc(Sci_PositionU startPos, Sci_Position length, int i
 			} else if (ch == '.' && visibleChars == 0 && IsAlpha(chNext)) {
 				styler.ColourTo(i - 1, state);
 				state = SCE_SMALI_DIRECTIVE;
-				buf[wordLen++] = static_cast<char>(ch);
+				buf[0] = static_cast<char>(ch);
+				wordLen = 1;
 			} else if ((ch == 'v' || ch == 'p') && IsADigit(chNext)) {
 				styler.ColourTo(i - 1, state);
 				state = SCE_SMALI_REGISTER;
@@ -281,7 +280,8 @@ static void ColouriseSmaliDoc(Sci_PositionU startPos, Sci_Position length, int i
 					styler.ColourTo(i, SCE_SMALI_OPERATOR);
 				}
 				state = SCE_SMALI_IDENTIFIER;
-				buf[wordLen++] = static_cast<char>(ch);
+				buf[0] = static_cast<char>(ch);
+				wordLen = 1;
 			} else if (IsSmaliOp(ch) || (ch == '[' || ch == ']')) {
 				styler.ColourTo(i - 1, state);
 				state = SCE_SMALI_OPERATOR;

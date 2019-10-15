@@ -86,7 +86,7 @@ static void ColouriseGraphDoc(Sci_PositionU startPos, Sci_Position length, int i
 			break;
 		case SCE_C_IDENTIFIER:
 			if (!(iswordstart(ch) || ch == '-')) {
-				buf[wordLen] = 0;
+				buf[wordLen] = '\0';
 				Sci_PositionU pos = i;
 				while (IsASpace(styler.SafeGetCharAt(pos++)));
 				if (styler[pos - 1] == '=') {
@@ -95,7 +95,6 @@ static void ColouriseGraphDoc(Sci_PositionU startPos, Sci_Position length, int i
 					styler.ColourTo(i - 1, SCE_C_WORD);
 				}
 				state = SCE_C_DEFAULT;
-				wordLen = 0;
 			} else if (wordLen < MAX_WORD_LENGTH) {
 				buf[wordLen++] = static_cast<char>(ch);
 			}
@@ -181,7 +180,8 @@ static void ColouriseGraphDoc(Sci_PositionU startPos, Sci_Position length, int i
 			} else if (iswordstart(ch)) {
 				styler.ColourTo(i - 1, state);
 				state = SCE_C_IDENTIFIER;
-				buf[wordLen++] = static_cast<char>(ch);
+				buf[0] = static_cast<char>(ch);
+				wordLen = 1;
 			} else if (ch == '>' && !(chPrevNonWhite == '-' || chPrevNonWhite == '>')) {
 				styler.ColourTo(i, SCE_C_DIRECTIVE);
 			} else if (IsGraphOp(ch)) {

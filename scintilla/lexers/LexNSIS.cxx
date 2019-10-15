@@ -36,8 +36,6 @@ static void ColouriseNSISDoc(Sci_PositionU startPos, Sci_Position length, int in
 
 	int visibleChars = 0;
 	Sci_Position lineCurrent = styler.GetLine(startPos);
-	//char buf[MAX_WORD_LENGTH + 1] = "";
-	//int wordLen = 0;
 
 	for (Sci_PositionU i = startPos; i < endPos; i++) {
 		const int chPrev = ch;

@@ -74,7 +74,7 @@ static void ColouriseCILDoc(Sci_PositionU startPos, Sci_Position length, int ini
 			break;
 		case SCE_C_IDENTIFIER:
 			if (!(iswordstart(ch) || ch == '$')) {
-				buf[wordLen] = 0;
+				buf[wordLen] = '\0';
 				state = SCE_C_DEFAULT;
 				if (keywords.InList(buf)) {
 					styler.ColourTo(i - 1, SCE_C_WORD);
@@ -85,7 +85,6 @@ static void ColouriseCILDoc(Sci_PositionU startPos, Sci_Position length, int ini
 				} else if (ch == ':' && chNext != ':') {
 					styler.ColourTo(i - 1, SCE_C_LABEL);
 				}
-				wordLen = 0;
 			} else if (wordLen < MAX_WORD_LENGTH) {
 				buf[wordLen++] = static_cast<char>(ch);
 			}
@@ -148,7 +147,8 @@ static void ColouriseCILDoc(Sci_PositionU startPos, Sci_Position length, int ini
 			} else if (iswordstart(ch)) {
 				styler.ColourTo(i - 1, state);
 				state = SCE_C_IDENTIFIER;
-				buf[wordLen++] = static_cast<char>(ch);
+				buf[0] = static_cast<char>(ch);
+				wordLen = 1;
 			} else if (IsCILOp(ch)) {
 				styler.ColourTo(i - 1, state);
 				state = SCE_C_OPERATOR;

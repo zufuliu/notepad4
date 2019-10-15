@@ -66,13 +66,12 @@ static void ColouriseMakeDoc(Sci_PositionU startPos, Sci_Position length, int in
 			break;
 		case SCE_MAKE_IDENTIFIER:
 			if (IsMakeOp(ch, chNext) || IsASpace(ch)) {
-				buf[wordLen] = 0;
+				buf[wordLen] = '\0';
 				if (ch == ':' && chNext == ':') {
 					styler.ColourTo(i - 1, SCE_MAKE_TARGET);
 				} else if (makeType == MAKE_TYPE_BMAKE && keywordsDP2.InList(buf)) {
 					styler.ColourTo(i - 1, SCE_MAKE_PREPROCESSOR);
 				}
-				wordLen = 0;
 				state = SCE_MAKE_DEFAULT;
 			} else if (wordLen < MAX_WORD_LENGTH) {
 				buf[wordLen++] = static_cast<char>(ch);
@@ -80,7 +79,7 @@ static void ColouriseMakeDoc(Sci_PositionU startPos, Sci_Position length, int in
 			break;
 		case SCE_MAKE_TARGET:
 			if (IsMakeOp(ch, chNext) || IsASpace(ch)) {
-				buf[wordLen] = 0;
+				buf[wordLen] = '\0';
 				if (keywordsGP.InList(buf)) { // gmake
 					styler.ColourTo(i - 1, SCE_MAKE_PREPROCESSOR);
 					makeType = MAKE_TYPE_GMAKE;
@@ -102,7 +101,6 @@ static void ColouriseMakeDoc(Sci_PositionU startPos, Sci_Position length, int in
 					}
 				}
 				state = SCE_MAKE_DEFAULT;
-				wordLen = 0;
 			} else if (wordLen < MAX_WORD_LENGTH) {
 				buf[wordLen++] = static_cast<char>(ch);
 			}
@@ -207,7 +205,8 @@ static void ColouriseMakeDoc(Sci_PositionU startPos, Sci_Position length, int in
 				state = SCE_MAKE_OPERATOR;
 			} else if (IsASCII(ch) && isgraph(ch)) {
 				styler.ColourTo(i - 1, state);
-				buf[wordLen++] = static_cast<char>(ch);
+				buf[0] = static_cast<char>(ch);
+				wordLen = 1;
 				state = (visibleChars == 0) ? SCE_MAKE_TARGET : SCE_MAKE_IDENTIFIER;
 			}
 		}

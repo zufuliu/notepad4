@@ -88,7 +88,7 @@ static void ColouriseLLVMDoc(Sci_PositionU startPos, Sci_Position length, int in
 			break;
 		case SCE_C_IDENTIFIER:
 			if (!iswordchar(ch)) {
-				buf[wordLen] = 0;
+				buf[wordLen] = '\0';
 				if (buf[0] == '@' || buf[0] == '%') {
 					if (strncmp(buf + 1, "llvm.", 5) == 0) {
 						styler.ColourTo(i - 1, SCE_C_DIRECTIVE);
@@ -117,7 +117,6 @@ static void ColouriseLLVMDoc(Sci_PositionU startPos, Sci_Position length, int in
 					styler.ColourTo(i - 1, SCE_C_LABEL);
 				}
 				state = SCE_C_DEFAULT;
-				wordLen = 0;
 			} else if (wordLen < MAX_WORD_LENGTH) {
 				buf[wordLen++] = static_cast<char>(ch);
 			}
@@ -177,7 +176,8 @@ static void ColouriseLLVMDoc(Sci_PositionU startPos, Sci_Position length, int in
 			} else if (iswordstart(ch) || ch == '@' || ch == '%') {
 				styler.ColourTo(i - 1, state);
 				state = SCE_C_IDENTIFIER;
-				buf[wordLen++] = static_cast<char>(ch);
+				buf[0] = static_cast<char>(ch);
+				wordLen = 1;
 			} else if (isoperator(ch)) {
 				styler.ColourTo(i - 1, state);
 				state = SCE_C_OPERATOR;

@@ -66,12 +66,11 @@ static void ColouriseLispDoc(Sci_PositionU startPos, Sci_Position length, int in
 			break;
 		case SCE_C_IDENTIFIER:
 			if (!(iswordchar(ch) || ch == '-')) {
-				buf[wordLen] = 0;
+				buf[wordLen] = '\0';
 				if (keywords.InList(buf)) {
 					styler.ColourTo(i - 1, SCE_C_WORD);
 				}
 				state = SCE_C_DEFAULT;
-				wordLen = 0;
 			} else if (wordLen < MAX_WORD_LENGTH) {
 				buf[wordLen++] = static_cast<char>(ch);
 			}
@@ -133,7 +132,8 @@ static void ColouriseLispDoc(Sci_PositionU startPos, Sci_Position length, int in
 			} else if (iswordstart(ch)) {
 				styler.ColourTo(i - 1, state);
 				state = SCE_C_IDENTIFIER;
-				buf[wordLen++] = static_cast<char>(ch);
+				buf[0] = static_cast<char>(ch);
+				wordLen = 1;
 			} else if (IsLispOp(ch)) {
 				styler.ColourTo(i - 1, state);
 				state = SCE_C_OPERATOR;
