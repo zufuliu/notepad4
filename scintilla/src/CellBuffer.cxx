@@ -986,7 +986,7 @@ void CellBuffer::BasicInsertString(const Sci::Position position, const char * co
 	}
 
 	//ElapsedPeriod period;
-	unsigned char ch = ' ';
+	unsigned char ch;
 	if (utf8LineEnds || insertLength < 32) {
 		// s may not NULL-terminated, ensure *ptr == '\n' is valid.
 		const char * const end = s + insertLength - 1;

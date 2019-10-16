@@ -1000,9 +1000,8 @@ void MsgThemeChanged(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	UNREFERENCED_PARAMETER(lParam);
 
 	HINSTANCE hInstance = (HINSTANCE)(INT_PTR)GetWindowLongPtr(hwnd, GWLP_HINSTANCE);
-	const BOOL bIsAppThemed = IsAppThemed();
 
-	if (bIsAppThemed) {
+	if (IsAppThemed()) {
 		SetWindowLongPtr(hwndDirList, GWL_EXSTYLE, GetWindowLongPtr(hwndDirList, GWL_EXSTYLE) & ~WS_EX_CLIENTEDGE);
 		SetWindowPos(hwndDirList, NULL, 0, 0, 0, 0, SWP_NOZORDER | SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE);
 		if (bFullRowSelect) {
@@ -1013,9 +1012,6 @@ void MsgThemeChanged(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	} else {
 		SetWindowLongPtr(hwndDirList, GWL_EXSTYLE, WS_EX_CLIENTEDGE | GetWindowLongPtr(hwndDirList, GWL_EXSTYLE));
 		SetWindowPos(hwndDirList, NULL, 0, 0, 0, 0, SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE | SWP_FRAMECHANGED);
-		if (bIsAppThemed) {
-			SetListViewTheme(hwndDirList);
-		}
 	}
 
 	// recreate toolbar and statusbar

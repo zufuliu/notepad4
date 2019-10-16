@@ -1774,8 +1774,8 @@ void PrepareFilterStr(LPWSTR lpFilter) {
 //
 void StrTab2Space(LPWSTR lpsz) {
 	WCHAR *c = lpsz;
-	while ((c = StrChr(lpsz, L'\t')) != NULL) {
-		*c = L' ';
+	while ((c = StrChr(c, L'\t')) != NULL) {
+		*c++ = L' ';
 	}
 }
 
@@ -1789,7 +1789,7 @@ void PathFixBackslashes(LPWSTR lpsz) {
 		if (*CharPrev(lpsz, c) == L':' && *CharNext(c) == L'/') {
 			c += 2;
 		} else {
-			*c = L'\\';
+			*c++ = L'\\';
 		}
 	}
 }

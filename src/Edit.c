@@ -670,10 +670,9 @@ BOOL EditLoadFile(LPWSTR pszFile, BOOL bSkipEncodingDetection, EditFileIOStatus 
 #endif
 
 	MEMORYSTATUSEX statex;
-	ULONGLONG maxMem = 0;
 	statex.dwLength = sizeof(statex);
 	if (GlobalMemoryStatusEx(&statex)) {
-		maxMem = statex.ullTotalPhys/3U;
+		ULONGLONG maxMem = statex.ullTotalPhys/3U;
 		if (maxMem < (ULONGLONG)maxFileSize) {
 			maxFileSize = (LONGLONG)maxMem;
 		}
@@ -3111,8 +3110,8 @@ void EditToggleLineComments(LPCWSTR pwszComment, BOOL bInsertAtStart) {
 		SciCall_GetTextRange(&tr);;
 
 		Sci_Position iCommentPos;
-		int ch;
 		if (_strnicmp(tchBuf, mszComment, cchComment) == 0) {
+			int ch;
 			switch (iAction) {
 			case 0:
 				iAction = 2;

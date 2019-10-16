@@ -204,7 +204,7 @@ static void ColouriseConfDoc(Sci_PositionU startPos, Sci_Position length, int in
 
 #define IsCommentLine(line)		IsLexCommentLine(line, styler, SCE_CONF_COMMENT)
 
-static void FoldConfDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList, Accessor &styler) {
+static void FoldConfDoc(Sci_PositionU startPos, Sci_Position length, int /*initStyle*/, LexerWordList, Accessor &styler) {
 	const bool foldComment = styler.GetPropertyInt("fold.comment") != 0;
 	const bool foldCompact = styler.GetPropertyInt("fold.compact", 1) != 0;
 
@@ -218,13 +218,11 @@ static void FoldConfDoc(Sci_PositionU startPos, Sci_Position length, int initSty
 
 	char chNext = styler[startPos];
 	int styleNext = styler.StyleAt(startPos);
-	int style = initStyle;
 
 	for (Sci_PositionU i = startPos; i < endPos; i++) {
 		const char ch = chNext;
 		chNext = styler.SafeGetCharAt(i + 1);
-		//int stylePrev = style;
-		style = styleNext;
+		const int style = styleNext;
 		styleNext = styler.StyleAt(i + 1);
 		const bool atEOL = (ch == '\r' && chNext != '\n') || (ch == '\n');
 
