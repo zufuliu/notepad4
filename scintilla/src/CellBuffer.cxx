@@ -146,7 +146,6 @@ class LineVector : public ILineVector {
 	LineStartIndex<POS> startsUTF32;
 public:
 	LineVector() : starts(256), perLine(nullptr) {
-		Init();
 	}
 	// Deleted so LineVector objects can not be copied.
 	LineVector(const LineVector &) = delete;
@@ -693,9 +692,7 @@ void CellBuffer::Allocate(Sci::Position newSize) {
 }
 
 void CellBuffer::SetUTF8Substance(bool utf8Substance_) noexcept {
-	if (utf8Substance != utf8Substance_) {
-		utf8Substance = utf8Substance_;
-	}
+	utf8Substance = utf8Substance_;
 }
 
 void CellBuffer::SetLineEndTypes(int utf8LineEnds_) {
