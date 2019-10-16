@@ -173,6 +173,8 @@ BOOL	EditLineNumDlg(HWND hwnd);
 void	EditModifyLinesDlg(HWND hwnd);
 void	EditEncloseSelectionDlg(HWND hwnd);
 void	EditInsertTagDlg(HWND hwnd);
+void	EditInsertDateTime(BOOL bShort);
+void	EditUpdateTimestampMatchTemplate(HWND hwnd);
 void	EditInsertUnicodeControlCharacter(int menu);
 void	EditShowUnicodeControlCharacter(BOOL bShow);
 BOOL	EditSortDlg(HWND hwnd, int *piSortFlags);
