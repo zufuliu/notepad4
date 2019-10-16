@@ -185,14 +185,14 @@ static constexpr char opposite(char ch) noexcept {
 // Null transitions when we see we've reached the end
 // and need to relex the curr char.
 
-static void redo_char(Sci_Position &i, char &ch, char &chNext, char &chNext2, int &state) noexcept {
+static void redo_char(Sci_Position &i, char ch, char &chNext, char &chNext2, int &state) noexcept {
 	i--;
 	chNext2 = chNext;
 	chNext = ch;
 	state = SCE_RB_DEFAULT;
 }
 
-static void advance_char(Sci_Position &i, char &ch, char &chNext, char &chNext2) noexcept {
+static void advance_char(Sci_Position &i, char &ch, char &chNext, char chNext2) noexcept {
 	i++;
 	ch = chNext;
 	chNext = chNext2;
