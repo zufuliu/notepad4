@@ -30,6 +30,7 @@
 #include <time.h>
 #include <inttypes.h>
 #include "SciCall.h"
+#include "VectorISA.h"
 #include "Helpers.h"
 #include "Notepad2.h"
 #include "Edit.h"
@@ -409,6 +410,15 @@ static inline void UpdateStatusBarCache_OVRMode(BOOL force) {
 // temporary fix for issue #77: force InvalidateStyleRedraw().
 static inline void InvalidateStyleRedraw(void) {
 	SciCall_SetViewEOL(bViewEOLs);
+}
+
+// temporary fix for issue #134: Direct2D on arm32
+static inline int GetDefualtRenderingTechnology(void) {
+#if NP2_TARGET_ARM32
+	return SC_TECHNOLOGY_DIRECTWRITERETAIN;
+#else
+	return IsVistaAndAbove()? SC_TECHNOLOGY_DIRECTWRITE : SC_TECHNOLOGY_DEFAULT;
+#endif
 }
 
 //=============================================================================
@@ -5251,7 +5261,7 @@ void LoadSettings(void) {
 	bEditLayoutRTL = IniSectionGetBool(pIniSection, L"EditLayoutRTL", 0);
 	bWindowLayoutRTL = IniSectionGetBool(pIniSection, L"WindowLayoutRTL", 0);
 
-	iValue = IniSectionGetInt(pIniSection, L"RenderingTechnology", (IsVistaAndAbove()? SC_TECHNOLOGY_DIRECTWRITE : SC_TECHNOLOGY_DEFAULT));
+	iValue = IniSectionGetInt(pIniSection, L"RenderingTechnology", GetDefualtRenderingTechnology());
 	iValue = clamp_i(iValue, SC_TECHNOLOGY_DEFAULT, SC_TECHNOLOGY_DIRECTWRITEDC);
 	iRenderingTechnology = iValue;
 	bEditLayoutRTL = bEditLayoutRTL && iValue == SC_TECHNOLOGY_DEFAULT;
@@ -5540,7 +5550,7 @@ void SaveSettings(BOOL bSaveSettingsNow) {
 	IniSectionSetBoolEx(pIniSection, L"FindReplaceTransparentMode", bFindReplaceTransparentMode, 1);
 	IniSectionSetBoolEx(pIniSection, L"EditLayoutRTL", bEditLayoutRTL, 0);
 	IniSectionSetBoolEx(pIniSection, L"WindowLayoutRTL", bWindowLayoutRTL, 0);
-	IniSectionSetIntEx(pIniSection, L"RenderingTechnology", iRenderingTechnology, (IsVistaAndAbove()? SC_TECHNOLOGY_DIRECTWRITE : SC_TECHNOLOGY_DEFAULT));
+	IniSectionSetIntEx(pIniSection, L"RenderingTechnology", iRenderingTechnology, GetDefualtRenderingTechnology());
 	IniSectionSetIntEx(pIniSection, L"Bidirectional", iBidirectional, SC_BIDIRECTIONAL_DISABLED);
 	IniSectionSetIntEx(pIniSection, L"FontQuality", iFontQuality, SC_EFF_QUALITY_LCD_OPTIMIZED);
 	IniSectionSetIntEx(pIniSection, L"CaretStyle", iCaretStyle + iOvrCaretStyle*10 + bBlockCaretOutSelection*100, 1);
