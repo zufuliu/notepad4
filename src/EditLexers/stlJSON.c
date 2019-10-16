@@ -6,7 +6,8 @@
 // https://spec.json5.org/
 
 static KEYWORDLIST Keywords_JSON = {{
-"true false null"
+"Infinity NaN false null true "
+
 , NULL, NULL, NULL, NULL, NULL, NULL, NULL,
 
 NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL
