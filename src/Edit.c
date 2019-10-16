@@ -26,6 +26,7 @@
 #include <uxtheme.h>
 #include <vssym32.h>
 #endif
+#include <time.h>
 #include <stdio.h>
 #include <limits.h>
 #include <inttypes.h>
@@ -6108,6 +6109,96 @@ static INT_PTR CALLBACK EditInsertTagDlgProc(HWND hwnd, UINT umsg, WPARAM wParam
 //
 void EditInsertTagDlg(HWND hwnd) {
 	ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_INSERTTAG), hwnd, EditInsertTagDlgProc, 0);
+}
+
+void EditInsertDateTime(BOOL bShort) {
+	WCHAR tchDateTime[256];
+	WCHAR tchTemplate[256];
+
+	SYSTEMTIME st;
+	GetLocalTime(&st);
+
+	if (IniGetString(INI_SECTION_NAME_FLAGS, bShort ? L"DateTimeShort" : L"DateTimeLong",
+					 L"", tchTemplate, COUNTOF(tchTemplate))) {
+		struct tm sst;
+		sst.tm_isdst	= -1;
+		sst.tm_sec		= (int)st.wSecond;
+		sst.tm_min		= (int)st.wMinute;
+		sst.tm_hour		= (int)st.wHour;
+		sst.tm_mday		= (int)st.wDay;
+		sst.tm_mon		= (int)st.wMonth - 1;
+		sst.tm_year		= (int)st.wYear - 1900;
+		sst.tm_wday		= (int)st.wDayOfWeek;
+		mktime(&sst);
+		wcsftime(tchDateTime, COUNTOF(tchDateTime), tchTemplate, &sst);
+	} else {
+		WCHAR tchDate[128];
+		WCHAR tchTime[128];
+		GetDateFormat(LOCALE_USER_DEFAULT, bShort ? DATE_SHORTDATE : DATE_LONGDATE,
+					  &st, NULL, tchDate, COUNTOF(tchDate));
+		GetTimeFormat(LOCALE_USER_DEFAULT, TIME_NOSECONDS, &st, NULL, tchTime, COUNTOF(tchTime));
+
+		wsprintf(tchDateTime, L"%s %s", tchTime, tchDate);
+	}
+
+	const UINT cpEdit = SciCall_GetCodePage();
+	char mszBuf[256 * kMaxMultiByteCount];
+	WideCharToMultiByte(cpEdit, 0, tchDateTime, -1, mszBuf, COUNTOF(mszBuf), NULL, NULL);
+	SciCall_ReplaceSel(mszBuf);
+}
+
+void EditUpdateTimestampMatchTemplate(HWND hwnd) {
+	WCHAR wchFind[256] = {0};
+	IniGetString(INI_SECTION_NAME_FLAGS, L"TimeStamp", L"\\$Date:[^\\$]+\\$ | $Date: %Y/%m/%d %H:%M:%S $", wchFind, COUNTOF(wchFind));
+
+	WCHAR wchTemplate[256] = {0};
+	WCHAR *pwchSep;
+	if ((pwchSep = StrChr(wchFind, L'|')) != NULL) {
+		lstrcpy(wchTemplate, pwchSep + 1);
+		*pwchSep = 0;
+	}
+
+	StrTrim(wchFind, L" ");
+	StrTrim(wchTemplate, L" ");
+
+	if (StrIsEmpty(wchFind) || StrIsEmpty(wchTemplate)) {
+		return;
+	}
+
+	SYSTEMTIME st;
+	struct tm sst;
+	GetLocalTime(&st);
+	sst.tm_isdst = -1;
+	sst.tm_sec	 = (int)st.wSecond;
+	sst.tm_min	 = (int)st.wMinute;
+	sst.tm_hour	 = (int)st.wHour;
+	sst.tm_mday	 = (int)st.wDay;
+	sst.tm_mon	 = (int)st.wMonth - 1;
+	sst.tm_year	 = (int)st.wYear - 1900;
+	sst.tm_wday	 = (int)st.wDayOfWeek;
+	mktime(&sst);
+
+	WCHAR wchReplace[256];
+	wcsftime(wchReplace, COUNTOF(wchReplace), wchTemplate, &sst);
+
+	const UINT cpEdit = SciCall_GetCodePage();
+#if NP2_USE_DESIGNATED_INITIALIZER
+	EDITFINDREPLACE efrTS = {
+		.hwnd = hwnd,
+		.fuFlags = SCFIND_REGEXP,
+	};
+#else
+	EDITFINDREPLACE efrTS = { "", "", "", "", hwnd, SCFIND_REGEXP };
+#endif
+
+	WideCharToMultiByte(cpEdit, 0, wchFind, -1, efrTS.szFind, COUNTOF(efrTS.szFind), NULL, NULL);
+	WideCharToMultiByte(cpEdit, 0, wchReplace, -1, efrTS.szReplace, COUNTOF(efrTS.szReplace), NULL, NULL);
+
+	if (!SciCall_IsSelectionEmpty()) {
+		EditReplaceAllInSelection(hwnd, &efrTS, TRUE);
+	} else {
+		EditReplaceAll(hwnd, &efrTS, TRUE);
+	}
 }
 
 typedef struct UnicodeControlCharacter {
