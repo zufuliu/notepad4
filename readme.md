@@ -190,10 +190,10 @@ Or build from source, see the [Wiki](https://github.com/zufuliu/notepad2/wiki/Bu
 * [Scintilla's website](https://www.scintilla.org/)
 * [Build Notepad2 and metapath](https://github.com/zufuliu/notepad2/wiki/Build-Notepad2)
 * [Localization](https://github.com/zufuliu/notepad2/wiki/Localization)
+	* [한국어 (Korean) Localization](https://teus.me/category/IT/Notepad2)
+	* [简体中文 (Simplified Chinese) Localization](https://github.com/yfdyh000/notepad2)
 * [Notepad2 Wiki](https://github.com/zufuliu/notepad2/wiki)
 
 ### Other projects based on (original) Notepad2 or Notepad2-mod:
-* [한국어 (Korean) Localization](https://teus.me/category/IT/Notepad2)
-* [简体中文 (Simplified Chinese) Localization](https://github.com/yfdyh000/notepad2)
 * [Notepad3](https://github.com/rizonesoft/Notepad3)
 * [Notepad2e](https://github.com/ProgerXP/Notepad2e)
