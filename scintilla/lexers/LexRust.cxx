@@ -82,6 +82,10 @@ void ColouriseRustDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 		hashCount = (lineState >> 16) & 0xff;
 		inAttribute = (lineState & RustLineStateMaskAttr) != 0;
 	}
+	if (startPos == 0 && sc.Match('#', '!')) {
+		// Shell Shebang at beginning of file
+		sc.SetState(SCE_RUST_COMMENTLINE);
+	}
 
 	while (sc.More()) {
 		switch (sc.state) {
@@ -276,14 +280,10 @@ void ColouriseRustDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 
 		if (sc.state == SCE_RUST_DEFAULT) {
 			if (sc.ch == '#') {
-				const bool mark = sc.chNext == '!';
-				if (sc.currentPos == 0 && mark) {
-					// Shell Shebang at beginning of file
-					sc.SetState(SCE_RUST_COMMENTLINE);
-				} else if (sc.chNext == '[' || ((mark || isspacechar(sc.chNext)) && LexGetNextChar(sc.currentPos + 2, styler) == '[')) {
+				if (sc.chNext == '[' || ((sc.chNext == '!' || isspacechar(sc.chNext)) && LexGetNextChar(sc.currentPos + 2, styler) == '[')) {
 					// only support `#...[attr]` or `#!...[attr]`, not `#...!...[attr]`
 					sc.SetState(SCE_RUST_ATTRIBUTE);
-					if (mark) {
+					if (sc.chNext == '!') {
 						sc.Forward();
 					}
 					inAttribute = true;
