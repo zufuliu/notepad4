@@ -97,20 +97,84 @@ def UpdateKeywordFile(path, keywordList):
 	output = BuildKeywordContent(keywordList)
 	Regenerate(path, '//', output)
 
-# Rust
-def parse_rust_api_file(path):
+def read_api_file(path, comment):
 	doc = open(path, encoding='utf-8').read()
-	doc = re.sub(r'//[^!].+', '', doc)
-	sections = doc.split("//!")
-	keywordMap = {}
-	used = set()
-	for section in sections:
+	doc = re.sub(comment + r'[^!].+', '', doc) # normal comment
+	sections = []
+	items = doc.split(comment + "!") #! section name
+	for section in items:
 		lines = section.strip().splitlines()
 		if not lines:
 			continue
 
 		key = lines[0].strip().lower()
 		doc = '\n'.join(lines[1:])
+		sections.append((key, doc))
+	return sections
+
+
+# CMake
+def parse_cmake_api_file(path):
+	def get_variable_name(name):
+		# TODO: expand <LANG>, <CONFIG> and others
+		index = name.find('<')
+		if index == 0:
+			return ''
+		if index > 0:
+			name = name[:index].strip('_')
+		return name
+
+	sections = read_api_file(path, '#')
+	keywordMap = {}
+	parameters = set()
+	for key, doc in sections:
+		if key in ('keywords', 'commands'):
+			items = re.findall(r'(?P<name>\w+)\s*\((?P<params>.*?)\)', doc, re.MULTILINE | re.DOTALL)
+			commands = set()
+			for item in items:
+				commands.add(item[0] + '()')
+				parameters.update(item[1].split())
+			keywordMap[key] = commands
+		elif key == 'generator expressions':
+			items = re.findall(r'\$\<(?P<name>[\w\-]+)[:>]', doc, re.MULTILINE)
+			parameters.update(items)
+		else:
+			items = doc.split()
+			result = {name for item in items if (name := get_variable_name(item))}
+			keywordMap[key] = result
+
+	keywordMap['parameters'] = parameters
+	RemoveDuplicateKeyword(keywordMap, [
+		'keywords',
+		'commands',
+		'parameters',
+		'properties',
+		'variables',
+		'environment variables',
+	])
+	keywordList = [
+		('keywords', keywordMap['keywords']),
+		('commands', keywordMap['commands']),
+		('parameters', keywordMap['parameters']),
+		#('properties', keywordMap['properties']),
+		#('variables', keywordMap['variables']),
+		#('environment variables', keywordMap['environment variables']),
+		('properties', []),
+		('variables', []),
+		('environment variables', []),
+	]
+	return keywordList
+
+def update_cmake_keyword():
+	keywordList = parse_cmake_api_file('lang/CMake.cmake')
+	UpdateKeywordFile('../src/EditLexers/stlCMake.c', keywordList)
+
+# Rust
+def parse_rust_api_file(path):
+	sections = read_api_file(path, '//')
+	keywordMap = {}
+	used = set()
+	for key, doc in sections:
 		if key in ('keywords', 'reserved keywords', 'primitive types', 'macros'):
 			items = set(doc.split())
 			keywordMap[key] = items
@@ -207,3 +271,7 @@ def update_rust_keyword():
 	keywordList = parse_rust_api_file('lang/Rust.rs')
 	UpdateKeywordFile('../src/EditLexers/stlRust.c', keywordList)
 
+# update all keywords in order
+def update_all_keyword():
+	update_cmake_keyword()
+	update_rust_keyword()

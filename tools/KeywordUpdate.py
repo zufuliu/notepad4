@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
-from KeywordCore import *
+from KeywordCore import update_all_keyword
 
 def main():
-	update_rust_keyword()
+	update_all_keyword()
 
 if __name__ == '__main__':
 	main()
- 
