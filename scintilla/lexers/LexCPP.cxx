@@ -201,6 +201,10 @@ static void ColouriseCppDoc(Sci_PositionU startPos, Sci_Position length, int ini
 	}
 
 	StyleContext sc(startPos, length, initStyle, styler);
+	if (startPos == 0 && sc.Match('#', '!')) {
+		// Shell Shebang at beginning of file
+		sc.SetState(SCE_C_COMMENTLINE);
+	}
 
 	for (; sc.More(); sc.Forward()) {
 
@@ -884,7 +888,6 @@ static void ColouriseCppDoc(Sci_PositionU startPos, Sci_Position length, int ini
 						}
 						sc.Forward();
 					} else if ((!(_sharpComment(lexType)) && sc.Match('/', '/'))
-						|| (lineCurrent == 0 && sc.Match('#', '!'))
 						|| ((_sharpComment(lexType) || lexType == LEX_PHP) && sc.ch == '#')) {
 						if (visibleChars == 0 && ((sc.Match("///") && !sc.Match("////")) || sc.Match("//!")))
 							sc.SetState(SCE_C_COMMENTLINEDOC);
