@@ -1697,6 +1697,8 @@ CPACK_INSTALL_DEFAULT_DIRECTORY_PERMISSIONS
 CPACK_PACKAGING_INSTALL_PREFIX
 CPACK_SET_DESTDIR
 CPACK_WARN_ON_ABSOLUTE_INSTALL_DESTINATION
+# Variables specific to cpack generators
+# https://cmake.org/cmake/help/latest/manual/cpack-generators.7.html
 
 # Variable Expansion Operators
 CACHE

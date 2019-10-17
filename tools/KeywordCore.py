@@ -2,7 +2,15 @@
 import sys
 sys.path.append('../scintilla/scripts')
 import re
+from enum import IntFlag
 from FileGenerator import Regenerate
+
+# see EditLexer.h
+class KeywordAttr(IntFlag):
+	Default = 0
+	NoLexer = 1
+	MakeLower = 2
+	NoAutoComp = 4
 
 def MakeKeywordGroups(items, maxLineLength=120, prefixLen=1):
 	items = list(sorted(items))
@@ -77,7 +85,7 @@ def RemoveDuplicateKeyword(keywordMap, orderedKeys):
 def BuildKeywordContent(keywordList, keywordCount=16):
 	output = []
 	for index, item in enumerate(keywordList):
-		comment, items = item
+		comment, items, attr = item
 		lines = MakeKeywordLines(items)
 		if index != 0:
 			output.append(", // %d %s" % (index, comment))
@@ -153,15 +161,15 @@ def parse_cmake_api_file(path):
 		'environment variables',
 	])
 	keywordList = [
-		('keywords', keywordMap['keywords']),
-		('commands', keywordMap['commands']),
-		('parameters', keywordMap['parameters']),
-		#('properties', keywordMap['properties']),
-		#('variables', keywordMap['variables']),
-		#('environment variables', keywordMap['environment variables']),
-		('properties', []),
-		('variables', []),
-		('environment variables', []),
+		('keywords', keywordMap['keywords'], KeywordAttr.Default),
+		('commands', keywordMap['commands'], KeywordAttr.Default),
+		('parameters', keywordMap['parameters'], KeywordAttr.Default),
+		#('properties', keywordMap['properties'], KeywordAttr.NoLexer),
+		#('variables', keywordMap['variables'], KeywordAttr.NoLexer),
+		#('environment variables', keywordMap['environment variables'], KeywordAttr.NoLexer),
+		('properties', [], KeywordAttr.NoLexer),
+		('variables', [], KeywordAttr.NoLexer),
+		('environment variables', [], KeywordAttr.NoLexer),
 	]
 	return keywordList
 
@@ -252,18 +260,18 @@ def parse_rust_api_file(path):
 		'constant',
 	])
 	keywordList = [
-		('keywords', keywordMap['keywords']),
-		('reserved keywords', keywordMap['reserved keywords']),
-		('primitive types', keywordMap['primitive types']),
-		('struct', keywordMap['struct']),
-		('trait', keywordMap['trait']),
-		('enumeration', keywordMap['enumeration']),
-		('union', keywordMap['union']),
-		('constant', keywordMap['constant']),
-		('attribute', keywordMap['attribute']),
-		('macro', keywordMap['macros']),
-		('module', keywordMap['modules']),
-		('function', keywordMap['function']),
+		('keywords', keywordMap['keywords'], KeywordAttr.Default),
+		('reserved keywords', keywordMap['reserved keywords'], KeywordAttr.NoAutoComp),
+		('primitive types', keywordMap['primitive types'], KeywordAttr.Default),
+		('struct', keywordMap['struct'], KeywordAttr.Default),
+		('trait', keywordMap['trait'], KeywordAttr.Default),
+		('enumeration', keywordMap['enumeration'], KeywordAttr.Default),
+		('union', keywordMap['union'], KeywordAttr.Default),
+		('constant', keywordMap['constant'], KeywordAttr.Default),
+		('attribute', keywordMap['attribute'], KeywordAttr.NoLexer),
+		('macro', keywordMap['macros'], KeywordAttr.NoLexer),
+		('module', keywordMap['modules'], KeywordAttr.NoLexer),
+		('function', keywordMap['function'], KeywordAttr.NoLexer),
 	]
 	return keywordList
 
