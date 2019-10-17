@@ -1,7 +1,7 @@
 // This file is part of Notepad2.
 // See License.txt for details about distribution and modification.
 //! Lexer for CMake.
-// https://cmake.org/cmake/help/v3.15/manual/cmake-language.7.html
+// https://cmake.org/cmake/help/latest/manual/cmake-language.7.html
 
 #include <cstring>
 #include <cassert>
@@ -53,9 +53,6 @@ bool IsBracketArgument(Accessor &styler, Sci_PositionU pos, bool start, int &bra
 }
 
 void ColouriseCmakeDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
-	const WordList &keywords = *keywordLists[0];
-	const WordList &keywords2 = *keywordLists[1];
-
 	int outerStyle = SCE_CMAKE_DEFAULT;
 	int varNestedLevel = 0; // nested variable: ${${}}
 	int generatorExpr = 0; // nested generator expressions: $<$<>>
@@ -87,7 +84,7 @@ void ColouriseCmakeDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 			}
 			break;
 		case SCE_CMAKE_IDENTIFIER:
-			if (!IsIdentifierChar(sc.ch)) {
+			if (!(IsIdentifierChar(sc.ch) || sc.ch == '-')) {
 				const int chNext = sc.GetNextNSChar();
 				if (chNext == '(') {
 					// command, function and macro are case insensitive
@@ -95,14 +92,14 @@ void ColouriseCmakeDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 					char s[128];
 					sc.GetCurrentLowered(s, sizeof(s));
 					userDefType = SCE_CMAKE_DEFAULT;
-					if (keywords.InListPrefixed(s, '(')) {
+					if (keywordLists[0]->InListPrefixed(s, '(')) {
 						sc.ChangeState(SCE_CMAKE_WORD);
 						if (strcmp(s, "function") == 0) {
 							userDefType = SCE_CMAKE_FUNCATION;
 						} else if (strcmp(s, "macro") == 0) {
 							userDefType = SCE_CMAKE_MACRO;
 						}
-					} else if (keywords2.InListPrefixed(s, '(')) {
+					} else if (keywordLists[1]->InListPrefixed(s, '(')) {
 						sc.ChangeState(SCE_CMAKE_COMMANDS);
 					} else {
 						sc.ChangeState(SCE_CMAKE_FUNCATION);
@@ -112,6 +109,11 @@ void ColouriseCmakeDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 					userDefType = SCE_CMAKE_DEFAULT;
 				} else {
 					// case sensitive
+					char s[128];
+					sc.GetCurrent(s, sizeof(s));
+					if (keywordLists[2]->InList(s)) {
+						sc.ChangeState(SCE_CMAKE_PARAMETERS);
+					}
 				}
 				sc.SetState(SCE_CMAKE_DEFAULT);
 			}

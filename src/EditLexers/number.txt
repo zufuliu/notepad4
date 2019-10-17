@@ -101,6 +101,7 @@ style number must < 32 or > 40
 63045	Makefiles							no
 63046	CMake Script		63361-63370		yes/no
 		63361, L"Bracket Argument"
+		63362, L"Parameter"
 63047	Inno Setup Script	63501-63510		no
 		63501, L"Pascal Keyword"
 		63502, L"Section"

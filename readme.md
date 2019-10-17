@@ -35,7 +35,7 @@ Or build from source, see the [Wiki](https://github.com/zufuliu/notepad2/wiki/Bu
 		* GNU AWK
 	* Windows Batch Script, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#batch)
 	* .NET IL
-	* CMake, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#cmake), up to 3.15.4
+	* [CMake](../master/tools/lang/CMake.cmake), [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#cmake), up to 3.16
 	* C/C++, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#cc)
 		* Objective-C/C++, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#objective-cc)
 		* [C Standard Library](../master/tools/lang/C.c), up to C11.
