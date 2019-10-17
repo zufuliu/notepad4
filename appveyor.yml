@@ -28,6 +28,7 @@ deploy: off
 matrix:
   fast_finish: true
   exclude:
+    - configuration: Debug
     - platform: ARM
       compiler: Clang
 
