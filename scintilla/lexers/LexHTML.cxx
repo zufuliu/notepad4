@@ -227,8 +227,8 @@ void classifyAttribHTML(Sci_PositionU start, Sci_PositionU end, const WordList &
 
 // https://html.spec.whatwg.org/multipage/custom-elements.html#custom-elements-core-concepts
 bool isHTMLCustomElement(const char *tag, size_t length) noexcept {
-	// HTML custom element name: starts with an ASCII lower alpha and contains hyphen.
-	if (length < 2 || !IsLowerCase(tag[0])) {
+	// HTML custom element name: starts with an ASCII alpha and contains hyphen.
+	if (length < 2 || !IsAlpha(tag[0])) {
 		return false;
 	}
 	if (strchr(tag, '-') == nullptr) {
@@ -255,8 +255,7 @@ int classifyTagHTML(Sci_PositionU start, Sci_PositionU end,
 		for (Sci_PositionU cPos = start; cPos <= end && i < sizeof(withSpace) - 2; cPos++) {
 			const char ch = styler[cPos];
 			if ((ch != '<') && (ch != '/')) {
-				const char chTmp = MakeLowerCase(ch);
-				withSpace[i++] = chTmp;
+				withSpace[i++] = MakeLowerCase(ch);
 			}
 		}
 	}
