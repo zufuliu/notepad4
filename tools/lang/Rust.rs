@@ -3,7 +3,7 @@
 // https://doc.rust-lang.org/reference/index.html
 // Rust 1.38 https://doc.rust-lang.org/std/index.html
 
-//! Keywords
+//! Keywords		===========================================================
 // https://doc.rust-lang.org/std/index.html#keywords
 // https://doc.rust-lang.org/reference/keywords.html
 as async await
@@ -24,7 +24,7 @@ where while
 
 false self Self super true
 
-//! Reserved Keywords
+//! Reserved Keywords	=======================================================
 // https://doc.rust-lang.org/reference/keywords.html#reserved-keywords
 abstract
 become box
@@ -38,7 +38,7 @@ unsized
 virtual
 yield
 
-//! Primitive Types
+//! Primitive Types		=======================================================
 // https://doc.rust-lang.org/std/index.html#primitives
 array
 bool
@@ -52,7 +52,7 @@ tuple
 u8 u16 u32 u64 u128 unit usize
 never
 
-//! Macros
+//! Macros			===========================================================
 // https://doc.rust-lang.org/reference/macros.html
 // https://doc.rust-lang.org/std/index.html#macros
 macro_rules!
@@ -91,7 +91,7 @@ vec!()
 write!()
 writeln!()
 
-//! Attribute
+//! Attribute		===========================================================
 // https://doc.rust-lang.org/reference/attributes.html#built-in-attributes-index
 // Conditional compilation
 #[cfg(target_arch, target_feature, target_os, target_family, unix, windows, target_env, target_endian, target_pointer_width, target_vendor, test, debug_assertions, proc_macro)]
@@ -150,7 +150,7 @@ writeln!()
 #[global_allocator]
 #![windows_subsystem]
 
-//! Modules
+//! Modules			===========================================================
 // https://doc.rust-lang.org/std/index.html#modules
 
 mod std::alloc {

@@ -5,7 +5,7 @@
 " Write a Vim script
 " https://vimhelp.org/usr_41.txt.html#usr_41.txt
 
-"! keywords
+"! keywords			===========================================================
 " Expression syntax
 is isnot
 " Defining functions
@@ -45,7 +45,7 @@ endtry
 " Automatic commands
 au autocmd
 
-"! commands
+"! commands			===========================================================
 echo
 echon
 echoh echohl
