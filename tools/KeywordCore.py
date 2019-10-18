@@ -115,7 +115,7 @@ def read_api_file(path, comment):
 		if not lines:
 			continue
 
-		key = lines[0].strip().lower()
+		key = lines[0].replace('=', '').strip().lower()
 		doc = '\n'.join(lines[1:])
 		sections.append((key, doc))
 	return sections

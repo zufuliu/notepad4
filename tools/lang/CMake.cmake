@@ -1,6 +1,6 @@
 # CMake 3.16 https://cmake.org/cmake/help/latest/index.html
 
-#! keywords
+#! keywords			===========================================================
 # https://cmake.org/cmake/help/latest/manual/cmake-language.7.html
 if(ON YES TRUE OFF NO FALSE IGNORE NOTFOUND
 	NOT
@@ -48,7 +48,7 @@ function()
 endfunction()
 return()
 
-#! commands
+#! commands			===========================================================
 # cmake --help-command-list
 # https://cmake.org/cmake/help/latest/manual/cmake-commands.7.html
 # Scripting Commands
@@ -553,7 +553,7 @@ ctest_upload(FILES QUIET CAPTURE_CMAKE_ERROR)
 
 # Deprecated Commands
 
-#! generator expressions
+#! generator expressions	===================================================
 # https://cmake.org/cmake/help/latest/manual/cmake-generator-expressions.7.html
 # Logical Operators
 $<BOOL:string>
@@ -655,7 +655,7 @@ $<MAKE_C_IDENTIFIER:...>
 $<TARGET_OBJECTS:objLib>
 $<SHELL_PATH:...>
 
-#! properties
+#! properties		===========================================================
 # cmake --help-property-list
 # https://cmake.org/cmake/help/latest/manual/cmake-properties.7.html
 # Properties of Global Scope
@@ -1120,7 +1120,7 @@ CPACK_WIX_ACL
 # Deprecated Properties on Targets
 # Deprecated Properties on Source Files
 
-#! variables
+#! variables		===========================================================
 # cmake --help-variable-list
 # https://cmake.org/cmake/help/latest/manual/cmake-variables.7.html
 # Variables that Provide Information
@@ -1714,7 +1714,7 @@ CMAKE_<LANG>_PLATFORM_ID
 CMAKE_NOT_USING_CONFIG_FLAGS
 CMAKE_VS_INTEL_Fortran_PROJECT_VERSION
 
-#! environment variables
+#! environment variables	===================================================
 # https://cmake.org/cmake/help/latest/manual/cmake-env-variables.7.html
 # Environment Variables that Control the Build
 CMAKE_BUILD_PARALLEL_LEVEL
