@@ -247,7 +247,6 @@ void ColouriseRustDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 							sc.ForwardSetState(outerState);
 						} else {
 							escSeq.resetEscapeState(outerState, sc.chNext);
-							sc.SetState(SCE_RUST_ESCAPECHAR);
 							sc.Forward();
 						}
 					} else {
