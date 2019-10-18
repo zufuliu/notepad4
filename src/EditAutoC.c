@@ -551,7 +551,6 @@ static inline BOOL IsOperatorStyle(int style) {
 	case SCLEX_LISP:
 	case SCLEX_LLVM:
 	case SCLEX_NSIS:
-	case SCLEX_VIM:
 		return style == SCE_C_OPERATOR;
 	case SCLEX_CSS:
 		return style == SCE_CSS_OPERATOR;
@@ -604,6 +603,8 @@ static inline BOOL IsOperatorStyle(int style) {
 		return style == SCE_V_OPERATOR;
 	case SCLEX_VHDL:
 		return style == SCE_VHDL_OPERATOR;
+	case SCLEX_VIM:
+		return style == SCE_VIM_OPERATOR;
 	}
 	return FALSE;
 }
