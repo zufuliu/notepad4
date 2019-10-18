@@ -675,6 +675,11 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 	//	The default is off.
 	const bool foldHeredoc = fold && styler.GetPropertyInt("fold.hypertext.heredoc", 0) != 0;
 
+	// property fold.xml.at.tag.open
+	//	Enable folding for XML at the start of open tag.
+	//	The default is on.
+	const bool foldXmlAtTagOpen = isXml && fold && styler.GetPropertyInt("fold.xml.at.tag.open", 1) != 0;
+
 	// property html.tags.case.sensitive
 	//	For XML and HTML, setting this property to 1 will make tags match in a case
 	//	sensitive way which is the expected behaviour for XML and XHTML.
@@ -908,7 +913,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 				i += 2;
 				visibleChars += 2;
 				tagClosing = true;
-				if (isXml) {
+				if (foldXmlAtTagOpen) {
 					--levelCurrent;
 				}
 				continue;
@@ -1237,10 +1242,10 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 				// in HTML, fold on tag open and unfold on tag close
 				tagOpened = true;
 				tagClosing = (chNext == '/');
-				if (isXml && !(chNext == '/' || chNext == '?' || chNext == '!' || chNext == '-' || chNext == '%')) {
+				if (foldXmlAtTagOpen && !(chNext == '/' || chNext == '?' || chNext == '!' || chNext == '-' || chNext == '%')) {
 					levelCurrent++;
 				}
-				if (isXml && chNext == '/') {
+				if (foldXmlAtTagOpen && chNext == '/') {
 					levelCurrent--;
 				}
 				styler.ColourTo(i - 1, StateToPrint);
@@ -1439,7 +1444,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 						state = SCE_H_DEFAULT;
 					}
 					tagOpened = false;
-					if (!(isXml || tagDontFold)) {
+					if (!(foldXmlAtTagOpen || tagDontFold)) {
 						if (tagClosing) {
 							levelCurrent--;
 						} else {
@@ -1458,7 +1463,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 					ch = chNext;
 					state = SCE_H_DEFAULT;
 					tagOpened = false;
-					if (isXml) {
+					if (foldXmlAtTagOpen) {
 						levelCurrent--;
 					}
 				} else {
@@ -1490,7 +1495,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 						state = SCE_H_DEFAULT;
 					}
 					tagOpened = false;
-					if (!(isXml || tagDontFold)) {
+					if (!(foldXmlAtTagOpen || tagDontFold)) {
 						if (tagClosing) {
 							levelCurrent--;
 						} else {
@@ -1516,7 +1521,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 					state = SCE_H_DEFAULT;
 				}
 				tagOpened = false;
-				if (!(isXml || tagDontFold)) {
+				if (!(foldXmlAtTagOpen || tagDontFold)) {
 					if (tagClosing) {
 						levelCurrent--;
 					} else {
@@ -1540,7 +1545,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 				ch = chNext;
 				state = SCE_H_DEFAULT;
 				tagOpened = false;
-				if (isXml) {
+				if (foldXmlAtTagOpen) {
 					levelCurrent--;
 				}
 			} else if (ch == '?' && chNext == '>') {
