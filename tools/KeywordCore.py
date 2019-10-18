@@ -279,7 +279,30 @@ def update_rust_keyword():
 	keywordList = parse_rust_api_file('lang/Rust.rs')
 	UpdateKeywordFile('../src/EditLexers/stlRust.c', keywordList)
 
+# Vim
+def parse_vim_api_file(path):
+	sections = read_api_file(path, '"')
+	keywordMap = {}
+	for key, doc in sections:
+		items = doc.split()
+		keywordMap[key] = items
+
+	RemoveDuplicateKeyword(keywordMap, [
+		'keywords',
+		'commands',
+	])
+	keywordList = [
+		('keywords', keywordMap['keywords'], KeywordAttr.Default),
+		('commands', keywordMap['commands'], KeywordAttr.Default),
+	]
+	return keywordList
+
+def update_vim_keyword():
+	keywordList = parse_vim_api_file('lang/Vim.vim')
+	UpdateKeywordFile('../src/EditLexers/stlVim.c', keywordList)
+
 # update all keywords in order
 def update_all_keyword():
 	update_cmake_keyword()
 	update_rust_keyword()
+	update_vim_keyword()
