@@ -65,6 +65,7 @@ void ColouriseCmakeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 	int bracketNumber = 0; // number of '=' in bracket: [[]]
 	int userDefType = SCE_CMAKE_DEFAULT;
 	int chBeforeNumber = 0;
+	int chIdentifierStart = 0;
 	int visibleChars = 0;
 
 	StyleContext sc(startPos, lengthDoc, initStyle, styler);
@@ -114,12 +115,18 @@ void ColouriseCmakeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 				} else if (userDefType != SCE_CMAKE_DEFAULT) {
 					sc.ChangeState(userDefType);
 					userDefType = SCE_CMAKE_DEFAULT;
-				} else {
+				} else if (IsUpperCase(chIdentifierStart)) {
 					// case sensitive
 					char s[128];
 					sc.GetCurrent(s, sizeof(s));
 					if (keywordLists[2]->InList(s)) {
 						sc.ChangeState(SCE_CMAKE_PARAMETERS);
+					} else if (keywordLists[3]->InList(s)) {
+						sc.ChangeState(SCE_CMAKE_PROPERTIES);
+					} else if (keywordLists[4]->InList(s)) {
+						sc.ChangeState(SCE_CMAKE_VARIABLE);
+					} else if (keywordLists[5]->InList(s)) {
+						sc.ChangeState(SCE_CMAKE_VALUES);
 					}
 				}
 				sc.SetState(SCE_CMAKE_DEFAULT);
@@ -274,6 +281,7 @@ void ColouriseCmakeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 				sc.SetState(SCE_CMAKE_ESCAPE_SEQUENCE);
 				sc.Forward();
 			} else if (IsIdentifierStart(sc.ch)) {
+				chIdentifierStart = sc.ch;
 				sc.SetState(SCE_CMAKE_IDENTIFIER);
 			} else if (IsADigit(sc.ch) || (sc.ch == '-' && IsADigit(sc.chNext))) {
 				sc.SetState(SCE_CMAKE_NUMBER);
@@ -292,7 +300,7 @@ void ColouriseCmakeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 			}
 		}
 
-		if (!isspacechar(sc.ch)) {
+		if (visibleChars == 0 && !isspacechar(sc.ch)) {
 			visibleChars++;
 		}
 		if (sc.atLineEnd) {

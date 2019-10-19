@@ -33,6 +33,7 @@
 #define NP2STYLE_XMLSGML			63150
 #define NP2STYLE_XMLCDATA			63151
 //63161-63300 Web
+#define NP2STYLE_Value				63309
 //63301-63320 CSS
 #define NP2STYLE_Class				63320
 #define NP2STYLE_Struct				63321
@@ -89,7 +90,7 @@
 #define NP2STYLE_Callback			63595	// Matlab
 #define NP2STYLE_Target				63596	// Makefile
 #define NP2STYLE_BuildinRule		63597	// Jamfile
-#define NP2STYLE_BlobHex			63598	// SQL
+#define NP2STYLE_BlobHex			63598	// SQL, Vim
 #define NP2STYLE_BitField			63599	// SQL - MySQL
 
 #endif // end of EditStyle.h

@@ -125,12 +125,11 @@ def read_api_file(path, comment):
 def parse_cmake_api_file(path):
 	def get_variable_name(name):
 		# TODO: expand <LANG>, <CONFIG> and others
-		index = name.find('<')
-		if index == 0:
-			return ''
-		if index > 0:
-			name = name[:index].strip('_')
-		return name
+		if '<' in name:
+			return ('', True)
+		if '_' in name or '-' in name:
+			return (name, True)
+		return (name, False)
 
 	sections = read_api_file(path, '#')
 	keywordMap = {}
@@ -146,30 +145,44 @@ def parse_cmake_api_file(path):
 		elif key == 'generator expressions':
 			items = re.findall(r'\$\<(?P<name>[\w\-]+)[:>]', doc, re.MULTILINE)
 			parameters.update(items)
+		elif key == 'values':
+			keywordMap[key] = doc.split()
 		else:
 			items = doc.split()
-			result = {name for item in items if (name := get_variable_name(item))}
+			result = set()
+			ignores = set()
+			for item in items:
+				name, ignore = get_variable_name(item)
+				if name:
+					if ignore:
+						ignores.add(name)
+					else:
+						result.add(name)
 			keywordMap[key] = result
+			keywordMap['long ' + key] = ignores
 
 	keywordMap['parameters'] = parameters
 	RemoveDuplicateKeyword(keywordMap, [
 		'keywords',
 		'commands',
+		'variables',
 		'parameters',
 		'properties',
-		'variables',
-		'environment variables',
+		'values',
+		'long properties',
+		'long variables',
 	])
 	keywordList = [
 		('keywords', keywordMap['keywords'], KeywordAttr.Default),
 		('commands', keywordMap['commands'], KeywordAttr.Default),
 		('parameters', keywordMap['parameters'], KeywordAttr.Default),
-		#('properties', keywordMap['properties'], KeywordAttr.NoLexer),
-		#('variables', keywordMap['variables'], KeywordAttr.NoLexer),
-		#('environment variables', keywordMap['environment variables'], KeywordAttr.NoLexer),
-		('properties', [], KeywordAttr.NoLexer),
-		('variables', [], KeywordAttr.NoLexer),
-		('environment variables', [], KeywordAttr.NoLexer),
+		('properties', keywordMap['properties'], KeywordAttr.Default),
+		('variables', keywordMap['variables'], KeywordAttr.Default),
+		('values', keywordMap['values'], KeywordAttr.Default),
+		#('long properties', keywordMap['long properties'], KeywordAttr.NoLexer),
+		#('long variables', keywordMap['long variables'], KeywordAttr.NoLexer),
+		('long properties', [], KeywordAttr.NoLexer),
+		('long variables', [], KeywordAttr.NoLexer),
 	]
 	return keywordList
 

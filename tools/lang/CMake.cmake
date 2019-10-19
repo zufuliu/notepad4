@@ -1,9 +1,8 @@
 # CMake 3.16 https://cmake.org/cmake/help/latest/index.html
 
-#! keywords			===========================================================
+#! Keywords			===========================================================
 # https://cmake.org/cmake/help/latest/manual/cmake-language.7.html
-if(ON YES TRUE OFF NO FALSE IGNORE NOTFOUND
-	NOT
+if(NOT
 	AND
 	OR
 	COMMAND
@@ -44,11 +43,11 @@ break()
 continue()
 macro()
 endmacro()
-function()
+function(ARGC ARGV)
 endfunction()
 return()
 
-#! commands			===========================================================
+#! Commands			===========================================================
 # cmake --help-command-list
 # https://cmake.org/cmake/help/latest/manual/cmake-commands.7.html
 # Scripting Commands
@@ -60,8 +59,7 @@ cmake_policy(VERSION
 	GET
 	PUSH
 	POP)
-configure_file(COPYONLY ESCAPE_QUOTES ONLY
-	NEWLINE_STYLE UNIX DOS WIN32 LF CRLF)
+configure_file(COPYONLY ESCAPE_QUOTES ONLY NEWLINE_STYLE)
 execute_process(COMMAND
 	WORKING_DIRECTORY
 	TIMEOUT
@@ -77,7 +75,7 @@ execute_process(COMMAND
 	COMMAND_ECHO
 	OUTPUT_STRIP_TRAILING_WHITESPACE
 	ERROR_STRIP_TRAILING_WHITESPACE
-	ENCODING NONE AUTO ANSI OEM UTF8 UTF-8)
+	ENCODING)
 file(
 	# Reading
 	READ OFFSET LIMIT HEX
@@ -158,7 +156,7 @@ file(
 		TIMEOUT
 		USERPWD
 		HTTPHEADER
-		NETRC IGNORED OPTIONAL REQUIRED
+		NETRC
 		NETRC_FILE
 		EXPECTED_HASH ALGO
 		EXPECTED_MD5
@@ -393,10 +391,6 @@ install(
 		ARCHIVE LIBRARY RUNTIME OBJECTS FRAMEWORK BUNDLE PRIVATE_HEADER PUBLIC_HEADER RESOURCE
 		DESTINATION
 		PERMISSIONS
-			OWNER_READ OWNER_WRITE OWNER_EXECUTE
-			GROUP_READ GROUP_WRITE GROUP_EXECUTE
-			WORLD_READ WORLD_WRITE WORLD_EXECUTE
-			SETUID SETGID
 		CONFIGURATIONS
 		COMPONENT
 		NAMELINK_COMPONENT
@@ -406,7 +400,7 @@ install(
 		INCLUDES DESTINATION
 	# Installing Files
 	FILES PROGRAMS
-		TYPE BIN SBIN LIB INCLUDE SYSCONF SHAREDSTATE LOCALSTATE RUNSTATE DATA INFO LOCALE MAN DOC
+		TYPE
 		DESTINATION
 		PERMISSIONS
 		CONFIGURATIONS
@@ -519,7 +513,7 @@ ctest_run_script(NEW_PROCESS RETURN_VALUE)
 ctest_sleep()
 ctest_start(GROUP APPEND QUIET)
 ctest_submit(
-	PARTS Start Update Configure Build Test Coverage MemCheck Notes ExtraFiles Upload Submit Done
+	PARTS
 	FILES
 	SUBMIT_URL
 	BUILD_ID
@@ -553,7 +547,7 @@ ctest_upload(FILES QUIET CAPTURE_CMAKE_ERROR)
 
 # Deprecated Commands
 
-#! generator expressions	===================================================
+#! Generator Expressions	===================================================
 # https://cmake.org/cmake/help/latest/manual/cmake-generator-expressions.7.html
 # Logical Operators
 $<BOOL:string>
@@ -655,7 +649,7 @@ $<MAKE_C_IDENTIFIER:...>
 $<TARGET_OBJECTS:objLib>
 $<SHELL_PATH:...>
 
-#! properties		===========================================================
+#! Properties		===========================================================
 # cmake --help-property-list
 # https://cmake.org/cmake/help/latest/manual/cmake-properties.7.html
 # Properties of Global Scope
@@ -883,10 +877,22 @@ JOB_POOL_COMPILE
 JOB_POOL_LINK
 LABELS
 <LANG>_CLANG_TIDY
+	C_CLANG_TIDY
+	CXX_CLANG_TIDY
 <LANG>_COMPILER_LAUNCHER
+	C_COMPILER_LAUNCHER
+	CXX_COMPILER_LAUNCHER
+	CUDA_COMPILER_LAUNCHER
+	Fortran_COMPILER_LAUNCHER
 <LANG>_CPPCHECK
+	C_CPPCHECK
+	CXX_CPPCHECK
 <LANG>_CPPLINT
+	C_CPPLINT
+	CXX_CPPLINT
 <LANG>_INCLUDE_WHAT_YOU_USE
+	C_INCLUDE_WHAT_YOU_USE
+	CXX_INCLUDE_WHAT_YOU_USE
 <LANG>_VISIBILITY_PRESET
 LIBRARY_OUTPUT_DIRECTORY_<CONFIG>
 LIBRARY_OUTPUT_DIRECTORY
@@ -1120,7 +1126,36 @@ CPACK_WIX_ACL
 # Deprecated Properties on Targets
 # Deprecated Properties on Source Files
 
-#! variables		===========================================================
+# Query key for cmake_host_system_information()
+NUMBER_OF_LOGICAL_CORES
+NUMBER_OF_PHYSICAL_CORES
+HOSTNAME
+FQDN
+TOTAL_VIRTUAL_MEMORY
+AVAILABLE_VIRTUAL_MEMORY
+TOTAL_PHYSICAL_MEMORY
+AVAILABLE_PHYSICAL_MEMORY
+IS_64BIT
+HAS_FPU
+HAS_MMX
+HAS_MMX_PLUS
+HAS_SSE
+HAS_SSE2
+HAS_SSE_FP
+HAS_SSE_MMX
+HAS_AMD_3DNOW
+HAS_AMD_3DNOW_PLUS
+HAS_IA64
+HAS_SERIAL_NUMBER
+PROCESSOR_SERIAL_NUMBER
+PROCESSOR_NAME
+PROCESSOR_DESCRIPTION
+OS_NAME
+OS_RELEASE
+OS_VERSION
+OS_PLATFORM
+
+#! Variables		===========================================================
 # cmake --help-variable-list
 # https://cmake.org/cmake/help/latest/manual/cmake-variables.7.html
 # Variables that Provide Information
@@ -1473,10 +1508,22 @@ CMAKE_INTERPROCEDURAL_OPTIMIZATION
 CMAKE_INTERPROCEDURAL_OPTIMIZATION_<CONFIG>
 CMAKE_IOS_INSTALL_COMBINED
 CMAKE_<LANG>_CLANG_TIDY
+	CMAKE_C_CLANG_TIDY
+	CMAKE_CXX_CLANG_TIDY
 CMAKE_<LANG>_COMPILER_LAUNCHER
+	CMAKE_C_COMPILER_LAUNCHER
+	CMAKE_CXX_COMPILER_LAUNCHER
+	CMAKE_Fortran_COMPILER_LAUNCHER
+	CMAKE_CUDA_COMPILER_LAUNCHER
 CMAKE_<LANG>_CPPCHECK
+	CMAKE_C_CPPCHECK
+	CMAKE_CXX_CPPCHECK
 CMAKE_<LANG>_CPPLINT
+	CMAKE_C_CPPLINT
+	CMAKE_CXX_CPPLINT
 CMAKE_<LANG>_INCLUDE_WHAT_YOU_USE
+	CMAKE_C_INCLUDE_WHAT_YOU_USE
+	CMAKE_CXX_INCLUDE_WHAT_YOU_USE
 CMAKE_<LANG>_LINK_LIBRARY_FILE_FLAG
 CMAKE_<LANG>_LINK_LIBRARY_FLAG
 CMAKE_<LANG>_VISIBILITY_PRESET
@@ -1582,6 +1629,10 @@ CMAKE_<LANG>_CREATE_SHARED_LIBRARY
 CMAKE_<LANG>_CREATE_SHARED_MODULE
 CMAKE_<LANG>_CREATE_STATIC_LIBRARY
 CMAKE_<LANG>_FLAGS
+	CMAKE_C_FLAGS
+	CMAKE_CXX_FLAGS
+	CMAKE_CUDA_FLAGS
+	CMAKE_Fortran_FLAGS
 CMAKE_<LANG>_FLAGS_<CONFIG>
 CMAKE_<LANG>_FLAGS_<CONFIG>_INIT
 CMAKE_<LANG>_FLAGS_DEBUG
@@ -1608,6 +1659,8 @@ CMAKE_<LANG>_OUTPUT_EXTENSION
 CMAKE_<LANG>_SIMULATE_ID
 CMAKE_<LANG>_SIMULATE_VERSION
 CMAKE_<LANG>_SIZEOF_DATA_PTR
+	CMAKE_C_SIZEOF_DATA_PTR
+	CMAKE_CXX_SIZEOF_DATA_PTR
 CMAKE_<LANG>_SOURCE_FILE_EXTENSIONS
 CMAKE_<LANG>_STANDARD_INCLUDE_DIRECTORIES
 CMAKE_<LANG>_STANDARD_LIBRARIES
@@ -1714,7 +1767,7 @@ CMAKE_<LANG>_PLATFORM_ID
 CMAKE_NOT_USING_CONFIG_FLAGS
 CMAKE_VS_INTEL_Fortran_PROJECT_VERSION
 
-#! environment variables	===================================================
+# Environment Variables
 # https://cmake.org/cmake/help/latest/manual/cmake-env-variables.7.html
 # Environment Variables that Control the Build
 CMAKE_BUILD_PARALLEL_LEVEL
@@ -1734,7 +1787,15 @@ VERBOSE
 
 # Environment Variables for Languages
 ASM<DIALECT>
+	ASM
+	ASM_NASM
+	ASM_MASM
+	ASM-ATT
 ASM<DIALECT>FLAGS
+	ASMFLAGS
+	ASM_NASMFLAGS
+	ASM_MASMFLAGS
+	ASM-ATTFLAGS
 CC
 CFLAGS
 CSFLAGS
@@ -1757,3 +1818,26 @@ CTEST_PARALLEL_LEVEL
 CTEST_PROGRESS_OUTPUT
 CTEST_USE_LAUNCHERS_DEFAULT
 DASHBOARD_TEST_FROM_CTEST
+
+#! Values			===========================================================
+# Build variant
+Debug MinSizeRel Release RelWithDebInfo
+# if()
+ON YES TRUE OFF NO FALSE IGNORE NOTFOUND
+# NEWLINE_STYLE for execute_process()
+UNIX DOS WIN32 LF CRLF
+# ENCODING for configure_file()
+NONE AUTO ANSI OEM UTF8 UTF-8
+# ENCODING for file()
+UTF-16LE UTF-16BE UTF-32LE UTF-32BE
+# NETRC for file()
+IGNORED OPTIONAL REQUIRED
+# PERMISSIONS for install()
+OWNER_READ OWNER_WRITE OWNER_EXECUTE
+GROUP_READ GROUP_WRITE GROUP_EXECUTE
+WORLD_READ WORLD_WRITE WORLD_EXECUTE
+SETUID SETGID
+# TYPE for install()
+BIN SBIN LIB INCLUDE SYSCONF SHAREDSTATE LOCALSTATE RUNSTATE DATA INFO LOCALE MAN DOC
+# PARTS for ctest_submit()
+Start Update Configure Build Test Coverage MemCheck Notes ExtraFiles Upload Submit Done
