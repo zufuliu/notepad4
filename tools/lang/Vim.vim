@@ -8,6 +8,7 @@
 "! keywords			===========================================================
 " Expression syntax
 is isnot
+END
 " Defining functions
 function
 endfunction
