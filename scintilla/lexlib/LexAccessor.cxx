@@ -19,53 +19,48 @@ using namespace Scintilla;
 namespace Scintilla {
 
 bool LexAccessor::MatchIgnoreCase(Sci_Position pos, const char *s) noexcept {
-	for (int i = 0; *s; i++) {
-		if (*s != MakeLowerCase(SafeGetCharAt(pos + i))) {
+	for (; *s; s++, pos++) {
+		if (*s != MakeLowerCase(SafeGetCharAt(pos))) {
 			return false;
 		}
-		s++;
 	}
 	return true;
 }
 
 Sci_PositionU LexAccessor::GetRange(Sci_PositionU startPos_, Sci_PositionU endPos_, char *s, Sci_PositionU len) noexcept {
-	Sci_PositionU i = 0;
 	endPos_ = std::min(endPos_, startPos_ + len - 1);
+	len = endPos_ - startPos_;
 	if (startPos_ >= static_cast<Sci_PositionU>(startPos) && endPos_ <= static_cast<Sci_PositionU>(endPos)) {
-		startPos_ -= startPos;
-		endPos_ -= startPos;
-		while (startPos_ < endPos_) {
-			s[i++] = buf[startPos_];
-			++startPos_;
+		const char *p = buf + startPos_ - startPos;
+		const char * const t = buf + endPos_ - startPos;
+		while (p < t) {
+			*s++ = *p++;
 		}
 	} else {
-		while (startPos_ < endPos_) {
-			s[i++] = SafeGetCharAt(startPos_);
-			++startPos_;
+		for (; startPos_ < endPos_; startPos_++) {
+			*s++ = SafeGetCharAt(startPos_);
 		}
 	}
-	s[i] = '\0';
-	return i;
+	*s = '\0';
+	return len;
 }
 
 Sci_PositionU LexAccessor::GetRangeLowered(Sci_PositionU startPos_, Sci_PositionU endPos_, char *s, Sci_PositionU len) noexcept {
-	Sci_PositionU i = 0;
 	endPos_ = std::min(endPos_, startPos_ + len - 1);
+	len = endPos_ - startPos_;
 	if (startPos_ >= static_cast<Sci_PositionU>(startPos) && endPos_ <= static_cast<Sci_PositionU>(endPos)) {
-		startPos_ -= startPos;
-		endPos_ -= startPos;
-		while (startPos_ < endPos_) {
-			s[i++] = MakeLowerCase(buf[startPos_]);
-			++startPos_;
+		const char *p = buf + startPos_ - startPos;
+		const char * const t = buf + endPos_ - startPos;
+		while (p < t) {
+			*s++ = MakeLowerCase(*p++);
 		}
 	} else {
-		while (startPos_ < endPos_) {
-			s[i++] = MakeLowerCase(SafeGetCharAt(startPos_));
-			++startPos_;
+		for (; startPos_ < endPos_; startPos_++) {
+			*s++ = MakeLowerCase(SafeGetCharAt(startPos_));
 		}
 	}
-	s[i] = '\0';
-	return i;
+	*s = '\0';
+	return len;
 }
 
 Sci_Position LexLineSkipSpaceTab(Sci_Position line, LexAccessor &styler) noexcept {

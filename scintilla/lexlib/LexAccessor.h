@@ -108,17 +108,16 @@ public:
 	}
 
 	bool Match(Sci_Position pos, const char *s) noexcept {
-		for (int i = 0; *s; i++) {
-			if (*s != SafeGetCharAt(pos + i)) {
+		for (; *s; s++, pos++) {
+			if (*s != SafeGetCharAt(pos)) {
 				return false;
 			}
-			s++;
 		}
 		return true;
 	}
 	bool MatchIgnoreCase(Sci_Position pos, const char *s) noexcept;
 
-	// Get first len - 1 characters in range [startPos_, endPos_)
+	// Get first len - 1 characters in range [startPos_, endPos_).
 	Sci_PositionU GetRange(Sci_PositionU startPos_, Sci_PositionU endPos_, char *s, Sci_PositionU len) noexcept;
 	Sci_PositionU GetRangeLowered(Sci_PositionU startPos_, Sci_PositionU endPos_, char *s, Sci_PositionU len) noexcept;
 
