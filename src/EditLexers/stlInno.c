@@ -57,8 +57,8 @@ static EDITSTYLE Styles_INNO[] = {
 	{ SCE_INNO_PREPROC, NP2STYLE_Preprocessor, EDITSTYLE_HOLE(L"Preprocessor"), L"fore:#FF8000" },
 	{ SCE_INNO_KEYWORD_PASCAL, 63501, EDITSTYLE_HOLE(L"Pascal Keyword"), L"fore:#0000FF" },
 	//{ SCE_INNO_PAS_TYPE, NP2STYLE_TypeKeyword, EDITSTYLE_HOLE(L"Pascal Type Keyword"), L"bold; fore:#1E90FF" },
-	{ SCE_INNO_SECTION, 63502, EDITSTYLE_HOLE(L"Section"), L"bold; fore:#000080; back:#FF8000; eolfilled" },
-	{ SCE_INNO_PARAMETER, 63503, EDITSTYLE_HOLE(L"Parameter"), L"fore:#0000FF" },
+	{ SCE_INNO_SECTION, NP2STYLE_Section, EDITSTYLE_HOLE(L"Section"), L"bold; fore:#000080; back:#FF8000; eolfilled" },
+	{ SCE_INNO_PARAMETER, NP2STYLE_Parameter, EDITSTYLE_HOLE(L"Parameter"), L"fore:#0000FF" },
 	{ SCE_INNO_INLINE_EXPANSION, 63504, EDITSTYLE_HOLE(L"Inline Expansion"), L"fore:#800080" },
 	{ MULTI_STYLE(SCE_INNO_STRING_DOUBLE, SCE_INNO_STRING_SINGLE, 0, 0), NP2STYLE_String, EDITSTYLE_HOLE(L"String"), L"fore:#808000" },
 	//{ SCE_INNO_NUMBER, NP2STYLE_Number, EDITSTYLE_HOLE(L"Number"), L"fore:#FF0000" },
@@ -72,4 +72,3 @@ EDITLEXER lexINNO = {
 	&Keywords_INNO,
 	Styles_INNO
 };
-
