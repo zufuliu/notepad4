@@ -981,9 +981,8 @@ void Style_UpdateLexerKeywordAttr(LPCEDITLEXER pLexNew) {
 		attr[6] = KeywordAttr_NoLexer;		// Upper Case Keyword
 		break;
 	case NP2LEX_CMAKE:
-		attr[3] = KeywordAttr_NoLexer;		// properties
-		attr[4] = KeywordAttr_NoLexer;		// variables
-		attr[5] = KeywordAttr_NoLexer;		// environment variables
+		attr[6] = KeywordAttr_NoLexer;		// long properties
+		attr[7] = KeywordAttr_NoLexer;		// long variables
 		break;
 	case NP2LEX_CPP:
 		attr[2] = KeywordAttr_NoAutoComp;	// Preprocessor
