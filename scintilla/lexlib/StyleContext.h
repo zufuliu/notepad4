@@ -205,11 +205,10 @@ public:
 			return false;
 		}
 		s++;
-		for (int n = 2; *s; n++) {
-			if (*s != styler.SafeGetCharAt(currentPos + n)) {
+		for (Sci_PositionU pos = currentPos + 2; *s; s++, pos++) {
+			if (*s != styler.SafeGetCharAt(pos)) {
 				return false;
 			}
-			s++;
 		}
 		return true;
 	}
