@@ -52,19 +52,26 @@ bool IsBracketArgument(Accessor &styler, Sci_PositionU pos, bool start, int &bra
 	return false;
 }
 
-void ColouriseCmakeDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
+enum {
+	CMakeLineStateMaskLineComment = (1 << 16), // line comment
+};
+
+void ColouriseCmakeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList keywordLists, Accessor &styler) {
+	int lineStateLineComment = 0;
+
 	int outerStyle = SCE_CMAKE_DEFAULT;
 	int varNestedLevel = 0; // nested variable: ${${}}
 	int generatorExpr = 0; // nested generator expressions: $<$<>>
 	int bracketNumber = 0; // number of '=' in bracket: [[]]
 	int userDefType = SCE_CMAKE_DEFAULT;
 	int chBeforeNumber = 0;
+	int visibleChars = 0;
 
-	StyleContext sc(startPos, length, initStyle, styler);
+	StyleContext sc(startPos, lengthDoc, initStyle, styler);
 	if (sc.currentLine > 0) {
 		const int lineState = styler.GetLineState(sc.currentLine - 1);
 		outerStyle = lineState & 0xff;
-		bracketNumber = lineState >> 8;
+		bracketNumber = (lineState >> 8) & 0xff;
 		if (outerStyle != SCE_CMAKE_DEFAULT) {
 			sc.SetState(outerStyle);
 		}
@@ -238,6 +245,9 @@ void ColouriseCmakeDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 					sc.Forward(2 + bracketNumber);
 				} else {
 					sc.SetState(SCE_CMAKE_COMMENT);
+					if (visibleChars == 0) {
+						lineStateLineComment = CMakeLineStateMaskLineComment;
+					}
 				}
 			} else if (sc.ch == '[' && (sc.chNext == '=' || sc.chNext == '[')) {
 				if (IsBracketArgument(styler, sc.currentPos, true, bracketNumber)) {
@@ -246,6 +256,9 @@ void ColouriseCmakeDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 				}
 			} else if (sc.Match('/', '/')) { // CMakeCache.txt
 				sc.SetState(SCE_CMAKE_COMMENT);
+				if (visibleChars == 0) {
+					lineStateLineComment = CMakeLineStateMaskLineComment;
+				}
 			} else if (sc.ch == '\"') {
 				outerStyle = SCE_CMAKE_STRING;
 				sc.SetState(SCE_CMAKE_STRING);
@@ -279,8 +292,13 @@ void ColouriseCmakeDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 			}
 		}
 
+		if (!isspacechar(sc.ch)) {
+			visibleChars++;
+		}
 		if (sc.atLineEnd) {
-			styler.SetLineState(sc.currentLine, (bracketNumber << 8) | outerStyle);
+			styler.SetLineState(sc.currentLine, (bracketNumber << 8) | outerStyle | lineStateLineComment);
+			lineStateLineComment = 0;
+			visibleChars = 0;
 		}
 		sc.Forward();
 	}
@@ -288,24 +306,29 @@ void ColouriseCmakeDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 	sc.Complete();
 }
 
-#define IsCommentLine(line)		IsLexCommentLine(line, styler, SCE_CMAKE_COMMENT)
-#define CMakeMatch(str)			styler.MatchIgnoreCase(i, str)
-
-void FoldCmakeDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList, Accessor &styler) {
+void FoldCmakeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList, Accessor &styler) {
 	const bool foldComment = styler.GetPropertyInt("fold.comment", 1) != 0;
-	//const bool foldCompact = styler.GetPropertyInt("fold.compact") != 0;
 
-	const Sci_PositionU endPos = startPos + length;
-	//int visibleChars = 0;
+	const Sci_PositionU endPos = startPos + lengthDoc;
 	Sci_Position lineCurrent = styler.GetLine(startPos);
 	int levelCurrent = SC_FOLDLEVELBASE;
-	if (lineCurrent > 0)
+	int lineCommentPrev = 0;
+	if (lineCurrent > 0) {
 		levelCurrent = styler.LevelAt(lineCurrent - 1) >> 16;
+		lineCommentPrev = styler.GetLineState(lineCurrent - 1) & CMakeLineStateMaskLineComment;
+	}
+
 	int levelNext = levelCurrent;
+	int lineCommentCurrent = styler.GetLineState(lineCurrent) & CMakeLineStateMaskLineComment;
+	Sci_PositionU lineStartNext = styler.LineStart(lineCurrent + 1);
 
 	char chNext = styler[startPos];
 	int styleNext = styler.StyleAt(startPos);
 	int style = initStyle;
+
+	constexpr int MaxWordLength = 8 + 1; // function
+	char buf[MaxWordLength + 1] = "";
+	int wordLen = 0;
 
 	for (Sci_PositionU i = startPos; i < endPos; i++) {
 		const char ch = chNext;
@@ -313,14 +336,7 @@ void FoldCmakeDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, Le
 		const int stylePrev = style;
 		style = styleNext;
 		styleNext = styler.StyleAt(i + 1);
-		const bool atEOL = (ch == '\r' && chNext != '\n') || (ch == '\n');
 
-		if (foldComment && atEOL && IsCommentLine(lineCurrent)) {
-			if (!IsCommentLine(lineCurrent - 1) && IsCommentLine(lineCurrent + 1))
-				levelNext++;
-			else if (IsCommentLine(lineCurrent - 1) && !IsCommentLine(lineCurrent + 1))
-				levelNext--;
-		}
 		if (style == SCE_CMAKE_BLOCK_COMMENT || style == SCE_CMAKE_BRACKET_ARGUMENT) {
 			if (style != stylePrev) {
 				levelNext++;
@@ -333,30 +349,45 @@ void FoldCmakeDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, Le
 			} else if (ch == ')') {
 				levelNext--;
 			}
-		} else if (style == SCE_CMAKE_WORD && stylePrev != SCE_CMAKE_WORD) {
-			if (CMakeMatch("end")) {
-				levelNext--;
-			} else if (CMakeMatch("if") || CMakeMatch("function") || CMakeMatch("macro")
-				|| CMakeMatch("foreach") || CMakeMatch("while")) {
-				levelNext++;
+		} else if (style == SCE_CMAKE_WORD) {
+			if (wordLen < MaxWordLength) {
+				buf[wordLen++] = MakeLowerCase(ch);
+			}
+			if (styleNext != SCE_CMAKE_WORD) {
+				buf[wordLen] = '\0';
+				wordLen = 0;
+				if (strncmp(buf, "end", 3) == 0) {
+					levelNext--;
+				} else if (strcmp(buf, "if") == 0 || strcmp(buf, "function") == 0 || strcmp(buf, "macro") == 0
+					|| strcmp(buf, "foreach") == 0 || strcmp(buf, "while") == 0) {
+					levelNext++;
+				}
 			}
 		}
 
-		//if (!isspacechar(ch))
-		//	visibleChars++;
-		if (atEOL || (i == endPos - 1)) {
+		if ((i == lineStartNext - 1) || (i == endPos - 1)) {
+			const int lineCommentNext = styler.GetLineState(lineCurrent + 1) & CMakeLineStateMaskLineComment;
+			if (foldComment && lineCommentCurrent) {
+				if (!lineCommentPrev && lineCommentNext) {
+					levelNext++;
+				} else if (lineCommentPrev && !lineCommentNext) {
+					levelNext--;
+				}
+			}
+
 			const int levelUse = levelCurrent;
 			int lev = levelUse | levelNext << 16;
-			//if (visibleChars == 0 && foldCompact)
-			//	lev |= SC_FOLDLEVELWHITEFLAG;
-			if (levelUse < levelNext)
+			if (levelUse < levelNext) {
 				lev |= SC_FOLDLEVELHEADERFLAG;
+			}
 			if (lev != styler.LevelAt(lineCurrent)) {
 				styler.SetLevel(lineCurrent, lev);
 			}
 			lineCurrent++;
+			lineStartNext = styler.LineStart(lineCurrent + 1);
 			levelCurrent = levelNext;
-			//visibleChars = 0;
+			lineCommentPrev = lineCommentCurrent;
+			lineCommentCurrent = lineCommentNext;
 		}
 	}
 }
