@@ -404,8 +404,8 @@ static bool sureThisIsNotHeredoc(Sci_Position lt2StartPos, Accessor &styler) {
 	const Sci_Position lineStart = styler.GetLine(lt2StartPos);
 	const Sci_Position lineStartPosn = styler.LineStart(lineStart);
 	styler.Flush();
-	const bool definitely_not_a_here_doc = true;
-	const bool looks_like_a_here_doc = false;
+	constexpr bool definitely_not_a_here_doc = true;
+	constexpr bool looks_like_a_here_doc = false;
 
 	// find the expression start rather than the line start
 	const Sci_Position exprStartPosn = findExpressionStart(lt2StartPos, lineStartPosn, styler);

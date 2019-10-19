@@ -20,12 +20,15 @@ CharacterSet::CharacterSet(setBase base, const char *initialSet, int size_, bool
 	valueAfter = valueAfter_;
 	bset = new bool[size]();
 	AddString(initialSet);
-	if (base & setLower)
+	if (base & setLower) {
 		AddString("abcdefghijklmnopqrstuvwxyz");
-	if (base & setUpper)
+	}
+	if (base & setUpper) {
 		AddString("ABCDEFGHIJKLMNOPQRSTUVWXYZ");
-	if (base & setDigits)
+	}
+	if (base & setDigits) {
 		AddString("0123456789");
+	}
 }
 
 void CharacterSet::AddString(const char *setToAdd) noexcept {

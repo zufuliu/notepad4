@@ -268,7 +268,7 @@ RESearch::RESearch(const CharClassify *charClassTable) {
 	previousPattern = nullptr;
 	previousLength = 0;
 	previousFlags = 0;
-	const unsigned char nul = 0;
+	constexpr unsigned char nul = 0;
 	std::fill(bittab, std::end(bittab), nul);
 	std::fill(tagstk, std::end(tagstk), 0);
 	std::fill(nfa, std::end(nfa), '\0');

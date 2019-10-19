@@ -65,9 +65,8 @@ Sci_Position SCI_METHOD LexerBase::PropertySet(const char *key, const char *val)
 	if (strcmp(val, valOld) != 0) {
 		props.Set(key, val, strlen(key), strlen(val));
 		return 0;
-	} else {
-		return -1;
 	}
+	return -1;
 }
 
 const char * SCI_METHOD LexerBase::DescribeWordListSets() const noexcept {

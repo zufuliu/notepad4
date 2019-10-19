@@ -313,7 +313,7 @@ static int NumberLines(const char *text) noexcept {
 // Each allocated LineAnnotation is a char array which starts with an AnnotationHeader
 // and then has text and optional styles.
 
-static const int IndividualStyles = 0x100;
+constexpr int IndividualStyles = 0x100;
 
 struct AnnotationHeader {
 	short style;	// Style IndividualStyles implies array of styles

@@ -134,7 +134,7 @@ void MarginView::AllocateGraphics(const ViewStyle &vsDraw) {
 
 void MarginView::RefreshPixMaps(Surface *surfaceWindow, WindowID wid, const ViewStyle &vsDraw) {
 	if (!pixmapSelPattern->Initialised()) {
-		const int patternSize = 8;
+		constexpr int patternSize = 8;
 		pixmapSelPattern->InitPixMap(patternSize, patternSize, surfaceWindow, wid);
 		pixmapSelPatternOffset1->InitPixMap(patternSize, patternSize, surfaceWindow, wid);
 		// This complex procedure is to reproduce the checkerboard dithered pattern used by windows

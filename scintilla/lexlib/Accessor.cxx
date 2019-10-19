@@ -44,8 +44,9 @@ int Accessor::IndentAmount(Sci_Position line, int *flags, PFNIsCommentLeader pfn
 		if (inPrevPrefix) {
 			const char chPrev = (*this)[posPrev++];
 			if (chPrev == ' ' || chPrev == '\t') {
-				if (chPrev != ch)
+				if (chPrev != ch) {
 					spaceFlags |= wsInconsistent;
+				}
 			} else {
 				inPrevPrefix = false;
 			}
@@ -55,8 +56,9 @@ int Accessor::IndentAmount(Sci_Position line, int *flags, PFNIsCommentLeader pfn
 			indent++;
 		} else {	// Tab
 			spaceFlags |= wsTab;
-			if (spaceFlags & wsSpace)
+			if (spaceFlags & wsSpace) {
 				spaceFlags |= wsSpaceTab;
+			}
 			indent = (indent / 4 + 1) * 4;
 		}
 		ch = (*this)[++pos];
@@ -66,8 +68,8 @@ int Accessor::IndentAmount(Sci_Position line, int *flags, PFNIsCommentLeader pfn
 	indent += SC_FOLDLEVELBASE;
 	// if completely empty line or the start of a comment...
 	if ((LineStart(line) == Length()) || (ch == ' ' || ch == '\t' || ch == '\n' || ch == '\r') ||
-		(pfnIsCommentLeader && (*pfnIsCommentLeader)(*this, pos, end - pos)))
+		(pfnIsCommentLeader && (*pfnIsCommentLeader)(*this, pos, end - pos))) {
 		return indent | SC_FOLDLEVELWHITEFLAG;
-	else
-		return indent;
+	}
+	return indent;
 }

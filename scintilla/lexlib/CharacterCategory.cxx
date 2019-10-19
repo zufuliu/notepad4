@@ -4828,8 +4828,9 @@ constexpr int maskCategory = 0x1F;
 // alphabetic languages.
 
 CharacterCategory CategoriseCharacter(int character) noexcept {
-	if (character < 0 || character > maxUnicode)
+	if (character < 0 || character > maxUnicode) {
 		return ccCn;
+	}
 #if CHARACTERCATEGORY_OPTIMIZE_LATIN1
 	if (static_cast<size_t>(character) < std::size(catLatin)) {
 		return static_cast<CharacterCategory>(catLatin[character]);
@@ -4865,15 +4866,15 @@ OtherID OtherIDOfCharacter(int character) noexcept {
 		(character == 0x309B) ||	// KATAKANA-HIRAGANA VOICED SOUND MARK
 		(character == 0x309C)) {	// KATAKANA-HIRAGANA SEMI-VOICED SOUND MARK
 		return OtherID::oidStart;
-	} else if (
+	}
+	if (
 		(character == 0x00B7) ||	// MIDDLE DOT
 		(character == 0x0387) ||	// GREEK ANO TELEIA
 		((character >= 0x1369) && (character <= 0x1371)) ||	// ETHIOPIC DIGIT ONE..ETHIOPIC DIGIT NINE
 		(character == 0x19DA)) {	// NEW TAI LUE THAM DIGIT ONE
 		return OtherID::oidContinue;
-	} else {
-		return OtherID::oidNone;
 	}
+	return OtherID::oidNone;
 }
 
 // Determine if a character is in  Ll|Lu|Lt|Lm|Lo|Nl|Mn|Mc|Nd|Pc and has
@@ -4978,18 +4979,16 @@ bool IsIdContinue(int character) noexcept {
 bool IsXidStart(int character) noexcept {
 	if (OmitXidStart(character)) {
 		return false;
-	} else {
-		return IsIdStart(character);
 	}
+	return IsIdStart(character);
 }
 
 // XID_Continue is ID_Continue modified for Normalization Form KC in UAX #31
 bool IsXidContinue(int character) noexcept {
 	if (OmitXidContinue(character)) {
 		return false;
-	} else {
-		return IsIdContinue(character);
 	}
+	return IsIdContinue(character);
 }
 
 CharacterCategoryMap::CharacterCategoryMap() noexcept {

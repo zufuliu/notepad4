@@ -41,7 +41,9 @@ public:
 	void AddString(const char *setToAdd) noexcept;
 	bool Contains(int val) const noexcept {
 		assert(val >= 0);
-		if (val < 0) return false;
+		if (val < 0) {
+			return false;
+		}
 		return (val < size) ? bset[val] : valueAfter;
 	}
 	bool Contains(char ch) const noexcept {
@@ -74,11 +76,10 @@ constexpr bool IsHexDigit(int ch) noexcept {
 constexpr bool IsADigit(int ch, int base) noexcept {
 	if (base <= 10) {
 		return (ch >= '0') && (ch < '0' + base);
-	} else {
-		return ((ch >= '0') && (ch <= '9')) ||
-			((ch >= 'A') && (ch < 'A' + base - 10)) ||
-			((ch >= 'a') && (ch < 'a' + base - 10));
 	}
+	return ((ch >= '0') && (ch <= '9'))
+		|| ((ch >= 'A') && (ch < 'A' + base - 10))
+		|| ((ch >= 'a') && (ch < 'a' + base - 10));
 }
 
 constexpr bool IsASCII(int ch) noexcept {
@@ -98,15 +99,14 @@ constexpr bool IsUpperOrLowerCase(int ch) noexcept {
 }
 
 constexpr bool IsAlpha(int ch) noexcept {
-	return 	((ch >= 'a') && (ch <= 'z')) ||
-		((ch >= 'A') && (ch <= 'Z'));
+	return ((ch >= 'a') && (ch <= 'z'))
+		|| ((ch >= 'A') && (ch <= 'Z'));
 }
 
 constexpr bool IsAlphaNumeric(int ch) noexcept {
-	return
-		((ch >= '0') && (ch <= '9')) ||
-		((ch >= 'a') && (ch <= 'z')) ||
-		((ch >= 'A') && (ch <= 'Z'));
+	return ((ch >= '0') && (ch <= '9'))
+		|| ((ch >= 'a') && (ch <= 'z'))
+		|| ((ch >= 'A') && (ch <= 'Z'));
 }
 
 /**
@@ -134,34 +134,25 @@ constexpr bool IsIdentifierStart(int ch) noexcept {
 }
 
 constexpr bool isoperator(int ch) noexcept {
-	if (IsAlphaNumeric(ch))
-		return false;
-	if (ch == '%' || ch == '^' || ch == '&' || ch == '*' ||
+	return
+		(ch == '%' || ch == '^' || ch == '&' || ch == '*' ||
 		ch == '(' || ch == ')' || ch == '-' || ch == '+' ||
 		ch == '=' || ch == '|' || ch == '{' || ch == '}' ||
 		ch == '[' || ch == ']' || ch == ':' || ch == ';' ||
 		ch == '<' || ch == '>' || ch == ',' || ch == '/' ||
-		ch == '?' || ch == '!' || ch == '.' || ch == '~')
-		return true;
-	return false;
+		ch == '?' || ch == '!' || ch == '.' || ch == '~');
 }
 
 // Simple case functions for ASCII supersets.
 
 template <typename T>
 constexpr T MakeUpperCase(T ch) noexcept {
-	if (ch < 'a' || ch > 'z')
-		return ch;
-	else
-		return ch - 'a' + 'A';
+	return (ch < 'a' || ch > 'z') ? ch : (ch - 'a' + 'A');
 }
 
 template <typename T>
 constexpr T MakeLowerCase(T ch) noexcept {
-	if (ch < 'A' || ch > 'Z')
-		return ch;
-	else
-		return ch - 'A' + 'a';
+	return (ch < 'A' || ch > 'Z') ? ch : (ch - 'A' + 'a');
 }
 
 #if 0
