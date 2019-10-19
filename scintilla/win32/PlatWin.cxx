@@ -390,7 +390,7 @@ FontID CreateFontFromParameters(const FontParameters &fp) {
 			hr = pIDWriteFactory->CreateTextLayout(L"X", 1, pTextFormat,
 				100.0f, 100.0f, &pTextLayout);
 			if (SUCCEEDED(hr)) {
-				const int maxLines = 2;
+				constexpr int maxLines = 2;
 				DWRITE_LINE_METRICS lineMetrics[maxLines]{};
 				UINT32 lineCount = 0;
 				hr = pTextLayout->GetLineMetrics(lineMetrics, maxLines, &lineCount);
@@ -462,7 +462,7 @@ public:
 	}
 };
 
-const int stackBufferLength = 1000;
+constexpr int stackBufferLength = 1000;
 class TextWide : public VarBuffer<wchar_t, stackBufferLength> {
 public:
 	int tlen;	// Using int instead of size_t as most Win32 APIs take int.
@@ -2037,7 +2037,7 @@ void SurfaceD2D::MeasureWidths(const Font &font_, std::string_view text, XYPOSIT
 	if (!SUCCEEDED(hrCreate)) {
 		return;
 	}
-	const int clusters = stackBufferLength;
+	constexpr int clusters = stackBufferLength;
 	DWRITE_CLUSTER_METRICS clusterMetrics[clusters];
 	UINT32 count = 0;
 	const HRESULT hrGetCluster = pTextLayout->GetClusterMetrics(clusterMetrics, clusters, &count);
@@ -2130,7 +2130,7 @@ XYPOSITION SurfaceD2D::AverageCharWidth(const Font &font_) {
 		// Create a layout
 		IDWriteTextLayout *pTextLayout = nullptr;
 		const WCHAR wszAllAlpha[] = L"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-		const size_t lenAllAlpha = (sizeof(wszAllAlpha) / sizeof(WCHAR)) - 1;
+		constexpr size_t lenAllAlpha = (sizeof(wszAllAlpha) / sizeof(WCHAR)) - 1;
 		const HRESULT hr = pIDWriteFactory->CreateTextLayout(wszAllAlpha, static_cast<UINT32>(lenAllAlpha),
 			pTextFormat, 1000.0, 1000.0, &pTextLayout);
 		if (SUCCEEDED(hr)) {

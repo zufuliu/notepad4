@@ -1181,7 +1181,7 @@ void ScintillaWin::EscapeHanja() {
 
 	// ImmEscapeW() may overwrite uniChar[] with a null terminated string.
 	// So enlarge it enough to Maximum 4 as in UTF-8.
-	unsigned int const safeLength = UTF8MaxBytes + 1;
+	constexpr unsigned int safeLength = UTF8MaxBytes + 1;
 	std::string oneChar(safeLength, '\0');
 	pdoc->GetCharRange(oneChar.data(), currentPos, oneCharLen);
 
@@ -1612,7 +1612,7 @@ sptr_t ScintillaWin::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam
 
 						const DWORD dwCurrent = GetTickCount();
 						const DWORD dwStart = wParam ? static_cast<DWORD>(wParam) : dwCurrent;
-						const DWORD maxWorkTime = 50;
+						constexpr DWORD maxWorkTime = 50;
 
 						if (dwCurrent >= dwStart && dwCurrent > maxWorkTime && dwCurrent - maxWorkTime < dwStart)
 							PostMessage(MainHWND(), SC_WIN_IDLE, dwStart, 0);

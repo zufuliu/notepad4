@@ -174,7 +174,7 @@ void DrawStyledText(Surface *surface, const ViewStyle &vs, int styleOffset, PRec
 
 }
 
-const XYPOSITION epsilon = 0.0001f;	// A small nudge to avoid floating point precision issues
+constexpr XYPOSITION epsilon = 0.0001f;	// A small nudge to avoid floating point precision issues
 
 EditView::EditView() {
 	tabWidthMinimumPixels = 2; // needed for calculating tab stops for fractional proportional fonts

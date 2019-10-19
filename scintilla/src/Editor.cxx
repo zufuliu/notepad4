@@ -1547,7 +1547,7 @@ bool Editor::WrapLines(WrapScope ws) {
 			}
 		} else if (ws == WrapScope::wsIdle) {
 			// Try to keep time taken by wrapping reasonable so interaction remains smooth.
-			const double secondsAllowed = 0.01;
+			constexpr double secondsAllowed = 0.01;
 			const Sci::Line linesInAllowedTime = std::clamp<Sci::Line>(
 				static_cast<Sci::Line>(secondsAllowed / durationWrapOneLine.Duration()),
 				LinesOnScreen() + 50, 0x10000);

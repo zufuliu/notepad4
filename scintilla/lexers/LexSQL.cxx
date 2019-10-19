@@ -107,7 +107,7 @@ static void ColouriseSqlDoc(Sci_PositionU startPos, Sci_Position length, int ini
 			break;
 		case SCE_SQL_IDENTIFIER:
 			if (!IsSqlWordChar(sc.ch, sqlAllowDottedWord)) {
-				const int nextState = SCE_SQL_DEFAULT;
+				constexpr int nextState = SCE_SQL_DEFAULT;
 				char s[128];
 				const int chNext = sc.GetNextNSChar();
 				sc.GetCurrentLowered(s, sizeof(s));
@@ -602,7 +602,7 @@ static void FoldSqlDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 		}
 		// If new keyword (cannot trigger on elseif or nullif, does less tests)
 		if (style == SCE_SQL_WORD && stylePrev != SCE_SQL_WORD) {
-			const int MAX_KW_LEN = 9;	// Maximum length of folding keywords
+			constexpr int MAX_KW_LEN = 9;	// Maximum length of folding keywords
 			char s[MAX_KW_LEN + 2];
 			unsigned int j = 0;
 			for (; j < MAX_KW_LEN + 1; j++) {

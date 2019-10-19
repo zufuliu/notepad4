@@ -8,6 +8,8 @@
 #include <cassert>
 #include <cctype>
 
+#include <algorithm>
+
 #include "ILexer.h"
 #include "LexAccessor.h"
 #include "CharacterSet.h"
@@ -24,6 +26,46 @@ bool LexAccessor::MatchIgnoreCase(Sci_Position pos, const char *s) noexcept {
 		s++;
 	}
 	return true;
+}
+
+Sci_PositionU LexAccessor::GetRange(Sci_PositionU startPos_, Sci_PositionU endPos_, char *s, Sci_PositionU len) noexcept {
+	Sci_PositionU i = 0;
+	endPos_ = std::min(endPos_ + 1, startPos_ + len - 1);
+	if (startPos_ >= static_cast<Sci_PositionU>(startPos) && endPos_ <= static_cast<Sci_PositionU>(endPos)) {
+		startPos_ -= startPos;
+		endPos_ -= startPos;
+		while (startPos_ < endPos_) {
+			s[i++] = buf[startPos_];
+			++startPos_;
+		}
+	} else {
+		while (startPos_ < endPos_) {
+			s[i++] = SafeGetCharAt(startPos_);
+			++startPos_;
+		}
+	}
+	s[i] = '\0';
+	return i;
+}
+
+Sci_PositionU LexAccessor::GetRangeLowered(Sci_PositionU startPos_, Sci_PositionU endPos_, char *s, Sci_PositionU len) noexcept {
+	Sci_PositionU i = 0;
+	endPos_ = std::min(endPos_ + 1, startPos_ + len - 1);
+	if (startPos_ >= static_cast<Sci_PositionU>(startPos) && endPos_ <= static_cast<Sci_PositionU>(endPos)) {
+		startPos_ -= startPos;
+		endPos_ -= startPos;
+		while (startPos_ < endPos_) {
+			s[i++] = MakeLowerCase(buf[startPos_]);
+			++startPos_;
+		}
+	} else {
+		while (startPos_ < endPos_) {
+			s[i++] = MakeLowerCase(SafeGetCharAt(startPos_));
+			++startPos_;
+		}
+	}
+	s[i] = '\0';
+	return i;
 }
 
 Sci_Position LexLineSkipSpaceTab(Sci_Position line, LexAccessor &styler) noexcept {
@@ -117,38 +159,6 @@ Sci_Position LexSkipWhiteSpace(Sci_Position startPos, Sci_Position endPos, LexAc
 		}
 	}
 	return endPos;
-}
-
-Sci_PositionU LexGetRange(Sci_Position startPos, Sci_Position endPos, LexAccessor &styler, char *s, Sci_PositionU len) noexcept {
-	Sci_PositionU i = 0;
-	char ch = styler.SafeGetCharAt(startPos + i);
-	Sci_PositionU _endPos = endPos - startPos + 1;
-	if (_endPos > len - 1) {
-		_endPos = len - 1;
-	}
-	while (i < _endPos) {
-		s[i] = ch;
-		i++;
-		ch = styler.SafeGetCharAt(startPos + i);
-	}
-	s[i] = '\0';
-	return i;
-}
-
-Sci_PositionU LexGetRangeLowered(Sci_Position startPos, Sci_Position endPos, LexAccessor &styler, char *s, Sci_PositionU len) noexcept {
-	Sci_PositionU i = 0;
-	char ch = MakeLowerCase(styler.SafeGetCharAt(startPos + i));
-	Sci_PositionU _endPos = endPos - startPos + 1;
-	if (_endPos > len - 1) {
-		_endPos = len - 1;
-	}
-	while (i < _endPos) {
-		s[i] = ch;
-		i++;
-		ch = MakeLowerCase(styler.SafeGetCharAt(startPos + i));
-	}
-	s[i] = '\0';
-	return i;
 }
 
 Sci_PositionU LexGetRange(Sci_Position startPos, LexAccessor &styler, bool IsWordChar(int), char *s, Sci_PositionU len) noexcept {

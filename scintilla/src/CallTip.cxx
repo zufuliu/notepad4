@@ -101,7 +101,7 @@ void CallTip::DrawChunk(Surface *surface, int &x, const char *s,
 	// Divide the text into sections that are all text, or that are
 	// single arrows or single tab characters (if tabSize > 0).
 	int maxEnd = 0;
-	const int numEnds = 10;
+	constexpr int numEnds = 10;
 	int ends[numEnds + 2];
 	for (int i = 0; i < len; i++) {
 		if ((maxEnd < numEnds) &&

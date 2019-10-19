@@ -44,8 +44,9 @@ PropSetSimple::~PropSetSimple() {
 
 void PropSetSimple::Set(const char *key, const char *val, size_t lenKey, size_t lenVal) {
 	mapss *props = PropsFromPointer(impl);
-	if (!*key)	// Empty keys are not supported
+	if (!*key) {	// Empty keys are not supported
 		return;
+	}
 	(*props)[std::string(key, lenKey)] = std::string(val, lenVal);
 }
 
@@ -80,9 +81,8 @@ const char *PropSetSimple::Get(const char *key) const {
 	const auto keyPos = props->find(std::string(key));
 	if (keyPos != props->end()) {
 		return keyPos->second.c_str();
-	} else {
-		return "";
 	}
+	return "";
 }
 
 // There is some inconsistency between GetExpanded("foo") and Expand("$(foo)").

@@ -36,10 +36,11 @@ private:
 		}
 		// End of line determined from line end position, allowing CR, LF,
 		// CRLF and Unicode line ends as set by document.
-		if (currentLine < lineDocEnd)
+		if (currentLine < lineDocEnd) {
 			atLineEnd = static_cast<Sci_Position>(currentPos) >= (lineStartNext - 1);
-		else // Last line
+		} else { // Last line
 			atLineEnd = static_cast<Sci_Position>(currentPos) >= lineStartNext;
+		}
 	}
 
 public:
@@ -84,8 +85,9 @@ public:
 		currentLine = styler.GetLine(startPos);
 		lineStartNext = styler.LineStart(currentLine + 1);
 		lengthDocument = static_cast<Sci_PositionU>(styler.Length());
-		if (endPos == lengthDocument)
+		if (endPos == lengthDocument) {
 			endPos++;
+		}
 		lineDocEnd = styler.GetLine(lengthDocument);
 		atLineStart = static_cast<Sci_PositionU>(styler.LineStart(currentLine)) == startPos;
 
@@ -164,8 +166,9 @@ public:
 		return static_cast<unsigned char>(styler.SafeGetCharAt(currentPos + n));
 	}
 	int GetRelativeCharacter(Sci_Position n) noexcept {
-		if (n == 0)
+		if (n == 0) {
 			return ch;
+		}
 		if (multiByteAccess) {
 			if ((currentPosLastRelative != currentPos) ||
 				((n > 0) && ((offsetRelative < 0) || (n < offsetRelative))) ||
@@ -180,10 +183,9 @@ public:
 			currentPosLastRelative = currentPos;
 			offsetRelative = n;
 			return chReturn;
-		} else {
-			// fast version for single byte encodings
-			return static_cast<unsigned char>(styler.SafeGetCharAt(currentPos + n));
 		}
+		// fast version for single byte encodings
+		return static_cast<unsigned char>(styler.SafeGetCharAt(currentPos + n));
 	}
 	bool Match(char ch0) const noexcept {
 		return ch == static_cast<unsigned char>(ch0);
@@ -192,27 +194,31 @@ public:
 		return (ch == static_cast<unsigned char>(ch0)) && (chNext == static_cast<unsigned char>(ch1));
 	}
 	bool Match(const char *s) const noexcept {
-		if (ch != static_cast<unsigned char>(*s))
+		if (ch != static_cast<unsigned char>(*s)) {
 			return false;
+		}
 		s++;
-		if (!*s)
+		if (!*s) {
 			return true;
-		if (chNext != static_cast<unsigned char>(*s))
+		}
+		if (chNext != static_cast<unsigned char>(*s)) {
 			return false;
+		}
 		s++;
 		for (int n = 2; *s; n++) {
-			if (*s != styler.SafeGetCharAt(currentPos + n))
+			if (*s != styler.SafeGetCharAt(currentPos + n)) {
 				return false;
+			}
 			s++;
 		}
 		return true;
 	}
 	bool MatchIgnoreCase(const char *s) const noexcept;
 	Sci_Position GetCurrent(char *s, Sci_PositionU len) const noexcept {
-		return LexGetRange(styler.GetStartSegment(), currentPos - 1, styler, s, len);
+		return styler.GetRange(styler.GetStartSegment(), currentPos - 1, s, len);
 	}
 	Sci_Position GetCurrentLowered(char *s, Sci_PositionU len) const noexcept {
-		return LexGetRangeLowered(styler.GetStartSegment(), currentPos - 1, styler, s, len);
+		return styler.GetRangeLowered(styler.GetStartSegment(), currentPos - 1, s, len);
 	}
 
 	int GetNextNSChar() const noexcept {

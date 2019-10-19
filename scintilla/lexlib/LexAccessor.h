@@ -117,6 +117,9 @@ public:
 		return true;
 	}
 	bool MatchIgnoreCase(Sci_Position pos, const char *s) noexcept;
+	Sci_PositionU GetRange(Sci_PositionU startPos_, Sci_PositionU endPos_, char *s, Sci_PositionU len) noexcept;
+	Sci_PositionU GetRangeLowered(Sci_PositionU startPos_, Sci_PositionU endPos_, char *s, Sci_PositionU len) noexcept;
+
 	unsigned char StyleAt(Sci_Position position) const noexcept {
 		return pAccess->StyleAt(position);
 	}
@@ -245,8 +248,6 @@ Sci_Position LexSkipWhiteSpace(Sci_Position startPos, Sci_Position endPos, LexAc
 bool IsLexSpaceToEOL(LexAccessor &styler, Sci_Position startPos) noexcept;
 bool IsLexEmptyLine(LexAccessor &styler, Sci_Position line) noexcept;
 
-Sci_PositionU LexGetRange(Sci_Position startPos, Sci_Position endPos, LexAccessor &styler, char *s, Sci_PositionU len) noexcept;
-Sci_PositionU LexGetRangeLowered(Sci_Position startPos, Sci_Position endPos, LexAccessor &styler, char *s, Sci_PositionU len) noexcept;
 Sci_PositionU LexGetRange(Sci_Position startPos, LexAccessor &styler, bool IsWordChar(int), char *s, Sci_PositionU len) noexcept;
 Sci_PositionU LexGetRangeLowered(Sci_Position startPos, LexAccessor &styler, bool IsWordChar(int), char *s, Sci_PositionU len) noexcept;
 Sci_PositionU LexGetRange(Sci_Position startPos, LexAccessor &styler, const CharacterSet &charSet, char *s, Sci_PositionU len) noexcept;
