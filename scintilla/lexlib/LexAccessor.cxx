@@ -30,7 +30,7 @@ bool LexAccessor::MatchIgnoreCase(Sci_Position pos, const char *s) noexcept {
 
 Sci_PositionU LexAccessor::GetRange(Sci_PositionU startPos_, Sci_PositionU endPos_, char *s, Sci_PositionU len) noexcept {
 	Sci_PositionU i = 0;
-	endPos_ = std::min(endPos_ + 1, startPos_ + len - 1);
+	endPos_ = std::min(endPos_, startPos_ + len - 1);
 	if (startPos_ >= static_cast<Sci_PositionU>(startPos) && endPos_ <= static_cast<Sci_PositionU>(endPos)) {
 		startPos_ -= startPos;
 		endPos_ -= startPos;
@@ -50,7 +50,7 @@ Sci_PositionU LexAccessor::GetRange(Sci_PositionU startPos_, Sci_PositionU endPo
 
 Sci_PositionU LexAccessor::GetRangeLowered(Sci_PositionU startPos_, Sci_PositionU endPos_, char *s, Sci_PositionU len) noexcept {
 	Sci_PositionU i = 0;
-	endPos_ = std::min(endPos_ + 1, startPos_ + len - 1);
+	endPos_ = std::min(endPos_, startPos_ + len - 1);
 	if (startPos_ >= static_cast<Sci_PositionU>(startPos) && endPos_ <= static_cast<Sci_PositionU>(endPos)) {
 		startPos_ -= startPos;
 		endPos_ -= startPos;

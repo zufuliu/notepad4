@@ -215,10 +215,10 @@ public:
 	}
 	bool MatchIgnoreCase(const char *s) const noexcept;
 	Sci_Position GetCurrent(char *s, Sci_PositionU len) const noexcept {
-		return styler.GetRange(styler.GetStartSegment(), currentPos - 1, s, len);
+		return styler.GetRange(styler.GetStartSegment(), currentPos, s, len);
 	}
 	Sci_Position GetCurrentLowered(char *s, Sci_PositionU len) const noexcept {
-		return styler.GetRangeLowered(styler.GetStartSegment(), currentPos - 1, s, len);
+		return styler.GetRangeLowered(styler.GetStartSegment(), currentPos, s, len);
 	}
 
 	int GetNextNSChar() const noexcept {
