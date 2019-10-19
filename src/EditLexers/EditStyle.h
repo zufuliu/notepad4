@@ -70,17 +70,22 @@
 //63441-63450 Tcl
 //63451-63460 Lua
 //63461-63470 Python
+#define NP2STYLE_Bytes				63461
+#define NP2STYLE_RawBytes			63462
 //63471-63480 Ruby
 //63481-63490 PowerShell
 //63491-63500 AutoIt3
 //63501-63510 Inno
+#define NP2STYLE_Parameter			63503
 //63511-63520 Ini
+#define NP2STYLE_Section			63511
 //63521-63530 Apache
 //63531-63540 Bash
 //63541-63550 Diff
 //63551-63560 Asm
 //63561-63570 PHP
 //63571-63580 LaTeX
+#define NP2STYLE_Option				63574
 //63581-63590 VHDL
 // Misc.
 #define NP2STYLE_DelimitedString	63591	// D

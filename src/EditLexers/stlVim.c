@@ -31,7 +31,7 @@ static EDITSTYLE Styles_VIM[] = {
 	{ SCE_VIM_OPERATOR, NP2STYLE_Operator, EDITSTYLE_HOLE(L"Operator"), L"fore:#B000B0" },
 	{ SCE_VIM_ENV_VARIABLE, NP2STYLE_Variable, EDITSTYLE_HOLE(L"Variable"), L"fore:#9E4D2A" },
 	{ SCE_VIM_REGISTER, NP2STYLE_Register, EDITSTYLE_HOLE(L"Register"), L"fore:#808000" },
-	{ SCE_VIM_OPTION, 63574, EDITSTYLE_HOLE(L"Option"), L"fore:#0C71C3" },
+	{ SCE_VIM_OPTION, NP2STYLE_Option, EDITSTYLE_HOLE(L"Option"), L"fore:#0C71C3" },
 };
 
 EDITLEXER lexVim = {
