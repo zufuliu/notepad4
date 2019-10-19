@@ -304,7 +304,7 @@ static void ClassifyPascalWordFoldPoint(int &levelCurrent, int &lineFoldStateCur
 	const CharacterSet setWordStart(CharacterSet::setAlpha, "_");
 	const CharacterSet setWord(CharacterSet::setAlphaNum, "_");
 
-	styler.GetRangeLowered(lastStart, currentPos, s, sizeof(s));
+	styler.GetRangeLowered(lastStart, currentPos + 1, s, sizeof(s));
 
 	if (strcmp(s, "record") == 0) {
 		lineFoldStateCurrent |= stateFoldInRecord;
