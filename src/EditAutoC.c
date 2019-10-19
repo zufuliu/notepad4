@@ -972,9 +972,9 @@ void AutoC_AddKeyword(struct WordList *pWList, int iCurrentStyle) {
 #define AutoC_AddSpecWord_Keyword	2
 INT AutoC_AddSpecWord(struct WordList *pWList, int iCurrentStyle, int ch, int chPrev) {
 	if (pLexCurrent->iLexer == SCLEX_CPP && IsCppCommentStyle(iCurrentStyle) && np2_LexKeyword) {
-		if ((ch == '@' && (*np2_LexKeyword == kwJavaDoc || *np2_LexKeyword == kwPHPDoc || *np2_LexKeyword == kwDoxyDoc))
-				|| (ch == '\\' && *np2_LexKeyword == kwDoxyDoc)
-				|| ((ch == '<' || chPrev == '<') && *np2_LexKeyword == kwNETDoc)) {
+		if ((ch == '@' && (np2_LexKeyword == &kwJavaDoc || np2_LexKeyword == &kwPHPDoc || np2_LexKeyword == &kwDoxyDoc))
+				|| (ch == '\\' && np2_LexKeyword == &kwDoxyDoc)
+				|| ((ch == '<' || chPrev == '<') && np2_LexKeyword == &kwNETDoc)) {
 			WordList_AddList(pWList, (*np2_LexKeyword)[0]);
 			WordList_AddList(pWList, (*np2_LexKeyword)[1]);
 			WordList_AddList(pWList, (*np2_LexKeyword)[2]);

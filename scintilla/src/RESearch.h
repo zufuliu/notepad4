@@ -52,13 +52,9 @@ private:
 	// The following enums are not meant to be changeable.
 	// They are for readability only.
 	enum {
-		MAXCHR = 256
-	};
-	enum {
-		CHRBIT = 8
-	};
-	enum {
-		BITBLK = MAXCHR / CHRBIT
+		MAXCHR = 256,
+		CHRBIT = 8,
+		BITBLK = MAXCHR / CHRBIT,
 	};
 
 	void ChSet(unsigned char c) noexcept;
