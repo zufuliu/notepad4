@@ -8,7 +8,7 @@ static KEYWORDLIST Keywords_HTML = {{
 "data dd del details dfn dialog div dl dt em embed fieldset figcaption figure footer "
 "form h1 h2 h3 h4 h5 h6 head header hgroup hr html i iframe img input ins kbd "
 "keygen label legend li link main map mark meta meter nav noscript object ol "
-"optgroup option output p param picture pre progress q rb rp rt rtc ruby s samp script section "
+"optgroup option output p param picture pre progress q rp rt ruby s samp script section "
 "select slot small source span strong style sub summary sup table tbody td template textarea "
 "tfoot th thead time title tr track u ul var video wbr "
 "math svg "
@@ -18,7 +18,7 @@ static KEYWORDLIST Keywords_HTML = {{
 
 // Obsolete Elements
 "applet acronym bgsound basefont big blink center dir font frame frameset isindex listing "
-"marquee menu menuitem multicol nobr noembed noframes plaintext spacer strike tt xmp "
+"marquee menu menuitem multicol nextid nobr noembed noframes plaintext rb rtc spacer strike tt xmp "
 
 , // 1 JavaScript
 "async await break case catch class const continue debugger default delete do else export extends finally for function if import in "
@@ -61,12 +61,12 @@ NULL
 
 , // 6 Attribute
 // Attribute
-"abbr accept accept-charset accesskey action allow allowfullscreen allowpaymentrequest alt async autocapitalize autocomplete autofocus autoplay "
+"abbr accept accept-charset accesskey action allow allowfullscreen allowpaymentrequest alt as async autocapitalize autocomplete autofocus autoplay "
 "border challenge charset checked cite class cols colspan command content "
 "contenteditable contextmenu controls coords crossorigin data datetime decoding default "
 "defer dir dirname disabled download draggable dropzone enctype enterkeyhint for form formaction "
 "formenctype formmethod formnovalidate formtarget headers height hidden inputmode high href hreflang "
-"http-equiv icon id integrity is ismap itemid itemprop itemref itemscope itemtype "
+"http-equiv icon id imagesrcset imagesizes integrity is ismap itemid itemprop itemref itemscope itemtype "
 "keytype kind label lang list longdesc loop low nonce minlength manifest max "
 "maxlength media mediagroup method min multiple muted name nomodule novalidate open "
 "optimum pattern placeholder playsinline poster preload radiogroup readonly referrerpolicy rel required "
@@ -99,7 +99,7 @@ NULL
 "onfocus onformdata onhashchange oninput oninvalid onkeydown onkeypress onkeyup onlanguagechange onload onloadeddata "
 "onloadedmetadata onloadend onloadstart onmousedown onmouseenter onmouseleave onmousemove onmouseout onmouseover "
 "onmouseup onmousewheel onwheel onoffline ononline onpagehide onpageshow onpause onplay onplaying onprogress onpaste onratechange onrejectionhandled onremovetrack onreset "
-"onscroll onsecuritypolicyviolation onseeked onseeking onselect onshow onstalled onstorage onsubmit onsuspend "
+"onscroll onsecuritypolicyviolation onseeked onseeking onselect onslotchange onshow onstalled onstorage onsubmit onsuspend "
 "ontimeupdate ontoggle onvolumechange onunhandledrejection onunload onwaiting "
 
 , // 7 Value

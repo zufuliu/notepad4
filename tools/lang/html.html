@@ -1,16 +1,15 @@
 <!--
-HTML 5.2 https://www.w3.org/TR/html5/ 2017-12-14
-https://whatwg.org/ 2019-06-28
-https://www.w3.org/TR/html5-diff/
-https://www.w3.org/TR/html4/
-https://www.w3.org/TR/xhtml2/
+https://whatwg.org/ 2019-08-19
+HTML 4.01 https://www.w3.org/TR/html4/ 1999-12-24
+XHTML 2.0 https://www.w3.org/TR/xhtml2/ 2010-12-16
 -->
 <!DOCTYPE html>
-<!-- Global attributes https://www.w3.org/TR/html5/dom.html#global-attributes -->
+<!-- Global https://html.spec.whatwg.org/multipage/dom.html#global-attributes -->
 <html
 	accesskey
 	class
 	autocapitalize="off none on sentences words characters"
+	autofocus
 	contenteditable
 	dir="ltr rtl auto"
 	draggable
@@ -19,7 +18,13 @@ https://www.w3.org/TR/xhtml2/
 	inputmode="none text tel url email numeric decimal search"
 	id
 	is
+	itemid
+	itemprop
+	itemref
+	itemscope
+	itemtype
 	lang="en"
+	manifest
 	nonce
 	spellcheck
 	style
@@ -28,27 +33,28 @@ https://www.w3.org/TR/xhtml2/
 	translate="yes no"
 >
 	<head>
-		<!-- https://www.w3.org/TR/html5/document-metadata.html -->
+		<title>HTML5</title>
+		<!-- https://html.spec.whatwg.org/multipage/semantics.html -->
 		<base href target>
-		<!-- Link types https://www.w3.org/TR/html5/links.html
+		<!-- Link types https://html.spec.whatwg.org/multipage/links.html#linkTypes
 		alternate canonical author bookmark dns-prefetch external help icon modulepreload license next nofollow noopener noreferrer opener
 		pingback preconnect prefetch preload prerender prev search stylesheet tag
 		-->
 		<link href
 			crossorigin="anonymous use-credentials"
-			rel="alternate author help icon license next prev search stylesheet"
-			rev media hreflang  type="text/plain text/css"
-			referrerpolicy="no-referrer no-referrer-when-downgrade unsafe-url origin-when-cross-origin" sizes>
-		<!-- Standard metadata names https://www.w3.org/TR/html5/document-metadata.html#standard-metadata-names
+			rel="alternate author dns-prefetch help icon license modulepreload next pingback preconnect prefetch preload prerender prev search stylesheet"
+			media integrity hreflang type="text/plain text/css"
+			referrerpolicy="no-referrer no-referrer-when-downgrade unsafe-url origin-when-cross-origin"
+			sizes imagesrcset imagesizes as color>
+		<!-- Standard metadata names https://html.spec.whatwg.org/multipage/semantics.html#document-metadata#standard-metadata-names
 		application-name author description generator keywords
 		referrer[never default always origin-when-crossorigin]
 		theme-color
 		-->
 		<meta name http-equiv="content-language content-type default-style refresh set-cookie x-ua-compatible content-security-policy" content charset="utf-8">
 		<style media type="text/css"></style>
-		<title>HTML5</title>
 	</head>
-	<!-- event handler content attributes https://www.w3.org/TR/html5/dom.html#global-attributes -->
+	<!-- event handler content attributes https://html.spec.whatwg.org/multipage/dom.html#global-attributes -->
 	<body
 		onabort
 		onauxclick
@@ -109,6 +115,7 @@ https://www.w3.org/TR/xhtml2/
 		onseeked
 		onseeking
 		onselect
+		onslotchange
 		onshow
 		onstalled
 		onsubmit
@@ -135,7 +142,7 @@ https://www.w3.org/TR/xhtml2/
 		onunhandledrejection
 		onunload
 	>
-		<!-- Sections https://www.w3.org/TR/html5/sections.html -->
+		<!-- Sections https://html.spec.whatwg.org/multipage/sections.html -->
 		<article></article>
 		<section></section>
 		<nav></nav>
@@ -151,7 +158,7 @@ https://www.w3.org/TR/xhtml2/
 		<header></header>
 		<footer></footer>
 		<address></address>
-		<!-- Grouping content https://www.w3.org/TR/html5/grouping-content.html -->
+		<!-- Grouping content https://html.spec.whatwg.org/multipage/grouping-content.html -->
 		<p></p>
 		<hr>
 		<pre></pre>
@@ -167,7 +174,7 @@ https://www.w3.org/TR/xhtml2/
 		<figcaption></figcaption>
 		<main></main>
 		<div></div>
-		<!-- Text-level semantics https://www.w3.org/TR/html5/textlevel-semantics.html -->
+		<!-- Text-level semantics https://html.spec.whatwg.org/multipage/text-level-semantics.html -->
 		<a href="about:, blob:, data:, http:, https:, mailto:, sms:, urn:, tel:"
 		target="_blank _self _parent _top" download ping
 		rel="alternate author bookmark external help license next nofollow noopener noreferrer prev search tag"
@@ -181,9 +188,7 @@ https://www.w3.org/TR/xhtml2/
 		<dfn></dfn>
 		<abbr></abbr>
 		<ruby></ruby>
-		<rb></rb>
 		<rt></rt>
-		<rtc></rtc>
 		<rp></rp>
 		<data value></data>
 		<time datetime></time>
@@ -202,29 +207,33 @@ https://www.w3.org/TR/xhtml2/
 		<span></span>
 		<br>
 		<wbr>
-		<!-- Edits https://www.w3.org/TR/html5/edits.html -->
+		<!-- Edits https://html.spec.whatwg.org/multipage/edits.html -->
 		<ins cite datetime></ins>
 		<del cite datetime></del>
-		<!-- Embedded content https://www.w3.org/TR/html5/semantics-embedded-content.html -->
+		<!-- Embedded content https://html.spec.whatwg.org/multipage/embedded-content.html -->
 		<picture></picture>
 		<source src type srcset sizes media>
 		<img alt src srcset sizes crossorigin usemap ismap width height referrerpolicy decoding>
+		<!-- https://html.spec.whatwg.org/multipage/iframe-embed-object.html -->
 		<iframe src srcdoc name sandbox allow allowfullscreen allowpaymentrequest width height referrerpolicy></iframe>
 		<embed src type width height>
 		<object data type typemustmatch name usemap form width height></object>
 		<param name value>
+		<!-- https://html.spec.whatwg.org/multipage/media.html -->
 		<video src crossorigin poster preload="none metadata auto" autoplay playsinline loop muted controls width height></video>
 		<audio src crossorigin preload autoplay loop muted controls></audio>
 		<track kind="subtitles captions descriptions chapters metadata" src srclang label default
-
+		onchange
 		onaddtrack
 		onremovetrack
+		oncuechange
 		onenter
 		onexit
 		>
+		<!-- https://html.spec.whatwg.org/multipage/image-maps.html -->
 		<map name></map>
 		<area alt coords href download hreflang ping rel shape="circle circ default poly polygon rect rectangle" target type referrerpolicy>
-		<!-- Tabular data https://www.w3.org/TR/html5/tabular-data.html -->
+		<!-- Tabular data https://html.spec.whatwg.org/multipage/tables.html -->
 		<table border>
 			<caption></caption>
 			<colgroup span>
@@ -238,23 +247,25 @@ https://www.w3.org/TR/xhtml2/
 			</tbody>
 			<tfoot></tfoot>
 		</table>
-		<!-- Forms https://www.w3.org/TR/html5/sec-forms.html -->
+		<!-- https://html.spec.whatwg.org/multipage/forms.html -->
 		<form accept-charset action autocomplete
 			enctype="application/x-www-form-urlencoded multipart/form-data text/plain" method name novalidate target rel>
 			<label for></label>
+			<!-- https://html.spec.whatwg.org/multipage/input.html#the-input-element -->
 			<input accept="audio/* video/* image/*"
-				alt autocomplete autofocus checked dirname disabled form formaction formenctype formmethod formnovalidate formtarget
+				alt autocomplete checked dirname disabled form formaction formenctype formmethod formnovalidate formtarget
 				height list max maxlength min minlength multiple name pattern placeholder readonly required size src step
 				type="hidden text search tel url email password date month week time datetime-local number range color checkbox radio file submit image reset button"
 				value width>
-			<button autofocus disabled form formaction formenctype formmethod formnovalidate formtarget name type="submit reset button" value></button>
-			<select autocomplete autofocus disabled form multiple name required size>
+			<!-- https://html.spec.whatwg.org/multipage/form-elements.html#the-button-element -->
+			<button disabled form formaction formenctype formmethod formnovalidate formtarget name type="submit reset button" value></button>
+			<select autocomplete disabled form multiple name required size>
 				<optgroup disabled label>
 					<option disabled label selected value></option>
 				</optgroup>
 			</select>
 			<datalist></datalist>
-			<textarea autocomplete autofocus cols dirname disabled form maxlength minlength name placeholder readonly required rows wrap></textarea>
+			<textarea autocomplete cols dirname disabled form maxlength minlength name placeholder readonly required rows wrap></textarea>
 			<output for form name></output>
 			<progress value max></progress>
 			<meter value min max low high optimum></meter>
@@ -262,21 +273,22 @@ https://www.w3.org/TR/xhtml2/
 				<legend></legend>
 			</fieldset>
 		</form>
-		<!-- Interactive elements https://www.w3.org/TR/html5/interactive-elements.html -->
+		<!-- Interactive elements https://html.spec.whatwg.org/multipage/interactive-elements.html -->
 		<details open></details>
 		<summary></summary>
 		<dialog open></dialog>
-		<!-- Scripting https://www.w3.org/TR/html5/semantics-scripting.html -->
+		<!-- Scripting https://html.spec.whatwg.org/multipage/scripting.html -->
 		<script src type="text/javascript text/ecmascript text/jscript text/livescript module text/plain text/xml application/octet-stream application/xml"
 			charset nomodule async defer crossorigin integrity referrerpolicy></script>
 		<noscript></noscript>
 		<template></template>
 		<slot name></slot>
+		<!-- https://html.spec.whatwg.org/multipage/canvas.html -->
 		<canvas width height></canvas>
-		<!-- Microdata https://html.spec.whatwg.org/multipage/microdata.html#microdata -->
+		<!-- Microdata https://html.spec.whatwg.org/multipage/microdata.html -->
 		<div itemid itemprop itemref itemscope itemtype></div>
-		<!-- Obsolete features https://www.w3.org/TR/html5/obsolete.html -->
-		<!-- Obsolete Elements https://www.w3.org/TR/html5-diff/ -->
+		<!-- Obsolete features https://html.spec.whatwg.org/multipage/obsolete.html -->
+		<!-- Obsolete Elements https://html.spec.whatwg.org/multipage/obsolete.html#non-conforming-features -->
 		<applet datafld datasrc></applet>
 		<acronym></acronym>
 		<bgsound></bgsound>
@@ -289,15 +301,19 @@ https://www.w3.org/TR/xhtml2/
 		<frame>
 		<frameset></frameset>
 		<isindex>
+		<keygen>
 		<listing></listing>
 		<marquee bgcolor datafld dataformatas datasrc height hspace vspace width></marquee>
 		<menu compact></menu>
 		<menuitem></menuitem>
 		<multicol></multicol>
+		<nextid></nextid>
 		<nobr></nobr>
 		<noembed></noembed>
 		<noframes></noframes>
 		<plaintext></plaintext>
+		<rb></rb>
+		<rtc></rtc>
 		<spacer></spacer>
 		<strike></strike>
 		<tt></tt>
