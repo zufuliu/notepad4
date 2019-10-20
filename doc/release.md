@@ -11,6 +11,7 @@ Tips: To keep your current settings, do NOT replace *Notepad2.ini* or *metapath.
 ## File List
 | File | SHA-256 |
 | ---|--|
+| [ARM_v4.19.?.zip](https://www.virustotal.com/gui/url/?/detection) | ? |
 | [ARM64_v4.19.?.zip](https://www.virustotal.com/gui/url/?/detection) | ? |
 | [AVX2_v4.19.?.zip](https://www.virustotal.com/gui/url/?/detection) | ? |
 | [Win32_v4.19.?.zip](https://www.virustotal.com/gui/url/?/detection) | ? |
