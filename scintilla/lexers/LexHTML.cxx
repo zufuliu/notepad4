@@ -35,12 +35,8 @@ namespace {
 enum script_type { eScriptNone = 0, eScriptJS, eScriptVBS, eScriptPython, eScriptPHP, eScriptXML, eScriptSGML, eScriptSGMLblock, eScriptComment };
 enum script_mode { eHtml = 0, eNonHtmlScript, eNonHtmlPreProc, eNonHtmlScriptPreProc };
 
-void GetTextSegment(Accessor &styler, Sci_PositionU start, Sci_PositionU end, char *s, size_t len) noexcept {
-	Sci_PositionU i = 0;
-	for (; (i < end - start + 1) && (i < len - 1); i++) {
-		s[i] = MakeLowerCase(styler[start + i]);
-	}
-	s[i] = '\0';
+inline void GetTextSegment(Accessor &styler, Sci_PositionU start, Sci_PositionU end, char *s, size_t len) noexcept {
+	styler.GetRangeLowered(start, end + 1, s, len);
 }
 
 const char *GetNextWord(Accessor &styler, Sci_PositionU start, char *s, size_t sLen) noexcept {
