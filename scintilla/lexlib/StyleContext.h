@@ -213,11 +213,11 @@ public:
 		return true;
 	}
 	bool MatchIgnoreCase(const char *s) const noexcept;
-	Sci_Position GetCurrent(char *s, Sci_PositionU len) const noexcept {
-		return styler.GetRange(styler.GetStartSegment(), currentPos, s, len);
+	void GetCurrent(char *s, Sci_PositionU len) const noexcept {
+		styler.GetRange(styler.GetStartSegment(), currentPos, s, len);
 	}
-	Sci_Position GetCurrentLowered(char *s, Sci_PositionU len) const noexcept {
-		return styler.GetRangeLowered(styler.GetStartSegment(), currentPos, s, len);
+	void GetCurrentLowered(char *s, Sci_PositionU len) const noexcept {
+		styler.GetRangeLowered(styler.GetStartSegment(), currentPos, s, len);
 	}
 
 	int GetNextNSChar() const noexcept {

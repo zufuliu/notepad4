@@ -27,9 +27,8 @@ bool LexAccessor::MatchIgnoreCase(Sci_Position pos, const char *s) noexcept {
 	return true;
 }
 
-Sci_PositionU LexAccessor::GetRange(Sci_PositionU startPos_, Sci_PositionU endPos_, char *s, Sci_PositionU len) noexcept {
+void LexAccessor::GetRange(Sci_PositionU startPos_, Sci_PositionU endPos_, char *s, Sci_PositionU len) noexcept {
 	endPos_ = std::min(endPos_, startPos_ + len - 1);
-	len = endPos_ - startPos_;
 	if (startPos_ >= static_cast<Sci_PositionU>(startPos) && endPos_ <= static_cast<Sci_PositionU>(endPos)) {
 		const char *p = buf + startPos_ - startPos;
 		const char * const t = buf + endPos_ - startPos;
@@ -37,18 +36,15 @@ Sci_PositionU LexAccessor::GetRange(Sci_PositionU startPos_, Sci_PositionU endPo
 			*s++ = *p++;
 		}
 	} else {
-		endPos_ = std::min<Sci_PositionU>(endPos_, lenDoc);
 		for (; startPos_ < endPos_; startPos_++) {
 			*s++ = (*this)[startPos_];
 		}
 	}
 	*s = '\0';
-	return len;
 }
 
-Sci_PositionU LexAccessor::GetRangeLowered(Sci_PositionU startPos_, Sci_PositionU endPos_, char *s, Sci_PositionU len) noexcept {
+void LexAccessor::GetRangeLowered(Sci_PositionU startPos_, Sci_PositionU endPos_, char *s, Sci_PositionU len) noexcept {
 	endPos_ = std::min(endPos_, startPos_ + len - 1);
-	len = endPos_ - startPos_;
 	if (startPos_ >= static_cast<Sci_PositionU>(startPos) && endPos_ <= static_cast<Sci_PositionU>(endPos)) {
 		const char *p = buf + startPos_ - startPos;
 		const char * const t = buf + endPos_ - startPos;
@@ -56,13 +52,11 @@ Sci_PositionU LexAccessor::GetRangeLowered(Sci_PositionU startPos_, Sci_Position
 			*s++ = MakeLowerCase(*p++);
 		}
 	} else {
-		endPos_ = std::min<Sci_PositionU>(endPos_, lenDoc);
 		for (; startPos_ < endPos_; startPos_++) {
 			*s++ = MakeLowerCase((*this)[startPos_]);
 		}
 	}
 	*s = '\0';
-	return len;
 }
 
 Sci_Position LexLineSkipSpaceTab(Sci_Position line, LexAccessor &styler) noexcept {
