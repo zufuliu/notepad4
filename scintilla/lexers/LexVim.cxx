@@ -78,9 +78,9 @@ void ColouriseVimDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 		case SCE_VIM_IDENTIFIER:
 			if (!IsIdentifierChar(sc.ch)) {
 				char s[128];
-				const Sci_Position len = sc.GetCurrent(s, sizeof(s));
+				sc.GetCurrent(s, sizeof(s));
 				if (keywordLists[0]->InList(s)) {
-					if (!lineStateLineAutoCommand && visibleChars == len) {
+					if (!lineStateLineAutoCommand && visibleChars == sc.LengthCurrent()) {
 						sc.ChangeState(SCE_VIM_WORD);
 						lineStateLineAutoCommand = strcmp(s, "au") == 0 || strcmp(s, "autocmd") == 0;
 					} else {

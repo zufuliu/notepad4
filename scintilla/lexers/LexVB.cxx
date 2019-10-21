@@ -106,7 +106,8 @@ static void ColouriseVBDoc(Sci_PositionU startPos, Sci_Position length, int init
 					sc.Forward();
 				}
 				char s[128];
-				Sci_Position len = sc.GetCurrentLowered(s, sizeof(s));
+				sc.GetCurrentLowered(s, sizeof(s));
+				const Sci_Position len = sc.LengthCurrent();
 				if (skipType) {
 					s[len - 1] = '\0';
 				}
