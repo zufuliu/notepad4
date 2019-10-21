@@ -37,8 +37,9 @@ Sci_PositionU LexAccessor::GetRange(Sci_PositionU startPos_, Sci_PositionU endPo
 			*s++ = *p++;
 		}
 	} else {
+		endPos_ = std::min<Sci_PositionU>(endPos_, lenDoc);
 		for (; startPos_ < endPos_; startPos_++) {
-			*s++ = SafeGetCharAt(startPos_);
+			*s++ = (*this)[startPos_];
 		}
 	}
 	*s = '\0';
@@ -55,8 +56,9 @@ Sci_PositionU LexAccessor::GetRangeLowered(Sci_PositionU startPos_, Sci_Position
 			*s++ = MakeLowerCase(*p++);
 		}
 	} else {
+		endPos_ = std::min<Sci_PositionU>(endPos_, lenDoc);
 		for (; startPos_ < endPos_; startPos_++) {
-			*s++ = MakeLowerCase(SafeGetCharAt(startPos_));
+			*s++ = MakeLowerCase((*this)[startPos_]);
 		}
 	}
 	*s = '\0';
