@@ -329,6 +329,7 @@ void FoldCmakeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle,
 	int levelNext = levelCurrent;
 	int lineCommentCurrent = styler.GetLineState(lineCurrent) & CMakeLineStateMaskLineComment;
 	Sci_PositionU lineStartNext = styler.LineStart(lineCurrent + 1);
+	Sci_PositionU lineEndPos = ((lineStartNext < endPos) ? lineStartNext : endPos) -1;
 
 	char chNext = styler[startPos];
 	int styleNext = styler.StyleAt(startPos);
@@ -373,7 +374,7 @@ void FoldCmakeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle,
 			}
 		}
 
-		if ((i == lineStartNext - 1) || (i == endPos - 1)) {
+		if (i == lineEndPos) {
 			const int lineCommentNext = styler.GetLineState(lineCurrent + 1) & CMakeLineStateMaskLineComment;
 			if (foldComment && lineCommentCurrent) {
 				if (!lineCommentPrev && lineCommentNext) {
@@ -393,6 +394,7 @@ void FoldCmakeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle,
 			}
 			lineCurrent++;
 			lineStartNext = styler.LineStart(lineCurrent + 1);
+			lineEndPos = ((lineStartNext < endPos) ? lineStartNext : endPos) -1;
 			levelCurrent = levelNext;
 			lineCommentPrev = lineCommentCurrent;
 			lineCommentCurrent = lineCommentNext;

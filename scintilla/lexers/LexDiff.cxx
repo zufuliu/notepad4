@@ -9,8 +9,6 @@
 #include <cstring>
 #include <cassert>
 
-#include <algorithm>
-
 #include "ILexer.h"
 #include "Scintilla.h"
 #include "SciLexer.h"
