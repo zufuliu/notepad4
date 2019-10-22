@@ -24,6 +24,8 @@
 
 using namespace Scintilla;
 
+#if 0
+// styles for Null language are already zeros in CellBuffer::BasicInsertString().
 static void ColouriseNullDoc(Sci_PositionU startPos, Sci_Position length, int, LexerWordList, Accessor &styler) {
 	// Null language means all style bytes are 0 so just mark the end - no need to fill in.
 	if (length > 0) {
@@ -32,6 +34,7 @@ static void ColouriseNullDoc(Sci_PositionU startPos, Sci_Position length, int, L
 		styler.ColourTo(startPos + length - 1, 0);
 	}
 }
+#endif
 
 // code folding based on Python
 static void FoldNullDoc(Sci_PositionU startPos, Sci_Position length, int /* initStyle */, LexerWordList, Accessor &styler) {
@@ -123,4 +126,4 @@ static void FoldNullDoc(Sci_PositionU startPos, Sci_Position length, int /* init
 	//styler.SetLevel(lineCurrent, indentCurrent);
 }
 
-LexerModule lmNull(SCLEX_NULL, ColouriseNullDoc, "null", FoldNullDoc);
+LexerModule lmNull(SCLEX_NULL, nullptr, "null", FoldNullDoc);
