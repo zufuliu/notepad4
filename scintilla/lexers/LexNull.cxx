@@ -36,8 +36,8 @@ static void ColouriseNullDoc(Sci_PositionU startPos, Sci_Position length, int, L
 // code folding based on Python
 static void FoldNullDoc(Sci_PositionU startPos, Sci_Position length, int /* initStyle */, LexerWordList, Accessor &styler) {
 	const Sci_Position maxPos = startPos + length;
-	const Sci_Position maxLines = (maxPos == styler.Length()) ? styler.GetLine(maxPos) : styler.GetLine(maxPos - 1);	// Requested last line
 	const Sci_Position docLines = styler.GetLine(styler.Length());	// Available last line
+	const Sci_Position maxLines = (maxPos == styler.Length()) ? docLines : styler.GetLine(maxPos - 1);	// Requested last line
 
 	const bool foldCompact = styler.GetPropertyInt("fold.compact") != 0;
 
@@ -58,7 +58,7 @@ static void FoldNullDoc(Sci_PositionU startPos, Sci_Position length, int /* init
 	// Process all characters to end of requested range
 	// Cap processing in all cases
 	// to end of document (in case of unclosed quote at end).
-	while ((lineCurrent <= docLines) && ((lineCurrent <= maxLines))) {
+	while (lineCurrent <= maxLines) {
 		// Gather info
 		int lev = indentCurrent;
 		Sci_Position lineNext = lineCurrent + 1;
