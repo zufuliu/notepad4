@@ -112,55 +112,57 @@ int ColouriseDiffLine(const char *lineBuffer) noexcept {
 	return SCE_DIFF_DEFAULT;
 }
 
-void ColouriseDiffDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int, LexerWordList, Accessor &styler) {
+void ColouriseDiffDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList, Accessor &styler) {
 	const bool fold = styler.GetPropertyInt("fold", 1) != 0;
 
 	styler.StartAt(startPos);
 	styler.StartSegment(startPos);
-	const Sci_PositionU endPos = startPos + lengthDoc;
+	const Sci_Position endPos = startPos + lengthDoc;
+	const Sci_Position maxLines = (endPos == styler.Length()) ? styler.GetLine(endPos) : styler.GetLine(endPos - 1);	// Requested last line
 
 	Sci_Position lineCurrent = styler.GetLine(startPos);
 	int prevLevel = (lineCurrent > 0) ? styler.LevelAt(lineCurrent - 1) : SC_FOLDLEVELBASE;
 
 	Sci_PositionU lineStartCurrent = styler.LineStart(lineCurrent);
 	Sci_PositionU lineStartNext = styler.LineStart(lineCurrent + 1);
-	Sci_PositionU lineEndPos = std::min(lineStartNext, endPos) - 1;
 
-	for (Sci_PositionU i = startPos; i < endPos; i++) {
-		if (i == lineEndPos) {
-			char lineBuffer[DIFF_BUFFER_START_SIZE];
-			styler.GetRange(lineStartCurrent, i + 1, lineBuffer, sizeof(lineBuffer));
-			const int lineType = ColouriseDiffLine(lineBuffer);
-			styler.ColourTo(i, lineType);
+	while (lineCurrent <= maxLines) {
+		char lineBuffer[DIFF_BUFFER_START_SIZE];
+		styler.GetRange(lineStartCurrent, lineStartNext, lineBuffer, sizeof(lineBuffer));
+		const int lineType = ColouriseDiffLine(lineBuffer);
+		if (initStyle != lineType) {
+			styler.ColourTo(lineStartCurrent - 1, initStyle);
+			initStyle = lineType;
+		}
 
-			if (fold) {
-				int nextLevel;
-				if (lineType == SCE_DIFF_COMMAND) {
-					nextLevel = SC_FOLDLEVELBASE | SC_FOLDLEVELHEADERFLAG;
-				} else if (lineType == SCE_DIFF_HEADER) {
-					nextLevel = (SC_FOLDLEVELBASE + 1) | SC_FOLDLEVELHEADERFLAG;
-				} else if (lineType == SCE_DIFF_POSITION && lineBuffer[0] != '-') {
-					nextLevel = (SC_FOLDLEVELBASE + 2) | SC_FOLDLEVELHEADERFLAG;
-				} else if (prevLevel & SC_FOLDLEVELHEADERFLAG) {
-					nextLevel = (prevLevel & SC_FOLDLEVELNUMBERMASK) + 1;
-				} else {
-					nextLevel = prevLevel;
-				}
-
-				if ((nextLevel & SC_FOLDLEVELHEADERFLAG) && (nextLevel == prevLevel)) {
-					styler.SetLevel(lineCurrent - 1, prevLevel & ~SC_FOLDLEVELHEADERFLAG);
-				}
-
-				styler.SetLevel(lineCurrent, nextLevel);
-				prevLevel = nextLevel;
+		if (fold) {
+			int nextLevel;
+			if (lineType == SCE_DIFF_COMMAND) {
+				nextLevel = SC_FOLDLEVELBASE | SC_FOLDLEVELHEADERFLAG;
+			} else if (lineType == SCE_DIFF_HEADER) {
+				nextLevel = (SC_FOLDLEVELBASE + 1) | SC_FOLDLEVELHEADERFLAG;
+			} else if (lineType == SCE_DIFF_POSITION && lineBuffer[0] != '-') {
+				nextLevel = (SC_FOLDLEVELBASE + 2) | SC_FOLDLEVELHEADERFLAG;
+			} else if (prevLevel & SC_FOLDLEVELHEADERFLAG) {
+				nextLevel = (prevLevel & SC_FOLDLEVELNUMBERMASK) + 1;
+			} else {
+				nextLevel = prevLevel;
 			}
 
-			lineStartCurrent = lineStartNext;
-			lineCurrent++;
-			lineStartNext = styler.LineStart(lineCurrent + 1);
-			lineEndPos = std::min(lineStartNext, endPos) - 1;
+			if ((nextLevel & SC_FOLDLEVELHEADERFLAG) && (nextLevel == prevLevel)) {
+				styler.SetLevel(lineCurrent - 1, prevLevel & ~SC_FOLDLEVELHEADERFLAG);
+			}
+
+			styler.SetLevel(lineCurrent, nextLevel);
+			prevLevel = nextLevel;
 		}
+
+		lineStartCurrent = lineStartNext;
+		lineCurrent++;
+		lineStartNext = styler.LineStart(lineCurrent + 1);
 	}
+
+	styler.ColourTo(endPos - 1, initStyle);
 }
 
 }
