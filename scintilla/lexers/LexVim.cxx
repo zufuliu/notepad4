@@ -238,6 +238,7 @@ void FoldVimDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initStyle*
 	int levelNext = levelCurrent;
 	FoldLineState foldCurrent(styler.GetLineState(lineCurrent));
 	Sci_PositionU lineStartNext = styler.LineStart(lineCurrent + 1);
+	Sci_PositionU lineEndPos = ((lineStartNext < endPos) ? lineStartNext : endPos) -1;
 
 	int styleNext = styler.StyleAt(startPos);
 
@@ -265,7 +266,7 @@ void FoldVimDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initStyle*
 			}
 		}
 
-		if ((i == lineStartNext - 1) || (i == endPos - 1)) {
+		if (i == lineEndPos) {
 			const FoldLineState foldNext(styler.GetLineState(lineCurrent + 1));
 			if (foldComment && foldCurrent.lineComment) {
 				if (!foldPrev.lineComment && foldNext.lineComment) {
@@ -291,6 +292,7 @@ void FoldVimDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initStyle*
 			}
 			lineCurrent++;
 			lineStartNext = styler.LineStart(lineCurrent + 1);
+			lineEndPos = ((lineStartNext < endPos) ? lineStartNext : endPos) -1;
 			levelCurrent = levelNext;
 			foldPrev = foldCurrent;
 			foldCurrent = foldNext;

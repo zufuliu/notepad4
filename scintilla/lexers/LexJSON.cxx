@@ -41,14 +41,14 @@ enum {
 	JsonChar_ID = 0x20,
 };
 
-void ColouriseJSONDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
+void ColouriseJSONDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList keywordLists, Accessor &styler) {
 	const bool fold = styler.GetPropertyInt("fold", 1) != 0;
 
 	int state = initStyle;
 	unsigned char chNext = styler[startPos];
 	styler.StartAt(startPos);
 	styler.StartSegment(startPos);
-	const Sci_PositionU endPos = startPos + length;
+	const Sci_PositionU endPos = startPos + lengthDoc;
 
 	Sci_Position lineCurrent = styler.GetLine(startPos);
 	int levelCurrent = SC_FOLDLEVELBASE;
@@ -62,6 +62,7 @@ void ColouriseJSONDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 	bool lineContinue = false;
 	bool atLineStart = startPos == static_cast<Sci_PositionU>(styler.LineStart(lineCurrent));
 	Sci_PositionU lineStartNext = styler.LineStart(lineCurrent + 1);
+	Sci_PositionU lineEndPos = ((lineStartNext < endPos) ? lineStartNext : endPos) -1;
 
 	// scripts/GenerateCharTable.py
 	static const unsigned char kJsonCharClass[256] = {
@@ -125,7 +126,7 @@ void ColouriseJSONDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 			break;
 		case SCE_C_STRING:
 		case SCE_C_CHARACTER:
-			if (i == lineStartNext - 1) { // atLineEnd
+			if (i == lineEndPos) { // atLineEnd
 				if (lineContinue) {
 					lineContinue = false;
 				} else {
@@ -248,7 +249,7 @@ void ColouriseJSONDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 			chNext = styler.SafeGetCharAt(i + 1);
 		}
 
-		atLineStart = i == lineStartNext - 1 || i == endPos - 1;
+		atLineStart = i == lineEndPos;
 		if (atLineStart) {
 			if (fold) {
 				const int levelUse = levelCurrent;
@@ -263,6 +264,7 @@ void ColouriseJSONDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 			}
 			lineCurrent++;
 			lineStartNext = styler.LineStart(lineCurrent + 1);
+			lineEndPos = ((lineStartNext < endPos) ? lineStartNext : endPos) -1;
 		}
 	}
 
