@@ -355,8 +355,8 @@ static inline bool IsQuoteLine(Sci_Position line, const Accessor &styler) noexce
 // based on original folding code
 static void FoldPyDoc(Sci_PositionU startPos, Sci_Position length, int, LexerWordList, Accessor &styler) {
 	const Sci_Position maxPos = startPos + length;
-	const Sci_Position maxLines = (maxPos == styler.Length()) ? styler.GetLine(maxPos) : styler.GetLine(maxPos - 1);	// Requested last line
 	const Sci_Position docLines = styler.GetLine(styler.Length());	// Available last line
+	const Sci_Position maxLines = (maxPos == styler.Length()) ? docLines : styler.GetLine(maxPos - 1);	// Requested last line
 
 	// property fold.quotes.python
 	//	This option enables folding multi-line quoted strings when using the Python lexer.
@@ -390,7 +390,7 @@ static void FoldPyDoc(Sci_PositionU startPos, Sci_Position length, int, LexerWor
 	// Process all characters to end of requested range or end of any triple quote
 	//that hangs over the end of the range.  Cap processing in all cases
 	// to end of document (in case of unclosed quote at end).
-	while ((lineCurrent <= docLines) && ((lineCurrent <= maxLines) || prevQuote)) {
+	while ((lineCurrent <= maxLines) || prevQuote) {
 
 		// Gather info
 		int lev = indentCurrent;
