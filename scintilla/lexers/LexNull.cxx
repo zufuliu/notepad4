@@ -20,21 +20,16 @@
 
 using namespace Scintilla;
 
-#if 0
-// styles for Null language are already zeros in CellBuffer::BasicInsertString().
-static void ColouriseNullDoc(Sci_PositionU startPos, Sci_Position length, int, LexerWordList, Accessor &styler) {
+namespace {
+
+void ColouriseNullDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int, LexerWordList, Accessor &styler) {
 	// Null language means all style bytes are 0 so just mark the end - no need to fill in.
-	if (length > 0) {
-		styler.StartAt(startPos + length - 1);
-		styler.StartSegment(startPos + length - 1);
-		styler.ColourTo(startPos + length - 1, 0);
-	}
+	styler.StartAt(startPos + lengthDoc);
 }
-#endif
 
 // code folding based on Python
-static void FoldNullDoc(Sci_PositionU startPos, Sci_Position length, int /* initStyle */, LexerWordList, Accessor &styler) {
-	const Sci_Position maxPos = startPos + length;
+void FoldNullDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /* initStyle */, LexerWordList, Accessor &styler) {
+	const Sci_Position maxPos = startPos + lengthDoc;
 	const Sci_Position docLines = styler.GetLine(styler.Length());	// Available last line
 	const Sci_Position maxLines = (maxPos == styler.Length()) ? docLines : styler.GetLine(maxPos - 1);	// Requested last line
 
@@ -122,4 +117,6 @@ static void FoldNullDoc(Sci_PositionU startPos, Sci_Position length, int /* init
 	//styler.SetLevel(lineCurrent, indentCurrent);
 }
 
-LexerModule lmNull(SCLEX_NULL, nullptr, "null", FoldNullDoc);
+}
+
+LexerModule lmNull(SCLEX_NULL, ColouriseNullDoc, "null", FoldNullDoc);
