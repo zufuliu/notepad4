@@ -4,9 +4,6 @@
 
 #include <cstring>
 #include <cassert>
-#include <cctype>
-
-#include <algorithm>
 
 #include "ILexer.h"
 #include "Scintilla.h"
@@ -23,18 +20,6 @@ using namespace Scintilla;
 
 #define		LEX_PY		32	// Python
 #define		LEX_BOO		55	// Boo
-
-/*static const char *const pythonWordListDesc[] = {
-	"Keywords",
-	"Type Keywords",
-	"Built-in Constants",
-	"Decorator",
-	"Build-in Functions",
-	"Attribute",
-	"object Method"
-	"global class",
-	0
-};*/
 
 #define PY_DEF_CLASS 1
 #define PY_DEF_FUNC	2
@@ -441,7 +426,7 @@ static void FoldPyDoc(Sci_PositionU startPos, Sci_Position length, int, LexerWor
 		}
 
 		const int levelAfterComments = ((lineNext < docLines) ? indentNext & SC_FOLDLEVELNUMBERMASK : minCommentLevel);
-		const int levelBeforeComments = std::max(indentCurrentLevel, levelAfterComments);
+		const int levelBeforeComments = (indentCurrentLevel > levelAfterComments) ? indentCurrentLevel : levelAfterComments;
 
 		// Now set all the indent levels on the lines we skipped
 		// Do this from end to start.  Once we encounter one line
