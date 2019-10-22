@@ -7,9 +7,6 @@
 
 #include <cstring>
 #include <cassert>
-#include <cctype>
-
-#include <algorithm>
 
 #include "ILexer.h"
 #include "Scintilla.h"
@@ -18,7 +15,6 @@
 #include "WordList.h"
 #include "LexAccessor.h"
 #include "Accessor.h"
-#include "StyleContext.h"
 #include "CharacterSet.h"
 #include "LexerModule.h"
 
@@ -81,7 +77,7 @@ static void FoldNullDoc(Sci_PositionU startPos, Sci_Position length, int /* init
 		}
 
 		const int levelAfterBlank = indentNext & SC_FOLDLEVELNUMBERMASK;
-		const int levelBeforeBlank = std::max(indentCurrentLevel, levelAfterBlank);
+		const int levelBeforeBlank = (indentCurrentLevel > levelAfterBlank) ? indentCurrentLevel : levelAfterBlank;
 
 		// Now set all the indent levels on the lines we skipped
 		// Do this from end to start. Once we encounter one line
