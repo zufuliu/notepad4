@@ -130,6 +130,7 @@ EDITLEXER lexCONF = {
 
 static EDITSTYLE Styles_INI[] = {
 	EDITSTYLE_DEFAULT,
+	{ SCE_PROPS_KEY, NP2STYLE_Property, EDITSTYLE_HOLE(L"Property"), L"fore:#A46000" },
 	{ SCE_PROPS_COMMENT, NP2STYLE_Comment, EDITSTYLE_HOLE(L"Comment"), L"fore:#008000" },
 	{ SCE_PROPS_SECTION, NP2STYLE_Section, EDITSTYLE_HOLE(L"Section"), L"bold; back:#FFC040; eolfilled" },
 	{ SCE_PROPS_ASSIGNMENT, 63512, EDITSTYLE_HOLE(L"Assignment"), L"fore:#FF0000" },
