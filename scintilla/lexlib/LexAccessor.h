@@ -274,10 +274,6 @@ inline char LexGetNextChar(Sci_Position startPos, LexAccessor &styler) noexcept 
 	} while (true);
 }
 
-inline bool IsLexAtEOL(Sci_Position pos, LexAccessor &styler) noexcept {
-	return (styler[pos] == '\n') || ((styler[pos] == '\r') && styler.SafeGetCharAt(pos + 1) != '\n');
-}
-
 }
 
 #endif
