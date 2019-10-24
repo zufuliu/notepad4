@@ -27,7 +27,6 @@
       <File Name="../../scintilla/lexers/LexFSharp.cxx"/>
       <File Name="../../scintilla/lexers/LexGraphViz.cxx"/>
       <File Name="../../scintilla/lexers/LexHTML.cxx"/>
-      <File Name="../../scintilla/lexers/LexIni.cxx"/>
       <File Name="../../scintilla/lexers/LexInno.cxx"/>
       <File Name="../../scintilla/lexers/LexJSON.cxx"/>
       <File Name="../../scintilla/lexers/LexLaTeX.cxx"/>
@@ -41,6 +40,7 @@
       <File Name="../../scintilla/lexers/LexPascal.cxx"/>
       <File Name="../../scintilla/lexers/LexPerl.cxx"/>
       <File Name="../../scintilla/lexers/LexPowerShell.cxx"/>
+      <File Name="../../scintilla/lexers/LexProps.cxx"/>
       <File Name="../../scintilla/lexers/LexPython.cxx"/>
       <File Name="../../scintilla/lexers/LexRuby.cxx"/>
       <File Name="../../scintilla/lexers/LexRust.cxx"/>

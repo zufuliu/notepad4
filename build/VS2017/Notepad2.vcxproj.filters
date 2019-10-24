@@ -186,9 +186,6 @@
     <ClCompile Include="..\..\scintilla\lexers\LexHTML.cxx">
       <Filter>Scintilla\lexers</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\scintilla\lexers\LexIni.cxx">
-      <Filter>Scintilla\lexers</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\scintilla\lexers\LexInno.cxx">
       <Filter>Scintilla\lexers</Filter>
     </ClCompile>
@@ -214,6 +211,9 @@
       <Filter>Scintilla\lexers</Filter>
     </ClCompile>
     <ClCompile Include="..\..\scintilla\lexers\LexPowerShell.cxx">
+      <Filter>Scintilla\lexers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\scintilla\lexers\LexProps.cxx">
       <Filter>Scintilla\lexers</Filter>
     </ClCompile>
     <ClCompile Include="..\..\scintilla\lexers\LexPython.cxx">

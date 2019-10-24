@@ -24,11 +24,15 @@ namespace {
 
 void ColouriseNullDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int, LexerWordList, Accessor &styler) {
 	// Null language means all style bytes are 0 so just mark the end - no need to fill in.
+#if 0
+	styler.StartAt(startPos + lengthDoc);
+#else
 	if (lengthDoc > 0) {
 		styler.StartAt(startPos + lengthDoc - 1);
 		styler.StartSegment(startPos + lengthDoc - 1);
 		styler.ColourTo(startPos + lengthDoc - 1, 0);
 	}
+#endif
 }
 
 // code folding based on Python
