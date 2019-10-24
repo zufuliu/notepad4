@@ -948,7 +948,6 @@
     <ClCompile Include="..\..\scintilla\lexers\LexFortran.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexFSharp.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexHTML.cxx" />
-    <ClCompile Include="..\..\scintilla\lexers\LexIni.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexInno.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexJSON.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexLaTeX.cxx" />
@@ -958,6 +957,7 @@
     <ClCompile Include="..\..\scintilla\lexers\LexPascal.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexPerl.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexPowerShell.cxx" />
+    <ClCompile Include="..\..\scintilla\lexers\LexProps.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexPython.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexRuby.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexRust.cxx" />

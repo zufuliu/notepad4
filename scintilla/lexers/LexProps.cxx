@@ -1,5 +1,5 @@
 // Scintilla source code edit control
-/** @file LexIni.cxx
+/** @file LexProps.cxx
  ** Lexers for properties files.
  **/
 // Copyright 1998-2001 by Neil Hodgson <neilh@scintilla.org>
