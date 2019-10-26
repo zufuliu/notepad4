@@ -29,6 +29,7 @@
       <File Name="../../scintilla/lexers/LexHTML.cxx"/>
       <File Name="../../scintilla/lexers/LexInno.cxx"/>
       <File Name="../../scintilla/lexers/LexJSON.cxx"/>
+      <File Name="../../scintilla/lexers/LexKotlin.cxx"/>
       <File Name="../../scintilla/lexers/LexLaTeX.cxx"/>
       <File Name="../../scintilla/lexers/LexLisp.cxx"/>
       <File Name="../../scintilla/lexers/LexLLVM.cxx"/>
@@ -182,6 +183,7 @@
       <File Name="../../src/EditLexers/stlJavaScript.c"/>
       <File Name="../../src/EditLexers/stlJSON.c"/>
       <File Name="../../src/EditLexers/stlJulia.c"/>
+      <File Name="../../src/EditLexers/stlKotlin.c"/>
       <File Name="../../src/EditLexers/stlLaTeX.c"/>
       <File Name="../../src/EditLexers/stlLisp.c"/>
       <File Name="../../src/EditLexers/stlLLVM.c"/>

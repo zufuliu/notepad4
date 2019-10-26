@@ -84,6 +84,8 @@ extern EDITLEXER lexINNO;
 extern EDITLEXER lexJAM;
 extern EDITLEXER lexJulia;
 
+extern EDITLEXER lexKotlin;
+
 extern EDITLEXER lexLaTeX;
 extern EDITLEXER lexLisp;
 extern EDITLEXER lexLLVM;
@@ -167,6 +169,8 @@ static const PEDITLEXER pLexArray[ALL_LEXER_COUNT] = {
 
 	&lexJAM,
 	&lexJulia,
+
+	&lexKotlin,
 
 	&lexLaTeX,
 	&lexLisp,
@@ -1016,6 +1020,9 @@ void Style_UpdateLexerKeywordAttr(LPCEDITLEXER pLexNew) {
 		attr[9] = KeywordAttr_NoLexer;		// Function
 		attr[10] = KeywordAttr_NoLexer;		// Property
 		attr[11] = KeywordAttr_NoLexer;		// Method
+		break;
+	case NP2LEX_KOTLIN:
+		attr[4] = KeywordAttr_NoLexer;		// annotation
 		break;
 	case NP2LEX_NSIS:
 		attr[0] = KeywordAttr_MakeLower;

@@ -190,6 +190,37 @@ def update_cmake_keyword():
 	keywordList = parse_cmake_api_file('lang/CMake.cmake')
 	UpdateKeywordFile('../src/EditLexers/stlCMake.c', keywordList)
 
+# Kotlin
+def parse_kotlin_api_file(path):
+	sections = read_api_file(path, '//')
+	keywordMap = {}
+	for key, doc in sections:
+		if key in ('annotation', 'kdoc'):
+			items = re.findall(r'@(\w+)', doc)
+		else:
+			items = doc.split()
+		keywordMap[key] = items
+
+	RemoveDuplicateKeyword(keywordMap, [
+		'keywords',
+		'class',
+		'interface',
+		'enum',
+		'annotation',
+	])
+	keywordList = [
+		('keywords', keywordMap['keywords'], KeywordAttr.Default),
+		('class', keywordMap['class'], KeywordAttr.Default),
+		('interface', keywordMap['interface'], KeywordAttr.Default),
+		('enum', keywordMap['enum'], KeywordAttr.Default),
+		('annotation', keywordMap['annotation'], KeywordAttr.NoLexer),
+	]
+	return keywordList
+
+def update_kotlin_keyword():
+	keywordList = parse_kotlin_api_file('lang/Kotlin.kt')
+	UpdateKeywordFile('../src/EditLexers/stlKotlin.c', keywordList)
+
 # Rust
 def parse_rust_api_file(path):
 	sections = read_api_file(path, '//')
@@ -317,5 +348,6 @@ def update_vim_keyword():
 # update all keywords in order
 def update_all_keyword():
 	update_cmake_keyword()
+	update_kotlin_keyword()
 	update_rust_keyword()
 	update_vim_keyword()

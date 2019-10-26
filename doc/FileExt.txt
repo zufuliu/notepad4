@@ -290,6 +290,10 @@ Julia Script
 	jl
 
 
+Kotlin
+	kt
+
+
 LaTeX File
 	tex
 	latex
