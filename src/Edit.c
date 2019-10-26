@@ -3894,29 +3894,56 @@ typedef struct _SORTLINE {
 } SORTLINE;
 
 typedef int (__stdcall *FNSTRCMP)(LPCWSTR, LPCWSTR);
+typedef int (__cdecl *QSortCmp)(const void *, const void *);
 
-static int __cdecl CmpStd(const void *s1, const void *s2) {
-	const int cmp = StrCmp(((SORTLINE *)s1)->pwszSortEntry, ((SORTLINE *)s2)->pwszSortEntry);
-	return (cmp) ? cmp : StrCmp(((SORTLINE *)s1)->pwszLine, ((SORTLINE *)s2)->pwszLine);
+static int __cdecl CmpStd(const void *p1, const void *p2) {
+	const SORTLINE *s1 = (const SORTLINE *)p1;
+	const SORTLINE *s2 = (const SORTLINE *)p2;
+	const int cmp = StrCmpW(s1->pwszSortEntry, s2->pwszSortEntry);
+	return cmp ? cmp : StrCmpW(s1->pwszLine, s2->pwszLine);
 }
 
-static int __cdecl CmpStdRev(const void *s1, const void *s2) {
-	return CmpStd(s2, s1);
+static int __cdecl CmpIStd(const void *p1, const void *p2) {
+	const SORTLINE *s1 = (const SORTLINE *)p1;
+	const SORTLINE *s2 = (const SORTLINE *)p2;
+	const int cmp = StrCmpIW(s1->pwszSortEntry, s2->pwszSortEntry);
+	return cmp ? cmp : StrCmpIW(s1->pwszLine, s2->pwszLine);
 }
 
-static int __cdecl CmpLogical(const void *s1, const void *s2) {
-	int cmp = (int)StrCmpLogicalW(((SORTLINE *)s1)->pwszSortEntry, ((SORTLINE *)s2)->pwszSortEntry);
+static int __cdecl CmpStdRev(const void *p1, const void *p2) {
+	return CmpStd(p2, p1);
+}
+
+static int __cdecl CmpIStdRev(const void *p1, const void *p2) {
+	return CmpIStd(p2, p1);
+}
+
+static int __cdecl CmpLogical(const void *p1, const void *p2) {
+	const SORTLINE *s1 = (const SORTLINE *)p1;
+	const SORTLINE *s2 = (const SORTLINE *)p2;
+	int cmp = StrCmpLogicalW(s1->pwszSortEntry, s1->pwszSortEntry);
 	if (cmp == 0) {
-		cmp = (int)StrCmpLogicalW(((SORTLINE *)s1)->pwszLine, ((SORTLINE *)s2)->pwszLine);
+		cmp = StrCmpLogicalW(s2->pwszLine, s2->pwszLine);
 	}
-	if (cmp == 0) {
-		cmp = StrCmp(((SORTLINE *)s1)->pwszSortEntry, ((SORTLINE *)s2)->pwszSortEntry);
-	}
-	return (cmp) ? cmp : StrCmp(((SORTLINE *)s1)->pwszLine, ((SORTLINE *)s2)->pwszLine);
+	return cmp ? cmp : CmpStd(p1, p2);
 }
 
-static int __cdecl CmpLogicalRev(const void *s1, const void *s2) {
-	return CmpLogical(s2, s1);
+static int __cdecl CmpILogical(const void *p1, const void *p2) {
+	const SORTLINE *s1 = (const SORTLINE *)p1;
+	const SORTLINE *s2 = (const SORTLINE *)p2;
+	int cmp = StrCmpLogicalW(s1->pwszSortEntry, s1->pwszSortEntry);
+	if (cmp == 0) {
+		cmp = StrCmpLogicalW(s2->pwszLine, s2->pwszLine);
+	}
+	return cmp ? cmp : CmpIStd(p1, p2);
+}
+
+static int __cdecl CmpLogicalRev(const void *p1, const void *p2) {
+	return CmpLogical(p2, p1);
+}
+
+static int __cdecl CmpILogicalRev(const void *p1, const void *p2) {
+	return CmpILogical(p2, p1);
 }
 
 void EditSortLines(int iSortFlags) {
@@ -4032,11 +4059,10 @@ void EditSortLines(int iSortFlags) {
 	}
 
 	if (iSortFlags & SORT_DESCENDING) {
-		if ((iSortFlags & SORT_LOGICAL)) {
-			qsort(pLines, iLineCount, sizeof(SORTLINE), CmpLogicalRev);
-		} else {
-			qsort(pLines, iLineCount, sizeof(SORTLINE), CmpStdRev);
-		}
+		const QSortCmp cmpFuc = (iSortFlags & SORT_LOGICAL)
+			? ((iSortFlags & SORT_NOCASE) ? CmpILogicalRev : CmpLogicalRev)
+			: ((iSortFlags & SORT_NOCASE) ? CmpIStdRev : CmpStdRev);
+		qsort(pLines, iLineCount, sizeof(SORTLINE), cmpFuc);
 	} else if (iSortFlags & SORT_SHUFFLE) {
 		srand(GetTickCount());
 		for (Sci_Line i = iLineCount - 1; i > 0; i--) {
@@ -4046,11 +4072,10 @@ void EditSortLines(int iSortFlags) {
 			pLines[j] = sLine;
 		}
 	} else {
-		if ((iSortFlags & SORT_LOGICAL)) {
-			qsort(pLines, iLineCount, sizeof(SORTLINE), CmpLogical);
-		} else {
-			qsort(pLines, iLineCount, sizeof(SORTLINE), CmpStd);
-		}
+		const QSortCmp cmpFuc = (iSortFlags & SORT_LOGICAL)
+			? ((iSortFlags & SORT_NOCASE) ? CmpILogical : CmpLogical)
+			: ((iSortFlags & SORT_NOCASE) ? CmpIStd : CmpStd);
+		qsort(pLines, iLineCount, sizeof(SORTLINE), cmpFuc);
 	}
 
 	char *pmszResult = (char *)NP2HeapAlloc(cchTotal + 2 * iLineCount + 1);
