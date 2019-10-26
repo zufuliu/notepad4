@@ -133,6 +133,18 @@ constexpr bool IsIdentifierStart(int ch) noexcept {
 	return IsAlpha(ch) || ch == '_';
 }
 
+constexpr bool IsIdentifierCharEx(int ch) noexcept {
+	return IsIdentifierChar(ch) || ch > 0x80;
+}
+
+constexpr bool IsIdentifierStartEx(int ch) noexcept {
+	return IsIdentifierStart(ch) || ch > 0x80;
+}
+
+constexpr bool IsWordCharEx(int ch) noexcept {
+	return iswordchar(ch) || ch > 0x80;
+}
+
 constexpr bool isoperator(int ch) noexcept {
 	return
 		(ch == '%' || ch == '^' || ch == '&' || ch == '*' ||

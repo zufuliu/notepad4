@@ -4059,7 +4059,7 @@ void EditSortLines(int iSortFlags) {
 	}
 
 	if (iSortFlags & SORT_DESCENDING) {
-		const QSortCmp cmpFuc = (iSortFlags & SORT_LOGICAL)
+		QSortCmp cmpFuc = (iSortFlags & SORT_LOGICAL)
 			? ((iSortFlags & SORT_NOCASE) ? CmpILogicalRev : CmpLogicalRev)
 			: ((iSortFlags & SORT_NOCASE) ? CmpIStdRev : CmpStdRev);
 		qsort(pLines, iLineCount, sizeof(SORTLINE), cmpFuc);
@@ -4072,7 +4072,7 @@ void EditSortLines(int iSortFlags) {
 			pLines[j] = sLine;
 		}
 	} else {
-		const QSortCmp cmpFuc = (iSortFlags & SORT_LOGICAL)
+		QSortCmp cmpFuc = (iSortFlags & SORT_LOGICAL)
 			? ((iSortFlags & SORT_NOCASE) ? CmpILogical : CmpLogical)
 			: ((iSortFlags & SORT_NOCASE) ? CmpIStd : CmpStd);
 		qsort(pLines, iLineCount, sizeof(SORTLINE), cmpFuc);

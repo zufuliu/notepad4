@@ -563,6 +563,9 @@ static inline BOOL IsOperatorStyle(int style) {
 	case SCLEX_HTML:
 		return style == SCE_HPHP_OPERATOR || style == SCE_HJ_SYMBOLS || style == SCE_HJA_SYMBOLS;
 
+	case SCLEX_KOTLIN:
+		return style == SCE_KOTLIN_OPERATOR || style == SCE_KOTLIN_OPERATOR2;
+
 	case SCLEX_LATEX:
 	case SCLEX_TEXINFO:
 		return style == SCE_L_OPERATOR;
@@ -1943,6 +1946,7 @@ void EditToggleCommentLine(void) {
 	case SCLEX_FSHARP:
 	case SCLEX_GRAPHVIZ:
 	case SCLEX_JSON:
+	case SCLEX_KOTLIN:
 	case SCLEX_PASCAL:
 	case SCLEX_RUST:
 	case SCLEX_VERILOG:
@@ -2071,6 +2075,7 @@ void EditToggleCommentBlock(void) {
 	case SCLEX_CSS:
 	case SCLEX_GRAPHVIZ:
 	case SCLEX_JSON:
+	case SCLEX_KOTLIN:
 	case SCLEX_NSIS:
 	case SCLEX_RUST:
 	case SCLEX_SQL:
@@ -2214,6 +2219,10 @@ void EditInsertScriptShebangLine(void) {
 			break;
 		}
 		break;
+
+	//case SCLEX_KOTLIN:
+	//	name = "kotlin";
+	//	break;
 
 	case SCLEX_LUA:
 		name = "lua";

@@ -902,6 +902,7 @@
     <ClCompile Include="..\..\scintilla\lexers\LexHTML.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexInno.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexJSON.cxx" />
+    <ClCompile Include="..\..\scintilla\lexers\LexKotlin.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexLaTeX.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexLisp.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexLLVM.cxx" />
@@ -1003,6 +1004,7 @@
     <ClCompile Include="..\..\src\EditLexers\stlJavaScript.c" />
     <ClCompile Include="..\..\src\EditLexers\stlJSON.c" />
     <ClCompile Include="..\..\src\EditLexers\stlJulia.c" />
+    <ClCompile Include="..\..\src\EditLexers\stlKotlin.c" />
     <ClCompile Include="..\..\src\EditLexers\stlLaTeX.c" />
     <ClCompile Include="..\..\src\EditLexers\stlLisp.c" />
     <ClCompile Include="..\..\src\EditLexers\stlLLVM.c" />
