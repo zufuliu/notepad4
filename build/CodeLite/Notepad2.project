@@ -208,6 +208,7 @@
       <File Name="../../src/EditLexers/stlVim.c"/>
       <File Name="../../src/EditLexers/stlXML.c"/>
     </VirtualDirectory>
+    <File Name="../../src/Bridge.cpp"/>
     <File Name="../../src/Dialogs.c"/>
     <File Name="../../src/Dlapi.c"/>
     <File Name="../../src/Edit.c"/>
@@ -215,7 +216,6 @@
     <File Name="../../src/EditEncoding.c"/>
     <File Name="../../src/Helpers.c"/>
     <File Name="../../src/Notepad2.c"/>
-    <File Name="../../src/Bridge.cpp"/>
     <File Name="../../src/Styles.c"/>
   </VirtualDirectory>
   <VirtualDirectory Name="Header Files">
