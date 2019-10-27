@@ -49,84 +49,114 @@ sealed suspend
 tailrec
 vararg
 
+//! Library			===========================================================
 // Kotlin Standard Library
 // https://kotlinlang.org/api/latest/jvm/stdlib/index.html
-
-//! class			============================================================
 // Basic Types
 // https://kotlinlang.org/docs/reference/basic-types.html
-Any
-Array
-Boolean BooleanArray
-Byte ByteArray
-Char CharArray
-Double DoubleArray
-Enum
-Error
-Exception
-Float FloatArray
-Int IntArray
-Long LongArray
-Nothing
-Number
-Pair
-Result
-Short ShortArray
-String
-Throwable
-Triple
-UByte UByteArray
-UInt UIntArray
-ULong ULongArray
-Unit
-UShort UShortArray
 
-// kotlin.collections
-ArrayList
-HashMap
-HashSet
-LinkedHashMap
-LinkedHashSet
+package kotlin {
+	// Types
+	interface Annotation
+	open class Any
+	class Array<T>
+	class Boolean : Comparable<Boolean>
+	class BooleanArray
+	class Byte : Number, Comparable<Byte>
+	class ByteArray
+	class Char : Comparable<Char>
+	class CharArray
+	interface CharSequence
+	interface Comparable<in T>
+	interface Comparator<T>
+	enum class DeprecationLevel
+	class Double : Number, Comparable<Double>
+	class DoubleArray
+	abstract class Enum<E : Enum<E>> : Comparable<E>
+	open class Error : Throwable
+	open class Exception : Throwable
+	class Float : Number, Comparable<Float>
+	class FloatArray
+	interface Function<out R>
+	class Int : Number, Comparable<Int>
+	class IntArray
+	interface Lazy<out T>
+	class Long : Number, Comparable<Long>
+	class LongArray
+	class Nothing
+	abstract class Number
+	data class Pair<out A, out B> : Serializable
+	inline class Result<out T> : Serializable
+	class Short : Number, Comparable<Short>
+	class ShortArray
+	class String : Comparable<String>, CharSequence
+	open class Throwable
+	data class Triple<out A, out B, out C> : Serializable
+	inline class UByte : Comparable<UByte>
+	inline class UByteArray : Collection<UByte>
+	inline class UInt : Comparable<UInt>
+	inline class UIntArray : Collection<UInt>
+	inline class ULong : Comparable<ULong>
+	inline class ULongArray : Collection<ULong>
+	inline class UShort : Comparable<UShort>
+	inline class UShortArray : Collection<UShort>
+	object Unit
 
-// kotlin.text
-Regex
-StringBuilder
+	// Annotations
+	annotation class Deprecated(message: String, replaceWith: ReplaceWith, level: DeprecationLevel)
+	annotation class Metadata()
+	annotation class ReplaceWith(expression: String, vararg imports: String)
+	annotation class Suppress(vararg names: String)
 
-//! interface		===========================================================
-Annotation
-CharSequence
-Comparable
-Comparator
-Function
-Lazy
+	// Functions
+	fun assert(value: Boolean)
+	fun error(message: Any): Nothing
+	fun require(value: Boolean)
+}
 
-// kotlin.collections
-Collection
-Iterable
-Iterator
-List
-Map
-Set
-Grouping
+package kotlin.annotation {
+	// Types
+	enum class AnnotationRetention
+	enum class AnnotationTarget
 
-//! enum
-// kotlin.annotation
-AnnotationRetention
-AnnotationTarget
+	// Annotations
+	annotation class MustBeDocumented
+	annotation class Repeatable
+	annotation class Retention(value: AnnotationRetention)
+	annotation class Target(vararg allowedTargets: AnnotationTarget)
+}
 
-//! annotation		===========================================================
-@Deprecated()
-@Metadata()
-@Suppress()
+package kotlin.collections {
+	// Types
+	class ArrayList<E> : MutableList<E>, RandomAccess
+	interface Collection<out E> : Iterable<E>
+	interface Grouping<T, out K>
+	class HashMap<K, V> : MutableMap<K, V>
+	class HashSet<E> : MutableSet<E>
+	interface Iterable<out T>
+	interface Iterator<out T>
+	class LinkedHashMap<K, V> : MutableMap<K, V>
+	class LinkedHashSet<E> : MutableSet<E>
+	interface List<out E> : Collection<E>
+	interface Map<K, out V>
+	interface Set<out E> : Collection<E>
+}
 
-// kotlin.annotation
-@MustBeDocumented
-@Repeatable
-@Retention()
-@Target()
+package kotlin.io {
+	// Functions
+	fun print(message: Any?)
+	fun println(message: Any?)
+	fun readLine(): String?
+}
 
+package kotlin.text {
+	// Types
+	interface Appendable
+	class Regex
+	class StringBuilder : Appendable, CharSequence
+}
 
-//! KDoc
+//! KDoc			===========================================================
 // https://kotlinlang.org/docs/reference/kotlin-doc.html
 /**
  * @param <name>
