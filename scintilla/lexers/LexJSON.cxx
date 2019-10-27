@@ -1,9 +1,6 @@
 // This file is part of Notepad2.
 // See License.txt for details about distribution and modification.
 //! Lexer for JSON, JSON5.
-// https://www.json.org
-// https://json5.org/
-// https://spec.json5.org/
 
 #include <cstring>
 #include <cassert>

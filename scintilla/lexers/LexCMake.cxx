@@ -1,7 +1,6 @@
 // This file is part of Notepad2.
 // See License.txt for details about distribution and modification.
 //! Lexer for CMake.
-// https://cmake.org/cmake/help/latest/manual/cmake-language.7.html
 
 #include <cstring>
 #include <cassert>
