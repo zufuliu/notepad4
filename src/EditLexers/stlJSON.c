@@ -31,4 +31,3 @@ EDITLEXER lexJSON = {
 	&Keywords_JSON,
 	Styles_JSON
 };
-

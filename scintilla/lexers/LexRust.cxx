@@ -1,7 +1,6 @@
 // This file is part of Notepad2.
 // See License.txt for details about distribution and modification.
-//! Lexer for Rust
-// https://doc.rust-lang.org/reference/index.html
+//! Lexer for Rust.
 
 #include <cstring>
 #include <cassert>

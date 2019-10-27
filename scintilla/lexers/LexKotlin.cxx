@@ -1,7 +1,6 @@
 // This file is part of Notepad2.
 // See License.txt for details about distribution and modification.
-//! Lexer for Kotlin
-// https://kotlinlang.org/docs/reference/
+//! Lexer for Kotlin.
 
 #include <cstring>
 #include <cassert>
