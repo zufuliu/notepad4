@@ -195,8 +195,33 @@ def parse_kotlin_api_file(path):
 	sections = read_api_file(path, '//')
 	keywordMap = {}
 	for key, doc in sections:
-		if key in ('annotation', 'kdoc'):
+		if key == 'kdoc':
 			items = re.findall(r'@(\w+)', doc)
+		elif key == 'library':
+			items = re.findall(r'annotation\s+class\s+(\w+)', doc)
+			annotations = set(items)
+
+			items = re.findall(r'enum\s+class\s+(\w+)', doc)
+			enums = set(items)
+
+			items = re.findall(r'class\s+(\w+)', doc)
+			classes = set(items)
+			classes -= annotations
+			classes -= enums
+
+			items = re.findall(r'object\s+(\w+)', doc)
+			classes.update(items)
+
+			items = re.findall(r'interface\s+(\w+)', doc)
+			interfaces = set(items)
+
+			keywordMap['class'] = classes
+			keywordMap['interface'] = interfaces
+			keywordMap['enum'] = enums
+			keywordMap['annotation'] = annotations
+
+			items = re.findall(r'fun\s+.*?(\w+\()', doc, re.DOTALL)
+			keywordMap['function'] = items
 		else:
 			items = doc.split()
 		keywordMap[key] = items
@@ -214,6 +239,9 @@ def parse_kotlin_api_file(path):
 		('interface', keywordMap['interface'], KeywordAttr.Default),
 		('enum', keywordMap['enum'], KeywordAttr.Default),
 		('annotation', keywordMap['annotation'], KeywordAttr.NoLexer),
+		('function', keywordMap['function'], KeywordAttr.NoLexer),
+		#('KDoc', keywordMap['kdoc'], KeywordAttr.NoLexer | KeywordAttr.NoAutoComp),
+		('KDoc', [], KeywordAttr.NoLexer | KeywordAttr.NoAutoComp),
 	]
 	return keywordList
 

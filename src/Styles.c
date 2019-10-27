@@ -1023,6 +1023,8 @@ void Style_UpdateLexerKeywordAttr(LPCEDITLEXER pLexNew) {
 		break;
 	case NP2LEX_KOTLIN:
 		attr[4] = KeywordAttr_NoLexer;		// annotation
+		attr[5] = KeywordAttr_NoLexer;		// function
+		attr[6] = KeywordAttr_NoLexer | KeywordAttr_NoAutoComp;		// kdoc
 		break;
 	case NP2LEX_NSIS:
 		attr[0] = KeywordAttr_MakeLower;
