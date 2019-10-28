@@ -1463,12 +1463,10 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 						levelCurrent--;
 					}
 				} else {
-					if (eClass != SCE_H_TAGUNKNOWN) {
-						if (eClass == SCE_H_SGML_DEFAULT) {
-							state = SCE_H_SGML_DEFAULT;
-						} else {
-							state = SCE_H_OTHER;
-						}
+					if (eClass == SCE_H_SGML_DEFAULT) {
+						state = SCE_H_SGML_DEFAULT;
+					} else {
+						state = SCE_H_OTHER;
 					}
 				}
 			}
