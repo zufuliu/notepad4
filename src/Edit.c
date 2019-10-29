@@ -4059,10 +4059,10 @@ void EditSortLines(int iSortFlags) {
 	}
 
 	if (iSortFlags & SORT_DESCENDING) {
-		QSortCmp cmpFuc = (iSortFlags & SORT_LOGICAL)
+		QSortCmp cmpFunc = (iSortFlags & SORT_LOGICAL)
 			? ((iSortFlags & SORT_NOCASE) ? CmpILogicalRev : CmpLogicalRev)
 			: ((iSortFlags & SORT_NOCASE) ? CmpIStdRev : CmpStdRev);
-		qsort(pLines, iLineCount, sizeof(SORTLINE), cmpFuc);
+		qsort(pLines, iLineCount, sizeof(SORTLINE), cmpFunc);
 	} else if (iSortFlags & SORT_SHUFFLE) {
 		srand(GetTickCount());
 		for (Sci_Line i = iLineCount - 1; i > 0; i--) {
@@ -4072,10 +4072,10 @@ void EditSortLines(int iSortFlags) {
 			pLines[j] = sLine;
 		}
 	} else {
-		QSortCmp cmpFuc = (iSortFlags & SORT_LOGICAL)
+		QSortCmp cmpFunc = (iSortFlags & SORT_LOGICAL)
 			? ((iSortFlags & SORT_NOCASE) ? CmpILogical : CmpLogical)
 			: ((iSortFlags & SORT_NOCASE) ? CmpIStd : CmpStd);
-		qsort(pLines, iLineCount, sizeof(SORTLINE), cmpFuc);
+		qsort(pLines, iLineCount, sizeof(SORTLINE), cmpFunc);
 	}
 
 	char *pmszResult = (char *)NP2HeapAlloc(cchTotal + 2 * iLineCount + 1);
