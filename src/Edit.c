@@ -5593,7 +5593,7 @@ static INT_PTR CALLBACK EditLineNumDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, 
 			iNewLine = iLine;
 
 			if (SendDlgItemMessage(hwnd, IDC_COLNUM, WM_GETTEXTLENGTH, 0, 0) > 0) {
-				GetDlgItemText(hwnd, IDC_LINENUM, tchLn, COUNTOF(tchLn));
+				GetDlgItemText(hwnd, IDC_COLNUM, tchLn, COUNTOF(tchLn));
 #if defined(_WIN64)
 				fTranslated2 = CRTStrToInt64(tchLn, &iLine);
 #else
