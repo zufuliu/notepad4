@@ -617,7 +617,6 @@ BOOL EditLoadFile(LPWSTR pszFile, BOOL bSkipEncodingDetection, EditFileIOStatus 
 		return FALSE;
 	}
 
-	// calculate buffer limit
 	LARGE_INTEGER fileSize;
 	fileSize.QuadPart = 0;
 	if (!GetFileSizeEx(hFile, &fileSize)) {
@@ -657,12 +656,9 @@ BOOL EditLoadFile(LPWSTR pszFile, BOOL bSkipEncodingDetection, EditFileIOStatus 
 	//     1. The buffers we allocated below or when saving file, depends on encoding.
 	//     2. Scintilla's content buffer and style buffer, see CellBuffer class. The style buffer can be disabled by using SCLEX_NULL and SC_DOCUMENTOPTION_STYLES_NONE.
 	//     3. Extra memory when moving gaps on editing, it may requires more than 2/3 physical memory.
-	// large file TODO:
-	// [x] [> 2 GiB] use SC_DOCUMENTOPTION_TEXT_LARGE somewhere or hard-coded in EditModel::EditModel().
+	// large file TODO: https://github.com/zufuliu/notepad2/issues/125
 	// [ ] [> 4 GiB] use SetFilePointerEx() and ReadFile()/WriteFile() to read/write file.
 	// [-] [> 2 GiB] fix encoding conversion with MultiByteToWideChar() and WideCharToMultiByte().
-	// [x] [> 4 GiB] fix sprintf(), wsprintf() for Sci_Position and Sci_Line, currently UINT is used.
-	// [x] [> 2 GiB] ensure Sci_PositionCR is same as Sci_Position, see Sci_Position.h
 	LONGLONG maxFileSize = INT64_C(0x100000000);
 #else
 	// 2 GiB: ptrdiff_t / Sci_Position used in Scintilla
