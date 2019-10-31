@@ -27,35 +27,33 @@ def findAPIHoles():
 	for item in result:
 		name = item[2]
 		value = int(item[3])
-		if value in valList:
-			print(f'duplicate value: {value} {name} {valList[value]}')
-			valList[value].append(name)
-		else:
-			valList[value] = [name]
+		values = valList.setdefault(value, [])
+		if values:
+			print(f'duplicate value: {value} {name} {" ".join(values)}')
+		values.append(name)
 
 	allVals = sorted(valList.keys())
 	print('all values:', allVals)
 	allVals = [item for item in allVals if item < 3000]
 	print('min, max and holes:', allVals[0], allVals[-1], findHoles(allVals))
 
-def CheckLexerDefinition():
+def checkLexerDefinition():
 	ifaceDoc = readIFace('../include/SciLexer.iface')
 
-	# 1. ensure SCLEX_ is unique
+	# ensure SCLEX_ is unique
 	valList = {} # {value: [name]}
 	result = re.findall(r'val\s+(?P<name>SCLEX_\w+)\s*=\s*(?P<value>\d+)', ifaceDoc)
 	for name, value in result:
 		value = int(value)
-		if value in valList:
-			print(f'duplicate value: {value} {name} {valList[value]}')
-			valList[value].append(name)
-		else:
-			valList[value] = [name]
+		values = valList.setdefault(value, [])
+		if values:
+			print(f'duplicate value: {value} {name} {" ".join(values)}')
+		values.append(name)
 
 	# StylesCommon in Scintilla.iface
 	STYLE_DEFAULT = 32
 	STYLE_LASTPREDEFINED = 39
-	# 2. ensure style number is unique within same lexer and not used by StylesCommon
+	# ensure style number is unique within same lexer and not used by StylesCommon
 	prefixMap = {} # {prefix: lexer}
 	result = re.findall(r'lex\s+(?P<name>\w+)\s*=(.+)+', ifaceDoc)
 	for name, value in result:
@@ -73,11 +71,10 @@ def CheckLexerDefinition():
 		value = int(value)
 		if value >= STYLE_DEFAULT and value <= STYLE_LASTPREDEFINED:
 			print(f'error value: {value} {name}')
-		if value in valList:
-			print(f'duplicate value: {value} {name} {valList[value]}')
-			valList[value].append(name)
-		else:
-			valList[value] = [name]
+		values = valList.setdefault(value, [])
+		if values:
+			print(f'duplicate value: {value} {name} {" ".join(values)}')
+		values.append(name)
 
 findAPIHoles()
-CheckLexerDefinition()
+checkLexerDefinition()
