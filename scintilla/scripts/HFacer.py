@@ -2,7 +2,6 @@
 # HFacer.py - regenerate the Scintilla.h file from the Scintilla.iface interface
 # definition file.
 # Implemented 2000 by Neil Hodgson neilh@scintilla.org
-# Requires Python 2.5 or later
 
 import sys
 import os
