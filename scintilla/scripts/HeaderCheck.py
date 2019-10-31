@@ -1,8 +1,7 @@
+#!/usr/bin/env python3
 # Script to check that headers are in a consistent order
-# Requires Python 2.6 or later
 
-from __future__ import print_function
-import codecs, glob, os, platform, sys, unicodedata
+import glob, os, platform, sys, unicodedata
 
 def ciCompare(a, b):
     return cmp(a.lower(), b.lower())
@@ -20,7 +19,7 @@ def IsHeader(x):
     return x.strip().startswith("#") and ("include" in x or "import" in x)
 
 def ExtractHeaders(filename):
-    with codecs.open(filename, "r", "UTF-8") as infile:
+    with open(filename, "r", encoding="utf-8") as infile:
         includeLines = [x.strip()[1:].strip()[7:].strip() for x in infile.readlines() if \
             IsHeader(x)]
     if '.' not in filename:

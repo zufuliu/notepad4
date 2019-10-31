@@ -11,9 +11,7 @@
 # instantiated, it is compared with the target file and if different the file
 # is rewritten.
 
-from __future__ import with_statement
-
-import codecs, os, re, string, sys
+import os, re, string, sys
 
 lineEnd = "\r\n" if sys.platform == "win32" else "\n"
 
@@ -37,7 +35,7 @@ def UpdateFile(filename, updated):
     file else leave alone so Mercurial and make don't treat it as modified. """
     newOrChanged = "Changed"
     try:
-        with codecs.open(filename, "r", "utf-8") as infile:
+        with open(filename, "r", encoding="utf-8") as infile:
             original = infile.read()
         if updated == original:
             # Same as before so don't write
@@ -49,7 +47,7 @@ def UpdateFile(filename, updated):
         os.unlink(filename)
     except IOError: # File is not there yet
         newOrChanged = "New"
-    with codecs.open(filename, "w", "utf-8") as outfile:
+    with open(filename, "w", encoding="utf-8") as outfile:
         outfile.write(updated)
     print("%s %s" % (newOrChanged, filename))
 
@@ -138,7 +136,7 @@ def GenerateFile(inpath, outpath, commentPrefix, retainDefs, *lists):
     """
 
     try:
-        with codecs.open(inpath, "r", "UTF-8") as infile:
+        with open(inpath, "r", encoding="utf-8") as infile:
             original = infile.read()
         updated = CopyWithInsertion(original, commentPrefix,
             retainDefs, lists)
@@ -161,7 +159,7 @@ def UpdateLineInPlistFile(path, key, value):
     """
     lines = []
     keyCurrent = ""
-    with codecs.open(path, "rb", "utf-8") as f:
+    with open(path, "rb", encoding="utf-8") as f:
         for l in f.readlines():
             ls = l.strip()
             if ls.startswith("<key>"):
@@ -178,7 +176,7 @@ def UpdateLineInPlistFile(path, key, value):
 def UpdateLineInFile(path, linePrefix, lineReplace):
     lines = []
     updated = False
-    with codecs.open(path, "r", "utf-8") as f:
+    with open(path, "r", encoding="utf-8") as f:
         for l in f.readlines():
             l = l.rstrip()
             if not updated and l.startswith(linePrefix):
@@ -192,7 +190,7 @@ def UpdateLineInFile(path, linePrefix, lineReplace):
 def ReadFileAsList(path):
     """Read all the lnes in the file and return as a list of strings without line ends.
     """
-    with codecs.open(path, "rU", "utf-8") as f:
+    with open(path, "r", encoding="utf-8") as f:
         return [l.rstrip('\n') for l in f]
 
 def UpdateFileFromLines(path, lines, lineEndToUse):
@@ -234,7 +232,7 @@ def FindSectionInList(lines, markers):
     return slice(start, end)
 
 def ReplaceREInFile(path, match, replace):
-    with codecs.open(path, "r", "utf-8") as f:
+    with open(path, "r", encoding="utf-8") as f:
         contents = f.read()
     contents = re.sub(match, replace, contents)
     UpdateFile(path, contents)

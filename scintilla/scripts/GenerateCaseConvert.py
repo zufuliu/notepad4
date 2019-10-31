@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 # Script to generate CaseConvert.cxx from Python's Unicode data
 # Should be run rarely when a Python with a new version of Unicode data is available.
-# Requires Python 3.3 or later
-# Should not be run with old versions of Python.
 
 # Current best approach divides case conversions into two cases:
 # simple symmetric and complex.
@@ -17,7 +15,7 @@
 # strings with original, folded, upper, and lower separated by '|'.
 # There are 126 complex cases.
 
-import codecs, itertools, os, string, sys, unicodedata
+import itertools, os, string, sys, unicodedata
 
 from FileGenerator import Regenerate
 

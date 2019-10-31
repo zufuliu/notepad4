@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 # Script to generate CharacterCategory.cxx from Python's Unicode data
 # Should be run rarely when a Python with a new version of Unicode data is available.
-# Requires Python 3.3 or later
-# Should not be run with old versions of Python.
 
 import codecs, os, platform, sys, unicodedata
 from collections import OrderedDict
@@ -153,7 +151,7 @@ CJKBlockList = [
 ]
 
 def findCategories(filename):
-	with open(filename, "r", encoding="UTF-8") as infile:
+	with open(filename, "r", encoding="utf-8") as infile:
 		lines = [x.strip() for x in infile.readlines() if "\tcc" in x]
 	values = "".join(lines).replace(" ","").split(",")
 	print(values)
