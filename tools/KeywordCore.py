@@ -123,17 +123,45 @@ def read_api_file(path, comment):
 
 # CMake
 def parse_cmake_api_file(path):
-	def get_variable_name(name):
-		# TODO: expand <LANG>, <CONFIG> and others
+	# languages from https://gitlab.kitware.com/cmake/cmake/blob/master/Auxiliary/vim/extract-upper-case.pl
+	cmakeLang = "C CSharp CUDA CXX Fortran Java RC Swift".split()
+
+	def is_long_name(name):
+		return '_' in name or '-' in name
+
+	def expand_name(name, expanded):
+		# TODO: expand <CONFIG> and others
+		if '<LANG>' in name:
+			items = []
+			done = False
+			for lang in cmakeLang:
+				item = name.replace('<LANG>', lang)
+				if item in expanded:
+					# only valid for specific languages
+					done = True
+					break
+				items.append(item)
+			if done:
+				return []
+			return items
+		else:
+			return [name]
+
+	def get_prefix(name):
 		if '<' in name:
-			return ('', True)
-		if '_' in name or '-' in name:
-			return (name, True)
-		return (name, False)
+			# not full expanded
+			if name.count('<') == 1 and name[-1] == '>':
+				# ignore suffix
+				name = name[:name.index('<')].strip('_')
+				return name, True
+			else:
+				return '', False
+		return name, is_long_name(name)
 
 	sections = read_api_file(path, '#')
 	keywordMap = {}
 	parameters = set()
+	needExpand = {}
 	for key, doc in sections:
 		if key in ('keywords', 'commands'):
 			items = re.findall(r'(?P<name>\w+)\s*\((?P<params>.*?)\)', doc, re.MULTILINE | re.DOTALL)
@@ -151,15 +179,35 @@ def parse_cmake_api_file(path):
 			items = doc.split()
 			result = set()
 			ignores = set()
+			pending = set()
 			for item in items:
-				name, ignore = get_variable_name(item)
-				if name:
-					if ignore:
-						ignores.add(name)
-					else:
-						result.add(name)
+				if '<' in item:
+					pending.add(item)
+				elif is_long_name(item):
+					ignores.add(item)
+				else:
+					result.add(item)
 			keywordMap[key] = result
 			keywordMap['long ' + key] = ignores
+			needExpand[key] = (pending, result | ignores)
+
+	for key, value in needExpand.items():
+		pending, expanded = value
+		result = set()
+		ignores = set()
+		items = set()
+		for item in pending:
+			items.update(expand_name(item, expanded))
+		for item in items:
+			name, ignore = get_prefix(item)
+			if name and name not in expanded:
+				if ignore:
+					ignores.add(name)
+				else:
+					result.add(name)
+
+		keywordMap[key] |= result
+		keywordMap['long ' + key] |= ignores
 
 	keywordMap['parameters'] = parameters
 	RemoveDuplicateKeyword(keywordMap, [
