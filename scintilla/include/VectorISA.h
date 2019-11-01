@@ -24,7 +24,7 @@
 		#define NP2_USE_SSE2	1
 	#endif
 
-	// Clang & GCC use -mavx2 -mpopcnt -mlzcnt -mbmi (to enable tzcnt).
+	// Clang & GCC use -mavx2 -mpopcnt -mbmi (to enable tzcnt).
 	// MSVC use /arch:AVX2
 	#if defined(_WIN64) && !defined(NP2_USE_AVX2)
 		#if defined(__AVX2__)
