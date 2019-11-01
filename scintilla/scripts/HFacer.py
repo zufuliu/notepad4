@@ -3,11 +3,9 @@
 # definition file.
 # Implemented 2000 by Neil Hodgson neilh@scintilla.org
 
-import sys
-import os
 import Face
 
-from FileGenerator import UpdateFile, Generate, Regenerate, UpdateLineInFile, lineEnd
+from FileGenerator import Regenerate
 
 def printLexHFile(f):
 	out = []

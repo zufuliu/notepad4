@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # Script to check that headers are in a consistent order
 
-import glob, os, platform, sys, unicodedata
+import glob
 
 def ciCompare(a, b):
     return cmp(a.lower(), b.lower())

@@ -2,7 +2,7 @@
 # Script to generate CharacterCategory.cxx from Python's Unicode data
 # Should be run rarely when a Python with a new version of Unicode data is available.
 
-import codecs, os, platform, sys, unicodedata
+import codecs, platform, sys, unicodedata
 from collections import OrderedDict
 from enum import IntEnum
 import math
