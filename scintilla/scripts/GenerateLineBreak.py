@@ -2,7 +2,7 @@
 # Script to generate line breaking data from
 # http://www.unicode.org/Public/UCD/latest/ucd/LineBreak.txt
 
-import sys, platform, unicodedata
+import platform, unicodedata
 from enum import IntFlag
 import re
 from FileGenerator import Regenerate

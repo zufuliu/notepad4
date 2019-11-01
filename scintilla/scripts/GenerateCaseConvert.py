@@ -15,7 +15,7 @@
 # strings with original, folded, upper, and lower separated by '|'.
 # There are 126 complex cases.
 
-import itertools, os, string, sys, unicodedata
+import itertools, string, sys
 
 from FileGenerator import Regenerate
 
@@ -39,7 +39,7 @@ def conversionSets():
     # with complex cases.
     complexes = []
     symmetrics = []
-    for ch in range(sys.maxunicode):
+    for ch in range(sys.maxunicode + 1):
         if ch >= 0xd800 and ch <= 0xDBFF:
             continue
         if ch >= 0xdc00 and ch <= 0xDFFF:
