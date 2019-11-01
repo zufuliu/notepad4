@@ -5,8 +5,8 @@
 // Written by Friedrich Vedder <fvedd@t-online.de>, using code from LexOthers.cxx.
 // The License.txt file describes the conditions under which this software may be distributed.
 
-#include <cstring>
 #include <cassert>
+#include <cstring>
 #include <cctype>
 
 #include "ILexer.h"

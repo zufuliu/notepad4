@@ -7,8 +7,8 @@
 // The License.txt file describes the conditions under which this software may be distributed.
 // Scintilla source code edit control
 
-#include <cstring>
 #include <cassert>
+#include <cstring>
 #include <cctype>
 
 #include "ILexer.h"

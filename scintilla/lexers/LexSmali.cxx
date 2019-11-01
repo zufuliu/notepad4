@@ -2,8 +2,8 @@
 // See License.txt for details about distribution and modification.
 //! Lexer for javap, Jasmin, Android Dalvik Smali.
 
-#include <cstring>
 #include <cassert>
+#include <cstring>
 #include <cctype>
 
 #include "ILexer.h"

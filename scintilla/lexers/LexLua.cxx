@@ -7,8 +7,8 @@
  ** Modified by Marcos E. Wurzius & Philippe Lhoste
  **/
 
-#include <cstring>
 #include <cassert>
+#include <cstring>
 #include <cctype>
 
 #include "ILexer.h"

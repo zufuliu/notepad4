@@ -2,8 +2,8 @@
 // See License.txt for details about distribution and modification.
 //! Lexer for Makefile of gmake, nmake, bmake, qmake
 
-#include <cstring>
 #include <cassert>
+#include <cstring>
 #include <cctype>
 
 #include "ILexer.h"

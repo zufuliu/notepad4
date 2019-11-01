@@ -2,8 +2,8 @@
 // See License.txt for details about distribution and modification.
 //! Lexer for JSON, JSON5.
 
-#include <cstring>
 #include <cassert>
+#include <cstring>
 
 #include "ILexer.h"
 #include "Scintilla.h"
