@@ -3034,7 +3034,9 @@ BOOL CreateIniFileEx(LPCWSTR lpszIniFile) {
 						   GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE,
 						   NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 		if (hFile != INVALID_HANDLE_VALUE) {
-			if (GetFileSize(hFile, NULL) == 0) {
+			LARGE_INTEGER fileSize;
+			fileSize.QuadPart = 0;
+			if (GetFileSizeEx(hFile, &fileSize) && fileSize.QuadPart < 2) {
 				DWORD dw;
 				WriteFile(hFile, (LPCVOID)L"\xFEFF[metapath]\r\n", 26, &dw, NULL);
 			}

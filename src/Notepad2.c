@@ -6585,7 +6585,9 @@ BOOL CreateIniFileEx(LPCWSTR lpszIniFile) {
 						   NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 		dwLastIOError = GetLastError();
 		if (hFile != INVALID_HANDLE_VALUE) {
-			if (GetFileSize(hFile, NULL) == 0) {
+			LARGE_INTEGER fileSize;
+			fileSize.QuadPart = 0;
+			if (GetFileSizeEx(hFile, &fileSize) && fileSize.QuadPart < 2) {
 				DWORD dw;
 				WriteFile(hFile, (LPCVOID)L"\xFEFF[Notepad2]\r\n", 26, &dw, NULL);
 			}
