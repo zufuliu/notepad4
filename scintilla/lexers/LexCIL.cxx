@@ -2,8 +2,8 @@
 // See License.txt for details about distribution and modification.
 //! Lexer for MSIL, CIL
 
-#include <cstring>
 #include <cassert>
+#include <cstring>
 #include <cctype>
 
 #include "ILexer.h"

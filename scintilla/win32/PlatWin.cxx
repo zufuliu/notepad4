@@ -53,8 +53,8 @@
 #include "Platform.h"
 #include "Scintilla.h"
 #include "XPM.h"
-#include "UniConversion.h"
 #include "CharClassify.h"
+#include "UniConversion.h"
 #include "FontQuality.h"
 
 #include "PlatWin.h"

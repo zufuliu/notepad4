@@ -2,8 +2,8 @@
 // See License.txt for details about distribution and modification.
 //! Lexer for Assembler, include MASM NASM GAS.
 
-#include <cstring>
 #include <cassert>
+#include <cstring>
 
 #include <string>
 #include <map>

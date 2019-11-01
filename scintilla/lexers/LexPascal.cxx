@@ -7,8 +7,8 @@
  ** Completely rewritten by Marko Njezic <sf@maxempire.com> October 2008
  **/
 
-#include <cstring>
 #include <cassert>
+#include <cstring>
 #include <cctype>
 
 #include <string>
