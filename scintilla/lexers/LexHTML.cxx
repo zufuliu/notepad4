@@ -285,7 +285,9 @@ int classifyTagHTML(Sci_PositionU start, Sci_PositionU end,
 		customElement = true;
 		chAttr = SCE_H_TAG;
 	}
-	styler.ColourTo(end, chAttr);
+	if (chAttr != SCE_H_TAGUNKNOWN) {
+		styler.ColourTo(end, chAttr);
+	}
 	if (chAttr == SCE_H_TAG && !customElement) {
 		if (allowScripts && 0 == strcmp(tag, "script")) {
 			// check to see if this is a self-closing tag by sniffing ahead
@@ -1463,9 +1465,14 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 						levelCurrent--;
 					}
 				} else {
-					if (eClass == SCE_H_SGML_DEFAULT) {
-						state = SCE_H_SGML_DEFAULT;
-					} else {
+					if (eClass != SCE_H_TAGUNKNOWN) {
+						if (eClass == SCE_H_SGML_DEFAULT) {
+							state = SCE_H_SGML_DEFAULT;
+						} else {
+							state = SCE_H_OTHER;
+						}
+					} else if (true) {
+						styler.ColourTo(i - 1, eClass);
 						state = SCE_H_OTHER;
 					}
 				}
