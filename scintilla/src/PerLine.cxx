@@ -79,9 +79,7 @@ void MarkerHandleSet::CombineWith(MarkerHandleSet *other) {
 	mhList.splice_after(mhList.before_begin(), other->mhList);
 }
 
-LineMarkers::~LineMarkers() {
-	markers.DeleteAll();
-}
+LineMarkers::~LineMarkers() = default;
 
 void LineMarkers::Init() {
 	markers.DeleteAll();
@@ -321,9 +319,7 @@ struct AnnotationHeader {
 	int length;
 };
 
-LineAnnotation::~LineAnnotation() {
-	ClearAll();
-}
+LineAnnotation::~LineAnnotation() = default;
 
 void LineAnnotation::Init() {
 	ClearAll();
@@ -447,9 +443,7 @@ int LineAnnotation::Lines(Sci::Line line) const noexcept {
 		return 0;
 }
 
-LineTabstops::~LineTabstops() {
-	tabstops.DeleteAll();
-}
+LineTabstops::~LineTabstops() = default;
 
 void LineTabstops::Init() {
 	tabstops.DeleteAll();

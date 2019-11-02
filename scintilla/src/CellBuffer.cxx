@@ -102,9 +102,7 @@ public:
 	LineStartIndex(LineStartIndex &&) = delete;
 	void operator=(const LineStartIndex &) = delete;
 	void operator=(LineStartIndex &&) = delete;
-	virtual ~LineStartIndex() {
-		starts.DeleteAll();
-	}
+	virtual ~LineStartIndex() = default;
 	bool Allocate(Sci::Line lines) {
 		refCount++;
 		Sci::Position length = starts.PositionFromPartition(starts.Partitions());

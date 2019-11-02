@@ -4991,7 +4991,7 @@ bool IsXidContinue(int character) noexcept {
 	return IsIdContinue(character);
 }
 
-CharacterCategoryMap::CharacterCategoryMap() noexcept {
+CharacterCategoryMap::CharacterCategoryMap() {
 	Optimize(256);
 }
 
