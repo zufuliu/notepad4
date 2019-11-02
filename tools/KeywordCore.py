@@ -133,16 +133,13 @@ def parse_cmake_api_file(path):
 		# TODO: expand <CONFIG> and others
 		if '<LANG>' in name:
 			items = []
-			done = False
 			for lang in cmakeLang:
 				item = name.replace('<LANG>', lang)
 				if item in expanded:
 					# only valid for specific languages
-					done = True
+					items = []
 					break
 				items.append(item)
-			if done:
-				return []
 			return items
 		else:
 			return [name]
