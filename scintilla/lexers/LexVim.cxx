@@ -84,7 +84,7 @@ void ColouriseVimDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 						sc.ChangeState(SCE_VIM_WORD);
 						lineStateLineAutoCommand = strcmp(s, "au") == 0 || strcmp(s, "autocmd") == 0;
 					} else {
-						sc.ChangeState(SCE_VIM_WORD2);
+						sc.ChangeState(SCE_VIM_WORD_DEMOTED);
 					}
 				} else if (keywordLists[1]->InList(s)) {
 					sc.ChangeState(SCE_VIM_COMMANDS);
