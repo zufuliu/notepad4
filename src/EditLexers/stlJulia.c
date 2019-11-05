@@ -32,7 +32,7 @@ static KEYWORDLIST Keywords_Julia = {{
 "MIME Matrix MersenneTwister Method MethodError Microsecond Millisecond Minute Missing MissingException Module Month "
 "Mutex "
 "NTuple NamedTuple Nanosecond Nothing NullLogger Number OneTo OrdinalRange OutOfMemoryError OverflowError "
-"Pair Pairs PartialQuickSort Period PermutedDimsArray PipeBuffer PosDefException ProcessFailedException Ptr "
+"Pair Pairs PartialQuickSort Period PermutedDimsArray Pipe PipeBuffer PosDefException ProcessFailedException Ptr "
 "QR QRCompactWY QRPivoted "
 "Random RandomDevice Rational RawFD "
 "ReadOnlyMemoryError Real ReentrantLock Ref Regex RegexMatch RemoteChannel RemoteException RoundingMode "
