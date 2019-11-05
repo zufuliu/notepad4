@@ -130,7 +130,7 @@ style number must < 32 or > 40
 63054	JSON Document						yes
 63055	Android Smali						yes
 63056	NSIS Setup Script					no
-63057	Texinfo	File						no
+63057	Texinfo File						no
 		63572, L"Special Char"
 		63575, L"Title"
 		63579, L"Chapter"

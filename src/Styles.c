@@ -1021,6 +1021,11 @@ void Style_UpdateLexerKeywordAttr(LPCEDITLEXER pLexNew) {
 		attr[10] = KeywordAttr_NoLexer;		// Property
 		attr[11] = KeywordAttr_NoLexer;		// Method
 		break;
+	case NP2LEX_JULIA:
+		attr[5] = KeywordAttr_NoLexer;		// module
+		attr[6] = KeywordAttr_NoLexer | KeywordAttr_NoAutoComp;		// macro
+		attr[7] = KeywordAttr_NoLexer;		// function
+		break;
 	case NP2LEX_KOTLIN:
 		attr[4] = KeywordAttr_NoLexer;		// annotation
 		attr[5] = KeywordAttr_NoLexer;		// function

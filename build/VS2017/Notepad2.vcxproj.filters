@@ -84,6 +84,9 @@
     <ClCompile Include="..\..\scintilla\lexers\LexJSON.cxx">
       <Filter>Scintilla\lexers</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\scintilla\lexers\LexJulia.cxx">
+      <Filter>Scintilla\lexers</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\scintilla\lexers\LexKotlin.cxx">
       <Filter>Scintilla\lexers</Filter>
     </ClCompile>
@@ -510,6 +513,9 @@
       <Filter>Scintilla\lexlib</Filter>
     </ClInclude>
     <ClInclude Include="..\..\scintilla\lexlib\LexerSimple.h">
+      <Filter>Scintilla\lexlib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\scintilla\lexlib\LexerUtils.h">
       <Filter>Scintilla\lexlib</Filter>
     </ClInclude>
     <ClInclude Include="..\..\scintilla\lexlib\OptionSet.h">
