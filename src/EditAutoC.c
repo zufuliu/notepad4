@@ -502,6 +502,7 @@ BOOL IsDocWordChar(int ch) {
 
 	case NP2LEX_JAVA:
 	case NP2LEX_JULIA:
+	case NP2LEX_RUST:
 		return (ch == '$' || ch == '@' || ch == ':');
 
 	case NP2LEX_GROOVY:
@@ -919,22 +920,24 @@ void AutoC_AddDocWord(struct WordList *pWList, BOOL bIgnoreCase, char prefix) {
 						}
 					}
 
-					int chWordEnd = SciCall_GetCharAt(wordEnd);
-					if (pLexCurrent->iLexer == SCLEX_JULIA && chWordEnd == '!') {
+					const int chWordEnd = SciCall_GetCharAt(wordEnd);
+					if ((pLexCurrent->iLexer == SCLEX_JULIA || pLexCurrent->iLexer == SCLEX_RUST) && chWordEnd == '!') {
 						const int chNext = SciCall_GetCharAt(wordEnd + 1);
 						if (chNext == '(') {
-							wordEnd++;
+							wordEnd += 2;
 							pWord[wordLength++] = '!';
-							chWordEnd = chNext;
+							pWord[wordLength++] = '(';
+							pWord[wordLength++] = ')';
 						}
 					}
-					if (chWordEnd == '(') {
+					else if (chWordEnd == '(') {
 						if (space && NeedSpaceAfterKeyword(pWord, wordLength)) {
 							pWord[wordLength++] = ' ';
 						}
 
 						pWord[wordLength++] = '(';
 						pWord[wordLength++] = ')';
+						wordEnd++;
 					}
 
 					if (wordLength >= iRootLen) {
