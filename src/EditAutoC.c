@@ -502,6 +502,7 @@ BOOL IsDocWordChar(int ch) {
 
 	case NP2LEX_JAVA:
 	case NP2LEX_JULIA:
+	case NP2LEX_KOTLIN:
 	case NP2LEX_RUST:
 		return (ch == '$' || ch == '@' || ch == ':');
 
@@ -1055,9 +1056,17 @@ INT AutoC_AddSpecWord(struct WordList *pWList, int iCurrentStyle, int ch, int ch
 		//}
 	}
 	else if (pLexCurrent->iLexer == SCLEX_JULIA && ch == '@' && iCurrentStyle == SCE_JULIA_DEFAULT) {
-		// macro
-		WordList_AddList(pWList, pLexCurrent->pKeyWords->pszKeyWords[6]);
+		WordList_AddList(pWList, pLexCurrent->pKeyWords->pszKeyWords[6]); // macro
 		return AutoC_AddSpecWord_Keyword;
+	}
+	else if (pLexCurrent->iLexer == SCLEX_KOTLIN && ch == '@') {
+		if (iCurrentStyle == SCE_KOTLIN_DEFAULT) {
+			WordList_AddList(pWList, pLexCurrent->pKeyWords->pszKeyWords[4]); // annotation
+			return AutoC_AddSpecWord_Keyword;
+		} else if (iCurrentStyle >= SCE_KOTLIN_COMMENTLINE && iCurrentStyle <= SCE_KOTLIN_COMMENTDOCWORD) {
+			WordList_AddList(pWList, pLexCurrent->pKeyWords->pszKeyWords[6]); // KDoc
+			return AutoC_AddSpecWord_Finish;
+		}
 	}
 	return 0;
 }
