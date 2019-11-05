@@ -33,22 +33,22 @@ struct EscapeSequence {
 		outerState = state;
 		digitsLeft = 1;
 		numBase = 16;
-		if (state == SCE_JULIA_RAWSTRING || state == SCE_JULIA_TRIPLE_RAWSTRING
-			|| state == SCE_JULIA_BYTESTRING || state == SCE_JULIA_TRIPLE_BYTESTRING) {
+		if (state == SCE_JULIA_RAWSTRING || state == SCE_JULIA_TRIPLE_RAWSTRING) {
+			// TODO: only when backslash followed by double quote
 			return chNext == '\\' || chNext == '\"';
-		} else {
-			if (chNext == 'x') {
-				digitsLeft = 3;
-			} else if (chNext == 'u') {
-				digitsLeft = 5;
-			} else if (chNext == 'U') {
-				digitsLeft = 9;
-			} else if (IsADigit(chNext)) {
-				digitsLeft = 3;
-				numBase = 8;
-			}
-			return true;
 		}
+
+		if (chNext == 'x') {
+			digitsLeft = 3;
+		} else if (chNext == 'u') {
+			digitsLeft = 5;
+		} else if (chNext == 'U') {
+			digitsLeft = 9;
+		} else if (IsADigit(chNext)) {
+			digitsLeft = 3;
+			numBase = 8;
+		}
+		return true;
 	}
 	bool atEscapeEnd(int ch) noexcept {
 		--digitsLeft;
