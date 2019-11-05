@@ -119,6 +119,7 @@ int Scintilla_LinkLexers() {
 	LINK_LEXER(lmHTML);
 	LINK_LEXER(lmInno);
 	LINK_LEXER(lmJSON);
+	LINK_LEXER(lmJulia);
 	//LINK_LEXER(lmKix);
 	LINK_LEXER(lmKotlin);
 	LINK_LEXER(lmLatex);

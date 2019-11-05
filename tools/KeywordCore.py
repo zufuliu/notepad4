@@ -235,6 +235,63 @@ def update_cmake_keyword():
 	keywordList = parse_cmake_api_file('lang/CMake.cmake')
 	UpdateKeywordFile('../src/EditLexers/stlCMake.c', keywordList)
 
+# Julia
+def parse_julia_api_file(path):
+	sections = read_api_file(path, '#')
+	keywordMap = {}
+	for key, doc in sections:
+		if key in ('core', 'modules'):
+			items = re.findall(r'^\s*module\s+([\w.]+)', doc, re.MULTILINE)
+			modules = []
+			for item in items:
+				modules.extend(item.split('.'))
+			keywordMap.setdefault('module', set()).update(modules)
+
+			items = re.findall(r'^\s+const\s+(\w+)', doc, re.MULTILINE)
+			keywordMap.setdefault('constant', set()).update(items)
+
+			items = re.findall(r'^\s+([A-Z]\w+)', doc, re.MULTILINE)
+			keywordMap.setdefault('type', set()).update(items)
+
+			items = re.findall(r'^\s+@([a-z]\w+)', doc, re.MULTILINE)
+			keywordMap.setdefault('macro', set()).update(items)
+
+			items = re.findall(r'^\s+([a-z]\w+!?\()', doc, re.MULTILINE)
+			if key == 'core':
+				keywordMap['basic function'] = set(items)
+			else:
+				keywordMap['function'] = set(items)
+		else:
+			keywordMap[key] = set(doc.split())
+
+	codeFold = keywordMap['code fold']
+	keywordMap['keywords'] |= codeFold
+	codeFold.remove('end')
+	codeFold.add('type')
+
+	RemoveDuplicateKeyword(keywordMap, [
+		'keywords',
+		'constant',
+		'type',
+		'module',
+		'function',
+	])
+	keywordList = [
+		('keywords', keywordMap['keywords'], KeywordAttr.Default),
+		('code fold', codeFold, KeywordAttr.NoAutoComp),
+		('type', keywordMap['type'], KeywordAttr.Default),
+		('constant', keywordMap['constant'], KeywordAttr.Default),
+		('basic function', keywordMap['basic function'], KeywordAttr.Default),
+		('module', keywordMap['module'], KeywordAttr.NoLexer),
+		('macro', keywordMap['macro'], KeywordAttr.NoLexer | KeywordAttr.NoAutoComp),
+		('function', keywordMap['function'], KeywordAttr.NoLexer),
+	]
+	return keywordList
+
+def update_julia_keyword():
+	keywordList = parse_julia_api_file('lang/Julia.jl')
+	UpdateKeywordFile('../src/EditLexers/stlJulia.c', keywordList)
+
 # Kotlin
 def parse_kotlin_api_file(path):
 	sections = read_api_file(path, '//')
@@ -421,6 +478,7 @@ def update_vim_keyword():
 # update all keywords in order
 def update_all_keyword():
 	update_cmake_keyword()
+	update_julia_keyword()
 	update_kotlin_keyword()
 	update_rust_keyword()
 	update_vim_keyword()

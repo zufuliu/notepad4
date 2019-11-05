@@ -143,7 +143,7 @@ typedef const EDITLEXER *LPCEDITLEXER;
 #define NP2LEX_OCTAVE	63061	// SCLEX_MATLAB		Octave Code
 #define NP2LEX_SCILAB	63062	// SCLEX_MATLAB		SciLab Code
 
-#define NP2LEX_JULIA	63066	// SCLEX_MATLAB		Julia Script
+#define NP2LEX_JULIA	63066	// SCLEX_JULIA		Julia Script
 #define NP2LEX_RUST		63067	// SCLEX_RUST		Rust Source
 #define NP2LEX_KOTLIN	63068	// SCLEX_KOTLIN		Kotlin Source
 

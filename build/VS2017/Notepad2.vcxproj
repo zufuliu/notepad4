@@ -902,6 +902,7 @@
     <ClCompile Include="..\..\scintilla\lexers\LexHTML.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexInno.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexJSON.cxx" />
+    <ClCompile Include="..\..\scintilla\lexers\LexJulia.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexKotlin.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexLaTeX.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexLisp.cxx" />
@@ -1046,6 +1047,7 @@
     <ClInclude Include="..\..\scintilla\lexlib\LexerBase.h" />
     <ClInclude Include="..\..\scintilla\lexlib\LexerModule.h" />
     <ClInclude Include="..\..\scintilla\lexlib\LexerSimple.h" />
+    <ClInclude Include="..\..\scintilla\lexlib\LexerUtils.h" />
     <ClInclude Include="..\..\scintilla\lexlib\OptionSet.h" />
     <ClInclude Include="..\..\scintilla\lexlib\PropSetSimple.h" />
     <ClInclude Include="..\..\scintilla\lexlib\SparseState.h" />

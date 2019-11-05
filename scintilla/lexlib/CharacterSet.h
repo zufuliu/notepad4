@@ -82,6 +82,17 @@ constexpr bool IsADigit(int ch, int base) noexcept {
 		|| ((ch >= 'a') && (ch < 'a' + base - 10));
 }
 
+constexpr bool IsFloatExponent(int ch, int chNext) noexcept {
+	return (ch == 'e' || ch == 'E')
+		&& (chNext == '+' || chNext == '-' || IsADigit(chNext));
+}
+
+constexpr bool IsFloatExponent(int base, int ch, int chNext) noexcept {
+	return ((base == 10 && (ch == 'e' || ch == 'E'))
+		|| (base == 16 && (ch == 'p' || ch == 'P')))
+		&& (chNext == '+' || chNext == '-' || IsADigit(chNext));
+}
+
 constexpr bool IsASCII(int ch) noexcept {
 	return (ch >= 0) && (ch < 0x80);
 }
