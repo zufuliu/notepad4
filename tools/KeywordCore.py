@@ -342,8 +342,7 @@ def parse_kotlin_api_file(path):
 		('enum', keywordMap['enum'], KeywordAttr.Default),
 		('annotation', keywordMap['annotation'], KeywordAttr.NoLexer),
 		('function', keywordMap['function'], KeywordAttr.NoLexer),
-		#('KDoc', keywordMap['kdoc'], KeywordAttr.NoLexer | KeywordAttr.NoAutoComp),
-		('KDoc', [], KeywordAttr.NoLexer | KeywordAttr.NoAutoComp),
+		('KDoc', keywordMap['kdoc'], KeywordAttr.NoLexer | KeywordAttr.NoAutoComp),
 	]
 	return keywordList
 
