@@ -1197,6 +1197,7 @@ module Base
 		print_shortest(io::IO, x)
 	end
 
+	Pipe
 	fd(stream)
 	redirect_stdout([stream]) -> (rd, wr)
 	redirect_stderr([stream]) -> (rd, wr)
