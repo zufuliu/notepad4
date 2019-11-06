@@ -440,24 +440,20 @@ void ColouriseJuliaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 					isTransposeOperator = true;
 				}
 
+				sc.SetState(parenCount ? SCE_JULIA_OPERATOR2 : SCE_JULIA_OPERATOR);
 				if (parenCount) {
-					sc.SetState(SCE_JULIA_OPERATOR2);
-					const int outerState = nestedState.empty() ? SCE_JULIA_DEFAULT : nestedState.back();
 					if (sc.ch == '(') {
 						++parenCount;
-						nestedState.push_back(outerState);
+						nestedState.push_back(SCE_JULIA_DEFAULT);
 					} else if (sc.ch == ')') {
 						--parenCount;
+						const int outerState = nestedState.empty() ? SCE_JULIA_DEFAULT : nestedState.back();
 						if (!nestedState.empty()) {
 							nestedState.pop_back();
 						}
-						if (parenCount == 0) {
-							sc.ForwardSetState(outerState);
-							continue;
-						}
+						sc.ForwardSetState(outerState);
+						continue;
 					}
-				} else {
-					sc.SetState(SCE_JULIA_OPERATOR);
 				}
 
 				if (sc.chNext == ':' && ( sc.ch == ':' || sc.ch == '<' || sc.ch == '>')) {
