@@ -371,13 +371,6 @@ void ColouriseJuliaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 				sc.SetState(SCE_JULIA_TRIPLE_STRINGSTART);
 				sc.ForwardSetState(SCE_JULIA_TRIPLE_STRING);
 				sc.Forward();
-			} else if (sc.Match('r', '\"')) {
-				sc.SetState(SCE_JULIA_REGEX);
-				sc.Forward();
-				if (sc.Match(R"(""")")) {
-					sc.ChangeState(SCE_JULIA_TRIPLE_REGEX);
-					sc.Forward(2);
-				}
 			} else if (sc.ch == '\"') {
 				sc.SetState(SCE_JULIA_STRING);
 			} else if (sc.ch == '\'') {
@@ -388,6 +381,13 @@ void ColouriseJuliaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 				sc.Forward();
 			} else if (sc.ch == '`') {
 				sc.SetState(SCE_JULIA_BACKTICKS);
+			} else if (sc.Match('r', '\"')) {
+				sc.SetState(SCE_JULIA_REGEX);
+				sc.Forward();
+				if (sc.Match(R"(""")")) {
+					sc.ChangeState(SCE_JULIA_TRIPLE_REGEX);
+					sc.Forward(2);
+				}
 			} else if (sc.Match("raw\"")) {
 				sc.SetState(SCE_JULIA_RAWSTRING);
 				sc.Forward(3);
