@@ -10,23 +10,29 @@ static KEYWORDLIST Keywords_Kotlin = {{
 "tailrec this throw true try typealias typeof val var vararg when where while "
 
 , // 1 class
-"Any Array ArrayList Boolean BooleanArray Byte ByteArray Char CharArray Double DoubleArray Enum Error Exception "
-"Float FloatArray HashMap HashSet Int IntArray LinkedHashMap LinkedHashSet Long LongArray Nothing Number Pair "
-"Regex Result Short ShortArray String StringBuilder Throwable Triple "
+"AbstractCollection AbstractIterator AbstractList "
+"AbstractMap AbstractMutableCollection AbstractMutableList AbstractMutableMap AbstractMutableSet AbstractSet Any "
+"Array ArrayList "
+"Boolean BooleanArray Byte ByteArray Char CharArray Double DoubleArray Enum Error Exception Float FloatArray "
+"HashMap HashSet IndexedValue Int IntArray LinkedHashMap LinkedHashSet Long LongArray MatchGroup Nothing Number Pair "
+"Random Regex Result RuntimeException Short ShortArray String StringBuilder Throwable Triple "
 "UByte UByteArray UInt UIntArray ULong ULongArray UShort UShortArray Unit "
 
 , // 2 interface
-"Annotation Appendable CharSequence Collection Comparable Comparator Function Grouping Iterable Iterator Lazy List Map "
-"Set "
+"Annotation Appendable CharSequence Collection Comparable Comparator Function Grouping Iterable Iterator "
+"Lazy List ListIterator "
+"Map MatchGroupCollection MatchResult "
+"MutableCollection MutableIterable MutableIterator MutableList MutableListIterator MutableMap MutableSet "
+"RandomAccess Set "
 
 , // 3 enum
-"AnnotationRetention AnnotationTarget DeprecationLevel "
+"AnnotationRetention AnnotationTarget DeprecationLevel LazyThreadSafetyMode RegexOption "
 
 , // 4 annotation
 "Deprecated Metadata MustBeDocumented Repeatable ReplaceWith Retention Suppress Target "
 
 , // 5 function
-"assert( error( print( println( readLine( require( "
+"assert( check( error( print( println( readLine( require( "
 
 , // 6 KDoc
 "author constructor exception param property receiver return sample see since suppress throws "

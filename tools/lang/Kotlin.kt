@@ -81,12 +81,14 @@ package kotlin {
 	class Int : Number, Comparable<Int>
 	class IntArray
 	interface Lazy<out T>
+	enum class LazyThreadSafetyMode
 	class Long : Number, Comparable<Long>
 	class LongArray
 	class Nothing
 	abstract class Number
 	data class Pair<out A, out B> : Serializable
 	inline class Result<out T> : Serializable
+	open class RuntimeException : Exception
 	class Short : Number, Comparable<Short>
 	class ShortArray
 	class String : Comparable<String>, CharSequence
@@ -110,6 +112,7 @@ package kotlin {
 
 	// Functions
 	fun assert(value: Boolean)
+	fun check(value: Boolean)
 	fun error(message: Any): Nothing
 	fun require(value: Boolean)
 }
@@ -128,17 +131,36 @@ package kotlin.annotation {
 
 package kotlin.collections {
 	// Types
+	abstract class AbstractCollection<out E> : Collection<E>
+	abstract class AbstractIterator<T> : Iterator<T>
+	abstract class AbstractList<out E> : AbstractCollection<E>, List<E>
+	abstract class AbstractMap<K, out V> : Map<K, V>
+	abstract class AbstractMutableCollection<E> : MutableCollection<E>
+	abstract class AbstractMutableList<E> : MutableList<E>
+	abstract class AbstractMutableMap<K, V> : MutableMap<K, V>
+	abstract class AbstractMutableSet<E> : MutableSet<E>
+	abstract class AbstractSet<out E> : AbstractCollection<E>, Set<E>
 	class ArrayList<E> : MutableList<E>, RandomAccess
 	interface Collection<out E> : Iterable<E>
 	interface Grouping<T, out K>
 	class HashMap<K, V> : MutableMap<K, V>
 	class HashSet<E> : MutableSet<E>
+	data class IndexedValue<out T>
 	interface Iterable<out T>
 	interface Iterator<out T>
 	class LinkedHashMap<K, V> : MutableMap<K, V>
 	class LinkedHashSet<E> : MutableSet<E>
 	interface List<out E> : Collection<E>
+	interface ListIterator<out T> : Iterator<T>
 	interface Map<K, out V>
+	interface MutableCollection<E> : Collection<E>, MutableIterable<E>
+    interface MutableIterable<out T> : Iterable<T>
+    interface MutableIterator<out T> : Iterator<T>
+    interface MutableList<E> : List<E>, MutableCollection<E>
+    interface MutableListIterator<T> : ListIterator<T>, MutableIterator<T>
+    interface MutableMap<K, V> : Map<K, V>
+    interface MutableSet<E> : Set<E>, MutableCollection<E>
+    interface RandomAccess
 	interface Set<out E> : Collection<E>
 }
 
@@ -149,10 +171,19 @@ package kotlin.io {
 	fun readLine(): String?
 }
 
+package kotlin.random {
+	// Types
+	abstract class Random
+}
+
 package kotlin.text {
 	// Types
 	interface Appendable
+	class MatchGroup
+	interface MatchGroupCollection : Collection<MatchGroup?>
+	interface MatchResult
 	class Regex
+	enum class RegexOption
 	class StringBuilder : Appendable, CharSequence
 }
 
