@@ -74,7 +74,7 @@ Or build from source, see the [Wiki](https://github.com/zufuliu/notepad2/wiki/Bu
 	* [JavaScript](../master/tools/lang/JavaScript.js), up to ECMAScript 2018, 9ed.
 	* JSON and JSON5 Document
 	* Julia Script, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#julia)
-		* [Julia Standard Library](../master/tools/lang/Julia.jl), up to 1.2.
+		* [Julia Base and Standard Library](../master/tools/lang/Julia.jl), up to 1.2.
 	* [Kotlin](../master/tools/lang/Kotlin.kt)
 	* LaTeX
 	* Lisp Script
