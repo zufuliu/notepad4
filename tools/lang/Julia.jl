@@ -92,6 +92,8 @@ module Core
 	const nothing
 	const Cvoid
 	Expr(head::Symbol, args...)
+	QuoteNode
+	LineNumberNode
 	GlobalRef
 	Symbol
 	Symbol(x...) -> Symbol
