@@ -352,23 +352,19 @@ void ColouriseKotlinDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 				chBeforeIdentifier = sc.chPrev;
 				sc.SetState(SCE_KOTLIN_IDENTIFIER);
 			} else if (isoperator(sc.ch)) {
-				if (curlyBrace == 0) {
-					sc.SetState(SCE_KOTLIN_OPERATOR);
-				} else {
-					sc.SetState(SCE_KOTLIN_OPERATOR2);
-					const int outerState = nestedState.empty() ? SCE_KOTLIN_DEFAULT: nestedState.back();
+				sc.SetState(curlyBrace ? SCE_KOTLIN_OPERATOR2 : SCE_KOTLIN_OPERATOR);
+				if (curlyBrace) {
 					if (sc.ch == '{') {
 						++curlyBrace;
-						nestedState.push_back(outerState);
+						nestedState.push_back(SCE_KOTLIN_DEFAULT);
 					} else if (sc.ch == '}') {
 						--curlyBrace;
+						const int outerState = nestedState.empty() ? SCE_KOTLIN_DEFAULT: nestedState.back();
 						if (!nestedState.empty()) {
 							nestedState.pop_back();
 						}
-						if (curlyBrace == 0) {
-							sc.ForwardSetState(outerState);
-							continue;
-						}
+						sc.ForwardSetState(outerState);
+						continue;
 					}
 				}
 			}
