@@ -44,7 +44,7 @@ struct EscapeSequence {
 			digitsLeft = 5;
 		} else if (chNext == 'U') {
 			digitsLeft = 9;
-		} else if (IsADigit(chNext)) {
+		} else if (IsADigit(chNext, 8)) {
 			digitsLeft = 3;
 			numBase = 8;
 		}
