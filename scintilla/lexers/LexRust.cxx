@@ -123,7 +123,7 @@ void ColouriseRustDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 						if (strcmp(s, "struct") == 0) {
 							kwType = SCE_RUST_STRUCT;
 						} else if (strcmp(s, "fn") == 0) {
-							kwType = SCE_RUST_FUNCTION;
+							kwType = SCE_RUST_FUNCTION_DEFINE;
 						} else if (strcmp(s, "trait") == 0) {
 							kwType = SCE_RUST_TRAIT;
 						} else if (strcmp(s, "enum") == 0) {
@@ -161,7 +161,7 @@ void ColouriseRustDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 					} else {
 						const int chNext = sc.GetNextNSChar();
 						if (chNext == '(') {
-							sc.ChangeState(SCE_RUST_FUNCTION);
+							sc.ChangeState((kwType == SCE_RUST_FUNCTION_DEFINE)? kwType : SCE_RUST_FUNCTION);
 						} else if (chNext == '!') {
 							sc.ChangeState(SCE_RUST_MACRO);
 						} else if (kwType != SCE_RUST_DEFAULT) {
