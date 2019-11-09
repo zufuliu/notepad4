@@ -64,6 +64,8 @@ JSON Document
 	eslintrc		ESLint Configuration File
 	jsonld			JSON for Linked Data
 	arcconfig		Phabricator Arcanist
+	arclint			Phabricator Arcanist
+	jscop			JSCoP File, http://polly.llvm.org/documentation/passes.html
 
 PHP Script
 	php
