@@ -38,8 +38,7 @@ static EDITSTYLE Styles_XML[] = {
 EDITLEXER lexXML = {
 	SCLEX_XML, NP2LEX_XML,
 	EDITLEXER_HOLE(L"XML Document", Styles_XML),
-	L"xml; xsl; xslt; xsd; dtd; rss; svg; xul; axl; rdf; xaml; resx; plist; mm; xrc; fbp",
+	L"xml; xsl; xslt; xsd; dtd; rss; svg; xul; axl; rdf; xaml; resx; plist; pom; mm; xrc; fbp",
 	&Keywords_XML,
 	Styles_XML
 };
-
