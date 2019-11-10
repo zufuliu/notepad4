@@ -71,7 +71,7 @@ void ColouriseVimDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 			sc.SetState(SCE_VIM_DEFAULT);
 			break;
 		case SCE_VIM_NUMBER:
-			if (!(iswordchar(sc.ch) || ((sc.ch == '+' || sc.ch == '-') && IsADigit(sc.chNext)))) {
+			if (!IsDecimalNumber(sc.chPrev, sc.ch, sc.chNext)) {
 				sc.SetState(SCE_VIM_DEFAULT);
 			}
 			break;

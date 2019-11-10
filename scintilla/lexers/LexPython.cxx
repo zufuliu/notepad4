@@ -138,14 +138,8 @@ static void ColourisePyDoc(Sci_PositionU startPos, Sci_Position length, int init
 			sc.SetState(SCE_PY_DEFAULT);
 			break;
 		case SCE_PY_NUMBER:
-			if (!iswordstart(sc.ch)) {
-				if ((sc.ch == '+' || sc.ch == '-') && (sc.chPrev == 'e' || sc.chPrev == 'E')) {
-					sc.Forward();
-				} else if (sc.ch == '.' && sc.chNext != '.') {
-					sc.ForwardSetState(SCE_PY_DEFAULT);
-				} else {
-					sc.SetState(SCE_PY_DEFAULT);
-				}
+			if (!IsDecimalNumber(sc.chPrev, sc.ch, sc.chNext)) {
+				sc.SetState(SCE_PY_DEFAULT);
 			}
 			break;
 		case SCE_PY_IDENTIFIER:

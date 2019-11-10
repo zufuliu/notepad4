@@ -144,6 +144,18 @@ constexpr bool IsIdentifierStart(int ch) noexcept {
 	return IsAlpha(ch) || ch == '_';
 }
 
+constexpr bool IsDecimalNumber(int chPrev, int ch, int chNext) noexcept {
+	return IsIdentifierChar(ch)
+		|| ((ch == '+' || ch == '-') && (chPrev == 'e' || chPrev == 'E'))
+		|| (ch == '.' && chNext != '.');
+}
+
+constexpr bool IsDecimalNumberEx(int chPrev, int ch, int chNext) noexcept {
+	return IsIdentifierChar(ch)
+		|| ((ch == '+' || ch == '-') && (chPrev == 'e' || chPrev == 'E' || chPrev == 'p' || chPrev == 'P'))
+		|| (ch == '.' && chNext != '.');
+}
+
 constexpr bool IsIdentifierCharEx(int ch) noexcept {
 	return IsIdentifierChar(ch) || ch > 0x80;
 }

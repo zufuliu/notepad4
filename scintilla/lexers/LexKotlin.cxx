@@ -42,12 +42,6 @@ struct EscapeSequence {
 	}
 };
 
-constexpr bool IsKotlinNumber(int chPrev, int ch, int chNext) noexcept {
-	return IsIdentifierChar(ch)
-		|| ((ch == '+' || ch == '-') && (chPrev == 'E' || chPrev == 'e'))
-		|| (ch == '.' && chNext != '.');
-}
-
 enum {
 	MaxKotlinNestedStateCount = 4,
 	KotlinLineStateMaskLineComment = (1 << 14), // line comment
@@ -129,7 +123,7 @@ void ColouriseKotlinDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 			break;
 
 		case SCE_KOTLIN_NUMBER:
-			if (!IsKotlinNumber(sc.chPrev, sc.ch, sc.chNext)) {
+			if (!IsDecimalNumber(sc.chPrev, sc.ch, sc.chNext)) {
 				sc.SetState(SCE_KOTLIN_DEFAULT);
 			}
 			break;

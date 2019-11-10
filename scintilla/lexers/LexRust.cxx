@@ -35,12 +35,6 @@ struct EscapeSequence {
 	}
 };
 
-constexpr bool IsRustNumber(int chPrev, int ch, int chNext) noexcept {
-	return IsIdentifierChar(ch)
-		|| ((ch == '+' || ch == '-') && (chPrev == 'E' || chPrev == 'e'))
-		|| (ch == '.' && chNext != '.');
-}
-
 bool IsRustRawString(LexAccessor &styler, Sci_PositionU pos, bool start, int &hashCount) noexcept {
 	int count = 0;
 	while (styler.SafeGetCharAt(pos) == '#') {
@@ -103,7 +97,7 @@ void ColouriseRustDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 			break;
 
 		case SCE_RUST_NUMBER:
-			if (!IsRustNumber(sc.chPrev, sc.ch, sc.chNext)) {
+			if (!IsDecimalNumber(sc.chPrev, sc.ch, sc.chNext)) {
 				sc.SetState(SCE_RUST_DEFAULT);
 			}
 			break;

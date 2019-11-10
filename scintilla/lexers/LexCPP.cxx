@@ -248,13 +248,8 @@ static void ColouriseCppDoc(Sci_PositionU startPos, Sci_Position length, int ini
 			sc.SetState(SCE_C_DEFAULT);
 			break;
 		case SCE_C_NUMBER:
-			if (!iswordstart(sc.ch)) { //
-				if ((sc.ch == '+' || sc.ch == '-') && (
-					(sc.chPrev == 'E' || sc.chPrev == 'e') || (sc.chPrev == 'P' || sc.chPrev == 'p'))) {
-					sc.Forward();
-				} else if (sc.ch == '.' && sc.chNext != '.') {
-					sc.ForwardSetState(SCE_C_DEFAULT);
-				} else if (sc.ch == '\'' && lexType == LEX_CPP) {
+			if (!IsDecimalNumberEx(sc.chPrev, sc.ch, sc.chNext)) {
+				if (sc.ch == '\'' && lexType == LEX_CPP) {
 					sc.Forward();
 				} else {
 					sc.SetState(SCE_C_DEFAULT);

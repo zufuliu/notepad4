@@ -34,6 +34,7 @@ static void ColouriseLispDoc(Sci_PositionU startPos, Sci_Position length, int in
 	const WordList &keywords = *keywordLists[0];
 
 	int state = initStyle;
+	int ch = 0;
 	int chNext = styler[startPos];
 	styler.StartAt(startPos);
 	styler.StartSegment(startPos);
@@ -44,7 +45,8 @@ static void ColouriseLispDoc(Sci_PositionU startPos, Sci_Position length, int in
 	int wordLen = 0;
 
 	for (Sci_PositionU i = startPos; i < endPos; i++) {
-		int ch = chNext;
+		const int chPrev = ch;
+		ch = chNext;
 		chNext = styler.SafeGetCharAt(i + 1);
 
 		const bool atEOL = (ch == '\r' && chNext != '\n') || (ch == '\n');
@@ -59,7 +61,7 @@ static void ColouriseLispDoc(Sci_PositionU startPos, Sci_Position length, int in
 			state = SCE_C_DEFAULT;
 			break;
 		case SCE_C_NUMBER:
-			if (!(iswordchar(ch) || ((ch == '+' || ch == '-') && IsADigit(chNext)))) {
+			if (!IsDecimalNumber(chPrev, ch, chNext)) {
 				styler.ColourTo(i - 1, state);
 				state = SCE_C_DEFAULT;
 			}

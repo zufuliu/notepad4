@@ -67,14 +67,8 @@ static void ColouriseFSharpDoc(Sci_PositionU startPos, Sci_Position length, int 
 			sc.SetState(SCE_FSHARP_DEFAULT);
 			break;
 		case SCE_FSHARP_NUMBER:
-			if (!iswordstart(sc.ch)) { //
-				if ((sc.ch == '+' || sc.ch == '-') && (sc.chPrev == 'E' || sc.chPrev == 'e')) {
-					sc.Forward();
-				} else if (sc.ch == '.' && sc.chNext != '.') {
-					sc.ForwardSetState(SCE_FSHARP_DEFAULT);
-				} else {
-					sc.SetState(SCE_FSHARP_DEFAULT);
-				}
+			if (!IsDecimalNumber(sc.chPrev, sc.ch, sc.chNext)) {
+				sc.SetState(SCE_FSHARP_DEFAULT);
 			}
 			break;
 		case SCE_FSHARP_IDENTIFIER:
