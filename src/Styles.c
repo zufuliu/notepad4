@@ -2162,95 +2162,108 @@ LPCWSTR Style_GetCurrentLexerName(void) {
 	}
 }
 
+static void Style_UpdateLexerLang(PEDITLEXER pLex, LPCWSTR lpszExt, LPCWSTR lpszName) {
+	switch (pLex->rid) {
+	case NP2LEX_BASH:
+		if (StrCaseEqual(L"m4", lpszExt)) {
+			np2LexLangIndex = IDM_LANG_M4;
+		} else if (StrCaseEqual(L"csh", lpszExt) || StrCaseEqual(L"tcsh", lpszExt)) {
+			np2LexLangIndex = IDM_LANG_CSHELL;
+		}
+		break;
+
+	case NP2LEX_CONF:
+		if (StrNCaseEqual(lpszName, L"httpd", 5) || StrCaseEqual(lpszExt, L"htaccess")) {
+			np2LexLangIndex = IDM_LANG_APACHE;
+		}
+		break;
+
+	case NP2LEX_CSS:
+		if (StrCaseEqual(L"scss", lpszExt)) {
+			np2LexLangIndex = IDM_LANG_SCSS;
+		} else if (StrCaseEqual(L"less", lpszExt)) {
+			np2LexLangIndex = IDM_LANG_LESS;
+		} else if (StrCaseEqual(L"hss", lpszExt)) {
+			np2LexLangIndex = IDM_LANG_HSS;
+		}
+		break;
+
+	case NP2LEX_HTML:
+		if (StrCaseEqual(L"jsp", lpszExt)) {
+			np2LexLangIndex = IDM_LANG_JSP;
+		} else if (StrCaseEqual(L"aspx", lpszExt)) {
+			np2LexLangIndex = Style_GetDocTypeLanguage();
+			if (np2LexLangIndex == 0) {
+				np2LexLangIndex = IDM_LANG_ASPX_CS;
+			}
+		} else if (StrCaseEqual(L"asp", lpszExt)) {
+			np2LexLangIndex = Style_GetDocTypeLanguage();
+			if (np2LexLangIndex == 0) {
+				np2LexLangIndex = IDM_LANG_ASP_VBS;
+			}
+		}
+		break;
+
+	case NP2LEX_MATLAB:
+		if (StrCaseEqual(L"sce", lpszExt) || StrCaseEqual(L"sci", lpszExt)) {
+			np2LexLangIndex = IDM_LANG_SCILAB;
+		}
+		break;
+
+	case NP2LEX_XML:
+		if (StrCaseEqual(L"xml", lpszExt)) {
+			if (StrCaseEqual(lpszName, L"build.xml") || StrCaseEqual(lpszName, L"javadoc.xml")) {
+				np2LexLangIndex = IDM_LANG_ANT_BUILD;
+			} else if (StrCaseEqual(lpszName, L"pom.xml")) {
+				np2LexLangIndex = IDM_LANG_MAVEN_POM;
+			} else if (StrCaseEqual(lpszName, L"settings.xml")) {
+				np2LexLangIndex = IDM_LANG_MAVEN_SETTINGS;
+			} else if (StrCaseEqual(lpszName, L"AndroidManifest.xml")) {
+				np2LexLangIndex = IDM_LANG_ANDROID_MANIFEST;
+			} else if (StrCaseEqual(lpszName, L"server.xml")) {
+				np2LexLangIndex = IDM_LANG_TOMCAT;
+			} else if (StrCaseEqual(lpszName, L"web.xml")) {
+				np2LexLangIndex = IDM_LANG_WEB_JAVA;
+			} else if (StrCaseEqual(lpszName, L"struts.xml") || StrCaseEqual(lpszName, L"struts-config.xml")) {
+				np2LexLangIndex = IDM_LANG_STRUTS;
+			} else if (StrCaseEqual(lpszName, L"hibernate.cfg.xml")) {
+				np2LexLangIndex = IDM_LANG_HIB_CFG;
+			} else if (StrCaseEqual(lpszName, L"ivy.xml")) {
+				np2LexLangIndex = IDM_LANG_IVY_MODULE;
+			} else if (StrCaseEqual(lpszName, L"ivysettings.xml")) {
+				np2LexLangIndex = IDM_LANG_IVY_SETTINGS;
+			} else if (StrCaseEqual(lpszName, L"pmd.xml")) {
+				np2LexLangIndex = IDM_LANG_PMD_RULESET;
+			} else {
+				np2LexLangIndex = Style_GetDocTypeLanguage();
+			}
+		} else if (StrCaseEqual(L"xsd", lpszExt)) {
+			np2LexLangIndex = IDM_LANG_XSD;
+		} else if (StrNCaseEqual(L"xsl", lpszExt, 3)) {
+			np2LexLangIndex = IDM_LANG_XSLT;
+		} else if (StrCaseEqual(L"dtd", lpszExt)) {
+			np2LexLangIndex = IDM_LANG_DTD;
+		} else if (StrCaseEqual(L"pom", lpszExt)) {
+			np2LexLangIndex = IDM_LANG_MAVEN_POM;
+		} else if (StrCaseEqual(L"resx", lpszExt)) {
+			np2LexLangIndex = IDM_LANG_RESX;
+		} else if (StrCaseEqual(L"xaml", lpszExt)) {
+			np2LexLangIndex = IDM_LANG_XAML;
+		} else if (StrCaseEqual(L"plist", lpszExt)) {
+			np2LexLangIndex = IDM_LANG_PROPERTY_LIST;
+		} else if (StrCaseEqual(L"svg", lpszExt)) {
+			np2LexLangIndex = IDM_LANG_SVG;
+		}
+		break;
+	}
+}
+
 //=============================================================================
 // find lexer from file extension
 // Style_MatchLexer()
 //
 PEDITLEXER Style_MatchLexer(LPCWSTR lpszMatch, BOOL bCheckNames) {
 	if (!bCheckNames) {
-		//if (StrNCaseEqual(L"php", lpszMatch, 3) || StrCaseEqual(L"phtml", lpszMatch))) {
-		//	np2LexLangIndex = IDM_LANG_PHP;
-		//	return &lexPHP;
-		//}
-		if (StrCaseEqual(L"jsp", lpszMatch)) {
-			np2LexLangIndex = IDM_LANG_JSP;
-			return &lexHTML;
-		}
-		if (StrCaseEqual(L"aspx", lpszMatch)) {
-			np2LexLangIndex = Style_GetDocTypeLanguage();
-			if (np2LexLangIndex == 0) {
-				np2LexLangIndex = IDM_LANG_ASPX_CS;
-			}
-			return &lexHTML;
-		}
-		if (StrCaseEqual(L"asp", lpszMatch)) {
-			np2LexLangIndex = Style_GetDocTypeLanguage();
-			if (np2LexLangIndex == 0) {
-				np2LexLangIndex = IDM_LANG_ASP_VBS;
-			}
-			return &lexHTML;
-		}
-
-		if (StrCaseEqual(L"xsd", lpszMatch)) {
-			np2LexLangIndex = IDM_LANG_XSD;
-			return &lexXML;
-		}
-		if (StrNCaseEqual(L"xsl", lpszMatch, 3)) {
-			np2LexLangIndex = IDM_LANG_XSLT;
-			return &lexXML;
-		}
-		if (StrCaseEqual(L"dtd", lpszMatch)) {
-			np2LexLangIndex = IDM_LANG_DTD;
-			return &lexXML;
-		}
-		if (StrCaseEqual(L"pom", lpszMatch)) {
-			np2LexLangIndex = IDM_LANG_MAVEN_POM;
-			return &lexXML;
-		}
-		if (StrCaseEqual(L"resx", lpszMatch)) {
-			np2LexLangIndex = IDM_LANG_RESX;
-			return &lexXML;
-		}
-		if (StrCaseEqual(L"xaml", lpszMatch)) {
-			np2LexLangIndex = IDM_LANG_XAML;
-			return &lexXML;
-		}
-		if (StrCaseEqual(L"plist", lpszMatch)) {
-			np2LexLangIndex = IDM_LANG_PROPERTY_LIST;
-			return &lexXML;
-		}
-		if (StrCaseEqual(L"svg", lpszMatch)) {
-			np2LexLangIndex = IDM_LANG_SVG;
-			return &lexXML;
-		}
-		if (StrCaseEqual(L"xml", lpszMatch)) {
-			np2LexLangIndex = Style_GetDocTypeLanguage();
-			return &lexXML;
-		}
-		if (StrCaseEqual(L"sce", lpszMatch) || StrCaseEqual(L"sci", lpszMatch)) {
-			np2LexLangIndex = IDM_LANG_SCILAB;
-			return &lexMatlab;
-		}
-		if (StrCaseEqual(L"m4", lpszMatch)) {
-			np2LexLangIndex = IDM_LANG_M4;
-			return &lexBash;
-		}
-		if (StrCaseEqual(L"csh", lpszMatch) || StrCaseEqual(L"tcsh", lpszMatch)) {
-			np2LexLangIndex = IDM_LANG_CSHELL;
-			return &lexBash;
-		}
-		if (StrCaseEqual(L"scss", lpszMatch)) {
-			np2LexLangIndex = IDM_LANG_SCSS;
-			return &lexCSS;
-		}
-		if (StrCaseEqual(L"less", lpszMatch)) {
-			np2LexLangIndex = IDM_LANG_LESS;
-			return &lexCSS;
-		}
-		if (StrCaseEqual(L"hss", lpszMatch)) {
-			np2LexLangIndex = IDM_LANG_HSS;
-			return &lexCSS;
-		}
 		if (bAutoSelect && StrCaseEqual(L"m", lpszMatch)) {
 			PEDITLEXER lex = Style_DetectObjCAndMatlab();
 			if (lex != NULL) {
@@ -2326,36 +2339,6 @@ static PEDITLEXER Style_GetLexerFromFile(LPCWSTR lpszFile, BOOL bCGIGuess, LPCWS
 			bFound = pLexNew != NULL;
 		}
 
-		if (!bFound && StrCaseEqual(lpszExt, L"xml")) {
-			pLexNew = &lexXML;
-			bFound = TRUE;
-			if (StrCaseEqual(lpszName, L"build.xml") || StrCaseEqual(lpszName, L"javadoc.xml")) {
-				np2LexLangIndex = IDM_LANG_ANT_BUILD;
-			} else if (StrCaseEqual(lpszName, L"pom.xml")) {
-				np2LexLangIndex = IDM_LANG_MAVEN_POM;
-			} else if (StrCaseEqual(lpszName, L"settings.xml")) {
-				np2LexLangIndex = IDM_LANG_MAVEN_SETTINGS;
-			} else if (StrCaseEqual(lpszName, L"AndroidManifest.xml")) {
-				np2LexLangIndex = IDM_LANG_ANDROID_MANIFEST;
-			} else if (StrCaseEqual(lpszName, L"server.xml")) {
-				np2LexLangIndex = IDM_LANG_TOMCAT;
-			} else if (StrCaseEqual(lpszName, L"web.xml")) {
-				np2LexLangIndex = IDM_LANG_WEB_JAVA;
-			} else if (StrCaseEqual(lpszName, L"struts.xml") || StrCaseEqual(lpszName, L"struts-config.xml")) {
-				np2LexLangIndex = IDM_LANG_STRUTS;
-			} else if (StrCaseEqual(lpszName, L"hibernate.cfg.xml")) {
-				np2LexLangIndex = IDM_LANG_HIB_CFG;
-			} else if (StrCaseEqual(lpszName, L"ivy.xml")) {
-				np2LexLangIndex = IDM_LANG_IVY_MODULE;
-			} else if (StrCaseEqual(lpszName, L"ivysettings.xml")) {
-				np2LexLangIndex = IDM_LANG_IVY_SETTINGS;
-			} else if (StrCaseEqual(lpszName, L"pmd.xml")) {
-				np2LexLangIndex = IDM_LANG_PMD_RULESET;
-			} else {
-				np2LexLangIndex = Style_GetDocTypeLanguage();
-			}
-		}
-
 		// autoconf / automake
 		if (!bFound && StrCaseEqual(lpszExt, L"in") && pDotFile != NULL) {
 			WCHAR tchCopy[MAX_PATH];
@@ -2365,11 +2348,6 @@ static PEDITLEXER Style_GetLexerFromFile(LPCWSTR lpszFile, BOOL bCGIGuess, LPCWS
 			bFound = pLexNew != NULL;
 		}
 
-		if (!bFound && ((StrCaseEqual(lpszExt, L"conf") && StrNCaseEqual(lpszName, L"httpd", 5)) || StrCaseEqual(lpszExt, L"htaccess"))) {
-			pLexNew = &lexCONF;
-			bFound = TRUE;
-			np2LexLangIndex = IDM_LANG_APACHE;
-		}
 		// MySQL ini/cnf
 		if (!bFound && StrNCaseEqual(lpszName, L"my", 2) && (StrCaseEqual(lpszExt, L"ini") || StrCaseEqual(lpszExt, L"cnf"))) {
 			pLexNew = &lexCONF;
@@ -2386,7 +2364,9 @@ static PEDITLEXER Style_GetLexerFromFile(LPCWSTR lpszFile, BOOL bCGIGuess, LPCWS
 			pLexNew = Style_MatchLexer(lpszExt, FALSE);
 			bFound = pLexNew != NULL;
 		}
-
+		if (bFound) {
+			Style_UpdateLexerLang(pLexNew, lpszExt, lpszName);
+		}
 		// dot file
 		if (StrCaseEqual(lpszExt - 1, lpszName)) {
 			if (pDotFile) {
