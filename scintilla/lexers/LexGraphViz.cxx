@@ -79,7 +79,7 @@ static void ColouriseGraphDoc(Sci_PositionU startPos, Sci_Position length, int i
 			state = SCE_C_DEFAULT;
 			break;
 		case SCE_C_NUMBER:
-			if (!(iswordchar(ch) || ((ch == '+' || ch == '-') && IsADigit(chNext)))) {
+			if (!IsDecimalNumber(chPrev, ch, chNext)) {
 				styler.ColourTo(i - 1, state);
 				state = SCE_C_DEFAULT;
 			}

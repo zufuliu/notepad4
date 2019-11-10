@@ -102,7 +102,7 @@ static void ColouriseSmaliDoc(Sci_PositionU startPos, Sci_Position length, int i
 			state = SCE_SMALI_DEFAULT;
 			break;
 		case SCE_SMALI_NUMBER:
-			if (!(iswordchar(ch) || ((ch == '+' || ch == '-') && IsADigit(chNext)))) {
+			if (!IsDecimalNumber(chPrev, ch, chNext)) {
 				styler.ColourTo(i - 1, state);
 				state = SCE_SMALI_DEFAULT;
 			}
