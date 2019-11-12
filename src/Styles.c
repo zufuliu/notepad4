@@ -1990,6 +1990,7 @@ PEDITLEXER Style_AutoDetect(BOOL bDotFile) {
 	int cppCount = 0;
 	int sharpCount = 0;
 	BOOL maybeIni = FALSE;
+	BOOL maybeJson = FALSE;
 
 	while (*p) {
 		if (*p == '[') {
@@ -2019,6 +2020,15 @@ PEDITLEXER Style_AutoDetect(BOOL bDotFile) {
 				return &lexCPP;
 			}
 			break;
+
+		case '{':
+		case '}':
+		case ']':
+			maybeJson = TRUE;
+			break;
+		case '\"':
+			maybeJson |= maybeIni;
+			break;
 		}
 		// skip to next line
 		while (*p && !(*p == '\r' || *p == '\n')) {
@@ -2031,6 +2041,9 @@ PEDITLEXER Style_AutoDetect(BOOL bDotFile) {
 	}
 	if (sharpCount) {
 		return shebang ? &lexBash : &lexCONF;
+	}
+	if (maybeJson) {
+		return &lexJSON;
 	}
 	if (maybeIni) {
 		return &lexINI;
