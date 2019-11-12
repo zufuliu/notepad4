@@ -4,7 +4,6 @@
 
 #include <cassert>
 #include <cstring>
-#include <cctype>
 
 #include "ILexer.h"
 #include "Scintilla.h"
@@ -19,211 +18,269 @@
 
 using namespace Scintilla;
 
-#define MAX_WORD_LENGTH	31
+namespace {
 
-static void CheckLLVMVarType(Sci_PositionU pos, Sci_PositionU endPos, Accessor &styler, bool &is_func, bool &is_type) noexcept {
-	char c = 0;
-	while (pos < endPos) {
-		c = styler.SafeGetCharAt(pos);
-		if (!(IsASpaceOrTab(c) || c == '*')) break;
-		pos++;
-	}
+struct EscapeSequence {
+	int outerState = SCE_LLVM_DEFAULT;
+	int digitsLeft = 0;
 
-	if (c == '(') {
-		is_func = true;
-		return;
-	}
-	if (c == '%') {
-		is_type = true;
-		return;
-	}
-	if (c == '=') {
-		pos++;
-		while (pos < endPos) {
-			c = styler.SafeGetCharAt(pos);
-			if (!IsASpaceOrTab(c)) break;
-			pos++;
+	// highlight any character as escape sequence.
+	bool resetEscapeState(int state, int chNext) noexcept {
+		if (chNext == '\r' || chNext == '\n') {
+			return false;
 		}
-		if (c == 't' && styler.SafeGetCharAt(pos + 1) == 'y'
-			&& styler.SafeGetCharAt(pos + 2) == 'p' && styler.SafeGetCharAt(pos + 3) == 'e'
-			&& isspacechar(styler.SafeGetCharAt(pos + 4))) {
-			is_type = true;
-		}
+		outerState = state;
+		digitsLeft = IsHexDigit(chNext) ? 2 : 1;
+		return true;
 	}
+	bool atEscapeEnd(int ch) noexcept {
+		--digitsLeft;
+		return digitsLeft <= 0 || !IsHexDigit(ch);
+	}
+};
+
+constexpr bool IsLLVMIdentifierChar(int ch) {
+	return IsIdentifierChar(ch) || ch == '-' || ch == '.';
 }
 
-static void ColouriseLLVMDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
-	const WordList &keywords = *keywordLists[0];
-	const WordList &keywords2 = *keywordLists[1];
-	const WordList &kwAttr = *keywordLists[4];
-	const WordList &kwInstruction = *keywordLists[10];
+enum {
+	LLVMLineStateMaskLineComment = 1, // line comment
+};
 
-	int state = initStyle;
-	int chNext = styler[startPos];
-	styler.StartAt(startPos);
-	styler.StartSegment(startPos);
-	const Sci_PositionU endPos = startPos + length;
-
-	Sci_Position lineCurrent = styler.GetLine(startPos);
-	char buf[MAX_WORD_LENGTH + 1] = "";
-	int wordLen = 0;
-
-	for (Sci_PositionU i = startPos; i < endPos; i++) {
-		int ch = chNext;
-		chNext = styler.SafeGetCharAt(i + 1);
-
-		const bool atEOL = (ch == '\r' && chNext != '\n') || (ch == '\n');
-		const bool atLineStart = i == static_cast<Sci_PositionU>(styler.LineStart(lineCurrent));
-
-		switch (state) {
-		case SCE_C_OPERATOR:
-			styler.ColourTo(i - 1, state);
-			state = SCE_C_DEFAULT;
-			break;
-		case SCE_C_NUMBER:
-			if (!(iswordchar(ch) || ((ch == '+' || ch == '-') && IsADigit(chNext)))) {
-				styler.ColourTo(i - 1, state);
-				state = SCE_C_DEFAULT;
-			}
-			break;
-		case SCE_C_IDENTIFIER:
-			if (!iswordchar(ch)) {
-				buf[wordLen] = '\0';
-				if (buf[0] == '@' || buf[0] == '%') {
-					if (strncmp(buf + 1, "llvm.", 5) == 0) {
-						styler.ColourTo(i - 1, SCE_C_DIRECTIVE);
-					} else {
-						bool is_func = false;
-						bool is_type = false;
-						CheckLLVMVarType(i, endPos, styler, is_func, is_type);
-						if (is_func) {
-							state = SCE_C_PREPROCESSOR;
-						} else if (is_type) {
-							state = SCE_C_CLASS;
-						} else if (buf[0] == '@') {
-							state = SCE_C_STRUCT;
-						}
-						styler.ColourTo(i - 1, state);
-					}
-				} else if (keywords.InList(buf)) {
-					styler.ColourTo(i - 1, SCE_C_WORD);
-				} else if (keywords2.InList(buf)) {
-					styler.ColourTo(i - 1, SCE_C_WORD2);
-				} else if (kwInstruction.InList(buf)) {
-					styler.ColourTo(i - 1, SCE_C_ASM_INSTRUCTION);
-				} else if (kwAttr.InList(buf)) {
-					styler.ColourTo(i - 1, SCE_C_ATTRIBUTE);
-				} else if (ch == ':') {
-					styler.ColourTo(i - 1, SCE_C_LABEL);
-				}
-				state = SCE_C_DEFAULT;
-			} else if (wordLen < MAX_WORD_LENGTH) {
-				buf[wordLen++] = static_cast<char>(ch);
-			}
-			break;
-		case SCE_C_WORD2:
-			if (!IsADigit(ch)) {
-				styler.ColourTo(i - 1, state);
-				state = SCE_C_DEFAULT;
-			}
-			break;
-		case SCE_C_STRING:
-		case SCE_C_CHARACTER:
-			if (atLineStart) {
-				styler.ColourTo(i - 1, state);
-				state = SCE_C_DEFAULT;
-			} else if (ch == '\\' && (chNext == '\\' || chNext == '\"')) {
-				i++;
-				ch = chNext;
-				chNext = styler.SafeGetCharAt(i + 1);
-			} else if ((state == SCE_C_STRING && ch == '\"') || (state == SCE_C_CHARACTER && ch == '\'')) {
-				styler.ColourTo(i, state);
-				state = SCE_C_DEFAULT;
-				continue;
-			}
-			break;
-		case SCE_C_COMMENTLINE:
-			if (atLineStart) {
-				styler.ColourTo(i - 1, state);
-				state = SCE_C_DEFAULT;
-			}
-			break;
-		}
-
-		if (state == SCE_C_DEFAULT) {
-			if (ch == ';') {
-				styler.ColourTo(i - 1, state);
-				state = SCE_C_COMMENTLINE;
-			} else if (ch == '\"' || (ch == 'c' && chNext == '\"')) {
-				styler.ColourTo(i - 1, state);
-				state = SCE_C_STRING;
-				if (ch == 'c') {
-					++i;
-					chNext = styler.SafeGetCharAt(i + 1);
-				}
-			} else if (ch == '\'') {
-				styler.ColourTo(i - 1, state);
-				state = SCE_C_CHARACTER;
-			} else if (IsADigit(ch) || (ch == '.' && IsADigit(chNext))) {
-				styler.ColourTo(i - 1, state);
-				state = SCE_C_NUMBER;
-			} else if (ch == 'i' && IsADigit(chNext)) { // iN
-				styler.ColourTo(i - 1, state);
-				state = SCE_C_WORD2;
-			} else if (ch == 'x' && isspacechar(chNext)) {
-				styler.ColourTo(i - 1, state);
-				state = SCE_C_OPERATOR;
-			} else if (iswordstart(ch) || ch == '@' || ch == '%') {
-				styler.ColourTo(i - 1, state);
-				state = SCE_C_IDENTIFIER;
-				buf[0] = static_cast<char>(ch);
-				wordLen = 1;
-			} else if (isoperator(ch)) {
-				styler.ColourTo(i - 1, state);
-				state = SCE_C_OPERATOR;
-			}
-		}
-
-		if (atEOL || i == endPos - 1) {
-			lineCurrent++;
-		}
+bool IsLLVMTypeVar(LexAccessor &styler, Sci_Position pos) {
+	while (styler[pos] != '=') {
+		++pos;
 	}
-
-	// Colourise remaining document
-	styler.ColourTo(endPos - 1, state);
+	++pos;
+	while (isspacechar(styler.SafeGetCharAt(pos))) {
+		++pos;
+	}
+	return styler.Match(pos, "type") && isspacechar(styler.SafeGetCharAt(pos + 4));
 }
 
-#define IsCommentLine(line)			IsLexCommentLine(line, styler, SCE_C_COMMENTLINE)
-static void FoldLLVMDoc(Sci_PositionU startPos, Sci_Position length, int /*initStyle*/, LexerWordList, Accessor &styler) {
-	const bool foldComment = styler.GetPropertyInt("fold.comment") != 0;
-	const bool foldCompact = styler.GetPropertyInt("fold.compact", 1) != 0;
+int CheckLLVMVarType(StyleContext &sc, int kwType) {
+	int state = sc.state;
+	if (kwType == SCE_LLVM_LABEL || sc.ch == ':') {
+		state = SCE_LLVM_LABEL;
+	} else {
+		const int chNext = sc.GetNextNSChar();
+		if (chNext == '(') {
+			char s[8];
+			sc.GetCurrent(s, sizeof(s));
+			const bool quoted = state == SCE_LLVM_QUOTED_VARIABLE || state == SCE_LLVM_QUOTED_GLOBAL_VARIABLE;
+			if (strncmp(s + (quoted? 2 : 1), "llvm.", 5) == 0) {
+				state = SCE_LLVM_INTRINSIC;
+			} else {
+				state = SCE_LLVM_FUNCTION;
+			}
+		} else if (chNext == '=' && IsLLVMTypeVar(sc.styler, sc.currentPos)) {
+			// var = type {}
+			state = SCE_LLVM_TYPE;
+		}
+	}
+	return state;
+}
 
-	const Sci_PositionU endPos = startPos + length;
+void ColouriseLLVMDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList keywordLists, Accessor &styler) {
+	int lineStateLineComment = 0;
+	int kwType = SCE_LLVM_DEFAULT;
 	int visibleChars = 0;
+	bool noCharacterBefore = false;
+	EscapeSequence escSeq;
+
+	StyleContext sc(startPos, lengthDoc, initStyle, styler);
+
+	while (sc.More()) {
+		switch (sc.state) {
+		case SCE_LLVM_OPERATOR:
+			sc.SetState(SCE_LLVM_DEFAULT);
+			break;
+
+		case SCE_LLVM_NUMBER:
+			if (!IsDecimalNumber(sc.chPrev, sc.ch, sc.chNext)) {
+				sc.SetState(SCE_LLVM_DEFAULT);
+			}
+			break;
+
+		case SCE_LLVM_IDENTIFIER:
+		case SCE_LLVM_VARIABLE:
+		case SCE_LLVM_GLOBAL_VARIABLE:
+		case SCE_LLVM_COMDAT:
+		case SCE_LLVM_METADATA:
+		case SCE_LLVM_ATTRIBUTE_GROUP:
+			if (sc.ch == '\\' && IsHexDigit(sc.chNext)) {
+				sc.Forward();
+			} else if (!IsLLVMIdentifierChar(sc.ch)) {
+				int state = sc.state;
+				if (sc.state == SCE_LLVM_VARIABLE || sc.state == SCE_LLVM_GLOBAL_VARIABLE) {
+					state = CheckLLVMVarType(sc, kwType);
+					kwType = SCE_LLVM_DEFAULT;
+				} else if (sc.state == SCE_LLVM_IDENTIFIER) {
+					char s[128];
+					sc.GetCurrent(s, sizeof(s));
+					kwType = SCE_LLVM_DEFAULT;
+					if (keywordLists[0]->InList(s)) {
+						state = SCE_LLVM_WORD;
+					} else if (keywordLists[1]->InList(s)) {
+						state = SCE_LLVM_WORD2;
+						if (strcmp(s, "label") == 0) {
+							kwType = SCE_LLVM_LABEL;
+						}
+					} else if (keywordLists[2]->InListPrefixed(s, '(')) {
+						state = SCE_LLVM_ATTRIBUTE;
+					} else if (keywordLists[3]->InList(s)) {
+						state = SCE_LLVM_INSTRUCTION;
+					} else if (sc.ch == ':' && noCharacterBefore) {
+						state = SCE_LLVM_LABEL;
+					}
+				}
+				sc.ChangeState(state);
+				sc.SetState(SCE_LLVM_DEFAULT);
+			}
+			break;
+
+		case SCE_LLVM_QUOTED_VARIABLE:
+		case SCE_LLVM_QUOTED_GLOBAL_VARIABLE:
+			if (sc.ch == '\\' && !(sc.chNext == '\n' || sc.chNext == '\r')) {
+				sc.Forward();
+			} else if (sc.ch == '\"' || sc.atLineStart) {
+				if (sc.ch == '\"') {
+					sc.Forward();
+				}
+
+				const int state = CheckLLVMVarType(sc, kwType);
+				sc.ChangeState(state);
+				sc.SetState(SCE_LLVM_DEFAULT);
+				kwType = SCE_LLVM_DEFAULT;
+			}
+			break;
+
+		case SCE_LLVM_WORD2:
+			if (!IsADigit(sc.ch)) {
+				if (IsIdentifierChar(sc.ch)) {
+					sc.ChangeState(SCE_LLVM_IDENTIFIER);
+				} else {
+					sc.SetState(SCE_LLVM_DEFAULT);
+				}
+			}
+			break;
+
+		case SCE_LLVM_STRING:
+		case SCE_LLVM_META_STRING:
+			if (sc.atLineStart) {
+				sc.SetState(SCE_LLVM_DEFAULT);
+			} else if (sc.ch == '\\') {
+				if (escSeq.resetEscapeState(sc.state, sc.chNext)) {
+					sc.SetState(SCE_LLVM_ESCAPECHAR);
+					sc.Forward();
+				}
+			} else if (sc.ch == '\"') {
+				sc.ForwardSetState(SCE_LLVM_DEFAULT);
+			}
+			break;
+
+		case SCE_LLVM_ESCAPECHAR:
+			if (escSeq.atEscapeEnd(sc.ch)) {
+				const int outerState = escSeq.outerState;
+				if (sc.ch == '\\' && escSeq.resetEscapeState(outerState, sc.chNext)) {
+					sc.Forward();
+				} else {
+					sc.SetState(outerState);
+					if (sc.ch == '\"') {
+						sc.ForwardSetState(SCE_LLVM_DEFAULT);
+					}
+				}
+			}
+			break;
+
+		case SCE_LLVM_COMMENTLINE:
+			if (sc.atLineStart) {
+				sc.SetState(SCE_LLVM_DEFAULT);
+			}
+			break;
+		}
+
+		if (sc.state == SCE_LLVM_DEFAULT) {
+			if (sc.ch == ';') {
+				sc.SetState(SCE_LLVM_COMMENTLINE);
+				if (visibleChars == 0) {
+					lineStateLineComment = LLVMLineStateMaskLineComment;
+				}
+			} else if (sc.ch == '\"' || sc.Match('c', '\"')) {
+				sc.SetState(SCE_LLVM_STRING);
+				if (sc.ch == 'c') {
+					sc.Forward();
+				}
+			} else if (sc.Match('!', '\"')) {
+				sc.SetState(SCE_LLVM_META_STRING);
+				sc.Forward();
+			} else if (sc.ch == '@' || sc.ch == '%') {
+				if (IsLLVMIdentifierChar(sc.chNext)) {
+					sc.SetState((sc.ch == '@')? SCE_LLVM_GLOBAL_VARIABLE : SCE_LLVM_VARIABLE);
+					sc.Forward();
+				} else if (sc.chNext == '\"') {
+					sc.SetState((sc.ch == '@')? SCE_LLVM_QUOTED_GLOBAL_VARIABLE : SCE_LLVM_QUOTED_VARIABLE);
+					sc.Forward();
+				} else {
+					sc.SetState(SCE_LLVM_OPERATOR);
+				}
+			} else if (sc.ch == '!' && IsLLVMIdentifierChar(sc.chNext)) {
+				sc.SetState(SCE_LLVM_METADATA);
+			} else if (sc.ch == '$' && IsLLVMIdentifierChar(sc.chNext)) {
+				sc.SetState(SCE_LLVM_COMDAT);
+			} else if (sc.ch == '#' && IsLLVMIdentifierChar(sc.chNext)) {
+				sc.SetState(SCE_LLVM_ATTRIBUTE_GROUP);
+			} else if (IsADigit(sc.ch) || (sc.ch == '.' && IsADigit(sc.chNext))) {
+				sc.SetState(SCE_LLVM_NUMBER);
+			} else if (sc.ch == 'i' && IsADigit(sc.chNext)) {
+				// iN
+				sc.SetState(SCE_LLVM_WORD2);
+			} else if (sc.ch == 'x' && isspacechar(sc.chNext)) {
+				sc.SetState(SCE_LLVM_OPERATOR);
+			} else if (IsIdentifierStart(sc.ch)) {
+				noCharacterBefore = visibleChars == 0;
+				sc.SetState(SCE_LLVM_IDENTIFIER);
+			} else if (isoperator(sc.ch)) {
+				sc.SetState(SCE_LLVM_OPERATOR);
+			}
+		}
+
+		if (visibleChars == 0 && !isspacechar(sc.ch)) {
+			visibleChars = 1;
+		}
+		if (sc.atLineEnd) {
+			styler.SetLineState(sc.currentLine, lineStateLineComment);
+			lineStateLineComment = 0;
+			visibleChars = 0;
+		}
+		sc.Forward();
+	}
+
+	sc.Complete();
+}
+
+void FoldLLVMDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initStyle*/, LexerWordList, Accessor &styler) {
+	const bool foldComment = styler.GetPropertyInt("fold.comment") != 0;
+
+	const Sci_PositionU endPos = startPos + lengthDoc;
 	Sci_Position lineCurrent = styler.GetLine(startPos);
 	int levelCurrent = SC_FOLDLEVELBASE;
-	if (lineCurrent > 0)
+	int lineCommentPrev = 0;
+	if (lineCurrent > 0) {
 		levelCurrent = styler.LevelAt(lineCurrent - 1) >> 16;
-	int levelNext = levelCurrent;
+		lineCommentPrev = styler.GetLineState(lineCurrent - 1) & LLVMLineStateMaskLineComment;
+	}
 
-	char chNext = styler[startPos];
-	int styleNext = styler.StyleAt(startPos);
+	int levelNext = levelCurrent;
+	int lineCommentCurrent = styler.GetLineState(lineCurrent) & LLVMLineStateMaskLineComment;
+	Sci_PositionU lineStartNext = styler.LineStart(lineCurrent + 1);
+	Sci_PositionU lineEndPos = ((lineStartNext < endPos) ? lineStartNext : endPos) - 1;
 
 	for (Sci_PositionU i = startPos; i < endPos; i++) {
-		const char ch = chNext;
-		chNext = styler.SafeGetCharAt(i + 1);
-		const int style = styleNext;
-		styleNext = styler.StyleAt(i + 1);
-		const bool atEOL = (ch == '\r' && chNext != '\n') || (ch == '\n');
+		const int style =  styler.StyleAt(i);
 
-		if (foldComment && atEOL && IsCommentLine(lineCurrent)) {
-			if (!IsCommentLine(lineCurrent - 1) && IsCommentLine(lineCurrent + 1))
-				levelNext++;
-			else if (IsCommentLine(lineCurrent - 1) && !IsCommentLine(lineCurrent + 1))
-				levelNext--;
-		}
-
-		if (style == SCE_C_OPERATOR) {
+		if (style == SCE_LLVM_OPERATOR) {
+			const char ch = styler[i];
 			if (ch == '{' || ch == '[' || ch == '(') {
 				levelNext++;
 			} else if (ch == '}' || ch == ']' || ch == ')') {
@@ -231,24 +288,35 @@ static void FoldLLVMDoc(Sci_PositionU startPos, Sci_Position length, int /*initS
 			}
 		}
 
-		if (!isspacechar(ch))
-			visibleChars++;
+		if (i == lineEndPos) {
+			const int lineCommentNext = styler.GetLineState(lineCurrent + 1) & LLVMLineStateMaskLineComment;
+			if (foldComment && lineCommentCurrent) {
+				if (!lineCommentPrev && lineCommentNext) {
+					levelNext++;
+				} else if (lineCommentPrev && !lineCommentNext) {
+					levelNext--;
+				}
+			}
 
-		if (atEOL || (i == endPos - 1)) {
 			const int levelUse = levelCurrent;
 			int lev = levelUse | levelNext << 16;
-			if (visibleChars == 0 && foldCompact)
-				lev |= SC_FOLDLEVELWHITEFLAG;
-			if (levelUse < levelNext)
+			if (levelUse < levelNext) {
 				lev |= SC_FOLDLEVELHEADERFLAG;
+			}
 			if (lev != styler.LevelAt(lineCurrent)) {
 				styler.SetLevel(lineCurrent, lev);
 			}
+
 			lineCurrent++;
+			lineStartNext = styler.LineStart(lineCurrent + 1);
+			lineEndPos = ((lineStartNext < endPos) ? lineStartNext : endPos) - 1;
 			levelCurrent = levelNext;
-			visibleChars = 0;
+			lineCommentPrev = lineCommentCurrent;
+			lineCommentCurrent = lineCommentNext;
 		}
 	}
+}
+
 }
 
 LexerModule lmLLVM(SCLEX_LLVM, ColouriseLLVMDoc, "llvm", FoldLLVMDoc);

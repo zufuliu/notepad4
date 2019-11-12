@@ -516,7 +516,7 @@ BOOL IsDocWordChar(int ch) {
 		return (ch == '$' || ch == '@');
 
 	case NP2LEX_LLVM:
-		return (ch == '@' || ch == '%');
+		return (ch == '@' || ch == '%' || ch == '$' || ch == '-');
 
 	case NP2LEX_MAKE:
 	case NP2LEX_NSIS:
@@ -552,7 +552,6 @@ static inline BOOL IsOperatorStyle(int style) {
 	case SCLEX_GRAPHVIZ:
 	case SCLEX_JSON:
 	case SCLEX_LISP:
-	case SCLEX_LLVM:
 	case SCLEX_NSIS:
 		return style == SCE_C_OPERATOR;
 	case SCLEX_CSS:
@@ -574,6 +573,8 @@ static inline BOOL IsOperatorStyle(int style) {
 	case SCLEX_LATEX:
 	case SCLEX_TEXINFO:
 		return style == SCE_L_OPERATOR;
+	case SCLEX_LLVM:
+		return style == SCE_LLVM_OPERATOR;
 	case SCLEX_LUA:
 		return style == SCE_LUA_OPERATOR;
 

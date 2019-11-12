@@ -368,6 +368,38 @@ def update_kotlin_keyword():
 	keywordList = parse_kotlin_api_file('lang/Kotlin.kt')
 	UpdateKeywordFile('NP2LEX_KOTLIN', '../src/EditLexers/stlKotlin.c', keywordList)
 
+# LLVM IR
+def parse_llvm_api_file(path):
+	sections = read_api_file(path, ';')
+	keywordMap = {}
+	for key, doc in sections:
+		if key in ('keywords', 'type'):
+			keywordMap[key] = doc.split()
+		elif key == 'attribute':
+			items = re.findall(r'^\s*([\w\-]+\(?)', doc, re.MULTILINE)
+			keywordMap[key] = items
+		elif key == 'instruction':
+			items = re.findall(r'^\s*(\w+)', doc, re.MULTILINE)
+			keywordMap[key] = items
+
+	RemoveDuplicateKeyword(keywordMap, [
+		'keywords',
+		'type',
+		'attribute',
+		'instruction',
+	])
+	keywordList = [
+		('keywords', keywordMap['keywords'], KeywordAttr.Default),
+		('type', keywordMap['type'], KeywordAttr.Default),
+		('attribute', keywordMap['attribute'], KeywordAttr.Default),
+		('instruction', keywordMap['instruction'], KeywordAttr.Default),
+	]
+	return keywordList
+
+def update_llvm_keyword():
+	keywordList = parse_llvm_api_file('lang/LLVM.ll')
+	UpdateKeywordFile('NP2LEX_LLVM', '../src/EditLexers/stlLLVM.c', keywordList)
+
 # Rust
 def parse_rust_api_file(path):
 	sections = read_api_file(path, '//')
@@ -517,6 +549,7 @@ def update_all_keyword():
 	update_cmake_keyword()
 	update_julia_keyword()
 	update_kotlin_keyword()
+	update_llvm_keyword()
 	update_rust_keyword()
 	update_vim_keyword()
 	update_lexer_keyword_attr()
