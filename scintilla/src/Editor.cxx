@@ -3101,10 +3101,16 @@ void Editor::NewLine() {
 		sel.Range(r).ClearVirtualSpace();
 		const char *eol = StringFromEOLMode(pdoc->eolMode);
 		const Sci::Position positionInsert = sel.Range(r).caret.Position();
+		const Sci::Line lineDoc = pdoc->SciLineFromPosition(positionInsert);
+		const bool expanded = pcs->GetExpanded(lineDoc);
 		const Sci::Position insertLength = pdoc->InsertString(positionInsert, eol, strlen(eol));
 		if (insertLength > 0) {
 			sel.Range(r) = SelectionRange(positionInsert + insertLength);
 			countInsertions++;
+			if (!expanded) {
+				pcs->SetExpanded(lineDoc, true);
+				pcs->SetExpanded(lineDoc + 1, false);
+			}
 		}
 	}
 
