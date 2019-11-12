@@ -137,6 +137,9 @@ style number must < 32 or > 40
 63058	Lisp Script							yes
 63059	Vim Script							yes
 63060	LLVM IR								yes
+		63588, L"Metadata"
+		63589, L"COMDAT"
+		63590, L"Global Variable"
 63061	Octave Code							yes
 63062	Scilab Code							yes
 
