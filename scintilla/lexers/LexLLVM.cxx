@@ -47,7 +47,7 @@ enum {
 	LLVMLineStateMaskLineComment = 1, // line comment
 };
 
-bool IsLLVMTypeVar(LexAccessor &styler, Sci_Position pos) {
+bool IsLLVMTypeVar(LexAccessor &styler, Sci_Position pos) noexcept {
 	while (styler[pos] != '=') {
 		++pos;
 	}
@@ -58,7 +58,7 @@ bool IsLLVMTypeVar(LexAccessor &styler, Sci_Position pos) {
 	return styler.Match(pos, "type") && isspacechar(styler.SafeGetCharAt(pos + 4));
 }
 
-int CheckLLVMVarType(StyleContext &sc, int kwType) {
+int CheckLLVMVarType(StyleContext &sc, int kwType) noexcept {
 	int state = sc.state;
 	if (kwType == SCE_LLVM_LABEL || sc.ch == ':') {
 		state = SCE_LLVM_LABEL;

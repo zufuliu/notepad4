@@ -6974,6 +6974,7 @@ BOOL FileVars_ParseStr(LPCSTR pszData, LPCSTR pszName, char *pszValue, int cchVa
 		*pvEnd = '\0';
 		StrTrimA(tch, " \t:=\"'");
 
+		*pszValue = '\0';
 		strncpy(pszValue, tch, cchValue);
 		return TRUE;
 	}
