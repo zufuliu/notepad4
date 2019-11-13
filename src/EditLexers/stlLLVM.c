@@ -9,7 +9,7 @@ static KEYWORDLIST Keywords_LLVM = {{
 "weak weak_odr "
 
 , // 1 type
-"double float fp128 half i1 i128 i16 i32 i64 i8 label metadata opaque ppc_fp128 token type void vscale x86_fp80 "
+"double float fp128 half i1 i128 i16 i32 i64 i8 label metadata opaque ppc_fp128 token type void vscale x86_fp80 x86_mmx "
 
 , // 2 attribute
 "acq_rel acquire addrspace( afn align alignstack alignstack( allocsize( alwaysinline any anyregcc arcp argmemonly atomic "
