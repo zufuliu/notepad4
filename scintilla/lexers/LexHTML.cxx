@@ -912,7 +912,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 				visibleChars += 2;
 				tagClosing = true;
 				if (foldXmlAtTagOpen) {
-					--levelCurrent;
+					levelCurrent--;
 				}
 				continue;
 			}
