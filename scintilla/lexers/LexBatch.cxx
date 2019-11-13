@@ -79,7 +79,7 @@ constexpr int LevelNumber(int level) noexcept {
 	return (level & SC_FOLDLEVELNUMBERMASK) - SC_FOLDLEVELBASE;
 }
 
-void DetectBatVariable(StyleContext &sc, bool &quotedVar, bool &markVar, bool &numVar) noexcept {
+void DetectBatVariable(StyleContext &sc, bool &quotedVar, bool &markVar, bool &numVar) {
 	quotedVar = false;
 	markVar = false;
 	numVar = false;
