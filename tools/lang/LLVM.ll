@@ -64,6 +64,7 @@ double
 fp128
 x86_fp80
 ppc_fp128
+x86_mmx
 vscale 			; Vector Type
 label			; Label Type
 token			; Token Type
