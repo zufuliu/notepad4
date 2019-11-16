@@ -223,7 +223,8 @@ void classifyAttribHTML(Sci_PositionU start, Sci_PositionU end, const WordList &
 
 // https://html.spec.whatwg.org/multipage/custom-elements.html#custom-elements-core-concepts
 bool isHTMLCustomElement(const char *tag, size_t length) noexcept {
-	// HTML custom element name: starts with an ASCII alpha and contains hyphen.
+	// check valid HTML custom element name: starts with an ASCII lower alpha and contains hyphen.
+	// IsAlpha() is used for `html.tags.case.sensitive=1`.
 	if (length < 2 || !IsAlpha(tag[0])) {
 		return false;
 	}
@@ -240,19 +241,13 @@ int classifyTagHTML(Sci_PositionU start, Sci_PositionU end,
 	const char *tag = withSpace + 1;
 	// Copy after the '<'
 	Sci_PositionU i = 1;
-	if (caseSensitive) {
-		for (Sci_PositionU cPos = start; cPos <= end && i < sizeof(withSpace) - 2; cPos++) {
-			const char ch = styler[cPos];
-			if ((ch != '<') && (ch != '/')) {
-				withSpace[i++] = ch;
-			}
+	for (Sci_PositionU cPos = start; cPos <= end && i < sizeof(withSpace) - 2; cPos++) {
+		const char ch = styler[cPos];
+		if (IsASpace(ch)) {
+			break;
 		}
-	} else {
-		for (Sci_PositionU cPos = start; cPos <= end && i < sizeof(withSpace) - 2; cPos++) {
-			const char ch = styler[cPos];
-			if ((ch != '<') && (ch != '/')) {
-				withSpace[i++] = MakeLowerCase(ch);
-			}
+		if ((ch != '<') && (ch != '/')) {
+			withSpace[i++] = caseSensitive ? ch : MakeLowerCase(ch);
 		}
 	}
 
