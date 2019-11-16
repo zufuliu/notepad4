@@ -341,8 +341,6 @@ static void FoldPyDoc(Sci_PositionU startPos, Sci_Position length, int, LexerWor
 	//	This option enables folding multi-line quoted strings when using the Python lexer.
 	const bool foldQuotes = styler.GetPropertyInt("fold.quotes.python", 1) != 0;
 
-	const bool foldCompact = styler.GetPropertyInt("fold.compact") != 0;
-
 	// Backtrack to previous non-blank line so we can determine indent level
 	// for any white space lines (needed esp. within triple quoted strings)
 	// and so we can fix any preceding fold level (which is why we go back
@@ -354,16 +352,18 @@ static void FoldPyDoc(Sci_PositionU startPos, Sci_Position length, int, LexerWor
 		lineCurrent--;
 		indentCurrent = styler.IndentAmount(lineCurrent, &spaceFlags, nullptr);
 		if (!(indentCurrent & SC_FOLDLEVELWHITEFLAG) && (!IsCommentLine(lineCurrent)) &&
-			(!IsQuoteLine(lineCurrent, styler)))
+			(!IsQuoteLine(lineCurrent, styler))) {
 			break;
+		}
 	}
 	int indentCurrentLevel = indentCurrent & SC_FOLDLEVELNUMBERMASK;
 
 	// Set up initial loop state
 	startPos = styler.LineStart(lineCurrent);
 	int prev_state = SCE_PY_DEFAULT;
-	if (lineCurrent >= 1)
+	if (lineCurrent >= 1) {
 		prev_state = styler.StyleAt(startPos - 1);
+	}
 	int prevQuote = foldQuotes && IsPyTripleStyle(prev_state);
 
 	// Process all characters to end of requested range or end of any triple quote
@@ -385,12 +385,15 @@ static void FoldPyDoc(Sci_PositionU startPos, Sci_Position length, int, LexerWor
 		}
 		const int quote_start = (quote && !prevQuote);
 		const int quote_continue = (quote && prevQuote);
-		if (!quote || !prevQuote)
+		if (!quote || !prevQuote) {
 			indentCurrentLevel = indentCurrent & SC_FOLDLEVELNUMBERMASK;
-		if (quote)
+		}
+		if (quote) {
 			indentNext = indentCurrentLevel;
-		if (indentNext & SC_FOLDLEVELWHITEFLAG)
+		}
+		if (indentNext & SC_FOLDLEVELWHITEFLAG) {
 			indentNext = SC_FOLDLEVELWHITEFLAG | indentCurrentLevel;
+		}
 
 		if (quote_start) {
 			// Place fold point at start of triple quoted string
@@ -432,35 +435,27 @@ static void FoldPyDoc(Sci_PositionU startPos, Sci_Position length, int, LexerWor
 
 		while (--skipLine > lineCurrent) {
 			const int skipLineIndent = styler.IndentAmount(skipLine, &spaceFlags, nullptr);
-
-			if (foldCompact) {
-				if ((skipLineIndent & SC_FOLDLEVELNUMBERMASK) > levelAfterComments)
-					skipLevel = levelBeforeComments;
-
-				const int whiteFlag = skipLineIndent & SC_FOLDLEVELWHITEFLAG;
-
-				styler.SetLevel(skipLine, skipLevel | whiteFlag);
-			} else {
-				if ((skipLineIndent & SC_FOLDLEVELNUMBERMASK) > levelAfterComments &&
-					!(skipLineIndent & SC_FOLDLEVELWHITEFLAG) &&
-					!IsCommentLine(skipLine))
-					skipLevel = levelBeforeComments;
-
-				styler.SetLevel(skipLine, skipLevel);
+			if ((skipLineIndent & SC_FOLDLEVELNUMBERMASK) > levelAfterComments &&
+				!(skipLineIndent & SC_FOLDLEVELWHITEFLAG) &&
+				!IsCommentLine(skipLine)) {
+				skipLevel = levelBeforeComments;
 			}
+
+			styler.SetLevel(skipLine, skipLevel);
 		}
 
 		// Set fold header on non-quote line
 		if (!quote && !(indentCurrent & SC_FOLDLEVELWHITEFLAG)) {
-			if ((indentCurrent & SC_FOLDLEVELNUMBERMASK) < (indentNext & SC_FOLDLEVELNUMBERMASK))
+			if ((indentCurrent & SC_FOLDLEVELNUMBERMASK) < (indentNext & SC_FOLDLEVELNUMBERMASK)) {
 				lev |= SC_FOLDLEVELHEADERFLAG;
+			}
 		}
 
 		// Keep track of triple quote state of previous line
 		prevQuote = quote;
 
 		// Set fold level for this line and move to next line
-		styler.SetLevel(lineCurrent, foldCompact ? lev : lev & ~SC_FOLDLEVELWHITEFLAG);
+		styler.SetLevel(lineCurrent, lev & ~SC_FOLDLEVELWHITEFLAG);
 		indentCurrent = indentNext;
 		lineCurrent = lineNext;
 	}
