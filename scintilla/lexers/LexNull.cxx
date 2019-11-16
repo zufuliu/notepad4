@@ -41,8 +41,6 @@ void FoldNullDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /* initStyl
 	const Sci_Position docLines = styler.GetLine(styler.Length());	// Available last line
 	const Sci_Position maxLines = (maxPos == styler.Length()) ? docLines : styler.GetLine(maxPos - 1);	// Requested last line
 
-	const bool foldCompact = styler.GetPropertyInt("fold.compact") != 0;
-
 	// Backtrack to previous non-blank line so we can determine indent level
 	// for any white space lines
 	// and so we can fix any preceding fold level (which is why we go back
@@ -53,8 +51,9 @@ void FoldNullDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /* initStyl
 	while (lineCurrent > 0) {
 		lineCurrent--;
 		indentCurrent = styler.IndentAmount(lineCurrent, &spaceFlags, nullptr);
-		if (!(indentCurrent & SC_FOLDLEVELWHITEFLAG))
+		if (!(indentCurrent & SC_FOLDLEVELWHITEFLAG)){
 			break;
+		}
 	}
 
 	// Process all characters to end of requested range
@@ -70,8 +69,9 @@ void FoldNullDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /* initStyl
 			indentNext = styler.IndentAmount(lineNext, &spaceFlags, nullptr);
 		}
 		const int indentCurrentLevel = indentCurrent & SC_FOLDLEVELNUMBERMASK;
-		if (indentNext & SC_FOLDLEVELWHITEFLAG)
+		if (indentNext & SC_FOLDLEVELWHITEFLAG) {
 			indentNext = SC_FOLDLEVELWHITEFLAG | indentCurrentLevel;
+		}
 
 		// Skip past any blank lines for next indent level info
 		while ((lineNext < docLines) && (indentNext & SC_FOLDLEVELWHITEFLAG)) {
@@ -92,30 +92,22 @@ void FoldNullDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /* initStyl
 
 		while (--skipLine > lineCurrent) {
 			const int skipLineIndent = styler.IndentAmount(skipLine, &spaceFlags, nullptr);
-
-			if (foldCompact) {
-				if ((skipLineIndent & SC_FOLDLEVELNUMBERMASK) > levelAfterBlank)
-					skipLevel = levelBeforeBlank;
-
-				const int whiteFlag = skipLineIndent & SC_FOLDLEVELWHITEFLAG;
-				styler.SetLevel(skipLine, skipLevel | whiteFlag);
-			} else {
-				if ((skipLineIndent & SC_FOLDLEVELNUMBERMASK) > levelAfterBlank &&
-					!(skipLineIndent & SC_FOLDLEVELWHITEFLAG))
-					skipLevel = levelBeforeBlank;
-
-				styler.SetLevel(skipLine, skipLevel);
+			if ((skipLineIndent & SC_FOLDLEVELNUMBERMASK) > levelAfterBlank &&
+				!(skipLineIndent & SC_FOLDLEVELWHITEFLAG)) {
+				skipLevel = levelBeforeBlank;
 			}
+			styler.SetLevel(skipLine, skipLevel);
 		}
 
 		// Set fold header
 		if (!(indentCurrent & SC_FOLDLEVELWHITEFLAG)) {
-			if ((indentCurrent & SC_FOLDLEVELNUMBERMASK) < (indentNext & SC_FOLDLEVELNUMBERMASK))
+			if ((indentCurrent & SC_FOLDLEVELNUMBERMASK) < (indentNext & SC_FOLDLEVELNUMBERMASK)) {
 				lev |= SC_FOLDLEVELHEADERFLAG;
+			}
 		}
 
 		// Set fold level for this line and move to next line
-		styler.SetLevel(lineCurrent, foldCompact ? lev : lev & ~SC_FOLDLEVELWHITEFLAG);
+		styler.SetLevel(lineCurrent, lev & ~SC_FOLDLEVELWHITEFLAG);
 		indentCurrent = indentNext;
 		lineCurrent = lineNext;
 	}
