@@ -63,7 +63,8 @@ JSON Document
 	wxcp			CodeLite wxCrafter Resource
 	jshintrc		JSHint Configuration File
 	eslintrc		ESLint Configuration File
-	jsonld			JSON for Linked Data
+	jsonld			JSON for Linked Data, https://json-ld.org/
+	jsonc			JSON with Comments, https://code.visualstudio.com/docs/languages/json#_json-with-comments
 	arcconfig		Phabricator Arcanist
 	arclint			Phabricator Arcanist
 	jscop			JSCoP File, http://polly.llvm.org/documentation/passes.html
