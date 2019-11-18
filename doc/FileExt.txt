@@ -25,6 +25,7 @@ C/C++ Source
 	m				Objective C Source File
 	mm				Objective C++ Source File
 	xpm				X11 Pixmap Graphic
+	cl				OpenCL Source File
 	cu				CUDA Source File
 
 	*.h.in
