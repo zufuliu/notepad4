@@ -314,8 +314,9 @@ Lisp Script
 	lisp
 	el				Emacs Lisp
 	lsp
-	clj				Common Lisp
+	clj				Common Lisp, ClojureScript
 	cljs			Common Lisp
+	scm				Scheme
 
 LLVM IR
 	ll

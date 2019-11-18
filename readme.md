@@ -77,8 +77,7 @@ Or build from source, see the [Wiki](https://github.com/zufuliu/notepad2/wiki/Bu
 		* [Julia Base and Standard Library](../master/tools/lang/Julia.jl), up to 1.2.
 	* [Kotlin](../master/tools/lang/Kotlin.kt), up to Kotlin 1.3
 	* LaTeX
-	* Lisp Script
-		* Common Lisp
+	* Lisp Script (Common Lisp, Clojure, Scheme, etc.)
 	* [LLVM IR](../master/tools/lang/LLVM.ll), up to LLVM 10.
 	* Lua Script
 	* Makefile, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#makefile)
