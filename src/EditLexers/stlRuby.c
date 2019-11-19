@@ -15,12 +15,15 @@ static KEYWORDLIST Keywords_Ruby = {{
 , // Pre-defined variables
 "$DEBUG $LOADED_FEATURES $FILENAME $LOAD_PATH $stderr $stdin $stdout $VERBOSE "
 
+, NULL, NULL, NULL, NULL, NULL
+
+, // 7 Fold
+"begin case class def do for if module unless until while "
+
+, // 8 CanFollowKeyword
+"and begin break case do else elsif if next not or return unless until when "
+
 , NULL, NULL, NULL, NULL, NULL, NULL
-
-, // 8 Fold
-"and begin break case do else elsif if next return when unless until not or"
-
-, NULL, NULL, NULL, NULL, NULL, NULL, NULL
 }};
 
 static EDITSTYLE Styles_Ruby[] = {
@@ -58,4 +61,3 @@ EDITLEXER lexRuby = {
 	&Keywords_Ruby,
 	Styles_Ruby
 };
-

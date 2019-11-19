@@ -87,14 +87,8 @@ using namespace Scintilla;
 static bool isPerlKeyword(Sci_PositionU start, Sci_PositionU end, const WordList &keywords, LexAccessor &styler) noexcept {
 	// old-style keyword matcher; needed because GetCurrent() needs
 	// current segment to be committed, but we may abandon early...
-	char s[100];
-	Sci_PositionU i;
-	Sci_PositionU len = end - start;
-	if (len > 30) {
-		len = 30;
-	}
-	for (i = 0; i < len; i++, start++) s[i] = styler[start];
-	s[i] = '\0';
+	char s[128];
+	styler.GetRange(start, end, s, sizeof(s));
 	return keywords.InList(s);
 }
 
@@ -340,13 +334,6 @@ static int PodHeadingLevel(Sci_Position pos, LexAccessor &styler) noexcept {
 	}
 	return 0;
 }
-
-/*
-static const char *const perlWordListDesc[] = {
-	"Keywords",
-	0
-};
-*/
 
 static int InputSymbolScan(StyleContext &sc) noexcept {
 	// forward scan for matching > on same line; file handles
@@ -899,8 +886,7 @@ static void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int in
 			}
 			break;
 		case SCE_PL_POD:
-		case SCE_PL_POD_VERB:
-		{
+		case SCE_PL_POD_VERB: {
 			Sci_PositionU fw = sc.currentPos;
 			const Sci_Position ln = styler.GetLine(fw);
 			if (sc.atLineStart && sc.Match("=cut")) {	// end of POD
@@ -1087,8 +1073,7 @@ static void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int in
 					sc.ForwardSetState(SCE_PL_DEFAULT);
 			}
 			break;
-		case SCE_PL_SUB_PROTOTYPE:
-		{
+		case SCE_PL_SUB_PROTOTYPE: {
 			int i = 0;
 			// forward scan; must all be valid proto characters
 			while (setSubPrototype.Contains(sc.GetRelative(i)))
@@ -1103,8 +1088,7 @@ static void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int in
 			}
 		}
 		break;
-		case SCE_PL_FORMAT:
-		{
+		case SCE_PL_FORMAT: {
 			sc.Complete();
 			if (sc.Match('.')) {
 				sc.Forward();

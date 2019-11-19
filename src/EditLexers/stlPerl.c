@@ -27,7 +27,7 @@ static KEYWORDLIST Keywords_Perl = {{
 "unless unlink unpack unshift untie until use utime values vec wait waitpid wantarray warn "
 "when while write xor"
 
-, // 1
+, // keywords that forces /PATTERN/ at all times
 "elsif if split while"
 
 , NULL, NULL, NULL, NULL, NULL, NULL, NULL
@@ -78,4 +78,3 @@ EDITLEXER lexPerl = {
 	&Keywords_Perl,
 	Styles_Perl
 };
-
