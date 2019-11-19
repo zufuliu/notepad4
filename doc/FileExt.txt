@@ -62,7 +62,10 @@ JSON Document
 	ipynb			Jupyter Notebook
 	wxcp			CodeLite wxCrafter Resource
 	jshintrc		JSHint Configuration File
-	eslintrc		ESLint Configuration File
+	eslintrc		ESLint Configuration File, https://eslint.org/
+	babelrc			Babel Configuration File, https://babeljs.io/
+	prettierrc		Prettier Configuration File, https://prettier.io/
+	stylelintrc		Stylelint Configuration File, https://stylelint.io/
 	jsonld			JSON for Linked Data, https://json-ld.org/
 	jsonc			JSON with Comments, https://code.visualstudio.com/docs/languages/json#_json-with-comments
 	arcconfig		Phabricator Arcanist
