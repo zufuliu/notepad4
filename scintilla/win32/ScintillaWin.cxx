@@ -54,7 +54,7 @@ Used by VSCode, Atom etc.
 #define USE_D2D 1
 #endif
 #ifndef _WIN32_WINNT_WIN7
-#define _WIN32_WINNT_WIN7					0x0601
+#define _WIN32_WINNT_WIN7				0x0601
 #endif
 
 #if defined(USE_D2D)
@@ -116,27 +116,27 @@ Used by VSCode, Atom etc.
 #include "HanjaDic.h"
 
 #ifndef _WIN32_WINNT_WIN8
-#define _WIN32_WINNT_WIN8					0x0602
+#define _WIN32_WINNT_WIN8				0x0602
 #endif
 
 #ifndef SPI_GETWHEELSCROLLLINES
-#define SPI_GETWHEELSCROLLLINES   104
+#define SPI_GETWHEELSCROLLLINES			104
 #endif
 
 #ifndef WM_UNICHAR
-#define WM_UNICHAR                      0x0109
+#define WM_UNICHAR						0x0109
 #endif
 
 #ifndef UNICODE_NOCHAR
-#define UNICODE_NOCHAR                  0xFFFF
+#define UNICODE_NOCHAR					0xFFFF
 #endif
 
 #ifndef IS_HIGH_SURROGATE
-#define IS_HIGH_SURROGATE(x)            ((x) >= SURROGATE_LEAD_FIRST && (x) <= SURROGATE_LEAD_LAST)
+#define IS_HIGH_SURROGATE(x)			((x) >= SURROGATE_LEAD_FIRST && (x) <= SURROGATE_LEAD_LAST)
 #endif
 
 #ifndef IS_LOW_SURROGATE
-#define IS_LOW_SURROGATE(x)             ((x) >= SURROGATE_TRAIL_FIRST && (x) <= SURROGATE_TRAIL_LAST)
+#define IS_LOW_SURROGATE(x)				((x) >= SURROGATE_TRAIL_FIRST && (x) <= SURROGATE_TRAIL_LAST)
 #endif
 
 #ifndef MK_ALT
