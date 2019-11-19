@@ -239,7 +239,7 @@ int classifyTagHTML(Sci_PositionU start, Sci_PositionU end,
 	bool caseSensitive, bool isXml, bool allowScripts) {
 	char withSpace[126 + 2] = " ";
 	const char *tag = withSpace + 1;
-	// Copy after the '<'
+	// Copy after the '<' and stop before space
 	Sci_PositionU i = 1;
 	for (Sci_PositionU cPos = start; cPos <= end && i < sizeof(withSpace) - 2; cPos++) {
 		const char ch = styler[cPos];

@@ -260,8 +260,12 @@ static void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int in
 		// handle line continuation, updates per-line stored state
 		if (sc.atLineStart) {
 			ln = styler.GetLine(sc.currentPos);
-			if (sc.state == SCE_SH_STRING || sc.state == SCE_SH_BACKTICKS || sc.state == SCE_SH_CHARACTER
-				|| sc.state == SCE_SH_HERE_Q || sc.state == SCE_SH_COMMENTLINE || sc.state == SCE_SH_PARAM) {
+			if (sc.state == SCE_SH_STRING
+				|| sc.state == SCE_SH_BACKTICKS
+				|| sc.state == SCE_SH_CHARACTER
+				|| sc.state == SCE_SH_HERE_Q
+				|| sc.state == SCE_SH_COMMENTLINE
+				|| sc.state == SCE_SH_PARAM) {
 				// force backtrack while retaining cmdState
 				styler.SetLineState(ln, BASH_CMD_BODY);
 			} else {
@@ -632,9 +636,10 @@ static void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int in
 			if (sc.ch == '\\') {
 				// Bash can escape any non-newline as a literal
 				sc.SetState(SCE_SH_IDENTIFIER);
-				if (sc.chNext == '\r' || sc.chNext == '\n')
+				if (sc.chNext == '\r' || sc.chNext == '\n') {
 					//sc.SetState(SCE_SH_OPERATOR);
 					sc.SetState(SCE_SH_DEFAULT);
+				}
 			} else if (IsADigit(sc.ch)) {
 				sc.SetState(SCE_SH_NUMBER);
 				numBase = BASH_BASE_DECIMAL;
@@ -652,7 +657,7 @@ static void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int in
 				}
 			} else if (setWordStart.Contains(sc.ch)) {
 				sc.SetState(SCE_SH_WORD);
-				//} else if (sc.ch == '#' || (sc.ch == '/' && sc.chNext == '/')) {
+			//} else if (sc.ch == '#' || (sc.ch == '/' && sc.chNext == '/')) {
 			} else if (sc.ch == '#') {
 				if (stylePrev != SCE_SH_WORD && stylePrev != SCE_SH_IDENTIFIER &&
 					(sc.currentPos == 0 || setMetaCharacter.Contains(sc.chPrev))) {
@@ -758,7 +763,9 @@ static void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int in
 					continue;
 				}
 				// handle command delimiters in command START|BODY|WORD state, also TEST if 'test'
-				if (cmdState == BASH_CMD_START || cmdState == BASH_CMD_BODY || cmdState == BASH_CMD_WORD
+				if (cmdState == BASH_CMD_START
+					|| cmdState == BASH_CMD_BODY
+					|| cmdState == BASH_CMD_WORD
 					|| (cmdState == BASH_CMD_TEST && testExprType == 0)) {
 					char s[10];
 					bool isCmdDelim = false;
@@ -808,6 +815,7 @@ static void FoldBashDoc(Sci_PositionU startPos, Sci_Position length, int, LexerW
 	const bool foldComment = styler.GetPropertyInt("fold.comment") != 0;
 	const bool foldCompact = styler.GetPropertyInt("fold.compact", 1) != 0;
 	const bool isCShell = styler.GetPropertyInt("lexer.bash.csh.language") != 0;
+
 	const Sci_PositionU endPos = startPos + length;
 	int visibleChars = 0;
 	int skipHereCh = 0;
