@@ -17,13 +17,7 @@
 *
 *
 ******************************************************************************/
-
-#ifndef METAPATH_DLAPI_H_
-#define METAPATH_DLAPI_H_
-
-#ifdef __cplusplus
-extern "C" { // C-Declarations
-#endif //__cplusplus
+#pragma once
 
 typedef struct tagLV_ITEMDATA { // lvid
 	LPITEMIDLIST pidl; // Item Id
@@ -109,11 +103,3 @@ static inline LPITEMIDLIST IL_Next(LPITEMIDLIST pidl) {
 LPITEMIDLIST IL_Create(LPCITEMIDLIST pidl1, UINT cb1, LPCITEMIDLIST pidl2, UINT cb2);
 UINT IL_GetSize(LPCITEMIDLIST pidl);
 BOOL IL_GetDisplayName(LPSHELLFOLDER lpsf, LPCITEMIDLIST pidl, DWORD dwFlags, LPWSTR lpszDisplayName, int nDisplayName);
-
-#ifdef __cplusplus
-}
-#endif //__cplusplus
-
-#endif // METAPATH_DLAPI_H_
-
-///   End of Dlapi.h

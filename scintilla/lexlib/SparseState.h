@@ -6,9 +6,7 @@
  **/
 // Copyright 2011 by Neil Hodgson <neilh@scintilla.org>
 // The License.txt file describes the conditions under which this software may be distributed.
-
-#ifndef SPARSESTATE_H
-#define SPARSESTATE_H
+#pragma once
 
 namespace Scintilla {
 
@@ -102,5 +100,3 @@ public:
 };
 
 }
-
-#endif

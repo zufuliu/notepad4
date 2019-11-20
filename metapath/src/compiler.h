@@ -1,8 +1,6 @@
 // This file is part of Notepad2.
 // See License.txt for details about distribution and modification.
-
-#ifndef NOTEPAD2_COMPILER_H_
-#define NOTEPAD2_COMPILER_H_
+#pragma once
 
 #if defined(__cplusplus)
 #undef NULL
@@ -68,5 +66,3 @@
 #ifndef _WIN32_WINNT_WIN10
 #define _WIN32_WINNT_WIN10				0x0A00
 #endif
-
-#endif // NOTEPAD2_COMPILER_H_

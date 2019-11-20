@@ -4,9 +4,7 @@
  **/
 // Copyright 2018 by Neil Hodgson <neilh@scintilla.org>
 // The License.txt file describes the conditions under which this software may be distributed.
-
-#ifndef INTEGERRECTANGLE_H
-#define INTEGERRECTANGLE_H
+#pragma once
 
 namespace Scintilla {
 
@@ -25,5 +23,3 @@ struct IntegerRectangle {
 };
 
 }
-
-#endif

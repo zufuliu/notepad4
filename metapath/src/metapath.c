@@ -3682,5 +3682,3 @@ void SnapToDefaultPos(HWND hwnd) {
 
 	SetWindowPlacement(hwnd, &wndpl);
 }
-
-///  End of metapath.c

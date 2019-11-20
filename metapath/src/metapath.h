@@ -17,9 +17,7 @@
 *
 *
 ******************************************************************************/
-
-#ifndef METAPATH_H_
-#define METAPATH_H_
+#pragma once
 
 //==== Main Window ============================================================
 #define WC_METAPATH L"metapath"
@@ -142,7 +140,3 @@ void MsgSize(HWND hwnd, WPARAM wParam, LPARAM lParam);
 void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam);
 LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam);
 LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam);
-
-#endif // METAPATH_H_
-
-///   End of metapath.h

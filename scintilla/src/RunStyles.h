@@ -3,12 +3,10 @@
  **/
 // Copyright 1998-2007 by Neil Hodgson <neilh@scintilla.org>
 // The License.txt file describes the conditions under which this software may be distributed.
+#pragma once
 
 /// Styling buffer using one element for each run rather than using
 /// a filled buffer.
-
-#ifndef RUNSTYLES_H
-#define RUNSTYLES_H
 
 namespace Scintilla {
 
@@ -60,5 +58,3 @@ public:
 };
 
 }
-
-#endif

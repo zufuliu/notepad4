@@ -4,9 +4,7 @@
  **/
 // Copyright 1998-2017 by Neil Hodgson <neilh@scintilla.org>
 // The License.txt file describes the conditions under which this software may be distributed.
-
-#ifndef ILOADER_H
-#define ILOADER_H
+#pragma once
 
 #include "Sci_Position.h"
 
@@ -17,5 +15,3 @@ public:
 	virtual int SCI_METHOD AddData(const char *data, Sci_Position length) = 0;
 	virtual void * SCI_METHOD ConvertToDocument() noexcept = 0;
 };
-
-#endif

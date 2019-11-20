@@ -17,9 +17,7 @@
 *
 *
 ******************************************************************************/
-
-#ifndef NOTEPAD2_H_
-#define NOTEPAD2_H_
+#pragma once
 
 //==== Main Window ============================================================
 #define WC_NOTEPAD2 L"Notepad2"
@@ -206,7 +204,3 @@ void	MsgSize(HWND hwnd, WPARAM wParam, LPARAM lParam);
 void	MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam);
 LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam);
 LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam);
-
-#endif // NOTEPAD2_H_
-
-// End of Notepad2.h

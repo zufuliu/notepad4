@@ -567,5 +567,3 @@ static void EditPrintInit() noexcept {
 		}
 	}
 }
-
-// End of Bridge.cpp

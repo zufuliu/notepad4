@@ -1370,5 +1370,3 @@ BOOL IL_GetDisplayName(LPSHELLFOLDER lpsf, LPCITEMIDLIST pidl,
 
 	return FALSE;
 }
-
-// End of Dlapi.c

@@ -1,5 +1,4 @@
-#ifndef NOTEPAD2_EDITSTYLE_H_
-#define NOTEPAD2_EDITSTYLE_H_
+#pragma once
 
 //#include "EditStyle.h"
 // MULTI_STYLE
@@ -97,5 +96,3 @@
 #define NP2STYLE_BuildinRule		63597	// Jamfile
 #define NP2STYLE_BlobHex			63598	// SQL, Vim
 #define NP2STYLE_BitField			63599	// SQL - MySQL
-
-#endif // end of EditStyle.h

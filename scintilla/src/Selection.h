@@ -4,9 +4,7 @@
  **/
 // Copyright 2009 by Neil Hodgson <neilh@scintilla.org>
 // The License.txt file describes the conditions under which this software may be distributed.
-
-#ifndef SELECTION_H
-#define SELECTION_H
+#pragma once
 
 namespace Scintilla {
 
@@ -186,5 +184,3 @@ public:
 };
 
 }
-
-#endif

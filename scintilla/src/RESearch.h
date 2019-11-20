@@ -5,9 +5,7 @@
 // Written by Neil Hodgson <neilh@scintilla.org>
 // Based on the work of Ozan S. Yigit.
 // This file is in the public domain.
-
-#ifndef RESEARCH_H
-#define RESEARCH_H
+#pragma once
 
 namespace Scintilla {
 
@@ -84,6 +82,3 @@ private:
 };
 
 }
-
-#endif
-

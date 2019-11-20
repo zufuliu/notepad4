@@ -4,9 +4,7 @@
  **/
 // Copyright 2016 by Neil Hodgson <neilh@scintilla.org>
 // The License.txt file describes the conditions under which this software may be distributed.
-
-#ifndef SPARSEVECTOR_H
-#define SPARSEVECTOR_H
+#pragma once
 
 namespace Scintilla {
 
@@ -154,5 +152,3 @@ public:
 };
 
 }
-
-#endif

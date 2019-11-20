@@ -11,9 +11,7 @@
 *
 *
 ******************************************************************************/
-
-#ifndef NOTEPAD2_VERSION_H
-#define NOTEPAD2_VERSION_H
+#pragma once
 
 #include "VersionRev.h"
 
@@ -96,7 +94,3 @@
 #define VERSION_FILEVERSION_LONG	MY_APPNAME VERSION_FILEVERSION_ARCH STRINGIFY(VERSION_MAJOR) L"." \
 									STRINGIFY(VERSION_MINOR) L"." STRINGIFY(VERSION_BUILD)  \
 									L" " VERSION_REV_FULL
-
-#endif // NOTEPAD2_VERSION_H
-
-// End of Version.h

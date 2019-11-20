@@ -5,9 +5,7 @@
  **/
 // Copyright 2013 by Neil Hodgson <neilh@scintilla.org>
 // The License.txt file describes the conditions under which this software may be distributed.
-
-#ifndef STRINGCOPY_H
-#define STRINGCOPY_H
+#pragma once
 
 namespace Scintilla {
 
@@ -28,5 +26,3 @@ void StringCopy(T(&dest)[count], const T *source) noexcept {
 #define ELEMENTS(a) std::size(a)
 
 }
-
-#endif

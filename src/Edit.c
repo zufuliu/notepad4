@@ -7452,5 +7452,3 @@ void FoldAltArrow(int key, int mode) {
 		}
 	}
 }
-
-// End of Edit.c

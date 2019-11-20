@@ -1,5 +1,4 @@
-#ifndef NOTEPAD2_EDITLEXER_H_
-#define NOTEPAD2_EDITLEXER_H_
+#pragma once
 
 #include <stdlib.h>
 #include "compiler.h"
@@ -151,7 +150,3 @@ typedef const EDITLEXER *LPCEDITLEXER;
 #define NP2LEX_2NDGLOBAL	63098	// SCLEX_NULL		2nd Global Styles
 #define NP2LEX_ANSI			63099	// SCLEX_NULL		ANSI Art
 #define NP2LEX_GLOBAL		63100	// SCLEX_NULL		Global Styles
-
-#endif // NOTEPAD2_EDITLEXER_H_
-
-// end of EditLexer.h

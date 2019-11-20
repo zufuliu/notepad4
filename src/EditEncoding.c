@@ -1509,5 +1509,3 @@ int FileVars_GetEncoding(LPCFILEVARS lpfv) {
 	}
 	return -1;
 }
-
-// End of EditEncoding.c

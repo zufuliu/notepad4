@@ -6,9 +6,7 @@
  **/
 // Copyright 2013 by Neil Hodgson <neilh@scintilla.org>
 // The License.txt file describes the conditions under which this software may be distributed.
-
-#ifndef CASECONVERT_H
-#define CASECONVERT_H
+#pragma once
 
 namespace Scintilla {
 
@@ -42,5 +40,3 @@ size_t CaseConvertString(char *converted, size_t sizeConverted, const char *mixe
 std::string CaseConvertString(const std::string &s, enum CaseConversion conversion);
 
 }
-
-#endif

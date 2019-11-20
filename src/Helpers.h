@@ -17,9 +17,8 @@
 *
 *
 ******************************************************************************/
+#pragma once
 
-#ifndef NOTEPAD2_HELPERS_H_
-#define NOTEPAD2_HELPERS_H_
 #include <stdint.h>
 #include "compiler.h"
 
@@ -667,7 +666,3 @@ BOOL AddBackslash(char *pszOut, const char *pszInput);
 BOOL GetDoAnimateMinimize(void);
 void MinimizeWndToTray(HWND hwnd);
 void RestoreWndFromTray(HWND hwnd);
-
-#endif // NOTEPAD2_HELPERS_H_
-
-// End of Helpers.h

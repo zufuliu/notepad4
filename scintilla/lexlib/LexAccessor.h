@@ -4,9 +4,7 @@
  **/
 // Copyright 1998-2010 by Neil Hodgson <neilh@scintilla.org>
 // The License.txt file describes the conditions under which this software may be distributed.
-
-#ifndef LEXACCESSOR_H
-#define LEXACCESSOR_H
+#pragma once
 
 namespace Scintilla {
 
@@ -275,5 +273,3 @@ inline char LexGetNextChar(Sci_Position startPos, LexAccessor &styler) noexcept 
 }
 
 }
-
-#endif

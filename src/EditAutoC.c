@@ -2341,5 +2341,3 @@ void EditShowCallTips(Sci_Position position) {
 	NP2HeapFree(pLine);
 	NP2HeapFree(text);
 }
-
-// End of EditAutoC.c

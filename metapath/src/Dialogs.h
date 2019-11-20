@@ -17,9 +17,8 @@
 *
 *
 ******************************************************************************/
+#pragma once
 
-#ifndef METAPATH_DIALOGS_H_
-#define METAPATH_DIALOGS_H_
 #include "compiler.h"
 
 /**
@@ -52,7 +51,3 @@ BOOL OpenWithDlg(HWND hwnd, LPCDLITEM lpdliParam);
 BOOL NewDirDlg(HWND hwnd, LPWSTR pszNewDir);
 
 INT_PTR CALLBACK FindTargetDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam);
-
-#endif // METAPATH_DIALOGS_H_
-
-// End of Dialogs.h

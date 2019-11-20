@@ -2362,5 +2362,3 @@ INT_PTR CALLBACK FindTargetDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 
 	return FALSE;
 }
-
-// End of Dialogs.c
