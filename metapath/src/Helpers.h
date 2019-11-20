@@ -17,9 +17,8 @@
 *
 *
 ******************************************************************************/
+#pragma once
 
-#ifndef METAPATH_HELPERS_H_
-#define METAPATH_HELPERS_H_
 #include "compiler.h"
 
 NP2_inline int min_i(int x, int y) {
@@ -480,7 +479,3 @@ INT_PTR ThemedDialogBoxParam(HINSTANCE hInstance, LPCWSTR lpTemplate, HWND hWndP
 BOOL GetDoAnimateMinimize(void);
 void MinimizeWndToTray(HWND hwnd);
 void RestoreWndFromTray(HWND hwnd);
-
-#endif // METAPATH_HELPERS_H_
-
-///   End of Helpers.h

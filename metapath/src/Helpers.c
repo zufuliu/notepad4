@@ -2140,5 +2140,3 @@ void RestoreWndFromTray(HWND hwnd) {
 	// call to DrawAnimatedRects, or the taskbar will not refresh itself
 	// properly until DAR finished
 }
-
-///   End of Helpers.c

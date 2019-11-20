@@ -4,9 +4,7 @@
  **/
 // Copyright 1998-2009 by Neil Hodgson <neilh@scintilla.org>
 // The License.txt file describes the conditions under which this software may be distributed.
-
-#ifndef PERLINE_H
-#define PERLINE_H
+#pragma once
 
 namespace Scintilla {
 
@@ -160,5 +158,3 @@ public:
 };
 
 }
-
-#endif

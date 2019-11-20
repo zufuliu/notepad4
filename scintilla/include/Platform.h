@@ -5,9 +5,7 @@
  **/
 // Copyright 1998-2009 by Neil Hodgson <neilh@scintilla.org>
 // The License.txt file describes the conditions under which this software may be distributed.
-
-#ifndef PLATFORM_H
-#define PLATFORM_H
+#pragma once
 
 // PLAT_GTK = GTK on Linux or Win32
 // PLAT_GTK_WIN32 is defined additionally when running PLAT_GTK under Win32
@@ -598,5 +596,3 @@ public:
 #endif
 
 }
-
-#endif

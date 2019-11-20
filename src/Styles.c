@@ -4496,5 +4496,3 @@ void Style_SelectLexerDlg(HWND hwnd) {
 		}
 	}
 }
-
-// End of Styles.c

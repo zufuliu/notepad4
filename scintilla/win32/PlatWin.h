@@ -4,9 +4,7 @@
  **/
 // Copyright 1998-2011 by Neil Hodgson <neilh@scintilla.org>
 // The License.txt file describes the conditions under which this software may be distributed.
-
-#ifndef PLATWIN_H
-#define PLATWIN_H
+#pragma once
 
 // force compile C as CPP
 #define NP2_FORCE_COMPILE_C_AS_CPP	0
@@ -35,5 +33,3 @@ extern IDWriteFactory *pIDWriteFactory;
 #endif
 
 }
-
-#endif

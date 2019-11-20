@@ -1,5 +1,4 @@
-#ifndef LEXERUTILS_H
-#define LEXERUTILS_H
+#pragma once
 
 namespace Scintilla {
 
@@ -55,5 +54,3 @@ inline void SaveNestedState(NestedStateStack& stateStack, Sci_Position line, con
 #endif
 
 }
-
-#endif // LEXERUTILS_H

@@ -5,9 +5,7 @@
  **/
 // Copyright 2015 by Neil Hodgson <neilh@scintilla.org>
 // The License.txt file describes the conditions under which this software may be distributed.
-
-#ifndef SCI_POSITION_H
-#define SCI_POSITION_H
+#pragma once
 
 #if defined(__cplusplus)
 #include <cstddef>
@@ -29,6 +27,4 @@ typedef Sci_Position Sci_PositionCR;
 	#define SCI_METHOD __stdcall
 #else
 	#define SCI_METHOD
-#endif
-
 #endif

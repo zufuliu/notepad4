@@ -17,9 +17,7 @@
 *
 *
 ******************************************************************************/
-
-#ifndef NOTEPAD2_EDIT_H_
-#define NOTEPAD2_EDIT_H_
+#pragma once
 
 // WideCharToMultiByte, UTF8 encoding of U+0800 to U+FFFF
 #define kMaxMultiByteCount	3
@@ -412,7 +410,3 @@ void FoldToggleCurrentLevel(FOLD_ACTION action);
 void FoldToggleDefault(FOLD_ACTION action);
 void FoldClick(Sci_Line ln, int mode);
 void FoldAltArrow(int key, int mode);
-
-#endif //NOTEPAD2_EDIT_H_
-
-// End of Edit.h

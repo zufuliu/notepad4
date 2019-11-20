@@ -14,9 +14,8 @@
 *
 *
 ******************************************************************************/
+#pragma once
 
-#ifndef NOTEPAD2_SCICALL_H_
-#define NOTEPAD2_SCICALL_H_
 #include "compiler.h"
 #include "Scintilla.h"
 
@@ -1315,7 +1314,3 @@ NP2_inline void SciCall_SetCommandEvents(BOOL commandEvents) {
 NP2_inline void SciCall_SetMouseDwellTime(int periodMilliseconds) {
 	SciCall(SCI_SETMOUSEDWELLTIME, periodMilliseconds, 0);
 }
-
-#endif // NOTEPAD2_SCICALL_H_
-
-// End of SciCall.h

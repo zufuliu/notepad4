@@ -17,9 +17,7 @@
 *
 *
 ******************************************************************************/
-
-#ifndef METAPATH_DROPSOURCE_H_
-#define METAPATH_DROPSOURCE_H_
+#pragma once
 
 class CDropSource : public IDropSource {
 public:
@@ -38,7 +36,3 @@ public:
 private:
 	ULONG m_refs;
 };
-
-#endif // METAPATH_DROPSOURCE_H_
-
-// End of DropSource.h

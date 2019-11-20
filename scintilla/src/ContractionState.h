@@ -4,9 +4,7 @@
  **/
 // Copyright 1998-2007 by Neil Hodgson <neilh@scintilla.org>
 // The License.txt file describes the conditions under which this software may be distributed.
-
-#ifndef CONTRACTIONSTATE_H
-#define CONTRACTIONSTATE_H
+#pragma once
 
 namespace Scintilla {
 
@@ -55,5 +53,3 @@ public:
 std::unique_ptr<IContractionState> ContractionStateCreate(bool largeDocument);
 
 }
-
-#endif

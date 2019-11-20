@@ -17,9 +17,7 @@
 *
 *
 ******************************************************************************/
-
-#ifndef NOTEPAD2_STYLES_H_
-#define NOTEPAD2_STYLES_H_
+#pragma once
 
 #include "EditLexer.h"
 // Number of Lexers in pLexArray
@@ -103,7 +101,3 @@ void	Style_SetStyles(int iStyle, LPCWSTR lpszStyle);
 int 	Style_GetLexerIconId(LPCEDITLEXER pLex);
 void	Style_ConfigDlg(HWND hwnd);
 void	Style_SelectLexerDlg(HWND hwnd);
-
-#endif // NOTEPAD2_STYLES_H_
-
-// End of Style.h

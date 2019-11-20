@@ -4,9 +4,7 @@
  **/
 // Copyright 2007 by Neil Hodgson <neilh@scintilla.org>
 // The License.txt file describes the conditions under which this software may be distributed.
-
-#ifndef CHARACTERSET_H
-#define CHARACTERSET_H
+#pragma once
 
 namespace Scintilla {
 
@@ -199,5 +197,3 @@ int CompareNCaseInsensitive(const char *a, const char *b, size_t len) noexcept;
 #endif
 
 }
-
-#endif

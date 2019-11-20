@@ -8106,5 +8106,3 @@ void CALLBACK PasteBoardTimer(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTi
 		dwLastCopyTime = 0;
 	}
 }
-
-// End of Notepad2.c

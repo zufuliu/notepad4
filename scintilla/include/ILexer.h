@@ -4,9 +4,7 @@
  **/
 // Copyright 1998-2010 by Neil Hodgson <neilh@scintilla.org>
 // The License.txt file describes the conditions under which this software may be distributed.
-
-#ifndef ILEXER_H
-#define ILEXER_H
+#pragma once
 
 #include "Sci_Position.h"
 
@@ -78,5 +76,3 @@ public:
 };
 
 }
-
-#endif

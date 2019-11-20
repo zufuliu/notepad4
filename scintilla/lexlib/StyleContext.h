@@ -4,9 +4,7 @@
  **/
 // Copyright 1998-2004 by Neil Hodgson <neilh@scintilla.org>
 // This file is in the public domain.
-
-#ifndef STYLECONTEXT_H
-#define STYLECONTEXT_H
+#pragma once
 
 namespace Scintilla {
 
@@ -232,5 +230,3 @@ public:
 };
 
 }
-
-#endif

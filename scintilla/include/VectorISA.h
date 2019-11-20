@@ -1,8 +1,6 @@
 // This file is part of Notepad2.
 // See License.txt for details about distribution and modification.
-
-#ifndef NOTEPAD2_VECTOR_ISA_H_
-#define NOTEPAD2_VECTOR_ISA_H_
+#pragma once
 
 #if defined(__aarch64__) || defined(_ARM64_) || defined(_M_ARM64)
 	#define NP2_TARGET_ARM64	1
@@ -45,7 +43,3 @@
 
 	// TODO: Function Multiversioning https://gcc.gnu.org/wiki/FunctionMultiVersioning
 #endif
-
-#endif // NOTEPAD2_VECTOR_ISA_H_
-
-// end of VectorISA.h

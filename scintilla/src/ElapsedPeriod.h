@@ -4,9 +4,7 @@
  **/
 // Copyright 2018 by Neil Hodgson <neilh@scintilla.org>
 // The License.txt file describes the conditions under which this software may be distributed.
-
-#ifndef ELAPSEDPERIOD_H
-#define ELAPSEDPERIOD_H
+#pragma once
 
 namespace Scintilla {
 
@@ -31,5 +29,3 @@ public:
 };
 
 }
-
-#endif

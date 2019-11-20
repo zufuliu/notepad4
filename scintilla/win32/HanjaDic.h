@@ -5,9 +5,7 @@
  **/
 // Copyright 2015 by Neil Hodgson <neilh@scintilla.org>
 // The License.txt file describes the conditions under which this software may be distributed.
-
-#ifndef HANJADIC_H
-#define HANJADIC_H
+#pragma once
 
 namespace Scintilla {
 
@@ -18,5 +16,3 @@ int GetHangulOfHanja(wchar_t *inout) noexcept;
 }
 
 }
-
-#endif

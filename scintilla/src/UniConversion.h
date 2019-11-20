@@ -4,9 +4,7 @@
  **/
 // Copyright 1998-2001 by Neil Hodgson <neilh@scintilla.org>
 // The License.txt file describes the conditions under which this software may be distributed.
-
-#ifndef UNICONVERSION_H
-#define UNICONVERSION_H
+#pragma once
 
 namespace Scintilla {
 
@@ -116,5 +114,3 @@ constexpr unsigned int UTF16LengthFromUTF8ByteCount(unsigned int byteCount) noex
 }
 
 }
-
-#endif

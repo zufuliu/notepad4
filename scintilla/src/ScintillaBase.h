@@ -4,9 +4,7 @@
  **/
 // Copyright 1998-2002 by Neil Hodgson <neilh@scintilla.org>
 // The License.txt file describes the conditions under which this software may be distributed.
-
-#ifndef SCINTILLABASE_H
-#define SCINTILLABASE_H
+#pragma once
 
 namespace Scintilla {
 
@@ -108,5 +106,3 @@ public:
 };
 
 }
-
-#endif

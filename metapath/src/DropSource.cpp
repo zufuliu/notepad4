@@ -80,5 +80,3 @@ STDMETHODIMP CDropSource::GiveFeedback(DWORD /*dwEffect*/) noexcept {
 extern "C" HANDLE CreateDropSource(void) {
 	return (new CDropSource);
 }
-
-// End of DropSource.cpp

@@ -4,9 +4,7 @@
  **/
 // Copyright 2015 by Neil Hodgson <neilh@scintilla.org>
 // The License.txt file describes the conditions under which this software may be distributed.
-
-#ifndef POSITION_H
-#define POSITION_H
+#pragma once
 
 /**
  * A Position is a position within a document between two characters or at the beginning or end.
@@ -31,5 +29,3 @@ using MarkerMask = unsigned int;
 constexpr int MarkerBitCount = sizeof(MarkerMask) * 8;
 
 }
-
-#endif

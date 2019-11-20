@@ -17,9 +17,7 @@
 *
 *
 ******************************************************************************/
-
-#ifndef METAPATH_VERSION_H_
-#define METAPATH_VERSION_H_
+#pragma once
 
 #include "VersionRev.h"
 
@@ -93,5 +91,3 @@
 #define VERSION_FILEVERSION_LONG	MY_APPNAME VERSION_FILEVERSION_ARCH STRINGIFY(VERSION_MAJOR) L"." \
 									STRINGIFY(VERSION_MINOR) L"." STRINGIFY(VERSION_BUILD)  \
 									L" " VERSION_REV_FULL
-
-#endif // METAPATH_VERSION_H_

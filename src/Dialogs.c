@@ -2361,5 +2361,3 @@ INT_PTR InfoBox(int iType, LPCWSTR lpstrSetting, UINT uidMessage, ...) {
 	MessageBeep(MB_ICONEXCLAMATION);
 	return ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(idDlg), hwnd, InfoBoxDlgProc, (LPARAM)&ib);
 }
-
-// End of Dialogs.c
