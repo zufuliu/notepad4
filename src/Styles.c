@@ -1068,6 +1068,11 @@ void Style_UpdateLexerKeywordAttr(LPCEDITLEXER pLexNew) {
 		attr[5] = KeywordAttr_NoLexer;		// function
 		attr[6] = KeywordAttr_NoLexer | KeywordAttr_NoAutoComp;	// KDoc
 		break;
+	case NP2LEX_RUBY:
+		attr[1] = KeywordAttr_NoAutoComp;	// code fold
+		attr[2] = KeywordAttr_NoAutoComp;	// re
+		attr[3] = KeywordAttr_NoLexer;		// pre-defined variables
+		break;
 	case NP2LEX_RUST:
 		attr[1] = KeywordAttr_NoAutoComp;	// reserved keywords
 		attr[8] = KeywordAttr_NoLexer;		// attribute
@@ -1561,7 +1566,7 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 	// update style font, color, etc. don't need colorizing (analyzing whole document) again,
 	// thus we not call SciCall_ClearDocumentStyle() in previous block.
 	if (bLexerChanged) {
-#if 0
+#if 1
 		// profile lexer performance
 		SciCall_ColouriseAll();
 #else
