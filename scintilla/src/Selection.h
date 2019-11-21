@@ -75,6 +75,9 @@ struct SelectionSegment {
 		if (end < p)
 			end = p;
 	}
+	Sci::Position Length() const noexcept {
+		return end.Position() - start.Position();
+	}
 };
 
 struct SelectionRange {
