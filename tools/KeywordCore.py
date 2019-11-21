@@ -400,6 +400,29 @@ def update_llvm_keyword():
 	keywordList = parse_llvm_api_file('lang/LLVM.ll')
 	UpdateKeywordFile('NP2LEX_LLVM', '../src/EditLexers/stlLLVM.c', keywordList)
 
+def parse_ruby_api_file(path):
+	sections = read_api_file(path, '#')
+	keywordMap = {}
+	for key, doc in sections:
+		items = set(doc.split())
+		keywordMap[key] = items
+
+	codeFold = keywordMap['code fold']
+	keywordMap['keywords'] |= codeFold
+	codeFold.remove('end')
+
+	keywordList = [
+		('keywords', keywordMap['keywords'], KeywordAttr.Default),
+		('code fold', codeFold, KeywordAttr.NoAutoComp),
+		('re', keywordMap['re'], KeywordAttr.NoAutoComp),
+		('pre-defined variables', keywordMap['pre-defined variables'], KeywordAttr.NoLexer),
+	]
+	return keywordList
+
+def update_ruby_keyword():
+	keywordList = parse_ruby_api_file('lang/Ruby.rb')
+	UpdateKeywordFile('NP2LEX_RUBY', '../src/EditLexers/stlRuby.c', keywordList)
+
 # Rust
 def parse_rust_api_file(path):
 	sections = read_api_file(path, '//')
@@ -550,6 +573,7 @@ def update_all_keyword():
 	update_julia_keyword()
 	update_kotlin_keyword()
 	update_llvm_keyword()
+	update_ruby_keyword()
 	update_rust_keyword()
 	update_vim_keyword()
 	update_lexer_keyword_attr()

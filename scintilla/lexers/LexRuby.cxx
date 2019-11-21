@@ -620,7 +620,7 @@ static void ColouriseRbDoc(Sci_PositionU startPos, Sci_Position length, int init
 	// start position and what the termination string is for here documents
 
 	const WordList &keywords = *keywordLists[0];
-	const WordList &kwREFollowKeyword = *keywordLists[8];
+	const WordList &kwREFollowKeyword = *keywordLists[2];
 
 	class HereDocCls {
 	public:
@@ -1662,7 +1662,7 @@ static void FoldRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 	const bool foldCompact = styler.GetPropertyInt("fold.compact", 1) != 0;
 	const bool foldComment = styler.GetPropertyInt("fold.comment") != 0;
 
-	const WordList &kwFold = *keywordLists[7];
+	const WordList &kwFold = *keywordLists[1];
 
 	synchronizeDocStart(startPos, length, initStyle, styler, // ref args
 		false);

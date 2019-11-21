@@ -103,7 +103,7 @@ Or build from source, see the [Wiki](https://github.com/zufuliu/notepad2/wiki/Bu
 	* PHP Script, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#php)
 		* PHPDoc
 	* Windows Rescouce Script
-	* Ruby, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#ruby)
+	* [Ruby](../master/tools/lang/Ruby.rb), [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#ruby)
 	* Rust, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#rust)
 		* [Rust Standard Library](../master/tools/lang/Rust.rs), up to 1.38.
 	* Scala Script
