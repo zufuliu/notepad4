@@ -940,14 +940,14 @@ std::wstring StringMapCase(const std::wstring_view wsv, DWORD mapFlags) {
 // Returns the target converted to UTF8.
 // Return the length in bytes.
 Sci::Position ScintillaWin::TargetAsUTF8(char *text) const {
-	const Sci::Position targetLength = targetEnd - targetStart;
+	const Sci::Position targetLength = targetRange.Length();
 	if (IsUnicodeMode()) {
 		if (text) {
-			pdoc->GetCharRange(text, targetStart, targetLength);
+			pdoc->GetCharRange(text, targetRange.start.Position(), targetLength);
 		}
 	} else {
 		// Need to convert
-		const std::string s = RangeText(targetStart, targetEnd);
+		const std::string s = RangeText(targetRange.start.Position(), targetRange.end.Position());
 		const std::wstring characters = StringDecode(s, CodePageOfDocument());
 		const int utf8Len = MultiByteLenFromWideChar(CP_UTF8, characters);
 		if (text) {
