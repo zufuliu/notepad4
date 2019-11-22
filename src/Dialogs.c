@@ -85,7 +85,7 @@ int MsgBox(int iType, UINT uIdMsg, ...) {
 	WCHAR szTitle[64];
 	GetString(IDS_APPTITLE, szTitle, COUNTOF(szTitle));
 
-	int iIcon = 0;
+	int iIcon = MB_OK;
 	switch (iType) {
 	case MBINFO:
 		iIcon = MB_ICONINFORMATION;
