@@ -26,11 +26,6 @@
 #define MBYESNOCANCEL	4
 #define MBOKCANCEL		8
 
-/**
- * App message used to center MessageBox to the window of the program.
- */
-#define APPM_CENTER_MESSAGE_BOX		(WM_APP + 1)
-
 extern BOOL bWindowLayoutRTL;
 NP2_inline void InitWindowCommon(HWND hwnd) {
 	if (bWindowLayoutRTL) {
