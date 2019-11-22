@@ -594,8 +594,6 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 		}
 
 		HMENU hmenu = LoadMenu(g_hInstance, MAKEINTRESOURCE(IDR_MAINWND));
-		SetMenuDefaultItem(GetSubMenu(hmenu, IDP_POPUP_SUBMENU_PATH), IDM_FILE_OPENSAME, FALSE);
-		SetMenuDefaultItem(GetSubMenu(hmenu, IDP_POPUP_SUBMENU_PATH), IDM_FILE_OPENNEW, FALSE);
 
 		int imenu = 0;
 		switch (nID) {
@@ -622,12 +620,13 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 		pt.x = GET_X_LPARAM(lParam);
 		pt.y = GET_Y_LPARAM(lParam);
 
-		TrackPopupMenuEx(GetSubMenu(hmenu, imenu),
+		HMENU hMenuPopup = GetSubMenu(hmenu, imenu);
+		if (imenu == IDP_POPUP_SUBMENU_PATH) {
+			SetMenuDefaultItem(hMenuPopup, iDefaultOpenMenu, FALSE);
+		}
+		TrackPopupMenuEx(hMenuPopup,
 						 TPM_LEFTBUTTON | TPM_RIGHTBUTTON,
 						 pt.x + 1, pt.y + 1, hwnd, NULL);
-		if (imenu == IDP_POPUP_SUBMENU_PATH) {
-			SetMenuDefaultItem(GetSubMenu(hmenu, IDP_POPUP_SUBMENU_PATH), iDefaultOpenMenu, TRUE);
-		}
 		DestroyMenu(hmenu);
 	}
 	break;
