@@ -172,7 +172,7 @@ bool WordList::InList(const char *s) const noexcept {
 		} else {
 			int j = r.start;
 			do {
-				const int step = count/2;
+				const int step = count >> 1;
 				const int mid = j + step;
 				const char *a = words[mid] + 1;
 				const char *b = s + 1;
@@ -190,7 +190,7 @@ bool WordList::InList(const char *s) const noexcept {
 				} else {
 					count = step;
 				}
-			} while (count > 0);
+			} while (count != 0);
 		}
 	}
 
@@ -243,7 +243,7 @@ bool WordList::InListPrefixed(const char *s, const char marker) const noexcept {
 		} else {
 			int j = r.start;
 			do {
-				const int step = count/2;
+				const int step = count >> 1;
 				const int mid = j + step;
 				const char *a = words[mid] + 1;
 				const char *b = s + 1;
@@ -261,7 +261,7 @@ bool WordList::InListPrefixed(const char *s, const char marker) const noexcept {
 				} else {
 					count = step;
 				}
-			} while (count > 0);
+			} while (count != 0);
 		}
 	}
 
