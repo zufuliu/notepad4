@@ -81,8 +81,12 @@
 //==== Timer for Change Notifications =========================================
 #define ID_TIMER 0xA000
 
+/**
+ * App message used to center MessageBox to the window of the program.
+ */
+#define APPM_CENTER_MESSAGE_BOX		(WM_APP + 1)
 //==== Callback Message from System Tray ======================================
-#define APPM_TRAYMESSAGE	(WM_APP + 4)
+#define APPM_TRAYMESSAGE			(WM_APP + 4)
 
 #define INI_SECTION_NAME_METAPATH			L"metapath"
 #define INI_SECTION_NAME_SETTINGS			L"Settings"
