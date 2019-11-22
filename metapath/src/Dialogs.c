@@ -1220,14 +1220,14 @@ INT_PTR CALLBACK GetFilterDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lP
 								SetDlgItemText(hwnd, IDC_FILTER, tchValue + 1);
 								CheckDlgButton(hwnd, IDC_NEGFILTER, TRUE);
 							} else {
-								MessageBeep(0);
+								MessageBeep(MB_OK);
 							}
 						} else {
 							SetDlgItemText(hwnd, IDC_FILTER, tchValue);
 							CheckDlgButton(hwnd, IDC_NEGFILTER, FALSE);
 						}
 					} else {
-						MessageBeep(0);
+						MessageBeep(MB_OK);
 					}
 				}
 			} else {
@@ -1721,7 +1721,7 @@ INT_PTR CALLBACK OpenWithDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPa
 			if (lpdli->ntype != DLE_NONE) {
 				EndDialog(hwnd, IDOK);
 			} else {
-				MessageBeep(0);
+				MessageBeep(MB_OK);
 			}
 		}
 		break;
