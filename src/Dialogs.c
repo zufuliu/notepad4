@@ -627,7 +627,7 @@ static INT_PTR CALLBACK OpenWithDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPA
 			if (lpdli->ntype != DLE_NONE) {
 				EndDialog(hwnd, IDOK);
 			} else {
-				MessageBeep(0);
+				MessageBeep(MB_OK);
 			}
 		}
 		break;
@@ -805,7 +805,7 @@ static INT_PTR CALLBACK FavoritesDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LP
 			if (lpdli->ntype != DLE_NONE) {
 				EndDialog(hwnd, IDOK);
 			} else {
-				MessageBeep(0);
+				MessageBeep(MB_OK);
 			}
 		}
 		break;

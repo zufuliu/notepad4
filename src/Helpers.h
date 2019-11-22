@@ -547,7 +547,7 @@ NP2_inline void SendWMCommandOrBeep(HWND hwnd, UINT id) {
 	if (IsCmdEnabled(hwnd, id)) {
 		SendWMCommand(hwnd, id);
 	} else {
-		MessageBeep(0);
+		MessageBeep(MB_OK);
 	}
 }
 

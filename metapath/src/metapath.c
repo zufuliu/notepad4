@@ -1221,7 +1221,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	case IDM_FILE_LAUNCH: {
 		if (!DirList_IsFileSelected(hwndDirList)) {
-			MessageBeep(0);
+			MessageBeep(MB_OK);
 			return 0;
 		}
 
@@ -1248,7 +1248,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	case IDM_FILE_QUICKVIEW: {
 		if (!DirList_IsFileSelected(hwndDirList)) {
-			MessageBeep(0);
+			MessageBeep(MB_OK);
 			return 0;
 		}
 
@@ -1289,7 +1289,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	case IDM_FILE_OPENWITH: {
 		if (!ListView_GetSelectedCount(hwndDirList)) {
-			MessageBeep(0);
+			MessageBeep(MB_OK);
 			return 0;
 		}
 
@@ -1394,7 +1394,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	case IDM_FILE_SAVEAS: {
 		if (!DirList_IsFileSelected(hwndDirList)) {
-			MessageBeep(0);
+			MessageBeep(MB_OK);
 			return 0;
 		}
 
@@ -1461,7 +1461,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		if (ListView_GetSelectedCount(hwndDirList)) {
 			CopyMoveDlg(hwnd, &wFuncCopyMove);
 		} else {
-			MessageBeep(0);
+			MessageBeep(MB_OK);
 		}
 		break;
 
@@ -1515,13 +1515,13 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		if (ListView_GetSelectedCount(hwndDirList)) {
 			RenameFileDlg(hwnd);
 		} else {
-			MessageBeep(0);
+			MessageBeep(MB_OK);
 		}
 		break;
 
 	case IDM_FILE_PROPERTIES:
 		if (!ListView_GetSelectedCount(hwndDirList)) {
-			MessageBeep(0);
+			MessageBeep(MB_OK);
 		} else {
 			DirList_PropertyDlg(hwndDirList, -1);
 		}
@@ -1875,7 +1875,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 				ErrorMessage(2, IDS_ERR_CD);
 			}
 		} else {
-			MessageBeep(0);
+			MessageBeep(MB_OK);
 		}
 		History_UpdateToolbar(&mHistory, hwndToolbar, IDT_HISTORY_BACK, IDT_HISTORY_FORWARD);
 		break;
@@ -1888,7 +1888,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 				ErrorMessage(2, IDS_ERR_CD);
 			}
 		} else {
-			MessageBeep(0);
+			MessageBeep(MB_OK);
 		}
 		History_UpdateToolbar(&mHistory, hwndToolbar, IDT_HISTORY_BACK, IDT_HISTORY_FORWARD);
 		break;
@@ -1899,7 +1899,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 				ErrorMessage(2, IDS_ERR_CD);
 			}
 		} else {
-			MessageBeep(0);
+			MessageBeep(MB_OK);
 		}
 	}
 	break;
@@ -1910,7 +1910,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 				ErrorMessage(2, IDS_ERR_CD);
 			}
 		} else {
-			MessageBeep(0);
+			MessageBeep(MB_OK);
 		}
 	}
 	break;
@@ -1950,7 +1950,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			ListView_Update(hwndDirList, i);
 			SendWMCommand(hwnd, iDefaultOpenMenu);
 		} else {
-			MessageBeep(0);
+			MessageBeep(MB_OK);
 		}
 	}
 	break;
@@ -1987,7 +1987,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			ListView_Update(hwndDirList, i);
 			SendWMCommand(hwnd, iDefaultOpenMenu);
 		} else {
-			MessageBeep(0);
+			MessageBeep(MB_OK);
 		}
 	}
 	break;
@@ -2000,7 +2000,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		if (DirList_IsFileSelected(hwndDirList)) {
 			SendWMCommand(hwnd, IDM_FILE_QUICKVIEW);
 		} else {
-			MessageBeep(0);
+			MessageBeep(MB_OK);
 		}
 		break;
 
@@ -2008,7 +2008,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		if (DirList_IsFileSelected(hwndDirList)) {
 			SendWMCommand(hwnd, IDM_FILE_SAVEAS);
 		} else {
-			MessageBeep(0);
+			MessageBeep(MB_OK);
 		}
 		break;
 
@@ -2016,7 +2016,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		if (ListView_GetSelectedCount(hwndDirList)) {
 			SendWMCommand(hwnd, IDM_FILE_COPYMOVE);
 		} else {
-			MessageBeep(0);
+			MessageBeep(MB_OK);
 		}
 		break;
 
@@ -2027,7 +2027,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			SendWMCommand(hwnd, IDM_FILE_DELETE);
 			fUseRecycleBin = fUseRecycleBin2;
 		} else {
-			MessageBeep(0);
+			MessageBeep(MB_OK);
 		}
 		break;
 
@@ -2035,7 +2035,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		if (ListView_GetSelectedCount(hwndDirList)) {
 			SendWMCommand(hwnd, IDM_FILE_DELETE2);
 		} else {
-			MessageBeep(0);
+			MessageBeep(MB_OK);
 		}
 		break;
 
