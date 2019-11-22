@@ -4971,7 +4971,7 @@ BOOL EditFindNext(LPEDITFINDREPLACE lpefr, BOOL fExtendSelection) {
 	BOOL bSuppressNotFound = FALSE;
 
 	if (iPos == -1 && ttf.chrg.cpMin > 0 && !lpefr->bNoFindWrap && !fExtendSelection) {
-		if (!lpefr->bNoFindWrap || (IDOK == InfoBox(MBOKCANCEL, L"MsgFindWrap1", IDS_FIND_WRAPFW))) {
+		if (IDOK == InfoBox(MBOKCANCEL, L"MsgFindWrap1", IDS_FIND_WRAPFW)) {
 			ttf.chrg.cpMin = 0;
 			iPos = SciCall_FindText(lpefr->fuFlags, &ttf);
 		} else {
@@ -5035,7 +5035,7 @@ BOOL EditFindPrev(LPEDITFINDREPLACE lpefr, BOOL fExtendSelection) {
 	BOOL bSuppressNotFound = FALSE;
 
 	if (iPos == -1 && ttf.chrg.cpMin < iLength && !lpefr->bNoFindWrap && !fExtendSelection) {
-		if (!lpefr->bNoFindWrap || (IDOK == InfoBox(MBOKCANCEL, L"MsgFindWrap2", IDS_FIND_WRAPRE))) {
+		if (IDOK == InfoBox(MBOKCANCEL, L"MsgFindWrap2", IDS_FIND_WRAPRE)) {
 			ttf.chrg.cpMin = (Sci_PositionCR)iLength;
 			iPos = SciCall_FindText(lpefr->fuFlags, &ttf);
 		} else {
