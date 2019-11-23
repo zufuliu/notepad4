@@ -1,5 +1,5 @@
 #pragma once
-
+#ifndef RC_INVOKED
 #include <stdlib.h>
 #include "compiler.h"
 #include "Scintilla.h"
@@ -79,6 +79,8 @@ typedef const EDITLEXER *LPCEDITLEXER;
 
 #define EDITLEXER_HOLE(name, style)	{ StyleTheme_Default, 0, 1, 1, COUNTOF(style), CSTRLEN(name), (name), NULL, NULL }
 #define EDITLEXER_TEXT(name, style)	{ StyleTheme_Default, 0, 0, 0, COUNTOF(style), CSTRLEN(name), (name), NULL, NULL }
+
+#endif  // !RC_INVOKED
 
 // NP2LEX_, rid for EDITLEXER
 #define NP2LEX_TEXTFILE	63000	// SCLEX_NULL		Text File
