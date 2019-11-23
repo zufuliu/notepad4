@@ -123,9 +123,9 @@ static EDITSTYLE Styles_AU3[] = {
 	{ SCE_AU3_NUMBER, NP2STYLE_Number, EDITSTYLE_HOLE(L"Number"), L"fore:#FF0000" },
 	{ SCE_AU3_OPERATOR, NP2STYLE_Operator, EDITSTYLE_HOLE(L"Operator"), L"fore:#C000C0" },
 	{ SCE_AU3_VARIABLE, NP2STYLE_Variable, EDITSTYLE_HOLE(L"Variable"), L"fore:#808000" },
-	{ SCE_AU3_SENT, 63491, EDITSTYLE_HOLE(L"Send Key"), L"fore:#FF0000" },
+	{ SCE_AU3_SENT, NP2STYLE_SendKey, EDITSTYLE_HOLE(L"Send Key"), L"fore:#FF0000" },
 	{ SCE_AU3_PREPROCESSOR, NP2STYLE_Preprocessor, EDITSTYLE_HOLE(L"Preprocessor"), L"fore:#FF8000" },
-	{ SCE_AU3_SPECIAL, 63492, EDITSTYLE_HOLE(L"Special"), L"fore:#FF8000" },
+	{ SCE_AU3_SPECIAL, NP2STYLE_Special, EDITSTYLE_HOLE(L"Special"), L"fore:#FF8000" },
 };
 
 EDITLEXER lexAU3 = {
@@ -135,4 +135,3 @@ EDITLEXER lexAU3 = {
 	&Keywords_AU3,
 	Styles_AU3
 };
-

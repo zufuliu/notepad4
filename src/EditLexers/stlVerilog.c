@@ -25,13 +25,13 @@ static KEYWORDLIST Keywords_Verilog = {{
 static EDITSTYLE Styles_Verilog[] = {
 	EDITSTYLE_DEFAULT,
 	{ SCE_V_WORD, NP2STYLE_Keyword, EDITSTYLE_HOLE(L"Keyword"), L"fore:#0000FF" },
-	{ SCE_V_WORD2, 63586, EDITSTYLE_HOLE(L"System Task and Function"), L"fore:#0080FF" },
+	{ SCE_V_WORD2, NP2STYLE_SystemTaskFunction, EDITSTYLE_HOLE(L"System Task and Function"), L"fore:#0080FF" },
 	{ MULTI_STYLE(SCE_V_COMMENT, SCE_V_COMMENTLINE, SCE_V_COMMENTLINEBANG, 0), NP2STYLE_Comment, EDITSTYLE_HOLE(L"Comment"), L"fore:#608060" },
 	{ SCE_V_STRING, NP2STYLE_String, EDITSTYLE_HOLE(L"String"), L"fore:#008000" },
 	{ SCE_V_NUMBER, NP2STYLE_Number, EDITSTYLE_HOLE(L"Number"), L"fore:#FF0000" },
 	{ SCE_V_OPERATOR, NP2STYLE_Operator, EDITSTYLE_HOLE(L"Operator"), L"fore:#B000B0" },
 	{ SCE_V_PREPROCESSOR, NP2STYLE_Preprocessor, EDITSTYLE_HOLE(L"Preprocessor"), L"fore:#FF8000" },
-	{ SCE_V_USER, 63585, EDITSTYLE_HOLE(L"User Define"), L"fore:#B5E71F" },
+	{ SCE_V_USER, NP2STYLE_UserDefine, EDITSTYLE_HOLE(L"User Define"), L"fore:#B5E71F" },
 };
 
 EDITLEXER lexVerilog = {
@@ -41,4 +41,3 @@ EDITLEXER lexVerilog = {
 	&Keywords_Verilog,
 	Styles_Verilog
 };
-

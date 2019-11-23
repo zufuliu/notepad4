@@ -53,8 +53,8 @@ static EDITSTYLE Styles_Batch[] = {
 	{ SCE_BAT_COMMENT, NP2STYLE_Comment, EDITSTYLE_HOLE(L"Comment"), L"fore:#008000" },
 	{ SCE_BAT_WORD, NP2STYLE_Keyword, EDITSTYLE_HOLE(L"Keyword"), L"bold; fore:#FF8000" },
 	{ SCE_BAT_COMMAND, NP2STYLE_Command, EDITSTYLE_HOLE(L"Command"), L"bold; fore:#0080FF" },
-	{ SCE_BAT_STRINGDQ, 63413, EDITSTYLE_HOLE(L"Double Quoted String"), L"fore:#008080" },
-	{ SCE_BAT_STRINGSQ, 63412, EDITSTYLE_HOLE(L"Single Quoted String"), L"fore:#C08000" },
+	{ SCE_BAT_STRINGDQ, NP2STYLE_DoubleQuotedString, EDITSTYLE_HOLE(L"Double Quoted String"), L"fore:#008080" },
+	{ SCE_BAT_STRINGSQ, NP2STYLE_SingleQuotedString, EDITSTYLE_HOLE(L"Single Quoted String"), L"fore:#C08000" },
 	{ SCE_BAT_STRINGBT, NP2STYLE_Backticks, EDITSTYLE_HOLE(L"Backticks"), L"fore:#F08000" },
 	{ SCE_BAT_ESCAPE, NP2STYLE_EscapeSequence, EDITSTYLE_HOLE(L"Escape Sequence"), L"fore:#FF0000" },
 	{ SCE_BAT_VARIABLE, NP2STYLE_Variable, EDITSTYLE_HOLE(L"Variable"), L"fore:#003CE6; back:#FFF1A8" },
@@ -69,4 +69,3 @@ EDITLEXER lexBatch = {
 	&Keywords_Batch,
 	Styles_Batch
 };
-

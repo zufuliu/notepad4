@@ -58,4 +58,3 @@ EDITLEXER lexMatlab = {
 	&Keywords_Matlab,
 	Styles_Matlab
 };
-

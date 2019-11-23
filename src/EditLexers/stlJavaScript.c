@@ -149,7 +149,7 @@ static EDITSTYLE Styles_JS[] = {
 	EDITSTYLE_DEFAULT,
 	{ SCE_C_WORD, NP2STYLE_Keyword, EDITSTYLE_HOLE(L"Keyword"), L"fore:#0000FF" },
 	{ SCE_C_WORD2, NP2STYLE_ReservedWord, EDITSTYLE_HOLE(L"Reserved Word"), L"fore:#B000B0" },
-	{ SCE_C_ATTRIBUTE, NP2STYLE_Directive, EDITSTYLE_HOLE(L"Module Directive"), L"fore:#FF8000" },
+	{ SCE_C_ATTRIBUTE, NP2STYLE_ModuleDirective, EDITSTYLE_HOLE(L"Module Directive"), L"fore:#FF8000" },
 	{ SCE_C_CLASS, NP2STYLE_Object, EDITSTYLE_HOLE(L"Object"), L"bold; fore:#0080C0" },
 	{ SCE_C_FUNCTION, NP2STYLE_Function, EDITSTYLE_HOLE(L"Function"), L"fore:#A46000" },
 	{ SCE_C_CONSTANT, NP2STYLE_Constant, EDITSTYLE_HOLE(L"Constant"), L"fore:#B000B0" },
@@ -157,7 +157,7 @@ static EDITSTYLE Styles_JS[] = {
 	{ SCE_C_COMMENTDOC_TAG, NP2STYLE_DocCommentTag, EDITSTYLE_HOLE(L"Doc Comment Tag"), L"fore:#408080" },
 	{ MULTI_STYLE(SCE_C_COMMENTDOC, SCE_C_COMMENTLINEDOC, SCE_C_COMMENTDOC_TAG_XML, 0), NP2STYLE_DocComment, EDITSTYLE_HOLE(L"Doc Comment"), L"fore:#408040" },
 	{ MULTI_STYLE(SCE_C_STRING, SCE_C_CHARACTER, SCE_C_STRINGEOL, 0), NP2STYLE_String, EDITSTYLE_HOLE(L"String"), L"fore:#008000" },
-	{ SCE_C_DSTRINGB, NP2STYLE_Backticks, EDITSTYLE_HOLE(L"Template Literal"), L"fore:#F08000" },
+	{ SCE_C_DSTRINGB, NP2STYLE_TemplateLiteral, EDITSTYLE_HOLE(L"Template Literal"), L"fore:#F08000" },
 	{ SCE_C_REGEX, NP2STYLE_Regex, EDITSTYLE_HOLE(L"Regex"), L"fore:#006633; back:#FFF1A8" },
 	{ SCE_C_LABEL, NP2STYLE_Label, EDITSTYLE_HOLE(L"Label"), L"back:#FFC040" },
 	{ SCE_C_NUMBER, NP2STYLE_Number, EDITSTYLE_HOLE(L"Number"), L"fore:#FF0000" },
@@ -171,4 +171,3 @@ EDITLEXER lexJS = {
 	&Keywords_JS,
 	Styles_JS
 };
-

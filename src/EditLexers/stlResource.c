@@ -58,4 +58,3 @@ EDITLEXER lexRC = {
 	&Keywords_RC,
 	Styles_RC
 };
-

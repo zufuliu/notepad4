@@ -104,4 +104,3 @@ EDITLEXER lexD = {
 	&Keywords_D,
 	Styles_D
 };
-

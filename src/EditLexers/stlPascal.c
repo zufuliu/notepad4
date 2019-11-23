@@ -46,4 +46,3 @@ EDITLEXER lexPascal = {
 	&Keywords_Pascal,
 	Styles_Pascal
 };
-

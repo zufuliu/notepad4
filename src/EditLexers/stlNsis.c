@@ -42,4 +42,3 @@ EDITLEXER lexNsis = {
 	&Keywords_NSIS,
 	Styles_NSIS
 };
-

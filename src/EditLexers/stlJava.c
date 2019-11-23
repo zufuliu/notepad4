@@ -116,7 +116,7 @@ static EDITSTYLE Styles_Java[] = {
 	EDITSTYLE_DEFAULT,
 	{ SCE_C_WORD, NP2STYLE_Keyword, EDITSTYLE_HOLE(L"Keyword"), L"fore:#0000FF" },
 	{ SCE_C_WORD2, NP2STYLE_TypeKeyword, EDITSTYLE_HOLE(L"Type Keyword"), L"fore:#0000FF" },
-	{ SCE_C_ATTRIBUTE, NP2STYLE_Directive, EDITSTYLE_HOLE(L"Module Directive"), L"fore:#FF8000" },
+	{ SCE_C_ATTRIBUTE, NP2STYLE_ModuleDirective, EDITSTYLE_HOLE(L"Module Directive"), L"fore:#FF8000" },
 	{ SCE_C_DIRECTIVE, NP2STYLE_Annotation, EDITSTYLE_HOLE(L"Annotation"), L"fore:#FF8000" },
 	{ SCE_C_CLASS, NP2STYLE_Class, EDITSTYLE_HOLE(L"Class"), L"fore:#0080FF" },
 	{ SCE_C_INTERFACE, NP2STYLE_Interface, EDITSTYLE_HOLE(L"Interface"), L"bold; fore:#1E90FF" },
@@ -128,7 +128,7 @@ static EDITSTYLE Styles_Java[] = {
 	{ SCE_C_COMMENTDOC_TAG_XML, NP2STYLE_DocCommentTagHTML, EDITSTYLE_HOLE(L"Doc Comment HTML Tag"), L"fore:#808080" },
 	{ MULTI_STYLE(SCE_C_COMMENTDOC, SCE_C_COMMENTLINEDOC, 0, 0), NP2STYLE_DocComment, EDITSTYLE_HOLE(L"Doc Comment"), L"fore:#408040" },
 	{ MULTI_STYLE(SCE_C_STRING, SCE_C_CHARACTER, SCE_C_STRINGEOL, 0), NP2STYLE_String, EDITSTYLE_HOLE(L"String"), L"fore:#008000" },
-	{ SCE_C_TRIPLEVERBATIM, NP2STYLE_TripleString, EDITSTYLE_HOLE(L"Triple Quoted String"), L"fore:#F08000" },
+	{ SCE_C_TRIPLEVERBATIM, NP2STYLE_TripleQuotedString, EDITSTYLE_HOLE(L"Triple Quoted String"), L"fore:#F08000" },
 	{ SCE_C_LABEL, NP2STYLE_Label, EDITSTYLE_HOLE(L"Label"), L"back:#FFC040" },
 	{ SCE_C_NUMBER, NP2STYLE_Number, EDITSTYLE_HOLE(L"Number"), L"fore:#FF0000" },
 	{ SCE_C_OPERATOR, NP2STYLE_Operator, EDITSTYLE_HOLE(L"Operator"), L"fore:#B000B0" },
@@ -141,4 +141,3 @@ EDITLEXER lexJava = {
 	&Keywords_Java,
 	Styles_Java
 };
-

@@ -42,8 +42,8 @@ static EDITSTYLE Styles_Lua[] = {
 	EDITSTYLE_DEFAULT,
 	{ SCE_LUA_WORD, NP2STYLE_Keyword, EDITSTYLE_HOLE(L"Keyword"), L"fore:#0000FF" },
 	{ SCE_LUA_WORD2, NP2STYLE_BasicFunction, EDITSTYLE_HOLE(L"Basic Function"), L"fore:#FF8000" },
-	{ SCE_LUA_WORD3, 63452, EDITSTYLE_HOLE(L"String, Table & Math Function"), L"fore:#FF0080" },
-	{ SCE_LUA_WORD4, 63453, EDITSTYLE_HOLE(L"Input, Output & System Facility"), L"fore:#0080FF" },
+	{ SCE_LUA_WORD3, NP2STYLE_StringTableMathFunc, EDITSTYLE_HOLE(L"String, Table & Math Function"), L"fore:#FF0080" },
+	{ SCE_LUA_WORD4, NP2STYLE_IOSystemFacility, EDITSTYLE_HOLE(L"Input, Output & System Facility"), L"fore:#0080FF" },
 	{ SCE_LUA_FUNCTION, NP2STYLE_Function, EDITSTYLE_HOLE(L"Function"), L"fore:#A46000" },
 	{ MULTI_STYLE(SCE_LUA_COMMENT, SCE_LUA_COMMENTLINE, SCE_LUA_COMMENTDOC, 0), NP2STYLE_Comment, EDITSTYLE_HOLE(L"Comment"), L"fore:#608060" },
 	{ MULTI_STYLE(SCE_LUA_STRING, SCE_LUA_STRINGEOL, SCE_LUA_LITERALSTRING, SCE_LUA_CHARACTER), NP2STYLE_String, EDITSTYLE_HOLE(L"String"), L"fore:#008000" },
@@ -59,4 +59,3 @@ EDITLEXER lexLua = {
 	&Keywords_Lua,
 	Styles_Lua
 };
-

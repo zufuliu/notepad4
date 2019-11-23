@@ -74,7 +74,7 @@ static EDITSTYLE Styles_CSharp[] = {
 	EDITSTYLE_DEFAULT,
 	{ SCE_C_WORD, NP2STYLE_Keyword, EDITSTYLE_HOLE(L"Keyword"), L"fore:#0000FF" },
 	{ SCE_C_WORD2, NP2STYLE_TypeKeyword, EDITSTYLE_HOLE(L"Type Keyword"), L"fore:#0000FF" },
-	{ SCE_C_DIRECTIVE, 63391, EDITSTYLE_HOLE(L"LINQ Keyword"), L"fore:#FF8000" },
+	{ SCE_C_DIRECTIVE, NP2STYLE_LINQKeyword, EDITSTYLE_HOLE(L"LINQ Keyword"), L"fore:#FF8000" },
 	{ SCE_C_PREPROCESSOR, NP2STYLE_Preprocessor, EDITSTYLE_HOLE(L"Preprocessor"), L"fore:#FF8000" },
 	{ SCE_C_ATTRIBUTE, NP2STYLE_Attribute, EDITSTYLE_HOLE(L"Attribute"), L"fore:#FF8000" },
 	{ SCE_C_CLASS, NP2STYLE_Class, EDITSTYLE_HOLE(L"Class"), L"fore:#0080FF" },
@@ -100,4 +100,3 @@ EDITLEXER lexCSharp = {
 	&Keywords_CSharp,
 	Styles_CSharp
 };
-

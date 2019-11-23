@@ -891,4 +891,3 @@ EDITLEXER lexCPP = {
 	&Keywords_CPP,
 	Styles_CPP
 };
-

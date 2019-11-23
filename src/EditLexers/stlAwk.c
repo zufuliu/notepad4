@@ -53,4 +53,3 @@ EDITLEXER lexAwk = {
 	&Keywords_Awk,
 	Styles_Awk
 };
-

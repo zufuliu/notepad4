@@ -1,4 +1,4 @@
-// Kotlin 1.3 https://kotlinlang.org/docs/reference/kotlin-doc.html
+// Kotlin 1.3 https://kotlinlang.org/docs/reference/
 
 //! Keywords		===========================================================
 // https://kotlinlang.org/docs/reference/keyword-reference.html

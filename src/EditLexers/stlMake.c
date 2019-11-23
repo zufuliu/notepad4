@@ -65,4 +65,3 @@ EDITLEXER lexMake = {
 	&Keywords_MAK,
 	Styles_MAK
 };
-
