@@ -50,4 +50,3 @@ EDITLEXER lexFSharp = {
 	&Keywords_FSharp,
 	Styles_FSharp
 };
-

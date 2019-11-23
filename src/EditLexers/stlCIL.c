@@ -103,4 +103,3 @@ EDITLEXER lexCIL = {
 	&Keywords_CIL,
 	Styles_CIL
 };
-

@@ -62,4 +62,3 @@ EDITLEXER lexHaXe = {
 	&Keywords_HaXe,
 	Styles_HaXe
 };
-

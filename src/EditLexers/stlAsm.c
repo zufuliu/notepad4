@@ -164,11 +164,11 @@ static EDITSTYLE Styles_ASM[] = {
 	{ SCE_ASM_PREPROCESSOR, NP2STYLE_Preprocessor, EDITSTYLE_HOLE(L"Preprocessor"), L"fore:#FF8000" },
 	{ SCE_ASM_NUMBER, NP2STYLE_Number, EDITSTYLE_HOLE(L"Number"), L"fore:#FF0000" },
 	{ SCE_ASM_OPERATOR, NP2STYLE_Operator, EDITSTYLE_HOLE(L"Operator"), L"fore:#B000B0" },
-	{ SCE_ASM_CPUINSTRUCTION, 63551, EDITSTYLE_HOLE(L"CPU Instruction"), L"fore:#0080FF" },
-	{ SCE_ASM_MATHINSTRUCTION, 63552, EDITSTYLE_HOLE(L"FPU Instruction"), L"fore:#FF0080" },
-	{ SCE_ASM_EXTINSTRUCTION, 63553, EDITSTYLE_HOLE(L"Extended Instruction"), L"fore:#8000FF" },
+	{ SCE_ASM_CPUINSTRUCTION, NP2STYLE_CPUInstruction, EDITSTYLE_HOLE(L"CPU Instruction"), L"fore:#0080FF" },
+	{ SCE_ASM_MATHINSTRUCTION, NP2STYLE_FPUInstruction, EDITSTYLE_HOLE(L"FPU Instruction"), L"fore:#FF0080" },
+	{ SCE_ASM_EXTINSTRUCTION, NP2STYLE_ExtendedInstruction, EDITSTYLE_HOLE(L"Extended Instruction"), L"fore:#8000FF" },
 	{ SCE_ASM_DIRECTIVE, NP2STYLE_Directive, EDITSTYLE_HOLE(L"Directive"), L"fore:#0000FF" },
-	{ SCE_ASM_DIRECTIVEOPERAND, 63554, EDITSTYLE_HOLE(L"Directive Operand"), L"fore:#0000FF" },
+	{ SCE_ASM_DIRECTIVEOPERAND, NP2STYLE_DirectiveOperand, EDITSTYLE_HOLE(L"Directive Operand"), L"fore:#0000FF" },
 	{ SCE_ASM_REGISTER, NP2STYLE_Register, EDITSTYLE_HOLE(L"Register"), L"fore:#FF8000" },
 	{ SCE_ASM_LABEL, NP2STYLE_Label, EDITSTYLE_HOLE(L"Label"), L"back:#FFC040" },
 };
@@ -180,4 +180,3 @@ EDITLEXER lexASM = {
 	&Keywords_ASM,
 	Styles_ASM
 };
-

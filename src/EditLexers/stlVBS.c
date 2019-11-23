@@ -74,4 +74,3 @@ EDITLEXER lexVBS = {
 	&Keywords_VBS,
 	Styles_VBS
 };
-

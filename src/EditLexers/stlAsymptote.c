@@ -55,4 +55,3 @@ EDITLEXER lexASY = {
 	&Keywords_ASY,
 	Styles_ASY
 };
-

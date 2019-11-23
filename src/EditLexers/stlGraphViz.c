@@ -60,4 +60,3 @@ EDITLEXER lexDOT = {
 	&Keywords_DOT,
 	Styles_DOT
 };
-

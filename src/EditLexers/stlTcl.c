@@ -40,8 +40,8 @@ static EDITSTYLE Styles_Tcl[] = {
 	{ SCE_TCL_IN_QUOTE, NP2STYLE_String, EDITSTYLE_HOLE(L"String"), L"fore:#008000" },
 	{ SCE_TCL_NUMBER, NP2STYLE_Number, EDITSTYLE_HOLE(L"Number"), L"fore:#FF0000" },
 	{ SCE_TCL_OPERATOR, NP2STYLE_Operator, EDITSTYLE_HOLE(L"Operator"), L"fore:#B000B0" },
-	{ MULTI_STYLE(SCE_TCL_SUBSTITUTION, SCE_TCL_SUB_BRACE, 0, 0), 63441, EDITSTYLE_HOLE(L"Substitution"), L"fore:#0080FF" },
-	{ SCE_TCL_MODIFIER, 63442, EDITSTYLE_HOLE(L"Modifier"), L"fore:#FF00FF" },
+	{ MULTI_STYLE(SCE_TCL_SUBSTITUTION, SCE_TCL_SUB_BRACE, 0, 0), NP2STYLE_Substitution, EDITSTYLE_HOLE(L"Substitution"), L"fore:#0080FF" },
+	{ SCE_TCL_MODIFIER, NP2STYLE_Modifier, EDITSTYLE_HOLE(L"Modifier"), L"fore:#FF00FF" },
 };
 
 EDITLEXER lexTcl = {
@@ -51,4 +51,3 @@ EDITLEXER lexTcl = {
 	&Keywords_Tcl,
 	Styles_Tcl
 };
-

@@ -34,4 +34,3 @@ EDITLEXER lexFortran = {
 	&Keywords_Fortran,
 	Styles_Fortran
 };
-

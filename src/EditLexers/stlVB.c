@@ -91,4 +91,3 @@ EDITLEXER lexVB = {
 	&Keywords_VB,
 	Styles_VB
 };
-

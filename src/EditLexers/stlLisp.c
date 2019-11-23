@@ -29,4 +29,3 @@ EDITLEXER lexLisp = {
 	&Keywords_LISP,
 	Styles_LISP
 };
-

@@ -45,4 +45,3 @@ EDITLEXER lexJAM = {
 	&Keywords_JAM,
 	Styles_JAM
 };
-

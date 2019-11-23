@@ -61,4 +61,3 @@ EDITLEXER lexAS = {
 	&Keywords_AS,
 	Styles_AS
 };
-

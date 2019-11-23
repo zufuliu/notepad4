@@ -141,4 +141,3 @@ EDITLEXER lexSmali = {
 	&Keywords_Smail,
 	Styles_Smail
 };
-
