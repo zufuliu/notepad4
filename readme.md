@@ -144,6 +144,7 @@ Or build from source, see the [Wiki](https://github.com/zufuliu/notepad2/wiki/Bu
 		* Spring Beans
 		* Apple Property List
 		* Android Manifest
+	* YAML Document
 	* ANSI Art
 	* Many Others
 * Toggle fold for specific level, shortcuts: <kbd>Alt</kbd>+<kbd>Number</kbd>
