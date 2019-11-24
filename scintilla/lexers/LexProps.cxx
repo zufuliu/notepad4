@@ -24,6 +24,14 @@ namespace {
 
 #define ENABLE_FOLD_PROPS_COMMENT	1
 
+constexpr bool IsCommentChar(unsigned char ch) noexcept {
+	return ch == '#' || ch == ';' || ch == '!';
+}
+
+constexpr bool IsAssignChar(unsigned char ch) noexcept {
+	return ch == '=' || ch == ':';
+}
+
 void ColourisePropsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList, Accessor &styler) {
 	// property lexer.props.allow.initial.spaces
 	//	For properties files, set to 0 to style all lines that start with whitespace in the default style.
@@ -57,24 +65,42 @@ void ColourisePropsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 		}
 
 		initStyle = SCE_PROPS_DEFAULT;
-		if (ch == '#' || ch == ';' || ch == '!') {
+#if ENABLE_FOLD_PROPS_COMMENT
+		bool changed = false;
+#endif
+		if (IsCommentChar(ch)) {
 			initStyle = SCE_PROPS_COMMENT;
 		} else if (ch == '[') {
 			initStyle = SCE_PROPS_SECTION;
 		} else if (ch == '@') {
 			styler.ColourTo(i, SCE_PROPS_DEFVAL);
 			const char chNext = styler[++i];
-			if (chNext == '=' || chNext == ':') {
+			if (IsAssignChar(chNext)) {
 				styler.ColourTo(i, SCE_PROPS_ASSIGNMENT);
 			}
 		} else if (allowInitialSpaces || !isspacechar(ch)) {
 			while (i < lineStartNext) {
 				ch = styler[i];
-				if (ch == '=' || ch == ':') {
+				if (IsAssignChar(ch)) {
 					styler.ColourTo(i - 1, SCE_PROPS_KEY);
 					styler.ColourTo(i, SCE_PROPS_ASSIGNMENT);
+					++i;
 					break;
 				}
+				// ignore trail byte in DBCS character
+				i += styler.IsLeadByte(ch) ? 2 : 1;
+			}
+
+			unsigned char chPrev = ch;
+			while (i < lineStartNext) {
+				ch = styler[i];
+				if (IsCommentChar(ch) && IsASpaceOrTab(chPrev))	{
+					styler.ColourTo(i - 1, SCE_PROPS_DEFAULT);
+					initStyle = SCE_PROPS_COMMENT;
+					changed = true;
+					break;
+				}
+				chPrev = ch;
 				// ignore trail byte in DBCS character
 				i += styler.IsLeadByte(ch) ? 2 : 1;
 			}
@@ -82,7 +108,7 @@ void ColourisePropsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 
 		styler.ColourTo(lineEndPos, initStyle);
 #if ENABLE_FOLD_PROPS_COMMENT
-		styler.SetLineState(lineCurrent, initStyle);
+		styler.SetLineState(lineCurrent, changed ? SCE_PROPS_DEFAULT : initStyle);
 #else
 		if (fold) {
 			int nextLevel;
