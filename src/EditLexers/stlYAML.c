@@ -33,7 +33,7 @@ static EDITSTYLE Styles_YAML[] = {
 EDITLEXER lexYAML = {
 	SCLEX_YAML, NP2LEX_YAML,
 	EDITLEXER_HOLE(L"YAML Document", Styles_YAML),
-	L"yml; yaml; clang-format; clang-tidy; apinotes; ifs",
+	L"yml; yaml; clang-format; clang-tidy; mir; apinotes; ifs",
 	&Keywords_YAML,
 	Styles_YAML
 };

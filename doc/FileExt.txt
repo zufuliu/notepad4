@@ -458,6 +458,7 @@ YAML Document
 	yaml
 	clang-format	clang-format Configuration File
 	clang-tidy		clang-tidy Configuration File
+	mir				LLVM Machine IR, http://llvm.org/docs/MIRLangRef.html
 	apinotes		Swift API Notes
 	ifs				LLVM IFS (Interface Stubs)
 
