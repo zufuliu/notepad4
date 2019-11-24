@@ -140,7 +140,7 @@ static EDITSTYLE Styles_INI[] = {
 EDITLEXER lexINI = {
 	SCLEX_PROPERTIES, NP2LEX_INI,
 	EDITLEXER_HOLE(L"Ini Config File", Styles_INI),
-	L"ini; inf; reg; oem; sif; url; sed; theme; clw; toml",
+	L"ini; inf; reg; oem; sif; url; sed; theme; clw; abnf; toml",
 	&Keywords_NULL,
 	Styles_INI
 };
