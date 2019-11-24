@@ -614,6 +614,9 @@ static inline BOOL IsOperatorStyle(int style) {
 		return style == SCE_VHDL_OPERATOR;
 	case SCLEX_VIM:
 		return style == SCE_VIM_OPERATOR;
+
+	case SCLEX_YAML:
+		return style == SCE_YAML_OPERATOR;
 	}
 	return FALSE;
 }
@@ -2015,9 +2018,15 @@ void EditToggleCommentLine(void) {
 	case SCLEX_CMAKE:
 	case SCLEX_CONF:
 	case SCLEX_JULIA:
+	case SCLEX_MAKEFILE:
+	case SCLEX_NSIS:
 	case SCLEX_PERL:
 	case SCLEX_POWERSHELL:
+	case SCLEX_PYTHON:
+	case SCLEX_RUBY:
+	case SCLEX_SMALI:
 	case SCLEX_TCL:
+	case SCLEX_YAML:
 		EditToggleLineComments(L"#", FALSE);
 		break;
 
@@ -2065,14 +2074,6 @@ void EditToggleCommentLine(void) {
 	case SCLEX_LUA:
 	case SCLEX_VHDL:
 		EditToggleLineComments(L"--", FALSE);
-		break;
-
-	case SCLEX_MAKEFILE:
-	case SCLEX_NSIS:
-	case SCLEX_PYTHON:
-	case SCLEX_RUBY:
-	case SCLEX_SMALI:
-		EditToggleLineComments(L"#", FALSE);
 		break;
 
 	case SCLEX_MATLAB:

@@ -54,6 +54,7 @@
       <File Name="../../scintilla/lexers/LexVerilog.cxx"/>
       <File Name="../../scintilla/lexers/LexVHDL.cxx"/>
       <File Name="../../scintilla/lexers/LexVim.cxx"/>
+      <File Name="../../scintilla/lexers/LexYAML.cxx"/>
     </VirtualDirectory>
     <VirtualDirectory Name="lexlib">
       <File Name="../../scintilla/lexlib/Accessor.cxx"/>
@@ -211,6 +212,7 @@
       <File Name="../../src/EditLexers/stlVHDL.c"/>
       <File Name="../../src/EditLexers/stlVim.c"/>
       <File Name="../../src/EditLexers/stlXML.c"/>
+      <File Name="../../src/EditLexers/stlYAML.c"/>
     </VirtualDirectory>
     <File Name="../../src/Bridge.cpp"/>
     <File Name="../../src/Dialogs.c"/>

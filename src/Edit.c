@@ -7112,6 +7112,7 @@ static void EditFoldStack_Push(struct EditFoldStack *foldStack, int level) {
 
 static inline BOOL IsFoldIndentationBased(int iLexer) {
 	return iLexer == SCLEX_PYTHON
+		|| iLexer == SCLEX_YAML
 		|| iLexer == SCLEX_NULL;
 }
 

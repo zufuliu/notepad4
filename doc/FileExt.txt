@@ -452,6 +452,14 @@ Visual Basic
 	dsr				Visual Basic Active Designer File
 	dob				Visual Basic User Document
 
+YAML Document
+	yml
+	yaml
+	clang-format	clang-format Configuration File
+	clang-tidy		clang-tidy Configuration File
+	apinotes		Swift API Notes
+	ifs				LLVM IFS (Interface Stubs)
+
 ANSI Art
 	nfo				System Information File
 	diz				Description in Zip File
