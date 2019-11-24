@@ -138,7 +138,7 @@ void ColouriseYAMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 					++pos;
 					++indentCount;
 				}
-				if (sc.state == SCE_YAML_TEXT_BLOCK && indentCount <= textIndentCount && !(ch == '\n' || ch == '\r')) {
+				if (indentCount <= textIndentCount && !(ch == '\n' || ch == '\r')) {
 					textIndentCount = 0;
 					sc.SetState(SCE_YAML_DEFAULT);
 				}

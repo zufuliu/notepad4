@@ -277,6 +277,7 @@ Ini Config File
 	sed
 	theme
 	clw
+	abnf			ABNF, https://www.ietf.org/rfc/rfc5234.txt
 	toml			https://github.com/toml-lang/toml
 
 	LLVMBuild.txt
