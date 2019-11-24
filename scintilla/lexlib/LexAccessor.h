@@ -272,4 +272,15 @@ inline char LexGetNextChar(Sci_Position startPos, LexAccessor &styler) noexcept 
 	} while (true);
 }
 
+inline char LexGetNextChar(Sci_Position startPos, Sci_Position endPos, LexAccessor &styler) noexcept {
+	while (startPos < endPos) {
+		const char ch = styler[startPos];
+		if (!IsWhiteSpace(ch)) {
+			return ch;
+		}
+		++startPos;
+	}
+	return '\0';
+}
+
 }

@@ -116,6 +116,8 @@ extern EDITLEXER lexVHDL;
 extern EDITLEXER lexVim;
 extern EDITLEXER lexVB;
 
+extern EDITLEXER lexYAML;
+
 extern EDITLEXER lexANSI;
 
 // the two global lexers at the end of the array not visible in "Select Scheme" list, doesn't participate in file extension match
@@ -201,6 +203,8 @@ static const PEDITLEXER pLexArray[ALL_LEXER_COUNT] = {
 	&lexVHDL,
 	&lexVim,
 	&lexVB,
+
+	&lexYAML,
 
 	&lexANSI,
 
@@ -1109,6 +1113,7 @@ static inline BOOL DidLexerHasBlockComment(int iLexer, int rid) {
 		|| iLexer == SCLEX_VB
 		|| iLexer == SCLEX_VBSCRIPT
 		|| iLexer == SCLEX_VIM
+		|| iLexer == SCLEX_YAML
 		|| rid == NP2LEX_AWK
 		|| rid == NP2LEX_JAM
 	);
@@ -1116,6 +1121,7 @@ static inline BOOL DidLexerHasBlockComment(int iLexer, int rid) {
 
 static inline BOOL IsPythonLikeFolding(int iLexer) {
 	return iLexer == SCLEX_PYTHON
+		|| iLexer == SCLEX_YAML
 		|| iLexer == SCLEX_NULL;
 }
 
@@ -1996,6 +2002,7 @@ PEDITLEXER Style_AutoDetect(BOOL bDotFile) {
 	int sharpCount = 0;
 	BOOL maybeIni = FALSE;
 	BOOL maybeJson = FALSE;
+	BOOL maybeYAML = FALSE;
 
 	while (*p) {
 		if (*p == '[') {
@@ -2034,6 +2041,13 @@ PEDITLEXER Style_AutoDetect(BOOL bDotFile) {
 		case '\"':
 			maybeJson |= maybeIni;
 			break;
+
+		case '-':
+			++p;
+			if (*p == '-'  && p[1] == '-' && IsASpace(p[2])) {
+				maybeYAML = TRUE;
+			}
+			break;
 		}
 		// skip to next line
 		while (*p && !(*p == '\r' || *p == '\n')) {
@@ -2046,6 +2060,9 @@ PEDITLEXER Style_AutoDetect(BOOL bDotFile) {
 	}
 	if (sharpCount) {
 		return shebang ? &lexBash : &lexCONF;
+	}
+	if (maybeYAML) {
+		return &lexYAML;
 	}
 	if (maybeJson) {
 		return &lexJSON;
