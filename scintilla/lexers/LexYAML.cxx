@@ -311,9 +311,16 @@ void ColouriseYAMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 					--braceCount;
 				}
 			} else if (sc.ch == '+' || sc.ch == '-' || sc.ch == '.') {
-				if ((sc.ch == '-' && isspacechar(sc.chNext))
-					|| IsADigit(sc.chNext)
-					|| (sc.ch != '.' && sc.chNext == '.')) {
+				if ((sc.ch == '-' && isspacechar(sc.chNext))) {
+					sc.SetState(SCE_YAML_OPERATOR);
+					if (visibleChars == 0) {
+						// temporary fix for unindented block sequence:
+						// children content should be indented at least two levels (for '- ') greater than current line,
+						// thus increase one indentation level doesn't break code folding.
+						++indentCount;
+					}
+				} else if (IsADigit(sc.chNext) || (sc.ch != '.' && sc.chNext == '.')) {
+					// [+-]number, [+-].[inf | nan]
 					sc.SetState(SCE_YAML_OPERATOR);
 				} else {
 					sc.SetState(SCE_YAML_TEXT);
