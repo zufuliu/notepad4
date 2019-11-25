@@ -268,6 +268,7 @@ void ColouriseYAMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 			} else if (sc.ch == '#' && (visibleChars == 0 || isspacechar(sc.chPrev))) {
 				sc.SetState(SCE_YAML_COMMENT);
 				if (visibleChars == 0) {
+					indentCount = 0;
 					lineType = YAMLLineType_CommentLine;
 				}
 			} else if (visibleChars == 0 && (sc.Match("---") || sc.Match("..."))) {
@@ -361,6 +362,7 @@ struct FoldLineState {
 	}
 };
 
+// code folding based on LexNull
 void FoldYAMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initStyle*/, LexerWordList, Accessor &styler) {
 	const Sci_Position maxPos = startPos + lengthDoc;
 	const Sci_Position docLines = styler.GetLine(styler.Length());
@@ -390,19 +392,13 @@ void FoldYAMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initStyle
 			stateNext = FoldLineState(styler.GetLineState(lineNext));
 		}
 
-		const int indentCurrentLevel = stateCurrent.indentCount;
 		const int levelAfterBlank = stateNext.indentCount;
-		const int levelBeforeBlank = (indentCurrentLevel > levelAfterBlank) ? indentCurrentLevel : levelAfterBlank;
 
 		Sci_Position skipLine = lineNext;
-		int skipLevel = levelAfterBlank;
+		const int skipLevel = levelAfterBlank + SC_FOLDLEVELBASE;
 
 		while (--skipLine > lineCurrent) {
-			const FoldLineState skipLineState = FoldLineState(styler.GetLineState(skipLine));
-			if (skipLineState.indentCount > levelAfterBlank && !skipLineState.Empty()) {
-				skipLevel = levelBeforeBlank;
-			}
-			styler.SetLevel(skipLine, skipLevel + SC_FOLDLEVELBASE);
+			styler.SetLevel(skipLine, skipLevel);
 		}
 
 		int lev = stateCurrent.indentCount + SC_FOLDLEVELBASE;
