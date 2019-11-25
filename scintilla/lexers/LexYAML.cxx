@@ -401,13 +401,6 @@ void FoldYAMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initStyle
 			stateNext = FoldLineState(styler.GetLineState(lineNext));
 		}
 
-		const int levelAfterBlank = stateNext.indentCount;
-		const int skipLevel = levelAfterBlank + SC_FOLDLEVELBASE;
-
-		for (Sci_Position skipLine = lineCurrent + 1; skipLine < lineNext; skipLine++) {
-			styler.SetLevel(skipLine, skipLevel);
-		}
-
 		int lev = stateCurrent.indentCount + SC_FOLDLEVELBASE;
 		if (!stateCurrent.Empty()) {
 			if (stateCurrent.indentCount < stateNext.indentCount) {
@@ -416,8 +409,16 @@ void FoldYAMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initStyle
 		}
 
 		styler.SetLevel(lineCurrent, lev);
+		lineCurrent++;
+
+		const int levelAfterBlank = stateNext.indentCount;
+		const int skipLevel = levelAfterBlank + SC_FOLDLEVELBASE;
+
+		for (; lineCurrent < lineNext; lineCurrent++) {
+			styler.SetLevel(lineCurrent, skipLevel);
+		}
+
 		stateCurrent = stateNext;
-		lineCurrent = lineNext;
 	}
 }
 
