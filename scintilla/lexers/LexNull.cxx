@@ -80,7 +80,6 @@ void FoldNullDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /* initStyl
 		}
 
 		const int levelAfterBlank = indentNext & SC_FOLDLEVELNUMBERMASK;
-		const int levelBeforeBlank = (indentCurrentLevel > levelAfterBlank) ? indentCurrentLevel : levelAfterBlank;
 
 		// Now set all the indent levels on the lines we skipped
 		// Do this from end to start. Once we encounter one line
@@ -88,14 +87,9 @@ void FoldNullDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /* initStyl
 		// the blank-block, use the level of the block before
 
 		Sci_Position skipLine = lineNext;
-		int skipLevel = levelAfterBlank;
+		const int skipLevel = levelAfterBlank;
 
 		while (--skipLine > lineCurrent) {
-			const int skipLineIndent = styler.IndentAmount(skipLine, &spaceFlags, nullptr);
-			if ((skipLineIndent & SC_FOLDLEVELNUMBERMASK) > levelAfterBlank &&
-				!(skipLineIndent & SC_FOLDLEVELWHITEFLAG)) {
-				skipLevel = levelBeforeBlank;
-			}
 			styler.SetLevel(skipLine, skipLevel);
 		}
 
