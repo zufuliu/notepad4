@@ -373,6 +373,8 @@ struct FoldLineState {
 
 // code folding based on LexNull
 void FoldYAMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initStyle*/, LexerWordList, Accessor &styler) {
+	const bool foldComment = styler.GetPropertyInt("fold.comment") != 0;
+
 	const Sci_Position maxPos = startPos + lengthDoc;
 	const Sci_Position docLines = styler.GetLine(styler.Length());
 	const Sci_Position maxLines = (maxPos == styler.Length()) ? docLines : styler.GetLine(maxPos - 1);
@@ -414,8 +416,38 @@ void FoldYAMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initStyle
 		const int levelAfterBlank = stateNext.indentCount;
 		const int skipLevel = levelAfterBlank + SC_FOLDLEVELBASE;
 
-		for (; lineCurrent < lineNext; lineCurrent++) {
-			styler.SetLevel(lineCurrent, skipLevel);
+		if (foldComment && lineCurrent < lineNext) {
+			int prevLineType = stateCurrent.lineType;
+			int nextLineType = styler.GetLineState(lineCurrent) >> 28;
+			int prevLevel = skipLevel;
+			// comment on first line
+			if (prevLineType == YAMLLineType_CommentLine) {
+				nextLineType = prevLineType;
+				prevLineType = YAMLLineType_None;
+				--lineCurrent;
+			}
+			for (; lineCurrent < lineNext; lineCurrent++) {
+				int level = skipLevel;
+				const int currentLineType = nextLineType;
+				nextLineType = styler.GetLineState(lineCurrent + 1) >> 28;
+				if (currentLineType == YAMLLineType_CommentLine) {
+					if (nextLineType == YAMLLineType_CommentLine && prevLineType != YAMLLineType_CommentLine) {
+						level |= SC_FOLDLEVELHEADERFLAG;
+					} else if (prevLevel & SC_FOLDLEVELHEADERFLAG) {
+						level++;
+					} else {
+						level = prevLevel;
+					}
+				}
+
+				styler.SetLevel(lineCurrent, level);
+				prevLineType = currentLineType;
+				prevLevel = level;
+			}
+		} else {
+			for (; lineCurrent < lineNext; lineCurrent++) {
+				styler.SetLevel(lineCurrent, skipLevel);
+			}
 		}
 
 		stateCurrent = stateNext;
