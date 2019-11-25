@@ -273,6 +273,7 @@ void ColouriseYAMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 					lineType = YAMLLineType_CommentLine;
 				}
 			} else if (visibleChars == 0 && (sc.Match("---") || sc.Match("..."))) {
+				// reset document state
 				braceCount = 0;
 				visibleChars = 1;
 				//lineType = (sc.ch == '-')? YAMLLineType_DocumentStart : YAMLLineType_DocumentEnd;
@@ -401,11 +402,9 @@ void FoldYAMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initStyle
 		}
 
 		const int levelAfterBlank = stateNext.indentCount;
-
-		Sci_Position skipLine = lineNext;
 		const int skipLevel = levelAfterBlank + SC_FOLDLEVELBASE;
 
-		while (--skipLine > lineCurrent) {
+		for (Sci_Position skipLine = lineCurrent + 1; skipLine < lineNext; skipLine++) {
 			styler.SetLevel(skipLine, skipLevel);
 		}
 
