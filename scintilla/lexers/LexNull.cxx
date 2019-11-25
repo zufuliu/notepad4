@@ -61,7 +61,6 @@ void FoldNullDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /* initStyl
 	// to end of document (in case of unclosed quote at end).
 	while (lineCurrent <= maxLines) {
 		// Gather info
-		int lev = indentCurrent;
 		Sci_Position lineNext = lineCurrent + 1;
 		int indentNext = indentCurrent;
 		if (lineNext <= docLines) {
@@ -79,6 +78,19 @@ void FoldNullDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /* initStyl
 			indentNext = styler.IndentAmount(lineNext, &spaceFlags, nullptr);
 		}
 
+		// Set fold header
+		int lev = indentCurrent;
+		if (!(indentCurrent & SC_FOLDLEVELWHITEFLAG)) {
+			if ((indentCurrent & SC_FOLDLEVELNUMBERMASK) < (indentNext & SC_FOLDLEVELNUMBERMASK)) {
+				lev |= SC_FOLDLEVELHEADERFLAG;
+			}
+		}
+
+		// Set fold level for this line and move to next line
+		styler.SetLevel(lineCurrent, lev & ~SC_FOLDLEVELWHITEFLAG);
+		lineCurrent++;
+		indentCurrent = indentNext;
+
 		const int levelAfterBlank = indentNext & SC_FOLDLEVELNUMBERMASK;
 		const int skipLevel = levelAfterBlank;
 
@@ -88,21 +100,9 @@ void FoldNullDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /* initStyl
 		// which is indented more than the line after the end of
 		// the blank-block, use the level of the block before
 
-		for (Sci_Position skipLine = lineCurrent + 1; skipLine < lineNext; skipLine++) {
-			styler.SetLevel(skipLine, skipLevel);
+		for (; lineCurrent < lineNext; lineCurrent++) {
+			styler.SetLevel(lineCurrent, skipLevel);
 		}
-
-		// Set fold header
-		if (!(indentCurrent & SC_FOLDLEVELWHITEFLAG)) {
-			if ((indentCurrent & SC_FOLDLEVELNUMBERMASK) < (indentNext & SC_FOLDLEVELNUMBERMASK)) {
-				lev |= SC_FOLDLEVELHEADERFLAG;
-			}
-		}
-
-		// Set fold level for this line and move to next line
-		styler.SetLevel(lineCurrent, lev & ~SC_FOLDLEVELWHITEFLAG);
-		indentCurrent = indentNext;
-		lineCurrent = lineNext;
 	}
 
 	// NOTE: Cannot set level of last line here because indentCurrent doesn't have
