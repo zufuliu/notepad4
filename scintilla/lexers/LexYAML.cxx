@@ -105,6 +105,7 @@ void ColouriseYAMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 	const CharacterSet setUriChar(CharacterSet::setAlphaNum, "%-#;/?:@&=+$,_.!~*'()[]");
 
 	int visibleChars = 0;
+	bool indentEnded = true;
 	int indentCount = 0;
 	int textIndentCount = 0;
 	int braceCount = 0;
@@ -131,6 +132,7 @@ void ColouriseYAMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 			lineStartNext = styler.LineStart(sc.currentLine + 1);
 			visibleChars = 0;
 			indentCount = 0;
+			indentEnded = false;
 			if (sc.state == SCE_YAML_TEXT_BLOCK) {
 				Sci_Position pos = sc.currentPos;
 				char ch = '\n';
@@ -264,7 +266,7 @@ void ColouriseYAMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 		}
 
 		if (sc.state == SCE_YAML_DEFAULT) {
-			if (sc.ch == '%' && visibleChars == 0) {
+			if (sc.ch == '%' && sc.atLineStart) {
 				sc.SetState(SCE_YAML_DIRECTIVE);
 			} else if (sc.ch == '#' && (visibleChars == 0 || isspacechar(sc.chPrev))) {
 				sc.SetState(SCE_YAML_COMMENT);
@@ -272,7 +274,7 @@ void ColouriseYAMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 					indentCount = 0;
 					lineType = YAMLLineType_CommentLine;
 				}
-			} else if (visibleChars == 0 && (sc.Match("---") || sc.Match("..."))) {
+			} else if (sc.atLineStart && (sc.Match("---") || sc.Match("..."))) {
 				// reset document state
 				braceCount = 0;
 				visibleChars = 1;
@@ -333,9 +335,14 @@ void ColouriseYAMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 
 		if (visibleChars == 0) {
 			if (sc.ch == ' ') {
-				++indentCount;
-			} else if (!(sc.ch == '\n' || sc.ch == '\r')) {
-				++visibleChars;
+				if (!indentEnded) {
+					++indentCount;
+				}
+			} else {
+				indentEnded = true;
+				if (!isspacechar(sc.ch)) {
+					++visibleChars;
+				}
 			}
 		}
 		if (sc.atLineEnd) {
