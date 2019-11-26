@@ -35,7 +35,7 @@ def UpdateFile(filename, updated):
     file else leave alone so Mercurial and make don't treat it as modified. """
     newOrChanged = "Changed"
     try:
-        with open(filename, "r", encoding="utf-8") as infile:
+        with open(filename, "r", encoding="utf-8", newline='') as infile:
             original = infile.read()
         if updated == original:
             # Same as before so don't write
@@ -47,7 +47,7 @@ def UpdateFile(filename, updated):
         os.unlink(filename)
     except IOError: # File is not there yet
         newOrChanged = "New"
-    with open(filename, "w", encoding="utf-8") as outfile:
+    with open(filename, "w", encoding="utf-8", newline='') as outfile:
         outfile.write(updated)
     print("%s %s" % (newOrChanged, filename))
 
