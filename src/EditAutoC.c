@@ -516,6 +516,7 @@ BOOL IsDocWordChar(int ch) {
 		return (ch == '$' || ch == '@');
 
 	case NP2LEX_LLVM:
+	case NP2LEX_WASM:
 		return (ch == '@' || ch == '%' || ch == '$' || ch == '-');
 
 	case NP2LEX_MAKE:
@@ -614,6 +615,9 @@ static inline BOOL IsOperatorStyle(int style) {
 		return style == SCE_VHDL_OPERATOR;
 	case SCLEX_VIM:
 		return style == SCE_VIM_OPERATOR;
+
+	case SCLEX_WASM:
+		return style == SCE_WASM_OPERATOR;
 
 	case SCLEX_YAML:
 		return style == SCE_YAML_OPERATOR;
@@ -2100,6 +2104,10 @@ void EditToggleCommentLine(void) {
 	case SCLEX_VIM:
 		EditToggleLineComments(L"\"", FALSE);
 		break;
+
+	case SCLEX_WASM:
+		EditToggleLineComments(L";;", FALSE);
+		break;
 	}
 }
 
@@ -2227,6 +2235,10 @@ void EditToggleCommentBlock(void) {
 
 	case SCLEX_TCL:
 		EditEncloseSelectionNewLine(L"if (0) {", L"}");
+		break;
+
+	case SCLEX_WASM:
+		EditEncloseSelection(L"(;", L";)");
 		break;
 	}
 }

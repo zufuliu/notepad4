@@ -126,6 +126,7 @@ Or build from source, see the [Wiki](https://github.com/zufuliu/notepad2/wiki/Bu
 	* VHDL
 	* Verilog HDL
 	* [Vim Script](../master/tools/lang/Vim.vim)
+	* WebAssembly
 	* XML Document, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#xml)
 		* XML Schema
 		* XML Stylesheet

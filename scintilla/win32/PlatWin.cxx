@@ -127,11 +127,20 @@ bool LoadD2D() noexcept {
 		if (hDLLD2D) {
 			D2D1CFSig fnD2DCF = reinterpret_cast<D2D1CFSig>(::GetProcAddress(hDLLD2D, "D2D1CreateFactory"));
 			if (fnD2DCF) {
+#ifdef NDEBUG
 				// A single threaded factory as Scintilla always draw on the GUI thread
 				fnD2DCF(D2D1_FACTORY_TYPE_SINGLE_THREADED,
 					__uuidof(ID2D1Factory),
 					nullptr,
 					reinterpret_cast<IUnknown**>(&pD2DFactory));
+#else
+				D2D1_FACTORY_OPTIONS options = {};
+				options.debugLevel = D2D1_DEBUG_LEVEL_INFORMATION;
+				fnD2DCF(D2D1_FACTORY_TYPE_SINGLE_THREADED,
+					__uuidof(ID2D1Factory),
+					&options,
+					reinterpret_cast<IUnknown**>(&pD2DFactory));
+#endif
 			}
 		}
 		hDLLDWrite = ::LoadLibraryEx(L"DWRITE.DLL", nullptr, kSystemLibraryLoadFlags);
@@ -1173,7 +1182,10 @@ void SurfaceD2D::Clear() noexcept {
 			clipsActive--;
 		}
 		if (ownRenderTarget) {
+			[[maybe_unused]] const HRESULT hr = pRenderTarget->EndDraw();
+			PLATFORM_ASSERT(hr == S_OK);
 			pRenderTarget->Release();
+			ownRenderTarget = false;
 		}
 		pRenderTarget = nullptr;
 	}

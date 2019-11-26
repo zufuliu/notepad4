@@ -453,6 +453,10 @@ Visual Basic
 	dsr				Visual Basic Active Designer File
 	dob				Visual Basic User Document
 
+WebAssembly
+	wat
+	wast
+
 YAML Document
 	yml
 	yaml
