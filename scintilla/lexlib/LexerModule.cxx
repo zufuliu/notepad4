@@ -24,39 +24,6 @@
 
 using namespace Scintilla;
 
-LexerModule::LexerModule(int language_,
-	LexerFunction fnLexer_,
-	const char *languageName_,
-	LexerFunction fnFolder_,
-	const char *const wordListDescriptions_[],
-	const LexicalClass *lexClasses_,
-	size_t nClasses_) noexcept :
-	language(language_),
-	fnLexer(fnLexer_),
-	fnFolder(fnFolder_),
-	fnFactory(nullptr),
-	wordListDescriptions(wordListDescriptions_),
-	lexClasses(lexClasses_),
-	nClasses(nClasses_),
-	languageName(languageName_) {
-}
-
-LexerModule::LexerModule(int language_,
-	LexerFactoryFunction fnFactory_,
-	const char *languageName_,
-	const char *const wordListDescriptions_[]) noexcept :
-	language(language_),
-	fnLexer(nullptr),
-	fnFolder(nullptr),
-	fnFactory(fnFactory_),
-	wordListDescriptions(wordListDescriptions_),
-	lexClasses(nullptr),
-	nClasses(0),
-	languageName(languageName_) {
-}
-
-LexerModule::~LexerModule() = default;
-
 int LexerModule::GetLanguage() const noexcept {
 	return language;
 }

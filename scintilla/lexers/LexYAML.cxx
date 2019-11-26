@@ -61,7 +61,7 @@ constexpr bool IsYAMLDateTime(int ch, int chNext) noexcept {
 		|| (ch == ' ' && (chNext == '-' || IsADigit(chNext)));
 }
 
-bool IsYAMLText(StyleContext& sc, Sci_Position lineStartNext, int braceCount, const WordList *kwList) noexcept {
+bool IsYAMLText(StyleContext& sc, Sci_Position lineStartNext, int braceCount, const WordList *kwList) {
 	const int state = sc.state;
 	const Sci_Position endPos = braceCount? sc.styler.Length() : lineStartNext;
 	const int chNext = LexGetNextChar(sc.currentPos, endPos, sc.styler);
