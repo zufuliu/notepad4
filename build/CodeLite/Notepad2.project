@@ -54,6 +54,7 @@
       <File Name="../../scintilla/lexers/LexVerilog.cxx"/>
       <File Name="../../scintilla/lexers/LexVHDL.cxx"/>
       <File Name="../../scintilla/lexers/LexVim.cxx"/>
+      <File Name="../../scintilla/lexers/LexWASM.cxx"/>
       <File Name="../../scintilla/lexers/LexYAML.cxx"/>
     </VirtualDirectory>
     <VirtualDirectory Name="lexlib">
@@ -211,6 +212,7 @@
       <File Name="../../src/EditLexers/stlVerilog.c"/>
       <File Name="../../src/EditLexers/stlVHDL.c"/>
       <File Name="../../src/EditLexers/stlVim.c"/>
+      <File Name="../../src/EditLexers/stlWASM.c"/>
       <File Name="../../src/EditLexers/stlXML.c"/>
       <File Name="../../src/EditLexers/stlYAML.c"/>
     </VirtualDirectory>

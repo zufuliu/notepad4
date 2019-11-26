@@ -181,6 +181,7 @@ int Scintilla_LinkLexers() {
 	LINK_LEXER(lmVerilog);
 	LINK_LEXER(lmVHDL);
 	LINK_LEXER(lmVim);
+	LINK_LEXER(lmWASM);
 	LINK_LEXER(lmXML);
 	LINK_LEXER(lmYAML);
 

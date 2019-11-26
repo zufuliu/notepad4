@@ -1,6 +1,7 @@
 #-*- coding: UTF-8 -*-
 import sys
 sys.path.append('../scintilla/scripts')
+import os.path
 import re
 from enum import IntFlag
 from FileGenerator import Regenerate
@@ -547,6 +548,70 @@ def update_vim_keyword():
 	keywordList = parse_vim_api_file('lang/Vim.vim')
 	UpdateKeywordFile('NP2LEX_VIM', '../src/EditLexers/stlVim.c', keywordList)
 
+# WebAssembly
+def parse_web_assembly_lexer_keywords(path):
+	keywordMap = {
+		'keywords': [],
+		'type': [],
+		'instruction': [],
+		'full instruction': [],
+	}
+
+	types = ['i32', 'i64', 'f32', 'f64', 'v128',
+		'f32x4', 'f64x2', 'i16x8', 'i32x4', 'i64x2', 'i8x16']
+
+	def has_type_prefix(word):
+		return any(word.startswith(prefix + '.') for prefix in types)
+
+	for line in open(path).readlines():
+		if not line or not (line[0].islower() and ',' in line and '::' in line):
+			continue
+
+		items = ''.join(line.split()).split(',')
+		word = items[0]
+		token_type = [item[:item.index('::')] for item in items[1:]]
+
+		if 'Opcode' in token_type:
+			if '/' in word:
+				# Deprecated names
+				continue
+			if has_type_prefix(word):
+				keywordMap['full instruction'].append(word)
+			else:
+				keywordMap['instruction'].append(word)
+		elif 'TokenType' in token_type:
+			if word not in types:
+				keywordMap['keywords'].append(word)
+		elif 'Type' in token_type:
+			keywordMap['type'].append(word)
+		else:
+			print('Unknown TokenType:', token_type, line)
+		assert '/' not in word
+
+	keywordMap['type'].extend(types)
+	RemoveDuplicateKeyword(keywordMap, [
+		'keywords',
+		'type',
+		'instruction'
+	])
+	keywordList = [
+		('keywords', keywordMap['keywords'], KeywordAttr.Default),
+		('type', keywordMap['type'], KeywordAttr.Default),
+		('instruction', keywordMap['instruction'], KeywordAttr.Default),
+		('full instruction', keywordMap['full instruction'], KeywordAttr.NoLexer),
+	]
+	return keywordList
+
+def update_web_assembly_keyword():
+	url = 'https://github.com/WebAssembly/wabt/blob/master/src/lexer-keywords.txt'
+	path = 'wasm-lexer-keywords.txt'
+	if not os.path.isfile(path):
+		print(f'please manually download {url}\nand save it as {path}')
+		AllKeywordAttrList['NP2LEX_WASM'] = [(3, KeywordAttr.NoLexer, 'full instruction')]
+		return
+	keywordList = parse_web_assembly_lexer_keywords(path)
+	UpdateKeywordFile('NP2LEX_WASM', '../src/EditLexers/stlWASM.c', keywordList)
+
 # Style_UpdateLexerKeywordAttr()
 def update_lexer_keyword_attr():
 	output = []
@@ -576,4 +641,5 @@ def update_all_keyword():
 	update_ruby_keyword()
 	update_rust_keyword()
 	update_vim_keyword()
+	update_web_assembly_keyword()
 	update_lexer_keyword_attr()

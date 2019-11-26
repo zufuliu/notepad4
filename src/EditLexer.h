@@ -148,6 +148,7 @@ typedef const EDITLEXER *LPCEDITLEXER;
 #define NP2LEX_RUST		63067	// SCLEX_RUST		Rust Source
 #define NP2LEX_KOTLIN	63068	// SCLEX_KOTLIN		Kotlin Source
 #define NP2LEX_YAML		63069	// SCLEX_YAML		YAML Document
+#define NP2LEX_WASM		63070	// SCLEX_WASM		WebAssembly
 
 #define NP2LEX_2NDTEXTFILE	63097	// SCLEX_NULL		2nd Text File
 #define NP2LEX_2NDGLOBAL	63098	// SCLEX_NULL		2nd Global Styles

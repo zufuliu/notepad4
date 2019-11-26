@@ -927,6 +927,7 @@
     <ClCompile Include="..\..\scintilla\lexers\LexVerilog.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexVHDL.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexVim.cxx" />
+    <ClCompile Include="..\..\scintilla\lexers\LexWASM.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexYAML.cxx" />
     <ClCompile Include="..\..\scintilla\lexlib\Accessor.cxx" />
     <ClCompile Include="..\..\scintilla\lexlib\CharacterSet.cxx" />
@@ -1031,6 +1032,7 @@
     <ClCompile Include="..\..\src\EditLexers\stlVerilog.c" />
     <ClCompile Include="..\..\src\EditLexers\stlVHDL.c" />
     <ClCompile Include="..\..\src\EditLexers\stlVim.c" />
+    <ClCompile Include="..\..\src\EditLexers\stlWASM.c" />
     <ClCompile Include="..\..\src\EditLexers\stlXML.c" />
     <ClCompile Include="..\..\src\EditLexers\stlYAML.c" />
   </ItemGroup>
