@@ -752,10 +752,7 @@ static int GetCurrentHtmlTextBlock(void) {
 		|| (iCurrentStyle >= SCE_HPA_START && iCurrentStyle <= SCE_HPA_IDENTIFIER)) {
 		return HTML_TEXT_BLOCK_PYTHON;
 	}
-	if ((iCurrentStyle >= SCE_HPHP_DEFAULT && iCurrentStyle <= SCE_HPHP_OPERATOR)
-		|| iCurrentStyle == SCE_HPHP_HEREDOC
-		|| iCurrentStyle == SCE_HPHP_NOWDOC
-		|| iCurrentStyle == SCE_HPHP_COMPLEX_VARIABLE) {
+	if ((iCurrentStyle >= SCE_HPHP_DEFAULT && iCurrentStyle <= SCE_HPHP_COMPLEX_VARIABLE)) {
 		return HTML_TEXT_BLOCK_PHP;
 	}
 	return HTML_TEXT_BLOCK_TAG;
