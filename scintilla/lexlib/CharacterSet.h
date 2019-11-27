@@ -80,6 +80,20 @@ constexpr bool IsADigit(int ch, int base) noexcept {
 		|| ((ch >= 'a') && (ch < 'a' + base - 10));
 }
 
+constexpr bool IsNumberStart(int ch, int chNext) noexcept {
+	return IsADigit(ch) || (ch == '.' && IsADigit(chNext));
+}
+
+constexpr bool IsNumberContinue(int chPrev, int ch, int chNext) noexcept {
+	return ((ch == '+' || ch == '-') && (chPrev == 'e' || chPrev == 'E'))
+		|| (ch == '.' && chNext != '.');
+}
+
+constexpr bool IsNumberContinueEx(int chPrev, int ch, int chNext) noexcept {
+	return ((ch == '+' || ch == '-') && (chPrev == 'e' || chPrev == 'E' || chPrev == 'p' || chPrev == 'P'))
+		|| (ch == '.' && chNext != '.');
+}
+
 constexpr bool IsFloatExponent(int ch, int chNext) noexcept {
 	return (ch == 'e' || ch == 'E')
 		&& (chNext == '+' || chNext == '-' || IsADigit(chNext));
@@ -143,27 +157,23 @@ constexpr bool IsIdentifierStart(int ch) noexcept {
 }
 
 constexpr bool IsDecimalNumber(int chPrev, int ch, int chNext) noexcept {
-	return IsIdentifierChar(ch)
-		|| ((ch == '+' || ch == '-') && (chPrev == 'e' || chPrev == 'E'))
-		|| (ch == '.' && chNext != '.');
+	return IsIdentifierChar(ch) || IsNumberContinue(chPrev, ch, chNext);
 }
 
 constexpr bool IsDecimalNumberEx(int chPrev, int ch, int chNext) noexcept {
-	return IsIdentifierChar(ch)
-		|| ((ch == '+' || ch == '-') && (chPrev == 'e' || chPrev == 'E' || chPrev == 'p' || chPrev == 'P'))
-		|| (ch == '.' && chNext != '.');
+	return IsIdentifierChar(ch) || IsNumberContinueEx(chPrev, ch, chNext);
 }
 
 constexpr bool IsIdentifierCharEx(int ch) noexcept {
-	return IsIdentifierChar(ch) || ch > 0x80;
+	return IsIdentifierChar(ch) || ch >= 0x80;
 }
 
 constexpr bool IsIdentifierStartEx(int ch) noexcept {
-	return IsIdentifierStart(ch) || ch > 0x80;
+	return IsIdentifierStart(ch) || ch >= 0x80;
 }
 
 constexpr bool IsWordCharEx(int ch) noexcept {
-	return iswordchar(ch) || ch > 0x80;
+	return iswordchar(ch) || ch >= 0x80;
 }
 
 constexpr bool isoperator(int ch) noexcept {
