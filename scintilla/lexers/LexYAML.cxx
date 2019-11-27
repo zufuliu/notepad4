@@ -66,6 +66,7 @@ bool IsYAMLText(StyleContext& sc, Sci_Position lineStartNext, int braceCount, co
 	const Sci_Position endPos = braceCount? sc.styler.Length() : lineStartNext;
 	const int chNext = LexGetNextChar(sc.currentPos, endPos, sc.styler);
 	if (chNext == ':') {
+		// possible key
 		sc.ChangeState(SCE_YAML_TEXT);
 		return true;
 	}
@@ -134,7 +135,9 @@ void ColouriseYAMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 			visibleChars = 0;
 			indentCount = 0;
 			indentEnded = false;
+
 			if (sc.state == SCE_YAML_TEXT_BLOCK) {
+				indentEnded = true;
 				Sci_Position pos = sc.currentPos;
 				char ch = '\n';
 				while (pos < lineStartNext && (ch = styler[pos]) == ' ') {
