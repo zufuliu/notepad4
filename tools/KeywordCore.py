@@ -143,10 +143,11 @@ def read_api_file(path, comment):
 # CMake
 def parse_cmake_api_file(path):
 	# languages from https://gitlab.kitware.com/cmake/cmake/blob/master/Auxiliary/vim/extract-upper-case.pl
-	cmakeLang = "C CSharp CUDA CXX Fortran Java RC Swift".split()
+	cmakeLang = "ASM C CSharp CUDA CXX Fortran Java RC Swift".split()
 
 	def is_long_name(name):
-		return '_' in name or '-' in name
+		count = name.count('_') + name.count('-')
+		return count != 0
 
 	def expand_name(name, expanded):
 		# TODO: expand <CONFIG> and others
@@ -169,7 +170,6 @@ def parse_cmake_api_file(path):
 			if name.count('<') == 1 and name[-1] == '>':
 				# ignore suffix
 				name = name[:name.index('<')].strip('_')
-				return name, True
 			else:
 				return '', False
 		return name, is_long_name(name)
