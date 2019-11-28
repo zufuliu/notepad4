@@ -223,7 +223,7 @@ XYPOSITION EditView::NextTabstopPos(Sci::Line line, XYPOSITION x, XYPOSITION tab
 	return (static_cast<int>((x + tabWidthMinimumPixels) / tabWidth) + 1) * tabWidth;
 }
 
-bool EditView::ClearTabstops(Sci::Line line) noexcept {
+bool EditView::ClearTabstops(Sci::Line line) const noexcept {
 	return ldTabstops && ldTabstops->ClearTabstops(line);
 }
 
@@ -242,7 +242,7 @@ int EditView::GetNextTabstop(Sci::Line line, int x) const noexcept {
 	}
 }
 
-void EditView::LinesAddedOrRemoved(Sci::Line lineOfPos, Sci::Line linesAdded) {
+void EditView::LinesAddedOrRemoved(Sci::Line lineOfPos, Sci::Line linesAdded) const {
 	if (ldTabstops) {
 		if (linesAdded > 0) {
 			for (Sci::Line line = lineOfPos; line < lineOfPos + linesAdded; line++) {
@@ -316,7 +316,7 @@ static void DrawTabArrow(Surface *surface, PRectangle rcTab, int ymid, const Vie
 	}
 }
 
-void EditView::RefreshPixMaps(Surface *surfaceWindow, WindowID wid, const ViewStyle &vsDraw) {
+void EditView::RefreshPixMaps(Surface *surfaceWindow, WindowID wid, const ViewStyle &vsDraw) const {
 	if (!pixmapIndentGuide->Initialised()) {
 		// 1 extra pixel in height so can handle odd/even positions and so produce a continuous line
 		pixmapIndentGuide->InitPixMap(1, vsDraw.lineHeight + 1, surfaceWindow, wid);
@@ -1012,7 +1012,7 @@ static ColourDesired TextBackground(const EditModel &model, const ViewStyle &vsD
 	}
 }
 
-void EditView::DrawIndentGuide(Surface *surface, Sci::Line lineVisible, int lineHeight, XYPOSITION start, PRectangle rcSegment, bool highlight) {
+void EditView::DrawIndentGuide(Surface *surface, Sci::Line lineVisible, int lineHeight, XYPOSITION start, PRectangle rcSegment, bool highlight) const {
 	const Point from = Point::FromInts(0, ((lineVisible & 1) && (lineHeight & 1)) ? 1 : 0);
 	const PRectangle rcCopyArea(start + 1, rcSegment.top,
 		start + 2, rcSegment.bottom);
@@ -1084,7 +1084,7 @@ static void DrawCaretLineFramed(Surface *surface, const ViewStyle &vsDraw, const
 
 void EditView::DrawEOL(Surface *surface, const EditModel &model, const ViewStyle &vsDraw, const LineLayout *ll,
 	PRectangle rcLine, Sci::Line line, Sci::Position lineEnd, int xStart, int subLine, XYACCUMULATOR subLineStart,
-	ColourOptional background) {
+	ColourOptional background) const {
 
 	const Sci::Position posLineStart = model.pdoc->LineStart(line);
 	PRectangle rcSegment = rcLine;
@@ -1925,7 +1925,7 @@ static void DrawTranslucentLineState(Surface *surface, const EditModel &model, c
 
 void EditView::DrawForeground(Surface *surface, const EditModel &model, const ViewStyle &vsDraw, const LineLayout *ll,
 	Sci::Line lineVisible, PRectangle rcLine, Range lineRange, Sci::Position posLineStart, int xStart,
-	int subLine, ColourOptional background) {
+	int subLine, ColourOptional background) const {
 
 	const bool selBackDrawn = vsDraw.SelectionBackgroundDrawn();
 	const bool drawWhitespaceBackground = vsDraw.WhitespaceBackgroundDrawn() && !background.isSet;
@@ -2122,7 +2122,7 @@ void EditView::DrawForeground(Surface *surface, const EditModel &model, const Vi
 }
 
 void EditView::DrawIndentGuidesOverEmpty(Surface *surface, const EditModel &model, const ViewStyle &vsDraw, const LineLayout *ll,
-	Sci::Line line, Sci::Line lineVisible, PRectangle rcLine, int xStart, int subLine) {
+	Sci::Line line, Sci::Line lineVisible, PRectangle rcLine, int xStart, int subLine) const {
 	if ((vsDraw.viewIndentationGuides == ivLookForward || vsDraw.viewIndentationGuides == ivLookBoth)
 		&& (subLine == 0)) {
 		const Sci::Position posLineStart = model.pdoc->LineStart(line);

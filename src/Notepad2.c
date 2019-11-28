@@ -461,6 +461,9 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 		fprintf(stdout, "\n%s:%d %s\n", __FILE__, __LINE__, __FUNCTION__);
 	}
 #endif
+#if 0 && defined(__clang__)
+	SetEnvironmentVariable(L"UBSAN_OPTIONS", L"log_path=" WC_NOTEPAD2 L"-UBSan.log");
+#endif
 
 	// Set global variable g_hInstance
 	g_hInstance = hInstance;

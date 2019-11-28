@@ -104,14 +104,14 @@ public:
 
 	void ClearAllTabstops() noexcept;
 	XYPOSITION SCICALL NextTabstopPos(Sci::Line line, XYPOSITION x, XYPOSITION tabWidth) const noexcept;
-	bool ClearTabstops(Sci::Line line) noexcept;
+	bool ClearTabstops(Sci::Line line) const noexcept;
 	bool AddTabstop(Sci::Line line, int x);
 	int GetNextTabstop(Sci::Line line, int x) const noexcept;
-	void LinesAddedOrRemoved(Sci::Line lineOfPos, Sci::Line linesAdded);
+	void LinesAddedOrRemoved(Sci::Line lineOfPos, Sci::Line linesAdded) const;
 
 	void DropGraphics(bool freeObjects) noexcept;
 	void AllocateGraphics(const ViewStyle &vsDraw);
-	void RefreshPixMaps(Surface *surfaceWindow, WindowID wid, const ViewStyle &vsDraw);
+	void RefreshPixMaps(Surface *surfaceWindow, WindowID wid, const ViewStyle &vsDraw) const;
 
 	LineLayout *RetrieveLineLayout(Sci::Line lineNumber, const EditModel &model);
 	void LayoutLine(const EditModel &model, Sci::Line line, Surface *surface, const ViewStyle &vstyle,
@@ -128,10 +128,10 @@ public:
 	Sci::Line DisplayFromPosition(Surface *surface, const EditModel &model, Sci::Position pos, const ViewStyle &vs);
 	Sci::Position StartEndDisplayLine(Surface *surface, const EditModel &model, Sci::Position pos, bool start, const ViewStyle &vs);
 
-	void SCICALL DrawIndentGuide(Surface *surface, Sci::Line lineVisible, int lineHeight, XYPOSITION start, PRectangle rcSegment, bool highlight);
+	void SCICALL DrawIndentGuide(Surface *surface, Sci::Line lineVisible, int lineHeight, XYPOSITION start, PRectangle rcSegment, bool highlight) const;
 	void SCICALL DrawEOL(Surface *surface, const EditModel &model, const ViewStyle &vsDraw, const LineLayout *ll, PRectangle rcLine,
 		Sci::Line line, Sci::Position lineEnd, int xStart, int subLine, XYACCUMULATOR subLineStart,
-		ColourOptional background);
+		ColourOptional background) const;
 	void SCICALL DrawFoldDisplayText(Surface *surface, const EditModel &model, const ViewStyle &vsDraw, const LineLayout *ll,
 		Sci::Line line, int xStart, PRectangle rcLine, int subLine, XYACCUMULATOR subLineStart, DrawPhase phase);
 	void SCICALL DrawAnnotation(Surface *surface, const EditModel &model, const ViewStyle &vsDraw, const LineLayout *ll,
@@ -143,9 +143,9 @@ public:
 		int subLine, ColourOptional background) const;
 	void SCICALL DrawForeground(Surface *surface, const EditModel &model, const ViewStyle &vsDraw, const LineLayout *ll, Sci::Line lineVisible,
 		PRectangle rcLine, Range lineRange, Sci::Position posLineStart, int xStart,
-		int subLine, ColourOptional background);
+		int subLine, ColourOptional background) const;
 	void SCICALL DrawIndentGuidesOverEmpty(Surface *surface, const EditModel &model, const ViewStyle &vsDraw, const LineLayout *ll,
-		Sci::Line line, Sci::Line lineVisible, PRectangle rcLine, int xStart, int subLine);
+		Sci::Line line, Sci::Line lineVisible, PRectangle rcLine, int xStart, int subLine) const;
 	void SCICALL DrawLine(Surface *surface, const EditModel &model, const ViewStyle &vsDraw, const LineLayout *ll, Sci::Line line,
 		Sci::Line lineVisible, int xStart, PRectangle rcLine, int subLine, DrawPhase phase);
 	void SCICALL PaintText(Surface *surfaceWindow, const EditModel &model, PRectangle rcArea, PRectangle rcClient,

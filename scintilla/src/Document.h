@@ -556,7 +556,7 @@ public:
 	int IndentSize() const noexcept {
 		return actualIndentInChars;
 	}
-	Sci::Position BraceMatch(Sci::Position position, Sci::Position maxReStyle) noexcept;
+	Sci::Position BraceMatch(Sci::Position position, Sci::Position maxReStyle) const noexcept;
 
 	bool IsAutoCompletionWordCharacter(unsigned int ch) const noexcept {
 		return WordCharacterClass(ch) == CharClassify::ccWord;
