@@ -76,11 +76,11 @@ public:
 	/// Return the value of an item in the list
 	std::string GetValue(int item) const;
 
-	void Show(bool show);
+	void Show(bool show) const;
 	void Cancel() noexcept;
 
 	/// Move the current list element by delta, scrolling appropriately
-	void Move(int delta);
+	void Move(int delta) const;
 
 	/// Select a list element that starts with word as the current element
 	void Select(const char *word);

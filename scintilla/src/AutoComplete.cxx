@@ -208,7 +208,7 @@ std::string AutoComplete::GetValue(int item) const {
 	return std::string(value);
 }
 
-void AutoComplete::Show(bool show) {
+void AutoComplete::Show(bool show) const {
 	lb->Show(show);
 	if (show)
 		lb->Select(0);
@@ -223,7 +223,7 @@ void AutoComplete::Cancel() noexcept {
 }
 
 
-void AutoComplete::Move(int delta) {
+void AutoComplete::Move(int delta) const {
 	const int count = lb->Length();
 	int current = lb->GetSelection();
 	current += delta;

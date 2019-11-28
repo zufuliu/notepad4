@@ -30,8 +30,8 @@ bool LexAccessor::MatchIgnoreCase(Sci_Position pos, const char *s) noexcept {
 void LexAccessor::GetRange(Sci_PositionU startPos_, Sci_PositionU endPos_, char *s, Sci_PositionU len) noexcept {
 	endPos_ = std::min(endPos_, startPos_ + len - 1);
 	if (startPos_ >= static_cast<Sci_PositionU>(startPos) && endPos_ <= static_cast<Sci_PositionU>(endPos)) {
-		const char *p = buf + startPos_ - startPos;
-		const char * const t = buf + endPos_ - startPos;
+		const char *p = buf + (startPos_ - startPos);
+		const char * const t = buf + (endPos_ - startPos);
 		while (p < t) {
 			*s++ = *p++;
 		}
@@ -46,8 +46,8 @@ void LexAccessor::GetRange(Sci_PositionU startPos_, Sci_PositionU endPos_, char 
 void LexAccessor::GetRangeLowered(Sci_PositionU startPos_, Sci_PositionU endPos_, char *s, Sci_PositionU len) noexcept {
 	endPos_ = std::min(endPos_, startPos_ + len - 1);
 	if (startPos_ >= static_cast<Sci_PositionU>(startPos) && endPos_ <= static_cast<Sci_PositionU>(endPos)) {
-		const char *p = buf + startPos_ - startPos;
-		const char * const t = buf + endPos_ - startPos;
+		const char *p = buf + (startPos_ - startPos);
+		const char * const t = buf + (endPos_ - startPos);
 		while (p < t) {
 			*s++ = MakeLowerCase(*p++);
 		}

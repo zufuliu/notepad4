@@ -80,10 +80,10 @@ void DrawWrapMarker(Surface *surface, PRectangle rcPlace,
 		int xDir;
 		int yBase;
 		int yDir;
-		void MoveTo(int xRelative, int yRelative) noexcept {
+		void MoveTo(int xRelative, int yRelative) const noexcept {
 			surface->MoveTo(xBase + xDir * xRelative, yBase + yDir * yRelative);
 		}
-		void LineTo(int xRelative, int yRelative) noexcept {
+		void LineTo(int xRelative, int yRelative) const noexcept {
 			surface->LineTo(xBase + xDir * xRelative, yBase + yDir * yRelative);
 		}
 	};
@@ -132,7 +132,7 @@ void MarginView::AllocateGraphics(const ViewStyle &vsDraw) {
 		pixmapSelPatternOffset1.reset(Surface::Allocate(vsDraw.technology));
 }
 
-void MarginView::RefreshPixMaps(Surface *surfaceWindow, WindowID wid, const ViewStyle &vsDraw) {
+void MarginView::RefreshPixMaps(Surface *surfaceWindow, WindowID wid, const ViewStyle &vsDraw) const {
 	if (!pixmapSelPattern->Initialised()) {
 		constexpr int patternSize = 8;
 		pixmapSelPattern->InitPixMap(patternSize, patternSize, surfaceWindow, wid);

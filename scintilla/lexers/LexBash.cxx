@@ -158,7 +158,7 @@ static void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int in
 			State = 0;
 			Quote = 0;
 			Quoted = false;
-			Indent = 0;
+			Indent = false;
 			DelimiterLength = 0;
 			Delimiter[0] = '\0';
 		}
