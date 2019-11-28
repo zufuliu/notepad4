@@ -1,5 +1,5 @@
 # https://julialang.org/
-# 1.2 https://docs.julialang.org/
+# 1.3 https://docs.julialang.org/
 
 #! Keywords			===========================================================
 # https://docs.julialang.org/en/v1/base/base/#Keywords-1
@@ -13,6 +13,7 @@ import
 local
 return
 using
+var
 
 # reserved two-word sequences
 abstract type
