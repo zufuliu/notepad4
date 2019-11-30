@@ -4440,7 +4440,7 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 				//	*lpsz = '\0';
 				//}
 				char *lpszEscSel = (char *)NP2HeapAlloc((2 * NP2_FIND_REPLACE_LIMIT));
-				lpefr->bTransformBS = AddBackslash(lpszEscSel, lpszSelection);
+				lpefr->bTransformBS = AddBackslashA(lpszEscSel, lpszSelection);
 
 				SetDlgItemTextA2W(cpEdit, hwnd, IDC_FINDTEXT, lpszEscSel);
 				NP2HeapFree(lpszSelection);
@@ -4678,13 +4678,13 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 				if (StrNotEmptyA(lpefr->szFind)) {
 					if (GetDlgItemTextA2W(CP_UTF8, hwnd, IDC_FINDTEXT, lpefr->szFindUTF8, COUNTOF(lpefr->szFindUTF8))) {
 						GetDlgItemText(hwnd, IDC_FINDTEXT, tch, COUNTOF(tch));
-						MRU_Add(mruFind, tch);
+						MRU_AddMultiline(mruFind, tch);
 					}
 				}
 				if (StrNotEmptyA(lpefr->szReplace)) {
 					if (GetDlgItemTextA2W(CP_UTF8, hwnd, IDC_REPLACETEXT, lpefr->szReplaceUTF8, COUNTOF(lpefr->szReplaceUTF8))) {
 						GetDlgItemText(hwnd, IDC_REPLACETEXT, tch, COUNTOF(tch));
-						MRU_Add(mruReplace, tch);
+						MRU_AddMultiline(mruReplace, tch);
 					}
 				} else {
 					strcpy(lpefr->szReplaceUTF8, "");

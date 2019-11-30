@@ -621,6 +621,7 @@ typedef const MRULIST * LPCMRULIST;
 LPMRULIST MRU_Create(LPCWSTR pszRegKey, int iFlags, int iSize);
 BOOL	MRU_Destroy(LPMRULIST pmru);
 BOOL	MRU_Add(LPMRULIST pmru, LPCWSTR pszNew);
+BOOL	MRU_AddMultiline(LPMRULIST pmru, LPCWSTR pszNew);
 BOOL	MRU_AddFile(LPMRULIST pmru, LPCWSTR pszFile, BOOL bRelativePath, BOOL bUnexpandMyDocs);
 BOOL	MRU_Delete(LPMRULIST pmru, int iIndex);
 BOOL	MRU_DeleteFileFromStore(LPCMRULIST pmru, LPCWSTR pszFile);
@@ -660,7 +661,8 @@ HWND	CreateThemedDialogParam(HINSTANCE hInstance, LPCWSTR lpTemplate, HWND hWndP
 
 //==== UnSlash Functions ======================================================
 void TransformBackslashes(char *pszInput, BOOL bRegEx, UINT cpEdit);
-BOOL AddBackslash(char *pszOut, const char *pszInput);
+BOOL AddBackslashA(char *pszOut, const char *pszInput);
+BOOL AddBackslashW(LPWSTR pszOut, LPCWSTR pszInput);
 
 //==== MinimizeToTray Functions - see comments in Helpers.c ===================
 BOOL GetDoAnimateMinimize(void);

@@ -2012,6 +2012,15 @@ BOOL MRU_Add(LPMRULIST pmru, LPCWSTR pszNew) {
 	return TRUE;
 }
 
+BOOL MRU_AddMultiline(LPMRULIST pmru, LPCWSTR pszNew) {
+	const int len = lstrlen(pszNew);
+	LPWSTR lpszEsc = (LPWSTR)NP2HeapAlloc((2*len + 1)*sizeof(WCHAR));
+	AddBackslashW(lpszEsc, pszNew);
+	MRU_Add(pmru, lpszEsc);
+	NP2HeapFree(lpszEsc);
+	return TRUE;
+}
+
 BOOL MRU_AddFile(LPMRULIST pmru, LPCWSTR pszFile, BOOL bRelativePath, BOOL bUnexpandMyDocs) {
 	int i;
 	for (i = 0; i < pmru->iSize; i++) {
@@ -2533,7 +2542,7 @@ void TransformBackslashes(char *pszInput, BOOL bRegEx, UINT cpEdit) {
 	}
 }
 
-BOOL AddBackslash(char *pszOut, const char *pszInput) {
+BOOL AddBackslashA(char *pszOut, const char *pszInput) {
 	BOOL hasEscapeChar = FALSE;
 	BOOL hasSlash = FALSE;
 	char *lpszEsc = pszOut;
@@ -2594,6 +2603,71 @@ BOOL AddBackslash(char *pszOut, const char *pszInput) {
 
 	if (hasSlash && !hasEscapeChar) {
 		strcpy(pszOut, pszInput);
+	}
+	return hasEscapeChar;
+}
+
+BOOL AddBackslashW(LPWSTR pszOut, LPCWSTR pszInput) {
+	BOOL hasEscapeChar = FALSE;
+	BOOL hasSlash = FALSE;
+	LPWSTR lpszEsc = pszOut;
+	LPCWSTR lpsz = pszInput;
+	while (*lpsz) {
+		switch (*lpsz) {
+		case '\n':
+			*lpszEsc++ = '\\';
+			*lpszEsc++ = 'n';
+			hasEscapeChar = TRUE;
+			break;
+		case '\r':
+			*lpszEsc++ = '\\';
+			*lpszEsc++ = 'r';
+			hasEscapeChar = TRUE;
+			break;
+		case '\t':
+			*lpszEsc++ = '\\';
+			*lpszEsc++ = 't';
+			hasEscapeChar = TRUE;
+			break;
+		case '\\':
+			*lpszEsc++ = '\\';
+			*lpszEsc++ = '\\';
+			hasSlash = TRUE;
+			break;
+		case '\f':
+			*lpszEsc++ = '\\';
+			*lpszEsc++ = 'f';
+			hasEscapeChar = TRUE;
+			break;
+		case '\v':
+			*lpszEsc++ = '\\';
+			*lpszEsc++ = 'v';
+			hasEscapeChar = TRUE;
+			break;
+		case '\a':
+			*lpszEsc++ = '\\';
+			*lpszEsc++ = 'b';
+			hasEscapeChar = TRUE;
+			break;
+		case '\b':
+			*lpszEsc++ = '\\';
+			*lpszEsc++ = 'a';
+			hasEscapeChar = TRUE;
+			break;
+		case '\x1B':
+			*lpszEsc++ = '\\';
+			*lpszEsc++ = 'e';
+			hasEscapeChar = TRUE;
+			break;
+		default:
+			*lpszEsc++ = *lpsz;
+			break;
+		}
+		lpsz++;
+	}
+
+	if (hasSlash && !hasEscapeChar) {
+		lstrcpy(pszOut, pszInput);
 	}
 	return hasEscapeChar;
 }
