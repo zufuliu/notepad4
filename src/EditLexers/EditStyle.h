@@ -215,8 +215,9 @@
 
 #define NP2STYLE_DoubleQuotedString		63532
 #define NP2STYLE_SingleQuotedString		63533
-
+#define NP2STYLE_Key					63534
 #define NP2STYLE_ParameterExpansion		63535
+#define NP2STYLE_Table					63536
 
 #define NP2STYLE_SourceDestination		63541
 #define NP2STYLE_PositionSetting		63542
