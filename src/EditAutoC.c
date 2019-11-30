@@ -735,10 +735,13 @@ static inline BOOL NeedSpaceAfterKeyword(const char *word, Sci_Position length) 
 #define HTML_TEXT_BLOCK_PHP		5
 #define HTML_TEXT_BLOCK_CSS		6
 
-static int GetCurrentHtmlTextBlock(void) {
-	const Sci_Position iCurrentPos = SciCall_GetCurrentPos();
-	const int iCurrentStyle = SciCall_GetStyleAt(iCurrentPos);
+extern EDITLEXER lexCSS;
+extern EDITLEXER lexJS;
+extern EDITLEXER lexPHP;
+extern EDITLEXER lexPython;
+extern EDITLEXER lexVBS;
 
+static int GetCurrentHtmlTextBlockEx(int iCurrentStyle) {
 	if (iCurrentStyle == SCE_H_CDATA) {
 		return HTML_TEXT_BLOCK_CDATA;
 	}
@@ -758,6 +761,12 @@ static int GetCurrentHtmlTextBlock(void) {
 		return HTML_TEXT_BLOCK_PHP;
 	}
 	return HTML_TEXT_BLOCK_TAG;
+}
+
+static int GetCurrentHtmlTextBlock(void) {
+	const Sci_Position iCurrentPos = SciCall_GetCurrentPos();
+	const int iCurrentStyle = SciCall_GetStyleAt(iCurrentPos);
+	return GetCurrentHtmlTextBlockEx(iCurrentStyle);
 }
 
 static void EscapeRegex(LPSTR pszOut, LPCSTR pszIn) {
@@ -994,6 +1003,37 @@ void AutoC_AddKeyword(struct WordList *pWList, int iCurrentStyle) {
 		WordList_AddList(pWList, (*np2_LexKeyword)[1]);
 		WordList_AddList(pWList, (*np2_LexKeyword)[2]);
 		WordList_AddList(pWList, (*np2_LexKeyword)[3]);
+	}
+
+	// embedded script
+	if (pLexCurrent->rid == NP2LEX_HTML) {
+		const int block = GetCurrentHtmlTextBlockEx(iCurrentStyle);
+		PEDITLEXER pLex = NULL;
+		switch (block) {
+		case HTML_TEXT_BLOCK_JS:
+			pLex = &lexJS;
+			break;
+		case HTML_TEXT_BLOCK_VBS:
+			pLex = &lexVBS;
+			break;
+		case HTML_TEXT_BLOCK_PYTHON:
+			pLex = &lexPython;
+			break;
+		case HTML_TEXT_BLOCK_PHP:
+			pLex = &lexPHP;
+			break;
+		case HTML_TEXT_BLOCK_CSS:
+			pLex = &lexCSS;
+			break;
+		}
+		if (pLex != NULL) {
+			for (int i = 0; i < NUMKEYWORD; i++) {
+				const char *pKeywords = pLex->pKeyWords->pszKeyWords[i];
+				if (StrNotEmptyA(pKeywords)) {
+					WordList_AddListEx(pWList, pKeywords);
+				}
+			}
+		}
 	}
 }
 
