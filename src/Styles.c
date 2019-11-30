@@ -109,6 +109,7 @@ extern EDITLEXER lexBash;
 
 extern EDITLEXER lexTcl;
 extern EDITLEXER lexTexinfo;
+extern EDITLEXER lexTOML;
 
 extern EDITLEXER lexVBS;
 extern EDITLEXER lexVerilog;
@@ -200,6 +201,7 @@ static const PEDITLEXER pLexArray[ALL_LEXER_COUNT] = {
 
 	&lexTcl,
 	&lexTexinfo,
+	&lexTOML,
 
 	&lexVBS,
 	&lexVerilog,
@@ -1118,6 +1120,7 @@ static inline BOOL DidLexerHasBlockComment(int iLexer, int rid) {
 		|| iLexer == SCLEX_RUBY
 		|| iLexer == SCLEX_SMALI
 		|| iLexer == SCLEX_TEXINFO
+		|| iLexer == SCLEX_TOML
 		|| iLexer == SCLEX_VB
 		|| iLexer == SCLEX_VBSCRIPT
 		|| iLexer == SCLEX_VIM

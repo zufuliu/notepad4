@@ -148,8 +148,8 @@ void FoldPropsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initStyl
 		prevComment = foldComment && styler.GetLineState(lineCurrent - 1) == SCE_PROPS_COMMENT;
 		prev2Comment = foldComment && lineCurrent > 1 && styler.GetLineState(lineCurrent - 2) == SCE_PROPS_COMMENT;
 	}
-	bool commentHead = prevComment && (prevLevel & SC_FOLDLEVELHEADERFLAG);
 
+	bool commentHead = prevComment && (prevLevel & SC_FOLDLEVELHEADERFLAG);
 	while (lineCurrent <= maxLines) {
 		int nextLevel;
 		const int initStyle = styler.GetLineState(lineCurrent);

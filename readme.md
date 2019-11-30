@@ -119,6 +119,7 @@ Or build from source, see the [Wiki](https://github.com/zufuliu/notepad2/wiki/Bu
 		* [SQLite3](../master/tools/lang/SQLite3.sql)
 	* TCL, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#tcl)
 	* Texinfo
+	* TOML File
 	* Visual Basic
 		* VB6
 		* VB.NET

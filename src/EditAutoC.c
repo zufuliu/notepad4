@@ -605,6 +605,8 @@ static inline BOOL IsOperatorStyle(int style) {
 
 	case SCLEX_TCL:
 		return style == SCE_TCL_OPERATOR;
+	case SCLEX_TOML:
+		return style == SCE_TOML_OPERATOR;
 
 	case SCLEX_VB:
 	case SCLEX_VBSCRIPT:
@@ -2027,6 +2029,7 @@ void EditToggleCommentLine(void) {
 	case SCLEX_RUBY:
 	case SCLEX_SMALI:
 	case SCLEX_TCL:
+	case SCLEX_TOML:
 	case SCLEX_YAML:
 		EditToggleLineComments(L"#", FALSE);
 		break;

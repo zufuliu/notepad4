@@ -923,6 +923,7 @@
     <ClCompile Include="..\..\scintilla\lexers\LexSQL.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexTCL.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexTexinfo.cxx" />
+    <ClCompile Include="..\..\scintilla\lexers\LexTOML.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexVB.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexVerilog.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexVHDL.cxx" />
@@ -1027,6 +1028,7 @@
     <ClCompile Include="..\..\src\EditLexers\stlSmali.c" />
     <ClCompile Include="..\..\src\EditLexers\stlSQL.c" />
     <ClCompile Include="..\..\src\EditLexers\stlTcl.c" />
+    <ClCompile Include="..\..\src\EditLexers\stlTOML.c" />
     <ClCompile Include="..\..\src\EditLexers\stlVB.c" />
     <ClCompile Include="..\..\src\EditLexers\stlVBS.c" />
     <ClCompile Include="..\..\src\EditLexers\stlVerilog.c" />
