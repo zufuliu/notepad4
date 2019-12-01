@@ -1,5 +1,5 @@
 #include "EditLexer.h"
-#include "EditStyle.h"
+#include "EditStyleX.h"
 
 // https://graphviz.org/
 // http://blockdiag.com/en/
@@ -43,14 +43,14 @@ NULL
 
 static EDITSTYLE Styles_DOT[] = {
 	EDITSTYLE_DEFAULT,
-	{ SCE_C_WORD, NP2STYLE_Keyword, EDITSTYLE_HOLE(L"Keyword"), L"fore:#0000FF" },
-	{ SCE_C_WORD2, NP2STYLE_Attribute, EDITSTYLE_HOLE(L"Attribute"), L"fore:#FF8000" },
-	{ SCE_C_LABEL, NP2STYLE_Value, EDITSTYLE_HOLE(L"Value"), L"fore:#008287" },
-	{ SCE_C_DIRECTIVE, NP2STYLE_Label, EDITSTYLE_HOLE(L"Label"), L"fore:#008287" },
-	{ MULTI_STYLE(SCE_C_COMMENT, SCE_C_COMMENTLINE, SCE_C_COMMENTDOC, 0), NP2STYLE_Comment, EDITSTYLE_HOLE(L"Comment"), L"fore:#608060" },
-	{ SCE_C_STRING, NP2STYLE_String, EDITSTYLE_HOLE(L"String"), L"fore:#008000" },
-	{ SCE_C_NUMBER, NP2STYLE_Number, EDITSTYLE_HOLE(L"Number"), L"fore:#FF0000" },
-	{ SCE_C_OPERATOR, NP2STYLE_Operator, EDITSTYLE_HOLE(L"Operator"), L"fore:#B000B0" },
+	{ SCE_C_WORD, NP2StyleX_Keyword, L"fore:#0000FF" },
+	{ SCE_C_WORD2, NP2StyleX_Attribute, L"fore:#FF8000" },
+	{ SCE_C_LABEL, NP2StyleX_Value, L"fore:#008287" },
+	{ SCE_C_DIRECTIVE, NP2StyleX_Label, L"fore:#008287" },
+	{ MULTI_STYLE(SCE_C_COMMENT, SCE_C_COMMENTLINE, SCE_C_COMMENTDOC, 0), NP2StyleX_Comment, L"fore:#608060" },
+	{ SCE_C_STRING, NP2StyleX_String, L"fore:#008000" },
+	{ SCE_C_NUMBER, NP2StyleX_Number, L"fore:#FF0000" },
+	{ SCE_C_OPERATOR, NP2StyleX_Operator, L"fore:#B000B0" },
 };
 
 EDITLEXER lexDOT = {

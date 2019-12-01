@@ -1,5 +1,5 @@
 #include "EditLexer.h"
-#include "EditStyle.h"
+#include "EditStyleX.h"
 
 // https://en.wikibooks.org/wiki/Fortran
 
@@ -18,13 +18,13 @@ static KEYWORDLIST Keywords_Fortran = {{
 
 static EDITSTYLE Styles_Fortran[] = {
 	EDITSTYLE_DEFAULT,
-	{ SCE_F_WORD, NP2STYLE_Keyword, EDITSTYLE_HOLE(L"Keyword"), L"fore:#0000FF" },
-	{ SCE_F_WORD2, NP2STYLE_BasicFunction, EDITSTYLE_HOLE(L"Basic Function"), L"fore:#0080FF" },
-	{ SCE_F_COMMENT, NP2STYLE_Comment, EDITSTYLE_HOLE(L"Comment"), L"fore:#608060" },
-	{ MULTI_STYLE(SCE_F_STRING1, SCE_F_STRING2, SCE_F_STRINGEOL, 0), NP2STYLE_String, EDITSTYLE_HOLE(L"String"), L"fore:#008000" },
-	{ SCE_F_NUMBER, NP2STYLE_Number, EDITSTYLE_HOLE(L"Number"), L"fore:#FF0000" },
-	{ MULTI_STYLE(SCE_F_OPERATOR, SCE_F_OPERATOR2, 0, 0), NP2STYLE_Operator, EDITSTYLE_HOLE(L"Operator"), L"fore:#B000B0" },
-	{ SCE_F_PREPROCESSOR, NP2STYLE_Preprocessor, EDITSTYLE_HOLE(L"Preprocessor"), L"fore:#FF8000" },
+	{ SCE_F_WORD, NP2StyleX_Keyword, L"fore:#0000FF" },
+	{ SCE_F_WORD2, NP2StyleX_BasicFunction, L"fore:#0080FF" },
+	{ SCE_F_COMMENT, NP2StyleX_Comment, L"fore:#608060" },
+	{ MULTI_STYLE(SCE_F_STRING1, SCE_F_STRING2, SCE_F_STRINGEOL, 0), NP2StyleX_String, L"fore:#008000" },
+	{ SCE_F_NUMBER, NP2StyleX_Number, L"fore:#FF0000" },
+	{ MULTI_STYLE(SCE_F_OPERATOR, SCE_F_OPERATOR2, 0, 0), NP2StyleX_Operator, L"fore:#B000B0" },
+	{ SCE_F_PREPROCESSOR, NP2StyleX_Preprocessor, L"fore:#FF8000" },
 };
 
 EDITLEXER lexFortran = {

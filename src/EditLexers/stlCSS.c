@@ -1,5 +1,5 @@
 #include "EditLexer.h"
-#include "EditStyle.h"
+#include "EditStyleX.h"
 
 // https://en.wikipedia.org/wiki/Cascading_Style_Sheets
 // https://www.w3.org/Style/CSS/
@@ -65,22 +65,22 @@ static KEYWORDLIST Keywords_CSS = {{
 
 static EDITSTYLE Styles_CSS[] = {
 	EDITSTYLE_DEFAULT,
-	{ SCE_CSS_COMMENT, NP2STYLE_Comment, EDITSTYLE_HOLE(L"Comment"), L"fore:#608060" },
-	{ SCE_CSS_TAG, NP2STYLE_HTMLTag, EDITSTYLE_HOLE(L"HTML Tag"), L"bold; fore:#0A246A" },
-	{ SCE_CSS_CLASS, NP2STYLE_TagClass, EDITSTYLE_HOLE(L"Tag Class"), L"fore:#648000" },
-	{ SCE_CSS_ID, NP2STYLE_TagId, EDITSTYLE_HOLE(L"Tag Id"), L"fore:#648000" },
-	{ SCE_CSS_ATTRIBUTE, NP2STYLE_TagAttribute, EDITSTYLE_HOLE(L"Tag Attribute"), L"italic; fore:#648000" },
-	{ MULTI_STYLE(SCE_CSS_PSEUDOCLASS, SCE_CSS_EXTENDED_PSEUDOCLASS, SCE_CSS_PSEUDOELEMENT, SCE_CSS_EXTENDED_PSEUDOELEMENT), NP2STYLE_PseudoClassElement, EDITSTYLE_HOLE(L"Pseudo Class/Element"), L"fore:#B000B0" },
-	{ MULTI_STYLE(SCE_CSS_IDENTIFIER, SCE_CSS_IDENTIFIER2, SCE_CSS_IDENTIFIER3, SCE_CSS_EXTENDED_IDENTIFIER), NP2STYLE_CSSProperty, EDITSTYLE_HOLE(L"CSS Property"), L"fore:#FF4000" },
-	{ MULTI_STYLE(SCE_CSS_DOUBLESTRING, SCE_CSS_SINGLESTRING, 0, 0), NP2STYLE_String, EDITSTYLE_HOLE(L"String"), L"fore:#008000" },
-	{ SCE_CSS_VALUE, NP2STYLE_Value, EDITSTYLE_HOLE(L"Value"), L"fore:#3A6EA5" },
-	{ SCE_CSS_OPERATOR, NP2STYLE_Operator, EDITSTYLE_HOLE(L"Operator"), L"fore:#B000B0" },
-	{ SCE_CSS_IMPORTANT, NP2STYLE_Important, EDITSTYLE_HOLE(L"Important"), L"bold; fore:#C80000" },
-	{ SCE_CSS_DIRECTIVE, NP2STYLE_Directive, EDITSTYLE_HOLE(L"Directive"), L"bold; back:#FFF1A8" },
-	{ SCE_CSS_MEDIA, NP2STYLE_Media, EDITSTYLE_HOLE(L"Media"), L"bold; fore:#0A246A" },
-	{ SCE_CSS_VARIABLE, NP2STYLE_Variable, EDITSTYLE_HOLE(L"Variable"), L"bold; fore:#FF4000" },
-	{ SCE_CSS_UNKNOWN_PSEUDOCLASS, NP2STYLE_UnknownPseudoClass, EDITSTYLE_HOLE(L"Unknown Pseudo Class"), L"fore:#C80000; back:#FFFF80" },
-	{ SCE_CSS_UNKNOWN_IDENTIFIER, NP2STYLE_UnknownProperty, EDITSTYLE_HOLE(L"Unknown Property"), L"fore:#C80000; back:#FFFF80" },
+	{ SCE_CSS_COMMENT, NP2StyleX_Comment, L"fore:#608060" },
+	{ SCE_CSS_TAG, NP2StyleX_HTMLTag, L"bold; fore:#0A246A" },
+	{ SCE_CSS_CLASS, NP2StyleX_TagClass, L"fore:#648000" },
+	{ SCE_CSS_ID, NP2StyleX_TagId, L"fore:#648000" },
+	{ SCE_CSS_ATTRIBUTE, NP2StyleX_TagAttribute, L"italic; fore:#648000" },
+	{ MULTI_STYLE(SCE_CSS_PSEUDOCLASS, SCE_CSS_EXTENDED_PSEUDOCLASS, SCE_CSS_PSEUDOELEMENT, SCE_CSS_EXTENDED_PSEUDOELEMENT), NP2StyleX_PseudoClassElement, L"fore:#B000B0" },
+	{ MULTI_STYLE(SCE_CSS_IDENTIFIER, SCE_CSS_IDENTIFIER2, SCE_CSS_IDENTIFIER3, SCE_CSS_EXTENDED_IDENTIFIER), NP2StyleX_CSSProperty, L"fore:#FF4000" },
+	{ MULTI_STYLE(SCE_CSS_DOUBLESTRING, SCE_CSS_SINGLESTRING, 0, 0), NP2StyleX_String, L"fore:#008000" },
+	{ SCE_CSS_VALUE, NP2StyleX_Value, L"fore:#3A6EA5" },
+	{ SCE_CSS_OPERATOR, NP2StyleX_Operator, L"fore:#B000B0" },
+	{ SCE_CSS_IMPORTANT, NP2StyleX_Important, L"bold; fore:#C80000" },
+	{ SCE_CSS_DIRECTIVE, NP2StyleX_Directive, L"bold; back:#FFF1A8" },
+	{ SCE_CSS_MEDIA, NP2StyleX_Media, L"bold; fore:#0A246A" },
+	{ SCE_CSS_VARIABLE, NP2StyleX_Variable, L"bold; fore:#FF4000" },
+	{ SCE_CSS_UNKNOWN_PSEUDOCLASS, NP2StyleX_UnknownPseudoClass, L"fore:#C80000; back:#FFFF80" },
+	{ SCE_CSS_UNKNOWN_IDENTIFIER, NP2StyleX_UnknownProperty, L"fore:#C80000; back:#FFFF80" },
 };
 
 EDITLEXER lexCSS = {

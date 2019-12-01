@@ -1,5 +1,5 @@
 #include "EditLexer.h"
-#include "EditStyle.h"
+#include "EditStyleX.h"
 
 // https://developer.apple.com/library/content/documentation/Cocoa/Conceptual/ProgrammingWithObjectiveC/Introduction/Introduction.html
 
@@ -858,30 +858,30 @@ static KEYWORDLIST Keywords_CPP = {{
 
 static EDITSTYLE Styles_CPP[] = {
 	EDITSTYLE_DEFAULT,
-	{ MULTI_STYLE(SCE_C_WORD, SCE_C_2NDWORD, 0, 0), NP2STYLE_Keyword, EDITSTYLE_HOLE(L"Keyword"), L"fore:#0000FF" },
-	{ SCE_C_WORD2, NP2STYLE_TypeKeyword, EDITSTYLE_HOLE(L"Type Keyword"), L"fore:#0000FF" },
-	{ SCE_C_PREPROCESSOR, NP2STYLE_Preprocessor, EDITSTYLE_HOLE(L"Preprocessor"), L"fore:#FF8000" },
-	{ SCE_C_ATTRIBUTE, NP2STYLE_Attribute, EDITSTYLE_HOLE(L"Attribute"), L"fore:#FF8000" },
-	{ SCE_C_DIRECTIVE, NP2STYLE_Directive, EDITSTYLE_HOLE(L"Directive"), L"fore:#0000FF" },
-	{ SCE_C_2NDWORD2, NP2STYLE_Type, EDITSTYLE_HOLE(L"Type"), L"fore:#007F7F" },
-	{ SCE_C_CLASS, NP2STYLE_Class, EDITSTYLE_HOLE(L"Class"), L"fore:#0080FF" },
-	{ SCE_C_STRUCT, NP2STYLE_Struct, EDITSTYLE_HOLE(L"Struct"), L"fore:#0080FF" },
-	{ SCE_C_UNION, NP2STYLE_Union, EDITSTYLE_HOLE(L"Union"), L"fore:#0080FF" },
-	{ SCE_C_INTERFACE, NP2STYLE_Interface, EDITSTYLE_HOLE(L"Interface"), L"bold; fore:#1E90FF" },
-	{ SCE_C_FUNCTION, NP2STYLE_Function, EDITSTYLE_HOLE(L"Function"), L"fore:#A46000" },
-	{ SCE_C_ENUMERATION, NP2STYLE_Enumeration, EDITSTYLE_HOLE(L"Enumeration"), L"fore:#FF8000" },
-	{ SCE_C_CONSTANT, NP2STYLE_Constant, EDITSTYLE_HOLE(L"Constant"), L"fore:#B000B0" },
-	{ MULTI_STYLE(SCE_C_MACRO2, SCE_C_MACRO, 0, 0), NP2STYLE_Macro, EDITSTYLE_HOLE(L"Macro"), L"fore:#B000B0" },
-	{ MULTI_STYLE(SCE_C_COMMENT, SCE_C_COMMENTLINE, 0, 0), NP2STYLE_Comment, EDITSTYLE_HOLE(L"Comment"), L"fore:#608060" },
-	{ SCE_C_COMMENTDOC_TAG, NP2STYLE_DocCommentTag, EDITSTYLE_HOLE(L"Doc Comment Tag"), L"fore:#408080" },
-	{ MULTI_STYLE(SCE_C_COMMENTDOC, SCE_C_COMMENTLINEDOC, SCE_C_COMMENTDOC_TAG_XML, 0), NP2STYLE_DocComment, EDITSTYLE_HOLE(L"Doc Comment"), L"fore:#408040" },
-	{ MULTI_STYLE(SCE_C_STRING, SCE_C_CHARACTER, SCE_C_STRINGEOL, 0), NP2STYLE_String, EDITSTYLE_HOLE(L"String"), L"fore:#008000" },
-	{ SCE_C_STRINGRAW, NP2STYLE_RawString, EDITSTYLE_HOLE(L"Raw String"), L"fore:#E24000" },
-	{ SCE_C_LABEL, NP2STYLE_Label, EDITSTYLE_HOLE(L"Label"), L"back:#FFC040" },
-	{ SCE_C_NUMBER, NP2STYLE_Number, EDITSTYLE_HOLE(L"Number"), L"fore:#FF0000" },
-	{ SCE_C_OPERATOR, NP2STYLE_Operator, EDITSTYLE_HOLE(L"Operator"), L"fore:#B000B0" },
-	{ SCE_C_ASM_INSTRUCTION, NP2STYLE_Instruction, EDITSTYLE_HOLE(L"Instruction"), L"fore:#0080FF" },
-	{ SCE_C_ASM_REGISTER, NP2STYLE_Register, EDITSTYLE_HOLE(L"Register"), L"fore:#FF8000" },
+	{ MULTI_STYLE(SCE_C_WORD, SCE_C_2NDWORD, 0, 0), NP2StyleX_Keyword, L"fore:#0000FF" },
+	{ SCE_C_WORD2, NP2StyleX_TypeKeyword, L"fore:#0000FF" },
+	{ SCE_C_PREPROCESSOR, NP2StyleX_Preprocessor, L"fore:#FF8000" },
+	{ SCE_C_ATTRIBUTE, NP2StyleX_Attribute, L"fore:#FF8000" },
+	{ SCE_C_DIRECTIVE, NP2StyleX_Directive, L"fore:#0000FF" },
+	{ SCE_C_2NDWORD2, NP2StyleX_Type, L"fore:#007F7F" },
+	{ SCE_C_CLASS, NP2StyleX_Class, L"fore:#0080FF" },
+	{ SCE_C_STRUCT, NP2StyleX_Struct, L"fore:#0080FF" },
+	{ SCE_C_UNION, NP2StyleX_Union, L"fore:#0080FF" },
+	{ SCE_C_INTERFACE, NP2StyleX_Interface, L"bold; fore:#1E90FF" },
+	{ SCE_C_FUNCTION, NP2StyleX_Function, L"fore:#A46000" },
+	{ SCE_C_ENUMERATION, NP2StyleX_Enumeration, L"fore:#FF8000" },
+	{ SCE_C_CONSTANT, NP2StyleX_Constant, L"fore:#B000B0" },
+	{ MULTI_STYLE(SCE_C_MACRO2, SCE_C_MACRO, 0, 0), NP2StyleX_Macro, L"fore:#B000B0" },
+	{ MULTI_STYLE(SCE_C_COMMENT, SCE_C_COMMENTLINE, 0, 0), NP2StyleX_Comment, L"fore:#608060" },
+	{ SCE_C_COMMENTDOC_TAG, NP2StyleX_DocCommentTag, L"fore:#408080" },
+	{ MULTI_STYLE(SCE_C_COMMENTDOC, SCE_C_COMMENTLINEDOC, SCE_C_COMMENTDOC_TAG_XML, 0), NP2StyleX_DocComment, L"fore:#408040" },
+	{ MULTI_STYLE(SCE_C_STRING, SCE_C_CHARACTER, SCE_C_STRINGEOL, 0), NP2StyleX_String, L"fore:#008000" },
+	{ SCE_C_STRINGRAW, NP2StyleX_RawString, L"fore:#E24000" },
+	{ SCE_C_LABEL, NP2StyleX_Label, L"back:#FFC040" },
+	{ SCE_C_NUMBER, NP2StyleX_Number, L"fore:#FF0000" },
+	{ SCE_C_OPERATOR, NP2StyleX_Operator, L"fore:#B000B0" },
+	{ SCE_C_ASM_INSTRUCTION, NP2StyleX_Instruction, L"fore:#0080FF" },
+	{ SCE_C_ASM_REGISTER, NP2StyleX_Register, L"fore:#FF8000" },
 };
 
 EDITLEXER lexCPP = {

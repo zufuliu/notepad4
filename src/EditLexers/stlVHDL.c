@@ -1,5 +1,5 @@
 #include "EditLexer.h"
-#include "EditStyle.h"
+#include "EditStyleX.h"
 
 static KEYWORDLIST Keywords_VHDL = {{
 "access after alias all architecture array assert attribute begin block body buffer bus case component "
@@ -45,17 +45,17 @@ NULL
 
 static EDITSTYLE Styles_VHDL[] = {
 	EDITSTYLE_DEFAULT,
-	{ SCE_VHDL_KEYWORD, NP2STYLE_Keyword, EDITSTYLE_HOLE(L"Keyword"), L"fore:#0000FF" },
-	{ MULTI_STYLE(SCE_VHDL_COMMENT, SCE_VHDL_COMMENTLINEBANG, SCE_VHDL_BLOCK_COMMENT, 0), NP2STYLE_Comment, EDITSTYLE_HOLE(L"Comment"), L"fore:#608060" },
-	{ SCE_VHDL_STRING, NP2STYLE_String, EDITSTYLE_HOLE(L"String"), L"fore:#008000" },
-	{ SCE_VHDL_NUMBER, NP2STYLE_Number, EDITSTYLE_HOLE(L"Number"), L"fore:#FF0000" },
-	{ SCE_VHDL_OPERATOR, NP2STYLE_Operator, EDITSTYLE_HOLE(L"Operator"), L"fore:#B000B0" },
-	{ SCE_VHDL_ATTRIBUTE, NP2STYLE_Attribute, EDITSTYLE_HOLE(L"Attribute"), L"fore:#8080FF" },
-	{ SCE_VHDL_STDPACKAGE, NP2STYLE_StdPackage, EDITSTYLE_HOLE(L"STD Package"), L"bold; fore:#0000FF" },
-	{ SCE_VHDL_STDOPERATOR, NP2STYLE_StdOperator, EDITSTYLE_HOLE(L"STD Operator"), L"fore:#0080C0" },
-	{ SCE_VHDL_STDFUNCTION, NP2STYLE_StdFunction, EDITSTYLE_HOLE(L"STD Function"), L"bold; fore:#0080C0" },
-	{ SCE_VHDL_STDTYPE, NP2STYLE_StdType, EDITSTYLE_HOLE(L"STD Type"), L"bold; fore:#FF8000" },
-	{ SCE_VHDL_USERWORD, NP2STYLE_UserDefine, EDITSTYLE_HOLE(L"User Define"), L"fore:#B5E71F" },
+	{ SCE_VHDL_KEYWORD, NP2StyleX_Keyword, L"fore:#0000FF" },
+	{ MULTI_STYLE(SCE_VHDL_COMMENT, SCE_VHDL_COMMENTLINEBANG, SCE_VHDL_BLOCK_COMMENT, 0), NP2StyleX_Comment, L"fore:#608060" },
+	{ SCE_VHDL_STRING, NP2StyleX_String, L"fore:#008000" },
+	{ SCE_VHDL_NUMBER, NP2StyleX_Number, L"fore:#FF0000" },
+	{ SCE_VHDL_OPERATOR, NP2StyleX_Operator, L"fore:#B000B0" },
+	{ SCE_VHDL_ATTRIBUTE, NP2StyleX_Attribute, L"fore:#8080FF" },
+	{ SCE_VHDL_STDPACKAGE, NP2StyleX_StdPackage, L"bold; fore:#0000FF" },
+	{ SCE_VHDL_STDOPERATOR, NP2StyleX_StdOperator, L"fore:#0080C0" },
+	{ SCE_VHDL_STDFUNCTION, NP2StyleX_StdFunction, L"bold; fore:#0080C0" },
+	{ SCE_VHDL_STDTYPE, NP2StyleX_StdType, L"bold; fore:#FF8000" },
+	{ SCE_VHDL_USERWORD, NP2StyleX_UserDefine, L"fore:#B5E71F" },
 };
 
 EDITLEXER lexVHDL = {

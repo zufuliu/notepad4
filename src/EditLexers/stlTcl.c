@@ -1,5 +1,5 @@
 #include "EditLexer.h"
-#include "EditStyle.h"
+#include "EditStyleX.h"
 
 // https://www.tcl.tk/about/language.html
 
@@ -35,13 +35,13 @@ static KEYWORDLIST Keywords_Tcl = {{
 
 static EDITSTYLE Styles_Tcl[] = {
 	EDITSTYLE_DEFAULT,
-	{ MULTI_STYLE(SCE_TCL_WORD, SCE_TCL_WORD2, SCE_TCL_WORD3, SCE_TCL_WORD_IN_QUOTE), NP2STYLE_Keyword, EDITSTYLE_HOLE(L"Keyword"), L"bold; fore:#FF8000" },
-	{ MULTI_STYLE(SCE_TCL_COMMENT, SCE_TCL_COMMENTLINE, SCE_TCL_COMMENT_BOX, SCE_TCL_BLOCK_COMMENT), NP2STYLE_Comment, EDITSTYLE_HOLE(L"Comment"), L"fore:#608060" },
-	{ SCE_TCL_IN_QUOTE, NP2STYLE_String, EDITSTYLE_HOLE(L"String"), L"fore:#008000" },
-	{ SCE_TCL_NUMBER, NP2STYLE_Number, EDITSTYLE_HOLE(L"Number"), L"fore:#FF0000" },
-	{ SCE_TCL_OPERATOR, NP2STYLE_Operator, EDITSTYLE_HOLE(L"Operator"), L"fore:#B000B0" },
-	{ MULTI_STYLE(SCE_TCL_SUBSTITUTION, SCE_TCL_SUB_BRACE, 0, 0), NP2STYLE_Substitution, EDITSTYLE_HOLE(L"Substitution"), L"fore:#0080FF" },
-	{ SCE_TCL_MODIFIER, NP2STYLE_Modifier, EDITSTYLE_HOLE(L"Modifier"), L"fore:#FF00FF" },
+	{ MULTI_STYLE(SCE_TCL_WORD, SCE_TCL_WORD2, SCE_TCL_WORD3, SCE_TCL_WORD_IN_QUOTE), NP2StyleX_Keyword, L"bold; fore:#FF8000" },
+	{ MULTI_STYLE(SCE_TCL_COMMENT, SCE_TCL_COMMENTLINE, SCE_TCL_COMMENT_BOX, SCE_TCL_BLOCK_COMMENT), NP2StyleX_Comment, L"fore:#608060" },
+	{ SCE_TCL_IN_QUOTE, NP2StyleX_String, L"fore:#008000" },
+	{ SCE_TCL_NUMBER, NP2StyleX_Number, L"fore:#FF0000" },
+	{ SCE_TCL_OPERATOR, NP2StyleX_Operator, L"fore:#B000B0" },
+	{ MULTI_STYLE(SCE_TCL_SUBSTITUTION, SCE_TCL_SUB_BRACE, 0, 0), NP2StyleX_Substitution, L"fore:#0080FF" },
+	{ SCE_TCL_MODIFIER, NP2StyleX_Modifier, L"fore:#FF00FF" },
 };
 
 EDITLEXER lexTcl = {

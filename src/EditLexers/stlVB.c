@@ -1,5 +1,5 @@
 #include "EditLexer.h"
-#include "EditStyle.h"
+#include "EditStyleX.h"
 
 // Visual Basic Language Reference
 // https://docs.microsoft.com/en-us/dotnet/visual-basic/language-reference/
@@ -72,16 +72,16 @@ static KEYWORDLIST Keywords_VB = {{
 
 static EDITSTYLE Styles_VB[] = {
 	EDITSTYLE_DEFAULT,
-	{ MULTI_STYLE(SCE_B_KEYWORD, SCE_B_KEYWORD3, 0, 0), NP2STYLE_Keyword, EDITSTYLE_HOLE(L"Keyword"), L"fore:#0000FF" },
-	{ SCE_B_KEYWORD2, NP2STYLE_TypeKeyword, EDITSTYLE_HOLE(L"Type Keyword"), L"fore:#0000FF" },
-	{ SCE_B_PREPROCESSOR, NP2STYLE_Preprocessor, EDITSTYLE_HOLE(L"Preprocessor"), L"fore:#FF8000" },
-	{ SCE_B_KEYWORD4, NP2STYLE_Attribute, EDITSTYLE_HOLE(L"Attribute"), L"fore:#FF8000" },
-	{ SCE_B_CONSTANT, NP2STYLE_Constant, EDITSTYLE_HOLE(L"Constant"), L"fore:#B000B0" },
-	{ SCE_B_COMMENT, NP2STYLE_Comment, EDITSTYLE_HOLE(L"Comment"), L"fore:#608060" },
-	{ MULTI_STYLE(SCE_B_STRING, SCE_B_STRINGEOL, 0, 0), NP2STYLE_String, EDITSTYLE_HOLE(L"String"), L"fore:#008000" },
-	{ SCE_B_LABEL, NP2STYLE_Label, EDITSTYLE_HOLE(L"Label"), L"back:#FFC040" },
-	{ MULTI_STYLE(SCE_B_NUMBER, SCE_B_DATE, 0, 0), NP2STYLE_Number, EDITSTYLE_HOLE(L"Number"), L"fore:#FF0000" },
-	{ SCE_B_OPERATOR, NP2STYLE_Operator, EDITSTYLE_HOLE(L"Operator"), L"fore:#B000B0" },
+	{ MULTI_STYLE(SCE_B_KEYWORD, SCE_B_KEYWORD3, 0, 0), NP2StyleX_Keyword, L"fore:#0000FF" },
+	{ SCE_B_KEYWORD2, NP2StyleX_TypeKeyword, L"fore:#0000FF" },
+	{ SCE_B_PREPROCESSOR, NP2StyleX_Preprocessor, L"fore:#FF8000" },
+	{ SCE_B_KEYWORD4, NP2StyleX_Attribute, L"fore:#FF8000" },
+	{ SCE_B_CONSTANT, NP2StyleX_Constant, L"fore:#B000B0" },
+	{ SCE_B_COMMENT, NP2StyleX_Comment, L"fore:#608060" },
+	{ MULTI_STYLE(SCE_B_STRING, SCE_B_STRINGEOL, 0, 0), NP2StyleX_String, L"fore:#008000" },
+	{ SCE_B_LABEL, NP2StyleX_Label, L"back:#FFC040" },
+	{ MULTI_STYLE(SCE_B_NUMBER, SCE_B_DATE, 0, 0), NP2StyleX_Number, L"fore:#FF0000" },
+	{ SCE_B_OPERATOR, NP2StyleX_Operator, L"fore:#B000B0" },
 };
 
 EDITLEXER lexVB = {

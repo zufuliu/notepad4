@@ -1,5 +1,5 @@
 #include "EditLexer.h"
-#include "EditStyle.h"
+#include "EditStyleX.h"
 
 // smali smaliLexer.flex
 // android src/dalvik/opcode-gen/bytecode.txt
@@ -120,18 +120,18 @@ NULL
 
 static EDITSTYLE Styles_Smail[] = {
 	EDITSTYLE_DEFAULT,
-	{ SCE_SMALI_WORD, NP2STYLE_Keyword, EDITSTYLE_HOLE(L"Keyword"), L"fore:#0000FF" },
-	{ SCE_SMALI_DIRECTIVE, NP2STYLE_Directive, EDITSTYLE_HOLE(L"Directive"), L"fore:#FF8000" },
-	{ SCE_SMALI_INSTRUCTION, NP2STYLE_Instruction, EDITSTYLE_HOLE(L"Instruction"), L"fore:#0080FF" },
-	{ SCE_SMALI_REGISTER, NP2STYLE_Register, EDITSTYLE_HOLE(L"Register"), L"fore:#FF8000" },
-	{ SCE_SMALI_TYPE, NP2STYLE_Type, EDITSTYLE_HOLE(L"Type"), L"bold; fore:#007F7F" },
-	{ SCE_SMALI_FIELD, NP2STYLE_Field, EDITSTYLE_HOLE(L"Field"), L"fore:#648000" },
-	{ SCE_SMALI_METHOD, NP2STYLE_Method, EDITSTYLE_HOLE(L"Method"), L"fore:#A46000" },
-	{ SCE_SMALI_COMMENTLINE, NP2STYLE_Comment, EDITSTYLE_HOLE(L"Comment"), L"fore:#608060" },
-	{ MULTI_STYLE(SCE_SMALI_STRING, SCE_SMALI_CHARACTER, 0, 0), NP2STYLE_String, EDITSTYLE_HOLE(L"String"), L"fore:#008000" },
-	{ MULTI_STYLE(SCE_SMALI_LABEL, SCE_SMALI_LABEL_EOL, 0, 0), NP2STYLE_Label, EDITSTYLE_HOLE(L"Label"), L"back:#FFC040; eolfilled" },
-	{ SCE_SMALI_NUMBER, NP2STYLE_Number, EDITSTYLE_HOLE(L"Number"), L"fore:#FF0000" },
-	{ SCE_SMALI_OPERATOR, NP2STYLE_Operator, EDITSTYLE_HOLE(L"Operator"), L"fore:#B000B0" },
+	{ SCE_SMALI_WORD, NP2StyleX_Keyword, L"fore:#0000FF" },
+	{ SCE_SMALI_DIRECTIVE, NP2StyleX_Directive, L"fore:#FF8000" },
+	{ SCE_SMALI_INSTRUCTION, NP2StyleX_Instruction, L"fore:#0080FF" },
+	{ SCE_SMALI_REGISTER, NP2StyleX_Register, L"fore:#FF8000" },
+	{ SCE_SMALI_TYPE, NP2StyleX_Type, L"bold; fore:#007F7F" },
+	{ SCE_SMALI_FIELD, NP2StyleX_Field, L"fore:#648000" },
+	{ SCE_SMALI_METHOD, NP2StyleX_Method, L"fore:#A46000" },
+	{ SCE_SMALI_COMMENTLINE, NP2StyleX_Comment, L"fore:#608060" },
+	{ MULTI_STYLE(SCE_SMALI_STRING, SCE_SMALI_CHARACTER, 0, 0), NP2StyleX_String, L"fore:#008000" },
+	{ MULTI_STYLE(SCE_SMALI_LABEL, SCE_SMALI_LABEL_EOL, 0, 0), NP2StyleX_Label, L"back:#FFC040; eolfilled" },
+	{ SCE_SMALI_NUMBER, NP2StyleX_Number, L"fore:#FF0000" },
+	{ SCE_SMALI_OPERATOR, NP2StyleX_Operator, L"fore:#B000B0" },
 };
 
 EDITLEXER lexSmali = {

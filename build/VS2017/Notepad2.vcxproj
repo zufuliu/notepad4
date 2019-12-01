@@ -1104,6 +1104,7 @@
     <ClInclude Include="..\..\src\Edit.h" />
     <ClInclude Include="..\..\src\EditLexer.h" />
     <ClInclude Include="..\..\src\EditLexers/EditStyle.h" />
+    <ClInclude Include="..\..\src\EditLexers/EditStyleX.h" />
     <ClInclude Include="..\..\src\Helpers.h" />
     <ClInclude Include="..\..\src\Notepad2.h" />
     <ClInclude Include="..\..\src\Resource.h" />

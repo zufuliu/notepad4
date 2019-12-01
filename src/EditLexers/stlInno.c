@@ -1,5 +1,5 @@
 #include "EditLexer.h"
-#include "EditStyle.h"
+#include "EditStyleX.h"
 
 // http://www.jrsoftware.org/isinfo.php
 
@@ -52,17 +52,17 @@ static KEYWORDLIST Keywords_INNO = {{
 
 static EDITSTYLE Styles_INNO[] = {
 	EDITSTYLE_DEFAULT,
-	{ MULTI_STYLE(SCE_INNO_COMMENT, SCE_INNO_COMMENT_PASCAL, 0, 0), NP2STYLE_Comment, EDITSTYLE_HOLE(L"Comment"), L"fore:#008000" },
-	{ SCE_INNO_KEYWORD, NP2STYLE_Keyword, EDITSTYLE_HOLE(L"Keyword"), L"fore:#0000FF" },
-	{ SCE_INNO_PREPROC, NP2STYLE_Preprocessor, EDITSTYLE_HOLE(L"Preprocessor"), L"fore:#FF8000" },
-	{ SCE_INNO_KEYWORD_PASCAL, NP2STYLE_PascalKeyword, EDITSTYLE_HOLE(L"Pascal Keyword"), L"fore:#0000FF" },
-	//{ SCE_INNO_PAS_TYPE, , EDITSTYLE_HOLE(L"Pascal Type Keyword"), L"bold; fore:#1E90FF" },
-	{ SCE_INNO_SECTION, NP2STYLE_Section, EDITSTYLE_HOLE(L"Section"), L"bold; fore:#000080; back:#FF8000; eolfilled" },
-	{ SCE_INNO_PARAMETER, NP2STYLE_Parameter, EDITSTYLE_HOLE(L"Parameter"), L"fore:#0000FF" },
-	{ SCE_INNO_INLINE_EXPANSION, NP2STYLE_InlineExpansion, EDITSTYLE_HOLE(L"Inline Expansion"), L"fore:#800080" },
-	{ MULTI_STYLE(SCE_INNO_STRING_DOUBLE, SCE_INNO_STRING_SINGLE, 0, 0), NP2STYLE_String, EDITSTYLE_HOLE(L"String"), L"fore:#808000" },
-	//{ SCE_INNO_NUMBER, NP2STYLE_Number, EDITSTYLE_HOLE(L"Number"), L"fore:#FF0000" },
-	//{ SCE_INNO_OPERATOR, NP2STYLE_Operator, EDITSTYLE_HOLE(L"Operator"), L"fore:#B000B0" },
+	{ MULTI_STYLE(SCE_INNO_COMMENT, SCE_INNO_COMMENT_PASCAL, 0, 0), NP2StyleX_Comment, L"fore:#008000" },
+	{ SCE_INNO_KEYWORD, NP2StyleX_Keyword, L"fore:#0000FF" },
+	{ SCE_INNO_PREPROC, NP2StyleX_Preprocessor, L"fore:#FF8000" },
+	{ SCE_INNO_KEYWORD_PASCAL, NP2StyleX_PascalKeyword, L"fore:#0000FF" },
+	//{ SCE_INNO_PAS_TYPE, EDITSTYLE_HOLE(L"Pascal Type Keyword"), L"bold; fore:#1E90FF" },
+	{ SCE_INNO_SECTION, NP2StyleX_Section, L"bold; fore:#000080; back:#FF8000; eolfilled" },
+	{ SCE_INNO_PARAMETER, NP2StyleX_Parameter, L"fore:#0000FF" },
+	{ SCE_INNO_INLINE_EXPANSION, NP2StyleX_InlineExpansion, L"fore:#800080" },
+	{ MULTI_STYLE(SCE_INNO_STRING_DOUBLE, SCE_INNO_STRING_SINGLE, 0, 0), NP2StyleX_String, L"fore:#808000" },
+	//{ SCE_INNO_NUMBER, NP2StyleX_Number, L"fore:#FF0000" },
+	//{ SCE_INNO_OPERATOR, NP2StyleX_Operator, L"fore:#B000B0" },
 };
 
 EDITLEXER lexINNO = {

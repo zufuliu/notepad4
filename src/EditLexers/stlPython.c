@@ -1,5 +1,5 @@
 #include "EditLexer.h"
-#include "EditStyle.h"
+#include "EditStyleX.h"
 
 // https://www.python.org/
 // https://ironpython.net/
@@ -298,27 +298,27 @@ static KEYWORDLIST Keywords_Python = {{
 
 static EDITSTYLE Styles_Python[] = {
 	EDITSTYLE_DEFAULT,
-	{ SCE_PY_WORD, NP2STYLE_Keyword, EDITSTYLE_HOLE(L"Keyword"), L"bold; fore:#FF8000" },
-	{ SCE_PY_WORD2, NP2STYLE_Type, EDITSTYLE_HOLE(L"Type"), L"fore:#0080FF" },
-	{ SCE_PY_CLASSNAME, NP2STYLE_Class, EDITSTYLE_HOLE(L"Class"), L"bold; fore:#007F7F" },
-	{ SCE_PY_DEFNAME, NP2STYLE_FunctionDefine, EDITSTYLE_HOLE(L"Function Define"), L"bold; fore:#0080C0" },
-	{ SCE_PY_FUNCTION, NP2STYLE_Function, EDITSTYLE_HOLE(L"Function"), L"fore:#A46000" },
-	{ SCE_PY_ATTR, NP2STYLE_Attribute, EDITSTYLE_HOLE(L"Attribute"), L"fore:#FF8000" },
-	{ SCE_PY_DECORATOR, NP2STYLE_Decorator, EDITSTYLE_HOLE(L"Decorator"), L"fore:#C65D09" },
-	{ SCE_PY_BUILDIN_CONST, NP2STYLE_BuildinConstant, EDITSTYLE_HOLE(L"Build-in Constant"), L"bold; fore:#008080" },
-	{ SCE_PY_BUILDIN_FUNC, NP2STYLE_BuildinFunction, EDITSTYLE_HOLE(L"Build-in Function"), L"fore:#0080C0" },
-	{ SCE_PY_OBJ_FUNC, NP2STYLE_objectMethod, EDITSTYLE_HOLE(L"object Method"), L"fore:#0080C0" },
-	{ MULTI_STYLE(SCE_PY_COMMENTLINE, SCE_PY_COMMENTBLOCK, 0, 0), NP2STYLE_Comment, EDITSTYLE_HOLE(L"Comment"), L"fore:#608060" },
-	{ MULTI_STYLE(SCE_PY_STRING1, SCE_PY_STRING2, 0, 0), NP2STYLE_String, EDITSTYLE_HOLE(L"String"), L"fore:#008000" },
-	{ MULTI_STYLE(SCE_PY_RAW_STRING1, SCE_PY_RAW_STRING2, 0, 0), NP2STYLE_RawString, EDITSTYLE_HOLE(L"Raw String"), L"fore:#008080" },
-	{ MULTI_STYLE(SCE_PY_TRIPLE_STRING1, SCE_PY_TRIPLE_STRING2, 0, 0), NP2STYLE_TripleQuotedString, EDITSTYLE_HOLE(L"Triple Quoted String"), L"fore:#F08000" },
-	{ MULTI_STYLE(SCE_PY_BYTES1, SCE_PY_BYTES2, 0, 0), NP2STYLE_Bytes, EDITSTYLE_HOLE(L"Bytes"), L"fore:#C08000" },
-	{ MULTI_STYLE(SCE_PY_RAW_BYTES1, SCE_PY_RAW_BYTES2, 0, 0), NP2STYLE_RawBytes, EDITSTYLE_HOLE(L"Raw Bytes"), L"fore:#648000" },
-	{ MULTI_STYLE(SCE_PY_TRIPLE_BYTES1, SCE_PY_TRIPLE_BYTES2, 0, 0), NP2STYLE_TripleQuotedBytes, EDITSTYLE_HOLE(L"Triple Quoted Bytes"), L"fore:#A46000" },
-	{ MULTI_STYLE(SCE_PY_FMT_STRING1, SCE_PY_FMT_STRING2, 0, 0), NP2STYLE_FormattedString, EDITSTYLE_HOLE(L"Formatted String"), L"fore:#008080" },
-	{ MULTI_STYLE(SCE_PY_TRIPLE_FMT_STRING1, SCE_PY_TRIPLE_FMT_STRING2, 0, 0), NP2STYLE_TripleQuotedFString, EDITSTYLE_HOLE(L"Triple Quoted Formatted String"), L"fore:#F08000" },
-	{ SCE_PY_NUMBER, NP2STYLE_Number, EDITSTYLE_HOLE(L"Number"), L"fore:#FF0000" },
-	{ SCE_PY_OPERATOR, NP2STYLE_Operator, EDITSTYLE_HOLE(L"Operator"), L"fore:#B000B0" },
+	{ SCE_PY_WORD, NP2StyleX_Keyword, L"bold; fore:#FF8000" },
+	{ SCE_PY_WORD2, NP2StyleX_Type, L"fore:#0080FF" },
+	{ SCE_PY_CLASSNAME, NP2StyleX_Class, L"bold; fore:#007F7F" },
+	{ SCE_PY_DEFNAME, NP2StyleX_FunctionDefine, L"bold; fore:#0080C0" },
+	{ SCE_PY_FUNCTION, NP2StyleX_Function, L"fore:#A46000" },
+	{ SCE_PY_ATTR, NP2StyleX_Attribute, L"fore:#FF8000" },
+	{ SCE_PY_DECORATOR, NP2StyleX_Decorator, L"fore:#C65D09" },
+	{ SCE_PY_BUILDIN_CONST, NP2StyleX_BuildinConstant, L"bold; fore:#008080" },
+	{ SCE_PY_BUILDIN_FUNC, NP2StyleX_BuildinFunction, L"fore:#0080C0" },
+	{ SCE_PY_OBJ_FUNC, NP2StyleX_objectMethod, L"fore:#0080C0" },
+	{ MULTI_STYLE(SCE_PY_COMMENTLINE, SCE_PY_COMMENTBLOCK, 0, 0), NP2StyleX_Comment, L"fore:#608060" },
+	{ MULTI_STYLE(SCE_PY_STRING1, SCE_PY_STRING2, 0, 0), NP2StyleX_String, L"fore:#008000" },
+	{ MULTI_STYLE(SCE_PY_RAW_STRING1, SCE_PY_RAW_STRING2, 0, 0), NP2StyleX_RawString, L"fore:#008080" },
+	{ MULTI_STYLE(SCE_PY_TRIPLE_STRING1, SCE_PY_TRIPLE_STRING2, 0, 0), NP2StyleX_TripleQuotedString, L"fore:#F08000" },
+	{ MULTI_STYLE(SCE_PY_BYTES1, SCE_PY_BYTES2, 0, 0), NP2StyleX_Bytes, L"fore:#C08000" },
+	{ MULTI_STYLE(SCE_PY_RAW_BYTES1, SCE_PY_RAW_BYTES2, 0, 0), NP2StyleX_RawBytes, L"fore:#648000" },
+	{ MULTI_STYLE(SCE_PY_TRIPLE_BYTES1, SCE_PY_TRIPLE_BYTES2, 0, 0), NP2StyleX_TripleQuotedBytes, L"fore:#A46000" },
+	{ MULTI_STYLE(SCE_PY_FMT_STRING1, SCE_PY_FMT_STRING2, 0, 0), NP2StyleX_FormattedString, L"fore:#008080" },
+	{ MULTI_STYLE(SCE_PY_TRIPLE_FMT_STRING1, SCE_PY_TRIPLE_FMT_STRING2, 0, 0), NP2StyleX_TripleQuotedFString, L"fore:#F08000" },
+	{ SCE_PY_NUMBER, NP2StyleX_Number, L"fore:#FF0000" },
+	{ SCE_PY_OPERATOR, NP2StyleX_Operator,L"fore:#B000B0" },
 };
 
 EDITLEXER lexPython = {

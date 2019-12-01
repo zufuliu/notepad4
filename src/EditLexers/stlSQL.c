@@ -1,5 +1,5 @@
 #include "EditLexer.h"
-#include "EditStyle.h"
+#include "EditStyleX.h"
 
 static KEYWORDLIST Keywords_SQL = {{
 "abort accessible account action active add admin after against aggregate algorithm all allocate alter always analyse analyze and any array as asc ascii asensitive at attach audit authorization authors auto_increment autoextend_size autoincrement avg avg_row_length "
@@ -136,17 +136,17 @@ static KEYWORDLIST Keywords_SQL = {{
 
 static EDITSTYLE Styles_SQL[] = {
 	EDITSTYLE_DEFAULT,
-	{ SCE_SQL_WORD, NP2STYLE_Keyword, EDITSTYLE_HOLE(L"Keyword"), L"bold; fore:#FF8040" },
-	{ SCE_SQL_WORD2, NP2STYLE_TypeKeyword, EDITSTYLE_HOLE(L"Type Keyword"), L"bold; fore:#1E90FF" },
-	{ SCE_SQL_USER1, NP2STYLE_BasicFunction, EDITSTYLE_HOLE(L"Basic Function"), L"fore:#FF0080" },
-	{ MULTI_STYLE(SCE_SQL_COMMENT, SCE_SQL_COMMENTLINE, SCE_SQL_COMMENTLINEDOC, 0), NP2STYLE_Comment, EDITSTYLE_HOLE(L"Comment"), L"fore:#608060" },
-	{ MULTI_STYLE(SCE_SQL_STRING, SCE_SQL_CHARACTER, 0, 0), NP2STYLE_String, EDITSTYLE_HOLE(L"String"), L"fore:#008000" },
-	{ SCE_SQL_ESCAPECHAR, NP2STYLE_EscapeSequence, EDITSTYLE_HOLE(L"Escape Sequence"), L"fore:#0080C0" },
-	{ SCE_SQL_NUMBER, NP2STYLE_Number, EDITSTYLE_HOLE(L"Number"), L"fore:#FF0000" },
-	{ MULTI_STYLE(SCE_SQL_HEX, SCE_SQL_HEX2, 0, 0), NP2STYLE_BlobHex, EDITSTYLE_HOLE(L"Blob Hex"), L"fore:#C08000" },
-	{ MULTI_STYLE(SCE_SQL_BIT, SCE_SQL_BIT2, 0, 0), NP2STYLE_BitField, EDITSTYLE_HOLE(L"Bit Field"), L"fore:#C08000" },
-	{ SCE_SQL_VARIABLE, NP2STYLE_Variable, EDITSTYLE_HOLE(L"Variable"), L"fore:#9E4D2A" },
-	{ MULTI_STYLE(SCE_SQL_OPERATOR, SCE_SQL_QOPERATOR, 0, 0), NP2STYLE_Operator, EDITSTYLE_HOLE(L"Operator"), L"fore:#B000B0" },
+	{ SCE_SQL_WORD, NP2StyleX_Keyword, L"bold; fore:#FF8040" },
+	{ SCE_SQL_WORD2, NP2StyleX_TypeKeyword, L"bold; fore:#1E90FF" },
+	{ SCE_SQL_USER1, NP2StyleX_BasicFunction, L"fore:#FF0080" },
+	{ MULTI_STYLE(SCE_SQL_COMMENT, SCE_SQL_COMMENTLINE, SCE_SQL_COMMENTLINEDOC, 0), NP2StyleX_Comment, L"fore:#608060" },
+	{ MULTI_STYLE(SCE_SQL_STRING, SCE_SQL_CHARACTER, 0, 0), NP2StyleX_String, L"fore:#008000" },
+	{ SCE_SQL_ESCAPECHAR, NP2StyleX_EscapeSequence, L"fore:#0080C0" },
+	{ SCE_SQL_NUMBER, NP2StyleX_Number, L"fore:#FF0000" },
+	{ MULTI_STYLE(SCE_SQL_HEX, SCE_SQL_HEX2, 0, 0), NP2StyleX_BlobHex, L"fore:#C08000" },
+	{ MULTI_STYLE(SCE_SQL_BIT, SCE_SQL_BIT2, 0, 0), NP2StyleX_BitField, L"fore:#C08000" },
+	{ SCE_SQL_VARIABLE, NP2StyleX_Variable, L"fore:#9E4D2A" },
+	{ MULTI_STYLE(SCE_SQL_OPERATOR, SCE_SQL_QOPERATOR, 0, 0), NP2StyleX_Operator, L"fore:#B000B0" },
 };
 
 EDITLEXER lexSQL = {

@@ -1,5 +1,5 @@
 #include "EditLexer.h"
-#include "EditStyle.h"
+#include "EditStyleX.h"
 
 // https://www.scala-lang.org/index.html
 
@@ -40,22 +40,22 @@ NULL
 
 static EDITSTYLE Styles_Scala[] = {
 	EDITSTYLE_DEFAULT,
-	{ SCE_C_WORD, NP2STYLE_Keyword, EDITSTYLE_HOLE(L"Keyword"), L"fore:#0000FF" },
-	{ SCE_C_WORD2, NP2STYLE_TypeKeyword, EDITSTYLE_HOLE(L"Type Keyword"), L"fore:#0000FF" },
-	{ SCE_C_DIRECTIVE, NP2STYLE_Annotation, EDITSTYLE_HOLE(L"Annotation"), L"fore:#FF8000" },
-	{ SCE_C_CLASS, NP2STYLE_Class, EDITSTYLE_HOLE(L"Class"), L"fore:#0080FF" },
-	{ SCE_C_TRAIT, NP2STYLE_Trait, EDITSTYLE_HOLE(L"Trait"), L"bold; fore:#007F7F" },
-	{ SCE_C_FUNCTION, NP2STYLE_Method, EDITSTYLE_HOLE(L"Method"), L"fore:#A46000" },
-	{ MULTI_STYLE(SCE_C_COMMENT, SCE_C_COMMENTLINE, 0, 0), NP2STYLE_Comment, EDITSTYLE_HOLE(L"Comment"), L"fore:#608060" },
-	{ SCE_C_COMMENTDOC_TAG, NP2STYLE_DocCommentTag, EDITSTYLE_HOLE(L"Doc Comment Tag"), L"fore:#408080" },
-	{ MULTI_STYLE(SCE_C_COMMENTDOC, SCE_C_COMMENTLINEDOC, SCE_C_COMMENTDOC_TAG_XML, 0), NP2STYLE_DocComment, EDITSTYLE_HOLE(L"Doc Comment"), L"fore:#408040" },
-	{ MULTI_STYLE(SCE_C_STRING, SCE_C_CHARACTER, SCE_C_STRINGEOL, 0), NP2STYLE_String, EDITSTYLE_HOLE(L"String"), L"fore:#008000" },
-	{ SCE_C_TRIPLEVERBATIM, NP2STYLE_TripleQuotedString, EDITSTYLE_HOLE(L"Triple Quoted String"), L"fore:#F08000" },
-	{ SCE_C_NUMBER, NP2STYLE_Number, EDITSTYLE_HOLE(L"Number"), L"fore:#FF0000" },
-	{ SCE_C_OPERATOR, NP2STYLE_Operator, EDITSTYLE_HOLE(L"Operator"), L"fore:#B000B0" },
-	{ MULTI_STYLE(SCE_C_XML_TAG, SCE_C_XML_ASSIGN, 0, 0), NP2STYLE_XMLTag, EDITSTYLE_HOLE(L"XML Tag"), L"fore:#648000" },
-	{ SCE_C_XML_ATTR, NP2STYLE_XMLAttribute, EDITSTYLE_HOLE(L"XML Attribute"), L"fore:#FF0000" },
-	{ SCE_C_XML_VALUE, NP2STYLE_XMLValue, EDITSTYLE_HOLE(L"XML Value"), L"fore:#1A1AA6" },
+	{ SCE_C_WORD, NP2StyleX_Keyword, L"fore:#0000FF" },
+	{ SCE_C_WORD2, NP2StyleX_TypeKeyword, L"fore:#0000FF" },
+	{ SCE_C_DIRECTIVE, NP2StyleX_Annotation, L"fore:#FF8000" },
+	{ SCE_C_CLASS, NP2StyleX_Class, L"fore:#0080FF" },
+	{ SCE_C_TRAIT, NP2StyleX_Trait, L"bold; fore:#007F7F" },
+	{ SCE_C_FUNCTION, NP2StyleX_Method, L"fore:#A46000" },
+	{ MULTI_STYLE(SCE_C_COMMENT, SCE_C_COMMENTLINE, 0, 0), NP2StyleX_Comment, L"fore:#608060" },
+	{ SCE_C_COMMENTDOC_TAG, NP2StyleX_DocCommentTag, L"fore:#408080" },
+	{ MULTI_STYLE(SCE_C_COMMENTDOC, SCE_C_COMMENTLINEDOC, SCE_C_COMMENTDOC_TAG_XML, 0), NP2StyleX_DocComment, L"fore:#408040" },
+	{ MULTI_STYLE(SCE_C_STRING, SCE_C_CHARACTER, SCE_C_STRINGEOL, 0), NP2StyleX_String, L"fore:#008000" },
+	{ SCE_C_TRIPLEVERBATIM, NP2StyleX_TripleQuotedString, L"fore:#F08000" },
+	{ SCE_C_NUMBER, NP2StyleX_Number, L"fore:#FF0000" },
+	{ SCE_C_OPERATOR, NP2StyleX_Operator, L"fore:#B000B0" },
+	{ MULTI_STYLE(SCE_C_XML_TAG, SCE_C_XML_ASSIGN, 0, 0), NP2StyleX_XMLTag, L"fore:#648000" },
+	{ SCE_C_XML_ATTR, NP2StyleX_XMLAttribute, L"fore:#FF0000" },
+	{ SCE_C_XML_VALUE, NP2StyleX_XMLValue, L"fore:#1A1AA6" },
 };
 
 EDITLEXER lexScala = {

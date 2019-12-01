@@ -1,5 +1,5 @@
 #include "EditLexer.h"
-#include "EditStyle.h"
+#include "EditStyleX.h"
 
 // https://en.wikipedia.org/wiki/Pascal_%28programming_language%29
 // https://en.wikipedia.org/wiki/Delphi_(programming_language)
@@ -27,16 +27,16 @@ static KEYWORDLIST Keywords_Pascal = {{
 
 static EDITSTYLE Styles_Pascal[] = {
 	EDITSTYLE_DEFAULT,
-	{ SCE_PAS_WORD, NP2STYLE_Keyword, EDITSTYLE_HOLE(L"Keyword"), L"bold; fore:#FF8000" },
-	{ SCE_PAS_TYPE, NP2STYLE_TypeKeyword, EDITSTYLE_HOLE(L"Type Keyword"), L"bold; fore:#1E90FF" },
-	{ SCE_PAS_FUNCTION, NP2STYLE_BasicFunction, EDITSTYLE_HOLE(L"Basic Function"), L"fore:#0080FF" },
-	{ SCE_PAS_FUNCTION, NP2STYLE_Function, EDITSTYLE_HOLE(L"Function"), L"fore:#A46000" },
-	{ MULTI_STYLE(SCE_PAS_PREPROCESSOR, SCE_PAS_PREPROCESSOR2, 0, 0), NP2STYLE_Preprocessor, EDITSTYLE_HOLE(L"Preprocessor"), L"fore:#FF00FF" },
-	{ MULTI_STYLE(SCE_PAS_COMMENT, SCE_PAS_COMMENT2, SCE_PAS_COMMENTLINE, 0), NP2STYLE_Comment, EDITSTYLE_HOLE(L"Comment"), L"fore:#608060" },
-	{ MULTI_STYLE(SCE_PAS_STRING, SCE_PAS_CHARACTER, SCE_PAS_STRINGEOL, 0), NP2STYLE_String, EDITSTYLE_HOLE(L"String"), L"fore:#008000" },
-	{ MULTI_STYLE(SCE_PAS_NUMBER, SCE_PAS_HEXNUMBER, 0, 0), NP2STYLE_Number, EDITSTYLE_HOLE(L"Number"), L"fore:#FF0000" },
-	{ SCE_PAS_OPERATOR, NP2STYLE_Operator, EDITSTYLE_HOLE(L"Operator"), L"fore:#B000B0" },
-	{ SCE_PAS_ASM, NP2STYLE_InlineAsm, EDITSTYLE_HOLE(L"Inline Asm"), L"#fore:#408080" },
+	{ SCE_PAS_WORD, NP2StyleX_Keyword, L"bold; fore:#FF8000" },
+	{ SCE_PAS_TYPE, NP2StyleX_TypeKeyword, L"bold; fore:#1E90FF" },
+	{ SCE_PAS_FUNCTION, NP2StyleX_BasicFunction, L"fore:#0080FF" },
+	{ SCE_PAS_FUNCTION, NP2StyleX_Function, L"fore:#A46000" },
+	{ MULTI_STYLE(SCE_PAS_PREPROCESSOR, SCE_PAS_PREPROCESSOR2, 0, 0), NP2StyleX_Preprocessor, L"fore:#FF00FF" },
+	{ MULTI_STYLE(SCE_PAS_COMMENT, SCE_PAS_COMMENT2, SCE_PAS_COMMENTLINE, 0), NP2StyleX_Comment, L"fore:#608060" },
+	{ MULTI_STYLE(SCE_PAS_STRING, SCE_PAS_CHARACTER, SCE_PAS_STRINGEOL, 0), NP2StyleX_String, L"fore:#008000" },
+	{ MULTI_STYLE(SCE_PAS_NUMBER, SCE_PAS_HEXNUMBER, 0, 0), NP2StyleX_Number, L"fore:#FF0000" },
+	{ SCE_PAS_OPERATOR, NP2StyleX_Operator, L"fore:#B000B0" },
+	{ SCE_PAS_ASM, NP2StyleX_InlineAsm, L"#fore:#408080" },
 };
 
 EDITLEXER lexPascal = {

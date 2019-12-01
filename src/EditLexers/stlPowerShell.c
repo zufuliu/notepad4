@@ -1,5 +1,5 @@
 #include "EditLexer.h"
-#include "EditStyle.h"
+#include "EditStyleX.h"
 
 // https://en.wikipedia.org/wiki/PowerShell
 // https://docs.microsoft.com/en-us/powershell/scripting/powershell-scripting
@@ -66,14 +66,14 @@ static KEYWORDLIST Keywords_PS1 = {{
 
 static EDITSTYLE Styles_PS1[] = {
 	EDITSTYLE_DEFAULT,
-	{ MULTI_STYLE(SCE_POWERSHELL_COMMENT, SCE_POWERSHELL_COMMENTSTREAM, 0, 0), NP2STYLE_Comment, EDITSTYLE_HOLE(L"Comment"), L"fore:#608060" },
-	{ SCE_POWERSHELL_KEYWORD, NP2STYLE_Keyword, EDITSTYLE_HOLE(L"Keyword"), L"bold; fore:#FF8000" },
-	{ MULTI_STYLE(SCE_POWERSHELL_STRING, SCE_POWERSHELL_CHARACTER, 0, 0), NP2STYLE_String, EDITSTYLE_HOLE(L"String"), L"fore:#008000" },
-	{ SCE_POWERSHELL_NUMBER, NP2STYLE_Number, EDITSTYLE_HOLE(L"Number"), L"fore:#FF0000" },
-	{ SCE_POWERSHELL_OPERATOR, NP2STYLE_Operator, EDITSTYLE_HOLE(L"Operator"), L"fore:#B000B0" },
-	{ SCE_POWERSHELL_VARIABLE, NP2STYLE_Variable, EDITSTYLE_HOLE(L"Variable"), L"fore:#003CE6" },
-	{ MULTI_STYLE(SCE_POWERSHELL_CMDLET, SCE_POWERSHELL_FUNCTION, 0, 0), NP2STYLE_Cmdlet, EDITSTYLE_HOLE(L"Cmdlet"), L"fore:#804000; back:#FFF1A8" },
-	{ SCE_POWERSHELL_ALIAS, NP2STYLE_Alias, EDITSTYLE_HOLE(L"Alias"), L"bold; fore:#0080C0" },
+	{ MULTI_STYLE(SCE_POWERSHELL_COMMENT, SCE_POWERSHELL_COMMENTSTREAM, 0, 0), NP2StyleX_Comment, L"fore:#608060" },
+	{ SCE_POWERSHELL_KEYWORD, NP2StyleX_Keyword, L"bold; fore:#FF8000" },
+	{ MULTI_STYLE(SCE_POWERSHELL_STRING, SCE_POWERSHELL_CHARACTER, 0, 0), NP2StyleX_String, L"fore:#008000" },
+	{ SCE_POWERSHELL_NUMBER, NP2StyleX_Number, L"fore:#FF0000" },
+	{ SCE_POWERSHELL_OPERATOR, NP2StyleX_Operator, L"fore:#B000B0" },
+	{ SCE_POWERSHELL_VARIABLE, NP2StyleX_Variable, L"fore:#003CE6" },
+	{ MULTI_STYLE(SCE_POWERSHELL_CMDLET, SCE_POWERSHELL_FUNCTION, 0, 0), NP2StyleX_Cmdlet, L"fore:#804000; back:#FFF1A8" },
+	{ SCE_POWERSHELL_ALIAS, NP2StyleX_Alias, L"bold; fore:#0080C0" },
 };
 
 EDITLEXER lexPS1 = {

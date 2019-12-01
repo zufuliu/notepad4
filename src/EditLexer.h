@@ -5,7 +5,6 @@
 #include "Scintilla.h"
 #include "SciLexer.h"
 
-#define	MULTI_STYLE(a, b, c, d)	((a) | ((b) << 8) | ((c) << 16) | ((d) << 24))
 #define	NUMKEYWORD				(KEYWORDSET_MAX + 1)
 
 #define MAX_EDITSTYLE_VALUE_SIZE	256
@@ -31,8 +30,8 @@ typedef unsigned char BYTE;
 
 typedef struct _editstyle {
 	const int iStyle;
-	const int rid;
 	struct {
+		const int rid;
 		const int iNameLen;
 		LPCWSTR const pszName;
 		LPWSTR szValue;
@@ -40,9 +39,6 @@ typedef struct _editstyle {
 	LPCWSTR const pszDefault;
 } EDITSTYLE, *PEDITSTYLE;
 
-#define EDITSTYLE_HOLE(name)	{ CSTRLEN(name), (name), NULL }
-#define EDITSTYLE_DEFAULT 		{ STYLE_DEFAULT, NP2STYLE_Default, EDITSTYLE_HOLE(L"Default"), L"" }
-//#define EDITSTYLE_SENTINEL 		{ 0, 0, { 0, NULL, NULL }, NULL }
 #define EDITSTYLE_BufferSize(iStyleCount)	((iStyleCount) * MAX_EDITSTYLE_VALUE_SIZE * sizeof(WCHAR))
 
 // Not used by Scintilla lexer, listed for auto completion.
@@ -76,9 +72,6 @@ typedef struct _editlexer {
 } EDITLEXER, *PEDITLEXER;
 
 typedef const EDITLEXER *LPCEDITLEXER;
-
-#define EDITLEXER_HOLE(name, style)	{ StyleTheme_Default, 0, 1, 1, COUNTOF(style), CSTRLEN(name), (name), NULL, NULL }
-#define EDITLEXER_TEXT(name, style)	{ StyleTheme_Default, 0, 0, 0, COUNTOF(style), CSTRLEN(name), (name), NULL, NULL }
 
 #endif  // !RC_INVOKED
 
