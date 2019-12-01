@@ -68,10 +68,10 @@ extern LPMRULIST mruFind;
 extern LPMRULIST mruReplace;
 extern WCHAR szCurFile[MAX_PATH + 40];
 
-static DString wchPrefixSelection;
-static DString wchAppendSelection;
-static DString wchPrefixLines;
-static DString wchAppendLines;
+static DStringW wchPrefixSelection;
+static DStringW wchAppendSelection;
+static DStringW wchPrefixLines;
+static DStringW wchAppendLines;
 
 #define MAX_NON_UTF8_SIZE	(UINT_MAX/2 - 16)
 
@@ -82,10 +82,10 @@ static struct EditMarkAllStatus {
 } editMarkAllStatus;
 
 void Edit_ReleaseResources(void) {
-	DString_Free(&wchPrefixSelection);
-	DString_Free(&wchAppendSelection);
-	DString_Free(&wchPrefixLines);
-	DString_Free(&wchAppendLines);
+	DStringW_Free(&wchPrefixSelection);
+	DStringW_Free(&wchAppendSelection);
+	DStringW_Free(&wchPrefixLines);
+	DStringW_Free(&wchAppendLines);
 	if (editMarkAllStatus.pszText) {
 		NP2HeapFree(editMarkAllStatus.pszText);
 	}
@@ -5931,8 +5931,8 @@ static INT_PTR CALLBACK EditModifyLinesDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 	case WM_COMMAND:
 		switch (LOWORD(wParam)) {
 		case IDOK: {
-			DString_GetDlgItemText(&wchPrefixLines, hwnd, IDC_MODIFY_LINE_PREFIX);
-			DString_GetDlgItemText(&wchAppendLines, hwnd, IDC_MODIFY_LINE_APPEND);
+			DStringW_GetDlgItemText(&wchPrefixLines, hwnd, IDC_MODIFY_LINE_PREFIX);
+			DStringW_GetDlgItemText(&wchAppendLines, hwnd, IDC_MODIFY_LINE_APPEND);
 
 			EditModifyLines(wchPrefixLines.buffer, wchAppendLines.buffer);
 			EndDialog(hwnd, IDOK);
@@ -6048,8 +6048,8 @@ static INT_PTR CALLBACK EditEncloseSelectionDlgProc(HWND hwnd, UINT umsg, WPARAM
 	case WM_COMMAND:
 		switch (LOWORD(wParam)) {
 		case IDOK: {
-			DString_GetDlgItemText(&wchPrefixSelection, hwnd, IDC_MODIFY_LINE_PREFIX);
-			DString_GetDlgItemText(&wchAppendSelection, hwnd, IDC_MODIFY_LINE_APPEND);
+			DStringW_GetDlgItemText(&wchPrefixSelection, hwnd, IDC_MODIFY_LINE_PREFIX);
+			DStringW_GetDlgItemText(&wchAppendSelection, hwnd, IDC_MODIFY_LINE_APPEND);
 
 			EditEncloseSelection(wchPrefixSelection.buffer, wchAppendSelection.buffer);
 			EndDialog(hwnd, IDOK);
@@ -6125,10 +6125,10 @@ static INT_PTR CALLBACK EditInsertTagDlgProc(HWND hwnd, UINT umsg, WPARAM wParam
 		switch (LOWORD(wParam)) {
 		case IDC_MODIFY_LINE_PREFIX: {
 			if (HIWORD(wParam) == EN_CHANGE) {
-				DString wszOpen = { NULL, 0 };
+				DStringW wszOpen = DSTRINGW_INIT;
 				BOOL bClear = TRUE;
 
-				DString_GetDlgItemText(&wszOpen, hwnd, IDC_MODIFY_LINE_PREFIX);
+				DStringW_GetDlgItemText(&wszOpen, hwnd, IDC_MODIFY_LINE_PREFIX);
 				const int len = lstrlen(wszOpen.buffer);
 				if (len >= 3) {
 					LPCWSTR pwsz1 = StrChr(wszOpen.buffer, L'<');
@@ -6179,20 +6179,20 @@ static INT_PTR CALLBACK EditInsertTagDlgProc(HWND hwnd, UINT umsg, WPARAM wParam
 				if (bClear) {
 					SetDlgItemText(hwnd, IDC_MODIFY_LINE_APPEND, L"");
 				}
-				DString_Free(&wszOpen);
+				DStringW_Free(&wszOpen);
 			}
 		}
 		break;
 
 		case IDOK: {
-			DString wszOpen = { NULL, 0 };
-			DString wszClose = { NULL, 0 };
-			DString_GetDlgItemText(&wszOpen, hwnd, IDC_MODIFY_LINE_PREFIX);
-			DString_GetDlgItemText(&wszClose, hwnd, IDC_MODIFY_LINE_APPEND);
+			DStringW wszOpen = DSTRINGW_INIT;
+			DStringW wszClose = DSTRINGW_INIT;
+			DStringW_GetDlgItemText(&wszOpen, hwnd, IDC_MODIFY_LINE_PREFIX);
+			DStringW_GetDlgItemText(&wszClose, hwnd, IDC_MODIFY_LINE_APPEND);
 
 			EditEncloseSelection(wszOpen.buffer, wszClose.buffer);
-			DString_Free(&wszOpen);
-			DString_Free(&wszClose);
+			DStringW_Free(&wszOpen);
+			DStringW_Free(&wszClose);
 			EndDialog(hwnd, IDOK);
 		}
 		break;

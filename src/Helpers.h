@@ -417,20 +417,22 @@ NP2_inline void IniSectionSetBoolEx(IniSectionOnSave *section, LPCWSTR key, BOOL
 	}
 }
 
-typedef struct DString {
+typedef struct DStringW {
 	LPWSTR buffer;
 	INT capacity;
-} DString;
+} DStringW;
 
-static inline void DString_Free(DString *s) {
+#define DSTRINGW_INIT	{ NULL, 0 };
+
+NP2_inline void DStringW_Free(DStringW *s) {
 	if (s->buffer) {
 		NP2HeapFree(s->buffer);
 	}
 }
 
-int DString_GetWindowText(DString *s, HWND hwnd);
-NP2_inline int DString_GetDlgItemText(DString *s, HWND hwndDlg, int nCtlId) {
-	return DString_GetWindowText(s, GetDlgItem(hwndDlg, nCtlId));
+int DStringW_GetWindowText(DStringW *s, HWND hwnd);
+NP2_inline int DStringW_GetDlgItemText(DStringW *s, HWND hwndDlg, int nCtlId) {
+	return DStringW_GetWindowText(s, GetDlgItem(hwndDlg, nCtlId));
 }
 
 NP2_inline BOOL KeyboardIsKeyDown(int key) {

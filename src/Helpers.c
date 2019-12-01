@@ -243,7 +243,7 @@ void IniSectionSetString(IniSectionOnSave *section, LPCWSTR key, LPCWSTR value) 
 	section->next = p;
 }
 
-int DString_GetWindowText(DString *s, HWND hwnd) {
+int DStringW_GetWindowText(DStringW *s, HWND hwnd) {
 	int len = GetWindowTextLength(hwnd);
 	if (len == 0) {
 		if (s->buffer != NULL) {
@@ -1924,13 +1924,13 @@ BOOL SetDlgItemIntEx(HWND hwnd, int nIdItem, UINT uValue) {
 // A2W: Convert Dialog Item Text form Unicode to UTF-8 and vice versa
 //
 UINT GetDlgItemTextA2W(UINT uCP, HWND hDlg, int nIDDlgItem, LPSTR lpString, int nMaxCount) {
-	DString wsz = { NULL, 0 };
-	const int iRet = DString_GetDlgItemText(&wsz, hDlg, nIDDlgItem);
+	DStringW wsz = DSTRINGW_INIT;
+	const int iRet = DStringW_GetDlgItemText(&wsz, hDlg, nIDDlgItem);
 	ZeroMemory(lpString, nMaxCount);
 	if (iRet) {
 		WideCharToMultiByte(uCP, 0, wsz.buffer, -1, lpString, nMaxCount - 2, NULL, NULL);
 	}
-	DString_Free(&wsz);
+	DStringW_Free(&wsz);
 	return iRet;
 }
 
