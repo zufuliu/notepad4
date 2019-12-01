@@ -1,5 +1,5 @@
 #include "EditLexer.h"
-#include "EditStyle.h"
+#include "EditStyleX.h"
 
 // https://en.wikipedia.org/wiki/F_Sharp_(programming_language)
 // https://fsharp.org/
@@ -31,16 +31,16 @@ static KEYWORDLIST Keywords_FSharp = {{
 
 static EDITSTYLE Styles_FSharp[] = {
 	EDITSTYLE_DEFAULT,
-	{ SCE_FSHARP_KEYWORD, NP2STYLE_Keyword, EDITSTYLE_HOLE(L"Keyword"), L"fore:#0000FF" },
-	{ SCE_FSHARP_TYPEKEYWORD, NP2STYLE_TypeKeyword, EDITSTYLE_HOLE(L"Type Keyword"), L"fore:#1E90FF" },
-	{ SCE_FSHARP_PREPROCESSOR, NP2STYLE_Preprocessor, EDITSTYLE_HOLE(L"Preprocessor"), L"fore:#FF8000" },
-	{ SCE_FSHARP_ATTRIBUTE, NP2STYLE_Attribute, EDITSTYLE_HOLE(L"Attribute"), L"fore:#FF8000" },
-	{ MULTI_STYLE(SCE_FSHARP_COMMENT, SCE_FSHARP_COMMENTLINE, 0, 0), NP2STYLE_Comment, EDITSTYLE_HOLE(L"Comment"), L"fore:#608060" },
-	{ MULTI_STYLE(SCE_FSHARP_STRING, SCE_FSHARP_STRINGEOL, SCE_FSHARP_CHARACTER, 0), NP2STYLE_String, EDITSTYLE_HOLE(L"String"), L"fore:#008000" },
-	{ SCE_FSHARP_VERBATIM, NP2STYLE_VerbatimString, EDITSTYLE_HOLE(L"Verbatim String"), L"fore:#008080" },
-	{ SCE_FSHARP_QUOTATION, NP2STYLE_CodeQuotation, EDITSTYLE_HOLE(L"Code Quotation"), L"fore:#006633; back:#FFF1A8" },
-	{ SCE_FSHARP_NUMBER, NP2STYLE_Number, EDITSTYLE_HOLE(L"Number"), L"fore:#FF0000" },
-	{ SCE_FSHARP_OPERATOR, NP2STYLE_Operator, EDITSTYLE_HOLE(L"Operator"), L"fore:#B000B0" },
+	{ SCE_FSHARP_KEYWORD, NP2StyleX_Keyword, L"fore:#0000FF" },
+	{ SCE_FSHARP_TYPEKEYWORD, NP2StyleX_TypeKeyword, L"fore:#1E90FF" },
+	{ SCE_FSHARP_PREPROCESSOR, NP2StyleX_Preprocessor, L"fore:#FF8000" },
+	{ SCE_FSHARP_ATTRIBUTE, NP2StyleX_Attribute, L"fore:#FF8000" },
+	{ MULTI_STYLE(SCE_FSHARP_COMMENT, SCE_FSHARP_COMMENTLINE, 0, 0), NP2StyleX_Comment, L"fore:#608060" },
+	{ MULTI_STYLE(SCE_FSHARP_STRING, SCE_FSHARP_STRINGEOL, SCE_FSHARP_CHARACTER, 0), NP2StyleX_String, L"fore:#008000" },
+	{ SCE_FSHARP_VERBATIM, NP2StyleX_VerbatimString, L"fore:#008080" },
+	{ SCE_FSHARP_QUOTATION, NP2StyleX_CodeQuotation, L"fore:#006633; back:#FFF1A8" },
+	{ SCE_FSHARP_NUMBER, NP2StyleX_Number, L"fore:#FF0000" },
+	{ SCE_FSHARP_OPERATOR, NP2StyleX_Operator, L"fore:#B000B0" },
 };
 
 EDITLEXER lexFSharp = {

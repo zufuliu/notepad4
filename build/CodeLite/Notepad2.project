@@ -235,6 +235,7 @@
     <File Name="../../src/Edit.h"/>
     <File Name="../../src/EditLexer.h"/>
     <File Name="../../src/EditLexers/EditStyle.h"/>
+    <File Name="../../src/EditLexers/EditStyleX.h"/>
     <File Name="../../src/Helpers.h"/>
     <File Name="../../src/Notepad2.h"/>
     <File Name="../../src/resource.h"/>

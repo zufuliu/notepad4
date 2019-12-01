@@ -1,5 +1,5 @@
 #include "EditLexer.h"
-#include "EditStyle.h"
+#include "EditStyleX.h"
 
 // https://www.mathworks.com/help/pdf_doc/matlab/matlab_prog.pdf
 // https://www.mathworks.com/help/matlab/matlab_oop/specifying-attributes.html
@@ -39,16 +39,16 @@ static KEYWORDLIST Keywords_Matlab = {{
 
 static EDITSTYLE Styles_Matlab[] = {
 	EDITSTYLE_DEFAULT,
-	{ SCE_MAT_KEYWORD, NP2STYLE_Keyword, EDITSTYLE_HOLE(L"Keyword"), L"fore:#0000FF" },
-	{ SCE_MAT_ATTRIBUTE, NP2STYLE_Attribute, EDITSTYLE_HOLE(L"Attribte"), L"fore:#FF8000" },
-	{ MULTI_STYLE(SCE_MAT_INTERNALCOMMAND, SCE_MAT_COMMAND, 0, 0), NP2STYLE_Command, EDITSTYLE_HOLE(L"Command"), L"bold; fore:#FF8000" },
-	{ MULTI_STYLE(SCE_MAT_FUNCTION1, SCE_MAT_FUNCTION2, 0, 0), NP2STYLE_BasicFunction, EDITSTYLE_HOLE(L"Basic Function"), L"fore:#FF0080" },
-	{ SCE_MAT_FUNCTION, NP2STYLE_Function, EDITSTYLE_HOLE(L"Function"), L"fore:#A46000" },
-	{ SCE_MAT_CALLBACK, NP2STYLE_Callback, EDITSTYLE_HOLE(L"Callback"), L"fore:#FF0080" },
-	{ MULTI_STYLE(SCE_MAT_COMMENT, SCE_MAT_COMMENTBLOCK, 0, 0), NP2STYLE_Comment, EDITSTYLE_HOLE(L"Comment"), L"fore:#608060" },
-	{ MULTI_STYLE(SCE_MAT_STRING, SCE_MAT_DOUBLEQUOTESTRING, 0, 0), NP2STYLE_String, EDITSTYLE_HOLE(L"String"), L"fore:#008000" },
-	{ MULTI_STYLE(SCE_MAT_NUMBER, SCE_MAT_HEXNUM, 0, 0), NP2STYLE_Number, EDITSTYLE_HOLE(L"Number"), L"fore:#FF0000" },
-	{ SCE_MAT_OPERATOR, NP2STYLE_Operator, EDITSTYLE_HOLE(L"Operator"), L"fore:#B000B0" },
+	{ SCE_MAT_KEYWORD, NP2StyleX_Keyword, L"fore:#0000FF" },
+	{ SCE_MAT_ATTRIBUTE, NP2StyleX_Attribute, L"fore:#FF8000" },
+	{ MULTI_STYLE(SCE_MAT_INTERNALCOMMAND, SCE_MAT_COMMAND, 0, 0), NP2StyleX_Command, L"bold; fore:#FF8000" },
+	{ MULTI_STYLE(SCE_MAT_FUNCTION1, SCE_MAT_FUNCTION2, 0, 0), NP2StyleX_BasicFunction, L"fore:#FF0080" },
+	{ SCE_MAT_FUNCTION, NP2StyleX_Function, L"fore:#A46000" },
+	{ SCE_MAT_CALLBACK, NP2StyleX_Callback, L"fore:#FF0080" },
+	{ MULTI_STYLE(SCE_MAT_COMMENT, SCE_MAT_COMMENTBLOCK, 0, 0), NP2StyleX_Comment, L"fore:#608060" },
+	{ MULTI_STYLE(SCE_MAT_STRING, SCE_MAT_DOUBLEQUOTESTRING, 0, 0), NP2StyleX_String, L"fore:#008000" },
+	{ MULTI_STYLE(SCE_MAT_NUMBER, SCE_MAT_HEXNUM, 0, 0), NP2StyleX_Number, L"fore:#FF0000" },
+	{ SCE_MAT_OPERATOR, NP2StyleX_Operator, L"fore:#B000B0" },
 };
 
 EDITLEXER lexMatlab = {

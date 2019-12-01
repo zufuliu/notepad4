@@ -1,5 +1,5 @@
 #include "EditLexer.h"
-#include "EditStyle.h"
+#include "EditStyleX.h"
 
 // https://docs.microsoft.com/en-us/cpp/build/nmake-reference
 // https://www.gnu.org/software/make/
@@ -50,12 +50,12 @@ static KEYWORDLIST Keywords_MAK = {{
 
 static EDITSTYLE Styles_MAK[] = {
 	EDITSTYLE_DEFAULT,
-	{ SCE_MAKE_COMMENT, NP2STYLE_Comment, EDITSTYLE_HOLE(L"Comment"), L"fore:#008000" },
-	{ SCE_MAKE_PREPROCESSOR, NP2STYLE_Preprocessor, EDITSTYLE_HOLE(L"Preprocessor"), L"fore:#FF8000" },
-	{ SCE_MAKE_FUNCTION, NP2STYLE_Function, EDITSTYLE_HOLE(L"Function"), L"fore:#FF8000" },
-	{ MULTI_STYLE(SCE_MAKE_VARIABLE, SCE_MAKE_VARIABLE2, SCE_MAKE_VARIABLE3, 0), NP2STYLE_Variable, EDITSTYLE_HOLE(L"Variable"), L"fore:#003CE6" },
-	{ SCE_MAKE_OPERATOR, NP2STYLE_Operator, EDITSTYLE_HOLE(L"Operator"), L"fore:#B000B0" },
-	{ SCE_MAKE_TARGET, NP2STYLE_Target, EDITSTYLE_HOLE(L"Target"), L"fore:#003CE6; back:#FFC000" },
+	{ SCE_MAKE_COMMENT, NP2StyleX_Comment, L"fore:#008000" },
+	{ SCE_MAKE_PREPROCESSOR, NP2StyleX_Preprocessor, L"fore:#FF8000" },
+	{ SCE_MAKE_FUNCTION, NP2StyleX_Function, L"fore:#FF8000" },
+	{ MULTI_STYLE(SCE_MAKE_VARIABLE, SCE_MAKE_VARIABLE2, SCE_MAKE_VARIABLE3, 0), NP2StyleX_Variable, L"fore:#003CE6" },
+	{ SCE_MAKE_OPERATOR, NP2StyleX_Operator, L"fore:#B000B0" },
+	{ SCE_MAKE_TARGET, NP2StyleX_Target, L"fore:#003CE6; back:#FFC000" },
 };
 
 EDITLEXER lexMake = {

@@ -1,5 +1,5 @@
 #include "EditLexer.h"
-#include "EditStyle.h"
+#include "EditStyleX.h"
 
 // https://en.wikipedia.org/wiki/Almquist_shell
 // https://en.wikipedia.org/wiki/Bourne_shell
@@ -44,18 +44,18 @@ static KEYWORDLIST Keywords_Bash = {{
 
 static EDITSTYLE Styles_Bash[] = {
 	EDITSTYLE_DEFAULT,
-	{ MULTI_STYLE(SCE_SH_COMMENTLINE, 0, 0, 0), NP2STYLE_Comment, EDITSTYLE_HOLE(L"Comment"), L"fore:#608060" },
-	{ SCE_SH_WORD, NP2STYLE_Keyword, EDITSTYLE_HOLE(L"Keyword"), L"bold; fore:#FF8000" },
-	{ SCE_SH_STRING, NP2STYLE_DoubleQuotedString, EDITSTYLE_HOLE(L"Double Quoted String"), L"fore:#008080" },
-	{ SCE_SH_CHARACTER, NP2STYLE_SingleQuotedString, EDITSTYLE_HOLE(L"Single Quoted String"), L"fore:#800080" },
-	{ SCE_SH_NUMBER, NP2STYLE_Number, EDITSTYLE_HOLE(L"Number"), L"fore:#FF0000" },
-	{ SCE_SH_OPERATOR, NP2STYLE_Operator, EDITSTYLE_HOLE(L"Operator"), L"fore:#B000B0" },
-	{ SCE_SH_SCALAR, NP2STYLE_ScalarVar, EDITSTYLE_HOLE(L"Scalar $var"), L"fore:#808000" },
-	{ SCE_SH_PARAM, NP2STYLE_ParameterExpansion, EDITSTYLE_HOLE(L"Parameter Expansion"), L"fore:#808000; back:#FFFF99" },
-	{ SCE_SH_BACKTICKS, NP2STYLE_Backticks, EDITSTYLE_HOLE(L"Backticks"), L"fore:#FF0080" },
-	{ SCE_SH_HERE_DELIM, NP2STYLE_HeredocDelimiter, EDITSTYLE_HOLE(L"Here-doc (Delimiter)"), L"fore:#A46000; back:#FFFFC0; eolfilled" },
-	{ SCE_SH_HERE_Q, NP2STYLE_HeredocSingleQuoted, EDITSTYLE_HOLE(L"Here-doc (Single Quoted, q)"), L"fore:#A46000; back:#FFFFC0; eolfilled" },
-	{ SCE_SH_ERROR, NP2STYLE_ParsingError, EDITSTYLE_HOLE(L"Parsing Error"), L"fore:#C80000; back:#FFFF80" },
+	{ MULTI_STYLE(SCE_SH_COMMENTLINE, 0, 0, 0), NP2StyleX_Comment, L"fore:#608060" },
+	{ SCE_SH_WORD, NP2StyleX_Keyword, L"bold; fore:#FF8000" },
+	{ SCE_SH_STRING, NP2StyleX_DoubleQuotedString, L"fore:#008080" },
+	{ SCE_SH_CHARACTER, NP2StyleX_SingleQuotedString, L"fore:#800080" },
+	{ SCE_SH_NUMBER, NP2StyleX_Number, L"fore:#FF0000" },
+	{ SCE_SH_OPERATOR, NP2StyleX_Operator, L"fore:#B000B0" },
+	{ SCE_SH_SCALAR, NP2StyleX_ScalarVar, L"fore:#808000" },
+	{ SCE_SH_PARAM, NP2StyleX_ParameterExpansion, L"fore:#808000; back:#FFFF99" },
+	{ SCE_SH_BACKTICKS, NP2StyleX_Backticks, L"fore:#FF0080" },
+	{ SCE_SH_HERE_DELIM, NP2StyleX_HeredocDelimiter, L"fore:#A46000; back:#FFFFC0; eolfilled" },
+	{ SCE_SH_HERE_Q, NP2StyleX_HeredocSingleQuoted, L"fore:#A46000; back:#FFFFC0; eolfilled" },
+	{ SCE_SH_ERROR, NP2StyleX_ParsingError, L"fore:#C80000; back:#FFFF80" },
 };
 
 EDITLEXER lexBash = {

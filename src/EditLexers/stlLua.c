@@ -1,5 +1,5 @@
 #include "EditLexer.h"
-#include "EditStyle.h"
+#include "EditStyleX.h"
 
 // https://en.wikipedia.org/wiki/Lua_(programming_language)
 // https://www.lua.org/
@@ -40,16 +40,16 @@ static KEYWORDLIST Keywords_Lua = {{
 
 static EDITSTYLE Styles_Lua[] = {
 	EDITSTYLE_DEFAULT,
-	{ SCE_LUA_WORD, NP2STYLE_Keyword, EDITSTYLE_HOLE(L"Keyword"), L"fore:#0000FF" },
-	{ SCE_LUA_WORD2, NP2STYLE_BasicFunction, EDITSTYLE_HOLE(L"Basic Function"), L"fore:#FF8000" },
-	{ SCE_LUA_WORD3, NP2STYLE_StringTableMathFunc, EDITSTYLE_HOLE(L"String, Table & Math Function"), L"fore:#FF0080" },
-	{ SCE_LUA_WORD4, NP2STYLE_IOSystemFacility, EDITSTYLE_HOLE(L"Input, Output & System Facility"), L"fore:#0080FF" },
-	{ SCE_LUA_FUNCTION, NP2STYLE_Function, EDITSTYLE_HOLE(L"Function"), L"fore:#A46000" },
-	{ MULTI_STYLE(SCE_LUA_COMMENT, SCE_LUA_COMMENTLINE, SCE_LUA_COMMENTDOC, 0), NP2STYLE_Comment, EDITSTYLE_HOLE(L"Comment"), L"fore:#608060" },
-	{ MULTI_STYLE(SCE_LUA_STRING, SCE_LUA_STRINGEOL, SCE_LUA_LITERALSTRING, SCE_LUA_CHARACTER), NP2STYLE_String, EDITSTYLE_HOLE(L"String"), L"fore:#008000" },
-	{ SCE_LUA_NUMBER, NP2STYLE_Number, EDITSTYLE_HOLE(L"Number"), L"fore:#FF0000" },
-	{ SCE_LUA_OPERATOR, NP2STYLE_Operator, EDITSTYLE_HOLE(L"Operator"), L"fore:#B000B0" },
-	{ SCE_LUA_PREPROCESSOR, NP2STYLE_Preprocessor, EDITSTYLE_HOLE(L"Preprocessor"), L"fore:#FF8000" },
+	{ SCE_LUA_WORD, NP2StyleX_Keyword, L"fore:#0000FF" },
+	{ SCE_LUA_WORD2, NP2StyleX_BasicFunction, L"fore:#FF8000" },
+	{ SCE_LUA_WORD3, NP2StyleX_StringTableMathFunc, L"fore:#FF0080" },
+	{ SCE_LUA_WORD4, NP2StyleX_IOSystemFacility, L"fore:#0080FF" },
+	{ SCE_LUA_FUNCTION, NP2StyleX_Function, L"fore:#A46000" },
+	{ MULTI_STYLE(SCE_LUA_COMMENT, SCE_LUA_COMMENTLINE, SCE_LUA_COMMENTDOC, 0), NP2StyleX_Comment, L"fore:#608060" },
+	{ MULTI_STYLE(SCE_LUA_STRING, SCE_LUA_STRINGEOL, SCE_LUA_LITERALSTRING, SCE_LUA_CHARACTER), NP2StyleX_String, L"fore:#008000" },
+	{ SCE_LUA_NUMBER, NP2StyleX_Number, L"fore:#FF0000" },
+	{ SCE_LUA_OPERATOR, NP2StyleX_Operator, L"fore:#B000B0" },
+	{ SCE_LUA_PREPROCESSOR, NP2StyleX_Preprocessor, L"fore:#FF8000" },
 };
 
 EDITLEXER lexLua = {

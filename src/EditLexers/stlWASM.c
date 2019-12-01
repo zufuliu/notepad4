@@ -1,5 +1,5 @@
 #include "EditLexer.h"
-#include "EditStyle.h"
+#include "EditStyleX.h"
 
 // http://webassembly.github.io/spec/core/text/index.html
 // https://github.com/WebAssembly/wabt
@@ -81,14 +81,14 @@ static KEYWORDLIST Keywords_WASM = {{
 
 static EDITSTYLE Styles_WASM[] = {
 	EDITSTYLE_DEFAULT,
-	{ SCE_WASM_KEYWORD, NP2STYLE_Keyword, EDITSTYLE_HOLE(L"Keyword"), L"fore:#FF8000" },
-	{ SCE_WASM_TYPE, NP2STYLE_Type, EDITSTYLE_HOLE(L"Type"), L"fore:#7C5AF3" },
-	{ SCE_WASM_INSTRUCTION, NP2STYLE_Instruction, EDITSTYLE_HOLE(L"Instruction"), L"fore:#0080FF" },
-	{ MULTI_STYLE(SCE_WASM_COMMENTLINE, SCE_WASM_COMMENTBLOCK, 0, 0), NP2STYLE_Comment, EDITSTYLE_HOLE(L"Comment"), L"fore:#608060" },
-	{ SCE_WASM_STRING, NP2STYLE_String, EDITSTYLE_HOLE(L"String"), L"fore:#008000" },
-	{ SCE_WASM_ESCAPECHAR, NP2STYLE_EscapeSequence, EDITSTYLE_HOLE(L"Escape Sequence"), L"fore:#0080C0" },
-	{ SCE_WASM_NUMBER, NP2STYLE_Number, EDITSTYLE_HOLE(L"Number"), L"fore:#FF0000" },
-	{ SCE_WASM_OPERATOR, NP2STYLE_Operator, EDITSTYLE_HOLE(L"Operator"), L"fore:#B000B0" },
+	{ SCE_WASM_KEYWORD, NP2StyleX_Keyword, L"fore:#FF8000" },
+	{ SCE_WASM_TYPE, NP2StyleX_Type, L"fore:#7C5AF3" },
+	{ SCE_WASM_INSTRUCTION, NP2StyleX_Instruction, L"fore:#0080FF" },
+	{ MULTI_STYLE(SCE_WASM_COMMENTLINE, SCE_WASM_COMMENTBLOCK, 0, 0), NP2StyleX_Comment, L"fore:#608060" },
+	{ SCE_WASM_STRING, NP2StyleX_String, L"fore:#008000" },
+	{ SCE_WASM_ESCAPECHAR, NP2StyleX_EscapeSequence, L"fore:#0080C0" },
+	{ SCE_WASM_NUMBER, NP2StyleX_Number, L"fore:#FF0000" },
+	{ SCE_WASM_OPERATOR, NP2StyleX_Operator, L"fore:#B000B0" },
 };
 
 EDITLEXER lexWASM = {

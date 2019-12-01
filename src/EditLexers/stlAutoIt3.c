@@ -1,5 +1,5 @@
 #include "EditLexer.h"
-#include "EditStyle.h"
+#include "EditStyleX.h"
 
 // https://www.autoitscript.com/site/autoit/
 
@@ -115,17 +115,17 @@ static KEYWORDLIST Keywords_AU3 = {{
 
 static EDITSTYLE Styles_AU3[] = {
 	EDITSTYLE_DEFAULT,
-	{ SCE_AU3_KEYWORD, NP2STYLE_Keyword, EDITSTYLE_HOLE(L"Keyword"), L"fore:#0000FF" },
-	{ SCE_AU3_FUNCTION, NP2STYLE_Function, EDITSTYLE_HOLE(L"Function"), L"fore:#0000FF" },
-	{ SCE_AU3_MACRO, NP2STYLE_Macro, EDITSTYLE_HOLE(L"Macro"), L"fore:#0080FF" },
-	{ MULTI_STYLE(SCE_AU3_COMMENT, SCE_AU3_COMMENTBLOCK, 0, 0), NP2STYLE_Comment, EDITSTYLE_HOLE(L"Comment"), L"fore:#608060" },
-	{ SCE_AU3_STRING, NP2STYLE_String, EDITSTYLE_HOLE(L"String"), L"fore:#008080" },
-	{ SCE_AU3_NUMBER, NP2STYLE_Number, EDITSTYLE_HOLE(L"Number"), L"fore:#FF0000" },
-	{ SCE_AU3_OPERATOR, NP2STYLE_Operator, EDITSTYLE_HOLE(L"Operator"), L"fore:#C000C0" },
-	{ SCE_AU3_VARIABLE, NP2STYLE_Variable, EDITSTYLE_HOLE(L"Variable"), L"fore:#808000" },
-	{ SCE_AU3_SENT, NP2STYLE_SendKey, EDITSTYLE_HOLE(L"Send Key"), L"fore:#FF0000" },
-	{ SCE_AU3_PREPROCESSOR, NP2STYLE_Preprocessor, EDITSTYLE_HOLE(L"Preprocessor"), L"fore:#FF8000" },
-	{ SCE_AU3_SPECIAL, NP2STYLE_Special, EDITSTYLE_HOLE(L"Special"), L"fore:#FF8000" },
+	{ SCE_AU3_KEYWORD, NP2StyleX_Keyword, L"fore:#0000FF" },
+	{ SCE_AU3_FUNCTION, NP2StyleX_Function, L"fore:#0000FF" },
+	{ SCE_AU3_MACRO, NP2StyleX_Macro, L"fore:#0080FF" },
+	{ MULTI_STYLE(SCE_AU3_COMMENT, SCE_AU3_COMMENTBLOCK, 0, 0), NP2StyleX_Comment, L"fore:#608060" },
+	{ SCE_AU3_STRING, NP2StyleX_String, L"fore:#008080" },
+	{ SCE_AU3_NUMBER, NP2StyleX_Number, L"fore:#FF0000" },
+	{ SCE_AU3_OPERATOR, NP2StyleX_Operator, L"fore:#C000C0" },
+	{ SCE_AU3_VARIABLE, NP2StyleX_Variable, L"fore:#808000" },
+	{ SCE_AU3_SENT, NP2StyleX_SendKey, L"fore:#FF0000" },
+	{ SCE_AU3_PREPROCESSOR, NP2StyleX_Preprocessor, L"fore:#FF8000" },
+	{ SCE_AU3_SPECIAL, NP2StyleX_Special, L"fore:#FF8000" },
 };
 
 EDITLEXER lexAU3 = {

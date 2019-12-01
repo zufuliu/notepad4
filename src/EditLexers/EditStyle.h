@@ -1,6 +1,4 @@
 #pragma once
-//#include "EditStyle.h"
-// MULTI_STYLE
 // NP2STYLE_
 #define NP2STYLE_MarginLineNumber		63101
 #define NP2STYLE_MatchingBrace			63102
@@ -44,7 +42,7 @@
 #define NP2STYLE_XMLOtherTag			63145
 #define NP2STYLE_XMLComment				63146
 #define NP2STYLE_XMLEntity				63147
-#define NP2STYLE_XMLElementText			64148
+#define NP2STYLE_XMLElementText			63148
 #define NP2STYLE_XMLIdentifier			63149
 #define NP2STYLE_XMLSGML				63150
 #define NP2STYLE_XMLCDATA				63151

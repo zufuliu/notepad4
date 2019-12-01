@@ -1,5 +1,5 @@
 #include "EditLexer.h"
-#include "EditStyle.h"
+#include "EditStyleX.h"
 
 // https://www.latex-project.org/
 
@@ -11,20 +11,20 @@ NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL
 
 static EDITSTYLE Styles_TEX[] = {
 	EDITSTYLE_DEFAULT,
-	{ SCE_L_COMMAND, NP2STYLE_Command, EDITSTYLE_HOLE(L"Command"), L"fore:#0000FF" },
-	{ MULTI_STYLE(SCE_L_COMMENT, SCE_L_COMMENT2, 0, 0), NP2STYLE_Comment, EDITSTYLE_HOLE(L"Comment"), L"fore:#608060" },
-	{ SCE_L_TITLE, NP2STYLE_Title, EDITSTYLE_HOLE(L"Title"), L"fore:#008000" },
-	{ SCE_L_CHAPTER, NP2STYLE_Chapter, EDITSTYLE_HOLE(L"Chapter"), L"fore:#008000" },
-	{ MULTI_STYLE(SCE_L_SECTION, SCE_L_SECTION1, SCE_L_SECTION2, 0), NP2STYLE_Section, EDITSTYLE_HOLE(L"Section"), L"fore:#008000" },
-	{ MULTI_STYLE(SCE_L_MATH, SCE_L_MATH2, 0, 0), NP2STYLE_Math, EDITSTYLE_HOLE(L"Math"), L"fore:#FF0000" },
-	{ SCE_L_SPECIAL, NP2STYLE_SpecialCharacter, EDITSTYLE_HOLE(L"Special Character"), L"fore:#3A6EA5" },
-	{ MULTI_STYLE(SCE_L_TAG, SCE_L_TAG2, 0, 0), NP2STYLE_Tag, EDITSTYLE_HOLE(L"Tag"), L"fore:#FF8000" },
-	{ SCE_L_CMDOPT, NP2STYLE_Option, EDITSTYLE_HOLE(L"Option"), L"fore:#1E90FF" },
-	{ SCE_L_STRING, NP2STYLE_String, EDITSTYLE_HOLE(L"String"), L"fore:#008000" },
-	{ MULTI_STYLE(SCE_L_QUOTE1, SCE_L_QUOTE2, 0, 0), NP2STYLE_Quote, EDITSTYLE_HOLE(L"Quote"), L"fore:#408080" },
-	{ MULTI_STYLE(SCE_L_VERBATIM, SCE_L_VERBATIM2, 0, 0), NP2STYLE_VerbatimSegment, EDITSTYLE_HOLE(L"Verbatim Segment"), L"fore:#666666" },
-	{ SCE_L_LISTCODE, NP2STYLE_ListCode, EDITSTYLE_HOLE(L"List Code"), L"fore:#808080" },
-	{ SCE_L_OPERATOR, NP2STYLE_Operator, EDITSTYLE_HOLE(L"Operator"), L"fore:#B000B0" },
+	{ SCE_L_COMMAND, NP2StyleX_Command, L"fore:#0000FF" },
+	{ MULTI_STYLE(SCE_L_COMMENT, SCE_L_COMMENT2, 0, 0), NP2StyleX_Comment, L"fore:#608060" },
+	{ SCE_L_TITLE, NP2StyleX_Title, L"fore:#008000" },
+	{ SCE_L_CHAPTER, NP2StyleX_Chapter, L"fore:#008000" },
+	{ MULTI_STYLE(SCE_L_SECTION, SCE_L_SECTION1, SCE_L_SECTION2, 0), NP2StyleX_Section, L"fore:#008000" },
+	{ MULTI_STYLE(SCE_L_MATH, SCE_L_MATH2, 0, 0), NP2StyleX_Math, L"fore:#FF0000" },
+	{ SCE_L_SPECIAL, NP2StyleX_SpecialCharacter, L"fore:#3A6EA5" },
+	{ MULTI_STYLE(SCE_L_TAG, SCE_L_TAG2, 0, 0), NP2StyleX_Tag, L"fore:#FF8000" },
+	{ SCE_L_CMDOPT, NP2StyleX_Option, L"fore:#1E90FF" },
+	{ SCE_L_STRING, NP2StyleX_String, L"fore:#008000" },
+	{ MULTI_STYLE(SCE_L_QUOTE1, SCE_L_QUOTE2, 0, 0), NP2StyleX_Quote, L"fore:#408080" },
+	{ MULTI_STYLE(SCE_L_VERBATIM, SCE_L_VERBATIM2, 0, 0), NP2StyleX_VerbatimSegment, L"fore:#666666" },
+	{ SCE_L_LISTCODE, NP2StyleX_ListCode, L"fore:#808080" },
+	{ SCE_L_OPERATOR, NP2StyleX_Operator, L"fore:#B000B0" },
 };
 
 EDITLEXER lexLaTeX = {
@@ -68,13 +68,13 @@ static KEYWORDLIST Keywords_TEXI = {{
 
 static EDITSTYLE Styles_TEXI[] = {
 	EDITSTYLE_DEFAULT,
-	{ SCE_L_COMMAND, NP2STYLE_Command, EDITSTYLE_HOLE(L"Command"), L"fore:#0000FF" },
-	{ MULTI_STYLE(SCE_L_COMMENT, SCE_L_COMMENT2, 0, 0), NP2STYLE_Comment, EDITSTYLE_HOLE(L"Comment"), L"fore:#608060" },
-	{ SCE_L_TITLE, NP2STYLE_Title, EDITSTYLE_HOLE(L"Title"), L"back:#FF8040; eolfilled" },
-	{ SCE_L_CHAPTER, NP2STYLE_Chapter, EDITSTYLE_HOLE(L"Chapter"), L"back:#FF8040; eolfilled" },
-	{ MULTI_STYLE(SCE_L_SECTION, SCE_L_SECTION1, SCE_L_SECTION2, 0), NP2STYLE_Section, EDITSTYLE_HOLE(L"Section"), L"back:#FF8040; eolfilled" },
-	{ SCE_L_SPECIAL, NP2STYLE_SpecialCharacter, EDITSTYLE_HOLE(L"Special Character"), L"fore:#3A6EA5" },
-	{ SCE_L_OPERATOR, NP2STYLE_Operator, EDITSTYLE_HOLE(L"Operator"), L"fore:#B000B0" },
+	{ SCE_L_COMMAND, NP2StyleX_Command, L"fore:#0000FF" },
+	{ MULTI_STYLE(SCE_L_COMMENT, SCE_L_COMMENT2, 0, 0), NP2StyleX_Comment, L"fore:#608060" },
+	{ SCE_L_TITLE, NP2StyleX_Title, L"back:#FF8040; eolfilled" },
+	{ SCE_L_CHAPTER, NP2StyleX_Chapter, L"back:#FF8040; eolfilled" },
+	{ MULTI_STYLE(SCE_L_SECTION, SCE_L_SECTION1, SCE_L_SECTION2, 0), NP2StyleX_Section, L"back:#FF8040; eolfilled" },
+	{ SCE_L_SPECIAL, NP2StyleX_SpecialCharacter, L"fore:#3A6EA5" },
+	{ SCE_L_OPERATOR, NP2StyleX_Operator, L"fore:#B000B0" },
 };
 
 EDITLEXER lexTexinfo = {

@@ -686,6 +686,9 @@
     <ClInclude Include="..\..\src\EditLexers/EditStyle.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\EditLexers/EditStyleX.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\src\Helpers.h">
       <Filter>Header Files</Filter>
     </ClInclude>
