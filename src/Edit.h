@@ -304,6 +304,7 @@ void	EditShowCallTips(Sci_Position position);
 typedef struct _np2encoding {
 	const UINT uFlags;
 	/*const*/UINT uCodePage;
+	// string format: [normal name + ',']  + [lower case parse name + ',']+
 	const char * const pszParseNames;
 	const UINT idsName;
 	LPWSTR wchLabel;
@@ -340,7 +341,7 @@ void	Encoding_InitDefaults(void);
 int 	Encoding_MapIniSetting(BOOL bLoad, int iSetting);
 void	Encoding_GetLabel(int iEncoding);
 int 	Encoding_Match(LPCWSTR pwszTest);
-int 	Encoding_MatchA(char *pchTest);
+int 	Encoding_MatchA(LPCSTR pchTest);
 BOOL	Encoding_IsValid(int iTestEncoding);
 void	Encoding_AddToTreeView(HWND hwnd, int idSel, BOOL bRecodeOnly);
 BOOL	Encoding_GetFromTreeView(HWND hwnd, int *pidEncoding, BOOL bQuiet);
