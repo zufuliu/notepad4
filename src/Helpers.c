@@ -1413,8 +1413,6 @@ BOOL PathGetLnkPath(LPCWSTR pszLnkFile, LPWSTR pszResPath, int cchResPath) {
 
 		if (SUCCEEDED(psl->QueryInterface(IID_IPersistFile, (void **)(&ppf)))) {
 			WCHAR wsz[MAX_PATH];
-
-			/*MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, pszLnkFile, -1, wsz, MAX_PATH);*/
 			lstrcpy(wsz, pszLnkFile);
 
 			if (SUCCEEDED(ppf->Load(wsz, STGM_READ))) {
@@ -1434,8 +1432,6 @@ BOOL PathGetLnkPath(LPCWSTR pszLnkFile, LPWSTR pszResPath, int cchResPath) {
 
 		if (SUCCEEDED(psl->lpVtbl->QueryInterface(psl, &IID_IPersistFile, (void **)(&ppf)))) {
 			WCHAR wsz[MAX_PATH];
-
-			/*MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, pszLnkFile, -1, wsz, MAX_PATH);*/
 			lstrcpy(wsz, pszLnkFile);
 
 			if (SUCCEEDED(ppf->lpVtbl->Load(ppf, wsz, STGM_READ))) {
@@ -1529,8 +1525,6 @@ BOOL PathCreateDeskLnk(LPCWSTR pszDocument) {
 
 		if (SUCCEEDED(psl->QueryInterface(IID_IPersistFile, (void **)(&ppf)))) {
 			WCHAR wsz[MAX_PATH];
-
-			/*MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, tchLnkFileName, -1, wsz, MAX_PATH);*/
 			lstrcpy(wsz, tchLnkFileName);
 
 			psl->SetPath(tchExeFile);
@@ -1550,8 +1544,6 @@ BOOL PathCreateDeskLnk(LPCWSTR pszDocument) {
 
 		if (SUCCEEDED(psl->lpVtbl->QueryInterface(psl, &IID_IPersistFile, (void **)(&ppf)))) {
 			WCHAR wsz[MAX_PATH];
-
-			/*MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, tchLnkFileName, -1, wsz, MAX_PATH);*/
 			lstrcpy(wsz, tchLnkFileName);
 
 			psl->lpVtbl->SetPath(psl, tchExeFile);
@@ -1602,8 +1594,6 @@ BOOL PathCreateFavLnk(LPCWSTR pszName, LPCWSTR pszTarget, LPCWSTR pszDir) {
 
 		if (SUCCEEDED(psl->QueryInterface(IID_IPersistFile, (void **)(&ppf)))) {
 			WCHAR wsz[MAX_PATH];
-
-			/*MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, tchLnkFileName, -1, wsz, MAX_PATH);*/
 			lstrcpy(wsz, tchLnkFileName);
 
 			psl->SetPath(pszTarget);
@@ -1622,8 +1612,6 @@ BOOL PathCreateFavLnk(LPCWSTR pszName, LPCWSTR pszTarget, LPCWSTR pszDir) {
 
 		if (SUCCEEDED(psl->lpVtbl->QueryInterface(psl, &IID_IPersistFile, (void **)(&ppf)))) {
 			WCHAR wsz[MAX_PATH];
-
-			/*MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, tchLnkFileName, -1, wsz, MAX_PATH);*/
 			lstrcpy(wsz, tchLnkFileName);
 
 			psl->lpVtbl->SetPath(psl, pszTarget);
@@ -2146,13 +2134,6 @@ BOOL MRU_Load(LPMRULIST pmru) {
 		const IniKeyValueNode *node = &pIniSection->nodeList[i];
 		LPCWSTR tchItem = node->value;
 		if (StrNotEmpty(tchItem)) {
-			/*if (pmru->iFlags & MRU_UTF8) {
-				WCHAR wchItem[1024];
-				int cbw = MultiByteToWideChar(CP_UTF7, 0, tchItem, -1, wchItem, COUNTOF(wchItem));
-				WideCharToMultiByte(CP_UTF8, 0, wchItem, cbw, tchItem, COUNTOF(tchItem), NULL, NULL);
-				pmru->pszItems[n++] = StrDup(tchItem);
-			}
-			else*/
 			pmru->pszItems[n++] = StrDup(tchItem);
 		}
 	}
@@ -2180,14 +2161,6 @@ BOOL MRU_Save(LPCMRULIST pmru) {
 	for (int i = 0; i < pmru->iSize; i++) {
 		if (StrNotEmpty(pmru->pszItems[i])) {
 			wsprintf(tchName, L"%02i", i + 1);
-			/*if (pmru->iFlags & MRU_UTF8) {
-				WCHAR	 tchItem[1024];
-				WCHAR wchItem[1024];
-				int cbw = MultiByteToWideChar(CP_UTF8, 0, pmru->pszItems[i], -1, wchItem, COUNTOF(wchItem));
-				WideCharToMultiByte(CP_UTF7, 0, wchItem, cbw, tchItem, COUNTOF(tchItem), NULL, NULL);
-				IniSectionSetString(pIniSection, tchName, tchItem);
-			}
-			else*/
 			IniSectionSetString(pIniSection, tchName, pmru->pszItems[i]);
 		}
 	}
