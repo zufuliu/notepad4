@@ -216,8 +216,6 @@ int DirList_Fill(HWND hwnd, LPCWSTR lpszDir, DWORD grfFlags, LPCWSTR lpszFileSpe
 	lvi.iImage = I_IMAGECALLBACK;
 
 	WCHAR wszDir[MAX_PATH];
-	// Convert Directory to a UNICODE string
-	//MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, lpszDir, -1, wszDir, MAX_PATH);
 	lstrcpy(wszDir, lpszDir);
 
 	// Get Desktop Folder
@@ -1380,24 +1378,7 @@ BOOL IL_GetDisplayName(LPSHELLFOLDER lpsf, LPCITEMIDLIST pidl, DWORD dwFlags, LP
 	}
 #else
 	if (NOERROR == lpsf->lpVtbl->GetDisplayNameOf(lpsf, pidl, dwFlags, &str)) {
-		// Shlwapi.dll provides new function:
 		return StrRetToBuf(&str, pidl, lpszDisplayName, nDisplayName) == S_OK;
-		// ...but I suppose my version is faster ;-)
-		//switch (str.uType) {
-		//case STRRET_WSTR:
-		//	WideCharToMultiByte(CP_ACP, 0, str.pOleStr, -1, lpszDisplayName, nDisplayName, NULL, NULL);
-		//	CoTaskMemFree(str.pOleStr);
-		//	break;
-		//
-		//case STRRET_OFFSET:
-		//	lstrcpyn(lpszDisplayName, ((WCHAR *)(pidl)) + str.uOffset, nDisplayName);
-		//	break;
-		//
-		//case STRRET_CSTR:
-		//	lstrcpyn(lpszDisplayName, str.cStr, nDisplayName);
-		//	break;
-		//}
-		//return TRUE;
 	}
 #endif
 
