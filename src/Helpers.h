@@ -605,14 +605,14 @@ UINT CodePageFromCharSet(UINT uCharSet);
 
 //==== MRU Functions ==========================================================
 #define MRU_MAXITEMS	32
+#define MRU_DEFAULT		0
 #define MRU_NOCASE		1
-#define MRU_UTF8		2
 
 // MRU_MAXITEMS * (MAX_PATH + 4)
 #define MAX_INI_SECTION_SIZE_MRU	(8 * 1024)
 
 typedef struct _mrulist {
-	LPCWSTR	szRegKey;
+	LPCWSTR szRegKey;
 	int		iFlags;
 	int		iSize;
 	LPWSTR pszItems[MRU_MAXITEMS];

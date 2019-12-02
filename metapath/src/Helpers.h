@@ -419,9 +419,9 @@ BOOL History_CanBack(LCPHISTORY ph);
 void History_UpdateToolbar(LCPHISTORY ph, HWND hwnd, int cmdBack, int cmdForward);
 
 //==== MRU Functions ==========================================================
-#define MRU_MAXITEMS 24
-#define MRU_NOCASE    1
-#define MRU_UTF8      2
+#define MRU_MAXITEMS	24
+#define MRU_DEFAULT		0
+#define MRU_NOCASE		1
 
 #define MRU_MAX_COPY_MOVE_HISTORY	24
 // MRU_MAXITEMS * (MAX_PATH + 4)
@@ -429,8 +429,8 @@ void History_UpdateToolbar(LCPHISTORY ph, HWND hwnd, int cmdBack, int cmdForward
 
 typedef struct _mrulist {
 	LPCWSTR szRegKey;
-	int   iFlags;
-	int   iSize;
+	int		iFlags;
+	int		iSize;
 	LPWSTR pszItems[MRU_MAXITEMS];
 } MRULIST, *PMRULIST, *LPMRULIST;
 
