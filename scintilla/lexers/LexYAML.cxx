@@ -41,6 +41,10 @@ struct EscapeSequence {
 	}
 };
 
+constexpr bool IsEOLChar(int ch) noexcept {
+	return (ch == '\r') || (ch == '\n');
+}
+
 constexpr bool IsYAMLFlowIndicator(int ch) noexcept {
 	// c-flow-indicator
 	return ch == ',' || ch == '[' || ch == ']' || ch == '{' || ch == '}';
@@ -91,13 +95,38 @@ bool IsYAMLText(StyleContext& sc, Sci_Position lineStartNext, int braceCount, co
 	return false;
 }
 
+bool IsYAMLTextBlockEnd(int &indentCount, int textIndentCount, Sci_Position pos, Sci_Position lineStartNext, LexAccessor &styler) noexcept {
+	const Sci_Position endPos = styler.Length();
+	do {
+		char ch = '\n';
+		int indentation = 0;
+		while (pos < endPos && (ch = styler[pos]) == ' ') {
+			++pos;
+			++indentation;
+		}
+		if (pos < lineStartNext) {
+			indentCount = indentation;
+		}
+		if (indentation > textIndentCount) {
+			return false;
+		}
+		if (!IsEOLChar(ch)) {
+			return true;
+		}
+		// skip to next line
+		while (pos < endPos && IsEOLChar(styler[pos])) {
+			++pos;
+		}
+	} while (pos < endPos);
+	return true;
+}
+
 enum {
 	YAMLLineType_None = 0,
 	YAMLLineType_EmptyLine = 1,
 	YAMLLineType_CommentLine = 2,
 	YAMLLineType_BlockSequence = 3,
-	YAMLLineType_DocumentStart = 4,
-	YAMLLineType_DocumentEnd = 5,
+	YAMLLineType_Text = 4,
 
 	YAMLLineStateMask_IndentCount = 0xfff,
 };
@@ -136,19 +165,16 @@ void ColouriseYAMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 			indentCount = 0;
 			indentEnded = false;
 
-			if (sc.state == SCE_YAML_TEXT_BLOCK) {
+			if (sc.state == SCE_YAML_TEXT_BLOCK || sc.state == SCE_YAML_TEXTEOL) {
 				indentEnded = true;
-				Sci_Position pos = sc.currentPos;
-				char ch = '\n';
-				while (pos < lineStartNext && (ch = styler[pos]) == ' ') {
-					++pos;
-					++indentCount;
-				}
-				if (indentCount <= textIndentCount && !(ch == '\n' || ch == '\r')) {
+				if (IsYAMLTextBlockEnd(indentCount, textIndentCount, sc.currentPos, lineStartNext, styler)) {
 					textIndentCount = 0;
 					sc.SetState(SCE_YAML_DEFAULT);
 					sc.Forward(indentCount);
 				} else {
+					if (sc.state == SCE_YAML_TEXTEOL) {
+						sc.ChangeState(SCE_YAML_TEXT_BLOCK);
+					}
 					sc.Forward(indentCount);
 					// inside block scalar
 					indentCount = textIndentCount + 1;
@@ -188,9 +214,7 @@ void ColouriseYAMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 			break;
 
 		case SCE_YAML_TEXT:
-			if (sc.atLineStart && !braceCount) {
-				sc.SetState(SCE_YAML_DEFAULT);
-			} else if (sc.ch == ':') {
+			if (sc.ch == ':') {
 				if (isspacechar(sc.chNext)) {
 					sc.ChangeState(SCE_YAML_KEY);
 					sc.SetState(SCE_YAML_OPERATOR);
@@ -286,7 +310,6 @@ void ColouriseYAMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 				// reset document state
 				braceCount = 0;
 				visibleChars = 1;
-				//lineType = (sc.ch == '-')? YAMLLineType_DocumentStart : YAMLLineType_DocumentEnd;
 				sc.SetState(SCE_YAML_DOCUMENT);
 				sc.Forward(3);
 				const int chNext = LexGetNextChar(sc.currentPos + 1, lineStartNext, styler);
@@ -309,9 +332,12 @@ void ColouriseYAMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 			} else if (sc.ch == '|' || sc.ch == '>') {
 				// ignore block scalar header or comment
 				textIndentCount = indentCount;
-				if (lineType == YAMLLineType_BlockSequence) {
-					// indented to key after '- '
-					++textIndentCount;
+				if (lineType == YAMLLineType_BlockSequence && isspacechar(sc.chPrev)) {
+					const int chPrev = LexGetPrevChar(sc.currentPos, styler);
+					if (chPrev == ':') {
+						// indented to key after '- '
+						++textIndentCount;
+					}
 				}
 				sc.SetState(SCE_YAML_TEXT_BLOCK);
 			} else if (IsADigit(sc.ch) || (sc.ch == '.' && IsADigit(sc.chNext))) {
@@ -328,12 +354,11 @@ void ColouriseYAMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 			} else if (sc.ch == '+' || sc.ch == '-' || sc.ch == '.') {
 				if ((sc.ch == '-' && isspacechar(sc.chNext))) {
 					sc.SetState(SCE_YAML_OPERATOR);
-					if (visibleChars == 0) {
-						// temporary fix for unindented block sequence:
-						// children content should be indented at least two levels (for '- ') greater than current line,
-						// thus increase one indentation level doesn't break code folding.
+					if (visibleChars == 0 && lineType == YAMLLineType_None) {
 						lineType = YAMLLineType_BlockSequence;
-						++indentCount;
+						// spaces after '-' are indentation white space
+						indentEnded = false;
+						sc.ForwardSetState(SCE_YAML_DEFAULT);
 					}
 				} else if (IsADigit(sc.chNext) || (sc.ch != '.' && sc.chNext == '.')) {
 					// [+-]number, [+-].[inf | nan]
@@ -359,7 +384,13 @@ void ColouriseYAMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 			}
 		}
 		if (sc.atLineEnd) {
-			if (visibleChars == 0 && sc.state != SCE_YAML_TEXT_BLOCK) {
+			if (sc.state == SCE_YAML_TEXT && !braceCount) {
+				sc.ChangeState(SCE_YAML_TEXTEOL);
+				textIndentCount = indentCount;
+				if (lineType == YAMLLineType_BlockSequence) {
+					++textIndentCount;
+				}
+			} else if (visibleChars == 0 && sc.state != SCE_YAML_TEXT_BLOCK) {
 				indentCount = 0;
 				lineType = YAMLLineType_EmptyLine;
 			}
