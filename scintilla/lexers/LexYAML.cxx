@@ -137,7 +137,9 @@ void ColouriseYAMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 
 	int visibleChars = 0;
 	bool indentEnded = true;
+	bool hasKey = false;
 	int indentCount = 0;
+	int indentBefore = 0;
 	int textIndentCount = 0;
 	int braceCount = 0;
 	int lineType = YAMLLineType_None;
@@ -162,8 +164,10 @@ void ColouriseYAMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 		if (sc.atLineStart) {
 			lineStartNext = styler.LineStart(sc.currentLine + 1);
 			visibleChars = 0;
+			indentBefore = 0;
 			indentCount = 0;
 			indentEnded = false;
+			hasKey = false;
 
 			if (sc.state == SCE_YAML_TEXT_BLOCK || sc.state == SCE_YAML_TEXTEOL) {
 				indentEnded = true;
@@ -216,6 +220,7 @@ void ColouriseYAMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 		case SCE_YAML_TEXT:
 			if (sc.ch == ':') {
 				if (isspacechar(sc.chNext)) {
+					hasKey = true;
 					sc.ChangeState(SCE_YAML_KEY);
 					sc.SetState(SCE_YAML_OPERATOR);
 				}
@@ -255,6 +260,7 @@ void ColouriseYAMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 				} else {
 					sc.Forward();
 					if (sc.GetNextNSChar() == ':') {
+						hasKey = true;
 						sc.ChangeState(SCE_YAML_KEY);
 					}
 					sc.SetState(SCE_YAML_DEFAULT);
@@ -270,6 +276,7 @@ void ColouriseYAMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 			} else if (sc.ch == '\"') {
 				sc.Forward();
 				if (sc.GetNextNSChar() == ':') {
+					hasKey = true;
 					sc.ChangeState(SCE_YAML_KEY);
 				}
 				sc.SetState(SCE_YAML_DEFAULT);
@@ -331,13 +338,11 @@ void ColouriseYAMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 				}
 			} else if (sc.ch == '|' || sc.ch == '>') {
 				// ignore block scalar header or comment
-				textIndentCount = indentCount;
-				if (lineType == YAMLLineType_BlockSequence && isspacechar(sc.chPrev)) {
-					const int chPrev = LexGetPrevChar(sc.currentPos, styler);
-					if (chPrev == ':') {
-						// indented to key after '- '
-						++textIndentCount;
-					}
+				if (lineType == YAMLLineType_BlockSequence) {
+					textIndentCount = hasKey ? indentCount : indentBefore;
+					++textIndentCount;
+				} else {
+					textIndentCount = indentCount;
 				}
 				sc.SetState(SCE_YAML_TEXT_BLOCK);
 			} else if (IsADigit(sc.ch) || (sc.ch == '.' && IsADigit(sc.chNext))) {
@@ -354,12 +359,11 @@ void ColouriseYAMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 			} else if (sc.ch == '+' || sc.ch == '-' || sc.ch == '.') {
 				if ((sc.ch == '-' && isspacechar(sc.chNext))) {
 					sc.SetState(SCE_YAML_OPERATOR);
-					if (visibleChars == 0 && lineType == YAMLLineType_None) {
-						lineType = YAMLLineType_BlockSequence;
-						// spaces after '-' are indentation white space
-						indentEnded = false;
-						sc.ForwardSetState(SCE_YAML_DEFAULT);
-					}
+					sc.ForwardSetState(SCE_YAML_DEFAULT);
+					// spaces after '-' are indentation white space when '- ' followed by key
+					indentBefore = indentCount;
+					indentEnded = false;
+					lineType = YAMLLineType_BlockSequence;
 				} else if (IsADigit(sc.chNext) || (sc.ch != '.' && sc.chNext == '.')) {
 					// [+-]number, [+-].[inf | nan]
 					sc.SetState(SCE_YAML_OPERATOR);
@@ -386,10 +390,20 @@ void ColouriseYAMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 		if (sc.atLineEnd) {
 			if (sc.state == SCE_YAML_TEXT && !braceCount) {
 				sc.ChangeState(SCE_YAML_TEXTEOL);
-				textIndentCount = indentCount;
 				if (lineType == YAMLLineType_BlockSequence) {
+					textIndentCount = hasKey ? indentCount : indentBefore;
 					++textIndentCount;
+				} else {
+					textIndentCount = indentCount;
 				}
+			} else if (lineType == YAMLLineType_BlockSequence) {
+				// temporary fix for unindented block sequence:
+				// children content should be indented at least two levels (for '- ') greater than current line,
+				// thus increase one indentation level doesn't break code folding.
+				if (!hasKey) {
+					indentCount = indentBefore;
+				}
+				++indentCount;
 			} else if (visibleChars == 0 && sc.state != SCE_YAML_TEXT_BLOCK) {
 				indentCount = 0;
 				lineType = YAMLLineType_EmptyLine;
