@@ -126,7 +126,6 @@ enum {
 	YAMLLineType_EmptyLine = 1,
 	YAMLLineType_CommentLine = 2,
 	YAMLLineType_BlockSequence = 3,
-	YAMLLineType_Text = 4,
 
 	YAMLLineStateMask_IndentCount = 0xfff,
 };
@@ -401,13 +400,12 @@ void ColouriseYAMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 					textIndentCount = indentCount;
 				}
 			} else if (lineType == YAMLLineType_BlockSequence) {
-				if (!hasKey) {
-					indentCount = indentBefore;
-				}
 				// temporary fix for unindented block sequence:
 				// children content should be indented at least two levels (for '- ') greater than current line,
 				// thus increase one indentation level doesn't break code folding.
-				++indentCount;
+				if (!hasKey) {
+					indentCount = indentBefore + 1;
+				}
 			} else if (visibleChars == 0 && sc.state != SCE_YAML_TEXT_BLOCK) {
 				indentCount = 0;
 				lineType = YAMLLineType_EmptyLine;
