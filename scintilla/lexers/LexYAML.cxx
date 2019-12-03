@@ -219,7 +219,7 @@ void ColouriseYAMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 
 		case SCE_YAML_TEXT:
 			if (sc.ch == ':') {
-				if (isspacechar(sc.chNext)) {
+				if ((!hasKey || braceCount) && isspacechar(sc.chNext)) {
 					hasKey = true;
 					sc.ChangeState(SCE_YAML_KEY);
 					sc.SetState(SCE_YAML_OPERATOR);
@@ -309,7 +309,7 @@ void ColouriseYAMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 				sc.SetState(SCE_YAML_DIRECTIVE);
 			} else if (sc.ch == '#' && (visibleChars == 0 || isspacechar(sc.chPrev))) {
 				sc.SetState(SCE_YAML_COMMENT);
-				if (visibleChars == 0) {
+				if (visibleChars == 0 && lineType == YAMLLineType_None) {
 					indentCount = 0;
 					lineType = YAMLLineType_CommentLine;
 				}
@@ -360,10 +360,14 @@ void ColouriseYAMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 				if ((sc.ch == '-' && isspacechar(sc.chNext))) {
 					sc.SetState(SCE_YAML_OPERATOR);
 					sc.ForwardSetState(SCE_YAML_DEFAULT);
-					// spaces after '-' are indentation white space when '- ' followed by key
-					indentBefore = indentCount;
-					indentEnded = false;
-					lineType = YAMLLineType_BlockSequence;
+					if (visibleChars == 0 && lineType == YAMLLineType_None) {
+						// spaces after '-' are indentation white space when '- ' followed by key
+						indentBefore = indentCount;
+						indentEnded = false;
+						lineType = YAMLLineType_BlockSequence;
+					} else {
+						++visibleChars;
+					}
 				} else if (IsADigit(sc.chNext) || (sc.ch != '.' && sc.chNext == '.')) {
 					// [+-]number, [+-].[inf | nan]
 					sc.SetState(SCE_YAML_OPERATOR);
@@ -397,12 +401,12 @@ void ColouriseYAMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 					textIndentCount = indentCount;
 				}
 			} else if (lineType == YAMLLineType_BlockSequence) {
-				// temporary fix for unindented block sequence:
-				// children content should be indented at least two levels (for '- ') greater than current line,
-				// thus increase one indentation level doesn't break code folding.
 				if (!hasKey) {
 					indentCount = indentBefore;
 				}
+				// temporary fix for unindented block sequence:
+				// children content should be indented at least two levels (for '- ') greater than current line,
+				// thus increase one indentation level doesn't break code folding.
 				++indentCount;
 			} else if (visibleChars == 0 && sc.state != SCE_YAML_TEXT_BLOCK) {
 				indentCount = 0;
