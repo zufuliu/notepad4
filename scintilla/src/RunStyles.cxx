@@ -277,9 +277,9 @@ DISTANCE RunStyles<DISTANCE, STYLE>::Find(STYLE value, DISTANCE start) const noe
 	return -1;
 }
 
-#if 0
 template <typename DISTANCE, typename STYLE>
 void RunStyles<DISTANCE, STYLE>::Check() const {
+#ifdef CHECK_CORRECTNESS
 	if (Length() < 0) {
 		throw std::runtime_error("RunStyles: Length can not be negative.");
 	}
@@ -305,8 +305,8 @@ void RunStyles<DISTANCE, STYLE>::Check() const {
 			throw std::runtime_error("RunStyles: Style of a partition same as previous.");
 		}
 	}
-}
 #endif
+}
 
 template class Scintilla::RunStyles<int, int>;
 template class Scintilla::RunStyles<int, char>;

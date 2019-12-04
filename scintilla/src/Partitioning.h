@@ -110,6 +110,10 @@ public:
 		body->ReAllocate(newSize + 2);
 	}
 
+	T Length() const noexcept {
+		return PositionFromPartition(Partitions());
+	}
+
 	void InsertPartition(T partition, T pos) {
 		if (stepPartition < partition) {
 			ApplyStep(partition);
@@ -195,6 +199,33 @@ public:
 
 	void DeleteAll() {
 		Allocate(body->GetGrowSize());
+	}
+
+	void Check() const {
+#ifdef CHECK_CORRECTNESS
+		if (Length() < 0) {
+			throw std::runtime_error("Partitioning: Length can not be negative.");
+		}
+		if (Partitions() < 1) {
+			throw std::runtime_error("Partitioning: Must always have 1 or more partitions.");
+		}
+		if (Length() == 0) {
+			if ((PositionFromPartition(0) != 0) || (PositionFromPartition(1) != 0)) {
+				throw std::runtime_error("Partitioning: Invalid empty partitioning.");
+			}
+		} else {
+			// Positions should be a strictly ascending sequence
+			for (T i = 0; i < Partitions(); i++) {
+				const T pos = PositionFromPartition(i);
+				const T posNext = PositionFromPartition(i+1);
+				if (pos > posNext) {
+					throw std::runtime_error("Partitioning: Negative partition.");
+				} else if (pos == posNext) {
+					throw std::runtime_error("Partitioning: Empty partition.");
+				}
+			}
+		}
+#endif
 	}
 };
 
