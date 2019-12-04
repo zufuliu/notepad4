@@ -44,7 +44,7 @@ static EDITSTYLE Styles_Go[] = {
 	{ SCE_C_COMMENTDOC_TAG, NP2StyleX_DocCommentTag, L"fore:#408080" },
 	{ MULTI_STYLE(SCE_C_COMMENTDOC, SCE_C_COMMENTLINEDOC, SCE_C_COMMENTDOC_TAG_XML, 0), NP2StyleX_DocComment, L"fore:#408040" },
 	{ MULTI_STYLE(SCE_C_STRING, SCE_C_CHARACTER, SCE_C_STRINGEOL, 0), NP2StyleX_String, L"fore:#008000" },
-	{ SCE_C_DSTRINGB, NP2StyleX_Backticks, L"fore:#F08000" },
+	{ SCE_C_DSTRINGB, NP2StyleX_RawString, L"fore:#F08000" },
 	{ SCE_C_NUMBER, NP2StyleX_Number, L"fore:#FF0000" },
 	{ SCE_C_OPERATOR, NP2StyleX_Operator, L"fore:#B000B0" },
 };
