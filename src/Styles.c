@@ -2214,7 +2214,7 @@ LPCWSTR Style_GetCurrentLexerName(void) {
 static void Style_UpdateLexerLang(PEDITLEXER pLex, LPCWSTR lpszExt, LPCWSTR lpszName) {
 	switch (pLex->rid) {
 	case NP2LEX_BASH:
-		if (StrCaseEqual(L"m4", lpszExt)) {
+		if (StrCaseEqual(L"m4", lpszExt) || StrCaseEqual(L"ac", lpszExt)) {
 			np2LexLangIndex = IDM_LANG_M4;
 		} else if (StrCaseEqual(L"csh", lpszExt) || StrCaseEqual(L"tcsh", lpszExt)) {
 			np2LexLangIndex = IDM_LANG_CSHELL;
