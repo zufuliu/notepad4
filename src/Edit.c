@@ -6311,7 +6311,7 @@ typedef struct UnicodeControlCharacter {
 } UnicodeControlCharacter;
 
 // https://en.wikipedia.org/wiki/Unicode_control_characters
-// http://www.unicode.org/charts/PDF/U2000.pdf
+// https://www.unicode.org/charts/PDF/U2000.pdf
 // scintilla/scripts/GenerateCharTable.py
 static const UnicodeControlCharacter kUnicodeControlCharacterTable[] = {
 	{ "\xe2\x80\x8e", "LRM" },	// U+200E	LRM		Left-to-right mark

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # Script to generate line breaking data from
-# http://www.unicode.org/Public/UCD/latest/ucd/LineBreak.txt
+# https://www.unicode.org/Public/UCD/latest/ucd/LineBreak.txt
 
 import platform, unicodedata
 from enum import IntFlag
@@ -9,7 +9,7 @@ from FileGenerator import Regenerate
 from GenerateCharacterCategory import *
 
 # Unicode Line Breaking Algorithm
-# http://www.unicode.org/reports/tr14/
+# https://www.unicode.org/reports/tr14/
 
 class LineBreak(IntFlag):
 	NonBreak = 0
@@ -19,7 +19,7 @@ class LineBreak(IntFlag):
 
 	RLEValueBit = 2
 
-# http://www.unicode.org/reports/tr14/#Properties
+# https://www.unicode.org/reports/tr14/#Properties
 LineBreakPropertyMap = {
 	LineBreak.NonBreak: [
 		'AL',	# Ordinary Alphabetic and Symbol Characters (XP)

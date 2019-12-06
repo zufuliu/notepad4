@@ -4848,7 +4848,7 @@ CharacterCategory CategoriseCharacter(int character) noexcept {
 }
 
 // Implementation of character sets recommended for identifiers in Unicode Standard Annex #31.
-// http://unicode.org/reports/tr31/
+// https://unicode.org/reports/tr31/
 
 namespace {
 
@@ -4856,7 +4856,7 @@ enum class OtherID { oidNone, oidStart, oidContinue };
 
 // Some characters are treated as valid for identifiers even
 // though most characters from their category are not.
-// Values copied from http://www.unicode.org/Public/9.0.0/ucd/PropList.txt
+// Values copied from https://www.unicode.org/Public/12.1.0/ucd/PropList.txt
 OtherID OtherIDOfCharacter(int character) noexcept {
 	if (
 		(character == 0x1885) ||	// MONGOLIAN LETTER ALI GALI BALUDA
@@ -4879,7 +4879,7 @@ OtherID OtherIDOfCharacter(int character) noexcept {
 
 // Determine if a character is in  Ll|Lu|Lt|Lm|Lo|Nl|Mn|Mc|Nd|Pc and has
 // Pattern_Syntax|Pattern_White_Space.
-// As of Unicode 9, only VERTICAL TILDE which is in Lm and has Pattern_Syntax matches.
+// As of Unicode 12, only VERTICAL TILDE which is in Lm and has Pattern_Syntax matches.
 // Should really generate from PropList.txt a list of Pattern_Syntax and Pattern_White_Space.
 bool IsIdPattern(int character) noexcept {
 	return character == 0x2E2F;

@@ -1,7 +1,7 @@
 #include "EditLexer.h"
 #include "EditStyleX.h"
 
-// http://webassembly.github.io/spec/core/text/index.html
+// https://webassembly.github.io/spec/core/text/index.html
 // https://github.com/WebAssembly/wabt
 
 static KEYWORDLIST Keywords_WASM = {{

@@ -70,7 +70,7 @@ JSON Document
 	jsonc			JSON with Comments, https://code.visualstudio.com/docs/languages/json#_json-with-comments
 	arcconfig		Phabricator Arcanist
 	arclint			Phabricator Arcanist
-	jscop			JSCoP File, http://polly.llvm.org/documentation/passes.html
+	jscop			JSCoP File, https://polly.llvm.org/documentation/passes.html
 
 PHP Script
 	php
@@ -467,7 +467,7 @@ YAML Document
 	yaml
 	clang-format	clang-format Configuration File
 	clang-tidy		clang-tidy Configuration File
-	mir				LLVM Machine IR, http://llvm.org/docs/MIRLangRef.html
+	mir				LLVM Machine IR, https://llvm.org/docs/MIRLangRef.html
 	apinotes		Swift API Notes
 	ifs				LLVM IFS (Interface Stubs)
 

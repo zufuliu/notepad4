@@ -105,7 +105,7 @@ IN THE SOFTWARE.
 
 License for "Andersson trees"
 
-http://www.eternallyconfuzzled.com/tuts/datastructures/jsw_tut_andersson.aspx
+https://www.eternallyconfuzzled.com/tuts/datastructures/jsw_tut_andersson.aspx
 
 Copyright 2019 Eternally Confuzzled
 
