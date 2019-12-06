@@ -2,7 +2,7 @@
 #include "EditStyleX.h"
 
 // https://en.wikipedia.org/wiki/Groovy_(programming_language)
-// http://www.groovy-lang.org/
+// https://www.groovy-lang.org/
 
 static KEYWORDLIST Keywords_Groovy = {{
 "as assert break case catch class continue const def default do else enum extends "

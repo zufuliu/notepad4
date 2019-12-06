@@ -878,7 +878,7 @@ Credits and Special Thanks
 
   [2] https://www.roland-weigelt.de
   [3] https://www.TimoSoft-Software.de
-  [4] http://code.kliu.org/misc/notepad2/
+  [4] https://code.kliu.org/misc/notepad2/
   [5] stlee42@gmail.com
 
 

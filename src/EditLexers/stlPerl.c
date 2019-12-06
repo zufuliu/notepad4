@@ -3,7 +3,7 @@
 
 // https://www.perl.org/
 // https://perldoc.perl.org/index-language.html
-// http://learn.perl.org/docs/keywords.html
+// https://learn.perl.org/docs/keywords.html
 
 static KEYWORDLIST Keywords_Perl = {{
 "__DATA__ __END__ __FILE__ __LINE__ __PACKAGE__ abs accept alarm and atan2 AUTOLOAD BEGIN "

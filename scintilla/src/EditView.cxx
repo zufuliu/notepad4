@@ -660,7 +660,7 @@ void EditView::LayoutLine(const EditModel &model, Sci::Line line, Surface *surfa
 						}
 					} else {
 						// word boundary
-						// TODO: Unicode Line Breaking Algorithm http://www.unicode.org/reports/tr14/
+						// TODO: Unicode Line Breaking Algorithm https://www.unicode.org/reports/tr14/
 						Sci::Position pos = p + posLineStart;
 						if (validateCache) {
 							pos = model.pdoc->MovePositionOutsideChar(pos, -1);

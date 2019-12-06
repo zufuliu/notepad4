@@ -181,8 +181,8 @@ Or build from source, see the [Wiki](https://github.com/zufuliu/notepad2/wiki/Bu
 
 ## Contributors:
 * [XhmikosR](https://xhmikosr.github.io/notepad2-mod/)
-* [Kai Liu](http://code.kliu.org/misc/notepad2/)
-* [RL Vision](http://www.rlvision.com/notepad2/about.asp)
+* [Kai Liu](https://code.kliu.org/misc/notepad2/)
+* [RL Vision](https://www.rlvision.com/notepad2/about.asp)
 * Aleksandar Lekov
 * Bruno Barbieri
 * Homam
