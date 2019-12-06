@@ -95,7 +95,8 @@ bool IsYAMLText(StyleContext& sc, Sci_Position lineStartNext, int braceCount, co
 	return false;
 }
 
-bool IsYAMLTextBlockEnd(int &indentCount, int textIndentCount, Sci_Position pos, Sci_Position lineStartNext, LexAccessor &styler) noexcept {
+bool IsYAMLTextBlockEnd(bool hasComment, int &indentCount, int textIndentCount,
+	Sci_Position pos, Sci_Position lineStartNext, LexAccessor &styler) noexcept {
 	const Sci_Position endPos = styler.Length();
 	do {
 		char ch = '\n';
@@ -106,6 +107,9 @@ bool IsYAMLTextBlockEnd(int &indentCount, int textIndentCount, Sci_Position pos,
 		}
 		if (pos < lineStartNext) {
 			indentCount = indentation;
+		}
+		if (hasComment && ch == '#') {
+			return true;
 		}
 		if (indentation > textIndentCount) {
 			return false;
@@ -168,18 +172,19 @@ void ColouriseYAMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 			indentEnded = false;
 			hasKey = false;
 
-			if (sc.state == SCE_YAML_TEXT_BLOCK || sc.state == SCE_YAML_TEXTEOL) {
+			if (sc.state == SCE_YAML_BLOCK_SCALAR || sc.state == SCE_YAML_TEXTEOL || sc.state == SCE_YAML_INDENTED_TEXT) {
 				indentEnded = true;
-				if (IsYAMLTextBlockEnd(indentCount, textIndentCount, sc.currentPos, lineStartNext, styler)) {
+				const bool hasComment = sc.state != SCE_YAML_BLOCK_SCALAR;
+				if (IsYAMLTextBlockEnd(hasComment, indentCount, textIndentCount, sc.currentPos, lineStartNext, styler)) {
 					textIndentCount = 0;
 					sc.SetState(SCE_YAML_DEFAULT);
 					sc.Forward(indentCount);
 				} else {
 					if (sc.state == SCE_YAML_TEXTEOL) {
-						sc.ChangeState(SCE_YAML_TEXT_BLOCK);
+						sc.ChangeState(SCE_YAML_INDENTED_TEXT);
 					}
 					sc.Forward(indentCount);
-					// inside block scalar
+					// inside block scalar or indented text
 					indentCount = textIndentCount + 1;
 				}
 			}
@@ -343,7 +348,7 @@ void ColouriseYAMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 				} else {
 					textIndentCount = indentCount;
 				}
-				sc.SetState(SCE_YAML_TEXT_BLOCK);
+				sc.SetState(SCE_YAML_BLOCK_SCALAR);
 			} else if (IsADigit(sc.ch) || (sc.ch == '.' && IsADigit(sc.chNext))) {
 				sc.SetState(SCE_YAML_NUMBER);
 			} else if (IsAlpha(sc.ch) || (sc.ch == '.' && IsAlpha(sc.chNext))) {
@@ -406,7 +411,7 @@ void ColouriseYAMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 				if (!hasKey) {
 					indentCount = indentBefore + 1;
 				}
-			} else if (visibleChars == 0 && sc.state != SCE_YAML_TEXT_BLOCK) {
+			} else if (visibleChars == 0 && !(sc.state == SCE_YAML_BLOCK_SCALAR || sc.state == SCE_YAML_INDENTED_TEXT)) {
 				indentCount = 0;
 				lineType = YAMLLineType_EmptyLine;
 			}
