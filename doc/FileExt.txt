@@ -408,8 +408,10 @@ Shell Script
 	zsh				Z Shell
 	bash
 	tcsh			C Shell
+
 	m4				M4 Macro
 	in				automake / autoconf
+	ac				Autoconf
 
 	.bash*
 	.profile
