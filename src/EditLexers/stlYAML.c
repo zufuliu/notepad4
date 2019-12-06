@@ -24,7 +24,7 @@ static EDITSTYLE Styles_YAML[] = {
 	{ SCE_YAML_COMMENT, NP2StyleX_Comment, L"fore:#608060" },
 	{ MULTI_STYLE(SCE_YAML_STRING1, SCE_YAML_STRING2, 0, 0), NP2StyleX_String, L"fore:#008000" },
 	{ SCE_YAML_ESCAPECHAR, NP2StyleX_EscapeSequence, L"fore:#0080C0" },
-	{ SCE_YAML_TEXT_BLOCK, NP2StyleX_TextBlock, L"fore:#F08000" },
+	{ MULTI_STYLE(SCE_YAML_BLOCK_SCALAR, SCE_YAML_INDENTED_TEXT, 0, 0), NP2StyleX_TextBlock, L"fore:#F08000" },
 	{ SCE_YAML_DATETIME, NP2StyleX_DateTime, L"fore:#008080" },
 	{ SCE_YAML_NUMBER, NP2StyleX_Number, L"fore:#FF0000" },
 	{ SCE_YAML_OPERATOR, NP2StyleX_Operator, L"fore:#B000B0" },
