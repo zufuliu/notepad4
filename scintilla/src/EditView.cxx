@@ -1584,11 +1584,16 @@ void EditView::DrawCarets(Surface *surface, const EditModel &model, const ViewSt
 		SelectionPosition posCaret = (drawDrag ? model.posDrag : model.sel.Range(r).caret);
 		if (vsDraw.DrawCaretInsideSelection(model.inOverstrike, imeCaretBlockOverride) &&
 			!drawDrag && posCaret > model.sel.Range(r).anchor) {
-			if (posCaret.VirtualSpace() > 0)
+			if (posCaret.VirtualSpace() > 0) {
 				posCaret.SetVirtualSpace(posCaret.VirtualSpace() - 1);
-			else
-				posCaret.SetPosition(model.pdoc->MovePositionOutsideChar(posCaret.Position() - 1, -1));
+			} else {
+				const Sci::Position posBefore = model.pdoc->MovePositionOutsideChar(posCaret.Position() - 1, -1);
+				if (posBefore >= posLineStart) {
+					posCaret.SetPosition(posBefore);
+				}
+			}
 		}
+
 		const int offset = static_cast<int>(posCaret.Position() - posLineStart);
 		const XYPOSITION spaceWidth = vsDraw.styles[ll->EndLineStyle()].spaceWidth;
 		const XYPOSITION virtualOffset = posCaret.VirtualSpace() * spaceWidth;
