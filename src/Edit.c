@@ -7179,10 +7179,11 @@ LRESULT CALLBACK SciThemedWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lP
 #define FOLD_CHILDREN SCMOD_CTRL
 #define FOLD_SIBLINGS SCMOD_SHIFT
 
-#define MAX_EDIT_TOGGLE_FOLD_LEVEL		63
+#define MAX_EDIT_TOGGLE_FOLD_LEVEL		126
+// uint16_t is used because max fold level <= SC_FOLDLEVELNUMBERMASK - SC_FOLDLEVELBASE + 1
 struct EditFoldStack {
-	int level_count; // 1-based level number at current header line
-	int level_stack[MAX_EDIT_TOGGLE_FOLD_LEVEL];
+	uint16_t level_count; // 1-based level number at current header line
+	uint16_t level_stack[MAX_EDIT_TOGGLE_FOLD_LEVEL + 1];
 };
 
 static void EditFoldStack_Push(struct EditFoldStack *foldStack, int level) {
@@ -7190,7 +7191,7 @@ static void EditFoldStack_Push(struct EditFoldStack *foldStack, int level) {
 		--foldStack->level_count;
 	}
 
-	foldStack->level_stack[foldStack->level_count] = level;
+	foldStack->level_stack[foldStack->level_count] = (uint16_t)level;
 	++foldStack->level_count;
 }
 
