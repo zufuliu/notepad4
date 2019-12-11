@@ -172,7 +172,7 @@ void ColouriseYAMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 			indentEnded = false;
 			hasKey = false;
 
-			if (sc.state == SCE_YAML_BLOCK_SCALAR || sc.state == SCE_YAML_TEXTEOL || sc.state == SCE_YAML_INDENTED_TEXT) {
+			if (sc.state == SCE_YAML_BLOCK_SCALAR || (sc.state == SCE_YAML_TEXT && !braceCount) || sc.state == SCE_YAML_INDENTED_TEXT) {
 				indentEnded = true;
 				const bool hasComment = sc.state != SCE_YAML_BLOCK_SCALAR;
 				if (IsYAMLTextBlockEnd(hasComment, indentCount, textIndentCount, sc.currentPos, lineStartNext, styler)) {
@@ -180,7 +180,7 @@ void ColouriseYAMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 					sc.SetState(SCE_YAML_DEFAULT);
 					sc.Forward(indentCount);
 				} else {
-					if (sc.state == SCE_YAML_TEXTEOL) {
+					if (sc.state == SCE_YAML_TEXT) {
 						sc.ChangeState(SCE_YAML_INDENTED_TEXT);
 					}
 					sc.Forward(indentCount);
@@ -397,7 +397,6 @@ void ColouriseYAMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 		}
 		if (sc.atLineEnd) {
 			if (sc.state == SCE_YAML_TEXT && !braceCount) {
-				sc.ChangeState(SCE_YAML_TEXTEOL);
 				if (lineType == YAMLLineType_BlockSequence) {
 					textIndentCount = hasKey ? indentCount : indentBefore;
 					++textIndentCount;
