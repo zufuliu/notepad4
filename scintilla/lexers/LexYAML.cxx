@@ -148,6 +148,14 @@ void ColouriseYAMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 	int lineType = YAMLLineType_None;
 	EscapeSequence escSeq;
 
+	// backtrack to previous line for better coloring for indented text on typing.
+	if (initStyle == SCE_YAML_INDENTED_TEXT || initStyle == SCE_YAML_TEXT) {
+		const Sci_Position endPos = startPos + lengthDoc;
+		const Sci_Position currentLine = styler.GetLine(startPos);
+		startPos = (currentLine == 0)? 0 : styler.LineStart(currentLine - 1);
+		lengthDoc = endPos - startPos;
+	}
+
 	StyleContext sc(startPos, lengthDoc, initStyle, styler);
 	if (sc.currentLine > 0) {
 		const int lineState = styler.GetLineState(sc.currentLine - 1);
