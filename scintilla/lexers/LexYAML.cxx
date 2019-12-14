@@ -154,6 +154,7 @@ void ColouriseYAMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 		const Sci_Position currentLine = styler.GetLine(startPos);
 		startPos = (currentLine == 0)? 0 : styler.LineStart(currentLine - 1);
 		lengthDoc = endPos - startPos;
+		initStyle = styler.StyleAt(startPos);
 	}
 
 	StyleContext sc(startPos, lengthDoc, initStyle, styler);
