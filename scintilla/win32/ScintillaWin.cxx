@@ -462,6 +462,8 @@ class ScintillaWin :
 
 	Sci::Position TargetAsUTF8(char *text) const;
 	Sci::Position EncodedFromUTF8(const char *utf8, char *encoded) const;
+
+	bool PaintDC(HDC hdc);
 	sptr_t WndPaint();
 
 	sptr_t HandleCompositionWindowed(uptr_t wParam, sptr_t lParam);
@@ -985,6 +987,35 @@ Sci::Position ScintillaWin::EncodedFromUTF8(const char *utf8, char *encoded) con
 	}
 }
 
+bool ScintillaWin::PaintDC(HDC hdc) {
+	if (technology == SC_TECHNOLOGY_DEFAULT) {
+		AutoSurface surfaceWindow(hdc, this);
+		if (surfaceWindow) {
+			Paint(surfaceWindow, rcPaint);
+			surfaceWindow->Release();
+		}
+	} else {
+#if defined(USE_D2D)
+		EnsureRenderTarget(hdc);
+		if (pRenderTarget) {
+			AutoSurface surfaceWindow(pRenderTarget, this);
+			if (surfaceWindow) {
+				pRenderTarget->BeginDraw();
+				Paint(surfaceWindow, rcPaint);
+				surfaceWindow->Release();
+				const HRESULT hr = pRenderTarget->EndDraw();
+				if (hr == static_cast<HRESULT>(D2DERR_RECREATE_TARGET)) {
+					DropRenderTarget();
+					return false;
+				}
+			}
+		}
+#endif
+	}
+
+	return true;
+}
+
 sptr_t ScintillaWin::WndPaint() {
 	//ElapsedPeriod ep;
 
@@ -1001,27 +1032,8 @@ sptr_t ScintillaWin::WndPaint() {
 	rcPaint = PRectangle::FromInts(ps.rcPaint.left, ps.rcPaint.top, ps.rcPaint.right, ps.rcPaint.bottom);
 	const PRectangle rcClient = GetClientRectangle();
 	paintingAllText = BoundsContains(rcPaint, hRgnUpdate, rcClient);
-	if (technology == SC_TECHNOLOGY_DEFAULT) {
-		AutoSurface surfaceWindow(ps.hdc, this);
-		if (surfaceWindow) {
-			Paint(surfaceWindow, rcPaint);
-			surfaceWindow->Release();
-		}
-	} else {
-#if defined(USE_D2D)
-		EnsureRenderTarget(ps.hdc);
-		AutoSurface surfaceWindow(pRenderTarget, this);
-		if (surfaceWindow) {
-			pRenderTarget->BeginDraw();
-			Paint(surfaceWindow, rcPaint);
-			surfaceWindow->Release();
-			const HRESULT hr = pRenderTarget->EndDraw();
-			if (hr == static_cast<HRESULT>(D2DERR_RECREATE_TARGET)) {
-				DropRenderTarget();
-				paintState = paintAbandoned;
-			}
-		}
-#endif
+	if (!PaintDC(ps.hdc)) {
+		paintState = paintAbandoned;
 	}
 	if (hRgnUpdate) {
 		::DeleteRgn(hRgnUpdate);
@@ -3192,27 +3204,7 @@ void ScintillaWin::FullPaintDC(HDC hdc) {
 	paintState = painting;
 	rcPaint = GetClientRectangle();
 	paintingAllText = true;
-	if (technology == SC_TECHNOLOGY_DEFAULT) {
-		AutoSurface surfaceWindow(hdc, this);
-		if (surfaceWindow) {
-			Paint(surfaceWindow, rcPaint);
-			surfaceWindow->Release();
-		}
-	} else {
-#if defined(USE_D2D)
-		EnsureRenderTarget(hdc);
-		AutoSurface surfaceWindow(pRenderTarget, this);
-		if (surfaceWindow) {
-			pRenderTarget->BeginDraw();
-			Paint(surfaceWindow, rcPaint);
-			surfaceWindow->Release();
-			const HRESULT hr = pRenderTarget->EndDraw();
-			if (hr == static_cast<HRESULT>(D2DERR_RECREATE_TARGET)) {
-				DropRenderTarget();
-			}
-		}
-#endif
-	}
+	PaintDC(hdc);
 	paintState = notPainting;
 }
 

@@ -1591,7 +1591,7 @@ class BlobInline : public IDWriteInlineObject {
 	STDMETHODIMP_(ULONG)Release() noexcept override;
 
 	// IDWriteInlineObject
-	STDMETHODIMP Draw(
+	COM_DECLSPEC_NOTHROW STDMETHODIMP Draw(
 		void *clientDrawingContext,
 		IDWriteTextRenderer *renderer,
 		FLOAT originX,
@@ -1599,12 +1599,12 @@ class BlobInline : public IDWriteInlineObject {
 		BOOL isSideways,
 		BOOL isRightToLeft,
 		IUnknown *clientDrawingEffect
-	) noexcept override;
-	STDMETHODIMP GetMetrics(DWRITE_INLINE_OBJECT_METRICS *metrics) noexcept override;
-	STDMETHODIMP GetOverhangMetrics(DWRITE_OVERHANG_METRICS *overhangs) noexcept override;
-	STDMETHODIMP GetBreakConditions(
+	) override;
+	COM_DECLSPEC_NOTHROW STDMETHODIMP GetMetrics(DWRITE_INLINE_OBJECT_METRICS *metrics) override;
+	COM_DECLSPEC_NOTHROW STDMETHODIMP GetOverhangMetrics(DWRITE_OVERHANG_METRICS *overhangs) override;
+	COM_DECLSPEC_NOTHROW STDMETHODIMP GetBreakConditions(
 		DWRITE_BREAK_CONDITION *breakConditionBefore,
-		DWRITE_BREAK_CONDITION *breakConditionAfter) noexcept override;
+		DWRITE_BREAK_CONDITION *breakConditionAfter) override;
 public:
 	explicit BlobInline(XYPOSITION width_ = 0.0f) noexcept : width(width_) {}
 	virtual ~BlobInline() = default;
@@ -1634,23 +1634,23 @@ STDMETHODIMP_(ULONG) BlobInline::Release() noexcept {
 }
 
 /// Implement IDWriteInlineObject
-HRESULT STDMETHODCALLTYPE BlobInline::Draw(
+COM_DECLSPEC_NOTHROW HRESULT STDMETHODCALLTYPE BlobInline::Draw(
 	void*,
 	IDWriteTextRenderer*,
 	FLOAT,
 	FLOAT,
 	BOOL,
 	BOOL,
-	IUnknown*) noexcept {
+	IUnknown*) {
 	// Since not performing drawing, not necessary to implement
 	// Could be implemented by calling back into platform-independent code.
 	// This would allow more of the drawing to be mediated through DirectWrite.
 	return S_OK;
 }
 
-HRESULT STDMETHODCALLTYPE BlobInline::GetMetrics(
+COM_DECLSPEC_NOTHROW HRESULT STDMETHODCALLTYPE BlobInline::GetMetrics(
 	DWRITE_INLINE_OBJECT_METRICS *metrics
-) noexcept {
+) {
 	metrics->width = width;
 	metrics->height = 2;
 	metrics->baseline = 1;
@@ -1658,9 +1658,9 @@ HRESULT STDMETHODCALLTYPE BlobInline::GetMetrics(
 	return S_OK;
 }
 
-HRESULT STDMETHODCALLTYPE BlobInline::GetOverhangMetrics(
+COM_DECLSPEC_NOTHROW HRESULT STDMETHODCALLTYPE BlobInline::GetOverhangMetrics(
 	DWRITE_OVERHANG_METRICS *overhangs
-) noexcept {
+) {
 	overhangs->left = 0;
 	overhangs->top = 0;
 	overhangs->right = 0;
@@ -1668,10 +1668,10 @@ HRESULT STDMETHODCALLTYPE BlobInline::GetOverhangMetrics(
 	return S_OK;
 }
 
-HRESULT STDMETHODCALLTYPE BlobInline::GetBreakConditions(
+COM_DECLSPEC_NOTHROW HRESULT STDMETHODCALLTYPE BlobInline::GetBreakConditions(
 	DWRITE_BREAK_CONDITION *breakConditionBefore,
 	DWRITE_BREAK_CONDITION *breakConditionAfter
-) noexcept {
+) {
 	// Since not performing 2D layout, not necessary to implement
 	*breakConditionBefore = DWRITE_BREAK_CONDITION_NEUTRAL;
 	*breakConditionAfter = DWRITE_BREAK_CONDITION_NEUTRAL;
