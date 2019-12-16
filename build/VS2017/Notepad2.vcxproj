@@ -931,6 +931,7 @@
     <ClCompile Include="..\..\scintilla\lexers\LexWASM.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexYAML.cxx" />
     <ClCompile Include="..\..\scintilla\lexlib\Accessor.cxx" />
+    <ClCompile Include="..\..\scintilla\lexlib\CharacterCategory.cxx" />
     <ClCompile Include="..\..\scintilla\lexlib\CharacterSet.cxx" />
     <ClCompile Include="..\..\scintilla\lexlib\DefaultLexer.cxx" />
     <ClCompile Include="..\..\scintilla\lexlib\LexAccessor.cxx" />
@@ -1047,6 +1048,7 @@
     <ClInclude Include="..\..\scintilla\include\Scintilla.h" />
     <ClInclude Include="..\..\scintilla\include\VectorISA.h" />
     <ClInclude Include="..\..\scintilla\lexlib\Accessor.h" />
+    <ClInclude Include="..\..\scintilla\lexlib\CharacterCategory.h" />
     <ClInclude Include="..\..\scintilla\lexlib\CharacterSet.h" />
     <ClInclude Include="..\..\scintilla\lexlib\DefaultLexer.h" />
     <ClInclude Include="..\..\scintilla\lexlib\LexAccessor.h" />
