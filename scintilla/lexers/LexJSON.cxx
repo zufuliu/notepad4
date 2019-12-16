@@ -132,7 +132,7 @@ void ColouriseJSONDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 				}
 			} else if (ch == '\\') {
 				styler.ColourTo(i - 1, state);
-				if (chNext == '\r' || chNext == '\n') {
+				if (IsEOLChar(chNext)) {
 					styler.ColourTo(i, SCE_C_DEFAULT);
 					lineContinue = true;
 				} else {

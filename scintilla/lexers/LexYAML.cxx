@@ -41,10 +41,6 @@ struct EscapeSequence {
 	}
 };
 
-constexpr bool IsEOLChar(int ch) noexcept {
-	return (ch == '\r') || (ch == '\n');
-}
-
 constexpr bool IsYAMLFlowIndicator(int ch) noexcept {
 	// c-flow-indicator
 	return ch == ',' || ch == '[' || ch == ']' || ch == '{' || ch == '}';

@@ -142,7 +142,7 @@ static void ColouriseMakeDoc(Sci_PositionU startPos, Sci_Position length, int in
 			break;
 		}
 
-		if (state != SCE_MAKE_COMMENT && ch == '\\' && (chNext == '\n' || chNext == '\r')) {
+		if (state != SCE_MAKE_COMMENT && ch == '\\' && IsEOLChar(chNext)) {
 			i++;
 			lineCurrent++;
 			ch = chNext;

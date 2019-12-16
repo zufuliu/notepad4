@@ -211,7 +211,7 @@ void ColouriseRustDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 		case SCE_RUST_BYTESTRING:
 			if (sc.ch == '\\') {
 				const int state = sc.state;
-				if (sc.chNext == '\r' || sc.chNext == '\n') {
+				if (IsEOLChar(sc.chNext)) {
 					sc.SetState(SCE_RUST_LINE_CONTINUE);
 					sc.ForwardSetState(state);
 				} else {
@@ -227,7 +227,7 @@ void ColouriseRustDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 		case SCE_RUST_CHARACTER:
 		case SCE_RUST_BYTE_CHARACTER:
 			if (sc.ch == '\\') {
-				if (sc.chNext == '\r' || sc.chNext == '\n') {
+				if (IsEOLChar(sc.chNext)) {
 					sc.ForwardSetState(SCE_RUST_DEFAULT);
 				} else {
 					escSeq.resetEscapeState(sc.state, sc.chNext);
@@ -247,7 +247,7 @@ void ColouriseRustDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 				const int outerState = escSeq.outerState;
 				if (outerState == SCE_RUST_STRING || outerState == SCE_RUST_BYTESTRING) {
 					if (sc.ch == '\\') {
-						if (sc.chNext == '\r' || sc.chNext == '\n') {
+						if (IsEOLChar(sc.chNext)) {
 							sc.SetState(SCE_RUST_LINE_CONTINUE);
 							sc.ForwardSetState(outerState);
 						} else {

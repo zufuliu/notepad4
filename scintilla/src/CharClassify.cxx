@@ -24,7 +24,7 @@ CharClassify::CharClassify() noexcept : charClass{} {
 void CharClassify::SetDefaultCharClasses(bool includeWordClass) noexcept {
 	// Initialize all char classes to default values
 	for (int ch = 0; ch < 128; ch++) {
-		if (ch == '\r' || ch == '\n')
+		if (IsEOLChar(ch))
 			charClass[ch] = ccNewLine;
 		else if (ch < 0x20 || ch == ' ')
 			charClass[ch] = ccSpace;

@@ -2085,7 +2085,7 @@ void Editor::InsertPasteShape(const char *text, Sci::Position len, PasteShape sh
 				pdoc->LineStart(pdoc->LineFromPosition(sel.MainCaret()));
 			Sci::Position lengthInserted = pdoc->InsertString(insertPos, text, len);
 			// add the newline if necessary
-			if ((len > 0) && (text[len - 1] != '\n' && text[len - 1] != '\r')) {
+			if ((len > 0) && !IsEOLChar(text[len - 1])) {
 				const char *endline = StringFromEOLMode(pdoc->eolMode);
 				const Sci::Position length = strlen(endline);
 				lengthInserted += pdoc->InsertString(insertPos + lengthInserted, endline, length);

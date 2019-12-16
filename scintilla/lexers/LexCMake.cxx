@@ -147,7 +147,7 @@ void ColouriseCmakeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 			break;
 		case SCE_CMAKE_STRING:
 			if (sc.ch == '\\') {
-				if (sc.chNext == '\n' || sc.chNext == '\r') {
+				if (IsEOLChar(sc.chNext)) {
 					sc.SetState(SCE_CMAKE_LINE_CONTINUE);
 					sc.ForwardSetState(SCE_CMAKE_STRING);
 				} else {
@@ -176,7 +176,7 @@ void ColouriseCmakeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 			break;
 		case SCE_CMAKE_ESCAPE_SEQUENCE:
 			if (sc.ch == '\\') {
-				if (sc.chNext == '\n' || sc.chNext == '\r') {
+				if (IsEOLChar(sc.chNext)) {
 					sc.SetState(SCE_CMAKE_LINE_CONTINUE);
 					sc.ForwardSetState(outerStyle);
 				} else {

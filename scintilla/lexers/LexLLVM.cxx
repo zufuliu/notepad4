@@ -26,7 +26,7 @@ struct EscapeSequence {
 
 	// highlight any character as escape sequence.
 	bool resetEscapeState(int state, int chNext) noexcept {
-		if (chNext == '\r' || chNext == '\n') {
+		if (IsEOLChar(chNext)) {
 			return false;
 		}
 		outerState = state;
@@ -141,7 +141,7 @@ void ColouriseLLVMDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 
 		case SCE_LLVM_QUOTED_VARIABLE:
 		case SCE_LLVM_QUOTED_GLOBAL_VARIABLE:
-			if (sc.ch == '\\' && !(sc.chNext == '\n' || sc.chNext == '\r')) {
+			if (sc.ch == '\\' && !IsEOLChar(sc.chNext)) {
 				sc.Forward();
 			} else if (sc.ch == '\"' || sc.atLineStart) {
 				if (sc.ch == '\"') {

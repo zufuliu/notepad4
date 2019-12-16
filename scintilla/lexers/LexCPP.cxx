@@ -1186,7 +1186,7 @@ static bool IsOpenBraceLine(Sci_Position line, LexAccessor &styler) noexcept {
 	Sci_Position pos = LexSkipSpaceTab(startPos, endPos, styler);
 	char ch = styler[pos];
 	int stl = styler.StyleAt(pos);
-	if (ch == '\r' || ch == '\n' || IsSpaceEquiv(stl) || (stl == SCE_C_PREPROCESSOR || stl == SCE_C_XML_TAG))
+	if (IsEOLChar(ch) || IsSpaceEquiv(stl) || (stl == SCE_C_PREPROCESSOR || stl == SCE_C_XML_TAG))
 		return false;
 	while (endPos >= pos && isspacechar(styler[endPos]))
 		endPos--;

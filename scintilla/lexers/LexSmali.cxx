@@ -242,7 +242,7 @@ static void ColouriseSmaliDoc(Sci_PositionU startPos, Sci_Position length, int i
 			} else if (ch == '/' && chNext == '/') { // javap
 				styler.ColourTo(i - 1, state);
 				state = SCE_SMALI_COMMENTLINE;
-			} else if (ch == ';' && !(chPrev == '>' || iswordchar(chPrev)) && !(chNext == '\r' || chNext == '\n')) { // jasmin
+			} else if (ch == ';' && !(chPrev == '>' || iswordchar(chPrev)) && !IsEOLChar(chNext)) { // jasmin
 				styler.ColourTo(i - 1, state);
 				state = SCE_SMALI_COMMENTLINE;
 			} else if (ch == '\"') {
