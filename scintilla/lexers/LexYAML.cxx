@@ -270,14 +270,15 @@ void ColouriseYAMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 					sc.SetState(SCE_YAML_ESCAPECHAR);
 					sc.Forward(2);
 					sc.SetState(SCE_YAML_STRING1);
-				} else {
-					sc.Forward();
-					if (sc.GetNextNSChar() == ':') {
-						hasKey = true;
-						sc.ChangeState(SCE_YAML_KEY);
-					}
-					sc.SetState(SCE_YAML_DEFAULT);
+					continue;
 				}
+
+				sc.Forward();
+				if (sc.GetNextNSChar() == ':') {
+					hasKey = true;
+					sc.ChangeState(SCE_YAML_KEY);
+				}
+				sc.SetState(SCE_YAML_DEFAULT);
 			}
 			break;
 
