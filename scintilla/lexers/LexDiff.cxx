@@ -43,7 +43,7 @@ int ColouriseDiffLine(const char *lineBuffer) noexcept {
 		if (lineBuffer[3] == ' ' && atoi(lineBuffer + 4) && !strchr(lineBuffer, '/')) {
 			return SCE_DIFF_POSITION;
 		}
-		if (lineBuffer[3] == '\r' || lineBuffer[3] == '\n') {
+		if (IsEOLChar(lineBuffer[3])) {
 			return SCE_DIFF_POSITION;
 		}
 		if (lineBuffer[3] == ' ') {

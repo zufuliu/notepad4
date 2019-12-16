@@ -8,10 +8,6 @@
 
 namespace Scintilla {
 
-constexpr bool IsEOLChar(int ch) noexcept {
-	return (ch == '\r') || (ch == '\n');
-}
-
 constexpr bool IsSpaceOrTab(int ch) noexcept {
 	return ch == ' ' || ch == '\t';
 }

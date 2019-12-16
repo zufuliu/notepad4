@@ -414,10 +414,6 @@ constexpr bool IsScriptCommentState(const int state) noexcept {
 		   state == SCE_HJA_COMMENTLINE || state == SCE_HB_COMMENTLINE || state == SCE_HBA_COMMENTLINE;
 }
 
-constexpr bool isLineEnd(int ch) noexcept {
- 	return ch == '\r' || ch == '\n';
-}
-
 bool isMakoBlockEnd(const int ch, const int chNext, const char *blockType) noexcept {
 	if (strlen(blockType) == 0) {
 		return ((ch == '%') && (chNext == '>'));
@@ -427,10 +423,10 @@ bool isMakoBlockEnd(const int ch, const int chNext, const char *blockType) noexc
 		(0 == strcmp(blockType, "page"))) {
 		return ((ch == '/') && (chNext == '>'));
 	} else if (0 == strcmp(blockType, "%")) {
-		if (ch == '/' && isLineEnd(chNext))
+		if (ch == '/' && IsEOLChar(chNext))
 			return true;
 		else
-			return isLineEnd(ch);
+			return IsEOLChar(ch);
 	} else if (0 == strcmp(blockType, "{")) {
 		return ch == '}';
 	} else {
@@ -485,9 +481,9 @@ Sci_Position FindPhpStringDelimiter(char *phpStringDelimiter, const int phpStrin
 	phpStringDelimiter[0] = ch;
 	i++;
 
-	for (j = i; j < lengthDoc && !isLineEnd(styler[j]); j++) {
+	for (j = i; j < lengthDoc && !IsEOLChar(styler[j]); j++) {
 		if (!IsIdentifierCharEx(styler[j])) {
-			if (heardocQuotes && (styler[j] == '\'' || styler[j] == '\"') && isLineEnd(styler.SafeGetCharAt(j + 1))) {
+			if (heardocQuotes && (styler[j] == '\'' || styler[j] == '\"') && IsEOLChar(styler.SafeGetCharAt(j + 1))) {
 				isValidSimpleString = true;
 				j++;
 				break;
@@ -553,7 +549,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 	}
 	// String can be heredoc, must find a delimiter first. Reread from beginning of line containing the string, to get the correct lineState
 	if (isPHPStringState(state)) {
-		while (startPos > 0 && (isPHPStringState(state) || !isLineEnd(styler[startPos - 1]))) {
+		while (startPos > 0 && (isPHPStringState(state) || !IsEOLChar(styler[startPos - 1]))) {
 			startPos--;
 			length++;
 			state = styler.StyleAt(startPos);
@@ -797,7 +793,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 		}
 
 		// handle end of Mako comment line
-		else if (isMako && makoComment && (ch == '\r' || ch == '\n')) {
+		else if (isMako && makoComment && IsEOLChar(ch)) {
 			makoComment = 0;
 			styler.ColourTo(i - 1, StateToPrint);
 			if (scriptLanguage == eScriptPython) {
@@ -1656,7 +1652,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 			}
 			break;
 		case SCE_HJ_COMMENTLINE:
-			if (ch == '\r' || ch == '\n') {
+			if (IsEOLChar(ch)) {
 				styler.ColourTo(i - 1, statePrintForState(SCE_HJ_COMMENTLINE, inScriptType));
 				state = SCE_HJ_DEFAULT;
 				ch = ' ';
@@ -1674,7 +1670,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 				styler.ColourTo(i - 1, StateToPrint);
 				state = SCE_HJ_COMMENTLINE;
 				i += 2;
-			} else if (isLineEnd(ch)) {
+			} else if (IsEOLChar(ch)) {
 				styler.ColourTo(i - 1, StateToPrint);
 				state = SCE_HJ_STRINGEOL;
 			}
@@ -1691,7 +1687,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 				styler.ColourTo(i - 1, StateToPrint);
 				state = SCE_HJ_COMMENTLINE;
 				i += 2;
-			} else if (isLineEnd(ch)) {
+			} else if (IsEOLChar(ch)) {
 				styler.ColourTo(i - 1, StateToPrint);
 				if (chPrev != '\\' && (chPrev2 != '\\' || chPrev != '\r' || ch != '\n')) {
 					state = SCE_HJ_STRINGEOL;
@@ -1699,10 +1695,10 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 			}
 			break;
 		case SCE_HJ_STRINGEOL:
-			if (!isLineEnd(ch)) {
+			if (!IsEOLChar(ch)) {
 				styler.ColourTo(i - 1, StateToPrint);
 				state = SCE_HJ_DEFAULT;
-			} else if (!isLineEnd(chNext)) {
+			} else if (!IsEOLChar(chNext)) {
 				styler.ColourTo(i, StateToPrint);
 				state = SCE_HJ_DEFAULT;
 			}
@@ -1781,22 +1777,22 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 			if (ch == '\"') {
 				styler.ColourTo(i, StateToPrint);
 				state = SCE_HB_DEFAULT;
-			} else if (ch == '\r' || ch == '\n') {
+			} else if (IsEOLChar(ch)) {
 				styler.ColourTo(i - 1, StateToPrint);
 				state = SCE_HB_STRINGEOL;
 			}
 			break;
 		case SCE_HB_COMMENTLINE:
-			if (ch == '\r' || ch == '\n') {
+			if (IsEOLChar(ch)) {
 				styler.ColourTo(i - 1, StateToPrint);
 				state = SCE_HB_DEFAULT;
 			}
 			break;
 		case SCE_HB_STRINGEOL:
-			if (!isLineEnd(ch)) {
+			if (!IsEOLChar(ch)) {
 				styler.ColourTo(i - 1, StateToPrint);
 				state = SCE_HB_DEFAULT;
-			} else if (!isLineEnd(chNext)) {
+			} else if (!IsEOLChar(chNext)) {
 				styler.ColourTo(i, StateToPrint);
 				state = SCE_HB_DEFAULT;
 			}
@@ -1887,7 +1883,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 			}
 			break;
 		case SCE_HP_COMMENTLINE:
-			if (ch == '\r' || ch == '\n') {
+			if (IsEOLChar(ch)) {
 				styler.ColourTo(i - 1, StateToPrint);
 				state = SCE_HP_DEFAULT;
 			}
@@ -1982,7 +1978,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 			}
 			break;
 		case SCE_HPHP_COMMENTLINE:
-			if (ch == '\r' || ch == '\n') {
+			if (IsEOLChar(ch)) {
 				styler.ColourTo(i - 1, StateToPrint);
 				state = SCE_HPHP_DEFAULT;
 			}
@@ -2005,12 +2001,12 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 				if (phpStringDelimiter[0] == '\"') {
 					styler.ColourTo(i, StateToPrint);
 					state = SCE_HPHP_DEFAULT;
-				} else if (isLineEnd(chPrev)) {
+				} else if (IsEOLChar(chPrev)) {
 					const int psdLength = static_cast<int>(strlen(phpStringDelimiter));
 					const char chAfterPsd = styler.SafeGetCharAt(i + psdLength);
 					const char chAfterPsd2 = styler.SafeGetCharAt(i + psdLength + 1);
-					if (isLineEnd(chAfterPsd) ||
-						(chAfterPsd == ';' && isLineEnd(chAfterPsd2))) {
+					if (IsEOLChar(chAfterPsd) ||
+						(chAfterPsd == ';' && IsEOLChar(chAfterPsd2))) {
 							i += (((i + psdLength) < lengthDoc) ? psdLength : lengthDoc) - 1;
 						styler.ColourTo(i, StateToPrint);
 						state = SCE_HPHP_DEFAULT;
@@ -2029,12 +2025,12 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 					styler.ColourTo(i, StateToPrint);
 					state = SCE_HPHP_DEFAULT;
 				}
-			} else if (isLineEnd(chPrev) && styler.Match(i, phpStringDelimiter)) {
+			} else if (IsEOLChar(chPrev) && styler.Match(i, phpStringDelimiter)) {
 				const int psdLength = static_cast<int>(strlen(phpStringDelimiter));
 				const char chAfterPsd = styler.SafeGetCharAt(i + psdLength);
 				const char chAfterPsd2 = styler.SafeGetCharAt(i + psdLength + 1);
-				if (isLineEnd(chAfterPsd) ||
-				(chAfterPsd == ';' && isLineEnd(chAfterPsd2))) {
+				if (IsEOLChar(chAfterPsd) ||
+				(chAfterPsd == ';' && IsEOLChar(chAfterPsd2))) {
 					i += (((i + psdLength) < lengthDoc) ? psdLength : lengthDoc) - 1;
 					styler.ColourTo(i, StateToPrint);
 					state = SCE_HPHP_DEFAULT;

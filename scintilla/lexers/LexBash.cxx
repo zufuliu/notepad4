@@ -636,7 +636,7 @@ static void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int in
 			if (sc.ch == '\\') {
 				// Bash can escape any non-newline as a literal
 				sc.SetState(SCE_SH_IDENTIFIER);
-				if (sc.chNext == '\r' || sc.chNext == '\n') {
+				if (IsEOLChar(sc.chNext)) {
 					//sc.SetState(SCE_SH_OPERATOR);
 					sc.SetState(SCE_SH_DEFAULT);
 				}

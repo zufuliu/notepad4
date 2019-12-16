@@ -1564,7 +1564,7 @@ void Document::Indent(bool forwards, Sci::Line lineBottom, Sci::Line lineTop) {
 std::string Document::TransformLineEnds(const char *s, size_t len, int eolModeWanted) {
 	std::string dest;
 	for (size_t i = 0; (i < len) && (s[i]); i++) {
-		if (s[i] == '\n' || s[i] == '\r') {
+		if (IsEOLChar(s[i])) {
 			if (eolModeWanted == SC_EOL_CR) {
 				dest.push_back('\r');
 			} else if (eolModeWanted == SC_EOL_LF) {
@@ -2510,18 +2510,14 @@ Sci::Position Document::WordPartRight(Sci::Position pos) const noexcept {
 	return pos;
 }
 
-static constexpr bool IsLineEndChar(char c) noexcept {
-	return (c == '\n' || c == '\r');
-}
-
 Sci::Position Document::ExtendStyleRange(Sci::Position pos, int delta, bool singleLine) noexcept {
 	const int sStart = cb.StyleAt(pos);
 	if (delta < 0) {
-		while (pos > 0 && (cb.StyleAt(pos) == sStart) && (!singleLine || !IsLineEndChar(cb.CharAt(pos))))
+		while (pos > 0 && (cb.StyleAt(pos) == sStart) && (!singleLine || !IsEOLChar(cb.CharAt(pos))))
 			pos--;
 		pos++;
 	} else {
-		while (pos < (Length()) && (cb.StyleAt(pos) == sStart) && (!singleLine || !IsLineEndChar(cb.CharAt(pos))))
+		while (pos < (Length()) && (cb.StyleAt(pos) == sStart) && (!singleLine || !IsEOLChar(cb.CharAt(pos))))
 			pos++;
 	}
 	return pos;

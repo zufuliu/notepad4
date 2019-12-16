@@ -146,7 +146,7 @@ static void ColouriseAsmDoc(Sci_PositionU startPos, Sci_Position length, int ini
 				sc.SetState(SCE_ASM_DEFAULT);
 				if (IsDirective && s[0] == '#' && (strcmp(s, "#error") == 0 || strcmp(s, "%error") == 0 ||
 					strcmp(s, "#warning") == 0 || strcmp(s, "#message") == 0)) {
-					while (!(sc.ch == ' ' || sc.ch == '\t') && !(sc.chNext == '\r' || sc.chNext == '\n'))
+					while (!IsASpaceOrTab(sc.ch) && !IsEOLChar(sc.chNext))
 						sc.Forward();
 					if (!sc.atLineEnd)
 						sc.ForwardSetState(SCE_ASM_STRING);

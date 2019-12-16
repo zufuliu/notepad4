@@ -53,6 +53,10 @@ public:
 
 // Functions for classifying characters
 
+constexpr bool IsEOLChar(int ch) noexcept {
+	return (ch == '\r') || (ch == '\n');
+}
+
 constexpr bool IsASpace(int ch) noexcept {
 	return (ch == ' ') || ((ch >= 0x09) && (ch <= 0x0d));
 }

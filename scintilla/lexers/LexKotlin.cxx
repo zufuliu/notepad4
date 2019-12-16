@@ -29,7 +29,7 @@ struct EscapeSequence {
 
 	// highlight any character as escape sequence.
 	bool resetEscapeState(int state, int chNext) noexcept {
-		if (chNext == '\r' || chNext == '\n') {
+		if (IsEOLChar(chNext)) {
 			return false;
 		}
 		outerState = state;
