@@ -1394,7 +1394,7 @@ void EditView::DrawFoldDisplayText(Surface *surface, const EditModel &model, con
 	rcBox.top += 1 + vsDraw.extraAscent/2;
 	rcBox.bottom -= vsDraw.extraDescent/2;
 	rcBox.left = std::round(rcBox.left);
-	rcBox.right = std::round(rcBox.right);
+	rcBox.right = std::round(rcBox.right) + 1;
 
 	if (phase & drawBack) {
 		// Fill Remainder of the line
@@ -1425,13 +1425,10 @@ void EditView::DrawFoldDisplayText(Surface *surface, const EditModel &model, con
 			surface->PenColour(textFore);
 			const IntegerRectangle ircBox(rcBox);
 			surface->MoveTo(ircBox.left, ircBox.top);
-			surface->LineTo(ircBox.left, ircBox.bottom);
-			surface->MoveTo(ircBox.right, ircBox.top);
-			surface->LineTo(ircBox.right, ircBox.bottom);
-			surface->MoveTo(ircBox.left, ircBox.top);
-			surface->LineTo(ircBox.right, ircBox.top);
-			surface->MoveTo(ircBox.left, ircBox.bottom - 1);
-			surface->LineTo(ircBox.right, ircBox.bottom - 1);
+			surface->LineTo(ircBox.left, ircBox.bottom - 1);
+			surface->LineTo(ircBox.right - 1, ircBox.bottom - 1);
+			surface->LineTo(ircBox.right - 1, ircBox.top);
+			surface->LineTo(ircBox.left, ircBox.top);
 		}
 	}
 
