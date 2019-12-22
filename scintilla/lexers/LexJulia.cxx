@@ -343,7 +343,7 @@ void ColouriseJuliaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 				if (commentLevel == 0) {
 					sc.ForwardSetState(SCE_JULIA_DEFAULT);
 				}
-			} else if (sc.Match('=', '#')) {
+			} else if (sc.Match('#', '=')) {
 				sc.Forward(2);
 				++commentLevel;
 			}
