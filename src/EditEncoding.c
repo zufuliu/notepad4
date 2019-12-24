@@ -531,12 +531,10 @@ void Encoding_InitDefaults(void) {
 	g_DOSEncoding = CPI_OEM;
 
 	// Try to set the DOS encoding to DOS-437 if the default OEMCP is not DOS-437
-	if (oemcp != 437) {
+	if (oemcp != 437 && IsValidCodePage(437)) {
 		for (int i = CPI_UTF7 + 1; i < (int)COUNTOF(mEncoding); ++i) {
 			if (mEncoding[i].uCodePage == 437) {
-				if (IsValidCodePage(i)) {
-					g_DOSEncoding = i;
-				}
+				g_DOSEncoding = i;
 				break;
 			}
 		}
