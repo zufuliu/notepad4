@@ -1133,10 +1133,11 @@ static inline BOOL DidLexerHasBlockComment(int iLexer, int rid) {
 	);
 }
 
+// Python like indentation based code folding that can use SC_IV_LOOKFORWARD
 static inline BOOL IsPythonLikeFolding(int iLexer) {
-	return iLexer == SCLEX_PYTHON
-		|| iLexer == SCLEX_YAML
-		|| iLexer == SCLEX_NULL;
+	return iLexer == SCLEX_NULL
+		|| iLexer == SCLEX_PYTHON
+		|| iLexer == SCLEX_YAML;
 }
 
 static void Style_Parse(struct DetailStyle *style, LPCWSTR lpszStyle);

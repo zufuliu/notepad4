@@ -7196,9 +7196,9 @@ static void EditFoldStack_Push(struct EditFoldStack *foldStack, int level) {
 }
 
 static inline BOOL IsFoldIndentationBased(int iLexer) {
-	return iLexer == SCLEX_PYTHON
-		|| iLexer == SCLEX_YAML
-		|| iLexer == SCLEX_NULL;
+	return iLexer == SCLEX_NULL
+		|| iLexer == SCLEX_PYTHON
+		|| iLexer == SCLEX_YAML;
 }
 
 static UINT Style_GetDefaultFoldState(int rid, int *maxLevel) {
