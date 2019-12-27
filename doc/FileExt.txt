@@ -36,6 +36,7 @@ C# Source
 	cs
 	csx				C# Script
 	vala			GNOME Vala
+	vapi			Vala API File
 
 CSS Style Sheet
 	css
