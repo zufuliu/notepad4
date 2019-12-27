@@ -1,7 +1,7 @@
 // C++11 http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2012/n3337.pdf
 // C++14 https://github.com/cplusplus/draft/raw/master/papers/n4140.pdf
 // C++17 http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/n4659.pdf
-// C++20 https://github.com/cplusplus/draft/raw/master/papers/n4830.pdf
+// C++20 https://github.com/cplusplus/draft/raw/master/papers/n4842.pdf
 // https://en.cppreference.com/w/cpp
 // https://en.cppreference.com/w/cpp/header
 // https://en.cppreference.com/w/cpp/links
