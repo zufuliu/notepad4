@@ -96,7 +96,7 @@ static EDITSTYLE Styles_CSharp[] = {
 EDITLEXER lexCSharp = {
 	SCLEX_CPP, NP2LEX_CSHARP,
 	EDITLEXER_HOLE(L"C# Source", Styles_CSharp),
-	L"cs; csx; vala",
+	L"cs; csx; vala; vapi",
 	&Keywords_CSharp,
 	Styles_CSharp
 };
