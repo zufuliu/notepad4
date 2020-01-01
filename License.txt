@@ -5,8 +5,8 @@ Notepad2, metapath and Notepad2-mod is licensed under the BSD 3-Clause License
 http://www.flos-freeware.ch
 https://xhmikosr.github.io/notepad2-mod/
 
-metapath Copyright © 1996-2019 Florian Balmer et al.
-Notepad2 Copyright © 2004-2019 Florian Balmer et al.
+metapath Copyright © 1996-2020 Florian Balmer et al.
+Notepad2 Copyright © 2004-2020 Florian Balmer et al.
 Notepad2-mod Copyright © 2010-2017 All contributors.
 All rights reserved.
 
@@ -45,7 +45,7 @@ License for Scintilla and SciTE
 https://www.scintilla.org/
 https://www.scintilla.org/License.txt
 
-Copyright 1998-2019 by Neil Hodgson <neilh@scintilla.org>
+Copyright 1998-2020 by Neil Hodgson <neilh@scintilla.org>
 
 All Rights Reserved
 
