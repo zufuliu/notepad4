@@ -2085,11 +2085,6 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 			if ((pnmlv->uNewState & (LVIS_SELECTED | LVIS_FOCUSED)) !=
 					(pnmlv->uOldState & (LVIS_SELECTED | LVIS_FOCUSED))) {
-				const int iItem = pnmlv->iItem;
-				const int count = ListView_GetItemCount(hwndDirList);
-				ListView_EnsureVisible(hwndDirList, max_i(0, iItem - 1), FALSE);
-				ListView_EnsureVisible(hwndDirList, min_i(iItem + 1, count - 1), FALSE);
-				ListView_EnsureVisible(hwndDirList, iItem, FALSE);
 
 				WCHAR tch[64];
 				if ((pnmlv->uNewState & LVIS_SELECTED)) {
@@ -2127,7 +2122,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 				} else {
 					WCHAR tchnum[64];
 					WCHAR fmt[64];
-					_ltow(count, tchnum, 10);
+					_ltow(ListView_GetItemCount(hwndDirList), tchnum, 10);
 					FormatNumberStr(tchnum);
 					FormatString(tch, fmt, HasFilter() ? IDS_NUMFILES_FILTER : IDS_NUMFILES, tchnum);
 				}
