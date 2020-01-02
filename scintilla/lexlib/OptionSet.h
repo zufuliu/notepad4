@@ -24,6 +24,7 @@ class OptionSet {
 			plcos ps;
 		};
 		const char *description;
+		std::string value;
 		Option() noexcept :
 			opType(SC_TYPE_BOOLEAN), pb(false), description("") {
 		}
@@ -36,7 +37,8 @@ class OptionSet {
 		Option(plcos ps_, const char *description_) noexcept :
 			opType(SC_TYPE_STRING), ps(ps_), description(description_) {
 		}
-		bool Set(T *base, const char *val) const {
+		bool Set(T *base, const char *val) {
+			value = val;
 			switch (opType) {
 			case SC_TYPE_BOOLEAN: {
 				bool option = atoi(val) != 0;
@@ -63,6 +65,9 @@ class OptionSet {
 			}
 			}
 			return false;
+		}
+		const char *Get() const {
+			return value.c_str();
 		}
 	};
 	typedef std::map<std::string, Option> OptionMap;
@@ -113,6 +118,14 @@ public:
 			return it->second.Set(base, val);
 		}
 		return false;
+	}
+
+	const char *PropertyGet(const char *name) const {
+		const auto it = nameToDef.find(name);
+		if (it != nameToDef.end()) {
+			return it->second.Get();
+		}
+		return nullptr;
 	}
 
 	void DefineWordListSets(const char *const wordListDescriptions[]) {
