@@ -3000,6 +3000,9 @@ fun int TagsOfStyle=4031(int style, stringresult tags)
 # Result is NUL-terminated.
 fun int DescriptionOfStyle=4032(int style, stringresult description)
 
+# Set the lexer from an ILexer*.
+set void SetILexer=4033(, pointer ilexer)
+
 # Notifications
 # Type of modification and the action which caused the modification.
 # These are defined as a bit mask to make it easy to specify which notifications are wanted.

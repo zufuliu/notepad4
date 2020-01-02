@@ -17,6 +17,9 @@ public:
 	const char * SCI_METHOD DescribeWordListSets() const noexcept override;
 	void SCI_METHOD Lex(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, IDocument *pAccess) override;
 	void SCI_METHOD Fold(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, IDocument *pAccess) override;
+	// ILexer5 methods
+	const char * SCI_METHOD GetName() const noexcept override;
+	int SCI_METHOD  GetIdentifier() const noexcept override;
 };
 
 }

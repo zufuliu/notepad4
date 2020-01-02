@@ -11,7 +11,7 @@
 namespace Scintilla {
 
 enum {
-	dvRelease4 = 2
+	dvRelease4 = 2,
 };
 
 class IDocument {
@@ -43,7 +43,8 @@ public:
 };
 
 enum {
-	lvRelease4 = 2
+	lvRelease4 = 2,
+	lvRelease5 = 3,
 };
 
 class ILexer4 {
@@ -73,6 +74,13 @@ public:
 	virtual const char * SCI_METHOD NameOfStyle(int style) const noexcept = 0;
 	virtual const char * SCI_METHOD TagsOfStyle(int style) const noexcept = 0;
 	virtual const char * SCI_METHOD DescriptionOfStyle(int style) const noexcept = 0;
+};
+
+class ILexer5 : public ILexer4 {
+public:
+	virtual const char * SCI_METHOD GetName() const noexcept = 0;
+	virtual int SCI_METHOD GetIdentifier() const noexcept = 0;
+	virtual const char * SCI_METHOD PropertyGet(const char *key) const = 0;
 };
 
 }

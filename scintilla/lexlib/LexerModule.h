@@ -16,7 +16,7 @@ typedef const WordList * const LexerWordList[];
 
 typedef void (*LexerFunction)(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle,
 	LexerWordList keywordLists, Accessor &styler);
-typedef ILexer4 *(*LexerFactoryFunction)();
+typedef ILexer5 *(*LexerFactoryFunction)();
 
 /**
  * A LexerModule is responsible for lexing and folding a particular language.
@@ -76,14 +76,14 @@ public:
 	const LexicalClass *LexClasses() const noexcept;
 	size_t NamedStyles() const noexcept;
 
-	ILexer4 *Create() const;
+	ILexer5 *Create() const;
 
 	void Lex(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle,
 		LexerWordList keywordLists, Accessor &styler) const;
 	void Fold(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle,
 		LexerWordList keywordLists, Accessor &styler) const;
 
-	friend class Catalogue;
+	friend class CatalogueModules;
 };
 
 }

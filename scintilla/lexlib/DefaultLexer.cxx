@@ -24,8 +24,12 @@ using namespace Scintilla;
 
 static const char styleSubable[] = { 0 };
 
-DefaultLexer::DefaultLexer(const LexicalClass *lexClasses_, size_t nClasses_) :
-	lexClasses(lexClasses_), nClasses(nClasses_) {
+DefaultLexer::DefaultLexer(const char *languageName_, int language_,
+	const LexicalClass *lexClasses_, size_t nClasses_) :
+	languageName(languageName_),
+	language(language_),
+	lexClasses(lexClasses_),
+	nClasses(nClasses_) {
 }
 
 DefaultLexer::~DefaultLexer() = default;
@@ -35,7 +39,7 @@ void SCI_METHOD DefaultLexer::Release() noexcept {
 }
 
 int SCI_METHOD DefaultLexer::Version() const noexcept {
-	return lvRelease4;
+	return lvRelease5;
 }
 
 const char * SCI_METHOD DefaultLexer::PropertyNames() const noexcept {
@@ -121,4 +125,13 @@ const char * SCI_METHOD DefaultLexer::TagsOfStyle(int style) const noexcept {
 
 const char * SCI_METHOD DefaultLexer::DescriptionOfStyle(int style) const noexcept {
 	return (style < NamedStyles()) ? lexClasses[style].description : "";
+}
+
+// ILexer5 methods
+const char * SCI_METHOD DefaultLexer::GetName() const noexcept {
+	return languageName;
+}
+
+int SCI_METHOD DefaultLexer::GetIdentifier() const noexcept {
+	return language;
 }

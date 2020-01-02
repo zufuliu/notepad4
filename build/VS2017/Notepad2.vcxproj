@@ -1048,6 +1048,7 @@
     <ClInclude Include="..\..\scintilla\include\Scintilla.h" />
     <ClInclude Include="..\..\scintilla\include\VectorISA.h" />
     <ClInclude Include="..\..\scintilla\lexlib\Accessor.h" />
+    <ClInclude Include="..\..\scintilla\lexlib\CatalogueModules.h" />
     <ClInclude Include="..\..\scintilla\lexlib\CharacterCategory.h" />
     <ClInclude Include="..\..\scintilla\lexlib\CharacterSet.h" />
     <ClInclude Include="..\..\scintilla\lexlib\DefaultLexer.h" />

@@ -53,3 +53,11 @@ void SCI_METHOD LexerSimple::Fold(Sci_PositionU startPos, Sci_Position lengthDoc
 		astyler.Flush();
 	}
 }
+
+const char * SCI_METHOD LexerSimple::GetName() const noexcept {
+	return module->languageName;
+}
+
+int SCI_METHOD LexerSimple::GetIdentifier() const noexcept {
+	return module->GetLanguage();
+}

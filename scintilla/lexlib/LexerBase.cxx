@@ -45,7 +45,7 @@ void SCI_METHOD LexerBase::Release() noexcept {
 }
 
 int SCI_METHOD LexerBase::Version() const noexcept {
-	return lvRelease4;
+	return lvRelease5;
 }
 
 const char * SCI_METHOD LexerBase::PropertyNames() const noexcept {
@@ -67,6 +67,10 @@ Sci_Position SCI_METHOD LexerBase::PropertySet(const char *key, const char *val)
 		return 0;
 	}
 	return -1;
+}
+
+const char *SCI_METHOD LexerBase::PropertyGet(const char *key) const {
+	return props.Get(key);
 }
 
 const char * SCI_METHOD LexerBase::DescribeWordListSets() const noexcept {
@@ -138,4 +142,14 @@ const char * SCI_METHOD LexerBase::TagsOfStyle(int style) const noexcept {
 
 const char * SCI_METHOD LexerBase::DescriptionOfStyle(int style) const noexcept {
 	return (style < NamedStyles()) ? lexClasses[style].description : "";
+}
+
+// ILexer5 methods
+
+const char *SCI_METHOD LexerBase::GetName() const noexcept {
+	return "";
+}
+
+int SCI_METHOD LexerBase::GetIdentifier() const noexcept {
+	return SCLEX_AUTOMATIC;
 }
