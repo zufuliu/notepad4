@@ -795,7 +795,7 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		SetExplorerTheme(hwndDirList);
 	}
 
-	ListView_SetHoverTime(hwndDirList, 10);
+	ListView_SetHoverTime(hwndDirList, 50);
 	// Drag & Drop
 	DragAcceptFiles(hwnd, TRUE);
 	// History
