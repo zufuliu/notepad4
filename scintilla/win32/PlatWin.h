@@ -6,6 +6,41 @@
 // The License.txt file describes the conditions under which this software may be distributed.
 #pragma once
 
+// sdkddkver.h
+#ifndef _WIN32_WINNT_VISTA
+#define _WIN32_WINNT_VISTA				0x0600
+#endif
+#ifndef _WIN32_WINNT_WIN7
+#define _WIN32_WINNT_WIN7				0x0601
+#endif
+#ifndef _WIN32_WINNT_WIN8
+#define _WIN32_WINNT_WIN8				0x0602
+#endif
+#ifndef _WIN32_WINNT_WINBLUE
+#define _WIN32_WINNT_WINBLUE			0x0603
+#endif
+#ifndef _WIN32_WINNT_WIN10
+#define _WIN32_WINNT_WIN10				0x0A00
+#endif
+
+#if !defined(DISABLE_D2D)
+#define USE_D2D 1
+#endif
+
+#if defined(USE_D2D)
+#if defined(_MSC_BUILD) && (VER_PRODUCTVERSION_W <= _WIN32_WINNT_WIN7)
+#pragma warning(push)
+#pragma warning(disable: 4458)
+// d2d1helper.h(677,19): warning C4458:  declaration of 'a' hides class member
+#endif
+#include <d2d1.h>
+#include <dwrite.h>
+#if defined(_MSC_BUILD) && (VER_PRODUCTVERSION_W <= _WIN32_WINNT_WIN7)
+#pragma warning(pop)
+#endif
+#endif
+
+
 // force compile C as CPP
 #define NP2_FORCE_COMPILE_C_AS_CPP	0
 
