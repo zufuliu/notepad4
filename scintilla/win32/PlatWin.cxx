@@ -270,7 +270,7 @@ inline void SetWindowPointer(HWND hWnd, void *ptr) noexcept {
 }
 
 #if USE_SRW_LOCK
-SRWLOCK crPlatformLock = SRWLOCK_INIT;
+SRWLOCK srwPlatformLock = SRWLOCK_INIT;
 #else
 CRITICAL_SECTION crPlatformLock;
 #endif
@@ -2325,7 +2325,7 @@ HCURSOR GetReverseArrowCursor() noexcept {
 		return reverseArrowCursor;
 
 #if USE_SRW_LOCK
-	::AcquireSRWLockExclusive(&crPlatformLock);
+	::AcquireSRWLockExclusive(&srwPlatformLock);
 #else
 	::EnterCriticalSection(&crPlatformLock);
 #endif
@@ -2352,7 +2352,7 @@ HCURSOR GetReverseArrowCursor() noexcept {
 		}
 	}
 #if USE_SRW_LOCK
-	::ReleaseSRWLockExclusive(&crPlatformLock);
+	::ReleaseSRWLockExclusive(&srwPlatformLock);
 #else
 	::LeaveCriticalSection(&crPlatformLock);
 #endif
