@@ -128,23 +128,6 @@ EDITLEXER lexCONF = {
 	Styles_CONF
 };
 
-static EDITSTYLE Styles_INI[] = {
-	EDITSTYLE_DEFAULT,
-	{ SCE_PROPS_KEY, NP2StyleX_Property, L"fore:#A46000" },
-	{ SCE_PROPS_COMMENT, NP2StyleX_Comment, L"fore:#008000" },
-	{ SCE_PROPS_SECTION, NP2StyleX_Section, L"bold; back:#FFC040; eolfilled" },
-	{ SCE_PROPS_ASSIGNMENT, NP2StyleX_Assignment, L"fore:#FF0000" },
-	{ SCE_PROPS_DEFVAL, NP2StyleX_DefaultValue, L"fore:#FF0000" },
-};
-
-EDITLEXER lexINI = {
-	SCLEX_PROPERTIES, NP2LEX_INI,
-	EDITLEXER_HOLE(L"Ini Config File", Styles_INI),
-	L"ini; inf; reg; oem; sif; url; sed; theme; clw; abnf",
-	&Keywords_NULL,
-	Styles_INI
-};
-
 static EDITSTYLE Styles_DIFF[] = {
 	EDITSTYLE_DEFAULT,
 	{ SCE_DIFF_COMMENT, NP2StyleX_Comment, L"fore:#008000" },
@@ -162,4 +145,21 @@ EDITLEXER lexDIFF = {
 	L"diff; patch",
 	&Keywords_NULL,
 	Styles_DIFF
+};
+
+static EDITSTYLE Styles_INI[] = {
+	EDITSTYLE_DEFAULT,
+	{ SCE_PROPS_KEY, NP2StyleX_Property, L"fore:#A46000" },
+	{ SCE_PROPS_COMMENT, NP2StyleX_Comment, L"fore:#008000" },
+	{ SCE_PROPS_SECTION, NP2StyleX_Section, L"bold; back:#FFC040; eolfilled" },
+	{ SCE_PROPS_ASSIGNMENT, NP2StyleX_Assignment, L"fore:#FF0000" },
+	{ SCE_PROPS_DEFVAL, NP2StyleX_DefaultValue, L"fore:#FF0000" },
+};
+
+EDITLEXER lexINI = {
+	SCLEX_PROPERTIES, NP2LEX_INI,
+	EDITLEXER_HOLE(L"Ini Config File", Styles_INI),
+	L"ini; inf; reg; oem; sif; url; sed; theme; clw; abnf",
+	&Keywords_NULL,
+	Styles_INI
 };
