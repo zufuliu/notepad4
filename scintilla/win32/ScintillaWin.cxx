@@ -2059,7 +2059,6 @@ void ScintillaWin::FineTickerCancel(TickReason reason) noexcept {
 	}
 }
 
-
 bool ScintillaWin::SetIdle(bool on) noexcept {
 	// On Win32 the Idler is implemented as a Timer on the Scintilla window.  This
 	// takes advantage of the fact that WM_TIMER messages are very low priority,
@@ -2429,11 +2428,7 @@ void ScintillaWin::CopyAllowLine() {
 bool ScintillaWin::CanPaste() {
 	if (!Editor::CanPaste())
 		return false;
-	if (::IsClipboardFormatAvailable(CF_UNICODETEXT))
-		return true;
-	if (::IsClipboardFormatAvailable(CF_TEXT))
-		return true;
-	return false;
+	return ::IsClipboardFormatAvailable(CF_UNICODETEXT);
 }
 
 namespace {
@@ -2555,33 +2550,6 @@ void ScintillaWin::Paste(bool asBinary) {
 			InsertPasteShape(putf.data(), len, pasteShape);
 		}
 		memUSelection.Unlock();
-	} else {
-		// CF_UNICODETEXT not available, paste ANSI text
-		GlobalMemory memSelection(::GetClipboardData(CF_TEXT));
-		if (memSelection) {
-			const char *ptr = static_cast<const char *>(memSelection.ptr);
-			if (ptr) {
-				const size_t bytes = memSelection.Size();
-				const size_t len = strnlen(ptr, bytes);
-				// In Unicode mode, convert clipboard text to UTF-8
-				if (IsUnicodeMode()) {
-					std::vector<wchar_t> uptr(len + 1);
-
-					const size_t ulen = WideCharFromMultiByte(CP_ACP,
-						std::string_view(ptr, len), uptr.data(), len + 1);
-
-					const std::wstring_view wsv(uptr.data(), ulen);
-					const size_t mlen = UTF8Length(wsv);
-					std::vector<char> putf(mlen + 1);
-					UTF8FromUTF16(wsv, putf.data(), mlen);
-
-					InsertPasteShape(putf.data(), mlen, pasteShape);
-				} else {
-					InsertPasteShape(ptr, len, pasteShape);
-				}
-			}
-			memSelection.Unlock();
-		}
 	}
 	::CloseClipboard();
 	Redraw();
@@ -3037,22 +3005,13 @@ void ScintillaWin::CopyToClipboard(const SelectionText &selectedText) {
 			const size_t uLen = WideCharLenFromMultiByte(cpSrc, svSelected);
 			uniText.Allocate(2 * uLen);
 			if (uniText) {
-				WideCharFromMultiByte(cpSrc, svSelected,
-					static_cast<wchar_t *>(uniText.ptr), uLen);
+				WideCharFromMultiByte(cpSrc, svSelected, static_cast<wchar_t *>(uniText.ptr), uLen);
 			}
 		}
 	}
 
 	if (uniText) {
 		uniText.SetClip(CF_UNICODETEXT);
-	} else {
-		// There was a failure - try to copy at least ANSI text
-		GlobalMemory ansiText;
-		ansiText.Allocate(selectedText.LengthWithTerminator());
-		if (ansiText) {
-			memcpy(ansiText.ptr, selectedText.Data(), selectedText.LengthWithTerminator());
-			ansiText.SetClip(CF_TEXT);
-		}
 	}
 
 	if (selectedText.rectangular) {
