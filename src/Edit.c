@@ -3960,9 +3960,9 @@ static int __cdecl CmpIStdRev(const void *p1, const void *p2) {
 static int __cdecl CmpLogical(const void *p1, const void *p2) {
 	const SORTLINE *s1 = (const SORTLINE *)p1;
 	const SORTLINE *s2 = (const SORTLINE *)p2;
-	int cmp = StrCmpLogicalW(s1->pwszSortEntry, s1->pwszSortEntry);
+	int cmp = StrCmpLogicalW(s1->pwszSortEntry, s2->pwszSortEntry);
 	if (cmp == 0) {
-		cmp = StrCmpLogicalW(s2->pwszLine, s2->pwszLine);
+		cmp = StrCmpLogicalW(s1->pwszLine, s2->pwszLine);
 	}
 	return cmp ? cmp : CmpStd(p1, p2);
 }
@@ -3970,9 +3970,9 @@ static int __cdecl CmpLogical(const void *p1, const void *p2) {
 static int __cdecl CmpILogical(const void *p1, const void *p2) {
 	const SORTLINE *s1 = (const SORTLINE *)p1;
 	const SORTLINE *s2 = (const SORTLINE *)p2;
-	int cmp = StrCmpLogicalW(s1->pwszSortEntry, s1->pwszSortEntry);
+	int cmp = StrCmpLogicalW(s1->pwszSortEntry, s2->pwszSortEntry);
 	if (cmp == 0) {
-		cmp = StrCmpLogicalW(s2->pwszLine, s2->pwszLine);
+		cmp = StrCmpLogicalW(s1->pwszLine, s2->pwszLine);
 	}
 	return cmp ? cmp : CmpIStd(p1, p2);
 }
@@ -4128,11 +4128,11 @@ void EditSortLines(int iSortFlags) {
 		if (pLines[i].pwszLine && ((iSortFlags & SORT_SHUFFLE) || StrNotEmpty(pLines[i].pwszLine))) {
 			BOOL bDropLine = FALSE;
 			if (!(iSortFlags & SORT_SHUFFLE)) {
-				if ((iSortFlags & SORT_MERGEDUP) || (iSortFlags & SORT_UNIQDUP) || (iSortFlags & SORT_UNIQUNIQ)) {
+				if (iSortFlags & (SORT_MERGEDUP | SORT_UNIQDUP | SORT_UNIQUNIQ)) {
 					if (i < iLineCount - 1) {
 						if (pfnStrCmp(pLines[i].pwszLine, pLines[i + 1].pwszLine) == 0) {
 							bLastDup = TRUE;
-							bDropLine = ((iSortFlags & SORT_MERGEDUP) || (iSortFlags & SORT_UNIQDUP));
+							bDropLine = iSortFlags & (SORT_MERGEDUP | SORT_UNIQDUP);
 						} else {
 							bDropLine = (!bLastDup && (iSortFlags & SORT_UNIQUNIQ)) || (bLastDup && (iSortFlags & SORT_UNIQDUP));
 							bLastDup = FALSE;
