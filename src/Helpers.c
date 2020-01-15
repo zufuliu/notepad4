@@ -1758,7 +1758,7 @@ BOOL ExtractFirstArgument(LPCWSTR lpArgs, LPWSTR lpArg1, LPWSTR lpArg2) {
 void PrepareFilterStr(LPWSTR lpFilter) {
 	LPWSTR psz = StrEnd(lpFilter);
 	while (psz != lpFilter) {
-		if (*(psz = CharPrev(lpFilter, psz)) == L'\n') {
+		if (*(psz = CharPrev(lpFilter, psz)) == L'|') {
 			*psz = L'\0';
 		}
 	}
