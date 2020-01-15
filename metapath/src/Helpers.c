@@ -1220,7 +1220,7 @@ LPWSTR GetFilenameStr(LPWSTR lpFile) {
 void PrepareFilterStr(LPWSTR lpFilter) {
 	LPWSTR psz = StrEnd(lpFilter);
 	while (psz != lpFilter) {
-		if (*(psz = CharPrev(lpFilter, psz)) == L'\n') {
+		if (*(psz = CharPrev(lpFilter, psz)) == L'|') {
 			*psz = L'\0';
 		}
 	}
