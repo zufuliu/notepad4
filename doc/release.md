@@ -11,8 +11,10 @@ Tips: To keep your current settings, do NOT replace *Notepad2.ini* or *metapath.
 ## File List
 | File | SHA-256 |
 | ---|--|
-| [ARM_v4.19.?.zip](https://www.virustotal.com/gui/url/?/detection) | ? |
-| [ARM64_v4.19.?.zip](https://www.virustotal.com/gui/url/?/detection) | ? |
-| [AVX2_v4.19.?.zip](https://www.virustotal.com/gui/url/?/detection) | ? |
-| [Win32_v4.19.?.zip](https://www.virustotal.com/gui/url/?/detection) | ? |
-| [x64_v4.19.?.zip](https://www.virustotal.com/gui/url/?/detection) | ? |
+| [ARM_v4.20.?.zip](https://www.virustotal.com/gui/url/?/detection) | ? |
+| [ARM64_v4.20.?.zip](https://www.virustotal.com/gui/url/?/detection) | ? |
+| [AVX2_v4.20.?.zip](https://www.virustotal.com/gui/url/?/detection) | ? |
+| [Win32_v4.20.?.zip](https://www.virustotal.com/gui/url/?/detection) | ? |
+| [x64_v4.20.?.zip](https://www.virustotal.com/gui/url/?/detection) | ? |
+| 한국어 | https://teus.me/category/IT/Notepad2 |
+| 简体中文 | https://github.com/yfdyh000/notepad2 |
