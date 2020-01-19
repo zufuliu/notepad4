@@ -268,6 +268,7 @@
         <IncludePath Value="../../scintilla/include"/>
         <IncludePath Value="../../scintilla/lexlib"/>
         <IncludePath Value="../../scintilla/src"/>
+        <Preprocessor Value="_WINDOWS"/>
         <Preprocessor Value="UNICODE"/>
         <Preprocessor Value="_UNICODE"/>
         <Preprocessor Value="SCI_LEXER"/>
