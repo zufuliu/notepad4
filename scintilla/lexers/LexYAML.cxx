@@ -274,7 +274,7 @@ void ColouriseYAMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 					hasKey = true;
 					sc.ChangeState(SCE_YAML_KEY);
 				}
-				sc.SetState(SCE_YAML_DEFAULT);
+				sc.SetState((sc.ch == ':')? SCE_YAML_OPERATOR : SCE_YAML_DEFAULT);
 			}
 			break;
 
@@ -289,7 +289,7 @@ void ColouriseYAMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 					hasKey = true;
 					sc.ChangeState(SCE_YAML_KEY);
 				}
-				sc.SetState(SCE_YAML_DEFAULT);
+				sc.SetState((sc.ch == ':')? SCE_YAML_OPERATOR : SCE_YAML_DEFAULT);
 			}
 			break;
 
