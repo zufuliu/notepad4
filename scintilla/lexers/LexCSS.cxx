@@ -111,9 +111,9 @@ static void ColouriseCssDoc(Sci_PositionU startPos, Sci_Position length, int ini
 		varPrefix = isLessDocument ? '@' : '$';
 
 	// SCSS/LESS/HSS support single-line comments
-	typedef enum _CommentModes {
+	enum CommentMode {
 		eCommentBlock = 0, eCommentLine = 1
-	} CommentMode;
+	};
 	CommentMode comment_mode = eCommentBlock;
 	const bool hasSingleLineComments = isScssDocument || isLessDocument || isHssDocument;
 

@@ -3927,7 +3927,7 @@ void EditJoinLinesEx(void) {
 //
 // EditSortLines()
 //
-typedef struct _SORTLINE {
+typedef struct SORTLINE {
 	WCHAR *pwszLine;
 	WCHAR *pwszSortEntry;
 } SORTLINE;

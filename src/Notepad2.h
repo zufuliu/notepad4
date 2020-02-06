@@ -25,7 +25,7 @@
 
 //==== Data Type for WM_COPYDATA ==============================================
 #define DATA_NOTEPAD2_PARAMS 0xFB10
-typedef struct np2params {
+typedef struct NP2PARAMS {
 	int		flagFileSpecified;
 	int		flagChangeNotify;
 	int		flagLexerSpecified;

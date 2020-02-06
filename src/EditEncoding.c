@@ -665,7 +665,7 @@ BOOL Encoding_IsValid(int iTestEncoding) {
 	return iTestEncoding >= 0 && iTestEncoding < (int)COUNTOF(mEncoding) && IsValidEncoding(iTestEncoding);
 }
 
-typedef struct _ee {
+typedef struct ENCODINGENTRY {
 	int id;
 	WCHAR wch[256];
 } ENCODINGENTRY, *PENCODINGENTRY;

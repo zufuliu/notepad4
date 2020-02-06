@@ -127,7 +127,7 @@ COLORREF	colorNoFilter;
 COLORREF	colorFilter;
 COLORREF	colorCustom[16];
 
-typedef struct _wi {
+typedef struct WININFO {
 	int x;
 	int y;
 	int cx;

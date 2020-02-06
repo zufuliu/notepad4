@@ -611,7 +611,7 @@ UINT CodePageFromCharSet(UINT uCharSet);
 // MRU_MAXITEMS * (MAX_PATH + 4)
 #define MAX_INI_SECTION_SIZE_MRU	(8 * 1024)
 
-typedef struct _mrulist {
+typedef struct MRULIST {
 	LPCWSTR szRegKey;
 	int		iFlags;
 	int		iSize;

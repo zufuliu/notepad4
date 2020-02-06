@@ -28,7 +28,7 @@
 //==== DirList ================================================================
 //==== DLDATA Structure =======================================================
 
-typedef struct tagDLDATA { // dl
+typedef struct DLDATA { // dl
 	HWND hwnd;					// HWND of ListView Control
 	UINT cbidl;					// Size of pidl
 	LPITEMIDLIST pidl;			// Directory Id
@@ -935,7 +935,7 @@ BOOL DirList_MatchFilter(LPSHELLFOLDER lpsf, LPCITEMIDLIST pidl, LPCDL_FILTER pd
 //
 //  Internal Itemdata Structure
 //
-typedef struct tagDC_ITEMDATA {
+typedef struct DC_ITEMDATA {
 	LPITEMIDLIST pidl;
 	LPSHELLFOLDER lpsf;
 } DC_ITEMDATA, *LPDC_ITEMDATA;
