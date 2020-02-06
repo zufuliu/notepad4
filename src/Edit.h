@@ -25,7 +25,7 @@
 #define NP2_FIND_REPLACE_LIMIT	2048
 #define NP2_LONG_LINE_LIMIT		4096
 
-typedef struct _editfindreplace {
+typedef struct EDITFINDREPLACE {
 	char	szFind[512];
 	char	szReplace[512];
 	char	szFindUTF8[3 * 512];
@@ -301,7 +301,7 @@ void	EditShowCallTips(Sci_Position position);
 
 #define MAX_ENCODING_LABEL_SIZE		32
 
-typedef struct _np2encoding {
+typedef struct NP2ENCODING {
 	const UINT uFlags;
 	/*const*/UINT uCodePage;
 	// string format: [normal name + ',']  + [lower case parse name + ',']+
@@ -373,7 +373,7 @@ static inline BOOL IsUTF8Signature(const char *p) {
 #define FV_ENCODING				64
 #define FV_MODE					128
 
-typedef struct _filevars {
+typedef struct FILEVARS {
 	int 	mask;
 	int 	iTabWidth;
 	int 	iIndentWidth;

@@ -1281,7 +1281,7 @@ BOOL GetFilterDlg(HWND hwnd) {
 }
 
 // Data structure used in file operation dialogs
-typedef struct tagFILEOPDLGDATA {
+typedef struct FILEOPDLGDATA {
 	WCHAR szSource[MAX_PATH];
 	WCHAR szDestination[MAX_PATH];
 	UINT wFunc;

@@ -200,7 +200,7 @@ static BOOL bShowStatusbar;
 static BOOL bInFullScreenMode;
 static int iFullScreenMode;
 
-typedef struct _wi {
+typedef struct WININFO {
 	int x;
 	int y;
 	int cx;

@@ -402,7 +402,7 @@ BOOL ExecDDECommand(LPCWSTR lpszCmdLine, LPCWSTR lpszDDEMsg, LPCWSTR lpszDDEApp,
 //==== History Functions ======================================================
 #define HISTORY_ITEMS 50
 
-typedef struct tagHISTORY {
+typedef struct HISTORY {
 	WCHAR *psz[HISTORY_ITEMS]; // Strings
 	int  iCurItem;            // Current Item
 } HISTORY, *PHISTORY, *LPHISTORY;
@@ -427,7 +427,7 @@ void History_UpdateToolbar(LCPHISTORY ph, HWND hwnd, int cmdBack, int cmdForward
 // MRU_MAXITEMS * (MAX_PATH + 4)
 #define MAX_INI_SECTION_SIZE_MRU	(8 * 1024)
 
-typedef struct _mrulist {
+typedef struct MRULIST {
 	LPCWSTR szRegKey;
 	int		iFlags;
 	int		iSize;

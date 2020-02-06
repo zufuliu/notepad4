@@ -28,7 +28,7 @@ typedef const wchar_t * LPCWSTR;
 typedef unsigned char BYTE;
 #endif
 
-typedef struct _editstyle {
+typedef struct EDITSTYLE {
 	const int iStyle;
 	struct {
 		const int rid;
@@ -48,11 +48,11 @@ typedef struct _editstyle {
 // Don't add to default auto completion list.
 #define KeywordAttr_NoAutoComp	4
 
-typedef struct _keywordlist {
+typedef struct KEYWORDLIST {
 	const char * const pszKeyWords[NUMKEYWORD];
 } KEYWORDLIST, *PKEYWORDLIST;
 
-typedef struct _editlexer {
+typedef struct EDITLEXER {
 	const int iLexer;
 	const int rid;
 	struct {

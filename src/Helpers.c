@@ -843,7 +843,7 @@ void SetDlgPos(HWND hDlg, int xDlg, int yDlg) {
 // Resize Dialog Helpers()
 //
 #define RESIZEDLG_PROP_KEY	L"ResizeDlg"
-typedef struct _resizeDlg {
+typedef struct RESIZEDLG {
 	int direction;
 	int cxClient;
 	int cyClient;
