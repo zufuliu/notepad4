@@ -2037,8 +2037,8 @@ void SurfaceD2D::MeasureWidths(const Font &font_, std::string_view text, XYPOSIT
 	}
 	// A cluster may be more than one WCHAR, such as for "ffi" which is a ligature in the Candara font
 	FLOAT position = 0.0f;
-	UINT32 ti = 0;
-	for (UINT32 ci = 0; ci < count; ci++) {
+	int ti = 0;
+	for (unsigned int ci = 0; ci < count; ci++) {
 		const FLOAT width = clusterMetrics[ci].width;
 		const UINT16 length = clusterMetrics[ci].length;
 		for (UINT16 inCluster = 0; inCluster < length; inCluster++) {
@@ -2046,7 +2046,7 @@ void SurfaceD2D::MeasureWidths(const Font &font_, std::string_view text, XYPOSIT
 		}
 		position += width;
 	}
-	PLATFORM_ASSERT(ti == static_cast<UINT32>(tbuf.tlen));
+	PLATFORM_ASSERT(ti == tbuf.tlen);
 	if (unicodeMode) {
 		// Map the widths given for UTF-16 characters back onto the UTF-8 input string
 		int ui = 0;
@@ -2057,7 +2057,7 @@ void SurfaceD2D::MeasureWidths(const Font &font_, std::string_view text, XYPOSIT
 			if (byteCount == 4) {	// Non-BMP
 				ui++;
 			}
-			for (unsigned int bytePos = 0; (bytePos < byteCount) && (i < text.length()); bytePos++) {
+			for (unsigned int bytePos = 0; (bytePos < byteCount) && (i < text.length()) && (ui < tbuf.tlen); bytePos++) {
 				positions[i++] = poses.buffer[ui];
 			}
 			ui++;
@@ -2169,14 +2169,6 @@ Surface *Surface::Allocate(int technology) {
 #endif
 }
 
-namespace {
-
-inline HWND HwndFromWindowID(WindowID wid) noexcept {
-	return static_cast<HWND>(wid);
-}
-
-}
-
 Window::~Window() = default;
 
 void Window::Destroy() noexcept {
@@ -2221,7 +2213,7 @@ void Window::SetPositionRelative(PRectangle rc, const Window *relativeTo) noexce
 	const LONG style = ::GetWindowLong(HwndFromWindowID(wid), GWL_STYLE);
 	if (style & WS_POPUP) {
 		POINT ptOther = { 0, 0 };
-		::ClientToScreen(HwndFromWindowID(relativeTo->GetID()), &ptOther);
+		::ClientToScreen(HwndFromWindow(*relativeTo), &ptOther);
 		rc.Move(static_cast<XYPOSITION>(ptOther.x), static_cast<XYPOSITION>(ptOther.y));
 
 		const RECT rcMonitor = RectFromPRectangle(rc);
@@ -2537,7 +2529,7 @@ void ListBoxX::Create(Window &parent_, int ctrlID_, Point location_, int lineHei
 	lineHeight = lineHeight_;
 	unicodeMode = unicodeMode_;
 	technology = technology_;
-	HWND hwndParent = HwndFromWindowID(parent->GetID());
+	HWND hwndParent = HwndFromWindow(*parent);
 	HINSTANCE hinstanceParent = GetWindowInstance(hwndParent);
 	// Window created as popup so not clipped within parent client area
 	wid = ::CreateWindowEx(
@@ -3167,7 +3159,7 @@ LRESULT CALLBACK ListBoxX::ControlWndProc(HWND hWnd, UINT iMessage, WPARAM wPara
 LRESULT ListBoxX::WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam) {
 	switch (iMessage) {
 	case WM_CREATE: {
-		HINSTANCE hinstanceParent = GetWindowInstance(HwndFromWindowID(parent->GetID()));
+		HINSTANCE hinstanceParent = GetWindowInstance(HwndFromWindow(*parent));
 		// Note that LBS_NOINTEGRALHEIGHT is specified to fix cosmetic issue when resizing the list
 		// but has useful side effect of speeding up list population significantly
 		lb = ::CreateWindowEx(
@@ -3202,7 +3194,7 @@ LRESULT ListBoxX::WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam
 	case WM_COMMAND:
 		// This is not actually needed now - the registered double click action is used
 		// directly to action a choice from the list.
-		::SendMessage(HwndFromWindowID(parent->GetID()), iMessage, wParam, lParam);
+		::SendMessage(HwndFromWindow(*parent), iMessage, wParam, lParam);
 		break;
 
 	case WM_MEASUREITEM: {
@@ -3399,7 +3391,7 @@ void Menu::Destroy() noexcept {
 void Menu::Show(Point pt, const Window &w) noexcept {
 	::TrackPopupMenu(static_cast<HMENU>(mid),
 		TPM_RIGHTBUTTON, static_cast<int>(pt.x - 4), static_cast<int>(pt.y), 0,
-		HwndFromWindowID(w.GetID()), nullptr);
+		HwndFromWindow(w), nullptr);
 	Destroy();
 }
 

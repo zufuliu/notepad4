@@ -4881,7 +4881,7 @@ OtherID OtherIDOfCharacter(int character) noexcept {
 // Pattern_Syntax|Pattern_White_Space.
 // As of Unicode 12, only VERTICAL TILDE which is in Lm and has Pattern_Syntax matches.
 // Should really generate from PropList.txt a list of Pattern_Syntax and Pattern_White_Space.
-bool IsIdPattern(int character) noexcept {
+constexpr bool IsIdPattern(int character) noexcept {
 	return character == 0x2E2F;
 }
 

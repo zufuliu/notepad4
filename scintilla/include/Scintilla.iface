@@ -294,7 +294,7 @@ val SC_IME_INLINE=1
 # Is the IME displayed in a window or inline?
 get IMEInteraction GetIMEInteraction=2678(,)
 
-# Choose to display the the IME in a winow or inline.
+# Choose to display the IME in a winow or inline.
 set void SetIMEInteraction=2679(IMEInteraction imeInteraction,)
 
 enu MarkerSymbol=SC_MARK_
