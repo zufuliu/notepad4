@@ -163,6 +163,12 @@ public:
 	int GetRelative(Sci_Position n) const noexcept {
 		return static_cast<unsigned char>(styler.SafeGetCharAt(currentPos + n));
 	}
+#if 0
+	[[deprecated]]
+	int GetRelative(Sci_Position n, char chDefault) const noexcept {
+		return static_cast<unsigned char>(styler.SafeGetCharAt(currentPos + n, chDefault));
+	}
+#endif
 	int GetRelativeCharacter(Sci_Position n) noexcept {
 		if (n == 0) {
 			return ch;

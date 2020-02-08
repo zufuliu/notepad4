@@ -25,7 +25,7 @@ using namespace Scintilla;
 static const char styleSubable[] = { 0 };
 
 DefaultLexer::DefaultLexer(const char *languageName_, int language_,
-	const LexicalClass *lexClasses_, size_t nClasses_) :
+	const LexicalClass *lexClasses_, size_t nClasses_) noexcept :
 	languageName(languageName_),
 	language(language_),
 	lexClasses(lexClasses_),

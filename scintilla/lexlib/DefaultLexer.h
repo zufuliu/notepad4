@@ -18,7 +18,7 @@ class DefaultLexer : public ILexer5 {
 	size_t nClasses;
 public:
 	DefaultLexer(const char *languageName_, int language_,
-		const LexicalClass *lexClasses_ = nullptr, size_t nClasses_ = 0);
+		const LexicalClass *lexClasses_ = nullptr, size_t nClasses_ = 0) noexcept;
 	virtual ~DefaultLexer();
 	void SCI_METHOD Release() noexcept override;
 	int SCI_METHOD Version() const noexcept override;

@@ -61,6 +61,14 @@ constexpr RECT RectFromPRectangle(PRectangle prc) noexcept {
 	return rc;
 }
 
+constexpr HWND HwndFromWindowID(WindowID wid) noexcept {
+	return static_cast<HWND>(wid);
+}
+
+inline HWND HwndFromWindow(const Window &w) noexcept {
+	return HwndFromWindowID(w.GetID());
+}
+
 #if defined(USE_D2D)
 extern bool LoadD2D() noexcept;
 extern ID2D1Factory *pD2DFactory;
