@@ -1577,21 +1577,21 @@ void ScintillaWin::SizeWindow() {
 sptr_t ScintillaWin::MouseMessage(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 	switch (iMessage) {
 	case WM_LBUTTONDOWN: {
-			// For IME, set the composition string as the result string.
-			IMContext imc(MainHWND());
-			if (imc.hIMC) {
-				::ImmNotifyIME(imc.hIMC, NI_COMPOSITIONSTR, CPS_COMPLETE, 0);
-			}
-			//
-			//Platform::DebugPrintf("Buttdown %d %x %x %x %x %x\n",iMessage, wParam, lParam,
-			//	KeyboardIsKeyDown(VK_SHIFT),
-			//	KeyboardIsKeyDown(VK_CONTROL),
-			//	KeyboardIsKeyDown(VK_MENU));
-			::SetFocus(MainHWND());
-			ButtonDownWithModifiers(PointFromLParam(lParam), ::GetMessageTime(),
-						MouseModifiers(wParam));
+		// For IME, set the composition string as the result string.
+		IMContext imc(MainHWND());
+		if (imc.hIMC) {
+			::ImmNotifyIME(imc.hIMC, NI_COMPOSITIONSTR, CPS_COMPLETE, 0);
 		}
-		break;
+		//
+		//Platform::DebugPrintf("Buttdown %d %x %x %x %x %x\n",iMessage, wParam, lParam,
+		//	KeyboardIsKeyDown(VK_SHIFT),
+		//	KeyboardIsKeyDown(VK_CONTROL),
+		//	KeyboardIsKeyDown(VK_MENU));
+		::SetFocus(MainHWND());
+		ButtonDownWithModifiers(PointFromLParam(lParam), ::GetMessageTime(),
+					MouseModifiers(wParam));
+	}
+	break;
 
 	case WM_LBUTTONUP:
 		ButtonUpWithModifiers(PointFromLParam(lParam),
@@ -1599,28 +1599,28 @@ sptr_t ScintillaWin::MouseMessage(unsigned int iMessage, uptr_t wParam, sptr_t l
 		break;
 
 	case WM_RBUTTONDOWN: {
-			::SetFocus(MainHWND());
-			const Point pt = PointFromLParam(lParam);
-			if (!PointInSelection(pt)) {
-				CancelModes();
-				SetEmptySelection(PositionFromLocation(PointFromLParam(lParam)));
-			}
-
-			RightButtonDownWithModifiers(pt, ::GetMessageTime(), MouseModifiers(wParam));
+		::SetFocus(MainHWND());
+		const Point pt = PointFromLParam(lParam);
+		if (!PointInSelection(pt)) {
+			CancelModes();
+			SetEmptySelection(PositionFromLocation(PointFromLParam(lParam)));
 		}
-		break;
+
+		RightButtonDownWithModifiers(pt, ::GetMessageTime(), MouseModifiers(wParam));
+	}
+	break;
 
 	case WM_MOUSEMOVE: {
-			const Point pt = PointFromLParam(lParam);
+		const Point pt = PointFromLParam(lParam);
 
-			// Windows might send WM_MOUSEMOVE even though the mouse has not been moved:
-			// http://blogs.msdn.com/b/oldnewthing/archive/2003/10/01/55108.aspx
-			if (ptMouseLast != pt) {
-				SetTrackMouseLeaveEvent(true);
-				ButtonMoveWithModifiers(pt, ::GetMessageTime(), MouseModifiers(wParam));
-			}
+		// Windows might send WM_MOUSEMOVE even though the mouse has not been moved:
+		// http://blogs.msdn.com/b/oldnewthing/archive/2003/10/01/55108.aspx
+		if (ptMouseLast != pt) {
+			SetTrackMouseLeaveEvent(true);
+			ButtonMoveWithModifiers(pt, ::GetMessageTime(), MouseModifiers(wParam));
 		}
-		break;
+	}
+	break;
 
 	case WM_MOUSELEAVE:
 		SetTrackMouseLeaveEvent(false);
@@ -1695,27 +1695,27 @@ sptr_t ScintillaWin::KeyMessage(unsigned int iMessage, uptr_t wParam, sptr_t lPa
 
 	case WM_SYSKEYDOWN:
 	case WM_KEYDOWN: {
-			// Platform::DebugPrintf("Keydown %c %c%c%c%c %x %x\n",
-			// iMessage == WM_KEYDOWN ? 'K' : 'S',
-			// (lParam & (1 << 24)) ? 'E' : '-',
-			// KeyboardIsKeyDown(VK_SHIFT) ? 'S' : '-',
-			// KeyboardIsKeyDown(VK_CONTROL) ? 'C' : '-',
-			// KeyboardIsKeyDown(VK_MENU) ? 'A' : '-',
-			// wParam, lParam);
-			lastKeyDownConsumed = false;
-			const bool altDown = KeyboardIsKeyDown(VK_MENU);
-			if (altDown && KeyboardIsNumericKeypadFunction(wParam, lParam)) {
-				// Don't interpret these as they may be characters entered by number.
-				return ::DefWindowProc(MainHWND(), iMessage, wParam, lParam);
-			}
-			const int ret = KeyDownWithModifiers(KeyTranslate(static_cast<int>(wParam)),
-								ModifierFlags(KeyboardIsKeyDown(VK_SHIFT), KeyboardIsKeyDown(VK_CONTROL), altDown),
-								&lastKeyDownConsumed);
-			if (!ret && !lastKeyDownConsumed) {
-				return ::DefWindowProc(MainHWND(), iMessage, wParam, lParam);
-			}
-			break;
+		// Platform::DebugPrintf("Keydown %c %c%c%c%c %x %x\n",
+		// iMessage == WM_KEYDOWN ? 'K' : 'S',
+		// (lParam & (1 << 24)) ? 'E' : '-',
+		// KeyboardIsKeyDown(VK_SHIFT) ? 'S' : '-',
+		// KeyboardIsKeyDown(VK_CONTROL) ? 'C' : '-',
+		// KeyboardIsKeyDown(VK_MENU) ? 'A' : '-',
+		// wParam, lParam);
+		lastKeyDownConsumed = false;
+		const bool altDown = KeyboardIsKeyDown(VK_MENU);
+		if (altDown && KeyboardIsNumericKeypadFunction(wParam, lParam)) {
+			// Don't interpret these as they may be characters entered by number.
+			return ::DefWindowProc(MainHWND(), iMessage, wParam, lParam);
 		}
+		const int ret = KeyDownWithModifiers(KeyTranslate(static_cast<int>(wParam)),
+							ModifierFlags(KeyboardIsKeyDown(VK_SHIFT), KeyboardIsKeyDown(VK_CONTROL), altDown),
+							&lastKeyDownConsumed);
+		if (!ret && !lastKeyDownConsumed) {
+			return ::DefWindowProc(MainHWND(), iMessage, wParam, lParam);
+		}
+		break;
+	}
 
 	case WM_KEYUP:
 		//Platform::DebugPrintf("S keyup %d %x %x\n",iMessage, wParam, lParam);
@@ -1787,18 +1787,18 @@ sptr_t ScintillaWin::IMEMessage(unsigned int iMessage, uptr_t wParam, sptr_t lPa
 	switch (iMessage) {
 
 	case WM_IME_KEYDOWN: {
-			if (wParam == VK_HANJA) {
-				ToggleHanja();
-			}
-			return ::DefWindowProc(MainHWND(), iMessage, wParam, lParam);
+		if (wParam == VK_HANJA) {
+			ToggleHanja();
 		}
+		return ::DefWindowProc(MainHWND(), iMessage, wParam, lParam);
+	}
 
 	case WM_IME_REQUEST: {
-			if (wParam == IMR_RECONVERTSTRING) {
-				return ImeOnReconvert(lParam);
-			}
-			return ::DefWindowProc(MainHWND(), iMessage, wParam, lParam);
+		if (wParam == IMR_RECONVERTSTRING) {
+			return ImeOnReconvert(lParam);
 		}
+		return ::DefWindowProc(MainHWND(), iMessage, wParam, lParam);
+	}
 
 	case WM_IME_STARTCOMPOSITION: 	// dbcs
 		if (KoreanIME() || imeInteraction == imeInline) {
@@ -1859,43 +1859,44 @@ sptr_t ScintillaWin::EditMessage(unsigned int iMessage, uptr_t wParam, sptr_t lP
 		return MAKELRESULT(SelectionStart().Position(), SelectionEnd().Position());
 
 	case EM_EXGETSEL: {
-			if (lParam == 0) {
-				return 0;
-			}
-			CHARRANGE *pCR = reinterpret_cast<CHARRANGE *>(lParam);
-			pCR->cpMin = static_cast<LONG>(SelectionStart().Position());
-			pCR->cpMax = static_cast<LONG>(SelectionEnd().Position());
+		if (lParam == 0) {
+			return 0;
 		}
-		break;
+		CHARRANGE *pCR = reinterpret_cast<CHARRANGE *>(lParam);
+		pCR->cpMin = static_cast<LONG>(SelectionStart().Position());
+		pCR->cpMax = static_cast<LONG>(SelectionEnd().Position());
+	}
+	break;
 
 	case EM_SETSEL: {
-			Sci::Position nStart = wParam;
-			Sci::Position nEnd = lParam;
-			if (nStart == 0 && nEnd == -1) {
-				nEnd = pdoc->Length();
-			}
-			if (nStart == -1) {
-				nStart = nEnd;	// Remove selection
-			}
-			SetSelection(nEnd, nStart);
-			EnsureCaretVisible();
+		Sci::Position nStart = wParam;
+		Sci::Position nEnd = lParam;
+		if (nStart == 0 && nEnd == -1) {
+			nEnd = pdoc->Length();
 		}
-		break;
+		if (nStart == -1) {
+			nStart = nEnd;	// Remove selection
+		}
+		SetSelection(nEnd, nStart);
+		EnsureCaretVisible();
+	}
+	break;
 
 	case EM_EXSETSEL: {
-			if (lParam == 0) {
-				return 0;
-			}
-			const CHARRANGE *pCR = reinterpret_cast<const CHARRANGE *>(lParam);
-			sel.selType = Selection::selStream;
-			if (pCR->cpMin == 0 && pCR->cpMax == -1) {
-				SetSelection(pCR->cpMin, pdoc->Length());
-			} else {
-				SetSelection(pCR->cpMin, pCR->cpMax);
-			}
-			EnsureCaretVisible();
-			return pdoc->LineFromPosition(SelectionStart().Position());
+		if (lParam == 0) {
+			return 0;
 		}
+		const CHARRANGE *pCR = reinterpret_cast<const CHARRANGE *>(lParam);
+		sel.selType = Selection::selStream;
+		if (pCR->cpMin == 0 && pCR->cpMax == -1) {
+			SetSelection(pCR->cpMin, pdoc->Length());
+		} else {
+			SetSelection(pCR->cpMin, pCR->cpMax);
+		}
+		EnsureCaretVisible();
+		return pdoc->LineFromPosition(SelectionStart().Position());
+	}
+
 	}
 	return 0;
 }
