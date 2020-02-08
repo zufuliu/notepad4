@@ -61,6 +61,14 @@ constexpr RECT RectFromPRectangle(PRectangle prc) noexcept {
 	return rc;
 }
 
+constexpr POINT POINTFromPoint(Point pt) noexcept {
+	return POINT { static_cast<LONG>(pt.x), static_cast<LONG>(pt.y) };
+}
+
+constexpr Point PointFromPOINT(POINT pt) noexcept {
+	return Point::FromInts(pt.x, pt.y);
+}
+
 constexpr HWND HwndFromWindowID(WindowID wid) noexcept {
 	return static_cast<HWND>(wid);
 }

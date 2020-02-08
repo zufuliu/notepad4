@@ -158,16 +158,8 @@ inline void SetWindowID(HWND hWnd, int identifier) noexcept {
 	::SetWindowLongPtr(hWnd, GWLP_ID, identifier);
 }
 
-constexpr Point PointFromPOINT(POINT pt) noexcept {
-	return Point::FromInts(pt.x, pt.y);
-}
-
 constexpr Point PointFromLParam(sptr_t lpoint) noexcept {
 	return Point::FromInts(GET_X_LPARAM(lpoint), GET_Y_LPARAM(lpoint));
-}
-
-constexpr POINT POINTFromPoint(Point pt) noexcept {
-	return POINT{ static_cast<LONG>(pt.x), static_cast<LONG>(pt.y) };
 }
 
 inline bool KeyboardIsKeyDown(int key) noexcept {
@@ -1642,9 +1634,7 @@ sptr_t ScintillaWin::MouseMessage(unsigned int iMessage, uptr_t wParam, sptr_t l
 			// handle the message but pass it on.
 			RECT rc;
 			GetWindowRect(MainHWND(), &rc);
-			POINT pt;
-			pt.x = GET_X_LPARAM(lParam);
-			pt.y = GET_Y_LPARAM(lParam);
+			const POINT pt = { GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) };
 			if (!PtInRect(&rc, pt)) {
 				return ::DefWindowProc(MainHWND(), iMessage, wParam, lParam);
 			}
