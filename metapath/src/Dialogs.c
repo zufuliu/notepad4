@@ -1931,9 +1931,7 @@ static INT_PTR CALLBACK FindWinDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 		break;
 
 	case WM_LBUTTONDOWN: {
-		POINT pt;
-		pt.x = GET_X_LPARAM(lParam);
-		pt.y = GET_Y_LPARAM(lParam);
+		const POINT pt = { GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) };
 		if (GetDlgCtrlID((ChildWindowFromPoint(hwnd, pt))) == IDC_CROSSCURSOR) {
 			SetCapture(hwnd);
 			bHasCapture = TRUE;

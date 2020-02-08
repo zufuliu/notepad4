@@ -619,10 +619,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 			break;
 		}
 
-		POINT pt;
-		pt.x = GET_X_LPARAM(lParam);
-		pt.y = GET_Y_LPARAM(lParam);
-
+		const POINT pt = { GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) };
 		HMENU hMenuPopup = GetSubMenu(hmenu, imenu);
 		if (imenu == IDP_POPUP_SUBMENU_PATH) {
 			SetMenuDefaultItem(hMenuPopup, iDefaultOpenMenu, FALSE);
