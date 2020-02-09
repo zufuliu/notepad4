@@ -210,11 +210,11 @@ class ScintillaWin; 	// Forward declaration for COM interface subobjects
  */
 class FormatEnumerator : public IEnumFORMATETC {
 	ULONG ref;
-	unsigned int pos;
+	ULONG pos;
 	std::vector<CLIPFORMAT> formats;
 
 public:
-	FormatEnumerator(int pos_, const CLIPFORMAT formats_[], size_t formatsLen_);
+	FormatEnumerator(ULONG pos_, const CLIPFORMAT formats_[], size_t formatsLen_);
 	virtual ~FormatEnumerator() = default;
 
 	// IUnknown
@@ -441,7 +441,7 @@ class ScintillaWin :
 	static LRESULT CALLBACK CTWndProc(
 		HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam);
 
-	enum {
+	enum : UINT_PTR {
 		invalidTimerID, standardTimerID, idleTimerID, fineTimerStart
 	};
 
@@ -616,7 +616,7 @@ ScintillaWin::ScintillaWin(HWND hwnd) {
 	linesPerScroll = 0;
 	wheelDelta = 0;   // Wheel delta from roll
 
-	hRgnUpdate = nullptr;
+	hRgnUpdate = {};
 
 	hasOKText = false;
 
@@ -656,7 +656,7 @@ ScintillaWin::ScintillaWin(HWND hwnd) {
 	ds.sci = this;
 	dt.sci = this;
 
-	sysCaretBitmap = nullptr;
+	sysCaretBitmap = {};
 	sysCaretWidth = 0;
 	sysCaretHeight = 0;
 	inputLang = LANG_USER_DEFAULT;
@@ -1046,7 +1046,7 @@ sptr_t ScintillaWin::WndPaint() {
 	}
 	if (hRgnUpdate) {
 		::DeleteRgn(hRgnUpdate);
-		hRgnUpdate = nullptr;
+		hRgnUpdate = {};
 	}
 
 	::EndPaint(MainHWND(), &ps);
@@ -1400,25 +1400,27 @@ namespace {
 unsigned int SciMessageFromEM(unsigned int iMessage) noexcept {
 	switch (iMessage) {
 	case EM_CANPASTE: return SCI_CANPASTE;
+	case EM_CANREDO: return SCI_CANREDO;
 	case EM_CANUNDO: return SCI_CANUNDO;
 	case EM_EMPTYUNDOBUFFER: return SCI_EMPTYUNDOBUFFER;
-	case EM_FINDTEXTEX: return SCI_FINDTEXT;
-	case EM_FORMATRANGE: return SCI_FORMATRANGE;
 	case EM_GETFIRSTVISIBLELINE: return SCI_GETFIRSTVISIBLELINE;
+	case EM_GETLINE: return SCI_GETLINE;
 	case EM_GETLINECOUNT: return SCI_GETLINECOUNT;
 	case EM_GETSELTEXT: return SCI_GETSELTEXT;
-	case EM_GETTEXTRANGE: return SCI_GETTEXTRANGE;
 	case EM_HIDESELECTION: return SCI_HIDESELECTION;
 	case EM_LINEINDEX: return SCI_POSITIONFROMLINE;
 	case EM_LINESCROLL: return SCI_LINESCROLL;
+	case EM_REDO: return SCI_REDO;
 	case EM_REPLACESEL: return SCI_REPLACESEL;
+	case EM_SCROLL: return WM_VSCROLL;
 	case EM_SCROLLCARET: return SCI_SCROLLCARET;
 	case EM_SETREADONLY: return SCI_SETREADONLY;
+	case EM_UNDO: return SCI_UNDO;
 	case WM_CLEAR: return SCI_CLEAR;
 	case WM_COPY: return SCI_COPY;
 	case WM_CUT: return SCI_CUT;
-	case WM_SETTEXT: return SCI_SETTEXT;
 	case WM_PASTE: return SCI_PASTE;
+	case WM_SETTEXT: return SCI_SETTEXT;
 	case WM_UNDO: return SCI_UNDO;
 	}
 	return iMessage;
@@ -1840,6 +1842,47 @@ sptr_t ScintillaWin::IMEMessage(unsigned int iMessage, uptr_t wParam, sptr_t lPa
 sptr_t ScintillaWin::EditMessage(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 	switch (iMessage) {
 
+	case EM_FINDTEXT:
+		if (lParam == 0) {
+			return -1;
+		} else {
+			const FINDTEXTA *pFT = reinterpret_cast<const FINDTEXTA *>(lParam);
+			Sci_TextToFind tt = { { pFT->chrg.cpMin, pFT->chrg.cpMax }, pFT->lpstrText, {} };
+			return ScintillaBase::WndProc(SCI_FINDTEXT, wParam, reinterpret_cast<sptr_t>(&tt));
+		}
+
+	case EM_FINDTEXTEX:
+		if (lParam == 0) {
+			return -1;
+		} else {
+			FINDTEXTEXA *pFT = reinterpret_cast<FINDTEXTEXA *>(lParam);
+			Sci_TextToFind tt = { { pFT->chrg.cpMin, pFT->chrg.cpMax }, pFT->lpstrText, {} };
+			const Sci::Position pos =ScintillaBase::WndProc(SCI_FINDTEXT, wParam, reinterpret_cast<sptr_t>(&tt));
+			pFT->chrgText.cpMin = (pos == -1)? -1 : static_cast<LONG>(tt.chrgText.cpMin);
+			pFT->chrgText.cpMax = (pos == -1)? -1 : static_cast<LONG>(tt.chrgText.cpMax);
+			return pos;
+		}
+
+	case EM_FORMATRANGE:
+		if (lParam) {
+			const FORMATRANGE *pFR = reinterpret_cast<const FORMATRANGE *>(lParam);
+			const Sci_RangeToFormat fr = { pFR->hdcTarget, pFR->hdc,
+				{ pFR->rc.left, pFR->rc.top, pFR->rc.right, pFR->rc.bottom },
+				{ pFR->rcPage.left, pFR->rcPage.top, pFR->rcPage.right, pFR->rcPage.bottom },
+				{ pFR->chrg.cpMin, pFR->chrg.cpMax },
+			};
+			return ScintillaBase::WndProc(SCI_FORMATRANGE, wParam, reinterpret_cast<sptr_t>(&fr));
+		}
+		break;
+
+	case EM_GETTEXTRANGE:
+		if (lParam) {
+			TEXTRANGEA *pTR = reinterpret_cast<TEXTRANGEA *>(lParam);
+			Sci_TextRange tr = { { pTR->chrg.cpMin, pTR->chrg.cpMax }, pTR->lpstrText };
+			return ScintillaBase::WndProc(SCI_GETTEXTRANGE, 0, reinterpret_cast<sptr_t>(&tr));
+		}
+		break;
+
 	case EM_LINEFROMCHAR:
 		if (static_cast<Sci::Position>(wParam) < 0) {
 			wParam = SelectionStart().Position();
@@ -1896,6 +1939,40 @@ sptr_t ScintillaWin::EditMessage(unsigned int iMessage, uptr_t wParam, sptr_t lP
 		EnsureCaretVisible();
 		return pdoc->LineFromPosition(SelectionStart().Position());
 	}
+
+	case EM_LINELENGTH:
+		return ScintillaBase::WndProc(SCI_LINELENGTH, pdoc->LineFromPosition(wParam), lParam);
+
+	case EM_POSFROMCHAR:
+		if (wParam) {
+			const Point pt = LocationFromPosition(lParam);
+			POINTL *ptw = reinterpret_cast<POINTL *>(wParam);
+			ptw->x = static_cast<LONG>(pt.x - vs.textStart + vs.fixedColumnWidth); // SCI_POINTXFROMPOSITION
+			ptw->y = static_cast<LONG>(pt.y);
+		}
+		break;
+
+	case EM_GETZOOM:
+		if (wParam && lParam) {
+			*reinterpret_cast<int *>(wParam) = 16*vs.zoomLevel/25;
+			*reinterpret_cast<int *>(lParam) = 64;
+			return TRUE;
+		}
+		break;
+
+	case EM_SETZOOM: {
+		int level = 0;
+		if (wParam == 0 && lParam == 0) {
+			level = 100;
+		} else if (wParam != 0 && lParam > 0) {
+			level = static_cast<int>(wParam/lParam);
+		}
+		if (level != 0) {
+			ScintillaBase::WndProc(SCI_SETZOOM, level, 0);
+			return TRUE;
+		}
+	}
+	break;
 
 	}
 	return 0;
@@ -2152,10 +2229,18 @@ sptr_t ScintillaWin::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam
 
 		case EM_LINEFROMCHAR:
 		case EM_EXLINEFROMCHAR:
+		case EM_FINDTEXT:
+		case EM_FINDTEXTEX:
+		case EM_FORMATRANGE:
+		case EM_GETTEXTRANGE:
 		case EM_GETSEL:
 		case EM_EXGETSEL:
 		case EM_SETSEL:
 		case EM_EXSETSEL:
+		case EM_LINELENGTH:
+		case EM_POSFROMCHAR:
+		case EM_GETZOOM:
+		case EM_SETZOOM:
 			return EditMessage(iMessage, wParam, lParam);
 
 		case SCI_GETDIRECTFUNCTION:
@@ -2198,7 +2283,7 @@ bool ScintillaWin::FineTickerRunning(TickReason reason) noexcept {
 
 void ScintillaWin::FineTickerStart(TickReason reason, int millis, int tolerance) noexcept {
 	FineTickerCancel(reason);
-	const int idEvent = static_cast<int>(fineTimerStart) + static_cast<int>(reason);
+	const UINT_PTR idEvent = fineTimerStart + static_cast<UINT_PTR>(reason);
 #if _WIN32_WINNT < _WIN32_WINNT_WIN8
 	if (SetCoalescableTimerFn && tolerance) {
 		timers[reason] = SetCoalescableTimerFn(MainHWND(), idEvent, millis, nullptr, tolerance);
@@ -2767,7 +2852,7 @@ STDMETHODIMP_(ULONG)FormatEnumerator::Release() noexcept {
 /// Implement IEnumFORMATETC
 STDMETHODIMP FormatEnumerator::Next(ULONG celt, FORMATETC *rgelt, ULONG *pceltFetched) {
 	if (!rgelt) return E_POINTER;
-	unsigned int putPos = 0;
+	ULONG putPos = 0;
 	while ((pos < formats.size()) && (putPos < celt)) {
 		rgelt->cfFormat = formats[pos];
 		rgelt->ptd = nullptr;
@@ -2800,7 +2885,7 @@ STDMETHODIMP FormatEnumerator::Clone(IEnumFORMATETC **ppenum) {
 	return pfe->QueryInterface(IID_IEnumFORMATETC, reinterpret_cast<PVOID *>(ppenum));
 }
 
-FormatEnumerator::FormatEnumerator(int pos_, const CLIPFORMAT formats_[], size_t formatsLen_) {
+FormatEnumerator::FormatEnumerator(ULONG pos_, const CLIPFORMAT formats_[], size_t formatsLen_) {
 	ref = 0;   // First QI adds first reference...
 	pos = pos_;
 	formats.insert(formats.begin(), formats_, formats_ + formatsLen_);
@@ -3037,8 +3122,8 @@ LRESULT ScintillaWin::ImeOnReconvert(LPARAM lParam) {
 
 	const UINT codePage = CodePageOfDocument();
 	const std::wstring rcFeed = StringDecode(RangeText(baseStart, baseEnd), codePage);
-	const int rcFeedLen = static_cast<int>(rcFeed.length()) * sizeof(wchar_t);
-	const int rcSize = sizeof(RECONVERTSTRING) + rcFeedLen + sizeof(wchar_t);
+	const DWORD rcFeedLen = static_cast<DWORD>(rcFeed.length()) * sizeof(wchar_t);
+	const DWORD rcSize = sizeof(RECONVERTSTRING) + rcFeedLen + sizeof(wchar_t);
 
 	RECONVERTSTRING *rc = static_cast<RECONVERTSTRING *>(PtrFromSPtr(lParam));
 	if (!rc)
@@ -3070,15 +3155,15 @@ LRESULT ScintillaWin::ImeOnReconvert(LPARAM lParam) {
 		return 0;
 
 	// No selection asks IME to fill target fields with its own value.
-	const int tgWlen = rc->dwTargetStrLen;
-	const int tgWstart = rc->dwTargetStrOffset / sizeof(wchar_t);
+	const DWORD tgWlen = rc->dwTargetStrLen;
+	const DWORD tgWstart = rc->dwTargetStrOffset / sizeof(wchar_t);
 
 	std::string tgCompStart = StringEncode(rcFeed.substr(0, tgWstart), codePage);
 	std::string tgComp = StringEncode(rcFeed.substr(tgWstart, tgWlen), codePage);
 
 	// No selection needs to adjust reconvert start position for IME set.
-	const int adjust = static_cast<int>(tgCompStart.length() - rcCompStart.length());
-	const int docCompLen = static_cast<int>(tgComp.length());
+	const Sci::Position adjust = tgCompStart.length() - rcCompStart.length();
+	const Sci::Position docCompLen = tgComp.length();
 
 	// Make place for next composition string to sit in.
 	for (size_t r = 0; r < sel.Count(); r++) {
@@ -3278,7 +3363,7 @@ void ScintillaWin::FullPaint() {
 		FullPaintDC(hdc);
 		::ReleaseDC(MainHWND(), hdc);
 	} else {
-		FullPaintDC(nullptr);
+		FullPaintDC({});
 	}
 }
 
@@ -3516,13 +3601,12 @@ STDMETHODIMP ScintillaWin::Drop(LPDATAOBJECT pIDataSource, DWORD grfKeyState, PO
 
 		std::string putf;
 		bool fileDrop = false;
-		HRESULT hr = DV_E_FORMATETC;
 
 		//EnumDataSourceFormat("Drop", pIDataSource);
 		for (const CLIPFORMAT fmt : dropFormat) {
 			FORMATETC fmtu = { fmt, nullptr, DVASPECT_CONTENT, -1, TYMED_HGLOBAL };
 			STGMEDIUM medium = {};
-			hr = pIDataSource->GetData(&fmtu, &medium);
+			const HRESULT hr = pIDataSource->GetData(&fmtu, &medium);
 
 			if (SUCCEEDED(hr) && medium.hGlobal) {
 				// File Drop
@@ -3721,7 +3805,7 @@ BOOL ScintillaWin::DestroySystemCaret() noexcept {
 	const BOOL retval = ::DestroyCaret();
 	if (sysCaretBitmap) {
 		::DeleteObject(sysCaretBitmap);
-		sysCaretBitmap = nullptr;
+		sysCaretBitmap = {};
 	}
 	return retval;
 }
