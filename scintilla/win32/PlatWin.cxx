@@ -550,29 +550,29 @@ void SurfaceGDI::Clear() noexcept {
 	if (penOld) {
 		::SelectObject(hdc, penOld);
 		::DeleteObject(pen);
-		penOld = nullptr;
+		penOld = {};
 	}
-	pen = nullptr;
+	pen = {};
 	if (brushOld) {
 		::SelectObject(hdc, brushOld);
 		::DeleteObject(brush);
-		brushOld = nullptr;
+		brushOld = {};
 	}
-	brush = nullptr;
+	brush = {};
 	if (fontOld) {
 		// Fonts are not deleted as they are owned by a Font object
 		::SelectObject(hdc, fontOld);
-		fontOld = nullptr;
+		fontOld = {};
 	}
 	if (bitmapOld) {
 		::SelectObject(hdc, bitmapOld);
 		::DeleteObject(bitmap);
-		bitmapOld = nullptr;
+		bitmapOld = {};
 	}
-	bitmap = nullptr;
+	bitmap = {};
 	if (hdcOwned) {
 		::DeleteDC(hdc);
-		hdc = nullptr;
+		hdc = {};
 		hdcOwned = false;
 	}
 }
@@ -587,7 +587,7 @@ bool SurfaceGDI::Initialised() const noexcept {
 
 void SurfaceGDI::Init(WindowID) noexcept {
 	Release();
-	hdc = ::CreateCompatibleDC(nullptr);
+	hdc = ::CreateCompatibleDC({});
 	hdcOwned = true;
 	::SetTextAlign(hdc, TA_BASELINE);
 }
@@ -614,8 +614,8 @@ void SurfaceGDI::PenColour(ColourDesired fore) noexcept {
 	if (pen) {
 		::SelectObject(hdc, penOld);
 		::DeleteObject(pen);
-		pen = nullptr;
-		penOld = nullptr;
+		pen = {};
+		penOld = {};
 	}
 	pen = ::CreatePen(PS_SOLID, 1, fore.AsInteger());
 	penOld = SelectPen(hdc, pen);
@@ -625,8 +625,8 @@ void SurfaceGDI::BrushColour(ColourDesired back) noexcept {
 	if (brush) {
 		::SelectObject(hdc, brushOld);
 		::DeleteObject(brush);
-		brush = nullptr;
-		brushOld = nullptr;
+		brush = {};
+		brushOld = {};
 	}
 	// Only ever want pure, non-dithered brushes
 	const ColourDesired colourNearest = ColourDesired(::GetNearestColor(hdc, back.AsInteger()));
@@ -1007,8 +1007,8 @@ void SurfaceGDI::SetClip(PRectangle rc) noexcept {
 }
 
 void SurfaceGDI::FlushCachedState() noexcept {
-	pen = nullptr;
-	brush = nullptr;
+	pen = {};
+	brush = {};
 }
 
 void SurfaceGDI::SetUnicodeMode(bool unicodeMode_) noexcept {
@@ -1029,7 +1029,8 @@ class BlobInline;
 
 class SurfaceD2D : public Surface {
 	bool unicodeMode;
-	int x, y;
+	int x;
+	int y;
 
 	int codePage;
 	int codePageText;
@@ -1164,7 +1165,7 @@ void SurfaceD2D::Release() noexcept {
 }
 
 void SurfaceD2D::SetScale() noexcept {
-	HDC hdcMeasure = ::CreateCompatibleDC(nullptr);
+	HDC hdcMeasure = ::CreateCompatibleDC({});
 	logPixelsY = ::GetDeviceCaps(hdcMeasure, LOGPIXELSY);
 	dpiScaleX = ::GetDeviceCaps(hdcMeasure, LOGPIXELSX) / 96.0f;
 	dpiScaleY = logPixelsY / 96.0f;
@@ -2271,7 +2272,7 @@ void Window::SetFont(const Font &font) noexcept {
 namespace {
 
 void FlipBitmap(HBITMAP bitmap, int width, int height) noexcept {
-	HDC hdc = ::CreateCompatibleDC(nullptr);
+	HDC hdc = ::CreateCompatibleDC({});
 	if (hdc) {
 		HBITMAP prevBmp = SelectBitmap(hdc, bitmap);
 		::StretchBlt(hdc, width - 1, 0, -width, height, hdc, 0, 0, width, height, SRCCOPY);
