@@ -1984,6 +1984,7 @@ void MsgDPIChanged(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	Style_OnDPIChanged();
 	SciCall_GotoPos(pos);
 	UpdateToolbar();
+	UpdateStatusbar();
 }
 
 //=============================================================================
