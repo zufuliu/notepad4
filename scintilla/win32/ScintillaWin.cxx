@@ -2971,6 +2971,7 @@ STDMETHODIMP DataObject::EnumFormatEtc(DWORD dwDirection, IEnumFORMATETC **ppEnu
 			*ppEnum = nullptr;
 			return E_FAIL;
 		}
+
 		const CLIPFORMAT formats[] = { CF_UNICODETEXT, CF_TEXT };
 		FormatEnumerator *pfe = new FormatEnumerator(0, formats, std::size(formats));
 		return pfe->QueryInterface(IID_IEnumFORMATETC, reinterpret_cast<PVOID *>(ppEnum));
@@ -3217,20 +3218,20 @@ void ScintillaWin::CopyToGlobal(GlobalMemory &gmUnicode, const SelectionText &se
 		break;
 
 	case CopyEncoding::Ansi: {
-			std::string s;
-			if (IsUnicodeMode()) {
-				const std::wstring wsv = StringDecode(svSelected, CP_UTF8);
-				s = StringEncode(wsv, CP_ACP);
-			} else {
-				// no need to convert selectedText to CP_ACP
-				s = svSelected;
-			}
-			gmUnicode.Allocate(s.size() + 1);
-			if (gmUnicode) {
-				memcpy(gmUnicode.ptr, s.c_str(), s.size());
-			}
+		std::string s;
+		if (IsUnicodeMode()) {
+			const std::wstring wsv = StringDecode(svSelected, CP_UTF8);
+			s = StringEncode(wsv, CP_ACP);
+		} else {
+			// no need to convert selectedText to CP_ACP
+			s = svSelected;
 		}
-		break;
+		gmUnicode.Allocate(s.size() + 1);
+		if (gmUnicode) {
+			memcpy(gmUnicode.ptr, s.c_str(), s.size());
+		}
+	}
+	break;
 
 	case CopyEncoding::Binary:
 		gmUnicode.Allocate(svSelected.size());
@@ -3534,8 +3535,9 @@ void ScintillaWin::EnumAllClipboardFormat(const char *tag) {
 
 /// Implement IDropTarget
 STDMETHODIMP ScintillaWin::DragEnter(LPDATAOBJECT pIDataSource, DWORD grfKeyState, POINTL, PDWORD pdwEffect) {
-	if (!pIDataSource)
+	if (!pIDataSource) {
 		return E_POINTER;
+	}
 
 	//EnumDataSourceFormat("DragEnter", pIDataSource);
 
@@ -3549,12 +3551,7 @@ STDMETHODIMP ScintillaWin::DragEnter(LPDATAOBJECT pIDataSource, DWORD grfKeyStat
 		}
 	}
 
-	if (!hasOKText) {
-		*pdwEffect = DROPEFFECT_NONE;
-		return S_OK;
-	}
-
-	*pdwEffect = EffectFromState(grfKeyState);
+	*pdwEffect = hasOKText? EffectFromState(grfKeyState) : DROPEFFECT_NONE;
 	return S_OK;
 }
 
@@ -3601,12 +3598,13 @@ STDMETHODIMP ScintillaWin::Drop(LPDATAOBJECT pIDataSource, DWORD grfKeyState, PO
 
 		std::string putf;
 		bool fileDrop = false;
+		HRESULT hr = DV_E_FORMATETC;
 
 		//EnumDataSourceFormat("Drop", pIDataSource);
 		for (const CLIPFORMAT fmt : dropFormat) {
 			FORMATETC fmtu = { fmt, nullptr, DVASPECT_CONTENT, -1, TYMED_HGLOBAL };
-			STGMEDIUM medium = {};
-			const HRESULT hr = pIDataSource->GetData(&fmtu, &medium);
+			STGMEDIUM medium {};
+			hr = pIDataSource->GetData(&fmtu, &medium);
 
 			if (SUCCEEDED(hr) && medium.hGlobal) {
 				// File Drop
@@ -3677,6 +3675,9 @@ STDMETHODIMP ScintillaWin::Drop(LPDATAOBJECT pIDataSource, DWORD grfKeyState, PO
 			}
 		}
 
+		if (!SUCCEEDED(hr)) {
+			return hr;
+		}
 		if (putf.empty()) {
 			return S_OK;
 		}
