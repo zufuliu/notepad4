@@ -2,22 +2,37 @@
 #include "EditStyleX.h"
 
 static KEYWORDLIST Keywords_XML = {{
-NULL, NULL, NULL
+// Tag
+NULL
 
-, // 4 Tag
-"xml xmlns xsi DOCTYPE doctype PUBLIC "
+, // 1 JavaScript
+NULL
 
-, // 5 Attribute
-"version encoding standalone noNamespaceSchemaLocation schemaLocation CDATA "
+, // 2 VBScript
+NULL
+
+, // 3 Python
+NULL
+
+, // 4 PHP
+NULL
+
+, // 5 SGML DTD
+"doctype DOCTYPE PUBLIC SYSTEM "
+"ELEMENT ATTLIST ENTITY "
+"ANY CDATA EMPT ENTITIES ID IDREF IDREFS NDATA NOTATION NMTOKEN NMTOKENS "
+"IMPLIED FIXED PCDATA REQUIRED "
+
+, // 6 Attribute
+"xml xmlns xsi "
+"version encoding standalone noNamespaceSchemaLocation schemaLocation "
 "lang id name type value "
 
-, // 6 Value
+, // 7 Value
 "utf-8 UTF-8 ISO-8859-1 "
 "true false yes no on off "
 
-, NULL, NULL, NULL
-
-, NULL, NULL, NULL, NULL, NULL, NULL, NULL
+,NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL
 }};
 
 static EDITSTYLE Styles_XML[] = {
