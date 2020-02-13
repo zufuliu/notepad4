@@ -734,6 +734,7 @@ static inline BOOL NeedSpaceAfterKeyword(const char *word, Sci_Position length) 
 #define HTML_TEXT_BLOCK_PYTHON	4
 #define HTML_TEXT_BLOCK_PHP		5
 #define HTML_TEXT_BLOCK_CSS		6
+#define HTML_TEXT_BLOCK_SGML	7
 
 extern EDITLEXER lexCSS;
 extern EDITLEXER lexJS;
@@ -759,6 +760,9 @@ static int GetCurrentHtmlTextBlockEx(int iCurrentStyle) {
 	}
 	if ((iCurrentStyle >= SCE_HPHP_DEFAULT && iCurrentStyle <= SCE_HPHP_COMPLEX_VARIABLE)) {
 		return HTML_TEXT_BLOCK_PHP;
+	}
+	if ((iCurrentStyle >= SCE_H_SGML_DEFAULT && iCurrentStyle <= SCE_H_SGML_BLOCK_DEFAULT)) {
+		return HTML_TEXT_BLOCK_SGML;
 	}
 	return HTML_TEXT_BLOCK_TAG;
 }
@@ -2234,6 +2238,12 @@ void EditToggleCommentBlock(void) {
 		case HTML_TEXT_BLOCK_PHP:
 		case HTML_TEXT_BLOCK_CSS:
 			EditEncloseSelection(L"/*", L"*/");
+			break;
+
+		case HTML_TEXT_BLOCK_SGML:
+			// A brief SGML tutorial
+			// https://www.w3.org/TR/WD-html40-970708/intro/sgmltut.html
+			EditEncloseSelection(L"--", L"--");
 			break;
 		}
 	} break;
