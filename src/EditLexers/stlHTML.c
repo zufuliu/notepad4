@@ -3,7 +3,7 @@
 
 static KEYWORDLIST Keywords_HTML = {{
 // Tag
-"!doctype !DOCTYPE a abbr address area article aside audio b base bdi bdo "
+"a abbr address area article aside audio b base bdi bdo "
 "blockquote body br button canvas caption cite code col colgroup command datalist "
 "data dd del details dfn dialog div dl dt em embed fieldset figcaption figure footer "
 "form h1 h2 h3 h4 h5 h6 head header hgroup hr html i iframe img input ins kbd "
@@ -57,7 +57,10 @@ NULL
 "__CLASS__ __DIR__ __FILE__ __FUNCTION__ __LINE__ __METHOD__ __NAMESPACE__ __TRAIT__ "
 
 , // 5 SGML DTD
-NULL
+"doctype DOCTYPE PUBLIC SYSTEM "
+"ELEMENT ATTLIST ENTITY "
+"ANY CDATA EMPT ENTITIES ID IDREF IDREFS NDATA NOTATION NMTOKEN NMTOKENS "
+"IMPLIED FIXED PCDATA REQUIRED "
 
 , // 6 Attribute
 // Attribute
@@ -134,9 +137,8 @@ NULL
 "allow-forms allow-popups allow-same-origin allow-scripts allow-top-navigation "
 "row col rowgroup colgroup any "
 "command context toolbar soft hard "
-, NULL
 
-, NULL, NULL, NULL, NULL, NULL, NULL, NULL
+,NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL
 }};
 
 static EDITSTYLE Styles_HTML[] = {
