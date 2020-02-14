@@ -36,7 +36,7 @@ enum script_type { eScriptNone = 0, eScriptJS, eScriptVBS, eScriptPython, eScrip
 enum script_mode { eHtml = 0, eNonHtmlScript, eNonHtmlPreProc, eNonHtmlScriptPreProc };
 
 constexpr bool IsEmpty(const char *text) noexcept {
-	return text == '\0';
+	return *text == '\0';
 }
 
 inline void GetTextSegment(Accessor &styler, Sci_PositionU start, Sci_PositionU end, char *s, size_t len) noexcept {
