@@ -594,7 +594,7 @@ public:
 	void SetLexerLanguage(const char *languageName);
 
 	const char *DescribeWordListSets() const noexcept;
-	void SetWordList(int n, const char *wl);
+	void SetWordList(int n, bool toLower, const char *wl);
 
 	int GetIdentifier() const noexcept;
 	const char *GetName() const noexcept;
@@ -700,9 +700,9 @@ const char *LexState::DescribeWordListSets() const noexcept {
 	}
 }
 
-void LexState::SetWordList(int n, const char *wl) {
+void LexState::SetWordList(int n, bool toLower, const char *wl) {
 	if (instance) {
-		const Sci_Position firstModification = instance->WordListSet(n, wl);
+		const Sci_Position firstModification = instance->WordListSet(n, toLower, wl);
 		if (firstModification >= 0) {
 			pdoc->ModifiedAt(firstModification);
 		}
@@ -1131,7 +1131,7 @@ sptr_t ScintillaBase::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lPara
 		return DocumentLexState()->PropGetInt(ConstCharPtrFromUPtr(wParam), static_cast<int>(lParam));
 
 	case SCI_SETKEYWORDS:
-		DocumentLexState()->SetWordList(static_cast<int>(wParam), ConstCharPtrFromSPtr(lParam));
+		DocumentLexState()->SetWordList(static_cast<int>(wParam & KEYWORDSET_INDEXMASK), (wParam & KEYWORDSET_TOLOWER) != 0, ConstCharPtrFromSPtr(lParam));
 		break;
 
 	case SCI_SETLEXERLANGUAGE:

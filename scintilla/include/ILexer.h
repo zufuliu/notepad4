@@ -56,7 +56,7 @@ public:
 	virtual const char * SCI_METHOD DescribeProperty(const char *name) const = 0;
 	virtual Sci_Position SCI_METHOD PropertySet(const char *key, const char *val) = 0;
 	virtual const char * SCI_METHOD DescribeWordListSets() const noexcept = 0;
-	virtual Sci_Position SCI_METHOD WordListSet(int n, const char *wl) = 0;
+	virtual Sci_Position SCI_METHOD WordListSet(int n, bool toLower, const char *wl) = 0;
 	virtual void SCI_METHOD Lex(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, IDocument *pAccess) = 0;
 	virtual void SCI_METHOD Fold(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, IDocument *pAccess) = 0;
 	virtual void * SCI_METHOD PrivateCall(int operation, void *pointer) = 0;

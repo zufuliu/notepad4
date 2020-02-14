@@ -62,7 +62,7 @@ const char * SCI_METHOD DefaultLexer::DescribeWordListSets() const noexcept {
 	return "";
 }
 
-Sci_Position SCI_METHOD DefaultLexer::WordListSet(int, const char *) {
+Sci_Position SCI_METHOD DefaultLexer::WordListSet(int, bool, const char *) {
 	return -1;
 }
 

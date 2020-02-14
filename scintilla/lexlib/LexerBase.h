@@ -28,7 +28,7 @@ public:
 	const char * SCI_METHOD DescribeProperty(const char *name) const noexcept override;
 	Sci_Position SCI_METHOD PropertySet(const char *key, const char *val) override;
 	const char * SCI_METHOD DescribeWordListSets() const noexcept override;
-	Sci_Position SCI_METHOD WordListSet(int n, const char *wl) override;
+	Sci_Position SCI_METHOD WordListSet(int n, bool toLower, const char *wl) override;
 	void SCI_METHOD Lex(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, IDocument *pAccess) override = 0;
 	void SCI_METHOD Fold(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, IDocument *pAccess) override = 0;
 	void *SCI_METHOD PrivateCall(int operation, void *pointer) noexcept override;

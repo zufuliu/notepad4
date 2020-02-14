@@ -109,7 +109,7 @@ void WordList::Clear() noexcept {
 	len = 0;
 }
 
-bool WordList::Set(const char *s) {
+bool WordList::Set(const char *s, bool toLower) {
 	// omitted comparison for Notepad2, we don't care whether the list is same as before or not.
 	// 1. when we call SciCall_SetKeywords(), the document or styles already changed.
 	// 2. the comparison is expensive than rebuild the list, especially for a long list.
@@ -118,6 +118,16 @@ bool WordList::Set(const char *s) {
 	const size_t lenS = strlen(s) + 1;
 	list = new char[lenS];
 	memcpy(list, s, lenS);
+	if (toLower) {
+		char *p = list;
+		while (*p) {
+			if (*p >= 'A' && *p <= 'Z') {
+				*p += 'a' - 'A';
+			}
+			++p;
+		}
+	}
+
 	words = ArrayFromWordList(list, lenS - 1, &len);
 	std::sort(words, words + len, [](const char *a, const char *b) noexcept {
 		return strcmp(a, b) < 0;

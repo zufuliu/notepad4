@@ -128,9 +128,9 @@ static void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int in
 	WordList cmdDelimiter;
 	WordList bashStruct;
 	WordList bashStruct_in;
-	cmdDelimiter.Set("| || |& & && ; ;; ( ) { }");
-	bashStruct.Set("if elif fi while until else then do done esac eval");
-	bashStruct_in.Set("for case select");
+	cmdDelimiter.Set("| || |& & && ; ;; ( ) { }", false);
+	bashStruct.Set("if elif fi while until else then do done esac eval", false);
+	bashStruct_in.Set("for case select", false);
 
 	const CharacterSet setWordStart(CharacterSet::setAlpha, "_");
 	// note that [+-] are often parts of identifiers in shell scripts
