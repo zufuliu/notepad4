@@ -1293,23 +1293,9 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 		// Add keyword lists
 		for (int i = 0; i < NUMKEYWORD; i++) {
 			const char *pKeywords = pLexNew->pKeyWords->pszKeyWords[i];
-			if (StrNotEmptyA(pKeywords) && !(currentLexKeywordAttr[i] & KeywordAttr_NoLexer)) {
-				if (currentLexKeywordAttr[i] & KeywordAttr_MakeLower) {
-					const size_t len = strlen(pKeywords);
-					char *lowerKeywords = (char *)NP2HeapAlloc(len + 1);
-					char *p = lowerKeywords;
-					CopyMemory(lowerKeywords, pKeywords, len);
-					while (*p) {
-						if (*p >= 'A' && *p <= 'Z') {
-							*p += 'a' - 'A';
-						}
-						++p;
-					}
-					SciCall_SetKeywords(i, lowerKeywords);
-					NP2HeapFree(lowerKeywords);
-				} else {
-					SciCall_SetKeywords(i, pKeywords);
-				}
+			const uint8_t attr = currentLexKeywordAttr[i];
+			if (StrNotEmptyA(pKeywords) && !(attr & KeywordAttr_NoLexer)) {
+				SciCall_SetKeywords(i | (attr & KeywordAttr_MakeLower), pKeywords);
 			}
 		}
 

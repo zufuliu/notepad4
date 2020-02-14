@@ -44,7 +44,7 @@ typedef struct EDITSTYLE {
 // Not used by Scintilla lexer, listed for auto completion.
 #define KeywordAttr_NoLexer		1
 // Convert to lower case before pass to Scintilla.
-#define KeywordAttr_MakeLower	2
+#define KeywordAttr_MakeLower	KEYWORDSET_TOLOWER
 // Don't add to default auto completion list.
 #define KeywordAttr_NoAutoComp	4
 

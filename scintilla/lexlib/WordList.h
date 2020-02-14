@@ -31,7 +31,7 @@ public:
 	}
 	int Length() const noexcept;
 	void Clear() noexcept;
-	bool Set(const char *s);
+	bool Set(const char *s, bool toLower);
 	bool InList(const char *s) const noexcept;
 	bool InListPrefixed(const char *s, char marker) const noexcept;
 	bool InListAbbreviated(const char *s, char marker) const noexcept;
