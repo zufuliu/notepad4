@@ -70,7 +70,7 @@ NULL
 "defer dir dirname disabled download draggable dropzone enctype enterkeyhint for form formaction "
 "formenctype formmethod formnovalidate formtarget headers height hidden inputmode high href hreflang "
 "http-equiv icon id imagesrcset imagesizes integrity is ismap itemid itemprop itemref itemscope itemtype "
-"keytype kind label lang list longdesc loop low nonce minlength manifest max "
+"keytype kind label lang list loading longdesc loop low nonce minlength manifest max "
 "maxlength media mediagroup method min multiple muted name nomodule novalidate open "
 "optimum pattern placeholder playsinline poster preload radiogroup readonly referrerpolicy rel required "
 "rev reversed rows rowspan sandbox sizes spellcheck scope scoped seamless selected shape size span "
