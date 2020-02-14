@@ -88,15 +88,6 @@ static NP2_KEYWORDS kwXmlStylesheet = {
 , NULL
 };
 
-// XML DTD SGML
-static NP2_KEYWORDS kwXmlDTD = {
-"DOCTYPE ENTITY ELEMENT ATTLIST ",
-"CDATA PCDATA ID IDREF IDREFS NMTOKEN NMTOKENS ENTITY ENTITIES NOTATION EMPTY SYSTEM PUBLIC ANY "
-,
-"REQUIRED IMPLIED FIXED "
-, NULL
-};
-
 // Ant Build
 static NP2_KEYWORDS kwAntBuild = {
 // task or type
@@ -498,9 +489,6 @@ void Style_UpdateLexerKeywords(LPCEDITLEXER pLexNew) {
 		return;
 	case IDM_LANG_XSLT:
 		np2_LexKeyword = &kwXmlStylesheet;
-		return;
-	case IDM_LANG_DTD:
-		np2_LexKeyword = &kwXmlDTD;
 		return;
 
 	case IDM_LANG_ANT_BUILD:
