@@ -131,7 +131,7 @@ Or build from source, see the [Wiki](https://github.com/zufuliu/notepad2/wiki/Bu
 	* XML Document, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#xml)
 		* XML Schema
 		* XML Stylesheet
-		* XML DTD SGML
+		* SGML and DTD
 		* Ant Build
 		* Maven POM
 		* Maven Settings
