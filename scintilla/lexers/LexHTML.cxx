@@ -396,6 +396,10 @@ constexpr int StateForScript(script_type scriptLanguage) noexcept {
 	}
 }
 
+constexpr int defaultStateForSGML(script_type scriptLanguage) noexcept {
+	return (scriptLanguage == eScriptSGMLblock)? SCE_H_SGML_BLOCK_DEFAULT : SCE_H_SGML_DEFAULT;
+}
+
 bool issgmlwordchar(int ch) noexcept {
 	return !IsASCII(ch) ||
 		(isalnum(ch) || ch == '.' || ch == '_' || ch == ':' || ch == '!' || ch == '#' || ch == '[');
@@ -1269,18 +1273,10 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 		case SCE_H_SGML_1ST_PARAM:
 			// wait for the beginning of the word
 			if ((ch == '-') && (chPrev == '-')) {
-				if (scriptLanguage == eScriptSGMLblock) {
-					styler.ColourTo(i - 2, SCE_H_SGML_BLOCK_DEFAULT);
-				} else {
-					styler.ColourTo(i - 2, SCE_H_SGML_DEFAULT);
-				}
+				styler.ColourTo(i - 2, defaultStateForSGML(scriptLanguage));
 				state = SCE_H_SGML_1ST_PARAM_COMMENT;
 			} else if (issgmlwordchar(ch)) {
-				if (scriptLanguage == eScriptSGMLblock) {
-					styler.ColourTo(i - 1, SCE_H_SGML_BLOCK_DEFAULT);
-				} else {
-					styler.ColourTo(i - 1, SCE_H_SGML_DEFAULT);
-				}
+				styler.ColourTo(i - 1, defaultStateForSGML(scriptLanguage));
 				// find the length of the word
 				int size = 1;
 				while (setHTMLWord.Contains(static_cast<unsigned char>(styler.SafeGetCharAt(i + size))))
@@ -1289,18 +1285,20 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 				i += size - 1;
 				visibleChars += size - 1;
 				ch = static_cast<unsigned char>(styler.SafeGetCharAt(i));
-				if (scriptLanguage == eScriptSGMLblock) {
-					state = SCE_H_SGML_BLOCK_DEFAULT;
-				} else {
-					state = SCE_H_SGML_DEFAULT;
-				}
+				state = defaultStateForSGML(scriptLanguage);
 				continue;
+			} else if (ch == '\"' || ch == '\'') {
+				styler.ColourTo(i - 1, defaultStateForSGML(scriptLanguage));
+				state = (ch == '\"')? SCE_H_SGML_DOUBLESTRING : SCE_H_SGML_SIMPLESTRING;
 			}
 			break;
 		case SCE_H_SGML_ERROR:
 			if ((ch == '-') && (chPrev == '-')) {
 				styler.ColourTo(i - 2, StateToPrint);
 				state = SCE_H_SGML_COMMENT;
+			} else if (ch == '\"' || ch == '\'') {
+				styler.ColourTo(i - 1, defaultStateForSGML(scriptLanguage));
+				state = (ch == '\"')? SCE_H_SGML_DOUBLESTRING : SCE_H_SGML_SIMPLESTRING;
 			}
 			break;
 		case SCE_H_SGML_DOUBLESTRING:
