@@ -4,7 +4,7 @@ Since v4.19.01r1786, latest development build (artifacts in Release configuratio
 
 Tips: To keep your current settings, do NOT replace *Notepad2.ini* or *metapath.ini* or any theme files with the bundled one, but please mind the breaking changes in [v4.19.01r1786](https://github.com/zufuliu/notepad2/releases/tag/v4.19.01r1786) and below when upgrading to this version from versions before v4.19.01r1786.
 
-## Changes Since v4.19.?
+## Changes Since v4.20.?
 
 ## Breaking Changes
 
