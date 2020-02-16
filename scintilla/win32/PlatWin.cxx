@@ -600,7 +600,9 @@ void SurfaceGDI::Init(SurfaceID sid, WindowID) noexcept {
 
 void SurfaceGDI::InitPixMap(int width, int height, Surface *surface_, WindowID) noexcept {
 	Release();
-	SurfaceGDI *psurfOther = static_cast<SurfaceGDI *>(surface_);
+	SurfaceGDI *psurfOther = dyn_cast<SurfaceGDI *>(surface_);
+	// Should only ever be called with a SurfaceGDI, not a SurfaceD2D
+	PLATFORM_ASSERT(psurfOther);
 	hdc = ::CreateCompatibleDC(psurfOther->hdc);
 	hdcOwned = true;
 	bitmap = ::CreateCompatibleBitmap(psurfOther->hdc, width, height);
@@ -689,10 +691,11 @@ void SurfaceGDI::FillRectangle(PRectangle rc, ColourDesired back) noexcept {
 
 void SurfaceGDI::FillRectangle(PRectangle rc, Surface &surfacePattern) noexcept {
 	HBRUSH br;
-	if (static_cast<SurfaceGDI &>(surfacePattern).bitmap)
-		br = ::CreatePatternBrush(static_cast<SurfaceGDI &>(surfacePattern).bitmap);
-	else	// Something is wrong so display in red
+	if (SurfaceGDI *psgdi = dyn_cast<SurfaceGDI *>(&surfacePattern); psgdi && psgdi->bitmap) {
+		br = ::CreatePatternBrush(psgdi->bitmap);
+	} else {	// Something is wrong so display in red
 		br = ::CreateSolidBrush(RGB(0xff, 0, 0));
+	}
 	const RECT rcw = RectFromPRectangle(rc);
 	::FillRect(hdc, &rcw, br);
 	::DeleteObject(br);
@@ -825,15 +828,10 @@ void SurfaceGDI::DrawRGBAImage(PRectangle rc, int width, int height, const unsig
 			HBITMAP hbmOld = SelectBitmap(hMemDC, hbmMem);
 
 			for (int y = height - 1; y >= 0; y--) {
-				for (int x = 0; x < width; x++) {
-					unsigned char *pixel = static_cast<unsigned char *>(image) + (y*width + x) * 4;
-					const unsigned char alpha = pixelsImage[3];
-					// Input is RGBA, output is BGRA with premultiplied alpha
-					pixel[2] = static_cast<unsigned char>((*pixelsImage++) * alpha / 255);
-					pixel[1] = static_cast<unsigned char>((*pixelsImage++) * alpha / 255);
-					pixel[0] = static_cast<unsigned char>((*pixelsImage++) * alpha / 255);
-					pixel[3] = *pixelsImage++;
-				}
+				// Bits flipped vertically
+				unsigned char *pixel = static_cast<unsigned char *>(image) + RGBAImage::bytesPerPixel * y * width;
+				RGBAImage::BGRAFromRGBA(pixel, pixelsImage, width);
+				pixelsImage += RGBAImage::bytesPerPixel * width;
 			}
 
 			const BLENDFUNCTION merge = { AC_SRC_OVER, 0, 255, AC_SRC_ALPHA };
@@ -1036,6 +1034,7 @@ class SurfaceD2D : public Surface {
 	int codePageText;
 
 	ID2D1RenderTarget *pRenderTarget;
+	ID2D1BitmapRenderTarget *pBitmapRenderTarget;
 	bool ownRenderTarget;
 	int clipsActive;
 
@@ -1120,6 +1119,7 @@ SurfaceD2D::SurfaceD2D() noexcept :
 	codePageText = 0;
 
 	pRenderTarget = nullptr;
+	pBitmapRenderTarget = nullptr;
 	ownRenderTarget = false;
 	clipsActive = 0;
 
@@ -1151,13 +1151,13 @@ void SurfaceD2D::Clear() noexcept {
 			clipsActive--;
 		}
 		if (ownRenderTarget) {
-			[[maybe_unused]] const HRESULT hr = pRenderTarget->EndDraw();
-			PLATFORM_ASSERT(hr == S_OK);
+			pRenderTarget->EndDraw();
 			pRenderTarget->Release();
 			ownRenderTarget = false;
 		}
 		pRenderTarget = nullptr;
 	}
+	pBitmapRenderTarget = nullptr;
 }
 
 void SurfaceD2D::Release() noexcept {
@@ -1194,8 +1194,9 @@ void SurfaceD2D::Init(SurfaceID sid, WindowID) noexcept {
 void SurfaceD2D::InitPixMap(int width, int height, Surface *surface_, WindowID) noexcept {
 	Release();
 	SetScale();
-	SurfaceD2D *psurfOther = static_cast<SurfaceD2D *>(surface_);
-	ID2D1BitmapRenderTarget *pCompatibleRenderTarget = nullptr;
+	SurfaceD2D *psurfOther = dyn_cast<SurfaceD2D *>(surface_);
+	// Should only ever be called with a SurfaceD2D, not a SurfaceGDI
+	PLATFORM_ASSERT(psurfOther);
 	const D2D1_SIZE_F desiredSize = D2D1::SizeF(static_cast<float>(width), static_cast<float>(height));
 	D2D1_PIXEL_FORMAT desiredFormat;
 #ifdef __MINGW32__
@@ -1205,9 +1206,9 @@ void SurfaceD2D::InitPixMap(int width, int height, Surface *surface_, WindowID) 
 #endif
 	desiredFormat.alphaMode = D2D1_ALPHA_MODE_IGNORE;
 	const HRESULT hr = psurfOther->pRenderTarget->CreateCompatibleRenderTarget(
-		&desiredSize, nullptr, &desiredFormat, D2D1_COMPATIBLE_RENDER_TARGET_OPTIONS_NONE, &pCompatibleRenderTarget);
+		&desiredSize, nullptr, &desiredFormat, D2D1_COMPATIBLE_RENDER_TARGET_OPTIONS_NONE, &pBitmapRenderTarget);
 	if (SUCCEEDED(hr)) {
-		pRenderTarget = pCompatibleRenderTarget;
+		pRenderTarget = pBitmapRenderTarget;
 		pRenderTarget->BeginDraw();
 		ownRenderTarget = true;
 	}
@@ -1363,12 +1364,11 @@ void SurfaceD2D::FillRectangle(PRectangle rc, ColourDesired back) {
 }
 
 void SurfaceD2D::FillRectangle(PRectangle rc, Surface &surfacePattern) {
-	SurfaceD2D &surfOther = static_cast<SurfaceD2D &>(surfacePattern);
-	surfOther.FlushDrawing();
+	SurfaceD2D *psurfOther = dyn_cast<SurfaceD2D *>(&surfacePattern);
+	PLATFORM_ASSERT(psurfOther && psurfOther->pBitmapRenderTarget);
+	psurfOther->FlushDrawing();
 	ID2D1Bitmap *pBitmap = nullptr;
-	ID2D1BitmapRenderTarget *pCompatibleRenderTarget = reinterpret_cast<ID2D1BitmapRenderTarget *>(
-		surfOther.pRenderTarget);
-	HRESULT hr = pCompatibleRenderTarget->GetBitmap(&pBitmap);
+	HRESULT hr = psurfOther->pBitmapRenderTarget->GetBitmap(&pBitmap);
 	if (SUCCEEDED(hr)) {
 		ID2D1BitmapBrush *pBitmapBrush = nullptr;
 		const D2D1_BITMAP_BRUSH_PROPERTIES brushProperties =
@@ -1490,18 +1490,8 @@ void SurfaceD2D::DrawRGBAImage(PRectangle rc, int width, int height, const unsig
 			rc.top += std::floor((rc.Height() - height) / 2);
 		rc.bottom = rc.top + height;
 
-		std::vector<unsigned char> image(height * width * 4);
-		for (int yPixel = 0; yPixel < height; yPixel++) {
-			for (int xPixel = 0; xPixel < width; xPixel++) {
-				unsigned char *pixel = image.data() + (yPixel*width + xPixel) * 4;
-				const unsigned char alpha = pixelsImage[3];
-				// Input is RGBA, output is BGRA with premultiplied alpha
-				pixel[2] = (*pixelsImage++) * alpha / 255;
-				pixel[1] = (*pixelsImage++) * alpha / 255;
-				pixel[0] = (*pixelsImage++) * alpha / 255;
-				pixel[3] = *pixelsImage++;
-			}
-		}
+		std::vector<unsigned char> image(RGBAImage::bytesPerPixel * height * width);
+		RGBAImage::BGRAFromRGBA(image.data(), pixelsImage, static_cast<ptrdiff_t>(height) * width);
 
 		ID2D1Bitmap *bitmap = nullptr;
 		const D2D1_SIZE_U size = D2D1::SizeU(width, height);

@@ -1756,7 +1756,13 @@ void Editor::Paint(Surface *surfaceWindow, PRectangle rcArea) {
 		}
 		RefreshPixMaps(surfaceWindow);	// In case pixmaps invalidated by scrollbar change
 	}
-	PLATFORM_ASSERT(marginView.pixmapSelPattern->Initialised());
+
+	if (!marginView.pixmapSelPattern->Initialised()) {
+		// When Direct2D is used, pixmap creation may fail with D2DERR_RECREATE_TARGET so
+		// abandon this paint to avoid further failures.
+		// Main drawing surface and pixmaps should be recreated by next paint.
+		return;
+	}
 
 	if (!view.bufferedDraw)
 		surfaceWindow->SetClip(rcArea);
