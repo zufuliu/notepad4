@@ -43,8 +43,7 @@
 // suppress -Wimplicit-fallthrough in C source
 #if defined(__cplusplus)
 #define FALLTHROUGH_ATTR		[[fallthrough]]
-// TODO: change to Clang 9 once released
-#elif (defined(__GNUC__) && __GNUC__ >= 7) || (defined(__clang__) && __clang_major__ > 9)
+#elif (defined(__GNUC__) && __GNUC__ >= 7) || (defined(__clang__) && __clang_major__ >= 10)
 #define FALLTHROUGH_ATTR		__attribute__((fallthrough))
 #else
 #define FALLTHROUGH_ATTR

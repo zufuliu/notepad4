@@ -24,7 +24,7 @@
 #endif
 
 #if !defined(DISABLE_D2D)
-#define USE_D2D 1
+#define USE_D2D		1
 #endif
 
 #if defined(USE_D2D)
@@ -40,6 +40,12 @@
 #endif
 #endif
 
+// official Scintilla use dynamic_cast, which requires RTTI.
+#ifdef NDEBUG
+#define USE_RTTI	0
+#else
+#define USE_RTTI	1
+#endif
 
 // force compile C as CPP
 #define NP2_FORCE_COMPILE_C_AS_CPP	0
@@ -75,6 +81,15 @@ constexpr HWND HwndFromWindowID(WindowID wid) noexcept {
 
 inline HWND HwndFromWindow(const Window &w) noexcept {
 	return HwndFromWindowID(w.GetID());
+}
+
+template<typename Pointer, class Type>
+inline Pointer dyn_cast(Type *ptr) {
+#if USE_RTTI
+	return dynamic_cast<Pointer>(ptr);
+#else
+	return static_cast<Pointer>(ptr);
+#endif
 }
 
 #if defined(USE_D2D)
