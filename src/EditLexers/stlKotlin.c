@@ -65,7 +65,7 @@ static EDITSTYLE Styles_Kotlin[] = {
 EDITLEXER lexKotlin = {
 	SCLEX_KOTLIN, NP2LEX_KOTLIN,
 	EDITLEXER_HOLE(L"Kotlin Source", Styles_Kotlin),
-	L"kt",
+	L"kt; kts",
 	&Keywords_Kotlin,
 	Styles_Kotlin
 };
