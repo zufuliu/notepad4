@@ -5439,10 +5439,8 @@ BOOL EditReplaceAll(HWND hwnd, LPEDITFINDREPLACE lpefr, BOOL bShowInfo) {
 			break;
 		}
 
-		//const int ch = SciCall_GetCharAt(SciCall_GetTargetEnd());
-		if (/*ch == '\r' || ch == '\n' || iReplacedLen == 0 || */
-			ttf.chrgText.cpMin == ttf.chrgText.cpMax &&
-			!(bRegexStartOrEndOfLine && iReplacedLen > 0)) {
+		if (ttf.chrgText.cpMin == ttf.chrgText.cpMax && !bRegexStartOfLine) {
+			// move to next line after the replacement.
 			ttf.chrg.cpMin = (Sci_PositionCR)SciCall_PositionAfter(ttf.chrg.cpMin);
 		}
 
@@ -5559,10 +5557,8 @@ BOOL EditReplaceAllInSelection(HWND hwnd, LPEDITFINDREPLACE lpefr, BOOL bShowInf
 				fCancel = TRUE;
 			}
 
-			//const int ch = SciCall_GetCharAt(SciCall_GetTargetEnd());
-			if (/*ch == '\r' || ch == '\n' || iReplacedLen == 0 || */
-				ttf.chrgText.cpMin == ttf.chrgText.cpMax &&
-				!(bRegexStartOrEndOfLine && iReplacedLen > 0)) {
+			if (ttf.chrgText.cpMin == ttf.chrgText.cpMax && !bRegexStartOfLine) {
+				// move to next line after the replacement.
 				ttf.chrg.cpMin = (Sci_PositionCR)SciCall_PositionAfter(ttf.chrg.cpMin);
 			}
 
