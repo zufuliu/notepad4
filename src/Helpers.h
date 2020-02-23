@@ -605,8 +605,11 @@ UINT CodePageFromCharSet(UINT uCharSet);
 
 //==== MRU Functions ==========================================================
 #define MRU_MAXITEMS	32
-#define MRU_DEFAULT		0
-#define MRU_NOCASE		1
+
+enum {
+	MRUFlags_Default = 0, 
+	MRUFlags_CaseInsensitive = 1,
+};
 
 // MRU_MAXITEMS * (MAX_PATH + 4)
 #define MAX_INI_SECTION_SIZE_MRU	(8 * 1024)
