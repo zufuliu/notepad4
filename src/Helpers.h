@@ -345,7 +345,7 @@ NP2_inline BOOL IniSectionIsEmpty(const IniSection *section) {
 	return section->count == 0;
 }
 
-BOOL IniSectionParseArray(IniSection *section, LPWSTR lpCachedIniSection);
+BOOL IniSectionParseArray(IniSection *section, LPWSTR lpCachedIniSection, BOOL quoted);
 BOOL IniSectionParse(IniSection *section, LPWSTR lpCachedIniSection);
 LPCWSTR IniSectionUnsafeGetValue(IniSection *section, LPCWSTR key, int keyLen);
 
@@ -388,6 +388,7 @@ typedef struct IniSectionOnSave {
 } IniSectionOnSave;
 
 void IniSectionSetString(IniSectionOnSave *section, LPCWSTR key, LPCWSTR value);
+void IniSectionSetQuotedString(IniSectionOnSave *section, LPCWSTR key, LPCWSTR value);
 
 NP2_inline void IniSectionSetInt(IniSectionOnSave *section, LPCWSTR key, int i) {
 	WCHAR tch[16];
@@ -607,8 +608,9 @@ UINT CodePageFromCharSet(UINT uCharSet);
 #define MRU_MAXITEMS	32
 
 enum {
-	MRUFlags_Default = 0, 
+	MRUFlags_Default = 0,
 	MRUFlags_CaseInsensitive = 1,
+	MRUFlags_QuoteValue = 2,
 };
 
 // MRU_MAXITEMS * (MAX_PATH + 4)

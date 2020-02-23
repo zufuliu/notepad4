@@ -678,7 +678,7 @@ static void Style_LoadAll(BOOL bFore) {
 		CopyMemory(customColor, defaultCustomColor, MAX_CUSTOM_COLOR_COUNT * sizeof(COLORREF));
 
 		GetPrivateProfileSection(INI_SECTION_NAME_CUSTOM_COLORS, pIniSectionBuf, cchIniSection, themePath);
-		IniSectionParseArray(pIniSection, pIniSectionBuf);
+		IniSectionParseArray(pIniSection, pIniSectionBuf, FALSE);
 
 		const int count = min_i(pIniSection->count, MAX_CUSTOM_COLOR_COUNT);
 		for (int i = 0; i < count; i++) {
