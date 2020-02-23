@@ -89,7 +89,7 @@ void IniClearAllSectionEx(LPCWSTR lpszPrefix, LPCWSTR lpszIniFile, BOOL bDelete)
 //
 // Manipulation of (cached) ini file sections
 //
-BOOL IniSectionParseArray(IniSection *section, LPWSTR lpCachedIniSection) {
+BOOL IniSectionParseArray(IniSection *section, LPWSTR lpCachedIniSection, BOOL quoted) {
 	IniSectionClear(section);
 	if (StrIsEmpty(lpCachedIniSection)) {
 		return FALSE;
@@ -104,10 +104,15 @@ BOOL IniSectionParseArray(IniSection *section, LPWSTR lpCachedIniSection) {
 		LPWSTR v = StrChr(p, L'=');
 		if (v != NULL) {
 			*v++ = L'\0';
+			const int valueLen = lstrlen(v);
 			node->key = p;
+			p = v + valueLen + 1;
+			if (quoted && valueLen > 1 && *v == L'\"' && v[valueLen - 1] == L'\"') {
+				v[valueLen - 1] = L'\0';
+				*v++ = L'\0';
+			}
 			node->value = v;
 			++count;
-			p = StrEnd(v) + 1;
 		} else {
 			p = StrEnd(p) + 1;
 		}
@@ -238,6 +243,18 @@ void IniSectionSetString(IniSectionOnSave *section, LPCWSTR key, LPCWSTR value) 
 	lstrcpy(p, key);
 	lstrcat(p, L"=");
 	lstrcat(p, value);
+	p = StrEnd(p) + 1;
+	*p = L'\0';
+	section->next = p;
+}
+
+void IniSectionSetQuotedString(IniSectionOnSave *section, LPCWSTR key, LPCWSTR value) {
+	LPWSTR p = section->next;
+	lstrcpy(p, key);
+	lstrcat(p, L"=");
+	lstrcat(p, L"\"");
+	lstrcat(p, value);
+	lstrcat(p, L"\"");
 	p = StrEnd(p) + 1;
 	*p = L'\0';
 	section->next = p;
@@ -2126,7 +2143,7 @@ BOOL MRU_Load(LPMRULIST pmru) {
 	IniSectionInit(pIniSection, MRU_MAXITEMS);
 
 	LoadIniSection(pmru->szRegKey, pIniSectionBuf, cchIniSection);
-	IniSectionParseArray(pIniSection, pIniSectionBuf);
+	IniSectionParseArray(pIniSection, pIniSectionBuf, pmru->iFlags & MRUFlags_QuoteValue);
 	const int count = pIniSection->count;
 	const int size = pmru->iSize;
 
@@ -2157,11 +2174,16 @@ BOOL MRU_Save(LPCMRULIST pmru) {
 	WCHAR *pIniSectionBuf = (WCHAR *)NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_MRU);
 	IniSectionOnSave *pIniSection = &section;
 	pIniSection->next = pIniSectionBuf;
+	const BOOL quoted = pmru->iFlags & MRUFlags_QuoteValue;
 
 	for (int i = 0; i < pmru->iSize; i++) {
 		if (StrNotEmpty(pmru->pszItems[i])) {
 			wsprintf(tchName, L"%02i", i + 1);
-			IniSectionSetString(pIniSection, tchName, pmru->pszItems[i]);
+			if (quoted) {
+				IniSectionSetQuotedString(pIniSection, tchName, pmru->pszItems[i]);
+			} else {
+				IniSectionSetString(pIniSection, tchName, pmru->pszItems[i]);
+			}
 		}
 	}
 

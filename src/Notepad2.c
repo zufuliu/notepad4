@@ -1779,10 +1779,10 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	pFileMRU = MRU_Create(MRU_KEY_RECENT_FILES, MRUFlags_CaseInsensitive, MRU_MAX_RECENT_FILES);
 	MRU_Load(pFileMRU);
 
-	mruFind = MRU_Create(MRU_KEY_RECENT_FIND, MRUFlags_Default, MRU_MAX_RECENT_FIND);
+	mruFind = MRU_Create(MRU_KEY_RECENT_FIND, MRUFlags_QuoteValue, MRU_MAX_RECENT_FIND);
 	MRU_Load(mruFind);
 
-	mruReplace = MRU_Create(MRU_KEY_RECENT_REPLACE, MRUFlags_Default, MRU_MAX_RECENT_REPLACE);
+	mruReplace = MRU_Create(MRU_KEY_RECENT_REPLACE, MRUFlags_QuoteValue, MRU_MAX_RECENT_REPLACE);
 	MRU_Load(mruReplace);
 
 	if (bInFullScreenMode) {
@@ -1883,7 +1883,7 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) {
 
 	IniSectionInit(pIniSection, COUNTOF(tbbMainWnd));
 	LoadIniSection(INI_SECTION_NAME_TOOLBAR_LABELS, pIniSectionBuf, cchIniSection);
-	IniSectionParseArray(pIniSection, pIniSectionBuf);
+	IniSectionParseArray(pIniSection, pIniSectionBuf, FALSE);
 	const int count = pIniSection->count;
 
 	for (int i = 0; i < count; i++) {
