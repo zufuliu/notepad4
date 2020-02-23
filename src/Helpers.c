@@ -1981,7 +1981,7 @@ BOOL MRU_Destroy(LPMRULIST pmru) {
 }
 
 int MRU_Compare(LPCMRULIST pmru, LPCWSTR psz1, LPCWSTR psz2) {
-	return (pmru->iFlags & MRU_NOCASE) ? StrCmpI(psz1, psz2) : StrCmp(psz1, psz2);
+	return (pmru->iFlags & MRUFlags_CaseInsensitive) ? StrCmpI(psz1, psz2) : StrCmp(psz1, psz2);
 }
 
 BOOL MRU_Add(LPMRULIST pmru, LPCWSTR pszNew) {

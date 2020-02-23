@@ -420,8 +420,11 @@ void History_UpdateToolbar(LCPHISTORY ph, HWND hwnd, int cmdBack, int cmdForward
 
 //==== MRU Functions ==========================================================
 #define MRU_MAXITEMS	24
-#define MRU_DEFAULT		0
-#define MRU_NOCASE		1
+
+enum {
+	MRUFlags_Default = 0, 
+	MRUFlags_CaseInsensitive = 1,
+};
 
 #define MRU_MAX_COPY_MOVE_HISTORY	24
 // MRU_MAXITEMS * (MAX_PATH + 4)

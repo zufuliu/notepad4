@@ -1776,13 +1776,13 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	DragAcceptFiles(hwnd, TRUE);
 
 	// File MRU
-	pFileMRU = MRU_Create(MRU_KEY_RECENT_FILES, MRU_NOCASE, MRU_MAX_RECENT_FILES);
+	pFileMRU = MRU_Create(MRU_KEY_RECENT_FILES, MRUFlags_CaseInsensitive, MRU_MAX_RECENT_FILES);
 	MRU_Load(pFileMRU);
 
-	mruFind = MRU_Create(MRU_KEY_RECENT_FIND, MRU_DEFAULT, MRU_MAX_RECENT_FIND);
+	mruFind = MRU_Create(MRU_KEY_RECENT_FIND, MRUFlags_Default, MRU_MAX_RECENT_FIND);
 	MRU_Load(mruFind);
 
-	mruReplace = MRU_Create(MRU_KEY_RECENT_REPLACE, MRU_DEFAULT, MRU_MAX_RECENT_REPLACE);
+	mruReplace = MRU_Create(MRU_KEY_RECENT_REPLACE, MRUFlags_Default, MRU_MAX_RECENT_REPLACE);
 	MRU_Load(mruReplace);
 
 	if (bInFullScreenMode) {
