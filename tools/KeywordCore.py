@@ -558,7 +558,10 @@ def parse_web_assembly_lexer_keywords(path):
 	}
 
 	types = ['i32', 'i64', 'f32', 'f64', 'v128',
-		'f32x4', 'f64x2', 'i16x8', 'i32x4', 'i64x2', 'i8x16']
+		'f32x4', 'f64x2',
+		'i8x16', 'i16x8', 'i32x4', 'i64x2',
+		'v8x16', 'v16x8', 'v32x4', 'v64x2',
+	]
 
 	def has_type_prefix(word):
 		return any(word.startswith(prefix + '.') for prefix in types)
