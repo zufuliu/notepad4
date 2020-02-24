@@ -1057,7 +1057,7 @@ INT AutoC_AddSpecWord(struct WordList *pWList, int iCurrentStyle, int ch, int ch
 	}
 	else if ((pLexCurrent->rid == NP2LEX_HTML || pLexCurrent->rid == NP2LEX_XML || pLexCurrent->rid == NP2LEX_CONF)
 			   && ((ch == '<') || (chPrev == '<' && ch == '/'))) {
-		WordList_AddListEx(pWList, pLexCurrent->pKeyWords->pszKeyWords[0]);// Tag
+		WordList_AddList(pWList, pLexCurrent->pKeyWords->pszKeyWords[0]);// Tag
 		if (pLexCurrent->rid == NP2LEX_XML) {
 			if (np2_LexKeyword) { // XML Tag
 				WordList_AddList(pWList, (*np2_LexKeyword)[0]);
