@@ -4286,6 +4286,19 @@ void Editor::SetDragPosition(SelectionPosition newPos) {
 		posDrop = newPos;
 	}
 	if (!(posDrag == newPos)) {
+		const int oldCaretYPolicy = caretYPolicy;
+		const int oldCaretYSlop = caretYSlop;
+		const int oldCaretXPolicy = caretXPolicy;
+		const int oldCaretXSlop = caretXSlop;
+		caretYPolicy = CARET_SLOP | CARET_STRICT | CARET_EVEN;
+		caretYSlop = 2;
+		caretXPolicy = CARET_SLOP | CARET_STRICT | CARET_EVEN;
+		caretXSlop = 50;
+		MovedCaret(newPos, posDrag, true);
+		caretYPolicy = oldCaretYPolicy;
+		caretYSlop = oldCaretYSlop;
+		caretXPolicy = oldCaretXPolicy;
+		caretXSlop = oldCaretXSlop;
 		caret.on = true;
 		FineTickerCancel(tickCaret);
 		if ((caret.active) && (caret.period > 0) && (newPos.Position() < 0))
