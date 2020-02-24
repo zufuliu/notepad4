@@ -251,8 +251,7 @@ void IniSectionSetString(IniSectionOnSave *section, LPCWSTR key, LPCWSTR value) 
 void IniSectionSetQuotedString(IniSectionOnSave *section, LPCWSTR key, LPCWSTR value) {
 	LPWSTR p = section->next;
 	lstrcpy(p, key);
-	lstrcat(p, L"=");
-	lstrcat(p, L"\"");
+	lstrcat(p, L"=\"");
 	lstrcat(p, value);
 	lstrcat(p, L"\"");
 	p = StrEnd(p) + 1;
