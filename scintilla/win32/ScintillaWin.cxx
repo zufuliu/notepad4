@@ -455,10 +455,14 @@ class ScintillaWin :
 	bool PaintDC(HDC hdc);
 	sptr_t WndPaint();
 
+	// DBCS
+	void ImeStartComposition();
+	void ImeEndComposition();
+	LRESULT ImeOnReconvert(LPARAM lParam);
 	sptr_t HandleCompositionWindowed(uptr_t wParam, sptr_t lParam);
 	sptr_t HandleCompositionInline(uptr_t wParam, sptr_t lParam);
 
-	// Korean IME always use inline mode, and block caret in inline mode.
+	// Korean IME always use inline mode, and use block caret in inline mode.
 	bool KoreanIME() const noexcept {
 		return PRIMARYLANGID(inputLang) == LANG_KOREAN;
 	}
@@ -510,11 +514,6 @@ class ScintillaWin :
 	void AddToPopUp(const char *label, int cmd = 0, bool enabled = true) noexcept override;
 #endif
 	void ClaimSelection() noexcept override;
-
-	// DBCS
-	void ImeStartComposition();
-	void ImeEndComposition();
-	LRESULT ImeOnReconvert(LPARAM lParam);
 
 	enum class CopyEncoding {
 		Unicode,	// used in Copy & Paste, Drag & Drop
