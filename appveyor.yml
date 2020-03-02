@@ -131,6 +131,17 @@ for:
     build_script:
       - cmd: CALL "build\VS2017\build.bat" Build ARM Debug 1
 
+  - # Clang ARM Debug
+    matrix:
+      only:
+        - configuration: Debug
+          platform: ARM
+          compiler: Clang
+
+    build_script:
+      - cmd: CALL "build\install_llvm.bat" 1
+      - cmd: CALL "build\VS2017\build.bat" Build ARM LLVMDebug 1
+
   - # MSVC x64 Release
     matrix:
       only:
@@ -269,3 +280,19 @@ for:
     artifacts:
       - path: 'build\Notepad2*.zip'
         name: Notepad2_ARM
+
+  - # Clang ARM Release
+    matrix:
+      only:
+        - configuration: Release
+          platform: ARM
+          compiler: Clang
+
+    build_script:
+      - cmd: CALL "build\install_llvm.bat" 1
+      - cmd: CALL "build\VS2017\build.bat" Build ARM LLVMRelease 1
+      - cmd: CALL "build\make_zip.bat" Clang ARM Release 1
+
+    artifacts:
+      - path: 'build\Notepad2*.zip'
+        name: Notepad2_Clang_ARM
