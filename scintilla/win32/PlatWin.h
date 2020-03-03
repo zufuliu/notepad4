@@ -83,12 +83,12 @@ inline HWND HwndFromWindow(const Window &w) noexcept {
 	return HwndFromWindowID(w.GetID());
 }
 
-template<typename Pointer, class Type>
-inline Pointer dyn_cast(Type *ptr) {
+template<typename DerivedPointer, class Base>
+inline DerivedPointer down_cast(Base *ptr) noexcept {
 #if USE_RTTI
-	return dynamic_cast<Pointer>(ptr);
+	return dynamic_cast<DerivedPointer>(ptr);
 #else
-	return static_cast<Pointer>(ptr);
+	return static_cast<DerivedPointer>(ptr);
 #endif
 }
 
