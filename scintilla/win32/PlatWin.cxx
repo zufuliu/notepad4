@@ -600,7 +600,7 @@ void SurfaceGDI::Init(SurfaceID sid, WindowID) noexcept {
 
 void SurfaceGDI::InitPixMap(int width, int height, Surface *surface_, WindowID) noexcept {
 	Release();
-	SurfaceGDI *psurfOther = dyn_cast<SurfaceGDI *>(surface_);
+	SurfaceGDI *psurfOther = down_cast<SurfaceGDI *>(surface_);
 	// Should only ever be called with a SurfaceGDI, not a SurfaceD2D
 	PLATFORM_ASSERT(psurfOther);
 	hdc = ::CreateCompatibleDC(psurfOther->hdc);
@@ -691,7 +691,7 @@ void SurfaceGDI::FillRectangle(PRectangle rc, ColourDesired back) noexcept {
 
 void SurfaceGDI::FillRectangle(PRectangle rc, Surface &surfacePattern) noexcept {
 	HBRUSH br;
-	if (SurfaceGDI *psgdi = dyn_cast<SurfaceGDI *>(&surfacePattern); psgdi && psgdi->bitmap) {
+	if (SurfaceGDI *psgdi = down_cast<SurfaceGDI *>(&surfacePattern); psgdi && psgdi->bitmap) {
 		br = ::CreatePatternBrush(psgdi->bitmap);
 	} else {	// Something is wrong so display in red
 		br = ::CreateSolidBrush(RGB(0xff, 0, 0));
@@ -1194,7 +1194,7 @@ void SurfaceD2D::Init(SurfaceID sid, WindowID) noexcept {
 void SurfaceD2D::InitPixMap(int width, int height, Surface *surface_, WindowID) noexcept {
 	Release();
 	SetScale();
-	SurfaceD2D *psurfOther = dyn_cast<SurfaceD2D *>(surface_);
+	SurfaceD2D *psurfOther = down_cast<SurfaceD2D *>(surface_);
 	// Should only ever be called with a SurfaceD2D, not a SurfaceGDI
 	PLATFORM_ASSERT(psurfOther);
 	const D2D1_SIZE_F desiredSize = D2D1::SizeF(static_cast<float>(width), static_cast<float>(height));
@@ -1364,7 +1364,7 @@ void SurfaceD2D::FillRectangle(PRectangle rc, ColourDesired back) {
 }
 
 void SurfaceD2D::FillRectangle(PRectangle rc, Surface &surfacePattern) {
-	SurfaceD2D *psurfOther = dyn_cast<SurfaceD2D *>(&surfacePattern);
+	SurfaceD2D *psurfOther = down_cast<SurfaceD2D *>(&surfacePattern);
 	PLATFORM_ASSERT(psurfOther && psurfOther->pBitmapRenderTarget);
 	psurfOther->FlushDrawing();
 	ID2D1Bitmap *pBitmap = nullptr;
