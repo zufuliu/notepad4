@@ -551,7 +551,6 @@ static inline BOOL IsOperatorStyle(int style) {
 		return style == SCE_CONF_OPERATOR;
 	case SCLEX_CPP:
 	case SCLEX_GRAPHVIZ:
-	case SCLEX_JSON:
 	case SCLEX_LISP:
 	case SCLEX_NSIS:
 		return style == SCE_C_OPERATOR;
@@ -566,8 +565,11 @@ static inline BOOL IsOperatorStyle(int style) {
 	case SCLEX_HTML:
 		return style == SCE_HPHP_OPERATOR || style == SCE_HJ_SYMBOLS || style == SCE_HJA_SYMBOLS;
 
+	case SCLEX_JSON:
+		return style == SCE_JSON_OPERATOR;
 	case SCLEX_JULIA:
 		return style == SCE_JULIA_OPERATOR || style == SCE_JULIA_OPERATOR2;
+
 	case SCLEX_KOTLIN:
 		return style == SCE_KOTLIN_OPERATOR || style == SCE_KOTLIN_OPERATOR2;
 
@@ -635,7 +637,7 @@ static inline BOOL IsWordStyleToIgnore(int style) {
 			|| style == SCE_C_PREPROCESSOR;
 
 	case SCLEX_JSON:
-		return style == SCE_C_WORD;
+		return style == SCE_JSON_KEYWORD;
 
 	case SCLEX_PYTHON:
 		return style == SCE_PY_WORD
