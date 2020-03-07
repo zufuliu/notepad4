@@ -88,52 +88,56 @@ void ColouriseJSONDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 		chNext = styler.SafeGetCharAt(i + 1);
 
 		switch (state) {
-		case SCE_C_OPERATOR:
+		case SCE_JSON_OPERATOR:
 			styler.ColourTo(i - 1, state);
-			state = SCE_C_DEFAULT;
+			state = SCE_JSON_DEFAULT;
 			break;
-		case SCE_C_NUMBER:
+
+		case SCE_JSON_NUMBER:
 			if (!(kJsonCharClass[ch] & JsonChar_Number)) {
 				styler.ColourTo(i - 1, state);
-				state = SCE_C_DEFAULT;
+				state = SCE_JSON_DEFAULT;
 			}
 			break;
-		case SCE_C_WORD2:
+
+		case SCE_JSON_MAYBE_KEYWORD:
 			if (!(kJsonCharClass[ch] & JsonChar_ID)) {
 				buf[wordLen] = '\0';
 				if (keywordLists[0]->InList(buf)) {
-					styler.ColourTo(i - 1, SCE_C_WORD);
+					styler.ColourTo(i - 1, SCE_JSON_KEYWORD);
 				} else if (ch == ':' || chNext == ':' || LexGetNextChar(i + 1, styler) == ':') {
-					styler.ColourTo(i - 1, SCE_C_LABEL);
+					styler.ColourTo(i - 1, SCE_JSON_PROPERTYNAME);
 				}
-				state = SCE_C_DEFAULT;
+				state = SCE_JSON_DEFAULT;
 			} else if (wordLen < MaxJsonWordLength) {
 				buf[wordLen++] = static_cast<char>(ch);
 			} else {
-				state = SCE_C_IDENTIFIER;
+				state = SCE_JSON_IDENTIFIER;
 			}
 			break;
-		case SCE_C_IDENTIFIER:
+
+		case SCE_JSON_IDENTIFIER:
 			if (!(kJsonCharClass[ch] & JsonChar_ID)) {
 				if (ch == ':' || chNext == ':' || LexGetNextChar(i + 1, styler) == ':') {
-					styler.ColourTo(i - 1, SCE_C_LABEL);
+					styler.ColourTo(i - 1, SCE_JSON_PROPERTYNAME);
 				}
-				state = SCE_C_DEFAULT;
+				state = SCE_JSON_DEFAULT;
 			}
 			break;
-		case SCE_C_STRING:
-		case SCE_C_CHARACTER:
+
+		case SCE_JSON_STRING:
+		case SCE_JSON_CHARACTER:
 			if (i == lineEndPos) { // atLineEnd
 				if (lineContinue) {
 					lineContinue = false;
 				} else {
 					styler.ColourTo(i - 1, state);
-					state = SCE_C_DEFAULT;
+					state = SCE_JSON_DEFAULT;
 				}
 			} else if (ch == '\\') {
 				styler.ColourTo(i - 1, state);
 				if (IsEOLChar(chNext)) {
-					styler.ColourTo(i, SCE_C_DEFAULT);
+					styler.ColourTo(i, SCE_JSON_DEFAULT);
 					lineContinue = true;
 				} else {
 					// highlight any character as escape sequence
@@ -151,79 +155,81 @@ void ColouriseJSONDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 					}
 
 					chNext = styler.SafeGetCharAt(i + 1);
-					styler.ColourTo(i, SCE_C_ESCAPECHAR);
+					styler.ColourTo(i, SCE_JSON_ESCAPESEQUENCE);
 					continue;
 				}
-			} else if ((state == SCE_C_STRING && ch == '\"') || (state == SCE_C_CHARACTER && ch == '\'')) {
+			} else if ((state == SCE_JSON_STRING && ch == '\"') || (state == SCE_JSON_CHARACTER && ch == '\'')) {
 				if (chNext == ':' || LexGetNextChar(i + 1, styler) == ':') {
-					styler.ColourTo(i, SCE_C_LABEL);
+					styler.ColourTo(i, SCE_JSON_PROPERTYNAME);
 				} else {
-					styler.ColourTo(i, SCE_C_STRING);
+					styler.ColourTo(i, state);
 				}
-				state = SCE_C_DEFAULT;
+				state = SCE_JSON_DEFAULT;
 				continue;
 			}
 			break;
-		case SCE_C_COMMENTLINE:
+
+		case SCE_JSON_LINECOMMENT:
 			if (atLineStart) {
 				styler.ColourTo(i - 1, state);
-				state = SCE_C_DEFAULT;
+				state = SCE_JSON_DEFAULT;
 			}
 			break;
-		case SCE_C_COMMENT:
+
+		case SCE_JSON_BLOCKCOMMENT:
 			if (ch == '*' && chNext == '/') {
 				i++;
 				chNext = styler.SafeGetCharAt(i + 1);
 				styler.ColourTo(i, state);
-				state = SCE_C_DEFAULT;
+				state = SCE_JSON_DEFAULT;
 				levelNext--;
 				continue;
 			}
 			break;
 		}
 
-		if (state == SCE_C_DEFAULT) {
+		if (state == SCE_JSON_DEFAULT) {
 			const int charClass = kJsonCharClass[ch] & 0x0F;
 			switch (charClass) {
 			case JsonChar_Operator:
 				styler.ColourTo(i - 1, state);
-				state = SCE_C_OPERATOR;
+				state = SCE_JSON_OPERATOR;
 				break;
 			case JsonChar_OperatorOpen:
 				styler.ColourTo(i - 1, state);
-				state = SCE_C_OPERATOR;
+				state = SCE_JSON_OPERATOR;
 				levelNext++;
 				break;
 			case JsonChar_OperatorClose:
 				styler.ColourTo(i - 1, state);
-				state = SCE_C_OPERATOR;
+				state = SCE_JSON_OPERATOR;
 				levelNext--;
 				break;
 			case JsonChar_String:
 				styler.ColourTo(i - 1, state);
-				state = SCE_C_STRING;
+				state = SCE_JSON_STRING;
 				break;
 			case JsonChar_Digit:
 				styler.ColourTo(i - 1, state);
-				state = SCE_C_NUMBER;
+				state = SCE_JSON_NUMBER;
 				break;
 			case JsonChar_WordStart:
 				styler.ColourTo(i - 1, state);
-				state = SCE_C_WORD2;
+				state = SCE_JSON_MAYBE_KEYWORD;
 				buf[0] = static_cast<char>(ch);
 				wordLen = 1;
 				break;
 			case JsonChar_Dot:
 				styler.ColourTo(i - 1, state);
-				state = (chNext >= '0' && chNext <= '9') ? SCE_C_NUMBER : SCE_C_OPERATOR;
+				state = (chNext >= '0' && chNext <= '9') ? SCE_JSON_NUMBER : SCE_JSON_OPERATOR;
 				break;
 			case JsonChar_Slash:
 				if (chNext == '/') {
 					styler.ColourTo(i - 1, state);
-					state = SCE_C_COMMENTLINE;
+					state = SCE_JSON_LINECOMMENT;
 				} else if (chNext == '*') {
 					styler.ColourTo(i - 1, state);
-					state = SCE_C_COMMENT;
+					state = SCE_JSON_BLOCKCOMMENT;
 					levelNext++;
 					i++;
 					chNext = styler.SafeGetCharAt(i + 1);
@@ -231,11 +237,11 @@ void ColouriseJSONDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 				break;
 			case JsonChar_Char:
 				styler.ColourTo(i - 1, state);
-				state = SCE_C_CHARACTER;
+				state = SCE_JSON_CHARACTER;
 				break;
 			case JsonChar_IDStart:
 				styler.ColourTo(i - 1, state);
-				state = SCE_C_IDENTIFIER;
+				state = SCE_JSON_IDENTIFIER;
 				break;
 			}
 		}
