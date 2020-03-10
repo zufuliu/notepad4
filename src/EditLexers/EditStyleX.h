@@ -244,7 +244,7 @@
 #define NP2StyleX_DateTime				EDITSTYLE_HOLE(DateTime, L"DateTime")
 #define NP2StyleX_Action				EDITSTYLE_HOLE(Action, L"Action")
 #define NP2StyleX_ModuleDirective		EDITSTYLE_HOLE(ModuleDirective, L"Module Directive")
-#define NP2StyleX_Reference				EDITSTYLE_HOLE(Reference, L"Reference")
+#define NP2StyleX_Anchor				EDITSTYLE_HOLE(Anchor, L"Anchor")
 #define NP2StyleX_TextBlock				EDITSTYLE_HOLE(TextBlock, L"Text Block")
 #define NP2StyleX_Math					EDITSTYLE_HOLE(Math, L"Math")
 #define NP2StyleX_SpecialCharacter		EDITSTYLE_HOLE(SpecialCharacter, L"Special Character")
