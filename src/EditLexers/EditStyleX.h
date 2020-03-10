@@ -40,7 +40,7 @@
 #define NP2StyleX_Regex					EDITSTYLE_HOLE(Regex, L"Regex")
 #define NP2StyleX_Attribute				EDITSTYLE_HOLE(Attribute, L"Attribute")
 #define NP2StyleX_Directive				EDITSTYLE_HOLE(Directive, L"Directive")
-
+#define NP2StyleX_Identifier			EDITSTYLE_HOLE(Identifier, L"Identifier")
 #define NP2StyleX_DocComment			EDITSTYLE_HOLE(DocComment, L"Doc Comment")
 #define NP2StyleX_DocCommentTag			EDITSTYLE_HOLE(DocCommentTag, L"Doc Comment Tag")
 #define NP2StyleX_XMLTag				EDITSTYLE_HOLE(XMLTag, L"XML Tag")

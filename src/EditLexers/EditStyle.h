@@ -32,7 +32,7 @@
 #define NP2STYLE_Regex					63135
 #define NP2STYLE_Attribute				63136
 #define NP2STYLE_Directive				63137
-// 63138
+#define NP2STYLE_Identifier				63138
 #define NP2STYLE_DocComment				63139
 #define NP2STYLE_DocCommentTag			63140
 #define NP2STYLE_XMLTag					63141
