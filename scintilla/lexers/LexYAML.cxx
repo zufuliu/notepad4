@@ -245,7 +245,8 @@ void ColouriseYAMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 			}
 			break;
 
-		case SCE_YAML_REFERENCE:
+		case SCE_YAML_ANCHOR:
+		case SCE_YAML_ALIAS:
 			if (!IsYAMLAnchorChar(sc.ch)) {
 				sc.SetState(SCE_YAML_DEFAULT);
 			}
@@ -338,7 +339,7 @@ void ColouriseYAMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 			} else if (sc.ch == '\"') {
 				sc.SetState(SCE_YAML_STRING2);
 			} else if ((sc.ch == '&' || sc.ch == '*') && IsYAMLAnchorChar(sc.chNext)) {
-				sc.SetState(SCE_YAML_REFERENCE);
+				sc.SetState((sc.ch == '&')? SCE_YAML_ANCHOR : SCE_YAML_ALIAS);
 			} else if (sc.ch == '!') {
 				if (sc.chNext == '<') {
 					sc.SetState(SCE_YAML_VERBATIM_TAG);

@@ -236,7 +236,7 @@
 #define NP2STYLE_DateTime				63566
 #define NP2STYLE_Action					63567
 #define NP2STYLE_ModuleDirective		63568
-#define NP2STYLE_Reference				63569
+#define NP2STYLE_Anchor					63569
 #define NP2STYLE_TextBlock				63570
 #define NP2STYLE_Math					63571
 #define NP2STYLE_SpecialCharacter		63572
