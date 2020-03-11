@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import unicodedata
+
 from FileGenerator import Regenerate
 from GenerateCharacterCategory import dumpArray
 

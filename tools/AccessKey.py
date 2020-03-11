@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 #-*- coding: UTF-8 -*-
-from collections import OrderedDict
 
 def is_access_key(ch):
 	return (ch >= '0' and ch <= '9') or (ch >= 'A' and ch <= 'Z') or (ch >= 'a' and ch <= 'z')
@@ -78,8 +77,8 @@ def find_free_access_key(menu, path):
 					all_key[ch] = [line]
 
 	if all_key:
-		all_key = OrderedDict(sorted(all_key.items(), key=lambda m: m[0]))
-		all_key = OrderedDict(sorted(all_key.items(), key=lambda m: len(m[1])))
+		all_key = dict(sorted(all_key.items(), key=lambda m: m[0]))
+		all_key = dict(sorted(all_key.items(), key=lambda m: len(m[1])))
 
 		print('write:', path)
 		with open(path, 'w', encoding='utf-8', newline='\n') as fd:

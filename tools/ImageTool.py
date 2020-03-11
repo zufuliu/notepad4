@@ -2,6 +2,7 @@
 #-*- coding: UTF-8 -*-
 import os.path
 import re
+
 from Bitmap import Bitmap
 
 def save_bitmap(bmp, path):
