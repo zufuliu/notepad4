@@ -152,6 +152,11 @@ static void ColouriseBatchDoc(Sci_PositionU startPos, Sci_Position length, int i
 			if ((sc.ch == '%' || sc.ch == '^') && GetBatEscapeLen(sc.state, escapeLen, sc.ch, sc.chNext, sc.GetRelative(2))) {
 				sc.SetState(SCE_BAT_ESCAPE);
 				sc.Forward(escapeLen);
+			} else if (sc.ch == '.' && !inEcho && sc.LengthCurrent() == 4 && sc.styler.MatchIgnoreCase(sc.styler.GetStartSegment(), "echo")) {
+				inEcho = true;
+				parenCount = levelNext;
+				sc.ChangeState(SCE_BAT_WORD);
+				sc.ForwardSetState(SCE_BAT_DEFAULT);
 			} else if (!IsWordChar(sc.ch)) {
 				char s[256];
 				sc.GetCurrentLowered(s, sizeof(s));
@@ -160,7 +165,7 @@ static void ColouriseBatchDoc(Sci_PositionU startPos, Sci_Position length, int i
 				} else {
 					if (!inEcho && keywords.InList(s)) { // not in echo ?
 						sc.ChangeState(SCE_BAT_WORD);
-						inEcho = strcmp(s, "echo") == 0 || strcmp(s, "title") == 0 || strcmp(s, "prompt") == 0;
+						inEcho = strcmp(s, "echo") == 0 || strcmp(s, "echo.") == 0 || strcmp(s, "title") == 0 || strcmp(s, "prompt") == 0;
 						isGoto = strcmp(s, "goto") == 0;
 						isCall = strcmp(s, "call") == 0;
 						if (inEcho) {
