@@ -279,7 +279,7 @@ unsigned int UTF16FromUTF32Character(unsigned int val, wchar_t *tbuf) noexcept {
 // https://tools.ietf.org/html/rfc3629
 // UTF-8, a transformation format of ISO 10646
 //  4. Syntax of UTF-8 Byte Sequences
-// https://www.unicode.org/versions/Unicode12.0.0/
+// https://www.unicode.org/versions/Unicode13.0.0/
 //  3.9 Unicode Encoding Forms
 //      Table 3-7. Well-Formed UTF-8 Byte Sequences
 /*

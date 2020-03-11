@@ -102,9 +102,10 @@ def isPrivateChar(c):
 # https://en.wikipedia.org/wiki/CJK_Unified_Ideographs
 # https://en.wikipedia.org/wiki/Katakana
 # https://en.wikipedia.org/wiki/Hangul
-# Chapter 18 East Asia https://www.unicode.org/versions/Unicode12.0.0/ch18.pdf
+# Chapter 18 East Asia http://www.unicode.org/versions/Unicode13.0.0/UnicodeStandard-13.0.pdf
 # Unicode Han Database (Unihan) https://unicode.org/reports/tr38/#BlockListing
 CJKBlockList = [
+	# Table 18-1. Blocks Containing Han Ideographs
 	(0x3400, 0x4DBF), # U+3400..U+4DBF CJK Unified Ideographs Extension A
 	(0x4E00, 0x9FFF), # U+4E00..U+9FFF CJK Unified Ideographs
 	(0xF900, 0xFAFF), # U+F900..U+FAFF CJK Compatibility Ideographs
@@ -115,6 +116,7 @@ CJKBlockList = [
 	(0x2B820, 0x2CEAF), # U+2B820..U+2CEAF CJK Unified Ideographs Extension E
 	(0x2CEB0, 0x2EBEF), # U+2CEB0..U+2EBEF CJK Unified Ideographs Extension F
 	(0x2F800, 0x2FA1F), # U+2F800..U+2FA1F CJK Compatibility Ideographs Supplement
+	(0x30000, 0x3134F), # U+30000..U+3134F CJK Unified Ideographs Extension G
 
 	(0x2E80, 0x2EFF), # U+2E80..U+2EFF CJK Radicals Supplement
 	(0x2F00, 0x2FDF), # U+2F00..U+2FDF Kangxi Radicals
@@ -127,6 +129,8 @@ CJKBlockList = [
 	(0x3300, 0x33FF), # U+3300..U+33FF CJK Compatibility
 	(0xFE30, 0xFE4F), # U+FE30..U+FE4F CJK Compatibility Forms
 	(0xFF5F, 0xFFEF), # U+FF5F..U+FFEF Halfwidth and Fullwidth Forms (without fullwidth ASCII)
+	(0x16FE0, 0x16FFF), # U+16FE0..U+16FFF Ideographic Symbols and Punctuation
+	(0x1F200, 0x1F2FF), # U+1F200..U+1F2FF Enclosed Ideographic Supplement
 	# Japanese
 	(0x3040, 0x309F), # U+3040..U+309F Hiragana
 	(0x30A0, 0x30FF), # U+30A0..U+30FF Katakana
@@ -146,11 +150,11 @@ CJKBlockList = [
 	# Other
 	(0xA000, 0xA48F), # U+A000..U+A48F Yi Syllables
 	(0xA490, 0xA4CF), # U+A490..U+A4CF Yi Radicals
-	(0x16FE0, 0x16FFF), # U+16FE0..U+16FFF Ideographic Symbols and Punctuation
 	(0x17000, 0x187FF), # U+17000..U+187FF Tangut
 	(0x18800, 0x18AFF), # U+18800..U+18AFF Tangut Components
-	(0x1B170, 0x1B2FF), # U+1B170..U+1B2FF Nushu
-	(0x1F200, 0x1F2FF), # U+1F200..U+1F2FF Enclosed Ideographic Supplement
+	(0x18D00, 0x18D8F), # U+18D00..U+18D8F Tangut Supplement
+	(0x18B00, 0x18CFF), # U+18B00..U+18CFF Khitan Small Script
+	(0x1B170, 0x1B2FF), # U+1B170..U+1B2FF Nüshu
 ]
 
 def findCategories(filename):
