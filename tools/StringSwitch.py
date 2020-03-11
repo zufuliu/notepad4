@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 #-*- coding: UTF-8 -*-
-from collections import OrderedDict
 import operator
 
 # return true if equal
@@ -130,7 +129,7 @@ def build_switch_stmt(switch_type, func_name, var_name, word_list, int_arg=0, sw
 			buf = bytearray(item.encode(CStringEncoding))
 			sorted_list.append((len(buf), buf))
 
-	cond_map = OrderedDict()
+	cond_map = {}
 	sorted_list.sort(key=operator.itemgetter(0)) # sorted by string length
 	for item in sorted_list:
 		length = item[0]

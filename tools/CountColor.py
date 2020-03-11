@@ -2,7 +2,6 @@
 #-*- coding: UTF-8 -*-
 import sys
 import os.path
-from collections import OrderedDict
 import operator
 import re
 
@@ -67,12 +66,12 @@ def count_color(path):
 
 	colors = sorted(color_map.items(), key=operator.itemgetter(0))
 	colors = sorted(colors, key=lambda m: m[1]['total_count'], reverse=True)
-	color_map = OrderedDict(colors)
+	color_map = dict(colors)
 	for color_stat in color_map.values():
 		usage = color_stat['usage']
 		usage = sorted(usage.items(), key=operator.itemgetter(0))
 		usage = sorted(usage, key=operator.itemgetter(1), reverse=True)
-		color_stat['usage'] = OrderedDict(usage)
+		color_stat['usage'] = dict(usage)
 
 	print_color_count(color_map)
 

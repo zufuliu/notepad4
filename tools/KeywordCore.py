@@ -4,6 +4,7 @@ sys.path.append('../scintilla/scripts')
 import os.path
 import re
 from enum import IntFlag
+
 from FileGenerator import Regenerate
 
 AllKeywordAttrList = {}

@@ -15,7 +15,9 @@
 # strings with original, folded, upper, and lower separated by '|'.
 # There are 126 complex cases.
 
-import itertools, string, sys
+import sys
+import itertools
+import string
 
 from FileGenerator import Regenerate
 

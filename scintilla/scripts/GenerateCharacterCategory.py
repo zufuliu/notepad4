@@ -2,10 +2,13 @@
 # Script to generate CharacterCategory.cxx from Python's Unicode data
 # Should be run rarely when a Python with a new version of Unicode data is available.
 
-import codecs, platform, sys, unicodedata
-from collections import OrderedDict
+import sys
+import codecs
+import platform
+import unicodedata
 from enum import IntEnum
 import math
+
 from FileGenerator import Regenerate
 from splitbins import *
 
@@ -241,7 +244,7 @@ def buildFoldDisplayEllipsis():
 		('cp1361', 1361, 'Johab'),
 	]
 
-	result = OrderedDict()
+	result = {}
 	for encoding, codepage, comment in encodingList:
 		try:
 			value = defaultText.encode(encoding)
@@ -283,7 +286,7 @@ def buildFoldDisplayEllipsis():
 		('cp874', 874, 'Thai (Windows-874)'),
 	]
 
-	result = OrderedDict()
+	result = {}
 	fallback = []
 	for encoding, codepage, comment in encodingList:
 		try:
@@ -368,7 +371,7 @@ def buildANSICharClassifyTable(filename):
 		('cp874', 874, 'Thai (Windows-874)'),
 	]
 
-	result = OrderedDict()
+	result = {}
 	offset = 0
 	for encoding, codepage, comment in encodingList:
 		s, m = buildCharClassify(encoding)
