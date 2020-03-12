@@ -164,7 +164,7 @@ def findCategories(filename):
 	print(values)
 	return [v[2:] for v in values]
 
-def isCJKLetter(category, ch):
+def isCJKCharacter(category, ch):
 	if category not in CharClassifyMap[CharClassify.ccWord]:
 		return False
 
@@ -582,7 +582,7 @@ def updateCharClassifyTable(filename, headfile):
 		uch = chr(ch)
 		category = unicodedata.category(uch)
 		value = ClassifyMap[category]
-		if isCJKLetter(category, ch):
+		if isCJKCharacter(category, ch):
 			value = CharClassify.ccCJKWord
 		indexTable[ch] = int(value)
 
@@ -664,7 +664,7 @@ def getDBCSCharClassify(decode, ch, isReservedOrUDC=None):
 		category = unicodedata.category(uch[0])
 		ch = ord(uch[0])
 		# treat PUA in DBCS as word instead of punctuation or space
-		if isCJKLetter(category, ch) or (category == 'Co' and isPrivateChar(ch)):
+		if isCJKCharacter(category, ch) or (category == 'Co' and isPrivateChar(ch)):
 			return int(CharClassify.ccCJKWord)
 	else:
 		# treat reserved or user-defined characters as word
