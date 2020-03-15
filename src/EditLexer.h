@@ -143,6 +143,7 @@ typedef const EDITLEXER *LPCEDITLEXER;
 #define NP2LEX_YAML			63069	// SCLEX_YAML		YAML Document
 #define NP2LEX_WASM			63070	// SCLEX_WASM		WebAssembly
 #define NP2LEX_TOML			63071	// SCLEX_TOML		TOML File
+#define NP2LEX_GN			63072	// SCLEX_GN			GN Build Script
 
 #define NP2LEX_2NDTEXTFILE	63097	// SCLEX_NULL		2nd Text File
 #define NP2LEX_2NDGLOBAL	63098	// SCLEX_NULL		2nd Global Styles

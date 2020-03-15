@@ -55,6 +55,7 @@ Or build from source, see the [Wiki](https://github.com/zufuliu/notepad2/wiki/Bu
 	* Fortran
 		* GNU Fortran
 	* F#
+	* [GN Build](../master/tools/lang/GN.gn), up to GN 2019-03-13.
 	* Go
 	* Gradle, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#gradle)
 	* GraphViz Dot, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#graphviz)

@@ -147,6 +147,7 @@
 #define NP2STYLE_DocCommentTagHTML		63350
 #define NP2STYLE_ReservedWord			63351
 #define NP2STYLE_EscapeSequence			63352
+#define NP2STYLE_Placeholder			63353
 
 #define NP2STYLE_BracketArgument		63361
 

@@ -155,6 +155,7 @@
 #define NP2StyleX_DocCommentTagHTML		EDITSTYLE_HOLE(DocCommentTagHTML, L"Doc Comment HTML Tag")
 #define NP2StyleX_ReservedWord			EDITSTYLE_HOLE(ReservedWord, L"Reserved Word")
 #define NP2StyleX_EscapeSequence		EDITSTYLE_HOLE(EscapeSequence, L"Escape Sequence")
+#define NP2StyleX_Placeholder			EDITSTYLE_HOLE(Placeholder, L"Placeholder")
 
 #define NP2StyleX_BracketArgument		EDITSTYLE_HOLE(BracketArgument, L"Bracket Argument")
 

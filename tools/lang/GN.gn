@@ -1,0 +1,190 @@
+# GN 2019-03-13 https://gn.googlesource.com/gn/+/master/docs/reference.md
+# gn help --markdown all
+# https://storage.googleapis.com/chromium-gn/
+
+#! Keywords			===========================================================
+else false if true
+
+#! Function			===========================================================
+# Target declarations
+action()
+action_foreach()
+bundle_data()
+copy()
+create_bundle()
+executable()
+generated_file()
+group()
+loadable_module()
+shared_library()
+source_set()
+static_library()
+target()
+
+# Buildfile functions
+assert(<condition> [, <error string>])
+config()
+declare_args()
+defined(foo)
+exec_script(filename, arguments = [], input_conversion = "", file_dependencies = [])
+foreach(<loop_var>, <list>)
+forward_variables_from(from_scope, variable_list_or_star, variable_to_not_forward_list = [])
+get_label_info(target_label, what)
+get_path_info(input, what)
+get_target_outputs(target_label)
+getenv(env_var_name)
+import("")
+not_needed(variable_list_or_star, variable_to_ignore_list = [])
+not_needed(from_scope, variable_list_or_star, variable_to_ignore_list = [])
+pool()
+print()
+process_file_template(source_list, template)
+read_file(filename, input_conversion)
+rebase_path(input, new_base = "", current_base = ".")
+set_default_toolchain(toolchain_label)
+set_defaults(<target_type_name>)
+set_sources_assignment_filter()
+split_list(input, n)
+string_replace(str, old, new[, max])
+template()
+tool(<tool type>)
+toolchain()
+write_file(filename, data, output_conversion = "")
+
+#! Predefined Variables	=======================================================
+target_cpu
+target_os
+current_toolchain
+default_toolchain
+host_cpu
+host_os
+invoker
+python_path
+root_build_dir
+root_gen_dir
+root_out_dir
+target_cpu
+target_gen_dir
+target_name
+target_os
+target_out_dir
+
+# Variables in .gn file
+arg_file_template
+buildconfig
+check_targets
+exec_script_whitelist
+root
+script_executable
+secondary_source
+default_args
+
+#! Target Variables
+all_dependent_configs
+allow_circular_includes_from
+arflags
+args
+asmflags
+assert_no_deps
+bundle_contents_dir
+bundle_deps_filter
+bundle_executable_dir
+bundle_plugins_dir
+bundle_resources_dir
+bundle_root_dir
+cflags
+cflags_c
+cflags_cc
+cflags_objc
+cflags_objcc
+check_includes
+code_signing_args
+code_signing_outputs
+code_signing_script
+code_signing_sources
+complete_static_lib
+configs
+contents
+data
+data_deps
+data_keys
+defines
+depfile
+deps
+friend
+include_dirs
+inputs
+ldflags
+lib_dirs
+libs
+metadata
+output_conversion
+output_dir
+output_extension
+output_name
+output_prefix_override
+outputs
+partial_info_plist
+pool
+precompiled_header
+precompiled_header_type
+precompiled_source
+product_type
+public
+public_configs
+public_deps
+rebase
+response_file_contents
+script
+sources
+testonly
+visibility
+walk_keys
+write_runtime_deps
+xcode_extra_attributes
+xcode_test_application_name
+
+#! Placeholders		===========================================================
+# Expansions for tool variables
+label
+label_name
+output
+target_gen_dir
+target_out_dir
+target_output_name
+# Compiler tools
+asmflags
+cflags
+cflags_c
+cflags_cc
+cflags_objc
+cflags_objcc
+defines
+include_dirs
+source
+source_file_part
+source_name_part
+source_gen_dir
+source_out_dir
+# Linker tools
+inputs
+inputs_newline
+ldflags
+libs
+output_dir
+output_extension
+solibs
+# compile_xcassets tool
+inputs
+bundle_product_type
+bundle_partial_info_plist
+
+# placeholders for actions
+source
+source_file_part
+source_name_part
+source_dir
+source_root_relative_dir
+source_gen_dir
+source_out_dir
+source_target_relative

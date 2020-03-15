@@ -21,7 +21,7 @@
 
 #include "EditLexer.h"
 // Number of Lexers in pLexArray
-#define NUMLEXERS	63
+#define NUMLEXERS	64
 
 // all schemes with "All Files (*.*)"
 #define MAX_OPEN_SAVE_FILE_DIALOG_FILTER_SIZE	((NUMLEXERS + 1) * 128)

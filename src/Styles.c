@@ -70,6 +70,7 @@ extern EDITLEXER lexDIFF;
 extern EDITLEXER lexFSharp;
 extern EDITLEXER lexFortran;
 
+extern EDITLEXER lexGN;
 extern EDITLEXER lexGo;
 extern EDITLEXER lexGradle;
 extern EDITLEXER lexDOT;
@@ -162,6 +163,7 @@ static const PEDITLEXER pLexArray[ALL_LEXER_COUNT] = {
 	&lexFSharp,
 	&lexFortran,
 
+	&lexGN,
 	&lexGo,
 	&lexGradle,
 	&lexDOT,
@@ -1076,6 +1078,10 @@ void Style_UpdateLexerKeywordAttr(LPCEDITLEXER pLexNew) {
 		attr[6] = KeywordAttr_NoLexer;		// long properties
 		attr[7] = KeywordAttr_NoLexer;		// long variables
 		break;
+	case NP2LEX_GN:
+		attr[3] = KeywordAttr_NoLexer;		// target variables
+		attr[4] = KeywordAttr_NoLexer;		// placeholders
+		break;
 	case NP2LEX_JULIA:
 		attr[1] = KeywordAttr_NoAutoComp;	// code fold
 		attr[5] = KeywordAttr_NoLexer;		// module
@@ -1120,6 +1126,7 @@ static inline BOOL DidLexerHasBlockComment(int iLexer, int rid) {
 		|| iLexer == SCLEX_BATCH
 		|| iLexer == SCLEX_CONF
 		|| iLexer == SCLEX_DIFF
+		|| iLexer == SCLEX_GN
 		|| iLexer == SCLEX_LLVM
 		|| iLexer == SCLEX_MAKEFILE
 		|| iLexer == SCLEX_PERL

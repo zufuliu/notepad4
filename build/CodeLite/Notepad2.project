@@ -25,6 +25,7 @@
       <File Name="../../scintilla/lexers/LexDiff.cxx"/>
       <File Name="../../scintilla/lexers/LexFortran.cxx"/>
       <File Name="../../scintilla/lexers/LexFSharp.cxx"/>
+      <File Name="../../scintilla/lexers/LexGN.cxx"/>
       <File Name="../../scintilla/lexers/LexGraphViz.cxx"/>
       <File Name="../../scintilla/lexers/LexHTML.cxx"/>
       <File Name="../../scintilla/lexers/LexInno.cxx"/>
@@ -179,6 +180,7 @@
       <File Name="../../src/EditLexers/stlDefault.c"/>
       <File Name="../../src/EditLexers/stlFortran.c"/>
       <File Name="../../src/EditLexers/stlFSharp.c"/>
+      <File Name="../../src/EditLexers/stlGN.c"/>
       <File Name="../../src/EditLexers/stlGo.c"/>
       <File Name="../../src/EditLexers/stlGradle.c"/>
       <File Name="../../src/EditLexers/stlGraphViz.c"/>
