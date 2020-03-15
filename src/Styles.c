@@ -70,9 +70,9 @@ extern EDITLEXER lexDIFF;
 extern EDITLEXER lexFSharp;
 extern EDITLEXER lexFortran;
 
+extern EDITLEXER lexGo;
 extern EDITLEXER lexGradle;
 extern EDITLEXER lexDOT;
-extern EDITLEXER lexGo;
 extern EDITLEXER lexGroovy;
 
 extern EDITLEXER lexHaXe;
@@ -162,9 +162,9 @@ static const PEDITLEXER pLexArray[ALL_LEXER_COUNT] = {
 	&lexFSharp,
 	&lexFortran,
 
+	&lexGo,
 	&lexGradle,
 	&lexDOT,
-	&lexGo,
 	&lexGroovy,
 
 	&lexHaXe,
