@@ -187,9 +187,9 @@
 #define NP2STYLE_TripleQuotedBytes		63463
 #define NP2STYLE_Lifetime				63464
 #define NP2STYLE_Decorator				63465
-#define NP2STYLE_BuildinFunction		63466
+#define NP2STYLE_BuiltInFunction		63466
 #define NP2STYLE_objectMethod			63467
-#define NP2STYLE_BuildinConstant		63468
+#define NP2STYLE_BuiltInConstant		63468
 #define NP2STYLE_FormattedString		63469
 #define NP2STYLE_TripleQuotedFString	63470
 #define NP2STYLE_Module					63471
@@ -264,6 +264,6 @@
 #define NP2STYLE_InlineAsm				63594
 #define NP2STYLE_Callback				63595
 #define NP2STYLE_Target					63596
-#define NP2STYLE_BuildinRule			63597
+#define NP2STYLE_BuiltInRule			63597
 #define NP2STYLE_BlobHex				63598
 #define NP2STYLE_BitField				63599

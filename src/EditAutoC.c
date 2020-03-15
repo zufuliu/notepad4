@@ -642,8 +642,8 @@ static inline BOOL IsWordStyleToIgnore(int style) {
 	case SCLEX_PYTHON:
 		return style == SCE_PY_WORD
 			|| style == SCE_PY_WORD2
-			|| style == SCE_PY_BUILDIN_CONST
-			|| style == SCE_PY_BUILDIN_FUNC
+			|| style == SCE_PY_BUILTIN_CONST
+			|| style == SCE_PY_BUILTIN_FUNC
 			|| style == SCE_PY_ATTR
 			|| style == SCE_PY_OBJ_FUNC;
 
