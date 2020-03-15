@@ -1211,7 +1211,7 @@ void ScintillaWin::EscapeHanja() {
 
 	// ImmEscapeW() may overwrite uniChar[] with a null terminated string.
 	// So enlarge it enough to Maximum 4 as in UTF-8.
-	constexpr unsigned int safeLength = UTF8MaxBytes + 1;
+	constexpr size_t safeLength = UTF8MaxBytes + 1;
 	std::string oneChar(safeLength, '\0');
 	pdoc->GetCharRange(oneChar.data(), currentPos, oneCharLen);
 
@@ -1222,7 +1222,7 @@ void ScintillaWin::EscapeHanja() {
 		// Set the candidate box position since IME may show it.
 		SetCandidateWindowPos();
 		// IME_ESC_HANJA_MODE appears to receive the first character only.
-		if (ImmEscapeW(GetKeyboardLayout(0), imc.hIMC, IME_ESC_HANJA_MODE, uniChar.data())) {
+		if (::ImmEscapeW(GetKeyboardLayout(0), imc.hIMC, IME_ESC_HANJA_MODE, uniChar.data())) {
 			SetSelection(currentPos, currentPos + oneCharLen);
 		}
 	}
@@ -3697,7 +3697,7 @@ STDMETHODIMP ScintillaWin::Drop(LPDATAOBJECT pIDataSource, DWORD grfKeyState, PO
 			NotifyURIDropped(putf.c_str());
 		} else {
 			FORMATETC fmtr = { cfColumnSelect, nullptr, DVASPECT_CONTENT, -1, TYMED_HGLOBAL };
-			const bool isRectangular = SUCCEEDED(pIDataSource->QueryGetData(&fmtr));
+			const bool isRectangular = S_OK == pIDataSource->QueryGetData(&fmtr);
 
 			POINT rpt = { pt.x, pt.y };
 			::ScreenToClient(MainHWND(), &rpt);

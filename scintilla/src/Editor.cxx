@@ -789,7 +789,7 @@ void Editor::MultipleSelectAdd(AddNumber addNumber) {
 	}
 }
 
-bool Editor::RangeContainsProtected(Sci::Position start, Sci::Position end) const {
+bool Editor::RangeContainsProtected(Sci::Position start, Sci::Position end) const noexcept {
 	if (vs.ProtectionActive()) {
 		if (start > end) {
 			const Sci::Position t = start;
@@ -804,7 +804,7 @@ bool Editor::RangeContainsProtected(Sci::Position start, Sci::Position end) cons
 	return false;
 }
 
-bool Editor::SelectionContainsProtected() {
+bool Editor::SelectionContainsProtected() const {
 	for (size_t r = 0; r < sel.Count(); r++) {
 		if (RangeContainsProtected(sel.Range(r).Start().Position(),
 			sel.Range(r).End().Position())) {
@@ -1105,7 +1105,7 @@ Sci::Line Editor::DisplayFromPosition(Sci::Position pos) {
 /**
  * Ensure the caret is reasonably visible in context.
  *
-Caret policy in SciTE
+Caret policy in Scintilla
 
 If slop is set, we can define a slop value.
 This value defines an unwanted zone (UZ) where the caret is... unwanted.
