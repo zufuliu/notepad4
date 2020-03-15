@@ -297,6 +297,21 @@ get IMEInteraction GetIMEInteraction=2678(,)
 # Choose to display the IME in a winow or inline.
 set void SetIMEInteraction=2679(IMEInteraction imeInteraction,)
 
+enu Alpha=SC_ALPHA_
+val SC_ALPHA_TRANSPARENT=0
+val SC_ALPHA_OPAQUE=255
+val SC_ALPHA_NOALPHA=256
+
+ali SC_ALPHA_NOALPHA=NO_ALPHA
+
+enu CursorShape=SC_CURSOR
+val SC_CURSORNORMAL=-1
+val SC_CURSORARROW=2
+val SC_CURSORWAIT=4
+val SC_CURSORREVERSEARROW=7
+
+ali SC_CURSORREVERSEARROW=REVERSE_ARROW
+
 enu MarkerSymbol=SC_MARK_
 val MARKER_MAX=31
 val SC_MARK_CIRCLE=0
@@ -2037,14 +2052,6 @@ set void SetMouseWheelCaptures=2696(bool captures,)
 # Get whether mouse wheel can be active outside the window.
 get bool GetMouseWheelCaptures=2697(,)
 
-enu CursorShape=SC_CURSOR
-val SC_CURSORNORMAL=-1
-val SC_CURSORARROW=2
-val SC_CURSORWAIT=4
-val SC_CURSORREVERSEARROW=7
-
-ali SC_CURSORREVERSEARROW=REVERSE_ARROW
-
 # Sets the cursor to one of the SC_CURSOR* values.
 set void SetCursor=2386(CursorShape cursorType,)
 
@@ -2076,6 +2083,7 @@ fun void WordPartRightExtend=2393(,)
 enu VisiblePolicy=VISIBLE_
 val VISIBLE_SLOP=0x01
 val VISIBLE_STRICT=0x04
+
 # Set the way the display area is determined when a particular line
 # is to be moved to by Find, FindNext, GotoLine, etc.
 fun void SetVisiblePolicy=2394(VisiblePolicy visiblePolicy, int visibleSlop)
@@ -2355,18 +2363,18 @@ fun position EncodedFromUTF8=2449(string utf8, stringresult encoded)
 # multi-byte characters. If beyond end of line, return line end position.
 fun position FindColumn=2456(line line, position column)
 
-# Can the caret preferred x position only be changed by explicit movement commands?
-get CaretSticky GetCaretSticky=2457(,)
-
-# Stop the caret preferred x position changing when the user types.
-set void SetCaretSticky=2458(CaretSticky useCaretStickyBehaviour,)
-
 enu CaretSticky=SC_CARETSTICKY_
 val SC_CARETSTICKY_OFF=0
 val SC_CARETSTICKY_ON=1
 val SC_CARETSTICKY_WHITESPACE=2
 
 ali SC_CARETSTICKY_WHITESPACE=WHITE_SPACE
+
+# Can the caret preferred x position only be changed by explicit movement commands?
+get CaretSticky GetCaretSticky=2457(,)
+
+# Stop the caret preferred x position changing when the user types.
+set void SetCaretSticky=2458(CaretSticky useCaretStickyBehaviour,)
 
 # Switch between sticky and non-sticky: meant to be bound to a key.
 fun void ToggleCaretSticky=2459(,)
@@ -2379,13 +2387,6 @@ get bool GetPasteConvertEndings=2468(,)
 
 # Duplicate the selection. If selection empty duplicate the line containing the caret.
 fun void SelectionDuplicate=2469(,)
-
-enu Alpha=SC_ALPHA_
-val SC_ALPHA_TRANSPARENT=0
-val SC_ALPHA_OPAQUE=255
-val SC_ALPHA_NOALPHA=256
-
-ali SC_ALPHA_NOALPHA=NO_ALPHA
 
 # Set background alpha of the caret line.
 set void SetCaretLineBackAlpha=2470(Alpha alpha,)

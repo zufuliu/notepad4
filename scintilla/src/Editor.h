@@ -154,7 +154,7 @@ struct WrapPending {
 struct CaretPolicy {
 	int policy;
 	int slop;	// Pixels for X, lines for Y
-	CaretPolicy(uptr_t policy_=0, sptr_t slop_=0) :
+	CaretPolicy(uptr_t policy_=0, sptr_t slop_=0) noexcept:
 		policy(static_cast<int>(policy_)), slop(static_cast<int>(slop_)) {}
 };
 
@@ -341,8 +341,8 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 		addOne, addEach
 	};
 	void MultipleSelectAdd(AddNumber addNumber);
-	bool RangeContainsProtected(Sci::Position start, Sci::Position end) const;
-	bool SelectionContainsProtected();
+	bool RangeContainsProtected(Sci::Position start, Sci::Position end) const noexcept;
+	bool SelectionContainsProtected() const;
 	Sci::Position MovePositionOutsideChar(Sci::Position pos, Sci::Position moveDir, bool checkLineEnd = true) const;
 	SelectionPosition MovePositionOutsideChar(SelectionPosition pos, Sci::Position moveDir, bool checkLineEnd = true) const;
 	void MovedCaret(SelectionPosition newPos, SelectionPosition previousPos,
@@ -673,7 +673,7 @@ class AutoSurface {
 private:
 	std::unique_ptr<Surface> surf;
 public:
-	AutoSurface(Editor *ed, int technology = -1) {
+	AutoSurface(const Editor *ed, int technology = -1) {
 		if (ed->wMain.GetID()) {
 			surf.reset(Surface::Allocate(technology != -1 ? technology : ed->technology));
 			surf->Init(ed->wMain.GetID());
@@ -682,7 +682,7 @@ public:
 			surf->SetBidiR2L(ed->BidirectionalR2L());
 		}
 	}
-	AutoSurface(SurfaceID sid, Editor *ed, int technology = -1) {
+	AutoSurface(SurfaceID sid, const Editor *ed, int technology = -1) {
 		if (ed->wMain.GetID()) {
 			surf.reset(Surface::Allocate(technology != -1 ? technology : ed->technology));
 			surf->Init(sid, ed->wMain.GetID());

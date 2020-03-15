@@ -41,7 +41,7 @@
 #define HELP_LINK_FEATURE_REQUEST	L"https://github.com/zufuliu/notepad2/issues"
 #define HELP_LINK_ONLINE_WIKI		L"https://github.com/zufuliu/notepad2/wiki"
 
-#define VERSION_BUILD_INFO_LIB		L",\nScintilla 4.3.0"
+#define VERSION_BUILD_INFO_LIB		L",\nScintilla 4.3.2"
 #define VERSION_BUILD_INFO_FORMAT	L"Compiled on " __DATE__ L" with %s %d.%d.%d" VERSION_BUILD_INFO_LIB
 #if defined(__clang__)
 #define VERSION_BUILD_TOOL_NAME		L"Clang"
