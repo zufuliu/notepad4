@@ -481,6 +481,7 @@ BOOL IsDocWordChar(int ch) {
 	case NP2LEX_BASH:
 	case NP2LEX_BATCH:
 	case NP2LEX_HTML:
+	case NP2LEX_GN:
 	case NP2LEX_PHP:
 	case NP2LEX_PS1:
 		return (ch == '-' || ch == '$');
@@ -561,6 +562,9 @@ static inline BOOL IsOperatorStyle(int style) {
 		return style == SCE_F_OPERATOR;
 	case SCLEX_FSHARP:
 		return style == SCE_FSHARP_OPERATOR;
+
+	case SCLEX_GN:
+		return style == SCE_GN_OPERATOR;
 
 	case SCLEX_HTML:
 		return style == SCE_HPHP_OPERATOR || style == SCE_HJ_SYMBOLS || style == SCE_HJA_SYMBOLS;
@@ -2064,6 +2068,7 @@ void EditToggleCommentLine(void) {
 
 	case SCLEX_CMAKE:
 	case SCLEX_CONF:
+	case SCLEX_GN:
 	case SCLEX_JULIA:
 	case SCLEX_MAKEFILE:
 	case SCLEX_NSIS:

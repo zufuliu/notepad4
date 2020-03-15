@@ -255,6 +255,36 @@ def update_cmake_keyword():
 	keywordList = parse_cmake_api_file('lang/CMake.cmake')
 	UpdateKeywordFile('NP2LEX_CMAKE', '../src/EditLexers/stlCMake.c', keywordList)
 
+# GN
+def parse_gn_api_file(path):
+	sections = read_api_file(path, '#')
+	keywordMap = {}
+	for key, doc in sections:
+		if key == 'function':
+			items = re.findall(r'^(\w+\()', doc, re.MULTILINE)
+		else:
+			items = set(doc.split())
+		keywordMap[key] = items
+
+	RemoveDuplicateKeyword(keywordMap, [
+		'keywords',
+		'predefined variables',
+		'target variables',
+		'placeholders',
+	])
+	keywordList = [
+		('keywords', keywordMap['keywords'], KeywordAttr.Default),
+		('function', keywordMap['function'], KeywordAttr.Default),
+		('predefined variables', keywordMap['predefined variables'], KeywordAttr.Default),
+		('target variables', keywordMap['target variables'], KeywordAttr.NoLexer),
+		('placeholders', keywordMap['placeholders'], KeywordAttr.NoLexer),
+	]
+	return keywordList
+
+def update_gn_keyword():
+	keywordList = parse_gn_api_file('lang/GN.gn')
+	UpdateKeywordFile('NP2LEX_GN', '../src/EditLexers/stlGN.c', keywordList)
+
 # Julia
 def parse_julia_api_file(path):
 	sections = read_api_file(path, '#')
@@ -402,6 +432,7 @@ def update_llvm_keyword():
 	keywordList = parse_llvm_api_file('lang/LLVM.ll')
 	UpdateKeywordFile('NP2LEX_LLVM', '../src/EditLexers/stlLLVM.c', keywordList)
 
+# Ruby
 def parse_ruby_api_file(path):
 	sections = read_api_file(path, '#')
 	keywordMap = {}
@@ -639,6 +670,7 @@ def update_lexer_keyword_attr():
 # update all keywords in order
 def update_all_keyword():
 	update_cmake_keyword()
+	update_gn_keyword()
 	update_julia_keyword()
 	update_kotlin_keyword()
 	update_llvm_keyword()

@@ -243,11 +243,15 @@ F# Source
 	nb				Mathematica Notebook
 
 
-Gradle Build Script
-	gradle
+GN Build Script
+	gn
+	gni
 
 Go Source
 	go
+
+Gradle Build Script
+	gradle
 
 GraphViz Dot
 	dot

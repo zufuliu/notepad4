@@ -990,6 +990,7 @@
     <ClCompile Include="..\..\scintilla\lexers\LexDiff.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexFortran.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexFSharp.cxx" />
+    <ClCompile Include="..\..\scintilla\lexers\LexGN.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexGraphViz.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexHTML.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexInno.cxx" />
@@ -1090,6 +1091,7 @@
     <ClCompile Include="..\..\src\EditLexers\stlFortran.c" />
     <ClCompile Include="..\..\src\EditLexers\stlFSharp.c" />
     <ClCompile Include="..\..\src\EditLexers\stlGo.c" />
+    <ClCompile Include="..\..\src\EditLexers\stlGN.c" />
     <ClCompile Include="..\..\src\EditLexers\stlGradle.c" />
     <ClCompile Include="..\..\src\EditLexers\stlGraphViz.c" />
     <ClCompile Include="..\..\src\EditLexers\stlGroovy.c" />
