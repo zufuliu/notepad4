@@ -19,8 +19,6 @@ using namespace Scintilla;
 
 namespace {
 
-constexpr int MaxJsonWordLength = 8; // Infinity
-
 enum {
 	JsonChar_None = 0,
 	JsonChar_Operator = 1,
@@ -53,8 +51,11 @@ void ColouriseJSONDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 		levelCurrent = styler.LevelAt(lineCurrent - 1) >> 16;
 	}
 	int levelNext = levelCurrent;
-	char buf[MaxJsonWordLength + 1] = "";
+
+	constexpr int MaxLexWordLength = 8; // Infinity
+	char buf[MaxLexWordLength + 1] = "";
 	int wordLen = 0;
+
 	// JSON5 line continue
 	bool lineContinue = false;
 	bool atLineStart = startPos == static_cast<Sci_PositionU>(styler.LineStart(lineCurrent));
@@ -109,7 +110,7 @@ void ColouriseJSONDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 					styler.ColourTo(i - 1, SCE_JSON_PROPERTYNAME);
 				}
 				state = SCE_JSON_DEFAULT;
-			} else if (wordLen < MaxJsonWordLength) {
+			} else if (wordLen < MaxLexWordLength) {
 				buf[wordLen++] = static_cast<char>(ch);
 			} else {
 				state = SCE_JSON_IDENTIFIER;

@@ -810,7 +810,6 @@ static void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int in
 
 #define IsCommentLine(line)	IsLexCommentLine(line, styler, SCE_SH_COMMENTLINE)
 
-#define MAX_BASH_WORD_LEN	15
 static void FoldBashDoc(Sci_PositionU startPos, Sci_Position length, int, LexerWordList, Accessor &styler) {
 	const bool foldComment = styler.GetPropertyInt("fold.comment") != 0;
 	const bool foldCompact = styler.GetPropertyInt("fold.compact", 1) != 0;
@@ -824,8 +823,11 @@ static void FoldBashDoc(Sci_PositionU startPos, Sci_Position length, int, LexerW
 	int levelCurrent = levelPrev;
 	char chNext = styler[startPos];
 	int styleNext = styler.StyleAt(startPos);
-	char word[MAX_BASH_WORD_LEN + 1] = "";
+
+	constexpr int MaxFoldWordLength = 7 + 1; // foreach
+	char word[MaxFoldWordLength + 1] = "";
 	int wordlen = 0;
+
 	for (Sci_PositionU i = startPos; i < endPos; i++) {
 		const char ch = chNext;
 		chNext = styler.SafeGetCharAt(i + 1);
@@ -841,7 +843,7 @@ static void FoldBashDoc(Sci_PositionU startPos, Sci_Position length, int, LexerW
 		}
 
 		if (style == SCE_SH_WORD) {
-			if (wordlen < MAX_BASH_WORD_LEN) {
+			if (wordlen < MaxFoldWordLength) {
 				word[wordlen++] = ch;
 			}
 			if (styleNext != SCE_SH_WORD) {
