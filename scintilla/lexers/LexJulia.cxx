@@ -509,8 +509,8 @@ void FoldJuliaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle,
 	Sci_PositionU lineStartNext = styler.LineStart(lineCurrent + 1);
 	Sci_PositionU lineEndPos = ((lineStartNext < endPos) ? lineStartNext : endPos) - 1;
 
-	constexpr int MaxWordLength = 10 + 1; // baremodule
-	char buf[MaxWordLength + 1] = "";
+	constexpr int MaxFoldWordLength = 10 + 1; // baremodule
+	char buf[MaxFoldWordLength + 1] = "";
 	int wordLen = 0;
 
 	char chNext = styler[startPos];
@@ -536,7 +536,7 @@ void FoldJuliaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle,
 				}
 			}
 		} else if (style == SCE_JULIA_WORD) {
-			if (wordLen < MaxWordLength) {
+			if (wordLen < MaxFoldWordLength) {
 				buf[wordLen++] = ch;
 			}
 			if (styleNext != SCE_JULIA_WORD) {

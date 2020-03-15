@@ -242,8 +242,8 @@ void FoldVimDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initStyle*
 
 	int styleNext = styler.StyleAt(startPos);
 
-	constexpr int MaxWordLength = 5 + 1; // while
-	char buf[MaxWordLength + 1] = "";
+	constexpr int MaxFoldWordLength = 5 + 1; // while
+	char buf[MaxFoldWordLength + 1] = "";
 	int wordLen = 0;
 
 	for (Sci_PositionU i = startPos; i < endPos; i++) {
@@ -251,7 +251,7 @@ void FoldVimDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initStyle*
 		styleNext = styler.StyleAt(i + 1);
 
 		if (style == SCE_VIM_WORD) {
-			if (wordLen < MaxWordLength) {
+			if (wordLen < MaxFoldWordLength) {
 				buf[wordLen++] = styler[i];
 			}
 			if (styleNext != SCE_VIM_WORD) {
