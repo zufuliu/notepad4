@@ -1,5 +1,5 @@
 #define VERSION_MINOR 20
-#define VERSION_BUILD 02
-#define VERSION_HASH TEXT("fd22bee")
-#define VERSION_REV 2652
-#define VERSION_REV_FULL TEXT("r2652 (fd22bee)")
+#define VERSION_BUILD 03
+#define VERSION_HASH TEXT("c8a291b")
+#define VERSION_REV 2680
+#define VERSION_REV_FULL TEXT("r2680 (c8a291b)")
