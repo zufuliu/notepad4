@@ -4057,15 +4057,25 @@ void EditSortLines(int iSortFlags) {
 		const Sci_Position cchm = SciCall_GetLineLength(iLine);
 		char *pmsz = (char *)NP2HeapAlloc(cchm + 1);
 		SciCall_GetLine(iLine, pmsz);
-		StrTrimA(pmsz, "\r\n");
+
+		// remove EOL
+		char *p = pmsz + cchm - 1;
+		if (*p == '\n' || *p == '\r') {
+			*p-- = '\0';
+		}
+		if (*p == '\r') {
+			*p-- = '\0';
+		}
+
 		cchTotal += cchm;
 		ichlMax = max_pos(ichlMax, cchm);
 
 		const int cchw = MultiByteToWideChar(cpEdit, 0, pmsz, -1, NULL, 0) - 1;
 		if (cchw > 0) {
-			pLines[i].pwszLine = (LPWSTR)LocalAlloc(LPTR, sizeof(WCHAR) * (cchw + 1));
-			MultiByteToWideChar(cpEdit, 0, pmsz, -1, pLines[i].pwszLine, (int)(LocalSize(pLines[i].pwszLine) / sizeof(WCHAR)));
-			pLines[i].pwszSortEntry = pLines[i].pwszLine;
+			LPWSTR pwszLine = (LPWSTR)LocalAlloc(LPTR, sizeof(WCHAR) * (cchw + 1));
+			MultiByteToWideChar(cpEdit, 0, pmsz, -1, pwszLine, (int)(LocalSize(pwszLine) / sizeof(WCHAR)));
+			pLines[i].pwszLine = pwszLine;
+			pLines[i].pwszSortEntry = pwszLine;
 
 			if (iSortFlags & SORT_COLUMN) {
 				Sci_Position col = 0;
