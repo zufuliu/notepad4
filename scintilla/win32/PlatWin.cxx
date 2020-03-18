@@ -48,12 +48,6 @@
 #define LOAD_LIBRARY_SEARCH_SYSTEM32	0x00000800
 #endif
 
-#if _WIN32_WINNT < _WIN32_WINNT_VISTA
-#define USE_SRW_LOCK	0
-#else
-#define USE_SRW_LOCK	1
-#endif
-
 #if _WIN32_WINNT < _WIN32_WINNT_WIN8
 #if NP2_FORCE_COMPILE_C_AS_CPP
 extern DWORD kSystemLibraryLoadFlags;
@@ -237,11 +231,6 @@ inline void SetWindowPointer(HWND hWnd, void *ptr) noexcept {
 	::SetWindowLongPtr(hWnd, 0, reinterpret_cast<LONG_PTR>(ptr));
 }
 
-#if USE_SRW_LOCK
-SRWLOCK srwPlatformLock = SRWLOCK_INIT;
-#else
-CRITICAL_SECTION crPlatformLock;
-#endif
 HINSTANCE hinstPlatformRes {};
 
 HCURSOR reverseArrowCursor {};
@@ -2271,43 +2260,26 @@ void FlipBitmap(HBITMAP bitmap, int width, int height) noexcept {
 	}
 }
 
-HCURSOR GetReverseArrowCursor() noexcept {
-	if (reverseArrowCursor)
-		return reverseArrowCursor;
-
-#if USE_SRW_LOCK
-	::AcquireSRWLockExclusive(&srwPlatformLock);
-#else
-	::EnterCriticalSection(&crPlatformLock);
-#endif
-	HCURSOR cursor = reverseArrowCursor;
-	if (!cursor) {
-		cursor = ::LoadCursor(nullptr, IDC_ARROW);
-		ICONINFO info;
-		if (::GetIconInfo(cursor, &info)) {
-			BITMAP bmp;
-			if (::GetObject(info.hbmMask, sizeof(bmp), &bmp)) {
-				FlipBitmap(info.hbmMask, bmp.bmWidth, bmp.bmHeight);
-				if (info.hbmColor)
-					FlipBitmap(info.hbmColor, bmp.bmWidth, bmp.bmHeight);
-				info.xHotspot = bmp.bmWidth - 1 - info.xHotspot;
-
-				reverseArrowCursor = ::CreateIconIndirect(&info);
-				if (reverseArrowCursor)
-					cursor = reverseArrowCursor;
+void LoadReverseArrowCursor() noexcept {
+	HCURSOR cursor = ::LoadCursor(nullptr, IDC_ARROW);
+	ICONINFO info;
+	if (::GetIconInfo(cursor, &info)) {
+		BITMAP bmp;
+		if (::GetObject(info.hbmMask, sizeof(bmp), &bmp)) {
+			FlipBitmap(info.hbmMask, bmp.bmWidth, bmp.bmHeight);
+			if (info.hbmColor) {
+				FlipBitmap(info.hbmColor, bmp.bmWidth, bmp.bmHeight);
 			}
+			info.xHotspot = bmp.bmWidth - 1 - info.xHotspot;
 
-			::DeleteObject(info.hbmMask);
-			if (info.hbmColor)
-				::DeleteObject(info.hbmColor);
+			reverseArrowCursor = ::CreateIconIndirect(&info);
+		}
+
+		::DeleteObject(info.hbmMask);
+		if (info.hbmColor) {
+			::DeleteObject(info.hbmColor);
 		}
 	}
-#if USE_SRW_LOCK
-	::ReleaseSRWLockExclusive(&srwPlatformLock);
-#else
-	::LeaveCriticalSection(&crPlatformLock);
-#endif
-	return cursor;
 }
 
 }
@@ -2333,7 +2305,7 @@ void Window::SetCursor(Cursor curs) noexcept {
 		::SetCursor(::LoadCursor(nullptr, IDC_HAND));
 		break;
 	case cursorReverseArrow:
-		::SetCursor(GetReverseArrowCursor());
+		::SetCursor(reverseArrowCursor);
 		break;
 	case cursorArrow:
 	case cursorInvalid:	// Should not occur, but just in case.
@@ -3471,10 +3443,8 @@ void Platform::Assert(const char *, const char *, int) noexcept {
 #endif
 
 void Platform_Initialise(void *hInstance) noexcept {
-#if !USE_SRW_LOCK
-	::InitializeCriticalSection(&crPlatformLock);
-#endif
 	hinstPlatformRes = static_cast<HINSTANCE>(hInstance);
+	LoadReverseArrowCursor();
 	ListBoxX_Register();
 }
 
@@ -3514,9 +3484,6 @@ void Platform_Finalise(bool fromDllMain) noexcept {
 	if (reverseArrowCursor)
 		::DestroyCursor(reverseArrowCursor);
 	ListBoxX_Unregister();
-#if !USE_SRW_LOCK
-	::DeleteCriticalSection(&crPlatformLock);
-#endif
 }
 
 }

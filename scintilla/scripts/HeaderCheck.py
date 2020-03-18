@@ -41,6 +41,7 @@ def CheckFiles(root):
     #~ print(filePaths)
     masterHeaderList = ExtractHeaders(os.path.join(root, "scripts/HeaderOrder.txt"))
     orderedPaths = sorted(filePaths, key=str.casefold)
+    allIncs = set()
     for f in orderedPaths:
         if "LexCaml" in f: # LexCaml adds system headers in #if to be an external lexer
             continue
@@ -48,6 +49,7 @@ def CheckFiles(root):
         incs = ExtractHeaders(f)
         #~ print("\n".join(incs))
         news = set(incs) - set(masterHeaderList)
+        allIncs = allIncs.union(set(incs))
         m = 0
         i = 0
         while i < len(incs):
@@ -74,5 +76,9 @@ def CheckFiles(root):
                     i += 1
                     #~ return
         #print("Master header list", " ".join(masterHeaderList))
+    unused = sorted(set(masterHeaderList) - allIncs)
+    if unused:
+        print("In HeaderOrder.txt but not used")
+        print("\n".join(unused))
 
 CheckFiles("..")
