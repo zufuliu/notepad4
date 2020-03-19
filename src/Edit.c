@@ -4075,17 +4075,16 @@ void EditSortLines(int iSortFlags) {
 			LPWSTR pwszLine = (LPWSTR)LocalAlloc(LPTR, sizeof(WCHAR) * (cchw + 1));
 			MultiByteToWideChar(cpEdit, 0, pmsz, -1, pwszLine, (int)(LocalSize(pwszLine) / sizeof(WCHAR)));
 			pLines[i].pwszLine = pwszLine;
-			pLines[i].pwszSortEntry = pwszLine;
 
 			if (iSortFlags & SORT_COLUMN) {
 				Sci_Position col = 0;
 				Sci_Position tabs = iTabWidth;
-				while (*(pLines[i].pwszSortEntry)) {
-					if (*(pLines[i].pwszSortEntry) == L'\t') {
+				while (*pwszLine) {
+					if (*pwszLine == L'\t') {
 						if (col + tabs <= iSortColumn) {
 							col += tabs;
 							tabs = iTabWidth;
-							pLines[i].pwszSortEntry = CharNext(pLines[i].pwszSortEntry);
+							pwszLine = CharNext(pwszLine);
 						} else {
 							break;
 						}
@@ -4094,12 +4093,13 @@ void EditSortLines(int iSortFlags) {
 						if (--tabs == 0) {
 							tabs = iTabWidth;
 						}
-						pLines[i].pwszSortEntry = CharNext(pLines[i].pwszSortEntry);
+						pwszLine = CharNext(pwszLine);
 					} else {
 						break;
 					}
 				}
 			}
+			pLines[i].pwszSortEntry = pwszLine;
 		} else {
 			pLines[i].pwszLine = StrDup(L"");
 			pLines[i].pwszSortEntry = pLines[i].pwszLine;
