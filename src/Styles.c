@@ -615,7 +615,7 @@ void Style_Load(void) {
 
 	// default scheme
 	int iValue = IniSectionGetInt(pIniSection, L"DefaultScheme", 0);
-	iDefaultLexer = clamp_i(iValue, 0, NUMLEXERS - 1);
+	iDefaultLexer = Style_GetEditLexerId(iValue + NP2LEX_TEXTFILE);
 
 	iValue = IniSectionGetInt(pIniSection, L"StyleTheme", StyleTheme_Default);
 	np2StyleTheme = clamp_i(iValue, StyleTheme_Default, StyleTheme_Max);
@@ -722,7 +722,7 @@ void Style_Save(void) {
 	IniSectionSetBoolEx(pIniSection, L"Use2ndGlobalStyle", bUse2ndGlobalStyle, 0);
 
 	// default scheme
-	IniSectionSetIntEx(pIniSection, L"DefaultScheme", iDefaultLexer, 0);
+	IniSectionSetIntEx(pIniSection, L"DefaultScheme", pLexArray[iDefaultLexer]->rid - NP2LEX_TEXTFILE, 0);
 	IniSectionSetIntEx(pIniSection, L"StyleTheme", np2StyleTheme, StyleTheme_Default);
 
 	// auto select
