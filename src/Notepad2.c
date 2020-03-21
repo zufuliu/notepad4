@@ -888,8 +888,8 @@ HWND InitInstance(HINSTANCE hInstance, int nCmdShow) {
 		if (lpSchemeArg) {
 			Style_SetLexerFromName(szCurFile, lpSchemeArg);
 			LocalFree(lpSchemeArg);
-		} else if (iInitialLexer >= 0 && iInitialLexer < NUMLEXERS) {
-			Style_SetLexerFromID(iInitialLexer);
+		} else {
+			Style_SetLexerFromID(Style_GetEditLexerId(iInitialLexer));
 		}
 		flagLexerSpecified = 0;
 	}
@@ -1188,12 +1188,12 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 					}
 
 					if (params->flagLexerSpecified) {
-						if (params->iInitialLexer < 0) {
+						if (params->iInitialLexer <= 0) {
 							WCHAR wchExt[32] = L".";
 							lstrcpyn(CharNext(wchExt), StrEnd(&params->wchData) + 1, 30);
 							Style_SetLexerFromName(&params->wchData, wchExt);
-						} else if (params->iInitialLexer >= 0 && params->iInitialLexer < NUMLEXERS) {
-							Style_SetLexerFromID(params->iInitialLexer);
+						} else {
+							Style_SetLexerFromID(Style_GetEditLexerId(params->iInitialLexer));
 						}
 					}
 
@@ -5734,7 +5734,7 @@ int ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2, BOOL *bIsNotepadReplacement) 
 				LocalFree(lpSchemeArg);
 				lpSchemeArg = NULL;
 			}
-			iInitialLexer = Style_GetEditLexerId(EditLexer_Default);
+			iInitialLexer = NP2LEX_TEXTFILE;
 			flagLexerSpecified = 1;
 			state = 1;
 			break;
@@ -5784,7 +5784,7 @@ int ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2, BOOL *bIsNotepadReplacement) 
 				LocalFree(lpSchemeArg);
 				lpSchemeArg = NULL;
 			}
-			iInitialLexer = Style_GetEditLexerId(EditLexer_HTML);
+			iInitialLexer = NP2LEX_HTML;
 			flagLexerSpecified = 1;
 			state = 1;
 			break;
@@ -5859,7 +5859,7 @@ int ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2, BOOL *bIsNotepadReplacement) 
 				LocalFree(lpSchemeArg);
 				lpSchemeArg = NULL;
 			}
-			iInitialLexer = Style_GetEditLexerId(EditLexer_XML);
+			iInitialLexer = NP2LEX_XML;
 			flagLexerSpecified = 1;
 			state = 1;
 			break;
@@ -7449,7 +7449,7 @@ BOOL ActivatePrevInst(void) {
 				params->flagLexerSpecified = flagLexerSpecified;
 				if (flagLexerSpecified && lpSchemeArg) {
 					lstrcpy(StrEnd(&params->wchData) + 1, lpSchemeArg);
-					params->iInitialLexer = -1;
+					params->iInitialLexer = 0;
 				} else {
 					params->iInitialLexer = iInitialLexer;
 				}
@@ -7536,7 +7536,7 @@ BOOL ActivatePrevInst(void) {
 				params->flagLexerSpecified = flagLexerSpecified;
 				if (flagLexerSpecified && lpSchemeArg) {
 					lstrcpy(StrEnd(&params->wchData) + 1, lpSchemeArg);
-					params->iInitialLexer = -1;
+					params->iInitialLexer = 0;
 				} else {
 					params->iInitialLexer = iInitialLexer;
 				}
