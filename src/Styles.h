@@ -32,13 +32,6 @@
 
 #define MAX_INI_SECTION_SIZE_STYLES			(8 * 1024)
 
-/**
- * used in ParseCommandLine() for option /d, /h and /x.
- */
-#define EditLexer_Default	0
-#define EditLexer_HTML		1
-#define EditLexer_XML		2
-
 extern PEDITLEXER pLexCurrent;
 extern int np2LexLangIndex;
 extern BOOL bUse2ndGlobalStyle;
@@ -63,7 +56,7 @@ void	Style_SetLexerFromName(LPCWSTR lpszFile, LPCWSTR lpszName);
 BOOL	Style_MaybeBinaryFile(LPCWSTR lpszFile);
 BOOL	Style_CanOpenFile(LPCWSTR lpszFile);
 void	Style_SetLexerFromID(int id);
-int		Style_GetEditLexerId(int lexer);
+int		Style_GetEditLexerId(int rid);
 
 int		Style_GetDocTypeLanguage(void);
 void	Style_UpdateLexerKeywords(LPCEDITLEXER pLexNew);

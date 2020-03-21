@@ -2856,32 +2856,13 @@ void Style_SetLexerFromID(int id) {
 	}
 }
 
-int Style_GetEditLexerId(int lexer) {
-	PEDITLEXER lex = NULL;
-
-	switch (lexer) {
-	case EditLexer_Default:
-		lex = &lexTextFile;
-		break;
-
-	case EditLexer_HTML:
-		lex = &lexHTML;
-		break;
-
-	case EditLexer_XML:
-		lex = &lexXML;
-		break;
-
-	default:
-		return -1;
-	}
-
+int Style_GetEditLexerId(int rid) {
 	for (UINT iLexer = 0; iLexer < NUMLEXERS; iLexer++) {
-		if (pLexArray[iLexer] == lex) {
+		if (pLexArray[iLexer]->rid == rid) {
 			return iLexer;
 		}
 	}
-	return -1;
+	return 0;
 }
 
 //=============================================================================
