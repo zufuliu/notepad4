@@ -146,6 +146,6 @@ typedef const EDITLEXER *LPCEDITLEXER;
 #define NP2LEX_GN			63072	// SCLEX_GN			GN Build Script
 
 #define NP2LEX_2NDTEXTFILE	63097	// SCLEX_NULL		2nd Text File
-#define NP2LEX_2NDGLOBAL	63098	// SCLEX_NULL		2nd Global Styles
-#define NP2LEX_ANSI			63099	// SCLEX_NULL		ANSI Art
+#define NP2LEX_ANSI			63098	// SCLEX_NULL		ANSI Art
+#define NP2LEX_2NDGLOBAL	63099	// SCLEX_NULL		2nd Global Styles
 #define NP2LEX_GLOBAL		63100	// SCLEX_NULL		Global Styles
