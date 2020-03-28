@@ -889,7 +889,7 @@ HWND InitInstance(HINSTANCE hInstance, int nCmdShow) {
 			Style_SetLexerFromName(szCurFile, lpSchemeArg);
 			LocalFree(lpSchemeArg);
 		} else {
-			Style_SetLexerFromID(Style_GetEditLexerId(iInitialLexer));
+			Style_SetLexerFromID(iInitialLexer);
 		}
 		flagLexerSpecified = 0;
 	}
@@ -1193,7 +1193,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 							lstrcpyn(CharNext(wchExt), StrEnd(&params->wchData) + 1, 30);
 							Style_SetLexerFromName(&params->wchData, wchExt);
 						} else {
-							Style_SetLexerFromID(Style_GetEditLexerId(params->iInitialLexer));
+							Style_SetLexerFromID(params->iInitialLexer);
 						}
 					}
 

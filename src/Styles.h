@@ -55,8 +55,8 @@ BOOL	Style_SetLexerFromFile(LPCWSTR lpszFile);
 void	Style_SetLexerFromName(LPCWSTR lpszFile, LPCWSTR lpszName);
 BOOL	Style_MaybeBinaryFile(LPCWSTR lpszFile);
 BOOL	Style_CanOpenFile(LPCWSTR lpszFile);
-void	Style_SetLexerFromID(int id);
-int		Style_GetEditLexerId(int rid);
+void	Style_SetLexerFromID(int rid);
+int		Style_GetMatchLexerIndex(int rid);
 
 int		Style_GetDocTypeLanguage(void);
 void	Style_UpdateLexerKeywords(LPCEDITLEXER pLexNew);

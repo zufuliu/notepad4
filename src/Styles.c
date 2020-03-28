@@ -615,7 +615,7 @@ void Style_Load(void) {
 
 	// default scheme
 	int iValue = IniSectionGetInt(pIniSection, L"DefaultScheme", 0);
-	iDefaultLexer = Style_GetEditLexerId(iValue + NP2LEX_TEXTFILE);
+	iDefaultLexer = Style_GetMatchLexerIndex(iValue + NP2LEX_TEXTFILE);
 
 	iValue = IniSectionGetInt(pIniSection, L"StyleTheme", StyleTheme_Default);
 	np2StyleTheme = clamp_i(iValue, StyleTheme_Default, StyleTheme_Max);
@@ -2853,15 +2853,14 @@ void Style_UpdateSchemeMenu(HMENU hmenu) {
 //
 // Style_SetLexerFromID()
 //
-void Style_SetLexerFromID(int id) {
-	if (id >= LEXER_INDEX_MATCH && id < ALL_LEXER_COUNT) {
-		np2LexLangIndex = Style_GetDocTypeLanguage();
-		Style_SetLexer(pLexArray[id], TRUE);
-	}
+void Style_SetLexerFromID(int rid) {
+	const int iLexer = Style_GetMatchLexerIndex(rid);
+	np2LexLangIndex = Style_GetDocTypeLanguage();
+	Style_SetLexer(pLexArray[iLexer], TRUE);
 }
 
-int Style_GetEditLexerId(int rid) {
-	for (UINT iLexer = LEXER_INDEX_MATCH; iLexer < ALL_LEXER_COUNT; iLexer++) {
+int Style_GetMatchLexerIndex(int rid) {
+	for (int iLexer = LEXER_INDEX_MATCH; iLexer < ALL_LEXER_COUNT; iLexer++) {
 		if (pLexArray[iLexer]->rid == rid) {
 			return iLexer;
 		}
