@@ -37,28 +37,28 @@ Or build from source, see the [Wiki](https://github.com/zufuliu/notepad2/wiki/Bu
 	* AutoIt Script
 	* AWK
 		* GNU AWK
-	* Windows Batch Script, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#batch)
-	* .NET IL
-	* [CMake](../master/tools/lang/CMake.cmake), [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#cmake), up to 3.16
+	* Batch Script, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#batch)
+	* C#, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#c)
+		* C# Doc
+		* Vala
 	* C/C++, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#cc)
 		* Objective-C/C++, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#objective-cc)
 		* [C Standard Library](../master/tools/lang/C.c), up to C11.
 		* [C++ STL](../master/tools/lang/CPP.cpp), up to C++20.
-	* C#, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#c)
-		* C# Doc
-		* Vala
 	* CSS Style Sheet
 		* Sassy CSS
 		* Less CSS
 		* HSS
+	* [CMake](../master/tools/lang/CMake.cmake), [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#cmake), up to 3.16
+	* Common Intermediate Language
 	* Configuration / Properties File
 		* Apache Configuration File
 	* D
 	* Diff/Patch File
 	* Doxygen
+	* F#
 	* Fortran
 		* GNU Fortran
-	* F#
 	* [GN Build](../master/tools/lang/GN.gn), up to GN 2019-03-13.
 	* Go
 	* Gradle, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#gradle)
