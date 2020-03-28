@@ -62,6 +62,7 @@ extern EDITLEXER lexAwk;
 
 extern EDITLEXER lexBatch;
 
+extern EDITLEXER lexCIL;
 extern EDITLEXER lexCMake;
 extern EDITLEXER lexCONF;
 
@@ -96,7 +97,6 @@ extern EDITLEXER lexLua;
 extern EDITLEXER lexMake;
 extern EDITLEXER lexMatlab;
 
-extern EDITLEXER lexCIL;
 extern EDITLEXER lexNsis;
 
 extern EDITLEXER lexPascal;
@@ -158,6 +158,7 @@ static const PEDITLEXER pLexArray[ALL_LEXER_COUNT] = {
 
 	&lexBatch,
 
+	&lexCIL,
 	&lexCMake,
 	&lexCONF,
 
@@ -192,7 +193,6 @@ static const PEDITLEXER pLexArray[ALL_LEXER_COUNT] = {
 	&lexMake,
 	&lexMatlab,
 
-	&lexCIL,
 	&lexNsis,
 
 	&lexPascal,

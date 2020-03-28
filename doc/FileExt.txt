@@ -180,6 +180,9 @@ Batch File
 	cmd
 
 
+CIL Assembly
+	il
+
 CMake Script
 	cmake
 	ctest
@@ -359,9 +362,6 @@ MATLAB Code
 	sce				Scilab
 	sci				Scilab
 
-
-.NET IL
-	il
 
 Nsis Setup Script
 	nsi				NSIS Script
