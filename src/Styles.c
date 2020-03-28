@@ -571,14 +571,13 @@ static void Style_LoadOneEx(PEDITLEXER pLex, IniSection *pIniSection, WCHAR *pIn
 		pLex->szStyleBuf = szStyleBuf;
 	}
 	if (!IniSectionParse(pIniSection, pIniSectionBuf)) {
-		pLex->bUseDefaultCodeStyle = pLex->bUseDefaultCodeStyle_Default;
 		for (UINT i = 0; i < iStyleCount; i++) {
 			LPWSTR szValue = szStyleBuf + (i * MAX_EDITSTYLE_VALUE_SIZE);
 			pLex->Styles[i].szValue = szValue;
 			lstrcpy(szValue, pLex->Styles[i].pszDefault);
 		}
 	} else {
-		pLex->bUseDefaultCodeStyle = (BYTE)IniSectionGetBool(pIniSection, L"UseDefaultCodeStyle", pLex->bUseDefaultCodeStyle_Default);
+		pLex->bUseDefaultCodeStyle = (BYTE)IniSectionGetBool(pIniSection, L"UseDefaultCodeStyle", pLex->bUseDefaultCodeStyle);
 		for (UINT i = 0; i < iStyleCount; i++) {
 			LPWSTR szValue = szStyleBuf + (i * MAX_EDITSTYLE_VALUE_SIZE);
 			pLex->Styles[i].szValue = szValue;
@@ -783,7 +782,7 @@ void Style_Save(void) {
 
 			ZeroMemory(pIniSectionBuf, cbIniSection);
 			pIniSection->next = pIniSectionBuf;
-			IniSectionSetBoolEx(pIniSection, L"UseDefaultCodeStyle", pLex->bUseDefaultCodeStyle, pLex->bUseDefaultCodeStyle_Default);
+			IniSectionSetBoolEx(pIniSection, L"UseDefaultCodeStyle", pLex->bUseDefaultCodeStyle, pLex->rid != NP2LEX_TEXTFILE);
 			const UINT iStyleCount = pLex->iStyleCount;
 			for (UINT i = 0; i < iStyleCount; i++) {
 				IniSectionSetStringEx(pIniSection, pLex->Styles[i].pszName, pLex->Styles[i].szValue, pLex->Styles[i].pszDefault);
@@ -848,7 +847,7 @@ BOOL Style_Import(HWND hwnd) {
 				if (!IniSectionParse(pIniSection, pIniSectionBuf)) {
 					continue;
 				}
-				pLex->bUseDefaultCodeStyle = (BYTE)IniSectionGetBool(pIniSection, L"UseDefaultCodeStyle", pLex->bUseDefaultCodeStyle_Default);
+				pLex->bUseDefaultCodeStyle = (BYTE)IniSectionGetBool(pIniSection, L"UseDefaultCodeStyle", pLex->bUseDefaultCodeStyle);
 				const UINT iStyleCount = pLex->iStyleCount;
 				for (UINT i = 0; i < iStyleCount; i++) {
 					LPCWSTR value = IniSectionGetValueImpl(pIniSection, pLex->Styles[i].pszName, pLex->Styles[i].iNameLen);
@@ -940,7 +939,7 @@ static void Style_ResetAll(BOOL resetColor) {
 			lstrcpy(pLex->szExtensions, pLex->pszDefExt);
 		}
 		pLex->bStyleChanged = TRUE;
-		pLex->bUseDefaultCodeStyle = pLex->bUseDefaultCodeStyle_Default;
+		pLex->bUseDefaultCodeStyle = (pLex->rid == NP2LEX_TEXTFILE)? 0 : 1;
 		if (resetColor) {
 			const UINT iStyleCount = pLex->iStyleCount;
 			for (UINT i = 0; i < iStyleCount; i++) {
