@@ -666,7 +666,7 @@ static void Style_LoadOne(PEDITLEXER pLex) {
 	NP2HeapFree(pIniSectionBuf);
 }
 
-static void Style_LoadAll(BOOL bFore) {
+static void Style_LoadAll(BOOL bReload) {
 	IniSection section;
 	WCHAR *pIniSectionBuf = (WCHAR *)NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_STYLES);
 	const int cchIniSection = (int)(NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR));
@@ -675,7 +675,7 @@ static void Style_LoadAll(BOOL bFore) {
 
 	// Custom colors
 	const int value = (np2StyleTheme << 1) | 1;
-	if (bFore || iCustomColorLoaded != value) {
+	if (bReload || iCustomColorLoaded != value) {
 		LPCWSTR themePath = GetStyleThemeFilePath();
 		iCustomColorLoaded = value;
 		CopyMemory(customColor, defaultCustomColor, MAX_CUSTOM_COLOR_COUNT * sizeof(COLORREF));
@@ -699,7 +699,7 @@ static void Style_LoadAll(BOOL bFore) {
 
 	for (UINT iLexer = 0; iLexer < ALL_LEXER_COUNT; iLexer++) {
 		PEDITLEXER pLex = pLexArray[iLexer];
-		if (bFore || !IsStyleLoaded(pLex)) {
+		if (bReload || !IsStyleLoaded(pLex)) {
 			Style_LoadOneEx(pLex, pIniSection, pIniSectionBuf, cchIniSection);
 		}
 	}
