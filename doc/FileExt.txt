@@ -154,9 +154,9 @@ XML Document
 ActionScript
 	as
 
-Android Smali
-	smali
-	ddx
+ANSI Art
+	nfo				System Information File
+	diz				Description in Zip File
 
 Assembler Source
 	asm
@@ -404,6 +404,7 @@ Resource Script
 Rust Source
 	rs
 
+
 Scala Script
 	scala
 
@@ -478,9 +479,6 @@ YAML Document
 	apinotes		Swift API Notes
 	ifs				LLVM IFS (Interface Stubs)
 
-ANSI Art
-	nfo				System Information File
-	diz				Description in Zip File
 
 https://en.wikipedia.org/wiki/List_of_filename_extensions
 https://fileinfo.com/

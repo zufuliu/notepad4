@@ -25,6 +25,10 @@ Or build from source, see the [Wiki](https://github.com/zufuliu/notepad2/wiki/Bu
 * Syntax highlighting, code folding and API list for (see built-in [file extension list](../master/doc/FileExt.txt)):
 	* Plain Text
 	* ActionScript
+	* Android Smali, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#android-smali)
+		* javap
+		* Jasmin
+	* ANSI Art
 	* Assembler, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#assembler)
 		* MASM
 		* GNU Assembler
@@ -112,9 +116,6 @@ Or build from source, see the [Wiki](https://github.com/zufuliu/notepad2/wiki/Bu
 		* Bash likes (sh, bash, dash, ash, zsh, ksh), [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#shell-script)
 		* C Shell (csh, tcsh)
 		* M4 Macro, limited support
-	* Android Dalvik Smali, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#android-smali)
-		* javap
-		* Jasmin
 	* SQL Query
 		* [MySQL](../master/tools/lang/MySQL.sql), up to MySQL 8.0, MariaDB 10.3.
 		* [SQLite3](../master/tools/lang/SQLite3.sql)
@@ -148,7 +149,6 @@ Or build from source, see the [Wiki](https://github.com/zufuliu/notepad2/wiki/Bu
 		* Apple Property List
 		* Android Manifest
 	* YAML Document
-	* ANSI Art
 	* Many Others
 * Toggle fold for specific level, shortcuts: <kbd>Alt</kbd>+<kbd>Number</kbd>
 * Toggle fold for current block without scrolling back to the block start line, shortcut: <kbd>Alt</kbd>+<kbd>C</kbd>, or context menu "Toggle Fold"
