@@ -59,6 +59,7 @@ typedef struct EDITLEXER {
 		BYTE bStyleTheme;
 		BYTE bStyleChanged;
 		BYTE bUseDefaultCodeStyle;
+		BYTE bFavoriteOrder;
 		const unsigned int iStyleCount;
 		const int iNameLen;
 		LPCWSTR const pszName;
