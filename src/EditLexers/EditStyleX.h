@@ -5,8 +5,8 @@
 #define EDITSTYLE_HOLE(style, name)		{ NP2STYLE_ ## style, CSTRLEN(name), (name), NULL }
 #define EDITSTYLE_HOLEX(style, name)	{ style, CSTRLEN(name), (name), NULL }
 
-#define EDITLEXER_HOLE(name, styles)	{ StyleTheme_Default, 0, 1, COUNTOF(styles), CSTRLEN(name), (name), NULL, NULL }
-#define EDITLEXER_TEXT(name, styles)	{ StyleTheme_Default, 0, 0, COUNTOF(styles), CSTRLEN(name), (name), NULL, NULL }
+#define EDITLEXER_HOLE(name, styles)	{ StyleTheme_Default, 0, 1, 0, COUNTOF(styles), CSTRLEN(name), (name), NULL, NULL }
+#define EDITLEXER_TEXT(name, styles)	{ StyleTheme_Default, 0, 0, 0, COUNTOF(styles), CSTRLEN(name), (name), NULL, NULL }
 
 #define NP2StyleX_MarginLineNumber		EDITSTYLE_HOLE(MarginLineNumber, L"Margin and Line Number")
 #define NP2StyleX_MatchingBrace			EDITSTYLE_HOLE(MatchingBrace, L"Matching Brace")

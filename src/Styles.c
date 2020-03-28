@@ -127,8 +127,15 @@ extern EDITLEXER lexYAML;
 // "Select Scheme" list, don't participate in file extension match.
 #define LEXER_INDEX_MATCH	2
 #define ALL_LEXER_COUNT		(NUMLEXERS + LEXER_INDEX_MATCH)
+// the lexer array has three sections:
+// 1. global lexers and lexers for text file, not sortable, the order is hard-coded.
+// 2. favorite lexers, sortable, the order is configured by FavoriteSchemes
+// 3. other lexers, sorted alphabetical
+#define LEXER_INDEX_SORTABLE	4
+#define MAX_FAVORITE_SCHEMES_COUNT			16
+#define MAX_FAVORITE_SCHEMES_CONFIG_SIZE	64	// MAX_FAVORITE_SCHEMES_COUNT*3
 // This array holds all the lexers...
-static const PEDITLEXER pLexArray[ALL_LEXER_COUNT] = {
+static PEDITLEXER pLexArray[ALL_LEXER_COUNT] = {
 	&lexGlobal,
 	&lex2ndGlobal,
 
@@ -228,6 +235,7 @@ static WCHAR defaultCodeFontName[LF_FACESIZE];
 static WCHAR defaultTextFontName[LF_FACESIZE];
 
 static WCHAR darkStyleThemeFilePath[MAX_PATH];
+static WCHAR favoriteSchemesConfig[MAX_FAVORITE_SCHEMES_CONFIG_SIZE];
 
 // Currently used lexer
 static PEDITLEXER pLexGlobal = &lexGlobal;
@@ -592,6 +600,53 @@ static void Style_LoadOneEx(PEDITLEXER pLex, IniSection *pIniSection, WCHAR *pIn
 	pLex->bStyleTheme = (BYTE)np2StyleTheme;
 }
 
+static void Style_SetFavoriteSchemes(void) {
+	int favorite[MAX_FAVORITE_SCHEMES_COUNT];
+	const int count = ParseCommaList(favoriteSchemesConfig, favorite, MAX_FAVORITE_SCHEMES_COUNT);
+	for (int i = 0; i < count; i++) {
+		const int rid = favorite[i] + NP2LEX_TEXTFILE;
+		for (UINT iLexer = LEXER_INDEX_SORTABLE; iLexer < ALL_LEXER_COUNT; iLexer++) {
+			PEDITLEXER const pLex = pLexArray[iLexer];
+			if (pLex->rid == rid) {
+				pLex->bFavoriteOrder = (BYTE)(MAX_FAVORITE_SCHEMES_COUNT - i);
+				break;
+			}
+		}
+	}
+}
+
+static void Style_GetFavoriteSchemes(void) {
+	const int maxCch = MAX_FAVORITE_SCHEMES_CONFIG_SIZE - 3; // two digits, one space and NULL
+	WCHAR *wch = favoriteSchemesConfig;
+	int len = 0;
+	int count = 0;
+	for (UINT iLexer = LEXER_INDEX_SORTABLE; iLexer < ALL_LEXER_COUNT && len < maxCch && count < MAX_FAVORITE_SCHEMES_COUNT; iLexer++) {
+		const LPCEDITLEXER pLex = pLexArray[iLexer];
+		if (!pLex->bFavoriteOrder) {
+			break;
+		}
+
+		len += wsprintf(wch + len, L"%i ", pLex->rid - NP2LEX_TEXTFILE);
+		++count;
+	}
+
+	wch[len--] = L'\0';
+	if (len >= 0) {
+		wch[len] = L'\0';
+	}
+}
+
+static int __cdecl CmpEditLexer(const void *p1, const void *p2) {
+	LPCEDITLEXER pLex1 = *(LPCEDITLEXER *)(p1);
+	LPCEDITLEXER pLex2 = *(LPCEDITLEXER *)(p2);
+	int cmp = pLex2->bFavoriteOrder - pLex1->bFavoriteOrder;
+	// TODO: sort by localized name
+#if NP2_GET_LEXER_STYLE_NAME_FROM_RES
+#endif
+	cmp = cmp ? cmp : StrCmpIW(pLex1->pszName, pLex2->pszName);
+	return cmp;
+}
+
 //=============================================================================
 //
 // Style_Load()
@@ -611,6 +666,15 @@ void Style_Load(void) {
 	bUse2ndGlobalStyle = IniSectionGetBool(pIniSection, L"Use2ndGlobalStyle", 0);
 	pLexGlobal = bUse2ndGlobalStyle ? &lex2ndGlobal : &lexGlobal;
 
+	// favorite schemes
+	LPCWSTR strValue = IniSectionGetValue(pIniSection, L"FavoriteSchemes");
+	if (StrNotEmpty(strValue)) {
+		lstrcpyn(favoriteSchemesConfig, strValue, MAX_FAVORITE_SCHEMES_CONFIG_SIZE);
+		Style_SetFavoriteSchemes();
+	}
+
+	qsort(pLexArray + LEXER_INDEX_SORTABLE, ALL_LEXER_COUNT - LEXER_INDEX_SORTABLE, sizeof(PEDITLEXER), CmpEditLexer);
+
 	// default scheme
 	int iValue = IniSectionGetInt(pIniSection, L"DefaultScheme", 0);
 	iDefaultLexer = Style_GetMatchLexerIndex(iValue + NP2LEX_TEXTFILE);
@@ -621,7 +685,7 @@ void Style_Load(void) {
 	// auto select
 	bAutoSelect = IniSectionGetBool(pIniSection, L"AutoSelect", 1);
 
-	LPCWSTR strValue = IniSectionGetValue(pIniSection, L"DarkTheme.ini");
+	strValue = IniSectionGetValue(pIniSection, L"DarkTheme.ini");
 	if (StrNotEmpty(strValue)) {
 		lstrcpyn(darkStyleThemeFilePath, strValue, COUNTOF(darkStyleThemeFilePath));
 	}
@@ -719,7 +783,8 @@ void Style_Save(void) {
 
 	// 2nd default
 	IniSectionSetBoolEx(pIniSection, L"Use2ndGlobalStyle", bUse2ndGlobalStyle, 0);
-
+	// favorite schemes
+	IniSectionSetString(pIniSection, L"FavoriteSchemes", favoriteSchemesConfig);
 	// default scheme
 	IniSectionSetIntEx(pIniSection, L"DefaultScheme", pLexArray[iDefaultLexer]->rid - NP2LEX_TEXTFILE, 0);
 	IniSectionSetIntEx(pIniSection, L"StyleTheme", np2StyleTheme, StyleTheme_Default);
