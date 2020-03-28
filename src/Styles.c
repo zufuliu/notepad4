@@ -131,7 +131,7 @@ extern EDITLEXER lexYAML;
 // 1. global lexers and lexers for text file, not sortable, the order is hard-coded.
 // 2. favorite lexers, sortable, the order is configured by FavoriteSchemes
 // 3. other lexers, sorted alphabetical
-#define LEXER_INDEX_SORTABLE	4
+#define LEXER_INDEX_FAVORITE	4
 #define MAX_FAVORITE_SCHEMES_COUNT			16
 #define MAX_FAVORITE_SCHEMES_CONFIG_SIZE	64	// MAX_FAVORITE_SCHEMES_COUNT*3
 // This array holds all the lexers...
@@ -605,7 +605,7 @@ static void Style_SetFavoriteSchemes(void) {
 	const int count = ParseCommaList(favoriteSchemesConfig, favorite, MAX_FAVORITE_SCHEMES_COUNT);
 	for (int i = 0; i < count; i++) {
 		const int rid = favorite[i] + NP2LEX_TEXTFILE;
-		for (UINT iLexer = LEXER_INDEX_SORTABLE; iLexer < ALL_LEXER_COUNT; iLexer++) {
+		for (UINT iLexer = LEXER_INDEX_FAVORITE; iLexer < ALL_LEXER_COUNT; iLexer++) {
 			PEDITLEXER const pLex = pLexArray[iLexer];
 			if (pLex->rid == rid) {
 				pLex->bFavoriteOrder = (BYTE)(MAX_FAVORITE_SCHEMES_COUNT - i);
@@ -620,7 +620,7 @@ static void Style_GetFavoriteSchemes(void) {
 	WCHAR *wch = favoriteSchemesConfig;
 	int len = 0;
 	int count = 0;
-	for (UINT iLexer = LEXER_INDEX_SORTABLE; iLexer < ALL_LEXER_COUNT && len < maxCch && count < MAX_FAVORITE_SCHEMES_COUNT; iLexer++) {
+	for (UINT iLexer = LEXER_INDEX_FAVORITE; iLexer < ALL_LEXER_COUNT && len < maxCch && count < MAX_FAVORITE_SCHEMES_COUNT; iLexer++) {
 		const LPCEDITLEXER pLex = pLexArray[iLexer];
 		if (!pLex->bFavoriteOrder) {
 			break;
@@ -673,7 +673,7 @@ void Style_Load(void) {
 		Style_SetFavoriteSchemes();
 	}
 
-	qsort(pLexArray + LEXER_INDEX_SORTABLE, ALL_LEXER_COUNT - LEXER_INDEX_SORTABLE, sizeof(PEDITLEXER), CmpEditLexer);
+	qsort(pLexArray + LEXER_INDEX_FAVORITE, ALL_LEXER_COUNT - LEXER_INDEX_FAVORITE, sizeof(PEDITLEXER), CmpEditLexer);
 
 	// default scheme
 	int iValue = IniSectionGetInt(pIniSection, L"DefaultScheme", 0);
