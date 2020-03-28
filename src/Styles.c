@@ -3797,12 +3797,10 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 									  SHGFI_SMALLICON | SHGFI_SYSICONINDEX), TVSIL_NORMAL);
 
 		// Add lexers
-		BOOL found = FALSE;
 		HTREEITEM currentLex = NULL;
 		for (UINT iLexer = 0; iLexer < ALL_LEXER_COUNT; iLexer++) {
 			PEDITLEXER pLex = pLexArray[iLexer];
-			if (!found && pLex->rid == pLexCurrent->rid) {
-				found = TRUE;
+			if (currentLex == NULL && pLex == pLexCurrent) {
 				currentLex = Style_AddLexerToTreeView(hwndTV, pLex);
 			} else {
 				Style_AddLexerToTreeView(hwndTV, pLex);
@@ -4408,8 +4406,8 @@ static INT_PTR CALLBACK Style_SelectLexerDlgProc(HWND hwnd, UINT umsg, WPARAM wP
 		for (UINT iLexer = LEXER_INDEX_MATCH; iLexer < ALL_LEXER_COUNT; iLexer++) {
 			PEDITLEXER pLex = pLexArray[iLexer];
 			Style_AddLexerToListView(hwndLV, pLex);
-			if (iCurrent < 0 && pLex->rid == pLexCurrent->rid) {
-				iCurrent = iLexer;
+			if (iCurrent < 0 && pLex == pLexCurrent) {
+				iCurrent = iLexer - LEXER_INDEX_MATCH;
 			}
 		}
 
@@ -4419,11 +4417,11 @@ static INT_PTR CALLBACK Style_SelectLexerDlgProc(HWND hwnd, UINT umsg, WPARAM wP
 		iCurrent = max_i(0, iCurrent);
 		ListView_SetItemState(hwndLV, iCurrent, LVIS_FOCUSED | LVIS_SELECTED, LVIS_FOCUSED | LVIS_SELECTED);
 		ListView_EnsureVisible(hwndLV, iCurrent, FALSE);
-		if (iDefaultLexer == iCurrent) {
+
+		iInternalDefault = iDefaultLexer - LEXER_INDEX_MATCH;
+		if (iInternalDefault == iCurrent) {
 			CheckDlgButton(hwnd, IDC_DEFAULTSCHEME, BST_CHECKED);
 		}
-
-		iInternalDefault = iDefaultLexer;
 
 		if (bAutoSelect) {
 			CheckDlgButton(hwnd, IDC_AUTOSELECT, BST_CHECKED);
@@ -4501,7 +4499,7 @@ static INT_PTR CALLBACK Style_SelectLexerDlgProc(HWND hwnd, UINT umsg, WPARAM wP
 			if (ListView_GetItem(hwndLV, &lvi)) {
 				pLexCurrent = (PEDITLEXER)lvi.lParam;
 				np2LexLangIndex = 0;
-				iDefaultLexer = iInternalDefault;
+				iDefaultLexer = iInternalDefault + LEXER_INDEX_MATCH;
 				bAutoSelect = IsButtonChecked(hwnd, IDC_AUTOSELECT);
 				EndDialog(hwnd, IDOK);
 			}
