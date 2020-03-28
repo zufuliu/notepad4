@@ -54,6 +54,7 @@ extern EDITLEXER lexXML;
 
 extern EDITLEXER lexAS;
 extern EDITLEXER lexSmali;
+extern EDITLEXER lexANSI;
 extern EDITLEXER lexASM;
 extern EDITLEXER lexASY;
 extern EDITLEXER lexAU3;
@@ -122,8 +123,6 @@ extern EDITLEXER lexWASM;
 
 extern EDITLEXER lexYAML;
 
-extern EDITLEXER lexANSI;
-
 // the two global lexers at the beginning of the array not visible in
 // "Select Scheme" list, don't participate in file extension match.
 #define LEXER_INDEX_MATCH	2
@@ -151,6 +150,7 @@ static const PEDITLEXER pLexArray[ALL_LEXER_COUNT] = {
 
 	&lexAS,
 	&lexSmali,
+	&lexANSI,
 	&lexASM,
 	&lexASY,
 	&lexAU3,
@@ -218,8 +218,6 @@ static const PEDITLEXER pLexArray[ALL_LEXER_COUNT] = {
 	&lexWASM,
 
 	&lexYAML,
-
-	&lexANSI,
 };
 
 // system available default monospaced font and proportional font
