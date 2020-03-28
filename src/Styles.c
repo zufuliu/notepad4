@@ -124,11 +124,15 @@ extern EDITLEXER lexYAML;
 
 extern EDITLEXER lexANSI;
 
-// the two global lexers at the end of the array not visible in
+// the two global lexers at the beginning of the array not visible in
 // "Select Scheme" list, don't participate in file extension match.
-#define ALL_LEXER_COUNT		(NUMLEXERS + 2)
+#define LEXER_INDEX_MATCH	2
+#define ALL_LEXER_COUNT		(NUMLEXERS + LEXER_INDEX_MATCH)
 // This array holds all the lexers...
 static const PEDITLEXER pLexArray[ALL_LEXER_COUNT] = {
+	&lexGlobal,
+	&lex2ndGlobal,
+
 	&lexTextFile,
 	&lex2ndTextFile,
 
@@ -216,9 +220,6 @@ static const PEDITLEXER pLexArray[ALL_LEXER_COUNT] = {
 	&lexYAML,
 
 	&lexANSI,
-
-	&lexGlobal,
-	&lex2ndGlobal,
 };
 
 // system available default monospaced font and proportional font
@@ -627,10 +628,11 @@ void Style_Load(void) {
 		lstrcpyn(darkStyleThemeFilePath, strValue, COUNTOF(darkStyleThemeFilePath));
 	}
 
+	// file extensions
 	LoadIniSection(INI_SECTION_NAME_FILE_EXTENSIONS, pIniSectionBuf, cchIniSection);
 	IniSectionParse(pIniSection, pIniSectionBuf);
 	for (UINT iLexer = 0; iLexer < NUMLEXERS; iLexer++) {
-		PEDITLEXER pLex = pLexArray[iLexer];
+		PEDITLEXER pLex = pLexArray[iLexer + LEXER_INDEX_MATCH];
 		pLex->szExtensions = g_AllFileExtensions + (iLexer * MAX_EDITLEXER_EXT_SIZE);
 		LPCWSTR value = IniSectionGetValueImpl(pIniSection, pLex->pszName, pLex->iNameLen);
 		if (StrIsEmpty(value)) {
@@ -729,10 +731,11 @@ void Style_Save(void) {
 
 	SaveIniSection(INI_SECTION_NAME_STYLES, pIniSectionBuf);
 
+	// file extensions
 	if (fStylesModified & STYLESMODIFIED_FILE_EXT) {
 		ZeroMemory(pIniSectionBuf, cbIniSection);
 		pIniSection->next = pIniSectionBuf;
-		for (UINT iLexer = 0; iLexer < NUMLEXERS; iLexer++) {
+		for (UINT iLexer = LEXER_INDEX_MATCH; iLexer < ALL_LEXER_COUNT; iLexer++) {
 			const LPCEDITLEXER pLex = pLexArray[iLexer];
 			IniSectionSetStringEx(pIniSection, pLex->pszName, pLex->szExtensions, pLex->pszDefExt);
 		}
@@ -826,9 +829,10 @@ BOOL Style_Import(HWND hwnd) {
 		IniSection *pIniSection = &section;
 
 		IniSectionInit(pIniSection, 128);
+		// file extensions
 		if (GetPrivateProfileSection(INI_SECTION_NAME_FILE_EXTENSIONS, pIniSectionBuf, cchIniSection, szFile)) {
 			if (IniSectionParse(pIniSection, pIniSectionBuf)) {
-				for (UINT iLexer = 0; iLexer < NUMLEXERS; iLexer++) {
+				for (UINT iLexer = LEXER_INDEX_MATCH; iLexer < ALL_LEXER_COUNT; iLexer++) {
 					PEDITLEXER pLex = pLexArray[iLexer];
 					LPCWSTR value = IniSectionGetValueImpl(pIniSection, pLex->pszName, pLex->iNameLen);
 					if (StrNotEmpty(value)) {
@@ -897,8 +901,9 @@ BOOL Style_Export(HWND hwnd) {
 		const int cchIniSection = (int)(NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR));
 		IniSectionOnSave *pIniSection = &section;
 
+		// file extensions
 		pIniSection->next = pIniSectionBuf;
-		for (UINT iLexer = 0; iLexer < NUMLEXERS; iLexer++) {
+		for (UINT iLexer = LEXER_INDEX_MATCH; iLexer < ALL_LEXER_COUNT; iLexer++) {
 			const LPCEDITLEXER pLex = pLexArray[iLexer];
 			IniSectionSetString(pIniSection, pLex->pszName, pLex->szExtensions);
 		}
@@ -2337,7 +2342,7 @@ PEDITLEXER Style_MatchLexer(LPCWSTR lpszMatch, BOOL bCheckNames) {
 		}
 
 		const int cch = lstrlen(lpszMatch);
-		for (UINT iLexer = 0; iLexer < NUMLEXERS; iLexer++) {
+		for (UINT iLexer = LEXER_INDEX_MATCH; iLexer < ALL_LEXER_COUNT; iLexer++) {
 			PEDITLEXER pLex = pLexArray[iLexer];
 			LPCWSTR p1 = pLex->szExtensions;
 			do {
@@ -2357,7 +2362,7 @@ PEDITLEXER Style_MatchLexer(LPCWSTR lpszMatch, BOOL bCheckNames) {
 	} else {
 		const int cch = lstrlen(lpszMatch);
 		if (cch >= 3) {
-			for (UINT iLexer = 0; iLexer < NUMLEXERS; iLexer++) {
+			for (UINT iLexer = LEXER_INDEX_MATCH; iLexer < ALL_LEXER_COUNT; iLexer++) {
 				PEDITLEXER pLex = pLexArray[iLexer];
 				if (StrNCaseEqual(pLex->pszName, lpszMatch, cch)) {
 					return pLex;
@@ -2849,19 +2854,19 @@ void Style_UpdateSchemeMenu(HMENU hmenu) {
 // Style_SetLexerFromID()
 //
 void Style_SetLexerFromID(int id) {
-	if (id >= 0 && id < NUMLEXERS) {
+	if (id >= LEXER_INDEX_MATCH && id < ALL_LEXER_COUNT) {
 		np2LexLangIndex = Style_GetDocTypeLanguage();
 		Style_SetLexer(pLexArray[id], TRUE);
 	}
 }
 
 int Style_GetEditLexerId(int rid) {
-	for (UINT iLexer = 0; iLexer < NUMLEXERS; iLexer++) {
+	for (UINT iLexer = LEXER_INDEX_MATCH; iLexer < ALL_LEXER_COUNT; iLexer++) {
 		if (pLexArray[iLexer]->rid == rid) {
 			return iLexer;
 		}
 	}
-	return 0;
+	return LEXER_INDEX_MATCH; // Text File
 }
 
 //=============================================================================
@@ -3795,9 +3800,7 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 		// Add lexers
 		BOOL found = FALSE;
 		HTREEITEM currentLex = NULL;
-		Style_AddLexerToTreeView(hwndTV, &lexGlobal);
-		Style_AddLexerToTreeView(hwndTV, &lex2ndGlobal);
-		for (UINT iLexer = 0; iLexer < NUMLEXERS; iLexer++) {
+		for (UINT iLexer = 0; iLexer < ALL_LEXER_COUNT; iLexer++) {
 			PEDITLEXER pLex = pLexArray[iLexer];
 			if (!found && pLex->rid == pLexCurrent->rid) {
 				found = TRUE;
@@ -4403,7 +4406,7 @@ static INT_PTR CALLBACK Style_SelectLexerDlgProc(HWND hwnd, UINT umsg, WPARAM wP
 
 		// Add lexers
 		int iCurrent = -1;
-		for (UINT iLexer = 0; iLexer < NUMLEXERS; iLexer++) {
+		for (UINT iLexer = LEXER_INDEX_MATCH; iLexer < ALL_LEXER_COUNT; iLexer++) {
 			PEDITLEXER pLex = pLexArray[iLexer];
 			Style_AddLexerToListView(hwndLV, pLex);
 			if (iCurrent < 0 && pLex->rid == pLexCurrent->rid) {
