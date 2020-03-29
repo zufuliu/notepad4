@@ -23,6 +23,9 @@
 // Number of Lexers in pLexArray
 #define NUMLEXERS	64
 
+// localization, get lexer and style name from resuorce
+#define NP2_GET_LEXER_STYLE_NAME_FROM_RES	0
+
 // all schemes with "All Files (*.*)"
 #define MAX_OPEN_SAVE_FILE_DIALOG_FILTER_SIZE	((NUMLEXERS + 1) * 128)
 
