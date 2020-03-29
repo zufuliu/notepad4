@@ -481,6 +481,10 @@ void UndoHistory::TentativeCommit() noexcept {
 	maxAction = currentAction;
 }
 
+bool UndoHistory::TentativeActive() const noexcept {
+	return tentativePoint >= 0;
+}
+
 int UndoHistory::TentativeSteps() {
 	// Drop any trailing startAction
 	if (actions[currentAction].at == startAction && currentAction > 0)
