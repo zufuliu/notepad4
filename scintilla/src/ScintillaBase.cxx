@@ -605,7 +605,7 @@ public:
 	void PropSet(const char *key, const char *val);
 	const char *PropGet(const char *key) const;
 	int PropGetInt(const char *key, int defaultValue = 0) const;
-	int PropGetExpanded(const char *key, char *result) const;
+	size_t PropGetExpanded(const char *key, char *result) const;
 
 	int LineEndTypesSupported() const noexcept override;
 	int AllocateSubStyles(int styleBase, int numberStyles);
@@ -652,7 +652,7 @@ LexState *ScintillaBase::DocumentLexState() {
 	if (!pdoc->GetLexInterface()) {
 		pdoc->SetLexInterface(new LexState(pdoc));
 	}
-	return static_cast<LexState *>(pdoc->GetLexInterface());
+	return down_cast<LexState *>(pdoc->GetLexInterface());
 }
 
 void LexState::SetLexerModule(const LexerModule *lex) {
@@ -771,7 +771,7 @@ int LexState::PropGetInt(const char *key, int defaultValue) const {
 	return props.GetInt(key, defaultValue);
 }
 
-int LexState::PropGetExpanded(const char *key, char *result) const {
+size_t LexState::PropGetExpanded(const char *key, char *result) const {
 	return props.GetExpanded(key, result);
 }
 
@@ -1058,7 +1058,7 @@ sptr_t ScintillaBase::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lPara
 		break;
 
 	case SCI_CALLTIPSETHLT:
-		ct.SetHighlight(static_cast<int>(wParam), static_cast<int>(lParam));
+		ct.SetHighlight(wParam, lParam);
 		break;
 
 	case SCI_CALLTIPSETBACK:

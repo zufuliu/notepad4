@@ -171,7 +171,7 @@ void XPM::Draw(Surface *surface, PRectangle rc) {
 	}
 }
 
-void XPM::PixelAt(int x, int y, ColourDesired &colour, bool &transparent) const {
+void XPM::PixelAt(int x, int y, ColourDesired &colour, bool &transparent) const noexcept {
 	if (pixels.empty() || (x < 0) || (x >= width) || (y < 0) || (y >= height)) {
 		colour = ColourDesired(0);;
 		transparent = true;

@@ -210,7 +210,7 @@ void LineLevels::InsertLine(Sci::Line line) {
 void LineLevels::RemoveLine(Sci::Line line) {
 	if (levels.Length()) {
 		// Move up following lines but merge header flag from this line
-		// to line before to avoid a temporary disappearence causing expansion.
+		// to line before to avoid a temporary disappearance causing expansion.
 		int firstHeader = levels[line] & SC_FOLDLEVELHEADERFLAG;
 		levels.Delete(line);
 		if (line == levels.Length() - 1) // Last line loses the header flag

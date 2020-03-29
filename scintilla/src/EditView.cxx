@@ -1386,7 +1386,7 @@ void EditView::DrawFoldDisplayText(Surface *surface, const EditModel &model, con
 
 	if (model.trackLineWidth) {
 		if (rcSegment.right + 1 > lineWidthMaxSeen) {
-			// Fold display text border drawn on rcSegment.right with width 1 is the last visble object of the line
+			// Fold display text border drawn on rcSegment.right with width 1 is the last visible object of the line
 			lineWidthMaxSeen = static_cast<int>(rcSegment.right + 1);
 		}
 	}

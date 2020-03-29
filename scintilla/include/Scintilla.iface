@@ -157,7 +157,7 @@ fun position GetStyledText=2015(, textrange tr)
 fun bool CanRedo=2016(,)
 
 # Retrieve the line number at which a particular marker is located.
-fun int MarkerLineFromHandle=2017(int markerHandle,)
+fun line MarkerLineFromHandle=2017(int markerHandle,)
 
 # Delete a marker.
 fun void MarkerDeleteHandle=2018(int markerHandle,)
@@ -1319,7 +1319,7 @@ fun position CallTipPosStart=2203(,)
 set void CallTipSetPosStart=2214(position posStart,)
 
 # Highlight a segment of the definition.
-fun void CallTipSetHlt=2204(int highlightStart, int highlightEnd)
+fun void CallTipSetHlt=2204(position highlightStart, position highlightEnd)
 
 # Set the background colour for the call tip.
 set void CallTipSetBack=2205(colour back,)
@@ -2434,10 +2434,10 @@ fun int IndicatorAllOnFor=2506(position pos,)
 fun int IndicatorValueAt=2507(int indicator, position pos)
 
 # Where does a particular indicator start?
-fun int IndicatorStart=2508(int indicator, position pos)
+fun position IndicatorStart=2508(int indicator, position pos)
 
 # Where does a particular indicator end?
-fun int IndicatorEnd=2509(int indicator, position pos)
+fun position IndicatorEnd=2509(int indicator, position pos)
 
 # Set number of entries in position cache
 set void SetPositionCache=2514(int size,)

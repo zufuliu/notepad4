@@ -39,7 +39,7 @@ void CharClassify::SetDefaultCharClasses(bool includeWordClass) noexcept {
 }
 
 void CharClassify::SetCharClasses(const unsigned char *chars, cc newCharClass) noexcept {
-	// Apply the newCharClass to the specifed chars
+	// Apply the newCharClass to the specified chars
 	if (chars) {
 		const unsigned char w = static_cast<unsigned char>(newCharClass);
 		while (*chars) {

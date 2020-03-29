@@ -38,7 +38,7 @@ public:
 	constexpr int GetWidth() const noexcept {
 		return width;
 	}
-	void PixelAt(int x, int y, ColourDesired &colour, bool &transparent) const;
+	void PixelAt(int x, int y, ColourDesired &colour, bool &transparent) const noexcept;
 private:
 	static std::vector<const char *>LinesFormFromTextForm(const char *textForm);
 };

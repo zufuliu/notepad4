@@ -194,23 +194,23 @@ void Document::RemoveLine(Sci::Line line) {
 }
 
 LineMarkers *Document::Markers() const noexcept {
-	return static_cast<LineMarkers *>(perLineData[ldMarkers].get());
+	return down_cast<LineMarkers *>(perLineData[ldMarkers].get());
 }
 
 LineLevels *Document::Levels() const noexcept {
-	return static_cast<LineLevels *>(perLineData[ldLevels].get());
+	return down_cast<LineLevels *>(perLineData[ldLevels].get());
 }
 
 LineState *Document::States() const noexcept {
-	return static_cast<LineState *>(perLineData[ldState].get());
+	return down_cast<LineState *>(perLineData[ldState].get());
 }
 
 LineAnnotation *Document::Margins() const noexcept {
-	return static_cast<LineAnnotation *>(perLineData[ldMargin].get());
+	return down_cast<LineAnnotation *>(perLineData[ldMargin].get());
 }
 
 LineAnnotation *Document::Annotations() const noexcept {
-	return static_cast<LineAnnotation *>(perLineData[ldAnnotation].get());
+	return down_cast<LineAnnotation *>(perLineData[ldAnnotation].get());
 }
 
 int Document::LineEndTypesSupported() const noexcept {
@@ -899,9 +899,9 @@ Document::CharacterExtracted Document::CharacterBefore(Sci::Position position) c
 			Sci::Position startUTF = position;
 			Sci::Position endUTF = position;
 			if (InGoodUTF8(position, startUTF, endUTF)) {
-				const int widthCharBytes = static_cast<int>(endUTF - startUTF);
+				const Sci::Position widthCharBytes = endUTF - startUTF;
 				unsigned char charBytes[UTF8MaxBytes] = { 0, 0, 0, 0 };
-				for (int b = 0; b < widthCharBytes; b++) {
+				for (Sci::Position b = 0; b < widthCharBytes; b++) {
 					charBytes[b] = cb.UCharAt(startUTF + b);
 				}
 				const int utf8status = UTF8ClassifyMulti(charBytes, widthCharBytes);
@@ -1677,7 +1677,7 @@ CharClassify::cc Document::WordCharacterClass(unsigned int ch) const noexcept {
 }
 
 /**
- * Used by commmands that want to select whole words.
+ * Used by commands that want to select whole words.
  * Finds the start of word at pos when delta < 0 or the end of the word when delta >= 0.
  */
 Sci::Position Document::ExtendWordSelect(Sci::Position pos, int delta, bool onlyWordCharacters) const noexcept {
@@ -3023,7 +3023,7 @@ Sci::Position Cxx11RegexFindText(const Document *doc, Sci::Position minPos, Sci:
 	try {
 		//ElapsedPeriod ep;
 		std::regex::flag_type flagsRe = std::regex::ECMAScript;
-		// Flags that apper to have no effect:
+		// Flags that appear to have no effect:
 		// | std::regex::collate | std::regex::extended;
 		if (!caseSensitive)
 			flagsRe = flagsRe | std::regex::icase;

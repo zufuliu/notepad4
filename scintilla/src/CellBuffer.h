@@ -85,9 +85,7 @@ public:
 	// Tentative actions are used for input composition so that it can be undone cleanly
 	void TentativeStart() noexcept;
 	void TentativeCommit() noexcept;
-	bool TentativeActive() const noexcept {
-		return tentativePoint >= 0;
-	}
+	bool TentativeActive() const noexcept;
 	int TentativeSteps();
 
 	/// To perform an undo, StartUndo is called to retrieve the number of steps, then UndoStep is
