@@ -513,15 +513,6 @@ Sci_Position FindPhpStringDelimiter(char *phpStringDelimiter, const int phpStrin
 	return j - 1;
 }
 
-#define		LEX_XML		25
-#define		LEX_HTML	26
-#define		LEX_PHP		29
-//#define		LEX_ASP_VB	4
-//#define		LEX_ASP_JS	5
-//#define		LEX_JSP		6
-//#define		LEX_ASPNET_CS	7
-//#define		LEX_ASPNET_VB	8
-
 void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists,
                                   Accessor &styler, bool isXml) {
 	const WordList &keywords_Tag = *keywordLists[0];
@@ -2163,24 +2154,26 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 	styler.Flush();
 }
 
-void ColouriseXMLDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists,
-                                  Accessor &styler) {
+void ColouriseXMLDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
 	// Passing in true because we're lexing XML
 	ColouriseHyperTextDoc(startPos, length, initStyle, keywordLists, styler, true);
 }
 
 void ColouriseHTMLDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
 	// Passing in false because we're notlexing XML
-	const int lexType = styler.GetPropertyInt("lexer.lang.type", LEX_HTML);
-	if (lexType == LEX_PHP && startPos == 0)
-		initStyle = SCE_HPHP_DEFAULT;
+	if (startPos == 0) {
+		const int php = styler.GetPropertyInt("lexer.lang.type", 0);
+		if (php) {
+			initStyle = SCE_HPHP_DEFAULT;
+		}
+	}
 	ColouriseHyperTextDoc(startPos, length, initStyle, keywordLists, styler, false);
 }
 
-/*void ColourisePHPScriptDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists,
-        Accessor &styler) {
-	if (startPos == 0)
+/*void ColourisePHPScriptDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
+	if (startPos == 0) {
 		initStyle = SCE_HPHP_DEFAULT;
+	}
 	ColouriseHTMLDoc(startPos, length, initStyle, keywordLists, styler);
 }*/
 
@@ -2206,6 +2199,6 @@ void ColouriseHTMLDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 
 }
 
-LexerModule lmHTML(SCLEX_HTML, ColouriseHTMLDoc, "hypertext", nullptr);
-LexerModule lmXML(SCLEX_XML, ColouriseXMLDoc, "xml", nullptr);
-//LexerModule lmPHPSCRIPT(SCLEX_PHPSCRIPT, ColourisePHPScriptDoc, "phpscript", nullptr);
+LexerModule lmHTML(SCLEX_HTML, ColouriseHTMLDoc, "hypertext");
+LexerModule lmXML(SCLEX_XML, ColouriseXMLDoc, "xml");
+//LexerModule lmPHPSCRIPT(SCLEX_PHPSCRIPT, ColourisePHPScriptDoc, "phpscript");

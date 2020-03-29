@@ -18,9 +18,6 @@
 
 using namespace Scintilla;
 
-#define		LEX_PY		32	// Python
-#define		LEX_BOO		55	// Boo
-
 #define PY_DEF_CLASS 1
 #define PY_DEF_FUNC	2
 #define PY_DEF_ENUM	3	// Boo
@@ -120,7 +117,6 @@ static void ColourisePyDoc(Sci_PositionU startPos, Sci_Position length, int init
 	int visibleChars = 0;
 	bool continuationLine = false;
 
-	//const int lexType = styler.GetPropertyInt("lexer.lang.type", LEX_PY);
 	StyleContext sc(startPos, length, initStyle, styler);
 
 	for (; sc.More(); sc.Forward()) {
