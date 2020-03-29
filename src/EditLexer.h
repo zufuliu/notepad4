@@ -25,7 +25,7 @@ enum {
 #ifndef _INC_WINDOWS
 typedef wchar_t * LPWSTR;
 typedef const wchar_t * LPCWSTR;
-typedef unsigned char BYTE;
+typedef int BOOL;
 #endif
 
 typedef struct EDITSTYLE {
@@ -56,10 +56,10 @@ typedef struct EDITLEXER {
 	const int iLexer;
 	const int rid;
 	struct {
-		BYTE bStyleTheme;
-		BYTE bStyleChanged;
-		BYTE bUseDefaultCodeStyle;
-		BYTE bFavoriteOrder;
+		int iStyleTheme;
+		BOOL bStyleChanged;
+		BOOL bUseDefaultCodeStyle;
+		int iFavoriteOrder;
 		const unsigned int iStyleCount;
 		const int iNameLen;
 		LPCWSTR const pszName;
