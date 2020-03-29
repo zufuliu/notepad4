@@ -125,13 +125,14 @@ extern EDITLEXER lexYAML;
 
 // the two global lexers at the beginning of the array not visible in
 // "Select Scheme" list, don't participate in file extension match.
-#define LEXER_INDEX_MATCH	2
-#define ALL_LEXER_COUNT		(NUMLEXERS + LEXER_INDEX_MATCH)
+#define LEXER_INDEX_MATCH		2
+#define ALL_LEXER_COUNT			(NUMLEXERS + LEXER_INDEX_MATCH)
 // the lexer array has three sections:
 // 1. global lexers and lexers for text file, not sortable, the order is hard-coded.
 // 2. favorite lexers, sortable, the order is configured by FavoriteSchemes
 // 3. other lexers, sorted alphabetical
 #define LEXER_INDEX_FAVORITE	4
+#define GENERAL_LEXER_COUNT		(ALL_LEXER_COUNT - LEXER_INDEX_FAVORITE)
 #define MAX_FAVORITE_SCHEMES_COUNT			16
 #define MAX_FAVORITE_SCHEMES_CONFIG_SIZE	64	// MAX_FAVORITE_SCHEMES_COUNT*3
 // This array holds all the lexers...
@@ -673,7 +674,7 @@ void Style_Load(void) {
 		Style_SetFavoriteSchemes();
 	}
 
-	qsort(pLexArray + LEXER_INDEX_FAVORITE, ALL_LEXER_COUNT - LEXER_INDEX_FAVORITE, sizeof(PEDITLEXER), CmpEditLexer);
+	qsort(pLexArray + LEXER_INDEX_FAVORITE, GENERAL_LEXER_COUNT, sizeof(PEDITLEXER), CmpEditLexer);
 
 	// default scheme
 	int iValue = IniSectionGetInt(pIniSection, L"DefaultScheme", 0);
