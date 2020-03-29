@@ -556,7 +556,7 @@ void Style_ReleaseResources(void) {
 }
 
 static inline BOOL IsStyleLoaded(PEDITLEXER pLex) {
-	return pLex->bStyleTheme == np2StyleTheme && pLex->szStyleBuf != NULL;
+	return pLex->iStyleTheme == np2StyleTheme && pLex->szStyleBuf != NULL;
 }
 
 static inline LPCWSTR GetStyleThemeFilePath(void) {
@@ -584,7 +584,7 @@ static void Style_LoadOneEx(PEDITLEXER pLex, IniSection *pIniSection, WCHAR *pIn
 			lstrcpy(szValue, pLex->Styles[i].pszDefault);
 		}
 	} else {
-		pLex->bUseDefaultCodeStyle = (BYTE)IniSectionGetBool(pIniSection, L"UseDefaultCodeStyle", pLex->bUseDefaultCodeStyle);
+		pLex->bUseDefaultCodeStyle = IniSectionGetBool(pIniSection, L"UseDefaultCodeStyle", pLex->bUseDefaultCodeStyle);
 		for (UINT i = 0; i < iStyleCount; i++) {
 			LPWSTR szValue = szStyleBuf + (i * MAX_EDITSTYLE_VALUE_SIZE);
 			pLex->Styles[i].szValue = szValue;
@@ -597,7 +597,7 @@ static void Style_LoadOneEx(PEDITLEXER pLex, IniSection *pIniSection, WCHAR *pIn
 		}
 	}
 
-	pLex->bStyleTheme = (BYTE)np2StyleTheme;
+	pLex->iStyleTheme = np2StyleTheme;
 }
 
 static void Style_SetFavoriteSchemes(void) {
@@ -608,7 +608,7 @@ static void Style_SetFavoriteSchemes(void) {
 		for (UINT iLexer = LEXER_INDEX_FAVORITE; iLexer < ALL_LEXER_COUNT; iLexer++) {
 			PEDITLEXER const pLex = pLexArray[iLexer];
 			if (pLex->rid == rid) {
-				pLex->bFavoriteOrder = (BYTE)(MAX_FAVORITE_SCHEMES_COUNT - i);
+				pLex->iFavoriteOrder = MAX_FAVORITE_SCHEMES_COUNT - i;
 				break;
 			}
 		}
@@ -622,7 +622,7 @@ static void Style_GetFavoriteSchemes(void) {
 	int count = 0;
 	for (UINT iLexer = LEXER_INDEX_FAVORITE; iLexer < ALL_LEXER_COUNT && len < maxCch && count < MAX_FAVORITE_SCHEMES_COUNT; iLexer++) {
 		const LPCEDITLEXER pLex = pLexArray[iLexer];
-		if (!pLex->bFavoriteOrder) {
+		if (!pLex->iFavoriteOrder) {
 			break;
 		}
 
@@ -639,7 +639,7 @@ static void Style_GetFavoriteSchemes(void) {
 static int __cdecl CmpEditLexer(const void *p1, const void *p2) {
 	LPCEDITLEXER pLex1 = *(LPCEDITLEXER *)(p1);
 	LPCEDITLEXER pLex2 = *(LPCEDITLEXER *)(p2);
-	int cmp = pLex2->bFavoriteOrder - pLex1->bFavoriteOrder;
+	int cmp = pLex2->iFavoriteOrder - pLex1->iFavoriteOrder;
 	// TODO: sort by localized name
 #if NP2_GET_LEXER_STYLE_NAME_FROM_RES
 #endif
@@ -914,7 +914,7 @@ BOOL Style_Import(HWND hwnd) {
 				if (!IniSectionParse(pIniSection, pIniSectionBuf)) {
 					continue;
 				}
-				pLex->bUseDefaultCodeStyle = (BYTE)IniSectionGetBool(pIniSection, L"UseDefaultCodeStyle", pLex->bUseDefaultCodeStyle);
+				pLex->bUseDefaultCodeStyle = IniSectionGetBool(pIniSection, L"UseDefaultCodeStyle", pLex->bUseDefaultCodeStyle);
 				const UINT iStyleCount = pLex->iStyleCount;
 				for (UINT i = 0; i < iStyleCount; i++) {
 					LPCWSTR value = IniSectionGetValueImpl(pIniSection, pLex->Styles[i].pszName, pLex->Styles[i].iNameLen);
