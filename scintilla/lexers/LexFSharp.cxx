@@ -23,10 +23,6 @@ static constexpr bool IsFSOperator(int ch) noexcept {
 	return isoperator(ch) || (ch == '\'' || ch == '@' || ch == '$' || ch == '#' || ch == '`');
 }
 
-#define	LEX_FSHARP	22
-#define LEX_CAML	54
-#define LEX_MATH	64
-
 /*static const char *const fsharpWordLists[] = {
 	"Primary keywords",
 	"Type Keywords",
@@ -41,7 +37,6 @@ static void ColouriseFSharpDoc(Sci_PositionU startPos, Sci_Position length, int 
 	const WordList &keywords3 = *keywordLists[2];
 	const WordList &keywords4 = *keywordLists[3];
 
-	//const int lexType = styler.GetPropertyInt("lexer.lang.type", LEX_FSHARP);
 	int visibleChars = 0;
 	StyleContext sc(startPos, length, initStyle, styler);
 
@@ -192,7 +187,6 @@ static constexpr bool IsStreamCommentStyle(int style) noexcept {
 #define IsOpenLine(line)		IsFSLine(line, "open")
 
 static void FoldFSharpDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList, Accessor &styler) {
-	//const int lexType = styler.GetPropertyInt("lexer.lang.type", LEX_FSHARP);
 	const bool foldComment = styler.GetPropertyInt("fold.comment", 1) != 0;
 	const bool foldPreprocessor = styler.GetPropertyInt("fold.preprocessor", 1) != 0;
 	//const bool foldCompact = styler.GetPropertyInt("fold.compact") != 0;

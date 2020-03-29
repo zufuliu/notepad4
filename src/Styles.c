@@ -1329,19 +1329,23 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 	// Lexer
 	const int iLexer = pLexNew->iLexer;
 	int rid = pLexNew->rid;
-	if (rid == NP2LEX_MATLAB) {
-		if (np2LexLangIndex == IDM_LANG_OCTAVE) {
-			rid = NP2LEX_OCTAVE;
-		} else if (np2LexLangIndex == IDM_LANG_SCILAB) {
-			rid = NP2LEX_SCILAB;
-		}
-	}
 
 	if (bLexerChanged) {
-		char msg[10];
 		SciCall_SetLexer(iLexer);
-		_itoa(rid - 63000, msg, 10);
-		SciCall_SetProperty("lexer.lang.type", msg);
+
+		if (iLexer == NP2LEX_CPP || iLexer == SCLEX_MATLAB) {
+			if (iLexer == NP2LEX_MATLAB) {
+				if (np2LexLangIndex == IDM_LANG_OCTAVE) {
+					rid = NP2LEX_OCTAVE;
+				} else if (np2LexLangIndex == IDM_LANG_SCILAB) {
+					rid = NP2LEX_SCILAB;
+				}
+			}
+
+			char msg[10];
+			_itoa(rid - NP2LEX_TEXTFILE, msg, 10);
+			SciCall_SetProperty("lexer.lang.type", msg);
+		}
 
 		// Code folding
 		SciCall_SetProperty("fold", "1");
@@ -1355,6 +1359,7 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 			SciCall_SetProperty("fold.html", "1");
 			SciCall_SetProperty("fold.hypertext.comment", "1");
 			SciCall_SetProperty("fold.hypertext.heredoc", "1");
+			SciCall_SetProperty("lexer.lang.type", ((np2LexLangIndex == IDM_LANG_PHP)? "1" : "0"));
 			break;
 
 		case NP2LEX_CSS:
