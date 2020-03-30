@@ -2026,6 +2026,7 @@ BEGIN
 	IDS_EOLMODENAME_CR				"Classic Mac OS (CR)"
 	IDS_CONFIG_THEME_TITLE_DEFAULT	"Customize Schemes - Default Theme"
 	IDS_CONFIG_THEME_TITLE_DARK		"Customize Schemes - Dark Theme"
+	IDS_FAVORITE_SCHEMES_TITLE		"Favorite Schemes"
 END
 
 
