@@ -3749,6 +3749,10 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		Style_SelectLexerDlg(hwndEdit);
 		break;
 
+	case IDM_VIEW_SCHEME_CONFIG:
+		Style_ConfigDlg(hwndEdit);
+		break;
+
 	case IDM_VIEW_USE2NDGLOBALSTYLE:
 		Style_ToggleUse2ndGlobalStyle();
 		break;
@@ -3760,10 +3764,6 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case IDM_VIEW_STYLE_THEME_DEFAULT:
 	case IDM_VIEW_STYLE_THEME_DARK:
 		OnStyleThemeChanged(LOWORD(wParam) - IDM_VIEW_STYLE_THEME_DEFAULT);
-		break;
-
-	case IDM_VIEW_SCHEMECONFIG:
-		Style_ConfigDlg(hwndEdit);
 		break;
 
 	case IDM_VIEW_DEFAULT_CODE_FONT:
@@ -4661,7 +4661,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	case IDT_VIEW_SCHEMECONFIG:
-		SendWMCommandOrBeep(hwnd, IDM_VIEW_SCHEMECONFIG);
+		SendWMCommandOrBeep(hwnd, IDM_VIEW_SCHEME_CONFIG);
 		break;
 
 	case IDT_FILE_EXIT:
