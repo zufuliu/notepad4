@@ -601,13 +601,13 @@ static void Style_LoadOneEx(PEDITLEXER pLex, IniSection *pIniSection, WCHAR *pIn
 	pLex->iStyleTheme = np2StyleTheme;
 }
 
-static void Style_SetFavoriteSchemes(void) {
+void Style_SetFavoriteSchemes(void) {
 	int favorite[MAX_FAVORITE_SCHEMES_COUNT];
 	const int count = ParseCommaList(favoriteSchemesConfig, favorite, MAX_FAVORITE_SCHEMES_COUNT);
 	for (int i = 0; i < count; i++) {
 		const int rid = favorite[i] + NP2LEX_TEXTFILE;
 		for (UINT iLexer = LEXER_INDEX_GENERAL; iLexer < ALL_LEXER_COUNT; iLexer++) {
-			PEDITLEXER const pLex = pLexArray[iLexer];
+			PEDITLEXER pLex = pLexArray[iLexer];
 			if (pLex->rid == rid) {
 				pLex->iFavoriteOrder = MAX_FAVORITE_SCHEMES_COUNT - i;
 				break;
@@ -616,7 +616,7 @@ static void Style_SetFavoriteSchemes(void) {
 	}
 }
 
-static void Style_GetFavoriteSchemes(void) {
+void Style_GetFavoriteSchemes(void) {
 	const int maxCch = MAX_FAVORITE_SCHEMES_CONFIG_SIZE - 3; // two digits, one space and NULL
 	WCHAR *wch = favoriteSchemesConfig;
 	int len = 0;
@@ -4876,7 +4876,7 @@ void Style_SelectLexerDlg(HWND hwnd, BOOL favorite) {
 	const LPCEDITLEXER pLex = pLexCurrent;
 	const int langIndex = np2LexLangIndex;
 	if (IDOK == ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_STYLESELECT), GetParent(hwnd), Style_SelectLexerDlgProc, favorite)) {
-		const BOOL bLexerChanged = !favorite && pLex != pLexCurrent || langIndex != np2LexLangIndex;
+		const BOOL bLexerChanged = !favorite && (pLex != pLexCurrent || langIndex != np2LexLangIndex);
 		if (bLexerChanged) {
 			Style_SetLexer(pLexCurrent, TRUE);
 		}
