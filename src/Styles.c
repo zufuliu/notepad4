@@ -3905,7 +3905,7 @@ static void Style_AddAllLexerToTreeView(HWND hwndTV, BOOL withStyles) {
 		if (group != 0) {
 			WCHAR szTitle[128];
 			if (group == 1) {
-				GetString(IDT_FILE_OPENFAV, szTitle, COUNTOF(szTitle));
+				GetString(IDS_FAVORITE_SCHEMES_TITLE, szTitle, COUNTOF(szTitle));
 			} else {
 				szTitle[0] = (WCHAR)group;
 				szTitle[1] = L'\0';
