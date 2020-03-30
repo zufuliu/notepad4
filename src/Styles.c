@@ -4880,5 +4880,9 @@ void Style_SelectLexerDlg(HWND hwnd, BOOL favorite) {
 		if (bLexerChanged) {
 			Style_SetLexer(pLexCurrent, TRUE);
 		}
+	} else {
+		if (favorite) {
+			Style_SetFavoriteSchemes();
+		}
 	}
 }
