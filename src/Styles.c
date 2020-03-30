@@ -3851,7 +3851,7 @@ static void Style_ResetStyle(PEDITLEXER pLex, PEDITSTYLE pStyle) {
 	lstrcpy(pStyle->szValue, pStyle->pszDefault);
 }
 
-static void Style_AddAllLexerToTreeView(HWND hwndTV, BOOL withStyles) {
+static HTREEITEM Style_AddAllLexerToTreeView(HWND hwndTV, BOOL withStyles, BOOL withCheckBox) {
 	struct SchemeGroupInfo groupList[ALL_LEXER_COUNT];
 	int groupCount = 2;
 	groupList[0].group = 0;
@@ -3894,6 +3894,7 @@ static void Style_AddAllLexerToTreeView(HWND hwndTV, BOOL withStyles) {
 
 	HTREEITEM hSelNode = NULL;
 	HTREEITEM hSelParent = NULL;
+	HTREEITEM hFavoriteNode = NULL;
 
 	iLexer = LEXER_INDEX_GENERAL - groupList[0].count;
 	for (int i = 0; i < groupCount; i++) {
@@ -3920,6 +3921,18 @@ static void Style_AddAllLexerToTreeView(HWND hwndTV, BOOL withStyles) {
 			tvis.item.iSelectedImage = folderIcon;
 			tvis.item.lParam = 0; // group
 			hParent = (HTREEITEM)TreeView_InsertItem(hwndTV, &tvis);
+
+			if (group == 1) {
+				hFavoriteNode = hParent;
+			}
+			if (withCheckBox) {
+				// remove checkbox
+				tvis.item.hItem = hParent;
+				tvis.item.mask = TVIF_STATE;
+				tvis.item.state = 0;
+				tvis.item.stateMask = TVIS_STATEIMAGEMASK;
+				TreeView_SetItem(hwndTV, &(tvis.item));
+			}
 		}
 
 		if (group <= 1) {
@@ -3929,6 +3942,19 @@ static void Style_AddAllLexerToTreeView(HWND hwndTV, BOOL withStyles) {
 				if (hSelNode == NULL && pLex == pLexCurrent) {
 					hSelNode = hTreeNode;
 					hSelParent = hParent;
+				}
+				if (withCheckBox) {
+					if (pLex->iFavoriteOrder) {
+						TreeView_SetCheckState(hwndTV, hTreeNode, TRUE);
+					} else if (group == 0) {
+						TVITEM item;
+						ZeroMemory(&item, sizeof(item));
+						item.hItem = hTreeNode;
+						item.mask = TVIF_STATE;
+						item.state = 0;
+						item.stateMask = TVIS_STATEIMAGEMASK;
+						TreeView_SetItem(hwndTV, &(item));
+					}
 				}
 			}
 			if (groupList[group + 1].group > 1) {
@@ -3942,6 +3968,9 @@ static void Style_AddAllLexerToTreeView(HWND hwndTV, BOOL withStyles) {
 					hSelNode = hTreeNode;
 					hSelParent = hParent;
 				}
+				if (withCheckBox && pLex->iFavoriteOrder) {
+					TreeView_SetCheckState(hwndTV, hTreeNode, TRUE);
+				}
 			}
 		}
 
@@ -3954,6 +3983,7 @@ static void Style_AddAllLexerToTreeView(HWND hwndTV, BOOL withStyles) {
 		TreeView_EnsureVisible(hwndTV, hSelParent);
 	}
 	TreeView_Select(hwndTV, hSelNode, TVGN_CARET);
+	return hFavoriteNode;
 }
 
 //=============================================================================
@@ -3988,7 +4018,7 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 		hwndTV = GetDlgItem(hwnd, IDC_STYLELIST);
 		TreeView_SetExtendedStyle(hwndTV, TVS_EX_DOUBLEBUFFER, TVS_EX_DOUBLEBUFFER);
 		//SetExplorerTheme(hwndTV);
-		Style_AddAllLexerToTreeView(hwndTV, TRUE);
+		Style_AddAllLexerToTreeView(hwndTV, TRUE, FALSE);
 
 		MultilineEditSetup(hwnd, IDC_STYLEEDIT);
 		MultilineEditSetup(hwnd, IDC_STYLEVALUE_DEFAULT);
@@ -4578,22 +4608,148 @@ static PEDITLEXER Lexer_GetFromTreeView(HWND hwndTV) {
 	return NULL;
 }
 
+static void Lexer_OnCheckStateChanged(HWND hwndTV, HTREEITEM hFavoriteNode, HTREEITEM hTreeNode) {
+	TVITEM item;
+	ZeroMemory(&item, sizeof(item));
+	item.mask = TVIF_PARAM;
+	item.hItem = hTreeNode;
+	TreeView_GetItem(hwndTV, &item);
+
+	const LPARAM lParam = item.lParam;
+	if (lParam == 0) {
+		return;
+	}
+
+	// toggle check state
+	const BOOL checked = !TreeView_GetCheckState(hwndTV, hTreeNode);
+	HTREEITEM hParent = TreeView_GetParent(hwndTV, hTreeNode);
+
+	BOOL found = FALSE;
+	hTreeNode = TreeView_GetChild(hwndTV, hFavoriteNode);
+	while (hTreeNode != NULL) {
+		item.hItem = hTreeNode;
+		TreeView_GetItem(hwndTV, &item);
+		if (item.lParam == lParam) {
+			found = TRUE;
+			break;
+		}
+		hTreeNode = TreeView_GetNextSibling(hwndTV, hTreeNode);
+	}
+
+	// add or remove node in Favorites
+	PEDITLEXER pLex = (PEDITLEXER)lParam;
+	if (checked) {
+		if (!found) {
+			hTreeNode = Style_AddLexerToTreeView(hwndTV, pLex, hFavoriteNode, FALSE);
+			TreeView_SetCheckState(hwndTV, hTreeNode, TRUE);
+		}
+		TreeView_Expand(hwndTV, hFavoriteNode, TVE_EXPAND);
+	} else {
+		pLex->iFavoriteOrder = 0;
+		if (found) {
+			TreeView_DeleteItem(hwndTV, hTreeNode);
+		}
+
+		if (hParent == hFavoriteNode) {
+			// update check state
+			const int ch = ToUpperA(pLex->pszName[0]);
+			WCHAR szTitle[4] = {0};
+			item.mask = TVIF_TEXT;
+			item.pszText = szTitle;
+			item.cchTextMax  = COUNTOF(szTitle);
+
+			hParent = TreeView_GetNextSibling(hwndTV, hParent);
+			found = FALSE;
+			while (!found && hParent != NULL) {
+				item.mask = TVIF_TEXT;
+				item.hItem = hParent;
+				TreeView_GetItem(hwndTV, &item);
+				// test group header
+				if (ch == szTitle[0]) {
+					item.mask = TVIF_PARAM;
+					hTreeNode = TreeView_GetChild(hwndTV, hParent);
+					while (hTreeNode != NULL) {
+						item.hItem = hTreeNode;
+						TreeView_GetItem(hwndTV, &item);
+						if (item.lParam == lParam) {
+							found = TRUE;
+							TreeView_SetCheckState(hwndTV, hTreeNode, checked);
+							break;
+						}
+						hTreeNode = TreeView_GetNextSibling(hwndTV, hTreeNode);
+					}
+				}
+
+				hParent = TreeView_GetNextSibling(hwndTV, hParent);
+			}
+		}
+	}
+}
+
+static void Style_GetFavoriteSchemesFromTreeView(HWND hwndTV, HTREEITEM hFavoriteNode) {
+	const int maxCch = MAX_FAVORITE_SCHEMES_CONFIG_SIZE - 3; // two digits, one space and NULL
+	WCHAR *wch = favoriteSchemesConfig;
+	int len = 0;
+	int count = 0;
+
+	TVITEM item;
+	ZeroMemory(&item, sizeof(item));
+	item.mask = TVIF_PARAM;
+
+	HTREEITEM hTreeNode = TreeView_GetChild(hwndTV, hFavoriteNode);
+	while (hTreeNode != NULL) {
+		item.hItem = hTreeNode;
+		TreeView_GetItem(hwndTV, &item);
+		if (item.lParam) {
+			PEDITLEXER pLex = (PEDITLEXER)item.lParam;
+			pLex->iFavoriteOrder = MAX_FAVORITE_SCHEMES_COUNT - count;
+
+			len += wsprintf(wch + len, L"%i ", pLex->rid - NP2LEX_TEXTFILE);
+			++count;
+			if (count == MAX_FAVORITE_SCHEMES_COUNT || len > maxCch) {
+				break;
+			}
+		}
+		hTreeNode = TreeView_GetNextSibling(hwndTV, hTreeNode);
+	}
+
+	wch[len--] = L'\0';
+	if (len >= 0) {
+		wch[len] = L'\0';
+	}
+
+	qsort(pLexArray + LEXER_INDEX_GENERAL, GENERAL_LEXER_COUNT, sizeof(PEDITLEXER), CmpEditLexer);
+}
+
 //=============================================================================
 //
 // Style_SelectLexerDlgProc()
 //
 static INT_PTR CALLBACK Style_SelectLexerDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
 	static HWND hwndTV;
+	static HTREEITEM hFavoriteNode;
 	static int iInternalDefault;
 
 	switch (umsg) {
 	case WM_INITDIALOG: {
+		SetWindowLongPtr(hwnd, DWLP_USER, lParam);
 		ResizeDlg_Init(hwnd, cxStyleSelectDlg, cyStyleSelectDlg, IDC_RESIZEGRIP3);
 
 		hwndTV = GetDlgItem(hwnd, IDC_STYLELIST);
+		const BOOL favorite = lParam != 0;
+		if (favorite) {
+			SetWindowLongPtr(hwndTV, GWL_STYLE, GetWindowLongPtr(hwndTV, GWL_STYLE) | TVS_CHECKBOXES);
+			WCHAR szTitle[128];
+			GetString(IDS_FAVORITE_SCHEMES_TITLE, szTitle, COUNTOF(szTitle));
+			SetWindowText(hwnd, szTitle);
+		}
+
 		TreeView_SetExtendedStyle(hwndTV, TVS_EX_DOUBLEBUFFER, TVS_EX_DOUBLEBUFFER);
 		//SetExplorerTheme(hwndTV);
-		Style_AddAllLexerToTreeView(hwndTV, FALSE);
+		hFavoriteNode = Style_AddAllLexerToTreeView(hwndTV, FALSE, favorite);
+		if (favorite) {
+			TreeView_EnsureVisible(hwndTV, hFavoriteNode);
+		}
 
 		iInternalDefault = pLexArray[iDefaultLexer]->rid;
 		if (iInternalDefault == pLexCurrent->rid) {
@@ -4635,6 +4791,21 @@ static INT_PTR CALLBACK Style_SelectLexerDlgProc(HWND hwnd, UINT umsg, WPARAM wP
 	case WM_NOTIFY:
 		if (((LPNMHDR)(lParam))->idFrom == IDC_STYLELIST) {
 			switch (((LPNMHDR)(lParam))->code) {
+			case NM_CLICK: {
+				// https://support.microsoft.com/en-us/help/261289/how-to-know-when-the-user-clicks-a-check-box-in-a-treeview-control
+				TVHITTESTINFO tvht = {0};
+				DWORD dwpos = GetMessagePos();
+				tvht.pt.x = GET_X_LPARAM(dwpos);
+				tvht.pt.y = GET_Y_LPARAM(dwpos);
+				MapWindowPoints(HWND_DESKTOP, hwndTV, &tvht.pt, 1);
+
+				TreeView_HitTest(hwndTV, &tvht);
+				if (tvht.hItem != NULL && (TVHT_ONITEMSTATEICON & tvht.flags)) {
+					Lexer_OnCheckStateChanged(hwndTV, hFavoriteNode, tvht.hItem);
+				}
+			}
+			break;
+
 			case NM_DBLCLK:
 				if (Lexer_GetFromTreeView(hwndTV)) {
 					SendWMCommand(hwnd, IDOK);
@@ -4671,10 +4842,16 @@ static INT_PTR CALLBACK Style_SelectLexerDlgProc(HWND hwnd, UINT umsg, WPARAM wP
 
 		case IDOK: {
 			PEDITLEXER pLex = Lexer_GetFromTreeView(hwndTV);
+			const LONG_PTR favorite = GetWindowLongPtr(hwnd, DWLP_USER);
 			if (pLex != NULL) {
-				pLexCurrent = pLex;
-				np2LexLangIndex = 0;
+				if (!favorite) {
+					pLexCurrent = pLex;
+					np2LexLangIndex = 0;
+				}
 				iDefaultLexer = Style_GetMatchLexerIndex(iInternalDefault);
+			}
+			if (favorite) {
+				Style_GetFavoriteSchemesFromTreeView(hwndTV, hFavoriteNode);
 			}
 
 			bAutoSelect = IsButtonChecked(hwnd, IDC_AUTOSELECT);
@@ -4695,11 +4872,11 @@ static INT_PTR CALLBACK Style_SelectLexerDlgProc(HWND hwnd, UINT umsg, WPARAM wP
 //
 // Style_SelectLexerDlg()
 //
-void Style_SelectLexerDlg(HWND hwnd) {
+void Style_SelectLexerDlg(HWND hwnd, BOOL favorite) {
 	const LPCEDITLEXER pLex = pLexCurrent;
 	const int langIndex = np2LexLangIndex;
-	if (IDOK == ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_STYLESELECT), GetParent(hwnd), Style_SelectLexerDlgProc, 0)) {
-		const BOOL bLexerChanged = pLex != pLexCurrent || langIndex != np2LexLangIndex;
+	if (IDOK == ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_STYLESELECT), GetParent(hwnd), Style_SelectLexerDlgProc, favorite)) {
+		const BOOL bLexerChanged = !favorite && pLex != pLexCurrent || langIndex != np2LexLangIndex;
 		if (bLexerChanged) {
 			Style_SetLexer(pLexCurrent, TRUE);
 		}
