@@ -1778,6 +1778,7 @@ static INT_PTR CALLBACK SelectEncodingDlgProc(HWND hwnd, UINT umsg, WPARAM wPara
 
 		HWND hwndTV = GetDlgItem(hwnd, IDC_ENCODINGLIST);
 		InitWindowCommon(hwndTV);
+		TreeView_SetExtendedStyle(hwndTV, TVS_EX_DOUBLEBUFFER, TVS_EX_DOUBLEBUFFER);
 		TreeView_SetImageList(hwndTV, himl, TVSIL_NORMAL);
 		Encoding_AddToTreeView(hwndTV, pdd->idEncoding, pdd->bRecodeOnly);
 
@@ -1823,16 +1824,10 @@ static INT_PTR CALLBACK SelectEncodingDlgProc(HWND hwnd, UINT umsg, WPARAM wPara
 			break;
 
 			case TVN_SELCHANGED: {
-				HWND hwndTV = GetDlgItem(hwnd, IDC_ENCODINGLIST);
 				LPNMTREEVIEW lpnmtv = (LPNMTREEVIEW)lParam;
-				TVITEM item;
-				ZeroMemory(&item, sizeof(item));
-				item.mask = TVIF_PARAM;
-				item.hItem = lpnmtv->itemNew.hItem;
-				TreeView_GetItem(hwndTV, &item);
-				EnableWindow(GetDlgItem(hwnd, IDOK), item.lParam != 0);
-				if (item.lParam == 0) {
-					TreeView_Expand(hwndTV, lpnmtv->itemNew.hItem, TVE_EXPAND);
+				EnableWindow(GetDlgItem(hwnd, IDOK), lpnmtv->itemNew.lParam != 0);
+				if (lpnmtv->itemNew.lParam == 0) {
+					TreeView_Expand(GetDlgItem(hwnd, IDC_ENCODINGLIST), lpnmtv->itemNew.hItem, TVE_EXPAND);
 				}
 			}
 			break;
