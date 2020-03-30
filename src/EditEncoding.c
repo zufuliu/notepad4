@@ -812,10 +812,10 @@ void Encoding_AddToTreeView(HWND hwnd, int idSel, BOOL bRecodeOnly) {
 		}
 	}
 
-	TreeView_Select(hwnd, hSelNode, TVGN_CARET);
 	if (hSelParent != NULL) {
 		TreeView_EnsureVisible(hwnd, hSelParent);
 	}
+	TreeView_Select(hwnd, hSelNode, TVGN_CARET);
 	NP2HeapFree(pEE);
 }
 
