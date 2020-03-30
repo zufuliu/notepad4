@@ -1333,7 +1333,7 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 	if (bLexerChanged) {
 		SciCall_SetLexer(iLexer);
 
-		if (iLexer == NP2LEX_CPP || iLexer == SCLEX_MATLAB) {
+		if (iLexer == SCLEX_CPP || iLexer == SCLEX_MATLAB) {
 			if (iLexer == NP2LEX_MATLAB) {
 				if (np2LexLangIndex == IDM_LANG_OCTAVE) {
 					rid = NP2LEX_OCTAVE;
