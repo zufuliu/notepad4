@@ -3741,7 +3741,7 @@ int Style_GetLexerIconId(LPCEDITLEXER pLex) {
 //
 // Style_AddLexerToTreeView()
 //
-HTREEITEM Style_AddLexerToTreeView(HWND hwnd, PEDITLEXER pLex, HTREEITEM hParent) {
+HTREEITEM Style_AddLexerToTreeView(HWND hwnd, PEDITLEXER pLex, HTREEITEM hParent, BOOL withStyles) {
 #if NP2_GET_LEXER_STYLE_NAME_FROM_RES
 	WCHAR tch[128];
 #endif
@@ -3766,6 +3766,9 @@ HTREEITEM Style_AddLexerToTreeView(HWND hwnd, PEDITLEXER pLex, HTREEITEM hParent
 	tvis.item.lParam = (LPARAM)pLex;
 
 	HTREEITEM hTreeNode = (HTREEITEM)TreeView_InsertItem(hwnd, &tvis);
+	if (!withStyles) {
+		return hTreeNode;
+	}
 
 	tvis.hParent = hTreeNode;
 	tvis.item.mask = TVIF_TEXT | TVIF_IMAGE | TVIF_SELECTEDIMAGE | TVIF_PARAM;
@@ -3848,11 +3851,11 @@ static void Style_ResetStyle(PEDITLEXER pLex, PEDITSTYLE pStyle) {
 	lstrcpy(pStyle->szValue, pStyle->pszDefault);
 }
 
-static void Style_AddAllLexerToTreeView(HWND hwndTV) {
+static void Style_AddAllLexerToTreeView(HWND hwndTV, BOOL withStyles) {
 	struct SchemeGroupInfo groupList[ALL_LEXER_COUNT];
 	int groupCount = 2;
 	groupList[0].group = 0;
-	groupList[0].count = LEXER_INDEX_GENERAL;
+	groupList[0].count = withStyles ? LEXER_INDEX_GENERAL : LEXER_INDEX_MATCH;
 	groupList[1].group = 1;
 	groupList[1].count = 0;
 
@@ -3891,7 +3894,7 @@ static void Style_AddAllLexerToTreeView(HWND hwndTV) {
 
 	HTREEITEM hSelNode = NULL;
 	HTREEITEM hSelParent = NULL;
-	iLexer = 0;
+	iLexer = withStyles ? 0 : LEXER_INDEX_MATCH;
 
 	for (int i = 0; i < groupCount; i++) {
 		const struct SchemeGroupInfo info = groupList[i];
@@ -3922,7 +3925,7 @@ static void Style_AddAllLexerToTreeView(HWND hwndTV) {
 		if (group <= 1) {
 			for (int j = 0; j < count; j++) {
 				PEDITLEXER pLex = pLexArray[iLexer++];
-				HTREEITEM hTreeNode = Style_AddLexerToTreeView(hwndTV, pLex, hParent);
+				HTREEITEM hTreeNode = Style_AddLexerToTreeView(hwndTV, pLex, hParent, withStyles);
 				if (hSelNode == NULL && pLex == pLexCurrent) {
 					hSelNode = hTreeNode;
 					hSelParent = hParent;
@@ -3934,7 +3937,7 @@ static void Style_AddAllLexerToTreeView(HWND hwndTV) {
 		} else {
 			for (int j = 0; j < count; j++) {
 				PEDITLEXER pLex = generalLex[iLexer++];
-				HTREEITEM hTreeNode = Style_AddLexerToTreeView(hwndTV, pLex, hParent);
+				HTREEITEM hTreeNode = Style_AddLexerToTreeView(hwndTV, pLex, hParent, withStyles);
 				if (hSelNode == NULL && pLex == pLexCurrent) {
 					hSelNode = hTreeNode;
 					hSelParent = hParent;
@@ -3985,7 +3988,7 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 		hwndTV = GetDlgItem(hwnd, IDC_STYLELIST);
 		TreeView_SetExtendedStyle(hwndTV, TVS_EX_DOUBLEBUFFER, TVS_EX_DOUBLEBUFFER);
 		//SetExplorerTheme(hwndTV);
-		Style_AddAllLexerToTreeView(hwndTV);
+		Style_AddAllLexerToTreeView(hwndTV, TRUE);
 
 		MultilineEditSetup(hwnd, IDC_STYLEEDIT);
 		MultilineEditSetup(hwnd, IDC_STYLEVALUE_DEFAULT);
@@ -4562,6 +4565,19 @@ void Style_ConfigDlg(HWND hwnd) {
 	}
 }
 
+static PEDITLEXER Lexer_GetFromTreeView(HWND hwndTV) {
+	HTREEITEM hTreeNode = TreeView_GetSelection(hwndTV);
+	if (hTreeNode != NULL) {
+		TVITEM item;
+		ZeroMemory(&item, sizeof(item));
+		item.mask = TVIF_PARAM;
+		item.hItem = hTreeNode;
+		TreeView_GetItem(hwndTV, &item);
+		return (PEDITLEXER)item.lParam;
+	}
+	return NULL;
+}
+
 //=============================================================================
 //
 // Style_SelectLexerDlgProc()
@@ -4571,46 +4587,15 @@ static INT_PTR CALLBACK Style_SelectLexerDlgProc(HWND hwnd, UINT umsg, WPARAM wP
 
 	switch (umsg) {
 	case WM_INITDIALOG: {
-		LVCOLUMN lvc = { LVCF_FMT | LVCF_TEXT, LVCFMT_LEFT, 0, NULL, -1, 0, 0, 0
-#if (NTDDI_VERSION >= NTDDI_VISTA)
-			, 0, 0, 0
-#endif
-		};
 		ResizeDlg_Init(hwnd, cxStyleSelectDlg, cyStyleSelectDlg, IDC_RESIZEGRIP3);
 
-		HWND hwndLV = GetDlgItem(hwnd, IDC_STYLELIST);
-		InitWindowCommon(hwndLV);
+		HWND hwndTV = GetDlgItem(hwnd, IDC_STYLELIST);
+		TreeView_SetExtendedStyle(hwndTV, TVS_EX_DOUBLEBUFFER, TVS_EX_DOUBLEBUFFER);
+		//SetExplorerTheme(hwndTV);
+		Style_AddAllLexerToTreeView(hwndTV, FALSE);
 
-		SHFILEINFO shfi;
-		ListView_SetImageList(hwndLV, (HIMAGELIST)SHGetFileInfo(L"C:\\", 0, &shfi,
-							  sizeof(SHFILEINFO), SHGFI_SMALLICON | SHGFI_SYSICONINDEX), LVSIL_SMALL);
-
-		ListView_SetImageList(hwndLV, (HIMAGELIST)SHGetFileInfo(L"C:\\", 0, &shfi,
-							  sizeof(SHFILEINFO), SHGFI_LARGEICON | SHGFI_SYSICONINDEX), LVSIL_NORMAL);
-
-		//SetExplorerTheme(hwndLV);
-		ListView_SetExtendedListViewStyle(hwndLV, /*LVS_EX_FULLROWSELECT|*/LVS_EX_DOUBLEBUFFER | LVS_EX_LABELTIP);
-		ListView_InsertColumn(hwndLV, 0, &lvc);
-
-		// Add lexers
-		int iCurrent = -1;
-		for (UINT iLexer = LEXER_INDEX_MATCH; iLexer < ALL_LEXER_COUNT; iLexer++) {
-			PEDITLEXER pLex = pLexArray[iLexer];
-			Style_AddLexerToListView(hwndLV, pLex);
-			if (iCurrent < 0 && pLex == pLexCurrent) {
-				iCurrent = iLexer - LEXER_INDEX_MATCH;
-			}
-		}
-
-		ListView_SetColumnWidth(hwndLV, 0, LVSCW_AUTOSIZE_USEHEADER);
-
-		// Select current lexer
-		iCurrent = max_i(0, iCurrent);
-		ListView_SetItemState(hwndLV, iCurrent, LVIS_FOCUSED | LVIS_SELECTED, LVIS_FOCUSED | LVIS_SELECTED);
-		ListView_EnsureVisible(hwndLV, iCurrent, FALSE);
-
-		iInternalDefault = iDefaultLexer - LEXER_INDEX_MATCH;
-		if (iInternalDefault == iCurrent) {
+		iInternalDefault = pLexArray[iDefaultLexer]->rid;
+		if (iInternalDefault == pLexCurrent->rid) {
 			CheckDlgButton(hwnd, IDC_DEFAULTSCHEME, BST_CHECKED);
 		}
 
@@ -4639,8 +4624,6 @@ static INT_PTR CALLBACK Style_SelectLexerDlgProc(HWND hwnd, UINT umsg, WPARAM wP
 		hdwp = DeferCtlPos(hdwp, hwnd, IDC_AUTOSELECT, 0, dy, SWP_NOSIZE);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDC_DEFAULTSCHEME, 0, dy, SWP_NOSIZE);
 		EndDeferWindowPos(hdwp);
-
-		ListView_SetColumnWidth(GetDlgItem(hwnd, IDC_STYLELIST), 0, LVSCW_AUTOSIZE_USEHEADER);
 	}
 	return TRUE;
 
@@ -4652,19 +4635,22 @@ static INT_PTR CALLBACK Style_SelectLexerDlgProc(HWND hwnd, UINT umsg, WPARAM wP
 		if (((LPNMHDR)(lParam))->idFrom == IDC_STYLELIST) {
 			switch (((LPNMHDR)(lParam))->code) {
 			case NM_DBLCLK:
-				SendWMCommand(hwnd, IDOK);
+				if (Lexer_GetFromTreeView(GetDlgItem(hwnd, IDC_STYLELIST))) {
+					SendWMCommand(hwnd, IDOK);
+				}
 				break;
 
-			case LVN_ITEMCHANGED:
-			case LVN_DELETEITEM: {
-				const int i = ListView_GetNextItem(GetDlgItem(hwnd, IDC_STYLELIST), -1, LVNI_ALL | LVNI_SELECTED);
-				if (iInternalDefault == i) {
-					CheckDlgButton(hwnd, IDC_DEFAULTSCHEME, BST_CHECKED);
+			case TVN_SELCHANGED: {
+				LPNMTREEVIEW lpnmtv = (LPNMTREEVIEW)lParam;
+				PEDITLEXER pLex = (PEDITLEXER)lpnmtv->itemNew.lParam;
+				const BOOL selected = pLex != NULL;
+				if (selected) {
+					CheckDlgButton(hwnd, IDC_DEFAULTSCHEME, (iInternalDefault == pLex->rid)? BST_CHECKED : BST_UNCHECKED);
 				} else {
-					CheckDlgButton(hwnd, IDC_DEFAULTSCHEME, BST_UNCHECKED);
+					TreeView_Expand(GetDlgItem(hwnd, IDC_STYLELIST), lpnmtv->itemNew.hItem, TVE_EXPAND);
 				}
-				EnableWindow(GetDlgItem(hwnd, IDC_DEFAULTSCHEME), i != -1);
-				EnableWindow(GetDlgItem(hwnd, IDOK), i != -1);
+				EnableWindow(GetDlgItem(hwnd, IDOK), selected);
+				EnableWindow(GetDlgItem(hwnd, IDC_DEFAULTSCHEME), selected);
 			}
 			break;
 			}
@@ -4674,23 +4660,21 @@ static INT_PTR CALLBACK Style_SelectLexerDlgProc(HWND hwnd, UINT umsg, WPARAM wP
 	case WM_COMMAND:
 		switch (LOWORD(wParam)) {
 		case IDC_DEFAULTSCHEME:
+			iInternalDefault = NP2LEX_TEXTFILE;
 			if (IsButtonChecked(hwnd, IDC_DEFAULTSCHEME)) {
-				iInternalDefault = ListView_GetNextItem(GetDlgItem(hwnd, IDC_STYLELIST), -1, LVNI_ALL | LVNI_SELECTED);
-			} else {
-				iInternalDefault = 0;
+				PEDITLEXER pLex = Lexer_GetFromTreeView(GetDlgItem(hwnd, IDC_STYLELIST));
+				if (pLex != NULL) {
+					iInternalDefault = pLex->rid;
+				}
 			}
 			break;
 
 		case IDOK: {
-			HWND hwndLV = GetDlgItem(hwnd, IDC_STYLELIST);
-			LVITEM lvi;
-
-			lvi.mask = LVIF_PARAM;
-			lvi.iItem = ListView_GetNextItem(hwndLV, -1, LVNI_ALL | LVNI_SELECTED);
-			if (ListView_GetItem(hwndLV, &lvi)) {
-				pLexCurrent = (PEDITLEXER)lvi.lParam;
+			PEDITLEXER pLex = Lexer_GetFromTreeView(GetDlgItem(hwnd, IDC_STYLELIST));
+			if (pLex != NULL) {
+				pLexCurrent = pLex;
 				np2LexLangIndex = 0;
-				iDefaultLexer = iInternalDefault + LEXER_INDEX_MATCH;
+				iDefaultLexer = Style_GetMatchLexerIndex(iInternalDefault);
 				bAutoSelect = IsButtonChecked(hwnd, IDC_AUTOSELECT);
 				EndDialog(hwnd, IDOK);
 			}
