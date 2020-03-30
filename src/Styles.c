@@ -3894,8 +3894,8 @@ static void Style_AddAllLexerToTreeView(HWND hwndTV, BOOL withStyles) {
 
 	HTREEITEM hSelNode = NULL;
 	HTREEITEM hSelParent = NULL;
-	iLexer = withStyles ? 0 : LEXER_INDEX_MATCH;
 
+	iLexer = LEXER_INDEX_GENERAL - groupList[0].count;
 	for (int i = 0; i < groupCount; i++) {
 		const struct SchemeGroupInfo info = groupList[i];
 		const int group = info.group;
@@ -4583,13 +4583,14 @@ static PEDITLEXER Lexer_GetFromTreeView(HWND hwndTV) {
 // Style_SelectLexerDlgProc()
 //
 static INT_PTR CALLBACK Style_SelectLexerDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
+	static HWND hwndTV;
 	static int iInternalDefault;
 
 	switch (umsg) {
 	case WM_INITDIALOG: {
 		ResizeDlg_Init(hwnd, cxStyleSelectDlg, cyStyleSelectDlg, IDC_RESIZEGRIP3);
 
-		HWND hwndTV = GetDlgItem(hwnd, IDC_STYLELIST);
+		hwndTV = GetDlgItem(hwnd, IDC_STYLELIST);
 		TreeView_SetExtendedStyle(hwndTV, TVS_EX_DOUBLEBUFFER, TVS_EX_DOUBLEBUFFER);
 		//SetExplorerTheme(hwndTV);
 		Style_AddAllLexerToTreeView(hwndTV, FALSE);
@@ -4635,7 +4636,7 @@ static INT_PTR CALLBACK Style_SelectLexerDlgProc(HWND hwnd, UINT umsg, WPARAM wP
 		if (((LPNMHDR)(lParam))->idFrom == IDC_STYLELIST) {
 			switch (((LPNMHDR)(lParam))->code) {
 			case NM_DBLCLK:
-				if (Lexer_GetFromTreeView(GetDlgItem(hwnd, IDC_STYLELIST))) {
+				if (Lexer_GetFromTreeView(hwndTV)) {
 					SendWMCommand(hwnd, IDOK);
 				}
 				break;
@@ -4647,9 +4648,8 @@ static INT_PTR CALLBACK Style_SelectLexerDlgProc(HWND hwnd, UINT umsg, WPARAM wP
 				if (selected) {
 					CheckDlgButton(hwnd, IDC_DEFAULTSCHEME, (iInternalDefault == pLex->rid)? BST_CHECKED : BST_UNCHECKED);
 				} else {
-					TreeView_Expand(GetDlgItem(hwnd, IDC_STYLELIST), lpnmtv->itemNew.hItem, TVE_EXPAND);
+					TreeView_Expand(hwndTV, lpnmtv->itemNew.hItem, TVE_EXPAND);
 				}
-				EnableWindow(GetDlgItem(hwnd, IDOK), selected);
 				EnableWindow(GetDlgItem(hwnd, IDC_DEFAULTSCHEME), selected);
 			}
 			break;
@@ -4662,7 +4662,7 @@ static INT_PTR CALLBACK Style_SelectLexerDlgProc(HWND hwnd, UINT umsg, WPARAM wP
 		case IDC_DEFAULTSCHEME:
 			iInternalDefault = NP2LEX_TEXTFILE;
 			if (IsButtonChecked(hwnd, IDC_DEFAULTSCHEME)) {
-				PEDITLEXER pLex = Lexer_GetFromTreeView(GetDlgItem(hwnd, IDC_STYLELIST));
+				PEDITLEXER pLex = Lexer_GetFromTreeView(hwndTV);
 				if (pLex != NULL) {
 					iInternalDefault = pLex->rid;
 				}
@@ -4670,14 +4670,15 @@ static INT_PTR CALLBACK Style_SelectLexerDlgProc(HWND hwnd, UINT umsg, WPARAM wP
 			break;
 
 		case IDOK: {
-			PEDITLEXER pLex = Lexer_GetFromTreeView(GetDlgItem(hwnd, IDC_STYLELIST));
+			PEDITLEXER pLex = Lexer_GetFromTreeView(hwndTV);
 			if (pLex != NULL) {
 				pLexCurrent = pLex;
 				np2LexLangIndex = 0;
 				iDefaultLexer = Style_GetMatchLexerIndex(iInternalDefault);
-				bAutoSelect = IsButtonChecked(hwnd, IDC_AUTOSELECT);
-				EndDialog(hwnd, IDOK);
 			}
+
+			bAutoSelect = IsButtonChecked(hwnd, IDC_AUTOSELECT);
+			EndDialog(hwnd, IDOK);
 		}
 		break;
 
