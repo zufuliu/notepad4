@@ -648,6 +648,16 @@ static int __cdecl CmpEditLexer(const void *p1, const void *p2) {
 	return cmp;
 }
 
+static int __cdecl CmpEditLexerByName(const void *p1, const void *p2) {
+	LPCEDITLEXER pLex1 = *(LPCEDITLEXER *)(p1);
+	LPCEDITLEXER pLex2 = *(LPCEDITLEXER *)(p2);
+	// TODO: sort by localized name
+#if NP2_GET_LEXER_STYLE_NAME_FROM_RES
+#endif
+	int cmp = StrCmpIW(pLex1->pszName, pLex2->pszName);
+	return cmp;
+}
+
 //=============================================================================
 //
 // Style_Load()
@@ -3731,7 +3741,7 @@ int Style_GetLexerIconId(LPCEDITLEXER pLex) {
 //
 // Style_AddLexerToTreeView()
 //
-HTREEITEM Style_AddLexerToTreeView(HWND hwnd, PEDITLEXER pLex) {
+HTREEITEM Style_AddLexerToTreeView(HWND hwnd, PEDITLEXER pLex, HTREEITEM hParent) {
 #if NP2_GET_LEXER_STYLE_NAME_FROM_RES
 	WCHAR tch[128];
 #endif
@@ -3739,6 +3749,7 @@ HTREEITEM Style_AddLexerToTreeView(HWND hwnd, PEDITLEXER pLex) {
 	TVINSERTSTRUCT tvis;
 	ZeroMemory(&tvis, sizeof(TVINSERTSTRUCT));
 
+	tvis.hParent = hParent;
 	tvis.hInsertAfter = TVI_LAST;
 	tvis.item.mask = TVIF_TEXT | TVIF_IMAGE | TVIF_SELECTEDIMAGE | TVIF_PARAM;
 #if NP2_GET_LEXER_STYLE_NAME_FROM_RES
@@ -3815,6 +3826,11 @@ struct StyleConfigDlgParam {
 	LPWSTR styleBackup[ALL_LEXER_COUNT];
 };
 
+struct SchemeGroupInfo {
+	int group;
+	int count;
+};
+
 static void Style_ResetStyle(PEDITLEXER pLex, PEDITSTYLE pStyle) {
 	if (np2StyleTheme != StyleTheme_Default) {
 		// reload style from external file
@@ -3830,6 +3846,111 @@ static void Style_ResetStyle(PEDITLEXER pLex, PEDITSTYLE pStyle) {
 
 	// reset style to built-in default
 	lstrcpy(pStyle->szValue, pStyle->pszDefault);
+}
+
+static void Style_AddAllLexerToTreeView(HWND hwndTV) {
+	struct SchemeGroupInfo groupList[ALL_LEXER_COUNT];
+	int groupCount = 2;
+	groupList[0].group = 0;
+	groupList[0].count = LEXER_INDEX_GENERAL;
+	groupList[1].group = 1;
+	groupList[1].count = 0;
+
+	// favorite schemes
+	int iLexer = LEXER_INDEX_GENERAL;
+	while (iLexer < ALL_LEXER_COUNT && pLexArray[iLexer]->iFavoriteOrder) {
+		++iLexer;
+		++groupList[1].count;
+	}
+
+	// all general schemes
+	PEDITLEXER generalLex[GENERAL_LEXER_COUNT];
+	memcpy(generalLex, pLexArray + LEXER_INDEX_GENERAL, sizeof(generalLex));
+	qsort(generalLex, GENERAL_LEXER_COUNT, sizeof(PEDITLEXER), CmpEditLexerByName);
+
+	iLexer = 0;
+	while (iLexer < GENERAL_LEXER_COUNT) {
+		PEDITLEXER pLex = generalLex[iLexer++];
+		int count = 1;
+		const int ch = ToUpperA(pLex->pszName[0]);
+		while (iLexer < GENERAL_LEXER_COUNT && ch == ToUpperA(generalLex[iLexer]->pszName[0])) {
+			++iLexer;
+			++count;
+		}
+		groupList[groupCount].group = ch;
+		groupList[groupCount].count = count;
+		++groupCount;
+	}
+
+	SHFILEINFO shfi;
+	HIMAGELIST himl = (HIMAGELIST)SHGetFileInfo(L"C:\\", 0, &shfi, sizeof(SHFILEINFO), SHGFI_SMALLICON | SHGFI_SYSICONINDEX);
+	TreeView_SetImageList(hwndTV, himl, TVSIL_NORMAL);
+	// folder icon
+	SHGetFileInfo(L"Icon", FILE_ATTRIBUTE_DIRECTORY, &shfi, sizeof(SHFILEINFO), SHGFI_ICON | SHGFI_SMALLICON | SHGFI_USEFILEATTRIBUTES);
+	const int folderIcon = shfi.iIcon;
+
+	HTREEITEM hSelNode = NULL;
+	HTREEITEM hSelParent = NULL;
+	iLexer = 0;
+
+	for (int i = 0; i < groupCount; i++) {
+		const struct SchemeGroupInfo info = groupList[i];
+		const int group = info.group;
+		const int count = info.count;
+
+		HTREEITEM hParent = NULL;
+		if (group != 0) {
+			WCHAR szTitle[128];
+			if (group == 1) {
+				GetString(IDT_FILE_OPENFAV, szTitle, COUNTOF(szTitle));
+			} else {
+				szTitle[0] = (WCHAR)group;
+				szTitle[1] = L'\0';
+			}
+
+			TVINSERTSTRUCT tvis;
+			ZeroMemory(&tvis, sizeof(TVINSERTSTRUCT));
+			tvis.hInsertAfter = TVI_LAST;
+			tvis.item.mask = TVIF_TEXT | TVIF_IMAGE | TVIF_SELECTEDIMAGE | TVIF_PARAM;
+			tvis.item.pszText = szTitle;
+			tvis.item.iImage = folderIcon;
+			tvis.item.iSelectedImage = folderIcon;
+			tvis.item.lParam = 0; // group
+			hParent = (HTREEITEM)TreeView_InsertItem(hwndTV, &tvis);
+		}
+
+		if (group <= 1) {
+			for (int j = 0; j < count; j++) {
+				PEDITLEXER pLex = pLexArray[iLexer++];
+				HTREEITEM hTreeNode = Style_AddLexerToTreeView(hwndTV, pLex, hParent);
+				if (hSelNode == NULL && pLex == pLexCurrent) {
+					hSelNode = hTreeNode;
+					hSelParent = hParent;
+				}
+			}
+			if (groupList[group + 1].group > 1) {
+				iLexer = 0;
+			}
+		} else {
+			for (int j = 0; j < count; j++) {
+				PEDITLEXER pLex = generalLex[iLexer++];
+				HTREEITEM hTreeNode = Style_AddLexerToTreeView(hwndTV, pLex, hParent);
+				if (hSelNode == NULL && pLex == pLexCurrent) {
+					hSelNode = hTreeNode;
+					hSelParent = hParent;
+				}
+			}
+		}
+
+		if (hParent != NULL) {
+			TreeView_Expand(hwndTV, hParent, TVE_EXPAND);
+		}
+	}
+
+	if (hSelParent != NULL) {
+		TreeView_EnsureVisible(hwndTV, hSelParent);
+	}
+	TreeView_Select(hwndTV, hSelNode, TVGN_CARET);
 }
 
 //=============================================================================
@@ -3855,32 +3976,16 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 		GetString(idsTitle, szTitle, COUNTOF(szTitle));
 		SetWindowText(hwnd, szTitle);
 
-		hwndTV = GetDlgItem(hwnd, IDC_STYLELIST);
 		fDragging = FALSE;
 		fLexerSelected = FALSE;
 		iCurrentStyleIndex = -1;
-
-		SHFILEINFO shfi;
-		TreeView_SetImageList(hwndTV,
-							  (HIMAGELIST)SHGetFileInfo(L"C:\\", 0, &shfi, sizeof(SHFILEINFO),
-									  SHGFI_SMALLICON | SHGFI_SYSICONINDEX), TVSIL_NORMAL);
-
-		// Add lexers
-		HTREEITEM currentLex = NULL;
-		for (UINT iLexer = 0; iLexer < ALL_LEXER_COUNT; iLexer++) {
-			PEDITLEXER pLex = pLexArray[iLexer];
-			if (currentLex == NULL && pLex == pLexCurrent) {
-				currentLex = Style_AddLexerToTreeView(hwndTV, pLex);
-			} else {
-				Style_AddLexerToTreeView(hwndTV, pLex);
-			}
-		}
-
+		pCurrentLexer = NULL;
 		pCurrentStyle = NULL;
 
+		hwndTV = GetDlgItem(hwnd, IDC_STYLELIST);
+		TreeView_SetExtendedStyle(hwndTV, TVS_EX_DOUBLEBUFFER, TVS_EX_DOUBLEBUFFER);
 		//SetExplorerTheme(hwndTV);
-		//TreeView_Expand(hwndTV, TreeView_GetRoot(hwndTV), TVE_EXPAND);
-		TreeView_Select(hwndTV, currentLex, TVGN_CARET);
+		Style_AddAllLexerToTreeView(hwndTV);
 
 		MultilineEditSetup(hwnd, IDC_STYLEEDIT);
 		MultilineEditSetup(hwnd, IDC_STYLEVALUE_DEFAULT);
@@ -3964,22 +4069,48 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 					}
 				}
 
-				HTREEITEM hParent = TreeView_GetParent(hwndTV, lpnmtv->itemNew.hItem);
-				fLexerSelected = hParent == NULL;
+				fLexerSelected = FALSE;
 				iCurrentStyleIndex = -1;
+				pCurrentStyle = NULL;
+
+				HTREEITEM hParent = TreeView_GetParent(hwndTV, lpnmtv->itemNew.hItem);
+				if (hParent == NULL) {
+					if (lpnmtv->itemNew.lParam == 0) {
+						pCurrentLexer = NULL;
+					} else {
+						fLexerSelected = TRUE;
+						pCurrentLexer = (PEDITLEXER)lpnmtv->itemNew.lParam;
+					}
+				} else {
+					TVITEM item;
+					ZeroMemory(&item, sizeof(item));
+					item.mask = TVIF_PARAM;
+					item.hItem = hParent;
+					TreeView_GetItem(hwndTV, &item);
+
+					if (item.lParam == 0) {
+						fLexerSelected = TRUE;
+						pCurrentLexer = (PEDITLEXER)lpnmtv->itemNew.lParam;
+					} else {
+						pCurrentLexer = (PEDITLEXER)item.lParam;
+						pCurrentStyle = (PEDITSTYLE)lpnmtv->itemNew.lParam;
+					}
+				}
+				if (hParent == NULL || fLexerSelected) {
+					TreeView_Expand(hwndTV, lpnmtv->itemNew.hItem, TVE_EXPAND);
+				}
+
 				UINT enableMask = StyleControl_None;
 				// a lexer has been selected
-				if (hParent == NULL) {
-					WCHAR wch[MAX_EDITLEXER_EXT_SIZE];
-
-					GetDlgItemText(hwnd, IDC_STYLELABELS, wch, COUNTOF(wch));
-					if (StrChr(wch, L'|')) {
-						*StrChr(wch, L'|') = 0;
-					}
-
-					pCurrentLexer = (PEDITLEXER)lpnmtv->itemNew.lParam;
-					pCurrentStyle = NULL;
+				if (fLexerSelected) {
 					if (pCurrentLexer != NULL) {
+						WCHAR wch[MAX_EDITLEXER_EXT_SIZE];
+
+						GetDlgItemText(hwnd, IDC_STYLELABELS, wch, COUNTOF(wch));
+						if (StrChr(wch, L'|')) {
+							*StrChr(wch, L'|') = 0;
+						}
+
 						SetDlgItemText(hwnd, IDC_STYLELABEL, wch);
 						EnableWindow(GetDlgItem(hwnd, IDC_STYLEEDIT), (pCurrentLexer->szExtensions != NULL));
 						EnableWindow(GetDlgItem(hwnd, IDC_STYLEDEFAULT), TRUE);
@@ -3988,25 +4119,16 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 					}
 				}
 
-				// a style has been selected
+				// a style or group has been selected
 				else {
-					WCHAR wch[MAX_EDITSTYLE_VALUE_SIZE];
-
-					GetDlgItemText(hwnd, IDC_STYLELABELS, wch, COUNTOF(wch));
-					if (StrChr(wch, L'|')) {
-						*StrChr(wch, L'|') = 0;
-					}
-
-					// TVS_SINGLEEXPAND: CTRL key.
-					TVITEM item;
-					ZeroMemory(&item, sizeof(item));
-					item.mask = TVIF_PARAM;
-					item.hItem = hParent;
-					TreeView_GetItem(hwndTV, &item);
-					pCurrentLexer = (PEDITLEXER)item.lParam;
-
-					pCurrentStyle = (PEDITSTYLE)lpnmtv->itemNew.lParam;
 					if (pCurrentStyle != NULL) {
+						WCHAR wch[MAX_EDITSTYLE_VALUE_SIZE];
+
+						GetDlgItemText(hwnd, IDC_STYLELABELS, wch, COUNTOF(wch));
+						if (StrChr(wch, L'|')) {
+							*StrChr(wch, L'|') = 0;
+						}
+
 						SetDlgItemText(hwnd, IDC_STYLELABEL, StrEnd(wch) + 1);
 						EnableWindow(GetDlgItem(hwnd, IDC_STYLEEDIT), TRUE);
 						EnableWindow(GetDlgItem(hwnd, IDC_STYLEBACK), TRUE);
