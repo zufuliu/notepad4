@@ -469,6 +469,7 @@ BEGIN
 	BEGIN
 		MENUITEM "&Syntax Scheme...\tF12",			IDM_VIEW_SCHEME
 		MENUITEM "&Customize Schemes...\tCtrl+F12",	IDM_VIEW_SCHEME_CONFIG
+		MENUITEM "&Favorite Schemes...",			IDM_VIEW_SCHEME_FAVORITE
 		MENUITEM "Use &2nd Global Styles\tShift+F12",IDM_VIEW_USE2NDGLOBALSTYLE
 		MENUITEM "&Use Default Code Style",			IDM_VIEW_USEDEFAULT_CODESTYLE
 		POPUP "St&yle Theme"

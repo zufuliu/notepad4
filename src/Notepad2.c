@@ -3746,7 +3746,8 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	case IDM_VIEW_SCHEME:
-		Style_SelectLexerDlg(hwndEdit);
+	case IDM_VIEW_SCHEME_FAVORITE:
+		Style_SelectLexerDlg(hwndEdit, LOWORD(wParam) == IDM_VIEW_SCHEME_FAVORITE);
 		break;
 
 	case IDM_VIEW_SCHEME_CONFIG:
