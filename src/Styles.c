@@ -3915,18 +3915,21 @@ static HTREEITEM Style_AddAllLexerToTreeView(HWND hwndTV, BOOL withStyles, BOOL 
 			TVINSERTSTRUCT tvis;
 			ZeroMemory(&tvis, sizeof(TVINSERTSTRUCT));
 			tvis.hInsertAfter = TVI_LAST;
-			tvis.item.mask = TVIF_TEXT | TVIF_IMAGE | TVIF_SELECTEDIMAGE | TVIF_PARAM;
+			tvis.item.mask = TVIF_TEXT | TVIF_IMAGE | TVIF_SELECTEDIMAGE | TVIF_PARAM | TVIF_STATE;
 			tvis.item.pszText = szTitle;
 			tvis.item.iImage = folderIcon;
 			tvis.item.iSelectedImage = folderIcon;
 			tvis.item.lParam = 0; // group
+			// expand all group
+			tvis.item.state = TVIS_EXPANDED;
+			tvis.item.stateMask = TVIS_EXPANDED;
 			hParent = (HTREEITEM)TreeView_InsertItem(hwndTV, &tvis);
 
 			if (group == 1) {
 				hFavoriteNode = hParent;
 			}
 			if (withCheckBox) {
-				// remove checkbox
+				// remove checkbox for group folder
 				tvis.item.hItem = hParent;
 				tvis.item.mask = TVIF_STATE;
 				tvis.item.state = 0;
@@ -3947,6 +3950,7 @@ static HTREEITEM Style_AddAllLexerToTreeView(HWND hwndTV, BOOL withStyles, BOOL 
 					if (pLex->iFavoriteOrder) {
 						TreeView_SetCheckState(hwndTV, hTreeNode, TRUE);
 					} else if (group == 0) {
+						// remove checkbox for Text File
 						TVITEM item;
 						ZeroMemory(&item, sizeof(item));
 						item.hItem = hTreeNode;
@@ -3972,10 +3976,6 @@ static HTREEITEM Style_AddAllLexerToTreeView(HWND hwndTV, BOOL withStyles, BOOL 
 					TreeView_SetCheckState(hwndTV, hTreeNode, TRUE);
 				}
 			}
-		}
-
-		if (hParent != NULL) {
-			TreeView_Expand(hwndTV, hParent, TVE_EXPAND);
 		}
 	}
 
@@ -4636,7 +4636,7 @@ static void Lexer_OnCheckStateChanged(HWND hwndTV, HTREEITEM hFavoriteNode, HTRE
 		hTreeNode = TreeView_GetNextSibling(hwndTV, hTreeNode);
 	}
 
-	// add or remove node in Favorites
+	// add or remove node in Favorite Schemes
 	PEDITLEXER pLex = (PEDITLEXER)lParam;
 	if (checked) {
 		if (!found) {
