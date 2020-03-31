@@ -3766,18 +3766,21 @@ HTREEITEM Style_AddLexerToTreeView(HWND hwnd, PEDITLEXER pLex, HTREEITEM hParent
 	tvis.item.iSelectedImage = tvis.item.iImage;
 	tvis.item.lParam = (LPARAM)pLex;
 
-	HTREEITEM hTreeNode = TreeView_InsertItem(hwnd, &tvis);
+	hParent = TreeView_InsertItem(hwnd, &tvis);
 	if (!withStyles) {
-		return hTreeNode;
+		return hParent;
 	}
 
-	tvis.hParent = hTreeNode;
+	tvis.hParent = hParent;
 	tvis.item.mask = TVIF_TEXT | TVIF_IMAGE | TVIF_SELECTEDIMAGE | TVIF_PARAM;
 	//tvis.item.iImage = -1;
 	//tvis.item.iSelectedImage = -1;
 
+	HTREEITEM hTreeNode = TVI_FIRST;
 	const UINT iStyleCount = pLex->iStyleCount;
+
 	for (UINT i = 0; i < iStyleCount; i++) {
+		tvis.hInsertAfter = hTreeNode;
 #if NP2_GET_LEXER_STYLE_NAME_FROM_RES
 		if (GetString(pLex->Styles[i].rid, tch, COUNTOF(tch))) {
 			tvis.item.pszText = tch;
@@ -3788,10 +3791,10 @@ HTREEITEM Style_AddLexerToTreeView(HWND hwnd, PEDITLEXER pLex, HTREEITEM hParent
 		tvis.item.pszText = (WCHAR *)pLex->Styles[i].pszName;
 #endif
 		tvis.item.lParam = (LPARAM)(&pLex->Styles[i]);
-		TreeView_InsertItem(hwnd, &tvis);
+		hTreeNode = TreeView_InsertItem(hwnd, &tvis);
 	}
 
-	return hTreeNode;
+	return hParent;
 }
 
 //=============================================================================
