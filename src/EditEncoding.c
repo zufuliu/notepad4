@@ -735,8 +735,9 @@ void Encoding_AddToTreeView(HWND hwnd, int idSel, BOOL bRecodeOnly) {
 	WCHAR wchBuf[256];
 	TVINSERTSTRUCT tvis;
 	ZeroMemory(&tvis, sizeof(TVINSERTSTRUCT));
-	tvis.hInsertAfter = TVI_LAST;
 	tvis.item.mask = TVIF_TEXT | TVIF_IMAGE | TVIF_SELECTEDIMAGE | TVIF_PARAM;
+
+	HTREEITEM hParent = TVI_FIRST;
 	HTREEITEM hSelNode = NULL;
 	HTREEITEM hSelParent = NULL;
 
@@ -756,27 +757,32 @@ void Encoding_AddToTreeView(HWND hwnd, int idSel, BOOL bRecodeOnly) {
 		} else if (id == CPI_OEM) {
 			StrCatBuff(wchBuf, wchOEM, COUNTOF(wchBuf));
 		}
+
+		tvis.hInsertAfter = hParent;
 		tvis.item.pszText = wchBuf;
 		tvis.item.iImage = IsValidEncoding(id) ? 0 : 1;
 		tvis.item.iSelectedImage = tvis.item.iImage;
 		tvis.item.lParam = 1 + id;
 
-		HTREEITEM hTreeNode = TreeView_InsertItem(hwnd, &tvis);
+		hParent = TreeView_InsertItem(hwnd, &tvis);
 		if (idSel == id) {
-			hSelNode = hTreeNode;
+			hSelNode = hParent;
 		}
 	}
 
 	for (UINT i = 0; i < COUNTOF(sEncodingGroupList); i++) {
 		const NP2EncodingGroup *group = &sEncodingGroupList[pEE[i].id];
 		tvis.hParent = NULL;
+		tvis.hInsertAfter = hParent;
 		tvis.item.pszText = pEE[i].wch;
 		tvis.item.iImage = 2; // folder
 		tvis.item.iSelectedImage = 2;
 		tvis.item.lParam = 0; // group
 
-		HTREEITEM hParent = TreeView_InsertItem(hwnd, &tvis);
+		hParent = TreeView_InsertItem(hwnd, &tvis);
 		tvis.hParent = hParent;
+
+		HTREEITEM hTreeNode = TVI_FIRST;
 		BOOL expand = i < 2; // Unicode, Western European
 
 		for (UINT j = 0; j < COUNTOF(group->encodings); j++) {
@@ -791,12 +797,13 @@ void Encoding_AddToTreeView(HWND hwnd, int idSel, BOOL bRecodeOnly) {
 					*pwsz = L'\0';
 				}
 
+				tvis.hInsertAfter = hTreeNode;
 				tvis.item.pszText = wchBuf;
 				tvis.item.iImage = IsValidEncoding(id) ? 0 : 1;
 				tvis.item.iSelectedImage = tvis.item.iImage;
 				tvis.item.lParam = 1 + id;
 
-				HTREEITEM hTreeNode = TreeView_InsertItem(hwnd, &tvis);
+				hTreeNode = TreeView_InsertItem(hwnd, &tvis);
 				if (idSel == id) {
 					hSelNode = hTreeNode;
 					hSelParent = hParent;
