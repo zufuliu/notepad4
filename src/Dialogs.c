@@ -24,6 +24,7 @@
 #include <shellapi.h>
 #include <commctrl.h>
 #include <commdlg.h>
+#include <uxtheme.h>
 #include "SciCall.h"
 #include "Helpers.h"
 #include "Notepad2.h"
@@ -1779,6 +1780,8 @@ static INT_PTR CALLBACK SelectEncodingDlgProc(HWND hwnd, UINT umsg, WPARAM wPara
 		HWND hwndTV = GetDlgItem(hwnd, IDC_ENCODINGLIST);
 		InitWindowCommon(hwndTV);
 		TreeView_SetExtendedStyle(hwndTV, TVS_EX_DOUBLEBUFFER, TVS_EX_DOUBLEBUFFER);
+		SetExplorerTheme(hwndTV);
+
 		TreeView_SetImageList(hwndTV, himl, TVSIL_NORMAL);
 		Encoding_AddToTreeView(hwndTV, pdd->idEncoding, pdd->bRecodeOnly);
 

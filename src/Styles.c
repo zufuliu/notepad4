@@ -24,6 +24,7 @@
 #include <shlobj.h>
 #include <commctrl.h>
 #include <commdlg.h>
+#include <uxtheme.h>
 #include <stdio.h>
 #include <math.h>
 #include "SciCall.h"
@@ -3868,7 +3869,7 @@ static HTREEITEM Style_AddAllLexerToTreeView(HWND hwndTV, BOOL withStyles, BOOL 
 
 	// all general schemes
 	PEDITLEXER generalLex[GENERAL_LEXER_COUNT];
-	memcpy(generalLex, pLexArray + LEXER_INDEX_GENERAL, sizeof(generalLex));
+	CopyMemory(generalLex, pLexArray + LEXER_INDEX_GENERAL, sizeof(generalLex));
 	qsort(generalLex, GENERAL_LEXER_COUNT, sizeof(PEDITLEXER), CmpEditLexerByName);
 
 	iLexer = 0;
@@ -3884,6 +3885,10 @@ static HTREEITEM Style_AddAllLexerToTreeView(HWND hwndTV, BOOL withStyles, BOOL 
 		groupList[groupCount].count = count;
 		++groupCount;
 	}
+
+	InitWindowCommon(hwndTV);
+	TreeView_SetExtendedStyle(hwndTV, TVS_EX_DOUBLEBUFFER, TVS_EX_DOUBLEBUFFER);
+	SetExplorerTheme(hwndTV);
 
 	SHFILEINFO shfi;
 	HIMAGELIST himl = (HIMAGELIST)SHGetFileInfo(L"C:\\", 0, &shfi, sizeof(SHFILEINFO), SHGFI_SMALLICON | SHGFI_SYSICONINDEX);
@@ -4016,8 +4021,6 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 		pCurrentStyle = NULL;
 
 		hwndTV = GetDlgItem(hwnd, IDC_STYLELIST);
-		TreeView_SetExtendedStyle(hwndTV, TVS_EX_DOUBLEBUFFER, TVS_EX_DOUBLEBUFFER);
-		//SetExplorerTheme(hwndTV);
 		Style_AddAllLexerToTreeView(hwndTV, TRUE, FALSE);
 
 		MultilineEditSetup(hwnd, IDC_STYLEEDIT);
@@ -4741,8 +4744,6 @@ static INT_PTR CALLBACK Style_SelectLexerDlgProc(HWND hwnd, UINT umsg, WPARAM wP
 			SetWindowText(hwnd, szTitle);
 		}
 
-		TreeView_SetExtendedStyle(hwndTV, TVS_EX_DOUBLEBUFFER, TVS_EX_DOUBLEBUFFER);
-		//SetExplorerTheme(hwndTV);
 		hFavoriteNode = Style_AddAllLexerToTreeView(hwndTV, FALSE, favorite);
 		if (favorite) {
 			TreeView_EnsureVisible(hwndTV, hFavoriteNode);
