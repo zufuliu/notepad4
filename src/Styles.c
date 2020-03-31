@@ -3852,7 +3852,7 @@ static void Style_ResetStyle(PEDITLEXER pLex, PEDITSTYLE pStyle) {
 }
 
 static HTREEITEM Style_AddAllLexerToTreeView(HWND hwndTV, BOOL withStyles, BOOL withCheckBox) {
-	struct SchemeGroupInfo groupList[ALL_LEXER_COUNT];
+	struct SchemeGroupInfo groupList[26 + 2];
 	int groupCount = 2;
 	groupList[0].group = 0;
 	groupList[0].count = withStyles ? LEXER_INDEX_GENERAL : LEXER_INDEX_MATCH;
