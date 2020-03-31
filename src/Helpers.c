@@ -464,17 +464,6 @@ BOOL IsElevated(void) {
 
 //=============================================================================
 //
-//  SetTheme()
-//
-#if 0
-BOOL SetTheme(HWND hwnd, LPCWSTR lpszTheme) {
-	const HRESULT hr = SetWindowTheme(hwnd, lpszTheme, NULL);
-	return hr == S_OK;
-}
-#endif
-
-//=============================================================================
-//
 // BitmapMergeAlpha()
 // Merge alpha channel into color channel
 //

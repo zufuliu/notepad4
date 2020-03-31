@@ -282,13 +282,9 @@ NP2_inline void EndWaitCursor(void) {
 HRESULT PrivateSetCurrentProcessExplicitAppUserModelID(PCWSTR AppID);
 BOOL ExeNameFromWnd(HWND hwnd, LPWSTR szExeName, int cchExeName);
 //BOOL Is32bitExe(LPCWSTR lpszExeName);
-BOOL SetTheme(HWND hwnd, LPCWSTR lpszTheme);
-NP2_inline BOOL SetExplorerTheme(HWND hwnd) {
-	return SetTheme(hwnd, L"Explorer");
-}
-NP2_inline BOOL SetListViewTheme(HWND hwnd) {
-	return SetTheme(hwnd, L"Listview");
-}
+
+#define SetExplorerTheme(hwnd)		SetWindowTheme((hwnd), L"Explorer", NULL)
+#define SetListViewTheme(hwnd)		SetWindowTheme((hwnd), L"Listview", NULL)
 
 HBITMAP LoadBitmapFile(LPCWSTR path);
 BOOL BitmapMergeAlpha(HBITMAP hbmp, COLORREF crDest);
@@ -422,7 +418,7 @@ void History_UpdateToolbar(LCPHISTORY ph, HWND hwnd, int cmdBack, int cmdForward
 #define MRU_MAXITEMS	24
 
 enum {
-	MRUFlags_Default = 0, 
+	MRUFlags_Default = 0,
 	MRUFlags_CaseInsensitive = 1,
 };
 
