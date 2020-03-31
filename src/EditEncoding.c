@@ -761,7 +761,7 @@ void Encoding_AddToTreeView(HWND hwnd, int idSel, BOOL bRecodeOnly) {
 		tvis.item.iSelectedImage = tvis.item.iImage;
 		tvis.item.lParam = 1 + id;
 
-		HTREEITEM hTreeNode = (HTREEITEM)TreeView_InsertItem(hwnd, &tvis);
+		HTREEITEM hTreeNode = TreeView_InsertItem(hwnd, &tvis);
 		if (idSel == id) {
 			hSelNode = hTreeNode;
 		}
@@ -775,7 +775,7 @@ void Encoding_AddToTreeView(HWND hwnd, int idSel, BOOL bRecodeOnly) {
 		tvis.item.iSelectedImage = 2;
 		tvis.item.lParam = 0; // group
 
-		HTREEITEM hParent = (HTREEITEM)TreeView_InsertItem(hwnd, &tvis);
+		HTREEITEM hParent = TreeView_InsertItem(hwnd, &tvis);
 		tvis.hParent = hParent;
 		BOOL expand = i < 2; // Unicode, Western European
 
@@ -796,7 +796,7 @@ void Encoding_AddToTreeView(HWND hwnd, int idSel, BOOL bRecodeOnly) {
 				tvis.item.iSelectedImage = tvis.item.iImage;
 				tvis.item.lParam = 1 + id;
 
-				HTREEITEM hTreeNode = (HTREEITEM)TreeView_InsertItem(hwnd, &tvis);
+				HTREEITEM hTreeNode = TreeView_InsertItem(hwnd, &tvis);
 				if (idSel == id) {
 					hSelNode = hTreeNode;
 					hSelParent = hParent;
