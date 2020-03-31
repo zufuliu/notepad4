@@ -4004,7 +4004,7 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 	case WM_INITDIALOG: {
 		ResizeDlg_InitY2(hwnd, cxStyleCustomizeDlg, cyStyleCustomizeDlg, IDC_RESIZEGRIP3, IDC_STYLEEDIT, IDC_STYLEVALUE_DEFAULT);
 
-		WCHAR szTitle[256];
+		WCHAR szTitle[128];
 		const UINT idsTitle = (np2StyleTheme == StyleTheme_Dark) ? IDS_CONFIG_THEME_TITLE_DARK : IDS_CONFIG_THEME_TITLE_DEFAULT;
 		GetString(idsTitle, szTitle, COUNTOF(szTitle));
 		SetWindowText(hwnd, szTitle);
@@ -4242,29 +4242,28 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 				SetCapture(hwnd);
 				fDragging = TRUE;
 			}
+			break;
 			}
 		}
 		break;
 
 	case WM_MOUSEMOVE: {
 		if (fDragging && pCurrentStyle) {
-			HTREEITEM htiTarget;
-			TVHITTESTINFO tvht;
-			const LONG xCur = GET_X_LPARAM(lParam);
-			const LONG yCur = GET_Y_LPARAM(lParam);
+			TVHITTESTINFO tvht = {0};
 
-			//ImageList_DragMove(xCur, yCur);
+			//ImageList_DragMove(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
 			//ImageList_DragShowNolock(FALSE);
 
-			tvht.pt.x = xCur;
-			tvht.pt.y = yCur;
+			tvht.pt.x = GET_X_LPARAM(lParam);
+			tvht.pt.y = GET_Y_LPARAM(lParam);
 
 			//ClientToScreen(hwnd, &tvht.pt);
 			//ScreenToClient(hwndTV, &tvht.pt);
 			MapWindowPoints(hwnd, hwndTV, &tvht.pt, 1);
+			TreeView_HitTest(hwndTV, &tvht);
 
-			if ((htiTarget = TreeView_HitTest(hwndTV, &tvht)) != NULL &&
-					TreeView_GetParent(hwndTV, htiTarget) != NULL) {
+			HTREEITEM htiTarget = tvht.hItem;
+			if (htiTarget != NULL && TreeView_GetParent(hwndTV, htiTarget) != NULL) {
 				TreeView_SelectDropTarget(hwndTV, htiTarget);
 				//TreeView_Expand(hwndTV, htiTarget, TVE_EXPAND);
 				TreeView_EnsureVisible(hwndTV, htiTarget);
@@ -4279,11 +4278,10 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 
 	case WM_LBUTTONUP: {
 		if (fDragging) {
-			HTREEITEM htiTarget;
-
 			//ImageList_EndDrag();
+			HTREEITEM htiTarget = TreeView_GetDropHilight(hwndTV);
 
-			if ((htiTarget = TreeView_GetDropHilight(hwndTV)) != NULL) {
+			if (htiTarget != NULL) {
 				WCHAR tchCopy[MAX_LEXER_STYLE_EDIT_SIZE];
 				TreeView_SelectDropTarget(hwndTV, NULL);
 				GetDlgItemText(hwnd, IDC_STYLEEDIT, tchCopy, COUNTOF(tchCopy));
@@ -4299,6 +4297,7 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 					//CheckDlgButton(hwnd, IDC_STYLEEOLFILLED, Style_StrGetEOLFilled(tchCopy) ? BST_CHECKED : BST_UNCHECKED);
 				}
 			}
+
 			ReleaseCapture();
 			DestroyCursor(SetCursor(LoadCursor(NULL, IDC_ARROW)));
 			fDragging = FALSE;
@@ -4321,16 +4320,14 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 		switch (LOWORD(wParam)) {
 		case IDC_PREVSTYLE:
 			if (TreeView_GetSelection(hwndTV)) {
-				TreeView_Select(hwndTV, TreeView_GetPrevVisible(hwndTV,
-								TreeView_GetSelection(hwndTV)), TVGN_CARET);
+				TreeView_Select(hwndTV, TreeView_GetPrevVisible(hwndTV, TreeView_GetSelection(hwndTV)), TVGN_CARET);
 			}
 			PostMessage(hwnd, WM_NEXTDLGCTL, (WPARAM)(GetDlgItem(hwnd, IDC_STYLEEDIT)), 1);
 			break;
 
 		case IDC_NEXTSTYLE:
 			if (TreeView_GetSelection(hwndTV)) {
-				TreeView_Select(hwndTV, TreeView_GetNextVisible(hwndTV,
-								TreeView_GetSelection(hwndTV)), TVGN_CARET);
+				TreeView_Select(hwndTV, TreeView_GetNextVisible(hwndTV, TreeView_GetSelection(hwndTV)), TVGN_CARET);
 			}
 			PostMessage(hwnd, WM_NEXTDLGCTL, (WPARAM)(GetDlgItem(hwnd, IDC_STYLEEDIT)), 1);
 			break;
@@ -4790,7 +4787,8 @@ static INT_PTR CALLBACK Style_SelectLexerDlgProc(HWND hwnd, UINT umsg, WPARAM wP
 
 	case WM_NOTIFY:
 		if (((LPNMHDR)(lParam))->idFrom == IDC_STYLELIST) {
-			switch (((LPNMHDR)(lParam))->code) {
+			LPNMTREEVIEW lpnmtv = (LPNMTREEVIEW)lParam;
+			switch (lpnmtv->hdr.code) {
 			case NM_CLICK: {
 				// https://support.microsoft.com/en-us/help/261289/how-to-know-when-the-user-clicks-a-check-box-in-a-treeview-control
 				TVHITTESTINFO tvht = {0};
@@ -4798,8 +4796,8 @@ static INT_PTR CALLBACK Style_SelectLexerDlgProc(HWND hwnd, UINT umsg, WPARAM wP
 				tvht.pt.x = GET_X_LPARAM(dwpos);
 				tvht.pt.y = GET_Y_LPARAM(dwpos);
 				MapWindowPoints(HWND_DESKTOP, hwndTV, &tvht.pt, 1);
-
 				TreeView_HitTest(hwndTV, &tvht);
+
 				if (tvht.hItem != NULL && (TVHT_ONITEMSTATEICON & tvht.flags)) {
 					Lexer_OnCheckStateChanged(hwndTV, hFavoriteNode, tvht.hItem);
 				}
@@ -4813,7 +4811,6 @@ static INT_PTR CALLBACK Style_SelectLexerDlgProc(HWND hwnd, UINT umsg, WPARAM wP
 				break;
 
 			case TVN_SELCHANGED: {
-				LPNMTREEVIEW lpnmtv = (LPNMTREEVIEW)lParam;
 				PEDITLEXER pLex = (PEDITLEXER)lpnmtv->itemNew.lParam;
 				const BOOL selected = pLex != NULL;
 				if (selected) {
