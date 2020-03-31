@@ -3766,7 +3766,7 @@ HTREEITEM Style_AddLexerToTreeView(HWND hwnd, PEDITLEXER pLex, HTREEITEM hParent
 	tvis.item.iSelectedImage = tvis.item.iImage;
 	tvis.item.lParam = (LPARAM)pLex;
 
-	HTREEITEM hTreeNode = (HTREEITEM)TreeView_InsertItem(hwnd, &tvis);
+	HTREEITEM hTreeNode = TreeView_InsertItem(hwnd, &tvis);
 	if (!withStyles) {
 		return hTreeNode;
 	}
@@ -3928,7 +3928,7 @@ static HTREEITEM Style_AddAllLexerToTreeView(HWND hwndTV, BOOL withStyles, BOOL 
 			// expand all group
 			tvis.item.state = TVIS_EXPANDED;
 			tvis.item.stateMask = TVIS_EXPANDED;
-			hParent = (HTREEITEM)TreeView_InsertItem(hwndTV, &tvis);
+			hParent = TreeView_InsertItem(hwndTV, &tvis);
 
 			if (group == 1) {
 				hFavoriteNode = hParent;
