@@ -3949,7 +3949,7 @@ static HTREEITEM Style_AddAllLexerToTreeView(HWND hwndTV, BOOL withStyles, BOOL 
 			if (withCheckBox) {
 				// remove checkbox for group folder
 				item.hItem = hParent;
-				TreeView_SetItem(hwndTV, &(tvis.item));
+				TreeView_SetItem(hwndTV, &item);
 			}
 		}
 
