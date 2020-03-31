@@ -323,15 +323,6 @@ BOOL Is32bitExe(LPCWSTR lpszExeName) {
 
 //=============================================================================
 //
-//  SetTheme()
-//
-BOOL SetTheme(HWND hwnd, LPCWSTR lpszTheme) {
-	const HRESULT hr = SetWindowTheme(hwnd, lpszTheme, NULL);
-	return hr == S_OK;
-}
-
-//=============================================================================
-//
 //  BitmapMergeAlpha()
 //  Merge alpha channel into color channel
 //

@@ -447,10 +447,7 @@ UINT GetCurrentDPI(HWND hwnd);
 HRESULT PrivateSetCurrentProcessExplicitAppUserModelID(PCWSTR AppID);
 BOOL IsElevated(void);
 
-//BOOL SetTheme(HWND hwnd, LPCWSTR lpszTheme)
-//NP2_inline BOOL SetExplorerTheme(HWND hwnd) {
-//	return SetTheme(hwnd, L"Explorer");
-//}
+#define SetExplorerTheme(hwnd)		SetWindowTheme((hwnd), L"Explorer", NULL)
 
 HBITMAP LoadBitmapFile(LPCWSTR path);
 HBITMAP ResizeImageForCurrentDPI(HBITMAP hbmp);

@@ -25,6 +25,7 @@
 #include <shlobj.h>
 #include <shellapi.h>
 #include <commdlg.h>
+#include <uxtheme.h>
 #include "Helpers.h"
 #include "metapath.h"
 #include "Dlapi.h"
