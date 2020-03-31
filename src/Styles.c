@@ -4635,39 +4635,25 @@ static void Lexer_OnCheckStateChanged(HWND hwndTV, HTREEITEM hFavoriteNode, HTRE
 	// toggle check state
 	const BOOL checked = !TreeView_GetCheckState(hwndTV, hTreeNode);
 	HTREEITEM hParent = TreeView_GetParent(hwndTV, hTreeNode);
+	BOOL found = hParent == hFavoriteNode;
 
-	BOOL found = FALSE;
-	HTREEITEM hInsertAfter = TVI_FIRST;
-	hTreeNode = TreeView_GetChild(hwndTV, hFavoriteNode);
-
-	while (hTreeNode != NULL) {
-		item.hItem = hTreeNode;
-		TreeView_GetItem(hwndTV, &item);
-		if (item.lParam == lParam) {
-			found = TRUE;
-			break;
-		}
-
-		hInsertAfter = hTreeNode;
-		hTreeNode = TreeView_GetNextSibling(hwndTV, hTreeNode);
-	}
-
-	// add or remove node in Favorite Schemes
 	PEDITLEXER pLex = (PEDITLEXER)lParam;
 	if (checked) {
+		// append node into Favorite Schemes
 		if (!found) {
-			hTreeNode = Style_AddLexerToTreeView(hwndTV, pLex, hFavoriteNode, hInsertAfter, FALSE);
-			TreeView_SetCheckState(hwndTV, hTreeNode, TRUE);
+			hParent = Style_AddLexerToTreeView(hwndTV, pLex, hFavoriteNode, TVI_LAST, FALSE);
+			TreeView_SetCheckState(hwndTV, hParent, TRUE);
+			TreeView_Expand(hwndTV, hFavoriteNode, TVE_EXPAND);
+			TreeView_EnsureVisible(hwndTV, hTreeNode);
 		}
-		TreeView_Expand(hwndTV, hFavoriteNode, TVE_EXPAND);
 	} else {
+		// remove node from Favorite Schemes
 		pLex->iFavoriteOrder = 0;
+
 		if (found) {
 			TreeView_DeleteItem(hwndTV, hTreeNode);
-		}
 
-		if (hParent == hFavoriteNode) {
-			// update check state
+			// update check state in general schemes
 			const int ch = ToUpperA(pLex->pszName[0]);
 			WCHAR szTitle[4] = {0};
 			item.mask = TVIF_TEXT;
@@ -4689,7 +4675,7 @@ static void Lexer_OnCheckStateChanged(HWND hwndTV, HTREEITEM hFavoriteNode, HTRE
 						TreeView_GetItem(hwndTV, &item);
 						if (item.lParam == lParam) {
 							found = TRUE;
-							TreeView_SetCheckState(hwndTV, hTreeNode, checked);
+							TreeView_SetCheckState(hwndTV, hTreeNode, FALSE);
 							break;
 						}
 
