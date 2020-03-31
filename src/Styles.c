@@ -3743,7 +3743,7 @@ int Style_GetLexerIconId(LPCEDITLEXER pLex) {
 //
 HTREEITEM Style_AddLexerToTreeView(HWND hwnd, PEDITLEXER pLex, HTREEITEM hParent, BOOL withStyles) {
 #if NP2_GET_LEXER_STYLE_NAME_FROM_RES
-	WCHAR tch[128];
+	WCHAR tch[MAX_EDITLEXER_NAME_SIZE];
 #endif
 
 	TVINSERTSTRUCT tvis;
