@@ -1789,6 +1789,8 @@ static INT_PTR CALLBACK SelectEncodingDlgProc(HWND hwnd, UINT umsg, WPARAM wPara
 	case WM_DESTROY: {
 		PENCODEDLG pdd = (PENCODEDLG)GetWindowLongPtr(hwnd, DWLP_USER);
 		ResizeDlg_Destroy(hwnd, &pdd->cxDlg, &pdd->cyDlg);
+		HIMAGELIST himl = TreeView_GetImageList(GetDlgItem(hwnd, IDC_ENCODINGLIST), TVSIL_NORMAL);
+		ImageList_Destroy(himl);
 	}
 	return FALSE;
 
