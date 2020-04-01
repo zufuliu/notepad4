@@ -1913,7 +1913,7 @@ static INT_PTR CALLBACK SelectDefLineEndingDlgProc(HWND hwnd, UINT umsg, WPARAM 
 			ComboBox_AddString(hwndCtl, wch);
 		}
 
-		SendDlgItemMessage(hwnd, IDC_EOLMODELIST, CB_SETCURSEL, iOption, 0);
+		ComboBox_SetCurSel(hwndCtl, iOption);
 		ComboBox_SetExtendedUI(hwndCtl, TRUE);
 
 		if (bWarnLineEndings) {
@@ -1978,7 +1978,7 @@ static INT_PTR CALLBACK WarnLineEndingDlgProc(HWND hwnd, UINT umsg, WPARAM wPara
 			ComboBox_AddString(hwndCtl, wch);
 		}
 
-		SendDlgItemMessage(hwnd, IDC_EOLMODELIST, CB_SETCURSEL, iEOLMode, 0);
+		ComboBox_SetCurSel(hwndCtl, iEOLMode);
 		ComboBox_SetExtendedUI(hwndCtl, TRUE);
 
 		WCHAR tchFmt[128];
@@ -2048,7 +2048,7 @@ void InitZoomLevelComboBox(HWND hwnd, int nCtlId, int zoomLevel) {
 	}
 
 	ComboBox_SetExtendedUI(hwndCtl, TRUE);
-	SendMessage(hwndCtl, CB_SETCURSEL, selIndex, 0);
+	ComboBox_SetCurSel(hwndCtl, selIndex);
 	if (selIndex == -1) {
 		wsprintf(tch, L"%d%%", zoomLevel);
 		SetWindowText(hwndCtl, tch);

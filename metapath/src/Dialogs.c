@@ -1428,13 +1428,12 @@ INT_PTR CALLBACK CopyMoveDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPa
 		MakeBitmapButton(hwnd, IDC_BROWSEDESTINATION, g_hInstance, IDB_OPEN);
 
 		const LPCFILEOPDLGDATA lpfod = (LPCFILEOPDLGDATA)lParam;
+		SetDlgItemText(hwnd, IDC_SOURCE, lpfod->szSource);
+
 		HWND hwndDest = GetDlgItem(hwnd, IDC_DESTINATION);
 		MRU_LoadToCombobox(hwndDest, MRU_KEY_COPY_MOVE_HISTORY);
-		SendMessage(hwndDest, CB_SETCURSEL, 0, 0);
-
-		SetDlgItemText(hwnd, IDC_SOURCE, lpfod->szSource);
+		ComboBox_SetCurSel(hwndDest, 0);
 		ComboBox_LimitText(hwndDest, MAX_PATH - 1);
-
 		ComboBox_SetExtendedUI(hwndDest, TRUE);
 
 		if (lpfod->wFunc == FO_COPY) {
