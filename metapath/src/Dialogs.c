@@ -344,11 +344,11 @@ INT_PTR CALLBACK GotoDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 
 		for (int i = 0; i < HISTORY_ITEMS; i++) {
 			if (mHistory.psz[i]) {
-				const int iItem = (int)SendMessage(hwndGoto, CB_FINDSTRINGEXACT, (WPARAM)(-1), (LPARAM)mHistory.psz[i]);
+				const int iItem = ComboBox_FindStringExact(hwndGoto, -1, mHistory.psz[i]);
 				if (iItem != LB_ERR) {
-					SendMessage(hwndGoto, CB_DELETESTRING, iItem, 0);
+					ComboBox_DeleteString(hwndGoto, iItem);
 				}
-				SendMessage(hwndGoto, CB_INSERTSTRING, 0, (LPARAM)mHistory.psz[i]);
+				ComboBox_InsertString(hwndGoto, 0, mHistory.psz[i]);
 			}
 		}
 
@@ -396,8 +396,9 @@ INT_PTR CALLBACK GotoDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 
 			if (HIWORD(wParam) == CBN_CLOSEUP) {
 				LONG lSelEnd = 0;
-				SendDlgItemMessage(hwnd, IDC_GOTO, CB_GETEDITSEL, 0, (LPARAM)&lSelEnd);
-				SendDlgItemMessage(hwnd, IDC_GOTO, CB_SETEDITSEL, 0, MAKELPARAM(lSelEnd, lSelEnd));
+				// ComboBox_GetEditSel() in windowsx.h is wrong.
+				SendMessage(hwndGoto, CB_GETEDITSEL, 0, (LPARAM)&lSelEnd);
+				ComboBox_SetEditSel(hwndGoto, lSelEnd, lSelEnd);
 			}
 		}
 		break;
