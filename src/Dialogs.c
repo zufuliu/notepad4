@@ -1774,7 +1774,7 @@ static INT_PTR CALLBACK SelectEncodingDlgProc(HWND hwnd, UINT umsg, WPARAM wPara
 
 		// folder icon
 		SHFILEINFO shfi;
-		SHGetFileInfo(L"Icon", FILE_ATTRIBUTE_DIRECTORY, &shfi, sizeof(SHFILEINFO), SHGFI_ICON | SHGFI_SMALLICON | SHGFI_USEFILEATTRIBUTES);
+		SHGetFileInfo(L"Icon", FILE_ATTRIBUTE_DIRECTORY, &shfi, sizeof(SHFILEINFO), SHGFI_USEFILEATTRIBUTES | SHGFI_SMALLICON | SHGFI_ICON);
 		ImageList_AddIcon(himl, shfi.hIcon);
 
 		HWND hwndTV = GetDlgItem(hwnd, IDC_ENCODINGLIST);
