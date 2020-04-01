@@ -268,7 +268,7 @@ static void ColouriseCppDoc(Sci_PositionU startPos, Sci_Position length, int ini
 				followsReturn = false;
 				//int len = static_cast<int>(strlen(s));
 				//bool pps = (len > 4 && s[0] == '_' && s[1] == '_' && s[len - 1] == '_' && s[len - 2] == '_');
-				//char tu[256] = {0};
+				//char tu[256]{};
 				//if (pps)
 				//	strncpy(tu, s + 2, len - 4);
 				// __attribute__()
