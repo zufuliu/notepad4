@@ -124,14 +124,14 @@ extern EDITLEXER lexWASM;
 
 extern EDITLEXER lexYAML;
 
-// the two global lexers at the beginning of the array not visible in
+// the two global styles at the beginning of the array not visible in
 // "Select Scheme" list, don't participate in file extension match.
 #define LEXER_INDEX_MATCH		2
 #define ALL_LEXER_COUNT			(NUMLEXERS + LEXER_INDEX_MATCH)
 // the lexer array has three sections:
-// 1. global lexers and lexers for text file, not sortable, the order is hard-coded.
-// 2. favorite lexers, sortable, the order is configured by FavoriteSchemes
-// 3. other lexers, sorted alphabetical
+// 1. global styles and lexers for text file, not sortable, the order is hard-coded.
+// 2. favorite lexers, sortable, the order is configured by FavoriteSchemes preference.
+// 3. other lexers, grouped by first letter, sorted alphabetical (case insensitive).
 #define LEXER_INDEX_GENERAL		4
 #define GENERAL_LEXER_COUNT		(ALL_LEXER_COUNT - LEXER_INDEX_GENERAL)
 #define MAX_FAVORITE_SCHEMES_COUNT			20
