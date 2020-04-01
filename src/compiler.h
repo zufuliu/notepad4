@@ -68,6 +68,12 @@
 #define NP2_USE_DESIGNATED_INITIALIZER	1
 #endif
 
+#if defined(__cplusplus) || defined(__GNUC__) || defined(__clang__)
+#define EMPTY_BRACE_INITIALIZER			{}
+#else
+#define EMPTY_BRACE_INITIALIZER			{0}
+#endif
+
 // sdkddkver.h
 #ifndef _WIN32_WINNT_VISTA
 #define _WIN32_WINNT_VISTA				0x0600
