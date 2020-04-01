@@ -5015,17 +5015,14 @@ static INT_PTR CALLBACK Style_SelectLexerDlgProc(HWND hwnd, UINT umsg, WPARAM wP
 		case IDOK: {
 			PEDITLEXER pLex = Lexer_GetFromTreeView(hwndTV);
 			const LONG_PTR favorite = GetWindowLongPtr(hwnd, DWLP_USER);
-			if (pLex != NULL) {
-				if (!favorite) {
-					pLexCurrent = pLex;
-					np2LexLangIndex = 0;
-				}
-				iDefaultLexerIndex = Style_GetMatchLexerIndex(iInternalDefault);
-			}
 			if (favorite) {
 				Style_GetFavoriteSchemesFromTreeView(hwndTV, hFavoriteNode);
+			} else if (pLex != NULL) {
+				pLexCurrent = pLex;
+				np2LexLangIndex = 0;
 			}
 
+			iDefaultLexerIndex = Style_GetMatchLexerIndex(iInternalDefault);
 			bAutoSelect = IsButtonChecked(hwnd, IDC_AUTOSELECT);
 			EndDialog(hwnd, IDOK);
 		}
