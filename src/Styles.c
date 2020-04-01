@@ -4743,6 +4743,12 @@ static void Lexer_OnDragDrop(HWND hwndTV, HTREEITEM hFavoriteNode, HTREEITEM hDr
 			return;
 		}
 
+		hTreeNode = TreeView_GetNextSibling(hwndTV, htiTarget);
+		if (hTreeNode == hDraggingNode) {
+			// position not changed for next sibling node
+			return;
+		}
+
 		TreeView_DeleteItem(hwndTV, hDraggingNode);
 	} else {
 		// dragging into Favorite Schemes
