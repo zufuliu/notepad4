@@ -4305,10 +4305,10 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 		if (fDragging) {
 			//ImageList_EndDrag();
 			HTREEITEM htiTarget = TreeView_GetDropHilight(hwndTV);
+			TreeView_SelectDropTarget(hwndTV, NULL);
 
 			if (htiTarget != NULL) {
 				WCHAR tchCopy[MAX_LEXER_STYLE_EDIT_SIZE];
-				TreeView_SelectDropTarget(hwndTV, NULL);
 				GetDlgItemText(hwnd, IDC_STYLEEDIT, tchCopy, COUNTOF(tchCopy));
 				TreeView_Select(hwndTV, htiTarget, TVGN_CARET);
 
