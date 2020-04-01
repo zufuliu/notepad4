@@ -4808,8 +4808,8 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 			}
 
 			// Reload MRUs
-			SendDlgItemMessage(hwnd, IDC_FINDTEXT, CB_RESETCONTENT, 0, 0);
-			SendDlgItemMessage(hwnd, IDC_REPLACETEXT, CB_RESETCONTENT, 0, 0);
+			ComboBox_ResetContent(hwndFind);
+			ComboBox_ResetContent(hwndRepl);
 
 			for (int i = 0; i < MRU_GetCount(mruFind); i++) {
 				MRU_Enum(mruFind, i, tch, COUNTOF(tch));
@@ -4952,21 +4952,23 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 				//ShowNotificationMessage(SC_NOTIFICATIONPOSITION_CENTER, IDS_WILDCARDHELP);
 				break;
 
-			case IDC_CLEAR_FIND:
-				GetDlgItemText(hwnd, IDC_FINDTEXT, tch, COUNTOF(tch));
-				SendDlgItemMessage(hwnd, IDC_FINDTEXT, CB_RESETCONTENT, 0, 0);
+			case IDC_CLEAR_FIND: {
+				HWND hwndFind = GetDlgItem(hwnd, IDC_FINDTEXT);
+				ComboBox_GetText(hwndFind, tch, COUNTOF(tch));
+				ComboBox_ResetContent(hwndFind);
 				MRU_Empty(mruFind);
 				MRU_Save(mruFind);
-				SetDlgItemText(hwnd, IDC_FINDTEXT, tch);
-				break;
+				ComboBox_SetText(hwndFind, tch);
+			} break;
 
-			case IDC_CLEAR_REPLACE:
-				GetDlgItemText(hwnd, IDC_REPLACETEXT, tch, COUNTOF(tch));
-				SendDlgItemMessage(hwnd, IDC_REPLACETEXT, CB_RESETCONTENT, 0, 0);
+			case IDC_CLEAR_REPLACE: {
+				HWND hwndRepl = GetDlgItem(hwnd, IDC_REPLACETEXT);
+				ComboBox_GetText(hwndRepl, tch, COUNTOF(tch));
+				ComboBox_ResetContent(hwndRepl);
 				MRU_Empty(mruReplace);
 				MRU_Save(mruReplace);
-				SetDlgItemText(hwnd, IDC_REPLACETEXT, tch);
-				break;
+				ComboBox_SetText(hwndRepl, tch);
+			} break;
 
 			case IDC_SAVEPOSITION:
 				PostWMCommand(hwnd, IDACC_SAVEPOS);
