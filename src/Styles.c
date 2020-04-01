@@ -4708,6 +4708,69 @@ static void Lexer_OnCheckStateChanged(HWND hwndTV, HTREEITEM hFavoriteNode, HTRE
 	}
 }
 
+static void Lexer_OnDragDrop(HWND hwndTV, HTREEITEM hFavoriteNode, HTREEITEM hDraggingNode, HTREEITEM htiTarget) {
+	TVITEM item;
+	ZeroMemory(&item, sizeof(item));
+	item.mask = TVIF_PARAM;
+	item.hItem = hDraggingNode;
+	TreeView_GetItem(hwndTV, &item);
+
+	if (item.lParam == 0) {
+		return;
+	}
+
+	HTREEITEM hTreeNode = TreeView_GetParent(hwndTV, htiTarget);
+	if (!(htiTarget == hFavoriteNode || hTreeNode == hFavoriteNode)) {
+		return;
+	}
+
+	HTREEITEM hParent = TreeView_GetParent(hwndTV, hDraggingNode);
+	HTREEITEM hLastChild = TVI_FIRST;
+	const LPARAM lParam = item.lParam;
+
+	hTreeNode = TreeView_GetChild(hwndTV, hFavoriteNode);
+	if (hParent == hFavoriteNode) {
+		// dragging within Favorite Schemes
+		if (htiTarget == hFavoriteNode && hDraggingNode == hTreeNode) {
+			// position not changed for first child
+			return;
+		}
+
+		TreeView_DeleteItem(hwndTV, hDraggingNode);
+	} else {
+		// dragging into Favorite Schemes
+		TreeView_SetCheckState(hwndTV, hDraggingNode, TRUE);
+
+		BOOL found = FALSE;
+		while (hTreeNode != NULL) {
+			item.hItem = hTreeNode;
+			TreeView_GetItem(hwndTV, &item);
+			if (item.lParam == lParam) {
+				found = TRUE;
+				break;
+			}
+
+			hLastChild = hTreeNode;
+			hTreeNode = TreeView_GetNextSibling(hwndTV, hTreeNode);
+		}
+
+		if (found) {
+			TreeView_SetCheckState(hwndTV, hTreeNode, TRUE);
+			return;
+		}
+	}
+
+	const UINT expanded = TreeView_GetItemState(hwndTV, hFavoriteNode, TVIS_EXPANDED) & TVIS_EXPANDED;
+	HTREEITEM hInsertAfter = expanded ? ((htiTarget == hFavoriteNode)? TVI_FIRST : htiTarget) : hLastChild;
+	PEDITLEXER pLex = (PEDITLEXER)lParam;
+
+	hTreeNode = Style_AddLexerToTreeView(hwndTV, pLex, hFavoriteNode, hInsertAfter, FALSE);
+	TreeView_SetCheckState(hwndTV, hTreeNode, TRUE);
+	if (expanded) {
+		TreeView_Select(hwndTV, hTreeNode, TVGN_CARET);
+	}
+}
+
 static void Style_GetFavoriteSchemesFromTreeView(HWND hwndTV, HTREEITEM hFavoriteNode) {
 	const int maxCch = MAX_FAVORITE_SCHEMES_CONFIG_SIZE - 3; // two digits, one space and NULL
 	WCHAR *wch = favoriteSchemesConfig;
@@ -4751,6 +4814,8 @@ static void Style_GetFavoriteSchemesFromTreeView(HWND hwndTV, HTREEITEM hFavorit
 static INT_PTR CALLBACK Style_SelectLexerDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
 	static HWND hwndTV;
 	static HTREEITEM hFavoriteNode;
+	static HTREEITEM hDraggingNode;
+	static BOOL fDragging;
 	static int iInternalDefault;
 
 	switch (umsg) {
@@ -4760,8 +4825,8 @@ static INT_PTR CALLBACK Style_SelectLexerDlgProc(HWND hwnd, UINT umsg, WPARAM wP
 
 		hwndTV = GetDlgItem(hwnd, IDC_STYLELIST);
 		const BOOL favorite = lParam != 0;
+		SetWindowLongPtr(hwndTV, GWL_STYLE, GetWindowLongPtr(hwndTV, GWL_STYLE) | (favorite ? TVS_CHECKBOXES : TVS_DISABLEDRAGDROP));
 		if (favorite) {
-			SetWindowLongPtr(hwndTV, GWL_STYLE, GetWindowLongPtr(hwndTV, GWL_STYLE) | TVS_CHECKBOXES);
 			WCHAR szTitle[128];
 			GetString(IDS_FAVORITE_SCHEMES_TITLE, szTitle, COUNTOF(szTitle));
 			SetWindowText(hwnd, szTitle);
@@ -4770,9 +4835,13 @@ static INT_PTR CALLBACK Style_SelectLexerDlgProc(HWND hwnd, UINT umsg, WPARAM wP
 		hFavoriteNode = Style_AddAllLexerToTreeView(hwndTV, FALSE, favorite);
 		if (favorite) {
 			TreeView_EnsureVisible(hwndTV, hFavoriteNode);
+			TreeView_SetInsertMarkColor(hwndTV, GetSysColor(COLOR_HIGHLIGHT));
 		}
 
+		hDraggingNode = NULL;
+		fDragging = FALSE;
 		iInternalDefault = pLexArray[iDefaultLexer]->rid;
+
 		if (iInternalDefault == pLexCurrent->rid) {
 			CheckDlgButton(hwnd, IDC_DEFAULTSCHEME, BST_CHECKED);
 		}
@@ -4846,9 +4915,74 @@ static INT_PTR CALLBACK Style_SelectLexerDlgProc(HWND hwnd, UINT umsg, WPARAM wP
 				EnableWindow(GetDlgItem(hwnd, IDC_DEFAULTSCHEME), selected);
 			}
 			break;
+
+			case TVN_BEGINDRAG: {
+				TreeView_Select(hwndTV, lpnmtv->itemNew.hItem, TVGN_CARET);
+				// prevent dragging group folder or Text File
+				if (lpnmtv->itemNew.lParam != 0 && TreeView_GetParent(hwndTV, lpnmtv->itemNew.hItem) != NULL) {
+					hDraggingNode = lpnmtv->itemNew.hItem;
+					DestroyCursor(SetCursor(LoadCursor(g_hInstance, MAKEINTRESOURCE(IDC_COPY))));
+				} else {
+					hDraggingNode = NULL;
+					DestroyCursor(SetCursor(LoadCursor(NULL, IDC_NO)));
+				}
+				SetCapture(hwnd);
+				fDragging = TRUE;
+			}
+			break;
 			}
 		}
 		return TRUE;
+
+	case WM_MOUSEMOVE: {
+		if (fDragging && hDraggingNode != NULL) {
+			TVHITTESTINFO tvht = {0};
+
+			tvht.pt.x = GET_X_LPARAM(lParam);
+			tvht.pt.y = GET_Y_LPARAM(lParam);
+
+			MapWindowPoints(hwnd, hwndTV, &tvht.pt, 1);
+			TreeView_HitTest(hwndTV, &tvht);
+
+			HTREEITEM htiTarget = tvht.hItem;
+			if (htiTarget == hFavoriteNode || (htiTarget != NULL && TreeView_GetParent(hwndTV, htiTarget) == hFavoriteNode)) {
+				TreeView_SelectDropTarget(hwndTV, htiTarget);
+				TreeView_SetInsertMark(hwndTV, htiTarget, TRUE);
+				TreeView_EnsureVisible(hwndTV, htiTarget);
+			} else {
+				TreeView_SelectDropTarget(hwndTV, NULL);
+			}
+		}
+	}
+	break;
+
+	case WM_LBUTTONUP: {
+		if (fDragging) {
+			HTREEITEM htiTarget = TreeView_GetDropHilight(hwndTV);
+			TreeView_SelectDropTarget(hwndTV, NULL);
+			TreeView_SetInsertMark(hwndTV, NULL, TRUE);
+
+			if (hDraggingNode != NULL && htiTarget != NULL && hDraggingNode != htiTarget) {
+				Lexer_OnDragDrop(hwndTV, hFavoriteNode, hDraggingNode, htiTarget);
+			}
+
+			ReleaseCapture();
+			DestroyCursor(SetCursor(LoadCursor(NULL, IDC_ARROW)));
+			fDragging = FALSE;
+		}
+	}
+	break;
+
+	case WM_CANCELMODE: {
+		if (fDragging) {
+			TreeView_SelectDropTarget(hwndTV, NULL);
+			TreeView_SetInsertMark(hwndTV, NULL, TRUE);
+			ReleaseCapture();
+			DestroyCursor(SetCursor(LoadCursor(NULL, IDC_ARROW)));
+			fDragging = FALSE;
+		}
+	}
+	break;
 
 	case WM_COMMAND:
 		switch (LOWORD(wParam)) {
@@ -4882,7 +5016,11 @@ static INT_PTR CALLBACK Style_SelectLexerDlgProc(HWND hwnd, UINT umsg, WPARAM wP
 		break;
 
 		case IDCANCEL:
-			EndDialog(hwnd, IDCANCEL);
+			if (fDragging) {
+				SendMessage(hwnd, WM_CANCELMODE, 0, 0);
+			} else {
+				EndDialog(hwnd, IDCANCEL);
+			}
 			break;
 		}
 		return TRUE;
