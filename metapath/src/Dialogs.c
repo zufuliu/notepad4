@@ -340,7 +340,7 @@ INT_PTR CALLBACK GotoDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 
 		HWND hwndGoto = GetDlgItem(hwnd, IDC_GOTO);
 		SendMessage(hwndGoto, CB_LIMITTEXT, MAX_PATH - 1, 0);
-		SendMessage(hwndGoto, CB_SETEXTENDEDUI, TRUE, 0);
+		ComboBox_SetExtendedUI(hwndGoto, TRUE);
 
 		for (int i = 0; i < HISTORY_ITEMS; i++) {
 			if (mHistory.psz[i]) {
@@ -1437,7 +1437,7 @@ INT_PTR CALLBACK CopyMoveDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPa
 		SetDlgItemText(hwnd, IDC_SOURCE, lpfod->szSource);
 		SendMessage(hwndDest, CB_LIMITTEXT, MAX_PATH - 1, 0);
 
-		SendMessage(hwndDest, CB_SETEXTENDEDUI, TRUE, 0);
+		ComboBox_SetExtendedUI(hwndDest, TRUE);
 
 		if (lpfod->wFunc == FO_COPY) {
 			CheckRadioButton(hwnd, IDC_FUNCCOPY, IDC_FUNCMOVE, IDC_FUNCCOPY);
