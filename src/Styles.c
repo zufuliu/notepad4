@@ -295,7 +295,7 @@ int		iOvrCaretStyle = 0; // 0 for bar, 1 for block
 BOOL bBlockCaretOutSelection = 0;
 int		iCaretBlinkPeriod = -1; // system default, 0 for noblink
 static BOOL bBookmarkColorUpdated;
-static int	iDefaultLexer;
+static int	iDefaultLexerIndex;
 static BOOL bAutoSelect;
 int		cxStyleSelectDlg;
 int		cyStyleSelectDlg;
@@ -689,7 +689,7 @@ void Style_Load(void) {
 
 	// default scheme
 	int iValue = IniSectionGetInt(pIniSection, L"DefaultScheme", 0);
-	iDefaultLexer = Style_GetMatchLexerIndex(iValue + NP2LEX_TEXTFILE);
+	iDefaultLexerIndex = Style_GetMatchLexerIndex(iValue + NP2LEX_TEXTFILE);
 
 	iValue = IniSectionGetInt(pIniSection, L"StyleTheme", StyleTheme_Default);
 	np2StyleTheme = clamp_i(iValue, StyleTheme_Default, StyleTheme_Max);
@@ -720,7 +720,7 @@ void Style_Load(void) {
 		FindDarkThemeFile();
 	}
 	Style_LoadOneEx(pLexGlobal, pIniSection, pIniSectionBuf, cchIniSection);
-	Style_LoadOneEx(pLexArray[iDefaultLexer], pIniSection, pIniSectionBuf, cchIniSection);
+	Style_LoadOneEx(pLexArray[iDefaultLexerIndex], pIniSection, pIniSectionBuf, cchIniSection);
 
 	FindSystemDefaultCodeFont();
 	FindSystemDefaultTextFont();
@@ -798,7 +798,7 @@ void Style_Save(void) {
 	// favorite schemes
 	IniSectionSetString(pIniSection, L"FavoriteSchemes", favoriteSchemesConfig);
 	// default scheme
-	IniSectionSetIntEx(pIniSection, L"DefaultScheme", pLexArray[iDefaultLexer]->rid - NP2LEX_TEXTFILE, 0);
+	IniSectionSetIntEx(pIniSection, L"DefaultScheme", pLexArray[iDefaultLexerIndex]->rid - NP2LEX_TEXTFILE, 0);
 	IniSectionSetIntEx(pIniSection, L"StyleTheme", np2StyleTheme, StyleTheme_Default);
 
 	// auto select
@@ -1273,7 +1273,7 @@ static BOOL Style_StrGetAttributeEx(LPCWSTR lpszStyle, LPCWSTR key, int keyLen) 
 
 // set default colors to avoid showing white (COLOR_WINDOW) window while loading big file.
 void Style_InitDefaultColor(void) {
-	PEDITLEXER pLexNew = pLexArray[iDefaultLexer];
+	PEDITLEXER pLexNew = pLexArray[iDefaultLexerIndex];
 	int iValue = pLexNew->bUseDefaultCodeStyle ? Style_DefaultCode : Style_DefaultText;
 	LPCWSTR szValue = pLexGlobal->Styles[iValue].szValue;
 	if (!Style_StrGetColor(TRUE, szValue, &iValue)) {
@@ -1328,7 +1328,7 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 	// Select default if NULL is specified
 	if (!pLexNew) {
 		np2LexLangIndex = 0;
-		pLexNew = pLexArray[iDefaultLexer];
+		pLexNew = pLexArray[iDefaultLexerIndex];
 	}
 	if (!IsStyleLoaded(pLexGlobal)) {
 		Style_LoadOne(pLexGlobal);
@@ -2575,7 +2575,7 @@ BOOL Style_SetLexerFromFile(LPCWSTR lpszFile) {
 	}
 	if (pLexNew == NULL) {
 		bFound = FALSE;
-		pLexNew = pLexArray[iDefaultLexer];
+		pLexNew = pLexArray[iDefaultLexerIndex];
 	}
 
 	// xml/html
@@ -4840,7 +4840,7 @@ static INT_PTR CALLBACK Style_SelectLexerDlgProc(HWND hwnd, UINT umsg, WPARAM wP
 
 		hDraggingNode = NULL;
 		fDragging = FALSE;
-		iInternalDefault = pLexArray[iDefaultLexer]->rid;
+		iInternalDefault = pLexArray[iDefaultLexerIndex]->rid;
 
 		if (iInternalDefault == pLexCurrent->rid) {
 			CheckDlgButton(hwnd, IDC_DEFAULTSCHEME, BST_CHECKED);
@@ -5004,7 +5004,7 @@ static INT_PTR CALLBACK Style_SelectLexerDlgProc(HWND hwnd, UINT umsg, WPARAM wP
 					pLexCurrent = pLex;
 					np2LexLangIndex = 0;
 				}
-				iDefaultLexer = Style_GetMatchLexerIndex(iInternalDefault);
+				iDefaultLexerIndex = Style_GetMatchLexerIndex(iInternalDefault);
 			}
 			if (favorite) {
 				Style_GetFavoriteSchemesFromTreeView(hwndTV, hFavoriteNode);
