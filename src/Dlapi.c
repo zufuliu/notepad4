@@ -19,6 +19,7 @@
 ******************************************************************************/
 
 #include <windows.h>
+#include <windowsx.h>
 #include <shlwapi.h>
 #include <shlobj.h>
 #include <commctrl.h>
@@ -922,7 +923,7 @@ BOOL DriveBox_Init(HWND hwnd) {
 int DriveBox_Fill(HWND hwnd) {
 	// Init ComboBox
 	SendMessage(hwnd, WM_SETREDRAW, 0, 0);
-	SendMessage(hwnd, CB_RESETCONTENT, 0, 0);
+	ComboBox_ResetContent(hwnd);
 
 	COMBOBOXEXITEM cbei;
 	ZeroMemory(&cbei, sizeof(COMBOBOXEXITEM));

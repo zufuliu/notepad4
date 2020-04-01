@@ -1768,7 +1768,7 @@ void MRU_ClearCombobox(HWND hwnd, LPCWSTR pszKey) {
 	MRU_Empty(pmru);
 	MRU_Save(pmru);
 	MRU_Destroy(pmru);
-	SendMessage(hwnd, CB_RESETCONTENT, 0, 0);
+	ComboBox_ResetContent(hwnd);
 }
 
 /*
