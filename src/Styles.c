@@ -4247,8 +4247,9 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 			break;
 
 			case TVN_BEGINDRAG: {
-				//if (pCurrentStyle)
+				//if (pCurrentStyle) {
 				//	GetDlgItemText(hwnd, IDC_STYLEEDIT, pCurrentStyle->szValue, MAX_EDITSTYLE_VALUE_SIZE);
+				//}
 				TreeView_Select(hwndTV, lpnmtv->itemNew.hItem, TVGN_CARET);
 
 				//HIMAGELIST himl = TreeView_CreateDragImage(hwndTV, lpnmtv->itemNew.hItem);
@@ -4268,7 +4269,7 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 		}
 		break;
 
-	case WM_MOUSEMOVE: {
+	case WM_MOUSEMOVE:
 		if (fDragging && pCurrentStyle) {
 			TVHITTESTINFO tvht = EMPTY_BRACE_INITIALIZER;
 
@@ -4294,10 +4295,9 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 
 			//ImageList_DragShowNolock(TRUE);
 		}
-	}
-	break;
+		break;
 
-	case WM_LBUTTONUP: {
+	case WM_LBUTTONUP:
 		if (fDragging) {
 			//ImageList_EndDrag();
 			HTREEITEM htiTarget = TreeView_GetDropHilight(hwndTV);
@@ -4323,10 +4323,9 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 			DestroyCursor(SetCursor(LoadCursor(NULL, IDC_ARROW)));
 			fDragging = FALSE;
 		}
-	}
-	break;
+		break;
 
-	case WM_CANCELMODE: {
+	case WM_CANCELMODE:
 		if (fDragging) {
 			//ImageList_EndDrag();
 			TreeView_SelectDropTarget(hwndTV, NULL);
@@ -4334,8 +4333,7 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 			DestroyCursor(SetCursor(LoadCursor(NULL, IDC_ARROW)));
 			fDragging = FALSE;
 		}
-	}
-	break;
+		break;
 
 	case WM_COMMAND:
 		switch (LOWORD(wParam)) {
@@ -4451,7 +4449,7 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 		//	}
 		//	break;
 
-		case IDC_STYLEEDIT: {
+		case IDC_STYLEEDIT:
 			if (HIWORD(wParam) == EN_CHANGE && pCurrentStyle != NULL) {
 				WCHAR tch[MAX_LEXER_STYLE_EDIT_SIZE];
 
@@ -4465,8 +4463,7 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 				Style_StrGetColor(FALSE, tch, &cr);
 				MakeColorPickButton(hwnd, IDC_STYLEBACK, g_hInstance, cr);
 			}
-		}
-		break;
+			break;
 
 		case IDC_IMPORT:
 		case IDC_EXPORT:
@@ -4940,7 +4937,7 @@ static INT_PTR CALLBACK Style_SelectLexerDlgProc(HWND hwnd, UINT umsg, WPARAM wP
 		}
 		return TRUE;
 
-	case WM_MOUSEMOVE: {
+	case WM_MOUSEMOVE:
 		if (fDragging && hDraggingNode != NULL) {
 			TVHITTESTINFO tvht = EMPTY_BRACE_INITIALIZER;
 
@@ -4959,10 +4956,9 @@ static INT_PTR CALLBACK Style_SelectLexerDlgProc(HWND hwnd, UINT umsg, WPARAM wP
 				TreeView_SelectDropTarget(hwndTV, NULL);
 			}
 		}
-	}
-	break;
+		break;
 
-	case WM_LBUTTONUP: {
+	case WM_LBUTTONUP:
 		if (fDragging) {
 			HTREEITEM htiTarget = TreeView_GetDropHilight(hwndTV);
 			TreeView_SelectDropTarget(hwndTV, NULL);
@@ -4976,10 +4972,9 @@ static INT_PTR CALLBACK Style_SelectLexerDlgProc(HWND hwnd, UINT umsg, WPARAM wP
 			DestroyCursor(SetCursor(LoadCursor(NULL, IDC_ARROW)));
 			fDragging = FALSE;
 		}
-	}
-	break;
+		break;
 
-	case WM_CANCELMODE: {
+	case WM_CANCELMODE:
 		if (fDragging) {
 			TreeView_SelectDropTarget(hwndTV, NULL);
 			TreeView_SetInsertMark(hwndTV, NULL, TRUE);
@@ -4987,8 +4982,7 @@ static INT_PTR CALLBACK Style_SelectLexerDlgProc(HWND hwnd, UINT umsg, WPARAM wP
 			DestroyCursor(SetCursor(LoadCursor(NULL, IDC_ARROW)));
 			fDragging = FALSE;
 		}
-	}
-	break;
+		break;
 
 	case WM_COMMAND:
 		switch (LOWORD(wParam)) {
