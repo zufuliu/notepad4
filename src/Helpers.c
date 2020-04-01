@@ -21,6 +21,7 @@
 ******************************************************************************/
 
 #include <windows.h>
+#include <windowsx.h>
 #include <shlwapi.h>
 #include <shlobj.h>
 #include <commctrl.h>
@@ -1944,7 +1945,7 @@ void ComboBox_AddStringA2W(UINT uCP, HWND hwnd, LPCSTR lpString) {
 	if (len) {
 		LPWSTR wsz = (LPWSTR)NP2HeapAlloc((len + 1) * sizeof(WCHAR));
 		MultiByteToWideChar(uCP, 0, lpString, -1, wsz, len);
-		SendMessage(hwnd, CB_ADDSTRING, 0, (LPARAM)wsz);
+		ComboBox_AddString(hwnd, wsz);
 		NP2HeapFree(wsz);
 	}
 }

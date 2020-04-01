@@ -19,6 +19,7 @@
 ******************************************************************************/
 
 #include <windows.h>
+#include <windowsx.h>
 #include <shlwapi.h>
 #include <shlobj.h>
 #include <commctrl.h>
@@ -1746,7 +1747,7 @@ void MRU_LoadToCombobox(HWND hwnd, LPCWSTR pszKey) {
 	MRU_Load(pmru);
 	for (int i = 0; i < MRU_GetCount(pmru); i++) {
 		MRU_Enum(pmru, i, tch, COUNTOF(tch));
-		SendMessage(hwnd, CB_ADDSTRING, 0, (LPARAM)tch);
+		ComboBox_AddString(hwnd, tch);
 	}
 	MRU_Destroy(pmru);
 }

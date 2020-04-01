@@ -1447,7 +1447,7 @@ static INT_PTR CALLBACK WordWrapSettingsDlgProc(HWND hwnd, UINT umsg, WPARAM wPa
 			while ((p2 = StrChr(p1, L'|')) != NULL) {
 				*p2++ = L'\0';
 				if (*p1) {
-					SendDlgItemMessage(hwnd, IDC_WRAP_INDENT + i, CB_ADDSTRING, 0, (LPARAM)p1);
+					ComboBox_AddString(hwndCtl, p1);
 				}
 				p1 = p2;
 			}
@@ -1910,7 +1910,7 @@ static INT_PTR CALLBACK SelectDefLineEndingDlgProc(HWND hwnd, UINT umsg, WPARAM 
 		WCHAR wch[128];
 		for (int i = 0; i < 3; i++) {
 			GetString(IDS_EOLMODENAME_CRLF + i, wch, COUNTOF(wch));
-			SendDlgItemMessage(hwnd, IDC_EOLMODELIST, CB_ADDSTRING, 0, (LPARAM)wch);
+			ComboBox_AddString(hwndCtl, wch);
 		}
 
 		SendDlgItemMessage(hwnd, IDC_EOLMODELIST, CB_SETCURSEL, iOption, 0);
@@ -1975,7 +1975,7 @@ static INT_PTR CALLBACK WarnLineEndingDlgProc(HWND hwnd, UINT umsg, WPARAM wPara
 		WCHAR wch[128];
 		for (int i = 0; i < 3; i++) {
 			GetString(IDS_EOLMODENAME_CRLF + i, wch, COUNTOF(wch));
-			SendDlgItemMessage(hwnd, IDC_EOLMODELIST, CB_ADDSTRING, 0, (LPARAM)wch);
+			ComboBox_AddString(hwndCtl, wch);
 		}
 
 		SendDlgItemMessage(hwnd, IDC_EOLMODELIST, CB_SETCURSEL, iEOLMode, 0);
@@ -2044,7 +2044,7 @@ void InitZoomLevelComboBox(HWND hwnd, int nCtlId, int zoomLevel) {
 			selIndex = i;
 		}
 		wsprintf(tch, L"%d%%", level);
-		SendMessage(hwndCtl, CB_ADDSTRING, 0, (LPARAM)tch);
+		ComboBox_AddString(hwndCtl, tch);
 	}
 
 	ComboBox_SetExtendedUI(hwndCtl, TRUE);

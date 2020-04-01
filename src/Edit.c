@@ -4501,7 +4501,7 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 		// Load MRUs
 		for (int i = 0; i < MRU_GetCount(mruFind); i++) {
 			MRU_Enum(mruFind, i, tch, COUNTOF(tch));
-			SendDlgItemMessage(hwnd, IDC_FINDTEXT, CB_ADDSTRING, 0, (LPARAM)tch);
+			ComboBox_AddString(hwndFind, tch);
 		}
 
 		if (!bSwitchedFindReplace) {
@@ -4551,7 +4551,7 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 			AddBackslashComboBoxSetup(hwnd, IDC_REPLACETEXT);
 			for (int i = 0; i < MRU_GetCount(mruReplace); i++) {
 				MRU_Enum(mruReplace, i, tch, COUNTOF(tch));
-				SendDlgItemMessage(hwnd, IDC_REPLACETEXT, CB_ADDSTRING, 0, (LPARAM)tch);
+				ComboBox_AddString(hwndRepl, tch);
 			}
 
 			ComboBox_LimitText(hwndRepl, NP2_FIND_REPLACE_LIMIT);
@@ -4716,7 +4716,9 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 		case IDMSG_SWITCHTOFIND:
 		case IDMSG_SWITCHTOREPLACE: {
 			LPEDITFINDREPLACE lpefr = (LPEDITFINDREPLACE)GetWindowLongPtr(hwnd, DWLP_USER);
-			const BOOL bIsFindDlg = (GetDlgItem(hwnd, IDC_REPLACE) == NULL);
+			HWND hwndFind = GetDlgItem(hwnd, IDC_FINDTEXT);
+			HWND hwndRepl = GetDlgItem(hwnd, IDC_REPLACETEXT);
+			const BOOL bIsFindDlg = (hwndRepl == NULL);
 
 			if ((bIsFindDlg && LOWORD(wParam) == IDMSG_SWITCHTOREPLACE) ||
 					(!bIsFindDlg && LOWORD(wParam) == IDMSG_SWITCHTOFIND)) {
@@ -4739,7 +4741,7 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 				return TRUE;
 			}
 
-			if (GetDlgItem(hwnd, IDC_REPLACETEXT)) {
+			if (!bIsFindDlg) {
 				GetDlgItemTextA2W(cpEdit, hwnd, IDC_REPLACETEXT, lpefr->szReplace, COUNTOF(lpefr->szReplace));
 			}
 
@@ -4811,12 +4813,12 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 
 			for (int i = 0; i < MRU_GetCount(mruFind); i++) {
 				MRU_Enum(mruFind, i, tch, COUNTOF(tch));
-				SendDlgItemMessage(hwnd, IDC_FINDTEXT, CB_ADDSTRING, 0, (LPARAM)tch);
+				ComboBox_AddString(hwndFind, tch);
 			}
 
 			for (int i = 0; i < MRU_GetCount(mruReplace); i++) {
 				MRU_Enum(mruReplace, i, tch, COUNTOF(tch));
-				SendDlgItemMessage(hwnd, IDC_REPLACETEXT, CB_ADDSTRING, 0, (LPARAM)tch);
+				ComboBox_AddString(hwndRepl, tch);
 			}
 
 			SetDlgItemTextA2W(CP_UTF8, hwnd, IDC_FINDTEXT, lpefr->szFindUTF8);
