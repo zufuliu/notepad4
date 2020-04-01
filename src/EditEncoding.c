@@ -984,7 +984,7 @@ void Encoding_AddToComboboxEx(HWND hwnd, int idSel, BOOL bRecodeOnly) {
 BOOL Encoding_GetFromComboboxEx(HWND hwnd, int *pidEncoding) {
 	COMBOBOXEXITEM cbei;
 
-	cbei.iItem = SendMessage(hwnd, CB_GETCURSEL, 0, 0);
+	cbei.iItem = ComboBox_GetCurSel(hwnd);
 	cbei.mask = CBEIF_LPARAM;
 
 	if (SendMessage(hwnd, CBEM_GETITEM, 0, (LPARAM)&cbei)) {

@@ -1074,7 +1074,7 @@ int DriveBox_Fill(HWND hwnd) {
 // DriveBox_GetSelDrive
 //
 BOOL DriveBox_GetSelDrive(HWND hwnd, LPWSTR lpszDrive, int nDrive, BOOL fNoSlash) {
-	const int i = (int)SendMessage(hwnd, CB_GETCURSEL, 0, 0);
+	const int i = ComboBox_GetCurSel(hwnd);
 	// CB_ERR means no Selection
 	if (i == CB_ERR) {
 		return FALSE;
@@ -1145,7 +1145,7 @@ BOOL DriveBox_SelectDrive(HWND hwnd, LPCWSTR lpszPath) {
 BOOL DriveBox_PropertyDlg(HWND hwnd) {
 	static const char *lpVerb = "properties";
 
-	const int iItem = (int)SendMessage(hwnd, CB_GETCURSEL, 0, 0);
+	const int iItem = ComboBox_GetCurSel(hwnd);
 	if (iItem == CB_ERR) {
 		return FALSE;
 	}

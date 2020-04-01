@@ -1121,7 +1121,7 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	EnableCmd(hmenu, IDM_FILE_DELETE, i);
 	EnableCmd(hmenu, IDM_FILE_RENAME, i);
 
-	i = (SendMessage(hwndDriveBox, CB_GETCURSEL, 0, 0) != CB_ERR);
+	i = (ComboBox_GetCurSel(hwndDriveBox) != CB_ERR);
 	EnableCmd(hmenu, IDM_FILE_DRIVEPROP, i);
 
 	CheckCmd(hmenu, IDM_VIEW_FOLDERS, (dwFillMask & DL_FOLDERS));
