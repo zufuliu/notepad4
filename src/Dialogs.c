@@ -2037,7 +2037,7 @@ void InitZoomLevelComboBox(HWND hwnd, int nCtlId, int zoomLevel) {
 	};
 
 	HWND hwndCtl = GetDlgItem(hwnd, nCtlId);
-	SendMessage(hwndCtl, CB_LIMITTEXT, 8, 0);
+	ComboBox_LimitText(hwndCtl, 8);
 	for (int i = 0; i < (int)COUNTOF(levelList); i++) {
 		const int level = levelList[i];
 		if (zoomLevel == level) {

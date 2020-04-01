@@ -339,7 +339,7 @@ INT_PTR CALLBACK GotoDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 		ResizeDlg_InitX(hwnd, cxGotoDlg, IDC_RESIZEGRIP);
 
 		HWND hwndGoto = GetDlgItem(hwnd, IDC_GOTO);
-		SendMessage(hwndGoto, CB_LIMITTEXT, MAX_PATH - 1, 0);
+		ComboBox_LimitText(hwndGoto, MAX_PATH - 1);
 		ComboBox_SetExtendedUI(hwndGoto, TRUE);
 
 		for (int i = 0; i < HISTORY_ITEMS; i++) {
@@ -1435,7 +1435,7 @@ INT_PTR CALLBACK CopyMoveDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPa
 		SendMessage(hwndDest, CB_SETCURSEL, 0, 0);
 
 		SetDlgItemText(hwnd, IDC_SOURCE, lpfod->szSource);
-		SendMessage(hwndDest, CB_LIMITTEXT, MAX_PATH - 1, 0);
+		ComboBox_LimitText(hwndDest, MAX_PATH - 1);
 
 		ComboBox_SetExtendedUI(hwndDest, TRUE);
 
