@@ -3844,23 +3844,6 @@ static inline int GetSchemeGroupHeader(LPCEDITLEXER pLex) {
 	return ToUpperA(ch);
 }
 
-static void Style_ResetStyle(PEDITLEXER pLex, PEDITSTYLE pStyle) {
-	if (np2StyleTheme != StyleTheme_Default) {
-		// reload style from external file
-		LPCWSTR themePath = GetStyleThemeFilePath();
-		WCHAR wch[MAX_EDITSTYLE_VALUE_SIZE] = L"";
-		// use "NULL" to distinguish between empty style value like: Keyword=
-		GetPrivateProfileString(pLex->pszName, pStyle->pszName, L"NULL", wch, COUNTOF(wch), themePath);
-		if (!StrEqual(wch, L"NULL")) {
-			lstrcpy(pStyle->szValue, wch);
-			return;
-		}
-	}
-
-	// reset style to built-in default
-	lstrcpy(pStyle->szValue, pStyle->pszDefault);
-}
-
 static HTREEITEM Style_AddAllLexerToTreeView(HWND hwndTV, BOOL withStyles, BOOL withCheckBox) {
 	struct SchemeGroupInfo groupList[26 + 2];
 	int groupCount = 2;
@@ -4007,6 +3990,23 @@ static HTREEITEM Style_AddAllLexerToTreeView(HWND hwndTV, BOOL withStyles, BOOL 
 	}
 	TreeView_Select(hwndTV, hSelNode, TVGN_CARET);
 	return hFavoriteNode;
+}
+
+static void Style_ResetStyle(PEDITLEXER pLex, PEDITSTYLE pStyle) {
+	if (np2StyleTheme != StyleTheme_Default) {
+		// reload style from external file
+		LPCWSTR themePath = GetStyleThemeFilePath();
+		WCHAR wch[MAX_EDITSTYLE_VALUE_SIZE] = L"";
+		// use "NULL" to distinguish between empty style value like: Keyword=
+		GetPrivateProfileString(pLex->pszName, pStyle->pszName, L"NULL", wch, COUNTOF(wch), themePath);
+		if (!StrEqual(wch, L"NULL")) {
+			lstrcpy(pStyle->szValue, wch);
+			return;
+		}
+	}
+
+	// reset style to built-in default
+	lstrcpy(pStyle->szValue, pStyle->pszDefault);
 }
 
 //=============================================================================
@@ -4826,14 +4826,15 @@ static INT_PTR CALLBACK Style_SelectLexerDlgProc(HWND hwnd, UINT umsg, WPARAM wP
 		SetWindowLongPtr(hwnd, DWLP_USER, lParam);
 		ResizeDlg_Init(hwnd, cxStyleSelectDlg, cyStyleSelectDlg, IDC_RESIZEGRIP3);
 
-		hwndTV = GetDlgItem(hwnd, IDC_STYLELIST);
 		const BOOL favorite = lParam != 0;
-		SetWindowLongPtr(hwndTV, GWL_STYLE, GetWindowLongPtr(hwndTV, GWL_STYLE) | (favorite ? TVS_CHECKBOXES : TVS_DISABLEDRAGDROP));
 		if (favorite) {
 			WCHAR szTitle[128];
 			GetString(IDS_FAVORITE_SCHEMES_TITLE, szTitle, COUNTOF(szTitle));
 			SetWindowText(hwnd, szTitle);
 		}
+
+		hwndTV = GetDlgItem(hwnd, IDC_STYLELIST);
+		SetWindowLongPtr(hwndTV, GWL_STYLE, GetWindowLongPtr(hwndTV, GWL_STYLE) | (favorite ? TVS_CHECKBOXES : TVS_DISABLEDRAGDROP));
 
 		hFavoriteNode = Style_AddAllLexerToTreeView(hwndTV, FALSE, favorite);
 		if (favorite) {
