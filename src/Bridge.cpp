@@ -445,7 +445,7 @@ static UINT_PTR CALLBACK PageSetupHook(HWND hwnd, UINT uiMsg, WPARAM wParam, LPA
 		while ((p2 = StrChr(p1, L'|')) != nullptr) {
 			*p2++ = L'\0';
 			if (*p1) {
-				SendDlgItemMessage(hwnd, IDC_PAGESETUP_HEADER_LIST, CB_ADDSTRING, 0, (LPARAM)p1);
+				ComboBox_AddString(hwndCtl, p1);
 			}
 			p1 = p2;
 		}
@@ -461,7 +461,7 @@ static UINT_PTR CALLBACK PageSetupHook(HWND hwnd, UINT uiMsg, WPARAM wParam, LPA
 		while ((p2 = StrChr(p1, L'|')) != nullptr) {
 			*p2++ = L'\0';
 			if (*p1) {
-				SendDlgItemMessage(hwnd, IDC_PAGESETUP_FOOTER_LIST, CB_ADDSTRING, 0, (LPARAM)p1);
+				ComboBox_AddString(hwndCtl, p1);
 			}
 			p1 = p2;
 		}
@@ -477,7 +477,7 @@ static UINT_PTR CALLBACK PageSetupHook(HWND hwnd, UINT uiMsg, WPARAM wParam, LPA
 		while ((p2 = StrChr(p1, L'|')) != nullptr) {
 			*p2++ = L'\0';
 			if (*p1) {
-				SendDlgItemMessage(hwnd, IDC_PAGESETUP_COLOR_MODE_LIST, CB_ADDSTRING, 0, (LPARAM)p1);
+				ComboBox_AddString(hwndCtl, p1);
 			}
 			p1 = p2;
 		}
