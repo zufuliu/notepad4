@@ -4665,8 +4665,8 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 		switch (LOWORD(wParam)) {
 		case IDC_FINDTEXT:
 		case IDC_REPLACETEXT: {
-			const BOOL bEnable = (GetWindowTextLength(GetDlgItem(hwnd, IDC_FINDTEXT)) ||
-							CB_ERR != SendDlgItemMessage(hwnd, IDC_FINDTEXT, CB_GETCURSEL, 0, 0));
+			HWND hwndFind = GetDlgItem(hwnd, IDC_FINDTEXT);
+			const BOOL bEnable = (GetWindowTextLength(hwndFind) || CB_ERR != ComboBox_GetCurSel(hwndFind));
 
 			EnableWindow(GetDlgItem(hwnd, IDOK), bEnable);
 			EnableWindow(GetDlgItem(hwnd, IDC_FINDPREV), bEnable);
@@ -4777,13 +4777,13 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 				// Save MRUs
 				if (StrNotEmptyA(lpefr->szFind)) {
 					if (GetDlgItemTextA2W(CP_UTF8, hwnd, IDC_FINDTEXT, lpefr->szFindUTF8, COUNTOF(lpefr->szFindUTF8))) {
-						GetDlgItemText(hwnd, IDC_FINDTEXT, tch, COUNTOF(tch));
+						ComboBox_GetText(hwndFind, tch, COUNTOF(tch));
 						MRU_AddMultiline(mruFind, tch);
 					}
 				}
 				if (StrNotEmptyA(lpefr->szReplace)) {
 					if (GetDlgItemTextA2W(CP_UTF8, hwnd, IDC_REPLACETEXT, lpefr->szReplaceUTF8, COUNTOF(lpefr->szReplaceUTF8))) {
-						GetDlgItemText(hwnd, IDC_REPLACETEXT, tch, COUNTOF(tch));
+						ComboBox_GetText(hwndRepl, tch, COUNTOF(tch));
 						MRU_AddMultiline(mruReplace, tch);
 					}
 				} else {
