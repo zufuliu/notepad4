@@ -328,6 +328,8 @@ void SetWindowLayoutRTL(HWND hwnd, BOOL bRTL);
 #define SendWMCommand(hwnd, id)				SendWMCommandEx(hwnd, (id), 1)
 #define PostWMCommand(hwnd, id)				PostMessage(hwnd, WM_COMMAND, MAKEWPARAM((id), 1), 0)
 
+#define ComboBox_HasText(hwnd)					(ComboBox_GetTextLength(hwnd) || CB_ERR != ComboBox_GetCurSel(hwnd))
+
 #define StatusSetSimple(hwnd, b)				SendMessage(hwnd, SB_SIMPLE, (b), 0)
 #define StatusSetText(hwnd, nPart, lpszText)	SendMessage(hwnd, SB_SETTEXT, (nPart), (LPARAM)(lpszText))
 

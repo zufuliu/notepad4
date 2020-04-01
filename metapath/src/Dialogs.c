@@ -392,7 +392,7 @@ INT_PTR CALLBACK GotoDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 		switch (LOWORD(wParam)) {
 		case IDC_GOTO: {
 			HWND hwndGoto = GetDlgItem(hwnd, IDC_GOTO);
-			EnableWindow(GetDlgItem(hwnd, IDOK), (GetWindowTextLength(hwndGoto) || CB_ERR != ComboBox_GetCurSel(hwndGoto)));
+			EnableWindow(GetDlgItem(hwnd, IDOK), ComboBox_HasText(hwndGoto));
 
 			if (HIWORD(wParam) == CBN_CLOSEUP) {
 				const DWORD lSelEnd = HIWORD(ComboBox_GetEditSel(hwndGoto));
@@ -409,7 +409,7 @@ INT_PTR CALLBACK GotoDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 				PathUnquoteSpaces(tch);
 				DisplayPath(tch, IDS_ERR_CMDLINE);
 			} else {
-				EnableWindow(GetDlgItem(hwnd, IDOK), (GetWindowTextLength(hwndGoto) || CB_ERR != ComboBox_GetCurSel(hwndGoto)));
+				EnableWindow(GetDlgItem(hwnd, IDOK), ComboBox_HasText(hwndGoto));
 			}
 		}
 		break;
@@ -1480,9 +1480,10 @@ INT_PTR CALLBACK CopyMoveDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPa
 		LPNMHDR pnmhdr = (LPNMHDR)lParam;
 		if (pnmhdr->idFrom == IDC_EMPTY_MRU && (pnmhdr->code == NM_CLICK || pnmhdr->code == NM_RETURN)) {
 			WCHAR tch[MAX_PATH];
-			GetDlgItemText(hwnd, IDC_DESTINATION, tch, COUNTOF(tch));
-			MRU_ClearCombobox(GetDlgItem(hwnd, IDC_DESTINATION), MRU_KEY_COPY_MOVE_HISTORY);
-			SetDlgItemText(hwnd, IDC_DESTINATION, tch);
+			HWND hwndDest = GetDlgItem(hwnd, IDC_DESTINATION);
+			ComboBox_GetText(hwndDest, tch, COUNTOF(tch));
+			MRU_ClearCombobox(hwndDest, MRU_KEY_COPY_MOVE_HISTORY);
+			ComboBox_SetText(hwndDest, tch);
 		}
 	}
 	return TRUE;
@@ -1491,7 +1492,7 @@ INT_PTR CALLBACK CopyMoveDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPa
 		switch (LOWORD(wParam)) {
 		case IDC_DESTINATION: {
 			HWND hwndDest = GetDlgItem(hwnd, IDC_DESTINATION);
-			EnableWindow(GetDlgItem(hwnd, IDOK), (GetWindowTextLength(hwndDest) || CB_ERR != ComboBox_GetCurSel(hwndDest)));
+			EnableWindow(GetDlgItem(hwnd, IDOK), ComboBox_HasText(hwndDest));
 		} break;
 
 		case IDC_BROWSEDESTINATION: {
@@ -1513,7 +1514,7 @@ INT_PTR CALLBACK CopyMoveDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPa
 				lpfod->wFunc = IsButtonChecked(hwnd, IDC_FUNCCOPY) ? FO_COPY : FO_MOVE;
 				EndDialog(hwnd, IDOK);
 			} else {
-				EnableWindow(GetDlgItem(hwnd, IDOK), (GetWindowTextLength(hwndDest) || CB_ERR != ComboBox_GetCurSel(hwndDest)));
+				EnableWindow(GetDlgItem(hwnd, IDOK), ComboBox_HasText(hwndDest));
 			}
 		}
 		break;

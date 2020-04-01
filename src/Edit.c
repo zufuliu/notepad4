@@ -4666,7 +4666,7 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 		case IDC_FINDTEXT:
 		case IDC_REPLACETEXT: {
 			HWND hwndFind = GetDlgItem(hwnd, IDC_FINDTEXT);
-			const BOOL bEnable = (GetWindowTextLength(hwndFind) || CB_ERR != ComboBox_GetCurSel(hwndFind));
+			const BOOL bEnable = ComboBox_HasText(hwndFind);
 
 			EnableWindow(GetDlgItem(hwnd, IDOK), bEnable);
 			EnableWindow(GetDlgItem(hwnd, IDC_FINDPREV), bEnable);
