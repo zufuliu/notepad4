@@ -19,6 +19,7 @@
 ******************************************************************************/
 
 #include <windows.h>
+#include <windowsx.h>
 #include <shlwapi.h>
 #include <shlobj.h>
 #include <shellapi.h>
@@ -1438,6 +1439,7 @@ static INT_PTR CALLBACK WordWrapSettingsDlgProc(HWND hwnd, UINT umsg, WPARAM wPa
 	case WM_INITDIALOG: {
 		WCHAR tch[512];
 		for (int i = 0; i < 4; i++) {
+			HWND hwndCtl = GetDlgItem(hwnd, IDC_WRAP_INDENT + i);
 			GetDlgItemText(hwnd, IDC_WRAP_INDENT_OPTIONS + i, tch, COUNTOF(tch));
 			lstrcat(tch, L"|");
 			LPWSTR p1 = tch;
@@ -1450,7 +1452,7 @@ static INT_PTR CALLBACK WordWrapSettingsDlgProc(HWND hwnd, UINT umsg, WPARAM wPa
 				p1 = p2;
 			}
 
-			SendDlgItemMessage(hwnd, IDC_WRAP_INDENT + i, CB_SETEXTENDEDUI, TRUE, 0);
+			ComboBox_SetExtendedUI(hwndCtl, TRUE);
 		}
 
 		SendDlgItemMessage(hwnd, IDC_WRAP_INDENT, CB_SETCURSEL, iWordWrapIndent, 0);
@@ -1904,6 +1906,7 @@ static INT_PTR CALLBACK SelectDefLineEndingDlgProc(HWND hwnd, UINT umsg, WPARAM 
 		const int iOption = *((int *)lParam);
 
 		// Load options
+		HWND hwndCtl = GetDlgItem(hwnd, IDC_EOLMODELIST);
 		WCHAR wch[128];
 		for (int i = 0; i < 3; i++) {
 			GetString(IDS_EOLMODENAME_CRLF + i, wch, COUNTOF(wch));
@@ -1911,7 +1914,7 @@ static INT_PTR CALLBACK SelectDefLineEndingDlgProc(HWND hwnd, UINT umsg, WPARAM 
 		}
 
 		SendDlgItemMessage(hwnd, IDC_EOLMODELIST, CB_SETCURSEL, iOption, 0);
-		SendDlgItemMessage(hwnd, IDC_EOLMODELIST, CB_SETEXTENDEDUI, TRUE, 0);
+		ComboBox_SetExtendedUI(hwndCtl, TRUE);
 
 		if (bWarnLineEndings) {
 			CheckDlgButton(hwnd, IDC_WARNINCONSISTENTEOLS, BST_CHECKED);
@@ -1968,6 +1971,7 @@ static INT_PTR CALLBACK WarnLineEndingDlgProc(HWND hwnd, UINT umsg, WPARAM wPara
 		iEOLMode = (iEOLMode == SC_EOL_CRLF) ? 0 : (iEOLMode == SC_EOL_LF) ? 1 : 2;
 
 		// Load options
+		HWND hwndCtl = GetDlgItem(hwnd, IDC_EOLMODELIST);
 		WCHAR wch[128];
 		for (int i = 0; i < 3; i++) {
 			GetString(IDS_EOLMODENAME_CRLF + i, wch, COUNTOF(wch));
@@ -1975,7 +1979,7 @@ static INT_PTR CALLBACK WarnLineEndingDlgProc(HWND hwnd, UINT umsg, WPARAM wPara
 		}
 
 		SendDlgItemMessage(hwnd, IDC_EOLMODELIST, CB_SETCURSEL, iEOLMode, 0);
-		SendDlgItemMessage(hwnd, IDC_EOLMODELIST, CB_SETEXTENDEDUI, TRUE, 0);
+		ComboBox_SetExtendedUI(hwndCtl, TRUE);
 
 		WCHAR tchFmt[128];
 		for (int i = 0; i < 3; i++) {
@@ -2043,7 +2047,7 @@ void InitZoomLevelComboBox(HWND hwnd, int nCtlId, int zoomLevel) {
 		SendMessage(hwndCtl, CB_ADDSTRING, 0, (LPARAM)tch);
 	}
 
-	SendMessage(hwndCtl, CB_SETEXTENDEDUI, TRUE, 0);
+	ComboBox_SetExtendedUI(hwndCtl, TRUE);
 	SendMessage(hwndCtl, CB_SETCURSEL, selIndex, 0);
 	if (selIndex == -1) {
 		wsprintf(tch, L"%d%%", zoomLevel);

@@ -770,7 +770,7 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	// Window Initialization
 	// DriveBox
 	DriveBox_Init(hwndDriveBox);
-	SendMessage(hwndDriveBox, CB_SETEXTENDEDUI, TRUE, 0);
+	ComboBox_SetExtendedUI(hwndDriveBox, TRUE);
 	// DirList
 	LVCOLUMN lvc = { LVCF_FMT | LVCF_TEXT, LVCFMT_LEFT, 0, NULL, -1, 0, 0, 0
 #if (NTDDI_VERSION >= NTDDI_VISTA)
