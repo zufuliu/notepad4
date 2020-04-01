@@ -132,7 +132,7 @@ extern EDITLEXER lexYAML;
 // 1. global styles and lexers for text file, not sortable, the order is hard-coded.
 // 2. favorite lexers, sortable, the order is configured by FavoriteSchemes preference.
 // 3. other lexers, grouped by first letter, sorted alphabetical (case insensitive).
-#define LEXER_INDEX_GENERAL		4
+#define LEXER_INDEX_GENERAL		(LEXER_INDEX_MATCH + 2)
 #define GENERAL_LEXER_COUNT		(ALL_LEXER_COUNT - LEXER_INDEX_GENERAL)
 #define MAX_FAVORITE_SCHEMES_COUNT			20
 #define MAX_FAVORITE_SCHEMES_CONFIG_SIZE	64	// 3 + MAX_FAVORITE_SCHEMES_COUNT*3
