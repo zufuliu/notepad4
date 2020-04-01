@@ -1126,13 +1126,13 @@ BOOL DriveBox_SelectDrive(HWND hwnd, LPCWSTR lpszPath) {
 		// Compare Root Directory with Path
 		if (PathIsSameRoot(lpszPath, szRoot)) {
 			// Select matching Drive
-			SendMessage(hwnd, CB_SETCURSEL, i, 0);
+			ComboBox_SetCurSel(hwnd, i);
 			return TRUE;
 		}
 	}
 
 	// Don't select anything
-	SendMessage(hwnd, CB_SETCURSEL, (WPARAM)(-1), 0);
+	ComboBox_SetCurSel(hwnd, -1);
 	return FALSE;
 }
 

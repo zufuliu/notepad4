@@ -450,7 +450,7 @@ static UINT_PTR CALLBACK PageSetupHook(HWND hwnd, UINT uiMsg, WPARAM wParam, LPA
 			p1 = p2;
 		}
 
-		SendDlgItemMessage(hwnd, IDC_PAGESETUP_HEADER_LIST, CB_SETCURSEL, iPrintHeader, 0);
+		ComboBox_SetCurSel(hwndCtl, iPrintHeader);
 		ComboBox_SetExtendedUI(hwndCtl, TRUE);
 
 		// Set footer options
@@ -466,7 +466,7 @@ static UINT_PTR CALLBACK PageSetupHook(HWND hwnd, UINT uiMsg, WPARAM wParam, LPA
 			p1 = p2;
 		}
 
-		SendDlgItemMessage(hwnd, IDC_PAGESETUP_FOOTER_LIST, CB_SETCURSEL, iPrintFooter, 0);
+		ComboBox_SetCurSel(hwndCtl, iPrintFooter);
 		ComboBox_SetExtendedUI(hwndCtl, TRUE);
 
 		// Set color options
@@ -482,7 +482,7 @@ static UINT_PTR CALLBACK PageSetupHook(HWND hwnd, UINT uiMsg, WPARAM wParam, LPA
 			p1 = p2;
 		}
 
-		SendDlgItemMessage(hwnd, IDC_PAGESETUP_COLOR_MODE_LIST, CB_SETCURSEL, iPrintColor, 0);
+		ComboBox_SetCurSel(hwndCtl, iPrintColor);
 		ComboBox_SetExtendedUI(hwndCtl, TRUE);
 
 		// Make combox handier

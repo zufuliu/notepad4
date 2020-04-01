@@ -977,7 +977,7 @@ void Encoding_AddToComboboxEx(HWND hwnd, int idSel, BOOL bRecodeOnly) {
 	NP2HeapFree(pEE);
 
 	if (iSelItem != -1) {
-		SendMessage(hwnd, CB_SETCURSEL, iSelItem, 0);
+		ComboBox_SetCurSel(hwnd, iSelItem);
 	}
 }
 
