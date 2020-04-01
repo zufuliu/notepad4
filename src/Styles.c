@@ -4953,13 +4953,18 @@ static INT_PTR CALLBACK Style_SelectLexerDlgProc(HWND hwnd, UINT umsg, WPARAM wP
 			TreeView_HitTest(hwndTV, &tvht);
 
 			HTREEITEM htiTarget = tvht.hItem;
-			if (htiTarget == hFavoriteNode || (htiTarget != NULL && TreeView_GetParent(hwndTV, htiTarget) == hFavoriteNode)) {
-				TreeView_SelectDropTarget(hwndTV, htiTarget);
-				TreeView_SetInsertMark(hwndTV, htiTarget, TRUE);
+			if (htiTarget != NULL) {
 				TreeView_EnsureVisible(hwndTV, htiTarget);
-			} else {
-				TreeView_SelectDropTarget(hwndTV, NULL);
+				HTREEITEM hParent = TreeView_GetParent(hwndTV, htiTarget);
+				if (htiTarget == hFavoriteNode || hParent == hFavoriteNode) {
+					//TreeView_Expand(hwndTV, hFavoriteNode, TVE_EXPAND);
+				} else {
+					htiTarget = NULL;
+				}
 			}
+
+			TreeView_SelectDropTarget(hwndTV, htiTarget);
+			TreeView_SetInsertMark(hwndTV, htiTarget, TRUE);
 		}
 		break;
 
