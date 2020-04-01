@@ -4810,7 +4810,8 @@ static INT_PTR CALLBACK Style_SelectLexerDlgProc(HWND hwnd, UINT umsg, WPARAM wP
 			break;
 
 			case NM_DBLCLK:
-				if (Lexer_GetFromTreeView(hwndTV)) {
+				// disable double click when managing favorite schemes.
+				if (Lexer_GetFromTreeView(hwndTV) != NULL && GetWindowLongPtr(hwnd, DWLP_USER) == 0) {
 					SendWMCommand(hwnd, IDOK);
 				}
 				break;
