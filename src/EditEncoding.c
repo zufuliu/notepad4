@@ -948,7 +948,7 @@ void Encoding_AddToComboboxEx(HWND hwnd, int idSel, BOOL bRecodeOnly) {
 		if (!bRecodeOnly || (mEncoding[id].uFlags & NCP_RECODE)) {
 			WCHAR *pwsz;
 
-			cbei.iItem = SendMessage(hwnd, CB_GETCOUNT, 0, 0);
+			cbei.iItem = ComboBox_GetCount(hwnd);
 			if ((pwsz = StrChr(pEE[i].wch, L';')) != NULL) {
 				lstrcpyn(wchBuf, CharNext(pwsz), COUNTOF(wchBuf));
 				if ((pwsz = StrChr(wchBuf, L';')) != NULL) {

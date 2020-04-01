@@ -1066,7 +1066,7 @@ int DriveBox_Fill(HWND hwnd) {
 
 	SendMessage(hwnd, WM_SETREDRAW, 1, 0);
 	// Return number of items added to combo box
-	return (int)SendMessage(hwnd, CB_GETCOUNT, 0, 0);
+	return ComboBox_GetCount(hwnd);
 }
 
 //=============================================================================
@@ -1103,7 +1103,7 @@ BOOL DriveBox_GetSelDrive(HWND hwnd, LPWSTR lpszDrive, int nDrive, BOOL fNoSlash
 // DriveBox_SelectDrive
 //
 BOOL DriveBox_SelectDrive(HWND hwnd, LPCWSTR lpszPath) {
-	const int cbItems = (int)SendMessage(hwnd, CB_GETCOUNT, 0, 0);
+	const int cbItems = ComboBox_GetCount(hwnd);
 	// No Drives in Combo Box
 	if (!cbItems) {
 		return FALSE;
