@@ -3838,6 +3838,12 @@ struct SchemeGroupInfo {
 	int count;
 };
 
+static inline int GetSchemeGroupHeader(LPCEDITLEXER pLex) {
+	const int ch = pLex->pszName[0];
+	// assume all lexer name start with A-Z a-z
+	return ToUpperA(ch);
+}
+
 static void Style_ResetStyle(PEDITLEXER pLex, PEDITSTYLE pStyle) {
 	if (np2StyleTheme != StyleTheme_Default) {
 		// reload style from external file
@@ -3879,8 +3885,8 @@ static HTREEITEM Style_AddAllLexerToTreeView(HWND hwndTV, BOOL withStyles, BOOL 
 	while (iLexer < GENERAL_LEXER_COUNT) {
 		PEDITLEXER pLex = generalLex[iLexer++];
 		int count = 1;
-		const int ch = ToUpperA(pLex->pszName[0]);
-		while (iLexer < GENERAL_LEXER_COUNT && ch == ToUpperA(generalLex[iLexer]->pszName[0])) {
+		const int ch = GetSchemeGroupHeader(pLex);
+		while (iLexer < GENERAL_LEXER_COUNT && ch == GetSchemeGroupHeader(generalLex[iLexer])) {
 			++iLexer;
 			++count;
 		}
@@ -4673,7 +4679,7 @@ static void Lexer_OnCheckStateChanged(HWND hwndTV, HTREEITEM hFavoriteNode, HTRE
 
 		// update check state in general schemes
 		if (hParent == hFavoriteNode) {
-			const int ch = ToUpperA(pLex->pszName[0]);
+			const int ch = GetSchemeGroupHeader(pLex);
 			WCHAR szTitle[4] = {0};
 			item.mask = TVIF_TEXT;
 			item.pszText = szTitle;
