@@ -4285,14 +4285,18 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 			TreeView_HitTest(hwndTV, &tvht);
 
 			HTREEITEM htiTarget = tvht.hItem;
-			if (htiTarget != NULL && TreeView_GetParent(hwndTV, htiTarget) != NULL) {
-				TreeView_SelectDropTarget(hwndTV, htiTarget);
-				//TreeView_Expand(hwndTV, htiTarget, TVE_EXPAND);
+			if (htiTarget != NULL) {
 				TreeView_EnsureVisible(hwndTV, htiTarget);
-			} else {
-				TreeView_SelectDropTarget(hwndTV, NULL);
+				HTREEITEM hParent = TreeView_GetParent(hwndTV, htiTarget);
+				HTREEITEM hChildNode = TreeView_GetChild(hwndTV, htiTarget);
+				if (!(hParent != NULL && hChildNode == NULL)) {
+					// not on style node
+					//TreeView_Expand(hwndTV, htiTarget, TVE_EXPAND);
+					htiTarget = NULL;
+				}
 			}
 
+			TreeView_SelectDropTarget(hwndTV, htiTarget);
 			//ImageList_DragShowNolock(TRUE);
 		}
 		break;
