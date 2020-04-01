@@ -1771,8 +1771,8 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	break;
 
 	case ACC_ESCAPE:
-		if (SendMessage(hwndDriveBox, CB_GETDROPPEDSTATE, 0, 0)) {
-			SendMessage(hwndDriveBox, CB_SHOWDROPDOWN, 0, 0);
+		if (ComboBox_GetDroppedState(hwndDriveBox)) {
+			ComboBox_ShowDropdown(hwndDriveBox, FALSE);
 		} else if (iEscFunction == 1) {
 			SendMessage(hwnd, WM_SYSCOMMAND, SC_MINIMIZE, 0);
 		} else if (iEscFunction == 2) {
