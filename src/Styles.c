@@ -5022,7 +5022,10 @@ static INT_PTR CALLBACK Style_SelectLexerDlgProc(HWND hwnd, UINT umsg, WPARAM wP
 				np2LexLangIndex = 0;
 			}
 
-			iDefaultLexerIndex = Style_GetMatchLexerIndex(iInternalDefault);
+			if (iInternalDefault != pLexArray[iDefaultLexerIndex]->rid) {
+				// default lexer changed
+				iDefaultLexerIndex = Style_GetMatchLexerIndex(iInternalDefault);
+			}
 			bAutoSelect = IsButtonChecked(hwnd, IDC_AUTOSELECT);
 			EndDialog(hwnd, IDOK);
 		}
