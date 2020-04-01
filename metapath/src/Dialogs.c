@@ -395,9 +395,7 @@ INT_PTR CALLBACK GotoDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 			EnableWindow(GetDlgItem(hwnd, IDOK), (GetWindowTextLength(hwndGoto) || CB_ERR != ComboBox_GetCurSel(hwndGoto)));
 
 			if (HIWORD(wParam) == CBN_CLOSEUP) {
-				LONG lSelEnd = 0;
-				// ComboBox_GetEditSel() in windowsx.h is wrong.
-				SendMessage(hwndGoto, CB_GETEDITSEL, 0, (LPARAM)&lSelEnd);
+				const DWORD lSelEnd = HIWORD(ComboBox_GetEditSel(hwndGoto));
 				ComboBox_SetEditSel(hwndGoto, lSelEnd, lSelEnd);
 			}
 		}
