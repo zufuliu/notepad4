@@ -3714,26 +3714,30 @@ int Style_GetLexerIconId(LPCEDITLEXER pLex) {
 		pszExtensions = pLex->pszDefExt;
 	}
 
-	WCHAR *pszFile = (WCHAR *)NP2HeapAlloc(sizeof(WCHAR) * (lstrlen(pszExtensions) + CSTRLEN(L"*.txt") + 16));
+	WCHAR pszFile[MAX_PATH];
 	lstrcpy(pszFile, L"*.");
+
+	// TODO: avoid copying all extensions then find separators.
+	// we only need the first extension, it's usually very short.
+	LPWSTR p = pszFile + 2;
 	if (StrNotEmpty(pszExtensions)) {
-		lstrcat(pszFile, pszExtensions);
-	}
-	WCHAR *p = StrChr(pszFile, L';');
-	if (p != NULL) {
-		*p = L'\0';
+		lstrcpyn(p, pszExtensions, MAX_PATH - 2);
+
+		p = StrChr(p, L';');
+		//p = StrPBrk(p, L"; ");
+		if (p != NULL) {
+			*p = L'\0';
+		}
 	}
 
 	// check for ; at beginning
-	if (lstrlen(pszFile) < 3) {
-		lstrcat(pszFile, L"txt");
+	if (p == pszFile + 2) {
+		lstrcpy(p, L"txt");
 	}
 
 	SHFILEINFO shfi;
 	SHGetFileInfo(pszFile, FILE_ATTRIBUTE_NORMAL, &shfi, sizeof(SHFILEINFO),
 				  SHGFI_SMALLICON | SHGFI_SYSICONINDEX | SHGFI_USEFILEATTRIBUTES);
-
-	NP2HeapFree(pszFile);
 
 	return shfi.iIcon;
 }
