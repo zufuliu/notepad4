@@ -134,8 +134,8 @@ extern EDITLEXER lexYAML;
 // 3. other lexers, grouped by first letter, sorted alphabetical (case insensitive).
 #define LEXER_INDEX_GENERAL		(LEXER_INDEX_MATCH + 2)	// global styles and lexers for text file
 #define GENERAL_LEXER_COUNT		(ALL_LEXER_COUNT - LEXER_INDEX_GENERAL)
-#define MAX_FAVORITE_SCHEMES_COUNT			20
-#define MAX_FAVORITE_SCHEMES_CONFIG_SIZE	64	// 3 + MAX_FAVORITE_SCHEMES_COUNT*3
+#define MAX_FAVORITE_SCHEMES_COUNT			31
+#define MAX_FAVORITE_SCHEMES_CONFIG_SIZE	96	// 1 + MAX_FAVORITE_SCHEMES_COUNT*3
 // This array holds all the lexers...
 static PEDITLEXER pLexArray[ALL_LEXER_COUNT] = {
 	&lexGlobal,
@@ -622,7 +622,7 @@ void Style_GetFavoriteSchemes(void) {
 	WCHAR *wch = favoriteSchemesConfig;
 	int len = 0;
 	int count = 0;
-	for (UINT iLexer = LEXER_INDEX_GENERAL; iLexer < ALL_LEXER_COUNT && len < maxCch && count < MAX_FAVORITE_SCHEMES_COUNT; iLexer++) {
+	for (UINT iLexer = LEXER_INDEX_GENERAL; iLexer < ALL_LEXER_COUNT; iLexer++) {
 		const LPCEDITLEXER pLex = pLexArray[iLexer];
 		if (!pLex->iFavoriteOrder) {
 			break;
@@ -630,6 +630,9 @@ void Style_GetFavoriteSchemes(void) {
 
 		len += wsprintf(wch + len, L"%i ", pLex->rid - NP2LEX_TEXTFILE);
 		++count;
+		if (count == MAX_FAVORITE_SCHEMES_COUNT || len > maxCch) {
+			break;
+		}
 	}
 
 	wch[len--] = L'\0';
