@@ -466,12 +466,15 @@ BOOL IsDocWordChar(int ch) {
 	}
 
 	switch (pLexCurrent->rid) {
+	case NP2LEX_TEXTFILE:
+	case NP2LEX_2NDTEXTFILE:
 	case NP2LEX_ANSI:
 	case NP2LEX_CSS:
 	case NP2LEX_DOT:
 	case NP2LEX_LISP:
 	case NP2LEX_SMALI:
 		return (ch == '-');
+
 	case NP2LEX_ASM:
 	case NP2LEX_FORTRAN:
 		return (ch == '#' || ch == '%');
