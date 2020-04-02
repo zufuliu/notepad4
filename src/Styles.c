@@ -3772,7 +3772,7 @@ HTREEITEM Style_AddLexerToTreeView(HWND hwnd, PEDITLEXER pLex, HTREEITEM hParent
 	}
 
 	tvis.hParent = hParent;
-	tvis.item.mask = TVIF_TEXT | TVIF_IMAGE | TVIF_SELECTEDIMAGE | TVIF_PARAM;
+	//tvis.item.mask = TVIF_TEXT | TVIF_IMAGE | TVIF_SELECTEDIMAGE | TVIF_PARAM;
 	//tvis.item.iImage = -1;
 	//tvis.item.iSelectedImage = -1;
 
@@ -4682,7 +4682,7 @@ static void Lexer_OnCheckStateChanged(HWND hwndTV, HTREEITEM hFavoriteNode, HTRE
 		if (hParent == hFavoriteNode) {
 			const int ch = GetSchemeGroupHeader(pLex);
 			WCHAR szTitle[4] = {0};
-			item.mask = TVIF_TEXT;
+			//item.mask = TVIF_TEXT;
 			item.pszText = szTitle;
 			item.cchTextMax  = COUNTOF(szTitle);
 
