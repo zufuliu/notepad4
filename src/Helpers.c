@@ -1095,7 +1095,7 @@ void MakeBitmapButton(HWND hwnd, int nCtlId, HINSTANCE hInstance, WORD wBmpId) {
 	DeleteObject(hBmp);
 	SetRect(&bi.margin, 0, 0, 0, 0);
 	bi.uAlign = BUTTON_IMAGELIST_ALIGN_CENTER;
-	SendMessage(hwndCtl, BCM_SETIMAGELIST, 0, (LPARAM)&bi);
+	Button_SetImageList(hwndCtl, &bi);
 }
 
 //=============================================================================
@@ -1108,7 +1108,7 @@ void MakeColorPickButton(HWND hwnd, int nCtlId, HINSTANCE hInstance, COLORREF cr
 	HIMAGELIST himlOld = NULL;
 	COLORMAP colormap[2];
 
-	if (SendMessage(hwndCtl, BCM_GETIMAGELIST, 0, (LPARAM)&bi)) {
+	if (Button_GetImageList(hwndCtl, &bi)) {
 		himlOld = bi.himl;
 	}
 
@@ -1141,7 +1141,7 @@ void MakeColorPickButton(HWND hwnd, int nCtlId, HINSTANCE hInstance, COLORREF cr
 	SetRect(&bi.margin, 0, 0, 2, 0);
 	bi.uAlign = BUTTON_IMAGELIST_ALIGN_RIGHT;
 
-	SendMessage(hwndCtl, BCM_SETIMAGELIST, 0, (LPARAM)&bi);
+	Button_SetImageList(hwndCtl, &bi);
 	InvalidateRect(hwndCtl, NULL, TRUE);
 
 	if (himlOld) {
@@ -1156,7 +1156,7 @@ void MakeColorPickButton(HWND hwnd, int nCtlId, HINSTANCE hInstance, COLORREF cr
 void DeleteBitmapButton(HWND hwnd, int nCtlId) {
 	HWND hwndCtl = GetDlgItem(hwnd, nCtlId);
 	BUTTON_IMAGELIST bi;
-	if (SendMessage(hwndCtl, BCM_GETIMAGELIST, 0, (LPARAM)&bi)) {
+	if (Button_GetImageList(hwndCtl, &bi)) {
 		ImageList_Destroy(bi.himl);
 	}
 }
