@@ -2601,7 +2601,7 @@ int ListBoxX::CaretFromEdge() const {
 }
 
 void ListBoxX::Clear() noexcept {
-	::SendMessage(lb, LB_RESETCONTENT, 0, 0);
+	ListBox_ResetContent(lb);
 	maxItemCharacters = 0;
 	widestItem = nullptr;
 	lti.Clear();
@@ -2622,13 +2622,13 @@ void ListBoxX::Select(int n) {
 	// selected states
 	SetRedraw(false);
 	CentreItem(n);
-	::SendMessage(lb, LB_SETCURSEL, n, 0);
+	ListBox_SetCurSel(lb, n);
 	OnSelChange();
 	SetRedraw(true);
 }
 
 int ListBoxX::GetSelection() const noexcept {
-	return static_cast<int>(::SendMessage(lb, LB_GETCURSEL, 0, 0));
+	return ListBox_GetCurSel(lb);
 }
 
 // This is not actually called at present
@@ -3033,10 +3033,10 @@ void ListBoxX::CentreItem(int n) {
 		const POINT extent = GetClientExtent();
 		const int visible = extent.y / ItemHeight();
 		if (visible < Length()) {
-			const LRESULT top = ::SendMessage(lb, LB_GETTOPINDEX, 0, 0);
+			const int top = ListBox_GetTopIndex(lb);
 			const int half = (visible - 1) / 2;
 			if (n > (top + half))
-				::SendMessage(lb, LB_SETTOPINDEX, n - half, 0);
+				ListBox_SetTopIndex(lb, n - half);
 		}
 	}
 }
@@ -3089,7 +3089,7 @@ LRESULT CALLBACK ListBoxX::ControlWndProc(HWND hWnd, UINT iMessage, WPARAM wPara
 			const LRESULT lResult = ::SendMessage(hWnd, LB_ITEMFROMPOINT, 0, lParam);
 			const int item = LOWORD(lResult);
 			if (HIWORD(lResult) == 0 && item >= 0) {
-				::SendMessage(hWnd, LB_SETCURSEL, item, 0);
+				ListBox_SetCurSel(hWnd, item);
 				if (lbx) {
 					lbx->OnSelChange();
 				}
@@ -3275,11 +3275,11 @@ LRESULT ListBoxX::WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam
 				linesToScroll = 3;
 			}
 			linesToScroll *= (wheelDelta / WHEEL_DELTA);
-			LRESULT top = ::SendMessage(lb, LB_GETTOPINDEX, 0, 0) + linesToScroll;
+			int top = ListBox_GetTopIndex(lb) + linesToScroll;
 			if (top < 0) {
 				top = 0;
 			}
-			::SendMessage(lb, LB_SETTOPINDEX, top, 0);
+			ListBox_SetTopIndex(lb, top);
 			// update wheel delta residue
 			if (wheelDelta >= 0)
 				wheelDelta = wheelDelta % WHEEL_DELTA;
