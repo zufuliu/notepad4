@@ -4675,9 +4675,9 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 			EnableWindow(GetDlgItem(hwnd, IDC_REPLACEINSEL), bEnable);
 
 			if (HIWORD(wParam) == CBN_CLOSEUP) {
-				LONG lSelEnd;
-				SendDlgItemMessage(hwnd, LOWORD(wParam), CB_GETEDITSEL, 0, (LPARAM)&lSelEnd);
-				SendDlgItemMessage(hwnd, LOWORD(wParam), CB_SETEDITSEL, 0, MAKELPARAM(lSelEnd, lSelEnd));
+				HWND hwndCtl = GetDlgItem(hwnd, LOWORD(wParam));
+				const DWORD lSelEnd = ComboBox_GetEditSelEnd(hwndCtl);
+				ComboBox_SetEditSel(hwndCtl, lSelEnd, lSelEnd);
 			}
 		}
 		break;
