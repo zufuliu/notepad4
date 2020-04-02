@@ -176,16 +176,17 @@ INT_PTR CALLBACK RunDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) 
 		ResizeDlg_InitX(hwnd, cxRunDlg, IDC_RESIZEGRIP3);
 		MakeBitmapButton(hwnd, IDC_SEARCHEXE, g_hInstance, IDB_OPEN);
 
+		HWND hwndCtl = GetDlgItem(hwnd, IDC_COMMANDLINE);
 		DLITEM dli;
 		dli.mask = DLI_FILENAME;
 		if (DirList_GetItem(hwndDirList, -1, &dli) != -1) {
 			LPWSTR psz = GetFilenameStr(dli.szFileName);
 			QuotateFilenameStr(psz);
-			SetDlgItemText(hwnd, IDC_COMMANDLINE, psz);
+			Edit_SetText(hwndCtl, psz);
 		}
 
-		SendDlgItemMessage(hwnd, IDC_COMMANDLINE, EM_LIMITTEXT, MAX_PATH - 1, 0);
-		SHAutoComplete(GetDlgItem(hwnd, IDC_COMMANDLINE), SHACF_FILESYSTEM);
+		Edit_LimitText(hwndCtl, MAX_PATH - 1);
+		SHAutoComplete(hwndCtl, SHACF_FILESYSTEM);
 		CenterDlgInParent(hwnd);
 	}
 	return TRUE;
@@ -907,13 +908,16 @@ static INT_PTR CALLBACK ProgPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM
 			StrCatBuff(tch, L" ", COUNTOF(tch));
 			StrCatBuff(tch, szQuickviewParams, COUNTOF(tch));
 		}
-		SendDlgItemMessage(hwnd, IDC_QUICKVIEW, EM_LIMITTEXT, MAX_PATH - 2, 0);
-		SetDlgItemText(hwnd, IDC_QUICKVIEW, tch);
-		SHAutoComplete(GetDlgItem(hwnd, IDC_QUICKVIEW), SHACF_FILESYSTEM);
 
-		SendDlgItemMessage(hwnd, IDC_FAVORITES, EM_LIMITTEXT, MAX_PATH - 2, 0);
-		SetDlgItemText(hwnd, IDC_FAVORITES, tchFavoritesDir);
-		SHAutoComplete(GetDlgItem(hwnd, IDC_FAVORITES), SHACF_FILESYSTEM);
+		HWND hwndCtl = GetDlgItem(hwnd, IDC_QUICKVIEW);
+		Edit_LimitText(hwndCtl, MAX_PATH - 2);
+		Edit_SetText(hwndCtl, tch);
+		SHAutoComplete(hwndCtl, SHACF_FILESYSTEM);
+
+		hwndCtl = GetDlgItem(hwnd, IDC_FAVORITES);
+		Edit_LimitText(hwndCtl, MAX_PATH - 2);
+		Edit_SetText(hwndCtl, tchFavoritesDir);
+		SHAutoComplete(hwndCtl, SHACF_FILESYSTEM);
 	}
 	return TRUE;
 
@@ -1124,8 +1128,9 @@ INT_PTR CALLBACK GetFilterDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lP
 		ResizeDlg_InitX(hwnd, cxFileFilterDlg, IDC_RESIZEGRIP3);
 		MakeBitmapButton(hwnd, IDC_BROWSEFILTER, NULL, OBM_COMBO);
 
-		SendDlgItemMessage(hwnd, IDC_FILTER, EM_LIMITTEXT, COUNTOF(tchFilter) - 1, 0);
-		SetDlgItemText(hwnd, IDC_FILTER, tchFilter);
+		HWND hwndCtl = GetDlgItem(hwnd, IDC_FILTER);
+		Edit_LimitText(hwndCtl, COUNTOF(tchFilter) - 1);
+		Edit_SetText(hwndCtl, tchFilter);
 
 		CheckDlgButton(hwnd, IDC_NEGFILTER, bNegFilter);
 
@@ -1301,9 +1306,11 @@ INT_PTR CALLBACK RenameFileDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 		const LPCFILEOPDLGDATA lpfod = (LPCFILEOPDLGDATA)lParam;
 
 		SetDlgItemText(hwnd, IDC_OLDNAME, lpfod->szSource);
-		SetDlgItemText(hwnd, IDC_NEWNAME, lpfod->szSource);
-		SendDlgItemMessage(hwnd, IDC_NEWNAME, EM_LIMITTEXT, MAX_PATH - 1, 0);
-		SendDlgItemMessage(hwnd, IDC_NEWNAME, EM_SETMODIFY, 0, 0);
+
+		HWND hwndCtl = GetDlgItem(hwnd, IDC_NEWNAME);
+		Edit_SetText(hwndCtl, lpfod->szSource);
+		Edit_LimitText(hwndCtl, MAX_PATH - 1);
+		Edit_SetModify(hwndCtl, FALSE);
 
 		CenterDlgInParent(hwnd);
 	}
@@ -1337,15 +1344,16 @@ INT_PTR CALLBACK RenameFileDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 			EnableWindow(GetDlgItem(hwnd, IDOK), GetWindowTextLength(GetDlgItem(hwnd, IDC_NEWNAME)));
 			break;
 
-		case IDOK:
-			if (!SendDlgItemMessage(hwnd, IDC_NEWNAME, EM_GETMODIFY, 0, 0)) {
+		case IDOK: {
+			HWND hwndCtl = GetDlgItem(hwnd, IDC_NEWNAME);
+			if (!Edit_GetModify(hwndCtl)) {
 				EndDialog(hwnd, IDCANCEL);
 			} else {
 				LPFILEOPDLGDATA lpfod = (LPFILEOPDLGDATA)GetWindowLongPtr(hwnd, DWLP_USER);
-				GetDlgItemText(hwnd, IDC_NEWNAME, lpfod->szDestination, COUNTOF(lpfod->szDestination) - 1);
+				Edit_GetText(hwndCtl, lpfod->szDestination, COUNTOF(lpfod->szDestination) - 1);
 				EndDialog(hwnd, IDOK);
 			}
-			break;
+		} break;
 
 		case IDCANCEL:
 			EndDialog(hwnd, IDCANCEL);
@@ -2091,8 +2099,9 @@ INT_PTR CALLBACK FindTargetDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 		//MakeBitmapButton(hwnd, IDC_FINDWIN, g_hInstance, IDB_BROWSE);
 
 		// initialize edit controls
-		SendDlgItemMessage(hwnd, IDC_TARGETPATH, EM_LIMITTEXT, MAX_PATH - 1, 0);
-		SHAutoComplete(GetDlgItem(hwnd, IDC_TARGETPATH), SHACF_FILESYSTEM | SHACF_URLMRU);
+		HWND hwndCtl = GetDlgItem(hwnd, IDC_TARGETPATH);
+		Edit_LimitText(hwndCtl, MAX_PATH - 1);
+		SHAutoComplete(hwndCtl, SHACF_FILESYSTEM | SHACF_URLMRU);
 
 		SendDlgItemMessage(hwnd, IDC_DDEMSG, EM_LIMITTEXT, 128, 0);
 		SendDlgItemMessage(hwnd, IDC_DDEAPP, EM_LIMITTEXT, 128, 0);

@@ -1046,7 +1046,7 @@ static LRESULT CALLBACK MultilineEditProc(HWND hwnd, UINT umsg, WPARAM wParam, L
 
 	case WM_CHAR:
 		if (wParam == 1) { // Ctrl+A
-			SendMessage(hwnd, EM_SETSEL, 0, -1);
+			Edit_SetSel(hwnd, 0, -1);
 			return TRUE;
 		}
 		break;

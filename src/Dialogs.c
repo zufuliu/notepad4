@@ -357,9 +357,10 @@ static INT_PTR CALLBACK RunDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 		ResizeDlg_InitX(hwnd, cxRunDlg, IDC_RESIZEGRIP3);
 		MakeBitmapButton(hwnd, IDC_SEARCHEXE, g_hInstance, IDB_OPEN);
 
-		SendDlgItemMessage(hwnd, IDC_COMMANDLINE, EM_LIMITTEXT, MAX_PATH - 1, 0);
-		SetDlgItemText(hwnd, IDC_COMMANDLINE, (LPCWSTR)lParam);
-		SHAutoComplete(GetDlgItem(hwnd, IDC_COMMANDLINE), SHACF_FILESYSTEM);
+		HWND hwndCtl = GetDlgItem(hwnd, IDC_COMMANDLINE);
+		Edit_LimitText(hwndCtl, MAX_PATH - 1);
+		Edit_SetText(hwndCtl, (LPCWSTR)lParam);
+		SHAutoComplete(hwndCtl, SHACF_FILESYSTEM);
 
 		CenterDlgInParent(hwnd);
 	}
@@ -850,9 +851,9 @@ static INT_PTR CALLBACK AddToFavDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPA
 		SetWindowLongPtr(hwnd, DWLP_USER, lParam);
 		ResizeDlg_InitX(hwnd, cxAddFavoritesDlg, IDC_RESIZEGRIP);
 
-		const LPCWSTR pszName = (LPCWSTR)lParam;
-		SendDlgItemMessage(hwnd, IDC_FAVORITESFILE, EM_LIMITTEXT, MAX_PATH - 1, 0);
-		SetDlgItemText(hwnd, IDC_FAVORITESFILE, pszName);
+		HWND hwndCtl = GetDlgItem(hwnd, IDC_FAVORITESFILE);
+		Edit_LimitText(hwndCtl, MAX_PATH - 1);
+		Edit_SetText(hwndCtl, (LPCWSTR)lParam);
 
 		CenterDlgInParent(hwnd);
 	}
