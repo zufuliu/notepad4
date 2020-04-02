@@ -177,7 +177,6 @@ Or build from source, see the [Wiki](https://github.com/zufuliu/notepad2/wiki/Bu
 * [ReactOS](https://www.reactos.org/)
 
 ## Notes:
-* The default *Win32* build require [SSE2](https://en.wikipedia.org/wiki/SSE2) (Pentium 4), which can be turned off if you [build Notepad2 and metapath](https://github.com/zufuliu/notepad2/wiki/Build-Notepad2) yourself.
 * If you find any bugs or have any suggestions feel free to **write proposals/issues** or **provide patches/pull requests**.
 
 ## Contributors:
@@ -195,8 +194,8 @@ Or build from source, see the [Wiki](https://github.com/zufuliu/notepad2/wiki/Bu
 * [Scintilla's website](https://www.scintilla.org/)
 * [Build Notepad2 and metapath](https://github.com/zufuliu/notepad2/wiki/Build-Notepad2)
 * [Localization](https://github.com/zufuliu/notepad2/wiki/Localization)
-	* [한국어 (Korean) Localization](https://teus.me/category/IT/Notepad2)
-	* [简体中文 (Simplified Chinese) Localization](https://github.com/yfdyh000/notepad2)
+	* [한국어](https://teus.me/category/IT/Notepad2)
+	* [简体中文](https://github.com/yfdyh000/notepad2)
 * [Notepad2 Wiki](https://github.com/zufuliu/notepad2/wiki)
 * Other projects based on (original) Notepad2 or Notepad2-mod:
 	* [Notepad3](https://github.com/rizonesoft/Notepad3)
