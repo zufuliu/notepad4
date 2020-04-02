@@ -345,7 +345,7 @@ INT_PTR CALLBACK GotoDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 		for (int i = 0; i < HISTORY_ITEMS; i++) {
 			if (mHistory.psz[i]) {
 				const int iItem = ComboBox_FindStringExact(hwndGoto, -1, mHistory.psz[i]);
-				if (iItem != LB_ERR) {
+				if (iItem != CB_ERR) {
 					ComboBox_DeleteString(hwndGoto, iItem);
 				}
 				ComboBox_InsertString(hwndGoto, 0, mHistory.psz[i]);
@@ -395,7 +395,7 @@ INT_PTR CALLBACK GotoDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 			EnableWindow(GetDlgItem(hwnd, IDOK), ComboBox_HasText(hwndGoto));
 
 			if (HIWORD(wParam) == CBN_CLOSEUP) {
-				const DWORD lSelEnd = HIWORD(ComboBox_GetEditSel(hwndGoto));
+				const DWORD lSelEnd = ComboBox_GetEditSelEnd(hwndGoto);
 				ComboBox_SetEditSel(hwndGoto, lSelEnd, lSelEnd);
 			}
 		}
