@@ -318,7 +318,7 @@ static NP2EncodingGroup sEncodingGroupList[] = {
 		28606,		// Latin-10, ISO 8859-16
 		10082,		// Mac (Croatian)
 	}},
-	{ FALSE, IDS_ENCODINGGROUP_SOUTASIA, { // Southeast Asia
+	{ FALSE, IDS_ENCODINGGROUP_SOUTHASIA, { // Southeast Asia
 		874,		// Thai TIS-620, ISO 8859-11
 		10021,		// Mac (Thai)
 		1258,		// Vietnamese Windows-1258
