@@ -671,7 +671,7 @@ void MakeBitmapButton(HWND hwnd, int nCtlId, HINSTANCE hInstance, WORD wBmpId) {
 	DeleteObject(hBmp);
 	SetRect(&bi.margin, 0, 0, 0, 0);
 	bi.uAlign = BUTTON_IMAGELIST_ALIGN_CENTER;
-	SendMessage(hwndCtl, BCM_SETIMAGELIST, 0, (LPARAM)&bi);
+	Button_SetImageList(hwndCtl, &bi);
 }
 
 //=============================================================================
@@ -681,7 +681,7 @@ void MakeBitmapButton(HWND hwnd, int nCtlId, HINSTANCE hInstance, WORD wBmpId) {
 void DeleteBitmapButton(HWND hwnd, int nCtlId) {
 	HWND hwndCtl = GetDlgItem(hwnd, nCtlId);
 	BUTTON_IMAGELIST bi;
-	if (SendMessage(hwndCtl, BCM_GETIMAGELIST, 0, (LPARAM)&bi)) {
+	if (Button_GetImageList(hwndCtl, &bi)) {
 		ImageList_Destroy(bi.himl);
 	}
 }
