@@ -2921,7 +2921,7 @@ void Style_UpdateSchemeMenu(HMENU hmenu) {
 	if (lang == IDM_LANG_TEXTFILE || lang == NP2LEX_2NDTEXTFILE) {
 		np2LexLangIndex = 0;
 	}
-	for (int i = IDM_LANG_TEXTFILE; i < IDM_LANG_NULL; i++) {
+	for (int i = IDM_LANG_TEXTFILE; i < IDM_LANG_LAST_LEXER; i++) {
 		CheckCmd(hmenu, i, FALSE);
 	}
 	if (lang >= IDM_LANG_TEXTFILE) {
