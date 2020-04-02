@@ -1208,7 +1208,8 @@ static INT_PTR CALLBACK FileMRUDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 			ResetEvent(lpit->hExitThread);
 			SetEvent(lpit->hTerminatedThread);
 
-			ListView_DeleteAllItems(GetDlgItem(hwnd, IDC_FILEMRU));
+			HWND hwndLV = GetDlgItem(hwnd, IDC_FILEMRU);
+			ListView_DeleteAllItems(hwndLV);
 
 			LV_ITEM lvi;
 			ZeroMemory(&lvi, sizeof(LV_ITEM));
@@ -1223,15 +1224,13 @@ static INT_PTR CALLBACK FileMRUDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 			for (int i = 0; i < MRU_GetCount(pFileMRU); i++) {
 				MRU_Enum(pFileMRU, i, tch, COUNTOF(tch));
 				PathAbsoluteFromApp(tch, tch, COUNTOF(tch), TRUE);
-				//	SendDlgItemMessage(hwnd, IDC_FILEMRU, LB_ADDSTRING, 0, (LPARAM)tch); }
-				//	SendDlgItemMessage(hwnd, IDC_FILEMRU, LB_SETCARETINDEX, 0, FALSE);
 				lvi.iItem = i;
 				lvi.pszText = tch;
-				ListView_InsertItem(GetDlgItem(hwnd, IDC_FILEMRU), &lvi);
+				ListView_InsertItem(hwndLV, &lvi);
 			}
 
-			ListView_SetItemState(GetDlgItem(hwnd, IDC_FILEMRU), 0, LVIS_FOCUSED, LVIS_FOCUSED);
-			ListView_SetColumnWidth(GetDlgItem(hwnd, IDC_FILEMRU), 0, LVSCW_AUTOSIZE_USEHEADER);
+			ListView_SetItemState(hwndLV, 0, LVIS_FOCUSED, LVIS_FOCUSED);
+			ListView_SetColumnWidth(hwndLV, 0, LVSCW_AUTOSIZE_USEHEADER);
 
 			DWORD dwtid;
 			lpit->hFileMRUIconThread = CreateThread(NULL, 0, FileMRUIconThread, (LPVOID)lpit, 0, &dwtid);
@@ -1243,40 +1242,32 @@ static INT_PTR CALLBACK FileMRUDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 
 		case IDOK: {
 			WCHAR tch[MAX_PATH];
-			//int iItem;
+			HWND hwndLV = GetDlgItem(hwnd, IDC_FILEMRU);
 
-			//if ((iItem = SendDlgItemMessage(hwnd, IDC_FILEMRU, LB_GETCURSEL, 0, 0)) != LB_ERR)
-			if (ListView_GetSelectedCount(GetDlgItem(hwnd, IDC_FILEMRU))) {
-				//SendDlgItemMessage(hwnd, IDC_FILEMRU, LB_GETTEXT, iItem, (LPARAM)tch);
+			if (ListView_GetSelectedCount(hwndLV)) {
 				LV_ITEM lvi;
 				ZeroMemory(&lvi, sizeof(LV_ITEM));
 
 				lvi.mask = LVIF_TEXT;
 				lvi.pszText = tch;
 				lvi.cchTextMax = COUNTOF(tch);
-				lvi.iItem = ListView_GetNextItem(GetDlgItem(hwnd, IDC_FILEMRU), -1, LVNI_ALL | LVNI_SELECTED);
+				lvi.iItem = ListView_GetNextItem(hwndLV, -1, LVNI_ALL | LVNI_SELECTED);
 
-				ListView_GetItem(GetDlgItem(hwnd, IDC_FILEMRU), &lvi);
+				ListView_GetItem(hwndLV, &lvi);
 
 				PathUnquoteSpaces(tch);
 
 				if (!PathFileExists(tch)) {
 					// Ask...
 					if (IDYES == MsgBox(MBYESNO, IDS_ERR_MRUDLG)) {
-
 						MRU_Delete(pFileMRU, lvi.iItem);
 						MRU_DeleteFileFromStore(pFileMRU, tch);
 
-						//SendDlgItemMessage(hwnd, IDC_FILEMRU, LB_DELETESTRING, iItem, 0);
-						//ListView_DeleteItem(GetDlgItem(hwnd, IDC_FILEMRU), lvi.iItem);
-						// must use IDM_VIEW_REFRESH, index might change...
+						// must use recreate the list, index might change...
+						//ListView_DeleteItem(hwndLV, lvi.iItem);
 						SendWMCommand(hwnd, IDC_FILEMRU_UPDATE_VIEW);
 
-						//EnableWindow(GetDlgItem(hwnd, IDOK),
-						//	(LB_ERR != SendDlgItemMessage(hwnd, IDC_GOTO, LB_GETCURSEL, 0, 0)));
-
-						EnableWindow(GetDlgItem(hwnd, IDOK),
-									 ListView_GetSelectedCount(GetDlgItem(hwnd, IDC_FILEMRU)));
+						EnableWindow(GetDlgItem(hwnd, IDOK), ListView_GetSelectedCount(hwndLV));
 					}
 				} else {
 					lstrcpy((LPWSTR)GetWindowLongPtr(hwnd, DWLP_USER), tch);
