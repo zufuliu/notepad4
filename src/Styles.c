@@ -3838,7 +3838,12 @@ struct SchemeGroupInfo {
 	int count;
 };
 
-static inline int GetSchemeGroupHeader(LPCEDITLEXER pLex) {
+enum {
+	SchemeGroup_Global = 0,
+	SchemeGroup_Favorite = 1,
+};
+
+static inline int Lexer_GetSchemeGroup(LPCEDITLEXER pLex) {
 	const int ch = pLex->pszName[0];
 	// assume all lexer name start with A-Z a-z
 	return ToUpperA(ch);
@@ -3847,9 +3852,9 @@ static inline int GetSchemeGroupHeader(LPCEDITLEXER pLex) {
 static HTREEITEM Style_AddAllLexerToTreeView(HWND hwndTV, BOOL withStyles, BOOL withCheckBox) {
 	struct SchemeGroupInfo groupList[26 + 2];
 	int groupCount = 2;
-	groupList[0].group = 0;
+	groupList[0].group = SchemeGroup_Global;
 	groupList[0].count = withStyles ? LEXER_INDEX_GENERAL : LEXER_INDEX_MATCH;
-	groupList[1].group = 1;
+	groupList[1].group = SchemeGroup_Favorite;
 	groupList[1].count = 0;
 
 	// favorite schemes
@@ -3868,12 +3873,13 @@ static HTREEITEM Style_AddAllLexerToTreeView(HWND hwndTV, BOOL withStyles, BOOL 
 	while (iLexer < GENERAL_LEXER_COUNT) {
 		PEDITLEXER pLex = generalLex[iLexer++];
 		int count = 1;
-		const int ch = GetSchemeGroupHeader(pLex);
-		while (iLexer < GENERAL_LEXER_COUNT && ch == GetSchemeGroupHeader(generalLex[iLexer])) {
+		const int group = Lexer_GetSchemeGroup(pLex);
+		while (iLexer < GENERAL_LEXER_COUNT && group == Lexer_GetSchemeGroup(generalLex[iLexer])) {
 			++iLexer;
 			++count;
 		}
-		groupList[groupCount].group = ch;
+
+		groupList[groupCount].group = group;
 		groupList[groupCount].count = count;
 		++groupCount;
 	}
@@ -3920,8 +3926,8 @@ static HTREEITEM Style_AddAllLexerToTreeView(HWND hwndTV, BOOL withStyles, BOOL 
 		const int count = info.count;
 
 		HTREEITEM hParent = NULL;
-		if (group != 0) {
-			if (group == 1) {
+		if (group != SchemeGroup_Global) {
+			if (group == SchemeGroup_Favorite) {
 				GetString(IDS_FAVORITE_SCHEMES_TITLE, szTitle, COUNTOF(szTitle));
 			} else {
 				szTitle[0] = (WCHAR)group;
@@ -3932,7 +3938,7 @@ static HTREEITEM Style_AddAllLexerToTreeView(HWND hwndTV, BOOL withStyles, BOOL 
 			hParent = TreeView_InsertItem(hwndTV, &tvis);
 			hInsertAfter = hParent;
 
-			if (group == 1) {
+			if (group == SchemeGroup_Favorite) {
 				hFavoriteNode = hParent;
 			}
 			if (withCheckBox) {
@@ -3942,7 +3948,7 @@ static HTREEITEM Style_AddAllLexerToTreeView(HWND hwndTV, BOOL withStyles, BOOL 
 			}
 		}
 
-		if (group <= 1) {
+		if (group <= SchemeGroup_Favorite) {
 			HTREEITEM hTreeNode = TVI_FIRST;
 			for (int j = 0; j < count; j++) {
 				PEDITLEXER pLex = pLexArray[iLexer++];
@@ -3952,9 +3958,9 @@ static HTREEITEM Style_AddAllLexerToTreeView(HWND hwndTV, BOOL withStyles, BOOL 
 					hSelParent = hParent;
 				}
 				if (withCheckBox) {
-					if (pLex->iFavoriteOrder) {
+					if (group == SchemeGroup_Favorite) {
 						TreeView_SetCheckState(hwndTV, hTreeNode, TRUE);
-					} else if (group == 0) {
+					} else {
 						// remove checkbox for Text File
 						item.hItem = hTreeNode;
 						TreeView_SetItem(hwndTV, &item);
@@ -3962,7 +3968,7 @@ static HTREEITEM Style_AddAllLexerToTreeView(HWND hwndTV, BOOL withStyles, BOOL 
 				}
 			}
 
-			if (group == 0) {
+			if (group == SchemeGroup_Global) {
 				hInsertAfter = hTreeNode;
 			} else {
 				iLexer = 0;
@@ -4682,7 +4688,7 @@ static void Lexer_OnCheckStateChanged(HWND hwndTV, HTREEITEM hFavoriteNode, HTRE
 
 		// update check state in general schemes
 		if (hParent == hFavoriteNode) {
-			const int ch = GetSchemeGroupHeader(pLex);
+			const int group = Lexer_GetSchemeGroup(pLex);
 			WCHAR szTitle[4] = {0};
 			//item.mask = TVIF_TEXT;
 			item.pszText = szTitle;
@@ -4695,7 +4701,7 @@ static void Lexer_OnCheckStateChanged(HWND hwndTV, HTREEITEM hFavoriteNode, HTRE
 				item.hItem = hParent;
 				TreeView_GetItem(hwndTV, &item);
 				// test group header
-				if (ch == szTitle[0]) {
+				if (group == szTitle[0]) {
 					item.mask = TVIF_PARAM;
 					hTreeNode = TreeView_GetChild(hwndTV, hParent);
 					while (hTreeNode != NULL) {
