@@ -4666,8 +4666,10 @@ static void Lexer_OnCheckStateChanged(HWND hwndTV, HTREEITEM hFavoriteNode, HTRE
 	if (checked) {
 		// append node into Favorite Schemes
 		if (!found) {
+			hTreeNode = TreeView_GetLastVisible(hwndTV);
 			hParent = Style_AddLexerToTreeView(hwndTV, pLex, hFavoriteNode, hInsertAfter, FALSE);
 			TreeView_SetCheckState(hwndTV, hParent, TRUE);
+			// prevent auto scroll
 			TreeView_EnsureVisible(hwndTV, hTreeNode);
 		}
 	} else {
