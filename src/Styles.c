@@ -1533,16 +1533,21 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 
 	Style_SetLongLineColors();
 	// Extra Line Spacing
-	if (rid != NP2LEX_ANSI && Style_StrGetRawSize(pLexGlobal->Styles[Style_ExtraLineSpacing].szValue, &iValue)) {
-		int iAscent = 0;
-		int iDescent = 0;
-		iValue = max_i(0, RoundToCurrentDPI(iValue));
-		if ((iValue & 1)) { // iValue % 2
-			iAscent++;
-			iValue--;
+	if (rid != NP2LEX_ANSI && Style_StrGetRawSize(pLexGlobal->Styles[Style_ExtraLineSpacing].szValue, &iValue) && iValue != 0) {
+		int iAscent;
+		int iDescent;
+		if (iValue > 0) {
+			// 5 => iAscent = 3, iDescent = 2
+			iValue = max_i(0, RoundToCurrentDPI(iValue));
+			iDescent = iValue/2 ;
+			iAscent = iValue - iDescent;
+		} else {
+			// -5 => iAscent = -2, iDescent = -3
+			iValue = -max_i(0, RoundToCurrentDPI(-iValue));
+			iAscent = iValue/2 ;
+			iDescent = iValue - iAscent;
 		}
-		iAscent += iValue / 2;
-		iDescent += iValue / 2;
+
 		SciCall_SetExtraAscent(iAscent);
 		SciCall_SetExtraDescent(iDescent);
 	} else {
