@@ -5768,8 +5768,8 @@ extern int cxInsertTagDlg;
 extern int cyInsertTagDlg;
 
 static INT_PTR CALLBACK EditModifyLinesDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
-	static int id_hover;
-	static int id_capture;
+	static DWORD id_hover;
+	static DWORD id_capture;
 	static HFONT hFontHover;
 	static HCURSOR hCursorNormal;
 	static HCURSOR hCursorHover;
@@ -5918,7 +5918,7 @@ static INT_PTR CALLBACK EditModifyLinesDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 		if (id_capture != 0) {
 			ReleaseCapture();
 			if (id_hover == id_capture) {
-				const int id_focus = GetWindowLong(GetFocus(), GWL_ID);
+				const DWORD id_focus = GetWindowLong(GetFocus(), GWL_ID);
 				if (id_focus == IDC_MODIFY_LINE_PREFIX || id_focus == IDC_MODIFY_LINE_APPEND) {
 					WCHAR wch[8];
 					GetDlgItemText(hwnd, id_capture, wch, COUNTOF(wch));

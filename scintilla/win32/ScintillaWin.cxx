@@ -146,14 +146,6 @@ namespace {
 
 const TCHAR *callClassName = L"CallTip";
 
-inline void *PointerFromWindow(HWND hWnd) noexcept {
-	return reinterpret_cast<void *>(::GetWindowLongPtr(hWnd, 0));
-}
-
-inline void SetWindowPointer(HWND hWnd, void *ptr) noexcept {
-	::SetWindowLongPtr(hWnd, 0, reinterpret_cast<LONG_PTR>(ptr));
-}
-
 inline void SetWindowID(HWND hWnd, int identifier) noexcept {
 	::SetWindowLongPtr(hWnd, GWLP_ID, identifier);
 }
@@ -3839,7 +3831,7 @@ LRESULT CALLBACK ScintillaWin::CTWndProc(
 			}
 		} else {
 			if (iMessage == WM_NCDESTROY) {
-				::SetWindowLong(hWnd, 0, 0);
+				ClearWindowPointer(hWnd);
 				return ::DefWindowProc(hWnd, iMessage, wParam, lParam);
 			} else if (iMessage == WM_PAINT) {
 				PAINTSTRUCT ps;
@@ -3959,7 +3951,7 @@ LRESULT CALLBACK ScintillaWin::SWndProc(
 				delete sci;
 			} catch (...) {
 			}
-			::SetWindowLong(hWnd, 0, 0);
+			ClearWindowPointer(hWnd);
 			return ::DefWindowProc(hWnd, iMessage, wParam, lParam);
 		} else {
 			return sci->WndProc(iMessage, wParam, lParam);

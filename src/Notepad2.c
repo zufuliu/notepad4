@@ -1557,7 +1557,7 @@ static void EditFrameOnThemeChanged(void) {
 			cyEditFrame = ((rc2.bottom - rc2.top) - (rc.bottom - rc.top)) / 2;
 		}
 	} else {
-		SetWindowLongPtr(hwndEdit, GWL_EXSTYLE, WS_EX_CLIENTEDGE | GetWindowLongPtr(hwndEdit, GWL_EXSTYLE));
+		SetWindowLongPtr(hwndEdit, GWL_EXSTYLE, GetWindowLongPtr(hwndEdit, GWL_EXSTYLE) | WS_EX_CLIENTEDGE);
 		SetWindowPos(hwndEdit, NULL, 0, 0, 0, 0, SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE | SWP_FRAMECHANGED);
 
 		cxEditFrame = 0;
