@@ -5869,7 +5869,7 @@ static INT_PTR CALLBACK EditModifyLinesDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 	break;
 
 	case WM_MOUSEMOVE: {
-		const POINT pt = { LOWORD(lParam), HIWORD(lParam) };
+		const POINT pt = { GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) };
 		HWND hwndHover = ChildWindowFromPoint(hwnd, pt);
 		const DWORD dwId = GetWindowLong(hwndHover, GWL_ID);
 
@@ -5896,7 +5896,7 @@ static INT_PTR CALLBACK EditModifyLinesDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 	break;
 
 	case WM_LBUTTONDOWN: {
-		const POINT pt = { LOWORD(lParam), HIWORD(lParam) };
+		const POINT pt = { GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) };
 		HWND hwndHover = ChildWindowFromPoint(hwnd, pt);
 		const DWORD dwId = GetWindowLong(hwndHover, GWL_ID);
 
@@ -5911,7 +5911,7 @@ static INT_PTR CALLBACK EditModifyLinesDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 	break;
 
 	case WM_LBUTTONUP: {
-		//const POINT pt = { LOWORD(lParam), HIWORD(lParam) };
+		//const POINT pt = { GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) };
 		//HWND hwndHover = ChildWindowFromPoint(hwnd, pt);
 		//const DWORD dwId = GetWindowLong(hwndHover, GWL_ID);
 
