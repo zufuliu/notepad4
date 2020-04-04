@@ -3713,7 +3713,7 @@ static void Style_SetParsed(const struct DetailStyle *style, int iStyle) {
 //
 // Style_GetLexerIconId()
 //
-int Style_GetLexerIconId(LPCEDITLEXER pLex) {
+int Style_GetLexerIconId(LPCEDITLEXER pLex, DWORD iconFlags) {
 	LPCWSTR pszExtensions;
 	if (StrNotEmpty(pLex->szExtensions)) {
 		pszExtensions = pLex->szExtensions;
@@ -3743,8 +3743,7 @@ int Style_GetLexerIconId(LPCEDITLEXER pLex) {
 	}
 
 	SHFILEINFO shfi;
-	SHGetFileInfo(pszFile, FILE_ATTRIBUTE_NORMAL, &shfi, sizeof(SHFILEINFO),
-				  SHGFI_SMALLICON | SHGFI_SYSICONINDEX | SHGFI_USEFILEATTRIBUTES);
+	SHGetFileInfo(pszFile, FILE_ATTRIBUTE_NORMAL, &shfi, sizeof(SHFILEINFO), iconFlags);
 
 	return shfi.iIcon;
 }
@@ -3753,7 +3752,7 @@ int Style_GetLexerIconId(LPCEDITLEXER pLex) {
 //
 // Style_AddLexerToTreeView()
 //
-HTREEITEM Style_AddLexerToTreeView(HWND hwnd, PEDITLEXER pLex, HTREEITEM hParent, HTREEITEM hInsertAfter, BOOL withStyles) {
+HTREEITEM Style_AddLexerToTreeView(HWND hwnd, PEDITLEXER pLex, DWORD iconFlags, HTREEITEM hParent, HTREEITEM hInsertAfter, BOOL withStyles) {
 #if NP2_ENABLE_LEXER_NAME_LOCALIZATION || NP2_ENABLE_STYLE_NAME_LOCALIZATION
 	WCHAR tch[MAX_EDITLEXER_NAME_SIZE];
 #endif
@@ -3773,7 +3772,7 @@ HTREEITEM Style_AddLexerToTreeView(HWND hwnd, PEDITLEXER pLex, HTREEITEM hParent
 #else
 	tvis.item.pszText = (WCHAR *)pLex->pszName;
 #endif
-	tvis.item.iImage = Style_GetLexerIconId(pLex);
+	tvis.item.iImage = Style_GetLexerIconId(pLex, iconFlags);
 	tvis.item.iSelectedImage = tvis.item.iImage;
 	tvis.item.lParam = (LPARAM)pLex;
 
@@ -3812,7 +3811,7 @@ HTREEITEM Style_AddLexerToTreeView(HWND hwnd, PEDITLEXER pLex, HTREEITEM hParent
 //
 // Style_AddLexerToListView()
 //
-void Style_AddLexerToListView(HWND hwnd, PEDITLEXER pLex) {
+void Style_AddLexerToListView(HWND hwnd, PEDITLEXER pLex, DWORD iconFlags) {
 #if NP2_ENABLE_LEXER_NAME_LOCALIZATION
 	WCHAR tch[MAX_EDITLEXER_NAME_SIZE];
 #endif
@@ -3830,7 +3829,7 @@ void Style_AddLexerToListView(HWND hwnd, PEDITLEXER pLex) {
 #else
 	lvi.pszText = (WCHAR *)pLex->pszName;
 #endif
-	lvi.iImage = Style_GetLexerIconId(pLex);
+	lvi.iImage = Style_GetLexerIconId(pLex, iconFlags);
 	lvi.lParam = (LPARAM)pLex;
 
 	ListView_InsertItem(hwnd, &lvi);
@@ -3899,11 +3898,12 @@ static HTREEITEM Style_AddAllLexerToTreeView(HWND hwndTV, BOOL withStyles, BOOL 
 	TreeView_SetExtendedStyle(hwndTV, TVS_EX_DOUBLEBUFFER, TVS_EX_DOUBLEBUFFER);
 	SetExplorerTheme(hwndTV);
 
+	const DWORD iconFlags = GetCurrentIconIndexFlags();
 	SHFILEINFO shfi;
-	HIMAGELIST himl = (HIMAGELIST)SHGetFileInfo(L"C:\\", 0, &shfi, sizeof(SHFILEINFO), SHGFI_SMALLICON | SHGFI_SYSICONINDEX);
+	HIMAGELIST himl = (HIMAGELIST)SHGetFileInfo(L"C:\\", 0, &shfi, sizeof(SHFILEINFO), iconFlags);
 	TreeView_SetImageList(hwndTV, himl, TVSIL_NORMAL);
 	// folder icon
-	SHGetFileInfo(L"Icon", FILE_ATTRIBUTE_DIRECTORY, &shfi, sizeof(SHFILEINFO), SHGFI_USEFILEATTRIBUTES | SHGFI_SMALLICON | SHGFI_SYSICONINDEX);
+	SHGetFileInfo(L"Icon", FILE_ATTRIBUTE_DIRECTORY, &shfi, sizeof(SHFILEINFO), iconFlags);
 
 	WCHAR szTitle[128];
 
@@ -3963,7 +3963,7 @@ static HTREEITEM Style_AddAllLexerToTreeView(HWND hwndTV, BOOL withStyles, BOOL 
 			HTREEITEM hTreeNode = TVI_FIRST;
 			for (int j = 0; j < count; j++) {
 				PEDITLEXER pLex = pLexArray[iLexer++];
-				hTreeNode = Style_AddLexerToTreeView(hwndTV, pLex, hParent, hTreeNode, withStyles);
+				hTreeNode = Style_AddLexerToTreeView(hwndTV, pLex, iconFlags, hParent, hTreeNode, withStyles);
 				if (hSelNode == NULL && pLex == pLexCurrent) {
 					hSelNode = hTreeNode;
 					hSelParent = hParent;
@@ -3988,7 +3988,7 @@ static HTREEITEM Style_AddAllLexerToTreeView(HWND hwndTV, BOOL withStyles, BOOL 
 			HTREEITEM hTreeNode = TVI_FIRST;
 			for (int j = 0; j < count; j++) {
 				PEDITLEXER pLex = generalLex[iLexer++];
-				hTreeNode = Style_AddLexerToTreeView(hwndTV, pLex, hParent, hTreeNode, withStyles);
+				hTreeNode = Style_AddLexerToTreeView(hwndTV, pLex, iconFlags, hParent, hTreeNode, withStyles);
 				if (hSelNode == NULL && pLex == pLexCurrent) {
 					hSelNode = hTreeNode;
 					hSelParent = hParent;
@@ -4683,8 +4683,9 @@ static void Lexer_OnCheckStateChanged(HWND hwndTV, HTREEITEM hFavoriteNode, HTRE
 	if (checked) {
 		// append node into Favorite Schemes
 		if (!found) {
+			const DWORD iconFlags = GetCurrentIconIndexFlags();
 			hTreeNode = TreeView_GetLastVisible(hwndTV);
-			hParent = Style_AddLexerToTreeView(hwndTV, pLex, hFavoriteNode, hInsertAfter, FALSE);
+			hParent = Style_AddLexerToTreeView(hwndTV, pLex, iconFlags, hFavoriteNode, hInsertAfter, FALSE);
 			TreeView_SetCheckState(hwndTV, hParent, TRUE);
 			// prevent auto scroll
 			TreeView_EnsureVisible(hwndTV, hTreeNode);
@@ -4796,7 +4797,8 @@ static void Lexer_OnDragDrop(HWND hwndTV, HTREEITEM hFavoriteNode, HTREEITEM hDr
 	HTREEITEM hInsertAfter = expanded ? ((htiTarget == hFavoriteNode)? TVI_FIRST : htiTarget) : hLastChild;
 	PEDITLEXER pLex = (PEDITLEXER)lParam;
 
-	hTreeNode = Style_AddLexerToTreeView(hwndTV, pLex, hFavoriteNode, hInsertAfter, FALSE);
+	const DWORD iconFlags = GetCurrentIconIndexFlags();
+	hTreeNode = Style_AddLexerToTreeView(hwndTV, pLex, iconFlags, hFavoriteNode, hInsertAfter, FALSE);
 	TreeView_SetCheckState(hwndTV, hTreeNode, TRUE);
 	if (expanded) {
 		TreeView_Select(hwndTV, hTreeNode, TVGN_CARET);

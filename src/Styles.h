@@ -89,6 +89,6 @@ BOOL	Style_SelectFont(HWND hwnd, LPWSTR lpszStyle, int cchStyle, BOOL bDefaultSt
 BOOL	Style_SelectColor(HWND hwnd, BOOL bFore, LPWSTR lpszStyle, int cchStyle);
 void	Style_SetStyles(int iStyle, LPCWSTR lpszStyle);
 
-int 	Style_GetLexerIconId(LPCEDITLEXER pLex);
+int 	Style_GetLexerIconId(LPCEDITLEXER pLex, DWORD iconFlags);
 void	Style_ConfigDlg(HWND hwnd);
 void	Style_SelectLexerDlg(HWND hwnd, BOOL favorite);
