@@ -4,7 +4,7 @@
 
 //! Enable customize toolbar labels
 // When enabled, user can change toolbar button tooltip text
-// in the "Toolbar Labels" section int notepad2.ini
+// in the "Toolbar Labels" section int Notepad2.ini
 #define NP2_ENABLE_CUSTOMIZE_TOOLBAR_LABELS		0
 
 //! Enable the .LOG feature
