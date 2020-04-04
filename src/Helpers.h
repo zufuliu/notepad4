@@ -450,7 +450,8 @@ BOOL IsElevated(void);
 #define SetExplorerTheme(hwnd)		SetWindowTheme((hwnd), L"Explorer", NULL)
 
 HBITMAP LoadBitmapFile(LPCWSTR path);
-HBITMAP ResizeImageForCurrentDPI(HBITMAP hbmp);
+HBITMAP ResizeImageForDPI(HBITMAP hbmp, UINT dpi);
+#define ResizeImageForCurrentDPI(hbmp)		ResizeImageForDPI(hbmp, g_uCurrentDPI)
 BOOL BitmapMergeAlpha(HBITMAP hbmp, COLORREF crDest);
 BOOL BitmapAlphaBlend(HBITMAP hbmp, COLORREF crDest, BYTE alpha);
 BOOL BitmapGrayScale(HBITMAP hbmp);
