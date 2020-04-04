@@ -1027,8 +1027,8 @@ class SurfaceD2D : public Surface {
 	ID2D1SolidColorBrush *pBrush;
 
 	int logPixelsY;
-	float dpiScaleX;
-	float dpiScaleY;
+	//float dpiScaleX;
+	//float dpiScaleY;
 
 	void Clear() noexcept;
 	void SetFont(const Font &font_) noexcept;
@@ -1113,8 +1113,8 @@ SurfaceD2D::SurfaceD2D() noexcept :
 	pBrush = nullptr;
 
 	logPixelsY = 72;
-	dpiScaleX = 1.0;
-	dpiScaleY = 1.0;
+	//dpiScaleX = 1.0;
+	//dpiScaleY = 1.0;
 }
 
 SurfaceD2D::~SurfaceD2D() noexcept {
@@ -1148,8 +1148,8 @@ void SurfaceD2D::Release() noexcept {
 void SurfaceD2D::SetScale() noexcept {
 	HDC hdcMeasure = ::CreateCompatibleDC({});
 	logPixelsY = ::GetDeviceCaps(hdcMeasure, LOGPIXELSY);
-	dpiScaleX = ::GetDeviceCaps(hdcMeasure, LOGPIXELSX) / 96.0f;
-	dpiScaleY = logPixelsY / 96.0f;
+	//dpiScaleX = ::GetDeviceCaps(hdcMeasure, LOGPIXELSX) / 96.0f;
+	//dpiScaleY = logPixelsY / 96.0f;
 	::DeleteDC(hdcMeasure);
 }
 
