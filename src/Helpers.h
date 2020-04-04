@@ -192,8 +192,6 @@ extern HANDLE g_hDefaultHeap;
 #if _WIN32_WINNT < _WIN32_WINNT_WIN10
 extern DWORD g_uWinVer;
 #endif
-extern UINT g_uCurrentDPI;
-extern UINT g_uDefaultDPI;
 extern WCHAR szIniFile[MAX_PATH];
 
 // Operating System Version
@@ -251,7 +249,13 @@ extern WCHAR szIniFile[MAX_PATH];
 #define MDT_EFFECTIVE_DPI	0
 #endif
 
+// use large icon when window DPI is greater than or equal to this value.
 #define NP2_LARGER_ICON_SIZE_DPI	192		// 200%
+
+// current DPI for main/editor window
+extern UINT g_uCurrentDPI;
+// startup DPI for main/editor window, may different from g_uCurrentDPI after moving to a different display.
+extern UINT g_uDefaultDPI;
 
 NP2_inline int RoundToCurrentDPI(int value)	{
 	return (g_uCurrentDPI == USER_DEFAULT_SCREEN_DPI) ? value : MulDiv(g_uCurrentDPI, value, USER_DEFAULT_SCREEN_DPI);
@@ -261,16 +265,24 @@ NP2_inline int DefaultToCurrentDPI(int value) {
 	return (g_uCurrentDPI == g_uDefaultDPI) ? value : MulDiv(g_uCurrentDPI, value, g_uDefaultDPI);
 }
 
-NP2_inline DWORD GetCurrentIconIndexFlags() {
-	return (g_uCurrentDPI >= NP2_LARGER_ICON_SIZE_DPI)
+NP2_inline DWORD GetIconIndexFlagsForDPI(UINT dpi) {
+	return (dpi >= NP2_LARGER_ICON_SIZE_DPI)
 			? (SHGFI_USEFILEATTRIBUTES | SHGFI_LARGEICON | SHGFI_SYSICONINDEX)
 			: (SHGFI_USEFILEATTRIBUTES | SHGFI_SMALLICON | SHGFI_SYSICONINDEX);
 }
 
-NP2_inline DWORD GetCurrentIconHandleFlags() {
-	return (g_uCurrentDPI >= NP2_LARGER_ICON_SIZE_DPI)
+NP2_inline DWORD GetIconHandleFlagsForDPI(UINT dpi) {
+	return (dpi >= NP2_LARGER_ICON_SIZE_DPI)
 			? (SHGFI_USEFILEATTRIBUTES | SHGFI_LARGEICON | SHGFI_ICON)
 			: (SHGFI_USEFILEATTRIBUTES | SHGFI_SMALLICON | SHGFI_ICON);
+}
+
+NP2_inline DWORD GetCurrentIconIndexFlags(void) {
+	return GetIconIndexFlagsForDPI(g_uCurrentDPI);
+}
+
+NP2_inline DWORD GetCurrentIconHandleFlags(void) {
+	return GetIconHandleFlagsForDPI(g_uCurrentDPI);
 }
 
 // https://docs.microsoft.com/en-us/windows/desktop/api/winuser/nf-winuser-getsystemmetrics
@@ -465,7 +477,10 @@ BOOL IsElevated(void);
 
 HBITMAP LoadBitmapFile(LPCWSTR path);
 HBITMAP ResizeImageForDPI(HBITMAP hbmp, UINT dpi);
-#define ResizeImageForCurrentDPI(hbmp)		ResizeImageForDPI(hbmp, g_uCurrentDPI)
+NP2_inline HBITMAP ResizeImageForCurrentDPI(HBITMAP hbmp) {
+	return ResizeImageForDPI(hbmp, g_uCurrentDPI);
+}
+
 BOOL BitmapMergeAlpha(HBITMAP hbmp, COLORREF crDest);
 BOOL BitmapAlphaBlend(HBITMAP hbmp, COLORREF crDest, BYTE alpha);
 BOOL BitmapGrayScale(HBITMAP hbmp);
