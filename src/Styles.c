@@ -1350,9 +1350,9 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 
 		if (iLexer == SCLEX_CPP || iLexer == SCLEX_MATLAB) {
 			if (iLexer == NP2LEX_MATLAB) {
-				if (np2LexLangIndex == IDM_LANG_OCTAVE) {
+				if (np2LexLangIndex == IDM_LEXER_OCTAVE) {
 					rid = NP2LEX_OCTAVE;
-				} else if (np2LexLangIndex == IDM_LANG_SCILAB) {
+				} else if (np2LexLangIndex == IDM_LEXER_SCILAB) {
 					rid = NP2LEX_SCILAB;
 				}
 			}
@@ -1374,17 +1374,17 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 			SciCall_SetProperty("fold.html", "1");
 			SciCall_SetProperty("fold.hypertext.comment", "1");
 			SciCall_SetProperty("fold.hypertext.heredoc", "1");
-			SciCall_SetProperty("lexer.lang.type", ((np2LexLangIndex == IDM_LANG_PHP)? "1" : "0"));
+			SciCall_SetProperty("lexer.lang.type", ((np2LexLangIndex == IDM_LEXER_PHP)? "1" : "0"));
 			break;
 
 		case NP2LEX_CSS:
-			SciCall_SetProperty("lexer.css.scss.language", ((np2LexLangIndex == IDM_LANG_SCSS)? "1" : "0"));
-			SciCall_SetProperty("lexer.css.less.language", ((np2LexLangIndex == IDM_LANG_LESS)? "1" : "0"));
-			SciCall_SetProperty("lexer.css.hss.language", ((np2LexLangIndex == IDM_LANG_HSS)? "1" : "0"));
+			SciCall_SetProperty("lexer.css.scss.language", ((np2LexLangIndex == IDM_LEXER_SCSS)? "1" : "0"));
+			SciCall_SetProperty("lexer.css.less.language", ((np2LexLangIndex == IDM_LEXER_LESS)? "1" : "0"));
+			SciCall_SetProperty("lexer.css.hss.language", ((np2LexLangIndex == IDM_LEXER_HSS)? "1" : "0"));
 			break;
 
 		case NP2LEX_BASH:
-			SciCall_SetProperty("lexer.bash.csh.language", ((np2LexLangIndex == IDM_LANG_CSHELL)? "1" : "0"));
+			SciCall_SetProperty("lexer.bash.csh.language", ((np2LexLangIndex == IDM_LEXER_CSHELL)? "1" : "0"));
 			break;
 		}
 
@@ -1763,7 +1763,7 @@ PEDITLEXER Style_SniffShebang(char *pchText) {
 				return &lexBash;
 			}
 			if (!strncmp(name, "tcsh", 4)) {
-				np2LexLangIndex = IDM_LANG_CSHELL;
+				np2LexLangIndex = IDM_LEXER_CSHELL;
 				return &lexBash;
 			}
 			if (!strncmp(name, "perl", 4)) {
@@ -1796,7 +1796,7 @@ PEDITLEXER Style_SniffShebang(char *pchText) {
 				return &lexLua;
 			}
 			if (!strncmp(name, "php", 3)) {
-				//np2LexLangIndex = IDM_LANG_PHP;
+				//np2LexLangIndex = IDM_LEXER_PHP;
 				return &lexPHP;
 			}
 			if (!strncmp(name, "tcl", 3)) {
@@ -1806,7 +1806,7 @@ PEDITLEXER Style_SniffShebang(char *pchText) {
 				return &lexBash;
 			}
 			if (!strncmp(name, "csh", 3)) {
-				np2LexLangIndex = IDM_LANG_CSHELL;
+				np2LexLangIndex = IDM_LEXER_CSHELL;
 				return &lexBash;
 			}
 			if (!strncmp(name, "ipy", 3)) {
@@ -1844,10 +1844,10 @@ int Style_GetDocTypeLanguage(void) {
 			++p;
 		}
 		if (!_strnicmp(p, "html", 4)) {
-			return IDM_LANG_WEB;
+			return IDM_LEXER_WEB;
 		}
 		if (!strncmp(p, "struts", 6) || !strncmp(p, "xwork", 5) || !strncmp(p, "validators", 10)) {
-			return IDM_LANG_STRUTS;
+			return IDM_LEXER_STRUTS;
 		}
 		if (!strncmp(p, "hibernate", 9)) {
 			p += 9;
@@ -1855,29 +1855,29 @@ int Style_GetDocTypeLanguage(void) {
 				p++;
 			}
 			if (*p == 'm') {
-				return IDM_LANG_HIB_MAP;
+				return IDM_LEXER_HIB_MAP;
 			}
-			return IDM_LANG_HIB_CFG;
+			return IDM_LEXER_HIB_CFG;
 		}
 		//if (!strncmp(p, "plist", 5)) {
-		//	return IDM_LANG_PROPERTY_LIST;
+		//	return IDM_LEXER_PROPERTY_LIST;
 		//}
 		if (!strncmp(p, "schema", 6)) {
-			return IDM_LANG_XSD;
+			return IDM_LEXER_XSD;
 		}
 		if (!strncmp(p, "jboss", 5)) {
-			return IDM_LANG_JBOSS;
+			return IDM_LEXER_JBOSS;
 		}
 		if (!strncmp(p, "beans", 5)) {
-			return IDM_LANG_SPRING_BEANS;
+			return IDM_LEXER_SPRING_BEANS;
 		}
 		if (!_strnicmp(p, "module", 6)) {
-			return IDM_LANG_CHECKSTYLE;
+			return IDM_LEXER_CHECKSTYLE;
 		}
 	}
 
 	if (strstr(tchText, "<?php")) {
-		return IDM_LANG_PHP;
+		return IDM_LEXER_PHP;
 	}
 	// check Language
 	if ((p = strstr(tchText, "<%@")) != NULL && (p = StrStrIA(p + 3, "Language")) != NULL) {
@@ -1886,19 +1886,19 @@ int Style_GetDocTypeLanguage(void) {
 			p++;
 		}
 		if (!_strnicmp(p, "C#", 2)) {
-			return IDM_LANG_ASPX_CS;
+			return IDM_LEXER_ASPX_CS;
 		}
 		if (!_strnicmp(p, "VBScript", 7)) {
-			return IDM_LANG_ASP_VBS;
+			return IDM_LEXER_ASP_VBS;
 		}
 		if (!_strnicmp(p, "VB", 2)) {
-			return IDM_LANG_ASPX_VB;
+			return IDM_LEXER_ASPX_VB;
 		}
 		if (!_strnicmp(p, "JScript", 7)) {
-			return IDM_LANG_ASP_JS;
+			return IDM_LEXER_ASP_JS;
 		}
 		if (!_strnicmp(p, "Java", 4)) {
-			return IDM_LANG_JSP;
+			return IDM_LEXER_JSP;
 		}
 	}
 
@@ -1936,78 +1936,78 @@ int Style_GetDocTypeLanguage(void) {
 	}
 
 	//if (!_strnicmp(p, "html", 4))
-	//	return IDM_LANG_WEB;
+	//	return IDM_LEXER_WEB;
 	if (!strncmp(p, "schema", 6)) {
-		return IDM_LANG_XSD;
+		return IDM_LEXER_XSD;
 	}
 	//if (!strncmp(p, "schema", 6) || !strncmp(p, "xsd:schema", 10) || !strncmp(p, "xs:schema", 9))
-	//	return IDM_LANG_XSD;
+	//	return IDM_LEXER_XSD;
 	//if (!strncmp(p, "xsl:stylesheet", 14))
-	//	return IDM_LANG_XSLT;
+	//	return IDM_LEXER_XSLT;
 
 	if (!strncmp(p, "project", 7)) {
-		return IDM_LANG_ANT_BUILD;
+		return IDM_LEXER_ANT_BUILD;
 	}
 	//if (!strncmp(p, "project", 7)) {
 	//	p += 7;
 	//	if (strstr(p, "maven") && strstr(p, "POM"))
-	//		return IDM_LANG_MAVEN_POM;
-	//	return IDM_LANG_ANT_BUILD;
+	//		return IDM_LEXER_MAVEN_POM;
+	//	return IDM_LEXER_ANT_BUILD;
 	//}
 	if (!strncmp(p, "settings", 8)) {
-		return IDM_LANG_MAVEN_SETTINGS;
+		return IDM_LEXER_MAVEN_SETTINGS;
 	}
 	if (!strncmp(p, "ivy", 3)) {
 		if (*(p + 3) == '-') {
-			return IDM_LANG_IVY_MODULE;
+			return IDM_LEXER_IVY_MODULE;
 		}
-		return IDM_LANG_IVY_SETTINGS;
+		return IDM_LEXER_IVY_SETTINGS;
 	}
 	if (!strncmp(p, "ruleset", 7)) {
-		return IDM_LANG_PMD_RULESET;
+		return IDM_LEXER_PMD_RULESET;
 	}
 	if (!strncmp(p, "module", 6)) {
-		return IDM_LANG_CHECKSTYLE;
+		return IDM_LEXER_CHECKSTYLE;
 	}
 
 	//if (!strncmp(p, "Server"))
-	//	return IDM_LANG_TOMCAT;
+	//	return IDM_LEXER_TOMCAT;
 	//if (!strncmp(p, "web-app"))
-	//	return IDM_LANG_WEB_JAVA;
+	//	return IDM_LEXER_WEB_JAVA;
 	if (!strncmp(p, "struts", 6) || !strncmp(p, "xwork", 5) || !strncmp(p, "validators", 10)) {
-		return IDM_LANG_STRUTS;
+		return IDM_LEXER_STRUTS;
 	}
 	if (!strncmp(p, "hibernate", 9)) {
 		if (*(p + 10) == 'm') {
-			return IDM_LANG_HIB_MAP;
+			return IDM_LEXER_HIB_MAP;
 		}
-		return IDM_LANG_HIB_CFG;
+		return IDM_LEXER_HIB_CFG;
 	}
 	if (!strncmp(p, "jboss", 5)) {
-		return IDM_LANG_JBOSS;
+		return IDM_LEXER_JBOSS;
 	}
 	if (!strncmp(p, "beans", 5)) {
-		return IDM_LANG_SPRING_BEANS;
+		return IDM_LEXER_SPRING_BEANS;
 	}
 
 	//if (!strncmp(p, "configuration", 10))
-	//	return IDM_LANG_WEB_NET;
+	//	return IDM_LEXER_WEB_NET;
 	//if (!strncmp(p, "root", 4))
-	//	return IDM_LANG_RESX;
+	//	return IDM_LEXER_RESX;
 	//if (!strncmp(p, "Canvas", 6))
-	//	return IDM_LANG_XAML;
+	//	return IDM_LEXER_XAML;
 
 	//if (!strncmp(p, "plist", 5))
-	//	return IDM_LANG_PROPERTY_LIST;
+	//	return IDM_LEXER_PROPERTY_LIST;
 	//if (!strncmp(p, "manifest", 8))
-	//	return IDM_LANG_ANDROID_MANIFEST;
+	//	return IDM_LEXER_ANDROID_MANIFEST;
 	//if (!strncmp(p, "svg", 3))
-	//	return IDM_LANG_SVG;
+	//	return IDM_LEXER_SVG;
 	const char * const pb = p;
 	if (((p = strstr(pb, "Layout")) != NULL && strstr(p + 6, "xmlns:android")) ||
 			((p = strstr(pb, "View")) != NULL && strstr(p + 4, "xmlns:android")) ||
 			((p = strstr(pb, "menu")) != NULL && strstr(p + 4, "xmlns:android"))) {
-		return IDM_LANG_ANDROID_LAYOUT;
+		return IDM_LEXER_ANDROID_LAYOUT;
 	}
 
 	return 0;
@@ -2054,7 +2054,7 @@ PEDITLEXER Style_DetectObjCAndMatlab(void) {
 				if (MatchCPPKeyword(p, 2)) {
 					return &lexCPP;
 				}
-				np2LexLangIndex = IDM_LANG_OCTAVE;
+				np2LexLangIndex = IDM_LEXER_OCTAVE;
 				return &lexMatlab;
 			}
 			break;
@@ -2216,102 +2216,102 @@ LPCWSTR Style_GetCurrentLexerName(void) {
 		return pLexCurrent->pszName;
 	}
 	switch (np2LexLangIndex) {
-	case IDM_LANG_TEXTFILE:
-	case IDM_LANG_2NDTEXTFILE:
+	case IDM_LEXER_TEXTFILE:
+	case IDM_LEXER_2NDTEXTFILE:
 		return pLexCurrent->pszName;
-	case IDM_LANG_WEB:
+	case IDM_LEXER_WEB:
 		return L"Web Source Code";
-	case IDM_LANG_PHP:
+	case IDM_LEXER_PHP:
 		return L"PHP Page";
-	case IDM_LANG_JSP:
+	case IDM_LEXER_JSP:
 		return L"JSP Page";
-	case IDM_LANG_ASPX_CS:
+	case IDM_LEXER_ASPX_CS:
 		return L"ASP.NET (C#)";
-	case IDM_LANG_ASPX_VB:
+	case IDM_LEXER_ASPX_VB:
 		return L"ASP.NET (VB.NET)";
-	case IDM_LANG_ASP_VBS:
+	case IDM_LEXER_ASP_VBS:
 		return L"ASP (VBScript)";
-	case IDM_LANG_ASP_JS:
+	case IDM_LEXER_ASP_JS:
 		return L"ASP (JScript)";
 
-	case IDM_LANG_XML:
+	case IDM_LEXER_XML:
 		return L"XML Document";
-	case IDM_LANG_XSD:
+	case IDM_LEXER_XSD:
 		return L"XML Schema";
-	case IDM_LANG_XSLT:
+	case IDM_LEXER_XSLT:
 		return L"XSLT Stylesheet";
-	case IDM_LANG_DTD:
+	case IDM_LEXER_DTD:
 		return L"XML DTD";
 
-	case IDM_LANG_ANT_BUILD:
+	case IDM_LEXER_ANT_BUILD:
 		return L"Ant Build";
-	case IDM_LANG_MAVEN_POM:
+	case IDM_LEXER_MAVEN_POM:
 		return L"Maven POM";
-	case IDM_LANG_MAVEN_SETTINGS:
+	case IDM_LEXER_MAVEN_SETTINGS:
 		return L"Maven Settings";
-	case IDM_LANG_IVY_MODULE:
+	case IDM_LEXER_IVY_MODULE:
 		return L"Ivy Module";
-	case IDM_LANG_IVY_SETTINGS:
+	case IDM_LEXER_IVY_SETTINGS:
 		return L"Ivy Settings";
-	case IDM_LANG_PMD_RULESET:
+	case IDM_LEXER_PMD_RULESET:
 		return L"PMD Ruleset";
-	case IDM_LANG_CHECKSTYLE:
+	case IDM_LEXER_CHECKSTYLE:
 		return L"CheckStyle";
 
-	case IDM_LANG_APACHE:
+	case IDM_LEXER_APACHE:
 		return L"Apache Config";
-	case IDM_LANG_TOMCAT:
+	case IDM_LEXER_TOMCAT:
 		return L"Tomcat Config";
-	case IDM_LANG_WEB_JAVA:
+	case IDM_LEXER_WEB_JAVA:
 		return L"Java Web Config";
-	case IDM_LANG_STRUTS:
+	case IDM_LEXER_STRUTS:
 		return L"Struts Config";
-	case IDM_LANG_HIB_CFG:
+	case IDM_LEXER_HIB_CFG:
 		return L"Hibernate Config";
-	case IDM_LANG_HIB_MAP:
+	case IDM_LEXER_HIB_MAP:
 		return L"Hibernate Mapping";
-	case IDM_LANG_SPRING_BEANS:
+	case IDM_LEXER_SPRING_BEANS:
 		return L"Spring Beans";
-	case IDM_LANG_JBOSS:
+	case IDM_LEXER_JBOSS:
 		return L"JBoss Config";
 
-	case IDM_LANG_WEB_NET:
+	case IDM_LEXER_WEB_NET:
 		return L"ASP.NET Web Config";
-	case IDM_LANG_RESX:
+	case IDM_LEXER_RESX:
 		return L"ResX Schema";
-	case IDM_LANG_XAML:
+	case IDM_LEXER_XAML:
 		return L"WPF XAML";
 
-	case IDM_LANG_PROPERTY_LIST:
+	case IDM_LEXER_PROPERTY_LIST:
 		return L"Property List";
-	case IDM_LANG_ANDROID_MANIFEST:
+	case IDM_LEXER_ANDROID_MANIFEST:
 		return L"Android Manifest";
-	case IDM_LANG_ANDROID_LAYOUT:
+	case IDM_LEXER_ANDROID_LAYOUT:
 		return L"Android Layout";
-	case IDM_LANG_SVG:
+	case IDM_LEXER_SVG:
 		return L"SVG Document";
 
-	case IDM_LANG_BASH:
+	case IDM_LEXER_BASH:
 		return L"Shell Script";
-	case IDM_LANG_CSHELL:
+	case IDM_LEXER_CSHELL:
 		return L"C Shell";
-	case IDM_LANG_M4:
+	case IDM_LEXER_M4:
 		return L"M4 Macro";
 
-	case IDM_LANG_MATLAB:
+	case IDM_LEXER_MATLAB:
 		return L"MATLAB Code";
-	case IDM_LANG_OCTAVE:
+	case IDM_LEXER_OCTAVE:
 		return L"Octave Code";
-	case IDM_LANG_SCILAB:
+	case IDM_LEXER_SCILAB:
 		return L"Scilab Code";
 
-	case IDM_LANG_CSS:
+	case IDM_LEXER_CSS:
 		return L"CSS Style Sheet";
-	case IDM_LANG_SCSS:
+	case IDM_LEXER_SCSS:
 		return L"Sassy CSS";
-	case IDM_LANG_LESS:
+	case IDM_LEXER_LESS:
 		return L"Less CSS";
-	case IDM_LANG_HSS:
+	case IDM_LEXER_HSS:
 		return L"HSS";
 
 	default:
@@ -2323,93 +2323,93 @@ static void Style_UpdateLexerLang(PEDITLEXER pLex, LPCWSTR lpszExt, LPCWSTR lpsz
 	switch (pLex->rid) {
 	case NP2LEX_BASH:
 		if (StrCaseEqual(L"m4", lpszExt) || StrCaseEqual(L"ac", lpszExt)) {
-			np2LexLangIndex = IDM_LANG_M4;
+			np2LexLangIndex = IDM_LEXER_M4;
 		} else if (StrCaseEqual(L"csh", lpszExt) || StrCaseEqual(L"tcsh", lpszExt)) {
-			np2LexLangIndex = IDM_LANG_CSHELL;
+			np2LexLangIndex = IDM_LEXER_CSHELL;
 		}
 		break;
 
 	case NP2LEX_CONF:
 		if (StrNCaseEqual(lpszName, L"httpd", 5) || StrCaseEqual(lpszExt, L"htaccess")) {
-			np2LexLangIndex = IDM_LANG_APACHE;
+			np2LexLangIndex = IDM_LEXER_APACHE;
 		}
 		break;
 
 	case NP2LEX_CSS:
 		if (StrCaseEqual(L"scss", lpszExt)) {
-			np2LexLangIndex = IDM_LANG_SCSS;
+			np2LexLangIndex = IDM_LEXER_SCSS;
 		} else if (StrCaseEqual(L"less", lpszExt)) {
-			np2LexLangIndex = IDM_LANG_LESS;
+			np2LexLangIndex = IDM_LEXER_LESS;
 		} else if (StrCaseEqual(L"hss", lpszExt)) {
-			np2LexLangIndex = IDM_LANG_HSS;
+			np2LexLangIndex = IDM_LEXER_HSS;
 		}
 		break;
 
 	case NP2LEX_HTML:
 		if (StrCaseEqual(L"jsp", lpszExt)) {
-			np2LexLangIndex = IDM_LANG_JSP;
+			np2LexLangIndex = IDM_LEXER_JSP;
 		} else if (StrCaseEqual(L"aspx", lpszExt)) {
 			np2LexLangIndex = Style_GetDocTypeLanguage();
 			if (np2LexLangIndex == 0) {
-				np2LexLangIndex = IDM_LANG_ASPX_CS;
+				np2LexLangIndex = IDM_LEXER_ASPX_CS;
 			}
 		} else if (StrCaseEqual(L"asp", lpszExt)) {
 			np2LexLangIndex = Style_GetDocTypeLanguage();
 			if (np2LexLangIndex == 0) {
-				np2LexLangIndex = IDM_LANG_ASP_VBS;
+				np2LexLangIndex = IDM_LEXER_ASP_VBS;
 			}
 		}
 		break;
 
 	case NP2LEX_MATLAB:
 		if (StrCaseEqual(L"sce", lpszExt) || StrCaseEqual(L"sci", lpszExt)) {
-			np2LexLangIndex = IDM_LANG_SCILAB;
+			np2LexLangIndex = IDM_LEXER_SCILAB;
 		}
 		break;
 
 	case NP2LEX_XML:
 		if (StrCaseEqual(L"xml", lpszExt)) {
 			if (StrCaseEqual(lpszName, L"build.xml") || StrCaseEqual(lpszName, L"javadoc.xml")) {
-				np2LexLangIndex = IDM_LANG_ANT_BUILD;
+				np2LexLangIndex = IDM_LEXER_ANT_BUILD;
 			} else if (StrCaseEqual(lpszName, L"pom.xml")) {
-				np2LexLangIndex = IDM_LANG_MAVEN_POM;
+				np2LexLangIndex = IDM_LEXER_MAVEN_POM;
 			} else if (StrCaseEqual(lpszName, L"settings.xml")) {
-				np2LexLangIndex = IDM_LANG_MAVEN_SETTINGS;
+				np2LexLangIndex = IDM_LEXER_MAVEN_SETTINGS;
 			} else if (StrCaseEqual(lpszName, L"AndroidManifest.xml")) {
-				np2LexLangIndex = IDM_LANG_ANDROID_MANIFEST;
+				np2LexLangIndex = IDM_LEXER_ANDROID_MANIFEST;
 			} else if (StrCaseEqual(lpszName, L"server.xml")) {
-				np2LexLangIndex = IDM_LANG_TOMCAT;
+				np2LexLangIndex = IDM_LEXER_TOMCAT;
 			} else if (StrCaseEqual(lpszName, L"web.xml")) {
-				np2LexLangIndex = IDM_LANG_WEB_JAVA;
+				np2LexLangIndex = IDM_LEXER_WEB_JAVA;
 			} else if (StrCaseEqual(lpszName, L"struts.xml") || StrCaseEqual(lpszName, L"struts-config.xml")) {
-				np2LexLangIndex = IDM_LANG_STRUTS;
+				np2LexLangIndex = IDM_LEXER_STRUTS;
 			} else if (StrCaseEqual(lpszName, L"hibernate.cfg.xml")) {
-				np2LexLangIndex = IDM_LANG_HIB_CFG;
+				np2LexLangIndex = IDM_LEXER_HIB_CFG;
 			} else if (StrCaseEqual(lpszName, L"ivy.xml")) {
-				np2LexLangIndex = IDM_LANG_IVY_MODULE;
+				np2LexLangIndex = IDM_LEXER_IVY_MODULE;
 			} else if (StrCaseEqual(lpszName, L"ivysettings.xml")) {
-				np2LexLangIndex = IDM_LANG_IVY_SETTINGS;
+				np2LexLangIndex = IDM_LEXER_IVY_SETTINGS;
 			} else if (StrCaseEqual(lpszName, L"pmd.xml")) {
-				np2LexLangIndex = IDM_LANG_PMD_RULESET;
+				np2LexLangIndex = IDM_LEXER_PMD_RULESET;
 			} else {
 				np2LexLangIndex = Style_GetDocTypeLanguage();
 			}
 		} else if (StrCaseEqual(L"xsd", lpszExt)) {
-			np2LexLangIndex = IDM_LANG_XSD;
+			np2LexLangIndex = IDM_LEXER_XSD;
 		} else if (StrNCaseEqual(L"xsl", lpszExt, 3)) {
-			np2LexLangIndex = IDM_LANG_XSLT;
+			np2LexLangIndex = IDM_LEXER_XSLT;
 		} else if (StrCaseEqual(L"dtd", lpszExt)) {
-			np2LexLangIndex = IDM_LANG_DTD;
+			np2LexLangIndex = IDM_LEXER_DTD;
 		} else if (StrCaseEqual(L"pom", lpszExt)) {
-			np2LexLangIndex = IDM_LANG_MAVEN_POM;
+			np2LexLangIndex = IDM_LEXER_MAVEN_POM;
 		} else if (StrCaseEqual(L"resx", lpszExt)) {
-			np2LexLangIndex = IDM_LANG_RESX;
+			np2LexLangIndex = IDM_LEXER_RESX;
 		} else if (StrCaseEqual(L"xaml", lpszExt)) {
-			np2LexLangIndex = IDM_LANG_XAML;
+			np2LexLangIndex = IDM_LEXER_XAML;
 		} else if (StrCaseEqual(L"plist", lpszExt)) {
-			np2LexLangIndex = IDM_LANG_PROPERTY_LIST;
+			np2LexLangIndex = IDM_LEXER_PROPERTY_LIST;
 		} else if (StrCaseEqual(L"svg", lpszExt)) {
-			np2LexLangIndex = IDM_LANG_SVG;
+			np2LexLangIndex = IDM_LEXER_SVG;
 		}
 		break;
 	}
@@ -2513,7 +2513,7 @@ static PEDITLEXER Style_GetLexerFromFile(LPCWSTR lpszFile, BOOL bCGIGuess, LPCWS
 		if (!bFound && StrCaseEqual(lpszName, L"web.config")) {
 			pLexNew = &lexXML;
 			bFound = TRUE;
-			np2LexLangIndex = IDM_LANG_WEB_NET;
+			np2LexLangIndex = IDM_LEXER_WEB_NET;
 		}
 
 		// check associated extensions
@@ -2596,7 +2596,7 @@ BOOL Style_SetLexerFromFile(LPCWSTR lpszFile) {
 		const BOOL bPHP = strncmp(p, "<?php", 5) == 0;
 		if ((pLexNew->rid == NP2LEX_PHP) ^ bPHP) {
 			pLexNew = &lexHTML;
-			np2LexLangIndex = IDM_LANG_PHP;
+			np2LexLangIndex = IDM_LEXER_PHP;
 			bFound = TRUE;
 		} else if (*p == '<') {
 			if (strncmp(p, "<?xml", 5) == 0) {
@@ -2622,7 +2622,7 @@ BOOL Style_SetLexerFromFile(LPCWSTR lpszFile) {
 			if (pLexNew->rid == NP2LEX_HTML || pLexNew->rid == NP2LEX_XML) {
 				bFound = TRUE;
 				np2LexLangIndex = Style_GetDocTypeLanguage();
-				if (pLexNew->rid == NP2LEX_XML && np2LexLangIndex == IDM_LANG_WEB) {
+				if (pLexNew->rid == NP2LEX_XML && np2LexLangIndex == IDM_LEXER_WEB) {
 					// xhtml: <?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html>
 					pLexNew = &lexHTML;
 				}
@@ -2802,84 +2802,84 @@ void Style_SetLexerByLangIndex(int lang) {
 	np2LexLangIndex = lang;
 
 	switch (lang) {
-	case IDM_LANG_TEXTFILE:
+	case IDM_LEXER_TEXTFILE:
 		np2LexLangIndex = 0;
 		pLex = &lexTextFile;
 		break;
 
-	case IDM_LANG_2NDTEXTFILE:
+	case IDM_LEXER_2NDTEXTFILE:
 		np2LexLangIndex = 0;
 		pLex = &lex2ndTextFile;
 		break;
 
-	case IDM_LANG_APACHE:
+	case IDM_LEXER_APACHE:
 		pLex = &lexCONF;
 		break;
 
-	case IDM_LANG_WEB:
-	case IDM_LANG_PHP:
-	case IDM_LANG_JSP:
-	case IDM_LANG_ASPX_CS:
-	case IDM_LANG_ASPX_VB:
-	case IDM_LANG_ASP_VBS:
-	case IDM_LANG_ASP_JS:
-		if (lang == IDM_LANG_WEB) {
+	case IDM_LEXER_WEB:
+	case IDM_LEXER_PHP:
+	case IDM_LEXER_JSP:
+	case IDM_LEXER_ASPX_CS:
+	case IDM_LEXER_ASPX_VB:
+	case IDM_LEXER_ASP_VBS:
+	case IDM_LEXER_ASP_JS:
+		if (lang == IDM_LEXER_WEB) {
 			np2LexLangIndex = Style_GetDocTypeLanguage();
 		}
 		pLex = &lexHTML;
 		break;
 
-	case IDM_LANG_XML:
-	case IDM_LANG_XSD:
-	case IDM_LANG_XSLT:
-	case IDM_LANG_DTD:
+	case IDM_LEXER_XML:
+	case IDM_LEXER_XSD:
+	case IDM_LEXER_XSLT:
+	case IDM_LEXER_DTD:
 
-	case IDM_LANG_ANT_BUILD:
-	case IDM_LANG_MAVEN_POM:
-	case IDM_LANG_MAVEN_SETTINGS:
-	case IDM_LANG_IVY_MODULE:
-	case IDM_LANG_IVY_SETTINGS:
-	case IDM_LANG_PMD_RULESET:
-	case IDM_LANG_CHECKSTYLE:
+	case IDM_LEXER_ANT_BUILD:
+	case IDM_LEXER_MAVEN_POM:
+	case IDM_LEXER_MAVEN_SETTINGS:
+	case IDM_LEXER_IVY_MODULE:
+	case IDM_LEXER_IVY_SETTINGS:
+	case IDM_LEXER_PMD_RULESET:
+	case IDM_LEXER_CHECKSTYLE:
 
-	case IDM_LANG_TOMCAT:
-	case IDM_LANG_WEB_JAVA:
-	case IDM_LANG_STRUTS:
-	case IDM_LANG_HIB_CFG:
-	case IDM_LANG_HIB_MAP:
-	case IDM_LANG_SPRING_BEANS:
-	case IDM_LANG_JBOSS:
+	case IDM_LEXER_TOMCAT:
+	case IDM_LEXER_WEB_JAVA:
+	case IDM_LEXER_STRUTS:
+	case IDM_LEXER_HIB_CFG:
+	case IDM_LEXER_HIB_MAP:
+	case IDM_LEXER_SPRING_BEANS:
+	case IDM_LEXER_JBOSS:
 
-	case IDM_LANG_WEB_NET:
-	case IDM_LANG_RESX:
-	case IDM_LANG_XAML:
+	case IDM_LEXER_WEB_NET:
+	case IDM_LEXER_RESX:
+	case IDM_LEXER_XAML:
 
-	case IDM_LANG_PROPERTY_LIST:
-	case IDM_LANG_ANDROID_MANIFEST:
-	case IDM_LANG_ANDROID_LAYOUT:
-	case IDM_LANG_SVG:
-		if (lang == IDM_LANG_XML) {
+	case IDM_LEXER_PROPERTY_LIST:
+	case IDM_LEXER_ANDROID_MANIFEST:
+	case IDM_LEXER_ANDROID_LAYOUT:
+	case IDM_LEXER_SVG:
+		if (lang == IDM_LEXER_XML) {
 			np2LexLangIndex = Style_GetDocTypeLanguage();
 		}
 		pLex = &lexXML;
 		break;
 
-	case IDM_LANG_BASH:
-	case IDM_LANG_CSHELL:
-	case IDM_LANG_M4:
+	case IDM_LEXER_BASH:
+	case IDM_LEXER_CSHELL:
+	case IDM_LEXER_M4:
 		pLex = &lexBash;
 		break;
 
-	case IDM_LANG_MATLAB:
-	case IDM_LANG_OCTAVE:
-	case IDM_LANG_SCILAB:
+	case IDM_LEXER_MATLAB:
+	case IDM_LEXER_OCTAVE:
+	case IDM_LEXER_SCILAB:
 		pLex = &lexMatlab;
 		break;
 
-	case IDM_LANG_CSS:
-	case IDM_LANG_SCSS:
-	case IDM_LANG_LESS:
-	case IDM_LANG_HSS:
+	case IDM_LEXER_CSS:
+	case IDM_LEXER_SCSS:
+	case IDM_LEXER_LESS:
+	case IDM_LEXER_HSS:
 		pLex = &lexCSS;
 		break;
 	}
@@ -2896,42 +2896,42 @@ void Style_UpdateSchemeMenu(HMENU hmenu) {
 	if (lang == 0) {
 		switch (pLexCurrent->rid) {
 		case NP2LEX_TEXTFILE:
-			lang = IDM_LANG_TEXTFILE;
+			lang = IDM_LEXER_TEXTFILE;
 			break;
 		case NP2LEX_2NDTEXTFILE:
-			lang = IDM_LANG_2NDTEXTFILE;
+			lang = IDM_LEXER_2NDTEXTFILE;
 			break;
 		case NP2LEX_HTML:
-			lang = IDM_LANG_WEB;
+			lang = IDM_LEXER_WEB;
 			break;
 		case NP2LEX_XML:
-			lang = IDM_LANG_XML;
+			lang = IDM_LEXER_XML;
 			break;
 		case NP2LEX_BASH:
-			lang = IDM_LANG_BASH;
+			lang = IDM_LEXER_BASH;
 			break;
 		case NP2LEX_MATLAB:
-			lang = IDM_LANG_MATLAB;
+			lang = IDM_LEXER_MATLAB;
 			break;
 		case NP2LEX_OCTAVE:
-			lang = IDM_LANG_OCTAVE;
+			lang = IDM_LEXER_OCTAVE;
 			break;
 		case NP2LEX_SCILAB:
-			lang = IDM_LANG_SCILAB;
+			lang = IDM_LEXER_SCILAB;
 			break;
 		case NP2LEX_CSS:
-			lang = IDM_LANG_CSS;
+			lang = IDM_LEXER_CSS;
 			break;
 		}
 		np2LexLangIndex = lang;
 	}
-	if (lang == IDM_LANG_TEXTFILE || lang == NP2LEX_2NDTEXTFILE) {
+	if (lang == IDM_LEXER_TEXTFILE || lang == NP2LEX_2NDTEXTFILE) {
 		np2LexLangIndex = 0;
 	}
-	for (int i = IDM_LANG_TEXTFILE; i < IDM_LANG_LAST_LEXER; i++) {
+	for (int i = IDM_LEXER_TEXTFILE; i < IDM_LEXER_LAST_LEXER; i++) {
 		CheckCmd(hmenu, i, FALSE);
 	}
-	if (lang >= IDM_LANG_TEXTFILE) {
+	if (lang >= IDM_LEXER_TEXTFILE) {
 		CheckCmd(hmenu, lang, TRUE);
 	}
 }
