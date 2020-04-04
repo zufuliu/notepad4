@@ -1196,6 +1196,7 @@
     <ClInclude Include="..\..\scintilla\win32\HanjaDic.h" />
     <ClInclude Include="..\..\scintilla\win32\PlatWin.h" />
     <ClInclude Include="..\..\src\compiler.h" />
+    <ClInclude Include="..\..\src\config.h" />
     <ClInclude Include="..\..\src\Dialogs.h" />
     <ClInclude Include="..\..\src\Dlapi.h" />
     <ClInclude Include="..\..\src\Edit.h" />

@@ -235,6 +235,7 @@
   </VirtualDirectory>
   <VirtualDirectory Name="Header Files">
     <File Name="../../src/compiler.h"/>
+    <File Name="../../src/config.h"/>
     <File Name="../../src/Dialogs.h"/>
     <File Name="../../src/Dlapi.h"/>
     <File Name="../../src/Edit.h"/>

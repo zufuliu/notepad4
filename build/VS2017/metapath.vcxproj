@@ -965,6 +965,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\metapath\src\compiler.h" />
+    <ClInclude Include="..\..\metapath\src\config.h" />
     <ClInclude Include="..\..\metapath\src\Dialogs.h" />
     <ClInclude Include="..\..\metapath\src\Dlapi.h" />
     <ClInclude Include="..\..\metapath\src\DropSource.h" />

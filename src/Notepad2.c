@@ -31,6 +31,7 @@
 #include <inttypes.h>
 #include "SciCall.h"
 #include "VectorISA.h"
+#include "config.h"
 #include "Helpers.h"
 #include "Notepad2.h"
 #include "Edit.h"
@@ -38,14 +39,11 @@
 #include "Dialogs.h"
 #include "resource.h"
 
-// show fold level
-#define NP2_DEBUG_FOLD_LEVEL	0
-// enable the .LOG feature
-#define NP2_ENABLE_DOT_LOG_FEATURE	0
-// enable CallTips (currently not yet implemented)
+//! show fold level
+#define NP2_DEBUG_FOLD_LEVEL		0
+
+//! Enable CallTips (not yet implemented)
 #define NP2_ENABLE_SHOW_CALLTIPS	0
-// enable customize toolbar labels
-#define NP2_ENABLE_CUSTOMIZE_TOOLBAR_LABELS		0
 
 /******************************************************************************
 *
@@ -321,7 +319,7 @@ struct CachedStatusItem {
 	LPCWSTR pszOvrMode;
 	WCHAR tchZoom[8];
 
-#if NP2_GET_LEXER_STYLE_NAME_FROM_RES
+#if NP2_ENABLE_LEXER_NAME_LOCALIZATION
 	WCHAR tchLexerName[MAX_EDITLEXER_NAME_SIZE];
 #endif
 	WCHAR tchDocPosFmt[96];
@@ -1670,11 +1668,11 @@ HWND EditCreate(HWND hwndParent) {
 	SciCall_MarkerDefine(SC_MARKNUM_FOLDEREND, SC_MARK_BOXPLUSCONNECTED);
 	SciCall_MarkerDefine(SC_MARKNUM_FOLDEROPENMID, SC_MARK_BOXMINUSCONNECTED);
 	SciCall_MarkerDefine(SC_MARKNUM_FOLDERMIDTAIL, SC_MARK_TCORNER);
-#if !NP2_DEBUG_FOLD_LEVEL
+#if NP2_DEBUG_FOLD_LEVEL
+	SciCall_SetFoldFlags(SC_FOLDFLAG_LEVELNUMBERS);
+#else
 	// Draw folding line below when collapsed
 	SciCall_SetFoldFlags(bShowFoldingLine ? SC_FOLDFLAG_LINEAFTER_CONTRACTED : 0);
-#else
-	SciCall_SetFoldFlags(SC_FOLDFLAG_LEVELNUMBERS);
 #endif
 	SciCall_FoldDisplayTextSetStyle((bFoldDisplayText ? SC_FOLDDISPLAYTEXT_BOXED : SC_FOLDDISPLAYTEXT_HIDDEN));
 	const char *text = GetFoldDisplayEllipsis(SC_CP_UTF8, 0); // internal default encoding
@@ -1904,7 +1902,7 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) {
 
 	IniSectionFree(pIniSection);
 	NP2HeapFree(pIniSectionBuf);
-#endif
+#endif // NP2_ENABLE_CUSTOMIZE_TOOLBAR_LABELS
 
 	SendMessage(hwndToolbar, TB_SETEXTENDEDSTYLE, 0,
 				SendMessage(hwndToolbar, TB_GETEXTENDEDSTYLE, 0, 0) | TBSTYLE_EX_MIXEDBUTTONS);
@@ -2084,7 +2082,7 @@ void MsgSize(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 void UpdateStatusBarCache(int item) {
 	switch (item) {
 	case STATUS_LEXER:
-#if NP2_GET_LEXER_STYLE_NAME_FROM_RES
+#if NP2_ENABLE_LEXER_NAME_LOCALIZATION
 		cachedStatusItem.pszLexerName = Style_GetCurrentLexerDisplayName(cachedStatusItem.tchLexerName, MAX_EDITLEXER_NAME_SIZE);
 #else
 		cachedStatusItem.pszLexerName = Style_GetCurrentLexerName();
@@ -6772,11 +6770,11 @@ void UpdateLineNumberWidth(void) {
 		const int iLineMarginWidthFit = SciCall_TextWidth(STYLE_LINENUMBER, tchLines);
 
 		if (iLineMarginWidthNow != iLineMarginWidthFit) {
-#if !NP2_DEBUG_FOLD_LEVEL
-			SciCall_SetMarginWidth(MARGIN_LINE_NUMBER, iLineMarginWidthFit);
+#if NP2_DEBUG_FOLD_LEVEL
+			SciCall_SetMarginWidth(MARGIN_LINE_NUMBER, RoundToCurrentDPI(100));
 
 #else
-			SciCall_SetMarginWidth(MARGIN_LINE_NUMBER, RoundToCurrentDPI(100));
+			SciCall_SetMarginWidth(MARGIN_LINE_NUMBER, iLineMarginWidthFit);
 #endif
 		}
 	} else {

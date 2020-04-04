@@ -35,6 +35,9 @@
     <ClInclude Include="..\..\metapath\src\compiler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\metapath\src\config.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\metapath\src\Dialogs.h">
       <Filter>Header Files</Filter>
     </ClInclude>
