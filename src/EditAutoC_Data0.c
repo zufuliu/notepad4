@@ -484,76 +484,76 @@ void Style_UpdateLexerKeywords(LPCEDITLEXER pLexNew) {
 		return;
 	}
 	switch (np2LexLangIndex) {
-	case IDM_LANG_XSD:
+	case IDM_LEXER_XSD:
 		np2_LexKeyword = &kwXmlSchema;
 		return;
-	case IDM_LANG_XSLT:
+	case IDM_LEXER_XSLT:
 		np2_LexKeyword = &kwXmlStylesheet;
 		return;
 
-	case IDM_LANG_ANT_BUILD:
+	case IDM_LEXER_ANT_BUILD:
 		np2_LexKeyword = &kwAntBuild;
 		return;
-	case IDM_LANG_MAVEN_POM:
+	case IDM_LEXER_MAVEN_POM:
 		np2_LexKeyword = &kwMavenPOM;
 		return;
-	case IDM_LANG_MAVEN_SETTINGS:
+	case IDM_LEXER_MAVEN_SETTINGS:
 		np2_LexKeyword = &kwMavenSettings;
 		return;
-	case IDM_LANG_IVY_MODULE:
+	case IDM_LEXER_IVY_MODULE:
 		np2_LexKeyword = &kwIvyModule;
 		return;
-	case IDM_LANG_IVY_SETTINGS:
+	case IDM_LEXER_IVY_SETTINGS:
 		np2_LexKeyword = &kwIvySettings;
 		return;
-	case IDM_LANG_PMD_RULESET:
+	case IDM_LEXER_PMD_RULESET:
 		np2_LexKeyword = &kwPMDRuleset;
 		return;
-	case IDM_LANG_CHECKSTYLE:
+	case IDM_LEXER_CHECKSTYLE:
 		np2_LexKeyword = &kwCheckstyle;
 		return;
 
-	case IDM_LANG_APACHE:
+	case IDM_LEXER_APACHE:
 		np2_LexKeyword = &kwApache;
 		return;
-	case IDM_LANG_TOMCAT:
+	case IDM_LEXER_TOMCAT:
 		np2_LexKeyword = &kwTomcat;
 		return;
-	case IDM_LANG_WEB_JAVA:
+	case IDM_LEXER_WEB_JAVA:
 		np2_LexKeyword = &kwJavaWebConfig;
 		return;
-	case IDM_LANG_STRUTS:
+	case IDM_LEXER_STRUTS:
 		np2_LexKeyword = &kwStruts;
 		return;
-	case IDM_LANG_HIB_CFG:
+	case IDM_LEXER_HIB_CFG:
 		np2_LexKeyword = &kwHibConfig;
 		return;
-	case IDM_LANG_HIB_MAP:
+	case IDM_LEXER_HIB_MAP:
 		np2_LexKeyword = &kwHibMapping;
 		return;
-	case IDM_LANG_SPRING_BEANS:
+	case IDM_LEXER_SPRING_BEANS:
 		np2_LexKeyword = &kwSpringBeans;
 		return;
-	case IDM_LANG_JBOSS:
+	case IDM_LEXER_JBOSS:
 		return;
 
-	//case IDM_LANG_WEB_NET:
+	//case IDM_LEXER_WEB_NET:
 	//	return;
-	//case IDM_LANG_RESX:
+	//case IDM_LEXER_RESX:
 	//	np2_LexKeyword = &kwXmlSchema;
 	//	return;
-	//case IDM_LANG_XAML:
+	//case IDM_LEXER_XAML:
 	//	return;
 
-	case IDM_LANG_PROPERTY_LIST:
+	case IDM_LEXER_PROPERTY_LIST:
 		np2_LexKeyword = &kwPList;
 		return;
-	case IDM_LANG_ANDROID_MANIFEST:
+	case IDM_LEXER_ANDROID_MANIFEST:
 		np2_LexKeyword = &kwAndroidManifest;
 		return;
-	case IDM_LANG_ANDROID_LAYOUT:
+	case IDM_LEXER_ANDROID_LAYOUT:
 		return;
-		//case IDM_LANG_SVG:
+		//case IDM_LEXER_SVG:
 		//	return;
 	}
 }

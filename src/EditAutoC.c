@@ -1700,7 +1700,7 @@ const char *EditKeywordIndent(const char *head, int *indent) {
 	switch (pLexCurrent->iLexer) {
 	//case SCLEX_AU3:
 	case SCLEX_BASH:
-		if (np2LexLangIndex == IDM_LANG_CSHELL) {
+		if (np2LexLangIndex == IDM_LEXER_CSHELL) {
 			if (!strcmp(word, "if")) {
 				*indent = 2;
 				endPart = "endif";
@@ -1791,7 +1791,7 @@ const char *EditKeywordIndent(const char *head, int *indent) {
 			*indent = 1;
 		} else if (!strcmp(word, "if") || !strcmp(word, "for") || !strcmp(word, "while") || !strcmp(word, "switch") || !strcmp(word, "try")) {
 			*indent = 2;
-			if (pLexCurrent->rid == NP2LEX_OCTAVE || np2LexLangIndex == IDM_LANG_OCTAVE) {
+			if (pLexCurrent->rid == NP2LEX_OCTAVE || np2LexLangIndex == IDM_LEXER_OCTAVE) {
 				if (strcmp(word, "if") == 0) {
 					endPart = "endif";
 				} else if (strcmp(word, "for") == 0) {
@@ -2050,7 +2050,7 @@ void EditToggleCommentLine(void) {
 		break;
 
 	case SCLEX_BASH:
-		EditToggleLineComments(((np2LexLangIndex == IDM_LANG_M4)? L"dnl " : L"#"), FALSE);
+		EditToggleLineComments(((np2LexLangIndex == IDM_LEXER_M4)? L"dnl " : L"#"), FALSE);
 		break;
 
 	case SCLEX_BATCH:
@@ -2133,7 +2133,7 @@ void EditToggleCommentLine(void) {
 		break;
 
 	case SCLEX_MATLAB:
-		if (pLexCurrent->rid == NP2LEX_SCILAB || np2LexLangIndex == IDM_LANG_SCILAB) {
+		if (pLexCurrent->rid == NP2LEX_SCILAB || np2LexLangIndex == IDM_LEXER_SCILAB) {
 			EditToggleLineComments(L"//", FALSE);
 		} else {
 			EditToggleLineComments(L"%", FALSE);
@@ -2280,7 +2280,7 @@ void EditToggleCommentBlock(void) {
 		break;
 
 	case SCLEX_MATLAB:
-		if (pLexCurrent->rid == NP2LEX_SCILAB || np2LexLangIndex == IDM_LANG_SCILAB) {
+		if (pLexCurrent->rid == NP2LEX_SCILAB || np2LexLangIndex == IDM_LEXER_SCILAB) {
 			EditEncloseSelection(L"/*", L"*/");
 		} else {
 			EditEncloseSelectionNewLine(L"%{", L"%}");
@@ -2309,11 +2309,11 @@ void EditInsertScriptShebangLine(void) {
 	switch (pLexCurrent->iLexer) {
 	case SCLEX_BASH:
 		switch (np2LexLangIndex) {
-		case IDM_LANG_CSHELL:
+		case IDM_LEXER_CSHELL:
 			prefix = "#!/bin/csh";
 			break;
 
-		case IDM_LANG_M4:
+		case IDM_LEXER_M4:
 			name = "m4";
 			break;
 
