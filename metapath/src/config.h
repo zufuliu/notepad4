@@ -4,5 +4,5 @@
 
 //! Enable customize toolbar labels
 // When enabled, you can change toolbar button tooltip text
-// in the "Toolbar Labels" section int metapath.ini
+// in the "Toolbar Labels" (without quotes) section in metapath.ini
 #define NP2_ENABLE_CUSTOMIZE_TOOLBAR_LABELS		0
