@@ -251,12 +251,26 @@ extern WCHAR szIniFile[MAX_PATH];
 #define MDT_EFFECTIVE_DPI	0
 #endif
 
+#define NP2_LARGER_ICON_SIZE_DPI	192		// 200%
+
 NP2_inline int RoundToCurrentDPI(int value)	{
 	return (g_uCurrentDPI == USER_DEFAULT_SCREEN_DPI) ? value : MulDiv(g_uCurrentDPI, value, USER_DEFAULT_SCREEN_DPI);
 }
 
 NP2_inline int DefaultToCurrentDPI(int value) {
 	return (g_uCurrentDPI == g_uDefaultDPI) ? value : MulDiv(g_uCurrentDPI, value, g_uDefaultDPI);
+}
+
+NP2_inline DWORD GetCurrentIconIndexFlags() {
+	return (g_uCurrentDPI >= NP2_LARGER_ICON_SIZE_DPI)
+			? (SHGFI_USEFILEATTRIBUTES | SHGFI_LARGEICON | SHGFI_SYSICONINDEX)
+			: (SHGFI_USEFILEATTRIBUTES | SHGFI_SMALLICON | SHGFI_SYSICONINDEX);
+}
+
+NP2_inline DWORD GetCurrentIconHandleFlags() {
+	return (g_uCurrentDPI >= NP2_LARGER_ICON_SIZE_DPI)
+			? (SHGFI_USEFILEATTRIBUTES | SHGFI_LARGEICON | SHGFI_ICON)
+			: (SHGFI_USEFILEATTRIBUTES | SHGFI_SMALLICON | SHGFI_ICON);
 }
 
 // https://docs.microsoft.com/en-us/windows/desktop/api/winuser/nf-winuser-getsystemmetrics
