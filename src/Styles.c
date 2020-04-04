@@ -4864,7 +4864,7 @@ static INT_PTR CALLBACK Style_SelectLexerDlgProc(HWND hwnd, UINT umsg, WPARAM wP
 		}
 
 		hwndTV = GetDlgItem(hwnd, IDC_STYLELIST);
-		SetWindowLongPtr(hwndTV, GWL_STYLE, GetWindowLongPtr(hwndTV, GWL_STYLE) | (favorite ? TVS_CHECKBOXES : TVS_DISABLEDRAGDROP));
+		SetWindowStyle(hwndTV, GetWindowStyle(hwndTV) | (favorite ? TVS_CHECKBOXES : TVS_DISABLEDRAGDROP));
 
 		hFavoriteNode = Style_AddAllLexerToTreeView(hwndTV, FALSE, favorite);
 		if (favorite) {

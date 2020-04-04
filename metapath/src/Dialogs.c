@@ -1976,7 +1976,7 @@ static INT_PTR CALLBACK FindWinDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 			GetCursorPos(&pt);
 
 			HWND hwndFind = WindowFromPoint(pt);
-			while (GetWindowLongPtr(hwndFind, GWL_STYLE) & WS_CHILD) {
+			while (GetWindowStyle(hwndFind) & WS_CHILD) {
 				hwndFind = GetParent(hwndFind);
 			}
 

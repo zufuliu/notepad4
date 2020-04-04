@@ -700,22 +700,22 @@ BOOL SetWindowTitle(HWND hwnd, UINT uIDAppName, BOOL bIsElevated, UINT uIDUntitl
 // SetWindowTransparentMode()
 //
 void SetWindowTransparentMode(HWND hwnd, BOOL bTransparentMode, int iOpacityLevel) {
-	const LONG_PTR exStyle = GetWindowLongPtr(hwnd, GWL_EXSTYLE);
+	const DWORD exStyle = GetWindowExStyle(hwnd);
 	if (bTransparentMode) {
-		SetWindowLongPtr(hwnd, GWL_EXSTYLE, exStyle | WS_EX_LAYERED);
+		SetWindowExStyle(hwnd, exStyle | WS_EX_LAYERED);
 		const BYTE bAlpha = (BYTE)(iOpacityLevel * 255 / 100);
 		SetLayeredWindowAttributes(hwnd, 0, bAlpha, LWA_ALPHA);
 	} else {
-		SetWindowLongPtr(hwnd, GWL_EXSTYLE, exStyle & ~WS_EX_LAYERED);
+		SetWindowExStyle(hwnd, exStyle & ~WS_EX_LAYERED);
 	}
 }
 
 void SetWindowLayoutRTL(HWND hwnd, BOOL bRTL) {
-	const LONG_PTR exStyle = GetWindowLongPtr(hwnd, GWL_EXSTYLE);
+	const DWORD exStyle = GetWindowExStyle(hwnd);
 	if (bRTL) {
-		SetWindowLongPtr(hwnd, GWL_EXSTYLE, exStyle | WS_EX_LAYOUTRTL);
+		SetWindowExStyle(hwnd, exStyle | WS_EX_LAYOUTRTL);
 	} else {
-		SetWindowLongPtr(hwnd, GWL_EXSTYLE, exStyle & ~WS_EX_LAYOUTRTL);
+		SetWindowExStyle(hwnd, exStyle & ~WS_EX_LAYOUTRTL);
 	}
 }
 
@@ -871,7 +871,8 @@ void ResizeDlg_InitEx(HWND hwnd, int cxFrame, int cyFrame, int nIdGrip, int iDir
 	pm->cxClient = rc.right - rc.left;
 	pm->cyClient = rc.bottom - rc.top;
 
-	AdjustWindowRectEx(&rc, GetWindowLong(hwnd, GWL_STYLE) | WS_THICKFRAME, FALSE, 0);
+	const DWORD style = GetWindowStyle(hwnd) | WS_THICKFRAME;
+	AdjustWindowRectEx(&rc, style, FALSE, 0);
 	pm->mmiPtMinX = rc.right - rc.left;
 	pm->mmiPtMinY = rc.bottom - rc.top;
 	// only one direction
@@ -892,7 +893,7 @@ void ResizeDlg_InitEx(HWND hwnd, int cxFrame, int cyFrame, int nIdGrip, int iDir
 
 	SetWindowPos(hwnd, NULL, rc.left, rc.top, cxFrame, cyFrame, SWP_NOZORDER);
 
-	SetWindowLongPtr(hwnd, GWL_STYLE, GetWindowLongPtr(hwnd, GWL_STYLE) | WS_THICKFRAME);
+	SetWindowStyle(hwnd, style);
 	SetWindowPos(hwnd, NULL, 0, 0, 0, 0, SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE | SWP_FRAMECHANGED);
 
 	WCHAR wch[64];
@@ -901,7 +902,7 @@ void ResizeDlg_InitEx(HWND hwnd, int cxFrame, int cyFrame, int nIdGrip, int iDir
 	InsertMenu(GetSystemMenu(hwnd, FALSE), SC_CLOSE, MF_BYCOMMAND | MF_SEPARATOR, 0, NULL);
 
 	HWND hwndCtl = GetDlgItem(hwnd, nIdGrip);
-	SetWindowLongPtr(hwndCtl, GWL_STYLE, GetWindowLongPtr(hwndCtl, GWL_STYLE) | SBS_SIZEGRIP | WS_CLIPSIBLINGS);
+	SetWindowStyle(hwndCtl, GetWindowStyle(hwndCtl) | SBS_SIZEGRIP | WS_CLIPSIBLINGS);
 	/// TODO: per-window DPI
 	const int cGrip = GetSystemMetricsEx(SM_CXHTHUMB);
 	SetWindowPos(hwndCtl, NULL, pm->cxClient - cGrip, pm->cyClient - cGrip, cGrip, cGrip, SWP_NOZORDER);
@@ -1039,7 +1040,7 @@ static LRESULT CALLBACK MultilineEditProc(HWND hwnd, UINT umsg, WPARAM wParam, L
 
 	switch (umsg) {
 	case WM_GETDLGCODE:
-		if (GetWindowLongPtr(hwnd, GWL_STYLE) & ES_WANTRETURN) {
+		if (GetWindowStyle(hwnd) & ES_WANTRETURN) {
 			return DLGC_WANTALLKEYS | DLGC_HASSETSEL;
 		}
 		break;

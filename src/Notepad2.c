@@ -1540,7 +1540,7 @@ void SetWrapVisualFlags(void) {
 
 static void EditFrameOnThemeChanged(void) {
 	if (IsAppThemed()) {
-		SetWindowLongPtr(hwndEdit, GWL_EXSTYLE, GetWindowLongPtr(hwndEdit, GWL_EXSTYLE) & ~WS_EX_CLIENTEDGE);
+		SetWindowExStyle(hwndEdit, GetWindowExStyle(hwndEdit) & ~WS_EX_CLIENTEDGE);
 		SetWindowPos(hwndEdit, NULL, 0, 0, 0, 0, SWP_NOZORDER | SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE);
 
 		if (IsVistaAndAbove()) {
@@ -1557,7 +1557,7 @@ static void EditFrameOnThemeChanged(void) {
 			cyEditFrame = ((rc2.bottom - rc2.top) - (rc.bottom - rc.top)) / 2;
 		}
 	} else {
-		SetWindowLongPtr(hwndEdit, GWL_EXSTYLE, GetWindowLongPtr(hwndEdit, GWL_EXSTYLE) | WS_EX_CLIENTEDGE);
+		SetWindowExStyle(hwndEdit, GetWindowExStyle(hwndEdit) | WS_EX_CLIENTEDGE);
 		SetWindowPos(hwndEdit, NULL, 0, 0, 0, 0, SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE | SWP_FRAMECHANGED);
 
 		cxEditFrame = 0;
@@ -1996,7 +1996,7 @@ void MsgThemeChanged(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	UNREFERENCED_PARAMETER(wParam);
 	UNREFERENCED_PARAMETER(lParam);
 
-	HINSTANCE hInstance = (HINSTANCE)(INT_PTR)GetWindowLongPtr(hwnd, GWLP_HINSTANCE);
+	HINSTANCE hInstance = GetWindowInstance(hwnd);
 
 	// reinitialize edit frame
 	EditFrameOnThemeChanged();
@@ -6789,7 +6789,7 @@ void ToggleFullScreenMode(void) {
 	static BOOL bSaved;
 	static WINDOWPLACEMENT wndpl;
 	static RECT rcWorkArea;
-	static LONG_PTR exStyle;
+	static DWORD exStyle;
 
 	HWND wTaskBar = FindWindow(L"Shell_TrayWnd", L"");
 	HWND wStartButton = FindWindow(L"Button", NULL);
@@ -6800,7 +6800,7 @@ void ToggleFullScreenMode(void) {
 			SystemParametersInfo(SPI_GETWORKAREA, 0, &rcWorkArea, 0);
 			wndpl.length = sizeof(WINDOWPLACEMENT);
 			GetWindowPlacement(hwndMain, &wndpl);
-			exStyle = GetWindowLongPtr(hwndEdit, GWL_EXSTYLE);
+			exStyle = GetWindowExStyle(hwndEdit);
 		}
 
 		HMONITOR hMonitor = MonitorFromWindow(hwndMain, MONITOR_DEFAULTTONEAREST);
@@ -6830,7 +6830,7 @@ void ToggleFullScreenMode(void) {
 		}
 		ShowWindow(wTaskBar, SW_HIDE);
 
-		SetWindowLongPtr(hwndEdit, GWL_EXSTYLE, 0);
+		SetWindowExStyle(hwndEdit, 0);
 		SetWindowPos(hwndMain, (IsTopMost() ? HWND_TOPMOST : HWND_TOP), x - cx, y - top, x + w + 2 * cx , y + h + top + cy, 0);
 	} else {
 		bSaved = FALSE;
@@ -6838,7 +6838,7 @@ void ToggleFullScreenMode(void) {
 		if (wStartButton) {
 			ShowWindow(wStartButton, SW_SHOW);
 		}
-		SetWindowLongPtr(hwndEdit, GWL_EXSTYLE, exStyle);
+		SetWindowExStyle(hwndEdit, exStyle);
 		if (!IsTopMost()) {
 			SetWindowPos(hwndMain, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
 		}

@@ -2182,7 +2182,7 @@ RECT RectFromMonitor(HMONITOR hMonitor) noexcept {
 }
 
 void Window::SetPositionRelative(PRectangle rc, const Window *relativeTo) noexcept {
-	const LONG_PTR style = ::GetWindowLongPtr(HwndFromWindowID(wid), GWL_STYLE);
+	const DWORD style = GetWindowStyle(HwndFromWindowID(wid));
 	if (style & WS_POPUP) {
 		POINT ptOther = { 0, 0 };
 		::ClientToScreen(HwndFromWindow(*relativeTo), &ptOther);
