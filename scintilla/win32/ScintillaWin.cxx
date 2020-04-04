@@ -3831,7 +3831,7 @@ LRESULT CALLBACK ScintillaWin::CTWndProc(
 			}
 		} else {
 			if (iMessage == WM_NCDESTROY) {
-				ClearWindowPointer(hWnd);
+				SetWindowPointer(hWnd, nullptr);
 				return ::DefWindowProc(hWnd, iMessage, wParam, lParam);
 			} else if (iMessage == WM_PAINT) {
 				PAINTSTRUCT ps;
@@ -3951,7 +3951,7 @@ LRESULT CALLBACK ScintillaWin::SWndProc(
 				delete sci;
 			} catch (...) {
 			}
-			ClearWindowPointer(hWnd);
+			SetWindowPointer(hWnd, nullptr);
 			return ::DefWindowProc(hWnd, iMessage, wParam, lParam);
 		} else {
 			return sci->WndProc(iMessage, wParam, lParam);

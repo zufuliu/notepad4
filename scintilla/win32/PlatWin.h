@@ -84,10 +84,6 @@ inline void SetWindowPointer(HWND hWnd, void *ptr) noexcept {
 	::SetWindowLongPtr(hWnd, 0, reinterpret_cast<LONG_PTR>(ptr));
 }
 
-inline void ClearWindowPointer(HWND hWnd) noexcept {
-	::SetWindowLongPtr(hWnd, 0, 0);
-}
-
 #if defined(USE_D2D)
 extern bool LoadD2D() noexcept;
 extern ID2D1Factory *pD2DFactory;
