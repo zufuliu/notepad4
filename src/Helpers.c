@@ -336,11 +336,16 @@ UINT GetCurrentDPI(HWND hwnd) {
 	UINT dpi = 0;
 	if (IsWin10AndAbove()) {
 		// since Windows 10, version 1607
+#if defined(__aarch64__) || defined(_ARM64_) || defined(_M_ARM64)
+		// 1709 was the first version for Windows 10 on ARM64.
+		dpi = GetDpiForWindow(hwnd);
+#else
 		typedef UINT (WINAPI *GetDpiForWindowSig)(HWND hwnd);
 		GetDpiForWindowSig pfnGetDpiForWindow = (GetDpiForWindowSig)GetProcAddress(GetModuleHandle(L"user32.dll"), "GetDpiForWindow");
 		if (pfnGetDpiForWindow) {
 			dpi = pfnGetDpiForWindow(hwnd);
 		}
+#endif
 	}
 
 	if (dpi == 0 && IsWin8p1AndAbove()) {
@@ -354,7 +359,7 @@ UINT GetCurrentDPI(HWND hwnd) {
 				UINT dpiX = 0;
 				UINT dpiY = 0;
 				if (pfnGetDpiForMonitor(hMonitor, MDT_EFFECTIVE_DPI, &dpiX, &dpiY) == S_OK) {
-					dpi = dpiX;
+					dpi = dpiY;
 				}
 			}
 			FreeLibrary(hShcore);
