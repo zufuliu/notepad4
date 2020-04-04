@@ -4,11 +4,11 @@
 
 //! Enable customize toolbar labels
 // When enabled, user can change toolbar button tooltip text
-// in the "Toolbar Labels" section int Notepad2.ini
+// in the "Toolbar Labels" (without quotes) section in Notepad2.ini
 #define NP2_ENABLE_CUSTOMIZE_TOOLBAR_LABELS		0
 
 //! Enable the .LOG feature
-// When enabled and Notepad2 opens a file starts with ".LOG" (in upper case),
+// When enabled and Notepad2 opens a file starts with ".LOG" (without quotes, in upper case),
 // Notepad2 will append current time to the file.
 // This is a hiden feature in Windows Notepad.
 #define NP2_ENABLE_DOT_LOG_FEATURE				0
