@@ -27,14 +27,12 @@
 #include <commdlg.h>
 #include <uxtheme.h>
 #include <stdio.h>
+#include "config.h"
 #include "Helpers.h"
 #include "Dlapi.h"
 #include "Dialogs.h"
 #include "metapath.h"
 #include "resource.h"
-
-// enable customize toolbar labels
-#define NP2_ENABLE_CUSTOMIZE_TOOLBAR_LABELS		0
 
 /******************************************************************************
 *
@@ -937,7 +935,7 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) {
 
 	IniSectionFree(pIniSection);
 	NP2HeapFree(pIniSectionBuf);
-#endif
+#endif // NP2_ENABLE_CUSTOMIZE_TOOLBAR_LABELS
 
 	SendMessage(hwndToolbar, TB_SETEXTENDEDSTYLE, 0,
 				SendMessage(hwndToolbar, TB_GETEXTENDEDSTYLE, 0, 0) | TBSTYLE_EX_MIXEDBUTTONS);

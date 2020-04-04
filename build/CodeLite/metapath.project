@@ -11,6 +11,7 @@
   </VirtualDirectory>
   <VirtualDirectory Name="Header Files">
     <File Name="../../metapath/src/compiler.h"/>
+    <File Name="../../metapath/src/config.h"/>
     <File Name="../../metapath/src/Dialogs.h"/>
     <File Name="../../metapath/src/Dlapi.h"/>
     <File Name="../../metapath/src/DropSource.h"/>

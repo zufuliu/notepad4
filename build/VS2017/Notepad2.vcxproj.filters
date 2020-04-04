@@ -686,6 +686,9 @@
     <ClInclude Include="..\..\src\compiler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\config.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\src\Dialogs.h">
       <Filter>Header Files</Filter>
     </ClInclude>

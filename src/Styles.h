@@ -23,9 +23,6 @@
 // Number of Lexers in pLexArray
 #define NUMLEXERS	64
 
-// localization, get lexer and style name from resuorce
-#define NP2_GET_LEXER_STYLE_NAME_FROM_RES	0
-
 // all schemes with "All Files (*.*)"
 #define MAX_OPEN_SAVE_FILE_DIALOG_FILTER_SIZE	((NUMLEXERS + 1) * 128)
 
@@ -64,9 +61,7 @@ int		Style_GetMatchLexerIndex(int rid);
 int		Style_GetDocTypeLanguage(void);
 void	Style_UpdateLexerKeywords(LPCEDITLEXER pLexNew);
 void	Style_UpdateLexerKeywordAttr(LPCEDITLEXER pLexNew);
-#if NP2_GET_LEXER_STYLE_NAME_FROM_RES
 LPCWSTR Style_GetCurrentLexerDisplayName(LPWSTR lpszName, int cchName);
-#endif
 LPCWSTR Style_GetCurrentLexerName(void);
 void	Style_SetLexerByLangIndex(int lang);
 void	Style_UpdateSchemeMenu(HMENU hmenu);
