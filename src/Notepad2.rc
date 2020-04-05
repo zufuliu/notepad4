@@ -53,7 +53,7 @@ IDI_STYLES              ICON                    "..\\res\\Styles.ico"
 //
 
 IDR_MAINWND             BITMAP                  "..\\res\\Toolbar.bmp"
-IDB_OPEN                BITMAP                  "..\\res\\Open.bmp"
+IDB_OPEN_FOLDER         BITMAP                  "..\\res\\OpenFolder.bmp"
 IDB_NEXT                BITMAP                  "..\\res\\Next.bmp"
 IDB_PREV                BITMAP                  "..\\res\\Prev.bmp"
 IDB_PICK                BITMAP                  "..\\res\\Pick.bmp"

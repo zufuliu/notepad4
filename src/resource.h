@@ -10,7 +10,7 @@
 #define IDI_RUN							101
 #define IDI_STYLES						102
 // Bitmap
-#define IDB_OPEN						101
+#define IDB_OPEN_FOLDER					101
 #define IDB_PREV						102
 #define IDB_NEXT						103
 #define IDB_PICK						104

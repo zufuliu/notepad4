@@ -174,7 +174,7 @@ INT_PTR CALLBACK RunDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) 
 	switch (umsg) {
 	case WM_INITDIALOG: {
 		ResizeDlg_InitX(hwnd, cxRunDlg, IDC_RESIZEGRIP3);
-		MakeBitmapButton(hwnd, IDC_SEARCHEXE, g_hInstance, IDB_OPEN);
+		MakeBitmapButton(hwnd, IDC_SEARCHEXE, g_hInstance, IDB_OPEN_FOLDER);
 
 		HWND hwndCtl = GetDlgItem(hwnd, IDC_COMMANDLINE);
 		DLITEM dli;
@@ -898,8 +898,8 @@ static INT_PTR CALLBACK ItemsPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARA
 static INT_PTR CALLBACK ProgPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
 	switch (umsg) {
 	case WM_INITDIALOG: {
-		MakeBitmapButton(hwnd, IDC_BROWSE_Q, g_hInstance, IDB_OPEN);
-		MakeBitmapButton(hwnd, IDC_BROWSE_F, g_hInstance, IDB_OPEN);
+		MakeBitmapButton(hwnd, IDC_BROWSE_Q, g_hInstance, IDB_OPEN_FOLDER);
+		MakeBitmapButton(hwnd, IDC_BROWSE_F, g_hInstance, IDB_OPEN_FOLDER);
 
 		WCHAR tch[MAX_PATH];
 		lstrcpy(tch, szQuickview);
@@ -1432,7 +1432,7 @@ INT_PTR CALLBACK CopyMoveDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPa
 		SetWindowLongPtr(hwnd, DWLP_USER, lParam);
 
 		ResizeDlg_InitX(hwnd, cxCopyMoveDlg, IDC_RESIZEGRIP5);
-		MakeBitmapButton(hwnd, IDC_BROWSEDESTINATION, g_hInstance, IDB_OPEN);
+		MakeBitmapButton(hwnd, IDC_BROWSEDESTINATION, g_hInstance, IDB_OPEN_FOLDER);
 
 		const LPCFILEOPDLGDATA lpfod = (LPCFILEOPDLGDATA)lParam;
 		SetDlgItemText(hwnd, IDC_SOURCE, lpfod->szSource);
@@ -1637,7 +1637,7 @@ INT_PTR CALLBACK OpenWithDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPa
 		DirList_StartIconThread(hwndLV);
 		ListView_SetItemState(hwndLV, 0, LVIS_FOCUSED, LVIS_FOCUSED);
 
-		MakeBitmapButton(hwnd, IDC_GETOPENWITHDIR, g_hInstance, IDB_OPEN);
+		MakeBitmapButton(hwnd, IDC_GETOPENWITHDIR, g_hInstance, IDB_OPEN_FOLDER);
 
 		CenterDlgInParent(hwnd);
 	}
@@ -2095,7 +2095,7 @@ INT_PTR CALLBACK FindTargetDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 		//}
 
 		// Bitmap for the Browse button
-		MakeBitmapButton(hwnd, IDC_BROWSE, g_hInstance, IDB_OPEN);
+		MakeBitmapButton(hwnd, IDC_BROWSE, g_hInstance, IDB_OPEN_FOLDER);
 		//MakeBitmapButton(hwnd, IDC_FINDWIN, g_hInstance, IDB_BROWSE);
 
 		// initialize edit controls
