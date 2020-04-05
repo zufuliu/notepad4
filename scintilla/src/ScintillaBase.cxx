@@ -650,7 +650,7 @@ void LexState::SetInstance(ILexer5 *instance_) {
 
 LexState *ScintillaBase::DocumentLexState() {
 	if (!pdoc->GetLexInterface()) {
-		pdoc->SetLexInterface(new LexState(pdoc));
+		pdoc->SetLexInterface(std::make_unique<LexState>(pdoc));
 	}
 	return down_cast<LexState *>(pdoc->GetLexInterface());
 }
@@ -707,6 +707,18 @@ void LexState::SetWordList(int n, bool toLower, const char *wl) {
 			pdoc->ModifiedAt(firstModification);
 		}
 	}
+}
+
+int LexState::GetIdentifier() const noexcept {
+	if (lexCurrent) {
+		return lexCurrent->GetLanguage();
+	}
+	if (instance) {
+		if (instance->Version() >= lvRelease5) {
+			return instance->GetIdentifier();
+		}
+	}
+	return SCLEX_CONTAINER;
 }
 
 const char *LexState::GetName() const noexcept {
@@ -877,7 +889,7 @@ const char *LexState::DescriptionOfStyle(int style) const noexcept {
 }
 
 void ScintillaBase::NotifyStyleToNeeded(Sci::Position endStyleNeeded) {
-	if (DocumentLexState()->lexLanguage != SCLEX_CONTAINER) {
+	if (DocumentLexState()->GetIdentifier() != SCLEX_CONTAINER) {
 		const Sci::Line lineEndStyled =
 			pdoc->SciLineFromPosition(pdoc->GetEndStyled());
 		const Sci::Position endStyled =
@@ -1103,7 +1115,7 @@ sptr_t ScintillaBase::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lPara
 		return 0;
 
 	case SCI_GETLEXER:
-		return DocumentLexState()->lexLanguage;
+		return DocumentLexState()->GetIdentifier();
 
 	case SCI_COLOURISE:
 		if (DocumentLexState()->lexLanguage == SCLEX_CONTAINER) {
