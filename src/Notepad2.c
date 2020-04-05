@@ -1446,16 +1446,8 @@ void UpdateSelectionMarginWidth(void) {
 }
 
 void UpdateFoldMarginWidth(void) {
-	if (bShowCodeFolding) {
-		const int iLineMarginWidthNow = SciCall_GetMarginWidth(MARGIN_FOLD_INDEX);
-		const int iLineMarginWidthFit = SciCall_TextWidth(STYLE_LINENUMBER, "+_");
-
-		if (iLineMarginWidthNow != iLineMarginWidthFit) {
-			SciCall_SetMarginWidth(MARGIN_FOLD_INDEX, iLineMarginWidthFit);
-		}
-	} else {
-		SciCall_SetMarginWidth(MARGIN_FOLD_INDEX, 0);
-	}
+	const int width = bShowCodeFolding ? SciCall_TextWidth(STYLE_LINENUMBER, "+_") : 0;
+	SciCall_SetMarginWidth(MARGIN_FOLD_INDEX, width);
 }
 
 void SetWrapStartIndent(void) {
@@ -6758,7 +6750,11 @@ void UpdateStatusbar(void) {
 //
 //
 void UpdateLineNumberWidth(void) {
+	int width = 0;
 	if (bShowLineNumbers) {
+#if NP2_DEBUG_FOLD_LEVEL
+		width = RoundToCurrentDPI(100);
+#else
 		char tchLines[32];
 
 		const Sci_Line iLines = SciCall_GetLineCount();
@@ -6766,20 +6762,10 @@ void UpdateLineNumberWidth(void) {
 		tchLines[0] = '_';
 		tchLines[1] = '_';
 
-		const int iLineMarginWidthNow = SciCall_GetMarginWidth(MARGIN_LINE_NUMBER);
-		const int iLineMarginWidthFit = SciCall_TextWidth(STYLE_LINENUMBER, tchLines);
-
-		if (iLineMarginWidthNow != iLineMarginWidthFit) {
-#if NP2_DEBUG_FOLD_LEVEL
-			SciCall_SetMarginWidth(MARGIN_LINE_NUMBER, RoundToCurrentDPI(100));
-
-#else
-			SciCall_SetMarginWidth(MARGIN_LINE_NUMBER, iLineMarginWidthFit);
+		width = SciCall_TextWidth(STYLE_LINENUMBER, tchLines);
 #endif
-		}
-	} else {
-		SciCall_SetMarginWidth(MARGIN_LINE_NUMBER, 0);
 	}
+	SciCall_SetMarginWidth(MARGIN_LINE_NUMBER, width);
 }
 
 // based on SciTEWin::FullScreenToggle()
