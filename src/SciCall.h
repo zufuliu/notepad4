@@ -927,6 +927,10 @@ NP2_inline void SciCall_IndicSetAlpha(int indicator, int alpha) {
 	SciCall(SCI_INDICSETALPHA, indicator, alpha);
 }
 
+NP2_inline void SciCall_IndicSetOutlineAlpha(int indicator, int alpha) {
+	SciCall(SCI_INDICSETOUTLINEALPHA, indicator, alpha);
+}
+
 NP2_inline void SciCall_SetIndicatorCurrent(int indicator) {
 	SciCall(SCI_SETINDICATORCURRENT, indicator, 0);
 }
