@@ -3898,7 +3898,7 @@ static HTREEITEM Style_AddAllLexerToTreeView(HWND hwndTV, BOOL withStyles, BOOL 
 	TreeView_SetExtendedStyle(hwndTV, TVS_EX_DOUBLEBUFFER, TVS_EX_DOUBLEBUFFER);
 	SetExplorerTheme(hwndTV);
 
-	const DWORD iconFlags = GetCurrentIconIndexFlags();
+	const DWORD iconFlags = SHGFI_USEFILEATTRIBUTES | SHGFI_SMALLICON | SHGFI_SYSICONINDEX;
 	SHFILEINFO shfi;
 	HIMAGELIST himl = (HIMAGELIST)SHGetFileInfo(L"C:\\", 0, &shfi, sizeof(SHFILEINFO), iconFlags);
 	TreeView_SetImageList(hwndTV, himl, TVSIL_NORMAL);
@@ -4683,7 +4683,7 @@ static void Lexer_OnCheckStateChanged(HWND hwndTV, HTREEITEM hFavoriteNode, HTRE
 	if (checked) {
 		// append node into Favorite Schemes
 		if (!found) {
-			const DWORD iconFlags = GetCurrentIconIndexFlags();
+			const DWORD iconFlags = SHGFI_USEFILEATTRIBUTES | SHGFI_SMALLICON | SHGFI_SYSICONINDEX;
 			hTreeNode = TreeView_GetLastVisible(hwndTV);
 			hParent = Style_AddLexerToTreeView(hwndTV, pLex, iconFlags, hFavoriteNode, hInsertAfter, FALSE);
 			TreeView_SetCheckState(hwndTV, hParent, TRUE);
@@ -4797,7 +4797,7 @@ static void Lexer_OnDragDrop(HWND hwndTV, HTREEITEM hFavoriteNode, HTREEITEM hDr
 	HTREEITEM hInsertAfter = expanded ? ((htiTarget == hFavoriteNode)? TVI_FIRST : htiTarget) : hLastChild;
 	PEDITLEXER pLex = (PEDITLEXER)lParam;
 
-	const DWORD iconFlags = GetCurrentIconIndexFlags();
+	const DWORD iconFlags = SHGFI_USEFILEATTRIBUTES | SHGFI_SMALLICON | SHGFI_SYSICONINDEX;
 	hTreeNode = Style_AddLexerToTreeView(hwndTV, pLex, iconFlags, hFavoriteNode, hInsertAfter, FALSE);
 	TreeView_SetCheckState(hwndTV, hTreeNode, TRUE);
 	if (expanded) {
