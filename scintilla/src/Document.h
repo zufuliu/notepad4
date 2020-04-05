@@ -522,7 +522,7 @@ public:
 	void SCI_METHOD DecorationSetCurrentIndicator(int indicator) noexcept override;
 	void SCI_METHOD DecorationFillRange(Sci_Position position, int value, Sci_Position fillLength) override;
 	LexInterface *GetLexInterface() const noexcept;
-	void SetLexInterface(LexInterface *pLexInterface) noexcept;
+	void SetLexInterface(std::unique_ptr<LexInterface> pLexInterface) noexcept;
 
 	int SCI_METHOD SetLineState(Sci_Position line, int state) override;
 	int SCI_METHOD GetLineState(Sci_Position line) const noexcept override;

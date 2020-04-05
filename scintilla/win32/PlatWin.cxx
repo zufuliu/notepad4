@@ -2780,8 +2780,8 @@ void ListBoxX::SetList(const char *list, const char separator, const char typese
 	// Finally populate the listbox itself with the correct number of items
 	const int count = lti.Count();
 	::SendMessage(lb, LB_INITSTORAGE, count, 0);
-	for (int j = 0; j < count; j++) {
-		::SendMessage(lb, LB_ADDSTRING, 0, j + 1);
+	for (intptr_t j = 0; j < count; j++) {
+		ListBox_AddItemData(lb, j + 1);
 	}
 	SetRedraw(true);
 }

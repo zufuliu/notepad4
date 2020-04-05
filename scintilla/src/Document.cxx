@@ -2204,8 +2204,8 @@ LexInterface *Document::GetLexInterface() const noexcept {
 	return pli.get();
 }
 
-void Document::SetLexInterface(LexInterface *pLexInterface) noexcept {
-	pli.reset(pLexInterface);
+void Document::SetLexInterface(std::unique_ptr<LexInterface> pLexInterface) noexcept {
+	pli = std::move(pLexInterface);
 }
 
 int SCI_METHOD Document::SetLineState(Sci_Position line, int state) {
