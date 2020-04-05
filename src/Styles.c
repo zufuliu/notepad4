@@ -1630,6 +1630,9 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 		iValue = MarkOccurrencesDefaultAlpha;
 	}
 	SciCall_IndicSetAlpha(IndicatorNumber_MarkOccurrences, iValue);
+	if (Style_StrGetOutlineAlpha(szValue, &iValue)) {
+		SciCall_IndicSetOutlineAlpha(IndicatorNumber_MarkOccurrences, iValue);
+	}
 	SciCall_IndicSetStyle(IndicatorNumber_MarkOccurrences, INDIC_ROUNDBOX);
 
 	// Bookmark
@@ -3264,6 +3267,7 @@ BOOL Style_StrGetLocale(LPCWSTR lpszStyle, LPWSTR lpszLocale, int cchLocale) {
 #define Style_StrCopyFore(szNewStyle, lpszStyle, tch)		Style_StrCopyValue((szNewStyle), (lpszStyle), L"fore:", (tch));
 #define Style_StrCopyBack(szNewStyle, lpszStyle, tch)		Style_StrCopyValue((szNewStyle), (lpszStyle), L"back:", (tch));
 #define Style_StrCopyAlpha(szNewStyle, lpszStyle, tch)		Style_StrCopyValue((szNewStyle), (lpszStyle), L"alpha:", (tch));
+#define Style_StrCopyOutline(szNewStyle, lpszStyle, tch)	Style_StrCopyValue((szNewStyle), (lpszStyle), L"outline:", (tch));
 
 #define Style_StrCopyAttribute(szNewStyle, lpszStyle, name)	Style_StrCopyAttributeEx((szNewStyle), (lpszStyle), (name), CSTRLEN(name))
 #define Style_StrCopyBold(szNewStyle, lpszStyle)			Style_StrCopyAttribute((szNewStyle), (lpszStyle), L"bold")
@@ -3335,6 +3339,19 @@ BOOL Style_StrGetAlpha(LPCWSTR lpszStyle, int *alpha) {
 
 	if (p != NULL) {
 		p += CSTRLEN(L"alpha:");
+		if (CRTStrToInt(p, alpha)) {
+			*alpha = clamp_i(*alpha, SC_ALPHA_TRANSPARENT, SC_ALPHA_OPAQUE);
+			return TRUE;
+		}
+	}
+	return FALSE;
+}
+
+BOOL Style_StrGetOutlineAlpha(LPCWSTR lpszStyle, int *alpha) {
+	LPCWSTR p = StrStr(lpszStyle, L"outline:");
+
+	if (p != NULL) {
+		p += CSTRLEN(L"outline:");
 		if (CRTStrToInt(p, alpha)) {
 			*alpha = clamp_i(*alpha, SC_ALPHA_TRANSPARENT, SC_ALPHA_OPAQUE);
 			return TRUE;
@@ -3446,6 +3463,7 @@ BOOL Style_SelectFont(HWND hwnd, LPWSTR lpszStyle, int cchStyle, BOOL bDefaultSt
 	Style_StrCopyFore(szNewStyle, lpszStyle, tch);
 	Style_StrCopyBack(szNewStyle, lpszStyle, tch);
 	Style_StrCopyAlpha(szNewStyle, lpszStyle, tch);
+	Style_StrCopyOutline(szNewStyle, lpszStyle, tch);
 	Style_StrCopyEOLFilled(szNewStyle, lpszStyle);
 
 	lstrcpyn(lpszStyle, szNewStyle, cchStyle);
@@ -3524,6 +3542,7 @@ BOOL Style_SelectColor(HWND hwnd, BOOL bFore, LPWSTR lpszStyle, int cchStyle) {
 	}
 
 	Style_StrCopyAlpha(szNewStyle, lpszStyle, tch);
+	Style_StrCopyOutline(szNewStyle, lpszStyle, tch);
 	Style_StrCopyEOLFilled(szNewStyle, lpszStyle);
 
 	lstrcpyn(lpszStyle, szNewStyle, cchStyle);
