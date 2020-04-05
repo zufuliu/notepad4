@@ -1835,12 +1835,12 @@ PEDITLEXER Style_SniffShebang(char *pchText) {
 // Style_GetDocTypeLanguage()
 //
 int Style_GetDocTypeLanguage(void) {
-	const char *p;
 	char tchText[4096] = ""; // maybe contains header comments
 	SciCall_GetText(COUNTOF(tchText), tchText);
 
 	// check DOCTYPE
-	if ((p = StrStrIA(tchText, "<!DOCTYPE")) != NULL) {
+	const char *p = StrStrIA(tchText, "<!DOCTYPE");
+	if (p != NULL) {
 		p += 9;
 		while (IsASpace(*p)) {
 			++p;
@@ -3109,9 +3109,9 @@ BOOL Style_GetOpenDlgFilterStr(LPWSTR lpszFilter, int cchFilter) {
 // Style_StrGetFont()
 //
 BOOL Style_StrGetFontEx(LPCWSTR lpszStyle, LPWSTR lpszFont, int cchFont, BOOL bDefaultStyle) {
-	LPWSTR p;
+	LPWSTR p = StrStr(lpszStyle, L"font:");
 
-	if ((p = StrStr(lpszStyle, L"font:")) != NULL) {
+	if (p != NULL) {
 		p += CSTRLEN(L"font:");
 		while (*p == L' ') {
 			++p;
@@ -3149,9 +3149,9 @@ static inline BOOL Style_StrGetFont(LPCWSTR lpszStyle, LPWSTR lpszFont, int cchF
 // Style_StrGetCharSet()
 //
 BOOL Style_StrGetCharSet(LPCWSTR lpszStyle, int *charset) {
-	LPCWSTR p;
+	LPCWSTR p = StrStr(lpszStyle, L"charset:");
 
-	if ((p = StrStr(lpszStyle, L"charset:")) != NULL) {
+	if (p != NULL) {
 		p += CSTRLEN(L"charset:");
 		return CRTStrToInt(p, charset);
 	}
@@ -3163,9 +3163,9 @@ BOOL Style_StrGetCharSet(LPCWSTR lpszStyle, int *charset) {
 // Style_StrGetSize()
 //
 BOOL Style_StrGetFontSize(LPCWSTR lpszStyle, int *size) {
-	LPCWSTR p;
+	LPCWSTR p = StrStr(lpszStyle, L"size:");
 
-	if ((p = StrStr(lpszStyle, L"size:")) != NULL) {
+	if (p != NULL) {
 		p += CSTRLEN(L"size:");
 		float value;
 		if (StrToFloat(p, &value)) {
@@ -3181,9 +3181,9 @@ BOOL Style_StrGetFontSize(LPCWSTR lpszStyle, int *size) {
 }
 
 BOOL Style_StrGetRawSize(LPCWSTR lpszStyle, int *size) {
-	LPCWSTR p;
+	LPCWSTR p = StrStr(lpszStyle, L"size:");
 
-	if ((p = StrStr(lpszStyle, L"size:")) != NULL) {
+	if (p != NULL) {
 		p += CSTRLEN(L"size:");
 		return CRTStrToInt(p, size);
 	}
@@ -3195,13 +3195,13 @@ BOOL Style_StrGetRawSize(LPCWSTR lpszStyle, int *size) {
 #define MIN_FONT_WEIGHT		0
 #define MAX_FONT_WEIGHT		1000
 BOOL Style_StrGetFontWeight(LPCWSTR lpszStyle, int *weight) {
-	LPCWSTR p;
-
 	if (Style_StrGetBold(lpszStyle)) {
 		*weight = FW_BOLD;
 		return TRUE;
 	}
-	if ((p = StrStr(lpszStyle, L"weight:")) != NULL) {
+
+	LPCWSTR p = StrStr(lpszStyle, L"weight:");
+	if (p != NULL) {
 		p += CSTRLEN(L"weight:");
 		return CRTStrToInt(p, weight) && (*weight > MIN_FONT_WEIGHT && *weight < MAX_FONT_WEIGHT);
 	}
@@ -3214,9 +3214,9 @@ BOOL Style_StrGetFontWeight(LPCWSTR lpszStyle, int *weight) {
 // Style_StrGetValueStr()
 //
 static BOOL Style_StrGetValueStr(LPCWSTR lpszStyle, LPCWSTR key, int keyLen, LPWSTR lpszValue, int cchValue) {
-	LPWSTR p;
+	LPWSTR p = StrStr(lpszStyle, key);
 
-	if ((p = StrStr(lpszStyle, key)) != NULL) {
+	if (p != NULL) {
 		p += keyLen;
 		while (*p == L' ') {
 			++p;
@@ -3277,9 +3277,9 @@ BOOL Style_StrGetLocale(LPCWSTR lpszStyle, LPWSTR lpszLocale, int cchLocale) {
 // Style_StrGetColor()
 //
 BOOL Style_StrGetColor(BOOL bFore, LPCWSTR lpszStyle, COLORREF *rgb) {
-	LPCWSTR p;
+	LPCWSTR p = StrStr(lpszStyle, (bFore ? L"fore:" : L"back:"));
 
-	if ((p = StrStr(lpszStyle, (bFore ? L"fore:" : L"back:"))) != NULL) {
+	if (p != NULL) {
 		p += CSTRLEN("fore:");
 		if (*p == L'#') {
 			int iValue;
@@ -3297,9 +3297,9 @@ BOOL Style_StrGetColor(BOOL bFore, LPCWSTR lpszStyle, COLORREF *rgb) {
 // Style_StrGetCase()
 //
 BOOL Style_StrGetCase(LPCWSTR lpszStyle, int *forceCase) {
-	LPCWSTR p;
+	LPCWSTR p = StrStr(lpszStyle, L"case:");
 
-	if ((p = StrStr(lpszStyle, L"case:")) != NULL) {
+	if (p != NULL) {
 		p += CSTRLEN(L"case:");
 		while (*p == L' ') {
 			++p;
@@ -3331,9 +3331,9 @@ BOOL Style_StrGetCase(LPCWSTR lpszStyle, int *forceCase) {
 // Style_StrGetAlpha()
 //
 BOOL Style_StrGetAlpha(LPCWSTR lpszStyle, int *alpha) {
-	LPCWSTR p;
+	LPCWSTR p = StrStr(lpszStyle, L"alpha:");
 
-	if ((p = StrStr(lpszStyle, L"alpha:")) != NULL) {
+	if (p != NULL) {
 		p += CSTRLEN(L"alpha:");
 		if (CRTStrToInt(p, alpha)) {
 			*alpha = clamp_i(*alpha, SC_ALPHA_TRANSPARENT, SC_ALPHA_OPAQUE);
