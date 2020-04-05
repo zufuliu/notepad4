@@ -1162,9 +1162,7 @@ BEGIN
     GROUPBOX        "Info",IDC_INFO_GROUPBOX,181,7,280,122
     ICON            IDI_STYLES,IDC_STATIC,189,19,20,20
     LTEXT           "Customize Schemes",IDC_TITLE,220,25,200,12
-    LTEXT           "Filename extensions must be separated by semicolon (;)",IDC_STATIC,191,44,247,13
-    LTEXT           "Style format:\n\tfont:Name; size:[+|-]nn.mm; weight:nnn; bold; italic; underline; strike;\n\tcharset:dd; locale:Name; case:[Upper|Lower|Camel];\n\tfore:#ffffff; back:#bbbbbb; alpha:aa; eolfilled;",IDC_STATIC,191,60,260,34
-    LTEXT           "Style properties can be copied using copy and paste or drag and drop.\n\nThe ""Preview"" button will not apply any changes.",IDC_STATIC,191,100,260,26
+    EDITTEXT        IDC_STYLEEDIT_HELP,186,40,272,86,ES_READONLY | ES_MULTILINE | NOT WS_BORDER
     LTEXT           "Associated file&name extensions:|Style &settings:",IDC_STYLELABELS,315,230,152,8,NOT WS_VISIBLE
     LTEXT           "Built-in default value:",IDC_STYLELABEL_DEFAULT,181,162,160,8
     EDITTEXT        IDC_STYLEVALUE_DEFAULT,181,172,280,18,ES_READONLY | ES_MULTILINE | ES_AUTOVSCROLL | WS_VSCROLL
@@ -2031,6 +2029,17 @@ BEGIN
 	IDS_CONFIG_THEME_TITLE_DEFAULT	"Customize Schemes - Default Theme"
 	IDS_CONFIG_THEME_TITLE_DARK		"Customize Schemes - Dark Theme"
 	IDS_FAVORITE_SCHEMES_TITLE		"Favorite Schemes"
+	IDS_CUSTOMIZE_SCHEMES_HELP		"Filename extensions must be separated by semicolon (;)\r\n\
+\r\n\
+Style format:\r\n\
+\tfont:Name; size:[+|-]nn.mm; weight:nnn; bold; italic; underline; strike;\r\n\
+\tcharset:dd; locale:Name; case:[Upper|Lower|Camel];\r\n\
+\tfore:#ffffff; back:#bbbbbb; alpha:aa; eolfilled;\r\n\
+\r\n\
+Style properties can be copied using copy and paste or drag and drop.\r\n\
+\r\n\
+The ""Preview"" button will not apply any changes."
+
 END
 
 
