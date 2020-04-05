@@ -3211,9 +3211,9 @@ BOOL Style_StrGetFontWeight(LPCWSTR lpszStyle, int *weight) {
 
 //=============================================================================
 //
-// Style_StrGetValueStr()
+// Style_StrGetValueEx()
 //
-static BOOL Style_StrGetValueStr(LPCWSTR lpszStyle, LPCWSTR key, int keyLen, LPWSTR lpszValue, int cchValue) {
+static BOOL Style_StrGetValueEx(LPCWSTR lpszStyle, LPCWSTR key, int keyLen, LPWSTR lpszValue, int cchValue) {
 	LPWSTR p = StrStr(lpszStyle, key);
 
 	if (p != NULL) {
@@ -3231,8 +3231,8 @@ static BOOL Style_StrGetValueStr(LPCWSTR lpszStyle, LPCWSTR key, int keyLen, LPW
 	return FALSE;
 }
 
-static void Style_StrCopyValueStrEx(LPWSTR szNewStyle, LPCWSTR lpszStyle, LPCWSTR key, int keyLen, LPWSTR lpszValue, int cchValue) {
-	if (Style_StrGetValueStr(lpszStyle, key, keyLen, lpszValue, cchValue)) {
+static void Style_StrCopyValueEx(LPWSTR szNewStyle, LPCWSTR lpszStyle, LPCWSTR key, int keyLen, LPWSTR lpszValue, int cchValue) {
+	if (Style_StrGetValueEx(lpszStyle, key, keyLen, lpszValue, cchValue)) {
 		if (*szNewStyle) {
 			lstrcat(szNewStyle, L"; ");
 		}
@@ -3251,19 +3251,19 @@ static void Style_StrCopyAttributeEx(LPWSTR szNewStyle, LPCWSTR lpszStyle, LPCWS
 }
 
 BOOL Style_StrGetLocale(LPCWSTR lpszStyle, LPWSTR lpszLocale, int cchLocale) {
-	return Style_StrGetValueStr(lpszStyle, L"locale:", CSTRLEN(L"locale:"), lpszLocale, cchLocale);
+	return Style_StrGetValueEx(lpszStyle, L"locale:", CSTRLEN(L"locale:"), lpszLocale, cchLocale);
 }
 
-#define Style_StrCopyValueStr(szNewStyle, lpszStyle, name, tch)	Style_StrCopyValueStrEx((szNewStyle), (lpszStyle), (name), CSTRLEN(name), (tch), COUNTOF(tch))
-#define Style_StrCopyFont(szNewStyle, lpszStyle, tch)		Style_StrCopyValueStr((szNewStyle), (lpszStyle), L"font:", (tch));
-#define Style_StrCopyChatset(szNewStyle, lpszStyle, tch)	Style_StrCopyValueStr((szNewStyle), (lpszStyle), L"charset:", (tch));
-#define Style_StrCopyLocale(szNewStyle, lpszStyle, tch)		Style_StrCopyValueStr((szNewStyle), (lpszStyle), L"locale:", (tch));
-#define Style_StrCopySize(szNewStyle, lpszStyle, tch)		Style_StrCopyValueStr((szNewStyle), (lpszStyle), L"size:", (tch));
-#define Style_StrCopyWeight(szNewStyle, lpszStyle, tch)		Style_StrCopyValueStr((szNewStyle), (lpszStyle), L"weight:", (tch));
-#define Style_StrCopyCase(szNewStyle, lpszStyle, tch)		Style_StrCopyValueStr((szNewStyle), (lpszStyle), L"case:", (tch));
-#define Style_StrCopyFore(szNewStyle, lpszStyle, tch)		Style_StrCopyValueStr((szNewStyle), (lpszStyle), L"fore:", (tch));
-#define Style_StrCopyBack(szNewStyle, lpszStyle, tch)		Style_StrCopyValueStr((szNewStyle), (lpszStyle), L"back:", (tch));
-#define Style_StrCopyAlpha(szNewStyle, lpszStyle, tch)		Style_StrCopyValueStr((szNewStyle), (lpszStyle), L"alpha:", (tch));
+#define Style_StrCopyValue(szNewStyle, lpszStyle, name, tch)	Style_StrCopyValueEx((szNewStyle), (lpszStyle), (name), CSTRLEN(name), (tch), COUNTOF(tch))
+#define Style_StrCopyFont(szNewStyle, lpszStyle, tch)		Style_StrCopyValue((szNewStyle), (lpszStyle), L"font:", (tch));
+#define Style_StrCopyChatset(szNewStyle, lpszStyle, tch)	Style_StrCopyValue((szNewStyle), (lpszStyle), L"charset:", (tch));
+#define Style_StrCopyLocale(szNewStyle, lpszStyle, tch)		Style_StrCopyValue((szNewStyle), (lpszStyle), L"locale:", (tch));
+#define Style_StrCopySize(szNewStyle, lpszStyle, tch)		Style_StrCopyValue((szNewStyle), (lpszStyle), L"size:", (tch));
+#define Style_StrCopyWeight(szNewStyle, lpszStyle, tch)		Style_StrCopyValue((szNewStyle), (lpszStyle), L"weight:", (tch));
+#define Style_StrCopyCase(szNewStyle, lpszStyle, tch)		Style_StrCopyValue((szNewStyle), (lpszStyle), L"case:", (tch));
+#define Style_StrCopyFore(szNewStyle, lpszStyle, tch)		Style_StrCopyValue((szNewStyle), (lpszStyle), L"fore:", (tch));
+#define Style_StrCopyBack(szNewStyle, lpszStyle, tch)		Style_StrCopyValue((szNewStyle), (lpszStyle), L"back:", (tch));
+#define Style_StrCopyAlpha(szNewStyle, lpszStyle, tch)		Style_StrCopyValue((szNewStyle), (lpszStyle), L"alpha:", (tch));
 
 #define Style_StrCopyAttribute(szNewStyle, lpszStyle, name)	Style_StrCopyAttributeEx((szNewStyle), (lpszStyle), (name), CSTRLEN(name))
 #define Style_StrCopyBold(szNewStyle, lpszStyle)			Style_StrCopyAttribute((szNewStyle), (lpszStyle), L"bold")
