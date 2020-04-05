@@ -3148,12 +3148,12 @@ static inline BOOL Style_StrGetFont(LPCWSTR lpszStyle, LPWSTR lpszFont, int cchF
 //
 // Style_StrGetCharSet()
 //
-BOOL Style_StrGetCharSet(LPCWSTR lpszStyle, int *i) {
+BOOL Style_StrGetCharSet(LPCWSTR lpszStyle, int *charset) {
 	LPCWSTR p;
 
 	if ((p = StrStr(lpszStyle, L"charset:")) != NULL) {
 		p += CSTRLEN(L"charset:");
-		return CRTStrToInt(p, i);
+		return CRTStrToInt(p, charset);
 	}
 	return FALSE;
 }
@@ -3162,7 +3162,7 @@ BOOL Style_StrGetCharSet(LPCWSTR lpszStyle, int *i) {
 //
 // Style_StrGetSize()
 //
-BOOL Style_StrGetFontSize(LPCWSTR lpszStyle, int *i) {
+BOOL Style_StrGetFontSize(LPCWSTR lpszStyle, int *size) {
 	LPCWSTR p;
 
 	if ((p = StrStr(lpszStyle, L"size:")) != NULL) {
@@ -3173,19 +3173,19 @@ BOOL Style_StrGetFontSize(LPCWSTR lpszStyle, int *i) {
 			iValue += (*p == L'+' || *p == '-')? iBaseFontSize : 0;
 			// scintilla/src/ViewStyle.h GetFontSizeZoomed()
 			iValue = max_i(iValue, 2 * SC_FONT_SIZE_MULTIPLIER);
-			*i = iValue;
+			*size = iValue;
 			return TRUE;
 		}
 	}
 	return FALSE;
 }
 
-BOOL Style_StrGetRawSize(LPCWSTR lpszStyle, int *i) {
+BOOL Style_StrGetRawSize(LPCWSTR lpszStyle, int *size) {
 	LPCWSTR p;
 
 	if ((p = StrStr(lpszStyle, L"size:")) != NULL) {
 		p += CSTRLEN(L"size:");
-		return CRTStrToInt(p, i);
+		return CRTStrToInt(p, size);
 	}
 	return FALSE;
 }
@@ -3194,16 +3194,16 @@ BOOL Style_StrGetRawSize(LPCWSTR lpszStyle, int *i) {
 // https://docs.microsoft.com/en-us/windows/desktop/api/dwrite/ne-dwrite-dwrite_font_weight
 #define MIN_FONT_WEIGHT		0
 #define MAX_FONT_WEIGHT		1000
-BOOL Style_StrGetFontWeight(LPCWSTR lpszStyle, int *i) {
+BOOL Style_StrGetFontWeight(LPCWSTR lpszStyle, int *weight) {
 	LPCWSTR p;
 
 	if (Style_StrGetBold(lpszStyle)) {
-		*i = FW_BOLD;
+		*weight = FW_BOLD;
 		return TRUE;
 	}
 	if ((p = StrStr(lpszStyle, L"weight:")) != NULL) {
 		p += CSTRLEN(L"weight:");
-		return CRTStrToInt(p, i) && (*i > MIN_FONT_WEIGHT && *i < MAX_FONT_WEIGHT);
+		return CRTStrToInt(p, weight) && (*weight > MIN_FONT_WEIGHT && *weight < MAX_FONT_WEIGHT);
 	}
 
 	return FALSE;
@@ -3296,7 +3296,7 @@ BOOL Style_StrGetColor(BOOL bFore, LPCWSTR lpszStyle, COLORREF *rgb) {
 //
 // Style_StrGetCase()
 //
-BOOL Style_StrGetCase(LPCWSTR lpszStyle, int *i) {
+BOOL Style_StrGetCase(LPCWSTR lpszStyle, int *forceCase) {
 	LPCWSTR p;
 
 	if ((p = StrStr(lpszStyle, L"case:")) != NULL) {
@@ -3307,19 +3307,19 @@ BOOL Style_StrGetCase(LPCWSTR lpszStyle, int *i) {
 		switch (*p) {
 		case L'u':
 		case L'U':
-			*i = SC_CASE_UPPER;
+			*forceCase = SC_CASE_UPPER;
 			return TRUE;
 		case L'l':
 		case L'L':
-			*i = SC_CASE_LOWER;
+			*forceCase = SC_CASE_LOWER;
 			return TRUE;
 		case L'c':
 		case L'C':
-			*i = SC_CASE_CAMEL;
+			*forceCase = SC_CASE_CAMEL;
 			return TRUE;
 		//case L'm':
 		//case L'M':
-		//	*i = SC_CASE_MIXED; // default normal case
+		//	*forceCase = SC_CASE_MIXED; // default normal case
 		//	return TRUE;
 		}
 	}
@@ -3330,13 +3330,13 @@ BOOL Style_StrGetCase(LPCWSTR lpszStyle, int *i) {
 //
 // Style_StrGetAlpha()
 //
-BOOL Style_StrGetAlpha(LPCWSTR lpszStyle, int *i) {
+BOOL Style_StrGetAlpha(LPCWSTR lpszStyle, int *alpha) {
 	LPCWSTR p;
 
 	if ((p = StrStr(lpszStyle, L"alpha:")) != NULL) {
 		p += CSTRLEN(L"alpha:");
-		if (CRTStrToInt(p, i)) {
-			*i = clamp_i(*i, SC_ALPHA_TRANSPARENT, SC_ALPHA_OPAQUE);
+		if (CRTStrToInt(p, alpha)) {
+			*alpha = clamp_i(*alpha, SC_ALPHA_TRANSPARENT, SC_ALPHA_OPAQUE);
 			return TRUE;
 		}
 	}
