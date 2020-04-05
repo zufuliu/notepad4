@@ -335,8 +335,8 @@ extern BOOL	bShowSelectionMargin;
 struct DetailStyle {
 	UINT mask;
 	int fontSize;
-	int foreColor;
-	int backColor;
+	COLORREF foreColor;
+	COLORREF backColor;
 	int weight;
 	BOOL italic;
 	BOOL underline;
@@ -848,7 +848,7 @@ void Style_Save(void) {
 				WCHAR tch[4];
 				WCHAR wch[16];
 				wsprintf(tch, L"%02u", i + 1);
-				wsprintf(wch, L"#%02X%02X%02X", (int)GetRValue(color), (int)GetGValue(color), (int)GetBValue(color));
+				wsprintf(wch, L"#%02X%02X%02X", GetRValue(color), GetGValue(color), GetBValue(color));
 				IniSectionSetString(pIniSection, tch, wch);
 			}
 		}
@@ -1278,31 +1278,32 @@ static BOOL Style_StrGetAttributeEx(LPCWSTR lpszStyle, LPCWSTR key, int keyLen) 
 // set default colors to avoid showing white (COLOR_WINDOW) window while loading big file.
 void Style_InitDefaultColor(void) {
 	PEDITLEXER pLexNew = pLexArray[iDefaultLexerIndex];
-	int iValue = pLexNew->bUseDefaultCodeStyle ? Style_DefaultCode : Style_DefaultText;
-	LPCWSTR szValue = pLexGlobal->Styles[iValue].szValue;
-	if (!Style_StrGetForeColor(szValue, &iValue)) {
-		if (!Style_StrGetForeColor(pLexNew->Styles[0].szValue, &iValue)) {
-			iValue = GetSysColor(COLOR_WINDOWTEXT);
+	const int index = pLexNew->bUseDefaultCodeStyle ? Style_DefaultCode : Style_DefaultText;
+	LPCWSTR szValue = pLexGlobal->Styles[index].szValue;
+	COLORREF rgb;
+	if (!Style_StrGetForeColor(szValue, &rgb)) {
+		if (!Style_StrGetForeColor(pLexNew->Styles[0].szValue, &rgb)) {
+			rgb = GetSysColor(COLOR_WINDOWTEXT);
 		}
 	}
-	SciCall_StyleSetFore(STYLE_DEFAULT, iValue);
-	if (!Style_StrGetBackColor(szValue, &iValue)) {
-		if (!Style_StrGetBackColor(pLexNew->Styles[0].szValue, &iValue)) {
-			iValue = GetSysColor(COLOR_WINDOW);
+	SciCall_StyleSetFore(STYLE_DEFAULT, rgb);
+	if (!Style_StrGetBackColor(szValue, &rgb)) {
+		if (!Style_StrGetBackColor(pLexNew->Styles[0].szValue, &rgb)) {
+			rgb = GetSysColor(COLOR_WINDOW);
 		}
 	}
-	SciCall_StyleSetBack(STYLE_DEFAULT, iValue);
+	SciCall_StyleSetBack(STYLE_DEFAULT, rgb);
 	//SciCall_StyleClearAll();
 
-	SciCall_SetFoldMarginColour(TRUE, iValue);
-	SciCall_SetFoldMarginHiColour(TRUE, iValue);
+	SciCall_SetFoldMarginColour(TRUE, rgb);
+	SciCall_SetFoldMarginHiColour(TRUE, rgb);
 
 	szValue = pLexGlobal->Styles[Style_LineNumber].szValue;
-	if (Style_StrGetForeColor(szValue, &iValue)) {
-		SciCall_StyleSetFore(STYLE_LINENUMBER, iValue);
+	if (Style_StrGetForeColor(szValue, &rgb)) {
+		SciCall_StyleSetFore(STYLE_LINENUMBER, rgb);
 	}
-	if (Style_StrGetBackColor(szValue, &iValue)) {
-		SciCall_StyleSetBack(STYLE_LINENUMBER, iValue);
+	if (Style_StrGetBackColor(szValue, &rgb)) {
+		SciCall_StyleSetBack(STYLE_LINENUMBER, rgb);
 	}
 }
 
@@ -1446,10 +1447,11 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 		SciCall_SetFontLocale(localeName);
 	}
 
-	if (!Style_StrGetForeColor(szValue, &iValue)) {
+	COLORREF rgb;
+	if (!Style_StrGetForeColor(szValue, &rgb)) {
 		SciCall_StyleSetFore(STYLE_DEFAULT, GetSysColor(COLOR_WINDOWTEXT));
 	}
-	if (!Style_StrGetBackColor(szValue, &iValue)) {
+	if (!Style_StrGetBackColor(szValue, &rgb)) {
 		SciCall_StyleSetBack(STYLE_DEFAULT, GetSysColor(COLOR_WINDOW));
 	}
 	// lexer default (base style), i.e.: EDITSTYLE_DEFAULT
@@ -1468,19 +1470,19 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 
 	//! begin Style_Selection
 	szValue = pLexGlobal->Styles[Style_Selection].szValue;
-	if (Style_StrGetForeColor(szValue, &iValue)) {
-		SciCall_SetSelFore(TRUE, iValue);
-		SciCall_SetAdditionalSelFore(iValue);
+	if (Style_StrGetForeColor(szValue, &rgb)) {
+		SciCall_SetSelFore(TRUE, rgb);
+		SciCall_SetAdditionalSelFore(rgb);
 	} else {
 		SciCall_SetSelFore(FALSE, 0);
 		SciCall_SetAdditionalSelFore(0);
 	}
 	// always set background color
-	if (!Style_StrGetBackColor(szValue, &iValue)) {
-		iValue = GetSysColor(COLOR_HIGHLIGHT);
+	if (!Style_StrGetBackColor(szValue, &rgb)) {
+		rgb = GetSysColor(COLOR_HIGHLIGHT);
 	}
-	SciCall_SetSelBack(TRUE, iValue);
-	SciCall_SetAdditionalSelBack(iValue);
+	SciCall_SetSelBack(TRUE, rgb);
+	SciCall_SetAdditionalSelBack(rgb);
 
 	if (!Style_StrGetAlpha(szValue, &iValue)) {
 		iValue = SC_ALPHA_NOALPHA;
@@ -1493,13 +1495,13 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 
 	//! begin Style_Whitespace
 	szValue = pLexGlobal->Styles[Style_Whitespace].szValue;
-	if (Style_StrGetForeColor(szValue, &iValue)) {
-		SciCall_SetWhitespaceFore(TRUE, iValue);
+	if (Style_StrGetForeColor(szValue, &rgb)) {
+		SciCall_SetWhitespaceFore(TRUE, rgb);
 	} else {
 		SciCall_SetWhitespaceFore(FALSE, 0);
 	}
-	if (Style_StrGetBackColor(szValue, &iValue)) {
-		SciCall_SetWhitespaceBack(TRUE, iValue);
+	if (Style_StrGetBackColor(szValue, &rgb)) {
+		SciCall_SetWhitespaceBack(TRUE, rgb);
 	} else {
 		SciCall_SetWhitespaceBack(FALSE, 0);
 	}
@@ -1514,23 +1516,23 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 	Style_HighlightCurrentLine();
 	Style_UpdateCaret();
 	// caret fore
-	if (!Style_StrGetForeColor(pLexGlobal->Styles[Style_Caret].szValue, &iValue)) {
-		iValue = GetSysColor(COLOR_WINDOWTEXT);
+	if (!Style_StrGetForeColor(pLexGlobal->Styles[Style_Caret].szValue, &rgb)) {
+		rgb = GetSysColor(COLOR_WINDOWTEXT);
 	}
-	if (!VerifyContrast(iValue, SciCall_StyleGetBack(STYLE_DEFAULT))) {
-		iValue = SciCall_StyleGetFore(STYLE_DEFAULT);
+	if (!VerifyContrast(rgb, SciCall_StyleGetBack(STYLE_DEFAULT))) {
+		rgb = SciCall_StyleGetFore(STYLE_DEFAULT);
 	}
-	SciCall_SetCaretFore(iValue);
-	SciCall_SetAdditionalCaretFore(iValue);
+	SciCall_SetCaretFore(rgb);
+	SciCall_SetAdditionalCaretFore(rgb);
 	// IME indicator
 	szValue = pLexGlobal->Styles[Style_IMEIndicator].szValue;
-	if (!Style_StrGetForeColor(szValue, &iValue)) {
-		iValue = IMEIndicatorDefaultColor;
+	if (!Style_StrGetForeColor(szValue, &rgb)) {
+		rgb = IMEIndicatorDefaultColor;
 	}
-	SciCall_IndicSetFore(SC_INDICATOR_INPUT, iValue);
-	SciCall_IndicSetFore(SC_INDICATOR_TARGET, iValue);
-	SciCall_IndicSetFore(SC_INDICATOR_CONVERTED, iValue);
-	SciCall_IndicSetFore(SC_INDICATOR_UNKNOWN, iValue);
+	SciCall_IndicSetFore(SC_INDICATOR_INPUT, rgb);
+	SciCall_IndicSetFore(SC_INDICATOR_TARGET, rgb);
+	SciCall_IndicSetFore(SC_INDICATOR_CONVERTED, rgb);
+	SciCall_IndicSetFore(SC_INDICATOR_UNKNOWN, rgb);
 
 	Style_SetLongLineColors();
 	// Extra Line Spacing
@@ -1573,13 +1575,13 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 		COLORREF clrFill;
 
 		szValue = pLexGlobal->Styles[Style_FoldingMarker].szValue;
-		if (Style_StrGetForeColor(szValue, &iValue)) {
-			clrFore = iValue;
+		if (Style_StrGetForeColor(szValue, &rgb)) {
+			clrFore = rgb;
 		} else {
 			clrFore = (bUse2ndGlobalStyle || np2StyleTheme == StyleTheme_Dark) ? FoldingMarkerLineColorDark : FoldingMarkerLineColorDefault;
 		}
-		if (Style_StrGetBackColor(szValue, &iValue)) {
-			clrFill = iValue;
+		if (Style_StrGetBackColor(szValue, &rgb)) {
+			clrFill = rgb;
 		} else {
 			clrFill = (bUse2ndGlobalStyle || np2StyleTheme == StyleTheme_Dark) ? FoldingMarkerFillColorDark : FoldingMarkerFillColorDefault;
 		}
@@ -1620,10 +1622,10 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 
 	// Mark Occurrence
 	szValue = pLexGlobal->Styles[Style_MarkOccurrences].szValue;
-	if (!Style_StrGetForeColor(szValue, &iValue)) {
-		iValue = GetSysColor(COLOR_HIGHLIGHT);
+	if (!Style_StrGetForeColor(szValue, &rgb)) {
+		rgb = GetSysColor(COLOR_HIGHLIGHT);
 	}
-	SciCall_IndicSetFore(IndicatorNumber_MarkOccurrences, iValue);
+	SciCall_IndicSetFore(IndicatorNumber_MarkOccurrences, rgb);
 	if (!Style_StrGetAlpha(szValue, &iValue)) {
 		iValue = MarkOccurrencesDefaultAlpha;
 	}
@@ -2980,7 +2982,7 @@ void Style_SetLongLineColors(void) {
 	LPCWSTR szValue = pLexGlobal->Styles[Style_LongLineMarker].szValue;
 
 	const BOOL foreColor = SciCall_GetEdgeMode() == EDGE_LINE;
-	int rgb;
+	COLORREF rgb;
 	if (!Style_StrGetColor(foreColor, szValue, &rgb)) {
 		rgb = GetSysColor(COLOR_3DLIGHT);
 	}
@@ -2996,22 +2998,24 @@ void Style_HighlightCurrentLine(void) {
 	SciCall_SetCaretLineVisible(FALSE);
 	if (iHighlightCurrentLine != 0) {
 		LPCWSTR szValue = pLexGlobal->Styles[Style_CurrentLine].szValue;
-		const BOOL backColor = iHighlightCurrentLine == 1;
-		int iValue;
-		if (Style_StrGetColor(!backColor, szValue, &iValue)) {
+		// 1: background color, 2: outline frame
+		const BOOL foreColor = iHighlightCurrentLine != 1;
+		COLORREF rgb;
+		if (Style_StrGetColor(foreColor, szValue, &rgb)) {
 			int size = 0;
-			if (!backColor) {
+			if (foreColor) {
 				Style_StrGetRawSize(szValue, &size);
 				size = max_i(1, RoundToCurrentDPI(size));
 			}
 
 			SciCall_SetCaretLineFrame(size);
-			SciCall_SetCaretLineBack(iValue);
+			SciCall_SetCaretLineBack(rgb);
 
-			if (!Style_StrGetAlpha(szValue, &iValue)) {
-				iValue = SC_ALPHA_NOALPHA;
+			int alpha;
+			if (!Style_StrGetAlpha(szValue, &alpha)) {
+				alpha = SC_ALPHA_NOALPHA;
 			}
-			SciCall_SetCaretLineBackAlpha(iValue);
+			SciCall_SetCaretLineBackAlpha(alpha);
 			SciCall_SetCaretLineVisible(TRUE);
 		}
 	}
@@ -3054,7 +3058,7 @@ void Style_SetBookmark(void) {
 
 	LPCWSTR szValue = pLexGlobal->Styles[Style_Bookmark].szValue;
 	if (bShowSelectionMargin) {
-		int iBookmarkImageColor;
+		COLORREF iBookmarkImageColor;
 		if (!Style_StrGetForeColor(szValue, &iBookmarkImageColor)) {
 			iBookmarkImageColor = BookmarkImageDefaultColor;
 		}
@@ -3068,7 +3072,7 @@ void Style_SetBookmark(void) {
 		SciCall_MarkerDefine(MarkerNumber_Bookmark, SC_MARK_VERTICALBOOKMARK);
 #endif
 	} else {
-		int iBookmarkLineColor;
+		COLORREF iBookmarkLineColor;
 		int iBookmarkLineAlpha;
 		if (!Style_StrGetBackColor(szValue, &iBookmarkLineColor)) {
 			iBookmarkLineColor = BookmarkLineDefaultColor;
@@ -3272,7 +3276,7 @@ BOOL Style_StrGetLocale(LPCWSTR lpszStyle, LPWSTR lpszLocale, int cchLocale) {
 //
 // Style_StrGetColor()
 //
-BOOL Style_StrGetColor(BOOL bFore, LPCWSTR lpszStyle, int *rgb) {
+BOOL Style_StrGetColor(BOOL bFore, LPCWSTR lpszStyle, COLORREF *rgb) {
 	LPCWSTR p;
 
 	if ((p = StrStr(lpszStyle, (bFore ? L"fore:" : L"back:"))) != NULL) {
@@ -3347,6 +3351,7 @@ BOOL Style_SelectFont(HWND hwnd, LPWSTR lpszStyle, int cchStyle, BOOL bDefaultSt
 	CHOOSEFONT cf;
 	LOGFONT lf;
 	int iValue;
+	COLORREF rgb;
 	WCHAR tch[MAX_STYLE_VALUE_LENGTH];
 
 	ZeroMemory(&cf, sizeof(CHOOSEFONT));
@@ -3359,8 +3364,8 @@ BOOL Style_SelectFont(HWND hwnd, LPWSTR lpszStyle, int cchStyle, BOOL bDefaultSt
 	if (Style_StrGetCharSet(lpszStyle, &iValue)) {
 		lf.lfCharSet = (BYTE)iValue;
 	}
-	if (Style_StrGetForeColor(lpszStyle, &iValue)) {
-		cf.rgbColors = iValue;
+	if (Style_StrGetForeColor(lpszStyle, &rgb)) {
+		cf.rgbColors = rgb;
 	}
 	if (!Style_StrGetFontSize(lpszStyle, &iValue)) {
 		iValue = iBaseFontSize;
@@ -3468,9 +3473,9 @@ BOOL Style_SelectColor(HWND hwnd, BOOL bFore, LPWSTR lpszStyle, int cchStyle) {
 	CHOOSECOLOR cc;
 	ZeroMemory(&cc, sizeof(CHOOSECOLOR));
 
-	int iRGBResult;
+	COLORREF iRGBResult;
 	if (!Style_StrGetColor(bFore, lpszStyle, &iRGBResult)) {
-		iRGBResult = (int)(bFore ? GetSysColor(COLOR_WINDOWTEXT) : GetSysColor(COLOR_WINDOW));
+		iRGBResult = bFore ? GetSysColor(COLOR_WINDOWTEXT) : GetSysColor(COLOR_WINDOW);
 	}
 
 	cc.lStructSize = sizeof(CHOOSECOLOR);
@@ -3506,10 +3511,7 @@ BOOL Style_SelectColor(HWND hwnd, BOOL bFore, LPWSTR lpszStyle, int cchStyle) {
 		if (StrNotEmpty(szNewStyle)) {
 			lstrcat(szNewStyle, L"; ");
 		}
-		wsprintf(tch, L"fore:#%02X%02X%02X",
-				 (int)GetRValue(iRGBResult),
-				 (int)GetGValue(iRGBResult),
-				 (int)GetBValue(iRGBResult));
+		wsprintf(tch, L"fore:#%02X%02X%02X", GetRValue(iRGBResult), GetGValue(iRGBResult), GetBValue(iRGBResult));
 		lstrcat(szNewStyle, tch);
 		Style_StrCopyBack(szNewStyle, lpszStyle, tch);
 	} else {
@@ -3517,10 +3519,7 @@ BOOL Style_SelectColor(HWND hwnd, BOOL bFore, LPWSTR lpszStyle, int cchStyle) {
 		if (StrNotEmpty(szNewStyle)) {
 			lstrcat(szNewStyle, L"; ");
 		}
-		wsprintf(tch, L"back:#%02X%02X%02X",
-				 (int)GetRValue(iRGBResult),
-				 (int)GetGValue(iRGBResult),
-				 (int)GetBValue(iRGBResult));
+		wsprintf(tch, L"back:#%02X%02X%02X", GetRValue(iRGBResult), GetGValue(iRGBResult), GetBValue(iRGBResult));
 		lstrcat(szNewStyle, tch);
 	}
 
@@ -3538,6 +3537,7 @@ BOOL Style_SelectColor(HWND hwnd, BOOL bFore, LPWSTR lpszStyle, int cchStyle) {
 void Style_SetStyles(int iStyle, LPCWSTR lpszStyle) {
 	WCHAR tch[LF_FACESIZE];
 	int iValue;
+	COLORREF rgb;
 
 	// Font
 	if (Style_StrGetFont(lpszStyle, tch, COUNTOF(tch))) {
@@ -3553,13 +3553,13 @@ void Style_SetStyles(int iStyle, LPCWSTR lpszStyle) {
 	}
 
 	// Fore
-	if (Style_StrGetForeColor(lpszStyle, &iValue)) {
-		SciCall_StyleSetFore(iStyle, iValue);
+	if (Style_StrGetForeColor(lpszStyle, &rgb)) {
+		SciCall_StyleSetFore(iStyle, rgb);
 	}
 
 	// Back
-	if (Style_StrGetBackColor(lpszStyle, &iValue)) {
-		SciCall_StyleSetBack(iStyle, iValue);
+	if (Style_StrGetBackColor(lpszStyle, &rgb)) {
+		SciCall_StyleSetBack(iStyle, rgb);
 	}
 
 	// Weight
@@ -3598,6 +3598,7 @@ void Style_SetStyles(int iStyle, LPCWSTR lpszStyle) {
 static void Style_Parse(struct DetailStyle *style, LPCWSTR lpszStyle) {
 	UINT mask = 0;
 	int iValue;
+	COLORREF rgb;
 
 	// Font
 	if (Style_StrGetFont(lpszStyle, style->fontWide, COUNTOF(style->fontWide))) {
@@ -3612,14 +3613,14 @@ static void Style_Parse(struct DetailStyle *style, LPCWSTR lpszStyle) {
 	}
 
 	// Fore
-	if (Style_StrGetForeColor(lpszStyle, &iValue)) {
-		style->foreColor = iValue;
+	if (Style_StrGetForeColor(lpszStyle, &rgb)) {
+		style->foreColor = rgb;
 		mask |= STYLE_MASK_FORE_COLOR;
 	}
 
 	// Back
-	if (Style_StrGetBackColor(lpszStyle, &iValue)) {
-		style->backColor = iValue;
+	if (Style_StrGetBackColor(lpszStyle, &rgb)) {
+		style->backColor = rgb;
 		mask |= STYLE_MASK_BACK_COLOR;
 	}
 
@@ -4476,11 +4477,11 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 
 				GetDlgItemText(hwnd, IDC_STYLEEDIT, tch, COUNTOF(tch));
 
-				int cr = -1;
+				COLORREF cr = (COLORREF)(-1);
 				Style_StrGetForeColor(tch, &cr);
 				MakeColorPickButton(hwnd, IDC_STYLEFORE, g_hInstance, cr);
 
-				cr = -1;
+				cr = (COLORREF)(-1);
 				Style_StrGetBackColor(tch, &cr);
 				MakeColorPickButton(hwnd, IDC_STYLEBACK, g_hInstance, cr);
 			}
