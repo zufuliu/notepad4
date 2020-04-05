@@ -82,13 +82,13 @@ BOOL	Style_StrGetLocale(LPCWSTR lpszStyle, LPWSTR lpszLocale, int cchLocale);
 BOOL	Style_StrGetFontSize(LPCWSTR lpszStyle, int *i);
 BOOL	Style_StrGetRawSize(LPCWSTR lpszStyle, int *i);
 BOOL	Style_StrGetFontWeight(LPCWSTR lpszStyle, int *i);
-BOOL	Style_StrGetColor(BOOL bFore, LPCWSTR lpszStyle, int *rgb);
+BOOL	Style_StrGetColor(BOOL bFore, LPCWSTR lpszStyle, COLORREF *rgb);
 
-NP2_inline BOOL Style_StrGetForeColor(LPCWSTR lpszStyle, int *rgb) {
+NP2_inline BOOL Style_StrGetForeColor(LPCWSTR lpszStyle, COLORREF *rgb) {
 	return Style_StrGetColor(TRUE, lpszStyle, rgb);
 }
 
-NP2_inline BOOL Style_StrGetBackColor(LPCWSTR lpszStyle, int *rgb) {
+NP2_inline BOOL Style_StrGetBackColor(LPCWSTR lpszStyle, COLORREF *rgb) {
 	return Style_StrGetColor(FALSE, lpszStyle, rgb);
 }
 
