@@ -192,3 +192,4 @@ def make_notepad2_toolbar_bitmap():
 make_matapath_toolbar_bitmap()
 #make_notepad2_toolbar_bitmap()
 #split_horizontal('Toolbar.bmp', '16x40')
+convert_image('images/OpenFolder_16x.png', 'OpenFolder.bmp')

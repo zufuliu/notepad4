@@ -14,7 +14,7 @@
 #define IDI_CROSS1						107
 #define IDI_CROSS2						108
 // Bitmap
-#define IDB_OPEN						101
+#define IDB_OPEN_FOLDER					101
 // Cursor
 #define IDC_CROSSHAIR					100
 // Common

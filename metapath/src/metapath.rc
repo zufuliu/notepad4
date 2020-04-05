@@ -59,7 +59,7 @@ IDI_CROSS2              ICON                    "..\\res\\cross2.ico"
 //
 
 IDR_MAINWND             BITMAP                  "..\\res\\Toolbar.bmp"
-IDB_OPEN                BITMAP                  "..\\res\\Open.bmp"
+IDB_OPEN_FOLDER         BITMAP                  "..\\res\\OpenFolder.bmp"
 
 /////////////////////////////////////////////////////////////////////////////
 //
