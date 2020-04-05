@@ -1,6 +1,7 @@
 #include "EditLexer.h"
 #include "EditStyleX.h"
 
+// https://docs.microsoft.com/en-us/windows/win32/menurc/about-resource-files
 // https://en.wikibooks.org/wiki/Windows_Programming/Resource_Script_Reference
 
 static KEYWORDLIST Keywords_RC = {{
@@ -12,7 +13,7 @@ static KEYWORDLIST Keywords_RC = {{
 // Statement
 "CAPTION CHARACTERISTICS CLASS EXSTYLE LANGUAGE MENUITEM STYLE VERSION "
 "BEGIN END BLOCK BUTTON SEPARATOR VALUE "
-"VIRTKEY ALT SHIFT NOINVERT "
+"VIRTKEY ALT SHIFT NOINVERT NOT "
 "PRELOAD LOADONCALL FIXED DISCARDABLE PURE IMPURE SHARED NONSHARED "
 
 , // 1 Type keyword
@@ -33,7 +34,7 @@ NULL
 NULL
 
 , // 8 Constant
-"RC_INVOKED __DATE__ __FILE__ __LINE__ __STDC__ __TIME__ __TIMESTAMP__ "
+"RC_INVOKED "
 
 , NULL, NULL, NULL, NULL, NULL, NULL
 
