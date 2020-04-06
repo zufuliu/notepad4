@@ -191,6 +191,7 @@ static int iRenderingTechnology;
 static BOOL bUseInlineIME;
 static int iBidirectional;
 static BOOL bShowToolbar;
+static BOOL bAutoScaleToolbar;
 static BOOL bShowStatusbar;
 static BOOL bInFullScreenMode;
 static int iFullScreenMode;
@@ -1806,7 +1807,9 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) {
 	} else {
 		hbmp = (HBITMAP)LoadImage(hInstance, MAKEINTRESOURCE(IDR_MAINWND), IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION);
 	}
-	hbmp = ResizeImageForCurrentDPI(hbmp);
+	if (bAutoScaleToolbar) {
+		hbmp = ResizeImageForCurrentDPI(hbmp);
+	}
 	HBITMAP hbmpCopy = NULL;
 	if (!bExternalBitmap) {
 		hbmpCopy = (HBITMAP)CopyImage(hbmp, IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION);
@@ -1823,7 +1826,9 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) {
 	if (tchToolbarBitmapHot != NULL) {
 		hbmp = LoadBitmapFile(tchToolbarBitmapHot);
 		if (hbmp != NULL) {
-			hbmp = ResizeImageForCurrentDPI(hbmp);
+			if (bAutoScaleToolbar) {
+				hbmp = ResizeImageForCurrentDPI(hbmp);
+			}
 			GetObject(hbmp, sizeof(BITMAP), &bmp);
 			himl = ImageList_Create(bmp.bmHeight, bmp.bmHeight, ILC_COLOR32 | ILC_MASK, 0, 0);
 			ImageList_AddMasked(himl, hbmp, CLR_DEFAULT);
@@ -1836,7 +1841,9 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) {
 	if (tchToolbarBitmapDisabled != NULL) {
 		hbmp = LoadBitmapFile(tchToolbarBitmapDisabled);
 		if (hbmp != NULL) {
-			hbmp = ResizeImageForCurrentDPI(hbmp);
+			if (bAutoScaleToolbar) {
+				hbmp = ResizeImageForCurrentDPI(hbmp);
+			}
 			GetObject(hbmp, sizeof(BITMAP), &bmp);
 			himl = ImageList_Create(bmp.bmHeight, bmp.bmHeight, ILC_COLOR32 | ILC_MASK, 0, 0);
 			ImageList_AddMasked(himl, hbmp, CLR_DEFAULT);
@@ -1944,6 +1951,15 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) {
 	cyReBarFrame = bIsAppThemed ? 0 : 2;
 }
 
+void RecreateBars(HWND hwnd, HINSTANCE hInstance) {
+	Toolbar_GetButtons(hwndToolbar, TOOLBAR_COMMAND_BASE, tchToolbarButtons, COUNTOF(tchToolbarButtons));
+
+	DestroyWindow(hwndToolbar);
+	DestroyWindow(hwndReBar);
+	DestroyWindow(hwndStatus);
+	CreateBars(hwnd, hInstance);
+}
+
 //=============================================================================
 //
 // MsgDPIChanged() - Handle WM_DPICHANGED
@@ -1958,12 +1974,9 @@ void MsgDPIChanged(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	sprintf(buf, "WM_DPICHANGED: dpi=%u, %u\n", g_uCurrentDPI, g_uDefaultDPI);
 	SciCall_InsertText(0, buf);
 #endif
+
 	// recreate toolbar and statusbar
-	Toolbar_GetButtons(hwndToolbar, TOOLBAR_COMMAND_BASE, tchToolbarButtons, COUNTOF(tchToolbarButtons));
-	DestroyWindow(hwndToolbar);
-	DestroyWindow(hwndReBar);
-	DestroyWindow(hwndStatus);
-	CreateBars(hwnd, g_hInstance);
+	RecreateBars(hwnd, g_hInstance);
 	SetWindowPos(hwnd, NULL, rc->left, rc->top, rc->right - rc->left, rc->bottom - rc->top, SWP_NOZORDER | SWP_NOACTIVATE);
 
 	cachedStatusItem.updateMask = UINT_MAX;
@@ -1990,17 +2003,12 @@ void MsgThemeChanged(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	EditFrameOnThemeChanged();
 
 	// recreate toolbar and statusbar
-	Toolbar_GetButtons(hwndToolbar, TOOLBAR_COMMAND_BASE, tchToolbarButtons, COUNTOF(tchToolbarButtons));
-
-	DestroyWindow(hwndToolbar);
-	DestroyWindow(hwndReBar);
-	DestroyWindow(hwndStatus);
-	CreateBars(hwnd, hInstance);
-	UpdateToolbar();
+	RecreateBars(hwnd, hInstance);
 
 	RECT rc;
 	GetClientRect(hwnd, &rc);
 	SendMessage(hwnd, WM_SIZE, SIZE_RESTORED, MAKELPARAM(rc.right, rc.bottom));
+	UpdateToolbar();
 	UpdateStatusbar();
 }
 
@@ -2417,6 +2425,7 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	CheckCmd(hmenu, IDM_VIEW_MATCHBRACES, bMatchBraces);
 	CheckCmd(hmenu, IDM_VIEW_TOOLBAR, bShowToolbar);
 	EnableCmd(hmenu, IDM_VIEW_CUSTOMIZE_TOOLBAR, bShowToolbar);
+	CheckCmd(hmenu, IDM_VIEW_AUTO_SCALE_TOOLBAR, bAutoScaleToolbar);
 	CheckCmd(hmenu, IDM_VIEW_STATUSBAR, bShowStatusbar);
 
 	CheckCmd(hmenu, IDM_VIEW_FULLSCREEN_ON_START, iFullScreenMode & FullScreenMode_OnStartup);
@@ -4008,6 +4017,15 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		SendMessage(hwndToolbar, TB_CUSTOMIZE, 0, 0);
 		break;
 
+	case IDM_VIEW_AUTO_SCALE_TOOLBAR:
+		bAutoScaleToolbar = !bAutoScaleToolbar;
+		if (g_uCurrentDPI > USER_DEFAULT_SCREEN_DPI) {
+			RecreateBars(hwnd, g_hInstance);
+			UpdateToolbar();
+			UpdateStatusbar();
+		}
+		break;
+
 	case IDM_VIEW_STATUSBAR:
 		bShowStatusbar = !bShowStatusbar;
 		if (bShowStatusbar) {
@@ -5274,6 +5292,7 @@ void LoadSettings(void) {
 	}
 
 	bShowToolbar = IniSectionGetBool(pIniSection, L"ShowToolbar", 1);
+	bAutoScaleToolbar = IniSectionGetBool(pIniSection, L"AutoScaleToolbar", 1);
 	bShowStatusbar = IniSectionGetBool(pIniSection, L"ShowStatusbar", 1);
 
 	iValue = IniSectionGetInt(pIniSection, L"FullScreenMode", FullScreenMode_Default);
@@ -5545,6 +5564,7 @@ void SaveSettings(BOOL bSaveSettingsNow) {
 	Toolbar_GetButtons(hwndToolbar, TOOLBAR_COMMAND_BASE, tchToolbarButtons, COUNTOF(tchToolbarButtons));
 	IniSectionSetStringEx(pIniSection, L"ToolbarButtons", tchToolbarButtons, DefaultToolbarButtons);
 	IniSectionSetBoolEx(pIniSection, L"ShowToolbar", bShowToolbar, 1);
+	IniSectionSetBoolEx(pIniSection, L"AutoScaleToolbar", bAutoScaleToolbar, 1);
 	IniSectionSetBoolEx(pIniSection, L"ShowStatusbar", bShowStatusbar, 1);
 	IniSectionSetIntEx(pIniSection, L"FullScreenMode", iFullScreenMode, FullScreenMode_Default);
 
