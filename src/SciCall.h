@@ -733,6 +733,10 @@ NP2_inline void SciCall_SetMarginSensitive(int margin, BOOL sensitive) {
 	SciCall(SCI_SETMARGINSENSITIVEN, margin, sensitive);
 }
 
+NP2_inline void SciCall_SetMarginCursor(int margin, int cursor) {
+	SciCall(SCI_SETMARGINCURSORN, margin, cursor);
+}
+
 NP2_inline void SciCall_SetFoldMarginColour(BOOL useSetting, COLORREF back) {
 	SciCall(SCI_SETFOLDMARGINCOLOUR, useSetting, back);
 }

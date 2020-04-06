@@ -1643,6 +1643,8 @@ HWND EditCreate(HWND hwndParent) {
 	SciCall_SetEdgeColumn(iLongLinesLimit);
 
 	// Margins
+	SciCall_SetMarginSensitive(MARGIN_BOOKMARK, TRUE);
+	SciCall_SetMarginCursor(MARGIN_BOOKMARK, SC_CURSORARROW);
 	UpdateBookmarkMarginWidth();
 	SciCall_SetMarginType(MARGIN_FOLD_INDEX, SC_MARGIN_SYMBOL);
 	SciCall_SetMarginMask(MARGIN_FOLD_INDEX, SC_MASK_FOLDERS);
@@ -2503,6 +2505,20 @@ static void ConvertLineEndings(int iNewEOLMode) {
 	UpdateToolbar();
 	UpdateStatusbar();
 	UpdateWindowTitle();
+}
+
+void EditToggleBookmarkAt(Sci_Position iPos) {
+	const Sci_Line iLine = SciCall_LineFromPosition(iPos);
+
+	const Sci_MarkerMask bitmask = SciCall_MarkerGet(iLine);
+	if (bitmask & MarkerBitmask_Bookmark) {
+		// unset
+		SciCall_MarkerDelete(iLine, MarkerNumber_Bookmark);
+	} else {
+		Style_SetBookmark();
+		// set
+		SciCall_MarkerAdd(iLine, MarkerNumber_Bookmark);
+	}
 }
 
 //=============================================================================
@@ -3610,21 +3626,9 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	}
 	break;
 
-	case BME_EDIT_BOOKMARKTOGGLE: {
-		const Sci_Position iPos = SciCall_GetCurrentPos();
-		const Sci_Line iLine = SciCall_LineFromPosition(iPos);
-
-		const Sci_MarkerMask bitmask = SciCall_MarkerGet(iLine);
-		if (bitmask & MarkerBitmask_Bookmark) {
-			// unset
-			SciCall_MarkerDelete(iLine, MarkerNumber_Bookmark);
-		} else {
-			Style_SetBookmark();
-			// set
-			SciCall_MarkerAdd(iLine, MarkerNumber_Bookmark);
-		}
-	}
-	break;
+	case BME_EDIT_BOOKMARKTOGGLE:
+		EditToggleBookmarkAt(SciCall_GetCurrentPos());
+		break;
 
 	case BME_EDIT_BOOKMARKCLEAR:
 		SciCall_MarkerDeleteAll(MarkerNumber_Bookmark);
@@ -4857,8 +4861,13 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			break;
 
 		case SCN_MARGINCLICK:
-			if (scn->margin == MARGIN_FOLD_INDEX) {
-				FoldClick(SciCall_LineFromPosition(scn->position), scn->modifiers);
+			switch (scn->margin) {
+			case MARGIN_FOLD_INDEX:
+				FoldClickAt(scn->position, scn->modifiers);
+				break;
+			case MARGIN_BOOKMARK:
+				EditToggleBookmarkAt(scn->position);
+				break;
 			}
 			break;
 
