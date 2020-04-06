@@ -167,6 +167,7 @@ void UpdateStatusBarWidth(void);
 void UpdateToolbar(void);
 void UpdateFoldMarginWidth(void);
 void UpdateLineNumberWidth(void);
+void UpdateBookmarkMarginWidth(void);
 
 enum {
 	FullScreenMode_OnStartup = 1,

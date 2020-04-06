@@ -1436,9 +1436,10 @@ static inline void UpdateDocumentModificationStatus(void) {
 }
 
 void UpdateBookmarkMarginWidth(void) {
-	// fixed width to put arrow cursor.
-	// 16px for bookmark symbol.
-	const int width = bShowBookmarkMargin ? max_i(GetSystemMetricsEx(SM_CXCURSOR) / 2, 16) : 0;
+	// see LineMarker::Draw() for minDim.
+	const int width = bShowBookmarkMargin ? SciCall_TextHeight() - 2 : 0;
+	// 16px for XPM bookmark symbol.
+	//const int width = bShowBookmarkMargin ? max_i(SciCall_TextHeight() - 2, 16) : 0;
 	SciCall_SetMarginWidth(MARGIN_BOOKMARK, width);
 }
 
@@ -1645,7 +1646,6 @@ HWND EditCreate(HWND hwndParent) {
 	// Margins
 	SciCall_SetMarginSensitive(MARGIN_BOOKMARK, TRUE);
 	SciCall_SetMarginCursor(MARGIN_BOOKMARK, SC_CURSORARROW);
-	UpdateBookmarkMarginWidth();
 	SciCall_SetMarginType(MARGIN_FOLD_INDEX, SC_MARGIN_SYMBOL);
 	SciCall_SetMarginMask(MARGIN_FOLD_INDEX, SC_MASK_FOLDERS);
 	SciCall_SetMarginSensitive(MARGIN_FOLD_INDEX, TRUE);
@@ -1968,7 +1968,6 @@ void MsgDPIChanged(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	cachedStatusItem.updateMask = UINT_MAX;
 	Style_DetectBaseFontSize(hwnd);
-	UpdateBookmarkMarginWidth();
 	UpdateStatusBarWidth();
 	Style_OnDPIChanged();
 	SciCall_GotoPos(pos);
@@ -2160,6 +2159,7 @@ void MsgNotifyZoom(void) {
 
 	UpdateStatusBarCache(STATUS_DOCZOOM);
 	UpdateLineNumberWidth();
+	UpdateBookmarkMarginWidth();
 	UpdateFoldMarginWidth();
 	UpdateStatusbar();
 }
