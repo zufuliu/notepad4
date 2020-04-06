@@ -6,7 +6,7 @@ import math
 from enum import IntEnum
 from PIL import Image
 
-__all__ = ['Bitmap']
+__all__ = ['Bitmap', 'ResizeMethod']
 
 # https://en.wikipedia.org/wiki/BMP_file_format
 class BitmapFileHeader(object):
@@ -41,6 +41,14 @@ class BitmapFileHeader(object):
 
 _InchesPerMetre = 0.0254
 _TransparentColor = (0, 0, 0, 0)
+
+class ResizeMethod(IntEnum):
+	Nearest = Image.NEAREST
+	Bilinear = Image.BILINEAR
+	Bicubic = Image.BICUBIC
+	Lanczos = Image.LANCZOS
+	Box = Image.BOX
+	Hamming = Image.HAMMING
 
 class CompressionMethod(IntEnum):
 	BI_RGB = 0
@@ -403,6 +411,12 @@ class Bitmap(object):
 		else:
 			print(f'Warning: toImage not implemented for {bitsPerPixel} bit bitmap', file=sys.stderr)
 		return image
+
+	def resize(self, size, method = ResizeMethod.Lanczos):
+		image = self.toImage()
+		image = image.resize(size, resample=method.value)
+		bmp = Bitmap.fromImage(image)
+		return bmp
 
 	@staticmethod
 	def fromFileEx(path):
