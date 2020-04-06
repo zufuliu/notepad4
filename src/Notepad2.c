@@ -61,7 +61,7 @@ HWND	hDlgFindReplace = NULL;
 static BOOL bInitDone = FALSE;
 
 #define MARGIN_LINE_NUMBER	0	// line number
-#define MARGIN_SELECTION	1	// bookmark and selection margin
+#define MARGIN_BOOKMARK		1	// bookmark and selection margin
 #define MARGIN_FOLD_INDEX	2	// folding index
 // tab width for notification text
 #define TAB_WIDTH_NOTIFICATION		8
@@ -140,7 +140,7 @@ int		iLongLinesLimit;
 int		iLongLinesLimitG;
 int		iLongLineMode;
 int		iWrapCol = 0;
-BOOL	bShowSelectionMargin;
+BOOL	bShowBookmarkMargin;
 static BOOL bShowLineNumbers;
 static BOOL bMarkOccurrences;
 static BOOL bMarkOccurrencesMatchCase;
@@ -1435,11 +1435,11 @@ static inline void UpdateDocumentModificationStatus(void) {
 	UpdateToolbar();
 }
 
-void UpdateSelectionMarginWidth(void) {
+void UpdateBookmarkMarginWidth(void) {
 	// fixed width to put arrow cursor.
 	// 16px for bookmark symbol.
-	const int width = bShowSelectionMargin ? max_i(GetSystemMetricsEx(SM_CXCURSOR) / 2, 16) : 0;
-	SciCall_SetMarginWidth(MARGIN_SELECTION, width);
+	const int width = bShowBookmarkMargin ? max_i(GetSystemMetricsEx(SM_CXCURSOR) / 2, 16) : 0;
+	SciCall_SetMarginWidth(MARGIN_BOOKMARK, width);
 }
 
 void UpdateFoldMarginWidth(void) {
@@ -1643,7 +1643,7 @@ HWND EditCreate(HWND hwndParent) {
 	SciCall_SetEdgeColumn(iLongLinesLimit);
 
 	// Margins
-	UpdateSelectionMarginWidth();
+	UpdateBookmarkMarginWidth();
 	SciCall_SetMarginType(MARGIN_FOLD_INDEX, SC_MARGIN_SYMBOL);
 	SciCall_SetMarginMask(MARGIN_FOLD_INDEX, SC_MASK_FOLDERS);
 	SciCall_SetMarginSensitive(MARGIN_FOLD_INDEX, TRUE);
@@ -1966,7 +1966,7 @@ void MsgDPIChanged(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	cachedStatusItem.updateMask = UINT_MAX;
 	Style_DetectBaseFontSize(hwnd);
-	UpdateSelectionMarginWidth();
+	UpdateBookmarkMarginWidth();
 	UpdateStatusBarWidth();
 	Style_OnDPIChanged();
 	SciCall_GotoPos(pos);
@@ -2395,7 +2395,7 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	CheckCmd(hmenu, IDM_VIEW_TABSASSPACES, bTabsAsSpaces);
 	CheckCmd(hmenu, IDM_VIEW_SHOWINDENTGUIDES, bShowIndentGuides);
 	CheckCmd(hmenu, IDM_VIEW_LINENUMBERS, bShowLineNumbers);
-	CheckCmd(hmenu, IDM_VIEW_MARGIN, bShowSelectionMargin);
+	CheckCmd(hmenu, IDM_VIEW_MARGIN, bShowBookmarkMargin);
 	EnableCmd(hmenu, IDM_EDIT_COMPLETEWORD, i);
 	CheckCmd(hmenu, IDM_VIEW_AUTOCOMPLETION_IGNORECASE, autoCompletionConfig.bIgnoreCase);
 
@@ -3832,8 +3832,8 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	case IDM_VIEW_MARGIN:
-		bShowSelectionMargin = !bShowSelectionMargin;
-		UpdateSelectionMarginWidth();
+		bShowBookmarkMargin = !bShowBookmarkMargin;
+		UpdateBookmarkMarginWidth();
 		Style_SetBookmark();
 		break;
 
@@ -5162,7 +5162,7 @@ void LoadSettings(void) {
 	iValue = IniSectionGetInt(pIniSection, L"LongLineMode", EDGE_LINE);
 	iLongLineMode = clamp_i(iValue, EDGE_LINE, EDGE_BACKGROUND);
 
-	bShowSelectionMargin = IniSectionGetBool(pIniSection, L"ShowSelectionMargin", 0);
+	bShowBookmarkMargin = IniSectionGetBool(pIniSection, L"ShowBookmarkMargin", 0);
 	bShowLineNumbers = IniSectionGetBool(pIniSection, L"ShowLineNumbers", 1);
 	bShowCodeFolding = IniSectionGetBool(pIniSection, L"ShowCodeFolding", 1);
 
@@ -5488,7 +5488,7 @@ void SaveSettings(BOOL bSaveSettingsNow) {
 	IniSectionSetBoolEx(pIniSection, L"MarkLongLines", bMarkLongLines, 0);
 	IniSectionSetIntEx(pIniSection, L"LongLinesLimit", iLongLinesLimitG, 80);
 	IniSectionSetIntEx(pIniSection, L"LongLineMode", iLongLineMode, EDGE_LINE);
-	IniSectionSetBoolEx(pIniSection, L"ShowSelectionMargin", bShowSelectionMargin, 0);
+	IniSectionSetBoolEx(pIniSection, L"ShowBookmarkMargin", bShowBookmarkMargin, 0);
 	IniSectionSetBoolEx(pIniSection, L"ShowLineNumbers", bShowLineNumbers, 1);
 	IniSectionSetBoolEx(pIniSection, L"ShowCodeFolding", bShowCodeFolding, 1);
 	IniSectionSetBoolEx(pIniSection, L"MarkOccurrences", bMarkOccurrences, 1);

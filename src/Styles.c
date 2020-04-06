@@ -312,7 +312,7 @@ extern int	g_DOSEncoding;
 extern int	iDefaultCodePage;
 extern int	iDefaultCharSet;
 extern INT	iHighlightCurrentLine;
-extern BOOL	bShowSelectionMargin;
+extern BOOL	bShowBookmarkMargin;
 
 #define STYLE_MASK_FONT_FACE	(1 << 0)
 #define STYLE_MASK_FONT_SIZE	(1 << 1)
@@ -3049,9 +3049,9 @@ void Style_SetIndentGuides(BOOL bShow) {
 void Style_SetBookmark(void) {
 	if (!bBookmarkColorUpdated) {
 #if BookmarkUsingPixmapImage
-		const int marker = bShowSelectionMargin ? SC_MARK_PIXMAP : SC_MARK_BACKGROUND;
+		const int marker = bShowBookmarkMargin ? SC_MARK_PIXMAP : SC_MARK_BACKGROUND;
 #else
-		const int marker = bShowSelectionMargin ? SC_MARK_VERTICALBOOKMARK : SC_MARK_BACKGROUND;
+		const int marker = bShowBookmarkMargin ? SC_MARK_VERTICALBOOKMARK : SC_MARK_BACKGROUND;
 #endif
 		const int markType = SciCall_MarkerSymbolDefined(MarkerNumber_Bookmark);
 		if (marker == markType) {
@@ -3060,7 +3060,7 @@ void Style_SetBookmark(void) {
 	}
 
 	LPCWSTR szValue = pLexGlobal->Styles[Style_Bookmark].szValue;
-	if (bShowSelectionMargin) {
+	if (bShowBookmarkMargin) {
 		COLORREF iBookmarkImageColor;
 		if (!Style_StrGetForeColor(szValue, &iBookmarkImageColor)) {
 			iBookmarkImageColor = BookmarkImageDefaultColor;
