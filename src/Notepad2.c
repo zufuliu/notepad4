@@ -2416,7 +2416,7 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 #endif
 	CheckCmd(hmenu, IDM_VIEW_MATCHBRACES, bMatchBraces);
 	CheckCmd(hmenu, IDM_VIEW_TOOLBAR, bShowToolbar);
-	EnableCmd(hmenu, IDM_VIEW_CUSTOMIZETB, bShowToolbar);
+	EnableCmd(hmenu, IDM_VIEW_CUSTOMIZE_TOOLBAR, bShowToolbar);
 	CheckCmd(hmenu, IDM_VIEW_STATUSBAR, bShowStatusbar);
 
 	CheckCmd(hmenu, IDM_VIEW_FULLSCREEN_ON_START, iFullScreenMode & FullScreenMode_OnStartup);
@@ -4004,7 +4004,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		SendWMSize(hwnd);
 		break;
 
-	case IDM_VIEW_CUSTOMIZETB:
+	case IDM_VIEW_CUSTOMIZE_TOOLBAR:
 		SendMessage(hwndToolbar, TB_CUSTOMIZE, 0, 0);
 		break;
 
