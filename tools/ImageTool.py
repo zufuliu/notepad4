@@ -3,7 +3,7 @@
 import os.path
 import re
 
-from Bitmap import Bitmap
+from Bitmap import Bitmap, ResizeMethod
 
 def save_bitmap(bmp, path):
 	ext = os.path.splitext(path)[1].lower()
@@ -141,6 +141,46 @@ def flip_vertical(path, out_path=None):
 	flip_image(False, path, out_path)
 
 
+def resize_toolbar_bitmap_whole(path, percent, method=ResizeMethod.Bicubic, out_path=None):
+	bmp = Bitmap.fromFileEx(path)
+
+	width, height = bmp.size
+	width = round(width * percent/100)
+	height = round(height * percent/100)
+	size = (width, height)
+
+	print(f'resize toolbar bitmap {percent} {method.name}: {bmp.size} => {size}')
+
+	bmp = bmp.resize(size, method=method)
+	if not out_path:
+		name, ext = os.path.splitext(path)
+		out_path = f"{name}_{height}_{percent}_{method.name}{ext}"
+	save_bitmap(bmp, out_path)
+
+def resize_toolbar_bitmap_each(path, percent, method=ResizeMethod.Bicubic, out_path=None):
+	bmp = Bitmap.fromFileEx(path)
+	bmps = bmp.splitHorizontal()
+
+	width, height = bmps[0].size
+	width = round(width * percent/100)
+	height = round(height * percent/100)
+	size = (width, height)
+
+	print(f'resize toolbar bitmap {percent} {method.name}: {bmps[0].size} => {size}')
+
+	resized = []
+	for bmp in bmps:
+		bmp = bmp.resize(size, method=method)
+		resized.append(bmp)
+
+	bmp = Bitmap.concatHorizontal(resized)
+	if not out_path:
+		name, ext = os.path.splitext(path)
+		out_path = f"{name}_{height}_{percent}_{method.name}{ext}"
+	save_bitmap(bmp, out_path)
+
+resize_toolbar_bitmap = resize_toolbar_bitmap_whole
+
 def make_matapath_toolbar_bitmap():
 	concat_horizontal([
 		'images/Previous_16x.png',				# IDT_HISTORY_BACK
@@ -191,5 +231,11 @@ def make_notepad2_toolbar_bitmap():
 
 make_matapath_toolbar_bitmap()
 #make_notepad2_toolbar_bitmap()
-#split_horizontal('Toolbar.bmp', '16x40')
 convert_image('images/OpenFolder_16x.png', 'OpenFolder.bmp')
+
+#split_horizontal('Toolbar.bmp', '16x40')
+
+#resize_toolbar_bitmap('../res/Toolbar.bmp', 200, ResizeMethod.Nearest)
+#resize_toolbar_bitmap('../res/Toolbar.bmp', 200, ResizeMethod.Bilinear)
+#resize_toolbar_bitmap('../res/Toolbar.bmp', 200, ResizeMethod.Bicubic)
+#resize_toolbar_bitmap('../res/Toolbar.bmp', 200, ResizeMethod.Lanczos)
