@@ -583,7 +583,7 @@ BEGIN
 		POPUP "Appearanc&e"
 		BEGIN
 			MENUITEM "S&how Toolbar\tCtrl+F11",		IDM_VIEW_TOOLBAR
-			MENUITEM "Customi&ze Toolbar...",		IDM_VIEW_CUSTOMIZETB
+			MENUITEM "Customi&ze Toolbar...",		IDM_VIEW_CUSTOMIZE_TOOLBAR
 			MENUITEM "Show Stat&usbar\tShift+F11",	IDM_VIEW_STATUSBAR
 			MENUITEM SEPARATOR
 			MENUITEM "Transparent &Mode\tCtrl+0",	IDM_VIEW_TRANSPARENT
@@ -668,7 +668,7 @@ BEGIN
 	POPUP "+"
 	BEGIN
 		MENUITEM "Show &Toolbar",				IDM_VIEW_TOOLBAR
-		MENUITEM "&Customize Toolbar...",		IDM_VIEW_CUSTOMIZETB
+		MENUITEM "&Customize Toolbar...",		IDM_VIEW_CUSTOMIZE_TOOLBAR
 		MENUITEM "Show &Statusbar",				IDM_VIEW_STATUSBAR
 	END
 	POPUP "+"
