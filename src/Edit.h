@@ -409,5 +409,5 @@ void FoldToggleLevel(int lev, FOLD_ACTION action);
 void FoldToggleCurrentBlock(FOLD_ACTION action);
 void FoldToggleCurrentLevel(FOLD_ACTION action);
 void FoldToggleDefault(FOLD_ACTION action);
-void FoldClick(Sci_Line ln, int mode);
+void FoldClickAt(Sci_Position pos, int mode);
 void FoldAltArrow(int key, int mode);

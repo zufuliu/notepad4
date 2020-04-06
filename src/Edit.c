@@ -7474,7 +7474,7 @@ static void FoldPerformAction(Sci_Line ln, int mode, FOLD_ACTION action) {
 	}
 }
 
-void FoldClick(Sci_Line ln, int mode) {
+void FoldClickAt(Sci_Position pos, int mode) {
 	static struct {
 		Sci_Line ln;
 		int mode;
@@ -7483,6 +7483,7 @@ void FoldClick(Sci_Line ln, int mode) {
 
 	BOOL fGotoFoldPoint = mode & FOLD_SIBLINGS;
 
+	Sci_Line ln = SciCall_LineFromPosition(pos);
 	if (!(SciCall_GetFoldLevel(ln) & SC_FOLDLEVELHEADERFLAG)) {
 		// Not a fold point: need to look for a double-click
 		if (prev.ln == ln && prev.mode == mode && (GetTickCount() - prev.dwTickCount <= GetDoubleClickTime())) {
