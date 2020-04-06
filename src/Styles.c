@@ -400,7 +400,7 @@ enum DefaultStyleIndex {
 
 #define BookmarkUsingPixmapImage		0
 #if BookmarkUsingPixmapImage
-// XPM Graphics for bookmark on selection margin.
+// XPM Graphics for bookmark on selection margin, always 16px width.
 /* GIMP export Bookmark2_16x.png with Alpha threshold 127 */
 static char bookmark_pixmap_color[16];
 #define bookmark_pixmap_color_fmt	".	c #%06X"
@@ -1698,8 +1698,10 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 		UpdateStatusBarCache(STATUS_LEXER);
 		UpdateStatusbar();
 	}
+
 	// font might changed
 	UpdateLineNumberWidth();
+	UpdateBookmarkMarginWidth();
 	UpdateFoldMarginWidth();
 }
 

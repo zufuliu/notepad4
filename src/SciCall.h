@@ -360,6 +360,10 @@ NP2_inline int SciCall_TextWidth(int style, const char *text) {
 	return (int)SciCall(SCI_TEXTWIDTH, style, (LPARAM)text);
 }
 
+NP2_inline int SciCall_TextHeight(void) {
+	return (int)SciCall(SCI_TEXTHEIGHT, 0, 0);
+}
+
 NP2_inline Sci_Position SciCall_GetColumn(Sci_Position position) {
 	return SciCall(SCI_GETCOLUMN, position, 0);
 }
