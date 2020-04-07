@@ -1952,6 +1952,7 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) {
 }
 
 void RecreateBars(HWND hwnd, HINSTANCE hInstance) {
+	cachedStatusItem.updateMask = UINT_MAX;
 	Toolbar_GetButtons(hwndToolbar, TOOLBAR_COMMAND_BASE, tchToolbarButtons, COUNTOF(tchToolbarButtons));
 
 	DestroyWindow(hwndToolbar);
@@ -1979,7 +1980,6 @@ void MsgDPIChanged(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	RecreateBars(hwnd, g_hInstance);
 	SetWindowPos(hwnd, NULL, rc->left, rc->top, rc->right - rc->left, rc->bottom - rc->top, SWP_NOZORDER | SWP_NOACTIVATE);
 
-	cachedStatusItem.updateMask = UINT_MAX;
 	Style_DetectBaseFontSize(hwnd);
 	UpdateStatusBarWidth();
 	Style_OnDPIChanged();
@@ -4020,9 +4020,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case IDM_VIEW_AUTO_SCALE_TOOLBAR:
 		bAutoScaleToolbar = !bAutoScaleToolbar;
 		if (g_uCurrentDPI > USER_DEFAULT_SCREEN_DPI) {
-			RecreateBars(hwnd, g_hInstance);
-			UpdateToolbar();
-			UpdateStatusbar();
+			MsgThemeChanged(hwnd, 0, 0);
 		}
 		break;
 
