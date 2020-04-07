@@ -123,6 +123,7 @@ BOOL	bWordWrapSelectSubLine;
 static BOOL bShowUnicodeControlCharacter;
 static BOOL bMatchBraces;
 static BOOL bShowIndentGuides;
+static BOOL bHighlightCurrentBlock;
 BOOL	bHighlightCurrentSubLine;
 INT		iHighlightCurrentLine;
 BOOL	bTabsAsSpaces;
@@ -1670,7 +1671,7 @@ HWND EditCreate(HWND hwndParent) {
 	const char *text = GetFoldDisplayEllipsis(SC_CP_UTF8, 0); // internal default encoding
 	SciCall_SetDefaultFoldDisplayText(text);
 	// highlight current folding block
-	SciCall_MarkerEnableHighlight(TRUE);
+	SciCall_MarkerEnableHighlight(bHighlightCurrentBlock);
 	SciCall_BraceHighlightIndicator(TRUE, IndicatorNumber_MatchBrace);
 	SciCall_BraceBadLightIndicator(TRUE, IndicatorNumber_MatchBraceError);
 
@@ -2424,7 +2425,6 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 #if NP2_ENABLE_SHOW_CALLTIPS
 	CheckCmd(hmenu, IDM_VIEW_SHOWCALLTIPS, bShowCallTips);
 #endif
-	CheckCmd(hmenu, IDM_VIEW_MATCHBRACES, bMatchBraces);
 	CheckCmd(hmenu, IDM_VIEW_TOOLBAR, bShowToolbar);
 	EnableCmd(hmenu, IDM_VIEW_CUSTOMIZE_TOOLBAR, bShowToolbar);
 	CheckCmd(hmenu, IDM_VIEW_AUTO_SCALE_TOOLBAR, bAutoScaleToolbar);
@@ -2434,6 +2434,8 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	CheckCmd(hmenu, IDM_VIEW_FULLSCREEN_HIDE_TITLE, iFullScreenMode & FullScreenMode_HideCaption);
 	CheckCmd(hmenu, IDM_VIEW_FULLSCREEN_HIDE_MENU, iFullScreenMode & FullScreenMode_HideMenu);
 
+	CheckCmd(hmenu, IDM_VIEW_MATCHBRACES, bMatchBraces);
+	CheckCmd(hmenu, IDM_VIEW_HIGHLIGHTCURRENT_BLOCK, bHighlightCurrentBlock);
 	i = IDM_VIEW_HIGHLIGHTCURRENTLINE_NONE + iHighlightCurrentLine;
 	CheckMenuRadioItem(hmenu, IDM_VIEW_HIGHLIGHTCURRENTLINE_NONE, IDM_VIEW_HIGHLIGHTCURRENTLINE_FRAME, i, MF_BYCOMMAND);
 	CheckCmd(hmenu, IDM_VIEW_HIGHLIGHTCURRENTLINE_SUBLINE, bHighlightCurrentSubLine);
@@ -3977,6 +3979,11 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		}
 		break;
 
+	case IDM_VIEW_HIGHLIGHTCURRENT_BLOCK:
+		bHighlightCurrentBlock = !bHighlightCurrentBlock;
+		SciCall_MarkerEnableHighlight(bHighlightCurrentBlock);
+		break;
+
 	case IDM_VIEW_HIGHLIGHTCURRENTLINE_NONE:
 	case IDM_VIEW_HIGHLIGHTCURRENTLINE_BACK:
 	case IDM_VIEW_HIGHLIGHTCURRENTLINE_FRAME:
@@ -5121,6 +5128,7 @@ void LoadSettings(void) {
 	bShowUnicodeControlCharacter = IniSectionGetBool(pIniSection, L"ShowUnicodeControlCharacter", 0);
 
 	bMatchBraces = IniSectionGetBool(pIniSection, L"MatchBraces", 1);
+	bHighlightCurrentBlock = IniSectionGetBool(pIniSection, L"HighlightCurrentBlock", 1);
 	iValue = IniSectionGetInt(pIniSection, L"HighlightCurrentLine", 12);
 	iValue = (iSettingsVersion < NP2SettingsVersion_V1) ? 12 : iValue;
 	bHighlightCurrentSubLine = iValue > 10;
@@ -5487,6 +5495,7 @@ void SaveSettings(BOOL bSaveSettingsNow) {
 	IniSectionSetBoolEx(pIniSection, L"WordWrapSelectSubLine", bWordWrapSelectSubLine, 0);
 	IniSectionSetBoolEx(pIniSection, L"ShowUnicodeControlCharacter", bShowUnicodeControlCharacter, 0);
 	IniSectionSetBoolEx(pIniSection, L"MatchBraces", bMatchBraces, 1);
+	IniSectionSetBoolEx(pIniSection, L"HighlightCurrentBlock", bHighlightCurrentBlock, 1);
 	IniSectionSetIntEx(pIniSection, L"HighlightCurrentLine", iHighlightCurrentLine + (bHighlightCurrentSubLine ? 10 : 0), 12);
 	IniSectionSetBoolEx(pIniSection, L"ShowIndentGuides", bShowIndentGuides, 0);
 
