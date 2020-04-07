@@ -369,13 +369,13 @@ enum DefaultStyleIndex {
 	Style_Whitespace,		// standalone style. `fore`, `back`, `size`: dot size
 	Style_CurrentLine,		// standalone style. frame (`fore`, `size`, `alpha`), background (`back`, `alpha`)
 	Style_Caret,			// standalone style. `fore`: caret color
-	Style_IMEIndicator,		// standalone style. `fore`: IME indicator color
+	Style_IMEIndicator,		// indicator style. `fore`: IME indicator color
 	Style_LongLineMarker,	// standalone style. `fore`: edge line color, `back`: edge background color
 	Style_ExtraLineSpacing,	// standalone style. descent = `size`/2, ascent = `size` - descent
 	Style_FoldingMarker,	// standalone style. `fore`: folder line color, `back`: folder box fill color
 	Style_FoldDispalyText,	// inherited style.
-	Style_MarkOccurrences,	// standalone style. `fore`, `alpha`
-	Style_Bookmark,			// standalone style. `fore`, `back`, `alpha`
+	Style_MarkOccurrences,	// indicator style. `fore`, `alpha`, `outline`
+	Style_Bookmark,			// indicator style. `fore`, `back`, `alpha`
 	Style_CallTip,			// inherited style.
 };
 
@@ -1622,6 +1622,7 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 
 	// Mark Occurrence
 	szValue = pLexGlobal->Styles[Style_MarkOccurrences].szValue;
+	SciCall_IndicSetStyle(IndicatorNumber_MarkOccurrences, INDIC_ROUNDBOX);
 	if (!Style_StrGetForeColor(szValue, &rgb)) {
 		rgb = GetSysColor(COLOR_HIGHLIGHT);
 	}
@@ -1633,7 +1634,7 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 	if (Style_StrGetOutlineAlpha(szValue, &iValue)) {
 		SciCall_IndicSetOutlineAlpha(IndicatorNumber_MarkOccurrences, iValue);
 	}
-	SciCall_IndicSetStyle(IndicatorNumber_MarkOccurrences, INDIC_ROUNDBOX);
+	//! end Mark Occurrence
 
 	// Bookmark
 	bBookmarkColorUpdated = TRUE;
