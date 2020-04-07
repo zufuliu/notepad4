@@ -93,8 +93,16 @@ NP2_inline BOOL Style_StrGetBackColor(LPCWSTR lpszStyle, COLORREF *rgb) {
 }
 
 BOOL	Style_StrGetCase(LPCWSTR lpszStyle, int *i);
-BOOL	Style_StrGetAlpha(LPCWSTR lpszStyle, int *alpha);
-BOOL	Style_StrGetOutlineAlpha(LPCWSTR lpszStyle, int *alpha);
+BOOL	Style_StrGetAlphaEx(BOOL outline, LPCWSTR lpszStyle, int *alpha);
+
+NP2_inline BOOL Style_StrGetAlpha(LPCWSTR lpszStyle, int *alpha) {
+	return Style_StrGetAlphaEx(FALSE, lpszStyle, alpha);
+}
+
+NP2_inline BOOL Style_StrGetOutlineAlpha(LPCWSTR lpszStyle, int *alpha) {
+	return Style_StrGetAlphaEx(TRUE, lpszStyle, alpha);
+}
+
 BOOL	Style_SelectFont(HWND hwnd, LPWSTR lpszStyle, int cchStyle, BOOL bDefaultStyle);
 BOOL	Style_SelectColor(HWND hwnd, BOOL bFore, LPWSTR lpszStyle, int cchStyle);
 void	Style_SetStyles(int iStyle, LPCWSTR lpszStyle);
