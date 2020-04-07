@@ -2351,7 +2351,7 @@ INT_PTR InfoBox(int iType, LPCWSTR lpstrSetting, UINT uidMessage, ...) {
 	va_end(va);
 
 	ib.lpstrSetting = (LPWSTR)lpstrSetting;
-	ib.idiIcon = (uidMessage == IDS_REPLCOUNT) ? IDI_INFORMATION : IDI_EXCLAMATION;
+	ib.idiIcon = (uidMessage == IDS_REPLCOUNT || uidMessage == IDS_FIND_WRAPFW || uidMessage == IDS_FIND_WRAPRE) ? IDI_INFORMATION : IDI_EXCLAMATION;
 	ib.bDisableCheckBox = StrIsEmpty(szIniFile) || StrIsEmpty(lpstrSetting) || iMode == 2;
 
 	const WORD idDlg = (iType == MBYESNO) ? IDD_INFOBOX_YESNO : ((iType == MBOKCANCEL) ? IDD_INFOBOX_OKCANCEL : IDD_INFOBOX_OK);
