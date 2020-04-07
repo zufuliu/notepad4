@@ -367,7 +367,7 @@ enum DefaultStyleIndex {
 	Style_IndentationGuide,	// inherited style. `fore`, `back`
 	Style_Selection,		// standalone style. `fore`, `back`, `alpha`, `eolfilled`
 	Style_Whitespace,		// standalone style. `fore`, `back`, `size`: dot size
-	Style_CurrentLine,		// standalone style. frame (`fore`, `size`, `alpha`), background (`back`, `alpha`)
+	Style_CurrentLine,		// standalone style. frame (`fore`, `size`, `outline`), background (`back`, `alpha`)
 	Style_Caret,			// standalone style. `fore`: caret color
 	Style_IMEIndicator,		// indicator style. `fore`: IME indicator color
 	Style_LongLineMarker,	// standalone style. `fore`: edge line color, `back`: edge background color
@@ -3005,11 +3005,11 @@ void Style_HighlightCurrentLine(void) {
 	if (iHighlightCurrentLine != 0) {
 		LPCWSTR szValue = pLexGlobal->Styles[Style_CurrentLine].szValue;
 		// 1: background color, 2: outline frame
-		const BOOL foreColor = iHighlightCurrentLine != 1;
+		const BOOL outline = iHighlightCurrentLine != 1;
 		COLORREF rgb;
-		if (Style_StrGetColor(foreColor, szValue, &rgb)) {
+		if (Style_StrGetColor(outline, szValue, &rgb)) {
 			int size = 0;
-			if (foreColor) {
+			if (outline) {
 				Style_StrGetRawSize(szValue, &size);
 				size = max_i(1, RoundToCurrentDPI(size));
 			}
@@ -3018,7 +3018,7 @@ void Style_HighlightCurrentLine(void) {
 			SciCall_SetCaretLineBack(rgb);
 
 			int alpha;
-			if (!Style_StrGetAlpha(szValue, &alpha)) {
+			if (!Style_StrGetAlphaEx(outline, szValue, &alpha)) {
 				alpha = SC_ALPHA_NOALPHA;
 			}
 			SciCall_SetCaretLineBackAlpha(alpha);
