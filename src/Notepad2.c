@@ -1663,7 +1663,7 @@ HWND EditCreate(HWND hwndParent) {
 #if NP2_DEBUG_FOLD_LEVEL
 	SciCall_SetFoldFlags(SC_FOLDFLAG_LEVELNUMBERS);
 #else
-	// Draw folding line below when collapsed
+	// Don't draw folding line below when collapsed.
 	SciCall_SetFoldFlags(0);
 #endif
 	SciCall_FoldDisplayTextSetStyle(SC_FOLDDISPLAYTEXT_BOXED);
@@ -1671,6 +1671,8 @@ HWND EditCreate(HWND hwndParent) {
 	SciCall_SetDefaultFoldDisplayText(text);
 	// highlight current folding block
 	SciCall_MarkerEnableHighlight(TRUE);
+	SciCall_BraceHighlightIndicator(TRUE, IndicatorNumber_MatchBrace);
+	SciCall_BraceBadLightIndicator(TRUE, IndicatorNumber_MatchBraceError);
 
 	// CallTips
 	SciCall_CallTipUseStyle(TAB_WIDTH_NOTIFICATION);

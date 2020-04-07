@@ -361,8 +361,8 @@ enum DefaultStyleIndex {
 	Style_DefaultCode,		// global default code style.
 	Style_DefaultText,		// global default text style.
 	Style_LineNumber,		// inherited style, except for background color (default to COLOR_3DFACE).
-	Style_MatchBrace,		// inherited style.
-	Style_MatchBraceError,	// inherited style.
+	Style_MatchBrace,		// indicator style. `fore`, `alpha`, `outline`
+	Style_MatchBraceError,	// indicator style. `fore`, `alpha`, `outline`
 	Style_ControlCharacter,	// inherited style. font attributes (white on black)
 	Style_IndentationGuide,	// inherited style. `fore`, `back`
 	Style_Selection,		// standalone style. `fore`, `back`, `alpha`, `eolfilled`
@@ -455,6 +455,8 @@ static inline UINT GetDefaultStyleControlMask(int index) {
 		return StyleControl_Fore | StyleControl_Back;
 	case Style_Selection:
 		return StyleControl_Fore | StyleControl_Back | StyleControl_EOLFilled;
+	case Style_MatchBrace:
+	case Style_MatchBraceError:
 	case Style_Caret:
 	case Style_IMEIndicator:
 	case Style_MarkOccurrences:
@@ -1323,6 +1325,23 @@ LPCWSTR Style_FindStyleValue(PEDITLEXER pLex, int style) {
 	return NULL;
 }
 
+void Style_DefineIndicator(int index, int indicator, int indicatorStyle) {
+	LPCWSTR szValue = pLexGlobal->Styles[index].szValue;
+	COLORREF rgb;
+	int iValue;
+
+	SciCall_IndicSetStyle(indicator, indicatorStyle);
+	if (Style_StrGetForeColor(szValue, &rgb)) {
+		SciCall_IndicSetFore(indicator, rgb);
+	}
+	if (Style_StrGetAlpha(szValue, &iValue)) {
+		SciCall_IndicSetAlpha(indicator, iValue);
+	}
+	if (Style_StrGetOutlineAlpha(szValue, &iValue)) {
+		SciCall_IndicSetOutlineAlpha(indicator, iValue);
+	}
+}
+
 //=============================================================================
 // set current lexer
 // Style_SetLexer()
@@ -1461,8 +1480,9 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 	//! end Style_Default
 
 	Style_SetDefaultStyle(Style_LineNumber);
-	Style_SetDefaultStyle(Style_MatchBrace);
-	Style_SetDefaultStyle(Style_MatchBraceError);
+	Style_DefineIndicator(Style_MatchBrace, IndicatorNumber_MatchBrace, INDIC_ROUNDBOX);
+	Style_DefineIndicator(Style_MatchBraceError, IndicatorNumber_MatchBraceError, INDIC_ROUNDBOX);
+
 	if (rid != NP2LEX_ANSI) {
 		Style_SetDefaultStyle(Style_ControlCharacter);
 	}

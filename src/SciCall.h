@@ -801,8 +801,16 @@ NP2_inline void SciCall_BraceHighlight(Sci_Position posA, Sci_Position posB) {
 	SciCall(SCI_BRACEHIGHLIGHT, posA, posB);
 }
 
+NP2_inline void SciCall_BraceHighlightIndicator(BOOL useSetting, int indicator) {
+	SciCall(SCI_BRACEHIGHLIGHTINDICATOR, useSetting, indicator);
+}
+
 NP2_inline void SciCall_BraceBadLight(Sci_Position pos) {
 	SciCall(SCI_BRACEBADLIGHT, pos, 0);
+}
+
+NP2_inline void SciCall_BraceBadLightIndicator(BOOL useSetting, int indicator) {
+	SciCall(SCI_BRACEBADLIGHTINDICATOR, useSetting, indicator);
 }
 
 NP2_inline Sci_Position SciCall_BraceMatch(Sci_Position pos, int maxReStyle) {

@@ -195,7 +195,10 @@ void	EditPrintSetup(HWND hwnd);
 
 enum {
 	MarkerNumber_Bookmark = 0,
+
 	IndicatorNumber_MarkOccurrences = 1,
+	IndicatorNumber_MatchBrace = 2,
+	IndicatorNumber_MatchBraceError = 3,
 
 	MarkerBitmask_Bookmark  = 1 << MarkerNumber_Bookmark,
 };
