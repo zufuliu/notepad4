@@ -3334,26 +3334,13 @@ BOOL Style_StrGetCase(LPCWSTR lpszStyle, int *forceCase) {
 
 //=============================================================================
 //
-// Style_StrGetAlpha()
+// Style_StrGetAlphaEx()
 //
-BOOL Style_StrGetAlpha(LPCWSTR lpszStyle, int *alpha) {
-	LPCWSTR p = StrStr(lpszStyle, L"alpha:");
+BOOL Style_StrGetAlphaEx(BOOL outline, LPCWSTR lpszStyle, int *alpha) {
+	LPCWSTR p = StrStr(lpszStyle, (outline ? L"outline:" : L"alpha:"));
 
 	if (p != NULL) {
-		p += CSTRLEN(L"alpha:");
-		if (CRTStrToInt(p, alpha)) {
-			*alpha = clamp_i(*alpha, SC_ALPHA_TRANSPARENT, SC_ALPHA_OPAQUE);
-			return TRUE;
-		}
-	}
-	return FALSE;
-}
-
-BOOL Style_StrGetOutlineAlpha(LPCWSTR lpszStyle, int *alpha) {
-	LPCWSTR p = StrStr(lpszStyle, L"outline:");
-
-	if (p != NULL) {
-		p += CSTRLEN(L"outline:");
+		p += outline ? CSTRLEN(L"outline:") : CSTRLEN(L"alpha:");
 		if (CRTStrToInt(p, alpha)) {
 			*alpha = clamp_i(*alpha, SC_ALPHA_TRANSPARENT, SC_ALPHA_OPAQUE);
 			return TRUE;
