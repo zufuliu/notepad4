@@ -5288,7 +5288,7 @@ void EditMarkAll_Clear(void) {
 
 	iMatchesCount = 0;
 	// clear existing indicator
-	SciCall_SetIndicatorCurrent(IndicatorNumber_MarkOccurrences);
+	SciCall_SetIndicatorCurrent(IndicatorNumber_MarkOccurrence);
 	SciCall_IndicatorClearRange(0, SciCall_GetLength());
 
 	if (editMarkAllStatus.pszText) {
@@ -5342,7 +5342,7 @@ void EditMarkAll(BOOL bChanged, BOOL bMarkOccurrencesMatchCase, BOOL bMarkOccurr
 	}
 
 	EditMarkAll_Clear();
-	SciCall_SetIndicatorCurrent(IndicatorNumber_MarkOccurrences);
+	SciCall_SetIndicatorCurrent(IndicatorNumber_MarkOccurrence);
 
 	SciCall_SetSearchFlags(findFlag);
 	const Sci_Position iDocLen = SciCall_GetLength();

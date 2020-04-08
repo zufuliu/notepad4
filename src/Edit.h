@@ -197,7 +197,7 @@ enum {
 	MarkerNumber_Bookmark = 0,
 
 	// [0, INDICATOR_CONTAINER) are reserved for lexer.
-	IndicatorNumber_MarkOccurrences = INDICATOR_CONTAINER + 0,
+	IndicatorNumber_MarkOccurrence = INDICATOR_CONTAINER + 0,
 	IndicatorNumber_MatchBrace = INDICATOR_CONTAINER + 1,
 	IndicatorNumber_MatchBraceError = INDICATOR_CONTAINER + 2,
 	// [INDICATOR_IME, INDICATOR_IME_MAX] are reserved for IME.

@@ -1626,7 +1626,7 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 		Style_SetDefaultStyle(GlobalStyleIndex_FoldDispalyText);
 	} // end set folding style
 
-	// CallTips
+	// CallTip
 	Style_SetDefaultStyle(GlobalStyleIndex_CallTip);
 
 	if (SciCall_GetIndentationGuides() != SC_IV_NONE) {
@@ -1635,17 +1635,17 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 
 	// Mark Occurrence
 	szValue = pLexGlobal->Styles[GlobalStyleIndex_MarkOccurrence].szValue;
-	SciCall_IndicSetStyle(IndicatorNumber_MarkOccurrences, INDIC_ROUNDBOX);
+	SciCall_IndicSetStyle(IndicatorNumber_MarkOccurrence, INDIC_ROUNDBOX);
 	if (!Style_StrGetForeColor(szValue, &rgb)) {
 		rgb = GetSysColor(COLOR_HIGHLIGHT);
 	}
-	SciCall_IndicSetFore(IndicatorNumber_MarkOccurrences, rgb);
+	SciCall_IndicSetFore(IndicatorNumber_MarkOccurrence, rgb);
 	if (!Style_StrGetAlpha(szValue, &iValue)) {
 		iValue = MarkOccurrencesDefaultAlpha;
 	}
-	SciCall_IndicSetAlpha(IndicatorNumber_MarkOccurrences, iValue);
+	SciCall_IndicSetAlpha(IndicatorNumber_MarkOccurrence, iValue);
 	if (Style_StrGetOutlineAlpha(szValue, &iValue)) {
-		SciCall_IndicSetOutlineAlpha(IndicatorNumber_MarkOccurrences, iValue);
+		SciCall_IndicSetOutlineAlpha(IndicatorNumber_MarkOccurrence, iValue);
 	}
 	//! end Mark Occurrence
 
