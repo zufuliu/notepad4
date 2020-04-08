@@ -200,6 +200,10 @@ enum {
 	IndicatorNumber_MatchBrace = 2,
 	IndicatorNumber_MatchBraceError = 3,
 
+	MarginNumber_LineNumber = 0,
+	MarginNumber_Bookmark = 1,
+	MarginNumber_CodeFolding = 2,
+
 	MarkerBitmask_Bookmark  = 1 << MarkerNumber_Bookmark,
 };
 
