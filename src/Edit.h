@@ -196,9 +196,11 @@ void	EditPrintSetup(HWND hwnd);
 enum {
 	MarkerNumber_Bookmark = 0,
 
-	IndicatorNumber_MarkOccurrences = 1,
-	IndicatorNumber_MatchBrace = 2,
-	IndicatorNumber_MatchBraceError = 3,
+	// [0, INDICATOR_CONTAINER) are reserved for lexer.
+	IndicatorNumber_MarkOccurrences = INDICATOR_CONTAINER + 0,
+	IndicatorNumber_MatchBrace = INDICATOR_CONTAINER + 1,
+	IndicatorNumber_MatchBraceError = INDICATOR_CONTAINER + 2,
+	// [INDICATOR_IME, INDICATOR_IME_MAX] are reserved for IME.
 
 	MarginNumber_LineNumber = 0,
 	MarginNumber_Bookmark = 1,
