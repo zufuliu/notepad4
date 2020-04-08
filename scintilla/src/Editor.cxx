@@ -7421,6 +7421,7 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 
 	case SCI_SETCARETFORE:
 		vs.caretcolour = ColourDesired(static_cast<int>(wParam));
+		vs.additionalCaretColour = ColourDesired(static_cast<int>(wParam));
 		InvalidateStyleRedraw();
 		break;
 

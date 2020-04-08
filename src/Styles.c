@@ -1492,23 +1492,23 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 	szValue = pLexGlobal->Styles[Style_Selection].szValue;
 	if (Style_StrGetForeColor(szValue, &rgb)) {
 		SciCall_SetSelFore(TRUE, rgb);
-		SciCall_SetAdditionalSelFore(rgb);
+		//SciCall_SetAdditionalSelFore(rgb);
 	} else {
 		SciCall_SetSelFore(FALSE, 0);
-		SciCall_SetAdditionalSelFore(0);
+		//SciCall_SetAdditionalSelFore(0);
 	}
 	// always set background color
 	if (!Style_StrGetBackColor(szValue, &rgb)) {
 		rgb = GetSysColor(COLOR_HIGHLIGHT);
 	}
 	SciCall_SetSelBack(TRUE, rgb);
-	SciCall_SetAdditionalSelBack(rgb);
+	//SciCall_SetAdditionalSelBack(rgb);
 
 	if (!Style_StrGetAlpha(szValue, &iValue)) {
 		iValue = SC_ALPHA_NOALPHA;
 	}
 	SciCall_SetSelAlpha(iValue);
-	SciCall_SetAdditionalSelAlpha(iValue);
+	//SciCall_SetAdditionalSelAlpha(iValue);
 
 	SciCall_SetSelEOLFilled(Style_StrGetEOLFilled(szValue));
 	//! end Style_Selection
@@ -1543,7 +1543,7 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 		rgb = SciCall_StyleGetFore(STYLE_DEFAULT);
 	}
 	SciCall_SetCaretFore(rgb);
-	SciCall_SetAdditionalCaretFore(rgb);
+	//SciCall_SetAdditionalCaretFore(rgb);
 	// IME indicator
 	szValue = pLexGlobal->Styles[Style_IMEIndicator].szValue;
 	if (!Style_StrGetForeColor(szValue, &rgb)) {
