@@ -60,9 +60,6 @@ static HWND hwndNextCBChain = NULL;
 HWND	hDlgFindReplace = NULL;
 static BOOL bInitDone = FALSE;
 
-#define MARGIN_LINE_NUMBER	0	// line number
-#define MARGIN_BOOKMARK		1	// bookmark and selection margin
-#define MARGIN_FOLD_INDEX	2	// folding index
 // tab width for notification text
 #define TAB_WIDTH_NOTIFICATION		8
 
@@ -1442,12 +1439,12 @@ void UpdateBookmarkMarginWidth(void) {
 	const int width = bShowBookmarkMargin ? SciCall_TextHeight() - 2 : 0;
 	// 16px for XPM bookmark symbol.
 	//const int width = bShowBookmarkMargin ? max_i(SciCall_TextHeight() - 2, 16) : 0;
-	SciCall_SetMarginWidth(MARGIN_BOOKMARK, width);
+	SciCall_SetMarginWidth(MarginNumber_Bookmark, width);
 }
 
 void UpdateFoldMarginWidth(void) {
 	const int width = bShowCodeFolding ? SciCall_TextWidth(STYLE_LINENUMBER, "+_") : 0;
-	SciCall_SetMarginWidth(MARGIN_FOLD_INDEX, width);
+	SciCall_SetMarginWidth(MarginNumber_CodeFolding, width);
 }
 
 void SetWrapStartIndent(void) {
@@ -1646,11 +1643,11 @@ HWND EditCreate(HWND hwndParent) {
 	SciCall_SetEdgeColumn(iLongLinesLimit);
 
 	// Margins
-	SciCall_SetMarginSensitive(MARGIN_BOOKMARK, TRUE);
-	SciCall_SetMarginCursor(MARGIN_BOOKMARK, SC_CURSORARROW);
-	SciCall_SetMarginType(MARGIN_FOLD_INDEX, SC_MARGIN_SYMBOL);
-	SciCall_SetMarginMask(MARGIN_FOLD_INDEX, SC_MASK_FOLDERS);
-	SciCall_SetMarginSensitive(MARGIN_FOLD_INDEX, TRUE);
+	SciCall_SetMarginSensitive(MarginNumber_Bookmark, TRUE);
+	SciCall_SetMarginCursor(MarginNumber_Bookmark, SC_CURSORARROW);
+	SciCall_SetMarginType(MarginNumber_CodeFolding, SC_MARGIN_SYMBOL);
+	SciCall_SetMarginMask(MarginNumber_CodeFolding, SC_MASK_FOLDERS);
+	SciCall_SetMarginSensitive(MarginNumber_CodeFolding, TRUE);
 	// only select sub line of wrapped line
 	SciCall_SetMarginOptions(bWordWrapSelectSubLine ? SC_MARGINOPTION_SUBLINESELECT : SC_MARGINOPTION_NONE);
 	// Code folding, Box tree
@@ -4887,10 +4884,10 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 		case SCN_MARGINCLICK:
 			switch (scn->margin) {
-			case MARGIN_FOLD_INDEX:
+			case MarginNumber_CodeFolding:
 				FoldClickAt(scn->position, scn->modifiers);
 				break;
-			case MARGIN_BOOKMARK:
+			case MarginNumber_Bookmark:
 				EditToggleBookmarkAt(scn->position);
 				break;
 			}
@@ -6785,7 +6782,7 @@ void UpdateLineNumberWidth(void) {
 		width = SciCall_TextWidth(STYLE_LINENUMBER, tchLines);
 #endif
 	}
-	SciCall_SetMarginWidth(MARGIN_LINE_NUMBER, width);
+	SciCall_SetMarginWidth(MarginNumber_LineNumber, width);
 }
 
 // based on SciTEWin::FullScreenToggle()
