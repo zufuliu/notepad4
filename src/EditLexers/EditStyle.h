@@ -12,13 +12,13 @@
 #define NP2STYLE_LongLineMarker			63110
 #define NP2STYLE_ExtraLineSpacing		63111
 #define NP2STYLE_FoldingMarker			63112
-#define NP2STYLE_MarkOccurrences		63113
+#define NP2STYLE_MarkOccurrence			63113
 #define NP2STYLE_DefaultCodeStyle		63114
 #define NP2STYLE_DefaultTextStyle		63115
 #define NP2STYLE_FoldEllipsis			63116
 #define NP2STYLE_IMEIndicator			63117
 #define NP2STYLE_Bookmark				63118
-#define NP2STYLE_CallTips				63119
+#define NP2STYLE_CallTip				63119
 
 #define NP2STYLE_Default				63126
 #define NP2STYLE_Comment				63127
