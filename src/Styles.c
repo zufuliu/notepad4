@@ -322,7 +322,7 @@ extern BOOL	bShowBookmarkMargin;
 #define STYLE_MASK_FORCE_CASE	(1 << 5)
 #define STYLE_MASK_CHARSET		(1 << 6)
 
-// LF_FACESIZE: 32, LOCALE_NAME_MAX_LENGTH: 85
+// LF_FACESIZE is 32, LOCALE_NAME_MAX_LENGTH is 85
 #define MAX_STYLE_VALUE_LENGTH	LOCALE_NAME_MAX_LENGTH
 
 struct DetailStyle {
@@ -349,27 +349,27 @@ style in other lexers is inherited from it's lexer default (first) style and glo
 font quality, caret style, caret width, caret blink period are moved to "Settings" section,
 see above variables and the "View" menu.
 */
-//! keep same order as lexGlobal
-enum DefaultStyleIndex {
-	Style_DefaultCode,		// global default code style.
-	Style_DefaultText,		// global default text style.
-	Style_LineNumber,		// inherited style, except for background color (default to COLOR_3DFACE).
-	Style_MatchBrace,		// indicator style. `fore`, `alpha`, `outline`
-	Style_MatchBraceError,	// indicator style. `fore`, `alpha`, `outline`
-	Style_ControlCharacter,	// inherited style. font attributes (white on black)
-	Style_IndentationGuide,	// inherited style. `fore`, `back`
-	Style_Selection,		// standalone style. `fore`, `back`, `alpha`, `eolfilled`
-	Style_Whitespace,		// standalone style. `fore`, `back`, `size`: dot size
-	Style_CurrentLine,		// standalone style. frame (`fore`, `size`, `outline`), background (`back`, `alpha`)
-	Style_Caret,			// standalone style. `fore`: caret color
-	Style_IMEIndicator,		// indicator style. `fore`: IME indicator color
-	Style_LongLineMarker,	// standalone style. `fore`: edge line color, `back`: edge background color
-	Style_ExtraLineSpacing,	// standalone style. descent = `size`/2, ascent = `size` - descent
-	Style_FoldingMarker,	// standalone style. `fore`: folder line color, `back`: folder box fill color
-	Style_FoldDispalyText,	// inherited style.
-	Style_MarkOccurrences,	// indicator style. `fore`, `alpha`, `outline`
-	Style_Bookmark,			// indicator style. `fore`, `back`, `alpha`
-	Style_CallTip,			// inherited style.
+//! MUST keep all index in same order as lexGlobal
+enum GlobalStyleIndex {
+	GlobalStyleIndex_DefaultCode,		// global default code style.
+	GlobalStyleIndex_DefaultText,		// global default text style.
+	GlobalStyleIndex_LineNumber,		// inherited style, except for background color (default to COLOR_3DFACE).
+	GlobalStyleIndex_MatchBrace,		// indicator style. `fore`, `alpha`, `outline`
+	GlobalStyleIndex_MatchBraceError,	// indicator style. `fore`, `alpha`, `outline`
+	GlobalStyleIndex_ControlCharacter,	// inherited style. font attributes (white on black)
+	GlobalStyleIndex_IndentationGuide,	// inherited style. `fore`, `back`
+	GlobalStyleIndex_Selection,			// standalone style. `fore`, `back`, `alpha`, `eolfilled`
+	GlobalStyleIndex_Whitespace,		// standalone style. `fore`, `back`, `size`: dot size
+	GlobalStyleIndex_CurrentLine,		// standalone style. frame (`fore`, `size`, `outline`), background (`back`, `alpha`)
+	GlobalStyleIndex_Caret,				// standalone style. `fore`: caret color
+	GlobalStyleIndex_IMEIndicator,		// indicator style. `fore`: IME indicator color
+	GlobalStyleIndex_LongLineMarker,	// standalone style. `fore`: edge line color, `back`: edge background color
+	GlobalStyleIndex_ExtraLineSpacing,	// standalone style. descent = `size`/2, ascent = `size` - descent
+	GlobalStyleIndex_FoldingMarker,		// standalone style. `fore`: folder line color, `back`: folder box fill color
+	GlobalStyleIndex_FoldDispalyText,	// inherited style.
+	GlobalStyleIndex_MarkOccurrence,	// indicator style. `fore`, `alpha`, `outline`
+	GlobalStyleIndex_Bookmark,			// indicator style. `fore`, `back`, `alpha`
+	GlobalStyleIndex_CallTip,			// inherited style.
 };
 
 // folding marker
@@ -432,29 +432,29 @@ enum {
 };
 
 static inline BOOL IsGlobalBaseStyleIndex(int index) {
-	return index == Style_DefaultCode || index == Style_DefaultText;
+	return index == GlobalStyleIndex_DefaultCode || index == GlobalStyleIndex_DefaultText;
 }
 
 static inline UINT GetDefaultStyleControlMask(int index) {
 	switch (index) {
-	case Style_ControlCharacter:
+	case GlobalStyleIndex_ControlCharacter:
 		return StyleControl_Font;
-	case Style_IndentationGuide:
-	case Style_Whitespace:
-	case Style_CurrentLine:
-	case Style_LongLineMarker:
-	case Style_FoldingMarker:
-	case Style_Bookmark:
+	case GlobalStyleIndex_IndentationGuide:
+	case GlobalStyleIndex_Whitespace:
+	case GlobalStyleIndex_CurrentLine:
+	case GlobalStyleIndex_LongLineMarker:
+	case GlobalStyleIndex_FoldingMarker:
+	case GlobalStyleIndex_Bookmark:
 		return StyleControl_Fore | StyleControl_Back;
-	case Style_Selection:
+	case GlobalStyleIndex_Selection:
 		return StyleControl_Fore | StyleControl_Back | StyleControl_EOLFilled;
-	case Style_MatchBrace:
-	case Style_MatchBraceError:
-	case Style_Caret:
-	case Style_IMEIndicator:
-	case Style_MarkOccurrences:
+	case GlobalStyleIndex_MatchBrace:
+	case GlobalStyleIndex_MatchBraceError:
+	case GlobalStyleIndex_Caret:
+	case GlobalStyleIndex_IMEIndicator:
+	case GlobalStyleIndex_MarkOccurrence:
 		return StyleControl_Fore;
-	case Style_ExtraLineSpacing:
+	case GlobalStyleIndex_ExtraLineSpacing:
 		return StyleControl_None;
 	default:
 		return StyleControl_All;
@@ -1273,7 +1273,7 @@ static BOOL Style_StrGetAttributeEx(LPCWSTR lpszStyle, LPCWSTR key, int keyLen) 
 // set default colors to avoid showing white (COLOR_WINDOW) window while loading big file.
 void Style_InitDefaultColor(void) {
 	PEDITLEXER pLexNew = pLexArray[iDefaultLexerIndex];
-	const int index = pLexNew->bUseDefaultCodeStyle ? Style_DefaultCode : Style_DefaultText;
+	const int index = pLexNew->bUseDefaultCodeStyle ? GlobalStyleIndex_DefaultCode : GlobalStyleIndex_DefaultText;
 	LPCWSTR szValue = pLexGlobal->Styles[index].szValue;
 	COLORREF rgb;
 	if (!Style_StrGetForeColor(szValue, &rgb)) {
@@ -1293,12 +1293,12 @@ void Style_InitDefaultColor(void) {
 	SciCall_SetFoldMarginColour(TRUE, rgb);
 	SciCall_SetFoldMarginHiColour(TRUE, rgb);
 
-	szValue = pLexGlobal->Styles[Style_LineNumber].szValue;
+	szValue = pLexGlobal->Styles[GlobalStyleIndex_LineNumber].szValue;
 	if (Style_StrGetForeColor(szValue, &rgb)) {
-		SciCall_StyleSetFore(STYLE_LINENUMBER, rgb);
+		SciCall_StyleSetFore(GlobalStyleIndex_LineNumber, rgb);
 	}
 	if (Style_StrGetBackColor(szValue, &rgb)) {
-		SciCall_StyleSetBack(STYLE_LINENUMBER, rgb);
+		SciCall_StyleSetBack(GlobalStyleIndex_LineNumber, rgb);
 	}
 }
 
@@ -1424,10 +1424,10 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 	SciCall_StyleSetCharacterSet(STYLE_DEFAULT, DEFAULT_CHARSET);
 
 	//! begin Style_Default
-	Style_StrGetFontEx(pLexGlobal->Styles[Style_DefaultCode].szValue, defaultCodeFontName, COUNTOF(defaultCodeFontName), TRUE);
-	Style_StrGetFontEx(pLexGlobal->Styles[Style_DefaultText].szValue, defaultTextFontName, COUNTOF(defaultTextFontName), TRUE);
+	Style_StrGetFontEx(pLexGlobal->Styles[GlobalStyleIndex_DefaultCode].szValue, defaultCodeFontName, COUNTOF(defaultCodeFontName), TRUE);
+	Style_StrGetFontEx(pLexGlobal->Styles[GlobalStyleIndex_DefaultText].szValue, defaultTextFontName, COUNTOF(defaultTextFontName), TRUE);
 
-	iValue = pLexNew->bUseDefaultCodeStyle ? Style_DefaultCode : Style_DefaultText;
+	iValue = pLexNew->bUseDefaultCodeStyle ? GlobalStyleIndex_DefaultCode : GlobalStyleIndex_DefaultText;
 	LPCWSTR szValue = pLexGlobal->Styles[iValue].szValue;
 	// base font size
 	if (!Style_StrGetFontSize(szValue, &iBaseFontSize)) {
@@ -1472,17 +1472,17 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 	SciCall_StyleClearAll();
 	//! end Style_Default
 
-	Style_SetDefaultStyle(Style_LineNumber);
-	Style_DefineIndicator(Style_MatchBrace, IndicatorNumber_MatchBrace, INDIC_ROUNDBOX);
-	Style_DefineIndicator(Style_MatchBraceError, IndicatorNumber_MatchBraceError, INDIC_ROUNDBOX);
+	Style_SetDefaultStyle(GlobalStyleIndex_LineNumber);
+	Style_DefineIndicator(GlobalStyleIndex_MatchBrace, IndicatorNumber_MatchBrace, INDIC_ROUNDBOX);
+	Style_DefineIndicator(GlobalStyleIndex_MatchBraceError, IndicatorNumber_MatchBraceError, INDIC_ROUNDBOX);
 
 	if (rid != NP2LEX_ANSI) {
-		Style_SetDefaultStyle(Style_ControlCharacter);
+		Style_SetDefaultStyle(GlobalStyleIndex_ControlCharacter);
 	}
-	Style_SetDefaultStyle(Style_IndentationGuide);
+	Style_SetDefaultStyle(GlobalStyleIndex_IndentationGuide);
 
-	//! begin Style_Selection
-	szValue = pLexGlobal->Styles[Style_Selection].szValue;
+	//! begin GlobalStyleIndex_Selection
+	szValue = pLexGlobal->Styles[GlobalStyleIndex_Selection].szValue;
 	if (Style_StrGetForeColor(szValue, &rgb)) {
 		SciCall_SetSelFore(TRUE, rgb);
 		//SciCall_SetAdditionalSelFore(rgb);
@@ -1504,10 +1504,10 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 	//SciCall_SetAdditionalSelAlpha(iValue);
 
 	SciCall_SetSelEOLFilled(Style_StrGetEOLFilled(szValue));
-	//! end Style_Selection
+	//! end GlobalStyleIndex_Selection
 
-	//! begin Style_Whitespace
-	szValue = pLexGlobal->Styles[Style_Whitespace].szValue;
+	//! begin GlobalStyleIndex_Whitespace
+	szValue = pLexGlobal->Styles[GlobalStyleIndex_Whitespace].szValue;
 	if (Style_StrGetForeColor(szValue, &rgb)) {
 		SciCall_SetWhitespaceFore(TRUE, rgb);
 	} else {
@@ -1524,12 +1524,12 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 	Style_StrGetRawSize(szValue, &iValue);
 	iValue = max_i(1, RoundToCurrentDPI(iValue));
 	SciCall_SetWhitespaceSize(iValue);
-	//! end Style_Whitespace
+	//! end GlobalStyleIndex_Whitespace
 
 	Style_HighlightCurrentLine();
 	Style_UpdateCaret();
 	// caret fore
-	if (!Style_StrGetForeColor(pLexGlobal->Styles[Style_Caret].szValue, &rgb)) {
+	if (!Style_StrGetForeColor(pLexGlobal->Styles[GlobalStyleIndex_Caret].szValue, &rgb)) {
 		rgb = GetSysColor(COLOR_WINDOWTEXT);
 	}
 	if (!VerifyContrast(rgb, SciCall_StyleGetBack(STYLE_DEFAULT))) {
@@ -1538,7 +1538,7 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 	SciCall_SetCaretFore(rgb);
 	//SciCall_SetAdditionalCaretFore(rgb);
 	// IME indicator
-	szValue = pLexGlobal->Styles[Style_IMEIndicator].szValue;
+	szValue = pLexGlobal->Styles[GlobalStyleIndex_IMEIndicator].szValue;
 	if (!Style_StrGetForeColor(szValue, &rgb)) {
 		rgb = IMEIndicatorDefaultColor;
 	}
@@ -1549,7 +1549,7 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 
 	Style_SetLongLineColors();
 	// Extra Line Spacing
-	if (rid != NP2LEX_ANSI && Style_StrGetRawSize(pLexGlobal->Styles[Style_ExtraLineSpacing].szValue, &iValue) && iValue != 0) {
+	if (rid != NP2LEX_ANSI && Style_StrGetRawSize(pLexGlobal->Styles[GlobalStyleIndex_ExtraLineSpacing].szValue, &iValue) && iValue != 0) {
 		int iAscent;
 		int iDescent;
 		if (iValue > 0) {
@@ -1587,7 +1587,7 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 		COLORREF clrFore;
 		COLORREF clrFill;
 
-		szValue = pLexGlobal->Styles[Style_FoldingMarker].szValue;
+		szValue = pLexGlobal->Styles[GlobalStyleIndex_FoldingMarker].szValue;
 		if (Style_StrGetForeColor(szValue, &rgb)) {
 			clrFore = rgb;
 		} else {
@@ -1623,18 +1623,18 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 		SciCall_MarkerSetFore(SC_MARKNUM_FOLDER, clrFill);
 		SciCall_MarkerSetFore(SC_MARKNUM_FOLDEREND, clrFill);
 
-		Style_SetDefaultStyle(Style_FoldDispalyText);
+		Style_SetDefaultStyle(GlobalStyleIndex_FoldDispalyText);
 	} // end set folding style
 
 	// CallTips
-	Style_SetDefaultStyle(Style_CallTip);
+	Style_SetDefaultStyle(GlobalStyleIndex_CallTip);
 
 	if (SciCall_GetIndentationGuides() != SC_IV_NONE) {
 		Style_SetIndentGuides(TRUE);
 	}
 
 	// Mark Occurrence
-	szValue = pLexGlobal->Styles[Style_MarkOccurrences].szValue;
+	szValue = pLexGlobal->Styles[GlobalStyleIndex_MarkOccurrence].szValue;
 	SciCall_IndicSetStyle(IndicatorNumber_MarkOccurrences, INDIC_ROUNDBOX);
 	if (!Style_StrGetForeColor(szValue, &rgb)) {
 		rgb = GetSysColor(COLOR_HIGHLIGHT);
@@ -2998,7 +2998,7 @@ void Style_ToggleUseDefaultCodeStyle(void) {
 // Style_SetLongLineColors()
 //
 void Style_SetLongLineColors(void) {
-	LPCWSTR szValue = pLexGlobal->Styles[Style_LongLineMarker].szValue;
+	LPCWSTR szValue = pLexGlobal->Styles[GlobalStyleIndex_LongLineMarker].szValue;
 
 	const BOOL foreColor = SciCall_GetEdgeMode() == EDGE_LINE;
 	COLORREF rgb;
@@ -3016,7 +3016,7 @@ void Style_SetLongLineColors(void) {
 void Style_HighlightCurrentLine(void) {
 	SciCall_SetCaretLineVisible(FALSE);
 	if (iHighlightCurrentLine != 0) {
-		LPCWSTR szValue = pLexGlobal->Styles[Style_CurrentLine].szValue;
+		LPCWSTR szValue = pLexGlobal->Styles[GlobalStyleIndex_CurrentLine].szValue;
 		// 1: background color, 2: outline frame
 		const BOOL outline = iHighlightCurrentLine != 1;
 		COLORREF rgb;
@@ -3075,7 +3075,7 @@ void Style_SetBookmark(void) {
 		}
 	}
 
-	LPCWSTR szValue = pLexGlobal->Styles[Style_Bookmark].szValue;
+	LPCWSTR szValue = pLexGlobal->Styles[GlobalStyleIndex_Bookmark].szValue;
 	if (bShowBookmarkMargin) {
 		COLORREF iBookmarkImageColor;
 		if (!Style_StrGetForeColor(szValue, &iBookmarkImageColor)) {
@@ -3478,7 +3478,7 @@ BOOL Style_SelectFont(HWND hwnd, LPWSTR lpszStyle, int cchStyle, BOOL bDefaultSt
 // Style_SetDefaultFont()
 //
 void Style_SetDefaultFont(HWND hwnd, BOOL bCode) {
-	const int iIdx = bCode ? Style_DefaultCode : Style_DefaultText;
+	const int iIdx = bCode ? GlobalStyleIndex_DefaultCode : GlobalStyleIndex_DefaultText;
 	if (Style_SelectFont(hwnd, pLexGlobal->Styles[iIdx].szValue, MAX_EDITSTYLE_VALUE_SIZE, TRUE)) {
 		fStylesModified |= STYLESMODIFIED_SOME_STYLE;
 		pLexGlobal->bStyleChanged = TRUE;
