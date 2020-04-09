@@ -25,7 +25,7 @@ static EDITSTYLE Styles_Global[] = {
 	{ SCI_SETEXTRAASCENT + SCI_SETEXTRADESCENT, NP2StyleX_ExtraLineSpacing, L"size:2" },
 	{ 0, NP2StyleX_FoldingMarker,  L"fore:#8080FF; back:#ADD8E6" },
 	{ STYLE_FOLDDISPLAYTEXT, NP2StyleX_FoldEllipsis, L"font:$(Code); size:-2; bold; fore:#808080" },
-	{ 0, NP2StyleX_MarkOccurrence, L"alpha:100; outline:150" },
+	{ 0, NP2StyleX_MarkOccurrences, L"alpha:100; outline:150" },
 	{ 0, NP2StyleX_Bookmark, L"fore:#408040; back:#00FF00; alpha:40" },
 	{ STYLE_CALLTIP, NP2StyleX_CallTip, L"" },
 };
@@ -48,7 +48,7 @@ static EDITSTYLE Styles_2ndGlobal[] = {
 	{ SCI_SETEXTRAASCENT + SCI_SETEXTRADESCENT, NP2StyleX_ExtraLineSpacing, L"size:2" },
 	{ 0, NP2StyleX_FoldingMarker, L"fore:#808080; back:#606060" },
 	{ STYLE_FOLDDISPLAYTEXT, NP2StyleX_FoldEllipsis, L"font:$(Code); size:-2; bold; fore:#606060" },
-	{ 0, NP2StyleX_MarkOccurrence, L"alpha:100; outline:150" },
+	{ 0, NP2StyleX_MarkOccurrences, L"alpha:100; outline:150" },
 	{ 0, NP2StyleX_Bookmark, L"fore:#408040; back:#00FF00; alpha:40" },
 	{ STYLE_CALLTIP, NP2StyleX_CallTip, L"" },
 };

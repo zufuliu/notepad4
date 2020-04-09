@@ -368,7 +368,7 @@ enum GlobalStyleIndex {
 	GlobalStyleIndex_ExtraLineSpacing,	// standalone style. descent = `size`/2, ascent = `size` - descent
 	GlobalStyleIndex_FoldingMarker,		// standalone style. `fore`: folding line color, `back`: folder box fill color
 	GlobalStyleIndex_FoldDispalyText,	// inherited style.
-	GlobalStyleIndex_MarkOccurrence,	// indicator style. `fore`, `alpha`, `outline`
+	GlobalStyleIndex_MarkOccurrences,	// indicator style. `fore`, `alpha`, `outline`
 	GlobalStyleIndex_Bookmark,			// indicator style. `fore`, `back`, `alpha`
 	GlobalStyleIndex_CallTip,			// inherited style.
 };
@@ -454,7 +454,7 @@ static inline UINT GetDefaultStyleControlMask(int index) {
 	case GlobalStyleIndex_MatchBraceError:
 	case GlobalStyleIndex_CurrentBlock:
 	case GlobalStyleIndex_IMEIndicator:
-	case GlobalStyleIndex_MarkOccurrence:
+	case GlobalStyleIndex_MarkOccurrences:
 		return StyleControl_Fore;
 	case GlobalStyleIndex_ExtraLineSpacing:
 		return StyleControl_None;
@@ -1648,8 +1648,8 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 		Style_SetIndentGuides(TRUE);
 	}
 
-	// Mark Occurrence
-	szValue = pLexGlobal->Styles[GlobalStyleIndex_MarkOccurrence].szValue;
+	// Mark Occurrences
+	szValue = pLexGlobal->Styles[GlobalStyleIndex_MarkOccurrences].szValue;
 	SciCall_IndicSetStyle(IndicatorNumber_MarkOccurrence, INDIC_ROUNDBOX);
 	if (!Style_StrGetForeColor(szValue, &rgb)) {
 		rgb = GetSysColor(COLOR_HIGHLIGHT);
@@ -1662,7 +1662,7 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 	if (Style_StrGetOutlineAlpha(szValue, &iValue)) {
 		SciCall_IndicSetOutlineAlpha(IndicatorNumber_MarkOccurrence, iValue);
 	}
-	//! end Mark Occurrence
+	//! end Mark Occurrences
 
 	// Bookmark
 	bBookmarkColorUpdated = TRUE;
