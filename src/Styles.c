@@ -356,16 +356,16 @@ enum GlobalStyleIndex {
 	GlobalStyleIndex_LineNumber,		// inherited style, except for background color (default to COLOR_3DFACE).
 	GlobalStyleIndex_MatchBrace,		// indicator style. `fore`, `alpha`, `outline`
 	GlobalStyleIndex_MatchBraceError,	// indicator style. `fore`, `alpha`, `outline`
-	GlobalStyleIndex_ControlCharacter,	// inherited style. font attributes (white on black)
+	GlobalStyleIndex_ControlCharacter,	// inherited style. font attributes (inverted text/background color, e.g. white on black or black on white based on theme)
 	GlobalStyleIndex_IndentationGuide,	// inherited style. `fore`, `back`
-	GlobalStyleIndex_Selection,			// standalone style. `fore`, `back`, `alpha`, `eolfilled`
+	GlobalStyleIndex_Selection,			// standalone style. main selection (`back`, `alpha`), additional selection (`fore`, `outline`), `eolfilled`
 	GlobalStyleIndex_Whitespace,		// standalone style. `fore`, `back`, `size`: dot size
 	GlobalStyleIndex_CurrentLine,		// standalone style. frame (`fore`, `size`, `outline`), background (`back`, `alpha`)
 	GlobalStyleIndex_Caret,				// standalone style. `fore`: main caret color, `back`: additional caret color
 	GlobalStyleIndex_IMEIndicator,		// indicator style. `fore`: IME indicator color
-	GlobalStyleIndex_LongLineMarker,	// standalone style. `fore`: edge line color, `back`: edge background color
+	GlobalStyleIndex_LongLineMarker,	// standalone style. `fore`: edge line color, `back`: background color for text exceeds long line limit
 	GlobalStyleIndex_ExtraLineSpacing,	// standalone style. descent = `size`/2, ascent = `size` - descent
-	GlobalStyleIndex_FoldingMarker,		// standalone style. `fore`: folder line color, `back`: folder box fill color
+	GlobalStyleIndex_FoldingMarker,		// standalone style. `fore`: folding line color, `back`: folder box fill color
 	GlobalStyleIndex_FoldDispalyText,	// inherited style.
 	GlobalStyleIndex_MarkOccurrence,	// indicator style. `fore`, `alpha`, `outline`
 	GlobalStyleIndex_Bookmark,			// indicator style. `fore`, `back`, `alpha`
@@ -1483,26 +1483,25 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 
 	//! begin GlobalStyleIndex_Selection
 	szValue = pLexGlobal->Styles[GlobalStyleIndex_Selection].szValue;
-	if (Style_StrGetForeColor(szValue, &rgb)) {
-		SciCall_SetSelFore(TRUE, rgb);
-		//SciCall_SetAdditionalSelFore(rgb);
-	} else {
-		SciCall_SetSelFore(FALSE, 0);
-		//SciCall_SetAdditionalSelFore(0);
-	}
+	// never change text color on selecting.
+	SciCall_SetSelFore(FALSE, 0);
+
 	// always set background color
 	if (!Style_StrGetBackColor(szValue, &rgb)) {
 		rgb = GetSysColor(COLOR_HIGHLIGHT);
 	}
 	SciCall_SetSelBack(TRUE, rgb);
-	//SciCall_SetAdditionalSelBack(rgb);
+	if (Style_StrGetForeColor(szValue, &rgb)) {
+		SciCall_SetAdditionalSelBack(rgb);
+	}
+
 	if (!Style_StrGetAlpha(szValue, &iValue)) {
 		iValue = SC_ALPHA_NOALPHA;
 	}
 	SciCall_SetSelAlpha(iValue);
-	//SciCall_SetAdditionalSelAlpha(iValue);
-
-	// TODO: add separate styles for additional selection
+	if (Style_StrGetOutlineAlpha(szValue, &iValue)) {
+		SciCall_SetAdditionalSelAlpha(iValue);
+	}
 
 	SciCall_SetSelEOLFilled(Style_StrGetEOLFilled(szValue));
 	//! end GlobalStyleIndex_Selection
