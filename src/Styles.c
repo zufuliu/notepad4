@@ -361,7 +361,7 @@ enum GlobalStyleIndex {
 	GlobalStyleIndex_Selection,			// standalone style. `fore`, `back`, `alpha`, `eolfilled`
 	GlobalStyleIndex_Whitespace,		// standalone style. `fore`, `back`, `size`: dot size
 	GlobalStyleIndex_CurrentLine,		// standalone style. frame (`fore`, `size`, `outline`), background (`back`, `alpha`)
-	GlobalStyleIndex_Caret,				// standalone style. `fore`: caret color
+	GlobalStyleIndex_Caret,				// standalone style. `fore`: main caret color, `back`: additional caret color
 	GlobalStyleIndex_IMEIndicator,		// indicator style. `fore`: IME indicator color
 	GlobalStyleIndex_LongLineMarker,	// standalone style. `fore`: edge line color, `back`: edge background color
 	GlobalStyleIndex_ExtraLineSpacing,	// standalone style. descent = `size`/2, ascent = `size` - descent
@@ -442,6 +442,7 @@ static inline UINT GetDefaultStyleControlMask(int index) {
 	case GlobalStyleIndex_IndentationGuide:
 	case GlobalStyleIndex_Whitespace:
 	case GlobalStyleIndex_CurrentLine:
+	case GlobalStyleIndex_Caret:
 	case GlobalStyleIndex_LongLineMarker:
 	case GlobalStyleIndex_FoldingMarker:
 	case GlobalStyleIndex_Bookmark:
@@ -450,7 +451,6 @@ static inline UINT GetDefaultStyleControlMask(int index) {
 		return StyleControl_Fore | StyleControl_Back | StyleControl_EOLFilled;
 	case GlobalStyleIndex_MatchBrace:
 	case GlobalStyleIndex_MatchBraceError:
-	case GlobalStyleIndex_Caret:
 	case GlobalStyleIndex_IMEIndicator:
 	case GlobalStyleIndex_MarkOccurrence:
 		return StyleControl_Fore;
@@ -1496,12 +1496,13 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 	}
 	SciCall_SetSelBack(TRUE, rgb);
 	//SciCall_SetAdditionalSelBack(rgb);
-
 	if (!Style_StrGetAlpha(szValue, &iValue)) {
 		iValue = SC_ALPHA_NOALPHA;
 	}
 	SciCall_SetSelAlpha(iValue);
 	//SciCall_SetAdditionalSelAlpha(iValue);
+
+	// TODO: add separate styles for additional selection
 
 	SciCall_SetSelEOLFilled(Style_StrGetEOLFilled(szValue));
 	//! end GlobalStyleIndex_Selection
@@ -1528,15 +1529,21 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 
 	Style_HighlightCurrentLine();
 	Style_UpdateCaret();
+	const COLORREF backColor = SciCall_StyleGetBack(STYLE_DEFAULT);
 	// caret fore
-	if (!Style_StrGetForeColor(pLexGlobal->Styles[GlobalStyleIndex_Caret].szValue, &rgb)) {
+	szValue = pLexGlobal->Styles[GlobalStyleIndex_Caret].szValue;
+	if (!Style_StrGetForeColor(szValue, &rgb)) {
 		rgb = GetSysColor(COLOR_WINDOWTEXT);
 	}
-	if (!VerifyContrast(rgb, SciCall_StyleGetBack(STYLE_DEFAULT))) {
+	if (!VerifyContrast(rgb, backColor)) {
 		rgb = SciCall_StyleGetFore(STYLE_DEFAULT);
 	}
 	SciCall_SetCaretFore(rgb);
-	//SciCall_SetAdditionalCaretFore(rgb);
+	// additional caret fore
+	if (Style_StrGetBackColor(szValue, &rgb) && VerifyContrast(rgb, backColor)) {
+		SciCall_SetAdditionalCaretFore(rgb);
+	}
+
 	// IME indicator
 	szValue = pLexGlobal->Styles[GlobalStyleIndex_IMEIndicator].szValue;
 	if (!Style_StrGetForeColor(szValue, &rgb)) {
@@ -1583,7 +1590,6 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 			SC_MARKNUM_FOLDERMIDTAIL
 		};
 
-		const COLORREF clrBack = SciCall_StyleGetBack(STYLE_DEFAULT);
 		COLORREF clrFore;
 		COLORREF clrFill;
 
@@ -1599,15 +1605,15 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 			clrFill = (bUse2ndGlobalStyle || np2StyleTheme == StyleTheme_Dark) ? FoldingMarkerFillColorDark : FoldingMarkerFillColorDefault;
 		}
 
-		SciCall_SetFoldMarginColour(TRUE, clrBack);
-		SciCall_SetFoldMarginHiColour(TRUE, clrBack);
+		SciCall_SetFoldMarginColour(TRUE, backColor);
+		SciCall_SetFoldMarginHiColour(TRUE, backColor);
 #if 0	// use gray fold color
 		COLORREF clrFore = SciCall_StyleGetFore(STYLE_DEFAULT);
 		// Marker fore/back colors
-		// Set marker color to the average of clrFore and clrBack
-		clrFore =	(((clrFore & 0xFF0000) + (clrBack & 0xFF0000)) >> 1 & 0xFF0000) |
-					(((clrFore & 0x00FF00) + (clrBack & 0x00FF00)) >> 1 & 0x00FF00) |
-					(((clrFore & 0x0000FF) + (clrBack & 0x0000FF)) >> 1 & 0x0000FF);
+		// Set marker color to the average of clrFore and backColor
+		clrFore =	(((clrFore & 0xFF0000) + (backColor & 0xFF0000)) >> 1 & 0xFF0000) |
+					(((clrFore & 0x00FF00) + (backColor & 0x00FF00)) >> 1 & 0x00FF00) |
+					(((clrFore & 0x0000FF) + (backColor & 0x0000FF)) >> 1 & 0x0000FF);
 
 		// Rounding hack for pure white against pure black
 		if (clrFore == 0x7F7F7F) {
@@ -1618,7 +1624,7 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 		for (UINT i = 0; i < (UINT)COUNTOF(iMarkerIDs); ++i) {
 			const int marker = iMarkerIDs[i];
 			SciCall_MarkerSetBack(marker, clrFore);
-			SciCall_MarkerSetFore(marker, clrBack);
+			SciCall_MarkerSetFore(marker, backColor);
 		}
 		SciCall_MarkerSetFore(SC_MARKNUM_FOLDER, clrFill);
 		SciCall_MarkerSetFore(SC_MARKNUM_FOLDEREND, clrFill);
