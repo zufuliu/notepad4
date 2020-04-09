@@ -993,7 +993,8 @@ Sci::Position RESearch::PMatch(const CharacterIndexer &ci, Sci::Position lp, Sci
 				return NOTFOUND;
 			}
 			lp = e;
-		} break;
+		}
+		break;
 		case REF:
 			n = *ap++;
 			bp = bopat[n];
