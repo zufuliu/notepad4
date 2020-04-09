@@ -228,7 +228,8 @@ static void ColouriseSmaliDoc(Sci_PositionU startPos, Sci_Position length, int i
 			} else if (ch == ':' || ch == '(' || IsASpace(ch)) {
 				styler.ColourTo(i - 1, (ch == ':' ? SCE_SMALI_FIELD : SCE_SMALI_METHOD));
 				state = SCE_SMALI_DEFAULT;
-			} break;
+			}
+			break;
 		}
 
 		if (state == SCE_SMALI_DEFAULT) {

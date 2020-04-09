@@ -4455,7 +4455,8 @@ static LRESULT CALLBACK AddBackslashEditProc(HWND hwnd, UINT umsg, WPARAM wParam
 		if (done) {
 			return TRUE;
 		}
-	} break;
+	}
+	break;
 	}
 
 	return DefSubclassProc(hwnd, umsg, wParam, lParam);
@@ -4959,7 +4960,8 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 				MRU_Empty(mruFind);
 				MRU_Save(mruFind);
 				ComboBox_SetText(hwndFind, tch);
-			} break;
+			}
+			break;
 
 			case IDC_CLEAR_REPLACE: {
 				HWND hwndRepl = GetDlgItem(hwnd, IDC_REPLACETEXT);
@@ -4968,7 +4970,8 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 				MRU_Empty(mruReplace);
 				MRU_Save(mruReplace);
 				ComboBox_SetText(hwndRepl, tch);
-			} break;
+			}
+			break;
 
 			case IDC_SAVEPOSITION:
 				PostWMCommand(hwnd, IDACC_SAVEPOS);

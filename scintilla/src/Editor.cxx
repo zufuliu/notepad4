@@ -1898,9 +1898,7 @@ SelectionPosition Editor::RealizeVirtualSpace(SelectionPosition position) {
 }
 
 void Editor::AddChar(char ch) {
-	char s[2];
-	s[0] = ch;
-	s[1] = '\0';
+	const char s[2] = { ch, '\0' };
 	InsertCharacter(std::string_view(s, 1), CharacterSource::directInput);
 }
 

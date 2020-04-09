@@ -176,7 +176,8 @@ void LineMarker::Draw(Surface *surface, PRectangle rcWhole, const Font &fontForC
 		rcRounded.left = rc.left + 1;
 		rcRounded.right = rc.right - 1;
 		surface->RoundedRectangle(rcRounded, fore, back);
-	} break;
+	}
+	break;
 
 	case SC_MARK_CIRCLE: {
 		const PRectangle rcCircle = PRectangle::FromInts(
@@ -185,7 +186,8 @@ void LineMarker::Draw(Surface *surface, PRectangle rcWhole, const Font &fontForC
 			centreX + dimOn2,
 			centreY + dimOn2);
 		surface->Ellipse(rcCircle, fore, back);
-	} break;
+	}
+	break;
 
 	case SC_MARK_ARROW: {
 		const Point pts[] = {
@@ -194,7 +196,8 @@ void LineMarker::Draw(Surface *surface, PRectangle rcWhole, const Font &fontForC
 			Point::FromInts(centreX + dimOn2 - dimOn4, centreY),
 		};
 		surface->Polygon(pts, std::size(pts), fore, back);
-	} break;
+	}
+	break;
 
 	case SC_MARK_ARROWDOWN: {
 		const Point pts[] = {
@@ -203,7 +206,8 @@ void LineMarker::Draw(Surface *surface, PRectangle rcWhole, const Font &fontForC
 			Point::FromInts(centreX, centreY + dimOn2 - dimOn4),
 		};
 		surface->Polygon(pts, std::size(pts), fore, back);
-	} break;
+	}
+	break;
 
 	case SC_MARK_PLUS: {
 		const Point pts[] = {
@@ -221,7 +225,8 @@ void LineMarker::Draw(Surface *surface, PRectangle rcWhole, const Font &fontForC
 			Point::FromInts(centreX - armSize, centreY + 1),
 		};
 		surface->Polygon(pts, std::size(pts), fore, back);
-	} break;
+	}
+	break;
 
 	case SC_MARK_MINUS: {
 		const Point pts[] = {
@@ -231,7 +236,8 @@ void LineMarker::Draw(Surface *surface, PRectangle rcWhole, const Font &fontForC
 			Point::FromInts(centreX - armSize, centreY + 1),
 		};
 		surface->Polygon(pts, std::size(pts), fore, back);
-	} break;
+	}
+	break;
 
 	case SC_MARK_SMALLRECT: {
 		PRectangle rcSmall;
@@ -240,7 +246,8 @@ void LineMarker::Draw(Surface *surface, PRectangle rcWhole, const Font &fontForC
 		rcSmall.right = rc.right - 1;
 		rcSmall.bottom = rc.bottom - 2;
 		surface->RectangleDraw(rcSmall, fore, back);
-	} break;
+	}
+	break;
 
 	case SC_MARK_EMPTY:
 	case SC_MARK_BACKGROUND:
@@ -253,14 +260,16 @@ void LineMarker::Draw(Surface *surface, PRectangle rcWhole, const Font &fontForC
 		surface->PenColour(colourBody);
 		surface->MoveTo(centreX, ircWhole.top);
 		surface->LineTo(centreX, ircWhole.bottom);
-	} break;
+	}
+	break;
 
 	case SC_MARK_LCORNER: {
 		surface->PenColour(colourTail);
 		surface->MoveTo(centreX, ircWhole.top);
 		surface->LineTo(centreX, centreY);
 		surface->LineTo(ircWhole.right - 1, centreY);
-	} break;
+	}
+	break;
 
 	case SC_MARK_TCORNER: {
 		surface->PenColour(colourTail);
@@ -273,7 +282,8 @@ void LineMarker::Draw(Surface *surface, PRectangle rcWhole, const Font &fontForC
 
 		surface->PenColour(colourHead);
 		surface->LineTo(centreX, ircWhole.bottom);
-	} break;
+	}
+	break;
 
 	case SC_MARK_LCORNERCURVE: {
 		surface->PenColour(colourTail);
@@ -281,7 +291,8 @@ void LineMarker::Draw(Surface *surface, PRectangle rcWhole, const Font &fontForC
 		surface->LineTo(centreX, centreY - 3);
 		surface->LineTo(centreX + 3, centreY);
 		surface->LineTo(ircWhole.right - 1, centreY);
-	} break;
+	}
+	break;
 
 	case SC_MARK_TCORNERCURVE: {
 		surface->PenColour(colourTail);
@@ -295,12 +306,14 @@ void LineMarker::Draw(Surface *surface, PRectangle rcWhole, const Font &fontForC
 
 		surface->PenColour(colourHead);
 		surface->LineTo(centreX, ircWhole.bottom);
-	} break;
+	}
+	break;
 
 	case SC_MARK_BOXPLUS: {
 		DrawBox(surface, centreX, centreY, blobSize, fore, colourHead);
 		DrawPlus(surface, centreX, centreY, blobSize, colourTail);
-	} break;
+	}
+	break;
 
 	case SC_MARK_BOXPLUSCONNECTED: {
 		if (tFold == LineMarker::headWithTail)
@@ -328,7 +341,8 @@ void LineMarker::Draw(Surface *surface, PRectangle rcWhole, const Font &fontForC
 			surface->MoveTo(centreX + 1, centreY - blobSize);
 			surface->LineTo(centreX + blobSize + 1, centreY - blobSize);
 		}
-	} break;
+	}
+	break;
 
 	case SC_MARK_BOXMINUS: {
 		DrawBox(surface, centreX, centreY, blobSize, fore, colourHead);
@@ -337,7 +351,8 @@ void LineMarker::Draw(Surface *surface, PRectangle rcWhole, const Font &fontForC
 		surface->PenColour(colourHead);
 		surface->MoveTo(centreX, centreY + blobSize);
 		surface->LineTo(centreX, ircWhole.bottom);
-	} break;
+	}
+	break;
 
 	case SC_MARK_BOXMINUSCONNECTED: {
 		DrawBox(surface, centreX, centreY, blobSize, fore, colourHead);
@@ -362,12 +377,14 @@ void LineMarker::Draw(Surface *surface, PRectangle rcWhole, const Font &fontForC
 			surface->MoveTo(centreX + 1, centreY - blobSize);
 			surface->LineTo(centreX + blobSize + 1, centreY - blobSize);
 		}
-	} break;
+	}
+	break;
 
 	case SC_MARK_CIRCLEPLUS: {
 		DrawCircle(surface, centreX, centreY, blobSize, fore, colourHead);
 		DrawPlus(surface, centreX, centreY, blobSize, colourTail);
-	} break;
+	}
+	break;
 
 	case SC_MARK_CIRCLEPLUSCONNECTED: {
 		if (tFold == LineMarker::headWithTail)
@@ -383,7 +400,8 @@ void LineMarker::Draw(Surface *surface, PRectangle rcWhole, const Font &fontForC
 
 		DrawCircle(surface, centreX, centreY, blobSize, fore, colourHead);
 		DrawPlus(surface, centreX, centreY, blobSize, colourTail);
-	} break;
+	}
+	break;
 
 	case SC_MARK_CIRCLEMINUS: {
 		surface->PenColour(colourHead);
@@ -392,7 +410,8 @@ void LineMarker::Draw(Surface *surface, PRectangle rcWhole, const Font &fontForC
 
 		DrawCircle(surface, centreX, centreY, blobSize, fore, colourHead);
 		DrawMinus(surface, centreX, centreY, blobSize, colourTail);
-	} break;
+	}
+	break;
 
 	case SC_MARK_CIRCLEMINUSCONNECTED: {
 		surface->PenColour(colourHead);
@@ -405,7 +424,8 @@ void LineMarker::Draw(Surface *surface, PRectangle rcWhole, const Font &fontForC
 
 		DrawCircle(surface, centreX, centreY, blobSize, fore, colourHead);
 		DrawMinus(surface, centreX, centreY, blobSize, colourTail);
-	} break;
+	}
+	break;
 
 	case SC_MARK_DOTDOTDOT: {
 		XYPOSITION right = static_cast<XYPOSITION>(centreX - 6);
@@ -414,7 +434,8 @@ void LineMarker::Draw(Surface *surface, PRectangle rcWhole, const Font &fontForC
 			surface->FillRectangle(rcBlob, fore);
 			right += 5.0f;
 		}
-	} break;
+	}
+	break;
 
 	case SC_MARK_ARROWS: {
 		surface->PenColour(fore);
@@ -427,7 +448,8 @@ void LineMarker::Draw(Surface *surface, PRectangle rcWhole, const Font &fontForC
 			surface->LineTo(right - armLength, centreY + armLength);
 			right += 4;
 		}
-	} break;
+	}
+	break;
 
 	case SC_MARK_SHORTARROW: {
 		const Point pts[] = {
@@ -441,7 +463,8 @@ void LineMarker::Draw(Surface *surface, PRectangle rcWhole, const Font &fontForC
 			Point::FromInts(centreX, centreY + dimOn2),
 		};
 		surface->Polygon(pts, std::size(pts), fore, back);
-	} break;
+	}
+	break;
 
 	case SC_MARK_FULLRECT:
 		surface->FillRectangle(rcWhole, back);
@@ -451,7 +474,8 @@ void LineMarker::Draw(Surface *surface, PRectangle rcWhole, const Font &fontForC
 		PRectangle rcLeft = rcWhole;
 		rcLeft.right = rcLeft.left + 4;
 		surface->FillRectangle(rcLeft, back);
-	} break;
+	}
+	break;
 
 	case SC_MARK_BOOKMARK: {
 		const int halfHeight = minDim / 3;
@@ -463,7 +487,8 @@ void LineMarker::Draw(Surface *surface, PRectangle rcWhole, const Font &fontForC
 			Point::FromInts(ircWhole.left, centreY + halfHeight),
 		};
 		surface->Polygon(pts, std::size(pts), fore, back);
-	} break;
+	}
+	break;
 
 	case SC_MARK_VERTICALBOOKMARK: {
 		const int halfWidth = minDim / 3;
@@ -475,7 +500,8 @@ void LineMarker::Draw(Surface *surface, PRectangle rcWhole, const Font &fontForC
 			Point::FromInts(centreX - halfWidth, centreY + dimOn2),
 		};
 		surface->Polygon(pts, std::size(pts), fore, back);
-	} break;
+	}
+	break;
 
 	default:
 		if (markType >= SC_MARK_CHARACTER) {

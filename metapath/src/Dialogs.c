@@ -1353,7 +1353,8 @@ INT_PTR CALLBACK RenameFileDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 				Edit_GetText(hwndCtl, lpfod->szDestination, COUNTOF(lpfod->szDestination) - 1);
 				EndDialog(hwnd, IDOK);
 			}
-		} break;
+		}
+		break;
 
 		case IDCANCEL:
 			EndDialog(hwnd, IDCANCEL);
@@ -1501,7 +1502,8 @@ INT_PTR CALLBACK CopyMoveDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPa
 		case IDC_DESTINATION: {
 			HWND hwndDest = GetDlgItem(hwnd, IDC_DESTINATION);
 			EnableWindow(GetDlgItem(hwnd, IDOK), ComboBox_HasText(hwndDest));
-		} break;
+		}
+		break;
 
 		case IDC_BROWSEDESTINATION: {
 			WCHAR tch[MAX_PATH];
@@ -2016,7 +2018,8 @@ static INT_PTR CALLBACK FindWinDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 				lstrcpyn(pTargetWndClassBuf, tch, COUNTOF(tch));
 			}
 			EndDialog(hwnd, IDOK);
-		} break;
+		}
+		break;
 
 		case IDCANCEL:
 			EndDialog(hwnd, IDCANCEL);

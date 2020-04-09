@@ -247,7 +247,8 @@ static void ColouriseBatchDoc(Sci_PositionU startPos, Sci_Position length, int i
 					continue;
 				}
 			}
-		} break;
+		}
+		break;
 		case SCE_BAT_STRINGDQ:
 		case SCE_BAT_STRINGSQ:
 		case SCE_BAT_STRINGBT:

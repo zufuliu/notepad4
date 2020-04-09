@@ -186,8 +186,7 @@ static void ColouriseSqlDoc(Sci_PositionU startPos, Sci_Position length, int ini
 				sc.ForwardSetState(SCE_SQL_DEFAULT);
 			}
 			break;
-		case SCE_SQL_QOPERATOR:
-		{
+		case SCE_SQL_QOPERATOR: {
 			// Locate the unique Q operator character
 			sc.Complete();
 			char qOperator = 0x00;
@@ -216,7 +215,8 @@ static void ColouriseSqlDoc(Sci_PositionU startPos, Sci_Position length, int ini
 				sc.Forward();
 				sc.ForwardSetState(SCE_SQL_DEFAULT);
 			}
-		} break;
+		}
+		break;
 		}
 
 		// Determine if a new state should be entered.

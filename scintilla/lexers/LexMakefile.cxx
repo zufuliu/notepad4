@@ -127,7 +127,8 @@ static void ColouriseMakeDoc(Sci_PositionU startPos, Sci_Position length, int in
 			if (chPrev == '}') {
 				styler.ColourTo(i - 1, state);
 				state = SCE_MAKE_DEFAULT;
-			} break;
+			}
+			break;
 		case SCE_MAKE_PREPROCESSOR:
 			if (!iswordchar(ch)) {
 				styler.ColourTo(i - 1, state);

@@ -2039,7 +2039,8 @@ void EditToggleCommentLine(void) {
 			break;
 		}
 		EditToggleLineComments(ch, FALSE);
-	} break;
+	}
+	break;
 
 	case SCLEX_AU3:
 	case SCLEX_INNOSETUP:
@@ -2121,7 +2122,8 @@ void EditToggleCommentLine(void) {
 			EditToggleLineComments(L"//", FALSE);
 			break;
 		}
-	} break;
+	}
+	break;
 
 	case SCLEX_LATEX:
 		EditToggleLineComments(L"%", FALSE);
@@ -2256,7 +2258,8 @@ void EditToggleCommentBlock(void) {
 			EditEncloseSelection(L"--", L"--");
 			break;
 		}
-	} break;
+	}
+	break;
 
 	case SCLEX_INNOSETUP:
 	case SCLEX_PASCAL:

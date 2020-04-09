@@ -9,13 +9,15 @@ H		--pad-header
 U		--unpad-paren
 j		--add-brackets
 k3		--align-pointer=name
+-W3		--align-reference=name 
 M		--max-continuation-indent=40
 -xn		--attach-namespaces
+-xc		--attach-classes
 -xk		--attach-extern-c
 -xV		--attach-closing-while
 R		--recursive
 
-astyle -A2 -TwpHUj -k3 -M -xn -xc -xV -R *.c *.h *.cpp *.cxx *.hpp
+astyle -A2 -TwpHUj -k3 -W3 -M -xn -xc -xk -xV -R *.c *.h *.cpp *.cxx *.hpp
 
-astyle -A3 -TwpHUj -k3 -M -xn -xc -xV -R *.c *.h *.cpp *.cxx *.hpp
+astyle -A3 -TwpHUj -k3 -W3 -M -xn -xc -xk -xV -R *.c *.h *.cpp *.cxx *.hpp
 

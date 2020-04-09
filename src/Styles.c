@@ -4546,7 +4546,8 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 				struct StyleConfigDlgParam *param = (struct StyleConfigDlgParam *)GetWindowLongPtr(hwnd, DWLP_USER);
 				param->bApply = TRUE;
 				Style_SetLexer(pLexCurrent, FALSE);
-			} break;
+			}
+			break;
 
 			case IDOK:
 				EndDialog(hwnd, IDOK);
