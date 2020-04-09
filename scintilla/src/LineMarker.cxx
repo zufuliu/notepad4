@@ -9,7 +9,6 @@
 #include <cmath>
 
 #include <stdexcept>
-#include <string>
 #include <string_view>
 #include <vector>
 #include <map>
@@ -505,12 +504,13 @@ void LineMarker::Draw(Surface *surface, PRectangle rcWhole, const Font &fontForC
 
 	default:
 		if (markType >= SC_MARK_CHARACTER) {
-			std::string character(1, static_cast<char>(markType - SC_MARK_CHARACTER));
-			const XYPOSITION width = surface->WidthText(fontForCharacter, character);
+			const char s[2] = { static_cast<char>(markType - SC_MARK_CHARACTER), '\0' };
+			const std::string_view sv(s, 1);
+			const XYPOSITION width = surface->WidthText(fontForCharacter, sv);
 			PRectangle rcText = rc;
 			rcText.left += (rc.Width() - width) / 2;
 			rcText.right = rc.left + width;
-			surface->DrawTextClipped(rcText, fontForCharacter, rcText.bottom - 2, character, fore, back);
+			surface->DrawTextClipped(rcText, fontForCharacter, rcText.bottom - 2, sv, fore, back);
 		} else {
 			// treat as SC_MARK_FULLRECT
 			surface->FillRectangle(rcWhole, back);
