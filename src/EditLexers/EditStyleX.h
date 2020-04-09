@@ -20,7 +20,7 @@
 #define NP2StyleX_LongLineMarker		EDITSTYLE_HOLE(LongLineMarker, L"Long Line Marker")
 #define NP2StyleX_ExtraLineSpacing		EDITSTYLE_HOLE(ExtraLineSpacing, L"Extra Line Spacing")
 #define NP2StyleX_FoldingMarker			EDITSTYLE_HOLE(FoldingMarker, L"Folding Marker")
-#define NP2StyleX_MarkOccurrence		EDITSTYLE_HOLE(MarkOccurrence, L"Mark Occurrence")
+#define NP2StyleX_MarkOccurrences		EDITSTYLE_HOLE(MarkOccurrences, L"Mark Occurrences")
 #define NP2StyleX_DefaultCodeStyle		EDITSTYLE_HOLE(DefaultCodeStyle, L"Default Code Style")
 #define NP2StyleX_DefaultTextStyle		EDITSTYLE_HOLE(DefaultTextStyle, L"Default Text Style")
 #define NP2StyleX_FoldEllipsis			EDITSTYLE_HOLE(FoldEllipsis, L"Fold Ellipsis")
