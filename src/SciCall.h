@@ -893,6 +893,10 @@ NP2_inline void SciCall_MarkerSetBack(int markerNumber, COLORREF back) {
 	SciCall(SCI_MARKERSETBACK, markerNumber, back);
 }
 
+NP2_inline void SciCall_MarkerSetBackSelected(int markerNumber, COLORREF back) {
+	SciCall(SCI_MARKERSETBACKSELECTED, markerNumber, back);
+}
+
 NP2_inline void SciCall_MarkerSetAlpha(int markerNumber, int alpha) {
 	SciCall(SCI_MARKERSETALPHA, markerNumber, alpha);
 }

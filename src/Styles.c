@@ -360,6 +360,7 @@ enum GlobalStyleIndex {
 	GlobalStyleIndex_IndentationGuide,	// inherited style. `fore`, `back`
 	GlobalStyleIndex_Selection,			// standalone style. main selection (`back`, `alpha`), additional selection (`fore`, `outline`), `eolfilled`
 	GlobalStyleIndex_Whitespace,		// standalone style. `fore`, `back`, `size`: dot size
+	GlobalStyleIndex_CurrentBlock,		// standalone style. `fore`
 	GlobalStyleIndex_CurrentLine,		// standalone style. frame (`fore`, `size`, `outline`), background (`back`, `alpha`)
 	GlobalStyleIndex_Caret,				// standalone style. `fore`: main caret color, `back`: additional caret color
 	GlobalStyleIndex_IMEIndicator,		// indicator style. `fore`: IME indicator color
@@ -451,6 +452,7 @@ static inline UINT GetDefaultStyleControlMask(int index) {
 		return StyleControl_Fore | StyleControl_Back | StyleControl_EOLFilled;
 	case GlobalStyleIndex_MatchBrace:
 	case GlobalStyleIndex_MatchBraceError:
+	case GlobalStyleIndex_CurrentBlock:
 	case GlobalStyleIndex_IMEIndicator:
 	case GlobalStyleIndex_MarkOccurrence:
 		return StyleControl_Fore;
@@ -1589,44 +1591,52 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 			SC_MARKNUM_FOLDERMIDTAIL
 		};
 
-		COLORREF clrFore;
-		COLORREF clrFill;
+		COLORREF foreColor;
+		COLORREF fillColor;
+		COLORREF highlightColor;
 
 		szValue = pLexGlobal->Styles[GlobalStyleIndex_FoldingMarker].szValue;
 		if (Style_StrGetForeColor(szValue, &rgb)) {
-			clrFore = rgb;
+			foreColor = rgb;
 		} else {
-			clrFore = (bUse2ndGlobalStyle || np2StyleTheme == StyleTheme_Dark) ? FoldingMarkerLineColorDark : FoldingMarkerLineColorDefault;
+			foreColor = (bUse2ndGlobalStyle || np2StyleTheme == StyleTheme_Dark) ? FoldingMarkerLineColorDark : FoldingMarkerLineColorDefault;
 		}
 		if (Style_StrGetBackColor(szValue, &rgb)) {
-			clrFill = rgb;
+			fillColor = rgb;
 		} else {
-			clrFill = (bUse2ndGlobalStyle || np2StyleTheme == StyleTheme_Dark) ? FoldingMarkerFillColorDark : FoldingMarkerFillColorDefault;
+			fillColor = (bUse2ndGlobalStyle || np2StyleTheme == StyleTheme_Dark) ? FoldingMarkerFillColorDark : FoldingMarkerFillColorDefault;
+		}
+
+		szValue = pLexGlobal->Styles[GlobalStyleIndex_CurrentBlock].szValue;
+		if (!Style_StrGetForeColor(szValue, &highlightColor)) {
+			highlightColor = RGB(0xFF, 0x00, 0x00); // Scintilla default red color
 		}
 
 		SciCall_SetFoldMarginColour(TRUE, backColor);
 		SciCall_SetFoldMarginHiColour(TRUE, backColor);
 #if 0	// use gray fold color
-		COLORREF clrFore = SciCall_StyleGetFore(STYLE_DEFAULT);
+		COLORREF foreColor = SciCall_StyleGetFore(STYLE_DEFAULT);
 		// Marker fore/back colors
-		// Set marker color to the average of clrFore and backColor
-		clrFore =	(((clrFore & 0xFF0000) + (backColor & 0xFF0000)) >> 1 & 0xFF0000) |
-					(((clrFore & 0x00FF00) + (backColor & 0x00FF00)) >> 1 & 0x00FF00) |
-					(((clrFore & 0x0000FF) + (backColor & 0x0000FF)) >> 1 & 0x0000FF);
+		// Set marker color to the average of foreColor and backColor
+		foreColor =	(((foreColor & 0xFF0000) + (backColor & 0xFF0000)) >> 1 & 0xFF0000) |
+					(((foreColor & 0x00FF00) + (backColor & 0x00FF00)) >> 1 & 0x00FF00) |
+					(((foreColor & 0x0000FF) + (backColor & 0x0000FF)) >> 1 & 0x0000FF);
 
 		// Rounding hack for pure white against pure black
-		if (clrFore == 0x7F7F7F) {
-			clrFore = 0x808080;
+		if (foreColor == 0x7F7F7F) {
+			foreColor = 0x808080;
 		}
 #endif
 
 		for (UINT i = 0; i < (UINT)COUNTOF(iMarkerIDs); ++i) {
 			const int marker = iMarkerIDs[i];
-			SciCall_MarkerSetBack(marker, clrFore);
+			SciCall_MarkerSetBack(marker, foreColor);
 			SciCall_MarkerSetFore(marker, backColor);
+			SciCall_MarkerSetBackSelected(marker, highlightColor);
 		}
-		SciCall_MarkerSetFore(SC_MARKNUM_FOLDER, clrFill);
-		SciCall_MarkerSetFore(SC_MARKNUM_FOLDEREND, clrFill);
+
+		SciCall_MarkerSetFore(SC_MARKNUM_FOLDER, fillColor);
+		SciCall_MarkerSetFore(SC_MARKNUM_FOLDEREND, fillColor);
 
 		Style_SetDefaultStyle(GlobalStyleIndex_FoldDispalyText);
 	} // end set folding style
