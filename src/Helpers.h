@@ -476,9 +476,23 @@ BOOL IsElevated(void);
 #define SetExplorerTheme(hwnd)		SetWindowTheme((hwnd), L"Explorer", NULL)
 
 HBITMAP LoadBitmapFile(LPCWSTR path);
-HBITMAP ResizeImageForDPI(HBITMAP hbmp, UINT dpi);
-NP2_inline HBITMAP ResizeImageForCurrentDPI(HBITMAP hbmp) {
-	return ResizeImageForDPI(hbmp, g_uCurrentDPI);
+HBITMAP EnlargeImageForDPI(HBITMAP hbmp, UINT dpi);
+HBITMAP ResizeImageForDPI(HBITMAP hbmp, UINT dpi, int height);
+
+NP2_inline HBITMAP EnlargeImageForCurrentDPI(HBITMAP hbmp) {
+	return EnlargeImageForDPI(hbmp, g_uCurrentDPI);
+}
+
+NP2_inline HBITMAP ResizeImageForCurrentDPI(HBITMAP hbmp, int height) {
+	return ResizeImageForDPI(hbmp, g_uCurrentDPI, height);
+}
+
+NP2_inline HBITMAP ResizeButtonImageForCurrentDPI(HBITMAP hbmp) {
+	return ResizeImageForDPI(hbmp, g_uCurrentDPI, 16);
+}
+
+NP2_inline HBITMAP ResizeToolbarImageForCurrentDPI(HBITMAP hbmp) {
+	return ResizeImageForDPI(hbmp, g_uCurrentDPI, 16);
 }
 
 BOOL BitmapMergeAlpha(HBITMAP hbmp, COLORREF crDest);
