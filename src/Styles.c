@@ -1272,7 +1272,7 @@ static BOOL Style_StrGetAttributeEx(LPCWSTR lpszStyle, LPCWSTR key, int keyLen) 
 #define Style_StrGetStrike(lpszStyle)			Style_StrGetAttribute((lpszStyle), L"strike")
 #define Style_StrGetEOLFilled(lpszStyle)		Style_StrGetAttribute((lpszStyle), L"eolfilled")
 
-// set default colors to avoid showing white (COLOR_WINDOW) window while loading big file.
+// set default colors to avoid showing white (COLOR_WINDOW or COLOR_3DFACE) window or margin while loading big file.
 void Style_InitDefaultColor(void) {
 	PEDITLEXER pLexNew = pLexArray[iDefaultLexerIndex];
 	const int index = pLexNew->bUseDefaultCodeStyle ? GlobalStyleIndex_DefaultCode : GlobalStyleIndex_DefaultText;
@@ -1297,10 +1297,10 @@ void Style_InitDefaultColor(void) {
 
 	szValue = pLexGlobal->Styles[GlobalStyleIndex_LineNumber].szValue;
 	if (Style_StrGetForeColor(szValue, &rgb)) {
-		SciCall_StyleSetFore(GlobalStyleIndex_LineNumber, rgb);
+		SciCall_StyleSetFore(STYLE_LINENUMBER, rgb);
 	}
 	if (Style_StrGetBackColor(szValue, &rgb)) {
-		SciCall_StyleSetBack(GlobalStyleIndex_LineNumber, rgb);
+		SciCall_StyleSetBack(STYLE_LINENUMBER, rgb);
 	}
 }
 
@@ -1425,7 +1425,7 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 	SciCall_StyleResetDefault();
 	SciCall_StyleSetCharacterSet(STYLE_DEFAULT, DEFAULT_CHARSET);
 
-	//! begin Style_Default
+	//! begin STYLE_DEFAULT
 	Style_StrGetFontEx(pLexGlobal->Styles[GlobalStyleIndex_DefaultCode].szValue, defaultCodeFontName, COUNTOF(defaultCodeFontName), TRUE);
 	Style_StrGetFontEx(pLexGlobal->Styles[GlobalStyleIndex_DefaultText].szValue, defaultTextFontName, COUNTOF(defaultTextFontName), TRUE);
 
@@ -1472,7 +1472,7 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 	Style_SetStyles(STYLE_DEFAULT, pLexNew->Styles[0].szValue);
 	// set all styles to have the same attributes as STYLE_DEFAULT.
 	SciCall_StyleClearAll();
-	//! end Style_Default
+	//! end STYLE_DEFAULT
 
 	Style_SetDefaultStyle(GlobalStyleIndex_LineNumber);
 	Style_DefineIndicator(GlobalStyleIndex_MatchBrace, IndicatorNumber_MatchBrace, INDIC_ROUNDBOX);
@@ -1483,7 +1483,7 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 	}
 	Style_SetDefaultStyle(GlobalStyleIndex_IndentationGuide);
 
-	//! begin GlobalStyleIndex_Selection
+	//! begin Selection
 	szValue = pLexGlobal->Styles[GlobalStyleIndex_Selection].szValue;
 	// never change text color on selecting.
 	SciCall_SetSelFore(FALSE, 0);
@@ -1506,9 +1506,9 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 	}
 
 	SciCall_SetSelEOLFilled(Style_StrGetEOLFilled(szValue));
-	//! end GlobalStyleIndex_Selection
+	//! end Selection
 
-	//! begin GlobalStyleIndex_Whitespace
+	//! begin Whitespace
 	szValue = pLexGlobal->Styles[GlobalStyleIndex_Whitespace].szValue;
 	if (Style_StrGetForeColor(szValue, &rgb)) {
 		SciCall_SetWhitespaceFore(TRUE, rgb);
@@ -1526,8 +1526,9 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 	Style_StrGetRawSize(szValue, &iValue);
 	iValue = max_i(1, RoundToCurrentDPI(iValue));
 	SciCall_SetWhitespaceSize(iValue);
-	//! end GlobalStyleIndex_Whitespace
+	//! end Whitespace
 
+	//! begin Caret
 	Style_HighlightCurrentLine();
 	Style_UpdateCaret();
 	const COLORREF backColor = SciCall_StyleGetBack(STYLE_DEFAULT);
@@ -1544,6 +1545,7 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 	if (Style_StrGetBackColor(szValue, &rgb) && VerifyContrast(rgb, backColor)) {
 		SciCall_SetAdditionalCaretFore(rgb);
 	}
+	//! end Caret
 
 	// IME indicator
 	szValue = pLexGlobal->Styles[GlobalStyleIndex_IMEIndicator].szValue;
@@ -1556,6 +1558,7 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 	SciCall_IndicSetFore(SC_INDICATOR_UNKNOWN, rgb);
 
 	Style_SetLongLineColors();
+
 	// Extra Line Spacing
 	if (rid != NP2LEX_ANSI && Style_StrGetRawSize(pLexGlobal->Styles[GlobalStyleIndex_ExtraLineSpacing].szValue, &iValue) && iValue != 0) {
 		int iAscent;
@@ -1671,6 +1674,7 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 		Style_SetBookmark();
 	}
 
+	// other lexer styles
 	{
 		struct DetailStyle style;
 		const UINT iStyleCount = pLexNew->iStyleCount;
