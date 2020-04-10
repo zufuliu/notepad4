@@ -399,11 +399,26 @@ HBITMAP LoadBitmapFile(LPCWSTR path) {
 	return hbmp;
 }
 
-HBITMAP ResizeImageForDPI(HBITMAP hbmp, UINT dpi) {
+HBITMAP EnlargeImageForDPI(HBITMAP hbmp, UINT dpi) {
 	BITMAP bmp;
 	if (dpi > USER_DEFAULT_SCREEN_DPI && GetObject(hbmp, sizeof(BITMAP), &bmp)) {
 		const int width = MulDiv(dpi, bmp.bmWidth, USER_DEFAULT_SCREEN_DPI);
 		const int height = MulDiv(dpi, bmp.bmHeight, USER_DEFAULT_SCREEN_DPI);
+		HBITMAP hCopy = (HBITMAP)CopyImage(hbmp, IMAGE_BITMAP, width, height, LR_COPYRETURNORG | LR_COPYDELETEORG);
+		if (hCopy != NULL) {
+			hbmp = hCopy;
+		}
+	}
+
+	return hbmp;
+}
+
+HBITMAP ResizeImageForDPI(HBITMAP hbmp, UINT dpi, int height) {
+	BITMAP bmp;
+	if (dpi > USER_DEFAULT_SCREEN_DPI && GetObject(hbmp, sizeof(BITMAP), &bmp)) {
+		height = MulDiv(dpi, height, USER_DEFAULT_SCREEN_DPI);
+		// keep aspect ratio
+		const int width = MulDiv(height, bmp.bmWidth, bmp.bmHeight);
 		HBITMAP hCopy = (HBITMAP)CopyImage(hbmp, IMAGE_BITMAP, width, height, LR_COPYRETURNORG | LR_COPYDELETEORG);
 		if (hCopy != NULL) {
 			hbmp = hCopy;
@@ -1092,7 +1107,7 @@ void MultilineEditSetup(HWND hwndDlg, int nCtlId) {
 void MakeBitmapButton(HWND hwnd, int nCtlId, HINSTANCE hInstance, WORD wBmpId) {
 	HWND hwndCtl = GetDlgItem(hwnd, nCtlId);
 	HBITMAP hBmp = (HBITMAP)LoadImage(hInstance, MAKEINTRESOURCE(wBmpId), IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION);
-	hBmp = ResizeImageForCurrentDPI(hBmp);
+	hBmp = ResizeButtonImageForCurrentDPI(hBmp);
 	BITMAP bmp;
 	GetObject(hBmp, sizeof(BITMAP), &bmp);
 	BUTTON_IMAGELIST bi;

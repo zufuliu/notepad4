@@ -1808,7 +1808,7 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) {
 		hbmp = (HBITMAP)LoadImage(hInstance, MAKEINTRESOURCE(IDR_MAINWND), IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION);
 	}
 	if (bAutoScaleToolbar) {
-		hbmp = ResizeImageForCurrentDPI(hbmp);
+		hbmp = ResizeToolbarImageForCurrentDPI(hbmp);
 	}
 	HBITMAP hbmpCopy = NULL;
 	if (!bExternalBitmap) {
@@ -1827,7 +1827,7 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) {
 		hbmp = LoadBitmapFile(tchToolbarBitmapHot);
 		if (hbmp != NULL) {
 			if (bAutoScaleToolbar) {
-				hbmp = ResizeImageForCurrentDPI(hbmp);
+				hbmp = ResizeToolbarImageForCurrentDPI(hbmp);
 			}
 			GetObject(hbmp, sizeof(BITMAP), &bmp);
 			himl = ImageList_Create(bmp.bmHeight, bmp.bmHeight, ILC_COLOR32 | ILC_MASK, 0, 0);
@@ -1842,7 +1842,7 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) {
 		hbmp = LoadBitmapFile(tchToolbarBitmapDisabled);
 		if (hbmp != NULL) {
 			if (bAutoScaleToolbar) {
-				hbmp = ResizeImageForCurrentDPI(hbmp);
+				hbmp = ResizeToolbarImageForCurrentDPI(hbmp);
 			}
 			GetObject(hbmp, sizeof(BITMAP), &bmp);
 			himl = ImageList_Create(bmp.bmHeight, bmp.bmHeight, ILC_COLOR32 | ILC_MASK, 0, 0);
