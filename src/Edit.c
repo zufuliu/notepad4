@@ -5340,6 +5340,7 @@ void EditMarkAll(BOOL bChanged, BOOL bMarkOccurrencesMatchCase, BOOL bMarkOccurr
 	if (!bChanged && findFlag == editMarkAllStatus.findFlag && editMarkAllStatus.iSelCount == iSelCount) {
 		// _stricmp() is not safe for DBCS string.
 		if (memcmp(pszText, editMarkAllStatus.pszText, iSelCount) == 0) {
+			NP2HeapFree(pszText);
 			return;
 		}
 	}
@@ -5878,7 +5879,7 @@ static INT_PTR CALLBACK EditModifyLinesDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 
 		if (GetActiveWindow() == hwnd) {
 			if (dwId >= IDC_MODIFY_LINE_DLN_NP && dwId <= IDC_MODIFY_LINE_ZCN_ZP) {
-				if (id_capture == (int)dwId || id_capture == 0) {
+				if (id_capture == dwId || id_capture == 0) {
 					if (id_hover != id_capture || id_hover == 0) {
 						id_hover = dwId;
 						//InvalidateRect(GetDlgItem(hwnd, dwId), NULL, FALSE);
