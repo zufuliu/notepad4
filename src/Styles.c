@@ -366,11 +366,20 @@ enum GlobalStyleIndex {
 	GlobalStyleIndex_IMEIndicator,		// indicator style. `fore`: IME indicator color
 	GlobalStyleIndex_LongLineMarker,	// standalone style. `fore`: edge line color, `back`: background color for text exceeds long line limit
 	GlobalStyleIndex_ExtraLineSpacing,	// standalone style. descent = `size`/2, ascent = `size` - descent
-	GlobalStyleIndex_FoldingMarker,		// standalone style. `fore`: folding line color, `back`: folder box fill color
+	GlobalStyleIndex_FoldingMarker,		// standalone style. `fore`: folding line color, `back`: plus/minus box fill color
 	GlobalStyleIndex_FoldDispalyText,	// inherited style.
 	GlobalStyleIndex_MarkOccurrences,	// indicator style. `fore`, `alpha`, `outline`
 	GlobalStyleIndex_Bookmark,			// indicator style. `fore`, `back`, `alpha`
 	GlobalStyleIndex_CallTip,			// inherited style.
+};
+
+// styles in ANSI Art used to override global styles.
+//! MUST keep all index in same order as lexANSI
+enum ANSIArtStyleIndex {
+	ANSIArtStyleIndex_Default,
+	ANSIArtStyleIndex_LineNumber,
+	ANSIArtStyleIndex_ExtraLineSpacing,
+	ANSIArtStyleIndex_FoldDispalyText,
 };
 
 // folding marker
@@ -1479,10 +1488,6 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 	Style_SetDefaultStyle(GlobalStyleIndex_LineNumber);
 	Style_DefineIndicator(GlobalStyleIndex_MatchBrace, IndicatorNumber_MatchBrace, INDIC_ROUNDBOX);
 	Style_DefineIndicator(GlobalStyleIndex_MatchBraceError, IndicatorNumber_MatchBraceError, INDIC_ROUNDBOX);
-
-	if (rid != NP2LEX_ANSI) {
-		Style_SetDefaultStyle(GlobalStyleIndex_ControlCharacter);
-	}
 	Style_SetDefaultStyle(GlobalStyleIndex_IndentationGuide);
 
 	//! begin Selection
@@ -1562,8 +1567,9 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 	Style_SetLongLineColors();
 
 	// Extra Line Spacing
-	szValue = pLexGlobal->Styles[GlobalStyleIndex_ExtraLineSpacing].szValue;
-	if (rid != NP2LEX_ANSI && Style_StrGetRawSize(szValue, &iValue) && iValue != 0) {
+	szValue = (rid != NP2LEX_ANSI)? pLexGlobal->Styles[GlobalStyleIndex_ExtraLineSpacing].szValue
+		: pLexNew->Styles[ANSIArtStyleIndex_ExtraLineSpacing].szValue;
+	if (Style_StrGetRawSize(szValue, &iValue) && iValue != 0) {
 		int iAscent;
 		int iDescent;
 		if (iValue > 0) {
@@ -1678,7 +1684,9 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 	}
 
 	// other lexer styles
-	{
+	if (rid != NP2LEX_ANSI) {
+		Style_SetDefaultStyle(GlobalStyleIndex_ControlCharacter);
+
 		struct DetailStyle style;
 		const UINT iStyleCount = pLexNew->iStyleCount;
 		// first style is the default style.
@@ -1714,6 +1722,11 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 				}
 			}
 		}
+	} else {
+		szValue = pLexNew->Styles[ANSIArtStyleIndex_LineNumber].szValue;
+		Style_SetStyles(STYLE_LINENUMBER, szValue);
+		szValue = pLexNew->Styles[ANSIArtStyleIndex_FoldDispalyText].szValue;
+		Style_SetStyles(STYLE_FOLDDISPLAYTEXT, szValue);
 	}
 
 	// update style font, color, etc. don't need colorizing (analyzing whole document) again,

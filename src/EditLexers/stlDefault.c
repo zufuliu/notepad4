@@ -94,8 +94,12 @@ EDITLEXER lex2ndTextFile = {
 };
 
 static EDITSTYLE Styles_ANSI[] = {
+	// override font used in global styles to ensure line height is same as measured from STYLE_DEFAULT.
+	// negative extra line spacing is required when using Direct2D, not required when using GDI.
 	{ STYLE_DEFAULT, NP2StyleX_Default, L"font:Lucida Console" },
-	{ STYLE_LINENUMBER, NP2StyleX_MarginLineNumber, L"font:Lucida Console; size:-2" },
+	{ STYLE_LINENUMBER, NP2StyleX_MarginLineNumber, L"font:Lucida Console" },
+	{ SCI_SETEXTRAASCENT + SCI_SETEXTRADESCENT, NP2StyleX_ExtraLineSpacing, L"size:-1" },
+	{ STYLE_FOLDDISPLAYTEXT, NP2StyleX_FoldEllipsis, L"font:Lucida Console" },
 };
 
 EDITLEXER lexANSI = {
