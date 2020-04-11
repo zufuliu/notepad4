@@ -142,9 +142,8 @@ typedef const EDITLEXER *LPCEDITLEXER;
 #define NP2LEX_TOML			63071	// SCLEX_TOML		TOML File
 #define NP2LEX_GN			63072	// SCLEX_GN			GN Build Script
 
-#define NP2LEX_ANSI			63096	// SCLEX_NULL		ANSI Art
-
 // special lexers
+#define NP2LEX_ANSI			63096	// SCLEX_NULL		ANSI Art
 #define NP2LEX_2NDTEXTFILE	63097	// SCLEX_NULL		2nd Text File
 //#define NP2LEX_DARKUITHEME	63098	// SCLEX_NULL		Dark Mode UI Theme
 #define NP2LEX_2NDGLOBAL	63099	// SCLEX_NULL		2nd Global Styles
