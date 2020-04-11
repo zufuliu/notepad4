@@ -1426,11 +1426,13 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 	SciCall_StyleSetCharacterSet(STYLE_DEFAULT, DEFAULT_CHARSET);
 
 	//! begin STYLE_DEFAULT
-	Style_StrGetFontEx(pLexGlobal->Styles[GlobalStyleIndex_DefaultCode].szValue, defaultCodeFontName, COUNTOF(defaultCodeFontName), TRUE);
-	Style_StrGetFontEx(pLexGlobal->Styles[GlobalStyleIndex_DefaultText].szValue, defaultTextFontName, COUNTOF(defaultTextFontName), TRUE);
+	LPCWSTR szValue = pLexGlobal->Styles[GlobalStyleIndex_DefaultCode].szValue;
+	Style_StrGetFontEx(szValue, defaultCodeFontName, COUNTOF(defaultCodeFontName), TRUE);
+	szValue = pLexGlobal->Styles[GlobalStyleIndex_DefaultText].szValue;
+	Style_StrGetFontEx(szValue, defaultTextFontName, COUNTOF(defaultTextFontName), TRUE);
 
 	iValue = pLexNew->bUseDefaultCodeStyle ? GlobalStyleIndex_DefaultCode : GlobalStyleIndex_DefaultText;
-	LPCWSTR szValue = pLexGlobal->Styles[iValue].szValue;
+	szValue = pLexGlobal->Styles[iValue].szValue;
 	// base font size
 	if (!Style_StrGetFontSize(szValue, &iBaseFontSize)) {
 		iBaseFontSize = defaultBaseFontSize;
@@ -1560,7 +1562,8 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 	Style_SetLongLineColors();
 
 	// Extra Line Spacing
-	if (rid != NP2LEX_ANSI && Style_StrGetRawSize(pLexGlobal->Styles[GlobalStyleIndex_ExtraLineSpacing].szValue, &iValue) && iValue != 0) {
+	szValue = pLexGlobal->Styles[GlobalStyleIndex_ExtraLineSpacing].szValue;
+	if (rid != NP2LEX_ANSI && Style_StrGetRawSize(szValue, &iValue) && iValue != 0) {
 		int iAscent;
 		int iDescent;
 		if (iValue > 0) {
