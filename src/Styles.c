@@ -441,32 +441,44 @@ enum {
 	StyleControl_All = StyleControl_Font | StyleControl_Fore | StyleControl_Back | StyleControl_EOLFilled,
 };
 
-static inline BOOL IsGlobalBaseStyleIndex(int index) {
-	return index == GlobalStyleIndex_DefaultCode || index == GlobalStyleIndex_DefaultText;
+static inline BOOL IsGlobalBaseStyleIndex(int rid, int index) {
+	return (rid == NP2LEX_GLOBAL || rid == NP2LEX_2NDGLOBAL)
+		&& (index == GlobalStyleIndex_DefaultCode || index == GlobalStyleIndex_DefaultText);
 }
 
-static inline UINT GetDefaultStyleControlMask(int index) {
-	switch (index) {
-	case GlobalStyleIndex_ControlCharacter:
-		return StyleControl_Font;
-	case GlobalStyleIndex_IndentationGuide:
-	case GlobalStyleIndex_Whitespace:
-	case GlobalStyleIndex_CurrentLine:
-	case GlobalStyleIndex_Caret:
-	case GlobalStyleIndex_LongLineMarker:
-	case GlobalStyleIndex_FoldingMarker:
-	case GlobalStyleIndex_Bookmark:
-		return StyleControl_Fore | StyleControl_Back;
-	case GlobalStyleIndex_Selection:
-		return StyleControl_Fore | StyleControl_Back | StyleControl_EOLFilled;
-	case GlobalStyleIndex_MatchBrace:
-	case GlobalStyleIndex_MatchBraceError:
-	case GlobalStyleIndex_CurrentBlock:
-	case GlobalStyleIndex_IMEIndicator:
-	case GlobalStyleIndex_MarkOccurrences:
-		return StyleControl_Fore;
-	case GlobalStyleIndex_ExtraLineSpacing:
-		return StyleControl_None;
+static inline UINT GetLexerStyleControlMask(int rid, int index) {
+	switch (rid) {
+	case NP2LEX_GLOBAL:
+	case NP2LEX_2NDGLOBAL:
+		switch (index) {
+		case GlobalStyleIndex_ControlCharacter:
+			return StyleControl_Font;
+		case GlobalStyleIndex_IndentationGuide:
+		case GlobalStyleIndex_Whitespace:
+		case GlobalStyleIndex_CurrentLine:
+		case GlobalStyleIndex_Caret:
+		case GlobalStyleIndex_LongLineMarker:
+		case GlobalStyleIndex_FoldingMarker:
+		case GlobalStyleIndex_Bookmark:
+			return StyleControl_Fore | StyleControl_Back;
+		case GlobalStyleIndex_Selection:
+			return StyleControl_Fore | StyleControl_Back | StyleControl_EOLFilled;
+		case GlobalStyleIndex_MatchBrace:
+		case GlobalStyleIndex_MatchBraceError:
+		case GlobalStyleIndex_CurrentBlock:
+		case GlobalStyleIndex_IMEIndicator:
+		case GlobalStyleIndex_MarkOccurrences:
+			return StyleControl_Fore;
+		case GlobalStyleIndex_ExtraLineSpacing:
+			return StyleControl_None;
+		default:
+			return StyleControl_All;
+		}
+		break;
+
+	case NP2LEX_ANSI:
+		return (index == ANSIArtStyleIndex_ExtraLineSpacing)? StyleControl_None : StyleControl_All;
+
 	default:
 		return StyleControl_All;
 	}
@@ -4275,7 +4287,7 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 								break;
 							}
 						}
-						enableMask = (pCurrentLexer->rid == NP2LEX_GLOBAL || pCurrentLexer->rid == NP2LEX_2NDGLOBAL) ? GetDefaultStyleControlMask(iCurrentStyleIndex) : StyleControl_All;
+						enableMask = GetLexerStyleControlMask(pCurrentLexer->rid, iCurrentStyleIndex);
 					}
 				}
 
@@ -4438,7 +4450,7 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 			if (pCurrentStyle) {
 				WCHAR tch[MAX_LEXER_STYLE_EDIT_SIZE];
 				GetDlgItemText(hwnd, IDC_STYLEEDIT, tch, COUNTOF(tch));
-				const BOOL bDefaultStyle = (pCurrentLexer->rid == NP2LEX_GLOBAL || pCurrentLexer->rid == NP2LEX_2NDGLOBAL) && IsGlobalBaseStyleIndex(iCurrentStyleIndex);
+				const BOOL bDefaultStyle = IsGlobalBaseStyleIndex(pCurrentLexer->rid, iCurrentStyleIndex);
 
 				if (Style_SelectFont(hwnd, tch, COUNTOF(tch), bDefaultStyle)) {
 					SetDlgItemText(hwnd, IDC_STYLEEDIT, tch);
