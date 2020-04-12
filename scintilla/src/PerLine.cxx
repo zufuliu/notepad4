@@ -54,6 +54,15 @@ bool MarkerHandleSet::Contains(int handle) const noexcept {
 	return false;
 }
 
+MarkerHandleNumber const *MarkerHandleSet::GetMarkerHandleNumber(int which) const noexcept {
+	for (const MarkerHandleNumber &mhn : mhList) {
+		if (which == 0)
+			return &mhn;
+		which--;
+	}
+	return nullptr;
+}
+
 bool MarkerHandleSet::InsertHandle(int handle, int markerNum) {
 	mhList.push_front(MarkerHandleNumber(handle, markerNum));
 	return true;
@@ -75,7 +84,7 @@ bool MarkerHandleSet::RemoveNumber(int markerNum, bool all) {
 	return performedDeletion;
 }
 
-void MarkerHandleSet::CombineWith(MarkerHandleSet *other) {
+void MarkerHandleSet::CombineWith(MarkerHandleSet *other) noexcept {
 	mhList.splice_after(mhList.before_begin(), other->mhList);
 }
 
@@ -105,15 +114,27 @@ void LineMarkers::RemoveLine(Sci::Line line) {
 	}
 }
 
-Sci::Line LineMarkers::LineFromHandle(int markerHandle) noexcept {
-	if (markers.Length()) {
-		for (Sci::Line line = 0; line < markers.Length(); line++) {
-			if (markers[line]) {
-				if (markers[line]->Contains(markerHandle)) {
-					return line;
-				}
-			}
+Sci::Line LineMarkers::LineFromHandle(int markerHandle) const noexcept {
+	for (Sci::Line line = 0; line < markers.Length(); line++) {
+		if (markers[line] && markers[line]->Contains(markerHandle)) {
+			return line;
 		}
+	}
+	return -1;
+}
+
+int LineMarkers::HandleFromLine(Sci::Line line, int which) const noexcept {
+	if (markers.Length() && (line >= 0) && (line < markers.Length()) && markers[line]) {
+		MarkerHandleNumber const *pnmh = markers[line]->GetMarkerHandleNumber(which);
+		return pnmh ? pnmh->handle : -1;
+	}
+	return -1;
+}
+
+int LineMarkers::NumberFromLine(Sci::Line line, int which) const noexcept {
+	if (markers.Length() && (line >= 0) && (line < markers.Length()) && markers[line]) {
+		MarkerHandleNumber const *pnmh = markers[line]->GetMarkerHandleNumber(which);
+		return pnmh ? pnmh->number : -1;
 	}
 	return -1;
 }
@@ -127,7 +148,7 @@ void LineMarkers::MergeMarkers(Sci::Line line) {
 	}
 }
 
-MarkerMask LineMarkers::MarkValue(Sci::Line line) noexcept {
+MarkerMask LineMarkers::MarkValue(Sci::Line line) const noexcept {
 	if (markers.Length() && (line >= 0) && (line < markers.Length()) && markers[line])
 		return markers[line]->MarkValue();
 	else
@@ -294,30 +315,29 @@ Sci::Line LineState::GetMaxLineState() const noexcept {
 	return lineStates.Length();
 }
 
-static int NumberLines(const char *text) noexcept {
-	if (text) {
-		int newLines = 0;
-		while (*text) {
-			if (*text == '\n')
-				newLines++;
-			text++;
-		}
-		return newLines + 1;
-	} else {
-		return 0;
-	}
-}
-
 // Each allocated LineAnnotation is a char array which starts with an AnnotationHeader
 // and then has text and optional styles.
-
-constexpr int IndividualStyles = 0x100;
 
 struct AnnotationHeader {
 	short style;	// Style IndividualStyles implies array of styles
 	short lines;
 	int length;
 };
+
+namespace {
+
+constexpr int IndividualStyles = 0x100;
+
+size_t NumberLines(std::string_view sv) {
+	return std::count(sv.begin(), sv.end(), '\n') + 1;
+}
+
+std::unique_ptr<char[]>AllocateAnnotation(size_t length, int style) {
+	const size_t len = sizeof(AnnotationHeader) + length + ((style == IndividualStyles) ? length : 0);
+	return std::make_unique<char[]>(len);
+}
+
+}
 
 LineAnnotation::~LineAnnotation() = default;
 
@@ -371,23 +391,19 @@ const unsigned char *LineAnnotation::Styles(Sci::Line line) const noexcept {
 		return nullptr;
 }
 
-static std::unique_ptr<char[]>AllocateAnnotation(int length, int style) {
-	const size_t len = sizeof(AnnotationHeader) + length + ((style == IndividualStyles) ? length : 0);
-	return std::make_unique<char[]>(len);
-}
-
 void LineAnnotation::SetText(Sci::Line line, const char *text) {
 	if (text && (line >= 0)) {
 		annotations.EnsureLength(line + 1);
 		const int style = Style(line);
-		annotations[line] = AllocateAnnotation(static_cast<int>(strlen(text)), style);
+		const size_t length = strlen(text);
+		annotations[line] = AllocateAnnotation(length, style);
 		char *pa = annotations[line].get();
 		assert(pa);
 		AnnotationHeader *pah = reinterpret_cast<AnnotationHeader *>(pa);
 		pah->style = static_cast<short>(style);
-		pah->length = static_cast<int>(strlen(text));
-		pah->lines = static_cast<short>(NumberLines(text));
-		memcpy(pa + sizeof(AnnotationHeader), text, pah->length);
+		pah->length = static_cast<int>(length);
+		pah->lines = static_cast<short>(NumberLines(std::string_view(text, length)));
+		memcpy(pa + sizeof(AnnotationHeader), text, length);
 	} else {
 		if (annotations.Length() && (line >= 0) && (line < annotations.Length()) && annotations[line]) {
 			annotations[line].reset();

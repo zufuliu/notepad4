@@ -38,7 +38,8 @@ public:
 	bool InsertHandle(int handle, int markerNum);
 	void RemoveHandle(int handle);
 	bool RemoveNumber(int markerNum, bool all);
-	void CombineWith(MarkerHandleSet *other);
+	void CombineWith(MarkerHandleSet *other) noexcept;
+	MarkerHandleNumber const *GetMarkerHandleNumber(int which) const noexcept;
 };
 
 class LineMarkers : public PerLine {
@@ -58,13 +59,15 @@ public:
 	void InsertLine(Sci::Line line) override;
 	void RemoveLine(Sci::Line line) override;
 
-	MarkerMask MarkValue(Sci::Line line) noexcept;
+	MarkerMask MarkValue(Sci::Line line) const noexcept;
 	Sci::Line MarkerNext(Sci::Line lineStart, MarkerMask mask) const noexcept;
 	int AddMark(Sci::Line line, int markerNum, Sci::Line lines);
 	void MergeMarkers(Sci::Line line);
 	bool DeleteMark(Sci::Line line, int markerNum, bool all);
 	void DeleteMarkFromHandle(int markerHandle);
-	Sci::Line LineFromHandle(int markerHandle) noexcept;
+	Sci::Line LineFromHandle(int markerHandle) const noexcept;
+	int HandleFromLine(Sci::Line line, int which) const noexcept;
+	int NumberFromLine(Sci::Line line, int which) const noexcept;
 };
 
 class LineLevels : public PerLine {

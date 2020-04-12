@@ -162,6 +162,12 @@ fun line MarkerLineFromHandle=2017(int markerHandle,)
 # Delete a marker.
 fun void MarkerDeleteHandle=2018(int markerHandle,)
 
+# Retrieve marker handles of a line
+fun int MarkerHandleFromLine=2732(line line, int which)
+
+# Retrieve marker number of a marker handle
+fun int MarkerNumberFromLine=2733(line line, int which)
+
 # Is undo history being collected?
 get bool GetUndoCollection=2019(,)
 
@@ -409,7 +415,7 @@ set void MarkerSetBack=2042(int markerNumber, colour back)
 # Set the background colour used for a particular marker number when its folding block is selected.
 set void MarkerSetBackSelected=2292(int markerNumber, colour back)
 
-# Enable/disable highlight for current folding bloc (smallest one that contains the caret)
+# Enable/disable highlight for current folding block (smallest one that contains the caret)
 fun void MarkerEnableHighlight=2293(bool enabled,)
 
 # Add a marker to a line, returning an ID which can be used to find or delete the marker.

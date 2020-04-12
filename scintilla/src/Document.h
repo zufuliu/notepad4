@@ -454,6 +454,8 @@ public:
 	void DeleteMarkFromHandle(int markerHandle);
 	void DeleteAllMarks(int markerNum);
 	Sci::Line LineFromHandle(int markerHandle) const noexcept;
+	int MarkerNumberFromLine(Sci::Line line, int which) const noexcept;
+	int MarkerHandleFromLine(Sci::Line line, int which) const noexcept;
 	Sci_Position SCI_METHOD LineStart(Sci_Position line) const noexcept override;
 	bool IsLineStartPosition(Sci::Position position) const noexcept;
 	Sci_Position SCI_METHOD LineEnd(Sci_Position line) const noexcept override;

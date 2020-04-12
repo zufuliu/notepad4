@@ -6463,6 +6463,12 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 		pdoc->DeleteMarkFromHandle(static_cast<int>(wParam));
 		break;
 
+	case SCI_MARKERHANDLEFROMLINE:
+		return pdoc->MarkerHandleFromLine(static_cast<Sci::Line>(wParam), static_cast<int>(lParam));
+
+	case SCI_MARKERNUMBERFROMLINE:
+		return pdoc->MarkerNumberFromLine(static_cast<Sci::Line>(wParam), static_cast<int>(lParam));
+
 	case SCI_GETVIEWWS:
 		return vs.viewWhitespace;
 

@@ -378,6 +378,14 @@ Sci::Line Document::LineFromHandle(int markerHandle) const noexcept {
 	return Markers()->LineFromHandle(markerHandle);
 }
 
+int Document::MarkerNumberFromLine(Sci::Line line, int which) const noexcept {
+	return Markers()->NumberFromLine(line, which);
+}
+
+int Document::MarkerHandleFromLine(Sci::Line line, int which) const noexcept {
+	return Markers()->HandleFromLine(line, which);
+}
+
 Sci_Position SCI_METHOD Document::LineStart(Sci_Position line) const noexcept {
 	return cb.LineStart(line);
 }
