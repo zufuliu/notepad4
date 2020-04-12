@@ -624,12 +624,23 @@ static void Style_LoadOneEx(PEDITLEXER pLex, IniSection *pIniSection, WCHAR *pIn
 void Style_SetFavoriteSchemes(void) {
 	int favorite[MAX_FAVORITE_SCHEMES_COUNT];
 	const int count = ParseCommaList(favoriteSchemesConfig, favorite, MAX_FAVORITE_SCHEMES_COUNT);
+	UINT index = LEXER_INDEX_GENERAL;
+
 	for (int i = 0; i < count; i++) {
 		const int rid = favorite[i] + NP2LEX_TEXTFILE;
-		for (UINT iLexer = LEXER_INDEX_GENERAL; iLexer < ALL_LEXER_COUNT; iLexer++) {
+		for (UINT iLexer = index; iLexer < ALL_LEXER_COUNT; iLexer++) {
 			PEDITLEXER pLex = pLexArray[iLexer];
 			if (pLex->rid == rid) {
 				pLex->iFavoriteOrder = MAX_FAVORITE_SCHEMES_COUNT - i;
+				// move pLex to the end of favorite schemes
+				if (iLexer != index) {
+					do {
+						pLexArray[iLexer] = pLexArray[iLexer - 1];
+						--iLexer;
+					} while (iLexer != index);
+					pLexArray[iLexer] = pLex;
+				}
+				++index;
 				break;
 			}
 		}
@@ -660,7 +671,7 @@ void Style_GetFavoriteSchemes(void) {
 	}
 }
 
-static int __cdecl CmpEditLexer(const void *p1, const void *p2) {
+static int __cdecl CmpEditLexerByOrder(const void *p1, const void *p2) {
 	LPCEDITLEXER pLex1 = *(LPCEDITLEXER *)(p1);
 	LPCEDITLEXER pLex2 = *(LPCEDITLEXER *)(p2);
 	int cmp = pLex2->iFavoriteOrder - pLex1->iFavoriteOrder;
@@ -706,8 +717,6 @@ void Style_Load(void) {
 		lstrcpyn(favoriteSchemesConfig, strValue, MAX_FAVORITE_SCHEMES_CONFIG_SIZE);
 		Style_SetFavoriteSchemes();
 	}
-
-	qsort(pLexArray + LEXER_INDEX_GENERAL, GENERAL_LEXER_COUNT, sizeof(PEDITLEXER), CmpEditLexer);
 
 	// default scheme
 	int iValue = IniSectionGetInt(pIniSection, L"DefaultScheme", 0);
@@ -4913,7 +4922,7 @@ static void Style_GetFavoriteSchemesFromTreeView(HWND hwndTV, HTREEITEM hFavorit
 		wch[len] = L'\0';
 	}
 
-	qsort(pLexArray + LEXER_INDEX_GENERAL, GENERAL_LEXER_COUNT, sizeof(PEDITLEXER), CmpEditLexer);
+	qsort(pLexArray + LEXER_INDEX_GENERAL, GENERAL_LEXER_COUNT, sizeof(PEDITLEXER), CmpEditLexerByOrder);
 }
 
 //=============================================================================
