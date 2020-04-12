@@ -1216,7 +1216,7 @@
     <None Include="..\..\res\Encoding.bmp" />
     <None Include="..\..\res\Next.bmp" />
     <None Include="..\..\res\Notepad2.ico" />
-    <None Include="..\..\res\Open.bmp" />
+    <None Include="..\..\res\OpenFolder.bmp" />
     <None Include="..\..\res\Pick.bmp" />
     <None Include="..\..\res\Prev.bmp" />
     <None Include="..\..\res\Run.ico" />

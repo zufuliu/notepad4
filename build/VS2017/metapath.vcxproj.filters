@@ -95,7 +95,7 @@
     <None Include="..\..\metapath\res\metapath.ico">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="..\..\metapath\res\Open.bmp">
+    <None Include="..\..\metapath\res\OpenFolder.bmp">
       <Filter>Resource Files</Filter>
     </None>
     <None Include="..\..\metapath\res\Options.ico">
