@@ -322,14 +322,14 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	bool UserVirtualSpace() const noexcept {
 		return ((virtualSpaceOptions & SCVS_USERACCESSIBLE) != 0);
 	}
-	Sci::Position CurrentPosition() const;
+	Sci::Position CurrentPosition() const noexcept;
 	bool SelectionEmpty() const noexcept;
-	SelectionPosition SelectionStart();
-	SelectionPosition SelectionEnd();
+	SelectionPosition SelectionStart() noexcept;
+	SelectionPosition SelectionEnd() noexcept;
 	void SetRectangularRange();
 	void ThinRectangularRange();
-	void InvalidateSelection(SelectionRange newMain, bool invalidateWholeSelection = false);
-	void InvalidateWholeSelection();
+	void InvalidateSelection(SelectionRange newMain, bool invalidateWholeSelection = false) noexcept;
+	void InvalidateWholeSelection() noexcept;
 	SelectionRange LineSelectionRange(SelectionPosition currentPos_, SelectionPosition anchor_) const noexcept;
 	void SetSelection(SelectionPosition currentPos_, SelectionPosition anchor_);
 	void SetSelection(Sci::Position currentPos_, Sci::Position anchor_);
@@ -342,22 +342,22 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	};
 	void MultipleSelectAdd(AddNumber addNumber);
 	bool RangeContainsProtected(Sci::Position start, Sci::Position end) const noexcept;
-	bool SelectionContainsProtected() const;
-	Sci::Position MovePositionOutsideChar(Sci::Position pos, Sci::Position moveDir, bool checkLineEnd = true) const;
-	SelectionPosition MovePositionOutsideChar(SelectionPosition pos, Sci::Position moveDir, bool checkLineEnd = true) const;
+	bool SelectionContainsProtected() const noexcept;
+	Sci::Position MovePositionOutsideChar(Sci::Position pos, Sci::Position moveDir, bool checkLineEnd = true) const noexcept;
+	SelectionPosition MovePositionOutsideChar(SelectionPosition pos, Sci::Position moveDir, bool checkLineEnd = true) const noexcept;
 	void MovedCaret(SelectionPosition newPos, SelectionPosition previousPos,
 		bool ensureVisible, CaretPolicies policies);
 	void MovePositionTo(SelectionPosition newPos, Selection::selTypes selt = Selection::noSel, bool ensureVisible = true);
 	void MovePositionTo(Sci::Position newPos, Selection::selTypes selt = Selection::noSel, bool ensureVisible = true);
-	SelectionPosition MovePositionSoVisible(SelectionPosition pos, int moveDir);
-	SelectionPosition MovePositionSoVisible(Sci::Position pos, int moveDir);
+	SelectionPosition MovePositionSoVisible(SelectionPosition pos, int moveDir) noexcept;
+	SelectionPosition MovePositionSoVisible(Sci::Position pos, int moveDir) noexcept;
 	Point PointMainCaret();
 	void SetLastXChosen();
 
 	void ScrollTo(Sci::Line line, bool moveThumb = true);
 	virtual void ScrollText(Sci::Line linesToMove);
 	void HorizontalScrollTo(int xPos);
-	void VerticalCentreCaret();
+	void VerticalCentreCaret() noexcept;
 	void MoveSelectedLines(int lineDelta);
 	void MoveSelectedLinesUp();
 	void MoveSelectedLinesDown();
@@ -430,7 +430,7 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	void PasteRectangular(SelectionPosition pos, const char *ptr, Sci::Position len);
 	virtual void Copy(bool asBinary) = 0;
 	virtual void CopyAllowLine();
-	virtual bool CanPaste();
+	virtual bool CanPaste() noexcept;
 	virtual void Paste(bool asBinary) = 0;
 	void Clear();
 	virtual void SelectAll();
@@ -505,7 +505,7 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 
 	virtual CaseFolder *CaseFolderForEncoding();
 	Sci::Position FindText(uptr_t wParam, sptr_t lParam);
-	void SearchAnchor();
+	void SearchAnchor() noexcept;
 	Sci::Position SearchText(unsigned int iMessage, uptr_t wParam, sptr_t lParam);
 	Sci::Position SearchInTarget(const char *text, Sci::Position length);
 	void GoToLine(Sci::Line lineNo);
@@ -522,7 +522,7 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	void DropAt(SelectionPosition position, const char *value, size_t lengthValue, bool moving, bool rectangular);
 	void DropAt(SelectionPosition position, const char *value, bool moving, bool rectangular);
 	/** PositionInSelection returns true if position in selection. */
-	bool PositionInSelection(Sci::Position pos);
+	bool PositionInSelection(Sci::Position pos) noexcept;
 	bool SCICALL PointInSelection(Point pt);
 	bool SCICALL PointInSelMargin(Point pt) const noexcept;
 	Window::Cursor GetMarginCursor(Point pt) const noexcept;
@@ -586,11 +586,11 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	Sci::Position GetTag(char *tagValue, int tagNumber);
 	Sci::Position ReplaceTarget(bool replacePatterns, const char *text, Sci::Position length = -1);
 
-	bool PositionIsHotspot(Sci::Position position) const;
+	bool PositionIsHotspot(Sci::Position position) const noexcept;
 	bool SCICALL PointIsHotspot(Point pt);
 	void SetHotSpotRange(const Point *pt);
 	Range GetHotSpotRange() const noexcept override;
-	void SetHoverIndicatorPosition(Sci::Position position);
+	void SetHoverIndicatorPosition(Sci::Position position) noexcept;
 	void SCICALL SetHoverIndicatorPoint(Point pt);
 
 	int CodePage() const noexcept;
@@ -604,7 +604,7 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	bool ValidMargin(uptr_t wParam) const noexcept;
 	void StyleSetMessage(unsigned int iMessage, uptr_t wParam, sptr_t lParam);
 	sptr_t StyleGetMessage(unsigned int iMessage, uptr_t wParam, sptr_t lParam);
-	void SetSelectionNMessage(unsigned int iMessage, uptr_t wParam, sptr_t lParam);
+	void SetSelectionNMessage(unsigned int iMessage, uptr_t wParam, sptr_t lParam) noexcept;
 
 	static const char *StringFromEOLMode(int eolMode) noexcept;
 

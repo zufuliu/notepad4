@@ -5,7 +5,7 @@ namespace Scintilla {
 // TODO: change packed line state to NestedStateStack (convert lexer to class).
 
 template<int bitCount, int maxStateCount, int PackState(int state) noexcept>
-inline int PackLineState(const std::vector<int>& states) {
+inline int PackLineState(const std::vector<int>& states) noexcept {
 	int lineState = 0;
 	int count = 0;
 	size_t index = states.size();

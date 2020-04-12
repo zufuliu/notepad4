@@ -70,7 +70,7 @@ constexpr int UnpackState(int state) noexcept  {
 	}
 }
 
-int PackNestedState(const std::vector<int>& nestedState) {
+int PackNestedState(const std::vector<int>& nestedState) noexcept {
 	return PackLineState<2, MaxKotlinNestedStateCount, PackState>(nestedState) << 16;
 }
 

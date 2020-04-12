@@ -2316,7 +2316,7 @@ PRectangle Window::GetMonitorRect(Point pt) const noexcept {
 
 	const RECT rcWork = RectFromMonitor(hMonitor);
 	if (rcWork.left < rcWork.right) {
-		PRectangle rcMonitor(
+		const PRectangle rcMonitor(
 			rcWork.left - rcPosition.left,
 			rcWork.top - rcPosition.top,
 			rcWork.right - rcPosition.left,
@@ -2343,7 +2343,7 @@ public:
 		data.clear();
 	}
 
-	ListItemData Get(size_t index) const {
+	ListItemData Get(size_t index) const noexcept {
 		if (index < data.size()) {
 			return data[index];
 		} else {
@@ -2454,7 +2454,7 @@ public:
 	void Select(int n) override;
 	int GetSelection() const noexcept override;
 	int Find(const char *prefix) const noexcept override;
-	void GetValue(int n, char *value, int len) const override;
+	void GetValue(int n, char *value, int len) const noexcept override;
 	void RegisterImage(int type, const char *xpm_data) override;
 	void RegisterRGBAImage(int type, int width, int height, const unsigned char *pixelsImage) override;
 	void ClearRegisteredImages() noexcept override;
@@ -2628,7 +2628,7 @@ int ListBoxX::Find(const char *) const noexcept {
 	return LB_ERR;
 }
 
-void ListBoxX::GetValue(int n, char *value, int len) const {
+void ListBoxX::GetValue(int n, char *value, int len) const noexcept {
 	const ListItemData item = lti.Get(n);
 	strncpy(value, item.text, len);
 	value[len - 1] = '\0';

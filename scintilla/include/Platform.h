@@ -377,15 +377,15 @@ public:
 
 class IScreenLine {
 public:
-	virtual std::string_view Text() const = 0;
+	virtual std::string_view Text() const noexcept = 0;
 	virtual size_t Length() const noexcept = 0;
 	virtual size_t RepresentationCount() const = 0;
 	virtual XYPOSITION Width() const noexcept = 0;
 	virtual XYPOSITION Height() const noexcept = 0;
 	virtual XYPOSITION TabWidth() const noexcept = 0;
 	virtual XYPOSITION TabWidthMinimumPixels() const noexcept = 0;
-	virtual const Font *FontOfPosition(size_t position) const = 0;
-	virtual XYPOSITION RepresentationWidth(size_t position) const = 0;
+	virtual const Font *FontOfPosition(size_t position) const noexcept = 0;
+	virtual XYPOSITION RepresentationWidth(size_t position) const noexcept = 0;
 	virtual XYPOSITION TabPositionAfter(XYPOSITION xPosition) const noexcept = 0;
 };
 
@@ -543,7 +543,7 @@ public:
 	virtual void Select(int n) = 0;
 	virtual int GetSelection() const noexcept = 0;
 	virtual int Find(const char *prefix) const noexcept = 0;
-	virtual void GetValue(int n, char *value, int len) const = 0;
+	virtual void GetValue(int n, char *value, int len) const noexcept = 0;
 	virtual void RegisterImage(int type, const char *xpm_data) = 0;
 	virtual void RegisterRGBAImage(int type, int width, int height, const unsigned char *pixelsImage) = 0;
 	virtual void ClearRegisteredImages() noexcept = 0;

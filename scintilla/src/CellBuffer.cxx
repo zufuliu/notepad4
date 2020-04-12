@@ -485,7 +485,7 @@ bool UndoHistory::TentativeActive() const noexcept {
 	return tentativePoint >= 0;
 }
 
-int UndoHistory::TentativeSteps() {
+int UndoHistory::TentativeSteps() noexcept {
 	// Drop any trailing startAction
 	if (actions[currentAction].at == startAction && currentAction > 0)
 		currentAction--;
@@ -499,7 +499,7 @@ bool UndoHistory::CanUndo() const noexcept {
 	return (currentAction > 0) && (maxAction > 0);
 }
 
-int UndoHistory::StartUndo() {
+int UndoHistory::StartUndo() noexcept {
 	// Drop any trailing startAction
 	if (actions[currentAction].at == startAction && currentAction > 0)
 		currentAction--;
@@ -512,7 +512,7 @@ int UndoHistory::StartUndo() {
 	return currentAction - act;
 }
 
-const Action &UndoHistory::GetUndoStep() const {
+const Action &UndoHistory::GetUndoStep() const noexcept {
 	return actions[currentAction];
 }
 
@@ -524,7 +524,7 @@ bool UndoHistory::CanRedo() const noexcept {
 	return maxAction > currentAction;
 }
 
-int UndoHistory::StartRedo() {
+int UndoHistory::StartRedo() noexcept {
 	// Drop any leading startAction
 	if (currentAction < maxAction && actions[currentAction].at == startAction)
 		currentAction++;
@@ -537,7 +537,7 @@ int UndoHistory::StartRedo() {
 	return act - currentAction;
 }
 
-const Action &UndoHistory::GetRedoStep() const {
+const Action &UndoHistory::GetRedoStep() const noexcept {
 	return actions[currentAction];
 }
 
@@ -807,7 +807,7 @@ void CellBuffer::TentativeCommit() noexcept {
 	uh.TentativeCommit();
 }
 
-int CellBuffer::TentativeSteps() {
+int CellBuffer::TentativeSteps() noexcept {
 	return uh.TentativeSteps();
 }
 
@@ -1391,11 +1391,11 @@ bool CellBuffer::CanUndo() const noexcept {
 	return uh.CanUndo();
 }
 
-int CellBuffer::StartUndo() {
+int CellBuffer::StartUndo() noexcept {
 	return uh.StartUndo();
 }
 
-const Action &CellBuffer::GetUndoStep() const {
+const Action &CellBuffer::GetUndoStep() const noexcept {
 	return uh.GetUndoStep();
 }
 
@@ -1417,11 +1417,11 @@ bool CellBuffer::CanRedo() const noexcept {
 	return uh.CanRedo();
 }
 
-int CellBuffer::StartRedo() {
+int CellBuffer::StartRedo() noexcept {
 	return uh.StartRedo();
 }
 
-const Action &CellBuffer::GetRedoStep() const {
+const Action &CellBuffer::GetRedoStep() const noexcept {
 	return uh.GetRedoStep();
 }
 

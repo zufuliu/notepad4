@@ -215,7 +215,7 @@ public:
 	STDMETHODIMP_(ULONG)Release() noexcept override;
 
 	// IEnumFORMATETC
-	STDMETHODIMP Next(ULONG celt, FORMATETC *rgelt, ULONG *pceltFetched) override;
+	STDMETHODIMP Next(ULONG celt, FORMATETC *rgelt, ULONG *pceltFetched) noexcept override;
 	STDMETHODIMP Skip(ULONG celt) noexcept override;
 	STDMETHODIMP Reset() noexcept override;
 	STDMETHODIMP Clone(IEnumFORMATETC **ppenum) override;
@@ -411,7 +411,7 @@ class ScintillaWin :
 	explicit ScintillaWin(HWND hwnd);
 	// ~ScintillaWin() in public section
 
-	void Init();
+	void Init() noexcept;
 	void Finalise() noexcept override;
 #if defined(USE_D2D)
 	void EnsureRenderTarget(HDC hdc) noexcept;
@@ -459,7 +459,7 @@ class ScintillaWin :
 		return PRIMARYLANGID(inputLang) == LANG_KOREAN;
 	}
 
-	void MoveImeCarets(Sci::Position offset);
+	void MoveImeCarets(Sci::Position offset) noexcept;
 	void DrawImeIndicator(int indicator, int len);
 	void SetCandidateWindowPos();
 	void SelectionToHangul();
@@ -499,7 +499,7 @@ class ScintillaWin :
 	std::string CaseMapString(const std::string &s, int caseMapping) override;
 	void Copy(bool asBinary) override;
 	void CopyAllowLine() override;
-	bool CanPaste() override;
+	bool CanPaste() noexcept override;
 	void Paste(bool asBinary) override;
 	void SCICALL CreateCallTipWindow(PRectangle rc) noexcept override;
 #if SCI_EnablePopupMenu
@@ -668,7 +668,7 @@ ScintillaWin::ScintillaWin(HWND hwnd) {
 
 ScintillaWin::~ScintillaWin() = default;
 
-void ScintillaWin::Init() {
+void ScintillaWin::Init() noexcept {
 	// Initialize COM.  If the app has already done this it will have
 	// no effect.  If the app hasn't, we really shouldn't ask them to call
 	// it just so this internal feature works.
@@ -1073,7 +1073,7 @@ sptr_t ScintillaWin::HandleCompositionWindowed(uptr_t wParam, sptr_t lParam) {
 	return ::DefWindowProc(MainHWND(), WM_IME_COMPOSITION, wParam, lParam);
 }
 
-void ScintillaWin::MoveImeCarets(Sci::Position offset) {
+void ScintillaWin::MoveImeCarets(Sci::Position offset) noexcept {
 	// Move carets relatively by bytes.
 	for (size_t r = 0; r < sel.Count(); r++) {
 		const Sci::Position positionInsert = sel.Range(r).Start().Position();
@@ -1996,7 +1996,7 @@ sptr_t ScintillaWin::IdleMessage(unsigned int iMessage, uptr_t wParam, sptr_t lP
 
 					const DWORD dwCurrent = GetTickCount();
 					const DWORD dwStart = wParam ? static_cast<DWORD>(wParam) : dwCurrent;
-					const DWORD maxWorkTime = 50;
+					constexpr DWORD maxWorkTime = 50;
 
 					if (dwCurrent >= dwStart && dwCurrent > maxWorkTime &&dwCurrent - maxWorkTime < dwStart) {
 						PostMessage(MainHWND(), SC_WIN_IDLE, dwStart, 0);
@@ -2675,7 +2675,7 @@ void ScintillaWin::CopyAllowLine() {
 	CopyToClipboard(selectedText);
 }
 
-bool ScintillaWin::CanPaste() {
+bool ScintillaWin::CanPaste() noexcept {
 	if (!Editor::CanPaste())
 		return false;
 	return ::IsClipboardFormatAvailable(CF_UNICODETEXT);
@@ -2853,7 +2853,7 @@ STDMETHODIMP_(ULONG)FormatEnumerator::Release() noexcept {
 }
 
 /// Implement IEnumFORMATETC
-STDMETHODIMP FormatEnumerator::Next(ULONG celt, FORMATETC *rgelt, ULONG *pceltFetched) {
+STDMETHODIMP FormatEnumerator::Next(ULONG celt, FORMATETC *rgelt, ULONG *pceltFetched) noexcept {
 	if (!rgelt) return E_POINTER;
 	ULONG putPos = 0;
 	while ((pos < formats.size()) && (putPos < celt)) {

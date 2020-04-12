@@ -94,23 +94,23 @@ public:
 	void EnsureBidiData();
 	void Free() noexcept;
 	void Invalidate(validLevel validity_) noexcept;
-	int LineStart(int line) const;
-	int LineLength(int line) const;
+	int LineStart(int line) const noexcept;
+	int LineLength(int line) const noexcept;
 	enum class Scope {
 		visibleOnly, includeEnd
 	};
-	int LineLastVisible(int line, Scope scope) const;
-	Range SubLineRange(int subLine, Scope scope) const;
-	bool InLine(int offset, int line) const;
-	int SubLineFromPosition(int posInLine, PointEnd pe) const;
+	int LineLastVisible(int line, Scope scope) const noexcept;
+	Range SubLineRange(int subLine, Scope scope) const noexcept;
+	bool InLine(int offset, int line) const noexcept;
+	int SubLineFromPosition(int posInLine, PointEnd pe) const noexcept;
 	void SetLineStart(int line, int start);
 	void SetBracesHighlight(Range rangeLine, const Sci::Position braces[],
-		char bracesMatchStyle, int xHighlight, bool ignoreStyle);
-	void RestoreBracesHighlight(Range rangeLine, const Sci::Position braces[], bool ignoreStyle);
-	int SCICALL FindBefore(XYPOSITION x, Range range) const;
-	int SCICALL FindPositionFromX(XYPOSITION x, Range range, bool charPosition) const;
-	Point PointFromPosition(int posInLine, int lineHeight, PointEnd pe) const;
-	int EndLineStyle() const;
+		char bracesMatchStyle, int xHighlight, bool ignoreStyle) noexcept;
+	void RestoreBracesHighlight(Range rangeLine, const Sci::Position braces[], bool ignoreStyle) noexcept;
+	int SCICALL FindBefore(XYPOSITION x, Range range) const noexcept;
+	int SCICALL FindPositionFromX(XYPOSITION x, Range range, bool charPosition) const noexcept;
+	Point PointFromPosition(int posInLine, int lineHeight, PointEnd pe) const noexcept;
+	int EndLineStyle() const noexcept;
 };
 
 struct ScreenLine : public IScreenLine {
@@ -123,7 +123,7 @@ struct ScreenLine : public IScreenLine {
 	XYPOSITION tabWidth;
 	int tabWidthMinimumPixels;
 
-	ScreenLine(const LineLayout *ll_, int subLine, const ViewStyle &vs, XYPOSITION width_, int tabWidthMinimumPixels_);
+	ScreenLine(const LineLayout *ll_, int subLine, const ViewStyle &vs, XYPOSITION width_, int tabWidthMinimumPixels_) noexcept;
 	// Deleted so ScreenLine objects can not be copied.
 	ScreenLine(const ScreenLine &) = delete;
 	ScreenLine(ScreenLine &&) = delete;
@@ -131,15 +131,15 @@ struct ScreenLine : public IScreenLine {
 	void operator=(ScreenLine &&) = delete;
 	virtual ~ScreenLine();
 
-	std::string_view Text() const override;
+	std::string_view Text() const noexcept override;
 	size_t Length() const noexcept override;
 	size_t RepresentationCount() const override;
 	XYPOSITION Width() const noexcept override;
 	XYPOSITION Height() const noexcept override;
 	XYPOSITION TabWidth() const noexcept override;
 	XYPOSITION TabWidthMinimumPixels() const noexcept override;
-	const Font *FontOfPosition(size_t position) const override;
-	XYPOSITION RepresentationWidth(size_t position) const override;
+	const Font *FontOfPosition(size_t position) const noexcept override;
+	XYPOSITION RepresentationWidth(size_t position) const noexcept override;
 	XYPOSITION TabPositionAfter(XYPOSITION xPosition) const noexcept override;
 };
 
@@ -194,7 +194,7 @@ public:
 	~PositionCacheEntry();
 	void Set(unsigned int styleNumber_, const char *s_, unsigned int len_, const XYPOSITION *positions_, unsigned int clock_);
 	void Clear() noexcept;
-	bool Retrieve(unsigned int styleNumber_, const char *s_, unsigned int len_, XYPOSITION *positions_) const;
+	bool Retrieve(unsigned int styleNumber_, const char *s_, unsigned int len_, XYPOSITION *positions_) const noexcept;
 	static unsigned int Hash(unsigned int styleNumber_, const char *s, unsigned int len_) noexcept;
 	bool NewerThan(const PositionCacheEntry &other) const noexcept;
 	void ResetClock() noexcept;
