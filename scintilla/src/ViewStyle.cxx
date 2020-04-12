@@ -154,7 +154,7 @@ ViewStyle::~ViewStyle() {
 	fonts.clear();
 }
 
-void ViewStyle::CalculateMarginWidthAndMask() {
+void ViewStyle::CalculateMarginWidthAndMask() noexcept {
 	fixedColumnWidth = marginInside ? leftMarginWidth : 0;
 	maskInLine = 0xffffffffU;
 	MarkerMask maskDefinedMarkers = 0;
@@ -383,7 +383,7 @@ void ViewStyle::ResetDefaultStyle() {
 		SC_WEIGHT_NORMAL, false, false, false, false, Style::caseMixed, true, true, false);
 }
 
-void ViewStyle::ClearStyles() {
+void ViewStyle::ClearStyles() noexcept {
 	fontsValid = false;
 	// Reset all styles to be like the default style
 	for (size_t i = 0; i < styles.size(); i++) {
@@ -416,7 +416,7 @@ int ViewStyle::ExternalMarginWidth() const noexcept {
 	return marginInside ? 0 : fixedColumnWidth;
 }
 
-int ViewStyle::MarginFromLocation(Point pt) const {
+int ViewStyle::MarginFromLocation(Point pt) const noexcept {
 	int margin = -1;
 	int x = marginInside ? 0 : -fixedColumnWidth;
 	for (size_t i = 0; i < ms.size(); i++) {
@@ -462,7 +462,7 @@ bool ViewStyle::IsLineFrameOpaque(bool caretActive, bool lineContainsCaret) cons
 // display itself (as long as it's not an SC_MARK_EMPTY marker).  These are checked in order
 // with the earlier taking precedence.  When multiple markers cause background override,
 // the colour for the highest numbered one is used.
-ColourOptional ViewStyle::Background(MarkerMask marksOfLine, bool caretActive, bool lineContainsCaret) const {
+ColourOptional ViewStyle::Background(MarkerMask marksOfLine, bool caretActive, bool lineContainsCaret) const noexcept {
 	ColourOptional background;
 	if (!caretLineFrame && (caretActive || alwaysShowCaretLineBackground) && showCaretLineBackground &&
 		(caretLineAlpha == SC_ALPHA_NOALPHA) && lineContainsCaret) {
@@ -508,7 +508,7 @@ bool ViewStyle::WhiteSpaceVisible(bool inIndent) const noexcept {
 		viewWhitespace == wsVisibleAlways;
 }
 
-ColourDesired ViewStyle::WrapColour() const {
+ColourDesired ViewStyle::WrapColour() const noexcept {
 	if (whitespaceColours.fore.isSet)
 		return whitespaceColours.fore;
 	else

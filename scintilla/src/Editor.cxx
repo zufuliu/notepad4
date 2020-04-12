@@ -561,7 +561,7 @@ void Editor::InvalidateRange(Sci::Position start, Sci::Position end) noexcept {
 	RedrawRect(RectangleFromRange(Range(start, end), view.LinesOverlap() ? vs.lineOverlap : 0));
 }
 
-Sci::Position Editor::CurrentPosition() const {
+Sci::Position Editor::CurrentPosition() const noexcept {
 	return sel.MainCaret();
 }
 
@@ -569,11 +569,11 @@ bool Editor::SelectionEmpty() const noexcept {
 	return sel.Empty();
 }
 
-SelectionPosition Editor::SelectionStart() {
+SelectionPosition Editor::SelectionStart() noexcept {
 	return sel.RangeMain().Start();
 }
 
-SelectionPosition Editor::SelectionEnd() {
+SelectionPosition Editor::SelectionEnd() noexcept {
 	return sel.RangeMain().End();
 }
 
@@ -616,7 +616,7 @@ void Editor::ThinRectangularRange() {
 	}
 }
 
-void Editor::InvalidateSelection(SelectionRange newMain, bool invalidateWholeSelection) {
+void Editor::InvalidateSelection(SelectionRange newMain, bool invalidateWholeSelection) noexcept {
 	if (sel.Count() > 1 || !(sel.RangeMain().anchor == newMain.anchor) || sel.IsRectangular()) {
 		invalidateWholeSelection = true;
 	}
@@ -636,7 +636,7 @@ void Editor::InvalidateSelection(SelectionRange newMain, bool invalidateWholeSel
 	InvalidateRange(firstAffected, lastAffected);
 }
 
-void Editor::InvalidateWholeSelection() {
+void Editor::InvalidateWholeSelection() noexcept {
 	InvalidateSelection(sel.RangeMain(), true);
 }
 
@@ -804,7 +804,7 @@ bool Editor::RangeContainsProtected(Sci::Position start, Sci::Position end) cons
 	return false;
 }
 
-bool Editor::SelectionContainsProtected() const {
+bool Editor::SelectionContainsProtected() const noexcept {
 	for (size_t r = 0; r < sel.Count(); r++) {
 		if (RangeContainsProtected(sel.Range(r).Start().Position(),
 			sel.Range(r).End().Position())) {
@@ -817,11 +817,11 @@ bool Editor::SelectionContainsProtected() const {
 /**
  * Asks document to find a good position and then moves out of any invisible positions.
  */
-Sci::Position Editor::MovePositionOutsideChar(Sci::Position pos, Sci::Position moveDir, bool checkLineEnd) const {
+Sci::Position Editor::MovePositionOutsideChar(Sci::Position pos, Sci::Position moveDir, bool checkLineEnd) const noexcept {
 	return MovePositionOutsideChar(SelectionPosition(pos), moveDir, checkLineEnd).Position();
 }
 
-SelectionPosition Editor::MovePositionOutsideChar(SelectionPosition pos, Sci::Position moveDir, bool checkLineEnd) const {
+SelectionPosition Editor::MovePositionOutsideChar(SelectionPosition pos, Sci::Position moveDir, bool checkLineEnd) const noexcept {
 	const Sci::Position posMoved = pdoc->MovePositionOutsideChar(pos.Position(), moveDir, checkLineEnd);
 	if (posMoved != pos.Position())
 		pos.SetPosition(posMoved);
@@ -911,7 +911,7 @@ void Editor::MovePositionTo(Sci::Position newPos, Selection::selTypes selt, bool
 	MovePositionTo(SelectionPosition(newPos), selt, ensureVisible);
 }
 
-SelectionPosition Editor::MovePositionSoVisible(SelectionPosition pos, int moveDir) {
+SelectionPosition Editor::MovePositionSoVisible(SelectionPosition pos, int moveDir) noexcept {
 	pos = ClampPositionIntoDocument(pos);
 	pos = MovePositionOutsideChar(pos, moveDir);
 	const Sci::Line lineDoc = pdoc->SciLineFromPosition(pos.Position());
@@ -932,7 +932,7 @@ SelectionPosition Editor::MovePositionSoVisible(SelectionPosition pos, int moveD
 	}
 }
 
-SelectionPosition Editor::MovePositionSoVisible(Sci::Position pos, int moveDir) {
+SelectionPosition Editor::MovePositionSoVisible(Sci::Position pos, int moveDir) noexcept {
 	return MovePositionSoVisible(SelectionPosition(pos), moveDir);
 }
 
@@ -996,7 +996,7 @@ void Editor::HorizontalScrollTo(int xPos) {
 	}
 }
 
-void Editor::VerticalCentreCaret() {
+void Editor::VerticalCentreCaret() noexcept {
 	const Sci::Line lineDoc =
 		pdoc->SciLineFromPosition(sel.IsRectangular() ? sel.Rectangular().caret.Position() : sel.MainCaret());
 	const Sci::Line lineDisplay = pcs->DisplayFromDoc(lineDoc);
@@ -2209,7 +2209,7 @@ void Editor::PasteRectangular(SelectionPosition pos, const char *ptr, Sci::Posit
 	SetEmptySelection(pos);
 }
 
-bool Editor::CanPaste() {
+bool Editor::CanPaste() noexcept {
 	return !pdoc->IsReadOnly() && !SelectionContainsProtected();
 }
 
@@ -4116,7 +4116,7 @@ Sci::Position Editor::FindText(
  * while still setting the selection to found text so the find/select
  * operation is self-contained.
  */
-void Editor::SearchAnchor() {
+void Editor::SearchAnchor() noexcept {
 	searchAnchor = SelectionStart().Position();
 }
 
@@ -4386,7 +4386,7 @@ void Editor::DropAt(SelectionPosition position, const char *value, bool moving, 
 /**
  * @return true if given position is inside the selection,
  */
-bool Editor::PositionInSelection(Sci::Position pos) {
+bool Editor::PositionInSelection(Sci::Position pos) noexcept {
 	pos = MovePositionOutsideChar(pos, sel.MainCaret() - pos);
 	for (size_t r = 0; r < sel.Count(); r++) {
 		if (sel.Range(r).Contains(pos))
@@ -4719,7 +4719,7 @@ void Editor::RightButtonDownWithModifiers(Point pt, unsigned int, int modifiers)
 		return;
 }
 
-bool Editor::PositionIsHotspot(Sci::Position position) const {
+bool Editor::PositionIsHotspot(Sci::Position position) const noexcept {
 	return vs.styles[pdoc->StyleIndexAt(position)].hotspot;
 }
 
@@ -4730,7 +4730,7 @@ bool Editor::PointIsHotspot(Point pt) {
 	return PositionIsHotspot(pos);
 }
 
-void Editor::SetHoverIndicatorPosition(Sci::Position position) {
+void Editor::SetHoverIndicatorPosition(Sci::Position position) noexcept {
 	const Sci::Position hoverIndicatorPosPrev = hoverIndicatorPos;
 	hoverIndicatorPos = INVALID_POSITION;
 	if (!vs.indicatorsDynamic)
@@ -5785,7 +5785,7 @@ sptr_t Editor::StyleGetMessage(unsigned int iMessage, uptr_t wParam, sptr_t lPar
 	return 0;
 }
 
-void Editor::SetSelectionNMessage(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
+void Editor::SetSelectionNMessage(unsigned int iMessage, uptr_t wParam, sptr_t lParam) noexcept {
 	InvalidateRange(sel.Range(wParam).Start().Position(), sel.Range(wParam).End().Position());
 
 	switch (iMessage) {

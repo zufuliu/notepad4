@@ -86,17 +86,17 @@ public:
 	void TentativeStart() noexcept;
 	void TentativeCommit() noexcept;
 	bool TentativeActive() const noexcept;
-	int TentativeSteps();
+	int TentativeSteps() noexcept;
 
 	/// To perform an undo, StartUndo is called to retrieve the number of steps, then UndoStep is
 	/// called that many times. Similarly for redo.
 	bool CanUndo() const noexcept;
-	int StartUndo();
-	const Action &GetUndoStep() const;
+	int StartUndo() noexcept;
+	const Action &GetUndoStep() const noexcept;
 	void CompletedUndoStep() noexcept;
 	bool CanRedo() const noexcept;
-	int StartRedo();
-	const Action &GetRedoStep() const;
+	int StartRedo() noexcept;
+	const Action &GetRedoStep() const noexcept;
 	void CompletedRedoStep() noexcept;
 };
 
@@ -190,7 +190,7 @@ public:
 	void TentativeStart() noexcept;
 	void TentativeCommit() noexcept;
 	bool TentativeActive() const noexcept;
-	int TentativeSteps();
+	int TentativeSteps() noexcept;
 
 	bool SetUndoCollection(bool collectUndo) noexcept;
 	bool IsCollectingUndo() const noexcept;
@@ -202,12 +202,12 @@ public:
 	/// To perform an undo, StartUndo is called to retrieve the number of steps, then UndoStep is
 	/// called that many times. Similarly for redo.
 	bool CanUndo() const noexcept;
-	int StartUndo();
-	const Action &GetUndoStep() const;
+	int StartUndo() noexcept;
+	const Action &GetUndoStep() const noexcept;
 	void PerformUndoStep();
 	bool CanRedo() const noexcept;
-	int StartRedo();
-	const Action &GetRedoStep() const;
+	int StartRedo() noexcept;
+	const Action &GetRedoStep() const noexcept;
 	void PerformRedoStep();
 };
 

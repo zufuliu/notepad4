@@ -54,7 +54,11 @@ public:
 	bool AllSameAs(STYLE value) const noexcept;
 	DISTANCE Find(STYLE value, DISTANCE start) const noexcept;
 
+#ifdef CHECK_CORRECTNESS
 	void Check() const;
+#else
+	void Check() const noexcept {}
+#endif
 };
 
 }

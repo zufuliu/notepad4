@@ -174,7 +174,7 @@ void MarginView::RefreshPixMaps(Surface *surfaceWindow, WindowID wid, const View
 	}
 }
 
-static int SubstituteMarkerIfEmpty(int markerCheck, int markerDefault, const ViewStyle &vs) {
+static int SubstituteMarkerIfEmpty(int markerCheck, int markerDefault, const ViewStyle &vs) noexcept {
 	if (vs.markers[markerCheck].markType == SC_MARK_EMPTY)
 		return markerDefault;
 	return markerCheck;
