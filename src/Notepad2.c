@@ -1714,6 +1714,8 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	Style_DetectBaseFontSize(hwnd);
 
 	// Setup edit control
+	// create edit control and frame with zero size to avoid
+	// a white/black window fades out on startup when using Direct2D.
 	hwndEdit = EditCreate(hwnd);
 	efrData.hwnd = hwndEdit;
 
@@ -1722,7 +1724,7 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 						WC_LISTVIEW,
 						NULL,
 						WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN,
-						0, 0, 100, 100,
+						0, 0, 0, 0,
 						hwnd,
 						(HMENU)IDC_EDITFRAME,
 						hInstance,
