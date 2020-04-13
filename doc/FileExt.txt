@@ -1,12 +1,14 @@
-Default Text
+Text File
 	txt
 	text
 	wtx				Text Document
-	log
-	asc				PGP ASCII Armored File
 	doc
 
 	Readme[.*]
+
+2nd Text File
+	log
+	asc				PGP ASCII Armored File
 
 C/C++ Source
 	c
