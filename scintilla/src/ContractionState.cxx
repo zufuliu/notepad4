@@ -100,7 +100,11 @@ public:
 
 	void ShowAll() noexcept override;
 
+#ifdef CHECK_CORRECTNESS
 	void Check() const noexcept;
+#else
+	void Check() const noexcept {}
+#endif
 };
 
 template <typename LINE>
@@ -468,9 +472,9 @@ void ContractionState<LINE>::ShowAll() noexcept {
 
 // Debugging checks
 
+#ifdef CHECK_CORRECTNESS
 template <typename LINE>
 void ContractionState<LINE>::Check() const noexcept {
-#ifdef CHECK_CORRECTNESS
 	for (Sci::Line vline = 0; vline < LinesDisplayed(); vline++) {
 		const Sci::Line lineDoc = DocFromDisplay(vline);
 		PLATFORM_ASSERT(GetVisible(lineDoc));
@@ -486,8 +490,8 @@ void ContractionState<LINE>::Check() const noexcept {
 			PLATFORM_ASSERT(0 == height);
 		}
 	}
-#endif
 }
+#endif
 
 }
 

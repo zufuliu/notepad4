@@ -211,14 +211,16 @@ public:
 		return partition + 1;
 	}
 
-	void Check() const {
 #ifdef CHECK_CORRECTNESS
+	void Check() const {
 		starts->Check();
 		if (starts->Partitions() != values->Length() - 1) {
 			throw std::runtime_error("SparseVector: Partitions and values different lengths.");
 		}
-#endif
 	}
+#else
+	void Check() const noexcept {}
+#endif
 };
 
 }
