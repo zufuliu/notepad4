@@ -20,20 +20,24 @@ private:
 	std::unique_ptr<Partitioning<Sci::Position>> starts;
 	std::unique_ptr<SplitVector<T>> values;
 	T empty;	// Return from ValueAt when no element at a position.
+
 	void ClearValue(Sci::Position partition) noexcept {
 		values->SetValueAt(partition, T());
 	}
+
 public:
 	SparseVector() : empty() {
 		starts = std::make_unique<Partitioning<Sci::Position>>(8);
 		values = std::make_unique<SplitVector<T>>();
 		values->InsertEmpty(0, 2);
 	}
+
 	// Deleted so SparseVector objects can not be copied.
 	SparseVector(const SparseVector &) = delete;
 	SparseVector(SparseVector &&) = delete;
 	void operator=(const SparseVector &) = delete;
 	void operator=(SparseVector &&) = delete;
+
 	~SparseVector() {
 		starts.reset();
 		// starts dead here but not used by ClearValue.
@@ -42,15 +46,19 @@ public:
 		}
 		values.reset();
 	}
+
 	Sci::Position Length() const noexcept {
 		return starts->PositionFromPartition(starts->Partitions());
 	}
+
 	Sci::Position Elements() const noexcept {
 		return starts->Partitions();
 	}
+
 	Sci::Position PositionOfElement(Sci::Position element) const noexcept {
 		return starts->PositionFromPartition(element);
 	}
+
 	Sci::Position ElementFromPosition(Sci::Position position) const noexcept {
 		if (position < Length()) {
 			return starts->PartitionFromPosition(position);
@@ -58,6 +66,7 @@ public:
 			return starts->Partitions();
 		}
 	}
+
 	const T& ValueAt(Sci::Position position) const noexcept {
 		assert(position <= Length());
 		const Sci::Position partition = ElementFromPosition(position);
@@ -68,6 +77,7 @@ public:
 			return empty;
 		}
 	}
+
 	template <typename ParamType>
 	void SetValueAt(Sci::Position position, ParamType &&value) {
 		assert(position <= Length());
@@ -96,6 +106,7 @@ public:
 			}
 		}
 	}
+
 	void InsertSpace(Sci::Position position, Sci::Position insertLength) {
 		assert(position <= Length());
 		const Sci::Position partition = starts->PartitionFromPosition(position);
@@ -122,6 +133,7 @@ public:
 			starts->InsertText(partition, insertLength);
 		}
 	}
+
 	void DeletePosition(Sci::Position position) {
 		assert(position < Length());
 		Sci::Position partition = starts->PartitionFromPosition(position);
@@ -152,6 +164,7 @@ public:
 		starts->InsertText(partition, -1);
 		Check();
 	}
+
 	void DeleteRange(Sci::Position position, Sci::Position deleteLength) {
 		// For now, delete elements in range - may want to leave value at start
 		// or combine onto position.
@@ -189,6 +202,7 @@ public:
 		}
 		Check();
 	}
+
 	Sci::Position IndexAfter(Sci::Position position) const noexcept {
 		assert(position < Length());
 		if (position < 0)
@@ -196,6 +210,7 @@ public:
 		const Sci::Position partition = starts->PartitionFromPosition(position);
 		return partition + 1;
 	}
+
 	void Check() const {
 #ifdef CHECK_CORRECTNESS
 		starts->Check();
