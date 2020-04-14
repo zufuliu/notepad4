@@ -201,8 +201,8 @@ public:
 		Allocate(body->GetGrowSize());
 	}
 
-	void Check() const {
 #ifdef CHECK_CORRECTNESS
+	void Check() const {
 		if (Length() < 0) {
 			throw std::runtime_error("Partitioning: Length can not be negative.");
 		}
@@ -225,8 +225,10 @@ public:
 				}
 			}
 		}
-#endif
 	}
+#else
+	void Check() const noexcept {}
+#endif
 };
 
 

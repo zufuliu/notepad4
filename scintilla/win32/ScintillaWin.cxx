@@ -1020,7 +1020,7 @@ sptr_t ScintillaWin::WndPaint() {
 	//ElapsedPeriod ep;
 
 	// Redirect assertions to debug output and save current state
-	const bool assertsPopup = Platform::ShowAssertionPopUps(false);
+	//const bool assertsPopup = Platform::ShowAssertionPopUps(false);
 	paintState = painting;
 	PAINTSTRUCT ps = {};
 
@@ -1049,7 +1049,7 @@ sptr_t ScintillaWin::WndPaint() {
 	paintState = notPainting;
 
 	// Restore debug output state
-	Platform::ShowAssertionPopUps(assertsPopup);
+	//Platform::ShowAssertionPopUps(assertsPopup);
 
 	//Platform::DebugPrintf("Paint took %g\n", ep.Duration());
 	return 0;
