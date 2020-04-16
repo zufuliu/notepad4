@@ -3886,6 +3886,7 @@ HTREEITEM Style_AddLexerToTreeView(HWND hwnd, PEDITLEXER pLex, DWORD iconFlags, 
 	return hParent;
 }
 
+#if 0
 //=============================================================================
 //
 // Style_AddLexerToListView()
@@ -3913,6 +3914,7 @@ void Style_AddLexerToListView(HWND hwnd, PEDITLEXER pLex, DWORD iconFlags) {
 
 	ListView_InsertItem(hwnd, &lvi);
 }
+#endif
 
 struct StyleConfigDlgParam {
 	HFONT hFontTitle;
