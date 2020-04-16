@@ -1224,7 +1224,7 @@ BOOL IsUTF8(const char *pTest, DWORD nLength) {
 			const uint64_t val = *temp;
 			if (val & UINT64_C(0x8080808080808080)) {
 #if 0
-				pt = (const uint8_t *)temp
+				pt = (const uint8_t *)temp;
 				state = utf8_dfa[256 + state + utf8_dfa[pt[0]]];
 				state = utf8_dfa[256 + state + utf8_dfa[pt[1]]];
 				state = utf8_dfa[256 + state + utf8_dfa[pt[2]]];
@@ -1259,7 +1259,7 @@ BOOL IsUTF8(const char *pTest, DWORD nLength) {
 			const uint32_t val = *temp;
 			if (val & 0x80808080U) {
 #if 0
-				pt = (const uint8_t *)temp
+				pt = (const uint8_t *)temp;
 				state = utf8_dfa[256 + state + utf8_dfa[pt[0]]];
 				state = utf8_dfa[256 + state + utf8_dfa[pt[1]]];
 				state = utf8_dfa[256 + state + utf8_dfa[pt[2]]];
