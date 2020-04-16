@@ -868,7 +868,9 @@ bool CellBuffer::UTF8IsCharacterBoundary(Sci::Position position) const {
 
 void CellBuffer::ResetLineEnds() {
 	// Reinitialize line data -- too much work to preserve
+	const Sci::Line lineCount = plv->Lines();
 	plv->Init();
+	plv->SetInitLineCount(lineCount);
 
 	constexpr Sci::Position position = 0;
 	const Sci::Position length = Length();
