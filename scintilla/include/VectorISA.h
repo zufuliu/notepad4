@@ -54,13 +54,23 @@
 	// TODO: Function Multiversioning https://gcc.gnu.org/wiki/FunctionMultiVersioning
 #endif
 
+#if NP2_USE_AVX2
+#define NP2_ALIGNED_LOAD_ALIGNMENT	sizeof(__m256i)
+#elif NP2_USE_SSE2
+#define NP2_ALIGNED_LOAD_ALIGNMENT	sizeof(__m128i)
+#elif defined(_WIN64)
+#define NP2_ALIGNED_LOAD_ALIGNMENT	sizeof(uint64_t)
+#else
+#define NP2_ALIGNED_LOAD_ALIGNMENT	sizeof(uint32_t)
+#endif
+
 // for C++20, use functions from <bit> header.
 
 // count trailing zero bits
 #if defined(__clang__) || defined(__GNUC__)
 	#define np2_ctz		__builtin_ctz
 #elif defined(_MSC_VER) && !(NP2_TARGET_ARM64 || NP2_TARGET_ARM32)
-	//! NOTE: TZCNT is compatible with BSF; but LZCNT is not, LZCNT = 31 - BSR.
+	//! NOTE: TZCNT is compatible with BSF; but LZCNT is not compatible with BSR, LZCNT = 31 - BSR.
 	#define np2_ctz		_tzcnt_u32
 #else
 	static __forceinline uint32_t np2_ctz(uint32_t value) NP2_noexcept {

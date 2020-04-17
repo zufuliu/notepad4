@@ -1139,23 +1139,13 @@ BOOL IsUTF8(const char *pTest, DWORD nLength) {
 	UINT state = UTF8_ACCEPT;
 
 	{
-#if NP2_USE_AVX2
-#define ALIGNMENT	sizeof(__m256i)
-#elif NP2_USE_SSE2
-#define ALIGNMENT	sizeof(__m128i)
-#elif defined(_WIN64)
-#define ALIGNMENT	sizeof(uint64_t)
-#else
-#define ALIGNMENT	sizeof(uint32_t)
-#endif
-		const uint8_t * const ptr = (const uint8_t *)align_ptr_ex(pt, ALIGNMENT);
+		const uint8_t * const ptr = (const uint8_t *)align_ptr_ex(pt, NP2_ALIGNED_LOAD_ALIGNMENT);
 		while (pt < ptr) {
 			state = utf8_dfa[256 + state + utf8_dfa[*pt++]];
 		}
 		if (state == UTF8_REJECT) {
 			return FALSE;
 		}
-#undef ALIGNMENT
 	}
 
 	{
@@ -1285,23 +1275,13 @@ BOOL IsUTF7(const char *pTest, DWORD nLength) {
 	const uint8_t * const end = pt + nLength;
 
 	{
-#if NP2_USE_AVX2
-#define ALIGNMENT	sizeof(__m256i)
-#elif NP2_USE_SSE2
-#define ALIGNMENT	sizeof(__m128i)
-#elif defined(_WIN64)
-#define ALIGNMENT	sizeof(uint64_t)
-#else
-#define ALIGNMENT	sizeof(uint32_t)
-#endif
-		const uint8_t * const ptr = (const uint8_t *)align_ptr_ex(pt, ALIGNMENT);
+		const uint8_t * const ptr = (const uint8_t *)align_ptr_ex(pt, NP2_ALIGNED_LOAD_ALIGNMENT);
 		while (pt < ptr && (*pt & 0x80) == 0) {
 			++pt;
 		}
 		if (pt != ptr) {
 			return FALSE;
 		}
-#undef ALIGNMENT
 	}
 
 	{
