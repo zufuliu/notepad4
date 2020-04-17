@@ -1097,14 +1097,7 @@ void CellBuffer::BasicInsertString(const Sci::Position position, const char * co
 				simpleInsertion = false;
 				Sci::Position offset = position + ptr - s;
 				do {
-#if defined(__clang__) || defined(__GNUC__)
-					const int trailing = __builtin_ctz(maskLF);
-#elif defined(_MSC_VER)
-					const uint32_t trailing = _tzcnt_u32(maskLF);
-#else
-					unsigned long trailing;
-					_BitScanForward(&trailing, maskLF);
-#endif
+					const uint32_t trailing = np2_ctz(maskLF);
 					maskLF >>= trailing;
 					//! shift 32 bit is undefined behavior: (0x80000000 >> 32) == 0x80000000.
 					maskLF >>= 1;
@@ -1163,14 +1156,7 @@ void CellBuffer::BasicInsertString(const Sci::Position position, const char * co
 				simpleInsertion = false;
 				Sci::Position offset = position + ptr - s;
 				do {
-#if defined(__clang__) || defined(__GNUC__)
-					const int trailing = __builtin_ctz(maskLF);
-#elif defined(_MSC_VER)
-					const uint32_t trailing = _tzcnt_u32(maskLF);
-#else
-					unsigned long trailing;
-					_BitScanForward(&trailing, maskLF);
-#endif
+					const uint32_t trailing = np2_ctz(maskLF);
 					maskLF >>= trailing;
 					//! shift 32 bit is undefined behavior: (0x80000000 >> 32) == 0x80000000.
 					maskLF >>= 1;

@@ -426,31 +426,6 @@ BOOL EditCopyAppend(HWND hwnd) {
 	return succ;
 }
 
-// https://docs.microsoft.com/en-us/cpp/intrinsics/popcnt16-popcnt-popcnt64
-// use __popcnt() or _mm_popcnt_u32() require testing __cpuid():
-/*
-* int cpuInfo[4];
-* __cpuid(cpuInfo, 0x00000001);
-* const BOOL cpuPOPCNT = cpuInfo[2] & (1 << 23);
-*/
-// https://graphics.stanford.edu/~seander/bithacks.html#CountBitsSetParallel
-// Bit Twiddling Hacks copyright 1997-2005 Sean Eron Anderson
-#if !defined(__clang__) && !defined(__GNUC__)
-static __forceinline unsigned int bth_popcount(unsigned int v) {
-	v = v - ((v >> 1) & 0x55555555U);
-	v = (v & 0x33333333U) + ((v >> 2) & 0x33333333U);
-	return (((v + (v >> 4)) & 0x0F0F0F0FU) * 0x01010101U) >> 24;
-}
-#endif
-#if defined(__clang__) || defined(__GNUC__)
-#define np2_popcount	__builtin_popcount
-#elif NP2_USE_AVX2
-#define np2_popcount	_mm_popcnt_u32
-#else
-//#define np2_popcount	__popcnt
-#define np2_popcount	bth_popcount
-#endif
-
 //=============================================================================
 //
 // EditDetectEOLMode()
