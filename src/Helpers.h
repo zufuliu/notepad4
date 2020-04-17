@@ -115,10 +115,11 @@ NP2_inline BOOL StrNCaseEqual(LPCWSTR s1, LPCWSTR s2, int cch) {
 	return _wcsnicmp(s1, s2, cch) == 0;
 }
 
-// str MUST NOT be NULL, can be empty
 NP2_inline BOOL StrToFloat(LPCWSTR str, float *value) {
 	LPWSTR end;
 #if defined(__USE_MINGW_STRTOX)
+	// Fix GCC warning when defined __USE_MINGW_ANSI_STDIO as 1:
+	// 'wcstof' is static but used in inline function 'StrToFloat' which is not static.
 	*value = __mingw_wcstof(str, &end);
 #else
 	*value = wcstof(str, &end);
@@ -138,7 +139,6 @@ NP2_inline BOOL CRTStrToInt64(LPCWSTR str, int64_t *value) {
 	return str != end;
 }
 
-// str MUST NOT be NULL, can be empty
 NP2_inline BOOL HexStrToInt(LPCWSTR str, int *value) {
 	LPWSTR end;
 	*value = (int)wcstol(str, &end, 16);
