@@ -1165,14 +1165,7 @@ BOOL IsUTF8(const char *pTest, DWORD nLength) {
 			const uint32_t mask = _mm256_movemask_epi8(chunk);
 			if (mask) {
 				// skip leading and trailing ASCII
-#if defined(__clang__) || defined(__GNUC__)
-				const int trailing = __builtin_ctz(mask);
-#elif defined(_MSC_VER)
-				const DWORD trailing = _tzcnt_u32(mask);
-#else
-				DWORD trailing;
-				_BitScanForward(&trailing, mask);
-#endif
+				const DWORD trailing = np2_ctz(mask);
 				DWORD leading;
 				_BitScanReverse(&leading, mask);
 
@@ -1194,14 +1187,7 @@ BOOL IsUTF8(const char *pTest, DWORD nLength) {
 			const uint32_t mask = _mm_movemask_epi8(chunk);
 			if (mask) {
 				// skip leading and trailing ASCII
-#if defined(__clang__) || defined(__GNUC__)
-				const int trailing = __builtin_ctz(mask);
-#elif defined(_MSC_VER)
-				const DWORD trailing = _tzcnt_u32(mask);
-#else
-				DWORD trailing;
-				_BitScanForward(&trailing, mask);
-#endif
+				const DWORD trailing = np2_ctz(mask);
 				DWORD leading;
 				_BitScanReverse(&leading, mask);
 

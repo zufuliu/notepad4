@@ -7,6 +7,14 @@
 #define NULL	nullptr
 #endif
 
+#ifndef NP2_noexcept
+	#if defined(__cplusplus)
+		#define NP2_noexcept noexcept
+	#else
+		#define NP2_noexcept
+	#endif
+#endif
+
 #if (defined(__GNUC__) || defined(__clang__)) && !defined(__cplusplus)
 // https://stackoverflow.com/questions/19452971/array-size-macro-that-rejects-pointers
 // trigger error for pointer: GCC: void value not ignored as it ought to be. Clang: invalid operands to binary expression.
