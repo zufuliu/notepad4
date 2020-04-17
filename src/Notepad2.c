@@ -176,7 +176,7 @@ int		iFileWatchingMode;
 int		iFileWatchingMethod;
 BOOL	bFileWatchingKeepAtEnd;
 BOOL	bResetFileWatching;
-static DWORD dwFileCheckInverval;
+static DWORD dwFileCheckInterval;
 static DWORD dwAutoReloadTimeout;
 static int iEscFunction;
 static BOOL bAlwaysOnTop;
@@ -6365,7 +6365,7 @@ void LoadFlags(void) {
 		tchFileDlgFilters = StrDup(strValue);
 	}
 
-	dwFileCheckInverval = IniSectionGetInt(pIniSection, L"FileCheckInverval", 1000);
+	dwFileCheckInterval = IniSectionGetInt(pIniSection, L"FileCheckInterval", 1000);
 	dwAutoReloadTimeout = IniSectionGetInt(pIniSection, L"AutoReloadTimeout", 1000);
 
 	flagNoFadeHidden = IniSectionGetBool(pIniSection, L"NoFadeHidden", 0);
@@ -7987,7 +7987,7 @@ void InstallFileWatching(LPCWSTR lpszFile) {
 			dwChangeNotifyTime = 0;
 		} else {
 			// No previous watching installed, so launch the timer first
-			SetTimer(NULL, ID_WATCHTIMER, dwFileCheckInverval, WatchTimerProc);
+			SetTimer(NULL, ID_WATCHTIMER, dwFileCheckInterval, WatchTimerProc);
 		}
 
 		WCHAR tchDirectory[MAX_PATH];
