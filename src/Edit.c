@@ -7172,20 +7172,20 @@ LRESULT CALLBACK SciThemedWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lP
 #define FOLD_CHILDREN SCMOD_CTRL
 #define FOLD_SIBLINGS SCMOD_SHIFT
 
-#define MAX_EDIT_TOGGLE_FOLD_LEVEL		126
+#define MAX_EDIT_TOGGLE_FOLD_LEVEL		126	// for Toggle Folds > Current Level
 // uint16_t is used because max fold level <= SC_FOLDLEVELNUMBERMASK - SC_FOLDLEVELBASE + 1
-struct EditFoldStack {
-	uint16_t level_count; // 1-based level number at current header line
-	uint16_t level_stack[MAX_EDIT_TOGGLE_FOLD_LEVEL + 1];
+struct FoldLevelStack {
+	uint16_t levelCount; // 1-based level number at current header line
+	uint16_t levelStack[MAX_EDIT_TOGGLE_FOLD_LEVEL + 1];
 };
 
-static void EditFoldStack_Push(struct EditFoldStack *foldStack, int level) {
-	while (foldStack->level_count != 0 && level <= foldStack->level_stack[foldStack->level_count - 1]) {
-		--foldStack->level_count;
+static void FoldLevelStack_Push(struct FoldLevelStack *levelStack, int level) {
+	while (levelStack->levelCount != 0 && level <= levelStack->levelStack[levelStack->levelCount - 1]) {
+		--levelStack->levelCount;
 	}
 
-	foldStack->level_stack[foldStack->level_count] = (uint16_t)level;
-	++foldStack->level_count;
+	levelStack->levelStack[levelStack->levelCount] = (uint16_t)level;
+	++levelStack->levelCount;
 }
 
 static inline BOOL IsFoldIndentationBased(int iLexer) {
@@ -7279,14 +7279,14 @@ void FoldToggleLevel(int lev, FOLD_ACTION action) {
 	Sci_Line line = 0;
 
 	if (IsFoldIndentationBased(pLexCurrent->iLexer)) {
-		struct EditFoldStack foldStack = { 0, { 0 }};
+		struct FoldLevelStack levelStack = { 0, { 0 }};
 		++lev;
 		while (line < lineCount) {
 			int level = SciCall_GetFoldLevel(line);
 			if (level & SC_FOLDLEVELHEADERFLAG) {
 				level &= SC_FOLDLEVELNUMBERMASK;
-				EditFoldStack_Push(&foldStack, level);
-				if (lev == foldStack.level_count) {
+				FoldLevelStack_Push(&levelStack, level);
+				if (lev == levelStack.levelCount) {
 					FoldToggleNode(line, &action, &fToggled);
 					line = SciCall_GetLastChild(line);
 				}
@@ -7378,13 +7378,13 @@ void FoldToggleDefault(FOLD_ACTION action) {
 	Sci_Line line = 0;
 
 	if (IsFoldIndentationBased(pLexCurrent->iLexer)) {
-		struct EditFoldStack foldStack = { 0, { 0 }};
+		struct FoldLevelStack levelStack = { 0, { 0 }};
 		while (line < lineCount) {
 			int level = SciCall_GetFoldLevel(line);
 			if (level & SC_FOLDLEVELHEADERFLAG) {
 				level &= SC_FOLDLEVELNUMBERMASK;
-				EditFoldStack_Push(&foldStack, level);
-				level = foldStack.level_count;
+				FoldLevelStack_Push(&levelStack, level);
+				level = levelStack.levelCount;
 				if (state & (1U << level)) {
 					FoldToggleNode(line, &action, &fToggled);
 					if (level == maxLevel) {
