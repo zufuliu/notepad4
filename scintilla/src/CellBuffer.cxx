@@ -1181,7 +1181,9 @@ void CellBuffer::BasicInsertString(const Sci::Position position, const char * co
 				maskLF |= maskCRLF | ((maskCR_LF ^ maskLF) >> 1);
 			}
 			if (maskLF) {
+#if !CellBuffer_InsertLine_CacheCount
 				simpleInsertion = false;
+#endif
 				Sci::Position offset = position + ptr - s;
 				do {
 					const uint32_t trailing = np2_ctz(maskLF);
@@ -1195,6 +1197,7 @@ void CellBuffer::BasicInsertString(const Sci::Position position, const char * co
 						plv->InsertLines(lineInsert, lineEndPos, lineCount, atLineStart);
 						lineInsert += lineCount;
 						lineCount = 0;
+						simpleInsertion = false;
 					}
 #else
 					InsertLine(lineInsert, offset, atLineStart);
@@ -1259,7 +1262,9 @@ void CellBuffer::BasicInsertString(const Sci::Position position, const char * co
 				maskLF |= maskCRLF | ((maskCR_LF ^ maskLF) >> 1);
 			}
 			if (maskLF) {
+#if !CellBuffer_InsertLine_CacheCount
 				simpleInsertion = false;
+#endif
 				Sci::Position offset = position + ptr - s;
 				do {
 					const uint32_t trailing = np2_ctz(maskLF);
@@ -1273,6 +1278,7 @@ void CellBuffer::BasicInsertString(const Sci::Position position, const char * co
 						plv->InsertLines(lineInsert, lineEndPos, lineCount, atLineStart);
 						lineInsert += lineCount;
 						lineCount = 0;
+						simpleInsertion = false;
 					}
 #else
 					InsertLine(lineInsert, offset, atLineStart);
