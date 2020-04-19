@@ -69,12 +69,12 @@ bool MarkerHandleSet::InsertHandle(int handle, int markerNum) {
 }
 
 void MarkerHandleSet::RemoveHandle(int handle) {
-	mhList.remove_if([handle](const MarkerHandleNumber &mhn) { return mhn.handle == handle; });
+	mhList.remove_if([handle](const MarkerHandleNumber &mhn) noexcept { return mhn.handle == handle; });
 }
 
 bool MarkerHandleSet::RemoveNumber(int markerNum, bool all) {
 	bool performedDeletion = false;
-	mhList.remove_if([&](const MarkerHandleNumber &mhn) {
+	mhList.remove_if([&](const MarkerHandleNumber &mhn) noexcept {
 		if ((all || !performedDeletion) && (mhn.number == markerNum)) {
 			performedDeletion = true;
 			return true;
