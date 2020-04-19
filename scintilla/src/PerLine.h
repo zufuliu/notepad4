@@ -57,6 +57,9 @@ public:
 	void Init() override;
 	bool IsActive() const noexcept override;
 	void InsertLine(Sci::Line line) override;
+#if EnablePerLine_InsertLines
+	void InsertLines(Sci::Line lineFirst, Sci::Line lineCount) override;
+#endif
 	void RemoveLine(Sci::Line line) override;
 
 	MarkerMask MarkValue(Sci::Line line) const noexcept;
@@ -83,6 +86,9 @@ public:
 	void Init() override;
 	bool IsActive() const noexcept override;
 	void InsertLine(Sci::Line line) override;
+#if EnablePerLine_InsertLines
+	void InsertLines(Sci::Line lineFirst, Sci::Line lineCount) override;
+#endif
 	void RemoveLine(Sci::Line line) override;
 
 	void ExpandLevels(Sci::Line sizeNew = -1);
@@ -104,6 +110,9 @@ public:
 	void Init() override;
 	bool IsActive() const noexcept override;
 	void InsertLine(Sci::Line line) override;
+#if EnablePerLine_InsertLines
+	void InsertLines(Sci::Line lineFirst, Sci::Line lineCount) override;
+#endif
 	void RemoveLine(Sci::Line line) override;
 
 	int SetLineState(Sci::Line line, int state, Sci::Line lines);
@@ -124,6 +133,9 @@ public:
 	void Init() override;
 	bool IsActive() const noexcept override;
 	void InsertLine(Sci::Line line) override;
+#if EnablePerLine_InsertLines
+	void InsertLines(Sci::Line lineFirst, Sci::Line lineCount) override;
+#endif
 	void RemoveLine(Sci::Line line) override;
 
 	bool MultipleStyles(Sci::Line line) const noexcept;
@@ -153,6 +165,9 @@ public:
 	void Init() override;
 	bool IsActive() const noexcept override;
 	void InsertLine(Sci::Line line) override;
+#if EnablePerLine_InsertLines
+	void InsertLines(Sci::Line lineFirst, Sci::Line lineCount) override;
+#endif
 	void RemoveLine(Sci::Line line) override;
 
 	bool ClearTabstops(Sci::Line line) noexcept;

@@ -186,6 +186,15 @@ void Document::InsertLine(Sci::Line line) {
 	}
 }
 
+#if EnablePerLine_InsertLines
+void Document::InsertLines(Sci::Line lineFirst, Sci::Line lineCount) {
+	for (const auto &pl : perLineData) {
+		if (pl)
+			pl->InsertLines(lineFirst, lineCount);
+	}
+}
+#endif
+
 void Document::RemoveLine(Sci::Line line) {
 	for (const auto &pl : perLineData) {
 		if (pl)
@@ -1208,6 +1217,7 @@ Sci::Position Document::InsertString(Sci::Position position, const char *s, Sci:
 	const Sci::Line prevLinesTotal = LinesTotal();
 	const bool startSavePoint = cb.IsSavePoint();
 	bool startSequence = false;
+#if Enable_WithoutPerLine
 	const char *text = nullptr;
 	if (insertLength > 1000 && !IsActive()) {
 		// avoid calling InsertLine() or RemoveLine()
@@ -1215,6 +1225,9 @@ Sci::Position Document::InsertString(Sci::Position position, const char *s, Sci:
 	} else {
 		text = cb.InsertString(position, s, insertLength, startSequence);
 	}
+#else
+	const char *text = cb.InsertString(position, s, insertLength, startSequence);
+#endif
 	if (startSavePoint && cb.IsCollectingUndo())
 		NotifySavePoint(!startSavePoint);
 	ModifiedAt(position);
