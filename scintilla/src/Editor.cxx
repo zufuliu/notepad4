@@ -1926,7 +1926,7 @@ void Editor::InsertCharacter(std::string_view sv, CharacterSource charSource) {
 		}
 		// Order selections by position in document.
 		std::sort(selPtrs.begin(), selPtrs.end(),
-			[](const SelectionRange *a, const SelectionRange *b) noexcept {return *a < *b; });
+			[](const SelectionRange *a, const SelectionRange *b) noexcept { return *a < *b; });
 
 		// Loop in reverse to avoid disturbing positions of selections yet to be processed.
 		for (auto rit = selPtrs.rbegin(); rit != selPtrs.rend(); ++rit) {

@@ -319,7 +319,7 @@ size_t ScreenLine::Length() const noexcept {
 size_t ScreenLine::RepresentationCount() const {
 	return std::count_if(&ll->bidiData->widthReprs[start],
 		&ll->bidiData->widthReprs[start + len],
-		[](XYPOSITION w) noexcept {return w > 0.0f; });
+		[](XYPOSITION w) noexcept { return w > 0.0f; });
 }
 
 XYPOSITION ScreenLine::Width() const noexcept {
