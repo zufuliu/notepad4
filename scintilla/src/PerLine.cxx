@@ -104,6 +104,14 @@ void LineMarkers::InsertLine(Sci::Line line) {
 	}
 }
 
+#if EnablePerLine_InsertLines
+void LineMarkers::InsertLines(Sci::Line lineFirst, Sci::Line lineCount) {
+	if (markers.Length()) {
+		markers.InsertEmpty(lineFirst, lineCount);
+	}
+}
+#endif
+
 void LineMarkers::RemoveLine(Sci::Line line) {
 	// Retain the markers from the deleted line by oring them into the previous line
 	if (markers.Length()) {
@@ -224,9 +232,26 @@ bool LineLevels::IsActive() const noexcept {
 void LineLevels::InsertLine(Sci::Line line) {
 	if (levels.Length()) {
 		const int level = (line < levels.Length()) ? levels[line] : SC_FOLDLEVELBASE;
-		levels.InsertValue(line, 1, level);
+		levels.EnsureLength(line);
+		levels.Insert(line, level);
 	}
 }
+
+#if EnablePerLine_InsertLines
+void LineLevels::InsertLines(Sci::Line lineFirst, Sci::Line lineCount) {
+	if (levels.Length()) {
+		const Sci::Line lineLast = lineFirst + lineCount;
+		lineCount = std::min(lineLast, levels.Length());
+		levels.EnsureLength(lineLast);
+		for (Sci::Line line = lineFirst; line < lineLast; line++) {
+			levels.Insert(line, levels[line]);
+		}
+		if (lineCount != lineLast) {
+			levels.InsertValue(lineCount, lineLast - lineCount, SC_FOLDLEVELBASE);
+		}
+	}
+}
+#endif
 
 void LineLevels::RemoveLine(Sci::Line line) {
 	if (levels.Length()) {
@@ -289,6 +314,22 @@ void LineState::InsertLine(Sci::Line line) {
 		lineStates.Insert(line, val);
 	}
 }
+
+#if EnablePerLine_InsertLines
+void LineState::InsertLines(Sci::Line lineFirst, Sci::Line lineCount) {
+	if (lineStates.Length()) {
+		const Sci::Line lineLast = lineFirst + lineCount;
+		lineCount = std::min(lineLast, lineStates.Length());
+		lineStates.EnsureLength(lineLast);
+		for (Sci::Line line = lineFirst; line < lineLast; line++) {
+			lineStates.Insert(line, lineStates[line]);
+		}
+		if (lineCount != lineLast) {
+			lineStates.InsertValue(lineCount, lineLast - lineCount, 0);
+		}
+	}
+}
+#endif
 
 void LineState::RemoveLine(Sci::Line line) {
 	if (lineStates.Length() > line) {
@@ -355,6 +396,16 @@ void LineAnnotation::InsertLine(Sci::Line line) {
 		annotations.Insert(line, std::unique_ptr<char[]>());
 	}
 }
+
+#if EnablePerLine_InsertLines
+void LineAnnotation::InsertLines(Sci::Line lineFirst, Sci::Line lineCount) {
+	if (annotations.Length()) {
+		const Sci::Line lineLast = lineFirst + lineCount;
+		annotations.EnsureLength(lineLast);
+		annotations.InsertEmpty(lineFirst, lineCount);
+	}
+}
+#endif
 
 void LineAnnotation::RemoveLine(Sci::Line line) {
 	if (annotations.Length() && (line > 0) && (line <= annotations.Length())) {
@@ -475,6 +526,15 @@ void LineTabstops::InsertLine(Sci::Line line) {
 		tabstops.Insert(line, nullptr);
 	}
 }
+
+#if EnablePerLine_InsertLines
+void LineTabstops::InsertLines(Sci::Line lineFirst, Sci::Line lineCount) {
+	if (tabstops.Length()) {
+		tabstops.EnsureLength(lineFirst + lineCount);
+		tabstops.InsertEmpty(lineFirst, lineCount);
+	}
+}
+#endif
 
 void LineTabstops::RemoveLine(Sci::Line line) {
 	if (tabstops.Length() > line) {

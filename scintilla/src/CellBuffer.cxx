@@ -214,6 +214,13 @@ public:
 			}
 		}
 		if (perLine) {
+#if EnablePerLine_InsertLines
+			lineCount -= lineStart;
+			if ((lineFirst > 0) && lineStart) {
+				lineFirst--;
+			}
+			perLine->InsertLines(lineFirst, lineCount);
+#else
 			if ((lineFirst > 0) && lineStart) {
 				lineFirst--;
 				lineCount--;
@@ -221,6 +228,7 @@ public:
 			for (Sci::Line line = lineFirst; line < lineCount; line++) {
 				perLine->InsertLine(line);
 			}
+#endif
 		}
 	}
 #endif
@@ -1369,7 +1377,8 @@ void CellBuffer::BasicInsertString(const Sci::Position position, const char * co
 #endif
 
 	//const double duration = period.Duration()*1e3;
-	//printf("%s avx2=%d, cache=%d, duration=%f\n", __func__, NP2_USE_AVX2, CellBuffer_InsertLine_CacheCount, duration);
+	//printf("%s avx2=%d, cache=%d, perLine=%d/%d, duration=%f\n", __func__, NP2_USE_AVX2,
+	//	CellBuffer_InsertLine_CacheCount, Enable_WithoutPerLine, EnablePerLine_InsertLines, duration);
 
 	// Joining two lines where last insertion is cr and following substance starts with lf
 	if (chAfter == '\n') {
