@@ -186,14 +186,12 @@ void Document::InsertLine(Sci::Line line) {
 	}
 }
 
-#if EnablePerLine_InsertLines
 void Document::InsertLines(Sci::Line lineFirst, Sci::Line lineCount) {
 	for (const auto &pl : perLineData) {
 		if (pl)
 			pl->InsertLines(lineFirst, lineCount);
 	}
 }
-#endif
 
 void Document::RemoveLine(Sci::Line line) {
 	for (const auto &pl : perLineData) {
