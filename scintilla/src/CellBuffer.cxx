@@ -74,9 +74,7 @@ public:
 	virtual void SetPerLine(PerLine *pl) noexcept = 0;
 	virtual void InsertText(Sci::Line line, Sci::Position delta) noexcept = 0;
 	virtual void InsertLine(Sci::Line line, Sci::Position position, bool lineStart) = 0;
-#if CellBuffer_InsertLine_CacheCount
 	virtual void InsertLines(Sci::Line line, const Sci::Position *positions, size_t lines, bool lineStart) = 0;
-#endif
 	virtual void SetLineStart(Sci::Line line, Sci::Position position) noexcept = 0;
 	virtual void RemoveLine(Sci::Line line) = 0;
 	virtual Sci::Line Lines() const noexcept = 0;
@@ -203,7 +201,6 @@ public:
 			perLine->InsertLine(line);
 		}
 	}
-#if CellBuffer_InsertLine_CacheCount
 	void InsertLines(Sci::Line line, const Sci::Position *positions, size_t lines, bool lineStart) override {
 		const POS lineAsPos = static_cast<POS>(line);
 		if constexpr (sizeof(Sci::Position) == sizeof(POS)) {
@@ -226,7 +223,6 @@ public:
 			perLine->InsertLines(line, lines);
 		}
 	}
-#endif
 	void SetLineStart(Sci::Line line, Sci::Position position) noexcept override {
 		starts.SetPartitionStartPosition(static_cast<POS>(line), static_cast<POS>(position));
 	}
@@ -1029,10 +1025,8 @@ void CellBuffer::BasicInsertString(const Sci::Position position, const char * co
 	}
 
 	//ElapsedPeriod period;
-#if CellBuffer_InsertLine_CacheCount
 	Sci::Position lineEndPos[CellBuffer_InsertLine_CacheCount];
 	Sci::Line lineCount = 0;
-#endif
 
 	unsigned char ch;
 	if (utf8LineEnds || insertLength < 32 + 2) {
@@ -1056,7 +1050,6 @@ void CellBuffer::BasicInsertString(const Sci::Position position, const char * co
 				}
 				[[fallthrough]];
 			case '\n':
-#if CellBuffer_InsertLine_CacheCount
 				lineEndPos[lineCount++] = position + ptr - s;
 				if (lineCount == CellBuffer_InsertLine_CacheCount) {
 					plv->InsertLines(lineInsert, lineEndPos, lineCount, atLineStart);
@@ -1064,17 +1057,11 @@ void CellBuffer::BasicInsertString(const Sci::Position position, const char * co
 					lineCount = 0;
 					simpleInsertion = false;
 				}
-#else
-				InsertLine(lineInsert, (position + ptr - s), atLineStart);
-				lineInsert++;
-				simpleInsertion = false;
-#endif
 				break;
 			default:
 				if (utf8LineEnds) {
 					const unsigned char back3[3] = { chBeforePrev, chPrev, ch };
 					if (UTF8IsSeparator(back3) || UTF8IsNEL(back3 + 1)) {
-#if CellBuffer_InsertLine_CacheCount
 						lineEndPos[lineCount++] = position + ptr - s;
 						if (lineCount == CellBuffer_InsertLine_CacheCount) {
 							plv->InsertLines(lineInsert, lineEndPos, lineCount, atLineStart);
@@ -1082,11 +1069,6 @@ void CellBuffer::BasicInsertString(const Sci::Position position, const char * co
 							lineCount = 0;
 							simpleInsertion = false;
 						}
-#else
-						InsertLine(lineInsert, (position + ptr - s), atLineStart);
-						lineInsert++;
-						simpleInsertion = false;
-#endif
 					}
 				}
 				break;
@@ -1099,7 +1081,6 @@ void CellBuffer::BasicInsertString(const Sci::Position position, const char * co
 		if (ptr == end) {
 			++ptr;
 			if (ch == '\r' || ch == '\n') {
-#if CellBuffer_InsertLine_CacheCount
 				lineEndPos[lineCount++] = position + ptr - s;
 				if (lineCount == CellBuffer_InsertLine_CacheCount) {
 					plv->InsertLines(lineInsert, lineEndPos, lineCount, atLineStart);
@@ -1107,15 +1088,9 @@ void CellBuffer::BasicInsertString(const Sci::Position position, const char * co
 					lineCount = 0;
 					simpleInsertion = false;
 				}
-#else
-				InsertLine(lineInsert, (position + ptr - s), atLineStart);
-				lineInsert++;
-				simpleInsertion = false;
-#endif
 			} else if (utf8LineEnds) {
 				const unsigned char back3[3] = { chBeforePrev, chPrev, ch };
 				if (UTF8IsSeparator(back3) || UTF8IsNEL(back3 + 1)) {
-#if CellBuffer_InsertLine_CacheCount
 					lineEndPos[lineCount++] = position + ptr - s;
 					if (lineCount == CellBuffer_InsertLine_CacheCount) {
 						plv->InsertLines(lineInsert, lineEndPos, lineCount, atLineStart);
@@ -1123,11 +1098,6 @@ void CellBuffer::BasicInsertString(const Sci::Position position, const char * co
 						lineCount = 0;
 						simpleInsertion = false;
 					}
-#else
-					InsertLine(lineInsert, (position + ptr - s), atLineStart);
-					lineInsert++;
-					simpleInsertion = false;
-#endif
 				}
 			}
 		}
@@ -1181,9 +1151,6 @@ void CellBuffer::BasicInsertString(const Sci::Position position, const char * co
 				maskLF |= maskCRLF | ((maskCR_LF ^ maskLF) >> 1);
 			}
 			if (maskLF) {
-#if !CellBuffer_InsertLine_CacheCount
-				simpleInsertion = false;
-#endif
 				Sci::Position offset = position + ptr - s;
 				do {
 					const uint32_t trailing = np2_ctz(maskLF);
@@ -1191,7 +1158,6 @@ void CellBuffer::BasicInsertString(const Sci::Position position, const char * co
 					//! shift 32 bit is undefined behavior: (0x80000000 >> 32) == 0x80000000.
 					maskLF >>= 1;
 					offset += trailing + 1;
-#if CellBuffer_InsertLine_CacheCount
 					lineEndPos[lineCount++] = offset;
 					if (lineCount == CellBuffer_InsertLine_CacheCount) {
 						plv->InsertLines(lineInsert, lineEndPos, lineCount, atLineStart);
@@ -1199,16 +1165,11 @@ void CellBuffer::BasicInsertString(const Sci::Position position, const char * co
 						lineCount = 0;
 						simpleInsertion = false;
 					}
-#else
-					InsertLine(lineInsert, offset, atLineStart);
-					lineInsert++;
-#endif
 				} while (maskLF);
 			}
 
 			ptr = next;
 			if (lastCR) {
-#if CellBuffer_InsertLine_CacheCount
 				lineEndPos[lineCount++] = position + ptr - s;
 				if (lineCount == CellBuffer_InsertLine_CacheCount) {
 					plv->InsertLines(lineInsert, lineEndPos, lineCount, atLineStart);
@@ -1216,11 +1177,6 @@ void CellBuffer::BasicInsertString(const Sci::Position position, const char * co
 					lineCount = 0;
 					simpleInsertion = false;
 				}
-#else
-				InsertLine(lineInsert, (position + ptr - s), atLineStart);
-				lineInsert++;
-				simpleInsertion = false;
-#endif
 			}
 		}
 
@@ -1262,9 +1218,6 @@ void CellBuffer::BasicInsertString(const Sci::Position position, const char * co
 				maskLF |= maskCRLF | ((maskCR_LF ^ maskLF) >> 1);
 			}
 			if (maskLF) {
-#if !CellBuffer_InsertLine_CacheCount
-				simpleInsertion = false;
-#endif
 				Sci::Position offset = position + ptr - s;
 				do {
 					const uint32_t trailing = np2_ctz(maskLF);
@@ -1272,7 +1225,6 @@ void CellBuffer::BasicInsertString(const Sci::Position position, const char * co
 					//! shift 32 bit is undefined behavior: (0x80000000 >> 32) == 0x80000000.
 					maskLF >>= 1;
 					offset += trailing + 1;
-#if CellBuffer_InsertLine_CacheCount
 					lineEndPos[lineCount++] = offset;
 					if (lineCount == CellBuffer_InsertLine_CacheCount) {
 						plv->InsertLines(lineInsert, lineEndPos, lineCount, atLineStart);
@@ -1280,16 +1232,11 @@ void CellBuffer::BasicInsertString(const Sci::Position position, const char * co
 						lineCount = 0;
 						simpleInsertion = false;
 					}
-#else
-					InsertLine(lineInsert, offset, atLineStart);
-					lineInsert++;
-#endif
 				} while (maskLF);
 			}
 
 			ptr = next;
 			if (lastCR) {
-#if CellBuffer_InsertLine_CacheCount
 				lineEndPos[lineCount++] = position + ptr - s;
 				if (lineCount == CellBuffer_InsertLine_CacheCount) {
 					plv->InsertLines(lineInsert, lineEndPos, lineCount, atLineStart);
@@ -1297,11 +1244,6 @@ void CellBuffer::BasicInsertString(const Sci::Position position, const char * co
 					lineCount = 0;
 					simpleInsertion = false;
 				}
-#else
-				InsertLine(lineInsert, (position + ptr - s), atLineStart);
-				lineInsert++;
-				simpleInsertion = false;
-#endif
 			}
 		}
 
@@ -1322,7 +1264,6 @@ void CellBuffer::BasicInsertString(const Sci::Position position, const char * co
 				}
 				[[fallthrough]];
 			case 1: // '\n'
-#if CellBuffer_InsertLine_CacheCount
 				lineEndPos[lineCount++] = position + ptr - s;
 				if (lineCount == CellBuffer_InsertLine_CacheCount) {
 					plv->InsertLines(lineInsert, lineEndPos, lineCount, atLineStart);
@@ -1330,11 +1271,6 @@ void CellBuffer::BasicInsertString(const Sci::Position position, const char * co
 					lineCount = 0;
 					simpleInsertion = false;
 				}
-#else
-				InsertLine(lineInsert, (position + ptr - s), atLineStart);
-				lineInsert++;
-				simpleInsertion = false;
-#endif
 				break;
 			}
 		}
@@ -1343,7 +1279,6 @@ void CellBuffer::BasicInsertString(const Sci::Position position, const char * co
 		if (ptr == end) {
 			++ptr;
 			if (ch == '\r' || ch == '\n') {
-#if CellBuffer_InsertLine_CacheCount
 				lineEndPos[lineCount++] = position + ptr - s;
 				if (lineCount == CellBuffer_InsertLine_CacheCount) {
 					plv->InsertLines(lineInsert, lineEndPos, lineCount, atLineStart);
@@ -1351,22 +1286,15 @@ void CellBuffer::BasicInsertString(const Sci::Position position, const char * co
 					lineCount = 0;
 					simpleInsertion = false;
 				}
-#else
-				InsertLine(lineInsert, (position + ptr - s), atLineStart);
-				lineInsert++;
-				simpleInsertion = false;
-#endif
 			}
 		}
 	}
 
-#if CellBuffer_InsertLine_CacheCount
 	if (lineCount != 0) {
 		plv->InsertLines(lineInsert, lineEndPos, lineCount, atLineStart);
 		lineInsert += lineCount;
 		simpleInsertion = false;
 	}
-#endif
 
 	//const double duration = period.Duration()*1e3;
 	//printf("%s avx2=%d, cache=%d, perLine=%d, duration=%f\n", __func__, NP2_USE_AVX2,
