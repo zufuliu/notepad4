@@ -1120,7 +1120,7 @@ void CellBuffer::BasicInsertString(const Sci::Position position, const char * co
 		}
 
 #if NP2_USE_AVX2
-		#define LAST_CR_MASK	(1U << (sizeof(__m256i) - 1))
+		constexpr uint32_t LAST_CR_MASK = (1U << (sizeof(__m256i) - 1));
 		const __m256i vectCR = _mm256_set1_epi8('\r');
 		const __m256i vectLF = _mm256_set1_epi8('\n');
 		while (ptr + sizeof(__m256i) <= end) {
@@ -1179,11 +1179,9 @@ void CellBuffer::BasicInsertString(const Sci::Position position, const char * co
 				}
 			}
 		}
-
-		#undef LAST_CR_MASK
 		// end NP2_USE_AVX2
 #elif NP2_USE_SSE2
-		#define LAST_CR_MASK	(1U << (2*sizeof(__m128i) - 1))
+		constexpr uint32_t LAST_CR_MASK = (1U << (2*sizeof(__m128i) - 1));
 		const __m128i vectCR = _mm_set1_epi8('\r');
 		const __m128i vectLF = _mm_set1_epi8('\n');
 		while (ptr + 2*sizeof(__m128i) <= end) {
@@ -1246,8 +1244,6 @@ void CellBuffer::BasicInsertString(const Sci::Position position, const char * co
 				}
 			}
 		}
-
-		#undef LAST_CR_MASK
 		// end NP2_USE_SSE2
 #endif
 
@@ -1509,4 +1505,3 @@ void CellBuffer::PerformRedoStep() {
 	}
 	uh.CompletedRedoStep();
 }
-
