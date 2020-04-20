@@ -755,7 +755,7 @@ bool CellBuffer::ContainsLineEnd(const char *s, Sci::Position length) const noex
 		const unsigned char ch = s[i];
 		if ((ch == '\r') || (ch == '\n')) {
 			return true;
-		} else if (utf8LineEnds) {
+		} else if (utf8LineEnds && !UTF8IsAscii(ch)) {
 			const unsigned char back3[3] = { chBeforePrev, chPrev, ch };
 			if (UTF8IsSeparator(back3) || UTF8IsNEL(back3 + 1)) {
 				return true;
@@ -934,7 +934,7 @@ void CellBuffer::ResetLineEnds() {
 				InsertLine(lineInsert, (position + i) + 1, atLineStart);
 				lineInsert++;
 			}
-		} else if (utf8LineEnds) {
+		} else if (utf8LineEnds && !UTF8IsAscii(ch)) {
 			const unsigned char back3[3] = { chBeforePrev, chPrev, ch };
 			if (UTF8IsSeparator(back3) || UTF8IsNEL(back3 + 1)) {
 				InsertLine(lineInsert, (position + i) + 1, atLineStart);
@@ -1479,13 +1479,11 @@ void CellBuffer::BasicDeleteChars(const Sci::Position position, const Sci::Posit
 				} else {
 					RemoveLine(lineRemove);
 				}
-			} else if (utf8LineEnds) {
-				if (!UTF8IsAscii(ch)) {
-					const unsigned char next3[3] = { ch, chNext,
-						static_cast<unsigned char>(substance.ValueAt(position + i + 2)) };
-					if (UTF8IsSeparator(next3) || UTF8IsNEL(next3)) {
-						RemoveLine(lineRemove);
-					}
+			} else if (utf8LineEnds && !UTF8IsAscii(ch)) {
+				const unsigned char next3[3] = { ch, chNext,
+					static_cast<unsigned char>(substance.ValueAt(position + i + 2)) };
+				if (UTF8IsSeparator(next3) || UTF8IsNEL(next3)) {
+					RemoveLine(lineRemove);
 				}
 			}
 
