@@ -151,8 +151,9 @@ class LineVector : public ILineVector {
 	PerLine *perLine;
 	LineStartIndex<POS> startsUTF16;
 	LineStartIndex<POS> startsUTF32;
+	int activeIndices;
 public:
-	LineVector() : starts(256), perLine(nullptr) {
+	LineVector() : starts(256), perLine(nullptr), activeIndices(0) {
 	}
 	// Deleted so LineVector objects can not be copied.
 	LineVector(const LineVector &) = delete;
@@ -177,13 +178,15 @@ public:
 	void InsertLine(Sci::Line line, Sci::Position position, bool lineStart) override {
 		const POS lineAsPos = static_cast<POS>(line);
 		starts.InsertPartition(lineAsPos, static_cast<POS>(position));
-		if (startsUTF32.Active()) {
-			startsUTF32.starts.InsertPartition(lineAsPos,
-				static_cast<POS>(startsUTF32.starts.PositionFromPartition(lineAsPos - 1) + 1));
-		}
-		if (startsUTF16.Active()) {
-			startsUTF16.starts.InsertPartition(lineAsPos,
-				static_cast<POS>(startsUTF16.starts.PositionFromPartition(lineAsPos - 1) + 1));
+		if (activeIndices) {
+			if (activeIndices & SC_LINECHARACTERINDEX_UTF32) {
+				startsUTF32.starts.InsertPartition(lineAsPos,
+					static_cast<POS>(startsUTF32.starts.PositionFromPartition(lineAsPos - 1) + 1));
+			}
+			if (activeIndices & SC_LINECHARACTERINDEX_UTF16) {
+				startsUTF16.starts.InsertPartition(lineAsPos,
+					static_cast<POS>(startsUTF16.starts.PositionFromPartition(lineAsPos - 1) + 1));
+			}
 		}
 		if (perLine) {
 			if ((line > 0) && lineStart) {
@@ -199,18 +202,20 @@ public:
 			const POS lineAsPos = static_cast<POS>(line);
 			starts.InsertPartition(lineAsPos, static_cast<POS>(positions[index]));
 		}
-		if (startsUTF32.Active()) {
-			for (Sci::Line line = lineFirst; line < lineCount; line++) {
-				const POS lineAsPos = static_cast<POS>(line);
-				startsUTF32.starts.InsertPartition(lineAsPos,
-					static_cast<POS>(startsUTF32.starts.PositionFromPartition(lineAsPos - 1) + 1));
+		if (activeIndices) {
+			if (activeIndices & SC_LINECHARACTERINDEX_UTF32) {
+				for (Sci::Line line = lineFirst; line < lineCount; line++) {
+					const POS lineAsPos = static_cast<POS>(line);
+					startsUTF32.starts.InsertPartition(lineAsPos,
+						static_cast<POS>(startsUTF32.starts.PositionFromPartition(lineAsPos - 1) + 1));
+				}
 			}
-		}
-		if (startsUTF16.Active()) {
-			for (Sci::Line line = lineFirst; line < lineCount; line++) {
-				const POS lineAsPos = static_cast<POS>(line);
-				startsUTF16.starts.InsertPartition(lineAsPos,
-					static_cast<POS>(startsUTF16.starts.PositionFromPartition(lineAsPos - 1) + 1));
+			if (activeIndices & SC_LINECHARACTERINDEX_UTF16) {
+				for (Sci::Line line = lineFirst; line < lineCount; line++) {
+					const POS lineAsPos = static_cast<POS>(line);
+					startsUTF16.starts.InsertPartition(lineAsPos,
+						static_cast<POS>(startsUTF16.starts.PositionFromPartition(lineAsPos - 1) + 1));
+				}
 			}
 		}
 		if (perLine) {
@@ -227,10 +232,10 @@ public:
 	}
 	void RemoveLine(Sci::Line line) override {
 		starts.RemovePartition(static_cast<POS>(line));
-		if (startsUTF32.Active()) {
+		if (activeIndices & SC_LINECHARACTERINDEX_UTF32) {
 			startsUTF32.starts.RemovePartition(static_cast<POS>(line));
 		}
-		if (startsUTF16.Active()) {
+		if (activeIndices & SC_LINECHARACTERINDEX_UTF16) {
 			startsUTF16.starts.RemovePartition(static_cast<POS>(line));
 		}
 		if (perLine) {
@@ -242,10 +247,10 @@ public:
 	}
 	void SetInitLineCount(Sci::Line lineCount) override {
 		starts.ReAllocate(lineCount);
-		if (startsUTF32.Active()) {
+		if (activeIndices & SC_LINECHARACTERINDEX_UTF32) {
 			startsUTF32.SetInitLineCount(lineCount);
 		}
-		if (startsUTF16.Active()) {
+		if (activeIndices & SC_LINECHARACTERINDEX_UTF16) {
 			startsUTF16.SetInitLineCount(lineCount);
 		}
 	}
@@ -256,33 +261,26 @@ public:
 		return starts.PositionFromPartition(static_cast<POS>(line));
 	}
 	void InsertCharacters(Sci::Line line, CountWidths delta) noexcept override {
-		if (startsUTF32.Active()) {
+		if (activeIndices & SC_LINECHARACTERINDEX_UTF32) {
 			startsUTF32.starts.InsertText(static_cast<POS>(line), static_cast<POS>(delta.WidthUTF32()));
 		}
-		if (startsUTF16.Active()) {
+		if (activeIndices & SC_LINECHARACTERINDEX_UTF16) {
 			startsUTF16.starts.InsertText(static_cast<POS>(line), static_cast<POS>(delta.WidthUTF16()));
 		}
 	}
 	void SetLineCharactersWidth(Sci::Line line, CountWidths width) noexcept override {
-		if (startsUTF32.Active()) {
+		if (activeIndices & SC_LINECHARACTERINDEX_UTF32) {
 			assert(startsUTF32.starts.Partitions() == starts.Partitions());
 			startsUTF32.SetLineWidth(line, width.WidthUTF32());
 		}
-		if (startsUTF16.Active()) {
+		if (activeIndices & SC_LINECHARACTERINDEX_UTF16) {
 			assert(startsUTF16.starts.Partitions() == starts.Partitions());
 			startsUTF16.SetLineWidth(line, width.WidthUTF16());
 		}
 	}
 
 	int LineCharacterIndex() const noexcept override {
-		int retVal = 0;
-		if (startsUTF32.Active()) {
-			retVal |= SC_LINECHARACTERINDEX_UTF32;
-		}
-		if (startsUTF16.Active()) {
-			retVal |= SC_LINECHARACTERINDEX_UTF16;
-		}
-		return retVal;
+		return activeIndices;
 	}
 	bool AllocateLineCharacterIndex(int lineCharacterIndex, Sci::Line lines) override {
 		bool changed = false;
@@ -294,6 +292,8 @@ public:
 			changed = startsUTF16.Allocate(lines) || changed;
 			assert(startsUTF16.starts.Partitions() == starts.Partitions());
 		}
+		activeIndices = (startsUTF32.Active() ? SC_LINECHARACTERINDEX_UTF32 : 0)
+			| (startsUTF16.Active() ? SC_LINECHARACTERINDEX_UTF16 : 0);
 		return changed;
 	}
 	bool ReleaseLineCharacterIndex(int lineCharacterIndex) override {
@@ -304,6 +304,8 @@ public:
 		if ((lineCharacterIndex & SC_LINECHARACTERINDEX_UTF16) != 0) {
 			changed = startsUTF16.Release() || changed;
 		}
+		activeIndices = (startsUTF32.Active() ? SC_LINECHARACTERINDEX_UTF32 : 0)
+			| (startsUTF16.Active() ? SC_LINECHARACTERINDEX_UTF16 : 0);
 		return changed;
 	}
 	Sci::Position IndexLineStart(Sci::Line line, int lineCharacterIndex) const noexcept override {
