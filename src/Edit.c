@@ -447,7 +447,7 @@ void EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus *status) {
 #endif
 
 	// tools/GenerateTable.py
-	static const uint8_t eol_table[16] = {
+	static const uint8_t eolTable[16] = {
 		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 2, 0, 0, // 00 - 0F
 	};
 
@@ -556,7 +556,7 @@ void EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus *status) {
 		// skip to line end
 		uint8_t ch;
 		uint8_t type = 0;
-		while (ptr < end && ((ch = *ptr++) > '\r' || (type = eol_table[ch]) == 0)) {
+		while (ptr < end && ((ch = *ptr++) > '\r' || (type = eolTable[ch]) == 0)) {
 			// nop
 		}
 		switch (type) {
