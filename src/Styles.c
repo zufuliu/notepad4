@@ -2789,8 +2789,8 @@ BOOL Style_MaybeBinaryFile(LPCWSTR lpszFile) {
 #if 1
 	UNREFERENCED_PARAMETER(lpszFile);
 	/* Test C0 Control Character
-	These character is not reused in most text encoding, and doesn't appears in normal text file.
-	Most binary file has reserved fields (most are NULL) or small values in it's header.
+	These characters are not reused in most text encodings, and do not appear in normal text files.
+	Most binary files have reserved fields (mostly zeros) or small values in the header.
 	Treat the file as binary when we find two adjacent C0 control characters
 	(very common in file header) or some (currently set to 8) C0 control characters. */
 
