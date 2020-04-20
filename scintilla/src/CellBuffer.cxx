@@ -75,7 +75,7 @@ public:
 	virtual void InsertText(Sci::Line line, Sci::Position delta) noexcept = 0;
 	virtual void InsertLine(Sci::Line line, Sci::Position position, bool lineStart) = 0;
 #if CellBuffer_InsertLine_CacheCount
-	virtual void InsertLines(Sci::Line lineFirst, const Sci::Position *positions, Sci::Line lineCount, bool lineStart) = 0;
+	virtual void InsertLines(Sci::Line line, const Sci::Position *positions, size_t lines, bool lineStart) = 0;
 #endif
 	virtual void SetLineStart(Sci::Line line, Sci::Position position) noexcept = 0;
 	virtual void RemoveLine(Sci::Line line) = 0;
@@ -143,6 +143,14 @@ public:
 	void SetInitLineCount(Sci::Line lineCount) {
 		starts.ReAllocate(lineCount);
 	}
+	void InsertLines(Sci::Line line, Sci::Line lines) {
+		lines += line;
+		for (; line < lines; line++) {
+			const POS lineAsPos = static_cast<POS>(line);
+			starts.InsertPartition(lineAsPos,
+				static_cast<POS>(starts.PositionFromPartition(lineAsPos - 1) + 1));
+		}
+	}
 };
 
 template <typename POS>
@@ -196,34 +204,26 @@ public:
 		}
 	}
 #if CellBuffer_InsertLine_CacheCount
-	void InsertLines(Sci::Line lineFirst, const Sci::Position *positions, Sci::Line lineCount, bool lineStart) override {
-		lineCount += lineFirst;
-		for (Sci::Line line = lineFirst, index = 0; line < lineCount; line++, index++) {
-			const POS lineAsPos = static_cast<POS>(line);
-			starts.InsertPartition(lineAsPos, static_cast<POS>(positions[index]));
+	void InsertLines(Sci::Line line, const Sci::Position *positions, size_t lines, bool lineStart) override {
+		const POS lineAsPos = static_cast<POS>(line);
+		if constexpr (sizeof(Sci::Position) == sizeof(POS)) {
+			starts.InsertPartitions(lineAsPos, positions, lines);
+		} else {
+			starts.InsertPartitionsWithCast(lineAsPos, positions, lines);
 		}
 		if (activeIndices) {
 			if (activeIndices & SC_LINECHARACTERINDEX_UTF32) {
-				for (Sci::Line line = lineFirst; line < lineCount; line++) {
-					const POS lineAsPos = static_cast<POS>(line);
-					startsUTF32.starts.InsertPartition(lineAsPos,
-						static_cast<POS>(startsUTF32.starts.PositionFromPartition(lineAsPos - 1) + 1));
-				}
+				startsUTF32.InsertLines(line, lines);
 			}
 			if (activeIndices & SC_LINECHARACTERINDEX_UTF16) {
-				for (Sci::Line line = lineFirst; line < lineCount; line++) {
-					const POS lineAsPos = static_cast<POS>(line);
-					startsUTF16.starts.InsertPartition(lineAsPos,
-						static_cast<POS>(startsUTF16.starts.PositionFromPartition(lineAsPos - 1) + 1));
-				}
+				startsUTF16.InsertLines(line, lines);
 			}
 		}
 		if (perLine) {
-			lineCount -= lineStart;
-			if ((lineFirst > 0) && lineStart) {
-				lineFirst--;
+			if ((line > 0) && lineStart) {
+				line--;
 			}
-			perLine->InsertLines(lineFirst, lineCount);
+			perLine->InsertLines(line, lines);
 		}
 	}
 #endif
