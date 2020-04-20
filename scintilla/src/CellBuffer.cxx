@@ -1028,28 +1028,43 @@ void CellBuffer::BasicInsertString(const Sci::Position position, const char * co
 	Sci::Position lineEndPos[CellBuffer_InsertLine_CacheCount];
 	Sci::Line lineCount = 0;
 
+	// s may not NULL-terminated, ensure *ptr == '\n' or *next == '\n' is valid.
+	const char * const end = s + insertLength - 1;
+	const char *ptr = s;
 	unsigned char ch;
-	if (utf8LineEnds || insertLength < 32 + 2) {
-		// s may not NULL-terminated, ensure *ptr == '\n' is valid.
-		const char * const end = s + insertLength - 1;
-		const char *ptr = s;
 
-		if (chPrev == '\r' && *ptr == '\n') {
-			++ptr;
-			// Patch up what was end of line
-			plv->SetLineStart(lineInsert - 1, (position + ptr - s));
-			simpleInsertion = false;
-		}
+	if (chPrev == '\r' && *ptr == '\n') {
+		++ptr;
+		// Patch up what was end of line
+		plv->SetLineStart(lineInsert - 1, (position + ptr - s));
+		simpleInsertion = false;
+	}
+
+	if (utf8LineEnds) {
+		uint8_t eolTable[256]{};
+		eolTable[static_cast<uint8_t>('\n')] = 1;
+		eolTable[static_cast<uint8_t>('\r')] = 2;
+		// see UniConversion.h for LS, PS and NEL
+		eolTable[0x85] = 4;
+		eolTable[0xa8] = 3;
+		eolTable[0xa9] = 3;
 
 		while (ptr < end) {
+			// skip to line end
 			ch = *ptr++;
-			switch (ch) {
-			case '\r':
+			uint8_t type;
+			while ((type = eolTable[ch]) == 0 && ptr < end) {
+				chBeforePrev = chPrev;
+				chPrev = ch;
+				ch = *ptr++;
+			}
+			switch (type) {
+			case 2: // '\r'
 				if (*ptr == '\n') {
 					++ptr;
 				}
 				[[fallthrough]];
-			case '\n':
+			case 1: // '\n'
 				lineEndPos[lineCount++] = position + ptr - s;
 				if (lineCount == CellBuffer_InsertLine_CacheCount) {
 					plv->InsertLines(lineInsert, lineEndPos, lineCount, atLineStart);
@@ -1058,39 +1073,10 @@ void CellBuffer::BasicInsertString(const Sci::Position position, const char * co
 					simpleInsertion = false;
 				}
 				break;
-			default:
-				if (utf8LineEnds) {
-					const unsigned char back3[3] = { chBeforePrev, chPrev, ch };
-					if (UTF8IsSeparator(back3) || UTF8IsNEL(back3 + 1)) {
-						lineEndPos[lineCount++] = position + ptr - s;
-						if (lineCount == CellBuffer_InsertLine_CacheCount) {
-							plv->InsertLines(lineInsert, lineEndPos, lineCount, atLineStart);
-							lineInsert += lineCount;
-							lineCount = 0;
-							simpleInsertion = false;
-						}
-					}
-				}
-				break;
-			}
-			chBeforePrev = chPrev;
-			chPrev = ch;
-		}
-
-		ch = *end;
-		if (ptr == end) {
-			++ptr;
-			if (ch == '\r' || ch == '\n') {
-				lineEndPos[lineCount++] = position + ptr - s;
-				if (lineCount == CellBuffer_InsertLine_CacheCount) {
-					plv->InsertLines(lineInsert, lineEndPos, lineCount, atLineStart);
-					lineInsert += lineCount;
-					lineCount = 0;
-					simpleInsertion = false;
-				}
-			} else if (utf8LineEnds) {
-				const unsigned char back3[3] = { chBeforePrev, chPrev, ch };
-				if (UTF8IsSeparator(back3) || UTF8IsNEL(back3 + 1)) {
+			case 3:
+			case 4:
+				// LS, PS and NEL
+				if ((type == 3 && chPrev == 0x80 && chBeforePrev == 0xe2) || (type == 4 && chPrev == 0xc2)) {
 					lineEndPos[lineCount++] = position + ptr - s;
 					if (lineCount == CellBuffer_InsertLine_CacheCount) {
 						plv->InsertLines(lineInsert, lineEndPos, lineCount, atLineStart);
@@ -1099,25 +1085,18 @@ void CellBuffer::BasicInsertString(const Sci::Position position, const char * co
 						simpleInsertion = false;
 					}
 				}
+				break;
 			}
+
+			chBeforePrev = chPrev;
+			chPrev = ch;
 		}
 	} else {
-		// see EditDetectEOLMode() in Edit.c
+		// same as above, see EditDetectEOLMode() in Edit.c
 		// tools/GenerateTable.py
 		static const uint8_t eolTable[16] = {
 			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 2, 0, 0, // 00 - 0F
 		};
-
-		// s may not NULL-terminated, ensure *next == '\n' or *ptr == '\n' is valid.
-		const char * const end = s + insertLength - 1;
-		const char *ptr = s;
-
-		if (chPrev == '\r' && *ptr == '\n') {
-			++ptr;
-			// Patch up what was end of line
-			plv->SetLineStart(lineInsert - 1, (position + ptr - s));
-			simpleInsertion = false;
-		}
 
 #if NP2_USE_AVX2
 		constexpr uint32_t LAST_CR_MASK = (1U << (sizeof(__m256i) - 1));
@@ -1270,26 +1249,29 @@ void CellBuffer::BasicInsertString(const Sci::Position position, const char * co
 				break;
 			}
 		}
-
-		ch = *end;
-		if (ptr == end) {
-			++ptr;
-			if (ch == '\r' || ch == '\n') {
-				lineEndPos[lineCount++] = position + ptr - s;
-				if (lineCount == CellBuffer_InsertLine_CacheCount) {
-					plv->InsertLines(lineInsert, lineEndPos, lineCount, atLineStart);
-					lineInsert += lineCount;
-					lineCount = 0;
-					simpleInsertion = false;
-				}
-			}
-		}
 	}
 
 	if (lineCount != 0) {
 		plv->InsertLines(lineInsert, lineEndPos, lineCount, atLineStart);
 		lineInsert += lineCount;
 		simpleInsertion = false;
+	}
+
+	ch = *end;
+	if (ptr == end) {
+		++ptr;
+		if (ch == '\r' || ch == '\n') {
+			InsertLine(lineInsert, (position + ptr - s), atLineStart);
+			lineInsert++;
+			simpleInsertion = false;
+		} else if (utf8LineEnds && !UTF8IsAscii(ch)) {
+			const unsigned char back3[3] = { chBeforePrev, chPrev, ch };
+			if (UTF8IsSeparator(back3) || UTF8IsNEL(back3 + 1)) {
+				InsertLine(lineInsert, (position + ptr - s), atLineStart);
+				lineInsert++;
+				simpleInsertion = false;
+			}
+		}
 	}
 
 	//const double duration = period.Duration()*1e3;
