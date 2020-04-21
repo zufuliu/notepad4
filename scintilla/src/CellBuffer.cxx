@@ -1288,6 +1288,8 @@ void CellBuffer::BasicInsertString(const Sci::Position position, const char * co
 			simpleInsertion = false;
 		}
 	} else if (utf8LineEnds && !UTF8IsAscii(chAfter)) {
+		chBeforePrev = chPrev;
+		chPrev = ch;
 		// May have end of UTF-8 line end in buffer and start in insertion
 		for (int j = 0; j < UTF8SeparatorLength - 1; j++) {
 			const unsigned char chAt = substance.ValueAt(position + insertLength + j);
