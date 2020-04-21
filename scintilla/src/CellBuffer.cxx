@@ -1278,7 +1278,7 @@ void CellBuffer::BasicInsertString(const Sci::Position position, const char * co
 
 	//const double duration = period.Duration()*1e3;
 	//printf("%s avx2=%d, cache=%d, perLine=%d, duration=%f\n", __func__, NP2_USE_AVX2,
-	//	CellBuffer_InsertLine_CacheCount, Enable_WithoutPerLine, duration);
+	//	CellBuffer_InsertLine_CacheCount, InsertString_WithoutPerLine, duration);
 
 	// Joining two lines where last insertion is cr and following substance starts with lf
 	if (chAfter == '\n') {
