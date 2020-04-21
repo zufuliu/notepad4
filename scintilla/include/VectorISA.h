@@ -70,7 +70,7 @@
 // count trailing zero bits
 #if defined(__clang__) || defined(__GNUC__)
 	#define np2_ctz(x)		__builtin_ctz(x)
-#elif defined(_MSC_VER)
+#elif defined(_MSC_VER) || defined(__INTEL_COMPILER_BUILD_DATE)
 	//! NOTE: TZCNT is compatible with BSF; but LZCNT is not compatible with BSR, LZCNT = 31 - BSR.
 	#define np2_ctz(x)		_tzcnt_u32(x)
 #elif defined(_WIN32)
