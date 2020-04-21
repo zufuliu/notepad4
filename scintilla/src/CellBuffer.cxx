@@ -1241,13 +1241,13 @@ void CellBuffer::BasicInsertString(const Sci::Position position, const char * co
 				}
 				[[fallthrough]];
 			case 1: // '\n'
-				lineEndPos[lineCount++] = position + ptr - s;
 				if (lineCount == CellBuffer_InsertLine_CacheCount) {
 					plv->InsertLines(lineInsert, lineEndPos, lineCount, atLineStart);
 					lineInsert += lineCount;
 					lineCount = 0;
 					simpleInsertion = false;
 				}
+				lineEndPos[lineCount++] = position + ptr - s;
 				break;
 			}
 		}
