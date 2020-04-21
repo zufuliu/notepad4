@@ -1215,9 +1215,9 @@ Sci::Position Document::InsertString(Sci::Position position, const char *s, Sci:
 	const Sci::Line prevLinesTotal = LinesTotal();
 	const bool startSavePoint = cb.IsSavePoint();
 	bool startSequence = false;
-#if Enable_WithoutPerLine
+#if InsertString_WithoutPerLine
 	const char *text = nullptr;
-	if (insertLength > 1000 && !IsActive()) {
+	if (insertLength > InsertString_WithoutPerLine && !IsActive()) {
 		// avoid calling InsertLine() or RemoveLine()
 		text = WithoutPerLine(&cb, this).InsertString(position, s, insertLength, startSequence);
 	} else {
