@@ -892,7 +892,7 @@ void AutoC_AddDocWord(struct WordList *pWList, BOOL bIgnoreCase, char prefix) {
 				bSubWord = TRUE;
 			}
 
-			Sci_Position wordLength = wordEnd - iPosFind;
+			int wordLength = (int)(wordEnd - iPosFind);
 			if (wordLength >= iRootLen) {
 				char *pWord = pWList->wordBuf + NP2DefaultPointerAlignment;
 				BOOL bChanged = FALSE;
@@ -972,9 +972,9 @@ void AutoC_AddDocWord(struct WordList *pWList, BOOL bIgnoreCase, char prefix) {
 
 					if (wordLength >= iRootLen) {
 						pWord[wordLength] = '\0';
-						WordList_AddWord(pWList, pWord, (int)wordLength);
+						WordList_AddWord(pWList, pWord, wordLength);
 						if (bSubWord) {
-							for (int i = 0; i < (int)wordLength - 1; i++) {
+							for (int i = 0; i < wordLength - 1; i++) {
 								const char ch = pWord[i];
 								if (ch == '.' || ch == '-' || ch == ':') {
 									if (i >= iRootLen) {
@@ -984,6 +984,12 @@ void AutoC_AddDocWord(struct WordList *pWList, BOOL bIgnoreCase, char prefix) {
 									}
 									if (ch != '.' && (pWord[i + 1] == '>' || pWord[i + 1] == ':')) {
 										++i;
+									}
+
+									const int subLen = wordLength - (i + 1);
+									LPCSTR pSubRoot = pWord + i + 1;
+									if (subLen >= iRootLen && WordList_StartsWith(pWList, pSubRoot)) {
+										WordList_AddWord(pWList, pSubRoot, subLen);
 									}
 								}
 							}
