@@ -6,7 +6,7 @@
 // The License.txt file describes the conditions under which this software may be distributed.
 #pragma once
 
-#define InsertString_WithoutPerLine		1000
+#define InsertString_WithoutPerLine		1023
 
 namespace Scintilla {
 
