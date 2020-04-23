@@ -135,8 +135,9 @@ public:
 		if (stepPartition < partition) {
 			ApplyStep(partition);
 		}
+		T *pInsertion = body->InsertEmpty(partition, length);
 		for (size_t i = 0; i < length; i++) {
-			body->Insert(partition + i, static_cast<T>(positions[i]));
+			pInsertion[i] = static_cast<T>(positions[i]);
 		}
 		stepPartition += static_cast<T>(length);
 	}
