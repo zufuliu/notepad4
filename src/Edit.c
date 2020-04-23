@@ -7171,11 +7171,11 @@ LRESULT CALLBACK SciThemedWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lP
 #define FOLD_CHILDREN SCMOD_CTRL
 #define FOLD_SIBLINGS SCMOD_SHIFT
 
-#define MAX_EDIT_TOGGLE_FOLD_LEVEL		126	// for Toggle Folds > Current Level
-// uint16_t is used because max fold level <= SC_FOLDLEVELNUMBERMASK - SC_FOLDLEVELBASE + 1
+// max level for Toggle Folds for Current Level for indentation based lexers.
+#define MAX_EDIT_TOGGLE_FOLD_LEVEL		63
 struct FoldLevelStack {
-	uint16_t levelCount; // 1-based level number at current header line
-	uint16_t levelStack[MAX_EDIT_TOGGLE_FOLD_LEVEL + 1];
+	int levelCount; // 1-based level number at current header line
+	int levelStack[MAX_EDIT_TOGGLE_FOLD_LEVEL];
 };
 
 static void FoldLevelStack_Push(struct FoldLevelStack *levelStack, int level) {
@@ -7183,7 +7183,7 @@ static void FoldLevelStack_Push(struct FoldLevelStack *levelStack, int level) {
 		--levelStack->levelCount;
 	}
 
-	levelStack->levelStack[levelStack->levelCount] = (uint16_t)level;
+	levelStack->levelStack[levelStack->levelCount] = level;
 	++levelStack->levelCount;
 }
 
@@ -7356,7 +7356,7 @@ void FoldToggleCurrentLevel(FOLD_ACTION action) {
 
 	if (level != 0 && IsFoldIndentationBased(pLexCurrent->iLexer)) {
 		level = 0;
-		while (line != 0 && level < MAX_EDIT_TOGGLE_FOLD_LEVEL) {
+		while (line != 0 && level < MAX_EDIT_TOGGLE_FOLD_LEVEL - 1) {
 			line = SciCall_GetFoldParent(line);
 			if (line < 0) {
 				break;
