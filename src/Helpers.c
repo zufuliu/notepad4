@@ -1055,7 +1055,6 @@ void ResizeDlgCtl(HWND hwndDlg, int nCtlId, int dx, int dy) {
 // https://support.microsoft.com/en-us/help/102589/how-to-use-the-enter-key-from-edit-controls-in-a-dialog-box
 // Ctrl+A: https://stackoverflow.com/questions/10127054/select-all-text-in-edit-contol-by-clicking-ctrla
 static LRESULT CALLBACK MultilineEditProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData) {
-	UNREFERENCED_PARAMETER(uIdSubclass);
 	UNREFERENCED_PARAMETER(dwRefData);
 
 	switch (umsg) {
@@ -1091,6 +1090,12 @@ static LRESULT CALLBACK MultilineEditProc(HWND hwnd, UINT umsg, WPARAM wParam, L
 		}
 		return result;
 	}
+
+	case WM_NCDESTROY:
+		// Safer subclassing
+		// https://devblogs.microsoft.com/oldnewthing/20031111-00/?p=41883
+		RemoveWindowSubclass(hwnd, MultilineEditProc, uIdSubclass);
+		break;
 	}
 
 	return DefSubclassProc(hwnd, umsg, wParam, lParam);

@@ -4403,7 +4403,6 @@ void EditSelectLine(void) {
 }
 
 static LRESULT CALLBACK AddBackslashEditProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData) {
-	UNREFERENCED_PARAMETER(uIdSubclass);
 	UNREFERENCED_PARAMETER(dwRefData);
 
 	switch (umsg) {
@@ -4428,6 +4427,10 @@ static LRESULT CALLBACK AddBackslashEditProc(HWND hwnd, UINT umsg, WPARAM wParam
 		}
 	}
 	break;
+
+	case WM_NCDESTROY:
+		RemoveWindowSubclass(hwnd, AddBackslashEditProc, uIdSubclass);
+		break;
 	}
 
 	return DefSubclassProc(hwnd, umsg, wParam, lParam);
