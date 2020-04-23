@@ -1027,6 +1027,7 @@ void CellBuffer::BasicInsertString(const Sci::Position position, const char * co
 	//ElapsedPeriod period;
 	Sci::Position lineEndPos[CellBuffer_InsertLine_CacheCount];
 	Sci::Line lineCount = 0;
+	const Sci::Line lineStart = lineInsert;
 
 	// s may not NULL-terminated, ensure *ptr == '\n' or *next == '\n' is valid.
 	const char * const end = s + insertLength - 1;
@@ -1070,7 +1071,6 @@ void CellBuffer::BasicInsertString(const Sci::Position position, const char * co
 					plv->InsertLines(lineInsert, lineEndPos, lineCount, atLineStart);
 					lineInsert += lineCount;
 					lineCount = 0;
-					simpleInsertion = false;
 				}
 				break;
 			case 3:
@@ -1082,7 +1082,6 @@ void CellBuffer::BasicInsertString(const Sci::Position position, const char * co
 						plv->InsertLines(lineInsert, lineEndPos, lineCount, atLineStart);
 						lineInsert += lineCount;
 						lineCount = 0;
-						simpleInsertion = false;
 					}
 				}
 				break;
@@ -1134,7 +1133,6 @@ void CellBuffer::BasicInsertString(const Sci::Position position, const char * co
 					plv->InsertLines(lineInsert, lineEndPos, lineCount, atLineStart);
 					lineInsert += lineCount;
 					lineCount = 0;
-					simpleInsertion = false;
 				}
 
 				Sci::Position offset = position + ptr - s;
@@ -1154,7 +1152,6 @@ void CellBuffer::BasicInsertString(const Sci::Position position, const char * co
 					plv->InsertLines(lineInsert, lineEndPos, lineCount, atLineStart);
 					lineInsert += lineCount;
 					lineCount = 0;
-					simpleInsertion = false;
 				}
 				lineEndPos[lineCount++] = position + ptr - s;
 			}
@@ -1200,7 +1197,6 @@ void CellBuffer::BasicInsertString(const Sci::Position position, const char * co
 					plv->InsertLines(lineInsert, lineEndPos, lineCount, atLineStart);
 					lineInsert += lineCount;
 					lineCount = 0;
-					simpleInsertion = false;
 				}
 
 				Sci::Position offset = position + ptr - s;
@@ -1220,7 +1216,6 @@ void CellBuffer::BasicInsertString(const Sci::Position position, const char * co
 					plv->InsertLines(lineInsert, lineEndPos, lineCount, atLineStart);
 					lineInsert += lineCount;
 					lineCount = 0;
-					simpleInsertion = false;
 				}
 				lineEndPos[lineCount++] = position + ptr - s;
 			}
@@ -1245,7 +1240,6 @@ void CellBuffer::BasicInsertString(const Sci::Position position, const char * co
 					plv->InsertLines(lineInsert, lineEndPos, lineCount, atLineStart);
 					lineInsert += lineCount;
 					lineCount = 0;
-					simpleInsertion = false;
 				}
 				lineEndPos[lineCount++] = position + ptr - s;
 				break;
@@ -1256,7 +1250,6 @@ void CellBuffer::BasicInsertString(const Sci::Position position, const char * co
 	if (lineCount != 0) {
 		plv->InsertLines(lineInsert, lineEndPos, lineCount, atLineStart);
 		lineInsert += lineCount;
-		simpleInsertion = false;
 	}
 
 	ch = *end;
@@ -1265,13 +1258,11 @@ void CellBuffer::BasicInsertString(const Sci::Position position, const char * co
 		if (ch == '\r' || ch == '\n') {
 			InsertLine(lineInsert, (position + ptr - s), atLineStart);
 			lineInsert++;
-			simpleInsertion = false;
 		} else if (utf8LineEnds && !UTF8IsAscii(ch)) {
 			const unsigned char back3[3] = { chBeforePrev, chPrev, ch };
 			if (UTF8IsSeparator(back3) || UTF8IsNEL(back3 + 1)) {
 				InsertLine(lineInsert, (position + ptr - s), atLineStart);
 				lineInsert++;
-				simpleInsertion = false;
 			}
 		}
 	}
@@ -1297,19 +1288,17 @@ void CellBuffer::BasicInsertString(const Sci::Position position, const char * co
 			if (UTF8IsSeparator(back3)) {
 				InsertLine(lineInsert, (position + insertLength + j) + 1, atLineStart);
 				lineInsert++;
-				simpleInsertion = false;
 			}
 			if ((j == 0) && UTF8IsNEL(back3 + 1)) {
 				InsertLine(lineInsert, (position + insertLength + j) + 1, atLineStart);
 				lineInsert++;
-				simpleInsertion = false;
 			}
 			chBeforePrev = chPrev;
 			chPrev = chAt;
 		}
 	}
 	if (maintainingIndex) {
-		if (simpleInsertion) {
+		if (simpleInsertion && (lineInsert == lineStart)) {
 			const CountWidths cw = CountCharacterWidthsUTF8(std::string_view(s, insertLength));
 			plv->InsertCharacters(linePosition, cw);
 		} else {
