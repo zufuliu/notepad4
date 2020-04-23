@@ -1077,9 +1077,16 @@ static LRESULT CALLBACK MultilineEditProc(HWND hwnd, UINT umsg, WPARAM wParam, L
 			return TRUE;
 		}
 		if (wParam == VK_TAB && KeyboardIsKeyDown(VK_SHIFT)) {
-			// focus on next control: GetNextDlgTabItem(GetParent(hwnd), hwnd)
+			// focus on next control that has the WS_TABSTOP style set
 			// TODO: find first control when hwnd is last tab item on this dialog: GetNextDlgTabItem() returns hwnd
-			PostMessage(GetParent(hwnd), WM_NEXTDLGCTL, 0, FALSE);
+			HWND hwndParent = GetParent(hwnd);
+			HWND hwndCtl = GetNextDlgTabItem(hwndParent, hwnd, TRUE); // next
+			if (hwndCtl == hwnd) {
+				hwndCtl = GetNextDlgTabItem(hwndParent, hwnd, FALSE); // previous
+			}
+			if (hwndCtl != hwnd) {
+				PostMessage(hwndParent, WM_NEXTDLGCTL, (WPARAM)hwndCtl, TRUE);
+			}
 		}
 		break;
 
