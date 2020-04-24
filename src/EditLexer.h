@@ -142,6 +142,16 @@ typedef const EDITLEXER *LPCEDITLEXER;
 #define NP2LEX_TOML			63071	// SCLEX_TOML		TOML File
 #define NP2LEX_GN			63072	// SCLEX_GN			GN Build Script
 
+#define NP2LEX_AVS			63087	// SCLEX_AVS		AviSynth Script
+#define NP2LEX_TEHEX		63088	// SCLEX_TEHEX		Tektronix extended HEX
+#define NP2LEX_IHEX			63089	// SCLEX_IHEX		Intel HEX
+#define NP2LEX_SREC			63090	// SCLEX_SREC		Motorola S-Record
+#define NP2LEX_SRT			63091	// SCLEX_SRT		Srt Subtitle
+#define NP2LEX_MARKDOWN		63092	// SCLEX_MARKDOWN	Markdown
+#define NP2LEX_REGISTRY		63093	// SCLEX_REGISTRY	Registry File
+#define NP2LEX_COFFEESCRIPT	63094	// SCLEX_COFFEESCRIPT	CoffeeScript
+#define NP2LEX_AHK			63095	// SCLEX_AHK		AutoHotkey Script
+
 // special lexers
 #define NP2LEX_ANSI			63096	// SCLEX_NULL		ANSI Art
 #define NP2LEX_2NDTEXTFILE	63097	// SCLEX_NULL		2nd Text File
