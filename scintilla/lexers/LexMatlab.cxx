@@ -22,7 +22,6 @@ using namespace Scintilla;
 #define	LEX_MATLAB		40
 #define	LEX_OCTAVE		61
 #define	LEX_SCILAB		62
-#define LEX_GNUPLOT		65
 
 static constexpr bool IsMatlabOctave(int lexType) noexcept {
 	return lexType == LEX_MATLAB || lexType == LEX_OCTAVE;
