@@ -337,7 +337,7 @@ FontID CreateFontFromParameters(const FontParameters &fp) {
 	} else {
 #if defined(USE_D2D)
 		IDWriteTextFormat *pTextFormat = nullptr;
- 		std::wstring wsFace;
+		std::wstring wsFace;
 		const FLOAT fHeight = fp.size;
 		DWRITE_FONT_WEIGHT weight = static_cast<DWRITE_FONT_WEIGHT>(fp.weight);
 		DWRITE_FONT_STYLE style = fp.italic ? DWRITE_FONT_STYLE_ITALIC : DWRITE_FONT_STYLE_NORMAL;

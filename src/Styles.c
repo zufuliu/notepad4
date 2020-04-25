@@ -2802,7 +2802,7 @@ BOOL Style_MaybeBinaryFile(LPCWSTR lpszFile) {
 		return FALSE; // empty file
 	}
 
-	const uint8_t * const end  = ptr + headerLen;
+	const uint8_t * const end = ptr + headerLen;
 	UINT count = 0;
 	while (ptr < end) {
 		uint8_t ch = *ptr++;
@@ -4790,7 +4790,7 @@ static void Lexer_OnCheckStateChanged(HWND hwndTV, HTREEITEM hFavoriteNode, HTRE
 			WCHAR szTitle[4] = {0};
 			//item.mask = TVIF_TEXT;
 			item.pszText = szTitle;
-			item.cchTextMax  = COUNTOF(szTitle);
+			item.cchTextMax = COUNTOF(szTitle);
 
 			hParent = TreeView_GetNextSibling(hwndTV, hParent);
 			found = FALSE;

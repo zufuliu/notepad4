@@ -233,7 +233,7 @@ void ColouriseTOMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 				sc.Forward(2);
 				sc.ForwardSetState(SCE_TOML_DEFAULT);
 			}
-			break;;
+			break;
 
 		case SCE_TOML_ESCAPECHAR:
 			if (escSeq.atEscapeEnd(sc.ch)) {

@@ -617,7 +617,7 @@ BOOL InitApplication(HINSTANCE hInstance) {
 //
 //
 HWND InitInstance(HINSTANCE hInstance, int nCmdShow) {
-	const BOOL defaultPos = (wi.x == CW_USEDEFAULT || wi.y == CW_USEDEFAULT ||  wi.cx == CW_USEDEFAULT || wi.cy == CW_USEDEFAULT);
+	const BOOL defaultPos = (wi.x == CW_USEDEFAULT || wi.y == CW_USEDEFAULT || wi.cx == CW_USEDEFAULT || wi.cy == CW_USEDEFAULT);
 	RECT rc = { wi.x, wi.y, (defaultPos ? CW_USEDEFAULT : (wi.x + wi.cx)), (defaultPos ? CW_USEDEFAULT : (wi.y + wi.cy)) };
 
 	if (flagDefaultPos == 1) {
@@ -2247,7 +2247,7 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	EnableCmd(hmenu, IDM_EDIT_UNDO, SciCall_CanUndo() /*&& !bReadOnly*/);
 	EnableCmd(hmenu, IDM_EDIT_REDO, SciCall_CanRedo() /*&& !bReadOnly*/);
 
-	i  = !SciCall_IsSelectionEmpty();
+	i = !SciCall_IsSelectionEmpty();
 	const BOOL canPaste = SciCall_CanPaste();
 	const BOOL nonEmpty = SciCall_GetLength() != 0;
 
@@ -4128,7 +4128,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case IDM_VIEW_CARET_STYLE_WIDTH1:
 	case IDM_VIEW_CARET_STYLE_WIDTH2:
 	case IDM_VIEW_CARET_STYLE_WIDTH3:
-		iCaretStyle = LOWORD(wParam) -  IDM_VIEW_CARET_STYLE_BLOCK;
+		iCaretStyle = LOWORD(wParam) - IDM_VIEW_CARET_STYLE_BLOCK;
 		Style_UpdateCaret();
 		break;
 
@@ -6073,7 +6073,7 @@ int ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2, BOOL *bIsNotepadReplacement) 
 		case L'S':
 			if (opt[1] == L'\0' || (opt[2] == L'\0' && (opt[1] == L'L' || opt[1] == L'l'))) {
 				flagPosParam = 1;
-				flagDefaultPos = (opt[1] == L'\0')? 2 : 3;;
+				flagDefaultPos = (opt[1] == L'\0')? 2 : 3;
 				state = 1;
 			}
 			break;
@@ -6673,7 +6673,7 @@ void UpdateStatusbar(void) {
 	WCHAR tchLinesSelected[32];
 	WCHAR tchMatchesCount[32];
 
-	const Sci_Position iPos =  SciCall_GetCurrentPos();
+	const Sci_Position iPos = SciCall_GetCurrentPos();
 
 	const Sci_Line iLn = SciCall_LineFromPosition(iPos) + 1;
 	PosToStrW(iLn, tchLn);
@@ -7947,7 +7947,7 @@ void ShowNotificationW(int notifyPos, LPCWSTR lpszText) {
 	NP2HeapFree(cchText);
 }
 
-void ShowNotificationMessage(int notifyPos, UINT uidMessage, ...)  {
+void ShowNotificationMessage(int notifyPos, UINT uidMessage, ...) {
 	WCHAR wchFormat[1024] = L"";
 	WCHAR wchMessage[2048] = L"";
 	GetString(uidMessage, wchFormat, COUNTOF(wchFormat));

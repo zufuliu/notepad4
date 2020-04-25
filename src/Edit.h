@@ -206,7 +206,7 @@ enum {
 	MarginNumber_Bookmark = 1,
 	MarginNumber_CodeFolding = 2,
 
-	MarkerBitmask_Bookmark  = 1 << MarkerNumber_Bookmark,
+	MarkerBitmask_Bookmark = 1 << MarkerNumber_Bookmark,
 };
 
 void	EditMarkAll_Clear(void);
@@ -313,7 +313,7 @@ void	EditShowCallTips(Sci_Position position);
 typedef struct NP2ENCODING {
 	const UINT uFlags;
 	/*const*/UINT uCodePage;
-	// string format: [normal name + ',']  + [lower case parse name + ',']+
+	// string format: [normal name + ','] + [lower case parse name + ',']+
 	const char * const pszParseNames;
 	const UINT idsName;
 	LPWSTR wchLabel;

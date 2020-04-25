@@ -1136,7 +1136,8 @@ void EditTitleCase(void) {
 		}
 		NP2HeapFree(pszMappedW);
 	} else {
-#if 1 // BOOKMARK_EDITION
+#if 1
+		// BOOKMARK_EDITION
 		//Slightly enhanced function to make Title Case:
 		//Added some '-characters and bPrevWasSpace makes it better (for example "'Don't'" will now work)
 		BOOL bNewWord = TRUE;
@@ -1292,7 +1293,7 @@ LPWSTR EditURLEncodeSelection(int *pcchEscaped, BOOL bTrim) {
 	MultiByteToWideChar(cpEdit, 0, pszText, (int)iSelCount, pszTextW, (int)(NP2HeapSize(pszTextW) / sizeof(WCHAR)));
 
 	// https://docs.microsoft.com/en-us/windows/desktop/api/shlwapi/nf-shlwapi-urlescapew
-	LPWSTR pszEscapedW = (LPWSTR)NP2HeapAlloc(NP2HeapSize(pszTextW) * 3);  // '&', H1, H0
+	LPWSTR pszEscapedW = (LPWSTR)NP2HeapAlloc(NP2HeapSize(pszTextW) * 3); // '&', H1, H0
 
 	DWORD cchEscapedW = (int)NP2HeapSize(pszEscapedW) / sizeof(WCHAR);
 	UrlEscape(pszTextW, pszEscapedW, &cchEscapedW, URL_ESCAPE_SEGMENT_ONLY);
@@ -1677,7 +1678,7 @@ void EditHex2Char(void) {
 						ci = ci * 16 + (*p++ - '0');
 					} else if (*p >= 'a' && *p <= 'f') {
 						ci = ci * 16 + (*p++ - 'a') + 10;
-					} else if (*p >= 'A' && *p <=  'F') {
+					} else if (*p >= 'A' && *p <= 'F') {
 						ci = ci * 16 + (*p++ - 'A') + 10;
 					} else {
 						break;
@@ -1846,8 +1847,8 @@ void EditConvertNumRadix(int radix) {
 						ci += (*p++ - '0');
 					} else if (*p >= 'a' && *p <= 'f') {
 						ci <<= 4;
-						ci += (*p++ - 'a') + 10;;
-					} else if (*p >= 'A' && *p <=  'F') {
+						ci += (*p++ - 'a') + 10;
+					} else if (*p >= 'A' && *p <= 'F') {
 						ci <<= 4;
 						ci += (*p++ - 'A') + 10;
 					} else if (*p == '_') {
@@ -2125,7 +2126,7 @@ void EditSpacesToTabs(int nTabWidth, BOOL bOnlyIndentingWS) {
 	tr.chrg.cpMin = (Sci_PositionCR)iSelStart;
 	tr.chrg.cpMax = (Sci_PositionCR)iSelEnd;
 	tr.lpstrText = pszText;
-	SciCall_GetTextRange(&tr);;
+	SciCall_GetTextRange(&tr);
 
 	const UINT cpEdit = SciCall_GetCodePage();
 
@@ -2143,7 +2144,7 @@ void EditSpacesToTabs(int nTabWidth, BOOL bOnlyIndentingWS) {
 	WCHAR space[256];
 	for (int iTextW = 0; iTextW < cchTextW; iTextW++) {
 		const WCHAR w = pszTextW[iTextW];
-		if ((w == L' ' || w == L'\t') && (!bOnlyIndentingWS ||  bIsLineStart)) {
+		if ((w == L' ' || w == L'\t') && (!bOnlyIndentingWS || bIsLineStart)) {
 			space[j++] = w;
 			if (j == nTabWidth - i % nTabWidth || w == L'\t') {
 				if (j > 1 || pszTextW[iTextW + 1] == L' ' || pszTextW[iTextW + 1] == L'\t') {
@@ -3118,7 +3119,7 @@ void EditToggleLineComments(LPCWSTR pwszComment, BOOL bInsertAtStart) {
 		tr.chrg.cpMin = (Sci_PositionCR)iIndentPos;
 		tr.chrg.cpMax = tr.chrg.cpMin + min_i(31, cchComment);
 		tr.lpstrText = tchBuf;
-		SciCall_GetTextRange(&tr);;
+		SciCall_GetTextRange(&tr);
 
 		Sci_Position iCommentPos;
 		if (_strnicmp(tchBuf, mszComment, cchComment) == 0) {
@@ -3666,7 +3667,7 @@ void EditWrapToColumn(int nColumn/*, int nTabWidth*/) {
 	tr.chrg.cpMin = (Sci_PositionCR)iSelStart;
 	tr.chrg.cpMax = (Sci_PositionCR)iSelEnd;
 	tr.lpstrText = pszText;
-	SciCall_GetTextRange(&tr);;
+	SciCall_GetTextRange(&tr);
 
 	const UINT cpEdit = SciCall_GetCodePage();
 	const int cchTextW = MultiByteToWideChar(cpEdit, 0, pszText, (int)iSelCount, pszTextW, (int)(NP2HeapSize(pszTextW) / sizeof(WCHAR)));
@@ -3827,7 +3828,7 @@ void EditJoinLinesEx(void) {
 	tr.chrg.cpMin = (Sci_PositionCR)iSelStart;
 	tr.chrg.cpMax = (Sci_PositionCR)iSelEnd;
 	tr.lpstrText = pszText;
-	SciCall_GetTextRange(&tr);;
+	SciCall_GetTextRange(&tr);
 
 	char szEOL[] = "\r\n";
 	int cchEOL = 2;
@@ -4325,7 +4326,7 @@ void EditGetExcerpt(LPWSTR lpszExcerpt, DWORD cchExcerpt) {
 	tr.chrg.cpMin = (Sci_PositionCR)iSelStart;
 	tr.chrg.cpMax = (Sci_PositionCR)iSelEnd;
 	tr.lpstrText = pszText;
-	SciCall_GetTextRange(&tr);;
+	SciCall_GetTextRange(&tr);
 	const UINT cpEdit = SciCall_GetCodePage();
 	MultiByteToWideChar(cpEdit, 0, pszText, (int)iSelCount, pszTextW, (int)(NP2HeapSize(pszTextW) / sizeof(WCHAR)));
 
@@ -6637,7 +6638,7 @@ char* EditGetStringAroundCaret(LPCSTR delimiters) {
 
 	char *mszSelection = (char *)NP2HeapAlloc(iLineEnd - iLineStart + 1);
 	struct Sci_TextRange tr = { { (Sci_PositionCR)iLineStart, (Sci_PositionCR)iLineEnd }, mszSelection };
-	SciCall_GetTextRange(&tr);;
+	SciCall_GetTextRange(&tr);
 
 	return mszSelection;
 }

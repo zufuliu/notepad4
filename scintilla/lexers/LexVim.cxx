@@ -166,7 +166,7 @@ void ColouriseVimDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 			} else if (IsADigit(sc.ch) || (sc.ch == '.' && IsADigit(sc.chNext))) {
 				sc.SetState(SCE_VIM_NUMBER);
 			} else if ((sc.ch == '$' || sc.ch == '&') && IsIdentifierChar(sc.chNext)) {
-				sc.SetState((sc.ch == '$') ? SCE_VIM_ENV_VARIABLE :  SCE_VIM_OPTION);
+				sc.SetState((sc.ch == '$') ? SCE_VIM_ENV_VARIABLE : SCE_VIM_OPTION);
 				sc.Forward();
 			} else if (sc.ch == '@') {
 				sc.SetState(SCE_VIM_REGISTER);

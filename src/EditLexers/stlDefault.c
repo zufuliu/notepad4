@@ -23,7 +23,7 @@ static EDITSTYLE Styles_Global[] = {
 	{ 0, NP2StyleX_IMEIndicator, L"fore:#108010" },
 	{ SCI_SETEDGECOLOUR, NP2StyleX_LongLineMarker, L"fore:#FFC000" },
 	{ SCI_SETEXTRAASCENT + SCI_SETEXTRADESCENT, NP2StyleX_ExtraLineSpacing, L"size:2" },
-	{ 0, NP2StyleX_FoldingMarker,  L"fore:#8080FF; back:#ADD8E6" },
+	{ 0, NP2StyleX_FoldingMarker, L"fore:#8080FF; back:#ADD8E6" },
 	{ STYLE_FOLDDISPLAYTEXT, NP2StyleX_FoldEllipsis, L"font:$(Code); size:-2; bold; fore:#808080" },
 	{ 0, NP2StyleX_MarkOccurrences, L"alpha:100; outline:150" },
 	{ 0, NP2StyleX_Bookmark, L"fore:#408040; back:#00FF00; alpha:40" },
@@ -69,11 +69,11 @@ EDITLEXER lex2ndGlobal = {
 	Styles_2ndGlobal
 };
 
-static EDITSTYLE Styles_Text[] =  {
+static EDITSTYLE Styles_Text[] = {
 	EDITSTYLE_DEFAULT,
 };
 
-static EDITSTYLE Styles_2ndText[] =  {
+static EDITSTYLE Styles_2ndText[] = {
 	EDITSTYLE_DEFAULT,
 };
 

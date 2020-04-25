@@ -277,7 +277,7 @@ void FoldLLVMDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initStyle
 	Sci_PositionU lineEndPos = ((lineStartNext < endPos) ? lineStartNext : endPos) - 1;
 
 	for (Sci_PositionU i = startPos; i < endPos; i++) {
-		const int style =  styler.StyleAt(i);
+		const int style = styler.StyleAt(i);
 
 		if (style == SCE_LLVM_OPERATOR) {
 			const char ch = styler[i];

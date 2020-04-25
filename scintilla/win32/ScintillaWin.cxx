@@ -301,7 +301,7 @@ LANGID InputLanguage() noexcept {
 	LANGID inputLang;
 	WCHAR keyboard_layout[KL_NAMELENGTH];
 	if (::GetKeyboardLayoutNameW(keyboard_layout)) {
-		inputLang =  static_cast<LANGID>(wcstol(&keyboard_layout[KL_NAMELENGTH >> 1], nullptr, 16));
+		inputLang = static_cast<LANGID>(wcstol(&keyboard_layout[KL_NAMELENGTH >> 1], nullptr, 16));
 	} else {
 		/// TODO: Fallback to en-US?
 		HKL inputLocale = ::GetKeyboardLayout(0);
@@ -1157,7 +1157,7 @@ void ScintillaWin::SetCandidateWindowPos() {
 		// ::ImmSetCandidateWindow() with its 'dwStyle' parameter CFS_EXCLUDE
 		// to move their candidate windows when a user disables TSF and CUAS.
 		// Therefore, we also set this parameter here.
-		CANDIDATEFORM excludeRect = { 0, CFS_EXCLUDE, { x, y2 },  { x, y, x + sysCaretWidth, y + sysCaretHeight }};
+		CANDIDATEFORM excludeRect = { 0, CFS_EXCLUDE, { x, y2 }, { x, y, x + sysCaretWidth, y + sysCaretHeight }};
 		::ImmSetCandidateWindow(imc.hIMC, &excludeRect);
 	}
 }

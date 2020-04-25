@@ -256,7 +256,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 
 	INITCOMMONCONTROLSEX icex;
 	icex.dwSize = sizeof(INITCOMMONCONTROLSEX);
-	icex.dwICC  = ICC_WIN95_CLASSES | ICC_COOL_CLASSES | ICC_BAR_CLASSES | ICC_USEREX_CLASSES;
+	icex.dwICC = ICC_WIN95_CLASSES | ICC_COOL_CLASSES | ICC_BAR_CLASSES | ICC_USEREX_CLASSES;
 	InitCommonControlsEx(&icex);
 
 	msgTaskbarCreated = RegisterWindowMessage(L"TaskbarCreated");
@@ -318,7 +318,7 @@ BOOL InitApplication(HINSTANCE hInstance) {
 //
 //
 HWND InitInstance(HINSTANCE hInstance, int nCmdShow) {
-	const BOOL defaultPos = (wi.x == CW_USEDEFAULT || wi.y == CW_USEDEFAULT ||  wi.cx == CW_USEDEFAULT || wi.cy == CW_USEDEFAULT);
+	const BOOL defaultPos = (wi.x == CW_USEDEFAULT || wi.y == CW_USEDEFAULT || wi.cx == CW_USEDEFAULT || wi.cy == CW_USEDEFAULT);
 	RECT rc = { wi.x, wi.y, (defaultPos ? CW_USEDEFAULT : (wi.x + wi.cx)), (defaultPos ? CW_USEDEFAULT : (wi.y + wi.cy)) };
 
 	if (defaultPos) {
@@ -531,7 +531,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 		if (WAIT_OBJECT_0 == WaitForSingleObject(hChangeHandle, 0)) {
 			// Store information about currently selected item
 			DLITEM dli;
-			dli.mask  = DLI_ALL;
+			dli.mask = DLI_ALL;
 			dli.ntype = DLE_NONE;
 			DirList_GetItem(hwndDirList, -1, &dli);
 
@@ -3322,7 +3322,7 @@ void GetRelaunchParameters(LPWSTR szParameters) {
 
 	// offset new window position +10/+10
 	int x = wndpl.rcNormalPosition.left + 10;
-	int y = wndpl.rcNormalPosition.top  + 10;
+	int y = wndpl.rcNormalPosition.top + 10;
 	const int cx = wndpl.rcNormalPosition.right - wndpl.rcNormalPosition.left;
 	const int cy = wndpl.rcNormalPosition.bottom - wndpl.rcNormalPosition.top;
 
@@ -3446,7 +3446,7 @@ void LaunchTarget(LPCWSTR lpFileName, BOOL bOpenNew) {
 	}
 
 	if (iUseTargetApplication && iTargetApplicationMode == 1) {
-		HWND hwnd  = NULL;
+		HWND hwnd = NULL;
 		if (!bOpenNew) { // hwnd == NULL
 			EnumWindows(EnumWndProc2, (LPARAM)&hwnd);
 		}
@@ -3621,7 +3621,7 @@ void SnapToTarget(HWND hwnd) {
 			rcNew.left = rc2.right;
 		}
 
-		rcNew.top  = rc2.top;
+		rcNew.top = rc2.top;
 		rcNew.right = rcNew.left + (rcOld.right - rcOld.left);
 		rcNew.bottom = rcNew.top + (rcOld.bottom - rcOld.top);
 

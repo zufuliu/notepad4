@@ -1667,7 +1667,7 @@ static void FoldPerlDoc(Sci_PositionU startPos, Sci_Position length, int /*initS
 		if (foldCommentExplicit && style == SCE_PL_COMMENTLINE && ch == '#') {
 			if (chNext == '{') {
 				levelCurrent++;
-			} else if (levelCurrent > SC_FOLDLEVELBASE  && chNext == '}') {
+			} else if (levelCurrent > SC_FOLDLEVELBASE && chNext == '}') {
 				levelCurrent--;
 			}
 		}
