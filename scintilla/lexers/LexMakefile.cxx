@@ -167,7 +167,7 @@ static void ColouriseMakeDoc(Sci_PositionU startPos, Sci_Position length, int in
 				ch = chNext;
 				while (ch != ')') {
 					chNext = styler.SafeGetCharAt(pos + 1);
-					if (ch == '$' &&  chNext == '(')
+					if (ch == '$' && chNext == '(')
 						break;
 					if (IsASpace(ch) || ch == ',')
 						break;

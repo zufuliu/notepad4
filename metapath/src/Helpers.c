@@ -1400,7 +1400,7 @@ HDROP CreateDropHandle(LPCWSTR lpFileName) {
 //  Execute a DDE command (Msg, App, Topic)
 //
 //
-HDDEDATA CALLBACK DdeCallback(UINT uType, UINT uFmt, HCONV hconv, HSZ hsz1, HSZ hsz2, HDDEDATA hdata, ULONG_PTR  dwData1, ULONG_PTR  dwData2) {
+HDDEDATA CALLBACK DdeCallback(UINT uType, UINT uFmt, HCONV hconv, HSZ hsz1, HSZ hsz2, HDDEDATA hdata, ULONG_PTR dwData1, ULONG_PTR dwData2) {
 	UNREFERENCED_PARAMETER(uFmt);
 	UNREFERENCED_PARAMETER(hconv);
 	UNREFERENCED_PARAMETER(hsz1);

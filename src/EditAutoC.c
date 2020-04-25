@@ -289,7 +289,7 @@ char* WordList_GetList(struct WordList *pWList) {
 
 struct WordList *WordList_Alloc(LPCSTR pRoot, int iRootLen, BOOL bIgnoreCase) {
 	struct WordList *pWList = (struct WordList *)NP2HeapAlloc(sizeof(struct WordList));
-	pWList->pListHead =  NULL;
+	pWList->pListHead = NULL;
 	pWList->pWordStart = pRoot;
 	pWList->nWordCount = 0;
 	pWList->nTotalLen = 0;
@@ -1516,7 +1516,7 @@ void EditAutoCloseBraceQuote(int ch) {
 	case '<':
 		if ((mask & AutoInsertAngleBracket) && (pLexCurrent->rid == NP2LEX_CPP || pLexCurrent->rid == NP2LEX_CSHARP || pLexCurrent->rid == NP2LEX_JAVA)) {
 			// geriatric type, template
-			if (iCurrentStyle == SCE_C_CLASS || iCurrentStyle == SCE_C_INTERFACE || iCurrentStyle ==  SCE_C_STRUCT) {
+			if (iCurrentStyle == SCE_C_CLASS || iCurrentStyle == SCE_C_INTERFACE || iCurrentStyle == SCE_C_STRUCT) {
 				tchIns[0] = '>';
 			}
 		}

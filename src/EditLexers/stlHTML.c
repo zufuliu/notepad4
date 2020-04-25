@@ -162,7 +162,7 @@ static EDITSTYLE Styles_HTML[] = {
 	//{ SCE_H_SCRIPT, EDITSTYLE_HOLE(L"Script"), L"" },
 	{ SCE_H_QUESTION, NP2StyleX_PHPTag, L"bold; fore:#8B008B" },
 	/////////////////////////////////// PHP
-	{ SCE_HPHP_DEFAULT, NP2StyleX_PHPDefault,  L"" },
+	{ SCE_HPHP_DEFAULT, NP2StyleX_PHPDefault, L"" },
 	{ MULTI_STYLE(SCE_HPHP_COMMENT, SCE_HPHP_COMMENTLINE, 0, 0), NP2StyleX_PHPComment, L"fore:#608060" },
 	{ SCE_HPHP_WORD, NP2StyleX_PHPKeyword, L"bold; fore:#FF8000" },
 	{ MULTI_STYLE(SCE_HPHP_HSTRING, SCE_HPHP_SIMPLESTRING, 0, 0), NP2StyleX_PHPString, L"fore:#008000" },

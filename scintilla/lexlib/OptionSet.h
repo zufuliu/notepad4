@@ -98,7 +98,7 @@ public:
 		return names.c_str();
 	}
 	int PropertyType(const char *name) const {
-		const auto  it = nameToDef.find(name);
+		const auto it = nameToDef.find(name);
 		if (it != nameToDef.end()) {
 			return it->second.opType;
 		}

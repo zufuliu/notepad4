@@ -815,7 +815,7 @@ BOOL DirList_SelectItem(HWND hwnd, LPCWSTR lpszDisplayName, LPCWSTR lpszFullPath
 	}
 
 	WCHAR szShortPath[MAX_PATH];
-	SHFILEINFO  shfi;
+	SHFILEINFO shfi;
 
 	GetShortPathName(lpszFullPath, szShortPath, MAX_PATH);
 	if (StrIsEmpty(lpszDisplayName)) {
@@ -1195,7 +1195,7 @@ BOOL DriveBox_PropertyDlg(HWND hwnd) {
 	LPCONTEXTMENU lpcm;
 
 #if defined(__cplusplus)
-	if (NOERROR == lpdcid->lpsf->GetUIObjectOf(GetParent(hwnd), 1, (LPCITEMIDLIST *)(&lpdcid->pidl), IID_IContextMenu, NULL, (void  **)(&lpcm))) {
+	if (NOERROR == lpdcid->lpsf->GetUIObjectOf(GetParent(hwnd), 1, (LPCITEMIDLIST *)(&lpdcid->pidl), IID_IContextMenu, NULL, (void **)(&lpcm))) {
 		CMINVOKECOMMANDINFO cmi;
 		cmi.cbSize = sizeof(CMINVOKECOMMANDINFO);
 		cmi.fMask = 0;
@@ -1216,7 +1216,7 @@ BOOL DriveBox_PropertyDlg(HWND hwnd) {
 		bSuccess = FALSE;
 	}
 #else
-	if (NOERROR == lpdcid->lpsf->lpVtbl->GetUIObjectOf(lpdcid->lpsf, GetParent(hwnd), 1, (LPCITEMIDLIST *)(&lpdcid->pidl), &IID_IContextMenu, NULL, (void  **)(&lpcm))) {
+	if (NOERROR == lpdcid->lpsf->lpVtbl->GetUIObjectOf(lpdcid->lpsf, GetParent(hwnd), 1, (LPCITEMIDLIST *)(&lpdcid->pidl), &IID_IContextMenu, NULL, (void **)(&lpcm))) {
 		CMINVOKECOMMANDINFO cmi;
 		cmi.cbSize = sizeof(CMINVOKECOMMANDINFO);
 		cmi.fMask = 0;

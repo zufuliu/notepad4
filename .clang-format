@@ -1,0 +1,19 @@
+---
+# https://clang.llvm.org/docs/ClangFormatStyleOptions.html
+BasedOnStyle: LLVM
+IndentWidth: 4
+TabWidth: 4
+
+---
+Language: Cpp
+AccessModifierOffset: -4
+AlignAfterOpenBracket: DontAlign
+AllowShortBlocksOnASingleLine: Empty
+AllowShortCaseLabelsOnASingleLine: true
+ColumnLimit: 0
+Cpp11BracedListStyle: false
+FixNamespaceComments: false
+SortIncludes: false
+UseTab: Always
+
+---
