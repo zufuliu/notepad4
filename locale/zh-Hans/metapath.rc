@@ -77,36 +77,36 @@ IDR_MAINWND MENU
 BEGIN
 	POPUP "+"
 	BEGIN
-		MENUITEM "打开(&O) (相同)",				IDM_FILE_OPENSAME
-		MENUITEM "打开(&e) (新的)",					IDM_FILE_OPENNEW
-		MENUITEM "运行...",						IDM_FILE_RUN
+		MENUITEM "在相同窗口中打开(&O)",			IDM_FILE_OPENSAME
+		MENUITEM "在新窗口中打开(&E)",				IDM_FILE_OPENNEW
+		MENUITEM "运行(&R)...",					IDM_FILE_RUN
 		MENUITEM "启动(&L)",						IDM_FILE_LAUNCH
 		MENUITEM "快速概览(&Q)",					IDM_FILE_QUICKVIEW
-		MENUITEM "打开方式(&W)",				IDM_FILE_OPENWITH
+		MENUITEM "打开方式(&W)",					IDM_FILE_OPENWITH
 		MENUITEM "复制名称(&C)",					IDM_POP_COPY_FILENAME
 		MENUITEM "复制路径名称(&T)",				IDM_POP_COPY_PATHNAME
 		MENUITEM SEPARATOR
 		MENUITEM "在文件管理器中显示(&X)",			IDM_FILE_EXPLORER
 		MENUITEM "创建链接(&K)...",				IDM_FILE_CREATELINK
-		MENUITEM "另存为(&S)...",					IDM_FILE_SAVEAS
+		MENUITEM "另存为(&S)...",				IDM_FILE_SAVEAS
 		MENUITEM "复制/移动(&M)...",				IDM_FILE_COPYMOVE
 		MENUITEM "删除(&D)...",					IDM_FILE_DELETE
-		MENUITEM "重命名(&N)...",					IDM_FILE_RENAME
+		MENUITEM "重命名(&N)...",				IDM_FILE_RENAME
 		MENUITEM SEPARATOR
-		MENUITEM "属性(&P)",					IDM_FILE_PROPERTIES
+		MENUITEM "属性(&P)",						IDM_FILE_PROPERTIES
 	END
 	POPUP "+"
 	BEGIN
 		MENUITEM "新建文件(&N)...",				IDM_FILE_NEW
-		MENUITEM "新建目录(&W)...",			IDM_FILE_NEWDIR
+		MENUITEM "新建目录(&W)...",				IDM_FILE_NEWDIR
 		MENUITEM SEPARATOR
 		MENUITEM "文件筛选器(&L)...",				IDM_VIEW_FILTER
 		MENUITEM "重置过滤器(&R)",				IDM_VIEW_FILTERALL
 		POPUP "显示(&S)"
 		BEGIN
-			MENUITEM "目录(&D)",			IDM_VIEW_FOLDERS
+			MENUITEM "目录(&D)",					IDM_VIEW_FOLDERS
 			MENUITEM "文件(&F)",					IDM_VIEW_FILES
-			MENUITEM "系统对象(&S)",			IDM_VIEW_HIDDEN
+			MENUITEM "系统对象(&S)",				IDM_VIEW_HIDDEN
 		END
 		POPUP "排序(&T)"
 		BEGIN
@@ -115,40 +115,40 @@ BEGIN
 			MENUITEM "按类型(&T)",				IDM_SORT_TYPE
 			MENUITEM "按日期(&D)",				IDM_SORT_DATE
 			MENUITEM SEPARATOR
-			MENUITEM "反向(&R)",				IDM_SORT_REVERSE
+			MENUITEM "逆序(&R)",					IDM_SORT_REVERSE
 		END
 		MENUITEM SEPARATOR
-		MENUITEM "在文件管理器中打开(&E)",			IDM_FILE_EXPLORER
+		MENUITEM "在资源管理器中打开(&E)",			IDM_FILE_EXPLORER
 		MENUITEM "转到收藏夹(&F)",				IDM_VIEW_FAVORITES
 		MENUITEM "打开收藏夹(&O)",				IDM_VIEW_EDITFAVORITES
-		MENUITEM "目录(&D)...",				IDM_FILE_CHANGEDIR
+		MENUITEM "目录(&D)...",					IDM_FILE_CHANGEDIR
 		MENUITEM "转到(&G)...",					IDM_FILE_GOTO
 		MENUITEM SEPARATOR
 		MENUITEM "显示驱动器(&V)",				IDM_VIEW_DRIVEBOX
-		MENUITEM "置顶(&K)",				IDM_VIEW_ALWAYSONTOP
+		MENUITEM "置顶(&K)",						IDM_VIEW_ALWAYSONTOP
 		MENUITEM SEPARATOR
-		MENUITEM "保存设置(&I)",				IDM_VIEW_SAVESETTINGS
-		MENUITEM "设定目标(&U)...",			IDM_VIEW_FINDTARGET
+		MENUITEM "保存设置(&I)",					IDM_VIEW_SAVESETTINGS
+		MENUITEM "设定目标(&U)...",				IDM_VIEW_FINDTARGET
 		MENUITEM "选项(&P)...",					IDM_VIEW_OPTIONS
 	END
 	POPUP "+"
 	BEGIN
-		MENUITEM "目录(&D)...",				IDM_FILE_CHANGEDIR
-		MENUITEM "驱动器属性(&P)",			IDM_FILE_DRIVEPROP
+		MENUITEM "目录(&D)...",					IDM_FILE_CHANGEDIR
+		MENUITEM "驱动器属性(&P)",				IDM_FILE_DRIVEPROP
 		MENUITEM SEPARATOR
 		MENUITEM "显示驱动器(&V)",				IDM_VIEW_DRIVEBOX
 	END
 	POPUP "+"
 	BEGIN
 		MENUITEM "显示工具栏(&T)",				IDM_VIEW_TOOLBAR
-		MENUITEM "自定义工具栏(&C)...",		IDM_VIEW_CUSTOMIZETB
+		MENUITEM "自定义工具栏(&C)...",			IDM_VIEW_CUSTOMIZETB
 		MENUITEM "显示状态栏(&S)",				IDM_VIEW_STATUSBAR
 	END
 	POPUP "+"
 	BEGIN
-		MENUITEM "打开 metapath(&O)",				IDM_TRAY_RESTORE
+		MENUITEM "打开 metapath(&O)",			IDM_TRAY_RESTORE
 		MENUITEM SEPARATOR
-		MENUITEM "退出 metapath(&X)",				IDM_TRAY_EXIT
+		MENUITEM "退出 metapath(&X)",			IDM_TRAY_EXIT
 	END
 END
 
@@ -605,7 +605,7 @@ BEGIN
 	IDT_FILE_SAVEAS			"另存为"
 	IDT_FILE_COPYMOVE		"复制/移动"
 	IDT_FILE_DELETE_RECYCLE	"删除 (回收站)"
-	IDT_FILE_DELETE_PERM	"删除 (永久)"
+	IDT_FILE_DELETE_PERM	"永久删除"
 	IDT_VIEW_FILTER			"过滤器"
 END
 
@@ -652,8 +652,8 @@ BEGIN
     IDS_GETQUICKVIEWER      "查找快速视图"
     IDS_GETTARGET           "查找编辑器"
     IDS_NEWFILE             "新文件"
-    IDS_FILTER_ALL          "所有文件 (*.*)\n*.*\n"
-    IDS_FILTER_EXE          "可执行文件 (*.exe;*.com;*.bat;*.lnk;*.pif)\n*.exe;*.com;*.bat;*.lk;*.pif\n所有文件 (*.*)\n*.*\n"
+    IDS_FILTER_ALL          "所有文件 (*.*)|*.*|"
+    IDS_FILTER_EXE          "可执行文件 (*.exe;*.com;*.bat;*.lnk;*.pif)|*.exe;*.com;*.bat;*.lnk;*.pif|所有文件 (*.*)|*.*|"
     IDS_GETDIRECTORY        "选择一个新的目录。"
     IDS_FAVORITES           "指定“收藏夹”目录。"
 END
