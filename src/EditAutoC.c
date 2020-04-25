@@ -261,12 +261,12 @@ void WordList_Free(struct WordList *pWList) {
 	}
 }
 
-void WordList_GetList(struct WordList *pWList, char* *pList) {
+char* WordList_GetList(struct WordList *pWList) {
 	struct WordNode *root = pWList->pListHead;
 	struct WordNode *path[NP2_TREE_HEIGHT_LIMIT] = { NULL };
 	int top = 0;
 	char *buf = (char *)NP2HeapAlloc(pWList->nTotalLen + 1);// additional separator
-	*pList = buf;
+	char * const pList = buf;
 
 	while (root || top > 0) {
 		if (root) {
@@ -281,9 +281,10 @@ void WordList_GetList(struct WordList *pWList, char* *pList) {
 		}
 	}
 	// trim last separator char
-	if (buf && buf != *pList) {
-		*(--buf) = 0;
+	if (buf != pList) {
+		*(--buf) = '\0';
 	}
+	return pList;
 }
 
 struct WordList *WordList_Alloc(LPCSTR pRoot, int iRootLen, BOOL bIgnoreCase) {
@@ -1377,8 +1378,7 @@ static BOOL EditCompleteWordCore(int iCondition, BOOL autoInsert) {
 
 	if (bShow && bUpdated) {
 		autoCompletionConfig.iPreviousItemCount = pWList->nWordCount;
-		char *pList = NULL;
-		WordList_GetList(pWList, &pList);
+		char *pList = WordList_GetList(pWList);
 		SciCall_AutoCSetOrder(SC_ORDER_PRESORTED); // pre-sorted
 		SciCall_AutoCSetIgnoreCase(bIgnoreCase); // case sensitivity
 		//if (bIgnoreCase) {
