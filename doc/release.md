@@ -17,4 +17,4 @@ Tips: To keep your current settings, do NOT replace *Notepad2.ini* or *metapath.
 | [Win32_v4.20.?.zip](https://www.virustotal.com/gui/url/?/detection) | ? |
 | [x64_v4.20.?.zip](https://www.virustotal.com/gui/url/?/detection) | ? |
 | 한국어 | https://teus.me/category/IT/Notepad2 |
-| 简体中文 | https://github.com/yfdyh000/notepad2 |
+| 简体中文 | https://github.com/zufuliu/notepad2/tree/master/locale/zh-Hans |
