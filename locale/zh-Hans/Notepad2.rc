@@ -1,6 +1,6 @@
 // Microsoft Visual C++ generated resource script.
 //
-#include "resource.h"
+#include "../../src/resource.h"
 
 #define APSTUDIO_READONLY_SYMBOLS
 /////////////////////////////////////////////////////////////////////////////
@@ -34,7 +34,7 @@ LANGUAGE LANG_CHINESE_SIMPLIFIED, SUBLANG_CHINESE_SIMPLIFIED
 // RT_MANIFEST
 //
 
-IDR_RT_MANIFEST         RT_MANIFEST             "..\\res\\Notepad2.exe.manifest"
+IDR_RT_MANIFEST         RT_MANIFEST             "..\\..\\res\\Notepad2.exe.manifest"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -43,28 +43,28 @@ IDR_RT_MANIFEST         RT_MANIFEST             "..\\res\\Notepad2.exe.manifest"
 
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
-IDR_MAINWND             ICON                    "..\\res\\Notepad2.ico"
-IDI_RUN                 ICON                    "..\\res\\Run.ico"
-IDI_STYLES              ICON                    "..\\res\\Styles.ico"
+IDR_MAINWND             ICON                    "..\\..\\res\\Notepad2.ico"
+IDI_RUN                 ICON                    "..\\..\\res\\Run.ico"
+IDI_STYLES              ICON                    "..\\..\\res\\Styles.ico"
 
 /////////////////////////////////////////////////////////////////////////////
 //
 // Bitmap
 //
 
-IDR_MAINWND             BITMAP                  "..\\res\\Toolbar.bmp"
-IDB_OPEN                BITMAP                  "..\\res\\Open.bmp"
-IDB_NEXT                BITMAP                  "..\\res\\Next.bmp"
-IDB_PREV                BITMAP                  "..\\res\\Prev.bmp"
-IDB_PICK                BITMAP                  "..\\res\\Pick.bmp"
-IDB_ENCODING            BITMAP                  "..\\res\\Encoding.bmp"
+IDR_MAINWND             BITMAP                  "..\\..\\res\\Toolbar.bmp"
+IDB_OPEN_FOLDER         BITMAP                  "..\\..\\res\\OpenFolder.bmp"
+IDB_NEXT                BITMAP                  "..\\..\\res\\Next.bmp"
+IDB_PREV                BITMAP                  "..\\..\\res\\Prev.bmp"
+IDB_PICK                BITMAP                  "..\\..\\res\\Pick.bmp"
+IDB_ENCODING            BITMAP                  "..\\..\\res\\Encoding.bmp"
 
 /////////////////////////////////////////////////////////////////////////////
 //
 // Cursor
 //
 
-IDC_COPY                CURSOR                  "..\\res\\Copy.cur"
+IDC_COPY                CURSOR                  "..\\..\\res\\Copy.cur"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -431,12 +431,7 @@ BEGIN
 			MENUITEM "只匹配完整单词(&W)",		IDM_VIEW_MARKOCCURRENCES_WORD
 		END
 		MENUITEM SEPARATOR
-		POPUP "代码折叠(&F)"
-		BEGIN
-			MENUITEM "显示代码折叠(&F)\tCtrl+Shift+Alt+F",IDM_VIEW_SHOW_FOLDING
-			MENUITEM "显示折叠行(&L)",			IDM_VIEW_SHOW_FOLDING_LINE
-			MENUITEM "显示折叠省略(&E)",			IDM_VIEW_FOLD_DISPALY_TEXT
-		END
+		MENUITEM "显示代码折叠(&F)\tCtrl+Shift+Alt+F",IDM_VIEW_SHOW_FOLDING
 		POPUP "切换折叠(&T)"
 		BEGIN
 			MENUITEM "当前块(&C)\tAlt+C",		IDM_VIEW_FOLD_CURRENT_BLOCK
@@ -468,7 +463,7 @@ BEGIN
 	POPUP "方案(&M)"
 	BEGIN
 		MENUITEM "语法方案(&S)...\tF12",			IDM_VIEW_SCHEME
-		MENUITEM "自定义方案(&C)...\tCtrl+F12",	IDM_VIEW_SCHEMECONFIG
+		MENUITEM "自定义方案(&C)...\tCtrl+F12",	IDM_VIEW_SCHEME_CONFIG
 		MENUITEM "使用第二全局样式(&2)\tShift+F12",IDM_VIEW_USE2NDGLOBALSTYLE
 		MENUITEM "使用默认代码样式(&U)",			IDM_VIEW_USEDEFAULT_CODESTYLE
 		POPUP "主题风格(&Y)"
@@ -479,79 +474,79 @@ BEGIN
 		MENUITEM SEPARATOR
 		POPUP "文本文件(&T)"
 		BEGIN
-			MENUITEM "文本文件(&T)",					IDM_LANG_TEXTFILE
-			MENUITEM "第二文本文件(&2)",				IDM_LANG_2NDTEXTFILE
+			MENUITEM "文本文件(&T)",					IDM_LEXER_TEXTFILE
+			MENUITEM "第二文本文件(&2)",				IDM_LEXER_2NDTEXTFILE
 		END
 		POPUP "CSS 样式表(&H)"
 		BEGIN
-			MENUITEM "&CSS",						IDM_LANG_CSS
-			MENUITEM "&Sassy CSS",					IDM_LANG_SCSS
-			MENUITEM "&Less CSS",					IDM_LANG_LESS
-			MENUITEM "&HSS",						IDM_LANG_HSS
+			MENUITEM "&CSS",						IDM_LEXER_CSS
+			MENUITEM "&Sassy CSS",					IDM_LEXER_SCSS
+			MENUITEM "&Less CSS",					IDM_LEXER_LESS
+			MENUITEM "&HSS",						IDM_LEXER_HSS
 		END
 		POPUP "&Web 源代码"
 		BEGIN
-			MENUITEM "&Web 源代码",			IDM_LANG_WEB
-			MENUITEM "&PHP 页面",					IDM_LANG_PHP
-			MENUITEM "&JSP 页面",					IDM_LANG_JSP
-			MENUITEM "ASP.NET (&C#)",				IDM_LANG_ASPX_CS
-			MENUITEM "ASP.NET (&VB.NET)",			IDM_LANG_ASPX_VB
-			MENUITEM "ASP (V&BScrpt)",				IDM_LANG_ASP_VBS
-			MENUITEM "ASP (J&Script)",				IDM_LANG_ASP_JS
+			MENUITEM "&Web 源代码",			IDM_LEXER_WEB
+			MENUITEM "&PHP 页面",					IDM_LEXER_PHP
+			MENUITEM "&JSP 页面",					IDM_LEXER_JSP
+			MENUITEM "ASP.NET (&C#)",				IDM_LEXER_ASPX_CS
+			MENUITEM "ASP.NET (&VB.NET)",			IDM_LEXER_ASPX_VB
+			MENUITEM "ASP (V&BScrpt)",				IDM_LEXER_ASP_VBS
+			MENUITEM "ASP (J&Script)",				IDM_LEXER_ASP_JS
 		END
 		POPUP "&Math"
 		BEGIN
-			MENUITEM "&MATLAB",						IDM_LANG_MATLAB
-			MENUITEM "&Octave",						IDM_LANG_OCTAVE
-			MENUITEM "&Scilab",						IDM_LANG_SCILAB
+			MENUITEM "&MATLAB",						IDM_LEXER_MATLAB
+			MENUITEM "&Octave",						IDM_LEXER_OCTAVE
+			MENUITEM "&Scilab",						IDM_LEXER_SCILAB
 		END
 		POPUP "Shell 脚本(&P)"
 		BEGIN
-			MENUITEM "&Shell 脚本",				IDM_LANG_BASH
-			MENUITEM "&C Shell",					IDM_LANG_CSHELL
-			MENUITEM "&M4 宏",					IDM_LANG_M4
+			MENUITEM "&Shell 脚本",				IDM_LEXER_BASH
+			MENUITEM "&C Shell",					IDM_LEXER_CSHELL
+			MENUITEM "&M4 宏",					IDM_LEXER_M4
 		END
 		//POPUP "S&QL Dialect"
 		POPUP "&XML 文档"
 		BEGIN
-			MENUITEM "&XML 文档",				IDM_LANG_XML
-			MENUITEM "XML &Schema",					IDM_LANG_XSD
-			MENUITEM "XSL&T 样式表",			IDM_LANG_XSLT
-			MENUITEM "XML &DDD",					IDM_LANG_DTD
+			MENUITEM "&XML 文档",				IDM_LEXER_XML
+			MENUITEM "XML &Schema",					IDM_LEXER_XSD
+			MENUITEM "XSL&T 样式表",			IDM_LEXER_XSLT
+			MENUITEM "XML &DDD",					IDM_LEXER_DTD
 		END
 		POPUP "XML (&Java)"
 		BEGIN
-			MENUITEM "Ant &Build",					IDM_LANG_ANT_BUILD
-			MENUITEM "Maven &POM",					IDM_LANG_MAVEN_POM
-			MENUITEM "&Maven 设置",				IDM_LANG_MAVEN_SETTINGS
-			MENUITEM "I&vy 模块",					IDM_LANG_IVY_MODULE
-			MENUITEM "&Ivy 设置",				IDM_LANG_IVY_SETTINGS
-			MENUITEM "PMD 规则集(&R)",				IDM_LANG_PMD_RULESET
-			MENUITEM "检查样式(&C)",					IDM_LANG_CHECKSTYLE
+			MENUITEM "Ant &Build",					IDM_LEXER_ANT_BUILD
+			MENUITEM "Maven &POM",					IDM_LEXER_MAVEN_POM
+			MENUITEM "&Maven 设置",				IDM_LEXER_MAVEN_SETTINGS
+			MENUITEM "I&vy 模块",					IDM_LEXER_IVY_MODULE
+			MENUITEM "&Ivy 设置",				IDM_LEXER_IVY_SETTINGS
+			MENUITEM "PMD 规则集(&R)",				IDM_LEXER_PMD_RULESET
+			MENUITEM "检查样式(&C)",					IDM_LEXER_CHECKSTYLE
 		END
 		POPUP "Web 配置(&G)"
 		BEGIN
-			MENUITEM "&Apache 配置",				IDM_LANG_APACHE
-			MENUITEM "&Tomcat 配置",				IDM_LANG_TOMCAT
-			MENUITEM "&Web 配置",					IDM_LANG_WEB_JAVA
-			MENUITEM "Str&ututer 配置",				IDM_LANG_STRUTS
-			MENUITEM "&Hibernate 配置",			IDM_LANG_HIB_CFG
-			MENUITEM "Hibernate 映射(&M)",			IDM_LANG_HIB_MAP
-			MENUITEM "Spring &Beans",				IDM_LANG_SPRING_BEANS
-			MENUITEM "&JBoss 配置",				IDM_LANG_JBOSS
+			MENUITEM "&Apache 配置",				IDM_LEXER_APACHE
+			MENUITEM "&Tomcat 配置",				IDM_LEXER_TOMCAT
+			MENUITEM "&Web 配置",					IDM_LEXER_WEB_JAVA
+			MENUITEM "Str&ututer 配置",				IDM_LEXER_STRUTS
+			MENUITEM "&Hibernate 配置",			IDM_LEXER_HIB_CFG
+			MENUITEM "Hibernate 映射(&M)",			IDM_LEXER_HIB_MAP
+			MENUITEM "Spring &Beans",				IDM_LEXER_SPRING_BEANS
+			MENUITEM "&JBoss 配置",				IDM_LEXER_JBOSS
 		END
 		//POPUP "XML (.&NET)"
 		//BEGIN
-		//	MENUITEM "&Web Config",					IDM_LANG_WEB_NET
-		//	MENUITEM "&ResX Resource",				IDM_LANG_RESX
-		//	MENUITEM "WPF &XAML",					IDM_LANG_XAML
+		//	MENUITEM "&Web Config",					IDM_LEXER_WEB_NET
+		//	MENUITEM "&ResX Resource",				IDM_LEXER_RESX
+		//	MENUITEM "WPF &XAML",					IDM_LEXER_XAML
 		//END
 		POPUP "XML (其他)(&O)"
 		BEGIN
-			MENUITEM "属性列表(&P)",				IDM_LANG_PROPERTY_LIST
-			MENUITEM "Android &Manifest",			IDM_LANG_ANDROID_MANIFEST
-			MENUITEM "Android &Layout",				IDM_LANG_ANDROID_LAYOUT
-			//MENUITEM "SV&G Document",				IDM_LANG_SVG
+			MENUITEM "属性列表(&P)",				IDM_LEXER_PROPERTY_LIST
+			MENUITEM "Android &Manifest",			IDM_LEXER_ANDROID_MANIFEST
+			MENUITEM "Android &Layout",				IDM_LEXER_ANDROID_LAYOUT
+			//MENUITEM "SV&G Document",				IDM_LEXER_SVG
 		END
 	END
 	POPUP "设置(&S)"
@@ -586,7 +581,7 @@ BEGIN
 		POPUP "外观(&E)"
 		BEGIN
 			MENUITEM "显示工具栏(&H)\tCtrl+F11",		IDM_VIEW_TOOLBAR
-			MENUITEM "自定义工具栏(&Z)...",		IDM_VIEW_CUSTOMIZETB
+			MENUITEM "自定义工具栏(&Z)...",		IDM_VIEW_CUSTOMIZE_TOOLBAR
 			MENUITEM "显示状态栏(&U)\tShift+F11",	IDM_VIEW_STATUSBAR
 			MENUITEM SEPARATOR
 			MENUITEM "透明模式(&M)\tCtrl+0",	IDM_VIEW_TRANSPARENT
@@ -670,7 +665,7 @@ BEGIN
 	POPUP "+"
 	BEGIN
 		MENUITEM "显示工具栏(&T)",				IDM_VIEW_TOOLBAR
-		MENUITEM "自定义工具栏(&C)...",		IDM_VIEW_CUSTOMIZETB
+		MENUITEM "自定义工具栏(&C)...",		IDM_VIEW_CUSTOMIZE_TOOLBAR
 		MENUITEM "显示状态栏(&S)",				IDM_VIEW_STATUSBAR
 	END
 	POPUP "+"
@@ -827,7 +822,7 @@ BEGIN
     VK_F11,         IDM_VIEW_FULLSCREEN_HIDE_MENU,   VIRTKEY, ALT, NOINVERT
     VK_F11,         IDM_VIEW_STATUSBAR,     VIRTKEY, SHIFT, NOINVERT
     VK_F12,         IDM_VIEW_SCHEME,        VIRTKEY, NOINVERT
-    VK_F12,         IDM_VIEW_SCHEMECONFIG,  VIRTKEY, CONTROL, NOINVERT
+    VK_F12,         IDM_VIEW_SCHEME_CONFIG,  VIRTKEY, CONTROL, NOINVERT
     VK_F12,         IDM_VIEW_DEFAULT_CODE_FONT, VIRTKEY, ALT, NOINVERT
     VK_F12,         IDM_VIEW_USE2NDGLOBALSTYLE, VIRTKEY, SHIFT, NOINVERT
     VK_F2,          IDM_EDIT_SELTONEXT,     VIRTKEY, CONTROL, ALT, NOINVERT
@@ -2013,7 +2008,7 @@ BEGIN
 	IDS_ENCODINGGROUP_JAPANESE		"日语"
 	IDS_ENCODINGGROUP_KOREAN		"韩语/朝鲜语"
 	IDS_ENCODINGGROUP_SOUTHEURO		"南欧"
-	IDS_ENCODINGGROUP_SOUTASIA		"东南亚"
+	IDS_ENCODINGGROUP_SOUTHASIA		"东南亚"
 	IDS_ENCODINGGROUP_TURKISH		"土耳其"
 	IDS_ENCODINGGROUP_EBCDIC		"IBM EBCDIC"
 END
@@ -2057,7 +2052,7 @@ END
 //
 // Generated from the TEXTINCLUDE 3 resource.
 //
-#include "Notepad2.ver"
+#include "../../src/Notepad2.ver"
 /////////////////////////////////////////////////////////////////////////////
 #endif    // not APSTUDIO_INVOKED
 
