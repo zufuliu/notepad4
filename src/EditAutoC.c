@@ -401,6 +401,49 @@ static inline void WordList_AddList(struct WordList *pWList, LPCSTR pList) {
 	}
 }
 
+void WordList_AddSubWord(struct WordList *pWList, LPSTR pWord, int wordLength, int iRootLen) {
+	/*
+	when pRoot is 'b', split 'bugprone-branch-clone' as following:
+	1. first hyphen: 'bugprone-branch-clone' => 'bugprone', 'branch-clone'.
+	2. second hyphen: 'bugprone-branch-clone' => 'bugprone-branch'; 'branch-clone' => 'branch'.
+	*/
+
+	LPCSTR words[8];
+	int starts[8];
+	UINT count = 0;
+
+	for (int i = 0; i < wordLength - 1; i++) {
+		const char ch = pWord[i];
+		if (ch == '.' || ch == '-' || ch == ':') {
+			if (i >= iRootLen) {
+				pWord[i] = '\0';
+				WordList_AddWord(pWList, pWord, i);
+				for (UINT j = 0; j < count; j++) {
+					const int subLen = i - starts[j];
+					if (subLen >= iRootLen) {
+						WordList_AddWord(pWList, words[j], subLen);
+					}
+				}
+				pWord[i] = ch;
+			}
+			if (ch != '.' && (pWord[i + 1] == '>' || pWord[i + 1] == ':')) {
+				++i;
+			}
+
+			const int subLen = wordLength - (i + 1);
+			LPCSTR pSubRoot = pWord + i + 1;
+			if (subLen >= iRootLen && WordList_StartsWith(pWList, pSubRoot)) {
+				WordList_AddWord(pWList, pSubRoot, subLen);
+				if (count < COUNTOF(words)) {
+					words[count] = pSubRoot;
+					starts[count] = i + 1;
+					++count;
+				}
+			}
+		}
+	}
+}
+
 
 static inline BOOL IsASpaceOrTab(int ch) {
 	return ch == ' ' || ch == '\t';
@@ -976,25 +1019,7 @@ void AutoC_AddDocWord(struct WordList *pWList, BOOL bIgnoreCase, char prefix) {
 						pWord[wordLength] = '\0';
 						WordList_AddWord(pWList, pWord, wordLength);
 						if (bSubWord) {
-							for (int i = 0; i < wordLength - 1; i++) {
-								const char ch = pWord[i];
-								if (ch == '.' || ch == '-' || ch == ':') {
-									if (i >= iRootLen) {
-										pWord[i] = '\0';
-										WordList_AddWord(pWList, pWord, i);
-										pWord[i] = ch;
-									}
-									if (ch != '.' && (pWord[i + 1] == '>' || pWord[i + 1] == ':')) {
-										++i;
-									}
-
-									const int subLen = wordLength - (i + 1);
-									LPCSTR pSubRoot = pWord + i + 1;
-									if (subLen >= iRootLen && WordList_StartsWith(pWList, pSubRoot)) {
-										WordList_AddWord(pWList, pSubRoot, subLen);
-									}
-								}
-							}
+							WordList_AddSubWord(pWList, pWord, wordLength, iRootLen);
 						}
 					}
 				}
