@@ -862,22 +862,20 @@ void AutoC_AddDocWord(struct WordList *pWList, BOOL bIgnoreCase, char prefix) {
 					break;
 				}
 
-				BOOL bFound = FALSE;
+				const Sci_Position before = wordEnd;
 				Sci_Position width = 0;
 				int chNext = SciCall_GetCharacterAndWidth(wordEnd + 1, &width);
 				if ((ch == '-' && chNext == '>') || (ch == ':' && chNext == ':')) {
 					chNext = SciCall_GetCharacterAndWidth(wordEnd + 2, &width);
 					if (IsAutoCompletionWordCharacter(chNext)) {
-						bFound = TRUE;
 						wordEnd += 2;
 					}
 				} else if (ch == '.' || (ch == '-' && !IsOperatorStyle(SciCall_GetStyleAt(wordEnd)))) {
 					if (IsAutoCompletionWordCharacter(chNext)) {
-						bFound = TRUE;
 						++wordEnd;
 					}
 				}
-				if (!bFound) {
+				if (wordEnd == before) {
 					break;
 				}
 
@@ -890,6 +888,10 @@ void AutoC_AddDocWord(struct WordList *pWList, BOOL bIgnoreCase, char prefix) {
 				}
 
 				wordEnd = SciCall_WordEndPosition(wordEnd, TRUE);
+				if (wordEnd - iPosFind > NP2_AUTOC_MAX_WORD_LENGTH) {
+					wordEnd = before;
+					break;
+				}
 				bSubWord = TRUE;
 			}
 
