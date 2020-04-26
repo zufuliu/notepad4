@@ -16,8 +16,6 @@
 SETLOCAL ENABLEEXTENSIONS
 CD /D %~dp0
 
-SET "EXIT_ON_ERROR=%~4"
-
 @rem Check for the help switches
 IF /I "%~1" == "help"   GOTO SHOWHELP
 IF /I "%~1" == "/help"  GOTO SHOWHELP
@@ -25,96 +23,80 @@ IF /I "%~1" == "-help"  GOTO SHOWHELP
 IF /I "%~1" == "--help" GOTO SHOWHELP
 IF /I "%~1" == "/?"     GOTO SHOWHELP
 
+@rem default arguments
+SET "COMPILER=MSVC"
+SET "ARCH=all"
+SET "CONFIG=Release"
 
 @rem Check for the first switch
-IF "%~1" == "" (
-  SET "COMPILER=MSVC"
-) ELSE (
-  IF /I "%~1" == "MSVC"         SET "COMPILER=MSVC"     & GOTO CHECKSECONDARG
-  IF /I "%~1" == "/MSVC"        SET "COMPILER=MSVC"     & GOTO CHECKSECONDARG
-  IF /I "%~1" == "-MSVC"        SET "COMPILER=MSVC"     & GOTO CHECKSECONDARG
-  IF /I "%~1" == "--MSVC"       SET "COMPILER=MSVC"     & GOTO CHECKSECONDARG
-  IF /I "%~1" == "GCC"          SET "COMPILER=GCC"      & GOTO CHECKSECONDARG
-  IF /I "%~1" == "/GCC"         SET "COMPILER=GCC"      & GOTO CHECKSECONDARG
-  IF /I "%~1" == "-GCC"         SET "COMPILER=GCC"      & GOTO CHECKSECONDARG
-  IF /I "%~1" == "--GCC"        SET "COMPILER=GCC"      & GOTO CHECKSECONDARG
-  IF /I "%~1" == "Clang"        SET "COMPILER=Clang"    & GOTO CHECKSECONDARG
-  IF /I "%~1" == "/Clang"       SET "COMPILER=Clang"    & GOTO CHECKSECONDARG
-  IF /I "%~1" == "-Clang"       SET "COMPILER=Clang"    & GOTO CHECKSECONDARG
-  IF /I "%~1" == "--Clang"      SET "COMPILER=Clang"    & GOTO CHECKSECONDARG
-  IF /I "%~1" == "LLVM"         SET "COMPILER=Clang"    & GOTO CHECKSECONDARG
-  IF /I "%~1" == "/LLVM"        SET "COMPILER=Clang"    & GOTO CHECKSECONDARG
-  IF /I "%~1" == "-LLVM"        SET "COMPILER=Clang"    & GOTO CHECKSECONDARG
-  IF /I "%~1" == "--LLVM"       SET "COMPILER=Clang"    & GOTO CHECKSECONDARG
+IF "%~1" == "" GOTO START_WORK
+IF /I "%~1" == "MSVC"    SET "COMPILER=MSVC"  & SHIFT & GOTO CHECKSECONDARG
+IF /I "%~1" == "/MSVC"   SET "COMPILER=MSVC"  & SHIFT & GOTO CHECKSECONDARG
+IF /I "%~1" == "-MSVC"   SET "COMPILER=MSVC"  & SHIFT & GOTO CHECKSECONDARG
+IF /I "%~1" == "--MSVC"  SET "COMPILER=MSVC"  & SHIFT & GOTO CHECKSECONDARG
+IF /I "%~1" == "GCC"     SET "COMPILER=GCC"   & SHIFT & GOTO CHECKSECONDARG
+IF /I "%~1" == "/GCC"    SET "COMPILER=GCC"   & SHIFT & GOTO CHECKSECONDARG
+IF /I "%~1" == "-GCC"    SET "COMPILER=GCC"   & SHIFT & GOTO CHECKSECONDARG
+IF /I "%~1" == "--GCC"   SET "COMPILER=GCC"   & SHIFT & GOTO CHECKSECONDARG
+IF /I "%~1" == "Clang"   SET "COMPILER=Clang" & SHIFT & GOTO CHECKSECONDARG
+IF /I "%~1" == "/Clang"  SET "COMPILER=Clang" & SHIFT & GOTO CHECKSECONDARG
+IF /I "%~1" == "-Clang"  SET "COMPILER=Clang" & SHIFT & GOTO CHECKSECONDARG
+IF /I "%~1" == "--Clang" SET "COMPILER=Clang" & SHIFT & GOTO CHECKSECONDARG
+IF /I "%~1" == "LLVM"    SET "COMPILER=Clang" & SHIFT & GOTO CHECKSECONDARG
+IF /I "%~1" == "/LLVM"   SET "COMPILER=Clang" & SHIFT & GOTO CHECKSECONDARG
+IF /I "%~1" == "-LLVM"   SET "COMPILER=Clang" & SHIFT & GOTO CHECKSECONDARG
+IF /I "%~1" == "--LLVM"  SET "COMPILER=Clang" & SHIFT & GOTO CHECKSECONDARG
 
-  ECHO.
-  ECHO Unsupported commandline switch!
-  ECHO Run "%~nx0 help" for details about the commandline switches.
-  CALL :SUBMSG "ERROR" "Compilation failed!"
-)
 
 :CHECKSECONDARG
 @rem Check for the second switch
-IF "%~2" == "" (
-  SET "ARCH=all"
-) ELSE (
-  IF /I "%~2" == "x86"   SET "ARCH=Win32" & GOTO CHECKTHIRDARG
-  IF /I "%~2" == "/x86"  SET "ARCH=Win32" & GOTO CHECKTHIRDARG
-  IF /I "%~2" == "-x86"  SET "ARCH=Win32" & GOTO CHECKTHIRDARG
-  IF /I "%~2" == "--x86" SET "ARCH=Win32" & GOTO CHECKTHIRDARG
-  IF /I "%~2" == "Win32"   SET "ARCH=Win32" & GOTO CHECKTHIRDARG
-  IF /I "%~2" == "/Win32"  SET "ARCH=Win32" & GOTO CHECKTHIRDARG
-  IF /I "%~2" == "-Win32"  SET "ARCH=Win32" & GOTO CHECKTHIRDARG
-  IF /I "%~2" == "--Win32" SET "ARCH=Win32" & GOTO CHECKTHIRDARG
-  IF /I "%~2" == "x64"   SET "ARCH=x64" & GOTO CHECKTHIRDARG
-  IF /I "%~2" == "/x64"  SET "ARCH=x64" & GOTO CHECKTHIRDARG
-  IF /I "%~2" == "-x64"  SET "ARCH=x64" & GOTO CHECKTHIRDARG
-  IF /I "%~2" == "--x64" SET "ARCH=x64" & GOTO CHECKTHIRDARG
-  IF /I "%~2" == "AVX2"   SET "ARCH=AVX2" & GOTO CHECKTHIRDARG
-  IF /I "%~2" == "/AVX2"  SET "ARCH=AVX2" & GOTO CHECKTHIRDARG
-  IF /I "%~2" == "-AVX2"  SET "ARCH=AVX2" & GOTO CHECKTHIRDARG
-  IF /I "%~2" == "--AVX2" SET "ARCH=AVX2" & GOTO CHECKTHIRDARG
-  IF /I "%~2" == "ARM64"   SET "ARCH=ARM64" & GOTO CHECKTHIRDARG
-  IF /I "%~2" == "/ARM64"  SET "ARCH=ARM64" & GOTO CHECKTHIRDARG
-  IF /I "%~2" == "-ARM64"  SET "ARCH=ARM64" & GOTO CHECKTHIRDARG
-  IF /I "%~2" == "--ARM64" SET "ARCH=ARM64" & GOTO CHECKTHIRDARG
-  IF /I "%~2" == "ARM"   SET "ARCH=ARM" & GOTO CHECKTHIRDARG
-  IF /I "%~2" == "/ARM"  SET "ARCH=ARM" & GOTO CHECKTHIRDARG
-  IF /I "%~2" == "-ARM"  SET "ARCH=ARM" & GOTO CHECKTHIRDARG
-  IF /I "%~2" == "--ARM" SET "ARCH=ARM" & GOTO CHECKTHIRDARG
-  IF /I "%~2" == "all"   SET "ARCH=all" & GOTO CHECKTHIRDARG
-  IF /I "%~2" == "/all"  SET "ARCH=all" & GOTO CHECKTHIRDARG
-  IF /I "%~2" == "-all"  SET "ARCH=all" & GOTO CHECKTHIRDARG
-  IF /I "%~2" == "--all" SET "ARCH=all" & GOTO CHECKTHIRDARG
-
-  ECHO.
-  ECHO Unsupported commandline switch!
-  ECHO Run "%~nx0 help" for details about the commandline switches.
-  CALL :SUBMSG "ERROR" "Compilation failed!"
-)
+IF "%~1" == "" GOTO START_WORK
+IF /I "%~1" == "x86"     SET "ARCH=Win32" & SHIFT & GOTO CHECKTHIRDARG
+IF /I "%~1" == "/x86"    SET "ARCH=Win32" & SHIFT & GOTO CHECKTHIRDARG
+IF /I "%~1" == "-x86"    SET "ARCH=Win32" & SHIFT & GOTO CHECKTHIRDARG
+IF /I "%~1" == "--x86"   SET "ARCH=Win32" & SHIFT & GOTO CHECKTHIRDARG
+IF /I "%~1" == "Win32"   SET "ARCH=Win32" & SHIFT & GOTO CHECKTHIRDARG
+IF /I "%~1" == "/Win32"  SET "ARCH=Win32" & SHIFT & GOTO CHECKTHIRDARG
+IF /I "%~1" == "-Win32"  SET "ARCH=Win32" & SHIFT & GOTO CHECKTHIRDARG
+IF /I "%~1" == "--Win32" SET "ARCH=Win32" & SHIFT & GOTO CHECKTHIRDARG
+IF /I "%~1" == "x64"     SET "ARCH=x64"   & SHIFT & GOTO CHECKTHIRDARG
+IF /I "%~1" == "/x64"    SET "ARCH=x64"   & SHIFT & GOTO CHECKTHIRDARG
+IF /I "%~1" == "-x64"    SET "ARCH=x64"   & SHIFT & GOTO CHECKTHIRDARG
+IF /I "%~1" == "--x64"   SET "ARCH=x64"   & SHIFT & GOTO CHECKTHIRDARG
+IF /I "%~1" == "AVX2"    SET "ARCH=AVX2"  & SHIFT & GOTO CHECKTHIRDARG
+IF /I "%~1" == "/AVX2"   SET "ARCH=AVX2"  & SHIFT & GOTO CHECKTHIRDARG
+IF /I "%~1" == "-AVX2"   SET "ARCH=AVX2"  & SHIFT & GOTO CHECKTHIRDARG
+IF /I "%~1" == "--AVX2"  SET "ARCH=AVX2"  & SHIFT & GOTO CHECKTHIRDARG
+IF /I "%~1" == "ARM64"   SET "ARCH=ARM64" & SHIFT & GOTO CHECKTHIRDARG
+IF /I "%~1" == "/ARM64"  SET "ARCH=ARM64" & SHIFT & GOTO CHECKTHIRDARG
+IF /I "%~1" == "-ARM64"  SET "ARCH=ARM64" & SHIFT & GOTO CHECKTHIRDARG
+IF /I "%~1" == "--ARM64" SET "ARCH=ARM64" & SHIFT & GOTO CHECKTHIRDARG
+IF /I "%~1" == "ARM"     SET "ARCH=ARM"   & SHIFT & GOTO CHECKTHIRDARG
+IF /I "%~1" == "/ARM"    SET "ARCH=ARM"   & SHIFT & GOTO CHECKTHIRDARG
+IF /I "%~1" == "-ARM"    SET "ARCH=ARM"   & SHIFT & GOTO CHECKTHIRDARG
+IF /I "%~1" == "--ARM"   SET "ARCH=ARM"   & SHIFT & GOTO CHECKTHIRDARG
+IF /I "%~1" == "all"     SET "ARCH=all"   & SHIFT & GOTO CHECKTHIRDARG
+IF /I "%~1" == "/all"    SET "ARCH=all"   & SHIFT & GOTO CHECKTHIRDARG
+IF /I "%~1" == "-all"    SET "ARCH=all"   & SHIFT & GOTO CHECKTHIRDARG
+IF /I "%~1" == "--all"   SET "ARCH=all"   & SHIFT & GOTO CHECKTHIRDARG
 
 
 :CHECKTHIRDARG
 @rem Check for the third switch
-IF "%~3" == "" (
-  SET "CONFIG=Release"
-) ELSE (
-  IF /I "%~3" == "Release"      SET "CONFIG=Release"    & GOTO START
-  IF /I "%~3" == "/Release"     SET "CONFIG=Release"    & GOTO START
-  IF /I "%~3" == "-Release"     SET "CONFIG=Release"    & GOTO START
-  IF /I "%~3" == "--Release"    SET "CONFIG=Release"    & GOTO START
-  IF /I "%~3" == "Debug"        SET "CONFIG=Debug"      & GOTO START
-  IF /I "%~3" == "/Debug"       SET "CONFIG=Debug"      & GOTO START
-  IF /I "%~3" == "-Debug"       SET "CONFIG=Debug"      & GOTO START
-  IF /I "%~3" == "--Debug"      SET "CONFIG=Debug"      & GOTO START
+IF "%~1" == "" GOTO START_WORK
+IF /I "%~1" == "Release"   SET "CONFIG=Release" & SHIFT & GOTO START_WORK
+IF /I "%~1" == "/Release"  SET "CONFIG=Release" & SHIFT & GOTO START_WORK
+IF /I "%~1" == "-Release"  SET "CONFIG=Release" & SHIFT & GOTO START_WORK
+IF /I "%~1" == "--Release" SET "CONFIG=Release" & SHIFT & GOTO START_WORK
+IF /I "%~1" == "Debug"     SET "CONFIG=Debug"   & SHIFT & GOTO START_WORK
+IF /I "%~1" == "/Debug"    SET "CONFIG=Debug"   & SHIFT & GOTO START_WORK
+IF /I "%~1" == "-Debug"    SET "CONFIG=Debug"   & SHIFT & GOTO START_WORK
+IF /I "%~1" == "--Debug"   SET "CONFIG=Debug"   & SHIFT & GOTO START_WORK
 
-  ECHO.
-  ECHO Unsupported commandline switch!
-  ECHO Run "%~nx0 help" for details about the commandline switches.
-  CALL :SUBMSG "ERROR" "Compilation failed!"
-)
 
-:START
+:START_WORK
+SET "EXIT_ON_ERROR=%~1"
+
 CALL :SubGetVersion
 CALL :SubDetectSevenzipPath
 
