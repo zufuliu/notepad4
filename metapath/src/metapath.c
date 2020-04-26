@@ -168,6 +168,9 @@ HANDLE		g_hDefaultHeap;
 DWORD		g_uWinVer;
 #endif
 static WCHAR g_wchAppUserModelID[64] = L"";
+#if NP2_ENABLE_APP_LOCALIZATION_DLL
+static INT uiLanguage;
+#endif
 
 //=============================================================================
 //
@@ -2846,6 +2849,10 @@ void LoadFlags(void) {
 	IniSectionInit(pIniSection, 16);
 	LoadIniSection(INI_SECTION_NAME_FLAGS, pIniSectionBuf, cchIniSection);
 	IniSectionParse(pIniSection, pIniSectionBuf);
+
+#if NP2_ENABLE_APP_LOCALIZATION_DLL
+	uiLanguage = IniSectionGetInt(pIniSection, L"UILanguage", LANG_USER_DEFAULT);
+#endif
 
 	bReuseWindow = IniSectionGetBool(pIniSection, L"ReuseWindow", 0);
 	if (!flagNoReuseWindow) {
