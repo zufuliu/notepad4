@@ -304,7 +304,7 @@
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='LLVMDebug|ARM'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
-  <PropertyGroup Label="UserMacros" >
+  <PropertyGroup Label="UserMacros">
     <CommonIntDir>$(SolutionDir)..\bin\$(Configuration)\$(Platform)\obj\$(ProjectName)\</CommonIntDir>
     <CommonOutDir>$(SolutionDir)..\bin\$(Configuration)\$(Platform)\</CommonOutDir>
   </PropertyGroup>
