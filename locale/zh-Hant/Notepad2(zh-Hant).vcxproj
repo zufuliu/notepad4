@@ -104,7 +104,7 @@
   </ImportGroup>
   <ImportGroup Label="Shared">
   </ImportGroup>
-  <PropertyGroup Label="UserMacros" >
+  <PropertyGroup Label="UserMacros">
     <CommonIntDir>$(SolutionDir)..\build\bin\$(Configuration)\$(Platform)\obj\$(ProjectName)\</CommonIntDir>
     <CommonOutDir>$(SolutionDir)..\build\bin\$(Configuration)\$(Platform)\locale\zh-Hant\</CommonOutDir>
   </PropertyGroup>
