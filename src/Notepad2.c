@@ -334,6 +334,9 @@ UINT		g_uCurrentDPI = USER_DEFAULT_SCREEN_DPI;
 UINT		g_uDefaultDPI = USER_DEFAULT_SCREEN_DPI;
 static WCHAR g_wchAppUserModelID[64] = L"";
 static WCHAR g_wchWorkingDirectory[MAX_PATH] = L"";
+#if NP2_ENABLE_APP_LOCALIZATION_DLL
+static INT uiLanguage;
+#endif
 
 //=============================================================================
 //
@@ -6337,6 +6340,10 @@ void LoadFlags(void) {
 
 	LoadIniSection(INI_SECTION_NAME_FLAGS, pIniSectionBuf, cchIniSection);
 	IniSectionParse(pIniSection, pIniSectionBuf);
+
+#if NP2_ENABLE_APP_LOCALIZATION_DLL
+	uiLanguage = IniSectionGetInt(pIniSection, L"UILanguage", LANG_USER_DEFAULT);
+#endif
 
 	bSingleFileInstance = IniSectionGetBool(pIniSection, L"SingleFileInstance", 1);
 	bReuseWindow = IniSectionGetBool(pIniSection, L"ReuseWindow", 0);
