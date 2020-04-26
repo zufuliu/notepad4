@@ -15,8 +15,6 @@
 
 //! Enable localization with satellite resource DLLs.
 #define NP2_ENABLE_APP_LOCALIZATION_SATELLITE	0
-//! Enable localization with Multilingual User Interface (Vista and later).
-#define NP2_ENABLE_APP_LOCALIZATION_MUI			0
 
 //! Enable localization for scheme/lexer names.
 #define NP2_ENABLE_LEXER_NAME_LOCALIZATION		0
