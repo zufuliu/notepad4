@@ -796,9 +796,10 @@ HMODULE LoadLocalizedResourceDLL(LANGID lang, LPCWSTR dllName) {
 	}
 
 	LPCWSTR folder = NULL;
+	const LANGID subLang = SUBLANGID(lang);
 	switch (PRIMARYLANGID(lang)) {
 	case LANG_CHINESE:
-		folder = (SUBLANGID(lang) == LANG_CHINESE_TRADITIONAL) ? L"zh-Hant" : L"zh-Hans";
+		folder = (subLang == SUBLANG_CHINESE_TRADITIONAL || subLang == SUBLANG_CHINESE_HONGKONG || subLang == SUBLANG_CHINESE_MACAU) ? L"zh-Hant" : L"zh-Hans";
 		break;
 	}
 
