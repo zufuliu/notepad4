@@ -335,7 +335,8 @@ UINT		g_uDefaultDPI = USER_DEFAULT_SCREEN_DPI;
 static WCHAR g_wchAppUserModelID[64] = L"";
 static WCHAR g_wchWorkingDirectory[MAX_PATH] = L"";
 #if NP2_ENABLE_APP_LOCALIZATION_DLL
-static INT uiLanguage;
+static HMODULE hResDLL;
+static LANGID uiLanguage;
 #endif
 
 //=============================================================================
@@ -445,6 +446,11 @@ static void CleanUpResources(BOOL initialized) {
 	if (initialized) {
 		UnregisterClass(wchWndClass, g_hInstance);
 	}
+#if NP2_ENABLE_APP_LOCALIZATION_DLL
+	if (hResDLL) {
+		FreeLibrary(hResDLL);
+	}
+#endif
 	OleUninitialize();
 }
 
@@ -512,7 +518,18 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 
 	// Command Line Help Dialog
 	if (flagDisplayHelp) {
+#if NP2_ENABLE_APP_LOCALIZATION_DLL
+		hResDLL = LoadLocalizedResourceDLL(uiLanguage, WC_NOTEPAD2 L".dll");
+		if (hResDLL) {
+			g_hInstance = hInstance = (HINSTANCE)hResDLL;
+		}
+#endif
 		DisplayCmdLineHelp(NULL);
+#if NP2_ENABLE_APP_LOCALIZATION_DLL
+		if (hResDLL) {
+			FreeLibrary(hResDLL);
+		}
+#endif
 		return 0;
 	}
 
@@ -554,6 +571,12 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 	kSystemLibraryLoadFlags = (IsWin8AndAbove() || GetProcAddress(GetModuleHandle(L"kernel32.dll"), "SetDefaultDllDirectories")) ? LOAD_LIBRARY_SEARCH_SYSTEM32 : 0;
 #endif
 
+#if NP2_ENABLE_APP_LOCALIZATION_DLL
+	hResDLL = LoadLocalizedResourceDLL(uiLanguage, WC_NOTEPAD2 L".dll");
+	if (hResDLL) {
+		g_hInstance = hInstance = (HINSTANCE)hResDLL;
+	}
+#endif
 	Scintilla_RegisterClasses(hInstance);
 
 	// Load Settings
@@ -6342,7 +6365,7 @@ void LoadFlags(void) {
 	IniSectionParse(pIniSection, pIniSectionBuf);
 
 #if NP2_ENABLE_APP_LOCALIZATION_DLL
-	uiLanguage = IniSectionGetInt(pIniSection, L"UILanguage", LANG_USER_DEFAULT);
+	uiLanguage = (LANGID)IniSectionGetInt(pIniSection, L"UILanguage", LANG_USER_DEFAULT);
 #endif
 
 	bSingleFileInstance = IniSectionGetBool(pIniSection, L"SingleFileInstance", 1);

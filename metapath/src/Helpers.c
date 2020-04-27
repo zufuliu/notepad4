@@ -790,6 +790,34 @@ LRESULT SendWMSize(HWND hwnd) {
 	return SendMessage(hwnd, WM_SIZE, SIZE_RESTORED, MAKELPARAM(rc.right, rc.bottom));
 }
 
+HMODULE LoadLocalizedResourceDLL(LANGID lang, LPCWSTR dllName) {
+	if (lang == LANG_USER_DEFAULT) {
+		lang = GetUserDefaultUILanguage();
+	}
+
+	LPCWSTR folder = NULL;
+	switch (PRIMARYLANGID(lang)) {
+	case LANG_CHINESE:
+		folder = (SUBLANGID(lang) == LANG_CHINESE_TRADITIONAL) ? L"zh-Hant" : L"zh-Hans";
+		break;
+	}
+
+	if (folder == NULL) {
+		return NULL;
+	}
+
+	WCHAR path[MAX_PATH];
+	GetModuleFileName(NULL, path, COUNTOF(path));
+	PathRemoveFileSpec(path);
+	PathAppend(path, L"locale");
+	PathAppend(path, folder);
+	PathAppend(path, dllName);
+
+	const DWORD flags = IsVistaAndAbove() ? (LOAD_LIBRARY_AS_DATAFILE | LOAD_LIBRARY_AS_IMAGE_RESOURCE) : LOAD_LIBRARY_AS_DATAFILE;
+	HMODULE hDLL = LoadLibraryEx(path, NULL, flags);
+	return hDLL;
+}
+
 //=============================================================================
 //
 //  PathRelativeToApp()
