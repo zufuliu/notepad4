@@ -169,7 +169,8 @@ DWORD		g_uWinVer;
 #endif
 static WCHAR g_wchAppUserModelID[64] = L"";
 #if NP2_ENABLE_APP_LOCALIZATION_DLL
-static INT uiLanguage;
+static HMODULE hResDLL;
+static LANGID uiLanguage;
 #endif
 
 //=============================================================================
@@ -209,6 +210,11 @@ static void CleanUpResources(BOOL initialized) {
 	if (initialized) {
 		UnregisterClass(WC_METAPATH, g_hInstance);
 	}
+#if NP2_ENABLE_APP_LOCALIZATION_DLL
+	if (hResDLL) {
+		FreeLibrary(hResDLL);
+	}
+#endif
 	OleUninitialize();
 }
 
@@ -263,6 +269,13 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 	InitCommonControlsEx(&icex);
 
 	msgTaskbarCreated = RegisterWindowMessage(L"TaskbarCreated");
+
+#if NP2_ENABLE_APP_LOCALIZATION_DLL
+	hResDLL = LoadLocalizedResourceDLL(uiLanguage, WC_METAPATH L".dll");
+	if (hResDLL) {
+		g_hInstance = hInstance = (HINSTANCE)hResDLL;
+	}
+#endif
 
 	// Load Settings
 	LoadSettings();
@@ -2851,7 +2864,7 @@ void LoadFlags(void) {
 	IniSectionParse(pIniSection, pIniSectionBuf);
 
 #if NP2_ENABLE_APP_LOCALIZATION_DLL
-	uiLanguage = IniSectionGetInt(pIniSection, L"UILanguage", LANG_USER_DEFAULT);
+	uiLanguage = (LANGID)IniSectionGetInt(pIniSection, L"UILanguage", LANG_USER_DEFAULT);
 #endif
 
 	bReuseWindow = IniSectionGetBool(pIniSection, L"ReuseWindow", 0);
