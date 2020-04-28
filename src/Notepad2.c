@@ -337,6 +337,7 @@ static WCHAR g_wchWorkingDirectory[MAX_PATH] = L"";
 #if NP2_ENABLE_APP_LOCALIZATION_DLL
 static HMODULE hResDLL;
 static LANGID uiLanguage;
+static UINT languageMenu;
 #endif
 
 //=============================================================================
@@ -2164,6 +2165,48 @@ void UpdateStatusBarWidth(void) {
 	SendMessage(hwndStatus, SB_SETPARTS, COUNTOF(aWidth), (LPARAM)aWidth);
 }
 
+#if NP2_ENABLE_APP_LOCALIZATION_DLL
+void ValidateUILangauge(void) {
+	const LANGID subLang = SUBLANGID(uiLanguage);
+	switch (PRIMARYLANGID(uiLanguage)) {
+	case LANG_ENGLISH:
+		languageMenu = IDM_LANG_ENGLISH_US;
+		break;
+	case LANG_CHINESE:
+		languageMenu = IsChineseTraditionalSubLang(subLang)? IDM_LANG_CHINESE_TRADITIONAL : IDM_LANG_CHINESE_SIMPLIFIED;
+		break;
+	case LANG_NEUTRAL:
+	default:
+		languageMenu = IDM_LANG_USER_DEFAULT;
+		uiLanguage = LANG_USER_DEFAULT;
+		break;
+	}
+}
+
+void SetUILanguage(UINT menu) {
+	languageMenu = menu;
+	LANGID lang = uiLanguage;
+	switch (menu) {
+	case IDM_LANG_USER_DEFAULT:
+		lang = LANG_USER_DEFAULT;
+		break;
+	case IDM_LANG_ENGLISH_US:
+		lang = MAKELANGID(LANG_ENGLISH, SUBLANG_ENGLISH_US);
+		break;
+	case IDM_LANG_CHINESE_SIMPLIFIED:
+		lang = MAKELANGID(LANG_CHINESE, SUBLANG_CHINESE_SIMPLIFIED);
+		break;
+	case IDM_LANG_CHINESE_TRADITIONAL:
+		lang = MAKELANGID(LANG_CHINESE, SUBLANG_CHINESE_TRADITIONAL);
+		break;
+	}
+
+	// TODO: change UI language without restart or alert restart is required.
+	uiLanguage = lang;
+	IniSetInt(INI_SECTION_NAME_FLAGS, L"UILanguage", lang);
+}
+#endif
+
 BOOL IsIMEInNativeMode(void) {
 	BOOL result = FALSE;
 	HIMC himc = ImmGetContext(hwndEdit);
@@ -2454,7 +2497,9 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	EnableCmd(hmenu, IDM_VIEW_CUSTOMIZE_TOOLBAR, bShowToolbar);
 	CheckCmd(hmenu, IDM_VIEW_AUTO_SCALE_TOOLBAR, bAutoScaleToolbar);
 	CheckCmd(hmenu, IDM_VIEW_STATUSBAR, bShowStatusbar);
-
+#if NP2_ENABLE_APP_LOCALIZATION_DLL
+	CheckMenuRadioItem(hmenu, IDM_LANG_USER_DEFAULT, IDM_LANG_LAST_LANGUAGE, languageMenu, MF_BYCOMMAND);
+#endif
 	CheckCmd(hmenu, IDM_VIEW_FULLSCREEN_ON_START, iFullScreenMode & FullScreenMode_OnStartup);
 	CheckCmd(hmenu, IDM_VIEW_FULLSCREEN_HIDE_TITLE, iFullScreenMode & FullScreenMode_HideCaption);
 	CheckCmd(hmenu, IDM_VIEW_FULLSCREEN_HIDE_MENU, iFullScreenMode & FullScreenMode_HideMenu);
@@ -4393,6 +4438,15 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 	case IDM_FILE_LARGE_FILE_MODE:
 		EditConvertToLargeMode();
+		break;
+#endif
+
+#if NP2_ENABLE_APP_LOCALIZATION_DLL
+	case IDM_LANG_USER_DEFAULT:
+	case IDM_LANG_ENGLISH_US:
+	case IDM_LANG_CHINESE_SIMPLIFIED:
+	case IDM_LANG_CHINESE_TRADITIONAL:
+		SetUILanguage(LOWORD(wParam));
 		break;
 #endif
 
@@ -6366,6 +6420,7 @@ void LoadFlags(void) {
 
 #if NP2_ENABLE_APP_LOCALIZATION_DLL
 	uiLanguage = (LANGID)IniSectionGetInt(pIniSection, L"UILanguage", LANG_USER_DEFAULT);
+	ValidateUILangauge();
 #endif
 
 	bSingleFileInstance = IniSectionGetBool(pIniSection, L"SingleFileInstance", 1);
