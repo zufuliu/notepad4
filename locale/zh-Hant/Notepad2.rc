@@ -1,6 +1,7 @@
 // Microsoft Visual C++ generated resource script.
 //
 #include "../../src/resource.h"
+#include "../../src/config.h"
 
 #define APSTUDIO_READONLY_SYMBOLS
 /////////////////////////////////////////////////////////////////////////////
@@ -589,6 +590,7 @@ BEGIN
 			MENUITEM "显示状态栏(&U)\tShift+F11",		IDM_VIEW_STATUSBAR
 			MENUITEM SEPARATOR
 			MENUITEM "透明模式(&M)\tCtrl+0",			IDM_VIEW_TRANSPARENT
+#if NP2_ENABLE_APP_LOCALIZATION_DLL
 			MENUITEM SEPARATOR
 			POPUP "語言(&L)"
 			BEGIN
@@ -597,6 +599,7 @@ BEGIN
 				MENUITEM "简体中文(&C)",				IDM_LANG_CHINESE_SIMPLIFIED
 				MENUITEM "繁體中文(&T)",				IDM_LANG_CHINESE_TRADITIONAL
 			END
+#endif
 		END
 		POPUP "全屏模式(&N)"
 		BEGIN
