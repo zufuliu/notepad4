@@ -1612,7 +1612,7 @@ HWND EditCreate(HWND hwndParent) {
 	SciCall_SetMultipleSelection(TRUE);
 	SciCall_SetAdditionalSelectionTyping(TRUE);
 	SciCall_SetMultiPaste(SC_MULTIPASTE_EACH);
-	SciCall_SetVirtualSpaceOptions(SCVS_NONE);
+	SciCall_SetVirtualSpaceOptions(SCVS_RECTANGULARSELECTION | SCVS_NOWRAPLINESTART);
 	SciCall_SetAdditionalCaretsBlink(TRUE);
 	SciCall_SetAdditionalCaretsVisible(TRUE);
 	// style both before and after the visible text in the background
