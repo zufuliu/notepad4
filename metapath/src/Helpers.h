@@ -360,6 +360,12 @@ LRESULT SendWMSize(HWND hwnd);
 #define IsButtonChecked(hwnd, uId)	(IsDlgButtonChecked(hwnd, (uId)) == BST_CHECKED)
 
 HMODULE LoadLocalizedResourceDLL(LANGID lang, LPCWSTR dllName);
+NP2_inline BOOL IsChineseTraditionalSubLang(LANGID subLang) {
+	return subLang == SUBLANG_CHINESE_TRADITIONAL
+		|| subLang == SUBLANG_CHINESE_HONGKONG
+		|| subLang == SUBLANG_CHINESE_MACAU;
+}
+
 #define GetString(id, pb, cb)	LoadString(g_hInstance, id, pb, cb)
 #define StrEnd(pStart)			((pStart) + lstrlen(pStart))
 
