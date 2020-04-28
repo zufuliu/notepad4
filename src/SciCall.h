@@ -204,6 +204,10 @@ NP2_inline BOOL SciCall_CanPaste(void) {
 	return (BOOL)SciCall(SCI_CANPASTE, 0, 0);
 }
 
+NP2_inline void SciCall_CopyAllowLine(void) {
+	SciCall(SCI_COPYALLOWLINE, 0, 0);
+}
+
 NP2_inline void SciCall_CopyRange(Sci_Position start, Sci_Position end) {
 	SciCall(SCI_COPYRANGE, start, end);
 }

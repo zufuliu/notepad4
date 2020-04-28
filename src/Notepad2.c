@@ -2322,7 +2322,7 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	EnableCmd(hmenu, IDM_EDIT_CUT, i /*&& !bReadOnly*/);
 	//EnableCmd(hmenu, IDM_EDIT_CUT_BINARY, i /*&& !bReadOnly*/);
-	EnableCmd(hmenu, IDM_EDIT_COPY, i /*&& !bReadOnly*/);
+	EnableCmd(hmenu, IDM_EDIT_COPY, nonEmpty /*&& !bReadOnly*/);
 	//EnableCmd(hmenu, IDM_EDIT_COPY_BINARY, i /*&& !bReadOnly*/);
 	EnableCmd(hmenu, IDM_EDIT_COPYALL, nonEmpty /*&& !bReadOnly*/);
 	EnableCmd(hmenu, IDM_EDIT_SELECTALL, nonEmpty);
@@ -3012,13 +3012,20 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	case IDM_EDIT_COPY:
-	//case IDM_EDIT_COPY_BINARY:
 		if (flagPasteBoard) {
 			bLastCopyFromMe = TRUE;
 		}
-		SciCall_Copy(LOWORD(wParam) == IDM_EDIT_COPY_BINARY);
+		SciCall_CopyAllowLine();
 		UpdateToolbar();
 		break;
+
+	//case IDM_EDIT_COPY_BINARY:
+	//	if (flagPasteBoard) {
+	//		bLastCopyFromMe = TRUE;
+	//	}
+	//	SciCall_Copy(TRUE);
+	//	UpdateToolbar();
+	//	break;
 
 	case IDM_EDIT_COPYALL:
 		if (flagPasteBoard) {
@@ -6719,10 +6726,10 @@ void UpdateToolbar(void) {
 
 	int i = !SciCall_IsSelectionEmpty();
 	EnableTool(IDT_EDIT_CUT, i /*&& !bReadOnly*/);
-	EnableTool(IDT_EDIT_COPY, i);
 	EnableTool(IDT_EDIT_PASTE, SciCall_CanPaste() /*&& !bReadOnly*/);
 
 	i = SciCall_GetLength() != 0;
+	EnableTool(IDT_EDIT_COPY, i);
 	EnableTool(IDT_EDIT_FIND, i);
 	//EnableTool(IDT_EDIT_FINDNEXT, i);
 	//EnableTool(IDT_EDIT_FINDPREV, i && StrNotEmptyA(efrData.szFind));
