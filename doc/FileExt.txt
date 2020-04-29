@@ -17,6 +17,7 @@ C/C++ Source
 	cc				C++ Source File
 	h				C/C++ Header File
 	hpp				C++ Header File
+	cppm			Clang C++ Module
 	hxx				C++ Header File
 	hh				C++ Header File
 	inl				C++ Inline File
