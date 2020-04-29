@@ -220,7 +220,7 @@ def updateCharacterCategory(categories):
 	value = (sys.maxunicode + 1)*32 + categories.index(category)
 	table.append(value)
 
-	print('catRanges:', len(values), 4*len(values)/1024, math.ceil(math.log2(len(values))))
+	print('catRanges:', len(table), 4*len(table)/1024, math.ceil(math.log2(len(table))))
 	values.append("#if CHARACTERCATEGORY_USE_BINARY_SEARCH")
 	values.append("const int catRanges[] = {")
 	values.extend(["%d," % value for value in table])
@@ -482,7 +482,6 @@ def compressIndexTable(head, indexTable, args):
 		})
 		if with_function:
 			function = """{function}
-
 	ch = ({table}[ch >> {shiftA}] << {shiftA2}) | (ch & {maskA});
 	ch = ({table}[{offsetC} + (ch >> {shiftC})] << {shiftC2}) | (ch & {maskC});
 	return static_cast<{returnType}>({table}[{offsetD} + ch]);
@@ -524,7 +523,6 @@ constexpr int {table}Offset2 = {offsetD};
 		})
 		if with_function:
 			function = """{function}
-
 	ch = ({table}1[ch >> {shiftA}] << {shiftA2}) | (ch & {maskA});
 	ch = ({table}2[(ch >> {shiftC})] << {shiftC2}) | (ch & {maskC});
 	return static_cast<{returnType}>({table}[ch]);
@@ -608,11 +606,13 @@ def updateCharClassifyTable(filename, headfile):
 	if (ch > maxUnicode) {
 		// Cn
 		return ccSpace;
-	}""",
+	}
+
+	ch -= sizeof(classifyMap);""",
 		'returnType': 'cc'
 	}
 
-	table, function = compressIndexTable('CharClassify Unicode', indexTable, args)
+	table, function = compressIndexTable('CharClassify Unicode', indexTable[BMPCharacterCharacterCount:], args)
 	output.extend(table.splitlines())
 
 	for line in function.splitlines():
@@ -709,7 +709,8 @@ def makeDBCSCharClassifyTable(output, encodingList, isReservedOrUDC=None):
 	if (ch > maxDBCSCharacter) {
 		// Cn
 		return CharClassify::ccSpace;
-	}""" % suffix,
+	}
+	""" % suffix,
 			'returnType': 'CharClassify::cc'
 		}
 
