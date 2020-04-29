@@ -27,6 +27,7 @@ IF /I "%~1" == "/?"     GOTO SHOWHELP
 SET "COMPILER=MSVC"
 SET "ARCH=all"
 SET "CONFIG=Release"
+SET "WITH_LOCALE="
 
 @rem Check for the first switch
 IF "%~1" == "" GOTO StartWork
@@ -84,14 +85,23 @@ IF /I "%~1" == "--all"   SET "ARCH=all"   & SHIFT & GOTO CheckThirdArg
 :CheckThirdArg
 @rem Check for the third switch
 IF "%~1" == "" GOTO StartWork
-IF /I "%~1" == "Release"   SET "CONFIG=Release" & SHIFT & GOTO StartWork
-IF /I "%~1" == "/Release"  SET "CONFIG=Release" & SHIFT & GOTO StartWork
-IF /I "%~1" == "-Release"  SET "CONFIG=Release" & SHIFT & GOTO StartWork
-IF /I "%~1" == "--Release" SET "CONFIG=Release" & SHIFT & GOTO StartWork
-IF /I "%~1" == "Debug"     SET "CONFIG=Debug"   & SHIFT & GOTO StartWork
-IF /I "%~1" == "/Debug"    SET "CONFIG=Debug"   & SHIFT & GOTO StartWork
-IF /I "%~1" == "-Debug"    SET "CONFIG=Debug"   & SHIFT & GOTO StartWork
-IF /I "%~1" == "--Debug"   SET "CONFIG=Debug"   & SHIFT & GOTO StartWork
+IF /I "%~1" == "Release"   SET "CONFIG=Release" & SHIFT & GOTO CheckFourthArg
+IF /I "%~1" == "/Release"  SET "CONFIG=Release" & SHIFT & GOTO CheckFourthArg
+IF /I "%~1" == "-Release"  SET "CONFIG=Release" & SHIFT & GOTO CheckFourthArg
+IF /I "%~1" == "--Release" SET "CONFIG=Release" & SHIFT & GOTO CheckFourthArg
+IF /I "%~1" == "Debug"     SET "CONFIG=Debug"   & SHIFT & GOTO CheckFourthArg
+IF /I "%~1" == "/Debug"    SET "CONFIG=Debug"   & SHIFT & GOTO CheckFourthArg
+IF /I "%~1" == "-Debug"    SET "CONFIG=Debug"   & SHIFT & GOTO CheckFourthArg
+IF /I "%~1" == "--Debug"   SET "CONFIG=Debug"   & SHIFT & GOTO CheckFourthArg
+
+
+:CheckFourthArg
+@rem Check for the fourth switch
+IF "%~1" == "" GOTO StartWork
+IF /I "%~1" == "Locale"   SET "WITH_LOCALE=1" & SHIFT & GOTO StartWork
+IF /I "%~1" == "/Locale"  SET "WITH_LOCALE=1" & SHIFT & GOTO StartWork
+IF /I "%~1" == "-Locale"  SET "WITH_LOCALE=1" & SHIFT & GOTO StartWork
+IF /I "%~1" == "--Locale" SET "WITH_LOCALE=1" & SHIFT & GOTO StartWork
 
 
 :StartWork
@@ -174,10 +184,15 @@ EXIT /B
 IF NOT EXIST "%1\Notepad2.exe" CALL :SUBMSG "ERROR" "%1\Notepad2.exe NOT found"
 IF NOT EXIST "%1\metapath.exe" CALL :SUBMSG "ERROR" "%1\metapath.exe NOT found"
 
-IF /I "%COMPILER%" == "MSVC" (
-  SET "ZIP_NAME=Notepad2_%2_%NP2_VER%"
+IF "%WITH_LOCALE%" == "1" (
+  SET "ZIP_NAME=Notepad2_i18n"
 ) ELSE (
-  SET "ZIP_NAME=Notepad2_%COMPILER%_%2_%NP2_VER%"
+  SET "ZIP_NAME=Notepad2"
+)
+IF /I "%COMPILER%" == "MSVC" (
+  SET "ZIP_NAME=%ZIP_NAME%_%2_%NP2_VER%"
+) ELSE (
+  SET "ZIP_NAME=%ZIP_NAME%_%COMPILER%_%2_%NP2_VER%"
 )
 TITLE Creating %ZIP_NAME%.zip...
 CALL :SUBMSG "INFO" "Creating %ZIP_NAME%.zip..."
@@ -189,9 +204,12 @@ IF NOT EXIST "%TEMP_ZIP_DIR%" MD "%TEMP_ZIP_DIR%"
 FOR %%A IN ( "..\License.txt"  "%1\Notepad2.exe"  "%1\metapath.exe" "..\doc\Notepad2.ini" "..\doc\Notepad2.reg" "..\metapath\doc\metapath.ini"
 ) DO COPY /Y /B /V "%%A" "%TEMP_ZIP_DIR%\"
 COPY /Y /B /V "..\doc\Notepad2 DarkTheme.ini" "%TEMP_ZIP_DIR%\"
+IF "%WITH_LOCALE%" == "1" (
+  XCOPY /Q /S /Y "%1\locale" "%TEMP_ZIP_DIR%\locale\"
+)
 
 PUSHD "%TEMP_ZIP_DIR%"
-"%SEVENZIP%" a -tzip -mx=9 "../%ZIP_NAME%.zip" "License.txt" "Notepad2.exe" "metapath.exe" "Notepad2.ini" "Notepad2 DarkTheme.ini" "Notepad2.reg" "metapath.ini" >NUL
+"%SEVENZIP%" a -tzip -mx=9 "../%ZIP_NAME%.zip" "*" >NUL
 POPD
 
 IF %ERRORLEVEL% NEQ 0 CALL :SUBMSG "ERROR" "Compilation failed!"
@@ -232,7 +250,7 @@ EXIT /B
 :SHOWHELP
 TITLE %~nx0 %1
 ECHO. & ECHO.
-ECHO Usage:  %~nx0 [MSVC^|GCC^|Clang^|LLVM] [Win32^|x64^|AVX2^|ARM64^|ARM^|all] [Release^|Debug]
+ECHO Usage:  %~nx0 [MSVC^|GCC^|Clang^|LLVM] [Win32^|x64^|AVX2^|ARM64^|ARM^|all] [Release^|Debug] [Locale]
 ECHO.
 ECHO Notes:  You can also prefix the commands with "-", "--" or "/".
 ECHO         The arguments are not case sensitive.
