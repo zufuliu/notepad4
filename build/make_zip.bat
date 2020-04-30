@@ -231,6 +231,11 @@ FOR /F "tokens=2*" %%A IN (
    REG QUERY "HKLM\SOFTWARE\Wow6432Node\7-Zip" /v "Path" 2^>NUL ^| FIND "REG_SZ"') DO SET "SEVENZIP=%%B\7z.exe"
 EXIT /B
 
+FOR /F "tokens=2*" %%A IN (
+  'REG QUERY "HKLM\SOFTWARE\7-Zip-Zstandard" /v "Path" 2^>NUL ^| FIND "REG_SZ" ^|^|
+   REG QUERY "HKLM\SOFTWARE\Wow6432Node\7-Zip-Zstandard" /v "Path" 2^>NUL ^| FIND "REG_SZ"') DO SET "SEVENZIP=%%B\7z.exe"
+EXIT /B
+
 
 :SubGetVersion
 rem Get the version
