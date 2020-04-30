@@ -498,7 +498,6 @@ class ScintillaWin :
 	CaseFolder *CaseFolderForEncoding() override;
 	std::string CaseMapString(const std::string &s, int caseMapping) override;
 	void Copy(bool asBinary) override;
-	void CopyAllowLine() override;
 	bool CanPaste() noexcept override;
 	void Paste(bool asBinary) override;
 	void SCICALL CreateCallTipWindow(PRectangle rc) noexcept override;
@@ -2667,12 +2666,6 @@ void ScintillaWin::Copy(bool asBinary) {
 		CopySelectionRange(&selectedText);
 		CopyToClipboard(selectedText);
 	}
-}
-
-void ScintillaWin::CopyAllowLine() {
-	SelectionText selectedText;
-	CopySelectionRange(&selectedText, true);
-	CopyToClipboard(selectedText);
 }
 
 bool ScintillaWin::CanPaste() noexcept {
