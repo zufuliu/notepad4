@@ -3912,8 +3912,7 @@ int Editor::KeyCommand(unsigned int iMessage) {
 	case SCI_LINECOPY: {
 		const Sci::Line lineStart = pdoc->SciLineFromPosition(SelectionStart().Position());
 		const Sci::Line lineEnd = pdoc->SciLineFromPosition(SelectionEnd().Position());
-		CopyRangeToClipboard(pdoc->LineStart(lineStart),
-			pdoc->LineStart(lineEnd + 1));
+		CopyRangeToClipboard(pdoc->LineStart(lineStart), pdoc->LineStart(lineEnd + 1), true);
 	}
 	break;
 	case SCI_LINECUT: {
@@ -4230,13 +4229,9 @@ void Editor::CopySelectionRange(SelectionText *ss, bool allowLineCopy) {
 		if (allowLineCopy) {
 			const Sci::Line currentLine = pdoc->SciLineFromPosition(sel.MainCaret());
 			const Sci::Position start = pdoc->LineStart(currentLine);
-			const Sci::Position end = pdoc->LineEnd(currentLine);
+			const Sci::Position end = pdoc->LineStart(currentLine + 1);
 
 			std::string text = RangeText(start, end);
-			if (pdoc->eolMode != SC_EOL_LF)
-				text.push_back('\r');
-			if (pdoc->eolMode != SC_EOL_CR)
-				text.push_back('\n');
 			ss->Copy(text, pdoc->dbcsCodePage,
 				vs.styles[STYLE_DEFAULT].characterSet, false, true);
 		}
@@ -4259,13 +4254,13 @@ void Editor::CopySelectionRange(SelectionText *ss, bool allowLineCopy) {
 	}
 }
 
-void Editor::CopyRangeToClipboard(Sci::Position start, Sci::Position end) {
+void Editor::CopyRangeToClipboard(Sci::Position start, Sci::Position end, bool allowLineCopy) {
 	start = pdoc->ClampPositionIntoDocument(start);
 	end = pdoc->ClampPositionIntoDocument(end);
 	SelectionText selectedText;
 	std::string text = RangeText(start, end);
 	selectedText.Copy(text,
-		pdoc->dbcsCodePage, vs.styles[STYLE_DEFAULT].characterSet, false, false);
+		pdoc->dbcsCodePage, vs.styles[STYLE_DEFAULT].characterSet, false, allowLineCopy);
 	CopyToClipboard(selectedText);
 }
 
