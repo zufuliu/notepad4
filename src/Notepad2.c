@@ -2320,7 +2320,7 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	const BOOL canPaste = SciCall_CanPaste();
 	const BOOL nonEmpty = SciCall_GetLength() != 0;
 
-	EnableCmd(hmenu, IDM_EDIT_CUT, i /*&& !bReadOnly*/);
+	EnableCmd(hmenu, IDM_EDIT_CUT, nonEmpty /*&& !bReadOnly*/);
 	//EnableCmd(hmenu, IDM_EDIT_CUT_BINARY, i /*&& !bReadOnly*/);
 	EnableCmd(hmenu, IDM_EDIT_COPY, nonEmpty /*&& !bReadOnly*/);
 	//EnableCmd(hmenu, IDM_EDIT_COPY_BINARY, i /*&& !bReadOnly*/);
@@ -3004,12 +3004,22 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	case IDM_EDIT_CUT:
-	//case IDM_EDIT_CUT_BINARY:
 		if (flagPasteBoard) {
 			bLastCopyFromMe = TRUE;
 		}
-		SciCall_Cut(LOWORD(wParam) == IDM_EDIT_CUT_BINARY);
+		if (SciCall_IsSelectionEmpty()) {
+			SciCall_LineCut();
+		} else {
+			SciCall_Cut(FALSE);
+		}
 		break;
+
+	//case IDM_EDIT_CUT_BINARY:
+	//	if (flagPasteBoard) {
+	//		bLastCopyFromMe = TRUE;
+	//	}
+	//	SciCall_Cut(TRUE);
+	//	break;
 
 	case IDM_EDIT_COPY:
 		if (flagPasteBoard) {
@@ -6724,12 +6734,10 @@ void UpdateToolbar(void) {
 	EnableTool(IDT_FILE_SAVE, IsDocumentModified());
 	EnableTool(IDT_EDIT_UNDO, SciCall_CanUndo() /*&& !bReadOnly*/);
 	EnableTool(IDT_EDIT_REDO, SciCall_CanRedo() /*&& !bReadOnly*/);
-
-	int i = !SciCall_IsSelectionEmpty();
-	EnableTool(IDT_EDIT_CUT, i /*&& !bReadOnly*/);
 	EnableTool(IDT_EDIT_PASTE, SciCall_CanPaste() /*&& !bReadOnly*/);
 
-	i = SciCall_GetLength() != 0;
+	int i = SciCall_GetLength() != 0;
+	EnableTool(IDT_EDIT_CUT, i /*&& !bReadOnly*/);
 	EnableTool(IDT_EDIT_COPY, i);
 	EnableTool(IDT_EDIT_FIND, i);
 	//EnableTool(IDT_EDIT_FINDNEXT, i);
