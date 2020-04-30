@@ -340,6 +340,10 @@ NP2_inline BOOL SciCall_IsRectangleSelection(void) {
 	return (BOOL)SciCall(SCI_SELECTIONISRECTANGLE, 0, 0);
 }
 
+NP2_inline void SciCall_SetSelectionMode(int selectionMode) {
+	SciCall(SCI_SETSELECTIONMODE, selectionMode, 0);
+}
+
 NP2_inline int SciCall_GetSelectionMode(void) {
 	return (int)SciCall(SCI_GETSELECTIONMODE, 0, 0);
 }
