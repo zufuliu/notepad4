@@ -3921,6 +3921,7 @@ int Editor::KeyCommand(unsigned int iMessage) {
 		const Sci::Position start = pdoc->LineStart(lineStart);
 		const Sci::Position end = pdoc->LineStart(lineEnd + 1);
 		SetSelection(start, end);
+		sel.selType = Selection::selLines;
 		Cut(false);
 		SetLastXChosen();
 	}
