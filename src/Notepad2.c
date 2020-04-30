@@ -3106,7 +3106,8 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	case IDM_EDIT_SELECTLINE:
-		EditSelectLine();
+		//EditSelectLine();
+		SciCall_SetSelectionMode(SC_SEL_LINES);
 		break;
 
 	case IDM_EDIT_MOVELINEUP:

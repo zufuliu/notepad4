@@ -4394,7 +4394,7 @@ void EditSelectWord(void) {
 
 void EditSelectLine(void) {
 	Sci_Position iSelStart = SciCall_GetSelectionStart();
-	Sci_Position iSelEnd = SciCall_GetSelectionStart();
+	Sci_Position iSelEnd = SciCall_GetSelectionEnd();
 	const Sci_Line iLineStart = SciCall_LineFromPosition(iSelStart);
 	const Sci_Line iLineEnd = SciCall_LineFromPosition(iSelEnd);
 	iSelStart = SciCall_PositionFromLine(iLineStart);
