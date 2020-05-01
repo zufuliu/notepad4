@@ -8,4 +8,4 @@
 #define NP2_ENABLE_CUSTOMIZE_TOOLBAR_LABELS		0
 
 //! Enable localization with satellite resource DLLs.
-#define NP2_ENABLE_APP_LOCALIZATION_DLL			0
+#define NP2_ENABLE_APP_LOCALIZATION_DLL			1
