@@ -1089,12 +1089,12 @@ NP2_inline void SciCall_LineDelete(void) {
 	SciCall(SCI_LINEDELETE, 0, 0);
 }
 
-NP2_inline void SciCall_LineCut(void) {
-	SciCall(SCI_LINECUT, 0, 0);
+NP2_inline void SciCall_LineCut(BOOL lineCopy) {
+	SciCall(SCI_LINECUT, lineCopy, 0);
 }
 
-NP2_inline void SciCall_LineCopy(void) {
-	SciCall(SCI_LINECOPY, 0, 0);
+NP2_inline void SciCall_LineCopy(BOOL lineCopy) {
+	SciCall(SCI_LINECOPY, lineCopy, 0);
 }
 
 NP2_inline void SciCall_LineTranspose(void) {
