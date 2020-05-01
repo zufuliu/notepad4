@@ -1818,7 +1818,7 @@ fun void DelWordRight=2336(,)
 fun void DelWordRightEnd=2518(,)
 
 # Cut the line containing the caret.
-fun void LineCut=2337(,)
+fun void LineCut=2337(bool lineCopy,)
 
 # Delete the line containing the caret.
 fun void LineDelete=2338(,)
@@ -1887,7 +1887,7 @@ fun void VCHomeWrap=2453(,)
 fun void VCHomeWrapExtend=2454(,)
 
 # Copy the line containing the caret.
-fun void LineCopy=2455(,)
+fun void LineCopy=2455(bool lineCopy,)
 
 # Move the caret inside current view if it's not there already.
 fun void MoveCaretInsideView=2401(,)

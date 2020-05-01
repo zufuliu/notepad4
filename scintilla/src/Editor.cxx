@@ -3909,23 +3909,6 @@ int Editor::KeyCommand(unsigned int iMessage) {
 	case SCI_DELLINERIGHT:
 		return DelWordOrLine(iMessage);
 
-	case SCI_LINECOPY: {
-		const Sci::Line lineStart = pdoc->SciLineFromPosition(SelectionStart().Position());
-		const Sci::Line lineEnd = pdoc->SciLineFromPosition(SelectionEnd().Position());
-		CopyRangeToClipboard(pdoc->LineStart(lineStart), pdoc->LineStart(lineEnd + 1), true);
-	}
-	break;
-	case SCI_LINECUT: {
-		const Sci::Line lineStart = pdoc->SciLineFromPosition(SelectionStart().Position());
-		const Sci::Line lineEnd = pdoc->SciLineFromPosition(SelectionEnd().Position());
-		const Sci::Position start = pdoc->LineStart(lineStart);
-		const Sci::Position end = pdoc->LineStart(lineEnd + 1);
-		SetSelection(start, end);
-		sel.selType = Selection::selLines;
-		Cut(false);
-		SetLastXChosen();
-	}
-	break;
 	case SCI_LINEDELETE: {
 		const Sci::Line line = pdoc->SciLineFromPosition(sel.MainCaret());
 		const Sci::Position start = pdoc->LineStart(line);
@@ -4255,13 +4238,13 @@ void Editor::CopySelectionRange(SelectionText *ss, bool allowLineCopy) {
 	}
 }
 
-void Editor::CopyRangeToClipboard(Sci::Position start, Sci::Position end, bool allowLineCopy) {
+void Editor::CopyRangeToClipboard(Sci::Position start, Sci::Position end, bool lineCopy) {
 	start = pdoc->ClampPositionIntoDocument(start);
 	end = pdoc->ClampPositionIntoDocument(end);
 	SelectionText selectedText;
 	std::string text = RangeText(start, end);
 	selectedText.Copy(text,
-		pdoc->dbcsCodePage, vs.styles[STYLE_DEFAULT].characterSet, false, allowLineCopy);
+		pdoc->dbcsCodePage, vs.styles[STYLE_DEFAULT].characterSet, false, lineCopy);
 	CopyToClipboard(selectedText);
 }
 
@@ -7576,6 +7559,26 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 	case SCI_INDICATOREND:
 		return pdoc->decorations->End(static_cast<int>(wParam), lParam);
 
+	case SCI_LINECOPY: {
+		const Sci::Line lineStart = pdoc->SciLineFromPosition(SelectionStart().Position());
+		const Sci::Line lineEnd = pdoc->SciLineFromPosition(SelectionEnd().Position());
+		CopyRangeToClipboard(pdoc->LineStart(lineStart), pdoc->LineStart(lineEnd + 1), wParam != 0);
+	}
+	break;
+	case SCI_LINECUT: {
+		const Sci::Line lineStart = pdoc->SciLineFromPosition(SelectionStart().Position());
+		const Sci::Line lineEnd = pdoc->SciLineFromPosition(SelectionEnd().Position());
+		const Sci::Position start = pdoc->LineStart(lineStart);
+		const Sci::Position end = pdoc->LineStart(lineEnd + 1);
+		SetSelection(start, end);
+		if (wParam) {
+			sel.selType = Selection::selLines;
+		}
+		Cut(false);
+		SetLastXChosen();
+	}
+	break;
+
 	case SCI_LINEDOWN:
 	case SCI_LINEDOWNEXTEND:
 	case SCI_PARADOWN:
@@ -7640,8 +7643,6 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 	case SCI_DELWORDRIGHTEND:
 	case SCI_DELLINELEFT:
 	case SCI_DELLINERIGHT:
-	case SCI_LINECOPY:
-	case SCI_LINECUT:
 	case SCI_LINEDELETE:
 	case SCI_LINETRANSPOSE:
 	case SCI_LINEREVERSE:

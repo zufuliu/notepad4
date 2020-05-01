@@ -144,6 +144,7 @@ static BOOL bMarkOccurrences;
 static BOOL bMarkOccurrencesMatchCase;
 static BOOL bMarkOccurrencesMatchWords;
 struct EditAutoCompletionConfig autoCompletionConfig;
+static BOOL bEnableLineSelectionMode;
 static BOOL bShowCodeFolding;
 #if NP2_ENABLE_SHOW_CALLTIPS
 static BOOL bShowCallTips = TRUE;
@@ -2479,6 +2480,7 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	CheckCmd(hmenu, IDM_VIEW_MARGIN, bShowBookmarkMargin);
 	EnableCmd(hmenu, IDM_EDIT_COMPLETEWORD, i);
 	CheckCmd(hmenu, IDM_VIEW_AUTOCOMPLETION_IGNORECASE, autoCompletionConfig.bIgnoreCase);
+	CheckCmd(hmenu, IDM_SET_LINE_SELECTION_MODE, bEnableLineSelectionMode);
 
 	CheckCmd(hmenu, IDM_VIEW_MARKOCCURRENCES_OFF, !bMarkOccurrences);
 	CheckCmd(hmenu, IDM_VIEW_MARKOCCURRENCES_CASE, bMarkOccurrencesMatchCase);
@@ -3008,7 +3010,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			bLastCopyFromMe = TRUE;
 		}
 		if (SciCall_IsSelectionEmpty()) {
-			SciCall_LineCut();
+			SciCall_LineCut(bEnableLineSelectionMode);
 		} else {
 			SciCall_Cut(FALSE);
 		}
@@ -3025,7 +3027,11 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		if (flagPasteBoard) {
 			bLastCopyFromMe = TRUE;
 		}
-		SciCall_CopyAllowLine();
+		if (SciCall_IsSelectionEmpty()) {
+			SciCall_LineCopy(bEnableLineSelectionMode);
+		} else {
+			SciCall_Copy(FALSE);
+		}
 		UpdateToolbar();
 		break;
 
@@ -3116,8 +3122,11 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	case IDM_EDIT_SELECTLINE:
-		//EditSelectLine();
-		SciCall_SetSelectionMode(SC_SEL_LINES);
+		if (bEnableLineSelectionMode) {
+			SciCall_SetSelectionMode(SC_SEL_LINES);
+		} else {
+			EditSelectLine();
+		}
 		break;
 
 	case IDM_EDIT_MOVELINEUP:
@@ -3140,14 +3149,14 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		if (flagPasteBoard) {
 			bLastCopyFromMe = TRUE;
 		}
-		SciCall_LineCut();
+		SciCall_LineCut(bEnableLineSelectionMode);
 		break;
 
 	case IDM_EDIT_COPYLINE:
 		if (flagPasteBoard) {
 			bLastCopyFromMe = TRUE;
 		}
-		SciCall_LineCopy();
+		SciCall_LineCopy(bEnableLineSelectionMode);
 		UpdateToolbar();
 		break;
 
@@ -3953,6 +3962,13 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case IDM_VIEW_AUTOCOMPLETION_IGNORECASE:
 		autoCompletionConfig.bIgnoreCase = !autoCompletionConfig.bIgnoreCase;
 		SciCall_AutoCCancel();
+		break;
+
+	case IDM_SET_LINE_SELECTION_MODE:
+		bEnableLineSelectionMode = !bEnableLineSelectionMode;
+		if (!bEnableLineSelectionMode) {
+			SciCall_SetSelectionMode(SC_SEL_STREAM);
+		}
 		break;
 
 	case IDM_VIEW_MARKOCCURRENCES_OFF:
@@ -5257,6 +5273,7 @@ void LoadSettings(void) {
 	}
 	EditCompleteUpdateConfig();
 
+	bEnableLineSelectionMode = IniSectionGetBool(pIniSection, L"LineSelection", 1);
 #if NP2_ENABLE_SHOW_CALLTIPS
 	bShowCallTips = IniSectionGetBool(pIniSection, L"ShowCallTips", TRUE);
 	iValue = IniSectionGetInt(pIniSection, L"CallTipsWaitTime", 500);
@@ -5610,6 +5627,7 @@ void SaveSettings(BOOL bSaveSettingsNow) {
 	IniSectionSetIntEx(pIniSection, L"AutoInsertMask", autoCompletionConfig.fAutoInsertMask, AutoInsertDefaultMask);
 	IniSectionSetIntEx(pIniSection, L"AsmLineCommentChar", autoCompletionConfig.iAsmLineCommentChar, AsmLineCommentCharSemicolon);
 	IniSectionSetStringEx(pIniSection, L"AutoCFillUpPunctuation", autoCompletionConfig.wszAutoCompleteFillUp, AUTO_COMPLETION_FILLUP_DEFAULT);
+	IniSectionSetBoolEx(pIniSection, L"LineSelection", bEnableLineSelectionMode, 1);
 #if NP2_ENABLE_SHOW_CALLTIPS
 	IniSectionSetBoolEx(pIniSection, L"ShowCallTips", bShowCallTips, TRUE);
 	IniSectionSetIntEx(pIniSection, L"CallTipsWaitTime", iCallTipsWaitTime, 500);
