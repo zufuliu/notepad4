@@ -151,11 +151,12 @@ for:
 
     build_script:
       - cmd: CALL "build\VS2017\build.bat" Build x64 Release 1
-      - cmd: CALL "build\make_zip.bat" MSVC x64 Release 1
+      - cmd: CALL "locale\build.bat" Build x64 Release 1
+      - cmd: CALL "build\make_zip.bat" MSVC x64 Release Locale 1
 
     artifacts:
       - path: 'build\Notepad2*.zip'
-        name: Notepad2_x64
+        name: Notepad2_i18n_x64
 
   - # Clang x64 Release
     matrix:
@@ -182,11 +183,12 @@ for:
 
     build_script:
       - cmd: CALL "build\VS2017\build.bat" Build Win32 Release 1
-      - cmd: CALL "build\make_zip.bat" MSVC Win32 Release 1
+      - cmd: CALL "locale\build.bat" Build Win32 Release 1
+      - cmd: CALL "build\make_zip.bat" MSVC Win32 Release Locale 1
 
     artifacts:
       - path: 'build\Notepad2*.zip'
-        name: Notepad2_Win32
+        name: Notepad2_i18n_Win32
 
   - # Clang Win32 Release
     matrix:
@@ -213,11 +215,12 @@ for:
 
     build_script:
       - cmd: CALL "build\VS2017\build.bat" Build AVX2 Release 1
-      - cmd: CALL "build\make_zip.bat" MSVC AVX2 Release 1
+      - cmd: CALL "locale\build.bat" Build AVX2 Release 1
+      - cmd: CALL "build\make_zip.bat" MSVC AVX2 Release Locale 1
 
     artifacts:
       - path: 'build\Notepad2*.zip'
-        name: Notepad2_AVX2
+        name: Notepad2_i18n_AVX2
 
   - # Clang AVX2 Release
     matrix:
