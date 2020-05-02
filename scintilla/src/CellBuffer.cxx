@@ -158,6 +158,12 @@ class LineVector : public ILineVector {
 	LineStartIndex<POS> startsUTF16;
 	LineStartIndex<POS> startsUTF32;
 	int activeIndices;
+
+	void SetActiveIndices() noexcept {
+		activeIndices = (startsUTF32.Active() ? SC_LINECHARACTERINDEX_UTF32 : 0)
+			| (startsUTF16.Active() ? SC_LINECHARACTERINDEX_UTF16 : 0);
+	}
+
 public:
 	LineVector() : starts(256), perLine(nullptr), activeIndices(0) {
 	}
@@ -279,30 +285,28 @@ public:
 		return activeIndices;
 	}
 	bool AllocateLineCharacterIndex(int lineCharacterIndex, Sci::Line lines) override {
-		bool changed = false;
+		const int activeIndicesStart = activeIndices;
 		if ((lineCharacterIndex & SC_LINECHARACTERINDEX_UTF32) != 0) {
-			changed = startsUTF32.Allocate(lines) || changed;
+			startsUTF32.Allocate(lines);
 			assert(startsUTF32.starts.Partitions() == starts.Partitions());
 		}
 		if ((lineCharacterIndex & SC_LINECHARACTERINDEX_UTF16) != 0) {
-			changed = startsUTF16.Allocate(lines) || changed;
+			startsUTF16.Allocate(lines);
 			assert(startsUTF16.starts.Partitions() == starts.Partitions());
 		}
-		activeIndices = (startsUTF32.Active() ? SC_LINECHARACTERINDEX_UTF32 : 0)
-			| (startsUTF16.Active() ? SC_LINECHARACTERINDEX_UTF16 : 0);
-		return changed;
+		SetActiveIndices();
+		return activeIndicesStart != activeIndices;
 	}
 	bool ReleaseLineCharacterIndex(int lineCharacterIndex) override {
-		bool changed = false;
+		const int activeIndicesStart = activeIndices;
 		if ((lineCharacterIndex & SC_LINECHARACTERINDEX_UTF32) != 0) {
-			changed = startsUTF32.Release() || changed;
+			startsUTF32.Release();
 		}
 		if ((lineCharacterIndex & SC_LINECHARACTERINDEX_UTF16) != 0) {
-			changed = startsUTF16.Release() || changed;
+			startsUTF16.Release();
 		}
-		activeIndices = (startsUTF32.Active() ? SC_LINECHARACTERINDEX_UTF32 : 0)
-			| (startsUTF16.Active() ? SC_LINECHARACTERINDEX_UTF16 : 0);
-		return changed;
+		SetActiveIndices();
+		return activeIndicesStart != activeIndices;
 	}
 	Sci::Position IndexLineStart(Sci::Line line, int lineCharacterIndex) const noexcept override {
 		if (lineCharacterIndex == SC_LINECHARACTERINDEX_UTF32) {
