@@ -16,7 +16,7 @@ Tips: To keep your current settings, do NOT replace *Notepad2.ini* or *metapath.
 | [AVX2_v4.20.?.zip](https://www.virustotal.com/gui/url/?/detection) | ? |
 | [Win32_v4.20.?.zip](https://www.virustotal.com/gui/url/?/detection) | ? |
 | [x64_v4.20.?.zip](https://www.virustotal.com/gui/url/?/detection) | ? |
-| Localization | UI in English, 简体中文, 繁體中文, 한국어 |
+| Localization | UI in English, 简体中文, 繁體中文, 日本語, 한국어 |
 | [ARM_v4.20.?.zip](https://www.virustotal.com/gui/url/?/detection) | ? |
 | [ARM64_v4.20.?.zip](https://www.virustotal.com/gui/url/?/detection) | ? |
 | [AVX2_v4.20.?.zip](https://www.virustotal.com/gui/url/?/detection) | ? |

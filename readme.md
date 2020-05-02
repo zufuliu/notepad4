@@ -194,9 +194,10 @@ Or build from source, see the [Wiki](https://github.com/zufuliu/notepad2/wiki/Bu
 * [Scintilla's website](https://www.scintilla.org/)
 * [Build Notepad2 and metapath](https://github.com/zufuliu/notepad2/wiki/Build-Notepad2)
 * [Localization](https://github.com/zufuliu/notepad2/wiki/Localization)
-	* [한국어](https://teus.me/category/IT/Notepad2)
 	* [简体中文](https://github.com/zufuliu/notepad2/tree/master/locale/zh-Hans)
 	* [繁體中文](https://github.com/zufuliu/notepad2/tree/master/locale/zh-Hant)
+	* [日本語](https://github.com/zufuliu/notepad2/tree/master/locale/ja)
+	* [한국어](https://teus.me/category/IT/Notepad2)
 * [Notepad2 Wiki](https://github.com/zufuliu/notepad2/wiki)
 * Other projects based on (original) Notepad2 or Notepad2-mod:
 	* [Notepad3](https://github.com/rizonesoft/Notepad3)

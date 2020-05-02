@@ -24,10 +24,8 @@
 // Chinese (Traditional, Taiwan) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHT)
-#ifdef _WIN32
 LANGUAGE LANG_CHINESE, SUBLANG_CHINESE_TRADITIONAL
 #pragma code_page(65001)
-#endif //_WIN32
 
 /////////////////////////////////////////////////////////////////////////////
 //

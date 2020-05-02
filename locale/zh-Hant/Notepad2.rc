@@ -25,10 +25,8 @@
 // Chinese (Traditional, Taiwan) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHT)
-#ifdef _WIN32
 LANGUAGE LANG_CHINESE, SUBLANG_CHINESE_TRADITIONAL
 #pragma code_page(65001)
-#endif
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -572,6 +570,7 @@ BEGIN
 				MENUITEM "&English",				IDM_LANG_ENGLISH_US
 				MENUITEM "简体中文(&C)",				IDM_LANG_CHINESE_SIMPLIFIED
 				MENUITEM "繁體中文(&T)",				IDM_LANG_CHINESE_TRADITIONAL
+				MENUITEM "日本語(&J)",				IDM_LANG_JAPANESE
 			END
 #endif
 		END
