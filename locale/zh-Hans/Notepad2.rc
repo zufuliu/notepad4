@@ -2,6 +2,8 @@
 //
 #include "../../src/resource.h"
 #include "../../src/config.h"
+#include "../../src/EditLexer.h"
+#include "../../src/EditLexers/EditStyle.h"
 
 #define APSTUDIO_READONLY_SYMBOLS
 /////////////////////////////////////////////////////////////////////////////
@@ -2052,6 +2054,47 @@ BEGIN
 \r\n\
 “预览”按钮将不会应用任何更改。"
 END
+
+#if NP2_ENABLE_LEXER_NAME_LOCALIZE
+// string table for lexers, see EditLexer.h
+STRINGTABLE
+BEGIN
+	NP2LEX_TEXTFILE					"文本文件"
+
+	NP2LEX_2NDTEXTFILE				"第二文本文件"
+	NP2LEX_2NDGLOBAL				"第二全局样式"
+	NP2LEX_GLOBAL					"全局样式"
+END
+#endif // NP2_ENABLE_LEXER_NAME_LOCALIZE
+
+#if NP2_ENABLE_STYLE_NAME_LOCALIZE
+// string table for styles, see EditLexers/EditStyleX.h
+STRINGTABLE
+BEGIN
+	NP2STYLE_MarginLineNumber		"边界与行号"
+	NP2STYLE_MatchingBrace			"成对的括号"
+	NP2STYLE_MatchingBraceError		"孤立的括号"
+	NP2STYLE_ControlCharacter		"控制字符"
+	NP2STYLE_IndentationGuide		"缩进辅助线"
+	NP2STYLE_SelectedText			"选中文本"
+	NP2STYLE_Whitespace				"空白"
+	NP2STYLE_CurrentLine			"当前行"
+	NP2STYLE_Caret					"光标"
+	NP2STYLE_LongLineMarker			"长行标记"
+	NP2STYLE_ExtraLineSpacing		"额外行间距"
+	NP2STYLE_FoldingMarker			"代码折叠标志"
+	NP2STYLE_MarkOccurrences		"标记匹配"
+	NP2STYLE_DefaultCodeStyle		"默认代码样式"
+	NP2STYLE_DefaultTextStyle		"默认文本样式"
+	NP2STYLE_FoldEllipsis			"代码折叠省略号"
+	NP2STYLE_IMEIndicator			"输入法指示"
+	NP2STYLE_Bookmark				"书签"
+	NP2STYLE_CallTip				"调用提示"
+	NP2STYLE_CurrentBlock			"当前代码块"
+
+	NP2STYLE_Default				"默认样式"
+END
+#endif // NP2_ENABLE_STYLE_NAME_LOCALIZE
 
 
 #ifdef APSTUDIO_INVOKED
