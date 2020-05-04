@@ -186,10 +186,10 @@ void Document::InsertLine(Sci::Line line) {
 	}
 }
 
-void Document::InsertLines(Sci::Line lineFirst, Sci::Line lineCount) {
+void Document::InsertLines(Sci::Line line, Sci::Line lines) {
 	for (const auto &pl : perLineData) {
 		if (pl)
-			pl->InsertLines(lineFirst, lineCount);
+			pl->InsertLines(line, lines);
 	}
 }
 
