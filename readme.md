@@ -196,7 +196,7 @@ Or build from source, see the [Wiki](https://github.com/zufuliu/notepad2/wiki/Bu
 * [Localization](https://github.com/zufuliu/notepad2/wiki/Localization)
 	* [简体中文](https://github.com/zufuliu/notepad2/tree/master/locale/zh-Hans)
 	* [繁體中文](https://github.com/zufuliu/notepad2/tree/master/locale/zh-Hant)
-	* [日本語](https://github.com/zufuliu/notepad2/tree/master/locale/ja)
+	* [日本語](https://github.com/maboroshin/notepad2)
 	* [한국어](https://teus.me/category/IT/Notepad2)
 * [Notepad2 Wiki](https://github.com/zufuliu/notepad2/wiki)
 * Other projects based on (original) Notepad2 or Notepad2-mod:
