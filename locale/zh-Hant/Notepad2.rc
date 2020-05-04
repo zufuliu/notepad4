@@ -2,6 +2,8 @@
 //
 #include "../../src/resource.h"
 #include "../../src/config.h"
+#include "../../src/EditLexer.h"
+#include "../../src/EditLexers/EditStyle.h"
 
 #define APSTUDIO_READONLY_SYMBOLS
 /////////////////////////////////////////////////////////////////////////////
@@ -405,7 +407,7 @@ BEGIN
 		//MENUITEM "S&how CallTips",				IDM_VIEW_SHOWCALLTIPS
 		MENUITEM SEPARATOR
 		MENUITEM "可視括弧符合(&V)\tCtrl+Shift+V",	IDM_VIEW_MATCHBRACES
-		MENUITEM "高度目前代碼塊(&B)",					IDM_VIEW_HIGHLIGHTCURRENT_BLOCK
+		MENUITEM "高度目前片段(&B)",					IDM_VIEW_HIGHLIGHTCURRENT_BLOCK
 		POPUP "高亮目前行(&U)"
 		BEGIN
 			MENUITEM "無高亮(&N)",					IDM_VIEW_HIGHLIGHTCURRENTLINE_NONE
@@ -424,7 +426,7 @@ BEGIN
 		MENUITEM "行號(&N)\tCtrl+Shift+N",			IDM_VIEW_LINENUMBERS
 		MENUITEM "書籤邊界(&M)\tCtrl+Shift+M",		IDM_VIEW_MARGIN
 		MENUITEM SEPARATOR
-		MENUITEM "顯示代碼折疊(&F)\tCtrl+Shift+Alt+F",IDM_VIEW_SHOW_FOLDING
+		MENUITEM "顯示程式碼折疊(&F)\tCtrl+Shift+Alt+F",IDM_VIEW_SHOW_FOLDING
 		POPUP "切換折疊(&T)"
 		BEGIN
 			MENUITEM "目前塊(&C)\tAlt+C",			IDM_VIEW_FOLD_CURRENT_BLOCK
@@ -460,7 +462,7 @@ BEGIN
 		MENUITEM "常用語法高亮(&F)...",				IDM_VIEW_SCHEME_FAVORITE
 		MENUITEM SEPARATOR
 		MENUITEM "使用第二全域樣式(&2)\tShift+F12",	IDM_VIEW_USE2NDGLOBALSTYLE
-		MENUITEM "使用預設代碼樣式(&U)",				IDM_VIEW_USEDEFAULT_CODESTYLE
+		MENUITEM "使用預設程式碼樣式(&U)",				IDM_VIEW_USEDEFAULT_CODESTYLE
 		POPUP "主題風格(&Y)"
 		BEGIN
 			MENUITEM "預設(&D)",					IDM_VIEW_STYLE_THEME_DEFAULT
@@ -2052,6 +2054,47 @@ BEGIN
 \r\n\
 “预览”按钮将不会应用任何更改。"
 END
+
+#if NP2_ENABLE_LEXER_NAME_LOCALIZE
+// string table for lexers, see EditLexer.h
+STRINGTABLE
+BEGIN
+	NP2LEX_TEXTFILE					"文字檔案"
+
+	NP2LEX_2NDTEXTFILE				"第二文字檔案"
+	NP2LEX_2NDGLOBAL				"第二全域樣式"
+	NP2LEX_GLOBAL					"全域樣式"
+END
+#endif // NP2_ENABLE_LEXER_NAME_LOCALIZE
+
+#if NP2_ENABLE_STYLE_NAME_LOCALIZE
+// string table for styles, see EditLexers/EditStyleX.h
+STRINGTABLE
+BEGIN
+	NP2STYLE_MarginLineNumber		"邊界與行號"
+	NP2STYLE_MatchingBrace			"成對的括弧"
+	NP2STYLE_MatchingBraceError		"孤立的括弧"
+	NP2STYLE_ControlCharacter		"控制字元"
+	NP2STYLE_IndentationGuide		"縮排輔助線"
+	NP2STYLE_SelectedText			"選取的文字"
+	NP2STYLE_Whitespace				"空白"
+	NP2STYLE_CurrentLine			"目前行"
+	NP2STYLE_Caret					"游標"
+	NP2STYLE_LongLineMarker			"長行標記"
+	NP2STYLE_ExtraLineSpacing		"額外行間距"
+	NP2STYLE_FoldingMarker			"程式碼折疊"
+	NP2STYLE_MarkOccurrences		"標記比對"
+	NP2STYLE_DefaultCodeStyle		"預設程式碼樣式"
+	NP2STYLE_DefaultTextStyle		"預設文字樣式"
+	NP2STYLE_FoldEllipsis			"程式碼折疊省略號"
+	NP2STYLE_IMEIndicator			"輸入法指標"
+	NP2STYLE_Bookmark				"書籤"
+	NP2STYLE_CallTip				"呼叫提示"
+	NP2STYLE_CurrentBlock			"目前片段"
+
+	NP2STYLE_Default				"預設樣式"
+END
+#endif // NP2_ENABLE_STYLE_NAME_LOCALIZE
 
 
 #ifdef APSTUDIO_INVOKED

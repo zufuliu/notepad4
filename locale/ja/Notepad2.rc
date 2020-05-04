@@ -2,6 +2,8 @@
 //
 #include "../../src/resource.h"
 #include "../../src/config.h"
+#include "../../src/EditLexer.h"
+#include "../../src/EditLexers/EditStyle.h"
 
 #define APSTUDIO_READONLY_SYMBOLS
 /////////////////////////////////////////////////////////////////////////////
@@ -2053,6 +2055,47 @@ Style properties can be copied using copy and paste or drag and drop.\r\n\
 The ""Preview"" button will not apply any changes."
 
 END
+
+#if NP2_ENABLE_LEXER_NAME_LOCALIZE
+// string table for lexers, see EditLexer.h
+STRINGTABLE
+BEGIN
+	NP2LEX_TEXTFILE					"Text File"
+
+	NP2LEX_2NDTEXTFILE				"2nd Text File"
+	NP2LEX_2NDGLOBAL				"2nd Global Styles"
+	NP2LEX_GLOBAL					"Global Styles"
+END
+#endif // NP2_ENABLE_LEXER_NAME_LOCALIZE
+
+#if NP2_ENABLE_STYLE_NAME_LOCALIZE
+// string table for styles, see EditLexers/EditStyleX.h
+STRINGTABLE
+BEGIN
+	NP2STYLE_MarginLineNumber		"Margin and Line Number"
+	NP2STYLE_MatchingBrace			"Matching Brace"
+	NP2STYLE_MatchingBraceError		"Matching Brace Error"
+	NP2STYLE_ControlCharacter		"Control Character"
+	NP2STYLE_IndentationGuide		"Indentation Guide"
+	NP2STYLE_SelectedText			"Selected Text"
+	NP2STYLE_Whitespace				"Whitespace"
+	NP2STYLE_CurrentLine			"Current Line"
+	NP2STYLE_Caret					"Caret"
+	NP2STYLE_LongLineMarker			"Long Line Marker"
+	NP2STYLE_ExtraLineSpacing		"Extra Line Spacing"
+	NP2STYLE_FoldingMarker			"Folding Marker"
+	NP2STYLE_MarkOccurrences		"Mark Occurrences"
+	NP2STYLE_DefaultCodeStyle		"Default Code Style"
+	NP2STYLE_DefaultTextStyle		"Default Text Style"
+	NP2STYLE_FoldEllipsis			"Fold Ellipsis"
+	NP2STYLE_IMEIndicator			"IME Indicator"
+	NP2STYLE_Bookmark				"Bookmark"
+	NP2STYLE_CallTip				"CallTip"
+	NP2STYLE_CurrentBlock			"Current Block"
+
+	NP2STYLE_Default				"Default"
+END
+#endif // NP2_ENABLE_STYLE_NAME_LOCALIZE
 
 
 #ifdef APSTUDIO_INVOKED
