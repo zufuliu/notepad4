@@ -676,7 +676,7 @@ static int __cdecl CmpEditLexerByOrder(const void *p1, const void *p2) {
 	LPCEDITLEXER pLex2 = *(LPCEDITLEXER *)(p2);
 	int cmp = pLex2->iFavoriteOrder - pLex1->iFavoriteOrder;
 	// TODO: sort by localized name
-#if NP2_ENABLE_LEXER_NAME_LOCALIZATION
+#if NP2_ENABLE_LEXER_NAME_LOCALIZE
 #endif
 	cmp = cmp ? cmp : StrCmpIW(pLex1->pszName, pLex2->pszName);
 	return cmp;
@@ -686,7 +686,7 @@ static int __cdecl CmpEditLexerByName(const void *p1, const void *p2) {
 	LPCEDITLEXER pLex1 = *(LPCEDITLEXER *)(p1);
 	LPCEDITLEXER pLex2 = *(LPCEDITLEXER *)(p2);
 	// TODO: sort by localized name
-#if NP2_ENABLE_LEXER_NAME_LOCALIZATION
+#if NP2_ENABLE_LEXER_NAME_LOCALIZE
 #endif
 	int cmp = StrCmpIW(pLex1->pszName, pLex2->pszName);
 	return cmp;
@@ -3827,7 +3827,7 @@ int Style_GetLexerIconId(LPCEDITLEXER pLex, DWORD iconFlags) {
 // Style_AddLexerToTreeView()
 //
 HTREEITEM Style_AddLexerToTreeView(HWND hwnd, PEDITLEXER pLex, DWORD iconFlags, HTREEITEM hParent, HTREEITEM hInsertAfter, BOOL withStyles) {
-#if NP2_ENABLE_LEXER_NAME_LOCALIZATION || NP2_ENABLE_STYLE_NAME_LOCALIZATION
+#if NP2_ENABLE_LEXER_NAME_LOCALIZE || NP2_ENABLE_STYLE_NAME_LOCALIZE
 	WCHAR tch[MAX_EDITLEXER_NAME_SIZE];
 #endif
 
@@ -3837,7 +3837,7 @@ HTREEITEM Style_AddLexerToTreeView(HWND hwnd, PEDITLEXER pLex, DWORD iconFlags, 
 	tvis.hParent = hParent;
 	tvis.hInsertAfter = hInsertAfter;
 	tvis.item.mask = TVIF_TEXT | TVIF_IMAGE | TVIF_SELECTEDIMAGE | TVIF_PARAM;
-#if NP2_ENABLE_LEXER_NAME_LOCALIZATION
+#if NP2_ENABLE_LEXER_NAME_LOCALIZE
 	if (GetString(pLex->rid, tch, COUNTOF(tch))) {
 		tvis.item.pszText = tch;
 	} else {
@@ -3865,7 +3865,7 @@ HTREEITEM Style_AddLexerToTreeView(HWND hwnd, PEDITLEXER pLex, DWORD iconFlags, 
 
 	for (UINT i = 0; i < iStyleCount; i++) {
 		tvis.hInsertAfter = hInsertAfter;
-#if NP2_ENABLE_STYLE_NAME_LOCALIZATION
+#if NP2_ENABLE_STYLE_NAME_LOCALIZE
 		if (GetString(pLex->Styles[i].rid, tch, COUNTOF(tch))) {
 			tvis.item.pszText = tch;
 		} else {
@@ -3887,7 +3887,7 @@ HTREEITEM Style_AddLexerToTreeView(HWND hwnd, PEDITLEXER pLex, DWORD iconFlags, 
 // Style_AddLexerToListView()
 //
 void Style_AddLexerToListView(HWND hwnd, PEDITLEXER pLex, DWORD iconFlags) {
-#if NP2_ENABLE_LEXER_NAME_LOCALIZATION
+#if NP2_ENABLE_LEXER_NAME_LOCALIZE
 	WCHAR tch[MAX_EDITLEXER_NAME_SIZE];
 #endif
 	LVITEM lvi;
@@ -3895,7 +3895,7 @@ void Style_AddLexerToListView(HWND hwnd, PEDITLEXER pLex, DWORD iconFlags) {
 
 	lvi.mask = LVIF_IMAGE | LVIF_PARAM | LVIF_TEXT;
 	lvi.iItem = ListView_GetItemCount(hwnd);
-#if NP2_ENABLE_LEXER_NAME_LOCALIZATION
+#if NP2_ENABLE_LEXER_NAME_LOCALIZE
 	if (GetString(pLex->rid, tch, COUNTOF(tch))) {
 		lvi.pszText = tch;
 	} else {
