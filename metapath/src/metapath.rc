@@ -348,7 +348,7 @@ BEGIN
     ICON            IDI_OPTIONS,IDC_STATIC,10,10,20,20
     LTEXT           "Specify general program settings for metapath.",IDC_STATIC,40,15,200,8
     AUTOCHECKBOX    "Open file in same target application window.",IDC_OPENFILE_SAME_WINDOW,10,34,190,10,WS_TABSTOP
-    AUTOCHECKBOX    "&Allow only single mouse-click to open objects.",IDC_SINGLECLICK,10,46,190,10,WS_TABSTOP
+    AUTOCHECKBOX    "&Allow single mouse-click to open objects.",IDC_SINGLECLICK,10,46,190,10,WS_TABSTOP
     AUTOCHECKBOX    "&Enable track selection.",IDC_TRACKSELECT,10,58,100,10,WS_TABSTOP
     AUTOCHECKBOX    "Enable &full row selection.",IDC_FULLROWSELECT,10,70,120,10,WS_TABSTOP
     AUTOCHECKBOX    "Always a&ctivate target window when a file is opened.",IDC_FOCUSEDIT,10,82,220,10,WS_TABSTOP

@@ -1042,7 +1042,7 @@ FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     CONTROL         "",IDC_OPENWITHDIR,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_SHAREIMAGELISTS | LVS_AUTOARRANGE | LVS_NOCOLUMNHEADER | WS_BORDER | WS_TABSTOP,7,7,214,149
     PUSHBUTTON      "",IDC_GETOPENWITHDIR,7,162,13,13
-    LTEXT           "点击此处选择存放您收藏的应用程序链接的目录。",IDC_OPENWITHDESCR,26,162,195,20
+    LTEXT           "点击此处选择存放您收藏的应用程序链接的文件夹。",IDC_OPENWITHDESCR,26,162,195,20
     DEFPUSHBUTTON   "确定",IDOK,115,185,50,14
     PUSHBUTTON      "取消",IDCANCEL,171,185,50,14
     SCROLLBAR       IDC_RESIZEGRIP3,7,189,10,10
@@ -1173,7 +1173,7 @@ BEGIN
     PUSHBUTTON      "取消",IDCANCEL,411,217,50,14
     GROUPBOX        "信息",IDC_INFO_GROUPBOX,181,7,280,122
     ICON            IDI_STYLES,IDC_STATIC,189,19,20,20
-    LTEXT           "自定义方案",IDC_TITLE,220,25,200,12
+    LTEXT           "自定义语法高亮",IDC_TITLE,220,25,200,12
     EDITTEXT        IDC_STYLEEDIT_HELP,186,40,272,86,ES_READONLY | ES_MULTILINE | NOT WS_BORDER | NOT WS_TABSTOP
     LTEXT           "关联的文件扩展名(&N)：|样式设置(&S)：",IDC_STYLELABELS,315,230,152,8,NOT WS_VISIBLE
     LTEXT           "内置默认值：",IDC_STYLELABEL_DEFAULT,181,162,160,8
@@ -1279,7 +1279,7 @@ FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     CONTROL         "",IDC_FAVORITESDIR,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_SHAREIMAGELISTS | LVS_AUTOARRANGE | LVS_NOCOLUMNHEADER | WS_BORDER | WS_TABSTOP,7,7,230,106
     PUSHBUTTON      "",IDC_GETFAVORITESDIR,7,118,13,13
-    LTEXT           "点击此处选择存放您收藏的文件链接的目录。",IDC_FAVORITESDESCR,22,118,214,20
+    LTEXT           "点击此处选择存放您收藏的文件链接的文件夹。",IDC_FAVORITESDESCR,22,118,214,20
     DEFPUSHBUTTON   "确定",IDOK,131,145,50,14
     PUSHBUTTON      "取消",IDCANCEL,187,145,50,14
     SCROLLBAR       IDC_RESIZEGRIP3,7,145,10,10
@@ -1791,8 +1791,8 @@ END
 STRINGTABLE
 BEGIN
     IDS_FILTER_INI          "配置文件 (*.ini)|*.ini|所有文件 (*.*)|*.*|"
-    IDS_OPENWITH            "点击此处选择存放您收藏的应用程序链接的目录。"
-    IDS_FAVORITES           "点击此处选择存放您收藏的文件链接的目录。"
+    IDS_OPENWITH            "点击此处选择存放您收藏的应用程序链接的文件夹。"
+    IDS_FAVORITES           "点击此处选择存放您收藏的文件链接的文件夹。"
 END
 
 STRINGTABLE
@@ -1852,7 +1852,7 @@ BEGIN
 +\t多个文件参数 (需要使用双引号括起有空格的路径名称)。\n\
 -\t单个文件参数 (无需使用双引号括起有空格的路径名称)。\n\
 …\t编码 (/ansi, /unicode, /unicodele, /unicodebe,\n\
-…\t/utf8, /utf8sig, /utf8bom, /utf16, /utf16le, /utf16be).\n\
+…\t/utf8, /utf8sig, /utf8bom, /utf16, /utf16le, /utf16be)。\n\
 …\t换行符 (/crlf, /lf, /cr)。\n\
 /e 编码\t文件编码。\n\
 /g 行[,列]\t跳转到指定位置 (/g -1 转到文件末尾)。\n\
@@ -1873,7 +1873,7 @@ BEGIN
 /o\t保持在最前面。\n\
 /f 路径\t指定配置文件 (/f0 无配置文件)。\n\
 /u\t以管理员身份运行。\n\
-/z\t跳过下个参数 (可用于对基于注册表的 Notepad 替换)."
+/z\t跳过下个参数 (对基于注册表的记事本替换有用)。"
 END
 
 STRINGTABLE
@@ -1891,7 +1891,7 @@ BEGIN
     IDS_PRINT_PAGENUM       "页 %s"
     IDS_PRINT_EMPTY         "此文档不包含任何需要打印的文本。"
     IDS_PRINT_ERROR         "打印""%s""时出错！"
-    IDS_FAV_SUCCESS         "已在收藏夹目录中创建一个当前文件的快捷方式。"
+    IDS_FAV_SUCCESS         "已在收藏夹中创建一个当前文件的快捷方式。"
     IDS_FAV_FAILURE         "未能创建当前文件的快捷方式。\n请检查是否已有同名文件。"
     IDS_READONLY_MODIFY     "不能修改“%s”的属性。"
 END
