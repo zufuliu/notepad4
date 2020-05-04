@@ -300,7 +300,7 @@ public:
 	void Init() override;
 	bool IsActive() const noexcept override;
 	void InsertLine(Sci::Line line) override;
-	void InsertLines(Sci::Line lineFirst, Sci::Line lineCount) override;
+	void InsertLines(Sci::Line line, Sci::Line lines) override;
 	void RemoveLine(Sci::Line line) override;
 
 	int LineEndTypesSupported() const noexcept;

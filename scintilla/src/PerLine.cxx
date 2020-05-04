@@ -104,9 +104,9 @@ void LineMarkers::InsertLine(Sci::Line line) {
 	}
 }
 
-void LineMarkers::InsertLines(Sci::Line lineFirst, Sci::Line lineCount) {
+void LineMarkers::InsertLines(Sci::Line line, Sci::Line lines) {
 	if (markers.Length()) {
-		markers.InsertEmpty(lineFirst, lineCount);
+		markers.InsertEmpty(line, lines);
 	}
 }
 
@@ -230,22 +230,14 @@ bool LineLevels::IsActive() const noexcept {
 void LineLevels::InsertLine(Sci::Line line) {
 	if (levels.Length()) {
 		const int level = (line < levels.Length()) ? levels[line] : SC_FOLDLEVELBASE;
-		levels.EnsureLength(line);
 		levels.Insert(line, level);
 	}
 }
 
-void LineLevels::InsertLines(Sci::Line lineFirst, Sci::Line lineCount) {
+void LineLevels::InsertLines(Sci::Line line, Sci::Line lines) {
 	if (levels.Length()) {
-		const Sci::Line lineLast = lineFirst + lineCount;
-		lineCount = std::min(lineLast, levels.Length());
-		levels.EnsureLength(lineLast);
-		for (Sci::Line line = lineFirst; line < lineLast; line++) {
-			levels.Insert(line, levels[line]);
-		}
-		if (lineCount != lineLast) {
-			levels.InsertValue(lineCount, lineLast - lineCount, SC_FOLDLEVELBASE);
-		}
+		const int level = (line < levels.Length()) ? levels[line] : SC_FOLDLEVELBASE;
+		levels.InsertValue(line, lines, level);
 	}
 }
 
@@ -305,23 +297,15 @@ bool LineState::IsActive() const noexcept {
 
 void LineState::InsertLine(Sci::Line line) {
 	if (lineStates.Length()) {
-		lineStates.EnsureLength(line);
 		const int val = (line < lineStates.Length()) ? lineStates[line] : 0;
 		lineStates.Insert(line, val);
 	}
 }
 
-void LineState::InsertLines(Sci::Line lineFirst, Sci::Line lineCount) {
+void LineState::InsertLines(Sci::Line line, Sci::Line lines) {
 	if (lineStates.Length()) {
-		const Sci::Line lineLast = lineFirst + lineCount;
-		lineCount = std::min(lineLast, lineStates.Length());
-		lineStates.EnsureLength(lineLast);
-		for (Sci::Line line = lineFirst; line < lineLast; line++) {
-			lineStates.Insert(line, lineStates[line]);
-		}
-		if (lineCount != lineLast) {
-			lineStates.InsertValue(lineCount, lineLast - lineCount, 0);
-		}
+		const int val = (line < lineStates.Length()) ? lineStates[line] : 0;
+		lineStates.InsertValue(line, lines, val);
 	}
 }
 
@@ -391,11 +375,10 @@ void LineAnnotation::InsertLine(Sci::Line line) {
 	}
 }
 
-void LineAnnotation::InsertLines(Sci::Line lineFirst, Sci::Line lineCount) {
+void LineAnnotation::InsertLines(Sci::Line line, Sci::Line lines) {
 	if (annotations.Length()) {
-		const Sci::Line lineLast = lineFirst + lineCount;
-		annotations.EnsureLength(lineLast);
-		annotations.InsertEmpty(lineFirst, lineCount);
+		annotations.EnsureLength(line);
+		annotations.InsertEmpty(line, lines);
 	}
 }
 
@@ -519,10 +502,10 @@ void LineTabstops::InsertLine(Sci::Line line) {
 	}
 }
 
-void LineTabstops::InsertLines(Sci::Line lineFirst, Sci::Line lineCount) {
+void LineTabstops::InsertLines(Sci::Line line, Sci::Line lines) {
 	if (tabstops.Length()) {
-		tabstops.EnsureLength(lineFirst + lineCount);
-		tabstops.InsertEmpty(lineFirst, lineCount);
+		tabstops.EnsureLength(line);
+		tabstops.InsertEmpty(line, lines);
 	}
 }
 
