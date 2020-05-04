@@ -93,8 +93,8 @@ void Edit_ReleaseResources(void) {
 }
 
 static inline void NotifyRectangleSelection(void) {
-	//MsgBox(MBWARN, IDS_SELRECT);
-	ShowNotificationMessage(SC_NOTIFICATIONPOSITION_CENTER, IDS_SELRECT);
+	MsgBox(MBWARN, IDS_SELRECT);
+	//ShowNotificationMessage(SC_NOTIFICATIONPOSITION_CENTER, IDS_SELRECT);
 }
 
 //=============================================================================
