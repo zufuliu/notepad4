@@ -592,7 +592,7 @@ BEGIN
 		POPUP "視窗標題顯示(&Y)"
 		BEGIN
 			MENUITEM "只檔名(&F)",				IDM_VIEW_SHOWFILENAMEONLY
-			MENUITEM "檔案名稱與目錄(&D)",			IDM_VIEW_SHOWFILENAMEFIRST
+			MENUITEM "檔案名稱與資料夾(&D)",		IDM_VIEW_SHOWFILENAMEFIRST
 			MENUITEM "完整路徑名稱(&P)",			IDM_VIEW_SHOWFULLPATH
 			MENUITEM "選取的文字(&T)",			IDM_VIEW_SHOWEXCERPT
 		END
@@ -1042,7 +1042,7 @@ FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     CONTROL         "",IDC_OPENWITHDIR,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_SHAREIMAGELISTS | LVS_AUTOARRANGE | LVS_NOCOLUMNHEADER | WS_BORDER | WS_TABSTOP,7,7,214,149
     PUSHBUTTON      "",IDC_GETOPENWITHDIR,7,162,13,13
-    LTEXT           "點選此處選擇存放您的收藏的應用程式連結的目錄。",IDC_OPENWITHDESCR,26,162,195,20
+    LTEXT           "點選此處選擇存放您的收藏的應用程式連結的資料夾。",IDC_OPENWITHDESCR,26,162,195,20
     DEFPUSHBUTTON   "確定",IDOK,115,185,50,14
     PUSHBUTTON      "取消",IDCANCEL,171,185,50,14
     SCROLLBAR       IDC_RESIZEGRIP3,7,189,10,10
@@ -1279,7 +1279,7 @@ FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     CONTROL         "",IDC_FAVORITESDIR,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_SHAREIMAGELISTS | LVS_AUTOARRANGE | LVS_NOCOLUMNHEADER | WS_BORDER | WS_TABSTOP,7,7,230,106
     PUSHBUTTON      "",IDC_GETFAVORITESDIR,7,118,13,13
-    LTEXT           "點選此處選擇存放您的收藏的檔案連結的目錄。",IDC_FAVORITESDESCR,22,118,214,20
+    LTEXT           "點選此處選擇存放您的收藏的檔案連結的資料夾。",IDC_FAVORITESDESCR,22,118,214,20
     DEFPUSHBUTTON   "確定",IDOK,131,145,50,14
     PUSHBUTTON      "取消",IDCANCEL,187,145,50,14
     SCROLLBAR       IDC_RESIZEGRIP3,7,145,10,10
@@ -1791,8 +1791,8 @@ END
 STRINGTABLE
 BEGIN
     IDS_FILTER_INI          "設定檔案 (*.ini)|*.ini|所有檔案 (*.*)|*.*|"
-    IDS_OPENWITH            "點選此處選擇存放您的收藏的應用程式連結的目錄。"
-    IDS_FAVORITES           "點選此處選擇存放您的收藏的檔案連結的目錄。"
+    IDS_OPENWITH            "點選此處選擇存放您的收藏的應用程式連結的資料夾。"
+    IDS_FAVORITES           "點選此處選擇存放您的收藏的檔案連結的資料夾。"
 END
 
 STRINGTABLE
@@ -1852,7 +1852,7 @@ BEGIN
 +\t多個檔案參數 (需要使用雙引括起有空白的路徑名稱)。\n\
 -\t單個檔案參數 (無需使用雙引括起有空白的路徑名稱)。\n\
 …\t編碼 (/ansi, /unicode, /unicodele, /unicodebe,\n\
-…\t/utf8, /utf8sig, /utf8bom, /utf16, /utf16le, /utf16be).\n\
+…\t/utf8, /utf8sig, /utf8bom, /utf16, /utf16le, /utf16be)。\n\
 …\t換行子 (/crlf, /lf, /cr)。\n\
 /e 編碼\t檔案編碼。\n\
 /g 行[,欄]\t跳到指定位置 (/g -1 跳到檔案尾)。\n\
@@ -1873,7 +1873,7 @@ BEGIN
 /o\t保持在最前面。\n\
 /f 路徑\t指定設定檔 (/f0 沒有設定檔)。\n\
 /u\t依管理員身份執行。\n\
-/z\t跳過下個參數 (可用於對基於註冊表的 Notepad 取代)."
+/z\t跳過下個參數 (對基於註冊表的記事本置換有用)。"
 END
 
 STRINGTABLE
@@ -1891,7 +1891,7 @@ BEGIN
     IDS_PRINT_PAGENUM       "頁 %s"
     IDS_PRINT_EMPTY         "此文件不包含任何需要列印的文字。"
     IDS_PRINT_ERROR         "列印""%s""時發生錯誤！"
-    IDS_FAV_SUCCESS         "在我的最愛目錄中建立目前檔案的快捷方式。"
+    IDS_FAV_SUCCESS         "在我的最愛中建立目前檔案的快捷方式。"
     IDS_FAV_FAILURE         "無法建立目前的檔案的快捷方法。\n請檢查是否已有同名檔案。"
     IDS_READONLY_MODIFY     "無法變更“%s”的屬性。"
 END

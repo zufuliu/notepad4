@@ -96,13 +96,13 @@ BEGIN
 	POPUP "+"
 	BEGIN
 		MENUITEM "新增檔案(&N)...",				IDM_FILE_NEW
-		MENUITEM "新增目錄(&W)...",				IDM_FILE_NEWDIR
+		MENUITEM "新增資料夾(&W)...",				IDM_FILE_NEWDIR
 		MENUITEM SEPARATOR
 		MENUITEM "檔案過濾(&L)...",				IDM_VIEW_FILTER
 		MENUITEM "重置過濾(&R)",					IDM_VIEW_FILTERALL
 		POPUP "顯示(&S)"
 		BEGIN
-			MENUITEM "目錄(&D)",					IDM_VIEW_FOLDERS
+			MENUITEM "資料夾(&D)",				IDM_VIEW_FOLDERS
 			MENUITEM "檔案(&F)",					IDM_VIEW_FILES
 			MENUITEM "系統物件(&S)",				IDM_VIEW_HIDDEN
 		END
@@ -119,7 +119,7 @@ BEGIN
 		MENUITEM "在資源管理器開啟(&E)",			IDM_FILE_EXPLORER
 		MENUITEM "跳到我的最愛(&F)",				IDM_VIEW_FAVORITES
 		MENUITEM "開啟我的最愛(&O)",				IDM_VIEW_EDITFAVORITES
-		MENUITEM "目錄(&D)...",					IDM_FILE_CHANGEDIR
+		MENUITEM "資料夾(&D)...",				IDM_FILE_CHANGEDIR
 		MENUITEM "跳到(&G)...",					IDM_FILE_GOTO
 		MENUITEM SEPARATOR
 		MENUITEM "顯示磁碟(&V)",					IDM_VIEW_DRIVEBOX
@@ -131,7 +131,7 @@ BEGIN
 	END
 	POPUP "+"
 	BEGIN
-		MENUITEM "目錄(&D)...",					IDM_FILE_CHANGEDIR
+		MENUITEM "資料夾(&D)...",				IDM_FILE_CHANGEDIR
 		MENUITEM "磁碟屬性(&P)",					IDM_FILE_DRIVEPROP
 		MENUITEM SEPARATOR
 		MENUITEM "磁碟(&V)",						IDM_VIEW_DRIVEBOX
@@ -262,7 +262,7 @@ FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
     CONTROL         "",IDC_OPENWITHDIR,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_SHAREIMAGELISTS | LVS_AUTOARRANGE | LVS_NOCOLUMNHEADER | WS_BORDER | WS_TABSTOP,7,7,151,69
     PUSHBUTTON      "",IDC_GETOPENWITHDIR,7,83,13,13
-    LTEXT           "點選此處選擇存放您的收藏的應用程式連結的目錄。",IDC_OPENWITHDESCR,26,83,132,18
+    LTEXT           "點選此處選擇存放您的收藏的應用程式連結的資料夾。",IDC_OPENWITHDESCR,26,83,132,18
     DEFPUSHBUTTON   "確定",IDOK,52,107,50,14
     PUSHBUTTON      "取消",IDCANCEL,108,107,50,14
     SCROLLBAR       IDC_RESIZEGRIP3,7,112,10,10
@@ -270,11 +270,11 @@ END
 
 IDD_GOTO DIALOGEX 0, 0, 224, 87
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "转到"
+CAPTION "跳到"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
     ICON            IDI_GOTO,IDC_STATIC,7,7,20,20
-    LTEXT           "输入要打开的文件或目录的名称，或者从列表中选择最近访问的目录。",IDC_GOTODESC,35,7,182,17
+    LTEXT           "輸入要開啟的檔案或資料夾名稱，或者从列表中选择最近打开的目录。",IDC_GOTODESC,35,7,182,17
     COMBOBOX        IDC_GOTO,7,35,210,126,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
     DEFPUSHBUTTON   "確定",IDOK,111,66,50,14,WS_DISABLED
     PUSHBUTTON      "取消",IDCANCEL,167,66,50,14
@@ -283,13 +283,13 @@ END
 
 IDD_FILTER DIALOGEX 0, 0, 204, 79
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "文件过滤器"
+CAPTION "檔案過濾"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
-    LTEXT           "指定一个新的文件过滤器(&F)。用 ; 分隔多个过滤器",IDC_STATIC,7,7,190,8
+    LTEXT           "指定新的檔案過濾器(&F)。用 ; 分隔多個過濾項目",IDC_STATIC,7,7,190,8
     EDITTEXT        IDC_FILTER,7,22,171,14,ES_AUTOHSCROLL
     PUSHBUTTON      "",IDC_BROWSEFILTER,183,22,14,14
-    AUTOCHECKBOX    "排除匹配过滤器的文件(&E)",IDC_NEGFILTER,7,40,170,10,WS_TABSTOP
+    AUTOCHECKBOX    "排除符合過濾的檔案(&E)。",IDC_NEGFILTER,7,40,170,10,WS_TABSTOP
     DEFPUSHBUTTON   "確定",IDOK,91,58,50,14
     PUSHBUTTON      "取消",IDCANCEL,147,58,50,14
     SCROLLBAR       IDC_RESIZEGRIP3,7,58,10,10
@@ -297,10 +297,10 @@ END
 
 IDD_RENAME DIALOGEX 0, 0, 172, 74
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "重命名"
+CAPTION "重新命名"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
-    LTEXT           "当前:",IDC_STATIC,7,9,28,8,SS_RIGHT
+    LTEXT           "目前:",IDC_STATIC,7,9,28,8,SS_RIGHT
     EDITTEXT        IDC_OLDNAME,39,7,126,14,ES_AUTOHSCROLL | ES_READONLY | NOT WS_TABSTOP
     LTEXT           "新的(&N):",IDC_STATIC,7,27,28,8,SS_RIGHT
     EDITTEXT        IDC_NEWNAME,39,26,126,14,ES_AUTOHSCROLL
@@ -311,10 +311,10 @@ END
 
 IDD_NEWDIR DIALOGEX 0, 0, 172, 66
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "新建目录"
+CAPTION "新增資料夾"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
-    LTEXT           "请输入新目录的名称：",IDC_STATIC,7,7,158,8
+    LTEXT           "請輸入新資料夾名稱：",IDC_STATIC,7,7,158,8
     EDITTEXT        IDC_NEWDIR,7,22,158,14,ES_AUTOHSCROLL
     DEFPUSHBUTTON   "確定",IDOK,59,45,50,14,WS_DISABLED
     PUSHBUTTON      "取消",IDCANCEL,115,45,50,14
@@ -323,18 +323,18 @@ END
 
 IDD_COPYMOVE DIALOGEX 0, 0, 230, 95
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "复制/移动"
+CAPTION "複製/移動"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
     LTEXT           "源：",IDC_STATIC,7,7,26,8
     EDITTEXT        IDC_SOURCE,7,18,216,14,ES_AUTOHSCROLL | ES_READONLY | NOT WS_TABSTOP
-    LTEXT           "目标(&D)：",IDC_STATIC,7,37,40,8
+    LTEXT           "目標(&D)：",IDC_STATIC,7,37,40,8
     COMBOBOX        IDC_DESTINATION,7,48,199,105,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
     PUSHBUTTON      "",IDC_BROWSEDESTINATION,210,48,13,13
-    CONTROL         "<a>清除最近记录</a>",IDC_EMPTY_MRU,"SysLink",WS_TABSTOP,154,37,70,10
-    LTEXT           "动作：",IDC_STATIC,7,72,24,8
-    AUTORADIOBUTTON "复制(&C)",IDC_FUNCCOPY,35,71,33,10,WS_GROUP | WS_TABSTOP
-    AUTORADIOBUTTON "移动(&M)",IDC_FUNCMOVE,68,71,33,10,WS_TABSTOP
+    CONTROL         "<a>清除最近記錄</a>",IDC_EMPTY_MRU,"SysLink",WS_TABSTOP,154,37,70,10
+    LTEXT           "動作：",IDC_STATIC,7,72,24,8
+    AUTORADIOBUTTON "複製(&C)",IDC_FUNCCOPY,35,71,33,10,WS_GROUP | WS_TABSTOP
+    AUTORADIOBUTTON "移動(&M)",IDC_FUNCMOVE,68,71,33,10,WS_TABSTOP
     DEFPUSHBUTTON   "確定",IDOK,117,74,50,14,WS_DISABLED
     PUSHBUTTON      "取消",IDCANCEL,173,74,50,14
     SCROLLBAR       IDC_RESIZEGRIP5,7,78,10,10
@@ -346,62 +346,62 @@ CAPTION "常规"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
     ICON            IDI_OPTIONS,IDC_STATIC,10,10,20,20
-    LTEXT           "指定用于 metapath 的一般设置。",IDC_STATIC,40,15,200,8
-    AUTOCHECKBOX    "在同一个目标应用程序窗口中打开文件",IDC_OPENFILE_SAME_WINDOW,10,34,190,10,WS_TABSTOP
-    AUTOCHECKBOX    "仅允许鼠标单击来打开对象(&A)",IDC_SINGLECLICK,10,46,190,10,WS_TABSTOP
-    AUTOCHECKBOX    "启用自动选中(&E)",IDC_TRACKSELECT,10,58,100,10,WS_TABSTOP
-    AUTOCHECKBOX    "启用整行选择(&F)",IDC_FULLROWSELECT,10,70,120,10,WS_TABSTOP
-    AUTOCHECKBOX    "打开一个文件时始终激活目标窗口(&C)",IDC_FOCUSEDIT,10,82,220,10,WS_TABSTOP
+    LTEXT           "指定用於 metapath 的一般設定。",IDC_STATIC,40,15,200,8
+    AUTOCHECKBOX    "在相同目標應用程式視窗開啟檔案。",IDC_OPENFILE_SAME_WINDOW,10,34,190,10,WS_TABSTOP
+    AUTOCHECKBOX    "允許滑鼠按下來開啟物件(&A)。",IDC_SINGLECLICK,10,46,190,10,WS_TABSTOP
+    AUTOCHECKBOX    "開啟自動選擇(&E)。",IDC_TRACKSELECT,10,58,100,10,WS_TABSTOP
+    AUTOCHECKBOX    "開啟整行選擇(&F)。",IDC_FULLROWSELECT,10,70,120,10,WS_TABSTOP
+    AUTOCHECKBOX    "開啟檔案時會自動啟動目標視窗(&C)。",IDC_FOCUSEDIT,10,82,220,10,WS_TABSTOP
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,10,100,205,1
-    AUTOCHECKBOX    "metapath 窗口保持置顶(&K)",IDC_ALWAYSONTOP,10,109,150,10,WS_TABSTOP
-    AUTOCHECKBOX    "最小化到系统托盘(&M)（单击以重新激活）",IDC_MINIMIZETOTRAY,10,121,200,10,WS_TABSTOP
-    AUTOCHECKBOX    "在 metapath 启动时尝试重用现有窗口(&T)",IDC_REUSEWINDOW,10,133,220,10,WS_TABSTOP
-    CONTROL         "<a>清除窗口位置记录</a>",IDC_CLEARWINPOS,"SysLink",WS_TABSTOP,20,145,103,12
+    AUTOCHECKBOX    "metapath 視窗保持置頂(&K)。",IDC_ALWAYSONTOP,10,109,150,10,WS_TABSTOP
+    AUTOCHECKBOX    "最小化到系統匣(&M)（點選以重新啟動）。",IDC_MINIMIZETOTRAY,10,121,200,10,WS_TABSTOP
+    AUTOCHECKBOX    "在 metapath 啟動時試著重用現有視窗(&T)。",IDC_REUSEWINDOW,10,133,220,10,WS_TABSTOP
+    CONTROL         "<a>清除視窗位置記錄</a>",IDC_CLEARWINPOS,"SysLink",WS_TABSTOP,20,145,103,12
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,10,161,205,1
-    AUTOCHECKBOX    "退出时保存设置(&S)",IDC_SAVESETTINGS,10,170,100,10,WS_TABSTOP
-    CONTROL         "<a>关于 metapath</a>",IDC_ABOUT,"SysLink",WS_TABSTOP,130,170,80,12
+    AUTOCHECKBOX    "離開時儲存設定(&S)。",IDC_SAVESETTINGS,10,170,100,10,WS_TABSTOP
+    CONTROL         "<a>關於 metapath</a>",IDC_ABOUT,"SysLink",WS_TABSTOP,130,170,80,12
 END
 
 IDPP_ADVANCED DIALOGEX 0, 0, 232, 185
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "高级"
+CAPTION "進階"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
     ICON            IDI_OPTIONS2,IDC_STATIC,10,10,20,20
-    AUTOCHECKBOX    "使用从右至左（&RTL）布局",IDC_RTL_LAYOUT,10,34,190,10,WS_TABSTOP
-    LTEXT           "指定 metapath 的高级设置。",IDC_STATIC,40,15,200,8
-    AUTOCHECKBOX    "使用启动目录(&U)：",IDC_STARTUPDIR,10,46,104,10,WS_GROUP | WS_TABSTOP
+    AUTOCHECKBOX    "使用从右至左（&RTL）佈局。",IDC_RTL_LAYOUT,10,34,190,10,WS_TABSTOP
+    LTEXT           "指定 metapath 的進階設定。",IDC_STATIC,40,15,200,8
+    AUTOCHECKBOX    "使用啟動資料夾(&U)：",IDC_STARTUPDIR,10,46,104,10,WS_GROUP | WS_TABSTOP
     AUTORADIOBUTTON "最近使用(&R)。",IDC_GOTOMRU,114,46,90,10,WS_GROUP | WS_TABSTOP
-    AUTORADIOBUTTON "“收藏夹”文件夹(&F)。",IDC_GOTOFAV,114,58,90,10,WS_TABSTOP
+    AUTORADIOBUTTON "“我的最愛”資料夾(&F)。",IDC_GOTOFAV,114,58,90,10,WS_TABSTOP
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,10,76,205,1
-    AUTOCHECKBOX    "清除所保存文件的只读属性(&C)",IDC_CLEARREADONLY,10,85,172,10,WS_TABSTOP
-    AUTOCHECKBOX    "命名冲突时重命名文件副本(&N)",IDC_RENAMEONCOLLISION,10,97,164,10,WS_TABSTOP
-    AUTOCHECKBOX    "将删除的文件移到回收站(&M)",IDC_USERECYCLEBIN,10,109,160,10,WS_TABSTOP
-    AUTOCHECKBOX    "不需确认删除（不推荐）(&D)",IDC_NOCONFIRMDELETE,10,121,184,10,WS_TABSTOP
+    AUTOCHECKBOX    "儲存檔案時移除唯讀屬性(&C)。",IDC_CLEARREADONLY,10,85,172,10,WS_TABSTOP
+    AUTOCHECKBOX    "命名衝突時重新命名檔案複本(&N)。",IDC_RENAMEONCOLLISION,10,97,164,10,WS_TABSTOP
+    AUTOCHECKBOX    "將刪除的檔案移到資源回收桶(&M)。",IDC_USERECYCLEBIN,10,109,160,10,WS_TABSTOP
+    AUTOCHECKBOX    "不要確認檔案移除（不推薦）(&D)。",IDC_NOCONFIRMDELETE,10,121,184,10,WS_TABSTOP
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,10,139,205,1
-    AUTOCHECKBOX    "启用 &Esc 键动作...",IDC_ESCFUNCTION,10,148,104,10,WS_GROUP | WS_TABSTOP
-    AUTORADIOBUTTON "最小化窗口(&W)。",IDC_ESCMIN,114,148,74,10,WS_GROUP | WS_TABSTOP
-    AUTORADIOBUTTON "退出 metapath(&X)。",IDC_ESCEXIT,114,160,66,10,WS_TABSTOP
+    AUTOCHECKBOX    "開啟 &Esc 鍵功能...",IDC_ESCFUNCTION,10,148,104,10,WS_GROUP | WS_TABSTOP
+    AUTORADIOBUTTON "最小化視窗(&W)。",IDC_ESCMIN,114,148,74,10,WS_GROUP | WS_TABSTOP
+    AUTORADIOBUTTON "離開 metapath(&X)。",IDC_ESCEXIT,114,160,66,10,WS_TABSTOP
 END
 
 IDPP_ITEMS DIALOGEX 0, 0, 232, 185
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "项目"
+CAPTION "項目"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
     ICON            IDI_ITEMS,IDC_STATIC,10,10,21,20
-    LTEXT           "目录列表的项目外观。",IDC_STATIC,40,15,160,8
-    GROUPBOX        "颜色",IDC_STATIC,10,41,205,134
-    LTEXT           "无过滤器激活时使用的文本颜色：",IDC_STATIC,20,54,170,8
-    AUTORADIOBUTTON "默认窗口颜色(&W)。",IDC_COLOR_DEF1,20,68,96,10,WS_GROUP | WS_TABSTOP
-    AUTORADIOBUTTON "自定义颜色(&C):",IDC_COLOR_CUST1,20,82,60,10,WS_TABSTOP
+    LTEXT           "目錄清單的項目外觀。",IDC_STATIC,40,15,160,8
+    GROUPBOX        "顏色",IDC_STATIC,10,41,205,134
+    LTEXT           "沒有過濾時使用的文字顏色：",IDC_STATIC,20,54,170,8
+    AUTORADIOBUTTON "預設視窗顏色(&W)。",IDC_COLOR_DEF1,20,68,96,10,WS_GROUP | WS_TABSTOP
+    AUTORADIOBUTTON "自訂顏色(&C):",IDC_COLOR_CUST1,20,82,60,10,WS_TABSTOP
     EDITTEXT        IDC_COLOR_SAMP1,85,80,30,14,ES_AUTOHSCROLL | WS_DISABLED
-    PUSHBUTTON      "选择颜色...",IDC_COLOR_PICK1,120,80,60,14
-    LTEXT           "有过滤器激活时使用的文本颜色：",IDC_STATIC,20,105,180,8
-    AUTORADIOBUTTON "默认窗口颜色(&E)。",IDC_COLOR_DEF2,20,120,95,10,WS_GROUP | WS_TABSTOP
-    AUTORADIOBUTTON "自定义颜色(&U)：",IDC_COLOR_CUST2,20,133,60,10,WS_TABSTOP
+    PUSHBUTTON      "選擇顏色...",IDC_COLOR_PICK1,120,80,60,14
+    LTEXT           "用過濾時使用的文字顏色：",IDC_STATIC,20,105,180,8
+    AUTORADIOBUTTON "預設視窗顏色(&E)。",IDC_COLOR_DEF2,20,120,95,10,WS_GROUP | WS_TABSTOP
+    AUTORADIOBUTTON "自訂顏色(&U)：",IDC_COLOR_CUST2,20,133,60,10,WS_TABSTOP
     EDITTEXT        IDC_COLOR_SAMP2,86,130,30,14,ES_AUTOHSCROLL | WS_DISABLED
-    PUSHBUTTON      "选择颜色...",IDC_COLOR_PICK2,120,130,60,14
+    PUSHBUTTON      "選擇顏色...",IDC_COLOR_PICK2,120,130,60,14
 END
 
 IDPP_PROG DIALOGEX 0, 0, 232, 185
@@ -410,31 +410,31 @@ CAPTION "位置"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
     ICON            IDI_PROGS,IDC_STATIC,10,10,20,20
-    LTEXT           "指定外部程序及路径。",IDC_STATIC,40,15,180,8
-    LTEXT           "默认“快速概览”应用程序(&D) (Ctrl+Q):",IDC_STATIC,10,41,180,8
+    LTEXT           "指定外部程式及路徑。",IDC_STATIC,40,15,180,8
+    LTEXT           "預設“快速概觀”應用程式(&D) (Ctrl+Q):",IDC_STATIC,10,41,180,8
     EDITTEXT        IDC_QUICKVIEW,10,52,191,14,ES_AUTOHSCROLL
     PUSHBUTTON      "",IDC_BROWSE_Q,204,52,14,14,BS_BITMAP
-    LTEXT           "“收藏夹”文件夹 (F11)(&F):",IDC_STATIC,10,76,120,8
+    LTEXT           "“我的最愛”資料夾 (F11)(&F):",IDC_STATIC,10,76,120,8
     EDITTEXT        IDC_FAVORITES,10,87,191,14,ES_AUTOHSCROLL
     PUSHBUTTON      "",IDC_BROWSE_F,204,87,14,14,BS_BITMAP
 END
 
 IDD_FINDTARGET DIALOGEX 0, 0, 272, 210
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "目标应用程序"
+CAPTION "目標應用程式"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    AUTORADIOBUTTON "不使用任何特定的应用程序，只是启动所选文件。",IDC_LAUNCH,7,7,260,10,WS_GROUP | WS_TABSTOP
-    AUTORADIOBUTTON "使用下列目标应用程序：",IDC_TARGET,7,21,160,10,WS_TABSTOP
-    LTEXT           "如果目标应用程序已在运行，指定操作：",IDC_STATIC,7,64,260,8
+    AUTORADIOBUTTON "不使用任何特定的應用程式，直接啟動選取的檔案。",IDC_LAUNCH,7,7,260,10,WS_GROUP | WS_TABSTOP
+    AUTORADIOBUTTON "使用以下目標應用程式：",IDC_TARGET,7,21,160,10,WS_TABSTOP
+    LTEXT           "如果目標應用程式已在執行，指定作業：",IDC_STATIC,7,64,260,8
     EDITTEXT        IDC_TARGETPATH,20,35,226,14,ES_AUTOHSCROLL
     PUSHBUTTON      "",IDC_BROWSE,251,35,14,14,BS_BITMAP
-    AUTORADIOBUTTON "无，每次打开一个文件时都运行目标应用程序。",IDC_ALWAYSRUN,7,78,240,10,WS_GROUP | WS_TABSTOP
-    AUTORADIOBUTTON "发送文件打开消息到目标应用窗口：",IDC_SENDDROPMSG,7,92,194,10,WS_TABSTOP
-    AUTORADIOBUTTON "执行以下 DDE 命令：",IDC_USEDDE,7,106,160,10,WS_TABSTOP
-    PUSHBUTTON      "查找窗口...",IDC_FINDWIN,204,91,60,14
-    LTEXT           "消息:",IDC_STATIC,19,124,42,8,SS_RIGHT
-    LTEXT           "应用程序:",IDC_STATIC,19,145,42,8,SS_RIGHT
+    AUTORADIOBUTTON "無，每次開啟檔案時都執行目標應用程式。",IDC_ALWAYSRUN,7,78,240,10,WS_GROUP | WS_TABSTOP
+    AUTORADIOBUTTON "送出檔案開啟訊息到目標套用視窗：",IDC_SENDDROPMSG,7,92,194,10,WS_TABSTOP
+    AUTORADIOBUTTON "執行以下 DDE 命令：",IDC_USEDDE,7,106,160,10,WS_TABSTOP
+    PUSHBUTTON      "尋找視窗...",IDC_FINDWIN,204,91,60,14
+    LTEXT           "訊息:",IDC_STATIC,19,124,42,8,SS_RIGHT
+    LTEXT           "應用程式:",IDC_STATIC,19,145,42,8,SS_RIGHT
     LTEXT           "主题:",IDC_STATIC,19,165,42,8,SS_RIGHT
     EDITTEXT        IDC_DDEMSG,65,122,200,14,ES_AUTOHSCROLL
     EDITTEXT        IDC_DDEAPP,65,142,200,14,ES_AUTOHSCROLL
@@ -446,14 +446,14 @@ END
 
 IDD_FINDWIN DIALOGEX 0, 0, 210, 85
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "查找窗口"
+CAPTION "尋找視窗"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     ICON            IDI_CROSS1,IDC_CROSSCURSOR,7,7,21,20,SS_CENTERIMAGE
-    LTEXT           "拖动十字线到目标窗口来选择新目标，或按 Esc 取消。",IDC_FINDWINDESC,35,7,168,22
+    LTEXT           "拖曳十字游標到目標視窗來選擇新目標，或按 Esc 取消。",IDC_FINDWINDESC,35,7,168,22
     EDITTEXT        IDC_WINTITLE,7,35,196,14,ES_AUTOHSCROLL | ES_READONLY | NOT WS_TABSTOP
-    LTEXT           "窗口类",IDC_WINCLASS,7,60,45,8,NOT WS_VISIBLE
-    LTEXT           "窗口模块",IDC_WINMODULE,7,70,51,8,NOT WS_VISIBLE
+    LTEXT           "視窗類",IDC_WINCLASS,7,60,45,8,NOT WS_VISIBLE
+    LTEXT           "視窗模組",IDC_WINMODULE,7,70,51,8,NOT WS_VISIBLE
     DEFPUSHBUTTON   "確定",IDOK,97,64,50,14,WS_DISABLED
     PUSHBUTTON      "取消",IDCANCEL,153,64,50,14
     SCROLLBAR       IDC_RESIZEGRIP5,7,64,10,10
@@ -617,51 +617,51 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_ERR_CD              "目录访问错误\n无权访问指定目录。\n检查磁盘或网络连接。"
-    IDS_ERR_FILE            "文件访问错误\n无权访问“%s”。\n该文件可能正被其他应用程序使用。\n检查磁盘或网络连接。"
-    IDS_ERR_NEW             "文件访问错误\n无法创建文件。\n检查磁盘或网络连接。"
-    IDS_ERR_NEWDIR          "目录访问错误\n无法创建目录。\n检查磁盘或网络连接。"
-    IDS_ERR_SAVEAS1         "文件保存错误\n保存“%s”时出错。\n可能是现有文件被写保护。"
-    IDS_ERR_SAVEAS2         "文件保存错误\n删除已保存文件的只读属性时出错。"
-    IDS_ERR_CMDLINE         "metapath\n访问命令行中指定的文件或目录出错。"
-    IDS_ERR_STARTUPDIR      "metapath\n无权访问启动目录。"
-    IDS_ERR_DROP1           "metapath\n无权访问拖拽放置的文件或目录。"
+    IDS_ERR_CD              "目錄存取錯誤\n無權存取指定目錄。\n請檢查磁碟或網路連線。"
+    IDS_ERR_FILE            "檔案存取錯誤\n無權存取“%s”。\n此檔案可能正被其他應用程式使用。\n請檢查磁碟或網路連線。"
+    IDS_ERR_NEW             "檔案存取錯誤\n無法建立檔案。\n請檢查磁碟或網路連線。"
+    IDS_ERR_NEWDIR          "目錄存取錯誤\n無法建立資料夾。\n請檢查磁碟或網路連線。"
+    IDS_ERR_SAVEAS1         "檔案儲存錯誤\n儲存“%s”時發生錯誤。\n可能是現有檔案被寫保護了。"
+    IDS_ERR_SAVEAS2         "檔案儲存錯誤\n刪除已儲存檔案的唯讀屬性時發生錯誤。"
+    IDS_ERR_CMDLINE         "metapath\n存取命令行中指定的檔案或資料夾時發生錯誤。"
+    IDS_ERR_STARTUPDIR      "metapath\n無權存取啟動資料夾。"
+    IDS_ERR_DROP1           "metapath\n無權存取拖曳放置的檔案或資料夾。"
     //IDS_ERR_DROP2           "metapath\nOnly a single file or directory can be dropped at a time."
-    IDS_ERR_FAVORITES       "收藏夹\n无权访问“收藏夹”文件夹。\n请在“选项”对话框中指定一个有效的目录。"
-    IDS_ERR_LNK_GETPATH     "链接错误\n没有有效的文件系统路径可用于链接的对象。\n链接可能未指向一个文件或目录。"
-    IDS_ERR_LNK_NOACCESS    "链接错误\n无权访问已链接对象的文件系统路径。\n请检查磁盘或网络连接。"
-    IDS_ERR_CREATELINK      "链接错误\n创建指定的链接时出错。\n可能目标目录被写保护。"
-    IDS_ERR_FILTER          "文件过滤器错误\n未指定其他过滤器。\n参阅 metapath 自述文件以获取更多信息。"
-    IDS_ERR_PREVWINDISABLED "metapath\n现有的 metapath 窗口正忙或有一个活动的对话框。\n要另外打开一个 metapath 窗口吗？"
+    IDS_ERR_FAVORITES       "我的最愛\n無權存取“我的最愛”資料夾。\n請在“選項”對話框中指定合法的資料夾。"
+    IDS_ERR_LNK_GETPATH     "連結錯誤\n沒有可用於連結的物件的合法的檔案系統路徑。\n連結可能未指向一個檔案或資料夾。"
+    IDS_ERR_LNK_NOACCESS    "連結錯誤\n無權存取連結物件的檔案系統路徑。\n請檢查磁碟或網路連線。"
+    IDS_ERR_CREATELINK      "連結錯誤\n建立指定的連結時發生錯誤。\n可能目標資料夾被寫保護了。"
+    IDS_ERR_FILTER          "檔案過濾錯誤\n沒有指定其他過濾項目。\n請參閱 metapath 自述檔案以取得更多資訊。"
+    IDS_ERR_PREVWINDISABLED "metapath\n現有的 metapath 視窗正忙或有一個活動的對話框。\n要另外開啟一個 metapath 視窗嗎？"
 END
 
 STRINGTABLE
 BEGIN
-    IDS_ERR_TARGETDISABLED  "metapath\n现有的目标窗口正忙或有一个活动的对话框。\n要打开一个新的窗口吗？"
-    IDS_ERR_INVALIDTARGET   "metapath\n请确保所有必填字段已完成。\n如果某些选项已启用，则还必须找一个目标窗口。"
-    IDS_ERR_INIOPEN         "metapath\n没有权限访问 metapath 配置文件。"
-    IDS_ERR_INICREATE       "保存设置\n创建配置文件出错。"
-    IDS_ERR_INIWRITE        "保存设置\n设置没有保存！\n没有写入配置文件的权限。"
+    IDS_ERR_TARGETDISABLED  "metapath\n現有的目標視窗正忙或有一個活動的對話框。\n要開啟新的視窗嗎？"
+    IDS_ERR_INVALIDTARGET   "metapath\n請確定已填寫所有需要的欄位。\n如果對應的選項已開啟，您必須找一個目標視窗。"
+    IDS_ERR_INIOPEN         "metapath\n沒有權限存取 metapath 設定檔。"
+    IDS_ERR_INICREATE       "儲存設定\n建立設定檔時發生錯誤。"
+    IDS_ERR_INIWRITE        "儲存設定\n設定沒有儲存！\n沒有寫入設定檔的權限。"
 END
 
 STRINGTABLE
 BEGIN
-    IDS_SEARCHEXE           "查找可执行文件"
-    IDS_GETQUICKVIEWER      "查找快速视图"
-    IDS_GETTARGET           "查找编辑器"
-    IDS_NEWFILE             "新文件"
-    IDS_FILTER_ALL          "所有文件 (*.*)|*.*|"
-    IDS_FILTER_EXE          "可执行文件 (*.exe;*.com;*.bat;*.lnk;*.pif)|*.exe;*.com;*.bat;*.lnk;*.pif|所有文件 (*.*)|*.*|"
-    IDS_GETDIRECTORY        "选择一个新的目录。"
-    IDS_FAVORITES           "指定“收藏夹”目录。"
+    IDS_SEARCHEXE           "尋找執行檔"
+    IDS_GETQUICKVIEWER      "尋找快速預覽程式"
+    IDS_GETTARGET           "尋找編輯器"
+    IDS_NEWFILE             "新檔案"
+    IDS_FILTER_ALL          "所有檔案 (*.*)|*.*|"
+    IDS_FILTER_EXE          "執行檔 (*.exe;*.com;*.bat;*.lnk;*.pif)|*.exe;*.com;*.bat;*.lnk;*.pif|所有檔案 (*.*)|*.*|"
+    IDS_GETDIRECTORY        "選擇一個新的資料夾。"
+    IDS_FAVORITES           "指定“我的最愛”資料夾。"
 END
 
 STRINGTABLE
 BEGIN
-    IDS_OPENWITH            "點選此處選擇存放您的收藏的應用程式連結的目錄。"
-    IDS_COPYMOVE            "选择目标目录。"
-    IDS_CREATELINK          "选择新链接的目标目录。"
-    IDS_SAVESETTINGS        "保存设置\n当前的程序设置已保存。"
+    IDS_OPENWITH            "點選此處選擇存放您的收藏的應用程式連結的資料夾。"
+    IDS_COPYMOVE            "選擇目標資料夾。"
+    IDS_CREATELINK          "選擇新連結的目標資料夾。"
+    IDS_SAVESETTINGS        "儲存設定\n目前的程式設定已儲存。"
 END
 
 
