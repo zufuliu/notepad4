@@ -1205,7 +1205,7 @@ BEGIN
     LTEXT           "长行长度(&L):",IDC_STATIC,7,10,85,8
     EDITTEXT        IDC_LONGLINE_LIMIT,91,7,30,14,ES_NUMBER | ES_AUTOHSCROLL
     AUTORADIOBUTTON "显示边缘线(&G)",IDC_LONGLINE_EDGE_LINE,7,27,75,10,WS_GROUP | WS_TABSTOP
-    AUTORADIOBUTTON "更改背景色(&B)",IDC_LONGLINE_BACK_COLOR,7,38,114,10,WS_TABSTOP
+    AUTORADIOBUTTON "改变背景色(&B)",IDC_LONGLINE_BACK_COLOR,7,38,114,10,WS_TABSTOP
     DEFPUSHBUTTON   "确定",IDOK,127,7,50,14
     PUSHBUTTON      "取消",IDCANCEL,127,24,50,14
 END
@@ -1742,12 +1742,12 @@ END
 STRINGTABLE
 BEGIN
 	IDS_BACKSLASHHELP		"反斜杠转义\n\n\
-\\a\tAlert (BEL, ASCII 7)\n\
+\\a\t警报 (BEL, ASCII 7)\n\
 \\b\t退格 (BS, ASCII 8)\n\
-\\e\tEscape (ESC, ASCII 27 / 1B)\n\
+\\e\t转义/中断 (ESC, ASCII 27 / 1B)\n\
 \\f\t换页 (FF, ASCII 12 / 0C)\n\
 \\n\t换行 (LF, ASCII 10 / 0A)\n\
-\\r\t回车 (Carriage return) (CR, ASCII 13 / 0D)\n\
+\\r\t回车 (CR, ASCII 13 / 0D)\n\
 \\t\t水平制表符 (HT, ASCII 9)\n\
 \\v\t垂直制表符 (VT, ASCII 11 / 0B)\n\
 \\ooo\t八进制值\n\
@@ -1757,34 +1757,34 @@ BEGIN
 
 	IDS_REGEXPHELP			"正则表达式（RegExp）语法（单行模式）\n\n\
 .\t任何字符\n\
-^\t行起始\n\
+^\t行开始\n\
 $\t行结束\n\
-\\<\t单词起始\n\
+\\<\t单词开始\n\
 \\>\t单词结束\n\
 [...]\t字符集合 ([abc]) 或字符范围 ([a-z])\n\
-[^...]\t非集合或范围中的字符\n\
+[^...]\t不在集合或范围中的字符\n\
 \\d\t任何十进制数字\n\
 \\D\t任何非数字字符\n\
 \\s\t任何空白字符\n\
 \\S\t任何非空白字符\n\
 \\w\t任何单词字符\n\
 \\W\t任何非单词字符\n\
-\\x\tEscape character with otherwise special meaning\n\
-\\xHH\t十六进制代码 HH 的字符\n\
+\\x\t有其他特殊意义的转义字符\n\
+\\xHH\t十六进制代码为 HH 的字符\n\
 ?\t匹配 0 或 1 次\n*\t匹配 0 次或多次\n\
 +\t匹配 1 次或多次\n\
-*? 或 +?\t指示数量定义 ""?"" 和 ""+"" 做非贪婪匹配\n\
-(\t范围起始\n\
-)\t范围结束\n\
-\\n\t提示替换时的范围 (n 为 1-9)\n\n\
+*? 或 +?\t对限量词 ""?"" 和 ""+"" 做非贪婪匹配\n\
+(\t区域开始\n\
+)\t区域结束\n\
+\\n\t替换时引用的区域 (n 为 1-9)\n\n\
 实验性语法:\n\
-\\h\t单词起始，根据 IsWordStartAt()\n\
+\\h\t单词开始，根据 IsWordStartAt()\n\
 \\H\t单词结束，根据 IsWordEndAt()\n\
 \\i\t匹配 1 个或多个字符到单词结束\n\
 \\i?\t匹配 0 个或多个字符到单词结束"
 
 	IDS_WILDCARDHELP		"通配符搜索\n\n\
-*\t匹配 0 个或多个字符\n\
+*\t匹配 0 个或多个字符。\n\
 ?\t匹配 1 个任意字符。"
 END
 
@@ -1826,86 +1826,86 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_ERR_LOADFILE        "加载 ""%s"" 出错"
-    IDS_ERR_SAVEFILE        "保存 ""%s"" 出错"
-    IDS_ERR_BROWSE          "没有找到文件浏览器插件。\nmetapath 文件浏览器插件可以从如下地址下载:\nhttps://github.com/zufuliu/notepad2/releases\n\n立即打开下载页面？"
-    IDS_ERR_MRUDLG          "无权访问选中的文件！\n从列表中移除？"
+    IDS_ERR_LOADFILE        "加载 ""%s"" 时出错"
+    IDS_ERR_SAVEFILE        "保存 ""%s"" 时出错"
+    IDS_ERR_BROWSE          "没有找到文件浏览器插件。\nmetapath 文件浏览器插件可以从如下地址下载:\nhttps://github.com/zufuliu/notepad2/releases\n\n是否立即打开下载页面？"
+    IDS_ERR_MRUDLG          "无法访问选中的文件！\n是否从列表中移除？"
     IDS_ERR_CREATELINK      "创建桌面快捷方式时出错。"
     IDS_ERR_PREVWINDISABLED "现有的 Notepad2 窗口正忙或有一个活动的对话框。\n要打开一个新的窗口吗？"
-    IDS_SELRECT             "此操作不能在矩形选框内执行。"
+    IDS_SELRECT             "此操作不能在矩形选区内执行。"
     IDS_BUFFERTOOSMALL      "此操作不能执行（行太长）。"
     IDS_FIND_WRAPFW         "已到文档末尾，从文档开头重新搜索。"
-    IDS_FIND_WRAPRE         "已到开头末尾，从文档结尾重新搜索。"
+    IDS_FIND_WRAPRE         "已到文档开头，从文档最后重新搜索。"
     IDS_NOTFOUND            "未找到指定的文本。"
-    IDS_REPLCOUNT           "出现的 %s 处指定文本已经替换。"
-    IDS_ASK_ENCODING        "将文件编码从 ANSI 切换到非 ANSI（或反之）可能将不支持的字符替换为默认字符，并且“撤销”历史将被清除。要继续吗？"
-    IDS_ASK_ENCODING2       "您即将更改一个空文件的编码，从 ANSI 到非 ANSI。请注意，这将清除“撤销”历史，因历史记录无法与新的编码同步。要继续吗？"
+    IDS_REPLCOUNT           "找到的 %s 处指定文本已经替换。"
+    IDS_ASK_ENCODING        "将文件编码从 ANSI 切换到非 ANSI（或反之）可能将不支持的字符替换为默认字符，并且编辑历史将被清除。要继续吗？"
+    IDS_ASK_ENCODING2       "您即将更改一个空文件的编码，从 ANSI 到非 ANSI。请注意，这将清除编辑历史，因历史记录无法与新的编码同步。要继续吗？"
     IDS_ERR_ENCODINGNA      "您的系统上没有所选编码的代码页转换表。"
-    IDS_ERR_UNICODE         "转换该 Unicode 文件出错。\n如果保存该文件，数据将会丢失！"
-	IDS_BINARY_FILE_LOCKED	"这不太像是一个文本文件，所以编辑已被锁定，以防止意外的编辑造成文件受损。"
+    IDS_ERR_UNICODE         "转换该 Unicode 文件时出错。\n如果保存该文件，数据将会丢失！"
+	IDS_BINARY_FILE_LOCKED	"这不太像是一个文本文件，已被锁定编辑，以防止意外的编辑造成文件损坏。"
 END
 
 STRINGTABLE
 BEGIN
-	IDS_CMDLINEHELP			"Command Line Help\n\n\
-file\tMust be the last argument, no quoted spaces by default.\n\
-+\tAccept multiple file arguments (with quoted spaces).\n\
--\tAccept single file argument (without quoted spaces).\n\
-…\tEncoding (/ansi, /unicode, /unicodele, /unicodebe,\n\
+	IDS_CMDLINEHELP			"命令行帮助\n\n\
+文件\t必须是最后一个参数，无需使用双引号括起有空格的路径名称。\n\
++\t多个文件参数 (需要使用双引号括起有空格的路径名称)。\n\
+-\t单个文件参数 (无需使用双引号括起有空格的路径名称)。\n\
+…\t编码 (/ansi, /unicode, /unicodele, /unicodebe,\n\
 …\t/utf8, /utf8sig, /utf8bom, /utf16, /utf16le, /utf16be).\n\
-…\tLine ending mode (/crlf, /lf, /cr).\n\
-/e encoding\tFile source encoding.\n\
-/g line[,column]\tJump to specified position (/g -1 end of file).\n\
-/m text\tMatch specified text (/m- last, /mr regex, /mb backslash).\n\
-/l[o|p]\tAuto-reload modified files.\n\
-/q\tForce creation of new files without prompt.\n\
-/s name\tSelect specified syntax scheme.\n\
-/d\tSelect default text scheme.\n\
-/h\tSelect Web Source Code scheme.\n\
-/x\tSelect XML Document scheme.\n\
-/c\tOpen new window and paste clipboard contents.\n\
-/b\tOpen new paste board to collect clipboard entries.\n\
-/n\tAlways open a new window (/ns single file instance).\n\
-/r\tReuse window (/rs single file instance).\n\
-/p\tSet window position and size (/p0, /ps, /pf,l,t,r,b,m).\n\
-/t title\tSet window title.\n\
-/i\tStart as tray icon.\n\
-/o\tKeep window on top.\n\
-/f path\tSpecify ini-file (/f0 no ini-file).\n\
-/u\tLaunch with elevated privileges (as Administrator).\n\
-/z\tSkip next (usable for registry-based Notepad replacement)."
+…\t换行符 (/crlf, /lf, /cr)。\n\
+/e 编码\t文件编码。\n\
+/g 行[,列]\t跳转到指定位置 (/g -1 转到文件末尾)。\n\
+/m 文本\t匹配文本 (/m- 向上查找, /mr 正则表达式, /mb 反斜杠转义)。\n\
+/l[o|p]\t自动加载修改的文件。\n\
+/q\t强制创建新文件而不提示。\n\
+/s 名称\t选择指定的文件类型。\n\
+/d\t指定为 文本文件。\n\
+/h\t指定为 Web 源代码。\n\
+/x\t指定为 XML 文档。\n\
+/c\t打开新窗口并粘贴剪贴板中的内容。\n\
+/b\t打开新的粘贴板来接收剪贴板中的内容。\n\
+/n\t始终打开一个新窗口 (/ns 单个实例模式)。\n\
+/r\t重用窗口 (/rs 单个实例模式)。\n\
+/p\t设置窗口大小和位置 (/p0, /ps, /pf,l,t,r,b,m)。\n\
+/t 标题\t设置窗口标题。\n\
+/i\t启动时最小化到托盘。\n\
+/o\t保持在最前面。\n\
+/f 路径\t指定配置文件 (/f0 无配置文件)。\n\
+/u\t以管理员身份运行。\n\
+/z\t跳过下个参数 (可用于对基于注册表的 Notepad 替换)."
 END
 
 STRINGTABLE
 BEGIN
-    IDS_ERR_UNICODE2        "当前文本中的某些字符在所选编码中不支持，如果保存将可能用默认的占位字符替换。推荐选择其他文件编码。要继续吗？"
-    IDS_WARNLOADBIGFILE     "加载文件：%s\n\n要打开的此文件太大（%s，%s 字节）。\n当前可加载的最大文件大小为 %s（%s 字节）。"
+    IDS_ERR_UNICODE2        "当前文本中的某些字符在所选编码中不支持，如果保存将可能被替换为默认的占位字符。推荐选择其他文件编码。要继续吗？"
+    IDS_WARNLOADBIGFILE     "加载文件：%s\n\n此文件太大（%s，%s 字节）。\n当前可加载的最大文件大小为 %s（%s 字节）。"
     //IDS_ERR_DROP            "Only one file can be dropped at the same time!"
-    IDS_ASK_SAVE            "保存更改到“%s”？"
-    IDS_ASK_REVERT          "还原文件到上次保存时的状态？您的更改将会丢失！"
-    IDS_ASK_RECODE          "重新编码需要从磁盘重新加载文件，未保存的更改将会丢失！"
+    IDS_ASK_SAVE            "保存修改到“%s”？"
+    IDS_ASK_REVERT          "还原文件到上次保存时的状态？您的修改将会丢失！"
+    IDS_ASK_RECODE          "重新编码需要从磁盘重新加载文件，未保存的修改将会丢失！"
     IDS_ASK_CREATE          "“%s”未找到。\n是否创建此文件？"
     IDS_PRINT_HEADER        "文件名，当前日期和时间|文件名，当前日期|文件名|留空"
     IDS_PRINT_FOOTER        "页号|留空"
     IDS_PRINT_COLOR         "正常|反色（暗背景）|白底黑字|白底彩色|白底彩色（行号除外）|当前屏幕颜色（所见即所得）"
     IDS_PRINT_PAGENUM       "页 %s"
-    IDS_PRINT_EMPTY         "此文档不包含任何可打印的文本。"
-    IDS_PRINT_ERROR         "打印""%s"" 出错！"
+    IDS_PRINT_EMPTY         "此文档不包含任何需要打印的文本。"
+    IDS_PRINT_ERROR         "打印""%s""时出错！"
     IDS_FAV_SUCCESS         "已在收藏夹目录中创建一个当前文件的快捷方式。"
     IDS_FAV_FAILURE         "未能创建当前文件的快捷方式。\n请检查是否已有同名文件。"
-    IDS_READONLY_MODIFY     "“%s”的属性修改失败。"
+    IDS_READONLY_MODIFY     "不能修改“%s”的属性。"
 END
 
 STRINGTABLE
 BEGIN
-    IDS_READONLY_SAVE       """%s"" 是只读的。保存到另一个文件？"
-    IDS_FILECHANGENOTIFY    "当前文件已被外部程序修改。重新载入？"
-    IDS_FILECHANGENOTIFY2   "当前文件已被删除。立即保存？"
+    IDS_READONLY_SAVE       """%s"" 是只读的。是否保存到另一个文件？"
+    IDS_FILECHANGENOTIFY    "当前文件已被外部程序修改。是否重新载入？"
+    IDS_FILECHANGENOTIFY2   "当前文件已被删除。是否立即保存？"
     IDS_SAVEDSETTINGS       "当前程序设置已被保存。"
-    IDS_CREATEINI_FAIL      "创建配置文件出错。"
-    IDS_WRITEINI_FAIL       "写入设置到配置文件出错。"
-    IDS_SETTINGSNOTSAVED    "没有找到现存的配置文件。\n若要保存您的样式修改，立即保存 (F7)，或者返回方案配置 (Ctrl+F12) 并导出您的样式。"
-    IDS_EXPORT_FAIL         "导出样式设置到“%s”出错。"
+    IDS_CREATEINI_FAIL      "创建配置文件时出错。"
+    IDS_WRITEINI_FAIL       "写入设置到配置文件时出错。"
+    IDS_SETTINGSNOTSAVED    "没有找到现有的配置文件。\n若要保存您的样式修改，请立即保存 (F7)，或者返回 自定义语法高亮 (Ctrl+F12) 并导出您的样式配置。"
+    IDS_EXPORT_FAIL         "导出样式设置到“%s”时出错。"
 END
 
 STRINGTABLE

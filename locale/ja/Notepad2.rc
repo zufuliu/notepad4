@@ -1773,7 +1773,7 @@ $\tEnd of a line\n\
 \\xHH\tCharacter with hexadecimal code HH\n\
 ?\tMatches preceding 0 or 1 times\n*\tMatches preceding 0 or more times\n\
 +\tMatches preceding 1 or more times\n\
-*? or +?\tNon greedy matching of quantifiers ""?"" and ""+""\n\
+*? or +?\tNon-greedy matching of quantifiers ""?"" and ""+""\n\
 (\tStart of a region\n\
 )\tEnd of a region\n\
 \\n\tRefers to a region when replacing (n is 1-9)\n\n\
@@ -1860,7 +1860,7 @@ file\tMust be the last argument, no quoted spaces by default.\n\
 /l[o|p]\tAuto-reload modified files.\n\
 /q\tForce creation of new files without prompt.\n\
 /s name\tSelect specified syntax scheme.\n\
-/d\tSelect default text scheme.\n\
+/d\tSelect Text File scheme.\n\
 /h\tSelect Web Source Code scheme.\n\
 /x\tSelect XML Document scheme.\n\
 /c\tOpen new window and paste clipboard contents.\n\
@@ -1872,7 +1872,7 @@ file\tMust be the last argument, no quoted spaces by default.\n\
 /i\tStart as tray icon.\n\
 /o\tKeep window on top.\n\
 /f path\tSpecify ini-file (/f0 no ini-file).\n\
-/u\tLaunch with elevated privileges (as Administrator).\n\
+/u\tLaunch with elevated privileges (run as Administrator).\n\
 /z\tSkip next (usable for registry-based Notepad replacement)."
 END
 
