@@ -26,6 +26,7 @@
 #include <shellapi.h>
 #include <commdlg.h>
 #include <uxtheme.h>
+#include "config.h"
 #include "Helpers.h"
 #include "metapath.h"
 #include "Dlapi.h"
@@ -765,6 +766,9 @@ extern BOOL     bDefColorFilter;
 extern COLORREF colorNoFilter;
 extern COLORREF colorFilter;
 extern COLORREF colorCustom[16];
+#if NP2_ENABLE_APP_LOCALIZATION_DLL
+extern UINT		languageResID;
+#endif
 
 static INT_PTR CALLBACK ItemsPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
 	static BOOL m_bDefColorNoFilter;
@@ -779,7 +783,7 @@ static INT_PTR CALLBACK ItemsPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARA
 	CHOOSECOLOR cc;
 
 	switch (umsg) {
-	case WM_INITDIALOG:
+	case WM_INITDIALOG: {
 		m_bDefColorNoFilter = bDefColorNoFilter;
 		m_bDefColorFilter = bDefColorFilter;
 
@@ -802,7 +806,19 @@ static INT_PTR CALLBACK ItemsPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARA
 		} else {
 			CheckRadioButton(hwnd, IDC_COLOR_DEF2, IDC_COLOR_CUST2, IDC_COLOR_CUST2);
 		}
-		return TRUE;
+
+#if NP2_ENABLE_APP_LOCALIZATION_DLL
+		HWND hwndCtl = GetDlgItem(hwnd, IDC_LANGUAGE_LIST);
+		WCHAR szText[128];
+		for (UINT rid = IDS_LANG_USER_DEFAULT; rid <= IDS_LANG_LAST_LANGUAGE; rid++) {
+			GetString(rid, szText, COUNTOF(szText));
+			ComboBox_AddString(hwndCtl, szText);
+		}
+		ComboBox_SetCurSel(hwndCtl, languageResID - IDS_LANG_USER_DEFAULT);
+		ComboBox_SetExtendedUI(hwndCtl, TRUE);
+#endif
+	}
+	return TRUE;
 
 	case WM_DESTROY:
 		DeleteObject(m_hbrNoFilter);
@@ -872,6 +888,9 @@ static INT_PTR CALLBACK ItemsPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARA
 			colorNoFilter = m_colorNoFilter;
 			colorFilter = m_colorFilter;
 
+#if NP2_ENABLE_APP_LOCALIZATION_DLL
+			SetUILanguage((UINT)SendDlgItemMessage(hwnd, IDC_LANGUAGE_LIST, CB_GETCURSEL, 0, 0) + IDS_LANG_USER_DEFAULT);
+#endif
 			SetWindowLongPtr(hwnd, DWLP_MSGRESULT, PSNRET_NOERROR);
 			return TRUE;
 		}

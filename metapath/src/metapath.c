@@ -171,6 +171,7 @@ static WCHAR g_wchAppUserModelID[64] = L"";
 #if NP2_ENABLE_APP_LOCALIZATION_DLL
 static HMODULE hResDLL;
 static LANGID uiLanguage;
+UINT languageResID;
 #endif
 
 //=============================================================================
@@ -2330,6 +2331,54 @@ static void GetWindowPositionSectionName(WCHAR sectionName[96]) {
 	wsprintf(sectionName, L"%s %ix%i", INI_SECTION_NAME_WINDOW_POSITION, cxScreen, cyScreen);
 }
 
+#if NP2_ENABLE_APP_LOCALIZATION_DLL
+void ValidateUILangauge(void) {
+	const LANGID subLang = SUBLANGID(uiLanguage);
+	switch (PRIMARYLANGID(uiLanguage)) {
+	case LANG_ENGLISH:
+		languageResID = IDS_LANG_ENGLISH_US;
+		break;
+	case LANG_CHINESE:
+		languageResID = IsChineseTraditionalSubLang(subLang)? IDS_LANG_CHINESE_TRADITIONAL : IDS_LANG_CHINESE_SIMPLIFIED;
+		break;
+	case LANG_JAPANESE:
+		languageResID = IDS_LANG_JAPANESE;
+		break;
+	case LANG_NEUTRAL:
+	default:
+		languageResID = IDS_LANG_USER_DEFAULT;
+		uiLanguage = LANG_USER_DEFAULT;
+		break;
+	}
+}
+
+void SetUILanguage(UINT resID) {
+	languageResID = resID;
+	LANGID lang = uiLanguage;
+	switch (resID) {
+	case IDS_LANG_USER_DEFAULT:
+		lang = LANG_USER_DEFAULT;
+		break;
+	case IDS_LANG_ENGLISH_US:
+		lang = MAKELANGID(LANG_ENGLISH, SUBLANG_ENGLISH_US);
+		break;
+	case IDS_LANG_CHINESE_SIMPLIFIED:
+		lang = MAKELANGID(LANG_CHINESE, SUBLANG_CHINESE_SIMPLIFIED);
+		break;
+	case IDS_LANG_CHINESE_TRADITIONAL:
+		lang = MAKELANGID(LANG_CHINESE, SUBLANG_CHINESE_TRADITIONAL);
+		break;
+	case IDS_LANG_JAPANESE:
+		lang = MAKELANGID(LANG_JAPANESE, SUBLANG_DEFAULT);
+		break;
+	}
+
+	// TODO: change UI language without restart or alert restart is required.
+	uiLanguage = lang;
+	IniSetInt(INI_SECTION_NAME_FLAGS, L"UILanguage", lang);
+}
+#endif
+
 //=============================================================================
 //
 //  LoadSettings()
@@ -2865,6 +2914,7 @@ void LoadFlags(void) {
 
 #if NP2_ENABLE_APP_LOCALIZATION_DLL
 	uiLanguage = (LANGID)IniSectionGetInt(pIniSection, L"UILanguage", LANG_USER_DEFAULT);
+	ValidateUILangauge();
 #endif
 
 	bReuseWindow = IniSectionGetBool(pIniSection, L"ReuseWindow", 0);

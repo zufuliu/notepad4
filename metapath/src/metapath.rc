@@ -1,6 +1,7 @@
 // Microsoft Visual C++ generated resource script.
 //
 #include "resource.h"
+#include "config.h"
 
 #define APSTUDIO_READONLY_SYMBOLS
 /////////////////////////////////////////////////////////////////////////////
@@ -391,7 +392,7 @@ FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
     ICON            IDI_ITEMS,IDC_STATIC,10,10,21,20
     LTEXT           "Appearance of metapath.",IDC_STATIC,40,15,160,8
-    GROUPBOX        "Appearance of items in directory list",IDC_STATIC,10,41,205,134
+    GROUPBOX        "Appearance of items in directory list",IDC_STATIC,10,41,205,112
     LTEXT           "Use this text color when NO FILTER is SET:",IDC_STATIC,20,54,170,8
     AUTORADIOBUTTON "Default &windows color.",IDC_COLOR_DEF1,20,68,96,10,WS_GROUP | WS_TABSTOP
     AUTORADIOBUTTON "Custom &color:",IDC_COLOR_CUST1,20,82,60,10,WS_TABSTOP
@@ -402,6 +403,10 @@ BEGIN
     AUTORADIOBUTTON "C&ustom color:",IDC_COLOR_CUST2,20,133,60,10,WS_TABSTOP
     EDITTEXT        IDC_COLOR_SAMP2,86,130,30,14,ES_AUTOHSCROLL | WS_DISABLED
     PUSHBUTTON      "Pick Color...",IDC_COLOR_PICK2,120,130,60,14
+#if NP2_ENABLE_APP_LOCALIZATION_DLL
+    LTEXT           "Language:",IDC_STATIC,10,163,38,10
+    COMBOBOX        IDC_LANGUAGE_LIST,50,160,82,100,CBS_DROPDOWNLIST | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
+#endif
 END
 
 IDPP_PROG DIALOGEX 0, 0, 232, 185
@@ -663,6 +668,17 @@ BEGIN
     IDS_CREATELINK          "Select a destination directory for the new link."
     IDS_SAVESETTINGS        "Save Settings\nThe current program settings have been saved."
 END
+
+#if NP2_ENABLE_APP_LOCALIZATION_DLL
+STRINGTABLE
+BEGIN
+	IDS_LANG_USER_DEFAULT			"System Language"
+	IDS_LANG_ENGLISH_US				"English"
+	IDS_LANG_CHINESE_SIMPLIFIED		"简体中文"
+	IDS_LANG_CHINESE_TRADITIONAL	"繁體中文"
+	IDS_LANG_JAPANESE				"日本語"
+END
+#endif
 
 
 #ifdef APSTUDIO_INVOKED

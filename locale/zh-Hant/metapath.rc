@@ -1,6 +1,7 @@
 // Microsoft Visual C++ generated resource script.
 //
 #include "../../metapath/src/resource.h"
+#include "../../metapath/src/config.h"
 
 #define APSTUDIO_READONLY_SYMBOLS
 /////////////////////////////////////////////////////////////////////////////
@@ -391,7 +392,7 @@ FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
     ICON            IDI_ITEMS,IDC_STATIC,10,10,21,20
     LTEXT           "metapath 外觀。",IDC_STATIC,40,15,160,8
-    GROUPBOX        "目錄清單的項目外觀",IDC_STATIC,10,41,205,134
+    GROUPBOX        "目錄清單的項目外觀",IDC_STATIC,10,41,205,112
     LTEXT           "沒有過濾時使用的文字顏色：",IDC_STATIC,20,54,170,8
     AUTORADIOBUTTON "預設視窗顏色(&W)。",IDC_COLOR_DEF1,20,68,96,10,WS_GROUP | WS_TABSTOP
     AUTORADIOBUTTON "自訂顏色(&C):",IDC_COLOR_CUST1,20,82,60,10,WS_TABSTOP
@@ -402,6 +403,10 @@ BEGIN
     AUTORADIOBUTTON "自訂顏色(&U)：",IDC_COLOR_CUST2,20,133,60,10,WS_TABSTOP
     EDITTEXT        IDC_COLOR_SAMP2,86,130,30,14,ES_AUTOHSCROLL | WS_DISABLED
     PUSHBUTTON      "選擇顏色...",IDC_COLOR_PICK2,120,130,60,14
+#if NP2_ENABLE_APP_LOCALIZATION_DLL
+    LTEXT           "語言：",IDC_STATIC,10,163,38,10
+    COMBOBOX        IDC_LANGUAGE_LIST,50,160,82,100,CBS_DROPDOWNLIST | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
+#endif
 END
 
 IDPP_PROG DIALOGEX 0, 0, 232, 185
@@ -663,6 +668,17 @@ BEGIN
     IDS_CREATELINK          "選擇新連結的目標資料夾。"
     IDS_SAVESETTINGS        "儲存設定\n目前的程式設定已儲存。"
 END
+
+#if NP2_ENABLE_APP_LOCALIZATION_DLL
+STRINGTABLE
+BEGIN
+	IDS_LANG_USER_DEFAULT			"系統語言"
+	IDS_LANG_ENGLISH_US				"English"
+	IDS_LANG_CHINESE_SIMPLIFIED		"简体中文"
+	IDS_LANG_CHINESE_TRADITIONAL	"繁體中文"
+	IDS_LANG_JAPANESE				"日本語"
+END
+#endif
 
 
 #ifdef APSTUDIO_INVOKED
