@@ -290,6 +290,7 @@ BOOL ExeNameFromWnd(HWND hwnd, LPWSTR szExeName, int cchExeName);
 #define SetExplorerTheme(hwnd)		SetWindowTheme((hwnd), L"Explorer", NULL)
 #define SetListViewTheme(hwnd)		SetWindowTheme((hwnd), L"Listview", NULL)
 
+BOOL FindUserResourcePath(LPCWSTR path, LPWSTR outPath);
 HBITMAP LoadBitmapFile(LPCWSTR path);
 BOOL BitmapMergeAlpha(HBITMAP hbmp, COLORREF crDest);
 BOOL BitmapAlphaBlend(HBITMAP hbmp, COLORREF crDest, BYTE alpha);
