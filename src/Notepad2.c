@@ -6686,7 +6686,7 @@ void FindExtraIniFile(LPWSTR lpszIniFile, LPCWSTR defaultName, LPCWSTR redirectK
 		lstrcpy(lpszIniFile, szIniFile);
 	} else {
 		// relative to program exe file
-		GetModuleFileName(NULL, lpszIniFile, COUNTOF(lpszIniFile));
+		GetModuleFileName(NULL, lpszIniFile, MAX_PATH);
 	}
 	lstrcpy(PathFindFileName(lpszIniFile), defaultName);
 }
