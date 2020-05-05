@@ -382,20 +382,44 @@ int GetSystemMetricsEx(int nIndex) {
 	return value;
 }
 
+BOOL FindUserResourcePath(LPCWSTR path, LPWSTR outPath) {
+	// similar to CheckIniFile()
+	WCHAR tchFileExpanded[MAX_PATH];
+	ExpandEnvironmentStrings(path, tchFileExpanded, COUNTOF(tchFileExpanded));
+
+	if (PathIsRelative(tchFileExpanded)) {
+		WCHAR tchBuild[MAX_PATH];
+		// relative to program ini file
+		if (StrNotEmpty(szIniFile)) {
+			lstrcpy(tchBuild, szIniFile);
+			lstrcpy(PathFindFileName(tchBuild), tchFileExpanded);
+			if (PathFileExists(tchBuild)) {
+				lstrcpy(outPath, tchBuild);
+				return TRUE;
+			}
+		}
+
+		// relative to program exe file
+		GetModuleFileName(NULL, tchBuild, COUNTOF(tchBuild));
+		lstrcpy(PathFindFileName(tchBuild), tchFileExpanded);
+		if (PathFileExists(tchBuild)) {
+			lstrcpy(outPath, tchBuild);
+			return TRUE;
+		}
+	} else if (PathFileExists(tchFileExpanded)) {
+		lstrcpy(outPath, tchFileExpanded);
+		return TRUE;
+	}
+	return FALSE;
+}
+
 HBITMAP LoadBitmapFile(LPCWSTR path) {
 	WCHAR szTmp[MAX_PATH];
-	if (PathIsRelative(path)) {
-		GetModuleFileName(NULL, szTmp, COUNTOF(szTmp));
-		PathRemoveFileSpec(szTmp);
-		PathAppend(szTmp, path);
-		path = szTmp;
-	}
-
-	if (!PathFileExists(path)) {
+	if (!FindUserResourcePath(path, szTmp)) {
 		return NULL;
 	}
 
-	HBITMAP hbmp = (HBITMAP)LoadImage(NULL, path, IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION | LR_LOADFROMFILE);
+	HBITMAP hbmp = (HBITMAP)LoadImage(NULL, szTmp, IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION | LR_LOADFROMFILE);
 	return hbmp;
 }
 

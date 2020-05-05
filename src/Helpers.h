@@ -478,6 +478,7 @@ BOOL IsElevated(void);
 
 #define SetExplorerTheme(hwnd)		SetWindowTheme((hwnd), L"Explorer", NULL)
 
+BOOL FindUserResourcePath(LPCWSTR path, LPWSTR outPath);
 HBITMAP LoadBitmapFile(LPCWSTR path);
 HBITMAP EnlargeImageForDPI(HBITMAP hbmp, UINT dpi);
 HBITMAP ResizeImageForDPI(HBITMAP hbmp, UINT dpi, int height);
