@@ -745,6 +745,7 @@ void Style_Load(void) {
 	if (np2StyleTheme == StyleTheme_Dark) {
 		FindDarkThemeFile();
 	}
+
 	Style_LoadOneEx(pLexGlobal, pIniSection, pIniSectionBuf, cchIniSection);
 	Style_LoadOneEx(pLexArray[iDefaultLexerIndex], pIniSection, pIniSectionBuf, cchIniSection);
 
