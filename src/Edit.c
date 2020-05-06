@@ -1665,7 +1665,7 @@ void EditHex2Char(void) {
 
 	SciCall_GetSelText(ch);
 
-	char *p = ch;
+	const uint8_t *p = (const uint8_t *)ch;
 	while (*p) {
 		if (*p == '\\') {
 			p++;
@@ -1719,15 +1719,12 @@ void EditShowHex(void) {
 
 	char *ch = (char *)NP2HeapAlloc(count + 1);
 	char *cch = (char *)NP2HeapAlloc(count * 3 + 3);
-	char *p = ch;
-	char *t = cch;
 	SciCall_GetSelText(ch);
+	const uint8_t *p = (const uint8_t *)ch;
+	char *t = cch;
 	*t++ = '[';
 	while (*p) {
 		int c = *p++;
-		if (c < 0) {
-			c += 256;
-		}
 		int v = c >> 4;
 		*t++ = (char)((v >= 10) ? v - 10 + 'a' : v + '0');
 		v = c & 0x0f;
