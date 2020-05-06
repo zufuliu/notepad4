@@ -523,7 +523,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 #if NP2_ENABLE_APP_LOCALIZATION_DLL
 		hResDLL = LoadLocalizedResourceDLL(uiLanguage, WC_NOTEPAD2 L".dll");
 		if (hResDLL) {
-			g_hInstance = hInstance = (HINSTANCE)hResDLL;
+			g_hInstance = (HINSTANCE)hResDLL;
 		}
 #endif
 		DisplayCmdLineHelp(NULL);

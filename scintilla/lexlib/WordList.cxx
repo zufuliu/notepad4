@@ -26,10 +26,10 @@ static char **ArrayFromWordList(char *wordlist, size_t slen, int *len) {
 	// For rapid determination of whether a character is a separator, build
 	// a look up table, for ASCII only.
 	bool wordSeparator[128] = {};	// Initialise all to false.
-	wordSeparator[static_cast<unsigned int>('\r')] = true;
-	wordSeparator[static_cast<unsigned int>('\n')] = true;
-	wordSeparator[static_cast<unsigned int>(' ')] = true;
-	wordSeparator[static_cast<unsigned int>('\t')] = true;
+	wordSeparator[static_cast<unsigned char>('\r')] = true;
+	wordSeparator[static_cast<unsigned char>('\n')] = true;
+	wordSeparator[static_cast<unsigned char>(' ')] = true;
+	wordSeparator[static_cast<unsigned char>('\t')] = true;
 
 	char * const end = wordlist + slen;
 	char *s = wordlist;
@@ -135,9 +135,9 @@ bool WordList::Set(const char *s, bool toLower) {
 
 	memset(ranges, 0, sizeof(ranges));
 	for (int i = 0; i < len;) {
-		const unsigned char indexChar = words[i][0];
+		const unsigned char indexChar = *words[i];
 		const int start = i++;
-		while (words[i][0] == indexChar) {
+		while (static_cast<unsigned char>(*words[i]) == indexChar) {
 			++i;
 		}
 		ranges[indexChar] = {start, i};
