@@ -15,7 +15,7 @@ protected:
 	size_t nClasses;
 	PropSetSimple props;
 	enum {
-		numWordLists = KEYWORDSET_MAX + 1
+		numWordLists = KEYWORDSET_MAX
 	};
 	WordList *keywordLists[numWordLists + 1];
 public:
