@@ -136,7 +136,8 @@ extern EDITLEXER lexYAML;
 #define LEXER_INDEX_GENERAL		(LEXER_INDEX_MATCH + 2)	// global styles and lexers for text file
 #define GENERAL_LEXER_COUNT		(ALL_LEXER_COUNT - LEXER_INDEX_GENERAL)
 #define MAX_FAVORITE_SCHEMES_COUNT			31
-#define MAX_FAVORITE_SCHEMES_CONFIG_SIZE	96	// 1 + MAX_FAVORITE_SCHEMES_COUNT*3
+#define MAX_FAVORITE_SCHEMES_CONFIG_SIZE	96	// 1 + MAX_FAVORITE_SCHEMES_COUNT*(2 + 1)
+#define MAX_FAVORITE_SCHEMES_SAFE_SIZE		(MAX_FAVORITE_SCHEMES_CONFIG_SIZE - 4) // two digits, one space and NULL
 // This array holds all the lexers...
 static PEDITLEXER pLexArray[ALL_LEXER_COUNT] = {
 	&lexGlobal,
@@ -648,7 +649,6 @@ void Style_SetFavoriteSchemes(void) {
 }
 
 void Style_GetFavoriteSchemes(void) {
-	const int maxCch = MAX_FAVORITE_SCHEMES_CONFIG_SIZE - 3; // two digits, one space and NULL
 	WCHAR *wch = favoriteSchemesConfig;
 	int len = 0;
 	int count = 0;
@@ -660,7 +660,7 @@ void Style_GetFavoriteSchemes(void) {
 
 		len += wsprintf(wch + len, L"%i ", pLex->rid - NP2LEX_TEXTFILE);
 		++count;
-		if (count == MAX_FAVORITE_SCHEMES_COUNT || len > maxCch) {
+		if (count == MAX_FAVORITE_SCHEMES_COUNT || len > MAX_FAVORITE_SCHEMES_SAFE_SIZE) {
 			break;
 		}
 	}
@@ -4888,7 +4888,6 @@ static void Lexer_OnDragDrop(HWND hwndTV, HTREEITEM hFavoriteNode, HTREEITEM hDr
 }
 
 static void Style_GetFavoriteSchemesFromTreeView(HWND hwndTV, HTREEITEM hFavoriteNode) {
-	const int maxCch = MAX_FAVORITE_SCHEMES_CONFIG_SIZE - 3; // two digits, one space and NULL
 	WCHAR *wch = favoriteSchemesConfig;
 	int len = 0;
 	int count = 0;
@@ -4907,7 +4906,7 @@ static void Style_GetFavoriteSchemesFromTreeView(HWND hwndTV, HTREEITEM hFavorit
 
 			len += wsprintf(wch + len, L"%i ", pLex->rid - NP2LEX_TEXTFILE);
 			++count;
-			if (count == MAX_FAVORITE_SCHEMES_COUNT || len > maxCch) {
+			if (count == MAX_FAVORITE_SCHEMES_COUNT || len > MAX_FAVORITE_SCHEMES_SAFE_SIZE) {
 				break;
 			}
 		}
