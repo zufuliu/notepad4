@@ -1095,7 +1095,7 @@ void Style_UpdateLexerKeywordAttr(LPCEDITLEXER pLexNew) {
 	uint8_t *attr = currentLexKeywordAttr;
 
 	// Code Snippet
-	attr[NUMKEYWORD - 1] = KeywordAttr_NoLexer;
+	attr[KEYWORDSET_MAX] = KeywordAttr_NoLexer;
 
 	switch (pLexNew->rid) {
 	case NP2LEX_AU3:
@@ -1432,7 +1432,7 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 		Style_UpdateLexerKeywords(pLexNew);
 		Style_UpdateLexerKeywordAttr(pLexNew);
 		// Add keyword lists
-		for (int i = 0; i < NUMKEYWORD; i++) {
+		for (int i = 0; i < KEYWORDSET_MAX; i++) {
 			const char *pKeywords = pLexNew->pKeyWords->pszKeyWords[i];
 			const uint8_t attr = currentLexKeywordAttr[i];
 			if (StrNotEmptyA(pKeywords) && !(attr & KeywordAttr_NoLexer)) {
