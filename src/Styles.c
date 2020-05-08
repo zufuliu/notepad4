@@ -3158,24 +3158,95 @@ void Style_SetBookmark(void) {
 	bBookmarkColorUpdated = FALSE;
 }
 
-// all schemes with "All Files (*.*)"
-#define MAX_OPEN_SAVE_FILE_DIALOG_FILTER_SIZE	((NUMLEXERS + 1) * 128)
-
 //=============================================================================
 //
-// Style_GetFileOpenDlgFilter()
+// Style_GetOpenDlgFilterStr()
 //
-LPWSTR Style_GetOpenDlgFilterStr(void) {
-	LPWSTR szFilter = (LPWSTR)NP2HeapAlloc(MAX_OPEN_SAVE_FILE_DIALOG_FILTER_SIZE * sizeof(WCHAR));
-	GetString(IDS_FILTER_ALL, szFilter, MAX_OPEN_SAVE_FILE_DIALOG_FILTER_SIZE);
+static int AddLexFilterStr(LPWSTR szFilter, LPCEDITLEXER pLex, int length) {
+	LPCWSTR p = pLex->szExtensions;
+	if (StrIsEmpty(p)) {
+		p = pLex->pszDefExt;
+	}
 
-	PrepareFilterStr(szFilter);
-	return szFilter;
+	// add '*.' prefix for each extension
+	WCHAR extensions[MAX_EDITLEXER_EXT_SIZE*3];
+	LPWSTR ptr = extensions;
+	WCHAR ch;
+	int state = 1;
+	int count = 0;
+	while ((ch = *p++) != L'\0') {
+		if (ch != L' ') {
+			if (ch == ';') {
+				if (state == 0) {
+					state = 1;
+					*ptr++ = ';';
+				}
+			} else {
+				if (state == 1) {
+					state = 0;
+					++count;
+					*ptr++ = L'*';
+					*ptr++ = L'.';
+				}
+				*ptr++ = ch;
+			}
+		}
+	}
+
+	if (count == 0) {
+		return length;
+	}
+
+#if NP2_ENABLE_LEXER_NAME_LOCALIZE
+	LPCWSTR pszName;
+	WCHAR wch[MAX_EDITLEXER_NAME_SIZE];
+	if (GetString(pLex->rid, wch, COUNTOF(wch))) {
+		pszName = wch;
+	} else {
+		pszName = pLex->pszName;
+	}
+#else
+	LPCWSTR pszName = pLex->pszName;
+#endif
+
+	if (state == 1) {
+		--ptr; // trailing semicolon
+	}
+	*ptr = L'\0';
+
+	length += wsprintf(szFilter + length, L"%s (%s)|%s|", pszName, extensions, extensions);
+	return length;
 }
 
-LPWSTR Style_GetSaveDlgFilterStr(void) {
-	LPWSTR szFilter = (LPWSTR)NP2HeapAlloc(MAX_OPEN_SAVE_FILE_DIALOG_FILTER_SIZE * sizeof(WCHAR));
-	GetString(IDS_FILTER_ALL, szFilter, MAX_OPEN_SAVE_FILE_DIALOG_FILTER_SIZE);
+LPWSTR Style_GetOpenDlgFilterStr(BOOL open) {
+	int length = (MAX_FAVORITE_SCHEMES_COUNT + 1 + LEXER_INDEX_GENERAL - LEXER_INDEX_MATCH)
+		*(MAX_EDITLEXER_NAME_SIZE + MAX_EDITLEXER_EXT_SIZE*3*2);
+	LPWSTR szFilter = (LPWSTR)NP2HeapAlloc(length * sizeof(WCHAR));
+
+	length = 0;
+	if (open) {
+		// All Files comes first for open file dialog.
+		GetString(IDS_FILTER_ALL, szFilter, MAX_EDITLEXER_EXT_SIZE);
+		length = lstrlen(szFilter);
+	}
+
+	// current scheme
+	length = AddLexFilterStr(szFilter, pLexCurrent, length);
+	// text file and favorite schemes
+	for (UINT index = LEXER_INDEX_MATCH; index < ALL_LEXER_COUNT; index++) {
+		LPCEDITLEXER pLex = pLexArray[index];
+		if (index >= LEXER_INDEX_GENERAL && pLex->iFavoriteOrder == 0) {
+			break;
+		}
+		if (pLex != pLexCurrent) {
+			length = AddLexFilterStr(szFilter, pLex, length);
+		}
+	}
+
+	if (!open) {
+		// All Files comes last for save file dialog.
+		GetString(IDS_FILTER_ALL, szFilter + length, MAX_EDITLEXER_EXT_SIZE);
+	}
 
 	PrepareFilterStr(szFilter);
 	return szFilter;
