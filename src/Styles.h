@@ -23,9 +23,6 @@
 // Number of Lexers in pLexArray
 #define NUMLEXERS	64
 
-// all schemes with "All Files (*.*)"
-#define MAX_OPEN_SAVE_FILE_DIALOG_FILTER_SIZE	((NUMLEXERS + 1) * 128)
-
 #define INI_SECTION_NAME_STYLES				L"Styles"
 #define INI_SECTION_NAME_FILE_EXTENSIONS	L"File Extensions"
 #define INI_SECTION_NAME_CUSTOM_COLORS		L"Custom Colors"
@@ -74,7 +71,8 @@ void	Style_SetLongLineColors(void);
 void	Style_HighlightCurrentLine(void);
 void	Style_ToggleUse2ndGlobalStyle(void);
 void	Style_ToggleUseDefaultCodeStyle(void);
-BOOL	Style_GetOpenDlgFilterStr(LPWSTR lpszFilter, int cchFilter);
+LPWSTR	Style_GetOpenDlgFilterStr(void);
+LPWSTR	Style_GetSaveDlgFilterStr(void);
 
 BOOL	Style_StrGetFontEx(LPCWSTR lpszStyle, LPWSTR lpszFont, int cchFont, BOOL bDefaultStyle);
 BOOL	Style_StrGetCharSet(LPCWSTR lpszStyle, int *charset);

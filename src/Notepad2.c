@@ -104,7 +104,6 @@ WCHAR	tchOpenWithDir[MAX_PATH];
 WCHAR	tchFavoritesDir[MAX_PATH];
 static WCHAR tchDefaultDir[MAX_PATH];
 static WCHAR tchDefaultExtension[64];
-LPWSTR	tchFileDlgFilters = NULL;
 static WCHAR tchToolbarButtons[MAX_TOOLBAR_BUTTON_CONFIG_BUFFER_SIZE];
 static LPWSTR tchToolbarBitmap = NULL;
 static LPWSTR tchToolbarBitmapHot = NULL;
@@ -427,9 +426,6 @@ static inline int GetDefualtRenderingTechnology(void) {
 //
 //
 static void CleanUpResources(BOOL initialized) {
-	if (tchFileDlgFilters != NULL) {
-		LocalFree(tchFileDlgFilters);
-	}
 	if (tchToolbarBitmap != NULL) {
 		LocalFree(tchToolbarBitmap);
 	}
@@ -6488,11 +6484,6 @@ void LoadFlags(void) {
 
 	IniSectionGetString(pIniSection, L"DefaultDirectory", L"", tchDefaultDir, COUNTOF(tchDefaultDir));
 
-	LPCWSTR strValue = IniSectionGetValue(pIniSection, L"FileDlgFilters");
-	if (StrNotEmpty(strValue)) {
-		tchFileDlgFilters = StrDup(strValue);
-	}
-
 	dwFileCheckInterval = IniSectionGetInt(pIniSection, L"FileCheckInterval", 1000);
 	dwAutoReloadTimeout = IniSectionGetInt(pIniSection, L"AutoReloadTimeout", 1000);
 
@@ -6514,7 +6505,7 @@ void LoadFlags(void) {
 	fNoFileVariables = IniSectionGetBool(pIniSection, L"NoFileVariables", 0);
 
 	if (StrIsEmpty(g_wchAppUserModelID)) {
-		strValue = IniSectionGetValue(pIniSection, L"ShellAppUserModelID");
+		LPCWSTR strValue = IniSectionGetValue(pIniSection, L"ShellAppUserModelID");
 		if (StrNotEmpty(strValue)) {
 			lstrcpyn(g_wchAppUserModelID, strValue, COUNTOF(g_wchAppUserModelID));
 		} else {
@@ -7364,13 +7355,7 @@ BOOL FileSave(BOOL bSaveAlways, BOOL bAsk, BOOL bSaveAs, BOOL bSaveCopy) {
 //
 //
 BOOL OpenFileDlg(HWND hwnd, LPWSTR lpstrFile, int cchFile, LPCWSTR lpstrInitialDir) {
-	WCHAR szFile[MAX_PATH];
-	LPWSTR szFilter = (LPWSTR)NP2HeapAlloc(MAX_OPEN_SAVE_FILE_DIALOG_FILTER_SIZE * sizeof(WCHAR));
 	WCHAR tchInitialDir[MAX_PATH] = L"";
-
-	lstrcpy(szFile, L"");
-	Style_GetOpenDlgFilterStr(szFilter, MAX_OPEN_SAVE_FILE_DIALOG_FILTER_SIZE);
-
 	if (!lpstrInitialDir) {
 		if (StrNotEmpty(szCurFile)) {
 			lstrcpy(tchInitialDir, szCurFile);
@@ -7388,6 +7373,10 @@ BOOL OpenFileDlg(HWND hwnd, LPWSTR lpstrFile, int cchFile, LPCWSTR lpstrInitialD
 			lstrcpy(tchInitialDir, g_wchWorkingDirectory);
 		}
 	}
+
+	WCHAR szFile[MAX_PATH];
+	lstrcpy(szFile, L"");
+	LPWSTR szFilter = Style_GetOpenDlgFilterStr();
 
 	OPENFILENAME ofn;
 	ZeroMemory(&ofn, sizeof(OPENFILENAME));
@@ -7416,13 +7405,7 @@ BOOL OpenFileDlg(HWND hwnd, LPWSTR lpstrFile, int cchFile, LPCWSTR lpstrInitialD
 //
 //
 BOOL SaveFileDlg(HWND hwnd, LPWSTR lpstrFile, int cchFile, LPCWSTR lpstrInitialDir) {
-	WCHAR szNewFile[MAX_PATH];
-	LPWSTR szFilter = (LPWSTR)NP2HeapAlloc(MAX_OPEN_SAVE_FILE_DIALOG_FILTER_SIZE * sizeof(WCHAR));
 	WCHAR tchInitialDir[MAX_PATH] = L"";
-
-	lstrcpy(szNewFile, lpstrFile);
-	Style_GetOpenDlgFilterStr(szFilter, MAX_OPEN_SAVE_FILE_DIALOG_FILTER_SIZE);
-
 	if (StrNotEmpty(lpstrInitialDir)) {
 		lstrcpy(tchInitialDir, lpstrInitialDir);
 	} else if (StrNotEmpty(szCurFile)) {
@@ -7440,6 +7423,10 @@ BOOL SaveFileDlg(HWND hwnd, LPWSTR lpstrFile, int cchFile, LPCWSTR lpstrInitialD
 	} else {
 		lstrcpy(tchInitialDir, g_wchWorkingDirectory);
 	}
+
+	WCHAR szNewFile[MAX_PATH];
+	lstrcpy(szNewFile, lpstrFile);
+	LPWSTR szFilter = Style_GetSaveDlgFilterStr();
 
 	OPENFILENAME ofn;
 	ZeroMemory(&ofn, sizeof(OPENFILENAME));

@@ -3158,21 +3158,27 @@ void Style_SetBookmark(void) {
 	bBookmarkColorUpdated = FALSE;
 }
 
+// all schemes with "All Files (*.*)"
+#define MAX_OPEN_SAVE_FILE_DIALOG_FILTER_SIZE	((NUMLEXERS + 1) * 128)
+
 //=============================================================================
 //
 // Style_GetFileOpenDlgFilter()
 //
-extern LPWSTR tchFileDlgFilters;
+LPWSTR Style_GetOpenDlgFilterStr(void) {
+	LPWSTR szFilter = (LPWSTR)NP2HeapAlloc(MAX_OPEN_SAVE_FILE_DIALOG_FILTER_SIZE * sizeof(WCHAR));
+	GetString(IDS_FILTER_ALL, szFilter, MAX_OPEN_SAVE_FILE_DIALOG_FILTER_SIZE);
 
-BOOL Style_GetOpenDlgFilterStr(LPWSTR lpszFilter, int cchFilter) {
-	if (StrIsEmpty(tchFileDlgFilters)) {
-		GetString(IDS_FILTER_ALL, lpszFilter, cchFilter);
-	} else {
-		lstrcpyn(lpszFilter, tchFileDlgFilters, cchFilter - 2);
-		lstrcat(lpszFilter, L"||");
-	}
-	PrepareFilterStr(lpszFilter);
-	return TRUE;
+	PrepareFilterStr(szFilter);
+	return szFilter;
+}
+
+LPWSTR Style_GetSaveDlgFilterStr(void) {
+	LPWSTR szFilter = (LPWSTR)NP2HeapAlloc(MAX_OPEN_SAVE_FILE_DIALOG_FILTER_SIZE * sizeof(WCHAR));
+	GetString(IDS_FILTER_ALL, szFilter, MAX_OPEN_SAVE_FILE_DIALOG_FILTER_SIZE);
+
+	PrepareFilterStr(szFilter);
+	return szFilter;
 }
 
 //=============================================================================
