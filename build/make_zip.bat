@@ -28,6 +28,7 @@ SET "COMPILER=MSVC"
 SET "ARCH=all"
 SET "CONFIG=Release"
 SET "WITH_LOCALE="
+SET "ZIP_SUFFIX="
 
 @rem Check for the first switch
 IF "%~1" == "" GOTO StartWork
@@ -102,6 +103,7 @@ IF /I "%~1" == "Locale"   SET "WITH_LOCALE=1" & SHIFT & GOTO StartWork
 IF /I "%~1" == "/Locale"  SET "WITH_LOCALE=1" & SHIFT & GOTO StartWork
 IF /I "%~1" == "-Locale"  SET "WITH_LOCALE=1" & SHIFT & GOTO StartWork
 IF /I "%~1" == "--Locale" SET "WITH_LOCALE=1" & SHIFT & GOTO StartWork
+IF NOT "%~1" == "1" (IF NOT "%~1" == "0" (SET "ZIP_SUFFIX=%1" & SHIFT & GOTO StartWork))
 
 
 :StartWork
@@ -187,7 +189,7 @@ IF NOT EXIST "%1\metapath.exe" CALL :SUBMSG "ERROR" "%1\metapath.exe NOT found"
 IF "%WITH_LOCALE%" == "1" (
   SET "ZIP_NAME=Notepad2_i18n"
 ) ELSE (
-  SET "ZIP_NAME=Notepad2"
+  IF "%ZIP_SUFFIX%" == "" (SET "ZIP_NAME=Notepad2") ELSE (SET "ZIP_NAME=Notepad2(%ZIP_SUFFIX%)")
 )
 IF /I "%COMPILER%" == "MSVC" (
   SET "ZIP_NAME=%ZIP_NAME%_%2_%NP2_VER%"
