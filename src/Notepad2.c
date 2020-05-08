@@ -7376,7 +7376,7 @@ BOOL OpenFileDlg(HWND hwnd, LPWSTR lpstrFile, int cchFile, LPCWSTR lpstrInitialD
 
 	WCHAR szFile[MAX_PATH];
 	lstrcpy(szFile, L"");
-	LPWSTR szFilter = Style_GetOpenDlgFilterStr();
+	LPWSTR szFilter = Style_GetOpenDlgFilterStr(TRUE);
 
 	OPENFILENAME ofn;
 	ZeroMemory(&ofn, sizeof(OPENFILENAME));
@@ -7426,7 +7426,7 @@ BOOL SaveFileDlg(HWND hwnd, LPWSTR lpstrFile, int cchFile, LPCWSTR lpstrInitialD
 
 	WCHAR szNewFile[MAX_PATH];
 	lstrcpy(szNewFile, lpstrFile);
-	LPWSTR szFilter = Style_GetSaveDlgFilterStr();
+	LPWSTR szFilter = Style_GetOpenDlgFilterStr(FALSE);
 
 	OPENFILENAME ofn;
 	ZeroMemory(&ofn, sizeof(OPENFILENAME));
