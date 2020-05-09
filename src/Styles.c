@@ -3176,10 +3176,10 @@ static int AddLexFilterStr(LPWSTR szFilter, LPCEDITLEXER pLex, int length) {
 	int count = 0;
 	while ((ch = *p++) != L'\0') {
 		if (ch != L' ') {
-			if (ch == ';') {
+			if (ch == L';') {
 				if (state == 0) {
 					state = 1;
-					*ptr++ = ';';
+					*ptr++ = L';';
 				}
 			} else {
 				if (state == 1) {
@@ -3220,7 +3220,7 @@ static int AddLexFilterStr(LPWSTR szFilter, LPCEDITLEXER pLex, int length) {
 
 LPWSTR Style_GetOpenDlgFilterStr(BOOL open) {
 	int length = (MAX_FAVORITE_SCHEMES_COUNT + 1 + LEXER_INDEX_GENERAL - LEXER_INDEX_MATCH)
-		*(MAX_EDITLEXER_NAME_SIZE + MAX_EDITLEXER_EXT_SIZE*3*2);
+				*(MAX_EDITLEXER_NAME_SIZE + MAX_EDITLEXER_EXT_SIZE*3*2);
 	LPWSTR szFilter = (LPWSTR)NP2HeapAlloc(length * sizeof(WCHAR));
 
 	length = 0;
