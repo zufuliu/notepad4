@@ -1728,12 +1728,12 @@ BEGIN
     IDS_APPTITLE_ELEVATED   "%s (管理員)"
     IDS_APPTITLE_PASTEBOARD "Notepad2: 貼上板"
     IDS_UNTITLED            "未命名"
-    IDS_TITLEEXCERPT        """%s"""
+    IDS_TITLEEXCERPT        "「%s」"
     IDS_READONLY            "(唯讀)"
 	IDS_LOCKED				"(編輯鎖定)"
     IDS_DOCPOS              "行 %s / %s  欄 %s / %s  文字 %s / %s  選擇 %s / %s  已選行 %s  找到 %s"
-    IDS_LOADFILE            "正在載入 ""%s""..."
-    IDS_SAVEFILE            "正在儲存 “%s”..."
+    IDS_LOADFILE            "正在載入「%s」..."
+    IDS_SAVEFILE            "正在儲存「%s」..."
     IDS_PRINTFILE           "正在列印頁面 %s..."
     IDS_SAVINGSETTINGS      "正在儲存設定..."
     IDS_LINKDESCRIPTION     "用 Notepad2 編輯"
@@ -1828,8 +1828,8 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_ERR_LOADFILE        "載入 ""%s"" 時發生錯誤"
-    IDS_ERR_SAVEFILE        "儲存 ""%s"" 時發生錯誤"
+    IDS_ERR_LOADFILE        "載入「%s」時發生錯誤"
+    IDS_ERR_SAVEFILE        "儲存「%s」時發生錯誤"
     IDS_ERR_BROWSE          "找不到檔案瀏覽器外掛程式。\nmetapath 檔案瀏覽器外掛程式可以從下址下載:\nhttps://github.com/zufuliu/notepad2/releases\n\n是否立即開啟下載頁面？"
     IDS_ERR_MRUDLG          "無法存取選取的檔案！\n是否從清單中移除？"
     IDS_ERR_CREATELINK      "建立桌面捷徑時發生錯誤。"
@@ -1883,31 +1883,31 @@ BEGIN
     IDS_ERR_UNICODE2        "目前文字中的某些字元在選取的編碼中不支援，如果儲存將可能被取代為預設的位元字元。建議選擇其他檔案編碼。要繼續嗎？"
     IDS_WARNLOADBIGFILE     "載入檔案：%s\n\n此檔案太大（%s，%s 位元組）。\n目前可載入的最大檔案大小為 %s（%s 位元組）。"
     //IDS_ERR_DROP            "Only one file can be dropped at the same time!"
-    IDS_ASK_SAVE            "儲存變更到“%s”？"
+    IDS_ASK_SAVE            "儲存變更到「%s」？"
     IDS_ASK_REVERT          "回復檔案到上次儲存時的狀態？您的變更會遺失！"
     IDS_ASK_RECODE          "重新編碼需要從磁碟重新載入檔案，未儲存的變更將會遺失！"
-    IDS_ASK_CREATE          "“%s”找不到。\n是否建立此檔案？"
+    IDS_ASK_CREATE          "「%s」找不到。\n是否建立此檔案？"
     IDS_PRINT_HEADER        "檔案名稱，目前日期與時間|檔案名稱，目前日期|檔案名稱|留空"
     IDS_PRINT_FOOTER        "頁號|留空"
     IDS_PRINT_COLOR         "正常|反色（暗背景）|白底黑字|白底彩色|白底彩色（行號除外）|目前螢幕顏色（所見即所得）"
     IDS_PRINT_PAGENUM       "頁 %s"
     IDS_PRINT_EMPTY         "此文件不包含任何需要列印的文字。"
-    IDS_PRINT_ERROR         "列印""%s""時發生錯誤！"
+    IDS_PRINT_ERROR         "列印「%s」時發生錯誤！"
     IDS_FAV_SUCCESS         "在我的最愛中建立目前檔案的快捷方式。"
     IDS_FAV_FAILURE         "無法建立目前的檔案的快捷方法。\n請檢查是否已有同名檔案。"
-    IDS_READONLY_MODIFY     "無法變更“%s”的屬性。"
+    IDS_READONLY_MODIFY     "無法變更「%s」的屬性。"
 END
 
 STRINGTABLE
 BEGIN
-    IDS_READONLY_SAVE       """%s"" 是唯讀的。是否儲存到另一個檔案？"
+    IDS_READONLY_SAVE       "「%s」是唯讀的。是否儲存到另一個檔案？"
     IDS_FILECHANGENOTIFY    "目前檔案已被外部程式修改。是否重新載入？"
     IDS_FILECHANGENOTIFY2   "目前檔案已被刪除。是否立即儲存？"
     IDS_SAVEDSETTINGS       "目前程式設定已儲存。"
     IDS_CREATEINI_FAIL      "建立設定檔時發生錯誤。"
     IDS_WRITEINI_FAIL       "寫入設定檔時發生錯誤。"
     IDS_SETTINGSNOTSAVED    "找不到現有的設定檔。\n若要儲存您的樣式修改，請立即儲存 (F7)，或者返回 自訂語法高亮 (Ctrl+F12) 匯出您的樣式設定。"
-    IDS_EXPORT_FAIL         "匯出樣式設定到“%s”時發生錯誤。"
+    IDS_EXPORT_FAIL         "匯出樣式設定到「%s」時發生錯誤。"
 END
 
 STRINGTABLE
