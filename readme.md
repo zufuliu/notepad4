@@ -156,8 +156,7 @@ Or build from source, see the [Wiki](https://github.com/zufuliu/notepad2/wiki/Bu
 * Number conversion between decimal, hexadecimal, octal and binary
 * Display caret location and length of selected text in count of characters
 * Improved support for NFO ANSI art
-* Support replacing Windows Notepad using a clean, unintuitive registry-based method
-* Support [adding Notepad2 to Windows explorer context menu](https://github.com/zufuliu/notepad2/wiki/Open-with-Notepad2)
+* Support various [Windows system integration](https://github.com/zufuliu/notepad2/wiki/System-Integration)
 * Per-Monitor DPI-Aware, improved high DPI display
 * Support rendering using Direct2D DirectWrite, and switch between GDI and Direct2D
 * Support font ligature with font like [FiraCode](https://github.com/tonsky/FiraCode) in Direct2D mode
