@@ -655,8 +655,8 @@ BEGIN
     IDS_GETQUICKVIEWER      "查找快速预览程序"
     IDS_GETTARGET           "查找编辑器"
     IDS_NEWFILE             "新文件"
-    IDS_FILTER_ALL          "所有文件(*.*)|*.*|"
-    IDS_FILTER_EXE          "可执行文件(*.exe;*.com;*.bat;*.lnk;*.pif)|*.exe;*.com;*.bat;*.lnk;*.pif|所有文件(*.*)|*.*|"
+    IDS_FILTER_ALL          "所有文件 (*.*)|*.*|"
+    IDS_FILTER_EXE          "可执行文件 (*.exe;*.com;*.bat;*.lnk;*.pif)|*.exe;*.com;*.bat;*.lnk;*.pif|所有文件 (*.*)|*.*|"
     IDS_GETDIRECTORY        "选择一个新的文件夹。"
     IDS_FAVORITES           "指定“收藏夹”文件夹。"
 END
