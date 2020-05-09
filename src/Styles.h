@@ -58,8 +58,7 @@ int		Style_GetMatchLexerIndex(int rid);
 int		Style_GetDocTypeLanguage(void);
 void	Style_UpdateLexerKeywords(LPCEDITLEXER pLexNew);
 void	Style_UpdateLexerKeywordAttr(LPCEDITLEXER pLexNew);
-LPCWSTR Style_GetCurrentLexerDisplayName(LPWSTR lpszName, int cchName);
-LPCWSTR Style_GetCurrentLexerName(void);
+LPCWSTR Style_GetCurrentLexerName(LPWSTR lpszName, int cchName);
 void	Style_SetLexerByLangIndex(int lang);
 void	Style_UpdateSchemeMenu(HMENU hmenu);
 
