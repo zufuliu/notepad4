@@ -11,4 +11,4 @@ def increase_style_resource_id_value(path, delta=100):
 	with open(path, 'w', encoding='utf-8', newline='\n') as fp:
 		fp.write(updated)
 
-increase_style_resource_id_value('../src/EditLexers/EditStyle.h')
+#increase_style_resource_id_value('../src/EditLexers/EditStyle.h')

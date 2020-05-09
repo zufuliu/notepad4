@@ -17,6 +17,8 @@ def get_available_locales():
 		for entry in it:
 			if entry.is_dir() and entry.name[0].islower():
 				result.append(entry.name)
+
+	result.sort()
 	return result
 
 def get_project_guid():
@@ -59,8 +61,8 @@ def make_new_localization(language):
 	if not os.path.exists(target):
 		os.makedirs(target)
 
-	metapath_dest =os.path.join(target, 'metapath.rc')
-	notepad2_dest =os.path.join(target, 'Notepad2.rc')
+	metapath_dest = os.path.join(target, 'metapath.rc')
+	notepad2_dest = os.path.join(target, 'Notepad2.rc')
 	shutil.copy(metapath_src, metapath_dest)
 	shutil.copy(notepad2_src, notepad2_dest)
 
