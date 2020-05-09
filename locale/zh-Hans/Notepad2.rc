@@ -173,7 +173,7 @@ BEGIN
 		BEGIN
 			MENUITEM "文件名(&F)",						CMD_COPYFILENAME_NOEXT
 			MENUITEM "文件名和扩展名(&E)\tShift+F9",		CMD_COPYFILENAME
-			MENUITEM "完整路径名称(&P)\tAlt+Shift+F9",	CMD_COPYPATHNAME
+			MENUITEM "完整路径名(&P)\tAlt+Shift+F9",		CMD_COPYPATHNAME
 			MENUITEM SEPARATOR
 			MENUITEM "复制全部(&A)\tAlt+A",				IDM_EDIT_COPYALL
 			MENUITEM "复制追加(&D)\tCtrl+E",				IDM_EDIT_COPYADD
@@ -296,7 +296,7 @@ BEGIN
 			MENUITEM SEPARATOR
 			MENUITEM "文件名(&F)",							CMD_INSERTFILENAME_NOEXT
 			MENUITEM "文件名和扩展名(&X)\tCtrl+F9",			IDM_EDIT_INSERT_FILENAME
-			MENUITEM "完整路径名称(&P)\tCtrl+Shift+F9",		IDM_EDIT_INSERT_PATHNAME
+			MENUITEM "完整路径名(&P)\tCtrl+Shift+F9",			IDM_EDIT_INSERT_PATHNAME
 			MENUITEM SEPARATOR
 			MENUITEM "当前日期(&D)",							IDM_EDIT_INSERT_LOC_DATE
 			MENUITEM "当前日期和时间(&T)",						IDM_EDIT_INSERT_LOC_DATETIME
@@ -595,7 +595,7 @@ BEGIN
 		BEGIN
 			MENUITEM "仅文件名(&F)",				IDM_VIEW_SHOWFILENAMEONLY
 			MENUITEM "文件名和目录(&D)",			IDM_VIEW_SHOWFILENAMEFIRST
-			MENUITEM "完整路径名称(&P)",			IDM_VIEW_SHOWFULLPATH
+			MENUITEM "完整路径名(&P)",			IDM_VIEW_SHOWFULLPATH
 			MENUITEM "选中的文本(&T)",			IDM_VIEW_SHOWEXCERPT
 		END
 		MENUITEM SEPARATOR
@@ -1850,9 +1850,9 @@ END
 STRINGTABLE
 BEGIN
 	IDS_CMDLINEHELP			"命令行帮助\n\n\
-文件\t必须是最后一个参数，无需使用双引号括起有空格的路径名称。\n\
-+\t多个文件参数 (需要使用双引号括起有空格的路径名称)。\n\
--\t单个文件参数 (无需使用双引号括起有空格的路径名称)。\n\
+文件\t必须是最后一个参数，无需使用双引号括起有空格的路径名。\n\
++\t多个文件参数 (需要使用双引号括起有空格的路径名)。\n\
+-\t单个文件参数 (无需使用双引号括起有空格的路径名)。\n\
 …\t编码 (/ansi, /unicode, /unicodele, /unicodebe,\n\
 …\t/utf8, /utf8sig, /utf8bom, /utf16, /utf16le, /utf16be)。\n\
 …\t换行符 (/crlf, /lf, /cr)。\n\
