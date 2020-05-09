@@ -373,7 +373,7 @@ BEGIN
     LTEXT           "指定 metapath 的進階設定。",IDC_STATIC,40,15,200,8
     AUTOCHECKBOX    "使用啟動資料夾(&U)：",IDC_STARTUPDIR,10,46,104,10,WS_GROUP | WS_TABSTOP
     AUTORADIOBUTTON "最近使用(&R)。",IDC_GOTOMRU,114,46,90,10,WS_GROUP | WS_TABSTOP
-    AUTORADIOBUTTON "“我的最愛”資料夾(&F)。",IDC_GOTOFAV,114,58,90,10,WS_TABSTOP
+    AUTORADIOBUTTON "「我的最愛」資料夾(&F)。",IDC_GOTOFAV,114,58,90,10,WS_TABSTOP
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,10,76,205,1
     AUTOCHECKBOX    "儲存檔案時移除唯讀屬性(&C)。",IDC_CLEARREADONLY,10,85,172,10,WS_TABSTOP
     AUTOCHECKBOX    "命名衝突時重新命名檔案複本(&N)。",IDC_RENAMEONCOLLISION,10,97,164,10,WS_TABSTOP
@@ -416,10 +416,10 @@ FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
     ICON            IDI_PROGS,IDC_STATIC,10,10,20,20
     LTEXT           "指定外部程式及路徑。",IDC_STATIC,40,15,180,8
-    LTEXT           "預設“快速概觀”應用程式(&D) (Ctrl+Q):",IDC_STATIC,10,41,180,8
+    LTEXT           "預設「快速概觀」應用程式(&D) (Ctrl+Q):",IDC_STATIC,10,41,180,8
     EDITTEXT        IDC_QUICKVIEW,10,52,191,14,ES_AUTOHSCROLL
     PUSHBUTTON      "",IDC_BROWSE_Q,204,52,14,14,BS_BITMAP
-    LTEXT           "“我的最愛”資料夾 (F11)(&F):",IDC_STATIC,10,76,120,8
+    LTEXT           "「我的最愛」資料夾 (F11)(&F):",IDC_STATIC,10,76,120,8
     EDITTEXT        IDC_FAVORITES,10,87,191,14,ES_AUTOHSCROLL
     PUSHBUTTON      "",IDC_BROWSE_F,204,87,14,14,BS_BITMAP
 END
@@ -607,7 +607,7 @@ BEGIN
 	IDT_FILE_QUICKVIEW		"快速預覽"
 	IDT_FILE_SAVEAS			"另存為"
 	IDT_FILE_COPYMOVE		"複製/移動"
-	IDT_FILE_DELETE_RECYCLE	"刪除 (回收站)"
+	IDT_FILE_DELETE_RECYCLE	"刪除(回收站)"
 	IDT_FILE_DELETE_PERM	"永久移除"
 	IDT_VIEW_FILTER			"過濾"
 END
@@ -616,23 +616,23 @@ STRINGTABLE
 BEGIN
 	IDS_APPTITLE			"metapath"
 	IDS_NUMFILES			"%s 個物件"
-	IDS_NUMFILES_FILTER		"%s 個物件 | 過濾"
-	IDS_SAVEFILE			"正在儲存 “%s”..."
+	IDS_NUMFILES_FILTER		"%s 個物件|過濾"
+	IDS_SAVEFILE			"正在儲存「%s」..."
 END
 
 STRINGTABLE
 BEGIN
     IDS_ERR_CD              "目錄存取錯誤\n無權存取指定目錄。\n請檢查磁碟或網路連線。"
-    IDS_ERR_FILE            "檔案存取錯誤\n無權存取“%s”。\n此檔案可能正被其他應用程式使用。\n請檢查磁碟或網路連線。"
+    IDS_ERR_FILE            "檔案存取錯誤\n無權存取「%s」。\n此檔案可能正被其他應用程式使用。\n請檢查磁碟或網路連線。"
     IDS_ERR_NEW             "檔案存取錯誤\n無法建立檔案。\n請檢查磁碟或網路連線。"
     IDS_ERR_NEWDIR          "目錄存取錯誤\n無法建立資料夾。\n請檢查磁碟或網路連線。"
-    IDS_ERR_SAVEAS1         "檔案儲存錯誤\n儲存“%s”時發生錯誤。\n可能是現有檔案被寫保護了。"
+    IDS_ERR_SAVEAS1         "檔案儲存錯誤\n儲存「%s」時發生錯誤。\n可能是現有檔案被寫保護了。"
     IDS_ERR_SAVEAS2         "檔案儲存錯誤\n刪除已儲存檔案的唯讀屬性時發生錯誤。"
     IDS_ERR_CMDLINE         "metapath\n存取命令行中指定的檔案或資料夾時發生錯誤。"
     IDS_ERR_STARTUPDIR      "metapath\n無權存取啟動資料夾。"
     IDS_ERR_DROP1           "metapath\n無權存取拖曳放置的檔案或資料夾。"
     //IDS_ERR_DROP2           "metapath\nOnly a single file or directory can be dropped at a time."
-    IDS_ERR_FAVORITES       "我的最愛\n無權存取“我的最愛”資料夾。\n請在“選項”對話框中指定合法的資料夾。"
+    IDS_ERR_FAVORITES       "我的最愛\n無權存取「我的最愛」資料夾。\n請在「選項」對話框中指定合法的資料夾。"
     IDS_ERR_LNK_GETPATH     "連結錯誤\n沒有可用於連結的物件的合法的檔案系統路徑。\n連結可能未指向一個檔案或資料夾。"
     IDS_ERR_LNK_NOACCESS    "連結錯誤\n無權存取連結物件的檔案系統路徑。\n請檢查磁碟或網路連線。"
     IDS_ERR_CREATELINK      "連結錯誤\n建立指定的連結時發生錯誤。\n可能目標資料夾被寫保護了。"
@@ -658,7 +658,7 @@ BEGIN
     IDS_FILTER_ALL          "所有檔案 (*.*)|*.*|"
     IDS_FILTER_EXE          "執行檔 (*.exe;*.com;*.bat;*.lnk;*.pif)|*.exe;*.com;*.bat;*.lnk;*.pif|所有檔案 (*.*)|*.*|"
     IDS_GETDIRECTORY        "選擇一個新的資料夾。"
-    IDS_FAVORITES           "指定“我的最愛”資料夾。"
+    IDS_FAVORITES           "指定「我的最愛」資料夾。"
 END
 
 STRINGTABLE
