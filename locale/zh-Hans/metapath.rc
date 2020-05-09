@@ -616,8 +616,8 @@ STRINGTABLE
 BEGIN
 	IDS_APPTITLE			"metapath"
 	IDS_NUMFILES			"%s 个对象"
-	IDS_NUMFILES_FILTER		"%s 个对象 | 过滤"
-	IDS_SAVEFILE			"正在保存 “%s”..."
+	IDS_NUMFILES_FILTER		"%s 个对象|过滤"
+	IDS_SAVEFILE			"正在保存“%s”..."
 END
 
 STRINGTABLE
