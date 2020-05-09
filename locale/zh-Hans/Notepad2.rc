@@ -308,7 +308,7 @@ BEGIN
 				MENUITEM "微秒(u&s)",						IDM_EDIT_INSERT_TIMESTAMP_US
 				MENUITEM "纳秒(&ns)",						IDM_EDIT_INSERT_TIMESTAMP_NS
 			END
-			MENUITEM "时间/日期(短形式)(&S)\tCtrl+F5",		IDM_EDIT_INSERT_SHORTDATE
+			MENUITEM "时间/日期(短形式)(&S)\tCtrl+F5",			IDM_EDIT_INSERT_SHORTDATE
 			MENUITEM "时间/日期(长形式)(&L)\tCtrl+Shift+F5",	IDM_EDIT_INSERT_LONGDATE
 			MENUITEM SEPARATOR
 			MENUITEM "编码标识符(&E)\tCtrl+F8",				IDM_EDIT_INSERT_ENCODING
@@ -631,7 +631,7 @@ BEGIN
 				MENUITEM "标准(&S)",					IDM_VIEW_FONTQUALITY_STANDARD
 				MENUITEM "&ClearType",				IDM_VIEW_FONTQUALITY_CLEARTYPE
 			END
-			POPUP "从右至左(&RTL)布局(GDI)"
+			POPUP "从右到左(&RTL)布局(GDI)"
 			BEGIN
 				MENUITEM "编辑窗口(&E)",				IDM_SET_RTL_LAYOUT_EDIT
 				MENUITEM "其他窗口(&O)",				IDM_SET_RTL_LAYOUT_OTHER
@@ -639,8 +639,8 @@ BEGIN
 			POPUP "双向文本(&B)(Direct2D)"
 			BEGIN
 				MENUITEM "无(&N)",					IDM_SET_BIDIRECTIONAL_NONE
-				MENUITEM "从左至右(&L)",				IDM_SET_BIDIRECTIONAL_L2R
-				MENUITEM "从右至左(&R)",				IDM_SET_BIDIRECTIONAL_R2L
+				MENUITEM "从左到右(&L)",				IDM_SET_BIDIRECTIONAL_L2R
+				MENUITEM "从右到左(&R)",				IDM_SET_BIDIRECTIONAL_R2L
 			END
 			MENUITEM "使用内嵌模式输入法(&I)",			IDM_SET_USE_INLINE_IME
 			MENUITEM SEPARATOR
@@ -657,7 +657,7 @@ BEGIN
 		MENUITEM "问题反馈(&I)",				IDM_HELP_REPORT_ISSUE
 		MENUITEM "功能请求(&F)",				IDM_HELP_FEATURE_REQUEST
 		MENUITEM SEPARATOR
-		MENUITEM "在线 Wiki(&W)",				IDM_HELP_ONLINE_WIKI
+		MENUITEM "在线 &Wiki",				IDM_HELP_ONLINE_WIKI
 		MENUITEM "命令行帮助(&C)",			IDM_CMDLINE_HELP
 		MENUITEM SEPARATOR
 		MENUITEM "关于 Notepad2(&A)\tF1",	IDM_HELP_ABOUT
@@ -1089,9 +1089,9 @@ BEGIN
     LTEXT           "CR+LF: ",IDC_STATIC,10,18,34,8,SS_RIGHT
     LTEXT           "LF: ",IDC_STATIC,10,28,34,8,SS_RIGHT
     LTEXT           "CR: ",IDC_STATIC,10,38,34,8,SS_RIGHT
-    LTEXT           "%s 行。",IDC_EOL_SUM_CRLF,48,18,136,8
-    LTEXT           "%s 行。",IDC_EOL_SUM_LF,48,28,136,8
-    LTEXT           "%s 行。",IDC_EOL_SUM_CR,48,38,136,8
+    LTEXT           "%s 行",IDC_EOL_SUM_CRLF,48,18,136,8
+    LTEXT           "%s 行",IDC_EOL_SUM_LF,48,28,136,8
+    LTEXT           "%s 行",IDC_EOL_SUM_CR,48,38,136,8
     LTEXT           "是否统一换行符？(&D)",IDC_STATIC,7,52,180,8
     COMBOBOX        IDC_EOLMODELIST,7,64,118,81,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     PUSHBUTTON      "是(&Y)",IDOK,138,63,50,14
@@ -1731,7 +1731,7 @@ BEGIN
     IDS_TITLEEXCERPT        "“%s”"
     IDS_READONLY            "(只读)"
 	IDS_LOCKED				"(编辑锁定)"
-    IDS_DOCPOS              "行 %s/%s  列 %s/%s  字符 %s/%s  选择 %s/%s  已选行 %s  找到 %s"
+    IDS_DOCPOS              "行 %s / %s  列 %s / %s  字符 %s / %s  选择 %s / %s  已选行 %s  找到 %s"
     IDS_LOADFILE            "正在载入“%s”..."
     IDS_SAVEFILE            "正在保存“%s”..."
     IDS_PRINTFILE           "正在打印页面 %s..."
@@ -1744,26 +1744,26 @@ END
 STRINGTABLE
 BEGIN
 	IDS_BACKSLASHHELP		"反斜杠转义\n\n\
-\\a\t警报 (BEL, ASCII 7)。\n\
-\\b\t退格 (BS, ASCII 8)。\n\
-\\e\t转义/中断 (ESC, ASCII 27 / 1B)。\n\
-\\f\t换页 (FF, ASCII 12 / 0C)。\n\
-\\n\t换行 (LF, ASCII 10 / 0A)。\n\
-\\r\t回车 (CR, ASCII 13 / 0D)。\n\
-\\t\t水平制表符 (HT, ASCII 9)。\n\
-\\v\t垂直制表符 (VT, ASCII 11 / 0B)。\n\
+\\a\t警报(BEL, ASCII 7)。\n\
+\\b\t退格(BS, ASCII 8)。\n\
+\\e\t转义/中断(ESC, ASCII 27 / 1B)。\n\
+\\f\t换页(FF, ASCII 12 / 0C)。\n\
+\\n\t换行(LF, ASCII 10 / 0A)。\n\
+\\r\t回车(CR, ASCII 13 / 0D)。\n\
+\\t\t水平制表符(HT, ASCII 9)。\n\
+\\v\t垂直制表符(VT, ASCII 11 / 0B)。\n\
 \\ooo\t八进制值。\n\
 \\uHHHH\t十六进制值。\n\
 \\xHH\t十六进制值。\n\
 \\\\\t反斜杠。"
 
-	IDS_REGEXPHELP			"正则表达式（RegExp）语法（单行模式）\n\n\
+	IDS_REGEXPHELP			"正则表达式(RegExp)语法(单行模式)\n\n\
 .\t任何字符。\n\
 ^\t行开始。\n\
 $\t行结束。\n\
 \\<\t单词开始。\n\
 \\>\t单词结束。\n\
-[...]\t字符集合 ([abc]) 或字符范围 ([a-z])。\n\
+[...]\t字符集合([abc])或字符范围([a-z])。\n\
 [^...]\t不在集合或范围中的字符。\n\
 \\d\t任何十进制数字。\n\
 \\D\t任何非数字字符。\n\
@@ -1778,7 +1778,7 @@ $\t行结束。\n\
 *? 或 +?\t对限量词 ""?"" 和 ""+"" 做非贪婪匹配。\n\
 (\t区域开始。\n\
 )\t区域结束。\n\
-\\n\t替换时引用的区域 (n 为 1-9)。\n\n\
+\\n\t替换时引用的区域(n 为 1-9)。\n\n\
 实验性语法:\n\
 \\h\t单词开始，根据 IsWordStartAt()。\n\
 \\H\t单词结束，根据 IsWordEndAt()。\n\
@@ -1890,7 +1890,7 @@ BEGIN
     IDS_PRINT_HEADER        "文件名，当前日期和时间|文件名，当前日期|文件名|留空"
     IDS_PRINT_FOOTER        "页号|留空"
     IDS_PRINT_COLOR         "正常|反色(暗背景)|白底黑字|白底彩色|白底彩色(行号除外)|当前屏幕颜色(所见即所得)"
-    IDS_PRINT_PAGENUM       "页 %s"
+    IDS_PRINT_PAGENUM       "第 %s 页"
     IDS_PRINT_EMPTY         "此文档不包含任何需要打印的文本。"
     IDS_PRINT_ERROR         "打印“%s”时出错！"
     IDS_FAV_SUCCESS         "已在收藏夹中创建一个当前文件的快捷方式。"
@@ -2045,7 +2045,7 @@ BEGIN
 	IDS_FAVORITE_SCHEMES_TITLE		"常用语法高亮"
 	IDS_CUSTOMIZE_SCHEMES_HELP		"文件扩展名必须由分号 (;) 分隔\r\n\
 \r\n\
-样式格式：\r\n\
+样式格式:\r\n\
 \tfont:Name; size:[+|-]nn.mm; weight:nnn; bold; italic; underline; strike;\r\n\
 \tcharset:dd; locale:Name; case:[Upper|Lower|Camel];\r\n\
 \tfore:#ffffff; back:#bbbbbb; alpha:aa; outline:aa; eolfilled;\r\n\
