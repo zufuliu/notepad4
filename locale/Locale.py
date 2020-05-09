@@ -129,15 +129,19 @@ def copy_back_localized_resources(language):
 	print(f"""{app}: resources for building standalone localized program for {language} are ready.
     you can copy English resources back by run: {app} back en""")
 
-def main():
-	if len(sys.argv) < 3:
-		print(f"""Usage: {app} action language
-action:
-    new     create a new localization with specific language.
 
-    back    prepare building standalone localized program with specific language,
+def show_help():
+	print(f"""Usage: {app} action language
+action:
+    new     create a new localization for specific language.
+
+    back    prepare building standalone localized program for specific language,
             copy back localized resources to overwrite English resources.
             English resources are copied into en folder when the folder does not exist.""")
+
+def main():
+	if len(sys.argv) < 3:
+		show_help()
 		return
 
 	action = sys.argv[1]
@@ -150,9 +154,11 @@ action:
 		make_new_localization(language)
 	elif action == 'back':
 		if language not in availableLocales:
-			print(f'{app}: language {language} not localized.');
+			print(f'{app}: language {language} not localized [{", ".join(availableLocales)}].');
 			return
 		copy_back_localized_resources(language)
+	else:
+		show_help()
 
 if __name__ == '__main__':
 	main()
