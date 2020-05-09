@@ -308,6 +308,7 @@ int		cyStyleCustomizeDlg;
 static LPWSTR g_AllFileExtensions = NULL;
 
 // Notepad2.c
+extern HWND hwndMain;
 extern int	iEncoding;
 extern int	g_DOSEncoding;
 extern int	iDefaultCodePage;
@@ -2277,119 +2278,33 @@ PEDITLEXER Style_AutoDetect(BOOL bDotFile) {
 //
 // Style_GetCurrentLexerName()
 //
-LPCWSTR Style_GetCurrentLexerDisplayName(LPWSTR lpszName, int cchName) {
-	if (GetString(pLexCurrent->rid, lpszName, cchName)) {
+LPCWSTR Style_GetCurrentLexerName(LPWSTR lpszName, int cchName) {
+	if (np2LexLangIndex == 0) {
+#if NP2_ENABLE_LOCALIZE_LEXER_NAME
+		if (GetString(pLexCurrent->rid, lpszName, cchName)) {
+			return lpszName;
+		}
+#endif
+		return pLexCurrent->pszName;
+	}
+
+	HMENU hmenu = GetMenu(hwndMain);
+	MENUITEMINFO mii;
+	mii.cbSize = sizeof(MENUITEMINFO);
+	mii.fMask = MIIM_STRING;
+	mii.dwTypeData = lpszName;
+	mii.cch = cchName;
+	if (GetMenuItemInfo(hmenu, np2LexLangIndex, FALSE, &mii)) {
+		// remove '&' from access key
+		LPWSTR p = StrChr(lpszName, L'&');
+		if (p != NULL) {
+			const int len = lstrlen(p) - 1;
+			MoveMemory(p, p + 1, sizeof(WCHAR) * len);
+			p[len] = L'\0';
+		}
 		return lpszName;
 	}
-	return Style_GetCurrentLexerName();
-}
-
-LPCWSTR Style_GetCurrentLexerName(void) {
-	if (np2LexLangIndex == 0) {
-		return pLexCurrent->pszName;
-	}
-	switch (np2LexLangIndex) {
-	case IDM_LEXER_TEXTFILE:
-	case IDM_LEXER_2NDTEXTFILE:
-		return pLexCurrent->pszName;
-	case IDM_LEXER_WEB:
-		return L"Web Source Code";
-	case IDM_LEXER_PHP:
-		return L"PHP Page";
-	case IDM_LEXER_JSP:
-		return L"JSP Page";
-	case IDM_LEXER_ASPX_CS:
-		return L"ASP.NET (C#)";
-	case IDM_LEXER_ASPX_VB:
-		return L"ASP.NET (VB.NET)";
-	case IDM_LEXER_ASP_VBS:
-		return L"ASP (VBScript)";
-	case IDM_LEXER_ASP_JS:
-		return L"ASP (JScript)";
-
-	case IDM_LEXER_XML:
-		return L"XML Document";
-	case IDM_LEXER_XSD:
-		return L"XML Schema";
-	case IDM_LEXER_XSLT:
-		return L"XSLT Stylesheet";
-	case IDM_LEXER_DTD:
-		return L"XML DTD";
-
-	case IDM_LEXER_ANT_BUILD:
-		return L"Ant Build";
-	case IDM_LEXER_MAVEN_POM:
-		return L"Maven POM";
-	case IDM_LEXER_MAVEN_SETTINGS:
-		return L"Maven Settings";
-	case IDM_LEXER_IVY_MODULE:
-		return L"Ivy Module";
-	case IDM_LEXER_IVY_SETTINGS:
-		return L"Ivy Settings";
-	case IDM_LEXER_PMD_RULESET:
-		return L"PMD Ruleset";
-	case IDM_LEXER_CHECKSTYLE:
-		return L"CheckStyle";
-
-	case IDM_LEXER_APACHE:
-		return L"Apache Config";
-	case IDM_LEXER_TOMCAT:
-		return L"Tomcat Config";
-	case IDM_LEXER_WEB_JAVA:
-		return L"Java Web Config";
-	case IDM_LEXER_STRUTS:
-		return L"Struts Config";
-	case IDM_LEXER_HIB_CFG:
-		return L"Hibernate Config";
-	case IDM_LEXER_HIB_MAP:
-		return L"Hibernate Mapping";
-	case IDM_LEXER_SPRING_BEANS:
-		return L"Spring Beans";
-	case IDM_LEXER_JBOSS:
-		return L"JBoss Config";
-
-	case IDM_LEXER_WEB_NET:
-		return L"ASP.NET Web Config";
-	case IDM_LEXER_RESX:
-		return L"ResX Schema";
-	case IDM_LEXER_XAML:
-		return L"WPF XAML";
-
-	case IDM_LEXER_PROPERTY_LIST:
-		return L"Property List";
-	case IDM_LEXER_ANDROID_MANIFEST:
-		return L"Android Manifest";
-	case IDM_LEXER_ANDROID_LAYOUT:
-		return L"Android Layout";
-	case IDM_LEXER_SVG:
-		return L"SVG Document";
-
-	case IDM_LEXER_BASH:
-		return L"Shell Script";
-	case IDM_LEXER_CSHELL:
-		return L"C Shell";
-	case IDM_LEXER_M4:
-		return L"M4 Macro";
-
-	case IDM_LEXER_MATLAB:
-		return L"MATLAB Code";
-	case IDM_LEXER_OCTAVE:
-		return L"Octave Code";
-	case IDM_LEXER_SCILAB:
-		return L"Scilab Code";
-
-	case IDM_LEXER_CSS:
-		return L"CSS Style Sheet";
-	case IDM_LEXER_SCSS:
-		return L"Sassy CSS";
-	case IDM_LEXER_LESS:
-		return L"Less CSS";
-	case IDM_LEXER_HSS:
-		return L"HSS";
-
-	default:
-		return L"Error";
-	}
+	return pLexCurrent->pszName;
 }
 
 static void Style_UpdateLexerLang(PEDITLEXER pLex, LPCWSTR lpszExt, LPCWSTR lpszName) {
@@ -3196,6 +3111,10 @@ static int AddLexFilterStr(LPWSTR szFilter, LPCEDITLEXER pLex, int length) {
 	if (count == 0) {
 		return length;
 	}
+	if (state == 1) {
+		--ptr; // trailing semicolon
+	}
+	*ptr = L'\0';
 
 #if NP2_ENABLE_LOCALIZE_LEXER_NAME
 	LPCWSTR pszName;
@@ -3208,11 +3127,6 @@ static int AddLexFilterStr(LPWSTR szFilter, LPCEDITLEXER pLex, int length) {
 #else
 	LPCWSTR pszName = pLex->pszName;
 #endif
-
-	if (state == 1) {
-		--ptr; // trailing semicolon
-	}
-	*ptr = L'\0';
 
 	length += wsprintf(szFilter + length, L"%s (%s)|%s|", pszName, extensions, extensions);
 	return length;
