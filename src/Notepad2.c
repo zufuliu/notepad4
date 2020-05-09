@@ -315,7 +315,7 @@ struct CachedStatusItem {
 	LPCWSTR pszOvrMode;
 	WCHAR tchZoom[8];
 
-#if NP2_ENABLE_LEXER_NAME_LOCALIZE
+#if NP2_ENABLE_LOCALIZE_LEXER_NAME
 	WCHAR tchLexerName[MAX_EDITLEXER_NAME_SIZE];
 #endif
 	WCHAR tchDocPosFmt[96];
@@ -2106,7 +2106,7 @@ void MsgSize(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 void UpdateStatusBarCache(int item) {
 	switch (item) {
 	case STATUS_LEXER:
-#if NP2_ENABLE_LEXER_NAME_LOCALIZE
+#if NP2_ENABLE_LOCALIZE_LEXER_NAME
 		cachedStatusItem.pszLexerName = Style_GetCurrentLexerDisplayName(cachedStatusItem.tchLexerName, MAX_EDITLEXER_NAME_SIZE);
 #else
 		cachedStatusItem.pszLexerName = Style_GetCurrentLexerName();
