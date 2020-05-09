@@ -388,9 +388,9 @@ BEGIN
 			MENUITEM "块状(覆盖模式)(&O)",			IDM_VIEW_CARET_STYLE_BLOCK_OVR
 			MENUITEM SEPARATOR
 			MENUITEM "块状(插入模式)(&I)",			IDM_VIEW_CARET_STYLE_BLOCK
-			MENUITEM "竖线 宽度 &1",					IDM_VIEW_CARET_STYLE_WIDTH1
-			MENUITEM "竖线 宽度 &2",					IDM_VIEW_CARET_STYLE_WIDTH2
-			MENUITEM "竖线 宽度 &3",					IDM_VIEW_CARET_STYLE_WIDTH3
+			MENUITEM "竖线(宽度 &1)",					IDM_VIEW_CARET_STYLE_WIDTH1
+			MENUITEM "竖线(宽度 &2)",					IDM_VIEW_CARET_STYLE_WIDTH2
+			MENUITEM "竖线(宽度 &3)",					IDM_VIEW_CARET_STYLE_WIDTH3
 			MENUITEM SEPARATOR
 			MENUITEM "不闪烁(&N)",					IDM_VIEW_CARET_STYLE_NOBLINK
 			MENUITEM "在选区内绘制块状光标(&S)",		IDM_VIEW_CARET_STYLE_SELECTION
@@ -1223,9 +1223,9 @@ BEGIN
     COMBOBOX        IDC_WRAP_MODE,7,58,236,196,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     DEFPUSHBUTTON   "确定",IDOK,137,118,50,14
     PUSHBUTTON      "取消",IDCANCEL,193,118,50,14
-    LTEXT           "无换行缩进|换行缩进1个字符|换行缩进2个字符|换行缩进1层|换行缩进2层|换行缩进同首个子行|换行缩进比首个子行多1层|换行缩进比首个子行多2层",IDC_WRAP_INDENT_OPTIONS,0,0,615,8,NOT WS_VISIBLE
-    LTEXT           "换行前无换行符|换行前显示换行符 (文本附近)|换行前显示换行符 (边缘附近)",IDC_WRAP_SYMBOL_BEFORE_OPTIONS,0,0,418,8,NOT WS_VISIBLE
-    LTEXT           "换行后无换行符|换行后显示换行符 (文本附近)|换行后显示换行符 (边缘附近)|换行后显示换行符 (在行号列)",IDC_WRAP_SYMBOL_AFTER_OPTIONS,0,0,402,8,NOT WS_VISIBLE
+    LTEXT           "无换行缩进|换行缩进 1 个字符|换行缩进 2 个字符|换行缩进 1 层|换行缩进 2 层|换行缩进同首个子行|换行缩进比首个子行多 1 层|换行缩进比首个子行多 2 层",IDC_WRAP_INDENT_OPTIONS,0,0,615,8,NOT WS_VISIBLE
+    LTEXT           "换行前无换行符|换行前显示换行符(文本附近)|换行前显示换行符(边缘附近)",IDC_WRAP_SYMBOL_BEFORE_OPTIONS,0,0,418,8,NOT WS_VISIBLE
+    LTEXT           "换行后无换行符|换行后显示换行符(文本附近)|换行后显示换行符(边缘附近)|换行后显示换行符(在行号列)",IDC_WRAP_SYMBOL_AFTER_OPTIONS,0,0,402,8,NOT WS_VISIBLE
     LTEXT           "无换行|单词之间换行|任何字符之间换行|空白字符处换行|自动单词换行",IDC_WRAP_MODE_OPTIONS,0,0,187,8,NOT WS_VISIBLE
     GROUPBOX        "对换行的文本",IDC_STATIC,7,74,235,38
     AUTOCHECKBOX    "从左边界选择行时只选中子行",IDC_WRAP_SELECT_SUBLINE,14,84,220,10,WS_TABSTOP
@@ -1338,9 +1338,9 @@ STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSM
 CAPTION "插入 HTML/XML 标签"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
-    LTEXT           "开始标签 (附属性)(&O): ",IDC_STATIC,7,7,130,8
+    LTEXT           "开始标签(附属性)(&O): ",IDC_STATIC,7,7,130,8
     EDITTEXT        IDC_MODIFY_LINE_PREFIX,7,18,250,18,ES_MULTILINE | ES_AUTOVSCROLL | WS_VSCROLL | ES_WANTRETURN
-    LTEXT           "闭合标签 (可编辑)(&C): ",IDC_MODIFY_LINE_TIP2,7,41,118,8
+    LTEXT           "闭合标签(可编辑)(&C): ",IDC_MODIFY_LINE_TIP2,7,41,118,8
     EDITTEXT        IDC_MODIFY_LINE_APPEND,7,52,250,18,ES_MULTILINE | ES_AUTOVSCROLL | WS_VSCROLL | ES_WANTRETURN
     DEFPUSHBUTTON   "确定",IDOK,151,77,50,14
     PUSHBUTTON      "取消",IDCANCEL,207,77,50,14
@@ -1399,7 +1399,7 @@ BEGIN
     AUTOCHECKBOX    "删除唯一行(&U)",IDC_SORT_REMOVE_UNIQUE,7,74,100,10,WS_TABSTOP
     AUTOCHECKBOX    "不区分大小写(&C)",IDC_SORT_IGNORE_CASE,7,92,81,10,WS_TABSTOP
     AUTOCHECKBOX    "逻辑数字比较(&N)",IDC_SORT_LOGICAL_NUMBER,7,104,130,10,WS_TABSTOP
-    AUTOCHECKBOX    "列排序 (矩形选择)",IDC_SORT_COLUMN,7,122,150,10,WS_TABSTOP
+    AUTOCHECKBOX    "列排序(矩形选择)",IDC_SORT_COLUMN,7,122,150,10,WS_TABSTOP
     DEFPUSHBUTTON   "确定",IDOK,127,7,50,14
     PUSHBUTTON      "取消",IDCANCEL,127,24,50,14
 END
@@ -1438,7 +1438,7 @@ BEGIN
     AUTORADIOBUTTON "右对齐(&R)",IDC_ALIGN_RIGHT,7,19,35,10,WS_TABSTOP
     AUTORADIOBUTTON "居中对齐(&C)",IDC_ALIGN_CENTER,7,31,41,10,WS_TABSTOP
     AUTORADIOBUTTON "两端对齐(&J)",IDC_ALIGN_JUSTIFY,7,43,40,10,WS_TABSTOP
-    AUTORADIOBUTTON "两端对齐 (段落模式)(&P)",IDC_ALIGN_JUSTIFY_PAR,7,55,124,10,WS_TABSTOP
+    AUTORADIOBUTTON "两端对齐(段落模式)(&P)",IDC_ALIGN_JUSTIFY_PAR,7,55,124,10,WS_TABSTOP
     DEFPUSHBUTTON   "确定",IDOK,127,7,50,14
     PUSHBUTTON      "取消",IDCANCEL,127,24,50,14
 END
@@ -1472,7 +1472,7 @@ BEGIN
     EDITTEXT        IDC_AUTOC_MIN_NUMBER_LENGTH,166,76,50,12,ES_NUMBER | WS_TABSTOP
     AUTOCHECKBOX    "扫描当前文档中的单词",IDC_AUTOC_SCAN_DOCUMENT_WORDS,14,92,160,10,WS_TABSTOP
     AUTOCHECKBOX    "仅在英文输入法模式下触发自动完成",IDC_AUTOC_ENGLISH_IME_ONLY,14,104,180,10,WS_TABSTOP
-    GROUPBOX        "按键完成自动完成 (使用 Esc 键取消)",IDC_STATIC,7,123,218,44
+    GROUPBOX        "按键完成自动完成(使用 Esc 键取消)",IDC_STATIC,7,123,218,44
     AUTOCHECKBOX    "Enter",IDC_AUTOC_FILLUP_ENTER,14,135,35,10,WS_TABSTOP
     AUTOCHECKBOX    "Tab",IDC_AUTOC_FILLUP_TAB,66,135,35,10,WS_TABSTOP
     AUTOCHECKBOX    "空格",IDC_AUTOC_FILLUP_SPACE,118,135,35,10,WS_TABSTOP
@@ -1744,46 +1744,46 @@ END
 STRINGTABLE
 BEGIN
 	IDS_BACKSLASHHELP		"反斜杠转义\n\n\
-\\a\t警报 (BEL, ASCII 7)\n\
-\\b\t退格 (BS, ASCII 8)\n\
-\\e\t转义/中断 (ESC, ASCII 27 / 1B)\n\
-\\f\t换页 (FF, ASCII 12 / 0C)\n\
-\\n\t换行 (LF, ASCII 10 / 0A)\n\
-\\r\t回车 (CR, ASCII 13 / 0D)\n\
-\\t\t水平制表符 (HT, ASCII 9)\n\
-\\v\t垂直制表符 (VT, ASCII 11 / 0B)\n\
-\\ooo\t八进制值\n\
-\\uHHHH\t十六进制值\n\
-\\xHH\t十六进制值\n\
-\\\\\t反斜杠"
+\\a\t警报 (BEL, ASCII 7)。\n\
+\\b\t退格 (BS, ASCII 8)。\n\
+\\e\t转义/中断 (ESC, ASCII 27 / 1B)。\n\
+\\f\t换页 (FF, ASCII 12 / 0C)。\n\
+\\n\t换行 (LF, ASCII 10 / 0A)。\n\
+\\r\t回车 (CR, ASCII 13 / 0D)。\n\
+\\t\t水平制表符 (HT, ASCII 9)。\n\
+\\v\t垂直制表符 (VT, ASCII 11 / 0B)。\n\
+\\ooo\t八进制值。\n\
+\\uHHHH\t十六进制值。\n\
+\\xHH\t十六进制值。\n\
+\\\\\t反斜杠。"
 
 	IDS_REGEXPHELP			"正则表达式（RegExp）语法（单行模式）\n\n\
-.\t任何字符\n\
-^\t行开始\n\
-$\t行结束\n\
-\\<\t单词开始\n\
-\\>\t单词结束\n\
-[...]\t字符集合 ([abc]) 或字符范围 ([a-z])\n\
-[^...]\t不在集合或范围中的字符\n\
-\\d\t任何十进制数字\n\
-\\D\t任何非数字字符\n\
-\\s\t任何空白字符\n\
-\\S\t任何非空白字符\n\
-\\w\t任何单词字符\n\
-\\W\t任何非单词字符\n\
-\\x\t有其他特殊意义的转义字符\n\
-\\xHH\t十六进制代码为 HH 的字符\n\
-?\t匹配 0 或 1 次\n*\t匹配 0 次或多次\n\
-+\t匹配 1 次或多次\n\
-*? 或 +?\t对限量词 ""?"" 和 ""+"" 做非贪婪匹配\n\
-(\t区域开始\n\
-)\t区域结束\n\
-\\n\t替换时引用的区域 (n 为 1-9)\n\n\
+.\t任何字符。\n\
+^\t行开始。\n\
+$\t行结束。\n\
+\\<\t单词开始。\n\
+\\>\t单词结束。\n\
+[...]\t字符集合 ([abc]) 或字符范围 ([a-z])。\n\
+[^...]\t不在集合或范围中的字符。\n\
+\\d\t任何十进制数字。\n\
+\\D\t任何非数字字符。\n\
+\\s\t任何空白字符\。n\
+\\S\t任何非空白字符。\n\
+\\w\t任何单词字符。\n\
+\\W\t任何非单词字符。\n\
+\\x\t有其他特殊意义的转义字符。\n\
+\\xHH\t十六进制代码为 HH 的字符。\n\
+?\t匹配 0 或 1 次\n*\t匹配 0 次或多次。\n\
++\t匹配 1 次或多次。\n\
+*? 或 +?\t对限量词 ""?"" 和 ""+"" 做非贪婪匹配。\n\
+(\t区域开始。\n\
+)\t区域结束。\n\
+\\n\t替换时引用的区域 (n 为 1-9)。\n\n\
 实验性语法:\n\
-\\h\t单词开始，根据 IsWordStartAt()\n\
-\\H\t单词结束，根据 IsWordEndAt()\n\
-\\i\t匹配 1 个或多个字符到单词结束\n\
-\\i?\t匹配 0 个或多个字符到单词结束"
+\\h\t单词开始，根据 IsWordStartAt()。\n\
+\\H\t单词结束，根据 IsWordEndAt()。\n\
+\\i\t匹配 1 个或多个字符到单词结束。\n\
+\\i?\t匹配 0 个或多个字符到单词结束。"
 
 	IDS_WILDCARDHELP		"通配符搜索\n\n\
 *\t匹配 0 个或多个字符。\n\
