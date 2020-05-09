@@ -304,12 +304,12 @@ BEGIN
 			MENUITEM "Unix 时间戳(&M)",						IDM_EDIT_INSERT_TIMESTAMP
 			POPUP "其他时间戳(&O)"
 			BEGIN
-				MENUITEM "毫秒 (&ms)",						IDM_EDIT_INSERT_TIMESTAMP_MS
-				MENUITEM "微秒 (u&s)",						IDM_EDIT_INSERT_TIMESTAMP_US
-				MENUITEM "纳秒 (&ns)",						IDM_EDIT_INSERT_TIMESTAMP_NS
+				MENUITEM "毫秒(&ms)",						IDM_EDIT_INSERT_TIMESTAMP_MS
+				MENUITEM "微秒(u&s)",						IDM_EDIT_INSERT_TIMESTAMP_US
+				MENUITEM "纳秒(&ns)",						IDM_EDIT_INSERT_TIMESTAMP_NS
 			END
-			MENUITEM "时间/日期 (短形式)(&S)\tCtrl+F5",		IDM_EDIT_INSERT_SHORTDATE
-			MENUITEM "时间/日期 (长形式)(&L)\tCtrl+Shift+F5",	IDM_EDIT_INSERT_LONGDATE
+			MENUITEM "时间/日期(短形式)(&S)\tCtrl+F5",		IDM_EDIT_INSERT_SHORTDATE
+			MENUITEM "时间/日期(长形式)(&L)\tCtrl+Shift+F5",	IDM_EDIT_INSERT_LONGDATE
 			MENUITEM SEPARATOR
 			MENUITEM "编码标识符(&E)\tCtrl+F8",				IDM_EDIT_INSERT_ENCODING
 			MENUITEM "脚本 She&bang 行",						IDM_EDIT_INSERT_SHEBANG
@@ -385,18 +385,18 @@ BEGIN
 		MENUITEM "默认文本字体(&D)...",				IDM_VIEW_DEFAULT_TEXT_FONT
 		POPUP "光标样式(&A)"
 		BEGIN
-			MENUITEM "块状 (覆盖模式)(&O)",			IDM_VIEW_CARET_STYLE_BLOCK_OVR
+			MENUITEM "块状(覆盖模式)(&O)",			IDM_VIEW_CARET_STYLE_BLOCK_OVR
 			MENUITEM SEPARATOR
-			MENUITEM "块状 (插入模式)(&I)",			IDM_VIEW_CARET_STYLE_BLOCK
-			MENUITEM "竖线 宽度 &1",					IDM_VIEW_CARET_STYLE_WIDTH1
-			MENUITEM "竖线 宽度 &2",					IDM_VIEW_CARET_STYLE_WIDTH2
-			MENUITEM "竖线 宽度 &3",					IDM_VIEW_CARET_STYLE_WIDTH3
+			MENUITEM "块状(插入模式)(&I)",			IDM_VIEW_CARET_STYLE_BLOCK
+			MENUITEM "竖线(宽度 &1)",					IDM_VIEW_CARET_STYLE_WIDTH1
+			MENUITEM "竖线(宽度 &2)",					IDM_VIEW_CARET_STYLE_WIDTH2
+			MENUITEM "竖线(宽度 &3)",					IDM_VIEW_CARET_STYLE_WIDTH3
 			MENUITEM SEPARATOR
 			MENUITEM "不闪烁(&N)",					IDM_VIEW_CARET_STYLE_NOBLINK
 			MENUITEM "在选区内绘制块状光标(&S)",		IDM_VIEW_CARET_STYLE_SELECTION
 		END
 		MENUITEM SEPARATOR
-		MENUITEM "自动换行 (软换行)(&R)\tCtrl+W",		IDM_VIEW_WORDWRAP
+		MENUITEM "自动换行(软换行)(&R)\tCtrl+W",		IDM_VIEW_WORDWRAP
 		MENUITEM "长行标记(&L)\tCtrl+Shift+L",		IDM_VIEW_LONGLINEMARKER
 		MENUITEM "缩进辅助线(&G)\tCtrl+Shift+G",		IDM_VIEW_SHOWINDENTGUIDES
 		MENUITEM SEPARATOR
@@ -631,12 +631,12 @@ BEGIN
 				MENUITEM "标准(&S)",					IDM_VIEW_FONTQUALITY_STANDARD
 				MENUITEM "&ClearType",				IDM_VIEW_FONTQUALITY_CLEARTYPE
 			END
-			POPUP "从右至左（&RTL）布局 (GDI)"
+			POPUP "从右至左(&RTL)布局(GDI)"
 			BEGIN
 				MENUITEM "编辑窗口(&E)",				IDM_SET_RTL_LAYOUT_EDIT
 				MENUITEM "其他窗口(&O)",				IDM_SET_RTL_LAYOUT_OTHER
 			END
-			POPUP "双向文本(&B) (Direct2D)"
+			POPUP "双向文本(&B)(Direct2D)"
 			BEGIN
 				MENUITEM "无(&N)",					IDM_SET_BIDIRECTIONAL_NONE
 				MENUITEM "从左至右(&L)",				IDM_SET_BIDIRECTIONAL_L2R
@@ -657,7 +657,7 @@ BEGIN
 		MENUITEM "问题反馈(&I)",				IDM_HELP_REPORT_ISSUE
 		MENUITEM "功能请求(&F)",				IDM_HELP_FEATURE_REQUEST
 		MENUITEM SEPARATOR
-		MENUITEM "在线 &Wiki",				IDM_HELP_ONLINE_WIKI
+		MENUITEM "在线 Wiki(&W)",				IDM_HELP_ONLINE_WIKI
 		MENUITEM "命令行帮助(&C)",			IDM_CMDLINE_HELP
 		MENUITEM SEPARATOR
 		MENUITEM "关于 Notepad2(&A)\tF1",	IDM_HELP_ABOUT
@@ -945,16 +945,16 @@ BEGIN
     LTEXT           "",IDC_AUTHORNAME,130,38,200,8
     LTEXT           "",IDC_WEBPAGE_TEXT,45,48,200,8,NOT WS_VISIBLE | WS_DISABLED
     CONTROL         "",IDC_WEBPAGE_LINK,"SysLink",WS_TABSTOP,45,48,200,10
-    LTEXT           "访问 Notepad2 网站:",IDC_STATIC,45,60,140,8
+    LTEXT           "访问 Notepad2 网站: ",IDC_STATIC,45,60,140,8
     LTEXT           "",IDC_NEW_PAGE_TEXT,45,68,200,8,NOT WS_VISIBLE | WS_DISABLED
     CONTROL         "",IDC_NEW_PAGE_LINK,"SysLink",WS_TABSTOP,45,68,200,10
-    LTEXT           "访问 Notepad2-mod 网站：",IDC_STATIC,45,80,140,8
+    LTEXT           "访问 Notepad2-mod 网站: ",IDC_STATIC,45,80,140,8
     LTEXT           "",IDC_MOD_PAGE_TEXT,45,80,140,8,NOT WS_VISIBLE | WS_DISABLED
     CONTROL         "",IDC_MOD_PAGE_LINK,"SysLink",WS_TABSTOP,45,88,144,10
-    LTEXT           "访问 Scintilla 网站：",IDC_STATIC,45,100,140,8
+    LTEXT           "访问 Scintilla 网站: ",IDC_STATIC,45,100,140,8
     LTEXT           "",IDC_SCI_PAGE_TEXT,45,108,140,8,NOT WS_VISIBLE | WS_DISABLED
     CONTROL         "",IDC_SCI_PAGE_LINK,"SysLink",WS_TABSTOP,45,108,140,10
-    LTEXT           "联系 Florian Balmer：",IDC_STATIC,45,120,140,8
+    LTEXT           "联系 Florian Balmer: ",IDC_STATIC,45,120,140,8
     LTEXT           "",IDC_EMAIL_TEXT,45,128,140,8,NOT WS_VISIBLE | WS_DISABLED
     CONTROL         "",IDC_EMAIL_LINK,"SysLink",WS_TABSTOP,45,128,140,10
 END
@@ -964,7 +964,7 @@ STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_NOFAILCREATE | WS_POPUP | WS
 CAPTION "查找文本"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
-    LTEXT           "搜索字符串(&G):",IDC_STATIC,7,7,67,8
+    LTEXT           "搜索字符串(&G): ",IDC_STATIC,7,7,67,8
     COMBOBOX        IDC_FINDTEXT,7,17,210,116,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
     AUTOCHECKBOX    "匹配大小写(&C)",IDC_FINDCASE,7,37,73,10,WS_TABSTOP
     AUTOCHECKBOX    "只匹配完整单词(&W)",IDC_FINDWORD,7,49,110,10,WS_TABSTOP
@@ -982,9 +982,9 @@ BEGIN
     CONTROL         "<a>(?)</a>",IDC_WILDCARDHELP,"SysLink",0x0,208,61,14,10
     CONTROL         "<a>清除历史</a>",IDC_CLEAR_FIND,"SysLink",WS_TABSTOP,173,7,48,10
     AUTOCHECKBOX    "离开时透明",IDC_TRANSPARENT,7,96,124,10,WS_TABSTOP
-    CONTROL         "<a>转至替换 (Ctrl+H)</a>",IDC_TOGGLEFINDREPLACE, "SysLink",WS_TABSTOP,138,97,80,10
-    CONTROL         "<a>保存位置 (&O)</a>",IDC_SAVEPOSITION,"SysLink",WS_TABSTOP,223,85,60,10
-    CONTROL         "<a>重置位置 (&P)</a>",IDC_RESETPOSITION,"SysLink",WS_TABSTOP,223,96,60,10
+    CONTROL         "<a>转至替换(Ctrl+H)</a>",IDC_TOGGLEFINDREPLACE, "SysLink",WS_TABSTOP,138,97,80,10
+    CONTROL         "<a>保存位置(&O)</a>",IDC_SAVEPOSITION,"SysLink",WS_TABSTOP,223,85,60,10
+    CONTROL         "<a>重置位置(&P)</a>",IDC_RESETPOSITION,"SysLink",WS_TABSTOP,223,96,60,10
     SCROLLBAR       IDC_RESIZEGRIP2,230,96,10,10
 END
 
@@ -993,9 +993,9 @@ STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_NOFAILCREATE | WS_POPUP | WS
 CAPTION "替换文本"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
-    LTEXT           "搜索字符串(&G):",IDC_STATIC,7,7,65,8
+    LTEXT           "搜索字符串(&G): ",IDC_STATIC,7,7,65,8
     COMBOBOX        IDC_FINDTEXT,7,17,210,116,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
-    LTEXT           "替换为(&H):",IDC_STATIC,7,35,64,8
+    LTEXT           "替换为(&H): ",IDC_STATIC,7,35,64,8
     COMBOBOX        IDC_REPLACETEXT,7,46,209,116,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
     AUTOCHECKBOX    "匹配大小写(&C)",IDC_FINDCASE,7,66,53,10,WS_TABSTOP
     AUTOCHECKBOX    "只匹配完整单词(&W)",IDC_FINDWORD,7,78,105,10,WS_TABSTOP
@@ -1017,9 +1017,9 @@ BEGIN
     CONTROL         "<a>清除历史</a>",IDC_CLEAR_FIND,"SysLink",WS_TABSTOP,173,6,48,10
     CONTROL         "<a>清除历史</a>",IDC_CLEAR_REPLACE,"SysLink",WS_TABSTOP,173,35,48,10
     AUTOCHECKBOX    "离开时透明",IDC_TRANSPARENT,7,126,124,10,WS_TABSTOP
-    CONTROL         "<a>转至查找 (Ctrl+F)</a>",IDC_TOGGLEFINDREPLACE, "SysLink",WS_TABSTOP,138,127,80,10
-    CONTROL         "<a>保存位置 (&O)</a>",IDC_SAVEPOSITION,"SysLink",WS_TABSTOP,223,114,60,10
-    CONTROL         "<a>重置位置 (&P)</a>",IDC_RESETPOSITION,"SysLink",WS_TABSTOP,223,126,60,10
+    CONTROL         "<a>转至查找(Ctrl+F)</a>",IDC_TOGGLEFINDREPLACE, "SysLink",WS_TABSTOP,138,127,80,10
+    CONTROL         "<a>保存位置(&O)</a>",IDC_SAVEPOSITION,"SysLink",WS_TABSTOP,223,114,60,10
+    CONTROL         "<a>重置位置(&P)</a>",IDC_RESETPOSITION,"SysLink",WS_TABSTOP,223,126,60,10
     SCROLLBAR       IDC_RESIZEGRIP2,230,126,10,10
 END
 
@@ -1055,13 +1055,13 @@ STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSM
 CAPTION "编码"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    LTEXT           "默认编码(&D):",IDC_STATIC,7,7,195,8
+    LTEXT           "默认编码(&D): ",IDC_STATIC,7,7,195,8
     EDITTEXT        IDC_ENCODING_LABEL,7,20,195,14,ES_READONLY | ES_AUTOHSCROLL | WS_TABSTOP
-    CONTROL         "<a>点击此处选择默认编码。</a>",IDC_ENCODING_LINK,"SysLink",WS_TABSTOP,7,38,195,10
-    AUTOCHECKBOX    "跳过基于统计的 &Unicode (UTF-16) 检测。",IDC_NOUNICODEDETECTION,7,52,195,10,WS_TABSTOP
-    AUTOCHECKBOX    "使用 UTF-8 打开 &ANSI (未知编码) 文件。",IDC_ANSIASUTF8,7,62,195,10,WS_TABSTOP
-    AUTOCHECKBOX    "使用 DOS-437 打开 ANSI Art（*.&nfo, *.diz）文件。",IDC_NFOASOEM,7,72,195,10,WS_TABSTOP
-    AUTOCHECKBOX    "不解析编码标签(&T)。",IDC_ENCODINGFROMFILEVARS,7,82,195,10,WS_TABSTOP
+    CONTROL         "<a>点击此处选择默认编码</a>",IDC_ENCODING_LINK,"SysLink",WS_TABSTOP,7,38,195,10
+    AUTOCHECKBOX    "跳过基于统计的 &Unicode (UTF-16)检测",IDC_NOUNICODEDETECTION,7,52,195,10,WS_TABSTOP
+    AUTOCHECKBOX    "使用 UTF-8 打开 &ANSI (未知编码)文件",IDC_ANSIASUTF8,7,62,195,10,WS_TABSTOP
+    AUTOCHECKBOX    "使用 DOS-437 打开 ANSI Art (*.&nfo, *.diz)文件",IDC_NFOASOEM,7,72,195,10,WS_TABSTOP
+    AUTOCHECKBOX    "不解析编码标签(&T)",IDC_ENCODINGFROMFILEVARS,7,82,195,10,WS_TABSTOP
     DEFPUSHBUTTON   "确定",IDOK,96,98,50,14
     PUSHBUTTON      "取消",IDCANCEL,152,98,50,14
 END
@@ -1071,11 +1071,11 @@ STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSM
 CAPTION "换行符"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    LTEXT           "默认行换行符(&D):",IDC_STATIC,7,7,116,8
+    LTEXT           "默认行换行符(&D): ",IDC_STATIC,7,7,116,8
     COMBOBOX        IDC_EOLMODELIST,7,20,118,81,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    AUTOCHECKBOX    "打开文件时显示换行符不一致警告。",IDC_WARNINCONSISTENTEOLS,7,40,186,10,WS_TABSTOP
-    AUTOCHECKBOX    "保存文件时确保换行符一致(&E)。",IDC_CONSISTENTEOLS,7,52,182,10,WS_TABSTOP
-    AUTOCHECKBOX    "保存文件时去除行尾空白(&S)。",IDC_AUTOSTRIPBLANKS,7,64,173,10,WS_TABSTOP
+    AUTOCHECKBOX    "打开文件时显示换行符不一致警告",IDC_WARNINCONSISTENTEOLS,7,40,186,10,WS_TABSTOP
+    AUTOCHECKBOX    "保存文件时确保换行符一致(&E)",IDC_CONSISTENTEOLS,7,52,182,10,WS_TABSTOP
+    AUTOCHECKBOX    "保存文件时去除行尾空白(&S)",IDC_AUTOSTRIPBLANKS,7,64,173,10,WS_TABSTOP
     DEFPUSHBUTTON   "确定",IDOK,139,7,50,14
     PUSHBUTTON      "取消",IDCANCEL,139,24,50,14
 END
@@ -1085,10 +1085,10 @@ STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSM
 CAPTION "换行符不一致"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    LTEXT           "该文件中的换行符不一致：",IDC_STATIC,7,7,180,8
-    LTEXT           "CR+LF:",IDC_STATIC,10,18,34,8,SS_RIGHT
-    LTEXT           "LF:",IDC_STATIC,10,28,34,8,SS_RIGHT
-    LTEXT           "CR:",IDC_STATIC,10,38,34,8,SS_RIGHT
+    LTEXT           "该文件中的换行符不一致: ",IDC_STATIC,7,7,180,8
+    LTEXT           "CR+LF: ",IDC_STATIC,10,18,34,8,SS_RIGHT
+    LTEXT           "LF: ",IDC_STATIC,10,28,34,8,SS_RIGHT
+    LTEXT           "CR: ",IDC_STATIC,10,38,34,8,SS_RIGHT
     LTEXT           "%s 行。",IDC_EOL_SUM_CRLF,48,18,136,8
     LTEXT           "%s 行。",IDC_EOL_SUM_LF,48,28,136,8
     LTEXT           "%s 行。",IDC_EOL_SUM_CR,48,38,136,8
@@ -1096,7 +1096,7 @@ BEGIN
     COMBOBOX        IDC_EOLMODELIST,7,64,118,81,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     PUSHBUTTON      "是(&Y)",IDOK,138,63,50,14
     PUSHBUTTON      "否(&N)",IDCANCEL,138,80,50,14
-    AUTOCHECKBOX    "总是显示此对话框(&A)。",IDC_WARNINCONSISTENTEOLS,7,82,118,10,WS_TABSTOP
+    AUTOCHECKBOX    "总是显示此对话框(&A)",IDC_WARNINCONSISTENTEOLS,7,82,118,10,WS_TABSTOP
 END
 
 IDD_LINENUM DIALOGEX 0, 0, 166, 70
@@ -1104,9 +1104,9 @@ STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSM
 CAPTION "转到"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
-    LTEXT           "行(&L) (留空 或 1 - %s):",IDC_LINE_RANGE,7,7,150,8
+    LTEXT           "行(&L)(留空 或 1 - %s): ",IDC_LINE_RANGE,7,7,150,8
     EDITTEXT        IDC_LINENUM,7,18,90,14,ES_AUTOHSCROLL
-    LTEXT           "列(&C) (留空 或 1 - %s):",IDC_COLUMN_RANGE,7,37,150,8
+    LTEXT           "列(&C)(留空 或 1 - %s): ",IDC_COLUMN_RANGE,7,37,150,8
     EDITTEXT        IDC_COLNUM,7,48,90,14,ES_AUTOHSCROLL
     DEFPUSHBUTTON   "确定",IDOK,109,18,50,14
     PUSHBUTTON      "取消",IDCANCEL,109,48,50,14
@@ -1118,7 +1118,7 @@ CAPTION "打开最近的文件"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     CONTROL         "",IDC_FILEMRU,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_SHAREIMAGELISTS | LVS_AUTOARRANGE | LVS_NOCOLUMNHEADER | WS_BORDER | WS_TABSTOP,7,7,212,158
-    AUTOCHECKBOX    "退出时记住最近的文件(&R)。",IDC_SAVEMRU,7,169,114,10,WS_TABSTOP
+    AUTOCHECKBOX    "退出时记住最近的文件(&R)",IDC_SAVEMRU,7,169,114,10,WS_TABSTOP
     CONTROL         "<a>清除历史</a>",IDC_EMPTY_MRU,"SysLink",WS_TABSTOP,172,169,48,10
     DEFPUSHBUTTON   "确定",IDOK,113,183,50,14,WS_DISABLED
     PUSHBUTTON      "取消",IDCANCEL,169,183,50,14
@@ -1132,10 +1132,10 @@ FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
     AUTORADIOBUTTON "无(&N)",IDC_CHANGENOTIFY_NONE,7,7,35,10,WS_GROUP | WS_TABSTOP
     AUTORADIOBUTTON "显示消息(&S)",IDC_CHANGENOTIFY_SHOW_MSG,7,19,71,10,WS_TABSTOP
-    AUTORADIOBUTTON "自动重新加载（如未修改）(&A)",IDC_CHANGENOTIFY_AUTO_RELOAD,7,31,114,10,WS_TABSTOP
-    AUTOCHECKBOX    "依靠轮询而非通知检测文件变更(&P)。",IDC_CHANGENOTIFY_USE_POLLING,7,48,184,10,WS_TABSTOP
-    AUTOCHECKBOX    "重新加载后保持在文件结尾(&K)。",IDC_CHANGENOTIFY_KEEP_AT_END,7,60,184,10,WS_TABSTOP
-    AUTOCHECKBOX    "新文件被打开时重置(&R)。",IDC_CHANGENOTIFY_RESET_WATCH,7,72,184,10,WS_TABSTOP
+    AUTORADIOBUTTON "自动重新加载(如未修改)(&A)",IDC_CHANGENOTIFY_AUTO_RELOAD,7,31,114,10,WS_TABSTOP
+    AUTOCHECKBOX    "依靠轮询而非通知检测文件变更(&P)",IDC_CHANGENOTIFY_USE_POLLING,7,48,184,10,WS_TABSTOP
+    AUTOCHECKBOX    "重新加载后保持在文件结尾(&K)",IDC_CHANGENOTIFY_KEEP_AT_END,7,60,184,10,WS_TABSTOP
+    AUTOCHECKBOX    "新文件被打开时重置(&R)",IDC_CHANGENOTIFY_RESET_WATCH,7,72,184,10,WS_TABSTOP
     DEFPUSHBUTTON   "确定",IDOK,139,7,50,14
     PUSHBUTTON      "取消",IDCANCEL,139,24,50,14
 END
@@ -1177,8 +1177,8 @@ BEGIN
     ICON            IDI_STYLES,IDC_STATIC,189,19,20,20
     LTEXT           "自定义语法高亮",IDC_TITLE,220,25,200,12
     EDITTEXT        IDC_STYLEEDIT_HELP,186,40,272,86,ES_READONLY | ES_MULTILINE | NOT WS_BORDER | NOT WS_TABSTOP
-    LTEXT           "关联的文件扩展名(&N)：|样式设置(&S)：",IDC_STYLELABELS,315,230,152,8,NOT WS_VISIBLE
-    LTEXT           "内置默认值：",IDC_STYLELABEL_DEFAULT,181,162,160,8
+    LTEXT           "关联的文件扩展名(&N): |样式设置(&S): ",IDC_STYLELABELS,315,230,152,8,NOT WS_VISIBLE
+    LTEXT           "内置默认值: ",IDC_STYLELABEL_DEFAULT,181,162,160,8
     EDITTEXT        IDC_STYLEVALUE_DEFAULT,181,172,280,18,ES_READONLY | ES_MULTILINE | ES_AUTOVSCROLL | WS_VSCROLL
     SCROLLBAR       IDC_RESIZEGRIP3,7,217,10,10
 END
@@ -1188,9 +1188,9 @@ STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSM
 CAPTION "制表符设置"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
-    LTEXT           "制表符宽度(&T):",IDC_STATIC,7,10,67,8
+    LTEXT           "制表符宽度(&T): ",IDC_STATIC,7,10,67,8
     EDITTEXT        IDC_TAB_WIDTH,78,7,30,14,ES_NUMBER | ES_AUTOHSCROLL
-    LTEXT           "缩进长度(&I):",IDC_STATIC,7,30,69,8
+    LTEXT           "缩进长度(&I): ",IDC_STATIC,7,30,69,8
     EDITTEXT        IDC_INDENT_WIDTH,78,27,30,14,ES_NUMBER | ES_AUTOHSCROLL
     AUTOCHECKBOX    "插入制表符为空格(&S)",IDC_TAB_AS_SPACE,7,47,101,10,WS_TABSTOP
     AUTOCHECKBOX    "Tab 键重新格式化缩进(&K)",IDC_TAB_INDENT,7,59,139,10,WS_TABSTOP
@@ -1204,7 +1204,7 @@ STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSM
 CAPTION "长行标记"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
-    LTEXT           "长行长度(&L):",IDC_STATIC,7,10,85,8
+    LTEXT           "长行长度(&L): ",IDC_STATIC,7,10,85,8
     EDITTEXT        IDC_LONGLINE_LIMIT,91,7,30,14,ES_NUMBER | ES_AUTOHSCROLL
     AUTORADIOBUTTON "显示边缘线(&G)",IDC_LONGLINE_EDGE_LINE,7,27,75,10,WS_GROUP | WS_TABSTOP
     AUTORADIOBUTTON "改变背景色(&B)",IDC_LONGLINE_BACK_COLOR,7,38,114,10,WS_TABSTOP
@@ -1223,9 +1223,9 @@ BEGIN
     COMBOBOX        IDC_WRAP_MODE,7,58,236,196,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     DEFPUSHBUTTON   "确定",IDOK,137,118,50,14
     PUSHBUTTON      "取消",IDCANCEL,193,118,50,14
-    LTEXT           "无换行缩进|换行缩进1个字符|换行缩进2个字符|换行缩进1层|换行缩进2层|换行缩进同首个子行|换行缩进比首个子行多1层|换行缩进比首个子行多2层",IDC_WRAP_INDENT_OPTIONS,0,0,615,8,NOT WS_VISIBLE
-    LTEXT           "换行前无换行符|换行前显示换行符 (文本附近)|换行前显示换行符 (边缘附近)",IDC_WRAP_SYMBOL_BEFORE_OPTIONS,0,0,418,8,NOT WS_VISIBLE
-    LTEXT           "换行后无换行符|换行后显示换行符 (文本附近)|换行后显示换行符 (边缘附近)|换行后显示换行符 (在行号列)",IDC_WRAP_SYMBOL_AFTER_OPTIONS,0,0,402,8,NOT WS_VISIBLE
+    LTEXT           "无换行缩进|换行缩进 1 个字符|换行缩进 2 个字符|换行缩进 1 层|换行缩进 2 层|换行缩进同首个子行|换行缩进比首个子行多 1 层|换行缩进比首个子行多 2 层",IDC_WRAP_INDENT_OPTIONS,0,0,615,8,NOT WS_VISIBLE
+    LTEXT           "换行前无换行符|换行前显示换行符(文本附近)|换行前显示换行符(边缘附近)",IDC_WRAP_SYMBOL_BEFORE_OPTIONS,0,0,418,8,NOT WS_VISIBLE
+    LTEXT           "换行后无换行符|换行后显示换行符(文本附近)|换行后显示换行符(边缘附近)|换行后显示换行符(在行号列)",IDC_WRAP_SYMBOL_AFTER_OPTIONS,0,0,402,8,NOT WS_VISIBLE
     LTEXT           "无换行|单词之间换行|任何字符之间换行|空白字符处换行|自动单词换行",IDC_WRAP_MODE_OPTIONS,0,0,187,8,NOT WS_VISIBLE
     GROUPBOX        "对换行的文本",IDC_STATIC,7,74,235,38
     AUTOCHECKBOX    "从左边界选择行时只选中子行",IDC_WRAP_SELECT_SUBLINE,14,84,220,10,WS_TABSTOP
@@ -1238,32 +1238,32 @@ CAPTION "页面设置"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     GROUPBOX        "纸张",IDC_PAGESETUP_PAGER_BOX,8,8,224,56,WS_GROUP
-    LTEXT           "大小(&Z):",IDC_PAGESETUP_SIZE,16,24,36,8
+    LTEXT           "大小(&Z): ",IDC_PAGESETUP_SIZE,16,24,36,8
     COMBOBOX        IDC_PAGESETUP_SOURCE_LIST,64,23,160,160,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_GROUP | WS_TABSTOP
-    LTEXT           "来源(&S):",IDC_PAGESETUP_SOURCE_LABEL,16,45,36,8
+    LTEXT           "来源(&S): ",IDC_PAGESETUP_SOURCE_LABEL,16,45,36,8
     COMBOBOX        IDC_PAGESETUP_ORIENTATION_LIST,64,42,160,160,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_GROUP | WS_TABSTOP
     GROUPBOX        "方向",IDC_PAGESETUP_ORIENTATION_BOX,8,69,64,56,WS_GROUP
     AUTORADIOBUTTON "纵向(&O)",IDC_PAGESETUP_PORTRAIT,16,82,52,12,WS_GROUP | WS_TABSTOP
     AUTORADIOBUTTON "横向(&A)",IDC_PAGESETUP_LANDSCAPE,16,103,52,12,WS_TABSTOP
     GROUPBOX        "页边距",IDC_PAGESETUP_MARGIN_BOX,80,69,152,56,WS_GROUP
-    LTEXT           "左(&L):",IDC_PAGESETUP_MARGIN_LEFT_LABEL,88,85,32,8
+    LTEXT           "左(&L): ",IDC_PAGESETUP_MARGIN_LEFT_LABEL,88,85,32,8
     EDITTEXT        IDC_PAGESETUP_MARGIN_LEFT,120,82,28,12,ES_NUMBER | WS_GROUP
-    LTEXT           "上(&T):",IDC_PAGESETUP_MARGIN_TOP_LABEL,88,104,32,8
+    LTEXT           "上(&T): ",IDC_PAGESETUP_MARGIN_TOP_LABEL,88,104,32,8
     EDITTEXT        IDC_PAGESETUP_MARGIN_RIGHT,120,103,28,12,ES_NUMBER | WS_GROUP
-    LTEXT           "右(&R):",IDC_PAGESETUP_MARGIN_RIGHT_LABEL,164,85,32,8
+    LTEXT           "右(&R): ",IDC_PAGESETUP_MARGIN_RIGHT_LABEL,164,85,32,8
     EDITTEXT        IDC_PAGESETUP_MARGIN_TOP,196,82,28,12,ES_NUMBER | WS_GROUP
-    LTEXT           "下(&B):",IDC_PAGESETUP_MARGIN_BOTTOM_LABEL,164,104,32,8
+    LTEXT           "下(&B): ",IDC_PAGESETUP_MARGIN_BOTTOM_LABEL,164,104,32,8
     EDITTEXT        IDC_PAGESETUP_MARGIN_BOOTOM,196,103,28,12,ES_NUMBER | WS_GROUP
     GROUPBOX        "页眉和页脚",IDC_PAGESETUP_HEADER_FOOTER_BOX,8,130,224,56,WS_GROUP
-    LTEXT           "页眉(&H):",IDC_STATIC,16,146,36,8
+    LTEXT           "页眉(&H): ",IDC_STATIC,16,146,36,8
     COMBOBOX        IDC_PAGESETUP_HEADER_LIST,64,145,160,160,CBS_DROPDOWNLIST | WS_VSCROLL | WS_GROUP | WS_TABSTOP
-    LTEXT           "页脚(&F):",IDC_STATIC,16,167,36,8
+    LTEXT           "页脚(&F): ",IDC_STATIC,16,167,36,8
     COMBOBOX        IDC_PAGESETUP_FOOTER_LIST,64,164,160,160,CBS_DROPDOWNLIST | WS_VSCROLL | WS_GROUP | WS_TABSTOP
     GROUPBOX        "打印颜色",1076,8,191,224,37,WS_GROUP
-    LTEXT           "模式(&D):",IDC_STATIC,16,207,36,8
+    LTEXT           "模式(&D): ",IDC_STATIC,16,207,36,8
     COMBOBOX        IDC_PAGESETUP_COLOR_MODE_LIST,64,206,160,160,CBS_DROPDOWNLIST | WS_VSCROLL | WS_GROUP | WS_TABSTOP
     GROUPBOX        "缩放",IDC_STATIC,240,170,108,58,WS_GROUP
-    LTEXT           "打印缩放(&M) (10% 到 500%):",IDC_STATIC,248,188,94,8
+    LTEXT           "打印缩放(&M)(10% 到 500%): ",IDC_STATIC,248,188,94,8
     COMBOBOX        IDC_PAGESETUP_ZOOMLEVEL,290,206,50,120,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
     DEFPUSHBUTTON   "确定",IDOK,187,239,50,14,WS_GROUP
     PUSHBUTTON      "取消",IDCANCEL,243,239,50,14
@@ -1292,7 +1292,7 @@ STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSM
 CAPTION "添加到收藏夹"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    LTEXT           "请输入新收藏项的名称：",IDC_FAVORITESDESCR,7,7,240,8
+    LTEXT           "请输入新收藏项的名称: ",IDC_FAVORITESDESCR,7,7,240,8
     EDITTEXT        IDC_FAVORITESFILE,7,22,240,14,ES_AUTOHSCROLL
     DEFPUSHBUTTON   "确定",IDOK,141,45,50,14,WS_DISABLED
     PUSHBUTTON      "取消",IDCANCEL,197,45,50,14
@@ -1304,7 +1304,7 @@ STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSM
 CAPTION "断行"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
-    LTEXT           "长度(&B):",IDC_STATIC,7,7,34,8
+    LTEXT           "长度(&B): ",IDC_STATIC,7,7,34,8
     EDITTEXT        IDC_COLUMNWRAP,7,24,54,14,ES_NUMBER | ES_AUTOHSCROLL
     DEFPUSHBUTTON   "确定",IDOK,73,7,50,14
     PUSHBUTTON      "取消",IDCANCEL,73,24,50,14
@@ -1315,9 +1315,9 @@ STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSM
 CAPTION "行修改"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
-    LTEXT           "每行前缀文本(&P):",IDC_STATIC,7,6,96,8
+    LTEXT           "每行前缀文本(&P): ",IDC_STATIC,7,6,96,8
     EDITTEXT        IDC_MODIFY_LINE_PREFIX,7,18,246,18,ES_MULTILINE | ES_AUTOVSCROLL | WS_VSCROLL | ES_WANTRETURN
-    LTEXT           "每行后缀文本(&A):",IDC_MODIFY_LINE_TIP2,7,41,97,8
+    LTEXT           "每行后缀文本(&A): ",IDC_MODIFY_LINE_TIP2,7,41,97,8
     EDITTEXT        IDC_MODIFY_LINE_APPEND,7,52,246,18,ES_MULTILINE | ES_AUTOVSCROLL | WS_VSCROLL | ES_WANTRETURN
     DEFPUSHBUTTON   "确定",IDOK,147,108,50,14
     PUSHBUTTON      "取消",IDCANCEL,203,108,50,14
@@ -1329,7 +1329,7 @@ BEGIN
     LTEXT           "连续编号。",IDC_MODIFY_LINE_TIP_CN,51,86,107,8
     LTEXT           "$(I)",IDC_MODIFY_LINE_ZCN_NP,7,96,21,8
     LTEXT           "$(0I)",IDC_MODIFY_LINE_ZCN_ZP,27,96,25,8
-    LTEXT           "连续编号（从 0 开始）。",IDC_MODIFY_LINE_TIP_ZCN,51,96,125,8
+    LTEXT           "连续编号(从 0 开始)。",IDC_MODIFY_LINE_TIP_ZCN,51,96,125,8
     SCROLLBAR       IDC_RESIZEGRIP2,7,108,10,10
 END
 
@@ -1338,9 +1338,9 @@ STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSM
 CAPTION "插入 HTML/XML 标签"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
-    LTEXT           "开始标签 (附属性)(&O):",IDC_STATIC,7,7,130,8
+    LTEXT           "开始标签(附属性)(&O): ",IDC_STATIC,7,7,130,8
     EDITTEXT        IDC_MODIFY_LINE_PREFIX,7,18,250,18,ES_MULTILINE | ES_AUTOVSCROLL | WS_VSCROLL | ES_WANTRETURN
-    LTEXT           "闭合标签 (可编辑)(&C):",IDC_MODIFY_LINE_TIP2,7,41,118,8
+    LTEXT           "闭合标签(可编辑)(&C): ",IDC_MODIFY_LINE_TIP2,7,41,118,8
     EDITTEXT        IDC_MODIFY_LINE_APPEND,7,52,250,18,ES_MULTILINE | ES_AUTOVSCROLL | WS_VSCROLL | ES_WANTRETURN
     DEFPUSHBUTTON   "确定",IDOK,151,77,50,14
     PUSHBUTTON      "取消",IDCANCEL,207,77,50,14
@@ -1352,7 +1352,7 @@ STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSM
 CAPTION "围住选中文本(&E)"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
-    LTEXT           "选中部分之前插入(&B):",IDC_STATIC,7,7,114,8
+    LTEXT           "选中部分之前插入(&B): ",IDC_STATIC,7,7,114,8
     EDITTEXT        IDC_MODIFY_LINE_PREFIX,7,18,234,18,ES_MULTILINE | ES_AUTOVSCROLL | WS_VSCROLL | ES_WANTRETURN
     LTEXT           "选中部分之后插入(&A)",IDC_MODIFY_LINE_TIP2,7,41,116,8
     EDITTEXT        IDC_MODIFY_LINE_APPEND,7,52,234,18,ES_MULTILINE | ES_AUTOVSCROLL | WS_VSCROLL | ES_WANTRETURN
@@ -1399,7 +1399,7 @@ BEGIN
     AUTOCHECKBOX    "删除唯一行(&U)",IDC_SORT_REMOVE_UNIQUE,7,74,100,10,WS_TABSTOP
     AUTOCHECKBOX    "不区分大小写(&C)",IDC_SORT_IGNORE_CASE,7,92,81,10,WS_TABSTOP
     AUTOCHECKBOX    "逻辑数字比较(&N)",IDC_SORT_LOGICAL_NUMBER,7,104,130,10,WS_TABSTOP
-    AUTOCHECKBOX    "列排序 (矩形选择)",IDC_SORT_COLUMN,7,122,150,10,WS_TABSTOP
+    AUTOCHECKBOX    "列排序(矩形选择)",IDC_SORT_COLUMN,7,122,150,10,WS_TABSTOP
     DEFPUSHBUTTON   "确定",IDOK,127,7,50,14
     PUSHBUTTON      "取消",IDCANCEL,127,24,50,14
 END
@@ -1438,7 +1438,7 @@ BEGIN
     AUTORADIOBUTTON "右对齐(&R)",IDC_ALIGN_RIGHT,7,19,35,10,WS_TABSTOP
     AUTORADIOBUTTON "居中对齐(&C)",IDC_ALIGN_CENTER,7,31,41,10,WS_TABSTOP
     AUTORADIOBUTTON "两端对齐(&J)",IDC_ALIGN_JUSTIFY,7,43,40,10,WS_TABSTOP
-    AUTORADIOBUTTON "两端对齐 (段落模式)(&P)",IDC_ALIGN_JUSTIFY_PAR,7,55,124,10,WS_TABSTOP
+    AUTORADIOBUTTON "两端对齐(段落模式)(&P)",IDC_ALIGN_JUSTIFY_PAR,7,55,124,10,WS_TABSTOP
     DEFPUSHBUTTON   "确定",IDOK,127,7,50,14
     PUSHBUTTON      "取消",IDCANCEL,127,24,50,14
 END
@@ -1448,7 +1448,7 @@ STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSM
 CAPTION "缩放级别"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
-    LTEXT           "缩放级别 (10% 到 500%):",IDC_STATIC,7,7,106,8
+    LTEXT           "缩放级别(10% 到 500%): ",IDC_STATIC,7,7,106,8
     COMBOBOX        IDC_ZOOMLEVEL,7,19,50,120,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
     PUSHBUTTON      "应用",IDYES,63,18,50,14
     DEFPUSHBUTTON   "确定",IDOK,7,43,50,14
@@ -1461,32 +1461,32 @@ CAPTION "自动完成设置"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
     AUTOCHECKBOX    "自动缩进文本",IDC_AUTO_INDENT_TEXT,7,7,120,10,WS_TABSTOP
-    AUTOCHECKBOX    "自动闭合 HTML 和 XML 标签",IDC_AUTO_CLOSE_TAGS,7,19,120,10,WS_TABSTOP
+    AUTOCHECKBOX    "自动闭合 HTML/XML 标签",IDC_AUTO_CLOSE_TAGS,7,19,120,10,WS_TABSTOP
     GROUPBOX        "",IDC_STATIC,7,35,218,82
     AUTOCHECKBOX    "输入时自动完成单词",IDC_AUTO_COMPLETE_WORD,14,34,122,10,WS_TABSTOP
-    LTEXT           "自动完成列表中显示项目数:",IDC_STATIC,14,46,148,10,SS_RIGHT
+    LTEXT           "自动完成列表中显示项目数: ",IDC_STATIC,14,46,148,10,SS_RIGHT
     EDITTEXT        IDC_AUTOC_VISIBLE_ITEM_COUNT,166,44,50,12,ES_NUMBER | WS_TABSTOP
-    LTEXT           "单词最小长度:",IDC_STATIC,14,62,148,10,SS_RIGHT
+    LTEXT           "单词最小长度: ",IDC_STATIC,14,62,148,10,SS_RIGHT
     EDITTEXT        IDC_AUTOC_MIN_WORD_LENGTH,166,60,50,12,ES_NUMBER | WS_TABSTOP
-    LTEXT           "数字最小长度 (无前缀):",IDC_STATIC,14,78,148,10,SS_RIGHT
+    LTEXT           "数字最小长度(无前缀): ",IDC_STATIC,14,78,148,10,SS_RIGHT
     EDITTEXT        IDC_AUTOC_MIN_NUMBER_LENGTH,166,76,50,12,ES_NUMBER | WS_TABSTOP
-    AUTOCHECKBOX    "扫描当前文档中的单词。",IDC_AUTOC_SCAN_DOCUMENT_WORDS,14,92,160,10,WS_TABSTOP
-    AUTOCHECKBOX    "仅在英文输入法模式下触发自动完成。",IDC_AUTOC_ENGLISH_IME_ONLY,14,104,180,10,WS_TABSTOP
-    GROUPBOX        "按键完成自动完成 (使用 Esc 键取消)",IDC_STATIC,7,123,218,44
+    AUTOCHECKBOX    "扫描当前文档中的单词",IDC_AUTOC_SCAN_DOCUMENT_WORDS,14,92,160,10,WS_TABSTOP
+    AUTOCHECKBOX    "仅在英文输入法模式下触发自动完成",IDC_AUTOC_ENGLISH_IME_ONLY,14,104,180,10,WS_TABSTOP
+    GROUPBOX        "按键完成自动完成(使用 Esc 键取消)",IDC_STATIC,7,123,218,44
     AUTOCHECKBOX    "Enter",IDC_AUTOC_FILLUP_ENTER,14,135,35,10,WS_TABSTOP
     AUTOCHECKBOX    "Tab",IDC_AUTOC_FILLUP_TAB,66,135,35,10,WS_TABSTOP
     AUTOCHECKBOX    "空格",IDC_AUTOC_FILLUP_SPACE,118,135,35,10,WS_TABSTOP
-    AUTOCHECKBOX    "标点符号:",IDC_AUTOC_FILLUP_PUNCTUATION,14,152,50,10,WS_TABSTOP
+    AUTOCHECKBOX    "标点符号: ",IDC_AUTOC_FILLUP_PUNCTUATION,14,152,50,10,WS_TABSTOP
     EDITTEXT        IDC_AUTOC_FILLUP_PUNCTUATION_LIST,66,150,150,12,WS_TABSTOP
     GROUPBOX        "自动插入",IDC_STATIC,231,7,218,110
-    AUTOCHECKBOX    ") 在输入 ( 后。",IDC_AUTO_INSERT_PARENTHESIS,238,19,80,10,WS_TABSTOP
-    AUTOCHECKBOX    "} 在输入 { 后。",IDC_AUTO_INSERT_BRACE,238,31,80,10,WS_TABSTOP
-    AUTOCHECKBOX    "] 在输入 [ 后，但 Smali、Jasmin 和 javap 除外。",IDC_AUTO_INSERT_SQUARE_BRACKET,238,43,210,10,WS_TABSTOP
-    AUTOCHECKBOX    "> 在输入 < 后，当 <> 用于泛型/模板中。",IDC_AUTO_INSERT_ANGLE_BRACKET,238,55,210,10,WS_TABSTOP
-    AUTOCHECKBOX    "双引号 ("")，当 """" 用于字符串/字节。",IDC_AUTO_INSERT_DOUBLE_QUOTE,238,67,210,10,WS_TABSTOP
-    AUTOCHECKBOX    "单引号 (')，当 '' 用于字符串/字节。",IDC_AUTO_INSERT_SINGLE_QUOTE,238,79,210,10,WS_TABSTOP
-    AUTOCHECKBOX    "反引号 (`)。",IDC_AUTO_INSERT_BACKTICK,238,91,80,10,WS_TABSTOP
-    AUTOCHECKBOX    "适当时输入逗号 (,) 后添加空格。",IDC_AUTO_INSERT_SPACE_COMMA,238,103,180,10,WS_TABSTOP
+    AUTOCHECKBOX    ") 在输入 ( 后",IDC_AUTO_INSERT_PARENTHESIS,238,19,80,10,WS_TABSTOP
+    AUTOCHECKBOX    "} 在输入 { 后",IDC_AUTO_INSERT_BRACE,238,31,80,10,WS_TABSTOP
+    AUTOCHECKBOX    "] 在输入 [ 后，但 Smali、Jasmin 和 javap 除外",IDC_AUTO_INSERT_SQUARE_BRACKET,238,43,210,10,WS_TABSTOP
+    AUTOCHECKBOX    "> 在输入 < 后，当 <> 用于泛型/模板中",IDC_AUTO_INSERT_ANGLE_BRACKET,238,55,210,10,WS_TABSTOP
+    AUTOCHECKBOX    "双引号 ("")，当 """" 用于字符串/字节",IDC_AUTO_INSERT_DOUBLE_QUOTE,238,67,210,10,WS_TABSTOP
+    AUTOCHECKBOX    "单引号 (')，当 '' 用于字符串/字节",IDC_AUTO_INSERT_SINGLE_QUOTE,238,79,210,10,WS_TABSTOP
+    AUTOCHECKBOX    "反引号 (`)",IDC_AUTO_INSERT_BACKTICK,238,91,80,10,WS_TABSTOP
+    AUTOCHECKBOX    "适当时输入逗号 (,) 后添加空格",IDC_AUTO_INSERT_SPACE_COMMA,238,103,180,10,WS_TABSTOP
     GROUPBOX        "用来切换汇编源代码行注释的字符",IDC_STATIC,231,123,218,26
     AUTORADIOBUTTON "分号 (;)",IDC_ASM_LINE_COMMENT_SEMICOLON,238,135,60,10,WS_GROUP | WS_TABSTOP
     AUTORADIOBUTTON "#",IDC_ASM_LINE_COMMENT_SHARP,316,135,22,10,WS_TABSTOP
@@ -1728,12 +1728,12 @@ BEGIN
     IDS_APPTITLE_ELEVATED   "%s (管理员)"
     IDS_APPTITLE_PASTEBOARD "Notepad2: 粘贴板"
     IDS_UNTITLED            "未命名"
-    IDS_TITLEEXCERPT        """%s"""
+    IDS_TITLEEXCERPT        "“%s”"
     IDS_READONLY            "(只读)"
 	IDS_LOCKED				"(编辑锁定)"
-    IDS_DOCPOS              "行 %s / %s  列 %s / %s  字符 %s / %s  选择 %s / %s  已选行 %s  找到 %s"
-    IDS_LOADFILE            "正在载入 ""%s""..."
-    IDS_SAVEFILE            "正在保存 “%s”..."
+    IDS_DOCPOS              "行 %s/%s  列 %s/%s  字符 %s/%s  选择 %s/%s  已选行 %s  找到 %s"
+    IDS_LOADFILE            "正在载入“%s”..."
+    IDS_SAVEFILE            "正在保存“%s”..."
     IDS_PRINTFILE           "正在打印页面 %s..."
     IDS_SAVINGSETTINGS      "正在保存设置..."
     IDS_LINKDESCRIPTION     "用 Notepad2 编辑"
@@ -1744,46 +1744,46 @@ END
 STRINGTABLE
 BEGIN
 	IDS_BACKSLASHHELP		"反斜杠转义\n\n\
-\\a\t警报 (BEL, ASCII 7)\n\
-\\b\t退格 (BS, ASCII 8)\n\
-\\e\t转义/中断 (ESC, ASCII 27 / 1B)\n\
-\\f\t换页 (FF, ASCII 12 / 0C)\n\
-\\n\t换行 (LF, ASCII 10 / 0A)\n\
-\\r\t回车 (CR, ASCII 13 / 0D)\n\
-\\t\t水平制表符 (HT, ASCII 9)\n\
-\\v\t垂直制表符 (VT, ASCII 11 / 0B)\n\
-\\ooo\t八进制值\n\
-\\uHHHH\t十六进制值\n\
-\\xHH\t十六进制值\n\
-\\\\\t反斜杠"
+\\a\t警报 (BEL, ASCII 7)。\n\
+\\b\t退格 (BS, ASCII 8)。\n\
+\\e\t转义/中断 (ESC, ASCII 27 / 1B)。\n\
+\\f\t换页 (FF, ASCII 12 / 0C)。\n\
+\\n\t换行 (LF, ASCII 10 / 0A)。\n\
+\\r\t回车 (CR, ASCII 13 / 0D)。\n\
+\\t\t水平制表符 (HT, ASCII 9)。\n\
+\\v\t垂直制表符 (VT, ASCII 11 / 0B)。\n\
+\\ooo\t八进制值。\n\
+\\uHHHH\t十六进制值。\n\
+\\xHH\t十六进制值。\n\
+\\\\\t反斜杠。"
 
 	IDS_REGEXPHELP			"正则表达式（RegExp）语法（单行模式）\n\n\
-.\t任何字符\n\
-^\t行开始\n\
-$\t行结束\n\
-\\<\t单词开始\n\
-\\>\t单词结束\n\
-[...]\t字符集合 ([abc]) 或字符范围 ([a-z])\n\
-[^...]\t不在集合或范围中的字符\n\
-\\d\t任何十进制数字\n\
-\\D\t任何非数字字符\n\
-\\s\t任何空白字符\n\
-\\S\t任何非空白字符\n\
-\\w\t任何单词字符\n\
-\\W\t任何非单词字符\n\
-\\x\t有其他特殊意义的转义字符\n\
-\\xHH\t十六进制代码为 HH 的字符\n\
-?\t匹配 0 或 1 次\n*\t匹配 0 次或多次\n\
-+\t匹配 1 次或多次\n\
-*? 或 +?\t对限量词 ""?"" 和 ""+"" 做非贪婪匹配\n\
-(\t区域开始\n\
-)\t区域结束\n\
-\\n\t替换时引用的区域 (n 为 1-9)\n\n\
+.\t任何字符。\n\
+^\t行开始。\n\
+$\t行结束。\n\
+\\<\t单词开始。\n\
+\\>\t单词结束。\n\
+[...]\t字符集合 ([abc]) 或字符范围 ([a-z])。\n\
+[^...]\t不在集合或范围中的字符。\n\
+\\d\t任何十进制数字。\n\
+\\D\t任何非数字字符。\n\
+\\s\t任何空白字符\。n\
+\\S\t任何非空白字符。\n\
+\\w\t任何单词字符。\n\
+\\W\t任何非单词字符。\n\
+\\x\t有其他特殊意义的转义字符。\n\
+\\xHH\t十六进制代码为 HH 的字符。\n\
+?\t匹配 0 或 1 次\n*\t匹配 0 次或多次。\n\
++\t匹配 1 次或多次。\n\
+*? 或 +?\t对限量词 ""?"" 和 ""+"" 做非贪婪匹配。\n\
+(\t区域开始。\n\
+)\t区域结束。\n\
+\\n\t替换时引用的区域 (n 为 1-9)。\n\n\
 实验性语法:\n\
-\\h\t单词开始，根据 IsWordStartAt()\n\
-\\H\t单词结束，根据 IsWordEndAt()\n\
-\\i\t匹配 1 个或多个字符到单词结束\n\
-\\i?\t匹配 0 个或多个字符到单词结束"
+\\h\t单词开始，根据 IsWordStartAt()。\n\
+\\H\t单词结束，根据 IsWordEndAt()。\n\
+\\i\t匹配 1 个或多个字符到单词结束。\n\
+\\i?\t匹配 0 个或多个字符到单词结束。"
 
 	IDS_WILDCARDHELP		"通配符搜索\n\n\
 *\t匹配 0 个或多个字符。\n\
@@ -1828,19 +1828,19 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_ERR_LOADFILE        "加载 ""%s"" 时出错"
-    IDS_ERR_SAVEFILE        "保存 ""%s"" 时出错"
+    IDS_ERR_LOADFILE        "加载“%s”时出错"
+    IDS_ERR_SAVEFILE        "保存“%s”时出错"
     IDS_ERR_BROWSE          "没有找到文件浏览器插件。\nmetapath 文件浏览器插件可以从如下地址下载:\nhttps://github.com/zufuliu/notepad2/releases\n\n是否立即打开下载页面？"
     IDS_ERR_MRUDLG          "无法访问选中的文件！\n是否从列表中移除？"
     IDS_ERR_CREATELINK      "创建桌面快捷方式时出错。"
     IDS_ERR_PREVWINDISABLED "现有的 Notepad2 窗口正忙或有一个活动的对话框。\n要打开一个新的窗口吗？"
     IDS_SELRECT             "此操作不能在矩形选区内执行。"
-    IDS_BUFFERTOOSMALL      "此操作不能执行（行太长）。"
+    IDS_BUFFERTOOSMALL      "此操作不能执行(行太长)。"
     IDS_FIND_WRAPFW         "已到文档末尾，从文档开头重新搜索。"
     IDS_FIND_WRAPRE         "已到文档开头，从文档最后重新搜索。"
     IDS_NOTFOUND            "未找到指定的文本。"
     IDS_REPLCOUNT           "找到的 %s 处指定文本已经替换。"
-    IDS_ASK_ENCODING        "将文件编码从 ANSI 切换到非 ANSI（或反之）可能将不支持的字符替换为默认字符，并且编辑历史将被清除。要继续吗？"
+    IDS_ASK_ENCODING        "将文件编码从 ANSI 切换到非 ANSI (或反之)可能将不支持的字符替换为默认字符，并且编辑历史将被清除。要继续吗？"
     IDS_ASK_ENCODING2       "您即将更改一个空文件的编码，从 ANSI 到非 ANSI。请注意，这将清除编辑历史，因历史记录无法与新的编码同步。要继续吗？"
     IDS_ERR_ENCODINGNA      "您的系统上没有所选编码的代码页转换表。"
     IDS_ERR_UNICODE         "转换该 Unicode 文件时出错。\n如果保存该文件，数据将会丢失！"
@@ -1881,7 +1881,7 @@ END
 STRINGTABLE
 BEGIN
     IDS_ERR_UNICODE2        "当前文本中的某些字符在所选编码中不支持，如果保存将可能被替换为默认的占位字符。推荐选择其他文件编码。要继续吗？"
-    IDS_WARNLOADBIGFILE     "加载文件：%s\n\n此文件太大（%s，%s 字节）。\n当前可加载的最大文件大小为 %s（%s 字节）。"
+    IDS_WARNLOADBIGFILE     "加载文件: %s\n\n此文件太大(%s，%s 字节)。\n当前可加载的最大文件大小为 %s (%s 字节)。"
     //IDS_ERR_DROP            "Only one file can be dropped at the same time!"
     IDS_ASK_SAVE            "保存修改到“%s”？"
     IDS_ASK_REVERT          "还原文件到上次保存时的状态？您的修改将会丢失！"
@@ -1889,10 +1889,10 @@ BEGIN
     IDS_ASK_CREATE          "“%s”未找到。\n是否创建此文件？"
     IDS_PRINT_HEADER        "文件名，当前日期和时间|文件名，当前日期|文件名|留空"
     IDS_PRINT_FOOTER        "页号|留空"
-    IDS_PRINT_COLOR         "正常|反色（暗背景）|白底黑字|白底彩色|白底彩色（行号除外）|当前屏幕颜色（所见即所得）"
+    IDS_PRINT_COLOR         "正常|反色(暗背景)|白底黑字|白底彩色|白底彩色(行号除外)|当前屏幕颜色(所见即所得)"
     IDS_PRINT_PAGENUM       "页 %s"
     IDS_PRINT_EMPTY         "此文档不包含任何需要打印的文本。"
-    IDS_PRINT_ERROR         "打印""%s""时出错！"
+    IDS_PRINT_ERROR         "打印“%s”时出错！"
     IDS_FAV_SUCCESS         "已在收藏夹中创建一个当前文件的快捷方式。"
     IDS_FAV_FAILURE         "未能创建当前文件的快捷方式。\n请检查是否已有同名文件。"
     IDS_READONLY_MODIFY     "不能修改“%s”的属性。"
@@ -1900,13 +1900,13 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_READONLY_SAVE       """%s"" 是只读的。是否保存到另一个文件？"
+    IDS_READONLY_SAVE       "“%s”是只读的。是否保存到另一个文件？"
     IDS_FILECHANGENOTIFY    "当前文件已被外部程序修改。是否重新载入？"
     IDS_FILECHANGENOTIFY2   "当前文件已被删除。是否立即保存？"
     IDS_SAVEDSETTINGS       "当前程序设置已被保存。"
     IDS_CREATEINI_FAIL      "创建配置文件时出错。"
     IDS_WRITEINI_FAIL       "写入设置到配置文件时出错。"
-    IDS_SETTINGSNOTSAVED    "没有找到现有的配置文件。\n若要保存您的样式修改，请立即保存 (F7)，或者返回 自定义语法高亮 (Ctrl+F12) 并导出您的样式配置。"
+    IDS_SETTINGSNOTSAVED    "没有找到现有的配置文件。\n若要保存您的样式修改，请立即保存(F7)，或者返回“自定义语法高亮(Ctrl+F12)”并导出您的样式配置。"
     IDS_EXPORT_FAIL         "导出样式设置到“%s”时出错。"
 END
 
@@ -1950,7 +1950,7 @@ BEGIN
 	IDS_ENCODING_KOI8_U				"乌克兰语 (KOI8-U);KOI8-U"								// Cyrillic
 	IDS_ENCODING_MAC_CYRILLIC		"Mac 西里尔文;Mac 西里尔文"								// Cyrillic
 	IDS_ENCODING_WINDOWS1251		"Windows-1251;Windows-1251"								// Cyrillic
-	IDS_ENCODING_ISO8859_13			"爱沙尼亚语（波罗的海周边, Latin-7, ISO 8859-13）; ISO 8859-13"	// Northern European
+	IDS_ENCODING_ISO8859_13			"爱沙尼亚语(波罗的海周边, Latin-7, ISO 8859-13); ISO 8859-13"	// Northern European
 	IDS_ENCODING_DOS863				"OEM 加拿大法语 (DOS-863);DOS-863"						// Western European
 	IDS_ENCODING_DOS737				"OEM 希腊语 (DOS-737);DOS-737"							// Greek
 	IDS_ENCODING_ISO8859_7			"ISO 8859-7;ISO 8859-7"									// Greek
@@ -2000,7 +2000,7 @@ BEGIN
 	IDS_ENCODING_DOS864				"OEM 阿拉伯文 (DOS-864);OEM 阿拉伯文"						// Arabic
 	IDS_ENCODING_MAC_ROMANIAN		"Mac 罗马尼亚;Mac 罗马尼亚"								// South European
 	IDS_ENCODING_DOS865				"OEM 北欧 (DOS-865);DOS-865"								// Northern European
-	IDS_ENCODING_IBM855				"OEM 西里尔语（俄语为主） (IBM855);OEM 西里尔语"				// Cyrillic
+	IDS_ENCODING_IBM855				"OEM 西里尔语(俄语为主)(IBM855);OEM 西里尔语"				// Cyrillic
 	IDS_ENCODING_MAC_JAPANESE		"Mac 日语;Mac 日语"										// Japanese
 	IDS_ENCODING_CS_ISO2022_JP		"ISO 2022 (允许单字节假名);CS ISO-2022-JP"					// Japanese
 	IDS_ENCODING_ISO2022_JP_SI		"ISO 2022 (允许单字节假名 - SO/SI);ISO-2022-JP SI/SO"		// Japanese
@@ -2013,9 +2013,9 @@ BEGIN
 	IDS_ENCODING_ISO2022_CNT		"繁体中文 (ISO 2022); ISO-2022-CN(T)"						// Chinese
 	IDS_ENCODING_CNS				"繁体中文 (CNS);CNS"										// Chinese
 
-	IDS_SELRECT_CURRENT_ENCODING	"选择当前文件编码(&E):"
-	IDS_SELRECT_RELOAD_ENCODING		"选择重新载入文件使用的编码:"
-	IDS_SELRECT_DEFAULT_ENCODING	"选择新文件的默认编码:"
+	IDS_SELRECT_CURRENT_ENCODING	"选择当前文件编码(&E): "
+	IDS_SELRECT_RELOAD_ENCODING		"选择重新载入文件使用的编码: "
+	IDS_SELRECT_DEFAULT_ENCODING	"选择新文件的默认编码: "
 
 	IDS_ENCODINGGROUP_UNICODE		"Unicode"
 	IDS_ENCODINGGROUP_WESTERNEURO	"西欧"
