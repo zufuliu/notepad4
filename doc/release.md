@@ -2,7 +2,7 @@ The builds (*unsigned*) works for Windows XP or Windows Server 2003 and above. T
 
 Since v4.19.01r1786, latest development build (artifacts in Release configuration for each compiler and platform) can be downloaded from https://ci.appveyor.com/project/zufuliu/notepad2
 
-Tips: To keep your current settings, do NOT replace *Notepad2.ini* or *metapath.ini* or any theme files with the bundled one, but please mind the breaking changes in [v4.19.01r1786](https://github.com/zufuliu/notepad2/releases/tag/v4.19.01r1786) and below when upgrading to this version from versions before v4.19.01r1786.
+💡Tips: To keep your current settings, do NOT replace *Notepad2.ini* or *metapath.ini* or any theme files with the bundled one, but please mind the breaking since in [v4.19.01r1786].
 
 ## Changes Since v4.20.?
 
