@@ -271,6 +271,19 @@ NP2_inline void IniSectionSetBoolEx(IniSectionOnSave *section, LPCWSTR key, BOOL
 	}
 }
 
+#define NP2RegSubKey_ContextMenu	L"Folder\\shell\\metapath"
+#define NP2RegSubKey_JumpList		L"Applications\\metapath.exe"
+
+LPWSTR Registry_GetString(HKEY hKey, LPCWSTR valueName);
+LSTATUS Registry_SetString(HKEY hKey, LPCWSTR valueName, LPCWSTR lpszText);
+#define Registry_GetDefaultString(hKey)				Registry_GetString((hKey), NULL)
+#define Registry_SetDefaultString(hKey, lpszText)	Registry_SetString((hKey), NULL, (lpszText))
+NP2_inline LSTATUS Registry_CreateKey(HKEY hKey, LPCWSTR lpSubKey, PHKEY phkResult) {
+	return RegCreateKeyEx(hKey, lpSubKey, 0, NULL, 0, KEY_WRITE, NULL, phkResult, NULL);
+}
+LSTATUS Registry_DeleteTree(HKEY hKey, LPCWSTR lpSubKey);
+
+
 NP2_inline BOOL KeyboardIsKeyDown(int key) {
 	return (GetKeyState(key) & 0x8000) != 0;
 }
@@ -284,6 +297,7 @@ NP2_inline void EndWaitCursor(void) {
 }
 
 HRESULT PrivateSetCurrentProcessExplicitAppUserModelID(PCWSTR AppID);
+BOOL IsElevated(void);
 BOOL ExeNameFromWnd(HWND hwnd, LPWSTR szExeName, int cchExeName);
 //BOOL Is32bitExe(LPCWSTR lpszExeName);
 

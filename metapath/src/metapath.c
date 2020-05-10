@@ -167,7 +167,7 @@ HANDLE		g_hDefaultHeap;
 #if _WIN32_WINNT < _WIN32_WINNT_WIN10
 DWORD		g_uWinVer;
 #endif
-static WCHAR g_wchAppUserModelID[64] = L"";
+WCHAR g_wchAppUserModelID[64] = L"";
 #if NP2_ENABLE_APP_LOCALIZATION_DLL
 static HMODULE hResDLL;
 static LANGID uiLanguage;

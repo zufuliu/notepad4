@@ -296,7 +296,7 @@ extern int iOvrCaretStyle;
 extern BOOL bBlockCaretOutSelection;
 extern int iCaretBlinkPeriod;
 
-static BOOL fIsElevated = FALSE;
+BOOL fIsElevated = FALSE;
 static WCHAR wchWndClass[16] = WC_NOTEPAD2;
 
 #define STATUS_BAR_UPDATE_MASK_LEXER	1
@@ -329,7 +329,7 @@ DWORD		kSystemLibraryLoadFlags = 0;
 #endif
 UINT		g_uCurrentDPI = USER_DEFAULT_SCREEN_DPI;
 UINT		g_uDefaultDPI = USER_DEFAULT_SCREEN_DPI;
-static WCHAR g_wchAppUserModelID[64] = L"";
+WCHAR 		g_wchAppUserModelID[64] = L"";
 static WCHAR g_wchWorkingDirectory[MAX_PATH] = L"";
 #if NP2_ENABLE_APP_LOCALIZATION_DLL
 static HMODULE hResDLL;
@@ -371,7 +371,7 @@ static int	flagMatchText			= 0;
 static int	flagChangeNotify		= 0;
 static int	flagLexerSpecified		= 0;
 static int	flagQuietCreate			= 0;
-static int	flagUseSystemMRU		= 0;
+int			flagUseSystemMRU		= 0;
 static int	flagRelaunchElevated	= 0;
 static int	flagDisplayHelp			= 0;
 
@@ -4708,6 +4708,10 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			CreateIniFile();
 			FileLoad(FALSE, FALSE, FALSE, FALSE, szIniFile);
 		}
+		break;
+
+	case IDM_SET_SYSTEM_INTEGRATION:
+		SystemIntegrationDlg(hwnd);
 		break;
 
 	case IDT_FILE_NEW:

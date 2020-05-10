@@ -2364,3 +2364,250 @@ INT_PTR InfoBox(int iType, LPCWSTR lpstrSetting, UINT uidMessage, ...) {
 	MessageBeep(MB_ICONEXCLAMATION);
 	return ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(idDlg), hwnd, InfoBoxDlgProc, (LPARAM)&ib);
 }
+
+/*
+HKEY_CLASSES_ROOT\*\shell\Notepad2.exe
+	(Default)				REG_SZ		Edit with Notepad2
+	icon					REG_SZ		Notepad2.exe
+	command
+		(Default)			REG_SZ		"Notepad2.exe" "%1"
+
+HKEY_CLASSES_ROOT\Applications\Notepad2.exe
+	AppUserModelID			REG_SZ		Notepad2 Text Editor
+	FriendlyAppName			REG_SZ		Notepad2 Text Editor
+	shell\open\command
+		(Default)			REG_SZ		"Notepad2.exe" "%1"
+
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\notepad.exe
+	Debugger				REG_SZ		"Notepad2.exe" /z
+*/
+extern BOOL fIsElevated;
+extern int flagUseSystemMRU;
+extern WCHAR g_wchAppUserModelID[64];
+
+enum {
+	SystemIntegration_ContextMenu = 1,
+	SystemIntegration_JumpList = 2,
+	SystemIntegration_Replacement = 4,
+};
+
+struct SystemIntegrationInfo {
+	LPWSTR lpszText;
+	LPWSTR lpszName;
+};
+
+#define NP2RegSubKey_Replacement	L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\notepad.exe"
+
+int GetSystemIntegrationStatus(struct SystemIntegrationInfo *info) {
+	int mask = 0;
+	WCHAR tchModule[MAX_PATH];
+	GetModuleFileName(NULL, tchModule, COUNTOF(tchModule));
+
+	// context menu
+	HKEY hKey;
+	LSTATUS status = RegOpenKeyEx(HKEY_CLASSES_ROOT, NP2RegSubKey_ContextMenu, 0, KEY_READ, &hKey);
+	if (status == ERROR_SUCCESS) {
+		info->lpszText = Registry_GetDefaultString(hKey);
+		HKEY hSubKey;
+		status = RegOpenKeyEx(hKey, L"command", 0, KEY_READ, &hSubKey);
+		if (status == ERROR_SUCCESS) {
+			LPWSTR command = Registry_GetDefaultString(hSubKey);
+			if (command != NULL) {
+				if (StrStrI(command, tchModule) != NULL) {
+					mask |= SystemIntegration_ContextMenu;
+				}
+				NP2HeapFree(command);
+			}
+		}
+		RegCloseKey(hSubKey);
+	}
+	RegCloseKey(hKey);
+
+	// jump list
+	status = RegOpenKeyEx(HKEY_CLASSES_ROOT, NP2RegSubKey_JumpList, 0, KEY_READ, &hKey);
+	if (status == ERROR_SUCCESS) {
+		info->lpszName = Registry_GetString(hKey, L"FriendlyAppName");
+		HKEY hSubKey;
+		status = RegOpenKeyEx(hKey, L"shell\\open\\command", 0, KEY_READ, &hSubKey);
+		if (status == ERROR_SUCCESS) {
+			LPWSTR command = Registry_GetDefaultString(hSubKey);
+			if (command != NULL) {
+				LPWSTR userId = Registry_GetString(hKey, L"AppUserModelID");
+				if (userId != NULL && StrEqual(userId, g_wchAppUserModelID) && StrStrI(command, tchModule) != NULL) {
+					mask |= SystemIntegration_JumpList;
+				}
+				if (userId != NULL) {
+					NP2HeapFree(userId);
+				}
+				NP2HeapFree(command);
+			}
+		}
+		RegCloseKey(hSubKey);
+	}
+	RegCloseKey(hKey);
+
+	// replace Windows Notepad
+	status = RegOpenKeyEx(HKEY_LOCAL_MACHINE, NP2RegSubKey_Replacement, 0, KEY_READ, &hKey);
+	if (status == ERROR_SUCCESS) {
+		LPWSTR command = Registry_GetString(hKey, L"Debugger");
+		if (command != NULL) {
+			if (StrStrI(command, tchModule) != NULL) {
+				mask |= SystemIntegration_Replacement;
+			}
+			NP2HeapFree(command);
+		}
+	}
+	RegCloseKey(hKey);
+
+	return mask;
+}
+
+void UpdateSystemIntegrationStatus(int mask, LPCWSTR lpszText, LPCWSTR lpszName) {
+	WCHAR tchModule[MAX_PATH];
+	GetModuleFileName(NULL, tchModule, COUNTOF(tchModule));
+	WCHAR command[300];
+	wsprintf(command, L"\"%s\" \"%%1\"", tchModule);
+
+	// context menu
+	// delete the old one: HKEY_CLASSES_ROOT\*\shell\Notepad2.exe
+	//Registry_DeleteTree(HKEY_CLASSES_ROOT, NP2RegSubKey_ContextMenu L".exe");
+	if (mask & SystemIntegration_ContextMenu) {
+		HKEY hSubKey;
+		LSTATUS status = Registry_CreateKey(HKEY_CLASSES_ROOT, NP2RegSubKey_ContextMenu L"\\command", &hSubKey);
+		if (status == ERROR_SUCCESS) {
+			HKEY hKey;
+			status = RegOpenKeyEx(HKEY_CLASSES_ROOT, NP2RegSubKey_ContextMenu, 0, KEY_WRITE, &hKey);
+			status = Registry_SetDefaultString(hKey, lpszText);
+			status = Registry_SetString(hKey, L"icon", tchModule);
+			status = Registry_SetDefaultString(hSubKey, command);
+			RegCloseKey(hKey);
+		}
+		RegCloseKey(hSubKey);
+	} else {
+		Registry_DeleteTree(HKEY_CLASSES_ROOT, NP2RegSubKey_ContextMenu);
+	}
+
+	// jump list
+	if (mask & SystemIntegration_JumpList) {
+		HKEY hSubKey;
+		LSTATUS status = Registry_CreateKey(HKEY_CLASSES_ROOT, NP2RegSubKey_JumpList L"\\shell\\open\\command", &hSubKey);
+		if (status == ERROR_SUCCESS) {
+			HKEY hKey;
+			status = RegOpenKeyEx(HKEY_CLASSES_ROOT, NP2RegSubKey_JumpList, 0, KEY_WRITE, &hKey);
+			status = Registry_SetString(hKey, L"AppUserModelID", g_wchAppUserModelID);
+			status = Registry_SetString(hKey, L"FriendlyAppName", lpszName);
+			status = Registry_SetDefaultString(hSubKey, command);
+			RegCloseKey(hKey);
+
+			if (flagUseSystemMRU != 2) {
+				IniSetInt(INI_SECTION_NAME_FLAGS, L"ShellUseSystemMRU", 1);
+			}
+		}
+		RegCloseKey(hSubKey);
+	} else {
+		Registry_DeleteTree(HKEY_CLASSES_ROOT, NP2RegSubKey_JumpList);
+	}
+
+	// replace Windows Notepad
+	if (mask & SystemIntegration_Replacement) {
+		HKEY hKey;
+		LSTATUS status = Registry_CreateKey(HKEY_LOCAL_MACHINE, NP2RegSubKey_Replacement, &hKey);
+		if (status == ERROR_SUCCESS) {
+			wsprintf(command, L"\"%s\" /z", tchModule);
+			status = Registry_SetString(hKey, L"Debugger", command);
+		}
+		RegCloseKey(hKey);
+	} else {
+		Registry_DeleteTree(HKEY_LOCAL_MACHINE, NP2RegSubKey_Replacement);
+	}
+}
+
+static INT_PTR CALLBACK SystemIntegrationDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
+	UNREFERENCED_PARAMETER(wParam);
+	UNREFERENCED_PARAMETER(lParam);
+
+	switch (umsg) {
+	case WM_INITDIALOG: {
+		struct SystemIntegrationInfo info = {NULL, NULL};
+		int mask = GetSystemIntegrationStatus(&info);
+		HWND hwndCtl = GetDlgItem(hwnd, IDC_CONTEXT_MENU_TEXT);
+		if (StrIsEmpty(info.lpszText)) {
+			WCHAR wch[128];
+			GetString(IDS_LINKDESCRIPTION, wch, COUNTOF(wch));
+			Edit_SetText(hwndCtl, wch);
+		} else {
+			Edit_SetText(hwndCtl, info.lpszText);
+		}
+
+		HWND hwndName = GetDlgItem(hwnd, IDC_APPLICATION_NAME);
+		Edit_SetText(hwndName, StrIsEmpty(info.lpszName)? g_wchAppUserModelID : info.lpszName);
+		if (info.lpszText) {
+			NP2HeapFree(info.lpszText);
+		}
+		if (info.lpszName) {
+			NP2HeapFree(info.lpszName);
+		}
+
+		if (mask & SystemIntegration_ContextMenu) {
+			CheckDlgButton(hwnd, IDC_ENABLE_CONTEXT_MENU, BST_CHECKED);
+		}
+		if (mask & SystemIntegration_JumpList) {
+			CheckDlgButton(hwnd, IDC_ENABLE_JUMP_LIST, BST_CHECKED);
+		}
+		if (mask & SystemIntegration_Replacement) {
+			CheckDlgButton(hwnd, IDC_REPLACE_WINDOWS_NOTEPAD, BST_CHECKED);
+		}
+
+		if (IsVistaAndAbove() && !fIsElevated) {
+			Edit_SetReadOnly(hwndCtl, TRUE);
+			Edit_SetReadOnly(hwndName, TRUE);
+			EnableWindow(GetDlgItem(hwnd, IDC_ENABLE_CONTEXT_MENU), FALSE);
+			EnableWindow(GetDlgItem(hwnd, IDC_ENABLE_JUMP_LIST), FALSE);
+			EnableWindow(GetDlgItem(hwnd, IDC_REPLACE_WINDOWS_NOTEPAD), FALSE);
+		}
+
+		CenterDlgInParent(hwnd);
+	}
+	return TRUE;
+
+	case WM_COMMAND:
+		switch (LOWORD(wParam)) {
+		case IDOK: {
+			if (IsWindowEnabled(GetDlgItem(hwnd, IDC_ENABLE_CONTEXT_MENU))) {
+				int mask = 0;
+				if (IsButtonChecked(hwnd, IDC_ENABLE_CONTEXT_MENU)) {
+					mask |= SystemIntegration_ContextMenu;
+				}
+				if (IsButtonChecked(hwnd, IDC_ENABLE_JUMP_LIST)) {
+					mask |= SystemIntegration_JumpList;
+				}
+				if (IsButtonChecked(hwnd, IDC_REPLACE_WINDOWS_NOTEPAD)) {
+					mask |= SystemIntegration_Replacement;
+				}
+
+				WCHAR wchText[128];
+				GetDlgItemText(hwnd, IDC_CONTEXT_MENU_TEXT, wchText, COUNTOF(wchText));
+				TrimString(wchText);
+
+				WCHAR wchName[128];
+				GetDlgItemText(hwnd, IDC_APPLICATION_NAME, wchName, COUNTOF(wchName));
+				TrimString(wchName);
+
+				UpdateSystemIntegrationStatus(mask, wchText, wchName);
+			}
+			EndDialog(hwnd, IDOK);
+		}
+		break;
+
+		case IDCANCEL:
+			EndDialog(hwnd, IDCANCEL);
+			break;
+		}
+		return TRUE;
+	}
+	return FALSE;
+}
+
+void SystemIntegrationDlg(HWND hwnd) {
+	ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_SYSTEM_INTEGRATION), hwnd, SystemIntegrationDlgProc, 0);
+}
