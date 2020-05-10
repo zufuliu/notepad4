@@ -769,6 +769,7 @@ extern COLORREF colorCustom[16];
 #if NP2_ENABLE_APP_LOCALIZATION_DLL
 extern UINT		languageResID;
 #endif
+extern WCHAR g_wchAppUserModelID[64];
 
 static INT_PTR CALLBACK ItemsPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
 	static BOOL m_bDefColorNoFilter;
@@ -909,6 +910,122 @@ static INT_PTR CALLBACK ItemsPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARA
 	return FALSE;
 }
 
+/*
+HKEY_CLASSES_ROOT\Folder\shell\metapath
+	(Default)				REG_SZ		Open in metapath
+	icon					REG_SZ		metapath.exe
+	command
+		(Default)			REG_SZ		"metapath.exe" "%1"
+
+HKEY_CLASSES_ROOT\Applications\metapath.exe
+	AppUserModelID			REG_SZ		metapath File Browser
+	FriendlyAppName			REG_SZ		metapath File Browser
+	shell\open\command
+		(Default)			REG_SZ		"metapath.exe" "%1"
+*/
+
+enum {
+	SystemIntegration_ContextMenu = 1,
+	SystemIntegration_JumpList = 2,
+};
+
+struct SystemIntegrationInfo {
+	LPWSTR lpszText;
+	LPWSTR lpszName;
+};
+
+int GetSystemIntegrationStatus(struct SystemIntegrationInfo *info) {
+	int mask = 0;
+	WCHAR tchModule[MAX_PATH];
+	GetModuleFileName(NULL, tchModule, COUNTOF(tchModule));
+
+	// context menu
+	HKEY hKey;
+	LSTATUS status = RegOpenKeyEx(HKEY_CLASSES_ROOT, NP2RegSubKey_ContextMenu, 0, KEY_READ, &hKey);
+	if (status == ERROR_SUCCESS) {
+		info->lpszText = Registry_GetDefaultString(hKey);
+		HKEY hSubKey;
+		status = RegOpenKeyEx(hKey, L"command", 0, KEY_READ, &hSubKey);
+		if (status == ERROR_SUCCESS) {
+			LPWSTR command = Registry_GetDefaultString(hSubKey);
+			if (command != NULL) {
+				if (StrStrI(command, tchModule) != NULL) {
+					mask |= SystemIntegration_ContextMenu;
+				}
+				NP2HeapFree(command);
+			}
+		}
+		RegCloseKey(hSubKey);
+	}
+	RegCloseKey(hKey);
+
+	// jump list
+	status = RegOpenKeyEx(HKEY_CLASSES_ROOT, NP2RegSubKey_JumpList, 0, KEY_READ, &hKey);
+	if (status == ERROR_SUCCESS) {
+		info->lpszName = Registry_GetString(hKey, L"FriendlyAppName");
+		HKEY hSubKey;
+		status = RegOpenKeyEx(hKey, L"shell\\open\\command", 0, KEY_READ, &hSubKey);
+		if (status == ERROR_SUCCESS) {
+			LPWSTR command = Registry_GetDefaultString(hSubKey);
+			if (command != NULL) {
+				LPWSTR userId = Registry_GetString(hKey, L"AppUserModelID");
+				if (userId != NULL && StrEqual(userId, g_wchAppUserModelID) && StrStrI(command, tchModule) != NULL) {
+					mask |= SystemIntegration_JumpList;
+				}
+				if (userId != NULL) {
+					NP2HeapFree(userId);
+				}
+				NP2HeapFree(command);
+			}
+		}
+		RegCloseKey(hSubKey);
+	}
+	RegCloseKey(hKey);
+
+	return mask;
+}
+
+void UpdateSystemIntegrationStatus(int mask, LPCWSTR lpszText, LPCWSTR lpszName) {
+	WCHAR tchModule[MAX_PATH];
+	GetModuleFileName(NULL, tchModule, COUNTOF(tchModule));
+	WCHAR command[300];
+	wsprintf(command, L"\"%s\" \"%%1\"", tchModule);
+
+	// context menu
+	if (mask & SystemIntegration_ContextMenu) {
+		HKEY hSubKey;
+		LSTATUS status = Registry_CreateKey(HKEY_CLASSES_ROOT, NP2RegSubKey_ContextMenu L"\\command", &hSubKey);
+		if (status == ERROR_SUCCESS) {
+			HKEY hKey;
+			status = RegOpenKeyEx(HKEY_CLASSES_ROOT, NP2RegSubKey_ContextMenu, 0, KEY_WRITE, &hKey);
+			status = Registry_SetDefaultString(hKey, lpszText);
+			status = Registry_SetString(hKey, L"icon", tchModule);
+			status = Registry_SetDefaultString(hSubKey, command);
+			RegCloseKey(hKey);
+		}
+		RegCloseKey(hSubKey);
+	} else {
+		Registry_DeleteTree(HKEY_CLASSES_ROOT, NP2RegSubKey_ContextMenu);
+	}
+
+	// jump list
+	if (mask & SystemIntegration_JumpList) {
+		HKEY hSubKey;
+		LSTATUS status = Registry_CreateKey(HKEY_CLASSES_ROOT, NP2RegSubKey_JumpList L"\\shell\\open\\command", &hSubKey);
+		if (status == ERROR_SUCCESS) {
+			HKEY hKey;
+			status = RegOpenKeyEx(HKEY_CLASSES_ROOT, NP2RegSubKey_JumpList, 0, KEY_WRITE, &hKey);
+			status = Registry_SetString(hKey, L"AppUserModelID", g_wchAppUserModelID);
+			status = Registry_SetString(hKey, L"FriendlyAppName", lpszName);
+			status = Registry_SetDefaultString(hSubKey, command);
+			RegCloseKey(hKey);
+		}
+		RegCloseKey(hSubKey);
+	} else {
+		Registry_DeleteTree(HKEY_CLASSES_ROOT, NP2RegSubKey_JumpList);
+	}
+}
+
 //=============================================================================
 //
 //  ProgPageProc
@@ -937,6 +1054,40 @@ static INT_PTR CALLBACK ProgPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM
 		Edit_LimitText(hwndCtl, MAX_PATH - 2);
 		Edit_SetText(hwndCtl, tchFavoritesDir);
 		SHAutoComplete(hwndCtl, SHACF_FILESYSTEM);
+
+		struct SystemIntegrationInfo info = {NULL, NULL};
+		int mask = GetSystemIntegrationStatus(&info);
+		hwndCtl = GetDlgItem(hwnd, IDC_CONTEXT_MENU_TEXT);
+		if (StrIsEmpty(info.lpszText)) {
+			WCHAR wch[128];
+			GetString(IDS_LINKDESCRIPTION, wch, COUNTOF(wch));
+			Edit_SetText(hwndCtl, wch);
+		} else {
+			Edit_SetText(hwndCtl, info.lpszText);
+		}
+
+		HWND hwndName = GetDlgItem(hwnd, IDC_APPLICATION_NAME);
+		Edit_SetText(hwndName, StrIsEmpty(info.lpszName)? g_wchAppUserModelID : info.lpszName);
+		if (info.lpszText) {
+			NP2HeapFree(info.lpszText);
+		}
+		if (info.lpszName) {
+			NP2HeapFree(info.lpszName);
+		}
+
+		if (mask & SystemIntegration_ContextMenu) {
+			CheckDlgButton(hwnd, IDC_ENABLE_CONTEXT_MENU, BST_CHECKED);
+		}
+		if (mask & SystemIntegration_JumpList) {
+			CheckDlgButton(hwnd, IDC_ENABLE_JUMP_LIST, BST_CHECKED);
+		}
+
+		if (IsVistaAndAbove() && !IsElevated()) {
+			EnableWindow(GetDlgItem(hwnd, IDC_ENABLE_CONTEXT_MENU), FALSE);
+			Edit_SetReadOnly(hwndCtl, TRUE);
+			EnableWindow(GetDlgItem(hwnd, IDC_ENABLE_JUMP_LIST), FALSE);
+			Edit_SetReadOnly(hwndName, TRUE);
+		}
 	}
 	return TRUE;
 
@@ -1021,6 +1172,25 @@ static INT_PTR CALLBACK ProgPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM
 				GetDefaultFavoritesDir(tchFavoritesDir, COUNTOF(tchFavoritesDir));
 			} else {
 				StrTrim(tchFavoritesDir, L" \"");
+			}
+
+			if (IsWindowEnabled(GetDlgItem(hwnd, IDC_ENABLE_CONTEXT_MENU))) {
+				int mask = 0;
+				if (IsButtonChecked(hwnd, IDC_ENABLE_CONTEXT_MENU)) {
+					mask |= SystemIntegration_ContextMenu;
+				}
+				if (IsButtonChecked(hwnd, IDC_ENABLE_JUMP_LIST)) {
+					mask |= SystemIntegration_JumpList;
+				}
+
+				GetDlgItemText(hwnd, IDC_CONTEXT_MENU_TEXT, tch, COUNTOF(tch));
+				TrimString(tch);
+
+				WCHAR wchName[128];
+				GetDlgItemText(hwnd, IDC_APPLICATION_NAME, wchName, COUNTOF(wchName));
+				TrimString(wchName);
+
+				UpdateSystemIntegrationStatus(mask, tch, wchName);
 			}
 
 			SetWindowLongPtr(hwnd, DWLP_MSGRESULT, PSNRET_NOERROR);

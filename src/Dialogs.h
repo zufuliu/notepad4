@@ -59,3 +59,4 @@ BOOL	GetZoomLevelComboBoxValue(HWND hwnd, int nCtrId, int *zoomLevel);
 void	ZoomLevelDlg(HWND hwnd, BOOL bBottom);
 BOOL	AutoCompletionSettingsDlg(HWND hwnd);
 INT_PTR InfoBox(int iType, LPCWSTR lpstrSetting, UINT uidMessage, ...);
+void	SystemIntegrationDlg(HWND hwnd);

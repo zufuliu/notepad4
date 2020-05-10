@@ -217,6 +217,61 @@ void IniSectionSetString(IniSectionOnSave *section, LPCWSTR key, LPCWSTR value) 
 	section->next = p;
 }
 
+LPWSTR Registry_GetString(HKEY hKey, LPCWSTR valueName) {
+	LPWSTR lpszText = NULL;
+	DWORD type = REG_SZ;
+	DWORD size = 0;
+
+	LSTATUS status = RegQueryValueEx(hKey, valueName, NULL, &type, NULL, &size);
+	if (status == ERROR_SUCCESS && type == REG_SZ && size != 0) {
+		size = (size + 1)*sizeof(WCHAR);
+		lpszText = (LPWSTR)NP2HeapAlloc(size);
+		status = RegQueryValueEx(hKey, valueName, NULL, &type, (LPBYTE)lpszText, &size);
+		if (status != ERROR_SUCCESS || type != REG_SZ || size == 0) {
+			NP2HeapFree(lpszText);
+			lpszText = NULL;
+		}
+	}
+	return lpszText;
+}
+
+LSTATUS Registry_SetString(HKEY hKey, LPCWSTR valueName, LPCWSTR lpszText) {
+	DWORD len = lstrlen(lpszText);
+	len = len ? ((len + 1)*sizeof(WCHAR)) : 0;
+	LSTATUS status = RegSetValueEx(hKey, valueName, 0, REG_SZ, (const BYTE *)lpszText, len);
+	return status;
+}
+
+#if _WIN32_WINNT < _WIN32_WINNT_VISTA
+typedef LSTATUS (WINAPI *RegDeleteTreeSig)(HKEY hKey, LPCWSTR lpSubKey);
+static RegDeleteTreeSig pfnDeleteTree = NULL;
+#endif
+
+LSTATUS Registry_DeleteTree(HKEY hKey, LPCWSTR lpSubKey) {
+#if _WIN32_WINNT >= _WIN32_WINNT_VISTA
+	return RegDeleteTree(hKey, lpSubKey);
+#else
+	if (IsVistaAndAbove()) {
+		if (pfnDeleteTree == NULL) {
+			pfnDeleteTree = (RegDeleteTreeSig)GetProcAddress(GetModuleHandle(L"advapi32.dll"), "RegDeleteTreeW");
+		}
+	}
+
+	LSTATUS status;
+	if (pfnDeleteTree != NULL) {
+		status = pfnDeleteTree(hKey, lpSubKey);
+	} else {
+		status = RegDeleteKey(hKey, lpSubKey);
+		if (status != ERROR_SUCCESS && status != ERROR_FILE_NOT_FOUND) {
+			// TODO: Deleting a Key with Subkeys on Windows XP.
+			// https://docs.microsoft.com/en-us/windows/win32/sysinfo/deleting-a-key-with-subkeys
+		}
+	}
+
+	return status;
+#endif
+}
+
 int ParseCommaList(LPCWSTR str, int result[], int count) {
 	if (StrIsEmpty(str)) {
 		return 0;
@@ -307,6 +362,32 @@ HRESULT PrivateSetCurrentProcessExplicitAppUserModelID(PCWSTR AppID) {
 	}
 	return S_OK;
 #endif
+}
+
+//=============================================================================
+//
+// IsElevated()
+//
+BOOL IsElevated(void) {
+	if (!IsVistaAndAbove()) {
+		return FALSE;
+	}
+
+	BOOL bIsElevated = FALSE;
+	HANDLE hToken = NULL;
+
+	if (OpenProcessToken(GetCurrentProcess(), TOKEN_QUERY, &hToken)) {
+		TOKEN_ELEVATION te;
+		DWORD dwReturnLength = 0;
+
+		if (GetTokenInformation(hToken, TokenElevation, &te, sizeof(te), &dwReturnLength)) {
+			if (dwReturnLength == sizeof(te)) {
+				bIsElevated = te.TokenIsElevated;
+			}
+		}
+		CloseHandle(hToken);
+	}
+	return bIsElevated;
 }
 
 //=============================================================================
