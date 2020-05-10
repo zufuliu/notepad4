@@ -2366,7 +2366,7 @@ INT_PTR InfoBox(int iType, LPCWSTR lpstrSetting, UINT uidMessage, ...) {
 }
 
 /*
-HKEY_CLASSES_ROOT\*\shell\Notepad2.exe
+HKEY_CLASSES_ROOT\*\shell\Notepad2
 	(Default)				REG_SZ		Edit with Notepad2
 	icon					REG_SZ		Notepad2.exe
 	command
