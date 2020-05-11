@@ -281,7 +281,11 @@ LSTATUS Registry_SetString(HKEY hKey, LPCWSTR valueName, LPCWSTR lpszText);
 NP2_inline LSTATUS Registry_CreateKey(HKEY hKey, LPCWSTR lpSubKey, PHKEY phkResult) {
 	return RegCreateKeyEx(hKey, lpSubKey, 0, NULL, 0, KEY_WRITE, NULL, phkResult, NULL);
 }
+#if _WIN32_WINNT >= _WIN32_WINNT_VISTA
+#define Registry_DeleteTree(hKey, lpSubKey)			RegDeleteTree((hKey), (lpSubKey))
+#else
 LSTATUS Registry_DeleteTree(HKEY hKey, LPCWSTR lpSubKey);
+#endif
 
 
 NP2_inline BOOL KeyboardIsKeyDown(int key) {

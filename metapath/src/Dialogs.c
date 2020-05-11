@@ -997,10 +997,10 @@ void UpdateSystemIntegrationStatus(int mask, LPCWSTR lpszText, LPCWSTR lpszName)
 		LSTATUS status = Registry_CreateKey(HKEY_CLASSES_ROOT, NP2RegSubKey_ContextMenu L"\\command", &hSubKey);
 		if (status == ERROR_SUCCESS) {
 			HKEY hKey;
-			status = RegOpenKeyEx(HKEY_CLASSES_ROOT, NP2RegSubKey_ContextMenu, 0, KEY_WRITE, &hKey);
-			status = Registry_SetDefaultString(hKey, lpszText);
-			status = Registry_SetString(hKey, L"icon", tchModule);
-			status = Registry_SetDefaultString(hSubKey, command);
+			RegOpenKeyEx(HKEY_CLASSES_ROOT, NP2RegSubKey_ContextMenu, 0, KEY_WRITE, &hKey);
+			Registry_SetDefaultString(hKey, lpszText);
+			Registry_SetString(hKey, L"icon", tchModule);
+			Registry_SetDefaultString(hSubKey, command);
 			RegCloseKey(hKey);
 		}
 		RegCloseKey(hSubKey);
@@ -1014,10 +1014,10 @@ void UpdateSystemIntegrationStatus(int mask, LPCWSTR lpszText, LPCWSTR lpszName)
 		LSTATUS status = Registry_CreateKey(HKEY_CLASSES_ROOT, NP2RegSubKey_JumpList L"\\shell\\open\\command", &hSubKey);
 		if (status == ERROR_SUCCESS) {
 			HKEY hKey;
-			status = RegOpenKeyEx(HKEY_CLASSES_ROOT, NP2RegSubKey_JumpList, 0, KEY_WRITE, &hKey);
-			status = Registry_SetString(hKey, L"AppUserModelID", g_wchAppUserModelID);
-			status = Registry_SetString(hKey, L"FriendlyAppName", lpszName);
-			status = Registry_SetDefaultString(hSubKey, command);
+			RegOpenKeyEx(HKEY_CLASSES_ROOT, NP2RegSubKey_JumpList, 0, KEY_WRITE, &hKey);
+			Registry_SetString(hKey, L"AppUserModelID", g_wchAppUserModelID);
+			Registry_SetString(hKey, L"FriendlyAppName", lpszName);
+			Registry_SetDefaultString(hSubKey, command);
 			RegCloseKey(hKey);
 		}
 		RegCloseKey(hSubKey);
