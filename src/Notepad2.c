@@ -2373,6 +2373,12 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	EnableCmd(hmenu, IDM_EDIT_INVERTCASE, i /*&& !bReadOnly*/ /*&& IsWindowsNT()*/);
 	EnableCmd(hmenu, IDM_EDIT_TITLECASE, i /*&& !bReadOnly*/ /*&& IsWindowsNT()*/);
 	EnableCmd(hmenu, IDM_EDIT_SENTENCECASE, i /*&& !bReadOnly*/ /*&& IsWindowsNT()*/);
+	EnableCmd(hmenu, IDM_EDIT_MAP_FULLWIDTH, i);
+	EnableCmd(hmenu, IDM_EDIT_MAP_HALFWIDTH, i);
+	EnableCmd(hmenu, IDM_EDIT_MAP_SIMPLIFIED_CHINESE, i);
+	EnableCmd(hmenu, IDM_EDIT_MAP_TRADITIONAL_CHINESE, i);
+	EnableCmd(hmenu, IDM_EDIT_MAP_HIRAGANA, i);
+	EnableCmd(hmenu, IDM_EDIT_MAP_KATAKANA, i);
 
 	EnableCmd(hmenu, IDM_EDIT_CONVERTTABS, i /*&& !bReadOnly*/);
 	EnableCmd(hmenu, IDM_EDIT_CONVERTSPACES, i /*&& !bReadOnly*/);
@@ -3330,8 +3336,14 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	case IDM_EDIT_TITLECASE:
+	case IDM_EDIT_MAP_FULLWIDTH:
+	case IDM_EDIT_MAP_HALFWIDTH:
+	case IDM_EDIT_MAP_SIMPLIFIED_CHINESE:
+	case IDM_EDIT_MAP_TRADITIONAL_CHINESE:
+	case IDM_EDIT_MAP_HIRAGANA:
+	case IDM_EDIT_MAP_KATAKANA:
 		BeginWaitCursor();
-		EditTitleCase();
+		EditTitleCase(LOWORD(wParam));
 		EndWaitCursor();
 		break;
 
