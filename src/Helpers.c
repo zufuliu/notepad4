@@ -286,14 +286,10 @@ LSTATUS Registry_SetString(HKEY hKey, LPCWSTR valueName, LPCWSTR lpszText) {
 }
 
 #if _WIN32_WINNT < _WIN32_WINNT_VISTA
-typedef LSTATUS (WINAPI *RegDeleteTreeSig)(HKEY hKey, LPCWSTR lpSubKey);
-static RegDeleteTreeSig pfnDeleteTree = NULL;
-#endif
-
 LSTATUS Registry_DeleteTree(HKEY hKey, LPCWSTR lpSubKey) {
-#if _WIN32_WINNT >= _WIN32_WINNT_VISTA
-	return RegDeleteTree(hKey, lpSubKey);
-#else
+	typedef LSTATUS (WINAPI *RegDeleteTreeSig)(HKEY hKey, LPCWSTR lpSubKey);
+	static RegDeleteTreeSig pfnDeleteTree = NULL;
+
 	if (IsVistaAndAbove()) {
 		if (pfnDeleteTree == NULL) {
 			pfnDeleteTree = (RegDeleteTreeSig)GetProcAddress(GetModuleHandle(L"advapi32.dll"), "RegDeleteTreeW");
@@ -312,8 +308,8 @@ LSTATUS Registry_DeleteTree(HKEY hKey, LPCWSTR lpSubKey) {
 	}
 
 	return status;
-#endif
 }
+#endif
 
 int DStringW_GetWindowText(DStringW *s, HWND hwnd) {
 	int len = GetWindowTextLength(hwnd);
