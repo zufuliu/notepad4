@@ -72,7 +72,7 @@ void	Style_SetLongLineColors(void);
 void	Style_HighlightCurrentLine(void);
 void	Style_ToggleUse2ndGlobalStyle(void);
 void	Style_ToggleUseDefaultCodeStyle(void);
-LPWSTR	Style_GetOpenDlgFilterStr(BOOL open, int lexers[]);
+LPWSTR	Style_GetOpenDlgFilterStr(BOOL open, LPCWSTR lpszExt, int lexers[]);
 
 BOOL	Style_StrGetFontEx(LPCWSTR lpszStyle, LPWSTR lpszFont, int cchFont, BOOL bDefaultStyle);
 BOOL	Style_StrGetCharSet(LPCWSTR lpszStyle, int *charset);
