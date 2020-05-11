@@ -3077,7 +3077,7 @@ void Style_SetBookmark(void) {
 //
 // Style_GetOpenDlgFilterStr()
 //
-static void AddLexFilterStr(LPWSTR szFilter, LPCEDITLEXER pLex, int *length, int lexers[], int *index) {
+static void AddLexFilterStr(LPWSTR szFilter, LPCEDITLEXER pLex, LPCWSTR lpszExt, int *length, int lexers[], int *index) {
 	LPCWSTR p = pLex->szExtensions;
 	if (StrIsEmpty(p)) {
 		p = pLex->pszDefExt;
@@ -3108,6 +3108,23 @@ static void AddLexFilterStr(LPWSTR szFilter, LPCEDITLEXER pLex, int *length, int
 		}
 	}
 
+	// add file extension for current file to current scheme
+	if (StrNotEmpty(lpszExt)) {
+		if (state == 0) {
+			*ptr++ = L';';
+			state = 1;
+		}
+		*ptr = L'\0';
+
+		WCHAR wch[MAX_PATH];
+		wsprintf(wch, L"*%s;", lpszExt);
+		if (StrStrI(extensions, wch) == NULL) {
+			++count;
+			lstrcpy(ptr, wch);
+			ptr += lstrlen(wch);
+		}
+	}
+
 	if (count == 0) {
 		return;
 	}
@@ -3133,7 +3150,7 @@ static void AddLexFilterStr(LPWSTR szFilter, LPCEDITLEXER pLex, int *length, int
 	*index += 1;
 }
 
-LPWSTR Style_GetOpenDlgFilterStr(BOOL open, int lexers[]) {
+LPWSTR Style_GetOpenDlgFilterStr(BOOL open, LPCWSTR lpszExt, int lexers[]) {
 	int length = (MAX_FAVORITE_SCHEMES_COUNT + 1 + LEXER_INDEX_GENERAL - LEXER_INDEX_MATCH)
 				*(MAX_EDITLEXER_NAME_SIZE + MAX_EDITLEXER_EXT_SIZE*3*2);
 	LPWSTR szFilter = (LPWSTR)NP2HeapAlloc(length * sizeof(WCHAR));
@@ -3148,7 +3165,7 @@ LPWSTR Style_GetOpenDlgFilterStr(BOOL open, int lexers[]) {
 	}
 
 	// current scheme
-	AddLexFilterStr(szFilter, pLexCurrent, &length, lexers, &index);
+	AddLexFilterStr(szFilter, pLexCurrent, lpszExt, &length, lexers, &index);
 	// text file and favorite schemes
 	for (UINT iLexer = LEXER_INDEX_MATCH; iLexer < ALL_LEXER_COUNT; iLexer++) {
 		LPCEDITLEXER pLex = pLexArray[iLexer];
@@ -3156,7 +3173,7 @@ LPWSTR Style_GetOpenDlgFilterStr(BOOL open, int lexers[]) {
 			break;
 		}
 		if (pLex != pLexCurrent) {
-			AddLexFilterStr(szFilter, pLex, &length, lexers, &index);
+			AddLexFilterStr(szFilter, pLex, NULL, &length, lexers, &index);
 		}
 	}
 
