@@ -3149,7 +3149,7 @@ static void AddLexFilterStr(LPWSTR szFilter, LPCEDITLEXER pLex, LPCWSTR lpszExt,
 	*index += 1;
 }
 
-LPWSTR Style_GetOpenDlgFilterStr(BOOL open, LPCWSTR lpszExt, int lexers[]) {
+LPWSTR Style_GetOpenDlgFilterStr(BOOL open, LPCWSTR lpszFile, int lexers[]) {
 	int length = (MAX_FAVORITE_SCHEMES_COUNT + 2 + LEXER_INDEX_GENERAL - LEXER_INDEX_MATCH)
 				*(MAX_EDITLEXER_NAME_SIZE + MAX_EDITLEXER_EXT_SIZE*3*2);
 	LPWSTR szFilter = (LPWSTR)NP2HeapAlloc(length * sizeof(WCHAR));
@@ -3164,6 +3164,7 @@ LPWSTR Style_GetOpenDlgFilterStr(BOOL open, LPCWSTR lpszExt, int lexers[]) {
 	}
 
 	// current scheme
+	LPCWSTR lpszExt = PathFindExtension(lpszFile);
 	AddLexFilterStr(szFilter, pLexCurrent, lpszExt, &length, lexers, &index);
 	// text file and favorite schemes
 	for (UINT iLexer = LEXER_INDEX_MATCH; iLexer < ALL_LEXER_COUNT; iLexer++) {
