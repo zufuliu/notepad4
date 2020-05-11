@@ -994,7 +994,7 @@ void UpdateSystemIntegrationStatus(int mask, LPCWSTR lpszText, LPCWSTR lpszName)
 	// context menu
 	if (mask & SystemIntegration_ContextMenu) {
 		HKEY hSubKey;
-		LSTATUS status = Registry_CreateKey(HKEY_CLASSES_ROOT, NP2RegSubKey_ContextMenu L"\\command", &hSubKey);
+		const LSTATUS status = Registry_CreateKey(HKEY_CLASSES_ROOT, NP2RegSubKey_ContextMenu L"\\command", &hSubKey);
 		if (status == ERROR_SUCCESS) {
 			HKEY hKey;
 			RegOpenKeyEx(HKEY_CLASSES_ROOT, NP2RegSubKey_ContextMenu, 0, KEY_WRITE, &hKey);
@@ -1011,7 +1011,7 @@ void UpdateSystemIntegrationStatus(int mask, LPCWSTR lpszText, LPCWSTR lpszName)
 	// jump list
 	if (mask & SystemIntegration_JumpList) {
 		HKEY hSubKey;
-		LSTATUS status = Registry_CreateKey(HKEY_CLASSES_ROOT, NP2RegSubKey_JumpList L"\\shell\\open\\command", &hSubKey);
+		const LSTATUS status = Registry_CreateKey(HKEY_CLASSES_ROOT, NP2RegSubKey_JumpList L"\\shell\\open\\command", &hSubKey);
 		if (status == ERROR_SUCCESS) {
 			HKEY hKey;
 			RegOpenKeyEx(HKEY_CLASSES_ROOT, NP2RegSubKey_JumpList, 0, KEY_WRITE, &hKey);
@@ -1056,7 +1056,8 @@ static INT_PTR CALLBACK ProgPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM
 		SHAutoComplete(hwndCtl, SHACF_FILESYSTEM);
 
 		struct SystemIntegrationInfo info = {NULL, NULL};
-		int mask = GetSystemIntegrationStatus(&info);
+		const int mask = GetSystemIntegrationStatus(&info);
+
 		hwndCtl = GetDlgItem(hwnd, IDC_CONTEXT_MENU_TEXT);
 		if (StrIsEmpty(info.lpszText)) {
 			WCHAR wch[128];

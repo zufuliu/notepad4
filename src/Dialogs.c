@@ -2388,7 +2388,8 @@ extern WCHAR g_wchAppUserModelID[64];
 enum {
 	SystemIntegration_ContextMenu = 1,
 	SystemIntegration_JumpList = 2,
-	SystemIntegration_Replacement = 4,
+	SystemIntegration_ReplaceNotepad = 4,
+	SystemIntegration_RestoreNotepad = 8,
 };
 
 struct SystemIntegrationInfo {
@@ -2396,7 +2397,7 @@ struct SystemIntegrationInfo {
 	LPWSTR lpszName;
 };
 
-#define NP2RegSubKey_Replacement	L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\notepad.exe"
+#define NP2RegSubKey_ReplaceNotepad	L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\notepad.exe"
 
 int GetSystemIntegrationStatus(struct SystemIntegrationInfo *info) {
 	int mask = 0;
@@ -2447,12 +2448,12 @@ int GetSystemIntegrationStatus(struct SystemIntegrationInfo *info) {
 	RegCloseKey(hKey);
 
 	// replace Windows Notepad
-	status = RegOpenKeyEx(HKEY_LOCAL_MACHINE, NP2RegSubKey_Replacement, 0, KEY_READ, &hKey);
+	status = RegOpenKeyEx(HKEY_LOCAL_MACHINE, NP2RegSubKey_ReplaceNotepad, 0, KEY_READ, &hKey);
 	if (status == ERROR_SUCCESS) {
 		LPWSTR command = Registry_GetString(hKey, L"Debugger");
 		if (command != NULL) {
 			if (StrStrI(command, tchModule) != NULL) {
-				mask |= SystemIntegration_Replacement;
+				mask |= SystemIntegration_ReplaceNotepad;
 			}
 			NP2HeapFree(command);
 		}
@@ -2473,7 +2474,7 @@ void UpdateSystemIntegrationStatus(int mask, LPCWSTR lpszText, LPCWSTR lpszName)
 	//Registry_DeleteTree(HKEY_CLASSES_ROOT, NP2RegSubKey_ContextMenu L".exe");
 	if (mask & SystemIntegration_ContextMenu) {
 		HKEY hSubKey;
-		LSTATUS status = Registry_CreateKey(HKEY_CLASSES_ROOT, NP2RegSubKey_ContextMenu L"\\command", &hSubKey);
+		const LSTATUS status = Registry_CreateKey(HKEY_CLASSES_ROOT, NP2RegSubKey_ContextMenu L"\\command", &hSubKey);
 		if (status == ERROR_SUCCESS) {
 			HKEY hKey;
 			RegOpenKeyEx(HKEY_CLASSES_ROOT, NP2RegSubKey_ContextMenu, 0, KEY_WRITE, &hKey);
@@ -2490,7 +2491,7 @@ void UpdateSystemIntegrationStatus(int mask, LPCWSTR lpszText, LPCWSTR lpszName)
 	// jump list
 	if (mask & SystemIntegration_JumpList) {
 		HKEY hSubKey;
-		LSTATUS status = Registry_CreateKey(HKEY_CLASSES_ROOT, NP2RegSubKey_JumpList L"\\shell\\open\\command", &hSubKey);
+		const LSTATUS status = Registry_CreateKey(HKEY_CLASSES_ROOT, NP2RegSubKey_JumpList L"\\shell\\open\\command", &hSubKey);
 		if (status == ERROR_SUCCESS) {
 			HKEY hKey;
 			RegOpenKeyEx(HKEY_CLASSES_ROOT, NP2RegSubKey_JumpList, 0, KEY_WRITE, &hKey);
@@ -2510,27 +2511,28 @@ void UpdateSystemIntegrationStatus(int mask, LPCWSTR lpszText, LPCWSTR lpszName)
 	}
 
 	// replace Windows Notepad
-	if (mask & SystemIntegration_Replacement) {
+	if (mask & SystemIntegration_ReplaceNotepad) {
 		HKEY hKey;
-		LSTATUS status = Registry_CreateKey(HKEY_LOCAL_MACHINE, NP2RegSubKey_Replacement, &hKey);
+		const LSTATUS status = Registry_CreateKey(HKEY_LOCAL_MACHINE, NP2RegSubKey_ReplaceNotepad, &hKey);
 		if (status == ERROR_SUCCESS) {
 			wsprintf(command, L"\"%s\" /z", tchModule);
 			Registry_SetString(hKey, L"Debugger", command);
 		}
 		RegCloseKey(hKey);
-	} else {
-		Registry_DeleteTree(HKEY_LOCAL_MACHINE, NP2RegSubKey_Replacement);
+	} else if (mask & SystemIntegration_RestoreNotepad) {
+		Registry_DeleteTree(HKEY_LOCAL_MACHINE, NP2RegSubKey_ReplaceNotepad);
 	}
 }
 
 static INT_PTR CALLBACK SystemIntegrationDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
-	UNREFERENCED_PARAMETER(wParam);
 	UNREFERENCED_PARAMETER(lParam);
 
 	switch (umsg) {
 	case WM_INITDIALOG: {
 		struct SystemIntegrationInfo info = {NULL, NULL};
-		int mask = GetSystemIntegrationStatus(&info);
+		const int mask = GetSystemIntegrationStatus(&info);
+		SetWindowLongPtr(hwnd, DWLP_USER, mask);
+
 		HWND hwndCtl = GetDlgItem(hwnd, IDC_CONTEXT_MENU_TEXT);
 		if (StrIsEmpty(info.lpszText)) {
 			WCHAR wch[128];
@@ -2555,15 +2557,15 @@ static INT_PTR CALLBACK SystemIntegrationDlgProc(HWND hwnd, UINT umsg, WPARAM wP
 		if (mask & SystemIntegration_JumpList) {
 			CheckDlgButton(hwnd, IDC_ENABLE_JUMP_LIST, BST_CHECKED);
 		}
-		if (mask & SystemIntegration_Replacement) {
+		if (mask & SystemIntegration_ReplaceNotepad) {
 			CheckDlgButton(hwnd, IDC_REPLACE_WINDOWS_NOTEPAD, BST_CHECKED);
 		}
 
 		if (IsVistaAndAbove() && !fIsElevated) {
-			Edit_SetReadOnly(hwndCtl, TRUE);
-			Edit_SetReadOnly(hwndName, TRUE);
 			EnableWindow(GetDlgItem(hwnd, IDC_ENABLE_CONTEXT_MENU), FALSE);
+			Edit_SetReadOnly(hwndCtl, TRUE);
 			EnableWindow(GetDlgItem(hwnd, IDC_ENABLE_JUMP_LIST), FALSE);
+			Edit_SetReadOnly(hwndName, TRUE);
 			EnableWindow(GetDlgItem(hwnd, IDC_REPLACE_WINDOWS_NOTEPAD), FALSE);
 		}
 
@@ -2583,7 +2585,13 @@ static INT_PTR CALLBACK SystemIntegrationDlgProc(HWND hwnd, UINT umsg, WPARAM wP
 					mask |= SystemIntegration_JumpList;
 				}
 				if (IsButtonChecked(hwnd, IDC_REPLACE_WINDOWS_NOTEPAD)) {
-					mask |= SystemIntegration_Replacement;
+					mask |= SystemIntegration_ReplaceNotepad;
+				} else {
+					// don't remove third party Notepad replacement.
+					const LONG_PTR prev = GetWindowLongPtr(hwnd, DWLP_USER);
+					if (prev & SystemIntegration_ReplaceNotepad) {
+						mask |= SystemIntegration_RestoreNotepad;
+					}
 				}
 
 				WCHAR wchText[128];
