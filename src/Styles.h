@@ -22,8 +22,12 @@
 #include "EditLexer.h"
 // Number of Lexers in pLexArray
 #define NUMLEXERS	64
+
+// maximum favorite schemes count, DON'T change.
+#define MAX_FAVORITE_SCHEMES_COUNT			31
+// All Files, current scheme, Text File, 2nd Text File and favorite schemes
 // see Style_GetOpenDlgFilterStr() for actually count.
-#define OPENDLG_MAX_LEXER_COUNT				(31 + 1 + 2)
+#define OPENDLG_MAX_LEXER_COUNT				(MAX_FAVORITE_SCHEMES_COUNT + 2 + 2)
 
 #define INI_SECTION_NAME_STYLES				L"Styles"
 #define INI_SECTION_NAME_FILE_EXTENSIONS	L"File Extensions"
