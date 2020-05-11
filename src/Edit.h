@@ -117,7 +117,7 @@ BOOL	EditLoadFile(LPWSTR pszFile, BOOL bSkipEncodingDetection, struct EditFileIO
 BOOL	EditSaveFile(HWND hwnd, LPCWSTR pszFile, BOOL bSaveCopy, struct EditFileIOStatus *status);
 
 void	EditInvertCase(void);
-void	EditTitleCase(void);
+void	EditTitleCase(UINT menu);
 void	EditSentenceCase(void);
 
 void	EditURLEncode(void);
