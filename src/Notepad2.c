@@ -7125,13 +7125,24 @@ BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect, LPCWST
 		SciCall_SetEOLMode(iEOLMode);
 		UpdateStatusBarCache(STATUS_CODEPAGE);
 		UpdateStatusBarCache(STATUS_EOLMODE);
+
 		BOOL bUnknownFile = FALSE;
-		if (!lexerSpecified) { // flagLexerSpecified will be cleared
-			np2LexLangIndex = 0;
-			bUnknownFile = !Style_SetLexerFromFile(szCurFile);
+		if (!lexerSpecified) {
+			if (flagLexerSpecified) {
+				if (pLexCurrent->rid == iInitialLexer) {
+					UpdateLineNumberWidth();
+				} else {
+					Style_SetLexerFromID(iInitialLexer);
+				}
+				flagLexerSpecified = 0;
+			} else {
+				np2LexLangIndex = 0;
+				bUnknownFile = !Style_SetLexerFromFile(szCurFile);
+			}
 		} else {
 			UpdateLineNumberWidth();
 		}
+
 		MRU_AddFile(pFileMRU, szFileName, flagRelativeFileMRU, flagPortableMyDocs);
 		if (flagUseSystemMRU == 2) {
 			SHAddToRecentDocs(SHARD_PATHW, szFileName);
@@ -7299,7 +7310,16 @@ BOOL FileSave(BOOL bSaveAlways, BOOL bAsk, BOOL bSaveAs, BOOL bSaveCopy) {
 					if (!fKeepTitleExcerpt) {
 						lstrcpy(szTitleExcerpt, L"");
 					}
-					Style_SetLexerFromFile(szCurFile);
+					if (flagLexerSpecified) {
+						if (pLexCurrent->rid == iInitialLexer) {
+							UpdateLineNumberWidth();
+						} else {
+							Style_SetLexerFromID(iInitialLexer);
+						}
+						flagLexerSpecified = 0;
+					} else {
+						Style_SetLexerFromFile(szCurFile);
+					}
 				} else {
 					lstrcpy(tchLastSaveCopyDir, tchFile);
 					PathRemoveFileSpec(tchLastSaveCopyDir);
@@ -7370,7 +7390,8 @@ BOOL OpenFileDlg(HWND hwnd, LPWSTR lpstrFile, int cchFile, LPCWSTR lpstrInitialD
 
 	WCHAR szFile[MAX_PATH];
 	lstrcpy(szFile, L"");
-	LPWSTR szFilter = Style_GetOpenDlgFilterStr(TRUE);
+	int lexers[1 + OPENDLG_MAX_LEXER_COUNT] = {0}; // 1-based filter index
+	LPWSTR szFilter = Style_GetOpenDlgFilterStr(TRUE, lexers);
 
 	OPENFILENAME ofn;
 	ZeroMemory(&ofn, sizeof(OPENFILENAME));
@@ -7388,6 +7409,9 @@ BOOL OpenFileDlg(HWND hwnd, LPWSTR lpstrFile, int cchFile, LPCWSTR lpstrInitialD
 	const BOOL success = GetOpenFileName(&ofn);
 	if (success) {
 		lstrcpyn(lpstrFile, szFile, cchFile);
+		const int iLexer = lexers[ofn.nFilterIndex];
+		flagLexerSpecified = iLexer != 0;
+		iInitialLexer = iLexer;
 	}
 	NP2HeapFree(szFilter);
 	return success;
@@ -7420,7 +7444,8 @@ BOOL SaveFileDlg(HWND hwnd, LPWSTR lpstrFile, int cchFile, LPCWSTR lpstrInitialD
 
 	WCHAR szNewFile[MAX_PATH];
 	lstrcpy(szNewFile, lpstrFile);
-	LPWSTR szFilter = Style_GetOpenDlgFilterStr(FALSE);
+	int lexers[1 + OPENDLG_MAX_LEXER_COUNT] = {0}; // 1-based filter index
+	LPWSTR szFilter = Style_GetOpenDlgFilterStr(FALSE, lexers);
 
 	OPENFILENAME ofn;
 	ZeroMemory(&ofn, sizeof(OPENFILENAME));
@@ -7438,6 +7463,9 @@ BOOL SaveFileDlg(HWND hwnd, LPWSTR lpstrFile, int cchFile, LPCWSTR lpstrInitialD
 	const BOOL success = GetSaveFileName(&ofn);
 	if (success) {
 		lstrcpyn(lpstrFile, szNewFile, cchFile);
+		const int iLexer = lexers[ofn.nFilterIndex];
+		flagLexerSpecified = iLexer != 0;
+		iInitialLexer = iLexer;
 	}
 	NP2HeapFree(szFilter);
 	return success;

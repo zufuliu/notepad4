@@ -3077,7 +3077,7 @@ void Style_SetBookmark(void) {
 //
 // Style_GetOpenDlgFilterStr()
 //
-static int AddLexFilterStr(LPWSTR szFilter, LPCEDITLEXER pLex, int length) {
+static void AddLexFilterStr(LPWSTR szFilter, LPCEDITLEXER pLex, int *length, int lexers[], int *index) {
 	LPCWSTR p = pLex->szExtensions;
 	if (StrIsEmpty(p)) {
 		p = pLex->pszDefExt;
@@ -3109,7 +3109,7 @@ static int AddLexFilterStr(LPWSTR szFilter, LPCEDITLEXER pLex, int length) {
 	}
 
 	if (count == 0) {
-		return length;
+		return;
 	}
 	if (state == 1) {
 		--ptr; // trailing semicolon
@@ -3128,32 +3128,35 @@ static int AddLexFilterStr(LPWSTR szFilter, LPCEDITLEXER pLex, int length) {
 	LPCWSTR pszName = pLex->pszName;
 #endif
 
-	length += wsprintf(szFilter + length, L"%s (%s)|%s|", pszName, extensions, extensions);
-	return length;
+	*length += wsprintf(szFilter + *length, L"%s (%s)|%s|", pszName, extensions, extensions);
+	lexers[*index] = pLex->rid;
+	*index += 1;
 }
 
-LPWSTR Style_GetOpenDlgFilterStr(BOOL open) {
+LPWSTR Style_GetOpenDlgFilterStr(BOOL open, int lexers[]) {
 	int length = (MAX_FAVORITE_SCHEMES_COUNT + 1 + LEXER_INDEX_GENERAL - LEXER_INDEX_MATCH)
 				*(MAX_EDITLEXER_NAME_SIZE + MAX_EDITLEXER_EXT_SIZE*3*2);
 	LPWSTR szFilter = (LPWSTR)NP2HeapAlloc(length * sizeof(WCHAR));
 
 	length = 0;
+	int index = 1; // 1-based filter index
 	if (open) {
 		// All Files comes first for open file dialog.
 		GetString(IDS_FILTER_ALL, szFilter, MAX_EDITLEXER_EXT_SIZE);
 		length = lstrlen(szFilter);
+		++index;
 	}
 
 	// current scheme
-	length = AddLexFilterStr(szFilter, pLexCurrent, length);
+	AddLexFilterStr(szFilter, pLexCurrent, &length, lexers, &index);
 	// text file and favorite schemes
-	for (UINT index = LEXER_INDEX_MATCH; index < ALL_LEXER_COUNT; index++) {
-		LPCEDITLEXER pLex = pLexArray[index];
-		if (index >= LEXER_INDEX_GENERAL && pLex->iFavoriteOrder == 0) {
+	for (UINT iLexer = LEXER_INDEX_MATCH; iLexer < ALL_LEXER_COUNT; iLexer++) {
+		LPCEDITLEXER pLex = pLexArray[iLexer];
+		if (iLexer >= LEXER_INDEX_GENERAL && pLex->iFavoriteOrder == 0) {
 			break;
 		}
 		if (pLex != pLexCurrent) {
-			length = AddLexFilterStr(szFilter, pLex, length);
+			AddLexFilterStr(szFilter, pLex, &length, lexers, &index);
 		}
 	}
 
