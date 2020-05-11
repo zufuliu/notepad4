@@ -1138,6 +1138,12 @@ void EditTitleCase(UINT menu) {
 	case IDM_EDIT_MAP_KATAKANA:
 		flags = LCMAP_KATAKANA;
 		break;
+	default:
+#if defined(__GNUC__) || defined(__clang__)
+		__builtin_unreachable();
+#else
+		__assume(0);
+#endif
 	}
 
 	const Sci_Position iSelCount = SciCall_GetSelTextLength() - 1;
@@ -1154,11 +1160,11 @@ void EditTitleCase(UINT menu) {
 		if (charsConverted) {
 			LPWSTR pszMappedW = (LPWSTR)NP2HeapAlloc((charsConverted + 1)*sizeof(WCHAR));
 			charsConverted = LCMapString(LOCALE_SYSTEM_DEFAULT, flags, pszTextW, cchTextW, pszMappedW, charsConverted);
-			if (charsConverted) {
+			bChanged = !(charsConverted == 0 || StrEqual(pszTextW, pszMappedW));
+			if (bChanged) {
 				NP2HeapFree(pszTextW);
 				pszTextW = pszMappedW;
 				cchTextW = charsConverted;
-				bChanged = TRUE;
 				charsConverted *= kMaxMultiByteCount;
 				if (charsConverted > iSelCount) {
 					NP2HeapFree(pszText);
@@ -1168,7 +1174,10 @@ void EditTitleCase(UINT menu) {
 				NP2HeapFree(pszMappedW);
 			}
 		}
-	} else if (menu == IDM_EDIT_TITLECASE) {
+	}
+
+#if _WIN32_WINNT < _WIN32_WINNT_WIN7
+	else if (menu == IDM_EDIT_TITLECASE) {
 #if 1
 		// BOOKMARK_EDITION
 		//Slightly enhanced function to make Title Case:
@@ -1224,6 +1233,7 @@ void EditTitleCase(UINT menu) {
 		}
 #endif
 	}
+#endif
 
 	if (bChanged) {
 		cchTextW = WideCharToMultiByte(cpEdit, 0, pszTextW, cchTextW, pszText, (int)NP2HeapSize(pszText), NULL, NULL);
