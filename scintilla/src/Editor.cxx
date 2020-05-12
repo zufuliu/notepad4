@@ -647,12 +647,12 @@ SelectionRange Editor::LineSelectionRange(SelectionPosition currentPos_, Selecti
 		anchor_ = SelectionPosition(
 			pdoc->LineStart(pdoc->LineFromPosition(anchor_.Position())));
 		currentPos_ = SelectionPosition(
-			pdoc->LineEnd(pdoc->LineFromPosition(currentPos_.Position())));
+			pdoc->LineStart(pdoc->LineFromPosition(currentPos_.Position()) + 1));
 	} else {
 		currentPos_ = SelectionPosition(
 			pdoc->LineStart(pdoc->LineFromPosition(currentPos_.Position())));
 		anchor_ = SelectionPosition(
-			pdoc->LineEnd(pdoc->LineFromPosition(anchor_.Position())));
+			pdoc->LineStart(pdoc->LineFromPosition(anchor_.Position()) + 1));
 	}
 	return SelectionRange(currentPos_, anchor_);
 }
