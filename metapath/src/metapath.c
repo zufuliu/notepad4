@@ -1569,13 +1569,17 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	}
 	break;
 
-	case IDM_VIEW_NEWWINDOW: {
+	case IDM_VIEW_NEWWINDOW:
+	case IDM_FILE_RESTART: {
 		WCHAR szModuleName[MAX_PATH];
 		WCHAR szParameters[1024];
 
 		GetModuleFileName(NULL, szModuleName, COUNTOF(szModuleName));
 		GetRelaunchParameters(szParameters);
-		ShellExecute(hwnd, NULL, szModuleName, szParameters, NULL, SW_SHOWNORMAL);
+		const LONG_PTR result = (LONG_PTR)ShellExecute(hwnd, NULL, szModuleName, szParameters, NULL, SW_SHOWNORMAL);
+		if (result > 32 && LOWORD(wParam) == IDM_FILE_RESTART) {
+			DestroyWindow(hwnd);
+		}
 	}
 	break;
 
