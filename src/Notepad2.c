@@ -2434,8 +2434,8 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	EnableCmd(hmenu, IDM_EDIT_FINDPREV, i && StrNotEmptyA(efrData.szFind));
 	EnableCmd(hmenu, IDM_EDIT_REPLACE, i /*&& !bReadOnly*/);
 	EnableCmd(hmenu, IDM_EDIT_REPLACENEXT, i);
-	//EnableCmd(hmenu, IDM_EDIT_SELECTWORD, i);
-	//EnableCmd(hmenu, IDM_EDIT_SELECTLINE, i);
+	EnableCmd(hmenu, IDM_EDIT_SELECTWORD, i);
+	EnableCmd(hmenu, IDM_EDIT_SELECTLINE, i);
 	EnableCmd(hmenu, IDM_EDIT_SELTODOCEND, i);
 	EnableCmd(hmenu, IDM_EDIT_SELTODOCSTART, i);
 	EnableCmd(hmenu, IDM_EDIT_SELTONEXT, i && StrNotEmptyA(efrData.szFind));
