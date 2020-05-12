@@ -2197,9 +2197,13 @@ void SetUILanguage(UINT menu) {
 		break;
 	}
 
-	// TODO: change UI language without restart or alert restart is required.
-	uiLanguage = lang;
-	IniSetInt(INI_SECTION_NAME_FLAGS, L"UILanguage", lang);
+	if (uiLanguage != lang) {
+		uiLanguage = lang;
+		IniSetInt(INI_SECTION_NAME_FLAGS, L"UILanguage", lang);
+		if (MsgBox(MBYESNOCANCEL, IDS_CHANGE_LANG_RESTART) == IDYES) {
+			PostWMCommand(hwndMain, IDM_FILE_RESTART);
+		}
+	}
 }
 #endif
 

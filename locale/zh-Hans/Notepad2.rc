@@ -1873,6 +1873,9 @@ BEGIN
     IDS_ERR_ENCODINGNA      "您的系统上没有所选编码的代码页转换表。"
     IDS_ERR_UNICODE         "转换该 Unicode 文件时出错。\n如果保存该文件，数据将会丢失！"
 	IDS_BINARY_FILE_LOCKED	"这不太像是一个文本文件，已被锁定编辑，以防止意外的编辑造成文件损坏。"
+#if NP2_ENABLE_APP_LOCALIZATION_DLL
+	IDS_CHANGE_LANG_RESTART	"更改界面语言需要重新启动 Notepad2，现在就重新启动吗？"
+#endif
 END
 
 STRINGTABLE
