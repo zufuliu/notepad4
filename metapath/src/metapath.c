@@ -2357,7 +2357,6 @@ void ValidateUILangauge(void) {
 }
 
 void SetUILanguage(UINT resID) {
-	languageResID = resID;
 	LANGID lang = uiLanguage;
 	switch (resID) {
 	case IDS_LANG_USER_DEFAULT:
@@ -2377,10 +2376,16 @@ void SetUILanguage(UINT resID) {
 		break;
 	}
 
-	if (uiLanguage != lang) {
+	if (uiLanguage == lang) {
+		return;
+	}
+
+	const int result = MsgBox(MBYESNOCANCEL, IDS_CHANGE_LANG_RESTART);
+	if (result != IDCANCEL) {
+		languageResID = resID;
 		uiLanguage = lang;
 		IniSetInt(INI_SECTION_NAME_FLAGS, L"UILanguage", lang);
-		if (MsgBox(MBYESNOCANCEL, IDS_CHANGE_LANG_RESTART) == IDYES) {
+		if (result == IDYES) {
 			PostWMCommand(hwndMain, IDM_FILE_RESTART);
 		}
 	}

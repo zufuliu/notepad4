@@ -2177,7 +2177,6 @@ void ValidateUILangauge(void) {
 }
 
 void SetUILanguage(UINT menu) {
-	languageMenu = menu;
 	LANGID lang = uiLanguage;
 	switch (menu) {
 	case IDM_LANG_USER_DEFAULT:
@@ -2197,10 +2196,16 @@ void SetUILanguage(UINT menu) {
 		break;
 	}
 
-	if (uiLanguage != lang) {
+	if (uiLanguage == lang) {
+		return;
+	}
+
+	const int result = MsgBox(MBYESNOCANCEL, IDS_CHANGE_LANG_RESTART);
+	if (result != IDCANCEL) {
+		languageMenu = menu;
 		uiLanguage = lang;
 		IniSetInt(INI_SECTION_NAME_FLAGS, L"UILanguage", lang);
-		if (MsgBox(MBYESNOCANCEL, IDS_CHANGE_LANG_RESTART) == IDYES) {
+		if (result == IDYES) {
 			PostWMCommand(hwndMain, IDM_FILE_RESTART);
 		}
 	}
@@ -7095,7 +7100,7 @@ BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect, LPCWST
 
 	// Ask to create a new file...
 	if (!bReload && !PathFileExists(szFileName)) {
-		UINT result = IDCANCEL;
+		int result = IDCANCEL;
 		if (flagQuietCreate || (result = MsgBox(MBYESNOCANCEL, IDS_ASK_CREATE, szFileName)) == IDYES) {
 			HANDLE hFile = CreateFile(szFileName,
 									  GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE,
