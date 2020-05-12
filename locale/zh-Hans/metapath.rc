@@ -647,6 +647,9 @@ BEGIN
     IDS_ERR_CREATELINK      "创建指定的链接时出错。\n可能目标文件夹被写保护了。"
     IDS_ERR_FILTER          "未指定其他过滤项。\n请参阅 metapath 自述文件以获取更多信息。"
     IDS_ERR_PREVWINDISABLED "现有的 metapath 窗口正忙或有一个活动的对话框。\n要另外打开一个 metapath 窗口吗？"
+#if NP2_ENABLE_APP_LOCALIZATION_DLL
+	IDS_CHANGE_LANG_RESTART	"更改界面语言需要重新启动 metapath，现在就重新启动吗？"
+#endif
 END
 
 STRINGTABLE

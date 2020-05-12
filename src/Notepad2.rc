@@ -1873,6 +1873,9 @@ BEGIN
     IDS_ERR_ENCODINGNA      "Code page conversion tables for the selected encoding are not available on your system."
     IDS_ERR_UNICODE         "Error converting this Unicode file.\nData will be lost if the file is saved!"
 	IDS_BINARY_FILE_LOCKED	"This is most likely not a text file, so it is locked for editing\nto prevent accidental editing cause file corruption."
+#if NP2_ENABLE_APP_LOCALIZATION_DLL
+	IDS_CHANGE_LANG_RESTART	"Changing the UI language requires a restart of Notepad2, restart now?"
+#endif
 END
 
 STRINGTABLE

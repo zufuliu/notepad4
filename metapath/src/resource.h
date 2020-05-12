@@ -263,6 +263,7 @@
 #define IDS_ERR_INIOPEN					50018
 #define IDS_ERR_INICREATE				50019
 #define IDS_ERR_INIWRITE				50020
+#define IDS_CHANGE_LANG_RESTART			50021
 
 // Next default values for new objects
 //
