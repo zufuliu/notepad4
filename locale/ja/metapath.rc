@@ -630,31 +630,31 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_ERR_CD              "Directory Access Error\nNo access to specified directory.\nCheck the disk or the network connection."
-    IDS_ERR_FILE            "File Access Error\nNo access to ""%s"".\nThe file may be used by another application.\nCheck the disk or the network connection."
-    IDS_ERR_NEW             "File Access Error\nFile could not be created.\nCheck the disk or the network connection."
-    IDS_ERR_NEWDIR          "Directory Access Error\nDirectory could not be created.\nCheck the disk or the network connection."
-    IDS_ERR_SAVEAS1         "File Save Error\nError saving ""%s"".\nProbably an already existing file is write-protected."
-    IDS_ERR_SAVEAS2         "File Save Error\nError removing read-only attribute of saved file."
-    IDS_ERR_CMDLINE         "metapath\nError accessing file or directory specified in command line."
-    IDS_ERR_STARTUPDIR      "metapath\nNo access to startup directory."
-    IDS_ERR_DROP1           "metapath\nNo access to dropped file or directory."
-    //IDS_ERR_DROP2           "metapath\nOnly a single file or directory can be dropped at a time."
-    IDS_ERR_FAVORITES       "Favorites\nNo access to ""Favorites"" folder.\nSpecify a valid directory in the ""Options"" dialog box."
-    IDS_ERR_LNK_GETPATH     "Link Error\nNo valid filesystem-path available for linked object.\nProbably the link doesn't refer to a file or directory."
-    IDS_ERR_LNK_NOACCESS    "Link Error\nNo access to filesystem-path of linked object.\nCheck the disk or the network connection."
-    IDS_ERR_CREATELINK      "Link Error\nError creating the specified link.\nProbably the destination directory is write-protected."
-    IDS_ERR_FILTER          "File Filter Error\nNo additional filters specified.\nPlease refer to the metapath readme file for more information."
-    IDS_ERR_PREVWINDISABLED "metapath\nExisting metapath window is busy or has an active dialog box.\nDo you want to open another metapath window?"
+    IDS_ERR_CD              "No access to specified directory.\nCheck the disk or the network connection."
+    IDS_ERR_FILE            "No access to ""%s"".\nThe file may be used by another application.\nCheck the disk or the network connection."
+    IDS_ERR_NEW             "File could not be created.\nCheck the disk or the network connection."
+    IDS_ERR_NEWDIR          "Directory could not be created.\nCheck the disk or the network connection."
+    IDS_ERR_SAVEAS1         "Error saving ""%s"".\nProbably an already existing file is write-protected."
+    IDS_ERR_SAVEAS2         "Error removing read-only attribute of saved file."
+    IDS_ERR_CMDLINE         "Error accessing file or directory specified in command line."
+    IDS_ERR_STARTUPDIR      "No access to startup directory."
+    IDS_ERR_DROP1           "No access to dropped file or directory."
+    //IDS_ERR_DROP2           "Only a single file or directory can be dropped at a time."
+    IDS_ERR_FAVORITES       "No access to ""Favorites"" folder.\nSpecify a valid directory in the ""Options"" dialog box."
+    IDS_ERR_LNK_GETPATH     "No valid filesystem-path available for linked object.\nProbably the link doesn't refer to a file or directory."
+    IDS_ERR_LNK_NOACCESS    "No access to filesystem-path of linked object.\nCheck the disk or the network connection."
+    IDS_ERR_CREATELINK      "Error creating the specified link.\nProbably the destination directory is write-protected."
+    IDS_ERR_FILTER          "No additional filters specified.\nPlease refer to the metapath readme file for more information."
+    IDS_ERR_PREVWINDISABLED "Existing metapath window is busy or has an active dialog box.\nDo you want to open another metapath window?"
 END
 
 STRINGTABLE
 BEGIN
-    IDS_ERR_TARGETDISABLED  "metapath\nExisting target window is busy or has an active dialog box.\nWould you like to open a new window?"
-    IDS_ERR_INVALIDTARGET   "metapath\nPlease make sure all the required fields are completed.\nYou will also have to find a target window if the appropriate option is enabled."
-    IDS_ERR_INIOPEN         "metapath\nNo access to metapath configuration file."
-    IDS_ERR_INICREATE       "Save Settings\nError creating configuration file."
-    IDS_ERR_INIWRITE        "Save Settings\nSettings not saved!\nNo write access to configuration file."
+    IDS_ERR_TARGETDISABLED  "Existing target window is busy or has an active dialog box.\nWould you like to open a new window?"
+    IDS_ERR_INVALIDTARGET   "Please make sure all the required fields are completed.\nYou will also have to find a target window if the appropriate option is enabled."
+    IDS_ERR_INIOPEN         "No access to metapath configuration file."
+    IDS_ERR_INICREATE       "Error creating configuration file."
+    IDS_ERR_INIWRITE        "Settings not saved!\nNo write access to configuration file."
 END
 
 STRINGTABLE
@@ -674,7 +674,7 @@ BEGIN
     IDS_OPENWITH            "Select the directory with links to your favorite applications."
     IDS_COPYMOVE            "Select a destination directory."
     IDS_CREATELINK          "Select a destination directory for the new link."
-    IDS_SAVESETTINGS        "Save Settings\nThe current program settings have been saved."
+    IDS_SAVESETTINGS        "The current program settings have been saved."
 END
 
 #if NP2_ENABLE_APP_LOCALIZATION_DLL

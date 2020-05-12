@@ -630,31 +630,31 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_ERR_CD              "目录访问错误\n无权访问指定目录。\n请检查磁盘或网络连接。"
-    IDS_ERR_FILE            "文件访问错误\n无权访问“%s”。\n该文件可能正被其他应用程序使用。\n请检查磁盘或网络连接。"
-    IDS_ERR_NEW             "文件访问错误\n无法创建文件。\n请检查磁盘或网络连接。"
-    IDS_ERR_NEWDIR          "目录访问错误\n无法创建文件夹。\n请检查磁盘或网络连接。"
-    IDS_ERR_SAVEAS1         "文件保存错误\n保存“%s”时出错。\n可能是现有文件被写保护了。"
-    IDS_ERR_SAVEAS2         "文件保存错误\n删除已保存文件的只读属性时出错。"
-    IDS_ERR_CMDLINE         "metapath\n访问命令行中指定的文件或文件夹时出错。"
-    IDS_ERR_STARTUPDIR      "metapath\n无权访问启动文件夹。"
-    IDS_ERR_DROP1           "metapath\n无权访问拖拽放置的文件或文件夹。"
-    //IDS_ERR_DROP2           "metapath\nOnly a single file or directory can be dropped at a time."
-    IDS_ERR_FAVORITES       "收藏夹\n无权访问“收藏夹”文件夹。\n请在“选项”对话框中指定一个有效的文件夹。"
-    IDS_ERR_LNK_GETPATH     "链接错误\n没有可用于链接的对象的有效的文件系统路径。\n链接可能未指向一个文件或文件夹。"
-    IDS_ERR_LNK_NOACCESS    "链接错误\n无权访问已链接对象的文件系统路径。\n请检查磁盘或网络连接。"
-    IDS_ERR_CREATELINK      "链接错误\n创建指定的链接时出错。\n可能目标文件夹被写保护了。"
-    IDS_ERR_FILTER          "文件过滤错误\n未指定其他过滤项。\n请参阅 metapath 自述文件以获取更多信息。"
-    IDS_ERR_PREVWINDISABLED "metapath\n现有的 metapath 窗口正忙或有一个活动的对话框。\n要另外打开一个 metapath 窗口吗？"
+    IDS_ERR_CD              "无权访问指定目录。\n请检查磁盘或网络连接。"
+    IDS_ERR_FILE            "无权访问“%s”。\n该文件可能正被其他应用程序使用。\n请检查磁盘或网络连接。"
+    IDS_ERR_NEW             "无法创建文件。\n请检查磁盘或网络连接。"
+    IDS_ERR_NEWDIR          "无法创建文件夹。\n请检查磁盘或网络连接。"
+    IDS_ERR_SAVEAS1         "保存“%s”时出错。\n可能是现有文件被写保护了。"
+    IDS_ERR_SAVEAS2         "删除已保存文件的只读属性时出错。"
+    IDS_ERR_CMDLINE         "访问命令行中指定的文件或文件夹时出错。"
+    IDS_ERR_STARTUPDIR      "无权访问启动文件夹。"
+    IDS_ERR_DROP1           "无权访问拖拽放置的文件或文件夹。"
+    //IDS_ERR_DROP2           "Only a single file or directory can be dropped at a time."
+    IDS_ERR_FAVORITES       "无权访问“收藏夹”文件夹。\n请在“选项”对话框中指定一个有效的文件夹。"
+    IDS_ERR_LNK_GETPATH     "没有可用于链接的对象的有效的文件系统路径。\n链接可能未指向一个文件或文件夹。"
+    IDS_ERR_LNK_NOACCESS    "无权访问已链接对象的文件系统路径。\n请检查磁盘或网络连接。"
+    IDS_ERR_CREATELINK      "创建指定的链接时出错。\n可能目标文件夹被写保护了。"
+    IDS_ERR_FILTER          "未指定其他过滤项。\n请参阅 metapath 自述文件以获取更多信息。"
+    IDS_ERR_PREVWINDISABLED "现有的 metapath 窗口正忙或有一个活动的对话框。\n要另外打开一个 metapath 窗口吗？"
 END
 
 STRINGTABLE
 BEGIN
-    IDS_ERR_TARGETDISABLED  "metapath\n现有的目标窗口正忙或有一个活动的对话框。\n要打开一个新的窗口吗？"
-    IDS_ERR_INVALIDTARGET   "metapath\n请确保已填写所有需要的字段。\n如果对应的选项已启用，您还需要找一个目标窗口。"
-    IDS_ERR_INIOPEN         "metapath\n没有权限访问 metapath 配置文件。"
-    IDS_ERR_INICREATE       "保存设置\n创建配置文件时出错。"
-    IDS_ERR_INIWRITE        "保存设置\n设置没有保存！\n没有写入配置文件的权限。"
+    IDS_ERR_TARGETDISABLED  "现有的目标窗口正忙或有一个活动的对话框。\n要打开一个新的窗口吗？"
+    IDS_ERR_INVALIDTARGET   "请确保已填写所有需要的字段。\n如果对应的选项已启用，您还需要找一个目标窗口。"
+    IDS_ERR_INIOPEN         "没有权限访问 metapath 配置文件。"
+    IDS_ERR_INICREATE       "创建配置文件时出错。"
+    IDS_ERR_INIWRITE        "设置没有保存！\n没有写入配置文件的权限。"
 END
 
 STRINGTABLE
@@ -674,7 +674,7 @@ BEGIN
     IDS_OPENWITH            "点击此处选择存放您收藏的应用程序链接的文件夹。"
     IDS_COPYMOVE            "选择目标文件夹。"
     IDS_CREATELINK          "选择新链接的目标文件夹。"
-    IDS_SAVESETTINGS        "保存设置\n当前的程序设置已保存。"
+    IDS_SAVESETTINGS        "当前的程序设置已保存。"
 END
 
 #if NP2_ENABLE_APP_LOCALIZATION_DLL

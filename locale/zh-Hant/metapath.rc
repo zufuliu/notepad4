@@ -630,31 +630,31 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_ERR_CD              "目錄存取錯誤\n無權存取指定目錄。\n請檢查磁碟或網路連線。"
-    IDS_ERR_FILE            "檔案存取錯誤\n無權存取「%s」。\n此檔案可能正被其他應用程式使用。\n請檢查磁碟或網路連線。"
-    IDS_ERR_NEW             "檔案存取錯誤\n無法建立檔案。\n請檢查磁碟或網路連線。"
-    IDS_ERR_NEWDIR          "目錄存取錯誤\n無法建立資料夾。\n請檢查磁碟或網路連線。"
-    IDS_ERR_SAVEAS1         "檔案儲存錯誤\n儲存「%s」時發生錯誤。\n可能是現有檔案被寫保護了。"
-    IDS_ERR_SAVEAS2         "檔案儲存錯誤\n刪除已儲存檔案的唯讀屬性時發生錯誤。"
-    IDS_ERR_CMDLINE         "metapath\n存取命令行中指定的檔案或資料夾時發生錯誤。"
-    IDS_ERR_STARTUPDIR      "metapath\n無權存取啟動資料夾。"
-    IDS_ERR_DROP1           "metapath\n無權存取拖曳放置的檔案或資料夾。"
-    //IDS_ERR_DROP2           "metapath\nOnly a single file or directory can be dropped at a time."
-    IDS_ERR_FAVORITES       "我的最愛\n無權存取「我的最愛」資料夾。\n請在「選項」對話框中指定合法的資料夾。"
-    IDS_ERR_LNK_GETPATH     "連結錯誤\n沒有可用於連結的物件的合法的檔案系統路徑。\n連結可能未指向一個檔案或資料夾。"
-    IDS_ERR_LNK_NOACCESS    "連結錯誤\n無權存取連結物件的檔案系統路徑。\n請檢查磁碟或網路連線。"
-    IDS_ERR_CREATELINK      "連結錯誤\n建立指定的連結時發生錯誤。\n可能目標資料夾被寫保護了。"
-    IDS_ERR_FILTER          "檔案過濾錯誤\n沒有指定其他過濾項目。\n請參閱 metapath 自述檔案以取得更多資訊。"
-    IDS_ERR_PREVWINDISABLED "metapath\n現有的 metapath 視窗正忙或有一個活動的對話框。\n要另外開啟一個 metapath 視窗嗎？"
+    IDS_ERR_CD              "無權存取指定目錄。\n請檢查磁碟或網路連線。"
+    IDS_ERR_FILE            "無權存取「%s」。\n此檔案可能正被其他應用程式使用。\n請檢查磁碟或網路連線。"
+    IDS_ERR_NEW             "無法建立檔案。\n請檢查磁碟或網路連線。"
+    IDS_ERR_NEWDIR          "無法建立資料夾。\n請檢查磁碟或網路連線。"
+    IDS_ERR_SAVEAS1         "儲存「%s」時發生錯誤。\n可能是現有檔案被寫保護了。"
+    IDS_ERR_SAVEAS2         "刪除已儲存檔案的唯讀屬性時發生錯誤。"
+    IDS_ERR_CMDLINE         "存取命令行中指定的檔案或資料夾時發生錯誤。"
+    IDS_ERR_STARTUPDIR      "無權存取啟動資料夾。"
+    IDS_ERR_DROP1           "無權存取拖曳放置的檔案或資料夾。"
+    //IDS_ERR_DROP2           "Only a single file or directory can be dropped at a time."
+    IDS_ERR_FAVORITES       "無權存取「我的最愛」資料夾。\n請在「選項」對話框中指定合法的資料夾。"
+    IDS_ERR_LNK_GETPATH     "沒有可用於連結的物件的合法的檔案系統路徑。\n連結可能未指向一個檔案或資料夾。"
+    IDS_ERR_LNK_NOACCESS    "無權存取連結物件的檔案系統路徑。\n請檢查磁碟或網路連線。"
+    IDS_ERR_CREATELINK      "建立指定的連結時發生錯誤。\n可能目標資料夾被寫保護了。"
+    IDS_ERR_FILTER          "沒有指定其他過濾項目。\n請參閱 metapath 自述檔案以取得更多資訊。"
+    IDS_ERR_PREVWINDISABLED "現有的 metapath 視窗正忙或有一個活動的對話框。\n要另外開啟一個 metapath 視窗嗎？"
 END
 
 STRINGTABLE
 BEGIN
-    IDS_ERR_TARGETDISABLED  "metapath\n現有的目標視窗正忙或有一個活動的對話框。\n要開啟新的視窗嗎？"
-    IDS_ERR_INVALIDTARGET   "metapath\n請確定已填寫所有需要的欄位。\n如果對應的選項已開啟，您必須找一個目標視窗。"
-    IDS_ERR_INIOPEN         "metapath\n沒有權限存取 metapath 設定檔。"
-    IDS_ERR_INICREATE       "儲存設定\n建立設定檔時發生錯誤。"
-    IDS_ERR_INIWRITE        "儲存設定\n設定沒有儲存！\n沒有寫入設定檔的權限。"
+    IDS_ERR_TARGETDISABLED  "現有的目標視窗正忙或有一個活動的對話框。\n要開啟新的視窗嗎？"
+    IDS_ERR_INVALIDTARGET   "請確定已填寫所有需要的欄位。\n如果對應的選項已開啟，您必須找一個目標視窗。"
+    IDS_ERR_INIOPEN         "沒有權限存取 metapath 設定檔。"
+    IDS_ERR_INICREATE       "建立設定檔時發生錯誤。"
+    IDS_ERR_INIWRITE        "設定沒有儲存！\n沒有寫入設定檔的權限。"
 END
 
 STRINGTABLE
@@ -674,7 +674,7 @@ BEGIN
     IDS_OPENWITH            "點選此處選擇存放您的收藏的應用程式連結的資料夾。"
     IDS_COPYMOVE            "選擇目標資料夾。"
     IDS_CREATELINK          "選擇新連結的目標資料夾。"
-    IDS_SAVESETTINGS        "儲存設定\n目前的程式設定已儲存。"
+    IDS_SAVESETTINGS        "目前的程式設定已儲存。"
 END
 
 #if NP2_ENABLE_APP_LOCALIZATION_DLL
