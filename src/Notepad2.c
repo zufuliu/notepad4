@@ -3024,7 +3024,12 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			bLastCopyFromMe = TRUE;
 		}
 		if (SciCall_IsSelectionEmpty()) {
+			Sci_Position iCurrentPos = SciCall_GetCurrentPos();
+			const Sci_Position iCol = SciCall_GetColumn(iCurrentPos) + 1;
 			SciCall_LineCut(bEnableLineSelectionMode);
+			iCurrentPos = SciCall_GetCurrentPos();
+			const Sci_Line iCurLine = SciCall_LineFromPosition(iCurrentPos);
+			EditJumpTo(iCurLine, iCol);
 		} else {
 			SciCall_Cut(FALSE);
 		}
