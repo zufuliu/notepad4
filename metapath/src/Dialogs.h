@@ -21,14 +21,20 @@
 
 #include "compiler.h"
 
+#define MBINFO			0
+#define MBWARN			1
+#define MBYESNO			2
+#define MBYESNOWARN		3
+#define MBYESNOCANCEL	4
+#define MBOKCANCEL		8
+
 extern BOOL bWindowLayoutRTL;
 NP2_inline void InitWindowCommon(HWND hwnd) {
 	if (bWindowLayoutRTL) {
 		SetWindowLayoutRTL(hwnd, TRUE);
 	}
 }
-
-int  ErrorMessage(int iLevel, UINT uIdMsg, ...);
+int MsgBox(int iType, UINT uIdMsg, ...);
 BOOL GetDirectory(HWND hwndParent, int iTitle, LPWSTR pszFolder, LPCWSTR pszBase);
 BOOL GetDirectory2(HWND hwndParent, int iTitle, LPWSTR pszFolder, int iBase);
 

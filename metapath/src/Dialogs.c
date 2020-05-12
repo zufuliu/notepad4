@@ -34,32 +34,45 @@
 #include "resource.h"
 #include "version.h"
 
+extern HWND hwndMain;
 //=============================================================================
 //
-//  ErrorMessage()
+// MsgBox()
 //
-//  L"Title\nMessage Text"
-//
-extern HWND hwndMain;
-
-int ErrorMessage(int iLevel, UINT uIdMsg, ...) {
+int MsgBox(int iType, UINT uIdMsg, ...) {
+	WCHAR szBuf[256 * 2];
 	WCHAR szText[256 * 2];
-	WCHAR szTitle[256 * 2];
 
-	GetString(uIdMsg, szText, COUNTOF(szText));
+	GetString(uIdMsg, szBuf, COUNTOF(szBuf));
 
 	va_list va;
 	va_start(va, uIdMsg);
-	wvsprintf(szTitle, szText, va);
+	wvsprintf(szText, szBuf, va);
 	va_end(va);
 
-	WCHAR *c = StrChr(szTitle, L'\n');
-	if (c) {
-		lstrcpy(szText, (c + 1));
-		*c = L'\0';
-	} else {
-		lstrcpy(szText, szTitle);
-		lstrcpy(szTitle, L"");
+	WCHAR szTitle[64];
+	GetString(IDS_APPTITLE, szTitle, COUNTOF(szTitle));
+
+	int iIcon = MB_OK;
+	switch (iType) {
+	case MBINFO:
+		iIcon = MB_ICONINFORMATION;
+		break;
+	case MBWARN:
+		iIcon = MB_ICONEXCLAMATION;
+		break;
+	case MBYESNO:
+		iIcon = MB_ICONEXCLAMATION | MB_YESNO;
+		break;
+	case MBYESNOCANCEL:
+		iIcon = MB_ICONEXCLAMATION | MB_YESNOCANCEL;
+		break;
+	case MBYESNOWARN:
+		iIcon = MB_ICONEXCLAMATION | MB_YESNO;
+		break;
+	case MBOKCANCEL:
+		iIcon = MB_ICONEXCLAMATION | MB_OKCANCEL;
+		break;
 	}
 
 	HWND hwnd;
@@ -67,9 +80,10 @@ int ErrorMessage(int iLevel, UINT uIdMsg, ...) {
 		hwnd = hwndMain;
 	}
 
-	const int iIcon = (iLevel > 1) ? MB_ICONEXCLAMATION : MB_ICONINFORMATION;
 	PostMessage(hwndMain, APPM_CENTER_MESSAGE_BOX, (WPARAM)hwnd, 0);
-	return MessageBoxEx(hwnd, szText, szTitle, MB_SETFOREGROUND | iIcon, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT));
+	return MessageBoxEx(hwnd, szText, szTitle,
+						MB_SETFOREGROUND | iIcon,
+						MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT));
 }
 
 //=============================================================================
@@ -1424,7 +1438,7 @@ INT_PTR CALLBACK GetFilterDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lP
 					}
 				}
 			} else {
-				ErrorMessage(0, IDS_ERR_FILTER);
+				MsgBox(MBINFO, IDS_ERR_FILTER);
 			}
 
 			DestroyMenu(hMenu);
@@ -2477,7 +2491,7 @@ INT_PTR CALLBACK FindTargetDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 					 (GetDlgItemText(hwnd, IDC_DDEMSG, tch, COUNTOF(tch)) == 0 ||
 					  GetDlgItemText(hwnd, IDC_DDEAPP, tch, COUNTOF(tch)) == 0 ||
 					  GetDlgItemText(hwnd, IDC_DDETOPIC, tch, COUNTOF(tch)) == 0))) {
-				ErrorMessage(1, IDS_ERR_INVALIDTARGET);
+				MsgBox(MBINFO, IDS_ERR_INVALIDTARGET);
 			} else {
 				IniSectionOnSave section;
 				WCHAR *pIniSectionBuf = (WCHAR *)NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_TARGET_APPLICATION);
