@@ -2419,10 +2419,10 @@ int GetSystemIntegrationStatus(struct SystemIntegrationInfo *info) {
 				}
 				NP2HeapFree(command);
 			}
+			RegCloseKey(hSubKey);
 		}
-		RegCloseKey(hSubKey);
+		RegCloseKey(hKey);
 	}
-	RegCloseKey(hKey);
 
 	// jump list
 	status = RegOpenKeyEx(HKEY_CLASSES_ROOT, NP2RegSubKey_JumpList, 0, KEY_READ, &hKey);
@@ -2442,10 +2442,10 @@ int GetSystemIntegrationStatus(struct SystemIntegrationInfo *info) {
 				}
 				NP2HeapFree(command);
 			}
+			RegCloseKey(hSubKey);
 		}
-		RegCloseKey(hSubKey);
+		RegCloseKey(hKey);
 	}
-	RegCloseKey(hKey);
 
 	// replace Windows Notepad
 	status = RegOpenKeyEx(HKEY_LOCAL_MACHINE, NP2RegSubKey_ReplaceNotepad, 0, KEY_READ, &hKey);
@@ -2457,8 +2457,8 @@ int GetSystemIntegrationStatus(struct SystemIntegrationInfo *info) {
 			}
 			NP2HeapFree(command);
 		}
+		RegCloseKey(hKey);
 	}
-	RegCloseKey(hKey);
 
 	return mask;
 }
@@ -2482,8 +2482,8 @@ void UpdateSystemIntegrationStatus(int mask, LPCWSTR lpszText, LPCWSTR lpszName)
 			Registry_SetString(hKey, L"icon", tchModule);
 			Registry_SetDefaultString(hSubKey, command);
 			RegCloseKey(hKey);
+			RegCloseKey(hSubKey);
 		}
-		RegCloseKey(hSubKey);
 	} else {
 		Registry_DeleteTree(HKEY_CLASSES_ROOT, NP2RegSubKey_ContextMenu);
 	}
@@ -2499,13 +2499,13 @@ void UpdateSystemIntegrationStatus(int mask, LPCWSTR lpszText, LPCWSTR lpszName)
 			Registry_SetString(hKey, L"FriendlyAppName", lpszName);
 			Registry_SetDefaultString(hSubKey, command);
 			RegCloseKey(hKey);
+			RegCloseKey(hSubKey);
 
 			if (flagUseSystemMRU != 2) {
 				flagUseSystemMRU = 2;
 				IniSetInt(INI_SECTION_NAME_FLAGS, L"ShellUseSystemMRU", 1);
 			}
 		}
-		RegCloseKey(hSubKey);
 	} else {
 		Registry_DeleteTree(HKEY_CLASSES_ROOT, NP2RegSubKey_JumpList);
 	}
@@ -2517,8 +2517,8 @@ void UpdateSystemIntegrationStatus(int mask, LPCWSTR lpszText, LPCWSTR lpszName)
 		if (status == ERROR_SUCCESS) {
 			wsprintf(command, L"\"%s\" /z", tchModule);
 			Registry_SetString(hKey, L"Debugger", command);
+			RegCloseKey(hKey);
 		}
-		RegCloseKey(hKey);
 	} else if (mask & SystemIntegration_RestoreNotepad) {
 		Registry_DeleteTree(HKEY_LOCAL_MACHINE, NP2RegSubKey_ReplaceNotepad);
 	}

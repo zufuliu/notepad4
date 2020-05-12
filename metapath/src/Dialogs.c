@@ -968,10 +968,10 @@ int GetSystemIntegrationStatus(struct SystemIntegrationInfo *info) {
 				}
 				NP2HeapFree(command);
 			}
+			RegCloseKey(hSubKey);
 		}
-		RegCloseKey(hSubKey);
+		RegCloseKey(hKey);
 	}
-	RegCloseKey(hKey);
 
 	// jump list
 	status = RegOpenKeyEx(HKEY_CLASSES_ROOT, NP2RegSubKey_JumpList, 0, KEY_READ, &hKey);
@@ -991,10 +991,10 @@ int GetSystemIntegrationStatus(struct SystemIntegrationInfo *info) {
 				}
 				NP2HeapFree(command);
 			}
+			RegCloseKey(hSubKey);
 		}
-		RegCloseKey(hSubKey);
+		RegCloseKey(hKey);
 	}
-	RegCloseKey(hKey);
 
 	return mask;
 }
@@ -1016,8 +1016,8 @@ void UpdateSystemIntegrationStatus(int mask, LPCWSTR lpszText, LPCWSTR lpszName)
 			Registry_SetString(hKey, L"icon", tchModule);
 			Registry_SetDefaultString(hSubKey, command);
 			RegCloseKey(hKey);
+			RegCloseKey(hSubKey);
 		}
-		RegCloseKey(hSubKey);
 	} else {
 		Registry_DeleteTree(HKEY_CLASSES_ROOT, NP2RegSubKey_ContextMenu);
 	}
@@ -1033,8 +1033,8 @@ void UpdateSystemIntegrationStatus(int mask, LPCWSTR lpszText, LPCWSTR lpszName)
 			Registry_SetString(hKey, L"FriendlyAppName", lpszName);
 			Registry_SetDefaultString(hSubKey, command);
 			RegCloseKey(hKey);
+			RegCloseKey(hSubKey);
 		}
-		RegCloseKey(hSubKey);
 	} else {
 		Registry_DeleteTree(HKEY_CLASSES_ROOT, NP2RegSubKey_JumpList);
 	}

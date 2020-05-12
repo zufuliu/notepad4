@@ -3110,8 +3110,8 @@ static void AddLexFilterStr(LPWSTR szFilter, LPCEDITLEXER pLex, LPCWSTR lpszExt,
 	// add file extension for current file to current scheme
 	if (StrNotEmpty(lpszExt)) {
 		if (state == 0) {
-			*ptr++ = L';';
 			state = 1;
+			*ptr++ = L';';
 		}
 		*ptr = L'\0';
 
