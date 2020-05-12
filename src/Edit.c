@@ -4328,13 +4328,21 @@ void EditSelectWord(void) {
 }
 
 void EditSelectLine(void) {
-	Sci_Position iSelStart = SciCall_GetSelectionStart();
-	Sci_Position iSelEnd = SciCall_GetSelectionEnd();
-	const Sci_Line iLineStart = SciCall_LineFromPosition(iSelStart);
-	const Sci_Line iLineEnd = SciCall_LineFromPosition(iSelEnd);
-	iSelStart = SciCall_PositionFromLine(iLineStart);
-	iSelEnd = SciCall_PositionFromLine(iLineEnd + 1);
-	SciCall_SetSel(iSelStart, iSelEnd);
+	// see Editor::LineSelectionRange()
+	Sci_Position iCurrentPos = SciCall_GetCurrentPos();
+	Sci_Position iAnchorPos = SciCall_GetAnchor();
+	const Sci_Line iLineAnchorPos = SciCall_LineFromPosition(iAnchorPos);
+	const Sci_Line iLineCurPos = SciCall_LineFromPosition(iCurrentPos);
+
+	if (iCurrentPos > iAnchorPos) {
+		iAnchorPos = SciCall_PositionFromLine(iLineAnchorPos);
+		iCurrentPos = SciCall_PositionFromLine(iLineCurPos + 1);
+	} else {
+		iCurrentPos = SciCall_PositionFromLine(iLineCurPos);
+		iAnchorPos = SciCall_PositionFromLine(iLineAnchorPos + 1);
+	}
+
+	SciCall_SetSel(iAnchorPos, iCurrentPos);
 	SciCall_ChooseCaretX();
 }
 
