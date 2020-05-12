@@ -2697,7 +2697,8 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	case IDM_FILE_NEWWINDOW:
-	case IDM_FILE_NEWWINDOW2: {
+	case IDM_FILE_NEWWINDOW2:
+	case IDM_FILE_RESTART: {
 		const BOOL emptyWind = LOWORD(wParam) == IDM_FILE_NEWWINDOW2;
 		if (!emptyWind && bSaveBeforeRunningTools && !FileSave(FALSE, TRUE, FALSE, FALSE)) {
 			break;
@@ -2719,8 +2720,11 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		sei.lpDirectory = g_wchWorkingDirectory;
 		sei.nShow = SW_SHOWNORMAL;
 
-		ShellExecuteEx(&sei);
+		const BOOL result = ShellExecuteEx(&sei);
 		NP2HeapFree(szParameters);
+		if (result && LOWORD(wParam) == IDM_FILE_RESTART) {
+			DestroyWindow(hwnd);
+		}
 	}
 	break;
 
