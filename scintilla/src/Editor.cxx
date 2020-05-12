@@ -7571,10 +7571,12 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 		const Sci::Position start = pdoc->LineStart(lineStart);
 		const Sci::Position end = pdoc->LineStart(lineEnd + 1);
 		SetSelection(start, end);
+		const auto back = sel.selType;
 		if (wParam) {
 			sel.selType = Selection::selLines;
 		}
 		Cut(false);
+		sel.selType = back;
 		SetLastXChosen();
 	}
 	break;
