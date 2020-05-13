@@ -74,6 +74,19 @@ static DStringW wchAppendSelection;
 static DStringW wchPrefixLines;
 static DStringW wchAppendLines;
 
+// see TransliterateText()
+#if defined(_MSC_VER) && (_WIN32_WINNT >= _WIN32_WINNT_WIN7)
+#define NP2_DYNAMIC_LOAD_ELSCORE_DLL	1
+#else
+#define NP2_DYNAMIC_LOAD_ELSCORE_DLL	1
+#endif
+#if NP2_DYNAMIC_LOAD_ELSCORE_DLL
+extern DWORD kSystemLibraryLoadFlags;
+static HMODULE hELSCoreDLL = NULL;
+#else
+#pragma comment(lib, "elscore.lib")
+#endif
+
 #define MAX_NON_UTF8_SIZE	(UINT_MAX/2 - 16)
 
 static struct EditMarkAllStatus {
@@ -90,6 +103,11 @@ void Edit_ReleaseResources(void) {
 	if (editMarkAllStatus.pszText) {
 		NP2HeapFree(editMarkAllStatus.pszText);
 	}
+#if NP2_DYNAMIC_LOAD_ELSCORE_DLL
+	if (hELSCoreDLL != NULL) {
+		FreeLibrary(hELSCoreDLL);
+	}
+#endif
 }
 
 static inline void NotifyRectangleSelection(void) {
@@ -1116,11 +1134,193 @@ void EditInvertCase(void) {
 	NP2HeapFree(pszTextW);
 }
 
+// https://docs.microsoft.com/en-us/windows/win32/intl/transliteration-services
+#include <elscore.h>
+#if (defined(__MINGW64__) || defined(__MINGW32__))
+#if defined(__has_include) && __has_include(<elssrvc.h>)
+#include <elssrvc.h>
+#else
+// {A3A8333B-F4FC-42f6-A0C4-0462FE7317CB}
+static const GUID ELS_GUID_TRANSLITERATION_HANT_TO_HANS =
+	{ 0xA3A8333B, 0xF4FC, 0x42f6, { 0xA0, 0xC4, 0x04, 0x62, 0xFE, 0x73, 0x17, 0xCB } };
+
+// {3CACCDC8-5590-42dc-9A7B-B5A6B5B3B63B}
+static const GUID ELS_GUID_TRANSLITERATION_HANS_TO_HANT =
+	{ 0x3CACCDC8, 0x5590, 0x42dc, { 0x9A, 0x7B, 0xB5, 0xA6, 0xB5, 0xB3, 0xB6, 0x3B } };
+
+// {D8B983B1-F8BF-4a2b-BCD5-5B5EA20613E1}
+static const GUID ELS_GUID_TRANSLITERATION_MALAYALAM_TO_LATIN =
+	{ 0xD8B983B1, 0xF8BF, 0x4a2b, { 0xBC, 0xD5, 0x5B, 0x5E, 0xA2, 0x06, 0x13, 0xE1 } };
+
+// {C4A4DCFE-2661-4d02-9835-F48187109803}
+static const GUID ELS_GUID_TRANSLITERATION_DEVANAGARI_TO_LATIN =
+	{ 0xC4A4DCFE, 0x2661, 0x4d02, { 0x98, 0x35, 0xF4, 0x81, 0x87, 0x10, 0x98, 0x03 } };
+
+// {3DD12A98-5AFD-4903-A13F-E17E6C0BFE01}
+static const GUID ELS_GUID_TRANSLITERATION_CYRILLIC_TO_LATIN =
+	{ 0x3DD12A98, 0x5AFD, 0x4903, { 0xA1, 0x3F, 0xE1, 0x7E, 0x6C, 0x0B, 0xFE, 0x01 } };
+
+// {F4DFD825-91A4-489f-855E-9AD9BEE55727}
+static const GUID ELS_GUID_TRANSLITERATION_BENGALI_TO_LATIN =
+	{ 0xF4DFD825, 0x91A4, 0x489f, { 0x85, 0x5E, 0x9A, 0xD9, 0xBE, 0xE5, 0x57, 0x27 } };
+#endif // __MINGW64__ || __MINGW32__
+#else
+#include <elssrvc.h>
+#endif
+
+// {4BA2A721-E43D-41b7-B330-536AE1E48863}
+static const GUID WIN10_ELS_GUID_TRANSLITERATION_HANGUL_DECOMPOSITION =
+	{ 0x4BA2A721, 0xE43D, 0x41b7, { 0xB3, 0x30, 0x53, 0x6A, 0xE1, 0xE4, 0x88, 0x63 } };
+
+static int TransliterateText(const GUID *pGuid, LPCWSTR pszTextW, int cchTextW, LPWSTR *pszMappedW) {
+#if NP2_DYNAMIC_LOAD_ELSCORE_DLL
+typedef HRESULT (WINAPI *MappingGetServicesSig)(PMAPPING_ENUM_OPTIONS pOptions, PMAPPING_SERVICE_INFO *prgServices, DWORD *pdwServicesCount);
+typedef HRESULT (WINAPI *MappingFreeServicesSig)(PMAPPING_SERVICE_INFO pServiceInfo);
+typedef HRESULT (WINAPI *MappingRecognizeTextSig)(PMAPPING_SERVICE_INFO pServiceInfo, LPCWSTR pszText, DWORD dwLength, DWORD dwIndex, PMAPPING_OPTIONS pOptions, PMAPPING_PROPERTY_BAG pbag);
+typedef HRESULT (WINAPI *MappingFreePropertyBagSig)(PMAPPING_PROPERTY_BAG pBag);
+
+	static int triedLoadingELSCore = 0;
+	static MappingGetServicesSig pfnMappingGetServices;
+	static MappingFreeServicesSig pfnMappingFreeServices;
+	static MappingRecognizeTextSig pfnMappingRecognizeText;
+	static MappingFreePropertyBagSig pfnMappingFreePropertyBag;
+
+	if (triedLoadingELSCore == 0) {
+		triedLoadingELSCore = 1;
+		hELSCoreDLL = LoadLibraryEx(L"elscore.dll", NULL, kSystemLibraryLoadFlags);
+		if (hELSCoreDLL != NULL) {
+			pfnMappingGetServices = (MappingGetServicesSig)GetProcAddress(hELSCoreDLL, "MappingGetServices");
+			pfnMappingFreeServices = (MappingFreeServicesSig)GetProcAddress(hELSCoreDLL, "MappingFreeServices");
+			pfnMappingRecognizeText = (MappingRecognizeTextSig)GetProcAddress(hELSCoreDLL, "MappingRecognizeText");
+			pfnMappingFreePropertyBag = (MappingFreePropertyBagSig)GetProcAddress(hELSCoreDLL, "MappingFreePropertyBag");
+			if (pfnMappingGetServices == NULL || pfnMappingFreeServices == NULL || pfnMappingRecognizeText == NULL || pfnMappingFreePropertyBag == NULL) {
+				FreeLibrary(hELSCoreDLL);
+				hELSCoreDLL = NULL;
+				return 0;
+			}
+			triedLoadingELSCore = 2;
+		}
+	}
+	if (triedLoadingELSCore != 2) {
+		return 0;
+	}
+#endif
+
+	MAPPING_ENUM_OPTIONS enumOptions;
+	PMAPPING_SERVICE_INFO prgServices = NULL;
+	DWORD dwServicesCount = 0;
+
+	ZeroMemory(&enumOptions, sizeof(MAPPING_ENUM_OPTIONS));
+	enumOptions.Size = sizeof(MAPPING_ENUM_OPTIONS);
+	enumOptions.pGuid = (GUID *)pGuid;
+
+#if NP2_DYNAMIC_LOAD_ELSCORE_DLL
+	HRESULT hResult = pfnMappingGetServices(&enumOptions, &prgServices, &dwServicesCount);
+#else
+	HRESULT hResult = MappingGetServices(&enumOptions, &prgServices, &dwServicesCount);
+#endif
+	dwServicesCount = 0;
+	if (SUCCEEDED(hResult)) {
+		MAPPING_PROPERTY_BAG bag;
+		ZeroMemory(&bag, sizeof (MAPPING_PROPERTY_BAG));
+		bag.Size = sizeof (MAPPING_PROPERTY_BAG);
+#if NP2_DYNAMIC_LOAD_ELSCORE_DLL
+		hResult = pfnMappingRecognizeText(prgServices, pszTextW, cchTextW, 0, NULL, &bag);
+#else
+		hResult = MappingRecognizeText(prgServices, pszTextW, cchTextW, 0, NULL, &bag);
+#endif
+		if (SUCCEEDED(hResult)) {
+			const DWORD dwDataSize = bag.prgResultRanges[0].dwDataSize;
+			dwServicesCount = dwDataSize/sizeof(WCHAR);
+			pszTextW = (LPCWSTR)bag.prgResultRanges[0].pData;
+			if (dwServicesCount != 0 && pszTextW[0] != L'\0') {
+				LPWSTR pszConvW = (LPWSTR)NP2HeapAlloc(dwDataSize + sizeof(WCHAR));
+				CopyMemory(pszConvW, pszTextW, dwDataSize);
+				*pszMappedW = pszConvW;
+			}
+#if NP2_DYNAMIC_LOAD_ELSCORE_DLL
+			pfnMappingFreePropertyBag(&bag);
+#else
+			MappingFreePropertyBag(&bag);
+#endif
+		}
+#if NP2_DYNAMIC_LOAD_ELSCORE_DLL
+		pfnMappingFreeServices(prgServices);
+#else
+		MappingFreeServices(prgServices);
+#endif
+	}
+
+	return dwServicesCount;
+}
+
+#if _WIN32_WINNT < _WIN32_WINNT_WIN7
+static BOOL EditTitleCase(LPWSTR pszTextW, int cchTextW) {
+	BOOL bChanged = FALSE;
+#if 1
+	// BOOKMARK_EDITION
+	//Slightly enhanced function to make Title Case:
+	//Added some '-characters and bPrevWasSpace makes it better (for example "'Don't'" will now work)
+	BOOL bNewWord = TRUE;
+	BOOL bPrevWasSpace = TRUE;
+	for (int i = 0; i < cchTextW; i++) {
+		if (!IsCharAlphaNumeric(pszTextW[i]) && (!StrChr(L"\x0027\x0060\x0384\x2019", pszTextW[i]) || bPrevWasSpace)) {
+			bNewWord = TRUE;
+		} else {
+			if (bNewWord) {
+				if (IsCharLower(pszTextW[i])) {
+					pszTextW[i] = LOWORD(CharUpper((LPWSTR)(LONG_PTR)MAKELONG(pszTextW[i], 0)));
+					bChanged = TRUE;
+				}
+			} else {
+				if (IsCharUpper(pszTextW[i])) {
+					pszTextW[i] = LOWORD(CharLower((LPWSTR)(LONG_PTR)MAKELONG(pszTextW[i], 0)));
+					bChanged = TRUE;
+				}
+			}
+			bNewWord = FALSE;
+		}
+
+		if (StrChr(L" \r\n\t[](){}", pszTextW[i])) {
+			bPrevWasSpace = TRUE;
+		} else {
+			bPrevWasSpace = FALSE;
+		}
+	}
+#else
+	BOOL bNewWord = TRUE;
+	BOOL bWordEnd = TRUE;
+	for (int i = 0; i < cchTextW; i++) {
+		const BOOL bAlphaNumeric = IsCharAlphaNumeric(pszTextW[i]);
+		if (!bAlphaNumeric && (!StrChr(L"\x0027\x2019\x0060\x00B4", pszTextW[i]) || bWordEnd)) {
+			bNewWord = TRUE;
+		} else {
+			if (bNewWord) {
+				if (IsCharLower(pszTextW[i])) {
+					pszTextW[i] = LOWORD(CharUpper((LPWSTR)(LONG_PTR)MAKELONG(pszTextW[i], 0)));
+					bChanged = TRUE;
+				}
+			} else {
+				if (IsCharUpper(pszTextW[i])) {
+					pszTextW[i] = LOWORD(CharLower((LPWSTR)(LONG_PTR)MAKELONG(pszTextW[i], 0)));
+					bChanged = TRUE;
+				}
+			}
+			bNewWord = FALSE;
+		}
+		bWordEnd = !bAlphaNumeric;
+	}
+#endif
+
+	return bChanged;
+}
+#endif
+
 //=============================================================================
 //
-// EditTitleCase()
+// EditMapTextCase()
 //
-void EditTitleCase(UINT menu) {
+void EditMapTextCase(UINT menu) {
 	const Sci_Position iSelCount = SciCall_GetSelTextLength() - 1;
 	if (iSelCount == 0) {
 		return;
@@ -1131,9 +1331,10 @@ void EditTitleCase(UINT menu) {
 	}
 
 	DWORD flags = 0;
+	const GUID *pGuid = NULL;
 	switch (menu) {
 	case IDM_EDIT_TITLECASE:
-		flags = IsWin7AndAbove() ? LCMAP_LINGUISTIC_CASING | LCMAP_TITLECASE : 0;
+		flags = IsWin7AndAbove() ? (LCMAP_LINGUISTIC_CASING | LCMAP_TITLECASE) : 0;
 		break;
 	case IDM_EDIT_MAP_FULLWIDTH:
 		flags = LCMAP_FULLWIDTH;
@@ -1143,15 +1344,32 @@ void EditTitleCase(UINT menu) {
 		break;
 	case IDM_EDIT_MAP_SIMPLIFIED_CHINESE:
 		flags = LCMAP_SIMPLIFIED_CHINESE;
+		pGuid = &ELS_GUID_TRANSLITERATION_HANT_TO_HANS;
 		break;
 	case IDM_EDIT_MAP_TRADITIONAL_CHINESE:
 		flags = LCMAP_TRADITIONAL_CHINESE;
+		pGuid = &ELS_GUID_TRANSLITERATION_HANS_TO_HANT;
 		break;
 	case IDM_EDIT_MAP_HIRAGANA:
 		flags = LCMAP_HIRAGANA;
 		break;
 	case IDM_EDIT_MAP_KATAKANA:
 		flags = LCMAP_KATAKANA;
+		break;
+	case IDM_EDIT_MAP_MALAYALAM_LATIN:
+		pGuid = &ELS_GUID_TRANSLITERATION_MALAYALAM_TO_LATIN;
+		break;
+	case IDM_EDIT_MAP_DEVANAGARI_LATIN:
+		pGuid = &ELS_GUID_TRANSLITERATION_DEVANAGARI_TO_LATIN;
+		break;
+	case IDM_EDIT_MAP_CYRILLIC_LATIN:
+		pGuid = &ELS_GUID_TRANSLITERATION_CYRILLIC_TO_LATIN;
+		break;
+	case IDM_EDIT_MAP_BENGALI_LATIN:
+		pGuid = &ELS_GUID_TRANSLITERATION_BENGALI_TO_LATIN;
+		break;
+	case IDM_EDIT_MAP_HANGUL_DECOMPOSITION:
+		pGuid = &WIN10_ELS_GUID_TRANSLITERATION_HANGUL_DECOMPOSITION;
 		break;
 	default:
 #if defined(__GNUC__) || defined(__clang__)
@@ -1169,82 +1387,37 @@ void EditTitleCase(UINT menu) {
 	int cchTextW = MultiByteToWideChar(cpEdit, 0, pszText, (int)iSelCount, pszTextW, (int)(NP2HeapSize(pszTextW) / sizeof(WCHAR)));
 
 	BOOL bChanged = FALSE;
-	if (flags != 0) {
-		int charsConverted = LCMapString(LOCALE_SYSTEM_DEFAULT, flags, pszTextW, cchTextW, NULL, 0);
-		if (charsConverted) {
-			LPWSTR pszMappedW = (LPWSTR)NP2HeapAlloc((charsConverted + 1)*sizeof(WCHAR));
-			charsConverted = LCMapString(LOCALE_SYSTEM_DEFAULT, flags, pszTextW, cchTextW, pszMappedW, charsConverted);
-			bChanged = !(charsConverted == 0 || StrEqual(pszTextW, pszMappedW));
-			if (bChanged) {
-				NP2HeapFree(pszTextW);
-				pszTextW = pszMappedW;
-				cchTextW = charsConverted;
-				if (charsConverted > iSelCount) {
-					NP2HeapFree(pszText);
-					pszText = (char *)NP2HeapAlloc(charsConverted*kMaxMultiByteCount + 1);
-				}
-			} else {
-				NP2HeapFree(pszMappedW);
+	if (flags != 0 || pGuid != NULL) {
+		int charsConverted = 0;
+		LPWSTR pszMappedW = NULL;
+		if (pGuid != NULL && IsWin7AndAbove()) {
+			charsConverted = TransliterateText(pGuid, pszTextW, cchTextW, &pszMappedW);
+		}
+		if (charsConverted == 0 && flags != 0) {
+			charsConverted = LCMapString(LOCALE_SYSTEM_DEFAULT, flags, pszTextW, cchTextW, NULL, 0);
+			if (charsConverted) {
+				pszMappedW = (LPWSTR)NP2HeapAlloc((charsConverted + 1)*sizeof(WCHAR));
+				charsConverted = LCMapString(LOCALE_SYSTEM_DEFAULT, flags, pszTextW, cchTextW, pszMappedW, charsConverted);
 			}
+		}
+
+		bChanged = !(charsConverted == 0 || StrIsEmpty(pszMappedW) || StrEqual(pszTextW, pszMappedW));
+		if (bChanged) {
+			NP2HeapFree(pszTextW);
+			pszTextW = pszMappedW;
+			cchTextW = charsConverted;
+			if (charsConverted > iSelCount) {
+				NP2HeapFree(pszText);
+				pszText = (char *)NP2HeapAlloc(charsConverted*kMaxMultiByteCount + 1);
+			}
+		} else if (pszMappedW != NULL) {
+			NP2HeapFree(pszMappedW);
 		}
 	}
 
 #if _WIN32_WINNT < _WIN32_WINNT_WIN7
 	else if (menu == IDM_EDIT_TITLECASE) {
-#if 1
-		// BOOKMARK_EDITION
-		//Slightly enhanced function to make Title Case:
-		//Added some '-characters and bPrevWasSpace makes it better (for example "'Don't'" will now work)
-		BOOL bNewWord = TRUE;
-		BOOL bPrevWasSpace = TRUE;
-		for (int i = 0; i < cchTextW; i++) {
-			if (!IsCharAlphaNumeric(pszTextW[i]) && (!StrChr(L"\x0027\x0060\x0384\x2019", pszTextW[i]) ||	bPrevWasSpace)) {
-				bNewWord = TRUE;
-			} else {
-				if (bNewWord) {
-					if (IsCharLower(pszTextW[i])) {
-						pszTextW[i] = LOWORD(CharUpper((LPWSTR)(LONG_PTR)MAKELONG(pszTextW[i], 0)));
-						bChanged = TRUE;
-					}
-				} else {
-					if (IsCharUpper(pszTextW[i])) {
-						pszTextW[i] = LOWORD(CharLower((LPWSTR)(LONG_PTR)MAKELONG(pszTextW[i], 0)));
-						bChanged = TRUE;
-					}
-				}
-				bNewWord = FALSE;
-			}
-
-			if (StrChr(L" \r\n\t[](){}", pszTextW[i])) {
-				bPrevWasSpace = TRUE;
-			} else {
-				bPrevWasSpace = FALSE;
-			}
-		}
-#else
-		BOOL bNewWord = TRUE;
-		BOOL bWordEnd = TRUE;
-		for (int i = 0; i < cchTextW; i++) {
-			const BOOL bAlphaNumeric = IsCharAlphaNumeric(pszTextW[i]);
-			if (!bAlphaNumeric && (!StrChr(L"\x0027\x2019\x0060\x00B4", pszTextW[i]) || bWordEnd)) {
-				bNewWord = TRUE;
-			} else {
-				if (bNewWord) {
-					if (IsCharLower(pszTextW[i])) {
-						pszTextW[i] = LOWORD(CharUpper((LPWSTR)(LONG_PTR)MAKELONG(pszTextW[i], 0)));
-						bChanged = TRUE;
-					}
-				} else {
-					if (IsCharUpper(pszTextW[i])) {
-						pszTextW[i] = LOWORD(CharLower((LPWSTR)(LONG_PTR)MAKELONG(pszTextW[i], 0)));
-						bChanged = TRUE;
-					}
-				}
-				bNewWord = FALSE;
-			}
-			bWordEnd = !bAlphaNumeric;
-		}
-#endif
+		bChanged = EditTitleCase(pszTextW, cchTextW);
 	}
 #endif
 
