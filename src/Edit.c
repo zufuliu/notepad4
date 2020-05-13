@@ -81,7 +81,11 @@ static DStringW wchAppendLines;
 #define NP2_DYNAMIC_LOAD_ELSCORE_DLL	1
 #endif
 #if NP2_DYNAMIC_LOAD_ELSCORE_DLL
+#if _WIN32_WINNT < _WIN32_WINNT_WIN8
 extern DWORD kSystemLibraryLoadFlags;
+#else
+#define kSystemLibraryLoadFlags		LOAD_LIBRARY_SEARCH_SYSTEM32
+#endif
 static HMODULE hELSCoreDLL = NULL;
 #else
 #pragma comment(lib, "elscore.lib")
