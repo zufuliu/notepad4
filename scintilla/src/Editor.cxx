@@ -642,17 +642,19 @@ void Editor::InvalidateWholeSelection() noexcept {
 
 /* For Line selection - the anchor and caret are always
    at the beginning and end of the region lines. */
-SelectionRange Editor::LineSelectionRange(SelectionPosition currentPos_, SelectionPosition anchor_) const noexcept {
+SelectionRange Editor::LineSelectionRange(SelectionPosition currentPos_, SelectionPosition anchor_, bool withEOL) const noexcept {
 	if (currentPos_ > anchor_) {
 		anchor_ = SelectionPosition(
 			pdoc->LineStart(pdoc->LineFromPosition(anchor_.Position())));
+		const Sci::Line endLine = pdoc->LineFromPosition(currentPos_.Position());
 		currentPos_ = SelectionPosition(
-			pdoc->LineEnd(pdoc->LineFromPosition(currentPos_.Position())));
+			withEOL ? pdoc->LineStart(endLine + 1) : pdoc->LineEnd(endLine));
 	} else {
 		currentPos_ = SelectionPosition(
 			pdoc->LineStart(pdoc->LineFromPosition(currentPos_.Position())));
+		const Sci::Line endLine = pdoc->LineFromPosition(anchor_.Position());
 		anchor_ = SelectionPosition(
-			pdoc->LineEnd(pdoc->LineFromPosition(anchor_.Position())));
+			withEOL ? pdoc->LineStart(endLine + 1) : pdoc->LineEnd(endLine));
 	}
 	return SelectionRange(currentPos_, anchor_);
 }
@@ -2107,11 +2109,16 @@ void Editor::ClearSelection(bool retainMultipleSelections) {
 	UndoGroup ug(pdoc);
 	for (size_t r = 0; r < sel.Count(); r++) {
 		if (!sel.Range(r).Empty()) {
-			if (!RangeContainsProtected(sel.Range(r).Start().Position(),
-				sel.Range(r).End().Position())) {
-				pdoc->DeleteChars(sel.Range(r).Start().Position(),
-					sel.Range(r).Length());
-				sel.Range(r) = SelectionRange(sel.Range(r).Start());
+			SelectionRange rangeNew = sel.Range(r);
+			if (sel.selType == Selection::selLines && sel.Count() == 1) {
+				// remove EOLs
+				rangeNew = LineSelectionRange(rangeNew.caret, rangeNew.anchor, true);
+			}
+			if (!RangeContainsProtected(rangeNew.Start().Position(),
+				rangeNew.End().Position())) {
+				pdoc->DeleteChars(rangeNew.Start().Position(),
+					rangeNew.Length());
+				sel.Range(r) = SelectionRange(rangeNew.Start());
 			}
 		}
 	}
@@ -2158,10 +2165,14 @@ void Editor::CopyAllowLine() {
 	CopyToClipboard(selectedText);
 }
 
-void Editor::Cut(bool asBinary) {
+void Editor::Cut(bool asBinary, bool lineCopy) {
 	pdoc->CheckReadOnly();
 	if (!pdoc->IsReadOnly() && !SelectionContainsProtected()) {
-		Copy(asBinary);
+		if (lineCopy) {
+			CopyRangeToClipboard(sel.RangeMain().Start().Position(), sel.RangeMain().End().Position(), true);
+		} else {
+			Copy(asBinary);
+		}
 		ClearSelection();
 	}
 }
@@ -7571,12 +7582,7 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 		const Sci::Position start = pdoc->LineStart(lineStart);
 		const Sci::Position end = pdoc->LineStart(lineEnd + 1);
 		SetSelection(start, end);
-		const auto back = sel.selType;
-		if (wParam) {
-			sel.selType = Selection::selLines;
-		}
-		Cut(false);
-		sel.selType = back;
+		Cut(false, wParam != 0);
 		SetLastXChosen();
 	}
 	break;
