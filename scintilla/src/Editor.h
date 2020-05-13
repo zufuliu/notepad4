@@ -330,7 +330,7 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	void ThinRectangularRange();
 	void InvalidateSelection(SelectionRange newMain, bool invalidateWholeSelection = false) noexcept;
 	void InvalidateWholeSelection() noexcept;
-	SelectionRange LineSelectionRange(SelectionPosition currentPos_, SelectionPosition anchor_) const noexcept;
+	SelectionRange LineSelectionRange(SelectionPosition currentPos_, SelectionPosition anchor_, bool withEOL = false) const noexcept;
 	void SetSelection(SelectionPosition currentPos_, SelectionPosition anchor_);
 	void SetSelection(Sci::Position currentPos_, Sci::Position anchor_);
 	void SetSelection(SelectionPosition currentPos_);
@@ -426,7 +426,7 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	void ClearSelection(bool retainMultipleSelections = false);
 	void ClearAll();
 	void ClearDocumentStyle();
-	virtual void Cut(bool asBinary);
+	virtual void Cut(bool asBinary, bool lineCopy = false);
 	void PasteRectangular(SelectionPosition pos, const char *ptr, Sci::Position len);
 	virtual void Copy(bool asBinary) = 0;
 	void CopyAllowLine();
