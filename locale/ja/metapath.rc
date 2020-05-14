@@ -667,8 +667,8 @@ BEGIN
     IDS_GETQUICKVIEWER      "Find Quickview"
     IDS_GETTARGET           "Find Editor"
     IDS_NEWFILE             "New File"
-    IDS_FILTER_ALL          "All files (*.*)|*.*|"
-    IDS_FILTER_EXE          "Executable files (*.exe;*.com;*.bat;*.lnk;*.pif)|*.exe;*.com;*.bat;*.lnk;*.pif|All files (*.*)|*.*|"
+    IDS_FILTER_ALL          "All Files (*.*)|*.*|"
+    IDS_FILTER_EXE          "Executable Files (*.exe;*.com;*.bat;*.lnk;*.pif)|*.exe;*.com;*.bat;*.lnk;*.pif|All Files (*.*)|*.*|"
     IDS_GETDIRECTORY        "Select a new directory."
     IDS_FAVORITES           "Specify the ""Favorites"" directory."
 END
