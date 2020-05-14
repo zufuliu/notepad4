@@ -1140,7 +1140,7 @@ void EditInvertCase(void) {
 
 // https://docs.microsoft.com/en-us/windows/win32/intl/transliteration-services
 #include <elscore.h>
-#if (defined(__MINGW64__) || defined(__MINGW32__))
+#if defined(__MINGW64__) || defined(__MINGW32__)
 #if defined(__has_include) && __has_include(<elssrvc.h>)
 #include <elssrvc.h>
 #else
