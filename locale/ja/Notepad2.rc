@@ -384,8 +384,8 @@ BEGIN
 			MENUITEM "Select to Document En&d",						IDM_EDIT_SELTODOCEND
 			MENUITEM "Select to Ne&xt\tCtrl+Alt+F2",				IDM_EDIT_SELTONEXT
 			MENUITEM "Select to Previou&s\tCtrl+Alt+Shift+F2",		IDM_EDIT_SELTOPREV
-			MENUITEM "&Jump to Selection Start\tAlt+,",				CMD_JUMP2SELSTART
-			MENUITEM "J&ump to Selection End\tAlt+.",				CMD_JUMP2SELEND
+			MENUITEM "&Jump to Selection Start\tAlt+Comma (,)",		CMD_JUMP2SELSTART
+			MENUITEM "J&ump to Selection End\tAlt+Period (.)",		CMD_JUMP2SELEND
 		END
 		POPUP "Boo&kmarks"
 		BEGIN
@@ -469,7 +469,7 @@ BEGIN
 		BEGIN
 			MENUITEM "Zoom &In\tCtrl++",			IDM_VIEW_ZOOMIN
 			MENUITEM "Zoom &Out\tCtrl+-",			IDM_VIEW_ZOOMOUT
-			MENUITEM "Zoom &Level...\tCtrl+.",		IDM_VIEW_ZOOM_LEVEL
+			MENUITEM "Zoom &Level...",				IDM_VIEW_ZOOM_LEVEL
 			MENUITEM "&Reset Zoom\tCtrl+\\",		IDM_VIEW_RESETZOOM
 		END
 		MENUITEM "Toggle Full &Screen\tF11 [Esc]",	IDM_VIEW_TOGGLE_FULLSCREEN
@@ -906,7 +906,6 @@ BEGIN
     VK_OEM_COMMA,   CMD_JUMP2SELSTART,      VIRTKEY, ALT, NOINVERT
     VK_OEM_MINUS,   IDM_VIEW_ZOOMOUT,       VIRTKEY, CONTROL, NOINVERT
     VK_OEM_MINUS,   CMD_DECREASENUM,        VIRTKEY, CONTROL, ALT, NOINVERT
-    VK_OEM_PERIOD,  IDM_VIEW_ZOOM_LEVEL,    VIRTKEY, CONTROL, NOINVERT
     VK_OEM_PERIOD,  CMD_JUMP2SELEND,        VIRTKEY, ALT, NOINVERT
     VK_OEM_PLUS,    IDM_VIEW_ZOOMIN,        VIRTKEY, CONTROL, NOINVERT
     VK_OEM_PLUS,    CMD_INCREASENUM,        VIRTKEY, CONTROL, ALT, NOINVERT
@@ -1775,8 +1774,8 @@ BEGIN
     IDS_PRINTFILE           "Printing page %s..."
     IDS_SAVINGSETTINGS      "Saving settings..."
     IDS_LINKDESCRIPTION     "Edit with Notepad2"
-    IDS_FILTER_ALL          "All files (*.*)|*.*|"
-    IDS_FILTER_EXE          "Executable files (*.exe;*.com;*.bat;*.cmd;*.lnk;*.pif)|*.exe;*.com;*.bat;*.cmd;*.lnk;*.pif|All files (*.*)|*.*|"
+    IDS_FILTER_ALL          "All Files (*.*)|*.*|"
+    IDS_FILTER_EXE          "Executable Files (*.exe;*.com;*.bat;*.cmd;*.lnk;*.pif)|*.exe;*.com;*.bat;*.cmd;*.lnk;*.pif|All Files (*.*)|*.*|"
 END
 
 STRINGTABLE
@@ -1830,7 +1829,7 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_FILTER_INI          "Configuration files (*.ini)|*.ini|All files (*.*)|*.*|"
+    IDS_FILTER_INI          "Configuration Files (*.ini)|*.ini|All Files (*.*)|*.*|"
     IDS_OPENWITH            "Select the directory with links to your favorite applications."
     IDS_FAVORITES           "Select the directory with links to your favorite files."
 END
