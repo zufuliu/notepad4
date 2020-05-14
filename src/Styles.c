@@ -2294,13 +2294,18 @@ LPCWSTR Style_GetCurrentLexerName(LPWSTR lpszName, int cchName) {
 	mii.dwTypeData = lpszName;
 	mii.cch = cchName;
 	if (GetMenuItemInfo(hmenu, np2LexLangIndex, FALSE, &mii)) {
-		// remove '&' from access key
+		// remove '&' from access key.
+#if 0 && defined(_MSC_VER)
+		SHStripMneumonic(lpszName);
+#else
+		// TODO: strip mnemonic like "String (&S)" => "String".
 		LPWSTR p = StrChr(lpszName, L'&');
 		if (p != NULL) {
 			const int len = lstrlen(p) - 1;
 			MoveMemory(p, p + 1, sizeof(WCHAR) * len);
 			p[len] = L'\0';
 		}
+#endif
 		return lpszName;
 	}
 	return pLexCurrent->pszName;

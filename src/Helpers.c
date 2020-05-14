@@ -2434,13 +2434,13 @@ static inline BYTE *DialogTemplate_GetFontSizeField(const DLGTEMPLATE *pTemplate
 		pw = (WORD *)(pTemplate + 1);
 	}
 
-	if (*pw == (WORD) - 1) {
+	if (*pw == (WORD)(-1)) {
 		pw += 2;
 	} else {
 		while (*pw++){}
 	}
 
-	if (*pw == (WORD) - 1) {
+	if (*pw == (WORD)(-1)) {
 		pw += 2;
 	} else {
 		while (*pw++){}
