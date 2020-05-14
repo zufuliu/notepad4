@@ -7969,7 +7969,7 @@ BOOL RelaunchElevated(void) {
 			sei.lpDirectory = g_wchWorkingDirectory;
 			sei.nShow = SW_SHOWNORMAL;
 
-			ShellExecuteEx(&sei);
+			exit = ShellExecuteEx(&sei);
 		} else {
 			exit = FALSE;
 		}
