@@ -4703,7 +4703,9 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			const Sci_Position iAnchorPos = SciCall_GetAnchor();
 			const Sci_Position iCursorPos = SciCall_GetCurrentPos();
 			if (iCursorPos > iAnchorPos) {
+				const int mode = SciCall_GetSelectionMode();
 				SciCall_SetSel(iCursorPos, iAnchorPos);
+				SciCall_SetSelectionMode(mode);
 				SciCall_ChooseCaretX();
 			}
 		}
@@ -4714,7 +4716,9 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			const Sci_Position iAnchorPos = SciCall_GetAnchor();
 			const Sci_Position iCursorPos = SciCall_GetCurrentPos();
 			if (iCursorPos < iAnchorPos) {
+				const int mode = SciCall_GetSelectionMode();
 				SciCall_SetSel(iCursorPos, iAnchorPos);
+				SciCall_SetSelectionMode(mode);
 				SciCall_ChooseCaretX();
 			}
 		}
