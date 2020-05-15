@@ -1419,7 +1419,7 @@ HMODULE LoadLocalizedResourceDLL(LANGID lang, LPCWSTR dllName) {
 	PathAppend(path, folder);
 	PathAppend(path, dllName);
 
-	const DWORD flags = IsVistaAndAbove() ? (LOAD_LIBRARY_AS_DATAFILE | LOAD_LIBRARY_AS_IMAGE_RESOURCE) : LOAD_LIBRARY_AS_DATAFILE;
+	const DWORD flags = IsVistaAndAbove() ? (LOAD_LIBRARY_AS_DATAFILE_EXCLUSIVE | LOAD_LIBRARY_AS_IMAGE_RESOURCE) : LOAD_LIBRARY_AS_DATAFILE;
 	HMODULE hDLL = LoadLibraryEx(path, NULL, flags);
 	return hDLL;
 }
