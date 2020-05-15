@@ -160,7 +160,7 @@ void	EditEnsureConsistentLineEndings(void);
 void	EditGetExcerpt(LPWSTR lpszExcerpt, DWORD cchExcerpt);
 
 void	EditSelectWord(void);
-void	EditSelectLine(void);
+void	EditSelectLines(BOOL currentBlock, BOOL lineSelection);
 HWND	EditFindReplaceDlg(HWND hwnd, LPEDITFINDREPLACE lpefr, BOOL bReplace);
 BOOL	EditFindNext(LPEDITFINDREPLACE lpefr, BOOL fExtendSelection);
 BOOL	EditFindPrev(LPEDITFINDREPLACE lpefr, BOOL fExtendSelection);
