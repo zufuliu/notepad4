@@ -643,7 +643,7 @@ void Editor::InvalidateWholeSelection() noexcept {
 /* For Line selection - the anchor and caret are always
    at the beginning and end of the region lines. */
 SelectionRange Editor::LineSelectionRange(SelectionPosition currentPos_, SelectionPosition anchor_, bool withEOL) const noexcept {
-	if (currentPos_ > anchor_) {
+	if (currentPos_ >= anchor_) {
 		anchor_ = SelectionPosition(
 			pdoc->LineStart(pdoc->LineFromPosition(anchor_.Position())));
 		const Sci::Line endLine = pdoc->LineFromPosition(currentPos_.Position());
