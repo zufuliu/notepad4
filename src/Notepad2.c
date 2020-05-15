@@ -2441,6 +2441,7 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	EnableCmd(hmenu, IDM_EDIT_REPLACENEXT, i);
 	EnableCmd(hmenu, IDM_EDIT_SELECTWORD, i);
 	EnableCmd(hmenu, IDM_EDIT_SELECTLINE, i);
+	EnableCmd(hmenu, IDM_EDIT_SELECTLINE_BLOCK, i);
 	EnableCmd(hmenu, IDM_EDIT_SELTODOCEND, i);
 	EnableCmd(hmenu, IDM_EDIT_SELTODOCSTART, i);
 	EnableCmd(hmenu, IDM_EDIT_SELTONEXT, i && StrNotEmptyA(efrData.szFind));
@@ -3146,11 +3147,8 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	case IDM_EDIT_SELECTLINE:
-		if (bEnableLineSelectionMode) {
-			SciCall_SetSelectionMode(SC_SEL_LINES);
-		} else {
-			EditSelectLine();
-		}
+	case IDM_EDIT_SELECTLINE_BLOCK:
+		EditSelectLines(LOWORD(wParam) == IDM_EDIT_SELECTLINE_BLOCK, bEnableLineSelectionMode);
 		break;
 
 	case IDM_EDIT_MOVELINEUP:

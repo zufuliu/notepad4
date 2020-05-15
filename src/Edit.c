@@ -4504,22 +4504,55 @@ void EditSelectWord(void) {
 	SciCall_SetSel(iLineStart, iLineEnd);
 }
 
-void EditSelectLine(void) {
+void EditSelectLines(BOOL currentBlock, BOOL lineSelection) {
+	if (lineSelection && !currentBlock) {
+		SciCall_SetSelectionMode(SC_SEL_LINES);
+		return;
+	}
+
 	// see Editor::LineSelectionRange()
 	Sci_Position iCurrentPos = SciCall_GetCurrentPos();
 	Sci_Position iAnchorPos = SciCall_GetAnchor();
-	const Sci_Line iLineAnchorPos = SciCall_LineFromPosition(iAnchorPos);
-	const Sci_Line iLineCurPos = SciCall_LineFromPosition(iCurrentPos);
+	BOOL backward = (iCurrentPos < iAnchorPos);
 
-	if (iCurrentPos >= iAnchorPos) {
-		iAnchorPos = SciCall_PositionFromLine(iLineAnchorPos);
-		iCurrentPos = SciCall_PositionFromLine(iLineCurPos + 1);
-	} else {
+	Sci_Line iLineAnchorPos = SciCall_LineFromPosition(iAnchorPos);
+	Sci_Line iLineCurPos = SciCall_LineFromPosition(iCurrentPos);
+
+	if (currentBlock) {
+		Sci_Line iLineStart = iLineCurPos;
+		const int level = SciCall_GetFoldLevel(iLineStart);
+		if (!(level & SC_FOLDLEVELHEADERFLAG)) {
+			iLineStart = SciCall_GetFoldParent(iLineStart);
+			if (iLineStart < 0) {
+				SciCall_SelectAll();
+				return;
+			}
+		}
+
+		const Sci_Line iLineEnd = SciCall_GetLastChild(iLineStart);
+		backward = backward || (iCurrentPos == iAnchorPos && iLineEnd - iLineCurPos > iLineCurPos - iLineStart);
+		if (backward) {
+			iLineCurPos = iLineStart;
+			iLineAnchorPos = iLineEnd;
+		} else {
+			iLineCurPos = iLineEnd;
+			iLineAnchorPos = iLineStart;
+		}
+	}
+
+	const Sci_Line offset = lineSelection ? 0 : 1;
+	if (backward) {
 		iCurrentPos = SciCall_PositionFromLine(iLineCurPos);
-		iAnchorPos = SciCall_PositionFromLine(iLineAnchorPos + 1);
+		iAnchorPos = SciCall_PositionFromLine(iLineAnchorPos + offset);
+	} else {
+		iAnchorPos = SciCall_PositionFromLine(iLineAnchorPos);
+		iCurrentPos = SciCall_PositionFromLine(iLineCurPos + offset);
 	}
 
 	SciCall_SetSel(iAnchorPos, iCurrentPos);
+	if (lineSelection) {
+		SciCall_SetSelectionMode(SC_SEL_LINES);
+	}
 	SciCall_ChooseCaretX();
 }
 
