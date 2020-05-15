@@ -4511,7 +4511,7 @@ void EditSelectLine(void) {
 	const Sci_Line iLineAnchorPos = SciCall_LineFromPosition(iAnchorPos);
 	const Sci_Line iLineCurPos = SciCall_LineFromPosition(iCurrentPos);
 
-	if (iCurrentPos > iAnchorPos) {
+	if (iCurrentPos >= iAnchorPos) {
 		iAnchorPos = SciCall_PositionFromLine(iLineAnchorPos);
 		iCurrentPos = SciCall_PositionFromLine(iLineCurPos + 1);
 	} else {
