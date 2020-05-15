@@ -378,7 +378,7 @@ BEGIN
 			MENUITEM "Find Matching &Brace\tCtrl+B",				IDM_EDIT_FINDMATCHINGBRACE
 			MENUITEM "Select to Matching B&race\tCtrl+Shift+B",		IDM_EDIT_SELTOMATCHINGBRACE
 			MENUITEM "Select &Word\tCtrl+Alt+Space",				IDM_EDIT_SELECTWORD
-			MENUITEM "Select &Lines\tCtrl+Shift+Space",				IDM_EDIT_SELECTLINE
+			MENUITEM "Select &Lines (Expand Selection)\tCtrl+Shift+Space",	IDM_EDIT_SELECTLINE
 			MENUITEM SEPARATOR
 			MENUITEM "Select to Document Star&t",					IDM_EDIT_SELTODOCSTART
 			MENUITEM "Select to Document En&d",						IDM_EDIT_SELTODOCEND

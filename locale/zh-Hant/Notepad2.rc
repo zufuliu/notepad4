@@ -378,14 +378,14 @@ BEGIN
 			MENUITEM "尋找符合括號(&B)\tCtrl+B",				IDM_EDIT_FINDMATCHINGBRACE
 			MENUITEM "選擇到符合括號(&R)\tCtrl+Shift+B",		IDM_EDIT_SELTOMATCHINGBRACE
 			MENUITEM "選擇單詞(&W)\tCtrl+Alt+Space",			IDM_EDIT_SELECTWORD
-			MENUITEM "選擇行(&L)\tCtrl+Shift+Space",			IDM_EDIT_SELECTLINE
+			MENUITEM "選擇行(擴展選區)(&L)\tCtrl+Shift+Space",	IDM_EDIT_SELECTLINE
 			MENUITEM SEPARATOR
 			MENUITEM "選擇到文件開頭(&T)",						IDM_EDIT_SELTODOCSTART
 			MENUITEM "選擇到文件結尾(&D)",						IDM_EDIT_SELTODOCEND
 			MENUITEM "選擇到下一個(&X)\tCtrl+Alt+F2",			IDM_EDIT_SELTONEXT
 			MENUITEM "選擇到前一個(&S)\tCtrl+Alt+Shift+F2",	IDM_EDIT_SELTOPREV
-			MENUITEM "跳到選擇起始(&J)\tAlt + 逗號(,)",		CMD_JUMP2SELSTART
-			MENUITEM "跳到選擇結束(&U)\tAlt + 句號(.)",		CMD_JUMP2SELEND
+			MENUITEM "跳到選區開始(&J)\tAlt + 逗號(,)",		CMD_JUMP2SELSTART
+			MENUITEM "跳到選區結束(&U)\tAlt + 句號(.)",		CMD_JUMP2SELEND
 		END
 		POPUP "書籤(&K)"
 		BEGIN
