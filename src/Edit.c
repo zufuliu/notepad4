@@ -817,19 +817,22 @@ BOOL EditLoadFile(LPWSTR pszFile, BOOL bSkipEncodingDetection, EditFileIOStatus 
 
 		// cbData/2 => WCHAR, WCHAR*3 => UTF-8
 		char *lpDataUTF8 = (char *)NP2HeapAlloc((cbData + 1)*sizeof(WCHAR));
-		cbData = WideCharToMultiByte(CP_UTF8, 0, (bBOM ? (LPWSTR)lpData + 1 : (LPWSTR)lpData),
-									 (int)(bBOM ? (cbData / sizeof(WCHAR)) : (cbData / sizeof(WCHAR)) + 1),
-									 lpDataUTF8, (int)NP2HeapSize(lpDataUTF8), NULL, NULL);
+		LPCWSTR pszTextW = bBOM ? ((LPWSTR)lpData + 1) : (LPWSTR)lpData;
+		// NOTE: requires two extra trailing NULL bytes.
+		const int cchTextW = bBOM ? (cbData / sizeof(WCHAR)) : ((cbData / sizeof(WCHAR)) + 1);
+		cbData = WideCharToMultiByte(CP_UTF8, 0, pszTextW, cchTextW, lpDataUTF8, (int)NP2HeapSize(lpDataUTF8), NULL, NULL);
 		if (cbData == 0) {
-			cbData = WideCharToMultiByte(CP_ACP, 0, (bBOM ? (LPWSTR)lpData + 1 : (LPWSTR)lpData),
-										 -1, lpDataUTF8, (int)NP2HeapSize(lpDataUTF8), NULL, NULL);
+			cbData = WideCharToMultiByte(CP_ACP, 0, pszTextW, -1, lpDataUTF8, (int)NP2HeapSize(lpDataUTF8), NULL, NULL);
 			status->bUnicodeErr = TRUE;
+		} else {
+			// remove the extra trailing NULL byte.
+			cbData -= 1;
 		}
 
-		EditDetectEOLMode(lpDataUTF8, cbData - 1, status);
-		FileVars_Init(lpDataUTF8, cbData - 1, &fvCurFile);
+		EditDetectEOLMode(lpDataUTF8, cbData, status);
+		FileVars_Init(lpDataUTF8, cbData, &fvCurFile);
 		SciCall_SetCodePage(SC_CP_UTF8);
-		EditSetNewText(lpDataUTF8, cbData - 1, status->totalLineCount);
+		EditSetNewText(lpDataUTF8, cbData, status->totalLineCount);
 		NP2HeapFree(lpDataUTF8);
 	} else {
 		FileVars_Init(lpData, cbData, &fvCurFile);
