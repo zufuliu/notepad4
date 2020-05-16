@@ -234,10 +234,8 @@ void Editor::SetRepresentations() {
 		}
 		reprs.SetRepresentation("\xe2\x80\xa8", "LS");
 		reprs.SetRepresentation("\xe2\x80\xa9", "PS");
-	}
 
-	// UTF-8 invalid bytes
-	if (IsUnicodeMode()) {
+		// UTF-8 invalid bytes
 		for (int k = 0x80; k < 0x100; k++) {
 			const char hiByte[2] = { static_cast<char>(k), 0 };
 			char hexits[5];	// Really only needs 4 but that causes warning from gcc 7.1

@@ -5348,7 +5348,7 @@ BOOL EditReplace(HWND hwnd, LPEDITFINDREPLACE lpefr) {
 	BOOL bSuppressNotFound = FALSE;
 
 	if (iPos == -1 && ttf.chrg.cpMin > 0 && !lpefr->bNoFindWrap) {
-		if (!lpefr->bNoFindWrap || (IDOK == InfoBox(MBOKCANCEL, L"MsgFindWrap1", IDS_FIND_WRAPFW))) {
+		if (IDOK == InfoBox(MBOKCANCEL, L"MsgFindWrap1", IDS_FIND_WRAPFW)) {
 			ttf.chrg.cpMin = 0;
 			iPos = SciCall_FindText(lpefr->fuFlags, &ttf);
 		} else {
@@ -5357,7 +5357,7 @@ BOOL EditReplace(HWND hwnd, LPEDITFINDREPLACE lpefr) {
 	}
 
 	if (iPos == -1) {
-		// notfound
+		// not found
 		LocalFree(pszReplace2);
 		if (!bSuppressNotFound) {
 			InfoBox(0, L"MsgNotFound", IDS_NOTFOUND);
@@ -5381,7 +5381,7 @@ BOOL EditReplace(HWND hwnd, LPEDITFINDREPLACE lpefr) {
 	bSuppressNotFound = FALSE;
 
 	if (iPos == -1 && ttf.chrg.cpMin > 0 && !lpefr->bNoFindWrap) {
-		if (!lpefr->bNoFindWrap || (IDOK == InfoBox(MBOKCANCEL, L"MsgFindWrap1", IDS_FIND_WRAPFW))) {
+		if (IDOK == InfoBox(MBOKCANCEL, L"MsgFindWrap1", IDS_FIND_WRAPFW)) {
 			ttf.chrg.cpMin = 0;
 			iPos = SciCall_FindText(lpefr->fuFlags, &ttf);
 		} else {
