@@ -59,6 +59,7 @@ extern BOOL bAutoStripBlanks;
 extern int iDefaultCodePage;
 //extern int iDefaultCharSet;
 extern BOOL bLoadANSIasUTF8;
+extern BOOL bLoadASCIIasUTF8;
 extern BOOL bLoadNFOasOEM;
 extern int iSrcEncoding;
 extern int iWeakSrcEncoding;
@@ -951,7 +952,7 @@ BOOL EditSaveFile(HWND hwnd, LPCWSTR pszFile, BOOL bSaveCopy, EditFileIOStatus *
 		int iEncoding = status->iEncoding;
 		UINT uFlags = mEncoding[iEncoding].uFlags;
 		if (cbData >= MAX_NON_UTF8_SIZE) {
-			// save in UTF-8 or ANSI
+			// save as UTF-8 or ANSI
 			if (!(uFlags & (NCP_DEFAULT | NCP_UTF8))) {
 				if (uFlags & NCP_UNICODE_BOM) {
 					iEncoding = CPI_UTF8SIGN;
