@@ -189,7 +189,7 @@ IF NOT EXIST "%1\metapath.exe" CALL :SUBMSG "ERROR" "%1\metapath.exe NOT found"
 IF "%WITH_LOCALE%" == "1" (
   SET "ZIP_NAME=Notepad2_i18n"
 ) ELSE (
-  IF "%ZIP_SUFFIX%" == "" (SET "ZIP_NAME=Notepad2") ELSE (SET "ZIP_NAME=Notepad2(%ZIP_SUFFIX%)")
+  IF "%ZIP_SUFFIX%" == "" (SET "ZIP_NAME=Notepad2") ELSE (SET "ZIP_NAME=Notepad2_%ZIP_SUFFIX%")
 )
 IF /I "%COMPILER%" == "MSVC" (
   SET "ZIP_NAME=%ZIP_NAME%_%2_%NP2_VER%"
