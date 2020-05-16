@@ -452,7 +452,7 @@ static void CleanUpResources(BOOL initialized) {
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nShowCmd) {
 	UNREFERENCED_PARAMETER(hPrevInstance);
 	UNREFERENCED_PARAMETER(lpCmdLine);
-#if 0 // used for Clang UBSan or printing debug message on console.
+#if 1 // used for Clang UBSan or printing debug message on console.
 	if (AttachConsole(ATTACH_PARENT_PROCESS)) {
 		freopen("CONOUT$", "w", stdout);
 		freopen("CONOUT$", "w", stderr);
@@ -7971,7 +7971,9 @@ BOOL RelaunchElevated(void) {
 			sei.lpDirectory = g_wchWorkingDirectory;
 			sei.nShow = SW_SHOWNORMAL;
 
-			exit = ShellExecuteEx(&sei);
+			if (!ShellExecuteEx(&sei)) {
+				exit = FALSE;
+			}
 		} else {
 			exit = FALSE;
 		}
