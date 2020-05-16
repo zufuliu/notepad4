@@ -101,6 +101,7 @@
 #define IDC_ANSIASUTF8					103
 #define IDC_NFOASOEM					104
 #define IDC_ENCODINGFROMFILEVARS		105
+#define IDC_ASCIIASUTF8					106
 // Select Encoding
 #define IDD_SELECT_ENCODING				104
 #define IDC_ENCODINGLIST				102
