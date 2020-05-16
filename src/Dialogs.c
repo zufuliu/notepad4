@@ -39,6 +39,7 @@ extern HWND		hwndMain;
 extern DWORD	dwLastIOError;
 extern BOOL		bSkipUnicodeDetection;
 extern BOOL		bLoadANSIasUTF8;
+extern BOOL		bLoadASCIIasUTF8;
 extern BOOL		bLoadNFOasOEM;
 extern int		fNoFileVariables;
 extern BOOL		bNoEncodingTags;
@@ -1686,6 +1687,9 @@ static INT_PTR CALLBACK SelectDefEncodingDlgProc(HWND hwnd, UINT umsg, WPARAM wP
 		if (bLoadANSIasUTF8) {
 			CheckDlgButton(hwnd, IDC_ANSIASUTF8, BST_CHECKED);
 		}
+		if (bLoadASCIIasUTF8) {
+			CheckDlgButton(hwnd, IDC_ASCIIASUTF8, BST_CHECKED);
+		}
 
 		if (bLoadNFOasOEM) {
 			CheckDlgButton(hwnd, IDC_NFOASOEM, BST_CHECKED);
@@ -1721,6 +1725,7 @@ static INT_PTR CALLBACK SelectDefEncodingDlgProc(HWND hwnd, UINT umsg, WPARAM wP
 		case IDOK: {
 			bSkipUnicodeDetection = IsButtonChecked(hwnd, IDC_NOUNICODEDETECTION);
 			bLoadANSIasUTF8 = IsButtonChecked(hwnd, IDC_ANSIASUTF8);
+			bLoadASCIIasUTF8 = IsButtonChecked(hwnd, IDC_ASCIIASUTF8);
 			bLoadNFOasOEM = IsButtonChecked(hwnd, IDC_NFOASOEM);
 			bNoEncodingTags = IsButtonChecked(hwnd, IDC_ENCODINGFROMFILEVARS);
 			EndDialog(hwnd, IDOK);
