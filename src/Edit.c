@@ -824,8 +824,9 @@ BOOL EditLoadFile(LPWSTR pszFile, BOOL bSkipEncodingDetection, EditFileIOStatus 
 		if (cbData == 0) {
 			cbData = WideCharToMultiByte(CP_ACP, 0, pszTextW, -1, lpDataUTF8, (int)NP2HeapSize(lpDataUTF8), NULL, NULL);
 			status->bUnicodeErr = TRUE;
-		} else {
-			// remove the extra trailing NULL byte.
+		}
+		if (cbData != 0) {
+			// remove the NULL terminator.
 			cbData -= 1;
 		}
 
