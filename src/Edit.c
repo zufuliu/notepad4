@@ -1398,7 +1398,7 @@ void EditMapTextCase(UINT menu) {
 		if (pGuid != NULL && IsWin7AndAbove()) {
 			charsConverted = TransliterateText(pGuid, pszTextW, cchTextW, &pszMappedW);
 		}
-		if (charsConverted == 0 && flags != 0) {
+		if (pszMappedW == NULL && flags != 0) {
 			charsConverted = LCMapString(LOCALE_SYSTEM_DEFAULT, flags, pszTextW, cchTextW, NULL, 0);
 			if (charsConverted) {
 				pszMappedW = (LPWSTR)NP2HeapAlloc((charsConverted + 1)*sizeof(WCHAR));
