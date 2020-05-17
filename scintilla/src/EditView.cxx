@@ -88,7 +88,7 @@ bool ValidStyledText(const ViewStyle &vs, size_t styleOffset, const StyledText &
 
 int WidthStyledText(Surface *surface, const ViewStyle &vs, int styleOffset,
 	const char *text, const unsigned char *styles, size_t len) {
-	int width = 0;
+	XYPOSITION width = 0;
 	size_t start = 0;
 	while (start < len) {
 		const unsigned char style = styles[start];
@@ -98,10 +98,10 @@ int WidthStyledText(Surface *surface, const ViewStyle &vs, int styleOffset,
 		}
 		FontAlias fontText = vs.styles[style + styleOffset].font;
 		const std::string_view sv(text + start, endSegment - start + 1);
-		width += static_cast<int>(surface->WidthText(fontText, sv));
+		width += surface->WidthText(fontText, sv);
 		start = endSegment + 1;
 	}
-	return width;
+	return static_cast<int>(std::lround(width));
 }
 
 int WidestLineWidth(Surface *surface, const ViewStyle &vs, int styleOffset, const StyledText &st) {
@@ -115,7 +115,7 @@ int WidestLineWidth(Surface *surface, const ViewStyle &vs, int styleOffset, cons
 		} else {
 			FontAlias fontText = vs.styles[styleOffset + st.style].font;
 			const std::string_view text(st.text + start, lenLine);
-			widthSubLine = static_cast<int>(surface->WidthText(fontText, text));
+			widthSubLine = static_cast<int>(std::lround(surface->WidthText(fontText, text)));
 		}
 		if (widthSubLine > widthMax)
 			widthMax = widthSubLine;
@@ -144,7 +144,7 @@ void DrawStyledText(Surface *surface, const ViewStyle &vs, int styleOffset, PRec
 	const StyledText &st, size_t start, size_t length, DrawPhase phase) {
 
 	if (st.multipleStyles) {
-		int x = static_cast<int>(rcText.left);
+		XYPOSITION x = rcText.left;
 		size_t i = 0;
 		while (i < length) {
 			size_t end = i;
@@ -155,10 +155,10 @@ void DrawStyledText(Surface *surface, const ViewStyle &vs, int styleOffset, PRec
 			style += styleOffset;
 			FontAlias fontText = vs.styles[style].font;
 			const std::string_view text(st.text + start + i, end - i + 1);
-			const int width = static_cast<int>(surface->WidthText(fontText, text));
+			const XYPOSITION width = surface->WidthText(fontText, text);
 			PRectangle rcSegment = rcText;
-			rcSegment.left = static_cast<XYPOSITION>(x);
-			rcSegment.right = static_cast<XYPOSITION>(x + width + 1);
+			rcSegment.left = x;
+			rcSegment.right = x + width + 1;
 			DrawTextNoClipPhase(surface, rcSegment, vs.styles[style],
 				rcText.top + vs.maxAscent, text, phase);
 			x += width;
@@ -1360,7 +1360,7 @@ void EditView::DrawFoldDisplayText(Surface *surface, const EditModel &model, con
 	const std::string_view foldDisplayText(text);
 	FontAlias fontText = vsDraw.styles[STYLE_FOLDDISPLAYTEXT].font;
 	constexpr int margin = 2;
-	const int widthFoldDisplayText = static_cast<int>(surface->WidthText(fontText, foldDisplayText));
+	const XYPOSITION widthFoldDisplayText = surface->WidthText(fontText, foldDisplayText);
 
 	int eolInSelection = 0;
 	int alpha = SC_ALPHA_NOALPHA;
@@ -1374,7 +1374,7 @@ void EditView::DrawFoldDisplayText(Surface *surface, const EditModel &model, con
 	const XYPOSITION virtualSpace = model.sel.VirtualSpaceFor(
 		model.pdoc->LineEnd(line)) * spaceWidth;
 	rcSegment.left = xStart + static_cast<XYPOSITION>(ll->positions[ll->numCharsInLine] - subLineStart) + virtualSpace + vsDraw.aveCharWidth;
-	rcSegment.right = rcSegment.left + static_cast<XYPOSITION>(widthFoldDisplayText) + margin*2;
+	rcSegment.right = rcSegment.left + widthFoldDisplayText + margin*2;
 
 	const ColourOptional background = vsDraw.Background(model.pdoc->GetMark(line), model.caret.active, ll->containsCaret);
 	ColourDesired textFore = vsDraw.styles[STYLE_FOLDDISPLAYTEXT].fore;
@@ -2594,8 +2594,8 @@ Sci::Position EditView::FormatRange(bool draw, const Sci_RangeToFormat *pfr, Sur
 	// Determining width must happen after fonts have been realised in Refresh
 	int lineNumberWidth = 0;
 	if (lineNumberIndex >= 0) {
-		lineNumberWidth = static_cast<int>(surfaceMeasure->WidthText(vsPrint.styles[STYLE_LINENUMBER].font,
-			"99999" lineNumberPrintSpace));
+		lineNumberWidth = static_cast<int>(std::lround(surfaceMeasure->WidthText(vsPrint.styles[STYLE_LINENUMBER].font,
+			"99999" lineNumberPrintSpace)));
 		vsPrint.ms[lineNumberIndex].width = lineNumberWidth;
 		vsPrint.Refresh(*surfaceMeasure, model.pdoc->tabInChars);	// Recalculate fixedColumnWidth
 	}
