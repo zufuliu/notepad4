@@ -4220,13 +4220,20 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case IDM_SET_RENDER_TECH_GDI:
 	case IDM_SET_RENDER_TECH_D2D:
 	case IDM_SET_RENDER_TECH_D2DRETAIN:
-	case IDM_SET_RENDER_TECH_D2DDC:
+	case IDM_SET_RENDER_TECH_D2DDC: {
+		const int back = iRenderingTechnology;
 		iRenderingTechnology = LOWORD(wParam) - IDM_SET_RENDER_TECH_GDI;
 		SciCall_SetBufferedDraw(iRenderingTechnology == SC_TECHNOLOGY_DEFAULT);
 		SciCall_SetTechnology(iRenderingTechnology);
 		iRenderingTechnology = SciCall_GetTechnology();
 		iBidirectional = SciCall_GetBidirectional();
-		break;
+		if (back != iRenderingTechnology) {
+			UpdateLineNumberWidth();
+			UpdateBookmarkMarginWidth();
+			UpdateFoldMarginWidth();
+		}
+	}
+	break;
 
 	case IDM_SET_RTL_LAYOUT_EDIT:
 		bEditLayoutRTL = !bEditLayoutRTL;
