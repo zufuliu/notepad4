@@ -1830,7 +1830,7 @@ int Editor::TextWidth(int style, const char *text) {
 	RefreshStyleData();
 	AutoSurface surface(this);
 	if (surface) {
-		return static_cast<int>(surface->WidthText(vs.styles[style].font, text));
+		return static_cast<int>(std::lround(surface->WidthText(vs.styles[style].font, text)));
 	} else {
 		return 1;
 	}
