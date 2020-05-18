@@ -88,7 +88,7 @@ BOOL IniSectionParseArray(IniSection *section, LPWSTR lpCachedIniSection) {
 	} while (*p && count < capacity);
 
 	section->count = count;
-	return TRUE;
+	return count != 0;
 }
 
 BOOL IniSectionParse(IniSection *section, LPWSTR lpCachedIniSection) {
@@ -116,6 +116,10 @@ BOOL IniSectionParse(IniSection *section, LPWSTR lpCachedIniSection) {
 			p = StrEnd(p) + 1;
 		}
 	} while (*p && count < capacity);
+
+	if (count == 0) {
+		return FALSE;
+	}
 
 	section->count = count;
 	section->head = &section->nodeList[0];
