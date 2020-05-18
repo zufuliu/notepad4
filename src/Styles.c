@@ -1477,8 +1477,11 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 		char localeName[LOCALE_NAME_MAX_LENGTH] = "";
 #if 0
 		if (!Style_StrGetLocale(szValue, localeWide, COUNTOF(localeWide))) {
-			 //GetUserDefaultLocaleName(localeWide, COUNTOF(localeWide));
+#if _WIN32_WINNT >= _WIN32_WINNT_VISTA
+			GetUserDefaultLocaleName(localeWide, COUNTOF(localeWide));
+#else
 			 GetLocaleInfo(0 /*LOCALE_NAME_USER_DEFAULT*/, 0x0000005c /*LOCALE_SNAME*/, localeWide, COUNTOF(localeWide));
+#endif
 		}
 		WideCharToMultiByte(CP_UTF8, 0, localeWide, -1, localeName, COUNTOF(localeName), NULL, NULL);
 #else
