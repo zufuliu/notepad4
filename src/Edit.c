@@ -676,7 +676,7 @@ int EditDetermineEncoding(LPCWSTR pszFile, char *lpData, DWORD cbData, BOOL bSki
 	BOOL bReverse = FALSE;
 
 	// check Unicode / UTF-16
-	// file large than 2 GiB is loaded without encoding conversion, i.e. loaded with UTF-8 or ANSI only.
+	// file large than 2 GiB is loaded without encoding conversion, i.e. loaded as UTF-8 or ANSI only.
 	if (cbData < MAX_NON_UTF8_SIZE && (
 		(iSrcEncoding == CPI_UNICODE || iSrcEncoding == CPI_UNICODEBE) // reload as UTF-16
 		|| (!bSkipEncodingDetection && iSrcEncoding == -1 && !utf8Sig && IsUnicode(lpData, cbData, &bBOM, &bReverse))
@@ -900,7 +900,7 @@ BOOL EditLoadFile(LPWSTR pszFile, BOOL bSkipEncodingDetection, EditFileIOStatus 
 
 		NP2HeapFree(lpData);
 		lpData = lpDataUTF8;
-		FileVars_Init(lpDataUTF8, cbData, &fvCurFile);
+		FileVars_Init(lpData, cbData, &fvCurFile);
 	} else if (uFlags & NCP_UTF8) {
 		if (bBOM) {
 			lpDataUTF8 = lpData + 3;
