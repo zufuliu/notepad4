@@ -74,217 +74,217 @@ IDC_COPY                CURSOR                  "..\\..\\res\\Copy.cur"
 
 IDR_MAINWND MENU
 BEGIN
-	POPUP "&File"
+	POPUP "ファイル(&F)"
 	BEGIN
-		MENUITEM "&New\tCtrl+N",					IDM_FILE_NEW
-		MENUITEM "&Open...\tCtrl+O",				IDM_FILE_OPEN
-		MENUITEM "&Save\tCtrl+S",					IDM_FILE_SAVE
-		MENUITEM "Save &As...\tF6",					IDM_FILE_SAVEAS
-		MENUITEM "Save Cop&y...\tCtrl+F6",			IDM_FILE_SAVECOPY
+		MENUITEM "新規(&N)\tCtrl+N",					IDM_FILE_NEW
+		MENUITEM "開く(&O)...\tCtrl+O",				IDM_FILE_OPEN
+		MENUITEM "上書き保存(&S)\tCtrl+S",					IDM_FILE_SAVE
+		MENUITEM "名前を付けて保存(&A)...\tF6",					IDM_FILE_SAVEAS
+		MENUITEM "コピーして保存(&Y)...\tCtrl+F6",			IDM_FILE_SAVECOPY
 		MENUITEM SEPARATOR
-		POPUP "File &Mode"
+		POPUP "編集モード(&M)"
 		BEGIN
-			MENUITEM "&Read Only",					IDM_FILE_READONLY
-			MENUITEM "Lo&ck For Editing",			IDM_FILE_LOCK_EDITING
+			MENUITEM "読み取り専用(&R)",					IDM_FILE_READONLY
+			MENUITEM "編集ロック(&C)",			IDM_FILE_LOCK_EDITING
 #if defined(_WIN64)
-			MENUITEM "&Large File Mode",			IDM_FILE_LARGE_FILE_MODE
+			MENUITEM "巨大ファイル(&L)",			IDM_FILE_LARGE_FILE_MODE
 #endif
 		END
-		MENUITEM "Re&vert\tF5",						IDM_FILE_REVERT
-		POPUP "Reloa&d"
+		MENUITEM "再読み込み(&V)\tF5",						IDM_FILE_REVERT
+		POPUP "読み直し(&D)"
 		BEGIN
-			MENUITEM "As UTF-&8\tShift+F8",			CMD_RELOADUTF8
-			MENUITEM "As &ANSI\tCtrl+Shift+A",		CMD_RELOADANSI
-			MENUITEM "As &OEM\tCtrl+Shift+O",		CMD_RELOADOEM
+			MENUITEM "UTF-8として(&8)\tShift+F8",			CMD_RELOADUTF8
+			MENUITEM "ANSIとして(&A)\tCtrl+Shift+A",		CMD_RELOADANSI
+			MENUITEM "OEMとして(&O)\tCtrl+Shift+O",		CMD_RELOADOEM
 			MENUITEM SEPARATOR
-			MENUITEM "&No File Variables\tAlt+F8",	CMD_RELOADNOFILEVARS
-			MENUITEM "&Default\tCtrl+Alt+F",		CMD_RECODEDEFAULT
+			MENUITEM "文字コード解析をパス(&N)\tAlt+F8",	CMD_RELOADNOFILEVARS
+			MENUITEM "デフォルト(&D)\tCtrl+Alt+F",		CMD_RECODEDEFAULT
 #if defined(_WIN64)
-			MENUITEM "&Large File Mode",			IDM_FILE_LARGE_FILE_MODE_RELOAD
+			MENUITEM "巨大ファイルモード(&L)",			IDM_FILE_LARGE_FILE_MODE_RELOAD
 #endif
 			MENUITEM SEPARATOR
-			MENUITEM "&With Encoding...\tF8",		IDM_RECODE_SELECT
+			MENUITEM "文字コードを指定(&W)...\tF8",		IDM_RECODE_SELECT
 		END
-		POPUP "&Launch"
+		POPUP "起動(&L)"
 		BEGIN
-			MENUITEM "Open Containing &Folder",		IDM_FILE_OPEN_CONTAINING_FOLDER
-			MENUITEM "Open As &Administrator",		IDM_FILE_RELAUNCH_ELEVATED
+			MENUITEM "ファイルのあるフォルダを開く(&F)",		IDM_FILE_OPEN_CONTAINING_FOLDER
+			MENUITEM "管理者権限で再起動(&A)",		IDM_FILE_RELAUNCH_ELEVATED
 			MENUITEM SEPARATOR
-			MENUITEM "&New Window\tAlt+N",			IDM_FILE_NEWWINDOW
-			MENUITEM "&Empty Window\tAlt+0",		IDM_FILE_NEWWINDOW2
-			MENUITEM "&Restart",					IDM_FILE_RESTART
+			MENUITEM "同じファイルを別に開く(&N)\tAlt+N",			IDM_FILE_NEWWINDOW
+			MENUITEM "新規ウィンドウ(&E)\tAlt+0",		IDM_FILE_NEWWINDOW2
 			MENUITEM SEPARATOR
-			MENUITEM "Execute &Document\tCtrl+L",	IDM_FILE_LAUNCH
-			MENUITEM "Open &With...",				IDM_FILE_OPENWITH
-			MENUITEM "&Command...\tCtrl+R",			IDM_FILE_RUN
+			MENUITEM "再起動(&R)",					IDM_FILE_RESTART
+			MENUITEM "開いている文書を実行(&D)\tCtrl+L",	IDM_FILE_LAUNCH
+			MENUITEM "別のプログラムで開く(&W)...",				IDM_FILE_OPENWITH
+			MENUITEM "ファイル名を指定して実行(&C)...\tCtrl+R",			IDM_FILE_RUN
 		END
 		MENUITEM SEPARATOR
-		POPUP "&Encoding"
+		POPUP "文字コード(&E)"
 		BEGIN
-			MENUITEM "&ANSI",						IDM_ENCODING_ANSI
-			MENUITEM "UTF-&8",						IDM_ENCODING_UTF8
-			MENUITEM "UTF-8 B&OM",					IDM_ENCODING_UTF8SIGN
-			MENUITEM "UTF-16&LE BOM",				IDM_ENCODING_UNICODE
-			MENUITEM "UTF-16&BE BOM",				IDM_ENCODING_UNICODEREV
-			MENUITEM "&More...\tF9",				IDM_ENCODING_SELECT
+			MENUITEM "ANSI (&A)",						IDM_ENCODING_ANSI
+			MENUITEM "UTF-8 (&8)",						IDM_ENCODING_UTF8
+			MENUITEM "UTF-8 BOM (&O)",					IDM_ENCODING_UTF8SIGN
+			MENUITEM "UTF-16 LE BOM (&L)",				IDM_ENCODING_UNICODE
+			MENUITEM "UTF-16 BE BOM (&B)",				IDM_ENCODING_UNICODEREV
+			MENUITEM "ほかの文字コード指定(&M)...\tF9",				IDM_ENCODING_SELECT
 			MENUITEM SEPARATOR
-			MENUITEM "&Default...",					IDM_ENCODING_SETDEFAULT
+			MENUITEM "デフォルトを設定(&D)...",					IDM_ENCODING_SETDEFAULT
 		END
-		POPUP "Line Endin&gs"
+		POPUP "改行コード(&G)"
 		BEGIN
-			MENUITEM "&Windows (CR+LF)",			IDM_LINEENDINGS_CRLF
-			MENUITEM "&Unix/macOS (LF)",			IDM_LINEENDINGS_LF
-			MENUITEM "Classic &Mac OS (CR)",		IDM_LINEENDINGS_CR
+			MENUITEM "Windows(&W) (CR+LF)",			IDM_LINEENDINGS_CRLF
+			MENUITEM "Unix/MacOS(&U) (LF)",			IDM_LINEENDINGS_LF
+			MENUITEM "古いMac(&M) (CR)",		IDM_LINEENDINGS_CR
 			MENUITEM SEPARATOR
-			MENUITEM "&Default...",					IDM_LINEENDINGS_SETDEFAULT
+			MENUITEM "デフォルトを設定(&D)...",					IDM_LINEENDINGS_SETDEFAULT
 		END
 		MENUITEM SEPARATOR
-		MENUITEM "Page Se&tup...",					IDM_FILE_PAGESETUP
-		MENUITEM "&Print...\tCtrl+P",				IDM_FILE_PRINT
+		MENUITEM "ページ設定(&T)...",					IDM_FILE_PAGESETUP
+		MENUITEM "印刷(&P)...\tCtrl+P",				IDM_FILE_PRINT
 		MENUITEM SEPARATOR
-		MENUITEM "Propert&ies...",					IDM_FILE_PROPERTIES
-		MENUITEM "Create Desktop Lin&k",			IDM_FILE_CREATELINK
+		MENUITEM "プロパティ(&I)...",					IDM_FILE_PROPERTIES
+		MENUITEM "デスクトップにショートカット(&K)",			IDM_FILE_CREATELINK
 		MENUITEM SEPARATOR
-		MENUITEM "&Browse...\tCtrl+M",				IDM_FILE_BROWSE
-		POPUP "&Favorites"
+		MENUITEM "ファイラで開く(&B)...\tCtrl+M",				IDM_FILE_BROWSE
+		POPUP "お気に入り(&F)"
 		BEGIN
-			MENUITEM "&Open Favorites...\tAlt+I",	IDM_FILE_OPENFAV
-			MENUITEM "&Add Current File...\tAlt+K",	IDM_FILE_ADDTOFAV
-			MENUITEM "&Manage...\tAlt+F9",			IDM_FILE_MANAGEFAV
+			MENUITEM "お気に入りを開く(&O)...\tAlt+I",	IDM_FILE_OPENFAV
+			MENUITEM "現在のファイルを追加(&A)...\tAlt+K",	IDM_FILE_ADDTOFAV
+			MENUITEM "エクスプローラーで開く(&M)...\tAlt+F9",			IDM_FILE_MANAGEFAV
 		END
-		MENUITEM "Recent (&History)...\tAlt+H",		IDM_FILE_RECENT
+		MENUITEM "最近開いたファイル(&H)...\tAlt+H",		IDM_FILE_RECENT
 		MENUITEM SEPARATOR
-		MENUITEM "E&xit\tAlt+F4",					IDM_FILE_EXIT
+		MENUITEM "終了(&X)\tAlt+F4",					IDM_FILE_EXIT
 	END
-	POPUP "&Edit"
+	POPUP "編集(&E)"
 	BEGIN
-		MENUITEM "&Undo\tCtrl+Z",						IDM_EDIT_UNDO
-		MENUITEM "&Redo\tCtrl+Y",						IDM_EDIT_REDO
+		MENUITEM "元に戻す(&U)\tCtrl+Z",						IDM_EDIT_UNDO
+		MENUITEM "やり直し(&R)\tCtrl+Y",						IDM_EDIT_REDO
 		MENUITEM SEPARATOR
-		MENUITEM "Cu&t\tCtrl+X",						IDM_EDIT_CUT
-		MENUITEM "&Copy\tCtrl+C",						IDM_EDIT_COPY
-		MENUITEM "&Paste\tCtrl+V",						IDM_EDIT_PASTE
-		MENUITEM "&Delete\tDelete",						IDM_EDIT_DELETE
-		MENUITEM "Select &All\tCtrl+A",					IDM_EDIT_SELECTALL
-		MENUITEM "S&wap\tCtrl+K",						IDM_EDIT_SWAP
+		MENUITEM "切り取り(&T)\tCtrl+X",						IDM_EDIT_CUT
+		MENUITEM "コピー(&C)\tCtrl+C",						IDM_EDIT_COPY
+		MENUITEM "貼り付け(&P)\tCtrl+V",						IDM_EDIT_PASTE
+		MENUITEM "削除(&D)\tDel",						IDM_EDIT_DELETE
+		MENUITEM "すべて選択(&A)\tCtrl+A",					IDM_EDIT_SELECTALL
+		MENUITEM "クリップボードと入替(&W)\tCtrl+K",						IDM_EDIT_SWAP
 		MENUITEM SEPARATOR
-		MENUITEM "Clear Docu&ment",						IDM_EDIT_CLEARDOCUMENT
-		MENUITEM "Clear Clip&board",					IDM_EDIT_CLEARCLIPBOARD
-		POPUP "Cop&y to Clipboard"
+		MENUITEM "この文書を白紙化(&M)",						IDM_EDIT_CLEARDOCUMENT
+		MENUITEM "クリップボードをクリア(&B)",					IDM_EDIT_CLEARCLIPBOARD
+		POPUP "クリップボードへコピー(&Y)"
 		BEGIN
-			MENUITEM "&File Name",						CMD_COPYFILENAME_NOEXT
-			MENUITEM "File Name and &Ext.\tShift+F9",	CMD_COPYFILENAME
-			MENUITEM "Full &Path Name\tAlt+Shift+F9",	CMD_COPYPATHNAME
+			MENUITEM "ファイル名(&F)",						CMD_COPYFILENAME_NOEXT
+			MENUITEM "ファイル名と拡張子(&E)\tShift+F9",	CMD_COPYFILENAME
+			MENUITEM "フルパス名(&P)\tAlt+Shift+F9",	CMD_COPYPATHNAME
 			MENUITEM SEPARATOR
-			MENUITEM "Copy &All\tAlt+A",				IDM_EDIT_COPYALL
-			MENUITEM "Copy A&dd\tCtrl+E",				IDM_EDIT_COPYADD
-			MENUITEM "Copy As &RTF",					IDM_EDIT_COPYRTF
+			MENUITEM "すべてコピー(&A)\tAlt+A",				IDM_EDIT_COPYALL
+			MENUITEM "クリップボード末尾に追加(&D)\tCtrl+E",				IDM_EDIT_COPYADD
+			MENUITEM "リッチテキストとしてコピー(&R)",					IDM_EDIT_COPYRTF
 			//MENUITEM SEPARATOR
-			//MENUITEM "&Copy As Binary",					IDM_EDIT_COPY_BINARY
-			//MENUITEM "Cu&t As Binary",					IDM_EDIT_CUT_BINARY
-			//MENUITEM "&Paste As Binary",				IDM_EDIT_PASTE_BINARY
+			//MENUITEM "バイナリとしてコピー(&C)",					IDM_EDIT_COPY_BINARY
+			//MENUITEM "バイナリとして切り取り(&T)",					IDM_EDIT_CUT_BINARY
+			//MENUITEM "バイナリとして貼り付け(&P)",				IDM_EDIT_PASTE_BINARY
 			MENUITEM SEPARATOR
-			MENUITEM "&Window Position\tCtrl+Shift+K",	CMD_COPYWINPOS
+			MENUITEM "ウインドウ位置(&W)\tCtrl+Shift+K",	CMD_COPYWINPOS
 		END
 		MENUITEM SEPARATOR
-		POPUP "&Selection"
+		POPUP "選択範囲(&S)"
 		BEGIN
-			MENUITEM "&Duplicate\tAlt+D",				IDM_EDIT_SELECTIONDUPLICATE
+			MENUITEM "選択範囲を複製(&D)\tAlt+D",				IDM_EDIT_SELECTIONDUPLICATE
 			MENUITEM SEPARATOR
-			MENUITEM "T&oggle Line Comment\tCtrl+/",	IDM_EDIT_LINECOMMENT
-			MENUITEM "Block &Comment\tCtrl+Q",			IDM_EDIT_STREAMCOMMENT
-			MENUITEM "&Indent\tTab",					IDM_EDIT_INDENT
-			MENUITEM "&Unindent\tShift+Tab",			IDM_EDIT_UNINDENT
+			MENUITEM "行コメント(切替)(&O)\tCtrl+/",	IDM_EDIT_LINECOMMENT
+			MENUITEM "ブロックコメント(&C)\tCtrl+Q",			IDM_EDIT_STREAMCOMMENT
+			MENUITEM "インデント(&I)\tTab",					IDM_EDIT_INDENT
+			MENUITEM "逆インデント(&U)\tShift+Tab",			IDM_EDIT_UNINDENT
 			MENUITEM SEPARATOR
-			MENUITEM "Strip &Trailing Blanks\tAlt+T",	IDM_EDIT_TRIMLINES
-			MENUITEM "Strip &First Character\tAlt+Z",	IDM_EDIT_STRIP1STCHAR
-			MENUITEM "Strip &Last Character\tAlt+L",	IDM_EDIT_STRIPLASTCHAR
-			MENUITEM "Strip Leading Blan&ks",			IDM_EDIT_TRIMLEAD
+			MENUITEM "末尾の空白削除(&T)\tAlt+T",	IDM_EDIT_TRIMLINES
+			MENUITEM "行頭削除(&F)\tAlt+Z",	IDM_EDIT_STRIP1STCHAR
+			MENUITEM "行末削除(&L)\tAlt+L",	IDM_EDIT_STRIPLASTCHAR
+			MENUITEM "行頭からの空白を除去(&K)",			IDM_EDIT_TRIMLEAD
 			MENUITEM SEPARATOR
-			MENUITEM "Merge &Blank Lines\tAlt+B",		IDM_EDIT_MERGEBLANKLINES
-			MENUITEM "&Remove Blank Lines\tAlt+R",		IDM_EDIT_REMOVEBLANKLINES
-			MENUITEM "&Pad With Spaces\tAlt+P",			IDM_EDIT_PADWITHSPACES
-			MENUITEM "Compress &Whitespace\tAlt+W",		IDM_EDIT_COMPRESSWS
+			MENUITEM "余分な空行を削除(&B)\tAlt+B",		IDM_EDIT_MERGEBLANKLINES
+			MENUITEM "空行を削除(&R)\tAlt+R",		IDM_EDIT_REMOVEBLANKLINES
+			MENUITEM "空欄を空白で埋める(&P)\tAlt+P",			IDM_EDIT_PADWITHSPACES
+			MENUITEM "空白をまとめる(&W)\tAlt+W",		IDM_EDIT_COMPRESSWS
 		END
-		POPUP "&Enclose Selection"
+		POPUP "選択範囲を囲む(&E)"
 		BEGIN
-			MENUITEM "&With...\tAlt+Q",					IDM_EDIT_ENCLOSESELECTION
-			MENUITEM "&HTML/XML Tag...\tAlt+X",			IDM_EDIT_INSERT_XMLTAG
+			MENUITEM "指定文字で囲む(&W)...\tAlt+Q",					IDM_EDIT_ENCLOSESELECTION
+			MENUITEM "HTML/XMLタグ(&H)...\tAlt+X",			IDM_EDIT_INSERT_XMLTAG
 			MENUITEM SEPARATOR
 			MENUITEM "&( )\tCtrl+4",					CMD_EMBRACKETR
 			MENUITEM "&{ }\tCtrl+5",					CMD_EMBRACKETC
 			MENUITEM "&[ ]\tCtrl+6",					CMD_EMBRACKETS
 			MENUITEM "&< >\tCtrl+7",					CMD_EMBRACKETA
 			MENUITEM SEPARATOR
-			MENUITEM "&Single Quotes\tCtrl+1",			CMD_STRINGIFYS
-			MENUITEM "&Double Quotes\tCtrl+2",			CMD_STRINGIFYD
-			MENUITEM "&Triple Double Quotes\tCtrl+3",	CMD_STRINGIFYT2
-			MENUITEM "Triple Single &Quotes\tCtrl+9",	CMD_STRINGIFYT1
-			MENUITEM "&Backticks\tCtrl+8",				CMD_STRINGIFYB
+			MENUITEM "シングルクォート(&S)\tCtrl+1",			CMD_STRINGIFYS
+			MENUITEM "ダブルクォート(&D)\tCtrl+2",			CMD_STRINGIFYD
+			MENUITEM "トリプル ダブルクォート2(&T)\tCtrl+3",	CMD_STRINGIFYT2
+			MENUITEM "トリプル シングルクォート1(&Q)\tCtrl+9",	CMD_STRINGIFYT1
+			MENUITEM "バッククォート(&B)\tCtrl+8",				CMD_STRINGIFYB
 		END
-		POPUP "&Lines"
+		POPUP "行(&L)"
 		BEGIN
-			MENUITEM "Move &Up\tAlt+Up",				IDM_EDIT_MOVELINEUP
-			MENUITEM "Mo&ve Down\tAlt+Down",			IDM_EDIT_MOVELINEDOWN
-			MENUITEM "T&ranspose\tAlt+S",				IDM_EDIT_LINETRANSPOSE
+			MENUITEM "上へ移動(&U)\tAlt+Up",				IDM_EDIT_MOVELINEUP
+			MENUITEM "下へ移動(&V)\tAlt+Down",			IDM_EDIT_MOVELINEDOWN
+			MENUITEM "上と入れ替え(&R)\tAlt+S",				IDM_EDIT_LINETRANSPOSE
 			MENUITEM SEPARATOR
-			MENUITEM "S&ort Lines...\tAlt+O",			IDM_EDIT_SORTLINES
-			MENUITEM "&Modify Lines...\tAlt+M",			IDM_EDIT_MODIFYLINES
-			MENUITEM "Alig&n Lines...\tAlt+J",			IDM_EDIT_ALIGN
+			MENUITEM "行の並べ替え(&O)...\tAlt+O",			IDM_EDIT_SORTLINES
+			MENUITEM "行の修飾(&M)...\tAlt+M",			IDM_EDIT_MODIFYLINES
+			MENUITEM "行の整列((&N)...\tAlt+J",			IDM_EDIT_ALIGN
 			MENUITEM SEPARATOR
-			MENUITEM "&Duplicate Line\tCtrl+D",			IDM_EDIT_DUPLICATELINE
-			MENUITEM "Cu&t Line\tCtrl+Shift+X",			IDM_EDIT_CUTLINE
-			MENUITEM "&Copy Line\tCtrl+Shift+C",		IDM_EDIT_COPYLINE
-			MENUITEM "D&elete Line\tCtrl+Shift+D",		IDM_EDIT_DELETELINE
+			MENUITEM "複製(&D)\tCtrl+D",			IDM_EDIT_DUPLICATELINE
+			MENUITEM "切り取り(&T)\tCtrl+Shift+X",			IDM_EDIT_CUTLINE
+			MENUITEM "コピー(&C)\tCtrl+Shift+C",		IDM_EDIT_COPYLINE
+			MENUITEM "削除(&E)\tCtrl+Shift+D",		IDM_EDIT_DELETELINE
 			MENUITEM SEPARATOR
-			MENUITEM "&Join Lines\tCtrl+J",				IDM_EDIT_JOINLINES
-			MENUITEM "Column &Wrap...\tCtrl+Shift+W",	IDM_EDIT_COLUMNWRAP
-			MENUITEM "&Split Lines\tCtrl+I",			IDM_EDIT_SPLITLINES
-			MENUITEM "Join &Paragraphs\tCtrl+Shift+J",	IDM_EDIT_JOINLINESEX
+			MENUITEM "行を結合(空白で)(&J)\tCtrl+J",				IDM_EDIT_JOINLINES
+			MENUITEM "空白で折り返し(&W)...\tCtrl+Shift+W",	IDM_EDIT_COLUMNWRAP
+			MENUITEM "長い行を分割し折り返し(&S)\tCtrl+I",			IDM_EDIT_SPLITLINES
+			MENUITEM "段落を温存して結合(&P)\tCtrl+Shift+J",	IDM_EDIT_JOINLINESEX
 		END
-		POPUP "Con&vert"
+		POPUP "変換(&V)"
 		BEGIN
-			MENUITEM "&Upper Case\tCtrl+Shift+U",		IDM_EDIT_CONVERTUPPERCASE
-			MENUITEM "&Lower Case\tCtrl+U",				IDM_EDIT_CONVERTLOWERCASE
-			MENUITEM "In&vert Case\tCtrl+Alt+U",		IDM_EDIT_INVERTCASE
-			MENUITEM "Title &Case\tCtrl+Alt+I",			IDM_EDIT_TITLECASE
-			MENUITEM "&Sentence Case\tCtrl+Alt+O",		IDM_EDIT_SENTENCECASE
-			POPUP "Oth&er Conversions"
+			MENUITEM "大文字(&U)\tCtrl+Shift+U",		IDM_EDIT_CONVERTUPPERCASE
+			MENUITEM "小文字(&L)\tCtrl+U",				IDM_EDIT_CONVERTLOWERCASE
+			MENUITEM "大文字/小文字を反転(&V)\tCtrl+Alt+U",		IDM_EDIT_INVERTCASE
+			MENUITEM "頭文字を大文字に(&C)\tCtrl+Alt+I",			IDM_EDIT_TITLECASE
+			MENUITEM "文の最初を大文字に(&S)\tCtrl+Alt+O",		IDM_EDIT_SENTENCECASE
+			POPUP "他の言語の変換(&E)"
 			BEGIN
-				MENUITEM "Halfwidth Form to Full&width",		IDM_EDIT_MAP_FULLWIDTH
-				MENUITEM "Fullwidth Form to H&alfwidth",		IDM_EDIT_MAP_HALFWIDTH
+				MENUITEM "半角を全角に(&W)",		IDM_EDIT_MAP_FULLWIDTH
+				MENUITEM "全角を半角に(&A)",		IDM_EDIT_MAP_HALFWIDTH
 				MENUITEM SEPARATOR
-				MENUITEM "Chinese Traditional to &Simplified",	IDM_EDIT_MAP_SIMPLIFIED_CHINESE
-				MENUITEM "Chinese Simplified to &Traditional",	IDM_EDIT_MAP_TRADITIONAL_CHINESE
+				MENUITEM "繁体字を簡体字に(&S)(中国)",	IDM_EDIT_MAP_SIMPLIFIED_CHINESE
+				MENUITEM "簡体字を繁体字に(&T)"",	IDM_EDIT_MAP_TRADITIONAL_CHINESE
 				MENUITEM SEPARATOR
-				MENUITEM "Japanese Katakana to &Hiragana",		IDM_EDIT_MAP_HIRAGANA
-				MENUITEM "Japanese Hiragana to &Katakana",		IDM_EDIT_MAP_KATAKANA
+				MENUITEM "カタカナをひらがなに(&H)",		IDM_EDIT_MAP_HIRAGANA
+				MENUITEM "ひらがなをカタカナに(&K)",		IDM_EDIT_MAP_KATAKANA
 				MENUITEM SEPARATOR
-				MENUITEM "Korean Han&gul Decomposition",		IDM_EDIT_MAP_HANGUL_DECOMPOSITION
+				MENUITEM "ハングル語を分解(&G)",		IDM_EDIT_MAP_HANGUL_DECOMPOSITION
 				MENUITEM SEPARATOR
-				MENUITEM "&Bengali to Latin",					IDM_EDIT_MAP_BENGALI_LATIN
-				MENUITEM "C&yrillic to Latin",					IDM_EDIT_MAP_CYRILLIC_LATIN
-				MENUITEM "&Devanagari to Latin",				IDM_EDIT_MAP_DEVANAGARI_LATIN
-				MENUITEM "&Malayalam to Latin",					IDM_EDIT_MAP_MALAYALAM_LATIN
+				MENUITEM "ベンガル語をラテンに(&B)",					IDM_EDIT_MAP_BENGALI_LATIN
+				MENUITEM "キリル文字を以下同(&Y)",					IDM_EDIT_MAP_CYRILLIC_LATIN
+				MENUITEM "デバナーガリ文字を(&D)",				IDM_EDIT_MAP_DEVANAGARI_LATIN
+				MENUITEM "マラヤーラム語を(&M)",					IDM_EDIT_MAP_MALAYALAM_LATIN
 			END
 			MENUITEM SEPARATOR
-			MENUITEM "&Tabify Selection\tCtrl+Shift+T",		IDM_EDIT_CONVERTSPACES
-			MENUITEM "U&ntabify Selection\tCtrl+Shift+S",	IDM_EDIT_CONVERTTABS
-			MENUITEM "Tabify &Indent\tCtrl+Alt+T",			IDM_EDIT_CONVERTSPACES2
-			MENUITEM "Untabi&fy Indent\tCtrl+Alt+S",		IDM_EDIT_CONVERTTABS2
+			MENUITEM "空白をタブに(&T)\tCtrl+Shift+T",		IDM_EDIT_CONVERTSPACES
+			MENUITEM "タブを空白に(&N)\tCtrl+Shift+S",	IDM_EDIT_CONVERTTABS
+			MENUITEM "インデントをタブに(&I)\tCtrl+Alt+T",			IDM_EDIT_CONVERTSPACES2
+			MENUITEM "インデントを空白に(&F)\tCtrl+Alt+S",		IDM_EDIT_CONVERTTABS2
 			MENUITEM SEPARATOR
-			MENUITEM "To &Hexadecimal\tCtrl+Alt+H",			IDM_EDIT_NUM2HEX
-			MENUITEM "To &Decimal\tCtrl+Alt+D",				IDM_EDIT_NUM2DEC
-			MENUITEM "To &Binary\tCtrl+Alt+B",				IDM_EDIT_NUM2BIN
-			MENUITEM "To &Octet",							IDM_EDIT_NUM2OCT
+			MENUITEM "16進数(&H)\tCtrl+Alt+H",			IDM_EDIT_NUM2HEX
+			MENUITEM "10進数(&D)\tCtrl+Alt+D",				IDM_EDIT_NUM2DEC
+			MENUITEM "バイナリ(&B)\tCtrl+Alt+B",				IDM_EDIT_NUM2BIN
+			MENUITEM "8ビット(octet)(&O)",							IDM_EDIT_NUM2OCT
 		END
-		POPUP "I&nsert"
+		POPUP "挿入(&N)"
 		BEGIN
-			MENUITEM "Complete &Word\tAlt+/",				IDM_EDIT_COMPLETEWORD
+			MENUITEM "単語補完(&W)\tAlt+/",				IDM_EDIT_COMPLETEWORD
 			MENUITEM SEPARATOR
-			MENUITEM "&HTML/XML Tag...\tAlt+X",				IDM_EDIT_INSERT_XMLTAG
-			MENUITEM "New &GUID",							IDM_EDIT_INSERT_GUID
-			POPUP "Unicode &Control Character"
+			MENUITEM "HTML/XMLタグ(&H)...\tAlt+X",				IDM_EDIT_INSERT_XMLTAG
+			MENUITEM "GUID(&G)",							IDM_EDIT_INSERT_GUID
+			POPUP "Unicode 制御文字(&C)"
 			BEGIN
 				MENUITEM "WJ\t&Word joiner",						IDM_INSERT_UNICODE_WJ
 				MENUITEM "ZWJ\tZero width &joiner",					IDM_INSERT_UNICODE_ZWJ
@@ -313,235 +313,235 @@ BEGIN
 				MENUITEM "ZWSP\t&Zero width space",					IDM_INSERT_UNICODE_ZWSP
 			END
 			MENUITEM SEPARATOR
-			MENUITEM "&File Name",								CMD_INSERTFILENAME_NOEXT
-			MENUITEM "File Name and E&xtension\tCtrl+F9",		IDM_EDIT_INSERT_FILENAME
-			MENUITEM "Full &Path Name\tCtrl+Shift+F9",			IDM_EDIT_INSERT_PATHNAME
+			MENUITEM "ファイル名(&F)",								CMD_INSERTFILENAME_NOEXT
+			MENUITEM "ファイル名と拡張子(&X)\tCtrl+F9",		IDM_EDIT_INSERT_FILENAME
+			MENUITEM "フルパス(&P)\tCtrl+Shift+F9",			IDM_EDIT_INSERT_PATHNAME
 			MENUITEM SEPARATOR
-			MENUITEM "Current &Date",							IDM_EDIT_INSERT_LOC_DATE
-			MENUITEM "Current Date &Time",						IDM_EDIT_INSERT_LOC_DATETIME
-			MENUITEM "&UTC Date Time",							IDM_EDIT_INSERT_UTC_DATETIME
-			MENUITEM "Unix Timesta&mp",							IDM_EDIT_INSERT_TIMESTAMP
-			POPUP "&Other Timestamps"
+			MENUITEM "日付(&D)",							IDM_EDIT_INSERT_LOC_DATE
+			MENUITEM "日付と時刻(&T)",						IDM_EDIT_INSERT_LOC_DATETIME
+			MENUITEM "UTC日時(&U)",							IDM_EDIT_INSERT_UTC_DATETIME
+			MENUITEM "Unixタイムスタンプ(&U)",							IDM_EDIT_INSERT_TIMESTAMP
+			POPUP "ミリ秒(&O)"
 			BEGIN
-				MENUITEM "&Millisecond (ms)",					IDM_EDIT_INSERT_TIMESTAMP_MS
-				MENUITEM "Micro&second (us)",					IDM_EDIT_INSERT_TIMESTAMP_US
-				MENUITEM "&Nanosecond (ns)",					IDM_EDIT_INSERT_TIMESTAMP_NS
+				MENUITEM "ミリ秒 (ms)(&M)",					IDM_EDIT_INSERT_TIMESTAMP_MS
+				MENUITEM "マイクロ秒 (us)(&S)",					IDM_EDIT_INSERT_TIMESTAMP_US
+				MENUITEM "ナノ秒 (ns)(&N)",					IDM_EDIT_INSERT_TIMESTAMP_NS
 			END
-			MENUITEM "Time/Date (&Short Form)\tCtrl+F5",		IDM_EDIT_INSERT_SHORTDATE
-			MENUITEM "Time/Date (&Long Form)\tCtrl+Shift+F5",	IDM_EDIT_INSERT_LONGDATE
+			MENUITEM "日付と時刻(/)(&S)\tCtrl+F5",		IDM_EDIT_INSERT_SHORTDATE
+			MENUITEM "日付と時刻(年月日)(&L)\tCtrl+Shift+F5",	IDM_EDIT_INSERT_LONGDATE
 			MENUITEM SEPARATOR
-			MENUITEM "&Encoding Identifier\tCtrl+F8",			IDM_EDIT_INSERT_ENCODING
-			MENUITEM "Script She&bang Line",					IDM_EDIT_INSERT_SHEBANG
+			MENUITEM "現在の文字コード形式(&E)\tCtrl+F8",			IDM_EDIT_INSERT_ENCODING
+			MENUITEM "スクリプトのシバン行(&B)",					IDM_EDIT_INSERT_SHEBANG
 		END
-		POPUP "Spec&ial"
+		POPUP "プログラム(&I)"
 		BEGIN
-			MENUITEM "C&har to Hex\tCtrl+Alt+X",				IDM_EDIT_CHAR2HEX
-			MENUITEM "Hex to Cha&r\tCtrl+Alt+C",				IDM_EDIT_HEX2CHAR
-			MENUITEM "Esca&pe C Chars\tCtrl+Alt+E",				IDM_EDIT_ESCAPECCHARS
-			MENUITEM "&Unescape C Chars\tCtrl+Alt+R",			IDM_EDIT_UNESCAPECCHARS
-			MENUITEM "&Show Hex Code",							IDM_EDIT_SHOW_HEX
+			MENUITEM "16進数表記へ(&H)\tCtrl+Alt+X",				IDM_EDIT_CHAR2HEX
+			MENUITEM "16進数表記を文字へ(&R)\tCtrl+Alt+C",				IDM_EDIT_HEX2CHAR
+			MENUITEM "文字列型中のエスケープ文字変換(&P)\tCtrl+Alt+E",				IDM_EDIT_ESCAPECCHARS
+			MENUITEM "文字列型中の上記アンエスケープ(&U)\tCtrl+Alt+R",			IDM_EDIT_UNESCAPECCHARS
+			MENUITEM "16進コードを表示(&S)",							IDM_EDIT_SHOW_HEX
 			MENUITEM SEPARATOR
-			MENUITEM "URL &Encode\tCtrl+Shift+E",				IDM_EDIT_URLENCODE
-			MENUITEM "URL &Decode\tCtrl+Shift+R",				IDM_EDIT_URLDECODE
-			MENUITEM "Escape HT&ML/XML Chars\tAlt+Shift+X",		IDM_EDIT_XHTML_ESCAPE_CHAR
-			MENUITEM "Unescape HTML/&XML Chars\tAlt+Shift+H",	IDM_EDIT_XHTML_UNESCAPE_CHAR
+			MENUITEM "URLエンコード(&E)\tCtrl+Shift+E",				IDM_EDIT_URLENCODE
+			MENUITEM "URLデコード(&D)\tCtrl+Shift+R",				IDM_EDIT_URLDECODE
+			MENUITEM "HTML/XMLをエスケープ(&M)\tAlt+Shift+X",		IDM_EDIT_XHTML_ESCAPE_CHAR
+			MENUITEM "HTML/XMLをアンエスケープ(&X)\tAlt+Shift+H",	IDM_EDIT_XHTML_UNESCAPE_CHAR
 			MENUITEM SEPARATOR
-			MENUITEM "Delete &Line Left\tCtrl+Shift+Back",		IDM_EDIT_DELETELINELEFT
-			MENUITEM "Delete Li&ne Right\tCtrl+Shift+Del",		IDM_EDIT_DELETELINERIGHT
-			MENUITEM "Delete Word Le&ft\tCtrl+Back",			CMD_CTRLBACK
-			MENUITEM "Delete Word Ri&ght\tCtrl+Del",			CMD_CTRLDEL
+			MENUITEM "行の左を削除(&L)\tCtrl+Shift+Back",		IDM_EDIT_DELETELINELEFT
+			MENUITEM "行の右を削除(&N)\tCtrl+Shift+Del",		IDM_EDIT_DELETELINERIGHT
+			MENUITEM "単語の左を削除(&F)\tCtrl+Back",			CMD_CTRLBACK
+			MENUITEM "単語の右を削除(&G)\tCtrl+Del",			CMD_CTRLDEL
 			MENUITEM SEPARATOR
-			MENUITEM "Update &Timestamps\tShift+F5",			CMD_TIMESTAMPS
+			MENUITEM "タイムスタンプの更新(&T)\tShift+F5",			CMD_TIMESTAMPS
 		END
-		POPUP "Action &on Selection"
+		POPUP "選択範囲を実行(&O)"
 		BEGIN
-			MENUITEM "&Open File, Folder, Link, etc.",		CMD_OPEN_PATH_OR_LINK
-			MENUITEM "Open Containing &Folder",				CMD_OPEN_CONTAINING_FOLDER
+			MENUITEM ファイル		CMD_OPEN_PATH_OR_LINK
+			MENUITEM "このフォルダを開く(&F)",				CMD_OPEN_CONTAINING_FOLDER
 			MENUITEM SEPARATOR
-			MENUITEM "Search with &Google",					CMD_ONLINE_SEARCH_GOOGLE
-			MENUITEM "Search with &Bing",					CMD_ONLINE_SEARCH_BING
-			MENUITEM "Search on &Wikipedia",				CMD_ONLINE_SEARCH_WIKI
+			MENUITEM "&Google 検索",					CMD_ONLINE_SEARCH_GOOGLE
+			MENUITEM "&Bing 検索",					CMD_ONLINE_SEARCH_BING
+			MENUITEM "&Wikipedia 検索",				CMD_ONLINE_SEARCH_WIKI
 			MENUITEM SEPARATOR
-			MENUITEM "Custom Action &1\tCtrl+Shift+1",		CMD_CUSTOM_ACTION1
-			MENUITEM "Custom Action &2\tCtrl+Shift+2",		CMD_CUSTOM_ACTION2
+			MENUITEM "ウェブ1 で開く (&1)\tCtrl+Shift+1",		CMD_CUSTOM_ACTION1
+			MENUITEM "ウェブ2 で開く (&2)\tCtrl+Shift+2",		CMD_CUSTOM_ACTION2
 		END
 		MENUITEM SEPARATOR
-		POPUP "&Find and Replace"
+		POPUP "検索/置換(&F)"
 		BEGIN
-			MENUITEM "&Find...\tCtrl+F",				IDM_EDIT_FIND
-			MENUITEM "Sa&ve Find Text\tAlt+F3",			IDM_EDIT_SAVEFIND
-			MENUITEM "Find &Next\tF3",					IDM_EDIT_FINDNEXT
-			MENUITEM "Find &Previous\tShift+F3",		IDM_EDIT_FINDPREV
-			MENUITEM "R&eplace...\tCtrl+H",				IDM_EDIT_REPLACE
-			MENUITEM "Repl&ace Next\tF4",				IDM_EDIT_REPLACENEXT
+			MENUITEM "検索(&F)...\tCtrl+F",				IDM_EDIT_FIND
+			MENUITEM "検索文字列候補に追加(&V)\tAlt+F3",			IDM_EDIT_SAVEFIND
+			MENUITEM "次を検索(&N)\tF3",					IDM_EDIT_FINDNEXT
+			MENUITEM "前へ検索(&P)\tShift+F3",		IDM_EDIT_FINDPREV
+			MENUITEM "置換(&E)...\tCtrl+H",				IDM_EDIT_REPLACE
+			MENUITEM "置換し次へ(&A)\tF4",				IDM_EDIT_REPLACENEXT
 			MENUITEM SEPARATOR
-			MENUITEM "Find Matching &Brace\tCtrl+B",				IDM_EDIT_FINDMATCHINGBRACE
-			MENUITEM "Select to Matching B&race\tCtrl+Shift+B",		IDM_EDIT_SELTOMATCHINGBRACE
-			MENUITEM "Select &Word\tCtrl+Alt+Space",				IDM_EDIT_SELECTWORD
-			MENUITEM "Select &Lines (Expand Selection)\tCtrl+Shift+Space",	IDM_EDIT_SELECTLINE
-			MENUITEM "Select Lines in &Current Block\tAlt+Shift+]",	IDM_EDIT_SELECTLINE_BLOCK
+			MENUITEM "対応括弧に移動(&B)\tCtrl+B",				IDM_EDIT_FINDMATCHINGBRACE
+			MENUITEM "対応括弧まで選択(&R)\tCtrl+Shift+B",		IDM_EDIT_SELTOMATCHINGBRACE
+			MENUITEM "単語を選択(&W)\tCtrl+Alt+Space",				IDM_EDIT_SELECTWORD
+			MENUITEM "行を選択(&L)\tCtrl+Shift+Space",	IDM_EDIT_SELECTLINE
+			MENUITEM "現在行のブロックを選択(&C)\tAlt+Shift+]",	IDM_EDIT_SELECTLINE_BLOCK
 			MENUITEM SEPARATOR
-			MENUITEM "Select to Document Star&t",					IDM_EDIT_SELTODOCSTART
-			MENUITEM "Select to Document En&d",						IDM_EDIT_SELTODOCEND
-			MENUITEM "Select to Ne&xt\tCtrl+Alt+F2",				IDM_EDIT_SELTONEXT
-			MENUITEM "Select to Previou&s\tCtrl+Alt+Shift+F2",		IDM_EDIT_SELTOPREV
-			MENUITEM "&Jump to Selection Start\tAlt+Comma (,)",		CMD_JUMP2SELSTART
-			MENUITEM "J&ump to Selection End\tAlt+Period (.)",		CMD_JUMP2SELEND
+			MENUITEM "先頭まで選択(&T)",					IDM_EDIT_SELTODOCSTART
+			MENUITEM "終端まで選択(&D)",						IDM_EDIT_SELTODOCEND
+			MENUITEM "次の検索一致まで選択(&X)\tCtrl+Alt+F2",				IDM_EDIT_SELTONEXT
+			MENUITEM "前の検索一致まで選択(&S)\tCtrl+Alt+Shift+F2",		IDM_EDIT_SELTOPREV
+			MENUITEM "選択範囲の先頭へカーソル移動(&J)\t+カンマ(,),		CMD_JUMP2SELSTART
+			MENUITEM "選択範囲の末尾へカーソル移動(&U)\t+ピリオド(.)",			CMD_JUMP2SELEND
 		END
-		POPUP "Boo&kmarks"
+		POPUP "ブックマーク(しおり)(&K)"
 		BEGIN
-			MENUITEM "&Toggle\tCtrl+F2",			BME_EDIT_BOOKMARKTOGGLE
+			MENUITEM "指定の切り替え(&T)\tCtrl+F2",			BME_EDIT_BOOKMARKTOGGLE
 			MENUITEM SEPARATOR
-			MENUITEM "Goto &Next\tF2",				BME_EDIT_BOOKMARKNEXT
-			MENUITEM "Goto &Previous\tShift+F2",	BME_EDIT_BOOKMARKPREV
+			MENUITEM "次へ(&N)\tF2",				BME_EDIT_BOOKMARKNEXT
+			MENUITEM "前へ(&P)\tShift+F2",	BME_EDIT_BOOKMARKPREV
 			MENUITEM SEPARATOR
-			MENUITEM "&Clear All\tAlt+F2",			BME_EDIT_BOOKMARKCLEAR
+			MENUITEM "すべて消去(&C)\tAlt+F2",			BME_EDIT_BOOKMARKCLEAR
 		END
-		MENUITEM "&Goto...\tCtrl+G",				IDM_EDIT_GOTOLINE
+		MENUITEM "指定行へジャンプ(&G)...\tCtrl+G",				IDM_EDIT_GOTOLINE
 	END
-	POPUP "&View"
+	POPUP "表示(&V)"
 	BEGIN
-		MENUITEM "Default &Code Font...\tAlt+F12",	IDM_VIEW_DEFAULT_CODE_FONT
-		MENUITEM "&Default Text Font...",			IDM_VIEW_DEFAULT_TEXT_FONT
-		POPUP "C&aret Style"
+		MENUITEM "フォント設定/コード用(&C)...\tAlt+F12",	IDM_VIEW_DEFAULT_CODE_FONT
+		MENUITEM "フォント設定/テキスト用(&D)...",			IDM_VIEW_DEFAULT_TEXT_FONT
+		POPUP "キャレットの種類(&A)"
 		BEGIN
-			MENUITEM "Block (&OVR Mode)",			IDM_VIEW_CARET_STYLE_BLOCK_OVR
+			MENUITEM "ブロック 上書モードの表示(未反映?)(&O)",			IDM_VIEW_CARET_STYLE_BLOCK_OVR
 			MENUITEM SEPARATOR
-			MENUITEM "Block (&INS Mode)",			IDM_VIEW_CARET_STYLE_BLOCK
-			MENUITEM "Line Width &1",				IDM_VIEW_CARET_STYLE_WIDTH1
-			MENUITEM "Line Width &2",				IDM_VIEW_CARET_STYLE_WIDTH2
-			MENUITEM "Line Width &3",				IDM_VIEW_CARET_STYLE_WIDTH3
+			MENUITEM "ブロック 挿入モード(&I)",			IDM_VIEW_CARET_STYLE_BLOCK
+			MENUITEM "幅1 (&1)",				IDM_VIEW_CARET_STYLE_WIDTH1
+			MENUITEM "幅2 (&2)",				IDM_VIEW_CARET_STYLE_WIDTH2
+			MENUITEM "幅3 (&3)",				IDM_VIEW_CARET_STYLE_WIDTH3
 			MENUITEM SEPARATOR
-			MENUITEM "&No Blink",					IDM_VIEW_CARET_STYLE_NOBLINK
-			MENUITEM "Draw Block Caret In &Selection",		IDM_VIEW_CARET_STYLE_SELECTION
+			MENUITEM "点滅なし(&N)",					IDM_VIEW_CARET_STYLE_NOBLINK
+			MENUITEM "ブロックでの選択状態は内側に表示(&S)",		IDM_VIEW_CARET_STYLE_SELECTION
 		END
 		MENUITEM SEPARATOR
-		MENUITEM "Word W&rap\tCtrl+W",						IDM_VIEW_WORDWRAP
-		MENUITEM "&Long Line Marker\tCtrl+Shift+L",			IDM_VIEW_LONGLINEMARKER
-		MENUITEM "Indentation &Guides\tCtrl+Shift+G",		IDM_VIEW_SHOWINDENTGUIDES
+		MENUITEM "右端で折り返す(&R)\tCtrl+W",						IDM_VIEW_WORDWRAP
+		MENUITEM "行の長さガイド(&L)\tCtrl+Shift+L",			IDM_VIEW_LONGLINEMARKER
+		MENUITEM "インデントのガイド(&G)\tCtrl+Shift+G",		IDM_VIEW_SHOWINDENTGUIDES
 		MENUITEM SEPARATOR
-		MENUITEM "Show &Whitespace\tCtrl+Shift+8",			IDM_VIEW_SHOWWHITESPACE
-		MENUITEM "Show Line &Endings\tCtrl+Shift+9",		IDM_VIEW_SHOWEOLS
-		MENUITEM "Show Wrap S&ymbols\tCtrl+Shift+0",		IDM_VIEW_WORDWRAPSYMBOLS
-		MENUITEM "Un&icode Control Character",				IDM_VIEW_UNICODE_CONTROL_CHAR
-		//MENUITEM "S&how CallTips",						IDM_VIEW_SHOWCALLTIPS
+		MENUITEM "空白(&W)\tCtrl+Shift+8",			IDM_VIEW_SHOWWHITESPACE
+		MENUITEM "改行コード(&E)\tCtrl+Shift+9",		IDM_VIEW_SHOWEOLS
+		MENUITEM "折り返し記号(&Y)\tCtrl+Shift+0",		IDM_VIEW_WORDWRAPSYMBOLS
+		MENUITEM "Unicode 制御文字(&I)",				IDM_VIEW_UNICODE_CONTROL_CHAR
+		//MENUITEM "コールチップ(&H)",						IDM_VIEW_SHOWCALLTIPS
 		MENUITEM SEPARATOR
-		MENUITEM "&Visual Brace Matching\tCtrl+Shift+V",	IDM_VIEW_MATCHBRACES
-		MENUITEM "Highlight Current &Block",				IDM_VIEW_HIGHLIGHTCURRENT_BLOCK
-		POPUP "Highlight C&urrent Line"
+		MENUITEM "対応括弧を強調表示(&V)\tCtrl+Shift+V",	IDM_VIEW_MATCHBRACES
+		MENUITEM "現在のブロックを強調(&B)",				IDM_VIEW_HIGHLIGHTCURRENT_BLOCK
+		POPUP "現在の行を強調表示(&U)"
 		BEGIN
-			MENUITEM "&No Highlight",						IDM_VIEW_HIGHLIGHTCURRENTLINE_NONE
-			MENUITEM "Background &Color\tCtrl+Shift+I",		IDM_VIEW_HIGHLIGHTCURRENTLINE_BACK
-			MENUITEM "Outline &Frame\tCtrl+Shift+F",		IDM_VIEW_HIGHLIGHTCURRENTLINE_FRAME
+			MENUITEM "なし(&N)",						IDM_VIEW_HIGHLIGHTCURRENTLINE_NONE
+			MENUITEM "背景色を変更(&C)\tCtrl+Shift+I",		IDM_VIEW_HIGHLIGHTCURRENTLINE_BACK
+			MENUITEM "外枠(&F)\tCtrl+Shift+F",		IDM_VIEW_HIGHLIGHTCURRENTLINE_FRAME
 			MENUITEM SEPARATOR
-			MENUITEM "Highlight &Subline",					IDM_VIEW_HIGHLIGHTCURRENTLINE_SUBLINE
+			MENUITEM "折り返し行を強調(&S)",					IDM_VIEW_HIGHLIGHTCURRENTLINE_SUBLINE
 		END
-		POPUP "Mar&k Occurrences"
+		POPUP "単語出現マーカー(&K)"
 		BEGIN
-			MENUITEM "&Off",						IDM_VIEW_MARKOCCURRENCES_OFF
-			MENUITEM "Match &Case",					IDM_VIEW_MARKOCCURRENCES_CASE
-			MENUITEM "Match &Whole Word Only",		IDM_VIEW_MARKOCCURRENCES_WORD
+			MENUITEM "なし(&O)",						IDM_VIEW_MARKOCCURRENCES_OFF
+			MENUITEM "大/小文字を区別(&C)",					IDM_VIEW_MARKOCCURRENCES_CASE
+			MENUITEM "単語単位で一致(&W)",		IDM_VIEW_MARKOCCURRENCES_WORD
 		END
 		MENUITEM SEPARATOR
-		MENUITEM "Line &Numbers\tCtrl+Shift+N",		IDM_VIEW_LINENUMBERS
-		MENUITEM "Bookmark &Margin\tCtrl+Shift+M",	IDM_VIEW_MARGIN
+		MENUITEM "行番号(&N)\tCtrl+Shift+N",		IDM_VIEW_LINENUMBERS
+		MENUITEM "行番号/しおりの余白(&M)\tCtrl+Shift+M",	IDM_VIEW_MARGIN
 		MENUITEM SEPARATOR
-		MENUITEM "Show Code &Folding\tCtrl+Shift+Alt+F",IDM_VIEW_SHOW_FOLDING
-		POPUP "&Toggle Folds"
+		MENUITEM "コード折りたたみを表示(&F)\tCtrl+Shift+Alt+F",IDM_VIEW_SHOW_FOLDING
+		POPUP "折りたたみの切り替え(&T)"
 		BEGIN
-			MENUITEM "&Current Block\tAlt+C",		IDM_VIEW_FOLD_CURRENT_BLOCK
-			MENUITEM "Current &Level",				IDM_VIEW_FOLD_CURRENT_LEVEL
-			MENUITEM "&Default Levels\tShift+Alt+D",IDM_VIEW_FOLD_DEFAULT
-			MENUITEM "&All Levels\tShift+Alt+A",	IDM_VIEW_FOLD_ALL
+			MENUITEM "現在のブロック(&C)\tAlt+C",		IDM_VIEW_FOLD_CURRENT_BLOCK
+			MENUITEM "現在の深さ(&L)",				IDM_VIEW_FOLD_CURRENT_LEVEL
+			MENUITEM "デフォルトの深さ(&D)\tShift+Alt+D",IDM_VIEW_FOLD_DEFAULT
+			MENUITEM "すべての深さ(&A)\tShift+Alt+A",	IDM_VIEW_FOLD_ALL
 			MENUITEM SEPARATOR
-			MENUITEM "Level &1\tAlt+1",				IDM_VIEW_FOLD_LEVEL1
-			MENUITEM "Level &2\tAlt+2",				IDM_VIEW_FOLD_LEVEL2
-			MENUITEM "Level &3\tAlt+3",				IDM_VIEW_FOLD_LEVEL3
-			MENUITEM "Level &4\tAlt+4",				IDM_VIEW_FOLD_LEVEL4
-			MENUITEM "Level &5\tAlt+5",				IDM_VIEW_FOLD_LEVEL5
-			MENUITEM "Level &6\tAlt+6",				IDM_VIEW_FOLD_LEVEL6
-			MENUITEM "Level &7\tAlt+7",				IDM_VIEW_FOLD_LEVEL7
-			MENUITEM "Level &8\tAlt+8",				IDM_VIEW_FOLD_LEVEL8
-			MENUITEM "Level &9\tAlt+9",				IDM_VIEW_FOLD_LEVEL9
-			MENUITEM "Level 1&0",					IDM_VIEW_FOLD_LEVEL10
+			MENUITEM "深さ1 (&1)\tAlt+1",				IDM_VIEW_FOLD_LEVEL1
+			MENUITEM "深さ2 (&2)\tAlt+2",				IDM_VIEW_FOLD_LEVEL2
+			MENUITEM "深さ3 (&3)\tAlt+3",				IDM_VIEW_FOLD_LEVEL3
+			MENUITEM "深さ4 (&4)\tAlt+4",				IDM_VIEW_FOLD_LEVEL4
+			MENUITEM "深さ5 (&5)\tAlt+5",				IDM_VIEW_FOLD_LEVEL5
+			MENUITEM "深さ6 (&6)\tAlt+6",				IDM_VIEW_FOLD_LEVEL6
+			MENUITEM "深さ7 (&7)\tAlt+7",				IDM_VIEW_FOLD_LEVEL7
+			MENUITEM "深さ8 (&8)\tAlt+8",				IDM_VIEW_FOLD_LEVEL8
+			MENUITEM "深さ9 (&9)\tAlt+9",				IDM_VIEW_FOLD_LEVEL9
+			MENUITEM "深さ10 (&0)",					IDM_VIEW_FOLD_LEVEL10
 		END
 		MENUITEM SEPARATOR
-		POPUP "&Zoom"
+		POPUP "拡大縮小(&Z)"
 		BEGIN
-			MENUITEM "Zoom &In\tCtrl++",			IDM_VIEW_ZOOMIN
-			MENUITEM "Zoom &Out\tCtrl+-",			IDM_VIEW_ZOOMOUT
-			MENUITEM "Zoom &Level...",				IDM_VIEW_ZOOM_LEVEL
-			MENUITEM "&Reset Zoom\tCtrl+\\",		IDM_VIEW_RESETZOOM
+			MENUITEM "拡大(&I)\tCtrl++",			IDM_VIEW_ZOOMIN
+			MENUITEM "縮小(&O)\tCtrl+-",			IDM_VIEW_ZOOMOUT
+			MENUITEM "拡大率の指定(&L)...",		IDM_VIEW_ZOOM_LEVEL
+			MENUITEM "拡大縮小リセット(&R)\tCtrl+\\",		IDM_VIEW_RESETZOOM
 		END
-		MENUITEM "Toggle Full &Screen\tF11 [Esc]",	IDM_VIEW_TOGGLE_FULLSCREEN
+		MENUITEM ""全画面の切り替え(&S)\tF11 [Esc]",	IDM_VIEW_TOGGLE_FULLSCREEN
 	END
-	POPUP "Sche&me"
+	POPUP "文書(&M)"
 	BEGIN
-		MENUITEM "&Syntax Scheme...\tF12",			IDM_VIEW_SCHEME
-		MENUITEM "&Customize Schemes...\tCtrl+F12",	IDM_VIEW_SCHEME_CONFIG
-		MENUITEM "&Favorite Schemes...",			IDM_VIEW_SCHEME_FAVORITE
+		MENUITEM "文書の種類を選択(&S)...\tF12",			IDM_VIEW_SCHEME
+		MENUITEM "配色の編集(&C)...\tCtrl+F12",	IDM_VIEW_SCHEME_CONFIG
+		MENUITEM "配色のお気に入り(&F)...",			IDM_VIEW_SCHEME_FAVORITE
 		MENUITEM SEPARATOR
-		MENUITEM "Use &2nd Global Styles\tShift+F12",IDM_VIEW_USE2NDGLOBALSTYLE
-		MENUITEM "&Use Default Code Style",			IDM_VIEW_USEDEFAULT_CODESTYLE
-		POPUP "St&yle Theme"
+		MENUITEM "配色設定2 で表示(&2)\tShift+F12"",IDM_VIEW_USE2NDGLOBALSTYLE
+		MENUITEM "コード用の標準配色で表示(&U)",			IDM_VIEW_USEDEFAULT_CODESTYLE
+		POPUP "カラーテーマ(&Y)"
 		BEGIN
-			MENUITEM "&Default",					IDM_VIEW_STYLE_THEME_DEFAULT
-			MENUITEM "Dar&k",						IDM_VIEW_STYLE_THEME_DARK
+			MENUITEM "標準(&D)",					IDM_VIEW_STYLE_THEME_DEFAULT
+			MENUITEM "ダーク(&K)",						IDM_VIEW_STYLE_THEME_DARK
 		END
 		MENUITEM SEPARATOR
-		POPUP "&Text File"
+		POPUP "テキスト文書(&T)"
 		BEGIN
 			MENUITEM "&Text File",					IDM_LEXER_TEXTFILE
 			MENUITEM "&2nd Text File",				IDM_LEXER_2NDTEXTFILE
 		END
-		POPUP "CSS Style S&heet"
+		POPUP "CSSスタイルシート(&H)"
 		BEGIN
 			MENUITEM "&CSS",						IDM_LEXER_CSS
 			MENUITEM "&Sassy CSS",					IDM_LEXER_SCSS
 			MENUITEM "&Less CSS",					IDM_LEXER_LESS
 			MENUITEM "&HSS",						IDM_LEXER_HSS
 		END
-		POPUP "&Web Source Code"
+		POPUP "Webソースコード(&W)"
 		BEGIN
-			MENUITEM "&Web Source Code",			IDM_LEXER_WEB
-			MENUITEM "&PHP Page",					IDM_LEXER_PHP
-			MENUITEM "&JSP Page",					IDM_LEXER_JSP
+			MENUITEM "&Web ソースコード",			IDM_LEXER_WEB
+			MENUITEM "&PHP ページ",					IDM_LEXER_PHP
+			MENUITEM "&JSP ページ",					IDM_LEXER_JSP
 			MENUITEM "ASP.NET (&C#)",				IDM_LEXER_ASPX_CS
 			MENUITEM "ASP.NET (&VB.NET)",			IDM_LEXER_ASPX_VB
 			MENUITEM "ASP (V&BScript)",				IDM_LEXER_ASP_VBS
 			MENUITEM "ASP (J&Script)",				IDM_LEXER_ASP_JS
 		END
-		POPUP "&Math"
+		POPUP "計算(&M)"
 		BEGIN
 			MENUITEM "&MATLAB",						IDM_LEXER_MATLAB
 			MENUITEM "&Octave",						IDM_LEXER_OCTAVE
 			MENUITEM "&Scilab",						IDM_LEXER_SCILAB
 		END
-		POPUP "Shell Scri&pt"
+		POPUP "シェルスクリプト(&P)"
 		BEGIN
-			MENUITEM "&Shell Script",				IDM_LEXER_BASH
-			MENUITEM "&C Shell",					IDM_LEXER_CSHELL
-			MENUITEM "&M4 Macro",					IDM_LEXER_M4
+			MENUITEM "シェルスクリプト(&S)",				IDM_LEXER_BASH
+			MENUITEM "&C シェル",					IDM_LEXER_CSHELL
+			MENUITEM "&M4 マクロ",					IDM_LEXER_M4
 		END
 		//POPUP "S&QL Dialect"
-		POPUP "&XML Document"
+		POPUP "XML文書(&X)"
 		BEGIN
-			MENUITEM "&XML Document",				IDM_LEXER_XML
-			MENUITEM "XML &Schema",					IDM_LEXER_XSD
-			MENUITEM "XSL&T Stylesheet",			IDM_LEXER_XSLT
-			MENUITEM "XML &DTD",					IDM_LEXER_DTD
+			MENUITEM "XML文書(&X)"				IDM_LEXER_XML
+			MENUITEM "XML スキーマ(&S)",					IDM_LEXER_XSD
+			MENUITEM "XSLT スタイルシート(&T)",			IDM_LEXER_XSLT
+			MENUITEM "XML DTD(&D)",					IDM_LEXER_DTD
 		END
 		POPUP "XML (&Java)"
 		BEGIN
 			MENUITEM "Ant &Build",					IDM_LEXER_ANT_BUILD
 			MENUITEM "Maven &POM",					IDM_LEXER_MAVEN_POM
 			MENUITEM "&Maven Settings",				IDM_LEXER_MAVEN_SETTINGS
-			MENUITEM "I&vy Module",					IDM_LEXER_IVY_MODULE
+			MENUITEM "I&vy モジュール",					IDM_LEXER_IVY_MODULE
 			MENUITEM "&Ivy Settings",				IDM_LEXER_IVY_SETTINGS
-			MENUITEM "PMD &Ruleset",				IDM_LEXER_PMD_RULESET
+			MENUITEM "PMD ルールセット(&R)",				IDM_LEXER_PMD_RULESET
 			MENUITEM "&Checkstyle",					IDM_LEXER_CHECKSTYLE
 		END
-		POPUP "Web Confi&g"
+		POPUP "Webサーバ設定(&G)"
 		BEGIN
 			MENUITEM "&Apache Config",				IDM_LEXER_APACHE
 			MENUITEM "&Tomcat Config",				IDM_LEXER_TOMCAT
@@ -554,41 +554,41 @@ BEGIN
 		END
 		//POPUP "XML (.&NET)"
 		//BEGIN
-		//	MENUITEM "&Web Config",					IDM_LEXER_WEB_NET
-		//	MENUITEM "&ResX Resource",				IDM_LEXER_RESX
+		//	MENUITEM "&Web 設定",					IDM_LEXER_WEB_NET
+		//	MENUITEM "&ResX リソース",				IDM_LEXER_RESX
 		//	MENUITEM "WPF &XAML",					IDM_LEXER_XAML
 		//END
-		POPUP "XML (&Others)"
+		POPUP "XML 他(&O)"
 		BEGIN
-			MENUITEM "&Property List",				IDM_LEXER_PROPERTY_LIST
-			MENUITEM "Android &Manifest",			IDM_LEXER_ANDROID_MANIFEST
-			MENUITEM "Android &Layout",				IDM_LEXER_ANDROID_LAYOUT
-			//MENUITEM "SV&G Document",				IDM_LEXER_SVG
+			MENUITEM "プロパティリスト(&P)",				IDM_LEXER_PROPERTY_LIST
+			MENUITEM "Android マニフェスト(&M)",			IDM_LEXER_ANDROID_MANIFEST
+			MENUITEM "Android レイアウト(&L)",				IDM_LEXER_ANDROID_LAYOUT
+			//MENUITEM "SVG 文書(&G)",				IDM_LEXER_SVG
 		END
 	END
-	POPUP "&Settings"
+	POPUP "設定(&S)"
 	BEGIN
-		MENUITEM "Insert Tabs as &Spaces",			IDM_VIEW_TABSASSPACES
-		MENUITEM "&Tab Settings...\tCtrl+T",		IDM_VIEW_TABSETTINGS
-		MENUITEM "Word &Wrap Settings...",			IDM_VIEW_WORDWRAPSETTINGS
-		MENUITEM "&Long Line Settings...",			IDM_VIEW_LONGLINESETTINGS
-		MENUITEM "&Auto Completion Settings...",	IDM_VIEW_AUTOCOMPLETION_SETTINGS
-		MENUITEM "Auto Completion I&gnore Case",	IDM_VIEW_AUTOCOMPLETION_IGNORECASE
-		MENUITEM "Enable Line Selection &Mode",		IDM_SET_LINE_SELECTION_MODE
+		MENUITEM "タブキーで空白を入力(&S)",			IDM_VIEW_TABSASSPACES
+		MENUITEM "タブキーの設定(&T)...\tCtrl+T",		IDM_VIEW_TABSETTINGS
+		MENUITEM "折り返し方の設定(&W)...",			IDM_VIEW_WORDWRAPSETTINGS
+		MENUITEM "行の長さガイドの設定(&L)...",			IDM_VIEW_LONGLINESETTINGS
+		MENUITEM "自動補完の設定(&A)...",	IDM_VIEW_AUTOCOMPLETION_SETTINGS
+		MENUITEM "自動補完/大文字小文字無視(&G)",	IDM_VIEW_AUTOCOMPLETION_IGNORECASE
+		MENUITEM "行選択モードを使用(&M)",		IDM_SET_LINE_SELECTION_MODE
 		MENUITEM SEPARATOR
-		POPUP "Appearanc&e"
+		POPUP "表示(&E)"
 		BEGIN
-			MENUITEM "S&how Toolbar\tCtrl+F11",		IDM_VIEW_TOOLBAR
-			MENUITEM "Customi&ze Toolbar...",		IDM_VIEW_CUSTOMIZE_TOOLBAR
-			MENUITEM "&Auto Scale Toolbar",			IDM_VIEW_AUTO_SCALE_TOOLBAR
-			MENUITEM "Show Stat&usbar\tShift+F11",	IDM_VIEW_STATUSBAR
+			MENUITEM "ツールバーを表示(&H)\tCtrl+F11",		IDM_VIEW_TOOLBAR
+			MENUITEM "ツールバーの編集(&Z)...",		IDM_VIEW_CUSTOMIZE_TOOLBAR
+			MENUITEM "ツールバーの自動縮尺(&A)",			IDM_VIEW_AUTO_SCALE_TOOLBAR
+			MENUITEM "ステータスバーを表示(&U)\tShift+F11",	IDM_VIEW_STATUSBAR
 			MENUITEM SEPARATOR
-			MENUITEM "Transparent &Mode\tCtrl+0",	IDM_VIEW_TRANSPARENT
+			MENUITEM "ウィンドウ透化(&M)\tCtrl+0",	IDM_VIEW_TRANSPARENT
 #if NP2_ENABLE_APP_LOCALIZATION_DLL
 			MENUITEM SEPARATOR
-			POPUP "&Language"
+			POPUP "言語(&L)"
 			BEGIN
-				MENUITEM "&System Language",		IDM_LANG_USER_DEFAULT
+				MENUITEM "システムの規定(&S)",		IDM_LANG_USER_DEFAULT
 				MENUITEM "&English",				IDM_LANG_ENGLISH_US
 				MENUITEM "简体中文(&C)",				IDM_LANG_CHINESE_SIMPLIFIED
 				MENUITEM "繁體中文(&T)",				IDM_LANG_CHINESE_TRADITIONAL
@@ -596,92 +596,92 @@ BEGIN
 			END
 #endif
 		END
-		POPUP "Full Scree&n Mode"
+		POPUP "全画面モード(&N)"
 		BEGIN
-			MENUITEM "On &Startup",					IDM_VIEW_FULLSCREEN_ON_START
+			MENUITEM "起動時(&S)",					IDM_VIEW_FULLSCREEN_ON_START
 			MENUITEM SEPARATOR
-			MENUITEM "Hide &Title",					IDM_VIEW_FULLSCREEN_HIDE_TITLE
-			MENUITEM "Hide &Menu\tAlt+F11",			IDM_VIEW_FULLSCREEN_HIDE_MENU
+			MENUITEM "隠す/タイトル(&T)",					IDM_VIEW_FULLSCREEN_HIDE_TITLE
+			MENUITEM "隠す/メニュー(&M)\tAlt+F11",			IDM_VIEW_FULLSCREEN_HIDE_MENU
 		END
-		POPUP "Window O&ptions"
+		POPUP "ウィンドウオプション(&P)"
 		BEGIN
-			MENUITEM "Always On &Top\tAlt+Shift+T",	IDM_VIEW_ALWAYSONTOP
-			MENUITEM "Minimi&ze to Tray",			IDM_VIEW_MINTOTRAY
+			MENUITEM "常に手前に表示(&T)\tAlt+Shift+T",	IDM_VIEW_ALWAYSONTOP
+			MENUITEM "システムトレイに最小化(&Z)",			IDM_VIEW_MINTOTRAY
 			MENUITEM SEPARATOR
-			MENUITEM "&Reuse Window",				IDM_VIEW_REUSEWINDOW
-			MENUITEM "Clear Position &History",		IDM_VIEW_CLEARWINPOS
+			MENUITEM "新しいウィンドウを開かない(&R)",				IDM_VIEW_REUSEWINDOW
+			MENUITEM "ウィンドウ位置の履歴を消去(&H)",		IDM_VIEW_CLEARWINPOS
 		END
-		POPUP "Window Title Displa&y"
+		POPUP "タイトルバーの表示名(&Y)"
 		BEGIN
-			MENUITEM "&File Name Only",				IDM_VIEW_SHOWFILENAMEONLY
-			MENUITEM "File Name and &Directory",	IDM_VIEW_SHOWFILENAMEFIRST
-			MENUITEM "Full &Path Name",				IDM_VIEW_SHOWFULLPATH
-			MENUITEM "&Text Excerpt",				IDM_VIEW_SHOWEXCERPT
+			MENUITEM "ファイル名のみ(&F)",				IDM_VIEW_SHOWFILENAMEONLY
+			MENUITEM "ファイル名とフォルダ(&D)",	IDM_VIEW_SHOWFILENAMEFIRST
+			MENUITEM "フルパス(&P)",				IDM_VIEW_SHOWFULLPATH
+			MENUITEM "選択文字列を使用(&T)",				IDM_VIEW_SHOWEXCERPT
 		END
 		MENUITEM SEPARATOR
-		MENUITEM "Single &File Instance",			IDM_VIEW_SINGLEFILEINSTANCE
-		MENUITEM "File &Change Notification...\tAlt+F5",	IDM_VIEW_CHANGENOTIFY
-		POPUP "Extra Esc &Key Function"
+		MENUITEM "単一インスタンスでファイルを開く(&F)",			IDM_VIEW_SINGLEFILEINSTANCE
+		MENUITEM "ファイルの変更を通知する(&C)...\tAlt+F5",	IDM_VIEW_CHANGENOTIFY
+		POPUP "Escキーの動作(&K)"
 		BEGIN
-			MENUITEM "&None",						IDM_VIEW_NOESCFUNC
-			MENUITEM "&Minimize Notepad2",			IDM_VIEW_ESCMINIMIZE
-			MENUITEM "E&xit Notepad2",				IDM_VIEW_ESCEXIT
+			MENUITEM "何もしない(&N)",						IDM_VIEW_NOESCFUNC
+			MENUITEM "最小化(&M)",			IDM_VIEW_ESCMINIMIZE
+			MENUITEM "終了(&X)",				IDM_VIEW_ESCEXIT
 		END
-		POPUP "Other Sett&ings"
+		POPUP "他の設定(&I)"
 		BEGIN
-			MENUITEM "Remember Recent &Files",		IDM_VIEW_NOSAVERECENT
-			MENUITEM "Remember &Search Options",	IDM_VIEW_NOSAVEFINDREPL
-			MENUITEM "Sa&ve Before Running Tools",	IDM_VIEW_SAVEBEFORERUNNINGTOOLS
-			MENUITEM "Use &metapath to Open Folder",IDM_SET_OPEN_FOLDER_METAPATH
+			MENUITEM "保存/最近使ったファイルの履歴(&F)",		IDM_VIEW_NOSAVERECENT
+			MENUITEM "保存/検索文字列(&S)",	IDM_VIEW_NOSAVEFINDREPL
+			MENUITEM "ツールを実行する前に保存(&V)",	IDM_VIEW_SAVEBEFORERUNNINGTOOLS
+			MENUITEM "フォルダを開くのにメタパスを使用(&M)",IDM_SET_OPEN_FOLDER_METAPATH
 		END
 		MENUITEM SEPARATOR
-		POPUP "A&dvanced Settings"
+		POPUP "高度(&D)"
 		BEGIN
-			POPUP "Ren&dering Technology"
+			POPUP "描画方式(&D)"
 			BEGIN
-				MENUITEM "&Legacy GDI",				IDM_SET_RENDER_TECH_GDI
+				MENUITEM "従来のGDI(&L)",				IDM_SET_RENDER_TECH_GDI
 				MENUITEM "&Direct2D",				IDM_SET_RENDER_TECH_D2D
 				MENUITEM "Direct2D &Retain",		IDM_SET_RENDER_TECH_D2DRETAIN
 				MENUITEM "Direct2D &GDI DC",		IDM_SET_RENDER_TECH_D2DDC
 			END
-			POPUP "Font &Quality"
+			POPUP "フォントの品質(&Q)"
 			BEGIN
-				MENUITEM "&Default",				IDM_VIEW_FONTQUALITY_DEFAULT
-				MENUITEM "&None",					IDM_VIEW_FONTQUALITY_NONE
-				MENUITEM "&Standard",				IDM_VIEW_FONTQUALITY_STANDARD
-				MENUITEM "&ClearType",				IDM_VIEW_FONTQUALITY_CLEARTYPE
+				MENUITEM "デフォルト(&D)",				IDM_VIEW_FONTQUALITY_DEFAULT
+				MENUITEM "なし(&N)",					IDM_VIEW_FONTQUALITY_NONE
+				MENUITEM "標準(&S)",				IDM_VIEW_FONTQUALITY_STANDARD
+				MENUITEM "クリアータイプ(&C)",				IDM_VIEW_FONTQUALITY_CLEARTYPE
 			END
-			POPUP "&RTL Layout (GDI)"
+			POPUP ""RTL レイアウト (GDI)(&R)"
 			BEGIN
-				MENUITEM "&Edit Window",			IDM_SET_RTL_LAYOUT_EDIT
-				MENUITEM "&Other Window",			IDM_SET_RTL_LAYOUT_OTHER
+				MENUITEM "Edit ウィンドウ(&E)",			IDM_SET_RTL_LAYOUT_EDIT
+				MENUITEM "他のウィンドウ(&O)",			IDM_SET_RTL_LAYOUT_OTHER
 			END
-			POPUP "&Bidirectional (Direct2D)"
+			POPUP "書字方向 (Direct2D)(&B)"
 			BEGIN
-				MENUITEM "&None",					IDM_SET_BIDIRECTIONAL_NONE
-				MENUITEM "&Left to Right",			IDM_SET_BIDIRECTIONAL_L2R
-				MENUITEM "&Right to Left",			IDM_SET_BIDIRECTIONAL_R2L
+				MENUITEM "指定なし(&N)",					IDM_SET_BIDIRECTIONAL_NONE
+				MENUITEM "左から右(&L)",			IDM_SET_BIDIRECTIONAL_L2R
+				MENUITEM "右から左(&R)",			IDM_SET_BIDIRECTIONAL_R2L
 			END
-			MENUITEM "Use &Inline Mode IME",		IDM_SET_USE_INLINE_IME
+			MENUITEM "インライン IME を使用(&I)",		IDM_SET_USE_INLINE_IME
 			MENUITEM SEPARATOR
-			MENUITEM "&System Integration...",		IDM_SET_SYSTEM_INTEGRATION
-			MENUITEM "&Open Notepad2.ini\tCtrl+F7",	CMD_OPENINIFILE
+			MENUITEM "システムに統合(&S)...",		IDM_SET_SYSTEM_INTEGRATION
+			MENUITEM "Notepad2.ini を開く(&O)\tCtrl+F7",	CMD_OPENINIFILE
 		END
-		MENUITEM "Save Settings On E&xit",			IDM_VIEW_SAVESETTINGS
-		MENUITEM "Sa&ve Settings Now\tF7",			IDM_VIEW_SAVESETTINGSNOW
+		MENUITEM "設定を保存/終了時(&X)",			IDM_VIEW_SAVESETTINGS
+		MENUITEM "設定の保存/今すぐ(&V)\tF7",			IDM_VIEW_SAVESETTINGSNOW
 	END
-	POPUP "&Help"
+	POPUP "ヘルプ(&H)"
 	BEGIN
-		MENUITEM "Project &Home",				IDM_HELP_PROJECT_HOME
-		MENUITEM "Latest &Release",				IDM_HELP_LATEST_RELEASE
-		MENUITEM "Latest &Build",				IDM_HELP_LATEST_BUILD
-		MENUITEM "Report &Issue",				IDM_HELP_REPORT_ISSUE
-		MENUITEM "&Feature Request",			IDM_HELP_FEATURE_REQUEST
+		MENUITEM "ホームページ(英web)(&H)",				IDM_HELP_PROJECT_HOME
+		MENUITEM "最新リリース版(同)(&R)",				IDM_HELP_LATEST_RELEASE
+		MENUITEM "最新のビルド(同)(&B)",				IDM_HELP_LATEST_BUILD
+		MENUITEM "問題の報告(同)(&I)",				IDM_HELP_REPORT_ISSUE
+		MENUITEM "機能の要望(同)(&F)",			IDM_HELP_FEATURE_REQUEST
 		MENUITEM SEPARATOR
-		MENUITEM "Online &Wiki",				IDM_HELP_ONLINE_WIKI
-		MENUITEM "&Command Line Help",			IDM_CMDLINE_HELP
+		MENUITEM "オンラインのWiki(同)(&W)",				IDM_HELP_ONLINE_WIKI
+		MENUITEM "コマンドラインのヘルプ(&C)",			IDM_CMDLINE_HELP
 		MENUITEM SEPARATOR
-		MENUITEM "&About Notepad2\tF1",			IDM_HELP_ABOUT
+		MENUITEM "Notepad2 について(&A)...\tF1",			IDM_HELP_ABOUT
 	END
 END
 
@@ -689,50 +689,50 @@ IDR_POPUPMENU MENU
 BEGIN
 	POPUP "+"
 	BEGIN
-		MENUITEM "&Undo",						IDM_EDIT_UNDO
-		MENUITEM "&Redo",						IDM_EDIT_REDO
+		MENUITEM "元に戻す(&U)",						IDM_EDIT_UNDO
+		MENUITEM "やり直し(&R)",						IDM_EDIT_REDO
 		MENUITEM SEPARATOR
-		MENUITEM "Cu&t",						IDM_EDIT_CUT
-		MENUITEM "&Copy",						IDM_EDIT_COPY
-		MENUITEM "&Paste",						IDM_EDIT_PASTE
-		MENUITEM "&Delete",						IDM_EDIT_DELETE
+		MENUITEM "切り取り(&t)",						IDM_EDIT_CUT
+		MENUITEM "コピー(&C)",						IDM_EDIT_COPY
+		MENUITEM "貼り付け(&P)",						IDM_EDIT_PASTE
+		MENUITEM "削除(&D)",						IDM_EDIT_DELETE
 		MENUITEM SEPARATOR
-		MENUITEM "Select &All",					IDM_EDIT_SELECTALL
+		MENUITEM "すべて選択(&A)",					IDM_EDIT_SELECTALL
 		MENUITEM SEPARATOR
-		MENUITEM "Toggle &Fold",				IDM_VIEW_FOLD_CURRENT_BLOCK
+		MENUITEM "折りたたみの切替(&F)",				IDM_VIEW_FOLD_CURRENT_BLOCK
 		MENUITEM SEPARATOR
-		MENUITEM "&Open",						CMD_OPEN_PATH_OR_LINK
+		MENUITEM "開く (パスやリンク)(&O)",						CMD_OPEN_PATH_OR_LINK
 	END
 	POPUP "+"
 	BEGIN
-		MENUITEM "Show &Toolbar",				IDM_VIEW_TOOLBAR
-		MENUITEM "&Customize Toolbar...",		IDM_VIEW_CUSTOMIZE_TOOLBAR
-		MENUITEM "&Auto Scale Toolbar",			IDM_VIEW_AUTO_SCALE_TOOLBAR
-		MENUITEM "Show &Statusbar",				IDM_VIEW_STATUSBAR
+		MENUITEM "ツールバーの表示(&T)",				IDM_VIEW_TOOLBAR
+		MENUITEM "ツールバーの編集(&C)...",		IDM_VIEW_CUSTOMIZE_TOOLBAR
+		MENUITEM "ツールバーの自動縮尺(&A)",			IDM_VIEW_AUTO_SCALE_TOOLBAR
+		MENUITEM "ステータスバーの表示(&S)",				IDM_VIEW_STATUSBAR
 	END
 	POPUP "+"
 	BEGIN
-		MENUITEM "&Open Notepad2",				IDM_TRAY_RESTORE
+		MENUITEM "Notepad2 を開く(&O)",				IDM_TRAY_RESTORE
 		MENUITEM SEPARATOR
-		MENUITEM "E&xit Notepad2",				IDM_TRAY_EXIT
+		MENUITEM "終了(&X)",				IDM_TRAY_EXIT
 	END
 	POPUP "+"
 	BEGIN
-		MENUITEM "&Current Block",				IDM_VIEW_FOLD_CURRENT_BLOCK
-		MENUITEM "Current &Level",				IDM_VIEW_FOLD_CURRENT_LEVEL
-		MENUITEM "&Default Levels",				IDM_VIEW_FOLD_DEFAULT
-		MENUITEM "&All Levels",					IDM_VIEW_FOLD_ALL
+		MENUITEM "現在のブロック(&C)",				IDM_VIEW_FOLD_CURRENT_BLOCK
+		MENUITEM "現在の深さ(&L)",				IDM_VIEW_FOLD_CURRENT_LEVEL
+		MENUITEM "デフォルトの深さ(&D)",				IDM_VIEW_FOLD_DEFAULT
+		MENUITEM "すべての深さ(&A)",					IDM_VIEW_FOLD_ALL
 		MENUITEM SEPARATOR
-		MENUITEM "Level &1",					IDM_VIEW_FOLD_LEVEL1
-		MENUITEM "Level &2",					IDM_VIEW_FOLD_LEVEL2
-		MENUITEM "Level &3",					IDM_VIEW_FOLD_LEVEL3
-		MENUITEM "Level &4",					IDM_VIEW_FOLD_LEVEL4
-		MENUITEM "Level &5",					IDM_VIEW_FOLD_LEVEL5
-		MENUITEM "Level &6",					IDM_VIEW_FOLD_LEVEL6
-		MENUITEM "Level &7",					IDM_VIEW_FOLD_LEVEL7
-		MENUITEM "Level &8",					IDM_VIEW_FOLD_LEVEL8
-		MENUITEM "Level &9",					IDM_VIEW_FOLD_LEVEL9
-		MENUITEM "Level 1&0",					IDM_VIEW_FOLD_LEVEL10
+		MENUITEM "深さ 1 (&1)",					IDM_VIEW_FOLD_LEVEL1
+		MENUITEM "深さ 2 (&2)",					IDM_VIEW_FOLD_LEVEL2
+		MENUITEM "深さ 3 (&3)",					IDM_VIEW_FOLD_LEVEL3
+		MENUITEM "深さ 4 (&4)",					IDM_VIEW_FOLD_LEVEL4
+		MENUITEM "深さ 5 (&5)",					IDM_VIEW_FOLD_LEVEL5
+		MENUITEM "深さ 6 (&6)",					IDM_VIEW_FOLD_LEVEL6
+		MENUITEM "深さ 7 (&7)",					IDM_VIEW_FOLD_LEVEL7
+		MENUITEM "深さ 8 (&8)",					IDM_VIEW_FOLD_LEVEL8
+		MENUITEM "深さ 9 (&9)",					IDM_VIEW_FOLD_LEVEL9
+		MENUITEM "深さ 10 (&0)",					IDM_VIEW_FOLD_LEVEL10
 	END
 END
 
@@ -967,294 +967,294 @@ BEGIN
     LTEXT           "",IDC_AUTHORNAME,130,38,200,8
     LTEXT           "",IDC_WEBPAGE_TEXT,45,48,200,8,NOT WS_VISIBLE | WS_DISABLED
     CONTROL         "",IDC_WEBPAGE_LINK,"SysLink",WS_TABSTOP,45,48,200,10
-    LTEXT           "Visit our Notepad2's website:",IDC_STATIC,45,60,140,8
+    LTEXT           "Notepad2 のサイトにアクセス:",IDC_STATIC,45,60,140,8
     LTEXT           "",IDC_NEW_PAGE_TEXT,45,68,200,8,NOT WS_VISIBLE | WS_DISABLED
     CONTROL         "",IDC_NEW_PAGE_LINK,"SysLink",WS_TABSTOP,45,68,200,10
-    LTEXT           "Visit Notepad2-mod's website:",IDC_STATIC,45,80,140,8
+    LTEXT           "Notepad2-mod のサイトにアクセス:",IDC_STATIC,45,80,140,8
     LTEXT           "",IDC_MOD_PAGE_TEXT,45,80,140,8,NOT WS_VISIBLE | WS_DISABLED
     CONTROL         "",IDC_MOD_PAGE_LINK,"SysLink",WS_TABSTOP,45,88,144,10
-    LTEXT           "Visit Scintilla's website:",IDC_STATIC,45,100,140,8
+    LTEXT           "Scintilla のサイトにアクセス:",IDC_STATIC,45,100,140,8
     LTEXT           "",IDC_SCI_PAGE_TEXT,45,108,140,8,NOT WS_VISIBLE | WS_DISABLED
     CONTROL         "",IDC_SCI_PAGE_LINK,"SysLink",WS_TABSTOP,45,108,140,10
-    LTEXT           "Contact Florian Balmer:",IDC_STATIC,45,120,140,8
+    LTEXT           "Florian Balmer の連絡先:",IDC_STATIC,45,120,140,8
     LTEXT           "",IDC_EMAIL_TEXT,45,128,140,8,NOT WS_VISIBLE | WS_DISABLED
     CONTROL         "",IDC_EMAIL_LINK,"SysLink",WS_TABSTOP,45,128,140,10
 END
 
 IDD_FIND DIALOGEX 0, 0, 290, 112
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_NOFAILCREATE | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Find Text"
+CAPTION "検索"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
-    LTEXT           "Search Strin&g:",IDC_STATIC,7,7,67,8
+    LTEXT           "検索文字列(&G):",IDC_STATIC,7,7,67,8
     COMBOBOX        IDC_FINDTEXT,7,17,210,116,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
-    AUTOCHECKBOX    "Match &case",IDC_FINDCASE,7,37,73,10,WS_TABSTOP
-    AUTOCHECKBOX    "Match &whole word only",IDC_FINDWORD,7,49,110,10,WS_TABSTOP
-    AUTOCHECKBOX    "Match &beginning of word only",IDC_FINDSTART,7,61,124,10,WS_TABSTOP
-    AUTOCHECKBOX    "Regular &expression search",IDC_FINDREGEXP,7,73,112,10,WS_TABSTOP
-    AUTOCHECKBOX    "&Transform backslashes",IDC_FINDTRANSFORMBS,7,85,95,10,WS_TABSTOP
-    AUTOCHECKBOX    "&Don't wrap around",IDC_NOWRAP,132,37,79,10,WS_TABSTOP
-    AUTOCHECKBOX    "C&lose after find",IDC_FINDCLOSE,132,49,77,10,WS_TABSTOP
-    AUTOCHECKBOX    "W&ildcard search",IDC_WILDCARDSEARCH,132,61,74,10,WS_TABSTOP
-    DEFPUSHBUTTON   "&Find Next",IDOK,223,7,60,14
-    PUSHBUTTON      "Find &Previous",IDC_FINDPREV,223,24,60,14
-    PUSHBUTTON      "Close",IDCANCEL,223,41,60,14
+    AUTOCHECKBOX    "大文字/小文字を区別(&C)",IDC_FINDCASE,7,37,73,10,WS_TABSTOP
+    AUTOCHECKBOX    "単語全体が一致(&W)",IDC_FINDWORD,7,49,110,10,WS_TABSTOP
+    AUTOCHECKBOX    "単語の先頭から一致(&B)",IDC_FINDSTART,7,61,124,10,WS_TABSTOP
+    AUTOCHECKBOX    "正規表現(&E)",IDC_FINDREGEXP,7,73,112,10,WS_TABSTOP
+    AUTOCHECKBOX    "バックスラッシュを変換(&T)",IDC_FINDTRANSFORMBS,7,85,95,10,WS_TABSTOP
+    AUTOCHECKBOX    "再検索しない(&D)",IDC_NOWRAP,132,37,79,10,WS_TABSTOP
+    AUTOCHECKBOX    "検索後に閉じる(&L)",IDC_FINDCLOSE,132,49,77,10,WS_TABSTOP
+    AUTOCHECKBOX    "ワイルドカード(&I)",IDC_WILDCARDSEARCH,132,61,74,10,WS_TABSTOP
+    DEFPUSHBUTTON   "次を検索(&F)",IDOK,223,7,60,14
+    PUSHBUTTON      "前へ検索(&P)",IDC_FINDPREV,223,24,60,14
+    PUSHBUTTON      "閉じる",IDCANCEL,223,41,60,14
     CONTROL         "<a>(?)</a>",IDC_REGEXPHELP,"SysLink",0x0,118,73,14,10
     CONTROL         "<a>(?)</a>",IDC_BACKSLASHHELP,"SysLink",0x0,118,85,14,10
     CONTROL         "<a>(?)</a>",IDC_WILDCARDHELP,"SysLink",0x0,208,61,14,10
-    CONTROL         "<a>Clear History</a>",IDC_CLEAR_FIND,"SysLink",WS_TABSTOP,173,7,48,10
-    AUTOCHECKBOX    "Transparent mode on losing focus",IDC_TRANSPARENT,7,96,124,10,WS_TABSTOP
-    CONTROL         "<a>Goto Replace (Ctrl+H)</a>",IDC_TOGGLEFINDREPLACE, "SysLink",WS_TABSTOP,138,97,80,10
-    CONTROL         "<a>Save Position (&O)</a>",IDC_SAVEPOSITION,"SysLink",WS_TABSTOP,223,85,60,10
-    CONTROL         "<a>Reset Position (&P)</a>",IDC_RESETPOSITION,"SysLink",WS_TABSTOP,223,96,60,10
+    CONTROL         "<a>履歴を消去</a>",IDC_CLEAR_FIND,"SysLink",WS_TABSTOP,173,7,48,10
+    AUTOCHECKBOX    "フォーカスのない時に半透明に",IDC_TRANSPARENT,7,96,124,10,WS_TABSTOP
+    CONTROL         "<a>置換を開く (Ctrl+H)</a>",IDC_TOGGLEFINDREPLACE, "SysLink",WS_TABSTOP,138,97,80,10
+    CONTROL         "<a>位置を記憶 (&O)</a>",IDC_SAVEPOSITION,"SysLink",WS_TABSTOP,223,85,60,10
+    CONTROL         "<a>位置を初期化 (&P)</a>",IDC_RESETPOSITION,"SysLink",WS_TABSTOP,223,96,60,10
     SCROLLBAR       IDC_RESIZEGRIP2,230,96,10,10
 END
 
 IDD_REPLACE DIALOGEX 0, 0, 290, 142
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_NOFAILCREATE | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Replace Text"
+CAPTION "置換"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
-    LTEXT           "Search Strin&g:",IDC_STATIC,7,7,65,8
+    LTEXT           "検索文字列(&G):",IDC_STATIC,7,7,65,8
     COMBOBOX        IDC_FINDTEXT,7,17,210,116,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
-    LTEXT           "Replace Wit&h:",IDC_STATIC,7,35,64,8
+    LTEXT           "置換文字列(&H):",IDC_STATIC,7,35,64,8
     COMBOBOX        IDC_REPLACETEXT,7,46,209,116,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
-    AUTOCHECKBOX    "Match &case",IDC_FINDCASE,7,66,53,10,WS_TABSTOP
-    AUTOCHECKBOX    "Match &whole word only",IDC_FINDWORD,7,78,105,10,WS_TABSTOP
-    AUTOCHECKBOX    "Match &beginning of word only",IDC_FINDSTART,7,90,124,10,WS_TABSTOP
-    AUTOCHECKBOX    "Regular &expression search",IDC_FINDREGEXP,7,102,112,10,WS_TABSTOP
-    AUTOCHECKBOX    "&Transform backslashes",IDC_FINDTRANSFORMBS,7,114,97,10,WS_TABSTOP
-    AUTOCHECKBOX    "&Don't wrap around",IDC_NOWRAP,132,66,79,10,WS_TABSTOP
-    AUTOCHECKBOX    "C&lose after replace",IDC_FINDCLOSE,132,78,90,10,WS_TABSTOP
-    AUTOCHECKBOX    "W&ildcard search",IDC_WILDCARDSEARCH,132,90,74,10,WS_TABSTOP
-    DEFPUSHBUTTON   "&Find Next",IDOK,223,7,60,14
-    PUSHBUTTON      "Find &Previous",IDC_FINDPREV,223,24,60,14
-    PUSHBUTTON      "&Replace",IDC_REPLACE,223,41,60,14
-    PUSHBUTTON      "Replace &All",IDC_REPLACEALL,223,58,60,14
-    PUSHBUTTON      "In &Selection",IDC_REPLACEINSEL,223,75,60,14
-    PUSHBUTTON      "Close",IDCANCEL,223,92,60,14
+    AUTOCHECKBOX    "大文字/小文字を区別(&C)",IDC_FINDCASE,7,66,53,10,WS_TABSTOP
+    AUTOCHECKBOX    "単語全体が一致(&W)",IDC_FINDWORD,7,78,105,10,WS_TABSTOP
+    AUTOCHECKBOX    "単語の先頭から一致(&B)",IDC_FINDSTART,7,90,124,10,WS_TABSTOP
+    AUTOCHECKBOX    "正規表現(&E)",IDC_FINDREGEXP,7,102,112,10,WS_TABSTOP
+    AUTOCHECKBOX    "バックスラッシュを変換(&T)",IDC_FINDTRANSFORMBS,7,114,97,10,WS_TABSTOP
+    AUTOCHECKBOX    "再検索しない(&D)",IDC_NOWRAP,132,66,79,10,WS_TABSTOP
+    AUTOCHECKBOX    "置換後に閉じる(&L)",IDC_FINDCLOSE,132,78,90,10,WS_TABSTOP
+    AUTOCHECKBOX    "ワイルドカード(&I)",IDC_WILDCARDSEARCH,132,90,74,10,WS_TABSTOP
+    DEFPUSHBUTTON   "次を検索(&F)",IDOK,223,7,60,14
+    PUSHBUTTON      "前へ検索(&P)",IDC_FINDPREV,223,24,60,14
+    PUSHBUTTON      "置換し次に(&R)",IDC_REPLACE,223,41,60,14
+    PUSHBUTTON      "すべて置換(&A)",IDC_REPLACEALL,223,58,60,14
+    PUSHBUTTON      "選択範囲を(&S)",IDC_REPLACEINSEL,223,75,60,14
+    PUSHBUTTON      "閉じる",IDCANCEL,223,92,60,14
     CONTROL         "<a>(?)</a>",IDC_REGEXPHELP,"SysLink",0x0,118,102,14,10
     CONTROL         "<a>(?)</a>",IDC_BACKSLASHHELP,"SysLink",0x0,118,114,14,10
     CONTROL         "<a>(?)</a>",IDC_WILDCARDHELP,"SysLink",0x0,208,90,14,10
-    CONTROL         "<a>Clear History</a>",IDC_CLEAR_FIND,"SysLink",WS_TABSTOP,173,6,48,10
-    CONTROL         "<a>Clear History</a>",IDC_CLEAR_REPLACE,"SysLink",WS_TABSTOP,173,35,48,10
-    AUTOCHECKBOX    "Transparent mode on losing focus",IDC_TRANSPARENT,7,126,124,10,WS_TABSTOP
+    CONTROL         "<a>履歴を消去</a>",IDC_CLEAR_FIND,"SysLink",WS_TABSTOP,173,6,48,10
+    CONTROL         "<a>履歴を消去</a>",IDC_CLEAR_REPLACE,"SysLink",WS_TABSTOP,173,35,48,10
+    AUTOCHECKBOX    "フォーカスのない時に半透明に",IDC_TRANSPARENT,7,126,124,10,WS_TABSTOP
     CONTROL         "<a>Goto Find (Ctrl+F)</a>",IDC_TOGGLEFINDREPLACE, "SysLink",WS_TABSTOP,138,127,80,10
-    CONTROL         "<a>Save Position (&O)</a>",IDC_SAVEPOSITION,"SysLink",WS_TABSTOP,223,114,60,10
-    CONTROL         "<a>Reset Position (&P)</a>",IDC_RESETPOSITION,"SysLink",WS_TABSTOP,223,126,60,10
+    CONTROL         "<a>位置を記憶 (&O)</a>",IDC_SAVEPOSITION,"SysLink",WS_TABSTOP,223,114,60,10
+    CONTROL         "<a>位置を初期化 (&P)</a>",IDC_RESETPOSITION,"SysLink",WS_TABSTOP,223,126,60,10
     SCROLLBAR       IDC_RESIZEGRIP2,230,126,10,10
 END
 
 IDD_RUN DIALOGEX 0, 0, 234, 86
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Run"
+CAPTION "ファイル名を指定して実行"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
     ICON            IDI_RUN,IDC_STATIC,7,7,21,20
-    LTEXT           "Enter the name of an executable program file, a folder or a document to open.",IDC_RUNDESC,35,7,188,17
+    LTEXT           "プログラム名、フォルダやドキュメント名、インターネットリソースを入力してください。",IDC_RUNDESC,35,7,188,17
     EDITTEXT        IDC_COMMANDLINE,7,35,203,14,ES_AUTOHSCROLL
     PUSHBUTTON      "",IDC_SEARCHEXE,215,35,14,14
     DEFPUSHBUTTON   "OK",IDOK,121,65,50,14
-    PUSHBUTTON      "Cancel",IDCANCEL,177,65,50,14
+    PUSHBUTTON     "キャンセル",IDCANCEL,177,65,50,14
     SCROLLBAR       IDC_RESIZEGRIP3,7,65,10,10
 END
 
 IDD_OPENWITH DIALOGEX 0, 0, 228, 206
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Open with..."
+CAPTION "プログラムから開く..."
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     CONTROL         "",IDC_OPENWITHDIR,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_SHAREIMAGELISTS | LVS_AUTOARRANGE | LVS_NOCOLUMNHEADER | WS_BORDER | WS_TABSTOP,7,7,214,149
     PUSHBUTTON      "",IDC_GETOPENWITHDIR,7,162,13,13
-    LTEXT           "Click here to specify the directory with links to your favorite applications.",IDC_OPENWITHDESCR,26,162,195,20
+    LTEXT           "プログラムがあるフォルダを指定するには、ここをクリックします。",IDC_OPENWITHDESCR,26,162,195,20
     DEFPUSHBUTTON   "OK",IDOK,115,185,50,14
-    PUSHBUTTON      "Cancel",IDCANCEL,171,185,50,14
+    PUSHBUTTON     "キャンセル",IDCANCEL,171,185,50,14
     SCROLLBAR       IDC_RESIZEGRIP3,7,189,10,10
 END
 
 IDD_SYSTEM_INTEGRATION DIALOGEX 0, 0, 232, 118
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "System Integration"
+CAPTION "システムに統合"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    GROUPBOX        "System Integration (requires Administrator privileges)",IDC_GROUP_SYSTEM_INTEGRATION,7,7,218,84
-    AUTOCHECKBOX    "Add Notepad2 to Windows Explorer's context menu.",IDC_ENABLE_CONTEXT_MENU,14,20,204,10,WS_TABSTOP
-    LTEXT           "Context menu text:",IDC_STATIC,28,35,70,8
+    GROUPBOX        "システムに統合 (管理者権限が必要)",IDC_GROUP_SYSTEM_INTEGRATION,7,7,218,84
+    AUTOCHECKBOX    "エクスプローラーの右クリックメニューに Notepad2 を追加",IDC_ENABLE_CONTEXT_MENU,14,20,204,10,WS_TABSTOP
+    LTEXT           "メニュー表示の文字列:",IDC_STATIC,28,35,70,8
     EDITTEXT        IDC_CONTEXT_MENU_TEXT,100,32,118,14,ES_AUTOHSCROLL | WS_TABSTOP
-    AUTOCHECKBOX    "Enable Taskbar Jump List.",IDC_ENABLE_JUMP_LIST,14,48,204,10,WS_TABSTOP
-    LTEXT           "Application name:",IDC_STATIC,28,63,70,8
+    AUTOCHECKBOX    "タスクバーのジャンプリストを有効化",IDC_ENABLE_JUMP_LIST,14,48,204,10,WS_TABSTOP
+    LTEXT           "アプリケーション名:",IDC_STATIC,28,63,70,8
     EDITTEXT        IDC_APPLICATION_NAME,100,60,118,14,ES_AUTOHSCROLL | WS_TABSTOP
-    AUTOCHECKBOX    "Replace Windows Notepad via registry.",IDC_REPLACE_WINDOWS_NOTEPAD,14,76,204,10,WS_TABSTOP
+    AUTOCHECKBOX    "レジストリで Windows 標準のメモ帳を置き換え",IDC_REPLACE_WINDOWS_NOTEPAD,14,76,204,10,WS_TABSTOP
     DEFPUSHBUTTON   "OK",IDOK,119,97,50,14
-    PUSHBUTTON      "Cancel",IDCANCEL,175,97,50,14
+    PUSHBUTTON      "キャンセル",IDCANCEL,175,97,50,14
 END
 
 IDD_DEFENCODING DIALOGEX 0, 0, 209, 129
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Encoding"
+CAPTION "文字コードの設定"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    LTEXT           "&Default encoding:",IDC_STATIC,7,7,195,8
+    LTEXT           "デフォルトの文字コード(&S)",IDC_STATIC,7,7,195,8
     EDITTEXT        IDC_ENCODING_LABEL,7,20,195,14,ES_READONLY | ES_AUTOHSCROLL | WS_TABSTOP
-    CONTROL         "<a>Click here to &select default encoding.</a>",IDC_ENCODING_LINK,"SysLink",WS_TABSTOP,7,38,195,10
-    AUTOCHECKBOX    "Skip statistical &Unicode (UTF-16) detection.",IDC_NOUNICODEDETECTION,7,52,195,10,WS_TABSTOP
-    AUTOCHECKBOX    "Open 7-bit &ASCII files in UTF-8 mode.",IDC_ASCIIASUTF8,7,62,195,10,WS_TABSTOP
-    AUTOCHECKBOX    "Open ANSI (unknown encoding) files in UTF-&8 mode.",IDC_ANSIASUTF8,7,72,195,10,WS_TABSTOP
-    AUTOCHECKBOX    "Open ANSI Art (*.&nfo, *.diz) files in DOS-437 mode.",IDC_NFOASOEM,7,82,195,10,WS_TABSTOP
-    AUTOCHECKBOX    "Don't parse encoding &tags.",IDC_ENCODINGFROMFILEVARS,7,92,195,10,WS_TABSTOP
+    CONTROL         "<a>デフォルトの文字コードを指定するにはここをクリック</a>",IDC_ENCODING_LINK,"SysLink",WS_TABSTOP,7,38,195,10
+    AUTOCHECKBOX    "統計的な Unicode (UTF-16) の判別を省略(&U)",IDC_NOUNICODEDETECTION,7,52,195,10,WS_TABSTOP
+    AUTOCHECKBOX    "7-bit ASCII は UTF-8 として開く(&7)",IDC_ASCIIASUTF8,7,62,195,10,WS_TABSTOP
+    AUTOCHECKBOX    "ANSI (文字コード不明)は UTF-8 として開く(&A)",IDC_ANSIASUTF8,7,72,195,10,WS_TABSTOP
+    AUTOCHECKBOX    "ANSIアート (nfo/dizファイル)は DOS-437 として開く(&N)",IDC_NFOASOEM,7,82,195,10,WS_TABSTOP
+    AUTOCHECKBOX    "タグ中の文字コードの指定を解析しない(&T)",IDC_ENCODINGFROMFILEVARS,7,92,195,10,WS_TABSTOP
     DEFPUSHBUTTON   "OK",IDOK,96,108,50,14
-    PUSHBUTTON      "Cancel",IDCANCEL,152,108,50,14
+    PUSHBUTTON      "キャンセル",IDCANCEL,152,108,50,14
 END
 
 IDD_DEFEOLMODE DIALOGEX 0, 0, 196, 80
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Line Endings"
+CAPTION "改行コード"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    LTEXT           "&Default line ending mode:",IDC_STATIC,7,7,116,8
+    LTEXT           "デフォルトの改行コード(&D):",IDC_STATIC,7,7,116,8
     COMBOBOX        IDC_EOLMODELIST,7,20,118,81,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    AUTOCHECKBOX    "Show inconsistent line endings warning on loading.",IDC_WARNINCONSISTENTEOLS,7,40,186,10,WS_TABSTOP
-    AUTOCHECKBOX    "&Ensure consistent line endings when saving.",IDC_CONSISTENTEOLS,7,52,182,10,WS_TABSTOP
-    AUTOCHECKBOX    "&Strip trailing blanks when saving.",IDC_AUTOSTRIPBLANKS,7,64,173,10,WS_TABSTOP
+    AUTOCHECKBOX    "読込時に一貫性のない改行コードを警告(&I)",IDC_WARNINCONSISTENTEOLS,7,40,186,10,WS_TABSTOP
+    AUTOCHECKBOX    "保存時に改行コードを統一する(&E)",IDC_CONSISTENTEOLS,7,52,182,10,WS_TABSTOP
+    AUTOCHECKBOX    "保存時に末尾の空白を削除する(&S)",IDC_AUTOSTRIPBLANKS,7,64,173,10,WS_TABSTOP
     DEFPUSHBUTTON   "OK",IDOK,139,7,50,14
-    PUSHBUTTON      "Cancel",IDCANCEL,139,24,50,14
+    PUSHBUTTON     "キャンセル",IDCANCEL,139,24,50,14
 END
 
 IDD_WARNLINEENDS DIALOGEX 0, 0, 196, 100
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Inconsistent Line Endings"
+CAPTION "一貫性ない改行コード"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    LTEXT           "The line endings in this file is not consistent:",IDC_STATIC,7,7,180,8
+    LTEXT           "改行コードが一貫していません:",IDC_STATIC,7,7,180,8
     LTEXT           "CR+LF:",IDC_STATIC,10,18,34,8,SS_RIGHT
     LTEXT           "LF:",IDC_STATIC,10,28,34,8,SS_RIGHT
     LTEXT           "CR:",IDC_STATIC,10,38,34,8,SS_RIGHT
-    LTEXT           "%s line(s).",IDC_EOL_SUM_CRLF,48,18,136,8
-    LTEXT           "%s line(s).",IDC_EOL_SUM_LF,48,28,136,8
-    LTEXT           "%s line(s).",IDC_EOL_SUM_CR,48,38,136,8
-    LTEXT           "&Do you want to normalize the line endings?",IDC_STATIC,7,52,180,8
+    LTEXT           "%s 行",IDC_EOL_SUM_CRLF,48,18,136,8
+    LTEXT           "%s 行",IDC_EOL_SUM_LF,48,28,136,8
+    LTEXT           "%s 行",IDC_EOL_SUM_CR,48,38,136,8
+    LTEXT           "改行コードを統一しますか？(&D)",IDC_STATIC,7,52,180,8
     COMBOBOX        IDC_EOLMODELIST,7,64,118,81,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    PUSHBUTTON      "&Yes",IDOK,138,63,50,14
-    PUSHBUTTON      "&No",IDCANCEL,138,80,50,14
-    AUTOCHECKBOX    "&Always show this dialog.",IDC_WARNINCONSISTENTEOLS,7,82,118,10,WS_TABSTOP
+    PUSHBUTTON      "はい(&Y)",IDOK,138,63,50,14
+    PUSHBUTTON      "いいえ(&N)",IDCANCEL,138,80,50,14
+    AUTOCHECKBOX    "常にこのダイアログを表示する(&A)",IDC_WARNINCONSISTENTEOLS,7,82,118,10,WS_TABSTOP
 END
 
 IDD_LINENUM DIALOGEX 0, 0, 166, 70
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Goto"
+CAPTION "ジャンプ"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
-    LTEXT           "&Line (empty or 1 - %s):",IDC_LINE_RANGE,7,7,150,8
+    LTEXT           "行 (空や1 - %s)(&L):",IDC_LINE_RANGE,7,7,150,8
     EDITTEXT        IDC_LINENUM,7,18,90,14,ES_AUTOHSCROLL
-    LTEXT           "&Column (empty or 1 - %s):",IDC_COLUMN_RANGE,7,37,150,8
+    LTEXT           "列 (空や1 - %s)(&C):",IDC_COLUMN_RANGE,7,37,150,8
     EDITTEXT        IDC_COLNUM,7,48,90,14,ES_AUTOHSCROLL
     DEFPUSHBUTTON   "OK",IDOK,109,18,50,14
-    PUSHBUTTON      "Cancel",IDCANCEL,109,48,50,14
+    PUSHBUTTON     "キャンセル",IDCANCEL,109,48,50,14
 END
 
 IDD_FILEMRU DIALOGEX 0, 0, 226, 204
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Open Recent File"
+CAPTION "最近使ったファイル"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     CONTROL         "",IDC_FILEMRU,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_SHAREIMAGELISTS | LVS_AUTOARRANGE | LVS_NOCOLUMNHEADER | WS_BORDER | WS_TABSTOP,7,7,212,158
-    AUTOCHECKBOX    "&Remember recent files on exit.",IDC_SAVEMRU,7,169,114,10,WS_TABSTOP
-    CONTROL         "<a>Clear History</a>",IDC_EMPTY_MRU,"SysLink",WS_TABSTOP,172,169,48,10
+    AUTOCHECKBOX    "終了時に最近使ったファイル一覧を保存(&R)",IDC_SAVEMRU,7,169,114,10,WS_TABSTOP
+    CONTROL         "<a>履歴を消去</a>",IDC_EMPTY_MRU,"SysLink",WS_TABSTOP,172,169,48,10
     DEFPUSHBUTTON   "OK",IDOK,113,183,50,14,WS_DISABLED
-    PUSHBUTTON      "Cancel",IDCANCEL,169,183,50,14
+    PUSHBUTTON     "キャンセル",IDCANCEL,169,183,50,14
     SCROLLBAR       IDC_RESIZEGRIP,7,187,10,10
 END
 
 IDD_CHANGENOTIFY DIALOGEX 0, 0, 196, 89
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "File Change Notification"
+CAPTION "ファイル変更の通知"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
-    AUTORADIOBUTTON "&None.",IDC_CHANGENOTIFY_NONE,7,7,35,10,WS_GROUP | WS_TABSTOP
-    AUTORADIOBUTTON "&Show message.",IDC_CHANGENOTIFY_SHOW_MSG,7,19,71,10,WS_TABSTOP
-    AUTORADIOBUTTON "&Auto-reload (unmodified).",IDC_CHANGENOTIFY_AUTO_RELOAD,7,31,114,10,WS_TABSTOP
-    AUTOCHECKBOX    "Detect file change by &polling instead of notification.",IDC_CHANGENOTIFY_USE_POLLING,7,48,184,10,WS_TABSTOP
+    AUTORADIOBUTTON "なし(&N)",IDC_CHANGENOTIFY_NONE,7,7,35,10,WS_GROUP | WS_TABSTOP
+    AUTORADIOBUTTON "メッセージを表示(&S)",IDC_CHANGENOTIFY_SHOW_MSG,7,19,71,10,WS_TABSTOP
+    AUTORADIOBUTTON "自動再読み込み(修正不可)(&A)",IDC_CHANGENOTIFY_AUTO_RELOAD,7,31,114,10,WS_TABSTOP
+    AUTOCHECKBOX    "通知の代わりにポーリングで変更を検出する(&P)",IDC_CHANGENOTIFY_USE_POLLING,7,48,184,10,WS_TABSTOP
     AUTOCHECKBOX    "&Keep at document end after reloading.",IDC_CHANGENOTIFY_KEEP_AT_END,7,60,184,10,WS_TABSTOP
     AUTOCHECKBOX    "&Reset if a new file is opened.",IDC_CHANGENOTIFY_RESET_WATCH,7,72,184,10,WS_TABSTOP
     DEFPUSHBUTTON   "OK",IDOK,139,7,50,14
-    PUSHBUTTON      "Cancel",IDCANCEL,139,24,50,14
+    PUSHBUTTON     "キャンセル",IDCANCEL,139,24,50,14
 END
 
 IDD_STYLESELECT DIALOGEX 0, 0, 165, 217
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Select Scheme"
+CAPTION "文書の種類を選択"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     CONTROL         "",IDC_STYLELIST,"SysTreeView32",TVS_SHOWSELALWAYS | TVS_HASBUTTONS | TVS_LINESATROOT | WS_BORDER | WS_HSCROLL | WS_TABSTOP,7,7,151,162
-    AUTOCHECKBOX    "Set selected scheme as &default.",IDC_DEFAULTSCHEME,7,171,151,10,WS_TABSTOP
-    AUTOCHECKBOX    "&Auto-select by filename extension.",IDC_AUTOSELECT,7,182,151,10,WS_TABSTOP
+    AUTOCHECKBOX    "選択した構文言語をデフォルトに設定(&D)",IDC_DEFAULTSCHEME,7,171,151,10,WS_TABSTOP
+    AUTOCHECKBOX    "拡張子から自動選択する(&A)",DC_AUTOSELECT,7,182,151,10,WS_TABSTOP
     DEFPUSHBUTTON   "OK",IDOK,52,196,50,14
-    PUSHBUTTON      "Cancel",IDCANCEL,108,196,50,14
+    PUSHBUTTON     "キャンセル",IDCANCEL,108,196,50,14
     SCROLLBAR       IDC_RESIZEGRIP3,7,198,10,10
 END
 
 IDD_STYLECONFIG DIALOGEX 0, 0, 468, 238
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Customize Schemes"
+CAPTION "プログラミング言語の構文の配色設定"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     CONTROL         "",IDC_STYLELIST,"SysTreeView32",TVS_FULLROWSELECT | TVS_SHOWSELALWAYS | TVS_HASBUTTONS | TVS_LINESATROOT | WS_BORDER | WS_HSCROLL | WS_TABSTOP,7,7,164,224
     LTEXT           "",IDC_STYLELABEL,181,132,280,8
     EDITTEXT        IDC_STYLEEDIT,181,142,280,18,ES_MULTILINE | ES_AUTOVSCROLL | WS_VSCROLL
-    PUSHBUTTON      "For&e...",IDC_STYLEFORE,181,195,46,14
-    PUSHBUTTON      "&Back...",IDC_STYLEBACK,232,195,46,14
-    PUSHBUTTON      "&Font...",IDC_STYLEFONT,283,195,42,14
-    PUSHBUTTON      "&Preview",IDC_PREVIEW,330,195,42,14
-    PUSHBUTTON      "&Reset",IDC_STYLEDEFAULT,377,195,42,14
+    PUSHBUTTON      "文字色(&E)...",　IDC_STYLEFORE,181,195,46,14
+    PUSHBUTTON      "背景色(&B)...",IDC_STYLEBACK,232,195,46,14
+    PUSHBUTTON      "フォント(&F)...",IDC_STYLEFONT,283,195,42,14
+    PUSHBUTTON      "プレビュー(&P)",IDC_PREVIEW,330,195,42,14
+    PUSHBUTTON      "初期化(&R)",IDC_STYLEDEFAULT,377,195,42,14
     PUSHBUTTON      "",IDC_PREVSTYLE,426,195,15,14
     PUSHBUTTON      "",IDC_NEXTSTYLE,446,195,15,14
-    PUSHBUTTON      "&Import...",IDC_IMPORT,181,217,50,14
-    PUSHBUTTON      "E&xport...",IDC_EXPORT,237,217,50,14
-    PUSHBUTTON      "Reset All",IDC_RESETALL,293,217,50,14
+    PUSHBUTTON      "インポート(&I)...",IDC_IMPORT,181,217,50,14
+    PUSHBUTTON      "エクスポート(&X)...",IDC_EXPORT,237,217,50,14
+    PUSHBUTTON      "すべて初期化",IDC_RESETALL,293,217,50,14
     DEFPUSHBUTTON   "OK",IDOK,355,217,50,14
-    PUSHBUTTON      "Cancel",IDCANCEL,411,217,50,14
-    GROUPBOX        "Info",IDC_INFO_GROUPBOX,181,7,280,122
+    PUSHBUTTON     "キャンセル",IDCANCEL,411,217,50,14
+    GROUPBOX        "説明",IDC_INFO_GROUPBOX,181,7,280,122
     ICON            IDI_STYLES,IDC_STATIC,189,19,20,20
-    LTEXT           "Customize Schemes",IDC_TITLE,220,25,200,12
+    LTEXT           "色とフォントの指定方法",IDC_TITLE,220,25,200,12
     EDITTEXT        IDC_STYLEEDIT_HELP,186,40,272,86,ES_READONLY | ES_MULTILINE | NOT WS_BORDER | NOT WS_TABSTOP
-    LTEXT           "Associated file&name extensions:|Style &settings:",IDC_STYLELABELS,315,230,152,8,NOT WS_VISIBLE
-    LTEXT           "Built-in default value:",IDC_STYLELABEL_DEFAULT,181,162,160,8
+    LTEXT           "関連付け拡張子(&N):|スタイル設定(&S)::",IDC_STYLELABELS,315,230,152,8,NOT WS_VISIBLE
+    LTEXT           "初期化時の値:",IDC_STYLELABEL_DEFAULT,181,162,160,8
     EDITTEXT        IDC_STYLEVALUE_DEFAULT,181,172,280,18,ES_READONLY | ES_MULTILINE | ES_AUTOVSCROLL | WS_VSCROLL
     SCROLLBAR       IDC_RESIZEGRIP3,7,217,10,10
 END
 
 IDD_TABSETTINGS DIALOGEX 0, 0, 174, 90
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Tab Settings"
+CAPTION "タブキーの設定"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
-    LTEXT           "&Tabulator width:",IDC_STATIC,7,10,67,8
+    LTEXT           "タブ表示の文字数(&T):",IDC_STATIC,7,10,67,8
     EDITTEXT        IDC_TAB_WIDTH,78,7,30,14,ES_NUMBER | ES_AUTOHSCROLL
-    LTEXT           "&Indentation size:",IDC_STATIC,7,30,69,8
+    LTEXT           "インデント文字数(&I):",IDC_STATIC,7,30,69,8
     EDITTEXT        IDC_INDENT_WIDTH,78,27,30,14,ES_NUMBER | ES_AUTOHSCROLL
-    AUTOCHECKBOX    "Insert tabs as &spaces.",IDC_TAB_AS_SPACE,7,47,101,10,WS_TABSTOP
-    AUTOCHECKBOX    "Tab &key reformats indentation.",IDC_TAB_INDENT,7,59,139,10,WS_TABSTOP
-    AUTOCHECKBOX    "&Backspace key reformats indentation.",IDC_BACKSPACE_UNINDENT,7,71,160,10,WS_TABSTOP
+    AUTOCHECKBOX    "タブキーで空白を入力(&S)",IDC_TAB_AS_SPACE,7,47,101,10,WS_TABSTOP
+    AUTOCHECKBOX    "タブキーで追加しインデント全体を再変換(&K)",IDC_TAB_INDENT,7,59,139,10,WS_TABSTOP
+    AUTOCHECKBOX    "バックスペースで削除し、同様に再変換(&B)",IDC_BACKSPACE_UNINDENT,7,71,160,10,WS_TABSTOP
     DEFPUSHBUTTON   "OK",IDOK,117,7,50,14
-    PUSHBUTTON      "Cancel",IDCANCEL,117,27,50,14
+    PUSHBUTTON     "キャンセル",IDCANCEL,117,27,50,14
 END
 
 IDD_LONGLINES DIALOGEX 0, 0, 184, 55
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Long Lines"
+CAPTION "行の長さガイドの設定"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
-    LTEXT           "&Limit for long lines:",IDC_STATIC,7,10,85,8
+    LTEXT           "長い行の上限値(&L):",IDC_STATIC,7,10,85,8
     EDITTEXT        IDC_LONGLINE_LIMIT,91,7,30,14,ES_NUMBER | ES_AUTOHSCROLL
-    AUTORADIOBUTTON "Show &edge line.",IDC_LONGLINE_EDGE_LINE,7,27,75,10,WS_GROUP | WS_TABSTOP
-    AUTORADIOBUTTON "Change &background color.",IDC_LONGLINE_BACK_COLOR,7,38,114,10,WS_TABSTOP
+    AUTORADIOBUTTON "境界を線で表示(&E)",IDC_LONGLINE_EDGE_LINE,7,27,75,10,WS_GROUP | WS_TABSTOP
+    AUTORADIOBUTTON "背景色を変更(&B)",IDC_LONGLINE_BACK_COLOR,7,38,114,10,WS_TABSTOP
     DEFPUSHBUTTON   "OK",IDOK,127,7,50,14
-    PUSHBUTTON      "Cancel",IDCANCEL,127,24,50,14
+    PUSHBUTTON     "キャンセル",IDCANCEL,127,24,50,14
 END
 
 IDD_WORDWRAP DIALOGEX 0, 0, 250, 139
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Word Wrap Settings"
+CAPTION "折り返し方の設定"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     COMBOBOX        IDC_WRAP_INDENT,7,7,236,196,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
@@ -1262,53 +1262,53 @@ BEGIN
     COMBOBOX        IDC_WRAP_SYMBOL_AFTER,7,41,236,196,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     COMBOBOX        IDC_WRAP_MODE,7,58,236,196,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     DEFPUSHBUTTON   "OK",IDOK,137,118,50,14
-    PUSHBUTTON      "Cancel",IDCANCEL,193,118,50,14
-    LTEXT           "No wrap indent|Wrap indent by 1 character|Wrap indent by 2 characters|Wrap indent by 1 level|Wrap indent by 2 levels|Wrap indent same as first subline|Wrap indent 1 level more than first subline|Wrap indent 2 levels more than first subline",IDC_WRAP_INDENT_OPTIONS,0,0,615,8,NOT WS_VISIBLE
-    LTEXT           "No visual indicators before wrap|Show visual indicators before wrap (near text)|Show visual indicators before wrap (near borders)",IDC_WRAP_SYMBOL_BEFORE_OPTIONS,0,0,418,8,NOT WS_VISIBLE
-    LTEXT           "No visual indicators after wrap|Show visual indicators after wrap (near text)|Show visual indicators after wrap (near borders)|Show visual indicators after wrap (in line number margin)",IDC_WRAP_SYMBOL_AFTER_OPTIONS,0,0,402,8,NOT WS_VISIBLE
-    LTEXT           "No wrap|Wrap text between words|Wrap text between any characters|Wrap text on whitespace|Automatic word wrap",IDC_WRAP_MODE_OPTIONS,0,0,187,8,NOT WS_VISIBLE
-    GROUPBOX        "For wrapped line",IDC_STATIC,7,74,235,38
-    AUTOCHECKBOX    "Only select subline when selecting line from left margin.",IDC_WRAP_SELECT_SUBLINE,14,84,220,10,WS_TABSTOP
-    AUTOCHECKBOX    "Only highlight subline when highlighting current line.",IDC_WRAP_HIGHLIGHT_SUBLINE,14,96,220,10,WS_TABSTOP
+    PUSHBUTTON     "キャンセル",IDCANCEL,193,118,50,14
+    LTEXT           "折り返し箇所をインデントしない|折り返し箇所を1字インデント|折り返し箇所を2字インデント|折り返し箇所を1段階インデント|折り返し箇所を2段階インデント| 折り返し箇所の最初の行を目安にインデント|折り返し箇所の最初の行を目安に1段階インデント|折り返し箇所の最初の行を目安に2段階インデント",IDC_WRAP_INDENT_OPTIONS,0,0,615,8,NOT WS_VISIBLE
+    LTEXT           "折り返し前のマークは非表示|折り返し前のマークは文字列の近くに表示|折り返し前のマークは端に表示",IDC_WRAP_SYMBOL_BEFORE_OPTIONS,0,0,418,8,NOT WS_VISIBLE
+    LTEXT           "折り返し後のマークは非表示|折り返し後のマークは文字列の近くに表示|折り返し後のマークは端に表示|折り返し後のマークは行番号に表示",IDC_WRAP_SYMBOL_AFTER_OPTIONS,0,0,402,8,NOT WS_VISIBLE
+    LTEXT           "文章中に折り返さない|半角単語の間で折り返す|どんな文字の間でも折り返す|空白で折り返す|自動",IDC_WRAP_MODE_OPTIONS,0,0,187,8,NOT WS_VISIBLE
+    GROUPBOX        "折り返された行は…",IDC_STATIC,7,74,235,38
+    AUTOCHECKBOX    "行番号から行を選択した際に該当の折り返し行を選択(&S)",IDC_WRAP_SELECT_SUBLINE,14,84,220,10,WS_TABSTOP
+    AUTOCHECKBOX    "現在の行を強調表示した際に該当の折り返し行を強調表示(&H)",IDC_WRAP_HIGHLIGHT_SUBLINE,14,96,220,10,WS_TABSTOP
 END
 
 IDD_PAGESETUP DIALOGEX 5, 5, 356, 260
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Page Setup"
+CAPTION "ページ設定"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    GROUPBOX        "Paper",IDC_PAGESETUP_PAGER_BOX,8,8,224,56,WS_GROUP
-    LTEXT           "Si&ze:",IDC_PAGESETUP_SIZE,16,24,36,8
+    GROUPBOX        "用紙"",IDC_PAGESETUP_PAGER_BOX,8,8,224,56,WS_GROUP
+    LTEXT           "用紙サイズ(&Z):",IDC_PAGESETUP_SIZE,16,24,36,8
     COMBOBOX        IDC_PAGESETUP_SOURCE_LIST,64,23,160,160,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_GROUP | WS_TABSTOP
-    LTEXT           "&Source:",IDC_PAGESETUP_SOURCE_LABEL,16,45,36,8
+    LTEXT           "給紙方法(&S):",IDC_PAGESETUP_SOURCE_LABEL,16,45,36,8
     COMBOBOX        IDC_PAGESETUP_ORIENTATION_LIST,64,42,160,160,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_GROUP | WS_TABSTOP
-    GROUPBOX        "Orientation",IDC_PAGESETUP_ORIENTATION_BOX,8,69,64,56,WS_GROUP
-    AUTORADIOBUTTON "P&ortrait",IDC_PAGESETUP_PORTRAIT,16,82,52,12,WS_GROUP | WS_TABSTOP
-    AUTORADIOBUTTON "L&andscape",IDC_PAGESETUP_LANDSCAPE,16,103,52,12,WS_TABSTOP
-    GROUPBOX        "Margins",IDC_PAGESETUP_MARGIN_BOX,80,69,152,56,WS_GROUP
-    LTEXT           "&Left:",IDC_PAGESETUP_MARGIN_LEFT_LABEL,88,85,32,8
+    GROUPBOX        "印刷の向き",IDC_PAGESETUP_ORIENTATION_BOX,8,69,64,56,WS_GROUP
+    AUTORADIOBUTTON "縦(&O)",IDC_PAGESETUP_PORTRAIT,16,82,52,12,WS_GROUP | WS_TABSTOP
+    AUTORADIOBUTTON "横(&A)",IDC_PAGESETUP_LANDSCAPE,16,103,52,12,WS_TABSTOP
+    GROUPBOX        "余白",IDC_PAGESETUP_MARGIN_BOX,80,69,152,56,WS_GROUP
+    LTEXT           "左(&L):",IDC_PAGESETUP_MARGIN_LEFT_LABEL,88,85,32,8
     EDITTEXT        IDC_PAGESETUP_MARGIN_LEFT,120,82,28,12,ES_NUMBER | WS_GROUP
-    LTEXT           "&Top:",IDC_PAGESETUP_MARGIN_TOP_LABEL,88,104,32,8
+    LTEXT           "上(&T):",IDC_PAGESETUP_MARGIN_TOP_LABEL,88,104,32,8
     EDITTEXT        IDC_PAGESETUP_MARGIN_RIGHT,120,103,28,12,ES_NUMBER | WS_GROUP
-    LTEXT           "&Right:",IDC_PAGESETUP_MARGIN_RIGHT_LABEL,164,85,32,8
+    LTEXT           "右(&R):",IDC_PAGESETUP_MARGIN_RIGHT_LABEL,164,85,32,8
     EDITTEXT        IDC_PAGESETUP_MARGIN_TOP,196,82,28,12,ES_NUMBER | WS_GROUP
-    LTEXT           "&Bottom:",IDC_PAGESETUP_MARGIN_BOTTOM_LABEL,164,104,32,8
+    LTEXT           "下(&B):",IDC_PAGESETUP_MARGIN_BOTTOM_LABEL,164,104,32,8
     EDITTEXT        IDC_PAGESETUP_MARGIN_BOOTOM,196,103,28,12,ES_NUMBER | WS_GROUP
-    GROUPBOX        "Headers and Footers",IDC_PAGESETUP_HEADER_FOOTER_BOX,8,130,224,56,WS_GROUP
-    LTEXT           "&Header:",IDC_STATIC,16,146,36,8
+    GROUPBOX        "ヘッダーとフッター",IDC_PAGESETUP_HEADER_FOOTER_BOX,8,130,224,56,WS_GROUP
+    LTEXT           "ヘッダー(&H):",IDC_STATIC,16,146,36,8
     COMBOBOX        IDC_PAGESETUP_HEADER_LIST,64,145,160,160,CBS_DROPDOWNLIST | WS_VSCROLL | WS_GROUP | WS_TABSTOP
-    LTEXT           "&Footer:",IDC_STATIC,16,167,36,8
+    LTEXT           "フッター(&F):",IDC_STATIC,16,167,36,8
     COMBOBOX        IDC_PAGESETUP_FOOTER_LIST,64,164,160,160,CBS_DROPDOWNLIST | WS_VSCROLL | WS_GROUP | WS_TABSTOP
-    GROUPBOX        "Print Colors",1076,8,191,224,37,WS_GROUP
-    LTEXT           "Mo&de:",IDC_STATIC,16,207,36,8
+    GROUPBOX        "色",1076,8,191,224,37,WS_GROUP
+    LTEXT           "様式(&D):",IDC_STATIC,16,207,36,8
     COMBOBOX        IDC_PAGESETUP_COLOR_MODE_LIST,64,206,160,160,CBS_DROPDOWNLIST | WS_VSCROLL | WS_GROUP | WS_TABSTOP
-    GROUPBOX        "Zoom",IDC_STATIC,240,170,108,58,WS_GROUP
-    LTEXT           "Print zoo&m (10% to 500%):",IDC_STATIC,248,188,94,8
+    GROUPBOX        "拡大/縮小",IDC_STATIC,240,170,108,58,WS_GROUP
+    LTEXT           "拡大縮小率(&M) (10% - 500%):",IDC_STATIC,248,188,94,8
     COMBOBOX        IDC_PAGESETUP_ZOOMLEVEL,290,206,50,120,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
     DEFPUSHBUTTON   "OK",IDOK,187,239,50,14,WS_GROUP
-    PUSHBUTTON      "Cancel",IDCANCEL,243,239,50,14
-    PUSHBUTTON      "&Printer...",IDC_PAGESETUP_PRINTER,299,239,50,14
-    GROUPBOX        "Preview",IDC_STATIC,240,8,108,157
+    PUSHBUTTON     "キャンセル",IDCANCEL,243,239,50,14
+    PUSHBUTTON      "プリンタ(&P)...",IDC_PAGESETUP_PRINTER,299,239,50,14
+    GROUPBOX        "プレビュー",IDC_STATIC,240,8,108,157
     CONTROL         "",IDC_PAGESETUP_PREVIEW_WHITE_RECT,"Static",SS_WHITERECT,254,47,80,80
     CONTROL         "",IDC_PAGESETUP_PREVIEW_VERT_RECT,"Static",SS_GRAYRECT,334,51,4,80
     CONTROL         "",IDC_PAGESETUP_PREVIEW_HOR_RECT,"Static",SS_GRAYRECT,262,123,80,4
@@ -1316,88 +1316,88 @@ END
 
 IDD_FAVORITES DIALOGEX 0, 0, 244, 166
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Favorites"
+CAPTION "お気に入り"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     CONTROL         "",IDC_FAVORITESDIR,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_SHAREIMAGELISTS | LVS_AUTOARRANGE | LVS_NOCOLUMNHEADER | WS_BORDER | WS_TABSTOP,7,7,230,106
     PUSHBUTTON      "",IDC_GETFAVORITESDIR,7,118,13,13
-    LTEXT           "Click here to specify the directory with links to your favorite files.",IDC_FAVORITESDESCR,22,118,214,20
+    LTEXT           "ここをクリックして、お気に入りのフォルダを指定してください。",IDC_FAVORITESDESCR,22,118,214,20
     DEFPUSHBUTTON   "OK",IDOK,131,145,50,14
-    PUSHBUTTON      "Cancel",IDCANCEL,187,145,50,14
+    PUSHBUTTON     "キャンセル",IDCANCEL,187,145,50,14
     SCROLLBAR       IDC_RESIZEGRIP3,7,145,10,10
 END
 
 IDD_ADDTOFAV DIALOGEX 0, 0, 254, 66
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Add to Favorites"
+CAPTION "お気に入りに追加"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    LTEXT           "Enter the name for the new favorites item:",IDC_FAVORITESDESCR,7,7,240,8
+    LTEXT           "お気に入りに追加する項目名を入力:",IDC_FAVORITESDESCR,7,7,240,8
     EDITTEXT        IDC_FAVORITESFILE,7,22,240,14,ES_AUTOHSCROLL
     DEFPUSHBUTTON   "OK",IDOK,141,45,50,14,WS_DISABLED
-    PUSHBUTTON      "Cancel",IDCANCEL,197,45,50,14
+    PUSHBUTTON     "キャンセル",IDCANCEL,197,45,50,14
     SCROLLBAR       IDC_RESIZEGRIP,7,45,10,10
 END
 
 IDD_COLUMNWRAP DIALOGEX 0, 0, 130, 47
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Column Wrap"
+CAPTION "空白で折り返し"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
-    LTEXT           "&Boundary:",IDC_STATIC,7,7,34,8
+    LTEXT           "境界文字数(&B):",IDC_STATIC,7,7,34,8
     EDITTEXT        IDC_COLUMNWRAP,7,24,54,14,ES_NUMBER | ES_AUTOHSCROLL
     DEFPUSHBUTTON   "OK",IDOK,73,7,50,14
-    PUSHBUTTON      "Cancel",IDCANCEL,73,24,50,14
+    PUSHBUTTON     "キャンセル",IDCANCEL,73,24,50,14
 END
 
 IDD_MODIFYLINES DIALOGEX 0, 0, 260, 129
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Modify Lines"
+CAPTION "行の修飾"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
-    LTEXT           "&Prefix text to lines:",IDC_STATIC,7,6,96,8
+    LTEXT           "行の前の文字列(&P):",IDC_STATIC,7,6,96,8
     EDITTEXT        IDC_MODIFY_LINE_PREFIX,7,18,246,18,ES_MULTILINE | ES_AUTOVSCROLL | WS_VSCROLL | ES_WANTRETURN
-    LTEXT           "&Append text to lines:",IDC_MODIFY_LINE_TIP2,7,41,97,8
+    LTEXT           "行の後ろの文字列(&A):",IDC_MODIFY_LINE_TIP2,7,41,97,8
     EDITTEXT        IDC_MODIFY_LINE_APPEND,7,52,246,18,ES_MULTILINE | ES_AUTOVSCROLL | WS_VSCROLL | ES_WANTRETURN
     DEFPUSHBUTTON   "OK",IDOK,147,108,50,14
-    PUSHBUTTON      "Cancel",IDCANCEL,203,108,50,14
+    PUSHBUTTON     "キャンセル",IDCANCEL,203,108,50,14
     LTEXT           "$(L)",IDC_MODIFY_LINE_DLN_NP,7,76,21,8
     LTEXT           "$(0L)",IDC_MODIFY_LINE_DLN_ZP,27,76,27,8
-    LTEXT           "Document line number.",IDC_MODIFY_LINE_TIP_DLN,51,76,118,8
+    LTEXT           "文書内の行番号",IDC_MODIFY_LINE_TIP_DLN,51,76,118,8
     LTEXT           "$(N)",IDC_MODIFY_LINE_CN_NP,7,86,22,8
     LTEXT           "$(0N)",IDC_MODIFY_LINE_CN_ZP,27,86,25,8
-    LTEXT           "Continuous number.",IDC_MODIFY_LINE_TIP_CN,51,86,107,8
+    LTEXT           "1ずつ増加",IDC_MODIFY_LINE_TIP_CN,51,86,107,8
     LTEXT           "$(I)",IDC_MODIFY_LINE_ZCN_NP,7,96,21,8
     LTEXT           "$(0I)",IDC_MODIFY_LINE_ZCN_ZP,27,96,25,8
-    LTEXT           "Continuous number (zero-based).",IDC_MODIFY_LINE_TIP_ZCN,51,96,125,8
+    LTEXT           "1ずつ増加 (0 から開始)",IDC_MODIFY_LINE_TIP_ZCN,51,96,125,8
     SCROLLBAR       IDC_RESIZEGRIP2,7,108,10,10
 END
 
 IDD_INSERTTAG DIALOGEX 0, 0, 264, 98
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Insert HTML/XML Tag"
+CAPTION "HTML/XMLタグを挿入"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
-    LTEXT           "&Opening tag (with attributes):",IDC_STATIC,7,7,130,8
+    LTEXT           "開始タグ(属性含む)(&O):",IDC_STATIC,7,7,130,8
     EDITTEXT        IDC_MODIFY_LINE_PREFIX,7,18,250,18,ES_MULTILINE | ES_AUTOVSCROLL | WS_VSCROLL | ES_WANTRETURN
-    LTEXT           "&Closing tag (can be edited):",IDC_MODIFY_LINE_TIP2,7,41,118,8
+    LTEXT           "閉じタグ(編集可)(&C):",IDC_MODIFY_LINE_TIP2,7,41,118,8
     EDITTEXT        IDC_MODIFY_LINE_APPEND,7,52,250,18,ES_MULTILINE | ES_AUTOVSCROLL | WS_VSCROLL | ES_WANTRETURN
     DEFPUSHBUTTON   "OK",IDOK,151,77,50,14
-    PUSHBUTTON      "Cancel",IDCANCEL,207,77,50,14
+    PUSHBUTTON     "キャンセル",IDCANCEL,207,77,50,14
     SCROLLBAR       IDC_RESIZEGRIP2,7,77,10,10
 END
 
 IDD_ENCLOSESELECTION DIALOGEX 0, 0, 248, 98
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Enclose Selection"
+CAPTION "選択範囲を囲む"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
-    LTEXT           "Insert &before selection:",IDC_STATIC,7,7,114,8
+    LTEXT           "選択範囲の前に挿入(&B):",IDC_STATIC,7,7,114,8
     EDITTEXT        IDC_MODIFY_LINE_PREFIX,7,18,234,18,ES_MULTILINE | ES_AUTOVSCROLL | WS_VSCROLL | ES_WANTRETURN
-    LTEXT           "Insert &after selection:",IDC_MODIFY_LINE_TIP2,7,41,116,8
+    LTEXT           "選択範囲の後に挿入(&A):",IDC_MODIFY_LINE_TIP2,7,41,116,8
     EDITTEXT        IDC_MODIFY_LINE_APPEND,7,52,234,18,ES_MULTILINE | ES_AUTOVSCROLL | WS_VSCROLL | ES_WANTRETURN
     DEFPUSHBUTTON   "OK",IDOK,135,77,50,14
-    PUSHBUTTON      "Cancel",IDCANCEL,191,77,50,14
+    PUSHBUTTON     "キャンセル",IDCANCEL,191,77,50,14
     SCROLLBAR       IDC_RESIZEGRIP2,7,77,10,10
 END
 
@@ -1410,7 +1410,7 @@ BEGIN
     ICON            IDR_MAINWND,IDC_INFOBOXICON,7,7,20,20
     LTEXT           "",IDC_INFOBOXTEXT,35,7,202,42
     DEFPUSHBUTTON   "OK",IDOK,187,53,50,14
-    AUTOCHECKBOX    "&Don't show this message again.",IDC_INFOBOXCHECK,7,55,120,10,WS_TABSTOP
+    AUTOCHECKBOX    "このメッセージを再び表示しない(&D)",IDC_INFOBOXCHECK,7,55,120,10,WS_TABSTOP
 END
 
 IDD_INFOBOX_YESNO DIALOGEX 0, 0, 244, 74
@@ -1421,27 +1421,27 @@ BEGIN
     LTEXT           "",IDC_INFOBOXRECT,0,0,244,49
     ICON            IDR_MAINWND,IDC_INFOBOXICON,7,7,20,20
     LTEXT           "",IDC_INFOBOXTEXT,35,7,202,42
-    PUSHBUTTON      "&Yes",IDYES,131,54,50,14
-    PUSHBUTTON      "&No",IDNO,187,54,50,14
-    AUTOCHECKBOX    "&Don't show this message again.",IDC_INFOBOXCHECK,7,55,120,10,WS_TABSTOP
+    PUSHBUTTON      "はい(&Y)",IDYES,131,54,50,14
+    PUSHBUTTON      "いいえ(&N)",IDNO,187,54,50,14
+    AUTOCHECKBOX    "このメッセージを再び表示しない(&D)",IDC_INFOBOXCHECK,7,55,120,10,WS_TABSTOP
 END
 
 IDD_SORT DIALOGEX 0, 0, 184, 140
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Sort Lines"
+CAPTION "行の並べ替え"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
-    AUTORADIOBUTTON "Sort &ascending.",IDC_SORT_ASC,7,7,85,10,WS_GROUP | WS_TABSTOP
-    AUTORADIOBUTTON "Sort &descending.",IDC_SORT_DESC,7,19,84,10,WS_TABSTOP
-    AUTORADIOBUTTON "Shu&ffle lines.",IDC_SORT_SHUFFLE,7,31,70,10,WS_TABSTOP
-    AUTOCHECKBOX    "&Merge duplicate lines.",IDC_SORT_MERGE_DUP,7,50,100,10,WS_TABSTOP
-    AUTOCHECKBOX    "&Remove duplicate lines.",IDC_SORT_REMOVE_DUP,7,62,100,10,WS_TABSTOP
-    AUTOCHECKBOX    "Remove &unique lines.",IDC_SORT_REMOVE_UNIQUE,7,74,100,10,WS_TABSTOP
-    AUTOCHECKBOX    "&Case insensitive.",IDC_SORT_IGNORE_CASE,7,92,81,10,WS_TABSTOP
-    AUTOCHECKBOX    "Logical &number comparison.",IDC_SORT_LOGICAL_NUMBER,7,104,130,10,WS_TABSTOP
-    AUTOCHECKBOX    "Column &sort (rectangular selection).",IDC_SORT_COLUMN,7,122,150,10,WS_TABSTOP
+    AUTORADIOBUTTON "昇順ソート(&A)",IDC_SORT_ASC,7,7,85,10,WS_GROUP | WS_TABSTOP
+    AUTORADIOBUTTON "降順ソート(&D)",IDC_SORT_DESC,7,19,84,10,WS_TABSTOP
+    AUTORADIOBUTTON "シャッフル(&F)",IDC_SORT_SHUFFLE,7,31,70,10,WS_TABSTOP
+    AUTOCHECKBOX    "重複行を合併(&M)",IDC_SORT_MERGE_DUP,7,50,100,10,WS_TABSTOP
+    AUTOCHECKBOX    "重複行を削除(&R)",IDC_SORT_REMOVE_DUP,7,62,100,10,WS_TABSTOP
+    AUTOCHECKBOX    "それしかない行を削除(&U)",IDC_SORT_REMOVE_UNIQUE,7,74,100,10,WS_TABSTOP
+    AUTOCHECKBOX    "大文字/小文字を区別しない(&C)",IDC_SORT_IGNORE_CASE,7,92,81,10,WS_TABSTOP
+    AUTOCHECKBOX    "論理番号で比較(&N)",IDC_SORT_LOGICAL_NUMBER,7,104,130,10,WS_TABSTOP
+    AUTOCHECKBOX    "列でソート (Altで矩形選択) (&S)",IDC_SORT_COLUMN,7,122,150,10,WS_TABSTOP
     DEFPUSHBUTTON   "OK",IDOK,127,7,50,14
-    PUSHBUTTON      "Cancel",IDCANCEL,127,24,50,14
+    PUSHBUTTON     "キャンセル",IDCANCEL,127,24,50,14
 END
 
 IDD_INFOBOX_OKCANCEL DIALOGEX 0, 0, 244, 74
@@ -1453,87 +1453,87 @@ BEGIN
     ICON            IDR_MAINWND,IDC_INFOBOXICON,7,7,20,20
     LTEXT           "",IDC_INFOBOXTEXT,35,7,202,42
     DEFPUSHBUTTON   "OK",IDOK,131,53,50,14
-    PUSHBUTTON      "Cancel",IDCANCEL,187,53,50,14
-    AUTOCHECKBOX    "&Don't show this message again.",IDC_INFOBOXCHECK,7,55,120,10,WS_TABSTOP
+    PUSHBUTTON     "キャンセル",IDCANCEL,187,53,50,14
+    AUTOCHECKBOX    "このメッセージを再び表示しない(&D)",IDC_INFOBOXCHECK,7,55,120,10,WS_TABSTOP
 END
 
 IDD_SELECT_ENCODING DIALOGEX 0, 0, 187, 238
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Select Encoding"
+CAPTION "文字コードの選択"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     LTEXT           "",IDC_ENCODING_LABEL,7,7,173,8
     CONTROL         "",IDC_ENCODINGLIST,"SysTreeView32",TVS_SHOWSELALWAYS | TVS_HASBUTTONS | TVS_LINESATROOT | WS_BORDER | WS_TABSTOP,7,19,173,190
     DEFPUSHBUTTON   "OK",IDOK,74,217,50,14,WS_DISABLED
-    PUSHBUTTON      "Cancel",IDCANCEL,130,217,50,14
+    PUSHBUTTON     "キャンセル",IDCANCEL,130,217,50,14
     SCROLLBAR       IDC_RESIZEGRIP,7,221,10,10
 END
 
 IDD_ALIGN DIALOGEX 0, 0, 184, 74
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Align Lines"
+CAPTION "行の整列"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
-    AUTORADIOBUTTON "&Left.",IDC_ALIGN_LEFT,7,7,31,10,WS_GROUP | WS_TABSTOP
-    AUTORADIOBUTTON "&Right.",IDC_ALIGN_RIGHT,7,19,35,10,WS_TABSTOP
-    AUTORADIOBUTTON "&Center.",IDC_ALIGN_CENTER,7,31,41,10,WS_TABSTOP
-    AUTORADIOBUTTON "&Justify.",IDC_ALIGN_JUSTIFY,7,43,40,10,WS_TABSTOP
-    AUTORADIOBUTTON "Justify (&Paragraph mode).",IDC_ALIGN_JUSTIFY_PAR,7,55,124,10,WS_TABSTOP
+    AUTORADIOBUTTON "左端(&L)",IDC_ALIGN_LEFT,7,7,31,10,WS_GROUP | WS_TABSTOP
+    AUTORADIOBUTTON "右端(&R)",IDC_ALIGN_RIGHT,7,19,35,10,WS_TABSTOP
+    AUTORADIOBUTTON "中央(&C)",IDC_ALIGN_CENTER,7,31,41,10,WS_TABSTOP
+    AUTORADIOBUTTON "均等(&J)",IDC_ALIGN_JUSTIFY,7,43,40,10,WS_TABSTOP
+    AUTORADIOBUTTON "均等 (段落モード) (&P)",IDC_ALIGN_JUSTIFY_PAR,7,55,124,10,WS_TABSTOP
     DEFPUSHBUTTON   "OK",IDOK,127,7,50,14
-    PUSHBUTTON      "Cancel",IDCANCEL,127,24,50,14
+    PUSHBUTTON     "キャンセル",IDCANCEL,127,24,50,14
 END
 
 IDD_ZOOMLEVEL DIALOGEX 0, 0, 120, 64
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Zoom Level"
+CAPTION "拡大率"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
-    LTEXT           "Zoom level (10% to 500%):",IDC_STATIC,7,7,106,8
+    LTEXT           "拡大率 (10% to 500%):",IDC_STATIC,7,7,106,8
     COMBOBOX        IDC_ZOOMLEVEL,7,19,50,120,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
-    PUSHBUTTON      "Apply",IDYES,63,18,50,14
+    PUSHBUTTON      "反映",IDYES,63,18,50,14
     DEFPUSHBUTTON   "OK",IDOK,7,43,50,14
-    PUSHBUTTON      "Cancel",IDCANCEL,63,43,50,14
+    PUSHBUTTON     "キャンセル",IDCANCEL,63,43,50,14
 END
 
 IDD_AUTOCOMPLETION DIALOGEX 0, 0, 456, 178
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Auto Completion Settings"
+CAPTION "自動補完の設定"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
-    AUTOCHECKBOX    "Auto indent text.",IDC_AUTO_INDENT_TEXT,7,7,120,10,WS_TABSTOP
-    AUTOCHECKBOX    "Auto close HTML and XML tags.",IDC_AUTO_CLOSE_TAGS,7,19,120,10,WS_TABSTOP
+    AUTOCHECKBOX    "自動インデント(&I)",IDC_AUTO_INDENT_TEXT,7,7,120,10,WS_TABSTOP
+    AUTOCHECKBOX    "自動閉じHTML/XMLタグ(&T)",IDC_AUTO_CLOSE_TAGS,7,19,120,10,WS_TABSTOP
     GROUPBOX        "",IDC_STATIC,7,35,218,82
-    AUTOCHECKBOX    "Auto complete word while typing.",IDC_AUTO_COMPLETE_WORD,14,34,122,10,WS_TABSTOP
-    LTEXT           "Visible item count in auto completion list:",IDC_STATIC,14,46,148,10,SS_RIGHT
+    AUTOCHECKBOX    "文字入力中の単語自動補完(&W)",IDC_AUTO_COMPLETE_WORD,14,34,122,10,WS_TABSTOP
+    LTEXT           "候補に表示する項目数(&C):",IDC_STATIC,14,46,148,10,SS_RIGHT
     EDITTEXT        IDC_AUTOC_VISIBLE_ITEM_COUNT,166,44,50,12,ES_NUMBER | WS_TABSTOP
-    LTEXT           "Minimum length for word:",IDC_STATIC,14,62,148,10,SS_RIGHT
+    LTEXT           "単語の最小文字数(&M):",IDC_STATIC,14,62,148,10,SS_RIGHT
     EDITTEXT        IDC_AUTOC_MIN_WORD_LENGTH,166,60,50,12,ES_NUMBER | WS_TABSTOP
-    LTEXT           "Minimum length for number (without prefix):",IDC_STATIC,14,78,148,10,SS_RIGHT
+    LTEXT           "数値の最小の文字数(演算子除く)(&N):",IDC_STATIC,14,78,148,10,SS_RIGHT
     EDITTEXT        IDC_AUTOC_MIN_NUMBER_LENGTH,166,76,50,12,ES_NUMBER | WS_TABSTOP
-    AUTOCHECKBOX    "Scan words in current document.",IDC_AUTOC_SCAN_DOCUMENT_WORDS,14,92,160,10,WS_TABSTOP
-    AUTOCHECKBOX    "Only trigger auto completion in English IME mode.",IDC_AUTOC_ENGLISH_IME_ONLY,14,104,180,10,WS_TABSTOP
-    GROUPBOX        "Keys used to finish auto completion (use Esc to cancel)",IDC_STATIC,7,123,218,44
-    AUTOCHECKBOX    "Enter",IDC_AUTOC_FILLUP_ENTER,14,135,35,10,WS_TABSTOP
-    AUTOCHECKBOX    "Tab",IDC_AUTOC_FILLUP_TAB,66,135,35,10,WS_TABSTOP
+    AUTOCHECKBOX    "現在の文書中の単語を拾う(&S)",IDC_AUTOC_SCAN_DOCUMENT_WORDS,14,92,160,10,WS_TABSTOP
+    AUTOCHECKBOX    "IMEが英数の場合にだけ自動補完を行う",IDC_AUTOC_ENGLISH_IME_ONLY,14,104,180,10,WS_TABSTOP
+    GROUPBOX        "自動補完確定に使うキー(Escでキャンセル)(&K)",IDC_STATIC,7,123,218,44
+    AUTOCHECKBOX    "Enter(&E)",IDC_AUTOC_FILLUP_ENTER,14,135,35,10,WS_TABSTOP
+    AUTOCHECKBOX    "Tab(&T)",IDC_AUTOC_FILLUP_TAB,66,135,35,10,WS_TABSTOP
     AUTOCHECKBOX    "Space",IDC_AUTOC_FILLUP_SPACE,118,135,35,10,WS_TABSTOP
-    AUTOCHECKBOX    "Punctuation:",IDC_AUTOC_FILLUP_PUNCTUATION,14,152,50,10,WS_TABSTOP
+    AUTOCHECKBOX    "区切り文字(&P):",IDC_AUTOC_FILLUP_PUNCTUATION,14,152,50,10,WS_TABSTOP
     EDITTEXT        IDC_AUTOC_FILLUP_PUNCTUATION_LIST,66,150,150,12,WS_TABSTOP
-    GROUPBOX        "Auto Insert",IDC_STATIC,231,7,218,110
-    AUTOCHECKBOX    ") after typing (.",IDC_AUTO_INSERT_PARENTHESIS,238,19,80,10,WS_TABSTOP
-    AUTOCHECKBOX    "} after typing {.",IDC_AUTO_INSERT_BRACE,238,31,80,10,WS_TABSTOP
-    AUTOCHECKBOX    "] after typring [, except for Smali, Jasmin and javap.",IDC_AUTO_INSERT_SQUARE_BRACKET,238,43,210,10,WS_TABSTOP
-    AUTOCHECKBOX    "> after typing <, when <> is used in generics / template.",IDC_AUTO_INSERT_ANGLE_BRACKET,238,55,210,10,WS_TABSTOP
-    AUTOCHECKBOX    "Double quote (""), when """" is used to quote string / bytes.",IDC_AUTO_INSERT_DOUBLE_QUOTE,238,67,210,10,WS_TABSTOP
-    AUTOCHECKBOX    "Single quote ('), when '' is used to quote string / bytes.",IDC_AUTO_INSERT_SINGLE_QUOTE,238,79,210,10,WS_TABSTOP
-    AUTOCHECKBOX    "Backtick (`).",IDC_AUTO_INSERT_BACKTICK,238,91,80,10,WS_TABSTOP
-    AUTOCHECKBOX    "Space after typing comma (,) when appropriate.",IDC_AUTO_INSERT_SPACE_COMMA,238,103,180,10,WS_TABSTOP
-    GROUPBOX        "Characters used to toggle line comment for Assembler source",IDC_STATIC,231,123,218,26
-    AUTORADIOBUTTON "Semicolon (;)",IDC_ASM_LINE_COMMENT_SEMICOLON,238,135,60,10,WS_GROUP | WS_TABSTOP
+    GROUPBOX        "自動挿入",IDC_STATIC,231,7,218,110
+    AUTOCHECKBOX    ") : ( に対応",IDC_AUTO_INSERT_PARENTHESIS,238,19,80,10,WS_TABSTOP
+    AUTOCHECKBOX    "} : { に対応",IDC_AUTO_INSERT_BRACE,238,31,80,10,WS_TABSTOP
+    AUTOCHECKBOX    "] : [ に対応、Smali, Jasmin, javapを除く",IDC_AUTO_INSERT_SQUARE_BRACKET,238,43,210,10,WS_TABSTOP
+    AUTOCHECKBOX    "> : < に対応、ジェネリック/テンプレートに使用時",IDC_AUTO_INSERT_ANGLE_BRACKET,238,55,210,10,WS_TABSTOP
+    AUTOCHECKBOX    "ダブルクォート ("") 文字列/バイトの引用符に使用時",IDC_AUTO_INSERT_DOUBLE_QUOTE,238,67,210,10,WS_TABSTOP
+    AUTOCHECKBOX    "シングルクォート (') 文字列/バイトの引用符に使用時",IDC_AUTO_INSERT_SINGLE_QUOTE,238,79,210,10,WS_TABSTOP
+    AUTOCHECKBOX    "バッククォート(`).",IDC_AUTO_INSERT_BACKTICK,238,91,80,10,WS_TABSTOP
+    AUTOCHECKBOX    "空白 : カンマ(,)の後に適切なら",IDC_AUTO_INSERT_SPACE_COMMA,238,103,180,10,WS_TABSTOP
+    GROUPBOX        "アセンブリコードの行コメントを切り替える文字(&A)",IDC_STATIC,231,123,218,26
+    AUTORADIOBUTTON "セミコロン(;)",IDC_ASM_LINE_COMMENT_SEMICOLON,238,135,60,10,WS_GROUP | WS_TABSTOP
     AUTORADIOBUTTON "#",IDC_ASM_LINE_COMMENT_SHARP,316,135,22,10,WS_TABSTOP
     AUTORADIOBUTTON "//",IDC_ASM_LINE_COMMENT_SLASH,362,135,22,10,WS_TABSTOP
     AUTORADIOBUTTON "@",IDC_ASM_LINE_COMMENT_AT,408,135,22,10,WS_TABSTOP
     DEFPUSHBUTTON   "OK",IDOK,343,157,50,14
-    PUSHBUTTON      "Cancel",IDCANCEL,399,157,50,14
+    PUSHBUTTON     "キャンセル",IDCANCEL,399,157,50,14
 END
 
 
@@ -1765,199 +1765,199 @@ END
 STRINGTABLE
 BEGIN
     IDS_APPTITLE            "Notepad2"
-    IDS_APPTITLE_ELEVATED   "%s (Administrator)"
-    IDS_APPTITLE_PASTEBOARD "Notepad2: Paste Board"
-    IDS_UNTITLED            "Untitled"
+    IDS_APPTITLE_ELEVATED   "%s (管理者)"
+    IDS_APPTITLE_PASTEBOARD "Notepad2: クリップボード履歴"
+    IDS_UNTITLED            "無題"
     IDS_TITLEEXCERPT        """%s"""
-    IDS_READONLY            "(Read Only)"
-	IDS_LOCKED				"(Locked For Editing)"
-    IDS_DOCPOS              "Ln %s / %s  Col %s / %s  Ch %s / %s  Sel %s / %s  SelLn %s  Fnd %s"
-    IDS_LOADFILE            "Loading ""%s""..."
-    IDS_SAVEFILE            "Saving ""%s""..."
-    IDS_PRINTFILE           "Printing page %s..."
-    IDS_SAVINGSETTINGS      "Saving settings..."
-    IDS_LINKDESCRIPTION     "Edit with Notepad2"
-    IDS_FILTER_ALL          "All Files (*.*)|*.*|"
-    IDS_FILTER_EXE          "Executable Files (*.exe;*.com;*.bat;*.cmd;*.lnk;*.pif)|*.exe;*.com;*.bat;*.cmd;*.lnk;*.pif|All Files (*.*)|*.*|"
+    IDS_READONLY            "(読み取り専用)"
+	IDS_LOCKED				"(編集ロック)"
+    IDS_DOCPOS              "行 %s / %s  列 %s / %s  字 %s / %s  選 %s / %s  選行 %s  見 %s"
+    IDS_LOADFILE            "読み込み中 \"%s\" ..."
+    IDS_SAVEFILE            "保存中 \"%s\" ..."
+    IDS_PRINTFILE           "%s ページを印刷中..."
+    IDS_SAVINGSETTINGS     "設定保存中..."
+    IDS_LINKDESCRIPTION     "Notepad2 で編集"
+    IDS_FILTER_ALL          "すべてのファイル (*.*)|*.*|"
+    IDS_FILTER_EXE          "実行可能ファイル (*.exe;*.com;*.bat;*.cmd;*.lnk;*.pif)|*.exe;*.com;*.bat;*.cmd;*.lnk;*.pif|すべてのファイル (*.*)|*.*|"
 END
 
 STRINGTABLE
 BEGIN
-	IDS_BACKSLASHHELP		"Backslash Transformations\n\n\
-\\a\tAlert (BEL, ASCII 7)\n\
-\\b\tBackspace (BS, ASCII 8)\n\
-\\e\tEscape (ESC, ASCII 27 / 1B)\n\
-\\f\tFormfeed (FF, ASCII 12 / 0C)\n\
-\\n\tNewline (LF, ASCII 10 / 0A)\n\
-\\r\tCarriage return (CR, ASCII 13 / 0D)\n\
-\\t\tHorizontal Tab (HT, ASCII 9)\n\
-\\v\tVertical Tab (VT, ASCII 11 / 0B)\n\
-\\ooo\tOctal Value\n\
-\\uHHHH\tHexadecimal Value\n\
-\\xHH\tHexadecimal Value\n\
-\\\\\tBackslash"
+	IDS_BACKSLASHHELP		"バックスラッシュ変換\n\n\
+\\a\tアラート (BEL, ASCII 7, ベル)\n\
+\\b\tバックスペース (BS, ASCII 8)\n\
+\\e\tエスケープ (ESC, ASCII 27 / 1B)\n\
+\\f\t改ページ (FF, ASCII 12 / 0C)\n\
+\\n\t改行文字 (LF, ASCII 10 / 0A)\n\
+\\r\t復帰文字 (CR, ASCII 13 / 0D, キャリッジリターン)\n\
+\\t\tタブ Tab (HT, ASCII 9)\n\
+\\v\t垂直タブ (VT, ASCII 11 / 0B)\n\
+\\ooo\t8進数表記\n\
+\\uHHHH\t16進数表記\n\
+\\xHH\t16進数表記\n\
+\\\\\tバックスラッシュ自体"
 
-	IDS_REGEXPHELP			"RegExp Syntax (Single Lines Only)\n\n\
-.\tAny character\n\
-^\tStart of a line\n\
-$\tEnd of a line\n\
-\\<\tStart of a word\n\
-\\>\tEnd of a word\n\
-[...]\tA set of characters ([abc]) or a range ([a-z])\n\
-[^...]\tCharacters NOT in the set or range\n\
-\\d\tAny decimal digit\n\
-\\D\tAny non-digit character\n\
-\\s\tAny whitespace character\n\
-\\S\tAny non-whitespace character\n\
-\\w\tAny ""word"" character\n\
-\\W\tAny ""non-word"" character\n\
-\\x\tEscape character with otherwise special meaning\n\
-\\xHH\tCharacter with hexadecimal code HH\n\
-?\tMatches preceding 0 or 1 times\n*\tMatches preceding 0 or more times\n\
-+\tMatches preceding 1 or more times\n\
-*? or +?\tNon-greedy matching of quantifiers ""?"" and ""+""\n\
-(\tStart of a region\n\
-)\tEnd of a region\n\
-\\n\tRefers to a region when replacing (n is 1-9)\n\n\
-Experimental Syntax:\n\
-\\h\tStart of a word, according to IsWordStartAt()\n\
-\\H\tEnd of a word, according to IsWordEndAt()\n\
-\\i\tMatches 1 or more characters to the end of a word\n\
-\\i?\tMatches 0 or more characters to the end of a word"
+	IDS_REGEXPHELP			"正規表現の構文 (単一行のみ)\n\n\
+.\t何らかの1文字\n\
+^\t行の先頭\n\
+$\t行の末尾\n\
+\\<\t単語の先頭\n\
+\\>\t単語の末尾\n\
+[...]\t指定した文字群 ([abc]) または - で範囲\n\
+[^...]\t上記で指定した文字ではない(^で除外)\n\
+\\d\t10進数1文字(半角数字)\n\
+\\D\t10進数ではない(上記以外)\n\
+\\s\t空白文字(何らかの)\n\
+\\S\t空白文字ではない(上記以外)\n\
+\\w\t言葉の1文字(日本語含む)\n\
+\\W\t非言語文字(上記以外)\n\
+\\x\t下記用のエスケープ文字\n\
+\\xHH\t16進コードHHで1文字\n\
+?\t直前文字0回か1回に合致\n*\t直前文字0回以上の繰り返し\n\
++\t直前文字1回以上の繰り返し\n\
+*? か +?\t上記記号の ""?"" と ""+"" を最長合致ではなくする\n\
+(\t範囲指定の括弧開始\n\
+)\t範囲指定の閉じ括弧\n\
+\\n\t置換時に対応括弧内の文字列を呼出 (n は 1-9)\n\n\
+試験段階の構文:\n\
+\\h\tIsWordStartAt() による単語の開始\n\
+\\H\tIsWordEndAt() による単語の終わり\n\
+\\i\t単語の終わりまで1文字以上に合致\n\
+\\i?\t同 0文字以上に合致""
 
-	IDS_WILDCARDHELP		"Wildcard Search\n\n\
-*\tMatches zero or more characters.\n\
-?\tMatches exactly one character. "
+	IDS_WILDCARDHELP		"ワイルドカード検索\n\n\
+*\t0文字以上の文字列に合致\n\
+?\tちょうど1文字に合致 "
 END
 
 STRINGTABLE
 BEGIN
-    IDS_FILTER_INI          "Configuration Files (*.ini)|*.ini|All Files (*.*)|*.*|"
-    IDS_OPENWITH            "Select the directory with links to your favorite applications."
-    IDS_FAVORITES           "Select the directory with links to your favorite files."
+    IDS_FILTER_INI          "設定ファイル (*.ini)|*.ini|すべてのファイル (*.*)|*.*|"
+    IDS_OPENWITH            "開きたいプログラムがあるフォルダを指定してください。"
+    IDS_FAVORITES           "お気に入りのフォルダを指定してください。"
 END
 
 STRINGTABLE
 BEGIN
-    IDT_FILE_NEW            "New"
-    IDT_FILE_OPEN           "Open"
-    IDT_FILE_BROWSE         "Browse"
-    IDT_FILE_SAVE           "Save"
-    IDT_EDIT_UNDO           "Undo"
-    IDT_EDIT_REDO           "Redo"
-    IDT_EDIT_CUT            "Cut"
-    IDT_EDIT_COPY           "Copy"
-    IDT_EDIT_PASTE          "Paste"
-    IDT_EDIT_FIND           "Find"
-    IDT_EDIT_REPLACE        "Replace"
-    IDT_VIEW_WORDWRAP       "Word Wrap"
-    IDT_VIEW_ZOOMIN         "Zoom In"
-    IDT_VIEW_ZOOMOUT        "Zoom Out"
-    IDT_VIEW_SCHEME         "Select Scheme"
-    IDT_VIEW_SCHEMECONFIG   "Customize Schemes"
-    IDT_FILE_EXIT           "Exit"
-    IDT_FILE_SAVEAS         "Save As"
-    IDT_FILE_SAVECOPY       "Save Copy"
-    IDT_EDIT_DELETE         "Delete"
-    IDT_FILE_PRINT          "Print"
-    IDT_FILE_OPENFAV        "Favorites"
-    IDT_FILE_ADDTOFAV       "Add to Favorites"
-    IDT_VIEW_TOGGLEFOLDS    "Toggle Folds"
-    IDT_FILE_LAUNCH         "Execute Document"
+    IDT_FILE_NEW            "新規"
+    IDT_FILE_OPEN           "開く"
+    IDT_FILE_BROWSE         "ファイラで開く"
+    IDT_FILE_SAVE           "保存"
+    IDT_EDIT_UNDO           "元に戻す"
+    IDT_EDIT_REDO           "やり直し"
+    IDT_EDIT_CUT            "切り取り"
+    IDT_EDIT_COPY           "コピー"
+    IDT_EDIT_PASTE          "貼り付け"
+    IDT_EDIT_FIND           "検索"
+    IDT_EDIT_REPLACE        "置換"
+    IDT_VIEW_WORDWRAP       "右端で折り返す"
+    IDT_VIEW_ZOOMIN         "拡大"
+    IDT_VIEW_ZOOMOUT        "縮小"
+    IDT_VIEW_SCHEME         "文書の種類を選択"
+    IDT_VIEW_SCHEMECONFIG   "配色の編集"
+    IDT_FILE_EXIT           "終了"
+    IDT_FILE_SAVEAS         "名前を付けて保存"
+    IDT_FILE_SAVECOPY       "コピーして保存"
+    IDT_EDIT_DELETE         "削除"
+    IDT_FILE_PRINT          "印刷"
+    IDT_FILE_OPENFAV        "お気に入り"
+    IDT_FILE_ADDTOFAV       "お気に入りに追加"
+    IDT_VIEW_TOGGLEFOLDS    "折りたたみの切り替え"
+    IDT_FILE_LAUNCH         "開いている文書を実行"
 END
 
 STRINGTABLE
 BEGIN
-    IDS_ERR_LOADFILE        "Error loading ""%s""."
-    IDS_ERR_SAVEFILE        "Error saving ""%s""."
-    IDS_ERR_BROWSE          "No file browser plugin was found.\nThe metapath file browser plugin can be downloaded from\nhttps://github.com/zufuliu/notepad2/releases.\n\nOpen download page?"
-    IDS_ERR_MRUDLG          "No access to the selected file!\nWould you like to remove it from the list?"
-    IDS_ERR_CREATELINK      "Error creating the Desktop link."
-    IDS_ERR_PREVWINDISABLED "Existing Notepad2 window is busy or has an active dialog box.\nWould you like to open another Notepad2 window?"
-    IDS_SELRECT             "This operation can't be perfomed within a rectangular selection."
-    IDS_BUFFERTOOSMALL      "This operation can't be performed (lines too long)."
-    IDS_FIND_WRAPFW         "Reached the end of the document, restarting search at the beginning."
-    IDS_FIND_WRAPRE         "Reached the beginning of the document, restarting search at the end."
-    IDS_NOTFOUND            "The specified text was not found."
-    IDS_REPLCOUNT           "%s occurrences of the specified text have been replaced."
-    IDS_ASK_ENCODING        "Switching the file encoding from ANSI to non-ANSI (and vice versa) may replace unsupported text with default characters, and the undo history will be cleared. Continue?"
-    IDS_ASK_ENCODING2       "You are about to change the encoding of an empty file from ANSI to non-ANSI. Note that this will clear the undo history, as it can't be synchronized with the new encoding. Continue?"
-    IDS_ERR_ENCODINGNA      "Code page conversion tables for the selected encoding are not available on your system."
-    IDS_ERR_UNICODE         "Error converting this Unicode file.\nData will be lost if the file is saved!"
-	IDS_BINARY_FILE_LOCKED	"This is most likely not a text file, so it is locked for editing\nto prevent accidental editing cause file corruption."
+    IDS_ERR_LOADFILE        "読込失敗 \"%s\""
+    IDS_ERR_SAVEFILE        "保存失敗 \"%s\""
+    IDS_ERR_BROWSE          "ファイラーのプラグインがありません。\nこのプラグイン metapath は https://github.com/zufuliu/notepad2/releases でダウンロードできます。\nこのサイトを開きますか？"
+    IDS_ERR_MRUDLG          "選択したファイルにアクセスできませんでした。\n一覧から消去しますか？"
+    IDS_ERR_CREATELINK      "デスクトップへのショートカット作成時にエラーが発生しました。"
+    IDS_ERR_PREVWINDISABLED "現在 Notepad2 のウィンドウはビジー状態か､ダイアログが出たままのようです。\n新しいウィンドウを開きますか？"
+    IDS_SELRECT             "この操作は矩形選択では使えません"
+    IDS_BUFFERTOOSMALL      "この操作は実行できません。行が長すぎます。"
+    IDS_FIND_WRAPFW         "文書の最後に到達しました。先頭から検索しますか？"
+    IDS_FIND_WRAPRE         "文書の先頭に到達しました。終端から検索しますか？"
+    IDS_NOTFOUND            "指定の文字列は見つかりませんでした。"
+    IDS_REPLCOUNT           "%s か所の指定の文字列を置換しました。"
+    IDS_ASK_ENCODING        "文字コードを ANSI から 非ANCI へと変換すると (その逆も)、未対応の文字は所定の文字に置換され、また「元に戻す」の履歴も消去されます。\n続行しますか？"
+    IDS_ASK_ENCODING2       "空のファイルの文字コードを ANSI から 非ANCI へと変更しようとしています。引き継げないので「元に戻す」の履歴が消去されます。\n続行しますか？"
+    IDS_ERR_ENCODINGNA      "このパソコンでは、選択した文字コード用のコードページ変換テーブルが利用できません。"
+    IDS_ERR_UNICODE         "Unicode への変換中にエラーが発生しました。\nファイルを保存するとデータが失われます！"
+	IDS_BINARY_FILE_LOCKED	"テキストファイルではない可能性が高いため、編集ロックしました。\n誤って編集し、ファイルが破損することを防ぎます。"
 #if NP2_ENABLE_APP_LOCALIZATION_DLL
-	IDS_CHANGE_LANG_RESTART	"Changing the UI language requires a restart of Notepad2, restart now?"
+	IDS_CHANGE_LANG_RESTART	"表示言語の変更には Notepad2 の再起動が必要です。\n今すぐ再起動しますか？"
 #endif
 END
 
 STRINGTABLE
 BEGIN
-	IDS_CMDLINEHELP			"Command Line Help\n\n\
-file\tMust be the last argument, no quoted spaces by default.\n\
-+\tAccept multiple file arguments (with quoted spaces).\n\
--\tAccept single file argument (without quoted spaces).\n\
-…\tEncoding (/ansi, /unicode, /unicodele, /unicodebe,\n\
+	IDS_CMDLINEHELP			"コマンドラインのヘルプ\n\n\
+ファイル\t対パス可能. 最後の引数にする必要がある.\n\
++\tデフォルトでは空白があっても引用符は不要.\n\
+-\t複数のファイルの引数を許容 (要・引用符)\n\
+…\t文字コード (/ansi, /unicode, /unicodele, /unicodebe,\n\
 …\t/utf8, /utf8sig, /utf8bom, /utf16, /utf16le, /utf16be).\n\
-…\tLine ending mode (/crlf, /lf, /cr).\n\
-/e encoding\tFile source encoding.\n\
-/g line[,column]\tJump to specified position (/g -1 end of file).\n\
-/m text\tMatch specified text (/m- last, /mr regex, /mb backslash).\n\
-/l[o|p]\tAuto-reload modified files.\n\
-/q\tForce creation of new files without prompt.\n\
-/s name\tSelect specified syntax scheme.\n\
-/d\tSelect Text File scheme.\n\
-/h\tSelect Web Source Code scheme.\n\
-/x\tSelect XML Document scheme.\n\
-/c\tOpen new window and paste clipboard contents.\n\
-/b\tOpen new paste board to collect clipboard entries.\n\
-/n\tAlways open a new window (/ns single file instance).\n\
-/r\tReuse window (/rs single file instance).\n\
-/p\tSet window position and size (/p0, /ps, /pf,l,t,r,b,m).\n\
-/t title\tSet window title.\n\
-/i\tStart as tray icon.\n\
-/o\tKeep window on top.\n\
-/f path\tSpecify ini-file (/f0 no ini-file).\n\
-/u\tLaunch with elevated privileges (run as Administrator).\n\
-/z\tSkip next (usable for registry-based Notepad replacement)."
+…\t改行コード (/crlf, /lf, /cr).\n\
+/e 文字コード\tファイルの文字コードを指定\n\
+/g 行[,列]\t指定位置にジャンプ (/g 行[,列] -1で終端)\n\
+/m 文字列\t文字列一致 (/m- 最後, /mr 正規表現, /mb バックスラッシュ変換)\n\
+/l[o|p]\tファイル変更時に自動で最新内容に再読み込み\n\
+/q\tファイルがない場合、問い合わせずファイル作成\n\
+/s 設定名\t配色設定を指定 [/s ext]\n\
+/d\tテキストファイルの配色を指定\n\
+/h\tWEBソースコードの配色を指定\n\
+/x\tXML文書の配色を指定\n\
+/c\t新規ウインドウを開きクリップボードの内容を貼り付け
+/b\tクリップボード履歴表示モードで開く\n\
+/n\t新規ウィンドウで開く (/ns ファイルは単一のインスタンス)\n\
+/r\tひとつウインドウを再利用 (/rs 同じく単一のインスタンス\n\
+/p\tウィンドウの位置とサイズを指定  (/p0, /ps, /pf,l,t,r,b,m).\n\
+/t タイトル\tタイトルバーの文字列を指定 [/t text]\n\
+/i\tシステムトレイ内に起動\n\
+/o\t常に手前に表示\n\
+/f パス\t設定ファイルを指定 (/f0 設定不使用)\n\
+/u\t管理者権限で実行\n\
+/z\t「次へ」を省略(レジストリでメモ帳を置換している際に有効化)""
 END
 
 STRINGTABLE
 BEGIN
-    IDS_ERR_UNICODE2        "Certain characters in the current text are not supported by the selected encoding, and may be replaced by default placeholders when saving. It's recommended to choose another file encoding. Continue?"
-    IDS_WARNLOADBIGFILE     "Loading file: %s\n\nThis file is too large (%s, %s bytes) to open.\nCurrently maximum loadable file size is %s (%s bytes)."
-    //IDS_ERR_DROP            "Only one file can be dropped at the same time!"
-    IDS_ASK_SAVE            "Save changes to ""%s""?"
-    IDS_ASK_REVERT          "Revert file to last saved state? Your changes will be lost!"
-    IDS_ASK_RECODE          "Recoding requires reloading file from disk, unsaved changes will be lost!"
-    IDS_ASK_CREATE          """%s"" not found.\nWould you like to create this file?"
-    IDS_PRINT_HEADER        "Filename, Current Date and Time|Filename, Current Date|Filename|Leave blank"
-    IDS_PRINT_FOOTER        "Page Number|Leave blank"
-    IDS_PRINT_COLOR         "Normal|Invert light (dark background)|Black on white|Color on white|Color on white (except line numbers)|Current screen color (WYSIWYG)"
-    IDS_PRINT_PAGENUM       "Page %s"
-    IDS_PRINT_EMPTY         "This document doesn't contain any text to be printed."
-    IDS_PRINT_ERROR         "Error printing ""%s""!"
-    IDS_FAV_SUCCESS         "A shortcut to the current file has been created in the favorites directory."
-    IDS_FAV_FAILURE         "The shortcut to the current file could not be created.\nMake sure there's no other file with the same name."
-    IDS_READONLY_MODIFY     "The attributes of ""%s"" could not be modified."
+    IDS_ERR_UNICODE2        "現在の文書に含まれる一部の文字が、選択した文字コードに対応していません。保存した場合、所定の文字に置換される可能性があります。他の文字コードを推奨します。\n変換を続行しますか？"
+    IDS_WARNLOADBIGFILE     "ファイル読込: %s\n\n開くには巨大すぎるファイルです。 (%s, %s バイト)\n読込可能な最大ファイルサイズ %s (%s バイト)"
+    //IDS_ERR_DROP            "一度にひとつのファイルしかドロップできません。"
+    IDS_ASK_SAVE            "「%s」\nの編集を保存しますか？"
+    IDS_ASK_REVERT          "最後に保存された内容で再読み込みします。それ以降の変更内容は失われますがよろしいですか？"
+    IDS_ASK_RECODE          "読み直しはファイルを再読み込みするため、変更内容は失われます。続行しますか？"
+    IDS_ASK_CREATE          "「%s」は存在しません。\nこのファイルを作成しますか？"
+    IDS_PRINT_HEADER        "ファイル名, 現在の日付と時刻|ファイル名, 現在の日付|ファイル名|空欄とする"
+    IDS_PRINT_FOOTER        "ページ番号|空欄とする"
+    IDS_PRINT_COLOR         "通常|明るさの反転 (暗い背景)|白背景に黒|白背景にカラー|白背景にカラー (行番号以外)|モニタ通りの見ている色 (WYSIWYG)"
+    IDS_PRINT_PAGENUM       "%s ページ"
+    IDS_PRINT_EMPTY         "この文書には、印刷のための文章が含まれていません。"
+    IDS_PRINT_ERROR         "印刷失敗 \"%s\""
+    IDS_FAV_SUCCESS         "このファイルへのショートカットが、お気に入りフォルダ内に作成されました。"
+    IDS_FAV_FAILURE         "このファイルへのショートカットは作成できませんでした。\n同じ名前の他のファイルがないことを確認してください。"
+    IDS_READONLY_MODIFY     "「%s」の属性を変更できませんでした。"
 END
 
 STRINGTABLE
 BEGIN
-    IDS_READONLY_SAVE       """%s"" is read only. Save to a different file?"
-    IDS_FILECHANGENOTIFY    "The current file has been modified by an external program. Reload?"
-    IDS_FILECHANGENOTIFY2   "The current file has been deleted. Save now?"
-    IDS_SAVEDSETTINGS       "The current program settings have been saved."
-    IDS_CREATEINI_FAIL      "Error creating configuration file."
-    IDS_WRITEINI_FAIL       "Error writing settings to configuration file."
-    IDS_SETTINGSNOTSAVED    "No existing configuration file was found.\nTo keep your style modifications, save settings now (F7) or go back to scheme configuration (Ctrl+F12) and export your styles."
-    IDS_EXPORT_FAIL         "Error exporting style settings to ""%s""."
+    IDS_READONLY_SAVE       "「%s」 は読み取り専用です。別のファイル名で保存しますか？"
+    IDS_FILECHANGENOTIFY    "ファイルが他のプログラムによって変更されました。再読み込みしますか？"
+    IDS_FILECHANGENOTIFY2   "ファイルが削除されました。保存しますか？"
+    IDS_SAVEDSETTINGS       "設定が保存されました。"
+    IDS_CREATEINI_FAIL      "設定ファイルの作成に失敗しました。"
+    IDS_WRITEINI_FAIL       "設定ファイルへの書き込みに失敗しました。"
+    IDS_SETTINGSNOTSAVED    "設定ファイルがありません。\n配色の変更を保つには、すぐに設定を保存するか(F7)、配色の設定(Ctrl+F12)から配色設定をエクスポートしてください。"
+    IDS_EXPORT_FAIL         "「%s」への配色設定のエクスポートに失敗しました。"
 END
 
 STRINGTABLE
 BEGIN
     IDS_GOOGLE_SEARCH_URL   "https://www.google.com/search?q=%s"
     IDS_BING_SEARCH_URL     "https://www.bing.com/search?q=%s"
-    IDS_WIKI_SEARCH_URL     "https://en.wikipedia.org/wiki/Special:Search?search=%s"
+    IDS_WIKI_SEARCH_URL     "https://ja.wikipedia.org/wiki/Special:Search?search=%s"
 END
 
 // encoding name string format: 'long descriptive name on Select Encoding dialog' + ';' + 'short name on statusbar'
@@ -1965,115 +1965,115 @@ STRINGTABLE
 BEGIN
 	IDS_ENCODING_ANSI				"ANSI;ANSI"
 	IDS_ENCODING_OEM				"OEM;OEM"
-	IDS_ENCODING_UTF16LE_BOM		"UTF-16LE with BOM;UTF-16LE BOM"
-	IDS_ENCODING_UTF16BE_BOM		"UTF-16BE with BOM;UTF-16BE BOM"
+	IDS_ENCODING_UTF16LE_BOM		"UTF-16LE BOM;UTF-16LE BOM"
+	IDS_ENCODING_UTF16BE_BOM		"UTF-16BE BOM;UTF-16BE BOM"
 	IDS_ENCODING_UTF16LE			"UTF-16LE;UTF-16LE"
 	IDS_ENCODING_UTF16BE			"UTF-16BE;UTF-16BE"
 	IDS_ENCODING_UTF8				"UTF-8;UTF-8"
-	IDS_ENCODING_UTF8BOM			"UTF-8 with BOM;UTF-8 BOM"
+	IDS_ENCODING_UTF8BOM			"UTF-8 BOM;UTF-8 BOM"
 	IDS_ENCODING_UTF7				"UTF-7;UTF-7"
 	IDS_ENCODING_DOS720				"Transparent ASMO (DOS-720);DOS-720"					// Arabic
-	IDS_ENCODING_ISO8859_6			"ISO 8859-6 (Visual Order);ISO 8859-6"					// Arabic
-	IDS_ENCODING_ISO8859_6I			"ISO 8859-6-I (Logical Order);ISO 8859-6-I"				// Arabic
+	IDS_ENCODING_ISO8859_6			"ISO 8859-6 (覚順);ISO 8859-6"					// Arabic
+	IDS_ENCODING_ISO8859_6I			"ISO 8859-6-I (論理順);ISO 8859-6-I"				// Arabic
 	IDS_ENCODING_WINDOWS1256		"Windows-1256;Windows-1256"								// Arabic
-	IDS_ENCODING_DOS775				"OEM Baltic (DOS-775);DOS-775"							// Baltic Northern European
-	IDS_ENCODING_ISO8859_4			"Baltic (Latin-4, ISO 8859-4);ISO 8859-4"				// Baltic Northern European
-	IDS_ENCODING_WINDOWS1257		"ANSI Baltic (Windows-1257);Windows-1257"				// Baltic Northern European
-	IDS_ENCODING_DOS852				"OEM Latin-2 (DOS-852);DOS-852"							// Central European
-	IDS_ENCODING_ISO8859_2			"Latin-2 (ISO 8859-2);ISO 8859-2"						// Central European
-	IDS_ENCODING_MAC_LATIN2			"Mac Latin-2;Mac Latin-2"								// Central European
-	IDS_ENCODING_WINDOWS1250		"Latin-2 (Windows-1250);Windows-1250"					// Central European
-	IDS_ENCODING_GBK				"Simplified Chinese (GBK, GB2312);GBK"					// Chinese
-	IDS_ENCODING_GB18030			"Simplified Chinese (GB18030);GB18030"					// Chinese
-	IDS_ENCODING_BIG5				"Traditional Chinese (Big5, Big5-HKSCS);Big5"			// Chinese
-	IDS_ENCODING_MAC_CROATIAN		"Mac Croatian;Mac Croatian"								// Southeast European
-	IDS_ENCODING_DOS866				"OEM Russian (DOS-866);DOS-866"							// Cyrillic
+	IDS_ENCODING_DOS775				"OEM バルト言語 (DOS-775);DOS-775"							// Baltic Northern European
+	IDS_ENCODING_ISO8859_4			"バルト言語 (ラテン4, ISO 8859-4);ISO 8859-4"				// Baltic Northern European
+	IDS_ENCODING_WINDOWS1257		"ANSI バルト言語 (Windows-1257);Windows-1257"				// Baltic Northern European
+	IDS_ENCODING_DOS852				"OEM ラテン2 (DOS-852);DOS-852"							// Central European
+	IDS_ENCODING_ISO8859_2			"ラテン2 (ISO 8859-2);ISO 8859-2"						// Central European
+	IDS_ENCODING_MAC_LATIN2			"Mac ラテン2;Mac ラテン2"								// Central European
+	IDS_ENCODING_WINDOWS1250		"ラテン2 (Windows-1250);Windows-1250"					// Central European
+	IDS_ENCODING_GBK				"簡体字中国語 (GBK, GB2312);GBK"					// Chinese
+	IDS_ENCODING_GB18030			"簡体字中国語 (GB18030);GB18030"					// Chinese
+	IDS_ENCODING_BIG5				"繁体字中国語 (Big5, Big5-HKSCS);Big5"			// Chinese
+	IDS_ENCODING_MAC_CROATIAN		"Mac クロアチア;Mac クロアチア"								// Southeast European
+	IDS_ENCODING_DOS866				"OEM ロシア (DOS-866);DOS-866"							// Cyrillic
 	IDS_ENCODING_ISO8859_5			"ISO 8859-5;ISO 8859-5"									// Cyrillic
-	IDS_ENCODING_KOI8_R				"Russian (KOI8-R);KOI8-R"								// Cyrillic
-	IDS_ENCODING_KOI8_U				"Ukrainian (KOI8-U);KOI8-U"								// Cyrillic
-	IDS_ENCODING_MAC_CYRILLIC		"Mac Cyrillic;Mac Cyrillic"								// Cyrillic
+	IDS_ENCODING_KOI8_R				"ロシア (KOI8-R);KOI8-R"								// Cyrillic
+	IDS_ENCODING_KOI8_U				"ウクライナ (KOI8-U);KOI8-U"								// Cyrillic
+	IDS_ENCODING_MAC_CYRILLIC		"Mac キリル;Mac キリル"								// Cyrillic
 	IDS_ENCODING_WINDOWS1251		"Windows-1251;Windows-1251"								// Cyrillic
-	IDS_ENCODING_ISO8859_13			"Estonian (Baltic Rim, Latin-7, ISO 8859-13);ISO 8859-13"// Northern European
-	IDS_ENCODING_DOS863				"OEM French Canadian (DOS-863);DOS-863"					// Western European
-	IDS_ENCODING_DOS737				"OEM Greek (DOS-737);DOS-737"							// Greek
+	IDS_ENCODING_ISO8859_13			"エストニア語 (バルト系 ラテン7, ISO 8859-13);ISO 8859-13"// Northern European
+	IDS_ENCODING_DOS863				"OEM 仏系カナダ (DOS-863);DOS-863"					// Western European
+	IDS_ENCODING_DOS737				"OEM ギリシャ語 (DOS-737);DOS-737"							// Greek
 	IDS_ENCODING_ISO8859_7			"ISO 8859-7;ISO 8859-7"									// Greek
-	IDS_ENCODING_MAC_GREEK			"Mac Greek;Mac Greek"									// Greek
+	IDS_ENCODING_MAC_GREEK			"Mac ギリシャ語;Mac ギリシャ"									// Greek
 	IDS_ENCODING_WINDOWS1253		"Windows-1253;Windows-1253"								// Greek
-	IDS_ENCODING_DOS869				"OEM Modern Greek (DOS-869);DOS-869"					// Greek
-	IDS_ENCODING_DOS862				"OEM Hebrew (DOS-862);DOS-862"							// Hebrew
-	IDS_ENCODING_ISO8859_8I			"ISO 8859-8-I (Logical Order);ISO 8859-8-I"				// Hebrew
-	IDS_ENCODING_ISO8859_8			"ISO 8859-8 (Visual Order);ISO 8859-8"					// Hebrew
-	IDS_ENCODING_MAC_HEBREW			"Mac Hebrew;Mac Hebrew"									// Hebrew
+	IDS_ENCODING_DOS869				"OEM 近代ギリシャ語 (DOS-869);DOS-869"					// Greek
+	IDS_ENCODING_DOS862				"OEM ヘブライ語 (DOS-862);DOS-862"							// Hebrew
+	IDS_ENCODING_ISO8859_8I			"ISO 8859-8-I (論理順);ISO 8859-8-I"				// Hebrew
+	IDS_ENCODING_ISO8859_8			"ISO 8859-8 (覚順);ISO 8859-8"					// Hebrew
+	IDS_ENCODING_MAC_HEBREW			"Mac ヘブライ語;Mac ヘブライ"									// Hebrew
 	IDS_ENCODING_WINDOWS1255		"Windows-1255;Windows-1255"								// Hebrew
-	IDS_ENCODING_DOS861				"OEM Icelandic (DOS-861);DOS-861"						// Northern European
-	IDS_ENCODING_MAC_ICELANDIC		"Mac Icelandic;Mac Icelandic"							// Northern European
-	IDS_ENCODING_ISO2022_JP			"ISO 2022 (no halfwidth Katakana);ISO-2022-JP"			// Japanese
+	IDS_ENCODING_DOS861				"OEM アイスランド (DOS-861);DOS-861"						// Northern European
+	IDS_ENCODING_MAC_ICELANDIC		"Mac アイスランド;Mac アイスランド"							// Northern European
+	IDS_ENCODING_ISO2022_JP			"ISO 2022 (半角カタカナなし);ISO-2022-JP"			// Japanese
 	IDS_ENCODING_SHIFT_JIS			"Shift-JIS;Shift-JIS"									// Japanese
 	IDS_ENCODING_JOHAB				"Johab;Johab"											// Korean
-	IDS_ENCODING_UHC				"Unified Hangul Code;UHC"								// Korean
-	IDS_ENCODING_ISO8859_3			"Southern European (Latin-3, ISO 8859-3);ISO 8859-3"	// Southern European
-	IDS_ENCODING_ISO8859_15			"Latin-9 (ISO 8859-15);ISO 8859-15"						// Western European
-	IDS_ENCODING_ISO8859_10			"Nordic (Latin-6, ISO 8859-10);ISO 8859-10"				// Northern European
-	IDS_ENCODING_EUC_JP				"EUC Japanese;EUC-JP"									// Japanese
-	IDS_ENCODING_EUC_KR				"EUC Korean;EUC-KR"										// Korean
-	IDS_ENCODING_ISO8859_16			"South-Eastern European (Latin-10, ISO 8859-16);ISO 8859-16"// South-Eastern European
-	IDS_ENCODING_ISO8859_14			"Celtic (Latin-8, ISO 8859-14);ISO 8859-14"				// Western European
-	IDS_ENCODING_MAC_THAI			"Mac Thai;Mac Thai"										// Southeast Asia
-	IDS_ENCODING_TIS620				"Thai (TIS-620, Windows-874, ISO 8859-11);TIS-620"		// Southeast Asia
-	IDS_ENCODING_DOS857				"OEM Turkish (DOS-857);DOS-857"							// Turkish
-	IDS_ENCODING_ISO8859_9			"Latin-5 (ISO 8859-9);ISO 8859-9"						// Turkish
-	IDS_ENCODING_MAC_TURKISH		"Mac Turkish;Mac Turkish"								// Turkish
+	IDS_ENCODING_UHC				"統合ハングルコード;UHC"								// Korean
+	IDS_ENCODING_ISO8859_3			"南欧 (ラテン3, ISO 8859-3);ISO 8859-3"	// Southern European
+	IDS_ENCODING_ISO8859_15			"ラテン9 (ISO 8859-15);ISO 8859-15"						// Western European
+	IDS_ENCODING_ISO8859_10			"北欧 (ラテン6, ISO 8859-10);ISO 8859-10"				// Northern European
+	IDS_ENCODING_EUC_JP				"EUC 日本語;EUC-JP"									// Japanese
+	IDS_ENCODING_EUC_KR				"EUC 韓国語;EUC-KR"										// Korean
+	IDS_ENCODING_ISO8859_16			"南東欧 (ラテン10, ISO 8859-16);ISO 8859-16"// South-Eastern European
+	IDS_ENCODING_ISO8859_14			"ケルト語 (ラテン8, ISO 8859-14);ISO 8859-14"				// Western European
+	IDS_ENCODING_MAC_THAI			"Mac タイ語;Mac タイ"										// Southeast Asia
+	IDS_ENCODING_TIS620				"タイ語 (TIS-620, Windows-874, ISO 8859-11);TIS-620"		// Southeast Asia
+	IDS_ENCODING_DOS857				"OEM トルコ語 (DOS-857);DOS-857"							// Turkish
+	IDS_ENCODING_ISO8859_9			"ラテン5 (ISO 8859-9);ISO 8859-9"						// Turkish
+	IDS_ENCODING_MAC_TURKISH		"Mac トルコ語;Mac トルコ"								// Turkish
 	IDS_ENCODING_WINDOWS1254		"Windows-1254;Windows-1254"								// Turkish
-	IDS_ENCODING_MAC_UKRAINIAN		"Mac Ukrainian;Mac Ukrainian"							// Cyrillic
-	IDS_ENCODING_WINDOWS1258		"Vietnamese (Windows-1258);Windows-1258"				// Southeast Asia
-	IDS_ENCODING_DOS850				"OEM Latin-1 (DOS-850);DOS-850"							// Western European
-	IDS_ENCODING_ISO8859_1			"Latin-1 (ISO 8859-1);ISO 8859-1"						// Western European
-	IDS_ENCODING_MAC_ROMAN			"Mac Roman;Mac Roman"									// Western European
-	IDS_ENCODING_WINDOWS1252		"Latin-1 (Windows-1252);Windows-1252"					// Western European
-	IDS_ENCODING_IBM037				"US-Canada (IBM037);EBCDIC (US-Canada)"					// EBCDIC
-	IDS_ENCODING_IBM1140			"US-Canada + Euro Symbol (IBM1140);EBCDIC (US-Canada Euro)"// EBCDIC
-	IDS_ENCODING_IBM500				"International (IBM500);EBCDIC (Intl.)"					// EBCDIC
-	IDS_ENCODING_IBM870				"Latin-2 (IBM870);EBCDIC (Latin-2)"						// EBCDIC
-	IDS_ENCODING_CP875				"Greek Modern (CP875);EBCDIC (Greek)"					// EBCDIC
-	IDS_ENCODING_IBM1026			"Turkish (Latin-5) (IBM1026);EBCDIC (Latin-5)"			// EBCDIC
-	IDS_ENCODING_DOS437				"OEM United States (DOS-437);DOS-437"					// Western European
-	IDS_ENCODING_DOS858				"OEM Latin-1 + Euro Symbol (DOS-858);DOS-858"			// Western European
-	IDS_ENCODING_DOS860				"OEM Portuguese (DOS-860);DOS-860"						// Western European
-	IDS_ENCODING_MAC_ARABIC			"Mac Arabic;Mac Arabic"									// Arabic
-	IDS_ENCODING_DOS864				"OEM Arabic (DOS-864);OEM Arabic"						// Arabic
-	IDS_ENCODING_MAC_ROMANIAN		"Mac Romanian;Mac Romanian"								// South European
-	IDS_ENCODING_DOS865				"OEM Nordic (DOS-865);DOS-865"							// Northern European
-	IDS_ENCODING_IBM855				"OEM Cyrillic (primarily Russian) (IBM855);OEM Cyrillic"// Cyrillic
-	IDS_ENCODING_MAC_JAPANESE		"Mac Japanese;Mac Japanese"								// Japanese
-	IDS_ENCODING_CS_ISO2022_JP		"ISO 2022 (allow 1 byte Kana);CS ISO-2022-JP"			// Japanese
-	IDS_ENCODING_ISO2022_JP_SI		"ISO 2022 (allow 1 byte Kana - SO/SI);ISO-2022-JP SI/SO"// Japanese
-	IDS_ENCODING_MAC_KOREAN			"Mac Korean;Mac Korean"									// Korean
-	IDS_ENCODING_ISO2022_KR			"ISO 2022 Korean;ISO-2022-KR"							// Korean
-	IDS_ENCODING_MAC_GB2312			"Simplified Chinese (Mac);Mac GB-2312"					// Chinese
-	IDS_ENCODING_HZ_GB2312			"Simplified Chinese (HZ-GB2312);HZ-GB2312"				// Chinese
-	IDS_ENCODING_ISO2022_CNS		"Simplified Chinese (ISO 2022);ISO-2022-CN(S)"			// Chinese
-	IDS_ENCODING_MAC_BIG5			"Traditional Chinese (Mac);Mac Big5"					// Chinese
-	IDS_ENCODING_ISO2022_CNT		"Traditional Chinese (ISO 2022);ISO-2022-CN(T)"			// Chinese
-	IDS_ENCODING_CNS				"Traditional Chinese (CNS);CNS"							// Chinese
+	IDS_ENCODING_MAC_UKRAINIAN		"Mac ウクライナ;Mac ウクライナ"							// Cyrillic
+	IDS_ENCODING_WINDOWS1258		"ベトナム語 (Windows-1258);Windows-1258"				// Southeast Asia
+	IDS_ENCODING_DOS850				"OEM ラテン1 (DOS-850);DOS-850"							// Western European
+	IDS_ENCODING_ISO8859_1			"ラテン1 (ISO 8859-1);ISO 8859-1"						// Western European
+	IDS_ENCODING_MAC_ROMAN			"Mac ローマ字;Mac ローマ"									// Western European
+	IDS_ENCODING_WINDOWS1252		"ラテン1 (Windows-1252);Windows-1252"					// Western European
+	IDS_ENCODING_IBM037				"米国カナダ (IBM037);EBCDIC (米国カナダ)"					// EBCDIC
+	IDS_ENCODING_IBM1140			"米国カナダ + 欧州記号 (IBM1140);EBCDIC (米加欧)"// EBCDIC
+	IDS_ENCODING_IBM500				"国際 (IBM500);EBCDIC (国際)"					// EBCDIC
+	IDS_ENCODING_IBM870				"ラテン2 (IBM870);EBCDIC (ラテン2)"						// EBCDIC
+	IDS_ENCODING_CP875				"ギリシャ語近代(CP875);EBCDIC (ギリシャ)"					// EBCDIC
+	IDS_ENCODING_IBM1026			"トルコ語 (ラテン5) (IBM1026);EBCDIC (ラテン5)"			// EBCDIC
+	IDS_ENCODING_DOS437				"OEM 米国 (DOS-437);DOS-437"					// Western European
+	IDS_ENCODING_DOS858				"OEM ラテン1 + Euro Symbol (DOS-858);DOS-858"			// Western European
+	IDS_ENCODING_DOS860				"OEM ポルトガル語 (DOS-860);DOS-860"						// Western European
+	IDS_ENCODING_MAC_ARABIC			"Mac アラビア語;Mac アラビア"									// Arabic
+	IDS_ENCODING_DOS864				"OEM アラビア語 (DOS-864);OEM アラビア"						// Arabic
+	IDS_ENCODING_MAC_ROMANIAN		"Mac ルーマニア;Mac ルーマニア"								// South European
+	IDS_ENCODING_DOS865				"OEM 北欧 (DOS-865);DOS-865"							// Northern European
+	IDS_ENCODING_IBM855				"OEM キリル語 (主にロシア) (IBM855);OEM キリル"// Cyrillic
+	IDS_ENCODING_MAC_JAPANESE		"Mac 日本語;Mac 日本語"								// Japanese
+	IDS_ENCODING_CS_ISO2022_JP		"ISO 2022 (1バイトカナを許容);CS ISO-2022-JP"			// Japanese
+	IDS_ENCODING_ISO2022_JP_SI		"ISO 2022 (1バイトカナを許容 - SI/SO);ISO-2022-JP SI/SO"// Japanese
+	IDS_ENCODING_MAC_KOREAN			"Mac 韓国語;Mac 韓国語"									// Korean
+	IDS_ENCODING_ISO2022_KR			"ISO 2022 韓国語;ISO-2022-KR"							// Korean
+	IDS_ENCODING_MAC_GB2312			"簡体字中国語 (Mac);Mac GB-2312"					// Chinese
+	IDS_ENCODING_HZ_GB2312			"簡体字中国語 (HZ-GB2312);HZ-GB2312"				// Chinese
+	IDS_ENCODING_ISO2022_CNS		"簡体字中国語 (ISO 2022);ISO-2022-CN(S)"			// Chinese
+	IDS_ENCODING_MAC_BIG5			"繁体字中国語 (Mac);Mac Big5"					// Chinese
+	IDS_ENCODING_ISO2022_CNT		"繁体字中国語 (ISO 2022);ISO-2022-CN(T)"			// Chinese
+	IDS_ENCODING_CNS				"繁体字中国語 (CNS);CNS"							// Chinese
 
-	IDS_SELRECT_CURRENT_ENCODING	"Select current file &encoding:"
-	IDS_SELRECT_RELOAD_ENCODING		"Select source &encoding to reload file:"
-	IDS_SELRECT_DEFAULT_ENCODING	"Select default &encoding for new file:"
+	IDS_SELRECT_CURRENT_ENCODING	"このファイルの文字コードを選択(&E):"
+	IDS_SELRECT_RELOAD_ENCODING		"読み直す文字コードを選択($E)"
+	IDS_SELRECT_DEFAULT_ENCODING	"新規ファイルのデフォルトの文字コードを選択(&E):"
 
 	IDS_ENCODINGGROUP_UNICODE		"Unicode"
-	IDS_ENCODINGGROUP_WESTERNEURO	"Western European"
-	IDS_ENCODINGGROUP_ARABIC		"Arabic"
-	IDS_ENCODINGGROUP_NORTHERNEURO	"Baltic and Northern European"
-	IDS_ENCODINGGROUP_CENTRALEURO	"Central and Eastern European"
-	IDS_ENCODINGGROUP_CHINESE		"Chinese"
-	IDS_ENCODINGGROUP_CYRILLIC		"Cyrillic"
-	IDS_ENCODINGGROUP_GREEK			"Greek"
-	IDS_ENCODINGGROUP_HEBREW		"Hebrew"
-	IDS_ENCODINGGROUP_JAPANESE		"Japanese"
-	IDS_ENCODINGGROUP_KOREAN		"Korean"
-	IDS_ENCODINGGROUP_SOUTHEURO		"South European"
-	IDS_ENCODINGGROUP_SOUTHASIA		"Southeast Asia"
-	IDS_ENCODINGGROUP_TURKISH		"Turkish"
+	IDS_ENCODINGGROUP_WESTERNEURO	"西欧"
+	IDS_ENCODINGGROUP_ARABIC		"アラビア"
+	IDS_ENCODINGGROUP_NORTHERNEURO	"バルト言語と北欧"
+	IDS_ENCODINGGROUP_CENTRALEURO	"中欧と東欧"
+	IDS_ENCODINGGROUP_CHINESE		"中国語"
+	IDS_ENCODINGGROUP_CYRILLIC		"キリル言語"
+	IDS_ENCODINGGROUP_GREEK			"ギリシャ語"
+	IDS_ENCODINGGROUP_HEBREW		"ヘブライ語"
+	IDS_ENCODINGGROUP_JAPANESE		"日本語"
+	IDS_ENCODINGGROUP_KOREAN		"韓国語"
+	IDS_ENCODINGGROUP_SOUTHEURO		"南欧"
+	IDS_ENCODINGGROUP_SOUTHASIA		"東南アジア"
+	IDS_ENCODINGGROUP_TURKISH		"トルコ語"
 	IDS_ENCODINGGROUP_EBCDIC		"IBM EBCDIC"
 END
 
@@ -2081,21 +2081,21 @@ STRINGTABLE
 BEGIN
 	IDS_EOLMODENAME_CRLF			"Windows (CR+LF)"
 	IDS_EOLMODENAME_LF				"Unix/macOS (LF)"
-	IDS_EOLMODENAME_CR				"Classic Mac OS (CR)"
+	IDS_EOLMODENAME_CR				"古い Mac OS (CR)"
 
-	IDS_CONFIG_THEME_TITLE_DEFAULT	"Customize Schemes - Default Theme"
-	IDS_CONFIG_THEME_TITLE_DARK		"Customize Schemes - Dark Theme"
-	IDS_FAVORITE_SCHEMES_TITLE		"Favorite Schemes"
-	IDS_CUSTOMIZE_SCHEMES_HELP		"Filename extensions must be separated by semicolon (;)\r\n\
+	IDS_CONFIG_THEME_TITLE_DEFAULT	"配色の編集 - 標準のテーマ"
+	IDS_CONFIG_THEME_TITLE_DARK		"配色の編集 - ダークテーマ"
+	IDS_FAVORITE_SCHEMES_TITLE		"配色のお気に入り"
+	IDS_CUSTOMIZE_SCHEMES_HELP		"拡張子の区切りはセミコロン(;)です。\r\n\
 \r\n\
-Style format:\r\n\
+設定書式: 各指定は省略可能\r\n\
 \tfont:Name; size:[+|-]nn.mm; weight:nnn; bold; italic; underline; strike;\r\n\
 \tcharset:dd; locale:Name; case:[Upper|Lower|Camel];\r\n\
 \tfore:#ffffff; back:#bbbbbb; alpha:aa; outline:aa; eolfilled;\r\n\
 \r\n\
-Style properties can be copied using copy and paste or drag and drop.\r\n\
+コピーペーストやドラッグドロップでも指定が変更できます。\r\n\
 \r\n\
-The ""Preview"" button will not apply any changes."
+プレビューでの反映では、まだ設定は保存されません。"
 
 END
 
@@ -2103,11 +2103,11 @@ END
 // string table for lexers, see EditLexer.h
 STRINGTABLE
 BEGIN
-	NP2LEX_TEXTFILE					"Text File"
+	NP2LEX_TEXTFILE					"テキストファイル"
 
-	NP2LEX_2NDTEXTFILE				"2nd Text File"
-	NP2LEX_2NDGLOBAL				"2nd Global Styles"
-	NP2LEX_GLOBAL					"Global Styles"
+	NP2LEX_2NDTEXTFILE				"テキストファイル2"
+	NP2LEX_2NDGLOBAL				"配色設定2"
+	NP2LEX_GLOBAL					"配色設定"
 END
 #endif // NP2_ENABLE_LOCALIZE_LEXER_NAME
 
@@ -2115,28 +2115,28 @@ END
 // string table for styles, see EditLexers/EditStyleX.h
 STRINGTABLE
 BEGIN
-	NP2STYLE_MarginLineNumber		"Margin and Line Number"
-	NP2STYLE_MatchingBrace			"Matching Brace"
-	NP2STYLE_MatchingBraceError		"Matching Brace Error"
-	NP2STYLE_ControlCharacter		"Control Character"
-	NP2STYLE_IndentationGuide		"Indentation Guide"
-	NP2STYLE_SelectedText			"Selected Text"
-	NP2STYLE_Whitespace				"Whitespace"
-	NP2STYLE_CurrentLine			"Current Line"
-	NP2STYLE_Caret					"Caret"
-	NP2STYLE_LongLineMarker			"Long Line Marker"
-	NP2STYLE_ExtraLineSpacing		"Extra Line Spacing"
-	NP2STYLE_FoldingMarker			"Folding Marker"
-	NP2STYLE_MarkOccurrences		"Mark Occurrences"
-	NP2STYLE_DefaultCodeStyle		"Default Code Style"
-	NP2STYLE_DefaultTextStyle		"Default Text Style"
-	NP2STYLE_FoldEllipsis			"Fold Ellipsis"
-	NP2STYLE_IMEIndicator			"IME Indicator"
-	NP2STYLE_Bookmark				"Bookmark"
-	NP2STYLE_CallTip				"CallTip"
-	NP2STYLE_CurrentBlock			"Current Block"
+	NP2STYLE_MarginLineNumber		"行番号と余白"
+	NP2STYLE_MatchingBrace			"対応する括弧"
+	NP2STYLE_MatchingBraceError		"未対応の括弧"
+	NP2STYLE_ControlCharacter		"制御文字"
+	NP2STYLE_IndentationGuide		"インデントのガイド"
+	NP2STYLE_SelectedText			"洗濯文字列"
+	NP2STYLE_Whitespace				"空白"
+	NP2STYLE_CurrentLine			"現在の行の強調表示"
+	NP2STYLE_Caret					"キャレット"
+	NP2STYLE_LongLineMarker			"行の長さのガイド"
+	NP2STYLE_ExtraLineSpacing		"行間の余白"
+	NP2STYLE_FoldingMarker			"折りたたみ記号"
+	NP2STYLE_MarkOccurrences		"単語出現マーカー"
+	NP2STYLE_DefaultCodeStyle		"コード用の標準配色"
+	NP2STYLE_DefaultTextStyle		"テキスト用の標準配色"
+	NP2STYLE_FoldEllipsis			"折りたたみ省略記号"
+	NP2STYLE_IMEIndicator			"IME変換"
+	NP2STYLE_Bookmark				"ブックマーク"
+	NP2STYLE_CallTip				"コールチップ"
+	NP2STYLE_CurrentBlock			"現在のブロック"
 
-	NP2STYLE_Default				"Default"
+	NP2STYLE_Default				"標準"
 END
 #endif // NP2_ENABLE_LOCALIZE_STYLE_NAME
 
