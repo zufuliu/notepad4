@@ -249,17 +249,11 @@ LSTATUS Registry_SetString(HKEY hKey, LPCWSTR valueName, LPCWSTR lpszText) {
 #if _WIN32_WINNT < _WIN32_WINNT_VISTA
 LSTATUS Registry_DeleteTree(HKEY hKey, LPCWSTR lpSubKey) {
 	typedef LSTATUS (WINAPI *RegDeleteTreeSig)(HKEY hKey, LPCWSTR lpSubKey);
-	static RegDeleteTreeSig pfnDeleteTree = NULL;
-
-	if (IsVistaAndAbove()) {
-		if (pfnDeleteTree == NULL) {
-			pfnDeleteTree = (RegDeleteTreeSig)GetProcAddress(GetModuleHandle(L"advapi32.dll"), "RegDeleteTreeW");
-		}
-	}
+	RegDeleteTreeSig pfnRegDeleteTree = (RegDeleteTreeSig)GetProcAddress(GetModuleHandle(L"advapi32.dll"), "RegDeleteTreeW");
 
 	LSTATUS status;
-	if (pfnDeleteTree != NULL) {
-		status = pfnDeleteTree(hKey, lpSubKey);
+	if (pfnRegDeleteTree != NULL) {
+		status = pfnRegDeleteTree(hKey, lpSubKey);
 	} else {
 		status = RegDeleteKey(hKey, lpSubKey);
 		if (status != ERROR_SUCCESS && status != ERROR_FILE_NOT_FOUND) {
