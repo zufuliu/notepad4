@@ -377,7 +377,7 @@ BEGIN
     AUTORADIOBUTTON "「お気に入り」(&F)",IDC_GOTOFAV,114,58,90,10,WS_TABSTOP
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,10,76,205,1
     AUTOCHECKBOX    "保存時にファイルの読み取り専用属性を消す(&C)",IDC_CLEARREADONLY,10,85,172,10,WS_TABSTOP
-    AUTOCHECKBOX    "移動時などファイル名の衝突時に自動で改名する(&N)",IDC_RENAMEONCOLLISION,10,97,164,10,WS_TABSTOP
+    AUTOCHECKBOX    "移動時などファイル名の衝突時に自動で改名(&N)",IDC_RENAMEONCOLLISION,10,97,164,10,WS_TABSTOP
     AUTOCHECKBOX    "削除したファイルをごみ箱へ移動(&M) (注意:オフで直接削除)",IDC_USERECYCLEBIN,10,109,160,10,WS_TABSTOP
     AUTOCHECKBOX    "削除時に確認しない(&D) (非推奨)",IDC_NOCONFIRMDELETE,10,121,184,10,WS_TABSTOP
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,10,139,205,1
@@ -400,7 +400,7 @@ BEGIN
     EDITTEXT        IDC_COLOR_SAMP1,85,80,30,14,ES_AUTOHSCROLL | WS_DISABLED
     PUSHBUTTON      "色選択...",IDC_COLOR_PICK1,120,80,60,14
     LTEXT           "フィルター時の文字色:",IDC_STATIC,20,105,180,8
-    AUTORADIOBUTTON "標準設定(&E),IDC_COLOR_DEF2,20,120,95,10,WS_GROUP | WS_TABSTOP
+    AUTORADIOBUTTON "標準設定(&E)",IDC_COLOR_DEF2,20,120,95,10,WS_GROUP | WS_TABSTOP
     AUTORADIOBUTTON "カスタム(&U):",IDC_COLOR_CUST2,20,133,60,10,WS_TABSTOP
     EDITTEXT        IDC_COLOR_SAMP2,86,130,30,14,ES_AUTOHSCROLL | WS_DISABLED
     PUSHBUTTON      "色選択...",IDC_COLOR_PICK2,120,130,60,14
@@ -438,7 +438,7 @@ STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSM
 CAPTION "対象プログラム"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    AUTORADIOBUTTON "対象とするプログラムを指定せず、単にファイラーとして使用",IDC_LAUNCH,7,7,260,10,WS_GROUP | WS_TABSTOP
+    AUTORADIOBUTTON "対象プログラムを指定せず単にファイラーとして使用",IDC_LAUNCH,7,7,260,10,WS_GROUP | WS_TABSTOP
     AUTORADIOBUTTON "次のプログラムで開く:",IDC_TARGET,7,21,160,10,WS_TABSTOP
     LTEXT           "対象プログラムが既に実行済みの場合の動作:",IDC_STATIC,7,64,260,8
     EDITTEXT        IDC_TARGETPATH,20,35,226,14,ES_AUTOHSCROLL
@@ -633,11 +633,11 @@ END
 STRINGTABLE
 BEGIN
     IDS_ERR_CD              "指定したフォルダにアクセスできません。\nディスクあるいはネットワーク接続を確認してください。"
-    IDS_ERR_FILE            "「%s」にアクセスできません。\nこのファイルはほかのプログラムに使用されれています。\nディスクあるいはネットワーク接続を確認してください。"
+    IDS_ERR_FILE            "「%s」にアクセスできません。\nこのファイルはほかのプログラムに使用されています。\nディスクあるいはネットワーク接続を確認してください。"
     IDS_ERR_NEW             "ファイルを作成できませんでした。\nディスクあるいはネットワーク接続を確認してください。"
     IDS_ERR_NEWDIR          "フォルダを作成できませんでした。\nディスクあるいはネットワーク接続を確認してください。"
     IDS_ERR_SAVEAS1         "「%s」の保存に失敗しました。\nファイルはおそらく書き込み保護されています。"
-    IDS_ERR_SAVEAS2         "ファイルの保存時に読み取り専用属性を除去できませんでした。"
+    IDS_ERR_SAVEAS2         "ファイルの保存時に読み取り専用属性を解除できませんでした。"
     IDS_ERR_CMDLINE         "コマンドラインで指定されたファイルやフォルダにアクセスできません。"
     IDS_ERR_STARTUPDIR      "起動時に読み込むフォルダがありません。
     IDS_ERR_DROP1           "ドロップしたファイルやフォルダにアクセスできません。"
@@ -665,7 +665,7 @@ END
 STRINGTABLE
 BEGIN
     IDS_SEARCHEXE           "プログラムの指定"
-    IDS_GETQUICKVIEWER      "Quickviewの指定"
+    IDS_GETQUICKVIEWER      "Quickview の指定"
     IDS_GETTARGET           "エディターの指定"
     IDS_NEWFILE             "新規作成"
     IDS_FILTER_ALL          "すべてのファイル (*.*)|*.*|"
