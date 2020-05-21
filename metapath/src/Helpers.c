@@ -74,10 +74,10 @@ BOOL IniSectionParseArray(IniSection *section, LPWSTR lpCachedIniSection) {
 	int count = 0;
 
 	do {
-		IniKeyValueNode *node = &section->nodeList[count];
 		LPWSTR v = StrChr(p, L'=');
 		if (v != NULL) {
 			*v++ = L'\0';
+			IniKeyValueNode *node = &section->nodeList[count];
 			node->key = p;
 			node->value = v;
 			++count;
@@ -102,11 +102,11 @@ BOOL IniSectionParse(IniSection *section, LPWSTR lpCachedIniSection) {
 	int count = 0;
 
 	do {
-		IniKeyValueNode *node = &section->nodeList[count];
 		LPWSTR v = StrChr(p, L'=');
 		if (v != NULL) {
 			*v++ = L'\0';
 			const UINT keyLen = (UINT)(v - p - 1);
+			IniKeyValueNode *node = &section->nodeList[count];
 			node->hash = keyLen | (p[0] << 8) | (p[1] << 16);
 			node->key = p;
 			node->value = v;

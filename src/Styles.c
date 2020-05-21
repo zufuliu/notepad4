@@ -3097,21 +3097,19 @@ static void AddLexFilterStr(LPWSTR szFilter, LPCEDITLEXER pLex, LPCWSTR lpszExt,
 	int state = 1;
 	int count = 0;
 	while ((ch = *p++) != L'\0') {
-		if (ch != L' ') {
-			if (ch == L';') {
-				if (state == 0) {
-					state = 1;
-					*ptr++ = L';';
-				}
-			} else {
-				if (state == 1) {
-					state = 0;
-					++count;
-					*ptr++ = L'*';
-					*ptr++ = L'.';
-				}
-				*ptr++ = ch;
+		if (ch == L';') {
+			if (state == 0) {
+				state = 1;
+				*ptr++ = L';';
 			}
+		} else if (ch != ' ') {
+			if (state == 1) {
+				state = 0;
+				++count;
+				*ptr++ = L'*';
+				*ptr++ = L'.';
+			}
+			*ptr++ = ch;
 		}
 	}
 
