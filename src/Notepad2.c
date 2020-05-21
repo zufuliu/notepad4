@@ -6587,22 +6587,51 @@ BOOL CheckIniFile(LPWSTR lpszFile, LPCWSTR lpszModule) {
 			lstrcpy(lpszFile, tchBuild);
 			return TRUE;
 		}
-		// Application Data
-		if (S_OK == SHGetFolderPath(NULL, CSIDL_APPDATA, NULL, SHGFP_TYPE_CURRENT, tchBuild)) {
-			PathAppend(tchBuild, tchFileExpanded);
-			if (PathFileExists(tchBuild)) {
-				lstrcpy(lpszFile, tchBuild);
-				return TRUE;
+
+#if _WIN32_WINNT < _WIN32_WINNT_VISTA
+		const int csidlList[] = {
+			// %LOCALAPPDATA%
+			// C:\Users\<username>\AppData\Local
+			// C:\Documents and Settings\<username>\Local Settings\Application Data
+			CSIDL_LOCAL_APPDATA,
+			// %APPDATA%
+			// C:\Users\<username>\AppData\Roaming
+			// C:\Documents and Settings\<username>\Application Data
+			CSIDL_APPDATA,
+			// Home
+			// C:\Users\<username>
+			CSIDL_PROFILE,
+		};
+		for (UINT i = 0; i < COUNTOF(csidlList); i++) {
+			if (S_OK == SHGetFolderPath(NULL, csidlList[i], NULL, SHGFP_TYPE_CURRENT, tchBuild)) {
+				PathAppend(tchBuild, WC_NOTEPAD2);
+				PathAppend(tchBuild, tchFileExpanded);
+				if (PathFileExists(tchBuild)) {
+					lstrcpy(lpszFile, tchBuild);
+					return TRUE;
+				}
 			}
 		}
-		// Home
-		if (S_OK == SHGetFolderPath(NULL, CSIDL_PROFILE, NULL, SHGFP_TYPE_CURRENT, tchBuild)) {
-			PathAppend(tchBuild, tchFileExpanded);
-			if (PathFileExists(tchBuild)) {
-				lstrcpy(lpszFile, tchBuild);
-				return TRUE;
+#else
+		REFKNOWNFOLDERID rfidList[] = {
+			&FOLDERID_LocalAppData,
+			&FOLDERID_RoamingAppData,
+			&FOLDERID_Profile,
+		};
+		for (UINT i = 0; i < COUNTOF(rfidList); i++) {
+			LPWSTR pszPath = NULL;
+			if (S_OK == SHGetKnownFolderPath(rfidList[i], KF_FLAG_DEFAULT, NULL, &pszPath)) {
+				lstrcpy(tchBuild, pszPath);
+				CoTaskMemFree(pszPath);
+				PathAppend(tchBuild, WC_NOTEPAD2);
+				PathAppend(tchBuild, tchFileExpanded);
+				if (PathFileExists(tchBuild)) {
+					lstrcpy(lpszFile, tchBuild);
+					return TRUE;
+				}
 			}
 		}
+#endif
 	} else if (PathFileExists(tchFileExpanded)) {
 		lstrcpy(lpszFile, tchFileExpanded);
 		return TRUE;
