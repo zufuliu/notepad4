@@ -30,6 +30,7 @@
 #include "Helpers.h"
 #include "Dlapi.h"
 #include "resource.h"
+#include "config.h"
 
 void IniClearSectionEx(LPCWSTR lpSection, LPCWSTR lpszIniFile, BOOL bDelete) {
 	if (StrIsEmpty(lpszIniFile)) {
@@ -889,6 +890,7 @@ LRESULT SendWMSize(HWND hwnd) {
 	return SendMessage(hwnd, WM_SIZE, SIZE_RESTORED, MAKELPARAM(rc.right, rc.bottom));
 }
 
+#if NP2_ENABLE_APP_LOCALIZATION_DLL
 HMODULE LoadLocalizedResourceDLL(LANGID lang, LPCWSTR dllName) {
 	if (lang == LANG_USER_DEFAULT) {
 		lang = GetUserDefaultUILanguage();
@@ -905,6 +907,9 @@ HMODULE LoadLocalizedResourceDLL(LANGID lang, LPCWSTR dllName) {
 	case LANG_JAPANESE:
 		folder = L"ja";
 		break;
+	//case LANG_KOREAN:
+	//	folder = L"ko";
+	//	break;
 	}
 
 	if (folder == NULL) {
@@ -922,6 +927,34 @@ HMODULE LoadLocalizedResourceDLL(LANGID lang, LPCWSTR dllName) {
 	HMODULE hDLL = LoadLibraryEx(path, NULL, flags);
 	return hDLL;
 }
+
+#if NP2_ENABLE_TEST_LOCALIZATION_LAYOUT
+void GetLocaleDefaultUIFont(LANGID lang, LPWSTR lpFaceName, WORD *wSize) {
+	LPCWSTR font;
+	const LANGID subLang = SUBLANGID(lang);
+	switch (PRIMARYLANGID(lang)) {
+	default:
+	case LANG_ENGLISH:
+		font = L"Segoe UI";
+		*wSize = 9;
+		break;
+	case LANG_CHINESE:
+		font = IsChineseTraditionalSubLang(subLang) ? L"Microsoft JhengHei UI" : L"Microsoft YaHei UI";
+		*wSize = 9;
+		break;
+	case LANG_JAPANESE:
+		font = L"Meiryo UI";
+		*wSize = 9;
+		break;
+	case LANG_KOREAN:
+		font = L"Malgun Gothic";
+		*wSize = 9;
+		break;
+	}
+	lstrcpy(lpFaceName, font);
+}
+#endif
+#endif
 
 //=============================================================================
 //
@@ -1911,6 +1944,12 @@ void MRU_ClearCombobox(HWND hwnd, LPCWSTR pszKey) {
   Based on code of MFC helper class CDialogTemplate
 */
 BOOL GetThemedDialogFont(LPWSTR lpFaceName, WORD *wSize) {
+#if NP2_ENABLE_APP_LOCALIZATION_DLL && NP2_ENABLE_TEST_LOCALIZATION_LAYOUT
+	extern LANGID uiLanguage;
+	GetLocaleDefaultUIFont(uiLanguage, lpFaceName, wSize);
+	return TRUE;
+#else
+
 	BOOL bSucceed = FALSE;
 
 	HDC hDC = GetDC(NULL);
@@ -1963,6 +2002,7 @@ BOOL GetThemedDialogFont(LPWSTR lpFaceName, WORD *wSize) {
 		lstrcpy(lpFaceName, L"Tahoma");
 	}
 	return bSucceed;
+#endif
 }
 
 static inline BOOL DialogTemplate_IsDialogEx(const DLGTEMPLATE *pTemplate) {

@@ -15,6 +15,8 @@
 
 //! Enable localization with satellite resource DLLs.
 #define NP2_ENABLE_APP_LOCALIZATION_DLL			1
+//! Enable test localization dialog layout with default UI font for target locale.
+#define NP2_ENABLE_TEST_LOCALIZATION_LAYOUT		0
 
 //! Enable localization for scheme/lexer names.
 #define NP2_ENABLE_LOCALIZE_LEXER_NAME			1
