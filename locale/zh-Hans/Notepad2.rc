@@ -2046,7 +2046,7 @@ BEGIN
 	IDS_ENCODING_IBM855				"OEM 西里尔语(俄语为主)(IBM855);OEM 西里尔语"				// Cyrillic
 	IDS_ENCODING_MAC_JAPANESE		"Mac 日语;Mac 日语"										// Japanese
 	IDS_ENCODING_CS_ISO2022_JP		"ISO 2022 (允许单字节假名);CS ISO-2022-JP"					// Japanese
-	IDS_ENCODING_ISO2022_JP_SI		"ISO 2022 (允许单字节假名 - SO/SI);ISO-2022-JP SI/SO"		// Japanese
+	IDS_ENCODING_ISO2022_JP_SOSI	"ISO 2022 (允许单字节假名 - SO/SI);ISO-2022-JP SO/SI"		// Japanese
 	IDS_ENCODING_MAC_KOREAN			"Mac 韩语;Mac 韩语"										// Korean
 	IDS_ENCODING_ISO2022_KR			"ISO 2022 韩语;ISO-2022-KR"								// Korean
 	IDS_ENCODING_MAC_GB2312			"简体中文 (Mac); Mac GB-2312"								// Chinese
