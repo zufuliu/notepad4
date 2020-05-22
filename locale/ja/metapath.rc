@@ -626,7 +626,7 @@ BEGIN
 	IDS_APPTITLE			"metapath"
 	IDS_NUMFILES			"%s 項目"
 	IDS_NUMFILES_FILTER		"%s 項目 | フィルター使用"
-	IDS_SAVEFILE			"保存中 \"%s\"..."
+	IDS_SAVEFILE			"保存中 ""%s""..."
     IDS_LINKDESCRIPTION     "metapath で開く"
 END
 
@@ -639,7 +639,7 @@ BEGIN
     IDS_ERR_SAVEAS1         "「%s」の保存に失敗しました。\nファイルはおそらく書き込み保護されています。"
     IDS_ERR_SAVEAS2         "ファイルの保存時に読み取り専用属性を解除できませんでした。"
     IDS_ERR_CMDLINE         "コマンドラインで指定されたファイルやフォルダにアクセスできません。"
-    IDS_ERR_STARTUPDIR      "起動時に読み込むフォルダがありません。
+    IDS_ERR_STARTUPDIR      "起動時に読み込むフォルダがありません。"
     IDS_ERR_DROP1           "ドロップしたファイルやフォルダにアクセスできません。"
     //IDS_ERR_DROP2           "同時にひとつのファイルかフォルダしかドロップできません。"
     IDS_ERR_FAVORITES       "お気に入り\n「お気に入り」フォルダにアクセスできません。\n設定から存在するフォルダを指定してください。"

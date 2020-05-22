@@ -355,7 +355,7 @@ BEGIN
 		END
 		POPUP "選択範囲を実行(&O)"
 		BEGIN
-			MENUITEM ファイル		CMD_OPEN_PATH_OR_LINK
+			MENUITEM "ファイル"		CMD_OPEN_PATH_OR_LINK
 			MENUITEM "このフォルダを開く(&F)",				CMD_OPEN_CONTAINING_FOLDER
 			MENUITEM SEPARATOR
 			MENUITEM "&Google 検索",					CMD_ONLINE_SEARCH_GOOGLE
@@ -385,7 +385,7 @@ BEGIN
 			MENUITEM "終端まで選択(&D)",						IDM_EDIT_SELTODOCEND
 			MENUITEM "次の検索一致まで選択(&X)\tCtrl+Alt+F2",				IDM_EDIT_SELTONEXT
 			MENUITEM "前の検索一致まで選択(&S)\tCtrl+Alt+Shift+F2",		IDM_EDIT_SELTOPREV
-			MENUITEM "選択範囲の先頭へカーソル移動(&J)\t+カンマ(,),		CMD_JUMP2SELSTART
+			MENUITEM "選択範囲の先頭へカーソル移動(&J)\t+カンマ(,)",		CMD_JUMP2SELSTART
 			MENUITEM "選択範囲の末尾へカーソル移動(&U)\t+ピリオド(.)",			CMD_JUMP2SELEND
 		END
 		POPUP "ブックマーク(しおり)(&K)"
@@ -651,7 +651,7 @@ BEGIN
 				MENUITEM "標準(&S)",				IDM_VIEW_FONTQUALITY_STANDARD
 				MENUITEM "クリアータイプ(&C)",				IDM_VIEW_FONTQUALITY_CLEARTYPE
 			END
-			POPUP ""RTL レイアウト (GDI)(&R)"
+			POPUP "RTL レイアウト (GDI)(&R)"
 			BEGIN
 				MENUITEM "Edit ウィンドウ(&E)",			IDM_SET_RTL_LAYOUT_EDIT
 				MENUITEM "他のウィンドウ(&O)",			IDM_SET_RTL_LAYOUT_OTHER
@@ -1187,7 +1187,7 @@ FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     CONTROL         "",IDC_STYLELIST,"SysTreeView32",TVS_SHOWSELALWAYS | TVS_HASBUTTONS | TVS_LINESATROOT | WS_BORDER | WS_HSCROLL | WS_TABSTOP,7,7,151,162
     AUTOCHECKBOX    "選択した構文言語をデフォルトに設定(&D)",IDC_DEFAULTSCHEME,7,171,151,10,WS_TABSTOP
-    AUTOCHECKBOX    "拡張子から自動選択(&A)",DC_AUTOSELECT,7,182,151,10,WS_TABSTOP
+    AUTOCHECKBOX    "拡張子から自動選択(&A)",IDC_AUTOSELECT,7,182,151,10,WS_TABSTOP
     DEFPUSHBUTTON   "OK",IDOK,52,196,50,14
     PUSHBUTTON     "キャンセル",IDCANCEL,108,196,50,14
     SCROLLBAR       IDC_RESIZEGRIP3,7,198,10,10
@@ -1201,7 +1201,7 @@ BEGIN
     CONTROL         "",IDC_STYLELIST,"SysTreeView32",TVS_FULLROWSELECT | TVS_SHOWSELALWAYS | TVS_HASBUTTONS | TVS_LINESATROOT | WS_BORDER | WS_HSCROLL | WS_TABSTOP,7,7,164,224
     LTEXT           "",IDC_STYLELABEL,181,132,280,8
     EDITTEXT        IDC_STYLEEDIT,181,142,280,18,ES_MULTILINE | ES_AUTOVSCROLL | WS_VSCROLL
-    PUSHBUTTON      "文字色(&E)...",　IDC_STYLEFORE,181,195,46,14
+    PUSHBUTTON      "文字色(&E)...",IDC_STYLEFORE,181,195,46,14
     PUSHBUTTON      "背景色(&B)...",IDC_STYLEBACK,232,195,46,14
     PUSHBUTTON      "フォント(&F)...",IDC_STYLEFONT,283,195,42,14
     PUSHBUTTON      "プレビュー(&P)",IDC_PREVIEW,330,195,42,14
@@ -1277,7 +1277,7 @@ STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSM
 CAPTION "ページ設定"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    GROUPBOX        "用紙"",IDC_PAGESETUP_PAGER_BOX,8,8,224,56,WS_GROUP
+    GROUPBOX        "用紙",IDC_PAGESETUP_PAGER_BOX,8,8,224,56,WS_GROUP
     LTEXT           "用紙サイズ(&Z):",IDC_PAGESETUP_SIZE,16,24,36,8
     COMBOBOX        IDC_PAGESETUP_SOURCE_LIST,64,23,160,160,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_GROUP | WS_TABSTOP
     LTEXT           "給紙方法(&S):",IDC_PAGESETUP_SOURCE_LABEL,16,45,36,8
@@ -1772,8 +1772,8 @@ BEGIN
     IDS_READONLY            "(読み取り専用)"
 	IDS_LOCKED				"(編集ロック)"
     IDS_DOCPOS              "行 %s / %s  列 %s / %s  字 %s / %s  選 %s / %s  選行 %s  見 %s"
-    IDS_LOADFILE            "読込中 \"%s\" ..."
-    IDS_SAVEFILE            "保存中 \"%s\" ..."
+    IDS_LOADFILE            "読込中 ""%s"" ..."
+    IDS_SAVEFILE            "保存中 ""%s"" ..."
     IDS_PRINTFILE           "%s ページを印刷中..."
     IDS_SAVINGSETTINGS     "設定保存中..."
     IDS_LINKDESCRIPTION     "Notepad2 で編集"
@@ -1823,7 +1823,7 @@ $\t行の末尾\n\
 \\h\tIsWordStartAt() による単語の開始\n\
 \\H\tIsWordEndAt() による単語の終わり\n\
 \\i\t単語の終わりまで1文字以上に合致\n\
-\\i?\t同 0文字以上に合致""
+\\i?\t同 0文字以上に合致"
 
 	IDS_WILDCARDHELP		"ワイルドカード検索\n\n\
 *\t0文字以上の文字列に合致\n\
@@ -1868,8 +1868,8 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_ERR_LOADFILE        "読込失敗 \"%s\""
-    IDS_ERR_SAVEFILE        "保存失敗 \"%s\""
+    IDS_ERR_LOADFILE        "読込失敗 ""%s"""
+    IDS_ERR_SAVEFILE        "保存失敗 ""%s"""
     IDS_ERR_BROWSE          "ファイラーのプラグインがありません。\nこのプラグイン metapath は https://github.com/zufuliu/notepad2/releases でダウンロードできます。\nこのサイトを開きますか？"
     IDS_ERR_MRUDLG          "選択したファイルにアクセスできませんでした。\n一覧から消去しますか？"
     IDS_ERR_CREATELINK      "デスクトップへのショートカット作成時にエラーが発生しました。"
@@ -1908,7 +1908,7 @@ BEGIN
 /d\tテキストファイルの配色を指定\n\
 /h\tWEBソースコードの配色を指定\n\
 /x\tXML文書の配色を指定\n\
-/c\t新規ウインドウを開きクリップボードの内容を貼り付け
+/c\t新規ウインドウを開きクリップボードの内容を貼り付け\n\
 /b\tクリップボード履歴表示モードで開く\n\
 /n\t新規ウィンドウで開く (/ns ファイルは単一のインスタンス)\n\
 /r\tひとつウインドウを再利用 (/rs 同じく単一のインスタンス\n\
@@ -1918,7 +1918,7 @@ BEGIN
 /o\t常に手前に表示\n\
 /f パス\t設定ファイルを指定 (/f0 設定不使用)\n\
 /u\t管理者権限で実行\n\
-/z\t「次へ」を省略(レジストリでメモ帳を置換している際に有効化)""
+/z\t「次へ」を省略(レジストリでメモ帳を置換している際に有効化)"
 END
 
 STRINGTABLE
@@ -1935,7 +1935,7 @@ BEGIN
     IDS_PRINT_COLOR         "通常|明るさの反転 (暗い背景)|白背景に黒|白背景にカラー|白背景にカラー (行番号以外)|モニタ通りの見ている色 (WYSIWYG)"
     IDS_PRINT_PAGENUM       "%s ページ"
     IDS_PRINT_EMPTY         "この文書には、印刷のための文章が含まれていません。"
-    IDS_PRINT_ERROR         "印刷失敗 \"%s\""
+    IDS_PRINT_ERROR         "印刷失敗 ""%s"""
     IDS_FAV_SUCCESS         "このファイルへのショートカットが、お気に入りフォルダ内に作成されました。"
     IDS_FAV_FAILURE         "このファイルへのショートカットは作成できませんでした。\n同じ名前の他のファイルがないことを確認してください。"
     IDS_READONLY_MODIFY     "「%s」の属性を変更できませんでした。"
@@ -2046,7 +2046,7 @@ BEGIN
 	IDS_ENCODING_IBM855				"OEM キリル語 (主にロシア) (IBM855);OEM キリル"// Cyrillic
 	IDS_ENCODING_MAC_JAPANESE		"Mac 日本語;Mac 日本語"								// Japanese
 	IDS_ENCODING_CS_ISO2022_JP		"ISO 2022 (1バイトカナを許容);CS ISO-2022-JP"			// Japanese
-	IDS_ENCODING_ISO2022_JP_SI		"ISO 2022 (1バイトカナを許容 - SI/SO);ISO-2022-JP SI/SO"// Japanese
+	IDS_ENCODING_ISO2022_JP_SOSI	"ISO 2022 (1バイトカナを許容 - SO/SI);ISO-2022-JP SO/SI"	// Japanese
 	IDS_ENCODING_MAC_KOREAN			"Mac 韓国語;Mac 韓国語"									// Korean
 	IDS_ENCODING_ISO2022_KR			"ISO 2022 韓国語;ISO-2022-KR"							// Korean
 	IDS_ENCODING_MAC_GB2312			"簡体字中国語 (Mac);Mac GB-2312"					// Chinese
