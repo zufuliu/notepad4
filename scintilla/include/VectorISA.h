@@ -24,7 +24,6 @@
 	#define NP2_TARGET_ARM32	1
 	#define NP2_USE_SSE2		0
 	#define NP2_USE_AVX2		0
-	// TODO: use ARM Neon
 #else
 	#define NP2_TARGET_ARM64	0
 	#define NP2_TARGET_ARM32	0

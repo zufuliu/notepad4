@@ -30,7 +30,6 @@
 #include <time.h>
 #include <inttypes.h>
 #include "SciCall.h"
-#include "VectorISA.h"
 #include "config.h"
 #include "Helpers.h"
 #include "Notepad2.h"
@@ -411,7 +410,7 @@ static inline void InvalidateStyleRedraw(void) {
 
 // temporary fix for issue #134: Direct2D on arm32
 static inline int GetDefualtRenderingTechnology(void) {
-#if NP2_TARGET_ARM32
+#if defined(__arm__) || defined(_ARM_) || defined(_M_ARM)
 	return SC_TECHNOLOGY_DIRECTWRITERETAIN;
 #else
 	return IsVistaAndAbove()? SC_TECHNOLOGY_DIRECTWRITE : SC_TECHNOLOGY_DEFAULT;
