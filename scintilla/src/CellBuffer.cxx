@@ -928,7 +928,6 @@ void CellBuffer::ResetLineEnds() {
 				lineInsert++;
 			}
 		} else if (utf8LineEnds && !UTF8IsAscii(ch)) {
-			const unsigned char back3[3] = { chBeforePrev, chPrev, ch };
 			if (UTF8IsMultibyteLineEnd(chBeforePrev, chPrev, ch)) {
 				InsertLine(lineInsert, (position + i) + 1, atLineStart);
 				lineInsert++;
@@ -1262,7 +1261,6 @@ void CellBuffer::BasicInsertString(const Sci::Position position, const char * co
 			InsertLine(lineInsert, (position + ptr - s), atLineStart);
 			lineInsert++;
 		} else if (utf8LineEnds && !UTF8IsAscii(ch)) {
-			const unsigned char back3[3] = { chBeforePrev, chPrev, ch };
 			if (UTF8IsMultibyteLineEnd(chBeforePrev, chPrev, ch)) {
 				InsertLine(lineInsert, (position + ptr - s), atLineStart);
 				lineInsert++;

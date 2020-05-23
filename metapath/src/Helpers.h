@@ -116,6 +116,8 @@ extern DWORD g_uWinVer;
 #define LOAD_LIBRARY_AS_IMAGE_RESOURCE	0x00000020
 #endif
 
+#define DLLFunction(dllName, funcName)	GetProcAddress(GetModuleHandleW(dllName), (funcName))
+
 // https://docs.microsoft.com/en-us/windows/desktop/Memory/comparing-memory-allocation-methods
 // https://blogs.msdn.microsoft.com/oldnewthing/20120316-00/?p=8083/
 #define NP2HeapAlloc(size)			HeapAlloc(g_hDefaultHeap, HEAP_ZERO_MEMORY, (size))

@@ -230,6 +230,8 @@ extern WCHAR szIniFile[MAX_PATH];
 #define LOAD_LIBRARY_AS_IMAGE_RESOURCE	0x00000020
 #endif
 
+#define DLLFunction(dllName, funcName)	GetProcAddress(GetModuleHandleW(dllName), (funcName))
+
 #ifndef SEE_MASK_NOZONECHECKS
 #define SEE_MASK_NOZONECHECKS		0x00800000		// NTDDI_VERSION >= NTDDI_WINXPSP1
 #endif
