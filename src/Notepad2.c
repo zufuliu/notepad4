@@ -972,7 +972,7 @@ static inline BOOL IsFileStartsWithDotLog(void) {
 	char tch[5] = "";
 	const Sci_Position len = SciCall_GetText(COUNTOF(tch), tch);
 	// upper case
-	return len >= 4 && strncmp(tch, ".LOG", 4) == 0;
+	return len >= 4 && strcmp(tch, ".LOG") == 0;
 }
 #endif
 
@@ -5866,13 +5866,13 @@ int ParseCommandLineEncoding(LPCWSTR opt, int idmLE, int idmBE) {
 	if (*opt == '-') {
 		++opt;
 	}
-	if (StrNCaseEqual(opt, L"LE", CSTRLEN(L"LE"))){
+	if (StrHasPrefixCase(opt, L"LE")){
 		flag = idmLE;
 		opt += CSTRLEN(L"LE");
 		if (*opt == '-') {
 			++opt;
 		}
-	} else if (StrNCaseEqual(opt, L"BE", CSTRLEN(L"BE"))) {
+	} else if (StrHasPrefixCase(opt, L"BE")) {
 		flag = idmBE;
 		opt += CSTRLEN(L"BE");
 		if (*opt == '-') {
@@ -6137,7 +6137,7 @@ int ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2, BOOL *bIsNotepadReplacement) 
 		if (StrCaseEqual(opt, L"ANSI")) {
 			flagSetEncoding = IDM_ENCODING_ANSI - IDM_ENCODING_ANSI + 1;
 			state = 1;
-		} else if (StrNCaseEqual(opt, L"appid=", CSTRLEN(L"appid="))) {
+		} else if (StrHasPrefixCase(opt, L"appid=")) {
 			// Shell integration
 			opt += CSTRLEN(L"appid=");
 			lstrcpyn(g_wchAppUserModelID, opt, COUNTOF(g_wchAppUserModelID));
@@ -6226,7 +6226,7 @@ int ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2, BOOL *bIsNotepadReplacement) 
 			break;
 		}
 
-		if (StrNCaseEqual(opt, L"POS", CSTRLEN(L"POS"))) {
+		if (StrHasPrefixCase(opt, L"POS")) {
 			opt += CSTRLEN(L"POS");
 		} else {
 			++opt;
@@ -6339,7 +6339,7 @@ int ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2, BOOL *bIsNotepadReplacement) 
 
 	case L'S':
 		// Shell integration
-		if (StrNCaseEqual(opt, L"sysmru=", CSTRLEN(L"sysmru="))) {
+		if (StrHasPrefixCase(opt, L"sysmru=")) {
 			opt += CSTRLEN(L"sysmru=");
 			if (opt[1] == L'\0') {
 				switch (*opt) {
@@ -6358,7 +6358,7 @@ int ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2, BOOL *bIsNotepadReplacement) 
 		break;
 
 	case L'U':
-		if (StrNCaseEqual(opt, L"UTF", CSTRLEN(L"UTF"))) {
+		if (StrHasPrefixCase(opt, L"UTF")) {
 			opt += CSTRLEN(L"UTF");
 			if (*opt == '-') {
 				++opt;
@@ -6379,7 +6379,7 @@ int ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2, BOOL *bIsNotepadReplacement) 
 				opt += 2;
 				state = ParseCommandLineEncoding(opt, IDM_ENCODING_UNICODE, IDM_ENCODING_UNICODEREV);
 			}
-		} else if (StrNCaseEqual(opt, L"UNICODE", CSTRLEN(L"UNICODE"))) {
+		} else if (StrHasPrefixCase(opt, L"UNICODE")) {
 			opt += CSTRLEN(L"UNICODE");
 			state = ParseCommandLineEncoding(opt, IDM_ENCODING_UNICODE, IDM_ENCODING_UNICODEREV);
 		}

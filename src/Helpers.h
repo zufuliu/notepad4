@@ -107,13 +107,10 @@ NP2_inline BOOL StrCaseEqual(LPCWSTR s1, LPCWSTR s2) {
 	return _wcsicmp(s1, s2) == 0;
 }
 
-NP2_inline BOOL StrNEqual(LPCWSTR s1, LPCWSTR s2, int cch) {
-	return wcsncmp(s1, s2, cch) == 0;
-}
-
-NP2_inline BOOL StrNCaseEqual(LPCWSTR s1, LPCWSTR s2, int cch) {
-	return _wcsnicmp(s1, s2, cch) == 0;
-}
+#define StrHasPrefix(s, prefix)				(wcsncmp((s), (prefix), CSTRLEN(prefix)) == 0)
+#define StrHasPrefixEx(s, prefix, len)		(wcsncmp((s), (prefix), (len)) == 0)
+#define StrHasPrefixCase(s, prefix)			(_wcsnicmp((s), (prefix), CSTRLEN(prefix)) == 0)
+#define StrHasPrefixCaseEx(s, prefix, len)	(_wcsnicmp((s), (prefix), (len)) == 0)
 
 NP2_inline BOOL StrToFloat(LPCWSTR str, float *value) {
 	LPWSTR end;

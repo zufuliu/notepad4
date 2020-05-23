@@ -2325,7 +2325,7 @@ static void Style_UpdateLexerLang(PEDITLEXER pLex, LPCWSTR lpszExt, LPCWSTR lpsz
 		break;
 
 	case NP2LEX_CONF:
-		if (StrNCaseEqual(lpszName, L"httpd", 5) || StrCaseEqual(lpszExt, L"htaccess")) {
+		if (StrHasPrefixCase(lpszName, L"httpd") || StrCaseEqual(lpszExt, L"htaccess")) {
 			np2LexLangIndex = IDM_LEXER_APACHE;
 		}
 		break;
@@ -2391,7 +2391,7 @@ static void Style_UpdateLexerLang(PEDITLEXER pLex, LPCWSTR lpszExt, LPCWSTR lpsz
 			}
 		} else if (StrCaseEqual(L"xsd", lpszExt)) {
 			np2LexLangIndex = IDM_LEXER_XSD;
-		} else if (StrNCaseEqual(L"xsl", lpszExt, 3)) {
+		} else if (StrHasPrefixCase(L"xsl", lpszExt)) {
 			np2LexLangIndex = IDM_LEXER_XSLT;
 		} else if (StrCaseEqual(L"dtd", lpszExt)) {
 			np2LexLangIndex = IDM_LEXER_DTD;
@@ -2446,7 +2446,7 @@ PEDITLEXER Style_MatchLexer(LPCWSTR lpszMatch, BOOL bCheckNames) {
 		if (cch >= 3) {
 			for (UINT iLexer = LEXER_INDEX_MATCH; iLexer < ALL_LEXER_COUNT; iLexer++) {
 				PEDITLEXER pLex = pLexArray[iLexer];
-				if (StrNCaseEqual(pLex->pszName, lpszMatch, cch)) {
+				if (StrHasPrefixCaseEx(pLex->pszName, lpszMatch, cch)) {
 					return pLex;
 				}
 			}
@@ -2501,7 +2501,7 @@ static PEDITLEXER Style_GetLexerFromFile(LPCWSTR lpszFile, BOOL bCGIGuess, LPCWS
 		}
 
 		// MySQL ini/cnf
-		if (!bFound && StrNCaseEqual(lpszName, L"my", 2) && (StrCaseEqual(lpszExt, L"ini") || StrCaseEqual(lpszExt, L"cnf"))) {
+		if (!bFound && StrHasPrefixCase(lpszName, L"my") && (StrCaseEqual(lpszExt, L"ini") || StrCaseEqual(lpszExt, L"cnf"))) {
 			pLexNew = &lexCONF;
 			bFound = TRUE;
 		}
@@ -2524,7 +2524,7 @@ static PEDITLEXER Style_GetLexerFromFile(LPCWSTR lpszFile, BOOL bCGIGuess, LPCWS
 			if (pDotFile) {
 				*pDotFile = TRUE;
 			}
-			if (StrNEqual(lpszExt, L"bash", 4) || StrEqual(lpszExt, L"profile")) { // .bash_history, .bash_logout, .bash_profile, .bashrc, .profile
+			if (StrHasPrefix(lpszExt, L"bash") || StrEqual(lpszExt, L"profile")) { // .bash_history, .bash_logout, .bash_profile, .bashrc, .profile
 				pLexNew = &lexBash;
 				bFound = TRUE;
 			}
@@ -2532,11 +2532,11 @@ static PEDITLEXER Style_GetLexerFromFile(LPCWSTR lpszFile, BOOL bCGIGuess, LPCWS
 	}
 
 	if (!bFound) {
-		if (StrNCaseEqual(lpszName, L"Readme", 6)) {
+		if (StrHasPrefixCase(lpszName, L"Readme")) {
 			pLexNew = &lexTextFile;
 			bFound = TRUE;
 		}
-		if (!bFound && (StrNCaseEqual(lpszName, L"Makefile", 8) || StrNCaseEqual(lpszName, L"Kbuild", 6))) {
+		if (!bFound && (StrHasPrefixCase(lpszName, L"Makefile") || StrHasPrefixCase(lpszName, L"Kbuild"))) {
 			pLexNew = &lexMake;
 			bFound = TRUE;
 		}
@@ -2549,11 +2549,11 @@ static PEDITLEXER Style_GetLexerFromFile(LPCWSTR lpszFile, BOOL bCGIGuess, LPCWS
 			bFound = TRUE;
 		}
 		// Boost build
-		if (!bFound && (StrCaseEqual(lpszName, L"Jamroot") || StrNCaseEqual(lpszName, L"Jamfile", 7))) {
+		if (!bFound && (StrCaseEqual(lpszName, L"Jamroot") || StrHasPrefixCase(lpszName, L"Jamfile"))) {
 			pLexNew = &lexJAM;
 			bFound = TRUE;
 		}
-		if (!bFound && (StrNCaseEqual(lpszName, L"Kconfig", 7) || StrNCaseEqual(lpszName, L"Doxyfile", 8))) {
+		if (!bFound && (StrHasPrefixCase(lpszName, L"Kconfig") || StrHasPrefixCase(lpszName, L"Doxyfile"))) {
 			pLexNew = &lexCONF;
 			bFound = TRUE;
 		}

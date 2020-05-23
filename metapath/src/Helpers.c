@@ -53,7 +53,7 @@ void IniClearAllSectionEx(LPCWSTR lpszPrefix, LPCWSTR lpszIniFile, BOOL bDelete)
 	const int len = lstrlen(lpszPrefix);
 
 	while (*p) {
-		if (StrNCaseEqual(p, lpszPrefix, len)) {
+		if (StrHasPrefixCaseEx(p, lpszPrefix, len)) {
 			WritePrivateProfileSection(p, value, lpszIniFile);
 		}
 		p = StrEnd(p) + 1;
@@ -1000,7 +1000,7 @@ void PathRelativeToApp(LPCWSTR lpszSrc, LPWSTR lpszDest, int cchDest, BOOL bSrcI
 void PathAbsoluteFromApp(LPCWSTR lpszSrc, LPWSTR lpszDest, int cchDest, BOOL bExpandEnv) {
 	WCHAR wchPath[MAX_PATH];
 
-	if (StrNEqual(lpszSrc, L"%CSIDL:MYDOCUMENTS%", CSTRLEN("%CSIDL:MYDOCUMENTS%"))) {
+	if (StrHasPrefix(lpszSrc, L"%CSIDL:MYDOCUMENTS%")) {
 		SHGetFolderPath(NULL, CSIDL_PERSONAL, NULL, SHGFP_TYPE_CURRENT, wchPath);
 		PathAppend(wchPath, lpszSrc + CSTRLEN("%CSIDL:MYDOCUMENTS%"));
 	} else {
