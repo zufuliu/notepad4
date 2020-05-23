@@ -7,9 +7,11 @@
 ## Binaries
 Latest release: [![Latest release](https://img.shields.io/github/release/zufuliu/notepad2.svg)](https://github.com/zufuliu/notepad2/releases)
 
-Latest development build [![Build status](https://ci.appveyor.com/api/projects/status/github/zufuliu/notepad2?branch=master&svg=true)](https://ci.appveyor.com/project/zufuliu/notepad2) is available on [AppVeyor]( https://ci.appveyor.com/project/zufuliu/notepad2) (Find artifacts in Release configuration for each compiler and platform).
+Latest development builds (artifacts in Release configuration for each compiler and platform) are available on [GitHub Actions](https://github.com/zufuliu/notepad2/actions) and [AppVeyor](https://ci.appveyor.com/project/zufuliu/notepad2). Or you can build from source, see the [Wiki](https://github.com/zufuliu/notepad2/wiki/Build-Notepad2).
 
-Or build from source, see the [Wiki](https://github.com/zufuliu/notepad2/wiki/Build-Notepad2).
+| GitHub Actions | AppVeyor |
+| --------------- | -------- |
+| ![Build status](https://github.com/zufuliu/notepad2/workflows/CI/badge.svg) | [![Build status](https://ci.appveyor.com/api/projects/status/github/zufuliu/notepad2?branch=master&svg=true)](https://ci.appveyor.com/project/zufuliu/notepad2) |
 
 ## [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots)
 ![v4.20.04](https://raw.githubusercontent.com/wiki/zufuliu/notepad2/screenshots/v4.20.04.png)
