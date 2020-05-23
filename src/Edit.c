@@ -6745,7 +6745,7 @@ void TryBrowseFile(HWND hwnd, LPCWSTR pszFile, BOOL bWarn) {
 		GetModuleFileName(NULL, tchTemp, COUNTOF(tchTemp));
 		PathRemoveFileSpec(tchTemp);
 		PathAppend(tchTemp, tchExeFile);
-		if (PathFileExists(tchTemp)) {
+		if (PathIsFile(tchTemp)) {
 			lstrcpy(tchExeFile, tchTemp);
 		}
 	}

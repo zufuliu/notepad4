@@ -443,7 +443,7 @@ BOOL FindUserResourcePath(LPCWSTR path, LPWSTR outPath) {
 		if (StrNotEmpty(szIniFile)) {
 			lstrcpy(tchBuild, szIniFile);
 			lstrcpy(PathFindFileName(tchBuild), tchFileExpanded);
-			if (PathFileExists(tchBuild)) {
+			if (PathIsFile(tchBuild)) {
 				lstrcpy(outPath, tchBuild);
 				return TRUE;
 			}
@@ -452,11 +452,11 @@ BOOL FindUserResourcePath(LPCWSTR path, LPWSTR outPath) {
 		// relative to program exe file
 		GetModuleFileName(NULL, tchBuild, COUNTOF(tchBuild));
 		lstrcpy(PathFindFileName(tchBuild), tchFileExpanded);
-		if (PathFileExists(tchBuild)) {
+		if (PathIsFile(tchBuild)) {
 			lstrcpy(outPath, tchBuild);
 			return TRUE;
 		}
-	} else if (PathFileExists(tchFileExpanded)) {
+	} else if (PathIsFile(tchFileExpanded)) {
 		lstrcpy(outPath, tchFileExpanded);
 		return TRUE;
 	}
@@ -1756,7 +1756,7 @@ BOOL PathCreateFavLnk(LPCWSTR pszName, LPCWSTR pszTarget, LPCWSTR pszDir) {
 	PathAppend(tchLnkFileName, pszName);
 	lstrcat(tchLnkFileName, L".lnk");
 
-	if (PathFileExists(tchLnkFileName)) {
+	if (PathIsFile(tchLnkFileName)) {
 		return FALSE;
 	}
 
@@ -1862,6 +1862,7 @@ void OpenContainingFolder(HWND hwnd, LPCWSTR pszFile, BOOL bSelect) {
 		}
 	}
 
+#if 0
 	if (path == NULL) {
 		path = wchDirectory;
 	}
@@ -1874,6 +1875,7 @@ void OpenContainingFolder(HWND hwnd, LPCWSTR pszFile, BOOL bSelect) {
 	lstrcat(szParameters, L"\"");
 	ShellExecute(hwnd, L"open", L"explorer", szParameters, NULL, SW_SHOW);
 	NP2HeapFree(szParameters);
+#endif
 }
 
 //=============================================================================
@@ -2015,7 +2017,7 @@ DWORD GetLongPathNameEx(LPWSTR lpszPath, DWORD cchBuffer) {
 //	a filename extension
 //
 DWORD_PTR SHGetFileInfo2(LPCWSTR pszPath, DWORD dwFileAttributes, SHFILEINFO *psfi, UINT cbFileInfo, UINT uFlags) {
-	if (PathFileExists(pszPath)) {
+	if (PathIsFile(pszPath)) {
 		const DWORD_PTR dw = SHGetFileInfo(pszPath, dwFileAttributes, psfi, cbFileInfo, uFlags);
 		if (lstrlen(psfi->szDisplayName) < lstrlen(PathFindFileName(pszPath))) {
 			StrCatBuff(psfi->szDisplayName, PathFindExtension(pszPath), COUNTOF(psfi->szDisplayName));

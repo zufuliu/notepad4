@@ -967,7 +967,7 @@ static DWORD WINAPI FileMRUIconThread(LPVOID lpParam) {
 		if (ListView_GetItem(hwnd, &lvi)) {
 			SHFILEINFO shfi;
 			DWORD dwAttr = 0;
-			if (PathIsUNC(tch) || !PathFileExists(tch)) {
+			if (PathIsUNC(tch) || !PathIsFile(tch)) {
 				dwFlags |= SHGFI_USEFILEATTRIBUTES;
 				dwAttr = FILE_ATTRIBUTE_NORMAL;
 				shfi.dwAttributes = 0;
@@ -1135,7 +1135,7 @@ static INT_PTR CALLBACK FileMRUDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 					DWORD dwFlags = SHGFI_SMALLICON | SHGFI_SYSICONINDEX | SHGFI_ATTRIBUTES | SHGFI_ATTR_SPECIFIED;
 					DWORD dwAttr = 0;
 					SHFILEINFO shfi;
-					if (!PathFileExists(tch)) {
+					if (!PathIsFile(tch)) {
 						dwFlags |= SHGFI_USEFILEATTRIBUTES;
 						dwAttr = FILE_ATTRIBUTE_NORMAL;
 						shfi.dwAttributes = 0;
@@ -1259,7 +1259,7 @@ static INT_PTR CALLBACK FileMRUDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 
 				PathUnquoteSpaces(tch);
 
-				if (!PathFileExists(tch)) {
+				if (!PathIsFile(tch)) {
 					// Ask...
 					if (IDYES == MsgBox(MBYESNO, IDS_ERR_MRUDLG)) {
 						MRU_Delete(pFileMRU, lvi.iItem);
