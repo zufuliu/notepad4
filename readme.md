@@ -11,7 +11,7 @@ Latest development builds (artifacts in Release configuration for each compiler 
 
 | GitHub Actions | AppVeyor |
 | --------------- | -------- |
-| ![Build status](https://github.com/zufuliu/notepad2/workflows/CI/badge.svg) | [![Build status](https://ci.appveyor.com/api/projects/status/github/zufuliu/notepad2?branch=master&svg=true)](https://ci.appveyor.com/project/zufuliu/notepad2) |
+| [![Build status](https://github.com/zufuliu/notepad2/workflows/CI/badge.svg)](https://github.com/zufuliu/notepad2/actions) | [![Build status](https://ci.appveyor.com/api/projects/status/github/zufuliu/notepad2?branch=master&svg=true)](https://ci.appveyor.com/project/zufuliu/notepad2) |
 
 ## [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots)
 ![v4.20.04](https://raw.githubusercontent.com/wiki/zufuliu/notepad2/screenshots/v4.20.04.png)
