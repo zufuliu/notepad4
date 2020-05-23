@@ -397,6 +397,11 @@ NP2_inline BOOL IsChineseTraditionalSubLang(LANGID subLang) {
 		wsprintf((lpOutput), (lpFormat), __VA_ARGS__);			\
 	} while (0)
 
+NP2_inline BOOL PathIsFile(LPCWSTR pszPath) {
+	// note: INVALID_FILE_ATTRIBUTES is -1.
+	return (GetFileAttributes(pszPath) & FILE_ATTRIBUTE_DIRECTORY) == 0;
+}
+
 void PathRelativeToApp(LPCWSTR lpszSrc, LPWSTR lpszDest, int cchDest, BOOL bSrcIsFile,
 					   BOOL bUnexpandEnv, BOOL bUnexpandMyDocs);
 void PathAbsoluteFromApp(LPCWSTR lpszSrc, LPWSTR lpszDest, int cchDest, BOOL bExpandEnv);

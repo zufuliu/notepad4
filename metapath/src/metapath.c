@@ -1217,7 +1217,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 				if (PathGetLnkPath(dli.szFileName, tch, COUNTOF(tch))) {
 					ExpandEnvironmentStringsEx(tch, COUNTOF(tch));
 					const DWORD dwAttr = GetFileAttributes(tch);
-					if ((dwAttr == INVALID_FILE_ATTRIBUTES) || (dwAttr & FILE_ATTRIBUTE_DIRECTORY)) {
+					if ((dwAttr & FILE_ATTRIBUTE_DIRECTORY)) {
 						DisplayLnkFile(dli.szFileName);
 					} else {
 						// Made sure link points to a file
@@ -1726,7 +1726,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		if (back != bWindowLayoutRTL) {
 			SetWindowLayoutRTL(hwndDirList, bWindowLayoutRTL);
 		}
-		bHasQuickview = PathFileExists(szQuickview);
+		bHasQuickview = PathIsFile(szQuickview);
 		iDefaultOpenMenu = bOpenFileInSameWindow ? IDM_FILE_OPENSAME : IDM_FILE_OPENNEW;
 		iShiftOpenMenu = bOpenFileInSameWindow ? IDM_FILE_OPENNEW : IDM_FILE_OPENSAME;
 	}
@@ -2253,7 +2253,7 @@ BOOL ChangeDirectory(HWND hwnd, LPCWSTR lpszNewDir, BOOL bUpdateHistory) {
 		WCHAR szTest[MAX_PATH];
 
 		GetCurrentDirectory(COUNTOF(szTest), szTest);
-		if (!PathFileExists(szTest)) {
+		if (!PathIsDirectory(szTest)) {
 			WCHAR szWinDir[MAX_PATH];
 			GetWindowsDirectory(szWinDir, COUNTOF(szWinDir));
 			SetCurrentDirectory(szWinDir);
@@ -2453,7 +2453,7 @@ void LoadSettings(void) {
 		PathAbsoluteFromApp(strValue, szQuickview, COUNTOF(szQuickview), TRUE);
 	}
 
-	bHasQuickview = PathFileExists(szQuickview);
+	bHasQuickview = PathIsFile(szQuickview);
 	IniSectionGetString(pIniSection, L"QuikviewParams", L"",
 						szQuickviewParams, COUNTOF(szQuickviewParams));
 
@@ -2979,7 +2979,7 @@ BOOL CheckIniFile(LPWSTR lpszFile, LPCWSTR lpszModule) {
 		// program directory
 		lstrcpy(tchBuild, lpszModule);
 		lstrcpy(PathFindFileName(tchBuild), tchFileExpanded);
-		if (PathFileExists(tchBuild)) {
+		if (PathIsFile(tchBuild)) {
 			lstrcpy(lpszFile, tchBuild);
 			return TRUE;
 		}
@@ -3002,7 +3002,7 @@ BOOL CheckIniFile(LPWSTR lpszFile, LPCWSTR lpszModule) {
 			if (S_OK == SHGetFolderPath(NULL, csidlList[i], NULL, SHGFP_TYPE_CURRENT, tchBuild)) {
 				PathAppend(tchBuild, WC_METAPATH);
 				PathAppend(tchBuild, tchFileExpanded);
-				if (PathFileExists(tchBuild)) {
+				if (PathIsFile(tchBuild)) {
 					lstrcpy(lpszFile, tchBuild);
 					return TRUE;
 				}
@@ -3021,14 +3021,14 @@ BOOL CheckIniFile(LPWSTR lpszFile, LPCWSTR lpszModule) {
 				CoTaskMemFree(pszPath);
 				PathAppend(tchBuild, WC_METAPATH);
 				PathAppend(tchBuild, tchFileExpanded);
-				if (PathFileExists(tchBuild)) {
+				if (PathIsFile(tchBuild)) {
 					lstrcpy(lpszFile, tchBuild);
 					return TRUE;
 				}
 			}
 		}
 #endif
-	} else if (PathFileExists(tchFileExpanded)) {
+	} else if (PathIsFile(tchFileExpanded)) {
 		lstrcpy(lpszFile, tchFileExpanded);
 		return TRUE;
 	}
@@ -3238,7 +3238,7 @@ BOOL DisplayLnkFile(LPCWSTR pszLnkFile) {
 	WCHAR szTmp[MAX_PATH];
 	if (!PathGetLnkPath(pszLnkFile, szTmp, COUNTOF(szTmp))) {
 		// Select lnk-file if target is not available
-		if (PathFileExists(pszLnkFile)) {
+		if (PathIsFile(pszLnkFile)) {
 			lstrcpy(szTmp, pszLnkFile);
 			PathRemoveFileSpec(szTmp);
 			SetCurrentDirectory(szTmp);
@@ -3311,7 +3311,7 @@ BOOL DisplayLnkFile(LPCWSTR pszLnkFile) {
 
 	// GetFileAttributes() failed
 	// Select lnk-file if target is not available
-	if (PathFileExists(pszLnkFile)) {
+	if (PathIsFile(pszLnkFile)) {
 		lstrcpy(szTmp, pszLnkFile);
 		PathRemoveFileSpec(szTmp);
 		SetCurrentDirectory(szTmp);

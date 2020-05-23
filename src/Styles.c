@@ -1064,7 +1064,7 @@ void Style_OnDPIChanged(void) {
 
 void Style_OnStyleThemeChanged(int theme) {
 	if (theme != StyleTheme_Default) {
-		if (!PathFileExists(darkStyleThemeFilePath)) {
+		if (!PathIsFile(darkStyleThemeFilePath)) {
 			FindDarkThemeFile();
 		}
 	}

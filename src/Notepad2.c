@@ -1328,7 +1328,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 			SetForegroundWindow(hwnd);
 		}
 
-		if (PathFileExists(szCurFile)) {
+		if (PathIsFile(szCurFile)) {
 			if ((iFileWatchingMode == 2 && !IsDocumentModified()) || MsgBox(MBYESNO, IDS_FILECHANGENOTIFY) == IDYES) {
 				const Sci_Position iCurPos = SciCall_GetCurrentPos();
 				const Sci_Position iAnchorPos = SciCall_GetAnchor();
@@ -6591,7 +6591,7 @@ BOOL CheckIniFile(LPWSTR lpszFile, LPCWSTR lpszModule) {
 		// program directory
 		lstrcpy(tchBuild, lpszModule);
 		lstrcpy(PathFindFileName(tchBuild), tchFileExpanded);
-		if (PathFileExists(tchBuild)) {
+		if (PathIsFile(tchBuild)) {
 			lstrcpy(lpszFile, tchBuild);
 			return TRUE;
 		}
@@ -6614,7 +6614,7 @@ BOOL CheckIniFile(LPWSTR lpszFile, LPCWSTR lpszModule) {
 			if (S_OK == SHGetFolderPath(NULL, csidlList[i], NULL, SHGFP_TYPE_CURRENT, tchBuild)) {
 				PathAppend(tchBuild, WC_NOTEPAD2);
 				PathAppend(tchBuild, tchFileExpanded);
-				if (PathFileExists(tchBuild)) {
+				if (PathIsFile(tchBuild)) {
 					lstrcpy(lpszFile, tchBuild);
 					return TRUE;
 				}
@@ -6633,14 +6633,14 @@ BOOL CheckIniFile(LPWSTR lpszFile, LPCWSTR lpszModule) {
 				CoTaskMemFree(pszPath);
 				PathAppend(tchBuild, WC_NOTEPAD2);
 				PathAppend(tchBuild, tchFileExpanded);
-				if (PathFileExists(tchBuild)) {
+				if (PathIsFile(tchBuild)) {
 					lstrcpy(lpszFile, tchBuild);
 					return TRUE;
 				}
 			}
 		}
 #endif
-	} else if (PathFileExists(tchFileExpanded)) {
+	} else if (PathIsFile(tchFileExpanded)) {
 		lstrcpy(lpszFile, tchFileExpanded);
 		return TRUE;
 	}
@@ -7167,7 +7167,7 @@ BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect, LPCWST
 #endif
 
 	// Ask to create a new file...
-	if (!bReload && !PathFileExists(szFileName)) {
+	if (!bReload && !PathIsFile(szFileName)) {
 		int result = IDCANCEL;
 		if (flagQuietCreate || (result = MsgBox(MBYESNOCANCEL, IDS_ASK_CREATE, szFileName)) == IDYES) {
 			HANDLE hFile = CreateFile(szFileName,
