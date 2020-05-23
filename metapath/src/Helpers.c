@@ -27,10 +27,10 @@
 #include <vssym32.h>
 #include <psapi.h>
 #include <stdio.h>
+#include "config.h"
 #include "Helpers.h"
 #include "Dlapi.h"
 #include "resource.h"
-#include "config.h"
 
 void IniClearSectionEx(LPCWSTR lpSection, LPCWSTR lpszIniFile, BOOL bDelete) {
 	if (StrIsEmpty(lpszIniFile)) {

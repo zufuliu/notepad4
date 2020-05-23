@@ -28,9 +28,9 @@
 #include <uxtheme.h>
 #include <vssym32.h>
 #include <stdio.h>
+#include "config.h"
 #include "Helpers.h"
 #include "resource.h"
-#include "config.h"
 
 void StopWatch_Show(const StopWatch *watch, LPCWSTR msg) {
 	const double elapsed = StopWatch_Get(watch);

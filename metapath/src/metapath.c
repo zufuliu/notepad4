@@ -170,11 +170,7 @@ DWORD		g_uWinVer;
 WCHAR g_wchAppUserModelID[64] = L"";
 #if NP2_ENABLE_APP_LOCALIZATION_DLL
 static HMODULE hResDLL;
-#if NP2_ENABLE_TEST_LOCALIZATION_LAYOUT
 LANGID uiLanguage;
-#else
-static LANGID uiLanguage;
-#endif
 UINT languageResID;
 #endif
 
@@ -3399,18 +3395,7 @@ BOOL ActivatePrevInst(void) {
 			return TRUE;
 		}
 
-		WCHAR szBuf[256];
-
-		// Prepare message
-		GetString(IDS_ERR_PREVWINDISABLED, szBuf, COUNTOF(szBuf));
-		WCHAR *c = StrChr(szBuf, L'\n');
-		if (c) {
-			*c = 0;
-			c++;
-		}
-
-		// Ask...
-		if (MessageBox(NULL, c, szBuf, MB_YESNO | MB_ICONQUESTION | MB_SETFOREGROUND) == IDYES) {
+		if (MsgBoxAsk(MB_YESNO, IDS_ERR_PREVWINDISABLED) == IDYES) {
 			return FALSE;
 		}
 		return TRUE;
@@ -3586,19 +3571,7 @@ void LaunchTarget(LPCWSTR lpFileName, BOOL bOpenNew) {
 			}
 		} else { // Either no window or disabled - run target.exe
 			if (hwnd) { // disabled window
-				WCHAR szBuf[256];
-
-				// Prepare message
-				GetString(IDS_ERR_TARGETDISABLED, szBuf, COUNTOF(szBuf));
-				WCHAR *c = StrChr(szBuf, L'\n');
-				if (c) {
-					*c = 0;
-					c++;
-				}
-
-				// Ask...
-				if (MessageBox(hwndMain, c, szBuf,
-							   MB_YESNO | MB_ICONQUESTION | MB_SETFOREGROUND) == IDNO) {
+				if (MsgBoxAsk(MB_YESNO, IDS_ERR_TARGETDISABLED) == IDNO) {
 					return;
 				}
 			}
