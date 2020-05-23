@@ -854,7 +854,7 @@ void Style_Save(void) {
 	// save changes to each theme
 	LPCWSTR themePath = GetStyleThemeFilePath();
 	if (np2StyleTheme != StyleTheme_Default) {
-		if (!CreateIniFileEx(themePath)) {
+		if (!CreateIniFile(themePath)) {
 			NP2HeapFree(pIniSectionBuf);
 			MsgBox(MBWARN, IDS_CREATEINI_FAIL);
 			return;
@@ -2391,7 +2391,7 @@ static void Style_UpdateLexerLang(PEDITLEXER pLex, LPCWSTR lpszExt, LPCWSTR lpsz
 			}
 		} else if (StrCaseEqual(L"xsd", lpszExt)) {
 			np2LexLangIndex = IDM_LEXER_XSD;
-		} else if (StrHasPrefixCase(L"xsl", lpszExt)) {
+		} else if (StrHasPrefixCase(lpszExt, L"xsl")) {
 			np2LexLangIndex = IDM_LEXER_XSLT;
 		} else if (StrCaseEqual(L"dtd", lpszExt)) {
 			np2LexLangIndex = IDM_LEXER_DTD;

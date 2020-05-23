@@ -127,8 +127,7 @@ BOOL CheckIniFile(LPWSTR lpszFile, LPCWSTR lpszModule);
 BOOL CheckIniFileRedirect(LPWSTR lpszFile, LPCWSTR lpszModule);
 BOOL FindIniFile(void);
 BOOL TestIniFile(void);
-BOOL CreateIniFile(void);
-BOOL CreateIniFileEx(LPCWSTR lpszIniFile);
+BOOL CreateIniFile(LPCWSTR lpszIniFile);
 
 BOOL DisplayPath(LPCWSTR lpPath, UINT uIdError);
 BOOL DisplayLnkFile(LPCWSTR pszLnkFile);

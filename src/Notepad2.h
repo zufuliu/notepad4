@@ -156,8 +156,7 @@ BOOL CheckIniFile(LPWSTR lpszFile, LPCWSTR lpszModule);
 BOOL CheckIniFileRedirect(LPWSTR lpszFile, LPCWSTR lpszModule, LPCWSTR redirectKey);
 BOOL FindIniFile(void);
 BOOL TestIniFile(void);
-BOOL CreateIniFile(void);
-BOOL CreateIniFileEx(LPCWSTR lpszIniFile);
+BOOL CreateIniFile(LPCWSTR lpszIniFile);
 void FindExtraIniFile(LPWSTR lpszIniFile, LPCWSTR defaultName, LPCWSTR redirectKey);
 
 void UpdateWindowTitle(void);
