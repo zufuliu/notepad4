@@ -202,7 +202,6 @@ typedef struct WININFO {
 } WININFO;
 
 static WININFO wi;
-//BOOL	bIsAppThemed;
 
 static int cyReBar;
 static int cyReBarFrame;

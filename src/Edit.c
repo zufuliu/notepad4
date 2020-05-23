@@ -779,7 +779,7 @@ BOOL EditLoadFile(LPWSTR pszFile, BOOL bSkipEncodingDetection, EditFileIOStatus 
 	}
 
 	// display real path name
-	if (IsVistaAndAbove()) {
+	{
 		WCHAR path[MAX_PATH] = L"";
 		// since Windows Vista
 #if _WIN32_WINNT >= _WIN32_WINNT_VISTA
