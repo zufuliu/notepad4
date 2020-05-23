@@ -144,6 +144,7 @@ IF /I "%ARCH%" == "Win32" GOTO END_MSVC
 
 :MSVC_ARM64
 IF EXIST "%INPUTDIR_ARM64%" CALL :SubZipFiles %INPUTDIR_ARM64% ARM64
+IF /I "%ARCH%" == "ARM64" GOTO END_MSVC
 
 :MSVC_ARM
 IF EXIST "%INPUTDIR_ARM%" CALL :SubZipFiles %INPUTDIR_ARM% ARM
@@ -183,8 +184,8 @@ EXIT /B
 
 
 :SubZipFiles
-IF NOT EXIST "%1\Notepad2.exe" CALL :SUBMSG "ERROR" "%1\Notepad2.exe NOT found"
-IF NOT EXIST "%1\metapath.exe" CALL :SUBMSG "ERROR" "%1\metapath.exe NOT found"
+IF NOT EXIST "%1\Notepad2.exe" CALL (:SUBMSG "ERROR" "%1\Notepad2.exe NOT found" & EXIT /B)
+IF NOT EXIST "%1\metapath.exe" CALL (:SUBMSG "ERROR" "%1\metapath.exe NOT found" & EXIT /B)
 
 IF "%WITH_LOCALE%" == "1" (
   SET "ZIP_NAME=Notepad2_i18n"
@@ -214,8 +215,11 @@ PUSHD "%TEMP_ZIP_DIR%"
 "%SEVENZIP%" a -tzip -mx=9 "../%ZIP_NAME%.zip" "*" >NUL
 POPD
 
-IF %ERRORLEVEL% NEQ 0 CALL :SUBMSG "ERROR" "Compilation failed!"
-CALL :SUBMSG "INFO" "%ZIP_NAME%.zip created successfully!"
+IF %ERRORLEVEL% NEQ 0 (
+  CALL :SUBMSG "ERROR" "Compilation failed!"
+) ELSE (
+  CALL :SUBMSG "INFO" "%ZIP_NAME%.zip created successfully!"
+)
 
 IF EXIST "%TEMP_ZIP_DIR%"     RD /S /Q "%TEMP_ZIP_DIR%"
 EXIT /B
