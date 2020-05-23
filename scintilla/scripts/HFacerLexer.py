@@ -3,6 +3,7 @@
 # definition file.
 # Implemented 2000 by Neil Hodgson neilh@scintilla.org
 
+import pathlib
 import Face
 
 from FileGenerator import Regenerate
@@ -32,8 +33,8 @@ def printLexHFile(f):
 
 def RegenerateAll(root):
 	f = Face.Face()
-	f.ReadFromFile(root + "include/SciLexer.iface")
-	Regenerate(root + "include/SciLexer.h", "/* ", printLexHFile(f))
+	f.ReadFromFile(root / "include/SciLexer.iface")
+	Regenerate(root / "include/SciLexer.h", "/* ", printLexHFile(f))
 
 if __name__ == "__main__":
-	RegenerateAll("../")
+	RegenerateAll(pathlib.Path(__file__).resolve().parent.parent)

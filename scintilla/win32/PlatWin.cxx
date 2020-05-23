@@ -40,10 +40,6 @@
 
 #include "PlatWin.h"
 
-#ifndef SPI_GETFONTSMOOTHINGCONTRAST
-#define SPI_GETFONTSMOOTHINGCONTRAST	0x200C
-#endif
-
 #ifndef LOAD_LIBRARY_SEARCH_SYSTEM32
 #define LOAD_LIBRARY_SEARCH_SYSTEM32	0x00000800
 #endif
@@ -87,7 +83,7 @@ bool LoadD2D() noexcept {
 
 		hDLLD2D = ::LoadLibraryEx(L"D2D1.DLL", nullptr, kSystemLibraryLoadFlags);
 		if (hDLLD2D) {
-			D2D1CFSig fnD2DCF = reinterpret_cast<D2D1CFSig>(::GetProcAddress(hDLLD2D, "D2D1CreateFactory"));
+			D2D1CFSig fnD2DCF = DLLFunction<D2D1CFSig>(hDLLD2D, "D2D1CreateFactory");
 			if (fnD2DCF) {
 #ifdef NDEBUG
 				// A single threaded factory as Scintilla always draw on the GUI thread
@@ -107,7 +103,7 @@ bool LoadD2D() noexcept {
 		}
 		hDLLDWrite = ::LoadLibraryEx(L"DWRITE.DLL", nullptr, kSystemLibraryLoadFlags);
 		if (hDLLDWrite) {
-			DWriteCFSig fnDWCF = reinterpret_cast<DWriteCFSig>(::GetProcAddress(hDLLDWrite, "DWriteCreateFactory"));
+			DWriteCFSig fnDWCF = DLLFunction<DWriteCFSig>(hDLLDWrite, "DWriteCreateFactory");
 			if (fnDWCF) {
 				const GUID IID_IDWriteFactory2 = // 0439fc60-ca44-4994-8dee-3a9af7b732ec
 				{ 0x0439fc60, 0xca44, 0x4994, { 0x8d, 0xee, 0x3a, 0x9a, 0xf7, 0xb7, 0x32, 0xec } };
@@ -458,6 +454,9 @@ class SurfaceGDI : public Surface {
 	HFONT fontOld{};
 	HBITMAP bitmap{};
 	HBITMAP bitmapOld{};
+
+	int logPixelsY = USER_DEFAULT_SCREEN_DPI;
+
 	int maxWidthMeasure = INT_MAX;
 	// There appears to be a 16 bit string length limit in GDI on NT.
 	int maxLenText = 65535;
@@ -566,20 +565,20 @@ bool SurfaceGDI::Initialised() const noexcept {
 	return hdc != nullptr;
 }
 
-void SurfaceGDI::Init(WindowID) noexcept {
+void SurfaceGDI::Init(WindowID /*wid*/) noexcept {
 	Release();
 	hdc = ::CreateCompatibleDC({});
 	hdcOwned = true;
 	::SetTextAlign(hdc, TA_BASELINE);
 }
 
-void SurfaceGDI::Init(SurfaceID sid, WindowID) noexcept {
+void SurfaceGDI::Init(SurfaceID sid, WindowID /*wid*/) noexcept {
 	Release();
 	hdc = static_cast<HDC>(sid);
 	::SetTextAlign(hdc, TA_BASELINE);
 }
 
-void SurfaceGDI::InitPixMap(int width, int height, Surface *surface_, WindowID) noexcept {
+void SurfaceGDI::InitPixMap(int width, int height, Surface *surface_, WindowID /*wid*/) noexcept {
 	Release();
 	SurfaceGDI *psurfOther = down_cast<SurfaceGDI *>(surface_);
 	// Should only ever be called with a SurfaceGDI, not a SurfaceD2D
@@ -628,11 +627,11 @@ void SurfaceGDI::SetFont(const Font &font_) noexcept {
 }
 
 int SurfaceGDI::LogPixelsY() const noexcept {
-	return ::GetDeviceCaps(hdc, LOGPIXELSY);
+	return logPixelsY;
 }
 
 int SurfaceGDI::DeviceHeightFont(int points) const noexcept {
-	return ::MulDiv(points, LogPixelsY(), 72);
+	return ::MulDiv(points, logPixelsY, 72);
 }
 
 void SurfaceGDI::MoveTo(int x_, int y_) noexcept {
@@ -649,7 +648,7 @@ void SurfaceGDI::Polygon(const Point *pts, size_t npts, ColourDesired fore, Colo
 	std::vector<POINT> outline;
 	outline.reserve(npts);
 	for (size_t i = 0; i < npts; i++) {
-		POINT pt = POINTFromPoint(pts[i]);
+		const POINT pt = POINTFromPoint(pts[i]);
 		outline.push_back(pt);
 	}
 	::Polygon(hdc, outline.data(), static_cast<int>(npts));
@@ -803,8 +802,8 @@ void SurfaceGDI::DrawRGBAImage(PRectangle rc, int width, int height, const unsig
 		const BITMAPINFO bpih = { {sizeof(BITMAPINFOHEADER), width, height, 1, 32, BI_RGB, 0, 0, 0, 0, 0},
 			{{0, 0, 0, 0}} };
 		void *image = nullptr;
-		HBITMAP hbmMem = CreateDIBSection(hMemDC, &bpih,
-			DIB_RGB_COLORS, &image, nullptr, 0);
+		HBITMAP hbmMem = ::CreateDIBSection(hMemDC, &bpih,
+			DIB_RGB_COLORS, &image, {}, 0);
 		if (hbmMem) {
 			HBITMAP hbmOld = SelectBitmap(hMemDC, hbmMem);
 
@@ -1027,8 +1026,6 @@ class SurfaceD2D : public Surface {
 	ID2D1SolidColorBrush *pBrush;
 
 	int logPixelsY;
-	//float dpiScaleX;
-	//float dpiScaleY;
 
 	void Clear() noexcept;
 	void SetFont(const Font &font_) noexcept;
@@ -1042,7 +1039,7 @@ public:
 	SurfaceD2D &operator=(SurfaceD2D &&) = delete;
 	~SurfaceD2D() noexcept override;
 
-	void SetScale() noexcept;
+	void SetScale(WindowID wid) noexcept;
 	void Init(WindowID wid) noexcept override;
 	void Init(SurfaceID sid, WindowID wid) noexcept override;
 	void InitPixMap(int width, int height, Surface *surface_, WindowID wid) noexcept override;
@@ -1112,9 +1109,7 @@ SurfaceD2D::SurfaceD2D() noexcept :
 
 	pBrush = nullptr;
 
-	logPixelsY = 72;
-	//dpiScaleX = 1.0;
-	//dpiScaleY = 1.0;
+	logPixelsY = USER_DEFAULT_SCREEN_DPI;
 }
 
 SurfaceD2D::~SurfaceD2D() noexcept {
@@ -1145,12 +1140,7 @@ void SurfaceD2D::Release() noexcept {
 	Clear();
 }
 
-void SurfaceD2D::SetScale() noexcept {
-	HDC hdcMeasure = ::CreateCompatibleDC({});
-	logPixelsY = ::GetDeviceCaps(hdcMeasure, LOGPIXELSY);
-	//dpiScaleX = ::GetDeviceCaps(hdcMeasure, LOGPIXELSX) / 96.0f;
-	//dpiScaleY = logPixelsY / 96.0f;
-	::DeleteDC(hdcMeasure);
+void SurfaceD2D::SetScale(WindowID /*wid*/) noexcept {
 }
 
 bool SurfaceD2D::Initialised() const noexcept {
@@ -1161,20 +1151,20 @@ HRESULT SurfaceD2D::FlushDrawing() const noexcept {
 	return pRenderTarget->Flush();
 }
 
-void SurfaceD2D::Init(WindowID /* wid */) noexcept {
+void SurfaceD2D::Init(WindowID wid) noexcept {
 	Release();
-	SetScale();
+	SetScale(wid);
 }
 
-void SurfaceD2D::Init(SurfaceID sid, WindowID) noexcept {
+void SurfaceD2D::Init(SurfaceID sid, WindowID wid) noexcept {
 	Release();
-	SetScale();
+	SetScale(wid);
 	pRenderTarget = static_cast<ID2D1RenderTarget *>(sid);
 }
 
-void SurfaceD2D::InitPixMap(int width, int height, Surface *surface_, WindowID) noexcept {
+void SurfaceD2D::InitPixMap(int width, int height, Surface *surface_, WindowID wid) noexcept {
 	Release();
-	SetScale();
+	SetScale(wid);
 	SurfaceD2D *psurfOther = down_cast<SurfaceD2D *>(surface_);
 	// Should only ever be called with a SurfaceD2D, not a SurfaceGDI
 	PLATFORM_ASSERT(psurfOther);
@@ -1249,7 +1239,7 @@ int SurfaceD2D::LogPixelsY() const noexcept {
 }
 
 int SurfaceD2D::DeviceHeightFont(int points) const noexcept {
-	return ::MulDiv(points, LogPixelsY(), 72);
+	return ::MulDiv(points, logPixelsY, 72);
 }
 
 void SurfaceD2D::MoveTo(int x_, int y_) noexcept {
@@ -1654,13 +1644,13 @@ void ScreenLineLayout::FillTextLayoutFormats(const IScreenLine *screenLine, IDWr
 	for (size_t bytePosition = 0; bytePosition < screenLine->Length();) {
 		const unsigned char uch = screenLine->Text()[bytePosition];
 		const unsigned int byteCount = UTF8BytesOfLead(uch);
-		const UINT32 codeUnits = static_cast<UINT32>(UTF16LengthFromUTF8ByteCount(byteCount));
+		const UINT32 codeUnits = UTF16LengthFromUTF8ByteCount(byteCount);
 		const DWRITE_TEXT_RANGE textRange = { layoutPosition, codeUnits };
 
 		XYPOSITION representationWidth = screenLine->RepresentationWidth(bytePosition);
 		if ((representationWidth == 0.0f) && (screenLine->Text()[bytePosition] == '\t')) {
 			Point realPt;
-			DWRITE_HIT_TEST_METRICS realCaretMetrics;
+			DWRITE_HIT_TEST_METRICS realCaretMetrics {};
 			textLayout->HitTestTextPosition(
 				layoutPosition,
 				false, // trailing if false, else leading edge
@@ -1771,9 +1761,9 @@ size_t ScreenLineLayout::PositionFromX(XYPOSITION xDistance, bool charPosition) 
 	// If hitting the trailing side of a cluster, return the
 	// leading edge of the following text position.
 
-	BOOL isTrailingHit;
-	BOOL isInside;
-	DWRITE_HIT_TEST_METRICS caretMetrics;
+	BOOL isTrailingHit = FALSE;
+	BOOL isInside = FALSE;
+	DWRITE_HIT_TEST_METRICS caretMetrics {};
 
 	textLayout->HitTestPoint(
 		xDistance,
@@ -1783,7 +1773,7 @@ size_t ScreenLineLayout::PositionFromX(XYPOSITION xDistance, bool charPosition) 
 		&caretMetrics
 	);
 
-	DWRITE_HIT_TEST_METRICS hitTestMetrics = {};
+	DWRITE_HIT_TEST_METRICS hitTestMetrics {};
 	if (isTrailingHit) {
 		FLOAT caretX = 0.0f;
 		FLOAT caretY = 0.0f;
@@ -1823,8 +1813,8 @@ XYPOSITION ScreenLineLayout::XFromPosition(size_t caretPosition) noexcept {
 	const size_t position = GetPositionInLayout(text, caretPosition);
 
 	// Translate text character offset to point (x, y).
-	DWRITE_HIT_TEST_METRICS caretMetrics;
-	Point pt;
+	DWRITE_HIT_TEST_METRICS caretMetrics {};
+	Point pt {};
 
 	textLayout->HitTestTextPosition(
 		static_cast<UINT32>(position),
@@ -1918,7 +1908,7 @@ void SurfaceD2D::DrawTextCommon(PRectangle rc, const Font &font_, XYPOSITION yba
 		}
 
 		// Explicitly creating a text layout appears a little faster
-		IDWriteTextLayout *pTextLayout;
+		IDWriteTextLayout *pTextLayout = nullptr;
 		const HRESULT hr = pIDWriteFactory->CreateTextLayout(tbuf.buffer, tbuf.tlen, pTextFormat,
 			rc.Width(), rc.Height(), &pTextLayout);
 		if (SUCCEEDED(hr)) {
@@ -2236,8 +2226,7 @@ void Window::InvalidateRectangle(PRectangle rc) noexcept {
 }
 
 void Window::SetFont(const Font &font) noexcept {
-	::SendMessage(HwndFromWindowID(wid), WM_SETFONT,
-		reinterpret_cast<WPARAM>(font.GetID()), 0);
+	SetWindowFont(HwndFromWindowID(wid), font.GetID(), FALSE);
 }
 
 namespace {
@@ -2511,7 +2500,7 @@ void ListBoxX::SetFont(const Font &font) noexcept {
 		}
 		const FormatAndMetrics *pfm = static_cast<FormatAndMetrics *>(font.GetID());
 		fontCopy = pfm->HFont();
-		::SendMessage(lb, WM_SETFONT, reinterpret_cast<WPARAM>(fontCopy), 0);
+		SetWindowFont(lb, fontCopy, FALSE);
 	}
 }
 
@@ -3412,7 +3401,7 @@ bool Platform::ShowAssertionPopUps(bool) noexcept {
 
 #ifdef TRACE
 void Platform::Assert(const char *c, const char *file, int line) noexcept {
-	char buffer[2000];
+	char buffer[2000]{};
 	sprintf(buffer, "Assertion [%s] failed at %s %d%s", c, file, line, assertionPopUps ? "" : "\r\n");
 	if (assertionPopUps) {
 		const int idButton = ::MessageBoxA(nullptr, buffer, "Assertion failure",

@@ -23,6 +23,10 @@
 #define _WIN32_WINNT_WIN10				0x0A00
 #endif
 
+#ifndef USER_DEFAULT_SCREEN_DPI
+#define USER_DEFAULT_SCREEN_DPI		96
+#endif
+
 #if !defined(DISABLE_D2D)
 #define USE_D2D		1
 #endif
@@ -82,6 +86,29 @@ inline void *PointerFromWindow(HWND hWnd) noexcept {
 
 inline void SetWindowPointer(HWND hWnd, void *ptr) noexcept {
 	::SetWindowLongPtr(hWnd, 0, reinterpret_cast<LONG_PTR>(ptr));
+}
+
+/// Find a function in a DLL and convert to a function pointer.
+/// This avoids undefined and conditionally defined behaviour.
+template<typename T>
+inline T DLLFunction(HMODULE hModule, LPCSTR lpProcName) noexcept {
+#if 1
+	return reinterpret_cast<T>(::GetProcAddress(hModule, lpProcName));
+#else
+	if (!hModule) {
+		return nullptr;
+	}
+	FARPROC function = ::GetProcAddress(hModule, lpProcName);
+	static_assert(sizeof(T) == sizeof(function));
+	T fp;
+	memcpy(&fp, &function, sizeof(T));
+	return fp;
+#endif
+}
+
+template<typename T>
+inline T DLLFunction(LPCWSTR lpDllName, LPCSTR lpProcName) noexcept {
+	return DLLFunction<T>(::GetModuleHandleW(lpDllName), lpProcName);
 }
 
 #if defined(USE_D2D)
