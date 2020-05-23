@@ -43,8 +43,23 @@ jobs:
 
     - uses: actions/upload-artifact@v2
       with:
-          name: Notepad2_MSVC
-          path: 'build\Notepad2*.zip'
+          path: 'build\Notepad2_i18n_x64_*.zip'
+
+    - uses: actions/upload-artifact@v2
+      with:
+          path: 'build\Notepad2_i18n_Win32_*.zip'
+
+    - uses: actions/upload-artifact@v2
+      with:
+          path: 'build\Notepad2_i18n_AVX2_*.zip'
+
+    - uses: actions/upload-artifact@v2
+      with:
+          path: 'build\Notepad2_ARM64_*.zip'
+
+    - uses: actions/upload-artifact@v2
+      with:
+          path: 'build\Notepad2_ARM_*.zip'
 
   clang_build:
     name: Build with Clang
@@ -83,5 +98,20 @@ jobs:
 
     - uses: actions/upload-artifact@v2
       with:
-          name: Notepad2_Clang
-          path: 'build\Notepad2*.zip'
+          path: 'build\Notepad2_Clang_x64_*.zip'
+
+    - uses: actions/upload-artifact@v2
+      with:
+          path: 'build\Notepad2_Clang_Win32_*.zip'
+
+    - uses: actions/upload-artifact@v2
+      with:
+          path: 'build\Notepad2_Clang_AVX2_*.zip'
+
+    - uses: actions/upload-artifact@v2
+      with:
+          path: 'build\Notepad2_Clang_ARM64_*.zip'
+
+    #- uses: actions/upload-artifact@v2
+    #  with:
+    #      path: 'build\Notepad2_Clang_ARM_*.zip'
