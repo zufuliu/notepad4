@@ -35,6 +35,10 @@
 #include "version.h"
 
 extern HWND hwndMain;
+#if NP2_ENABLE_APP_LOCALIZATION_DLL
+extern LANGID uiLanguage;
+#endif
+
 //=============================================================================
 //
 // MsgBox()
@@ -50,7 +54,7 @@ int MsgBox(UINT uType, UINT uIdMsg, ...) {
 	wvsprintf(szText, szBuf, va);
 	va_end(va);
 
-	WCHAR szTitle[64];
+	WCHAR szTitle[128];
 	GetString(IDS_APPTITLE, szTitle, COUNTOF(szTitle));
 
 	HWND hwnd;
@@ -58,10 +62,17 @@ int MsgBox(UINT uType, UINT uIdMsg, ...) {
 		hwnd = hwndMain;
 	}
 
+	uType |= MB_SETFOREGROUND;
+	if (bWindowLayoutRTL) {
+		uType |= MB_RTLREADING;
+	}
+
 	PostMessage(hwndMain, APPM_CENTER_MESSAGE_BOX, (WPARAM)hwnd, 0);
-	return MessageBoxEx(hwnd, szText, szTitle,
-						MB_SETFOREGROUND | uType,
-						MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT));
+#if NP2_ENABLE_APP_LOCALIZATION_DLL
+	return MessageBoxEx(hwnd, szText, szTitle, uType, uiLanguage);
+#else
+	return MessageBoxEx(hwnd, szText, szTitle, uType, LANG_USER_DEFAULT);
+#endif
 }
 
 //=============================================================================

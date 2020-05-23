@@ -332,11 +332,7 @@ WCHAR 		g_wchAppUserModelID[64] = L"";
 static WCHAR g_wchWorkingDirectory[MAX_PATH] = L"";
 #if NP2_ENABLE_APP_LOCALIZATION_DLL
 static HMODULE hResDLL;
-#if NP2_ENABLE_TEST_LOCALIZATION_LAYOUT
 LANGID uiLanguage;
-#else
-static LANGID uiLanguage;
-#endif
 static UINT languageMenu;
 #endif
 

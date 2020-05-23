@@ -26,6 +26,7 @@
 #include <commctrl.h>
 #include <commdlg.h>
 #include <uxtheme.h>
+#include "config.h"
 #include "SciCall.h"
 #include "Helpers.h"
 #include "Notepad2.h"
@@ -47,6 +48,9 @@ extern BOOL		bWarnLineEndings;
 extern BOOL		bFixLineEndings;
 extern BOOL		bAutoStripBlanks;
 extern WCHAR	szCurFile[MAX_PATH + 40];
+#if NP2_ENABLE_APP_LOCALIZATION_DLL
+extern LANGID uiLanguage;
+#endif
 
 //=============================================================================
 //
@@ -63,6 +67,12 @@ int MsgBox(UINT uType, UINT uIdMsg, ...) {
 	wvsprintf(szText, szBuf, va);
 	va_end(va);
 
+#if NP2_ENABLE_APP_LOCALIZATION_DLL
+	const LANGID lang = uiLanguage;
+#else
+	const LANGID lang = LANG_USER_DEFAULT;
+#endif
+
 	if (uIdMsg == IDS_ERR_LOADFILE || uIdMsg == IDS_ERR_SAVEFILE ||
 			uIdMsg == IDS_CREATEINI_FAIL || uIdMsg == IDS_WRITEINI_FAIL ||
 			uIdMsg == IDS_EXPORT_FAIL) {
@@ -71,7 +81,7 @@ int MsgBox(UINT uType, UINT uIdMsg, ...) {
 			FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
 			NULL,
 			dwLastIOError,
-			MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+			lang,
 			(LPWSTR)(&lpMsgBuf),
 			0,
 			NULL);
@@ -85,7 +95,7 @@ int MsgBox(UINT uType, UINT uIdMsg, ...) {
 		}
 	}
 
-	WCHAR szTitle[64];
+	WCHAR szTitle[128];
 	GetString(IDS_APPTITLE, szTitle, COUNTOF(szTitle));
 
 	HWND hwnd;
@@ -93,10 +103,13 @@ int MsgBox(UINT uType, UINT uIdMsg, ...) {
 		hwnd = hwndMain;
 	}
 
+	uType |= MB_SETFOREGROUND;
+	if (bWindowLayoutRTL) {
+		uType |= MB_RTLREADING;
+	}
+
 	PostMessage(hwndMain, APPM_CENTER_MESSAGE_BOX, (WPARAM)hwnd, 0);
-	return MessageBoxEx(hwnd, szText, szTitle,
-						MB_SETFOREGROUND | uType,
-						MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT));
+	return MessageBoxEx(hwnd, szText, szTitle, uType, lang);
 }
 
 //=============================================================================
@@ -120,7 +133,14 @@ void DisplayCmdLineHelp(HWND hwnd) {
 	mbp.lpszIcon = MAKEINTRESOURCE(IDR_MAINWND);
 	mbp.dwContextHelpId = 0;
 	mbp.lpfnMsgBoxCallback = NULL;
-	mbp.dwLanguageId = MAKELANGID(LANG_NEUTRAL, SUBLANG_NEUTRAL);
+#if NP2_ENABLE_APP_LOCALIZATION_DLL
+	mbp.dwLanguageId = uiLanguage;
+#else
+	mbp.dwLanguageId = LANG_USER_DEFAULT;
+#endif
+	if (bWindowLayoutRTL) {
+		mbp.dwStyle |= MB_RTLREADING;
+	}
 
 	if (hwnd != NULL) {
 		PostMessage(hwndMain, APPM_CENTER_MESSAGE_BOX, (WPARAM)hwnd, 0);
