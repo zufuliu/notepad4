@@ -790,10 +790,10 @@ BOOL EditLoadFile(LPWSTR pszFile, BOOL bSkipEncodingDetection, EditFileIOStatus 
 		if (pfnGetFinalPathNameByHandle && pfnGetFinalPathNameByHandle(hFile, path, MAX_PATH, FILE_NAME_OPENED))
 #endif
 		{
-			if (StrNEqual(path, L"\\\\?\\", CSTRLEN(L"\\\\?\\"))) {
-				WCHAR *p = path + 4;
-				if (StrNEqual(p, L"UNC\\", CSTRLEN(L"UNC\\"))) {
-					p += 2;
+			if (StrHasPrefix(path, L"\\\\?\\")) {
+				WCHAR *p = path + CSTRLEN(L"\\\\?\\");
+				if (StrHasPrefix(p, L"UNC\\")) {
+					p += CSTRLEN(L"UNC\\");
 					*p = L'\\';
 				}
 				lstrcpy(pszFile, p);
