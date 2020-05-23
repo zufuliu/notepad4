@@ -2,6 +2,10 @@ name: CI
 
 on: [push, pull_request]
 
+defaults:
+  run:
+    shell: cmd
+
 jobs:
   msvc_build:
     name: Build with Visual C++
