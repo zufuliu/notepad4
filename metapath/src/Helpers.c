@@ -250,7 +250,7 @@ LSTATUS Registry_SetString(HKEY hKey, LPCWSTR valueName, LPCWSTR lpszText) {
 #if _WIN32_WINNT < _WIN32_WINNT_VISTA
 LSTATUS Registry_DeleteTree(HKEY hKey, LPCWSTR lpSubKey) {
 	typedef LSTATUS (WINAPI *RegDeleteTreeSig)(HKEY hKey, LPCWSTR lpSubKey);
-	RegDeleteTreeSig pfnRegDeleteTree = (RegDeleteTreeSig)GetProcAddress(GetModuleHandle(L"advapi32.dll"), "RegDeleteTreeW");
+	RegDeleteTreeSig pfnRegDeleteTree = (RegDeleteTreeSig)DLLFunction(L"advapi32.dll", "RegDeleteTreeW");
 
 	LSTATUS status;
 	if (pfnRegDeleteTree != NULL) {
@@ -348,7 +348,7 @@ HRESULT PrivateSetCurrentProcessExplicitAppUserModelID(PCWSTR AppID) {
 #else
 	typedef HRESULT (WINAPI *SetCurrentProcessExplicitAppUserModelIDSig)(PCWSTR AppID);
 	SetCurrentProcessExplicitAppUserModelIDSig pfnSetCurrentProcessExplicitAppUserModelID =
-		(SetCurrentProcessExplicitAppUserModelIDSig)GetProcAddress(GetModuleHandle(L"shell32.dll"), "SetCurrentProcessExplicitAppUserModelID");
+		(SetCurrentProcessExplicitAppUserModelIDSig)DLLFunction(L"shell32.dll", "SetCurrentProcessExplicitAppUserModelID");
 	if (pfnSetCurrentProcessExplicitAppUserModelID) {
 		return pfnSetCurrentProcessExplicitAppUserModelID(AppID);
 	}
