@@ -52,7 +52,7 @@ extern WCHAR	szCurFile[MAX_PATH + 40];
 //
 // MsgBox()
 //
-int MsgBox(int iType, UINT uIdMsg, ...) {
+int MsgBox(UINT uType, UINT uIdMsg, ...) {
 	WCHAR szBuf[1024];
 	WCHAR szText[1024];
 
@@ -88,28 +88,6 @@ int MsgBox(int iType, UINT uIdMsg, ...) {
 	WCHAR szTitle[64];
 	GetString(IDS_APPTITLE, szTitle, COUNTOF(szTitle));
 
-	int iIcon = MB_OK;
-	switch (iType) {
-	case MBINFO:
-		iIcon = MB_ICONINFORMATION;
-		break;
-	case MBWARN:
-		iIcon = MB_ICONEXCLAMATION;
-		break;
-	case MBYESNO:
-		iIcon = MB_ICONEXCLAMATION | MB_YESNO;
-		break;
-	case MBYESNOCANCEL:
-		iIcon = MB_ICONEXCLAMATION | MB_YESNOCANCEL;
-		break;
-	case MBYESNOWARN:
-		iIcon = MB_ICONEXCLAMATION | MB_YESNO;
-		break;
-	case MBOKCANCEL:
-		iIcon = MB_ICONEXCLAMATION | MB_OKCANCEL;
-		break;
-	}
-
 	HWND hwnd;
 	if ((hwnd = GetActiveWindow()) == NULL) {
 		hwnd = hwndMain;
@@ -117,7 +95,7 @@ int MsgBox(int iType, UINT uIdMsg, ...) {
 
 	PostMessage(hwndMain, APPM_CENTER_MESSAGE_BOX, (WPARAM)hwnd, 0);
 	return MessageBoxEx(hwnd, szText, szTitle,
-						MB_SETFOREGROUND | iIcon,
+						MB_SETFOREGROUND | uType,
 						MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT));
 }
 
@@ -919,10 +897,10 @@ BOOL AddToFavDlg(HWND hwnd, LPCWSTR lpszName, LPCWSTR lpszTarget) {
 
 	if (iResult == IDOK) {
 		if (PathCreateFavLnk(pszName, lpszTarget, tchFavoritesDir)) {
-			MsgBox(MBINFO, IDS_FAV_SUCCESS);
+			MsgBoxInfo(MB_OK, IDS_FAV_SUCCESS);
 			return TRUE;
 		}
-		MsgBox(MBWARN, IDS_FAV_FAILURE);
+		MsgBoxWarn(MB_OK, IDS_FAV_FAILURE);
 	}
 
 	return FALSE;
@@ -1261,7 +1239,7 @@ static INT_PTR CALLBACK FileMRUDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 
 				if (!PathIsFile(tch)) {
 					// Ask...
-					if (IDYES == MsgBox(MBYESNO, IDS_ERR_MRUDLG)) {
+					if (IDYES == MsgBoxWarn(MB_YESNO, IDS_ERR_MRUDLG)) {
 						MRU_Delete(pFileMRU, lvi.iItem);
 						MRU_DeleteFileFromStore(pFileMRU, tch);
 

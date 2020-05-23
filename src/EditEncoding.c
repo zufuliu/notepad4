@@ -841,7 +841,7 @@ BOOL Encoding_GetFromTreeView(HWND hwnd, int *pidEncoding, BOOL bQuiet) {
 				return TRUE;
 			}
 			if (!bQuiet) {
-				MsgBox(MBWARN, IDS_ERR_ENCODINGNA);
+				MsgBoxWarn(MB_OK, IDS_ERR_ENCODINGNA);
 			}
 		}
 	}
@@ -918,7 +918,7 @@ BOOL Encoding_GetFromListView(HWND hwnd, int *pidEncoding) {
 			*pidEncoding = (int)lvi.lParam;
 			return TRUE;
 		}
-		MsgBox(MBWARN, IDS_ERR_ENCODINGNA);
+		MsgBoxWarn(MB_OK, IDS_ERR_ENCODINGNA);
 	}
 
 	return FALSE;
@@ -992,7 +992,7 @@ BOOL Encoding_GetFromComboboxEx(HWND hwnd, int *pidEncoding) {
 			*pidEncoding = (int)cbei.lParam;
 			return TRUE;
 		}
-		MsgBox(MBWARN, IDS_ERR_ENCODINGNA);
+		MsgBoxWarn(MB_OK, IDS_ERR_ENCODINGNA);
 	}
 
 	return FALSE;

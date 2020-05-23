@@ -39,7 +39,7 @@ extern HWND hwndMain;
 //
 // MsgBox()
 //
-int MsgBox(int iType, UINT uIdMsg, ...) {
+int MsgBox(UINT uType, UINT uIdMsg, ...) {
 	WCHAR szBuf[256 * 2];
 	WCHAR szText[256 * 2];
 
@@ -53,28 +53,6 @@ int MsgBox(int iType, UINT uIdMsg, ...) {
 	WCHAR szTitle[64];
 	GetString(IDS_APPTITLE, szTitle, COUNTOF(szTitle));
 
-	int iIcon = MB_OK;
-	switch (iType) {
-	case MBINFO:
-		iIcon = MB_ICONINFORMATION;
-		break;
-	case MBWARN:
-		iIcon = MB_ICONEXCLAMATION;
-		break;
-	case MBYESNO:
-		iIcon = MB_ICONEXCLAMATION | MB_YESNO;
-		break;
-	case MBYESNOCANCEL:
-		iIcon = MB_ICONEXCLAMATION | MB_YESNOCANCEL;
-		break;
-	case MBYESNOWARN:
-		iIcon = MB_ICONEXCLAMATION | MB_YESNO;
-		break;
-	case MBOKCANCEL:
-		iIcon = MB_ICONEXCLAMATION | MB_OKCANCEL;
-		break;
-	}
-
 	HWND hwnd;
 	if ((hwnd = GetActiveWindow()) == NULL) {
 		hwnd = hwndMain;
@@ -82,7 +60,7 @@ int MsgBox(int iType, UINT uIdMsg, ...) {
 
 	PostMessage(hwndMain, APPM_CENTER_MESSAGE_BOX, (WPARAM)hwnd, 0);
 	return MessageBoxEx(hwnd, szText, szTitle,
-						MB_SETFOREGROUND | iIcon,
+						MB_SETFOREGROUND | uType,
 						MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT));
 }
 
@@ -1438,7 +1416,7 @@ INT_PTR CALLBACK GetFilterDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lP
 					}
 				}
 			} else {
-				MsgBox(MBINFO, IDS_ERR_FILTER);
+				MsgBoxInfo(MB_OK, IDS_ERR_FILTER);
 			}
 
 			DestroyMenu(hMenu);
@@ -2491,7 +2469,7 @@ INT_PTR CALLBACK FindTargetDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 					 (GetDlgItemText(hwnd, IDC_DDEMSG, tch, COUNTOF(tch)) == 0 ||
 					  GetDlgItemText(hwnd, IDC_DDEAPP, tch, COUNTOF(tch)) == 0 ||
 					  GetDlgItemText(hwnd, IDC_DDETOPIC, tch, COUNTOF(tch)) == 0))) {
-				MsgBox(MBINFO, IDS_ERR_INVALIDTARGET);
+				MsgBoxInfo(MB_OK, IDS_ERR_INVALIDTARGET);
 			} else {
 				IniSectionOnSave section;
 				WCHAR *pIniSectionBuf = (WCHAR *)NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_TARGET_APPLICATION);

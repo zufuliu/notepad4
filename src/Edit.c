@@ -116,7 +116,7 @@ void Edit_ReleaseResources(void) {
 }
 
 static inline void NotifyRectangleSelection(void) {
-	MsgBox(MBWARN, IDS_SELRECT);
+	MsgBoxWarn(MB_OK, IDS_SELRECT);
 	//ShowNotificationMessage(SC_NOTIFICATIONPOSITION_CENTER, IDS_SELRECT);
 }
 
@@ -842,7 +842,7 @@ BOOL EditLoadFile(LPWSTR pszFile, BOOL bSkipEncodingDetection, EditFileIOStatus 
 		_i64tow(maxFileSize, tchMaxBytes, 10);
 		FormatNumberStr(tchDocBytes);
 		FormatNumberStr(tchMaxBytes);
-		MsgBox(MBWARN, IDS_WARNLOADBIGFILE, pszFile, tchDocSize, tchDocBytes, tchMaxSize, tchMaxBytes);
+		MsgBoxWarn(MB_OK, IDS_WARNLOADBIGFILE, pszFile, tchDocSize, tchDocBytes, tchMaxSize, tchMaxBytes);
 		return FALSE;
 	}
 
@@ -3143,7 +3143,7 @@ void EditAlignText(int nMode) {
 			SciCall_EndUndoAction();
 		}
 	} else {
-		MsgBox(MBINFO, IDS_BUFFERTOOSMALL);
+		MsgBoxInfo(MB_OK, IDS_BUFFERTOOSMALL);
 	}
 
 	if (iCurPos < iAnchorPos) {
@@ -5098,17 +5098,17 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 
 			// Display help messages in the find/replace windows
 			case IDC_BACKSLASHHELP:
-				MsgBox(MBINFO, IDS_BACKSLASHHELP);
+				MsgBoxInfo(MB_OK, IDS_BACKSLASHHELP);
 				//ShowNotificationMessage(SC_NOTIFICATIONPOSITION_CENTER, IDS_BACKSLASHHELP);
 				break;
 
 			case IDC_REGEXPHELP:
-				MsgBox(MBINFO, IDS_REGEXPHELP);
+				MsgBoxInfo(MB_OK, IDS_REGEXPHELP);
 				//ShowNotificationMessage(SC_NOTIFICATIONPOSITION_CENTER, IDS_REGEXPHELP);
 				break;
 
 			case IDC_WILDCARDHELP:
-				MsgBox(MBINFO, IDS_WILDCARDHELP);
+				MsgBoxInfo(MB_OK, IDS_WILDCARDHELP);
 				//ShowNotificationMessage(SC_NOTIFICATIONPOSITION_CENTER, IDS_WILDCARDHELP);
 				break;
 
@@ -6776,7 +6776,7 @@ void TryBrowseFile(HWND hwnd, LPCWSTR pszFile, BOOL bWarn) {
 
 	if ((INT_PTR)sei.hInstApp < 32) {
 		if (bWarn) {
-			if (MsgBox(MBYESNOWARN, IDS_ERR_BROWSE) == IDYES) {
+			if (MsgBoxWarn(MB_YESNO, IDS_ERR_BROWSE) == IDYES) {
 				OpenHelpLink(hwnd, IDM_HELP_LATEST_RELEASE);
 			}
 		} else if (StrNotEmpty(pszFile)) {
