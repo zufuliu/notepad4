@@ -254,7 +254,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 	ParseCommandLine();
 	FindIniFile();
 	TestIniFile();
-	CreateIniFile();
+	CreateIniFile(szIniFile);
 	LoadFlags();
 
 	// Try to activate another window
@@ -1885,7 +1885,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	case ACC_SELECTINIFILE:
 		if (StrNotEmpty(szIniFile)) {
-			CreateIniFile();
+			CreateIniFile(szIniFile);
 			DisplayPath(szIniFile, IDS_ERR_INIOPEN);
 		}
 		break;
@@ -2582,7 +2582,7 @@ void SaveSettingsNow(void) {
 
 	if (StrIsEmpty(szIniFile)) {
 		if (StrNotEmpty(szIniFile2)) {
-			if (CreateIniFileEx(szIniFile2)) {
+			if (CreateIniFile(szIniFile2)) {
 				lstrcpy(szIniFile, szIniFile2);
 				lstrcpy(szIniFile2, L"");
 			} else {
@@ -2596,7 +2596,7 @@ void SaveSettingsNow(void) {
 	if (!bCreateFailure) {
 		if (WritePrivateProfileString(INI_SECTION_NAME_SETTINGS, L"WriteTest", L"ok", szIniFile)) {
 			BeginWaitCursor();
-			if (CreateIniFile()) {
+			if (CreateIniFile(szIniFile)) {
 				SaveSettings(TRUE);
 			} else {
 				bCreateFailure = TRUE;
@@ -2620,7 +2620,7 @@ void SaveSettingsNow(void) {
 //
 //
 void SaveSettings(BOOL bSaveSettingsNow) {
-	if (!CreateIniFile()) {
+	if (!CreateIniFile(szIniFile)) {
 		return;
 	}
 
@@ -3107,21 +3107,29 @@ BOOL TestIniFile(void) {
 		return 0;
 	}
 
-	if (PathIsDirectory(szIniFile) || *CharPrev(szIniFile, StrEnd(szIniFile)) == L'\\') {
+	DWORD dwFileAttributes = GetFileAttributes(szIniFile);
+	if ((dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == 0) {
+		return TRUE;
+	}
+
+	if ((dwFileAttributes != INVALID_FILE_ATTRIBUTES) || *CharPrev(szIniFile, StrEnd(szIniFile)) == L'\\') {
 		WCHAR wchModule[MAX_PATH];
 		GetModuleFileName(NULL, wchModule, COUNTOF(wchModule));
 		PathAppend(szIniFile, PathFindFileName(wchModule));
 		PathRenameExtension(szIniFile, L".ini");
-		if (!PathFileExists(szIniFile)) {
+		dwFileAttributes = GetFileAttributes(szIniFile);
+		if ((dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0) {
 			lstrcpy(PathFindFileName(szIniFile), L"metapath.ini");
-			if (!PathFileExists(szIniFile)) {
+			dwFileAttributes = GetFileAttributes(szIniFile);
+			if ((dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0) {
 				lstrcpy(PathFindFileName(szIniFile), PathFindFileName(wchModule));
 				PathRenameExtension(szIniFile, L".ini");
+				dwFileAttributes = GetFileAttributes(szIniFile);
 			}
 		}
 	}
 
-	if (!PathFileExists(szIniFile) || PathIsDirectory(szIniFile)) {
+	if ((dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0) {
 		lstrcpy(szIniFile2, szIniFile);
 		lstrcpy(szIniFile, L"");
 		return FALSE;
@@ -3129,11 +3137,7 @@ BOOL TestIniFile(void) {
 	return TRUE;
 }
 
-BOOL CreateIniFile(void) {
-	return CreateIniFileEx(szIniFile);
-}
-
-BOOL CreateIniFileEx(LPCWSTR lpszIniFile) {
+BOOL CreateIniFile(LPCWSTR lpszIniFile) {
 	if (StrNotEmpty(lpszIniFile)) {
 		WCHAR *pwchTail;
 
