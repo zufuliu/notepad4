@@ -750,8 +750,7 @@ bool CellBuffer::ContainsLineEnd(const char *s, Sci::Position length) const noex
 			return true;
 		}
 		if (utf8LineEnds && !UTF8IsAscii(ch)) {
-			const unsigned char back3[3] = { chBeforePrev, chPrev, ch };
-			if (UTF8IsSeparator(back3) || UTF8IsNEL(back3 + 1)) {
+			if (UTF8IsMultibyteLineEnd(chBeforePrev, chPrev, ch)) {
 				return true;
 			}
 		}
@@ -930,7 +929,7 @@ void CellBuffer::ResetLineEnds() {
 			}
 		} else if (utf8LineEnds && !UTF8IsAscii(ch)) {
 			const unsigned char back3[3] = { chBeforePrev, chPrev, ch };
-			if (UTF8IsSeparator(back3) || UTF8IsNEL(back3 + 1)) {
+			if (UTF8IsMultibyteLineEnd(chBeforePrev, chPrev, ch)) {
 				InsertLine(lineInsert, (position + i) + 1, atLineStart);
 				lineInsert++;
 			}
@@ -1264,7 +1263,7 @@ void CellBuffer::BasicInsertString(const Sci::Position position, const char * co
 			lineInsert++;
 		} else if (utf8LineEnds && !UTF8IsAscii(ch)) {
 			const unsigned char back3[3] = { chBeforePrev, chPrev, ch };
-			if (UTF8IsSeparator(back3) || UTF8IsNEL(back3 + 1)) {
+			if (UTF8IsMultibyteLineEnd(chBeforePrev, chPrev, ch)) {
 				InsertLine(lineInsert, (position + ptr - s), atLineStart);
 				lineInsert++;
 			}

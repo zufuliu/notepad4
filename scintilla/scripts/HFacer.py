@@ -3,6 +3,7 @@
 # definition file.
 # Implemented 2000 by Neil Hodgson neilh@scintilla.org
 
+import pathlib
 import Face
 
 from FileGenerator import Regenerate
@@ -42,8 +43,8 @@ def printHFile(f):
 
 def RegenerateAll(root, showMaxID):
 	f = Face.Face()
-	f.ReadFromFile(root + "include/Scintilla.iface")
-	Regenerate(root + "include/Scintilla.h", "/* ", printHFile(f))
+	f.ReadFromFile(root / "include/Scintilla.iface")
+	Regenerate(root / "include/Scintilla.h", "/* ", printHFile(f))
 	if showMaxID:
 		valueSet = set(int(x) for x in f.values if int(x) < 3000)
 		maximumID = max(valueSet)
@@ -54,4 +55,4 @@ def RegenerateAll(root, showMaxID):
 			#~ print(v)
 
 if __name__ == "__main__":
-	RegenerateAll("../", True)
+	RegenerateAll(pathlib.Path(__file__).resolve().parent.parent, True)

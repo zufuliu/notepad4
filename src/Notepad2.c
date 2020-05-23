@@ -1096,9 +1096,14 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 		MsgDPIChanged(hwnd, wParam, lParam);
 		break;
 
+	case WM_SETTINGCHANGE:
+		SendMessage(hwndEdit, WM_SETTINGCHANGE, wParam, lParam);
+		break;
+
 	// update Scintilla colors
 	case WM_SYSCOLORCHANGE: {
 		Style_SetLexer(pLexCurrent, FALSE);
+		SendMessage(hwndEdit, WM_SYSCOLORCHANGE, wParam, lParam);
 		return DefWindowProc(hwnd, umsg, wParam, lParam);
 	}
 
@@ -2009,6 +2014,7 @@ void MsgDPIChanged(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	Style_DetectBaseFontSize(hwnd);
 	UpdateStatusBarWidth();
 	Style_OnDPIChanged();
+	SendMessage(hwndEdit, WM_DPICHANGED, wParam, lParam);
 	SciCall_GotoPos(pos);
 	UpdateToolbar();
 	UpdateStatusbar();
