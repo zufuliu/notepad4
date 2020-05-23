@@ -1147,7 +1147,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 		OnDropOneFile(hwnd, szBuf);
 
 		//if (DragQueryFile(hDrop, (UINT)(-1), NULL, 0) > 1) {
-		//	MsgBox(MBWARN, IDS_ERR_DROP);
+		//	MsgBoxWarn(MB_OK, IDS_ERR_DROP);
 		//}
 
 		DragFinish(hDrop);
@@ -1329,7 +1329,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 		}
 
 		if (PathIsFile(szCurFile)) {
-			if ((iFileWatchingMode == 2 && !IsDocumentModified()) || MsgBox(MBYESNO, IDS_FILECHANGENOTIFY) == IDYES) {
+			if ((iFileWatchingMode == 2 && !IsDocumentModified()) || MsgBoxWarn(MB_YESNO, IDS_FILECHANGENOTIFY) == IDYES) {
 				const Sci_Position iCurPos = SciCall_GetCurrentPos();
 				const Sci_Position iAnchorPos = SciCall_GetAnchor();
 #if NP2_ENABLE_DOT_LOG_FEATURE
@@ -1357,7 +1357,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 				}
 			}
 		} else {
-			if (MsgBox(MBYESNO, IDS_FILECHANGENOTIFY2) == IDYES) {
+			if (MsgBoxWarn(MB_YESNO, IDS_FILECHANGENOTIFY2) == IDYES) {
 				FileSave(TRUE, FALSE, FALSE, FALSE);
 			}
 		}
@@ -2209,7 +2209,7 @@ void SetUILanguage(UINT menu) {
 		return;
 	}
 
-	const int result = MsgBox(MBYESNOCANCEL, IDS_CHANGE_LANG_RESTART);
+	const int result = MsgBoxInfo(MB_YESNOCANCEL, IDS_CHANGE_LANG_RESTART);
 	if (result != IDCANCEL) {
 		languageMenu = menu;
 		uiLanguage = lang;
@@ -2650,7 +2650,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	case IDM_FILE_REVERT:
 		if (StrNotEmpty(szCurFile)) {
-			if (IsDocumentModified() && MsgBox(MBOKCANCEL, IDS_ASK_REVERT) != IDOK) {
+			if (IsDocumentModified() && MsgBoxWarn(MB_OKCANCEL, IDS_ASK_REVERT) != IDOK) {
 				return 0;
 			}
 
@@ -2698,10 +2698,10 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 					dwFileAttributes |= FILE_ATTRIBUTE_READONLY;
 				}
 				if (!SetFileAttributes(szCurFile, dwFileAttributes)) {
-					MsgBox(MBWARN, IDS_READONLY_MODIFY, szCurFile);
+					MsgBoxWarn(MB_OK, IDS_READONLY_MODIFY, szCurFile);
 				}
 			} else {
-				MsgBox(MBWARN, IDS_READONLY_MODIFY, szCurFile);
+				MsgBoxWarn(MB_OK, IDS_READONLY_MODIFY, szCurFile);
 			}
 
 			dwFileAttributes = GetFileAttributes(szCurFile);
@@ -2832,7 +2832,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		}
 
 		if (!EditPrint(hwndEdit, pszTitle)) {
-			MsgBox(MBWARN, IDS_PRINT_ERROR, pszTitle);
+			MsgBoxWarn(MB_OK, IDS_PRINT_ERROR, pszTitle);
 		}
 	}
 	break;
@@ -2862,7 +2862,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		}
 
 		if (!PathCreateDeskLnk(szCurFile)) {
-			MsgBox(MBWARN, IDS_ERR_CREATELINK);
+			MsgBoxWarn(MB_OK, IDS_ERR_CREATELINK);
 		}
 	}
 	break;
@@ -2999,7 +2999,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 				break;
 			}
 
-			if (IsDocumentModified() && MsgBox(MBOKCANCEL, IDS_ASK_RECODE) != IDOK) {
+			if (IsDocumentModified() && MsgBoxWarn(MB_OKCANCEL, IDS_ASK_RECODE) != IDOK) {
 				return 0;
 			}
 
@@ -5605,15 +5605,15 @@ void SaveSettingsNow(BOOL bOnlySaveStyle, BOOL bQuiet) {
 			StatusSetSimple(hwndStatus, FALSE);
 			EndWaitCursor();
 			if (!bCreateFailure && !bQuiet) {
-				MsgBox(MBINFO, IDS_SAVEDSETTINGS);
+				MsgBoxInfo(MB_OK, IDS_SAVEDSETTINGS);
 			}
 		} else {
 			dwLastIOError = GetLastError();
-			MsgBox(MBWARN, IDS_WRITEINI_FAIL);
+			MsgBoxWarn(MB_OK, IDS_WRITEINI_FAIL);
 		}
 	}
 	if (bCreateFailure) {
-		MsgBox(MBWARN, IDS_CREATEINI_FAIL);
+		MsgBoxWarn(MB_OK, IDS_CREATEINI_FAIL);
 	}
 }
 
@@ -7169,7 +7169,7 @@ BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect, LPCWST
 	// Ask to create a new file...
 	if (!bReload && !PathIsFile(szFileName)) {
 		int result = IDCANCEL;
-		if (flagQuietCreate || (result = MsgBox(MBYESNOCANCEL, IDS_ASK_CREATE, szFileName)) == IDYES) {
+		if (flagQuietCreate || (result = MsgBoxWarn(MB_YESNOCANCEL, IDS_ASK_CREATE, szFileName)) == IDYES) {
 			HANDLE hFile = CreateFile(szFileName,
 									  GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE,
 									  NULL, CREATE_NEW, FILE_ATTRIBUTE_NORMAL, NULL);
@@ -7281,7 +7281,7 @@ BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect, LPCWST
 		UpdateDocumentModificationStatus();
 		// Show warning: Unicode file loaded as ANSI
 		if (status.bUnicodeErr) {
-			MsgBox(MBWARN, IDS_ERR_UNICODE);
+			MsgBoxWarn(MB_OK, IDS_ERR_UNICODE);
 		}
 		// notify binary file been locked for editing
 		if (binary) {
@@ -7301,7 +7301,7 @@ BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect, LPCWST
 			}
 		}
 	} else if (!status.bFileTooBig) {
-		MsgBox(MBWARN, IDS_ERR_LOADFILE, szFileName);
+		MsgBoxWarn(MB_OK, IDS_ERR_LOADFILE, szFileName);
 	}
 
 	return fSuccess;
@@ -7343,7 +7343,7 @@ BOOL FileSave(BOOL bSaveAlways, BOOL bAsk, BOOL bSaveAs, BOOL bSaveCopy) {
 			GetString(IDS_UNTITLED, tch, COUNTOF(tch));
 		}
 
-		switch (MsgBox(MBYESNOCANCEL, IDS_ASK_SAVE, tch)) {
+		switch (MsgBoxInfo(MB_YESNOCANCEL, IDS_ASK_SAVE, tch)) {
 		case IDCANCEL:
 			return FALSE;
 		case IDNO:
@@ -7368,7 +7368,7 @@ BOOL FileSave(BOOL bSaveAlways, BOOL bAsk, BOOL bSaveAs, BOOL bSaveCopy) {
 		bReadOnly = (dwFileAttributes != INVALID_FILE_ATTRIBUTES) && (dwFileAttributes & FILE_ATTRIBUTE_READONLY);
 		if (bReadOnly) {
 			UpdateWindowTitle();
-			if (MsgBox(MBYESNOWARN, IDS_READONLY_SAVE, szCurFile) == IDYES) {
+			if (MsgBoxWarn(MB_YESNO, IDS_READONLY_SAVE, szCurFile) == IDYES) {
 				bSaveAs = TRUE;
 			} else {
 				return FALSE;
@@ -7450,7 +7450,7 @@ BOOL FileSave(BOOL bSaveAlways, BOOL bAsk, BOOL bSaveAs, BOOL bSaveCopy) {
 		}
 
 		UpdateWindowTitle();
-		MsgBox(MBWARN, IDS_ERR_SAVEFILE, tchFile);
+		MsgBoxWarn(MB_OK, IDS_ERR_SAVEFILE, tchFile);
 	}
 
 	return fSuccess;
@@ -7689,7 +7689,7 @@ BOOL ActivatePrevInst(void) {
 			}
 
 			// Ask...
-			if (IDYES == MsgBox(MBYESNO, IDS_ERR_PREVWINDISABLED)) {
+			if (IDYES == MsgBoxInfo(MB_YESNO, IDS_ERR_PREVWINDISABLED)) {
 				return FALSE;
 			}
 			return TRUE;
@@ -7783,7 +7783,7 @@ BOOL ActivatePrevInst(void) {
 		}
 
 		// Ask...
-		if (IDYES == MsgBox(MBYESNO, IDS_ERR_PREVWINDISABLED)) {
+		if (IDYES == MsgBoxInfo(MB_YESNO, IDS_ERR_PREVWINDISABLED)) {
 			return FALSE;
 		}
 		return TRUE;

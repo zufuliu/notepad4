@@ -587,7 +587,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 		DisplayPath(szBuf, IDS_ERR_DROP1);
 
 		//if (DragQueryFile(hDrop, (UINT)(-1), NULL, 0) > 1) {
-		//	MsgBox(MBWARN, IDS_ERR_DROP2);
+		//	MsgBoxWarn(MB_OK, IDS_ERR_DROP2);
 		//}
 
 		DragFinish(hDrop);
@@ -1183,7 +1183,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 			if (DriveBox_GetSelDrive(hwndDriveBox, tch, COUNTOF(tch), TRUE) && !PathIsSameRoot(szCurDir, tch)) {
 				if (!ChangeDirectory(hwnd, tch, TRUE)) {
-					MsgBox(MBWARN, IDS_ERR_CD);
+					MsgBoxWarn(MB_OK, IDS_ERR_CD);
 					DriveBox_SelectDrive(hwndDriveBox, szCurDir);
 				}
 			}
@@ -1201,7 +1201,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		switch (dli.ntype) {
 		case DLE_DIR:
 			if (!ChangeDirectory(hwnd, dli.szFileName, TRUE)) {
-				MsgBox(MBWARN, IDS_ERR_CD);
+				MsgBoxWarn(MB_OK, IDS_ERR_CD);
 			}
 			break;
 
@@ -1378,7 +1378,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 				ListView_EnsureVisible(hwndDirList, 0, FALSE);
 			}
 		} else {
-			MsgBox(MBWARN, IDS_ERR_NEW);
+			MsgBoxWarn(MB_OK, IDS_ERR_NEW);
 		}
 	}
 	break;
@@ -1388,7 +1388,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 		if (NewDirDlg(hwnd, tchNewDir)) {
 			if (!CreateDirectory(tchNewDir, NULL)) {
-				MsgBox(MBWARN, IDS_ERR_NEWDIR);
+				MsgBoxWarn(MB_OK, IDS_ERR_NEWDIR);
 			}
 		}
 	}
@@ -1405,7 +1405,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 		if (GetDirectory(hwnd, IDS_CREATELINK, tchLinkDestination, NULL)) {
 			if (!PathCreateLnk(tchLinkDestination, dli.szFileName)) {
-				MsgBox(MBWARN, IDS_ERR_CREATELINK);
+				MsgBoxWarn(MB_OK, IDS_ERR_CREATELINK);
 			}
 		}
 	}
@@ -1458,7 +1458,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		const BOOL bSuccess = CopyFile(dli.szFileName, szNewFile, FALSE);
 
 		if (!bSuccess) {
-			MsgBox(MBWARN, IDS_ERR_SAVEAS1, dli.szDisplayName);
+			MsgBoxWarn(MB_OK, IDS_ERR_SAVEAS1, dli.szDisplayName);
 		}
 
 		if (bSuccess && bClearReadOnly) {
@@ -1466,7 +1466,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			if (dwFileAttributes & FILE_ATTRIBUTE_READONLY) {
 				dwFileAttributes &= ~FILE_ATTRIBUTE_READONLY;
 				if (!SetFileAttributes(szNewFile, dwFileAttributes)) {
-					MsgBox(MBWARN, IDS_ERR_SAVEAS2);
+					MsgBoxWarn(MB_OK, IDS_ERR_SAVEAS2);
 				}
 			}
 		}
@@ -1551,7 +1551,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 		if (GetDirectory(hwnd, IDS_GETDIRECTORY, tch, NULL)) {
 			if (!ChangeDirectory(hwnd, tch, TRUE)) {
-				MsgBox(MBWARN, IDS_ERR_CD);
+				MsgBoxWarn(MB_OK, IDS_ERR_CD);
 			}
 		}
 	}
@@ -1895,7 +1895,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			WCHAR tch[MAX_PATH];
 			History_Back(&mHistory, tch, COUNTOF(tch));
 			if (!ChangeDirectory(hwnd, tch, FALSE)) {
-				MsgBox(MBWARN, IDS_ERR_CD);
+				MsgBoxWarn(MB_OK, IDS_ERR_CD);
 			}
 		} else {
 			MessageBeep(MB_OK);
@@ -1908,7 +1908,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			WCHAR tch[MAX_PATH];
 			History_Forward(&mHistory, tch, COUNTOF(tch));
 			if (!ChangeDirectory(hwnd, tch, FALSE)) {
-				MsgBox(MBWARN, IDS_ERR_CD);
+				MsgBoxWarn(MB_OK, IDS_ERR_CD);
 			}
 		} else {
 			MessageBeep(MB_OK);
@@ -1919,7 +1919,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case IDT_UP_DIR: {
 		if (!PathIsRoot(szCurDir)) {
 			if (!ChangeDirectory(hwnd, L"..", TRUE)) {
-				MsgBox(MBWARN, IDS_ERR_CD);
+				MsgBoxWarn(MB_OK, IDS_ERR_CD);
 			}
 		} else {
 			MessageBeep(MB_OK);
@@ -1930,7 +1930,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case IDT_ROOT_DIR: {
 		if (!PathIsRoot(szCurDir)) {
 			if (!ChangeDirectory(hwnd, L"\\", TRUE)) {
-				MsgBox(MBWARN, IDS_ERR_CD);
+				MsgBoxWarn(MB_OK, IDS_ERR_CD);
 			}
 		} else {
 			MessageBeep(MB_OK);
@@ -2257,7 +2257,7 @@ BOOL ChangeDirectory(HWND hwnd, LPCWSTR lpszNewDir, BOOL bUpdateHistory) {
 			WCHAR szWinDir[MAX_PATH];
 			GetWindowsDirectory(szWinDir, COUNTOF(szWinDir));
 			SetCurrentDirectory(szWinDir);
-			MsgBox(MBWARN, IDS_ERR_CD);
+			MsgBoxWarn(MB_OK, IDS_ERR_CD);
 		}
 	}
 
@@ -2384,7 +2384,7 @@ void SetUILanguage(UINT resID) {
 		return;
 	}
 
-	const int result = MsgBox(MBYESNOCANCEL, IDS_CHANGE_LANG_RESTART);
+	const int result = MsgBoxInfo(MB_YESNOCANCEL, IDS_CHANGE_LANG_RESTART);
 	if (result != IDCANCEL) {
 		languageResID = resID;
 		uiLanguage = lang;
@@ -2603,14 +2603,14 @@ void SaveSettingsNow(void) {
 			}
 			EndWaitCursor();
 			if (!bCreateFailure) {
-				MsgBox(MBINFO, IDS_SAVESETTINGS);
+				MsgBoxInfo(MB_OK, IDS_SAVESETTINGS);
 			}
 		} else {
-			MsgBox(MBWARN, IDS_ERR_INIWRITE);
+			MsgBoxWarn(MB_OK, IDS_ERR_INIWRITE);
 		}
 	}
 	if (bCreateFailure) {
-		MsgBox(MBWARN, IDS_ERR_INICREATE);
+		MsgBoxWarn(MB_OK, IDS_ERR_INICREATE);
 	}
 }
 
@@ -3192,7 +3192,7 @@ BOOL DisplayPath(LPCWSTR lpPath, UINT uIdError) {
 	if (dwAttr != INVALID_FILE_ATTRIBUTES) {
 		if (dwAttr & FILE_ATTRIBUTE_DIRECTORY) {
 			if (!SetCurrentDirectory(szPath)) {
-				MsgBox(MBWARN, uIdError);
+				MsgBoxWarn(MB_OK, uIdError);
 				return FALSE;
 			}
 			PostWMCommand(hwndMain, IDM_VIEW_UPDATE);
@@ -3225,7 +3225,7 @@ BOOL DisplayPath(LPCWSTR lpPath, UINT uIdError) {
 		}
 	}
 
-	MsgBox(MBWARN, uIdError);
+	MsgBoxWarn(MB_OK, uIdError);
 	return FALSE;
 }
 
@@ -3252,7 +3252,7 @@ BOOL DisplayLnkFile(LPCWSTR pszLnkFile) {
 			}
 		}
 
-		MsgBox(MBWARN, IDS_ERR_LNK_GETPATH);
+		MsgBoxWarn(MB_OK, IDS_ERR_LNK_GETPATH);
 		return FALSE;
 	}
 
@@ -3267,7 +3267,7 @@ BOOL DisplayLnkFile(LPCWSTR pszLnkFile) {
 	if (dwAttr != INVALID_FILE_ATTRIBUTES) {
 		if (dwAttr & FILE_ATTRIBUTE_DIRECTORY) {
 			if (!SetCurrentDirectory(szPath)) {
-				MsgBox(MBWARN, IDS_ERR_LNK_NOACCESS);
+				MsgBoxWarn(MB_OK, IDS_ERR_LNK_NOACCESS);
 				return FALSE;
 			}
 			PostWMCommand(hwndMain, IDM_VIEW_UPDATE);
@@ -3325,7 +3325,7 @@ BOOL DisplayLnkFile(LPCWSTR pszLnkFile) {
 		}
 	}
 
-	MsgBox(MBWARN, IDS_ERR_LNK_NOACCESS);
+	MsgBoxWarn(MB_OK, IDS_ERR_LNK_NOACCESS);
 	return FALSE;
 }
 

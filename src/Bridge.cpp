@@ -69,7 +69,7 @@ static void EditPrintInit() noexcept;
 extern "C" BOOL EditPrint(HWND hwnd, LPCWSTR pszDocTitle) {
 	// Don't print empty documents
 	if (SciCall_GetLength() == 0) {
-		MsgBox(MBWARN, IDS_PRINT_EMPTY);
+		MsgBoxWarn(MB_OK, IDS_PRINT_EMPTY);
 		return TRUE;
 	}
 

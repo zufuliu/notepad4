@@ -856,7 +856,7 @@ void Style_Save(void) {
 	if (np2StyleTheme != StyleTheme_Default) {
 		if (!CreateIniFile(themePath)) {
 			NP2HeapFree(pIniSectionBuf);
-			MsgBox(MBWARN, IDS_CREATEINI_FAIL);
+			MsgBoxWarn(MB_OK, IDS_CREATEINI_FAIL);
 			return;
 		}
 	}
@@ -1029,7 +1029,7 @@ BOOL Style_Export(HWND hwnd) {
 		NP2HeapFree(pIniSectionBuf);
 
 		if (dwError != ERROR_SUCCESS) {
-			MsgBox(MBINFO, IDS_EXPORT_FAIL, szFile);
+			MsgBoxInfo(MB_OK, IDS_EXPORT_FAIL, szFile);
 		}
 		return TRUE;
 	}
@@ -4712,7 +4712,7 @@ void Style_ConfigDlg(HWND hwnd) {
 		if ((fStylesModified & STYLESMODIFIED_WARN_MASK) && !fWarnedNoIniFile) {
 			LPCWSTR themePath = GetStyleThemeFilePath();
 			if (StrIsEmpty(themePath)) {
-				MsgBox(MBWARN, IDS_SETTINGSNOTSAVED);
+				MsgBoxWarn(MB_OK, IDS_SETTINGSNOTSAVED);
 				fWarnedNoIniFile = TRUE;
 			}
 		}
