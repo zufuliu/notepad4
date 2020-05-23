@@ -335,9 +335,6 @@ HBITMAP LoadBitmapFile(LPCWSTR path) {
 // PrivateSetCurrentProcessExplicitAppUserModelID()
 //
 HRESULT PrivateSetCurrentProcessExplicitAppUserModelID(PCWSTR AppID) {
-	if (!IsWin7AndAbove()) {
-		return S_OK;
-	}
 	if (StrIsEmpty(AppID)) {
 		return S_OK;
 	}
@@ -364,10 +361,6 @@ HRESULT PrivateSetCurrentProcessExplicitAppUserModelID(PCWSTR AppID) {
 // IsElevated()
 //
 BOOL IsElevated(void) {
-	if (!IsVistaAndAbove()) {
-		return FALSE;
-	}
-
 	BOOL bIsElevated = FALSE;
 	HANDLE hToken = NULL;
 
