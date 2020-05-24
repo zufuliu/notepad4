@@ -1933,24 +1933,6 @@ void MRU_ClearCombobox(HWND hwnd, LPCWSTR pszKey) {
 	ComboBox_ResetContent(hwnd);
 }
 
-#if !(defined(__aarch64__) || defined(_ARM64_) || defined(_M_ARM64))
-UINT GetSystemDPI(void) {
-	typedef UINT (WINAPI *GetDpiForSystemSig)(void);
-	GetDpiForSystemSig pfnGetDpiForSystem = (GetDpiForSystemSig)DLLFunction(L"user32.dll", "GetDpiForSystem");
-
-	UINT dpi;
-	if (pfnGetDpiForSystem) {
-		dpi = pfnGetDpiForSystem();
-	} else {
-		HDC hDC = GetDC(NULL);
-		dpi = GetDeviceCaps(hDC, LOGPIXELSY);
-		ReleaseDC(NULL, hDC);
-
-	}
-	return dpi;
-}
-#endif
-
 /*
   Themed Dialogs
   Modify dialog templates to use current theme font
