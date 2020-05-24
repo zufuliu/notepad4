@@ -856,7 +856,7 @@ void Style_Save(void) {
 	if (np2StyleTheme != StyleTheme_Default) {
 		if (!CreateIniFile(themePath)) {
 			NP2HeapFree(pIniSectionBuf);
-			MsgBoxWarn(MB_OK, IDS_CREATEINI_FAIL);
+			MsgBoxLastError(MB_OK, IDS_CREATEINI_FAIL);
 			return;
 		}
 	}
@@ -1029,7 +1029,7 @@ BOOL Style_Export(HWND hwnd) {
 		NP2HeapFree(pIniSectionBuf);
 
 		if (dwError != ERROR_SUCCESS) {
-			MsgBoxInfo(MB_OK, IDS_EXPORT_FAIL, szFile);
+			MsgBoxLastError(MB_OK, IDS_EXPORT_FAIL, szFile);
 		}
 		return TRUE;
 	}

@@ -27,9 +27,10 @@ NP2_inline void InitWindowCommon(HWND hwnd) {
 }
 
 int 	MsgBox(UINT uType, UINT uIdMsg, ...);
-#define MsgBoxInfo(uType, uIdMsg, ...)	MsgBox(MB_ICONINFORMATION | (uType), (uIdMsg), __VA_ARGS__)
-#define MsgBoxWarn(uType, uIdMsg, ...)	MsgBox(MB_ICONEXCLAMATION | (uType), (uIdMsg), __VA_ARGS__)
-#define MsgBoxAsk(uType, uIdMsg, ...)	MsgBox(MB_ICONQUESTION | (uType), (uIdMsg), __VA_ARGS__)
+#define MsgBoxInfo(uType, uIdMsg, ...)		MsgBox(MB_ICONINFORMATION | (uType), (uIdMsg), __VA_ARGS__)
+#define MsgBoxWarn(uType, uIdMsg, ...)		MsgBox(MB_ICONEXCLAMATION | (uType), (uIdMsg), __VA_ARGS__)
+#define MsgBoxAsk(uType, uIdMsg, ...)		MsgBox(MB_ICONQUESTION | (uType), (uIdMsg), __VA_ARGS__)
+#define MsgBoxLastError(uType, uIdMsg, ...)	MsgBox(MB_ICONEXCLAMATION | MB_SERVICE_NOTIFICATION | (uType), (uIdMsg), __VA_ARGS__)
 
 void	DisplayCmdLineHelp(HWND hwnd);
 void	OpenHelpLink(HWND hwnd, int cmd);
@@ -56,9 +57,9 @@ BOOL	GetZoomLevelComboBoxValue(HWND hwnd, int nCtrId, int *zoomLevel);
 void	ZoomLevelDlg(HWND hwnd, BOOL bBottom);
 BOOL	AutoCompletionSettingsDlg(HWND hwnd);
 
-INT_PTR InfoBox(LPCWSTR idiIcon, UINT uType, LPCWSTR lpstrSetting, UINT uidMessage, ...);
-#define InfoBoxInfo(uType, lpstrSetting, uidMessage, ...)	InfoBox(IDI_INFORMATION, (uType), (lpstrSetting), (uidMessage), __VA_ARGS__)
-#define InfoBoxWarn(uType, lpstrSetting, uidMessage, ...)	InfoBox(IDI_EXCLAMATION, (uType), (lpstrSetting), (uidMessage), __VA_ARGS__)
-#define InfoBoxAsk(uType, lpstrSetting, uidMessage, ...)	InfoBox(IDI_QUESTION, (uType), (lpstrSetting), (uidMessage), __VA_ARGS__)
+INT_PTR InfoBox(UINT uType, LPCWSTR lpstrSetting, UINT uidMessage, ...);
+#define InfoBoxInfo(uType, lpstrSetting, uidMessage, ...)	InfoBox(MB_ICONINFORMATION | (uType), (lpstrSetting), (uidMessage), __VA_ARGS__)
+#define InfoBoxWarn(uType, lpstrSetting, uidMessage, ...)	InfoBox(MB_ICONEXCLAMATION | (uType), (lpstrSetting), (uidMessage), __VA_ARGS__)
+#define InfoBoxAsk(uType, lpstrSetting, uidMessage, ...)	InfoBox(MB_ICONQUESTION | (uType), (lpstrSetting), (uidMessage), __VA_ARGS__)
 
 void	SystemIntegrationDlg(HWND hwnd);

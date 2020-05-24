@@ -73,9 +73,8 @@ int MsgBox(UINT uType, UINT uIdMsg, ...) {
 	const LANGID lang = LANG_USER_DEFAULT;
 #endif
 
-	if (uIdMsg == IDS_ERR_LOADFILE || uIdMsg == IDS_ERR_SAVEFILE ||
-			uIdMsg == IDS_CREATEINI_FAIL || uIdMsg == IDS_WRITEINI_FAIL ||
-			uIdMsg == IDS_EXPORT_FAIL) {
+	if (uType & MB_SERVICE_NOTIFICATION) {
+		uType &= ~MB_SERVICE_NOTIFICATION;
 		LPWSTR lpMsgBuf;
 		FormatMessage(
 			FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
@@ -2336,7 +2335,9 @@ static INT_PTR CALLBACK InfoBoxDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 // InfoBox()
 //
 //
-INT_PTR InfoBox(LPCWSTR idiIcon, UINT uType, LPCWSTR lpstrSetting, UINT uidMessage, ...) {
+INT_PTR InfoBox(UINT uType, LPCWSTR lpstrSetting, UINT uidMessage, ...) {
+	const UINT icon = uType & MB_ICONMASK;
+	uType &= MB_TYPEMASK;
 	const int iMode = IniGetInt(INI_SECTION_NAME_SUPPRESSED_MESSAGES, lpstrSetting, 0);
 	if (StrNotEmpty(lpstrSetting) && iMode == 1) {
 		return (uType == MB_YESNO) ? IDYES : IDOK;
@@ -2354,7 +2355,7 @@ INT_PTR InfoBox(LPCWSTR idiIcon, UINT uType, LPCWSTR lpstrSetting, UINT uidMessa
 	va_end(va);
 
 	ib.lpstrSetting = lpstrSetting;
-	ib.idiIcon = idiIcon;
+	ib.idiIcon = (icon == MB_ICONINFORMATION) ? IDI_INFORMATION : ((icon == MB_ICONQUESTION) ? IDI_QUESTION : IDI_EXCLAMATION);
 	ib.bDisableCheckBox = StrIsEmpty(szIniFile) || StrIsEmpty(lpstrSetting) || iMode == 2;
 
 	const WORD idDlg = (uType == MB_YESNO) ? IDD_INFOBOX_YESNO : ((uType == MB_OKCANCEL) ? IDD_INFOBOX_OKCANCEL : IDD_INFOBOX_OK);
