@@ -37,10 +37,13 @@ void Indicator::Draw(Surface *surface, PRectangle rc, PRectangle rcLine, PRectan
 	if (drawState == drawHover) {
 		sacDraw = sacHover;
 	}
+
 	const IntegerRectangle irc(rc);
 	surface->PenColour(sacDraw.fore);
 	const int ymid = (irc.bottom + irc.top) / 2;
-	if (sacDraw.style == INDIC_SQUIGGLE) {
+
+	switch (sacDraw.style) {
+	case INDIC_SQUIGGLE: {
 		const IntegerRectangle ircSquiggle(PixelGridAlign(rc));
 		int x = ircSquiggle.left;
 		const int xLast = ircSquiggle.right;
@@ -56,7 +59,10 @@ void Indicator::Draw(Surface *surface, PRectangle rc, PRectangle rcLine, PRectan
 			}
 			surface->LineTo(x, irc.top + y);
 		}
-	} else if (sacDraw.style == INDIC_SQUIGGLEPIXMAP) {
+	}
+	break;
+
+	case INDIC_SQUIGGLEPIXMAP: {
 		const PRectangle rcSquiggle = PixelGridAlign(rc);
 
 		const int width = std::min(4000, static_cast<int>(rcSquiggle.Width()));
@@ -77,7 +83,10 @@ void Indicator::Draw(Surface *surface, PRectangle rc, PRectangle rcLine, PRectan
 			}
 		}
 		surface->DrawRGBAImage(rcSquiggle, image.GetWidth(), image.GetHeight(), image.Pixels());
-	} else if (sacDraw.style == INDIC_SQUIGGLELOW) {
+	}
+	break;
+
+	case INDIC_SQUIGGLELOW: {
 		surface->MoveTo(irc.left, irc.top);
 		int x = irc.left + 3;
 		int y = 0;
@@ -88,7 +97,10 @@ void Indicator::Draw(Surface *surface, PRectangle rc, PRectangle rcLine, PRectan
 			x += 3;
 		}
 		surface->LineTo(irc.right, irc.top + y);	// Finish the line
-	} else if (sacDraw.style == INDIC_TT) {
+	}
+	break;
+
+	case INDIC_TT: {
 		surface->MoveTo(irc.left, ymid);
 		int x = irc.left + 5;
 		while (x < rc.right) {
@@ -104,7 +116,10 @@ void Indicator::Draw(Surface *surface, PRectangle rc, PRectangle rcLine, PRectan
 			surface->MoveTo(x - 3, ymid);
 			surface->LineTo(x - 3, ymid + 2);
 		}
-	} else if (sacDraw.style == INDIC_DIAGONAL) {
+	}
+	break;
+
+	case INDIC_DIAGONAL: {
 		int x = irc.left;
 		while (x < rc.right) {
 			surface->MoveTo(x, irc.top + 2);
@@ -117,21 +132,33 @@ void Indicator::Draw(Surface *surface, PRectangle rc, PRectangle rcLine, PRectan
 			surface->LineTo(endX, endY);
 			x += 4;
 		}
-	} else if (sacDraw.style == INDIC_STRIKE) {
+	}
+	break;
+
+	case INDIC_STRIKE: {
 		surface->MoveTo(irc.left, irc.top - 4);
 		surface->LineTo(irc.right, irc.top - 4);
-	} else if ((sacDraw.style == INDIC_HIDDEN) || (sacDraw.style == INDIC_TEXTFORE)) {
+	}
+	break;
+
+	case INDIC_HIDDEN:
+	case INDIC_TEXTFORE:
 		// Draw nothing
-	} else if (sacDraw.style == INDIC_BOX) {
+		break;
+
+	case INDIC_BOX: {
 		surface->MoveTo(irc.left, ymid + 1);
 		surface->LineTo(irc.right, ymid + 1);
 		const int lineTop = static_cast<int>(rcLine.top) + 1;
 		surface->LineTo(irc.right, lineTop);
 		surface->LineTo(irc.left, lineTop);
 		surface->LineTo(irc.left, ymid + 1);
-	} else if (sacDraw.style == INDIC_ROUNDBOX ||
-		sacDraw.style == INDIC_STRAIGHTBOX ||
-		sacDraw.style == INDIC_FULLBOX) {
+	}
+	break;
+
+	case INDIC_ROUNDBOX:
+	case INDIC_STRAIGHTBOX:
+	case INDIC_FULLBOX: {
 		PRectangle rcBox = rcLine;
 		if (sacDraw.style != INDIC_FULLBOX)
 			rcBox.top = rcLine.top + 1;
@@ -139,8 +166,11 @@ void Indicator::Draw(Surface *surface, PRectangle rc, PRectangle rcLine, PRectan
 		rcBox.right = rc.right;
 		surface->AlphaRectangle(rcBox, (sacDraw.style == INDIC_ROUNDBOX) ? 1 : 0,
 			sacDraw.fore, fillAlpha, sacDraw.fore, outlineAlpha, 0);
-	} else if (sacDraw.style == INDIC_GRADIENT ||
-		sacDraw.style == INDIC_GRADIENTCENTRE) {
+	}
+	break;
+
+	case INDIC_GRADIENT:
+	case INDIC_GRADIENTCENTRE: {
 		PRectangle rcBox = rc;
 		rcBox.top = rcLine.top + 1;
 		rcBox.bottom = rcLine.bottom;
@@ -160,7 +190,10 @@ void Indicator::Draw(Surface *surface, PRectangle rc, PRectangle rcLine, PRectan
 			break;
 		}
 		surface->GradientRectangle(rcBox, stops, options);
-	} else if (sacDraw.style == INDIC_DOTBOX) {
+	}
+	break;
+
+	case INDIC_DOTBOX: {
 		PRectangle rcBox = PixelGridAlign(rc);
 		rcBox.top = rcLine.top + 1;
 		rcBox.bottom = rcLine.bottom;
@@ -181,27 +214,43 @@ void Indicator::Draw(Surface *surface, PRectangle rc, PRectangle rcLine, PRectan
 			}
 		}
 		surface->DrawRGBAImage(rcBox, image.GetWidth(), image.GetHeight(), image.Pixels());
-	} else if (sacDraw.style == INDIC_DASH) {
+	}
+	break;
+
+	case INDIC_DASH: {
 		int x = irc.left;
 		while (x < rc.right) {
 			surface->MoveTo(x, ymid);
 			surface->LineTo(std::min(x + 4, irc.right), ymid);
 			x += 7;
 		}
-	} else if (sacDraw.style == INDIC_DOTS) {
+	}
+	break;
+
+	case INDIC_DOTS: {
 		int x = irc.left;
 		while (x < irc.right) {
 			const PRectangle rcDot = PRectangle::FromInts(x, ymid, x + 1, ymid + 1);
 			surface->FillRectangle(rcDot, sacDraw.fore);
 			x += 2;
 		}
-	} else if (sacDraw.style == INDIC_COMPOSITIONTHICK) {
+	}
+	break;
+
+	case INDIC_COMPOSITIONTHICK: {
 		const PRectangle rcComposition(rc.left + 1, rcLine.bottom - 2, rc.right - 1, rcLine.bottom);
 		surface->FillRectangle(rcComposition, sacDraw.fore);
-	} else if (sacDraw.style == INDIC_COMPOSITIONTHIN) {
+	}
+	break;
+
+	case INDIC_COMPOSITIONTHIN: {
 		const PRectangle rcComposition(rc.left + 1, rcLine.bottom - 2, rc.right - 1, rcLine.bottom - 1);
 		surface->FillRectangle(rcComposition, sacDraw.fore);
-	} else if (sacDraw.style == INDIC_POINT || sacDraw.style == INDIC_POINTCHARACTER) {
+	}
+	break;
+
+	case INDIC_POINT:
+	case INDIC_POINTCHARACTER:
 		if (rcCharacter.Width() >= 0.1) {
 			const XYPOSITION pixelHeight = std::floor(rc.Height() - 1.0f);	// 1 pixel onto next line if multiphase
 			const XYPOSITION x = (sacDraw.style == INDIC_POINT) ? (rcCharacter.left) : ((rcCharacter.right + rcCharacter.left) / 2);
@@ -214,9 +263,13 @@ void Indicator::Draw(Surface *surface, PRectangle rc, PRectangle rcLine, PRectan
 			};
 			surface->Polygon(pts, std::size(pts), sacDraw.fore, sacDraw.fore);
 		}
-	} else {	// Either INDIC_PLAIN or unknown
+		break;
+
+	default:
+		// Either INDIC_PLAIN or unknown
 		surface->MoveTo(irc.left, ymid);
 		surface->LineTo(irc.right, ymid);
+		break;
 	}
 }
 
