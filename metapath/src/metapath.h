@@ -21,6 +21,7 @@
 
 //==== Main Window ============================================================
 #define WC_METAPATH L"metapath"
+#define WC_NOTEPAD2 L"Notepad2"
 #define MY_APPUSERMODELID	L"metapath File Browser"
 
 #define WS_METAPATH ((WS_OVERLAPPEDWINDOW ^ \
