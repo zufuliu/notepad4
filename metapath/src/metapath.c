@@ -3018,7 +3018,7 @@ BOOL CheckIniFile(LPWSTR lpszFile, LPCWSTR lpszModule) {
 		};
 		for (UINT i = 0; i < COUNTOF(csidlList); i++) {
 			if (S_OK == SHGetFolderPath(NULL, csidlList[i], NULL, SHGFP_TYPE_CURRENT, tchBuild)) {
-				PathAppend(tchBuild, WC_METAPATH);
+				PathAppend(tchBuild, WC_NOTEPAD2);
 				PathAppend(tchBuild, tchFileExpanded);
 				if (PathIsFile(tchBuild)) {
 					lstrcpy(lpszFile, tchBuild);
@@ -3037,7 +3037,7 @@ BOOL CheckIniFile(LPWSTR lpszFile, LPCWSTR lpszModule) {
 			if (S_OK == SHGetKnownFolderPath(rfidList[i], KF_FLAG_DEFAULT, NULL, &pszPath)) {
 				lstrcpy(tchBuild, pszPath);
 				CoTaskMemFree(pszPath);
-				PathAppend(tchBuild, WC_METAPATH);
+				PathAppend(tchBuild, WC_NOTEPAD2);
 				PathAppend(tchBuild, tchFileExpanded);
 				if (PathIsFile(tchBuild)) {
 					lstrcpy(lpszFile, tchBuild);
