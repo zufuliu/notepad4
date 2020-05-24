@@ -62,6 +62,9 @@ UINT CodePageFromCharSet(DWORD characterSet, UINT documentCodePage) noexcept;
 UINT g_uSystemDPI = USER_DEFAULT_SCREEN_DPI;
 
 #if !NP2_TARGET_ARM64
+using GetDpiForSystemSig = UINT (WINAPI *)(void);
+GetDpiForSystemSig pfnGetDpiForSystem = nullptr;
+
 using GetDpiForWindowSig = UINT (WINAPI *)(HWND hwnd);
 GetDpiForWindowSig pfnGetDpiForWindow = nullptr;
 
@@ -73,7 +76,11 @@ using GetSystemMetricsForDpiSig = int (WINAPI *)(int nIndex, UINT dpi);
 GetSystemMetricsForDpiSig pfnGetSystemMetricsForDpi = nullptr;
 
 void LoadDPIFunction() noexcept {
-	pfnGetDpiForWindow = DLLFunction<GetDpiForWindowSig>(L"user32.dll", "GetDpiForWindow");
+	HMODULE user32 = ::GetModuleHandleW(L"user32.dll");
+	pfnGetDpiForSystem = DLLFunction<GetDpiForSystemSig>(user32, "GetDpiForSystem");
+	pfnGetDpiForWindow = DLLFunction<GetDpiForWindowSig>(user32, "GetDpiForWindow");
+	pfnGetSystemMetricsForDpi = DLLFunction<GetSystemMetricsForDpiSig>(user32, "GetSystemMetricsForDpi");
+
 	if (pfnGetDpiForWindow == nullptr) {
 		HMODULE hShcore = LoadLibraryEx(L"shcore.dll", nullptr, LOAD_LIBRARY_SEARCH_SYSTEM32);
 		if (hShcore) {
@@ -85,8 +92,6 @@ void LoadDPIFunction() noexcept {
 			}
 		}
 	}
-
-	pfnGetSystemMetricsForDpi = DLLFunction<GetSystemMetricsForDpiSig>(L"user32.dll", "GetSystemMetricsForDpi");
 }
 #endif
 
@@ -3568,9 +3573,6 @@ using namespace Scintilla;
 #endif
 
 UINT GetSystemDPI(void) {
-	using GetDpiForSystemSig = UINT (WINAPI *)(void);
-	GetDpiForSystemSig pfnGetDpiForSystem = DLLFunction<GetDpiForSystemSig>(L"user32.dll", "GetDpiForSystem");
-
 	UINT dpi;
 	if (pfnGetDpiForSystem) {
 		dpi = pfnGetDpiForSystem();

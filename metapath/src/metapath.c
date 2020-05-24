@@ -189,6 +189,24 @@ static int	iOpacityLevel		= 75;
 static int	flagToolbarLook		= 0;
 static int	flagPosParam		= 0;
 
+#if !NP2_TARGET_ARM64
+typedef UINT (WINAPI *GetDpiForSystemSig)(void);
+static GetDpiForSystemSig pfnGetDpiForSystem = NULL;
+
+UINT GetSystemDPI(void) {
+	UINT dpi;
+	if (pfnGetDpiForSystem) {
+		dpi = pfnGetDpiForSystem();
+	} else {
+		HDC hDC = GetDC(NULL);
+		dpi = GetDeviceCaps(hDC, LOGPIXELSY);
+		ReleaseDC(NULL, hDC);
+
+	}
+	return dpi;
+}
+#endif
+
 static inline BOOL HasFilter(void) {
 	return !StrEqual(tchFilter, L"*.*") || bNegFilter;
 }
@@ -276,6 +294,10 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 	if (hResDLL) {
 		g_hInstance = hInstance = (HINSTANCE)hResDLL;
 	}
+#endif
+
+#if !NP2_TARGET_ARM64
+	pfnGetDpiForSystem = (GetDpiForSystemSig)DLLFunction(L"user32.dll", "GetDpiForSystem");
 #endif
 
 	// Load Settings
