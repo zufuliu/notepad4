@@ -5605,11 +5605,11 @@ void SaveSettingsNow(BOOL bOnlySaveStyle, BOOL bQuiet) {
 			}
 		} else {
 			dwLastIOError = GetLastError();
-			MsgBoxWarn(MB_OK, IDS_WRITEINI_FAIL);
+			MsgBoxLastError(MB_OK, IDS_WRITEINI_FAIL);
 		}
 	}
 	if (bCreateFailure) {
-		MsgBoxWarn(MB_OK, IDS_CREATEINI_FAIL);
+		MsgBoxLastError(MB_OK, IDS_CREATEINI_FAIL);
 	}
 }
 
@@ -7297,7 +7297,7 @@ BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect, LPCWST
 			}
 		}
 	} else if (!status.bFileTooBig) {
-		MsgBoxWarn(MB_OK, IDS_ERR_LOADFILE, szFileName);
+		MsgBoxLastError(MB_OK, IDS_ERR_LOADFILE, szFileName);
 	}
 
 	return fSuccess;
@@ -7446,7 +7446,7 @@ BOOL FileSave(BOOL bSaveAlways, BOOL bAsk, BOOL bSaveAs, BOOL bSaveCopy) {
 		}
 
 		UpdateWindowTitle();
-		MsgBoxWarn(MB_OK, IDS_ERR_SAVEFILE, tchFile);
+		MsgBoxLastError(MB_OK, IDS_ERR_SAVEFILE, tchFile);
 	}
 
 	return fSuccess;
