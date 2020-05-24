@@ -19,9 +19,6 @@
 ******************************************************************************/
 #pragma once
 
-#define MBYESNO			2
-#define MBOKCANCEL		8
-
 extern BOOL bWindowLayoutRTL;
 NP2_inline void InitWindowCommon(HWND hwnd) {
 	if (bWindowLayoutRTL) {
@@ -58,5 +55,10 @@ void	InitZoomLevelComboBox(HWND hwnd, int nCtlId, int zoomLevel);
 BOOL	GetZoomLevelComboBoxValue(HWND hwnd, int nCtrId, int *zoomLevel);
 void	ZoomLevelDlg(HWND hwnd, BOOL bBottom);
 BOOL	AutoCompletionSettingsDlg(HWND hwnd);
-INT_PTR InfoBox(int iType, LPCWSTR lpstrSetting, UINT uidMessage, ...);
+
+INT_PTR InfoBox(LPCWSTR idiIcon, UINT uType, LPCWSTR lpstrSetting, UINT uidMessage, ...);
+#define InfoBoxInfo(uType, lpstrSetting, uidMessage, ...)	InfoBox(IDI_INFORMATION, (uType), (lpstrSetting), (uidMessage), __VA_ARGS__)
+#define InfoBoxWarn(uType, lpstrSetting, uidMessage, ...)	InfoBox(IDI_EXCLAMATION, (uType), (lpstrSetting), (uidMessage), __VA_ARGS__)
+#define InfoBoxAsk(uType, lpstrSetting, uidMessage, ...)	InfoBox(IDI_QUESTION, (uType), (lpstrSetting), (uidMessage), __VA_ARGS__)
+
 void	SystemIntegrationDlg(HWND hwnd);

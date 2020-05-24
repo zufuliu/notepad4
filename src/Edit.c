@@ -1012,7 +1012,7 @@ BOOL EditSaveFile(HWND hwnd, LPCWSTR pszFile, BOOL bSaveCopy, EditFileIOStatus *
 					if (bEncodingMismatch) {
 						Encoding_GetLabel(iAltEncoding);
 						Encoding_GetLabel(iEncoding);
-						InfoBox(0, L"MsgEncodingMismatch", IDS_ENCODINGMISMATCH,
+						InfoBoxWarn(MB_OK, L"MsgEncodingMismatch", IDS_ENCODINGMISMATCH,
 							mEncoding[iAltEncoding].wchLabel,
 							mEncoding[iEncoding].wchLabel);
 					}
@@ -1075,7 +1075,7 @@ BOOL EditSaveFile(HWND hwnd, LPCWSTR pszFile, BOOL bSaveCopy, EditFileIOStatus *
 			}
 			NP2HeapFree(lpDataWide);
 
-			if (!bCancelDataLoss || InfoBox(MBOKCANCEL, L"MsgConv3", IDS_ERR_UNICODE2) == IDOK) {
+			if (!bCancelDataLoss || InfoBoxWarn(MB_OKCANCEL, L"MsgConv3", IDS_ERR_UNICODE2) == IDOK) {
 				SetEndOfFile(hFile);
 				bWriteSuccess = WriteFile(hFile, lpData, cbData, &dwBytesWritten, NULL);
 				dwLastIOError = GetLastError();
@@ -5214,7 +5214,7 @@ BOOL EditFindNext(LPEDITFINDREPLACE lpefr, BOOL fExtendSelection) {
 	}
 
 	if (StrIsEmptyA(szFind2)) {
-		InfoBox(0, L"MsgNotFound", IDS_NOTFOUND);
+		InfoBoxWarn(MB_OK, L"MsgNotFound", IDS_NOTFOUND);
 		return FALSE;
 	}
 
@@ -5235,7 +5235,7 @@ BOOL EditFindNext(LPEDITFINDREPLACE lpefr, BOOL fExtendSelection) {
 	BOOL bSuppressNotFound = FALSE;
 
 	if (iPos == -1 && ttf.chrg.cpMin > 0 && !lpefr->bNoFindWrap && !fExtendSelection) {
-		if (IDOK == InfoBox(MBOKCANCEL, L"MsgFindWrap1", IDS_FIND_WRAPFW)) {
+		if (IDOK == InfoBoxInfo(MB_OKCANCEL, L"MsgFindWrap1", IDS_FIND_WRAPFW)) {
 			ttf.chrg.cpMin = 0;
 			iPos = SciCall_FindText(lpefr->fuFlags, &ttf);
 		} else {
@@ -5246,7 +5246,7 @@ BOOL EditFindNext(LPEDITFINDREPLACE lpefr, BOOL fExtendSelection) {
 	if (iPos == -1) {
 		// notfound
 		if (!bSuppressNotFound) {
-			InfoBox(0, L"MsgNotFound", IDS_NOTFOUND);
+			InfoBoxWarn(MB_OK, L"MsgNotFound", IDS_NOTFOUND);
 		}
 		return FALSE;
 	}
@@ -5277,7 +5277,7 @@ BOOL EditFindPrev(LPEDITFINDREPLACE lpefr, BOOL fExtendSelection) {
 	}
 
 	if (StrIsEmptyA(szFind2)) {
-		InfoBox(0, L"MsgNotFound", IDS_NOTFOUND);
+		InfoBoxWarn(MB_OK, L"MsgNotFound", IDS_NOTFOUND);
 		return FALSE;
 	}
 
@@ -5299,7 +5299,7 @@ BOOL EditFindPrev(LPEDITFINDREPLACE lpefr, BOOL fExtendSelection) {
 	BOOL bSuppressNotFound = FALSE;
 
 	if (iPos == -1 && ttf.chrg.cpMin < iLength && !lpefr->bNoFindWrap && !fExtendSelection) {
-		if (IDOK == InfoBox(MBOKCANCEL, L"MsgFindWrap2", IDS_FIND_WRAPRE)) {
+		if (IDOK == InfoBoxInfo(MB_OKCANCEL, L"MsgFindWrap2", IDS_FIND_WRAPRE)) {
 			ttf.chrg.cpMin = (Sci_PositionCR)iLength;
 			iPos = SciCall_FindText(lpefr->fuFlags, &ttf);
 		} else {
@@ -5310,7 +5310,7 @@ BOOL EditFindPrev(LPEDITFINDREPLACE lpefr, BOOL fExtendSelection) {
 	if (iPos == -1) {
 		// notfound
 		if (!bSuppressNotFound) {
-			InfoBox(0, L"MsgNotFound", IDS_NOTFOUND);
+			InfoBoxWarn(MB_OK, L"MsgNotFound", IDS_NOTFOUND);
 		}
 		return FALSE;
 	}
@@ -5342,7 +5342,7 @@ BOOL EditReplace(HWND hwnd, LPEDITFINDREPLACE lpefr) {
 	}
 
 	if (StrIsEmptyA(szFind2)) {
-		InfoBox(0, L"MsgNotFound", IDS_NOTFOUND);
+		InfoBoxWarn(MB_OK, L"MsgNotFound", IDS_NOTFOUND);
 		return FALSE;
 	}
 
@@ -5379,7 +5379,7 @@ BOOL EditReplace(HWND hwnd, LPEDITFINDREPLACE lpefr) {
 	BOOL bSuppressNotFound = FALSE;
 
 	if (iPos == -1 && ttf.chrg.cpMin > 0 && !lpefr->bNoFindWrap) {
-		if (IDOK == InfoBox(MBOKCANCEL, L"MsgFindWrap1", IDS_FIND_WRAPFW)) {
+		if (IDOK == InfoBoxInfo(MB_OKCANCEL, L"MsgFindWrap1", IDS_FIND_WRAPFW)) {
 			ttf.chrg.cpMin = 0;
 			iPos = SciCall_FindText(lpefr->fuFlags, &ttf);
 		} else {
@@ -5391,7 +5391,7 @@ BOOL EditReplace(HWND hwnd, LPEDITFINDREPLACE lpefr) {
 		// not found
 		LocalFree(pszReplace2);
 		if (!bSuppressNotFound) {
-			InfoBox(0, L"MsgNotFound", IDS_NOTFOUND);
+			InfoBoxWarn(MB_OK, L"MsgNotFound", IDS_NOTFOUND);
 		}
 		return FALSE;
 	}
@@ -5412,7 +5412,7 @@ BOOL EditReplace(HWND hwnd, LPEDITFINDREPLACE lpefr) {
 	bSuppressNotFound = FALSE;
 
 	if (iPos == -1 && ttf.chrg.cpMin > 0 && !lpefr->bNoFindWrap) {
-		if (IDOK == InfoBox(MBOKCANCEL, L"MsgFindWrap1", IDS_FIND_WRAPFW)) {
+		if (IDOK == InfoBoxInfo(MB_OKCANCEL, L"MsgFindWrap1", IDS_FIND_WRAPFW)) {
 			ttf.chrg.cpMin = 0;
 			iPos = SciCall_FindText(lpefr->fuFlags, &ttf);
 		} else {
@@ -5426,7 +5426,7 @@ BOOL EditReplace(HWND hwnd, LPEDITFINDREPLACE lpefr) {
 		iPos = SciCall_GetTargetEnd();
 		EditSelectEx(iPos, iPos); //?
 		if (!bSuppressNotFound) {
-			InfoBox(0, L"MsgNotFound", IDS_NOTFOUND);
+			InfoBoxWarn(MB_OK, L"MsgNotFound", IDS_NOTFOUND);
 		}
 	}
 
@@ -5537,9 +5537,9 @@ static void ShwowReplaceCount(Sci_Position iCount) {
 		WCHAR tchNum[32];
 		PosToStrW(iCount, tchNum);
 		FormatNumberStr(tchNum);
-		InfoBox(0, L"MsgReplaceCount", IDS_REPLCOUNT, tchNum);
+		InfoBoxInfo(MB_OK, L"MsgReplaceCount", IDS_REPLCOUNT, tchNum);
 	} else {
-		InfoBox(0, L"MsgNotFound", IDS_NOTFOUND);
+		InfoBoxWarn(MB_OK, L"MsgNotFound", IDS_NOTFOUND);
 	}
 }
 
@@ -5564,7 +5564,7 @@ BOOL EditReplaceAll(HWND hwnd, LPEDITFINDREPLACE lpefr, BOOL bShowInfo) {
 	}
 
 	if (StrIsEmptyA(szFind2)) {
-		InfoBox(0, L"MsgNotFound", IDS_NOTFOUND);
+		InfoBoxWarn(MB_OK, L"MsgNotFound", IDS_NOTFOUND);
 		return FALSE;
 	}
 
@@ -5679,7 +5679,7 @@ BOOL EditReplaceAllInSelection(HWND hwnd, LPEDITFINDREPLACE lpefr, BOOL bShowInf
 	}
 
 	if (StrIsEmptyA(szFind2)) {
-		InfoBox(0, L"MsgNotFound", IDS_NOTFOUND);
+		InfoBoxWarn(MB_OK, L"MsgNotFound", IDS_NOTFOUND);
 		return FALSE;
 	}
 

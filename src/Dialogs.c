@@ -2278,7 +2278,7 @@ BOOL AutoCompletionSettingsDlg(HWND hwnd) {
 //
 typedef struct INFOBOX {
 	LPWSTR lpstrMessage;
-	LPWSTR lpstrSetting;
+	LPCWSTR lpstrSetting;
 	LPCWSTR idiIcon;
 	BOOL   bDisableCheckBox;
 } INFOBOX, *LPINFOBOX;
@@ -2336,10 +2336,10 @@ static INT_PTR CALLBACK InfoBoxDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 // InfoBox()
 //
 //
-INT_PTR InfoBox(int iType, LPCWSTR lpstrSetting, UINT uidMessage, ...) {
+INT_PTR InfoBox(LPCWSTR idiIcon, UINT uType, LPCWSTR lpstrSetting, UINT uidMessage, ...) {
 	const int iMode = IniGetInt(INI_SECTION_NAME_SUPPRESSED_MESSAGES, lpstrSetting, 0);
 	if (StrNotEmpty(lpstrSetting) && iMode == 1) {
-		return (iType == MBYESNO) ? IDYES : IDOK;
+		return (uType == MB_YESNO) ? IDYES : IDOK;
 	}
 
 	WCHAR wchFormat[512];
@@ -2353,11 +2353,11 @@ INT_PTR InfoBox(int iType, LPCWSTR lpstrSetting, UINT uidMessage, ...) {
 	wvsprintf(ib.lpstrMessage, wchFormat, va);
 	va_end(va);
 
-	ib.lpstrSetting = (LPWSTR)lpstrSetting;
-	ib.idiIcon = (uidMessage == IDS_REPLCOUNT || uidMessage == IDS_FIND_WRAPFW || uidMessage == IDS_FIND_WRAPRE) ? IDI_INFORMATION : IDI_EXCLAMATION;
+	ib.lpstrSetting = lpstrSetting;
+	ib.idiIcon = idiIcon;
 	ib.bDisableCheckBox = StrIsEmpty(szIniFile) || StrIsEmpty(lpstrSetting) || iMode == 2;
 
-	const WORD idDlg = (iType == MBYESNO) ? IDD_INFOBOX_YESNO : ((iType == MBOKCANCEL) ? IDD_INFOBOX_OKCANCEL : IDD_INFOBOX_OK);
+	const WORD idDlg = (uType == MB_YESNO) ? IDD_INFOBOX_YESNO : ((uType == MB_OKCANCEL) ? IDD_INFOBOX_OKCANCEL : IDD_INFOBOX_OK);
 
 	HWND hwnd;
 	if ((hwnd = GetActiveWindow()) == NULL) {
