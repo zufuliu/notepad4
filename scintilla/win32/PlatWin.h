@@ -45,12 +45,27 @@
 #endif
 
 // force compile C as CPP
-#define NP2_FORCE_COMPILE_C_AS_CPP	0
+#define NP2_FORCE_COMPILE_C_AS_CPP		0
 
-#if NP2_FORCE_COMPILE_C_AS_CPP
-extern int GetSystemMetricsEx(int nIndex);
+// since Windows 10, version 1607
+#if defined(__aarch64__) || defined(_ARM64_) || defined(_M_ARM64)
+// 1709 was the first version for Windows 10 on ARM64.
+#define NP2_TARGET_ARM64	1
+#define GetSystemDPI()						GetDpiForSystem()
+#define GetWindowDPI(hwnd)					GetDpiForWindow(hwnd)
+#define GetSystemMetricsEx(nIndex, dpi)		GetSystemMetricsForDpi((nIndex), (dpi))
+
 #else
-extern "C" int GetSystemMetricsEx(int nIndex);
+#define NP2_TARGET_ARM64	0
+#if NP2_FORCE_COMPILE_C_AS_CPP
+extern UINT GetSystemDPI(void);
+extern UINT GetWindowDPI(HWND hwnd);
+extern int GetSystemMetricsEx(int nIndex, UINT dpi);
+#else
+extern "C" UINT GetSystemDPI(void);
+extern "C" UINT GetWindowDPI(HWND hwnd);
+extern "C" int GetSystemMetricsEx(int nIndex, UINT dpi);
+#endif
 #endif
 
 namespace Scintilla {
@@ -109,6 +124,10 @@ inline T DLLFunction(HMODULE hModule, LPCSTR lpProcName) noexcept {
 template<typename T>
 inline T DLLFunction(LPCWSTR lpDllName, LPCSTR lpProcName) noexcept {
 	return DLLFunction<T>(::GetModuleHandleW(lpDllName), lpProcName);
+}
+
+inline UINT DpiForWindow(WindowID wid) noexcept {
+	return GetWindowDPI(HwndFromWindowID(wid));
 }
 
 #if defined(USE_D2D)

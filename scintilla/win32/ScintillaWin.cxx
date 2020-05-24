@@ -345,8 +345,6 @@ class ScintillaWin :
 	unsigned int linesPerScroll;	///< Intellimouse support
 	int wheelDelta; ///< Wheel delta from roll
 
-	UINT dpi = USER_DEFAULT_SCREEN_DPI;
-
 	HRGN hRgnUpdate;
 
 	bool hasOKText;
@@ -617,6 +615,7 @@ ScintillaWin::ScintillaWin(HWND hwnd) {
 
 	//hrOle = E_FAIL;
 	wMain = hwnd;
+	wMain.dpi = GetWindowDPI(hwnd);
 
 	dob.sci = this;
 	ds.sci = this;
@@ -772,8 +771,8 @@ bool ScintillaWin::DragThreshold(Point ptStart, Point ptNow) noexcept {
 	const Point ptDifference = ptStart - ptNow;
 	const XYPOSITION xMove = std::trunc(std::abs(ptDifference.x));
 	const XYPOSITION yMove = std::trunc(std::abs(ptDifference.y));
-	return (xMove > GetSystemMetricsEx(SM_CXDRAG)) ||
-		(yMove > GetSystemMetricsEx(SM_CYDRAG));
+	return (xMove > GetSystemMetricsEx(SM_CXDRAG, wMain.dpi)) ||
+		(yMove > GetSystemMetricsEx(SM_CYDRAG, wMain.dpi));
 }
 
 void ScintillaWin::StartDrag() {
@@ -2159,8 +2158,10 @@ sptr_t ScintillaWin::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam
 			break;
 
 		case WM_DPICHANGED:
-			dpi = HIWORD(wParam);
+			wMain.dpi = HIWORD(wParam);
 			vs.fontsValid = false;
+			ac.Cancel();
+			ct.CallTipCancel();
 			InvalidateStyleRedraw();
 			break;
 
@@ -3053,7 +3054,7 @@ void ScintillaWin::ImeStartComposition() {
 			LOGFONTW lf = { };
 			const int sizeZoomed = GetFontSizeZoomed(vs.styles[styleHere].size, vs.zoomLevel);
 			// The negative is to allow for leading
-			lf.lfHeight = -MulDiv(sizeZoomed, dpi, 72*SC_FONT_SIZE_MULTIPLIER);
+			lf.lfHeight = -MulDiv(sizeZoomed, wMain.dpi, 72*SC_FONT_SIZE_MULTIPLIER);
 			lf.lfWeight = vs.styles[styleHere].weight;
 			lf.lfItalic = vs.styles[styleHere].italic ? 1 : 0;
 			lf.lfCharSet = DEFAULT_CHARSET;
