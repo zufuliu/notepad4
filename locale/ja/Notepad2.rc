@@ -2120,7 +2120,7 @@ BEGIN
 	NP2STYLE_MatchingBraceError		"未対応の括弧"
 	NP2STYLE_ControlCharacter		"制御文字"
 	NP2STYLE_IndentationGuide		"インデントのガイド"
-	NP2STYLE_SelectedText			"洗濯文字列"
+	NP2STYLE_SelectedText			"選択文字列"
 	NP2STYLE_Whitespace				"空白"
 	NP2STYLE_CurrentLine			"現在の行の強調表示"
 	NP2STYLE_Caret					"キャレット"
