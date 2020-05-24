@@ -222,7 +222,6 @@ void AutoComplete::Cancel() noexcept {
 	}
 }
 
-
 void AutoComplete::Move(int delta) const {
 	const int count = lb->Length();
 	int current = lb->GetSelection();
@@ -300,4 +299,3 @@ void AutoComplete::Select(const char *word) {
 		lb->Select(sortMatrix[location]);
 	}
 }
-

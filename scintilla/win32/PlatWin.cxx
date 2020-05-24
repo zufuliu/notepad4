@@ -58,6 +58,38 @@ namespace Scintilla {
 
 UINT CodePageFromCharSet(DWORD characterSet, UINT documentCodePage) noexcept;
 
+// system DPI, same for all monitor.
+UINT g_uSystemDPI = USER_DEFAULT_SCREEN_DPI;
+
+#if !NP2_TARGET_ARM64
+using GetDpiForWindowSig = UINT (WINAPI *)(HWND hwnd);
+GetDpiForWindowSig pfnGetDpiForWindow = nullptr;
+
+using GetDpiForMonitorSig = HRESULT (WINAPI *)(HMONITOR hmonitor, /*MONITOR_DPI_TYPE*/int dpiType, UINT *dpiX, UINT *dpiY);
+HMODULE hShcoreDLL {};
+GetDpiForMonitorSig pfnGetDpiForMonitor = nullptr;
+
+using GetSystemMetricsForDpiSig = int (WINAPI *)(int nIndex, UINT dpi);
+GetSystemMetricsForDpiSig pfnGetSystemMetricsForDpi = nullptr;
+
+void LoadDPIFunction() noexcept {
+	pfnGetDpiForWindow = DLLFunction<GetDpiForWindowSig>(L"user32.dll", "GetDpiForWindow");
+	if (pfnGetDpiForWindow == nullptr) {
+		HMODULE hShcore = LoadLibraryEx(L"shcore.dll", nullptr, LOAD_LIBRARY_SEARCH_SYSTEM32);
+		if (hShcore) {
+			pfnGetDpiForMonitor = DLLFunction<GetDpiForMonitorSig>(hShcore, "GetDpiForMonitor");
+			if (pfnGetDpiForMonitor ) {
+				hShcoreDLL = hShcore;
+			} else {
+				FreeLibrary(hShcore);
+			}
+		}
+	}
+
+	pfnGetSystemMetricsForDpi = DLLFunction<GetSystemMetricsForDpiSig>(L"user32.dll", "GetSystemMetricsForDpi");
+}
+#endif
+
 #if defined(USE_D2D)
 IDWriteFactory *pIDWriteFactory = nullptr;
 ID2D1Factory *pD2DFactory = nullptr;
@@ -220,8 +252,6 @@ HFONT FormatAndMetrics::HFont() const noexcept {
 namespace {
 
 HINSTANCE hinstPlatformRes {};
-
-HCURSOR reverseArrowCursor {};
 
 inline FormatAndMetrics *FamFromFontID(void *fid) noexcept {
 	return static_cast<FormatAndMetrics *>(fid);
@@ -565,21 +595,24 @@ bool SurfaceGDI::Initialised() const noexcept {
 	return hdc != nullptr;
 }
 
-void SurfaceGDI::Init(WindowID /*wid*/) noexcept {
+void SurfaceGDI::Init(WindowID wid) noexcept {
 	Release();
+	logPixelsY = DpiForWindow(wid);
 	hdc = ::CreateCompatibleDC({});
 	hdcOwned = true;
 	::SetTextAlign(hdc, TA_BASELINE);
 }
 
-void SurfaceGDI::Init(SurfaceID sid, WindowID /*wid*/) noexcept {
+void SurfaceGDI::Init(SurfaceID sid, WindowID wid) noexcept {
 	Release();
+	logPixelsY = DpiForWindow(wid);
 	hdc = static_cast<HDC>(sid);
 	::SetTextAlign(hdc, TA_BASELINE);
 }
 
-void SurfaceGDI::InitPixMap(int width, int height, Surface *surface_, WindowID /*wid*/) noexcept {
+void SurfaceGDI::InitPixMap(int width, int height, Surface *surface_, WindowID wid) noexcept {
 	Release();
+	logPixelsY = DpiForWindow(wid);
 	SurfaceGDI *psurfOther = down_cast<SurfaceGDI *>(surface_);
 	// Should only ever be called with a SurfaceGDI, not a SurfaceD2D
 	PLATFORM_ASSERT(psurfOther);
@@ -1039,7 +1072,6 @@ public:
 	SurfaceD2D &operator=(SurfaceD2D &&) = delete;
 	~SurfaceD2D() noexcept override;
 
-	void SetScale(WindowID wid) noexcept;
 	void Init(WindowID wid) noexcept override;
 	void Init(SurfaceID sid, WindowID wid) noexcept override;
 	void InitPixMap(int width, int height, Surface *surface_, WindowID wid) noexcept override;
@@ -1140,9 +1172,6 @@ void SurfaceD2D::Release() noexcept {
 	Clear();
 }
 
-void SurfaceD2D::SetScale(WindowID /*wid*/) noexcept {
-}
-
 bool SurfaceD2D::Initialised() const noexcept {
 	return pRenderTarget != nullptr;
 }
@@ -1153,18 +1182,18 @@ HRESULT SurfaceD2D::FlushDrawing() const noexcept {
 
 void SurfaceD2D::Init(WindowID wid) noexcept {
 	Release();
-	SetScale(wid);
+	logPixelsY = DpiForWindow(wid);
 }
 
 void SurfaceD2D::Init(SurfaceID sid, WindowID wid) noexcept {
 	Release();
-	SetScale(wid);
+	logPixelsY = DpiForWindow(wid);
 	pRenderTarget = static_cast<ID2D1RenderTarget *>(sid);
 }
 
 void SurfaceD2D::InitPixMap(int width, int height, Surface *surface_, WindowID wid) noexcept {
 	Release();
-	SetScale(wid);
+	logPixelsY = DpiForWindow(wid);
 	SurfaceD2D *psurfOther = down_cast<SurfaceD2D *>(surface_);
 	// Should only ever be called with a SurfaceD2D, not a SurfaceGDI
 	PLATFORM_ASSERT(psurfOther);
@@ -2231,6 +2260,23 @@ void Window::SetFont(const Font &font) noexcept {
 
 namespace {
 
+class ReverseArrowCursor {
+	UINT dpi = USER_DEFAULT_SCREEN_DPI;
+	bool created = false;
+	HCURSOR cursor {};
+
+public:
+	ReverseArrowCursor() noexcept = default;
+	HCURSOR Get(UINT dpi_) noexcept;
+	~ReverseArrowCursor() {
+		if (created) {
+			::DestroyCursor(cursor);
+		}
+	}
+};
+
+ReverseArrowCursor reverseArrowCursor;
+
 void FlipBitmap(HBITMAP bitmap, int width, int height) noexcept {
 	HDC hdc = ::CreateCompatibleDC({});
 	if (hdc) {
@@ -2241,8 +2287,31 @@ void FlipBitmap(HBITMAP bitmap, int width, int height) noexcept {
 	}
 }
 
-void LoadReverseArrowCursor() noexcept {
-	HCURSOR cursor = ::LoadCursor(nullptr, IDC_ARROW);
+HCURSOR ReverseArrowCursor::Get(UINT dpi_) noexcept {
+	if (cursor) {
+		if (dpi == dpi_) {
+			return cursor;
+		}
+		if (created) {
+			::DestroyCursor(cursor);
+		}
+	}
+
+	dpi = dpi_;
+	created = false;
+	cursor = ::LoadCursor(nullptr, IDC_ARROW);
+	HCURSOR copy {};
+
+	if (dpi != g_uSystemDPI) {
+		const int width = GetSystemMetricsEx(SM_CXCURSOR, dpi);
+		const int height = GetSystemMetricsEx(SM_CYCURSOR, dpi);
+		copy = reinterpret_cast<HCURSOR>(::CopyImage(cursor, IMAGE_CURSOR, width, height, LR_COPYFROMRESOURCE | LR_COPYRETURNORG));
+		if (copy) {
+			created = true;
+			cursor = copy;
+		}
+	}
+
 	ICONINFO info;
 	if (::GetIconInfo(cursor, &info)) {
 		BITMAP bmp;
@@ -2253,7 +2322,14 @@ void LoadReverseArrowCursor() noexcept {
 			}
 			info.xHotspot = bmp.bmWidth - 1 - info.xHotspot;
 
-			reverseArrowCursor = ::CreateIconIndirect(&info);
+			copy = ::CreateIconIndirect(&info);
+			if (copy) {
+				if (created) {
+					::DestroyCursor(cursor);
+				}
+				created = true;
+				cursor = copy;
+			}
 		}
 
 		::DeleteObject(info.hbmMask);
@@ -2261,6 +2337,8 @@ void LoadReverseArrowCursor() noexcept {
 			::DeleteObject(info.hbmColor);
 		}
 	}
+
+	return cursor;
 }
 
 }
@@ -2286,7 +2364,7 @@ void Window::SetCursor(Cursor curs) noexcept {
 		::SetCursor(::LoadCursor(nullptr, IDC_HAND));
 		break;
 	case cursorReverseArrow:
-		::SetCursor(reverseArrowCursor);
+		::SetCursor(reverseArrowCursor.Get(dpi));
 		break;
 	case cursorArrow:
 	case cursorInvalid:	// Should not occur, but just in case.
@@ -2487,6 +2565,7 @@ void ListBoxX::Create(Window &parent_, int ctrlID_, Point location_, int lineHei
 		hinstanceParent,
 		this);
 
+	dpi = DpiForWindow(wid);
 	POINT locationw = POINTFromPoint(location);
 	::MapWindowPoints(hwndParent, nullptr, &locationw, 1);
 	location = PointFromPOINT(locationw);
@@ -2552,6 +2631,7 @@ PRectangle ListBoxX::GetDesiredRect() {
 			::GetTextExtentPoint32A(hdc, widestItem, len, &textSize);
 		}
 	}
+
 	TEXTMETRIC tm;
 	::GetTextMetrics(hdc, &tm);
 	maxCharWidth = tm.tmMaxCharWidth;
@@ -2563,8 +2643,9 @@ PRectangle ListBoxX::GetDesiredRect() {
 		width = widthDesired;
 
 	rcDesired.right = rcDesired.left + TextOffset() + width + (TextInset.x * 2);
-	if (Length() > rows)
-		rcDesired.right += GetSystemMetricsEx(SM_CXVSCROLL);
+	if (Length() > rows) {
+		rcDesired.right += GetSystemMetricsEx(SM_CXVSCROLL, dpi);
+	}
 
 	AdjustWindowRect(&rcDesired);
 	return rcDesired;
@@ -2812,7 +2893,7 @@ POINT ListBoxX::MinTrackSize() const {
 
 POINT ListBoxX::MaxTrackSize() const {
 	const int width = maxCharWidth * maxItemCharacters + static_cast<int>(TextInset.x) * 2 +
-		TextOffset() + GetSystemMetricsEx(SM_CXVSCROLL);
+		TextOffset() + GetSystemMetricsEx(SM_CXVSCROLL, dpi);
 	PRectangle rc = PRectangle::FromInts(0, 0,
 		std::max(MinClientWidth(), width),
 		ItemHeight() * lti.Count());
@@ -2923,7 +3004,7 @@ LRESULT ListBoxX::NcHitTest(WPARAM wParam, LPARAM lParam) const noexcept {
 	// window caption height + frame, even if one is hovering over the bottom edge of
 	// the frame, so workaround that here
 	if (hit >= HTTOP && hit <= HTTOPRIGHT) {
-		const int minHeight = GetSystemMetricsEx(SM_CYMINTRACK);
+		const int minHeight = GetSystemMetricsEx(SM_CYMINTRACK, dpi);
 		const int yPos = GET_Y_LPARAM(lParam);
 		if ((rc.Height() < minHeight) && (yPos > ((rc.top + rc.bottom) / 2))) {
 			hit += HTBOTTOM - HTTOP;
@@ -2931,9 +3012,9 @@ LRESULT ListBoxX::NcHitTest(WPARAM wParam, LPARAM lParam) const noexcept {
 	}
 #if LISTBOXX_USE_BORDER || LISTBOXX_USE_FAKE_FRAME
 	else if (hit < HTSIZEFIRST || hit > HTSIZELAST) {
-		const int cx = GetSystemMetricsEx(SM_CXVSCROLL);
+		const int cx = GetSystemMetricsEx(SM_CXVSCROLL, dpi);
 #if LISTBOXX_USE_BORDER
-		const PRectangle rcInner = rc.Deflate(GetSystemMetricsEx(SM_CXBORDER), GetSystemMetricsEx(SM_CYBORDER));
+		const PRectangle rcInner = rc.Deflate(GetSystemMetricsEx(SM_CXBORDER, dpi), GetSystemMetricsEx(SM_CYBORDER, dpi));
 #else
 		const PRectangle rcInner = rc.Deflate(ListBoxXFakeFrameSize, ListBoxXFakeFrameSize);
 #endif
@@ -3426,7 +3507,10 @@ void Platform::Assert(const char *, const char *, int) noexcept {
 
 void Platform_Initialise(void *hInstance) noexcept {
 	hinstPlatformRes = static_cast<HINSTANCE>(hInstance);
-	LoadReverseArrowCursor();
+#if !NP2_TARGET_ARM64
+	LoadDPIFunction();
+#endif
+	g_uSystemDPI = GetSystemDPI();
 	ListBoxX_Register();
 }
 
@@ -3463,9 +3547,65 @@ void Platform_Finalise(bool fromDllMain) noexcept {
 		}
 	}
 #endif
-	if (reverseArrowCursor)
-		::DestroyCursor(reverseArrowCursor);
+#if !NP2_TARGET_ARM64
+	if (!fromDllMain) {
+		if (hShcoreDLL) {
+			FreeLibrary(hShcoreDLL);
+			hShcoreDLL = nullptr;
+		}
+	}
+#endif
 	ListBoxX_Unregister();
 }
 
 }
+
+#if !NP2_TARGET_ARM64
+using namespace Scintilla;
+
+#ifndef DPI_ENUMS_DECLARED
+#define MDT_EFFECTIVE_DPI	0
+#endif
+
+UINT GetSystemDPI(void) {
+	using GetDpiForSystemSig = UINT (WINAPI *)(void);
+	GetDpiForSystemSig pfnGetDpiForSystem = DLLFunction<GetDpiForSystemSig>(L"user32.dll", "GetDpiForSystem");
+
+	UINT dpi;
+	if (pfnGetDpiForSystem) {
+		dpi = pfnGetDpiForSystem();
+	} else {
+		HDC hDC = ::GetDC(nullptr);
+		dpi = ::GetDeviceCaps(hDC, LOGPIXELSY);
+		::ReleaseDC(nullptr, hDC);
+
+	}
+	return dpi;
+}
+
+UINT GetWindowDPI(HWND hwnd) {
+	if (pfnGetDpiForWindow) {
+		return pfnGetDpiForWindow(hwnd);
+	}
+	if (pfnGetDpiForMonitor) {
+		HMONITOR hMonitor = ::MonitorFromWindow(hwnd, MONITOR_DEFAULTTONEAREST);
+		UINT dpiX = 0;
+		UINT dpiY = 0;
+		if (pfnGetDpiForMonitor(hMonitor, MDT_EFFECTIVE_DPI, &dpiX, &dpiY) == S_OK) {
+			return dpiY;
+		}
+	}
+	return g_uSystemDPI;
+}
+
+int GetSystemMetricsEx(int nIndex, UINT dpi) {
+	if (pfnGetSystemMetricsForDpi) {
+		return pfnGetSystemMetricsForDpi(nIndex, dpi);
+	}
+
+	int value = GetSystemMetrics(nIndex);
+	value = (dpi == g_uSystemDPI) ? value : MulDiv(value, dpi, g_uSystemDPI);
+	return value;
+}
+
+#endif

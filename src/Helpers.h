@@ -247,24 +247,27 @@ extern WCHAR szIniFile[MAX_PATH];
 #ifndef USER_DEFAULT_SCREEN_DPI
 #define USER_DEFAULT_SCREEN_DPI		96		// _WIN32_WINNT >= _WIN32_WINNT_VISTA
 #endif
-#ifndef DPI_ENUMS_DECLARED
-#define MDT_EFFECTIVE_DPI	0
-#endif
 
 // use large icon when window DPI is greater than or equal to this value.
 #define NP2_LARGER_ICON_SIZE_DPI	192		// 200%
 
 // current DPI for main/editor window
 extern UINT g_uCurrentDPI;
-// startup DPI for main/editor window, may different from g_uCurrentDPI after moving to a different display.
-extern UINT g_uDefaultDPI;
+
+// since Windows 10, version 1607
+#if defined(__aarch64__) || defined(_ARM64_) || defined(_M_ARM64)
+// 1709 was the first version for Windows 10 on ARM64.
+#define GetSystemDPI()						GetDpiForSystem()
+#define GetWindowDPI(hwnd)					GetDpiForWindow(hwnd)
+#define GetSystemMetricsEx(nIndex, dpi)		GetSystemMetricsForDpi((nIndex), (dpi))
+#else
+extern UINT GetSystemDPI(void);
+extern UINT GetWindowDPI(HWND hwnd);
+extern int GetSystemMetricsEx(int nIndex, UINT dpi);
+#endif
 
 NP2_inline int RoundToCurrentDPI(int value)	{
 	return (g_uCurrentDPI == USER_DEFAULT_SCREEN_DPI) ? value : MulDiv(g_uCurrentDPI, value, USER_DEFAULT_SCREEN_DPI);
-}
-
-NP2_inline int DefaultToCurrentDPI(int value) {
-	return (g_uCurrentDPI == g_uDefaultDPI) ? value : MulDiv(g_uCurrentDPI, value, g_uDefaultDPI);
 }
 
 NP2_inline DWORD GetIconIndexFlagsForDPI(UINT dpi) {
@@ -286,10 +289,6 @@ NP2_inline DWORD GetCurrentIconIndexFlags(void) {
 NP2_inline DWORD GetCurrentIconHandleFlags(void) {
 	return GetIconHandleFlagsForDPI(g_uCurrentDPI);
 }
-
-// https://docs.microsoft.com/en-us/windows/desktop/api/winuser/nf-winuser-getsystemmetrics
-// https://docs.microsoft.com/en-us/windows/desktop/api/winuser/nf-winuser-getsystemmetricsfordpi
-int GetSystemMetricsEx(int nIndex);
 
 // https://docs.microsoft.com/en-us/windows/desktop/Memory/comparing-memory-allocation-methods
 // https://blogs.msdn.microsoft.com/oldnewthing/20120316-00/?p=8083/
@@ -487,8 +486,6 @@ NP2_inline BOOL KeyboardIsKeyDown(int key) {
 	return (GetKeyState(key) & 0x8000) != 0;
 }
 
-UINT GetDefaultDPI(HWND hwnd);
-UINT GetCurrentDPI(HWND hwnd);
 HRESULT PrivateSetCurrentProcessExplicitAppUserModelID(PCWSTR AppID);
 BOOL IsElevated(void);
 

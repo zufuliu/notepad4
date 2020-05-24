@@ -1462,8 +1462,7 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 	// base font size
 	if (!Style_StrGetFontSize(szValue, &iBaseFontSize)) {
 		iBaseFontSize = defaultBaseFontSize;
-		iValue = DefaultToCurrentDPI(iBaseFontSize);
-		SciCall_StyleSetSizeFractional(STYLE_DEFAULT, iValue);
+		SciCall_StyleSetSizeFractional(STYLE_DEFAULT, iBaseFontSize);
 	}
 	Style_SetStyles(STYLE_DEFAULT, szValue);
 
@@ -3639,7 +3638,6 @@ void Style_SetStyles(int iStyle, LPCWSTR lpszStyle) {
 
 	// Size
 	if (Style_StrGetFontSize(lpszStyle, &iValue)) {
-		iValue = DefaultToCurrentDPI(iValue);
 		SciCall_StyleSetSizeFractional(iStyle, iValue);
 	}
 
@@ -3699,7 +3697,7 @@ static void Style_Parse(struct DetailStyle *style, LPCWSTR lpszStyle) {
 
 	// Size
 	if (Style_StrGetFontSize(lpszStyle, &iValue)) {
-		style->fontSize = DefaultToCurrentDPI(iValue);
+		style->fontSize = iValue;
 		mask |= STYLE_MASK_FONT_SIZE;
 	}
 
