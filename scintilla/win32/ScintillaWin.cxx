@@ -110,7 +110,7 @@ constexpr UINT SC_WORK_IDLE = 5002;
 #define SC_INDICATOR_UNKNOWN	INDICATOR_IME_MAX
 
 #if _WIN32_WINNT < _WIN32_WINNT_WIN8
-typedef UINT_PTR (WINAPI *SetCoalescableTimerSig)(HWND hwnd, UINT_PTR nIDEvent,
+using SetCoalescableTimerSig = UINT_PTR (WINAPI *)(HWND hwnd, UINT_PTR nIDEvent,
 	UINT uElapse, TIMERPROC lpTimerFunc, ULONG uToleranceDelay);
 #endif
 
@@ -3054,7 +3054,7 @@ void ScintillaWin::ImeStartComposition() {
 			LOGFONTW lf = { };
 			const int sizeZoomed = GetFontSizeZoomed(vs.styles[styleHere].size, vs.zoomLevel);
 			// The negative is to allow for leading
-			lf.lfHeight = -MulDiv(sizeZoomed, wMain.dpi, 72*SC_FONT_SIZE_MULTIPLIER);
+			lf.lfHeight = -::MulDiv(sizeZoomed, wMain.dpi, 72*SC_FONT_SIZE_MULTIPLIER);
 			lf.lfWeight = vs.styles[styleHere].weight;
 			lf.lfItalic = vs.styles[styleHere].italic ? 1 : 0;
 			lf.lfCharSet = DEFAULT_CHARSET;

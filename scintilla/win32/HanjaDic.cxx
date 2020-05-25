@@ -22,7 +22,7 @@ interface IRadical;
 interface IHanja;
 interface IStrokes;
 
-typedef enum { HANJA_UNKNOWN = 0, HANJA_K0 = 1, HANJA_K1 = 2, HANJA_OTHER = 3 } HANJA_TYPE;
+enum HANJA_TYPE { HANJA_UNKNOWN = 0, HANJA_K0 = 1, HANJA_K1 = 2, HANJA_OTHER = 3 };
 
 interface IHanjaDic : IUnknown {
 	STDMETHOD(OpenMainDic)();

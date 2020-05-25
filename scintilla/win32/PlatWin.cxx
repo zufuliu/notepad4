@@ -59,7 +59,7 @@ namespace Scintilla {
 UINT CodePageFromCharSet(DWORD characterSet, UINT documentCodePage) noexcept;
 
 // system DPI, same for all monitor.
-UINT g_uSystemDPI = USER_DEFAULT_SCREEN_DPI;
+UINT uSystemDPI = USER_DEFAULT_SCREEN_DPI;
 
 #if !NP2_TARGET_ARM64
 using GetDpiForSystemSig = UINT (WINAPI *)(void);
@@ -85,7 +85,7 @@ void LoadDPIFunction() noexcept {
 		HMODULE hShcore = LoadLibraryEx(L"shcore.dll", nullptr, LOAD_LIBRARY_SEARCH_SYSTEM32);
 		if (hShcore) {
 			pfnGetDpiForMonitor = DLLFunction<GetDpiForMonitorSig>(hShcore, "GetDpiForMonitor");
-			if (pfnGetDpiForMonitor ) {
+			if (pfnGetDpiForMonitor) {
 				hShcoreDLL = hShcore;
 			} else {
 				FreeLibrary(hShcore);
@@ -113,14 +113,14 @@ bool LoadD2D() noexcept {
 		// that KB2533623 has been installed so LoadLibraryEx can be called
 		// with LOAD_LIBRARY_SEARCH_SYSTEM32.
 
-		typedef HRESULT(WINAPI *D2D1CFSig)(D2D1_FACTORY_TYPE factoryType, REFIID riid,
+		using D2D1CreateFactorySig = HRESULT(WINAPI *)(D2D1_FACTORY_TYPE factoryType, REFIID riid,
 			CONST D2D1_FACTORY_OPTIONS *pFactoryOptions, IUnknown **factory);
-		typedef HRESULT(WINAPI *DWriteCFSig)(DWRITE_FACTORY_TYPE factoryType, REFIID iid,
+		using DWriteCreateFactorySig = HRESULT(WINAPI *)(DWRITE_FACTORY_TYPE factoryType, REFIID iid,
 			IUnknown **factory);
 
 		hDLLD2D = ::LoadLibraryEx(L"D2D1.DLL", nullptr, kSystemLibraryLoadFlags);
 		if (hDLLD2D) {
-			D2D1CFSig fnD2DCF = DLLFunction<D2D1CFSig>(hDLLD2D, "D2D1CreateFactory");
+			D2D1CreateFactorySig fnD2DCF = DLLFunction<D2D1CreateFactorySig>(hDLLD2D, "D2D1CreateFactory");
 			if (fnD2DCF) {
 #ifdef NDEBUG
 				// A single threaded factory as Scintilla always draw on the GUI thread
@@ -140,7 +140,7 @@ bool LoadD2D() noexcept {
 		}
 		hDLLDWrite = ::LoadLibraryEx(L"DWRITE.DLL", nullptr, kSystemLibraryLoadFlags);
 		if (hDLLDWrite) {
-			DWriteCFSig fnDWCF = DLLFunction<DWriteCFSig>(hDLLDWrite, "DWriteCreateFactory");
+			DWriteCreateFactorySig fnDWCF = DLLFunction<DWriteCreateFactorySig>(hDLLDWrite, "DWriteCreateFactory");
 			if (fnDWCF) {
 				const GUID IID_IDWriteFactory2 = // 0439fc60-ca44-4994-8dee-3a9af7b732ec
 				{ 0x0439fc60, 0xca44, 0x4994, { 0x8d, 0xee, 0x3a, 0x9a, 0xf7, 0xb7, 0x32, 0xec } };
@@ -249,10 +249,6 @@ struct FormatAndMetrics {
 HFONT FormatAndMetrics::HFont() const noexcept {
 	return ::CreateFontIndirectW(&lf);
 }
-
-#ifndef CLEARTYPE_QUALITY
-#define CLEARTYPE_QUALITY 5
-#endif
 
 namespace {
 
@@ -476,7 +472,7 @@ public:
 		}
 	}
 };
-typedef VarBuffer<XYPOSITION, stackBufferLength> TextPositions;
+using TextPositions = VarBuffer<XYPOSITION, stackBufferLength>;
 
 class SurfaceGDI : public Surface {
 	bool unicodeMode = false;
@@ -884,7 +880,7 @@ std::unique_ptr<IScreenLineLayout> SurfaceGDI::Layout(const IScreenLine *) noexc
 	return {};
 }
 
-typedef VarBuffer<int, stackBufferLength> TextPositionsI;
+using TextPositionsI = VarBuffer<int, stackBufferLength>;
 
 void SurfaceGDI::DrawTextCommon(PRectangle rc, const Font &font_, XYPOSITION ybase, std::string_view text, UINT fuOptions) {
 	SetFont(font_);
@@ -2265,14 +2261,19 @@ void Window::SetFont(const Font &font) noexcept {
 
 namespace {
 
-class ReverseArrowCursor {
+#define OnlyOneReverseArrowCursor	1
+
+struct ReverseArrowCursor {
 	UINT dpi = USER_DEFAULT_SCREEN_DPI;
 	bool created = false;
 	HCURSOR cursor {};
 
-public:
+#if OnlyOneReverseArrowCursor
 	ReverseArrowCursor() noexcept = default;
 	HCURSOR Get(UINT dpi_) noexcept;
+#else
+	ReverseArrowCursor(UINT dpi_) noexcept;
+#endif
 	~ReverseArrowCursor() {
 		if (created) {
 			::DestroyCursor(cursor);
@@ -2280,7 +2281,22 @@ public:
 	}
 };
 
+#if OnlyOneReverseArrowCursor
 ReverseArrowCursor reverseArrowCursor;
+#else
+std::vector<std::unique_ptr<ReverseArrowCursor>> reverseArrowCursorList;
+
+HCURSOR LoadReverseArrowCursor(UINT dpi) {
+	for (const auto& cursor : reverseArrowCursorList) {
+		if (cursor->dpi == dpi) {
+			return cursor->cursor;
+		}
+	}
+
+	reverseArrowCursorList.push_back(std::make_unique<ReverseArrowCursor>(dpi));
+	return reverseArrowCursorList.back()->cursor;
+}
+#endif
 
 void FlipBitmap(HBITMAP bitmap, int width, int height) noexcept {
 	HDC hdc = ::CreateCompatibleDC({});
@@ -2292,7 +2308,13 @@ void FlipBitmap(HBITMAP bitmap, int width, int height) noexcept {
 	}
 }
 
-HCURSOR ReverseArrowCursor::Get(UINT dpi_) noexcept {
+#if OnlyOneReverseArrowCursor
+HCURSOR ReverseArrowCursor::Get(UINT dpi_) noexcept
+#else
+ReverseArrowCursor::ReverseArrowCursor(UINT dpi_) noexcept
+#endif
+{
+#if OnlyOneReverseArrowCursor
 	if (cursor) {
 		if (dpi == dpi_) {
 			return cursor;
@@ -2301,18 +2323,19 @@ HCURSOR ReverseArrowCursor::Get(UINT dpi_) noexcept {
 			::DestroyCursor(cursor);
 		}
 	}
+#endif
 
 	dpi = dpi_;
 	created = false;
 	cursor = ::LoadCursor(nullptr, IDC_ARROW);
 	HCURSOR copy {};
 
-	if (dpi != g_uSystemDPI) {
-		const int width = GetSystemMetricsEx(SM_CXCURSOR, dpi);
-		const int height = GetSystemMetricsEx(SM_CYCURSOR, dpi);
-		copy = reinterpret_cast<HCURSOR>(::CopyImage(cursor, IMAGE_CURSOR, width, height, LR_COPYFROMRESOURCE | LR_COPYRETURNORG));
+	if (dpi_ != uSystemDPI) {
+		const int width = GetSystemMetricsEx(SM_CXCURSOR, dpi_);
+		const int height = GetSystemMetricsEx(SM_CYCURSOR, dpi_);
+		copy = static_cast<HCURSOR>(::CopyImage(cursor, IMAGE_CURSOR, width, height, LR_COPYFROMRESOURCE | LR_COPYRETURNORG));
 		if (copy) {
-			created = true;
+			created = copy != cursor;
 			cursor = copy;
 		}
 	}
@@ -2343,7 +2366,9 @@ HCURSOR ReverseArrowCursor::Get(UINT dpi_) noexcept {
 		}
 	}
 
+#if OnlyOneReverseArrowCursor
 	return cursor;
+#endif
 }
 
 }
@@ -2369,7 +2394,11 @@ void Window::SetCursor(Cursor curs) noexcept {
 		::SetCursor(::LoadCursor(nullptr, IDC_HAND));
 		break;
 	case cursorReverseArrow:
+#if OnlyOneReverseArrowCursor
 		::SetCursor(reverseArrowCursor.Get(dpi));
+#else
+		::SetCursor(LoadReverseArrowCursor(dpi));
+#endif
 		break;
 	case cursorArrow:
 	case cursorInvalid:	// Should not occur, but just in case.
@@ -3515,7 +3544,7 @@ void Platform_Initialise(void *hInstance) noexcept {
 #if !NP2_TARGET_ARM64
 	LoadDPIFunction();
 #endif
-	g_uSystemDPI = GetSystemDPI();
+	uSystemDPI = GetSystemDPI();
 	ListBoxX_Register();
 }
 
@@ -3597,7 +3626,7 @@ UINT GetWindowDPI(HWND hwnd) {
 			return dpiY;
 		}
 	}
-	return g_uSystemDPI;
+	return uSystemDPI;
 }
 
 int GetSystemMetricsEx(int nIndex, UINT dpi) {
@@ -3605,8 +3634,8 @@ int GetSystemMetricsEx(int nIndex, UINT dpi) {
 		return pfnGetSystemMetricsForDpi(nIndex, dpi);
 	}
 
-	int value = GetSystemMetrics(nIndex);
-	value = (dpi == g_uSystemDPI) ? value : MulDiv(value, dpi, g_uSystemDPI);
+	int value = ::GetSystemMetrics(nIndex);
+	value = (dpi == uSystemDPI) ? value : ::MulDiv(value, dpi, uSystemDPI);
 	return value;
 }
 
