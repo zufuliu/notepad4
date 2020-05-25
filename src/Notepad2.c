@@ -2004,7 +2004,7 @@ void MsgDPIChanged(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	Style_DetectBaseFontSize(hwnd);
 	UpdateStatusBarWidth();
-	Style_OnDPIChanged();
+	Style_OnDPIChanged(pLexCurrent);
 	SendMessage(hwndEdit, WM_DPICHANGED, wParam, lParam);
 	SciCall_GotoPos(pos);
 	UpdateToolbar();
