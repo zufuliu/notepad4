@@ -327,7 +327,6 @@ DWORD		g_uWinVer;
 DWORD		kSystemLibraryLoadFlags = 0;
 #endif
 UINT		g_uCurrentDPI = USER_DEFAULT_SCREEN_DPI;
-UINT		g_uDefaultDPI = USER_DEFAULT_SCREEN_DPI;
 WCHAR 		g_wchAppUserModelID[64] = L"";
 static WCHAR g_wchWorkingDirectory[MAX_PATH] = L"";
 #if NP2_ENABLE_APP_LOCALIZATION_DLL
@@ -562,7 +561,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 
 #if _WIN32_WINNT < _WIN32_WINNT_WIN8
 	// see LoadD2D() in PlatWin.cxx
-	kSystemLibraryLoadFlags = (IsWin8AndAbove() || DLLFunction(L"kernel32.dll", "SetDefaultDllDirectories") != NULL) ? LOAD_LIBRARY_SEARCH_SYSTEM32 : 0;
+	kSystemLibraryLoadFlags = (DLLFunction(L"kernel32.dll", "SetDefaultDllDirectories") != NULL) ? LOAD_LIBRARY_SEARCH_SYSTEM32 : 0;
 #endif
 
 #if NP2_ENABLE_APP_LOCALIZATION_DLL
@@ -1121,8 +1120,10 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 			const int h = mi.rcMonitor.bottom - mi.rcMonitor.top;
 
 			LPMINMAXINFO pmmi = (LPMINMAXINFO)lParam;
-			pmmi->ptMaxSize.x = w + 2 * GetSystemMetricsEx(SM_CXSIZEFRAME);
-			pmmi->ptMaxSize.y = h + GetSystemMetricsEx(SM_CYCAPTION) + GetSystemMetricsEx(SM_CYMENU) + 2 * GetSystemMetricsEx(SM_CYSIZEFRAME);
+			pmmi->ptMaxSize.x = w + 2 * GetSystemMetricsEx(SM_CXSIZEFRAME, g_uCurrentDPI);
+			pmmi->ptMaxSize.y = h + GetSystemMetricsEx(SM_CYCAPTION, g_uCurrentDPI)
+				+ GetSystemMetricsEx(SM_CYMENU, g_uCurrentDPI)
+				+ 2 * GetSystemMetricsEx(SM_CYSIZEFRAME, g_uCurrentDPI);
 			pmmi->ptMaxTrackSize.x = pmmi->ptMaxSize.x;
 			pmmi->ptMaxTrackSize.y = pmmi->ptMaxSize.y;
 			return 0;
@@ -1734,8 +1735,7 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	UNREFERENCED_PARAMETER(wParam);
 
 	HINSTANCE hInstance = ((LPCREATESTRUCT)lParam)->hInstance;
-	g_uCurrentDPI = GetCurrentDPI(hwnd);
-	g_uDefaultDPI = GetDefaultDPI(hwnd);
+	g_uCurrentDPI = GetWindowDPI(hwnd);
 	Style_DetectBaseFontSize(hwnd);
 
 	// Setup edit control
@@ -1997,11 +1997,6 @@ void MsgDPIChanged(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	g_uCurrentDPI = HIWORD(wParam);
 	const RECT* const rc = (RECT *)lParam;
 	const Sci_Position pos = SciCall_GetCurrentPos();
-#if 0
-	char buf[128];
-	sprintf(buf, "WM_DPICHANGED: dpi=%u, %u\n", g_uCurrentDPI, g_uDefaultDPI);
-	SciCall_InsertText(0, buf);
-#endif
 
 	// recreate toolbar and statusbar
 	RecreateBars(hwnd, g_hInstance);
@@ -2009,7 +2004,7 @@ void MsgDPIChanged(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	Style_DetectBaseFontSize(hwnd);
 	UpdateStatusBarWidth();
-	Style_OnDPIChanged();
+	Style_OnDPIChanged(pLexCurrent);
 	SendMessage(hwndEdit, WM_DPICHANGED, wParam, lParam);
 	SciCall_GotoPos(pos);
 	UpdateToolbar();
@@ -2147,7 +2142,8 @@ void UpdateStatusBarWidth(void) {
 	aWidth[3] = StatusCalcPaneWidth(hwndStatus, L"CR+LF");
 	aWidth[4] = StatusCalcPaneWidth(hwndStatus, L"OVR");
 	aWidth[5] = StatusCalcPaneWidth(hwndStatus, L"500%");
-	aWidth[6] = StatusCalcPaneWidth(hwndStatus, ((iBytes < 1024)? L"1,023 Bytes" : L"99.9 MiB")) + GetSystemMetricsEx(SM_CXHTHUMB);
+	aWidth[6] = StatusCalcPaneWidth(hwndStatus, ((iBytes < 1024)? L"1,023 Bytes" : L"99.9 MiB"))
+		+ GetSystemMetricsEx(SM_CXHTHUMB, g_uCurrentDPI);
 
 	aWidth[0] = max_i(120, cx - (aWidth[1] + aWidth[2] + aWidth[3] + aWidth[4] + aWidth[5] + aWidth[6]));
 	aWidth[1] += aWidth[0];
@@ -6998,15 +6994,15 @@ void ToggleFullScreenMode(void) {
 		const int y = mi.rcMonitor.top;
 		const int w = mi.rcMonitor.right - x;
 		const int h = mi.rcMonitor.bottom - y;
-		const int cx = GetSystemMetricsEx(SM_CXSIZEFRAME);
-		const int cy = GetSystemMetricsEx(SM_CYSIZEFRAME);
+		const int cx = GetSystemMetricsEx(SM_CXSIZEFRAME, g_uCurrentDPI);
+		const int cy = GetSystemMetricsEx(SM_CYSIZEFRAME, g_uCurrentDPI);
 
 		int top = cy;
 		if (iFullScreenMode & (FullScreenMode_HideCaption | FullScreenMode_HideMenu)) {
-			top += GetSystemMetricsEx(SM_CYCAPTION);
+			top += GetSystemMetricsEx(SM_CYCAPTION, g_uCurrentDPI);
 		}
 		if (iFullScreenMode & FullScreenMode_HideMenu) {
-			top += GetSystemMetricsEx(SM_CYMENU);
+			top += GetSystemMetricsEx(SM_CYMENU, g_uCurrentDPI);
 		}
 
 		SystemParametersInfo(SPI_SETWORKAREA, 0, NULL, SPIF_SENDCHANGE);

@@ -1058,8 +1058,42 @@ static void Style_ResetAll(BOOL resetColor) {
 	fStylesModified |= STYLESMODIFIED_ALL_STYLE | STYLESMODIFIED_FILE_EXT | STYLESMODIFIED_COLOR;
 }
 
-void Style_OnDPIChanged(void) {
-	Style_SetLexer(pLexCurrent, FALSE);
+// styles depend on current DPI.
+void Style_OnDPIChanged(PEDITLEXER pLex) {
+	// whitespace dot size
+	LPCWSTR szValue = pLexGlobal->Styles[GlobalStyleIndex_Whitespace].szValue;
+	int iValue = 1;
+	Style_StrGetRawSize(szValue, &iValue);
+	iValue = max_i(1, RoundToCurrentDPI(iValue));
+	SciCall_SetWhitespaceSize(iValue);
+
+	// update styles that use pixel
+	Style_HighlightCurrentLine();
+
+	// Extra Line Spacing
+	szValue = (pLex->rid != NP2LEX_ANSI)? pLexGlobal->Styles[GlobalStyleIndex_ExtraLineSpacing].szValue
+		: pLex->Styles[ANSIArtStyleIndex_ExtraLineSpacing].szValue;
+	if (Style_StrGetRawSize(szValue, &iValue) && iValue != 0) {
+		int iAscent;
+		int iDescent;
+		if (iValue > 0) {
+			// 5 => iAscent = 3, iDescent = 2
+			iValue = max_i(0, RoundToCurrentDPI(iValue));
+			iDescent = iValue/2 ;
+			iAscent = iValue - iDescent;
+		} else {
+			// -5 => iAscent = -2, iDescent = -3
+			iValue = -max_i(0, RoundToCurrentDPI(-iValue));
+			iAscent = iValue/2 ;
+			iDescent = iValue - iAscent;
+		}
+
+		SciCall_SetExtraAscent(iAscent);
+		SciCall_SetExtraDescent(iDescent);
+	} else {
+		SciCall_SetExtraAscent(0);
+		SciCall_SetExtraDescent(0);
+	}
 }
 
 void Style_OnStyleThemeChanged(int theme) {
@@ -1462,8 +1496,7 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 	// base font size
 	if (!Style_StrGetFontSize(szValue, &iBaseFontSize)) {
 		iBaseFontSize = defaultBaseFontSize;
-		iValue = DefaultToCurrentDPI(iBaseFontSize);
-		SciCall_StyleSetSizeFractional(STYLE_DEFAULT, iValue);
+		SciCall_StyleSetSizeFractional(STYLE_DEFAULT, iBaseFontSize);
 	}
 	Style_SetStyles(STYLE_DEFAULT, szValue);
 
@@ -1547,16 +1580,9 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 	} else {
 		SciCall_SetWhitespaceBack(FALSE, 0);
 	}
-
-	// whitespace dot size
-	iValue = 1;
-	Style_StrGetRawSize(szValue, &iValue);
-	iValue = max_i(1, RoundToCurrentDPI(iValue));
-	SciCall_SetWhitespaceSize(iValue);
 	//! end Whitespace
 
 	//! begin Caret
-	Style_HighlightCurrentLine();
 	Style_UpdateCaret();
 	const COLORREF backColor = SciCall_StyleGetBack(STYLE_DEFAULT);
 	// caret fore
@@ -1585,31 +1611,7 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 	SciCall_IndicSetFore(SC_INDICATOR_UNKNOWN, rgb);
 
 	Style_SetLongLineColors();
-
-	// Extra Line Spacing
-	szValue = (rid != NP2LEX_ANSI)? pLexGlobal->Styles[GlobalStyleIndex_ExtraLineSpacing].szValue
-		: pLexNew->Styles[ANSIArtStyleIndex_ExtraLineSpacing].szValue;
-	if (Style_StrGetRawSize(szValue, &iValue) && iValue != 0) {
-		int iAscent;
-		int iDescent;
-		if (iValue > 0) {
-			// 5 => iAscent = 3, iDescent = 2
-			iValue = max_i(0, RoundToCurrentDPI(iValue));
-			iDescent = iValue/2 ;
-			iAscent = iValue - iDescent;
-		} else {
-			// -5 => iAscent = -2, iDescent = -3
-			iValue = -max_i(0, RoundToCurrentDPI(-iValue));
-			iAscent = iValue/2 ;
-			iDescent = iValue - iAscent;
-		}
-
-		SciCall_SetExtraAscent(iAscent);
-		SciCall_SetExtraDescent(iDescent);
-	} else {
-		SciCall_SetExtraAscent(0);
-		SciCall_SetExtraDescent(0);
-	}
+	Style_OnDPIChanged(pLexNew);
 
 	// set folding style; braces are for scoping only
 	{
@@ -3459,12 +3461,7 @@ BOOL Style_SelectFont(HWND hwnd, LPWSTR lpszStyle, int cchStyle, BOOL bDefaultSt
 	if (!Style_StrGetFontSize(lpszStyle, &iValue)) {
 		iValue = iBaseFontSize;
 	}
-	{
-		HDC hdc = GetDC(hwnd);
-		cf.iPointSize = iValue / (SC_FONT_SIZE_MULTIPLIER / 10);
-		lf.lfHeight = -MulDiv(iValue, GetDeviceCaps(hdc, LOGPIXELSY), 72*SC_FONT_SIZE_MULTIPLIER);
-		ReleaseDC(hwnd, hdc);
-	}
+	lf.lfHeight = -MulDiv(iValue, GetSystemDPI(), 72*SC_FONT_SIZE_MULTIPLIER);
 	if (!Style_StrGetFontWeight(lpszStyle, &iValue)) {
 		iValue = FW_NORMAL;
 	}
@@ -3639,7 +3636,6 @@ void Style_SetStyles(int iStyle, LPCWSTR lpszStyle) {
 
 	// Size
 	if (Style_StrGetFontSize(lpszStyle, &iValue)) {
-		iValue = DefaultToCurrentDPI(iValue);
 		SciCall_StyleSetSizeFractional(iStyle, iValue);
 	}
 
@@ -3699,7 +3695,7 @@ static void Style_Parse(struct DetailStyle *style, LPCWSTR lpszStyle) {
 
 	// Size
 	if (Style_StrGetFontSize(lpszStyle, &iValue)) {
-		style->fontSize = DefaultToCurrentDPI(iValue);
+		style->fontSize = iValue;
 		mask |= STYLE_MASK_FONT_SIZE;
 	}
 

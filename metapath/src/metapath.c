@@ -189,6 +189,24 @@ static int	iOpacityLevel		= 75;
 static int	flagToolbarLook		= 0;
 static int	flagPosParam		= 0;
 
+#if !NP2_TARGET_ARM64
+typedef UINT (WINAPI *GetDpiForSystemSig)(void);
+static GetDpiForSystemSig pfnGetDpiForSystem = NULL;
+
+UINT GetSystemDPI(void) {
+	UINT dpi;
+	if (pfnGetDpiForSystem) {
+		dpi = pfnGetDpiForSystem();
+	} else {
+		HDC hDC = GetDC(NULL);
+		dpi = GetDeviceCaps(hDC, LOGPIXELSY);
+		ReleaseDC(NULL, hDC);
+
+	}
+	return dpi;
+}
+#endif
+
 static inline BOOL HasFilter(void) {
 	return !StrEqual(tchFilter, L"*.*") || bNegFilter;
 }
@@ -276,6 +294,10 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 	if (hResDLL) {
 		g_hInstance = hInstance = (HINSTANCE)hResDLL;
 	}
+#endif
+
+#if !NP2_TARGET_ARM64
+	pfnGetDpiForSystem = (GetDpiForSystemSig)DLLFunction(L"user32.dll", "GetDpiForSystem");
 #endif
 
 	// Load Settings
@@ -2996,7 +3018,7 @@ BOOL CheckIniFile(LPWSTR lpszFile, LPCWSTR lpszModule) {
 		};
 		for (UINT i = 0; i < COUNTOF(csidlList); i++) {
 			if (S_OK == SHGetFolderPath(NULL, csidlList[i], NULL, SHGFP_TYPE_CURRENT, tchBuild)) {
-				PathAppend(tchBuild, WC_METAPATH);
+				PathAppend(tchBuild, WC_NOTEPAD2);
 				PathAppend(tchBuild, tchFileExpanded);
 				if (PathIsFile(tchBuild)) {
 					lstrcpy(lpszFile, tchBuild);
@@ -3015,7 +3037,7 @@ BOOL CheckIniFile(LPWSTR lpszFile, LPCWSTR lpszModule) {
 			if (S_OK == SHGetKnownFolderPath(rfidList[i], KF_FLAG_DEFAULT, NULL, &pszPath)) {
 				lstrcpy(tchBuild, pszPath);
 				CoTaskMemFree(pszPath);
-				PathAppend(tchBuild, WC_METAPATH);
+				PathAppend(tchBuild, WC_NOTEPAD2);
 				PathAppend(tchBuild, tchFileExpanded);
 				if (PathIsFile(tchBuild)) {
 					lstrcpy(lpszFile, tchBuild);

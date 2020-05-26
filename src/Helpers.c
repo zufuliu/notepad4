@@ -374,64 +374,6 @@ int ParseCommaList64(LPCWSTR str, int64_t result[], int count) {
 	return index;
 }
 
-UINT GetDefaultDPI(HWND hwnd) {
-	HDC hDC = GetDC(hwnd);
-	UINT ppi = GetDeviceCaps(hDC, LOGPIXELSY);
-	ReleaseDC(hwnd, hDC);
-	ppi = max_u(ppi, USER_DEFAULT_SCREEN_DPI);
-	return ppi;
-}
-
-UINT GetCurrentDPI(HWND hwnd) {
-	UINT dpi = 0;
-	if (IsWin10AndAbove()) {
-		// since Windows 10, version 1607
-#if defined(__aarch64__) || defined(_ARM64_) || defined(_M_ARM64)
-		// 1709 was the first version for Windows 10 on ARM64.
-		dpi = GetDpiForWindow(hwnd);
-#else
-		typedef UINT (WINAPI *GetDpiForWindowSig)(HWND hwnd);
-		GetDpiForWindowSig pfnGetDpiForWindow = (GetDpiForWindowSig)DLLFunction(L"user32.dll", "GetDpiForWindow");
-		if (pfnGetDpiForWindow) {
-			dpi = pfnGetDpiForWindow(hwnd);
-		}
-#endif
-	}
-
-	if (dpi == 0 && IsWin8p1AndAbove()) {
-		// since Windows 8.1
-		typedef HRESULT (WINAPI *GetDpiForMonitorSig)(HMONITOR hmonitor, /*MONITOR_DPI_TYPE*/int dpiType, UINT *dpiX, UINT *dpiY);
-		HMODULE hShcore = LoadLibraryEx(L"shcore.dll", NULL, LOAD_LIBRARY_SEARCH_SYSTEM32);
-		if (hShcore) {
-			GetDpiForMonitorSig pfnGetDpiForMonitor = (GetDpiForMonitorSig)GetProcAddress(hShcore, "GetDpiForMonitor");
-			if (pfnGetDpiForMonitor) {
-				HMONITOR hMonitor = MonitorFromWindow(hwnd, MONITOR_DEFAULTTONEAREST);
-				UINT dpiX = 0;
-				UINT dpiY = 0;
-				if (pfnGetDpiForMonitor(hMonitor, MDT_EFFECTIVE_DPI, &dpiX, &dpiY) == S_OK) {
-					dpi = dpiY;
-				}
-			}
-			FreeLibrary(hShcore);
-		}
-	}
-
-	if (dpi == 0) {
-		HDC hDC = GetDC(hwnd);
-		dpi = GetDeviceCaps(hDC, LOGPIXELSY);
-		ReleaseDC(hwnd, hDC);
-	}
-
-	dpi = max_u(dpi, USER_DEFAULT_SCREEN_DPI);
-	return dpi;
-}
-
-int GetSystemMetricsEx(int nIndex) {
-	int value = GetSystemMetrics(nIndex);
-	value = DefaultToCurrentDPI(value);
-	return value;
-}
-
 BOOL FindUserResourcePath(LPCWSTR path, LPWSTR outPath) {
 	// similar to CheckIniFile()
 	WCHAR tchFileExpanded[MAX_PATH];
@@ -774,11 +716,6 @@ BOOL SetWindowTitle(HWND hwnd, UINT uIDAppName, BOOL bIsElevated, UINT uIDUntitl
 	lstrcat(szTitle, pszSep);
 	lstrcat(szTitle, szAppName);
 
-#if 0
-	wsprintf(szAppName, L"; dpi=%u, %u", g_uCurrentDPI, g_uDefaultDPI);
-	lstrcat(szTitle, szAppName);
-#endif
-
 	return SetWindowText(hwnd, szTitle);
 }
 
@@ -953,6 +890,8 @@ void ResizeDlg_InitEx(HWND hwnd, int cxFrame, int cyFrame, int nIdGrip, int iDir
 	RESIZEDLG *pm = (RESIZEDLG *)NP2HeapAlloc(sizeof(RESIZEDLG));
 	pm->direction = iDirection;
 
+	const UINT dpi = GetWindowDPI(hwnd);
+
 	RECT rc;
 	GetClientRect(hwnd, &rc);
 	pm->cxClient = rc.right - rc.left;
@@ -990,8 +929,7 @@ void ResizeDlg_InitEx(HWND hwnd, int cxFrame, int cyFrame, int nIdGrip, int iDir
 
 	HWND hwndCtl = GetDlgItem(hwnd, nIdGrip);
 	SetWindowStyle(hwndCtl, GetWindowStyle(hwndCtl) | SBS_SIZEGRIP | WS_CLIPSIBLINGS);
-	/// TODO: per-window DPI
-	const int cGrip = GetSystemMetricsEx(SM_CXHTHUMB);
+	const int cGrip = GetSystemMetricsEx(SM_CXHTHUMB, dpi);
 	SetWindowPos(hwndCtl, NULL, pm->cxClient - cGrip, pm->cyClient - cGrip, cGrip, cGrip, SWP_NOZORDER);
 }
 
@@ -2391,10 +2329,7 @@ BOOL GetThemedDialogFont(LPWSTR lpFaceName, WORD *wSize) {
 #else
 
 	BOOL bSucceed = FALSE;
-
-	HDC hDC = GetDC(NULL);
-	const int iLogPixelsY = GetDeviceCaps(hDC, LOGPIXELSY);
-	ReleaseDC(NULL, hDC);
+	const UINT iLogPixelsY = GetSystemDPI();
 
 	if (IsAppThemed()) {
 		HTHEME hTheme = OpenThemeData(NULL, L"WINDOWSTYLE;WINDOW");

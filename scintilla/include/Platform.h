@@ -469,8 +469,10 @@ public:
 class Window {
 protected:
 	WindowID wid;
+
 public:
-	Window() noexcept : wid(nullptr), cursorLast(cursorInvalid) {}
+	uint32_t dpi;
+	Window() noexcept : wid(nullptr), cursorLast(cursorInvalid), dpi(96) {}
 	Window(const Window &source) = delete;
 	Window(Window &&) = delete;
 	Window &operator=(WindowID wid_) noexcept {
@@ -501,6 +503,7 @@ public:
 	};
 	void SetCursor(Cursor curs) noexcept;
 	PRectangle SCICALL GetMonitorRect(Point pt) const noexcept;
+
 private:
 	Cursor cursorLast;
 };
