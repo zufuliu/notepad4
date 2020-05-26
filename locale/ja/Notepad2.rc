@@ -93,9 +93,9 @@ BEGIN
 		MENUITEM "再読み込み(&V)\tF5",						IDM_FILE_REVERT
 		POPUP "読み直し(&D)"
 		BEGIN
-			MENUITEM "UTF-8として(&8)\tShift+F8",			CMD_RELOADUTF8
-			MENUITEM "ANSIとして(&A)\tCtrl+Shift+A",		CMD_RELOADANSI
-			MENUITEM "OEMとして(&O)\tCtrl+Shift+O",		CMD_RELOADOEM
+			MENUITEM "UTF-8 として(&8)\tShift+F8",			CMD_RELOADUTF8
+			MENUITEM "ANSI として(&A)\tCtrl+Shift+A",		CMD_RELOADANSI
+			MENUITEM "OEM として(&O)\tCtrl+Shift+O",		CMD_RELOADOEM
 			MENUITEM SEPARATOR
 			MENUITEM "文字コード解析をパス(&N)\tAlt+F8",	CMD_RELOADNOFILEVARS
 			MENUITEM "デフォルト(&D)\tCtrl+Alt+F",		CMD_RECODEDEFAULT
@@ -454,15 +454,15 @@ BEGIN
 			MENUITEM "デフォルトの深さ(&D)\tShift+Alt+D",IDM_VIEW_FOLD_DEFAULT
 			MENUITEM "すべての深さ(&A)\tShift+Alt+A",	IDM_VIEW_FOLD_ALL
 			MENUITEM SEPARATOR
-			MENUITEM "深さ1 (&1)\tAlt+1",				IDM_VIEW_FOLD_LEVEL1
-			MENUITEM "深さ2 (&2)\tAlt+2",				IDM_VIEW_FOLD_LEVEL2
-			MENUITEM "深さ3 (&3)\tAlt+3",				IDM_VIEW_FOLD_LEVEL3
-			MENUITEM "深さ4 (&4)\tAlt+4",				IDM_VIEW_FOLD_LEVEL4
-			MENUITEM "深さ5 (&5)\tAlt+5",				IDM_VIEW_FOLD_LEVEL5
-			MENUITEM "深さ6 (&6)\tAlt+6",				IDM_VIEW_FOLD_LEVEL6
-			MENUITEM "深さ7 (&7)\tAlt+7",				IDM_VIEW_FOLD_LEVEL7
-			MENUITEM "深さ8 (&8)\tAlt+8",				IDM_VIEW_FOLD_LEVEL8
-			MENUITEM "深さ9 (&9)\tAlt+9",				IDM_VIEW_FOLD_LEVEL9
+			MENUITEM "深さ 1 (&1)\tAlt+1",				IDM_VIEW_FOLD_LEVEL1
+			MENUITEM "深さ 2 (&2)\tAlt+2",				IDM_VIEW_FOLD_LEVEL2
+			MENUITEM "深さ 3 (&3)\tAlt+3",				IDM_VIEW_FOLD_LEVEL3
+			MENUITEM "深さ 4 (&4)\tAlt+4",				IDM_VIEW_FOLD_LEVEL4
+			MENUITEM "深さ 5 (&5)\tAlt+5",				IDM_VIEW_FOLD_LEVEL5
+			MENUITEM "深さ 6 (&6)\tAlt+6",				IDM_VIEW_FOLD_LEVEL6
+			MENUITEM "深さ 7 (&7)\tAlt+7",				IDM_VIEW_FOLD_LEVEL7
+			MENUITEM "深さ 8 (&8)\tAlt+8",				IDM_VIEW_FOLD_LEVEL8
+			MENUITEM "深さ 9 (&9)\tAlt+9",				IDM_VIEW_FOLD_LEVEL9
 			MENUITEM "深さ10 (&0)",					IDM_VIEW_FOLD_LEVEL10
 		END
 		MENUITEM SEPARATOR
@@ -491,8 +491,8 @@ BEGIN
 		MENUITEM SEPARATOR
 		POPUP "テキスト文書(&T)"
 		BEGIN
-			MENUITEM "&Text File",					IDM_LEXER_TEXTFILE
-			MENUITEM "&2nd Text File",				IDM_LEXER_2NDTEXTFILE
+			MENUITEM "テキストファイル(&T)",					IDM_LEXER_TEXTFILE
+			MENUITEM "テキストファイル2(&2)",				IDM_LEXER_2NDTEXTFILE
 		END
 		POPUP "CSSスタイルシート(&H)"
 		BEGIN
@@ -1084,7 +1084,7 @@ BEGIN
     AUTOCHECKBOX    "タスクバーのジャンプリストを有効化",IDC_ENABLE_JUMP_LIST,14,48,204,10,WS_TABSTOP
     LTEXT           "アプリケーション名:",IDC_STATIC,28,63,70,8
     EDITTEXT        IDC_APPLICATION_NAME,100,60,118,14,ES_AUTOHSCROLL | WS_TABSTOP
-    AUTOCHECKBOX    "レジストリで Windows 標準のメモ帳を置き換え",IDC_REPLACE_WINDOWS_NOTEPAD,14,76,204,10,WS_TABSTOP
+    AUTOCHECKBOX    "レジストリで Windows 標準のメモ帳を置換",IDC_REPLACE_WINDOWS_NOTEPAD,14,76,204,10,WS_TABSTOP
     DEFPUSHBUTTON   "OK",IDOK,119,97,50,14
     PUSHBUTTON      "キャンセル",IDCANCEL,175,97,50,14
 END
@@ -1918,7 +1918,7 @@ BEGIN
 /o\t常に手前に表示\n\
 /f パス\t設定ファイルを指定 (/f0 設定不使用)\n\
 /u\t管理者権限で実行\n\
-/z\t「次へ」を省略(レジストリでメモ帳を置換している際に有効化)"
+/z\t「次へ」を省略(レジストリでメモ帳を置換している際に有効)"
 END
 
 STRINGTABLE
