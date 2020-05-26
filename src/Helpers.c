@@ -1620,7 +1620,9 @@ BOOL PathCreateDeskLnk(LPCWSTR pszDocument) {
 	SHGetSpecialFolderPath(NULL, tchLinkDir, CSIDL_DESKTOPDIRECTORY, TRUE);
 
 	WCHAR tchDescription[128];
+	// TODO: read custom menu text from registry, see System Integratio.
 	GetString(IDS_LINKDESCRIPTION, tchDescription, COUNTOF(tchDescription));
+	//StripMnemonic(tchDescription);
 
 	// Try to construct a valid filename...
 	BOOL fMustCopy;
@@ -1969,6 +1971,37 @@ DWORD_PTR SHGetFileInfo2(LPCWSTR pszPath, DWORD dwFileAttributes, SHFILEINFO *ps
 		}
 		return dw;
 	}
+}
+
+void StripMnemonic(LPWSTR pszMenu) {
+	LPWSTR prev = pszMenu;
+	do {
+		LPWSTR p = StrChr(prev, L'&');
+		if (p == NULL) {
+			break;
+		}
+		if (p[1] == L'&') {
+			// double '&&' represents one literal '&'
+			prev = p + 2;
+		} else {
+			int len = lstrlen(p);
+			int offset = 1;
+			prev = p;
+			if (p > pszMenu && len > 2 && p[-1] == L'(' && p[2] == L')') {
+				// "String (&S)" => "String"
+				offset = 3;
+				prev = p - 1;
+				if (prev > pszMenu && prev[-1] == L' ') {
+					--prev;
+				}
+			}
+
+			len -= offset;
+			MoveMemory(prev, p + offset, sizeof(WCHAR) * len);
+			prev[len] = L'\0';
+			break;
+		}
+	} while (TRUE);
 }
 
 //=============================================================================

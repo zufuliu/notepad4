@@ -2299,11 +2299,11 @@ LPCWSTR Style_GetCurrentLexerName(LPWSTR lpszName, int cchName) {
 	mii.dwTypeData = lpszName;
 	mii.cch = cchName;
 	if (GetMenuItemInfo(hmenu, np2LexLangIndex, FALSE, &mii)) {
-		// remove '&' from access key.
 #if 0 && defined(_MSC_VER)
 		SHStripMneumonic(lpszName);
+#elif 0
+		StripMnemonic(lpszName);
 #else
-		// TODO: strip mnemonic like "String (&S)" => "String".
 		LPWSTR p = StrChr(lpszName, L'&');
 		if (p != NULL) {
 			const int len = lstrlen(p) - 1;

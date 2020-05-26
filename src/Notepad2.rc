@@ -1776,7 +1776,7 @@ BEGIN
     IDS_SAVEFILE            "Saving ""%s""..."
     IDS_PRINTFILE           "Printing page %s..."
     IDS_SAVINGSETTINGS      "Saving settings..."
-    IDS_LINKDESCRIPTION     "Edit with Notepad2"
+    IDS_LINKDESCRIPTION     "Edit with Notepad&2"
     IDS_FILTER_ALL          "All Files (*.*)|*.*|"
     IDS_FILTER_EXE          "Executable Files (*.exe;*.com;*.bat;*.cmd;*.lnk;*.pif)|*.exe;*.com;*.bat;*.cmd;*.lnk;*.pif|All Files (*.*)|*.*|"
 END

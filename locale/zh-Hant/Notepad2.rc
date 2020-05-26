@@ -1776,7 +1776,7 @@ BEGIN
     IDS_SAVEFILE            "正在儲存「%s」..."
     IDS_PRINTFILE           "正在列印頁面 %s..."
     IDS_SAVINGSETTINGS      "正在儲存設定..."
-    IDS_LINKDESCRIPTION     "使用 Notepad2 編輯"
+    IDS_LINKDESCRIPTION     "使用 Notepad&2 編輯"
     IDS_FILTER_ALL          "所有檔案 (*.*)|*.*|"
     IDS_FILTER_EXE          "執行檔 (*.exe;*.com;*.bat;*.cmd;*.lnk;*.pif)|*.exe;*.com;*.bat;*.cmd;*.lnk;*.pif|所有檔案 (*.*)|*.*|"
 END
