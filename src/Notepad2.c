@@ -7335,7 +7335,7 @@ BOOL FileSave(BOOL bSaveAlways, BOOL bAsk, BOOL bSaveAs, BOOL bSaveCopy) {
 			GetString(IDS_UNTITLED, tch, COUNTOF(tch));
 		}
 
-		switch (MsgBoxInfo(MB_YESNOCANCEL, IDS_ASK_SAVE, tch)) {
+		switch (MsgBoxAsk(MB_YESNOCANCEL, IDS_ASK_SAVE, tch)) {
 		case IDCANCEL:
 			return FALSE;
 		case IDNO:
@@ -7681,7 +7681,7 @@ BOOL ActivatePrevInst(void) {
 			}
 
 			// Ask...
-			if (IDYES == MsgBoxInfo(MB_YESNO, IDS_ERR_PREVWINDISABLED)) {
+			if (IDYES == MsgBoxAsk(MB_YESNO, IDS_ERR_PREVWINDISABLED)) {
 				return FALSE;
 			}
 			return TRUE;
@@ -7775,7 +7775,7 @@ BOOL ActivatePrevInst(void) {
 		}
 
 		// Ask...
-		if (IDYES == MsgBoxInfo(MB_YESNO, IDS_ERR_PREVWINDISABLED)) {
+		if (IDYES == MsgBoxAsk(MB_YESNO, IDS_ERR_PREVWINDISABLED)) {
 			return FALSE;
 		}
 		return TRUE;
