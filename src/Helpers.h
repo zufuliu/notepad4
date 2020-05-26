@@ -674,6 +674,9 @@ DWORD	GetLongPathNameEx(LPWSTR lpszPath, DWORD cchBuffer);
 DWORD_PTR SHGetFileInfo2(LPCWSTR pszPath, DWORD dwFileAttributes,
 						 SHFILEINFO *psfi, UINT cbFileInfo, UINT uFlags);
 
+// remove '&' from access key, i.e. SHStripMneumonic().
+void	StripMnemonic(LPWSTR pszMenu);
+
 void	FormatNumberStr(LPWSTR lpNumberStr);
 BOOL	SetDlgItemIntEx(HWND hwnd, int nIdItem, UINT uValue);
 

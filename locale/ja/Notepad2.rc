@@ -1776,7 +1776,7 @@ BEGIN
     IDS_SAVEFILE            "保存中 ""%s"" ..."
     IDS_PRINTFILE           "%s ページを印刷中..."
     IDS_SAVINGSETTINGS     "設定保存中..."
-    IDS_LINKDESCRIPTION     "Notepad2 で編集"
+    IDS_LINKDESCRIPTION     "Notepad&2 で編集"
     IDS_FILTER_ALL          "すべてのファイル (*.*)|*.*|"
     IDS_FILTER_EXE          "実行可能ファイル (*.exe;*.com;*.bat;*.cmd;*.lnk;*.pif)|*.exe;*.com;*.bat;*.cmd;*.lnk;*.pif|すべてのファイル (*.*)|*.*|"
 END
