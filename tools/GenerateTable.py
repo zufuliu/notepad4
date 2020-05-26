@@ -1,5 +1,16 @@
 #!/usr/bin/env python3
 
+def GenerateBraceMatchTable():
+	# used in IsBraceMatchChar()
+	table = [0] * 8
+	for ch in "()[]{}<>":
+		c = ord(ch)
+		# table[c // 32] |= (1 << (c % 32))
+		table[c >> 5] |= (1 << (c & 31))
+
+	line = ', '.join(hex(c) for c in table)
+	print('BraceMatch:', line)
+
 def GenerateEOLTable():
 	# used in EditDetectEOLMode() and CellBuffer::BasicInsertString()
 	table = [0] * 16
@@ -34,5 +45,6 @@ def GenerateC0ControlCharacterMask(excludeSeparator):
 	print('C0 Control Character:', s, bin(value))
 
 if __name__ == '__main__':
+	GenerateBraceMatchTable()
 	GenerateEOLTable()
 	GenerateC0ControlCharacterMask(True)

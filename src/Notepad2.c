@@ -2623,6 +2623,19 @@ void EditToggleBookmarkAt(Sci_Position iPos) {
 	}
 }
 
+static inline BOOL IsBraceMatchChar(int ch) {
+#if 0
+	return ch == '(' || ch == ')'
+		|| ch == '[' || ch == ']'
+		|| ch == '{' || ch == '}'
+		|| ch == '<' || ch == '>';
+#else
+	// tools/GenerateTable.py
+	static const uint32_t table[8] = { 0, 0x50000300, 0x28000000, 0x28000000 };
+	return table[ch >> 5] & (1 << (ch & 31));
+#endif
+}
+
 //=============================================================================
 //
 // MsgCommand() - Handles WM_COMMAND
@@ -3677,12 +3690,12 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		Sci_Position iBrace2 = -1;
 		Sci_Position iPos = SciCall_GetCurrentPos();
 		int ch = SciCall_GetCharAt(iPos);
-		if (ch < 0x80 && strchr("()[]{}<>", ch)) {
+		if (IsBraceMatchChar(ch)) {
 			iBrace2 = SciCall_BraceMatch(iPos, 0);
 		} else { // Try one before
 			iPos = SciCall_PositionBefore(iPos);
 			ch = SciCall_GetCharAt(iPos);
-			if (ch < 0x80 && strchr("()[]{}<>", ch)) {
+			if (IsBraceMatchChar(ch)) {
 				iBrace2 = SciCall_BraceMatch(iPos, 0);
 			}
 		}
@@ -3696,12 +3709,12 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		Sci_Position iBrace2 = -1;
 		Sci_Position iPos = SciCall_GetCurrentPos();
 		int ch = SciCall_GetCharAt(iPos);
-		if (ch < 0x80 && strchr("()[]{}<>", ch)) {
+		if (IsBraceMatchChar(ch)) {
 			iBrace2 = SciCall_BraceMatch(iPos, 0);
 		} else { // Try one before
 			iPos = SciCall_PositionBefore(iPos);
 			ch = SciCall_GetCharAt(iPos);
-			if (ch < 0x80 && strchr("()[]{}<>", ch)) {
+			if (IsBraceMatchChar(ch)) {
 				iBrace2 = SciCall_BraceMatch(iPos, 0);
 			}
 		}
@@ -4910,7 +4923,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 				if (bMatchBraces) {
 					Sci_Position iPos = SciCall_GetCurrentPos();
 					int ch = SciCall_GetCharAt(iPos);
-					if (ch < 0x80 && strchr("()[]{}<>", ch)) {
+					if (IsBraceMatchChar(ch)) {
 						const Sci_Position iBrace2 = SciCall_BraceMatch(iPos, 0);
 						if (iBrace2 != -1) {
 							const Sci_Position col1 = SciCall_GetColumn(iPos);
@@ -4924,7 +4937,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 					} else { // Try one before
 						iPos = SciCall_PositionBefore(iPos);
 						ch = SciCall_GetCharAt(iPos);
-						if (ch < 0x80 && strchr("()[]{}<>", ch)) {
+						if (IsBraceMatchChar(ch)) {
 							const Sci_Position iBrace2 = SciCall_BraceMatch(iPos, 0);
 							if (iBrace2 != -1) {
 								const Sci_Position col1 = SciCall_GetColumn(iPos);
