@@ -59,12 +59,10 @@
 #else
 #define NP2_TARGET_ARM64	0
 #if NP2_FORCE_COMPILE_C_AS_CPP
-extern UINT g_uSystemDPI;
 extern UINT GetWindowDPI(HWND hwnd);
 extern int SystemMetricsForDpi(int nIndex, UINT dpi);
 extern BOOL SciAdjustWindowRect(LPRECT lpRect, DWORD dwStyle, DWORD dwExStyle, UINT dpi);
 #else
-extern "C" UINT g_uSystemDPI;
 extern "C" UINT GetWindowDPI(HWND hwnd);
 extern "C" int SystemMetricsForDpi(int nIndex, UINT dpi);
 extern "C" BOOL SciAdjustWindowRect(LPRECT lpRect, DWORD dwStyle, DWORD dwExStyle, UINT dpi);
