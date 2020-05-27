@@ -91,7 +91,10 @@ Used by VSCode, Atom etc.
 #include "HanjaDic.h"
 
 #ifndef WM_DPICHANGED
-#define WM_DPICHANGED			0x02E0
+#define WM_DPICHANGED				0x02E0
+#endif
+#ifndef WM_DPICHANGED_AFTERPARENT
+#define WM_DPICHANGED_AFTERPARENT	0x02E3
 #endif
 
 // Two idle messages SC_WIN_IDLE and SC_WORK_IDLE.
@@ -2114,7 +2117,7 @@ sptr_t ScintillaWin::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam
 		switch (iMessage) {
 
 		case WM_CREATE:
-			ctrlID = ::GetDlgCtrlID(HwndFromWindow(wMain));
+			ctrlID = ::GetDlgCtrlID(MainHWND());
 			// Get Intellimouse scroll line parameters
 			GetIntelliMouseParameters();
 			::RegisterDragDrop(MainHWND(), reinterpret_cast<IDropTarget *>(&dt));
@@ -2207,10 +2210,18 @@ sptr_t ScintillaWin::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam
 		case WM_DPICHANGED:
 			dpi = HIWORD(wParam);
 			vs.fontsValid = false;
-			ac.Cancel();
-			ct.CallTipCancel();
 			InvalidateStyleRedraw();
 			break;
+
+		case WM_DPICHANGED_AFTERPARENT: {
+			const UINT dpiNow = GetWindowDPI(MainHWND());
+			if (dpi != dpiNow) {
+				dpi = dpiNow;
+				vs.fontsValid = false;
+				InvalidateStyleRedraw();
+			}
+		}
+		break;
 
 		case WM_CONTEXTMENU:
 #if SCI_EnablePopupMenu
@@ -2531,11 +2542,11 @@ void ScintillaWin::NotifyFocus(bool focus) {
 }
 
 void ScintillaWin::SetCtrlID(int identifier) noexcept {
-	::SetWindowID(HwndFromWindow(wMain), identifier);
+	::SetWindowID(MainHWND(), identifier);
 }
 
 int ScintillaWin::GetCtrlID() const noexcept {
-	return ::GetDlgCtrlID(HwndFromWindow(wMain));
+	return ::GetDlgCtrlID(MainHWND());
 }
 
 void ScintillaWin::NotifyParent(SCNotification scn) noexcept {

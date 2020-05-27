@@ -47,10 +47,8 @@
 #if _WIN32_WINNT < _WIN32_WINNT_WIN8
 #if NP2_FORCE_COMPILE_C_AS_CPP
 extern DWORD kSystemLibraryLoadFlags;
-extern UINT g_uSystemDPI;
 #else
 extern "C" DWORD kSystemLibraryLoadFlags;
-extern "C" UINT g_uSystemDPI;
 #endif
 #else
 #define kSystemLibraryLoadFlags		LOAD_LIBRARY_SEARCH_SYSTEM32
@@ -96,7 +94,7 @@ void LoadDpiForWindow() noexcept {
 	}
 
 	if (fnGetDpiForWindow == nullptr) {
-		HMODULE hShcore = LoadLibraryEx(L"shcore.dll", nullptr, LOAD_LIBRARY_SEARCH_SYSTEM32);
+		HMODULE hShcore = ::LoadLibraryEx(L"shcore.dll", nullptr, LOAD_LIBRARY_SEARCH_SYSTEM32);
 		if (hShcore) {
 			pfnGetDpiForMonitor = DLLFunction<GetDpiForMonitorSig>(hShcore, "GetDpiForMonitor");
 			if (pfnGetDpiForMonitor) {
