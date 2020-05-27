@@ -47,11 +47,18 @@
 #if _WIN32_WINNT < _WIN32_WINNT_WIN8
 #if NP2_FORCE_COMPILE_C_AS_CPP
 extern DWORD kSystemLibraryLoadFlags;
+extern UINT g_uSystemDPI;
 #else
 extern "C" DWORD kSystemLibraryLoadFlags;
+extern "C" UINT g_uSystemDPI;
 #endif
 #else
 #define kSystemLibraryLoadFlags		LOAD_LIBRARY_SEARCH_SYSTEM32
+#endif
+#if NP2_FORCE_COMPILE_C_AS_CPP
+extern UINT g_uSystemDPI;
+#else
+extern "C" UINT g_uSystemDPI;
 #endif
 
 namespace Scintilla {
