@@ -253,17 +253,21 @@ extern WCHAR szIniFile[MAX_PATH];
 
 // current DPI for main/editor window
 extern UINT g_uCurrentDPI;
+// system DPI, same for all monitor.
+extern UINT g_uSystemDPI;
 
 // since Windows 10, version 1607
 #if defined(__aarch64__) || defined(_ARM64_) || defined(_M_ARM64)
 // 1709 was the first version for Windows 10 on ARM64.
-#define GetSystemDPI()						GetDpiForSystem()
 #define GetWindowDPI(hwnd)					GetDpiForWindow(hwnd)
-#define GetSystemMetricsEx(nIndex, dpi)		GetSystemMetricsForDpi((nIndex), (dpi))
+#define SystemMetricsForDpi(nIndex, dpi)	GetSystemMetricsForDpi((nIndex), (dpi))
+#define SciAdjustWindowRect(lpRect, dwStyle, dwExStyle, dpi) \
+		AdjustWindowRectExForDpi((lpRect), (dwStyle), FALSE, (dwExStyle), (dpi))
+
 #else
-extern UINT GetSystemDPI(void);
 extern UINT GetWindowDPI(HWND hwnd);
-extern int GetSystemMetricsEx(int nIndex, UINT dpi);
+extern int SystemMetricsForDpi(int nIndex, UINT dpi);
+extern BOOL SciAdjustWindowRect(LPRECT lpRect, DWORD dwStyle, DWORD dwExStyle, UINT dpi);
 #endif
 
 NP2_inline int RoundToCurrentDPI(int value)	{
@@ -556,10 +560,6 @@ NP2_inline void ResizeDlg_InitY(HWND hwnd, int cyFrame, int nIdGrip) {
 void ResizeDlg_Destroy(HWND hwnd, int *cxFrame, int *cyFrame);
 void ResizeDlg_Size(HWND hwnd, LPARAM lParam, int *cx, int *cy);
 void ResizeDlg_GetMinMaxInfo(HWND hwnd, LPARAM lParam);
-
-#define MAX_RESIZEDLG_ATTR_COUNT	2
-void ResizeDlg_SetAttr(HWND hwnd, int index, int value);
-int ResizeDlg_GetAttr(HWND hwnd, int index);
 
 void ResizeDlg_InitY2Ex(HWND hwnd, int cxFrame, int cyFrame, int nIdGrip, int iDirection, int nCtlId1, int nCtlId2);
 NP2_inline void ResizeDlg_InitY2(HWND hwnd, int cxFrame, int cyFrame, int nIdGrip, int nCtlId1, int nCtlId2) {

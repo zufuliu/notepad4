@@ -119,14 +119,15 @@ extern DWORD g_uWinVer;
 #define USER_DEFAULT_SCREEN_DPI		96		// _WIN32_WINNT >= _WIN32_WINNT_VISTA
 #endif
 
+// system DPI, same for all monitor.
+extern UINT g_uSystemDPI;
+
 // since Windows 10, version 1607
 #if defined(__aarch64__) || defined(_ARM64_) || defined(_M_ARM64)
 // 1709 was the first version for Windows 10 on ARM64.
 #define NP2_TARGET_ARM64	1
-#define GetSystemDPI()						GetDpiForSystem()
 #else
 #define NP2_TARGET_ARM64	0
-extern UINT GetSystemDPI(void);
 #endif
 
 // https://docs.microsoft.com/en-us/windows/desktop/Memory/comparing-memory-allocation-methods

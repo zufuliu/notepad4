@@ -167,6 +167,7 @@ HANDLE		g_hDefaultHeap;
 #if _WIN32_WINNT < _WIN32_WINNT_WIN10
 DWORD		g_uWinVer;
 #endif
+UINT		g_uSystemDPI = USER_DEFAULT_SCREEN_DPI;
 WCHAR g_wchAppUserModelID[64] = L"";
 #if NP2_ENABLE_APP_LOCALIZATION_DLL
 static HMODULE hResDLL;
@@ -188,24 +189,6 @@ int			flagNoFadeHidden	= 0;
 static int	iOpacityLevel		= 75;
 static int	flagToolbarLook		= 0;
 static int	flagPosParam		= 0;
-
-#if !NP2_TARGET_ARM64
-typedef UINT (WINAPI *GetDpiForSystemSig)(void);
-static GetDpiForSystemSig pfnGetDpiForSystem = NULL;
-
-UINT GetSystemDPI(void) {
-	UINT dpi;
-	if (pfnGetDpiForSystem) {
-		dpi = pfnGetDpiForSystem();
-	} else {
-		HDC hDC = GetDC(NULL);
-		dpi = GetDeviceCaps(hDC, LOGPIXELSY);
-		ReleaseDC(NULL, hDC);
-
-	}
-	return dpi;
-}
-#endif
 
 static inline BOOL HasFilter(void) {
 	return !StrEqual(tchFilter, L"*.*") || bNegFilter;
@@ -296,8 +279,18 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 	}
 #endif
 
-#if !NP2_TARGET_ARM64
-	pfnGetDpiForSystem = (GetDpiForSystemSig)DLLFunction(L"user32.dll", "GetDpiForSystem");
+#if NP2_TARGET_ARM64
+	g_uSystemDPI = GetDpiForSystem();
+#else
+	typedef UINT (WINAPI *GetDpiForSystemSig)(void);
+	GetDpiForSystemSig pfnGetDpiForSystem = (GetDpiForSystemSig)DLLFunction(L"user32.dll", "GetDpiForSystem");
+	if (pfnGetDpiForSystem) {
+		g_uSystemDPI = pfnGetDpiForSystem();
+	} else {
+		HDC hDC = GetDC(NULL);
+		g_uSystemDPI = GetDeviceCaps(hDC, LOGPIXELSY);
+		ReleaseDC(NULL, hDC);
+	}
 #endif
 
 	// Load Settings

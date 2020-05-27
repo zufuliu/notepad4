@@ -326,6 +326,37 @@ public:
 
 class GlobalMemory;
 
+class ReverseArrowCursor {
+	UINT dpi = USER_DEFAULT_SCREEN_DPI;
+	HCURSOR cursor {};
+
+public:
+	ReverseArrowCursor() noexcept {}
+	// Deleted so ReverseArrowCursor objects can not be copied.
+	ReverseArrowCursor(const ReverseArrowCursor &) = delete;
+	ReverseArrowCursor(ReverseArrowCursor &&) = delete;
+	ReverseArrowCursor &operator=(const ReverseArrowCursor &) = delete;
+	ReverseArrowCursor &operator=(ReverseArrowCursor &&) = delete;
+	~ReverseArrowCursor() {
+		if (cursor) {
+			::DestroyCursor(cursor);
+		}
+	}
+
+	HCURSOR Load(UINT dpi_) noexcept {
+		if (cursor)	 {
+			if (dpi == dpi_) {
+				return cursor;
+			}
+			::DestroyCursor(cursor);
+		}
+
+		dpi = dpi_;
+		cursor = LoadReverseArrowCursor(dpi_);
+		return cursor ? cursor : ::LoadCursor({}, IDC_ARROW);
+	}
+};
+
 }
 
 /**
@@ -344,6 +375,9 @@ class ScintillaWin :
 
 	unsigned int linesPerScroll;	///< Intellimouse support
 	int wheelDelta; ///< Wheel delta from roll
+
+	UINT dpi = USER_DEFAULT_SCREEN_DPI;
+	ReverseArrowCursor reverseArrowCursor;
 
 	HRGN hRgnUpdate;
 
@@ -411,6 +445,7 @@ class ScintillaWin :
 		invalidTimerID, standardTimerID, idleTimerID, fineTimerStart
 	};
 
+	void DisplayCursor(Window::Cursor c) noexcept override;
 	bool SCICALL DragThreshold(Point ptStart, Point ptNow) noexcept override;
 	void StartDrag() override;
 	static int MouseModifiers(uptr_t wParam) noexcept;
@@ -580,6 +615,8 @@ ScintillaWin::ScintillaWin(HWND hwnd) {
 	linesPerScroll = 0;
 	wheelDelta = 0;   // Wheel delta from roll
 
+	dpi = GetWindowDPI(hwnd);
+
 	hRgnUpdate = {};
 
 	hasOKText = false;
@@ -615,7 +652,6 @@ ScintillaWin::ScintillaWin(HWND hwnd) {
 
 	//hrOle = E_FAIL;
 	wMain = hwnd;
-	wMain.dpi = GetWindowDPI(hwnd);
 
 	dob.sci = this;
 	ds.sci = this;
@@ -767,12 +803,23 @@ HWND ScintillaWin::MainHWND() const noexcept {
 	return HwndFromWindow(wMain);
 }
 
+void ScintillaWin::DisplayCursor(Window::Cursor c) noexcept {
+	if (cursorMode != SC_CURSORNORMAL) {
+		c = static_cast<Window::Cursor>(cursorMode);
+	}
+	if (c == Window::cursorReverseArrow) {
+		::SetCursor(reverseArrowCursor.Load(dpi));
+	} else {
+		wMain.SetCursor(c);
+	}
+}
+
 bool ScintillaWin::DragThreshold(Point ptStart, Point ptNow) noexcept {
 	const Point ptDifference = ptStart - ptNow;
 	const XYPOSITION xMove = std::trunc(std::abs(ptDifference.x));
 	const XYPOSITION yMove = std::trunc(std::abs(ptDifference.y));
-	return (xMove > GetSystemMetricsEx(SM_CXDRAG, wMain.dpi)) ||
-		(yMove > GetSystemMetricsEx(SM_CYDRAG, wMain.dpi));
+	return (xMove > SystemMetricsForDpi(SM_CXDRAG, dpi)) ||
+		(yMove > SystemMetricsForDpi(SM_CYDRAG, dpi));
 }
 
 void ScintillaWin::StartDrag() {
@@ -2158,7 +2205,7 @@ sptr_t ScintillaWin::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam
 			break;
 
 		case WM_DPICHANGED:
-			wMain.dpi = HIWORD(wParam);
+			dpi = HIWORD(wParam);
 			vs.fontsValid = false;
 			ac.Cancel();
 			ct.CallTipCancel();
@@ -3054,7 +3101,7 @@ void ScintillaWin::ImeStartComposition() {
 			LOGFONTW lf = { };
 			const int sizeZoomed = GetFontSizeZoomed(vs.styles[styleHere].size, vs.zoomLevel);
 			// The negative is to allow for leading
-			lf.lfHeight = -::MulDiv(sizeZoomed, wMain.dpi, 72*SC_FONT_SIZE_MULTIPLIER);
+			lf.lfHeight = -::MulDiv(sizeZoomed, dpi, 72*SC_FONT_SIZE_MULTIPLIER);
 			lf.lfWeight = vs.styles[styleHere].weight;
 			lf.lfItalic = vs.styles[styleHere].italic ? 1 : 0;
 			lf.lfCharSet = DEFAULT_CHARSET;

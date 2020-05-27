@@ -3461,7 +3461,7 @@ BOOL Style_SelectFont(HWND hwnd, LPWSTR lpszStyle, int cchStyle, BOOL bDefaultSt
 	if (!Style_StrGetFontSize(lpszStyle, &iValue)) {
 		iValue = iBaseFontSize;
 	}
-	lf.lfHeight = -MulDiv(iValue, GetSystemDPI(), 72*SC_FONT_SIZE_MULTIPLIER);
+	lf.lfHeight = -MulDiv(iValue, g_uSystemDPI, 72*SC_FONT_SIZE_MULTIPLIER);
 	if (!Style_StrGetFontWeight(lpszStyle, &iValue)) {
 		iValue = FW_NORMAL;
 	}

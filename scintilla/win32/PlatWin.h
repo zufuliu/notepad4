@@ -51,20 +51,23 @@
 #if defined(__aarch64__) || defined(_ARM64_) || defined(_M_ARM64)
 // 1709 was the first version for Windows 10 on ARM64.
 #define NP2_TARGET_ARM64	1
-#define GetSystemDPI()						GetDpiForSystem()
-#define GetWindowDPI(hwnd)					GetDpiForWindow(hwnd)
-#define GetSystemMetricsEx(nIndex, dpi)		GetSystemMetricsForDpi((nIndex), (dpi))
+#define GetWindowDPI(hwnd)						GetDpiForWindow(hwnd)
+#define SystemMetricsForDpi(nIndex, dpi)		GetSystemMetricsForDpi((nIndex), (dpi))
+#define SciAdjustWindowRect(lpRect, dwStyle, dwExStyle, dpi) \
+		::AdjustWindowRectExForDpi((lpRect), (dwStyle), FALSE, (dwExStyle), (dpi))
 
 #else
 #define NP2_TARGET_ARM64	0
 #if NP2_FORCE_COMPILE_C_AS_CPP
-extern UINT GetSystemDPI(void);
+extern UINT g_uSystemDPI;
 extern UINT GetWindowDPI(HWND hwnd);
-extern int GetSystemMetricsEx(int nIndex, UINT dpi);
+extern int SystemMetricsForDpi(int nIndex, UINT dpi);
+extern BOOL SciAdjustWindowRect(LPRECT lpRect, DWORD dwStyle, DWORD dwExStyle, UINT dpi);
 #else
-extern "C" UINT GetSystemDPI(void);
+extern "C" UINT g_uSystemDPI;
 extern "C" UINT GetWindowDPI(HWND hwnd);
-extern "C" int GetSystemMetricsEx(int nIndex, UINT dpi);
+extern "C" int SystemMetricsForDpi(int nIndex, UINT dpi);
+extern "C" BOOL SciAdjustWindowRect(LPRECT lpRect, DWORD dwStyle, DWORD dwExStyle, UINT dpi);
 #endif
 #endif
 
@@ -129,6 +132,8 @@ inline T DLLFunction(LPCWSTR lpDllName, LPCSTR lpProcName) noexcept {
 inline UINT DpiForWindow(WindowID wid) noexcept {
 	return GetWindowDPI(HwndFromWindowID(wid));
 }
+
+HCURSOR LoadReverseArrowCursor(UINT dpi) noexcept;
 
 #if defined(USE_D2D)
 extern bool LoadD2D() noexcept;

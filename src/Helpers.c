@@ -873,8 +873,14 @@ void SetDlgPos(HWND hDlg, int xDlg, int yDlg) {
 // Resize Dialog Helpers()
 //
 #define RESIZEDLG_PROP_KEY	L"ResizeDlg"
+#define MAX_RESIZEDLG_ATTR_COUNT	2
+// temporary fix for moving dialog to monitor with different DPI
+// TODO: all dimensions no longer valid after window DPI changed.
+#define NP2_ENABLE_RESIZEDLG_TEMP_FIX	0
+
 typedef struct RESIZEDLG {
 	int direction;
+	UINT dpi;
 	int cxClient;
 	int cyClient;
 	int mmiPtMinX;
@@ -887,10 +893,10 @@ typedef struct RESIZEDLG {
 typedef const RESIZEDLG * LPCRESIZEDLG;
 
 void ResizeDlg_InitEx(HWND hwnd, int cxFrame, int cyFrame, int nIdGrip, int iDirection) {
+	const UINT dpi = GetWindowDPI(hwnd);
 	RESIZEDLG *pm = (RESIZEDLG *)NP2HeapAlloc(sizeof(RESIZEDLG));
 	pm->direction = iDirection;
-
-	const UINT dpi = GetWindowDPI(hwnd);
+	pm->dpi = dpi;
 
 	RECT rc;
 	GetClientRect(hwnd, &rc);
@@ -898,7 +904,7 @@ void ResizeDlg_InitEx(HWND hwnd, int cxFrame, int cyFrame, int nIdGrip, int iDir
 	pm->cyClient = rc.bottom - rc.top;
 
 	const DWORD style = GetWindowStyle(hwnd) | WS_THICKFRAME;
-	AdjustWindowRectEx(&rc, style, FALSE, 0);
+	SciAdjustWindowRect(&rc, style, 0, dpi);
 	pm->mmiPtMinX = rc.right - rc.left;
 	pm->mmiPtMinY = rc.bottom - rc.top;
 	// only one direction
@@ -929,7 +935,7 @@ void ResizeDlg_InitEx(HWND hwnd, int cxFrame, int cyFrame, int nIdGrip, int iDir
 
 	HWND hwndCtl = GetDlgItem(hwnd, nIdGrip);
 	SetWindowStyle(hwndCtl, GetWindowStyle(hwndCtl) | SBS_SIZEGRIP | WS_CLIPSIBLINGS);
-	const int cGrip = GetSystemMetricsEx(SM_CXHTHUMB, dpi);
+	const int cGrip = SystemMetricsForDpi(SM_CXHTHUMB, dpi);
 	SetWindowPos(hwndCtl, NULL, pm->cxClient - cGrip, pm->cyClient - cGrip, cGrip, cGrip, SWP_NOZORDER);
 }
 
@@ -953,6 +959,19 @@ void ResizeDlg_Size(HWND hwnd, LPARAM lParam, int *cx, int *cy) {
 	PRESIZEDLG pm = (PRESIZEDLG)GetProp(hwnd, RESIZEDLG_PROP_KEY);
 	const int cxClient = LOWORD(lParam);
 	const int cyClient = HIWORD(lParam);
+#if NP2_ENABLE_RESIZEDLG_TEMP_FIX
+	const UINT dpi = GetWindowDPI(hwnd);
+	const UINT old = pm->dpi;
+	if (cx) {
+		*cx = cxClient - MulDiv(pm->cxClient, dpi, old);
+	}
+	if (cy) {
+		*cy = cyClient - MulDiv(pm->cyClient, dpi, old);
+	}
+	// store in original DPI.
+	pm->cxClient = MulDiv(cxClient, old, dpi);
+	pm->cyClient = MulDiv(cyClient, old, dpi);
+#else
 	if (cx) {
 		*cx = cxClient - pm->cxClient;
 	}
@@ -961,12 +980,30 @@ void ResizeDlg_Size(HWND hwnd, LPARAM lParam, int *cx, int *cy) {
 	}
 	pm->cxClient = cxClient;
 	pm->cyClient = cyClient;
+#endif
 }
 
 void ResizeDlg_GetMinMaxInfo(HWND hwnd, LPARAM lParam) {
 	LPCRESIZEDLG pm = (LPCRESIZEDLG)GetProp(hwnd, RESIZEDLG_PROP_KEY);
-
 	LPMINMAXINFO lpmmi = (LPMINMAXINFO)lParam;
+#if NP2_ENABLE_RESIZEDLG_TEMP_FIX
+	const UINT dpi = GetWindowDPI(hwnd);
+	const UINT old = pm->dpi;
+
+	lpmmi->ptMinTrackSize.x = MulDiv(pm->mmiPtMinX, dpi, old);
+	lpmmi->ptMinTrackSize.y = MulDiv(pm->mmiPtMinY, dpi, old);
+
+	// only one direction
+	switch (pm->direction) {
+	case ResizeDlgDirection_OnlyX:
+		lpmmi->ptMaxTrackSize.y = MulDiv(pm->mmiPtMaxY, dpi, old);
+		break;
+
+	case ResizeDlgDirection_OnlyY:
+		lpmmi->ptMaxTrackSize.x = MulDiv(pm->mmiPtMaxX, dpi, old);
+		break;
+	}
+#else
 	lpmmi->ptMinTrackSize.x = pm->mmiPtMinX;
 	lpmmi->ptMinTrackSize.y = pm->mmiPtMinY;
 
@@ -980,22 +1017,7 @@ void ResizeDlg_GetMinMaxInfo(HWND hwnd, LPARAM lParam) {
 		lpmmi->ptMaxTrackSize.x = pm->mmiPtMaxX;
 		break;
 	}
-}
-
-void ResizeDlg_SetAttr(HWND hwnd, int index, int value) {
-	if (index < MAX_RESIZEDLG_ATTR_COUNT) {
-		PRESIZEDLG pm = (PRESIZEDLG)GetProp(hwnd, RESIZEDLG_PROP_KEY);
-		pm->attrs[index] = value;
-	}
-}
-
-int ResizeDlg_GetAttr(HWND hwnd, int index) {
-	if (index < MAX_RESIZEDLG_ATTR_COUNT) {
-		const LPCRESIZEDLG pm = (LPCRESIZEDLG)GetProp(hwnd, RESIZEDLG_PROP_KEY);
-		return pm->attrs[index];
-	}
-
-	return 0;
+#endif
 }
 
 static inline int GetDlgCtlHeight(HWND hwndDlg, int nCtlId) {
@@ -1023,8 +1045,14 @@ int ResizeDlg_CalcDeltaY2(HWND hwnd, int dy, int cy, int nCtlId1, int nCtlId2) {
 	}
 
 	const LPCRESIZEDLG pm = (LPCRESIZEDLG)GetProp(hwnd, RESIZEDLG_PROP_KEY);
+#if NP2_ENABLE_RESIZEDLG_TEMP_FIX
+	const UINT dpi = GetWindowDPI(hwnd);
+	const int hMin1 = MulDiv(pm->attrs[0], dpi, pm->dpi);
+	const int hMin2 = MulDiv(pm->attrs[1], dpi, pm->dpi);
+#else
 	const int hMin1 = pm->attrs[0];
 	const int hMin2 = pm->attrs[1];
+#endif
 	const int h1 = GetDlgCtlHeight(hwnd, nCtlId1);
 	const int h2 = GetDlgCtlHeight(hwnd, nCtlId2);
 	// cy + h1 >= hMin1			cy >= hMin1 - h1
@@ -2362,7 +2390,7 @@ BOOL GetThemedDialogFont(LPWSTR lpFaceName, WORD *wSize) {
 #else
 
 	BOOL bSucceed = FALSE;
-	const UINT iLogPixelsY = GetSystemDPI();
+	const UINT iLogPixelsY = g_uSystemDPI;
 
 	if (IsAppThemed()) {
 		HTHEME hTheme = OpenThemeData(NULL, L"WINDOWSTYLE;WINDOW");

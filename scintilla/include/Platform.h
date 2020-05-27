@@ -471,8 +471,7 @@ protected:
 	WindowID wid;
 
 public:
-	uint32_t dpi;
-	Window() noexcept : wid(nullptr), cursorLast(cursorInvalid), dpi(96) {}
+	Window() noexcept : wid(nullptr), cursorLast(cursorInvalid) {}
 	Window(const Window &source) = delete;
 	Window(Window &&) = delete;
 	Window &operator=(WindowID wid_) noexcept {
