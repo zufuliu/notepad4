@@ -34,7 +34,8 @@ jobs:
     - name: MSVC ARM64 Release
       run: |
         CALL "build\VS2017\build.bat" Build ARM64 Release 1
-        CALL "build\make_zip.bat" MSVC ARM64 Release 1
+        CALL "locale\build.bat" Build ARM64 Release 1
+        CALL "build\make_zip.bat" MSVC ARM64 Release Locale 1
 
     - name: MSVC ARM Release
       run: |
@@ -58,8 +59,8 @@ jobs:
 
     - uses: actions/upload-artifact@v2
       with:
-          name: Notepad2_ARM64
-          path: 'build\Notepad2_ARM64_*.zip'
+          name: Notepad2_i18n_ARM64
+          path: 'build\Notepad2_i18n_ARM64_*.zip'
 
     - uses: actions/upload-artifact@v2
       with:

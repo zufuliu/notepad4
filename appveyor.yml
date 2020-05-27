@@ -247,11 +247,12 @@ for:
 
     build_script:
       - cmd: CALL "build\VS2017\build.bat" Build ARM64 Release 1
-      - cmd: CALL "build\make_zip.bat" MSVC ARM64 Release 1
+      - cmd: CALL "locale\build.bat" Build ARM64 Release 1
+      - cmd: CALL "build\make_zip.bat" MSVC ARM64 Release Locale 1
 
     artifacts:
       - path: 'build\Notepad2*.zip'
-        name: Notepad2_ARM64
+        name: Notepad2_i18n_ARM64
 
   - # Clang ARM64 Release
     matrix:
