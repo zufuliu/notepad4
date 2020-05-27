@@ -327,6 +327,7 @@ DWORD		g_uWinVer;
 DWORD		kSystemLibraryLoadFlags = 0;
 #endif
 UINT		g_uCurrentDPI = USER_DEFAULT_SCREEN_DPI;
+UINT		g_uSystemDPI = USER_DEFAULT_SCREEN_DPI;
 WCHAR 		g_wchAppUserModelID[64] = L"";
 static WCHAR g_wchWorkingDirectory[MAX_PATH] = L"";
 #if NP2_ENABLE_APP_LOCALIZATION_DLL
@@ -1120,10 +1121,10 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 			const int h = mi.rcMonitor.bottom - mi.rcMonitor.top;
 
 			LPMINMAXINFO pmmi = (LPMINMAXINFO)lParam;
-			pmmi->ptMaxSize.x = w + 2 * GetSystemMetricsEx(SM_CXSIZEFRAME, g_uCurrentDPI);
-			pmmi->ptMaxSize.y = h + GetSystemMetricsEx(SM_CYCAPTION, g_uCurrentDPI)
-				+ GetSystemMetricsEx(SM_CYMENU, g_uCurrentDPI)
-				+ 2 * GetSystemMetricsEx(SM_CYSIZEFRAME, g_uCurrentDPI);
+			pmmi->ptMaxSize.x = w + 2 * SystemMetricsForDpi(SM_CXSIZEFRAME, g_uCurrentDPI);
+			pmmi->ptMaxSize.y = h + SystemMetricsForDpi(SM_CYCAPTION, g_uCurrentDPI)
+				+ SystemMetricsForDpi(SM_CYMENU, g_uCurrentDPI)
+				+ 2 * SystemMetricsForDpi(SM_CYSIZEFRAME, g_uCurrentDPI);
 			pmmi->ptMaxTrackSize.x = pmmi->ptMaxSize.x;
 			pmmi->ptMaxTrackSize.y = pmmi->ptMaxSize.y;
 			return 0;
@@ -2006,6 +2007,10 @@ void MsgDPIChanged(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	UpdateStatusBarWidth();
 	Style_OnDPIChanged(pLexCurrent);
 	SendMessage(hwndEdit, WM_DPICHANGED, wParam, lParam);
+	UpdateLineNumberWidth();
+	UpdateBookmarkMarginWidth();
+	UpdateFoldMarginWidth();
+
 	SciCall_GotoPos(pos);
 	UpdateToolbar();
 	UpdateStatusbar();
@@ -2143,7 +2148,7 @@ void UpdateStatusBarWidth(void) {
 	aWidth[4] = StatusCalcPaneWidth(hwndStatus, L"OVR");
 	aWidth[5] = StatusCalcPaneWidth(hwndStatus, L"500%");
 	aWidth[6] = StatusCalcPaneWidth(hwndStatus, ((iBytes < 1024)? L"1,023 Bytes" : L"99.9 MiB"))
-		+ GetSystemMetricsEx(SM_CXHTHUMB, g_uCurrentDPI);
+		+ SystemMetricsForDpi(SM_CXHTHUMB, g_uCurrentDPI);
 
 	aWidth[0] = max_i(120, cx - (aWidth[1] + aWidth[2] + aWidth[3] + aWidth[4] + aWidth[5] + aWidth[6]));
 	aWidth[1] += aWidth[0];
@@ -7007,15 +7012,15 @@ void ToggleFullScreenMode(void) {
 		const int y = mi.rcMonitor.top;
 		const int w = mi.rcMonitor.right - x;
 		const int h = mi.rcMonitor.bottom - y;
-		const int cx = GetSystemMetricsEx(SM_CXSIZEFRAME, g_uCurrentDPI);
-		const int cy = GetSystemMetricsEx(SM_CYSIZEFRAME, g_uCurrentDPI);
+		const int cx = SystemMetricsForDpi(SM_CXSIZEFRAME, g_uCurrentDPI);
+		const int cy = SystemMetricsForDpi(SM_CYSIZEFRAME, g_uCurrentDPI);
 
 		int top = cy;
 		if (iFullScreenMode & (FullScreenMode_HideCaption | FullScreenMode_HideMenu)) {
-			top += GetSystemMetricsEx(SM_CYCAPTION, g_uCurrentDPI);
+			top += SystemMetricsForDpi(SM_CYCAPTION, g_uCurrentDPI);
 		}
 		if (iFullScreenMode & FullScreenMode_HideMenu) {
-			top += GetSystemMetricsEx(SM_CYMENU, g_uCurrentDPI);
+			top += SystemMetricsForDpi(SM_CYMENU, g_uCurrentDPI);
 		}
 
 		SystemParametersInfo(SPI_SETWORKAREA, 0, NULL, SPIF_SENDCHANGE);

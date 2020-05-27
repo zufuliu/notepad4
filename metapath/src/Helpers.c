@@ -1946,7 +1946,7 @@ BOOL GetThemedDialogFont(LPWSTR lpFaceName, WORD *wSize) {
 #else
 
 	BOOL bSucceed = FALSE;
-	const UINT iLogPixelsY = GetSystemDPI();
+	const UINT iLogPixelsY = g_uSystemDPI;
 
 	if (IsAppThemed()) {
 		HTHEME hTheme = OpenThemeData(NULL, L"WINDOWSTYLE;WINDOW");
