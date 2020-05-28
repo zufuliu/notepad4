@@ -53,19 +53,21 @@
 #define NP2_TARGET_ARM64	1
 #define GetWindowDPI(hwnd)						GetDpiForWindow(hwnd)
 #define SystemMetricsForDpi(nIndex, dpi)		GetSystemMetricsForDpi((nIndex), (dpi))
-#define SciAdjustWindowRect(lpRect, dwStyle, dwExStyle, dpi) \
+#define DpiAdjustWindowRect(lpRect, dwStyle, dwExStyle, dpi) \
 		::AdjustWindowRectExForDpi((lpRect), (dwStyle), FALSE, (dwExStyle), (dpi))
 
 #else
 #define NP2_TARGET_ARM64	0
 #if NP2_FORCE_COMPILE_C_AS_CPP
-extern UINT GetWindowDPI(HWND hwnd);
-extern int SystemMetricsForDpi(int nIndex, UINT dpi);
-extern BOOL SciAdjustWindowRect(LPRECT lpRect, DWORD dwStyle, DWORD dwExStyle, UINT dpi);
+#define NP2_noexcept noexcept
+extern UINT GetWindowDPI(HWND hwnd) noexcept;
+extern int SystemMetricsForDpi(int nIndex, UINT dpi) noexcept;
+extern BOOL DpiAdjustWindowRect(LPRECT lpRect, DWORD dwStyle, DWORD dwExStyle, UINT dpi) noexcept;
 #else
+#define NP2_noexcept
 extern "C" UINT GetWindowDPI(HWND hwnd);
 extern "C" int SystemMetricsForDpi(int nIndex, UINT dpi);
-extern "C" BOOL SciAdjustWindowRect(LPRECT lpRect, DWORD dwStyle, DWORD dwExStyle, UINT dpi);
+extern "C" BOOL DpiAdjustWindowRect(LPRECT lpRect, DWORD dwStyle, DWORD dwExStyle, UINT dpi);
 #endif
 #endif
 
