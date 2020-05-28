@@ -2840,11 +2840,11 @@ void ListBoxX::SetList(const char *list, const char separator, const char typese
 void ListBoxX::AdjustWindowRect(PRectangle *rc, UINT dpi) noexcept {
 	RECT rcw = RectFromPRectangle(*rc);
 #if LISTBOXX_USE_THICKFRAME
-	SciAdjustWindowRect(&rcw, WS_THICKFRAME, WS_EX_WINDOWEDGE, dpi);
+	DpiAdjustWindowRect(&rcw, WS_THICKFRAME, WS_EX_WINDOWEDGE, dpi);
 #elif LISTBOXX_USE_BORDER
-	SciAdjustWindowRect(&rcw, WS_BORDER, WS_EX_WINDOWEDGE, dpi);
+	DpiAdjustWindowRect(&rcw, WS_BORDER, WS_EX_WINDOWEDGE, dpi);
 #else
-	SciAdjustWindowRect(&rcw, 0, WS_EX_WINDOWEDGE, dpi);
+	DpiAdjustWindowRect(&rcw, 0, WS_EX_WINDOWEDGE, dpi);
 #endif
 	*rc = PRectangle::FromInts(rcw.left, rcw.top, rcw.right, rcw.bottom);
 #if LISTBOXX_USE_FAKE_FRAME
@@ -3549,7 +3549,7 @@ using namespace Scintilla;
 #define MDT_EFFECTIVE_DPI	0
 #endif
 
-UINT GetWindowDPI(HWND hwnd) {
+UINT GetWindowDPI(HWND hwnd) NP2_noexcept {
 	if (fnGetDpiForWindow) {
 		return fnGetDpiForWindow(hwnd);
 	}
@@ -3564,7 +3564,7 @@ UINT GetWindowDPI(HWND hwnd) {
 	return g_uSystemDPI;
 }
 
-int SystemMetricsForDpi(int nIndex, UINT dpi) {
+int SystemMetricsForDpi(int nIndex, UINT dpi) NP2_noexcept {
 	if (fnGetSystemMetricsForDpi) {
 		return fnGetSystemMetricsForDpi(nIndex, dpi);
 	}
@@ -3574,7 +3574,7 @@ int SystemMetricsForDpi(int nIndex, UINT dpi) {
 	return value;
 }
 
-BOOL SciAdjustWindowRect(LPRECT lpRect, DWORD dwStyle, DWORD dwExStyle, UINT dpi) {
+BOOL DpiAdjustWindowRect(LPRECT lpRect, DWORD dwStyle, DWORD dwExStyle, UINT dpi) NP2_noexcept {
 	if (fnAdjustWindowRectExForDpi) {
 		return fnAdjustWindowRectExForDpi(lpRect, dwStyle, FALSE, dwExStyle, dpi);
 	}

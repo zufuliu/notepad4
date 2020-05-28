@@ -261,13 +261,13 @@ extern UINT g_uSystemDPI;
 // 1709 was the first version for Windows 10 on ARM64.
 #define GetWindowDPI(hwnd)					GetDpiForWindow(hwnd)
 #define SystemMetricsForDpi(nIndex, dpi)	GetSystemMetricsForDpi((nIndex), (dpi))
-#define SciAdjustWindowRect(lpRect, dwStyle, dwExStyle, dpi) \
+#define DpiAdjustWindowRect(lpRect, dwStyle, dwExStyle, dpi) \
 		AdjustWindowRectExForDpi((lpRect), (dwStyle), FALSE, (dwExStyle), (dpi))
 
 #else
-extern UINT GetWindowDPI(HWND hwnd);
-extern int SystemMetricsForDpi(int nIndex, UINT dpi);
-extern BOOL SciAdjustWindowRect(LPRECT lpRect, DWORD dwStyle, DWORD dwExStyle, UINT dpi);
+extern UINT GetWindowDPI(HWND hwnd) NP2_noexcept;
+extern int SystemMetricsForDpi(int nIndex, UINT dpi) NP2_noexcept;
+extern BOOL DpiAdjustWindowRect(LPRECT lpRect, DWORD dwStyle, DWORD dwExStyle, UINT dpi) NP2_noexcept;
 #endif
 
 NP2_inline int RoundToCurrentDPI(int value)	{

@@ -904,7 +904,7 @@ void ResizeDlg_InitEx(HWND hwnd, int cxFrame, int cyFrame, int nIdGrip, int iDir
 	pm->cyClient = rc.bottom - rc.top;
 
 	const DWORD style = GetWindowStyle(hwnd) | WS_THICKFRAME;
-	SciAdjustWindowRect(&rc, style, 0, dpi);
+	DpiAdjustWindowRect(&rc, style, 0, dpi);
 	pm->mmiPtMinX = rc.right - rc.left;
 	pm->mmiPtMinY = rc.bottom - rc.top;
 	// only one direction
