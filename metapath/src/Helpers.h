@@ -76,7 +76,7 @@ int ParseCommaList(LPCWSTR str, int result[], int count);
 
 extern HINSTANCE g_hInstance;
 extern HANDLE g_hDefaultHeap;
-#if _WIN32_WINNT < _WIN32_WINNT_WIN10
+#if _WIN32_WINNT < _WIN32_WINNT_VISTA
 extern DWORD g_uWinVer;
 #endif
 
@@ -121,14 +121,6 @@ extern DWORD g_uWinVer;
 
 // system DPI, same for all monitor.
 extern UINT g_uSystemDPI;
-
-// since Windows 10, version 1607
-#if defined(__aarch64__) || defined(_ARM64_) || defined(_M_ARM64)
-// 1709 was the first version for Windows 10 on ARM64.
-#define NP2_TARGET_ARM64	1
-#else
-#define NP2_TARGET_ARM64	0
-#endif
 
 // https://docs.microsoft.com/en-us/windows/desktop/Memory/comparing-memory-allocation-methods
 // https://blogs.msdn.microsoft.com/oldnewthing/20120316-00/?p=8083/

@@ -164,7 +164,7 @@ WCHAR	szDDETopic[256] = L"";
 
 HINSTANCE	g_hInstance;
 HANDLE		g_hDefaultHeap;
-#if _WIN32_WINNT < _WIN32_WINNT_WIN10
+#if _WIN32_WINNT < _WIN32_WINNT_VISTA
 DWORD		g_uWinVer;
 #endif
 UINT		g_uSystemDPI = USER_DEFAULT_SCREEN_DPI;
@@ -236,7 +236,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 
 	// Set global variable g_hInstance
 	g_hInstance = hInstance;
-#if _WIN32_WINNT < _WIN32_WINNT_WIN10
+#if _WIN32_WINNT < _WIN32_WINNT_VISTA
 	// Set the Windows version global variable
 	NP2_COMPILER_WARNING_PUSH
 	NP2_IGNORE_WARNING_DEPRECATED_DECLARATIONS
@@ -279,7 +279,9 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 	}
 #endif
 
-#if NP2_TARGET_ARM64
+// since Windows 10, version 1607
+#if defined(__aarch64__) || defined(_ARM64_) || defined(_M_ARM64)
+// 1709 was the first version for Windows 10 on ARM64.
 	g_uSystemDPI = GetDpiForSystem();
 #else
 	typedef UINT (WINAPI *GetDpiForSystemSig)(void);
