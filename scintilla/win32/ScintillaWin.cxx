@@ -334,7 +334,7 @@ class ReverseArrowCursor {
 	HCURSOR cursor {};
 
 public:
-	ReverseArrowCursor() noexcept {}
+	ReverseArrowCursor() noexcept = default;
 	// Deleted so ReverseArrowCursor objects can not be copied.
 	ReverseArrowCursor(const ReverseArrowCursor &) = delete;
 	ReverseArrowCursor(ReverseArrowCursor &&) = delete;
@@ -3774,7 +3774,7 @@ bool ScintillaWin::Register(HINSTANCE hInstance_) noexcept {
 		wndclassc.cbWndExtra = sizeof(ScintillaWin *);
 		wndclassc.hInstance = hInstance;
 		wndclassc.lpfnWndProc = ScintillaWin::CTWndProc;
-		wndclassc.hCursor = ::LoadCursor(nullptr, IDC_ARROW);
+		wndclassc.hCursor = ::LoadCursor({}, IDC_ARROW);
 		wndclassc.lpszClassName = callClassName;
 
 		callClassAtom = ::RegisterClassEx(&wndclassc);
@@ -3928,7 +3928,7 @@ LRESULT CALLBACK ScintillaWin::CTWndProc(
 				sciThis->CallTipClick();
 				return 0;
 			} else if (iMessage == WM_SETCURSOR) {
-				::SetCursor(::LoadCursor(nullptr, IDC_ARROW));
+				::SetCursor(::LoadCursor({}, IDC_ARROW));
 				return 0;
 			} else if (iMessage == WM_NCHITTEST) {
 				return HTCAPTION;
@@ -3964,6 +3964,7 @@ LRESULT CALLBACK ScintillaWin::SWndProc(
 	if (sci == nullptr) {
 		try {
 			if (iMessage == WM_CREATE) {
+				//Scintilla_LoadDpiForWindow();
 				// Create C++ object associated with window
 				sci = new ScintillaWin(hWnd);
 				SetWindowPointer(hWnd, sci);

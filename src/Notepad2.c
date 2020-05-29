@@ -571,6 +571,11 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 		g_hInstance = hInstance = (HINSTANCE)hResDLL;
 	}
 #endif
+#if NP2_TARGET_ARM64
+	g_uSystemDPI = GetDpiForSystem();
+#else
+	Scintilla_LoadDpiForWindow();
+#endif
 	Scintilla_RegisterClasses(hInstance);
 
 	// Load Settings

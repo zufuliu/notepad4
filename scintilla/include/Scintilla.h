@@ -14,6 +14,7 @@ extern "C" {
 #endif
 
 #if defined(_WIN32)
+void Scintilla_LoadDpiForWindow(void);
 /* Return false on failure: */
 int Scintilla_RegisterClasses(void *hInstance);
 int Scintilla_ReleaseResources(void);
