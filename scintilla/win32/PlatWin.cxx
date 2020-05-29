@@ -348,17 +348,13 @@ bool GetDWriteFontMetrics(const LOGFONTW &lf, std::wstring &wsFace,
 					wsFace.resize(length + 1);
 					names->GetString(index, wsFace.data(), length + 1);
 
+					names->Release();
 					success = wsFace[0] != L'\0';
 				}
-				if (names) {
-					names->Release();
-				}
-			}
-			if (family) {
+
 				family->Release();
 			}
-		}
-		if (font) {
+
 			font->Release();
 		}
 	}
