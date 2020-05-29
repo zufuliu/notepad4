@@ -29,9 +29,15 @@ NP2_inline void InitWindowCommon(HWND hwnd) {
 }
 
 int MsgBox(UINT uType, UINT uIdMsg, ...);
-#define MsgBoxInfo(uType, uIdMsg, ...)	MsgBox(MB_ICONINFORMATION | (uType), (uIdMsg), __VA_ARGS__)
-#define MsgBoxWarn(uType, uIdMsg, ...)	MsgBox(MB_ICONEXCLAMATION | (uType), (uIdMsg), __VA_ARGS__)
-#define MsgBoxAsk(uType, uIdMsg, ...)	MsgBox(MB_ICONQUESTION | (uType), (uIdMsg), __VA_ARGS__)
+#if defined(__GNUC__) || defined(__clang__)
+#define MsgBoxInfo(uType, uIdMsg, ...)		MsgBox(MB_ICONINFORMATION | (uType), (uIdMsg), ##__VA_ARGS__)
+#define MsgBoxWarn(uType, uIdMsg, ...)		MsgBox(MB_ICONEXCLAMATION | (uType), (uIdMsg), ##__VA_ARGS__)
+#define MsgBoxAsk(uType, uIdMsg, ...)		MsgBox(MB_ICONQUESTION | (uType), (uIdMsg), ##__VA_ARGS__)
+#else
+#define MsgBoxInfo(uType, uIdMsg, ...)		MsgBox(MB_ICONINFORMATION | (uType), (uIdMsg), __VA_ARGS__)
+#define MsgBoxWarn(uType, uIdMsg, ...)		MsgBox(MB_ICONEXCLAMATION | (uType), (uIdMsg), __VA_ARGS__)
+#define MsgBoxAsk(uType, uIdMsg, ...)		MsgBox(MB_ICONQUESTION | (uType), (uIdMsg), __VA_ARGS__)
+#endif
 
 BOOL GetDirectory(HWND hwndParent, int iTitle, LPWSTR pszFolder, LPCWSTR pszBase);
 BOOL GetDirectory2(HWND hwndParent, int iTitle, LPWSTR pszFolder, int iBase);
