@@ -1429,7 +1429,18 @@ void PathRelativeToApp(LPCWSTR lpszSrc, LPWSTR lpszDest, int cchDest,
 	GetModuleFileName(NULL, wchAppPath, COUNTOF(wchAppPath));
 	PathRemoveFileSpec(wchAppPath);
 	GetWindowsDirectory(wchWinDir, COUNTOF(wchWinDir));
-	SHGetFolderPath(NULL, CSIDL_PERSONAL, NULL, SHGFP_TYPE_CURRENT, wchUserFiles);
+#if _WIN32_WINNT < _WIN32_WINNT_VISTA
+	if (S_OK != SHGetFolderPath(NULL, CSIDL_PERSONAL, NULL, SHGFP_TYPE_CURRENT, wchUserFiles)) {
+		return;
+	}
+#else
+	LPWSTR pszPath = NULL;
+	if (S_OK != SHGetKnownFolderPath(&FOLDERID_Documents, KF_FLAG_DEFAULT, NULL, &pszPath)) {
+		return;
+	}
+	lstrcpy(wchUserFiles, pszPath);
+	CoTaskMemFree(pszPath);
+#endif
 
 	if (bUnexpandMyDocs &&
 			!PathIsRelative(lpszSrc) &&
@@ -1467,7 +1478,18 @@ void PathAbsoluteFromApp(LPCWSTR lpszSrc, LPWSTR lpszDest, int cchDest, BOOL bEx
 	WCHAR wchPath[MAX_PATH];
 
 	if (StrHasPrefix(lpszSrc, L"%CSIDL:MYDOCUMENTS%")) {
-		SHGetFolderPath(NULL, CSIDL_PERSONAL, NULL, SHGFP_TYPE_CURRENT, wchPath);
+#if _WIN32_WINNT < _WIN32_WINNT_VISTA
+		if (S_OK != SHGetFolderPath(NULL, CSIDL_PERSONAL, NULL, SHGFP_TYPE_CURRENT, wchPath)) {
+			return;
+		}
+#else
+		LPWSTR pszPath = NULL;
+		if (S_OK != SHGetKnownFolderPath(&FOLDERID_Documents, KF_FLAG_DEFAULT, NULL, &pszPath)) {
+			return;
+		}
+		lstrcpy(wchPath, pszPath);
+		CoTaskMemFree(pszPath);
+#endif
 		PathAppend(wchPath, lpszSrc + CSTRLEN("%CSIDL:MYDOCUMENTS%"));
 	} else {
 		lstrcpyn(wchPath, lpszSrc, COUNTOF(wchPath));
@@ -1644,8 +1666,17 @@ BOOL PathCreateDeskLnk(LPCWSTR pszDocument) {
 	lstrcpy(tchArguments, L"-n ");
 	lstrcat(tchArguments, tchDocTemp);
 
+#if _WIN32_WINNT < _WIN32_WINNT_VISTA
 	WCHAR tchLinkDir[MAX_PATH];
-	SHGetSpecialFolderPath(NULL, tchLinkDir, CSIDL_DESKTOPDIRECTORY, TRUE);
+	if (S_OK != SHGetFolderPath(NULL, CSIDL_DESKTOPDIRECTORY, NULL, SHGFP_TYPE_CURRENT, tchLinkDir)) {
+		return FALSE;
+	}
+#else
+	LPWSTR tchLinkDir = NULL;
+	if (S_OK != SHGetKnownFolderPath(&FOLDERID_Desktop, KF_FLAG_DEFAULT, NULL, &tchLinkDir)) {
+		return FALSE;
+	}
+#endif
 
 	WCHAR tchDescription[128];
 	// TODO: read custom menu text from registry, see System Integratio.
@@ -1656,8 +1687,15 @@ BOOL PathCreateDeskLnk(LPCWSTR pszDocument) {
 	BOOL fMustCopy;
 	WCHAR tchLnkFileName[MAX_PATH];
 	if (!SHGetNewLinkInfo(pszDocument, tchLinkDir, tchLnkFileName, &fMustCopy, SHGNLI_PREFIXNAME)) {
+#if _WIN32_WINNT >= _WIN32_WINNT_VISTA
+		CoTaskMemFree(tchLinkDir);
+#endif
 		return FALSE;
 	}
+
+#if _WIN32_WINNT >= _WIN32_WINNT_VISTA
+	CoTaskMemFree(tchLinkDir);
+#endif
 
 	IShellLink *psl;
 	BOOL bSucceeded = FALSE;

@@ -2450,9 +2450,32 @@ void LoadSettings(void) {
 
 	IniSectionGetString(pIniSection, L"MRUDirectory", L"", szMRUDirectory, COUNTOF(szMRUDirectory));
 
-	LPCWSTR strValue = IniSectionGetValue(pIniSection, L"Favorites");
+	LPCWSTR strValue = IniSectionGetValue(pIniSection, L"OpenWithDir");
 	if (StrIsEmpty(strValue)) {
+#if _WIN32_WINNT < _WIN32_WINNT_VISTA
+		SHGetFolderPath(NULL, CSIDL_DESKTOPDIRECTORY, NULL, SHGFP_TYPE_CURRENT, tchOpenWithDir);
+#else
+		LPWSTR pszPath = NULL;
+		if (S_OK == SHGetKnownFolderPath(&FOLDERID_Desktop, KF_FLAG_DEFAULT, NULL, &pszPath)) {
+			lstrcpy(tchOpenWithDir, pszPath);
+			CoTaskMemFree(pszPath);
+		}
+#endif
+	} else {
+		PathAbsoluteFromApp(strValue, tchOpenWithDir, COUNTOF(tchOpenWithDir), TRUE);
+	}
+
+	strValue = IniSectionGetValue(pIniSection, L"Favorites");
+	if (StrIsEmpty(strValue)) {
+#if _WIN32_WINNT < _WIN32_WINNT_VISTA
 		SHGetFolderPath(NULL, CSIDL_PERSONAL, NULL, SHGFP_TYPE_CURRENT, tchFavoritesDir);
+#else
+		LPWSTR pszPath = NULL;
+		if (S_OK == SHGetKnownFolderPath(&FOLDERID_Documents, KF_FLAG_DEFAULT, NULL, &pszPath)) {
+			lstrcpy(tchFavoritesDir, pszPath);
+			CoTaskMemFree(pszPath);
+		}
+#endif
 	} else {
 		PathAbsoluteFromApp(strValue, tchFavoritesDir, COUNTOF(tchFavoritesDir), TRUE);
 	}
@@ -2469,13 +2492,6 @@ void LoadSettings(void) {
 	bHasQuickview = PathIsFile(szQuickview);
 	IniSectionGetString(pIniSection, L"QuikviewParams", L"",
 						szQuickviewParams, COUNTOF(szQuickviewParams));
-
-	strValue = IniSectionGetValue(pIniSection, L"OpenWithDir");
-	if (StrIsEmpty(strValue)) {
-		SHGetSpecialFolderPath(NULL, tchOpenWithDir, CSIDL_DESKTOPDIRECTORY, TRUE);
-	} else {
-		PathAbsoluteFromApp(strValue, tchOpenWithDir, COUNTOF(tchOpenWithDir), TRUE);
-	}
 
 	dwFillMask = IniSectionGetInt(pIniSection, L"FillMask", DL_ALLOBJECTS);
 	if (dwFillMask & ~DL_ALLOBJECTS) {
