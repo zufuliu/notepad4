@@ -285,7 +285,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 	g_uSystemDPI = GetDpiForSystem();
 #else
 	typedef UINT (WINAPI *GetDpiForSystemSig)(void);
-	GetDpiForSystemSig pfnGetDpiForSystem = (GetDpiForSystemSig)DLLFunction(L"user32.dll", "GetDpiForSystem");
+	GetDpiForSystemSig pfnGetDpiForSystem = DLLFunctionEx(GetDpiForSystemSig, L"user32.dll", "GetDpiForSystem");
 	if (pfnGetDpiForSystem) {
 		g_uSystemDPI = pfnGetDpiForSystem();
 	} else {

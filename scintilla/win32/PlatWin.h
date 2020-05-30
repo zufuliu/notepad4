@@ -111,7 +111,14 @@ inline void SetWindowPointer(HWND hWnd, void *ptr) noexcept {
 template<typename T>
 inline T DLLFunction(HMODULE hModule, LPCSTR lpProcName) noexcept {
 #if 1
+#if defined(__GNUC__) && __GNUC__ >= 8
+	#pragma GCC diagnostic push
+	#pragma GCC diagnostic ignored "-Wcast-function-type"
 	return reinterpret_cast<T>(::GetProcAddress(hModule, lpProcName));
+	#pragma GCC diagnostic pop
+#else
+	return reinterpret_cast<T>(::GetProcAddress(hModule, lpProcName));
+#endif
 #else
 	if (!hModule) {
 		return nullptr;
@@ -125,7 +132,7 @@ inline T DLLFunction(HMODULE hModule, LPCSTR lpProcName) noexcept {
 }
 
 template<typename T>
-inline T DLLFunction(LPCWSTR lpDllName, LPCSTR lpProcName) noexcept {
+inline T DLLFunctionEx(LPCWSTR lpDllName, LPCSTR lpProcName) noexcept {
 	return DLLFunction<T>(::GetModuleHandleW(lpDllName), lpProcName);
 }
 

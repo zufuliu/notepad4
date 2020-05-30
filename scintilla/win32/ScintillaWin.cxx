@@ -689,7 +689,7 @@ void ScintillaWin::Init() noexcept {
 
 	// Find SetCoalescableTimer which is only available from Windows 8+
 #if _WIN32_WINNT < _WIN32_WINNT_WIN8
-	SetCoalescableTimerFn = DLLFunction<SetCoalescableTimerSig>(L"user32.dll", "SetCoalescableTimer");
+	SetCoalescableTimerFn = DLLFunctionEx<SetCoalescableTimerSig>(L"user32.dll", "SetCoalescableTimer");
 #endif
 
 	vs.indicators[SC_INDICATOR_UNKNOWN] = Indicator(INDIC_HIDDEN, ColourDesired(0, 0, 0xff));
