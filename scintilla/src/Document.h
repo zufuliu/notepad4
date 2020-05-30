@@ -390,7 +390,7 @@ public:
 	void TentativeCommit() noexcept {
 		cb.TentativeCommit();
 	}
-	void TentativeUndo();
+	void TentativeUndo(bool pendingUpdate = false);
 	bool TentativeActive() const noexcept {
 		return cb.TentativeActive();
 	}

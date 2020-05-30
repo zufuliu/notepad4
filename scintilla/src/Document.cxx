@@ -262,7 +262,7 @@ void Document::SetSavePoint() noexcept {
 	NotifySavePoint(true);
 }
 
-void Document::TentativeUndo() {
+void Document::TentativeUndo(bool pendingUpdate) {
 	if (!TentativeActive())
 		return;
 	CheckReadOnly();
@@ -314,8 +314,9 @@ void Document::TentativeUndo() {
 			}
 
 			const bool endSavePoint = cb.IsSavePoint();
-			if (startSavePoint != endSavePoint)
+			if (startSavePoint != endSavePoint && !pendingUpdate) {
 				NotifySavePoint(endSavePoint);
+			}
 
 			cb.TentativeCommit();
 		}
