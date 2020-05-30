@@ -319,6 +319,10 @@ public:
 		return attr;
 	}
 
+	LONG HasCompositionString(DWORD dwIndex) const noexcept {
+		return hIMC ? ::ImmGetCompositionStringW(hIMC, dwIndex, nullptr, 0) : 0;
+	}
+
 	std::wstring GetCompositionString(DWORD dwIndex) const {
 		const LONG byteLen = ::ImmGetCompositionStringW(hIMC, dwIndex, nullptr, 0);
 		std::wstring wcs(byteLen / sizeof(wchar_t), 0);
@@ -1312,10 +1316,13 @@ void ScintillaWin::AddWString(std::wstring_view wsv, CharacterSource charSource)
 sptr_t ScintillaWin::HandleCompositionInline(uptr_t, sptr_t lParam) {
 	// Copy & paste by johnsonj with a lot of helps of Neil.
 	// Great thanks for my foreruners, jiniya and BLUEnLIVE.
+	IMContext imc(MainHWND());
 
 	bool initialCompose = false;
 	if (pdoc->TentativeActive()) {
-		pdoc->TentativeUndo();
+		// GCS_COMPSTR is set on pressing Esc, but without composition string.
+		const bool pending = (lParam & GCS_COMPSTR) && imc.HasCompositionString(GCS_COMPSTR);
+		pdoc->TentativeUndo(pending);
 	} else {
 		// No tentative undo means start of this composition so
 		// fill in any virtual spaces.
@@ -1324,9 +1331,9 @@ sptr_t ScintillaWin::HandleCompositionInline(uptr_t, sptr_t lParam) {
 
 	view.imeCaretBlockOverride = false;
 
-	IMContext imc(MainHWND());
-	if (!imc.hIMC)
+	if (!imc.hIMC) {
 		return 0;
+	}
 	if (pdoc->IsReadOnly() || SelectionContainsProtected()) {
 		::ImmNotifyIME(imc.hIMC, NI_COMPOSITIONSTR, CPS_CANCEL, 0);
 		return 0;
