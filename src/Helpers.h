@@ -244,7 +244,7 @@ extern WCHAR szIniFile[MAX_PATH];
 	})
 #else
 #define DLLFunction(funcSig, hModule, funcName)		(funcSig)GetProcAddress((hModule), (funcName))
-#define DLLFunctionEx(funcSig, hModule, funcName)	(funcSig)GetProcAddress(GetModuleHandleW(dllName), (funcName))
+#define DLLFunctionEx(funcSig, dllName, funcName)	(funcSig)GetProcAddress(GetModuleHandleW(dllName), (funcName))
 #endif
 
 #ifndef SEE_MASK_NOZONECHECKS
