@@ -230,20 +230,20 @@ int DirList_Fill(HWND hwnd, LPCWSTR lpszDir, DWORD grfFlags, LPCWSTR lpszFileSpe
 	LPSHELLFOLDER lpsfDesktop = NULL;
 	LPITEMIDLIST pidl = NULL;
 	LPSHELLFOLDER lpsf = NULL;
-	if (NOERROR == SHGetDesktopFolder(&lpsfDesktop)) {
+	if (S_OK == SHGetDesktopFolder(&lpsfDesktop)) {
 		// Convert wszDir into a pidl
 		ULONG chParsed = 0;
 		ULONG dwAttributes = 0;
 #if defined(__cplusplus)
-		if (NOERROR == lpsfDesktop->ParseDisplayName(hwnd, NULL, wszDir, &chParsed, &pidl, &dwAttributes)) {
+		if (S_OK == lpsfDesktop->ParseDisplayName(hwnd, NULL, wszDir, &chParsed, &pidl, &dwAttributes)) {
 			// Bind pidl to IShellFolder
-			if (NOERROR == lpsfDesktop->BindToObject(pidl, NULL, IID_IShellFolder, (void **)(&lpsf))) {
+			if (S_OK == lpsfDesktop->BindToObject(pidl, NULL, IID_IShellFolder, (void **)(&lpsf))) {
 				// Create an Enumeration object for lpsf
 				LPENUMIDLIST lpe = NULL;
-				if (NOERROR == lpsf->EnumObjects(hwnd, grfFlags, &lpe)) {
+				if (S_OK == lpsf->EnumObjects(hwnd, grfFlags, &lpe)) {
 					// Enumerate the contents of lpsf
 					LPITEMIDLIST pidlEntry = NULL;
-					while (NOERROR == lpe->Next(1, &pidlEntry, NULL)) {
+					while (S_OK == lpe->Next(1, &pidlEntry, NULL)) {
 						// Add found item to the List
 						// Check if it's part of the Filesystem
 						dwAttributes = SFGAO_FILESYSTEM | SFGAO_FOLDER;
@@ -281,15 +281,15 @@ int DirList_Fill(HWND hwnd, LPCWSTR lpszDir, DWORD grfFlags, LPCWSTR lpszFileSpe
 
 		lpsfDesktop->Release();
 #else
-		if (NOERROR == lpsfDesktop->lpVtbl->ParseDisplayName(lpsfDesktop, hwnd, NULL, wszDir, &chParsed, &pidl, &dwAttributes)) {
+		if (S_OK == lpsfDesktop->lpVtbl->ParseDisplayName(lpsfDesktop, hwnd, NULL, wszDir, &chParsed, &pidl, &dwAttributes)) {
 			// Bind pidl to IShellFolder
-			if (NOERROR == lpsfDesktop->lpVtbl->BindToObject(lpsfDesktop, pidl, NULL, &IID_IShellFolder, (void **)(&lpsf))) {
+			if (S_OK == lpsfDesktop->lpVtbl->BindToObject(lpsfDesktop, pidl, NULL, &IID_IShellFolder, (void **)(&lpsf))) {
 				// Create an Enumeration object for lpsf
 				LPENUMIDLIST lpe = NULL;
-				if (NOERROR == lpsf->lpVtbl->EnumObjects(lpsf, hwnd, grfFlags, &lpe)) {
+				if (S_OK == lpsf->lpVtbl->EnumObjects(lpsf, hwnd, grfFlags, &lpe)) {
 					// Enumerate the contents of lpsf
 					LPITEMIDLIST pidlEntry = NULL;
-					while (NOERROR == lpe->lpVtbl->Next(lpe, 1, &pidlEntry, NULL)) {
+					while (S_OK == lpe->lpVtbl->Next(lpe, 1, &pidlEntry, NULL)) {
 						// Add found item to the List
 						// Check if it's part of the Filesystem
 						dwAttributes = SFGAO_FILESYSTEM | SFGAO_FOLDER;
@@ -397,7 +397,7 @@ DWORD WINAPI DirList_IconThread(LPVOID lpParam) {
 			lvi.mask = LVIF_IMAGE;
 
 #if defined(__cplusplus)
-			if (!lpshi || NOERROR != lpshi->GetIconOf(lplvid->pidl, GIL_FORSHELL, &lvi.iImage)) {
+			if (!lpshi || S_OK != lpshi->GetIconOf(lplvid->pidl, GIL_FORSHELL, &lvi.iImage)) {
 				SHFILEINFO shfi;
 				LPITEMIDLIST pidl = IL_Create(lpdl->pidl, lpdl->cbidl, lplvid->pidl, 0);
 				SHGetFileInfo((LPCWSTR)pidl, 0, &shfi, sizeof(SHFILEINFO), SHGFI_PIDL | SHGFI_SYSICONINDEX | SHGFI_SMALLICON);
@@ -405,7 +405,7 @@ DWORD WINAPI DirList_IconThread(LPVOID lpParam) {
 				lvi.iImage = shfi.iIcon;
 			}
 #else
-			if (!lpshi || NOERROR != lpshi->lpVtbl->GetIconOf(lpshi, lplvid->pidl, GIL_FORSHELL, &lvi.iImage)) {
+			if (!lpshi || S_OK != lpshi->lpVtbl->GetIconOf(lpshi, lplvid->pidl, GIL_FORSHELL, &lvi.iImage)) {
 				SHFILEINFO shfi;
 				LPITEMIDLIST pidl = IL_Create(lpdl->pidl, lpdl->cbidl, lplvid->pidl, 0);
 				SHGetFileInfo((LPCWSTR)pidl, 0, &shfi, sizeof(SHFILEINFO), SHGFI_PIDL | SHGFI_SYSICONINDEX | SHGFI_SMALLICON);
@@ -441,7 +441,7 @@ DWORD WINAPI DirList_IconThread(LPVOID lpParam) {
 			// Fade hidden/system files
 			if (!lpdl->bNoFadeHidden) {
 				WIN32_FIND_DATA fd;
-				if (NOERROR == SHGetDataFromIDList(lplvid->lpsf, lplvid->pidl,
+				if (S_OK == SHGetDataFromIDList(lplvid->lpsf, lplvid->pidl,
 												   SHGDFIL_FINDDATA, &fd, sizeof(WIN32_FIND_DATA))) {
 					if ((fd.dwFileAttributes & FILE_ATTRIBUTE_HIDDEN) ||
 							(fd.dwFileAttributes & FILE_ATTRIBUTE_SYSTEM)) {
@@ -641,7 +641,7 @@ int DirList_GetItem(HWND hwnd, int iItem, LPDLITEM lpdli) {
 		WIN32_FIND_DATA fd;
 		//ULONG dwAttributes = SFGAO_FILESYSTEM;
 
-		if (NOERROR == SHGetDataFromIDList(lplvid->lpsf, lplvid->pidl,
+		if (S_OK == SHGetDataFromIDList(lplvid->lpsf, lplvid->pidl,
 										   SHGDFIL_FINDDATA, &fd, sizeof(WIN32_FIND_DATA))) {
 			lpdli->ntype = (fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) ? DLE_DIR : DLE_FILE;
 		}
@@ -678,7 +678,7 @@ int DirList_GetItemEx(HWND hwnd, int iItem, LPWIN32_FIND_DATA pfd) {
 	}
 
 	LPLV_ITEMDATA lplvid = (LPLV_ITEMDATA)lvi.lParam;
-	if (NOERROR == SHGetDataFromIDList(lplvid->lpsf, lplvid->pidl, SHGDFIL_FINDDATA, pfd, sizeof(WIN32_FIND_DATA))) {
+	if (S_OK == SHGetDataFromIDList(lplvid->lpsf, lplvid->pidl, SHGDFIL_FINDDATA, pfd, sizeof(WIN32_FIND_DATA))) {
 		return iItem;
 	}
 	return -1;
@@ -715,7 +715,7 @@ BOOL DirList_PropertyDlg(HWND hwnd, int iItem) {
 	LPCONTEXTMENU lpcm;
 
 #if defined(__cplusplus)
-	if (NOERROR == lplvid->lpsf->GetUIObjectOf(GetParent(hwnd), 1, (LPCITEMIDLIST *)(&lplvid->pidl), IID_IContextMenu, NULL, (void **)(&lpcm))) {
+	if (S_OK == lplvid->lpsf->GetUIObjectOf(GetParent(hwnd), 1, (LPCITEMIDLIST *)(&lplvid->pidl), IID_IContextMenu, NULL, (void **)(&lpcm))) {
 		CMINVOKECOMMANDINFO cmi;
 		cmi.cbSize = sizeof(CMINVOKECOMMANDINFO);
 		cmi.fMask = 0;
@@ -727,7 +727,7 @@ BOOL DirList_PropertyDlg(HWND hwnd, int iItem) {
 		cmi.dwHotKey = 0;
 		cmi.hIcon = NULL;
 
-		if (NOERROR != lpcm->InvokeCommand(&cmi)) {
+		if (S_OK != lpcm->InvokeCommand(&cmi)) {
 			bSuccess = FALSE;
 		}
 
@@ -736,7 +736,7 @@ BOOL DirList_PropertyDlg(HWND hwnd, int iItem) {
 		bSuccess = FALSE;
 	}
 #else
-	if (NOERROR == lplvid->lpsf->lpVtbl->GetUIObjectOf(lplvid->lpsf, GetParent(hwnd), 1, (LPCITEMIDLIST *)(&lplvid->pidl), &IID_IContextMenu, NULL, (void **)(&lpcm))) {
+	if (S_OK == lplvid->lpsf->lpVtbl->GetUIObjectOf(lplvid->lpsf, GetParent(hwnd), 1, (LPCITEMIDLIST *)(&lplvid->pidl), &IID_IContextMenu, NULL, (void **)(&lpcm))) {
 		CMINVOKECOMMANDINFO cmi;
 		cmi.cbSize = sizeof(CMINVOKECOMMANDINFO);
 		cmi.fMask = 0;
@@ -748,7 +748,7 @@ BOOL DirList_PropertyDlg(HWND hwnd, int iItem) {
 		cmi.dwHotKey = 0;
 		cmi.hIcon = NULL;
 
-		if (NOERROR != lpcm->lpVtbl->InvokeCommand(lpcm, &cmi)) {
+		if (S_OK != lpcm->lpVtbl->InvokeCommand(lpcm, &cmi)) {
 			bSuccess = FALSE;
 		}
 
@@ -935,21 +935,21 @@ int DriveBox_Fill(HWND hwnd) {
 
 	// Get pidl to [My Computer]
 	LPITEMIDLIST pidl;
-	if (NOERROR == SHGetSpecialFolderLocation(hwnd, CSIDL_DRIVES, &pidl)) {
+	if (S_OK == SHGetSpecialFolderLocation(hwnd, CSIDL_DRIVES, &pidl)) {
 		// Get Desktop Folder
 		LPSHELLFOLDER lpsfDesktop;
-		if (NOERROR == SHGetDesktopFolder(&lpsfDesktop)) {
+		if (S_OK == SHGetDesktopFolder(&lpsfDesktop)) {
 			// Bind pidl to IShellFolder
 			LPSHELLFOLDER lpsf; // Workspace == CSIDL_DRIVES
 #if defined(__cplusplus)
-			if (NOERROR == lpsfDesktop->BindToObject(pidl, NULL, IID_IShellFolder, (void **)(&lpsf))) {
+			if (S_OK == lpsfDesktop->BindToObject(pidl, NULL, IID_IShellFolder, (void **)(&lpsf))) {
 				// Create an Enumeration object for lpsf
 				const DWORD grfFlags = SHCONTF_FOLDERS;
 				LPENUMIDLIST lpe;
-				if (NOERROR == lpsf->EnumObjects(hwnd, grfFlags, &lpe)) {
+				if (S_OK == lpsf->EnumObjects(hwnd, grfFlags, &lpe)) {
 					// Enumerate the contents of [My Computer]
 					LPITEMIDLIST pidlEntry;
-					while (NOERROR == lpe->Next(1, &pidlEntry, NULL)) {
+					while (S_OK == lpe->Next(1, &pidlEntry, NULL)) {
 						// Add item to the List if it is part of the
 						// Filesystem
 						ULONG dwAttributes = SFGAO_FILESYSTEM;
@@ -960,7 +960,7 @@ int DriveBox_Fill(HWND hwnd) {
 							// Windows XP: check if pidlEntry is a drive
 							SHDESCRIPTIONID di;
 							HRESULT hr = SHGetDataFromIDList(lpsf, pidlEntry, SHGDFIL_DESCRIPTIONID, &di, sizeof(SHDESCRIPTIONID));
-							if (hr != NOERROR || (di.dwDescriptionId >= SHDID_COMPUTER_DRIVE35 && di.dwDescriptionId <= SHDID_COMPUTER_OTHER)) {
+							if (hr != S_OK || (di.dwDescriptionId >= SHDID_COMPUTER_DRIVE35 && di.dwDescriptionId <= SHDID_COMPUTER_OTHER)) {
 								LPDC_ITEMDATA lpdcid = (LPDC_ITEMDATA)CoTaskMemAlloc(sizeof(DC_ITEMDATA));
 
 								//lpdcid->pidl = IL_Copy(pidlEntry);
@@ -998,14 +998,14 @@ int DriveBox_Fill(HWND hwnd) {
 				lpsf->Release();
 			} // IShellFolder::BindToObject()
 #else
-			if (NOERROR == lpsfDesktop->lpVtbl->BindToObject(lpsfDesktop, pidl, NULL, &IID_IShellFolder, (void **)(&lpsf))) {
+			if (S_OK == lpsfDesktop->lpVtbl->BindToObject(lpsfDesktop, pidl, NULL, &IID_IShellFolder, (void **)(&lpsf))) {
 				// Create an Enumeration object for lpsf
 				const DWORD grfFlags = SHCONTF_FOLDERS;
 				LPENUMIDLIST lpe;
-				if (NOERROR == lpsf->lpVtbl->EnumObjects(lpsf, hwnd, grfFlags, &lpe)) {
+				if (S_OK == lpsf->lpVtbl->EnumObjects(lpsf, hwnd, grfFlags, &lpe)) {
 					// Enumerate the contents of [My Computer]
 					LPITEMIDLIST pidlEntry;
-					while (NOERROR == lpe->lpVtbl->Next(lpe, 1, &pidlEntry, NULL)) {
+					while (S_OK == lpe->lpVtbl->Next(lpe, 1, &pidlEntry, NULL)) {
 						// Add item to the List if it is part of the
 						// Filesystem
 						ULONG dwAttributes = SFGAO_FILESYSTEM;
@@ -1016,7 +1016,7 @@ int DriveBox_Fill(HWND hwnd) {
 							// Windows XP: check if pidlEntry is a drive
 							SHDESCRIPTIONID di;
 							HRESULT hr = SHGetDataFromIDList(lpsf, pidlEntry, SHGDFIL_DESCRIPTIONID, &di, sizeof(SHDESCRIPTIONID));
-							if (hr != NOERROR || (di.dwDescriptionId >= SHDID_COMPUTER_DRIVE35 && di.dwDescriptionId <= SHDID_COMPUTER_OTHER)) {
+							if (hr != S_OK || (di.dwDescriptionId >= SHDID_COMPUTER_DRIVE35 && di.dwDescriptionId <= SHDID_COMPUTER_OTHER)) {
 								LPDC_ITEMDATA lpdcid = (LPDC_ITEMDATA)CoTaskMemAlloc(sizeof(DC_ITEMDATA));
 
 								//lpdcid->pidl = IL_Copy(pidlEntry);
@@ -1159,7 +1159,7 @@ BOOL DriveBox_PropertyDlg(HWND hwnd) {
 	LPCONTEXTMENU lpcm;
 
 #if defined(__cplusplus)
-	if (NOERROR == lpdcid->lpsf->GetUIObjectOf(GetParent(hwnd), 1, (LPCITEMIDLIST *)(&lpdcid->pidl), IID_IContextMenu, NULL, (void **)(&lpcm))) {
+	if (S_OK == lpdcid->lpsf->GetUIObjectOf(GetParent(hwnd), 1, (LPCITEMIDLIST *)(&lpdcid->pidl), IID_IContextMenu, NULL, (void **)(&lpcm))) {
 		CMINVOKECOMMANDINFO cmi;
 		cmi.cbSize = sizeof(CMINVOKECOMMANDINFO);
 		cmi.fMask = 0;
@@ -1171,7 +1171,7 @@ BOOL DriveBox_PropertyDlg(HWND hwnd) {
 		cmi.dwHotKey = 0;
 		cmi.hIcon = NULL;
 
-		if (NOERROR != lpcm->InvokeCommand(&cmi)) {
+		if (S_OK != lpcm->InvokeCommand(&cmi)) {
 			bSuccess = FALSE;
 		}
 
@@ -1180,7 +1180,7 @@ BOOL DriveBox_PropertyDlg(HWND hwnd) {
 		bSuccess = FALSE;
 	}
 #else
-	if (NOERROR == lpdcid->lpsf->lpVtbl->GetUIObjectOf(lpdcid->lpsf, GetParent(hwnd), 1, (LPCITEMIDLIST *)(&lpdcid->pidl), &IID_IContextMenu, NULL, (void **)(&lpcm))) {
+	if (S_OK == lpdcid->lpsf->lpVtbl->GetUIObjectOf(lpdcid->lpsf, GetParent(hwnd), 1, (LPCITEMIDLIST *)(&lpdcid->pidl), &IID_IContextMenu, NULL, (void **)(&lpcm))) {
 		CMINVOKECOMMANDINFO cmi;
 		cmi.cbSize = sizeof(CMINVOKECOMMANDINFO);
 		cmi.fMask = 0;
@@ -1192,7 +1192,7 @@ BOOL DriveBox_PropertyDlg(HWND hwnd) {
 		cmi.dwHotKey = 0;
 		cmi.hIcon = NULL;
 
-		if (NOERROR != lpcm->lpVtbl->InvokeCommand(lpcm, &cmi)) {
+		if (S_OK != lpcm->lpVtbl->InvokeCommand(lpcm, &cmi)) {
 			bSuccess = FALSE;
 		}
 
@@ -1340,11 +1340,11 @@ BOOL IL_GetDisplayName(LPSHELLFOLDER lpsf, LPCITEMIDLIST pidl,
 	STRRET str;
 
 #if defined(__cplusplus)
-	if (NOERROR == lpsf->GetDisplayNameOf(pidl, dwFlags, &str)) {
+	if (S_OK == lpsf->GetDisplayNameOf(pidl, dwFlags, &str)) {
 		return StrRetToBuf(&str, pidl, lpszDisplayName, nDisplayName) == S_OK;
 	}
 #else
-	if (NOERROR == lpsf->lpVtbl->GetDisplayNameOf(lpsf, pidl, dwFlags, &str)) {
+	if (S_OK == lpsf->lpVtbl->GetDisplayNameOf(lpsf, pidl, dwFlags, &str)) {
 		return StrRetToBuf(&str, pidl, lpszDisplayName, nDisplayName) == S_OK;
 	}
 #endif

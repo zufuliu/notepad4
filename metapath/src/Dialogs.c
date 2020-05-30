@@ -136,7 +136,7 @@ BOOL GetDirectory2(HWND hwndParent, int iTitle, LPWSTR pszFolder, int iBase) {
 	GetString(iTitle, szTitle, COUNTOF(szTitle));
 
 	LPITEMIDLIST pidlRoot;
-	if (NOERROR != SHGetSpecialFolderLocation(hwndParent, iBase, &pidlRoot)) {
+	if (S_OK != SHGetSpecialFolderLocation(hwndParent, iBase, &pidlRoot)) {
 		CoTaskMemFree((LPVOID)pidlRoot);
 		return FALSE;
 	}
