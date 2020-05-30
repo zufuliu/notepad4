@@ -119,7 +119,7 @@ BOOL GetDirectory(HWND hwndParent, int iTitle, LPWSTR pszFolder, LPCWSTR pszBase
 	LPITEMIDLIST pidl = SHBrowseForFolder(&bi);
 	if (pidl) {
 		SHGetPathFromIDList(pidl, pszFolder);
-		CoTaskMemFree((LPVOID)pidl);
+		CoTaskMemFree(pidl);
 		return TRUE;
 	}
 
@@ -130,14 +130,24 @@ BOOL GetDirectory(HWND hwndParent, int iTitle, LPWSTR pszFolder, LPCWSTR pszBase
 //
 // GetDirectory2()
 //
-BOOL GetDirectory2(HWND hwndParent, int iTitle, LPWSTR pszFolder, int iBase) {
+#if _WIN32_WINNT < _WIN32_WINNT_VISTA
+BOOL GetDirectory2(HWND hwndParent, int iTitle, LPWSTR pszFolder, int iBase)
+#else
+BOOL GetDirectory2(HWND hwndParent, int iTitle, LPWSTR pszFolder, REFKNOWNFOLDERID iBase)
+#endif
+{
 	WCHAR szTitle[256];
 	lstrcpy(szTitle, L"");
 	GetString(iTitle, szTitle, COUNTOF(szTitle));
 
 	LPITEMIDLIST pidlRoot;
-	if (S_OK != SHGetSpecialFolderLocation(hwndParent, iBase, &pidlRoot)) {
-		CoTaskMemFree((LPVOID)pidlRoot);
+#if _WIN32_WINNT < _WIN32_WINNT_VISTA
+	if (S_OK != SHGetFolderLocation(hwndParent, iBase, NULL, SHGFP_TYPE_DEFAULT, &pidlRoot))
+#else
+	if (S_OK != SHGetKnownFolderIDList(iBase, KF_FLAG_DEFAULT, NULL, &pidlRoot))
+#endif
+	{
+		CoTaskMemFree(pidlRoot);
 		return FALSE;
 	}
 
@@ -155,10 +165,10 @@ BOOL GetDirectory2(HWND hwndParent, int iTitle, LPWSTR pszFolder, int iBase) {
 	const BOOL fOk = pidl != NULL;
 	if (fOk) {
 		SHGetPathFromIDList(pidl, pszFolder);
-		CoTaskMemFree((LPVOID)pidl);
+		CoTaskMemFree(pidl);
 	}
 
-	CoTaskMemFree((LPVOID)pidlRoot);
+	CoTaskMemFree(pidlRoot);
 	return fOk;
 }
 

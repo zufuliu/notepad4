@@ -112,7 +112,7 @@ BOOL DirList_Destroy(HWND hwnd) {
 	CloseHandle(lpdl->hIconThread);
 
 	if (lpdl->pidl) {
-		CoTaskMemFree((LPVOID)(lpdl->pidl));
+		CoTaskMemFree(lpdl->pidl);
 	}
 
 	if (lpdl->lpsf) {
@@ -330,7 +330,7 @@ int DirList_Fill(HWND hwnd, LPCWSTR lpszDir, DWORD grfFlags, LPCWSTR lpszFileSpe
 	} // SHGetDesktopFolder()
 
 	if (lpdl->pidl) {
-		CoTaskMemFree((LPVOID)(lpdl->pidl));
+		CoTaskMemFree(lpdl->pidl);
 	}
 
 	if (lpdl->lpsf) {
@@ -401,7 +401,7 @@ DWORD WINAPI DirList_IconThread(LPVOID lpParam) {
 				SHFILEINFO shfi;
 				LPITEMIDLIST pidl = IL_Create(lpdl->pidl, lpdl->cbidl, lplvid->pidl, 0);
 				SHGetFileInfo((LPCWSTR)pidl, 0, &shfi, sizeof(SHFILEINFO), SHGFI_PIDL | SHGFI_SYSICONINDEX | SHGFI_SMALLICON);
-				CoTaskMemFree((LPVOID)pidl);
+				CoTaskMemFree(pidl);
 				lvi.iImage = shfi.iIcon;
 			}
 #else
@@ -409,7 +409,7 @@ DWORD WINAPI DirList_IconThread(LPVOID lpParam) {
 				SHFILEINFO shfi;
 				LPITEMIDLIST pidl = IL_Create(lpdl->pidl, lpdl->cbidl, lplvid->pidl, 0);
 				SHGetFileInfo((LPCWSTR)pidl, 0, &shfi, sizeof(SHFILEINFO), SHGFI_PIDL | SHGFI_SYSICONINDEX | SHGFI_SMALLICON);
-				CoTaskMemFree((LPVOID)pidl);
+				CoTaskMemFree(pidl);
 				lvi.iImage = shfi.iIcon;
 			}
 #endif
@@ -518,7 +518,7 @@ BOOL DirList_DeleteItem(HWND hwnd, LPARAM lParam) {
 	if (ListView_GetItem(hwnd, &lvi)) {
 		// Free mem
 		LPLV_ITEMDATA lplvid = (LPLV_ITEMDATA)lvi.lParam;
-		CoTaskMemFree((LPVOID)(lplvid->pidl));
+		CoTaskMemFree(lplvid->pidl);
 #if defined(__cplusplus)
 		lplvid->lpsf->Release();
 #else
@@ -935,7 +935,12 @@ int DriveBox_Fill(HWND hwnd) {
 
 	// Get pidl to [My Computer]
 	LPITEMIDLIST pidl;
-	if (S_OK == SHGetSpecialFolderLocation(hwnd, CSIDL_DRIVES, &pidl)) {
+#if _WIN32_WINNT < _WIN32_WINNT_VISTA
+	if (S_OK == SHGetFolderLocation(hwnd, CSIDL_DRIVES, NULL, SHGFP_TYPE_DEFAULT, &pidl))
+#else
+	if (S_OK == SHGetKnownFolderIDList(&FOLDERID_ComputerFolder, KF_FLAG_DEFAULT, NULL, &pidl))
+#endif
+	{
 		// Get Desktop Folder
 		LPSHELLFOLDER lpsfDesktop;
 		if (S_OK == SHGetDesktopFolder(&lpsfDesktop)) {
@@ -1054,15 +1059,15 @@ int DriveBox_Fill(HWND hwnd) {
 				lpsf->lpVtbl->Release(lpsf);
 			} // IShellFolder::BindToObject()
 #endif
-			CoTaskMemFree((LPVOID)pidl);
-		} // SHGetSpecialFolderLocation()
+			CoTaskMemFree(pidl);
+		} // SHGetDesktopFolder()
 
 #if defined(__cplusplus)
 		lpsfDesktop->Release();
 #else
 		lpsfDesktop->lpVtbl->Release(lpsfDesktop);
 #endif
-	} // SHGetDesktopFolder()
+	} // SHGetKnownFolderIDList()
 
 	SendMessage(hwnd, WM_SETREDRAW, 1, 0);
 	// Return number of items added to combo box
@@ -1219,7 +1224,7 @@ LRESULT DriveBox_DeleteItem(HWND hwnd, LPARAM lParam) {
 	LPDC_ITEMDATA lpdcid = (LPDC_ITEMDATA)cbei.lParam;
 
 	// Free pidl
-	CoTaskMemFree((LPVOID)(lpdcid->pidl));
+	CoTaskMemFree(lpdcid->pidl);
 	// Release lpsf
 #if defined(__cplusplus)
 	lpdcid->lpsf->Release();

@@ -1267,7 +1267,7 @@ void OpenContainingFolder(HWND hwnd, LPCWSTR pszFile, BOOL bSelect) {
 		LPITEMIDLIST pidlEntry = path ? ILCreateFromPath(path) : NULL;
 		if (pidlEntry) {
 			hr = SHOpenFolderAndSelectItems(pidl, 1, (LPCITEMIDLIST *)(&pidlEntry), 0);
-			ILFree(pidlEntry);
+			CoTaskMemFree(pidlEntry);
 		} else if (!bSelect) {
 #if 0
 			// Use an invalid item to open the folder?
@@ -1291,7 +1291,7 @@ void OpenContainingFolder(HWND hwnd, LPCWSTR pszFile, BOOL bSelect) {
 			// open parent folder and select the folder
 			hr = SHOpenFolderAndSelectItems(pidl, 0, NULL, 0);
 		}
-		ILFree(pidl);
+		CoTaskMemFree(pidl);
 		if (hr == S_OK) {
 			return;
 		}
@@ -1530,9 +1530,14 @@ void FormatNumberStr(LPWSTR lpNumberStr) {
 void GetDefaultFavoritesDir(LPWSTR lpFavDir, int cchFavDir) {
 	LPITEMIDLIST pidl;
 
-	if (S_OK == SHGetSpecialFolderLocation(NULL, CSIDL_PERSONAL, &pidl)) {
+#if _WIN32_WINNT < _WIN32_WINNT_VISTA
+	if (S_OK == SHGetFolderLocation(NULL, CSIDL_PERSONAL, NULL, SHGFP_TYPE_DEFAULT, &pidl))
+#else
+	if (S_OK == SHGetKnownFolderIDList(&FOLDERID_Documents, KF_FLAG_DEFAULT, NULL, &pidl))
+#endif
+	{
 		SHGetPathFromIDList(pidl, lpFavDir);
-		CoTaskMemFree((LPVOID)pidl);
+		CoTaskMemFree(pidl);
 	} else {
 		GetWindowsDirectory(lpFavDir, cchFavDir);
 	}
@@ -1545,9 +1550,14 @@ void GetDefaultFavoritesDir(LPWSTR lpFavDir, int cchFavDir) {
 void GetDefaultOpenWithDir(LPWSTR lpOpenWithDir, int cchOpenWithDir) {
 	LPITEMIDLIST pidl;
 
-	if (S_OK == SHGetSpecialFolderLocation(NULL, CSIDL_DESKTOPDIRECTORY, &pidl)) {
+#if _WIN32_WINNT < _WIN32_WINNT_VISTA
+	if (S_OK == SHGetFolderLocation(NULL, CSIDL_DESKTOPDIRECTORY, NULL, SHGFP_TYPE_DEFAULT, &pidl))
+#else
+	if (S_OK == SHGetKnownFolderIDList(&FOLDERID_Desktop, KF_FLAG_DEFAULT, NULL, &pidl))
+#endif
+	{
 		SHGetPathFromIDList(pidl, lpOpenWithDir);
-		CoTaskMemFree((LPVOID)pidl);
+		CoTaskMemFree(pidl);
 	} else {
 		GetWindowsDirectory(lpOpenWithDir, cchOpenWithDir);
 	}
