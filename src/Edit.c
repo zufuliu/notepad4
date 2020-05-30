@@ -786,7 +786,8 @@ BOOL EditLoadFile(LPWSTR pszFile, BOOL bSkipEncodingDetection, EditFileIOStatus 
 		if (GetFinalPathNameByHandleW(hFile, path, MAX_PATH, FILE_NAME_OPENED))
 #else
 		typedef DWORD (WINAPI *GetFinalPathNameByHandleSig)(HANDLE hFile, LPWSTR lpszFilePath, DWORD cchFilePath, DWORD dwFlags);
-		GetFinalPathNameByHandleSig pfnGetFinalPathNameByHandle = (GetFinalPathNameByHandleSig)DLLFunction(L"kernel32.dll", "GetFinalPathNameByHandleW");
+		GetFinalPathNameByHandleSig pfnGetFinalPathNameByHandle =
+			DLLFunctionEx(GetFinalPathNameByHandleSig, L"kernel32.dll", "GetFinalPathNameByHandleW");
 		if (pfnGetFinalPathNameByHandle && pfnGetFinalPathNameByHandle(hFile, path, MAX_PATH, FILE_NAME_OPENED))
 #endif
 		{
@@ -1222,12 +1223,12 @@ typedef HRESULT (WINAPI *MappingFreePropertyBagSig)(PMAPPING_PROPERTY_BAG pBag);
 
 	if (triedLoadingELSCore == 0) {
 		triedLoadingELSCore = 1;
-		hELSCoreDLL = LoadLibraryEx(L"elscore.dll", NULL, kSystemLibraryLoadFlags);
+		hELSCoreDLL = LoadLibraryExW(L"elscore.dll", NULL, kSystemLibraryLoadFlags);
 		if (hELSCoreDLL != NULL) {
-			pfnMappingGetServices = (MappingGetServicesSig)GetProcAddress(hELSCoreDLL, "MappingGetServices");
-			pfnMappingFreeServices = (MappingFreeServicesSig)GetProcAddress(hELSCoreDLL, "MappingFreeServices");
-			pfnMappingRecognizeText = (MappingRecognizeTextSig)GetProcAddress(hELSCoreDLL, "MappingRecognizeText");
-			pfnMappingFreePropertyBag = (MappingFreePropertyBagSig)GetProcAddress(hELSCoreDLL, "MappingFreePropertyBag");
+			pfnMappingGetServices = DLLFunction(MappingGetServicesSig, hELSCoreDLL, "MappingGetServices");
+			pfnMappingFreeServices = DLLFunction(MappingFreeServicesSig, hELSCoreDLL, "MappingFreeServices");
+			pfnMappingRecognizeText = DLLFunction(MappingRecognizeTextSig, hELSCoreDLL, "MappingRecognizeText");
+			pfnMappingFreePropertyBag = DLLFunction(MappingFreePropertyBagSig, hELSCoreDLL, "MappingFreePropertyBag");
 			if (pfnMappingGetServices == NULL || pfnMappingFreeServices == NULL || pfnMappingRecognizeText == NULL || pfnMappingFreePropertyBag == NULL) {
 				FreeLibrary(hELSCoreDLL);
 				hELSCoreDLL = NULL;

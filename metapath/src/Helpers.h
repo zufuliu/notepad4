@@ -113,7 +113,25 @@ extern DWORD g_uWinVer;
 #define LOAD_LIBRARY_AS_IMAGE_RESOURCE	0x00000020
 #endif
 
-#define DLLFunction(dllName, funcName)	GetProcAddress(GetModuleHandleW(dllName), (funcName))
+#if defined(__GNUC__) && __GNUC__ >= 8
+#define DLLFunction(funcSig, hModule, funcName) __extension__({			\
+	_Pragma("GCC diagnostic push")										\
+	_Pragma("GCC diagnostic ignored \"-Wcast-function-type\"")			\
+	funcSig PP_CONCAT(temp, __LINE__) = (funcSig)GetProcAddress((hModule), (funcName));\
+	_Pragma("GCC diagnostic pop")										\
+	PP_CONCAT(temp, __LINE__);											\
+	})
+#define DLLFunctionEx(funcSig, dllName, funcName) __extension__({		\
+	_Pragma("GCC diagnostic push")										\
+	_Pragma("GCC diagnostic ignored \"-Wcast-function-type\"")			\
+	funcSig PP_CONCAT(temp, __LINE__) = (funcSig)GetProcAddress(GetModuleHandleW(dllName), (funcName));\
+	_Pragma("GCC diagnostic pop")										\
+	PP_CONCAT(temp, __LINE__);											\
+	})
+#else
+#define DLLFunction(funcSig, hModule, funcName)		(funcSig)GetProcAddress((hModule), (funcName))
+#define DLLFunctionEx(funcSig, dllName, funcName)	(funcSig)GetProcAddress(GetModuleHandleW(dllName), (funcName))
+#endif
 
 #ifndef USER_DEFAULT_SCREEN_DPI
 #define USER_DEFAULT_SCREEN_DPI		96		// _WIN32_WINNT >= _WIN32_WINNT_VISTA

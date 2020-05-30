@@ -82,6 +82,9 @@
 #define EMPTY_BRACE_INITIALIZER			{0}
 #endif
 
+#define PP_CONCAT_(x, y)	x##y
+#define PP_CONCAT(x, y)		PP_CONCAT_(x, y)
+
 // sdkddkver.h
 #ifndef _WIN32_WINNT_VISTA
 #define _WIN32_WINNT_VISTA				0x0600

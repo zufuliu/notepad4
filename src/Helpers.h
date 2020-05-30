@@ -227,7 +227,25 @@ extern WCHAR szIniFile[MAX_PATH];
 #define LOAD_LIBRARY_AS_IMAGE_RESOURCE	0x00000020
 #endif
 
-#define DLLFunction(dllName, funcName)	GetProcAddress(GetModuleHandleW(dllName), (funcName))
+#if defined(__GNUC__) && __GNUC__ >= 8
+#define DLLFunction(funcSig, hModule, funcName) __extension__({			\
+	_Pragma("GCC diagnostic push")										\
+	_Pragma("GCC diagnostic ignored \"-Wcast-function-type\"")			\
+	funcSig PP_CONCAT(temp, __LINE__) = (funcSig)GetProcAddress((hModule), (funcName));\
+	_Pragma("GCC diagnostic pop")										\
+	PP_CONCAT(temp, __LINE__);											\
+	})
+#define DLLFunctionEx(funcSig, dllName, funcName) __extension__({		\
+	_Pragma("GCC diagnostic push")										\
+	_Pragma("GCC diagnostic ignored \"-Wcast-function-type\"")			\
+	funcSig PP_CONCAT(temp, __LINE__) = (funcSig)GetProcAddress(GetModuleHandleW(dllName), (funcName));\
+	_Pragma("GCC diagnostic pop")										\
+	PP_CONCAT(temp, __LINE__);											\
+	})
+#else
+#define DLLFunction(funcSig, hModule, funcName)		(funcSig)GetProcAddress((hModule), (funcName))
+#define DLLFunctionEx(funcSig, hModule, funcName)	(funcSig)GetProcAddress(GetModuleHandleW(dllName), (funcName))
+#endif
 
 #ifndef SEE_MASK_NOZONECHECKS
 #define SEE_MASK_NOZONECHECKS		0x00800000		// NTDDI_VERSION >= NTDDI_WINXPSP1

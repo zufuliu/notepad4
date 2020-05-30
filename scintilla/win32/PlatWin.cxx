@@ -101,7 +101,7 @@ void Scintilla_LoadDpiForWindow(void) {
 	}
 
 	if (fnGetDpiForWindow == nullptr) {
-		HMODULE hShcore = ::LoadLibraryEx(L"shcore.dll", {}, LOAD_LIBRARY_SEARCH_SYSTEM32);
+		HMODULE hShcore = ::LoadLibraryExW(L"shcore.dll", {}, LOAD_LIBRARY_SEARCH_SYSTEM32);
 		if (hShcore) {
 			pfnGetDpiForMonitor = DLLFunction<GetDpiForMonitorSig>(hShcore, "GetDpiForMonitor");
 			if (pfnGetDpiForMonitor) {
