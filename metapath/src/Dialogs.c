@@ -119,7 +119,7 @@ BOOL GetDirectory(HWND hwndParent, int iTitle, LPWSTR pszFolder, LPCWSTR pszBase
 	LPITEMIDLIST pidl = SHBrowseForFolder(&bi);
 	if (pidl) {
 		SHGetPathFromIDList(pidl, pszFolder);
-		CoTaskMemFree(pidl);
+		CoTaskMemFree((LPVOID)pidl);
 		return TRUE;
 	}
 
@@ -147,7 +147,6 @@ BOOL GetDirectory2(HWND hwndParent, int iTitle, LPWSTR pszFolder, REFKNOWNFOLDER
 	if (S_OK != SHGetKnownFolderIDList(iBase, KF_FLAG_DEFAULT, NULL, &pidlRoot))
 #endif
 	{
-		CoTaskMemFree(pidlRoot);
 		return FALSE;
 	}
 
@@ -165,10 +164,10 @@ BOOL GetDirectory2(HWND hwndParent, int iTitle, LPWSTR pszFolder, REFKNOWNFOLDER
 	const BOOL fOk = pidl != NULL;
 	if (fOk) {
 		SHGetPathFromIDList(pidl, pszFolder);
-		CoTaskMemFree(pidl);
+		CoTaskMemFree((LPVOID)pidl);
 	}
 
-	CoTaskMemFree(pidlRoot);
+	CoTaskMemFree((LPVOID)pidlRoot);
 	return fOk;
 }
 
