@@ -181,6 +181,7 @@ static int iEscFunction;
 static BOOL bAlwaysOnTop;
 static BOOL bMinimizeToTray;
 static BOOL bTransparentMode;
+static int	iEndAtLastLine;
 BOOL	bFindReplaceTransparentMode;
 static BOOL bEditLayoutRTL;
 BOOL	bWindowLayoutRTL;
@@ -451,7 +452,7 @@ static void CleanUpResources(BOOL initialized) {
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nShowCmd) {
 	UNREFERENCED_PARAMETER(hPrevInstance);
 	UNREFERENCED_PARAMETER(lpCmdLine);
-#if 0 // used for Clang UBSan or printing debug message on console.
+#if 1 // used for Clang UBSan or printing debug message on console.
 	if (AttachConsole(ATTACH_PARENT_PROCESS)) {
 		freopen("CONOUT$", "w", stdout);
 		freopen("CONOUT$", "w", stderr);
@@ -1610,7 +1611,7 @@ HWND EditCreate(HWND hwndParent) {
 	SciCall_SetCommandEvents(FALSE);
 	SciCall_UsePopUp(SC_POPUP_NEVER);
 	SciCall_SetScrollWidthTracking(TRUE);
-	SciCall_SetEndAtLastLine(TRUE);
+	SciCall_SetEndAtLastLine(iEndAtLastLine);
 	SciCall_SetCaretSticky(SC_CARETSTICKY_OFF);
 	SciCall_SetXCaretPolicy(CARET_SLOP | CARET_EVEN, 50);
 	SciCall_SetYCaretPolicy(CARET_EVEN, 0);
@@ -2545,6 +2546,8 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	CheckCmd(hmenu, IDM_VIEW_MINTOTRAY, bMinimizeToTray);
 	CheckCmd(hmenu, IDM_VIEW_TRANSPARENT, bTransparentMode);
 	EnableCmd(hmenu, IDM_VIEW_TRANSPARENT, i);
+	i = IDM_VIEW_SCROLLPASTLASTLINE_ONE + iEndAtLastLine;
+	CheckMenuRadioItem(hmenu, IDM_VIEW_SCROLLPASTLASTLINE_ONE, IDM_VIEW_SCROLLPASTLASTLINE_QUARTER, i, MF_BYCOMMAND);
 
 	// Rendering Technology
 	i = IsVistaAndAbove();
@@ -4240,6 +4243,15 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		SetWindowTransparentMode(hwnd, bTransparentMode, iOpacityLevel);
 		break;
 
+	case IDM_VIEW_SCROLLPASTLASTLINE_NO:
+	case IDM_VIEW_SCROLLPASTLASTLINE_ONE:
+	case IDM_VIEW_SCROLLPASTLASTLINE_HALF:
+	case IDM_VIEW_SCROLLPASTLASTLINE_THIRD:
+	case IDM_VIEW_SCROLLPASTLASTLINE_QUARTER:
+		iEndAtLastLine = LOWORD(wParam) - IDM_VIEW_SCROLLPASTLASTLINE_ONE;
+		SciCall_SetEndAtLastLine(iEndAtLastLine);
+		break;
+
 	case IDM_SET_RENDER_TECH_GDI:
 	case IDM_SET_RENDER_TECH_D2D:
 	case IDM_SET_RENDER_TECH_D2DRETAIN:
@@ -5475,6 +5487,8 @@ void LoadSettings(void) {
 	bMinimizeToTray = IniSectionGetBool(pIniSection, L"MinimizeToTray", 0);
 	bTransparentMode = IniSectionGetBool(pIniSection, L"TransparentMode", 0);
 	bFindReplaceTransparentMode = IniSectionGetBool(pIniSection, L"FindReplaceTransparentMode", 1);
+	iValue = IniSectionGetInt(pIniSection, L"EndAtLastLine", 1);
+	iEndAtLastLine = clamp_i(iValue, 0, 4);
 	bEditLayoutRTL = IniSectionGetBool(pIniSection, L"EditLayoutRTL", 0);
 	bWindowLayoutRTL = IniSectionGetBool(pIniSection, L"WindowLayoutRTL", 0);
 
@@ -5769,6 +5783,7 @@ void SaveSettings(BOOL bSaveSettingsNow) {
 	IniSectionSetBoolEx(pIniSection, L"MinimizeToTray", bMinimizeToTray, 0);
 	IniSectionSetBoolEx(pIniSection, L"TransparentMode", bTransparentMode, 0);
 	IniSectionSetBoolEx(pIniSection, L"FindReplaceTransparentMode", bFindReplaceTransparentMode, 1);
+	IniSectionSetIntEx(pIniSection, L"EndAtLastLine", iEndAtLastLine, 1);
 	IniSectionSetBoolEx(pIniSection, L"EditLayoutRTL", bEditLayoutRTL, 0);
 	IniSectionSetBoolEx(pIniSection, L"WindowLayoutRTL", bWindowLayoutRTL, 0);
 	IniSectionSetIntEx(pIniSection, L"RenderingTechnology", iRenderingTechnology, GetDefualtRenderingTechnology());

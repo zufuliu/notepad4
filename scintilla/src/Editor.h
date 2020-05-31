@@ -194,7 +194,7 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	bool horizontalScrollBarVisible;
 	int scrollWidth;
 	bool verticalScrollBarVisible;
-	bool endAtLastLine;
+	int endAtLastLine;
 	int caretSticky;
 	int marginOptions;
 	bool mouseSelectionRectangularSwitch;
