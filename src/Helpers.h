@@ -228,6 +228,7 @@ extern WCHAR szIniFile[MAX_PATH];
 #endif
 
 #if defined(__GNUC__) && __GNUC__ >= 8
+// GCC statement expression
 #define DLLFunction(funcSig, hModule, funcName) __extension__({			\
 	_Pragma("GCC diagnostic push")										\
 	_Pragma("GCC diagnostic ignored \"-Wcast-function-type\"")			\
