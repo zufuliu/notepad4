@@ -1857,7 +1857,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 				//SetFocus(hwndDirList);
 				if (PathGetLnkPath(dli.szFileName, szFullPath, COUNTOF(szFullPath))) {
-					if (PathFileExists(szFullPath)) {
+					if (GetFileAttributes(szFullPath) != INVALID_FILE_ATTRIBUTES) {
 						WCHAR szDir[MAX_PATH];
 						WCHAR *p;
 						lstrcpy(szDir, szFullPath);
