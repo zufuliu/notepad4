@@ -91,7 +91,10 @@ Used by VSCode, Atom etc.
 #include "HanjaDic.h"
 
 #ifndef WM_DPICHANGED
-#define WM_DPICHANGED			0x02E0
+#define WM_DPICHANGED				0x02E0
+#endif
+#ifndef WM_DPICHANGED_AFTERPARENT
+#define WM_DPICHANGED_AFTERPARENT	0x02E3
 #endif
 
 // Two idle messages SC_WIN_IDLE and SC_WORK_IDLE.
@@ -316,6 +319,10 @@ public:
 		return attr;
 	}
 
+	LONG HasCompositionString(DWORD dwIndex) const noexcept {
+		return hIMC ? ::ImmGetCompositionStringW(hIMC, dwIndex, nullptr, 0) : 0;
+	}
+
 	std::wstring GetCompositionString(DWORD dwIndex) const {
 		const LONG byteLen = ::ImmGetCompositionStringW(hIMC, dwIndex, nullptr, 0);
 		std::wstring wcs(byteLen / sizeof(wchar_t), 0);
@@ -325,6 +332,37 @@ public:
 };
 
 class GlobalMemory;
+
+class ReverseArrowCursor {
+	UINT dpi = USER_DEFAULT_SCREEN_DPI;
+	HCURSOR cursor {};
+
+public:
+	ReverseArrowCursor() noexcept = default;
+	// Deleted so ReverseArrowCursor objects can not be copied.
+	ReverseArrowCursor(const ReverseArrowCursor &) = delete;
+	ReverseArrowCursor(ReverseArrowCursor &&) = delete;
+	ReverseArrowCursor &operator=(const ReverseArrowCursor &) = delete;
+	ReverseArrowCursor &operator=(ReverseArrowCursor &&) = delete;
+	~ReverseArrowCursor() {
+		if (cursor) {
+			::DestroyCursor(cursor);
+		}
+	}
+
+	HCURSOR Load(UINT dpi_) noexcept {
+		if (cursor)	 {
+			if (dpi == dpi_) {
+				return cursor;
+			}
+			::DestroyCursor(cursor);
+		}
+
+		dpi = dpi_;
+		cursor = LoadReverseArrowCursor(dpi_);
+		return cursor ? cursor : ::LoadCursor({}, IDC_ARROW);
+	}
+};
 
 }
 
@@ -344,6 +382,9 @@ class ScintillaWin :
 
 	unsigned int linesPerScroll;	///< Intellimouse support
 	int wheelDelta; ///< Wheel delta from roll
+
+	UINT dpi = USER_DEFAULT_SCREEN_DPI;
+	ReverseArrowCursor reverseArrowCursor;
 
 	HRGN hRgnUpdate;
 
@@ -411,6 +452,7 @@ class ScintillaWin :
 		invalidTimerID, standardTimerID, idleTimerID, fineTimerStart
 	};
 
+	void DisplayCursor(Window::Cursor c) noexcept override;
 	bool SCICALL DragThreshold(Point ptStart, Point ptNow) noexcept override;
 	void StartDrag() override;
 	static int MouseModifiers(uptr_t wParam) noexcept;
@@ -580,6 +622,8 @@ ScintillaWin::ScintillaWin(HWND hwnd) {
 	linesPerScroll = 0;
 	wheelDelta = 0;   // Wheel delta from roll
 
+	dpi = GetWindowDPI(hwnd);
+
 	hRgnUpdate = {};
 
 	hasOKText = false;
@@ -615,7 +659,6 @@ ScintillaWin::ScintillaWin(HWND hwnd) {
 
 	//hrOle = E_FAIL;
 	wMain = hwnd;
-	wMain.dpi = GetWindowDPI(hwnd);
 
 	dob.sci = this;
 	ds.sci = this;
@@ -650,7 +693,7 @@ void ScintillaWin::Init() noexcept {
 
 	// Find SetCoalescableTimer which is only available from Windows 8+
 #if _WIN32_WINNT < _WIN32_WINNT_WIN8
-	SetCoalescableTimerFn = DLLFunction<SetCoalescableTimerSig>(L"user32.dll", "SetCoalescableTimer");
+	SetCoalescableTimerFn = DLLFunctionEx<SetCoalescableTimerSig>(L"user32.dll", "SetCoalescableTimer");
 #endif
 
 	vs.indicators[SC_INDICATOR_UNKNOWN] = Indicator(INDIC_HIDDEN, ColourDesired(0, 0, 0xff));
@@ -767,12 +810,23 @@ HWND ScintillaWin::MainHWND() const noexcept {
 	return HwndFromWindow(wMain);
 }
 
+void ScintillaWin::DisplayCursor(Window::Cursor c) noexcept {
+	if (cursorMode != SC_CURSORNORMAL) {
+		c = static_cast<Window::Cursor>(cursorMode);
+	}
+	if (c == Window::cursorReverseArrow) {
+		::SetCursor(reverseArrowCursor.Load(dpi));
+	} else {
+		wMain.SetCursor(c);
+	}
+}
+
 bool ScintillaWin::DragThreshold(Point ptStart, Point ptNow) noexcept {
 	const Point ptDifference = ptStart - ptNow;
 	const XYPOSITION xMove = std::trunc(std::abs(ptDifference.x));
 	const XYPOSITION yMove = std::trunc(std::abs(ptDifference.y));
-	return (xMove > GetSystemMetricsEx(SM_CXDRAG, wMain.dpi)) ||
-		(yMove > GetSystemMetricsEx(SM_CYDRAG, wMain.dpi));
+	return (xMove > SystemMetricsForDpi(SM_CXDRAG, dpi)) ||
+		(yMove > SystemMetricsForDpi(SM_CYDRAG, dpi));
 }
 
 void ScintillaWin::StartDrag() {
@@ -1262,10 +1316,13 @@ void ScintillaWin::AddWString(std::wstring_view wsv, CharacterSource charSource)
 sptr_t ScintillaWin::HandleCompositionInline(uptr_t, sptr_t lParam) {
 	// Copy & paste by johnsonj with a lot of helps of Neil.
 	// Great thanks for my foreruners, jiniya and BLUEnLIVE.
+	IMContext imc(MainHWND());
 
 	bool initialCompose = false;
 	if (pdoc->TentativeActive()) {
-		pdoc->TentativeUndo();
+		// GCS_COMPSTR is set on pressing Esc, but without composition string.
+		const bool pending = (lParam & GCS_COMPSTR) && imc.HasCompositionString(GCS_COMPSTR);
+		pdoc->TentativeUndo(pending);
 	} else {
 		// No tentative undo means start of this composition so
 		// fill in any virtual spaces.
@@ -1274,9 +1331,9 @@ sptr_t ScintillaWin::HandleCompositionInline(uptr_t, sptr_t lParam) {
 
 	view.imeCaretBlockOverride = false;
 
-	IMContext imc(MainHWND());
-	if (!imc.hIMC)
+	if (!imc.hIMC) {
 		return 0;
+	}
 	if (pdoc->IsReadOnly() || SelectionContainsProtected()) {
 		::ImmNotifyIME(imc.hIMC, NI_COMPOSITIONSTR, CPS_CANCEL, 0);
 		return 0;
@@ -2067,7 +2124,7 @@ sptr_t ScintillaWin::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam
 		switch (iMessage) {
 
 		case WM_CREATE:
-			ctrlID = ::GetDlgCtrlID(HwndFromWindow(wMain));
+			ctrlID = ::GetDlgCtrlID(MainHWND());
 			// Get Intellimouse scroll line parameters
 			GetIntelliMouseParameters();
 			::RegisterDragDrop(MainHWND(), reinterpret_cast<IDropTarget *>(&dt));
@@ -2158,12 +2215,20 @@ sptr_t ScintillaWin::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam
 			break;
 
 		case WM_DPICHANGED:
-			wMain.dpi = HIWORD(wParam);
+			dpi = HIWORD(wParam);
 			vs.fontsValid = false;
-			ac.Cancel();
-			ct.CallTipCancel();
 			InvalidateStyleRedraw();
 			break;
+
+		case WM_DPICHANGED_AFTERPARENT: {
+			const UINT dpiNow = GetWindowDPI(MainHWND());
+			if (dpi != dpiNow) {
+				dpi = dpiNow;
+				vs.fontsValid = false;
+				InvalidateStyleRedraw();
+			}
+		}
+		break;
 
 		case WM_CONTEXTMENU:
 #if SCI_EnablePopupMenu
@@ -2484,11 +2549,11 @@ void ScintillaWin::NotifyFocus(bool focus) {
 }
 
 void ScintillaWin::SetCtrlID(int identifier) noexcept {
-	::SetWindowID(HwndFromWindow(wMain), identifier);
+	::SetWindowID(MainHWND(), identifier);
 }
 
 int ScintillaWin::GetCtrlID() const noexcept {
-	return ::GetDlgCtrlID(HwndFromWindow(wMain));
+	return ::GetDlgCtrlID(MainHWND());
 }
 
 void ScintillaWin::NotifyParent(SCNotification scn) noexcept {
@@ -3054,7 +3119,7 @@ void ScintillaWin::ImeStartComposition() {
 			LOGFONTW lf = { };
 			const int sizeZoomed = GetFontSizeZoomed(vs.styles[styleHere].size, vs.zoomLevel);
 			// The negative is to allow for leading
-			lf.lfHeight = -::MulDiv(sizeZoomed, wMain.dpi, 72*SC_FONT_SIZE_MULTIPLIER);
+			lf.lfHeight = -::MulDiv(sizeZoomed, dpi, 72*SC_FONT_SIZE_MULTIPLIER);
 			lf.lfWeight = vs.styles[styleHere].weight;
 			lf.lfItalic = vs.styles[styleHere].italic ? 1 : 0;
 			lf.lfCharSet = DEFAULT_CHARSET;
@@ -3716,7 +3781,7 @@ bool ScintillaWin::Register(HINSTANCE hInstance_) noexcept {
 		wndclassc.cbWndExtra = sizeof(ScintillaWin *);
 		wndclassc.hInstance = hInstance;
 		wndclassc.lpfnWndProc = ScintillaWin::CTWndProc;
-		wndclassc.hCursor = ::LoadCursor(nullptr, IDC_ARROW);
+		wndclassc.hCursor = ::LoadCursor({}, IDC_ARROW);
 		wndclassc.lpszClassName = callClassName;
 
 		callClassAtom = ::RegisterClassEx(&wndclassc);
@@ -3870,7 +3935,7 @@ LRESULT CALLBACK ScintillaWin::CTWndProc(
 				sciThis->CallTipClick();
 				return 0;
 			} else if (iMessage == WM_SETCURSOR) {
-				::SetCursor(::LoadCursor(nullptr, IDC_ARROW));
+				::SetCursor(::LoadCursor({}, IDC_ARROW));
 				return 0;
 			} else if (iMessage == WM_NCHITTEST) {
 				return HTCAPTION;
@@ -3906,6 +3971,7 @@ LRESULT CALLBACK ScintillaWin::SWndProc(
 	if (sci == nullptr) {
 		try {
 			if (iMessage == WM_CREATE) {
+				//Scintilla_LoadDpiForWindow();
 				// Create C++ object associated with window
 				sci = new ScintillaWin(hWnd);
 				SetWindowPointer(hWnd, sci);

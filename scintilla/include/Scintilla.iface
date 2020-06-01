@@ -1611,11 +1611,11 @@ fun int TextWidth=2276(int style, string text)
 # Sets the scroll range so that maximum scroll position has
 # the last line at the bottom of the view (default).
 # Setting this to false allows scrolling one page below the last line.
-set void SetEndAtLastLine=2277(bool endAtLastLine,)
+set void SetEndAtLastLine=2277(int endAtLastLine,)
 
 # Retrieve whether the maximum scroll position has the last
 # line at the bottom of the view.
-get bool GetEndAtLastLine=2278(,)
+get int GetEndAtLastLine=2278(,)
 
 # Retrieve the height of a particular line of text in pixels.
 fun int TextHeight=2279(line line,)

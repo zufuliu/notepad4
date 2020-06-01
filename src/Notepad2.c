@@ -181,6 +181,7 @@ static int iEscFunction;
 static BOOL bAlwaysOnTop;
 static BOOL bMinimizeToTray;
 static BOOL bTransparentMode;
+static int	iEndAtLastLine;
 BOOL	bFindReplaceTransparentMode;
 static BOOL bEditLayoutRTL;
 BOOL	bWindowLayoutRTL;
@@ -320,13 +321,14 @@ struct CachedStatusItem {
 HINSTANCE	g_hInstance;
 HANDLE		g_hDefaultHeap;
 HANDLE		g_hScintilla;
-#if _WIN32_WINNT < _WIN32_WINNT_WIN10
+#if _WIN32_WINNT < _WIN32_WINNT_WIN7
 DWORD		g_uWinVer;
 #endif
 #if _WIN32_WINNT < _WIN32_WINNT_WIN8
 DWORD		kSystemLibraryLoadFlags = 0;
 #endif
 UINT		g_uCurrentDPI = USER_DEFAULT_SCREEN_DPI;
+UINT		g_uSystemDPI = USER_DEFAULT_SCREEN_DPI;
 WCHAR 		g_wchAppUserModelID[64] = L"";
 static WCHAR g_wchWorkingDirectory[MAX_PATH] = L"";
 #if NP2_ENABLE_APP_LOCALIZATION_DLL
@@ -463,7 +465,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 
 	// Set global variable g_hInstance
 	g_hInstance = hInstance;
-#if _WIN32_WINNT < _WIN32_WINNT_WIN10
+#if _WIN32_WINNT < _WIN32_WINNT_WIN7
 	// Set the Windows version global variable
 	NP2_COMPILER_WARNING_PUSH
 	NP2_IGNORE_WARNING_DEPRECATED_DECLARATIONS
@@ -561,7 +563,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 
 #if _WIN32_WINNT < _WIN32_WINNT_WIN8
 	// see LoadD2D() in PlatWin.cxx
-	kSystemLibraryLoadFlags = (DLLFunction(L"kernel32.dll", "SetDefaultDllDirectories") != NULL) ? LOAD_LIBRARY_SEARCH_SYSTEM32 : 0;
+	kSystemLibraryLoadFlags = (DLLFunctionEx(FARPROC, L"kernel32.dll", "SetDefaultDllDirectories") != NULL) ? LOAD_LIBRARY_SEARCH_SYSTEM32 : 0;
 #endif
 
 #if NP2_ENABLE_APP_LOCALIZATION_DLL
@@ -569,6 +571,11 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 	if (hResDLL) {
 		g_hInstance = hInstance = (HINSTANCE)hResDLL;
 	}
+#endif
+#if NP2_TARGET_ARM64
+	g_uSystemDPI = GetDpiForSystem();
+#else
+	Scintilla_LoadDpiForWindow();
 #endif
 	Scintilla_RegisterClasses(hInstance);
 
@@ -1120,10 +1127,10 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 			const int h = mi.rcMonitor.bottom - mi.rcMonitor.top;
 
 			LPMINMAXINFO pmmi = (LPMINMAXINFO)lParam;
-			pmmi->ptMaxSize.x = w + 2 * GetSystemMetricsEx(SM_CXSIZEFRAME, g_uCurrentDPI);
-			pmmi->ptMaxSize.y = h + GetSystemMetricsEx(SM_CYCAPTION, g_uCurrentDPI)
-				+ GetSystemMetricsEx(SM_CYMENU, g_uCurrentDPI)
-				+ 2 * GetSystemMetricsEx(SM_CYSIZEFRAME, g_uCurrentDPI);
+			pmmi->ptMaxSize.x = w + 2 * SystemMetricsForDpi(SM_CXSIZEFRAME, g_uCurrentDPI);
+			pmmi->ptMaxSize.y = h + SystemMetricsForDpi(SM_CYCAPTION, g_uCurrentDPI)
+				+ SystemMetricsForDpi(SM_CYMENU, g_uCurrentDPI)
+				+ 2 * SystemMetricsForDpi(SM_CYSIZEFRAME, g_uCurrentDPI);
 			pmmi->ptMaxTrackSize.x = pmmi->ptMaxSize.x;
 			pmmi->ptMaxTrackSize.y = pmmi->ptMaxSize.y;
 			return 0;
@@ -1604,7 +1611,7 @@ HWND EditCreate(HWND hwndParent) {
 	SciCall_SetCommandEvents(FALSE);
 	SciCall_UsePopUp(SC_POPUP_NEVER);
 	SciCall_SetScrollWidthTracking(TRUE);
-	SciCall_SetEndAtLastLine(TRUE);
+	SciCall_SetEndAtLastLine(iEndAtLastLine);
 	SciCall_SetCaretSticky(SC_CARETSTICKY_OFF);
 	SciCall_SetXCaretPolicy(CARET_SLOP | CARET_EVEN, 50);
 	SciCall_SetYCaretPolicy(CARET_EVEN, 0);
@@ -2006,6 +2013,10 @@ void MsgDPIChanged(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	UpdateStatusBarWidth();
 	Style_OnDPIChanged(pLexCurrent);
 	SendMessage(hwndEdit, WM_DPICHANGED, wParam, lParam);
+	UpdateLineNumberWidth();
+	UpdateBookmarkMarginWidth();
+	UpdateFoldMarginWidth();
+
 	SciCall_GotoPos(pos);
 	UpdateToolbar();
 	UpdateStatusbar();
@@ -2143,7 +2154,7 @@ void UpdateStatusBarWidth(void) {
 	aWidth[4] = StatusCalcPaneWidth(hwndStatus, L"OVR");
 	aWidth[5] = StatusCalcPaneWidth(hwndStatus, L"500%");
 	aWidth[6] = StatusCalcPaneWidth(hwndStatus, ((iBytes < 1024)? L"1,023 Bytes" : L"99.9 MiB"))
-		+ GetSystemMetricsEx(SM_CXHTHUMB, g_uCurrentDPI);
+		+ SystemMetricsForDpi(SM_CXHTHUMB, g_uCurrentDPI);
 
 	aWidth[0] = max_i(120, cx - (aWidth[1] + aWidth[2] + aWidth[3] + aWidth[4] + aWidth[5] + aWidth[6]));
 	aWidth[1] += aWidth[0];
@@ -2535,6 +2546,8 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	CheckCmd(hmenu, IDM_VIEW_MINTOTRAY, bMinimizeToTray);
 	CheckCmd(hmenu, IDM_VIEW_TRANSPARENT, bTransparentMode);
 	EnableCmd(hmenu, IDM_VIEW_TRANSPARENT, i);
+	i = IDM_VIEW_SCROLLPASTLASTLINE_ONE + iEndAtLastLine;
+	CheckMenuRadioItem(hmenu, IDM_VIEW_SCROLLPASTLASTLINE_ONE, IDM_VIEW_SCROLLPASTLASTLINE_QUARTER, i, MF_BYCOMMAND);
 
 	// Rendering Technology
 	i = IsVistaAndAbove();
@@ -2621,6 +2634,19 @@ void EditToggleBookmarkAt(Sci_Position iPos) {
 		// set
 		SciCall_MarkerAdd(iLine, MarkerNumber_Bookmark);
 	}
+}
+
+static inline BOOL IsBraceMatchChar(int ch) {
+#if 0
+	return ch == '(' || ch == ')'
+		|| ch == '[' || ch == ']'
+		|| ch == '{' || ch == '}'
+		|| ch == '<' || ch == '>';
+#else
+	// tools/GenerateTable.py
+	static const uint32_t table[8] = { 0, 0x50000300, 0x28000000, 0x28000000 };
+	return table[ch >> 5] & (1 << (ch & 31));
+#endif
 }
 
 //=============================================================================
@@ -3677,12 +3703,12 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		Sci_Position iBrace2 = -1;
 		Sci_Position iPos = SciCall_GetCurrentPos();
 		int ch = SciCall_GetCharAt(iPos);
-		if (ch < 0x80 && strchr("()[]{}<>", ch)) {
+		if (IsBraceMatchChar(ch)) {
 			iBrace2 = SciCall_BraceMatch(iPos, 0);
 		} else { // Try one before
 			iPos = SciCall_PositionBefore(iPos);
 			ch = SciCall_GetCharAt(iPos);
-			if (ch < 0x80 && strchr("()[]{}<>", ch)) {
+			if (IsBraceMatchChar(ch)) {
 				iBrace2 = SciCall_BraceMatch(iPos, 0);
 			}
 		}
@@ -3696,12 +3722,12 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		Sci_Position iBrace2 = -1;
 		Sci_Position iPos = SciCall_GetCurrentPos();
 		int ch = SciCall_GetCharAt(iPos);
-		if (ch < 0x80 && strchr("()[]{}<>", ch)) {
+		if (IsBraceMatchChar(ch)) {
 			iBrace2 = SciCall_BraceMatch(iPos, 0);
 		} else { // Try one before
 			iPos = SciCall_PositionBefore(iPos);
 			ch = SciCall_GetCharAt(iPos);
-			if (ch < 0x80 && strchr("()[]{}<>", ch)) {
+			if (IsBraceMatchChar(ch)) {
 				iBrace2 = SciCall_BraceMatch(iPos, 0);
 			}
 		}
@@ -4215,6 +4241,15 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case IDM_VIEW_TRANSPARENT:
 		bTransparentMode = !bTransparentMode;
 		SetWindowTransparentMode(hwnd, bTransparentMode, iOpacityLevel);
+		break;
+
+	case IDM_VIEW_SCROLLPASTLASTLINE_NO:
+	case IDM_VIEW_SCROLLPASTLASTLINE_ONE:
+	case IDM_VIEW_SCROLLPASTLASTLINE_HALF:
+	case IDM_VIEW_SCROLLPASTLASTLINE_THIRD:
+	case IDM_VIEW_SCROLLPASTLASTLINE_QUARTER:
+		iEndAtLastLine = LOWORD(wParam) - IDM_VIEW_SCROLLPASTLASTLINE_ONE;
+		SciCall_SetEndAtLastLine(iEndAtLastLine);
 		break;
 
 	case IDM_SET_RENDER_TECH_GDI:
@@ -4910,7 +4945,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 				if (bMatchBraces) {
 					Sci_Position iPos = SciCall_GetCurrentPos();
 					int ch = SciCall_GetCharAt(iPos);
-					if (ch < 0x80 && strchr("()[]{}<>", ch)) {
+					if (IsBraceMatchChar(ch)) {
 						const Sci_Position iBrace2 = SciCall_BraceMatch(iPos, 0);
 						if (iBrace2 != -1) {
 							const Sci_Position col1 = SciCall_GetColumn(iPos);
@@ -4924,7 +4959,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 					} else { // Try one before
 						iPos = SciCall_PositionBefore(iPos);
 						ch = SciCall_GetCharAt(iPos);
-						if (ch < 0x80 && strchr("()[]{}<>", ch)) {
+						if (IsBraceMatchChar(ch)) {
 							const Sci_Position iBrace2 = SciCall_BraceMatch(iPos, 0);
 							if (iBrace2 != -1) {
 								const Sci_Position col1 = SciCall_GetColumn(iPos);
@@ -5259,14 +5294,30 @@ void LoadSettings(void) {
 
 	LPCWSTR strValue = IniSectionGetValue(pIniSection, L"OpenWithDir");
 	if (StrIsEmpty(strValue)) {
-		SHGetSpecialFolderPath(NULL, tchOpenWithDir, CSIDL_DESKTOPDIRECTORY, TRUE);
+#if _WIN32_WINNT < _WIN32_WINNT_VISTA
+		SHGetFolderPath(NULL, CSIDL_DESKTOPDIRECTORY, NULL, SHGFP_TYPE_CURRENT, tchOpenWithDir);
+#else
+		LPWSTR pszPath = NULL;
+		if (S_OK == SHGetKnownFolderPath(&FOLDERID_Desktop, KF_FLAG_DEFAULT, NULL, &pszPath)) {
+			lstrcpy(tchOpenWithDir, pszPath);
+			CoTaskMemFree(pszPath);
+		}
+#endif
 	} else {
 		PathAbsoluteFromApp(strValue, tchOpenWithDir, COUNTOF(tchOpenWithDir), TRUE);
 	}
 
 	strValue = IniSectionGetValue(pIniSection, L"Favorites");
 	if (StrIsEmpty(strValue)) {
+#if _WIN32_WINNT < _WIN32_WINNT_VISTA
 		SHGetFolderPath(NULL, CSIDL_PERSONAL, NULL, SHGFP_TYPE_CURRENT, tchFavoritesDir);
+#else
+		LPWSTR pszPath = NULL;
+		if (S_OK == SHGetKnownFolderPath(&FOLDERID_Documents, KF_FLAG_DEFAULT, NULL, &pszPath)) {
+			lstrcpy(tchFavoritesDir, pszPath);
+			CoTaskMemFree(pszPath);
+		}
+#endif
 	} else {
 		PathAbsoluteFromApp(strValue, tchFavoritesDir, COUNTOF(tchFavoritesDir), TRUE);
 	}
@@ -5436,6 +5487,8 @@ void LoadSettings(void) {
 	bMinimizeToTray = IniSectionGetBool(pIniSection, L"MinimizeToTray", 0);
 	bTransparentMode = IniSectionGetBool(pIniSection, L"TransparentMode", 0);
 	bFindReplaceTransparentMode = IniSectionGetBool(pIniSection, L"FindReplaceTransparentMode", 1);
+	iValue = IniSectionGetInt(pIniSection, L"EndAtLastLine", 1);
+	iEndAtLastLine = clamp_i(iValue, 0, 4);
 	bEditLayoutRTL = IniSectionGetBool(pIniSection, L"EditLayoutRTL", 0);
 	bWindowLayoutRTL = IniSectionGetBool(pIniSection, L"WindowLayoutRTL", 0);
 
@@ -5730,6 +5783,7 @@ void SaveSettings(BOOL bSaveSettingsNow) {
 	IniSectionSetBoolEx(pIniSection, L"MinimizeToTray", bMinimizeToTray, 0);
 	IniSectionSetBoolEx(pIniSection, L"TransparentMode", bTransparentMode, 0);
 	IniSectionSetBoolEx(pIniSection, L"FindReplaceTransparentMode", bFindReplaceTransparentMode, 1);
+	IniSectionSetIntEx(pIniSection, L"EndAtLastLine", iEndAtLastLine, 1);
 	IniSectionSetBoolEx(pIniSection, L"EditLayoutRTL", bEditLayoutRTL, 0);
 	IniSectionSetBoolEx(pIniSection, L"WindowLayoutRTL", bWindowLayoutRTL, 0);
 	IniSectionSetIntEx(pIniSection, L"RenderingTechnology", iRenderingTechnology, GetDefualtRenderingTechnology());
@@ -6994,15 +7048,15 @@ void ToggleFullScreenMode(void) {
 		const int y = mi.rcMonitor.top;
 		const int w = mi.rcMonitor.right - x;
 		const int h = mi.rcMonitor.bottom - y;
-		const int cx = GetSystemMetricsEx(SM_CXSIZEFRAME, g_uCurrentDPI);
-		const int cy = GetSystemMetricsEx(SM_CYSIZEFRAME, g_uCurrentDPI);
+		const int cx = SystemMetricsForDpi(SM_CXSIZEFRAME, g_uCurrentDPI);
+		const int cy = SystemMetricsForDpi(SM_CYSIZEFRAME, g_uCurrentDPI);
 
 		int top = cy;
 		if (iFullScreenMode & (FullScreenMode_HideCaption | FullScreenMode_HideMenu)) {
-			top += GetSystemMetricsEx(SM_CYCAPTION, g_uCurrentDPI);
+			top += SystemMetricsForDpi(SM_CYCAPTION, g_uCurrentDPI);
 		}
 		if (iFullScreenMode & FullScreenMode_HideMenu) {
-			top += GetSystemMetricsEx(SM_CYMENU, g_uCurrentDPI);
+			top += SystemMetricsForDpi(SM_CYMENU, g_uCurrentDPI);
 		}
 
 		SystemParametersInfo(SPI_SETWORKAREA, 0, NULL, SPIF_SENDCHANGE);
@@ -7335,7 +7389,7 @@ BOOL FileSave(BOOL bSaveAlways, BOOL bAsk, BOOL bSaveAs, BOOL bSaveCopy) {
 			GetString(IDS_UNTITLED, tch, COUNTOF(tch));
 		}
 
-		switch (MsgBoxInfo(MB_YESNOCANCEL, IDS_ASK_SAVE, tch)) {
+		switch (MsgBoxAsk(MB_YESNOCANCEL, IDS_ASK_SAVE, tch)) {
 		case IDCANCEL:
 			return FALSE;
 		case IDNO:
@@ -7681,7 +7735,7 @@ BOOL ActivatePrevInst(void) {
 			}
 
 			// Ask...
-			if (IDYES == MsgBoxInfo(MB_YESNO, IDS_ERR_PREVWINDISABLED)) {
+			if (IDYES == MsgBoxAsk(MB_YESNO, IDS_ERR_PREVWINDISABLED)) {
 				return FALSE;
 			}
 			return TRUE;
@@ -7775,7 +7829,7 @@ BOOL ActivatePrevInst(void) {
 		}
 
 		// Ask...
-		if (IDYES == MsgBoxInfo(MB_YESNO, IDS_ERR_PREVWINDISABLED)) {
+		if (IDYES == MsgBoxAsk(MB_YESNO, IDS_ERR_PREVWINDISABLED)) {
 			return FALSE;
 		}
 		return TRUE;

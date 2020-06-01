@@ -164,9 +164,10 @@ WCHAR	szDDETopic[256] = L"";
 
 HINSTANCE	g_hInstance;
 HANDLE		g_hDefaultHeap;
-#if _WIN32_WINNT < _WIN32_WINNT_WIN10
+#if _WIN32_WINNT < _WIN32_WINNT_VISTA
 DWORD		g_uWinVer;
 #endif
+UINT		g_uSystemDPI = USER_DEFAULT_SCREEN_DPI;
 WCHAR g_wchAppUserModelID[64] = L"";
 #if NP2_ENABLE_APP_LOCALIZATION_DLL
 static HMODULE hResDLL;
@@ -188,24 +189,6 @@ int			flagNoFadeHidden	= 0;
 static int	iOpacityLevel		= 75;
 static int	flagToolbarLook		= 0;
 static int	flagPosParam		= 0;
-
-#if !NP2_TARGET_ARM64
-typedef UINT (WINAPI *GetDpiForSystemSig)(void);
-static GetDpiForSystemSig pfnGetDpiForSystem = NULL;
-
-UINT GetSystemDPI(void) {
-	UINT dpi;
-	if (pfnGetDpiForSystem) {
-		dpi = pfnGetDpiForSystem();
-	} else {
-		HDC hDC = GetDC(NULL);
-		dpi = GetDeviceCaps(hDC, LOGPIXELSY);
-		ReleaseDC(NULL, hDC);
-
-	}
-	return dpi;
-}
-#endif
 
 static inline BOOL HasFilter(void) {
 	return !StrEqual(tchFilter, L"*.*") || bNegFilter;
@@ -253,7 +236,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 
 	// Set global variable g_hInstance
 	g_hInstance = hInstance;
-#if _WIN32_WINNT < _WIN32_WINNT_WIN10
+#if _WIN32_WINNT < _WIN32_WINNT_VISTA
 	// Set the Windows version global variable
 	NP2_COMPILER_WARNING_PUSH
 	NP2_IGNORE_WARNING_DEPRECATED_DECLARATIONS
@@ -296,8 +279,20 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 	}
 #endif
 
-#if !NP2_TARGET_ARM64
-	pfnGetDpiForSystem = (GetDpiForSystemSig)DLLFunction(L"user32.dll", "GetDpiForSystem");
+// since Windows 10, version 1607
+#if defined(__aarch64__) || defined(_ARM64_) || defined(_M_ARM64)
+// 1709 was the first version for Windows 10 on ARM64.
+	g_uSystemDPI = GetDpiForSystem();
+#else
+	typedef UINT (WINAPI *GetDpiForSystemSig)(void);
+	GetDpiForSystemSig pfnGetDpiForSystem = DLLFunctionEx(GetDpiForSystemSig, L"user32.dll", "GetDpiForSystem");
+	if (pfnGetDpiForSystem) {
+		g_uSystemDPI = pfnGetDpiForSystem();
+	} else {
+		HDC hDC = GetDC(NULL);
+		g_uSystemDPI = GetDeviceCaps(hDC, LOGPIXELSY);
+		ReleaseDC(NULL, hDC);
+	}
 #endif
 
 	// Load Settings
@@ -1862,7 +1857,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 				//SetFocus(hwndDirList);
 				if (PathGetLnkPath(dli.szFileName, szFullPath, COUNTOF(szFullPath))) {
-					if (PathFileExists(szFullPath)) {
+					if (GetFileAttributes(szFullPath) != INVALID_FILE_ATTRIBUTES) {
 						WCHAR szDir[MAX_PATH];
 						WCHAR *p;
 						lstrcpy(szDir, szFullPath);
@@ -2455,9 +2450,32 @@ void LoadSettings(void) {
 
 	IniSectionGetString(pIniSection, L"MRUDirectory", L"", szMRUDirectory, COUNTOF(szMRUDirectory));
 
-	LPCWSTR strValue = IniSectionGetValue(pIniSection, L"Favorites");
+	LPCWSTR strValue = IniSectionGetValue(pIniSection, L"OpenWithDir");
 	if (StrIsEmpty(strValue)) {
+#if _WIN32_WINNT < _WIN32_WINNT_VISTA
+		SHGetFolderPath(NULL, CSIDL_DESKTOPDIRECTORY, NULL, SHGFP_TYPE_CURRENT, tchOpenWithDir);
+#else
+		LPWSTR pszPath = NULL;
+		if (S_OK == SHGetKnownFolderPath(&FOLDERID_Desktop, KF_FLAG_DEFAULT, NULL, &pszPath)) {
+			lstrcpy(tchOpenWithDir, pszPath);
+			CoTaskMemFree(pszPath);
+		}
+#endif
+	} else {
+		PathAbsoluteFromApp(strValue, tchOpenWithDir, COUNTOF(tchOpenWithDir), TRUE);
+	}
+
+	strValue = IniSectionGetValue(pIniSection, L"Favorites");
+	if (StrIsEmpty(strValue)) {
+#if _WIN32_WINNT < _WIN32_WINNT_VISTA
 		SHGetFolderPath(NULL, CSIDL_PERSONAL, NULL, SHGFP_TYPE_CURRENT, tchFavoritesDir);
+#else
+		LPWSTR pszPath = NULL;
+		if (S_OK == SHGetKnownFolderPath(&FOLDERID_Documents, KF_FLAG_DEFAULT, NULL, &pszPath)) {
+			lstrcpy(tchFavoritesDir, pszPath);
+			CoTaskMemFree(pszPath);
+		}
+#endif
 	} else {
 		PathAbsoluteFromApp(strValue, tchFavoritesDir, COUNTOF(tchFavoritesDir), TRUE);
 	}
@@ -2474,13 +2492,6 @@ void LoadSettings(void) {
 	bHasQuickview = PathIsFile(szQuickview);
 	IniSectionGetString(pIniSection, L"QuikviewParams", L"",
 						szQuickviewParams, COUNTOF(szQuickviewParams));
-
-	strValue = IniSectionGetValue(pIniSection, L"OpenWithDir");
-	if (StrIsEmpty(strValue)) {
-		SHGetSpecialFolderPath(NULL, tchOpenWithDir, CSIDL_DESKTOPDIRECTORY, TRUE);
-	} else {
-		PathAbsoluteFromApp(strValue, tchOpenWithDir, COUNTOF(tchOpenWithDir), TRUE);
-	}
 
 	dwFillMask = IniSectionGetInt(pIniSection, L"FillMask", DL_ALLOBJECTS);
 	if (dwFillMask & ~DL_ALLOBJECTS) {

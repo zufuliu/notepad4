@@ -293,7 +293,7 @@ LSTATUS Registry_SetString(HKEY hKey, LPCWSTR valueName, LPCWSTR lpszText) {
 #if _WIN32_WINNT < _WIN32_WINNT_VISTA
 LSTATUS Registry_DeleteTree(HKEY hKey, LPCWSTR lpSubKey) {
 	typedef LSTATUS (WINAPI *RegDeleteTreeSig)(HKEY hKey, LPCWSTR lpSubKey);
-	RegDeleteTreeSig pfnRegDeleteTree = (RegDeleteTreeSig)DLLFunction(L"advapi32.dll", "RegDeleteTreeW");
+	RegDeleteTreeSig pfnRegDeleteTree = DLLFunctionEx(RegDeleteTreeSig, L"advapi32.dll", "RegDeleteTreeW");
 
 	LSTATUS status;
 	if (pfnRegDeleteTree != NULL) {
@@ -462,7 +462,7 @@ HRESULT PrivateSetCurrentProcessExplicitAppUserModelID(PCWSTR AppID) {
 #else
 	typedef HRESULT (WINAPI *SetCurrentProcessExplicitAppUserModelIDSig)(PCWSTR AppID);
 	SetCurrentProcessExplicitAppUserModelIDSig pfnSetCurrentProcessExplicitAppUserModelID =
-		(SetCurrentProcessExplicitAppUserModelIDSig)DLLFunction(L"shell32.dll", "SetCurrentProcessExplicitAppUserModelID");
+		DLLFunctionEx(SetCurrentProcessExplicitAppUserModelIDSig, L"shell32.dll", "SetCurrentProcessExplicitAppUserModelID");
 	if (pfnSetCurrentProcessExplicitAppUserModelID) {
 		return pfnSetCurrentProcessExplicitAppUserModelID(AppID);
 	}
@@ -873,8 +873,14 @@ void SetDlgPos(HWND hDlg, int xDlg, int yDlg) {
 // Resize Dialog Helpers()
 //
 #define RESIZEDLG_PROP_KEY	L"ResizeDlg"
+#define MAX_RESIZEDLG_ATTR_COUNT	2
+// temporary fix for moving dialog to monitor with different DPI
+// TODO: all dimensions no longer valid after window DPI changed.
+#define NP2_ENABLE_RESIZEDLG_TEMP_FIX	0
+
 typedef struct RESIZEDLG {
 	int direction;
+	UINT dpi;
 	int cxClient;
 	int cyClient;
 	int mmiPtMinX;
@@ -887,10 +893,10 @@ typedef struct RESIZEDLG {
 typedef const RESIZEDLG * LPCRESIZEDLG;
 
 void ResizeDlg_InitEx(HWND hwnd, int cxFrame, int cyFrame, int nIdGrip, int iDirection) {
+	const UINT dpi = GetWindowDPI(hwnd);
 	RESIZEDLG *pm = (RESIZEDLG *)NP2HeapAlloc(sizeof(RESIZEDLG));
 	pm->direction = iDirection;
-
-	const UINT dpi = GetWindowDPI(hwnd);
+	pm->dpi = dpi;
 
 	RECT rc;
 	GetClientRect(hwnd, &rc);
@@ -898,7 +904,7 @@ void ResizeDlg_InitEx(HWND hwnd, int cxFrame, int cyFrame, int nIdGrip, int iDir
 	pm->cyClient = rc.bottom - rc.top;
 
 	const DWORD style = GetWindowStyle(hwnd) | WS_THICKFRAME;
-	AdjustWindowRectEx(&rc, style, FALSE, 0);
+	DpiAdjustWindowRect(&rc, style, 0, dpi);
 	pm->mmiPtMinX = rc.right - rc.left;
 	pm->mmiPtMinY = rc.bottom - rc.top;
 	// only one direction
@@ -929,7 +935,7 @@ void ResizeDlg_InitEx(HWND hwnd, int cxFrame, int cyFrame, int nIdGrip, int iDir
 
 	HWND hwndCtl = GetDlgItem(hwnd, nIdGrip);
 	SetWindowStyle(hwndCtl, GetWindowStyle(hwndCtl) | SBS_SIZEGRIP | WS_CLIPSIBLINGS);
-	const int cGrip = GetSystemMetricsEx(SM_CXHTHUMB, dpi);
+	const int cGrip = SystemMetricsForDpi(SM_CXHTHUMB, dpi);
 	SetWindowPos(hwndCtl, NULL, pm->cxClient - cGrip, pm->cyClient - cGrip, cGrip, cGrip, SWP_NOZORDER);
 }
 
@@ -953,6 +959,19 @@ void ResizeDlg_Size(HWND hwnd, LPARAM lParam, int *cx, int *cy) {
 	PRESIZEDLG pm = (PRESIZEDLG)GetProp(hwnd, RESIZEDLG_PROP_KEY);
 	const int cxClient = LOWORD(lParam);
 	const int cyClient = HIWORD(lParam);
+#if NP2_ENABLE_RESIZEDLG_TEMP_FIX
+	const UINT dpi = GetWindowDPI(hwnd);
+	const UINT old = pm->dpi;
+	if (cx) {
+		*cx = cxClient - MulDiv(pm->cxClient, dpi, old);
+	}
+	if (cy) {
+		*cy = cyClient - MulDiv(pm->cyClient, dpi, old);
+	}
+	// store in original DPI.
+	pm->cxClient = MulDiv(cxClient, old, dpi);
+	pm->cyClient = MulDiv(cyClient, old, dpi);
+#else
 	if (cx) {
 		*cx = cxClient - pm->cxClient;
 	}
@@ -961,12 +980,30 @@ void ResizeDlg_Size(HWND hwnd, LPARAM lParam, int *cx, int *cy) {
 	}
 	pm->cxClient = cxClient;
 	pm->cyClient = cyClient;
+#endif
 }
 
 void ResizeDlg_GetMinMaxInfo(HWND hwnd, LPARAM lParam) {
 	LPCRESIZEDLG pm = (LPCRESIZEDLG)GetProp(hwnd, RESIZEDLG_PROP_KEY);
-
 	LPMINMAXINFO lpmmi = (LPMINMAXINFO)lParam;
+#if NP2_ENABLE_RESIZEDLG_TEMP_FIX
+	const UINT dpi = GetWindowDPI(hwnd);
+	const UINT old = pm->dpi;
+
+	lpmmi->ptMinTrackSize.x = MulDiv(pm->mmiPtMinX, dpi, old);
+	lpmmi->ptMinTrackSize.y = MulDiv(pm->mmiPtMinY, dpi, old);
+
+	// only one direction
+	switch (pm->direction) {
+	case ResizeDlgDirection_OnlyX:
+		lpmmi->ptMaxTrackSize.y = MulDiv(pm->mmiPtMaxY, dpi, old);
+		break;
+
+	case ResizeDlgDirection_OnlyY:
+		lpmmi->ptMaxTrackSize.x = MulDiv(pm->mmiPtMaxX, dpi, old);
+		break;
+	}
+#else
 	lpmmi->ptMinTrackSize.x = pm->mmiPtMinX;
 	lpmmi->ptMinTrackSize.y = pm->mmiPtMinY;
 
@@ -980,22 +1017,7 @@ void ResizeDlg_GetMinMaxInfo(HWND hwnd, LPARAM lParam) {
 		lpmmi->ptMaxTrackSize.x = pm->mmiPtMaxX;
 		break;
 	}
-}
-
-void ResizeDlg_SetAttr(HWND hwnd, int index, int value) {
-	if (index < MAX_RESIZEDLG_ATTR_COUNT) {
-		PRESIZEDLG pm = (PRESIZEDLG)GetProp(hwnd, RESIZEDLG_PROP_KEY);
-		pm->attrs[index] = value;
-	}
-}
-
-int ResizeDlg_GetAttr(HWND hwnd, int index) {
-	if (index < MAX_RESIZEDLG_ATTR_COUNT) {
-		const LPCRESIZEDLG pm = (LPCRESIZEDLG)GetProp(hwnd, RESIZEDLG_PROP_KEY);
-		return pm->attrs[index];
-	}
-
-	return 0;
+#endif
 }
 
 static inline int GetDlgCtlHeight(HWND hwndDlg, int nCtlId) {
@@ -1023,8 +1045,14 @@ int ResizeDlg_CalcDeltaY2(HWND hwnd, int dy, int cy, int nCtlId1, int nCtlId2) {
 	}
 
 	const LPCRESIZEDLG pm = (LPCRESIZEDLG)GetProp(hwnd, RESIZEDLG_PROP_KEY);
+#if NP2_ENABLE_RESIZEDLG_TEMP_FIX
+	const UINT dpi = GetWindowDPI(hwnd);
+	const int hMin1 = MulDiv(pm->attrs[0], dpi, pm->dpi);
+	const int hMin2 = MulDiv(pm->attrs[1], dpi, pm->dpi);
+#else
 	const int hMin1 = pm->attrs[0];
 	const int hMin2 = pm->attrs[1];
+#endif
 	const int h1 = GetDlgCtlHeight(hwnd, nCtlId1);
 	const int h2 = GetDlgCtlHeight(hwnd, nCtlId2);
 	// cy + h1 >= hMin1			cy >= hMin1 - h1
@@ -1401,7 +1429,18 @@ void PathRelativeToApp(LPCWSTR lpszSrc, LPWSTR lpszDest, int cchDest,
 	GetModuleFileName(NULL, wchAppPath, COUNTOF(wchAppPath));
 	PathRemoveFileSpec(wchAppPath);
 	GetWindowsDirectory(wchWinDir, COUNTOF(wchWinDir));
-	SHGetFolderPath(NULL, CSIDL_PERSONAL, NULL, SHGFP_TYPE_CURRENT, wchUserFiles);
+#if _WIN32_WINNT < _WIN32_WINNT_VISTA
+	if (S_OK != SHGetFolderPath(NULL, CSIDL_PERSONAL, NULL, SHGFP_TYPE_CURRENT, wchUserFiles)) {
+		return;
+	}
+#else
+	LPWSTR pszPath = NULL;
+	if (S_OK != SHGetKnownFolderPath(&FOLDERID_Documents, KF_FLAG_DEFAULT, NULL, &pszPath)) {
+		return;
+	}
+	lstrcpy(wchUserFiles, pszPath);
+	CoTaskMemFree(pszPath);
+#endif
 
 	if (bUnexpandMyDocs &&
 			!PathIsRelative(lpszSrc) &&
@@ -1439,7 +1478,18 @@ void PathAbsoluteFromApp(LPCWSTR lpszSrc, LPWSTR lpszDest, int cchDest, BOOL bEx
 	WCHAR wchPath[MAX_PATH];
 
 	if (StrHasPrefix(lpszSrc, L"%CSIDL:MYDOCUMENTS%")) {
-		SHGetFolderPath(NULL, CSIDL_PERSONAL, NULL, SHGFP_TYPE_CURRENT, wchPath);
+#if _WIN32_WINNT < _WIN32_WINNT_VISTA
+		if (S_OK != SHGetFolderPath(NULL, CSIDL_PERSONAL, NULL, SHGFP_TYPE_CURRENT, wchPath)) {
+			return;
+		}
+#else
+		LPWSTR pszPath = NULL;
+		if (S_OK != SHGetKnownFolderPath(&FOLDERID_Documents, KF_FLAG_DEFAULT, NULL, &pszPath)) {
+			return;
+		}
+		lstrcpy(wchPath, pszPath);
+		CoTaskMemFree(pszPath);
+#endif
 		PathAppend(wchPath, lpszSrc + CSTRLEN("%CSIDL:MYDOCUMENTS%"));
 	} else {
 		lstrcpyn(wchPath, lpszSrc, COUNTOF(wchPath));
@@ -1529,7 +1579,7 @@ BOOL PathGetLnkPath(LPCWSTR pszLnkFile, LPWSTR pszResPath, int cchResPath) {
 
 			if (SUCCEEDED(ppf->Load(wsz, STGM_READ))) {
 				WIN32_FIND_DATA fd;
-				if (NOERROR == psl->GetPath(pszResPath, cchResPath, &fd, 0)) {
+				if (S_OK == psl->GetPath(pszResPath, cchResPath, &fd, 0)) {
 					// This additional check seems reasonable
 					bSucceeded = StrNotEmpty(pszResPath);
 				}
@@ -1548,7 +1598,7 @@ BOOL PathGetLnkPath(LPCWSTR pszLnkFile, LPWSTR pszResPath, int cchResPath) {
 
 			if (SUCCEEDED(ppf->lpVtbl->Load(ppf, wsz, STGM_READ))) {
 				WIN32_FIND_DATA fd;
-				if (NOERROR == psl->lpVtbl->GetPath(psl, pszResPath, cchResPath, &fd, 0)) {
+				if (S_OK == psl->lpVtbl->GetPath(psl, pszResPath, cchResPath, &fd, 0)) {
 					// This additional check seems reasonable
 					bSucceeded = StrNotEmpty(pszResPath);
 				}
@@ -1616,18 +1666,36 @@ BOOL PathCreateDeskLnk(LPCWSTR pszDocument) {
 	lstrcpy(tchArguments, L"-n ");
 	lstrcat(tchArguments, tchDocTemp);
 
+#if _WIN32_WINNT < _WIN32_WINNT_VISTA
 	WCHAR tchLinkDir[MAX_PATH];
-	SHGetSpecialFolderPath(NULL, tchLinkDir, CSIDL_DESKTOPDIRECTORY, TRUE);
+	if (S_OK != SHGetFolderPath(NULL, CSIDL_DESKTOPDIRECTORY, NULL, SHGFP_TYPE_CURRENT, tchLinkDir)) {
+		return FALSE;
+	}
+#else
+	LPWSTR tchLinkDir = NULL;
+	if (S_OK != SHGetKnownFolderPath(&FOLDERID_Desktop, KF_FLAG_DEFAULT, NULL, &tchLinkDir)) {
+		return FALSE;
+	}
+#endif
 
 	WCHAR tchDescription[128];
+	// TODO: read custom menu text from registry, see System Integratio.
 	GetString(IDS_LINKDESCRIPTION, tchDescription, COUNTOF(tchDescription));
+	//StripMnemonic(tchDescription);
 
 	// Try to construct a valid filename...
 	BOOL fMustCopy;
 	WCHAR tchLnkFileName[MAX_PATH];
 	if (!SHGetNewLinkInfo(pszDocument, tchLinkDir, tchLnkFileName, &fMustCopy, SHGNLI_PREFIXNAME)) {
+#if _WIN32_WINNT >= _WIN32_WINNT_VISTA
+		CoTaskMemFree(tchLinkDir);
+#endif
 		return FALSE;
 	}
+
+#if _WIN32_WINNT >= _WIN32_WINNT_VISTA
+	CoTaskMemFree(tchLinkDir);
+#endif
 
 	IShellLink *psl;
 	BOOL bSucceeded = FALSE;
@@ -1770,7 +1838,7 @@ void OpenContainingFolder(HWND hwnd, LPCWSTR pszFile, BOOL bSelect) {
 		LPITEMIDLIST pidlEntry = path ? ILCreateFromPath(path) : NULL;
 		if (pidlEntry) {
 			hr = SHOpenFolderAndSelectItems(pidl, 1, (LPCITEMIDLIST *)(&pidlEntry), 0);
-			ILFree(pidlEntry);
+			CoTaskMemFree((LPVOID)pidlEntry);
 		} else if (!bSelect) {
 #if 0
 			// Use an invalid item to open the folder?
@@ -1794,7 +1862,7 @@ void OpenContainingFolder(HWND hwnd, LPCWSTR pszFile, BOOL bSelect) {
 			// open parent folder and select the folder
 			hr = SHOpenFolderAndSelectItems(pidl, 0, NULL, 0);
 		}
-		ILFree(pidl);
+		CoTaskMemFree((LPVOID)pidl);
 		if (hr == S_OK) {
 			return;
 		}
@@ -1969,6 +2037,37 @@ DWORD_PTR SHGetFileInfo2(LPCWSTR pszPath, DWORD dwFileAttributes, SHFILEINFO *ps
 		}
 		return dw;
 	}
+}
+
+void StripMnemonic(LPWSTR pszMenu) {
+	LPWSTR prev = pszMenu;
+	do {
+		LPWSTR p = StrChr(prev, L'&');
+		if (p == NULL) {
+			break;
+		}
+		if (p[1] == L'&') {
+			// double '&&' represents one literal '&'
+			prev = p + 2;
+		} else {
+			int len = lstrlen(p);
+			int offset = 1;
+			prev = p;
+			if (p > pszMenu && len > 2 && p[-1] == L'(' && p[2] == L')') {
+				// "String (&S)" => "String"
+				offset = 3;
+				prev = p - 1;
+				if (prev > pszMenu && prev[-1] == L' ') {
+					--prev;
+				}
+			}
+
+			len -= offset;
+			MoveMemory(prev, p + offset, sizeof(WCHAR) * len);
+			prev[len] = L'\0';
+			break;
+		}
+	} while (TRUE);
 }
 
 //=============================================================================
@@ -2329,7 +2428,7 @@ BOOL GetThemedDialogFont(LPWSTR lpFaceName, WORD *wSize) {
 #else
 
 	BOOL bSucceed = FALSE;
-	const UINT iLogPixelsY = GetSystemDPI();
+	const UINT iLogPixelsY = g_uSystemDPI;
 
 	if (IsAppThemed()) {
 		HTHEME hTheme = OpenThemeData(NULL, L"WINDOWSTYLE;WINDOW");

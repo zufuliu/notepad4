@@ -250,7 +250,7 @@ LSTATUS Registry_SetString(HKEY hKey, LPCWSTR valueName, LPCWSTR lpszText) {
 #if _WIN32_WINNT < _WIN32_WINNT_VISTA
 LSTATUS Registry_DeleteTree(HKEY hKey, LPCWSTR lpSubKey) {
 	typedef LSTATUS (WINAPI *RegDeleteTreeSig)(HKEY hKey, LPCWSTR lpSubKey);
-	RegDeleteTreeSig pfnRegDeleteTree = (RegDeleteTreeSig)DLLFunction(L"advapi32.dll", "RegDeleteTreeW");
+	RegDeleteTreeSig pfnRegDeleteTree = DLLFunctionEx(RegDeleteTreeSig, L"advapi32.dll", "RegDeleteTreeW");
 
 	LSTATUS status;
 	if (pfnRegDeleteTree != NULL) {
@@ -348,7 +348,7 @@ HRESULT PrivateSetCurrentProcessExplicitAppUserModelID(PCWSTR AppID) {
 #else
 	typedef HRESULT (WINAPI *SetCurrentProcessExplicitAppUserModelIDSig)(PCWSTR AppID);
 	SetCurrentProcessExplicitAppUserModelIDSig pfnSetCurrentProcessExplicitAppUserModelID =
-		(SetCurrentProcessExplicitAppUserModelIDSig)DLLFunction(L"shell32.dll", "SetCurrentProcessExplicitAppUserModelID");
+		DLLFunctionEx(SetCurrentProcessExplicitAppUserModelIDSig, L"shell32.dll", "SetCurrentProcessExplicitAppUserModelID");
 	if (pfnSetCurrentProcessExplicitAppUserModelID) {
 		return pfnSetCurrentProcessExplicitAppUserModelID(AppID);
 	}
@@ -963,7 +963,18 @@ void PathRelativeToApp(LPCWSTR lpszSrc, LPWSTR lpszDest, int cchDest, BOOL bSrcI
 	GetModuleFileName(NULL, wchAppPath, COUNTOF(wchAppPath));
 	PathRemoveFileSpec(wchAppPath);
 	GetWindowsDirectory(wchWinDir, COUNTOF(wchWinDir));
-	SHGetFolderPath(NULL, CSIDL_PERSONAL, NULL, SHGFP_TYPE_CURRENT, wchUserFiles);
+#if _WIN32_WINNT < _WIN32_WINNT_VISTA
+	if (S_OK != SHGetFolderPath(NULL, CSIDL_PERSONAL, NULL, SHGFP_TYPE_CURRENT, wchUserFiles)) {
+		return;
+	}
+#else
+	LPWSTR pszPath = NULL;
+	if (S_OK != SHGetKnownFolderPath(&FOLDERID_Documents, KF_FLAG_DEFAULT, NULL, &pszPath)) {
+		return;
+	}
+	lstrcpy(wchUserFiles, pszPath);
+	CoTaskMemFree(pszPath);
+#endif
 
 	if (bUnexpandMyDocs &&
 			!PathIsRelative(lpszSrc) &&
@@ -1001,7 +1012,18 @@ void PathAbsoluteFromApp(LPCWSTR lpszSrc, LPWSTR lpszDest, int cchDest, BOOL bEx
 	WCHAR wchPath[MAX_PATH];
 
 	if (StrHasPrefix(lpszSrc, L"%CSIDL:MYDOCUMENTS%")) {
-		SHGetFolderPath(NULL, CSIDL_PERSONAL, NULL, SHGFP_TYPE_CURRENT, wchPath);
+#if _WIN32_WINNT < _WIN32_WINNT_VISTA
+		if (S_OK != SHGetFolderPath(NULL, CSIDL_PERSONAL, NULL, SHGFP_TYPE_CURRENT, wchPath)) {
+			return;
+		}
+#else
+		LPWSTR pszPath = NULL;
+		if (S_OK != SHGetKnownFolderPath(&FOLDERID_Documents, KF_FLAG_DEFAULT, NULL, &pszPath)) {
+			return;
+		}
+		lstrcpy(wchPath, pszPath);
+		CoTaskMemFree(pszPath);
+#endif
 		PathAppend(wchPath, lpszSrc + CSTRLEN("%CSIDL:MYDOCUMENTS%"));
 	} else {
 		lstrcpyn(wchPath, lpszSrc, COUNTOF(wchPath));
@@ -1095,7 +1117,7 @@ BOOL PathGetLnkPath(LPCWSTR pszLnkFile, LPWSTR pszResPath, int cchResPath) {
 
 			if (SUCCEEDED(ppf->Load(wsz, STGM_READ))) {
 				WIN32_FIND_DATA fd;
-				if (NOERROR == psl->GetPath(pszResPath, cchResPath, &fd, 0)) {
+				if (S_OK == psl->GetPath(pszResPath, cchResPath, &fd, 0)) {
 					// This additional check seems reasonable
 					bSucceeded = StrNotEmpty(pszResPath);
 				}
@@ -1114,7 +1136,7 @@ BOOL PathGetLnkPath(LPCWSTR pszLnkFile, LPWSTR pszResPath, int cchResPath) {
 
 			if (SUCCEEDED(ppf->lpVtbl->Load(ppf, wsz, STGM_READ))) {
 				WIN32_FIND_DATA fd;
-				if (NOERROR == psl->lpVtbl->GetPath(psl, pszResPath, cchResPath, &fd, 0)) {
+				if (S_OK == psl->lpVtbl->GetPath(psl, pszResPath, cchResPath, &fd, 0)) {
 					// This additional check seems reasonable
 					bSucceeded = StrNotEmpty(pszResPath);
 				}
@@ -1187,7 +1209,7 @@ BOOL PathCreateLnk(LPCWSTR pszLnkDir, LPCWSTR pszPath) {
 			WCHAR wsz[MAX_PATH];
 			lstrcpy(wsz, tchLnkFileName);
 
-			if (NOERROR == psl->SetPath(pszPath) && SUCCEEDED(ppf->Save(wsz, TRUE))) {
+			if (S_OK == psl->SetPath(pszPath) && SUCCEEDED(ppf->Save(wsz, TRUE))) {
 				bSucceeded = TRUE;
 			}
 
@@ -1203,7 +1225,7 @@ BOOL PathCreateLnk(LPCWSTR pszLnkDir, LPCWSTR pszPath) {
 			WCHAR wsz[MAX_PATH];
 			lstrcpy(wsz, tchLnkFileName);
 
-			if (NOERROR == psl->lpVtbl->SetPath(psl, pszPath) && SUCCEEDED(ppf->lpVtbl->Save(ppf, wsz, TRUE))) {
+			if (S_OK == psl->lpVtbl->SetPath(psl, pszPath) && SUCCEEDED(ppf->lpVtbl->Save(ppf, wsz, TRUE))) {
 				bSucceeded = TRUE;
 			}
 
@@ -1245,7 +1267,7 @@ void OpenContainingFolder(HWND hwnd, LPCWSTR pszFile, BOOL bSelect) {
 		LPITEMIDLIST pidlEntry = path ? ILCreateFromPath(path) : NULL;
 		if (pidlEntry) {
 			hr = SHOpenFolderAndSelectItems(pidl, 1, (LPCITEMIDLIST *)(&pidlEntry), 0);
-			ILFree(pidlEntry);
+			CoTaskMemFree((LPVOID)pidlEntry);
 		} else if (!bSelect) {
 #if 0
 			// Use an invalid item to open the folder?
@@ -1269,7 +1291,7 @@ void OpenContainingFolder(HWND hwnd, LPCWSTR pszFile, BOOL bSelect) {
 			// open parent folder and select the folder
 			hr = SHOpenFolderAndSelectItems(pidl, 0, NULL, 0);
 		}
-		ILFree(pidl);
+		CoTaskMemFree((LPVOID)pidl);
 		if (hr == S_OK) {
 			return;
 		}
@@ -1508,7 +1530,12 @@ void FormatNumberStr(LPWSTR lpNumberStr) {
 void GetDefaultFavoritesDir(LPWSTR lpFavDir, int cchFavDir) {
 	LPITEMIDLIST pidl;
 
-	if (NOERROR == SHGetSpecialFolderLocation(NULL, CSIDL_PERSONAL, &pidl)) {
+#if _WIN32_WINNT < _WIN32_WINNT_VISTA
+	if (S_OK == SHGetFolderLocation(NULL, CSIDL_PERSONAL, NULL, SHGFP_TYPE_DEFAULT, &pidl))
+#else
+	if (S_OK == SHGetKnownFolderIDList(&FOLDERID_Documents, KF_FLAG_DEFAULT, NULL, &pidl))
+#endif
+	{
 		SHGetPathFromIDList(pidl, lpFavDir);
 		CoTaskMemFree((LPVOID)pidl);
 	} else {
@@ -1523,7 +1550,12 @@ void GetDefaultFavoritesDir(LPWSTR lpFavDir, int cchFavDir) {
 void GetDefaultOpenWithDir(LPWSTR lpOpenWithDir, int cchOpenWithDir) {
 	LPITEMIDLIST pidl;
 
-	if (NOERROR == SHGetSpecialFolderLocation(NULL, CSIDL_DESKTOPDIRECTORY, &pidl)) {
+#if _WIN32_WINNT < _WIN32_WINNT_VISTA
+	if (S_OK == SHGetFolderLocation(NULL, CSIDL_DESKTOPDIRECTORY, NULL, SHGFP_TYPE_DEFAULT, &pidl))
+#else
+	if (S_OK == SHGetKnownFolderIDList(&FOLDERID_Desktop, KF_FLAG_DEFAULT, NULL, &pidl))
+#endif
+	{
 		SHGetPathFromIDList(pidl, lpOpenWithDir);
 		CoTaskMemFree((LPVOID)pidl);
 	} else {
@@ -1946,7 +1978,7 @@ BOOL GetThemedDialogFont(LPWSTR lpFaceName, WORD *wSize) {
 #else
 
 	BOOL bSucceed = FALSE;
-	const UINT iLogPixelsY = GetSystemDPI();
+	const UINT iLogPixelsY = g_uSystemDPI;
 
 	if (IsAppThemed()) {
 		HTHEME hTheme = OpenThemeData(NULL, L"WINDOWSTYLE;WINDOW");

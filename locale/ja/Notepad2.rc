@@ -584,6 +584,14 @@ BEGIN
 			MENUITEM "ステータスバーを表示(&U)\tShift+F11",	IDM_VIEW_STATUSBAR
 			MENUITEM SEPARATOR
 			MENUITEM "ウィンドウ透化(&M)\tCtrl+0",	IDM_VIEW_TRANSPARENT
+			POPUP "Scroll &Past Last Line"
+			BEGIN
+				MENUITEM "&No",						IDM_VIEW_SCROLLPASTLASTLINE_NO
+				MENUITEM "&One Page",				IDM_VIEW_SCROLLPASTLASTLINE_ONE
+				MENUITEM "&Half Page",				IDM_VIEW_SCROLLPASTLASTLINE_HALF
+				MENUITEM "1/&3 Page",				IDM_VIEW_SCROLLPASTLASTLINE_THIRD
+				MENUITEM "1/&4 Page",				IDM_VIEW_SCROLLPASTLASTLINE_QUARTER
+			END
 #if NP2_ENABLE_APP_LOCALIZATION_DLL
 			MENUITEM SEPARATOR
 			POPUP "言語(&L)"
@@ -1776,7 +1784,7 @@ BEGIN
     IDS_SAVEFILE            "保存中 ""%s"" ..."
     IDS_PRINTFILE           "%s ページを印刷中..."
     IDS_SAVINGSETTINGS     "設定保存中..."
-    IDS_LINKDESCRIPTION     "Notepad2 で編集"
+    IDS_LINKDESCRIPTION     "Notepad&2 で編集"
     IDS_FILTER_ALL          "すべてのファイル (*.*)|*.*|"
     IDS_FILTER_EXE          "実行可能ファイル (*.exe;*.com;*.bat;*.cmd;*.lnk;*.pif)|*.exe;*.com;*.bat;*.cmd;*.lnk;*.pif|すべてのファイル (*.*)|*.*|"
 END

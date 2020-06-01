@@ -500,7 +500,7 @@ NP2_inline void SciCall_SetScrollWidthTracking(BOOL tracking) {
 	SciCall(SCI_SETSCROLLWIDTHTRACKING, tracking, 0);
 }
 
-NP2_inline void SciCall_SetEndAtLastLine(BOOL endAtLastLine) {
+NP2_inline void SciCall_SetEndAtLastLine(int endAtLastLine) {
 	SciCall(SCI_SETENDATLASTLINE, endAtLastLine, 0);
 }
 

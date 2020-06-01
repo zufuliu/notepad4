@@ -76,7 +76,7 @@ int ParseCommaList(LPCWSTR str, int result[], int count);
 
 extern HINSTANCE g_hInstance;
 extern HANDLE g_hDefaultHeap;
-#if _WIN32_WINNT < _WIN32_WINNT_WIN10
+#if _WIN32_WINNT < _WIN32_WINNT_VISTA
 extern DWORD g_uWinVer;
 #endif
 
@@ -113,21 +113,33 @@ extern DWORD g_uWinVer;
 #define LOAD_LIBRARY_AS_IMAGE_RESOURCE	0x00000020
 #endif
 
-#define DLLFunction(dllName, funcName)	GetProcAddress(GetModuleHandleW(dllName), (funcName))
+#if defined(__GNUC__) && __GNUC__ >= 8
+// GCC statement expression
+#define DLLFunction(funcSig, hModule, funcName) __extension__({			\
+	_Pragma("GCC diagnostic push")										\
+	_Pragma("GCC diagnostic ignored \"-Wcast-function-type\"")			\
+	funcSig PP_CONCAT(temp, __LINE__) = (funcSig)GetProcAddress((hModule), (funcName));\
+	_Pragma("GCC diagnostic pop")										\
+	PP_CONCAT(temp, __LINE__);											\
+	})
+#define DLLFunctionEx(funcSig, dllName, funcName) __extension__({		\
+	_Pragma("GCC diagnostic push")										\
+	_Pragma("GCC diagnostic ignored \"-Wcast-function-type\"")			\
+	funcSig PP_CONCAT(temp, __LINE__) = (funcSig)GetProcAddress(GetModuleHandleW(dllName), (funcName));\
+	_Pragma("GCC diagnostic pop")										\
+	PP_CONCAT(temp, __LINE__);											\
+	})
+#else
+#define DLLFunction(funcSig, hModule, funcName)		(funcSig)GetProcAddress((hModule), (funcName))
+#define DLLFunctionEx(funcSig, dllName, funcName)	(funcSig)GetProcAddress(GetModuleHandleW(dllName), (funcName))
+#endif
 
 #ifndef USER_DEFAULT_SCREEN_DPI
 #define USER_DEFAULT_SCREEN_DPI		96		// _WIN32_WINNT >= _WIN32_WINNT_VISTA
 #endif
 
-// since Windows 10, version 1607
-#if defined(__aarch64__) || defined(_ARM64_) || defined(_M_ARM64)
-// 1709 was the first version for Windows 10 on ARM64.
-#define NP2_TARGET_ARM64	1
-#define GetSystemDPI()						GetDpiForSystem()
-#else
-#define NP2_TARGET_ARM64	0
-extern UINT GetSystemDPI(void);
-#endif
+// system DPI, same for all monitor.
+extern UINT g_uSystemDPI;
 
 // https://docs.microsoft.com/en-us/windows/desktop/Memory/comparing-memory-allocation-methods
 // https://blogs.msdn.microsoft.com/oldnewthing/20120316-00/?p=8083/
@@ -406,10 +418,17 @@ NP2_inline BOOL IsChineseTraditionalSubLang(LANGID subLang) {
  * https://gcc.gnu.org/onlinedocs/cpp/Variadic-Macros.html
  * https://docs.microsoft.com/en-us/cpp/preprocessor/variadic-macros?view=vs-2017
  */
+#if defined(__GNUC__) || defined(__clang__)
+#define FormatString(lpOutput, lpFormat, uIdFormat, ...) do {	\
+		GetString((uIdFormat), (lpFormat), COUNTOF(lpFormat));	\
+		wsprintf((lpOutput), (lpFormat), ##__VA_ARGS__);		\
+	} while (0)
+#else
 #define FormatString(lpOutput, lpFormat, uIdFormat, ...) do {	\
 		GetString((uIdFormat), (lpFormat), COUNTOF(lpFormat));	\
 		wsprintf((lpOutput), (lpFormat), __VA_ARGS__);			\
 	} while (0)
+#endif
 
 NP2_inline BOOL PathIsFile(LPCWSTR pszPath) {
 	// note: INVALID_FILE_ATTRIBUTES is -1.
