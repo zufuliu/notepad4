@@ -363,10 +363,10 @@ Sci::Line Editor::MaxScrollPos() const noexcept {
 		retVal -= linesOnScreen/2;
 		break;
 	case 3:
-		retVal -= 2*linesOnScreen/3;
+		retVal -= linesOnScreen - linesOnScreen/3;
 		break;
 	case 4:
-		retVal -= 3*linesOnScreen/4;
+		retVal -= linesOnScreen - linesOnScreen/4;
 		break;
 	}
 	return (retVal < 0) ? 0 : retVal;
