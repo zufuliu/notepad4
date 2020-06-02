@@ -14,11 +14,11 @@
 #define NP2_ENABLE_DOT_LOG_FEATURE				0
 
 //! Enable localization with satellite resource DLLs.
-#define NP2_ENABLE_APP_LOCALIZATION_DLL			0
+#define NP2_ENABLE_APP_LOCALIZATION_DLL			1
 //! Enable test localization dialog layout with default UI font for target locale.
 #define NP2_ENABLE_TEST_LOCALIZATION_LAYOUT		0
 
 //! Enable localization for scheme/lexer names.
-#define NP2_ENABLE_LOCALIZE_LEXER_NAME			0
+#define NP2_ENABLE_LOCALIZE_LEXER_NAME			1
 //! Enable localization for scheme/lexer style names.
-#define NP2_ENABLE_LOCALIZE_STYLE_NAME			0
+#define NP2_ENABLE_LOCALIZE_STYLE_NAME			1
