@@ -654,7 +654,8 @@ NP2_inline BOOL IsChineseTraditionalSubLang(LANGID subLang) {
 
 /**
  * Variadic Macros
- * use __VA_ARGS__ instead of ##__VA_ARGS__ to force GCC syntax error when no format argument is given.
+ * use __VA_ARGS__ instead of ##__VA_ARGS__ to force GCC syntax error
+ * for trailing comma when no format argument is given.
  * https://gcc.gnu.org/onlinedocs/cpp/Variadic-Macros.html
  * https://docs.microsoft.com/en-us/cpp/preprocessor/preprocessor-experimental-overview
  */

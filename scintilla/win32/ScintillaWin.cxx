@@ -2341,7 +2341,7 @@ void ScintillaWin::FineTickerStart(TickReason reason, int millis, int tolerance)
 	}
 #else
 	if (tolerance) {
-		timers[reason] = SetCoalescableTimer(MainHWND(), eventID, millis, nullptr, tolerance);
+		timers[reason] = ::SetCoalescableTimer(MainHWND(), eventID, millis, nullptr, tolerance);
 	} else {
 		timers[reason] = ::SetTimer(MainHWND(), eventID, millis, nullptr);
 	}
