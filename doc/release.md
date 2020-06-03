@@ -16,11 +16,10 @@ Latest development builds (artifacts in Release configuration for each compiler 
 | [AVX2_v4.20.?.zip](https://www.virustotal.com/gui/url/?/detection) | ? |
 | [Win32_v4.20.?.zip](https://www.virustotal.com/gui/url/?/detection) | ? |
 | [x64_v4.20.?.zip](https://www.virustotal.com/gui/url/?/detection) | ? |
-| Localization | English, 简体中文, 繁體中文, 日本語, 한국어 |
+| Localization | English, 简体中文, 繁體中文, 日本語 |
 | [ARM_v4.20.?.zip](https://www.virustotal.com/gui/url/?/detection) | ? |
 | [ARM64_v4.20.?.zip](https://www.virustotal.com/gui/url/?/detection) | ? |
 | [AVX2_v4.20.?.zip](https://www.virustotal.com/gui/url/?/detection) | ? |
 | [Win32_v4.20.?.zip](https://www.virustotal.com/gui/url/?/detection) | ? |
 | [x64_v4.20.?.zip](https://www.virustotal.com/gui/url/?/detection) | ? |
-| 日本語 | https://github.com/maboroshin/notepad2 |
 | 한국어 | https://teus.me/category/IT/Notepad2 |

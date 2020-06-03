@@ -6,6 +6,10 @@ echo | clang -dM -E -
 echo | clang-cl -Xclang -dM -E -
 echo | gcc -dM -E -
 
+echo | clang -dM -E -xc++ -
+echo | clang-cl -Xclang -dM -E -Xclang -xc++ -
+echo | gcc -dM -E -xc++ -
+
 https://clang.llvm.org/docs/UndefinedBehaviorSanitizer.html
 -fsanitize=undefined,integer
 

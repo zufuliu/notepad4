@@ -92,7 +92,7 @@ namespace Scintilla {
 
 // official Scintilla use dynamic_cast, which requires RTTI.
 // When RTTI is enabled, MSVC defines _CPPRTTI,
-// GCC/Clang defines __cpp_rtti (it's not C++20 feature testing macros).
+// GCC/Clang defines __cpp_rtti (similar to C++20 feature testing macros).
 #if defined(NDEBUG) && !(defined(_CPPRTTI) || defined(__cpp_rtti))
 #define USE_RTTI	0
 #else
