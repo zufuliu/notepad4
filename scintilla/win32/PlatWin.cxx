@@ -361,7 +361,7 @@ void SetLogFont(LOGFONTW &lf, const char *faceName, int characterSet, float size
 }
 
 #if defined(USE_D2D)
-bool GetDWriteFontMetrics(const LOGFONTW &lf, std::wstring &wsFace,
+bool GetDWriteFontMetrics(const LOGFONTW &lf, std::wstring &wsFamily,
 	DWRITE_FONT_WEIGHT &weight, DWRITE_FONT_STYLE &style, DWRITE_FONT_STRETCH &stretch) {
 	bool success = false;
 	if (gdiInterop) {
@@ -388,11 +388,11 @@ bool GetDWriteFontMetrics(const LOGFONTW &lf, std::wstring &wsFace,
 					UINT32 length = 0;
 					names->GetStringLength(index, &length);
 
-					wsFace.resize(length + 1);
-					names->GetString(index, wsFace.data(), length + 1);
+					wsFamily.resize(length + 1);
+					names->GetString(index, wsFamily.data(), length + 1);
 
 					names->Release();
-					success = wsFace[0] != L'\0';
+					success = wsFamily[0] != L'\0';
 				}
 
 				family->Release();
@@ -415,17 +415,17 @@ FontID CreateFontFromParameters(const FontParameters &fp) {
 	} else {
 #if defined(USE_D2D)
 		IDWriteTextFormat *pTextFormat = nullptr;
-		std::wstring wsFace;
+		std::wstring wsFamily;
 		const FLOAT fHeight = fp.size;
 		DWRITE_FONT_WEIGHT weight = static_cast<DWRITE_FONT_WEIGHT>(fp.weight);
 		DWRITE_FONT_STYLE style = fp.italic ? DWRITE_FONT_STYLE_ITALIC : DWRITE_FONT_STYLE_NORMAL;
 		DWRITE_FONT_STRETCH stretch = DWRITE_FONT_STRETCH_NORMAL;
-		if (!GetDWriteFontMetrics(lf, wsFace, weight, style, stretch)) {
-			wsFace = WStringFromUTF8(fp.faceName);
+		if (!GetDWriteFontMetrics(lf, wsFamily, weight, style, stretch)) {
+			wsFamily = WStringFromUTF8(fp.faceName);
 		}
 
 		const std::wstring wsLocale = WStringFromUTF8(fp.localeName);
-		HRESULT hr = pIDWriteFactory->CreateTextFormat(wsFace.c_str(), nullptr,
+		HRESULT hr = pIDWriteFactory->CreateTextFormat(wsFamily.c_str(), nullptr,
 			weight, style, stretch, fHeight, wsLocale.c_str(), &pTextFormat);
 		if (SUCCEEDED(hr)) {
 			pTextFormat->SetWordWrapping(DWRITE_WORD_WRAPPING_NO_WRAP);
