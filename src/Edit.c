@@ -794,8 +794,8 @@ BOOL EditLoadFile(LPWSTR pszFile, BOOL bSkipEncodingDetection, EditFileIOStatus 
 			if (StrHasPrefix(path, L"\\\\?\\")) {
 				WCHAR *p = path + CSTRLEN(L"\\\\?\\");
 				if (StrHasPrefix(p, L"UNC\\")) {
-					p += CSTRLEN(L"UNC\\");
-					*p = L'\\';
+					p += 2;
+					*p = L'\\'; // replace 'C' with backslash
 				}
 				lstrcpy(pszFile, p);
 			}
