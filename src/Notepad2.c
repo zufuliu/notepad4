@@ -572,6 +572,8 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 		g_hInstance = hInstance = (HINSTANCE)hResDLL;
 	}
 #endif
+
+	// we need DPI-related functions before create Scintilla window.
 #if NP2_TARGET_ARM64
 	g_uSystemDPI = GetDpiForSystem();
 #else
