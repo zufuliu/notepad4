@@ -418,7 +418,7 @@ public:
 	static Surface *Allocate(int technology);
 
 	virtual void Init(WindowID wid) noexcept = 0;
-	virtual void Init(SurfaceID sid, WindowID wid) noexcept = 0;
+	virtual void Init(SurfaceID sid, WindowID wid, bool printing = false) noexcept = 0;
 	virtual void InitPixMap(int width, int height, Surface *surface_, WindowID wid) noexcept = 0;
 
 	virtual void Release() noexcept = 0;
