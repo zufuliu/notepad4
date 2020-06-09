@@ -794,8 +794,8 @@ BOOL EditLoadFile(LPWSTR pszFile, BOOL bSkipEncodingDetection, EditFileIOStatus 
 			if (StrHasPrefix(path, L"\\\\?\\")) {
 				WCHAR *p = path + CSTRLEN(L"\\\\?\\");
 				if (StrHasPrefix(p, L"UNC\\")) {
-					p += CSTRLEN(L"UNC\\");
-					*p = L'\\';
+					p += 2;
+					*p = L'\\'; // replace 'C' with backslash
 				}
 				lstrcpy(pszFile, p);
 			}
@@ -1251,21 +1251,21 @@ typedef HRESULT (WINAPI *MappingFreePropertyBagSig)(PMAPPING_PROPERTY_BAG pBag);
 	enumOptions.pGuid = (GUID *)pGuid;
 
 #if NP2_DYNAMIC_LOAD_ELSCORE_DLL
-	HRESULT hResult = pfnMappingGetServices(&enumOptions, &prgServices, &dwServicesCount);
+	HRESULT hr = pfnMappingGetServices(&enumOptions, &prgServices, &dwServicesCount);
 #else
-	HRESULT hResult = MappingGetServices(&enumOptions, &prgServices, &dwServicesCount);
+	HRESULT hr = MappingGetServices(&enumOptions, &prgServices, &dwServicesCount);
 #endif
 	dwServicesCount = 0;
-	if (SUCCEEDED(hResult)) {
+	if (SUCCEEDED(hr)) {
 		MAPPING_PROPERTY_BAG bag;
 		ZeroMemory(&bag, sizeof (MAPPING_PROPERTY_BAG));
 		bag.Size = sizeof (MAPPING_PROPERTY_BAG);
 #if NP2_DYNAMIC_LOAD_ELSCORE_DLL
-		hResult = pfnMappingRecognizeText(prgServices, pszTextW, cchTextW, 0, NULL, &bag);
+		hr = pfnMappingRecognizeText(prgServices, pszTextW, cchTextW, 0, NULL, &bag);
 #else
-		hResult = MappingRecognizeText(prgServices, pszTextW, cchTextW, 0, NULL, &bag);
+		hr = MappingRecognizeText(prgServices, pszTextW, cchTextW, 0, NULL, &bag);
 #endif
-		if (SUCCEEDED(hResult)) {
+		if (SUCCEEDED(hr)) {
 			const DWORD dwDataSize = bag.prgResultRanges[0].dwDataSize;
 			dwServicesCount = dwDataSize/sizeof(WCHAR);
 			pszTextW = (LPCWSTR)bag.prgResultRanges[0].pData;

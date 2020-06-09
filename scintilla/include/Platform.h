@@ -91,7 +91,9 @@
 namespace Scintilla {
 
 // official Scintilla use dynamic_cast, which requires RTTI.
-#ifdef NDEBUG
+// When RTTI is enabled, MSVC defines _CPPRTTI,
+// GCC/Clang defines __cpp_rtti (similar to C++20 feature testing macros).
+#if defined(NDEBUG) && !((defined(_MSC_VER) && defined(_CPPRTTI)) || (!defined(_MSC_VER) && defined(__cpp_rtti)))
 #define USE_RTTI	0
 #else
 #define USE_RTTI	1
@@ -416,7 +418,7 @@ public:
 	static Surface *Allocate(int technology);
 
 	virtual void Init(WindowID wid) noexcept = 0;
-	virtual void Init(SurfaceID sid, WindowID wid) noexcept = 0;
+	virtual void Init(SurfaceID sid, WindowID wid, bool printing = false) noexcept = 0;
 	virtual void InitPixMap(int width, int height, Surface *surface_, WindowID wid) noexcept = 0;
 
 	virtual void Release() noexcept = 0;

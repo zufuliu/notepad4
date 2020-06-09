@@ -22,6 +22,7 @@
 #include <algorithm>
 #include <memory>
 #include <chrono>
+//#include <mutex>
 
 // Want to use std::min and std::max so don't want Windows.h version of min and max
 #if !defined(NOMINMAX)
@@ -583,6 +584,11 @@ public:
 	/// Implement important part of IDataObject
 	STDMETHODIMP GetData(FORMATETC *pFEIn, STGMEDIUM *pSTM);
 
+#if USE_WIN32_INIT_ONCE
+	static BOOL CALLBACK PrepareOnce(PINIT_ONCE initOnce, PVOID parameter, PVOID *lpContext) noexcept;
+#else
+	static void PrepareOnce() noexcept;
+#endif
 	static bool Register(HINSTANCE hInstance_) noexcept;
 	static bool Unregister() noexcept;
 
@@ -798,10 +804,7 @@ void ScintillaWin::EnsureRenderTarget(HDC hdc) noexcept {
 }
 
 void ScintillaWin::DropRenderTarget() noexcept {
-	if (pRenderTarget) {
-		pRenderTarget->Release();
-		pRenderTarget = nullptr;
-	}
+	ReleaseUnknown(pRenderTarget);
 }
 
 #endif
@@ -2341,7 +2344,7 @@ void ScintillaWin::FineTickerStart(TickReason reason, int millis, int tolerance)
 	}
 #else
 	if (tolerance) {
-		timers[reason] = SetCoalescableTimer(MainHWND(), eventID, millis, nullptr, tolerance);
+		timers[reason] = ::SetCoalescableTimer(MainHWND(), eventID, millis, nullptr, tolerance);
 	} else {
 		timers[reason] = ::SetTimer(MainHWND(), eventID, millis, nullptr);
 	}
@@ -3757,8 +3760,38 @@ STDMETHODIMP ScintillaWin::GetData(FORMATETC *pFEIn, STGMEDIUM *pSTM) {
 	return S_OK;
 }
 
-bool ScintillaWin::Register(HINSTANCE hInstance_) noexcept {
+#if USE_WIN32_INIT_ONCE
+BOOL CALLBACK ScintillaWin::PrepareOnce(PINIT_ONCE initOnce, PVOID parameter, PVOID *lpContext) noexcept
+#else
+void ScintillaWin::PrepareOnce() noexcept
+#endif
+{
+#if USE_WIN32_INIT_ONCE
+	UNREFERENCED_PARAMETER(initOnce);
+	UNREFERENCED_PARAMETER(parameter);
+	UNREFERENCED_PARAMETER(lpContext);
+#endif
 
+	Platform_Initialise(hInstance);
+	CharClassify::InitUnicodeData();
+
+	// Register the CallTip class
+	WNDCLASSEX wndclassc {};
+	wndclassc.cbSize = sizeof(wndclassc);
+	wndclassc.style = CS_GLOBALCLASS | CS_HREDRAW | CS_VREDRAW;
+	wndclassc.cbWndExtra = sizeof(ScintillaWin *);
+	wndclassc.hInstance = hInstance;
+	wndclassc.lpfnWndProc = ScintillaWin::CTWndProc;
+	wndclassc.hCursor = ::LoadCursor({}, IDC_ARROW);
+	wndclassc.lpszClassName = callClassName;
+
+	callClassAtom = ::RegisterClassEx(&wndclassc);
+#if USE_WIN32_INIT_ONCE
+	return TRUE;
+#endif
+}
+
+bool ScintillaWin::Register(HINSTANCE hInstance_) noexcept {
 	hInstance = hInstance_;
 
 	// Register the Scintilla class
@@ -3771,23 +3804,8 @@ bool ScintillaWin::Register(HINSTANCE hInstance_) noexcept {
 	wndclass.hInstance = hInstance;
 	wndclass.lpszClassName = L"Scintilla";
 	scintillaClassAtom = ::RegisterClassExW(&wndclass);
-	bool result = 0 != scintillaClassAtom;
 
-	if (result) {
-		// Register the CallTip class
-		WNDCLASSEX wndclassc {};
-		wndclassc.cbSize = sizeof(wndclassc);
-		wndclassc.style = CS_GLOBALCLASS | CS_HREDRAW | CS_VREDRAW;
-		wndclassc.cbWndExtra = sizeof(ScintillaWin *);
-		wndclassc.hInstance = hInstance;
-		wndclassc.lpfnWndProc = ScintillaWin::CTWndProc;
-		wndclassc.hCursor = ::LoadCursor({}, IDC_ARROW);
-		wndclassc.lpszClassName = callClassName;
-
-		callClassAtom = ::RegisterClassEx(&wndclassc);
-		result = 0 != callClassAtom;
-	}
-
+	const bool result = 0 != scintillaClassAtom;
 	return result;
 }
 
@@ -3918,8 +3936,7 @@ LRESULT CALLBACK ScintillaWin::CTWndProc(
 #endif
 				surfaceWindow->Release();
 #if defined(USE_D2D)
-				if (pCTRenderTarget)
-					pCTRenderTarget->Release();
+				ReleaseUnknown(pCTRenderTarget);
 #endif
 				::EndPaint(hWnd, &ps);
 				return 0;
@@ -3971,7 +3988,18 @@ LRESULT CALLBACK ScintillaWin::SWndProc(
 	if (sci == nullptr) {
 		try {
 			if (iMessage == WM_CREATE) {
-				//Scintilla_LoadDpiForWindow();
+#if USE_STD_CALL_ONCE
+				static std::once_flag once;
+				std::call_once(once, PrepareOnce);
+#elif USE_WIN32_INIT_ONCE
+				static INIT_ONCE once = INIT_ONCE_STATIC_INIT;
+				::InitOnceExecuteOnce(&once, PrepareOnce, nullptr, nullptr);
+#else
+				static LONG once = 0;
+				if (::InterlockedCompareExchange(&once, 1, 0) == 0) {
+					PrepareOnce();
+				}
+#endif
 				// Create C++ object associated with window
 				sci = new ScintillaWin(hWnd);
 				SetWindowPointer(hWnd, sci);
@@ -3998,9 +4026,7 @@ LRESULT CALLBACK ScintillaWin::SWndProc(
 // This function is externally visible so it can be called from container when building statically.
 // Must be called once only.
 int Scintilla_RegisterClasses(void *hInstance) {
-	Platform_Initialise(hInstance);
 	const bool result = ScintillaWin::Register(static_cast<HINSTANCE>(hInstance));
-	CharClassify::InitUnicodeData();
 	return result;
 }
 

@@ -47,6 +47,17 @@
 // force compile C as CPP
 #define NP2_FORCE_COMPILE_C_AS_CPP		0
 
+// official Scintilla use std::call_once(), which increases binary about 12 KiB.
+#define USE_STD_CALL_ONCE		0
+#if !USE_STD_CALL_ONCE && (_WIN32_WINNT >= _WIN32_WINNT_VISTA)
+// use InitOnceExecuteOnce()
+#define USE_WIN32_INIT_ONCE		0
+#else
+// fallback to InterlockedCompareExchange(). it's not same as std::call_once(),
+// but should safe in Windows message handlers (for WM_CREATE and SCI_SETTECHNOLOGY).
+#define USE_WIN32_INIT_ONCE		0
+#endif
+
 // since Windows 10, version 1607
 #if defined(__aarch64__) || defined(_ARM64_) || defined(_M_ARM64)
 // 1709 was the first version for Windows 10 on ARM64.
@@ -134,6 +145,25 @@ inline T DLLFunction(HMODULE hModule, LPCSTR lpProcName) noexcept {
 template<typename T>
 inline T DLLFunctionEx(LPCWSTR lpDllName, LPCSTR lpProcName) noexcept {
 	return DLLFunction<T>(::GetModuleHandleW(lpDllName), lpProcName);
+}
+
+// Release an IUnknown* and set to nullptr.
+// While IUnknown::Release must be noexcept, it isn't marked as such so produces
+// warnings which are avoided by the catch.
+template <class T>
+inline void ReleaseUnknown(T *&ppUnknown) noexcept {
+	if (ppUnknown) {
+#if 1
+		ppUnknown->Release();
+#else
+		try {
+			ppUnknown->Release();
+		} catch (...) {
+			// Never occurs
+		}
+#endif
+		ppUnknown = nullptr;
+	}
 }
 
 inline UINT DpiForWindow(WindowID wid) noexcept {

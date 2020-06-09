@@ -654,20 +654,15 @@ NP2_inline BOOL IsChineseTraditionalSubLang(LANGID subLang) {
 
 /**
  * Variadic Macros
+ * use __VA_ARGS__ instead of ##__VA_ARGS__ to force GCC syntax error
+ * for trailing comma when no format argument is given.
  * https://gcc.gnu.org/onlinedocs/cpp/Variadic-Macros.html
- * https://docs.microsoft.com/en-us/cpp/preprocessor/variadic-macros?view=vs-2017
+ * https://docs.microsoft.com/en-us/cpp/preprocessor/preprocessor-experimental-overview
  */
-#if defined(__GNUC__) || defined(__clang__)
-#define FormatString(lpOutput, lpFormat, uIdFormat, ...) do {	\
-		GetString((uIdFormat), (lpFormat), COUNTOF(lpFormat));	\
-		wsprintf((lpOutput), (lpFormat), ##__VA_ARGS__);		\
-	} while (0)
-#else
 #define FormatString(lpOutput, lpFormat, uIdFormat, ...) do {	\
 		GetString((uIdFormat), (lpFormat), COUNTOF(lpFormat));	\
 		wsprintf((lpOutput), (lpFormat), __VA_ARGS__);			\
 	} while (0)
-#endif
 
 NP2_inline BOOL PathIsFile(LPCWSTR pszPath) {
 	// note: INVALID_FILE_ATTRIBUTES is -1.

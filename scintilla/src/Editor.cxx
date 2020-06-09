@@ -363,10 +363,10 @@ Sci::Line Editor::MaxScrollPos() const noexcept {
 		retVal -= linesOnScreen/2;
 		break;
 	case 3:
-		retVal -= 2*linesOnScreen/3;
+		retVal -= linesOnScreen - linesOnScreen/3;
 		break;
 	case 4:
-		retVal -= 3*linesOnScreen/4;
+		retVal -= linesOnScreen - linesOnScreen/4;
 		break;
 	}
 	return (retVal < 0) ? 0 : retVal;
@@ -1825,10 +1825,10 @@ Sci::Position Editor::FormatRange(bool draw, const Sci_RangeToFormat *pfr) {
 	if (!pfr)
 		return 0;
 
-	AutoSurface surface(pfr->hdc, this, SC_TECHNOLOGY_DEFAULT);
+	AutoSurface surface(pfr->hdc, this, SC_TECHNOLOGY_DEFAULT, true);
 	if (!surface)
 		return 0;
-	AutoSurface surfaceMeasure(pfr->hdcTarget, this, SC_TECHNOLOGY_DEFAULT);
+	AutoSurface surfaceMeasure(pfr->hdcTarget, this, SC_TECHNOLOGY_DEFAULT, true);
 	if (!surfaceMeasure) {
 		return 0;
 	}

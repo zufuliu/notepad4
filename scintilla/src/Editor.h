@@ -682,10 +682,10 @@ public:
 			surf->SetBidiR2L(ed->BidirectionalR2L());
 		}
 	}
-	AutoSurface(SurfaceID sid, const Editor *ed, int technology = -1) {
+	AutoSurface(SurfaceID sid, const Editor *ed, int technology = -1, bool printing = false) {
 		if (ed->wMain.GetID()) {
 			surf.reset(Surface::Allocate(technology != -1 ? technology : ed->technology));
-			surf->Init(sid, ed->wMain.GetID());
+			surf->Init(sid, ed->wMain.GetID(), printing);
 			surf->SetUnicodeMode(SC_CP_UTF8 == ed->CodePage());
 			surf->SetDBCSMode(ed->CodePage());
 			surf->SetBidiR2L(ed->BidirectionalR2L());
