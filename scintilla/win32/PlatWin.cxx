@@ -581,7 +581,7 @@ public:
 	~SurfaceGDI() noexcept override;
 
 	void Init(WindowID wid) noexcept override;
-	void Init(SurfaceID sid, WindowID wid) noexcept override;
+	void Init(SurfaceID sid, WindowID wid, bool printing = false) noexcept override;
 	void InitPixMap(int width, int height, Surface *surface_, WindowID wid) noexcept override;
 
 	void Release() noexcept override;
@@ -676,10 +676,10 @@ void SurfaceGDI::Init(WindowID wid) noexcept {
 	::SetTextAlign(hdc, TA_BASELINE);
 }
 
-void SurfaceGDI::Init(SurfaceID sid, WindowID wid) noexcept {
+void SurfaceGDI::Init(SurfaceID sid, WindowID wid, bool printing) noexcept {
 	Release();
-	logPixelsY = DpiForWindow(wid);
 	hdc = static_cast<HDC>(sid);
+	logPixelsY = printing ? ::GetDeviceCaps(hdc, LOGPIXELSY) : DpiForWindow(wid);
 	::SetTextAlign(hdc, TA_BASELINE);
 }
 
@@ -1238,7 +1238,7 @@ public:
 	~SurfaceD2D() noexcept override;
 
 	void Init(WindowID wid) noexcept override;
-	void Init(SurfaceID sid, WindowID wid) noexcept override;
+	void Init(SurfaceID sid, WindowID wid, bool printing = false) noexcept override;
 	void InitPixMap(int width, int height, Surface *surface_, WindowID wid) noexcept override;
 
 	void Release() noexcept override;
@@ -1347,8 +1347,9 @@ void SurfaceD2D::Init(WindowID wid) noexcept {
 	logPixelsY = DpiForWindow(wid);
 }
 
-void SurfaceD2D::Init(SurfaceID sid, WindowID wid) noexcept {
+void SurfaceD2D::Init(SurfaceID sid, WindowID wid, bool /*printing*/) noexcept {
 	Release();
+	// printing always using GDI
 	logPixelsY = DpiForWindow(wid);
 	pRenderTarget = static_cast<ID2D1RenderTarget *>(sid);
 }
