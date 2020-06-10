@@ -1245,7 +1245,7 @@ void EditView::DrawEOL(Surface *surface, const EditModel &model, const ViewStyle
 }
 
 static void DrawIndicator(int indicNum, Sci::Position startPos, Sci::Position endPos, Surface *surface, const ViewStyle &vsDraw,
-	const LineLayout *ll, int xStart, PRectangle rcLine, Sci::Position secondCharacter, int subLine, Indicator::DrawState drawState,
+	const LineLayout *ll, int xStart, PRectangle rcLine, Sci::Position secondCharacter, int subLine, Indicator::State state,
 	int value, bool bidiEnabled, int tabWidthMinimumPixels) {
 
 	const XYPOSITION subLineStart = ll->positions[ll->LineStart(subLine)];
@@ -1285,7 +1285,7 @@ static void DrawIndicator(int indicNum, Sci::Position startPos, Sci::Position en
 			// Indicator continued from earlier line so make an empty box and don't draw
 			rcFirstCharacter.right = rcFirstCharacter.left;
 		}
-		vsDraw.indicators[indicNum].Draw(surface, rc, rcLine, rcFirstCharacter, drawState, value);
+		vsDraw.indicators[indicNum].Draw(surface, rc, rcLine, rcFirstCharacter, state, value);
 	}
 }
 
@@ -1308,10 +1308,10 @@ static void DrawIndicators(Surface *surface, const EditModel &model, const ViewS
 				const bool hover = vsDraw.indicators[deco->Indicator()].IsDynamic() &&
 					rangeRun.ContainsCharacter(model.hoverIndicatorPos);
 				const int value = deco->ValueAt(startPos);
-				const Indicator::DrawState drawState = hover ? Indicator::drawHover : Indicator::drawNormal;
+				const Indicator::State state = hover ? Indicator::State::hover : Indicator::State::normal;
 				const Sci::Position posSecond = model.pdoc->MovePositionOutsideChar(rangeRun.First() + 1, 1);
 				DrawIndicator(deco->Indicator(), startPos - posLineStart, endPos - posLineStart,
-					surface, vsDraw, ll, xStart, rcLine, posSecond - posLineStart, subLine, drawState,
+					surface, vsDraw, ll, xStart, rcLine, posSecond - posLineStart, subLine, state,
 					value, model.BidirectionalEnabled(), tabWidthMinimumPixels);
 				startPos = endPos;
 				if (!deco->ValueAt(startPos)) {
@@ -1332,7 +1332,7 @@ static void DrawIndicators(Surface *surface, const EditModel &model, const ViewS
 				if (braceOffset < ll->numCharsInLine) {
 					const Sci::Position secondOffset = model.pdoc->MovePositionOutsideChar(model.braces[0] + 1, 1) - posLineStart;
 					DrawIndicator(braceIndicator, braceOffset, braceOffset + 1, surface, vsDraw, ll, xStart, rcLine, secondOffset,
-						subLine, Indicator::drawNormal, 1, model.BidirectionalEnabled(), tabWidthMinimumPixels);
+						subLine, Indicator::State::normal, 1, model.BidirectionalEnabled(), tabWidthMinimumPixels);
 				}
 			}
 			if (rangeLine.ContainsCharacter(model.braces[1])) {
@@ -1340,7 +1340,7 @@ static void DrawIndicators(Surface *surface, const EditModel &model, const ViewS
 				if (braceOffset < ll->numCharsInLine) {
 					const Sci::Position secondOffset = model.pdoc->MovePositionOutsideChar(model.braces[1] + 1, 1) - posLineStart;
 					DrawIndicator(braceIndicator, braceOffset, braceOffset + 1, surface, vsDraw, ll, xStart, rcLine, secondOffset,
-						subLine, Indicator::drawNormal, 1, model.BidirectionalEnabled(), tabWidthMinimumPixels);
+						subLine, Indicator::State::normal, 1, model.BidirectionalEnabled(), tabWidthMinimumPixels);
 				}
 			}
 		}

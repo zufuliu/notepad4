@@ -1835,11 +1835,11 @@ Sci::Position Editor::FormatRange(bool draw, const Sci_RangeToFormat *pfr) {
 	return view.FormatRange(draw, pfr, surface, surfaceMeasure, *this, vs);
 }
 
-int Editor::TextWidth(int style, const char *text) {
+long Editor::TextWidth(uptr_t style, const char *text) {
 	RefreshStyleData();
 	AutoSurface surface(this);
 	if (surface) {
-		return static_cast<int>(std::lround(surface->WidthText(vs.styles[style].font, text)));
+		return std::lround(surface->WidthText(vs.styles[style].font, text));
 	} else {
 		return 1;
 	}
@@ -6806,7 +6806,7 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 	case SCI_TEXTWIDTH:
 		PLATFORM_ASSERT(wParam < vs.styles.size());
 		PLATFORM_ASSERT(lParam);
-		return TextWidth(static_cast<int>(wParam), CharPtrFromSPtr(lParam));
+		return TextWidth(wParam, CharPtrFromSPtr(lParam));
 
 	case SCI_TEXTHEIGHT:
 		RefreshStyleData();
