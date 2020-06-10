@@ -403,7 +403,7 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	void RefreshPixMaps(Surface *surfaceWindow);
 	void SCICALL Paint(Surface *surfaceWindow, PRectangle rcArea);
 	Sci::Position FormatRange(bool draw, const Sci_RangeToFormat *pfr);
-	int TextWidth(int style, const char *text);
+	long TextWidth(uptr_t style, const char *text);
 
 	virtual void SetVerticalScrollPos() = 0;
 	virtual void SetHorizontalScrollPos() = 0;
