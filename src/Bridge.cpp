@@ -47,6 +47,7 @@ extern int iPrintColor;
 extern int iPrintZoom;
 extern RECT pageSetupMargin;
 extern HWND hwndStatus;
+extern WCHAR defaultTextFontName[LF_FACESIZE];
 #else
 extern "C" int iPrintHeader;
 extern "C" int iPrintFooter;
@@ -54,6 +55,7 @@ extern "C" int iPrintColor;
 extern "C" int iPrintZoom;
 extern "C" RECT pageSetupMargin;
 extern "C" HWND hwndStatus;
+extern "C" WCHAR defaultTextFontName[LF_FACESIZE];
 #endif
 
 // Stored objects...
@@ -64,7 +66,7 @@ static void EditPrintInit() noexcept;
 
 //=============================================================================
 //
-// EditPrint() - Code from SciTE
+// EditPrint() - Code from SciTEWin::Print()
 //
 extern "C" BOOL EditPrint(HWND hwnd, LPCWSTR pszDocTitle) {
 	// Don't print empty documents
@@ -190,8 +192,10 @@ extern "C" BOOL EditPrint(HWND hwnd, LPCWSTR pszDocTitle) {
 	// Convert page size to logical units and we're done!
 	DPtoLP(hdc, (LPPOINT) &ptPage, 1);
 
+	const int fontSize = SciCall_StyleGetSizeFractional(STYLE_DEFAULT);
+
 	TEXTMETRIC tm;
-	int headerLineHeight = MulDiv(10, ptDpi.y, 72);
+	int headerLineHeight = MulDiv(fontSize - SC_FONT_SIZE_MULTIPLIER, ptDpi.y, 72*SC_FONT_SIZE_MULTIPLIER);
 	HFONT fontHeader = CreateFont(headerLineHeight,
 							0, 0, 0,
 							FW_BOLD,
@@ -199,7 +203,7 @@ extern "C" BOOL EditPrint(HWND hwnd, LPCWSTR pszDocTitle) {
 							0,
 							0, 0, 0,
 							0, 0, 0,
-							L"Arial");
+							defaultTextFontName);
 	SelectObject(hdc, fontHeader);
 	GetTextMetrics(hdc, &tm);
 	headerLineHeight = tm.tmHeight + tm.tmExternalLeading;
@@ -208,7 +212,7 @@ extern "C" BOOL EditPrint(HWND hwnd, LPCWSTR pszDocTitle) {
 		headerLineHeight = 0;
 	}
 
-	int footerLineHeight = MulDiv(10, ptDpi.y, 72);
+	int footerLineHeight = MulDiv(fontSize - 2*SC_FONT_SIZE_MULTIPLIER, ptDpi.y, 72*SC_FONT_SIZE_MULTIPLIER);
 	HFONT fontFooter = CreateFont(footerLineHeight,
 							0, 0, 0,
 							FW_NORMAL,
@@ -216,7 +220,7 @@ extern "C" BOOL EditPrint(HWND hwnd, LPCWSTR pszDocTitle) {
 							0,
 							0, 0, 0,
 							0, 0, 0,
-							L"Arial");
+							defaultTextFontName);
 	SelectObject(hdc, fontFooter);
 	GetTextMetrics(hdc, &tm);
 	footerLineHeight = tm.tmHeight + tm.tmExternalLeading;
@@ -347,7 +351,8 @@ extern "C" BOOL EditPrint(HWND hwnd, LPCWSTR pszDocTitle) {
 				const int len = lstrlen(dateString);
 				SelectObject(hdc, fontFooter);
 				GetTextExtentPoint32(hdc, dateString, len, &sizeInfo);
-				ExtTextOut(hdc, frPrint.rc.right - 5 - sizeInfo.cx, frPrint.rc.top - headerLineHeight / 2,
+				rcw.left = frPrint.rc.right - 10 - sizeInfo.cx;
+				ExtTextOut(hdc, rcw.left + 5, frPrint.rc.top - headerLineHeight / 2,
 						   ETO_OPAQUE, &rcw, dateString,
 						   len, nullptr);
 			}
