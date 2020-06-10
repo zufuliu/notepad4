@@ -7443,7 +7443,8 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 		return vs.caretStyle;
 
 	case SCI_SETCARETWIDTH:
-		vs.caretWidth = std::clamp(static_cast<int>(wParam), 0, 3);
+		// Windows accessibility allows 20 pixels caret width.
+		vs.caretWidth = std::clamp(static_cast<int>(wParam), 0, 20);
 		InvalidateStyleRedraw();
 		break;
 
