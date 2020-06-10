@@ -235,7 +235,7 @@ static WCHAR systemCodeFontName[LF_FACESIZE];
 static WCHAR systemTextFontName[LF_FACESIZE];
 // global default monospaced font and proportional font
 static WCHAR defaultCodeFontName[LF_FACESIZE];
-static WCHAR defaultTextFontName[LF_FACESIZE];
+WCHAR defaultTextFontName[LF_FACESIZE];
 
 static WCHAR darkStyleThemeFilePath[MAX_PATH];
 static WCHAR favoriteSchemesConfig[MAX_FAVORITE_SCHEMES_CONFIG_SIZE];
