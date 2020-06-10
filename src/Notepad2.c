@@ -125,7 +125,7 @@ BOOL	bTabsAsSpacesG;
 BOOL	bTabIndents;
 BOOL	bTabIndentsG;
 BOOL	bBackspaceUnindents;
-static int iZoomLevel = 100;
+int		iZoomLevel = 100;
 int		iTabWidth;
 int		iTabWidthG;
 int		iIndentWidth;
@@ -1091,8 +1091,8 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 		}
 		return FALSE;
 
-	// Reinitialize theme-dependent values and resize windows
 	case WM_THEMECHANGED:
+		// Reinitialize theme-dependent values and resize windows
 		MsgThemeChanged(hwnd, wParam, lParam);
 		break;
 
@@ -1101,15 +1101,16 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 		break;
 
 	case WM_SETTINGCHANGE:
+		// TODO: detect system theme and high contrast mode changes
+		Style_UpdateCaret();
 		SendMessage(hwndEdit, WM_SETTINGCHANGE, wParam, lParam);
 		break;
 
-	// update Scintilla colors
-	case WM_SYSCOLORCHANGE: {
+	case WM_SYSCOLORCHANGE:
+		// update Scintilla colors
 		Style_SetLexer(pLexCurrent, FALSE);
 		SendMessage(hwndEdit, WM_SYSCOLORCHANGE, wParam, lParam);
-		return DefWindowProc(hwnd, umsg, wParam, lParam);
-	}
+		break;
 
 	//case WM_TIMER:
 	//	break;
@@ -2256,6 +2257,7 @@ void MsgNotifyZoom(void) {
 	SciCall_SetTabMinimumWidth((iZoomLevel < 40)? 1 : 2);
 
 	UpdateStatusBarCache(STATUS_DOCZOOM);
+	Style_OnDPIChanged(pLexCurrent);
 	UpdateLineNumberWidth();
 	UpdateBookmarkMarginWidth();
 	UpdateFoldMarginWidth();
@@ -7007,7 +7009,7 @@ void UpdateLineNumberWidth(void) {
 	int width = 0;
 	if (bShowLineNumbers) {
 #if NP2_DEBUG_FOLD_LEVEL
-		width = RoundToCurrentDPI(100);
+		width = 100;
 #else
 		char tchLines[32];
 

@@ -291,10 +291,6 @@ extern int SystemMetricsForDpi(int nIndex, UINT dpi) NP2_noexcept;
 extern BOOL DpiAdjustWindowRect(LPRECT lpRect, DWORD dwStyle, DWORD dwExStyle, UINT dpi) NP2_noexcept;
 #endif
 
-NP2_inline int RoundToCurrentDPI(int value)	{
-	return (g_uCurrentDPI == USER_DEFAULT_SCREEN_DPI) ? value : MulDiv(g_uCurrentDPI, value, USER_DEFAULT_SCREEN_DPI);
-}
-
 NP2_inline DWORD GetIconIndexFlagsForDPI(UINT dpi) {
 	return (dpi >= NP2_LARGER_ICON_SIZE_DPI)
 			? (SHGFI_USEFILEATTRIBUTES | SHGFI_LARGEICON | SHGFI_SYSICONINDEX)
