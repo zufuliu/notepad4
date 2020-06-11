@@ -3124,7 +3124,7 @@ void ScintillaWin::ImeStartComposition() {
 			// The negative is to allow for leading
 			lf.lfHeight = -::MulDiv(sizeZoomed, dpi, 72*SC_FONT_SIZE_MULTIPLIER);
 			lf.lfWeight = vs.styles[styleHere].weight;
-			lf.lfItalic = vs.styles[styleHere].italic ? 1 : 0;
+			lf.lfItalic = vs.styles[styleHere].italic ? TRUE : FALSE;
 			lf.lfCharSet = DEFAULT_CHARSET;
 			lf.lfFaceName[0] = L'\0';
 			if (vs.styles[styleHere].fontName) {
@@ -3922,8 +3922,10 @@ LRESULT CALLBACK ScintillaWin::CTWndProc(
 					}
 					// If above SUCCEEDED, then pCTRenderTarget not nullptr
 					assert(pCTRenderTarget);
-					surfaceWindow->Init(pCTRenderTarget, hWnd);
-					pCTRenderTarget->BeginDraw();
+					if (pCTRenderTarget) {
+						surfaceWindow->Init(pCTRenderTarget, hWnd);
+						pCTRenderTarget->BeginDraw();
+					}
 #endif
 				}
 				surfaceWindow->SetUnicodeMode(SC_CP_UTF8 == sciThis->ct.codePage);
