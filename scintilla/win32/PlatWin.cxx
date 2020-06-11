@@ -346,7 +346,7 @@ constexpr BYTE Win32MapFontQuality(int extraFontFlag) noexcept {
 		return CLEARTYPE_QUALITY;
 
 	default:
-		return SC_EFF_QUALITY_DEFAULT;
+		return DEFAULT_QUALITY;
 	}
 }
 
@@ -679,6 +679,7 @@ void SurfaceGDI::Init(WindowID wid) noexcept {
 void SurfaceGDI::Init(SurfaceID sid, WindowID wid, bool printing) noexcept {
 	Release();
 	hdc = static_cast<HDC>(sid);
+	// Windows on screen are scaled but printers are not.
 	//const bool printing = (::GetDeviceCaps(hdc, TECHNOLOGY) != DT_RASDISPLAY);
 	logPixelsY = printing ? ::GetDeviceCaps(hdc, LOGPIXELSY) : DpiForWindow(wid);
 	::SetTextAlign(hdc, TA_BASELINE);

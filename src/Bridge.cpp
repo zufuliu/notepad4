@@ -195,14 +195,16 @@ extern "C" BOOL EditPrint(HWND hwnd, LPCWSTR pszDocTitle) {
 	const int fontSize = SciCall_StyleGetSizeFractional(STYLE_DEFAULT);
 
 	TEXTMETRIC tm;
-	int headerLineHeight = MulDiv(fontSize - SC_FONT_SIZE_MULTIPLIER, ptDpi.y, 72*SC_FONT_SIZE_MULTIPLIER);
+	int headerLineHeight = MulDiv(fontSize - SC_FONT_SIZE_MULTIPLIER/2, ptDpi.y, 72*SC_FONT_SIZE_MULTIPLIER);
 	HFONT fontHeader = CreateFont(headerLineHeight,
 							0, 0, 0,
-							FW_BOLD,
-							0,
-							0,
-							0, 0, 0,
-							0, 0, 0,
+							FW_NORMAL,
+							FALSE, FALSE, FALSE,
+							DEFAULT_CHARSET,
+							OUT_DEFAULT_PRECIS,
+							CLIP_DEFAULT_PRECIS,
+							DEFAULT_QUALITY,
+							DEFAULT_PITCH,
 							defaultTextFontName);
 	SelectObject(hdc, fontHeader);
 	GetTextMetrics(hdc, &tm);
@@ -216,10 +218,12 @@ extern "C" BOOL EditPrint(HWND hwnd, LPCWSTR pszDocTitle) {
 	HFONT fontFooter = CreateFont(footerLineHeight,
 							0, 0, 0,
 							FW_NORMAL,
-							0,
-							0,
-							0, 0, 0,
-							0, 0, 0,
+							FALSE, FALSE, FALSE,
+							DEFAULT_CHARSET,
+							OUT_DEFAULT_PRECIS,
+							CLIP_DEFAULT_PRECIS,
+							DEFAULT_QUALITY,
+							DEFAULT_PITCH,
 							defaultTextFontName);
 	SelectObject(hdc, fontFooter);
 	GetTextMetrics(hdc, &tm);
@@ -337,10 +341,9 @@ extern "C" BOOL EditPrint(HWND hwnd, LPCWSTR pszDocTitle) {
 				frPrint.rc.left, frPrint.rc.top - headerLineHeight - headerLineHeight / 2,
 				frPrint.rc.right, frPrint.rc.top - headerLineHeight / 2
 			};
-			rcw.bottom = rcw.top + headerLineHeight;
 
 			if (iPrintHeader < 3) {
-				ExtTextOut(hdc, frPrint.rc.left + 5, frPrint.rc.top - headerLineHeight / 2,
+				ExtTextOut(hdc, rcw.left + 5, rcw.bottom,
 						   ETO_OPAQUE, &rcw, pszDocTitle,
 						   lstrlen(pszDocTitle), nullptr);
 			}
@@ -352,13 +355,13 @@ extern "C" BOOL EditPrint(HWND hwnd, LPCWSTR pszDocTitle) {
 				SelectObject(hdc, fontFooter);
 				GetTextExtentPoint32(hdc, dateString, len, &sizeInfo);
 				rcw.left = frPrint.rc.right - 10 - sizeInfo.cx;
-				ExtTextOut(hdc, rcw.left + 5, frPrint.rc.top - headerLineHeight / 2,
+				ExtTextOut(hdc, rcw.left + 5, rcw.bottom,
 						   ETO_OPAQUE, &rcw, dateString,
 						   len, nullptr);
 			}
 
+			SetTextAlign(hdc, ta);
 			if (iPrintHeader < 3) {
-				SetTextAlign(hdc, ta);
 				HPEN pen = CreatePen(0, 1, RGB(0, 0, 0));
 				HPEN penOld = (HPEN)SelectObject(hdc, pen);
 				MoveToEx(hdc, frPrint.rc.left, frPrint.rc.top - headerLineHeight / 4, nullptr);
@@ -376,18 +379,19 @@ extern "C" BOOL EditPrint(HWND hwnd, LPCWSTR pszDocTitle) {
 		if (printPage) {
 			SetTextColor(hdc, RGB(0, 0, 0));
 			SetBkColor(hdc, RGB(255, 255, 255));
-			SelectObject(hdc, fontFooter);
-			const UINT ta = SetTextAlign(hdc, TA_TOP);
-			RECT rcw = {
-				frPrint.rc.left, frPrint.rc.bottom + footerLineHeight / 2,
-				frPrint.rc.right, frPrint.rc.bottom + footerLineHeight + footerLineHeight / 2
-			};
 
 			if (iPrintFooter == 0) {
+				SelectObject(hdc, fontFooter);
+				const UINT ta = SetTextAlign(hdc, TA_TOP);
+				RECT rcw = {
+					frPrint.rc.left, frPrint.rc.bottom + footerLineHeight / 2,
+					frPrint.rc.right, frPrint.rc.bottom + footerLineHeight + footerLineHeight / 2
+				};
+
 				SIZE sizeFooter;
 				const int len = lstrlen(pageString);
 				GetTextExtentPoint32(hdc, pageString, len, &sizeFooter);
-				ExtTextOut(hdc, frPrint.rc.right - 5 - sizeFooter.cx, frPrint.rc.bottom + footerLineHeight / 2,
+				ExtTextOut(hdc, rcw.right - 5 - sizeFooter.cx, rcw.top,
 						   ETO_OPAQUE, &rcw, pageString,
 						   len, nullptr);
 
@@ -432,7 +436,7 @@ extern "C" BOOL EditPrint(HWND hwnd, LPCWSTR pszDocTitle) {
 
 //=============================================================================
 //
-// EditPrintSetup() - Code from SciTE
+// EditPrintSetup() - Code from SciTEWin::PrintSetup()
 //
 //
 static UINT_PTR CALLBACK PageSetupHook(HWND hwnd, UINT uiMsg, WPARAM wParam, LPARAM /*lParam*/) noexcept {
