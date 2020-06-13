@@ -281,14 +281,14 @@ extern UINT g_uSystemDPI;
 #define NP2_TARGET_ARM64	1
 #define GetWindowDPI(hwnd)					GetDpiForWindow(hwnd)
 #define SystemMetricsForDpi(nIndex, dpi)	GetSystemMetricsForDpi((nIndex), (dpi))
-#define DpiAdjustWindowRect(lpRect, dwStyle, dwExStyle, dpi) \
+#define AdjustWindowRectForDpi(lpRect, dwStyle, dwExStyle, dpi) \
 		AdjustWindowRectExForDpi((lpRect), (dwStyle), FALSE, (dwExStyle), (dpi))
 
 #else
 #define NP2_TARGET_ARM64	0
 extern UINT GetWindowDPI(HWND hwnd) NP2_noexcept;
 extern int SystemMetricsForDpi(int nIndex, UINT dpi) NP2_noexcept;
-extern BOOL DpiAdjustWindowRect(LPRECT lpRect, DWORD dwStyle, DWORD dwExStyle, UINT dpi) NP2_noexcept;
+extern BOOL AdjustWindowRectForDpi(LPRECT lpRect, DWORD dwStyle, DWORD dwExStyle, UINT dpi) NP2_noexcept;
 #endif
 
 NP2_inline DWORD GetIconIndexFlagsForDPI(UINT dpi) {
