@@ -82,6 +82,12 @@ extern "C" BOOL AdjustWindowRectForDpi(LPRECT lpRect, DWORD dwStyle, DWORD dwExS
 #endif
 #endif
 
+#if defined(__GNUC__) || defined(__clang__)
+#define NP2_unreachable()	__builtin_unreachable()
+#else
+#define NP2_unreachable()	__assume(0)
+#endif
+
 namespace Scintilla {
 
 extern void Platform_Initialise(void *hInstance) noexcept;
@@ -131,9 +137,6 @@ inline T DLLFunction(HMODULE hModule, LPCSTR lpProcName) noexcept {
 	return reinterpret_cast<T>(::GetProcAddress(hModule, lpProcName));
 #endif
 #else
-	if (!hModule) {
-		return nullptr;
-	}
 	FARPROC function = ::GetProcAddress(hModule, lpProcName);
 	static_assert(sizeof(T) == sizeof(function));
 	T fp;
@@ -153,13 +156,14 @@ inline T DLLFunctionEx(LPCWSTR lpDllName, LPCSTR lpProcName) noexcept {
 template <class T>
 inline void ReleaseUnknown(T *&ppUnknown) noexcept {
 	if (ppUnknown) {
-#if 1
+#if 0
 		ppUnknown->Release();
 #else
 		try {
 			ppUnknown->Release();
 		} catch (...) {
 			// Never occurs
+			NP2_unreachable();
 		}
 #endif
 		ppUnknown = nullptr;

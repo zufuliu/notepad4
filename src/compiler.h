@@ -15,6 +15,12 @@
 	#endif
 #endif
 
+#if defined(__GNUC__) || defined(__clang__)
+#define NP2_unreachable()	__builtin_unreachable()
+#else
+#define NP2_unreachable()	__assume(0)
+#endif
+
 #if (defined(__GNUC__) || defined(__clang__)) && !defined(__cplusplus)
 // https://stackoverflow.com/questions/19452971/array-size-macro-that-rejects-pointers
 // trigger error for pointer: GCC: void value not ignored as it ought to be. Clang: invalid operands to binary expression.

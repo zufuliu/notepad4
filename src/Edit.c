@@ -1408,11 +1408,7 @@ void EditMapTextCase(UINT menu) {
 		pGuid = &WIN10_ELS_GUID_TRANSLITERATION_HANGUL_DECOMPOSITION;
 		break;
 	default:
-#if defined(__GNUC__) || defined(__clang__)
-		__builtin_unreachable();
-#else
-		__assume(0);
-#endif
+		NP2_unreachable();
 	}
 
 	char *pszText = (char *)NP2HeapAlloc(iSelCount*kMaxMultiByteCount + 1);
