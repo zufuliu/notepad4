@@ -572,6 +572,7 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	virtual void SetDocPointer(Document *document);
 
 	void SetAnnotationVisible(int visible);
+	void SetEOLAnnotationVisible(int visible);
 
 	Sci::Line ExpandLine(Sci::Line line);
 	void SetFoldExpanded(Sci::Line lineDoc, bool expanded);
