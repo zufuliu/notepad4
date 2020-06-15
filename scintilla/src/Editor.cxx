@@ -1173,7 +1173,7 @@ Editor::XYScrollPosition Editor::XYScrollToMakeVisible(SelectionRange range, con
 	if ((options & xysVertical) && (pt.y < rcClient.top || ptBottomCaret.y >= rcClient.bottom || (policies.y.policy & CARET_STRICT) != 0)) {
 		const Sci::Line lineCaret = DisplayFromPosition(range.caret.Position());
 		const Sci::Line linesOnScreen = LinesOnScreen();
-		const Sci::Line halfScreen = std::max(linesOnScreen - 1, static_cast<Sci::Line>(2)) / 2;
+		const Sci::Line halfScreen = std::max<Sci::Line>(linesOnScreen - 1, 2) / 2;
 		const bool bSlop = (policies.y.policy & CARET_SLOP) != 0;
 		const bool bStrict = (policies.y.policy & CARET_STRICT) != 0;
 		const bool bJump = (policies.y.policy & CARET_JUMPS) != 0;
@@ -2144,6 +2144,7 @@ void Editor::ClearAll() {
 		if (!pdoc->IsReadOnly()) {
 			pcs->Clear();
 			pdoc->AnnotationClearAll();
+			pdoc->EOLAnnotationClearAll();
 			pdoc->MarginClearAll();
 		}
 	}
@@ -2561,7 +2562,7 @@ void Editor::CheckModificationForWrap(DocModification mh) {
 	if (mh.modificationType & (SC_MOD_INSERTTEXT | SC_MOD_DELETETEXT)) {
 		view.llc.Invalidate(LineLayout::llCheckTextAndStyle);
 		const Sci::Line lineDoc = pdoc->SciLineFromPosition(mh.position);
-		const Sci::Line lines = std::max(static_cast<Sci::Line>(0), mh.linesAdded);
+		const Sci::Line lines = std::max<Sci::Line>(0, mh.linesAdded);
 		if (Wrapping()) {
 			NeedWrapping(lineDoc, lineDoc + lines + 1);
 		}
@@ -2693,6 +2694,11 @@ void Editor::NotifyModified(Document *, DocModification mh, void *) {
 				if (pcs->SetHeight(lineDoc, pcs->GetHeight(lineDoc) + static_cast<int>(mh.annotationLinesAdded))) {
 					SetScrollBars();
 				}
+				Redraw();
+			}
+		}
+		if (mh.modificationType & SC_MOD_CHANGEEOLANNOTATION) {
+			if (vs.eolAnnotationVisible) {
 				Redraw();
 			}
 		}
@@ -5324,6 +5330,13 @@ void Editor::SetAnnotationVisible(int visible) {
 	}
 }
 
+void Editor::SetEOLAnnotationVisible(int visible) {
+	if (vs.eolAnnotationVisible != visible) {
+		vs.eolAnnotationVisible = visible;
+		Redraw();
+	}
+}
+
 /**
  * Recursively expand a fold, making lines visible except where they have an unexpanded parent.
  */
@@ -6461,10 +6474,10 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 		break;
 
 	case SCI_MARKERHANDLEFROMLINE:
-		return pdoc->MarkerHandleFromLine(static_cast<Sci::Line>(wParam), static_cast<int>(lParam));
+		return pdoc->MarkerHandleFromLine(wParam, static_cast<int>(lParam));
 
 	case SCI_MARKERNUMBERFROMLINE:
-		return pdoc->MarkerNumberFromLine(static_cast<Sci::Line>(wParam), static_cast<int>(lParam));
+		return pdoc->MarkerNumberFromLine(wParam, static_cast<int>(lParam));
 
 	case SCI_GETVIEWWS:
 		return vs.viewWhitespace;
@@ -8150,6 +8163,43 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 
 	case SCI_ANNOTATIONGETSTYLEOFFSET:
 		return vs.annotationStyleOffset;
+
+	case SCI_EOLANNOTATIONSETTEXT:
+		pdoc->EOLAnnotationSetText(wParam, CharPtrFromSPtr(lParam));
+		break;
+
+	case SCI_EOLANNOTATIONGETTEXT: {
+		const StyledText st = pdoc->EOLAnnotationStyledText(wParam);
+		return BytesResult(lParam, reinterpret_cast<const unsigned char *>(st.text), st.length);
+	}
+
+	case SCI_EOLANNOTATIONGETSTYLE: {
+		const StyledText st = pdoc->EOLAnnotationStyledText(wParam);
+		return st.style;
+	}
+
+	case SCI_EOLANNOTATIONSETSTYLE:
+		pdoc->EOLAnnotationSetStyle(wParam, static_cast<int>(lParam));
+		break;
+
+	case SCI_EOLANNOTATIONCLEARALL:
+		pdoc->EOLAnnotationClearAll();
+		break;
+
+	case SCI_EOLANNOTATIONSETVISIBLE:
+		SetEOLAnnotationVisible(static_cast<int>(wParam));
+		break;
+
+	case SCI_EOLANNOTATIONGETVISIBLE:
+		return vs.eolAnnotationVisible;
+
+	case SCI_EOLANNOTATIONSETSTYLEOFFSET:
+		vs.eolAnnotationStyleOffset = static_cast<int>(wParam);
+		InvalidateStyleRedraw();
+		break;
+
+	case SCI_EOLANNOTATIONGETSTYLEOFFSET:
+		return vs.eolAnnotationStyleOffset;
 
 	case SCI_RELEASEALLEXTENDEDSTYLES:
 		vs.ReleaseAllExtendedStyles();

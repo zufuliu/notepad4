@@ -74,7 +74,7 @@ GetDpiForWindowSig fnGetDpiForWindow = nullptr;
 
 using GetDpiForMonitorSig = HRESULT (WINAPI *)(HMONITOR hmonitor, /*MONITOR_DPI_TYPE*/int dpiType, UINT *dpiX, UINT *dpiY);
 HMODULE hShcoreDLL {};
-GetDpiForMonitorSig pfnGetDpiForMonitor = nullptr;
+GetDpiForMonitorSig fnGetDpiForMonitor = nullptr;
 
 using GetSystemMetricsForDpiSig = int (WINAPI *)(int nIndex, UINT dpi);
 GetSystemMetricsForDpiSig fnGetSystemMetricsForDpi = nullptr;
@@ -105,7 +105,7 @@ void Scintilla_LoadDpiForWindow(void) {
 	if (!fnGetDpiForWindow) {
 		hShcoreDLL = ::LoadLibraryExW(L"shcore.dll", {}, LOAD_LIBRARY_SEARCH_SYSTEM32);
 		if (hShcoreDLL) {
-			pfnGetDpiForMonitor = DLLFunction<GetDpiForMonitorSig>(hShcoreDLL, "GetDpiForMonitor");
+			fnGetDpiForMonitor = DLLFunction<GetDpiForMonitorSig>(hShcoreDLL, "GetDpiForMonitor");
 		}
 	}
 }
@@ -114,11 +114,11 @@ UINT GetWindowDPI(HWND hwnd) NP2_noexcept {
 	if (fnGetDpiForWindow) {
 		return fnGetDpiForWindow(hwnd);
 	}
-	if (pfnGetDpiForMonitor) {
+	if (fnGetDpiForMonitor) {
 		HMONITOR hMonitor = ::MonitorFromWindow(hwnd, MONITOR_DEFAULTTONEAREST);
 		UINT dpiX = 0;
 		UINT dpiY = 0;
-		if (pfnGetDpiForMonitor(hMonitor, MDT_EFFECTIVE_DPI, &dpiX, &dpiY) == S_OK) {
+		if (fnGetDpiForMonitor(hMonitor, MDT_EFFECTIVE_DPI, &dpiX, &dpiY) == S_OK) {
 			return dpiY;
 		}
 	}
