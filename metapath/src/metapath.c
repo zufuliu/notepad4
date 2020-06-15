@@ -2362,6 +2362,9 @@ void ValidateUILangauge(void) {
 	case LANG_CHINESE:
 		languageResID = IsChineseTraditionalSubLang(subLang)? IDS_LANG_CHINESE_TRADITIONAL : IDS_LANG_CHINESE_SIMPLIFIED;
 		break;
+	case LANG_GERMAN:
+		languageResID = IDS_LANG_GERMAN;
+		break;
 	case LANG_JAPANESE:
 		languageResID = IDS_LANG_JAPANESE;
 		break;
@@ -2387,6 +2390,9 @@ void SetUILanguage(UINT resID) {
 		break;
 	case IDS_LANG_CHINESE_TRADITIONAL:
 		lang = MAKELANGID(LANG_CHINESE, SUBLANG_CHINESE_TRADITIONAL);
+		break;
+	case IDS_LANG_GERMAN:
+		lang = MAKELANGID(LANG_GERMAN, SUBLANG_GERMAN);
 		break;
 	case IDS_LANG_JAPANESE:
 		lang = MAKELANGID(LANG_JAPANESE, SUBLANG_DEFAULT);

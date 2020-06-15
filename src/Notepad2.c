@@ -2180,6 +2180,9 @@ void ValidateUILangauge(void) {
 	case LANG_CHINESE:
 		languageMenu = IsChineseTraditionalSubLang(subLang)? IDM_LANG_CHINESE_TRADITIONAL : IDM_LANG_CHINESE_SIMPLIFIED;
 		break;
+	case LANG_GERMAN:
+		languageMenu = IDM_LANG_GERMAN;
+		break;
 	case LANG_JAPANESE:
 		languageMenu = IDM_LANG_JAPANESE;
 		break;
@@ -2205,6 +2208,9 @@ void SetUILanguage(UINT menu) {
 		break;
 	case IDM_LANG_CHINESE_TRADITIONAL:
 		lang = MAKELANGID(LANG_CHINESE, SUBLANG_CHINESE_TRADITIONAL);
+		break;
+	case LANG_GERMAN:
+		lang = MAKELANGID(LANG_GERMAN, SUBLANG_GERMAN);
 		break;
 	case IDM_LANG_JAPANESE:
 		lang = MAKELANGID(LANG_JAPANESE, SUBLANG_DEFAULT);
