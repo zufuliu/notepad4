@@ -3751,21 +3751,6 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	}
 	break;
 
-	case IDM_EDIT_FIND:
-		if (!IsWindow(hDlgFindReplace)) {
-			hDlgFindReplace = EditFindReplaceDlg(hwndEdit, &efrData, FALSE);
-		} else {
-			if (GetDlgItem(hDlgFindReplace, IDC_REPLACE)) {
-				SendWMCommand(hDlgFindReplace, IDMSG_SWITCHTOFIND);
-				DestroyWindow(hDlgFindReplace);
-				hDlgFindReplace = EditFindReplaceDlg(hwndEdit, &efrData, FALSE);
-			} else {
-				SetForegroundWindow(hDlgFindReplace);
-				PostMessage(hDlgFindReplace, WM_NEXTDLGCTL, (WPARAM)(GetDlgItem(hDlgFindReplace, IDC_FINDTEXT)), 1);
-			}
-		}
-		break;
-
 	// Main Bookmark Functions
 	case BME_EDIT_BOOKMARKNEXT: {
 		const Sci_Position iPos = SciCall_GetCurrentPos();
@@ -3812,6 +3797,36 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	case BME_EDIT_BOOKMARKCLEAR:
 		SciCall_MarkerDeleteAll(MarkerNumber_Bookmark);
+		break;
+
+	case IDM_EDIT_FIND:
+		if (!IsWindow(hDlgFindReplace)) {
+			hDlgFindReplace = EditFindReplaceDlg(hwndEdit, &efrData, FALSE);
+		} else {
+			if (GetDlgItem(hDlgFindReplace, IDC_REPLACE)) {
+				SendWMCommand(hDlgFindReplace, IDC_TOGGLEFINDREPLACE);
+				DestroyWindow(hDlgFindReplace);
+				hDlgFindReplace = EditFindReplaceDlg(hwndEdit, &efrData, FALSE);
+			} else {
+				SetForegroundWindow(hDlgFindReplace);
+				PostMessage(hDlgFindReplace, WM_NEXTDLGCTL, (WPARAM)(GetDlgItem(hDlgFindReplace, IDC_FINDTEXT)), 1);
+			}
+		}
+		break;
+
+	case IDM_EDIT_REPLACE:
+		if (!IsWindow(hDlgFindReplace)) {
+			hDlgFindReplace = EditFindReplaceDlg(hwndEdit, &efrData, TRUE);
+		} else {
+			if (!GetDlgItem(hDlgFindReplace, IDC_REPLACE)) {
+				SendWMCommand(hDlgFindReplace, IDC_TOGGLEFINDREPLACE);
+				DestroyWindow(hDlgFindReplace);
+				hDlgFindReplace = EditFindReplaceDlg(hwndEdit, &efrData, TRUE);
+			} else {
+				SetForegroundWindow(hDlgFindReplace);
+				PostMessage(hDlgFindReplace, WM_NEXTDLGCTL, (WPARAM)(GetDlgItem(hDlgFindReplace, IDC_FINDTEXT)), 1);
+			}
+		}
 		break;
 
 	case IDM_EDIT_FINDNEXT:
@@ -3893,21 +3908,6 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	case IDM_EDIT_COMPLETEWORD:
 		EditCompleteWord(AutoCompleteCondition_Normal, TRUE);
-		break;
-
-	case IDM_EDIT_REPLACE:
-		if (!IsWindow(hDlgFindReplace)) {
-			hDlgFindReplace = EditFindReplaceDlg(hwndEdit, &efrData, TRUE);
-		} else {
-			if (!GetDlgItem(hDlgFindReplace, IDC_REPLACE)) {
-				SendWMCommand(hDlgFindReplace, IDMSG_SWITCHTOREPLACE);
-				DestroyWindow(hDlgFindReplace);
-				hDlgFindReplace = EditFindReplaceDlg(hwndEdit, &efrData, TRUE);
-			} else {
-				SetForegroundWindow(hDlgFindReplace);
-				PostMessage(hDlgFindReplace, WM_NEXTDLGCTL, (WPARAM)(GetDlgItem(hDlgFindReplace, IDC_FINDTEXT)), 1);
-			}
-		}
 		break;
 
 	case IDM_EDIT_GOTOLINE:
