@@ -4662,14 +4662,17 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 		}
 
 		// don't copy selection after toggle find & replace on this window.
+		BOOL hasFindText = FALSE;
 		if (bSwitchedFindReplace != 3) {
 			Sci_Position cchSelection = SciCall_GetSelTextLength();
 			if (cchSelection <= NP2_FIND_REPLACE_LIMIT) {
 				char *lpszSelection = (char *)NP2HeapAlloc(cchSelection);
 				SciCall_GetSelText(lpszSelection);
 
-				// First time you bring up find/replace dialog, copy content from clipboard to find box (but only if nothing is selected in the editor)
-				if (StrIsEmptyA(lpszSelection) && bFirstTime) {
+				hasFindText = !StrIsEmptyA(lpszSelection);
+				// First time you bring up find/replace dialog,
+				// copy content from clipboard to find box when nothing is selected in the editor.
+				if (!hasFindText && bFirstTime) {
 					char *pClip = EditGetClipboardText(lpefr->hwnd);
 					if (pClip != NULL) {
 						const size_t len = strlen(pClip);
@@ -4715,6 +4718,10 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 			ComboBox_LimitText(hwndRepl, NP2_FIND_REPLACE_LIMIT);
 			ComboBox_SetExtendedUI(hwndRepl, TRUE);
 			SetDlgItemTextA2W(CP_UTF8, hwnd, IDC_REPLACETEXT, lpefr->szReplaceUTF8);
+			if (hasFindText) {
+				// focus on replace box when selected text is not empty.
+				PostMessage(hwnd, WM_NEXTDLGCTL, (WPARAM)hwndRepl, 1);
+			}
 		}
 
 		if (lpefr->fuFlags & SCFIND_MATCHCASE) {
