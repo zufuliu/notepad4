@@ -4629,6 +4629,55 @@ void AddBackslashComboBoxSetup(HWND hwndDlg, int nCtlId) {
 
 extern BOOL bFindReplaceTransparentMode;
 extern int iFindReplaceOpacityLevel;
+
+static BOOL CopySelectionAsFindText(HWND hwnd, LPEDITFINDREPLACE lpefr, BOOL bFirstTime) {
+	const Sci_Position cchSelection = SciCall_GetSelTextLength() - 1;
+	char *lpszSelection = NULL;
+
+	if (cchSelection != 0 && cchSelection <= NP2_FIND_REPLACE_LIMIT) {
+		lpszSelection = (char *)NP2HeapAlloc(cchSelection + 1);
+		SciCall_GetSelText(lpszSelection);
+	}
+
+	// only for manually selected text
+	const BOOL hasFindText = StrNotEmptyA(lpszSelection);
+
+	// First time you bring up find/replace dialog,
+	// copy content from clipboard to find box when nothing is selected in the editor.
+	if (!hasFindText && bFirstTime) {
+		char *pClip = EditGetClipboardText(hwnd);
+		if (pClip != NULL) {
+			const size_t len = strlen(pClip);
+			if (len > 0 && len <= NP2_FIND_REPLACE_LIMIT) {
+				NP2HeapFree(lpszSelection);
+				lpszSelection = (char *)NP2HeapAlloc(len + 2);
+				strcpy(lpszSelection, pClip);
+			}
+			LocalFree(pClip);
+		}
+	}
+
+	if (StrNotEmptyA(lpszSelection)) {
+		const UINT cpEdit = SciCall_GetCodePage();
+		// Check lpszSelection and truncate bad chars
+		//char *lpsz = strpbrk(lpszSelection, "\r\n\t");
+		//if (lpsz) {
+		//	*lpsz = '\0';
+		//}
+
+		char *lpszEscSel = (char *)NP2HeapAlloc((2 * NP2_FIND_REPLACE_LIMIT));
+		lpefr->bTransformBS = AddBackslashA(lpszEscSel, lpszSelection);
+
+		SetDlgItemTextA2W(cpEdit, hwnd, IDC_FINDTEXT, lpszEscSel);
+		NP2HeapFree(lpszEscSel);
+	}
+
+	if (lpszSelection != NULL) {
+		NP2HeapFree(lpszSelection);
+	}
+	return hasFindText;
+}
+
 //=============================================================================
 //
 // EditFindReplaceDlgProc()
@@ -4643,17 +4692,11 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 
 	switch (umsg) {
 	case WM_INITDIALOG: {
-		static BOOL bFirstTime = TRUE;
-
 		SetWindowLongPtr(hwnd, DWLP_USER, lParam);
 		ResizeDlg_InitX(hwnd, cxFindReplaceDlg, IDC_RESIZEGRIP2);
 
 		HWND hwndFind = GetDlgItem(hwnd, IDC_FINDTEXT);
 		AddBackslashComboBoxSetup(hwnd, IDC_FINDTEXT);
-
-		LPEDITFINDREPLACE lpefr = (LPEDITFINDREPLACE)lParam;
-		// Get the current code page for Unicode conversion
-		const UINT cpEdit = SciCall_GetCodePage();
 
 		// Load MRUs
 		for (int i = 0; i < MRU_GetCount(mruFind); i++) {
@@ -4661,51 +4704,18 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 			ComboBox_AddString(hwndFind, tch);
 		}
 
+		LPEDITFINDREPLACE lpefr = (LPEDITFINDREPLACE)lParam;
 		// don't copy selection after toggle find & replace on this window.
 		BOOL hasFindText = FALSE;
 		if (bSwitchedFindReplace != 3) {
-			Sci_Position cchSelection = SciCall_GetSelTextLength();
-			if (cchSelection <= NP2_FIND_REPLACE_LIMIT) {
-				char *lpszSelection = (char *)NP2HeapAlloc(cchSelection);
-				SciCall_GetSelText(lpszSelection);
-
-				hasFindText = !StrIsEmptyA(lpszSelection);
-				// First time you bring up find/replace dialog,
-				// copy content from clipboard to find box when nothing is selected in the editor.
-				if (!hasFindText && bFirstTime) {
-					char *pClip = EditGetClipboardText(lpefr->hwnd);
-					if (pClip != NULL) {
-						const size_t len = strlen(pClip);
-						if (len > 0 && len <= NP2_FIND_REPLACE_LIMIT) {
-							NP2HeapFree(lpszSelection);
-							lpszSelection = (char *)NP2HeapAlloc(len + 2);
-							strcpy(lpszSelection, pClip);
-						}
-						LocalFree(pClip);
-					}
-				}
-				bFirstTime = FALSE;
-
-				// Check lpszSelection and truncate bad chars
-				//char *lpsz = strpbrk(lpszSelection, "\r\n\t");
-				//if (lpsz) {
-				//	*lpsz = '\0';
-				//}
-				char *lpszEscSel = (char *)NP2HeapAlloc((2 * NP2_FIND_REPLACE_LIMIT));
-				lpefr->bTransformBS = AddBackslashA(lpszEscSel, lpszSelection);
-
-				SetDlgItemTextA2W(cpEdit, hwnd, IDC_FINDTEXT, lpszEscSel);
-				NP2HeapFree(lpszSelection);
-				NP2HeapFree(lpszEscSel);
-			}
+			hasFindText = CopySelectionAsFindText(hwnd, lpefr, TRUE);
+		}
+		if (!GetWindowTextLength(hwndFind)) {
+			SetDlgItemTextA2W(CP_UTF8, hwnd, IDC_FINDTEXT, lpefr->szFindUTF8);
 		}
 
 		ComboBox_LimitText(hwndFind, NP2_FIND_REPLACE_LIMIT);
 		ComboBox_SetExtendedUI(hwndFind, TRUE);
-
-		if (!GetWindowTextLength(hwndFind)) {
-			SetDlgItemTextA2W(CP_UTF8, hwnd, IDC_FINDTEXT, lpefr->szFindUTF8);
-		}
 
 		HWND hwndRepl = GetDlgItem(hwnd, IDC_REPLACETEXT);
 		if (hwndRepl) {
@@ -4718,11 +4728,10 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 			ComboBox_LimitText(hwndRepl, NP2_FIND_REPLACE_LIMIT);
 			ComboBox_SetExtendedUI(hwndRepl, TRUE);
 			SetDlgItemTextA2W(CP_UTF8, hwnd, IDC_REPLACETEXT, lpefr->szReplaceUTF8);
-			if (hasFindText) {
-				// focus on replace box when selected text is not empty.
-				PostMessage(hwnd, WM_NEXTDLGCTL, (WPARAM)hwndRepl, 1);
-			}
 		}
+
+		// focus on replace box when selected text is not empty.
+		PostMessage(hwnd, WM_NEXTDLGCTL, (WPARAM)((hasFindText && hwndRepl)? hwndRepl : hwndFind), 1);
 
 		if (lpefr->fuFlags & SCFIND_MATCHCASE) {
 			CheckDlgButton(hwnd, IDC_FINDCASE, BST_CHECKED);
@@ -4753,7 +4762,7 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 			CheckDlgButton(hwnd, IDC_NOWRAP, BST_CHECKED);
 		}
 
-		if (GetDlgItem(hwnd, IDC_REPLACE)) {
+		if (hwndRepl) {
 			if (bSwitchedFindReplace) {
 				if (lpefr->bFindClose) {
 					CheckDlgButton(hwnd, IDC_FINDCLOSE, BST_CHECKED);
@@ -4792,6 +4801,23 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 		}
 	}
 	return TRUE;
+
+	case WM_COPYDATA: {
+		HWND hwndFind = GetDlgItem(hwnd, IDC_FINDTEXT);
+		HWND hwndRepl = GetDlgItem(hwnd, IDC_REPLACETEXT);
+		LPEDITFINDREPLACE lpefr = (LPEDITFINDREPLACE)GetWindowLongPtr(hwnd, DWLP_USER);
+
+		const BOOL hasFindText = CopySelectionAsFindText(hwnd, lpefr, FALSE);
+		if (!GetWindowTextLength(hwndFind)) {
+			SetDlgItemTextA2W(CP_UTF8, hwnd, IDC_FINDTEXT, lpefr->szFindUTF8);
+		}
+		if (lpefr->bTransformBS) {
+			CheckDlgButton(hwnd, IDC_FINDTRANSFORMBS, BST_CHECKED);
+		}
+		// focus on replace box when selected text is not empty.
+		PostMessage(hwnd, WM_NEXTDLGCTL, (WPARAM)((hasFindText && hwndRepl)? hwndRepl : hwndFind), 1);
+	}
+	break;
 
 	case WM_DESTROY:
 		ResizeDlg_Destroy(hwnd, &cxFindReplaceDlg, NULL);

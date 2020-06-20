@@ -3800,34 +3800,22 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	case IDM_EDIT_FIND:
+	case IDM_EDIT_REPLACE: {
+		const BOOL bReplace = LOWORD(wParam) == IDM_EDIT_REPLACE;
 		if (!IsWindow(hDlgFindReplace)) {
-			hDlgFindReplace = EditFindReplaceDlg(hwndEdit, &efrData, FALSE);
+			hDlgFindReplace = EditFindReplaceDlg(hwndEdit, &efrData, bReplace);
 		} else {
-			if (GetDlgItem(hDlgFindReplace, IDC_REPLACE)) {
+			if (bReplace ^ (GetDlgItem(hDlgFindReplace, IDC_REPLACE) != NULL)) {
 				SendWMCommand(hDlgFindReplace, IDC_TOGGLEFINDREPLACE);
 				DestroyWindow(hDlgFindReplace);
-				hDlgFindReplace = EditFindReplaceDlg(hwndEdit, &efrData, FALSE);
+				hDlgFindReplace = EditFindReplaceDlg(hwndEdit, &efrData, bReplace);
 			} else {
+				SendMessage(hDlgFindReplace, WM_COPYDATA, 0, 0);
 				SetForegroundWindow(hDlgFindReplace);
-				PostMessage(hDlgFindReplace, WM_NEXTDLGCTL, (WPARAM)(GetDlgItem(hDlgFindReplace, IDC_FINDTEXT)), 1);
 			}
 		}
-		break;
-
-	case IDM_EDIT_REPLACE:
-		if (!IsWindow(hDlgFindReplace)) {
-			hDlgFindReplace = EditFindReplaceDlg(hwndEdit, &efrData, TRUE);
-		} else {
-			if (!GetDlgItem(hDlgFindReplace, IDC_REPLACE)) {
-				SendWMCommand(hDlgFindReplace, IDC_TOGGLEFINDREPLACE);
-				DestroyWindow(hDlgFindReplace);
-				hDlgFindReplace = EditFindReplaceDlg(hwndEdit, &efrData, TRUE);
-			} else {
-				SetForegroundWindow(hDlgFindReplace);
-				PostMessage(hDlgFindReplace, WM_NEXTDLGCTL, (WPARAM)(GetDlgItem(hDlgFindReplace, IDC_FINDTEXT)), 1);
-			}
-		}
-		break;
+	}
+	break;
 
 	case IDM_EDIT_FINDNEXT:
 	case IDM_EDIT_FINDPREV:
