@@ -1978,7 +1978,14 @@ void EditAutoIndent(void) {
 		if (indent == 2 && endPart) {
 			const int level = SciCall_GetFoldLevel(iCurLine);
 			if (!(level & SC_FOLDLEVELHEADERFLAG)) {
-				indent = 1;
+				const Sci_Line parent = SciCall_GetFoldParent(iCurLine);
+				if (parent >= 0 && parent + 1 == iCurLine) {
+					const Sci_Line child = SciCall_GetLastChild(parent);
+					// TODO: check endPart is on this line
+					if (SciCall_GetLineLength(child)) {
+						indent = 1;
+					}
+				}
 			}
 		}
 
