@@ -1337,30 +1337,14 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 
 		if (PathIsFile(szCurFile)) {
 			if ((iFileWatchingMode == 2 && !IsDocumentModified()) || MsgBoxWarn(MB_YESNO, IDS_FILECHANGENOTIFY) == IDYES) {
-				const Sci_Position iCurPos = SciCall_GetCurrentPos();
-				const Sci_Position iAnchorPos = SciCall_GetAnchor();
-#if NP2_ENABLE_DOT_LOG_FEATURE
-				const Sci_Line iVisTopLine = SciCall_GetFirstVisibleLine();
-				const Sci_Line iDocTopLine = SciCall_DocLineFromVisible(iVisTopLine);
-				const int iXOffset = SciCall_GetXOffset();
-#endif
-				const BOOL bIsTail = bFileWatchingKeepAtEnd || ((iCurPos == iAnchorPos) && (SciCall_LineFromPosition(iCurPos) + 1 == SciCall_GetLineCount()));
+				const BOOL bIsTail = (iFileWatchingMode == 2) && (bFileWatchingKeepAtEnd || (SciCall_LineFromPosition(SciCall_GetCurrentPos()) + 1 == SciCall_GetLineCount()));
 
 				iWeakSrcEncoding = iEncoding;
 				if (FileLoad(TRUE, FALSE, TRUE, FALSE, szCurFile)) {
-					if (bIsTail && iFileWatchingMode == 2) {
+					if (bIsTail) {
 						SciCall_DocumentEnd();
 						EditEnsureSelectionVisible();
 					}
-#if NP2_ENABLE_DOT_LOG_FEATURE
-					 else if (IsFileStartsWithDotLog()) {
-						SciCall_SetSel(iAnchorPos, iCurPos);
-						SciCall_EnsureVisible(iDocTopLine);
-						const Sci_Line iNewTopLine = SciCall_GetFirstVisibleLine();
-						SciCall_LineScroll(0, iVisTopLine - iNewTopLine);
-						SciCall_SetXOffset(iXOffset);
-					}
-#endif
 				}
 			}
 		} else {
@@ -2682,25 +2666,8 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 				return 0;
 			}
 
-#if NP2_ENABLE_DOT_LOG_FEATURE
-			const Sci_Position iCurPos = SciCall_GetCurrentPos();
-			const Sci_Position iAnchorPos = SciCall_GetAnchor();
-			const Sci_Line iVisTopLine = SciCall_GetFirstVisibleLine();
-			const Sci_Line iDocTopLine = SciCall_DocLineFromVisible(iVisTopLine);
-			const int iXOffset = SciCall_GetXOffset();
-#endif
 			iWeakSrcEncoding = iEncoding;
-			if (FileLoad(TRUE, FALSE, TRUE, FALSE, szCurFile)) {
-#if NP2_ENABLE_DOT_LOG_FEATURE
-				if (IsFileStartsWithDotLog()) {
-					SciCall_SetSel(iAnchorPos, iCurPos);
-					SciCall_EnsureVisible(iDocTopLine);
-					const Sci_Line iNewTopLine = SciCall_GetFirstVisibleLine();
-					SciCall_LineScroll(0, iVisTopLine - iNewTopLine);
-					SciCall_SetXOffset(iXOffset);
-				}
-#endif
-			}
+			FileLoad(TRUE, FALSE, TRUE, FALSE, szCurFile);
 		}
 		break;
 
@@ -7125,17 +7092,28 @@ BOOL FileIO(BOOL fLoad, LPWSTR pszFile, BOOL bFlag, EditFileIOStatus *status) {
 BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect, LPCWSTR lpszFile) {
 	WCHAR tch[MAX_PATH] = L"";
 	BOOL fSuccess = FALSE;
-	Sci_Line line = 0;
-	Sci_Position col = 0;
+	BOOL bRestoreView = FALSE;
+	Sci_Position iCurPos = 0;
+	Sci_Position iAnchorPos = 0;
+	Sci_Line iLine = 0;
+	Sci_Position iCol = 0;
+	Sci_Line iVisTopLine = 0;
+	Sci_Line iDocTopLine = 0;
+	int iXOffset = 0;
 	int keepTitleExcerpt = fKeepTitleExcerpt;
 	int lexerSpecified = flagLexerSpecified;
 
 	if (!bNew && StrNotEmpty(lpszFile)) {
 		lstrcpy(tch, lpszFile);
 		if (lpszFile == szCurFile || StrCaseEqual(lpszFile, szCurFile)) {
-			const Sci_Position pos = SciCall_GetCurrentPos();
-			line = SciCall_LineFromPosition(pos) + 1;
-			col = SciCall_GetColumn(pos) + 1;
+			iCurPos = SciCall_GetCurrentPos();
+			iAnchorPos = SciCall_GetAnchor();
+			iLine = SciCall_LineFromPosition(iCurPos) + 1;
+			iCol = SciCall_GetColumn(iCurPos) + 1;
+			iVisTopLine = SciCall_GetFirstVisibleLine();
+			iDocTopLine = SciCall_DocLineFromVisible(iVisTopLine);
+			iXOffset = SciCall_GetXOffset();
+			bRestoreView = iLine > 1 || iCol > 1;
 			keepTitleExcerpt = 1;
 			lexerSpecified = 1;
 		}
@@ -7298,12 +7276,9 @@ BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect, LPCWST
 			bLockedForEditing = TRUE;
 			SciCall_SetReadOnly(TRUE);
 		} else {
-			if (line > 1 || col > 1) {
-				EditJumpTo(line, col);
-				EditEnsureSelectionVisible();
-			}
 #if NP2_ENABLE_DOT_LOG_FEATURE
 			if (IsFileStartsWithDotLog()) {
+				bRestoreView = TRUE;
 				SciCall_DocumentEnd();
 				SciCall_BeginUndoAction();
 				SciCall_NewLine();
@@ -7312,9 +7287,22 @@ BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect, LPCWST
 				SciCall_NewLine();
 				SciCall_EndUndoAction();
 				SciCall_DocumentEnd();
-				EditEnsureSelectionVisible();
 			}
 #endif
+			if (bRestoreView) {
+				SciCall_SetSel(iAnchorPos, iCurPos);
+				Sci_Line iCurLine = iLine - SciCall_LineFromPosition(SciCall_GetCurrentPos());
+				iCurLine = (iCurLine < 0) ? -iCurLine : iCurLine;
+				if (iCurLine > 5) {
+					EditJumpTo(iLine, iCol);
+				} else {
+					SciCall_EnsureVisible(iDocTopLine);
+					const Sci_Line iNewTopLine = SciCall_GetFirstVisibleLine();
+					SciCall_LineScroll(0, iVisTopLine - iNewTopLine);
+					SciCall_SetXOffset(iXOffset);
+				}
+				EditEnsureSelectionVisible();
+			}
 		}
 
 		if (!bInitDone) {
