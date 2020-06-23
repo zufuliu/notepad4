@@ -235,7 +235,7 @@ static WCHAR systemCodeFontName[LF_FACESIZE];
 static WCHAR systemTextFontName[LF_FACESIZE];
 // global default monospaced font and proportional font
 static WCHAR defaultCodeFontName[LF_FACESIZE];
-static WCHAR defaultTextFontName[LF_FACESIZE];
+WCHAR defaultTextFontName[LF_FACESIZE];
 
 static WCHAR darkStyleThemeFilePath[MAX_PATH];
 static WCHAR favoriteSchemesConfig[MAX_FAVORITE_SCHEMES_CONFIG_SIZE];
@@ -314,6 +314,7 @@ extern int	iDefaultCodePage;
 extern int	iDefaultCharSet;
 extern INT	iHighlightCurrentLine;
 extern BOOL	bShowBookmarkMargin;
+extern int	iZoomLevel;
 
 #define STYLE_MASK_FONT_FACE	(1 << 0)
 #define STYLE_MASK_FONT_SIZE	(1 << 1)
@@ -1058,17 +1059,26 @@ static void Style_ResetAll(BOOL resetColor) {
 	fStylesModified |= STYLESMODIFIED_ALL_STYLE | STYLESMODIFIED_FILE_EXT | STYLESMODIFIED_COLOR;
 }
 
-// styles depend on current DPI.
+static inline int ScaleStylePixel(int value, int scale, int minValue) {
+	value = (scale == USER_DEFAULT_SCREEN_DPI*100) ? value : MulDiv(value, scale, USER_DEFAULT_SCREEN_DPI*100);
+	return max_i(value, minValue);
+}
+
+// styles depend on current DPI or zoom level.
 void Style_OnDPIChanged(PEDITLEXER pLex) {
+	const int scale = g_uCurrentDPI*iZoomLevel;
+
 	// whitespace dot size
 	LPCWSTR szValue = pLexGlobal->Styles[GlobalStyleIndex_Whitespace].szValue;
-	int iValue = 1;
+	int iValue = 0;
 	Style_StrGetRawSize(szValue, &iValue);
-	iValue = max_i(1, RoundToCurrentDPI(iValue));
+	iValue = ScaleStylePixel(iValue, scale, 1);
 	SciCall_SetWhitespaceSize(iValue);
 
-	// update styles that use pixel
+	// outline frame width
 	Style_HighlightCurrentLine();
+	// caret width
+	Style_UpdateCaret();
 
 	// Extra Line Spacing
 	szValue = (pLex->rid != NP2LEX_ANSI)? pLexGlobal->Styles[GlobalStyleIndex_ExtraLineSpacing].szValue
@@ -1078,12 +1088,12 @@ void Style_OnDPIChanged(PEDITLEXER pLex) {
 		int iDescent;
 		if (iValue > 0) {
 			// 5 => iAscent = 3, iDescent = 2
-			iValue = max_i(0, RoundToCurrentDPI(iValue));
+			iValue = ScaleStylePixel(iValue, scale, 0);
 			iDescent = iValue/2 ;
 			iAscent = iValue - iDescent;
 		} else {
 			// -5 => iAscent = -2, iDescent = -3
-			iValue = -max_i(0, RoundToCurrentDPI(-iValue));
+			iValue = -ScaleStylePixel(-iValue, scale, 0);
 			iAscent = iValue/2 ;
 			iDescent = iValue - iAscent;
 		}
@@ -1111,16 +1121,26 @@ void Style_OnStyleThemeChanged(int theme) {
 }
 
 void Style_UpdateCaret(void) {
+	int iValue = iCaretStyle;
 	// caret style and width
-	const int style = (iCaretStyle ? CARETSTYLE_LINE : CARETSTYLE_BLOCK)
+	const int style = (iValue ? CARETSTYLE_LINE : CARETSTYLE_BLOCK)
 		| (iOvrCaretStyle ? CARETSTYLE_OVERSTRIKE_BLOCK : CARETSTYLE_OVERSTRIKE_BAR)
 		| (bBlockCaretOutSelection ? CARETSTYLE_BLOCK_AFTER : 0);
 	SciCall_SetCaretStyle(style);
-	if (iCaretStyle != 0) {
-		SciCall_SetCaretWidth(iCaretStyle);
+	// caret width
+	if (iValue != 0) {
+		DWORD width = 0;
+		if (SystemParametersInfo(SPI_GETCARETWIDTH, 0, &width, 0) && width > (DWORD)iValue) {
+			// use system caret width
+			iValue = width;
+		} else if (iValue == 1) {
+			// scale default caret width
+			iValue = ScaleStylePixel(iValue, g_uCurrentDPI*iZoomLevel, 1);
+		}
+		SciCall_SetCaretWidth(iValue);
 	}
 
-	const int iValue = (iCaretBlinkPeriod < 0)? (int)GetCaretBlinkTime() : iCaretBlinkPeriod;
+	iValue = (iCaretBlinkPeriod < 0)? (int)GetCaretBlinkTime() : iCaretBlinkPeriod;
 	SciCall_SetCaretPeriod(iValue);
 }
 
@@ -1583,7 +1603,6 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 	//! end Whitespace
 
 	//! begin Caret
-	Style_UpdateCaret();
 	const COLORREF backColor = SciCall_StyleGetBack(STYLE_DEFAULT);
 	// caret fore
 	szValue = pLexGlobal->Styles[GlobalStyleIndex_Caret].szValue;
@@ -1611,6 +1630,8 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 	SciCall_IndicSetFore(SC_INDICATOR_UNKNOWN, rgb);
 
 	Style_SetLongLineColors();
+
+	// update styles that use pixel
 	Style_OnDPIChanged(pLexNew);
 
 	// set folding style; braces are for scoping only
@@ -2994,13 +3015,13 @@ void Style_HighlightCurrentLine(void) {
 	if (iHighlightCurrentLine != 0) {
 		LPCWSTR szValue = pLexGlobal->Styles[GlobalStyleIndex_CurrentLine].szValue;
 		// 1: background color, 2: outline frame
-		const BOOL outline = iHighlightCurrentLine != 1;
+		const BOOL outline = iHighlightCurrentLine == 2;
 		COLORREF rgb;
 		if (Style_StrGetColor(outline, szValue, &rgb)) {
 			int size = 0;
 			if (outline) {
 				Style_StrGetRawSize(szValue, &size);
-				size = max_i(1, RoundToCurrentDPI(size));
+				size = ScaleStylePixel(size, g_uCurrentDPI*iZoomLevel, 1);
 			}
 
 			SciCall_SetCaretLineFrame(size);

@@ -64,7 +64,7 @@
 #define NP2_TARGET_ARM64	1
 #define GetWindowDPI(hwnd)						GetDpiForWindow(hwnd)
 #define SystemMetricsForDpi(nIndex, dpi)		GetSystemMetricsForDpi((nIndex), (dpi))
-#define DpiAdjustWindowRect(lpRect, dwStyle, dwExStyle, dpi) \
+#define AdjustWindowRectForDpi(lpRect, dwStyle, dwExStyle, dpi) \
 		::AdjustWindowRectExForDpi((lpRect), (dwStyle), FALSE, (dwExStyle), (dpi))
 
 #else
@@ -73,13 +73,19 @@
 #define NP2_noexcept noexcept
 extern UINT GetWindowDPI(HWND hwnd) noexcept;
 extern int SystemMetricsForDpi(int nIndex, UINT dpi) noexcept;
-extern BOOL DpiAdjustWindowRect(LPRECT lpRect, DWORD dwStyle, DWORD dwExStyle, UINT dpi) noexcept;
+extern BOOL AdjustWindowRectForDpi(LPRECT lpRect, DWORD dwStyle, DWORD dwExStyle, UINT dpi) noexcept;
 #else
 #define NP2_noexcept
 extern "C" UINT GetWindowDPI(HWND hwnd);
 extern "C" int SystemMetricsForDpi(int nIndex, UINT dpi);
-extern "C" BOOL DpiAdjustWindowRect(LPRECT lpRect, DWORD dwStyle, DWORD dwExStyle, UINT dpi);
+extern "C" BOOL AdjustWindowRectForDpi(LPRECT lpRect, DWORD dwStyle, DWORD dwExStyle, UINT dpi);
 #endif
+#endif
+
+#if defined(__GNUC__) || defined(__clang__)
+#define NP2_unreachable()	__builtin_unreachable()
+#else
+#define NP2_unreachable()	__assume(0)
 #endif
 
 namespace Scintilla {
@@ -131,9 +137,6 @@ inline T DLLFunction(HMODULE hModule, LPCSTR lpProcName) noexcept {
 	return reinterpret_cast<T>(::GetProcAddress(hModule, lpProcName));
 #endif
 #else
-	if (!hModule) {
-		return nullptr;
-	}
 	FARPROC function = ::GetProcAddress(hModule, lpProcName);
 	static_assert(sizeof(T) == sizeof(function));
 	T fp;
@@ -153,13 +156,14 @@ inline T DLLFunctionEx(LPCWSTR lpDllName, LPCSTR lpProcName) noexcept {
 template <class T>
 inline void ReleaseUnknown(T *&ppUnknown) noexcept {
 	if (ppUnknown) {
-#if 1
+#if 0
 		ppUnknown->Release();
 #else
 		try {
 			ppUnknown->Release();
 		} catch (...) {
 			// Never occurs
+			NP2_unreachable();
 		}
 #endif
 		ppUnknown = nullptr;

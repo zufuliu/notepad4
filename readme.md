@@ -195,9 +195,9 @@ Latest development builds (artifacts in Release configuration for each compiler 
 * [Scintilla's website](https://www.scintilla.org/)
 * [Build Notepad2 and metapath](https://github.com/zufuliu/notepad2/wiki/Build-Notepad2)
 * [Localization](https://github.com/zufuliu/notepad2/wiki/Localization)
-	* [简体中文](https://github.com/zufuliu/notepad2/tree/master/locale/zh-Hans)
-	* [繁體中文](https://github.com/zufuliu/notepad2/tree/master/locale/zh-Hant)
 	* [日本語](https://github.com/maboroshin/notepad2)
+	* [中文 (繁體)](https://github.com/zufuliu/notepad2/tree/master/locale/zh-Hant)
+	* [中文 (简体)](https://github.com/zufuliu/notepad2/tree/master/locale/zh-Hans)
 	* [한국어](https://teus.me/category/IT/Notepad2)
 * [Notepad2 Wiki](https://github.com/zufuliu/notepad2/wiki)
 * Other projects based on (original) Notepad2 or Notepad2-mod:

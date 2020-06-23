@@ -203,8 +203,8 @@ public:
  */
 class DropSource : public IDropSource {
 public:
-	ScintillaWin *sci;
-	DropSource() noexcept;
+	ScintillaWin *sci = nullptr;
+	DropSource() noexcept = default;
 	virtual ~DropSource() = default;
 
 	// IUnknown
@@ -221,8 +221,8 @@ public:
  */
 class DataObject : public IDataObject {
 public:
-	ScintillaWin *sci;
-	DataObject() noexcept;
+	ScintillaWin *sci = nullptr;
+	DataObject() noexcept = default;
 	virtual ~DataObject() = default;
 
 	// IUnknown
@@ -246,8 +246,8 @@ public:
  */
 class DropTarget : public IDropTarget {
 public:
-	ScintillaWin *sci;
-	DropTarget() noexcept;
+	ScintillaWin *sci = nullptr;
+	DropTarget() noexcept = default;
 	virtual ~DropTarget() = default;
 
 	// IUnknown
@@ -442,8 +442,8 @@ class ScintillaWin :
 	#define EnumAllClipboardFormat(tag)
 #endif
 
-	static sptr_t DirectFunction(
-		sptr_t ptr, UINT iMessage, uptr_t wParam, sptr_t lParam);
+	//static sptr_t DirectFunction(
+	//	sptr_t ptr, UINT iMessage, uptr_t wParam, sptr_t lParam);
 	static LRESULT CALLBACK SWndProc(
 		HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam);
 	static LRESULT CALLBACK CTWndProc(
@@ -582,7 +582,7 @@ public:
 		POINTL pt, PDWORD pdwEffect);
 
 	/// Implement important part of IDataObject
-	STDMETHODIMP GetData(FORMATETC *pFEIn, STGMEDIUM *pSTM);
+	STDMETHODIMP GetData(const FORMATETC *pFEIn, STGMEDIUM *pSTM);
 
 #if USE_WIN32_INIT_ONCE
 	static BOOL CALLBACK PrepareOnce(PINIT_ONCE initOnce, PVOID parameter, PVOID *lpContext) noexcept;
@@ -795,7 +795,7 @@ void ScintillaWin::EnsureRenderTarget(HDC hdc) noexcept {
 	if ((technology == SC_TECHNOLOGY_DIRECTWRITEDC) && pRenderTarget) {
 		RECT rcWindow;
 		GetClientRect(MainHWND(), &rcWindow);
-		const HRESULT hr = static_cast<ID2D1DCRenderTarget*>(pRenderTarget)->BindDC(hdc, &rcWindow);
+		const HRESULT hr = down_cast<ID2D1DCRenderTarget*>(pRenderTarget)->BindDC(hdc, &rcWindow);
 		if (FAILED(hr)) {
 			//Platform::DebugPrintf("BindDC failed 0x%lx\n", hr);
 			DropRenderTarget();
@@ -836,8 +836,8 @@ void ScintillaWin::StartDrag() {
 	inDragDrop = ddDragging;
 	DWORD dwEffect = 0;
 	dropWentOutside = true;
-	IDataObject *pDataObject = reinterpret_cast<IDataObject *>(&dob);
-	IDropSource *pDropSource = reinterpret_cast<IDropSource *>(&ds);
+	IDataObject *pDataObject = &dob;
+	IDropSource *pDropSource = &ds;
 	//Platform::DebugPrintf("About to DoDragDrop %p %p\n", pDataObject, pDropSource);
 	const HRESULT hr = ::DoDragDrop(
 		pDataObject,
@@ -1526,7 +1526,7 @@ sptr_t ScintillaWin::GetText(uptr_t wParam, sptr_t lParam) const {
 	Sci::Position sizeRequestedRange = pdoc->GetRelativePositionUTF16(0, lengthWanted);
 	if (sizeRequestedRange < 0) {
 		// Requested more text than there is in the document.
-		sizeRequestedRange = pdoc->CountUTF16(0, pdoc->Length());
+		sizeRequestedRange = pdoc->Length();
 	}
 	std::string docBytes(sizeRequestedRange, '\0');
 	pdoc->GetCharRange(&docBytes[0], 0, sizeRequestedRange);
@@ -2051,7 +2051,8 @@ sptr_t ScintillaWin::IdleMessage(unsigned int iMessage, uptr_t wParam, sptr_t lP
 sptr_t ScintillaWin::SciMessage(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 	switch (iMessage) {
 	case SCI_GETDIRECTFUNCTION:
-		return reinterpret_cast<sptr_t>(DirectFunction);
+		//return reinterpret_cast<sptr_t>(DirectFunction);
+		return 0;
 
 	case SCI_GETDIRECTPOINTER:
 		return reinterpret_cast<sptr_t>(this);
@@ -2130,7 +2131,7 @@ sptr_t ScintillaWin::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam
 			ctrlID = ::GetDlgCtrlID(MainHWND());
 			// Get Intellimouse scroll line parameters
 			GetIntelliMouseParameters();
-			::RegisterDragDrop(MainHWND(), reinterpret_cast<IDropTarget *>(&dt));
+			::RegisterDragDrop(MainHWND(), &dt);
 			break;
 
 		case WM_COMMAND:
@@ -2875,12 +2876,11 @@ void ScintillaWin::ClaimSelection() noexcept {
 STDMETHODIMP FormatEnumerator::QueryInterface(REFIID riid, PVOID *ppv) noexcept {
 	//Platform::DebugPrintf("EFE QI");
 	*ppv = nullptr;
-	if (riid == IID_IUnknown)
+	if (riid == IID_IUnknown || riid == IID_IEnumFORMATETC) {
 		*ppv = this;
-	if (riid == IID_IEnumFORMATETC)
-		*ppv = this;
-	if (!*ppv)
+	} else {
 		return E_NOINTERFACE;
+	}
 	AddRef();
 	return S_OK;
 }
@@ -2956,13 +2956,8 @@ STDMETHODIMP DropSource::QueryContinueDrag(BOOL fEsc, DWORD grfKeyState) noexcep
 		return DRAGDROP_S_DROP;
 	return S_OK;
 }
-
 STDMETHODIMP DropSource::GiveFeedback(DWORD) noexcept {
 	return DRAGDROP_S_USEDEFAULTCURSORS;
-}
-
-DropSource::DropSource() noexcept {
-	sci = nullptr;
 }
 
 /// Implement IUnkown
@@ -3045,10 +3040,6 @@ STDMETHODIMP DataObject::EnumDAdvise(IEnumSTATDATA **) noexcept {
 	return E_FAIL;
 }
 
-DataObject::DataObject() noexcept {
-	sci = nullptr;
-}
-
 /// Implement IUnknown
 STDMETHODIMP DropTarget::QueryInterface(REFIID riid, PVOID *ppv) noexcept {
 	//Platform::DebugPrintf("DT QI %p\n", this);
@@ -3063,40 +3054,16 @@ STDMETHODIMP_(ULONG)DropTarget::Release() noexcept {
 
 /// Implement IDropTarget by forwarding to Scintilla
 STDMETHODIMP DropTarget::DragEnter(LPDATAOBJECT pIDataSource, DWORD grfKeyState, POINTL pt, PDWORD pdwEffect) {
-	try {
-		return sci->DragEnter(pIDataSource, grfKeyState, pt, pdwEffect);
-	} catch (...) {
-		sci->errorStatus = SC_STATUS_FAILURE;
-	}
-	return E_FAIL;
+	return sci->DragEnter(pIDataSource, grfKeyState, pt, pdwEffect);
 }
 STDMETHODIMP DropTarget::DragOver(DWORD grfKeyState, POINTL pt, PDWORD pdwEffect) {
-	try {
-		return sci->DragOver(grfKeyState, pt, pdwEffect);
-	} catch (...) {
-		sci->errorStatus = SC_STATUS_FAILURE;
-	}
-	return E_FAIL;
+	return sci->DragOver(grfKeyState, pt, pdwEffect);
 }
 STDMETHODIMP DropTarget::DragLeave() {
-	try {
-		return sci->DragLeave();
-	} catch (...) {
-		sci->errorStatus = SC_STATUS_FAILURE;
-	}
-	return E_FAIL;
+	return sci->DragLeave();
 }
 STDMETHODIMP DropTarget::Drop(LPDATAOBJECT pIDataSource, DWORD grfKeyState, POINTL pt, PDWORD pdwEffect) {
-	try {
-		return sci->Drop(pIDataSource, grfKeyState, pt, pdwEffect);
-	} catch (...) {
-		sci->errorStatus = SC_STATUS_FAILURE;
-	}
-	return E_FAIL;
-}
-
-DropTarget::DropTarget() noexcept {
-	sci = nullptr;
+	return sci->Drop(pIDataSource, grfKeyState, pt, pdwEffect);
 }
 
 /**
@@ -3124,7 +3091,7 @@ void ScintillaWin::ImeStartComposition() {
 			// The negative is to allow for leading
 			lf.lfHeight = -::MulDiv(sizeZoomed, dpi, 72*SC_FONT_SIZE_MULTIPLIER);
 			lf.lfWeight = vs.styles[styleHere].weight;
-			lf.lfItalic = vs.styles[styleHere].italic ? 1 : 0;
+			lf.lfItalic = vs.styles[styleHere].italic ? TRUE : FALSE;
 			lf.lfCharSet = DEFAULT_CHARSET;
 			lf.lfFaceName[0] = L'\0';
 			if (vs.styles[styleHere].fontName) {
@@ -3466,16 +3433,18 @@ DWORD ScintillaWin::EffectFromState(DWORD grfKeyState) const noexcept {
 /// Implement IUnknown
 STDMETHODIMP ScintillaWin::QueryInterface(REFIID riid, PVOID *ppv) noexcept {
 	*ppv = nullptr;
-	if (riid == IID_IUnknown)
+	if (riid == IID_IUnknown) {
 		*ppv = &dt;
-	if (riid == IID_IDropSource)
+	} else if (riid == IID_IDropSource) {
 		*ppv = &ds;
-	if (riid == IID_IDropTarget)
+	} else if (riid == IID_IDropTarget) {
 		*ppv = &dt;
-	if (riid == IID_IDataObject)
+	} else if (riid == IID_IDataObject) {
 		*ppv = &dob;
-	if (!*ppv)
+	}
+	if (!*ppv) {
 		return E_NOINTERFACE;
+	}
 	return S_OK;
 }
 
@@ -3580,16 +3549,20 @@ STDMETHODIMP ScintillaWin::DragEnter(LPDATAOBJECT pIDataSource, DWORD grfKeyStat
 		return E_POINTER;
 	}
 
-	//EnumDataSourceFormat("DragEnter", pIDataSource);
-
 	hasOKText = false;
-	for (const CLIPFORMAT fmt : dropFormat) {
-		FORMATETC fmtu = { fmt, nullptr, DVASPECT_CONTENT, -1, TYMED_HGLOBAL };
-		const HRESULT hrHasUText = pIDataSource->QueryGetData(&fmtu);
-		hasOKText = (hrHasUText == S_OK);
-		if (hasOKText) {
-			break;
+	try {
+		//EnumDataSourceFormat("DragEnter", pIDataSource);
+
+		for (const CLIPFORMAT fmt : dropFormat) {
+			FORMATETC fmtu = { fmt, nullptr, DVASPECT_CONTENT, -1, TYMED_HGLOBAL };
+			const HRESULT hrHasUText = pIDataSource->QueryGetData(&fmtu);
+			hasOKText = (hrHasUText == S_OK);
+			if (hasOKText) {
+				break;
+			}
 		}
+	} catch (...) {
+		errorStatus = SC_STATUS_FAILURE;
 	}
 
 	*pdwEffect = hasOKText? EffectFromState(grfKeyState) : DROPEFFECT_NONE;
@@ -3744,7 +3717,7 @@ STDMETHODIMP ScintillaWin::Drop(LPDATAOBJECT pIDataSource, DWORD grfKeyState, PO
 }
 
 /// Implement important part of IDataObject
-STDMETHODIMP ScintillaWin::GetData(FORMATETC *pFEIn, STGMEDIUM *pSTM) {
+STDMETHODIMP ScintillaWin::GetData(const FORMATETC *pFEIn, STGMEDIUM *pSTM) {
 	if (!SupportedFormat(pFEIn)) {
 		//Platform::DebugPrintf("DOB GetData No %d %x %x fmt=%x\n", lenDrag, pFEIn, pSTM, pFEIn->cfFormat);
 		return DATA_E_FORMATETC;
@@ -3922,8 +3895,10 @@ LRESULT CALLBACK ScintillaWin::CTWndProc(
 					}
 					// If above SUCCEEDED, then pCTRenderTarget not nullptr
 					assert(pCTRenderTarget);
-					surfaceWindow->Init(pCTRenderTarget, hWnd);
-					pCTRenderTarget->BeginDraw();
+					if (pCTRenderTarget) {
+						surfaceWindow->Init(pCTRenderTarget, hWnd);
+						pCTRenderTarget->BeginDraw();
+					}
 #endif
 				}
 				surfaceWindow->SetUnicodeMode(SC_CP_UTF8 == sciThis->ct.codePage);
@@ -3966,11 +3941,11 @@ LRESULT CALLBACK ScintillaWin::CTWndProc(
 	return ::DefWindowProc(hWnd, iMessage, wParam, lParam);
 }
 
-sptr_t ScintillaWin::DirectFunction(
-	sptr_t ptr, UINT iMessage, uptr_t wParam, sptr_t lParam) {
-	PLATFORM_ASSERT(::GetCurrentThreadId() == ::GetWindowThreadProcessId(reinterpret_cast<ScintillaWin *>(ptr)->MainHWND(), nullptr));
-	return reinterpret_cast<ScintillaWin *>(ptr)->WndProc(iMessage, wParam, lParam);
-}
+//sptr_t ScintillaWin::DirectFunction(
+//	sptr_t ptr, UINT iMessage, uptr_t wParam, sptr_t lParam) {
+//	PLATFORM_ASSERT(::GetCurrentThreadId() == ::GetWindowThreadProcessId(reinterpret_cast<ScintillaWin *>(ptr)->MainHWND(), nullptr));
+//	return reinterpret_cast<ScintillaWin *>(ptr)->WndProc(iMessage, wParam, lParam);
+//}
 
 extern "C"
 sptr_t SCI_METHOD Scintilla_DirectFunction(

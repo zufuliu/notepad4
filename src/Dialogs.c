@@ -2127,6 +2127,9 @@ static INT_PTR CALLBACK AutoCompletionSettingsDlgProc(HWND hwnd, UINT umsg, WPAR
 		if (autoCompletionConfig.bEnglistIMEModeOnly) {
 			CheckDlgButton(hwnd, IDC_AUTOC_ENGLISH_IME_ONLY, BST_CHECKED);
 		}
+		if (autoCompletionConfig.bIgnoreCase) {
+			CheckDlgButton(hwnd, IDC_AUTOC_CASE_INSENSITIVE, BST_CHECKED);
+		}
 
 		SetDlgItemInt(hwnd, IDC_AUTOC_VISIBLE_ITEM_COUNT, autoCompletionConfig.iVisibleItemCount, FALSE);
 		SendDlgItemMessage(hwnd, IDC_AUTOC_VISIBLE_ITEM_COUNT, EM_LIMITTEXT, 8, 0);
@@ -2196,6 +2199,7 @@ static INT_PTR CALLBACK AutoCompletionSettingsDlgProc(HWND hwnd, UINT umsg, WPAR
 			autoCompletionConfig.bCompleteWord = IsButtonChecked(hwnd, IDC_AUTO_COMPLETE_WORD);
 			autoCompletionConfig.bScanWordsInDocument = IsButtonChecked(hwnd, IDC_AUTOC_SCAN_DOCUMENT_WORDS);
 			autoCompletionConfig.bEnglistIMEModeOnly = IsButtonChecked(hwnd, IDC_AUTOC_ENGLISH_IME_ONLY);
+			autoCompletionConfig.bIgnoreCase = IsButtonChecked(hwnd, IDC_AUTOC_CASE_INSENSITIVE);
 
 			int mask = GetDlgItemInt(hwnd, IDC_AUTOC_VISIBLE_ITEM_COUNT, NULL, FALSE);
 			autoCompletionConfig.iVisibleItemCount = max_i(mask, MIN_AUTO_COMPLETION_VISIBLE_ITEM_COUNT);

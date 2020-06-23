@@ -29,12 +29,12 @@ static inline PRectangle PixelGridAlign(PRectangle rc) noexcept {
 		std::round(rc.right), std::floor(rc.bottom));
 }
 
-void Indicator::Draw(Surface *surface, PRectangle rc, PRectangle rcLine, PRectangle rcCharacter, DrawState drawState, int value) const {
+void Indicator::Draw(Surface *surface, PRectangle rc, PRectangle rcLine, PRectangle rcCharacter, State drawState, int value) const {
 	StyleAndColour sacDraw = sacNormal;
 	if (Flags() & SC_INDICFLAG_VALUEFORE) {
 		sacDraw.fore = ColourDesired(value & SC_INDICVALUEMASK);
 	}
-	if (drawState == drawHover) {
+	if (drawState == State::hover) {
 		sacDraw = sacHover;
 	}
 

@@ -1821,6 +1821,7 @@ const char *EditKeywordIndent(const char *head, int *indent) {
 	case SCLEX_MATLAB:
 		if (!strcmp(word, "function")) {
 			*indent = 1;
+			// 'end' is optional
 		} else if (!strcmp(word, "if") || !strcmp(word, "for") || !strcmp(word, "while") || !strcmp(word, "switch") || !strcmp(word, "try")) {
 			*indent = 2;
 			if (pLexCurrent->rid == NP2LEX_OCTAVE || np2LexLangIndex == IDM_LEXER_OCTAVE) {
@@ -1972,6 +1973,20 @@ void EditAutoIndent(void) {
 				break;
 			}
 			iIndentLen += 1;
+		}
+
+		if (indent == 2 && endPart) {
+			const int level = SciCall_GetFoldLevel(iCurLine);
+			if (!(level & SC_FOLDLEVELHEADERFLAG)) {
+				const Sci_Line parent = SciCall_GetFoldParent(iCurLine);
+				if (parent >= 0 && parent + 1 == iCurLine) {
+					const Sci_Line child = SciCall_GetLastChild(parent);
+					// TODO: check endPart is on this line
+					if (SciCall_GetLineLength(child)) {
+						indent = 1;
+					}
+				}
+			}
 		}
 
 		Sci_Position iIndentPos = iCurPos;

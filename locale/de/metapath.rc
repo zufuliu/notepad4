@@ -22,10 +22,10 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// Japanese (Japan) resources
+// German (Germany) resources
 
-#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_JPN)
-LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+LANGUAGE LANG_GERMAN, SUBLANG_GERMAN
 #pragma code_page(65001)
 
 /////////////////////////////////////////////////////////////////////////////
@@ -76,78 +76,78 @@ IDR_MAINWND MENU
 BEGIN
 	POPUP "+"
 	BEGIN
-		MENUITEM "開く(&O)",			IDM_FILE_OPENSAME
-		MENUITEM "開く(新規ウィンドウ)(&E)",			IDM_FILE_OPENNEW
-		MENUITEM "ファイル名を指定して実行(&R)...",						IDM_FILE_RUN
-		MENUITEM "実行(&L)",						IDM_FILE_LAUNCH
-		MENUITEM "Quickview(&Q)",					IDM_FILE_QUICKVIEW
-		MENUITEM "別のプログラムで開く(&W)...",				IDM_FILE_OPENWITH
-		MENUITEM "ファイル名をコピー(&C)",				IDM_POP_COPY_FILENAME
-		MENUITEM "パスをコピー(&T)",				IDM_POP_COPY_PATHNAME
+		MENUITEM "&Open (Same Window)",			IDM_FILE_OPENSAME
+		MENUITEM "Open (N&ew Window)",			IDM_FILE_OPENNEW
+		MENUITEM "&Run...",						IDM_FILE_RUN
+		MENUITEM "&Launch",						IDM_FILE_LAUNCH
+		MENUITEM "&Quickview",					IDM_FILE_QUICKVIEW
+		MENUITEM "Open &with...",				IDM_FILE_OPENWITH
+		MENUITEM "&Copy File Name",				IDM_POP_COPY_FILENAME
+		MENUITEM "Copy Pa&th Name",				IDM_POP_COPY_PATHNAME
 		MENUITEM SEPARATOR
-		MENUITEM "エクスプローラーで表示(&X)",			IDM_FILE_EXPLORER
-		MENUITEM "ショートカット作成(&K)...",				IDM_FILE_CREATELINK
-		MENUITEM "名前を付けて保存(&S)...",					IDM_FILE_SAVEAS
-		MENUITEM "コピー/移動(&M)...",				IDM_FILE_COPYMOVE
-		MENUITEM "削除(&D)...",					IDM_FILE_DELETE
-		MENUITEM "名前の変更(&N)...",					IDM_FILE_RENAME
+		MENUITEM "Show in E&xplorer",			IDM_FILE_EXPLORER
+		MENUITEM "Create Lin&k...",				IDM_FILE_CREATELINK
+		MENUITEM "&Save As...",					IDM_FILE_SAVEAS
+		MENUITEM "Copy/&Move...",				IDM_FILE_COPYMOVE
+		MENUITEM "&Delete...",					IDM_FILE_DELETE
+		MENUITEM "Re&name...",					IDM_FILE_RENAME
 		MENUITEM SEPARATOR
-		MENUITEM "プロパティ(&P)",					IDM_FILE_PROPERTIES
+		MENUITEM "&Properties",					IDM_FILE_PROPERTIES
 	END
 	POPUP "+"
 	BEGIN
-		MENUITEM "新規作成(&N)",				IDM_FILE_NEW
-		MENUITEM "フォルダの作成(&W)...",			IDM_FILE_NEWDIR
+		MENUITEM "&New File...",				IDM_FILE_NEW
+		MENUITEM "Ne&w Directory...",			IDM_FILE_NEWDIR
 		MENUITEM SEPARATOR
-		MENUITEM "ファイルフィルター(&L)...",				IDM_VIEW_FILTER
-		MENUITEM "フィルター解除(&R)",				IDM_VIEW_FILTERALL
-		POPUP "表示(&S)"
+		MENUITEM "File Fi&lter...",				IDM_VIEW_FILTER
+		MENUITEM "&Reset Filter",				IDM_VIEW_FILTERALL
+		POPUP "&Show"
 		BEGIN
-			MENUITEM "フォルダ(&D)",			IDM_VIEW_FOLDERS
-			MENUITEM "ファイル(&F)",					IDM_VIEW_FILES
-			MENUITEM "システム関連(&S)",			IDM_VIEW_HIDDEN
+			MENUITEM "&Directories",			IDM_VIEW_FOLDERS
+			MENUITEM "&Files",					IDM_VIEW_FILES
+			MENUITEM "&System Objects",			IDM_VIEW_HIDDEN
 		END
-		POPUP "表示順(&T)"
+		POPUP "Sor&t"
 		BEGIN
-			MENUITEM "名前(&N)",				IDM_SORT_NAME
-			MENUITEM "サイズ(&S)",				IDM_SORT_SIZE
-			MENUITEM "種類(&T)",				IDM_SORT_TYPE
-			MENUITEM "日付(&D)",				IDM_SORT_DATE
+			MENUITEM "by &Name",				IDM_SORT_NAME
+			MENUITEM "by &Size",				IDM_SORT_SIZE
+			MENUITEM "by &Type",				IDM_SORT_TYPE
+			MENUITEM "by &Date",				IDM_SORT_DATE
 			MENUITEM SEPARATOR
-			MENUITEM "逆順(&R)",				IDM_SORT_REVERSE
+			MENUITEM "&Reverse",				IDM_SORT_REVERSE
 		END
 		MENUITEM SEPARATOR
-		MENUITEM "エクスプローラで開く(&E)",			IDM_FILE_EXPLORER
-		MENUITEM "お気に入りを表示(&F)",				IDM_VIEW_FAVORITES
-		MENUITEM "お気に入りをエクスプローラで開く(&O)",				IDM_VIEW_EDITFAVORITES
-		MENUITEM "フォルダ選択(&D)...",				IDM_FILE_CHANGEDIR
-		MENUITEM "開く(&G)...",					IDM_FILE_GOTO
+		MENUITEM "Open in &Explorer",			IDM_FILE_EXPLORER
+		MENUITEM "Goto &Favorites",				IDM_VIEW_FAVORITES
+		MENUITEM "&Open Favorites",				IDM_VIEW_EDITFAVORITES
+		MENUITEM "&Directory...",				IDM_FILE_CHANGEDIR
+		MENUITEM "&Goto...",					IDM_FILE_GOTO
 		MENUITEM SEPARATOR
-		MENUITEM "ドライブの表示(&V)",				IDM_VIEW_DRIVEBOX
-		MENUITEM "常に手前に表示(&K)",				IDM_VIEW_ALWAYSONTOP
+		MENUITEM "Show Dri&ves",				IDM_VIEW_DRIVEBOX
+		MENUITEM "&Keep on Top",				IDM_VIEW_ALWAYSONTOP
 		MENUITEM SEPARATOR
-		MENUITEM "設定の保存(&I)",				IDM_VIEW_SAVESETTINGS
-		MENUITEM "指定プログラムの設定(&U)...",			IDM_VIEW_FINDTARGET
-		MENUITEM "設定(&P)...",					IDM_VIEW_OPTIONS
+		MENUITEM "Save Sett&ings",				IDM_VIEW_SAVESETTINGS
+		MENUITEM "Set&up Target...",			IDM_VIEW_FINDTARGET
+		MENUITEM "O&ptions...",					IDM_VIEW_OPTIONS
 	END
 	POPUP "+"
 	BEGIN
-		MENUITEM "フォルダ(&D)...",				IDM_FILE_CHANGEDIR
-		MENUITEM "ドライブのプロパティ(&P)",			IDM_FILE_DRIVEPROP
+		MENUITEM "&Directory...",				IDM_FILE_CHANGEDIR
+		MENUITEM "Drive &Properties",			IDM_FILE_DRIVEPROP
 		MENUITEM SEPARATOR
-		MENUITEM "ドライブの表示(&V)",				IDM_VIEW_DRIVEBOX
+		MENUITEM "Show Dri&ves",				IDM_VIEW_DRIVEBOX
 	END
 	POPUP "+"
 	BEGIN
-		MENUITEM "ツールバーを表示(&T)",				IDM_VIEW_TOOLBAR
-		MENUITEM "ツールバーの編集(&C)...",		IDM_VIEW_CUSTOMIZETB
-		MENUITEM "ステータスバーを表示(&S)",				IDM_VIEW_STATUSBAR
+		MENUITEM "Show &Toolbar",				IDM_VIEW_TOOLBAR
+		MENUITEM "&Customize Toolbar...",		IDM_VIEW_CUSTOMIZETB
+		MENUITEM "Show &Statusbar",				IDM_VIEW_STATUSBAR
 	END
 	POPUP "+"
 	BEGIN
-		MENUITEM "metapath を開く(&O)",				IDM_TRAY_RESTORE
+		MENUITEM "&Open metapath",				IDM_TRAY_RESTORE
 		MENUITEM SEPARATOR
-		MENUITEM "終了(&X)",				IDM_TRAY_EXIT
+		MENUITEM "E&xit metapath",				IDM_TRAY_EXIT
 	END
 END
 
@@ -235,218 +235,217 @@ BEGIN
     LTEXT           "",IDC_AUTHORNAME,130,30,200,8
     LTEXT           "",IDC_WEBPAGE_TEXT,45,40,200,8,NOT WS_VISIBLE | WS_DISABLED
     CONTROL         "",IDC_WEBPAGE_LINK,"SysLink",WS_TABSTOP,45,40,200,10
-    LTEXT           "metapath のサイトにアクセス:",IDC_STATIC,45,52,140,8
+    LTEXT           "Visit our metapath's website:",IDC_STATIC,45,52,140,8
     LTEXT           "",IDC_NEW_PAGE_TEXT,45,60,200,8,NOT WS_VISIBLE | WS_DISABLED
     CONTROL         "",IDC_NEW_PAGE_LINK,"SysLink",WS_TABSTOP,45,60,200,10
-    LTEXT           "Florian Balmer の連絡先:",IDC_STATIC,45,72,140,8
+    LTEXT           "Contact Florian Balmer:",IDC_STATIC,45,72,140,8
     LTEXT           "",IDC_EMAIL_TEXT,45,80,140,8,NOT WS_VISIBLE | WS_DISABLED
     CONTROL         "",IDC_EMAIL_LINK,"SysLink",WS_TABSTOP,45,80,140,10
 END
 
 IDD_RUN DIALOGEX 0, 0, 234, 86
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "実行"
+CAPTION "Run"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
     ICON            IDI_RUN,IDC_STATIC,7,7,20,20
-    LTEXT           "実行するプログラム名、開くフォルダーやドキュメント名を入力してください。",IDC_RUNDESC,35,7,188,17
+    LTEXT           "Enter the name of an executable program file, a folder or a document to open.",IDC_RUNDESC,35,7,188,17
     EDITTEXT        IDC_COMMANDLINE,7,35,203,14,ES_AUTOHSCROLL
     PUSHBUTTON      "",IDC_SEARCHEXE,215,35,14,14
     DEFPUSHBUTTON   "OK",IDOK,121,65,50,14
-    PUSHBUTTON      "キャンセル",IDCANCEL,177,65,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,177,65,50,14
     SCROLLBAR       IDC_RESIZEGRIP3,7,65,10,10
 END
 
 IDD_OPENWITH DIALOGEX 0, 0, 165, 128
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "プログラムから開く..."
+CAPTION "Open with..."
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
     CONTROL         "",IDC_OPENWITHDIR,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_SHAREIMAGELISTS | LVS_AUTOARRANGE | LVS_NOCOLUMNHEADER | WS_BORDER | WS_TABSTOP,7,7,151,69
     PUSHBUTTON      "",IDC_GETOPENWITHDIR,7,83,13,13
-    LTEXT           "ここをクリックして開くプログラムのあるフォルダを指定します。",IDC_OPENWITHDESCR,26,83,132,18
+    LTEXT           "Click here to specify the directory with links to your favorite applications.",IDC_OPENWITHDESCR,26,83,132,18
     DEFPUSHBUTTON   "OK",IDOK,52,107,50,14
-    PUSHBUTTON      "キャンセル",IDCANCEL,108,107,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,108,107,50,14
     SCROLLBAR       IDC_RESIZEGRIP3,7,112,10,10
 END
 
 IDD_GOTO DIALOGEX 0, 0, 224, 87
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "開く"
+CAPTION "Goto"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
     ICON            IDI_GOTO,IDC_STATIC,7,7,20,20
-    LTEXT           "開くファイルやフォルダを入力するか、閲覧履歴から選択します。",IDC_GOTODESC,35,7,182,17
+    LTEXT           "Enter the name of a file or directory to open, or select a recently visited directory from the list.",IDC_GOTODESC,35,7,182,17
     COMBOBOX        IDC_GOTO,7,35,210,126,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
     DEFPUSHBUTTON   "OK",IDOK,111,66,50,14,WS_DISABLED
-    PUSHBUTTON      "キャンセル",IDCANCEL,167,66,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,167,66,50,14
     SCROLLBAR       IDC_RESIZEGRIP,7,70,10,10
 END
 
 IDD_FILTER DIALOGEX 0, 0, 204, 79
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "ファイルフィルター"
+CAPTION "File Filter"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
-    LTEXT           "フィルターの指定(&F) 複数指定には ; で区切ります。",IDC_STATIC,7,7,190,8
+    LTEXT           "Specify a new file &filter. Separate multiple filters by ;",IDC_STATIC,7,7,190,8
     EDITTEXT        IDC_FILTER,7,22,171,14,ES_AUTOHSCROLL
     PUSHBUTTON      "",IDC_BROWSEFILTER,183,22,14,14
-    AUTOCHECKBOX    "マッチしたものを除外(&E)",IDC_NEGFILTER,7,40,170,10,WS_TABSTOP
+    AUTOCHECKBOX    "&Exclude files matching the filter.",IDC_NEGFILTER,7,40,170,10,WS_TABSTOP
     DEFPUSHBUTTON   "OK",IDOK,91,58,50,14
-    PUSHBUTTON      "キャンセル",IDCANCEL,147,58,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,147,58,50,14
     SCROLLBAR       IDC_RESIZEGRIP3,7,58,10,10
 END
 
 IDD_RENAME DIALOGEX 0, 0, 172, 74
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "名前の変更"
+CAPTION "Rename"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
-    LTEXT           "現在:",IDC_STATIC,7,9,28,8,SS_RIGHT
+    LTEXT           "Current:",IDC_STATIC,7,9,28,8,SS_RIGHT
     EDITTEXT        IDC_OLDNAME,39,7,126,14,ES_AUTOHSCROLL | ES_READONLY | NOT WS_TABSTOP
-    LTEXT           "新規(&N):",IDC_STATIC,7,27,28,8,SS_RIGHT
+    LTEXT           "&New:",IDC_STATIC,7,27,28,8,SS_RIGHT
     EDITTEXT        IDC_NEWNAME,39,26,126,14,ES_AUTOHSCROLL
     DEFPUSHBUTTON   "OK",IDOK,59,53,50,14,WS_DISABLED
-    PUSHBUTTON      "キャンセル",IDCANCEL,115,53,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,115,53,50,14
     SCROLLBAR       IDC_RESIZEGRIP2,7,53,10,10
 END
 
 IDD_NEWDIR DIALOGEX 0, 0, 172, 66
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "フォルダの作成"
+CAPTION "New Directory"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
-    LTEXT           "作成するフォルダ名を入力:",IDC_STATIC,7,7,158,8
+    LTEXT           "Enter the name for the new directory:",IDC_STATIC,7,7,158,8
     EDITTEXT        IDC_NEWDIR,7,22,158,14,ES_AUTOHSCROLL
     DEFPUSHBUTTON   "OK",IDOK,59,45,50,14,WS_DISABLED
-    PUSHBUTTON      "キャンセル",IDCANCEL,115,45,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,115,45,50,14
     SCROLLBAR       IDC_RESIZEGRIP,7,45,10,10
 END
 
 IDD_COPYMOVE DIALOGEX 0, 0, 230, 95
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "コピー/移動"
+CAPTION "Copy/Move"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
-    LTEXT           "ここから:",IDC_STATIC,7,7,26,8
+    LTEXT           "Source:",IDC_STATIC,7,7,26,8
     EDITTEXT        IDC_SOURCE,7,18,216,14,ES_AUTOHSCROLL | ES_READONLY | NOT WS_TABSTOP
-    LTEXT           "ここへ(&D):",IDC_STATIC,7,37,40,8
+    LTEXT           "&Destination:",IDC_STATIC,7,37,40,8
     COMBOBOX        IDC_DESTINATION,7,48,199,105,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
     PUSHBUTTON      "",IDC_BROWSEDESTINATION,210,48,13,13
-    CONTROL         "<a>履歴の消去</a>",IDC_EMPTY_MRU,"SysLink",WS_TABSTOP,154,37,70,10
-    LTEXT           "動作:",IDC_STATIC,7,72,24,8
-    AUTORADIOBUTTON "コピー(&C)",IDC_FUNCCOPY,35,71,33,10,WS_GROUP | WS_TABSTOP
-    AUTORADIOBUTTON "移動(&M)",IDC_FUNCMOVE,68,71,33,10,WS_TABSTOP
+    CONTROL         "<a>Clear Recent History</a>",IDC_EMPTY_MRU,"SysLink",WS_TABSTOP,154,37,70,10
+    LTEXT           "Action:",IDC_STATIC,7,72,24,8
+    AUTORADIOBUTTON "&Copy",IDC_FUNCCOPY,35,71,33,10,WS_GROUP | WS_TABSTOP
+    AUTORADIOBUTTON "&Move",IDC_FUNCMOVE,68,71,33,10,WS_TABSTOP
     DEFPUSHBUTTON   "OK",IDOK,117,74,50,14,WS_DISABLED
-    PUSHBUTTON      "キャンセル",IDCANCEL,173,74,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,173,74,50,14
     SCROLLBAR       IDC_RESIZEGRIP5,7,78,10,10
 END
 
 IDPP_GENERAL DIALOGEX 0, 0, 232, 185
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "一般"
+CAPTION "General"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
     ICON            IDI_OPTIONS,IDC_STATIC,10,10,20,20
-    LTEXT           "metapath 一般設定",IDC_STATIC,40,15,200,8
-    AUTOCHECKBOX    "対象アプリケーションの同じウィンドウでファイルを開く",IDC_OPENFILE_SAME_WINDOW,10,34,190,10,WS_TABSTOP
-    AUTOCHECKBOX    "開くのにシングルクリックのみを使う(&A)",IDC_SINGLECLICK,10,46,190,10,WS_TABSTOP
-    AUTOCHECKBOX    "マウスオーバーで選択状態に(&E)",IDC_TRACKSELECT,10,58,100,10,WS_TABSTOP
-    AUTOCHECKBOX    "選択状態を横幅いっぱいに(&F)",IDC_FULLROWSELECT,10,70,120,10,WS_TABSTOP
-    AUTOCHECKBOX    "ファイルが開かれていれば対象ウインドウをアクティブにする(&C)",IDC_FOCUSEDIT,10,82,220,10,WS_TABSTOP
+    LTEXT           "Specify general program settings for metapath.",IDC_STATIC,40,15,200,8
+    AUTOCHECKBOX    "Open file in same target application window.",IDC_OPENFILE_SAME_WINDOW,10,34,190,10,WS_TABSTOP
+    AUTOCHECKBOX    "&Allow single mouse-click to open objects.",IDC_SINGLECLICK,10,46,190,10,WS_TABSTOP
+    AUTOCHECKBOX    "&Enable track selection.",IDC_TRACKSELECT,10,58,100,10,WS_TABSTOP
+    AUTOCHECKBOX    "Enable &full row selection.",IDC_FULLROWSELECT,10,70,120,10,WS_TABSTOP
+    AUTOCHECKBOX    "Always a&ctivate target window when a file is opened.",IDC_FOCUSEDIT,10,82,220,10,WS_TABSTOP
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,10,100,205,1
-    AUTOCHECKBOX    "常に最前面に metapath を表示(&K)",IDC_ALWAYSONTOP,10,109,150,10,WS_TABSTOP
-    AUTOCHECKBOX    "システムトレイに最小化する(&M) (クリックで復帰)",IDC_MINIMIZETOTRAY,10,121,200,10,WS_TABSTOP
-    AUTOCHECKBOX    "metapath の開始時にウインドウの再利用を試みる(&T)",IDC_REUSEWINDOW,10,133,220,10,WS_TABSTOP
-    CONTROL         "<a>ウィンドウ位置の履歴を消去</a>",IDC_CLEARWINPOS,"SysLink",WS_TABSTOP,20,145,103,12
+    AUTOCHECKBOX    "&Keep metapath window always on top.",IDC_ALWAYSONTOP,10,109,150,10,WS_TABSTOP
+    AUTOCHECKBOX    "&Minimize to system tray (click to reactivate).",IDC_MINIMIZETOTRAY,10,121,200,10,WS_TABSTOP
+    AUTOCHECKBOX    "&Try to reuse existing window when metapath is started.",IDC_REUSEWINDOW,10,133,220,10,WS_TABSTOP
+    CONTROL         "<a>Clear window position history</a>",IDC_CLEARWINPOS,"SysLink",WS_TABSTOP,20,145,103,12
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,10,161,205,1
-    AUTOCHECKBOX    "終了時に設定を保存(&S)",IDC_SAVESETTINGS,10,170,100,10,WS_TABSTOP
-    CONTROL         "<a>プログラムについて...</a>",IDC_ABOUT,"SysLink",WS_TABSTOP,130,170,80,12
+    AUTOCHECKBOX    "&Save settings on exit.",IDC_SAVESETTINGS,10,170,100,10,WS_TABSTOP
+    CONTROL         "<a>About metapath</a>",IDC_ABOUT,"SysLink",WS_TABSTOP,130,170,80,12
 END
 
 IDPP_ADVANCED DIALOGEX 0, 0, 232, 185
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "追加"
+CAPTION "Advanced"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
     ICON            IDI_OPTIONS2,IDC_STATIC,10,10,20,20
-    AUTOCHECKBOX    "右から左の書字方向を使用(&R)",IDC_RTL_LAYOUT,10,34,190,10,WS_TABSTOP
-    LTEXT           "metapath 追加設定",IDC_STATIC,40,15,200,8
-    AUTOCHECKBOX    "起動時に表示するフォルダ(&U):",IDC_STARTUPDIR,10,46,104,10,WS_GROUP | WS_TABSTOP
-    AUTORADIOBUTTON "よく使用するもの(&R)",IDC_GOTOMRU,114,46,90,10,WS_GROUP | WS_TABSTOP
-    AUTORADIOBUTTON "「お気に入り」(&F)",IDC_GOTOFAV,114,58,90,10,WS_TABSTOP
+    AUTOCHECKBOX    "Use &RTL Layout.",IDC_RTL_LAYOUT,10,34,190,10,WS_TABSTOP
+    LTEXT           "Specify advanced program settings for metapath.",IDC_STATIC,40,15,200,8
+    AUTOCHECKBOX    "&Use startup directory:",IDC_STARTUPDIR,10,46,104,10,WS_GROUP | WS_TABSTOP
+    AUTORADIOBUTTON "Most &recently used.",IDC_GOTOMRU,114,46,90,10,WS_GROUP | WS_TABSTOP
+    AUTORADIOBUTTON """&Favorites"" folder.",IDC_GOTOFAV,114,58,90,10,WS_TABSTOP
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,10,76,205,1
-    AUTOCHECKBOX    "保存時にファイルの読み取り専用属性を消す(&C)",IDC_CLEARREADONLY,10,85,172,10,WS_TABSTOP
-    AUTOCHECKBOX    "移動時などファイル名の衝突時に自動で改名(&N)",IDC_RENAMEONCOLLISION,10,97,164,10,WS_TABSTOP
-    AUTOCHECKBOX    "削除したファイルをごみ箱へ移動(&M) (注意:オフで直接削除)",IDC_USERECYCLEBIN,10,109,160,10,WS_TABSTOP
-    AUTOCHECKBOX    "削除時に確認しない(&D) (非推奨)",IDC_NOCONFIRMDELETE,10,121,184,10,WS_TABSTOP
+    AUTOCHECKBOX    "&Clear read-only attribute of saved files.",IDC_CLEARREADONLY,10,85,172,10,WS_TABSTOP
+    AUTOCHECKBOX    "Rename copied files on &name collisions.",IDC_RENAMEONCOLLISION,10,97,164,10,WS_TABSTOP
+    AUTOCHECKBOX    "&Move deleted files to the recycle bin.",IDC_USERECYCLEBIN,10,109,160,10,WS_TABSTOP
+    AUTOCHECKBOX    "&Don't confirm file delete (not recommended).",IDC_NOCONFIRMDELETE,10,121,184,10,WS_TABSTOP
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,10,139,205,1
-    AUTOCHECKBOX    "Escキーを有効(&E)...",IDC_ESCFUNCTION,10,148,104,10,WS_GROUP | WS_TABSTOP
-    AUTORADIOBUTTON "最小化(&W) (復帰高速)",IDC_ESCMIN,114,148,74,10,WS_GROUP | WS_TABSTOP
-    AUTORADIOBUTTON "終了(&X)",IDC_ESCEXIT,114,160,66,10,WS_TABSTOP
+    AUTOCHECKBOX    "Enable ""&Esc"" key to...",IDC_ESCFUNCTION,10,148,104,10,WS_GROUP | WS_TABSTOP
+    AUTORADIOBUTTON "Minimize &window.",IDC_ESCMIN,114,148,74,10,WS_GROUP | WS_TABSTOP
+    AUTORADIOBUTTON "E&xit metapath.",IDC_ESCEXIT,114,160,66,10,WS_TABSTOP
 END
 
 IDPP_ITEMS DIALOGEX 0, 0, 232, 185
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "表示"
+CAPTION "Appearance"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
     ICON            IDI_ITEMS,IDC_STATIC,10,10,21,20
-    LTEXT           "metapath の表示",IDC_STATIC,40,15,160,8
-    GROUPBOX        "一覧項目の表示",IDC_STATIC,10,41,205,112
-    LTEXT           "フィルター未使用時の文字色:",IDC_STATIC,20,54,170,8
-    AUTORADIOBUTTON "標準設定(&W)",IDC_COLOR_DEF1,20,68,96,10,WS_GROUP | WS_TABSTOP
-    AUTORADIOBUTTON "カスタム(&C):",IDC_COLOR_CUST1,20,82,60,10,WS_TABSTOP
+    LTEXT           "Appearance of metapath.",IDC_STATIC,40,15,160,8
+    GROUPBOX        "Appearance of items in directory list",IDC_STATIC,10,41,205,112
+    LTEXT           "Use this text color when NO FILTER is SET:",IDC_STATIC,20,54,170,8
+    AUTORADIOBUTTON "Default &windows color.",IDC_COLOR_DEF1,20,68,96,10,WS_GROUP | WS_TABSTOP
+    AUTORADIOBUTTON "Custom &color:",IDC_COLOR_CUST1,20,82,60,10,WS_TABSTOP
     EDITTEXT        IDC_COLOR_SAMP1,85,80,30,14,ES_AUTOHSCROLL | WS_DISABLED
-    PUSHBUTTON      "色選択...",IDC_COLOR_PICK1,120,80,60,14
-    LTEXT           "フィルター時の文字色:",IDC_STATIC,20,105,180,8
-    AUTORADIOBUTTON "標準設定(&E)",IDC_COLOR_DEF2,20,120,95,10,WS_GROUP | WS_TABSTOP
-    AUTORADIOBUTTON "カスタム(&U):",IDC_COLOR_CUST2,20,133,60,10,WS_TABSTOP
+    PUSHBUTTON      "Pick Color...",IDC_COLOR_PICK1,120,80,60,14
+    LTEXT           "Use this text color when a FILTER is ACTIVE:",IDC_STATIC,20,105,180,8
+    AUTORADIOBUTTON "D&efault windows color.",IDC_COLOR_DEF2,20,120,95,10,WS_GROUP | WS_TABSTOP
+    AUTORADIOBUTTON "C&ustom color:",IDC_COLOR_CUST2,20,133,60,10,WS_TABSTOP
     EDITTEXT        IDC_COLOR_SAMP2,86,130,30,14,ES_AUTOHSCROLL | WS_DISABLED
-    PUSHBUTTON      "色選択...",IDC_COLOR_PICK2,120,130,60,14
+    PUSHBUTTON      "Pick Color...",IDC_COLOR_PICK2,120,130,60,14
 #if NP2_ENABLE_APP_LOCALIZATION_DLL
-    LTEXT           "Lang/言語:",IDC_STATIC,10,163,38,10
+    LTEXT           "Language:",IDC_STATIC,10,163,38,10
     COMBOBOX        IDC_LANGUAGE_LIST,50,160,82,100,CBS_DROPDOWNLIST | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
 #endif
 END
 
 IDPP_PROG DIALOGEX 0, 0, 232, 185
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "パス"
+CAPTION "Locations"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
     ICON            IDI_PROGS,IDC_STATIC,10,10,20,20
-    LTEXT           "Quickview/お気に入りの設定",IDC_STATIC,40,15,180,8
-    LTEXT           "既定の Quick View プログラム名(&D) (Ctrl+Q):",IDC_STATIC,10,41,180,8
+    LTEXT           "Specify external programs and paths.",IDC_STATIC,40,15,180,8
+    LTEXT           "&Default ""Quick View"" program (Ctrl+Q):",IDC_STATIC,10,41,180,8
     EDITTEXT        IDC_QUICKVIEW,10,52,191,14,ES_AUTOHSCROLL
     PUSHBUTTON      "",IDC_BROWSE_Q,204,52,14,14,BS_BITMAP
-    LTEXT           "お気に入りフォルダ(&F) (F11):",IDC_STATIC,10,76,120,8
+    LTEXT           "&Favorites Folder (F11):",IDC_STATIC,10,76,120,8
     EDITTEXT        IDC_FAVORITES,10,87,191,14,ES_AUTOHSCROLL
     PUSHBUTTON      "",IDC_BROWSE_F,204,87,14,14,BS_BITMAP
-    GROUPBOX        "システムに統合(管理者権限が必要)",IDC_GROUP_SYSTEM_INTEGRATION,7,111,218,72
-    AUTOCHECKBOX    "エクスプローラーの右クリックメニューに metapath を追加",IDC_ENABLE_CONTEXT_MENU,14,124,204,10,WS_TABSTOP
-    LTEXT           "メニュー表示の文字列:",IDC_STATIC,28,139,70,8
+    GROUPBOX        "System Integration (requires Administrator privileges)",IDC_GROUP_SYSTEM_INTEGRATION,7,111,218,72
+    AUTOCHECKBOX    "Add metapath to Windows Explorer's context menu.",IDC_ENABLE_CONTEXT_MENU,14,124,204,10,WS_TABSTOP
+    LTEXT           "Context menu text:",IDC_STATIC,28,139,70,8
     EDITTEXT        IDC_CONTEXT_MENU_TEXT,100,136,118,14,ES_AUTOHSCROLL | WS_TABSTOP
-    AUTOCHECKBOX    "タスクバーのジャンプリストを有効化",IDC_ENABLE_JUMP_LIST,14,152,204,10,WS_TABSTOP
-    LTEXT           "アプリケーション名:",IDC_STATIC,28,167,70,8
+    AUTOCHECKBOX    "Enable Taskbar Jump List.",IDC_ENABLE_JUMP_LIST,14,152,204,10,WS_TABSTOP
+    LTEXT           "Application name:",IDC_STATIC,28,167,70,8
     EDITTEXT        IDC_APPLICATION_NAME,100,164,118,14,ES_AUTOHSCROLL | WS_TABSTOP
-
 END
 
 IDD_FINDTARGET DIALOGEX 0, 0, 272, 210
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "対象プログラム"
+CAPTION "Target Application"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    AUTORADIOBUTTON "対象プログラムを指定せず単にファイラーとして使用",IDC_LAUNCH,7,7,260,10,WS_GROUP | WS_TABSTOP
-    AUTORADIOBUTTON "次のプログラムで開く:",IDC_TARGET,7,21,160,10,WS_TABSTOP
-    LTEXT           "対象プログラムが既に実行済みの場合の動作:",IDC_STATIC,7,64,260,8
+    AUTORADIOBUTTON "Don't use any specific target application, simply launch the selected file.",IDC_LAUNCH,7,7,260,10,WS_GROUP | WS_TABSTOP
+    AUTORADIOBUTTON "Use the following target application:",IDC_TARGET,7,21,160,10,WS_TABSTOP
+    LTEXT           "Specify the action if the target applicatoin is already running:",IDC_STATIC,7,64,260,8
     EDITTEXT        IDC_TARGETPATH,20,35,226,14,ES_AUTOHSCROLL
     PUSHBUTTON      "",IDC_BROWSE,251,35,14,14,BS_BITMAP
-    AUTORADIOBUTTON "その都度、対象プログラムでファイルを開く",IDC_ALWAYSRUN,7,78,240,10,WS_GROUP | WS_TABSTOP
-    AUTORADIOBUTTON "対象プログラムのウインドウでファイルを開く:",IDC_SENDDROPMSG,7,92,194,10,WS_TABSTOP
-    AUTORADIOBUTTON "次のDDEコマンドを実行:",IDC_USEDDE,7,106,160,10,WS_TABSTOP
-    PUSHBUTTON      "ウインドウの指定...",IDC_FINDWIN,204,91,60,14
+    AUTORADIOBUTTON "None, run target application each time a file is opened.",IDC_ALWAYSRUN,7,78,240,10,WS_GROUP | WS_TABSTOP
+    AUTORADIOBUTTON "Send a file open message to target application window:",IDC_SENDDROPMSG,7,92,194,10,WS_TABSTOP
+    AUTORADIOBUTTON "Execute the following DDE command:",IDC_USEDDE,7,106,160,10,WS_TABSTOP
+    PUSHBUTTON      "Find Window...",IDC_FINDWIN,204,91,60,14
     LTEXT           "Message:",IDC_STATIC,19,124,42,8,SS_RIGHT
     LTEXT           "Application:",IDC_STATIC,19,145,42,8,SS_RIGHT
     LTEXT           "Topic:",IDC_STATIC,19,165,42,8,SS_RIGHT
@@ -454,22 +453,22 @@ BEGIN
     EDITTEXT        IDC_DDEAPP,65,142,200,14,ES_AUTOHSCROLL
     EDITTEXT        IDC_DDETOPIC,65,162,200,14,ES_AUTOHSCROLL
     DEFPUSHBUTTON   "OK",IDOK,159,189,50,14
-    PUSHBUTTON      "キャンセル",IDCANCEL,215,189,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,215,189,50,14
     SCROLLBAR       IDC_RESIZEGRIP4,7,189,10,10
 END
 
 IDD_FINDWIN DIALOGEX 0, 0, 210, 85
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "ウインドウの指定"
+CAPTION "Find Window"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     ICON            IDI_CROSS1,IDC_CROSSCURSOR,7,7,21,20,SS_CENTERIMAGE
-    LTEXT           "左の十字線をドラッグして、対象のウインドウを選択\nするか、Escでキャンセルします。",IDC_FINDWINDESC,35,7,168,22
+    LTEXT           "Drag the crosshair over the window you would like to select as the new target, or press Esc to cancel.",IDC_FINDWINDESC,35,7,168,22
     EDITTEXT        IDC_WINTITLE,7,35,196,14,ES_AUTOHSCROLL | ES_READONLY | NOT WS_TABSTOP
     LTEXT           "Window Class",IDC_WINCLASS,7,60,45,8,NOT WS_VISIBLE
     LTEXT           "Window Module",IDC_WINMODULE,7,70,51,8,NOT WS_VISIBLE
     DEFPUSHBUTTON   "OK",IDOK,97,64,50,14,WS_DISABLED
-    PUSHBUTTON      "キャンセル",IDCANCEL,153,64,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,153,64,50,14
     SCROLLBAR       IDC_RESIZEGRIP5,7,64,10,10
 END
 
@@ -605,87 +604,87 @@ END
 
 STRINGTABLE
 BEGIN
-	IDT_HISTORY_BACK		"戻る"
-	IDT_HISTORY_FORWARD		"進む"
-	IDT_UP_DIR				"上のフォルダ"
-	IDT_ROOT_DIR			"ルートフォルダ"
-	IDT_VIEW_FAVORITES		"お気に入り"
-	IDT_FILE_PREV			"前のファイルを開く"
-	IDT_FILE_NEXT			"次のファイルを開く"
-	IDT_FILE_RUN			"実行"
+	IDT_HISTORY_BACK		"Back"
+	IDT_HISTORY_FORWARD		"Forward"
+	IDT_UP_DIR				"Upper Directory"
+	IDT_ROOT_DIR			"Root Directory"
+	IDT_VIEW_FAVORITES		"Favorites"
+	IDT_FILE_PREV			"Previous File"
+	IDT_FILE_NEXT			"Next File"
+	IDT_FILE_RUN			"Run"
 	IDT_FILE_QUICKVIEW		"Quickview"
-	IDT_FILE_SAVEAS			"名前を付けて保存"
-	IDT_FILE_COPYMOVE		"コピー/移動"
-	IDT_FILE_DELETE_RECYCLE	"削除 (ごみ箱へ移動)"
-	IDT_FILE_DELETE_PERM	"削除 (直接削除)"
-	IDT_VIEW_FILTER			"フィルター"
+	IDT_FILE_SAVEAS			"Save As"
+	IDT_FILE_COPYMOVE		"Copy/Move"
+	IDT_FILE_DELETE_RECYCLE	"Delete (RecycleBin)"
+	IDT_FILE_DELETE_PERM	"Delete (Permanently)"
+	IDT_VIEW_FILTER			"Filter"
 END
 
 STRINGTABLE
 BEGIN
 	IDS_APPTITLE			"metapath"
-	IDS_NUMFILES			"%s 項目"
-	IDS_NUMFILES_FILTER		"%s 項目 | フィルター使用"
-	IDS_SAVEFILE			"保存中 ""%s""..."
-    IDS_LINKDESCRIPTION     "metapath で開く"
+	IDS_NUMFILES			"%s Object(s)"
+	IDS_NUMFILES_FILTER		"%s Object(s) | Filter"
+	IDS_SAVEFILE			"Saving ""%s""..."
+    IDS_LINKDESCRIPTION     "Open in metapath"
 END
 
 STRINGTABLE
 BEGIN
-    IDS_ERR_CD              "指定したフォルダにアクセスできません。\nディスクあるいはネットワーク接続を確認してください。"
-    IDS_ERR_FILE            "「%s」にアクセスできません。\nこのファイルはほかのプログラムに使用されています。\nディスクあるいはネットワーク接続を確認してください。"
-    IDS_ERR_NEW             "ファイルを作成できませんでした。\nディスクあるいはネットワーク接続を確認してください。"
-    IDS_ERR_NEWDIR          "フォルダを作成できませんでした。\nディスクあるいはネットワーク接続を確認してください。"
-    IDS_ERR_SAVEAS1         "「%s」の保存に失敗しました。\nファイルはおそらく書き込み保護されています。"
-    IDS_ERR_SAVEAS2         "ファイルの保存時に読み取り専用属性を解除できませんでした。"
-    IDS_ERR_CMDLINE         "コマンドラインで指定されたファイルやフォルダにアクセスできません。"
-    IDS_ERR_STARTUPDIR      "起動時に読み込むフォルダがありません。"
-    IDS_ERR_DROP1           "ドロップしたファイルやフォルダにアクセスできません。"
-    //IDS_ERR_DROP2           "同時にひとつのファイルかフォルダしかドロップできません。"
-    IDS_ERR_FAVORITES       "お気に入り\n「お気に入り」フォルダにアクセスできません。\n設定から存在するフォルダを指定してください。"
-    IDS_ERR_LNK_GETPATH     "ショートカットする対象のパスが正しくありません。\nおそらくファイルやフォルダではありません。"
-    IDS_ERR_LNK_NOACCESS    "ショートカットの対象のパスにアクセスできません。\nディスクあるいはネットワーク接続を確認してください。"
-    IDS_ERR_CREATELINK      "指定したショートカットを作成できません。\nおそらくフォルダが書き込み保護されています。"
-    IDS_ERR_FILTER          "追加のフィルタの指定がありません。\n詳細は metapath の readme ファイルを参照してください。"
-    IDS_ERR_PREVWINDISABLED "metapath ウインドウがビジー状態、あるいはダイアログを使用しています。\n新しい metapath のウインドウを開きますか？"
+    IDS_ERR_CD              "No access to specified directory.\nCheck the disk or the network connection."
+    IDS_ERR_FILE            "No access to ""%s"".\nThe file may be used by another application.\nCheck the disk or the network connection."
+    IDS_ERR_NEW             "File could not be created.\nCheck the disk or the network connection."
+    IDS_ERR_NEWDIR          "Directory could not be created.\nCheck the disk or the network connection."
+    IDS_ERR_SAVEAS1         "Error saving ""%s"".\nProbably an already existing file is write-protected."
+    IDS_ERR_SAVEAS2         "Error removing read-only attribute of saved file."
+    IDS_ERR_CMDLINE         "Error accessing file or directory specified in command line."
+    IDS_ERR_STARTUPDIR      "No access to startup directory."
+    IDS_ERR_DROP1           "No access to dropped file or directory."
+    //IDS_ERR_DROP2           "Only a single file or directory can be dropped at a time."
+    IDS_ERR_FAVORITES       "No access to ""Favorites"" folder.\nSpecify a valid directory in the ""Options"" dialog box."
+    IDS_ERR_LNK_GETPATH     "No valid filesystem-path available for linked object.\nProbably the link doesn't refer to a file or directory."
+    IDS_ERR_LNK_NOACCESS    "No access to filesystem-path of linked object.\nCheck the disk or the network connection."
+    IDS_ERR_CREATELINK      "Error creating the specified link.\nProbably the destination directory is write-protected."
+    IDS_ERR_FILTER          "No additional filters specified.\nPlease refer to the metapath readme file for more information."
+    IDS_ERR_PREVWINDISABLED "Existing metapath window is busy or has an active dialog box.\nDo you want to open another metapath window?"
 #if NP2_ENABLE_APP_LOCALIZATION_DLL
-	IDS_CHANGE_LANG_RESTART	"表示言語の変更には metapath の再起動が必要です。\n今すぐ再起動しますか？"
+	IDS_CHANGE_LANG_RESTART	"Changing the UI language requires a restart of metapath, restart now?"
 #endif
 END
 
 STRINGTABLE
 BEGIN
-    IDS_ERR_TARGETDISABLED  "対象ウインドウがビジー状態、あるいはダイアログを使用しています。\n新しいウインドウを開きますか？"
-    IDS_ERR_INVALIDTARGET   "必須項目の設定が完了していません。\n対象プログラムのウインドウを指定する必要があります。"
-    IDS_ERR_INIOPEN         "設定ファイルにアクセスできません。"
-    IDS_ERR_INICREATE       "設定ファイル作成時にエラーが発生しました。"
-    IDS_ERR_INIWRITE        "設定が保存されていません！\n設定ファイルに書き込めませんでした。"
+    IDS_ERR_TARGETDISABLED  "Existing target window is busy or has an active dialog box.\nWould you like to open a new window?"
+    IDS_ERR_INVALIDTARGET   "Please make sure all the required fields are completed.\nYou will also have to find a target window if the appropriate option is enabled."
+    IDS_ERR_INIOPEN         "No access to metapath configuration file."
+    IDS_ERR_INICREATE       "Error creating configuration file."
+    IDS_ERR_INIWRITE        "Settings not saved!\nNo write access to configuration file."
 END
 
 STRINGTABLE
 BEGIN
-    IDS_SEARCHEXE           "プログラムの指定"
-    IDS_GETQUICKVIEWER      "Quickview の指定"
-    IDS_GETTARGET           "エディターの指定"
-    IDS_NEWFILE             "新規作成"
-    IDS_FILTER_ALL          "すべてのファイル (*.*)|*.*|"
-    IDS_FILTER_EXE          "実行ファイル (*.exe;*.com;*.bat;*.lnk;*.pif)|*.exe;*.com;*.bat;*.lnk;*.pif|すべてのファイル (*.*)|*.*|"
-    IDS_GETDIRECTORY        "フォルダを選択"
-    IDS_FAVORITES           "「お気に入り」フォルダの指定"
+    IDS_SEARCHEXE           "Find Executable"
+    IDS_GETQUICKVIEWER      "Find Quickview"
+    IDS_GETTARGET           "Find Editor"
+    IDS_NEWFILE             "New File"
+    IDS_FILTER_ALL          "All Files (*.*)|*.*|"
+    IDS_FILTER_EXE          "Executable Files (*.exe;*.com;*.bat;*.lnk;*.pif)|*.exe;*.com;*.bat;*.lnk;*.pif|All Files (*.*)|*.*|"
+    IDS_GETDIRECTORY        "Select a new directory."
+    IDS_FAVORITES           "Specify the ""Favorites"" directory."
 END
 
 STRINGTABLE
 BEGIN
-    IDS_OPENWITH            "選択項目を開くプログラムのあるフォルダを指定します。"
-    IDS_COPYMOVE            "対象のフォルダを選択してください。"
-    IDS_CREATELINK          "選択項目のショートカットを作成するフォルダを選択します。"
-    IDS_SAVESETTINGS        "現在の設定を保存しました。"
+    IDS_OPENWITH            "Select the directory with links to your favorite applications."
+    IDS_COPYMOVE            "Select a destination directory."
+    IDS_CREATELINK          "Select a destination directory for the new link."
+    IDS_SAVESETTINGS        "The current program settings have been saved."
 END
 
 #if NP2_ENABLE_APP_LOCALIZATION_DLL
 STRINGTABLE
 BEGIN
-	IDS_LANG_USER_DEFAULT			"システムの言語"
+	IDS_LANG_USER_DEFAULT			"System Language"
 	IDS_LANG_ENGLISH_US				"English"
 	IDS_LANG_CHINESE_SIMPLIFIED		"简体中文"
 	IDS_LANG_CHINESE_TRADITIONAL	"繁體中文"
@@ -718,7 +717,7 @@ END
 
 #endif    // APSTUDIO_INVOKED
 
-#endif    // Japanese (Japan) resources
+#endif    // German (Germany) resources
 /////////////////////////////////////////////////////////////////////////////
 
 

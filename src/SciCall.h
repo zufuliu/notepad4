@@ -611,6 +611,10 @@ NP2_inline void SciCall_StyleSetSizeFractional(int style, int sizeHundredthPoint
 	SciCall(SCI_STYLESETSIZEFRACTIONAL, style, sizeHundredthPoints);
 }
 
+NP2_inline int SciCall_StyleGetSizeFractional(int style) {
+	return (int)SciCall(SCI_STYLEGETSIZEFRACTIONAL, style, 0);
+}
+
 NP2_inline void SciCall_StyleSetWeight(int style, int weight) {
 	SciCall(SCI_STYLESETWEIGHT, style, weight);
 }

@@ -19,6 +19,7 @@
 #include <vector>
 #include <map>
 #include <algorithm>
+#include <iterator>
 #include <memory>
 //#include <mutex>
 
@@ -73,7 +74,7 @@ GetDpiForWindowSig fnGetDpiForWindow = nullptr;
 
 using GetDpiForMonitorSig = HRESULT (WINAPI *)(HMONITOR hmonitor, /*MONITOR_DPI_TYPE*/int dpiType, UINT *dpiX, UINT *dpiY);
 HMODULE hShcoreDLL {};
-GetDpiForMonitorSig pfnGetDpiForMonitor = nullptr;
+GetDpiForMonitorSig fnGetDpiForMonitor = nullptr;
 
 using GetSystemMetricsForDpiSig = int (WINAPI *)(int nIndex, UINT dpi);
 GetSystemMetricsForDpiSig fnGetSystemMetricsForDpi = nullptr;
@@ -104,7 +105,7 @@ void Scintilla_LoadDpiForWindow(void) {
 	if (!fnGetDpiForWindow) {
 		hShcoreDLL = ::LoadLibraryExW(L"shcore.dll", {}, LOAD_LIBRARY_SEARCH_SYSTEM32);
 		if (hShcoreDLL) {
-			pfnGetDpiForMonitor = DLLFunction<GetDpiForMonitorSig>(hShcoreDLL, "GetDpiForMonitor");
+			fnGetDpiForMonitor = DLLFunction<GetDpiForMonitorSig>(hShcoreDLL, "GetDpiForMonitor");
 		}
 	}
 }
@@ -113,11 +114,11 @@ UINT GetWindowDPI(HWND hwnd) NP2_noexcept {
 	if (fnGetDpiForWindow) {
 		return fnGetDpiForWindow(hwnd);
 	}
-	if (pfnGetDpiForMonitor) {
+	if (fnGetDpiForMonitor) {
 		HMONITOR hMonitor = ::MonitorFromWindow(hwnd, MONITOR_DEFAULTTONEAREST);
 		UINT dpiX = 0;
 		UINT dpiY = 0;
-		if (pfnGetDpiForMonitor(hMonitor, MDT_EFFECTIVE_DPI, &dpiX, &dpiY) == S_OK) {
+		if (fnGetDpiForMonitor(hMonitor, MDT_EFFECTIVE_DPI, &dpiX, &dpiY) == S_OK) {
 			return dpiY;
 		}
 	}
@@ -134,7 +135,7 @@ int SystemMetricsForDpi(int nIndex, UINT dpi) NP2_noexcept {
 	return value;
 }
 
-BOOL DpiAdjustWindowRect(LPRECT lpRect, DWORD dwStyle, DWORD dwExStyle, UINT dpi) NP2_noexcept {
+BOOL AdjustWindowRectForDpi(LPRECT lpRect, DWORD dwStyle, DWORD dwExStyle, UINT dpi) NP2_noexcept {
 	if (fnAdjustWindowRectExForDpi) {
 		return fnAdjustWindowRectExForDpi(lpRect, dwStyle, FALSE, dwExStyle, dpi);
 	}
@@ -238,9 +239,8 @@ static void LoadD2DOnce() noexcept
 		}
 
 		hr = pIDWriteFactory->GetGdiInterop(&gdiInterop);
-		if (!SUCCEEDED(hr) && gdiInterop) {
-			gdiInterop->Release();
-			gdiInterop = nullptr;
+		if (!SUCCEEDED(hr)) {
+			ReleaseUnknown(gdiInterop);
 		}
 	}
 
@@ -346,7 +346,7 @@ constexpr BYTE Win32MapFontQuality(int extraFontFlag) noexcept {
 		return CLEARTYPE_QUALITY;
 
 	default:
-		return SC_EFF_QUALITY_DEFAULT;
+		return DEFAULT_QUALITY;
 	}
 }
 
@@ -679,6 +679,8 @@ void SurfaceGDI::Init(WindowID wid) noexcept {
 void SurfaceGDI::Init(SurfaceID sid, WindowID wid, bool printing) noexcept {
 	Release();
 	hdc = static_cast<HDC>(sid);
+	// Windows on screen are scaled but printers are not.
+	//const bool printing = (::GetDeviceCaps(hdc, TECHNOLOGY) != DT_RASDISPLAY);
 	logPixelsY = printing ? ::GetDeviceCaps(hdc, LOGPIXELSY) : DpiForWindow(wid);
 	::SetTextAlign(hdc, TA_BASELINE);
 }
@@ -1204,32 +1206,33 @@ void SurfaceGDI::SetBidiR2L(bool) noexcept {
 class BlobInline;
 
 class SurfaceD2D : public Surface {
-	bool unicodeMode;
-	int x;
-	int y;
+	bool unicodeMode = false;
+	int x = 0;
+	int y = 0;
 
-	int codePage;
-	int codePageText;
+	int codePage = 0;
+	int codePageText =0;
 
-	ID2D1RenderTarget *pRenderTarget;
-	ID2D1BitmapRenderTarget *pBitmapRenderTarget;
-	bool ownRenderTarget;
-	int clipsActive;
+	ID2D1RenderTarget *pRenderTarget = nullptr;
+	ID2D1BitmapRenderTarget *pBitmapRenderTarget = nullptr;
+	bool ownRenderTarget = false;
+	int clipsActive = 0;
 
-	IDWriteTextFormat *pTextFormat;
-	FLOAT yAscent;
-	FLOAT yDescent;
-	FLOAT yInternalLeading;
+	// From selected font
+	IDWriteTextFormat *pTextFormat = nullptr;
+	FLOAT yAscent = 2;
+	FLOAT yDescent = 1;
+	FLOAT yInternalLeading = 0;
 
-	ID2D1SolidColorBrush *pBrush;
+	ID2D1SolidColorBrush *pBrush = nullptr;
 
-	int logPixelsY;
+	int logPixelsY = USER_DEFAULT_SCREEN_DPI;
 
 	void Clear() noexcept;
 	void SetFont(const Font &font_) noexcept;
 
 public:
-	SurfaceD2D() noexcept;
+	SurfaceD2D() noexcept = default;
 	// Deleted so SurfaceD2D objects can not be copied.
 	SurfaceD2D(const SurfaceD2D &) = delete;
 	SurfaceD2D(SurfaceD2D &&) = delete;
@@ -1285,29 +1288,6 @@ public:
 	void SetDBCSMode(int codePage_) noexcept override;
 	void SetBidiR2L(bool bidiR2L_) noexcept override;
 };
-
-SurfaceD2D::SurfaceD2D() noexcept :
-	unicodeMode(false),
-	x(0), y(0) {
-
-	codePage = 0;
-	codePageText = 0;
-
-	pRenderTarget = nullptr;
-	pBitmapRenderTarget = nullptr;
-	ownRenderTarget = false;
-	clipsActive = 0;
-
-	// From selected font
-	pTextFormat = nullptr;
-	yAscent = 2;
-	yDescent = 1;
-	yInternalLeading = 0;
-
-	pBrush = nullptr;
-
-	logPixelsY = USER_DEFAULT_SCREEN_DPI;
-}
 
 SurfaceD2D::~SurfaceD2D() noexcept {
 	Clear();
@@ -1394,9 +1374,8 @@ void SurfaceD2D::D2DPenColour(ColourDesired fore, int alpha) {
 			pBrush->SetColor(col);
 		} else {
 			const HRESULT hr = pRenderTarget->CreateSolidColorBrush(col, &pBrush);
-			if (!SUCCEEDED(hr) && pBrush) {
-				pBrush->Release();
-				pBrush = nullptr;
+			if (!SUCCEEDED(hr)) {
+				ReleaseUnknown(pBrush);
 			}
 		}
 	}
@@ -2986,11 +2965,11 @@ void ListBoxX::SetList(const char *list, const char separator, const char typese
 void ListBoxX::AdjustWindowRect(PRectangle *rc, UINT dpi) noexcept {
 	RECT rcw = RectFromPRectangle(*rc);
 #if LISTBOXX_USE_THICKFRAME
-	DpiAdjustWindowRect(&rcw, WS_THICKFRAME, WS_EX_WINDOWEDGE, dpi);
+	AdjustWindowRectForDpi(&rcw, WS_THICKFRAME, WS_EX_WINDOWEDGE, dpi);
 #elif LISTBOXX_USE_BORDER
-	DpiAdjustWindowRect(&rcw, WS_BORDER, WS_EX_WINDOWEDGE, dpi);
+	AdjustWindowRectForDpi(&rcw, WS_BORDER, WS_EX_WINDOWEDGE, dpi);
 #else
-	DpiAdjustWindowRect(&rcw, 0, WS_EX_WINDOWEDGE, dpi);
+	AdjustWindowRectForDpi(&rcw, 0, WS_EX_WINDOWEDGE, dpi);
 #endif
 	*rc = PRectangle::FromInts(rcw.left, rcw.top, rcw.right, rcw.bottom);
 #if LISTBOXX_USE_FAKE_FRAME
@@ -3643,26 +3622,11 @@ void Platform_Initialise(void *hInstance) noexcept {
 void Platform_Finalise(bool fromDllMain) noexcept {
 #if defined(USE_D2D)
 	if (!fromDllMain) {
-		if (defaultRenderingParams) {
-			defaultRenderingParams->Release();
-			defaultRenderingParams = nullptr;
-		}
-		if (customClearTypeRenderingParams) {
-			customClearTypeRenderingParams->Release();
-			customClearTypeRenderingParams = nullptr;
-		}
-		if (gdiInterop) {
-			gdiInterop->Release();
-			gdiInterop = nullptr;
-		}
-		if (pIDWriteFactory) {
-			pIDWriteFactory->Release();
-			pIDWriteFactory = nullptr;
-		}
-		if (pD2DFactory) {
-			pD2DFactory->Release();
-			pD2DFactory = nullptr;
-		}
+		ReleaseUnknown(defaultRenderingParams);
+		ReleaseUnknown(customClearTypeRenderingParams);
+		ReleaseUnknown(gdiInterop);
+		ReleaseUnknown(pIDWriteFactory);
+		ReleaseUnknown(pD2DFactory);
 		if (hDLLDWrite) {
 			FreeLibrary(hDLLDWrite);
 			hDLLDWrite = {};
