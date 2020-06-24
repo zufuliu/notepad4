@@ -677,6 +677,10 @@ NP2_inline void SciCall_SetSelEOLFilled(BOOL filled) {
 	SciCall(SCI_SETSELEOLFILLED, filled, 0);
 }
 
+NP2_inline void SciCall_SetEOLSelectedWidth(int percent) {
+	SciCall(SCI_SETEOLSELECTEDWIDTH, percent, 0);
+}
+
 NP2_inline void SciCall_SetCaretFore(COLORREF fore) {
 	SciCall(SCI_SETCARETFORE, fore, 0);
 }

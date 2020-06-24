@@ -279,6 +279,8 @@ typedef sptr_t (*SciFnDirect)(sptr_t ptr, unsigned int iMessage, uptr_t wParam, 
 #define SCI_SETSELALPHA 2478
 #define SCI_GETSELEOLFILLED 2479
 #define SCI_SETSELEOLFILLED 2480
+#define SCI_GETEOLSELECTEDWIDTH 2474
+#define SCI_SETEOLSELECTEDWIDTH 2475
 #define SCI_SETCARETFORE 2069
 #define SCI_ASSIGNCMDKEY 2070
 #define SCI_CLEARCMDKEY 2071

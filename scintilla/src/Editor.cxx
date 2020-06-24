@@ -7424,6 +7424,14 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 		InvalidateStyleRedraw();
 		break;
 
+	case SCI_GETEOLSELECTEDWIDTH:
+		return vs.eolSelectedWidth;
+
+	case SCI_SETEOLSELECTEDWIDTH:
+		vs.eolSelectedWidth = std::clamp(static_cast<int>(wParam), 0, 100);
+		InvalidateStyleRedraw();
+		break;
+
 	case SCI_SETWHITESPACEFORE:
 		vs.whitespaceColours.fore = ColourOptional(wParam, lParam);
 		InvalidateStyleRedraw();

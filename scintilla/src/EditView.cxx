@@ -1209,6 +1209,7 @@ void EditView::DrawEOL(Surface *surface, const EditModel &model, const ViewStyle
 	const bool fillRemainder = (!lastSubLine || (!model.GetFoldDisplayText(line) && !drawEOLAnnotationStyledText));
 	if (fillRemainder) {
 		// Fill the remainder of the line
+		rcSegment.left -= vsDraw.aveCharWidth*(100 - vsDraw.eolSelectedWidth)/100;
 		FillLineRemainder(surface, model, vsDraw, ll, line, rcSegment, subLine);
 	}
 

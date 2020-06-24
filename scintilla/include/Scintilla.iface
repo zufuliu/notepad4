@@ -688,6 +688,12 @@ get bool GetSelEOLFilled=2479(,)
 # Set the selection to have its end of line filled or not.
 set void SetSelEOLFilled=2480(bool filled,)
 
+# Get the eol-is-selected rectangle width.
+get int GetEOLSelectedWidth=2474(,)
+
+# Set the eol-is-selected rectangle width.
+set void SetEOLSelectedWidth=2475(int percent,)
+
 # Set the foreground colour of the caret.
 set void SetCaretFore=2069(colour fore,)
 
