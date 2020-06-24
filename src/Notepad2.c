@@ -1990,7 +1990,6 @@ void RecreateBars(HWND hwnd, HINSTANCE hInstance) {
 void MsgDPIChanged(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	g_uCurrentDPI = HIWORD(wParam);
 	const RECT* const rc = (RECT *)lParam;
-	const Sci_Position pos = SciCall_GetCurrentPos();
 
 	// recreate toolbar and statusbar
 	RecreateBars(hwnd, g_hInstance);
@@ -2003,8 +2002,7 @@ void MsgDPIChanged(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	UpdateLineNumberWidth();
 	UpdateBookmarkMarginWidth();
 	UpdateFoldMarginWidth();
-
-	SciCall_GotoPos(pos);
+	EditEnsureSelectionVisible();
 	UpdateToolbar();
 	UpdateStatusbar();
 }
@@ -2251,6 +2249,7 @@ void MsgNotifyZoom(void) {
 	UpdateLineNumberWidth();
 	UpdateBookmarkMarginWidth();
 	UpdateFoldMarginWidth();
+	EditEnsureSelectionVisible();
 	UpdateStatusbar();
 }
 
@@ -3900,6 +3899,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		fWordWrap = !fWordWrap;
 		SciCall_SetWrapMode(fWordWrap? iWordWrapMode : SC_WRAP_NONE);
 		fWordWrapG = fWordWrap;
+		EditEnsureSelectionVisible();
 		UpdateToolbar();
 		break;
 
@@ -3908,9 +3908,10 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			SciCall_SetWrapMode(fWordWrap? iWordWrapMode : SC_WRAP_NONE);
 			SciCall_SetMarginOptions(bWordWrapSelectSubLine ? SC_MARGINOPTION_SUBLINESELECT : SC_MARGINOPTION_NONE);
 			fWordWrapG = fWordWrap;
-			UpdateToolbar();
 			SetWrapIndentMode();
 			SetWrapVisualFlags();
+			EditEnsureSelectionVisible();
+			UpdateToolbar();
 		}
 		break;
 
