@@ -1586,6 +1586,10 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 	}
 
 	SciCall_SetSelEOLFilled(Style_StrGetEOLFilled(szValue));
+	if (!Style_StrGetSize(szValue, &iValue)) {
+		iValue = 100;
+	}
+	SciCall_SetEOLSelectedWidth(iValue);
 	//! end Selection
 
 	//! begin Whitespace

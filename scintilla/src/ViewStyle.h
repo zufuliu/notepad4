@@ -102,6 +102,7 @@ public:
 	int selAlpha;
 	int selAdditionalAlpha;
 	bool selEOLFilled;
+	int eolSelectedWidth;
 	ForeBackColours whitespaceColours;
 	int controlCharSymbol;
 	XYPOSITION controlCharWidth;

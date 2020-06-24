@@ -83,6 +83,7 @@ ViewStyle::ViewStyle(const ViewStyle &source) : markers(MARKER_MAX + 1), indicat
 	selAlpha = source.selAlpha;
 	selAdditionalAlpha = source.selAdditionalAlpha;
 	selEOLFilled = source.selEOLFilled;
+	eolSelectedWidth = source.eolSelectedWidth;
 
 	foldmarginColour = source.foldmarginColour;
 	foldmarginHighlightColour = source.foldmarginHighlightColour;
@@ -214,6 +215,7 @@ void ViewStyle::Init(size_t stylesSize_) {
 	selAlpha = SC_ALPHA_NOALPHA;
 	selAdditionalAlpha = SC_ALPHA_NOALPHA;
 	selEOLFilled = false;
+	eolSelectedWidth = 100;
 
 	foldmarginColour = ColourOptional(ColourDesired(0xff, 0, 0));
 	foldmarginHighlightColour = ColourOptional(ColourDesired(0xc0, 0xc0, 0xc0));
