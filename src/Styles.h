@@ -83,7 +83,7 @@ BOOL	Style_StrGetFontEx(LPCWSTR lpszStyle, LPWSTR lpszFont, int cchFont, BOOL bD
 BOOL	Style_StrGetCharSet(LPCWSTR lpszStyle, int *charset);
 BOOL	Style_StrGetLocale(LPCWSTR lpszStyle, LPWSTR lpszLocale, int cchLocale);
 BOOL	Style_StrGetFontSize(LPCWSTR lpszStyle, int *size);
-BOOL	Style_StrGetRawSize(LPCWSTR lpszStyle, int *size);
+BOOL	Style_StrGetSize(LPCWSTR lpszStyle, int *size);
 BOOL	Style_StrGetFontWeight(LPCWSTR lpszStyle, int *weight);
 BOOL	Style_StrGetColor(BOOL bFore, LPCWSTR lpszStyle, COLORREF *rgb);
 
