@@ -957,11 +957,11 @@ std::wstring StringDecode(const std::string_view sv, int codePage) {
 }
 
 std::wstring StringMapCase(const std::wstring_view wsv, DWORD mapFlags) {
-	const int charsConverted = ::LCMapStringW(LOCALE_SYSTEM_DEFAULT, mapFlags,
+	const int charsConverted = ::LCMapStringW(LOCALE_USER_DEFAULT, mapFlags,
 		wsv.data(), static_cast<int>(wsv.length()), nullptr, 0);
 	std::wstring wsConverted(charsConverted, 0);
 	if (charsConverted) {
-		::LCMapStringW(LOCALE_SYSTEM_DEFAULT, mapFlags,
+		::LCMapStringW(LOCALE_USER_DEFAULT, mapFlags,
 			wsv.data(), static_cast<int>(wsv.length()), wsConverted.data(), charsConverted);
 	}
 	return wsConverted;
