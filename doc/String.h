@@ -6,6 +6,8 @@
 int CompareStringOrdinal(LPCWCH lpString1, int cchCount1, LPCWCH lpString2, int cchCount2, BOOL bIgnoreCase);
 // https://docs.microsoft.com/en-us/windows/desktop/api/stringapiset/nf-stringapiset-comparestringw
 int CompareStringW(LCID Locale, DWORD dwCmpFlags, PCNZWCH lpString1, int cchCount1, PCNZWCH lpString2, int cchCount2);
+// https://docs.microsoft.com/en-us/windows/win32/api/libloaderapi/nf-libloaderapi-findstringordinal
+int FindStringOrdinal(DWORD dwFindStringOrdinalFlags, LPCWSTR lpStringSource, int cchSource, LPCWSTR lpStringValue, int cchValue, BOOL bIgnoreCase);
 
 // https://docs.microsoft.com/en-us/windows/desktop/api/winbase/nf-winbase-lstrcmpa
 int lstrcmpA(LPCSTR lpString1, LPCSTR lpString2);
