@@ -48,7 +48,7 @@ static KEYWORDLIST Keywords_CPP = {{
 // errno.h
 "errno_t "
 // fenv.h
-"fenv_t fexcept_t "
+"fenv_t femode_t fexcept_t "
 // inttypes.h
 "imaxdiv_t "
 // math.h
@@ -122,7 +122,7 @@ static KEYWORDLIST Keywords_CPP = {{
 // <contract>
 //"contract_violation "
 // <compare>
-"weak_equality strong_equality partial_ordering weak_ordering strong_ordering common_comparison_category compare_three_way_result compare_three_way "
+"partial_ordering weak_ordering strong_ordering common_comparison_category compare_three_way_result compare_three_way "
 // <coroutine>
 "coroutine_traits coroutine_handle noop_coroutine_promise noop_coroutine_handle suspend_never suspend_always "
 // <exception>
@@ -313,7 +313,7 @@ static KEYWORDLIST Keywords_CPP = {{
 , // 8 Constant
 "__cplusplus __cplusplus_cli __assembler __midl "
 "__FILE__ __FUNCTION__ __LINE__ __DATE__ __TIME__ __TIMESTAMP__ __func__ __VA_ARGS__ __VA_OPT__ "
-"__STDC__ __STDC_HOSTED__ __STDC_VERSION__ __STDC_IEC_559__ __STDC_IEC_559_COMPLEX__ __STDC_ISO_10646__ "
+"__STDC__ __STDC_HOSTED__ __STDC_VERSION__ __STDC_IEC_60559_BFP__ __STDC_IEC_559__ __STDC_IEC_60559_DFP__ __STDC_IEC_60559_COMPLEX__ __STDC_IEC_559_COMPLEX__ __STDC_ISO_10646__ "
 "__COUNTER__ __STRICT_ANSI__ __PRETTY_FUNCTION__ __STDC_DEC_FP__ "
 "_MSC_VER _MSC_FULL_VER "
 "__GNUC__ __GNUG__ __GNUC_MINOR__ __GNUC_PATCHLEVEL__ __OBJC__ __ASSEMBLER__ __GFORTRAN__ "
@@ -333,9 +333,10 @@ static KEYWORDLIST Keywords_CPP = {{
 // errno.h
 "EDOM EILSEQ ERANGE "
 // fenv.h
-"FENV_ACCESS "
-"FE_INVALID FE_DENORMAL FE_DIVBYZERO FE_OVERFLOW FE_UNDERFLOW FE_INEXACT FE_ALL_EXCEPT "
+"FENV_ACCESS FENV_DEC_ROUND FENV_ROUND FE_DYNAMIC "
+"FE_INVALID FE_DENORMAL FE_DIVBYZERO FE_DFL_MODE FE_OVERFLOW FE_UNDERFLOW FE_INEXACT FE_ALL_EXCEPT "
 "FE_TONEAREST FE_DOWNWARD FE_UPWARD FE_TOWARDZERO " "FE_DFL_ENV FE_PC64_ENV FE_PC53_ENV "
+"FE_DEC_DOWNWARD FE_DEC_TONEAREST FE_DEC_TONEARESTFROMZERO FE_DEC_TOWARDZERO FE_DEC_UPWARD "
 // float.h
 "DECIMAL_DIG FLT_DECIMAL_DIG DBL_DECIMAL_DIG LDBL_DECIMAL_DIG "
 // inttypes.h
@@ -348,11 +349,13 @@ static KEYWORDLIST Keywords_CPP = {{
 // math.h
 "FP_CONTRACT "
 "M_E M_LOG2E M_LOG10E M_LN2 M_LN10 M_PI M_PI_2 M_PI_4 M_1_PI M_2_PI M_2_SQRTPI M_SQRT2 M_SQRT1_2 "
-"MAXFLOAT HUGE_VAL HUGE_VALF HUGE_VALL INFINITY NAN "
-"FP_INFINITE FP_NAN FP_NORMAL FP_SUBNORMAL FP_ZERO " "FP_FAST_FMA FP_FAST_FMAF FP_FAST_FMAL "
-"FP_ILOGB0 FP_ILOGBNAN " "MATH_ERRNO MATH_ERREXCEPT math_errhandling "
-"fpclassify() isfinite() isinf() isnan() isnormal() signbit() "
-"isgreater() isgreaterequal() isless() islessequal() islessgreater() isunordered() "
+"MAXFLOAT HUGE_VAL HUGE_VALF HUGE_VALL HUGE_VAL_D32 HUGE_VAL_D64 HUGE_VAL_D128 "
+"INFINITY DEC_INFINITY NAN DEC_NAN SNANF SNAN SNANL SNAND32 SNAND64 SNAND128 "
+"FP_INFINITE FP_NAN FP_NORMAL FP_SUBNORMAL FP_ZERO FP_INT_UPWARD FP_INT_DOWNWARD FP_INT_TOWARDZERO FP_INT_TONEARESTFROMZERO FP_INT_TONEAREST " 
+"FP_FAST_FMA FP_FAST_FMAF FP_FAST_FMAL FP_FAST_FMAD32 FP_FAST_FMAD64 FP_FAST_FMAD128 "
+"FP_ILOGB0 FP_ILOGBNAN FP_LLOGB0 FP_LLOGBNAN " "MATH_ERRNO MATH_ERREXCEPT math_errhandling "
+"fpclassify() iscanonical() isfinite() isinf() isnan() isnormal() signbit() issignaling() issubnormal() iszero() "
+"isgreater() isgreaterequal() isless() islessequal() islessgreater() isunordered() iseqsig() "
 // signal.h
 "SIG_DFL SIG_ERR SIG_IGN SIG_SGE SIG_ACK "
 "SIGABRT SIGFPE SIGILL SIGINT SIGSEGV SIGTERM SIGBREAK "
@@ -563,18 +566,22 @@ static KEYWORDLIST Keywords_CPP = {{
 "isalnum() isalpha() isblank() iscntrl() isdigit() isgraph() islower() isprint() ispunct() isspace() isupper() isxdigit() "
 "tolower() toupper() "
 // fenv.h
-"feclearexcept() fegetexceptflag() feraiseexcept() fesetexceptflag() fetestexcept() fegetround() fesetround() "
+"feclearexcept() fegetexceptflag() feraiseexcept() fesetexcept() fesetexceptflag() fetestexceptflag() fetestexcept() "
+"fegetmode() fegetround() fe_dec_getround() fesetmode() fesetround() fe_dec_setround() "
 "fegetenv() feholdexcept() fesetenv() feupdateenv() "
 // inttypes.h
 "imaxabs() imaxdiv() strtoimax() strtoumax() wcstoimax() wcstoumax() "
 // locale.h
 "setlocale() localeconv() "
 // math.h
-"acos() asin() atan() atan2() cos() sin() tan() acosh() asinh() atanh() cosh() sinh() tanh() "
-"exp() exp2() expm1() frexp() ilogb() ldexp() log() log10() log1p() log2() logb() modf() scalbn() scalbln() "
-"cbrt() fabs() hypot() pow() sqrt() erf() erfc() lgamma() tgamma() "
-"ceil() floor() nearbyint() rint() lint() llint() round() lround() llround() trunc() "
-"fmod() remainder() remquo() copysign() nan() nextafter() nexttoward() fdim() fmax() fmin() fma() "
+"acos() asin() atan() atan2() cos() sin() tan() acospi() asinpi() atanpi() atan2pi() cospi() sinpi() tanpi() "
+"acosh() asinh() atanh() cosh() sinh() tanh() "
+"exp() exp10() exp10m1() exp2() exp2m1() expm1() frexp() ilogb() ldexp() llogb() "
+"log() log10() log10p1() log1p() logp1() log2() log2p1() logb() modf() scalbn() scalbln() "
+"cbrt() compoundn() fabs() hypot() pow() pown() powr() rootn() rsqrt() sqrt() erf() erfc() lgamma() tgamma() "
+"ceil() floor() nearbyint() rint() lint() llint() round() lround() llround() roundeven() trunc() fromfp() ufromfp() fromfpx() ufromfpx() "
+"fmod() remainder() remquo() copysign() nan() nextafter() nexttoward() nextup() nextdown() canonicalize() "
+"fdim() fmax() fmin() fmaxmag() fminmag() fma() "
 // setjmp.h
 "_longjmp() longjmp() siglongjmp() _setjmp() setjmp() sigsetjmp() "
 // signal.h
@@ -599,7 +606,7 @@ static KEYWORDLIST Keywords_CPP = {{
 // string.h
 "memcpy() memmove() memcmp() memchr() memset() "
 "strcpy() strncpy() strcat() strncat() strcmp() strcoll() strncmp() strxfrm() "
-"strchr() strcspn() strpbrk() strrchr() strspn() strstr() strtok() " "strerror() strlen() "
+"strchr() strcspn() strpbrk() strrchr() strspn() strstr() strtok() " "strerror() strlen() strdup() strndup() "
 // threads.h
 "call_once() cnd_broadcast() cnd_destroy() cnd_init() cnd_signal() cnd_timedwait() cnd_wait() "
 "mtx_destroy() mtx_init() mtx_lock() mtx_timedlock() mtx_trylock() mtx_unlock() "
@@ -652,6 +659,7 @@ static KEYWORDLIST Keywords_CPP = {{
 "code() " // system_error
 // <utility>
 "swap() exchange() forward() move() move_if_noexcept() as_const() declval() to_chars() from_chars() "
+"cmp_equal() cmp_not_equal() cmp_less() cmp_greater() cmp_less_equal() cmp_greater_equal() in_range() "
 "make_pair() get() " // pair
 // <tuple>
 "make_tuple() forward_as_tuple() tie() tuple_cat() apply() make_from_tuple() "
@@ -672,9 +680,9 @@ static KEYWORDLIST Keywords_CPP = {{
 "allocate() deallocate() construct() destroy() max_size() " // allocator_traits
 "addressof() destroy_at() destroy() destroy_n() "
 "get_deleter() release() " // unique_ptr
-"make_unique() make_unique_default_init() "
+"make_unique() make_unique_for_overwrite() "
 "use_count() owner_before() " // shared_ptr
-"make_shared() allocate_shared() make_shared_default_init() static_pointer_cast() dynamic_pointer_cast() const_pointer_cast() reinterpret_pointer_cast() "
+"make_shared() allocate_shared() make_shared_for_overwrite() allocate_shared_for_overwrite() static_pointer_cast() dynamic_pointer_cast() const_pointer_cast() reinterpret_pointer_cast() "
 "expired() lock() " // weak_ptr
 "shared_from_this() weak_from_this() "
 // <memory_resource>
