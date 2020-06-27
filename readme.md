@@ -45,7 +45,7 @@ Latest development builds (artifacts in Release configuration for each compiler 
 		* Vala
 	* C/C++, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#cc)
 		* Objective-C/C++, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#objective-cc)
-		* [C Standard Library](../master/tools/lang/C.c), up to C11.
+		* [C Standard Library](../master/tools/lang/C.c), up to C2x.
 		* [C++ STL](../master/tools/lang/CPP.cpp), up to C++20.
 	* CSS Style Sheet
 		* Sassy CSS
