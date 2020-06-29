@@ -107,8 +107,6 @@ void ColouriseTOMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 		braceCount = (lineState >> 8) & 0xff;
 	}
 
-	Sci_Position lineStartNext = styler.LineStart(sc.currentLine + 1);
-
 	while (sc.More()) {
 		switch (sc.state) {
 		case SCE_TOML_OPERATOR:
@@ -182,7 +180,7 @@ void ColouriseTOMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 						if (sc.ch == ']') {
 							sc.Forward();
 						}
-						const int chNext = LexGetNextChar(sc.currentPos, lineStartNext, styler);
+						const int chNext = LexGetNextChar(sc.currentPos, sc.lineStartNext, styler);
 						if (chNext == '#') {
 							sc.SetState(SCE_TOML_DEFAULT);
 						}
@@ -320,7 +318,6 @@ void ColouriseTOMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 		if (sc.atLineEnd) {
 			const int lineState = tableLevel | (braceCount << 8) | (lineType << 16);
 			styler.SetLineState(sc.currentLine, lineState);
-			lineStartNext = styler.LineStart(sc.currentLine + 2);
 			lineType = TOMLLineType_None;
 			visibleChars = 0;
 			tableLevel = 0;

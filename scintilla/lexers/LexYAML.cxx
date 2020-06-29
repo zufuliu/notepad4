@@ -61,9 +61,9 @@ constexpr bool IsYAMLDateTime(int ch, int chNext) noexcept {
 		|| (ch == ' ' && (chNext == '-' || IsADigit(chNext)));
 }
 
-bool IsYAMLText(StyleContext& sc, Sci_Position lineStartNext, int braceCount, const WordList *kwList) {
+bool IsYAMLText(StyleContext& sc, int braceCount, const WordList *kwList) {
 	const int state = sc.state;
-	const Sci_Position endPos = braceCount? sc.styler.Length() : lineStartNext;
+	const Sci_Position endPos = braceCount? sc.styler.Length() : sc.lineStartNext;
 	const int chNext = LexGetNextChar(sc.currentPos, endPos, sc.styler);
 	if (chNext == ':') {
 		// possible key
@@ -166,11 +166,8 @@ void ColouriseYAMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 		textIndentCount = (lineState >> 7) & 0x1ff;
 	}
 
-	Sci_Position lineStartNext = styler.LineStart(sc.currentLine + 1);
-
 	while (sc.More()) {
 		if (sc.atLineStart) {
-			lineStartNext = styler.LineStart(sc.currentLine + 1);
 			visibleChars = 0;
 			indentBefore = 0;
 			indentCount = 0;
@@ -180,7 +177,7 @@ void ColouriseYAMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 			if (sc.state == SCE_YAML_BLOCK_SCALAR || (sc.state == SCE_YAML_TEXT && !braceCount) || sc.state == SCE_YAML_INDENTED_TEXT) {
 				indentEnded = true;
 				const bool hasComment = sc.state != SCE_YAML_BLOCK_SCALAR;
-				if (IsYAMLTextBlockEnd(hasComment, indentCount, textIndentCount, sc.currentPos, lineStartNext, styler)) {
+				if (IsYAMLTextBlockEnd(hasComment, indentCount, textIndentCount, sc.currentPos, sc.lineStartNext, styler)) {
 					textIndentCount = 0;
 					sc.SetState(SCE_YAML_DEFAULT);
 					sc.Forward(indentCount);
@@ -204,7 +201,7 @@ void ColouriseYAMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 			if (!IsDecimalNumber(sc.chPrev, sc.ch, sc.chNext)) {
 				if (IsYAMLDateTime(sc.ch, sc.chNext)) {
 					sc.ChangeState(SCE_YAML_DATETIME);
-				} else if (IsYAMLText(sc, lineStartNext, braceCount, nullptr)) {
+				} else if (IsYAMLText(sc, braceCount, nullptr)) {
 					continue;
 				}
 			}
@@ -212,7 +209,7 @@ void ColouriseYAMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 
 		case SCE_YAML_DATETIME:
 			if (!(IsIdentifierChar(sc.ch) || IsYAMLDateTime(sc.ch, sc.chNext))) {
-				 if (IsYAMLText(sc, lineStartNext, braceCount, nullptr)) {
+				 if (IsYAMLText(sc, braceCount, nullptr)) {
 					continue;
 				}
 			}
@@ -220,7 +217,7 @@ void ColouriseYAMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 
 		case SCE_YAML_IDENTIFIER:
 			if (!IsAlpha(sc.ch)) {
-				if (IsYAMLText(sc, lineStartNext, braceCount, keywordLists[0])) {
+				if (IsYAMLText(sc, braceCount, keywordLists[0])) {
 					continue;
 				}
 			}
@@ -330,7 +327,7 @@ void ColouriseYAMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 				visibleChars = 1;
 				sc.SetState(SCE_YAML_DOCUMENT);
 				sc.Forward(3);
-				const int chNext = LexGetNextChar(sc.currentPos + 1, lineStartNext, styler);
+				const int chNext = LexGetNextChar(sc.currentPos + 1, sc.lineStartNext, styler);
 				if (chNext != '\0') {
 					sc.SetState(SCE_YAML_DEFAULT);
 				}
