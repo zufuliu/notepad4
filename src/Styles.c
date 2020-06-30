@@ -1242,6 +1242,11 @@ void Style_UpdateLexerKeywordAttr(LPCEDITLEXER pLexNew) {
 		attr[3] = KeywordAttr_NoLexer;		// target variables
 		attr[4] = KeywordAttr_NoLexer;		// placeholders
 		break;
+	case NP2LEX_GO:
+		attr[7] = KeywordAttr_NoLexer;		// variables
+		attr[8] = KeywordAttr_NoLexer;		// function
+		attr[9] = KeywordAttr_NoLexer;		// package
+		break;
 	case NP2LEX_JULIA:
 		attr[1] = KeywordAttr_NoAutoComp;	// code fold
 		attr[5] = KeywordAttr_NoLexer;		// module
@@ -1922,9 +1927,6 @@ PEDITLEXER Style_SniffShebang(char *pchText) {
 			}
 			if (!strncmp(name, "py", 2)) {
 				return &lexPython;
-			}
-			if (!strncmp(name, "go", 2)) {
-				return &lexGo;
 			}
 		}
 	}
