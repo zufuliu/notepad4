@@ -180,7 +180,7 @@ void ColouriseTOMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 						if (sc.ch == ']') {
 							sc.Forward();
 						}
-						const int chNext = LexGetNextChar(sc.currentPos, sc.lineStartNext, styler);
+						const int chNext = sc.GetLineNextChar();
 						if (chNext == '#') {
 							sc.SetState(SCE_TOML_DEFAULT);
 						}
