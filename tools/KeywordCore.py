@@ -285,6 +285,91 @@ def update_gn_keyword():
 	keywordList = parse_gn_api_file('lang/GN.gn')
 	UpdateKeywordFile('NP2LEX_GN', '../src/EditLexers/stlGN.c', keywordList)
 
+# Go
+def parse_go_api_file(path):
+	sections = read_api_file(path, '//')
+	keywordMap = {}
+	for key, doc in sections:
+		if key in ('keywords', 'types'):
+			items = set(doc.split())
+			if key == 'types':
+				keywordMap['primitive types'] = items
+			else:
+				keywordMap[key] = items
+		else:
+			items = re.findall(r'^\s*(func\s+)?(?P<name>\w+\()', doc, re.MULTILINE)
+			items = set([item[1] for item in items])
+			if key == 'builtin':
+				keywordMap['builtin functions'] = items
+			else:
+				keywordMap['function'] = items
+
+			types = set()
+			structs = set()
+			interfaces = set()
+			items = re.findall(r'type\s+(?P<name>\w+)(\s+(?P<kind>\w+))?', doc)
+			for name, _, kind in items:
+				if kind == 'struct':
+					structs.add(name)
+				elif kind == 'interface':
+					interfaces.add(name)
+				else:
+					types.add(name)
+
+			keywordMap['type'] = types
+			keywordMap['struct'] = structs
+			keywordMap['interface'] = interfaces
+
+			items = re.findall(r'const\s+(\w+)', doc)
+			constant = set(items)
+			items = re.findall(r'const\s+\((?P<def>[^()]+)\)', doc, re.MULTILINE)
+			for item in items:
+				items = re.findall(r'^\s+(\w+)', item, re.MULTILINE)
+				constant.update(items)
+			keywordMap['constant'] = constant
+
+			items = re.findall(r'var\s+(\w+)', doc)
+			variables = set(items)
+			items = re.findall(r'var\s+\((?P<def>[^()]+)\)', doc, re.MULTILINE)
+			for item in items:
+				items = re.findall(r'^\s+(\w+)', item, re.MULTILINE)
+				variables.update(items)
+			keywordMap['variables'] = variables
+
+			items = re.findall(r'package\s+([/\w]+)', doc)
+			packages = set()
+			for item in items:
+				packages.update(item.split('/'))
+			keywordMap['package'] = set(packages)
+
+	RemoveDuplicateKeyword(keywordMap, [
+		'keywords',
+		'primitive types',
+		'builtin functions',
+		'type',
+		'struct',
+		'interface',
+		'constant',
+		'variables',
+	])
+	keywordList = [
+		('keywords', keywordMap['keywords'], KeywordAttr.Default),
+		('primitive types', keywordMap['primitive types'], KeywordAttr.Default),
+		('builtin functions', keywordMap['builtin functions'], KeywordAttr.Default),
+		('type', keywordMap['type'], KeywordAttr.Default),
+		('struct', keywordMap['struct'], KeywordAttr.Default),
+		('interface', keywordMap['interface'], KeywordAttr.Default),
+		('constant', keywordMap['constant'], KeywordAttr.Default),
+		('variables', keywordMap['variables'], KeywordAttr.NoLexer),
+		('function', keywordMap['function'], KeywordAttr.NoLexer),
+		('package', keywordMap['package'], KeywordAttr.NoLexer),
+	]
+	return keywordList
+
+def update_go_keyword():
+	keywordList = parse_go_api_file('lang/Go.go')
+	UpdateKeywordFile('NP2LEX_GO', '../src/EditLexers/stlGO.c', keywordList)
+
 # Julia
 def parse_julia_api_file(path):
 	sections = read_api_file(path, '#')
@@ -671,6 +756,7 @@ def update_lexer_keyword_attr():
 def update_all_keyword():
 	update_cmake_keyword()
 	update_gn_keyword()
+	update_go_keyword()
 	update_julia_keyword()
 	update_kotlin_keyword()
 	update_llvm_keyword()

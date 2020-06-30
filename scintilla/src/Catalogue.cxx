@@ -110,6 +110,7 @@ int Scintilla_LinkLexers() {
 	LINK_LEXER(lmFSharp);
 	//LINK_LEXER(lmGAP);
 	LINK_LEXER(lmGN);
+	LINK_LEXER(lmGo);
 	LINK_LEXER(lmGraphViz);
 	//LINK_LEXER(lmGui4Cli);
 	//LINK_LEXER(lmHaskell);

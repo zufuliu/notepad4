@@ -588,6 +588,12 @@ static inline BOOL IsWordStyleToIgnore(int style) {
 			|| style == SCE_C_WORD2
 			|| style == SCE_C_PREPROCESSOR;
 
+	case SCLEX_GO:
+		return style == SCE_GO_WORD
+			|| style == SCE_GO_WORD2
+			|| style == SCE_GO_BUILTIN_FUNC
+			|| style == SCE_GO_FORMAT_SPECIFIER;
+
 	case SCLEX_JSON:
 		return style == SCE_JSON_KEYWORD;
 
@@ -2009,6 +2015,7 @@ void EditToggleCommentLine(void) {
 	case SCLEX_CIL:
 	case SCLEX_CSS:
 	case SCLEX_FSHARP:
+	case SCLEX_GO:
 	case SCLEX_GRAPHVIZ:
 	case SCLEX_JSON:
 	case SCLEX_KOTLIN:
@@ -2142,6 +2149,7 @@ void EditToggleCommentBlock(void) {
 	case SCLEX_ASM:
 	case SCLEX_CIL:
 	case SCLEX_CSS:
+	case SCLEX_GO:
 	case SCLEX_GRAPHVIZ:
 	case SCLEX_JSON:
 	case SCLEX_KOTLIN:
@@ -2278,10 +2286,6 @@ void EditInsertScriptShebangLine(void) {
 		switch (pLexCurrent->rid) {
 		case NP2LEX_AWK:
 			name = "awk";
-			break;
-
-		case NP2LEX_GO:
-			name = "go";
 			break;
 
 		case NP2LEX_GROOVY:

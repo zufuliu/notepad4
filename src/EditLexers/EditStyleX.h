@@ -157,6 +157,8 @@
 #define NP2StyleX_ReservedWord			EDITSTYLE_HOLE(ReservedWord, L"Reserved Word")
 #define NP2StyleX_EscapeSequence		EDITSTYLE_HOLE(EscapeSequence, L"Escape Sequence")
 #define NP2StyleX_Placeholder			EDITSTYLE_HOLE(Placeholder, L"Placeholder")
+#define NP2StyleX_FormatSpecifier		EDITSTYLE_HOLE(FormatSpecifier, L"Format Specifier")
+#define NP2StyleX_TaskMarker			EDITSTYLE_HOLE(TaskMarker, L"Task Marker")
 
 #define NP2StyleX_BracketArgument		EDITSTYLE_HOLE(BracketArgument, L"Bracket Argument")
 

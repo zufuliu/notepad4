@@ -149,6 +149,9 @@
 #define NP2STYLE_ReservedWord			63451
 #define NP2STYLE_EscapeSequence			63452
 #define NP2STYLE_Placeholder			63453
+#define NP2STYLE_Placeholder			63453
+#define NP2STYLE_FormatSpecifier		63454
+#define NP2STYLE_TaskMarker				63455
 
 #define NP2STYLE_BracketArgument		63461
 

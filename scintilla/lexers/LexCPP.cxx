@@ -39,7 +39,6 @@ using namespace Scintilla;
 #define		LEX_HX		12	// haXe
 #define		LEX_GROOVY	13	// Groovy Script
 #define		LEX_SCALA	14	// Scala Script
-#define		LEX_GO		15	// Go
 //#define		LEX_AIDL	27	// Android Interface Definition Language
 #define		LEX_PHP		29
 #define		LEX_AWK		51	// Awk
@@ -647,7 +646,7 @@ static void ColouriseCppDoc(Sci_PositionU startPos, Sci_Position length, int ini
 			}
 			break;
 		case SCE_C_DSTRINGB: // D
-			if (sc.ch == '`' && (lexType == LEX_JS || lexType == LEX_D || lexType == LEX_GO)) {
+			if (sc.ch == '`' && (lexType == LEX_JS || lexType == LEX_D)) {
 				if (lexType == LEX_D && IsDStrFix(sc.chNext))
 					sc.Forward();
 				sc.ForwardSetState(SCE_C_DEFAULT);
@@ -873,7 +872,7 @@ static void ColouriseCppDoc(Sci_PositionU startPos, Sci_Position length, int ini
 						++numDTSBrace;
 						sc.SetState(SCE_C_DSTRINGT);
 						sc.Forward();
-					} else if (sc.ch == '`' && (lexType == LEX_JS || lexType == LEX_D || lexType == LEX_GO)) {
+					} else if (sc.ch == '`' && (lexType == LEX_JS || lexType == LEX_D)) {
 						sc.SetState(SCE_C_DSTRINGB);
 					} else if (!SharpComment(lexType) && sc.Match('/', '*')) {
 						if (visibleChars == 0 && (sc.Match("/**") || sc.Match("/*!"))) {
@@ -1373,8 +1372,7 @@ static void FoldCppDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 			}
 		}
 
-		// Go
-		if ((lexType == LEX_JS || lexType == LEX_GO) && style == SCE_C_DSTRINGB) {
+		if (lexType == LEX_JS && style == SCE_C_DSTRINGB) {
 			if (ch == '`') {
 				if (styleNext == SCE_C_DSTRINGB)
 					levelNext++;
