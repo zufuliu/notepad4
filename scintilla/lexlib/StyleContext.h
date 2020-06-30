@@ -233,6 +233,16 @@ public:
 		}
 		return LexGetNextChar(currentPos + 2, styler);
 	}
+
+	int GetLineNextChar(Sci_Position offset = 0) const noexcept {
+		if (offset == 0 && !IsWhiteSpace(ch)) {
+			return ch;
+		}
+		if (!IsWhiteSpace(chNext)) {
+			return chNext;
+		}
+		return LexGetNextChar(currentPos + 2, lineStartNext, styler);
+	}
 };
 
 }

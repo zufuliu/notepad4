@@ -327,7 +327,7 @@ void ColouriseYAMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 				visibleChars = 1;
 				sc.SetState(SCE_YAML_DOCUMENT);
 				sc.Forward(3);
-				const int chNext = LexGetNextChar(sc.currentPos + 1, sc.lineStartNext, styler);
+				const int chNext = sc.GetLineNextChar(1);
 				if (chNext != '\0') {
 					sc.SetState(SCE_YAML_DEFAULT);
 				}

@@ -125,7 +125,7 @@ bool IsLexCommentLine(Sci_Position line, LexAccessor &styler, int style) noexcep
 
 Sci_Position LexSkipWhiteSpace(Sci_Position startPos, Sci_Position endPos, LexAccessor &styler) noexcept {
 	for (Sci_Position i = startPos; i < endPos; i++) {
-		if (!(IsWhiteSpace(styler.SafeGetCharAt(i)))) {
+		if (!IsWhiteSpace(styler[i])) {
 			return i;
 		}
 	}
