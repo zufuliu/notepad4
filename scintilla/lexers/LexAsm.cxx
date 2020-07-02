@@ -36,7 +36,7 @@ static constexpr bool IsAsmNumber(int ch, int chPrev) noexcept {
 		|| ((ch == 'x' || ch == 'X') && chPrev == '0')
 		|| ((ch == 'H' || ch == 'h') && IsHexDigit(chPrev))
 		|| ((ch == '+' || ch == '-') && (chPrev == 'E' || chPrev == 'e'))
-		|| ((ch == 'Q' || ch == 'q') && (chPrev >= '0' && chPrev <= '7'));
+		|| ((ch == 'Q' || ch == 'q') && IsOctalDigit(chPrev));
 }
 
 /*static const char * const asmWordListDesc[] = {
@@ -248,7 +248,7 @@ static void ColouriseAsmDoc(Sci_PositionU startPos, Sci_Position length, int ini
 				sc.SetState(SCE_ASM_COMMENT);
 				sc.Forward();
 			} else if (sc.ch == '@') {
-				if (sc.chNext >= '0' && sc.chNext <= '7'
+				if (IsOctalDigit(sc.chNext)
 					&& (IsAsmOperator(sc.chPrev) || isspacechar(sc.chPrev))) {	// Freescale Octal
 					sc.SetState(SCE_ASM_NUMBER);
 				} else if (isspacechar(sc.chNext)) {

@@ -75,6 +75,10 @@ constexpr bool IsHexDigit(int ch) noexcept {
 		|| (ch >= 'a' && ch <= 'f');
 }
 
+constexpr bool IsOctalDigit(int ch) noexcept {
+	return ch >= '0' && ch <= '7';
+}
+
 constexpr bool IsADigit(int ch, int base) noexcept {
 	if (base <= 10) {
 		return (ch >= '0') && (ch < '0' + base);
