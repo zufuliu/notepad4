@@ -220,7 +220,7 @@ static EDITSTYLE Styles_Rust[] = {
 	{ SCE_RUST_WORD2, NP2StyleX_ReservedWord, L"fore:#B000B0" },
 	{ SCE_RUST_TYPE, NP2StyleX_Type, L"fore:#0080FF" },
 	{ SCE_RUST_ATTRIBUTE, NP2StyleX_Attribute, L"fore:#FF8000" },
-	{ SCE_RUST_STRUCT, NP2StyleX_Struct, L"bold; fore:#007F7F" },
+	{ SCE_RUST_STRUCT, NP2StyleX_Structure, L"bold; fore:#007F7F" },
 	{ SCE_RUST_UNION, NP2StyleX_Union, L"fore:#0080FF" },
 	{ SCE_RUST_TRAIT, NP2StyleX_Trait, L"bold; fore:#1E90FF" },
 	{ SCE_RUST_ENUMERATION, NP2StyleX_Enumeration, L"fore:#FF8000" },

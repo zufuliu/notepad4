@@ -76,7 +76,7 @@ static EDITSTYLE Styles_D[] = {
 	{ SCE_C_DIRECTIVE, NP2StyleX_Attribute, L"fore:#FF8000" },
 	{ SCE_C_2NDWORD, NP2StyleX_Directive, L"fore:#0000FF" },
 	{ SCE_C_CLASS, NP2StyleX_Class, L"fore:#0080FF" },
-	{ SCE_C_STRUCT, NP2StyleX_Struct, L"fore:#0080FF" },
+	{ SCE_C_STRUCT, NP2StyleX_Structure, L"fore:#0080FF" },
 	{ SCE_C_UNION, NP2StyleX_Union, L"fore:#0080FF" },
 	{ SCE_C_INTERFACE, NP2StyleX_Interface, L"bold; fore:#1E90FF" },
 	{ SCE_C_FUNCTION, NP2StyleX_Function, L"fore:#A46000" },

@@ -40,7 +40,7 @@ static EDITSTYLE Styles_ASY[] = {
 	EDITSTYLE_DEFAULT,
 	{ SCE_C_WORD, NP2StyleX_Keyword, L"fore:#0000FF" },
 	{ SCE_C_WORD2, NP2StyleX_TypeKeyword, L"fore:#1E90FF" },
-	{ SCE_C_STRUCT, NP2StyleX_Struct, L"bold; fore:#007F7F" },
+	{ SCE_C_STRUCT, NP2StyleX_Structure, L"bold; fore:#007F7F" },
 	{ SCE_C_FUNCTION, NP2StyleX_Function, L"fore:#A46000" },
 	{ MULTI_STYLE(SCE_C_COMMENT, SCE_C_COMMENTLINE, SCE_C_COMMENTDOC, SCE_C_COMMENTLINEDOC), NP2StyleX_Comment, L"fore:#608060" },
 	{ MULTI_STYLE(SCE_C_STRING, SCE_C_CHARACTER, SCE_C_STRINGEOL, 0), NP2StyleX_String, L"fore:#008000" },

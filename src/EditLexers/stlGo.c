@@ -95,7 +95,7 @@ static EDITSTYLE Styles_Go[] = {
 	{ SCE_GO_WORD, NP2StyleX_Keyword, L"fore:#0000FF" },
 	{ SCE_GO_WORD2, NP2StyleX_TypeKeyword, L"fore:#0000FF" },
 	{ SCE_GO_TYPE, NP2StyleX_Type, L"fore:#0080FF" },
-	{ SCE_GO_STRUCT, NP2StyleX_Struct, L"bold; fore:#007F7F" },
+	{ SCE_GO_STRUCT, NP2StyleX_Structure, L"bold; fore:#007F7F" },
 	{ SCE_GO_INTERFACE, NP2StyleX_Interface, L"bold; fore:#1E90FF" },
 	{ SCE_GO_CONSTANT, NP2StyleX_Constant, L"fore:#B000B0" },
 	{ SCE_GO_BUILTIN_FUNC, NP2StyleX_BuiltInFunction, L"fore:#FF8000" },

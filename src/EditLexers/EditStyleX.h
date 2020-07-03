@@ -126,7 +126,7 @@
 #define NP2StyleX_Important				EDITSTYLE_HOLE(Important, L"Important")
 
 #define NP2StyleX_Class					EDITSTYLE_HOLE(Class, L"Class")
-#define NP2StyleX_Struct				EDITSTYLE_HOLE(Struct, L"Struct")
+#define NP2StyleX_Structure				EDITSTYLE_HOLE(Structure, L"Structure")
 #define NP2StyleX_Union					EDITSTYLE_HOLE(Union, L"Union")
 #define NP2StyleX_Interface				EDITSTYLE_HOLE(Interface, L"Interface")
 #define NP2StyleX_Trait					EDITSTYLE_HOLE(Trait, L"Trait")

@@ -78,7 +78,7 @@ static EDITSTYLE Styles_CSharp[] = {
 	{ SCE_C_PREPROCESSOR, NP2StyleX_Preprocessor, L"fore:#FF8000" },
 	{ SCE_C_ATTRIBUTE, NP2StyleX_Attribute, L"fore:#FF8000" },
 	{ SCE_C_CLASS, NP2StyleX_Class, L"fore:#0080FF" },
-	{ SCE_C_STRUCT, NP2StyleX_Struct, L"fore:#0080FF" },
+	{ SCE_C_STRUCT, NP2StyleX_Structure, L"fore:#0080FF" },
 	{ SCE_C_INTERFACE, NP2StyleX_Interface, L"bold; fore:#1E90FF" },
 	{ SCE_C_FUNCTION, NP2StyleX_Method, L"fore:#A46000" },
 	{ SCE_C_ENUMERATION, NP2StyleX_Enumeration, L"fore:#FF8000" },
