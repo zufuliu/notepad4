@@ -201,7 +201,7 @@ static void ColourisePascalDoc(Sci_PositionU startPos, Sci_Position length, int 
 			//			if (IsADigit(sc.ch) && !(curLineState & stateInAsm)) {
 			if (IsADigit(sc.ch)) {
 				sc.SetState(SCE_PAS_NUMBER);
-				if (sc.MatchIgnoreCase("0x")) {
+				if (sc.ch == '0' && (sc.chNext =='x' || sc.chNext == 'X')) {
 					sc.SetState(SCE_PAS_HEXNUMBER);
 					sc.Forward(2);
 					while (IsHexDigit(sc.ch))
@@ -213,14 +213,14 @@ static void ColourisePascalDoc(Sci_PositionU startPos, Sci_Position length, int 
 			} else if (sc.ch == '$') {
 				sc.SetState(SCE_PAS_HEXNUMBER);
 				if (curLineState & stateInAsm) {
-					if (sc.MatchIgnoreCase("$0x"))
+					if (sc.chNext == '0' && styler.MatchAny(sc.currentPos + 2, 'x', 'X'))
 						sc.Forward(2);
 				}
 			} else if (sc.Match('{', '$')) {
 				sc.SetState(SCE_PAS_PREPROCESSOR);
 			} else if (sc.ch == '{') {
 				sc.SetState(SCE_PAS_COMMENT);
-			} else if (sc.Match("(*$")) {
+			} else if (sc.Match('(', '*', '$')) {
 				sc.SetState(SCE_PAS_PREPROCESSOR2);
 			} else if (sc.Match('(', '*')) {
 				sc.SetState(SCE_PAS_COMMENT2);
@@ -232,7 +232,7 @@ static void ColourisePascalDoc(Sci_PositionU startPos, Sci_Position length, int 
 			} else if (sc.ch == '#') {
 				if (curLineState & stateInAsm) {
 					sc.SetState(SCE_PAS_HEXNUMBER);
-					if (sc.MatchIgnoreCase("#0x"))
+					if (sc.chNext == '0' && styler.MatchAny(sc.currentPos + 2, 'x', 'X'))
 						sc.Forward(2);
 				} else
 					sc.SetState(SCE_PAS_CHARACTER);

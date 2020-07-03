@@ -299,7 +299,7 @@ static void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int in
 			break;
 		case SCE_SH_WORD:
 			// "." never used in Bash variable names but used in file names
-			if (!setWord.Contains(sc.ch) || (sc.ch == '+' && sc.chNext == '=')) {
+			if (!setWord.Contains(sc.ch) || sc.Match('+', '=')) {
 				char s[512];
 				char s2[10];
 				sc.GetCurrent(s, sizeof(s));
@@ -358,7 +358,7 @@ static void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int in
 						sc.SetState(SCE_SH_DEFAULT);
 					}
 				} else {
-					const int nextState = (sc.ch == '+' && sc.chNext == '=') ? SCE_SH_OPERATOR : SCE_SH_DEFAULT;
+					const int nextState = sc.Match('+', '=') ? SCE_SH_OPERATOR : SCE_SH_DEFAULT;
 					sc.SetState(nextState);
 				}
 			}
@@ -672,7 +672,7 @@ static void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int in
 						if (sc.chNext == '#') {
 							sc.Forward();
 						}
-					} else if (sc.Match("##^") && IsUpperCase(sc.GetRelative(3))) {	// ##^A
+					} else if (sc.Match('#', '#', '^') && IsUpperCase(sc.GetRelative(3))) {	// ##^A
 						sc.SetState(SCE_SH_IDENTIFIER);
 						sc.Forward(3);
 					} else if (sc.chNext == '#' && !IsASpace(sc.GetRelative(2))) {	// ##a

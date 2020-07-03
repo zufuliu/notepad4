@@ -22,7 +22,8 @@ private:
 	 * @a slopSize positions the buffer before the desired position
 	 * in case there is some backtracking. */
 	enum {
-		bufferSize = 4096, slopSize = bufferSize / 8
+		bufferSize = 4096,
+		slopSize = bufferSize / 8,
 	};
 	char buf[bufferSize + 1];
 	Sci_Position startPos;
@@ -34,7 +35,6 @@ private:
 	Sci_Position validLen;
 	Sci_PositionU startSeg;
 	Sci_Position startPosStyling;
-	const int documentVersion;
 
 	void Fill(Sci_Position position) noexcept {
 		startPos = position - slopSize;
@@ -61,8 +61,7 @@ public:
 		lenDoc(pAccess->Length()),
 		validLen(0),
 		startSeg(0),
-		startPosStyling(0),
-		documentVersion(pAccess->Version()) {
+		startPosStyling(0) {
 		// Prevent warnings by static analyzers about uninitialized buf and styleBuf.
 		buf[0] = 0;
 		styleBuf[0] = 0;
@@ -87,6 +86,7 @@ public:
 		}
 		return buf[position - startPos];
 	}
+#if 0	
 	[[deprecated]]
 	char SafeGetCharAt(Sci_Position position, char chDefault) noexcept {
 		if (position < startPos || position >= endPos) {
@@ -98,11 +98,17 @@ public:
 		}
 		return buf[position - startPos];
 	}
+#endif	
 	bool IsLeadByte(unsigned char ch) const noexcept {
 		return encodingType == encDBCS && ch > 0x80 && pAccess->IsDBCSLeadByte(ch);
 	}
 	constexpr EncodingType Encoding() const noexcept {
 		return encodingType;
+	}
+
+	bool MatchAny(Sci_Position pos, char ch0, char ch1) noexcept {
+		const char ch = SafeGetCharAt(pos);
+		return ch == ch0 || ch == ch1;
 	}
 
 	bool Match(Sci_Position pos, const char *s) noexcept {
@@ -119,9 +125,19 @@ public:
 	void GetRange(Sci_PositionU startPos_, Sci_PositionU endPos_, char *s, Sci_PositionU len) noexcept;
 	void GetRangeLowered(Sci_PositionU startPos_, Sci_PositionU endPos_, char *s, Sci_PositionU len) noexcept;
 
+	// Flush() must be called first when used in Colourise() or Lex() function.
 	unsigned char StyleAt(Sci_Position position) const noexcept {
 		return pAccess->StyleAt(position);
 	}
+	// only used in Colourise() or Lex() function, validLen is always zero in Fold() function.
+	unsigned char StyleAtEx(Sci_Position position) const noexcept {
+		const Sci_Position index = position - startPosStyling;
+		if (index >= 0 && index < validLen) {
+			return styleBuf[index];
+		}
+		return pAccess->StyleAt(position);
+	}
+
 	Sci_Position GetLine(Sci_Position position) const noexcept {
 		return pAccess->LineFromPosition(position);
 	}

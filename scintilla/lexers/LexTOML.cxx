@@ -60,7 +60,7 @@ constexpr bool IsTOMLUnquotedKey(int ch) noexcept {
 
 bool IsTOMLKey(StyleContext& sc, int braceCount, const WordList *kwList) {
 	if (braceCount) {
-		const int chNext = LexGetNextChar(sc.currentPos, sc.styler.Length(), sc.styler);
+		const char chNext = LexGetNextChar(sc.currentPos, sc.styler.Length(), sc.styler);
 		if (chNext == '=' || chNext == '.' || chNext == '-') {
 			sc.ChangeState(SCE_TOML_KEY);
 			return true;
@@ -217,7 +217,7 @@ void ColouriseTOMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 			break;
 
 		case SCE_TOML_TRIPLE_STRING1:
-			if (sc.Match(R"(''')")) {
+			if (sc.Match('\'', '\'', '\'')) {
 				sc.Forward(2);
 				sc.ForwardSetState(SCE_TOML_DEFAULT);
 			}
@@ -227,7 +227,7 @@ void ColouriseTOMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 				escSeq.resetEscapeState(sc.state, sc.chNext);
 				sc.SetState(SCE_TOML_ESCAPECHAR);
 				sc.Forward();
-			} else if (sc.Match(R"(""")")) {
+			} else if (sc.Match('"', '"', '"')) {
 				sc.Forward(2);
 				sc.ForwardSetState(SCE_TOML_DEFAULT);
 			}
@@ -283,10 +283,10 @@ void ColouriseTOMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 					if (visibleChars == 0) {
 						lineType = TOMLLineType_CommentLine;
 					}
-				} else if (sc.Match(R"(''')")) {
+				} else if (sc.Match('\'', '\'', '\'')) {
 					sc.SetState(SCE_TOML_TRIPLE_STRING1);
 					sc.Forward(2);
-				} else if (sc.Match(R"(""")")) {
+				} else if (sc.Match('"', '"', '"')) {
 					sc.SetState(SCE_TOML_TRIPLE_STRING2);
 					sc.Forward(2);
 				} else if (sc.ch == '\'') {

@@ -251,7 +251,7 @@ static void ColouriseSqlDoc(Sci_PositionU startPos, Sci_Position length, int ini
 				// MySQL requires a space or control char after --
 				// https://dev.mysql.com/doc/mysql/en/ansi-diff-comments.html
 				// Perhaps we should enforce that with proper property:
-				//~} else if (sc.Match("-- ")) {
+				//~} else if (sc.Match('-', '-', ' ')) {
 				sc.SetState(SCE_SQL_COMMENTLINE);
 			} else if (sc.ch == '#' && sqlNumbersignComment) {
 				sc.SetState(SCE_SQL_COMMENTLINEDOC);

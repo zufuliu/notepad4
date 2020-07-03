@@ -80,7 +80,7 @@ int ColouriseDiffLine(const char *lineBuffer) noexcept {
 	if (lineBuffer[0] == '@') {
 		return SCE_DIFF_POSITION;
 	}
-	if (lineBuffer[0] >= '0' && lineBuffer[0] <= '9') {
+	if (IsADigit(lineBuffer[0])) {
 		return SCE_DIFF_POSITION;
 	}
 	if (0 == strncmp(lineBuffer, "++", 2)) {
