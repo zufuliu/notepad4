@@ -75,22 +75,26 @@ constexpr bool IsFormatSpecifier(uint8_t ch) noexcept {
 		|| ch == 'U';
 }
 
-Sci_Position CheckFormatSpecifier(LexAccessor &styler, int chNext, Sci_Position currentPos, Sci_Position lineStartNext) noexcept {
-	if (chNext == '%') {
+Sci_Position CheckFormatSpecifier(const StyleContext &sc) noexcept {
+	if (sc.chNext == '%') {
 		return 2;
 	}
+	if (IsASpaceOrTab(sc.chNext) && IsADigit(sc.chPrev)) {
+		// ignore word after percent: "5% x"
+		return 0;
+	}
 
-	Sci_Position pos = currentPos + 1;
-	if (chNext == '+' || chNext == '-' || chNext == '#' || chNext == ' ') {
+	Sci_Position pos = sc.currentPos + 1;
+	if (sc.chNext == '+' || sc.chNext == '-' || sc.chNext == '#' || sc.chNext == ' ') {
 		++pos;
 	}
-	while (pos < lineStartNext) {
-		const uint8_t ch = styler[pos];
+	while (pos < sc.lineStartNext) {
+		const uint8_t ch = sc.styler[pos];
 		if (IsFormatSpecifier(ch)) {
 			// TODO: fix percent encoded URL string
-			return pos - currentPos + 1;
+			return pos - sc.currentPos + 1;
 		}
-		if (!((ch >= '0' && ch <= '9') || ch == '*' || ch == '.' || ch == '[' || ch == ']')) {
+		if (!(IsADigit(ch) || ch == '*' || ch == '.' || ch == '[' || ch == ']')) {
 			break;
 		}
 		++pos;
@@ -149,12 +153,12 @@ int DetectIsIdentifierType(LexAccessor &styler, int funcState, int chNext, Sci_P
 	}
 
 	if ((ch == '(' && chPrev == '.')
-		|| (ch == ']' && (chPrev == '[' || chPrev == '.'))
-		|| (chNext == '{' && (ch == ':' || (ch == '=' && !(chPrev == '=' || chPrev == '!' || chPrev == '<' || chPrev == '>'))))
+		|| ch == ']'
+		|| (chNext == '{' && (ch == ':' || (ch == '=' && (chPrev == ':' || !isoperator(chPrev)))))
 	) {
-		//  .(*Type), .(Type)
-		// []*Type, []Type, [...]Type
-		// identifier = Type{}, identifier: Type{}
+		// .(*Type), .(Type)
+		// []*Type, []Type, [...]Type, [ArrayLength]Type, map[KeyType]ElementType
+		// identifier = Type{}, identifier: Type{}, identifier := Type{}
 		return SCE_GO_TYPE;
 	}
 	if ((!star || space) && IsIdentifierCharEx(ch)) {
@@ -193,6 +197,7 @@ void ColouriseGoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 			if (!IsIdentifierCharEx(sc.ch)) {
 				char s[128];
 				sc.GetCurrent(s, sizeof(s));
+				const int kwPrev = kwType;
 				if (keywordLists[0]->InList(s)) {
 					sc.ChangeState(SCE_GO_WORD);
 					if (strcmp(s, "func") == 0) {
@@ -201,13 +206,16 @@ void ColouriseGoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 						kwType = SCE_GO_TYPE;
 					} else if (strcmp(s, "const") == 0) {
 						kwType = SCE_GO_CONSTANT;
-					} else {
-						kwType = SCE_GO_DEFAULT;
+					} else if (strcmp(s, "map") == 0 || strcmp(s, "chan") == 0) {
+						kwType = SCE_GO_IDENTIFIER;
 					}
 				} else if (keywordLists[1]->InList(s)) {
 					sc.ChangeState(SCE_GO_WORD2);
 				} else if (keywordLists[2]->InListPrefixed(s, '(')) {
 					sc.ChangeState(SCE_GO_BUILTIN_FUNC);
+					if (sc.ch == '(' && strcmp(s, "new") == 0) {
+						kwType = SCE_GO_IDENTIFIER;
+					}
 				} else if (keywordLists[3]->InList(s)) {
 					sc.ChangeState(SCE_GO_TYPE);
 				} else if (keywordLists[4]->InList(s)) {
@@ -236,9 +244,16 @@ void ColouriseGoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 							} else if (chNext == 's' && styler.Match(pos, "struct")) {
 								kwType = SCE_GO_STRUCT;
 							}
+						} else if (kwType == SCE_GO_IDENTIFIER && chNext != '.') {
+							// map[KeyType]ElementType
+							// chan ElementType
+							// new(Type)
+							kwType = SCE_GO_TYPE;
 						}
-						sc.ChangeState(kwType);
-						kwType = SCE_GO_DEFAULT;
+						if (kwType != SCE_GO_IDENTIFIER) {
+							sc.ChangeState(kwType);
+							kwType = SCE_GO_DEFAULT;
+						}
 					} else if (!(chNext == '.' || chNext == '*')) {
 						const int state = DetectIsIdentifierType(styler, funcState, chNext, identifierStart, lineStartCurrent);
 						if (state != SCE_GO_DEFAULT) {
@@ -249,6 +264,9 @@ void ColouriseGoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 
 				if (sc.state == SCE_GO_WORD || sc.state == SCE_GO_WORD2) {
 					identifierStart = lineStartCurrent = sc.currentPos;
+				}
+				if (kwType != SCE_GO_DEFAULT && kwPrev == kwType && sc.ch != '.') {
+					kwType = SCE_GO_DEFAULT;
 				}
 				if (sc.ch == '.' && IsIdentifierStartEx(sc.chNext)) {
 					sc.SetState(SCE_GO_OPERATOR);
@@ -264,12 +282,12 @@ void ColouriseGoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 				sc.SetState(SCE_GO_DEFAULT);
 			} else if (visibleChars == 2) {
 				if (IsUpperCase(sc.ch)) {
-					if (IsUpperCase(sc.ch)) {
+					if (IsUpperCase(sc.chNext)) {
 						escSeq.outerState = sc.state;
 						sc.SetState(SCE_GO_TASK_MARKER);
 						sc.Forward();
 					}
-				} else if (sc.Match("+build") || sc.Match("go:")) {
+				} else if (sc.Match("+build") || sc.Match('g', 'o', ':')) {
 					sc.SetState(SCE_GO_TASK_MARKER_LINE);
 				}
 			}
@@ -308,7 +326,7 @@ void ColouriseGoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 				sc.SetState(SCE_GO_ESCAPECHAR);
 				sc.Forward();
 			} else if (sc.ch == '%') {
-				const Sci_Position length = CheckFormatSpecifier(styler, sc.chNext, sc.currentPos, sc.lineStartNext);
+				const Sci_Position length = CheckFormatSpecifier(sc);
 				if (length != 0) {
 					const int state = sc.state;
 					sc.SetState(SCE_GO_FORMAT_SPECIFIER);
@@ -354,7 +372,7 @@ void ColouriseGoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 				sc.SetState(SCE_GO_CHARACTER);
 			} else if (sc.ch == '`') {
 				sc.SetState(SCE_GO_RAW_STRING);
-			} else if (IsADigit(sc.ch)) {
+			} else if (IsADigit(sc.ch) || (sc.ch == '.' && IsADigit(sc.chNext))) {
 				sc.SetState(SCE_GO_NUMBER);
 			} else if (IsIdentifierStartEx(sc.ch)) {
 				sc.SetState(SCE_GO_IDENTIFIER);
