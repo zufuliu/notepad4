@@ -125,7 +125,7 @@ static void ColouriseVerilogDoc(Sci_PositionU startPos, Sci_Position length, int
 				sc.SetState(SCE_V_COMMENT);
 				sc.Forward();	// Eat the * so it isn't used for the end of the comment
 			} else if (sc.Match('/', '/')) {
-				if (sc.Match("//!"))	// Nice to have a different comment style
+				if (sc.GetRelative(2) == '!')	// Nice to have a different comment style
 					sc.SetState(SCE_V_COMMENTLINEBANG);
 				else
 					sc.SetState(SCE_V_COMMENTLINE);

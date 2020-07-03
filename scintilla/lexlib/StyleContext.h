@@ -191,11 +191,17 @@ public:
 		// fast version for single byte encodings
 		return static_cast<unsigned char>(styler.SafeGetCharAt(currentPos + n));
 	}
+#if 0
+	[[deprecated]]
 	bool Match(char ch0) const noexcept {
 		return ch == static_cast<unsigned char>(ch0);
 	}
+#endif	
 	bool Match(char ch0, char ch1) const noexcept {
 		return (ch == static_cast<unsigned char>(ch0)) && (chNext == static_cast<unsigned char>(ch1));
+	}
+	bool Match(char ch0, char ch1, char ch2) const noexcept {
+		return Match(ch0, ch1) && ch2 == styler.SafeGetCharAt(currentPos + 2);
 	}
 	bool Match(const char *s) const noexcept {
 		if (ch != static_cast<unsigned char>(*s)) {

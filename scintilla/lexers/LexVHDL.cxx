@@ -98,7 +98,7 @@ static void ColouriseVHDLDoc(Sci_PositionU startPos, Sci_Position length, int in
 				sc.ForwardSetState(SCE_VHDL_DEFAULT);
 			}
 		} else if (sc.state == SCE_VHDL_BLOCK_COMMENT) {
-			if (sc.ch == '*' && sc.chNext == '/') {
+			if (sc.Match('*', '/')) {
 				sc.Forward();
 				sc.ForwardSetState(SCE_VHDL_DEFAULT);
 			}
@@ -111,7 +111,7 @@ static void ColouriseVHDLDoc(Sci_PositionU startPos, Sci_Position length, int in
 			} else if (iswordstart(sc.ch)) {
 				sc.SetState(SCE_VHDL_IDENTIFIER);
 			} else if (sc.Match('-', '-')) {
-				if (sc.Match("--!"))	// Nice to have a different comment style
+				if (sc.GetRelative(2) == '!')	// Nice to have a different comment style
 					sc.SetState(SCE_VHDL_COMMENTLINEBANG);
 				else
 					sc.SetState(SCE_VHDL_COMMENT);
@@ -325,7 +325,7 @@ static void FoldVHDLDoc(Sci_PositionU startPos, Sci_Position length, int /*initS
 									(!IsCommentLine(styleAtPos)) &&
 									(styleAtPos != SCE_VHDL_STRING) &&
 									!iswordchar(styler.SafeGetCharAt(pos - 1)) &&
-									(chAtPos | ' ') == 'i' && (styler.SafeGetCharAt(pos + 1) | ' ') == 's' &&
+									(chAtPos == 'i' || chAtPos == 'I') && styler.MatchAny(pos + 1, 's', 'S') &&
 									!iswordchar(styler.SafeGetCharAt(pos + 2))) {
 									if (levelMinCurrentElse > levelNext) {
 										levelMinCurrentElse = levelNext;

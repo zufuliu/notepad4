@@ -343,7 +343,7 @@ static int InputSymbolScan(StyleContext &sc) noexcept {
 		if (c == '\r' || c == '\n') {
 			return 0;
 		} else if (c == '>') {
-			if (sc.Match("<=>"))	// '<=>' case
+			if (sc.Match('<', '=', '>'))	// '<=>' case
 				return 0;
 			return sLen;
 		}
@@ -814,7 +814,7 @@ static void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int in
 						if (sc.ch != '\r') {	// skip CR if CRLF
 							int i = 0;			// else append char, possibly an extended char
 							while (i < sc.width) {
-								HereDoc.Append(static_cast<unsigned char>(styler.SafeGetCharAt(sc.currentPos + i)));
+								HereDoc.Append(sc.GetRelative(i));
 								i++;
 							}
 						}
@@ -1090,7 +1090,7 @@ static void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int in
 		break;
 		case SCE_PL_FORMAT: {
 			sc.Complete();
-			if (sc.Match('.')) {
+			if (sc.ch == '.') {
 				sc.Forward();
 				if (sc.atLineEnd || ((sc.ch == '\r' && sc.chNext == '\n')))
 					sc.SetState(SCE_PL_DEFAULT);
@@ -1309,7 +1309,6 @@ static void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int in
 				bool hereDocSpace = false;		// for: SCALAR [whitespace] '<<'
 				Sci_PositionU bk = (sc.currentPos > 0) ? sc.currentPos - 1 : 0;
 				sc.Complete();
-				styler.Flush();
 				if (styler.StyleAt(bk) == SCE_PL_DEFAULT)
 					hereDocSpace = true;
 				skipWhitespaceComment(styler, bk);

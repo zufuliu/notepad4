@@ -309,7 +309,7 @@ static void ColouriseLuaDoc(Sci_PositionU startPos, Sci_Position length, int ini
 				}
 			} else if (sc.Match('-', '-')) {
 				sc.SetState(SCE_LUA_COMMENTLINE);
-				if (sc.Match("--[")) {
+				if (sc.GetRelative(2) == '[') {
 					sc.Forward(2);
 					sepCount = LongDelimCheck(sc);
 					if (sepCount > 0) {
@@ -320,7 +320,7 @@ static void ColouriseLuaDoc(Sci_PositionU startPos, Sci_Position length, int ini
 				} else {
 					sc.Forward();
 				}
-			} else if (sc.atLineStart && sc.Match('$')) {
+			} else if (sc.atLineStart && sc.ch == '$') {
 				sc.SetState(SCE_LUA_PREPROCESSOR);	// Obsolete since Lua 4.0, but still in old code
 			} else if (setLuaOperator.Contains(sc.ch)) {
 				sc.SetState(SCE_LUA_OPERATOR);

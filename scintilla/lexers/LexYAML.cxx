@@ -64,7 +64,7 @@ constexpr bool IsYAMLDateTime(int ch, int chNext) noexcept {
 bool IsYAMLText(StyleContext& sc, int braceCount, const WordList *kwList) {
 	const int state = sc.state;
 	const Sci_Position endPos = braceCount? sc.styler.Length() : sc.lineStartNext;
-	const int chNext = LexGetNextChar(sc.currentPos, endPos, sc.styler);
+	const char chNext = LexGetNextChar(sc.currentPos, endPos, sc.styler);
 	if (chNext == ':') {
 		// possible key
 		sc.ChangeState(SCE_YAML_TEXT);
@@ -321,7 +321,7 @@ void ColouriseYAMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 					indentCount = 0;
 					lineType = YAMLLineType_CommentLine;
 				}
-			} else if (sc.atLineStart && (sc.Match("---") || sc.Match("..."))) {
+			} else if (sc.atLineStart && (sc.Match('-', '-', '-') || sc.Match('.', '.', '.'))) {
 				// reset document state
 				braceCount = 0;
 				visibleChars = 1;

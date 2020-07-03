@@ -35,8 +35,8 @@ static void ColouriseTexiDoc(Sci_PositionU startPos, Sci_Position length, int in
 	//const WordList &keywords4 = *keywordLists[3];// command with arg
 
 	int state = initStyle;
-	int ch = 0;
-	int chNext = styler[startPos];
+	char ch = 0;
+	char chNext = styler[startPos];
 	styler.StartAt(startPos);
 	styler.StartSegment(startPos);
 	const Sci_PositionU endPos = startPos + length;
@@ -51,7 +51,7 @@ static void ColouriseTexiDoc(Sci_PositionU startPos, Sci_Position length, int in
 	bool isCommand = false;
 
 	for (Sci_PositionU i = startPos; i < endPos; i++) {
-		const int chPrev = ch;
+		const char chPrev = ch;
 		ch = chNext;
 		chNext = styler.SafeGetCharAt(i + 1);
 
@@ -96,7 +96,7 @@ static void ColouriseTexiDoc(Sci_PositionU startPos, Sci_Position length, int in
 					state = SCE_L_DEFAULT;
 				}
 			} else if (wordLen < MAX_WORD_LENGTH) {
-				buf[wordLen++] = static_cast<char>(ch);
+				buf[wordLen++] = ch;
 			}
 			break;
 		case SCE_L_TAG:
@@ -123,7 +123,7 @@ static void ColouriseTexiDoc(Sci_PositionU startPos, Sci_Position length, int in
 		if (state == SCE_L_DEFAULT) {
 			if (lineCurrent == 0 && i == 0 && ch == '\\' && chNext == 'i') { // \input texinfo.tex
 				state = SCE_L_COMMAND;
-				buf[0] = static_cast<char>(ch);
+				buf[0] = ch;
 				wordLen = 1;
 			} else if (ch == '@') {
 				if (IsTexiSpec(chNext)) {
@@ -132,7 +132,7 @@ static void ColouriseTexiDoc(Sci_PositionU startPos, Sci_Position length, int in
 				} else if (IsAlpha(chNext)) {
 					styler.ColourTo(i - 1, state);
 					state = SCE_L_COMMAND;
-					buf[0] = static_cast<char>(ch);
+					buf[0] = ch;
 					wordLen = 1;
 				}
 			} else if (ch == '@' || ch == '{' || ch == '}' ||

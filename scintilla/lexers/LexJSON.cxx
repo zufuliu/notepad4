@@ -222,7 +222,7 @@ void ColouriseJSONDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 				break;
 			case JsonChar_Dot:
 				styler.ColourTo(i - 1, state);
-				state = (chNext >= '0' && chNext <= '9') ? SCE_JSON_NUMBER : SCE_JSON_OPERATOR;
+				state = IsADigit(chNext) ? SCE_JSON_NUMBER : SCE_JSON_OPERATOR;
 				break;
 			case JsonChar_Slash:
 				if (chNext == '/') {
