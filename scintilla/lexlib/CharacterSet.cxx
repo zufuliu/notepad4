@@ -15,10 +15,8 @@ using namespace Scintilla;
 
 namespace Scintilla {
 
-CharacterSet::CharacterSet(setBase base, const char *initialSet, int size_, bool valueAfter_) {
-	size = size_;
-	valueAfter = valueAfter_;
-	bset = new bool[size]();
+CharacterSet::CharacterSet(setBase base, const char *initialSet, bool valueAfter_) noexcept:
+	valueAfter(valueAfter_), bset{} {
 	AddString(initialSet);
 	if (base & setLower) {
 		AddString("abcdefghijklmnopqrstuvwxyz");
@@ -34,7 +32,7 @@ CharacterSet::CharacterSet(setBase base, const char *initialSet, int size_, bool
 void CharacterSet::AddString(const char *setToAdd) noexcept {
 	for (const char *cp = setToAdd; *cp; cp++) {
 		const unsigned char uch = *cp;
-		assert(uch < size);
+		assert(uch < 128);
 		bset[uch] = true;
 	}
 }

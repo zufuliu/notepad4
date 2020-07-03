@@ -643,9 +643,9 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 	//	Set to 1 to enable the django template language.
 	const bool isDjango = styler.GetPropertyInt("lexer.html.django", 0) != 0;
 
-	const CharacterSet setHTMLWord(CharacterSet::setAlphaNum, ".-_:!#", 0x80, true);
-	const CharacterSet setTagContinue(CharacterSet::setAlphaNum, ".-_:!#[]", 0x80, true);
-	const CharacterSet setAttributeContinue(CharacterSet::setAlphaNum, ".-_:!#/", 0x80, true);
+	const CharacterSet setHTMLWord(CharacterSet::setAlphaNum, ".-_:!#", true);
+	const CharacterSet setTagContinue(CharacterSet::setAlphaNum, ".-_:!#[]", true);
+	const CharacterSet setAttributeContinue(CharacterSet::setAlphaNum, ".-_:!#/", true);
 	// characters not allowed in unquoted attribute value
 	const CharacterSet setNonAttrValue(CharacterSet::setNone, "\"\'\\`=<> \t\n\v\f\r");
 	// TODO: also handle + and - (except if they're part of ++ or --) and return keywords

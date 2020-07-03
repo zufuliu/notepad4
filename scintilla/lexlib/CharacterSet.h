@@ -9,9 +9,9 @@
 namespace Scintilla {
 
 class CharacterSet {
-	int size;
 	bool valueAfter;
-	bool *bset;
+	// ASCII character only, not useful for UTF-8 or DBCS multi byte character
+	bool bset[128];
 public:
 	enum setBase {
 		setNone = 0,
@@ -21,19 +21,15 @@ public:
 		setAlpha = setLower | setUpper,
 		setAlphaNum = setAlpha | setDigits
 	};
-	CharacterSet(setBase base = setNone, const char *initialSet = "", int size_ = 0x80, bool valueAfter_ = false);
+	CharacterSet(setBase base = setNone, const char *initialSet = "", bool valueAfter_ = false) noexcept;
 	CharacterSet(const CharacterSet &other) = delete;
 	CharacterSet(CharacterSet &&other) = delete;
 	CharacterSet &operator=(const CharacterSet &other) = delete;
 	CharacterSet &operator=(CharacterSet &&other) = delete;
-	~CharacterSet() {
-		delete[]bset;
-		bset = nullptr;
-		size = 0;
-	}
+	~CharacterSet() = default;
 	void Add(int val) noexcept {
 		assert(val >= 0);
-		assert(val < size);
+		assert(val < 128);
 		bset[val] = true;
 	}
 	void AddString(const char *setToAdd) noexcept;
@@ -42,7 +38,7 @@ public:
 		if (val < 0) {
 			return false;
 		}
-		return (val < size) ? bset[val] : valueAfter;
+		return (val < 128) ? bset[val] : valueAfter;
 	}
 	bool Contains(char ch) const noexcept {
 		// Overload char as char may be signed

@@ -109,8 +109,8 @@ static void ClassifyPascalWord(LexerWordList keywordLists, StyleContext &sc, int
 static void ColourisePascalDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
 	const bool bSmartHighlighting = styler.GetPropertyInt("lexer.pascal.smart.highlighting", 1) != 0;
 
-	const CharacterSet setWordStart(CharacterSet::setAlpha, "_", 0x80, true);
-	const CharacterSet setWord(CharacterSet::setAlphaNum, "_", 0x80, true);
+	const CharacterSet setWordStart(CharacterSet::setAlpha, "_", true);
+	const CharacterSet setWord(CharacterSet::setAlphaNum, "_", true);
 	const CharacterSet setNumber(CharacterSet::setDigits, ".-+eE");
 	const CharacterSet setHexNumber(CharacterSet::setDigits, "abcdefABCDEF");
 	const CharacterSet setOperator(CharacterSet::setNone, "#$&'()*+,-./:;<=>@[]^{}");
@@ -413,7 +413,7 @@ static void FoldPascalDoc(Sci_PositionU startPos, Sci_Position length, int initS
 	int style = initStyle;
 
 	Sci_PositionU lastStart = 0;
-	const CharacterSet setWord(CharacterSet::setAlphaNum, "_", 0x80, true);
+	const CharacterSet setWord(CharacterSet::setAlphaNum, "_", true);
 
 	for (Sci_PositionU i = startPos; i < endPos; i++) {
 		const char ch = chNext;
