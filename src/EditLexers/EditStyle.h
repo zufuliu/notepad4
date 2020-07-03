@@ -118,7 +118,7 @@
 #define NP2STYLE_Important				63410
 
 #define NP2STYLE_Class					63420
-#define NP2STYLE_Struct					63421
+#define NP2STYLE_Structure				63421
 #define NP2STYLE_Union					63422
 #define NP2STYLE_Interface				63423
 #define NP2STYLE_Trait					63424
