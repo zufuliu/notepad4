@@ -102,7 +102,7 @@ Sci_Position CheckFormatSpecifier(const StyleContext &sc) noexcept {
 	return 0;
 }
 
-int DetectIsIdentifierType(LexAccessor &styler, int funcState, int chNext, Sci_Position startPos, Sci_Position lineStartCurrent) noexcept {
+int DetectIdentifierType(LexAccessor &styler, int funcState, int chNext, Sci_Position startPos, Sci_Position lineStartCurrent) noexcept {
 	if (((funcState == GoFunction_Caller || funcState == GoFunction_Return) && (chNext == ')' || chNext == ','))
 		|| (funcState > GoFunction_Name && chNext == '{')) {
 		// func (identifier *Type) (Type, error)
@@ -255,7 +255,7 @@ void ColouriseGoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 							kwType = SCE_GO_DEFAULT;
 						}
 					} else if (!(chNext == '.' || chNext == '*')) {
-						const int state = DetectIsIdentifierType(styler, funcState, chNext, identifierStart, lineStartCurrent);
+						const int state = DetectIdentifierType(styler, funcState, chNext, identifierStart, lineStartCurrent);
 						if (state != SCE_GO_DEFAULT) {
 							sc.ChangeState(state);
 						}

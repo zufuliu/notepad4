@@ -1430,24 +1430,24 @@ void EditAutoCloseBraceQuote(int ch) {
 
 	const int mask = autoCompletionConfig.fAutoInsertMask;
 	char fillChar = '\0';
-	char closeBrace = '\0';
+	BOOL closeBrace = FALSE;
 	switch (ch) {
 	case '(':
 		if (mask & AutoInsertParenthesis) {
 			fillChar = ')';
-			closeBrace = ')';
+			closeBrace = TRUE;
 		}
 		break;
 	case '[':
 		if ((mask & AutoInsertSquareBracket) && !(pLexCurrent->rid == NP2LEX_SMALI)) { // JVM array type
 			fillChar = ']';
-			closeBrace = ']';
+			closeBrace = TRUE;
 		}
 		break;
 	case '{':
 		if (mask & AutoInsertBrace) {
 			fillChar = '}';
-			closeBrace = '}';
+			closeBrace = TRUE;
 		}
 		break;
 	case '<':
@@ -1503,7 +1503,7 @@ void EditAutoCloseBraceQuote(int ch) {
 				tchIns[0] = (char)ch;
 				if (iBrace != -1) {
 					// already matched, so add close brace
-					tchIns[1] = closeBrace;
+					tchIns[1] = fillChar;
 				}
 			}
 		}
@@ -1881,8 +1881,8 @@ void EditAutoIndent(void) {
 
 		iIndentLen = 0;
 		ch = SciCall_GetCharAt(SciCall_PositionFromLine(iCurLine));
-		const BOOL closeBraces = (ch == '}' || ch == ']' || ch == ')');
-		if (indent == 2 && !closeBraces) {
+		const BOOL closeBrace = (ch == '}' || ch == ']' || ch == ')');
+		if (indent == 2 && !closeBrace) {
 			indent = 1;
 		}
 
