@@ -336,6 +336,8 @@ void ColouriseGoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 				}
 			} else if ((sc.state == SCE_GO_STRING && sc.ch == '\"') || (sc.state == SCE_GO_RAW_STRING && sc.ch == '`')) {
 				sc.ForwardSetState(SCE_GO_DEFAULT);
+			} else if (sc.state == SCE_GO_STRING && sc.atLineStart) {
+				sc.SetState(SCE_GO_DEFAULT);
 			}
 			break;
 
@@ -346,6 +348,8 @@ void ColouriseGoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 				sc.Forward();
 			} else if (sc.ch == '\'') {
 				sc.ForwardSetState(SCE_GO_DEFAULT);
+			} else if (sc.atLineStart) {
+				sc.SetState(SCE_GO_DEFAULT);
 			}
 			break;
 
