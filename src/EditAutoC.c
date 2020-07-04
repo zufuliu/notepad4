@@ -1410,15 +1410,15 @@ void EditAutoCloseBraceQuote(int ch) {
 	const Sci_Position iCurPos = SciCall_GetCurrentPos();
 	const int chPrev = SciCall_GetCharAt(iCurPos - 2);
 	const int chNext = SciCall_GetCharAt(iCurPos);
-	const int iCurrentStyle = SciCall_GetStyleAt(iCurPos - 2);
+	const int iPrevStyle = SciCall_GetStyleAt(iCurPos - 2);
 	const int iNextStyle = SciCall_GetStyleAt(iCurPos);
 
 	if (pLexCurrent->iLexer == SCLEX_CPP) {
 		// within char
-		if (iCurrentStyle == SCE_C_CHARACTER && iNextStyle == SCE_C_CHARACTER && pLexCurrent->rid != NP2LEX_PHP) {
+		if (iPrevStyle == SCE_C_CHARACTER && iNextStyle == SCE_C_CHARACTER && pLexCurrent->rid != NP2LEX_PHP) {
 			return;
 		}
-		if (ch == '`' && !IsCppStringStyle(iCurrentStyle)) {
+		if (ch == '`' && !IsCppStringStyle(iPrevStyle)) {
 			return;
 		}
 	}
@@ -1429,39 +1429,43 @@ void EditAutoCloseBraceQuote(int ch) {
 	}
 
 	const int mask = autoCompletionConfig.fAutoInsertMask;
-	char tchIns[2] = "";
+	char fillChar = '\0';
+	char closeBrace = '\0';
 	switch (ch) {
 	case '(':
 		if (mask & AutoInsertParenthesis) {
-			tchIns[0] = ')';
+			fillChar = ')';
+			closeBrace = ')';
 		}
 		break;
 	case '[':
-		if ((mask & AutoInsertSquareBracket) && !(pLexCurrent->rid == NP2LEX_SMALI)) { // Smali array type
-			tchIns[0] = ']';
+		if ((mask & AutoInsertSquareBracket) && !(pLexCurrent->rid == NP2LEX_SMALI)) { // JVM array type
+			fillChar = ']';
+			closeBrace = ']';
 		}
 		break;
 	case '{':
 		if (mask & AutoInsertBrace) {
-			tchIns[0] = '}';
+			fillChar = '}';
+			closeBrace = '}';
 		}
 		break;
 	case '<':
 		if ((mask & AutoInsertAngleBracket) && (pLexCurrent->rid == NP2LEX_CPP || pLexCurrent->rid == NP2LEX_CSHARP || pLexCurrent->rid == NP2LEX_JAVA)) {
 			// geriatric type, template
-			if (iCurrentStyle == SCE_C_CLASS || iCurrentStyle == SCE_C_INTERFACE || iCurrentStyle == SCE_C_STRUCT) {
-				tchIns[0] = '>';
+			if (iPrevStyle == SCE_C_CLASS || iPrevStyle == SCE_C_INTERFACE || iPrevStyle == SCE_C_STRUCT) {
+				fillChar = '>';
 			}
 		}
 		break;
 	case '\"':
 		if ((mask & AutoInsertDoubleQuote)) {
-			tchIns[0] = '\"';
+			fillChar = '\"';
 		}
 		break;
 	case '\'':
-		if ((mask & AutoInsertSingleQuote) && CanAutoCloseSingleQuote(chPrev, iCurrentStyle)) {
-			tchIns[0] = '\'';
+		if ((mask & AutoInsertSingleQuote) && CanAutoCloseSingleQuote(chPrev, iPrevStyle)) {
+			fillChar = '\'';
 		}
 		break;
 	case '`':
@@ -1470,24 +1474,43 @@ void EditAutoCloseBraceQuote(int ch) {
 		//|| pLexCurrent->iLexer == SCLEX_MAKEFILE
 		//|| pLexCurrent->iLexer == SCLEX_SQL
 		//) {
-		//	tchIns[0] = '`';
+		//	fillChar = '`';
 		//} else if (0) {
-		//	tchIns[0] = '\'';
+		//	fillChar = '\'';
 		//}
 		if (mask & AutoInsertBacktick) {
-			tchIns[0] = '`';
+			fillChar = '`';
 		}
 		break;
 	case ',':
 		if ((mask & AutoInsertSpaceAfterComma) && !(chNext == ' ' || chNext == '\t' || (chPrev == '\'' && chNext == '\'') || (chPrev == '\"' && chNext == '\"'))) {
-			tchIns[0] = ' ';
+			fillChar = ' ';
 		}
 		break;
 	default:
 		break;
 	}
-	if (tchIns[0]) {
+
+	if (fillChar) {
 		SciCall_BeginUndoAction();
+		char tchIns[4] = { fillChar };
+		if (closeBrace) {
+			Sci_Position iBrace = SciCall_BraceMatch(iCurPos - 1, 0);
+			if (iBrace != -1) {
+				// check whether original close brace already matched
+				SciCall_DeleteBack();
+				iBrace = SciCall_BraceMatch(iBrace - 1, 0);
+				tchIns[0] = (char)ch;
+				if (iBrace != -1) {
+					// already matched, so add close brace
+					tchIns[1] = closeBrace;
+				}
+			}
+		}
+		// TODO: auto escape quotes inside string
+		//else if (ch == fillChar) {
+		//}
+
 		SciCall_ReplaceSel(tchIns);
 		const Sci_Position iCurrentPos = (ch == ',') ? iCurPos + 1 : iCurPos;
 		SciCall_SetSel(iCurrentPos, iCurrentPos);
