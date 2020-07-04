@@ -2566,7 +2566,7 @@ Sci::Position Document::WordPartRight(Sci::Position pos) const noexcept {
 }
 
 Sci::Position Document::ExtendStyleRange(Sci::Position pos, int delta, bool singleLine) noexcept {
-	const int sStart = cb.StyleAt(pos);
+	const char sStart = cb.StyleAt(pos);
 	if (delta < 0) {
 		while (pos > 0 && (cb.StyleAt(pos) == sStart) && (!singleLine || !IsEOLChar(cb.CharAt(pos))))
 			pos--;

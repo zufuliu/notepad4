@@ -49,7 +49,7 @@ static int NestingLevelLookBehind(Sci_PositionU startPos, Accessor &styler) noex
 	int nestingLevel = 0;
 
 	for (Sci_PositionU i = 0; i < startPos; i++) {
-		const int ch = styler.SafeGetCharAt(i);
+		const char ch = styler.SafeGetCharAt(i);
 		if (ch == '{')
 			nestingLevel++;
 		else if (ch == '}')
@@ -385,7 +385,7 @@ static void ColouriseCssDoc(Sci_PositionU startPos, Sci_Position length, int ini
 				const Sci_PositionU endPos = startPos + length;
 
 				for (Sci_PositionU i = sc.currentPos; i < endPos; i++) {
-					const int ch = styler.SafeGetCharAt(i);
+					const char ch = styler.SafeGetCharAt(i);
 					if (ch == ';' || ch == '}')
 						break;
 					if (ch == '{') {

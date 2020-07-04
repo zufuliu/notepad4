@@ -206,11 +206,11 @@ static void ColouriseNSISDoc(Sci_PositionU startPos, Sci_Position length, int in
 
 #define IsCommentLine(line)			IsLexCommentLine(line, styler, SCE_C_COMMENTLINE)
 #define IsStreamCommantStyle(style)	((style) == SCE_C_COMMENT)
-static constexpr bool IsNsisFoldWordStart(int ch) noexcept {
+static constexpr bool IsNsisFoldWordStart(char ch) noexcept {
 	return (ch == 'S' || ch == 'F' || ch == 'P')
 		|| (ch == 's' || ch == 'f' || ch == 'p');
 }
-static constexpr bool IsNsisFoldPPStart(int ch) noexcept {
+static constexpr bool IsNsisFoldPPStart(char ch) noexcept {
 	return (ch == 'i' || ch == 'e' || ch == 'm')
 		|| (ch == 'I' || ch == 'E' || ch == 'M');
 }
@@ -227,12 +227,12 @@ static void FoldNSISDoc(Sci_PositionU startPos, Sci_Position length, int initSty
 		levelCurrent = styler.LevelAt(lineCurrent - 1) >> 16;
 	int levelNext = levelCurrent;
 
-	int chNext = styler[startPos];
+	char chNext = styler[startPos];
 	int styleNext = styler.StyleAt(startPos);
 	int style = initStyle;
 
 	for (Sci_PositionU i = startPos; i < endPos; i++) {
-		const int ch = chNext;
+		const char ch = chNext;
 		chNext = styler.SafeGetCharAt(i + 1);
 		const int stylePrev = style;
 		style = styleNext;
