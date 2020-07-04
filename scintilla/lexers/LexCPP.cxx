@@ -177,9 +177,9 @@ static void ColouriseCppDoc(Sci_PositionU startPos, Sci_Position length, int ini
 	if (initStyle == SCE_C_COMMENTLINE || initStyle == SCE_C_COMMENTLINEDOC || initStyle == SCE_C_PREPROCESSOR) {
 		// Set continuationLine if last character of previous line is '\'
 		if (lineCurrent > 0) {
-			const int chBack = styler.SafeGetCharAt(startPos - 1);
-			const int chBack2 = styler.SafeGetCharAt(startPos - 2);
-			int lineEndChar = '!';
+			const char chBack = styler.SafeGetCharAt(startPos - 1);
+			const char chBack2 = styler.SafeGetCharAt(startPos - 2);
+			char lineEndChar = '!';
 			if (chBack2 == '\r' && chBack == '\n') {
 				lineEndChar = styler.SafeGetCharAt(startPos - 3);
 			} else if (chBack == '\n' || chBack == '\r') {
@@ -1233,13 +1233,13 @@ static void FoldCppDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 	//int levelMinCurrent = levelCurrent;
 	int levelNext = levelCurrent;
 
-	int chNext = styler[startPos];
+	char chNext = styler[startPos];
 	int style = initStyle;
 	int styleNext = styler.StyleAt(startPos);
 	bool isObjCProtocol = false;
 
 	for (Sci_PositionU i = startPos; i < endPos; i++) {
-		const int ch = chNext;
+		const char ch = chNext;
 		chNext = styler.SafeGetCharAt(i + 1);
 		const int stylePrev = style;
 		style = styleNext;

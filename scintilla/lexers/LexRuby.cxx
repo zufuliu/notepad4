@@ -365,7 +365,7 @@ static Sci_Position findExpressionStart(Sci_Position pos, Sci_Position min_pos, 
 	for (; pos > min_pos; pos -= 1) {
 		const int style = styler.StyleAt(pos - 1);
 		if (style == SCE_RB_OPERATOR) {
-			const int ch = styler[pos - 1];
+			const char ch = styler[pos - 1];
 			if (ch == '}' || ch == ')' || ch == ']') {
 				depth += 1;
 			} else if (ch == '{' || ch == '(' || ch == '[') {
