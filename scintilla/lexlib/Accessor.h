@@ -19,9 +19,9 @@ class PropSetSimple;
 typedef bool (*PFNIsCommentLeader)(Accessor &styler, Sci_Position pos, Sci_Position len);
 
 class Accessor : public LexAccessor {
+	const PropSetSimple * const pprops;
 public:
-	PropSetSimple *pprops;
-	Accessor(IDocument *pAccess_, PropSetSimple *pprops_) noexcept;
+	Accessor(IDocument *pAccess_, const PropSetSimple *pprops_) noexcept;
 	int GetPropertyInt(const char *key, int defaultValue = 0) const;
 	int IndentAmount(Sci_Position line, int *flags, PFNIsCommentLeader pfnIsCommentLeader = nullptr) noexcept;
 };

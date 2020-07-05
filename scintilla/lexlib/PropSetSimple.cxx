@@ -25,7 +25,7 @@ inline mapss *PropsFromPointer(void *impl) noexcept {
 	return static_cast<mapss *>(impl);
 }
 
-constexpr bool IsASpaceCharacter(unsigned int ch) noexcept {
+constexpr bool IsASpaceCharacter(char ch) noexcept {
 	return (ch == ' ') || ((ch >= 0x09) && (ch <= 0x0d));
 }
 
@@ -50,6 +50,7 @@ void PropSetSimple::Set(const char *key, const char *val, size_t lenKey, size_t 
 	(*props)[std::string(key, lenKey)] = std::string(val, lenVal);
 }
 
+#if 0
 void PropSetSimple::Set(const char *keyVal) {
 	while (IsASpaceCharacter(*keyVal)) {
 		keyVal++;
@@ -75,6 +76,7 @@ void PropSetSimple::SetMultiple(const char *s) {
 	}
 	Set(s);
 }
+#endif
 
 const char *PropSetSimple::Get(const char *key) const {
 	mapss *props = PropsFromPointer(impl);
@@ -84,6 +86,8 @@ const char *PropSetSimple::Get(const char *key) const {
 	}
 	return "";
 }
+
+namespace {
 
 // There is some inconsistency between GetExpanded("foo") and Expand("$(foo)").
 // A solution is to keep a stack of variables that have been expanded, so that
@@ -102,7 +106,7 @@ struct VarChain {
 	const VarChain *link;
 };
 
-static int ExpandAllInPlace(const PropSetSimple &props, std::string &withVars, int maxExpands, const VarChain &blankVars) {
+int ExpandAllInPlace(const PropSetSimple &props, std::string &withVars, int maxExpands, const VarChain &blankVars) {
 	size_t varStart = withVars.find("$(");
 	while ((varStart != std::string::npos) && (maxExpands > 0)) {
 		const size_t varEnd = withVars.find(')', varStart + 2);
@@ -138,9 +142,11 @@ static int ExpandAllInPlace(const PropSetSimple &props, std::string &withVars, i
 	return maxExpands;
 }
 
+}
+
 size_t PropSetSimple::GetExpanded(const char *key, char *result) const {
-	std::string val = Get(key);
-	ExpandAllInPlace(*this, val, 100, VarChain(key));
+	const std::string val = Get(key);
+	//ExpandAllInPlace(*this, val, 100, VarChain(key));
 	const size_t n = val.size();
 	if (result) {
 		memcpy(result, val.c_str(), n + 1);
@@ -149,8 +155,8 @@ size_t PropSetSimple::GetExpanded(const char *key, char *result) const {
 }
 
 int PropSetSimple::GetInt(const char *key, int defaultValue) const {
-	std::string val = Get(key);
-	ExpandAllInPlace(*this, val, 100, VarChain(key));
+	const std::string val = Get(key);
+	//ExpandAllInPlace(*this, val, 100, VarChain(key));
 	if (!val.empty()) {
 		return atoi(val.c_str());
 	}
