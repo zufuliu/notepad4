@@ -7728,3 +7728,106 @@ void FoldAltArrow(int key, int mode) {
 		}
 	}
 }
+
+void EditGotoBlock(int menu) {
+	const Sci_Position iCurPos = SciCall_GetCurrentPos();
+	const Sci_Line iCurLine = SciCall_LineFromPosition(iCurPos);
+
+	Sci_Line iLine = iCurLine;
+	int level = SciCall_GetFoldLevel(iLine);
+	if (!(level & SC_FOLDLEVELHEADERFLAG)) {
+		iLine = SciCall_GetFoldParent(iLine);
+	}
+
+	switch (menu) {
+	case IDM_EDIT_GOTO_BLOCK_START:
+		break;
+
+	case IDM_EDIT_GOTO_BLOCK_END:
+		if (iLine >= 0) {
+			iLine = SciCall_GetLastChild(iLine);
+		}
+		break;
+
+	case IDM_EDIT_GOTO_PREVIOUS_BLOCK:
+	case IDM_EDIT_GOTO_PREV_SIBLING_BLOCK: {
+		BOOL sibling = menu == IDM_EDIT_GOTO_PREV_SIBLING_BLOCK;
+		Sci_Line line = iCurLine - 1;
+		Sci_Line first = -1;
+		level &= SC_FOLDLEVELNUMBERMASK;
+
+		while (line >= 0) {
+			const int lev = SciCall_GetFoldLevel(line);
+			 if ((lev & SC_FOLDLEVELHEADERFLAG) && line != iLine) {
+				if (sibling) {
+					if (first < 0) {
+						first = line;
+					}
+					if (level >= (lev & SC_FOLDLEVELNUMBERMASK)) {
+						iLine = line;
+						sibling = FALSE;
+						break;
+					}
+					line = SciCall_GetFoldParent(line);
+					continue;
+				}
+
+				iLine = line;
+				break;
+			}
+			--line;
+		}
+		if (sibling && first >= 0) {
+			iLine = first;
+		}
+	}
+	break;
+
+	case IDM_EDIT_GOTO_NEXT_BLOCK:
+	case IDM_EDIT_GOTO_NEXT_SIBLING_BLOCK: {
+		SciCall_ColouriseAll();
+		const Sci_Line lineCount = SciCall_GetLineCount();
+		if (iLine >= 0) {
+			iLine = SciCall_GetLastChild(iLine);
+		}
+
+		BOOL sibling = menu == IDM_EDIT_GOTO_NEXT_SIBLING_BLOCK;
+		Sci_Line line = iCurLine + 1;
+		Sci_Line first = -1;
+		if (sibling && iLine > 0 && (level & SC_FOLDLEVELHEADERFLAG)) {
+			line = iLine + 1;
+		}
+		level &= SC_FOLDLEVELNUMBERMASK;
+
+		while (line < lineCount) {
+			const int lev = SciCall_GetFoldLevel(line);
+			if (lev & SC_FOLDLEVELHEADERFLAG) {
+				if (sibling) {
+					if (first < 0) {
+						first = line;
+					}
+					if (level >= (lev & SC_FOLDLEVELNUMBERMASK)) {
+						iLine = line;
+						sibling = FALSE;
+						break;
+					}
+					line = SciCall_GetLastChild(line);
+				} else {
+					iLine = line;
+					break;
+				}
+			}
+			++line;
+		}
+		if (sibling && first >= 0) {
+			iLine = first;
+		}
+	}
+	break;
+	}
+
+	if (iLine >= 0 && iLine != iCurLine) {
+		const Sci_Position column = SciCall_GetColumn(iCurPos);
+		EditJumpTo(iLine + 1, column + 1);
+	}
+}

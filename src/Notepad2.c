@@ -2460,6 +2460,12 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	EnableCmd(hmenu, BME_EDIT_BOOKMARKTOGGLE, i);
 	EnableCmd(hmenu, BME_EDIT_BOOKMARKCLEAR, i);
 	EnableCmd(hmenu, IDM_EDIT_GOTOLINE, nonEmpty);
+	EnableCmd(hmenu, IDM_EDIT_GOTO_BLOCK_START, nonEmpty);
+	EnableCmd(hmenu, IDM_EDIT_GOTO_BLOCK_END, nonEmpty);
+	EnableCmd(hmenu, IDM_EDIT_GOTO_PREVIOUS_BLOCK, nonEmpty);
+	EnableCmd(hmenu, IDM_EDIT_GOTO_NEXT_BLOCK, nonEmpty);
+	EnableCmd(hmenu, IDM_EDIT_GOTO_PREV_SIBLING_BLOCK, nonEmpty);
+	EnableCmd(hmenu, IDM_EDIT_GOTO_NEXT_SIBLING_BLOCK, nonEmpty);
 	EnableCmd(hmenu, IDM_EDIT_DELETELINELEFT, i);
 	EnableCmd(hmenu, IDM_EDIT_DELETELINERIGHT, i);
 	EnableCmd(hmenu, CMD_CTRLBACK, i);
@@ -3866,6 +3872,19 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	case IDM_EDIT_GOTOLINE:
 		EditLineNumDlg(hwndEdit);
+		break;
+
+	//case IDM_EDIT_NAVIGATE_BACKWARD:
+	//case IDM_EDIT_NAVIGATE_FORWARD:
+	//	break;
+
+	case IDM_EDIT_GOTO_BLOCK_START:
+	case IDM_EDIT_GOTO_BLOCK_END:
+	case IDM_EDIT_GOTO_PREVIOUS_BLOCK:
+	case IDM_EDIT_GOTO_NEXT_BLOCK:
+	case IDM_EDIT_GOTO_PREV_SIBLING_BLOCK:
+	case IDM_EDIT_GOTO_NEXT_SIBLING_BLOCK:
+		EditGotoBlock(LOWORD(wParam));
 		break;
 
 	case IDM_VIEW_SCHEME:
