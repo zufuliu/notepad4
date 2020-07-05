@@ -25,9 +25,11 @@ inline mapss *PropsFromPointer(void *impl) noexcept {
 	return static_cast<mapss *>(impl);
 }
 
+#if 0
 constexpr bool IsASpaceCharacter(char ch) noexcept {
 	return (ch == ' ') || ((ch >= 0x09) && (ch <= 0x0d));
 }
+#endif
 
 }
 
@@ -87,6 +89,7 @@ const char *PropSetSimple::Get(const char *key) const {
 	return "";
 }
 
+#if 0
 namespace {
 
 // There is some inconsistency between GetExpanded("foo") and Expand("$(foo)").
@@ -143,6 +146,7 @@ int ExpandAllInPlace(const PropSetSimple &props, std::string &withVars, int maxE
 }
 
 }
+#endif
 
 size_t PropSetSimple::GetExpanded(const char *key, char *result) const {
 	const std::string val = Get(key);
