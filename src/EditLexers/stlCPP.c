@@ -189,13 +189,12 @@ static KEYWORDLIST Keywords_CPP = {{
 // <queue> <stack> <span>
 "queue priority_queue stack " "span "
 // <iterator>
-"incrementable_traits readable_traits iterator_traits input_iterator_tag output_iterator_tag forward_iterator_tag bidirectional_iterator_tag random_access_iterator_tag contiguous_iterator_tag "
+"incrementable_traits indirectly_readable_traits iterator_traits input_iterator_tag output_iterator_tag forward_iterator_tag bidirectional_iterator_tag random_access_iterator_tag contiguous_iterator_tag "
 "reverse_iterator back_insert_iterator front_insert_iterator insert_iterator move_iterator common_iterator counted_iterator move_sentinel "
 "istream_iterator ostream_iterator istreambuf_iterator ostreambuf_iterator "
 // <ranges>
 "view_base view_interface subrange dangling empty_view single_view iota_view all_view ref_view filter_view transform_view take_view take_while_view drop_view drop_while_view join_view split_view common_view basic_istream_view elements_view keys_view values_view "
 // <algorithm>
-"copy_result "
 // <random>
 "linear_congruential_engine mersenne_twister_engine subtract_with_carry_engine discard_block_engine independent_bits_engine shuffle_order_engine random_device seed_seq "
 "uniform_int_distribution uniform_real_distribution bernoulli_distribution binomial_distribution geometric_distribution negative_binomial_distribution poisson_distribution exponential_distribution gamma_distribution weibull_distribution extreme_value_distribution normal_distribution lognormal_distribution chi_squared_distribution cauchy_distribution fisher_f_distribution student_t_distribution discrete_distribution piecewise_constant_distribution piecewise_linear_distribution "
@@ -678,7 +677,7 @@ static KEYWORDLIST Keywords_CPP = {{
 "pointer_to() " // pointer_traits
 "to_address() get_pointer_safety() align() assume_aligned() "
 "allocate() deallocate() construct() destroy() max_size() " // allocator_traits
-"addressof() destroy_at() destroy() destroy_n() "
+"addressof() construct_at() destroy_at() destroy() destroy_n() "
 "get_deleter() release() " // unique_ptr
 "make_unique() make_unique_for_overwrite() "
 "use_count() owner_before() " // shared_ptr
@@ -726,7 +725,7 @@ static KEYWORDLIST Keywords_CPP = {{
 "before_begin() cbefore_begin() emplace_after() insert_after() erase_after() splice_after() remove() remove_if() unique() merge() sort() reverse() " // forward_list
 "splice() " // list
 // <map> <set>
-"emplace_hint() extract() try_emplace() insert_or_assign() contains() lower_bound() upper_bound() equal_range() " // map
+"emplace_hint() extract() try_emplace() insert_or_assign() key_comp() value_comp() contains() lower_bound() upper_bound() equal_range() " // map
 // <unordered_map> <unordered_set>
 "hash_function() key_eq() bucket_count() max_bucket_count() bucket_size() bucket() load_factor() max_load_factor() rehash() " // unordered_map
 // <queue> <stack> <span>
@@ -736,7 +735,7 @@ static KEYWORDLIST Keywords_CPP = {{
 "advance() distance() next() prev() base() iter_move() iter_swap() "
 "make_reverse_iterator() back_inserter() front_inserter() inserter() make_move_iterator() "
 // <ranges>
-"filter() take() take_while() drop() drop_while() split() counted() common() istream_view() elements() keys() values() "
+"single() filter() take() take_while() drop() drop_while() split() counted() common() istream_view() elements() keys() values() "
 // <algorithm>
 "all_of() any_of() none_of() for_each() for_each_n() find_if() find_if_not() find_end() adjacent_find() "
 "count_if() mismatch() equal() is_permutation() search() search_n() "
@@ -766,7 +765,7 @@ static KEYWORDLIST Keywords_CPP = {{
 // <numeric>
 "accumulate() reduce() inner_product() transform_reduce() partial_sum() exclusive_scan() inclusive_scan() transform_exclusive_scan() transform_inclusive_scan() adjacent_difference() iota() gcd() lcm() midpoint() "
 // <bit>
-"bit_cast() ispow2() ceil2() floor2() log2p1() rotl() rotr() countl_zero() countl_one() countr_zero() countr_one() popcount() "
+"bit_cast() has_single_bit() bit_ceil() bit_floor() bit_width() rotl() rotr() countl_zero() countl_one() countr_zero() countr_one() popcount() "
 // <cmath>
 "lerp() assoc_laguerre() assoc_legendre() comp_ellint_1() comp_ellint_2() comp_ellint_3() cyl_bessel_i() cyl_bessel_j() cyl_bessel_k() cyl_neumann() ellint_1() ellint_2() ellint_3() expint() hermite() laguerre() legendre() riemann_zeta() sph_bessel() sph_legendre() sph_neumann() "
 // Input/output library
