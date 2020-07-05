@@ -13,9 +13,10 @@ class PropSetSimple {
 	void Set(const char *keyVal);
 public:
 	PropSetSimple();
-	virtual ~PropSetSimple();
+	~PropSetSimple();
 	void Set(const char *key, const char *val, size_t lenKey = -1, size_t lenVal = -1);
-	void SetMultiple(const char *);
+	//void Set(const char *keyVal);
+	//void SetMultiple(const char *s);
 	const char *Get(const char *key) const;
 	size_t GetExpanded(const char *key, char *result) const;
 	int GetInt(const char *key, int defaultValue = 0) const;
