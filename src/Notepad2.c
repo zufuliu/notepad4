@@ -2176,7 +2176,7 @@ void ValidateUILangauge(void) {
 	}
 }
 
-void SetUILanguage(UINT menu) {
+void SetUILanguage(int menu) {
 	LANGID lang = uiLanguage;
 	switch (menu) {
 	case IDM_LANG_USER_DEFAULT:
