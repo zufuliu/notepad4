@@ -2376,7 +2376,7 @@ void ValidateUILangauge(void) {
 	}
 }
 
-void SetUILanguage(UINT resID) {
+void SetUILanguage(int resID) {
 	LANGID lang = uiLanguage;
 	switch (resID) {
 	case IDS_LANG_USER_DEFAULT:

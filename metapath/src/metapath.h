@@ -114,7 +114,7 @@ void GetRelaunchParameters(LPWSTR szParameters);
 void ShowNotifyIcon(HWND hwnd, BOOL bAdd);
 
 BOOL ChangeDirectory(HWND hwnd, LPCWSTR lpszNewDir, BOOL bUpdateHistory);
-void SetUILanguage(UINT resID);
+void SetUILanguage(int resID);
 void LoadSettings(void);
 void SaveSettingsNow(void);
 void SaveSettings(BOOL bSaveSettingsNow);

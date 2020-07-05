@@ -1356,7 +1356,7 @@ static BOOL EditTitleCase(LPWSTR pszTextW, int cchTextW) {
 //
 // EditMapTextCase()
 //
-void EditMapTextCase(UINT menu) {
+void EditMapTextCase(int menu) {
 	const Sci_Position iSelCount = SciCall_GetSelTextLength() - 1;
 	if (iSelCount == 0) {
 		return;
