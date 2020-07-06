@@ -402,15 +402,15 @@ BEGIN
 			//MENUITEM "Navigate &Backward\tAlt+Left",	IDM_EDIT_NAVIGATE_BACKWARD
 			//MENUITEM "Navigate &Forward\tAlt+Right",	IDM_EDIT_NAVIGATE_FORWARD
 			MENUITEM SEPARATOR
-			MENUITEM "Goto Block Start(&C)\tAlt+[",						IDM_EDIT_GOTO_BLOCK_START
-			MENUITEM "Goto Block End(&K)\tAlt+]",						IDM_EDIT_GOTO_BLOCK_END
-			MENUITEM "Goto Previous Block(&P)\tAlt+カンマ(<,)",			IDM_EDIT_GOTO_PREVIOUS_BLOCK
-			MENUITEM "Goto Next Block(&N)\tAlt+ピリオド(>.)",				IDM_EDIT_GOTO_NEXT_BLOCK
-			MENUITEM "Goto Previous Sibling Block(&R)\tCtrl+Alt+カンマ(<,)",	IDM_EDIT_GOTO_PREV_SIBLING_BLOCK
-			MENUITEM "Goto Next Sibling Block(&E)\tCtrl+Alt+ピリオド(>.)",	IDM_EDIT_GOTO_NEXT_SIBLING_BLOCK
+			MENUITEM "ブロックの先頭へ移動(&C)\tAlt+[",						IDM_EDIT_GOTO_BLOCK_START
+			MENUITEM "ブロックの末尾へ移動(&K)\tAlt+]",						IDM_EDIT_GOTO_BLOCK_END
+			MENUITEM "前のブロックへ移動(&P)\tAlt+カンマ(<,)",			IDM_EDIT_GOTO_PREVIOUS_BLOCK
+			MENUITEM "次のブロックへ移動(&N)\tAlt+ピリオド(>.)",				IDM_EDIT_GOTO_NEXT_BLOCK
+			MENUITEM "前の兄弟ブロックへ移動(&R)\tCtrl+Alt+カンマ(<,)",	IDM_EDIT_GOTO_PREV_SIBLING_BLOCK
+			MENUITEM "次の兄弟ブロックへ移動(&E)\tCtrl+Alt+ピリオド(>.)",	IDM_EDIT_GOTO_NEXT_SIBLING_BLOCK
 			MENUITEM SEPARATOR
-			MENUITEM "選択範囲の先頭へカーソル移動(&S)\tCtrl+Shift+カンマ(<,)",	CMD_JUMP2SELSTART
-			MENUITEM "選択範囲の末尾へカーソル移動(&T)\tCtrl+Shift+ピリオド(>.)",	CMD_JUMP2SELEND
+			MENUITEM "選択範囲の先頭へ移動(&S)\tCtrl+Shift+カンマ(<,)",	CMD_JUMP2SELSTART
+			MENUITEM "選択範囲の末尾へ移動(&T)\tCtrl+Shift+ピリオド(>.)",	CMD_JUMP2SELEND
 		END
 	END
 	POPUP "表示(&V)"
@@ -1981,7 +1981,7 @@ BEGIN
     IDS_SAVEDSETTINGS       "設定が保存されました。"
     IDS_CREATEINI_FAIL      "設定ファイルの作成に失敗しました。"
     IDS_WRITEINI_FAIL       "設定ファイルへの書き込みに失敗しました。"
-    IDS_SETTINGSNOTSAVED    "設定ファイルがありません。\n配色の変更を保つには、すぐに設定を保存するか(F7)、配色の設定(Ctrl+F12)から配色設定をエクスポートしてください。"
+    IDS_SETTINGSNOTSAVED    "設定ファイルがありません。\n配色の変更を保存するには、すぐに設定を保存するか(F7)、配色の設定(Ctrl+F12)から配色設定をエクスポートしてください。"
     IDS_EXPORT_FAIL         "「%s」への配色設定のエクスポートに失敗しました。"
 END
 
