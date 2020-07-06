@@ -287,7 +287,7 @@ void ColouriseGoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 						sc.SetState(SCE_GO_TASK_MARKER);
 						sc.Forward();
 					}
-				} else if (sc.Match("+build") || sc.Match('g', 'o', ':')) {
+				} else if ((sc.ch == '+' && sc.Match("+build")) || sc.Match('g', 'o', ':')) {
 					sc.SetState(SCE_GO_TASK_MARKER_LINE);
 				}
 			}
@@ -321,7 +321,7 @@ void ColouriseGoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 
 		case SCE_GO_STRING:
 		case SCE_GO_RAW_STRING:
-			if (sc.ch == '\\') {
+			if (sc.state == SCE_GO_STRING && sc.ch == '\\') {
 				escSeq.resetEscapeState(sc.state, sc.chNext);
 				sc.SetState(SCE_GO_ESCAPECHAR);
 				sc.Forward();
