@@ -4898,7 +4898,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	UNREFERENCED_PARAMETER(wParam);
 
 	LPNMHDR pnmh = (LPNMHDR)lParam;
-	const struct SCNotification *scn = (struct SCNotification *)lParam;
+	const struct SCNotification * const scn = (struct SCNotification *)lParam;
 
 	switch (pnmh->idFrom) {
 	case IDC_EDIT:
@@ -5012,16 +5012,46 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			// function/array/template/generic
 			LPSTR braces = (LPSTR)strpbrk(text, "([{<");
 			const Sci_Position iCurPos = SciCall_GetCurrentPos();
-			const int ch = SciCall_GetCharAt(iCurPos);
-			if (braces != NULL && *braces == ch) {
-				*braces = L'\0'; // unsafe
-			}
-			const Sci_Position iNewPos = scn->position + ((braces == NULL) ? (Sci_Position)strlen(text) : (braces - text + 1));
+			Sci_Position offset;
+			BOOL closeBrace = FALSE;
+			if (braces != NULL) {
+				Sci_Position iPos = iCurPos;
+				int ch = SciCall_GetCharAt(iPos);
+				while (ch == ' ' || ch == '\t') {
+					++iPos;
+					ch = SciCall_GetCharAt(iPos);
+				}
 
+				offset = braces - text + 1;
+				const char brace = *braces;
+				if (brace == ch) {
+					*braces = L'\0'; // delete open and close brace
+					offset += iPos - iCurPos;
+				} else {
+					const int chNext = (brace == '(') ? ')' : brace + 2;
+					if (ch == chNext) {
+						if (SciCall_BraceMatch(iPos, 0) == -1) {
+							*(braces + 1) = L'\0'; // delete close brace
+						}
+					} else {
+						closeBrace = brace != '<' && braces[1] == chNext;
+					}
+				}
+			} else {
+				offset = strlen(text);
+			}
+
+			const Sci_Position iNewPos = scn->position + offset;
 			SciCall_BeginUndoAction();
 			SciCall_SetSel(scn->position, iCurPos);
 			SciCall_ReplaceSel(text);
 			SciCall_SetSel(iNewPos, iNewPos);
+			if (closeBrace) {
+				if (SciCall_BraceMatch(iNewPos - 1, iNewPos) != -1) {
+					// delete close brace: open brace already matched next close brace
+					SciCall_Clear();
+				}
+			}
 			SciCall_EndUndoAction();
 			SciCall_AutoCCancel();
 		}

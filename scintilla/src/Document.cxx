@@ -2602,7 +2602,7 @@ static constexpr char BraceOpposite(char ch) noexcept {
 }
 
 // TODO: should be able to extend styled region to find matching brace
-Sci::Position Document::BraceMatch(Sci::Position position, Sci::Position /*maxReStyle*/) const noexcept {
+Sci::Position Document::BraceMatch(Sci::Position position, Sci::Position maxReStyle) const noexcept {
 	const char chBrace = CharAt(position);
 	const char chSeek = BraceOpposite(chBrace);
 	if (chSeek == '\0')
@@ -2612,7 +2612,7 @@ Sci::Position Document::BraceMatch(Sci::Position position, Sci::Position /*maxRe
 	if (chBrace == '(' || chBrace == '[' || chBrace == '{' || chBrace == '<')
 		direction = 1;
 	int depth = 1;
-	position = NextPosition(position, direction);
+	position = NextPosition(maxReStyle ? maxReStyle : position, direction);
 	while ((position >= 0) && (position < Length())) {
 		const char chAtPos = CharAt(position);
 		const int styAtPos = StyleIndexAt(position);

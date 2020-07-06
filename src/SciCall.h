@@ -829,8 +829,8 @@ NP2_inline void SciCall_BraceBadLightIndicator(BOOL useSetting, int indicator) {
 	SciCall(SCI_BRACEBADLIGHTINDICATOR, useSetting, indicator);
 }
 
-NP2_inline Sci_Position SciCall_BraceMatch(Sci_Position pos, int maxReStyle) {
-	return SciCall(SCI_BRACEMATCH, pos, maxReStyle);
+NP2_inline Sci_Position SciCall_BraceMatch(Sci_Position pos, Sci_Position startPos) {
+	return SciCall(SCI_BRACEMATCH, pos, startPos);
 }
 
 // Tabs and Indentation Guides

@@ -1492,18 +1492,14 @@ void EditAutoCloseBraceQuote(int ch) {
 	}
 
 	if (fillChar) {
-		SciCall_BeginUndoAction();
-		char tchIns[4] = { fillChar };
 		if (closeBrace) {
 			Sci_Position iBrace = SciCall_BraceMatch(iCurPos - 1, 0);
 			if (iBrace != -1) {
 				// check whether original close brace already matched
-				SciCall_DeleteBack();
-				iBrace = SciCall_BraceMatch(iBrace - 1, 0);
-				tchIns[0] = (char)ch;
-				if (iBrace != -1) {
-					// already matched, so add close brace
-					tchIns[1] = fillChar;
+				iBrace = SciCall_BraceMatch(iBrace, iCurPos - 1);
+				if (iBrace == -1) {
+					// not matched, so no need to add extra close brace
+					return;
 				}
 			}
 		}
@@ -1511,6 +1507,8 @@ void EditAutoCloseBraceQuote(int ch) {
 		//else if (ch == fillChar) {
 		//}
 
+		const char tchIns[4] = { fillChar };
+		SciCall_BeginUndoAction();
 		SciCall_ReplaceSel(tchIns);
 		const Sci_Position iCurrentPos = (ch == ',') ? iCurPos + 1 : iCurPos;
 		SciCall_SetSel(iCurrentPos, iCurrentPos);
