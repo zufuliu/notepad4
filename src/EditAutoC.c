@@ -1493,11 +1493,12 @@ void EditAutoCloseBraceQuote(int ch) {
 
 	if (fillChar) {
 		if (closeBrace) {
-			Sci_Position iBrace = SciCall_BraceMatch(iCurPos - 1, 0);
-			if (iBrace != -1) {
+			// find next close brace
+			Sci_Position iPos = SciCall_BraceMatch(iCurPos - 1, 0);
+			if (iPos != -1) {
 				// check whether original close brace already matched
-				iBrace = SciCall_BraceMatch(iBrace, iCurPos - 1);
-				if (iBrace == -1) {
+				iPos = SciCall_BraceMatch(iPos, iCurPos - 1);
+				if (iPos == -1) {
 					// not matched, so no need to add extra close brace
 					return;
 				}
