@@ -5025,7 +5025,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 				offset = braces - text + 1;
 				const char brace = *braces;
 				if (brace == ch) {
-					*braces = L'\0'; // delete open and close brace
+					*braces = L'\0'; // delete open and close braces
 					offset += iPos - iCurPos;
 				} else {
 					const int chNext = (brace == '(') ? ')' : brace + 2;
@@ -5050,12 +5050,12 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 				// find next close brace
 				Sci_Position iPos = SciCall_BraceMatch(iNewPos - 1, iNewPos);
 				if (iPos != -1) {
-					// check whether original close brace already matched
+					// check whether next close brace already matched
 					iPos = SciCall_BraceMatch(iPos, iNewPos - 1);
-				}
-				// delete close brace: open brace already matched next close brace
-				if (iPos == -1) {
-					SciCall_Clear();
+					if (iPos == -1) {
+						// delete close brace: open brace and next close brace already matched
+						SciCall_Clear();
+					}
 				}
 			}
 			SciCall_EndUndoAction();

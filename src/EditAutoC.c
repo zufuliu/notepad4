@@ -1496,10 +1496,10 @@ void EditAutoCloseBraceQuote(int ch) {
 			// find next close brace
 			Sci_Position iPos = SciCall_BraceMatch(iCurPos - 1, 0);
 			if (iPos != -1) {
-				// check whether original close brace already matched
+				// check whether next close brace already matched
 				iPos = SciCall_BraceMatch(iPos, iCurPos - 1);
 				if (iPos == -1) {
-					// not matched, so no need to add extra close brace
+					// open brace and next close brace already matched
 					return;
 				}
 			}
