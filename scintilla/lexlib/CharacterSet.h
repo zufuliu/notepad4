@@ -11,7 +11,7 @@ namespace Scintilla {
 class CharacterSet {
 	bool valueAfter;
 	// ASCII character only, not useful for UTF-8 or DBCS multi byte character
-	bool bset[128];
+	bool bset[128]{};
 public:
 	enum setBase {
 		setNone = 0,

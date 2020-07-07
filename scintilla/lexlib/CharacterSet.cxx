@@ -9,6 +9,8 @@
 #include <cstdlib>
 #include <cassert>
 
+#include <algorithm>
+
 #include "CharacterSet.h"
 
 using namespace Scintilla;
@@ -16,16 +18,19 @@ using namespace Scintilla;
 namespace Scintilla {
 
 CharacterSet::CharacterSet(setBase base, const char *initialSet, bool valueAfter_) noexcept:
-	valueAfter(valueAfter_), bset{} {
+	valueAfter(valueAfter_) {
 	AddString(initialSet);
 	if (base & setLower) {
-		AddString("abcdefghijklmnopqrstuvwxyz");
+		//AddString("abcdefghijklmnopqrstuvwxyz");
+		std::fill_n(bset + 'a', 26, true);
 	}
 	if (base & setUpper) {
-		AddString("ABCDEFGHIJKLMNOPQRSTUVWXYZ");
+		//AddString("ABCDEFGHIJKLMNOPQRSTUVWXYZ");
+		std::fill_n(bset + 'A', 26, true);
 	}
 	if (base & setDigits) {
-		AddString("0123456789");
+		//AddString("0123456789");
+		std::fill_n(bset + '0', 10, true);
 	}
 }
 
