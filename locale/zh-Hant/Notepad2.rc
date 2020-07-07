@@ -406,8 +406,8 @@ BEGIN
 			MENUITEM "跳到代碼塊結束(&K)\tAlt+]",				IDM_EDIT_GOTO_BLOCK_END
 			MENUITEM "跳到上一個代碼塊(&P)\tAlt+逗號(<,)",		IDM_EDIT_GOTO_PREVIOUS_BLOCK
 			MENUITEM "跳到下一個代碼塊(&N)\tAlt+句號(>.)",		IDM_EDIT_GOTO_NEXT_BLOCK
-			MENUITEM "跳轉到上一個同級代碼塊(&R)\tCtrl+Alt+逗号(<,)",IDM_EDIT_GOTO_PREV_SIBLING_BLOCK
-			MENUITEM "跳轉到下一個同級代碼塊(&E)\tCtrl+Alt+句号(>.)",IDM_EDIT_GOTO_NEXT_SIBLING_BLOCK
+			MENUITEM "跳轉到上一個同等級代碼塊(&R)\tCtrl+Alt+逗号(<,)",IDM_EDIT_GOTO_PREV_SIBLING_BLOCK
+			MENUITEM "跳轉到下一個同等級代碼塊(&E)\tCtrl+Alt+句号(>.)",IDM_EDIT_GOTO_NEXT_SIBLING_BLOCK
 			MENUITEM SEPARATOR
 			MENUITEM "跳到選區開始(&S)\tCtrl+Shift+逗號(<,)",	CMD_JUMP2SELSTART
 			MENUITEM "跳到選區結束(&T)\tCtrl+Shift+句號(>.)",	CMD_JUMP2SELEND
