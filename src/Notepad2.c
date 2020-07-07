@@ -5030,7 +5030,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 				} else {
 					const int chNext = (brace == '(') ? ')' : brace + 2;
 					if (ch == chNext) {
-						if (SciCall_BraceMatch(iPos, 0) == -1) {
+						if (SciCall_BraceMatch(iPos, iCurPos) == -1) {
 							*(braces + 1) = L'\0'; // delete close brace
 						}
 					} else {

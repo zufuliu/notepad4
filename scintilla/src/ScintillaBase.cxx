@@ -1122,7 +1122,12 @@ sptr_t ScintillaBase::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lPara
 			pdoc->ModifiedAt(wParam);
 			NotifyStyleToNeeded((lParam == -1) ? pdoc->Length() : lParam);
 		} else {
-			DocumentLexState()->Colourise(wParam, lParam);
+			if (lParam == -1) {
+				// from Editor::FoldAll()
+				pdoc->EnsureStyledTo(pdoc->Length());
+			} else {
+				DocumentLexState()->Colourise(wParam, lParam);
+			}
 		}
 		Redraw();
 		break;
