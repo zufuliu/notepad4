@@ -2612,6 +2612,7 @@ Sci::Position Document::BraceMatch(Sci::Position position, Sci::Position maxReSt
 	if (chBrace == '(' || chBrace == '[' || chBrace == '{' || chBrace == '<')
 		direction = 1;
 	int depth = 1;
+	// see https://sourceforge.net/p/scintilla/feature-requests/1368/
 	position = NextPosition(maxReStyle ? maxReStyle : position, direction);
 	while ((position >= 0) && (position < Length())) {
 		const char chAtPos = CharAt(position);
