@@ -8,6 +8,13 @@
 
 namespace Scintilla {
 
+template <typename T>
+constexpr bool IsControlCharacter(T ch) noexcept {
+	// iscntrl() returns true for lots of characters > 127 which are displayable,
+	// currently only check C0 control characters.
+	return ch < 32 || ch == 127;
+}
+
 struct PrintParameters {
 	/// 2018-09-04 Changed to a percent value
 	int magnification;
