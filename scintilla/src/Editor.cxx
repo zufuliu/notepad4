@@ -218,6 +218,7 @@ void Editor::SetRepresentations() {
 		const char c[2] = { static_cast<char>(j), 0 };
 		reprs.SetRepresentation(c, reps[j]);
 	}
+	reprs.SetRepresentation("\x7f", "DEL");
 
 	// C1 control set
 	// As well as Unicode mode, ISO-8859-1 should use these

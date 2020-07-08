@@ -59,12 +59,6 @@
 
 using namespace Scintilla;
 
-static constexpr bool IsControlCharacter(unsigned char ch) noexcept {
-	// iscntrl returns true for lots of characters > 127 which are displayable
-	// currently only check C0 control characters in [00 .. 1F]
-	return ch < ' ';
-}
-
 PrintParameters::PrintParameters() noexcept {
 	magnification = 100;
 	colourMode = SC_PRINT_NORMAL;
@@ -1746,7 +1740,7 @@ void EditView::DrawCarets(Surface *surface, const EditModel &model, const ViewSt
 				} else if (caretShape == ViewStyle::CaretShape::block) {
 					/* Block caret */
 					rcCaret.left = xposCaret;
-					if (canDrawBlockCaret && !IsControlCharacter(ll->chars[offset])) {
+					if (canDrawBlockCaret && !IsControlCharacter(static_cast<uint8_t>(ll->chars[offset]))) {
 						drawBlockCaret = true;
 						rcCaret.right = xposCaret + widthOverstrikeCaret;
 					} else {
