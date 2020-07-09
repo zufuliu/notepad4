@@ -1407,14 +1407,23 @@ static BOOL CanAutoCloseSingleQuote(int chPrev, int iCurrentStyle) {
 }
 
 BOOL EditIsOpenBraceMatched(Sci_Position pos, Sci_Position startPos) {
+	// SciCall_GetEndStyled() is SciCall_GetCurrentPos() - 1
+#if 0
 	// style current line, ensure brace matching on current line matched with style
 	const Sci_Line iLine = SciCall_LineFromPosition(pos);
 	SciCall_EnsureStyledTo(SciCall_PositionFromLine(iLine + 1));
+#else
+	// only find close brace with same style in next 1KiB text
+	const Sci_Position iDocLen = SciCall_GetLength();
+	SciCall_EnsureStyledTo(min_pos(iDocLen, pos + 1024));
+#endif
 	// find next close brace
 	const Sci_Position iPos = SciCall_BraceMatch(pos, startPos);
 	if (iPos != -1) {
 		// style may not matched when iPos > SciCall_GetEndStyled() (e.g. iPos on next line), see Document::BraceMatch()
+#if 0
 		SciCall_EnsureStyledTo(iPos + 1);
+#endif
 		// TODO: retry when style not matched
 		if (SciCall_GetStyleAt(pos) == SciCall_GetStyleAt(iPos)) {
 			// check whether next close brace already matched
