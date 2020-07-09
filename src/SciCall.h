@@ -1333,6 +1333,10 @@ NP2_inline void SciCall_ColouriseAll(void) {
 	SciCall_Colourise(0, -1);
 }
 
+NP2_inline void SciCall_EnsureStyledTo(Sci_Position end) {
+	SciCall_Colourise(0, end);
+}
+
 NP2_inline void SciCall_SetProperty(const char *key, const char *value) {
 	SciCall(SCI_SETPROPERTY, (WPARAM)key, (LPARAM)value);
 }

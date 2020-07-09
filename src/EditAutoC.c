@@ -1406,6 +1406,24 @@ static BOOL CanAutoCloseSingleQuote(int chPrev, int iCurrentStyle) {
 	return TRUE;
 }
 
+BOOL EditIsOpenBraceMatched(Sci_Position pos, Sci_Position startPos) {
+	// style current line, ensure brace matching on current line matched with style
+	const Sci_Line iLine = SciCall_LineFromPosition(pos);
+	SciCall_EnsureStyledTo(SciCall_PositionFromLine(iLine + 1));
+	// find next close brace
+	const Sci_Position iPos = SciCall_BraceMatch(pos, startPos);
+	if (iPos != -1) {
+		// style may not matched when iPos > SciCall_GetEndStyled() (e.g. iPos on next line), see Document::BraceMatch()
+		SciCall_EnsureStyledTo(iPos + 1);
+		// TODO: retry when style not matched
+		if (SciCall_GetStyleAt(pos) == SciCall_GetStyleAt(iPos)) {
+			// check whether next close brace already matched
+			return pos == 0 || SciCall_BraceMatch(iPos, pos) == -1;
+		}
+	}
+	return FALSE;
+}
+
 void EditAutoCloseBraceQuote(int ch) {
 	const Sci_Position iCurPos = SciCall_GetCurrentPos();
 	const int chPrev = SciCall_GetCharAt(iCurPos - 2);
@@ -1492,17 +1510,8 @@ void EditAutoCloseBraceQuote(int ch) {
 	}
 
 	if (fillChar) {
-		if (closeBrace) {
-			// find next close brace
-			Sci_Position iPos = SciCall_BraceMatch(iCurPos - 1, 0);
-			if (iPos != -1) {
-				// check whether next close brace already matched
-				iPos = SciCall_BraceMatch(iPos, iCurPos - 1);
-				if (iPos == -1) {
-					// open brace and next close brace already matched
-					return;
-				}
-			}
+		if (closeBrace && EditIsOpenBraceMatched(iCurPos - 1, 0)) {
+			return;
 		}
 		// TODO: auto escape quotes inside string
 		//else if (ch == fillChar) {
@@ -1514,6 +1523,10 @@ void EditAutoCloseBraceQuote(int ch) {
 		const Sci_Position iCurrentPos = (ch == ',') ? iCurPos + 1 : iCurPos;
 		SciCall_SetSel(iCurrentPos, iCurrentPos);
 		SciCall_EndUndoAction();
+		if (closeBrace) {
+			// fix brace matching
+			SciCall_EnsureStyledTo(iCurPos + 1);
+		}
 	}
 }
 

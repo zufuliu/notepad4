@@ -5046,17 +5046,8 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			SciCall_SetSel(scn->position, iCurPos);
 			SciCall_ReplaceSel(text);
 			SciCall_SetSel(iNewPos, iNewPos);
-			if (closeBrace) {
-				// find next close brace
-				Sci_Position iPos = SciCall_BraceMatch(iNewPos - 1, iNewPos);
-				if (iPos != -1) {
-					// check whether next close brace already matched
-					iPos = SciCall_BraceMatch(iPos, iNewPos - 1);
-					if (iPos == -1) {
-						// delete close brace: open brace and next close brace already matched
-						SciCall_Clear();
-					}
-				}
+			if (closeBrace && EditIsOpenBraceMatched(iNewPos - 1, iNewPos)) {
+				SciCall_Clear(); // delete close brace
 			}
 			SciCall_EndUndoAction();
 			SciCall_AutoCCancel();
