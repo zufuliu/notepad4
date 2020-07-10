@@ -20,20 +20,42 @@ using namespace Scintilla;
 
 namespace {
 
+constexpr bool IsVimEscapeChar(int ch) noexcept {
+	return ch == '\\'
+		|| ch == '\"'
+		|| ch == 'b'
+		|| ch == 'e'
+		|| ch == 'f'
+		|| ch == 'n'
+		|| ch == 'r'
+		|| ch == 't';
+}
+
 struct EscapeSequence {
 	int digitsLeft = 0;
+	int numBase = 16;
 
 	bool resetEscapeState(int chNext) noexcept {
 		// https://vimhelp.org/eval.txt.html#string
-		if (chNext > 0x7F || strchr("xXuUbefnrt\\\"", chNext) == nullptr) {
-			return false;
+		digitsLeft = 0;
+		numBase = 16;
+		if (chNext == 'x' || chNext == 'X') {
+			digitsLeft = 3;
+		} else if (chNext == 'u') {
+			digitsLeft = 5;
+		} else if (chNext == 'U') {
+			digitsLeft = 9;
+		} else if (IsOctalDigit(chNext)) {
+			digitsLeft = 3;
+			numBase = 8;
+		} else if (IsVimEscapeChar(chNext)) {
+			digitsLeft = 1;
 		}
-		digitsLeft = (chNext == 'u') ? 5 : ((chNext == 'U') ? 9 : ((chNext == 'x' || chNext == 'X')? 3 : 1));
-		return true;
+		return digitsLeft != 0;
 	}
 	bool atEscapeEnd(int ch) noexcept {
 		--digitsLeft;
-		return digitsLeft <= 0 || !IsHexDigit(ch);
+		return digitsLeft <= 0 || !IsADigit(ch, numBase);
 	}
 };
 
