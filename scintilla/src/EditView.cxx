@@ -404,6 +404,12 @@ inline WrapBreak GetWrapBreakEx(unsigned int ch, bool isUtf8) noexcept {
 	return WrapBreak::Undefined;
 }
 
+constexpr bool IsControlCharacter(unsigned int ch) noexcept {
+	// iscntrl() returns true for lots of characters > 127 which are displayable,
+	// currently only check C0 control characters.
+	return ch < 32 || ch == 127;
+}
+
 }
 
 /**
@@ -1740,7 +1746,7 @@ void EditView::DrawCarets(Surface *surface, const EditModel &model, const ViewSt
 				} else if (caretShape == ViewStyle::CaretShape::block) {
 					/* Block caret */
 					rcCaret.left = xposCaret;
-					if (canDrawBlockCaret && !IsControlCharacter(static_cast<uint8_t>(ll->chars[offset]))) {
+					if (canDrawBlockCaret && !IsControlCharacter(ll->chars[offset])) {
 						drawBlockCaret = true;
 						rcCaret.right = xposCaret + widthOverstrikeCaret;
 					} else {
