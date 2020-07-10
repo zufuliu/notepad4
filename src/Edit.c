@@ -7546,7 +7546,6 @@ void FoldToggleCurrentBlock(FOLD_ACTION action) {
 }
 
 void FoldToggleCurrentLevel(FOLD_ACTION action) {
-	SciCall_ColouriseAll();
 	Sci_Line line = SciCall_LineFromPosition(SciCall_GetCurrentPos());
 	int level = SciCall_GetFoldLevel(line);
 
