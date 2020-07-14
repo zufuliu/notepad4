@@ -1418,7 +1418,7 @@ BOOL EditIsOpenBraceMatched(Sci_Position pos, Sci_Position startPos) {
 	SciCall_EnsureStyledTo(min_pos(iDocLen, pos + 1024));
 #endif
 	// find next close brace
-	const Sci_Position iPos = SciCall_BraceMatch(pos, startPos);
+	const Sci_Position iPos = SciCall_BraceMatchNext(pos, startPos);
 	if (iPos != -1) {
 		// style may not matched when iPos > SciCall_GetEndStyled() (e.g. iPos on next line), see Document::BraceMatch()
 #if 0
@@ -1427,7 +1427,7 @@ BOOL EditIsOpenBraceMatched(Sci_Position pos, Sci_Position startPos) {
 		// TODO: retry when style not matched
 		if (SciCall_GetStyleAt(pos) == SciCall_GetStyleAt(iPos)) {
 			// check whether next close brace already matched
-			return pos == 0 || SciCall_BraceMatch(iPos, pos) == -1;
+			return SciCall_BraceMatchNext(iPos, pos - 1) == -1;
 		}
 	}
 	return FALSE;
@@ -1519,7 +1519,7 @@ void EditAutoCloseBraceQuote(int ch) {
 	}
 
 	if (fillChar) {
-		if (closeBrace && EditIsOpenBraceMatched(iCurPos - 1, 0)) {
+		if (closeBrace && EditIsOpenBraceMatched(iCurPos - 1, iCurPos)) {
 			return;
 		}
 		// TODO: auto escape quotes inside string

@@ -7736,7 +7736,10 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 	case SCI_BRACEMATCH:
 		// wParam is position of char to find brace for,
 		// lParam is maximum amount of text to restyle to find it
-		return pdoc->BraceMatch(wParam, lParam);
+		return pdoc->BraceMatch(wParam, lParam, 0, false);
+
+	case SCI_BRACEMATCHNEXT:
+		return pdoc->BraceMatch(wParam, 0, lParam, true);
 
 	case SCI_GETVIEWEOL:
 		return vs.viewEOL;

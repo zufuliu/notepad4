@@ -2602,7 +2602,7 @@ static constexpr char BraceOpposite(char ch) noexcept {
 }
 
 // TODO: should be able to extend styled region to find matching brace
-Sci::Position Document::BraceMatch(Sci::Position position, Sci::Position maxReStyle) const noexcept {
+Sci::Position Document::BraceMatch(Sci::Position position, Sci::Position /*maxReStyle*/, Sci::Position startPos, bool useStartPos) const noexcept {
 	const char chBrace = CharAt(position);
 	const char chSeek = BraceOpposite(chBrace);
 	if (chSeek == '\0')
@@ -2612,8 +2612,7 @@ Sci::Position Document::BraceMatch(Sci::Position position, Sci::Position maxReSt
 	if (chBrace == '(' || chBrace == '[' || chBrace == '{' || chBrace == '<')
 		direction = 1;
 	int depth = 1;
-	// see https://sourceforge.net/p/scintilla/feature-requests/1368/
-	position = NextPosition(maxReStyle ? maxReStyle : position, direction);
+	position = useStartPos ? startPos : NextPosition(position, direction);
 	while ((position >= 0) && (position < Length())) {
 		const char chAtPos = CharAt(position);
 		const int styAtPos = StyleIndexAt(position);
