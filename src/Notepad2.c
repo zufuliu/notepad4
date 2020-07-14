@@ -3686,12 +3686,12 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		Sci_Position iPos = SciCall_GetCurrentPos();
 		int ch = SciCall_GetCharAt(iPos);
 		if (IsBraceMatchChar(ch)) {
-			iBrace2 = SciCall_BraceMatch(iPos, 0);
+			iBrace2 = SciCall_BraceMatch(iPos);
 		} else { // Try one before
 			iPos = SciCall_PositionBefore(iPos);
 			ch = SciCall_GetCharAt(iPos);
 			if (IsBraceMatchChar(ch)) {
-				iBrace2 = SciCall_BraceMatch(iPos, 0);
+				iBrace2 = SciCall_BraceMatch(iPos);
 			}
 		}
 		if (iBrace2 != -1) {
@@ -3705,12 +3705,12 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		Sci_Position iPos = SciCall_GetCurrentPos();
 		int ch = SciCall_GetCharAt(iPos);
 		if (IsBraceMatchChar(ch)) {
-			iBrace2 = SciCall_BraceMatch(iPos, 0);
+			iBrace2 = SciCall_BraceMatch(iPos);
 		} else { // Try one before
 			iPos = SciCall_PositionBefore(iPos);
 			ch = SciCall_GetCharAt(iPos);
 			if (IsBraceMatchChar(ch)) {
-				iBrace2 = SciCall_BraceMatch(iPos, 0);
+				iBrace2 = SciCall_BraceMatch(iPos);
 			}
 		}
 		if (iBrace2 != -1) {
@@ -4931,7 +4931,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 					Sci_Position iPos = SciCall_GetCurrentPos();
 					int ch = SciCall_GetCharAt(iPos);
 					if (IsBraceMatchChar(ch)) {
-						const Sci_Position iBrace2 = SciCall_BraceMatch(iPos, 0);
+						const Sci_Position iBrace2 = SciCall_BraceMatch(iPos);
 						if (iBrace2 != -1) {
 							const Sci_Position col1 = SciCall_GetColumn(iPos);
 							const Sci_Position col2 = SciCall_GetColumn(iBrace2);
@@ -4945,7 +4945,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 						iPos = SciCall_PositionBefore(iPos);
 						ch = SciCall_GetCharAt(iPos);
 						if (IsBraceMatchChar(ch)) {
-							const Sci_Position iBrace2 = SciCall_BraceMatch(iPos, 0);
+							const Sci_Position iBrace2 = SciCall_BraceMatch(iPos);
 							if (iBrace2 != -1) {
 								const Sci_Position col1 = SciCall_GetColumn(iPos);
 								const Sci_Position col2 = SciCall_GetColumn(iBrace2);
@@ -5030,7 +5030,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 				} else {
 					const int chNext = (brace == '(') ? ')' : brace + 2;
 					if (ch == chNext) {
-						if (SciCall_BraceMatch(iPos, iCurPos) == -1) {
+						if (SciCall_BraceMatchNext(iPos, iCurPos - 1) == -1) {
 							*(braces + 1) = L'\0'; // delete close brace
 						}
 					} else {
@@ -5046,7 +5046,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			SciCall_SetSel(scn->position, iCurPos);
 			SciCall_ReplaceSel(text);
 			SciCall_SetSel(iNewPos, iNewPos);
-			if (closeBrace && EditIsOpenBraceMatched(iNewPos - 1, iNewPos)) {
+			if (closeBrace && EditIsOpenBraceMatched(iNewPos - 1, iNewPos + 1)) {
 				SciCall_Clear(); // delete close brace
 			}
 			SciCall_EndUndoAction();
