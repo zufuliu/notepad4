@@ -1427,7 +1427,7 @@ BOOL EditIsOpenBraceMatched(Sci_Position pos, Sci_Position startPos) {
 		// TODO: retry when style not matched
 		if (SciCall_GetStyleAt(pos) == SciCall_GetStyleAt(iPos)) {
 			// check whether next close brace already matched
-			return SciCall_BraceMatchNext(iPos, pos - 1) == -1;
+			return pos == 0 || SciCall_BraceMatchNext(iPos, SciCall_PositionBefore(pos)) == -1;
 		}
 	}
 	return FALSE;
