@@ -174,6 +174,7 @@ void ColouriseGoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 	int kwType = SCE_GO_DEFAULT;
 
 	int visibleChars = 0;
+	int visibleCharsBefore = 0;
 	EscapeSequence escSeq;
 
 	StyleContext sc(startPos, lengthDoc, initStyle, styler);
@@ -280,7 +281,7 @@ void ColouriseGoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 		case SCE_GO_COMMENTLINE:
 			if (sc.atLineStart) {
 				sc.SetState(SCE_GO_DEFAULT);
-			} else if (visibleChars == 2) {
+			} else if (visibleChars - visibleCharsBefore == 2) {
 				if (IsUpperCase(sc.ch)) {
 					if (IsUpperCase(sc.chNext)) {
 						escSeq.outerState = sc.state;
@@ -367,6 +368,7 @@ void ColouriseGoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 				if (visibleChars == 0) {
 					lineStateLineComment = GoLineStateMaskLineComment;
 				}
+				visibleCharsBefore = visibleChars;
 			} else if (sc.Match('/', '*')) {
 				sc.SetState(SCE_GO_COMMENTBLOCK);
 				sc.Forward();
