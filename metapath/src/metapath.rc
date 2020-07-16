@@ -22,7 +22,7 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// English (U.S.) resources
+// (United States) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
@@ -690,6 +690,7 @@ BEGIN
 	IDS_LANG_CHINESE_TRADITIONAL	"繁體中文"
 	IDS_LANG_JAPANESE				"日本語"
 	IDS_LANG_GERMAN					"Deutsch"
+	IDS_LANG_ITALIAN				"Italy"
 END
 #endif
 
@@ -717,7 +718,7 @@ END
 
 #endif    // APSTUDIO_INVOKED
 
-#endif    // English (U.S.) resources
+#endif    // (United States) resources
 /////////////////////////////////////////////////////////////////////////////
 
 

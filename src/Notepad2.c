@@ -2165,6 +2165,9 @@ void ValidateUILangauge(void) {
 	case LANG_GERMAN:
 		languageMenu = IDM_LANG_GERMAN;
 		break;
+	case LANG_ITALIAN:
+		languageMenu = IDM_LANG_ITALIAN;
+		break;
 	case LANG_JAPANESE:
 		languageMenu = IDM_LANG_JAPANESE;
 		break;
@@ -2193,6 +2196,9 @@ void SetUILanguage(int menu) {
 		break;
 	case LANG_GERMAN:
 		lang = MAKELANGID(LANG_GERMAN, SUBLANG_GERMAN);
+		break;
+	case IDM_LANG_ITALIAN:
+		lang = MAKELANGID(LANG_ITALIAN, SUBLANG_ITALIAN);
 		break;
 	case IDM_LANG_JAPANESE:
 		lang = MAKELANGID(LANG_JAPANESE, SUBLANG_DEFAULT);
