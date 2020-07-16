@@ -66,7 +66,7 @@ class OptionSet {
 			}
 			return false;
 		}
-		const char *Get() const {
+		const char *Get() const noexcept {
 			return value.c_str();
 		}
 	};
@@ -81,7 +81,6 @@ class OptionSet {
 		names += name;
 	}
 public:
-	virtual ~OptionSet() noexcept = default;
 	void DefineProperty(const char *name, plcob pb, const char *description = "") {
 		nameToDef[name] = Option(pb, description);
 		AppendName(name);

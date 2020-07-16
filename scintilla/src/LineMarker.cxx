@@ -109,9 +109,9 @@ static void DrawMinus(Surface *surface, int centreX, int centreY, int armSize, C
 	surface->FillRectangle(rcH, fore);
 }
 
-void LineMarker::Draw(Surface *surface, PRectangle rcWhole, const Font &fontForCharacter, typeOfFold tFold, int marginStyle) const {
+void LineMarker::Draw(Surface *surface, PRectangle rcWhole, const Font &fontForCharacter, FoldPart part, int marginStyle) const {
 	if (customDraw) {
-		customDraw(surface, rcWhole, fontForCharacter, tFold, marginStyle, this);
+		customDraw(surface, rcWhole, fontForCharacter, static_cast<int>(part), marginStyle, this);
 		return;
 	}
 
@@ -119,22 +119,22 @@ void LineMarker::Draw(Surface *surface, PRectangle rcWhole, const Font &fontForC
 	ColourDesired colourBody = back;
 	ColourDesired colourTail = back;
 
-	switch (tFold) {
-	case LineMarker::head:
-	case LineMarker::headWithTail:
+	switch (part) {
+	case FoldPart::head:
+	case FoldPart::headWithTail:
 		colourHead = backSelected;
 		colourTail = backSelected;
 		break;
-	case LineMarker::body:
+	case FoldPart::body:
 		colourHead = backSelected;
 		colourBody = backSelected;
 		break;
-	case LineMarker::tail:
+	case FoldPart::tail:
 		colourBody = backSelected;
 		colourTail = backSelected;
 		break;
 	default:
-		// LineMarker::undefined
+		// FoldPart::undefined
 		break;
 	}
 
@@ -315,7 +315,7 @@ void LineMarker::Draw(Surface *surface, PRectangle rcWhole, const Font &fontForC
 	break;
 
 	case SC_MARK_BOXPLUSCONNECTED: {
-		if (tFold == LineMarker::headWithTail)
+		if (part == FoldPart::headWithTail)
 			surface->PenColour(colourTail);
 		else
 			surface->PenColour(colourBody);
@@ -329,7 +329,7 @@ void LineMarker::Draw(Surface *surface, PRectangle rcWhole, const Font &fontForC
 		DrawBox(surface, centreX, centreY, blobSize, fore, colourHead);
 		DrawPlus(surface, centreX, centreY, blobSize, colourTail);
 
-		if (tFold == LineMarker::body) {
+		if (part == FoldPart::body) {
 			surface->PenColour(colourTail);
 			surface->MoveTo(centreX + 1, centreY + blobSize);
 			surface->LineTo(centreX + blobSize + 1, centreY + blobSize);
@@ -365,7 +365,7 @@ void LineMarker::Draw(Surface *surface, PRectangle rcWhole, const Font &fontForC
 		surface->MoveTo(centreX, ircWhole.top);
 		surface->LineTo(centreX, centreY - blobSize);
 
-		if (tFold == LineMarker::body) {
+		if (part == FoldPart::body) {
 			surface->PenColour(colourTail);
 			surface->MoveTo(centreX + 1, centreY + blobSize);
 			surface->LineTo(centreX + blobSize + 1, centreY + blobSize);
@@ -386,7 +386,7 @@ void LineMarker::Draw(Surface *surface, PRectangle rcWhole, const Font &fontForC
 	break;
 
 	case SC_MARK_CIRCLEPLUSCONNECTED: {
-		if (tFold == LineMarker::headWithTail)
+		if (part == FoldPart::headWithTail)
 			surface->PenColour(colourTail);
 		else
 			surface->PenColour(colourBody);

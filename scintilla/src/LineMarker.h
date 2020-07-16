@@ -11,13 +11,13 @@ namespace Scintilla {
 class XPM;
 class RGBAImage;
 
-typedef void (*DrawLineMarkerFn)(Surface *surface, PRectangle rcWhole, const Font &fontForCharacter, int tFold, int marginStyle, const void *lineMarker);
+typedef void (*DrawLineMarkerFn)(Surface *surface, PRectangle rcWhole, const Font &fontForCharacter, int part, int marginStyle, const void *lineMarker);
 
 /**
  */
 class LineMarker {
 public:
-	enum typeOfFold {
+	enum class FoldPart {
 		undefined, head, body, tail, headWithTail
 	};
 
@@ -44,7 +44,7 @@ public:
 	void SetXPM(const char *textForm);
 	void SetXPM(const char *const *linesForm);
 	void SCICALL SetRGBAImage(Point sizeRGBAImage, float scale, const unsigned char *pixelsRGBAImage);
-	void SCICALL Draw(Surface *surface, PRectangle rcWhole, const Font &fontForCharacter, typeOfFold tFold, int marginStyle) const;
+	void SCICALL Draw(Surface *surface, PRectangle rcWhole, const Font &fontForCharacter, FoldPart part, int marginStyle) const;
 };
 
 }

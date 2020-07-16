@@ -1108,11 +1108,11 @@ int Document::SafeSegment(const char *text, int length, int lengthSegment) const
 
 EncodingFamily Document::CodePageFamily() const noexcept {
 	if (SC_CP_UTF8 == dbcsCodePage)
-		return efUnicode;
+		return EncodingFamily::efUnicode;
 	else if (dbcsCodePage)
-		return efDBCS;
+		return EncodingFamily::efDBCS;
 	else
-		return efEightBit;
+		return EncodingFamily::efEightBit;
 }
 
 void Document::ModifiedAt(Sci::Position pos) noexcept {
@@ -2343,7 +2343,7 @@ StyledText Document::EOLAnnotationStyledText(Sci::Line line) const noexcept {
 void Document::EOLAnnotationSetText(Sci::Line line, const char *text) {
 	if (line >= 0 && line < LinesTotal()) {
 		EOLAnnotations()->SetText(line, text);
-		DocModification mh(SC_MOD_CHANGEEOLANNOTATION, LineStart(line),
+		const DocModification mh(SC_MOD_CHANGEEOLANNOTATION, LineStart(line),
 			0, 0, nullptr, line);
 		NotifyModified(mh);
 	}
