@@ -16,7 +16,7 @@ class LineLevels;
 class LineState;
 class LineAnnotation;
 
-enum EncodingFamily {
+enum class EncodingFamily {
 	efEightBit, efUnicode, efDBCS
 };
 

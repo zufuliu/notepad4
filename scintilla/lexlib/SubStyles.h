@@ -195,7 +195,7 @@ public:
 			classifier.Clear();
 	}
 
-	const WordClassifier &Classifier(int baseStyle) const {
+	const WordClassifier &Classifier(int baseStyle) const noexcept {
 		const int block = BlockFromBaseStyle(baseStyle);
 		return classifiers[block >= 0 ? block : 0];
 	}

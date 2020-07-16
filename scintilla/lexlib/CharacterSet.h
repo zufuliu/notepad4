@@ -26,7 +26,6 @@ public:
 	CharacterSet(CharacterSet &&other) = delete;
 	CharacterSet &operator=(const CharacterSet &other) = delete;
 	CharacterSet &operator=(CharacterSet &&other) = delete;
-	~CharacterSet() = default;
 	void Add(int val) noexcept {
 		assert(val >= 0);
 		assert(val < 128);
