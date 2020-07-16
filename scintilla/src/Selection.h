@@ -176,6 +176,7 @@ public:
 	int InSelectionForEOL(Sci::Position pos) const noexcept;
 	Sci::Position VirtualSpaceFor(Sci::Position pos) const noexcept;
 	void Clear();
+	void Reset() noexcept;
 	void RemoveDuplicates();
 	void RotateMain() noexcept;
 	bool Tentative() const noexcept {
