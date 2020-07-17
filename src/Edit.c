@@ -4334,33 +4334,17 @@ void EditJumpTo(Sci_Line iNewLine, Sci_Position iNewCol) {
 	const Sci_Line iMaxLine = SciCall_GetLineCount();
 
 	// Jumpt to end with line set to -1
-	if (iNewLine < 0) {
+	if (iNewLine < 0 || iNewLine >= iMaxLine) {
 		SciCall_DocumentEnd();
 		return;
 	}
 
-	// Line maximum is iMaxLine
-	iNewLine = min_pos(iNewLine, iMaxLine);
-
-	// Column minimum is 1
-	iNewCol = max_pos(iNewCol, 1);
-
-	if (iNewLine > 0 && iNewLine <= iMaxLine && iNewCol > 0) {
-		Sci_Position iNewPos = SciCall_PositionFromLine(iNewLine - 1);
-		const Sci_Position iLineEndPos = SciCall_GetLineEndPosition(iNewLine - 1);
-
-		while (iNewCol - 1 > SciCall_GetColumn(iNewPos)) {
-			if (iNewPos >= iLineEndPos) {
-				break;
-			}
-
-			iNewPos = SciCall_PositionAfter(iNewPos);
-		}
-
-		iNewPos = min_pos(iNewPos, iLineEndPos);
-		EditSelectEx(-1, iNewPos); // SciCall_GotoPos(pos) is equivalent to SciCall_SetSel(-1, pos)
-		SciCall_ChooseCaretX();
-	}
+	const Sci_Position iLineEndPos = SciCall_GetLineEndPosition(iNewLine - 1);
+	iNewCol = min_pos(iNewCol, iLineEndPos);
+	const Sci_Position iNewPos = SciCall_FindColumn(iNewLine - 1, iNewCol - 1);
+	// SciCall_GotoPos(pos) is equivalent to SciCall_SetSel(-1, pos)
+	EditSelectEx(-1, iNewPos);
+	SciCall_ChooseCaretX();
 }
 
 //=============================================================================
@@ -4371,10 +4355,13 @@ void EditSelectEx(Sci_Position iAnchorPos, Sci_Position iCurrentPos) {
 	const Sci_Line iNewLine = SciCall_LineFromPosition(iCurrentPos);
 	const Sci_Line iAnchorLine = SciCall_LineFromPosition(iAnchorPos);
 
-	// Ensure that the first and last lines of a selection are always unfolded
-	// This needs to be done *before* the SciCall_SetSel() message
-	SciCall_EnsureVisible(iAnchorLine);
-	if (iAnchorLine != iNewLine) {
+	if (iAnchorLine == iNewLine) {
+		// TODO: center current line on screen when it's not visible
+		SciCall_EnsureVisible(iAnchorLine);
+	} else {
+		// Ensure that the first and last lines of a selection are always unfolded
+		// This needs to be done *before* the SciCall_SetSel() message
+		SciCall_EnsureVisible(iAnchorLine);
 		SciCall_EnsureVisible(iNewLine);
 	}
 
@@ -5900,18 +5887,7 @@ static INT_PTR CALLBACK EditLineNumDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, 
 				} else {
 					PostMessage(hwnd, WM_NEXTDLGCTL, (WPARAM)(GetDlgItem(hwnd, IDC_COLNUM)), 1);
 				}
-			} else if (iNewLine > 0 && iNewLine <= iMaxLine && iNewCol > 0) {
-				//Sci_Position iNewPos = SciCall_PositionFromLine(iNewLine - 1);
-				//const Sci_Position iLineEndPos = SciCall_GetLineEndPosition(iNewLine - 1);
-				//while (iNewCol-1 > SciCall_GetColumn(iNewPos)) {
-				//	if (iNewPos >= iLineEndPos) {
-				//		break;
-				//	}
-				//	iNewPos = SciCall_PositionAfter(iNewPos);
-				//}
-				//iNewPos = min_pos(iNewPos, iLineEndPos);
-				//SciCall_GotoPos(iNewPos);
-				//SciCall_ChooseCaretX();
+			} else if (iNewLine > 0 && iNewLine <= iMaxLine) {
 				EditJumpTo(iNewLine, iNewCol);
 				EndDialog(hwnd, IDOK);
 			} else {
