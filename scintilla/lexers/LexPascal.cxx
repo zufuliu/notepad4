@@ -265,7 +265,7 @@ static void SetFoldInPreprocessorLevelFlag(int &lineFoldStateCurrent, unsigned i
 }
 
 static void ClassifyPascalPreprocessorFoldPoint(int &levelCurrent, int &lineFoldStateCurrent,
-	Sci_PositionU startPos, Accessor &styler) {
+	Sci_PositionU startPos, Accessor &styler) noexcept {
 	const CharacterSet setWord(CharacterSet::setAlpha);
 
 	char s[16];	// Size of the longest possible keyword + one additional character + null
@@ -299,7 +299,7 @@ static void ClassifyPascalPreprocessorFoldPoint(int &levelCurrent, int &lineFold
 
 static void ClassifyPascalWordFoldPoint(int &levelCurrent, int &lineFoldStateCurrent,
 	Sci_Position startPos, Sci_PositionU endPos,
-	Sci_PositionU lastStart, Sci_PositionU currentPos, Accessor &styler) {
+	Sci_PositionU lastStart, Sci_PositionU currentPos, Accessor &styler) noexcept {
 	char s[128];
 	const CharacterSet setWordStart(CharacterSet::setAlpha, "_");
 	const CharacterSet setWord(CharacterSet::setAlphaNum, "_");
