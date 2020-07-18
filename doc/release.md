@@ -23,3 +23,18 @@ Latest development builds (artifacts in Release configuration for each compiler 
 | [Win32_v4.20.?.zip](https://www.virustotal.com/gui/url/?/detection) | ? |
 | [x64_v4.20.?.zip](https://www.virustotal.com/gui/url/?/detection) | ? |
 | 한국어 | https://teus.me/category/IT/Notepad2 |
+| ja | 日本語 |
+| [ARM64_v4.20.?.zip](https://www.virustotal.com/gui/url/?/detection) | ? |
+| [AVX2_v4.20.?.zip](https://www.virustotal.com/gui/url/?/detection) | ? |
+| [Win32_v4.20.?.zip](https://www.virustotal.com/gui/url/?/detection) | ? |
+| [x64_v4.20.?.zip](https://www.virustotal.com/gui/url/?/detection) | ? |
+| zh-Hans | 中文 (简体) |
+| [ARM64_v4.20.?.zip](https://www.virustotal.com/gui/url/?/detection) | ? |
+| [AVX2_v4.20.?.zip](https://www.virustotal.com/gui/url/?/detection) | ? |
+| [Win32_v4.20.?.zip](https://www.virustotal.com/gui/url/?/detection) | ? |
+| [x64_v4.20.?.zip](https://www.virustotal.com/gui/url/?/detection) | ? |
+| zh-Hant | 中文 (繁體) |
+| [ARM64_v4.20.?.zip](https://www.virustotal.com/gui/url/?/detection) | ? |
+| [AVX2_v4.20.?.zip](https://www.virustotal.com/gui/url/?/detection) | ? |
+| [Win32_v4.20.?.zip](https://www.virustotal.com/gui/url/?/detection) | ? |
+| [x64_v4.20.?.zip](https://www.virustotal.com/gui/url/?/detection) | ? |
