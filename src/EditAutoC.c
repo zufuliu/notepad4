@@ -12,7 +12,7 @@
 #include "Edit.h"
 #include "Styles.h"
 #include "resource.h"
-#include "EditAutoC_Data0.c"
+#include "EditAutoC_Data0.c" // NOLINT(bugprone-suspicious-include)
 
 #define NP2_AUTOC_USE_STRING_ORDER	1
 // scintilla/src/AutoComplete.h AutoComplete::maxItemLen
