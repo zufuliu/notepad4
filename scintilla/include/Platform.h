@@ -582,32 +582,24 @@ public:
 #endif
 
 /**
- * Platform class used to retrieve system wide parameters such as double click speed
- * and chrome colour. Not a creatable object, more of a module with several functions.
+ * Platform namespace used to retrieve system wide parameters such as double click speed
+ * and chrome colour.
  */
-class Platform {
-public:
-	Platform() noexcept = default;
-	Platform(const Platform &) = delete;
-	Platform(Platform &&) = delete;
-	Platform &operator=(const Platform &) = delete;
-	Platform &operator=(Platform &&) = delete;
-	~Platform() = default;
+namespace Platform {
+	ColourDesired Chrome() noexcept;
+	ColourDesired ChromeHighlight() noexcept;
+	const char *DefaultFont() noexcept;
+	int DefaultFontSize() noexcept;
+	unsigned int DoubleClickTime() noexcept;
 
-	static ColourDesired Chrome() noexcept;
-	static ColourDesired ChromeHighlight() noexcept;
-	static const char *DefaultFont() noexcept;
-	static int DefaultFontSize() noexcept;
-	static unsigned int DoubleClickTime() noexcept;
-
-	static void DebugDisplay(const char *s) noexcept;
-	static void DebugPrintf(const char *format, ...) noexcept
+	void DebugDisplay(const char *s) noexcept;
+	void DebugPrintf(const char *format, ...) noexcept
 #if defined(__GNUC__) || defined(__clang__)
 	__attribute__((format(printf, 1, 2)))
 #endif
 	;
-	static bool ShowAssertionPopUps(bool assertionPopUps_) noexcept;
-	static void Assert(const char *c, const char *file, int line) noexcept CLANG_ANALYZER_NORETURN;
+	bool ShowAssertionPopUps(bool assertionPopUps_) noexcept;
+	void Assert(const char *c, const char *file, int line) noexcept CLANG_ANALYZER_NORETURN;
 };
 
 #ifdef  NDEBUG
