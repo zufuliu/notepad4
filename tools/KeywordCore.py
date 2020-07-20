@@ -1,4 +1,3 @@
-#-*- coding: UTF-8 -*-
 import sys
 sys.path.append('../scintilla/scripts')
 import os.path
