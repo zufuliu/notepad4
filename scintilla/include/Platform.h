@@ -593,14 +593,14 @@ namespace Platform {
 	unsigned int DoubleClickTime() noexcept;
 
 	void DebugDisplay(const char *s) noexcept;
-	void DebugPrintf(const char *format, ...) noexcept
 #if defined(__GNUC__) || defined(__clang__)
-	__attribute__((format(printf, 1, 2)))
+	void DebugPrintf(const char *format, ...) noexcept __attribute__((format(printf, 1, 2)));
+#else
+	void DebugPrintf(const char *format, ...) noexcept;
 #endif
-	;
 	bool ShowAssertionPopUps(bool assertionPopUps_) noexcept;
 	void Assert(const char *c, const char *file, int line) noexcept CLANG_ANALYZER_NORETURN;
-};
+}
 
 #ifdef  NDEBUG
 #define PLATFORM_ASSERT(c) ((void)0)

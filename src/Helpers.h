@@ -194,12 +194,12 @@ NP2_inline double StopWatch_Get(const StopWatch *watch) {
 void StopWatch_Show(const StopWatch *watch, LPCWSTR msg);
 void StopWatch_ShowLog(const StopWatch *watch, LPCSTR msg);
 
-#define DebugPrint(msg)	OutputDebugStringA(msg)
-void DebugPrintf(const char *fmt, ...)
+#define DebugPrint(msg)		OutputDebugStringA(msg)
 #if defined(__GNUC__) || defined(__clang__)
-__attribute__((format(printf, 1, 2)))
+void DebugPrintf(const char *fmt, ...) __attribute__((format(printf, 1, 2)));
+#else
+void DebugPrintf(const char *fmt, ...);
 #endif
-;
 
 extern HINSTANCE g_hInstance;
 extern HANDLE g_hDefaultHeap;
