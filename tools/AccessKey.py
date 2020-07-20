@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-#-*- coding: UTF-8 -*-
 
 def is_access_key(ch):
 	return (ch >= '0' and ch <= '9') or (ch >= 'A' and ch <= 'Z') or (ch >= 'a' and ch <= 'z')

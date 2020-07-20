@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-#-*- coding: UTF-8 -*-
 import operator
 
 # return true if equal
