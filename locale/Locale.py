@@ -15,7 +15,7 @@ def get_available_locales():
 	result = []
 	with os.scandir(localeDir) as it:
 		for entry in it:
-			if entry.is_dir() and entry.name[0].islower():
+			if entry.is_dir() and entry.name[:2].islower():
 				result.append(entry.name)
 
 	result.sort()
@@ -134,8 +134,8 @@ def copy_back_localized_resources(language):
 
 class StringExtractor:
 	def reset(self, path, reversion):
-		self.reversion = reversion
 		self.path = path
+		self.reversion = reversion
 		self.changed_lines = set()
 		if reversion:
 			self.find_changed_lines(reversion)
@@ -152,11 +152,10 @@ class StringExtractor:
 		if result.stderr:
 			print(result.stderr, file=sys.stderr)
 
-		diff = result.stdout
-		if not diff:
+		items = re.findall(r'^@@\s+\-\d+(,\d+)?\s+\+(\d+)(,\d+)?\s+@@', result.stdout, re.MULTILINE)
+		if not items:
 			return
 
-		items = re.findall(r'^@@\s+\-\d+(,\d+)?\s+\+(\d+)(,\d+)?\s+@@', diff, re.MULTILINE)
 		for item in items:
 			_, line, count = item
 			line = int(line)
@@ -193,6 +192,7 @@ class StringExtractor:
 	def scan_string(self, line, escape_sequence, format_specifier, access_key, start):
 		index = 0
 		if start:
+			# identifier "string"
 			index = line.find('"')
 			if index <= 0:
 				return '', 0, 0, False
@@ -218,10 +218,11 @@ class StringExtractor:
 					escape_sequence.add(sequence)
 				index = end
 			elif ch == '&':
-				if access_key != None:
-					ch = line[index]
-					if ch != '&' and not ch.isspace():
-						access_key.append(ch)
+				ch = line[index]
+				if ch == '&':
+					index += 1
+				elif not ch.isspace():
+					access_key.append(ch.upper())
 			elif ch == '%':
 				ch = line[index]
 				# we only use '%s' in resource files
@@ -240,8 +241,7 @@ class StringExtractor:
 	def build_hint(self, escape_sequence, format_specifier, access_key):
 		hint = ''
 		if access_key:
-			assert len(access_key) == 1
-			hint += ', access key: ' + access_key[0].upper()
+			hint += ', access key: ' + ', '.join(access_key)
 		if escape_sequence:
 			hint += ', escape sequence: ' + ', '.join(sorted(escape_sequence))
 		if format_specifier:
@@ -276,6 +276,8 @@ class StringExtractor:
 
 		if word == 'CAPTION':
 			return f'{word} {value}'
+		if len(access_key) > 1:
+			print(f'multiple access keys {lineno} {word} {rcid}', access_key)
 
 		comment = f'// {lineno} {word} {rcid}'.strip()
 		comment += self.build_hint(escape_sequence, format_specifier, access_key)
@@ -309,6 +311,8 @@ class StringExtractor:
 		value = '\n'.join(result)
 		if not any(ch.isalpha() for ch in value):
 			return lineno
+		if len(access_key) > 1:
+			print(f'multiple access keys {start} {rcid}', access_key)
 
 		comment = f'// {start} {rcid}'
 		comment += self.build_hint(escape_sequence, format_specifier, access_key)
@@ -354,13 +358,14 @@ class StringExtractor:
 				else:
 					items = line.split()
 					if len(items) >= 2:
-						if items[1] == 'MENU':
+						word = items[1]
+						if word == 'MENU':
 							block_type = Block_Menu
 							block_name = ' '.join(items[:2])
-						elif items[1] == 'DIALOGEX':
+						elif word == 'DIALOGEX':
 							block_type = Block_DialogEx
 							block_name = ' '.join(items[:2])
-						elif items[1] in ('ACCELERATORS', 'DESIGNINFO', 'TEXTINCLUDE'):
+						elif word in ('ACCELERATORS', 'DESIGNINFO', 'TEXTINCLUDE'):
 							block_type = Block_Ignore
 				if block_type != Block_None:
 					block_begin = lineno
@@ -404,14 +409,17 @@ class StringExtractor:
 		with open(out_path, 'w', encoding='utf-8') as fd:
 			fd.write("//! Ignore line starts with //, it's a comment line.\n")
 			fd.write("//! Please don't translate escape sequence or format specifiers.\n")
-			fd.write('\n')
 			if self.reversion:
 				fd.write("//! Updated strings since: " + self.reversion + '\n')
+			fd.write('\n')
+
 			for block in string_list:
 				fd.write(block['comment'] + '\n')
 				fd.write(block['name'] + '\n')
-				if caption := block.get('caption', None):
+				caption = block['caption']
+				if caption:
 					fd.write(caption + '\n')
+
 				fd.write('BEGIN' + '\n')
 				for item in block['items']:
 					fd.write('\t' + item['comment'] + '\n')
