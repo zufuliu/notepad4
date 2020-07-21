@@ -7642,7 +7642,8 @@ BOOL SaveFileDlg(HWND hwnd, BOOL Untitled, LPWSTR lpstrFile, int cchFile, LPCWST
 	if (success) {
 		lstrcpyn(lpstrFile, szNewFile, cchFile);
 		const int iLexer = lexers[ofn.nFilterIndex];
-		flagLexerSpecified = iLexer != 0 && !(Untitled && iLexer == NP2LEX_TEXTFILE && iLexer == lexers[0]);
+		// default scheme, current scheme and selected file type all are Text File => no lexer specified.
+		flagLexerSpecified = iLexer != 0 && !(Untitled && iLexer == NP2LEX_TEXTFILE && iLexer == lexers[0] && iLexer == pLexCurrent->rid);
 		iInitialLexer = iLexer;
 	}
 	NP2HeapFree(szFilter);
