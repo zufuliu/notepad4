@@ -3213,6 +3213,7 @@ LPWSTR Style_GetOpenDlgFilterStr(BOOL open, LPCWSTR lpszFile, int lexers[]) {
 	}
 
 	if (!open) {
+		lexers[0] = pLexArray[iDefaultLexerIndex]->rid;
 		// All Files comes last for save file dialog.
 		GetString(IDS_FILTER_ALL, szFilter + length, MAX_EDITLEXER_EXT_SIZE);
 	}
