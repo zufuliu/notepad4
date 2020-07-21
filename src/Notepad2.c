@@ -7478,7 +7478,7 @@ BOOL FileSave(BOOL bSaveAlways, BOOL bAsk, BOOL bSaveAs, BOOL bSaveCopy) {
 			lstrcpy(tchFile, szCurFile);
 		}
 
-		if (SaveFileDlg(hwndMain, tchFile, COUNTOF(tchFile), tchInitialDir)) {
+		if (SaveFileDlg(hwndMain, Untitled, tchFile, COUNTOF(tchFile), tchInitialDir)) {
 			fSuccess = FileIO(FALSE, tchFile, bSaveCopy, &status);
 			if (fSuccess) {
 				if (!bSaveCopy) {
@@ -7600,7 +7600,7 @@ BOOL OpenFileDlg(HWND hwnd, LPWSTR lpstrFile, int cchFile, LPCWSTR lpstrInitialD
 // SaveFileDlg()
 //
 //
-BOOL SaveFileDlg(HWND hwnd, LPWSTR lpstrFile, int cchFile, LPCWSTR lpstrInitialDir) {
+BOOL SaveFileDlg(HWND hwnd, BOOL Untitled, LPWSTR lpstrFile, int cchFile, LPCWSTR lpstrInitialDir) {
 	WCHAR tchInitialDir[MAX_PATH] = L"";
 	if (StrNotEmpty(lpstrInitialDir)) {
 		lstrcpy(tchInitialDir, lpstrInitialDir);
@@ -7642,7 +7642,7 @@ BOOL SaveFileDlg(HWND hwnd, LPWSTR lpstrFile, int cchFile, LPCWSTR lpstrInitialD
 	if (success) {
 		lstrcpyn(lpstrFile, szNewFile, cchFile);
 		const int iLexer = lexers[ofn.nFilterIndex];
-		flagLexerSpecified = iLexer != 0;
+		flagLexerSpecified = iLexer != 0 && !(Untitled && iLexer == NP2LEX_TEXTFILE && iLexer == lexers[0]);
 		iInitialLexer = iLexer;
 	}
 	NP2HeapFree(szFilter);
