@@ -1967,7 +1967,6 @@ BEGIN
     IDS_PRINT_FOOTER        "ページ番号|空欄とする"
     IDS_PRINT_COLOR         "通常|明るさの反転 (暗い背景)|白背景に黒|白背景にカラー|白背景にカラー (行番号以外)|モニタ通りの見ている色 (WYSIWYG)"
     IDS_PRINT_PAGENUM       "%s ページ"
-    IDS_PRINT_EMPTY         "この文書には、印刷のための文章が含まれていません。"
     IDS_PRINT_ERROR         "印刷失敗 ""%s"""
     IDS_FAV_SUCCESS         "このファイルへのショートカットが、お気に入りフォルダ内に作成されました。"
     IDS_FAV_FAILURE         "このファイルへのショートカットは作成できませんでした。\n同じ名前の他のファイルがないことを確認してください。"

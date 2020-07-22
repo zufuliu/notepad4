@@ -69,12 +69,6 @@ static void EditPrintInit() noexcept;
 // EditPrint() - Code from SciTEWin::Print()
 //
 extern "C" BOOL EditPrint(HWND hwnd, LPCWSTR pszDocTitle) {
-	// Don't print empty documents
-	if (SciCall_GetLength() == 0) {
-		MsgBoxWarn(MB_OK, IDS_PRINT_EMPTY);
-		return TRUE;
-	}
-
 	PRINTDLG pdlg;
 	ZeroMemory(&pdlg, sizeof(PRINTDLG));
 	pdlg.lStructSize = sizeof(PRINTDLG);
@@ -309,7 +303,9 @@ extern "C" BOOL EditPrint(HWND hwnd, LPCWSTR pszDocTitle) {
 	GetString(IDS_PRINT_PAGENUM, tchPageFormat, COUNTOF(tchPageFormat));
 	GetString(IDS_PRINTFILE, tchPageStatus, COUNTOF(tchPageStatus));
 
-	while (lengthPrinted < lengthDoc) {
+	BOOL printEmpty = lengthPrinted == lengthDoc;
+	while (lengthPrinted < lengthDoc || printEmpty) {
+		printEmpty = FALSE;
 		const BOOL printPage = !(pdlg.Flags & PD_PAGENUMS) || (pageNum >= pdlg.nFromPage && pageNum <= pdlg.nToPage);
 		WCHAR tchNum[32];
 		_ltow(pageNum, tchNum, 10);

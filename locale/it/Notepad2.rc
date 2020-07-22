@@ -1967,7 +1967,6 @@ BEGIN
     IDS_PRINT_FOOTER        "Page Number|Leave blank"
     IDS_PRINT_COLOR         "Normal|Invert light (dark background)|Black on white|Color on white|Color on white (except line numbers)|Current screen color (WYSIWYG)"
     IDS_PRINT_PAGENUM       "Page %s"
-    IDS_PRINT_EMPTY         "This document doesn't contain any text to be printed."
     IDS_PRINT_ERROR         "Error printing ""%s""!"
     IDS_FAV_SUCCESS         "A shortcut to the current file has been created in the favorites directory."
     IDS_FAV_FAILURE         "The shortcut to the current file could not be created.\nMake sure there's no other file with the same name."
