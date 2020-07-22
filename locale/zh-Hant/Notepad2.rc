@@ -1967,7 +1967,6 @@ BEGIN
     IDS_PRINT_FOOTER        "頁號|留空"
     IDS_PRINT_COLOR         "正常|反色(暗背景)|白底黑字|白底彩色|白底彩色(行號除外)|目前螢幕顏色(所見即所得)"
     IDS_PRINT_PAGENUM       "第 %s 頁"
-    IDS_PRINT_EMPTY         "此文件不包含任何需要列印的文字。"
     IDS_PRINT_ERROR         "列印「%s」時發生錯誤！"
     IDS_FAV_SUCCESS         "在我的最愛中建立目前檔案的快捷方式。"
     IDS_FAV_FAILURE         "無法建立目前的檔案的快捷方法。\n請檢查是否已有同名檔案。"
