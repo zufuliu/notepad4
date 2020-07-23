@@ -154,6 +154,7 @@ Latest development builds (artifacts in Release configuration for each compiler 
 	* Many Others
 * Toggle fold for specific level, shortcuts: <kbd>Alt</kbd>+<kbd>Number</kbd>
 * Toggle fold for current block without scrolling back to the block start line, shortcut: <kbd>Alt</kbd>+<kbd>C</kbd>, or context menu "Toggle Fold"
+* Improved support for Chinese, Japanese and Korean: inline mode IME, word wrapping, word selection, case conversions, etc.
 * Insert new GUID and current timestamps
 * Number conversion between decimal, hexadecimal, octal and binary
 * Display caret location and length of selected text in count of characters
@@ -165,7 +166,6 @@ Latest development builds (artifacts in Release configuration for each compiler 
 * Support color font (Windows 8.1 and above) in Direct2D mode, useful to display color [Emoji](http://unicode.org/emoji/charts/full-emoji-list.html) 😊 and others
 * Experimental support for RTL layout (GDI) and bidirectional (Direct2D), useful for Arabic and Hebrew
 * Support using fractional font size
-* Support inline mode IME
 * Support full screen mode
 * Extra support for drag and drop file from Visual Studio, Android Studio, IntelliJ IDEA, etc.
 * Other various major or minor changes and tweaks
