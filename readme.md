@@ -131,7 +131,7 @@ Latest development builds (artifacts in Release configuration for each compiler 
 	* VHDL
 	* Verilog HDL
 	* [Vim Script](../master/tools/lang/Vim.vim)
-	* WebAssembly
+	* [WebAssembly](https://github.com/WebAssembly/wabt/blob/master/src/lexer-keywords.txt), up to wabt 1.0.19
 	* XML Document, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#xml)
 		* XML Schema
 		* XML Stylesheet
