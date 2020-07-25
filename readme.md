@@ -51,7 +51,7 @@ Latest development builds (artifacts in Release configuration for each compiler 
 		* Sassy CSS
 		* Less CSS
 		* HSS
-	* [CMake](../master/tools/lang/CMake.cmake), [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#cmake), up to 3.16
+	* [CMake](../master/tools/lang/CMake.cmake), [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#cmake), up to 3.18
 	* Common Intermediate Language
 	* Configuration / Properties File
 		* Apache Configuration File
