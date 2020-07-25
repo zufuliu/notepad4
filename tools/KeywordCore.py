@@ -2,6 +2,7 @@ import sys
 sys.path.append('../scintilla/scripts')
 import os.path
 import re
+from collections import Counter
 from enum import IntFlag
 
 from FileGenerator import Regenerate
@@ -236,6 +237,12 @@ def parse_cmake_api_file(path):
 		'long properties',
 		'long variables',
 	])
+
+	#counter = Counter(item.split('_')[0] for item in keywordMap['long properties'])
+	#print('CMake long properties prefix:', counter)
+	#counter = Counter(item.split('_')[0] for item in keywordMap['long variables'])
+	#print('CMake long variables prefix:', counter)
+
 	keywordList = [
 		('keywords', keywordMap['keywords'], KeywordAttr.Default),
 		('commands', keywordMap['commands'], KeywordAttr.Default),
