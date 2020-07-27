@@ -368,6 +368,7 @@ enum GlobalStyleIndex {
 	GlobalStyleIndex_IMEIndicator,		// indicator style. `fore`: IME indicator color
 	GlobalStyleIndex_LongLineMarker,	// standalone style. `fore`: edge line color, `back`: background color for text exceeds long line limit
 	GlobalStyleIndex_ExtraLineSpacing,	// standalone style. descent = `size`/2, ascent = `size` - descent
+	GlobalStyleIndex_FoldMargin,		// standalone style. `back`
 	GlobalStyleIndex_FoldingMarker,		// standalone style. `fore`: folding line color, `back`: plus/minus box fill color
 	GlobalStyleIndex_FoldDispalyText,	// inherited style.
 	GlobalStyleIndex_MarkOccurrences,	// indicator style. `fore`, `alpha`, `outline`
@@ -473,6 +474,8 @@ static inline UINT GetLexerStyleControlMask(int rid, int index) {
 			return StyleControl_Fore;
 		case GlobalStyleIndex_ExtraLineSpacing:
 			return StyleControl_None;
+		case GlobalStyleIndex_FoldMargin:
+			return StyleControl_Back;
 		default:
 			return StyleControl_All;
 		}
@@ -1377,6 +1380,11 @@ void Style_InitDefaultColor(void) {
 	SciCall_StyleSetBack(STYLE_DEFAULT, rgb);
 	//SciCall_StyleClearAll();
 
+	const COLORREF backColor = rgb;
+	szValue = pLexGlobal->Styles[GlobalStyleIndex_FoldMargin].szValue;
+	if (!Style_StrGetBackColor(szValue, &rgb)) {
+		rgb = backColor;
+	}
 	SciCall_SetFoldMarginColour(TRUE, rgb);
 	SciCall_SetFoldMarginHiColour(TRUE, rgb);
 
@@ -1676,8 +1684,12 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 			highlightColor = RGB(0xFF, 0x00, 0x00); // Scintilla default red color
 		}
 
-		SciCall_SetFoldMarginColour(TRUE, backColor);
-		SciCall_SetFoldMarginHiColour(TRUE, backColor);
+		szValue = pLexGlobal->Styles[GlobalStyleIndex_FoldMargin].szValue;
+		if (!Style_StrGetBackColor(szValue, &rgb)) {
+			rgb = backColor;
+		}
+		SciCall_SetFoldMarginColour(TRUE, rgb);
+		SciCall_SetFoldMarginHiColour(TRUE, rgb);
 #if 0	// use gray fold color
 		COLORREF foreColor = SciCall_StyleGetFore(STYLE_DEFAULT);
 		// Marker fore/back colors
