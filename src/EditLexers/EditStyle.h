@@ -20,6 +20,7 @@
 #define NP2STYLE_Bookmark				63218
 #define NP2STYLE_CallTip				63219
 #define NP2STYLE_CurrentBlock			63220
+#define NP2STYLE_FoldMargin				63221
 
 #define NP2STYLE_Default				63226
 #define NP2STYLE_Comment				63227
