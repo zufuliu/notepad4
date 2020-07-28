@@ -691,6 +691,7 @@ BEGIN
 	IDS_LANG_CHINESE_TRADITIONAL	"繁體中文"
 	IDS_LANG_JAPANESE				"日本語"
 	IDS_LANG_GERMAN					"Deutsch"
+	IDS_LANG_ITALIAN				"Italiano"
 END
 #endif
 

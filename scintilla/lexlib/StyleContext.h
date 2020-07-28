@@ -75,7 +75,7 @@ public:
 	widthNext(1) {
 		// lexer need enable useUnicode if it wants to detect Unicode identifier (https://www.unicode.org/reports/tr31/)
 		// or operator. e.g. using functions from CharacterCategory.
-		if ((useUnicode && styler.Encoding() == encUnicode) || styler.Encoding() == encDBCS) {
+		if ((useUnicode && styler.Encoding() == EncodingType::encUnicode) || styler.Encoding() == EncodingType::encDBCS) {
 			multiByteAccess = styler.MultiByteAccess();
 		}
 		styler.StartAt(startPos/*, chMask*/);
@@ -196,7 +196,7 @@ public:
 	bool Match(char ch0) const noexcept {
 		return ch == static_cast<unsigned char>(ch0);
 	}
-#endif	
+#endif
 	bool Match(char ch0, char ch1) const noexcept {
 		return (ch == static_cast<unsigned char>(ch0)) && (chNext == static_cast<unsigned char>(ch1));
 	}

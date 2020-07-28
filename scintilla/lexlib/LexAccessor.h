@@ -8,7 +8,7 @@
 
 namespace Scintilla {
 
-enum EncodingType { enc8bit, encUnicode, encDBCS };
+enum class EncodingType { enc8bit, encUnicode, encDBCS };
 
 class LexAccessor {
 public:
@@ -57,7 +57,7 @@ public:
 	explicit LexAccessor(IDocument * pAccess_) noexcept :
 		pAccess(pAccess_), startPos(extremePosition), endPos(0),
 		codePage(pAccess->CodePage()),
-		encodingType((codePage == 65001) ? encUnicode : (codePage ? encDBCS : enc8bit)),
+		encodingType((codePage == 65001) ? EncodingType::encUnicode : (codePage ? EncodingType::encDBCS : EncodingType::enc8bit)),
 		lenDoc(pAccess->Length()),
 		validLen(0),
 		startSeg(0),
@@ -86,7 +86,7 @@ public:
 		}
 		return buf[position - startPos];
 	}
-#if 0	
+#if 0
 	[[deprecated]]
 	char SafeGetCharAt(Sci_Position position, char chDefault) noexcept {
 		if (position < startPos || position >= endPos) {
@@ -98,9 +98,9 @@ public:
 		}
 		return buf[position - startPos];
 	}
-#endif	
+#endif
 	bool IsLeadByte(unsigned char ch) const noexcept {
-		return encodingType == encDBCS && ch > 0x80 && pAccess->IsDBCSLeadByte(ch);
+		return encodingType == EncodingType::encDBCS && ch > 0x80 && pAccess->IsDBCSLeadByte(ch);
 	}
 	constexpr EncodingType Encoding() const noexcept {
 		return encodingType;

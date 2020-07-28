@@ -280,7 +280,7 @@ void ViewStyle::Init(size_t stylesSize_) {
 	ctrlCharPadding = 3; // +3 For a blank on front and rounded edge each side
 	lastSegItalicsOffset = 2;
 
-	wrapState = eWrapNone;
+	wrapState = WrapMode::none;
 	wrapVisualFlags = 0;
 	wrapVisualFlagsLocation = 0;
 	wrapVisualStartIndent = 0;
@@ -525,19 +525,19 @@ bool ViewStyle::SetWrapState(int wrapState_) noexcept {
 	WrapMode wrapStateWanted;
 	switch (wrapState_) {
 	case SC_WRAP_WORD:
-		wrapStateWanted = eWrapWord;
+		wrapStateWanted = WrapMode::word;
 		break;
 	case SC_WRAP_CHAR:
-		wrapStateWanted = eWrapChar;
+		wrapStateWanted = WrapMode::character;
 		break;
 	case SC_WRAP_WHITESPACE:
-		wrapStateWanted = eWrapWhitespace;
+		wrapStateWanted = WrapMode::whitespace;
 		break;
 	case SC_WRAP_AUTO:
-		wrapStateWanted = eWrapAuto;
+		wrapStateWanted = WrapMode::automatic;
 		break;
 	default:
-		wrapStateWanted = eWrapNone;
+		wrapStateWanted = WrapMode::none;
 		break;
 	}
 	const bool changed = wrapState != wrapStateWanted;

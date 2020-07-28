@@ -1108,11 +1108,11 @@ int Document::SafeSegment(const char *text, int length, int lengthSegment) const
 
 EncodingFamily Document::CodePageFamily() const noexcept {
 	if (SC_CP_UTF8 == dbcsCodePage)
-		return efUnicode;
+		return EncodingFamily::efUnicode;
 	else if (dbcsCodePage)
-		return efDBCS;
+		return EncodingFamily::efDBCS;
 	else
-		return efEightBit;
+		return EncodingFamily::efEightBit;
 }
 
 void Document::ModifiedAt(Sci::Position pos) noexcept {
@@ -2343,7 +2343,7 @@ StyledText Document::EOLAnnotationStyledText(Sci::Line line) const noexcept {
 void Document::EOLAnnotationSetText(Sci::Line line, const char *text) {
 	if (line >= 0 && line < LinesTotal()) {
 		EOLAnnotations()->SetText(line, text);
-		DocModification mh(SC_MOD_CHANGEEOLANNOTATION, LineStart(line),
+		const DocModification mh(SC_MOD_CHANGEEOLANNOTATION, LineStart(line),
 			0, 0, nullptr, line);
 		NotifyModified(mh);
 	}
@@ -2602,7 +2602,7 @@ static constexpr char BraceOpposite(char ch) noexcept {
 }
 
 // TODO: should be able to extend styled region to find matching brace
-Sci::Position Document::BraceMatch(Sci::Position position, Sci::Position maxReStyle) const noexcept {
+Sci::Position Document::BraceMatch(Sci::Position position, Sci::Position /*maxReStyle*/, Sci::Position startPos, bool useStartPos) const noexcept {
 	const char chBrace = CharAt(position);
 	const char chSeek = BraceOpposite(chBrace);
 	if (chSeek == '\0')
@@ -2612,7 +2612,7 @@ Sci::Position Document::BraceMatch(Sci::Position position, Sci::Position maxReSt
 	if (chBrace == '(' || chBrace == '[' || chBrace == '{' || chBrace == '<')
 		direction = 1;
 	int depth = 1;
-	position = NextPosition(maxReStyle ? maxReStyle : position, direction);
+	position = useStartPos ? startPos : NextPosition(position, direction);
 	while ((position >= 0) && (position < Length())) {
 		const char chAtPos = CharAt(position);
 		const int styAtPos = StyleIndexAt(position);

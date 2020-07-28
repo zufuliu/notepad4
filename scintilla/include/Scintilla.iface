@@ -1917,6 +1917,9 @@ fun void BraceBadLightIndicator=2499(bool useSetting, int indicator)
 # The maxReStyle must be 0 for now. It may be defined in a future release.
 fun position BraceMatch=2353(position pos, int maxReStyle)
 
+# Similar to BraceMatch, but matching starts at the explicit start position.
+fun position BraceMatchNext=2369(position pos, position startPos)
+
 # Are the end of line characters visible?
 get bool GetViewEOL=2355(,)
 

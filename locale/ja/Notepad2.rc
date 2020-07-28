@@ -610,12 +610,13 @@ BEGIN
 			MENUITEM SEPARATOR
 			POPUP "言語(&L)"
 			BEGIN
-				MENUITEM "システムの規定(&S)",			IDM_LANG_USER_DEFAULT
-				MENUITEM "&Deutsch",				IDM_LANG_GERMAN
-				MENUITEM "&English",				IDM_LANG_ENGLISH_US
-				MENUITEM "日本語(&J)",				IDM_LANG_JAPANESE
-				MENUITEM "中文 (繁體)(&T)",			IDM_LANG_CHINESE_TRADITIONAL
-				MENUITEM "中文 (简体)(&C)",			IDM_LANG_CHINESE_SIMPLIFIED
+				MENUITEM "システムの規定(&S)",		IDM_LANG_USER_DEFAULT
+				MENUITEM "Deutsch",					IDM_LANG_GERMAN
+				MENUITEM "English",					IDM_LANG_ENGLISH_US
+				MENUITEM "Italiano",				IDM_LANG_ITALIAN
+				MENUITEM "日本語",					IDM_LANG_JAPANESE
+				MENUITEM "中文(繁體)",				IDM_LANG_CHINESE_TRADITIONAL
+				MENUITEM "中文(简体)",				IDM_LANG_CHINESE_SIMPLIFIED
 			END
 #endif
 		END
@@ -1330,7 +1331,7 @@ BEGIN
     COMBOBOX        IDC_PAGESETUP_HEADER_LIST,64,145,160,160,CBS_DROPDOWNLIST | WS_VSCROLL | WS_GROUP | WS_TABSTOP
     LTEXT           "フッター(&F):",IDC_STATIC,16,167,36,8
     COMBOBOX        IDC_PAGESETUP_FOOTER_LIST,64,164,160,160,CBS_DROPDOWNLIST | WS_VSCROLL | WS_GROUP | WS_TABSTOP
-    GROUPBOX        "色",1076,8,191,224,37,WS_GROUP
+    GROUPBOX        "色",IDC_PAGESETUP_PRINT_COLOR_BOX,8,191,224,37,WS_GROUP
     LTEXT           "様式(&D):",IDC_STATIC,16,207,36,8
     COMBOBOX        IDC_PAGESETUP_COLOR_MODE_LIST,64,206,160,160,CBS_DROPDOWNLIST | WS_VSCROLL | WS_GROUP | WS_TABSTOP
     GROUPBOX        "拡大/縮小",IDC_STATIC,240,170,108,58,WS_GROUP
@@ -1966,7 +1967,6 @@ BEGIN
     IDS_PRINT_FOOTER        "ページ番号|空欄とする"
     IDS_PRINT_COLOR         "通常|明るさの反転 (暗い背景)|白背景に黒|白背景にカラー|白背景にカラー (行番号以外)|モニタ通りの見ている色 (WYSIWYG)"
     IDS_PRINT_PAGENUM       "%s ページ"
-    IDS_PRINT_EMPTY         "この文書には、印刷のための文章が含まれていません。"
     IDS_PRINT_ERROR         "印刷失敗 ""%s"""
     IDS_FAV_SUCCESS         "このファイルへのショートカットが、お気に入りフォルダ内に作成されました。"
     IDS_FAV_FAILURE         "このファイルへのショートカットは作成できませんでした。\n同じ名前の他のファイルがないことを確認してください。"
@@ -2166,7 +2166,7 @@ BEGIN
 	NP2STYLE_IMEIndicator			"IME変換"
 	NP2STYLE_Bookmark				"ブックマーク"
 	NP2STYLE_CallTip				"コールチップ"
-	NP2STYLE_CurrentBlock			"現在のブロック"
+	NP2STYLE_CodeFolding			"コード折りたたみを"
 
 	NP2STYLE_Default				"標準"
 END

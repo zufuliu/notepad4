@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
-#-*- coding: UTF-8 -*-
 
 def is_access_key(ch):
-	return (ch >= '0' and ch <= '9') or (ch >= 'A' and ch <= 'Z') or (ch >= 'a' and ch <= 'z')
+	return ch.isascii() and ch.isalnum()
 
 def find_access_key(menu):
 	key = []
@@ -12,7 +11,9 @@ def find_access_key(menu):
 		index += 1
 		if ch == '&':
 			ch = menu[index]
-			if is_access_key(ch):
+			if ch == '&':
+				index += 1
+			elif is_access_key(ch):
 				index += 1
 				key.append(ch.upper())
 

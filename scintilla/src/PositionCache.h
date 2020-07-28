@@ -61,8 +61,8 @@ public:
 	int maxLineLength;
 	int numCharsInLine;
 	int numCharsBeforeEOL;
-	enum validLevel {
-		llInvalid, llCheckTextAndStyle, llPositions, llLines
+	enum class ValidLevel {
+		invalid, checkTextAndStyle, positions, lines
 	} validity;
 	int xHighlightGuide;
 	bool highlightColumn;
@@ -93,7 +93,7 @@ public:
 	void Resize(int maxLineLength_);
 	void EnsureBidiData();
 	void Free() noexcept;
-	void Invalidate(validLevel validity_) noexcept;
+	void Invalidate(ValidLevel validity_) noexcept;
 	int LineStart(int line) const noexcept;
 	int LineLength(int line) const noexcept;
 	enum class Scope {
@@ -168,7 +168,7 @@ public:
 		llcPage = SC_CACHE_PAGE,
 		llcDocument = SC_CACHE_DOCUMENT
 	};
-	void Invalidate(LineLayout::validLevel validity_) noexcept;
+	void Invalidate(LineLayout::ValidLevel validity_) noexcept;
 	void SetLevel(int level_) noexcept;
 	int GetLevel() const noexcept {
 		return level;

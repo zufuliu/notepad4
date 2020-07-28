@@ -611,11 +611,12 @@ BEGIN
 			POPUP "&Language"
 			BEGIN
 				MENUITEM "&System Language",		IDM_LANG_USER_DEFAULT
-				MENUITEM "&Deutsch",				IDM_LANG_GERMAN
-				MENUITEM "&English",				IDM_LANG_ENGLISH_US
-				MENUITEM "日本語(&J)",				IDM_LANG_JAPANESE
-				MENUITEM "中文 (繁體)(&T)",			IDM_LANG_CHINESE_TRADITIONAL
-				MENUITEM "中文 (简体)(&C)",			IDM_LANG_CHINESE_SIMPLIFIED
+				MENUITEM "Deutsch",					IDM_LANG_GERMAN
+				MENUITEM "English",					IDM_LANG_ENGLISH_US
+				MENUITEM "Italiano",				IDM_LANG_ITALIAN
+				MENUITEM "日本語",					IDM_LANG_JAPANESE
+				MENUITEM "中文(繁體)",				IDM_LANG_CHINESE_TRADITIONAL
+				MENUITEM "中文(简体)",				IDM_LANG_CHINESE_SIMPLIFIED
 			END
 #endif
 		END
@@ -1330,7 +1331,7 @@ BEGIN
     COMBOBOX        IDC_PAGESETUP_HEADER_LIST,64,145,160,160,CBS_DROPDOWNLIST | WS_VSCROLL | WS_GROUP | WS_TABSTOP
     LTEXT           "&Footer:",IDC_STATIC,16,167,36,8
     COMBOBOX        IDC_PAGESETUP_FOOTER_LIST,64,164,160,160,CBS_DROPDOWNLIST | WS_VSCROLL | WS_GROUP | WS_TABSTOP
-    GROUPBOX        "Print Colors",1076,8,191,224,37,WS_GROUP
+    GROUPBOX        "Print Colors",IDC_PAGESETUP_PRINT_COLOR_BOX,8,191,224,37,WS_GROUP
     LTEXT           "Mo&de:",IDC_STATIC,16,207,36,8
     COMBOBOX        IDC_PAGESETUP_COLOR_MODE_LIST,64,206,160,160,CBS_DROPDOWNLIST | WS_VSCROLL | WS_GROUP | WS_TABSTOP
     GROUPBOX        "Zoom",IDC_STATIC,240,170,108,58,WS_GROUP
@@ -1966,7 +1967,6 @@ BEGIN
     IDS_PRINT_FOOTER        "Page Number|Leave blank"
     IDS_PRINT_COLOR         "Normal|Invert light (dark background)|Black on white|Color on white|Color on white (except line numbers)|Current screen color (WYSIWYG)"
     IDS_PRINT_PAGENUM       "Page %s"
-    IDS_PRINT_EMPTY         "This document doesn't contain any text to be printed."
     IDS_PRINT_ERROR         "Error printing ""%s""!"
     IDS_FAV_SUCCESS         "A shortcut to the current file has been created in the favorites directory."
     IDS_FAV_FAILURE         "The shortcut to the current file could not be created.\nMake sure there's no other file with the same name."
@@ -2167,6 +2167,7 @@ BEGIN
 	NP2STYLE_Bookmark				"Bookmark"
 	NP2STYLE_CallTip				"CallTip"
 	NP2STYLE_CurrentBlock			"Current Block"
+	NP2STYLE_FoldMargin				"Fold Margin"
 
 	NP2STYLE_Default				"Default"
 END

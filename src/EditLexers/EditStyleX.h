@@ -27,7 +27,7 @@
 #define NP2StyleX_IMEIndicator			EDITSTYLE_HOLE(IMEIndicator, L"IME Indicator")
 #define NP2StyleX_Bookmark				EDITSTYLE_HOLE(Bookmark, L"Bookmark")
 #define NP2StyleX_CallTip				EDITSTYLE_HOLE(CallTip, L"CallTip")
-#define NP2StyleX_CurrentBlock			EDITSTYLE_HOLE(CurrentBlock, L"Current Block")
+#define NP2StyleX_CodeFolding			EDITSTYLE_HOLE(CodeFolding, L"Code Folding")
 
 #define NP2StyleX_Default				EDITSTYLE_HOLE(Default, L"Default")
 #define NP2StyleX_Comment				EDITSTYLE_HOLE(Comment, L"Comment")

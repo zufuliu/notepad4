@@ -1118,12 +1118,16 @@ sptr_t ScintillaBase::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lPara
 		return DocumentLexState()->GetIdentifier();
 
 	case SCI_COLOURISE:
+		// from Editor::FoldAll()
+		pdoc->EnsureStyledTo((lParam == -1) ? pdoc->Length() : lParam);
+#if 0
 		if (DocumentLexState()->lexLanguage == SCLEX_CONTAINER) {
 			pdoc->ModifiedAt(wParam);
 			NotifyStyleToNeeded((lParam == -1) ? pdoc->Length() : lParam);
 		} else {
 			DocumentLexState()->Colourise(wParam, lParam);
 		}
+#endif
 		Redraw();
 		break;
 

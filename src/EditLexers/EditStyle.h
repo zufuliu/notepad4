@@ -19,7 +19,7 @@
 #define NP2STYLE_IMEIndicator			63217
 #define NP2STYLE_Bookmark				63218
 #define NP2STYLE_CallTip				63219
-#define NP2STYLE_CurrentBlock			63220
+#define NP2STYLE_CodeFolding			63220
 
 #define NP2STYLE_Default				63226
 #define NP2STYLE_Comment				63227

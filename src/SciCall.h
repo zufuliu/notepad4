@@ -829,8 +829,12 @@ NP2_inline void SciCall_BraceBadLightIndicator(BOOL useSetting, int indicator) {
 	SciCall(SCI_BRACEBADLIGHTINDICATOR, useSetting, indicator);
 }
 
-NP2_inline Sci_Position SciCall_BraceMatch(Sci_Position pos, Sci_Position startPos) {
-	return SciCall(SCI_BRACEMATCH, pos, startPos);
+NP2_inline Sci_Position SciCall_BraceMatch(Sci_Position pos) {
+	return SciCall(SCI_BRACEMATCH, pos, 0);
+}
+
+NP2_inline Sci_Position SciCall_BraceMatchNext(Sci_Position pos, Sci_Position startPos) {
+	return SciCall(SCI_BRACEMATCHNEXT, pos, startPos);
 }
 
 // Tabs and Indentation Guides
@@ -1331,6 +1335,10 @@ NP2_inline void SciCall_Colourise(Sci_Position start, Sci_Position end) {
 
 NP2_inline void SciCall_ColouriseAll(void) {
 	SciCall_Colourise(0, -1);
+}
+
+NP2_inline void SciCall_EnsureStyledTo(Sci_Position end) {
+	SciCall_Colourise(0, end);
 }
 
 NP2_inline void SciCall_SetProperty(const char *key, const char *value) {

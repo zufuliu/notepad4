@@ -44,7 +44,7 @@ enum TabDrawMode {tdLongArrow=0, tdStrikeOut=1};
 
 typedef std::map<FontSpecification, std::unique_ptr<FontRealised>> FontMap;
 
-enum WrapMode { eWrapNone, eWrapWord, eWrapChar, eWrapWhitespace, eWrapAuto };
+enum class WrapMode { none, word, character, whitespace, automatic };
 
 constexpr int GetFontSizeZoomed(int size, int zoomLevel) noexcept {
 	size = (size * zoomLevel + 50) / 100;

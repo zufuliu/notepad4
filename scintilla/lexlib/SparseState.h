@@ -29,7 +29,7 @@ class SparseState {
 	stateVector states;
 
 	typename stateVector::iterator Find(Sci_Position position) const {
-		State searchValue(position, T());
+		const State searchValue(position, T());
 		return std::lower_bound(states.begin(), states.end(), searchValue);
 	}
 

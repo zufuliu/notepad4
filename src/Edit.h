@@ -276,6 +276,7 @@ void	EditCompleteUpdateConfig(void);
 BOOL	IsDocWordChar(int ch);
 BOOL	IsAutoCompletionWordCharacter(int ch);
 void	EditCompleteWord(int iCondition, BOOL autoInsert);
+BOOL	EditIsOpenBraceMatched(Sci_Position pos, Sci_Position startPos);
 void	EditAutoCloseBraceQuote(int ch);
 void	EditAutoCloseXMLTag(void);
 void	EditAutoIndent(void);

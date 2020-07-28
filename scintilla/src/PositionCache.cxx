@@ -61,7 +61,7 @@ LineLayout::LineLayout(int maxLineLength_) :
 	maxLineLength(-1),
 	numCharsInLine(0),
 	numCharsBeforeEOL(0),
-	validity(llInvalid),
+	validity(ValidLevel::invalid),
 	xHighlightGuide(0),
 	highlightColumn(false),
 	containsCaret(false),
@@ -109,7 +109,7 @@ void LineLayout::Free() noexcept {
 	bidiData.reset();
 }
 
-void LineLayout::Invalidate(validLevel validity_) noexcept {
+void LineLayout::Invalidate(ValidLevel validity_) noexcept {
 	if (validity > validity_)
 		validity = validity_;
 }
@@ -395,14 +395,14 @@ void LineLayoutCache::Deallocate() noexcept {
 	cache.clear();
 }
 
-void LineLayoutCache::Invalidate(LineLayout::validLevel validity_) noexcept {
+void LineLayoutCache::Invalidate(LineLayout::ValidLevel validity_) noexcept {
 	if (!cache.empty() && !allInvalidated) {
 		for (const auto &ll : cache) {
 			if (ll) {
 				ll->Invalidate(validity_);
 			}
 		}
-		if (validity_ == LineLayout::llInvalid) {
+		if (validity_ == LineLayout::ValidLevel::invalid) {
 			allInvalidated = true;
 		}
 	}
@@ -420,7 +420,7 @@ LineLayout *LineLayoutCache::Retrieve(Sci::Line lineNumber, Sci::Line lineCaret,
 	Sci::Line linesOnScreen, Sci::Line linesInDoc) {
 	AllocateForLevel(linesOnScreen, linesInDoc);
 	if (styleClock != styleClock_) {
-		Invalidate(LineLayout::llCheckTextAndStyle);
+		Invalidate(LineLayout::ValidLevel::checkTextAndStyle);
 		styleClock = styleClock_;
 	}
 	allInvalidated = false;
@@ -590,7 +590,7 @@ BreakFinder::BreakFinder(const LineLayout *ll_, const Selection *psel, Range lin
 		}
 	}
 	if (pvsDraw && pvsDraw->indicatorsSetFore) {
-		for (const auto deco : pdoc->decorations->View()) {
+		for (const auto *const deco : pdoc->decorations->View()) {
 			if (pvsDraw->indicators[deco->Indicator()].OverridesTextFore()) {
 				Sci::Position startPos = deco->EndRun(posLineStart);
 				while (startPos < (posLineStart + lineRange.end)) {
@@ -612,10 +612,10 @@ TextSegment BreakFinder::Next() {
 		const int prev = nextBreak;
 		while (nextBreak < lineRange.end) {
 			int charWidth = 1;
-			if (encodingFamily == efUnicode)
+			if (encodingFamily == EncodingFamily::efUnicode)
 				charWidth = UTF8DrawBytes(reinterpret_cast<unsigned char *>(&ll->chars[nextBreak]),
 					static_cast<int>(lineRange.end - nextBreak));
-			else if (encodingFamily == efDBCS)
+			else if (encodingFamily == EncodingFamily::efDBCS)
 				charWidth = pdoc->DBCSDrawBytes(
 					std::string_view(&ll->chars[nextBreak], lineRange.end - nextBreak));
 			const Representation *repr = preprs->RepresentationFromCharacter(&ll->chars[nextBreak], charWidth);

@@ -2165,6 +2165,9 @@ void ValidateUILangauge(void) {
 	case LANG_GERMAN:
 		languageMenu = IDM_LANG_GERMAN;
 		break;
+	case LANG_ITALIAN:
+		languageMenu = IDM_LANG_ITALIAN;
+		break;
 	case LANG_JAPANESE:
 		languageMenu = IDM_LANG_JAPANESE;
 		break;
@@ -2193,6 +2196,9 @@ void SetUILanguage(int menu) {
 		break;
 	case LANG_GERMAN:
 		lang = MAKELANGID(LANG_GERMAN, SUBLANG_GERMAN);
+		break;
+	case IDM_LANG_ITALIAN:
+		lang = MAKELANGID(LANG_ITALIAN, SUBLANG_ITALIAN);
 		break;
 	case IDM_LANG_JAPANESE:
 		lang = MAKELANGID(LANG_JAPANESE, SUBLANG_DEFAULT);
@@ -3686,12 +3692,12 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		Sci_Position iPos = SciCall_GetCurrentPos();
 		int ch = SciCall_GetCharAt(iPos);
 		if (IsBraceMatchChar(ch)) {
-			iBrace2 = SciCall_BraceMatch(iPos, 0);
+			iBrace2 = SciCall_BraceMatch(iPos);
 		} else { // Try one before
 			iPos = SciCall_PositionBefore(iPos);
 			ch = SciCall_GetCharAt(iPos);
 			if (IsBraceMatchChar(ch)) {
-				iBrace2 = SciCall_BraceMatch(iPos, 0);
+				iBrace2 = SciCall_BraceMatch(iPos);
 			}
 		}
 		if (iBrace2 != -1) {
@@ -3705,12 +3711,12 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		Sci_Position iPos = SciCall_GetCurrentPos();
 		int ch = SciCall_GetCharAt(iPos);
 		if (IsBraceMatchChar(ch)) {
-			iBrace2 = SciCall_BraceMatch(iPos, 0);
+			iBrace2 = SciCall_BraceMatch(iPos);
 		} else { // Try one before
 			iPos = SciCall_PositionBefore(iPos);
 			ch = SciCall_GetCharAt(iPos);
 			if (IsBraceMatchChar(ch)) {
-				iBrace2 = SciCall_BraceMatch(iPos, 0);
+				iBrace2 = SciCall_BraceMatch(iPos);
 			}
 		}
 		if (iBrace2 != -1) {
@@ -4931,7 +4937,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 					Sci_Position iPos = SciCall_GetCurrentPos();
 					int ch = SciCall_GetCharAt(iPos);
 					if (IsBraceMatchChar(ch)) {
-						const Sci_Position iBrace2 = SciCall_BraceMatch(iPos, 0);
+						const Sci_Position iBrace2 = SciCall_BraceMatch(iPos);
 						if (iBrace2 != -1) {
 							const Sci_Position col1 = SciCall_GetColumn(iPos);
 							const Sci_Position col2 = SciCall_GetColumn(iBrace2);
@@ -4945,7 +4951,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 						iPos = SciCall_PositionBefore(iPos);
 						ch = SciCall_GetCharAt(iPos);
 						if (IsBraceMatchChar(ch)) {
-							const Sci_Position iBrace2 = SciCall_BraceMatch(iPos, 0);
+							const Sci_Position iBrace2 = SciCall_BraceMatch(iPos);
 							if (iBrace2 != -1) {
 								const Sci_Position col1 = SciCall_GetColumn(iPos);
 								const Sci_Position col2 = SciCall_GetColumn(iBrace2);
@@ -5030,7 +5036,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 				} else {
 					const int chNext = (brace == '(') ? ')' : brace + 2;
 					if (ch == chNext) {
-						if (SciCall_BraceMatch(iPos, 0) == -1) {
+						if (SciCall_BraceMatchNext(iPos, SciCall_PositionBefore(iCurPos)) == -1) {
 							*(braces + 1) = L'\0'; // delete close brace
 						}
 					} else {
@@ -5046,17 +5052,8 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			SciCall_SetSel(scn->position, iCurPos);
 			SciCall_ReplaceSel(text);
 			SciCall_SetSel(iNewPos, iNewPos);
-			if (closeBrace) {
-				// find next close brace
-				Sci_Position iPos = SciCall_BraceMatch(iNewPos - 1, iNewPos);
-				if (iPos != -1) {
-					// check whether next close brace already matched
-					iPos = SciCall_BraceMatch(iPos, iNewPos - 1);
-					if (iPos == -1) {
-						// delete close brace: open brace and next close brace already matched
-						SciCall_Clear();
-					}
-				}
+			if (closeBrace && EditIsOpenBraceMatched(iNewPos - 1, iNewPos + 1)) {
+				SciCall_Clear(); // delete close brace
 			}
 			SciCall_EndUndoAction();
 			SciCall_AutoCCancel();
@@ -7481,7 +7478,7 @@ BOOL FileSave(BOOL bSaveAlways, BOOL bAsk, BOOL bSaveAs, BOOL bSaveCopy) {
 			lstrcpy(tchFile, szCurFile);
 		}
 
-		if (SaveFileDlg(hwndMain, tchFile, COUNTOF(tchFile), tchInitialDir)) {
+		if (SaveFileDlg(hwndMain, Untitled, tchFile, COUNTOF(tchFile), tchInitialDir)) {
 			fSuccess = FileIO(FALSE, tchFile, bSaveCopy, &status);
 			if (fSuccess) {
 				if (!bSaveCopy) {
@@ -7603,7 +7600,7 @@ BOOL OpenFileDlg(HWND hwnd, LPWSTR lpstrFile, int cchFile, LPCWSTR lpstrInitialD
 // SaveFileDlg()
 //
 //
-BOOL SaveFileDlg(HWND hwnd, LPWSTR lpstrFile, int cchFile, LPCWSTR lpstrInitialDir) {
+BOOL SaveFileDlg(HWND hwnd, BOOL Untitled, LPWSTR lpstrFile, int cchFile, LPCWSTR lpstrInitialDir) {
 	WCHAR tchInitialDir[MAX_PATH] = L"";
 	if (StrNotEmpty(lpstrInitialDir)) {
 		lstrcpy(tchInitialDir, lpstrInitialDir);
@@ -7645,7 +7642,8 @@ BOOL SaveFileDlg(HWND hwnd, LPWSTR lpstrFile, int cchFile, LPCWSTR lpstrInitialD
 	if (success) {
 		lstrcpyn(lpstrFile, szNewFile, cchFile);
 		const int iLexer = lexers[ofn.nFilterIndex];
-		flagLexerSpecified = iLexer != 0;
+		// default scheme, current scheme and selected file type all are Text File => no lexer specified.
+		flagLexerSpecified = iLexer != 0 && !(Untitled && iLexer == NP2LEX_TEXTFILE && iLexer == lexers[0] && iLexer == pLexCurrent->rid);
 		iInitialLexer = iLexer;
 	}
 	NP2HeapFree(szFilter);

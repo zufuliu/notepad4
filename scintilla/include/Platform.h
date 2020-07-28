@@ -137,15 +137,15 @@ public:
 		return Point(static_cast<XYPOSITION>(x_), static_cast<XYPOSITION>(y_));
 	}
 
-	bool operator!=(Point other) const noexcept {
+	constexpr bool operator!=(Point other) const noexcept {
 		return (x != other.x) || (y != other.y);
 	}
 
-	Point operator+(Point other) const noexcept {
+	constexpr Point operator+(Point other) const noexcept {
 		return Point(x + other.x, y + other.y);
 	}
 
-	Point operator-(Point other) const noexcept {
+	constexpr Point operator-(Point other) const noexcept {
 		return Point(x - other.x, y - other.y);
 	}
 
@@ -174,24 +174,24 @@ public:
 
 	// Other automatically defined methods (assignment, copy constructor, destructor) are fine
 
-	bool operator==(const PRectangle &rc) const noexcept {
+	constexpr bool operator==(const PRectangle &rc) const noexcept {
 		return (rc.left == left) && (rc.right == right) &&
 			(rc.top == top) && (rc.bottom == bottom);
 	}
-	bool Contains(Point pt) const noexcept {
+	constexpr bool Contains(Point pt) const noexcept {
 		return (pt.x >= left) && (pt.x <= right) &&
 			(pt.y >= top) && (pt.y <= bottom);
 	}
-	bool ContainsWholePixel(Point pt) const noexcept {
+	constexpr bool ContainsWholePixel(Point pt) const noexcept {
 		// Does the rectangle contain all of the pixel to left/below the point
 		return (pt.x >= left) && ((pt.x + 1) <= right) &&
 			(pt.y >= top) && ((pt.y + 1) <= bottom);
 	}
-	bool Contains(PRectangle rc) const noexcept {
+	constexpr bool Contains(PRectangle rc) const noexcept {
 		return (rc.left >= left) && (rc.right <= right) &&
 			(rc.top >= top) && (rc.bottom <= bottom);
 	}
-	bool Intersects(PRectangle other) const noexcept {
+	constexpr bool Intersects(PRectangle other) const noexcept {
 		return (right > other.left) && (left < other.right) &&
 			(bottom > other.top) && (top < other.bottom);
 	}
@@ -213,13 +213,13 @@ public:
 	constexpr PRectangle Deflate(int xDelta, int yDelta) const noexcept {
 		return Inflate(-xDelta, -yDelta);
 	}
-	XYPOSITION Width() const noexcept {
+	constexpr XYPOSITION Width() const noexcept {
 		return right - left;
 	}
-	XYPOSITION Height() const noexcept {
+	constexpr XYPOSITION Height() const noexcept {
 		return bottom - top;
 	}
-	bool Empty() const noexcept {
+	constexpr bool Empty() const noexcept {
 		return (Height() <= 0) || (Width() <= 0);
 	}
 };
@@ -231,38 +231,38 @@ constexpr float componentMaximum = 255.0F;
 class ColourDesired {
 	unsigned int co;
 public:
-	explicit ColourDesired(unsigned int co_ = 0) noexcept : co(co_) {}
+	constexpr explicit ColourDesired(unsigned int co_ = 0) noexcept : co(co_) {}
 
-	ColourDesired(unsigned int red, unsigned int green, unsigned int blue) noexcept :
+	constexpr ColourDesired(unsigned int red, unsigned int green, unsigned int blue) noexcept :
 		co(red | (green << 8) | (blue << 16)) {}
 
-	bool operator==(const ColourDesired &other) const noexcept {
+	constexpr bool operator==(const ColourDesired &other) const noexcept {
 		return co == other.co;
 	}
 
-	unsigned int AsInteger() const noexcept {
+	constexpr unsigned int AsInteger() const noexcept {
 		return co;
 	}
 
 	// Red, green and blue values as bytes 0..255
-	unsigned char GetRed() const noexcept {
+	constexpr unsigned char GetRed() const noexcept {
 		return co & 0xff;
 	}
-	unsigned char GetGreen() const noexcept {
+	constexpr unsigned char GetGreen() const noexcept {
 		return (co >> 8) & 0xff;
 	}
-	unsigned char GetBlue() const noexcept {
+	constexpr unsigned char GetBlue() const noexcept {
 		return (co >> 16) & 0xff;
 	}
 
 	// Red, green and blue values as float 0..1.0
-	float GetRedComponent() const noexcept {
+	constexpr float GetRedComponent() const noexcept {
 		return GetRed() / componentMaximum;
 	}
-	float GetGreenComponent() const noexcept {
+	constexpr float GetGreenComponent() const noexcept {
 		return GetGreen() / componentMaximum;
 	}
-	float GetBlueComponent() const noexcept {
+	constexpr float GetBlueComponent() const noexcept {
 		return GetBlue() / componentMaximum;
 	}
 };
@@ -272,29 +272,30 @@ public:
 */
 class ColourAlpha : public ColourDesired {
 public:
-	explicit ColourAlpha(unsigned int co_ = 0) noexcept : ColourDesired(co_) {}
+	constexpr explicit ColourAlpha(unsigned int co_ = 0) noexcept : ColourDesired(co_) {}
 
-	ColourAlpha(unsigned int red, unsigned int green, unsigned int blue) noexcept :
+	constexpr ColourAlpha(unsigned int red, unsigned int green, unsigned int blue) noexcept :
 		ColourDesired(red | (green << 8) | (blue << 16)) {}
-	ColourAlpha(unsigned int red, unsigned int green, unsigned int blue, unsigned int alpha) noexcept :
+
+	constexpr ColourAlpha(unsigned int red, unsigned int green, unsigned int blue, unsigned int alpha) noexcept :
 		ColourDesired(red | (green << 8) | (blue << 16) | (alpha << 24)) {}
 
-	ColourAlpha(ColourDesired cd, unsigned int alpha) noexcept :
+	constexpr ColourAlpha(ColourDesired cd, unsigned int alpha) noexcept :
 		ColourDesired(cd.AsInteger() | (alpha << 24)) {}
 
-	ColourDesired GetColour() const noexcept {
+	constexpr ColourDesired GetColour() const noexcept {
 		return ColourDesired(AsInteger() & 0xffffff);
 	}
 
-	unsigned char GetAlpha() const noexcept {
+	constexpr unsigned char GetAlpha() const noexcept {
 		return (AsInteger() >> 24) & 0xff;
 	}
 
-	float GetAlphaComponent() const noexcept {
+	constexpr float GetAlphaComponent() const noexcept {
 		return GetAlpha() / componentMaximum;
 	}
 
-	ColourAlpha MixedWith(ColourAlpha other) const noexcept {
+	constexpr ColourAlpha MixedWith(ColourAlpha other) const noexcept {
 		const unsigned int red = (GetRed() + other.GetRed()) / 2;
 		const unsigned int green = (GetGreen() + other.GetGreen()) / 2;
 		const unsigned int blue = (GetBlue() + other.GetBlue()) / 2;
@@ -330,7 +331,7 @@ struct FontParameters {
 	int characterSet;
 	const char *localeName;
 
-	FontParameters(
+	explicit FontParameters(
 		const char *faceName_,
 		float size_ = 10,
 		int weight_ = 400,
@@ -581,33 +582,25 @@ public:
 #endif
 
 /**
- * Platform class used to retrieve system wide parameters such as double click speed
- * and chrome colour. Not a creatable object, more of a module with several functions.
+ * Platform namespace used to retrieve system wide parameters such as double click speed
+ * and chrome colour.
  */
-class Platform {
-public:
-	Platform() noexcept = default;
-	Platform(const Platform &) = delete;
-	Platform(Platform &&) = delete;
-	Platform &operator=(const Platform &) = delete;
-	Platform &operator=(Platform &&) = delete;
-	~Platform() = default;
+namespace Platform {
+	ColourDesired Chrome() noexcept;
+	ColourDesired ChromeHighlight() noexcept;
+	const char *DefaultFont() noexcept;
+	int DefaultFontSize() noexcept;
+	unsigned int DoubleClickTime() noexcept;
 
-	static ColourDesired Chrome() noexcept;
-	static ColourDesired ChromeHighlight() noexcept;
-	static const char *DefaultFont() noexcept;
-	static int DefaultFontSize() noexcept;
-	static unsigned int DoubleClickTime() noexcept;
-
-	static void DebugDisplay(const char *s) noexcept;
-	static void DebugPrintf(const char *format, ...) noexcept
+	void DebugDisplay(const char *s) noexcept;
 #if defined(__GNUC__) || defined(__clang__)
-	__attribute__((format(printf, 1, 2)))
+	void DebugPrintf(const char *format, ...) noexcept __attribute__((format(printf, 1, 2)));
+#else
+	void DebugPrintf(const char *format, ...) noexcept;
 #endif
-	;
-	static bool ShowAssertionPopUps(bool assertionPopUps_) noexcept;
-	static void Assert(const char *c, const char *file, int line) noexcept CLANG_ANALYZER_NORETURN;
-};
+	bool ShowAssertionPopUps(bool assertionPopUps_) noexcept;
+	void Assert(const char *c, const char *file, int line) noexcept CLANG_ANALYZER_NORETURN;
+}
 
 #ifdef  NDEBUG
 #define PLATFORM_ASSERT(c) ((void)0)

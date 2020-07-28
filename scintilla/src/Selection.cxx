@@ -427,6 +427,13 @@ void Selection::Clear() {
 	rangeRectangular.Reset();
 }
 
+void Selection::Reset() noexcept {
+	if (selType == selLines && Empty()) {
+		selType = selStream;
+		moveExtends = false;
+	}
+}
+
 void Selection::RemoveDuplicates() {
 	for (size_t i = 0; i < ranges.size() - 1; i++) {
 		if (ranges[i].Empty()) {
@@ -442,6 +449,7 @@ void Selection::RemoveDuplicates() {
 			}
 		}
 	}
+	Reset();
 }
 
 void Selection::RotateMain() noexcept {

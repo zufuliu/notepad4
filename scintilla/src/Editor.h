@@ -220,9 +220,9 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	int dwellDelay;
 	int ticksToDwell;
 	bool dwelling;
-	enum {
-		selChar, selWord, selSubLine, selWholeLine
-	} selectionType;
+	enum class TextUnit {
+		character, word, subLine, wholeLine
+	} selectionUnit;
 	Point ptMouseLast;
 	enum {
 		ddNone, ddInitial, ddDragging
@@ -337,8 +337,8 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	void SetSelection(int currentPos_);
 	void SetEmptySelection(SelectionPosition currentPos_);
 	void SetEmptySelection(Sci::Position currentPos_);
-	enum AddNumber {
-		addOne, addEach
+	enum class AddNumber {
+		one, each
 	};
 	void MultipleSelectAdd(AddNumber addNumber);
 	bool RangeContainsProtected(Sci::Position start, Sci::Position end) const noexcept;

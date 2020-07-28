@@ -6,7 +6,8 @@ class DBCSTailKind(IntFlag):
 	Digit = 1
 	Punctuation = 2
 	Word = 4
-	All = 7
+	Control = 8
+	All = 15
 	NonWord = 3
 
 	@staticmethod
@@ -17,6 +18,8 @@ class DBCSTailKind(IntFlag):
 			return DBCSTailKind.Punctuation
 		if (flags & DBCSTailKind.Word) and (ch_tail == '_' or ch_tail.isalpha()):
 			return DBCSTailKind.Word
+		if (flags & DBCSTailKind.Control) and not ch_tail.isprintable():
+			return DBCSTailKind.Control
 		return None
 
 	@staticmethod
@@ -24,7 +27,7 @@ class DBCSTailKind(IntFlag):
 		if flags.name:
 			return flags.name
 		comb = []
-		for value in [DBCSTailKind.Digit, DBCSTailKind.Punctuation, DBCSTailKind.Word]:
+		for value in [DBCSTailKind.Digit, DBCSTailKind.Punctuation, DBCSTailKind.Word, DBCSTailKind.Control]:
 			if flags & value:
 				comb.append(value.name)
 		return ' or '.join(comb)
@@ -73,10 +76,10 @@ def print_dbcs_char_by_tail(code_page, what):
 			print('\t\t', ' '.join(items[i:i + step]))
 			i += step
 
-def print_dbcs_test_char():
-	print_dbcs_char_by_tail('GBK', DBCSTailKind.Punctuation)
-	print_dbcs_char_by_tail('Shift-JIS', DBCSTailKind.Punctuation)
-	print_dbcs_char_by_tail('UHC', DBCSTailKind.Punctuation)
-	print_dbcs_char_by_tail('Johab', DBCSTailKind.Punctuation)
+def print_dbcs_test_char(what):
+	print_dbcs_char_by_tail('GBK', what)
+	print_dbcs_char_by_tail('Shift-JIS', what)
+	print_dbcs_char_by_tail('UHC', what)
+	print_dbcs_char_by_tail('Johab', what)
 
-print_dbcs_test_char()
+print_dbcs_test_char(DBCSTailKind.Punctuation)

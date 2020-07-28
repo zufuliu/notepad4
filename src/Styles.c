@@ -362,12 +362,12 @@ enum GlobalStyleIndex {
 	GlobalStyleIndex_IndentationGuide,	// inherited style. `fore`, `back`
 	GlobalStyleIndex_Selection,			// standalone style. main selection (`back`, `alpha`), additional selection (`fore`, `outline`), `eolfilled`
 	GlobalStyleIndex_Whitespace,		// standalone style. `fore`, `back`, `size`: dot size
-	GlobalStyleIndex_CurrentBlock,		// standalone style. `fore`
 	GlobalStyleIndex_CurrentLine,		// standalone style. frame (`fore`, `size`, `outline`), background (`back`, `alpha`)
 	GlobalStyleIndex_Caret,				// standalone style. `fore`: main caret color, `back`: additional caret color
 	GlobalStyleIndex_IMEIndicator,		// indicator style. `fore`: IME indicator color
 	GlobalStyleIndex_LongLineMarker,	// standalone style. `fore`: edge line color, `back`: background color for text exceeds long line limit
 	GlobalStyleIndex_ExtraLineSpacing,	// standalone style. descent = `size`/2, ascent = `size` - descent
+	GlobalStyleIndex_CodeFolding,		// standalone style. `fore`, `back`
 	GlobalStyleIndex_FoldingMarker,		// standalone style. `fore`: folding line color, `back`: plus/minus box fill color
 	GlobalStyleIndex_FoldDispalyText,	// inherited style.
 	GlobalStyleIndex_MarkOccurrences,	// indicator style. `fore`, `alpha`, `outline`
@@ -460,6 +460,7 @@ static inline UINT GetLexerStyleControlMask(int rid, int index) {
 		case GlobalStyleIndex_CurrentLine:
 		case GlobalStyleIndex_Caret:
 		case GlobalStyleIndex_LongLineMarker:
+		case GlobalStyleIndex_CodeFolding:
 		case GlobalStyleIndex_FoldingMarker:
 		case GlobalStyleIndex_Bookmark:
 			return StyleControl_Fore | StyleControl_Back;
@@ -467,7 +468,6 @@ static inline UINT GetLexerStyleControlMask(int rid, int index) {
 			return StyleControl_Fore | StyleControl_Back | StyleControl_EOLFilled;
 		case GlobalStyleIndex_MatchBrace:
 		case GlobalStyleIndex_MatchBraceError:
-		case GlobalStyleIndex_CurrentBlock:
 		case GlobalStyleIndex_IMEIndicator:
 		case GlobalStyleIndex_MarkOccurrences:
 			return StyleControl_Fore;
@@ -1377,6 +1377,11 @@ void Style_InitDefaultColor(void) {
 	SciCall_StyleSetBack(STYLE_DEFAULT, rgb);
 	//SciCall_StyleClearAll();
 
+	const COLORREF backColor = rgb;
+	szValue = pLexGlobal->Styles[GlobalStyleIndex_CodeFolding].szValue;
+	if (!Style_StrGetBackColor(szValue, &rgb)) {
+		rgb = backColor;
+	}
 	SciCall_SetFoldMarginColour(TRUE, rgb);
 	SciCall_SetFoldMarginHiColour(TRUE, rgb);
 
@@ -1671,13 +1676,15 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 			fillColor = (bUse2ndGlobalStyle || np2StyleTheme == StyleTheme_Dark) ? FoldingMarkerFillColorDark : FoldingMarkerFillColorDefault;
 		}
 
-		szValue = pLexGlobal->Styles[GlobalStyleIndex_CurrentBlock].szValue;
+		szValue = pLexGlobal->Styles[GlobalStyleIndex_CodeFolding].szValue;
 		if (!Style_StrGetForeColor(szValue, &highlightColor)) {
 			highlightColor = RGB(0xFF, 0x00, 0x00); // Scintilla default red color
 		}
-
-		SciCall_SetFoldMarginColour(TRUE, backColor);
-		SciCall_SetFoldMarginHiColour(TRUE, backColor);
+		if (!Style_StrGetBackColor(szValue, &rgb)) {
+			rgb = backColor;
+		}
+		SciCall_SetFoldMarginColour(TRUE, rgb);
+		SciCall_SetFoldMarginHiColour(TRUE, rgb);
 #if 0	// use gray fold color
 		COLORREF foreColor = SciCall_StyleGetFore(STYLE_DEFAULT);
 		// Marker fore/back colors
@@ -3213,6 +3220,7 @@ LPWSTR Style_GetOpenDlgFilterStr(BOOL open, LPCWSTR lpszFile, int lexers[]) {
 	}
 
 	if (!open) {
+		lexers[0] = pLexArray[iDefaultLexerIndex]->rid;
 		// All Files comes last for save file dialog.
 		GetString(IDS_FILTER_ALL, szFilter + length, MAX_EDITLEXER_EXT_SIZE);
 	}

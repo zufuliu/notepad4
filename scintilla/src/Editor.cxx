@@ -134,7 +134,7 @@ Editor::Editor() : durationWrapOneLine(0.00001, 0.000001, 0.0001) {
 	dropWentOutside = false;
 	posDrop = SelectionPosition(Sci::invalidPosition);
 	hotSpotClickPos = INVALID_POSITION;
-	selectionType = selChar;
+	selectionUnit = TextUnit::character;
 
 	lastXChosen = 0;
 	lineAnchorPos = 0;
@@ -218,6 +218,7 @@ void Editor::SetRepresentations() {
 		const char c[2] = { static_cast<char>(j), 0 };
 		reprs.SetRepresentation(c, reps[j]);
 	}
+	reprs.SetRepresentation("\x7f", "DEL");
 
 	// C1 control set
 	// As well as Unicode mode, ISO-8859-1 should use these
@@ -271,7 +272,7 @@ void Editor::InvalidateStyleData() {
 	vs.technology = technology;
 	DropGraphics(false);
 	AllocateGraphics();
-	view.llc.Invalidate(LineLayout::llInvalid);
+	view.llc.Invalidate(LineLayout::ValidLevel::invalid);
 	view.posCache.Clear();
 }
 
@@ -787,7 +788,7 @@ void Editor::MultipleSelectAdd(AddNumber addNumber) {
 					ContainerNeedsUpdate(SC_UPDATE_SELECTION);
 					ScrollRange(sel.RangeMain());
 					Redraw();
-					if (addNumber == addOne)
+					if (addNumber == AddNumber::one)
 						return;
 					searchStart = pos + lengthFound;
 				} else {
@@ -1482,13 +1483,13 @@ void Editor::UpdateSystemCaret() {
 }
 
 bool Editor::Wrapping() const noexcept {
-	return vs.wrapState != eWrapNone;
+	return vs.wrapState != WrapMode::none;
 }
 
 void Editor::NeedWrapping(Sci::Line docLineStart, Sci::Line docLineEnd) noexcept {
 	//Platform::DebugPrintf("\nNeedWrapping: %0d..%0d\n", docLineStart, docLineEnd);
 	if (wrapPending.AddRange(docLineStart, docLineEnd)) {
-		view.llc.Invalidate(LineLayout::llPositions);
+		view.llc.Invalidate(LineLayout::ValidLevel::positions);
 	}
 	// Wrap lines during idle.
 	if (Wrapping() && wrapPending.NeedsWrap()) {
@@ -2560,7 +2561,7 @@ void Editor::NotifySavePoint(Document *, void *, bool atSavePoint) noexcept {
 
 void Editor::CheckModificationForWrap(DocModification mh) {
 	if (mh.modificationType & (SC_MOD_INSERTTEXT | SC_MOD_DELETETEXT)) {
-		view.llc.Invalidate(LineLayout::llCheckTextAndStyle);
+		view.llc.Invalidate(LineLayout::ValidLevel::checkTextAndStyle);
 		const Sci::Line lineDoc = pdoc->SciLineFromPosition(mh.position);
 		const Sci::Line lines = std::max<Sci::Line>(0, mh.linesAdded);
 		if (Wrapping()) {
@@ -2641,7 +2642,7 @@ void Editor::NotifyModified(Document *, DocModification mh, void *) {
 			}
 		}
 		if (mh.modificationType & SC_MOD_CHANGESTYLE) {
-			view.llc.Invalidate(LineLayout::llCheckTextAndStyle);
+			view.llc.Invalidate(LineLayout::ValidLevel::checkTextAndStyle);
 		}
 	} else {
 		// Move selection and brace highlights
@@ -4570,34 +4571,34 @@ void Editor::ButtonDownWithModifiers(Point pt, unsigned int curTime, int modifie
 		//Platform::DebugPrintf("Double click %d %d = %d\n", curTime, lastClickTime, curTime - lastClickTime);
 		SetMouseCapture(true);
 		FineTickerStart(tickScroll, 100, 10);
-		if (!ctrl || !multipleSelection || (selectionType != selChar && selectionType != selWord))
+		if (!ctrl || !multipleSelection || (selectionUnit != TextUnit::character && selectionUnit != TextUnit::word))
 			SetEmptySelection(newPos.Position());
 		bool doubleClick = false;
 		if (inSelMargin) {
-			// Inside margin selection type should be either selSubLine or selWholeLine.
-			if (selectionType == selSubLine) {
-				// If it is selSubLine, we're inside a *double* click and word wrap is enabled,
-				// so we switch to selWholeLine in order to select whole line.
-				selectionType = selWholeLine;
-			} else if (selectionType != selSubLine && selectionType != selWholeLine) {
+			// Inside margin selection type should be either subLine or wholeLine.
+			if (selectionUnit == TextUnit::subLine) {
+				// If it is subLine, we're inside a *double* click and word wrap is enabled,
+				// so we switch to wholeLine in order to select whole line.
+				selectionUnit = TextUnit::wholeLine;
+			} else if (selectionUnit != TextUnit::subLine && selectionUnit != TextUnit::wholeLine) {
 				// If it is neither, reset selection type to line selection.
-				selectionType = (Wrapping() && (marginOptions & SC_MARGINOPTION_SUBLINESELECT)) ? selSubLine : selWholeLine;
+				selectionUnit = (Wrapping() && (marginOptions & SC_MARGINOPTION_SUBLINESELECT)) ? TextUnit::subLine : TextUnit::wholeLine;
 			}
 		} else {
-			if (selectionType == selChar) {
-				selectionType = selWord;
+			if (selectionUnit == TextUnit::character) {
+				selectionUnit = TextUnit::word;
 				doubleClick = true;
-			} else if (selectionType == selWord) {
+			} else if (selectionUnit == TextUnit::word) {
 				// Since we ended up here, we're inside a *triple* click, which should always select
 				// whole line regardless of word wrap being enabled or not.
-				selectionType = selWholeLine;
+				selectionUnit = TextUnit::wholeLine;
 			} else {
-				selectionType = selChar;
+				selectionUnit = TextUnit::character;
 				originalAnchorPos = sel.MainCaret();
 			}
 		}
 
-		if (selectionType == selWord) {
+		if (selectionUnit == TextUnit::word) {
 			Sci::Position charPos = originalAnchorPos;
 			if (sel.MainCaret() == originalAnchorPos) {
 				charPos = PositionFromLocation(pt, false, true);
@@ -4626,9 +4627,9 @@ void Editor::ButtonDownWithModifiers(Point pt, unsigned int curTime, int modifie
 			wordSelectAnchorEndPos = endWord;
 			wordSelectInitialCaretPos = sel.MainCaret();
 			WordSelection(wordSelectInitialCaretPos);
-		} else if (selectionType == selSubLine || selectionType == selWholeLine) {
+		} else if (selectionUnit == TextUnit::subLine || selectionUnit == TextUnit::wholeLine) {
 			lineAnchorPos = newPos.Position();
-			LineSelection(lineAnchorPos, lineAnchorPos, selectionType == selWholeLine);
+			LineSelection(lineAnchorPos, lineAnchorPos, selectionUnit == TextUnit::wholeLine);
 			//Platform::DebugPrintf("Triple click: %d - %d\n", anchor, currentPos);
 		} else {
 			SetEmptySelection(sel.MainCaret());
@@ -4647,10 +4648,10 @@ void Editor::ButtonDownWithModifiers(Point pt, unsigned int curTime, int modifie
 			}
 			sel.selType = Selection::selStream;
 			if (!shift) {
-				// Single click in margin: select whole line or only subline if word wrap is enabled
+				// Single click in margin: select wholeLine or only subLine if word wrap is enabled
 				lineAnchorPos = newPos.Position();
-				selectionType = (Wrapping() && (marginOptions & SC_MARGINOPTION_SUBLINESELECT)) ? selSubLine : selWholeLine;
-				LineSelection(lineAnchorPos, lineAnchorPos, selectionType == selWholeLine);
+				selectionUnit = (Wrapping() && (marginOptions & SC_MARGINOPTION_SUBLINESELECT)) ? TextUnit::subLine : TextUnit::wholeLine;
+				LineSelection(lineAnchorPos, lineAnchorPos, selectionUnit == TextUnit::wholeLine);
 			} else {
 				// Single shift+click in margin: select from line anchor to clicked line
 				if (sel.MainAnchor() > sel.MainCaret())
@@ -4659,11 +4660,11 @@ void Editor::ButtonDownWithModifiers(Point pt, unsigned int curTime, int modifie
 					lineAnchorPos = sel.MainAnchor();
 				// Reset selection type if there is an empty selection.
 				// This ensures that we don't end up stuck in previous selection mode, which is no longer valid.
-				// Otherwise, if there's a non empty selection, reset selection type only if it differs from selSubLine and selWholeLine.
+				// Otherwise, if there's a non empty selection, reset selection type only if it differs from subLine and wholeLine.
 				// This ensures that we continue selecting in the same selection mode.
-				if (sel.Empty() || (selectionType != selSubLine && selectionType != selWholeLine))
-					selectionType = (Wrapping() && (marginOptions & SC_MARGINOPTION_SUBLINESELECT)) ? selSubLine : selWholeLine;
-				LineSelection(newPos.Position(), lineAnchorPos, selectionType == selWholeLine);
+				if (sel.Empty() || (selectionUnit != TextUnit::subLine && selectionUnit != TextUnit::wholeLine))
+					selectionUnit = (Wrapping() && (marginOptions & SC_MARGINOPTION_SUBLINESELECT)) ? TextUnit::subLine : TextUnit::wholeLine;
+				LineSelection(newPos.Position(), lineAnchorPos, selectionUnit == TextUnit::wholeLine);
 			}
 
 			SetDragPosition(SelectionPosition(Sci::invalidPosition));
@@ -4704,7 +4705,7 @@ void Editor::ButtonDownWithModifiers(Point pt, unsigned int curTime, int modifie
 					anchorCurrent = sel.IsRectangular() ?
 					sel.Rectangular().anchor : sel.RangeMain().anchor;
 				sel.selType = alt ? Selection::selRectangle : Selection::selStream;
-				selectionType = selChar;
+				selectionUnit = TextUnit::character;
 				originalAnchorPos = sel.MainCaret();
 				sel.Rectangular() = SelectionRange(newPos, anchorCurrent);
 				SetRectangularRange();
@@ -4831,7 +4832,7 @@ void Editor::ButtonMoveWithModifiers(Point pt, unsigned int, int modifiers) {
 		if (posDrag.IsValid()) {
 			SetDragPosition(movePos);
 		} else {
-			if (selectionType == selChar) {
+			if (selectionUnit == TextUnit::character) {
 				if (sel.selType == Selection::selStream && (modifiers & SCI_ALT) && mouseSelectionRectangularSwitch) {
 					sel.selType = Selection::selRectangle;
 				}
@@ -4846,7 +4847,7 @@ void Editor::ButtonMoveWithModifiers(Point pt, unsigned int, int modifiers) {
 				} else {
 					SetSelection(movePos, sel.RangeMain().anchor);
 				}
-			} else if (selectionType == selWord) {
+			} else if (selectionUnit == TextUnit::word) {
 				// Continue selecting by word
 				if (movePos.Position() == wordSelectInitialCaretPos) {  // Didn't move
 					// No need to do anything. Previously this case was lumped
@@ -4864,7 +4865,7 @@ void Editor::ButtonMoveWithModifiers(Point pt, unsigned int, int modifiers) {
 				}
 			} else {
 				// Continue selecting by line
-				LineSelection(movePos.Position(), lineAnchorPos, selectionType == selWholeLine);
+				LineSelection(movePos.Position(), lineAnchorPos, selectionUnit == TextUnit::wholeLine);
 			}
 		}
 
@@ -4926,7 +4927,7 @@ void Editor::ButtonUpWithModifiers(Point pt, unsigned int curTime, int modifiers
 	if (inDragDrop == ddInitial) {
 		inDragDrop = ddNone;
 		SetEmptySelection(newPos);
-		selectionType = selChar;
+		selectionUnit = TextUnit::character;
 		originalAnchorPos = sel.MainCaret();
 	}
 	if (hotSpotClickPos != INVALID_POSITION && PointIsHotspot(pt)) {
@@ -4978,10 +4979,10 @@ void Editor::ButtonUpWithModifiers(Point pt, unsigned int curTime, int modifiers
 					}
 					drag.Clear();
 				}
-				selectionType = selChar;
+				selectionUnit = TextUnit::character;
 			}
 		} else {
-			if (selectionType == selChar) {
+			if (selectionUnit == TextUnit::character) {
 				if (sel.Count() > 1) {
 					sel.RangeMain() =
 						SelectionRange(newPos, sel.Range(sel.Count() - 1).anchor);
@@ -6425,11 +6426,11 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 		return view.printParameters.colourMode;
 
 	case SCI_SETPRINTWRAPMODE:
-		view.printParameters.wrapState = (wParam == SC_WRAP_WORD) ? eWrapWord : eWrapNone;
+		view.printParameters.wrapState = (wParam == SC_WRAP_WORD) ? WrapMode::word : WrapMode::none;
 		break;
 
 	case SCI_GETPRINTWRAPMODE:
-		return view.printParameters.wrapState;
+		return static_cast<sptr_t>(view.printParameters.wrapState);
 
 	case SCI_GETSTYLEAT:
 		if (static_cast<Sci::Position>(wParam) >= pdoc->Length())
@@ -6734,7 +6735,7 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 		break;
 
 	case SCI_GETWRAPMODE:
-		return vs.wrapState;
+		return static_cast<sptr_t>(vs.wrapState);
 
 	case SCI_SETWRAPVISUALFLAGS:
 		if (vs.SetWrapVisualFlags(static_cast<int>(wParam))) {
@@ -7735,7 +7736,10 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 	case SCI_BRACEMATCH:
 		// wParam is position of char to find brace for,
 		// lParam is maximum amount of text to restyle to find it
-		return pdoc->BraceMatch(wParam, lParam);
+		return pdoc->BraceMatch(wParam, lParam, 0, false);
+
+	case SCI_BRACEMATCHNEXT:
+		return pdoc->BraceMatch(wParam, 0, lParam, true);
 
 	case SCI_GETVIEWEOL:
 		return vs.viewEOL;
@@ -8429,11 +8433,11 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 		break;
 
 	case SCI_MULTIPLESELECTADDNEXT:
-		MultipleSelectAdd(addOne);
+		MultipleSelectAdd(AddNumber::one);
 		break;
 
 	case SCI_MULTIPLESELECTADDEACH:
-		MultipleSelectAdd(addEach);
+		MultipleSelectAdd(AddNumber::each);
 		break;
 
 	case SCI_CHANGELEXERSTATE:

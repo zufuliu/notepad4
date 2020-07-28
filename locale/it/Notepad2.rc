@@ -24,10 +24,10 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// German (Germany) resources
+// Italian (Italy) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
-LANGUAGE LANG_GERMAN, SUBLANG_GERMAN
+LANGUAGE LANG_ITALIAN, SUBLANG_ITALIAN
 #pragma code_page(65001)
 
 /////////////////////////////////////////////////////////////////////////////
@@ -409,7 +409,7 @@ BEGIN
 			MENUITEM "Goto P&revious Sibling Block\tCtrl+Alt+Comma (<,)",IDM_EDIT_GOTO_PREV_SIBLING_BLOCK
 			MENUITEM "Goto N&ext Sibling Block\tCtrl+Alt+Period (>.)",	IDM_EDIT_GOTO_NEXT_SIBLING_BLOCK
 			MENUITEM SEPARATOR
-			MENUITEM "Goto &Selection Start\tCtrl+Shift+Comma (<,)",	CMD_JUMP2SELSTART
+			MENUITEM "Goto &Selection Start\tCtrl+Shift+Comma (<,)",CMD_JUMP2SELSTART
 			MENUITEM "Goto Selec&tion End\tCtrl+Shift+Period (>.)",	CMD_JUMP2SELEND
 		END
 	END
@@ -614,7 +614,7 @@ BEGIN
 				MENUITEM "Deutsch",					IDM_LANG_GERMAN
 				MENUITEM "English",					IDM_LANG_ENGLISH_US
 				MENUITEM "Italiano",				IDM_LANG_ITALIAN
-				MENUITEM "日本語",					IDM_LANG_JAPANESE
+				MENUITEM "日本語",				IDM_LANG_JAPANESE
 				MENUITEM "中文(繁體)",				IDM_LANG_CHINESE_TRADITIONAL
 				MENUITEM "中文(简体)",				IDM_LANG_CHINESE_SIMPLIFIED
 			END
@@ -2196,7 +2196,7 @@ END
 
 #endif    // APSTUDIO_INVOKED
 
-#endif    // German (Germany) resources
+#endif    // Italian (Italy) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
