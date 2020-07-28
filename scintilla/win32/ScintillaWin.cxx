@@ -795,7 +795,7 @@ void ScintillaWin::EnsureRenderTarget(HDC hdc) noexcept {
 	if ((technology == SC_TECHNOLOGY_DIRECTWRITEDC) && pRenderTarget) {
 		RECT rcWindow;
 		GetClientRect(MainHWND(), &rcWindow);
-		const HRESULT hr = down_cast<ID2D1DCRenderTarget*>(pRenderTarget)->BindDC(hdc, &rcWindow);
+		const HRESULT hr = static_cast<ID2D1DCRenderTarget*>(pRenderTarget)->BindDC(hdc, &rcWindow);
 		if (FAILED(hr)) {
 			//Platform::DebugPrintf("BindDC failed 0x%lx\n", hr);
 			DropRenderTarget();
