@@ -2166,7 +2166,7 @@ BEGIN
 	NP2STYLE_IMEIndicator			"IME変換"
 	NP2STYLE_Bookmark				"ブックマーク"
 	NP2STYLE_CallTip				"コールチップ"
-	NP2STYLE_CodeFolding			"コード折りたたみを"
+	NP2STYLE_CodeFolding			"コード折りたたみ"
 
 	NP2STYLE_Default				"標準"
 END
