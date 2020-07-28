@@ -1036,7 +1036,7 @@ void SurfaceGDI::Copy(PRectangle rc, Point from, Surface &surfaceSource) noexcep
 	::BitBlt(hdc,
 		static_cast<int>(rc.left), static_cast<int>(rc.top),
 		static_cast<int>(rc.Width()), static_cast<int>(rc.Height()),
-		static_cast<SurfaceGDI &>(surfaceSource).hdc,
+		down_cast<SurfaceGDI &>(surfaceSource).hdc,
 		static_cast<int>(from.x), static_cast<int>(from.y), SRCCOPY);
 }
 
@@ -1236,6 +1236,7 @@ class SurfaceD2D : public Surface {
 
 	void Clear() noexcept;
 	void SetFont(const Font &font_) noexcept;
+	HRESULT GetBitmap(ID2D1Bitmap **ppBitmap);
 
 public:
 	SurfaceD2D() noexcept = default;
@@ -1365,6 +1366,11 @@ void SurfaceD2D::InitPixMap(int width, int height, Surface *surface_, WindowID w
 	SetDBCSMode(psurfOther->codePage);
 }
 
+HRESULT SurfaceD2D::GetBitmap(ID2D1Bitmap **ppBitmap) {
+	PLATFORM_ASSERT(pBitmapRenderTarget);
+	return pBitmapRenderTarget->GetBitmap(ppBitmap);
+}
+
 void SurfaceD2D::PenColour(ColourDesired fore) {
 	D2DPenColour(fore);
 }
@@ -1467,11 +1473,8 @@ void SurfaceD2D::LineTo(int x_, int y_) noexcept {
 void SurfaceD2D::Polygon(const Point *pts, size_t npts, ColourDesired fore, ColourDesired back) {
 	PLATFORM_ASSERT(pRenderTarget && (npts > 2));
 	if (pRenderTarget) {
-		ID2D1Factory *pFactory = nullptr;
-		pRenderTarget->GetFactory(&pFactory);
-		PLATFORM_ASSERT(pFactory);
 		ID2D1PathGeometry *geometry = nullptr;
-		HRESULT hr = pFactory->CreatePathGeometry(&geometry);
+		HRESULT hr = pD2DFactory->CreatePathGeometry(&geometry);
 		PLATFORM_ASSERT(geometry);
 		if (SUCCEEDED(hr) && geometry) {
 			ID2D1GeometrySink *sink = nullptr;
@@ -1516,10 +1519,10 @@ void SurfaceD2D::FillRectangle(PRectangle rc, ColourDesired back) {
 
 void SurfaceD2D::FillRectangle(PRectangle rc, Surface &surfacePattern) {
 	SurfaceD2D *psurfOther = down_cast<SurfaceD2D *>(&surfacePattern);
-	PLATFORM_ASSERT(psurfOther && psurfOther->pBitmapRenderTarget);
+	PLATFORM_ASSERT(psurfOther);
 	psurfOther->FlushDrawing();
 	ID2D1Bitmap *pBitmap = nullptr;
-	HRESULT hr = psurfOther->pBitmapRenderTarget->GetBitmap(&pBitmap);
+	HRESULT hr = psurfOther->GetBitmap(&pBitmap);
 	if (SUCCEEDED(hr) && pBitmap) {
 		ID2D1BitmapBrush *pBitmapBrush = nullptr;
 		const D2D1_BITMAP_BRUSH_PROPERTIES brushProperties =
@@ -1673,14 +1676,11 @@ void SurfaceD2D::Ellipse(PRectangle rc, ColourDesired fore, ColourDesired back) 
 }
 
 void SurfaceD2D::Copy(PRectangle rc, Point from, Surface &surfaceSource) {
-	SurfaceD2D &surfOther = static_cast<SurfaceD2D &>(surfaceSource);
+	SurfaceD2D &surfOther = down_cast<SurfaceD2D &>(surfaceSource);
 	surfOther.FlushDrawing();
-	ID2D1BitmapRenderTarget *pCompatibleRenderTarget = reinterpret_cast<ID2D1BitmapRenderTarget *>(
-		surfOther.pRenderTarget);
-	PLATFORM_ASSERT(pCompatibleRenderTarget);
 	ID2D1Bitmap *pBitmap = nullptr;
-	HRESULT hr = pCompatibleRenderTarget->GetBitmap(&pBitmap);
-	if (SUCCEEDED(hr)) {
+	HRESULT hr = surfOther.GetBitmap(&pBitmap);
+	if (SUCCEEDED(hr) && pBitmap) {
 		const D2D1_RECT_F rcDestination = RectangleFromPRectangle(rc);
 		D2D1_RECT_F rcSource = { from.x, from.y, from.x + rc.Width(), from.y + rc.Height() };
 		pRenderTarget->DrawBitmap(pBitmap, rcDestination, 1.0f,

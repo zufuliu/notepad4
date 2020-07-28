@@ -108,6 +108,15 @@ inline DerivedPointer down_cast(Base *ptr) noexcept {
 #endif
 }
 
+template<typename DerivedReference, class Base>
+inline DerivedReference down_cast(Base &ref) noexcept {
+#if USE_RTTI
+	return dynamic_cast<DerivedReference>(ref);
+#else
+	return static_cast<DerivedReference>(ref);
+#endif
+}
+
 typedef float XYPOSITION;
 typedef double XYACCUMULATOR;
 
