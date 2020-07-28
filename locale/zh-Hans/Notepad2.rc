@@ -2165,8 +2165,7 @@ BEGIN
 	NP2STYLE_IMEIndicator			"输入法指示"
 	NP2STYLE_Bookmark				"书签"
 	NP2STYLE_CallTip				"调用提示"
-	NP2STYLE_CurrentBlock			"当前代码块"
-	NP2STYLE_FoldMargin				"代码折叠"
+	NP2STYLE_CodeFolding			"代码折叠"
 
 	NP2STYLE_Default				"默认样式"
 END
