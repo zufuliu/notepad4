@@ -483,12 +483,12 @@ protected:
 	WindowID wid;
 
 public:
-	Window() noexcept : wid(nullptr), cursorLast(cursorInvalid) {}
+	Window() noexcept : wid(nullptr), cursorLast(Cursor::invalid) {}
 	Window(const Window &source) = delete;
 	Window(Window &&) = delete;
 	Window &operator=(WindowID wid_) noexcept {
 		wid = wid_;
-		cursorLast = cursorInvalid;
+		cursorLast = Cursor::invalid;
 		return *this;
 	}
 	Window &operator=(const Window &) = delete;
@@ -509,8 +509,8 @@ public:
 	void InvalidateAll() noexcept;
 	void SCICALL InvalidateRectangle(PRectangle rc) noexcept;
 	virtual void SetFont(const Font &font) noexcept;
-	enum Cursor {
-		cursorInvalid, cursorText, cursorArrow, cursorUp, cursorWait, cursorHoriz, cursorVert, cursorReverseArrow, cursorHand
+	enum class Cursor {
+		invalid, text, arrow, up, wait, horizontal, vertical, reverseArrow, hand
 	};
 	void SetCursor(Cursor curs) noexcept;
 	PRectangle SCICALL GetMonitorRect(Point pt) const noexcept;
