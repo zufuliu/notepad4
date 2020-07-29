@@ -2479,27 +2479,27 @@ HCURSOR LoadReverseArrowCursor(UINT dpi) noexcept {
 
 void Window::SetCursor(Cursor curs) noexcept {
 	switch (curs) {
-	case cursorText:
+	case Cursor::text:
 		::SetCursor(::LoadCursor({}, IDC_IBEAM));
 		break;
-	case cursorUp:
+	case Cursor::up:
 		::SetCursor(::LoadCursor({}, IDC_UPARROW));
 		break;
-	case cursorWait:
+	case Cursor::wait:
 		::SetCursor(::LoadCursor({}, IDC_WAIT));
 		break;
-	case cursorHoriz:
+	case Cursor::horizontal:
 		::SetCursor(::LoadCursor({}, IDC_SIZEWE));
 		break;
-	case cursorVert:
+	case Cursor::vertical:
 		::SetCursor(::LoadCursor({}, IDC_SIZENS));
 		break;
-	case cursorHand:
+	case Cursor::hand:
 		::SetCursor(::LoadCursor({}, IDC_HAND));
 		break;
-	case cursorReverseArrow:
-	case cursorArrow:
-	case cursorInvalid:	// Should not occur, but just in case.
+	case Cursor::reverseArrow:
+	case Cursor::arrow:
+	case Cursor::invalid:	// Should not occur, but just in case.
 		::SetCursor(::LoadCursor({}, IDC_ARROW));
 		break;
 	}

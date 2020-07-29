@@ -4318,7 +4318,7 @@ bool Editor::DragThreshold(Point ptStart, Point ptNow) noexcept {
 void Editor::StartDrag() {
 	// Always handled by subclasses
 	//SetMouseCapture(true);
-	//DisplayCursor(Window::cursorArrow);
+	//DisplayCursor(Window::Cursor::::arrow);
 }
 
 void Editor::DropAt(SelectionPosition position, const char *value, size_t lengthValue, bool moving, bool rectangular) {
@@ -4446,7 +4446,7 @@ Window::Cursor Editor::GetMarginCursor(Point pt) const noexcept {
 			return static_cast<Window::Cursor>(m.cursor);
 		x += m.width;
 	}
-	return Window::cursorReverseArrow;
+	return Window::Cursor::reverseArrow;
 }
 
 void Editor::TrimAndSetSelection(Sci::Position currentPos_, Sci::Position anchor_) {
@@ -4885,7 +4885,7 @@ void Editor::ButtonMoveWithModifiers(Point pt, unsigned int, int modifiers) {
 
 		if (hotSpotClickPos != INVALID_POSITION && PositionFromLocation(pt, true, true) != hotSpotClickPos) {
 			if (inDragDrop == ddNone) {
-				DisplayCursor(Window::cursorText);
+				DisplayCursor(Window::Cursor::text);
 			}
 			hotSpotClickPos = INVALID_POSITION;
 		}
@@ -4900,17 +4900,17 @@ void Editor::ButtonMoveWithModifiers(Point pt, unsigned int, int modifiers) {
 		}
 		// Display regular (drag) cursor over selection
 		if (PointInSelection(pt) && !SelectionEmpty()) {
-			DisplayCursor(Window::cursorArrow);
+			DisplayCursor(Window::Cursor::arrow);
 		} else {
 			SetHoverIndicatorPoint(pt);
 			if (PointIsHotspot(pt)) {
-				DisplayCursor(Window::cursorHand);
+				DisplayCursor(Window::Cursor::hand);
 				SetHotSpotRange(&pt);
 			} else {
 				if (hoverIndicatorPos != Sci::invalidPosition)
-					DisplayCursor(Window::cursorHand);
+					DisplayCursor(Window::Cursor::hand);
 				else
-					DisplayCursor(Window::cursorText);
+					DisplayCursor(Window::Cursor::text);
 				SetHotSpotRange(nullptr);
 			}
 		}
@@ -4940,7 +4940,7 @@ void Editor::ButtonUpWithModifiers(Point pt, unsigned int curTime, int modifiers
 		if (PointInSelMargin(pt)) {
 			DisplayCursor(GetMarginCursor(pt));
 		} else {
-			DisplayCursor(Window::cursorText);
+			DisplayCursor(Window::Cursor::text);
 			SetHotSpotRange(nullptr);
 		}
 		ptMouseLast = pt;
@@ -7964,7 +7964,7 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 
 	case SCI_SETCURSOR:
 		cursorMode = static_cast<int>(wParam);
-		DisplayCursor(Window::cursorText);
+		DisplayCursor(Window::Cursor::text);
 		break;
 
 	case SCI_GETCURSOR:
