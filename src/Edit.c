@@ -6814,6 +6814,28 @@ char* EditGetStringAroundCaret(LPCSTR delimiters) {
 		}
 	}
 
+	// Markdown URL: [alt](url)
+	Sci_Position iStartPos = iLineStart;
+	Sci_Position iEndPos = iLineEnd;
+	ft.chrg.cpMax = iLineEnd;
+	ft.lpstrText = "\\(\\w+://";
+	while (iStartPos < iEndPos) {
+		ft.chrg.cpMin = iStartPos;
+		Sci_Position iPos = SciCall_FindText(findFlag, &ft);
+		if (iPos == -1) {
+			break;
+		}
+
+		iStartPos = iPos + 1;
+		iPos = SciCall_BraceMatch(iPos);
+		iEndPos = (iPos == -1) ? iLineEnd : iPos;
+		if (iCurrentPos >= iStartPos && iCurrentPos <= iEndPos) {
+			iLineStart = iStartPos;
+			iLineEnd = iEndPos;
+			break;
+		}
+		iStartPos += 4;
+	}
 	if (iLineStart >= iLineEnd) {
 		return NULL;
 	}
