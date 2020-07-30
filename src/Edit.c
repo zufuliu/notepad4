@@ -6799,13 +6799,21 @@ char* EditGetStringAroundCaret(LPCSTR delimiters) {
 	// forward
 	if (iCurrentPos < iLineEnd) {
 		ft.chrg.cpMax = (Sci_PositionCR)iLineEnd;
-		const Sci_Position iPos = SciCall_FindText(findFlag, &ft);
+		Sci_Position iPos = SciCall_FindText(findFlag, &ft);
 		if (iPos >= 0) {
-			iLineEnd = SciCall_PositionBefore(ft.chrgText.cpMax);
+			iPos = ft.chrgText.cpMax;
+			// keep column in filename(line,column): warning
+			const int chPrev = SciCall_GetCharAt(iPos - 1);
+			const int ch = SciCall_GetCharAt(iPos);
+			if (chPrev == ',' && (ch >= '0' && ch <= '9')) {
+				iLineEnd = SciCall_WordEndPosition(iPos, TRUE);
+			} else {
+				iLineEnd = SciCall_PositionBefore(iPos);
+			}
 		}
 	}
 
-	// backword
+	// backward
 	if (iCurrentPos > iLineStart) {
 		ft.chrg.cpMax = (Sci_PositionCR)iLineStart;
 		const Sci_Position iPos = SciCall_FindText(findFlag, &ft);
@@ -6849,6 +6857,26 @@ char* EditGetStringAroundCaret(LPCSTR delimiters) {
 
 extern BOOL bOpenFolderWithMetapath;
 
+static DWORD EditOpenSelectionCheckFile(LPCWSTR link, LPWSTR path, int cchFilePath, LPWSTR wchDirectory) {
+	DWORD dwAttributes = GetFileAttributes(link);
+	if (dwAttributes == INVALID_FILE_ATTRIBUTES) {
+		if (StrNotEmpty(szCurFile)) {
+			lstrcpy(wchDirectory, szCurFile);
+			PathRemoveFileSpec(wchDirectory);
+			PathCombine(path, wchDirectory, link);
+			dwAttributes = GetFileAttributes(path);
+		}
+		if (dwAttributes == INVALID_FILE_ATTRIBUTES && GetFullPathName(link, cchFilePath, path, NULL)) {
+			dwAttributes = GetFileAttributes(path);
+		}
+	} else {
+		if (!GetFullPathName(link, cchFilePath, path, NULL)) {
+			lstrcpy(path, link);
+		}
+	}
+	return dwAttributes;
+}
+
 void EditOpenSelection(int type) {
 	Sci_Position cchSelection = SciCall_GetSelTextLength();
 	char *mszSelection = NULL;
@@ -6867,34 +6895,80 @@ void EditOpenSelection(int type) {
 	if (mszSelection == NULL) {
 		return;
 	}
-	/* remove quotes, spaces and some invalid filename characters (except '/', '\' and '?') */
-	StrTrimA(mszSelection, " \t\r\n'`\"<>|:*,;");
 	cchSelection = strlen(mszSelection);
-	if (cchSelection != 0) {
-		LPWSTR wszSelection = (LPWSTR)NP2HeapAlloc((max_pos(MAX_PATH, cchSelection) + 32) * sizeof(WCHAR));
-		LPWSTR link = wszSelection + 16;
+	if (cchSelection == 0) {
+		NP2HeapFree(mszSelection);
+		return;
+	}
 
-		const UINT cpEdit = SciCall_GetCodePage();
-		MultiByteToWideChar(cpEdit, 0, mszSelection, -1, link, (int)cchSelection);
+	LPWSTR wszSelection = (LPWSTR)NP2HeapAlloc((max_pos(MAX_PATH, cchSelection) + 32) * sizeof(WCHAR));
+	LPWSTR link = wszSelection + 16;
+	const UINT cpEdit = SciCall_GetCodePage();
+	MultiByteToWideChar(cpEdit, 0, mszSelection, -1, link, (int)cchSelection);
+	NP2HeapFree(mszSelection);
 
-		WCHAR path[MAX_PATH];
-		WCHAR wchDirectory[MAX_PATH] = L"";
-		DWORD dwAttributes = GetFileAttributes(link);
+	/* remove quotes, spaces and some invalid filename characters (except '/', '\' and '?') */
+	StrTrim(link, L" \t\r\n'`\"<>|:*,;");
+	const int cchTextW = lstrlen(link);
+
+	if (cchTextW != 0) {
+		// scan line and column after file name.
+		LPCWSTR line = NULL;
+		LPCWSTR column = L"";
+		LPWSTR back = link + cchTextW - 1;
+
+		LPWSTR p = back;
+		if (*p == L')') {
+			--p;
+			--back;
+		}
+		while (*p >= L'0' && *p <= L'9') {
+			--p;
+		}
+		if (p != back && (*p == L':' || *p == L',' || *p == L'(')) {
+			line = p + 1;
+			back = p;
+			if (*p == L',') {
+				*p = L'\0';
+			}
+			if (*p != L'(') {
+				--p;
+				while (*p >= L'0' && *p <= L'9') {
+					--p;
+				}
+				if (p != back - 1) {
+					column = line;
+					line = p + 1;
+					if (*p == L':' && *back == L':') {
+						// filename:line:column: warning
+						*back = L'\0';
+						*p = L'\0';
+					}
+					back = p;
+				}
+			}
+		}
+
+		WCHAR path[MAX_PATH * 2];
+		WCHAR wchDirectory[MAX_PATH];
+		DWORD dwAttributes = EditOpenSelectionCheckFile(link, path, COUNTOF(path), wchDirectory);
 		if (dwAttributes == INVALID_FILE_ATTRIBUTES) {
-			if (StrNotEmpty(szCurFile)) {
-				lstrcpy(wchDirectory, szCurFile);
-				PathRemoveFileSpec(wchDirectory);
-				PathCombine(path, wchDirectory, link);
-				dwAttributes = GetFileAttributes(path);
+			if (line != NULL) {
+				const WCHAR ch = *back;
+				*back = L'\0';
+				dwAttributes = EditOpenSelectionCheckFile(link, path, COUNTOF(path), wchDirectory);
+				if (dwAttributes == INVALID_FILE_ATTRIBUTES) {
+					// line is port number or the file not exists
+					*back = ch;
+				} else {
+					link = path;
+				}
 			}
-			if (dwAttributes == INVALID_FILE_ATTRIBUTES && GetFullPathName(link, COUNTOF(path), path, NULL)) {
-				dwAttributes = GetFileAttributes(path);
+		} else {
+			link = path;
+			if (*back != L'\0') {
+				line = NULL;
 			}
-			if (dwAttributes != INVALID_FILE_ATTRIBUTES) {
-				lstrcpy(link, path);
-			}
-		} else if (GetFullPathName(link, COUNTOF(path), path, NULL)) {
-			lstrcpy(link, path);
 		}
 
 		if (type == 4) { // containing folder
@@ -6905,7 +6979,7 @@ void EditOpenSelection(int type) {
 			if (dwAttributes & FILE_ATTRIBUTE_DIRECTORY) {
 				type = 3;
 			} else {
-				const BOOL can = Style_CanOpenFile(link);
+				const BOOL can = line != NULL || Style_CanOpenFile(link);
 				// open supported file in a new window
 				type = can ? 2 : 1;
 			}
@@ -6932,6 +7006,13 @@ void EditOpenSelection(int type) {
 			PathRemoveFileSpec(wchDirectory);
 			PathQuoteSpaces(link);
 
+			LPWSTR lpParameters = link;
+			if (line != NULL) {
+				// TODO: improve the code when column is actually character index
+				lpParameters = (LPWSTR)NP2HeapAlloc(sizeof(path));
+				wsprintf(lpParameters, L"-g %s,%s %s", line, column, link);
+			}
+
 			SHELLEXECUTEINFO sei;
 			ZeroMemory(&sei, sizeof(SHELLEXECUTEINFO));
 			sei.cbSize = sizeof(SHELLEXECUTEINFO);
@@ -6939,11 +7020,14 @@ void EditOpenSelection(int type) {
 			sei.hwnd = hwndMain;
 			sei.lpVerb = NULL;
 			sei.lpFile = szModuleName;
-			sei.lpParameters = link;
+			sei.lpParameters = lpParameters;
 			sei.lpDirectory = wchDirectory;
 			sei.nShow = SW_SHOWNORMAL;
 
 			ShellExecuteEx(&sei);
+			if (line != NULL) {
+				NP2HeapFree(lpParameters);
+			}
 		}
 		break;
 
@@ -6959,11 +7043,9 @@ void EditOpenSelection(int type) {
 			OpenContainingFolder(hwndMain, link, TRUE);
 			break;
 		}
-
-		NP2HeapFree(wszSelection);
 	}
 
-	NP2HeapFree(mszSelection);
+	NP2HeapFree(wszSelection);
 }
 
 //=============================================================================
