@@ -5779,9 +5779,6 @@ sptr_t Editor::StyleGetMessage(unsigned int iMessage, uptr_t wParam, sptr_t lPar
 		return StringResult(lParam, vs.styles[wParam].fontName);
 	case SCI_STYLEGETUNDERLINE:
 		return vs.styles[wParam].underline ? 1 : 0;
-		// Added strike style, 2011-12-20
-	case SCI_STYLEGETSTRIKE:
-		return vs.styles[wParam].strike ? 1 : 0;
 	case SCI_STYLEGETCASE:
 		return static_cast<int>(vs.styles[wParam].caseForce);
 	case SCI_STYLEGETCHARACTERSET:
@@ -7178,7 +7175,6 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 	case SCI_STYLEGETSIZEFRACTIONAL:
 	case SCI_STYLEGETFONT:
 	case SCI_STYLEGETUNDERLINE:
-	case SCI_STYLEGETSTRIKE:
 	case SCI_STYLEGETCASE:
 	case SCI_STYLEGETCHARACTERSET:
 	case SCI_STYLEGETVISIBLE:
@@ -7424,9 +7420,6 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 		vs.selEOLFilled = wParam != 0;
 		InvalidateStyleRedraw();
 		break;
-
-	case SCI_GETEOLSELECTEDWIDTH:
-		return vs.eolSelectedWidth;
 
 	case SCI_SETEOLSELECTEDWIDTH:
 		vs.eolSelectedWidth = std::clamp(static_cast<int>(wParam), 0, 100);

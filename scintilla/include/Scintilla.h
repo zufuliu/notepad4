@@ -243,7 +243,7 @@ typedef sptr_t (*SciFnDirect)(sptr_t ptr, unsigned int iMessage, uptr_t wParam, 
 #define SCI_STYLESETEOLFILLED 2057
 #define SCI_STYLERESETDEFAULT 2058
 #define SCI_STYLESETUNDERLINE 2059
-#define SCI_STYLESETSTRIKE 3501
+#define SCI_STYLESETSTRIKE 2474
 #define SC_CASE_MIXED 0
 #define SC_CASE_UPPER 1
 #define SC_CASE_LOWER 2
@@ -256,7 +256,6 @@ typedef sptr_t (*SciFnDirect)(sptr_t ptr, unsigned int iMessage, uptr_t wParam, 
 #define SCI_STYLEGETFONT 2486
 #define SCI_STYLEGETEOLFILLED 2487
 #define SCI_STYLEGETUNDERLINE 2488
-#define SCI_STYLEGETSTRIKE 3502
 #define SCI_STYLEGETCASE 2489
 #define SCI_STYLEGETCHARACTERSET 2490
 #define SCI_STYLEGETVISIBLE 2491
@@ -279,7 +278,6 @@ typedef sptr_t (*SciFnDirect)(sptr_t ptr, unsigned int iMessage, uptr_t wParam, 
 #define SCI_SETSELALPHA 2478
 #define SCI_GETSELEOLFILLED 2479
 #define SCI_SETSELEOLFILLED 2480
-#define SCI_GETEOLSELECTEDWIDTH 2474
 #define SCI_SETEOLSELECTEDWIDTH 2475
 #define SCI_SETCARETFORE 2069
 #define SCI_ASSIGNCMDKEY 2070
@@ -862,8 +860,8 @@ typedef sptr_t (*SciFnDirect)(sptr_t ptr, unsigned int iMessage, uptr_t wParam, 
 #define CARETSTYLE_BLOCK 2
 #define CARETSTYLE_OVERSTRIKE_BAR 0
 #define CARETSTYLE_OVERSTRIKE_BLOCK 0x10
-#define CARETSTYLE_BLOCK_AFTER 0x100
 #define CARETSTYLE_INS_MASK 0xF
+#define CARETSTYLE_BLOCK_AFTER 0x100
 #define SCI_SETCARETSTYLE 2512
 #define SCI_GETCARETSTYLE 2513
 #define SCI_SETINDICATORCURRENT 2500

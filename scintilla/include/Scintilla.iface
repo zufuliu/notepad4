@@ -300,7 +300,7 @@ val SC_IME_INLINE=1
 # Is the IME displayed in a window or inline?
 get IMEInteraction GetIMEInteraction=2678(,)
 
-# Choose to display the IME in a winow or inline.
+# Choose to display the IME in a window or inline.
 set void SetIMEInteraction=2679(IMEInteraction imeInteraction,)
 
 enu Alpha=SC_ALPHA_
@@ -587,7 +587,7 @@ fun void StyleResetDefault=2058(,)
 set void StyleSetUnderline=2059(int style, bool underline)
 
 # Set a style to be strike or not.
-set void StyleSetStrike=3501(int style, bool strike)
+set void StyleSetStrike=2474(int style, bool strike)
 
 enu CaseVisible=SC_CASE_
 val SC_CASE_MIXED=0
@@ -620,9 +620,6 @@ get bool StyleGetEOLFilled=2487(int style,)
 
 # Get is a style underlined or not.
 get bool StyleGetUnderline=2488(int style,)
-
-# Get is a style strike or not.
-get bool StyleGetStrike=3502(int style,)
 
 # Get is a style mixed case, or to force upper or lower case.
 get CaseVisible StyleGetCase=2489(int style,)
@@ -687,9 +684,6 @@ get bool GetSelEOLFilled=2479(,)
 
 # Set the selection to have its end of line filled or not.
 set void SetSelEOLFilled=2480(bool filled,)
-
-# Get the eol-is-selected rectangle width.
-get int GetEOLSelectedWidth=2474(,)
 
 # Set the eol-is-selected rectangle width.
 set void SetEOLSelectedWidth=2475(int percent,)
@@ -2415,8 +2409,8 @@ val CARETSTYLE_LINE=1
 val CARETSTYLE_BLOCK=2
 val CARETSTYLE_OVERSTRIKE_BAR=0
 val CARETSTYLE_OVERSTRIKE_BLOCK=0x10
-val CARETSTYLE_BLOCK_AFTER=0x100
 val CARETSTYLE_INS_MASK=0xF
+val CARETSTYLE_BLOCK_AFTER=0x100
 
 # Set the style of the caret to be drawn.
 set void SetCaretStyle=2512(CaretStyle caretStyle,)
