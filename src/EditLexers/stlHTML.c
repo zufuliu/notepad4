@@ -21,10 +21,11 @@ static KEYWORDLIST Keywords_HTML = {{
 "marquee menu menuitem multicol nextid nobr noembed noframes plaintext rb rtc spacer strike tt xmp "
 
 , // 1 JavaScript
-"async await break case catch class const continue debugger default delete do else export extends finally for function if import in "
-"instanceof let new return static super switch this throw try typeof var void while with yield "
-"null true false undefined "
+"Infinity NaN arguments async await break case catch class const continue debugger default delete do else extends "
+"false finally for function globalThis if in instanceof let new null return static super switch "
+"this throw true try typeof undefined var void while with yield "
 "enum implements interface package private protected public "
+"__dirname __filename as export exports from import module require "
 
 , // 2 VBScript
 "Alias And As Attribute Begin Boolean ByRef Byte ByVal Call Case Class Compare Const Continue "

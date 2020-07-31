@@ -121,8 +121,8 @@ def BuildKeywordContent(rid, keywordList, keywordCount=16):
 		AllKeywordAttrList[rid] = nonzero
 	return output
 
-def UpdateKeywordFile(rid, path, keywordList):
-	output = BuildKeywordContent(rid, keywordList)
+def UpdateKeywordFile(rid, path, keywordList, keywordCount=16):
+	output = BuildKeywordContent(rid, keywordList, keywordCount=keywordCount)
 	Regenerate(path, '//', output)
 
 def read_api_file(path, comment):
@@ -375,6 +375,78 @@ def parse_go_api_file(path):
 def update_go_keyword():
 	keywordList = parse_go_api_file('lang/Go.go')
 	UpdateKeywordFile('NP2LEX_GO', '../src/EditLexers/stlGO.c', keywordList)
+
+# JavaScript
+def parse_javascript_api_file(path):
+	sections = read_api_file(path, '//')
+	keywordMap = {}
+	for key, doc in sections:
+		if key in ('keywords', 'future reserved words'):
+			keywordMap[key] = set(doc.split())
+		elif key == 'module':
+			items = set()
+			for item in doc.split():
+				index = item.find('(')
+				if index > 0:
+					item = item[:index]
+				items.add(item)
+			keywordMap[key] = items
+		elif key == 'api':
+			classes = set(['JSON', 'jQuery'])
+			constant = set()
+			functions = set()
+			properties = set(['URL'])
+
+			items = re.findall(r'^\s*(\w+)(.?)', doc, re.MULTILINE)
+			for item, kind in items:
+				if item[0].isupper():
+					if any(ch.islower() for ch in item):
+						classes.add(item)
+					elif kind == '(':
+						functions.add(item + '(')
+					else:
+						constant.add(item)
+				else:
+					if kind == '(':
+						functions.add(item + '(')
+					else:
+						properties.add(item)
+
+			items = ['function', 'require', 'import']
+			for item in items:
+				functions.add(item + '(')
+
+			keywordMap['class'] = classes
+			keywordMap['constant'] = constant
+			keywordMap['function'] = functions
+			keywordMap['properties'] = properties
+
+	RemoveDuplicateKeyword(keywordMap, [
+		'module',
+		'keywords',
+		'future reserved words',
+		'class',
+		'properties',
+		'constant',
+	])
+	keywordList = [
+		('keywords', keywordMap['keywords'], KeywordAttr.Default),
+		('future reserved words', keywordMap['future reserved words'], KeywordAttr.Default),
+		('Preprocessor', [], KeywordAttr.Default),
+		('Directive', [], KeywordAttr.Default),
+		('module', keywordMap['module'], KeywordAttr.Default),
+		('class', keywordMap['class'], KeywordAttr.Default),
+		('Interface', [], KeywordAttr.Default),
+		('Enumeration', [], KeywordAttr.Default),
+		('constant', keywordMap['constant'], KeywordAttr.Default),
+		('function', keywordMap['function'], KeywordAttr.NoLexer),
+		('properties', keywordMap['properties'], KeywordAttr.NoLexer),
+	]
+	return keywordList
+
+def update_javascript_keyword():
+	keywordList = parse_javascript_api_file('lang/JavaScript.js')
+	UpdateKeywordFile('NP2LEX_JS', '../src/EditLexers/stlJavaScript.c', keywordList, 15)
 
 # Julia
 def parse_julia_api_file(path):
@@ -763,6 +835,7 @@ def update_all_keyword():
 	update_cmake_keyword()
 	update_gn_keyword()
 	update_go_keyword()
+	update_javascript_keyword()
 	update_julia_keyword()
 	update_kotlin_keyword()
 	update_llvm_keyword()

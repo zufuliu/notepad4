@@ -78,7 +78,7 @@ Latest development builds (artifacts in Release configuration for each compiler 
 	* Boost Jam
 	* Java, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#java)
 		* JavaDoc
-	* [JavaScript](../master/tools/lang/JavaScript.js), up to ECMAScript 2018, 9ed.
+	* [JavaScript](../master/tools/lang/JavaScript.js), up to ECMAScript 2020 (11th edition) with [Web APIs](https://developer.mozilla.org/en-US/docs/Web/API).
 	* JSON and JSON5 Document
 	* Julia Script, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#julia)
 		* [Julia Base and Standard Library](../master/tools/lang/Julia.jl), up to 1.2.
