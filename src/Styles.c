@@ -1188,12 +1188,6 @@ void Style_UpdateLexerKeywordAttr(LPCEDITLEXER pLexNew) {
 	case NP2LEX_JAVA:
 		attr[10] = KeywordAttr_NoLexer;		// Package
 		break;
-	case NP2LEX_JS:
-		//attr[1] = KeywordAttr_NoAutoComp;	// Reserved Word
-		attr[9] = KeywordAttr_NoLexer;		// Function
-		attr[10] = KeywordAttr_NoLexer;		// Property
-		attr[11] = KeywordAttr_NoLexer;		// Method
-		break;
 	case NP2LEX_NSIS:
 		attr[0] = KeywordAttr_MakeLower;
 		break;
@@ -1246,6 +1240,10 @@ void Style_UpdateLexerKeywordAttr(LPCEDITLEXER pLexNew) {
 		attr[7] = KeywordAttr_NoLexer;		// variables
 		attr[8] = KeywordAttr_NoLexer;		// function
 		attr[9] = KeywordAttr_NoLexer;		// package
+		break;
+	case NP2LEX_JS:
+		attr[9] = KeywordAttr_NoLexer;		// function
+		attr[10] = KeywordAttr_NoLexer;		// properties
 		break;
 	case NP2LEX_JULIA:
 		attr[1] = KeywordAttr_NoAutoComp;	// code fold

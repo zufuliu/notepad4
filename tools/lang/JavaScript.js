@@ -1,6 +1,7 @@
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Lexical_grammar
-// https://www.ecma-international.org/publications/standards/Ecma-262.htm
+// 2020 11.0 https://www.ecma-international.org/publications/standards/Ecma-262.htm
 
+//! keywords
 async await
 break
 case catch class const continue
@@ -17,19 +18,43 @@ while with
 yield
 let
 static
-enum
-implements interface package private protected public
 
+null true false
+globalThis
 Infinity
 NaN
 undefined
+arguments
 
-// https://www.ecma-international.org/ecma-262/9.0/index.html#sec-imports
-// https://www.ecma-international.org/ecma-262/9.0/index.html#sec-exports
-import as from;
-export as;
-export default;
+//! future reserved words
+enum implements interface package private protected public
+// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Lexical_grammar
+// ECMAScript 1 till 3
+// abstract boolean byte char double final float goto int long native short synchronized throws transient volatile
 
+// typeof Operator Results
+// undefined object boolean number string symbol bigint function
+
+// Meta Properties
+// new.target // 2020
+// import.meta // 2020
+
+//! module
+// https://www.ecma-international.org/ecma-262/11.0/index.html#sec-imports
+// https://www.ecma-international.org/ecma-262/11.0/index.html#sec-exports
+import as from
+import(path) // 2020
+export as
+// export default
+
+// https://nodejs.org/api/globals.html
+__dirname
+__filename
+exports
+module
+require(path)
+
+//! API
 eval(x)
 isFinite(number)
 isNaN(number)
@@ -47,10 +72,11 @@ Object([value]) {
 	create(O, Properties)
 	defineProperties(O, Properties)
 	defineProperty(O, P, Attributes)
-	entries(O)
+	entries(O) // 2017
 	freeze(O)
+	fromEntries(iterable) // 2019
 	getOwnPropertyDescriptor(O, P)
-	getOwnPropertyDescriptors(O)
+	getOwnPropertyDescriptors(O) // 2017
 	getOwnPropertyNames(O)
 	getOwnPropertySymbols(O)
 	getPrototypeOf(O)
@@ -62,8 +88,8 @@ Object([value]) {
 	preventExtensions(O)
 	seal(O)
 	setPrototypeOf(O, proto)
-	values(O)
-	prototype
+	values(O) // 2017
+	prototype:
 		constructor
 		hasOwnProperty(V)
 		isPrototypeOf(V)
@@ -82,7 +108,7 @@ Object([value]) {
 Function(p1, p2, … , pn, body) {
 	length
 	name
-	prototype
+	prototype:
 		apply(thisArg, argArray)
 		bind(thisArg, ...args)
 		call(thisArg, ...args)
@@ -97,6 +123,7 @@ Symbol([description]) {
 	isConcatSpreadable
 	iterator
 	match
+	matchAll // 2020
 	replace
 	search
 	species
@@ -113,13 +140,14 @@ Error(message) {
 	message
 	name
 
+	AggregateError // MDN
+	// Native Error Types
 	EvalError
 	RangeError
 	ReferenceError
 	SyntaxError
 	TypeError
 	URIError
-	NativeError
 }
 
 Number(value) {
@@ -138,10 +166,15 @@ Number(value) {
 	isSafeInteger(number)
 	parseFloat(string)
 	parseInt(string, radix)
-	prototype
+	prototype:
 		toExponential(fractionDigits)
 		toFixed(fractionDigits)
 		toPrecision(precision)
+}
+
+BigInt(value) {
+	asIntN(bits, bigint)
+	asUintN(bits, bigint)
 }
 
 Math {
@@ -197,7 +230,7 @@ Date(year, month [, date [, hours [, minutes [, seconds [, ms]]]]]) {
 	UTC(year [, month [, date [, hours [, minutes [, seconds [, ms]]]]]])
 	now()
 	parse(string)
-	prototype
+	prototype:
 		getDate()
 		getDay()
 		getFullYear()
@@ -249,7 +282,7 @@ String(value) {
 	fromCodePoint(...codePoints)
 	raw(template, ...substitutions)
 	length
-	prototype
+	prototype:
 		charAt(pos)
 		charCodeAt(pos)
 		codePointAt(pos)
@@ -260,6 +293,7 @@ String(value) {
 		lastIndexOf(searchString [, position])
 		localeCompare(that [, reserved1 [, reserved2]])
 		match(regexp)
+		matchAll(regexp) // 2020
 		normalize([form])
 		padEnd(maxLength [, fillString])
 		padStart(maxLength [, fillString])
@@ -275,6 +309,8 @@ String(value) {
 		toLowerCase()
 		toUpperCase()
 		trim()
+		trimEnd() // 2019
+		trimStart() // 2019
 		iterator
 			next()
 
@@ -298,10 +334,10 @@ String(value) {
 RegExp(pattern, flags) {
 	compile(pattern, flags)
 	lastIndex
-	prototype
+	prototype:
 		exec(string)
 		test(S)
-		dotAll
+		dotAll // 2018
 		flags
 		global
 		ignoreCase
@@ -318,7 +354,7 @@ Array(...items) {
 	isArray(arg)
 	of(...items)
 	length
-	prototype
+	prototype:
 		concat(...arguments)
 		copyWithin(target, start [, end])
 		entries()
@@ -327,8 +363,10 @@ Array(...items) {
 		filter(callbackfn [, thisArg])
 		find(predicate [, thisArg])
 		findIndex(predicate [, thisArg])
+		flat([depth]) // 2019
+		flatMap(mapperFunction [, thisArg]) // 2019
 		forEach(callbackfn [, thisArg])
-		includes(searchElement [, fromIndex])
+		includes(searchElement [, fromIndex]) // 2016
 		indexOf(searchElement [, fromIndex])
 		join(separator)
 		keys()
@@ -349,7 +387,7 @@ Array(...items) {
 		iterator
 		unscopables
 
-	TypedArray
+	// TypedArray
 		Int8Array
 		Uint8Array
 		Uint8ClampedArray
@@ -357,12 +395,21 @@ Array(...items) {
 		Uint16Array
 		Int32Array
 		Uint32Array
+		BigInt64Array // 2020
+		BigUint64Array // 2020
 		Float32Array
 		Float64Array
+		prototype:
+			BYTES_PER_ELEMENT
+			buffer
+			byteLength
+			byteOffset
+			set(overloaded [, offset ])
+			subarray(begin, end)
 }
 
 Map([iterable]) {
-	prototype
+	prototype:
 		clear()
 		delete(key)
 		entries()
@@ -378,7 +425,7 @@ Map([iterable]) {
 }
 
 Set([iterable]) {
-	prototype
+	prototype:
 		add(value)
 		clear()
 		delete(value)
@@ -391,7 +438,7 @@ Set([iterable]) {
 }
 
 WeakMap([iterable]) {
-	prototype
+	prototype:
 		delete(key)
 		get(key)
 		has(key)
@@ -399,7 +446,7 @@ WeakMap([iterable]) {
 }
 
 WeakSet([iterable]) {
-	prototype
+	prototype:
 		add(value)
 		delete(value)
 		has(value)
@@ -407,22 +454,24 @@ WeakSet([iterable]) {
 
 ArrayBuffer(length) {
 	isView(arg)
-	prototype
+	prototype:
 		byteLength
 		slice(start, end)
 }
 
 SharedArrayBuffer(length) {
-	prototype
+	prototype:
 		byteLength
 		slice(start, end)
 }
 
 DataView(buffer [, byteOffset [, byteLength]]) {
-	prototype
+	prototype:
 		buffer
 		byteLength
 		byteOffset
+		getBigInt64(byteOffset [, littleEndian]) // 2020
+		getBigUint64(byteOffset [, littleEndian]) // 2020
 		getFloat32(byteOffset [, littleEndian])
 		getFloat64(byteOffset [, littleEndian])
 		getInt8(byteOffset)
@@ -432,6 +481,8 @@ DataView(buffer [, byteOffset [, byteLength]]) {
 		getUint8(byteOffset)
 		getUint16(byteOffset [, littleEndian])
 		getUint32(byteOffset [, littleEndian])
+		setBigInt64(byteOffset, value [, littleEndian])
+		setBigUint64(byteOffset, value [, littleEndian])
 		setFloat32(byteOffset, value [, littleEndian])
 		setFloat64(byteOffset, value [, littleEndian])
 		setInt8(byteOffset, value)
@@ -462,8 +513,14 @@ JSON {
 	stringify(value [, replacer [, space]])
 }
 
-Generator {
-	prototype
+GeneratorFunction(p1, p2, … , pn, body) {
+}
+AsyncGeneratorFunction(p1, p2, … , pn, body) {
+}
+
+// Generator, AsyncGenerator
+{
+	prototype:
 		next(value)
 		return(value)
 		throw(exception)
@@ -471,11 +528,13 @@ Generator {
 
 Promise(executor) {
 	all(iterable)
+	allSettled(iterable) // 2020
 	race(iterable)
 	reject(r)
 	resolve(x)
-	prototype
+	prototype:
 		catch(onRejected)
+		finally(onFinally)
 		then(onFulfilled, onRejected)
 }
 
@@ -502,8 +561,305 @@ Proxy(target, handler) {
 	revocable(target, handler)
 }
 
+// JScript
+// https://developer.mozilla.org/en-US/docs/Archive/Web/JavaScript/Microsoft_Extensions
+ActiveXObject(servername.typename[, location])
+ConversionError
+Debug {
+	write([str1 [, str2 [, ... [, strN]]]])
+	writeln([str1 [, str2 [, ... [, strN]]]])
+}
+Enumerator([collection]) {
+	atEnd()
+	item()
+	moveFirst()
+	moveNext()
+}
+VBArray {
+	dimensions()
+	getItem(dimension1[, dimension2, ...], dimensionN)
+	lbound(dimension)
+	toArray()
+	ubound(dimension)
+}
+WScript {
+	echo()
+	quit()
+}
+WinRTError
+// GetObject([pathname] [, class])
+
+// https://developer.mozilla.org/en-US/docs/Web/API
+// https://developer.mozilla.org/en-US/docs/Web/API/Console
+{
+	assert(assertion, obj1 [, obj2, ..., objN])
+	assert(assertion, msg [, subst1, ..., substN]) // C-like message formatting
+	clear()
+	count([label])
+	countReset([label])
+	debug(obj1 [, obj2, ..., objN])
+	debug(msg [, subst1, ..., substN])
+	dir(object)
+	dirxml(object)
+	error(obj1 [, obj2, ..., objN])
+	error(msg [, subst1, ..., substN])
+	exception(obj1 [, obj2, ..., objN])
+	exception(msg [, subst1, ..., substN])
+	group([label])
+	groupCollapsed([label])
+	groupEnd()
+	info(obj1 [, obj2, ..., objN])
+	info(msg [, subst1, ..., substN])
+	log(obj1 [, obj2, ..., objN])
+	log(msg [, subst1, ..., substN])
+	table(data [, columns])
+	time(label)
+	timeEnd(label)
+	timeLog(label)
+	trace( [...any, ...data ])
+	warn(obj1 [, obj2, ..., objN])
+	warn(msg [, subst1, ..., substN])
+}
+
+// https://developer.mozilla.org/en-US/docs/Web/API/Document_Object_Model
+// https://developer.mozilla.org/en-US/docs/Web/API/EventTarget
+EventTarget() {
+	addEventListener(type, listener [, options])
+	addEventListener(type, listener [, useCapture])
+	dispatchEvent(event)
+	removeEventListener(type, listener[, options])
+	removeEventListener(type, listener[, useCapture])
+}
+
+// https://developer.mozilla.org/en-US/docs/Web/API/Node
+{
+	baseURI
+	childNodes
+	firstChild
+	isConnected
+	lastChild
+	nextSibling
+	nodeName
+	nodeType
+	nodeValue
+	ownerDocument
+	parentNode
+	parentElement
+	previousSibling
+	textContent
+	appendChild(aChild)
+	cloneNode([deep])
+	compareDocumentPosition(otherNode)
+	contains(otherNode)
+	getRootNode(options)
+	hasChildNodes()
+	insertBefore(newNode, referenceNode)
+	isDefaultNamespace(namespaceURI)
+	isEqualNode(otherNode)
+	isSameNode(otherNode)
+	lookupPrefix()
+	lookupNamespaceURI(prefix)
+	normalize()
+	removeChild(child)
+	replaceChild(newChild, oldChild)
+}
+
+// https://developer.mozilla.org/en-US/docs/Web/API/Element
+{
+	attributes
+	classList
+	className
+	clientHeight
+	clientLeft
+	clientTop
+	clientWidth
+	id
+	innerHTML
+	localName
+	namespaceURI
+	nextElementSibling
+	outerHTML
+	part
+	prefix
+	previousElementSibling
+	scrollHeight
+	scrollLeft
+	scrollTop
+	scrollWidth
+	shadowRoot
+	assignedSlot
+	attachShadow(shadowRootInit)
+	getAttribute(attributeName)
+	getAttributeNames()
+	getAttributeNS(namespace, name)
+	getBoundingClientRect()
+	getClientRects()
+	getElementsByClassName(names)
+	getElementsByTagName(tagName)
+	getElementsByTagNameNS(namespaceURI, localName)
+	hasAttribute(name)
+	hasAttributeNS(namespace,localName)
+	hasAttributes()
+	hasPointerCapture(pointerId)
+	insertAdjacentElement(position, element)
+	insertAdjacentHTML(position, text)
+	insertAdjacentText(position, element)
+	querySelector(selectors)
+	querySelectorAll(selectors)
+	releasePointerCapture(pointerId)
+	removeAttribute(attrName)
+	removeAttributeNS(namespace, attrName)
+	scroll(x-coord, y-coord)
+	scroll(options)
+	scrollBy(x-coord, y-coord)
+	scrollBy(options)
+	scrollTo(x-coord, y-coord)
+	scrollTo(options)
+	setAttribute(name, value)
+	setAttributeNS(namespace, name, value)
+	setPointerCapture(pointerId)
+	toggleAttribute(name [, force])
+}
+
+// https://developer.mozilla.org/en-US/docs/Web/API/Document
+Document() {
+	body
+	characterSet
+	doctype
+	documentElement
+	documentURI
+	embeds
+	fonts
+	forms
+	head
+	hidden
+	images
+	implementation
+	links
+	plugins
+	scripts
+	scrollingElement
+	visibilityState
+	childElementCount
+	children
+	firstElementChild
+	lastElementChild
+	// Extensions
+	cookie
+	defaultView
+	designMode
+	dir
+	domain
+	lastModified
+	location
+	readyState
+	referrer
+	title
+	URL
+	activeElement
+	fullscreenElement
+	// Methods
+	adoptNode(externalNode)
+	createAttribute(name)
+	createCDATASection(data)
+	createComment(data)
+	createDocumentFragment()
+	createElement(tagName[, options])
+	createElementNS(namespaceURI, qualifiedName[, options])
+	createNodeIterator(root[, whatToShow[, filter]])
+	createProcessingInstruction(target, data)
+	createRange()
+	createTextNode(data)
+	createTreeWalker(root, whatToShow[, filter[, entityReferenceExpansion]])
+	getElementsByClassName(names)
+	getElementsByTagName(name)
+	getElementsByTagNameNS(namespace, name)
+	importNode(externalNode [, deep])
+	getElementById(id)
+	querySelector(selectors)
+	querySelectorAll(selectors)
+	createExpression(xpathText, namespaceURLMapper)
+	createNSResolver(node)
+	evaluate(xpathExpression, contextNode, namespaceResolver, resultType, result)
+	// Extension
+	close()
+	getElementsByName(name)
+	hasFocus()
+	open()
+	write(markup)
+	writeln(line)
+	elementFromPoint(x, y)
+}
+
+// https://developer.mozilla.org/en-US/docs/Web/API/Window
+{
+	console
+	customElements
+	crypto
+	document
+	event
+	frameElement
+	frames
+	history
+	innerHeight
+	innerWidth
+	length
+	location
+	locationbar
+	localStorage
+	menubar
+	name
+	navigator
+	opener
+	outerHeight
+	outerWidth
+	pageXOffset
+	pageYOffset
+	parent
+	performance
+	personalbar
+	screen
+	screenX
+	screenLeft
+	screenY
+	screenTop
+	scrollbars
+	scrollX
+	scrollY
+	self
+	sessionStorage
+	status
+	statusbar
+	toolbar
+	top
+	window
+	alert(message)
+	blur()
+	close()
+	confirm(message)
+	focus()
+	getComputedStyle(element [, pseudoElt])
+	getSelection()
+	matchMedia(mediaQueryString)
+	moveBy(deltaX, deltaY)
+	moveTo(x, y)
+	open(url, windowName, [windowFeatures])
+	postMessage(message, targetOrigin, [transfer])
+	print()
+	prompt(message, default)
+	requestAnimationFrame(callback)
+	resizeBy(xDelta, yDelta)
+	resizeTo(width, height)
+	scroll(x-coord, y-coord)
+	scroll(options)
+	scrollBy(x-coord, y-coord)
+	scrollBy(options)
+	scrollTo(x-coord, y-coord)
+	scrollTo(options)
+	stop()
+}
+
 // https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest
-// https://xhr.spec.whatwg.org/
 XMLHttpRequest() {
 	UNSENT
 	OPENED
@@ -533,11 +889,10 @@ XMLHttpRequest() {
 }
 
 // https://developer.mozilla.org/en-US/docs/Web/API/FormData
-// https://xhr.spec.whatwg.org/#formdata
 FormData([form]) {
 	append(name, value [, filename])
 	delete(name)
-	delete(name)
+	entries()
 	get(name)
 	getAll(name)
 	has(name)
@@ -547,32 +902,28 @@ FormData([form]) {
 }
 
 // https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope
-WindowOrWorkerGlobalScope {
+{
+	indexedDB
 	atob(encodedData)
 	btoa(stringToEncode)
 	clearInterval(intervalID)
 	clearTimeout(timeoutID)
 	createImageBitmap(image[, sx, sy, sw, sh[, options]]).then(function(response) { ... })
-	Promise<Response> fetch(input[, init])
+	fetch(input[, init]) -> Promise<Response>
+	queueMicrotask(function)
 	setInterval(func, delay[, param1, param2, ...])
 	setTimeout(function[, delay, param1, param2, ...])
 }
 
 // https://developer.mozilla.org/en-US/docs/Web/API/Storage
-Storage {
+{
 	length
 	clear()
-	getItem()
-	key()
-	removeItem()
-	setItem()
-	localStorage
-	sessionStorage
+	getItem(keyName)
+	key(index)
+	removeItem(keyName)
+	setItem(keyName, keyValue)
 }
 
-// https://nodejs.org/api/globals.html
-__dirname
-__filename
-exports
-module
-require(path)
+// https://api.jquery.com/
+jQuery
