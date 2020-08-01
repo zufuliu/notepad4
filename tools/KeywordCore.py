@@ -141,7 +141,6 @@ def read_api_file(path, comment):
 	return sections
 
 
-# CMake
 def parse_cmake_api_file(path):
 	# languages from https://gitlab.kitware.com/cmake/cmake/blob/master/Auxiliary/vim/extract-upper-case.pl
 	cmakeLang = "ASM C CSharp CUDA CXX Fortran Java RC Swift".split()
@@ -257,11 +256,6 @@ def parse_cmake_api_file(path):
 	]
 	return keywordList
 
-def update_cmake_keyword():
-	keywordList = parse_cmake_api_file('lang/CMake.cmake')
-	UpdateKeywordFile('NP2LEX_CMAKE', '../src/EditLexers/stlCMake.c', keywordList)
-
-# GN
 def parse_gn_api_file(path):
 	sections = read_api_file(path, '#')
 	keywordMap = {}
@@ -287,11 +281,6 @@ def parse_gn_api_file(path):
 	]
 	return keywordList
 
-def update_gn_keyword():
-	keywordList = parse_gn_api_file('lang/GN.gn')
-	UpdateKeywordFile('NP2LEX_GN', '../src/EditLexers/stlGN.c', keywordList)
-
-# Go
 def parse_go_api_file(path):
 	sections = read_api_file(path, '//')
 	keywordMap = {}
@@ -372,11 +361,6 @@ def parse_go_api_file(path):
 	]
 	return keywordList
 
-def update_go_keyword():
-	keywordList = parse_go_api_file('lang/Go.go')
-	UpdateKeywordFile('NP2LEX_GO', '../src/EditLexers/stlGO.c', keywordList)
-
-# JavaScript
 def parse_javascript_api_file(path):
 	sections = read_api_file(path, '//')
 	keywordMap = {}
@@ -444,11 +428,6 @@ def parse_javascript_api_file(path):
 	]
 	return keywordList
 
-def update_javascript_keyword():
-	keywordList = parse_javascript_api_file('lang/JavaScript.js')
-	UpdateKeywordFile('NP2LEX_JS', '../src/EditLexers/stlJavaScript.c', keywordList, 15)
-
-# Julia
 def parse_julia_api_file(path):
 	sections = read_api_file(path, '#')
 	keywordMap = {}
@@ -501,11 +480,6 @@ def parse_julia_api_file(path):
 	]
 	return keywordList
 
-def update_julia_keyword():
-	keywordList = parse_julia_api_file('lang/Julia.jl')
-	UpdateKeywordFile('NP2LEX_JULIA', '../src/EditLexers/stlJulia.c', keywordList)
-
-# Kotlin
 def parse_kotlin_api_file(path):
 	sections = read_api_file(path, '//')
 	keywordMap = {}
@@ -559,11 +533,6 @@ def parse_kotlin_api_file(path):
 	]
 	return keywordList
 
-def update_kotlin_keyword():
-	keywordList = parse_kotlin_api_file('lang/Kotlin.kt')
-	UpdateKeywordFile('NP2LEX_KOTLIN', '../src/EditLexers/stlKotlin.c', keywordList)
-
-# LLVM IR
 def parse_llvm_api_file(path):
 	sections = read_api_file(path, ';')
 	keywordMap = {}
@@ -591,11 +560,6 @@ def parse_llvm_api_file(path):
 	]
 	return keywordList
 
-def update_llvm_keyword():
-	keywordList = parse_llvm_api_file('lang/LLVM.ll')
-	UpdateKeywordFile('NP2LEX_LLVM', '../src/EditLexers/stlLLVM.c', keywordList)
-
-# Ruby
 def parse_ruby_api_file(path):
 	sections = read_api_file(path, '#')
 	keywordMap = {}
@@ -615,11 +579,6 @@ def parse_ruby_api_file(path):
 	]
 	return keywordList
 
-def update_ruby_keyword():
-	keywordList = parse_ruby_api_file('lang/Ruby.rb')
-	UpdateKeywordFile('NP2LEX_RUBY', '../src/EditLexers/stlRuby.c', keywordList)
-
-# Rust
 def parse_rust_api_file(path):
 	sections = read_api_file(path, '//')
 	keywordMap = {}
@@ -717,11 +676,6 @@ def parse_rust_api_file(path):
 	]
 	return keywordList
 
-def update_rust_keyword():
-	keywordList = parse_rust_api_file('lang/Rust.rs')
-	UpdateKeywordFile('NP2LEX_RUST', '../src/EditLexers/stlRust.c', keywordList)
-
-# Vim
 def parse_vim_api_file(path):
 	sections = read_api_file(path, '"')
 	keywordMap = {}
@@ -739,12 +693,11 @@ def parse_vim_api_file(path):
 	]
 	return keywordList
 
-def update_vim_keyword():
-	keywordList = parse_vim_api_file('lang/Vim.vim')
-	UpdateKeywordFile('NP2LEX_VIM', '../src/EditLexers/stlVim.c', keywordList)
+def parse_wasm_lexer_keywords(path):
+	if not os.path.isfile(path):
+		AllKeywordAttrList['NP2LEX_WASM'] = [(3, KeywordAttr.NoLexer, 'full instruction')]
+		return []
 
-# WebAssembly
-def parse_web_assembly_lexer_keywords(path):
 	keywordMap = {
 		'keywords': [],
 		'type': [],
@@ -800,18 +753,8 @@ def parse_web_assembly_lexer_keywords(path):
 	]
 	return keywordList
 
-def update_web_assembly_keyword():
-	url = 'https://github.com/WebAssembly/wabt/blob/master/src/lexer-keywords.txt'
-	path = 'wasm-lexer-keywords.txt'
-	if not os.path.isfile(path):
-		print(f'please manually download {url}\nand save it as {path}')
-		AllKeywordAttrList['NP2LEX_WASM'] = [(3, KeywordAttr.NoLexer, 'full instruction')]
-		return
-	keywordList = parse_web_assembly_lexer_keywords(path)
-	UpdateKeywordFile('NP2LEX_WASM', '../src/EditLexers/stlWASM.c', keywordList)
-
 # Style_UpdateLexerKeywordAttr()
-def update_lexer_keyword_attr():
+def update_lexer_keyword_attr(path):
 	output = []
 	for rid, nonzero in sorted(AllKeywordAttrList.items()):
 		output.append(f'\tcase {rid}:')
@@ -828,19 +771,4 @@ def update_lexer_keyword_attr():
 			output.append(f'\t\t{line}{padding}// {comment}')
 		output.append('\t\tbreak;')
 
-	Regenerate('../src/Styles.c', '//', output)
-
-# update all keywords in order
-def update_all_keyword():
-	update_cmake_keyword()
-	update_gn_keyword()
-	update_go_keyword()
-	update_javascript_keyword()
-	update_julia_keyword()
-	update_kotlin_keyword()
-	update_llvm_keyword()
-	update_ruby_keyword()
-	update_rust_keyword()
-	update_vim_keyword()
-	update_web_assembly_keyword()
-	update_lexer_keyword_attr()
+	Regenerate(path, '//', output)
